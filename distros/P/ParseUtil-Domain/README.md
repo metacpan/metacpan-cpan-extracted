@@ -113,8 +113,3 @@ Toggles a domain between puny encoded and decoded versions.
 -
 The [Public Suffix List](http://publicsuffix.org/list/).
 
-# CHANGES
-
-- Added extra _prefix_ and _name_ fields to output to separate the actual registered part of the domain from subdomains (or things like _www_).
-- Updated with latest version of the public suffix list.
-- Added a bunch of new TLDs (nTLDs).

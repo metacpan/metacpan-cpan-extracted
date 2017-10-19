@@ -21,7 +21,7 @@ use Carp;
 
 use Audio::WMA;
 
-our $VERSION = 0.1;
+our $VERSION = 0.11;
 
 my %data = (
 	artist => 'ALBUMARTIST',

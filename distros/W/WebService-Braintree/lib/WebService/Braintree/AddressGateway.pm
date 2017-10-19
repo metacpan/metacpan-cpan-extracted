@@ -1,5 +1,8 @@
 package WebService::Braintree::AddressGateway;
-$WebService::Braintree::AddressGateway::VERSION = '0.93';
+$WebService::Braintree::AddressGateway::VERSION = '0.94';
+use 5.010_001;
+use strictures 1;
+
 use Moose;
 with 'WebService::Braintree::Role::MakeRequest';
 
@@ -35,5 +38,6 @@ sub delete {
 }
 
 __PACKAGE__->meta->make_immutable;
-1;
 
+1;
+__END__

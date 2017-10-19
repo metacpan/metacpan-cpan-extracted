@@ -1,6 +1,7 @@
 package WebService::Braintree::Digest;
-$WebService::Braintree::Digest::VERSION = '0.93';
-use strict;
+$WebService::Braintree::Digest::VERSION = '0.94';
+use 5.010_001;
+use strictures 1;
 
 use Digest::HMAC_SHA1 qw(hmac_sha1 hmac_sha1_hex);
 use Digest::SHA1;
@@ -8,11 +9,23 @@ use Digest::SHA256;
 use Digest::SHA qw(hmac_sha256_hex);
 use WebService::Braintree::DigestSHA256;
 
-use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS );
+use vars qw(@ISA @EXPORT @EXPORT_OK);
 use Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(hexdigest hexdigest_256);
 our @EXPORT_OK = qw();
+
+sub hexdigest {
+    my($key, $data) = @_;
+    return _hexdigest($key, $data, "SHA-1");
+}
+
+sub hexdigest_256 {
+    my($key, $data) = @_;
+    return _hexdigest($key, $data, "SHA-256");
+}
+
+# Methods below here are only used within this class.
 
 sub algo_class {
     my ($algo) = @_;
@@ -26,16 +39,6 @@ sub algo_class {
 sub hmac {
     my($key, $algo) = @_;
     return Digest::HMAC->new($key, algo_class($algo));
-}
-
-sub hexdigest {
-    my($key, $data) = @_;
-    return _hexdigest($key, $data, "SHA-1");
-}
-
-sub hexdigest_256 {
-    my($key, $data) = @_;
-    return _hexdigest($key, $data, "SHA-256");
 }
 
 sub _hexdigest {
@@ -53,6 +56,7 @@ sub key_digest {
     return $sha->digest;
 }
 
+# UNUSED?
 sub secure_compare {
     my ($left, $right) = @_;
 
@@ -75,3 +79,4 @@ sub secure_compare {
 }
 
 1;
+__END__

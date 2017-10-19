@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings FATAL => 'all';
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 use Net::HTTP;
 use URI;
@@ -28,8 +28,8 @@ sub new {
         '_host'       => 'localhost',
         '_port'       => 8123,
         '_database'   => 'default',
-        '_user'       => ':',
-        '_password'   => 48,
+        '_user'       => '',
+        '_password'   => '',
         '_keep_alive' => 1,
         '_format'     => 'TabSeparated',
         '_socket'     => undef,
@@ -94,7 +94,7 @@ sub new {
 
         # create URI object
         my $uri = URI->new(sprintf ("http://%s:%d/?database=%s", $self->{'_host'}, $self->{'_port'}, $self->{'_database'}));
-        $uri->query_param('user' => $self->{'_user'});
+        $uri->query_param('user' => $self->{'_user'}) if $self->{'_user'};
         $uri->query_param('password' => $self->{'_password'}) if $self->{'_password'};
 
         $self->{'_socket'} = $socket;
@@ -115,9 +115,9 @@ sub new {
         return &try (
             $cb,
             catch {
-                    $self->_connect();
-                    $cb->();
-                }
+                $self->_connect();
+                $cb->();
+            }
         );
     }
 }
@@ -155,12 +155,23 @@ sub disconnect {
 sub select {
     my ($self, $query) = @_;
     return $self->_query(sub {
-            my $query_url = $self->_construct_query_uri( $query );
+        my $method;
+        my $query_url;
+        my @post_data = ();
+        if (length ($query) <= 7000) {
+            $query_url = $self->_construct_query_uri( $query );
+            $method = 'GET';
+        }
+        else {
+            $query_url = $self->_get_uri()->clone();
+            $method = 'POST';
+            push @post_data, $query;
+        }
 
-            $self->_get_socket()->write_request( 'GET' => $query_url );
-            return $self->_parse_response();
-        });
 
+        $self->_get_socket()->write_request( $method => $query_url, @post_data );
+        return $self->_parse_response($query);
+    });
 }
 
 sub select_value {
@@ -173,13 +184,13 @@ sub select_value {
 sub do {
     my ($self, $query, @rows) = @_;
     return $self->_query(sub {
-            my @prepared_rows = $self->_prepare_query(@rows);
-            my $query_url = $self->_construct_query_uri($query);
-            my $post_data = scalar @prepared_rows ? join (",", map { "(" . join (",", @{ $_ }) . ")" } @prepared_rows) : "\n" ;
+        my @prepared_rows = $self->_prepare_query(@rows);
+        my $query_url = $self->_construct_query_uri($query);
+        my $post_data = scalar @prepared_rows ? join (",", map { "(" . join (",", @{ $_ }) . ")" } @prepared_rows) : "\n" ;
 
-            $self->_get_socket()->write_request('POST' => $query_url, $post_data);
-            return $self->_parse_response();
-        });
+        $self->_get_socket()->write_request('POST' => $query_url, $post_data);
+        return $self->_parse_response($query);
+    });
 
 }
 
@@ -205,14 +216,15 @@ sub ping {
 }
 
 sub _parse_response {
-    my ($self) = @_;
+    my ($self, $query) = @_;
     my ($code, $mess) = $self->_get_socket()->read_response_headers();
     if ($code == 200 ) {
         return _formaty_query_result( $self->_read_body() );
-    } else {
+    }
+    else {
         my $add_mess = _formaty_query_result( $self->_read_body() );
-        if (defined $add_mess) { $add_mess = $add_mess->[0]->[0] };
-        die "ClickHouse error: $mess ($add_mess)";
+        if (defined $add_mess) { $add_mess = $add_mess->[0]->[0] // '' };
+        die "ClickHouse error: $mess ($add_mess)\n\t$query";
     }
 }
 
@@ -220,13 +232,17 @@ sub _read_body {
     my ($self) = @_;
 
     my @response;
+    my $chunk = '';
     while (1) {
         my $buf;
         my $n = $self->_get_socket()->read_entity_body($buf, 1024);
         die "can't read response: $!" unless defined $n;
         last unless $n;
+        $buf = $chunk . $buf;
         push @response, split (/\n/, $buf);
+        $chunk = substr ($buf,-1) eq "\n" ? '' : pop @response;
     }
+    push @response, $chunk if $chunk;
     return \@response;
 }
 
@@ -276,6 +292,7 @@ sub _escape_value {
         $value = qq{''};
     }
     elsif ($type eq 'STRING') {
+        utf8::encode($value) if utf8::is_utf8($value);
         $value =~  s{\\}{\\\\}g;
         $value =~  s/'/\\'/g;
         $value = qq{'$value'};
@@ -300,7 +317,7 @@ ClickHouse - Database driver for Clickhouse OLAP Database
 
 =head1 VERSION
 
-Version 0.01
+Version 0.03
 
 
 
@@ -403,10 +420,10 @@ L<http://search.cpan.org/dist/ClickHouse/>
 Copyright 2016 Ilya Rassadin.
 
 This program is free software; you can redistribute it and/or modify it
-under the terms of the the Artistic License (1.0). You may obtain a
+under the terms of the the Artistic License (2.0). You may obtain a
 copy of the full license at:
 
-L<http://www.perlfoundation.org/artistic_license_1_0>
+   The Artistic License 2.0 (GPL Compatible)
 
 Aggregation of this Package with a commercial distribution is always
 permitted provided that the use of this Package is embedded; that is,

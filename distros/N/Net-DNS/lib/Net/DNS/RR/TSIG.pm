@@ -1,9 +1,9 @@
 package Net::DNS::RR::TSIG;
 
 #
-# $Id: TSIG.pm 1567 2017-05-19 09:52:52Z willem $
+# $Id: TSIG.pm 1597 2017-09-22 08:04:02Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1567 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
 
 
 use strict;
@@ -50,7 +50,7 @@ use constant TSIG => typebyname qw(TSIG);
 
 	my %algbyval = reverse @algbyname;
 
-	my @algrehash = map /^\d/ ? ($_) x 3 : do { s/[\W]//g; uc($_) }, @algbyname, @algalias;
+	my @algrehash = map /^\d/ ? ($_) x 3 : do { s/[\W_]//g; uc($_) }, @algbyname, @algalias;
 	my %algbyname = @algrehash;				# work around broken cperl
 
 	sub _algbyname {
@@ -221,10 +221,8 @@ sub macbin {
 
 sub prior_mac {
 	my $self = shift;
-	my @args = map { /[^0-9A-Fa-f]/ ? croak "corrupt hexadecimal" : $_ } @_;
-
-	$self->prior_macbin( pack "H*", join "", @args ) if scalar @args;
-	unpack "H*", $self->prior_macbin() if defined wantarray;
+	return unpack "H*", $self->prior_macbin() unless scalar @_;
+	$self->prior_macbin( pack "H*", map /[^\dA-F]/i ? croak "corrupt hex" : $_, join "", @_ );
 }
 
 
@@ -238,10 +236,8 @@ sub prior_macbin {
 
 sub request_mac {
 	my $self = shift;
-	my @args = map { /[^0-9A-Fa-f]/ ? croak "corrupt hexadecimal" : $_ } @_;
-
-	$self->request_macbin( pack "H*", join "", @args ) if scalar @args;
-	unpack "H*", $self->request_macbin() if defined wantarray;
+	return unpack "H*", $self->request_macbin() unless scalar @_;
+	$self->request_macbin( pack "H*", map /[^\dA-F]/i ? croak "corrupt hex" : $_, join "", @_ );
 }
 
 
@@ -381,21 +377,19 @@ sub create {
 			key  => $key
 			);
 
-	} elsif ( $karg =~ /[+.0-9]+private$/ ) {		# ( keyfile, options )
+	} elsif ( $karg =~ /private$/ ) {			# ( keyfile, options )
 		require File::Spec;
 		require Net::DNS::ZoneFile;
 		my $keyfile = new Net::DNS::ZoneFile($karg);
 		my ( $alg, $key, $junk );
-		while ( my $line = $keyfile->_getline ) {
-			for ($line) {
-				( $junk, $alg ) = split if /Algorithm:/;
-				( $junk, $key ) = split if /Key:/;
-			}
+		while ( $keyfile->_getline ) {
+			( $junk, $alg ) = split if /Algorithm:/;
+			( $junk, $key ) = split if /Key:/;
 		}
 
 		my ( $vol, $dir, $file ) = File::Spec->splitpath( $keyfile->name );
-		my $kname;
-		$kname = $1 if $file =~ /^K([^+]+)+.+private$/;
+		croak "misnamed private key" unless $file =~ /^K([^+]+)+.+private$/;
+		my $kname = $1;
 		return new Net::DNS::RR(
 			name	  => $kname,
 			type	  => 'TSIG',

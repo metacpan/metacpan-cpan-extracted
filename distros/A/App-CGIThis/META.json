@@ -1,0 +1,62 @@
+{
+   "abstract" : "Export the current directory like a cgi-bin",
+   "author" : [
+      "simbabque <simbabque@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-CGIThis",
+   "no_index" : {
+      "directory" : [
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Net::Rendezvous::Publish" : "0"
+         },
+         "requires" : {
+            "CGI::Compile" : "0",
+            "CGI::Emulate::PSGI" : "0",
+            "File::Find::Rule" : "0",
+            "Getopt::Long" : "0",
+            "Plack::App::CGIBin" : "0",
+            "Plack::Builder" : "0",
+            "Plack::Runner" : "0",
+            "Pod::Usage" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "App::CGIThis" : {
+         "file" : "lib/App/CGIThis.pm",
+         "version" : "0.003"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.003",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+}
+

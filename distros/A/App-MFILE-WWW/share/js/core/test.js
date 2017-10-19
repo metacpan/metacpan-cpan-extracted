@@ -42,20 +42,23 @@ require ([
     'tests/dummy',
     'tests/cf',
     'tests/current-user',
+    'tests/datetime',
     'tests/lib',
-    'tests/prototypes'
+    'tests/prototypes',
 ], function (
     QUnit,
     dummyTests,
     cfTests,
     currentUserTests,
+    dateTimeTests,
     libTests,
-    prototypeTests
+    prototypeTests,
 ) {
     QUnit.module("mfile-www core");
     dummyTests();
     cfTests();
     currentUserTests();
+    dateTimeTests();
     libTests();
     prototypeTests();
 });

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 use Test::More;
-use Math::Prime::Util qw/binomial factorial
+use Math::Prime::Util qw/binomial factorial factorialmod
                          forcomb forperm forderange formultiperm
                          numtoperm permtonum randperm shuffle/;
 my $extra = defined $ENV{EXTENDED_TESTING} && $ENV{EXTENDED_TESTING};
@@ -21,7 +21,8 @@ my %perms = (
 # TODO: Add a bunch of combs here:  "5,3" => [[..],[..],[..]],
 
 plan tests => 1                        # Factorial
-            + 6 + 4                    # Combinations
+            + 1                        # Factorialmod
+            + 7 + 4                    # Combinations
             + scalar(keys(%perms)) + 1 # Permutations
             + 4                        # Multiset Permutations
             + 5                        # Derangements
@@ -37,11 +38,17 @@ sub fact { my $n = Math::BigInt->new("$_[0]"); $n->bfac; }
   is_deeply( \@result, \@expect, "Factorials 0 to 100" );
 }
 
+{
+  my @result = map { my $m=$_; map { factorialmod($_,$m) } 0..$m-1; } 1 .. 50;
+  my @expect = map { my $m=$_; map { factorial($_) % $m; } 0..$m-1; } 1 .. 50;
+  is_deeply( \@result, \@expect, "factorialmod n! mod m for m 1 to 50, n 0 to m" );
+}
+
 
 { my @p = (); forcomb { push @p, [@_] } 0;
   is_deeply( [@p], [[]], "forcomb 0" ); }
 { my @p = (); forcomb { push @p, [@_] } 1;
-  is_deeply( [@p], [[0]], "forcomb 1" ); }
+  is_deeply( [@p], [[],[0]], "forcomb 1" ); }
 { my @p = (); forcomb { push @p, [@_] } 0,0;
   is_deeply( [@p], [[]], "forcomb 0,0" ); }
 { my @p = (); forcomb { push @p, [@_] } 5,0;
@@ -50,6 +57,8 @@ sub fact { my $n = Math::BigInt->new("$_[0]"); $n->bfac; }
   is_deeply( [@p], [], "forcomb 5,6" ); }
 { my @p = (); forcomb { push @p, [@_] } 5,5;
   is_deeply( [@p], [[0,1,2,3,4]], "forcomb 5,5" ); }
+{ my @p = (); forcomb { push @p, [@_] } 3;
+  is_deeply( [@p], [[],[0],[1],[2],[0,1],[0,2],[1,2],[0,1,2]], "forcomb 3 (power set)" ); }
 
 { my @data = (qw/apple bread curry/);
   my @p = (); forcomb { push @p, [@data[@_]] } @data,2;

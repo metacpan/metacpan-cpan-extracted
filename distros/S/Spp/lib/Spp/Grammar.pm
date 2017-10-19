@@ -1,41 +1,35 @@
 package Spp::Grammar;
 
 use 5.012;
-no warnings "experimental";
+no warnings 'experimental';
 
 use Exporter;
 our @ISA    = qw(Exporter);
-our @EXPORT = qw(get_grammar);
+our @EXPORT = qw(get_spp_grammar);
 
-sub get_grammar {
-   return << 'EOF'
+sub get_spp_grammar {
+  return <<'EOF'
 
-  spp       = |_ Spec|+ $ ;
+
+  door      = |_ Spec|+ $ ;
 
   _         = |\s+ _comm|+ ;
   _comm     = '//' ~ $$ ;
 
-  Spec      = Token \s* '=' |_ Branch @rule|+ |';' $| ;
-  
-  @rule      = |
-               Group In Out Qstr Qint
-               Token Str String Kstr Point
+  Spec      = Token \s* '=' |_ Branch rule|+ |';' $| ;
+
+  rule      = |
+               Group Token Str String Kstr
                Cclass Char Chclass
                Sym Expr Assert Any
-               Look Not Till Int
+               Look Not Till
               | ;
 
-  Branch    = '|'  |_ @rule|+ '|' ;
-  Group     = '{'  |_ Branch @rule|+ '}' ;
+  Branch    = '|'  |_ rule|+ '|' ;
+  Group     = '{'  |_ Branch rule|+ '}' ;
 
-  In        = '<' ;
-  Out       = '>' ;
-  Qstr      = '#' ;
-  Qint      = '&' ;
-
-  Token     = [@\a\-]+ ;
+  Token     = [\a\-]+ ;
   Kstr      = ':' [\a\-]+ ;
-  Point     = '0x' \x+ ;
 
   Str       = \' |Chars Char|+ \' ;
   Chars     = [^\\']+ ;
@@ -60,14 +54,13 @@ sub get_grammar {
   Not       = '!' ;
   Till      = '~' ;
 
-  Sym       = '$' [\a\-]+ ;
-  Expr      = '(' |_ @atom|+ ')' ;
-  Array     = '[' |_ @atom|* ']' ;
-  Sub       = [\a\-]+ ; 
-  Int       = \d+ ;
-  @atom     = | Expr Array Str Sub Sym Kstr Int | ;
+  Sym       = [@$] [\a\-]+ ;
+  Sub       = [\a\-]+ ;
+  Expr      = '(' |_ atom|+ ')' ;
+  Array     = '[' |_ atom|* ']' ;
+  atom      = | Array Sub Sym Kstr | ;
+
 
 EOF
 }
-
 1;

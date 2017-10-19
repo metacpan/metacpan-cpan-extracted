@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Devel::MAT::Tool );
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 use List::Util qw( pairs );
 

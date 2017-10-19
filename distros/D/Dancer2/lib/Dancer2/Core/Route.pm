@@ -1,6 +1,6 @@
 package Dancer2::Core::Route;
 # ABSTRACT: Dancer2's route handler
-$Dancer2::Core::Route::VERSION = '0.205001';
+$Dancer2::Core::Route::VERSION = '0.205002';
 use Moo;
 use Dancer2::Core::Types;
 use Carp 'croak';
@@ -272,7 +272,7 @@ Dancer2::Core::Route - Dancer2's route handler
 
 =head1 VERSION
 
-version 0.205001
+version 0.205002
 
 =head1 ATTRIBUTES
 
@@ -301,11 +301,11 @@ A HashRef of conditions on which the matching will depend. Optional.
 
 =head2 match
 
-Try to match the route with a given pair of method/path.
+Try to match the route with a given L<Dancer2::Core::Request> object.
 Returns the hash of matching data if success (captures and values of the route
-against the path) or undef if not.
+against the path of the request) or C<undef> if not.
 
-    my $match = $route->match( get => '/hello/sukria' );
+    my $match = $route->match( $request );
 
 =head2 execute
 

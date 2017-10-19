@@ -1,6 +1,7 @@
 package WebService::Braintree::Dispute::Reason;
-$WebService::Braintree::Dispute::Reason::VERSION = '0.93';
-use strict;
+$WebService::Braintree::Dispute::Reason::VERSION = '0.94';
+use 5.010_001;
+use strictures 1;
 
 use constant CancelledRecurringTransaction => "cancelled_recurring_transaction";
 use constant CreditNotProcessed => "credit_not_processed";
@@ -14,3 +15,4 @@ use constant ProductUnsatisfactory => "product_unsatisfactory";
 use constant TransactionAmountDiffers => "transaction_amount_differs";
 
 1;
+__END__

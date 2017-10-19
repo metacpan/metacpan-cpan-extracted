@@ -1,0 +1,9 @@
+Revision history for Perl extension Hash::Iterator.
+
+0.02    16.10.2017 (OTHER)
+				- Added a Pod document for Hash/Iterator.pm
+				- Added a testing (Critic, Pod, Tidy)
+
+0.01  Sun Oct 15 23:33:30 2017
+	- original version; created by h2xs 1.23 with options
+		-b 5.8.8 -XAn Hash::Iterator

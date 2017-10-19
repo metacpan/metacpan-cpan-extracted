@@ -6,7 +6,7 @@
                                      |___/ 
 
 
-This is the README for C::Utility version 0.006.
+This is the README for C::Utility version 0.007.
 
 C::Utility is a "module" for the Perl computer programming language, a
 library of computer code to install on a computer.  This document contains
@@ -27,7 +27,22 @@ four sections:
 C::Utility - utilities for generating C programs
 
 This module contains functions which assist in automatic generation of
-C programs.
+C programs.  "convert_to_c_string" converts a string into a string
+with characters correctly escaped for use in a C
+program. "convert_to_c_string_pc" does the same thing plus escaping
+percent signs so that they may be used as format strings for
+printf. "ch_files" makes a header file name from a C file
+name. "escape_string" escapes double quotes. "valid_c_variable"
+checks whether a string is valid as a C variable. "wrapper_name"
+returns a C preprocessor wrapper name. "print_top_h_wrapper" prints
+the top wrapper for a header file, and "print_bottom_h_wrapper"
+prints the bottom part. "print_include" prints "#include"
+statements. "hash_to_c_file" converts a Perl hash into a compilable
+C file with the keys as C strings. "line_directive" prints a C line
+directive. "brute_force_line" puts line directives on every
+line. "add_lines" converts the string #line to line directives as do
+"linein" and "lineout". "remove_quotes" removes leading and
+trailing quotes. "stamp_file" adds a printed stamp to a file handle.
 
 -----------------------------------------------------------------------------
 
@@ -60,11 +75,11 @@ If you have the App::cpanminus installer, you may prefer
 
     cpanm C::Utility
 
-To install the module from the source file, C-Utility-0.006.tar.gz, follow
+To install the module from the source file, C-Utility-0.007.tar.gz, follow
 this sequence of commands:
 
-    tar xfz C-Utility-0.006.tar.gz
-    cd C-Utility-0.006
+    tar xfz C-Utility-0.007.tar.gz
+    cd C-Utility-0.007
     perl Makefile.PL
     make
     make install
@@ -89,6 +104,6 @@ repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Thu Feb  9 12:50:11 2017.
+This README was written on Fri Oct 13 18:28:33 2017.
 
 -----------------------------------------------------------------------------

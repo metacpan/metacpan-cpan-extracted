@@ -61,16 +61,7 @@ C<Accept=true> is set, a service template file
 foo@.service must exist from which services
 are instantiated for each incoming connection.
 
-Unless C<DefaultDependencies> in the C<[Unit]> section is set to
-C<false>, socket units will implicitly have dependencies of type C<Requires> and
-C<After> on sysinit.target as well as dependencies of type
-C<Conflicts> and C<Before> on shutdown.target. These ensure
-that socket units pull in basic system initialization, and are terminated cleanly prior to system shutdown. Only
-sockets involved with early boot or late system shutdown should disable this option.
-
-Socket units will have a C<Before>
-dependency on the service which they trigger added implicitly. No
-implicit C<WantedBy> or
+No implicit C<WantedBy> or
 C<RequiredBy> dependency from the socket to the
 service is added. This means that the service may be started
 without the socket, in which case it must be able to open sockets
@@ -457,7 +448,7 @@ for details. Defaults to SOMAXCONN (128).',
 this socket to. If set, traffic will only be accepted from the
 specified network interfaces. This controls the
 SO_BINDTODEVICE socket option (see L<socket(7)>
-for details). If this option is used, an automatic dependency
+for details). If this option is used, an implicit dependency
 from this socket unit on the network interface device unit
 (L<systemd.device(5)>
 is created. Note that setting this parameter might result in
@@ -1049,13 +1040,12 @@ off.',
       },
       'Symlinks',
       {
-        'description' => 'Takes a list of file system paths. The
-specified paths will be created as symlinks to the AF_UNIX
-socket path or FIFO path of this socket unit. If this setting
-is used, only one AF_UNIX socket in the file system or one
-FIFO may be configured for the socket unit. Use this option to
-manage one or more symlinked alias names for a socket, binding
-their lifecycle together. Defaults to the empty
+        'description' => 'Takes a list of file system paths. The specified paths will be created as symlinks to the
+C<AF_UNIX> socket path or FIFO path of this socket unit. If this setting is used, only one
+C<AF_UNIX> socket in the file system or one FIFO may be configured for the socket unit. Use
+this option to manage one or more symlinked alias names for a socket, binding their lifecycle together. Note
+that if creation of a symlink fails this is not considered fatal for the socket unit, and the socket unit may
+still start. If an empty string is assigned, the list of paths is reset. Defaults to an empty
 list.',
         'type' => 'leaf',
         'value_type' => 'uniline'

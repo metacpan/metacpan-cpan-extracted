@@ -1,8 +1,6 @@
 README
 MANIFEST
 Makefile.PL
-perl_math_int64.c
-perl_math_int64.h
 typemap
 URPM.xs
 URPM.pm

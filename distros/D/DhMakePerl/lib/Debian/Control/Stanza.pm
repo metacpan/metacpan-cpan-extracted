@@ -12,7 +12,7 @@ Debian::Control::Stanza - single stanza of Debian source package control file
 
 =head1 DESCRIPTION
 
-Debian::Control::Stanza ins the base class for
+Debian::Control::Stanza is the base class for
 L<Debian::Control::Stanza::Source> and L<Debian::Control::Stanza::Binary>
 classes.
 
@@ -25,7 +25,7 @@ require v5.10.0;
 use strict;
 use warnings;
 
-our $VERSION = '0.71';
+our $VERSION = '0.96';
 
 use base qw( Class::Accessor Tie::IxHash );
 
@@ -48,8 +48,16 @@ L<Debian::Dependencies> class.
 
 use constant fields => ();
 
+my %canonical;
+
 sub import {
     my( $class ) = @_;
+
+    # map the accessor name for the lower case equivalent
+    %canonical = map (
+        ( lc($_) => $_ ),
+        $class->fields,
+    );
 
     $class->mk_accessors( $class->fields );
 }
@@ -87,6 +95,8 @@ sub new {
 
     while( my($k,$v) = each %$init ) {
         $k =~ s/-/_/g;
+        # translate field name into the accessor canonical name
+        $k = $canonical{ lc $k } || $k;
         $self->can($k)
             or croak "Invalid field given ($k)";
         $self->$k($v);

@@ -1,0 +1,152 @@
+# carton snapshot format: version 1.0
+DISTRIBUTIONS
+  Net-HTTP-6.09
+    pathname: E/ET/ETHER/Net-HTTP-6.09.tar.gz
+    provides:
+      Net::HTTP 6.09
+      Net::HTTP::Methods 6.09
+      Net::HTTP::NB 6.09
+      Net::HTTPS 6.09
+    requirements:
+      Compress::Raw::Zlib 0
+      ExtUtils::MakeMaker 0
+      IO::Select 0
+      IO::Socket::INET 0
+      IO::Uncompress::Gunzip 0
+      URI 0
+      perl 5.006002
+  Test-Simple-1.302047
+    pathname: E/EX/EXODIST/Test-Simple-1.302047.tar.gz
+    provides:
+      Test2 1.302047
+      Test2::API 1.302047
+      Test2::API::Breakage 1.302047
+      Test2::API::Context 1.302047
+      Test2::API::Instance 1.302047
+      Test2::API::Stack 1.302047
+      Test2::Event 1.302047
+      Test2::Event::Bail 1.302047
+      Test2::Event::Diag 1.302047
+      Test2::Event::Exception 1.302047
+      Test2::Event::Generic 1.302047
+      Test2::Event::Info 1.302047
+      Test2::Event::Note 1.302047
+      Test2::Event::Ok 1.302047
+      Test2::Event::Plan 1.302047
+      Test2::Event::Skip 1.302047
+      Test2::Event::Subtest 1.302047
+      Test2::Event::Waiting 1.302047
+      Test2::Formatter 1.302047
+      Test2::Formatter::TAP 1.302047
+      Test2::Hub 1.302047
+      Test2::Hub::Interceptor 1.302047
+      Test2::Hub::Interceptor::Terminator 1.302047
+      Test2::Hub::Subtest 1.302047
+      Test2::IPC 1.302047
+      Test2::IPC::Driver 1.302047
+      Test2::IPC::Driver::Files 1.302047
+      Test2::Util 1.302047
+      Test2::Util::ExternalMeta 1.302047
+      Test2::Util::HashBase 1.302047
+      Test2::Util::Trace 1.302047
+      Test::Builder 1.302047
+      Test::Builder::Formatter 1.302047
+      Test::Builder::IO::Scalar 2.113
+      Test::Builder::Module 1.302047
+      Test::Builder::Tester 1.302047
+      Test::Builder::Tester::Color 1.302047
+      Test::Builder::Tester::Tie 1.302047
+      Test::Builder::TodoDiag 1.302047
+      Test::More 1.302047
+      Test::Simple 1.302047
+      Test::Tester 1.302047
+      Test::Tester::Capture 1.302047
+      Test::Tester::CaptureRunner 1.302047
+      Test::Tester::Delegate 1.302047
+      Test::use::ok 1.302047
+      ok 1.302047
+    requirements:
+      ExtUtils::MakeMaker 0
+      File::Spec 0
+      File::Temp 0
+      PerlIO 0
+      Scalar::Util 1.13
+      Storable 0
+      perl 5.008001
+      utf8 0
+  Try-Tiny-0.24
+    pathname: E/ET/ETHER/Try-Tiny-0.24.tar.gz
+    provides:
+      Try::Tiny 0.24
+    requirements:
+      Carp 0
+      Exporter 5.57
+      ExtUtils::MakeMaker 0
+      constant 0
+      perl 5.006
+      strict 0
+      warnings 0
+  URI-1.71
+    pathname: E/ET/ETHER/URI-1.71.tar.gz
+    provides:
+      URI 1.71
+      URI::Escape 3.31
+      URI::Heuristic 4.20
+      URI::IRI 1.71
+      URI::QueryParam 1.71
+      URI::Split 1.71
+      URI::URL 5.04
+      URI::WithBase 2.20
+      URI::_foreign 1.71
+      URI::_generic 1.71
+      URI::_idna 1.71
+      URI::_ldap 1.71
+      URI::_login 1.71
+      URI::_punycode 1.71
+      URI::_query 1.71
+      URI::_segment 1.71
+      URI::_server 1.71
+      URI::_userpass 1.71
+      URI::data 1.71
+      URI::file 4.21
+      URI::file::Base 1.71
+      URI::file::FAT 1.71
+      URI::file::Mac 1.71
+      URI::file::OS2 1.71
+      URI::file::QNX 1.71
+      URI::file::Unix 1.71
+      URI::file::Win32 1.71
+      URI::ftp 1.71
+      URI::gopher 1.71
+      URI::http 1.71
+      URI::https 1.71
+      URI::ldap 1.71
+      URI::ldapi 1.71
+      URI::ldaps 1.71
+      URI::mailto 1.71
+      URI::mms 1.71
+      URI::news 1.71
+      URI::nntp 1.71
+      URI::pop 1.71
+      URI::rlogin 1.71
+      URI::rsync 1.71
+      URI::rtsp 1.71
+      URI::rtspu 1.71
+      URI::sftp 1.71
+      URI::sip 1.71
+      URI::sips 1.71
+      URI::snews 1.71
+      URI::ssh 1.71
+      URI::telnet 1.71
+      URI::tn3270 1.71
+      URI::urn 1.71
+      URI::urn::isbn undef
+      URI::urn::oid 1.71
+    requirements:
+      Exporter 5.57
+      ExtUtils::MakeMaker 0
+      MIME::Base64 2
+      Scalar::Util 0
+      parent 0
+      perl 5.008001
+      utf8 0

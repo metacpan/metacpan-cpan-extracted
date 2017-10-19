@@ -3,23 +3,27 @@ abstract: unknown
 author:
   - unknown
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.14, CPAN::Meta::Converter version 2.150001'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Mail-POP3
 no_index:
   directory:
     - t
     - inc
 requires:
-  Email::MIME: 0
-  HTML::Form: 0
-  HTML::FormatText: 0
-  HTTP::Cookies: 0
-version: 3.08
+  Email::MIME: '0'
+  HTML::Form: '0'
+  HTML::FormatText: '0'
+  HTTP::Cookies: '0'
+resources:
+  bugtracker: https://github.com/mohawk2/Mail-POP3/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/mohawk2/Mail-POP3
+version: '3.09'

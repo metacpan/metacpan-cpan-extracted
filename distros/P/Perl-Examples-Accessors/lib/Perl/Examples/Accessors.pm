@@ -1,7 +1,7 @@
 package Perl::Examples::Accessors;
 
-our $DATE = '2017-09-01'; # DATE
-our $VERSION = '0.130'; # VERSION
+our $DATE = '2017-10-15'; # DATE
+our $VERSION = '0.131'; # VERSION
 
 1;
 # ABSTRACT: A collection of example classes using various accessor generators
@@ -18,7 +18,7 @@ Perl::Examples::Accessors - A collection of example classes using various access
 
 =head1 VERSION
 
-This document describes version 0.130 of Perl::Examples::Accessors (from Perl distribution Perl-Examples-Accessors), released on 2017-09-01.
+This document describes version 0.131 of Perl::Examples::Accessors (from Perl distribution Perl-Examples-Accessors), released on 2017-10-15.
 
 =head1 DESCRIPTION
 

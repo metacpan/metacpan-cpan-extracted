@@ -17,6 +17,7 @@ struct message_address {
 	char *mailbox;
 	char *domain;
 	char *comment;
+	char *original;
 	/* there were errors when parsing this address */
 	bool invalid_syntax;
 };
@@ -28,7 +29,7 @@ struct message_address {
    Note that giving an empty string will return NULL since there are no
    addresses. */
 struct message_address *
-message_address_parse(const char *str, unsigned int max_addresses, bool fill_missing);
+message_address_parse(const char *str, size_t len, unsigned int max_addresses, bool fill_missing);
 
 void message_address_add(struct message_address **first, struct message_address **last,
 			 const char *name, const char *route, const char *mailbox,
@@ -39,7 +40,7 @@ void message_address_free(struct message_address **addr);
 void message_address_write(char **str, const struct message_address *addr);
 
 void compose_address(char **output, const char *mailbox, const char *domain);
-void split_address(const char *input, char **mailbox, char **domain);
+void split_address(const char *input, size_t input_len, char **mailbox, char **domain);
 
 void string_free(char *string);
 

@@ -6,22 +6,39 @@ use Dancer2::Plugin::WebSocket;
 
 websocket_on_open sub {
     my( $conn, $env ) = @_;
+    warn "opening $conn";
 };
 
 
 websocket_on_close sub {
     my( $conn ) = @_;
+    warn "closing $conn";
 };
 
 websocket_on_error sub {
     my ( $env ) = @_;
+    warn "Something went bonker";
 };
 
 websocket_on_message sub {
     my( $conn, $message ) = @_;
-    $message->{hello} = 'browser!';
-    warn "Got one!";
-    $conn->send( $message );
+
+    if ( $message->{hello} ) {
+        $message->{hello} = 'browser!';
+        $conn->send( $message );
+    }
+
+    if( my $browser = $message->{browser} ) {
+        $conn->add_channels( $browser );
+    }
+
+    if ( my $channel = $message->{emit} ) {
+        $conn->to($channel)->send({ emitting => $channel });
+    }
+
+    if ( my $channel = $message->{broadcast} ) {
+        $conn->to($channel)->broadcast({ broadcasting => $channel });
+    }
 };
 
 get '/' => sub {
@@ -33,15 +50,20 @@ get '/' => sub {
 			var urlMySocket = "$ws_url";
 
             var mySocket = new WebSocket(urlMySocket);
+            mySocket.sendJSON = function(message) { return this.send(JSON.stringify(message)) };
 
             mySocket.onmessage = function (evt) {
-                console.log( "Got message " + evt.data );
-                mySocket.close();
+                console.log( "Got message ", evt.data );
+//                mySocket.close();
             };
 
             mySocket.onopen = function(evt) {
                 console.log("opening");
-                setTimeout( function() { mySocket.send('{"hello": "Dancer"}'); }, 2000 );
+                let isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+                mySocket.sendJSON({
+                    browser: isChrome ? 'chrome' : 'firefox'
+                })
+                setTimeout( function() { mySocket.sendJSON({"hello": "Dancer"}); }, 2000 );
             };
 
 			</script>

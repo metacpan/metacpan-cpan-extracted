@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 
+BEGIN { push @INC, '.'; }
 use inc::MyBuilder;
 
 use FindBin '$Bin';

@@ -1,11 +1,14 @@
 package WebService::Braintree::TransparentRedirectGateway;
-$WebService::Braintree::TransparentRedirectGateway::VERSION = '0.93';
+$WebService::Braintree::TransparentRedirectGateway::VERSION = '0.94';
+use 5.010_001;
+use strictures 1;
+
 use Moose;
 with 'WebService::Braintree::Role::MakeRequest';
 
 use Carp qw(confess);
 use DateTime;
-use WebService::Braintree::Util;
+use WebService::Braintree::Util qw(hash_to_query_string);
 use WebService::Braintree::Digest qw(hexdigest);
 use WebService::Braintree::HTTP;
 use WebService::Braintree::Result;
@@ -33,7 +36,7 @@ sub create_customer_data {
     my ($self, $params) = @_;
     $self->requires($params, qw(redirect_url));
     $params->{'kind'} = 'create_customer';
-    return $self -> data_string($params);
+    return $self->data_string($params);
 }
 
 sub update_customer_data {
@@ -80,7 +83,7 @@ sub requires_type {
 
 sub time_string {
     my $dt = DateTime->now;
-    return $dt -> strftime("%Y%m%d%H%M%S");
+    return $dt->strftime("%Y%m%d%H%M%S");
 }
 
 sub data_string {
@@ -99,5 +102,6 @@ sub build_tr_data {
 }
 
 __PACKAGE__->meta->make_immutable;
-1;
 
+1;
+__END__

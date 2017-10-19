@@ -27,6 +27,7 @@ use vars qw(@EXPORT @ISA);
 Ring the bell.
 
 Should do something with I<$var_PreferVisibleBel> here, but what?
+
 =cut
 
 sub F_Ding($) {

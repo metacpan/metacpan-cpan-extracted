@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.73.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -15,14 +15,14 @@ not run its Makefile.PL or Build.PL.
 Hash: SHA1
 
 SHA1 846abd52ddad1c3141b395933fd10f14cb3cd7bc .gitignore
-SHA1 e3dd9692890aa2a330f3fa06fc72ee9c4d99354a Build.PL
-SHA1 c28b809041fffe23ec012c4a49b12bf9a1578295 Changes
+SHA1 cf2a8e9c893c079aec5ac8fca8bf5afc472554fb Build.PL
+SHA1 9fd88b5a09db2882fe419ca398ab648c89f39fa2 Changes
 SHA1 9546eeb74b22a29325aa9f25680754de1d2c66bd MANIFEST
-SHA1 5cc949633444715c30476b6cc3ec9ac8a0cb4618 META.json
-SHA1 0cf9af6b1218239cac47f4fe3189d0db52dc551b META.yml
-SHA1 d65cb8e21521e6063b5c9ff0aa5971133eb80697 Makefile.PL
+SHA1 7d82b740ac1da751490d3b18d22b873b55888b7c META.json
+SHA1 ae3deefcdeb95a151b603476b81ca5c8cf2b682f META.yml
+SHA1 6c97007f942e3d79516bad3e17cae3df3f5d6fe7 Makefile.PL
 SHA1 f39acd66237fdd46b843b872bf5636135afe0b07 README
-SHA1 51baafa53704c33b0a0dcdb0052095df132ae11d lib/Module/Runtime.pm
+SHA1 d20b3430d9b582c107f71f2fcab8bc5351a1f521 lib/Module/Runtime.pm
 SHA1 a0f9c0dfbe6472e81222a196a2f17554697d0d48 t/cmn.t
 SHA1 7324434239bc0678904a4eb406f6c3b08951b162 t/dependency.t
 SHA1 9331d0076c868209e9d3f0572d80f3e81df456df t/import_error.t
@@ -39,14 +39,14 @@ SHA1 8adfb7863317a2d0962a2538800cb5ad3bda1690 t/mnf.t
 SHA1 904d9a4f76525e2303e4b0c168c68230f223c8de t/pod_cvg.t
 SHA1 65c75abdef6f01a5d1588a307f2ddfe2333dc961 t/pod_syn.t
 SHA1 256e6d474b59dae11fd569f132c09079f9ac216a t/rm.t
-SHA1 5a0ef5f7a982fbaff5d501165ae2720f465c7560 t/taint.t
+SHA1 c7ec563b949b91a3c7b5c864607fcb8d7a0cfb9d t/taint.t
 SHA1 bfbc137c2e8721b12779c04c19869285714e0348 t/um.t
 SHA1 bf6317856eea0f9e36ddb75af8eda52f88a1d77f t/upo.t
 SHA1 0c5244ef9cc8c0ff2e07a6b8eb04ed742994aae9 t/upo_overridden.t
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1
 
-iEYEARECAAYFAllqs9UACgkQOV9mt2VyAVGR7wCeIGvW9/xLua3RXMYk78FHcFee
-FSkAoKQ/x6Tlk6cxBQGw8fN7rvJw4lWP
-=+SGA
+iEYEARECAAYFAlnmZ7kACgkQOV9mt2VyAVEj/gCeKs9vDfTwdU6OsSuxxGXYA9Gv
+PjkAnjPcXkbc5Eb6lWAEiHJbn2CnM16e
+=X0zz
 -----END PGP SIGNATURE-----

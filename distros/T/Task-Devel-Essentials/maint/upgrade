@@ -1,0 +1,52 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use version 0.77;
+use Module::Version qw(get_version);
+
+my $MAKEFILE_PL  = 'Makefile.PL';
+my $MAKEFILE_TMP = 'Makefile.TMP';
+my $THIS_YEAR    = this_year();
+
+my $changes = 0;
+
+open my $mf, '<', $MAKEFILE_PL  or die "$MAKEFILE_PL: cannot open: $!\n";
+open my $tf, '>', $MAKEFILE_TMP or die "$MAKEFILE_TMP: cannot create: $!\n";
+while (<$mf>) {
+    s/^(# Copyright \(c\) 2013-)\d{4}\b/$1$THIS_YEAR/;
+    s/^((?:requires|recommends)\s+'([\w\:]+)'\s*=>\s*')([\d._]+)(?=';)/$1 .
+        _get_version($2, $3)/e;
+    print $tf $_ or die "$MAKEFILE_TMP: cannot write: $!\n";
+}
+close $tf or die "$MAKEFILE_TMP: cannot write+close: $!\n";
+close $mf;
+
+if ($changes) {
+    die "To commit these changes, move $MAKEFILE_TMP to $MAKEFILE_PL\n";
+}
+
+unlink $MAKEFILE_TMP or die "$MAKEFILE_TMP: cannot remove: $!\n";
+
+sub this_year { (localtime)[5] + 1900 }
+
+sub _get_version {
+    my ($module, $old_version) = @_;
+    my $version = get_version($module);
+    if (!defined $version) {
+        warn "$module: not present, keeping version $old_version\n";
+        return $old_version;
+    }
+    my $cmp = version->parse($old_version) <=> version->parse($version);
+    if ($cmp > 1) {
+        warn "$module: too old, keeping version $old_version\n";
+        return $old_version;
+    }
+    if ($cmp) {
+        warn "$module: upgrading to version $version from $old_version\n";
+        ++$changes;
+    }
+    return $version;
+}
+
+__END__

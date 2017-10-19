@@ -24,14 +24,12 @@ const our $REDIRECT => {
 };
 
 sub http_request ($args) {
-
-    # set final url to the last accessed url
-    $args->{res}->set_url( $args->{url} );
+    my $res = Pcore::HTTP::Response->new( { status => 0 } );
 
     my $runtime;
 
     $runtime = {
-        res    => $args->{res},
+        res    => $res,
         h      => undef,
         finish => sub ( $error_status = undef, $error_reason = undef, $is_connect_error = undef ) {
             state $finished = 0;
@@ -41,15 +39,9 @@ sub http_request ($args) {
             $finished = 1;
 
             my $set_error = sub ( $error_status, $error_reason, $is_connect_error ) {
-                $args->{res}->set_status( $error_status, $error_reason );
+                $res->set_status( $error_status, $error_reason );
 
-                $args->{res}->{is_connect_error} = 1 if $is_connect_error;
-
-                if ( refaddr( $args->{res} ) != refaddr( $runtime->{res} ) ) {
-                    $runtime->{res}->set_status( $error_status, $error_reason );
-
-                    $runtime->{is_connect_error} = 1 if $is_connect_error;
-                }
+                $res->{is_connect_error} = 1 if $is_connect_error;
 
                 return;
             };
@@ -78,47 +70,50 @@ sub http_request ($args) {
                 $persistent ? $runtime->{h}->store($persistent) : $runtime->{h}->destroy;
 
                 # process redirect
-                if ( $runtime->{redirect} ) {
-                    if ( $args->{recurse} < 1 ) {
-                        $set_error->( 599, 'Too many redirections', 0 );
+                if ( $runtime->{redirect} && $args->{max_redirects} > 0 ) {
+                    $args->{max_redirects}--;
+
+                    # redirect type may require to switch request method during redirect
+                    if ( $REDIRECT->{ $res->status } ) {
+
+                        # change method to GET if original method was not "GET" or "HEAD"
+                        $args->{method} = 'GET' if $args->{method} ne 'HEAD';
+
+                        # do not resend request body
+                        delete $args->{body};
+                    }
+
+                    # parse LOCATION header, create uri object
+                    $res->{url} = $args->{url} = P->uri( $res->{headers}->{LOCATION}, base => $args->{url} );
+
+                    # set HOST header
+                    $args->{headers}->{HOST} = $args->{url}->host->name;
+
+                    # replace COOKIE headers
+                    if ( $args->{cookies} && ( my $cookies = $args->{cookies}->get_cookies( $args->{url} ) ) ) {
+                        $args->{headers}->{COOKIE} = join q[; ], $cookies->@*;
                     }
                     else {
-                        $args->{recurse}--;
-
-                        # redirect type may require to switch request method during redirect
-                        if ( $REDIRECT->{ $runtime->{res}->status } ) {
-
-                            # change method to GET if original method was not "GET" or "HEAD"
-                            $args->{method} = 'GET' if $args->{method} ne 'HEAD';
-
-                            # do not resend request body
-                            delete $args->{body};
-                        }
-
-                        $args->{url} = $runtime->{res}->headers->{LOCATION};
-
-                        # set HOST header
-                        $args->{headers}->{HOST} = $args->{url}->host->name;
-
-                        # replace COOKIE headers
-                        if ( $args->{cookies} && ( my $cookies = $args->{cookies}->get_cookies( $args->{url} ) ) ) {
-                            $args->{headers}->{COOKIE} = join q[; ], $cookies->@*;
-                        }
-                        else {
-                            delete $args->{headers}->{COOKIE};
-                        }
-
-                        # cleanup and recursive call on redirect
-                        $runtime->%* = ();
-
-                        undef $runtime;
-
-                        AE::postpone { http_request($args) };
-
-                        return;
+                        delete $args->{headers}->{COOKIE};
                     }
+
+                    # cleanup and recursive call on redirect
+                    $runtime->%* = ();
+
+                    undef $runtime;
+
+                    push $args->{_redirects}->@*, $res;
+
+                    AE::postpone { http_request($args) };
+
+                    return;
                 }
             }
+
+            # set final url to the last accessed url
+            $res->{url} = $args->{url};
+
+            $res->{redirect} = delete $args->{_redirects} if $args->{_redirects};
 
             my $on_finish = $args->{on_finish};
 
@@ -129,7 +124,7 @@ sub http_request ($args) {
 
             undef $runtime;
 
-            $on_finish->();
+            $on_finish->($res);
 
             return;
         },
@@ -367,24 +362,8 @@ sub _read_headers ( $args, $runtime, $cb ) {
                 # parse SET_COOKIE header, add cookies
                 $args->{cookies}->parse_cookies( $args->{url}, $res->{headers}->get('SET_COOKIE') ) if $args->{cookies} && $res->{headers}->{SET_COOKIE};
 
-                # handle redirect
-                $runtime->{redirect} = 0;
-
-                if ( exists $res->{headers}->{LOCATION} ) {
-
-                    # parse LOCATION header, create uri object
-                    $res->{headers}->{LOCATION} = P->uri( $res->{headers}->{LOCATION}, base => $args->{url} );
-
-                    # this is a redirect
-                    if ( exists $REDIRECT->{ $res->{status} } ) {
-                        $runtime->{redirect} = 1;
-
-                        # create new response object and set it as default response for current request
-                        $runtime->{res} = Pcore::HTTP::Response->new( { status => $res->{status} } );
-
-                        push $args->{res}->redirect->@*, $runtime->{res};
-                    }
-                }
+                # this is a redirect
+                $runtime->{redirect} = 1 if exists $res->{headers}->{LOCATION} && exists $REDIRECT->{ $res->{status} };
 
                 # clean and set content length
                 if ( my $cl = delete $res->{headers}->{CONTENT_LENGTH} ) {
@@ -683,13 +662,13 @@ sub _read_body ( $args, $runtime, $cb ) {
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
 ## |    3 |                      | Subroutines::ProhibitExcessComplexity                                                                          |
-## |      | 26                   | * Subroutine "http_request" with high complexity score (28)                                                    |
-## |      | 278                  | * Subroutine "_write_request" with high complexity score (25)                                                  |
-## |      | 413                  | * Subroutine "_read_body" with high complexity score (67)                                                      |
+## |      | 26                   | * Subroutine "http_request" with high complexity score (26)                                                    |
+## |      | 273                  | * Subroutine "_write_request" with high complexity score (25)                                                  |
+## |      | 392                  | * Subroutine "_read_body" with high complexity score (67)                                                      |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 393                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
+## |    3 | 372                  | ErrorHandling::RequireCheckingReturnValueOfEval - Return value of eval not tested                              |
 ## |------+----------------------+----------------------------------------------------------------------------------------------------------------|
-## |    3 | 625                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
+## |    3 | 604                  | ControlStructures::ProhibitDeepNests - Code structure is deeply nested                                         |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

@@ -2,7 +2,7 @@ use strict;
 use Test::More tests => 3;
 
 our %CONFIG;
-do 't/testcommon.pl';
+do './t/testcommon.pl';
 
 use File::Temp;
 use Net::POP3;

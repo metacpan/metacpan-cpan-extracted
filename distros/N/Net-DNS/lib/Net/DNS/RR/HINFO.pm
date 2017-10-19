@@ -1,9 +1,9 @@
 package Net::DNS::RR::HINFO;
 
 #
-# $Id: HINFO.pm 1528 2017-01-18 21:44:58Z willem $
+# $Id: HINFO.pm 1597 2017-09-22 08:04:02Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1528 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
 
 
 use strict;
@@ -34,7 +34,6 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 
-	return '' unless defined $self->{os};
 	join '', $self->{cpu}->encode, $self->{os}->encode;
 }
 
@@ -42,7 +41,6 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
-	return '' unless defined $self->{os};
 	join ' ', $self->{cpu}->string, $self->{os}->string;
 }
 

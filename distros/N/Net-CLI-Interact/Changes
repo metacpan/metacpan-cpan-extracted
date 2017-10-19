@@ -1,4 +1,4 @@
-2.300000 2017-10-11
+2.300002 2017-10-14
 
   * #25 cisco/hp/pb login failure on hp procurve (A. Zanger)
   * #27 find_prompt doesn't bail out on failure to find a prompt (A. Zanger)

@@ -1,0 +1,28 @@
+---
+abstract: 'Core modules for Bio::Phylo, re-implemented using C'
+author:
+  - 'Rutger Vos'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Bio-PhyloXS
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Bio::Phylo: '0.58'
+resources:
+  MailingList: mailto:bio-phylo@googlegroups.com
+  bugtracker: https://github.com/rvosa/bio-phylo-xs/issues
+  homepage: http://biophylo.blogspot.com/
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/rvosa/bio-phylo-xs.git
+version: v0.1.0

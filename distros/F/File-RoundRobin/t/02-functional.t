@@ -9,7 +9,7 @@ use_ok("File::RoundRobin");
 
 { # create a new file , write something and read it back using write()
     
-    my $rrfile = File::RoundRobin->new(path => 'test.txt',size => '1k');
+    my $rrfile = File::RoundRobin->new(path => '02_1_test.txt',size => '1k');
     
     isa_ok($rrfile,'File::RoundRobin');
     
@@ -21,12 +21,12 @@ use_ok("File::RoundRobin");
 	
 	is($buffer,"foo bar",'Read returned text as expected after write()');
 	
-	unlink('test.txt');
+	unlink('02_1_test.txt');
 }
 
 { # create a new file , write something and read it back using print()
     
-    my $rrfile = File::RoundRobin->new(path => 'test.txt',size => '1k');
+    my $rrfile = File::RoundRobin->new(path => '02_2_test.txt',size => '1k');
     
     isa_ok($rrfile,'File::RoundRobin');
     
@@ -38,12 +38,12 @@ use_ok("File::RoundRobin");
 	
 	is($buffer,"foo bar",'Read returned text as expected after print()');
 	
-	unlink('test.txt');
+	unlink('02_2_test.txt');
 }
 
 { # reate a new file, write to it and read back the content
     
-    my $rrfile = File::RoundRobin->new(path => 'test.txt',size => '100');
+    my $rrfile = File::RoundRobin->new(path => '02_3_test.txt',size => '100');
 
     isa_ok($rrfile,'File::RoundRobin');
     
@@ -53,7 +53,7 @@ use_ok("File::RoundRobin");
 	
 	$rrfile->close();
 	
-	$rrfile = File::RoundRobin->new(path => 'test.txt',mode => 'read');
+	$rrfile = File::RoundRobin->new(path => '02_3_test.txt',mode => 'read');
 	
 	my $buffer = $rrfile->read(100);
 	
@@ -61,25 +61,25 @@ use_ok("File::RoundRobin");
 	
 	$rrfile->close();
 	
-	$rrfile = File::RoundRobin->new(path => 'test.txt',mode => 'append');
+	$rrfile = File::RoundRobin->new(path => '02_3_test.txt',mode => 'append');
 	
 	ok($rrfile->write("C" x 60),'Write C successful') ;
 		
 	$rrfile->close();
 	
-	$rrfile = File::RoundRobin->new(path => 'test.txt',mode => 'read');
+	$rrfile = File::RoundRobin->new(path => '02_3_test.txt',mode => 'read');
 	
 	$buffer = $rrfile->read(100);
 	
 	like($buffer,qr/B{40}C{60}/,"read returned text as expected");
 	
-	unlink('test.txt');
+	unlink('02_3_test.txt');
 }
 
 
 { # create a new file , write something and read it back
     
-    my $rrfile = File::RoundRobin->new(path => 'test.txt',size => '1k', autoflush => 1);
+    my $rrfile = File::RoundRobin->new(path => '02_4_test.txt',size => '1k', autoflush => 1);
     
     isa_ok($rrfile,'File::RoundRobin');
     
@@ -89,11 +89,11 @@ use_ok("File::RoundRobin");
 	
 	$rrfile->close();
 	
-	$rrfile = File::RoundRobin->new(path => 'test.txt', mode => 'read');
+	$rrfile = File::RoundRobin->new(path => '02_4_test.txt', mode => 'read');
 	
 	my $buffer = $rrfile->read(1);
 	
 	is($buffer,"f",'read returned text as expected');
 	
-	unlink('test.txt');
+	unlink('02_4_test.txt');
 }

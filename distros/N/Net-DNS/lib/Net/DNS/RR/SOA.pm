@@ -1,9 +1,9 @@
 package Net::DNS::RR::SOA;
 
 #
-# $Id: SOA.pm 1546 2017-03-06 09:27:31Z willem $
+# $Id: SOA.pm 1597 2017-09-22 08:04:02Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1546 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
 
 
 use strict;
@@ -37,7 +37,7 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 	my ( $offset, @opaque ) = @_;
 
-	my $rname = $self->{rname} || return '';
+	my $rname = $self->{rname};
 	my $rdata = $self->{mname}->encode(@_);
 	$rdata .= $rname->encode( $offset + length($rdata), @opaque );
 	$rdata .= pack 'N5', $self->serial, @{$self}{qw(refresh retry expire minimum)};
@@ -47,7 +47,6 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
-	return '' unless defined $self->{rname};
 	my $mname  = $self->{mname}->string;
 	my $rname  = $self->{rname}->string;
 	my $serial = $self->serial;

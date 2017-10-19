@@ -3,8 +3,11 @@ use strict;
 use warnings;
 use Test::More;
 use Test::Exception;
+use Test::Deep;
 use JSON::MaybeXS;
 use Data::Dumper;
+
+my $JSON = JSON::MaybeXS->new->allow_nonref;
 
 BEGIN {
   use_ok( 'GraphQL::Schema' ) || print "Bail out!\n";
@@ -13,15 +16,20 @@ BEGIN {
   use_ok( 'GraphQL::Type::Scalar', qw($String) ) || print "Bail out!\n";
   use_ok( 'GraphQL::Type::Enum' ) || print "Bail out!\n";
   use_ok( 'GraphQL::Introspection', '$QUERY' ) || print "Bail out!\n";
-  use_ok( 'GraphQL::Execution' ) || print "Bail out!\n";
+  use_ok( 'GraphQL::Execution', qw(execute) ) || print "Bail out!\n";
 }
 
 sub run_test {
   my ($args, $expected) = @_;
-  my $got = GraphQL::Execution->execute(@$args);
+  my $got = execute(@$args);
+  is_deeply $got, $expected or diag nice_dump($got);
+}
+
+sub nice_dump {
+  my ($got) = @_;
   local ($Data::Dumper::Sortkeys, $Data::Dumper::Indent, $Data::Dumper::Terse);
   $Data::Dumper::Sortkeys = $Data::Dumper::Indent = $Data::Dumper::Terse = 1;
-  is_deeply $got, $expected or diag Dumper $got;
+  Dumper $got;
 }
 
 subtest 'executes an introspection query', sub {
@@ -29,14 +37,515 @@ subtest 'executes an introspection query', sub {
     name => 'QueryRoot',
     fields => { onlyField => { type => $String } },
   ));
-  my $got = GraphQL::Execution->execute($schema, $QUERY, undef, undef, undef, 'IntrospectionQuery');
-  my $big_expected = eval join '', 'my ', <DATA>, ' $VAR1';
+  my $got = execute($schema, $QUERY, undef, undef, undef, 'IntrospectionQuery');
+  my $expected_text = join '', <DATA>;
+  $expected_text =~ s#bless\(\s*do\{\\\(my\s*\$o\s*=\s*(.)\)\},\s*'JSON::PP::Boolean'\s*\)#'JSON->' . ($1 ? 'true' : 'false')#ge;
+  my $big_expected = eval 'use JSON::MaybeXS;my '.$expected_text.';$VAR1';
   local ($Data::Dumper::Sortkeys, $Data::Dumper::Indent, $Data::Dumper::Terse, $Data::Dumper::Purity);
   $Data::Dumper::Sortkeys = $Data::Dumper::Indent = $Data::Dumper::Terse = $Data::Dumper::Purity = 1;
   #open my $fh, '>', 'tf'; print $fh Dumper $got; # uncomment to regenerate
   $Data::Dumper::Purity = 0; # makes debug dumps less readable if 1
   is_deeply $got, $big_expected or diag Dumper $got;
   done_testing;
+};
+
+subtest 'introspects on input object'=> sub {
+  my $TestInputObject = GraphQL::Type::InputObject->new(
+    name => 'TestInputObject',
+    fields => {
+      a => { type => $String, default_value => 'foo' },
+      b => { type => $String->list },
+      c => { type => $String, default_value => undef }
+    }
+  );
+
+  my $TestType = GraphQL::Type::Object->new(
+    name => 'TestType',
+    fields => {
+      field => {
+        type => $String,
+        args => { complex => { type => $TestInputObject } },
+        resolve => sub {
+          my (undef, $args) = @_;
+          return $JSON->encode($args->{complex});
+        },
+      }
+    }
+  );
+
+  my $schema = GraphQL::Schema->new(query => $TestType);
+  my $request = <<'EOQ';
+{
+  __schema {
+    types {
+      kind
+      name
+      inputFields {
+        name
+        type { ...TypeRef }
+        defaultValue
+      }
+    }
+  }
+}
+
+fragment TypeRef on __Type {
+  kind
+  name
+  ofType {
+    kind
+    name
+    ofType {
+      kind
+      name
+      ofType {
+        kind
+        name
+      }
+    }
+  }
+}
+EOQ
+
+  my $got = execute($schema, $request);
+  cmp_deeply $got, {
+    data => {
+      __schema => {
+        types => supersetof(
+          {
+            kind => 'INPUT_OBJECT',
+            name => 'TestInputObject',
+            inputFields => bag(
+              {
+                name => 'a',
+                type => {
+                  kind => 'SCALAR',
+                  name => 'String',
+                  ofType => undef,
+                },
+                defaultValue => '"foo"',
+              },
+              {
+                name => 'b',
+                type => {
+                  kind => 'LIST',
+                  name => undef,
+                  ofType => {
+                    kind => 'SCALAR',
+                    name => 'String',
+                    ofType => undef,
+                  }
+                },
+                defaultValue => undef,
+              },
+              {
+                name => 'c',
+                type => {
+                  kind => 'SCALAR',
+                  name => 'String',
+                  ofType => undef,
+                },
+                defaultValue => undef,
+              }
+            )
+          }
+        )
+      }
+    }
+  } or diag nice_dump($got);
+};
+
+subtest 'supports the __type root field'=> sub {
+  my $TestType = GraphQL::Type::Object->new(
+    name => 'TestType',
+    fields => {
+      testField => {
+        type => $String,
+      }
+    }
+  );
+
+  my $schema = GraphQL::Schema->new(query => $TestType);
+  my $request = <<'EOQ';
+{
+  __type(name: "TestType") {
+    name
+  }
+}
+EOQ
+
+  run_test([$schema, $request], {
+    data => { __type => { name => 'TestType' } }
+  });
+};
+
+subtest 'identifies deprecated fields'=> sub {
+  my $TestType = GraphQL::Type::Object->new(
+    name => 'TestType',
+    fields => {
+      nonDeprecated => {
+        type => $String,
+      },
+      deprecated => {
+        type => $String,
+        deprecation_reason => 'Removed in 1.0'
+      }
+    }
+  );
+
+  my $schema = GraphQL::Schema->new(query => $TestType);
+  my $request = <<'EOQ';
+{
+  __type(name: "TestType") {
+    name
+    fields(includeDeprecated: true) {
+      name
+      isDeprecated,
+      deprecationReason
+    }
+  }
+}
+EOQ
+
+  run_test([$schema, $request], {
+    data => {
+      __type => {
+        name => 'TestType',
+        fields => [
+          {
+            name => 'deprecated',
+            isDeprecated => JSON->true,
+            deprecationReason => 'Removed in 1.0'
+          },
+          {
+            name => 'nonDeprecated',
+            isDeprecated => JSON->false,
+            deprecationReason => undef,
+          },
+        ]
+      }
+    }
+  });
+};
+
+subtest 'respects the includeDeprecated parameter for fields'=> sub {
+  my $TestType = GraphQL::Type::Object->new(
+    name => 'TestType',
+    fields => {
+      nonDeprecated => {
+        type => $String,
+      },
+      deprecated => {
+        type => $String,
+        deprecation_reason => 'Removed in 1.0'
+      }
+    }
+  );
+
+  my $schema = GraphQL::Schema->new(query => $TestType);
+  my $request = <<'EOQ';
+{
+  __type(name: "TestType") {
+    name
+    trueFields: fields(includeDeprecated: true) {
+      name
+    }
+    falseFields: fields(includeDeprecated: false) {
+      name
+    }
+    omittedFields: fields {
+      name
+    }
+  }
+}
+EOQ
+
+  run_test([$schema, $request], {
+    data => {
+      __type => {
+        name => 'TestType',
+        trueFields => [
+          { name => 'deprecated' },
+          { name => 'nonDeprecated' },
+        ],
+        falseFields => [
+          { name => 'nonDeprecated' },
+        ],
+        omittedFields => [
+          { name => 'nonDeprecated' },
+        ],
+      }
+    }
+  });
+};
+
+subtest 'identifies deprecated enum values'=> sub {
+  my $TestEnum = GraphQL::Type::Enum->new(
+    name => 'TestEnum',
+    values => {
+      NONDEPRECATED => { value => 0 },
+      DEPRECATED => { value => 1, deprecation_reason => 'Removed in 1.0' },
+      ALSONONDEPRECATED => { value => 2 }
+    }
+  );
+
+  my $TestType = GraphQL::Type::Object->new(
+    name => 'TestType',
+    fields => {
+      testEnum => {
+        type => $TestEnum,
+      },
+    }
+  );
+
+  my $schema = GraphQL::Schema->new(query => $TestType);
+  my $request = <<'EOQ';
+{
+  __type(name: "TestEnum") {
+    name
+    enumValues(includeDeprecated: true) {
+      name
+      isDeprecated,
+      deprecationReason
+    }
+  }
+}
+EOQ
+
+  run_test([$schema, $request], {
+    data => {
+      __type => {
+        name => 'TestEnum',
+        enumValues => [
+          {
+            name => 'ALSONONDEPRECATED',
+            isDeprecated => JSON->false,
+            deprecationReason => undef,
+          },
+          {
+            name => 'DEPRECATED',
+            isDeprecated => JSON->true,
+            deprecationReason => 'Removed in 1.0',
+          },
+          {
+            name => 'NONDEPRECATED',
+            isDeprecated => JSON->false,
+            deprecationReason => undef,
+          },
+        ]
+      }
+    }
+  });
+};
+
+subtest 'respects the includeDeprecated parameter for enum values'=> sub {
+  my $TestEnum = GraphQL::Type::Enum->new(
+    name => 'TestEnum',
+    values => {
+      NONDEPRECATED => { value => 0 },
+      DEPRECATED => { value => 1, deprecation_reason => 'Removed in 1.0' },
+      ALSONONDEPRECATED => { value => 2 }
+    }
+  );
+
+  my $TestType = GraphQL::Type::Object->new(
+    name => 'TestType',
+    fields => {
+      testEnum => {
+        type => $TestEnum,
+      },
+    }
+  );
+
+  my $schema = GraphQL::Schema->new(query => $TestType);
+  my $request = <<'EOQ';
+{
+  __type(name: "TestEnum") {
+    name
+    trueValues: enumValues(includeDeprecated: true) {
+      name
+    }
+    falseValues: enumValues(includeDeprecated: false) {
+      name
+    }
+    omittedValues: enumValues {
+      name
+    }
+  }
+}
+EOQ
+
+  run_test([$schema, $request], {
+    data => {
+      __type => {
+        name => 'TestEnum',
+        trueValues => [
+          { name => 'ALSONONDEPRECATED' },
+          { name => 'DEPRECATED' },
+          { name => 'NONDEPRECATED', },
+        ],
+        falseValues => [
+          { name => 'ALSONONDEPRECATED' },
+          { name => 'NONDEPRECATED' },
+        ],
+        omittedValues => [
+          { name => 'ALSONONDEPRECATED' },
+          { name => 'NONDEPRECATED' },
+        ],
+      }
+    }
+  });
+};
+
+subtest 'fails as expected on the __type root field without an arg'=> sub {
+  my $TestType = GraphQL::Type::Object->new(
+    name => 'TestType',
+    fields => {
+      testField => {
+        type => $String,
+      }
+    }
+  );
+
+  my $schema = GraphQL::Schema->new(query => $TestType);
+  my $request = <<'EOQ';
+{
+  __type {
+    name
+  }
+}
+EOQ
+
+  my $got = execute($schema, $request);
+  cmp_deeply $got, {
+    data => { __type => undef },
+    errors => [noclass(superhashof({
+      message => 'Argument \'name\' of type \'String!\' not given.',
+      locations => [{ line => 5, column => 1 }],
+    }))]
+  } or diag nice_dump($got);
+};
+
+subtest 'exposes descriptions on types and fields'=> sub {
+  my $QueryRoot = GraphQL::Type::Object->new(
+    name => 'QueryRoot',
+    fields => {
+      onlyField => { type => $String }
+    }
+  );
+
+  my $schema = GraphQL::Schema->new(query => $QueryRoot);
+  my $request = <<'EOQ';
+{
+  schemaType: __type(name: "__Schema") {
+    name,
+    description,
+    fields {
+      name,
+      description
+    }
+  }
+}
+EOQ
+
+  my $got = execute($schema, $request);
+  cmp_deeply $got, {
+    data => {
+      schemaType => {
+        name => '__Schema',
+        description => 'A GraphQL Schema defines the capabilities of a GraphQL server. It exposes all available types and directives on the server, as well as the entry points for query, mutation, and subscription operations.',
+        fields => bag(
+          {
+            name => 'types',
+            description => 'A list of all types supported by this server.'
+          },
+          {
+            name => 'queryType',
+            description => 'The type that query operations will be rooted at.'
+          },
+          {
+            name => 'mutationType',
+            description => 'If this server supports mutation, the type that mutation operations will be rooted at.'
+          },
+          {
+            name => 'subscriptionType',
+            description => 'If this server support subscription, the type that subscription operations will be rooted at.',
+          },
+          {
+            name => 'directives',
+            description => 'A list of all directives supported by this server.'
+          }
+        )
+      }
+    }
+  } or diag nice_dump($got);
+};
+
+subtest 'exposes descriptions on enums'=> sub {
+  my $QueryRoot = GraphQL::Type::Object->new(
+    name => 'QueryRoot',
+    fields => {
+      onlyField => { type => $String }
+    }
+  );
+
+  my $schema = GraphQL::Schema->new(query => $QueryRoot);
+  my $request = <<'EOQ';
+{
+  typeKindType: __type(name: "__TypeKind") {
+    name,
+    description,
+    enumValues {
+      name,
+      description
+    }
+  }
+}
+EOQ
+
+  my $got = execute($schema, $request);
+  cmp_deeply $got, {
+    data => {
+      typeKindType => {
+        name => '__TypeKind',
+        description => 'An enum describing what kind of type a given `__Type` is.',
+        enumValues => bag(
+          {
+            description => 'Indicates this type is a scalar.',
+            name => 'SCALAR'
+          },
+          {
+            description => 'Indicates this type is an object. `fields` and `interfaces` are valid fields.',
+            name => 'OBJECT'
+          },
+          {
+            description => 'Indicates this type is an interface. `fields` and `possibleTypes` are valid fields.',
+            name => 'INTERFACE'
+          },
+          {
+            description => 'Indicates this type is a union. `possibleTypes` is a valid field.',
+            name => 'UNION'
+          },
+          {
+            description => 'Indicates this type is an enum. `enumValues` is a valid field.',
+            name => 'ENUM'
+          },
+          {
+            description => 'Indicates this type is an input object. `inputFields` is a valid field.',
+            name => 'INPUT_OBJECT'
+          },
+          {
+            description => 'Indicates this type is a list. `ofType` is a valid field.',
+            name => 'LIST'
+          },
+          {
+            description => 'Indicates this type is a non-null. `ofType` is a valid field.',
+            name => 'NON_NULL'
+          }
+        )
+      }
+    }
+  } or diag nice_dump($got);
 };
 
 done_testing;
@@ -260,109 +769,109 @@ In some cases, you need to provide options to alter GraphQL\'s execution behavio
           'enumValues' => [
             {
               'deprecationReason' => undef,
-              'description' => undef,
+              'description' => 'Location adjacent to an argument definition.',
               'isDeprecated' => do{my $o},
               'name' => 'ARGUMENT_DEFINITION'
             },
             {
               'deprecationReason' => undef,
-              'description' => undef,
+              'description' => 'Location adjacent to an enum definition.',
               'isDeprecated' => do{my $o},
               'name' => 'ENUM'
             },
             {
               'deprecationReason' => undef,
-              'description' => undef,
+              'description' => 'Location adjacent to an enum value definition.',
               'isDeprecated' => do{my $o},
               'name' => 'ENUM_VALUE'
             },
             {
               'deprecationReason' => undef,
-              'description' => undef,
+              'description' => 'Location adjacent to a field.',
               'isDeprecated' => do{my $o},
               'name' => 'FIELD'
             },
             {
               'deprecationReason' => undef,
-              'description' => undef,
+              'description' => 'Location adjacent to a field definition.',
               'isDeprecated' => do{my $o},
               'name' => 'FIELD_DEFINITION'
             },
             {
               'deprecationReason' => undef,
-              'description' => undef,
+              'description' => 'Location adjacent to a fragment definition.',
               'isDeprecated' => do{my $o},
               'name' => 'FRAGMENT_DEFINITION'
             },
             {
               'deprecationReason' => undef,
-              'description' => undef,
+              'description' => 'Location adjacent to a fragment spread.',
               'isDeprecated' => do{my $o},
               'name' => 'FRAGMENT_SPREAD'
             },
             {
               'deprecationReason' => undef,
-              'description' => undef,
+              'description' => 'Location adjacent to an inline fragment.',
               'isDeprecated' => do{my $o},
               'name' => 'INLINE_FRAGMENT'
             },
             {
               'deprecationReason' => undef,
-              'description' => undef,
+              'description' => 'Location adjacent to an input object field definition.',
               'isDeprecated' => do{my $o},
               'name' => 'INPUT_FIELD_DEFINITION'
             },
             {
               'deprecationReason' => undef,
-              'description' => undef,
+              'description' => 'Location adjacent to an input object type definition.',
               'isDeprecated' => do{my $o},
               'name' => 'INPUT_OBJECT'
             },
             {
               'deprecationReason' => undef,
-              'description' => undef,
+              'description' => 'Location adjacent to an interface definition.',
               'isDeprecated' => do{my $o},
               'name' => 'INTERFACE'
             },
             {
               'deprecationReason' => undef,
-              'description' => undef,
+              'description' => 'Location adjacent to a mutation operation.',
               'isDeprecated' => do{my $o},
               'name' => 'MUTATION'
             },
             {
               'deprecationReason' => undef,
-              'description' => undef,
+              'description' => 'Location adjacent to an object type definition.',
               'isDeprecated' => do{my $o},
               'name' => 'OBJECT'
             },
             {
               'deprecationReason' => undef,
-              'description' => undef,
+              'description' => 'Location adjacent to a query operation.',
               'isDeprecated' => do{my $o},
               'name' => 'QUERY'
             },
             {
               'deprecationReason' => undef,
-              'description' => undef,
+              'description' => 'Location adjacent to a scalar definition.',
               'isDeprecated' => do{my $o},
               'name' => 'SCALAR'
             },
             {
               'deprecationReason' => undef,
-              'description' => undef,
+              'description' => 'Location adjacent to a schema definition.',
               'isDeprecated' => do{my $o},
               'name' => 'SCHEMA'
             },
             {
               'deprecationReason' => undef,
-              'description' => undef,
+              'description' => 'Location adjacent to a subscription operation.',
               'isDeprecated' => do{my $o},
               'name' => 'SUBSCRIPTION'
             },
             {
               'deprecationReason' => undef,
-              'description' => undef,
+              'description' => 'Location adjacent to a union definition.',
               'isDeprecated' => do{my $o},
               'name' => 'UNION'
             }
@@ -906,49 +1415,49 @@ Depending on the kind of a type, certain fields describe information about that 
           'enumValues' => [
             {
               'deprecationReason' => undef,
-              'description' => undef,
+              'description' => 'Indicates this type is an enum. `enumValues` is a valid field.',
               'isDeprecated' => do{my $o},
               'name' => 'ENUM'
             },
             {
               'deprecationReason' => undef,
-              'description' => undef,
+              'description' => 'Indicates this type is an input object. `inputFields` is a valid field.',
               'isDeprecated' => do{my $o},
               'name' => 'INPUT_OBJECT'
             },
             {
               'deprecationReason' => undef,
-              'description' => undef,
+              'description' => 'Indicates this type is an interface. `fields` and `possibleTypes` are valid fields.',
               'isDeprecated' => do{my $o},
               'name' => 'INTERFACE'
             },
             {
               'deprecationReason' => undef,
-              'description' => undef,
+              'description' => 'Indicates this type is a list. `ofType` is a valid field.',
               'isDeprecated' => do{my $o},
               'name' => 'LIST'
             },
             {
               'deprecationReason' => undef,
-              'description' => undef,
+              'description' => 'Indicates this type is a non-null. `ofType` is a valid field.',
               'isDeprecated' => do{my $o},
               'name' => 'NON_NULL'
             },
             {
               'deprecationReason' => undef,
-              'description' => undef,
+              'description' => 'Indicates this type is an object. `fields` and `interfaces` are valid fields.',
               'isDeprecated' => do{my $o},
               'name' => 'OBJECT'
             },
             {
               'deprecationReason' => undef,
-              'description' => undef,
+              'description' => 'Indicates this type is a scalar.',
               'isDeprecated' => do{my $o},
               'name' => 'SCALAR'
             },
             {
               'deprecationReason' => undef,
-              'description' => undef,
+              'description' => 'Indicates this type is a union. `possibleTypes` is a valid field.',
               'isDeprecated' => do{my $o},
               'name' => 'UNION'
             }

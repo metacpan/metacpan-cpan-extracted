@@ -5,7 +5,7 @@ use warnings;
 
 # ABSTRACT: Minimal-configuration, read-only LDAP server
 
-our $VERSION = '0.0.17';    # VERSION
+our $VERSION = '0.0.18';    # VERSION
 
 use 5.008;
 use Carp;
@@ -110,8 +110,7 @@ sub process_request {
     for (@LDAP_PRIVATE_OPTIONS) {
         $params->{$_} = $prop->{$_} if $prop->{$_};
     }
-    $params->{input}  = *STDIN{IO};
-    $params->{output} = *STDOUT{IO};
+    $params->{sock} = $self->{server}->{client};
     my $handler = Net::LDAP::SimpleServer::ProtocolHandler->new($params);
 
     until ( $handler->handle ) {
@@ -123,11 +122,11 @@ sub process_request {
 
 1;    # Magic true value required at end of module
 
-
+__END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
@@ -135,7 +134,7 @@ Net::LDAP::SimpleServer - Minimal-configuration, read-only LDAP server
 
 =head1 VERSION
 
-version 0.0.17
+version 0.0.18
 
 =head1 SYNOPSIS
 
@@ -326,7 +325,7 @@ CPANTS
 
 The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
 
-L<http://cpants.perl.org/dist/overview/Net-LDAP-SimpleServer>
+L<http://cpants.cpanauthors.org/dist/Net-LDAP-SimpleServer>
 
 =item *
 
@@ -370,7 +369,7 @@ You can connect to the server at 'irc.perl.org' and join this channel: #sao-paul
 =head2 Bugs / Feature Requests
 
 Please report any bugs or feature requests by email to C<bug-net-ldap-simpleserver at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Net-LDAP-SimpleServer>. You will be automatically notified of any
+the web interface at L<https://rt.cpan.org/Public/Bug/Report.html?Queue=Net-LDAP-SimpleServer>. You will be automatically notified of any
 progress on the request by the system.
 
 =head2 Source Code
@@ -389,7 +388,7 @@ Alexei Znamensky <russoz@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Alexei Znamensky.
+This software is copyright (c) 2012 - 2017 by Alexei Znamensky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -423,9 +422,3 @@ SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
 DAMAGES.
 
 =cut
-
-
-__END__
-
-
-

@@ -91,14 +91,14 @@ C<perldoc megatree-pruner>
 
 =head1 DESCRIPTION
 
-This program produces the subtree for the taxa provided as input from a previously 
+This program produces the subtree of the set of taxa provided as input from a previously 
 produced database. As such, the functionality is roughly similar to extracting the 'common
 tree' from the NCBI taxonomy, which is a common operation in phylogenomics and related
 fields.
 
 The input names can be provided either as a text file (the B<-i> argument) or as a comma-
 separated list on the command line (the B<-l> argument). The names in the file must match
-those in the database exactly, i.e. there is no fussy matching. Any names not found in the
+those in the database exactly, i.e. there is no fuzzy matching. Any names not found in the
 database are skipped, and a warning message will be emitted.
 
 The output that is produced is either a Newick-formatted tree string, or a tab-separated

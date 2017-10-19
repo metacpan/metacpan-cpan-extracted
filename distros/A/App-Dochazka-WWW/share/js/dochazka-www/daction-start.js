@@ -43,11 +43,13 @@
 define ([
     "jquery",
     "current-user",
+    "app/act-lib",
     "app/emp-lib",
     "app/ldap-lib",
     "app/priv-lib",
     "app/sched-history-lib",
     "app/sched-lib",
+    "app/int-lib",
     "app/rest-lib",
     "html",
     "loggout",
@@ -56,11 +58,13 @@ define ([
 ], function (
     $,
     currentUser,
+    actLib,
     empLib,
     ldapLib,
     privLib,
     schedHistLib,
     schedLib,
+    intLib,
     restLib,
     html,
     loggout,
@@ -74,6 +78,9 @@ define ([
     var act = {
 
         // general actions
+        "actionNoop": function () {
+            console.log("actionNoop: a daction that does nothing at all");
+        },
         "drowselectListen": function () {
             start.drowselectListen();
         },
@@ -111,6 +118,15 @@ define ([
         "actionDisplaySchedule": schedLib.actionDisplaySchedule,
         "schedEditSave": schedLib.schedEditSave,
         "schedReallyDelete": schedLib.schedReallyDelete,
+
+        // create interval actions
+        "createLastIntervalPlusOffsetSave": intLib.createLastIntervalPlusOffsetSave,
+        "createNextScheduledIntervalSave": intLib.createNextScheduledIntervalSave,
+        "createSingleIntSave": intLib.createSingleIntSave,
+        
+        // activity select actions
+        "selectActivityAction": actLib.selectActivityAction,
+        "selectActivityGo": actLib.selectActivityGo,
 
         // actions triggered from Adminitrivia menu
         "restServerDetailsAction": restLib.restServerDetailsAction,

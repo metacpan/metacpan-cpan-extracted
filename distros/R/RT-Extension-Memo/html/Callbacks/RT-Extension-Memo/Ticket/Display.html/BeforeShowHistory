@@ -1,0 +1,7 @@
+% if ($Ticket && $Ticket->id) {
+<& /Elements/Memo, Object => $Ticket &>
+% }
+
+<%ARGS>
+$Ticket
+</%ARGS>

@@ -322,6 +322,7 @@ t/regression/builder_does_not_init.t
 t/regression/errors_facet.t
 t/regression/inherit_trace.t
 t/regression/no_name_in_subtest.t
+t/regression/todo_and_facets.t
 t/zzz-check-breaks.t
 xt/author/pod-spell.t
 xt/author/pod-syntax.t

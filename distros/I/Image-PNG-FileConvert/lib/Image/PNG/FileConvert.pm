@@ -4,7 +4,7 @@ require Exporter;
 @EXPORT_OK = qw/file2png png2file/;
 use warnings;
 use strict;
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 use Carp;
 use Image::PNG::Libpng ':all';
 use Image::PNG::Const ':all';

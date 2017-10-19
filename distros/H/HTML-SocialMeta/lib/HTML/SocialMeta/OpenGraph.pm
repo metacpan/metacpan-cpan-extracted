@@ -2,7 +2,7 @@ package HTML::SocialMeta::OpenGraph;
 use Moo;
 use Carp;
 
-our $VERSION = '0.730002';
+our $VERSION = '0.730004';
 
 extends 'HTML::SocialMeta::Base';
 
@@ -102,7 +102,7 @@ HTML::SocialMeta::OpenGraph
 
 =head1 VERSION
 
-Version 0.730002
+Version 0.730004
 
 =cut
 

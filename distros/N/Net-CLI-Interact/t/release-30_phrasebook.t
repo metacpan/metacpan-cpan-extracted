@@ -37,8 +37,8 @@ isa_ok($m, 'Net::CLI::Interact::ActionSet');
 ok($s->set_phrasebook({ personality => 'fwsm3' }), 'new phrasebook loaded');
 $pb = $s->phrasebook;
 
-ok(eval { $pb->prompt('basic') }, 'prompt exists');
-ok(! eval { $pb->prompt('basic_XXX') }, 'prompt does not exist');
+ok(eval { $pb->prompt('generic') }, 'prompt exists');
+ok(! eval { $pb->prompt('generic_XXX') }, 'prompt does not exist');
 
 my $p2 = $pb->prompt('privileged');
 isa_ok($p2, 'Net::CLI::Interact::ActionSet');

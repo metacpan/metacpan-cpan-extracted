@@ -109,15 +109,16 @@ $rep->setsockopt (ZMQ::Raw::Socket->ZMQ_IPV6, 0);
 $rep->setsockopt (ZMQ::Raw::Socket->ZMQ_MAXMSGSIZE, 100);
 $rep->setsockopt (ZMQ::Raw::Socket->ZMQ_IDENTITY, "myid");
 
-ok (!eval {$rep->setsockopt (ZMQ::Raw::Socket->ZMQ_CURVE_SERVER, "unsupported")});
-
 $rep->bind ('tcp://127.0.0.1:5555');
 $req->connect ('tcp://localhost:5555');
 
 # send/recv
 $req->send ('hello');
+ok (!defined ($req->recv (ZMQ::Raw->ZMQ_DONTWAIT)));
+
 my $result = $rep->recv();
 is $result, 'hello';
+
 
 $rep->send ('world');
 my $result2 = $req->recv();
@@ -126,7 +127,10 @@ is $result2, 'world';
 # sendmsg/recvmsg (1 msg)
 my $msg = ZMQ::Raw::Message->new;
 $msg->data ('hello');
+
+isnt $msg->size, 0;
 $req->sendmsg ($msg);
+isnt $msg->size, 0;
 
 my $msg2 = $rep->recvmsg();
 is $msg2->size, 5;
@@ -138,19 +142,74 @@ $msg = $req->recvmsg();
 is $msg->size, 5;
 is $msg->data(), 'hello';
 
+# sendmsg/recvmsg (combin)
+$msg = ZMQ::Raw::Message->new;
+$msg->data ('hello');
+
+my $monitor = ZMQ::Raw::Socket->new ($ctx, ZMQ::Raw->ZMQ_PAIR);
+$monitor->connect ('inproc://req.monitor');
+
+$req->close;
+$req->monitor ('inproc://req.monitor', ZMQ::Raw->ZMQ_EVENT_ALL);
+$req->connect ('tcp://localhost:5555');
+
+my $event = $monitor->recv();
+ok (length ($event) > 0);
+
+$req->sendmsg ($msg, ZMQ::Raw->ZMQ_SNDMORE);
+$req->sendmsg ($msg, $msg, ZMQ::Raw->ZMQ_SNDMORE);
+$req->sendmsg ('world');
+
+my $data = $rep->recv();
+is length ($data), 20;
+is $data, 'hellohellohelloworld';
+
+$rep->send ('done');
+$req->recv();
+
+$req->sendmsg ($msg, ZMQ::Raw->ZMQ_SNDMORE);
+$req->sendmsg ($msg, $msg, ZMQ::Raw->ZMQ_SNDMORE);
+$req->sendmsg ('world');
+
+my @msgs;
+@msgs = $rep->recv();
+is scalar (@msgs), 4;
+is $msgs[0], 'hello';
+is $msgs[1], 'hello';
+is $msgs[2], 'hello';
+is $msgs[3], 'world';
+@msgs = ();
+
+$rep->send ('done');
+$req->recv();
+
 # sendmsg/recvmsg (multi msg)
 $msg = ZMQ::Raw::Message->new;
 $msg->data ('hello');
-$req->sendmsg ($msg, ZMQ::Raw->ZMQ_SNDMORE);
+push @msgs, $msg;
 
+$msg = ZMQ::Raw::Message->new;
 $msg->data ('world');
-$req->sendmsg ($msg);
+push @msgs, $msg;
+
+$req->sendmsg (@msgs, 'hello', 'world');
 
 $msg2 = $rep->recvmsg();
 is $msg2->more, 1;
 is $msg2->data(), 'hello';
 
-$msg2 = $rep->recvmsg();
+@msgs = $rep->recvmsg();
+is scalar (@msgs), 3;
+
+$msg2 = shift @msgs;
+is $msg2->more, 1;
+is $msg2->data(), 'world';
+
+$msg2 = shift @msgs;
+is $msg2->more, 1;
+is $msg2->data(), 'hello';
+
+$msg2 = shift @msgs;
 is $msg2->more, 0;
 is $msg2->data(), 'world';
 

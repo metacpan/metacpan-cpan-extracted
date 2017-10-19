@@ -1,0 +1,6 @@
+.memo-content {
+    background-color: #eee;
+    padding: 10px 20px;
+    border: 2px solid #aaa;
+    overflow: auto;
+}

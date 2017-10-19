@@ -8,9 +8,9 @@ package Devel::MAT::Tool::Inrefs;
 use strict;
 use warnings;
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
-use List::Util qw( pairs );
+use List::Util qw( any pairs );
 
 my %STRENGTH_TO_IDX = (
    strong   => 0,
@@ -19,8 +19,9 @@ my %STRENGTH_TO_IDX = (
    inferred => 3,
 );
 use constant {
-   IDX_ROOTS => 4,
-   IDX_STACK => 5,
+   IDX_ROOTS_STRONG => 4,
+   IDX_ROOTS_WEAK   => 5,
+   IDX_STACK        => 6,
 };
 
 =head1 NAME
@@ -69,9 +70,17 @@ sub patch_inrefs
 
    # Most SVs are not roots or on the stack. To save time later on we'll make
    #   a note of those rare ones that are
-   foreach ( pairs $df->_roots ) {
+
+   foreach ( pairs $df->roots_strong ) {
       my ( undef, $sv ) = @$_;
-      $sv->{tool_inrefs}[IDX_ROOTS]++;
+      next unless $sv;
+      $sv->{tool_inrefs}[IDX_ROOTS_STRONG]++;
+   }
+
+   foreach ( pairs $df->roots_weak ) {
+      my ( undef, $sv ) = @$_;
+      next unless $sv;
+      $sv->{tool_inrefs}[IDX_ROOTS_WEAK]++;
    }
 
    foreach my $addr ( @{ $df->{stack_at} } ) { # TODO
@@ -148,12 +157,12 @@ sub Devel::MAT::SV::_inrefs
       }
    }
 
-   if( $strengths[0] eq "strong" and $self->{tool_inrefs}[IDX_ROOTS] ) {
+   if( $self->{tool_inrefs}[IDX_ROOTS_STRONG] and $strengths[0] eq "strong" ) {
       if( $just_count ) {
-         push @inrefs, ( 1 ) x $self->{tool_inrefs}[IDX_ROOTS];
+         push @inrefs, ( 1 ) x $self->{tool_inrefs}[IDX_ROOTS_STRONG];
       }
       else {
-         foreach ( pairs $df->_roots ) {
+         foreach ( pairs $df->roots_strong ) {
             my ( $name, $sv ) = @$_;
             push @inrefs, Devel::MAT::SV::Reference( $name, strong => undef )
                if defined $sv and $sv == $self;
@@ -161,7 +170,20 @@ sub Devel::MAT::SV::_inrefs
       }
    }
 
-   if( $strengths[0] eq "strong" and $self->{tool_inrefs}[IDX_STACK] ) {
+   if( $self->{tool_inrefs}[IDX_ROOTS_WEAK] and any { $_ eq "weak" } @strengths ) {
+      if( $just_count ) {
+         push @inrefs, ( 1 ) x $self->{tool_inrefs}[IDX_ROOTS_WEAK];
+      }
+      else {
+         foreach ( pairs $df->roots_weak ) {
+            my ( $name, $sv ) = @$_;
+            push @inrefs, Devel::MAT::SV::Reference( $name, weak => undef )
+               if defined $sv and $sv == $self;
+         }
+      }
+   }
+
+   if( $self->{tool_inrefs}[IDX_STACK] and any { $_ eq "weak" } @strengths ) {
       if( $just_count ) {
          push @inrefs, ( 1 ) x $self->{tool_inrefs}[IDX_STACK];
       }

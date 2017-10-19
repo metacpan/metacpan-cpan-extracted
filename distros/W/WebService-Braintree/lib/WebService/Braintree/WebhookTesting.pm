@@ -1,8 +1,9 @@
 package WebService::Braintree::WebhookTesting;
-$WebService::Braintree::WebhookTesting::VERSION = '0.93';
+$WebService::Braintree::WebhookTesting::VERSION = '0.94';
+use 5.010_001;
+use strictures 1;
 
 use Moose;
-
 
 sub sample_notification {
     my ($class, $kind, $id) = @_;
@@ -15,5 +16,6 @@ sub gateway {
 }
 
 __PACKAGE__->meta->make_immutable;
-1;
 
+1;
+__END__

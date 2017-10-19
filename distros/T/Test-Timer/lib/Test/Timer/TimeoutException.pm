@@ -3,21 +3,19 @@ package Test::Timer::TimeoutException;
 use strict;
 use warnings;
 use vars qw($VERSION);
+use Data::Dumper;
 
 use base 'Error';
 use overload ( '""' => 'stringify' );
 
-$VERSION = '2.03';
+$VERSION = '2.04';
 
 sub new {
-    my $self = shift;
-    my $text = '' . shift;
-    my $time = shift;
-    my @args = ();
+    my ($self, $time) = @_;
 
     local $Error::Depth = $Error::Depth + 1;
 
-    $self = $self->SUPER::new( -text => $text, -value => $time );
+    $self = $self->SUPER::new( -text => $time, -value => $time );
 
     return $self;
 }
@@ -34,13 +32,15 @@ Test::Timer::TimeoutException - exception class for Test::Timer
 
 =head1 VERSION
 
-This documentation describes 2.03 of Test::Timer::TimeoutException
+This documentation describes 2.04 of Test::Timer::TimeoutException
 
 =head1 SYNOPSIS
 
     use Test::Timer::TimeoutException;
 
-    throw Test::Timer::TimeoutException(" ... ");
+    throw Test::Timer::TimeoutException($timeout);
+
+    throw Test::Timer::TimeoutException($timeout);
 
 =head1 DESCRIPTION
 

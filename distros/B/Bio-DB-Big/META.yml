@@ -7,8 +7,11 @@ build_requires:
   Test::Differences: '0'
   Test::Exception: '0'
   Test::Fake::HTTPD: '0'
+  Test::Output: '0'
 configure_requires:
   Module::Build: '0.42'
+  Module::Build::Pluggable: '0'
+  Module::Build::Pluggable::CPANfile: '0'
 dynamic_config: 1
 generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150010'
 license: open_source
@@ -19,7 +22,7 @@ name: Bio-DB-Big
 provides:
   Bio::DB::Big:
     file: lib/Bio/DB/Big.pm
-    version: v1.0.0
+    version: v1.0.1
   Bio::DB::Big::AutoSQL:
     file: lib/Bio/DB/Big/AutoSQL.pm
   Bio::DB::Big::AutoSQLField:
@@ -30,5 +33,5 @@ requires:
   perl: '5.008'
 resources:
   repository: https://github.com/Ensembl/Bio-DB-Big
-version: v1.0.0
+version: v1.0.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

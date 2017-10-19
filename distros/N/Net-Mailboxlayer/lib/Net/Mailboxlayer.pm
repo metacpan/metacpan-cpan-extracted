@@ -3,7 +3,7 @@ package Net::Mailboxlayer;
 use strict;
 use warnings;
 
-$Net::Mailboxlayer::VERSION = '0.001';
+$Net::Mailboxlayer::VERSION = '0.003';
 
 use URI::URL;
 use LWP::UserAgent;
@@ -151,14 +151,14 @@ sub check
 
     if ($response->is_error)
     {
-        return Net::Mailboxlayer::Error->new({
+        return Net::Mailboxlayer::Error->new(
             success => 0,
             error => {
                 code => $response->code,
                 type => $response->status_line,
                 info => $response->message,
             },
-        });
+        );
     }
 
     # todo: try catch here in case we have invalid json
@@ -367,11 +367,23 @@ The only restriction is that you pass a blessed ovject that has a 'decode' metho
 
 Make the api call to measure the C<email_address>.
 
- my $result = $mailboxlayer->check;
-
 This method will return either a F<Net::Mailboxlayer::Response> object on success or a F<Net::Mailboxlayer::Error> when an error occurs.
 
 You can call $result->has_error to determine if there was an error or not.
+
+ my $result = $mailboxlayer->check;
+ if ($result->has_error)
+ {
+   # $result is a F<Net::Mailboxlayer::Error> object.
+   print "There was an error: ". $result->info . "\n";
+ }
+ else
+ {
+   # $result is a F<Net::Mailboxlayer::Response> object.
+   $result->score;
+ }
+
+
 
 =head1 AUTHOR
 

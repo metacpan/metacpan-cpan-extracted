@@ -1,6 +1,6 @@
 package Acme::ICan::tSpell;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Moo;
 use MooX::LazierAttributes qw/rw lzy/;
@@ -19,7 +19,7 @@ validate_subs (
     get => { params => [ [Str] ], returns => [[HashRef]] },
     spell_check => { 
         params => { check => [Str], base_url => [Str, 'base_url'] },
-        returns => [[Str, 1]],
+        returns => [[Str]],
     }, 
     spell => { params => [[Str]], returns => [[Str]] },
 );
@@ -35,7 +35,7 @@ sub spell_check {
     my $moon = $_[0]->get(sprintf('%s%s', $_[1]->{base_url}, uri_escape($_[1]->{check})))->{content};
     if ($moon =~ m{(?:Showing results for|Did you mean|Including results for)[^\0]*?<a.*?>(.*?)</a>}){
         (my $str = $1) =~ s/<.*?>//g;
-        return $str;
+ 		return $_[0]->spell_check({ check => $str }); # work around googles struggles  	
     }
     return $_[1]->{check};
 }
@@ -54,7 +54,7 @@ Acme::ICan::tSpell - What do you do..
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
@@ -67,13 +67,14 @@ You use google...
     my $speller = Acme::ICan'tSpell->new();
     ...
     
-    $speller->spell('thakn yuo'); # thank you;
-
+    $speller->spell(q|last day stuk in a big Austrlien bank surrnded by srum and UX desigers.|);
+	# last day stuck in a big Australian bank surrounded by scrum and UX designers.	
+	
 =head1 SUBROUTINES/METHODS
 
 =head2 spell
 
-Accepts a word, phrase or sentence and uses google search to return a
+Accepts a word, phrase or sentence and uses google search to return the
 correctly spelled version. 
 
     $speller->spell();

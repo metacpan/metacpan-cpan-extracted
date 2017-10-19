@@ -1,0 +1,46 @@
+NAME
+    DateTimeX::Duration::Lite - Duration objects for date math (lite
+    version)
+
+VERSION
+    This document describes version 0.002 of DateTimeX::Duration::Lite (from
+    Perl distribution DateTimeX-Duration-Lite), released on 2017-10-19.
+
+SYNOPSIS
+    Use like you would DateTime::Duration.
+
+DESCRIPTION
+    EXPERIMENTAL, EARLY RELEASE.
+
+    This class is an alternative to DateTime::Duration. The goal is to
+    provide a reasonably compatible interface with less {startup overhead,
+    code, memory usage}.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/DateTimeX-Duration-Lite>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-DateTimeX-Duration-Lite>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=DateTimeX-Duration-Li
+    te>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    DateTime::Duration
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

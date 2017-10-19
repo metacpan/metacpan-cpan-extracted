@@ -1,5 +1,9 @@
 Revision history for Clone-Choose
 
+0.003	2017-10-16
+    - Introduce a backend() debug helper to help identifying issues depending
+      on underlying
+
 0.002   2017-10-05
     - When using Clone.pm enforce minimum version 0.10.
     - Fix bug which caused clone() not to be exported in the correct namespace.

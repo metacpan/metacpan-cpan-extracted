@@ -5,7 +5,7 @@ use warnings;
 
 use Number::Format;
 
-our $VERSION = 0.1;
+our $VERSION = 0.21;
 
 my %defaults =
 (

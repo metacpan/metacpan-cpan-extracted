@@ -1,6 +1,6 @@
 package MAB2::Writer::RAW;
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 use strict;
 use Moo;

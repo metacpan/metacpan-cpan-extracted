@@ -1,0 +1,81 @@
+cyberpomo.com	RR	cyberpomo.com.	86400	IN	SOA	kennedy.faerywicca.se. hostmaster.cyberpomo.com. 2015050711 28800 7200 604800 86400
+cyberpomo.com	RR	cyberpomo.com.	86400	IN	NSEC	dev.cyberpomo.com. NS SOA MX RRSIG NSEC DNSKEY 
+cyberpomo.com	RR	cyberpomo.com.	86400	IN	RRSIG	NSEC 5 2 86400 20150626093824 20150527092154 26205 cyberpomo.com. eOspPx7FD61xDc2w/cq1rPmePphrn3X2M6L6T4GfYsSBrCct4sClqOakIR8GmuytuqjNlS3eIN/JF+LzoyXLqVtjnUFe4NYUO2jlGt1IlSxcrSJQ6sFfI+tl5VaCIzCDFn++2saxT8RzlCKVJo3Apedw2csHVuoQktZP0y78rW8=
+cyberpomo.com	RR	cyberpomo.com.	86400	IN	NS	ns.cyberpomo.com.
+cyberpomo.com	RR	cyberpomo.com.	86400	IN	NS	ns2.cyberpomo.com.
+cyberpomo.com	RR	cyberpomo.com.	86400	IN	NS	kennedy.faerywicca.se.
+cyberpomo.com	RR	cyberpomo.com.	86400	IN	NS	spencer.faerywicca.se.
+cyberpomo.com	RR	cyberpomo.com.	86400	IN	MX	10 kennedy.faerywicca.se.
+cyberpomo.com	RR	cyberpomo.com.	86400	IN	DNSKEY	256 3 5 AwEAAdvI6Pq+Z8STqOHPxYkgpiPLkSJ13wPBzYDO4pU/p1I4jEhv9pvfRauH5QpY7xChJmLvR+SrKSMbomRQ/ANyayxvpuwjpU4xocFWpOtAR3fOGn+utXmoPjA0fGpSCo/+3CCLNcVpkNc1Un6TWslvLVAzDrgnbwBv2xH1RTIHs/lB ;{id = 26205 (zsk), size = 1024b}
+cyberpomo.com	RR	cyberpomo.com.	86400	IN	DNSKEY	257 3 5 AwEAAcmkKRx6/l0oIFyGSBO/4lQgO3i8dDjGD1a6PC/RwCHgQrrSDbIL2S5D4WCKUWsQ9EVqQ+p3QHEYxL0q7NpCtFjFxP3X+mmyz1wfxBtcsoNwX5uYYKK3GqIYoO2EZQ48oM9TRLfw7vjNMNRNuU58yhyNfV2/cmpw3rgvFinBG1nfG7KWCoH1aP6L/gmRKDF2A+ECTunjvU00JvtG6qK2T2AjCSdqEYIwF8zCsNak4fRcahACIYyiHH4frkNu9M4lJHIt5ltshD9P2NpHtwrSfk1OppmOwwphjp4jGS8FDo7BOn1LWnIuPghs49U3TU70r7ADqSII4rX6WPTIbEsXBG0= ;{id = 35326 (ksk), size = 2048b}
+cyberpomo.com	RR	cyberpomo.com.	86400	IN	RRSIG	DNSKEY 5 2 86400 20150625042739 20150526040008 26205 cyberpomo.com. bEJvwOAak9a0O7tHySnPiP9OSRi6hjLNzp57Aju2JgOurvzrO8USoEyNNNQ5CSyoosr8Ayt9HEAplOpudwzEuCFEolNf8paPkYDnSbTLJONQ354tO1726TEvjfIjE24t8csSwXhv6TcgQ5IQJhV7LpJdXqNXwZxk8tM9PDSh8fE=
+cyberpomo.com	RR	cyberpomo.com.	86400	IN	RRSIG	DNSKEY 5 2 86400 20150625042739 20150526040008 35326 cyberpomo.com. NDJF7Okwj3is2YimIceR0egC3o1kMo2Vr0RIVPTV5isJazC8Lf8pMuIrjWhBE7BrY7GCtjvH/Rqbdof63a41IlJQIghbSXWarc3m598ZrmSJm4mOuJklKn+EoK2BQ7g+hh0zwWUJZTwSqfm2RD5csfuJxSoSTsmzPgebzGg+uNsMBUEYls/o1r6mQozdGoXNQA/g3RUloltZ0jyWiljusvGj6L2zYe9N4HKgQgE4iFxzsf5A80eAsIM7Xi8hxwGBaTdBkLQIwKK8I754zlz2HhTsUk2n+BKtDLt0nYwYOaETf/7/r4Gpz+syoNMhgJ88LpX5GmUOi/OODYR7/moZyw==
+cyberpomo.com	RR	cyberpomo.com.	86400	IN	RRSIG	SOA 5 2 86400 20150710064749 20150610054749 26205 cyberpomo.com. 0AL8OB8YWYvSPOkcUsqy/xbUCTrI/rcQ3BHp4um04r81pbd8EqEyLmVCQ4dwPpKaSimbw6zLvcLw0BRLSIqqVLkaV3zU8wDAVMSbZMlhop5MxTHNWxjI+QF0WPEzbLOYloWeI6D4X7IPF/odtPnXb/PCbOy0NFSDjHpWocPQ9ZA=
+cyberpomo.com	RR	cyberpomo.com.	86400	IN	RRSIG	MX 5 2 86400 20150710062234 20150610054749 26205 cyberpomo.com. FnDOinc+Z2z42h0DnKW3ERUFX+nI1AKBljtrnvMXbLbeVgcHWJYU5/q4BuIMUe5lvFM/D1q++dhp1g6lu25EFtX96wWmClDYppjZDpwMd9fqXt/At8smxGFV0wRb+fiuP69+pZnOcriN668k7bv2cV/XV8fUuea/Zms8kGFeFVg=
+cyberpomo.com	RR	cyberpomo.com.	86400	IN	RRSIG	NS 5 2 86400 20150629001249 20150530000842 26205 cyberpomo.com. LyEQIwPzKJQXydwCbDIzZfTfIUMwBe+dWmt+rbvDVvpbgDFgKcbMhhojvBjmjy15w/etncE4qAKVAqRrJsS2W0qhGQwEp6jz6Q0DaJnFCJ7iNKHxkiYAxd2AqeQvp7ZWNazeOUhdFjDzJRfqjogpDyhhFABCFHwBu1aszr2dutQ=
+cyberpomo.com	RR	dev.cyberpomo.com.	86400	IN	A	127.0.0.1
+cyberpomo.com	RR	dev.cyberpomo.com.	86400	IN	NSEC	dns.cyberpomo.com. A RRSIG NSEC 
+cyberpomo.com	RR	dev.cyberpomo.com.	86400	IN	RRSIG	NSEC 5 3 86400 20150625001602 20150525232102 26205 cyberpomo.com. Kgh3isRRdI/4lNJdEHAWKXTn3l705Ts2bDaMUKQVftCceKDEDkPKt7CMI1S6Xi9WypZCbb9Y28zQ6oH+GYq02B9piGDLo5ZsJmEM3zoqX4JOdTVtCEdXSrIIDuUsQIx3b45q66EkVBPXo5Vxi8EB3xXh+SAyElDNBwFUn9L9A5o=
+cyberpomo.com	RR	dev.cyberpomo.com.	86400	IN	RRSIG	A 5 3 86400 20150625001602 20150525232102 26205 cyberpomo.com. i+FVHZTXOSF9EFAqXb+9xiJqxCRM7WQTtutGmqq9F9bP69zDDFNWwVm9u+vu+dGtjCAQJodUeC32cOSDBKTDXlTtWpi9aAlxWEDd88TNnDPivglOp+9oVbc21JkxrJHSKSW8NbsYawDNIdi4fS8TgTTVcfjVvFYXigf2CQhK4x0=
+cyberpomo.com	RR	dns.cyberpomo.com.	86400	IN	A	83.168.201.130
+cyberpomo.com	RR	dns.cyberpomo.com.	86400	IN	NSEC	fffiles.cyberpomo.com. A RRSIG NSEC 
+cyberpomo.com	RR	dns.cyberpomo.com.	86400	IN	RRSIG	NSEC 5 3 86400 20150625001602 20150525232102 26205 cyberpomo.com. Pm+1SFUdAMAV9KffUo4KK1r+c9VWGzXVr8J1XCOq3LjITestcUS3QmPcoLvgC7O9TqkaV/lLptTdHT22HeW24cNRU2nyn6W8KpOgAUXCUP+zLafzWL8/qy9OCIQ2dQx0MEgYtxl4WH8zWTG07U6+cfMbaVM6JajiCiQ+OMjS+jw=
+cyberpomo.com	RR	dns.cyberpomo.com.	86400	IN	RRSIG	A 5 3 86400 20150625001602 20150525232102 26205 cyberpomo.com. zzdQuPU5mNvV5ssqe2hRq7ujWEL0zY9f5XJzu4L70EEoRJhbiDNCZdmm1dr/UIMbkLxQT9SpRccGexZ025kqx/jLTLMjHOT1tDMJJlj4IAmPSWNYEKWKgImnLT4SjnAnLCBxOuRDSVWGPEBFiQatFHp2ad/iEp8gMa6uILblvr0=
+cyberpomo.com	RR	fffiles.cyberpomo.com.	86400	IN	NSEC	kadath.cyberpomo.com. CNAME RRSIG NSEC 
+cyberpomo.com	RR	fffiles.cyberpomo.com.	86400	IN	RRSIG	CNAME 5 3 86400 20150625004150 20150525235958 26205 cyberpomo.com. QbNadiz+uiqeszymfE9cbBZ3yy8cYVi7B3oH3LDA8IeQisexOGwvCrTEj6n2gn5J4Dbc/p/NpoBfpAnnY46CDsLtOB2DS9Zhjt1YQ+jE2GF2B/U6L7+IZhKeW3TcuUWUdxTND91bfgr2KmCpW201qj9IJtLVUJi6oiXyox/U5/8=
+cyberpomo.com	RR	fffiles.cyberpomo.com.	86400	IN	RRSIG	NSEC 5 3 86400 20150629001249 20150530000842 26205 cyberpomo.com. 2YQ3GEzsz/3XgGlrRvabBQuyq7SgrDvHDb5rGFQYzlZXkEnjdNvLRAFQ3bvs0GvmQg9BXoGcU0FJjqtb+DL2+oD8WYrsIuCY6vuRRnDizVNbv3nlp4eenPTDScUEjjZcF2SS08s7sdEsPUXBU6oMVsj6WnXiKCkjDS3WBZifcnA=
+cyberpomo.com	RR	fffiles.cyberpomo.com.	86400	IN	CNAME	kadath.homedns.org.
+cyberpomo.com	RR	kadath.cyberpomo.com.	86400	IN	NSEC	kadathv6.cyberpomo.com. CNAME RRSIG NSEC 
+cyberpomo.com	RR	kadath.cyberpomo.com.	86400	IN	RRSIG	CNAME 5 3 86400 20150625004150 20150525235958 26205 cyberpomo.com. lEo+TWuOLvxBQop8mAjk6AXHeH9U3zYdTgSHHtoE+uMmXB0TdrodtSJHOVeugVWBB4zv77pQwXNBvFp6PvPTL8MfuyWzPSQCYvqDF0SQurvHcBMF9YkNqMtx3T8cFBq8XFQ9RovBaOcw22is4rYXoc3FWAkqWmwzf9HB+o9x+rA=
+cyberpomo.com	RR	kadath.cyberpomo.com.	86400	IN	RRSIG	NSEC 5 3 86400 20150629001249 20150530000842 26205 cyberpomo.com. rC2WZ76Ix422QUfWPtjhjjbe4qzxY1gY+mBF4G/CeT312kkTBbsXkkoCe/o+lCwYl0wkvz6GaL/ys0iuBzcSQ+LZXF0zws3DMchUOTyKGHcEN98qOxVXoqzQCDoeeoEl81ku1Sl/iK9lv84rZgFU83dYxDzP8xEqYAkPwjdJ/FM=
+cyberpomo.com	RR	kadath.cyberpomo.com.	86400	IN	CNAME	kadath.homedns.org.
+cyberpomo.com	RR	kadathv6.cyberpomo.com.	86400	IN	NSEC	lists.cyberpomo.com. AAAA RRSIG NSEC 
+cyberpomo.com	RR	kadathv6.cyberpomo.com.	86400	IN	RRSIG	AAAA 5 3 86400 20150625001200 20150525233036 26205 cyberpomo.com. kKU6QzeU9MuSt6pUKC9YJ0GZwsxuDx4dBEoRK6XNIuULYKtu2tN0czMsgAHCdse105LU+WJg5kVTZJBHYWpkw4PIPi9tMvR1PGa0wOrX5TvvkKWz7NLTZ5Kun1/INql3jP1yhizoUYQMQbA14xA7kQi2HPTkwx2oqEj6wMhC4r8=
+cyberpomo.com	RR	kadathv6.cyberpomo.com.	86400	IN	RRSIG	NSEC 5 3 86400 20150625001200 20150525233036 26205 cyberpomo.com. K9DeeiUR0tQIYr+jX0HUg3CbfgkEbSq+gAJ8DW+GPohB9lIW39e+inomnVpEP2FVoIW//GBexX8dK7teyuTrrauZEuvIKAfTlfM2YfLqr/MtD55q2iVCXJgFlB0cFOUgUCFVPeaEuXYiznf/iXH06DHWxJFgTTIcfTjtc+eyLSY=
+cyberpomo.com	RR	kadathv6.cyberpomo.com.	86400	IN	AAAA	2001:470:27:594::2
+cyberpomo.com	RR	lists.cyberpomo.com.	86400	IN	NSEC	lj.cyberpomo.com. A RRSIG NSEC 
+cyberpomo.com	RR	lists.cyberpomo.com.	86400	IN	RRSIG	A 5 3 86400 20150625001200 20150525233036 26205 cyberpomo.com. lhfflcNhPDhpouBVNzas7oSiXgwSxZc+W+P4MCIMotBwCT/1GoJqeB9399hHcq3gzJMT1REe5IxtdQkw1Bvm4YC7BXAWTZBBZn9iVhtRuqifMJtJCFXVVxO3d+F5Nz/cABQD/gQHRBcHXhiB05Q75L7JnHwhSj+5YB0XM3qNgOA=
+cyberpomo.com	RR	lists.cyberpomo.com.	86400	IN	RRSIG	NSEC 5 3 86400 20150625001200 20150525233036 26205 cyberpomo.com. nRNVBYlpfnNX01zGhT41XmMP3JlPA0/XmFukLgzNGnBsDC8TiX4R9dwORZgYxT9xltgPuOlQX9JjOWAMd+B5NIM+xBvNLZwpoivz+T4z6uLe8ajadM0BP9qktHa09xVloQhDCHJ+dvvWHpTn7QCMjHw1IZmLHIMaobs1fMqbFdE=
+cyberpomo.com	RR	lists.cyberpomo.com.	86400	IN	A	83.168.201.130
+cyberpomo.com	RR	lj.cyberpomo.com.	86400	IN	NSEC	minitaur.cyberpomo.com. CNAME RRSIG NSEC 
+cyberpomo.com	RR	lj.cyberpomo.com.	86400	IN	RRSIG	CNAME 5 3 86400 20150625001200 20150525233036 26205 cyberpomo.com. Fik2xujBH5qzbJ7DjLgGD70avGDLqPmGOQQ1XxBN2x0dnZmnpcJ9m1pxJ0gDZUnoPcvvRPA0taSQ2gDlfwqUrxEJuYI/D5UgG7XIXv5/IwbQWMF2u+CtZnzEw814g2OhpLhTkG29kuh6qIgStxkUu2jQ04RZ8KFVgRamIq5D3M8=
+cyberpomo.com	RR	lj.cyberpomo.com.	86400	IN	RRSIG	NSEC 5 3 86400 20150625001200 20150525233036 26205 cyberpomo.com. SzbMwQV4BgO4rShvn14sXJMbRpJVcBbZTvuPiORvEUneym/0HavwxCzovDROlCker4/4qImzNffOCywLAZRmRa0CWU6U+R1nOrqDJ9DXvgIdD8SBWcNnyCpmU4HdgkRrCS/pq3Ccc14zfS+EibdghbB1bTIPD0T+3v2ssJjkdpA=
+cyberpomo.com	RR	lj.cyberpomo.com.	86400	IN	CNAME	livejournal.com.
+cyberpomo.com	RR	minitaur.cyberpomo.com.	86400	IN	NSEC	necronomicon.cyberpomo.com. AAAA RRSIG NSEC 
+cyberpomo.com	RR	minitaur.cyberpomo.com.	86400	IN	RRSIG	AAAA 5 3 86400 20150625001200 20150525233036 26205 cyberpomo.com. RNNPc8sbK4OghcTm13our1iJJiMfl0a5xOSsyE4ysZuGYK81A8vdnoekOjup7pj9IZkxBKhqDfh2f/QMKbowZ0SLELRG0BGOSlH6hZqabZJ8llL7E3mX5/knOhaBh+fveeqJdS248Vio0NMZXi6mPm2TOtnAtd4b/kC9sV5AfQA=
+cyberpomo.com	RR	minitaur.cyberpomo.com.	86400	IN	RRSIG	NSEC 5 3 86400 20150625001200 20150525233036 26205 cyberpomo.com. h/emdLS51zRmMDg3Z+h+1l9cpf+n0H/1PMEot2Zl/V3hMjuRms3nNdIvedTcdhno0IihtL8B8eQLBZVz/bRPa14BwJ5FStTCPuysERgftkG4s/6L0XlbOpPN1T6nbwqE/Utt0K2ddt+SZhPXSAcKz5dJegxm7eclq8W5vCUz98k=
+cyberpomo.com	RR	minitaur.cyberpomo.com.	86400	IN	AAAA	2001:16d8:ff60:0:2acf:daff:fe00:a52b
+cyberpomo.com	RR	necronomicon.cyberpomo.com.	86400	IN	NSEC	ns.cyberpomo.com. AAAA RRSIG NSEC 
+cyberpomo.com	RR	necronomicon.cyberpomo.com.	86400	IN	RRSIG	AAAA 5 3 86400 20150625004957 20150526001230 26205 cyberpomo.com. pl2eZ1JjMjZZx+xEOayN1b/kXC2pexUCUampbaxI3JGVwjMoWV8p7+HcZL0+ZMP3+QRmQojlxah8QPFiXxVp5zJabDPBK58Yv33aZRIlStyGmjZg2ZXATCcQLnQ5/v6WHw9zrfjiWxK36tlC2FLUdMul7iD7x8Gpe+gB9nRn5r0=
+cyberpomo.com	RR	necronomicon.cyberpomo.com.	86400	IN	RRSIG	NSEC 5 3 86400 20150625004957 20150526001230 26205 cyberpomo.com. kSpMuY4zDjWIQnMSwUPzgrzDUyrP24PCn0uG488k6MVnzqgPnNclyLgyp00fbg7mSmPatDv4E1sCVJapFa9chGWAaux7oF7A0B2xzGEgTxcTmTEHidSKQFRtyiqhtNCyhBK4caMErgmEn7pN7FoXuNmz1EeMzZOmI24WQrs2YDA=
+cyberpomo.com	RR	necronomicon.cyberpomo.com.	86400	IN	AAAA	2001:16d8:ff00:330::2
+cyberpomo.com	RR	ns.cyberpomo.com.	86400	IN	NSEC	ns2.cyberpomo.com. A RRSIG NSEC 
+cyberpomo.com	RR	ns.cyberpomo.com.	86400	IN	RRSIG	A 5 3 86400 20150625004957 20150526001230 26205 cyberpomo.com. n+HIJDMJY3dfJWZALTObICtNeU2Ro9dJwcPeD/c6zcKiYy4KmFiE2N02HKBN0BUmuCNLo3VVk+ecq7GRUenoaCQGO3IZXaLKfGQ/SnRnel4MzZTHaALF72cWXZcpnWezwbAhORy37pPP2ug12ITAPc8pbyYaZdyQff8NMgm/RlQ=
+cyberpomo.com	RR	ns.cyberpomo.com.	86400	IN	RRSIG	NSEC 5 3 86400 20150625004957 20150526001230 26205 cyberpomo.com. ZURG3HunPyf4snLNyJa+VAfAmyMNANsx2FWidCAwltzscJWQ/XGOMBIhKwcMZU3RO0Qd+/ThUJgSchHSQGxelDV5rmInt/hET4hd4kB7sR6MT3vhLel1Tnad4d7SWnW9/aKuGhjN7xV+l1unYv9bHUTQ2ikGMA+0HzEB6wQ+F/k=
+cyberpomo.com	RR	ns.cyberpomo.com.	86400	IN	A	46.21.106.227
+cyberpomo.com	RR	ns2.cyberpomo.com.	86400	IN	NSEC	rails.cyberpomo.com. A AAAA RRSIG NSEC 
+cyberpomo.com	RR	ns2.cyberpomo.com.	86400	IN	RRSIG	A 5 3 86400 20150625004957 20150526001230 26205 cyberpomo.com. fOOla/Qccic6ET1x8En9pJTAWJTDJssW+iXbOLV00vtiEkwT7hjAgJ2U0bVqu4KeaP+Wjn2+e7T8i7g4PHdagBVRe/CS7rf3RrW/JQGLo1KjwemxxLU77qxhVRrfFZ4NIaiLEvhSfbTZjpihRLHe9coxjrMV1G6kkvvhr9TC9n4=
+cyberpomo.com	RR	ns2.cyberpomo.com.	86400	IN	RRSIG	AAAA 5 3 86400 20150625004957 20150526001230 26205 cyberpomo.com. kwwdOn+09OQnt2bsyZqsQQSX2HtQ0P8nGClempG2s6IXnHvx+xq4mmu5py0szyAJhxu7VycYCQxmz7rCNWN2HLBVMAWOPFAHVUD4cM9EcMG3Dnq1YtKIR0MQZUS0di0y6MtrUngXuA50Duv2kWfNg4hKjC4mZSd0QjZXKvjpmtI=
+cyberpomo.com	RR	ns2.cyberpomo.com.	86400	IN	RRSIG	NSEC 5 3 86400 20150625004957 20150526001230 26205 cyberpomo.com. YODF5Qeyb/whHC3A1p/8oVqcCL1XclL3roejlm8FenfJVuuwAlQtxEt7eM/B/bacFSs6IEaT/AiIhNE5nICVDGvxtRQ77XanLoifm23sMagpexiFPiEy5qiP/kFYsCfjpuKJjrG+3PF0rCBHYlLNrNUWZZ4UGbObtvb+iQkS7L4=
+cyberpomo.com	RR	ns2.cyberpomo.com.	86400	IN	A	46.21.100.115
+cyberpomo.com	RR	ns2.cyberpomo.com.	86400	IN	AAAA	2a02:750:8::44b
+cyberpomo.com	RR	rails.cyberpomo.com.	86400	IN	NSEC	shiksaa.cyberpomo.com. A TXT RRSIG NSEC 
+cyberpomo.com	RR	rails.cyberpomo.com.	86400	IN	RRSIG	TXT 5 3 86400 20150625020536 20150526020344 26205 cyberpomo.com. VOvj53jponkTw3vr9FjGfTZWLidYwyqw9ynaivXL0ZgrrBXKmPauPhoBx5f+BInBzHOUsrRgU+RMSiUmg7/69RkQqgXDrpjaECw2KCRhp72xPdWMTkvU6awsDfGSkxwNdC7+nvoxlHyCKE4+bkoEvH38PqHJWPiir4w5Hv8av1U=
+cyberpomo.com	RR	rails.cyberpomo.com.	86400	IN	RRSIG	NSEC 5 3 86400 20150625020536 20150526020344 26205 cyberpomo.com. g+CDfXgUpoNeWd39oz3IJxLLiLgzOBs2OsjcAVD4nwDYx8/hxo13dGGvVBJ9ZdiWzUADpn+f9UlL2sI+KR87CoyciNiqdl31v0uFNcMwL31zjLIvDyhhGQrvr78zzeAOMzddZ8JLIpechFE3W6PBA/IHnsLh2MKW5abgX64LOs8=
+cyberpomo.com	RR	rails.cyberpomo.com.	86400	IN	RRSIG	A 5 3 86400 20150625020536 20150526020344 26205 cyberpomo.com. FX4/JDWC3LvJ0HnBEkLG3QvhW3+edGlNNe3ldlW9Ky1jpiKh23115L4etOBvkzRcj70WQ6HBj9ZWwYtrdijb2+BPYO5OYZNPYyrXWqdYRLWMjdJLnfzkcHgg25b2a/uAQVG+fTOBeJL1mrGrFe1VCFcvAztSvuVXXfAj2V33gis=
+cyberpomo.com	RR	rails.cyberpomo.com.	86400	IN	A	83.168.201.134
+cyberpomo.com	RR	rails.cyberpomo.com.	86400	IN	TXT	"Text record."
+cyberpomo.com	RR	shiksaa.cyberpomo.com.	86400	IN	NSEC	users.cyberpomo.com. A RRSIG NSEC 
+cyberpomo.com	RR	shiksaa.cyberpomo.com.	86400	IN	RRSIG	A 5 3 86400 20150625020536 20150526020344 26205 cyberpomo.com. OPcHDX5ayP6KjSU4JSNfO7NK77qvl8gSpSs5ha5FL+C4Z43HIui/PBPLOdUCtaUJoQFkwqC1OC1UqM4Ej/NejKywTqVI4H8FztRhXpxr+XgvC9SZ/WWOvAtRT9jlSevtSX9F78Rfb0nkUDrE7RRwEW0snCeGYWIpczRaEmGFomg=
+cyberpomo.com	RR	shiksaa.cyberpomo.com.	86400	IN	RRSIG	NSEC 5 3 86400 20150625020536 20150526020344 26205 cyberpomo.com. OI3Abdnxa3txsIE90iocdYzC9o/gAXNQszomVU2ZVNuN01ic8irGumWq/Xpf997ZCi85KJOcUVDXrOioBK8mcodK4goiCyXFVrtjwMVWnFitlq69hnqb0HOOo++B2Aks1iNCSozH+AaDAmV6N8qJ0gHPxLT9i3rfSGk6Qyb83+Y=
+cyberpomo.com	RR	shiksaa.cyberpomo.com.	86400	IN	A	82.182.159.13
+cyberpomo.com	RR	users.cyberpomo.com.	86400	IN	NSEC	www.cyberpomo.com. A RRSIG NSEC 
+cyberpomo.com	RR	users.cyberpomo.com.	86400	IN	RRSIG	A 5 3 86400 20150625020536 20150526020344 26205 cyberpomo.com. mD27UG4x1xZCoXgH1OfOzkXNRtb+ck38Ecnk+Ej2BFrkjDDMvHnYE/BJLcGfEnogDUVJOs8+UGYFJxyL5Os9AdVqltxIWNHrvpHrsfCuBH+C7zsjEiZYM1Pl7qrONPAoZIUiA1LYJb2vVyPzF1iY+HcT63Hhmnn4kZZR2p/Ucs4=
+cyberpomo.com	RR	users.cyberpomo.com.	86400	IN	RRSIG	NSEC 5 3 86400 20150625020536 20150526020344 26205 cyberpomo.com. Yb8BGbM+9yhmdiet/frBJ9rnj06vtb5fs86QBJxBkzehz22i9ZHHa/VM++oL+zBTh2inFVtFexM97v1L9//4rbEMmb8WzKmC/ws5J+VL7i0/qBQoNu+eIvwU1JH9HTJ64UgEJTYFRh2ypehBxoMLBxSFOxardfw/MU3YWn4mL7w=
+cyberpomo.com	RR	users.cyberpomo.com.	86400	IN	A	83.168.201.132
+cyberpomo.com	RR	www.cyberpomo.com.	86400	IN	NSEC	cyberpomo.com. CNAME RRSIG NSEC 
+cyberpomo.com	RR	www.cyberpomo.com.	86400	IN	RRSIG	CNAME 5 3 86400 20150423171649 20150324162443 26205 cyberpomo.com. 2wz8SgfN6jFkc9noin+69y1s0+bpaH+VoajRTdJpyZaqnrWy2QcHrEO5DSO3bx/3pXu24ySuZE+AyAErqIs/zBWLm/CmTbllpfNI9aZ0pKnFNRmM+ZSualYbsc1R5eme3YGlvI65c0BoIJwzBN/Lg4dfLsIgXYNZEgbDxCBWNE0=
+cyberpomo.com	RR	www.cyberpomo.com.	86400	IN	RRSIG	NSEC 5 3 86400 20150625033600 20150526031505 26205 cyberpomo.com. VF8CIdNnz+Pfv11E1Cz40yLfn+bzt24E1tvlceyasuzjs5sviM31bE7T2nxHPygwoir4sOgbZ6iW6TsIMAXfPF3qZj+qxiyGmEMlSB2O5Fgj7tufSLYIHcdsbziV67YHaTUdymVXGKrHQyfPhuqRJw6qVn138Llb+qcpufUz2mg=
+cyberpomo.com	RR	www.cyberpomo.com.	86400	IN	CNAME	spencer.faerywicca.se.
+cyberpomo.com	RR	cyberpomo.com.	86400	IN	SOA	kennedy.faerywicca.se. hostmaster.cyberpomo.com. 2015050711 28800 7200 604800 86400
+iis.se	EXCEPTION	AXFR transfer error: REFUSED at /home/levigner/Zonemaster/zonemaster-engine/blib/lib/Zonemaster/Nameserver.pm line 463, <DATA> line 1.

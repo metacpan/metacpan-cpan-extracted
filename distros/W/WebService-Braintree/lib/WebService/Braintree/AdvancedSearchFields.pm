@@ -1,5 +1,8 @@
 package WebService::Braintree::AdvancedSearchFields;
-$WebService::Braintree::AdvancedSearchFields::VERSION = '0.93';
+$WebService::Braintree::AdvancedSearchFields::VERSION = '0.94';
+use 5.010_001;
+use strictures 1;
+
 use Carp;
 use Moose;
 
@@ -13,36 +16,36 @@ sub field {
 sub is {
     my ($self, $name) = @_;
     $self->field($name, sub {
-                     return WebService::Braintree::IsNode->new(searcher => shift, name => $name);
-                 });
+        return WebService::Braintree::IsNode->new(searcher => shift, name => $name);
+    });
 }
 
 sub equality {
     my ($self, $name) = @_;
     $self->field($name, sub {
-                     return WebService::Braintree::EqualityNode->new(searcher => shift, name => $name);
-                 });
+        return WebService::Braintree::EqualityNode->new(searcher => shift, name => $name);
+    });
 }
 
 sub text {
     my ($self, $name) = @_;
     $self->field($name, sub {
-                     return WebService::Braintree::TextNode->new(searcher => shift, name => $name);
-                 });
+        return WebService::Braintree::TextNode->new(searcher => shift, name => $name);
+    });
 }
 
 sub key_value {
     my ($self, $name) = @_;
     $self->field($name, sub {
-                     return WebService::Braintree::KeyValueNode->new(searcher => shift, name => $name);
-                 });
+        return WebService::Braintree::KeyValueNode->new(searcher => shift, name => $name);
+    });
 }
 
 sub range {
     my ($self, $name) = @_;
     $self->field($name, sub {
-                     return WebService::Braintree::RangeNode->new(searcher => shift, name => $name);
-                 });
+        return WebService::Braintree::RangeNode->new(searcher => shift, name => $name);
+    });
 }
 
 sub multiple_values {
@@ -51,7 +54,8 @@ sub multiple_values {
         return WebService::Braintree::MultipleValuesNode->new(
             searcher => shift,
             name => $name,
-            allowed_values => @allowed_values ? [@allowed_values] : undef)
+            allowed_values => @allowed_values ? [@allowed_values] : undef,
+        );
     };
     $self->field($name, $node);
 }
@@ -59,10 +63,11 @@ sub multiple_values {
 sub partial_match {
     my ($self, $name) = @_;
     $self->field($name, sub {
-                     return WebService::Braintree::PartialMatchNode->new(searcher => shift, name => $name);
-                 });
+        return WebService::Braintree::PartialMatchNode->new(searcher => shift, name => $name);
+    });
 }
 
 __PACKAGE__->meta->make_immutable;
-1;
 
+1;
+__END__

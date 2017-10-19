@@ -8,7 +8,7 @@ package Devel::MAT;
 use strict;
 use warnings;
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 use Carp;
 use List::Util qw( first pairs );
@@ -235,35 +235,29 @@ sub inref_graph
       my $desc = $sv->type eq "UNDEF" ? "undef" :
                  $sv->uv              ? "true" :
                                         "false";
-      $graph->add_root( $sv, $desc );
+      $graph->add_root( $sv,
+         Devel::MAT::SV::Reference( $desc, strong => undef ) );
       return $graph->get_sv_node( $sv );
    }
 
    my $name;
    if( $elide_sym and $name = $sv->name and
          $name !~ m/^&.*::__ANON__$/ ) {
-      $graph->add_root( $sv, "the symbol '" . Devel::MAT::Cmd->format_symbol( $name, $sv ) . "'" );
+      $graph->add_root( $sv,
+         Devel::MAT::SV::Reference( "the symbol '" . Devel::MAT::Cmd->format_symbol( $name, $sv ) . "'", strong => undef ) );
       return $graph->get_sv_node( $sv );
-   }
-
-   my $svaddr = $sv->addr;
-
-   foreach ( pairs $self->dumpfile->roots ) {
-      my ( $name, $root ) = @$_;
-      $root and $svaddr == $root->addr and
-         $graph->add_root( $sv, $name ), return $graph->get_sv_node( $sv );
    }
 
    $graph->add_sv( $sv );
 
-   my @ret = ();
    my @inrefs = $opts{strong} ? $sv->inrefs_strong :
                 $opts{direct} ? $sv->inrefs_direct :
                                 $sv->inrefs;
 
    if( $elide_rv ) {
       @inrefs = map { sub {
-         return $_ unless $_->sv->type eq "REF" and
+         return $_ unless $_->sv and
+                          $_->sv->type eq "REF" and
                           $_->name eq "the referrant";
 
          my $rv = $_->sv;
@@ -281,7 +275,8 @@ sub inref_graph
 
    if( $elide_pad ) {
       @inrefs = map { sub {
-         return $_ unless $_->sv->type eq "PAD";
+         return $_ unless $_->sv and
+                          $_->sv->type eq "PAD";
          my $pad = $_->sv;
          my $cv = $pad->padcv;
          # Even if the CV isn't active, this might be a state variable so we
@@ -293,9 +288,7 @@ sub inref_graph
 
    foreach my $ref ( sort_by { $_->name } @inrefs ) {
       if( !defined $ref->sv ) {
-         # e.g. "a value on the stack"
-         $graph->add_root( $sv, $ref->name );
-         push @ret, $ref->name;
+         $graph->add_root( $sv, $ref );
          next;
       }
 
@@ -444,11 +437,24 @@ sub print_table
       my $colidx = $_;
       # TODO: consider a unicode/terminal-aware version of length here
       max map { length $_->[$colidx] } @$rows;
-   } 0 .. $cols-2;
+   } 0 .. $cols-1;
+
+   my $align = $opts{align} // "";
+   $align = [ ( $align ) x $cols ] if !ref $align;
+
+   my @leftalign = map { ($align->[$_]//"") ne "right" } 0 .. $cols-1;
 
    my $format = join( $opts{sep} // " ",
-      ( map { "%-${_}s" } @colwidths ), "%s\n"
-   );
+      ( map {
+         my $col = $_;
+         my $width = $colwidths[$col];
+         my $flags = $leftalign[$col] ? "-" : "";
+         # If final column should be left-aligned don't bother with width
+         $width = "" if $col == $cols-1 and $leftalign[$col];
+
+         "%${flags}${width}s"
+      } 0 .. $cols-1 ),
+   ) . "\n";
 
    foreach my $row ( @$rows ) {
       $self->printf( $format, @$row );

@@ -1,9 +1,9 @@
 package Net::DNS::Resolver;
 
 #
-# $Id: Resolver.pm 1590 2017-08-18 09:56:05Z willem $
+# $Id: Resolver.pm 1598 2017-10-03 09:48:30Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1590 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1598 $)[1];
 
 =head1 NAME
 
@@ -44,7 +44,7 @@ __END__
 
     # Send a prebuilt query packet
     $query = new Net::DNS::Packet( ... );
-    $reply = $resolver->send( $packet );
+    $reply = $resolver->send( $query );
 
 =head1 DESCRIPTION
 
@@ -202,19 +202,20 @@ any answers or not, use the C<send()> method instead.
 
 =head2 send
 
-    $packet = $resolver->send( $packet );
+    $packet = $resolver->send( $query );
 
     $packet = $resolver->send( 'mailhost.example.com' );
     $packet = $resolver->query( '192.0.2.1' );
     $packet = $resolver->send( 'example.com', 'MX' );
     $packet = $resolver->send( 'annotation.example.com', 'TXT', 'IN' );
 
-Performs a DNS query for the given name.  Neither the searchlist
-nor the default domain will be appended.
+Performs a DNS query for the given name.
+Neither the searchlist nor the default domain will be appended.
 
-The argument list can be either a L<Net::DNS::Packet> object or a list
-of strings.  The record type and class can be omitted; they default to
-A and IN.  If the name looks like an IP address (IPv4 or IPv6),
+The argument list can be either a pre-built query L<Net::DNS::Packet>
+or a list of strings.
+The record type and class can be omitted; they default to A and IN.
+If the name looks like an IP address (IPv4 or IPv6),
 then a query within in-addr.arpa or ip6.arpa will be performed.
 
 Returns a L<Net::DNS::Packet> object whether there were any answers or not.
@@ -339,7 +340,7 @@ received before the timeout interval expired.
 Returns true while awaiting the response or for the transaction to time out.
 The argument is the handle returned by C<bgsend()>.
 
-Truncated UDP packets will be retried over TCP transparently while
+Truncated UDP packets will be retried transparently using TCP while
 continuing to assert busy to the caller.
 
 
@@ -532,7 +533,7 @@ The default is 30 seconds.
 Get or set the UDP packet size.
 If set to a value not less than the default DNS packet size,
 an EDNS extension will be added indicating support for
-large UDP datagram.
+large UDP datagrams.
 
 
 =head2 usevc
@@ -558,8 +559,10 @@ received in response to a query.
 
     print 'query status: ', $resolver->errorstring, "\n";
 
-Returns a string containing error information from the most recent method call.
-C<errorstring()> is meaningful only when interrogated immediately after an error.
+Returns a string containing error information from the most recent
+DNS protocol interaction.
+C<errorstring()> is meaningful only when interrogated immediately
+after the corresponding method call.
 
 
 =head2 dnssec
@@ -693,8 +696,7 @@ take values are specified as C<option:value>.
 =head1 IPv6 TRANSPORT
 
 The Net::DNS::Resolver library will enable IPv6 transport if the
-appropriate library (L<IO::Socket::IP> or L<IO::Socket::INET6>) is
-available and the destination nameserver has an IPv6 address.
+L<IO::Socket::IP> library package is available.
 
 The C<force_v4()>, C<force_v6()>, C<prefer_v4()>, and C<prefer_v6()> methods
 with non-zero argument may be used to configure transport selection.

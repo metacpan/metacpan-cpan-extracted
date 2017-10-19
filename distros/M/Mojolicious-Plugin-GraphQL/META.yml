@@ -1,0 +1,33 @@
+---
+abstract: 'a plugin for adding GraphQL route handlers'
+author:
+  - 'Ed J <etj@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Mojolicious: '0'
+  Test::More: '0.92'
+configure_requires:
+  ExtUtils::MakeMaker: 6.63_03
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150001'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-GraphQL
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  GraphQL: '0.15'
+  Mojolicious: '5.48'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  IRC: irc://irc.perl.org/#graphql-perl
+  bugtracker: https://github.com/graphql-perl/Mojolicious-Plugin-GraphQL/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/graphql-perl/Mojolicious-Plugin-GraphQL
+version: '0.03'

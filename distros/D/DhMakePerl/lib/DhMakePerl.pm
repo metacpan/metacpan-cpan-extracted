@@ -14,11 +14,11 @@ DhMakePerl - create Debian source package from CPAN dist
 
 =head1 VERSION
 
-Version 0.89
+Version 0.90
 
 =cut
 
-our $VERSION = '0.89';
+our $VERSION = '0.96';
 
 =head1 SYNOPSIS
 
@@ -100,9 +100,7 @@ sub get_apt_contents {
     my $apt_c = Debian::AptContents->new(
         {   homedir      => $self->cfg->home_dir,
             dist         => $self->cfg->dist,
-            sources      => $self->cfg->sources_list,
             verbose      => $self->cfg->verbose,
-            contents_dir => $self->cfg->apt_contents_dir,
         }
     );
 

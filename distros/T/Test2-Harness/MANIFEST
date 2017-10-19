@@ -158,6 +158,8 @@ t2/findbin.t
 t2/no_stdout_eol.t
 t2/output.t
 t2/relative_paths.t
+t2/require_file.pm
+t2/require_file.t
 t2/simple.t
 test.pl
 xt/author/pod-spell.t

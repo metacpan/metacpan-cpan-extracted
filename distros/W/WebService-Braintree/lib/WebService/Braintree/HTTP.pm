@@ -1,8 +1,16 @@
+# vim: sw=4 ts=4 ft=perl
+
 package WebService::Braintree::HTTP;
-$WebService::Braintree::HTTP::VERSION = '0.93';
+$WebService::Braintree::HTTP::VERSION = '0.94';
+use 5.010_001;
+use strictures 1;
+
+use Data::Dumper;
 use HTTP::Request;
 use LWP::UserAgent;
-use WebService::Braintree::Xml;
+
+use WebService::Braintree::Xml qw(hash_to_xml xml_to_hash);
+
 use Moose;
 use Carp qw(confess);
 use constant CLIENT_VERSION => $WebService::Braintree::VERSION || 'development';
@@ -11,22 +19,22 @@ has 'config' => (is => 'ro', default => sub { WebService::Braintree->configurati
 
 sub post {
     my ($self, $path, $params) = @_;
-    $self -> make_request($path, $params, 'POST');
+    $self->make_request($path, $params, 'POST');
 }
 
 sub put {
     my ($self, $path, $params) = @_;
-    $self -> make_request($path, $params, 'PUT');
+    $self->make_request($path, $params, 'PUT');
 }
 
 sub get {
     my ($self, $path, $params) = @_;
-    $self -> make_request($path, $params, 'GET');
+    $self->make_request($path, $params, 'GET');
 }
 
 sub delete {
     my ($self, $path, $params) = @_;
-    $self -> make_request($path, undef, 'DELETE');
+    $self->make_request($path, undef, 'DELETE');
 }
 
 sub make_request {
@@ -44,7 +52,10 @@ sub make_request {
     $request->header("User-Agent" => "Braintree Perl Module " . CLIENT_VERSION );
 
     my $agent = LWP::UserAgent->new;
+
+    warn Dumper $request if $ENV{WEBSERVICE_BRAINTREE_DEBUG};
     my $response = $agent->request($request);
+    warn Dumper $response->content if $ENV{WEBSERVICE_BRAINTREE_DEBUG};
 
     $self->check_response_code($response->code);
 
@@ -65,5 +76,6 @@ sub check_response_code {
 }
 
 __PACKAGE__->meta->make_immutable;
-1;
 
+1;
+__END__

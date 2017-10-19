@@ -26,9 +26,18 @@ Module::Build->new(
 	dynamic_config => 0,
 	meta_add => { distribution_type => "module" },
 	meta_merge => {
+		"meta-spec" => { version => "2" },
 		resources => {
-			repository =>
-				"git://git.fysh.org/zefram/Module-Runtime.git",
+			bugtracker => {
+				mailto => "bug-Module-Runtime\@rt.cpan.org",
+				web => "https://rt.cpan.org/Public/Dist/".
+					"Display.html?Name=Module-Runtime",
+			},
+			repository => {
+				type => "git",
+				url => "git://git.fysh.org/zefram/".
+					"Module-Runtime.git",
+			},
 		},
 	},
 	create_makefile_pl => "traditional",

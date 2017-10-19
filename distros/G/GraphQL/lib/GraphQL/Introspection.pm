@@ -39,7 +39,7 @@ my $JSON = JSON::MaybeXS->new->allow_nonref;
 =head1 SYNOPSIS
 
   use GraphQL::Introspection qw($QUERY);
-  my $schema_data = GraphQL::Execution->execute($schema, $QUERY);
+  my $schema_data = execute($schema, $QUERY);
 
 =head1 DESCRIPTION
 
@@ -315,8 +315,8 @@ our $ENUM_VALUE_META_TYPE = GraphQL::Type::Object->new(
   fields => {
     name => { type => $String->non_null },
     description => { type => $String },
-    _make_hash_bool_field(isDeprecated => $Boolean->non_null, 'is_deprecated'),
-    _make_hash_field(deprecationReason => $String, 'deprecation_reason'),
+    _make_hash_bool_field(isDeprecated => $Boolean->non_null, 'isDeprecated'),
+    _make_hash_field(deprecationReason => $String, 'deprecationReason'),
   },
 );
 
@@ -376,8 +376,8 @@ our $FIELD_META_TYPE = GraphQL::Type::Object->new(
       resolve => sub { _hash2array($_[0]->{args}||{}) },
     },
     type => { type => $TYPE_META_TYPE->non_null },
-    _make_hash_bool_field(isDeprecated => $Boolean->non_null, 'is_deprecated'),
-    _make_hash_field(deprecationReason => $String, 'deprecation_reason'),
+    _make_hash_bool_field(isDeprecated => $Boolean->non_null, 'isDeprecated'),
+    _make_hash_field(deprecationReason => $String, 'deprecationReason'),
   } },
 );
 
@@ -455,7 +455,14 @@ $TYPE_META_TYPE = GraphQL::Type::Object->new(
         $map = {
           map { ($_ => $map->{$_}) } grep !$map->{$_}{deprecation_reason}, keys %$map
         } if !$args->{includeDeprecated};
-        _hash2array($map);
+        [ map { +{
+          name => $_,
+          description => $map->{$_}{description},
+          args => $map->{$_}{args},
+          type => $map->{$_}{type},
+          isDeprecated => $map->{$_}{is_deprecated},
+          deprecationReason => $map->{$_}{deprecation_reason},
+        } } sort keys %{$map} ];
       }
     },
     interfaces => {
@@ -481,14 +488,14 @@ $TYPE_META_TYPE = GraphQL::Type::Object->new(
       resolve => sub {
         my ($type, $args) = @_;
         return if !$type->isa('GraphQL::Type::Enum');
-        DEBUG and _debug('enumValues.resolve', $type, $args);
         my $values = $type->values;
+        DEBUG and _debug('enumValues.resolve', $type, $args, $values);
         $values = { map { ($_ => $values->{$_}) } grep !$values->{$_}{is_deprecated}, keys %$values } if !$args->{includeDeprecated};
         [ map { +{
           name => $_,
-          description => $values->{description},
-          isDeprecated => $values->{is_deprecated},
-          deprecationReason => $values->{deprecation_reason},
+          description => $values->{$_}{description},
+          isDeprecated => $values->{$_}{is_deprecated},
+          deprecationReason => $values->{$_}{deprecation_reason},
         } } sort keys %{$values} ];
       },
     },

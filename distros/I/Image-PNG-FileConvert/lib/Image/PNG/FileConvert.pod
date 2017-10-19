@@ -1,6 +1,6 @@
 =head1 NAME
 
-Image::PNG::FileConvert - convert a file to or from a PNG image
+Image::PNG::FileConvert - put a file into a PNG image
 
 =head1 SYNOPSIS
 
@@ -21,12 +21,12 @@ produces output
     Round trip OK
 
 
-(This example is included as L<F<synopsis.pl>|https://api.metacpan.org/source/BKB/Image-PNG-FileConvert-0.09/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-FileConvert-0.10/examples/synopsis.pl> in the distribution.)
 
 =head1 VERSION
 
-This documents version 0.09 of Image::PNG::FileConvert
-corresponding to git commit L<cf83fe76de941e86542bbb70c4eefce4935618b0|https://github.com/benkasminbullock/Image-PNG-FileConvert/commit/cf83fe76de941e86542bbb70c4eefce4935618b0> released on Thu Jan 5 10:43:24 2017 +0900.
+This documents version 0.10 of Image::PNG::FileConvert
+corresponding to git commit L<b5e49fd8e14684145965c2f5b41d0c9e9492e91a|https://github.com/benkasminbullock/Image-PNG-FileConvert/commit/b5e49fd8e14684145965c2f5b41d0c9e9492e91a> released on Sat Oct 14 16:31:45 2017 +0900.
 
 =head1 DESCRIPTION
 
@@ -69,7 +69,7 @@ is another option, C<row_length>, specified in the same way:
 The number you specify for C<row_length> will be the width of the
 image in pixels. If this is not specified, the row length is given by
 C<default_row_length> in the module, which is 2048
-as of version 0.09 of this module.
+as of version 0.10 of this module.
 
 =head2 png2file
 
@@ -128,8 +128,6 @@ L<Carp> is used to report errors.
 The distribution also includes two utility scripts, file2png and
 png2file, which convert a file to a PNG image and back again.
 
-=cut
-
 
 =head1 AUTHOR
 
@@ -138,7 +136,7 @@ Ben Bullock, <bkb@cpan.org>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2011-2016
+2011-2017
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

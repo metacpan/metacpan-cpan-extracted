@@ -54,7 +54,7 @@
    "provides" : {
       "App::MFILE::WWW" : {
          "file" : "lib/App/MFILE/WWW.pm",
-         "version" : "0.161"
+         "version" : "0.162"
       },
       "App::MFILE::WWW::Dispatch" : {
          "file" : "lib/App/MFILE/WWW/Dispatch.pm",
@@ -71,5 +71,5 @@
          "http://opensource.org/licenses/BSD-3-Clause"
       ]
    },
-   "version" : "0.161"
+   "version" : "0.162"
 }

@@ -126,7 +126,7 @@ routine is called. The second and third are meta parameters and are set by
 this routine.
 
 After setting the meta parameters, the routine causes a GET request for the
-C<employee/self/priv> resource to be send to the server, and uses the response
+C<employee/self/full> resource to be send to the server, and uses the response
 to initialize the C<$current_emp> and C<$current_priv> variables which are
 imported from the L<App::Dochazka::CLI> package.
 
@@ -145,7 +145,7 @@ The password to use (defaults to the value of the C<user> parameter)
 =back
 
 Since this routine returns the status object returned by the "GET
-employee/self/priv" request, it is actually a wrapper around C<send_req>.
+employee/self/full" request, it is actually a wrapper around C<send_req>.
 
 =cut
 
@@ -162,7 +162,7 @@ sub authenticate_to_server {
     # get info about us
     my $status;
     try {
-        $status = send_req( 'GET', '/employee/self/priv' );
+        $status = send_req( 'GET', '/employee/self/full' );
     } catch {
         $status = $_;
     };
@@ -172,7 +172,7 @@ sub authenticate_to_server {
     return $status unless $status->ok;
 
     # authentication OK, initialize package variables
-    $current_emp = App::Dochazka::Common::Model::Employee->spawn( %{ $status->payload->{'current_emp'} } );
+    $current_emp = App::Dochazka::Common::Model::Employee->spawn( %{ $status->payload->{'emp'} } );
     $current_priv = $status->payload->{'priv'};
     return $CELL->status_ok( 'DOCHAZKA_CLI_AUTHENTICATION_OK' );
 }

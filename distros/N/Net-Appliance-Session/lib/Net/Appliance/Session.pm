@@ -1,7 +1,5 @@
 package Net::Appliance::Session;
-{
-  $Net::Appliance::Session::VERSION = '4.200003';
-}
+{ $Net::Appliance::Session::VERSION = '4.300000' }
 
 use Moo;
 use Sub::Quote;
@@ -46,7 +44,6 @@ foreach my $slot (qw/
     do_login
     do_privileged_mode
     do_configure_mode
-    wake_up
 /) {
     has $slot => (
         is => 'rw',
@@ -55,6 +52,13 @@ foreach my $slot (qw/
         default => quote_sub('1'),
     );
 }
+
+has wake_up => (
+    is => 'rw',
+    isa => Int,
+    required => 0,
+    default => quote_sub('1'),
+);
 
 foreach my $slot (qw/
     username
@@ -156,19 +160,11 @@ sub _build_nci {
 
 1;
 
-# ABSTRACT: Run command-line sessions to network appliances
-
-
-__END__
 =pod
 
 =head1 NAME
 
 Net::Appliance::Session - Run command-line sessions to network appliances
-
-=head1 VERSION
-
-version 4.200003
 
 =head1 SYNOPSIS
 
@@ -537,7 +533,7 @@ Oliver Gorwits <oliver@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Oliver Gorwits.
+This software is copyright (c) 2017 by Oliver Gorwits.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

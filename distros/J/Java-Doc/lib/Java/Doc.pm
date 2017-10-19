@@ -3,6 +3,10 @@
 # Extract documentation from Java source code.
 # Philip R Brenan at gmail dot com, Appa Apps Ltd, 2017
 #-------------------------------------------------------------------------------
+# Override when we click on the method it should go to the overridden method and the comment can then be shortened
+# Method should use a hash of fields, it currently uses an array
+# returns in title should link to definition of that item
+# class in title should link to definition of that class
 package Java::Doc;
 require v5.16.0;
 use warnings FATAL => qw(all);
@@ -11,7 +15,7 @@ use Carp qw(confess);
 use Data::Dump qw(dump);
 use Data::Table::Text qw(:all);
 
-our $VERSION = '20171011';
+our $VERSION = '20171014';
 
 genLValueHashMethods(qw(parse));                                                # Combined parse tree of all the input files read
 genLValueHashMethods(qw(classes));                                              # Classes encountered in all the input files read
@@ -23,8 +27,7 @@ sub urlIfKnown($$)                                                              
   for my $url(keys %veryWellKnownClassesHash, @{$javaDoc->wellKnownClasses})
    {my $i = index($url, "/$type.html");
     if ($i >= 0)
-     {#say STDERR "AAAA $i  $type  $url", ;
-      return qq(<a href="$_">$type</a>);
+     {return qq(<a target="_blank" href="$url">$type</a>);
      }
    }
   $type
@@ -48,7 +51,9 @@ sub parseJavaFile($$)                                                           
  {my ($javaDoc, $fileOrString)  = @_;                                           # Java doc builder, Parse tree, java file or string of java to process
   my $parse = $javaDoc->parse;                                                  # Parse tree
 
-  my $s = $fileOrString =~ m(\n)s ? $fileOrString : readFile($fileOrString);
+  my $snf = $fileOrString =~ m(\n)s;                                            # String not file
+  my $s = $fileOrString =~ m(\n)s ? $fileOrString : readFile($fileOrString);    # Source
+  say STDERR $fileOrString unless $snf;
 
   my $package;                                                                  # Package we are in
   my @class;                                                                    # Containing classes as array
@@ -56,32 +61,53 @@ sub parseJavaFile($$)                                                           
   my $method;                                                                   # Method we are in
   my $state = 0;                                                                # 0 - outer, 1 - parameters to last method
 
+  my $line = 0;                                                                 # Line numbers
   for(split /\n/, $s)
-   {if ($state == 0)
+   {++$line;
+
+    my $at = sub                                                                # Position
+     {return "at line: $line\n$_\n" if $snf;
+      "at line $line in file/string:\n$fileOrString\n$_\n";
+     }->();
+
+    if ($state == 0)
      {if (m(\A\s*package\s+((\w+|\.)+)))                                        # 'package' package ;
        {#say STDERR "Package = $1";
         $package = $1;
        }
-      elsif (m(\A.*?class\s+(\w+)\s*\{?\s*//C\s+(.*?)\s*\Z))                    # Class with optional '{' //C
+      elsif (m(\A.*?class\s+(\S+)\s*\{?\s*//C\s+(.*?)\s*\Z))                    # Class with optional '{' //C
        {push @class, $1;                                                        # Save containing class
         $class = join '.', @class;
         #say STDERR "Class $class = $1 = $2";
         $javaDoc->classes->{$class} = $parse->{$package}{$class}{comment} = $2; # Record the last encountered class as the class to link to - could be improved!
        }
-      elsif (m(\A\s*}\s*//C\s+(\w+)))                                            # '}' '//C' className - close class className
+      elsif (m(\A\s*}\s*//C\s+(\S+)))                                           # '}' '//C' className - close class className
        {#say STDERR "Class = $1 End";
         if (!@class)
-         {warn "Closing class $1 but no class to close";
+         {warn "Closing class $1 but no class to close $at";
          }
-        if ($1 ne $class[-1])
-         {warn "Closing class $1 but in class $class ignored";
+        elsif ($1 ne $class[-1])
+         {warn "Closing class $1 but in class $class $at";
          }
         else
-         {pop @class;
+         {$parse->{$package}{$class}{methods} =
+           [sort
+             {my $r = $b->{res}     cmp $a->{res};     return $r if $r;
+              my $n = $a->{name}    cmp $b->{name};    return $n if $n;
+              my $c = $a->{comment} cmp $b->{comment}; return $c;
+             }
+            @{$parse->{$package}{$class}{methods}}];
+
+          pop @class;
           $class = join '.', @class;
          }
        }
-      elsif (m(\A\s*(.*?)\s+(\w+)\s*(\(\))?\s*\(?\s*//(M|c|O=\S+)\s+(.*?)\s*\Z))# Method with either '()' meaning no parameters or optional '(' followed by //M for method, //c for constructor, //O=package.method for override of the named method
+      elsif                                                                     # Method with either '()' meaning no parameters or optional '(' followed by //M for method, //c for constructor, //O=package.method for override of the named method. If () is specified  then {} can follow to indicate an empty method
+            (m(\A\s*(.*?)
+                 \s+(\w+)
+                 \s*(\x28\s*\x29\s*(?:\x7b\s*\x7d)?)?
+                 \s*\x28?\s*
+                 //(M|c|O=\S+)\s+(.*?)\s*\Z)x)                                  # Comment
        {my ($empty, $res, $comment) = ($3, $4, $5);
         $method = $2;
 
@@ -90,26 +116,34 @@ sub parseJavaFile($$)                                                           
         my $override;                                                           # Method is an override
         if ($res =~ m(\Ac\Z)s)                                                  # In summa it is a constructor
          {push @attributes, q(constructor);                                     # Constructor
-          $type = qq(<a href="#$package.$class.$method">$method</a>);                                                      # Type for a constructor is the constructor name
+          if ($package and $class)
+           {$type = qq(<a href="#$package.$class.$method">$method</a>);         # Type for a constructor is the constructor name
+           }
+          elsif (!$package)
+           {warn "Ignoring method $method because no package specified $at";
+           }
+          elsif (!$class)
+           {warn "Ignoring method $method because no containing class $at";
+           }
          }
         elsif ($res =~ m(\AO=(.+?)\Z)s)                                         # Override
          {$override = $1;
-          $comment  = qq(See <a href="#$override">$comment</a>);
+          my $dot = $comment =~ m(\.\Z)s ? '' : '.';
+          $comment  = qq($comment$dot Overrides: <a href="#$override">$override</a>);
          }
 
         if ($package and $class)                                                # Save method details is possible
          {#say STDERR "Method = $method == $type == $comment ";
 
           push @{$parse->{$package}{$class}{methods}},
-                {type=>$javaDoc->urlIfKnown($type), name=>$method,
-                 comment=>$comment, attributes=>[@attributes]};
+                {type=>$javaDoc->urlIfKnown($type), name=>$method, res=>$res,
+                 comment=>$comment, attributes=>[@attributes], line=>$line};
           $state = 1 if !$empty and !$override;                                 # Get parameters next if method has parameters and is not an override
          }
         else
          {my $m = qq(Ignoring method $method as no preceding);
-          my $f = qq(in file:\n$fileOrString\nLine:\n$_);
-          warn "$m package $f" unless $package;
-          warn "$m class $f"   unless $class;
+          warn "$m package $at" unless $package;
+          warn "$m class $at"   unless $class;
          }
        }
      }
@@ -119,7 +153,8 @@ sub parseJavaFile($$)                                                           
         my ($type, $parameter, $comment) = ($1, $2, $3);
         my ($t, @attributes) = getAttributes($type);
         push @{$parse->{$package}{$class}{methods}[-1]{parameters}},
-             [$javaDoc->urlIfKnown($t), $parameter, $comment, [@attributes]];
+             [$javaDoc->urlIfKnown($t), $parameter, $comment, [@attributes],
+              $line];
        }
       else                                                                      # End of parameters if the line does not match
        {$state = 0;
@@ -132,11 +167,22 @@ sub parseJavaFile($$)                                                           
              }
            }
          }
-        else
-         {warn "Ignoring method $method as no preceding package or class or ".
-               "method in file:\n$fileOrString\nLine:\n$_";
+        elsif (!$package)
+         {warn "Ignoring method $method because no package specified $at";
+         }
+        elsif (!$class)
+         {warn "Ignoring method $method because no containing class $at";
          }
        }
+     }
+   }
+  if (0 and @class)
+   {if ($snf)
+     {warn "Classes still to close at end of string: ".join(' ', @class);
+     }
+    else
+     {warn "Classes still to close: ".join(' ', @class). "\n".
+           "At end of file:\n$fileOrString";
      }
    }
   $parse
@@ -144,7 +190,7 @@ sub parseJavaFile($$)                                                           
 
 sub parseJavaFiles($)                                                           # Parse all the input files into one parse tree
  {my ($javaDoc)  = @_;                                                          # Java doc processor
-  for(@{$javaDoc->source})                                                      # Extend the parse tree with the parse of each source file
+  for(sort @{$javaDoc->source})                                                 # Extend the parse tree with the parse of each source file
    {$javaDoc->parseJavaFile($_);
    }
  }
@@ -188,7 +234,7 @@ END
     push @h, <<END;
 <a name="$package"/>
 $d
-<h2>Classes in package: <big>$package</big></h2>
+<h2>Package: <big>$package</big></h2>
 <table border="1" cellspacing="20">
 <tr><th>Class<th>Description</tr>
 END
@@ -196,7 +242,7 @@ END
      {my %class = %{$package{$class}};
       my $classComment = $class{comment};
       push @h, <<"END";
-<tr><td><a href="#$package.$class">$class</a>
+<tr><td><a href="#$package/$class">$class</a>
     <td>$classComment
 </tr>
 END
@@ -211,11 +257,11 @@ END
       &$swapColours(2);
       push @h, <<END;
 $d
-<a name="$package.$class"/>
-<h3>Methods in class: <big>$class</big>, package: $package</h3>
+<a name="$package/$class"/>
+<h3>Class: <big>$class</big>, package: $package</h3>
 <p>$classComment
 <table border="1" cellspacing="20">
-<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Description</tr>
+<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Line<th>Description</tr>
 END
       for my $method(@{$class{methods}})
        {my %method  = %{$method};
@@ -223,12 +269,14 @@ END
         my $type    = $method{type};
         my $name    = $method{name};
         my $comment = $method{comment};
+        my $line    = $method{line};
         my $sig     = $method{typeSig} // 'void';
         push @h, <<END;
 <tr><td>$type
-    <td><a href="#$package.$class.$name">$name</a>
+    <td><a href="#$package/$class/$name">$name</a>
     <td>$sig
     <td>$attr
+    <td>$line
     <td>$comment
 </tr>
 END
@@ -242,25 +290,25 @@ END
         my $type = $method{type};
         my $name = $method{name};
         my $comment = $method{comment};
+        my $sig     = $method{typeSig} // '';
         &$swapColours(3);
         push @h, <<END;
 $d
-<a name="$package.$class.$name"/>
-<h4><b>$name</b> : $type</h4>
+<a name="$package/$class/$name"/>
+<h4><big>$name($sig)</big> returns <big>$type</big>   <small>in class $class</small></h4>
 <p>$comment</p>
 END
 
         if (my $parameters = $method{parameters})
          {my @parameters = @$parameters;
           push @h, <<END;
-<p>Parameters:
 <table border="1" cellspacing="20">
-<tr><th>Name<th>Type<th>Attributes<th>Description</tr>
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
 END
           for my $parameter(@parameters)
-           {my ($type, $name, $comment, $attributes) = @$parameter;
+           {my ($type, $name, $comment, $attributes, $line) = @$parameter;
             my $attr    = join ' ', @{$attributes//[]};
-            push @h, qq(<tr><td>$name<td>$type<td>$attr<td>$comment</tr>);
+            push @h, qq(<tr><td>$name<td>$type<td>$line<td>$comment</tr>);
            }
           push @h, <<END;
 </table>
@@ -325,9 +373,7 @@ sub new                                                                         
 
 sub html($)                                                                     # Create documentation using html as the output format. Write the generated html to the file specified by L<target|/target> if any and return the generated html as an array of lines.
  {my ($javaDoc)  = @_;                                                          # Java doc processor
-
   $javaDoc->parseJavaFiles;                                                     # Parse the input files
-  #say STDERR "AAAA ", dump($javaDoc->parse); exit;
   my @h = $javaDoc->htmlJavaFiles;                                              # Write as html
 
   if (my $file = $javaDoc->target)
@@ -344,8 +390,8 @@ sub html($)                                                                     
 
 =head1 Name
 
-Java::Doc - Extract L<documentation|https://metacpan.org/source/PRBRENAN/Java-Doc-$VERSION/examples/documentation.html>
-from L<Java source code|https://metacpan.org/source/PRBRENAN/Java-Doc-$VERSION/examples/documentation.java>
+Java::Doc - Extract L<documentation|https://metacpan.org/source/PRBRENAN/Java-Doc-20171012/examples/documentation.html>
+from L<Java source code|https://metacpan.org/source/PRBRENAN/Java-Doc-20171012/examples/documentation.java>
 
 =head1 Synopsis
 

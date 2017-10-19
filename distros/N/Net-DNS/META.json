@@ -33,9 +33,9 @@
       "runtime" : {
          "recommends" : {
             "Digest::BubbleBabble" : "0.01",
-            "Digest::GOST" : "0.06",
             "IO::Socket::IP" : "0.38",
             "Net::LibIDN" : "0.12",
+            "Net::LibIDN2" : "1",
             "Scalar::Util" : "1.25"
          },
          "requires" : {
@@ -52,6 +52,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.12",
+   "version" : "1.13",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

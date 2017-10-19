@@ -149,6 +149,10 @@ Out of the box, the following storage classes are available:
     Persist processes in an existing [DBIx::Class](https://metacpan.org/pod/DBIx::Class) schema. Nice if you want to have only one instance of Schema in your application and if
     don't mind writing your own resultset.
 
+- [Schedule::LongSteps::Storage::DynamoDB](https://metacpan.org/pod/Schedule::LongSteps::Storage::DynamoDB)
+
+    Persist processes in a DynamoDB table in AWS. Please consider this Alpha. Give it a go and report any issue!
+
 # COOKBOOK
 
 ## WRITING A NEW PROCESS

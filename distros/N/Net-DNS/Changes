@@ -1,4 +1,12 @@
-$Id: Changes 1592 2017-08-18 10:02:44Z willem $                       -*-text-*-
+$Id: Changes 1604 2017-10-18 09:00:29Z willem $                       -*-text-*-
+
+
+**** 1.13 Oct 18, 2017
+
+Feature IDN query support
+
+	Queries for domain names containing non-ASCII characters are
+	now possible on Unicode platforms using CPAN Net::LibIDN2
 
 
 **** 1.12 Aug 18, 2017

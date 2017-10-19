@@ -103,6 +103,7 @@ t/sql/disabled_to_zero.t
 t/sql/immutable_id.t
 t/sql/privhistory.t
 t/sql/root.t
+t/sql/schedhistory.t
 t/sql/schedintvl.t
 t/unit/ACL.t
 t/unit/holiday.t

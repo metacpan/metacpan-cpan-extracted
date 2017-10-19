@@ -1,5 +1,8 @@
 Revision history for Dancer2::Plugin::GraphQL
 
+0.03    Mon Oct 16 00:18:15 BST 2017
+ - execute is a function now not method
+
 0.02    Wed Oct 11 16:46:28 BST 2017
  - allow handler
 

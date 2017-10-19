@@ -6,6 +6,7 @@ build_requires:
   HTTP::Request::Common: 0
   JSON: 0
   Plack::Test: 0
+  Test::More: 0
 configure_requires:
   ExtUtils::MakeMaker: 0
 dynamic_config: 0
@@ -18,7 +19,7 @@ name: Dancer2-Plugin-Paginator
 provides:
   Dancer2::Plugin::Paginator:
     file: lib/Dancer2/Plugin/Paginator.pm
-    version: 2.06
+    version: 2.07
 requires:
   Dancer2::Plugin: 0.159002
   Paginator::Lite: 2.001003
@@ -26,5 +27,5 @@ requires:
 resources:
   bugtracker: https://github.com/manwar/Dancer2-Plugin-Paginator/issues
   repository: git://github.com/manwar/Dancer2-Plugin-Paginator.git
-version: 2.06
+version: 2.07
 x_serialization_backend: 'YAML::Tiny version 1.56'

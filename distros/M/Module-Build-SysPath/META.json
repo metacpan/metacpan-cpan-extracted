@@ -4,7 +4,7 @@
       "Jozef Kutej <jkutej@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4202",
+   "generated_by" : "Module::Build version 0.4214",
    "keywords" : [
       "system",
       "paths",
@@ -50,7 +50,7 @@
    "provides" : {
       "Module::Build::SysPath" : {
          "file" : "lib/Module/Build/SysPath.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       }
    },
    "release_status" : "stable",
@@ -62,8 +62,9 @@
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
-         "url" : "git://github.com/jozef/Module-Build-SysPath.git"
+         "url" : "git://github.com/jozef/Module-Build-SysPath"
       }
    },
-   "version" : "0.17"
+   "version" : "0.18",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }

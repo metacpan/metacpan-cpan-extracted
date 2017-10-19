@@ -3,12 +3,14 @@ use Test::More;
 use Acme::ICan::tSpell;
 use Test::MockObject;
 
-(my $tiny = Test::MockObject->new)->mock(
-    'get', sub { 
-        return { 
+my $responses = [{ 
             content => '<div class="med"><p class="sp_cnt card-section"><span class="spell">Showing results for</span> <a class="spell" href="/search?q=tanks&amp;spell=1&amp;sa=X&amp;ved=0ahUKEwiswcrA4erSAhUDfRoKHSjgC-kQvwUIGSgA"><b><i>tanks</i></b></a><br><span class="spell_orig">Search instead for</span> <a class="spell_orig" href="/search?q=takns&amp;nfpr=1&amp;sa=X&amp;ved=0ahUKEwiswcrA4erSAhUDfRoKHSjgC-kQvgUIGigB">takns</a><br></p><div class="_cy" id="msg_box" style="display:none"><p class="card-section _fbd"><span><span class="spell" id="srfm"></span>&nbsp;<a class="spell" id="srfl"></a><br></span><span id="sif"><span class="spell_orig" id="sifm"></span>&nbsp;<a class="spell_orig" id="sifl"></a><br></span></p></div></div>', 
             success => 1 
-        } 
+        }, { content => '', success => 1 }];
+
+(my $tiny = Test::MockObject->new)->mock(
+    'get', sub {        
+		shift @{$responses};
     }
 );
 

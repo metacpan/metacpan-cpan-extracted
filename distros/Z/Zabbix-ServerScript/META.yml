@@ -12,7 +12,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.4005'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.2, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Minilla/v3.0.13, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -31,7 +31,7 @@ no_index:
 provides:
   Zabbix::ServerScript:
     file: lib/Zabbix/ServerScript.pm
-    version: '0.13'
+    version: '0.14'
   Zabbix::ServerScript::API:
     file: lib/Zabbix/ServerScript/API.pm
 requires:
@@ -51,4 +51,4 @@ resources:
   bugtracker: https://github.com/Akint/Zabbix-ServerScript/issues
   homepage: https://github.com/Akint/Zabbix-ServerScript
   repository: git://github.com/Akint/Zabbix-ServerScript.git
-version: '0.13'
+version: '0.14'

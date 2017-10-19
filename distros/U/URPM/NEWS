@@ -1,8 +1,25 @@
+Version 5.15 - 3 October 2017
+
+- testsuite:
+  o fix segfault with rpm-4.14 when checking invalid signatures
+  o revert workaround perl-5.26 vs librpm bug which results on exit cleanup
+
+Version 5.14 - 7 September 2017
+
+- use native 64bit integers instead of Math::Int64
+  (needs perl >= 5.26.0-8.mga7)
+    
+Version 5.13 - 23 August 2017
+
+- add support to rpm-4.14
+  (thus breaking support for rpm <= 4.13)
+- test failure:
+  o fix test failure with perl-5.26
+  o workaround perl-5.26 vs librpm bug which results on exit cleanup
+
 Version 5.12 - 10 November 2016
 
 - fix more compilation warnings
-- make sure to use int64 on 32bit arch
-  else we may got total size to overflow (mga#19686)
 
 Version 5.11 - 20 October 2016
 

@@ -1,0 +1,323 @@
+# Automatically generated file
+# Dist::Zilla::Plugin::Author::SKIRMESS::RepositoryBase 0.026
+
+only = 1
+severity = 1
+verbose = [%p] %m at %f line %l, near '%r'\n
+
+[BuiltinFunctions::ProhibitBooleanGrep]
+[BuiltinFunctions::ProhibitComplexMappings]
+[BuiltinFunctions::ProhibitLvalueSubstr]
+[BuiltinFunctions::ProhibitReverseSortBlock]
+[BuiltinFunctions::ProhibitSleepViaSelect]
+[BuiltinFunctions::ProhibitStringyEval]
+[BuiltinFunctions::ProhibitStringySplit]
+[BuiltinFunctions::ProhibitUniversalCan]
+[BuiltinFunctions::ProhibitUniversalIsa]
+[BuiltinFunctions::ProhibitUselessTopic]
+[BuiltinFunctions::ProhibitVoidGrep]
+[BuiltinFunctions::ProhibitVoidMap]
+[BuiltinFunctions::RequireBlockGrep]
+[BuiltinFunctions::RequireBlockMap]
+[BuiltinFunctions::RequireGlobFunction]
+[BuiltinFunctions::RequireSimpleSortBlock]
+[ClassHierarchies::ProhibitAutoloading]
+[ClassHierarchies::ProhibitExplicitISA]
+[ClassHierarchies::ProhibitOneArgBless]
+[CodeLayout::ProhibitHardTabs]
+[CodeLayout::ProhibitParensWithBuiltins]
+[CodeLayout::ProhibitQuotedWordLists]
+[CodeLayout::ProhibitTrailingWhitespace]
+[CodeLayout::RequireConsistentNewlines]
+[CodeLayout::RequireTidyCode]
+[CodeLayout::RequireTrailingCommas]
+[ControlStructures::ProhibitCStyleForLoops]
+[ControlStructures::ProhibitCascadingIfElse]
+[ControlStructures::ProhibitDeepNests]
+[ControlStructures::ProhibitLabelsWithSpecialBlockNames]
+[ControlStructures::ProhibitMutatingListFunctions]
+[ControlStructures::ProhibitNegativeExpressionsInUnlessAndUntilConditions]
+[ControlStructures::ProhibitPostfixControls]
+
+flowcontrol = skip
+[ControlStructures::ProhibitUnlessBlocks]
+[ControlStructures::ProhibitUnreachableCode]
+[ControlStructures::ProhibitUntilBlocks]
+[ControlStructures::ProhibitYadaOperator]
+#[Documentation::PodSpelling]
+[Documentation::RequirePackageMatchesPodName]
+[Documentation::RequirePodAtEnd]
+[Documentation::RequirePodLinksIncludeText]
+#[Documentation::RequirePodSections]
+
+[ErrorHandling::RequireCarping]
+allow_in_main_unless_in_subroutine = 1
+
+[ErrorHandling::RequireCheckingReturnValueOfEval]
+[InputOutput::ProhibitBacktickOperators]
+[InputOutput::ProhibitBarewordFileHandles]
+[InputOutput::ProhibitExplicitStdin]
+[InputOutput::ProhibitInteractiveTest]
+[InputOutput::ProhibitJoinedReadline]
+[InputOutput::ProhibitOneArgSelect]
+[InputOutput::ProhibitReadlineInForLoop]
+[InputOutput::ProhibitTwoArgOpen]
+[InputOutput::RequireBracedFileHandleWithPrint]
+#[InputOutput::RequireBriefOpen]
+[InputOutput::RequireCheckedClose]
+[InputOutput::RequireCheckedOpen]
+
+[InputOutput::RequireCheckedSyscalls]
+functions = :builtins
+exclude_functions = print say sleep
+
+[InputOutput::RequireEncodingWithUTF8Layer]
+[Miscellanea::ProhibitFormats]
+[Miscellanea::ProhibitTies]
+[Miscellanea::ProhibitUnrestrictedNoCritic]
+[Miscellanea::ProhibitUselessNoCritic]
+[Modules::ProhibitAutomaticExportation]
+[Modules::ProhibitConditionalUseStatements]
+
+[Modules::ProhibitEvilModules]
+modules = Class::ISA {Found use of Class::ISA. This module is deprecated by the Perl 5 Porters.} Pod::Plainer {Found use of Pod::Plainer. This module is deprecated by the Perl 5 Porters.} Shell {Found use of Shell. This module is deprecated by the Perl 5 Porters.} Switch {Found use of Switch. This module is deprecated by the Perl 5 Porters.} Readonly {Found use of Readonly. Please use constant.pm or Const::Fast.} base {Found use of base. Please use parent instead.} File::Slurp {Found use of File::Slurp. Please use Path::Tiny instead.} common::sense {Found use of common::sense. Please use strict and warnings instead.} Class::Load {Found use of Class::Load. Please use Module::Runtime instead.} Any::Moose {Found use of Any::Moose. Please use Moo instead.} Error {Found use of Error.pm. Please use Throwable.pm instead.} Getopt::Std {Found use of Getopt::Std. Please use Getopt::Long instead.} HTML::Template {Found use of HTML::Template. Please use Template::Toolkit.} IO::Socket::INET6 {Found use of IO::Socket::INET6. Please use IO::Socket::IP.} JSON {Found use of JSON. Please use JSON::MaybeXS or Cpanel::JSON::XS.} JSON::Any {Found use of JSON::Any. Please use JSON::MaybeXS.} List::MoreUtils {Found use of List::MoreUtils. Please use List::Util or List::UtilsBy.} Mouse {Found use of Mouse. Please use Moo.} Net::IRC {Found use of Net::IRC. Please use POE::Component::IRC, Net::Async::IRC, or Mojo::IRC.} XML::Simple {Found use of XML::Simple. Please use XML::LibXML, XML::TreeBuilder, XML::Twig, or Mojo::DOM.} Sub::Infix {Found use of Sub::Infix. Please do not use it.}
+
+#[Modules::ProhibitExcessMainComplexity]
+[Modules::ProhibitMultiplePackages]
+[Modules::RequireBarewordIncludes]
+[Modules::RequireEndWithOne]
+[Modules::RequireExplicitPackage]
+[Modules::RequireFilenameMatchesPackage]
+[Modules::RequireNoMatchVarsWithUseEnglish]
+#[Modules::RequireVersionVar]
+[NamingConventions::Capitalization]
+[NamingConventions::ProhibitAmbiguousNames]
+[Objects::ProhibitIndirectSyntax]
+[References::ProhibitDoubleSigils]
+[RegularExpressions::ProhibitCaptureWithoutTest]
+[RegularExpressions::ProhibitComplexRegexes]
+[RegularExpressions::ProhibitEscapedMetacharacters]
+[RegularExpressions::ProhibitFixedStringMatches]
+[RegularExpressions::ProhibitSingleCharAlternation]
+[RegularExpressions::ProhibitUnusedCapture]
+[RegularExpressions::ProhibitUnusualDelimiters]
+[RegularExpressions::ProhibitUselessTopic]
+[RegularExpressions::RequireBracesForMultiline]
+[Subroutines::ProhibitAmpersandSigils]
+[Subroutines::ProhibitBuiltinHomonyms]
+[Subroutines::ProhibitExcessComplexity]
+[Subroutines::ProhibitExplicitReturnUndef]
+[Subroutines::ProhibitManyArgs]
+[Subroutines::ProhibitNestedSubs]
+[Subroutines::ProhibitReturnSort]
+[Subroutines::ProhibitSubroutinePrototypes]
+
+[Subroutines::ProhibitUnusedPrivateSubroutines]
+private_name_regex = _(?!build_)\w+
+
+[Subroutines::ProtectPrivateSubs]
+[Subroutines::RequireArgUnpacking]
+[Subroutines::RequireFinalReturn]
+[TestingAndDebugging::ProhibitNoStrict]
+[TestingAndDebugging::ProhibitNoWarnings]
+[TestingAndDebugging::ProhibitProlongedStrictureOverride]
+[TestingAndDebugging::RequireTestLabels]
+[TestingAndDebugging::RequireUseStrict]
+[TestingAndDebugging::RequireUseWarnings]
+[ValuesAndExpressions::ProhibitCommaSeparatedStatements]
+
+[ValuesAndExpressions::ProhibitComplexVersion]
+forbid_use_version = 1
+
+[ValuesAndExpressions::ProhibitConstantPragma]
+[ValuesAndExpressions::ProhibitEmptyQuotes]
+[ValuesAndExpressions::ProhibitEscapedCharacters]
+[ValuesAndExpressions::ProhibitImplicitNewlines]
+[ValuesAndExpressions::ProhibitInterpolationOfLiterals]
+[ValuesAndExpressions::ProhibitLongChainsOfMethodCalls]
+[ValuesAndExpressions::ProhibitMismatchedOperators]
+[ValuesAndExpressions::ProhibitMixedBooleanOperators]
+[ValuesAndExpressions::ProhibitNoisyQuotes]
+[ValuesAndExpressions::ProhibitQuotesAsQuotelikeOperatorDelimiters]
+[ValuesAndExpressions::ProhibitSpecialLiteralHeredocTerminator]
+[ValuesAndExpressions::ProhibitVersionStrings]
+[ValuesAndExpressions::RequireConstantVersion]
+[ValuesAndExpressions::RequireInterpolationOfMetachars]
+[ValuesAndExpressions::RequireNumberSeparators]
+[ValuesAndExpressions::RequireQuotedHeredocTerminator]
+[ValuesAndExpressions::RequireUpperCaseHeredocTerminator]
+[Variables::ProhibitAugmentedAssignmentInDeclaration]
+[Variables::ProhibitConditionalDeclarations]
+[Variables::ProhibitEvilVariables]
+[Variables::ProhibitLocalVars]
+[Variables::ProhibitMatchVars]
+[Variables::ProhibitPackageVars]
+[Variables::ProhibitPerl4PackageNames]
+
+[Variables::ProhibitPunctuationVars]
+allow = $@ $! $/ $0
+
+[Variables::ProhibitReusedNames]
+[Variables::ProhibitUnusedVariables]
+[Variables::ProtectPrivateVars]
+[Variables::RequireInitializationForLocalVars]
+[Variables::RequireLexicalLoopIterators]
+[Variables::RequireLocalizedPunctuationVars]
+[Variables::RequireNegativeIndices]
+
+#[Bangs::ProhibitCommentedOutCode]
+[Bangs::ProhibitDebuggingModules]
+[Bangs::ProhibitFlagComments]
+#[Bangs::ProhibitNoPlan]
+[Bangs::ProhibitNumberedNames]
+[Bangs::ProhibitRefProtoOrProto]
+[Bangs::ProhibitUselessRegexModifiers]
+#[Bangs::ProhibitVagueNames]
+
+### Perl::Critic::Moose
+[Moose::ProhibitDESTROYMethod]
+equivalent_modules = Moo Moo::Role
+
+[Moose::ProhibitLazyBuild]
+equivalent_modules = Moo Moo::Role
+
+[Moose::ProhibitMultipleWiths]
+equivalent_modules = Moo Moo::Role
+
+[Moose::ProhibitNewMethod]
+equivalent_modules = Moo Moo::Role
+
+[Moose::RequireCleanNamespace]
+[Moose::RequireMakeImmutable]
+
+### Perl::Critic::Freenode
+[Freenode::AmpersandSubCalls]
+[Freenode::ArrayAssignAref]
+[Freenode::BarewordFilehandles]
+[Freenode::ConditionalDeclarations]
+[Freenode::ConditionalImplicitReturn]
+[Freenode::DeprecatedFeatures]
+[Freenode::DiscouragedModules]
+[Freenode::DollarAB]
+[Freenode::Each]
+#[Freenode::EmptyReturn]
+[Freenode::IndirectObjectNotation]
+[Freenode::ModPerl]
+[Freenode::OpenArgs]
+[Freenode::OverloadOptions]
+[Freenode::PackageMatchesFilename]
+[Freenode::POSIXImports]
+[Freenode::Prototypes]
+[Freenode::StrictWarnings]
+[Freenode::Threads]
+[Freenode::Wantarray]
+[Freenode::WarningsSwitch]
+[Freenode::WhileDiamondDefaultAssignment]
+
+### Perl::Critic::Policy::HTTPCookies
+[HTTPCookies]
+
+### Perl::Critic::Itch
+#[CodeLayout::ProhibitHashBarewords]
+
+### Perl::Critic::Lax
+[Lax::ProhibitComplexMappings::LinesNotStatements]
+#[Lax::ProhibitEmptyQuotes::ExceptAsFallback]
+#[Lax::ProhibitLeadingZeros::ExceptChmod]
+#[Lax::ProhibitStringyEval::ExceptForRequire]
+#[Lax::RequireConstantOnLeftSideOfEquality::ExceptEq]
+#[Lax::RequireEndWithTrueConst]
+#[Lax::RequireExplicitPackage::ExceptForPragmata]
+
+### Perl::Critic::More
+#[CodeLayout::RequireASCII]
+#[Editor::RequireEmacsFileVariables]
+#[ErrorHandling::RequireUseOfExceptions]
+[Modules::PerlMinimumVersion]
+[Modules::RequirePerlVersion]
+#[ValuesAndExpressions::RequireConstantOnLeftSideOfEquality]
+#[ValuesAndExpressions::RestrictLongStrings]
+
+# Perl::Critic::PetPeeves::JTRAMMELL
+[Variables::ProhibitUselessInitialization]
+
+### Perl::Critic::Policy::BuiltinFunctions::ProhibitDeleteOnArrays
+[BuiltinFunctions::ProhibitDeleteOnArrays]
+
+### Perl::Critic::Policy::BuiltinFunctions::ProhibitReturnOr
+[BuiltinFunctions::ProhibitReturnOr]
+
+### Perl::Critic::Policy::Moo::ProhibitMakeImmutable
+[Moo::ProhibitMakeImmutable]
+
+### Perl::Critic::Policy::ValuesAndExpressions::ProhibitSingleArgArraySlice
+# requires Perl 5.12
+#[ValuesAndExpressions::ProhibitSingleArgArraySlice]
+
+### Perl::Critic::Policy::Perlsecret
+[Perlsecret]
+
+### Perl::Critic::Policy::TryTiny::RequireBlockTermination
+[TryTiny::RequireBlockTermination]
+
+### Perl::Critic::Policy::TryTiny::RequireUse
+[TryTiny::RequireUse]
+
+### Perl::Critic::Policy::ValuesAndExpressions::PreventSQLInjection
+[ValuesAndExpressions::PreventSQLInjection]
+
+### Perl::Critic::Policy::Variables::ProhibitUnusedVarsStricter
+[Variables::ProhibitUnusedVarsStricter]
+allow_unused_subroutine_arguments = 1
+
+### Perl::Critic::Pulp
+[CodeLayout::ProhibitFatCommaNewline]
+#[CodeLayout::ProhibitIfIfSameLine]
+[CodeLayout::RequireFinalSemicolon]
+[CodeLayout::RequireTrailingCommaAtNewline]
+[Compatibility::ConstantLeadingUnderscore]
+[Compatibility::ConstantPragmaHash]
+#[Compatibility::Gtk2Constants]
+[Compatibility::PerlMinimumVersionAndWhy]
+#[Compatibility::PodMinimumVersion]
+[Compatibility::ProhibitUnixDevNull]
+[Documentation::ProhibitAdjacentLinks]
+[Documentation::ProhibitBadAproposMarkup]
+[Documentation::ProhibitDuplicateHeadings]
+#[Documentation::ProhibitDuplicateSeeAlso]
+[Documentation::ProhibitLinkToSelf]
+[Documentation::ProhibitParagraphEndComma]
+[Documentation::ProhibitParagraphTwoDots]
+[Documentation::ProhibitUnbalancedParens]
+[Documentation::ProhibitVerbatimMarkup]
+[Documentation::RequireEndBeforeLastPod]
+[Documentation::RequireFilenameMarkup]
+#[Documentation::RequireFinalCut]
+[Documentation::RequireLinkedURLs]
+#[Miscellanea::TextDomainPlaceholders]
+#[Miscellanea::TextDomainUnused]
+[Modules::ProhibitModuleShebang]
+[Modules::ProhibitPOSIXimport]
+[Modules::ProhibitUseQuotedVersion]
+[ValuesAndExpressions::ConstantBeforeLt]
+[ValuesAndExpressions::NotWithCompare]
+[ValuesAndExpressions::ProhibitArrayAssignAref]
+[ValuesAndExpressions::ProhibitBarewordDoubleColon]
+[ValuesAndExpressions::ProhibitDuplicateHashKeys]
+[ValuesAndExpressions::ProhibitEmptyCommas]
+#[ValuesAndExpressions::ProhibitFiletest_f]
+[ValuesAndExpressions::ProhibitNullStatements]
+[ValuesAndExpressions::ProhibitUnknownBackslash]
+[ValuesAndExpressions::RequireNumericVersion]
+[ValuesAndExpressions::UnexpandedSpecialLiteral]
+
+#[Subroutines::ProhibitCallsToUndeclaredSubs]
+#[Subroutines::ProhibitCallsToUnexportedSubs]
+[Subroutines::ProhibitExportingUndeclaredSubs]
+[Subroutines::ProhibitQualifiedSubDeclarations]
+
+### Perl::Critic::Tics
+#[Tics::ProhibitLongLines]
+[Tics::ProhibitManyArrows]
+[Tics::ProhibitUseBase]
+

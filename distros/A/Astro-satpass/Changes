@@ -1,3 +1,15 @@
+0.084		2017-10-12	T. R. Wyant
+
+    Add support for decayed Iridium satellites:
+
+    * Carry them in canned status table
+
+    * Have can_flare( 'all' ) return true regardless of satellite
+      status.
+
+    All this was triggered by Kelso's recognition that Iridium 77 had
+    decayed.
+
 0.083		2017-09-13	T. R. Wyant
 
     Add -decayed to eg/visual.

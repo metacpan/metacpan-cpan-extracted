@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Instance;
-$Config::Model::Instance::VERSION = '2.112';
+$Config::Model::Instance::VERSION = '2.113';
 #use Scalar::Util qw(weaken) ;
 use strict;
 
@@ -20,6 +20,7 @@ with "Config::Model::Role::NodeLoader";
 
 use Text::Diff;
 use File::Path;
+use Path::Tiny;
 use Log::Log4perl qw(get_logger :levels);
 
 use Config::Model::Exception;
@@ -246,6 +247,18 @@ sub _build_read_root_dir {
     # cleanup paths
     $root_dir .= '/' if $root_dir and $root_dir !~ m!/$! ;
     return $root_dir;
+}
+
+has root_path => (
+    is  => 'ro',
+    isa => 'Path::Tiny',
+    lazy_build => 1,
+);
+
+sub _build_root_path {
+    my $self = shift;
+    my $root_dir = $self->root_dir // '';
+    return $root_dir ? path($root_dir) : Path::Tiny->cwd;
 }
 
 # config_file cannot be a Path::Tiny object: it may be a file name
@@ -633,7 +646,7 @@ Config::Model::Instance - Instance of configuration tree
 
 =head1 VERSION
 
-version 2.112
+version 2.113
 
 =head1 SYNOPSIS
 
@@ -700,6 +713,11 @@ Constructor parameters are:
 Pseudo root directory where to read I<and> write configuration
 files. Configuration directory specified in model or with
 C<config_dir> option is appended to this root directory
+
+=item root_path
+
+L<Path::Tiny> object created with C<root_dir> value or with current
+directory if C<root_dir> is empty.
 
 =item config_dir
 

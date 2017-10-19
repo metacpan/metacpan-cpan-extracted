@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::HashId;
-$Config::Model::HashId::VERSION = '2.112';
+$Config::Model::HashId::VERSION = '2.113';
 use Mouse;
 use 5.10.1;
 
@@ -477,7 +477,7 @@ sub load_data {
             @load_keys = @{ delete $data->{$order_key} or delete $data->{__order} };
             $from      = ' with '.$order_key;
         }
-        elsif ( $self->{ordered} ) {
+        elsif ( $self->{ordered} and (keys %$data > 1)) {
             $logger->warn( "HashId "
                     . $self->location
                     . ": loading ordered "
@@ -538,7 +538,7 @@ Config::Model::HashId - Handle hash element for configuration model
 
 =head1 VERSION
 
-version 2.112
+version 2.113
 
 =head1 SYNOPSIS
 

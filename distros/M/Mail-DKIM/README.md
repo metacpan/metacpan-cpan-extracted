@@ -3,7 +3,7 @@ Mail-DKIM
 
 [![Build Status](https://travis-ci.org/marcbradshaw/mail-dkim.svg?branch=master)](https://travis-ci.org/marcbradshaw/mail-dkim)
 
-Mail-DKIM version 0.43
+Mail-DKIM version 0.44
 ======================
 
 This module implements the various components of the DKIM and DomainKeys
@@ -11,6 +11,7 @@ message-signing and verifying standards for Internet mail. It currently
 tries to implement these specifications:
  * RFC4871, for DKIM
  * RFC4870, for DomainKeys
+ * https://tools.ietf.org/html/draft-ietf-dmarc-arc-protocol-06, for ARC
 
 With each release, this module is getting bigger, but don't worry,
 most of the growth is from having more things to test with `make test'.
@@ -39,6 +40,10 @@ USAGE
 Decide whether you want to "sign" or "verify" messages.
 To sign, see the Mail::DKIM::Signer module.
 To verify, see the Mail::DKIM::Verifier module.
+
+If you want to sign or verify ARC headers
+(https://tools.ietf.org/html/draft-ietf-dmarc-arc-protocol-06)
+then look at Mail::DKIM::ARC::Signer and Mail::DKIM::ARC::Verifier
 
 BUGS
 

@@ -9,11 +9,11 @@ Data::SeaBASS - Object-oriented interface for reading/writing SeaBASS files
 
 =head1 VERSION
 
-version 0.172780
+version 0.172890
 
 =cut
 
-our $VERSION = '0.172780'; # VERSION
+our $VERSION = '0.172890'; # VERSION
 
 =head1 SYNOPSIS
 
@@ -235,6 +235,7 @@ my %DEFAULT_OPTIONS = (
 	fill_ancillary_data    => 0,
 	preserve_header        => 0,
 	preserve_detection_limits => 0,
+	optional_warnings => 1,
 );
 
 #return values for ref()
@@ -252,6 +253,7 @@ my %OPTION_TYPES = (
 	fill_ancillary_data    => [''],
 	preserve_header        => [''],
 	preserve_detection_limits => [''],
+	optional_warnings => [''],
 );
 
 # All headers required by STRICT_READ and STRICT_WRITE
@@ -513,6 +515,11 @@ C<0> or C<1>, default C<0>.  Disables setting values equal to below_detection_li
 or above_detection_limit to null while reading files.  This should only be used
 during read-only operation, as there is no telling missing data from data
 outside limits.
+
+=item * optional_warnings
+
+C<0> or C<1>, default C<1>.  Determines whether or not to print warnings deemed
+optional.  For the moment, the only defined warning is for optically shallow data.
 
 =back
 
@@ -2157,7 +2164,7 @@ sub read_headers {
 		delete( $self->{'fields_lc'} );
 	} ## end if ($self->{'options'}...)
 
-	if ($headers{"${slash}optical_depth_warning"} && $headers{"${slash}optical_depth_warning"} =~ /true/){
+	if ($self->{'options'}{'optional_warnings'} && $headers{"${slash}optical_depth_warning"} && $headers{"${slash}optical_depth_warning"} =~ /true/){
 		carp("/optical_depth_warning=true, indicating optically shallow water. Use caution when using this data.");
 	}
 

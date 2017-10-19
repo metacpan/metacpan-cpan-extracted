@@ -14,7 +14,7 @@ use warnings;
 
 our $VERSION;
 BEGIN {
-our $VERSION = '1.28'; # VERSION
+our $VERSION = '1.29'; # VERSION
 }
 
 use Devel::Cover::DB;
@@ -379,6 +379,8 @@ sub main {
         $structure->write($dbname);
     }
 
+    $db->clean;
+
     exit $test_result unless $Options->{summary} || @{$Options->{report}};
 
     $Options->{coverage}    = [ $db->collected ] unless @{$Options->{coverage}};
@@ -390,7 +392,7 @@ sub main {
     print "\n\n" unless $Options->{silent};
 
     # TODO - The sense of select and ignore should be reversed to match
-    # collection
+    # collection - check this
 
     my %f = map { $_ => 1 } (@{$Options->{select}}
                              ? map glob, @{$Options->{select}}
@@ -443,7 +445,7 @@ cover - report coverage statistics
 
 =head1 VERSION
 
-version 1.28
+version 1.29
 
 =head1 SYNOPSIS
 

@@ -23,7 +23,7 @@ extern UV rootof(UV n, UV k);
 extern int primepower(UV n, UV* prime);
 extern UV valuation(UV n, UV k);
 extern UV logint(UV n, UV b);
-extern UV mpu_popcount_string(const char* ptr, int len);
+extern UV mpu_popcount_string(const char* ptr, uint32_t len);
 
 extern signed char* _moebius_range(UV low, UV high);
 extern UV*    _totient_range(UV low, UV high);
@@ -59,7 +59,9 @@ extern UV jordan_totient(UV k, UV n);
 extern UV znprimroot(UV n);
 extern UV znorder(UV a, UV n);
 extern int is_primitive_root(UV a, UV n, int nprime);
+extern UV  factorialmod(UV n, UV m);
 #define is_square_free(n)  (moebius(n) != 0)
+extern int is_fundamental(UV n, int neg);
 extern int is_semiprime(UV n);
 extern int is_carmichael(UV n);
 extern UV  is_quasi_carmichael(UV n);  /* Returns number of bases */
@@ -169,12 +171,14 @@ static UV lcm_ui(UV x, UV y) {
 /* See:  http://mersenneforum.org/showpost.php?p=110896 */
 static int is_perfect_square(UV n)
 {
-  UV m;
-  m = n & 127;
+  UV m = n & 127;
   if ((m*0x8bc40d7d) & (m*0xa1e2f5d1) & 0x14020a)  return 0;
+  /* On x86-64, sqrt is fast enough to stop testing here */
+#if !defined(__x86_64__)
   /* This cuts out another 80%: */
   m = n % 63; if ((m*0x3d491df7) & (m*0xc824a9f9) & 0x10f14008) return 0;
   /* m = n % 25; if ((m*0x1929fc1b) & (m*0x4c9ea3b2) & 0x51001005) return 0; */
+#endif
   m = isqrt(n);
   return m*m == n;
 }
@@ -312,7 +316,7 @@ static int is_perfect_seventh(UV n)
 /* GCC 3.4 - 4.1 has broken 64-bit popcount.
  * GCC 4.2+ can generate awful code when it doesn't have asm (GCC bug 36041).
  * When the asm is present (e.g. compile with -march=native on a platform that
- * has them, like Nahelem+), then it is almost as fast as the direct asm. */
+ * has them, like Nahelem+), then it is almost as fast as manually written asm. */
 #if BITS_PER_WORD == 64
  #if defined(__POPCNT__) && defined(__GNUC__) && (__GNUC__> 4 || (__GNUC__== 4 && __GNUC_MINOR__> 1))
    #define popcnt(b)  __builtin_popcountll(b)

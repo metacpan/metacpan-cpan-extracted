@@ -14,6 +14,7 @@ ext/systemd/dochazka-www.service
 ext/WWW_SiteConfig.pm.example
 share/config/WWW_Message_en.conf
 share/js/000boilerplate.js
+share/js/dochazka-www/act-lib.js
 share/js/dochazka-www/canned-tests.js
 share/js/dochazka-www/daction-init.js
 share/js/dochazka-www/daction-start.js
@@ -24,6 +25,8 @@ share/js/dochazka-www/dnotice-init.js
 share/js/dochazka-www/drowselect-init.js
 share/js/dochazka-www/dtable-init.js
 share/js/dochazka-www/emp-lib.js
+share/js/dochazka-www/entries.js
+share/js/dochazka-www/int-lib.js
 share/js/dochazka-www/ldap-lib.js
 share/js/dochazka-www/priv-lib.js
 share/js/dochazka-www/sched-history-lib.js
@@ -33,6 +36,7 @@ share/js/dochazka-www/prototypes.js
 share/js/dochazka-www/rest-lib.js
 share/js/dochazka-www/target-init.js
 share/js/dochazka-www/test.js
+share/js/dochazka-www/tests/01-users.js
 share/js/dochazka-www/tests/dummy.js
 share/js/dochazka-www/tests/main-empl.js
 share/js/dochazka-www/tests/main-menu.js

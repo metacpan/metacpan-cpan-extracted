@@ -1,7 +1,9 @@
 package WebService::Braintree::Transaction::PaymentInstrumentType;
-$WebService::Braintree::Transaction::PaymentInstrumentType::VERSION = '0.93';
+$WebService::Braintree::Transaction::PaymentInstrumentType::VERSION = '0.94';
+use 5.010_001;
+use strictures 1;
 
-use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS );
+use vars qw(@ISA @EXPORT @EXPORT_OK);
 use Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(PAYPAL_ACCOUNT SEPA_BANK_ACCOUNT CREDIT_CARD ANY UNKNOWN);
@@ -14,3 +16,4 @@ use constant ANY                => "any";
 use constant UNKNOWN            => "unknown";
 
 1;
+__END__

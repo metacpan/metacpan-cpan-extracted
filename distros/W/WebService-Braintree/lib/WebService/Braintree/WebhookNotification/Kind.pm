@@ -1,6 +1,7 @@
 package WebService::Braintree::WebhookNotification::Kind;
-$WebService::Braintree::WebhookNotification::Kind::VERSION = '0.93';
-use strict;
+$WebService::Braintree::WebhookNotification::Kind::VERSION = '0.94';
+use 5.010_001;
+use strictures 1;
 
 use constant PartnerMerchantConnected => "partner_merchant_connected";
 use constant PartnerMerchantDisconnected => "partner_merchant_disconnected";
@@ -43,3 +44,4 @@ use constant All => (
 );
 
 1;
+__END__

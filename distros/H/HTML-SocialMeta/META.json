@@ -4,7 +4,7 @@
       "Robert Acock <ThisUsedToBeAnEmail@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -19,6 +19,30 @@
          "inc"
       ]
    },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Coerce::Types::Standard" : "0.000004",
+            "List::MoreUtils" : "0.33",
+            "Moo" : "1.001001",
+            "MooX::LazierAttributes" : "1.03",
+            "MooX::ValidateSubs" : "1.012001",
+            "Type::Tiny" : "1.002000",
+            "perl" : "5.006"
+         }
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "repository" : {
@@ -27,7 +51,7 @@
          "web" : "https://github.com/ThisUsedToBeAnEmail/HTML-SocialMeta"
       }
    },
-   "version" : "0.730002",
+   "version" : "0.730004",
    "x_contributors" : [
       "Robert Haliday <robh@cpan.org>",
       "Jason McIntosh (JMAC) <jmac@jmac.org>"

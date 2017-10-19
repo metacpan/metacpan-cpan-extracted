@@ -7,7 +7,6 @@ use warnings;
 use Config;
 
 use SPVM::Object;
-use SPVM::Object::Package;
 use SPVM::Object::Array;
 use SPVM::Object::Array::Byte;
 use SPVM::Object::Array::Short;
@@ -16,6 +15,8 @@ use SPVM::Object::Array::Long;
 use SPVM::Object::Array::Float;
 use SPVM::Object::Array::Double;
 use SPVM::Object::Array::Object;
+use SPVM::Object::Package;
+use SPVM::Object::Package::String;
 
 use File::Temp 'tempdir';
 use ExtUtils::CBuilder;
@@ -28,7 +29,7 @@ use Encode 'encode';
 
 use Carp 'confess';
 
-our $VERSION = '0.0279';
+our $VERSION = '0.0280';
 
 our $COMPILER;
 our @PACKAGE_INFOS;

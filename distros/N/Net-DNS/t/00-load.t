@@ -1,4 +1,4 @@
-# $Id: 00-load.t 1559 2017-04-10 07:39:44Z willem $	-*-perl-*-
+# $Id: 00-load.t 1595 2017-09-12 09:10:56Z willem $	-*-perl-*-
 
 use strict;
 use Test::More;
@@ -23,6 +23,7 @@ my @module = qw(
 	IO::Socket::IP
 	MIME::Base64
 	Net::LibIDN
+	Net::LibIDN2
 	PerlIO
 	Scalar::Util
 	Socket

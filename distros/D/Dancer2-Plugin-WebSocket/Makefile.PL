@@ -19,20 +19,23 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Dancer2::Plugin" => 0,
     "JSON::MaybeXS" => 0,
+    "Moo" => 0,
     "Moo::Role" => 0,
     "Plack::App::WebSocket" => 0,
-    "Role::Tiny" => 0
+    "Scalar::Util" => 0,
+    "Set::Tiny" => 0,
+    "Try::Tiny" => 0,
+    "strict" => 0,
+    "warnings" => 0
   },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
-    "Test::More" => 0,
-    "strict" => 0,
-    "warnings" => 0
+    "Test::More" => 0
   },
-  "VERSION" => "0.0.1",
+  "VERSION" => "0.1.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,10 +49,13 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "JSON::MaybeXS" => 0,
+  "Moo" => 0,
   "Moo::Role" => 0,
   "Plack::App::WebSocket" => 0,
-  "Role::Tiny" => 0,
+  "Scalar::Util" => 0,
+  "Set::Tiny" => 0,
   "Test::More" => 0,
+  "Try::Tiny" => 0,
   "strict" => 0,
   "warnings" => 0
 );

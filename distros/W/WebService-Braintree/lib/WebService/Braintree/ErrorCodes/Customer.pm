@@ -1,6 +1,7 @@
 package WebService::Braintree::ErrorCodes::Customer;
-$WebService::Braintree::ErrorCodes::Customer::VERSION = '0.93';
-use strict;
+$WebService::Braintree::ErrorCodes::Customer::VERSION = '0.94';
+use 5.010_001;
+use strictures 1;
 
 use constant CompanyIsTooLong       => "81601";
 use constant CustomFieldIsInvalid   => "91602";
@@ -23,3 +24,4 @@ use constant WebsiteFormatIsInvalid => "81616";
 use constant WebsiteIsTooLong       => "81615";
 
 1;
+__END__

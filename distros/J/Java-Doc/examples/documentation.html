@@ -12,985 +12,3238 @@
 
 <a name="com.appaapps"/>
 <div style="background-color: #FFccFF; margin-left: 20">
-<h2>Classes in package: <big>com.appaapps</big></h2>
+<h2>Package: <big>com.appaapps</big></h2>
 <table border="1" cellspacing="20">
 <tr><th>Class<th>Description</tr>
 
-<tr><td><a href="#com.appaapps.Svg">Svg</a>
+<tr><td><a href="#com.appaapps/AppState">AppState</a>
+    <td>Thread which constructs the current state of an app
+</tr>
+
+<tr><td><a href="#com.appaapps/AppState.Fact">AppState.Fact</a>
+    <td>Fact details
+</tr>
+
+<tr><td><a href="#com.appaapps/AppState.FactComparator">AppState.FactComparator</a>
+    <td>Sort facts by swing. If it is an ordered app, sort equal entries by fact.index so that we work through the facts in the order they are listed in the App Definition file written in the App Definition Language
+</tr>
+
+<tr><td><a href="#com.appaapps/AppState.FactComparator.PhotoFact">AppState.FactComparator.PhotoFact</a>
+    <td>PhotoFact
+</tr>
+
+<tr><td><a href="#com.appaapps/AppState.FactComparator.Possibility">AppState.FactComparator.Possibility</a>
+    <td>Question possibilities
+</tr>
+
+<tr><td><a href="#com.appaapps/AppState.FactComparator.PossibilityComparator">AppState.FactComparator.PossibilityComparator</a>
+    <td>Sort possibilities by swing. If it is an ordered app, sort equal entries by photo.index so that we work through the photos in the order they are listed in the App Definition file written in the App Definition Language
+</tr>
+
+<tr><td><a href="#com.appaapps/AppState.FactComparator.Question">AppState.FactComparator.Question</a>
+    <td>Question a user with either a photo and its title or a photofact (but not both)
+</tr>
+
+<tr><td><a href="#com.appaapps/AppState.FactComparator.Question.Response">AppState.FactComparator.Question.Response</a>
+    <td>Rate the user response
+</tr>
+
+<tr><td><a href="#com.appaapps/AppState.FactComparator.SvgPhoto">AppState.FactComparator.SvgPhoto</a>
+    <td>The Svg Image element currently being used to display a photo
+</tr>
+
+<tr><td><a href="#com.appaapps/AppState.Filter<E>">AppState.Filter<E></a>
+    <td>Filter for a specified type of object
+</tr>
+
+<tr><td><a href="#com.appaapps/AppState.Photo">AppState.Photo</a>
+    <td>Photo details
+</tr>
+
+<tr><td><a href="#com.appaapps/AppState.ShowAndTell">AppState.ShowAndTell</a>
+    <td>Speech and title for a fact or a photo
+</tr>
+
+<tr><td><a href="#com.appaapps/AppState.Speaker">AppState.Speaker</a>
+    <td>Speaker details
+</tr>
+
+<tr><td><a href="#com.appaapps/AppState.Tracker">AppState.Tracker</a>
+    <td>Track the score of the user of the app: Right/wrong/heard/swing in a saveable manner
+</tr>
+
+<tr><td><a href="#com.appaapps/Choices">Choices</a>
+    <td>Choices
+</tr>
+
+<tr><td><a href="#com.appaapps/ColoursTransformed">ColoursTransformed</a>
+    <td>Transformations of a colour
+</tr>
+
+<tr><td><a href="#com.appaapps/Fourier">Fourier</a>
+    <td>Fourier stream
+</tr>
+
+<tr><td><a href="#com.appaapps/Fourier.Impulse">Fourier.Impulse</a>
+    <td>A sine wave
+</tr>
+
+<tr><td><a href="#com.appaapps/Gradients">Gradients</a>
+    <td>Gradients in various patterns
+</tr>
+
+<tr><td><a href="#com.appaapps/Gradients.Pattern">Gradients.Pattern</a>
+    <td>Each gradient pattern should be derived from this class
+</tr>
+
+<tr><td><a href="#com.appaapps/Gradients.Tartan">Gradients.Tartan</a>
+    <td>Create a tartan paint gradient
+</tr>
+
+<tr><td><a href="#com.appaapps/LayoutText">LayoutText</a>
+    <td>Draw text to fill a fractional area of a canvas, justifying remaining space
+</tr>
+
+<tr><td><a href="#com.appaapps/Log">Log</a>
+    <td>Logging
+</tr>
+
+<tr><td><a href="#com.appaapps/Maths">Maths</a>
+    <td>Various mathematical methods
+</tr>
+
+<tr><td><a href="#com.appaapps/Midi">Midi</a>
+    <td>Midi sound player
+</tr>
+
+<tr><td><a href="#com.appaapps/RandomChoice<T>">RandomChoice<T></a>
+    <td>Random choices
+</tr>
+
+<tr><td><a href="#com.appaapps/Sound">Sound</a>
+    <td>Sounds
+</tr>
+
+<tr><td><a href="#com.appaapps/Speech">Speech</a>
+    <td>Speech played from mp3 files
+</tr>
+
+<tr><td><a href="#com.appaapps/Svg">Svg</a>
     <td>Structured Vector Graphics. Svg elements occupy fractions of the canvas which is assumed to have the approximate aspect ratio specified when creating the Svg. The elements then try to fit themselves into their fractional areas as best they can.
 </tr>
 
-<tr><td><a href="#com.appaapps.Svg.AFewChars">Svg.AFewChars</a>
-    <td>Draw a path - typically to show  a few chars for an alphabetic or numbers game
+<tr><td><a href="#com.appaapps/Svg.AFewChars">Svg.AFewChars</a>
+    <td>A Few chars is just like text except that the gradient is across each character not the entire drawing area
 </tr>
 
-<tr><td><a href="#com.appaapps.Svg.AngleTracker">Svg.AngleTracker</a>
-    <td>Track angles
+<tr><td><a href="#com.appaapps/Svg.Element">Svg.Element</a>
+    <td>Common features of a drawn element
 </tr>
 
-<tr><td><a href="#com.appaapps.Svg.CenterToCenter">Svg.CenterToCenter</a>
+<tr><td><a href="#com.appaapps/Svg.Element.CenterToCenter">Svg.Element.CenterToCenter</a>
     <td>Animation which expands an element its center is over the centre of the canvas
 </tr>
 
-<tr><td><a href="#com.appaapps.Svg.Element">Svg.Element</a>
-    <td>Common features
+<tr><td><a href="#com.appaapps/Svg.Element2">Svg.Element2</a>
+    <td>Common features of an element drawn with two paints - this is in effect a replacement for ComposeShader which does not seem to work - it always produces a white screen
 </tr>
 
-<tr><td><a href="#com.appaapps.Svg.Image">Svg.Image</a>
+<tr><td><a href="#com.appaapps/Svg.Image">Svg.Image</a>
     <td>Draw a bitmap image - move it around to show it all within the space available
 </tr>
 
-<tr><td><a href="#com.appaapps.Svg.LengthTracker">Svg.LengthTracker</a>
-    <td>Track length
+<tr><td><a href="#com.appaapps/Svg.Rectangle">Svg.Rectangle</a>
+    <td>Draw a rectangle
 </tr>
 
-<tr><td><a href="#com.appaapps.Svg.LowPassFilter">Svg.LowPassFilter</a>
-    <td>Low pass filter
+<tr><td><a href="#com.appaapps/Svg.Text">Svg.Text</a>
+    <td>Draw text
 </tr>
 
-<tr><td><a href="#com.appaapps.Svg.OpacityTracker">Svg.OpacityTracker</a>
-    <td>Track opacity
-</tr>
-
-<tr><td><a href="#com.appaapps.Svg.RandomStep">Svg.RandomStep</a>
-    <td>Random step function (x=time, y=position) with each step chosen at random between -1 and 1, each step duration chosen at random between 0 and timeScale
-</tr>
-
-<tr><td><a href="#com.appaapps.Svg.Rectangle">Svg.Rectangle</a>
-    <td>Rectangle
-</tr>
-
-<tr><td><a href="#com.appaapps.Svg.Text">Svg.Text</a>
-    <td>Text
-</tr>
-
-<tr><td><a href="#com.appaapps.Svg.Tracker">Svg.Tracker</a>
-    <td>Generates random but smoothly varying numbers between -1  and +1 by filtering random shocks.
+<tr><td><a href="#com.appaapps/Unzip">Unzip</a>
+    <td>A thread to unzip a file
 </tr>
 
 </table>
 </div>
 
 <div style="background-color: #FFFFcc; margin-left: 40">
-<a name="com.appaapps.Svg"/>
-<h3>Methods in class: <big>Svg</big>, package: com.appaapps</h3>
-<p>Structured Vector Graphics. Svg elements occupy fractions of the canvas which is assumed to have the approximate aspect ratio specified when creating the Svg. The elements then try to fit themselves into their fractional areas as best they can.
+<a name="com.appaapps/AppState"/>
+<h3>Class: <big>AppState</big>, package: com.appaapps</h3>
+<p>Thread which constructs the current state of an app
 <table border="1" cellspacing="20">
-<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Description</tr>
+<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Line<th>Description</tr>
 
-<tr><td>
-    <td><a href="#com.appaapps.Svg.Svg">Svg</a>
+<tr><td><a href="#com.appaapps.AppState.AppState">AppState</a>
+    <td><a href="#com.appaapps/AppState/AppState">AppState</a>
     <td>void
-    <td>public
-    <td>A default square Svg
-</tr>
-
-<tr><td>
-    <td><a href="#com.appaapps.Svg.Svg">Svg</a>
-    <td>float, float
-    <td>public
-    <td>Create an Svg with the specified aspect ratio.
-</tr>
-
-<tr><td>float
-    <td><a href="#com.appaapps.Svg.getWidth">getWidth</a>
-    <td>void
-    <td>public
-    <td>The width of the Svg
-</tr>
-
-<tr><td>float
-    <td><a href="#com.appaapps.Svg.getHeight">getHeight</a>
-    <td>void
-    <td>public
-    <td>The height of the Svg
-</tr>
-
-<tr><td>float
-    <td><a href="#com.appaapps.Svg.aspectRatio">aspectRatio</a>
-    <td>void
-    <td>public
-    <td>Aspect ratio
+    <td>public constructor
+    <td>67
+    <td>Create the app state from the details unpacked from the zip file - the real work is done by run() when we start this thread
 </tr>
 
 <tr><td>void
-    <td><a href="#com.appaapps.Svg.push">push</a>
-    <td>Element
+    <td><a href="#com.appaapps/AppState/run">run</a>
+    <td>void
     <td>public
-    <td>Add an element to the stack of elements to be displayed
+    <td>75
+    <td>Construct the current state of the app by unpacking its description
 </tr>
 
 <tr><td>void
-    <td><a href="#com.appaapps.Svg.onShow">onShow</a>
+    <td><a href="#com.appaapps/AppState/finished">finished</a>
     <td>void
     <td>public
-    <td>Called when this Svg is shown or reshown after some other Svg has been shown
+    <td>115
+    <td>Override called at end of construction thread
 </tr>
 
 <tr><td>void
-    <td><a href="#com.appaapps.Svg.draw">draw</a>
-    <td><a href="   (final Canvas canvas)                                                        //P Canvas to draw on">Canvas</a>
+    <td><a href="#com.appaapps/AppState/save">save</a>
+    <td>void
     <td>public
-    <td>Draw the Svg to cover an entire canvas
+    <td>118
+    <td>Save app state to a known file
 </tr>
 
 <tr><td>void
-    <td><a href="#com.appaapps.Svg.draw">draw</a>
-    <td><a href="   (final Canvas canvas,                                                        //P Canvas  to draw svg on">Canvas</a>, float, float, float, float
-    <td>private
-    <td>Draw the Svg on a canvas at a specified location
-</tr>
-
-<tr><td>boolean
-    <td><a href="#com.appaapps.Svg.chooseDoubleMode">chooseDoubleMode</a>
+    <td><a href="#com.appaapps/AppState/restore">restore</a>
     <td>void
-    <td>
-    <td>Choose either a single or a double gradient
-</tr>
-
-<tr><td>float
-    <td><a href="#com.appaapps.Svg.chooseStartAngle">chooseStartAngle</a>
-    <td>void
-    <td>
-    <td>Choose a start angle between 0 and 180 degrees
-</tr>
-
-<tr><td>PorterDuffXfermode
-    <td><a href="#com.appaapps.Svg.choosePorterDuffMode">choosePorterDuffMode</a>
-    <td>void
-    <td>
-    <td>Choose Porter=Duff blending method
-</tr>
-
-<tr><td>Rectangle
-    <td><a href="#com.appaapps.Svg.Rectangle">Rectangle</a>
-    <td>float, float, float, float
-    <td>
-    <td>Create and push a rectangle
-</tr>
-
-<tr><td>Text
-    <td><a href="#com.appaapps.Svg.Text">Text</a>
-    <td><a href="   (final String text,                                                          //P The text to  display">String</a>, float, float, float, float, int, int
     <td>public
-    <td>Create and push a new text element
+    <td>138
+    <td>Restore app state from a known file
 </tr>
 
 </table>
 </div>
 
 <div style="background-color: #CCccFF; margin-left: 60">
-<a name="com.appaapps.Svg.Svg"/>
-<h4><b>Svg</b> : </h4>
-<p>A default square Svg</p>
+<a name="com.appaapps/AppState/AppState"/>
+<h4><big>AppState()</big> returns <big><a href="#com.appaapps.AppState.AppState">AppState</a></big>   <small>in class AppState</small></h4>
+<p>Create the app state from the details unpacked from the zip file - the real work is done by run() when we start this thread</p>
 
 </div>
 </body>
 
 <div style="background-color: #FFCCcc; margin-left: 60">
-<a name="com.appaapps.Svg.Svg"/>
-<h4><b>Svg</b> : </h4>
-<p>Create an Svg with the specified aspect ratio.</p>
-
-<p>Parameters:
-<table border="1" cellspacing="20">
-<tr><th>Name<th>Type<th>Attributes<th>Description</tr>
-
-<tr><td>width<td>float<td>final<td>The width of the Svg</tr>
-<tr><td>height<td>float<td>final<td>The height of the Svg</tr>
-</table>
+<a name="com.appaapps/AppState/run"/>
+<h4><big>run()</big> returns <big>void</big>   <small>in class AppState</small></h4>
+<p>Construct the current state of the app by unpacking its description</p>
 
 </div>
 </body>
 
 <div style="background-color: #ccFFCC; margin-left: 60">
-<a name="com.appaapps.Svg.getWidth"/>
-<h4><b>getWidth</b> : float</h4>
-<p>The width of the Svg</p>
+<a name="com.appaapps/AppState/finished"/>
+<h4><big>finished()</big> returns <big>void</big>   <small>in class AppState</small></h4>
+<p>Override called at end of construction thread</p>
 
 </div>
 </body>
 
 <div style="background-color: #ccFFFF; margin-left: 60">
-<a name="com.appaapps.Svg.getHeight"/>
-<h4><b>getHeight</b> : float</h4>
-<p>The height of the Svg</p>
+<a name="com.appaapps/AppState/save"/>
+<h4><big>save()</big> returns <big>void</big>   <small>in class AppState</small></h4>
+<p>Save app state to a known file</p>
 
 </div>
 </body>
 
 <div style="background-color: #FFccFF; margin-left: 60">
-<a name="com.appaapps.Svg.aspectRatio"/>
-<h4><b>aspectRatio</b> : float</h4>
-<p>Aspect ratio</p>
-
-</div>
-</body>
-
-<div style="background-color: #FFFFcc; margin-left: 60">
-<a name="com.appaapps.Svg.push"/>
-<h4><b>push</b> : void</h4>
-<p>Add an element to the stack of elements to be displayed</p>
-
-<p>Parameters:
-<table border="1" cellspacing="20">
-<tr><th>Name<th>Type<th>Attributes<th>Description</tr>
-
-<tr><td>e<td>Element<td><td>the element to add</tr>
-</table>
-
-</div>
-</body>
-
-<div style="background-color: #CCccFF; margin-left: 60">
-<a name="com.appaapps.Svg.onShow"/>
-<h4><b>onShow</b> : void</h4>
-<p>Called when this Svg is shown or reshown after some other Svg has been shown</p>
-
-</div>
-</body>
-
-<div style="background-color: #FFCCcc; margin-left: 60">
-<a name="com.appaapps.Svg.draw"/>
-<h4><b>draw</b> : void</h4>
-<p>Draw the Svg to cover an entire canvas</p>
-
-<p>Parameters:
-<table border="1" cellspacing="20">
-<tr><th>Name<th>Type<th>Attributes<th>Description</tr>
-
-<tr><td>canvas<td><a href="   (final Canvas canvas)                                                        //P Canvas to draw on">Canvas</a><td>final<td>Canvas to draw on</tr>
-</table>
-
-</div>
-</body>
-
-<div style="background-color: #ccFFCC; margin-left: 60">
-<a name="com.appaapps.Svg.draw"/>
-<h4><b>draw</b> : void</h4>
-<p>Draw the Svg on a canvas at a specified location</p>
-
-<p>Parameters:
-<table border="1" cellspacing="20">
-<tr><th>Name<th>Type<th>Attributes<th>Description</tr>
-
-<tr><td>canvas<td><a href="   (final Canvas canvas,                                                        //P Canvas  to draw svg on">Canvas</a><td>final<td>Canvas  to draw svg on</tr>
-<tr><td>x<td>float<td>final<td>Left edge</tr>
-<tr><td>y<td>float<td>final<td>Upper edge</tr>
-<tr><td>w<td>float<td>final<td>Width</tr>
-<tr><td>h<td>float<td>final<td>Height</tr>
-</table>
-
-</div>
-</body>
-
-<div style="background-color: #ccFFFF; margin-left: 60">
-<a name="com.appaapps.Svg.chooseDoubleMode"/>
-<h4><b>chooseDoubleMode</b> : boolean</h4>
-<p>Choose either a single or a double gradient</p>
-
-</div>
-</body>
-
-<div style="background-color: #FFccFF; margin-left: 60">
-<a name="com.appaapps.Svg.chooseStartAngle"/>
-<h4><b>chooseStartAngle</b> : float</h4>
-<p>Choose a start angle between 0 and 180 degrees</p>
-
-</div>
-</body>
-
-<div style="background-color: #FFFFcc; margin-left: 60">
-<a name="com.appaapps.Svg.choosePorterDuffMode"/>
-<h4><b>choosePorterDuffMode</b> : PorterDuffXfermode</h4>
-<p>Choose Porter=Duff blending method</p>
-
-</div>
-</body>
-
-<div style="background-color: #CCccFF; margin-left: 60">
-<a name="com.appaapps.Svg.Rectangle"/>
-<h4><b>Rectangle</b> : Rectangle</h4>
-<p>Create and push a rectangle</p>
-
-<p>Parameters:
-<table border="1" cellspacing="20">
-<tr><th>Name<th>Type<th>Attributes<th>Description</tr>
-
-<tr><td>x<td>float<td>final<td>Fractional position - left</tr>
-<tr><td>y<td>float<td>final<td>Fractional position - upper</tr>
-<tr><td>𝘅<td>float<td>final<td>Fractional position - right</tr>
-<tr><td>𝘆<td>float<td>final<td>Fractional position - lower</tr>
-</table>
-
-</div>
-</body>
-
-<div style="background-color: #FFCCcc; margin-left: 60">
-<a name="com.appaapps.Svg.Text"/>
-<h4><b>Text</b> : Text</h4>
-<p>Create and push a new text element</p>
-
-<p>Parameters:
-<table border="1" cellspacing="20">
-<tr><th>Name<th>Type<th>Attributes<th>Description</tr>
-
-<tr><td>text<td><a href="   (final String text,                                                          //P The text to  display">String</a><td>final<td>The text to  display</tr>
-<tr><td>x<td>float<td>final<td>Fractional area in which to display the text - left</tr>
-<tr><td>y<td>float<td>final<td>Fractional area in which to display the text - upper</tr>
-<tr><td>𝘅<td>float<td>final<td>Fractional area in which to display the text - right</tr>
-<tr><td>𝘆<td>float<td>final<td>Fractional area in which to display the text - lower</tr>
-<tr><td>justifyX<td>int<td>final<td>Justification in x per: <a href="#com.appaapps.LayoutText">com.appaapps.LayoutText</a></tr>
-<tr><td>justifyY<td>int<td>final<td>Justification in y per: <a href="#com.appaapps.LayoutText">com.appaapps.LayoutText</a></tr>
-</table>
-
-</div>
-</body>
-
-<div style="background-color: #ccFFCC; margin-left: 40">
-<a name="com.appaapps.Svg.AFewChars"/>
-<h3>Methods in class: <big>Svg.AFewChars</big>, package: com.appaapps</h3>
-<p>Draw a path - typically to show  a few chars for an alphabetic or numbers game
-<table border="1" cellspacing="20">
-<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Description</tr>
-
-</table>
-</div>
-
-<div style="background-color: #ccFFFF; margin-left: 40">
-<a name="com.appaapps.Svg.AngleTracker"/>
-<h3>Methods in class: <big>Svg.AngleTracker</big>, package: com.appaapps</h3>
-<p>Track angles
-<table border="1" cellspacing="20">
-<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Description</tr>
-
-<tr><td>float
-    <td><a href="#com.appaapps.Svg.AngleTracker.angle">angle</a>
-    <td>void
-    <td>
-    <td>Current value in degrees
-</tr>
-
-</table>
-</div>
-
-<div style="background-color: #FFccFF; margin-left: 60">
-<a name="com.appaapps.Svg.AngleTracker.angle"/>
-<h4><b>angle</b> : float</h4>
-<p>Current value in degrees</p>
+<a name="com.appaapps/AppState/restore"/>
+<h4><big>restore()</big> returns <big>void</big>   <small>in class AppState</small></h4>
+<p>Restore app state from a known file</p>
 
 </div>
 </body>
 
 <div style="background-color: #FFFFcc; margin-left: 40">
-<a name="com.appaapps.Svg.CenterToCenter"/>
-<h3>Methods in class: <big>Svg.CenterToCenter</big>, package: com.appaapps</h3>
-<p>Animation which expands an element its center is over the centre of the canvas
+<a name="com.appaapps/AppState.Fact"/>
+<h3>Class: <big>AppState.Fact</big>, package: com.appaapps</h3>
+<p>Fact details
 <table border="1" cellspacing="20">
-<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Description</tr>
+<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Line<th>Description</tr>
 
-<tr><td><a href="#com.appaapps.Svg.CenterToCenter.CenterToCenter">CenterToCenter</a>
-    <td><a href="#com.appaapps.Svg.CenterToCenter.CenterToCenter">CenterToCenter</a>
-    <td>double, double, double
-    <td>public constructor
-    <td>Create a center to center animation
-</tr>
-
-<tr><td><a href="#com.appaapps.Svg.CenterToCenter.CenterToCenter">CenterToCenter</a>
-    <td><a href="#com.appaapps.Svg.CenterToCenter.CenterToCenter">CenterToCenter</a>
-    <td>CenterToCenter
-    <td>public constructor
-    <td>Clone a prior animation
-</tr>
-
-<tr><td>Float
-    <td><a href="#com.appaapps.Svg.CenterToCenter.active">active</a>
-    <td>void
-    <td>public
-    <td>Get fraction of animation
-</tr>
-
-<tr><td>void
-    <td><a href="#com.appaapps.Svg.CenterToCenter.scaleCanvas">scaleCanvas</a>
-    <td><a href="     (Canvas canvas,                                                            //P Canvas to which s calling is to be applied">Canvas</a>, <a href="      RectF drawArea)                                                           //P Drawing area">RectF</a>
-    <td>public
-    <td>Apply scale to the canvas if scaling is active for this element
-</tr>
-
-<tr><td>void
-    <td><a href="#com.appaapps.Svg.CenterToCenter.scaleRectangle">scaleRectangle</a>
-    <td><a href="     (Canvas canvas,                                                            //P Canvas to be scaled">Canvas</a>, <a href="      RectF drawArea)                                                           //P Apply scale to the canvas if active">RectF</a>
-    <td>public
-    <td>Apply scale to the canvas if the element scale effect is active
-</tr>
-
-<tr><td>void
-    <td><a href="#com.appaapps.Svg.CenterToCenter.onActivate">onActivate</a>
-    <td>void
-    <td>public
-    <td>Called when this animation becomes active
-</tr>
-
-</table>
-</div>
-
-<div style="background-color: #CCccFF; margin-left: 60">
-<a name="com.appaapps.Svg.CenterToCenter.CenterToCenter"/>
-<h4><b>CenterToCenter</b> : <a href="#com.appaapps.Svg.CenterToCenter.CenterToCenter">CenterToCenter</a></h4>
-<p>Create a center to center animation</p>
-
-<p>Parameters:
-<table border="1" cellspacing="20">
-<tr><th>Name<th>Type<th>Attributes<th>Description</tr>
-
-<tr><td>delay<td>double<td><td>Delay before animation starts</tr>
-<tr><td>duration<td>double<td><td>Duration of animation</tr>
-<tr><td>startAgain<td>double<td><td>Restart after animation after this time</tr>
-</table>
-
-</div>
-</body>
-
-<div style="background-color: #FFCCcc; margin-left: 60">
-<a name="com.appaapps.Svg.CenterToCenter.CenterToCenter"/>
-<h4><b>CenterToCenter</b> : <a href="#com.appaapps.Svg.CenterToCenter.CenterToCenter">CenterToCenter</a></h4>
-<p>Clone a prior animation</p>
-
-<p>Parameters:
-<table border="1" cellspacing="20">
-<tr><th>Name<th>Type<th>Attributes<th>Description</tr>
-
-<tr><td>clone<td>CenterToCenter<td><td>Animation to clone</tr>
-</table>
-
-</div>
-</body>
-
-<div style="background-color: #ccFFCC; margin-left: 60">
-<a name="com.appaapps.Svg.CenterToCenter.active"/>
-<h4><b>active</b> : Float</h4>
-<p>Get fraction of animation</p>
-
-</div>
-</body>
-
-<div style="background-color: #ccFFFF; margin-left: 60">
-<a name="com.appaapps.Svg.CenterToCenter.scaleCanvas"/>
-<h4><b>scaleCanvas</b> : void</h4>
-<p>Apply scale to the canvas if scaling is active for this element</p>
-
-<p>Parameters:
-<table border="1" cellspacing="20">
-<tr><th>Name<th>Type<th>Attributes<th>Description</tr>
-
-<tr><td>canvas<td><a href="     (Canvas canvas,                                                            //P Canvas to which s calling is to be applied">Canvas</a><td><td>Canvas to which s calling is to be applied</tr>
-<tr><td>drawArea<td><a href="      RectF drawArea)                                                           //P Drawing area">RectF</a><td><td>Drawing area</tr>
-</table>
-
-</div>
-</body>
-
-<div style="background-color: #FFccFF; margin-left: 60">
-<a name="com.appaapps.Svg.CenterToCenter.scaleRectangle"/>
-<h4><b>scaleRectangle</b> : void</h4>
-<p>Apply scale to the canvas if the element scale effect is active</p>
-
-<p>Parameters:
-<table border="1" cellspacing="20">
-<tr><th>Name<th>Type<th>Attributes<th>Description</tr>
-
-<tr><td>canvas<td><a href="     (Canvas canvas,                                                            //P Canvas to be scaled">Canvas</a><td><td>Canvas to be scaled</tr>
-<tr><td>drawArea<td><a href="      RectF drawArea)                                                           //P Apply scale to the canvas if active">RectF</a><td><td>Apply scale to the canvas if active</tr>
-</table>
-
-</div>
-</body>
-
-<div style="background-color: #FFFFcc; margin-left: 60">
-<a name="com.appaapps.Svg.CenterToCenter.onActivate"/>
-<h4><b>onActivate</b> : void</h4>
-<p>Called when this animation becomes active</p>
-
-</div>
-</body>
-
-<div style="background-color: #CCccFF; margin-left: 40">
-<a name="com.appaapps.Svg.Element"/>
-<h3>Methods in class: <big>Svg.Element</big>, package: com.appaapps</h3>
-<p>Common features
-<table border="1" cellspacing="20">
-<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Description</tr>
-
-<tr><td><a href="#com.appaapps.Svg.Element.Element">Element</a>
-    <td><a href="#com.appaapps.Svg.Element.Element">Element</a>
-    <td>void
+<tr><td><a href="#com.appaapps.AppState.Fact.Fact">Fact</a>
+    <td><a href="#com.appaapps/AppState.Fact/Fact">Fact</a>
+    <td>Unpackappdescription.FactCmd
     <td>constructor
-    <td>Add the new element to the stack of elements - which means that elements must be created in draw order and that element grouping within an Svg is unavailable, we could of course have an Svg.Sub that references a sub svg.
-</tr>
-
-<tr><td><a href="    private Paint getGradientPaint                                              //M Return a paint for a gradient">Paint</a>
-    <td><a href="#com.appaapps.Svg.Element.getGradientPaint">getGradientPaint</a>
-    <td>float, float, int, int, float, AngleTracker, LengthTracker, OpacityTracker
-    <td>private
-    <td>Return a paint for a gradient
-</tr>
-
-<tr><td><a href="    private Paint getHorizontalPaint                                            //M Return a paint for the horizontal gradient">Paint</a>
-    <td><a href="#com.appaapps.Svg.Element.getHorizontalPaint">getHorizontalPaint</a>
-    <td>float
-    <td>private
-    <td>Return a paint for the horizontal gradient
-</tr>
-
-<tr><td><a href="    private Paint getVerticalPaint                                              //M Return a paint for the vertical gradient">Paint</a>
-    <td><a href="#com.appaapps.Svg.Element.getVerticalPaint">getVerticalPaint</a>
-    <td>float
-    <td>private
-    <td>Return a paint for the vertical gradient
-</tr>
-
-<tr><td>void
-    <td><a href="#com.appaapps.Svg.Element.draw">draw</a>
-    <td><a href="     (final Canvas canvas,                                                      //P Canvas on which the element would be drawn">Canvas</a>, <a href="      Paint paint,                                                              //P Paint to draw the element">Paint</a>
-    <td>abstract
-    <td>The element draws itself on the supplied canvas using the supplied paint
-</tr>
-
-<tr><td>void
-    <td><a href="#com.appaapps.Svg.Element.draw">draw</a>
-    <td><a href="     (final Canvas canvas)                                                      //P Canvas to draw on">Canvas</a>
-    <td>
-    <td>Draw the SVG on a canvas
-</tr>
-
-<tr><td>boolean
-    <td><a href="#com.appaapps.Svg.Element.contains">contains</a>
-    <td>float, float
-    <td>public
-    <td>Does this element contain the point (x, y)?
-</tr>
-
-<tr><td>void
-    <td><a href="#com.appaapps.Svg.Element.setCenterToCenter">setCenterToCenter</a>
-    <td>CenterToCenter
-    <td>public
-    <td>Set Center To Center animation for this element
-</tr>
-
-</table>
-</div>
-
-<div style="background-color: #FFCCcc; margin-left: 60">
-<a name="com.appaapps.Svg.Element.Element"/>
-<h4><b>Element</b> : <a href="#com.appaapps.Svg.Element.Element">Element</a></h4>
-<p>Add the new element to the stack of elements - which means that elements must be created in draw order and that element grouping within an Svg is unavailable, we could of course have an Svg.Sub that references a sub svg.</p>
-
-</div>
-</body>
-
-<div style="background-color: #ccFFCC; margin-left: 60">
-<a name="com.appaapps.Svg.Element.getGradientPaint"/>
-<h4><b>getGradientPaint</b> : <a href="    private Paint getGradientPaint                                              //M Return a paint for a gradient">Paint</a></h4>
-<p>Return a paint for a gradient</p>
-
-<p>Parameters:
-<table border="1" cellspacing="20">
-<tr><th>Name<th>Type<th>Attributes<th>Description</tr>
-
-<tr><td>sizeX<td>float<td><td>Size in X of gradient</tr>
-<tr><td>sizeY<td>float<td><td>Size in Y of gradient</tr>
-<tr><td>c1<td>int<td><td>First colour</tr>
-<tr><td>c2<td>int<td><td>Opposing second colour</tr>
-<tr><td>startAngle<td>float<td><td>Start angle</tr>
-<tr><td>angle<td>AngleTracker<td><td>Angle of gradient as time goes by</tr>
-<tr><td>length<td>LengthTracker<td><td>Length of gradient as time goes by</tr>
-<tr><td>opacity<td>OpacityTracker<td><td>Opacity of gradient as time goes by</tr>
-</table>
-
-</div>
-</body>
-
-<div style="background-color: #ccFFFF; margin-left: 60">
-<a name="com.appaapps.Svg.Element.getHorizontalPaint"/>
-<h4><b>getHorizontalPaint</b> : <a href="    private Paint getHorizontalPaint                                            //M Return a paint for the horizontal gradient">Paint</a></h4>
-<p>Return a paint for the horizontal gradient</p>
-
-<p>Parameters:
-<table border="1" cellspacing="20">
-<tr><th>Name<th>Type<th>Attributes<th>Description</tr>
-
-<tr><td>size<td>float<td><td>Size of gradient</tr>
-</table>
-
-</div>
-</body>
-
-<div style="background-color: #FFccFF; margin-left: 60">
-<a name="com.appaapps.Svg.Element.getVerticalPaint"/>
-<h4><b>getVerticalPaint</b> : <a href="    private Paint getVerticalPaint                                              //M Return a paint for the vertical gradient">Paint</a></h4>
-<p>Return a paint for the vertical gradient</p>
-
-<p>Parameters:
-<table border="1" cellspacing="20">
-<tr><th>Name<th>Type<th>Attributes<th>Description</tr>
-
-<tr><td>size<td>float<td><td>Size of gradient</tr>
-</table>
-
-</div>
-</body>
-
-<div style="background-color: #FFFFcc; margin-left: 60">
-<a name="com.appaapps.Svg.Element.draw"/>
-<h4><b>draw</b> : void</h4>
-<p>The element draws itself on the supplied canvas using the supplied paint</p>
-
-<p>Parameters:
-<table border="1" cellspacing="20">
-<tr><th>Name<th>Type<th>Attributes<th>Description</tr>
-
-<tr><td>canvas<td><a href="     (final Canvas canvas,                                                      //P Canvas on which the element would be drawn">Canvas</a><td>final<td>Canvas on which the element would be drawn</tr>
-<tr><td>paint<td><a href="      Paint paint,                                                              //P Paint to draw the element">Paint</a><td><td>Paint to draw the element</tr>
-</table>
-
-</div>
-</body>
-
-<div style="background-color: #CCccFF; margin-left: 60">
-<a name="com.appaapps.Svg.Element.draw"/>
-<h4><b>draw</b> : void</h4>
-<p>Draw the SVG on a canvas</p>
-
-<p>Parameters:
-<table border="1" cellspacing="20">
-<tr><th>Name<th>Type<th>Attributes<th>Description</tr>
-
-<tr><td>canvas<td><a href="     (final Canvas canvas)                                                      //P Canvas to draw on">Canvas</a><td>final<td>Canvas to draw on</tr>
-</table>
-
-</div>
-</body>
-
-<div style="background-color: #FFCCcc; margin-left: 60">
-<a name="com.appaapps.Svg.Element.contains"/>
-<h4><b>contains</b> : boolean</h4>
-<p>Does this element contain the point (x, y)?</p>
-
-<p>Parameters:
-<table border="1" cellspacing="20">
-<tr><th>Name<th>Type<th>Attributes<th>Description</tr>
-
-<tr><td>x<td>float<td><td>Point.X</tr>
-<tr><td>y<td>float<td><td>Point.Y</tr>
-</table>
-
-</div>
-</body>
-
-<div style="background-color: #ccFFCC; margin-left: 60">
-<a name="com.appaapps.Svg.Element.setCenterToCenter"/>
-<h4><b>setCenterToCenter</b> : void</h4>
-<p>Set Center To Center animation for this element</p>
-
-<p>Parameters:
-<table border="1" cellspacing="20">
-<tr><th>Name<th>Type<th>Attributes<th>Description</tr>
-
-<tr><td>c<td>CenterToCenter<td><td>Animation  to use</tr>
-</table>
-
-</div>
-</body>
-
-<div style="background-color: #ccFFFF; margin-left: 40">
-<a name="com.appaapps.Svg.Image"/>
-<h3>Methods in class: <big>Svg.Image</big>, package: com.appaapps</h3>
-<p>Draw a bitmap image - move it around to show it all within the space available
-<table border="1" cellspacing="20">
-<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Description</tr>
-
-<tr><td><a href="#com.appaapps.Svg.Image.Image">Image</a>
-    <td><a href="#com.appaapps.Svg.Image.Image">Image</a>
-    <td><a href="     (Bitmap bitmap,                                                            //P Bitmap containing image">Bitmap</a>, float, float, float, float
-    <td>public constructor
-    <td>Fraction coordinates of corners of drawing area
-</tr>
-
-</table>
-</div>
-
-<div style="background-color: #FFccFF; margin-left: 60">
-<a name="com.appaapps.Svg.Image.Image"/>
-<h4><b>Image</b> : <a href="#com.appaapps.Svg.Image.Image">Image</a></h4>
-<p>Fraction coordinates of corners of drawing area</p>
-
-<p>Parameters:
-<table border="1" cellspacing="20">
-<tr><th>Name<th>Type<th>Attributes<th>Description</tr>
-
-<tr><td>bitmap<td><a href="     (Bitmap bitmap,                                                            //P Bitmap containing image">Bitmap</a><td><td>Bitmap containing image</tr>
-<tr><td>x<td>float<td><td>Fraction coordinates of left edge</tr>
-<tr><td>y<td>float<td><td>Fraction coordinates of upper edge</tr>
-<tr><td>𝘅<td>float<td><td>Fraction coordinates of right edge</tr>
-<tr><td>𝘆<td>float<td><td>Fraction coordinates of lower edge</tr>
-</table>
-
-</div>
-</body>
-
-<div style="background-color: #FFFFcc; margin-left: 40">
-<a name="com.appaapps.Svg.LengthTracker"/>
-<h3>Methods in class: <big>Svg.LengthTracker</big>, package: com.appaapps</h3>
-<p>Track length
-<table border="1" cellspacing="20">
-<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Description</tr>
-
-<tr><td>float
-    <td><a href="#com.appaapps.Svg.LengthTracker.length">length</a>
-    <td>void
-    <td>
-    <td>Current value in pixels
+    <td>326
+    <td>Describe a fact
 </tr>
 
 </table>
 </div>
 
 <div style="background-color: #CCccFF; margin-left: 60">
-<a name="com.appaapps.Svg.LengthTracker.length"/>
-<h4><b>length</b> : float</h4>
-<p>Current value in pixels</p>
+<a name="com.appaapps/AppState.Fact/Fact"/>
+<h4><big>Fact(Unpackappdescription.FactCmd)</big> returns <big><a href="#com.appaapps.AppState.Fact.Fact">Fact</a></big>   <small>in class AppState.Fact</small></h4>
+<p>Describe a fact</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>f<td>Unpackappdescription.FactCmd<td>327<td>Unpacked fact description from zip file</tr>
+</table>
 
 </div>
 </body>
 
 <div style="background-color: #FFCCcc; margin-left: 40">
-<a name="com.appaapps.Svg.LowPassFilter"/>
-<h3>Methods in class: <big>Svg.LowPassFilter</big>, package: com.appaapps</h3>
-<p>Low pass filter
+<a name="com.appaapps/AppState.FactComparator"/>
+<h3>Class: <big>AppState.FactComparator</big>, package: com.appaapps</h3>
+<p>Sort facts by swing. If it is an ordered app, sort equal entries by fact.index so that we work through the facts in the order they are listed in the App Definition file written in the App Definition Language
 <table border="1" cellspacing="20">
-<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Description</tr>
+<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Line<th>Description</tr>
 
-<tr><td><a href="#com.appaapps.Svg.LowPassFilter.LowPassFilter">LowPassFilter</a>
-    <td><a href="#com.appaapps.Svg.LowPassFilter.LowPassFilter">LowPassFilter</a>
-    <td>double
-    <td>constructor
-    <td>Create a low pass filter
+<tr><td>int
+    <td><a href="#com.appaapps/AppState.FactComparator/compare">compare</a>
+    <td>Fact, Fact
+    <td>public
+    <td>337
+    <td>Compare the ordering of two facts
 </tr>
 
-<tr><td>double
-    <td><a href="#com.appaapps.Svg.LowPassFilter.value">value</a>
-    <td>double
+<tr><td>void
+    <td><a href="#com.appaapps/AppState.FactComparator/changeLevel">changeLevel</a>
+    <td>void
     <td>public
-    <td>Value of applied value after passing through low pass filter
+    <td>365
+    <td>Change level when we max out the swing level of each item
+</tr>
+
+<tr><td>int
+    <td><a href="#com.appaapps/AppState.FactComparator/adjustNumberOfImagesToShow">adjustNumberOfImagesToShow</a>
+    <td>boolean
+    <td>public
+    <td>380
+    <td>Adjust number of images to show within limits up or down
+</tr>
+
+<tr><td>int
+    <td><a href="#com.appaapps/AppState.FactComparator/incNumberOfImagesToShow">incNumberOfImagesToShow</a>
+    <td>void
+    <td>public
+    <td>391
+    <td>Increase number of images to show
+</tr>
+
+<tr><td>int
+    <td><a href="#com.appaapps/AppState.FactComparator/decNumberOfImagesToShow">decNumberOfImagesToShow</a>
+    <td>void
+    <td>public
+    <td>394
+    <td>Decrease number of images to show
 </tr>
 
 </table>
 </div>
 
 <div style="background-color: #ccFFCC; margin-left: 60">
-<a name="com.appaapps.Svg.LowPassFilter.LowPassFilter"/>
-<h4><b>LowPassFilter</b> : <a href="#com.appaapps.Svg.LowPassFilter.LowPassFilter">LowPassFilter</a></h4>
-<p>Create a low pass filter</p>
+<a name="com.appaapps/AppState.FactComparator/compare"/>
+<h4><big>compare(Fact, Fact)</big> returns <big>int</big>   <small>in class AppState.FactComparator</small></h4>
+<p>Compare the ordering of two facts</p>
 
-<p>Parameters:
 <table border="1" cellspacing="20">
-<tr><th>Name<th>Type<th>Attributes<th>Description</tr>
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
 
-<tr><td>timeScale<td>double<td><td>Timescale of filter</tr>
+<tr><td>f1<td>Fact<td>338<td>First fact</tr>
+<tr><td>f2<td>Fact<td>339<td>Second fact</tr>
 </table>
 
 </div>
 </body>
 
 <div style="background-color: #ccFFFF; margin-left: 60">
-<a name="com.appaapps.Svg.LowPassFilter.value"/>
-<h4><b>value</b> : double</h4>
-<p>Value of applied value after passing through low pass filter</p>
+<a name="com.appaapps/AppState.FactComparator/changeLevel"/>
+<h4><big>changeLevel()</big> returns <big>void</big>   <small>in class AppState.FactComparator</small></h4>
+<p>Change level when we max out the swing level of each item</p>
 
-<p>Parameters:
+</div>
+</body>
+
+<div style="background-color: #FFccFF; margin-left: 60">
+<a name="com.appaapps/AppState.FactComparator/adjustNumberOfImagesToShow"/>
+<h4><big>adjustNumberOfImagesToShow(boolean)</big> returns <big>int</big>   <small>in class AppState.FactComparator</small></h4>
+<p>Adjust number of images to show within limits up or down</p>
+
 <table border="1" cellspacing="20">
-<tr><th>Name<th>Type<th>Attributes<th>Description</tr>
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
 
-<tr><td>applied<td>double<td><td>Applied signal</tr>
+<tr><td>up<td>boolean<td>381<td>True: up, false: down</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #FFFFcc; margin-left: 60">
+<a name="com.appaapps/AppState.FactComparator/incNumberOfImagesToShow"/>
+<h4><big>incNumberOfImagesToShow()</big> returns <big>int</big>   <small>in class AppState.FactComparator</small></h4>
+<p>Increase number of images to show</p>
+
+</div>
+</body>
+
+<div style="background-color: #CCccFF; margin-left: 60">
+<a name="com.appaapps/AppState.FactComparator/decNumberOfImagesToShow"/>
+<h4><big>decNumberOfImagesToShow()</big> returns <big>int</big>   <small>in class AppState.FactComparator</small></h4>
+<p>Decrease number of images to show</p>
+
+</div>
+</body>
+
+<div style="background-color: #FFCCcc; margin-left: 40">
+<a name="com.appaapps/AppState.FactComparator.PhotoFact"/>
+<h3>Class: <big>AppState.FactComparator.PhotoFact</big>, package: com.appaapps</h3>
+<p>PhotoFact
+<table border="1" cellspacing="20">
+<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Line<th>Description</tr>
+
+<tr><td><a href="#com.appaapps.AppState.FactComparator.PhotoFact.PhotoFact">PhotoFact</a>
+    <td><a href="#com.appaapps/AppState.FactComparator.PhotoFact/PhotoFact">PhotoFact</a>
+    <td>Unpackappdescription.PhotoFact
+    <td>constructor
+    <td>355
+    <td>Describe a photo fact
+</tr>
+
+<tr><td><a target="_blank" href="https://developer.android.com/reference/java/lang/String.html">String</a>
+    <td><a href="#com.appaapps/AppState.FactComparator.PhotoFact/toString">toString</a>
+    <td>void
+    <td>public
+    <td>360
+    <td>Short description of photo fact
+</tr>
+
+</table>
+</div>
+
+<div style="background-color: #ccFFCC; margin-left: 60">
+<a name="com.appaapps/AppState.FactComparator.PhotoFact/PhotoFact"/>
+<h4><big>PhotoFact(Unpackappdescription.PhotoFact)</big> returns <big><a href="#com.appaapps.AppState.FactComparator.PhotoFact.PhotoFact">PhotoFact</a></big>   <small>in class AppState.FactComparator.PhotoFact</small></h4>
+<p>Describe a photo fact</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>pf<td>Unpackappdescription.PhotoFact<td>356<td>Photo fact details from unpacked zip file</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #ccFFFF; margin-left: 60">
+<a name="com.appaapps/AppState.FactComparator.PhotoFact/toString"/>
+<h4><big>toString()</big> returns <big><a target="_blank" href="https://developer.android.com/reference/java/lang/String.html">String</a></big>   <small>in class AppState.FactComparator.PhotoFact</small></h4>
+<p>Short description of photo fact</p>
+
+</div>
+</body>
+
+<div style="background-color: #FFccFF; margin-left: 40">
+<a name="com.appaapps/AppState.FactComparator.Possibility"/>
+<h3>Class: <big>AppState.FactComparator.Possibility</big>, package: com.appaapps</h3>
+<p>Question possibilities
+<table border="1" cellspacing="20">
+<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Line<th>Description</tr>
+
+<tr><td><a href="#com.appaapps.AppState.FactComparator.Possibility.Possibility">Possibility</a>
+    <td><a href="#com.appaapps/AppState.FactComparator.Possibility/Possibility">Possibility</a>
+    <td>Photo
+    <td>public constructor
+    <td>412
+    <td>A question possibility is either a photo and its title
+</tr>
+
+<tr><td><a href="#com.appaapps.AppState.FactComparator.Possibility.Possibility">Possibility</a>
+    <td><a href="#com.appaapps/AppState.FactComparator.Possibility/Possibility">Possibility</a>
+    <td>PhotoFact
+    <td>public constructor
+    <td>418
+    <td>Or, a question possibility is a photo fact
+</tr>
+
+<tr><td><a target="_blank" href="https://developer.android.com/reference/java/lang/String.html">String</a>
+    <td><a href="#com.appaapps/AppState.FactComparator.Possibility/toString">toString</a>
+    <td>void
+    <td>public
+    <td>424
+    <td>Describe a possibility
+</tr>
+
+</table>
+</div>
+
+<div style="background-color: #FFFFcc; margin-left: 60">
+<a name="com.appaapps/AppState.FactComparator.Possibility/Possibility"/>
+<h4><big>Possibility(Photo)</big> returns <big><a href="#com.appaapps.AppState.FactComparator.Possibility.Possibility">Possibility</a></big>   <small>in class AppState.FactComparator.Possibility</small></h4>
+<p>A question possibility is either a photo and its title</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>photo<td>Photo<td>413<td>A photo we could show the user at this point</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #CCccFF; margin-left: 60">
+<a name="com.appaapps/AppState.FactComparator.Possibility/Possibility"/>
+<h4><big>Possibility(PhotoFact)</big> returns <big><a href="#com.appaapps.AppState.FactComparator.Possibility.Possibility">Possibility</a></big>   <small>in class AppState.FactComparator.Possibility</small></h4>
+<p>Or, a question possibility is a photo fact</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>photoFact<td>PhotoFact<td>419<td>The fact and associated photo we could show the user</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #FFCCcc; margin-left: 60">
+<a name="com.appaapps/AppState.FactComparator.Possibility/toString"/>
+<h4><big>toString()</big> returns <big><a target="_blank" href="https://developer.android.com/reference/java/lang/String.html">String</a></big>   <small>in class AppState.FactComparator.Possibility</small></h4>
+<p>Describe a possibility</p>
+
+</div>
+</body>
+
+<div style="background-color: #ccFFCC; margin-left: 40">
+<a name="com.appaapps/AppState.FactComparator.PossibilityComparator"/>
+<h3>Class: <big>AppState.FactComparator.PossibilityComparator</big>, package: com.appaapps</h3>
+<p>Sort possibilities by swing. If it is an ordered app, sort equal entries by photo.index so that we work through the photos in the order they are listed in the App Definition file written in the App Definition Language
+<table border="1" cellspacing="20">
+<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Line<th>Description</tr>
+
+<tr><td>int
+    <td><a href="#com.appaapps/AppState.FactComparator.PossibilityComparator/compare">compare</a>
+    <td>void
+    <td>public
+    <td>436
+    <td>Compare two possibilities and order by the one most important to show to the user. Overrides: <a href="#java.util.Comparator">java.util.Comparator</a>
+</tr>
+
+</table>
+</div>
+
+<div style="background-color: #ccFFFF; margin-left: 60">
+<a name="com.appaapps/AppState.FactComparator.PossibilityComparator/compare"/>
+<h4><big>compare()</big> returns <big>int</big>   <small>in class AppState.FactComparator.PossibilityComparator</small></h4>
+<p>Compare two possibilities and order by the one most important to show to the user. Overrides: <a href="#java.util.Comparator">java.util.Comparator</a></p>
+
+</div>
+</body>
+
+<div style="background-color: #FFccFF; margin-left: 40">
+<a name="com.appaapps/AppState.FactComparator.Question"/>
+<h3>Class: <big>AppState.FactComparator.Question</big>, package: com.appaapps</h3>
+<p>Question a user with either a photo and its title or a photofact (but not both)
+<table border="1" cellspacing="20">
+<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Line<th>Description</tr>
+
+<tr><td><a href="#com.appaapps.AppState.FactComparator.Question.Question">Question</a>
+    <td><a href="#com.appaapps/AppState.FactComparator.Question/Question">Question</a>
+    <td>void
+    <td>public constructor
+    <td>495
+    <td>new Question - Choose the next question, new Question(), "see how well that fits together"? - Jim Rockford!
+</tr>
+
+<tr><td>Fact
+    <td><a href="#com.appaapps/AppState.FactComparator.Question/bestFact">bestFact</a>
+    <td>void
+    <td>
+    <td>596
+    <td>Choose the best next fact
+</tr>
+
+<tr><td>Possibility
+    <td><a href="#com.appaapps/AppState.FactComparator.Question/bestPossibility">bestPossibility</a>
+    <td>void
+    <td>
+    <td>557
+    <td>Choose the best possibility for next question when not in race mode
+</tr>
+
+<tr><td>void
+    <td><a href="#com.appaapps/AppState.FactComparator.Question/enterRaceModeIfReady">enterRaceModeIfReady</a>
+    <td>void
+    <td>
+    <td>607
+    <td>Enter race mode
+</tr>
+
+<tr><td>PhotoFact
+    <td><a href="#com.appaapps/AppState.FactComparator.Question/findPhotoFact">findPhotoFact</a>
+    <td>Photo, Fact
+    <td>
+    <td>726
+    <td>Photo fact associated with this photo and fact
+</tr>
+
+<tr><td>Photo
+    <td><a href="#com.appaapps/AppState.FactComparator.Question/findSelectedPhoto">findSelectedPhoto</a>
+    <td>float, float
+    <td>public
+    <td>715
+    <td>Find the details of the photo the user selected at point(x, y)
+</tr>
+
+<tr><td>void
+    <td><a href="#com.appaapps/AppState.FactComparator.Question/leaveRaceMode">leaveRaceMode</a>
+    <td>void
+    <td>
+    <td>640
+    <td>Leave race mode
+</tr>
+
+<tr><td>void
+    <td><a href="#com.appaapps/AppState.FactComparator.Question/playMidi">playMidi</a>
+    <td>void
+    <td>public
+    <td>708
+    <td>Play a randomly chosen midi
+</tr>
+
+<tr><td>void
+    <td><a href="#com.appaapps/AppState.FactComparator.Question/playQuestionSound">playQuestionSound</a>
+    <td>void
+    <td>public
+    <td>704
+    <td>Play question for sound
+</tr>
+
+<tr><td>boolean
+    <td><a href="#com.appaapps/AppState.FactComparator.Question/raceCompleted">raceCompleted</a>
+    <td>void
+    <td>
+    <td>647
+    <td>Check whether race has been completed
+</tr>
+
+<tr><td>Response
+    <td><a href="#com.appaapps/AppState.FactComparator.Question/response">response</a>
+    <td>Photo
+    <td>public
+    <td>735
+    <td>The user responded by choosing this photo - which normally produces a Response, but in race mode it does not unless the response was wrong
+</tr>
+
+<tr><td>boolean
+    <td><a href="#com.appaapps/AppState.FactComparator.Question/rightAnswer">rightAnswer</a>
+    <td>Photo
+    <td>public
+    <td>749
+    <td>Whether the user chose the right answer
+</tr>
+
+<tr><td>Svg
+    <td><a href="#com.appaapps/AppState.FactComparator.Question/svg">svg</a>
+    <td>int, int
+    <td>public
+    <td>651
+    <td>Construct an Svg to show the question
+</tr>
+
+</table>
+</div>
+
+<div style="background-color: #FFFFcc; margin-left: 60">
+<a name="com.appaapps/AppState.FactComparator.Question/Question"/>
+<h4><big>Question()</big> returns <big><a href="#com.appaapps.AppState.FactComparator.Question.Question">Question</a></big>   <small>in class AppState.FactComparator.Question</small></h4>
+<p>new Question - Choose the next question, new Question(), "see how well that fits together"? - Jim Rockford!</p>
+
+</div>
+</body>
+
+<div style="background-color: #CCccFF; margin-left: 60">
+<a name="com.appaapps/AppState.FactComparator.Question/bestFact"/>
+<h4><big>bestFact()</big> returns <big>Fact</big>   <small>in class AppState.FactComparator.Question</small></h4>
+<p>Choose the best next fact</p>
+
+</div>
+</body>
+
+<div style="background-color: #FFCCcc; margin-left: 60">
+<a name="com.appaapps/AppState.FactComparator.Question/bestPossibility"/>
+<h4><big>bestPossibility()</big> returns <big>Possibility</big>   <small>in class AppState.FactComparator.Question</small></h4>
+<p>Choose the best possibility for next question when not in race mode</p>
+
+</div>
+</body>
+
+<div style="background-color: #ccFFCC; margin-left: 60">
+<a name="com.appaapps/AppState.FactComparator.Question/enterRaceModeIfReady"/>
+<h4><big>enterRaceModeIfReady()</big> returns <big>void</big>   <small>in class AppState.FactComparator.Question</small></h4>
+<p>Enter race mode</p>
+
+</div>
+</body>
+
+<div style="background-color: #ccFFFF; margin-left: 60">
+<a name="com.appaapps/AppState.FactComparator.Question/findPhotoFact"/>
+<h4><big>findPhotoFact(Photo, Fact)</big> returns <big>PhotoFact</big>   <small>in class AppState.FactComparator.Question</small></h4>
+<p>Photo fact associated with this photo and fact</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>p<td>Photo<td>727<td>Photo</tr>
+<tr><td>f<td>Fact<td>728<td>Fact</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #FFccFF; margin-left: 60">
+<a name="com.appaapps/AppState.FactComparator.Question/findSelectedPhoto"/>
+<h4><big>findSelectedPhoto(float, float)</big> returns <big>Photo</big>   <small>in class AppState.FactComparator.Question</small></h4>
+<p>Find the details of the photo the user selected at point(x, y)</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>x<td>float<td>716<td>X coordinate of touch point</tr>
+<tr><td>y<td>float<td>717<td>Y coordinate of touch point</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #FFFFcc; margin-left: 60">
+<a name="com.appaapps/AppState.FactComparator.Question/leaveRaceMode"/>
+<h4><big>leaveRaceMode()</big> returns <big>void</big>   <small>in class AppState.FactComparator.Question</small></h4>
+<p>Leave race mode</p>
+
+</div>
+</body>
+
+<div style="background-color: #CCccFF; margin-left: 60">
+<a name="com.appaapps/AppState.FactComparator.Question/playMidi"/>
+<h4><big>playMidi()</big> returns <big>void</big>   <small>in class AppState.FactComparator.Question</small></h4>
+<p>Play a randomly chosen midi</p>
+
+</div>
+</body>
+
+<div style="background-color: #FFCCcc; margin-left: 60">
+<a name="com.appaapps/AppState.FactComparator.Question/playQuestionSound"/>
+<h4><big>playQuestionSound()</big> returns <big>void</big>   <small>in class AppState.FactComparator.Question</small></h4>
+<p>Play question for sound</p>
+
+</div>
+</body>
+
+<div style="background-color: #ccFFCC; margin-left: 60">
+<a name="com.appaapps/AppState.FactComparator.Question/raceCompleted"/>
+<h4><big>raceCompleted()</big> returns <big>boolean</big>   <small>in class AppState.FactComparator.Question</small></h4>
+<p>Check whether race has been completed</p>
+
+</div>
+</body>
+
+<div style="background-color: #ccFFFF; margin-left: 60">
+<a name="com.appaapps/AppState.FactComparator.Question/response"/>
+<h4><big>response(Photo)</big> returns <big>Response</big>   <small>in class AppState.FactComparator.Question</small></h4>
+<p>The user responded by choosing this photo - which normally produces a Response, but in race mode it does not unless the response was wrong</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>chosenPhoto<td>Photo<td>736<td>Chosen photo</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #FFccFF; margin-left: 60">
+<a name="com.appaapps/AppState.FactComparator.Question/rightAnswer"/>
+<h4><big>rightAnswer(Photo)</big> returns <big>boolean</big>   <small>in class AppState.FactComparator.Question</small></h4>
+<p>Whether the user chose the right answer</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>chosenPhoto<td>Photo<td>750<td>Photo the user chose</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #FFFFcc; margin-left: 60">
+<a name="com.appaapps/AppState.FactComparator.Question/svg"/>
+<h4><big>svg(int, int)</big> returns <big>Svg</big>   <small>in class AppState.FactComparator.Question</small></h4>
+<p>Construct an Svg to show the question</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>width<td>int<td>652<td>Approximate width - used only to compute the aspect ratio of the drawing area</tr>
+<tr><td>height<td>int<td>653<td>Approximate width - used only to compute the aspect ratio of the drawing area</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #CCccFF; margin-left: 40">
+<a name="com.appaapps/AppState.FactComparator.Question.Response"/>
+<h3>Class: <big>AppState.FactComparator.Question.Response</big>, package: com.appaapps</h3>
+<p>Rate the user response
+<table border="1" cellspacing="20">
+<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Line<th>Description</tr>
+
+<tr><td><a href="#com.appaapps.AppState.FactComparator.Question.Response.Response">Response</a>
+    <td><a href="#com.appaapps/AppState.FactComparator.Question.Response/Response">Response</a>
+    <td>Photo
+    <td>public constructor
+    <td>760
+    <td>Create the response to the user's choice
+</tr>
+
+<tr><td>Svg
+    <td><a href="#com.appaapps/AppState.FactComparator.Question.Response/svg">svg</a>
+    <td>int, int
+    <td>public
+    <td>812
+    <td>Construct an Svg to show the response
+</tr>
+
+</table>
+</div>
+
+<div style="background-color: #FFCCcc; margin-left: 60">
+<a name="com.appaapps/AppState.FactComparator.Question.Response/Response"/>
+<h4><big>Response(Photo)</big> returns <big><a href="#com.appaapps.AppState.FactComparator.Question.Response.Response">Response</a></big>   <small>in class AppState.FactComparator.Question.Response</small></h4>
+<p>Create the response to the user's choice</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>chosenPhoto<td>Photo<td>761<td>The user responded by choosing this photo</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #ccFFCC; margin-left: 60">
+<a name="com.appaapps/AppState.FactComparator.Question.Response/svg"/>
+<h4><big>svg(int, int)</big> returns <big>Svg</big>   <small>in class AppState.FactComparator.Question.Response</small></h4>
+<p>Construct an Svg to show the response</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>width<td>int<td>813<td>Approximate width of drawing area - used only to compute aspect ratio</tr>
+<tr><td>height<td>int<td>814<td>Approximate width of drawing area - used only to compute aspect ratio</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #ccFFFF; margin-left: 40">
+<a name="com.appaapps/AppState.FactComparator.SvgPhoto"/>
+<h3>Class: <big>AppState.FactComparator.SvgPhoto</big>, package: com.appaapps</h3>
+<p>The Svg Image element currently being used to display a photo
+<table border="1" cellspacing="20">
+<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Line<th>Description</tr>
+
+<tr><td><a href="#com.appaapps.AppState.FactComparator.SvgPhoto.SvgPhoto">SvgPhoto</a>
+    <td><a href="#com.appaapps/AppState.FactComparator.SvgPhoto/SvgPhoto">SvgPhoto</a>
+    <td>Photo
+    <td>constructor
+    <td>401
+    <td>Connect a Photo to the Svg Image Element being used to display it
+</tr>
+
+</table>
+</div>
+
+<div style="background-color: #FFccFF; margin-left: 60">
+<a name="com.appaapps/AppState.FactComparator.SvgPhoto/SvgPhoto"/>
+<h4><big>SvgPhoto(Photo)</big> returns <big><a href="#com.appaapps.AppState.FactComparator.SvgPhoto.SvgPhoto">SvgPhoto</a></big>   <small>in class AppState.FactComparator.SvgPhoto</small></h4>
+<p>Connect a Photo to the Svg Image Element being used to display it</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>photo<td>Photo<td>402<td>Photo</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #FFFFcc; margin-left: 40">
+<a name="com.appaapps/AppState.Filter<E>"/>
+<h3>Class: <big>AppState.Filter<E></big>, package: com.appaapps</h3>
+<p>Filter for a specified type of object
+<table border="1" cellspacing="20">
+<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Line<th>Description</tr>
+
+<tr><td><a href="#com.appaapps.AppState.Filter<E>.Filter">Filter</a>
+    <td><a href="#com.appaapps/AppState.Filter<E>/Filter">Filter</a>
+    <td>int
+    <td>public constructor
+    <td>213
+    <td>Filter of specified width
+</tr>
+
+<tr><td>void
+    <td><a href="#com.appaapps/AppState.Filter<E>/add">add</a>
+    <td>E
+    <td>public final
+    <td>217
+    <td>Add an element to the filter
+</tr>
+
+<tr><td>boolean
+    <td><a href="#com.appaapps/AppState.Filter<E>/contains">contains</a>
+    <td>E
+    <td>public final
+    <td>227
+    <td>Check whether an element is in the filter
+</tr>
+
+</table>
+</div>
+
+<div style="background-color: #CCccFF; margin-left: 60">
+<a name="com.appaapps/AppState.Filter<E>/Filter"/>
+<h4><big>Filter(int)</big> returns <big><a href="#com.appaapps.AppState.Filter<E>.Filter">Filter</a></big>   <small>in class AppState.Filter<E></small></h4>
+<p>Filter of specified width</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>width<td>int<td>214<td>The width of the filter</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #FFCCcc; margin-left: 60">
+<a name="com.appaapps/AppState.Filter<E>/add"/>
+<h4><big>add(E)</big> returns <big>void</big>   <small>in class AppState.Filter<E></small></h4>
+<p>Add an element to the filter</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>element<td>E<td>218<td>Element to add to the filter</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #ccFFCC; margin-left: 60">
+<a name="com.appaapps/AppState.Filter<E>/contains"/>
+<h4><big>contains(E)</big> returns <big>boolean</big>   <small>in class AppState.Filter<E></small></h4>
+<p>Check whether an element is in the filter</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>element<td>E<td>228<td>Element to check for</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #ccFFFF; margin-left: 40">
+<a name="com.appaapps/AppState.Photo"/>
+<h3>Class: <big>AppState.Photo</big>, package: com.appaapps</h3>
+<p>Photo details
+<table border="1" cellspacing="20">
+<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Line<th>Description</tr>
+
+<tr><td><a href="#com.appaapps.AppState.Photo.Photo">Photo</a>
+    <td><a href="#com.appaapps/AppState.Photo/Photo">Photo</a>
+    <td>Unpackappdescription.PhotoCmd
+    <td>constructor
+    <td>283
+    <td>Describe a photo
+</tr>
+
+<tr><td>float
+    <td><a href="#com.appaapps/AppState.Photo/aspectRatio">aspectRatio</a>
+    <td>void
+    <td>public
+    <td>313
+    <td>Aspect ratio for a photo
+</tr>
+
+<tr><td><a target="_blank" href="https://developer.android.com/reference/java/lang/String.html">String</a>
+    <td><a href="#com.appaapps/AppState.Photo/toString">toString</a>
+    <td>void
+    <td>public
+    <td>317
+    <td>Some details of the photo
+</tr>
+
+</table>
+</div>
+
+<div style="background-color: #FFccFF; margin-left: 60">
+<a name="com.appaapps/AppState.Photo/Photo"/>
+<h4><big>Photo(Unpackappdescription.PhotoCmd)</big> returns <big><a href="#com.appaapps.AppState.Photo.Photo">Photo</a></big>   <small>in class AppState.Photo</small></h4>
+<p>Describe a photo</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>photoCmd<td>Unpackappdescription.PhotoCmd<td>284<td>Photo details from unpacked zip file</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #FFFFcc; margin-left: 60">
+<a name="com.appaapps/AppState.Photo/aspectRatio"/>
+<h4><big>aspectRatio()</big> returns <big>float</big>   <small>in class AppState.Photo</small></h4>
+<p>Aspect ratio for a photo</p>
+
+</div>
+</body>
+
+<div style="background-color: #CCccFF; margin-left: 60">
+<a name="com.appaapps/AppState.Photo/toString"/>
+<h4><big>toString()</big> returns <big><a target="_blank" href="https://developer.android.com/reference/java/lang/String.html">String</a></big>   <small>in class AppState.Photo</small></h4>
+<p>Some details of the photo</p>
+
+</div>
+</body>
+
+<div style="background-color: #FFCCcc; margin-left: 40">
+<a name="com.appaapps/AppState.ShowAndTell"/>
+<h3>Class: <big>AppState.ShowAndTell</big>, package: com.appaapps</h3>
+<p>Speech and title for a fact or a photo
+<table border="1" cellspacing="20">
+<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Line<th>Description</tr>
+
+<tr><td><a href="#com.appaapps.AppState.ShowAndTell.ShowAndTell">ShowAndTell</a>
+    <td><a href="#com.appaapps/AppState.ShowAndTell/ShowAndTell">ShowAndTell</a>
+    <td>TreeMap<String, ByteArrayOutputStream>, <a target="_blank" href="https://developer.android.com/reference/java/lang/String.html">String</a>
+    <td>public constructor
+    <td>245
+    <td>Create a new Show and Tell
+</tr>
+
+<tr><td>byte[]
+    <td><a href="#com.appaapps/AppState.ShowAndTell/createMediaDataSource">createMediaDataSource</a>
+    <td>Speaker
+    <td>public
+    <td>266
+    <td>Create a ready to play media player to tell the fact or the title of the photo as spoken by a specified speaker
+</tr>
+
+</table>
+</div>
+
+<div style="background-color: #ccFFCC; margin-left: 60">
+<a name="com.appaapps/AppState.ShowAndTell/ShowAndTell"/>
+<h4><big>ShowAndTell(TreeMap<String, ByteArrayOutputStream>, <a target="_blank" href="https://developer.android.com/reference/java/lang/String.html">String</a>)</big> returns <big><a href="#com.appaapps.AppState.ShowAndTell.ShowAndTell">ShowAndTell</a></big>   <small>in class AppState.ShowAndTell</small></h4>
+<p>Create a new Show and Tell</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>soundBytes<td>TreeMap<String, ByteArrayOutputStream><td>246<td>Speech by speaker name</tr>
+<tr><td>title<td><a target="_blank" href="https://developer.android.com/reference/java/lang/String.html">String</a><td>247<td>Title</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #ccFFFF; margin-left: 60">
+<a name="com.appaapps/AppState.ShowAndTell/createMediaDataSource"/>
+<h4><big>createMediaDataSource(Speaker)</big> returns <big>byte[]</big>   <small>in class AppState.ShowAndTell</small></h4>
+<p>Create a ready to play media player to tell the fact or the title of the photo as spoken by a specified speaker</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>speaker<td>Speaker<td>267<td>Speaker</tr>
 </table>
 
 </div>
 </body>
 
 <div style="background-color: #FFccFF; margin-left: 40">
-<a name="com.appaapps.Svg.OpacityTracker"/>
-<h3>Methods in class: <big>Svg.OpacityTracker</big>, package: com.appaapps</h3>
-<p>Track opacity
+<a name="com.appaapps/AppState.Speaker"/>
+<h3>Class: <big>AppState.Speaker</big>, package: com.appaapps</h3>
+<p>Speaker details
 <table border="1" cellspacing="20">
-<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Description</tr>
+<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Line<th>Description</tr>
 
-<tr><td>int
-    <td><a href="#com.appaapps.Svg.OpacityTracker.opacity">opacity</a>
-    <td>void
-    <td>public
-    <td>Current value as opacity
+<tr><td><a href="#com.appaapps.AppState.Speaker.Speaker">Speaker</a>
+    <td><a href="#com.appaapps/AppState.Speaker/Speaker">Speaker</a>
+    <td><a target="_blank" href="https://developer.android.com/reference/java/lang/String.html">String</a>
+    <td>constructor
+    <td>236
+    <td>Create a speaker
 </tr>
 
 </table>
 </div>
 
 <div style="background-color: #FFFFcc; margin-left: 60">
-<a name="com.appaapps.Svg.OpacityTracker.opacity"/>
-<h4><b>opacity</b> : int</h4>
-<p>Current value as opacity</p>
+<a name="com.appaapps/AppState.Speaker/Speaker"/>
+<h4><big>Speaker(<a target="_blank" href="https://developer.android.com/reference/java/lang/String.html">String</a>)</big> returns <big><a href="#com.appaapps.AppState.Speaker.Speaker">Speaker</a></big>   <small>in class AppState.Speaker</small></h4>
+<p>Create a speaker</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>name<td><a target="_blank" href="https://developer.android.com/reference/java/lang/String.html">String</a><td>237<td>Amazon Polly Name of the speaker</tr>
+</table>
 
 </div>
 </body>
 
 <div style="background-color: #CCccFF; margin-left: 40">
-<a name="com.appaapps.Svg.RandomStep"/>
-<h3>Methods in class: <big>Svg.RandomStep</big>, package: com.appaapps</h3>
-<p>Random step function (x=time, y=position) with each step chosen at random between -1 and 1, each step duration chosen at random between 0 and timeScale
+<a name="com.appaapps/AppState.Tracker"/>
+<h3>Class: <big>AppState.Tracker</big>, package: com.appaapps</h3>
+<p>Track the score of the user of the app: Right/wrong/heard/swing in a saveable manner
 <table border="1" cellspacing="20">
-<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Description</tr>
+<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Line<th>Description</tr>
 
-<tr><td>double
-    <td><a href="#com.appaapps.Svg.RandomStep.value">value</a>
+<tr><td>void
+    <td><a href="#com.appaapps/AppState.Tracker/decSwing">decSwing</a>
     <td>void
     <td>public
-    <td>Value of random step
+    <td>174
+    <td>Decrement swing
+</tr>
+
+<tr><td>void
+    <td><a href="#com.appaapps/AppState.Tracker/incPresented">incPresented</a>
+    <td>void
+    <td>public
+    <td>183
+    <td>Increment number of times seen or heard
+</tr>
+
+<tr><td>void
+    <td><a href="#com.appaapps/AppState.Tracker/incRight">incRight</a>
+    <td>void
+    <td>public
+    <td>177
+    <td>Increment right answers
+</tr>
+
+<tr><td>void
+    <td><a href="#com.appaapps/AppState.Tracker/incSwing">incSwing</a>
+    <td>void
+    <td>public
+    <td>171
+    <td>Increment swing
+</tr>
+
+<tr><td>void
+    <td><a href="#com.appaapps/AppState.Tracker/incWrong">incWrong</a>
+    <td>void
+    <td>public
+    <td>180
+    <td>Increment wrong answers
 </tr>
 
 </table>
 </div>
 
 <div style="background-color: #FFCCcc; margin-left: 60">
-<a name="com.appaapps.Svg.RandomStep.value"/>
-<h4><b>value</b> : double</h4>
-<p>Value of random step</p>
+<a name="com.appaapps/AppState.Tracker/decSwing"/>
+<h4><big>decSwing()</big> returns <big>void</big>   <small>in class AppState.Tracker</small></h4>
+<p>Decrement swing</p>
 
 </div>
 </body>
 
-<div style="background-color: #ccFFCC; margin-left: 40">
-<a name="com.appaapps.Svg.Rectangle"/>
-<h3>Methods in class: <big>Svg.Rectangle</big>, package: com.appaapps</h3>
-<p>Rectangle
-<table border="1" cellspacing="20">
-<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Description</tr>
+<div style="background-color: #ccFFCC; margin-left: 60">
+<a name="com.appaapps/AppState.Tracker/incPresented"/>
+<h4><big>incPresented()</big> returns <big>void</big>   <small>in class AppState.Tracker</small></h4>
+<p>Increment number of times seen or heard</p>
 
-<tr><td><a href="#com.appaapps.Svg.Rectangle.Rectangle">Rectangle</a>
-    <td><a href="#com.appaapps.Svg.Rectangle.Rectangle">Rectangle</a>
-    <td>float, float, float, float
-    <td>public constructor
-    <td>Create a rectangle
-</tr>
-
-<tr><td>void
-    <td><a href="#com.appaapps.Svg.Rectangle.draw">draw</a>
-    <td>void
-    <td>
-    <td>See <a href="#com.appaapps.Svg.Element.draw">Draw the rectangle</a>
-</tr>
-
-</table>
 </div>
+</body>
 
 <div style="background-color: #ccFFFF; margin-left: 60">
-<a name="com.appaapps.Svg.Rectangle.Rectangle"/>
-<h4><b>Rectangle</b> : <a href="#com.appaapps.Svg.Rectangle.Rectangle">Rectangle</a></h4>
-<p>Create a rectangle</p>
-
-<p>Parameters:
-<table border="1" cellspacing="20">
-<tr><th>Name<th>Type<th>Attributes<th>Description</tr>
-
-<tr><td>x<td>float<td>final<td>Fractional position - left</tr>
-<tr><td>y<td>float<td>final<td>Fractional position - upper</tr>
-<tr><td>𝘅<td>float<td>final<td>Fractional position - right</tr>
-<tr><td>𝘆<td>float<td>final<td>Fractional position - lower</tr>
-</table>
+<a name="com.appaapps/AppState.Tracker/incRight"/>
+<h4><big>incRight()</big> returns <big>void</big>   <small>in class AppState.Tracker</small></h4>
+<p>Increment right answers</p>
 
 </div>
 </body>
 
 <div style="background-color: #FFccFF; margin-left: 60">
-<a name="com.appaapps.Svg.Rectangle.draw"/>
-<h4><b>draw</b> : void</h4>
-<p>See <a href="#com.appaapps.Svg.Element.draw">Draw the rectangle</a></p>
+<a name="com.appaapps/AppState.Tracker/incSwing"/>
+<h4><big>incSwing()</big> returns <big>void</big>   <small>in class AppState.Tracker</small></h4>
+<p>Increment swing</p>
+
+</div>
+</body>
+
+<div style="background-color: #FFFFcc; margin-left: 60">
+<a name="com.appaapps/AppState.Tracker/incWrong"/>
+<h4><big>incWrong()</big> returns <big>void</big>   <small>in class AppState.Tracker</small></h4>
+<p>Increment wrong answers</p>
+
+</div>
+</body>
+
+<div style="background-color: #CCccFF; margin-left: 40">
+<a name="com.appaapps/Choices"/>
+<h3>Class: <big>Choices</big>, package: com.appaapps</h3>
+<p>Choices
+<table border="1" cellspacing="20">
+<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Line<th>Description</tr>
+
+<tr><td><a href="#com.appaapps.Choices.Choices">Choices</a>
+    <td><a href="#com.appaapps/Choices/Choices">Choices</a>
+    <td>int, int, float, float
+    <td>public constructor
+    <td>41
+    <td>Find best layout  for just two tiles - the wrong resposne display
+</tr>
+
+<tr><td><a href="#com.appaapps.Choices.Choices">Choices</a>
+    <td><a href="#com.appaapps/Choices/Choices">Choices</a>
+    <td>int, int, int, float[]
+    <td>public constructor
+    <td>21
+    <td>Find best layout for two or more tiles
+</tr>
+
+<tr><td>void
+    <td><a href="#com.appaapps/Choices/bestLayout">bestLayout</a>
+    <td>void
+    <td>public
+    <td>86
+    <td>Test all possible layouts and return the layout with the lowest average extension vector
+</tr>
+
+<tr><td>double
+    <td><a href="#com.appaapps/Choices/testLayout">testLayout</a>
+    <td>int, int
+    <td>
+    <td>61
+    <td>Test a proposed layout by calculating its extension vector
+</tr>
+
+</table>
+</div>
+
+<div style="background-color: #FFCCcc; margin-left: 60">
+<a name="com.appaapps/Choices/Choices"/>
+<h4><big>Choices(int, int, float, float)</big> returns <big><a href="#com.appaapps.Choices.Choices">Choices</a></big>   <small>in class Choices</small></h4>
+<p>Find best layout  for just two tiles - the wrong resposne display</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>width<td>int<td>42<td>Width of viewing area</tr>
+<tr><td>height<td>int<td>43<td>Height of viewing area</tr>
+<tr><td>aspectRatio1<td>float<td>44<td>Aspect ratio of first image</tr>
+<tr><td>aspectRatio2<td>float<td>45<td>Aspect ratio of second image</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #ccFFCC; margin-left: 60">
+<a name="com.appaapps/Choices/Choices"/>
+<h4><big>Choices(int, int, int, float[])</big> returns <big><a href="#com.appaapps.Choices.Choices">Choices</a></big>   <small>in class Choices</small></h4>
+<p>Find best layout for two or more tiles</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>width<td>int<td>22<td>Width of viewing area</tr>
+<tr><td>height<td>int<td>23<td>Height of viewing area</tr>
+<tr><td>requested<td>int<td>24<td>Number of tiles requested</tr>
+<tr><td>aspectRatios<td>float[]<td>25<td>Aspect ratio of each question choice with the best answer first</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #ccFFFF; margin-left: 60">
+<a name="com.appaapps/Choices/bestLayout"/>
+<h4><big>bestLayout()</big> returns <big>void</big>   <small>in class Choices</small></h4>
+<p>Test all possible layouts and return the layout with the lowest average extension vector</p>
+
+</div>
+</body>
+
+<div style="background-color: #FFccFF; margin-left: 60">
+<a name="com.appaapps/Choices/testLayout"/>
+<h4><big>testLayout(int, int)</big> returns <big>double</big>   <small>in class Choices</small></h4>
+<p>Test a proposed layout by calculating its extension vector</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>x<td>int<td>62<td>Number of tiles in x</tr>
+<tr><td>y<td>int<td>63<td>Number of tiles in y</tr>
+</table>
 
 </div>
 </body>
 
 <div style="background-color: #FFFFcc; margin-left: 40">
-<a name="com.appaapps.Svg.Text"/>
-<h3>Methods in class: <big>Svg.Text</big>, package: com.appaapps</h3>
-<p>Text
+<a name="com.appaapps/ColoursTransformed"/>
+<h3>Class: <big>ColoursTransformed</big>, package: com.appaapps</h3>
+<p>Transformations of a colour
 <table border="1" cellspacing="20">
-<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Description</tr>
+<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Line<th>Description</tr>
 
-<tr><td><a href="#com.appaapps.Svg.Text.Text">Text</a>
-    <td><a href="#com.appaapps.Svg.Text.Text">Text</a>
-    <td><a href="      (final String text,                                                       //P The text to  display">String</a>, float, float, float, float, int, int
-    <td>public constructor
-    <td>Create a text area
+<tr><td>int
+    <td><a href="#com.appaapps/ColoursTransformed/colour">colour</a>
+    <td>int, int, int, int
+    <td>public static
+    <td>21
+    <td>Create a new colour as an int
 </tr>
 
-<tr><td>void
-    <td><a href="#com.appaapps.Svg.Text.draw">draw</a>
+<tr><td>int
+    <td><a href="#com.appaapps/ColoursTransformed/colour">colour</a>
+    <td>int, int, int
+    <td>public static
+    <td>12
+    <td>Create a new colour as an int with full opacity
+</tr>
+
+<tr><td>int
+    <td><a href="#com.appaapps/ColoursTransformed/metal">metal</a>
     <td>void
-    <td>
-    <td>See <a href="#com.appaapps.Svg.Element.draw">Draw the text</a>
+    <td>public
+    <td>129
+    <td>Generate a random metallic colour
+</tr>
+
+<tr><td>int[]
+    <td><a href="#com.appaapps/ColoursTransformed/metalOrVivid">metalOrVivid</a>
+    <td>int
+    <td>public
+    <td>133
+    <td>Generate an array of all metal or all vivid colours at random with fractional opacity
+</tr>
+
+<tr><td>int
+    <td><a href="#com.appaapps/ColoursTransformed/mix">mix</a>
+    <td>int
+    <td>public
+    <td>143
+    <td>Mix a colour at random
+</tr>
+
+<tr><td>int
+    <td><a href="#com.appaapps/ColoursTransformed/opposite">opposite</a>
+    <td>int
+    <td>public static
+    <td>76
+    <td>Create the opposite colour by reflecting in 0x00888888
+</tr>
+
+<tr><td>int
+    <td><a href="#com.appaapps/ColoursTransformed/random">random</a>
+    <td>void
+    <td>public
+    <td>121
+    <td>Generate a random colour
+</tr>
+
+<tr><td>int
+    <td><a href="#com.appaapps/ColoursTransformed/setBlue">setBlue</a>
+    <td>int, int
+    <td>public static
+    <td>51
+    <td>Set blue while leaving the other components alone
+</tr>
+
+<tr><td>int
+    <td><a href="#com.appaapps/ColoursTransformed/setGreen">setGreen</a>
+    <td>int, int
+    <td>public static
+    <td>46
+    <td>Set green while leaving the other components alone
+</tr>
+
+<tr><td>int
+    <td><a href="#com.appaapps/ColoursTransformed/setOpacity">setOpacity</a>
+    <td>int, float
+    <td>public static
+    <td>36
+    <td>Set opacity fractionally while leaving the other components alone
+</tr>
+
+<tr><td>int
+    <td><a href="#com.appaapps/ColoursTransformed/setOpacity">setOpacity</a>
+    <td>int, int
+    <td>public static
+    <td>31
+    <td>Set opacity while leaving the other components alone
+</tr>
+
+<tr><td>int
+    <td><a href="#com.appaapps/ColoursTransformed/setRed">setRed</a>
+    <td>int, int
+    <td>public static
+    <td>41
+    <td>Set red while leaving the other components alone
+</tr>
+
+<tr><td>int
+    <td><a href="#com.appaapps/ColoursTransformed/t1">t1</a>
+    <td>int
+    <td>public static
+    <td>56
+    <td>Transform 1 of 5 transformations of a colour excluding the identity transform
+</tr>
+
+<tr><td>int
+    <td><a href="#com.appaapps/ColoursTransformed/t2">t2</a>
+    <td>int
+    <td>public static
+    <td>60
+    <td>Transform 2 of 5 transformations of a colour excluding the identity transform
+</tr>
+
+<tr><td>int
+    <td><a href="#com.appaapps/ColoursTransformed/t3">t3</a>
+    <td>int
+    <td>public static
+    <td>64
+    <td>Transform 3 of 5 transformations of a colour excluding the identity transform
+</tr>
+
+<tr><td>int
+    <td><a href="#com.appaapps/ColoursTransformed/t4">t4</a>
+    <td>int
+    <td>public static
+    <td>68
+    <td>Transform 4 of 5 transformations of a colour excluding the identity transform
+</tr>
+
+<tr><td>int
+    <td><a href="#com.appaapps/ColoursTransformed/t5">t5</a>
+    <td>int
+    <td>public static
+    <td>72
+    <td>Transform 5 of 5 transformations of a colour excluding the identity transform
+</tr>
+
+<tr><td>int
+    <td><a href="#com.appaapps/ColoursTransformed/vivid">vivid</a>
+    <td>void
+    <td>public
+    <td>125
+    <td>Generate a random vivid colour
 </tr>
 
 </table>
 </div>
 
 <div style="background-color: #CCccFF; margin-left: 60">
-<a name="com.appaapps.Svg.Text.Text"/>
-<h4><b>Text</b> : <a href="#com.appaapps.Svg.Text.Text">Text</a></h4>
-<p>Create a text area</p>
+<a name="com.appaapps/ColoursTransformed/colour"/>
+<h4><big>colour(int, int, int, int)</big> returns <big>int</big>   <small>in class ColoursTransformed</small></h4>
+<p>Create a new colour as an int</p>
 
-<p>Parameters:
 <table border="1" cellspacing="20">
-<tr><th>Name<th>Type<th>Attributes<th>Description</tr>
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
 
-<tr><td>text<td><a href="      (final String text,                                                       //P The text to  display">String</a><td>final<td>The text to  display</tr>
-<tr><td>x<td>float<td>final<td>Fractional area in which to display the text - left</tr>
-<tr><td>y<td>float<td>final<td>Fractional area in which to display the text - upper</tr>
-<tr><td>𝘅<td>float<td>final<td>Fractional area in which to display the text - right</tr>
-<tr><td>𝘆<td>float<td>final<td>Fractional area in which to display the text - lower</tr>
-<tr><td>justifyX<td>int<td>final<td>Justification in x per: <a href="#com.appaapps.LayoutText">com.appaapps.LayoutText</a></tr>
-<tr><td>justifyY<td>int<td>final<td>Justification in y per: <a href="#com.appaapps.LayoutText">com.appaapps.LayoutText</a></tr>
+<tr><td>o<td>int<td>22<td>Opacity</tr>
+<tr><td>r<td>int<td>23<td>Red</tr>
+<tr><td>g<td>int<td>24<td>Green</tr>
+<tr><td>b<td>int<td>25<td>Blue</tr>
 </table>
 
 </div>
 </body>
 
 <div style="background-color: #FFCCcc; margin-left: 60">
-<a name="com.appaapps.Svg.Text.draw"/>
-<h4><b>draw</b> : void</h4>
-<p>See <a href="#com.appaapps.Svg.Element.draw">Draw the text</a></p>
+<a name="com.appaapps/ColoursTransformed/colour"/>
+<h4><big>colour(int, int, int)</big> returns <big>int</big>   <small>in class ColoursTransformed</small></h4>
+<p>Create a new colour as an int with full opacity</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>r<td>int<td>13<td>Red</tr>
+<tr><td>g<td>int<td>14<td>Green</tr>
+<tr><td>b<td>int<td>15<td>Blue</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #ccFFCC; margin-left: 60">
+<a name="com.appaapps/ColoursTransformed/metal"/>
+<h4><big>metal()</big> returns <big>int</big>   <small>in class ColoursTransformed</small></h4>
+<p>Generate a random metallic colour</p>
+
+</div>
+</body>
+
+<div style="background-color: #ccFFFF; margin-left: 60">
+<a name="com.appaapps/ColoursTransformed/metalOrVivid"/>
+<h4><big>metalOrVivid(int)</big> returns <big>int[]</big>   <small>in class ColoursTransformed</small></h4>
+<p>Generate an array of all metal or all vivid colours at random with fractional opacity</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>n<td>int<td>134<td>Number of colours required</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #FFccFF; margin-left: 60">
+<a name="com.appaapps/ColoursTransformed/mix"/>
+<h4><big>mix(int)</big> returns <big>int</big>   <small>in class ColoursTransformed</small></h4>
+<p>Mix a colour at random</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>c<td>int<td>144<td>Colour to transform</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #FFFFcc; margin-left: 60">
+<a name="com.appaapps/ColoursTransformed/opposite"/>
+<h4><big>opposite(int)</big> returns <big>int</big>   <small>in class ColoursTransformed</small></h4>
+<p>Create the opposite colour by reflecting in 0x00888888</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>c<td>int<td>77<td>Colour to transform</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #CCccFF; margin-left: 60">
+<a name="com.appaapps/ColoursTransformed/random"/>
+<h4><big>random()</big> returns <big>int</big>   <small>in class ColoursTransformed</small></h4>
+<p>Generate a random colour</p>
+
+</div>
+</body>
+
+<div style="background-color: #FFCCcc; margin-left: 60">
+<a name="com.appaapps/ColoursTransformed/setBlue"/>
+<h4><big>setBlue(int, int)</big> returns <big>int</big>   <small>in class ColoursTransformed</small></h4>
+<p>Set blue while leaving the other components alone</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>c<td>int<td>52<td>Colour being constructed</tr>
+<tr><td>b<td>int<td>53<td>Blue</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #ccFFCC; margin-left: 60">
+<a name="com.appaapps/ColoursTransformed/setGreen"/>
+<h4><big>setGreen(int, int)</big> returns <big>int</big>   <small>in class ColoursTransformed</small></h4>
+<p>Set green while leaving the other components alone</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>c<td>int<td>47<td>Colour being constructed</tr>
+<tr><td>g<td>int<td>48<td>Green</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #ccFFFF; margin-left: 60">
+<a name="com.appaapps/ColoursTransformed/setOpacity"/>
+<h4><big>setOpacity(int, float)</big> returns <big>int</big>   <small>in class ColoursTransformed</small></h4>
+<p>Set opacity fractionally while leaving the other components alone</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>c<td>int<td>37<td>Colour being constructed</tr>
+<tr><td>o<td>float<td>38<td>Opacity between 0 and 1</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #FFccFF; margin-left: 60">
+<a name="com.appaapps/ColoursTransformed/setOpacity"/>
+<h4><big>setOpacity(int, int)</big> returns <big>int</big>   <small>in class ColoursTransformed</small></h4>
+<p>Set opacity while leaving the other components alone</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>c<td>int<td>32<td>Colour being constructed</tr>
+<tr><td>o<td>int<td>33<td>Opacity</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #FFFFcc; margin-left: 60">
+<a name="com.appaapps/ColoursTransformed/setRed"/>
+<h4><big>setRed(int, int)</big> returns <big>int</big>   <small>in class ColoursTransformed</small></h4>
+<p>Set red while leaving the other components alone</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>c<td>int<td>42<td>Colour being constructed</tr>
+<tr><td>r<td>int<td>43<td>Red</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #CCccFF; margin-left: 60">
+<a name="com.appaapps/ColoursTransformed/t1"/>
+<h4><big>t1(int)</big> returns <big>int</big>   <small>in class ColoursTransformed</small></h4>
+<p>Transform 1 of 5 transformations of a colour excluding the identity transform</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>c<td>int<td>57<td>Colour to transform</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #FFCCcc; margin-left: 60">
+<a name="com.appaapps/ColoursTransformed/t2"/>
+<h4><big>t2(int)</big> returns <big>int</big>   <small>in class ColoursTransformed</small></h4>
+<p>Transform 2 of 5 transformations of a colour excluding the identity transform</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>c<td>int<td>61<td>Colour to transform</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #ccFFCC; margin-left: 60">
+<a name="com.appaapps/ColoursTransformed/t3"/>
+<h4><big>t3(int)</big> returns <big>int</big>   <small>in class ColoursTransformed</small></h4>
+<p>Transform 3 of 5 transformations of a colour excluding the identity transform</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>c<td>int<td>65<td>Colour to transform</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #ccFFFF; margin-left: 60">
+<a name="com.appaapps/ColoursTransformed/t4"/>
+<h4><big>t4(int)</big> returns <big>int</big>   <small>in class ColoursTransformed</small></h4>
+<p>Transform 4 of 5 transformations of a colour excluding the identity transform</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>c<td>int<td>69<td>Colour to transform</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #FFccFF; margin-left: 60">
+<a name="com.appaapps/ColoursTransformed/t5"/>
+<h4><big>t5(int)</big> returns <big>int</big>   <small>in class ColoursTransformed</small></h4>
+<p>Transform 5 of 5 transformations of a colour excluding the identity transform</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>c<td>int<td>73<td>Colour to transform</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #FFFFcc; margin-left: 60">
+<a name="com.appaapps/ColoursTransformed/vivid"/>
+<h4><big>vivid()</big> returns <big>int</big>   <small>in class ColoursTransformed</small></h4>
+<p>Generate a random vivid colour</p>
+
+</div>
+</body>
+
+<div style="background-color: #CCccFF; margin-left: 40">
+<a name="com.appaapps/Fourier"/>
+<h3>Class: <big>Fourier</big>, package: com.appaapps</h3>
+<p>Fourier stream
+<table border="1" cellspacing="20">
+<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Line<th>Description</tr>
+
+<tr><td><a href="#com.appaapps.Fourier.Fourier">Fourier</a>
+    <td><a href="#com.appaapps/Fourier/Fourier">Fourier</a>
+    <td>void
+    <td>constructor
+    <td>33
+    <td>Create a new Fourier stream
+</tr>
+
+<tr><td><a href="#com.appaapps.Fourier.Fourier">Fourier</a>
+    <td><a href="#com.appaapps/Fourier/Fourier">Fourier</a>
+    <td>void
+    <td>constructor
+    <td>45
+    <td>Create a new Fourier stream at the default speed
+</tr>
+
+<tr><td>float
+    <td><a href="#com.appaapps/Fourier/get">get</a>
+    <td>void
+    <td>
+    <td>49
+    <td>Get the next value
+</tr>
+
+</table>
+</div>
+
+<div style="background-color: #FFCCcc; margin-left: 60">
+<a name="com.appaapps/Fourier/Fourier"/>
+<h4><big>Fourier()</big> returns <big><a href="#com.appaapps.Fourier.Fourier">Fourier</a></big>   <small>in class Fourier</small></h4>
+<p>Create a new Fourier stream</p>
+
+</div>
+</body>
+
+<div style="background-color: #ccFFCC; margin-left: 60">
+<a name="com.appaapps/Fourier/Fourier"/>
+<h4><big>Fourier()</big> returns <big><a href="#com.appaapps.Fourier.Fourier">Fourier</a></big>   <small>in class Fourier</small></h4>
+<p>Create a new Fourier stream at the default speed</p>
+
+</div>
+</body>
+
+<div style="background-color: #ccFFFF; margin-left: 60">
+<a name="com.appaapps/Fourier/get"/>
+<h4><big>get()</big> returns <big>float</big>   <small>in class Fourier</small></h4>
+<p>Get the next value</p>
+
+</div>
+</body>
+
+<div style="background-color: #FFccFF; margin-left: 40">
+<a name="com.appaapps/Fourier.Impulse"/>
+<h3>Class: <big>Fourier.Impulse</big>, package: com.appaapps</h3>
+<p>A sine wave
+<table border="1" cellspacing="20">
+<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Line<th>Description</tr>
+
+<tr><td><a href="#com.appaapps.Fourier.Impulse.Impulse">Impulse</a>
+    <td><a href="#com.appaapps/Fourier.Impulse/Impulse">Impulse</a>
+    <td>void
+    <td>constructor
+    <td>23
+    <td>A sine wave
+</tr>
+
+</table>
+</div>
+
+<div style="background-color: #FFFFcc; margin-left: 60">
+<a name="com.appaapps/Fourier.Impulse/Impulse"/>
+<h4><big>Impulse()</big> returns <big><a href="#com.appaapps.Fourier.Impulse.Impulse">Impulse</a></big>   <small>in class Fourier.Impulse</small></h4>
+<p>A sine wave</p>
+
+</div>
+</body>
+
+<div style="background-color: #CCccFF; margin-left: 40">
+<a name="com.appaapps/Gradients"/>
+<h3>Class: <big>Gradients</big>, package: com.appaapps</h3>
+<p>Gradients in various patterns
+<table border="1" cellspacing="20">
+<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Line<th>Description</tr>
+
+<tr><td>Tartan
+    <td><a href="#com.appaapps/Gradients/tartan">tartan</a>
+    <td>void
+    <td>public
+    <td>15
+    <td>A new tartan paint
+</tr>
+
+<tr><td>Tartan
+    <td><a href="#com.appaapps/Gradients/tartan">tartan</a>
+    <td>float
+    <td>public
+    <td>19
+    <td>A new tartan paint
+</tr>
+
+</table>
+</div>
+
+<div style="background-color: #FFCCcc; margin-left: 60">
+<a name="com.appaapps/Gradients/tartan"/>
+<h4><big>tartan()</big> returns <big>Tartan</big>   <small>in class Gradients</small></h4>
+<p>A new tartan paint</p>
+
+</div>
+</body>
+
+<div style="background-color: #ccFFCC; margin-left: 60">
+<a name="com.appaapps/Gradients/tartan"/>
+<h4><big>tartan(float)</big> returns <big>Tartan</big>   <small>in class Gradients</small></h4>
+<p>A new tartan paint</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>speed<td>float<td>20<td>Speed relative to 1</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #ccFFFF; margin-left: 40">
+<a name="com.appaapps/Gradients.Pattern"/>
+<h3>Class: <big>Gradients.Pattern</big>, package: com.appaapps</h3>
+<p>Each gradient pattern should be derived from this class
+<table border="1" cellspacing="20">
+<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Line<th>Description</tr>
+
+</table>
+</div>
+
+<div style="background-color: #FFccFF; margin-left: 40">
+<a name="com.appaapps/Gradients.Tartan"/>
+<h3>Class: <big>Gradients.Tartan</big>, package: com.appaapps</h3>
+<p>Create a tartan paint gradient
+<table border="1" cellspacing="20">
+<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Line<th>Description</tr>
+
+<tr><td>void
+    <td><a href="#com.appaapps/Gradients.Tartan/set">set</a>
+    <td>void
+    <td>public
+    <td>54
+    <td>Set the two paints needed to draw the tartan gradient. Overrides: <a href="#com.appaapps.Gradients.set">com.appaapps.Gradients.set</a>
+</tr>
+
+</table>
+</div>
+
+<div style="background-color: #FFFFcc; margin-left: 60">
+<a name="com.appaapps/Gradients.Tartan/set"/>
+<h4><big>set()</big> returns <big>void</big>   <small>in class Gradients.Tartan</small></h4>
+<p>Set the two paints needed to draw the tartan gradient. Overrides: <a href="#com.appaapps.Gradients.set">com.appaapps.Gradients.set</a></p>
+
+</div>
+</body>
+
+<div style="background-color: #CCccFF; margin-left: 40">
+<a name="com.appaapps/LayoutText"/>
+<h3>Class: <big>LayoutText</big>, package: com.appaapps</h3>
+<p>Draw text to fill a fractional area of a canvas, justifying remaining space
+<table border="1" cellspacing="20">
+<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Line<th>Description</tr>
+
+<tr><td>void
+    <td><a href="#com.appaapps/LayoutText/draw">draw</a>
+    <td><a target="_blank" href="https://developer.android.com/reference/android/graphics/Canvas.html">Canvas</a>, <a target="_blank" href="https://developer.android.com/reference/java/lang/String.html">String</a>, float, float, float, float, int, int, <a target="_blank" href="https://developer.android.com/reference/android/graphics/Paint.html">Paint</a>, <a target="_blank" href="https://developer.android.com/reference/android/graphics/Paint.html">Paint</a>
+    <td>public static
+    <td>12
+    <td>Draw text to fill a fractional area of a canvas, justifying remaining space
+</tr>
+
+</table>
+</div>
+
+<div style="background-color: #FFCCcc; margin-left: 60">
+<a name="com.appaapps/LayoutText/draw"/>
+<h4><big>draw(<a target="_blank" href="https://developer.android.com/reference/android/graphics/Canvas.html">Canvas</a>, <a target="_blank" href="https://developer.android.com/reference/java/lang/String.html">String</a>, float, float, float, float, int, int, <a target="_blank" href="https://developer.android.com/reference/android/graphics/Paint.html">Paint</a>, <a target="_blank" href="https://developer.android.com/reference/android/graphics/Paint.html">Paint</a>)</big> returns <big>void</big>   <small>in class LayoutText</small></h4>
+<p>Draw text to fill a fractional area of a canvas, justifying remaining space</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>canvas<td><a target="_blank" href="https://developer.android.com/reference/android/graphics/Canvas.html">Canvas</a><td>13<td>Canvas to draw on</tr>
+<tr><td>text<td><a target="_blank" href="https://developer.android.com/reference/java/lang/String.html">String</a><td>14<td>Text to draw</tr>
+<tr><td>x<td>float<td>15<td>Area to draw text in expressed as fractions of the canvas: left   x</tr>
+<tr><td>y<td>float<td>16<td>Area to draw text in expressed as fractions of the canvas: top    y</tr>
+<tr><td>X<td>float<td>17<td>Area to draw text in expressed as fractions of the canvas: right  x</tr>
+<tr><td>Y<td>float<td>18<td>Area to draw text in expressed as fractions of the canvas: bottom y</tr>
+<tr><td>justX<td>int<td>19<td>Justification in x: -1=left,   0=center, +1=right</tr>
+<tr><td>justY<td>int<td>20<td>Justification in y: +1=bottom, 0=center, -1=top</tr>
+<tr><td>paintF<td><a target="_blank" href="https://developer.android.com/reference/android/graphics/Paint.html">Paint</a><td>21<td>Character paint for foreground - setTextSize(128) or some other reasonable size that Android is capable of drawing text at in a hardware layer. The text will be scaled independently before it is drawn to get an optimal fit in the drawing area</tr>
+<tr><td>paintB<td><a target="_blank" href="https://developer.android.com/reference/android/graphics/Paint.html">Paint</a><td>22<td>Optional character paint for background or null. Both foreground and background text paints must have the same textSize. The foreground is painted last over the background which is painted first.</tr>
+</table>
 
 </div>
 </body>
 
 <div style="background-color: #ccFFCC; margin-left: 40">
-<a name="com.appaapps.Svg.Tracker"/>
-<h3>Methods in class: <big>Svg.Tracker</big>, package: com.appaapps</h3>
-<p>Generates random but smoothly varying numbers between -1  and +1 by filtering random shocks.
+<a name="com.appaapps/Log"/>
+<h3>Class: <big>Log</big>, package: com.appaapps</h3>
+<p>Logging
 <table border="1" cellspacing="20">
-<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Description</tr>
+<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Line<th>Description</tr>
 
-<tr><td>double
-    <td><a href="#com.appaapps.Svg.Tracker.value">value</a>
+<tr><td>void
+    <td><a href="#com.appaapps/Log/say">say</a>
     <td>void
-    <td>
-    <td>Value of tracker
+    <td>public static
+    <td>12
+    <td>Say some things
+</tr>
+
+<tr><td>void
+    <td><a href="#com.appaapps/Log/showLog">showLog</a>
+    <td><a target="_blank" href="https://developer.android.com/reference/android/graphics/Canvas.html">Canvas</a>
+    <td>public static
+    <td>21
+    <td>Show log
 </tr>
 
 </table>
 </div>
 
 <div style="background-color: #ccFFFF; margin-left: 60">
-<a name="com.appaapps.Svg.Tracker.value"/>
-<h4><b>value</b> : double</h4>
-<p>Value of tracker</p>
+<a name="com.appaapps/Log/say"/>
+<h4><big>say()</big> returns <big>void</big>   <small>in class Log</small></h4>
+<p>Say some things</p>
+
+</div>
+</body>
+
+<div style="background-color: #FFccFF; margin-left: 60">
+<a name="com.appaapps/Log/showLog"/>
+<h4><big>showLog(<a target="_blank" href="https://developer.android.com/reference/android/graphics/Canvas.html">Canvas</a>)</big> returns <big>void</big>   <small>in class Log</small></h4>
+<p>Show log</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>c<td><a target="_blank" href="https://developer.android.com/reference/android/graphics/Canvas.html">Canvas</a><td>22<td>Canvas to draw log upon</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #FFFFcc; margin-left: 40">
+<a name="com.appaapps/Maths"/>
+<h3>Class: <big>Maths</big>, package: com.appaapps</h3>
+<p>Various mathematical methods
+<table border="1" cellspacing="20">
+<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Line<th>Description</tr>
+
+<tr><td>int
+    <td><a href="#com.appaapps/Maths/isqrt">isqrt</a>
+    <td>int
+    <td>public static
+    <td>8
+    <td>Integer square root - slow but rarely used for numbers above 24
+</tr>
+
+<tr><td>int
+    <td><a href="#com.appaapps/Maths/isqrt2">isqrt2</a>
+    <td>int
+    <td>public static
+    <td>16
+    <td>Integer fourth root - slow but rarely used for numbers above 24
+</tr>
+
+<tr><td>float
+    <td><a href="#com.appaapps/Maths/max">max</a>
+    <td>float, float
+    <td>private static
+    <td>21
+    <td>Maximum of two floats
+</tr>
+
+<tr><td>float
+    <td><a href="#com.appaapps/Maths/min">min</a>
+    <td>float a, float
+    <td>private static
+    <td>28
+    <td>Minimum of two floats
+</tr>
+
+</table>
+</div>
+
+<div style="background-color: #CCccFF; margin-left: 60">
+<a name="com.appaapps/Maths/isqrt"/>
+<h4><big>isqrt(int)</big> returns <big>int</big>   <small>in class Maths</small></h4>
+<p>Integer square root - slow but rarely used for numbers above 24</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>n<td>int<td>9<td>Integer whose integer square root is required</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #FFCCcc; margin-left: 60">
+<a name="com.appaapps/Maths/isqrt2"/>
+<h4><big>isqrt2(int)</big> returns <big>int</big>   <small>in class Maths</small></h4>
+<p>Integer fourth root - slow but rarely used for numbers above 24</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>n<td>int<td>17<td>Integer whose integer fourth root is required</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #ccFFCC; margin-left: 60">
+<a name="com.appaapps/Maths/max"/>
+<h4><big>max(float, float)</big> returns <big>float</big>   <small>in class Maths</small></h4>
+<p>Maximum of two floats</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>a<td>float<td>22<td>First float</tr>
+<tr><td>b<td>float<td>23<td>Second float</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #ccFFFF; margin-left: 60">
+<a name="com.appaapps/Maths/min"/>
+<h4><big>min(float a, float)</big> returns <big>float</big>   <small>in class Maths</small></h4>
+<p>Minimum of two floats</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>b<td>float a, float<td>29<td>First float</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #FFccFF; margin-left: 40">
+<a name="com.appaapps/Midi"/>
+<h3>Class: <big>Midi</big>, package: com.appaapps</h3>
+<p>Midi sound player
+<table border="1" cellspacing="20">
+<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Line<th>Description</tr>
+
+<tr><td><a href="#com.appaapps.Midi.Midi">Midi</a>
+    <td><a href="#com.appaapps/Midi/Midi">Midi</a>
+    <td><a target="_blank" href="https://developer.android.com/reference/java/io/File.html">File</a>
+    <td>public constructor
+    <td>14
+    <td>Create a looping Midi player
+</tr>
+
+<tr><td>void
+    <td><a href="#com.appaapps/Midi/playSound">playSound</a>
+    <td>byte[]
+    <td>public
+    <td>25
+    <td>Play a midi byte stream on Android < 23
+</tr>
+
+<tr><td>void
+    <td><a href="#com.appaapps/Midi/change">change</a>
+    <td>int
+    <td>public
+    <td>74
+    <td>Override to observe changes of media player
+</tr>
+
+</table>
+</div>
+
+<div style="background-color: #FFFFcc; margin-left: 60">
+<a name="com.appaapps/Midi/Midi"/>
+<h4><big>Midi(<a target="_blank" href="https://developer.android.com/reference/java/io/File.html">File</a>)</big> returns <big><a href="#com.appaapps.Midi.Midi">Midi</a></big>   <small>in class Midi</small></h4>
+<p>Create a looping Midi player</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>cacheDir<td><a target="_blank" href="https://developer.android.com/reference/java/io/File.html">File</a><td>15<td>Folder holding midi files</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #CCccFF; margin-left: 60">
+<a name="com.appaapps/Midi/playSound"/>
+<h4><big>playSound(byte[])</big> returns <big>void</big>   <small>in class Midi</small></h4>
+<p>Play a midi byte stream on Android < 23</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>mds<td>byte[]<td>26<td>Byte stream containing midi instructions</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #FFCCcc; margin-left: 60">
+<a name="com.appaapps/Midi/change"/>
+<h4><big>change(int)</big> returns <big>void</big>   <small>in class Midi</small></h4>
+<p>Override to observe changes of media player</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>i<td>int<td>75<td>?</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #ccFFCC; margin-left: 40">
+<a name="com.appaapps/RandomChoice<T>"/>
+<h3>Class: <big>RandomChoice<T></big>, package: com.appaapps</h3>
+<p>Random choices
+<table border="1" cellspacing="20">
+<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Line<th>Description</tr>
+
+<tr><td>T
+    <td><a href="#com.appaapps/RandomChoice<T>/chooseFromStack">chooseFromStack</a>
+    <td>Stack<T>
+    <td>public
+    <td>15
+    <td>Choose one element at random from a stack
+</tr>
+
+<tr><td>T
+    <td><a href="#com.appaapps/RandomChoice<T>/chooseFromArray">chooseFromArray</a>
+    <td>T[]
+    <td>public
+    <td>23
+    <td>Choose one element at random from an array
+</tr>
+
+<tr><td>T
+    <td><a href="#com.appaapps/RandomChoice<T>/chooseFromSet">chooseFromSet</a>
+    <td>Set<T>
+    <td>public
+    <td>31
+    <td>Choose one element at random from a set
+</tr>
+
+<tr><td>void
+    <td><a href="#com.appaapps/RandomChoice<T>/shuffle">shuffle</a>
+    <td>Stack<T>
+    <td>public
+    <td>39
+    <td>Shuffle a stack
+</tr>
+
+<tr><td>Stack<T>
+    <td><a href="#com.appaapps/RandomChoice<T>/choose2">choose2</a>
+    <td>Stack<T>
+    <td>public
+    <td>52
+    <td>Choose two elements, ideally different ones, at random
+</tr>
+
+</table>
+</div>
+
+<div style="background-color: #ccFFFF; margin-left: 60">
+<a name="com.appaapps/RandomChoice<T>/chooseFromStack"/>
+<h4><big>chooseFromStack(Stack<T>)</big> returns <big>T</big>   <small>in class RandomChoice<T></small></h4>
+<p>Choose one element at random from a stack</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>s<td>Stack<T><td>16<td>Stack to choose from</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #FFccFF; margin-left: 60">
+<a name="com.appaapps/RandomChoice<T>/chooseFromArray"/>
+<h4><big>chooseFromArray(T[])</big> returns <big>T</big>   <small>in class RandomChoice<T></small></h4>
+<p>Choose one element at random from an array</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>s<td>T[]<td>24<td>Array to choose from</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #FFFFcc; margin-left: 60">
+<a name="com.appaapps/RandomChoice<T>/chooseFromSet"/>
+<h4><big>chooseFromSet(Set<T>)</big> returns <big>T</big>   <small>in class RandomChoice<T></small></h4>
+<p>Choose one element at random from a set</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>s<td>Set<T><td>32<td>Set tro choose from</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #CCccFF; margin-left: 60">
+<a name="com.appaapps/RandomChoice<T>/shuffle"/>
+<h4><big>shuffle(Stack<T>)</big> returns <big>void</big>   <small>in class RandomChoice<T></small></h4>
+<p>Shuffle a stack</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>s<td>Stack<T><td>40<td>Stack to shuffle</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #FFCCcc; margin-left: 60">
+<a name="com.appaapps/RandomChoice<T>/choose2"/>
+<h4><big>choose2(Stack<T>)</big> returns <big>Stack<T></big>   <small>in class RandomChoice<T></small></h4>
+<p>Choose two elements, ideally different ones, at random</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>s<td>Stack<T><td>53<td>Stack to choose from</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #ccFFCC; margin-left: 40">
+<a name="com.appaapps/Sound"/>
+<h3>Class: <big>Sound</big>, package: com.appaapps</h3>
+<p>Sounds
+<table border="1" cellspacing="20">
+<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Line<th>Description</tr>
+
+</table>
+</div>
+
+<div style="background-color: #ccFFFF; margin-left: 40">
+<a name="com.appaapps/Speech"/>
+<h3>Class: <big>Speech</big>, package: com.appaapps</h3>
+<p>Speech played from mp3 files
+<table border="1" cellspacing="20">
+<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Line<th>Description</tr>
+
+<tr><td><a href="#com.appaapps.Speech.Speech">Speech</a>
+    <td><a href="#com.appaapps/Speech/Speech">Speech</a>
+    <td><a target="_blank" href="https://developer.android.com/reference/java/io/File.html">File</a>
+    <td>public constructor
+    <td>11
+    <td>Create Speech player
+</tr>
+
+</table>
+</div>
+
+<div style="background-color: #FFccFF; margin-left: 60">
+<a name="com.appaapps/Speech/Speech"/>
+<h4><big>Speech(<a target="_blank" href="https://developer.android.com/reference/java/io/File.html">File</a>)</big> returns <big><a href="#com.appaapps.Speech.Speech">Speech</a></big>   <small>in class Speech</small></h4>
+<p>Create Speech player</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>cacheDir<td><a target="_blank" href="https://developer.android.com/reference/java/io/File.html">File</a><td>12<td>Folder containing files to play</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #FFFFcc; margin-left: 40">
+<a name="com.appaapps/Svg"/>
+<h3>Class: <big>Svg</big>, package: com.appaapps</h3>
+<p>Structured Vector Graphics. Svg elements occupy fractions of the canvas which is assumed to have the approximate aspect ratio specified when creating the Svg. The elements then try to fit themselves into their fractional areas as best they can.
+<table border="1" cellspacing="20">
+<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Line<th>Description</tr>
+
+<tr><td><a href="#com.appaapps.Svg.Svg">Svg</a>
+    <td><a href="#com.appaapps/Svg/Svg">Svg</a>
+    <td>void
+    <td>public constructor
+    <td>21
+    <td>Create an Svg
+</tr>
+
+<tr><td>AFewChars
+    <td><a href="#com.appaapps/Svg/AFewChars">AFewChars</a>
+    <td><a target="_blank" href="https://developer.android.com/reference/java/lang/String.html">String</a>, float, float, float, float, int, int
+    <td>protected
+    <td>331
+    <td>Create and push a new AFewChars element
+</tr>
+
+<tr><td>Image
+    <td><a href="#com.appaapps/Svg/Image">Image</a>
+    <td><a target="_blank" href="https://developer.android.com/reference/android/graphics/Bitmap.html">Bitmap</a>, float, float, float, float
+    <td>public
+    <td>385
+    <td>Create and push a new image
+</tr>
+
+<tr><td>Rectangle
+    <td><a href="#com.appaapps/Svg/Rectangle">Rectangle</a>
+    <td>float, float, float, float
+    <td>protected
+    <td>223
+    <td>Create and push a rectangle
+</tr>
+
+<tr><td>Text
+    <td><a href="#com.appaapps/Svg/Text">Text</a>
+    <td><a target="_blank" href="https://developer.android.com/reference/java/lang/String.html">String</a>, float, float, float, float, int, int
+    <td>protected
+    <td>296
+    <td>Create and push a new text element
+</tr>
+
+<tr><td>void
+    <td><a href="#com.appaapps/Svg/draw">draw</a>
+    <td><a target="_blank" href="https://developer.android.com/reference/android/graphics/Canvas.html">Canvas</a>
+    <td>public
+    <td>32
+    <td>Draw the Svg on the canvas
+</tr>
+
+<tr><td>float
+    <td><a href="#com.appaapps/Svg/maxScale">maxScale</a>
+    <td><a target="_blank" href="https://developer.android.com/reference/android/graphics/RectF.html">RectF</a>, <a target="_blank" href="https://developer.android.com/reference/android/graphics/RectF.html">RectF</a>
+    <td>private static
+    <td>396
+    <td>Maximum scale factor from first specified rectangle to the second
+</tr>
+
+<tr><td>void
+    <td><a href="#com.appaapps/Svg/onShow">onShow</a>
+    <td>void
+    <td>protected
+    <td>29
+    <td>Called when this Svg is shown or reshown after some other Svg has been shown
+</tr>
+
+<tr><td>void
+    <td><a href="#com.appaapps/Svg/push">push</a>
+    <td>Element
+    <td>private
+    <td>24
+    <td>Add an element to the stack of elements to be displayed
+</tr>
+
+<tr><td><a target="_blank" href="https://developer.android.com/reference/android/graphics/Bitmap.html">Bitmap</a>
+    <td><a href="#com.appaapps/Svg/testImage">testImage</a>
+    <td>void
+    <td>static
+    <td>408
+    <td>Create a test image
+</tr>
+
+</table>
+</div>
+
+<div style="background-color: #CCccFF; margin-left: 60">
+<a name="com.appaapps/Svg/Svg"/>
+<h4><big>Svg()</big> returns <big><a href="#com.appaapps.Svg.Svg">Svg</a></big>   <small>in class Svg</small></h4>
+<p>Create an Svg</p>
+
+</div>
+</body>
+
+<div style="background-color: #FFCCcc; margin-left: 60">
+<a name="com.appaapps/Svg/AFewChars"/>
+<h4><big>AFewChars(<a target="_blank" href="https://developer.android.com/reference/java/lang/String.html">String</a>, float, float, float, float, int, int)</big> returns <big>AFewChars</big>   <small>in class Svg</small></h4>
+<p>Create and push a new AFewChars element</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>text<td><a target="_blank" href="https://developer.android.com/reference/java/lang/String.html">String</a><td>332<td>The small amount of text to display</tr>
+<tr><td>x<td>float<td>333<td>Fractional area in which to display the text - left</tr>
+<tr><td>y<td>float<td>334<td>Fractional area in which to display the text - upper</tr>
+<tr><td>𝘅<td>float<td>335<td>Fractional area in which to display the text - right</tr>
+<tr><td>𝘆<td>float<td>336<td>Fractional area in which to display the text - lower</tr>
+<tr><td>justifyX<td>int<td>337<td>Justification in x per: <a href="#com.appaapps.LayoutText">com.appaapps.LayoutText</a></tr>
+<tr><td>justifyY<td>int<td>338<td>Justification in y per: <a href="#com.appaapps.LayoutText">com.appaapps.LayoutText</a></tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #ccFFCC; margin-left: 60">
+<a name="com.appaapps/Svg/Image"/>
+<h4><big>Image(<a target="_blank" href="https://developer.android.com/reference/android/graphics/Bitmap.html">Bitmap</a>, float, float, float, float)</big> returns <big>Image</big>   <small>in class Svg</small></h4>
+<p>Create and push a new image</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>bitmap<td><a target="_blank" href="https://developer.android.com/reference/android/graphics/Bitmap.html">Bitmap</a><td>386<td>Bitmap containing image</tr>
+<tr><td>x<td>float<td>387<td>Fraction coordinates of left edge</tr>
+<tr><td>y<td>float<td>388<td>Fraction coordinates of upper edge</tr>
+<tr><td>𝘅<td>float<td>389<td>Fraction coordinates of right edge</tr>
+<tr><td>𝘆<td>float<td>390<td>Fraction coordinates of lower edge</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #ccFFFF; margin-left: 60">
+<a name="com.appaapps/Svg/Rectangle"/>
+<h4><big>Rectangle(float, float, float, float)</big> returns <big>Rectangle</big>   <small>in class Svg</small></h4>
+<p>Create and push a rectangle</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>x<td>float<td>224<td>Fractional position - left</tr>
+<tr><td>y<td>float<td>225<td>Fractional position - upper</tr>
+<tr><td>𝘅<td>float<td>226<td>Fractional position - right</tr>
+<tr><td>𝘆<td>float<td>227<td>Fractional position - lower</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #FFccFF; margin-left: 60">
+<a name="com.appaapps/Svg/Text"/>
+<h4><big>Text(<a target="_blank" href="https://developer.android.com/reference/java/lang/String.html">String</a>, float, float, float, float, int, int)</big> returns <big>Text</big>   <small>in class Svg</small></h4>
+<p>Create and push a new text element</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>text<td><a target="_blank" href="https://developer.android.com/reference/java/lang/String.html">String</a><td>297<td>The text to display</tr>
+<tr><td>x<td>float<td>298<td>Fractional area in which to display the text - left</tr>
+<tr><td>y<td>float<td>299<td>Fractional area in which to display the text - upper</tr>
+<tr><td>𝘅<td>float<td>300<td>Fractional area in which to display the text - right</tr>
+<tr><td>𝘆<td>float<td>301<td>Fractional area in which to display the text - lower</tr>
+<tr><td>justifyX<td>int<td>302<td>Justification in x per: <a href="#com.appaapps.LayoutText">com.appaapps.LayoutText</a></tr>
+<tr><td>justifyY<td>int<td>303<td>Justification in y per: <a href="#com.appaapps.LayoutText">com.appaapps.LayoutText</a></tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #FFFFcc; margin-left: 60">
+<a name="com.appaapps/Svg/draw"/>
+<h4><big>draw(<a target="_blank" href="https://developer.android.com/reference/android/graphics/Canvas.html">Canvas</a>)</big> returns <big>void</big>   <small>in class Svg</small></h4>
+<p>Draw the Svg on the canvas</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>canvas<td><a target="_blank" href="https://developer.android.com/reference/android/graphics/Canvas.html">Canvas</a><td>33<td>Canvas to draw on</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #CCccFF; margin-left: 60">
+<a name="com.appaapps/Svg/maxScale"/>
+<h4><big>maxScale(<a target="_blank" href="https://developer.android.com/reference/android/graphics/RectF.html">RectF</a>, <a target="_blank" href="https://developer.android.com/reference/android/graphics/RectF.html">RectF</a>)</big> returns <big>float</big>   <small>in class Svg</small></h4>
+<p>Maximum scale factor from first specified rectangle to the second</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>source<td><a target="_blank" href="https://developer.android.com/reference/android/graphics/RectF.html">RectF</a><td>397<td>Source rectangle</tr>
+<tr><td>target<td><a target="_blank" href="https://developer.android.com/reference/android/graphics/RectF.html">RectF</a><td>398<td>Target rectangle</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #FFCCcc; margin-left: 60">
+<a name="com.appaapps/Svg/onShow"/>
+<h4><big>onShow()</big> returns <big>void</big>   <small>in class Svg</small></h4>
+<p>Called when this Svg is shown or reshown after some other Svg has been shown</p>
+
+</div>
+</body>
+
+<div style="background-color: #ccFFCC; margin-left: 60">
+<a name="com.appaapps/Svg/push"/>
+<h4><big>push(Element)</big> returns <big>void</big>   <small>in class Svg</small></h4>
+<p>Add an element to the stack of elements to be displayed</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>e<td>Element<td>25<td>the element to add</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #ccFFFF; margin-left: 60">
+<a name="com.appaapps/Svg/testImage"/>
+<h4><big>testImage()</big> returns <big><a target="_blank" href="https://developer.android.com/reference/android/graphics/Bitmap.html">Bitmap</a></big>   <small>in class Svg</small></h4>
+<p>Create a test image</p>
+
+</div>
+</body>
+
+<div style="background-color: #FFccFF; margin-left: 40">
+<a name="com.appaapps/Svg.AFewChars"/>
+<h3>Class: <big>Svg.AFewChars</big>, package: com.appaapps</h3>
+<p>A Few chars is just like text except that the gradient is across each character not the entire drawing area
+<table border="1" cellspacing="20">
+<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Line<th>Description</tr>
+
+<tr><td><a href="#com.appaapps.Svg.AFewChars.AFewChars">AFewChars</a>
+    <td><a href="#com.appaapps/Svg.AFewChars/AFewChars">AFewChars</a>
+    <td><a target="_blank" href="https://developer.android.com/reference/java/lang/String.html">String</a>, float, float, float, float, int, int
+    <td>private constructor
+    <td>311
+    <td>Create a text area
+</tr>
+
+<tr><td>float
+    <td><a href="#com.appaapps/Svg.AFewChars/width">width</a>
+    <td>void
+    <td>protected
+    <td>321
+    <td>Approximate width of object before scaling is the drawn length of the string. Overrides: <a href="#com.appaapps.Svg.Element2.width">com.appaapps.Svg.Element2.width</a>
+</tr>
+
+<tr><td>float
+    <td><a href="#com.appaapps/Svg.AFewChars/height">height</a>
+    <td>void
+    <td>protected
+    <td>325
+    <td>Approximate width of object before scaling is one character. Overrides: <a href="#com.appaapps.Svg.Element2.height">com.appaapps.Svg.Element2.height</a>
+</tr>
+
+</table>
+</div>
+
+<div style="background-color: #FFFFcc; margin-left: 60">
+<a name="com.appaapps/Svg.AFewChars/AFewChars"/>
+<h4><big>AFewChars(<a target="_blank" href="https://developer.android.com/reference/java/lang/String.html">String</a>, float, float, float, float, int, int)</big> returns <big><a href="#com.appaapps.Svg.AFewChars.AFewChars">AFewChars</a></big>   <small>in class Svg.AFewChars</small></h4>
+<p>Create a text area</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>text<td><a target="_blank" href="https://developer.android.com/reference/java/lang/String.html">String</a><td>312<td>The text to  display</tr>
+<tr><td>x<td>float<td>313<td>Fractional area in which to display the text - left</tr>
+<tr><td>y<td>float<td>314<td>Fractional area in which to display the text - upper</tr>
+<tr><td>𝘅<td>float<td>315<td>Fractional area in which to display the text - right</tr>
+<tr><td>𝘆<td>float<td>316<td>Fractional area in which to display the text - lower</tr>
+<tr><td>justifyX<td>int<td>317<td>Justification in x per: <a href="#com.appaapps.LayoutText">com.appaapps.LayoutText</a></tr>
+<tr><td>justifyY<td>int<td>318<td>Justification in y per: <a href="#com.appaapps.LayoutText">com.appaapps.LayoutText</a></tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #CCccFF; margin-left: 60">
+<a name="com.appaapps/Svg.AFewChars/width"/>
+<h4><big>width()</big> returns <big>float</big>   <small>in class Svg.AFewChars</small></h4>
+<p>Approximate width of object before scaling is the drawn length of the string. Overrides: <a href="#com.appaapps.Svg.Element2.width">com.appaapps.Svg.Element2.width</a></p>
+
+</div>
+</body>
+
+<div style="background-color: #FFCCcc; margin-left: 60">
+<a name="com.appaapps/Svg.AFewChars/height"/>
+<h4><big>height()</big> returns <big>float</big>   <small>in class Svg.AFewChars</small></h4>
+<p>Approximate width of object before scaling is one character. Overrides: <a href="#com.appaapps.Svg.Element2.height">com.appaapps.Svg.Element2.height</a></p>
+
+</div>
+</body>
+
+<div style="background-color: #ccFFCC; margin-left: 40">
+<a name="com.appaapps/Svg.Element"/>
+<h3>Class: <big>Svg.Element</big>, package: com.appaapps</h3>
+<p>Common features of a drawn element
+<table border="1" cellspacing="20">
+<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Line<th>Description</tr>
+
+<tr><td><a href="#com.appaapps.Svg.Element.Element">Element</a>
+    <td><a href="#com.appaapps/Svg.Element/Element">Element</a>
+    <td>float, float, float, float
+    <td>private constructor
+    <td>56
+    <td>Create en element by specifying its fractional area on the canvas
+</tr>
+
+<tr><td>void
+    <td><a href="#com.appaapps/Svg.Element/clearCenterToCenter">clearCenterToCenter</a>
+    <td>void
+    <td>protected
+    <td>108
+    <td>Clear animation for this element
+</tr>
+
+<tr><td>boolean
+    <td><a href="#com.appaapps/Svg.Element/contains">contains</a>
+    <td>float, float
+    <td>protected
+    <td>84
+    <td>Does this element contain the point (x, y)?
+</tr>
+
+<tr><td>void
+    <td><a href="#com.appaapps/Svg.Element/draw">draw</a>
+    <td><a target="_blank" href="https://developer.android.com/reference/android/graphics/Canvas.html">Canvas</a>
+    <td>protected
+    <td>80
+    <td>Overriden by each element to draw itself
+</tr>
+
+<tr><td>void
+    <td><a href="#com.appaapps/Svg.Element/drawElement">drawElement</a>
+    <td><a target="_blank" href="https://developer.android.com/reference/android/graphics/Canvas.html">Canvas</a>
+    <td>protected
+    <td>64
+    <td>Draw the SVG on a canvas
+</tr>
+
+<tr><td>CenterToCenter
+    <td><a href="#com.appaapps/Svg.Element/setCenterToCenter">setCenterToCenter</a>
+    <td>double, double, double, float, float, float, float
+    <td>private
+    <td>91
+    <td>Create set Center To Center animation for this element
+</tr>
+
+<tr><td>CenterToCenter
+    <td><a href="#com.appaapps/Svg.Element/setCenterToCenter">setCenterToCenter</a>
+    <td>CenterToCenter
+    <td>protected
+    <td>103
+    <td>Set Center To Center animation for this element
+</tr>
+
+</table>
+</div>
+
+<div style="background-color: #ccFFFF; margin-left: 60">
+<a name="com.appaapps/Svg.Element/Element"/>
+<h4><big>Element(float, float, float, float)</big> returns <big><a href="#com.appaapps.Svg.Element.Element">Element</a></big>   <small>in class Svg.Element</small></h4>
+<p>Create en element by specifying its fractional area on the canvas</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>x<td>float<td>57<td>Fractional area in which to display the element - left</tr>
+<tr><td>y<td>float<td>58<td>Fractional area in which to display the element - upper</tr>
+<tr><td>𝘅<td>float<td>59<td>Fractional area in which to display the element - right</tr>
+<tr><td>𝘆<td>float<td>60<td>Fractional area in which to display the element - lower</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #FFccFF; margin-left: 60">
+<a name="com.appaapps/Svg.Element/clearCenterToCenter"/>
+<h4><big>clearCenterToCenter()</big> returns <big>void</big>   <small>in class Svg.Element</small></h4>
+<p>Clear animation for this element</p>
+
+</div>
+</body>
+
+<div style="background-color: #FFFFcc; margin-left: 60">
+<a name="com.appaapps/Svg.Element/contains"/>
+<h4><big>contains(float, float)</big> returns <big>boolean</big>   <small>in class Svg.Element</small></h4>
+<p>Does this element contain the point (x, y)?</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>x<td>float<td>85<td>Point.X</tr>
+<tr><td>y<td>float<td>86<td>Point.Y</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #CCccFF; margin-left: 60">
+<a name="com.appaapps/Svg.Element/draw"/>
+<h4><big>draw(<a target="_blank" href="https://developer.android.com/reference/android/graphics/Canvas.html">Canvas</a>)</big> returns <big>void</big>   <small>in class Svg.Element</small></h4>
+<p>Overriden by each element to draw itself</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>canvas<td><a target="_blank" href="https://developer.android.com/reference/android/graphics/Canvas.html">Canvas</a><td>81<td>Canvas on which the element would be drawn</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #FFCCcc; margin-left: 60">
+<a name="com.appaapps/Svg.Element/drawElement"/>
+<h4><big>drawElement(<a target="_blank" href="https://developer.android.com/reference/android/graphics/Canvas.html">Canvas</a>)</big> returns <big>void</big>   <small>in class Svg.Element</small></h4>
+<p>Draw the SVG on a canvas</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>canvas<td><a target="_blank" href="https://developer.android.com/reference/android/graphics/Canvas.html">Canvas</a><td>65<td>Canvas to draw on</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #ccFFCC; margin-left: 60">
+<a name="com.appaapps/Svg.Element/setCenterToCenter"/>
+<h4><big>setCenterToCenter(double, double, double, float, float, float, float)</big> returns <big>CenterToCenter</big>   <small>in class Svg.Element</small></h4>
+<p>Create set Center To Center animation for this element</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>delay<td>double<td>92<td>Delay before animation starts</tr>
+<tr><td>duration<td>double<td>93<td>Duration of expansion and contraction</tr>
+<tr><td>startAgain<td>double<td>94<td>Restart again after this time</tr>
+<tr><td>x<td>float<td>95<td>Fractional position to expand to - left</tr>
+<tr><td>y<td>float<td>96<td>Fractional position to expand to - upper</tr>
+<tr><td>𝘅<td>float<td>97<td>Fractional position to expand to - right</tr>
+<tr><td>𝘆<td>float<td>98<td>Fractional position to expand to - lower</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #ccFFFF; margin-left: 60">
+<a name="com.appaapps/Svg.Element/setCenterToCenter"/>
+<h4><big>setCenterToCenter(CenterToCenter)</big> returns <big>CenterToCenter</big>   <small>in class Svg.Element</small></h4>
+<p>Set Center To Center animation for this element</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>animation<td>CenterToCenter<td>104<td>Animation</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #FFccFF; margin-left: 40">
+<a name="com.appaapps/Svg.Element.CenterToCenter"/>
+<h3>Class: <big>Svg.Element.CenterToCenter</big>, package: com.appaapps</h3>
+<p>Animation which expands an element its center is over the centre of the canvas
+<table border="1" cellspacing="20">
+<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Line<th>Description</tr>
+
+<tr><td><a href="#com.appaapps.Svg.Element.CenterToCenter.CenterToCenter">CenterToCenter</a>
+    <td><a href="#com.appaapps/Svg.Element.CenterToCenter/CenterToCenter">CenterToCenter</a>
+    <td>CenterToCenter
+    <td>protected constructor
+    <td>132
+    <td>Clone a center to center animation
+</tr>
+
+<tr><td><a href="#com.appaapps.Svg.Element.CenterToCenter.CenterToCenter">CenterToCenter</a>
+    <td><a href="#com.appaapps/Svg.Element.CenterToCenter/CenterToCenter">CenterToCenter</a>
+    <td>double, double, double, float, float, float, float
+    <td>protected constructor
+    <td>117
+    <td>Create a center to center animation
+</tr>
+
+<tr><td>float
+    <td><a href="#com.appaapps/Svg.Element.CenterToCenter/active">active</a>
+    <td>void
+    <td>protected
+    <td>141
+    <td>Get fraction of animation
+</tr>
+
+<tr><td>void
+    <td><a href="#com.appaapps/Svg.Element.CenterToCenter/onActivate">onActivate</a>
+    <td>void
+    <td>protected
+    <td>173
+    <td>Called when this animation becomes active
+</tr>
+
+<tr><td>void
+    <td><a href="#com.appaapps/Svg.Element.CenterToCenter/scaleDrawArea">scaleDrawArea</a>
+    <td><a target="_blank" href="https://developer.android.com/reference/android/graphics/Canvas.html">Canvas</a>
+    <td>protected
+    <td>162
+    <td>Apply scale to the drawing area
+</tr>
+
+</table>
+</div>
+
+<div style="background-color: #FFFFcc; margin-left: 60">
+<a name="com.appaapps/Svg.Element.CenterToCenter/CenterToCenter"/>
+<h4><big>CenterToCenter(CenterToCenter)</big> returns <big><a href="#com.appaapps.Svg.Element.CenterToCenter.CenterToCenter">CenterToCenter</a></big>   <small>in class Svg.Element.CenterToCenter</small></h4>
+<p>Clone a center to center animation</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>clone<td>CenterToCenter<td>133<td>Animation to clone</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #CCccFF; margin-left: 60">
+<a name="com.appaapps/Svg.Element.CenterToCenter/CenterToCenter"/>
+<h4><big>CenterToCenter(double, double, double, float, float, float, float)</big> returns <big><a href="#com.appaapps.Svg.Element.CenterToCenter.CenterToCenter">CenterToCenter</a></big>   <small>in class Svg.Element.CenterToCenter</small></h4>
+<p>Create a center to center animation</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>delay<td>double<td>118<td>Delay before animation starts in seconds</tr>
+<tr><td>duration<td>double<td>119<td>Duration of animation in seconds</tr>
+<tr><td>startAgain<td>double<td>120<td>Restart after animation after this time</tr>
+<tr><td>x<td>float<td>121<td>Fractional position to expand to - left</tr>
+<tr><td>y<td>float<td>122<td>Fractional position to expand to - upper</tr>
+<tr><td>𝘅<td>float<td>123<td>Fractional position to expand to - right</tr>
+<tr><td>𝘆<td>float<td>124<td>Fractional position to expand to - lower</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #FFCCcc; margin-left: 60">
+<a name="com.appaapps/Svg.Element.CenterToCenter/active"/>
+<h4><big>active()</big> returns <big>float</big>   <small>in class Svg.Element.CenterToCenter</small></h4>
+<p>Get fraction of animation</p>
+
+</div>
+</body>
+
+<div style="background-color: #ccFFCC; margin-left: 60">
+<a name="com.appaapps/Svg.Element.CenterToCenter/onActivate"/>
+<h4><big>onActivate()</big> returns <big>void</big>   <small>in class Svg.Element.CenterToCenter</small></h4>
+<p>Called when this animation becomes active</p>
+
+</div>
+</body>
+
+<div style="background-color: #ccFFFF; margin-left: 60">
+<a name="com.appaapps/Svg.Element.CenterToCenter/scaleDrawArea"/>
+<h4><big>scaleDrawArea(<a target="_blank" href="https://developer.android.com/reference/android/graphics/Canvas.html">Canvas</a>)</big> returns <big>void</big>   <small>in class Svg.Element.CenterToCenter</small></h4>
+<p>Apply scale to the drawing area</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>canvas<td><a target="_blank" href="https://developer.android.com/reference/android/graphics/Canvas.html">Canvas</a><td>163<td>Canvas to which scaling is to be applied</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #FFccFF; margin-left: 40">
+<a name="com.appaapps/Svg.Element2"/>
+<h3>Class: <big>Svg.Element2</big>, package: com.appaapps</h3>
+<p>Common features of an element drawn with two paints - this is in effect a replacement for ComposeShader which does not seem to work - it always produces a white screen
+<table border="1" cellspacing="20">
+<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Line<th>Description</tr>
+
+<tr><td><a href="#com.appaapps.Svg.Element2.Element2">Element2</a>
+    <td><a href="#com.appaapps/Svg.Element2/Element2">Element2</a>
+    <td>float, float, float, float
+    <td>private constructor
+    <td>183
+    <td>Create en element by specifying its fractional area on the canvas
+</tr>
+
+<tr><td>void
+    <td><a href="#com.appaapps/Svg.Element2/drawElement">drawElement</a>
+    <td><a target="_blank" href="https://developer.android.com/reference/android/graphics/Canvas.html">Canvas</a>
+    <td>protected
+    <td>191
+    <td>Draw the Svg on the canvas
+</tr>
+
+<tr><td>float
+    <td><a href="#com.appaapps/Svg.Element2/height">height</a>
+    <td><a target="_blank" href="https://developer.android.com/reference/android/graphics/Canvas.html">Canvas</a>
+    <td>protected
+    <td>200
+    <td>Approximate height of object before scaling
+</tr>
+
+<tr><td>float
+    <td><a href="#com.appaapps/Svg.Element2/width">width</a>
+    <td><a target="_blank" href="https://developer.android.com/reference/android/graphics/Canvas.html">Canvas</a>
+    <td>protected
+    <td>196
+    <td>Approximate width of object before scaling
+</tr>
+
+</table>
+</div>
+
+<div style="background-color: #FFFFcc; margin-left: 60">
+<a name="com.appaapps/Svg.Element2/Element2"/>
+<h4><big>Element2(float, float, float, float)</big> returns <big><a href="#com.appaapps.Svg.Element2.Element2">Element2</a></big>   <small>in class Svg.Element2</small></h4>
+<p>Create en element by specifying its fractional area on the canvas</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>x<td>float<td>184<td>Fractional area in which to display the element - left</tr>
+<tr><td>y<td>float<td>185<td>Fractional area in which to display the element - upper</tr>
+<tr><td>𝘅<td>float<td>186<td>Fractional area in which to display the element - right</tr>
+<tr><td>𝘆<td>float<td>187<td>Fractional area in which to display the element - lower</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #CCccFF; margin-left: 60">
+<a name="com.appaapps/Svg.Element2/drawElement"/>
+<h4><big>drawElement(<a target="_blank" href="https://developer.android.com/reference/android/graphics/Canvas.html">Canvas</a>)</big> returns <big>void</big>   <small>in class Svg.Element2</small></h4>
+<p>Draw the Svg on the canvas</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>canvas<td><a target="_blank" href="https://developer.android.com/reference/android/graphics/Canvas.html">Canvas</a><td>192<td>Canvas to draw on</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #FFCCcc; margin-left: 60">
+<a name="com.appaapps/Svg.Element2/height"/>
+<h4><big>height(<a target="_blank" href="https://developer.android.com/reference/android/graphics/Canvas.html">Canvas</a>)</big> returns <big>float</big>   <small>in class Svg.Element2</small></h4>
+<p>Approximate height of object before scaling</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>canvas<td><a target="_blank" href="https://developer.android.com/reference/android/graphics/Canvas.html">Canvas</a><td>201<td>Canvas to draw on</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #ccFFCC; margin-left: 60">
+<a name="com.appaapps/Svg.Element2/width"/>
+<h4><big>width(<a target="_blank" href="https://developer.android.com/reference/android/graphics/Canvas.html">Canvas</a>)</big> returns <big>float</big>   <small>in class Svg.Element2</small></h4>
+<p>Approximate width of object before scaling</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>canvas<td><a target="_blank" href="https://developer.android.com/reference/android/graphics/Canvas.html">Canvas</a><td>197<td>Canvas to draw on</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #ccFFFF; margin-left: 40">
+<a name="com.appaapps/Svg.Image"/>
+<h3>Class: <big>Svg.Image</big>, package: com.appaapps</h3>
+<p>Draw a bitmap image - move it around to show it all within the space available
+<table border="1" cellspacing="20">
+<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Line<th>Description</tr>
+
+<tr><td><a href="#com.appaapps.Svg.Image.Image">Image</a>
+    <td><a href="#com.appaapps/Svg.Image/Image">Image</a>
+    <td><a target="_blank" href="https://developer.android.com/reference/android/graphics/Bitmap.html">Bitmap</a>, float, float, float, float
+    <td>private constructor
+    <td>351
+    <td>Fraction coordinates of corners of drawing area
+</tr>
+
+<tr><td>void
+    <td><a href="#com.appaapps/Svg.Image/draw">draw</a>
+    <td>void
+    <td>protected
+    <td>366
+    <td>Draw a bitmap. Overrides: <a href="#com.appaapps.Svg.Element2.draw">com.appaapps.Svg.Element2.draw</a>
+</tr>
+
+</table>
+</div>
+
+<div style="background-color: #FFccFF; margin-left: 60">
+<a name="com.appaapps/Svg.Image/Image"/>
+<h4><big>Image(<a target="_blank" href="https://developer.android.com/reference/android/graphics/Bitmap.html">Bitmap</a>, float, float, float, float)</big> returns <big><a href="#com.appaapps.Svg.Image.Image">Image</a></big>   <small>in class Svg.Image</small></h4>
+<p>Fraction coordinates of corners of drawing area</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>bitmap<td><a target="_blank" href="https://developer.android.com/reference/android/graphics/Bitmap.html">Bitmap</a><td>352<td>Bitmap containing image</tr>
+<tr><td>x<td>float<td>353<td>Fraction coordinates of left edge</tr>
+<tr><td>y<td>float<td>354<td>Fraction coordinates of upper edge</tr>
+<tr><td>𝘅<td>float<td>355<td>Fraction coordinates of right edge</tr>
+<tr><td>𝘆<td>float<td>356<td>Fraction coordinates of lower edge</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #FFFFcc; margin-left: 60">
+<a name="com.appaapps/Svg.Image/draw"/>
+<h4><big>draw()</big> returns <big>void</big>   <small>in class Svg.Image</small></h4>
+<p>Draw a bitmap. Overrides: <a href="#com.appaapps.Svg.Element2.draw">com.appaapps.Svg.Element2.draw</a></p>
+
+</div>
+</body>
+
+<div style="background-color: #CCccFF; margin-left: 40">
+<a name="com.appaapps/Svg.Rectangle"/>
+<h3>Class: <big>Svg.Rectangle</big>, package: com.appaapps</h3>
+<p>Draw a rectangle
+<table border="1" cellspacing="20">
+<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Line<th>Description</tr>
+
+<tr><td><a href="#com.appaapps.Svg.Rectangle.Rectangle">Rectangle</a>
+    <td><a href="#com.appaapps/Svg.Rectangle/Rectangle">Rectangle</a>
+    <td>float, float, float, float
+    <td>private constructor
+    <td>208
+    <td>Create a rectangle
+</tr>
+
+<tr><td>void
+    <td><a href="#com.appaapps/Svg.Rectangle/draw">draw</a>
+    <td>void
+    <td>protected
+    <td>216
+    <td>Draw the rectangle. Overrides: <a href="#com.appaapps.Svg.Element2.draw">com.appaapps.Svg.Element2.draw</a>
+</tr>
+
+</table>
+</div>
+
+<div style="background-color: #FFCCcc; margin-left: 60">
+<a name="com.appaapps/Svg.Rectangle/Rectangle"/>
+<h4><big>Rectangle(float, float, float, float)</big> returns <big><a href="#com.appaapps.Svg.Rectangle.Rectangle">Rectangle</a></big>   <small>in class Svg.Rectangle</small></h4>
+<p>Create a rectangle</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>x<td>float<td>209<td>Fractional position - left</tr>
+<tr><td>y<td>float<td>210<td>Fractional position - upper</tr>
+<tr><td>𝘅<td>float<td>211<td>Fractional position - right</tr>
+<tr><td>𝘆<td>float<td>212<td>Fractional position - lower</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #ccFFCC; margin-left: 60">
+<a name="com.appaapps/Svg.Rectangle/draw"/>
+<h4><big>draw()</big> returns <big>void</big>   <small>in class Svg.Rectangle</small></h4>
+<p>Draw the rectangle. Overrides: <a href="#com.appaapps.Svg.Element2.draw">com.appaapps.Svg.Element2.draw</a></p>
+
+</div>
+</body>
+
+<div style="background-color: #ccFFFF; margin-left: 40">
+<a name="com.appaapps/Svg.Text"/>
+<h3>Class: <big>Svg.Text</big>, package: com.appaapps</h3>
+<p>Draw text
+<table border="1" cellspacing="20">
+<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Line<th>Description</tr>
+
+<tr><td><a href="#com.appaapps.Svg.Text.Text">Text</a>
+    <td><a href="#com.appaapps/Svg.Text/Text">Text</a>
+    <td><a target="_blank" href="https://developer.android.com/reference/java/lang/String.html">String</a>, float, float, float, float, int, int
+    <td>private constructor
+    <td>241
+    <td>Create a text area
+</tr>
+
+<tr><td>void
+    <td><a href="#com.appaapps/Svg.Text/draw">draw</a>
+    <td>void
+    <td>protected
+    <td>258
+    <td>Draw the text. Overrides: <a href="#com.appaapps.Svg.Element2.draw">com.appaapps.Svg.Element2.draw</a>
+</tr>
+
+</table>
+</div>
+
+<div style="background-color: #FFccFF; margin-left: 60">
+<a name="com.appaapps/Svg.Text/Text"/>
+<h4><big>Text(<a target="_blank" href="https://developer.android.com/reference/java/lang/String.html">String</a>, float, float, float, float, int, int)</big> returns <big><a href="#com.appaapps.Svg.Text.Text">Text</a></big>   <small>in class Svg.Text</small></h4>
+<p>Create a text area</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>text<td><a target="_blank" href="https://developer.android.com/reference/java/lang/String.html">String</a><td>242<td>The text to  display</tr>
+<tr><td>x<td>float<td>243<td>Fractional area in which to display the text - left</tr>
+<tr><td>y<td>float<td>244<td>Fractional area in which to display the text - upper</tr>
+<tr><td>𝘅<td>float<td>245<td>Fractional area in which to display the text - right</tr>
+<tr><td>𝘆<td>float<td>246<td>Fractional area in which to display the text - lower</tr>
+<tr><td>justifyX<td>int<td>247<td>Justification in x per: <a href="#com.appaapps.LayoutText">com.appaapps.LayoutText</a></tr>
+<tr><td>justifyY<td>int<td>248<td>Justification in y per: <a href="#com.appaapps.LayoutText">com.appaapps.LayoutText</a></tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #FFFFcc; margin-left: 60">
+<a name="com.appaapps/Svg.Text/draw"/>
+<h4><big>draw()</big> returns <big>void</big>   <small>in class Svg.Text</small></h4>
+<p>Draw the text. Overrides: <a href="#com.appaapps.Svg.Element2.draw">com.appaapps.Svg.Element2.draw</a></p>
+
+</div>
+</body>
+
+<div style="background-color: #CCccFF; margin-left: 40">
+<a name="com.appaapps/Unzip"/>
+<h3>Class: <big>Unzip</big>, package: com.appaapps</h3>
+<p>A thread to unzip a file
+<table border="1" cellspacing="20">
+<tr><th>Returns<th>Method<th>Signature<th>Attributes<th>Line<th>Description</tr>
+
+<tr><td>ZipFile
+    <td><a href="#com.appaapps/Unzip/createZipFile">createZipFile</a>
+    <td><a target="_blank" href="https://developer.android.com/reference/java/io/File.html">File</a>
+    <td>private
+    <td>15
+    <td>Create a file unzipper
+</tr>
+
+<tr><td><a href="#com.appaapps.Unzip.Unzip">Unzip</a>
+    <td><a href="#com.appaapps/Unzip/Unzip">Unzip</a>
+    <td><a target="_blank" href="https://developer.android.com/reference/java/lang/String.html">String</a>
+    <td>public constructor
+    <td>24
+    <td>Unzip the named file
+</tr>
+
+<tr><td>void
+    <td><a href="#com.appaapps/Unzip/run">run</a>
+    <td>void
+    <td>public
+    <td>29
+    <td>Unzip the named file
+</tr>
+
+<tr><td>void
+    <td><a href="#com.appaapps/Unzip/failed">failed</a>
+    <td>void
+    <td>public
+    <td>55
+    <td>Report a failure during the unzip
+</tr>
+
+<tr><td>void
+    <td><a href="#com.appaapps/Unzip/finished">finished</a>
+    <td>void
+    <td>public
+    <td>57
+    <td>Report the unzip as finished
+</tr>
+
+<tr><td>void
+    <td><a href="#com.appaapps/Unzip/zipEntry">zipEntry</a>
+    <td><a target="_blank" href="https://developer.android.com/reference/java/lang/String.html">String</a>
+    <td>public abstract
+    <td>59
+    <td>Override to process the content of each zip entry
+</tr>
+
+</table>
+</div>
+
+<div style="background-color: #FFCCcc; margin-left: 60">
+<a name="com.appaapps/Unzip/createZipFile"/>
+<h4><big>createZipFile(<a target="_blank" href="https://developer.android.com/reference/java/io/File.html">File</a>)</big> returns <big>ZipFile</big>   <small>in class Unzip</small></h4>
+<p>Create a file unzipper</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>file<td><a target="_blank" href="https://developer.android.com/reference/java/io/File.html">File</a><td>16<td>File to unzip</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #ccFFCC; margin-left: 60">
+<a name="com.appaapps/Unzip/Unzip"/>
+<h4><big>Unzip(<a target="_blank" href="https://developer.android.com/reference/java/lang/String.html">String</a>)</big> returns <big><a href="#com.appaapps.Unzip.Unzip">Unzip</a></big>   <small>in class Unzip</small></h4>
+<p>Unzip the named file</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>File<td><a target="_blank" href="https://developer.android.com/reference/java/lang/String.html">String</a><td>25<td>File to unzip</tr>
+</table>
+
+</div>
+</body>
+
+<div style="background-color: #ccFFFF; margin-left: 60">
+<a name="com.appaapps/Unzip/run"/>
+<h4><big>run()</big> returns <big>void</big>   <small>in class Unzip</small></h4>
+<p>Unzip the named file</p>
+
+</div>
+</body>
+
+<div style="background-color: #FFccFF; margin-left: 60">
+<a name="com.appaapps/Unzip/failed"/>
+<h4><big>failed()</big> returns <big>void</big>   <small>in class Unzip</small></h4>
+<p>Report a failure during the unzip</p>
+
+</div>
+</body>
+
+<div style="background-color: #FFFFcc; margin-left: 60">
+<a name="com.appaapps/Unzip/finished"/>
+<h4><big>finished()</big> returns <big>void</big>   <small>in class Unzip</small></h4>
+<p>Report the unzip as finished</p>
+
+</div>
+</body>
+
+<div style="background-color: #CCccFF; margin-left: 60">
+<a name="com.appaapps/Unzip/zipEntry"/>
+<h4><big>zipEntry(<a target="_blank" href="https://developer.android.com/reference/java/lang/String.html">String</a>)</big> returns <big>void</big>   <small>in class Unzip</small></h4>
+<p>Override to process the content of each zip entry</p>
+
+<table border="1" cellspacing="20">
+<tr><th>Name<th>Type<th>Line<th>Description</tr>
+
+<tr><td>name<td><a target="_blank" href="https://developer.android.com/reference/java/lang/String.html">String</a><td>60<td>Name of zip file entry == file name</tr>
+</table>
 
 </div>
 </body>

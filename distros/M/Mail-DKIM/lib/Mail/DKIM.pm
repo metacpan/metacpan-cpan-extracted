@@ -4,7 +4,9 @@ use strict;
 use warnings;
 
 package Mail::DKIM;
-our $VERSION = 0.43;
+our $VERSION = 0.44;
+
+our $SORTTAGS = 0;
 
 1;
 __END__
@@ -48,6 +50,8 @@ It currently tries to implement these specifications:
 
 =item RFC4870, for DomainKeys
 
+=item draft-ietf-dmarc-arc-protocol-06, for ARC
+
 =back
 
 The module uses an object-oriented interface. You use one of
@@ -55,12 +59,24 @@ two different classes, depending on whether you are signing or verifying
 a message. To sign, use the L<Mail::DKIM::Signer> class. To verify, use
 the L<Mail::DKIM::Verifier> class. Simple, eh?
 
+Likewise for ARC, use the ARC modules L<Mail::DKIM::ARC::Signer> and
+L<Mail::DKIM::ARC::Verifier>
+
+If you're sending to test libraries which expect the tags in headers
+to be sorted, you can set $Mail::DKIM::SORTTAGS to a true value, and
+all created headers will get sorted keys
+
 =head1 SEE ALSO
 
 L<Mail::DKIM::Signer>,
 L<Mail::DKIM::Verifier>
 
+L<Mail::DKIM::ARC::Signer>,
+L<Mail::DKIM::ARC::Verifier>
+
 http://dkimproxy.sourceforge.net/
+
+https://github.com/fastmail/authentication_milter
 
 =head1 KNOWN BUGS
 
@@ -86,10 +102,12 @@ Jason Long, E<lt>jlong@messiah.eduE<gt>
 =head1 CONTRIBUTORS
 
 Marc Bradshaw, E<lt>marc@marcbradshaw.netE<gt>
+Bron Gondwana, E<lt>brong@fastmailteam.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
 Copyright (C) 2006-2007, 2009 by Messiah College
+Copyright (C) 2017 by FastMail Pty Ltd
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.6 or,

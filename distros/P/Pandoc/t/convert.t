@@ -5,8 +5,8 @@ use Pandoc;
 
 plan skip_all => 'pandoc executable required' unless pandoc;
 
-my $latex = pandoc->convert('html' => 'latex', '<em>hello</em>');
-is $latex, '\emph{hello}', 'html => latex';
+my $latex = pandoc->convert('html' => 'latex', '<em>hällo</em>');
+is $latex, '\emph{hällo}', 'html => latex';
 
 my $html = pandoc->convert('markdown' => 'html', '...', '--smart');
 is $html, '<p>…</p>', 'markdown => html';

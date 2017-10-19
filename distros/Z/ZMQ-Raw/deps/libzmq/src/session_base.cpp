@@ -113,6 +113,11 @@ zmq::session_base_t::session_base_t (class io_thread_t *io_thread_,
 {
 }
 
+const char *zmq::session_base_t::get_endpoint () const
+{
+    return engine->get_endpoint ();
+}
+
 zmq::session_base_t::~session_base_t ()
 {
     zmq_assert (!pipe);
@@ -183,13 +188,10 @@ int zmq::session_base_t::read_zap_msg (msg_t *msg_)
 
 int zmq::session_base_t::write_zap_msg (msg_t *msg_)
 {
-    if (zap_pipe == NULL) {
+    if (zap_pipe == NULL || !zap_pipe->write (msg_)) {
         errno = ENOTCONN;
         return -1;
     }
-
-    const bool ok = zap_pipe->write (msg_);
-    zmq_assert (ok);
 
     if ((msg_->flags () & msg_t::more) == 0)
         zap_pipe->flush ();
@@ -284,8 +286,10 @@ void zmq::session_base_t::read_activated (pipe_t *pipe_)
 
     if (likely (pipe_ == pipe))
         engine->restart_output ();
-    else
+    else {
+        // i.e. pipe_ == zap_pipe
         engine->zap_msg_available ();
+    }
 }
 
 void zmq::session_base_t::write_activated (pipe_t *pipe_)
@@ -318,21 +322,25 @@ void zmq::session_base_t::process_plug ()
         start_connecting (false);
 }
 
+//  This functions can return 0 on success or -1 and errno=ECONNREFUSED if ZAP
+//  is not setup (IE: inproc://zeromq.zap.01 does not exist in the same context)
+//  or it aborts on any other error. In other words, either ZAP is not
+//  configured or if it is configured it MUST be configured correctly and it
+//  MUST work, otherwise authentication cannot be guaranteed and it would be a
+//  security flaw.
 int zmq::session_base_t::zap_connect ()
 {
-    zmq_assert (zap_pipe == NULL);
+    if (zap_pipe != NULL)
+        return 0;
 
     endpoint_t peer = find_endpoint ("inproc://zeromq.zap.01");
     if (peer.socket == NULL) {
         errno = ECONNREFUSED;
         return -1;
     }
-    if (peer.options.type != ZMQ_REP
-    &&  peer.options.type != ZMQ_ROUTER
-    &&  peer.options.type != ZMQ_SERVER) {
-        errno = ECONNREFUSED;
-        return -1;
-    }
+    zmq_assert (peer.options.type == ZMQ_REP ||
+            peer.options.type == ZMQ_ROUTER ||
+            peer.options.type == ZMQ_SERVER);
 
     //  Create a bi-directional pipe that will connect
     //  session with zap socket.
@@ -350,12 +358,12 @@ int zmq::session_base_t::zap_connect ()
 
     send_bind (peer.socket, new_pipes [1], false);
 
-    //  Send empty identity if required by the peer.
-    if (peer.options.recv_identity) {
+    //  Send empty routing id if required by the peer.
+    if (peer.options.recv_routing_id) {
         msg_t id;
         rc = id.init ();
         errno_assert (rc == 0);
-        id.set_flags (msg_t::identity);
+        id.set_flags (msg_t::routing_id);
         bool ok = zap_pipe->write (&id);
         zmq_assert (ok);
         zap_pipe->flush ();
@@ -368,7 +376,7 @@ bool zmq::session_base_t::zap_enabled ()
 {
     return (
          options.mechanism != ZMQ_NULL ||
-        (options.mechanism == ZMQ_NULL && options.zap_domain.length() > 0)
+         !options.zap_domain.empty()
     );
 }
 
@@ -427,14 +435,22 @@ void zmq::session_base_t::engine_error (
 
     switch (reason) {
         case stream_engine_t::timeout_error:
+            /* FALLTHROUGH */
         case stream_engine_t::connection_error:
-            if (active)
+            if (active) {
                 reconnect ();
-            else
-                terminate ();
-            break;
+                break;
+            }
+            /* FALLTHROUGH */
         case stream_engine_t::protocol_error:
-            terminate ();
+            if (pending) {
+                if (pipe)
+                    pipe->terminate (0);
+                if (zap_pipe)
+                    zap_pipe->terminate (0);
+            } else {
+                terminate ();
+            }
             break;
     }
 
@@ -508,6 +524,11 @@ void zmq::session_base_t::reconnect ()
         pipe->terminate (false);
         terminating_pipes.insert (pipe);
         pipe = NULL;
+
+        if (has_linger_timer) {
+            cancel_timer (linger_timer_id);
+            has_linger_timer = false;
+        }
     }
 
     reset ();
@@ -515,10 +536,15 @@ void zmq::session_base_t::reconnect ()
     //  Reconnect.
     if (options.reconnect_ivl != -1)
         start_connecting (true);
+    else {
+        std::string *ep = new (std::string);
+        addr->to_string (*ep);
+        send_term_endpoint (socket, ep);
+    }
 
     //  For subscriber sockets we hiccup the inbound pipe, which will cause
     //  the socket object to resend all the subscriptions.
-    if (pipe && (options.type == ZMQ_SUB || options.type == ZMQ_XSUB))
+    if (pipe && (options.type == ZMQ_SUB || options.type == ZMQ_XSUB || options.type == ZMQ_DISH))
         pipe->hiccup ();
 }
 

@@ -26,7 +26,7 @@
     asm ("mulq %3\n\t"              /* mul a*b -> rdx:rax */
          "divq %4\n\t"              /* (a*b)/c -> quot in rax remainder in rdx */
          :"=a"(dummy), "=&d"(d)     /* output */
-         :"a"(a), "rm"(b), "rm"(n)  /* input */
+         :"a"(a), "r"(b), "r"(n)    /* input */
          :"cc"                      /* mulq and divq can set conditions */
         );
     return d;
@@ -41,15 +41,15 @@
 
   /* addmod from Kruppa 2010 page 67 */
   static INLINE UV _addmod(UV a, UV b, UV n) {
-    UV r = a+b;
     UV t = a-n;
+    a += b;
     asm ("add %2, %1\n\t"    /* t := t + b */
-         "cmovc %1, %0\n\t"  /* if (carry) r := t */
-         :"+r" (r), "+&r" (t)
-         :"rm" (b)
+         "cmovc %1, %0\n\t"  /* if (carry) a := t */
+         :"+r" (a), "+&r" (t)
+         :"r" (b)
          :"cc"
         );
-    return r;
+    return a;
   }
   #define addmod(a,b,n) _addmod(a,b,n)
 

@@ -8,7 +8,7 @@ package Devel::MAT::Dumpfile;
 use strict;
 use warnings;
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 use Carp;
 use IO::Handle;   # ->read
@@ -56,7 +56,7 @@ foreach (
    [ incgv           => "+the INC GV" ],
    [ statgv          => "+the stat GV" ],
    [ statname        => "+the statname SV" ],
-   [ tmpsv           => "+the temporary SV" ],
+   [ tmpsv           => "-the temporary SV" ],
    [ defgv           => "+the default GV" ],
    [ argvgv          => "-the ARGV GV" ],
    [ argvoutgv       => "+the argvout GV" ],
@@ -541,6 +541,13 @@ Returns a key/value pair list giving the names and SVs at each of the roots.
 Returns a key/value pair list giving the names and SVs at each of the roots
 that count as strong references.
 
+=head2 roots_weak
+
+   %roots = $df->roots_weak
+
+Returns a key/value pair list giving the names and SVs at each of the roots
+that count as strong references.
+
 =cut
 
 sub _roots
@@ -559,6 +566,12 @@ sub roots_strong
 {
    my $self = shift;
    return pairmap { $a =~ m/^\+(.*)/ ? ( $1 => $b ) : () } $self->_roots;
+}
+
+sub roots_weak
+{
+   my $self = shift;
+   return pairmap { $a =~ m/^\-(.*)/ ? ( $1 => $b ) : () } $self->_roots;
 }
 
 =head2 ROOTS

@@ -27,5 +27,5 @@ requires:
   warnings: 0
 resources:
   repository: https://github.com/wreis/Business-OnlinePayment-Iridium.git
-version: 1.01
+version: 1.03
 x_serialization_backend: 'YAML::Tiny version 1.51'

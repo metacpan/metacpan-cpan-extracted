@@ -33,11 +33,12 @@ and show how to use the API.
   }
 
 =cut
+
 use warnings; use strict;
 use Term::ReadLine::Perl5::readline;
 no warnings 'once';
 
-our $VERSION = '1.43';
+our $VERSION = '1.45';
 
 use Carp;
 eval "use rlib '.' ";  # rlib is now optional
@@ -46,6 +47,8 @@ use Term::ReadLine::Perl5::OO;
 use Term::ReadLine::Perl5::OO::History;
 use Term::ReadLine::Perl5::Tie;
 use Term::ReadLine::Perl5::readline;
+
+use vars qw($editMode);
 
 if (require Term::ReadLine) {
     our @ISA = qw(Term::ReadLine::Stub Exporter);
@@ -116,6 +119,7 @@ returns the actual package that executes the commands. If this package
 is used, the value is C<Term::ReadLine::Perl5>.
 
 =cut
+
 sub ReadLine {'Term::ReadLine::Perl5'}
 
 
@@ -138,6 +142,15 @@ sub readline {
   &Term::ReadLine::Perl5::readline::readline(@_);
 }
 
+sub editModeFromShell() {
+    my @shell_settings = `$ENV{'SHELL'} -c 'set -o'`;
+    my $use_vi = grep /vi\ton\n/, @shell_settings;
+    return $use_vi ? 'vicmd' : 'emacs';
+}
+
+$editMode = 'emacs';
+eval {$editMode = editModeFromShell};
+
 =head3 new
 
 B<new>(I<$name>,[I<IN>[,I<OUT>]])
@@ -157,6 +170,7 @@ At present, because this code has lots of global state, we currently don't
 support more than one readline instance.
 
 =cut
+
 sub new {
     my $class = shift;
     if (require Term::ReadLine) {
@@ -172,9 +186,14 @@ sub new {
 	    name => $name,
 	    in   => $in,
 	    out  => $out,
+	    editMode => $editMode,
 	};
 	return Term::ReadLine::Perl5::OO->new($opts);
     }
+    Term::ReadLine::Perl5::readline::preinit($editMode);
+    Term::ReadLine::Perl5::readline::init();
+
+
     shift; # Package name
     if (@_) {
 	if ($term) {
@@ -207,12 +226,16 @@ sub new {
 	$Term::ReadLine::Perl5::readline::term_IN = shift;
 	$Term::ReadLine::readline::term_OUT = shift
     }
+    # FIXME? In https://github.com/rocky/p5-Term-ReadLine-Perl5/pull/12
+    # aferreira notes that the below should probably be something like
+    # $term = bless [$Term::ReadLine::readline::term_IN,
+    #                $Term::ReadLine::readline::term_OUT];
     # The following is here since it is mostly used for perl input:
     # $readline::rl_basic_word_break_characters .= '-:+/*,[])}';
     $term = bless [$readline::term_IN,$readline::term_OUT];
     my $self = {
-	'IN'  => $readline::term_IN,
-	'OUT' => $readline::term_OUT,
+	'IN'  => $Term::ReadLine::Perl5::readline::term_IN,
+	'OUT' => $Term::ReadLine::Perl5::readline::term_OUT,
     };
     bless $self, $class;
 
@@ -231,10 +254,12 @@ sub new {
 
 =head3 IN
 
-B<Term::ReadLine::Perl5-E<gt>IN>
+    $term->IN
 
-Returns the input filehandle
+Returns the input filehandle or C<undef>.
+
 =cut
+
 sub IN {
     my ($self) = @_;
     $self->{IN};
@@ -242,10 +267,12 @@ sub IN {
 
 =head3 OUT
 
-B<Term::ReadLine::Perl5-E<gt>OUT>
+        $term->OUT
 
-Returns the output filehandle
+Returns the output filehandle or C<undef>.
+
 =cut
+
 sub OUT {
     my ($self) = @_;
     $self->{OUT};
@@ -258,7 +285,9 @@ B<Term::ReadLine::Perl5-E<gt>newTTY>(I<IN>, I<OUT>)
 
 takes two arguments which are input filehandle and output filehandle.
 Switches to use these filehandles.
+
 =cut
+
 sub newTTY($$$) {
   my ($self, $in, $out) = @_;
   $Term::ReadLine::Perl5::readline::term_IN   = $self->{'IN'}  = $in;
@@ -276,7 +305,9 @@ If B<$minlength> is given, set C<$readline::minlength> the minimum
 length a $line for it to go into the readline history.
 
 The previous value is returned.
+
 =cut
+
 sub MinLine($;$) {
     my $old = $minlength;
     $minlength = $_[1] if @_ == 2;
@@ -334,6 +365,7 @@ number of lines.
 I<StifleHistory> is an alias for this function.
 
 =cut
+
 ### FIXME: stifle_history is still here because it updates $attribs.
 ## Pass a reference?
 sub stifle_history($$) {
@@ -438,4 +470,5 @@ select this among other compatible GNU Readline packages.
 =back
 
 =cut
+
 1;

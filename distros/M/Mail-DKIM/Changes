@@ -1,6 +1,10 @@
 This file summarizes what's changed between releases of Mail-DKIM.
 See the ChangeLog file for the details.
 
+Version 0.44
+
+ * Added experimental support for ARC
+
 Version 0.43
 
  * Update tests for new DNS setup

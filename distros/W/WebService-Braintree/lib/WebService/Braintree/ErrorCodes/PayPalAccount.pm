@@ -1,6 +1,7 @@
 package WebService::Braintree::ErrorCodes::PayPalAccount;
-$WebService::Braintree::ErrorCodes::PayPalAccount::VERSION = '0.93';
-use strict;
+$WebService::Braintree::ErrorCodes::PayPalAccount::VERSION = '0.94';
+use 5.010_001;
+use strictures 1;
 
 use constant CannotCloneTransactionWithPayPalAccount => "91573";
 use constant CannotVaultOneTimeUsePayPalAccount      => "82902";
@@ -15,6 +16,7 @@ use constant PayPalCommunicationError                => "92910";
 use constant TokenIsInUse                            => "92906";
 
 1;
+__END__
 
 
 

@@ -1,5 +1,7 @@
 package Mail::POP3::Folder::maildir;
 
+our @ISA = qw(Mail::POP3::Folder);
+
 use strict;
 use Fcntl ':flock';
 

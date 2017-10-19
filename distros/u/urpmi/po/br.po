@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: urpmi\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2014-09-13 21:15+0200\n"
-"PO-Revision-Date: 2013-05-08 16:30+0200\n"
+"PO-Revision-Date: 2017-07-17 20:49+0200\n"
 "Last-Translator: Thierry Vignaud <tvignaud@mandriva.com>\n"
 "Language-Team: Breton <LL@li.org>\n"
 "Language: br\n"
@@ -925,7 +925,7 @@ msgstr "o lemel pakadoù staliet (%s)"
 #: ../urpm/main_loop.pm:185
 #, c-format
 msgid "Try to continue anyway?"
-msgstr ""
+msgstr "Klask adarre memestra?"
 
 #: ../urpm/main_loop.pm:236
 #, c-format
@@ -948,9 +948,9 @@ msgid "Try installation without checking dependencies?"
 msgstr "Klask staliañ hep sell ouzh an ezhommoù ?"
 
 #: ../urpm/main_loop.pm:299
-#, fuzzy, c-format
+#, c-format
 msgid "Try harder to install (--force)?"
-msgstr "evit staliañ %s"
+msgstr "Klask kreñvoc'h evit staliañ (--force) ?"
 
 #: ../urpm/main_loop.pm:590
 #, c-format
@@ -1101,9 +1101,9 @@ msgid "retrieving media.cfg file..."
 msgstr "o tigas ar restr media.cfg ..."
 
 #: ../urpm/media.pm:1250
-#, fuzzy, c-format
+#, c-format
 msgid "trying to select nonexistent medium \"%s\""
-msgstr "o skrivañ restr ar roll evit ar mediom « %s »"
+msgstr "o klask dibab restr ar mediom « %s » ha n'eus ket anezhañ"
 
 #: ../urpm/media.pm:1253
 #, c-format
@@ -1253,7 +1253,7 @@ msgstr "sac'het eo bet degas [%s]"
 #: ../urpm/mirrors.pm:34 ../urpm/mirrors.pm:60
 #, c-format
 msgid "trying again with mirror %s"
-msgstr ""
+msgstr "o klask adarre gant ar melezour « %s »"
 
 #: ../urpm/mirrors.pm:112
 #, c-format

@@ -1,0 +1,28 @@
+{
+    "totalItemCount": 1,
+    "pageCount": 1,
+    "size": 100,
+    "_links": {
+        "self": {
+            "href": "/api/bag/?query=1011PZ&filters[huisnummer]=1"
+        }
+    },
+    "_embedded": {
+        "adres": [
+            {
+                "huisletter": "",
+                "huisnummer": "1",
+                "huisnummertoevoeging": "",
+                "openbareruimtenaam": "Muiderstraat",
+                "postcode": "1011PZ",
+                "url": "1011pz-muiderstraat-1",
+                "woonplaatsnaam": "Amsterdam",
+                "_links": {
+                    "self": {
+                        "href": "/api/bag/1011pz-muiderstraat-1"
+                    }
+                }
+            }
+        ]
+    }
+}

@@ -1,6 +1,7 @@
 package WebService::Braintree::ErrorCodes::Transaction;
-$WebService::Braintree::ErrorCodes::Transaction::VERSION = '0.93';
-use strict;
+$WebService::Braintree::ErrorCodes::Transaction::VERSION = '0.94';
+use 5.010_001;
+use strictures 1;
 
 use constant AmountCannotBeNegative                            => "81501";
 use constant AmountFormatIsInvalid                             => "81503";
@@ -79,3 +80,4 @@ use constant TypeIsRequired                                    => "91524";
 use constant UnsupportedVoiceAuthorization                     => "91539";
 
 1;
+__END__

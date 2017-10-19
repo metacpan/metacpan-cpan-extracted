@@ -1,7 +1,7 @@
 # ABSTRACT: Utilities for Monitoring ElasticSearch
 package App::ElasticSearch::Utilities;
 
-our $VERSION = '5.3'; # VERSION
+our $VERSION = '5.4'; # VERSION
 
 use strict;
 use warnings;
@@ -494,7 +494,15 @@ sub es_indices {
                     next unless $index =~ /$p->{re}/;
                 }
                 debug({indent=>2},"= name checks succeeded");
-                if( $args{check_dates} && defined $DEF{DAYS} ) {
+
+                if ($args{older} && defined $DEF{DAYS}) {
+                    debug({indent=>2,color=>"yellow"}, "+ checking to see if index is older than $DEF{DAYS} days.");
+                    my $days_old = es_index_days_old( $index );
+                    if ($days_old < $DEF{DAYS}) {
+                        next;
+                    }
+                }
+                elsif( $args{check_dates} && defined $DEF{DAYS} ) {
                     debug({indent=>2,color=>"yellow"}, "+ checking to see if index is in the past $DEF{DAYS} days.");
 
                     my $days_old = es_index_days_old( $index );
@@ -712,12 +720,11 @@ sub es_delete_index {
 sub es_optimize_index {
     my($index) = @_;
 
-    return es_request('_optimize',{
+    return es_request('_forcemerge',{
             method    => 'POST',
             index     => $index,
             uri_param => {
                 max_num_segments => 1,
-                wait_for_merge   => 0,
             },
     });
 }
@@ -817,7 +824,7 @@ App::ElasticSearch::Utilities - Utilities for Monitoring ElasticSearch
 
 =head1 VERSION
 
-version 5.3
+version 5.4
 
 =head1 SYNOPSIS
 
@@ -1283,7 +1290,7 @@ This is free software, licensed under:
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alexey Shatlovsky Surikov Daniel Ostermeier Jason Rojas Kang-min Liu Samit Badle Takumi Sakamoto
+=for stopwords Alexey Shatlovsky Surikov Daniel Ostermeier Jason Rojas Kang-min Liu Lisa Hare Markus Linnala Samit Badle Takumi Sakamoto
 
 =over 4
 
@@ -1306,6 +1313,14 @@ Jason Rojas <jason.rojas@mgo.com>
 =item *
 
 Kang-min Liu <gugod@gugod.org>
+
+=item *
+
+Lisa Hare <lhare@inview.co.uk>
+
+=item *
+
+Markus Linnala <Markus.Linnala@cybercom.com>
 
 =item *
 

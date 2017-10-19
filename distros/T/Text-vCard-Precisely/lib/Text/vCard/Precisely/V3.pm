@@ -1,7 +1,7 @@
 # ABSTRACT: turns baubles into trinkets
 package Text::vCard::Precisely::V3;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use 5.8.9;
 
@@ -393,8 +393,7 @@ coerce 'TimeStamp'
     => via {
         my ( $s, $m, $h, $d, $M, $y ) = gmtime($_);
         return sprintf '%4d-%02d-%02dT%02d:%02d:%02dZ', $y + 1900, $M + 1, $d, $h, $m, $s
-    };
-coerce 'TimeStamp'
+    }
     => from 'ArrayRef[HashRef]'
     => via { $_->[0]{content} };
 has rev => ( is => 'rw', isa => 'TimeStamp', coerce => 1 );
@@ -420,32 +419,28 @@ To specify the components of the name of the object the vCard represents.
 
 =cut
 
-subtype 'N'
-    => as 'Text::vCard::Precisely::V3::Node::N';
-coerce 'N'
-    => from 'HashRef[Maybe[Ref]|Maybe[Str]]'
-    => via {
+subtype 'N' => as 'Text::vCard::Precisely::V3::Node::N';
+coerce 'N',
+    from 'HashRef[Maybe[Ref]|Maybe[Str]]',
+    via {
         my %param;
         while( my ($key, $content) = each %$_ ) {
             $param{$key} = $content if $content;
         }
         return Text::vCard::Precisely::V3::Node::N->new(\%param);
-    };
-coerce 'N'
-    => from 'HashRef[Maybe[Str]]'
-    => via { Text::vCard::Precisely::V3::Node::N->new($_) };
-coerce 'N'
-    => from 'ArrayRef[Maybe[Str]]'
-    => via { Text::vCard::Precisely::V3::Node::N->new({
+    },
+    from 'HashRef[Maybe[Str]]',
+    via { Text::vCard::Precisely::V3::Node::N->new($_) },
+    from 'ArrayRef[Maybe[Str]]',
+    via { Text::vCard::Precisely::V3::Node::N->new({
         family      => $_->[0] || '',
         given       => $_->[1] || '',
         additional  => $_->[2] || '',
         prefixes    => $_->[3] || '',
         suffixes    => $_->[4] || '',
-    }) };
-coerce 'N'
-    => from 'Str'
-    => via { Text::vCard::Precisely::V3::Node::N->new({ content => [split /(?<!\\);/, $_] }) };
+    }) },
+    from 'Str',
+    via { Text::vCard::Precisely::V3::Node::N->new({ content => [split /(?<!\\);/, $_] }) };
 has n => ( is => 'rw', isa => 'N', coerce => 1 );
 
 =head3 tel()
@@ -460,15 +455,13 @@ has n => ( is => 'rw', isa => 'N', coerce => 1 );
 =cut
 
 subtype 'Tels' => as 'ArrayRef[Text::vCard::Precisely::V3::Node::Tel]';
-coerce 'Tels'
-    => from 'Str'
-    => via { [ Text::vCard::Precisely::V3::Node::Tel->new({ content => $_ }) ] };
-coerce 'Tels'
-    => from 'HashRef'
-    => via { [ Text::vCard::Precisely::V3::Node::Tel->new($_) ] };
-coerce 'Tels'
-    => from 'ArrayRef[HashRef]'
-    => via { [ map { Text::vCard::Precisely::V3::Node::Tel->new($_) } @$_ ] };
+coerce 'Tels',
+    from 'Str',
+    via { [ Text::vCard::Precisely::V3::Node::Tel->new({ content => $_ }) ] },
+    from 'HashRef',
+    via { [ Text::vCard::Precisely::V3::Node::Tel->new($_) ] },
+    from 'ArrayRef[HashRef]',
+    via { [ map { Text::vCard::Precisely::V3::Node::Tel->new($_) } @$_ ] };
 has tel => ( is => 'rw', isa => 'Tels', coerce => 1 );
 
 =head3 adr(), address()
@@ -492,12 +485,11 @@ Accepts/returns an ArrayRef that looks like:
 =cut
 
 subtype 'Address' => as 'ArrayRef[Text::vCard::Precisely::V3::Node::Address]';
-coerce 'Address'
-    => from 'HashRef'
-    => via { [ Text::vCard::Precisely::V3::Node::Address->new($_) ] };
-coerce 'Address'
-    => from 'ArrayRef[HashRef]'
-    => via { [ map { Text::vCard::Precisely::V3::Node::Address->new($_) } @$_ ] };
+coerce 'Address',
+    from 'HashRef',
+    via { [ Text::vCard::Precisely::V3::Node::Address->new($_) ] },
+    from 'ArrayRef[HashRef]',
+    via { [ map { Text::vCard::Precisely::V3::Node::Address->new($_) } @$_ ] };
 has adr => ( is => 'rw', isa => 'Address', coerce => 1 );
 
 =head3 email()
@@ -516,15 +508,13 @@ or accept the string as email like below
 =cut
 
 subtype 'Email' => as 'ArrayRef[Text::vCard::Precisely::V3::Node::Email]';
-coerce 'Email'
-    => from 'Str'
-    => via { [ Text::vCard::Precisely::V3::Node::Email->new({ content => $_ }) ] };
-coerce 'Email'
-    => from 'HashRef'
-    => via { [ Text::vCard::Precisely::V3::Node::Email->new($_) ] };
-coerce 'Email'
-    => from 'ArrayRef[HashRef]'
-    => via { [ map { Text::vCard::Precisely::V3::Node::Email->new($_) } @$_ ] };
+coerce 'Email',
+    from 'Str',
+    via { [ Text::vCard::Precisely::V3::Node::Email->new({ content => $_ }) ] },
+    from 'HashRef',
+    via { [ Text::vCard::Precisely::V3::Node::Email->new($_) ] },
+    from 'ArrayRef[HashRef]',
+    via { [ map { Text::vCard::Precisely::V3::Node::Email->new($_) } @$_ ] };
 has email => ( is => 'rw', isa => 'Email', coerce => 1 );
 
 =head3 url()
@@ -543,33 +533,30 @@ or accept the string as URL like below
 =cut
 
 subtype 'URLs' => as 'ArrayRef[Text::vCard::Precisely::V3::Node::URL]';
-coerce 'URLs'
-    => from 'Str'
-    => via {
+coerce 'URLs',
+    from 'Str',
+    via {
         my $name = uc [split( /::/, [caller(2)]->[3] )]->[-1];
         return [Text::vCard::Precisely::V3::Node::URL->new({ name => $name, content => $_ })]
-    };
-coerce 'URLs'
-    => from 'HashRef[Str]'
-    => via  {
+    },
+    from 'HashRef[Str]',
+    via  {
         my $name = uc [split( /::/, [caller(2)]->[3] )]->[-1];
         return [ Text::vCard::Precisely::V3::Node::URL->new({
             name => $name,
             content => $_->{'content'}
         }) ]
-    };
-coerce 'URLs'
-    => from 'Object'    # Can't asign 'URI' or 'Object[URI]'
-    => via {
+    },
+    from 'Object',    # Can't asign 'URI' or 'Object[URI]'
+    via {
         my $name = uc [split( /::/, [caller(2)]->[3] )]->[-1];
         return [Text::vCard::Precisely::V3::Node::URL->new({
             name => $name,
             content => $_->as_string,
         })]
-    };
-coerce 'URLs'
-    => from 'ArrayRef[HashRef]'
-    => via  { [ map{ Text::vCard::Precisely::V3::Node::URL->new($_) } @$_ ] };
+    },
+    from 'ArrayRef[HashRef]',
+    via  { [ map{ Text::vCard::Precisely::V3::Node::URL->new($_) } @$_ ] };
 has url => ( is => 'rw', isa => 'URLs', coerce => 1 );
 
 =head3 photo(), logo()
@@ -581,45 +568,41 @@ Attention! Mac OS X and iOS B<ignore> the description beeing URL
 =cut
 
 subtype 'Photos' => as 'ArrayRef[Text::vCard::Precisely::V3::Node::Image]';
-coerce 'Photos'
-    => from 'HashRef'
-    => via  {
+coerce 'Photos',
+    from 'HashRef',
+    via {
         my $name = uc [split( /::/, [caller(2)]->[3] )]->[-1];
         return [ Text::vCard::Precisely::V3::Node::Image->new({
             name => $name,
             media_type => $_->{media_type} || $_->{type},
             content => $_->{content},
-        }) ] };
-coerce 'Photos'
-    => from 'ArrayRef[HashRef]'
-    => via  { [ map{
+        }) ] },
+    from 'ArrayRef[HashRef]',
+    via { [ map{
         if( ref $_->{types} eq 'ARRAY' ){
             ( $_->{media_type} ) = @{$_->{types}};
             delete $_->{types};
         }
         Text::vCard::Precisely::V3::Node::Image->new($_)
-    } @$_ ] };
-coerce 'Photos'
-    => from 'Str'   # when parse BASE64 encoded strings
-    => via  {
+    } @$_ ] },
+    from 'Str',   # when parse BASE64 encoded strings
+    via {
         my $name = uc [split( /::/, [caller(2)]->[3] )]->[-1];
         return [ Text::vCard::Precisely::V3::Node::Image->new({
             name => $name,
             content => $_,
         } ) ]
-    };
-coerce 'Photos'
-    => from 'ArrayRef[Str]'   # when parse BASE64 encoded strings
-    => via  {
+    },
+    from 'ArrayRef[Str]',   # when parse BASE64 encoded strings
+    via {
         my $name = uc [split( /::/, [caller(2)]->[3] )]->[-1];
         return [ map{ Text::vCard::Precisely::V3::Node::Image->new({
             name => $name,
             content => $_,
         }) } @$_ ]
-    };
-coerce 'Photos'
-    => from 'Object'   # when URI.pm is used
-    => via  { [ Text::vCard::Precisely::V3::Node::Image->new( { content => $_->as_string } ) ] };
+    },
+    from 'Object',   # when URI.pm is used
+    via { [ Text::vCard::Precisely::V3::Node::Image->new( { content => $_->as_string } ) ] };
 has [qw| photo logo |] => ( is => 'rw', isa => 'Photos', coerce => 1 );
 
 =head3 note()
@@ -653,25 +636,23 @@ To specify the formatted text corresponding to delivery address of the object th
 =cut
 
 subtype 'Node' => as 'ArrayRef[Text::vCard::Precisely::V3::Node]';
-coerce 'Node'
-    => from 'Str'
-    => via {
+coerce 'Node',
+    from 'Str',
+    via {
         my $name = uc [split( /::/, [caller(2)]->[3] )]->[-1];
         return [ Text::vCard::Precisely::V3::Node->new( { name => $name, content => $_ } ) ]
-    };
-coerce 'Node'
-    => from 'HashRef'
-    => via {
+    },
+    from 'HashRef',
+    via {
         my $name = uc [split( /::/, [caller(2)]->[3] )]->[-1];
         return [ Text::vCard::Precisely::V3::Node->new({
             name => $_->{'name'} || $name,
             types => $_->{'types'} || [],
             content => $_->{'content'} || croak "No value in HashRef!",
         }) ]
-    };
-coerce 'Node'
-    => from 'ArrayRef[HashRef]'
-    => via {
+    },
+    from 'ArrayRef[HashRef]',
+    via {
         my $name = uc [split( /::/, [caller(2)]->[3] )]->[-1];
         return [ map { Text::vCard::Precisely::V3::Node->new({
             name => $_->{'name'} || $name,
@@ -714,12 +695,11 @@ So it just supports some text values
 =cut
 
 subtype 'TimeZones' => as 'ArrayRef[DateTime::TimeZone]';
-coerce 'TimeZones'
-    => from 'ArrayRef'
-    => via {[ map{ DateTime::TimeZone->new( name => $_ ) } @$_ ]};
-coerce 'TimeZones'
-    => from 'Str'
-    => via {[ DateTime::TimeZone->new( name => $_ ) ]};
+coerce 'TimeZones',
+    from 'ArrayRef',
+    via {[ map{ DateTime::TimeZone->new( name => $_ ) } @$_ ]},
+    from 'Str',
+    via {[ DateTime::TimeZone->new( name => $_ ) ]};
 has tz =>  ( is => 'rw', isa => 'TimeZones', coerce => 1 );
 
 =head3 bday(), birthday()
@@ -759,12 +739,11 @@ There is no documents about X-SOCIALPROFILE in RFC but it works!
 =cut
 
 subtype 'SocialProfile' => as 'ArrayRef[Text::vCard::Precisely::V3::Node::SocialProfile]';
-coerce 'SocialProfile'
-    => from 'HashRef'
-    => via { [ Text::vCard::Precisely::V3::Node::SocialProfile->new($_) ] };
-coerce 'SocialProfile'
-    => from 'ArrayRef[HashRef]'
-    => via { [ map { Text::vCard::Precisely::V3::Node::SocialProfile->new($_) } @$_ ] };
+coerce 'SocialProfile',
+    from 'HashRef',
+    via { [ Text::vCard::Precisely::V3::Node::SocialProfile->new($_) ] },
+    from 'ArrayRef[HashRef]',
+    via { [ map { Text::vCard::Precisely::V3::Node::SocialProfile->new($_) } @$_ ] };
 has socialprofile => ( is => 'rw', isa => 'SocialProfile', coerce => 1 );
 
 __PACKAGE__->meta->make_immutable;

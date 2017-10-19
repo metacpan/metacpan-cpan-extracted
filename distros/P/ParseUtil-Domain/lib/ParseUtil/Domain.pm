@@ -1,5 +1,5 @@
 package ParseUtil::Domain;
-$ParseUtil::Domain::VERSION = '2.426';
+$ParseUtil::Domain::VERSION = '2.427';
 # VERSION
 
 require Exporter;

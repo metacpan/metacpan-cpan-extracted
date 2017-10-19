@@ -1,0 +1,181 @@
+Revision history for App-Anchr
+
+0.4.3 2017-10-14T14:28:01Z
+    - Add command `anchr localcor`
+    - PARTIAL_COVERED for `anchr cover`
+    - Add --jvm to trimlong
+
+0.4.2 2017-06-20T13:12:51Z
+    - Completely rewrite command cover
+    - Add JSON and Statistics::Descriptive as dep
+    - Skip duplicated daligner steps in overlap2
+    - Modify anchorLong pipeline
+        -  No more anchor.cover.fasta
+        - environment.json replaced anchor.cover.fasta.covered.yml
+
+0.4.1 2017-06-19T03:11:31Z
+    - Use jrange in command covered
+    - Parallelize paf2ovlp with MCE
+    - minimap and miniasm in .travis.yml
+
+0.4.0 2017-06-15T20:21:55Z
+    - Add command `anchr paf2ovlp`
+    - Add command `anchr trimlong`
+    - Add command `anchr scaffold`
+    - Remove command `anchr superreads`
+    - `anchr anchors`
+        - Swap <k_unitigs.fasta> <pe.cor.fa>
+        - Add coverage filter
+    - `anchr cover`
+        - Same --idt
+        - Add `--all` in `overlap2`
+    - Add create_ovlp_line() and parse_paf_line() to Common.pm
+    - Document .ovlp.tsv
+
+0.3.2 2017-05-21T05:06:24Z
+    - Get rid of picard and genomeCoverageBed, use bbmap.sh's build in basecov
+    - No longer depend on bedrolls and picard-tools
+    - Remove share/anchor.sh
+
+0.3.1 2017-05-20T14:36:23Z
+    - Make sr_stat.sh fitting environment.json
+    - Use `faops dazz` as we don't need original names in `anchr contained`
+    - share/anchor.sh replaced by `anchr anchors`
+
+0.3.0 2017-05-11T01:12:28Z
+    - No more anchor2
+    - Can incorporate SE reads
+    - Separate `quorum` and `kunitigs` out of `superreads`
+
+0.2.1 2017-05-04T16:04:27Z
+    - Dealing with branching nodes in `anchr merge`
+    - Skip finished steps in superreads.sh
+    - Merge pe.anchor2.fa into pe.anchr.fa
+
+0.2.0 2017-05-03T19:27:23Z
+    - Parallelise the sampling step
+    - Use json to save enviroments
+    - Different K values in superreads.sh
+    - Drop contained k_unitigs
+    - Merge k_unitigs before anchor.sh
+    - Add examples from NCBI Pathogen Detection project
+
+0.1.5 2017-04-22T16:04:51Z
+    - Specify dependency versions
+    - Improve documents
+    - Add GAGE-B examples
+    - Don't trim reads longer than 200 bp in `anchr superreads`
+    - Add step of tally
+
+0.1.4 2017-03-31T18:58:35Z
+    - `anchr trim` in cwd
+    - Treat cyclic nodes as non-overlapped in `anchr merge`
+
+0.1.3 2017-03-20T01:57:35Z
+    - Add --proportion to contained
+    - Add --keep to group
+    - Adjust pipeline and parameters
+
+0.1.2 2017-03-11T09:20:45Z
+    - `anchr break`
+    - Don't leave any anchors in overlap2 and group
+
+0.1.1 2017-03-09T09:04:52Z
+    - Add --max for maximum contained to cover
+    - Add --all to overlap2
+    - Dealing branching and cyclic nodes in layout
+    - Avoid "Invalid cross-device link"
+
+0.1.0 2017-03-05T12:42:53Z
+    - `anchr layout`
+    - Merge all read groups of E. coli
+    - Discard *long reads* multi-matched by anchors
+    - Filter short reads before dazzname
+
+0.0.19 2017-03-04T05:36:25Z
+    - Rename `anchr merge` to `anchr contained`
+    - `anchr orient` can be used in anchors
+    - Add a new `anchr merge` to merge oriented anchors
+    - Simplify anchor.sh
+
+0.0.18 2017-03-02T12:24:38Z
+    - `anchr merge`
+    - Add parse_ovlp_line(), poa_consensus(), and lcss() to Common.pm
+    - Move transitive_reduction() and g2gv() to Common.pm
+
+0.0.17 2017-02-26T14:33:14Z
+    - Add --restrict for `anchr orient`
+    - Skip anchors match to multiple parts of a long read
+    - Delete edges with different strands
+    - Default prefix 'read' for `anchr dazzname`
+
+0.0.16 2017-02-25T08:44:29Z
+    - `anchr restrict`
+    - Rename ovlpreplace to replace
+
+0.0.15 2017-02-25T08:06:14Z
+    - `anchr ovlpreplace`
+    - Limit max distance of linked anchors
+
+0.0.14 2017-02-24T09:45:25Z
+    - `anchr group`
+    - Add serial2name() to Common.pm
+    - Add GraphViz to dependancies
+
+0.0.13 2017-02-23T15:49:51Z
+    - `anchr cover`
+    - Find tempdir easier
+
+0.0.12 2017-02-22T17:56:27Z
+    - `anchr orient`
+    - Use tempdir as basename of dazz db
+
+0.0.11 2017-02-21T08:54:07Z
+    - `anchr overlap2`: calling `daligner` to detect overlaps between two files
+    - Document paralogs
+    - Switch to k-unitigs
+    - Add --start for dazzname
+    - Use `faops replace` to rename headers in FA files
+
+0.0.10 2017-02-17T08:38:42Z
+    - Discard any reads with subs
+    - Use superReadSequences.fasta or k_unitigs.fasta
+
+0.0.9 2017-02-14T20:59:08Z
+    - Install quorum and picard via Linuxbrew
+    - Move docs from sra
+    - Add quast in QA section
+    - `--noscythe` for trim
+    - Change quorum parameters
+    - Turn raw data stat to tables
+
+0.0.8 2017-02-11T21:48:05Z
+    - `anchr overlap`
+    - Merge stat 3 and 4 in `sr_stat.sh`
+    - exec_cmd() in App::Anchr::Common
+    - Remove dependencies on ~/Scripts/sra
+
+0.0.7 2017-02-11T05:33:40Z
+    - Keep original orders in `anchr dazzname`
+    - Merge stat 1 and 2 in `sr_stat.sh`
+
+0.0.6 2017-02-11T00:57:42Z
+    - `anchr superreads`
+
+0.0.5 2017-02-10T18:19:39Z
+    - `anchr trim`
+
+0.0.4 2017-02-09T02:02:06Z
+    - `anchr dazzname`
+    - `anchr show2ovlp`
+
+0.0.3 2017-02-08T22:59:37Z
+    - `anchr dep`
+
+0.0.2 2017-02-08T21:11:05Z
+    - Setup Travis
+
+0.0.1 2017-02-08T20:17:24Z
+    - Initial version
+    - `anchr help` works
+    - No real commands

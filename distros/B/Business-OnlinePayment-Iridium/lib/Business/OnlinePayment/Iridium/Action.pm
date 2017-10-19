@@ -123,7 +123,7 @@ Business::OnlinePayment::Iridium::Action - Send / receive data to / from PayVect
 
 =head1 VERSION
 
-version 1.01
+version 1.03
 
 =head2 SERVERS
 

@@ -37,14 +37,12 @@
 "use strict";
 
 define ([
-    'app/lib',
-    'target'
+    'app/entries',
+    'target',
 ], function (
-    appLib,
-    target
+    entries,
+    target,
 ) {
-
-    var entries = appLib.entries;
 
     return function () {
 
@@ -55,7 +53,7 @@ define ([
             'title': 'Privilege (status) history',
             'preamble': null,
             'aclProfile': 'passerby',
-            'entries': [entries.ePnick, entries.pHeffective, entries.pHpriv],
+            'entriesRead': [entries.ePnick, entries.pHeffective, entries.pHpriv],
             'miniMenu': {
                 entries: ['actionPrivHistoryEdit']
             }
@@ -68,11 +66,12 @@ define ([
             'title': 'Schedule history',
             'preamble': null,
             'aclProfile': 'passerby',
-            'entries': [entries.pHeffective, entries.sDid, entries.sDcode],
+            'entriesRead': [entries.pHeffective, entries.sDid, entries.sDcode],
             'miniMenu': {
                 entries: ['actionSchedHistoryEdit']
             }
         });
 
     };
+
 });

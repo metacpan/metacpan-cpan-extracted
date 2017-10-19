@@ -37,16 +37,7 @@ sub run ($self) {
 
 sub _on_accept ( $self, $fh, $host, $port ) {
     Pcore::AE::Handle->new(
-        fh      => $fh,
-        tls_ctx => {
-            cache           => 1,
-            verify          => 0,
-            verify_peername => undef,
-            sslv2           => 1,
-            dh              => undef,              # Diffie-Hellman is disabled
-            key_file        => $self->key_file,
-            cert_file       => $self->cert_file,
-        },
+        fh       => $fh,
         on_error => sub ( $h, $fatal, $reason ) {
             return;
         },
@@ -60,7 +51,17 @@ sub _on_accept ( $self, $fh, $host, $port ) {
 
                                 $h->push_write("HTTP/1.1 200 OK${CRLF}${CRLF}");
 
-                                $h->starttls('accept');
+                                $h->starttls(
+                                    'accept',
+                                    {   cache           => 1,
+                                        verify          => undef,
+                                        verify_peername => undef,
+                                        sslv2           => 1,
+                                        dh              => undef,              # Diffie-Hellman is disabled
+                                        key_file        => $self->key_file,
+                                        cert_file       => $self->cert_file,
+                                    }
+                                );
 
                                 $h->read_http_req_headers(
                                     sub ( $h, $env, $error ) {
@@ -215,10 +216,10 @@ sub _proxy_req ( $self, $url, $env, $body, $cb ) {
         url               => $url,
         headers           => { map { $_ => $env->{$_} } grep {/\AHTTP_/sm} keys $env->%* },
         accept_compressed => 0,
-        recurse           => 0,
+        max_redirects     => 0,
         body              => $body,
         tls_ctx           => undef,
-        on_finish         => sub ($res) {
+        sub ($res) {
             $res->headers->{CONTENT_LENGTH} = length( $res->body ? $res->body->$* : q[] );
             $res->headers->{CONNECTION} = 'close';
             delete $res->headers->{TRANSFER_ENCODING};
@@ -235,15 +236,13 @@ sub _proxy_req ( $self, $url, $env, $body, $cb ) {
 }
 
 sub _return_res ( $self, $h, $res ) {
-    if ($res) {
-        my $buf = "HTTP/1.1 $res->{status} $res->{reason}" . $CRLF;
+    my $buf = "HTTP/1.1 $res->{status} $res->{reason}" . $CRLF;
 
-        $buf .= $res->headers->to_string . $CRLF;
+    $buf .= $res->headers->to_string . $CRLF;
 
-        $buf .= $res->body->$* if $res->body;
+    $buf .= $res->body->$* if $res->body;
 
-        $h->push_write($buf);
-    }
+    $h->push_write($buf);
 
     $h->destroy;
 

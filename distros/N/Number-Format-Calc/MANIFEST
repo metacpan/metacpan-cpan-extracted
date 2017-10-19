@@ -9,3 +9,5 @@ t/t2.t
 t/t3.t
 t/t4.t
 Makefile.PL
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

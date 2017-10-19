@@ -157,6 +157,7 @@ sub _set_up_logging {
     Log::Any::Adapter->set( 'File', $log_file );
     my $message = "Logging to $log_file";
     print "$message\n";
+    print "MREST_DEBUG_MODE is set to " . ( $site->MREST_DEBUG_MODE || 0 ) . "\n";
     $log->info( $message );
 
     if ( ! $site->MREST_APPNAME ) {

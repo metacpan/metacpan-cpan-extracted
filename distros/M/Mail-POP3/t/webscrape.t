@@ -1,16 +1,12 @@
 use strict;
-use Test::More tests => 11;
+use Test::More;
 
 use File::Temp;
 
-END {ok(0, 'loaded') unless $::loaded;}
-use Mail::POP3;
-use Mail::POP3::Folder::webscrape;
-$::loaded = 1;
-ok(1, 'loaded');
+use_ok 'Mail::POP3';
+use_ok 'Mail::POP3::Folder::webscrape';
 
-my %CONFIG;
-%CONFIG = (
+my %CONFIG = (
   msgid1 => '928F11260DD14DF7@jobserve.com',
   msgid2 => 'B1D9F6EA1A27AE23@jobserve.com',
   msgid3 => '9B214739A40DA63B@jobserve.com',
@@ -279,3 +275,5 @@ ok($mailbox->is_valid(2) and $mailbox->is_valid(3), 'reset');
 $mailbox->delete(2);
 
 ok(($mailbox->is_deleted(2) and !$mailbox->is_deleted(3)), 'is_deleted');
+
+done_testing;

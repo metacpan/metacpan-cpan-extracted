@@ -1,9 +1,12 @@
 package WebService::Braintree::Transaction::Type;
-$WebService::Braintree::Transaction::Type::VERSION = '0.93';
-use strict;
+$WebService::Braintree::Transaction::Type::VERSION = '0.94';
+use 5.010_001;
+use strictures 1;
 
 use constant Sale => "sale";
 use constant Credit => "credit";
 
 use constant All => [Sale, Credit];
+
 1;
+__END__

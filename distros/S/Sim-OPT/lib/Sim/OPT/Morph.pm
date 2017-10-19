@@ -25,6 +25,8 @@ use Sim::OPT::Report;
 use Sim::OPT::Descend;
 use Sim::OPT::Takechance;
 use Sim::OPT::Modish;
+use Devel::Trace;
+Devel::Trace::trace('on');  # Enable
 #use Parallel::ForkManager;
 #use Scalar::Utils qw( looks_like_number );
 #$Data::Dumper::Indent = 0;
@@ -57,7 +59,7 @@ decreasearray deg2rad_ rad2deg_ purifyarray replace_nth rotate2dabs rotate2d rot
 gatherseparators supercleanarray modish $max_processes
 ); # our @EXPORT = qw( );
 
-$VERSION = '0.63.19'; # our $VERSION = '';
+$VERSION = '0.63.27'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Morph is a morphing program for performing parametric variations on model descriptions for simulation programs.';
 
 ################################################# MORPH          
@@ -906,7 +908,8 @@ sub morph
 										my $countt = 1;
 										foreach my $inst ( @nondone_instances )
 										{ 
-											say $tee "FINALLY ACTING ON \@nondone_instances : " . dump( @nondone_instances ) .  "BY LOOPING THROUGH \@todolist : " . dump( @todolist );;
+											#say $tee "FINALLY ACTING ON \@nondone_instances : " . dump( @nondone_instances ) .  "BY LOOPING THROUGH \@todolist : " . dump( @todolist );;
+											say $tee "FINALLY ACTING ON \@nondone_instances BY LOOPING THROUGH \@todolist : " . dump( @todolist );
 											
 											
 											$countt++;

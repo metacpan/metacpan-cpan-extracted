@@ -11,4 +11,8 @@ BEGIN
 
 diag("Testing Clone::Choose $Clone::Choose::VERSION, Perl $], $^X");
 
+my $backend = Clone::Choose->backend;
+
+diag("Using backend $backend version " . $backend->VERSION);
+
 done_testing;

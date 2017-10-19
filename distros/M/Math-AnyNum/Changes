@@ -1,5 +1,9 @@
 Revision history for Math-AnyNum
 
+0.16    2017-10-17
+
+        - Fixed the numification of signed and unsigned integers close to the native integer limits.
+
 0.15    2017-10-08
 
         - Bug-fix in `gcd(x, -y)` and `lcm(x, -y)`, when `y` is a native integer.

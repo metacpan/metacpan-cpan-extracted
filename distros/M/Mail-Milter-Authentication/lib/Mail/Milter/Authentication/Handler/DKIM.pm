@@ -2,7 +2,7 @@ package Mail::Milter::Authentication::Handler::DKIM;
 use strict;
 use warnings;
 use base 'Mail::Milter::Authentication::Handler';
-use version; our $VERSION = version->declare('v1.1.3');
+use version; our $VERSION = version->declare('v1.1.4');
 
 use Data::Dumper;
 use English qw{ -no_match_vars };
@@ -19,6 +19,7 @@ sub default_config {
         'check_adsp'        => 1,
         'show default_adsp' => 0,
         'adsp_hide_none'    => 0,
+        'extra_properties'  => 0,
     };
 }
 
@@ -236,6 +237,7 @@ sub eom_callback {
 
                 my $key_size = 0;
                 my $key_type = q{};
+                my $selector = eval{ $signature->selector } || q{};
                 eval {
                     my $key = $signature->get_public_key();
                     $key_size = $key->size();
@@ -257,7 +259,6 @@ sub eom_callback {
                 } );
 
                 if ( $type eq 'domainkeys' ) {
-                    ## DEBUGGING
                     if ( $self->show_domainkeys() ) {
                         my $header = join(
                             q{ },
@@ -271,6 +272,16 @@ sub eom_callback {
                             $self->format_header_entry( 'header.d', $signature->domain() ),
                             $self->format_header_entry( 'header.b', substr( $signature->data(), 0, 8 ) ),
                         );
+                        if ( $config->{'extra_properties'} ) {
+                            $header = join(
+                                q{ },
+                                $header,
+                                $self->format_header_entry( 'x-bits', $key_size ),
+                                $self->format_header_entry( 'x-keytype', $key_type ),
+                                $self->format_header_entry( 'x-algorithm', $hash_algorithm ),
+                                $self->format_header_entry( 'x-selector', $selector ),
+                            );
+                        }
                         $self->add_auth_header($header);
                         }
                 }
@@ -288,6 +299,16 @@ sub eom_callback {
                         $self->format_header_entry( 'header.i', $signature->identity() ),
                         $self->format_header_entry( 'header.b', substr( $signature->data(), 0, 8 ) ),
                     );
+                    if ( $config->{'extra_properties'} ) {
+                        $header = join(
+                            q{ },
+                            $header,
+                            $self->format_header_entry( 'x-bits', $key_size ),
+                            $self->format_header_entry( 'x-keytype', $key_type ),
+                            $self->format_header_entry( 'x-algorithm', $hash_algorithm ),
+                            $self->format_header_entry( 'x-selector', $selector ),
+                        );
+                    }
                     $self->add_auth_header($header);
                 }
             }
@@ -419,7 +440,8 @@ Module for validation of DKIM and DomainKeys signatures, and application of ADSP
             "hide_domainkeys"   : 0,                    | Hide any DomainKeys results
             "check_adsp"        : 1,                    | Also check for ADSP
             "show_default_adsp" : 0,                    | Show the default ADSP result
-            "adsp_hide_none"    : 0                     | Hide auth ADSP if the result is 'none'
+            "adsp_hide_none"    : 0,                    | Hide auth ADSP if the result is 'none'
+            "extra_properties"  : 0                     | Add extra properties (not to rfc) relating to key and selector
         },
 
 =head1 SYNOPSIS

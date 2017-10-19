@@ -1,7 +1,7 @@
 package Mojolicious::Plugin::Check;
 use Mojo::Base 'Mojolicious::Plugin';
 
-our $VERSION        = '0.02';
+our $VERSION        = '0.03';
 
 sub register {
     my ($self, $app, $conf) = @_;
@@ -35,12 +35,12 @@ sub register {
         my $actions      = $c->stash->{$conf->{stash_actions}}          //= [];
 
         for my $args ( @$actions ) {
-            my $name = shift @$args;
+            my ($name, @opts) = @$args;
 
             my $checker = $checkers->{ $name };
             next unless $checker;
 
-            my @result = $checker->( @$args );
+            my @result = $checker->( @opts );
 
             if( @result ) {
                 if( defined $result[0] ) {

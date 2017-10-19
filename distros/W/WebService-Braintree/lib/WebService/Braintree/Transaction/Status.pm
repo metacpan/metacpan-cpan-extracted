@@ -1,6 +1,7 @@
 package WebService::Braintree::Transaction::Status;
-$WebService::Braintree::Transaction::Status::VERSION = '0.93';
-use strict;
+$WebService::Braintree::Transaction::Status::VERSION = '0.94';
+use 5.010_001;
+use strictures 1;
 
 use constant AuthorizationExpired => 'authorization_expired';
 use constant Authorizing => 'authorizing';
@@ -31,3 +32,4 @@ use constant All => (
 );
 
 1;
+__END__

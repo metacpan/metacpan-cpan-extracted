@@ -10,6 +10,7 @@ sub new {
 	$self->{NAME} = $self->{data_info};
 	for (my $i = 0; $i < @$data_info; ++$i) {
 		$self->{NAME_hash}{$data_info->[$i]} = $i;
+		$self->{NAME_lc_hash}{lc $data_info->[$i]} = $i;
 	}
 	$self->{TYPE} = [0 x @$data_info];
 	bless $self, $class;

@@ -1,5 +1,5 @@
 package WebService::Naver::TTS;
-$WebService::Naver::TTS::VERSION = 'v0.0.1';
+$WebService::Naver::TTS::VERSION = 'v0.0.2';
 use utf8;
 use strict;
 use warnings;
@@ -111,7 +111,7 @@ sub speaker {
     $self->{speaker} = $speaker;
 }
 
-=head2 tts($text)
+=head2 tts($text, %tmp_opts?)
 
     my $mp3 = $client->tts('안녕하세요');
 
@@ -119,19 +119,39 @@ C<$mp3> is L<Path::Tiny/"tempfile, tempdir"> obj.
 
 C<$mp3> is C<undef> if failed.
 
+C<%tmp_opts> is L<File::Temp> options.
+
+=over
+
+=item *
+
+  DIR => $dir
+
+=item *
+
+  SUFFIX => '.dir'
+
+=item *
+
+  TMPDIR => 1
+
+default is C<1>
+
+=back
+
 =cut
 
 our $URL = "https://openapi.naver.com/v1/voice/tts.bin";
 
 sub tts {
-    my ( $self, $text ) = @_;
+    my ( $self, $text, %tmp_opts ) = @_;
     return unless $text;
 
     my $res = $self->{http}->post_form( $URL, { speaker => $self->{speaker}, speed => $self->{speed}, text => $text } );
 
     die "Failed to convert text($text) to speech file: $res->{reason}\n" unless $res->{success};
 
-    my $temp = Path::Tiny->tempfile;
+    my $temp = Path::Tiny->tempfile(%tmp_opts);
     $temp->spew_raw( $res->{content} );
     return $temp;
 }

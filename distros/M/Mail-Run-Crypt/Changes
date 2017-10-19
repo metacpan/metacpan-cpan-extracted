@@ -1,0 +1,37 @@
+Revision history for Perl module Mail::Run::Crypt
+
+This project began life as a monolithic Perl script. It does much the
+same thing now but it's refactored out into an application and a module.
+
+0.07 2017-10-18
+
+ - Expand test suite a little more to test that encrypt-and-sign mode
+   objects are created correctly, and that both key ID and passphrase
+   have to be provided for the object to build.
+
+0.06 2017-10-18
+
+ - Expand test suite's test of constructed object's state. Much more
+   work is still needed as I figure out how to mock up the object
+   interfaces required without spraying email everywhere or requiring
+   system commands to be run.
+
+0.05 2017-10-15
+
+ - Backport to Perl v5.8.1
+
+0.04 2017-10-14
+
+ - Another documentation fix
+
+0.03 2017-10-14
+
+ - Several more documentation fixes
+
+0.02 2017-10-14
+
+ - Lots of documentation fixes and reformatting
+
+0.01 2017-10-05
+
+ - First perlmodded release, refactoring and rewriting much older code.

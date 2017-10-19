@@ -5,7 +5,7 @@ use warnings;
 
 # ABSTRACT: Data store to support Net::LDAP::SimpleServer
 
-our $VERSION = '0.0.17';    # VERSION
+our $VERSION = '0.0.18';    # VERSION
 
 use 5.010;
 use Carp qw/carp croak/;
@@ -100,11 +100,11 @@ sub list {    ## no critic
 
 1;            # Magic true value required at end of module
 
-
+__END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
@@ -112,7 +112,7 @@ Net::LDAP::SimpleServer::LDIFStore - Data store to support Net::LDAP::SimpleServ
 
 =head1 VERSION
 
-version 0.0.17
+version 0.0.18
 
 =head1 SYNOPSIS
 
@@ -196,7 +196,7 @@ Alexei Znamensky <russoz@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Alexei Znamensky.
+This software is copyright (c) 2012 - 2017 by Alexei Znamensky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -230,8 +230,3 @@ SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
 DAMAGES.
 
 =cut
-
-
-__END__
-
-

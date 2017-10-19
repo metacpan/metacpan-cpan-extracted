@@ -1,5 +1,15 @@
 Revision history for Devel-MAT
 
+0.30    2017-10-14 20:00:58
+        [CHANGES]
+         * Migrate `pmat-sizes` and `pmat-find-pv` stand-alone scripts into
+           Tool commands
+         * Move the 'io find' tool to 'find io'
+
+        [BUGFIXES]
+         * Correct handling of strong vs weak root references in inref_graph
+           method and 'identify' command (fixes RT123233)
+
 0.29    2017-10-11 21:16:12
         [CHANGES]
          * Slightly more efficient file loading by combining some steps

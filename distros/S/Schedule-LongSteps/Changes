@@ -1,9 +1,102 @@
 ==================================================
-Changes from 2016-08-18 00:00:00 +0000 to present.
+Changes from 2016-10-18 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.017 at 2017-08-18 10:21:58 +0000
+version 0.020 at 2017-10-18 09:36:01 +0000
+------------------------------------------
+
+  Change: ef75f521db61a6c9c51ea53ec0e7ce7120cfd113
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-10-18 10:09:27 +0000
+
+    Updated doc 
+
+  Change: 5a2595179f0baf5b7746f58716e02b946a3bd42d
+  Author: Jerome Eteve <jeteve@users.noreply.github.com>
+  Date : 2017-10-17 16:43:53 +0000
+
+    Merge pull request #13 from skinnyjeans/dynamo
+
+    DynamoDB storage. 
+
+  Change: 119784941cc5989b8030ce89349d87272ea7bcc2
+  Author: Mohammad S Anwar <Mohammad.Anwar@yahoo.com>
+  Date : 2017-10-17 14:50:03 +0000
+
+    - Auto generate META.json using dzil plugin [MetaJSON] as suggested
+    by CPANTS. (#14) 
+
+  Change: 230783f6c632f45326c3e2fbcbc5a9e23edb7df9
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-10-17 11:46:06 +0000
+
+    run_at_day and run_at are now ISO8601 strings 
+
+  Change: b6364c2144e3d9d65a65a0fc69f9c6949559eda5
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-10-16 23:05:19 +0000
+
+    Fullblown test uses local dynamoDB too 
+
+  Change: 1bc46f6c9a42cc09f5c211345f4e0e7df908a6b2
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-10-16 21:52:00 +0000
+
+    Use a local dynamoDB in travis 
+
+  Change: 8920fd046f2e7b58aa76ff4675cd7fbf9e135839
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-10-16 18:20:52 +0000
+
+    DynamoDB storage works 
+
+  Change: 4c43f5c87b083c531192d7adeb8bbd420af4640b
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-10-13 17:43:35 +0000
+
+    Can store and retrieve process from dynamoDB 
+
+  Change: 58b06cff72f4a6a71194ede97664dd4b6319011e
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-10-12 18:19:38 +0000
+
+    On the way to real implementation 
+
+  Change: 275603f8bd28355d238d3d49f071eb3c17371762
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-10-12 17:40:39 +0000
+
+    DynamoDB creates itself 
+
+  Change: fc8e204b7687378f38078448f42faf54d66473af
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-10-11 18:40:17 +0000
+
+    Seed dynamoDB storage 
+
+------------------------------------------
+version 0.019 at 2017-10-17 10:54:04 +0000
+------------------------------------------
+
+  Change: 3e332bfe8513d10effaf9aa0e598fdd6e4bc6e19
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-10-17 11:54:04 +0000
+
+    No transaction around getting due processes for DBIxClass storage 
+
+------------------------------------------
+version 0.018 at 2017-10-13 15:24:16 +0000
+------------------------------------------
+
+  Change: 195ae5ef991efdac3a1ecfb9d7243b18376cf935
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-10-13 16:24:16 +0000
+
+    More logging 
+
+------------------------------------------
+version 0.017 at 2017-08-18 10:21:49 +0000
 ------------------------------------------
 
   Change: 0fb2c9e47855d8c9316f87fffc9ee1cc988092f1
@@ -104,53 +197,6 @@ version 0.015 at 2017-04-13 16:21:48 +0000
 
     Use strict 
 
-------------------------------------------
-version 0.014 at 2016-10-10 14:46:48 +0000
-------------------------------------------
-
-  Change: 8078089b9be76499307c00b4fe044dfcdacbb031
-  Author: Jerome Eteve <jerome@broadbean.com>
-  Date : 2016-10-10 15:46:48 +0000
-
-    Added error trimming 
-
-------------------------------------------
-version 0.013 at 2016-09-30 14:09:44 +0000
-------------------------------------------
-
-  Change: 1763a2c2ff39a050b73dca62d1a83b48be4d028c
-  Author: Jerome Eteve <jerome@broadbean.com>
-  Date : 2016-09-30 15:09:44 +0000
-
-    More robust run grabbing 
-
-------------------------------------------
-version 0.012 at 2016-09-29 15:20:00 +0000
-------------------------------------------
-
-  Change: 0871e571c3963d176e1892d58e19a43800811981
-  Author: Jerome Eteve <jerome@broadbean.com>
-  Date : 2016-09-29 16:20:00 +0000
-
-    Make FOR UPDATE real with a transaction 
-
-------------------------------------------
-version 0.011 at 2016-09-26 17:36:38 +0000
-------------------------------------------
-
-  Change: d9fc6e7ad5b8f5364e583ba2379bf2129af67a01
-  Author: Jerome Eteve <jerome@broadbean.com>
-  Date : 2016-09-26 18:36:38 +0000
-
-    Cache travis 
-
-  Change: 568798474e071c72812e056f99723ace3ca65a2f
-  Author: Jerome Eteve <jerome@broadbean.com>
-  Date : 2016-09-26 18:30:37 +0000
-
-    Fixed AutoDBIx to work when a transaction is started externally on
-    the DBH 
-
 =================================================
-Plus 10 releases after 2016-08-18 00:00:00 +0000.
+Plus 14 releases after 2016-10-18 00:00:00 +0000.
 =================================================

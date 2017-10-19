@@ -1,0 +1,81 @@
+In order to run these tests you need a file named 'sandbox_config.json' in the current directory.
+The file is formatted thusly:
+
+{
+  "public_key": "xxx",
+  "merchant_id": "xxx",
+  "private_key": "xxx"
+}
+
+You also need to have created elements in the control panel. These items are
+verified by test preambles, but the description of how to create them is here.
+
+Add-ons:
+Create these by going to Recurring Billing > Add-ons / Discounts (left-side)
+    * id=increase_30
+      name="Increase 30"
+      description="" (default)
+      amount=30.00
+      duration=subscription
+
+Discounts:
+Create these by going to Recurring Billing > Add-ons / Discounts (left-side)
+    * id=discount_15
+      name="Discount 15"
+      description="" (default)
+      amount=15.00
+      duration=subscription
+
+Subscription Plans:
+Create these by going to Recurring Billing > Plans (left-side menu)
+    * id=integration_trialless_plan
+      name="Integration Trialless Plan"
+      description="" (default)
+      price=12.34
+      include_trial_period=No (default)
+      billing_cycle_every=1
+      first_bill_date=immediately (default)
+      billing_cycles=never_expires (default)
+      No addons
+      No discounts
+    * id=integration_plan_with_add_ons_and_discounts
+      name="Integration Plan with Add-ons and Discounts"
+      description="" (default)
+      price=1.00
+      include_trial_period=Yes
+          * trial_period=1 day
+      billing_cycle_every=1
+      first_bill_date=immediately (default)
+      billing_cycles=never_expires (default)
+      addons:
+          * increase_30
+      discounts:
+          * discount_15
+
+Merchant Accounts:
+Create these by going to Settings > Processing (top-side menu). Scroll to the
+bottom to the "Merchant Accounts" section.
+    * id=sandbox_master_merchant_account
+      default=Yes
+      accept_paypal=Yes
+
+NOTE: You must have a Marketplace account. The Marketplace features are only
+enabled for US sandbox accounts. To have a Marketplace account, you have to have
+selected "United States" as your country when signing up for your account. Then,
+you can sign up for your sandbox with Marketplace features enabled.
+
+Custom Fields:
+Create these by going to Settings > Processing (top-side menu). Scroll down to
+"Transactions" and you'll see "Custom Fields". Click on "Options" (tiny green
+text on the right), then click "+ Add" (tiny green text in the upper right).
+    * id=store_me
+      display_name="Store Me"
+
+Unfortunately, there is no way to verify the custom fields have been created via
+the API, so TestHelper->verify_sandbox() cannot catch this error.
+
+Transaction Descriptors:
+You will need to have "dynamic descriptors" enabled for your account. There is
+currently no way to determine if dynamic descriptors are enabled for an account
+other than to ask Braintree support. To enable dynamic descriptors, you will
+need to contact Braintree support.

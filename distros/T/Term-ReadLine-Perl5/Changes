@@ -1,5 +1,18 @@
 Release history for Perl module Term::ReadLine::Perl5
 
+1.45 2017-10-18
+
+- Fixes from Adriano Ferreira
+  * merge OO history into global history
+  * fix t/10test-readline.t
+
+1.44 2017-10-17
+
+- Fix small but in setting $term->IN and $term->OUT.
+  Thanks to Adriano Ferreira
+- vi editmode stuff
+git commit --amend -m"Get ready for release $TRP5_VERSION" .- Doc IN and OUT better
+
 1.43 2015-06-19
 
 - Add IN and OUT methods as part of the Term::ReadLine spec, and

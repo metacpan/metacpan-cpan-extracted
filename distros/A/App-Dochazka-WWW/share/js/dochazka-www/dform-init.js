@@ -1,22 +1,22 @@
-// ************************************************************************* 
+// *************************************************************************
 // Copyright (c) 2014-2017, SUSE LLC
-// 
+//
 // All rights reserved.
-// 
+//
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
-// 
+//
 // 1. Redistributions of source code must retain the above copyright notice,
 // this list of conditions and the following disclaimer.
-// 
+//
 // 2. Redistributions in binary form must reproduce the above copyright
 // notice, this list of conditions and the following disclaimer in the
 // documentation and/or other materials provided with the distribution.
-// 
+//
 // 3. Neither the name of SUSE LLC nor the names of its contributors may be
 // used to endorse or promote products derived from this software without
 // specific prior written permission.
-// 
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 // AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 // IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@
 // CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-// ************************************************************************* 
+// *************************************************************************
 //
 // app/dform-init.js
 //
@@ -39,8 +39,8 @@
 define ([
     'current-user',
     'lib',
-    'app/lib',
     'app/emp-lib',
+    'app/entries',
     'app/rest-lib',
     'app/sched-lib',
     'app/prototypes',
@@ -48,16 +48,14 @@ define ([
 ], function (
     currentUser,
     coreLib,
-    appLib,
     empLib,
+    entries,
     restLib,
     schedLib,
     prototypes,
     target
 ) {
 
-    var entries = appLib.entries;
-    
     return function () {
 
         target.push('empProfile', {
@@ -69,9 +67,10 @@ define ([
             'aclProfile': 'passerby',
             'entriesRead': [entries.ePfullname, entries.ePnick,
                 entries.ePsec_id, entries.ePemail, entries.ePremark,
+                coreLib.emptyLineEntry,
                 entries.ePpriv, entries.ePprivEffective,
+                coreLib.emptyLineEntry,
                 entries.ePsched, entries.ePschedEffective],
-            'entriesWrite': [],
             'miniMenu': {
                 entries: ['empProfileEdit', 'ldapSync']
             }
@@ -100,7 +99,6 @@ define ([
             'title': 'Look up an LDAP employee',
             'preamble': 'Enter employee nick for exact (case insensitive) match',
             'aclProfile': 'active',
-            'entriesRead': null,
             'entriesWrite': [entries.ePnick],
             'rememberState': true,
             'miniMenu': {
@@ -116,7 +114,6 @@ define ([
             'aclProfile': 'active',
             'entriesRead': [entries.ePfullname, entries.ePnick,
                 entries.ePsec_id, entries.ePemail, entries.LDAPdochazka],
-            'entriesWrite': [],
             'miniMenu': {
                 entries: ['ldapSync']
             }
@@ -129,7 +126,6 @@ define ([
             'title': 'Search Dochazka employees',
             'preamble': 'Enter search key, % is wildcard',
             'aclProfile': 'admin',
-            'entriesRead': null,
             'entriesWrite': [entries.sEnick],
             'miniMenu': {
                 entries: ['actionEmplSearch']
@@ -188,7 +184,6 @@ define ([
             'title': 'Look up schedule by code or ID',
             'preamble': 'Enter a schedule code or ID (must be an exact match)',
             'aclProfile': 'passerby',
-            'entriesRead': null,
             'entriesWrite': [entries.sScode, entries.sSid],
             'rememberState': true,
             'miniMenu': {
@@ -207,7 +202,6 @@ define ([
                             entries.sDtue, entries.sDwed, entries.sDthu,
                             entries.sDfri, entries.sDsat, entries.sDsun,
                             coreLib.emptyLineEntry, entries.ePremark],
-            'entriesWrite': null,
             'miniMenu': {
                 entries: ['schedEdit', 'schedDelete']
             }
@@ -248,7 +242,6 @@ define ([
                                 entries.sDtue, entries.sDwed, entries.sDthu,
                                 entries.sDfri, entries.sDsat, entries.sDsun,
                                 coreLib.emptyLineEntry, entries.ePremark],
-                'entriesWrite': null,
                 'miniMenu': {
                     entries: ['schedReallyDelete']
                 }
@@ -294,6 +287,87 @@ define ([
                 entries: ['createSchedule']
             }
         }); // schedNewCustom
+
+        target.push('createSingleInt', {
+            'name': 'createSingleInt',
+            'type': 'dform',
+            'menuText': 'Single interval',
+            'title': 'Create a single interval',
+            'preamble': 'Enter date in format YYYY-MM-DD<br>' +
+                        'Enter time range using 24hr format, example 11:30-15:00<br>' +
+                        'Description is optional',
+            'aclProfile': 'active',
+            'entriesWrite': [entries.iNdate, entries.iNtimerange, entries.iNact, entries.iNdesc,],
+            'rememberState': true,
+            'miniMenu': {
+                entries: ['selectActivityAction', 'createSingleIntSave']
+            }
+        }); // createSingleInt
+
+        target.push('createLastPlusOffset', {
+            // before doing any calculations, look up:
+            // - employee's schedule
+            // - schedule intervals on date
+            // - existing intervals on date
+            // timerange start will be:
+            // - end of last existing interval, if there are existing intervals
+            // - start of first schedule interval, if there are schedule intervals
+            // - 00:00 otherwise
+            // timerange end will be timerange start plus offset
+            'name': 'createLastPlusOffset',
+            'type': 'dform',
+            'menuText': "Last plus offset",
+            'title': "Create interval \"last plus offset\"",
+            'aclProfile': 'active',
+            'entriesRead': [entries.iNdate, entries.iNact, entries.iNdesc,
+                            entries.iNschedintvls, entries.iNlastexistintvl, entries.iNlastplusoffset,],
+            'miniMenu': {
+                entries: ['createLastPlusOffsetSave'],
+            }
+        }); // createLastPlusOffset
+
+        target.push('createNextScheduled', {
+            // before doing any calculations, look up/calculate:
+            // - employee's schedule
+            // - existing intervals on date
+            // - schedule intervals on date
+            // timerange will be:
+            // - first schedule interval that does not conflict/overlap with an existing interval
+            'name': 'createNextScheduled',
+            'type': 'dform',
+            'menuText': "Next scheduled",
+            'title': "Create interval \"next scheduled\"",
+            'aclProfile': 'active',
+            'entriesRead': [entries.iNdate, entries.iNact, entries.iNdesc,
+                            entries.iNschedintvls, entries.iNlastexistintvl, entries.iNnextscheduled,],
+            'miniMenu': {
+                entries: ['createNextScheduledSave'],
+            }
+        }); // createNextScheduled
+
+        target.push('createMultipleInt', {
+            'name': 'createMultipleInt',
+            'type': 'dform',
+            'menuText': 'Multiple intervals',
+            'title': 'Fill up a period with intervals',
+            'aclProfile': 'active',
+            'entriesRead': [entries.iNdate, entries.iNtimerange, entries.iNact, entries.iNdesc,],
+            'miniMenu': {
+                entries: ['fillUpAction']
+            }
+        }); // createMultipleInt
+
+        target.push('displaySingleInt', {
+            'name': 'displaySingleInt',
+            'type': 'dform',
+            'menuText': 'Single interval',
+            'title': 'Display a single interval',
+            'aclProfile': 'active',
+            'entriesRead': [entries.iNdaterange, entries.iNtimerange, entries.iNact, entries.iNdesc,],
+            'miniMenu': {
+                entries: []
+            }
+        }); // displaySingleInt
 
     }; // return function ()
     

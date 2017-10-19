@@ -8,7 +8,7 @@ require Exporter;
 *import = \&Exporter::import;
 require DynaLoader;
 
-$Math::NV::VERSION = '1.01';
+$Math::NV::VERSION = '1.02';
 
 DynaLoader::bootstrap Math::NV $Math::NV::VERSION;
 
@@ -99,11 +99,11 @@ sub is_eq {
     $first = substr($first, length($first) - 20, 20);
     my $second = scalar(reverse(unpack("h*", pack("F<", $check))));
     $second = substr($second, length($second) - 20, 20);
-    warn "In is_eq:\n$first vs $second\n\n";
+    warn "In is_eq:\nperl: $first vs C: $second\n\n";
   }
   else {
-    warn "In is_eq:\n",
-      scalar(reverse(unpack("h*", pack("F<", $nv)))), " vs ",
+    warn "In is_eq:\nperl: ",
+      scalar(reverse(unpack("h*", pack("F<", $nv)))), " vs C: ",
       scalar(reverse(unpack("h*", pack("F<", $check)))), "\n\n";
   }
 
@@ -138,11 +138,11 @@ sub is_eq_mpfr {
       $first = substr($first, length($first) - 20, 20);
       my $second = scalar(reverse(unpack("h*", pack("F<", Math::MPFR::Rmpfr_get_NV($fr, 0)))));
       $second = substr($second, length($second) - 20, 20);
-      warn "In is_eq_mpfr:\n$first vs $second\n\n";
+      warn "In is_eq_mpfr:\nperl: $first vs mpfr: $second\n\n";
     }
     else {
-      warn "In is_eq_mpfr:\n",
-        scalar(reverse(unpack("h*", pack("F<", $nv)))), " vs ",
+      warn "In is_eq_mpfr:\nperl: ",
+        scalar(reverse(unpack("h*", pack("F<", $nv)))), " vs mpfr: ",
         scalar(reverse(unpack("h*", pack("F<", Math::MPFR::Rmpfr_get_NV($fr, 0))))), "\n\n";
     }
   }
@@ -197,10 +197,18 @@ sub nv_mpfr {
   }
 
   if($bits == 113) {
-    die "No _f128_bytes with this version ($Math::MPFR::VERSION) - need at least 3.26"
-      unless $Math::MPFR::VERSION > 3.25;
-    my @bytes = Math::MPFR::_f128_bytes($_[0], 113);
-    return join('', @bytes);
+    my $t;
+    eval{$t = Math::MPFR::_have_IEEE_754_long_double();}; # needs Math-MPFR-3.33, perl-5.22.
+    if(!$@ && $t) {
+      my @bytes = Math::MPFR::_ld_bytes($_[0], 113);
+      return join('', @bytes);
+    }
+    else { # assume __float128 (though that might not be the case)
+      die "No _f128_bytes with this version ($Math::MPFR::VERSION) - need at least 3.26"
+        unless $Math::MPFR::VERSION > 3.25;
+      my @bytes = Math::MPFR::_f128_bytes($_[0], 113);
+      return join('', @bytes);
+    }
   }
 
   die "Unrecognized value for bits ($bits)";
@@ -291,9 +299,16 @@ Math::NV - compare the NV values that perl assigns with C and MPFR
     If $bits is not specified, it will be set to the value returned by
     mant_dig() - which is the appropriate value for the current perl
     that is being run.
-    Valid values for $bits are 53 (double), 64 (long double), 106
-    (double-double) and 113 (__float128). Other values will cause an
-    error.
+    Valid values for $bits are 53 (double), 64 (80-bit extended
+    precision long double), 106 (double-double) and 113 (128-bit quad
+    long double or __float128). Other values will cause an error.
+    If $bits is set to 113, the string will be treated as a 128-bit
+    IEEE 754 long double iff $Math::MPFR::VERSION >= 3.33 &&
+    $Config{longdblkind} is either 1 or 2. Otherwise the value of 113
+    will be taken to indicate __float128, though this is not
+    necessarily correct when $Math::MPFR::VERSION is less than 3.33 or
+    the version of perl itself is less than 5.22.
+
     Uses the mpfr library to assign the value represented by $str as a
     double or long double or double-double or __float128 (as determined
     by the value of $bits). It then returns a hex dump of the bytes that
@@ -406,7 +421,7 @@ Math::NV - compare the NV values that perl assigns with C and MPFR
 
    This program is free software; you may redistribute it and/or modify
    it under the same terms as Perl itself.
-   Copyright 2013-15 Sisyphus
+   Copyright 2013-16 Sisyphus
 
 
 =head1 AUTHOR

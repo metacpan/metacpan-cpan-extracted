@@ -1,9 +1,9 @@
 package Net::DNS::Nameserver;
 
 #
-# $Id: Nameserver.pm 1558 2017-04-03 11:38:22Z willem $
+# $Id: Nameserver.pm 1593 2017-09-04 14:23:26Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1558 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1593 $)[1];
 
 
 =head1 NAME
@@ -30,7 +30,7 @@ objects.  See L</EXAMPLE> for an example.
 
 =cut
 
-use constant USE_SOCKET_IP => defined eval 'use Socket 1.98; use IO::Socket::IP 0.32; 1;';
+use constant USE_SOCKET_IP => defined eval 'use Socket 1.97; use IO::Socket::IP 0.32; 1;';
 
 use constant USE_SOCKET_INET => defined eval 'require IO::Socket::INET';
 
@@ -574,7 +574,7 @@ could not be created.
 
 Attributes are:
 
-    LocalAddr		IP address on which to listen.	Defaults to INADDR_ANY.
+    LocalAddr		IP address on which to listen.	Defaults to loopback address.
     LocalPort		Port on which to listen.	Defaults to 53.
     ReplyHandler	Reference to reply-handling
 			subroutine			Required.
@@ -594,10 +594,8 @@ Attributes are:
 
 The LocalAddr attribute may alternatively be specified as a list of IP
 addresses to listen to.
-
-If IO::Socket::INET6 and Socket6 are available on the system you can
-also list IPv6 addresses and the default is '0' (listen on all interfaces on
-IPv6 and IPv4);
+If the IO::Socket::IP library package is available on the system
+this may also include IPv6 addresses.
 
 
 The ReplyHandler subroutine is passed the query name, query class,

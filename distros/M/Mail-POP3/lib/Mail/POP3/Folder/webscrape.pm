@@ -1,12 +1,53 @@
 package Mail::POP3::Folder::webscrape;
 
-# concepts:
-# a "listpage" is returned by the initial get_fill_submit which is parsed into:
-# a "listpage" is parsed into:
-# { items => \@items, pageno => $pageno, num_pages => $num_pages,
-#      nextlink => $nextlink, }
-# an "item" is +{ id => $id, url => $url, }
-# the item url points to a "page" which is parsed into
+our @ISA = qw(Mail::POP3::Folder);
+
+=head1 CONCEPTS
+
+=over
+
+=item a "listpage" is returned by the initial get_fill_submit which is parsed into:
+
+=item a "listpage" is parsed into:
+
+  { items => \@items, pageno => $pageno, num_pages => $num_pages,
+    nextlink => $nextlink, }
+
+=item an "item" is
+
+  +{ id => $id, url => $url, }
+
+=item the item url points to a "page" which is parsed into
+
+=back
+
+=head1 ADDITIONAL METHODS
+
+=head2 list_parse
+
+  ($text, $pageurl, $listre)
+
+=head2 one_parse
+
+Function:
+
+  ($text, $scrapespec, $scrapepostpro)
+
+=head2 parse_fill_submit
+
+Function:
+
+  ($cjar, $html, $real_url, $vars, $varnamechange)
+
+=head2 parse_refresh
+
+Parses out redirects done with C<< Refresh >> header.
+
+=head2 redirect_cookie_loop
+
+Gets web content, iterating through redirects while capturing cookies.
+
+=cut
 
 use strict;
 use HTML::Entities;

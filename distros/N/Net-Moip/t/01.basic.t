@@ -11,7 +11,7 @@ sub post {
 
     Test::More::is(
         $url,
-        'https://api.moip.com.br/ws/alpha/EnviarInstrucao/Unica',
+        'https://www.moip.com.br/ws/alpha/EnviarInstrucao/Unica',
         'requesting the proper url'
     );
 
@@ -42,7 +42,7 @@ sub post {
 sub is_success { 1 }
 
 sub content {
-    return q{<ns1:EnviarInstrucaoUnicaResponse xmlns:ns1="http://api.moip.com.br/ws/alpha/"><Resposta><ID>201410290037405090000006256931</ID><Status>Sucesso</Status><Token>I2T011T4Q1L0V23910N0W3I71410U5P0E9I02010C0G0U0K6Z285U6Q9D3L1</Token></Resposta></ns1:EnviarInstrucaoUnicaResponse>};
+    return q{<ns1:EnviarInstrucaoUnicaResponse xmlns:ns1="https://www.moip.com.br/ws/alpha/"><Resposta><ID>201410290037405090000006256931</ID><Status>Sucesso</Status><Token>I2T011T4Q1L0V23910N0W3I71410U5P0E9I02010C0G0U0K6Z285U6Q9D3L1</Token></Resposta></ns1:EnviarInstrucaoUnicaResponse>};
 }
 
 package main;
@@ -61,7 +61,7 @@ can_ok $moip, qw( sandbox api_url );
 
 is(
     $moip->api_url,
-    'https://api.moip.com.br/ws/alpha/EnviarInstrucao/Unica',
+    'https://www.moip.com.br/ws/alpha/EnviarInstrucao/Unica',
     'default Net::Moip object points to production'
 );
 

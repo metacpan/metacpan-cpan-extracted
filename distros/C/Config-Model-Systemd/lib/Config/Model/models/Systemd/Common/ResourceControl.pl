@@ -422,6 +422,107 @@ prefixed with C<BlockIO> or C<StartupBlockIO>.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
+      'IPAccounting',
+      {
+        'description' => "Takes a boolean argument. If true, turns on IPv4 and IPv6 network traffic accounting for packets sent
+or received by the unit. When this option is turned on, all IPv4 and IPv6 sockets created by any process of
+the unit are accounted for. When this option is used in socket units, it applies to all IPv4 and IPv6 sockets
+associated with it (including both listening and connection sockets where this applies). Note that for
+socket-activated services, this configuration setting and the accounting data of the service unit and the
+socket unit are kept separate, and displayed separately. No propagation of the setting and the collected
+statistics is done, in either direction. Moreover, any traffic sent or received on any of the socket unit's
+sockets is accounted to the socket unit \x{2014} and never to the service unit it might have activated, even if the
+socket is used by it. Note that IP accounting is currently not supported for slice units, and enabling this
+option for them has no effect. The system default for this setting may be controlled with
+C<DefaultIPAccounting> in
+L<systemd-system.conf(5)>.",
+        'type' => 'leaf',
+        'value_type' => 'boolean',
+        'write_as' => [
+          'no',
+          'yes'
+        ]
+      },
+      'IPAddressAllow',
+      {
+        'description' => "Turn on address range network traffic filtering for packets sent and received over AF_INET and AF_INET6
+sockets.  Both directives take a space separated list of IPv4 or IPv6 addresses, each optionally suffixed
+with an address prefix length (separated by a C</> character). If the latter is omitted, the
+address is considered a host address, i.e. the prefix covers the whole address (32 for IPv4, 128 for IPv6).
+
+The access lists configured with this option are applied to all sockets created by processes of this
+unit (or in the case of socket units, associated with it). The lists are implicitly combined with any lists
+configured for any of the parent slice units this unit might be a member of. By default all access lists are
+empty. When configured the lists are enforced as follows:
+
+In order to implement a whitelisting IP firewall, it is recommended to use a
+C<IPAddressDeny>C<any> setting on an upper-level slice unit (such as the
+root slice -.slice or the slice containing all system services
+system.slice \x{2013} see
+L<systemd.special(7)> for
+details on these slice units), plus individual per-service C<IPAddressAllow> lines
+permitting network access to relevant services, and only them.
+
+Note that for socket-activated services, the IP access list configured on the socket unit applies to
+all sockets associated with it directly, but not to any sockets created by the ultimately activated services
+for it. Conversely, the IP access list configured for the service is not applied to any sockets passed into
+the service via socket activation. Thus, it is usually a good idea, to replicate the IP access lists on both
+the socket and the service unit, however it often makes sense to maintain one list more open and the other
+one more restricted, depending on the usecase.
+
+If these settings are used multiple times in the same unit the specified lists are combined. If an
+empty string is assigned to these settings the specific access list is reset and all previous settings undone.
+
+In place of explicit IPv4 or IPv6 address and prefix length specifications a small set of symbolic
+names may be used. The following names are defined:
+
+Note that these settings might not be supported on some systems (for example if eBPF control group
+support is not enabled in the underlying kernel or container manager). These settings will have no effect in
+that case. If compatibility with such systems is desired it is hence recommended to not exclusively rely on
+them for IP security.",
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'IPAddressDeny',
+      {
+        'description' => "Turn on address range network traffic filtering for packets sent and received over AF_INET and AF_INET6
+sockets.  Both directives take a space separated list of IPv4 or IPv6 addresses, each optionally suffixed
+with an address prefix length (separated by a C</> character). If the latter is omitted, the
+address is considered a host address, i.e. the prefix covers the whole address (32 for IPv4, 128 for IPv6).
+
+The access lists configured with this option are applied to all sockets created by processes of this
+unit (or in the case of socket units, associated with it). The lists are implicitly combined with any lists
+configured for any of the parent slice units this unit might be a member of. By default all access lists are
+empty. When configured the lists are enforced as follows:
+
+In order to implement a whitelisting IP firewall, it is recommended to use a
+C<IPAddressDeny>C<any> setting on an upper-level slice unit (such as the
+root slice -.slice or the slice containing all system services
+system.slice \x{2013} see
+L<systemd.special(7)> for
+details on these slice units), plus individual per-service C<IPAddressAllow> lines
+permitting network access to relevant services, and only them.
+
+Note that for socket-activated services, the IP access list configured on the socket unit applies to
+all sockets associated with it directly, but not to any sockets created by the ultimately activated services
+for it. Conversely, the IP access list configured for the service is not applied to any sockets passed into
+the service via socket activation. Thus, it is usually a good idea, to replicate the IP access lists on both
+the socket and the service unit, however it often makes sense to maintain one list more open and the other
+one more restricted, depending on the usecase.
+
+If these settings are used multiple times in the same unit the specified lists are combined. If an
+empty string is assigned to these settings the specific access list is reset and all previous settings undone.
+
+In place of explicit IPv4 or IPv6 address and prefix length specifications a small set of symbolic
+names may be used. The following names are defined:
+
+Note that these settings might not be supported on some systems (for example if eBPF control group
+support is not enabled in the underlying kernel or container manager). These settings will have no effect in
+that case. If compatibility with such systems is desired it is hence recommended to not exclusively rely on
+them for IP security.",
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
       'DeviceAllow',
       {
         'cargo' => {
@@ -449,7 +550,7 @@ followed by a device group name, as listed in
 /proc/devices. The latter is useful to
 whitelist all current and future devices belonging to a
 specific device group at once. The device group is matched
-according to file name globbing rules, you may hence use the
+according to filename globbing rules, you may hence use the
 C<*> and C<?>
 wildcards. Examples: /dev/sda5 is a
 path to a device node, referring to an ATA or SCSI block
@@ -494,7 +595,7 @@ set this parameter directly for slice units.
 Special care should be taken when relying on the default slice assignment in templated service units
 that have C<DefaultDependencies=no> set, see
 L<systemd.service(5)>, section
-"Automatic Dependencies" for details.',
+"Default Dependencies" for details.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },

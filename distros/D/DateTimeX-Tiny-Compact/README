@@ -1,0 +1,66 @@
+NAME
+    DateTimeX::Tiny::Compact - DateTime::Tiny but uses less space
+
+VERSION
+    This document describes version 0.002 of DateTimeX::Tiny::Compact (from
+    Perl distribution DateTimeX-Tiny-Compact), released on 2017-10-19.
+
+SYNOPSIS
+      # Create a date manually
+      $christmas = DateTimeX::Tiny::Compact->new(
+          year   => 2006,
+          month  => 12,
+          day    => 25,
+          hour   => 10,
+          minute => 45,
+          second => 0,
+          );
+
+      # Show the current date
+      my $now = DateTimeX::Tiny::Compact->now;
+      print "Year   : " . $now->year   . "\n";
+      print "Month  : " . $now->month  . "\n";
+      print "Day    : " . $now->day    . "\n";
+      print "Hour   : " . $now->hour   . "\n";
+      print "Minute : " . $now->minute . "\n";
+      print "Second : " . $now->second . "\n";
+
+DESCRIPTION
+    EXPERIMENTAL.
+
+    DateTimeX::Tiny::Compact is a fork of DateTime::Tiny. It uses
+    Class::Accessor::PackedString::Set to create objects based on
+    "pack()"-ed string which is compact.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/DateTimeX-Tiny-Compact>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-DateTimeX-Tiny-Compact>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=DateTimeX-Tiny-Compac
+    t>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    DateTime::Tiny
+
+    Class::Accessor::PackedString::Set
+
+    DateTimeX::Duration::Lite
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

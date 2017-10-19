@@ -1,5 +1,11 @@
 Revision history for Perl extension Digest::SHA3.
 
+1.00  Sat Oct 14 18:08:10 MST 2017
+	- promoted to major release version 1.0
+		-- module stable enough not to be considered draft
+	- fixed alignment issue in BITS mode of addfile
+		-- surfaced only for large non-aligned inputs
+
 0.27  Wed Oct  4 00:40:04 MST 2017
 	- removed "portable" mode from sha3sum and addfile
 		-- rarely used, mostly in outdated systems

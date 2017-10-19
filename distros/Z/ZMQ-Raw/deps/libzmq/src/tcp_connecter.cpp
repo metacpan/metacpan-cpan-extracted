@@ -136,6 +136,7 @@ void zmq::tcp_connecter_t::out_event ()
     handle_valid = false;
 
     const fd_t fd = connect ();
+
     //  Handle the error condition by attempt to reconnect.
     if (fd == retired_fd) {
         close ();
@@ -143,10 +144,15 @@ void zmq::tcp_connecter_t::out_event ()
         return;
     }
 
-    tune_tcp_socket (fd);
-    tune_tcp_keepalives (fd, options.tcp_keepalive, options.tcp_keepalive_cnt,
-            options.tcp_keepalive_idle, options.tcp_keepalive_intvl);
-    tune_tcp_maxrt (fd, options.tcp_maxrt);
+    int rc = tune_tcp_socket (fd);
+    rc = rc | tune_tcp_keepalives (fd, options.tcp_keepalive, options.tcp_keepalive_cnt,
+        options.tcp_keepalive_idle, options.tcp_keepalive_intvl);
+    rc = rc | tune_tcp_maxrt (fd, options.tcp_maxrt);
+    if (rc != 0) {
+        close ();
+        add_reconnect_timer ();
+        return;
+    }
 
     //  Create the engine object for this connection.
     stream_engine_t *engine = new (std::nothrow)
@@ -298,6 +304,10 @@ int zmq::tcp_connecter_t::open ()
     // Set the IP Type-Of-Service priority for this socket
     if (options.tos != 0)
         set_ip_type_of_service (s, options.tos);
+
+    // Bind the socket to a device if applicable
+    if (!options.bound_device.empty ())
+        bind_to_device (s, options.bound_device);
 
     // Set the socket to non-blocking mode so that we get async connect().
     unblock_socket (s);

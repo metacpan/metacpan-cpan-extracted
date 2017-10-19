@@ -1,3 +1,4 @@
+1.2.3 - Enable rw on patch argument attributes
 1.2.2 - Disable script test unless developer
 1.2.1 - Add META.json and change script test
 1.2.0 - Add support for deployment scripts

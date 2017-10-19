@@ -1,5 +1,18 @@
 Revision history for Perl extension UNIVERSAL::Object
 
+0.12 2017-10-18
+    - UNIVERSAL::Object::Immutable now allows for
+      alteration of the instance during `BUILD` by
+      delaying locking of the instance until the
+      very last moment before `new` returns
+        - updated docs for this
+    - UNIVERSAL::Object::Immutable now supports
+      CODE ref based instances
+        - updated docs and tests for this
+    - added test to demonstrate that `%HAS` is not a
+      requirement and (ab)using SLOTS method works
+      too
+
 0.11 2017-06-19
     - fix a test that is causing CPANTS to fail, sorry
 

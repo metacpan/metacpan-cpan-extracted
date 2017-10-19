@@ -9,7 +9,7 @@ Sys::Path::SPc - mock for testing
 use warnings;
 use strict;
 
-our $VERSION = '0.14';
+our $VERSION = '0.18';
 
 use File::Spec;
 

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp ();
 
-our $VERSION = "0.002";
+our $VERSION = "0.003";
 $VERSION = eval $VERSION;
 
 our @BACKENDS = (
@@ -31,6 +31,24 @@ BEGIN
             1;
         };
     }
+}
+
+sub backend
+{
+    my $self     = shift;
+    my @backends = @BACKENDS;
+
+    while (my ($pkg, $rout) = splice @backends, 0, 2)
+    {
+        eval { $use_m->($pkg, ref $rout ? ($rout->[0]) : ()); 1; } or next;
+
+        my $fn = $pkg->can(ref $rout ? $rout->[1] : $rout);
+        $fn or next;
+
+        return $pkg;
+    }
+
+    return;
 }
 
 sub can
@@ -122,7 +140,7 @@ Clone::Choose - Choose appropriate clone utility
 =head1 DESCRIPTION
 
 C<Clone::Choose> checks several different modules which provides a
-C<clone()> function and selects an appropriate one. The default preferrence
+C<clone()> function and selects an appropriate one. The default preference
 is
 
   Clone
@@ -145,7 +163,7 @@ or pick a particular C<clone> implementation
   use Clone::Choose qw(:Storable clone);
 
 The exported implementation is resolved dynamically, which means that any
-using module can either rely on the default backend preferrence or choose
+using module can either rely on the default backend preference or choose
 a particular one.
 
 This also means, an already chosen import can't be modified like
@@ -167,6 +185,17 @@ implementations dynamically.
 
 The use of C<@Clone::Choose::BACKENDS> is discouraged and will be deprecated
 as soon as anyone provides a better idea.
+
+=head1 PACKAGE METHODS
+
+=head2 backend
+
+C<backend> tells the caller about the dynamic chosen backend:
+
+  use Clone::Choose;
+  say Clone::Choose->backend; # Clone
+
+This method currently exists for debug purposes only.
 
 =head1 AUTHOR
 

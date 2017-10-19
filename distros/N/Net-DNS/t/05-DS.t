@@ -1,7 +1,7 @@
-# $Id: 05-DS.t 1526 2017-01-16 09:17:54Z willem $	-*-perl-*-
+# $Id: 05-DS.t 1595 2017-09-12 09:10:56Z willem $	-*-perl-*-
 
 use strict;
-use Test::More tests => 36;
+use Test::More tests => 37;
 
 
 use Net::DNS;
@@ -113,6 +113,14 @@ my $wire = join '', qw( EC45 05 01 2BB183AF5F22588179A53B0A98631FAD1A292118 );
 	eval { $rr->digest('123456789XBCDEF'); };
 	my $exception = $1 if $@ =~ /^(.+)\n/;
 	ok( $exception ||= '', "corrupt hexadecimal\t[$exception]" );
+}
+
+
+{
+	my $keyrr = new Net::DNS::RR( type => 'DNSKEY', keybin => '' );
+	eval { create Net::DNS::RR::DS( $keyrr, ( 'digtype' => 255 ) ); };
+	my $exception = $1 if $@ =~ /^(.+)\n/;
+	ok( $exception ||= '', "create: wrong digtype\t[$exception]" );
 }
 
 

@@ -25,16 +25,16 @@ testing_loop( $loop );
 subtest 'constructor spec' => sub {
     subtest 'success' => sub {
         my $db = ETL::Yertl::Adapter::graphite->new( 'graphite://localhost:2003' );
-        is $db->host, 'localhost', 'host is correct';
-        is $db->write_port, 2003, 'write_port is correct';
-        is $db->http_port, 2003, 'http_port is correct';
+        is $db->{host}, 'localhost', 'host is correct';
+        is $db->{write_port}, 2003, 'write_port is correct';
+        is $db->{http_port}, 2003, 'http_port is correct';
     };
 
     subtest 'port defaults to 8086' => sub {
         my $db = ETL::Yertl::Adapter::graphite->new( 'graphite://localhost' );
-        is $db->host, 'localhost', 'host is correct';
-        is $db->write_port, 2003, 'write_port is correct';
-        is $db->http_port, 8080, 'http_port is correct';
+        is $db->{host}, 'localhost', 'host is correct';
+        is $db->{write_port}, 2003, 'write_port is correct';
+        is $db->{http_port}, 8080, 'http_port is correct';
     };
 
     subtest 'host is required' => sub {
@@ -77,17 +77,17 @@ subtest 'read ts' => sub {
     my @points = $db->read_ts( { metric => 'cpu_load.1m' } );
     cmp_deeply \@points, [
         {
-            timestamp => '2011-07-28T06:53:28Z',
+            timestamp => '2011-07-28T06:53:28',
             metric => 'cpu_load.1m',
             value => 1.0,
         },
         {
-            timestamp => '2011-07-28T06:53:29Z',
+            timestamp => '2011-07-28T06:53:29',
             metric => 'cpu_load.1m',
             value => 2.0,
         },
         {
-            timestamp => '2011-07-28T06:53:30Z',
+            timestamp => '2011-07-28T06:53:30',
             metric => 'cpu_load.1m',
             value => 3.0,
         },
@@ -123,12 +123,12 @@ subtest 'write ts' => sub {
 
     my @points = (
         {
-            timestamp => '2017-01-01T00:00:00.000000000Z',
+            timestamp => '2017-01-01T00:00:00',
             metric => 'mydb.cpu_load.5m',
             value => 1.23,
         },
         {
-            timestamp => '2017-01-01T00:05:00.000000000Z',
+            timestamp => '2017-01-01T00:05:00',
             metric => 'mydb.cpu_load.1m',
             value => 1.26,
         },

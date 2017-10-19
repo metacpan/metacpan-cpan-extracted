@@ -69,7 +69,7 @@ BEGIN { our $PACKAGE_SCALAR = "some value" }
 {
    my $sv = $pmat->find_symbol( '$PACKAGE_SCALAR' );
 
-   my $svnode = $pmat->inref_graph( $sv );
+   my $svnode = $pmat->inref_graph( $sv, depth => 4 );
 
    ok( defined $svnode, '->inref_graph $sv defined' );
 
@@ -81,7 +81,7 @@ BEGIN { our $PACKAGE_SCALAR = "some value" }
    ok( $stashnode, '$gvnode has value {PACKAGE_SCALAR}' );
    is( $stashnode->sv->type, "STASH", 'svnode stash is a STASH' );
 
-   ok( scalar( grep { $_ eq "the default stash" } $stashnode->roots ),
+   ok( scalar( grep { $_->name eq "the default stash" } $stashnode->roots ),
       'stashnode has default stash as a root' );
 }
 

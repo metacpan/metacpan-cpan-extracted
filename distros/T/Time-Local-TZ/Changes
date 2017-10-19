@@ -6,3 +6,5 @@ Revision history for Perl extension Time::Local::TZ.
 	- little code cleanup, remove trash from dist
 0.03  Thu May 18 12:51:14 2017
 	- support win32, bsd, solaris; support CCFLAGS in Makefile; update tests and docs
+0.04  Tue Oct 17 12:44:35 2017
+	- support NetBSD, OpenBSD

@@ -1,5 +1,5 @@
 # ************************************************************************* 
-# Copyright (c) 2014-2015, SUSE LLC
+# Copyright (c) 2014-2017, SUSE LLC
 # 
 # All rights reserved.
 # 
@@ -540,7 +540,7 @@ sub handler_session_terminate {
 
     # second pass
     $self->request->{'env'}->{'psgix.session'} = {};
-    return $CELL->status_ok;
+    return $CELL->status_ok( 'DOCHAZKA_SESSION_TERMINATED' );
 }
 
 
@@ -1906,10 +1906,26 @@ sub handler_history_post {
     my ( $class, $prop, $id ) = shared_get_class_prop_id( $context );
     my $emp = $context->{'stashed_employee_obj'};
 
+    my $entity = $context->{'request_entity'};
+    if ( $prop eq 'sid' ) {
+        # we might have scode instead of sid in the entity
+        if ( $entity->{'scode'} and not $entity->{'sid'} ) {
+            my $sched = shared_first_pass_lookup( $self, 'scode', $entity->{'scode'} );
+            if ( $sched ) {
+                $entity->{'sid'} = $sched->sid;
+            } else {
+                $self->mrest_declare_status(
+                    explanation => 'Schedule code ' . $entity->{'scode'} . ' not found',
+                    permanent => 1,
+                );
+                return $fail;
+            }
+        }
+    }
+
     # - check entity for presence of certain properties
     my $status = shared_entity_check( $self, $prop, 'effective' );
     return $status unless $status->ok;
-    my $entity = $context->{'request_entity'};
 
     # - run the insert operation
     my $ho;

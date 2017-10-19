@@ -3,6 +3,13 @@ distribution. Its contents are:
 
 README - This file.
 
+all_iridium_classic - A script to retrieve raw status of all
+	original-design Iridium satellites from Space Track and write it
+	to standard out in a format suitable for inclusion in a canned
+	status table in Astro::SpaceTrack. Because Space Track does not
+	know the operational status of the satellites, the only status
+	values reported will be '[?]' (unknown) or '[D]' (decayed).
+
 capture - A script to execute Space Track queries, censor the results
 	heavily, and write the results to the directory and file that
 	Mock::LWP::UserAgent (in the inc/ directory of this

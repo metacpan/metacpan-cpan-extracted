@@ -19,6 +19,42 @@ DBIx::Struct - convenience SQL functions with Class::Struct-like row objects
     my $rows = all_rows("table", {field => "some data"});
 
     print $rows->[0]->field;
+    
+    ## MORE EXAMPLES
+    # select columns
+    my $rows = all_rows(["table_users" => 
+                         -columns => [qw(id email enable avatar)]]);
+    
+    # Join tables: automatically join - based on foreign keys
+    # for multi tables too
+    my $rows = all_rows([
+                         "table_1" => 
+                         -join     => "table_2",
+		         -join     => "table_3",
+		         -columns => ['table_1.*', 'table_2.field', 'table_3.title as some_alias' ] ],
+                         -where    => { 'table_1.date' => {'<=', \"now()" }, 'table_1.is_true' => 1 },
+                         -order_by => "table_2.id",
+                         -limit    => 10,
+                         -offset   => 0 ,
+			 # you can manipulate with data in callback
+			 # add and modify results on the fly, like this:
+			 sub { +{ delay => $delay += 90, %{ $_->data } } } );    
+    
+    # Select with many params	
+    my $row = one_row( "table_1", { field1 => 'foo', field2 => 'bar'  } );
+    
+    # Some tricks for update...
+    my $params = { field1 => 'foo', field2 => 'bar', field3 => 'var' };
+    
+    my $row = one_row( "table_1", { id => $params->{id} } );
+    
+    $row->$_($params->{$_}) for ( keys %$params );
+    
+    $row->update;
+    
+    # ..and insert
+    my $row = new_row( 'table_1' => hash_ref_slice $params, keys %$params );
+    
 
 =head1 DESCRIPTION
 
@@ -303,6 +339,18 @@ select but for queries also.
                     ."  join session on (id = id_client)", 
                       { session_key => $input->{session}})
                       ->name;
+
+=head3 C<for_rows($table, $abstract_where, $order_by, $limit, $offset, $item_func)>
+
+This function is similar to C<all_rows> but it doesn't make array of row objects.
+Instead it calls C<$item_func> code reference for every selected row in C<$_>.
+Returns number of processed rows. C<$item_func> can be any argument, 
+it is determined as the only code reference in argument list. To stop processing rows
+return any false value from this function.
+
+    my $number_of_rows =  for_rows("table", 
+                     { date => {'>=', \"now() - interval '1 hour'"}, 
+                     sub {say $_->name});
 
 =head3 C<< new_row("table", column => $value, column2 => $value2, ...) >>
 
@@ -651,8 +699,9 @@ C<refEmployeeInvitedBy> and C<refEmployeeInvitedBys>.
 
 =head1 Known issues
 
-This module is tested only with PostgreSQL database. If you need other database 
-support be prepared to help me to test and debug it.
+This module is tested only with PostgreSQL and MySQL databases. 
+If you need other database support be prepared to help me to test
+and debug it.
 
 =head1 See also
 

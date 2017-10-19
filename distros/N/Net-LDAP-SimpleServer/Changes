@@ -1,47 +1,13 @@
 Revision History for Net-LDAP-SimpleServer
 ==========================================
 
-v0.0.17 2012-07-25
+v0.0.18 2017-10-16
 ------------------
 
-commit 24e799966ebc1ba119374b99e4f9858fb0b086dd
-Author: Alexei Znamensky <russoz@cpan.org>
+commit 07e9e3a54f33dd28be0f1242e998f7ab7b67aa13
+Author: Alexei Znamensky <russoz@gmail.com>
 
-    Bug fix, small improvements
-
-v0.0.16 2012-07-24
-------------------
-
-commit 58f60bd96f40c3ca9d1d61e3c5451ba92bf772d3
-Author: Alexei Znamensky <russoz@cpan.org>
-
-    Multiple Changes
-
-v0.0.15 2012-04-21
-------------------
-
-commit c6aaacba7ea6aaec30fcc8e12b1aaf8cac613002
-Author: Alexei Znamensky <russoz@cpan.org>
-
-    searchable directory!
-
-v0.0.14 2011-08-13
-------------------
-
-commit ad14dcea3da95d5d5b2d6c47786baf8637bcf32a
-Author: Alexei Znamensky <russoz@cpan.org>
-
-    added version spec for File::Path
-
-commit 0ecb36280bd128ae949b6aafde306772374a4b5c
-Author: Alexei Znamensky <russoz@cpan.org>
-
-    small details
-
-commit 4ec0095e112b3d653e795bbb1dc2606d4d2cd634
-Author: Alexei Znamensky <russoz@cpan.org>
-
-    using perl 5.010
+    #100818: The simple server fails to send responses. Attempts to bind to it hang.
 
 ===================================
 End of changes in the last 365 days

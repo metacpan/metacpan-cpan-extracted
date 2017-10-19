@@ -3,7 +3,7 @@ package Sys::Path;
 use warnings;
 use strict;
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 use File::Spec;
 use Text::Diff 'diff';
@@ -388,6 +388,9 @@ order):
     Emmanuel Rodriguez
     Salve J. Nilsen
     Daniel Perrett
+    Jose Luis Perez Diez
+    Petr Písař
+    Mohammad S Anwar
 
 =head1 COPYRIGHT & LICENSE
 

@@ -21,6 +21,9 @@ share/js/000boilerplate.js
 share/js/core/ajax.js
 share/js/core/cf.js
 share/js/core/current-user.js
+share/js/core/d3-4.10.2.js
+share/js/core/d3.js
+share/js/core/datetime.js
 share/js/core/html.js
 share/js/core/init2.js
 share/js/core/jquery-2.1.1.js
@@ -47,6 +50,7 @@ share/js/core/test.js
 share/js/core/test-go.js
 share/js/core/tests/cf.js
 share/js/core/tests/current-user.js
+share/js/core/tests/datetime.js
 share/js/core/tests/dummy.js
 share/js/core/tests/lib.js
 share/js/core/tests/prototypes.js
@@ -58,6 +62,7 @@ share/js/mfile-www/dmenu-init.js
 share/js/mfile-www/dnotice-init.js
 share/js/mfile-www/drowselect-init.js
 share/js/mfile-www/dtable-init.js
+share/js/mfile-www/entries.js
 share/js/mfile-www/lib.js
 share/js/mfile-www/target-init.js
 share/js/mfile-www/test.js

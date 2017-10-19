@@ -19,13 +19,14 @@ Someone please volunteer to rewrite this!
 See also L<Term::ReadLine::Perl5::readline-guide>.
 
 =cut
+
 use warnings;
 package Term::ReadLine::Perl5::readline;
 use File::Glob ':glob';
 
 # no critic
 # Version can be below the version given in Term::ReadLine::Perl5
-our $VERSION = '1.43';
+our $VERSION = '1.45';
 
 #
 # Separation into my and vars needs more work.
@@ -39,10 +40,9 @@ use vars qw(@KeyMap %KeyMap $rl_screen_width $rl_start_default_at_beginning
           $history_stifled
           $KillBuffer $dumb_term $stdin_not_tty $InsertMode
           $mode $winsz $force_redraw
-          $have_getpwent
-          $minlength $rl_readline_name
-          @winchhooks
-          $rl_NoInitFromFile
+          $have_getpwent $minlength $rl_readline_name
+          @winchhooks $rl_NoInitFromFile
+          $editingMode $Vi_mode &rl_editMode
           $DEBUG;
           );
 
@@ -83,34 +83,10 @@ $history_stifled = 0;
 &preinit;
 &init;
 
-#
-# my ($InputLocMsg, $term_OUT, $term_IN);
-# my ($winsz_t, $TIOCGWINSZ, $winsz, $rl_margin);
-# my ($hook, %var_HorizontalScrollMode, %var_EditingMode, %var_OutputMeta);
-# my ($var_HorizontalScrollMode, $var_EditingMode, $var_OutputMeta);
-# my (%var_ConvertMeta, $var_ConvertMeta, %var_MarkModifiedLines, $var_MarkModifiedLines);
 my $inDOS;
-# my (%var_PreferVisibleBell, $var_PreferVisibleBell);
-# my (%var_TcshCompleteMode, $var_TcshCompleteMode);
-# my (%var_CompleteAddsuffix, $var_CompleteAddsuffix);
-# my ($BRKINT, $ECHO, $FIONREAD, $ICANON, $ICRNL, $IGNBRK, $IGNCR, $INLCR,
-#     $ISIG, $ISTRIP, $NCCS, $OPOST, $RAW, $TCGETS, $TCOON, $TCSETS, $TCXONC,
-#     $TERMIOS_CFLAG, $TERMIOS_IFLAG, $TERMIOS_LFLAG, $TERMIOS_NORMAL_IOFF,
-#     $TERMIOS_NORMAL_ION, $TERMIOS_NORMAL_LOFF, $TERMIOS_NORMAL_LON,
-#     $TERMIOS_NORMAL_OOFF, $TERMIOS_NORMAL_OON, $TERMIOS_OFLAG,
-#     $TERMIOS_READLINE_IOFF, $TERMIOS_READLINE_ION, $TERMIOS_READLINE_LOFF,
-#     $TERMIOS_READLINE_LON, $TERMIOS_READLINE_OOFF, $TERMIOS_READLINE_OON,
-#     $TERMIOS_VMIN, $TERMIOS_VTIME, $TIOCGETP, $TIOCGWINSZ, $TIOCSETP,
-#     $fion, $fionread_t, $mode, $sgttyb_t,
-#     $termios, $termios_t, $winsz, $winsz_t);
-# my ($line, $initialized);
-#
-# Global variables added for vi mode (I'm leaving them all commented
-# out, like the declarations above, until SelfLoader issues
-#     are resolved).
 
 # True when we're in one of the vi modes.
-my $Vi_mode;
+$Vi_mode = 0;
 
 # Array refs: saves keystrokes for '.' command.  Undefined when we're
 #     not doing a '.'-able command.
@@ -135,6 +111,7 @@ my $Vi_search_reverse;  # True for '?' search, false for '/'
 =head1 SUBROUTINES
 
 =cut
+
 # Fix: case-sensitivity of inputrc on/off keywords in
 #      `set' commands. readline lib doesn't care about case.
 # changed case of keys 'On' and 'Off' to 'on' and 'off'
@@ -142,6 +119,7 @@ my $Vi_search_reverse;  # True for '?' search, false for '/'
 # lower case before hash lookup.
 sub preinit
 {
+    my $editMode = scalar(@_) > 0 ? $_[0] : 'vicmd';
     $DEBUG = 0;
 
     ## Set up the input and output handles
@@ -402,7 +380,7 @@ sub preinit
         ord('E')  =>  q{.\s*\S*(?=\S)|.?\s*(?=\s$)},
     };
 
-    *KeyMap = $var_EditingMode = $var_EditingMode{'emacs'};
+    *KeyMap = $var_EditingMode = $var_EditingMode{$editMode};
     1; # Returning a glob causes a bug in db5.001m
 }
 
@@ -712,10 +690,46 @@ sub rl_bind_keyseq($$)
 
 Accepts an array as pairs ($keyspec, $function, [$keyspec, $function]...).
 and maps the associated bindings to the current KeyMap.
+
 =cut
 
 sub rl_bind
 {
+    while (defined($key = shift(@_)) && defined($func = shift(@_)))
+    {
+	rl_bind_keyseq($key, $func);
+    }
+}
+
+=head3 rl_editMode
+
+Changes editmode to $1 which shoujld either be 'emacs', 'vi',
+'viopos', 'vicmd', 'visearch'
+
+=cut
+
+sub rl_editMode($)
+{
+    $keymap_name = shift;
+    if ($keymap_name eq 'emacs') {
+	F_EmacsEditingMode();
+	@KeyMap = emacs_keymap;
+	$KeyMap{'name'} = 'emacs';
+    } elsif ($keymap_name eq 'vi') {
+	@KeyMap = vi_keymap;
+	$KeyMap{'name'} = 'vi';
+    } elsif ($keymap_name eq 'vicmd') {
+	F_ViCommandMode();
+	@KeyMap = vicmd_keymap;
+	$KeyMap{'name'} = 'vicmd';
+    } elsif ($keymap_name eq 'vipos') {
+	@KeyMap = vipos_keymap;
+	$KeyMap{'name'} = 'vipos';
+    } elsif ($keymap_name eq 'visearch') {
+	@KeyMap = visearch_keymap;
+	$KeyMap{'name'} = 'visearch';
+    }
+
     while (defined($key = shift(@_)) && defined($func = shift(@_)))
     {
 	rl_bind_keyseq($key, $func);
@@ -846,6 +860,7 @@ the only useful one is directory since that will cause a further
 completion to continue.
 
 =cut
+
 sub rl_filename_list_deprecated
 {
     my $pattern = $_[0];
@@ -941,6 +956,7 @@ Parse I<$line> as if it had been read from the inputrc file and
 perform any key bindings and variable assignments found.
 
 =cut
+
 sub rl_parse_and_bind($)
 {
     my $line = shift;
@@ -961,6 +977,7 @@ to a routine that would look at the context of the word being completed
 and return the appropriate possibilities.
 
 =cut
+
 sub rl_basic_commands
 {
      @rl_basic_commands = @_;
@@ -979,6 +996,7 @@ B<rl_read_initfile>(I<$filename>)
 Read keybindings and variable assignments from filename I<$filename>.
 
 =cut
+
 sub rl_read_init_file($) {
     read_an_init_file(shift, 0);
 }
@@ -1152,6 +1170,7 @@ sub F_AcceptLine
 Move `back' through the history list, fetching the previous command.
 
 =cut
+
 sub F_PreviousHistory {
     &get_line_from_history($rl_HistoryIndex - shift);
 }
@@ -1161,6 +1180,7 @@ sub F_PreviousHistory {
 Move `forward' through the history list, fetching the next command.
 
 =cut
+
 sub F_NextHistory {
     &get_line_from_history($rl_HistoryIndex + shift);
 }
@@ -1170,6 +1190,7 @@ sub F_NextHistory {
 Move to the first line in the history.
 
 =cut
+
 sub F_BeginningOfHistory
 {
     &get_line_from_history(0);
@@ -1181,6 +1202,7 @@ Move to the end of the input history, i.e., the line currently being
 entered.
 
 =cut
+
 sub F_EndOfHistory { &get_line_from_history(@rl_History); }
 
 =head3 F_ReverseSearchHistory
@@ -1189,12 +1211,13 @@ Search backward starting at the current line and moving `up' through
 the history as necessary. This is an incremental search.
 
 =cut
+
 sub F_ReverseSearchHistory
 {
     &DoSearch($_[0] >= 0 ? 1 : 0);
 }
 
-=head3
+=head3 F_ForwardSearchHistory
 
 Search forward starting at the current line and moving `down' through
 the the history as necessary. This is an increment
@@ -1214,6 +1237,7 @@ must match at the beginning of a history line. This is a
 non-incremental search. By default, this command is unbound.
 
 =cut
+
 sub F_HistorySearchBackward
 {
     &DoSearchStart(($_[0] >= 0 ? 1 : 0),substr($line,0,$D));
@@ -1403,6 +1427,7 @@ past that word as well. If the insertion point is at the end of the
 line, this transposes the last two words on the line.
 
 =cut
+
 sub F_TransposeWords {
     my $c = shift;
     return F_Ding() unless $c;
@@ -1438,6 +1463,7 @@ Uppercase the current (or following) word. With a negative argument,
 uppercase the previous word, but do not move the cursor.
 
 =cut
+
 sub F_UpcaseWord     { &changecase($_[0], 'up');   }
 
 =head3 F_DownCaseWord
@@ -1446,6 +1472,7 @@ Lowercase the current (or following) word. With a negative argument,
 lowercase the previous word, but do not move the cursor.
 
 =cut
+
 sub F_DownCaseWord   { &changecase($_[0], 'down'); }
 
 =head3 F_CapitalizeWord
@@ -1454,6 +1481,7 @@ Capitalize the current (or following) word. With a negative argument,
 capitalize the previous word, but do not move the cursor.
 
 =cut
+
 sub F_CapitalizeWord { &changecase($_[0], 'cap');  }
 
 =head3 F_OverwriteMode
@@ -1470,6 +1498,7 @@ character before point with a space.
 By default, this command is unbound.
 
 =cut
+
 sub F_OverwriteMode
 {
     $InsertMode = 0;
@@ -1540,6 +1569,7 @@ currently not on a word (or just at the start of a word), to the start
 of the previous word.
 
 =cut
+
 sub F_BackwardKillWord
 {
     my $count = shift;
@@ -1570,6 +1600,7 @@ Kill the text in the current region. By default, this command is
 unbound.
 
 =cut
+
 sub F_KillRegion {
     return F_Ding() unless $line_rl_mark == $rl_HistoryIndex;
     $rl_mark = length $line if $rl_mark > length $line;
@@ -1582,6 +1613,7 @@ sub F_KillRegion {
 Copy the text in the region to the kill buffer, so it can be yanked right away. By default, this command is unbound.
 
 =cut
+
 sub F_CopyRegionAsKill {
     return F_Ding() unless $line_rl_mark == $rl_HistoryIndex;
     $rl_mark = length $line if $rl_mark > length $line;
@@ -1597,6 +1629,7 @@ sub F_CopyRegionAsKill {
 Yank the top of the kill ring into the buffer at point.
 
 =cut
+
 sub F_Yank
 {
     remove_selection();
@@ -1622,6 +1655,7 @@ Add this digit to the argument already accumulating, or start a new
 argument. C<M--> starts a negative argument.
 
 =cut
+
 sub F_DigitArgument
 {
     my $in = chr $_[1];
@@ -1677,6 +1711,7 @@ argument count sixteen, and so on. By default, this is not bound to a
 key.
 
 =cut
+
 sub F_UniversalArgument
 {
     &F_DigitArgument;
@@ -1770,6 +1805,7 @@ Abort the current editing command and ring the terminal's bell
 (subject to the setting of bell-style).
 
 =cut
+
 sub F_Abort
 {
     F_Ding();
@@ -1814,6 +1850,7 @@ sub F_RevertLine
 Perform tilde expansion on the current word.
 
 =cut
+
 sub F_TildeExpand {
 
     my $what_to_do = shift;
@@ -2002,6 +2039,7 @@ sub F_EmacsEditingMode
 =head3 F_Interrupt
 
 (Attempt to) interrupt the current program via I<kill('INT')>
+
 =cut
 
 sub F_Interrupt
@@ -2036,7 +2074,7 @@ sub F_ToggleInsertMode
     $InsertMode = !$InsertMode;
 }
 
-=head3
+=head3 F_Suspend
 
 (Attempt to) suspend the program via I<kill('TSTP')>
 
@@ -2062,7 +2100,9 @@ sub F_Suspend
 Ring the bell.
 
 Should do something with I<$var_PreferVisibleBel> here, but what?
+
 =cut
+
 sub F_Ding {
     Term::ReadLine::Perl5::Common::F_Ding($term_OUT)
 }
@@ -2084,6 +2124,7 @@ Repeat the most recent one of these vi commands:
    a A c C d D i I p P r R s S x X ~
 
 =cut
+
 sub F_ViRepeatLastCommand {
     my($count) = @_;
     return F_Ding() if !$Last_vi_command;
@@ -2247,6 +2288,7 @@ Prepend line with '#', add to history, and clear the input buffer
 (this feature was borrowed from ksh).
 
 =cut
+
 sub F_SaveLine
 {
     local $\ = '';
@@ -2263,7 +2305,9 @@ sub F_SaveLine
 
 Come here if we see a non-positioning keystroke when a positioning
 keystroke is expected.
+
 =cut
+
 sub F_ViNonPosition {
     # Not a positioning command - undefine the cursor to indicate the error
     #     to get_position().
@@ -2274,6 +2318,7 @@ sub F_ViNonPosition {
 
 Comes here if we see I<esc>I<char>, but I<not> an arrow key or other
 mapped sequence, when a positioning keystroke is expected.
+
 =cut
 
 sub F_ViPositionEsc {
@@ -2333,7 +2378,9 @@ sub F_ViBackwardDeleteChar {
 =head3 F_ViFirstWord
 
 Go to first non-space character of line.
+
 =cut
+
 sub F_ViFirstWord
 {
     $D = 0;
@@ -2345,6 +2392,7 @@ sub F_ViFirstWord
 # Like the emacs case transforms.
 
 I<Note>: this doesn't work for multi-byte characters.
+
 =cut
 
 sub F_ViToggleCase {
@@ -2379,7 +2427,9 @@ Search history for matching string.  As with vi in nomagic mode, the
 ^, $, \<, and \> positional assertions, the \* quantifier, the \.
 character class, and the \[ character class delimiter all have special
 meaning here.
+
 =cut
+
 sub F_ViSearch {
     my($n, $ord) = @_;
 
@@ -2460,7 +2510,9 @@ sub F_ViSearchBackwardDeleteChar {
 =head3 F_ViChangeEntireLine
 
 Kill entire line and enter input mode
+
 =cut
+
 sub F_ViChangeEntireLine
 {
     &start_dot_buf(@_);
@@ -2471,7 +2523,9 @@ sub F_ViChangeEntireLine
 =head3 F_ViChangeChar
 
 Kill characters and enter input mode
+
 =cut
+
 sub F_ViChangeChar
 {
     &start_dot_buf(@_);
@@ -3462,6 +3516,7 @@ B<redisplay>[(I<$prompt>)]
 If an argument I<$prompt> is given, it is used instead of the prompt.
 Updates the screen to reflect the current value of global C<$line> via
 L<rl_redisplay>.
+
 =cut
 
 sub redisplay(;$)
@@ -3627,6 +3682,7 @@ pointing to a 1-byte char.
 TODO: handle Unicode
 
 =cut
+
 sub CharSize
 {
     my $index = shift;
@@ -3785,6 +3841,7 @@ If I<$up_down_caps> is 'up' to upcase I<$count> words;
 If I<$count> is negative, the dot is not moved.
 
 =cut
+
 sub changecase
 {
     my $op = $_[1];
@@ -3930,6 +3987,7 @@ This is intended to be the called first in a potentially repetitive
 search, which is why the unusual return value. See also L<search>.
 
 =cut
+
 sub searchStart($$$) {
   my ($i, $reverse, $str) = @_;
   $i += $reverse ? - 1: +1;
@@ -3996,6 +4054,7 @@ Returns true if a completion was done, false otherwise, so vi completion
     routines can test it.
 
 =cut
+
 sub complete_internal
 
 {
@@ -4101,6 +4160,7 @@ prefix prepended as the first item of the list.  Therefore, the list
 will either be of zero length (meaning no matches) or of 2 or more.....
 
 =cut
+
 sub completion_matches
 {
     my ($func, $text, $line, $start) = @_;
@@ -4246,6 +4306,7 @@ sub do_delete {
     get_position($count, $ord, $fulline_ord, $poshash)
 
 Interpret vi positioning commands
+
 =cut
 
 sub get_position {
@@ -4436,4 +4497,5 @@ sub read_an_init_file($;$)
 L<Term::ReadLine::Perl5>
 
 =cut
+
 1;

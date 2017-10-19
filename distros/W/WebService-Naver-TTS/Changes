@@ -1,2 +1,5 @@
+v0.0.2    Tue, 17 Oct 2017 18:48:33 +0900
+  - Support File::Temp options
+
 v0.0.1    Fri, 05 May 2017 12:21:11 +0900
   - initial release

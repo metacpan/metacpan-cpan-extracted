@@ -1,5 +1,9 @@
 Revision history for App-TestOnTap
 
+0.037	2017-10-16
+
+	Change in Config::Std 0.901 => 0.903 unexplicably broke a 'use Config::Std qw(read_config)' line in App::TestOnTap which consequently broke a test...
+
 0.036	2017-09-02
 
 	Don't trap preprocessing STDERR

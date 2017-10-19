@@ -15,7 +15,7 @@ use English qw/ -no_match_vars /;
 use File::chdir;
 use Getopt::Alt;
 
-our $VERSION = version->new('0.6.4');
+our $VERSION = version->new('0.6.5');
 
 requires 'repos';
 requires 'verbose';
@@ -99,7 +99,7 @@ sub grep {
     }
 
     warn "$cmd\n" if $opt->opt->{verbose};
-    return `$cmd`;
+    return scalar `$cmd`;
 }
 
 1;
@@ -112,7 +112,7 @@ Group::Git::Cmd::Grep - Quick state of each repository (branch name and changes)
 
 =head1 VERSION
 
-This documentation refers to Group::Git::Cmd::Grep version 0.6.4.
+This documentation refers to Group::Git::Cmd::Grep version 0.6.5.
 
 =head1 SYNOPSIS
 

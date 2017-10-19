@@ -10,30 +10,30 @@ require Exporter;
 our @ISA = qw(Exporter);
 
 our @EXPORT_OK = qw/
-		   add_lines
-		   brute_force_line
-		   c_string
-		   c_to_h_name
-		   ch_files
-		   convert_to_c_string
-		   convert_to_c_string_pc
-		   escape_string
-		   hash_to_c_file
-		   line_directive
-		   linein 
-		   lineout
-		   print_bottom_h_wrapper
-		   print_top_h_wrapper
-		   remove_quotes
-		   stamp_file
-		   valid_c_variable
-               /;
+		       add_lines
+		       brute_force_line
+		       c_string
+		       c_to_h_name
+		       ch_files
+		       convert_to_c_string
+		       convert_to_c_string_pc
+		       escape_string
+		       hash_to_c_file
+		       line_directive
+		       linein 
+		       lineout
+		       print_bottom_h_wrapper
+		       print_top_h_wrapper
+		       remove_quotes
+		       stamp_file
+		       valid_c_variable
+		   /;
 
 our %EXPORT_TAGS = (
     'all' => \@EXPORT_OK,
 );
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 sub convert_to_c_string
 {

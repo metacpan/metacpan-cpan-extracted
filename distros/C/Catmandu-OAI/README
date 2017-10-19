@@ -29,6 +29,8 @@ MODULES
 
       * Catmandu::Importer::OAI
 
+      * Catmandu::Store::OAI
+
 AUTHOR
 
     Nicolas Steenlant, <nicolas.steenlant at ugent.be>

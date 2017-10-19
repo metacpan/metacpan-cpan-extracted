@@ -1,5 +1,9 @@
 Revision history for Struct-Path-PerlStyle
 
+0.71    2017-10-15
+        ranges composer in ps_serialize() optimized a bit
+        $_ mangling in ps_parse() fixed
+
 0.70    2017-07-19
         aliases initial support added (highly experimental)
         another attempt to fix tests for win32

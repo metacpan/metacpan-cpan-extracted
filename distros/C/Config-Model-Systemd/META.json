@@ -61,7 +61,7 @@
          "web" : "http://github.com/dod38fr/config-model-systemd"
       }
    },
-   "version" : "0.234.2",
+   "version" : "0.235.1",
    "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

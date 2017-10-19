@@ -334,6 +334,10 @@ int zmq::socks_connecter_t::connect_to_proxy ()
     if (options.tos != 0)
         set_ip_type_of_service (s, options.tos);
 
+    // Bind the socket to a device if applicable
+    if (!options.bound_device.empty ())
+        bind_to_device (s, options.bound_device);
+
     // Set the socket to non-blocking mode so that we get async connect().
     unblock_socket (s);
 
@@ -390,7 +394,7 @@ zmq::fd_t zmq::socks_connecter_t::check_proxy_connection ()
     socklen_t len = sizeof err;
 #endif
 
-    const int rc = getsockopt (s, SOL_SOCKET, SO_ERROR, (char*) &err, &len);
+    int rc = getsockopt (s, SOL_SOCKET, SO_ERROR, (char*) &err, &len);
 
     //  Assert if the error was caused by 0MQ bug.
     //  Networking problems are OK. No need to assert.
@@ -427,10 +431,12 @@ zmq::fd_t zmq::socks_connecter_t::check_proxy_connection ()
     }
 #endif
 
-    tune_tcp_socket (s);
-    tune_tcp_keepalives (s, options.tcp_keepalive, options.tcp_keepalive_cnt,
+    rc = tune_tcp_socket (s);
+    rc = rc | tune_tcp_keepalives (s, options.tcp_keepalive, options.tcp_keepalive_cnt,
         options.tcp_keepalive_idle, options.tcp_keepalive_intvl);
-
+    if (rc != 0)
+        return -1;
+    
     return 0;
 }
 

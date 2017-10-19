@@ -1,0 +1,23 @@
+[Icon Theme]
+Name=png_1
+
+[actions/22]
+Context=Actions
+Size=22
+Type=Fixed
+
+[actions/32]
+Context=Actions
+Size=32
+Type=Fixed
+
+[apps/22]
+Context=Applications
+Size=22
+Type=Fixed
+
+[apps/32]
+Context=Applications
+Size=32
+Type=Fixed
+

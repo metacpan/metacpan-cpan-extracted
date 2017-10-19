@@ -24,6 +24,8 @@ TODO:
     our @ISA; BEGIN { @ISA = ('UNIVERSAL::Object') }
     our %HAS; BEGIN { %HAS = (balance => sub { 0 }) }
 
+    #sub SLOTS { return (balance => sub { 0 }) }
+
     sub balance { $_[0]->{balance} }
 
     sub deposit {
@@ -45,6 +47,8 @@ TODO:
     use warnings;
     our @ISA; BEGIN { @ISA = ('BankAccount') }
     our %HAS; BEGIN { %HAS = (%BankAccount::HAS, overdraft_account => sub { undef }) }
+
+    #sub SLOTS { return ($_[0]->SUPER::SLOTS, overdraft_account => sub { undef }) }
 
     sub overdraft_account { $_[0]->{overdraft_account} }
 

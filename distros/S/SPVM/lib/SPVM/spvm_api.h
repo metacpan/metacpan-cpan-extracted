@@ -21,10 +21,12 @@ union SPVM_API_value {
 // spvm_api.h
 typedef union SPVM_API_value SPVM_API_VALUE;
 
-
-
-
-
+typedef int8_t SPVM_API_byte;
+typedef int16_t SPVM_API_short;
+typedef int32_t SPVM_API_int;
+typedef int64_t SPVM_API_long;
+typedef float SPVM_API_float;
+typedef double SPVM_API_double;
 
 struct SPVM_api {
   int32_t (*get_array_length)(SPVM_API*, SPVM_API_OBJECT*);
@@ -69,7 +71,9 @@ struct SPVM_api {
   SPVM_API_OBJECT* (*new_float_array)(SPVM_API*, int32_t);
   SPVM_API_OBJECT* (*new_double_array)(SPVM_API*, int32_t);
   SPVM_API_OBJECT* (*new_object_array)(SPVM_API*, int32_t, int32_t);
-  SPVM_API_OBJECT* (*new_byte_array_string)(SPVM_API* api, const char* string);
+  SPVM_API_OBJECT* (*new_string)(SPVM_API* api, const char* string, int32_t length);
+  int32_t (*get_string_length)(SPVM_API* api, SPVM_API_OBJECT*);
+  char* (*get_string_chars)(SPVM_API* api, SPVM_API_OBJECT*);
   SPVM_API_OBJECT* (*get_exception)(SPVM_API* api);
   void (*set_exception)(SPVM_API* api, SPVM_API_OBJECT* exception);
   int32_t (*get_ref_count)(SPVM_API* api, SPVM_API_OBJECT* base_object);

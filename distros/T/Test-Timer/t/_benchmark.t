@@ -5,19 +5,11 @@ use Test::More;
 
 use Test::Timer;
 
-$Test::Timer::alarm = 1;
-
-like(
-    exception { Test::Timer::_benchmark( sub { sleep(20); }, 1 ); },
-    qr/2/,
-    'Caught timeout exception'
-);
-
 $Test::Timer::alarm = 2;
 
 like(
     exception { Test::Timer::_benchmark( sub { sleep(20); }, 1 ); },
-    qr/3/,
+    qr/\d+/,
     'Caught timeout exception'
 );
 

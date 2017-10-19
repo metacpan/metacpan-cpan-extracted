@@ -18,11 +18,11 @@ CGI::Info - Information about the CGI environment
 
 =head1 VERSION
 
-Version 0.63
+Version 0.64
 
 =cut
 
-our $VERSION = '0.63';
+our $VERSION = '0.64';
 
 =head1 SYNOPSIS
 
@@ -48,8 +48,10 @@ Creates a CGI::Info object.
 It takes four optional arguments allow, logger, expect and upload_dir,
 which are documented in the params() method.
 
-Takes an optional boolean parameter syslog, to log messages to
+Takes an optional parameter syslog, to log messages to
 L<Sys::Syslog>.
+It can be a boolean to enable/disable logging to syslog, or a reference
+to a hash to be given to Sys::Syslog::setlogsock.
 
 Takes optional parameter logger, an object which is used for warnings
 
@@ -831,6 +833,9 @@ sub _warn {
 		require Sys::Syslog;
 
 		Sys::Syslog->import();
+		if(ref($self->{_syslog} eq 'HASH')) {
+			Sys::Syslog::setlogsock($self->{_syslog});
+		}
 		openlog($self->script_name(), 'cons,pid', 'user');
 		syslog('warning', $warning);
 		closelog();
@@ -1588,6 +1593,28 @@ sub status {
 	my $self = shift;
 
 	return $self->{_status};
+}
+
+=head2 set_logger
+
+Sometimes you don't know what the logger is until you've instantiated the class.
+This function fixes the catch22 situation.
+
+=cut
+
+sub set_logger {
+	my $self = shift;
+	my %params;
+
+	if(ref($_[0]) eq 'HASH') {
+		%params = %{$_[0]};
+	} elsif(@_ % 2 == 0) {
+		%params = @_;
+	} else {
+		$params{'logger'} = shift;
+	}
+
+	$self->{_logger} = $params{'logger'};
 }
 
 =head2 reset

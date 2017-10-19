@@ -1,5 +1,8 @@
 Revision history for Map::Tube::Tokyo
 
+0.32  Sun Oct 15 08:35:00 2017
+      - Upgraded to use Map::Tube v3.35.
+
 0.31  Wed Sep 13 10:35:00 2017
       - Upgraded to use Map::Tube v3.34.
 

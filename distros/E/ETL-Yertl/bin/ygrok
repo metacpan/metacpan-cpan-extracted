@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 package ygrok;
-our $VERSION = '0.033';
+our $VERSION = '0.035';
 # ABSTRACT: Build YAML by parsing lines of plain text
 
 use ETL::Yertl;
@@ -45,7 +45,7 @@ ygrok - Build YAML by parsing lines of plain text
 
 =head1 VERSION
 
-version 0.033
+version 0.035
 
 =head1 SYNOPSIS
 

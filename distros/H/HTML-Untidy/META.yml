@@ -1,0 +1,27 @@
+---
+abstract: 'yet another way to write HTML quickly and programmatically'
+author:
+  - 'Jeff Ober <sysread@fastmail.fm>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test2::Bundle::Extended: '0'
+  Test::More: '0'
+  Test::Pod: '1.41'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: HTML-Untidy
+requires:
+  HTML::Escape: '0'
+resources:
+  bugtracker: https://github.com/sysread/HTML-Untidy/issues
+  homepage: https://github.com/sysread/HTML-Untidy
+  repository: https://github.com/sysread/HTML-Untidy.git
+version: '0.01'
+x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 #
-# Daybo Logic Shared Library
-# Copyright (c) 2015, David Duncan Ross Palmer (2E0EOL), Daybo Logic
+# Module test framework
+# Copyright (c) 2015-2017, Duncan Ross Palmer (2E0EOL) and others,
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -37,9 +37,6 @@ use Test::Module::Runnable;
 use Test::More 0.96;
 
 extends 'Test::Module::Runnable';
-
-use strict;
-use warnings;
 
 has 'dummyRunCount' => (isa => 'Int', is => 'rw', default => 0);
 has [qw(methodsSetUp methodsTornDown)] => (
@@ -105,8 +102,6 @@ use Test::More 0.96;
 use POSIX qw/EXIT_SUCCESS/;
 use Moose;
 use List::MoreUtils qw/all/;
-use strict;
-use warnings;
 
 sub main {
 	my $tester;

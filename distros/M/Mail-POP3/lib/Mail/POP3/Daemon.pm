@@ -160,3 +160,29 @@ sub _to_file {
 }
 
 1;
+
+=head1 METHODS
+
+=head2 new
+
+Takes C<$config> and C<$connection_class>.
+
+=head2 start
+
+Starts forking server.
+
+=head2 MPOPDQUIT
+
+Signal handler, shuts down.
+
+=head2 MPOPDRESTART
+
+Signal handler, restarts.
+
+=head2 READCONFIG
+
+Signal handler, re-reads config.
+
+=head2 REAPER
+
+Signal handler, reaps zombies.

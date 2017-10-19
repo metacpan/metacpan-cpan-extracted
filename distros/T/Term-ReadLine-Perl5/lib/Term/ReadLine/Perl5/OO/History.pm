@@ -43,19 +43,18 @@ my $HOME = File::HomeDir->my_home;
 sub add_line_to_history
 {
     my ($self, $line, $minlength) = @_;
-    my @rl_History = @{$self->{rl_History}};
+    my $rl_History = $self->{rl_History};
     my $rl_MaxHistorySize = $self->{rl_MaxHistorySize};
     if (length($line) >= $minlength
-        && (!@rl_History || $rl_History[$#rl_History] ne $line)
+        && (!@$rl_History || $rl_History->[$#$rl_History] ne $line)
        ) {
         ## if the history list is full, shift out an old one first....
-        while (@rl_History >= $self->{rl_MaxHistorySize}) {
-            shift(@rl_History);
+        while (@$rl_History >= $self->{rl_MaxHistorySize}) {
+            shift(@$rl_History);
             $self->{rl_HistoryIndex}--;
         }
 
-        push(@rl_History, $line); ## tack new one on the end
-	$self->{rl_History} = \@rl_History;
+        push(@$rl_History, $line); ## tack new one on the end
     }
 }
 
@@ -244,6 +243,7 @@ I<read_history()> and I<write_history()> follow GNU Readline's C
 convention of returning 0 for success and 1 for failure.
 
 =cut
+
 sub write_history($$) {
     my ($self, $filename) = @_;
     open(my $fh, '>:encoding(utf-8)', $filename ) or return $!;

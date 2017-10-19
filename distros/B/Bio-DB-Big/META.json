@@ -21,7 +21,9 @@
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.42"
+            "Module::Build" : "0.42",
+            "Module::Build::Pluggable" : "0",
+            "Module::Build::Pluggable::CPANfile" : "0"
          }
       },
       "runtime" : {
@@ -33,14 +35,15 @@
          "requires" : {
             "Test::Differences" : "0",
             "Test::Exception" : "0",
-            "Test::Fake::HTTPD" : "0"
+            "Test::Fake::HTTPD" : "0",
+            "Test::Output" : "0"
          }
       }
    },
    "provides" : {
       "Bio::DB::Big" : {
          "file" : "lib/Bio/DB/Big.pm",
-         "version" : "v1.0.0"
+         "version" : "v1.0.1"
       },
       "Bio::DB::Big::AutoSQL" : {
          "file" : "lib/Bio/DB/Big/AutoSQL.pm"
@@ -58,6 +61,6 @@
          "url" : "https://github.com/Ensembl/Bio-DB-Big"
       }
    },
-   "version" : "v1.0.0",
+   "version" : "v1.0.1",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

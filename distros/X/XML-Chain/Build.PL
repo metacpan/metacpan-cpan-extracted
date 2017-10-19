@@ -47,7 +47,6 @@ my $builder = $mb_subclass->new(
     requires => {
         'perl'            => 5.010,
         'XML::LibXML'     => 2.0100,   # Added the unique_key() method to XML::LibXML::Node
-        'XML::Tidy'       => 0,
         'IO::Any'         => 0,
         'Moose'           => 0,
         'MooseX::Aliases' => 0,

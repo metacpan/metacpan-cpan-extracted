@@ -12,7 +12,7 @@ configure_requires:
   Module::Build: '0.4004'
   perl: '5.008005'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4206, CPAN::Meta::Converter version 2.141520'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,7 +21,7 @@ name: Term-ReadLine-Perl5
 provides:
   Term::ReadLine::Perl5:
     file: lib/Term/ReadLine/Perl5.pm
-    version: '1.43'
+    version: '1.45'
   Term::ReadLine::Perl5::Common:
     file: lib/Term/ReadLine/Perl5/Common.pm
   Term::ReadLine::Perl5::Dumb:
@@ -43,10 +43,10 @@ provides:
     file: lib/Term/ReadLine/Perl5/TermCap.pm
   Term::ReadLine::Perl5::Tie:
     file: lib/Term/ReadLine/Perl5/Tie.pm
-    version: '1.43'
+    version: '1.45'
   Term::ReadLine::Perl5::readline:
     file: lib/Term/ReadLine/Perl5/readline.pm
-    version: '1.43'
+    version: '1.45'
 recommends:
   rlib: '0.02'
 requires:
@@ -64,4 +64,5 @@ resources:
   bugtracker: https://github.com/rocky/p5-Term-ReadLine-Perl5/issues
   license: http://dev.perl.org/licenses/
   repository: http://github.com/rocky/p5-Term-ReadLine-Perl5
-version: '1.43'
+version: '1.45'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

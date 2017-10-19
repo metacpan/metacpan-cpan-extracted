@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
-use Test::More tests => 4;
+use Test::More tests => 6;
 use Test::Trap qw(:default);
 
 use Data::SeaBASS;
@@ -14,7 +14,11 @@ like(join('',@{$trap->warn}), qr"^/optical_depth_warning=true", "warning 1");
 
 trap {my $sb_file = Data::SeaBASS->new(\$DATA[1]);};
 is($trap->leaveby, 'return', "no warning trap");
-is(join('',@{$trap->warn}), '', "warning 1");
+is(join('',@{$trap->warn}), '', "warning 2");
+
+trap {my $sb_file = Data::SeaBASS->new(\$DATA[0], {optional_warnings => 0});};
+is($trap->leaveby, 'return', "disabled warnings trap");
+is(join('',@{$trap->warn}), '', "warning 3");
 
 __DATA__
 /begin_header

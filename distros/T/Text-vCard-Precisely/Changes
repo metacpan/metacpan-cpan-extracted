@@ -1,5 +1,8 @@
 Revision history for Perl extension Text-vCard-Precisely
 
+0.11 2017-10-17T10:42:20Z
+  - just optimized around coercing
+
 0.10 2017-08-21T09:20:53Z
   - Now available SORT-AS param in N,FN,ORG
 

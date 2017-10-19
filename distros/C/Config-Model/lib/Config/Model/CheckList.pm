@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::CheckList;
-$Config::Model::CheckList::VERSION = '2.112';
+$Config::Model::CheckList::VERSION = '2.113';
 use Mouse;
 use 5.010;
 
@@ -243,11 +243,11 @@ sub notify_change {
 
     $self->SUPER::notify_change( %args, value_type => $self->value_type );
 
-    # notify all warped or computed objects that depends on me
+    # shake all warped or computed objects that depends on me
     foreach my $s ( $self->get_warped_slaves ) {
         $logger->debug( "calling notify_change on slave ", $s->name )
             if $logger->is_debug;
-        $s->notify_change( note => 'checklist master triggered changed' );
+        $s->needs_check(1);
     }
 }
 
@@ -747,7 +747,7 @@ Config::Model::CheckList - Handle check list element
 
 =head1 VERSION
 
-version 2.112
+version 2.113
 
 =head1 SYNOPSIS
 

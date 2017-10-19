@@ -37,33 +37,15 @@
 "use strict";
 
 define ([
+    'app/entries',
     'lib',
-    'target'
+    'target',
 ], function (
+    entries,
     lib,
-    target
+    target,
 ) {
 
-    var entries = {
-
-            'tableEntry1': {
-                name: 'tableEntry1',
-                aclProfileRead: 'passerby',
-                text: 'Entry 1',
-                prop: 'prop1',
-                maxlen: 20
-            },
-
-            'tableEntry2': {
-                name: 'tableEntry2',
-                aclProfileRead: 'passerby',
-                text: 'Entry 2',
-                prop: 'prop2',
-                maxlen: 20
-            }
-    
-        };
-    
     return function () {
 
         target.push('demoTable', {
@@ -73,7 +55,7 @@ define ([
             'title': 'Demo table',
             'preamble': 'This is just an illustration',
             'aclProfile': 'passerby',
-            'entries': [ entries.tableEntry1, entries.tableEntry2 ],
+            'entriesRead': [ entries.tableEntry1, entries.tableEntry2 ],
             'miniMenu': {
                 entries: ['demoActionFromTable']
             }

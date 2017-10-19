@@ -1,7 +1,11 @@
-Base85.pm
 Changes
-MANIFEST
+lib/Math/Base85.pm
+LICENSE
 Makefile.PL
-test.pl
-README
+MANIFEST
+MANIFEST.SKIP
+META.json
+META.yml
+README.md
 rfc1924.txt
+t/00-basic.t

@@ -1,6 +1,7 @@
 package WebService::Braintree::ErrorCodes;
-$WebService::Braintree::ErrorCodes::VERSION = '0.93';
-use strict;
+$WebService::Braintree::ErrorCodes::VERSION = '0.94';
+use 5.010_001;
+use strictures 1;
 
 use WebService::Braintree::ErrorCodes::Address;
 use WebService::Braintree::ErrorCodes::ApplePay;
@@ -19,3 +20,4 @@ use WebService::Braintree::ErrorCodes::Transaction;
 use WebService::Braintree::ErrorCodes::Transaction::Options;
 
 1;
+__END__

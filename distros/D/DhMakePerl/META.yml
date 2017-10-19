@@ -14,7 +14,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.38'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 keywords:
   - debian
   - package
@@ -44,7 +44,7 @@ requires:
   Config::INI::Reader: '0'
   Cwd: '0'
   Dpkg: '0'
-  Dpkg::Source::Package: '0'
+  Dpkg::Source::Package: '1.01'
   Email::Address: '0'
   Email::Date::Format: '0'
   File::Basename: '0'
@@ -57,6 +57,8 @@ requires:
   Getopt::Long: '0'
   IO::File: '0'
   IO::Uncompress::Gunzip: '0'
+  LWP::ConnCache: '0'
+  LWP::UserAgent: '0'
   List::MoreUtils: '0'
   Module::Build: '0'
   Module::CoreList: '0'
@@ -73,10 +75,11 @@ requires:
   User::pwent: '0'
   WWW::Mechanize: '0'
   YAML: '0'
+  YAML::XS: '0'
   perl: '5.010'
   version: '0'
 resources:
   license: http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt
   repository: https://anonscm.debian.org/cgit/pkg-perl/packages/dh-make-perl.git
-version: '0.89'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.016'
+version: '0.96'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

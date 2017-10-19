@@ -6,7 +6,7 @@ Math::AnyNum - Arbitrary size precision for integers, rationals, floating-points
 
 =head1 VERSION
 
-Version 0.15
+Version 0.16
 
 =head1 SYNOPSIS
 
@@ -588,7 +588,7 @@ Logarithm of C<x> to base 2 and base 10, respectively.
     lgrt(x)                                       #=> Any
 
 Logarithmic-root of C<x>, which is the solution to C<a**a = x>, where C<x> is known.
-When the value of C<x> is less than C<e**(-1/e)>, it returns a complex number. It also accepts complex numbers as input.
+When the value of C<x> is less than C<e**(-1/e)>, it returns a complex number. It also accepts a complex number as input.
 
 Example:
 
@@ -599,7 +599,7 @@ Example:
     LambertW(x)                                   #=> Any
 
 The Lambert-W function. When the value of C<x> is less than C<-1/e>, it returns a complex number.
-It also accepts complex numbers as input.
+It also accepts a complex number as input.
 
 Example:
 
@@ -1536,6 +1536,11 @@ Returns a false value when the number is zero. True otherwise.
 
 Returns a Perl numerical scalar containing the value of C<x>, truncated if necessary.
 
+If C<x> is an integer that fits inside a native signed or unsigned integer, the returned result will be exact,
+otherwise the result is returned as a double, with possible truncation.
+
+If C<x> is a complex number, only the real part is considered.
+
 =head2 as_bin
 
     as_bin(n)                                     #=> Scalar
@@ -1781,7 +1786,7 @@ the B<GMP>, B<MPFR> and B<MPC> libraries are extremely efficient.
 
 =back
 
-To achieve the best performance, try to follow this rules:
+To achieve the best performance, try to:
 
 =over 4
 
@@ -1795,7 +1800,7 @@ use floating-point numbers when accuracy is not important.
 
 =item *
 
-pass Perl numbers as arguments to methods, if you can.
+pass Perl integers as arguments to methods, if you can.
 
 =back
 

@@ -6,6 +6,7 @@ package Lingua::Translit;
 #   Rona Linke <rlinke@lingua-systems.com>
 # Copyright (C) 2009-2016 Lingua-Systems Software GmbH
 # Copyright (C) 2016-2017 Netzum Sorglos, Lingua-Systems Software GmbH
+# Copyright (C) 2017 Netzum Sorglos Software GmbH
 #
 
 use strict;
@@ -18,7 +19,7 @@ use Encode qw/encode decode/;
 
 use Lingua::Translit::Tables;
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 =pod
 
@@ -181,7 +182,7 @@ sub translit {
 
 Transliterates the given text according to the object's transliteration
 table, but uses it the other way round. For example table ISO 9 is a
-transliteration scheme for the converion of Cyrillic letters to the Latin
+transliteration scheme for the conversion of Cyrillic letters to the Latin
 alphabet. So if used reverse, Latin letters will be mapped to Cyrillic ones.
 
 Returns the transliterated text.
@@ -348,7 +349,7 @@ I<Devanagari IAST>, not reversible, Devanāgarī to IAST Romanization
 
 In case you want to add your own transliteration tables to
 L<Lingua::Translit>, have a look at the developer documentation at
-L<http://www.netzum-sorglos.de/software/lingua-translit/developer-documentation.html>.
+L<https://www.netzum-sorglos.de/software/lingua-translit/developer-documentation.html>.
 
 A template of a transliteration table is provided as well
 (F<xml/template.xml>) so you can easily start developing.
@@ -415,6 +416,8 @@ Copyright (C) 2007-2008 Alex Linke and Rona Linke
 Copyright (C) 2009-2016 Lingua-Systems Software GmbH
 
 Copyright (C) 2016-2017 Netzum Sorglos, Lingua-Systems Software GmbH
+
+Copyright (C) 2017 Netzum Sorglos Software GmbH
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

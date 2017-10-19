@@ -10,7 +10,7 @@ use XML::Generator::PerlData;
 
 use Moo;
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 has 'ua', is => 'ro', default => sub {
     Furl->new(
@@ -25,8 +25,6 @@ has 'ua', is => 'ro', default => sub {
         # https://rt.cpan.org/Public/Bug/Display.html?id=86684
         ssl_opts => {
             SSL_verify_mode => SSL_VERIFY_PEER(),
-            # forcing version yields better error message:
-            SSL_version     => 'TLSv1_2',
         },
     );
 };
@@ -38,7 +36,7 @@ has 'key', is => 'ro', required => 1;
 has 'api_url', (
     is      => 'ro',
     writer  => '_set_api_url',
-    default => 'https://api.moip.com.br/ws/alpha/EnviarInstrucao/Unica'
+    default => 'https://www.moip.com.br/ws/alpha/EnviarInstrucao/Unica'
 );
 
 has 'sandbox', (
@@ -48,7 +46,7 @@ has 'sandbox', (
         my ($self, $sandbox) = @_;
         $self->_set_api_url( $sandbox
             ? 'https://desenvolvedor.moip.com.br/sandbox/ws/alpha/EnviarInstrucao/Unica'
-            : 'https://api.moip.com.br/ws/alpha/EnviarInstrucao/Unica'
+            : 'https://www.moip.com.br/ws/alpha/EnviarInstrucao/Unica'
         );
     }
 );
@@ -121,6 +119,14 @@ sub _gen_xml {
     my $xml_args  = { instrucao_unica => $args };
 
     $generator->parse( $xml_args );
+
+    # FIXME: XML::Generator::PerlData does not know how to handle
+    # elements with attributes *and* (leaf) data inside. And of course
+    # Moip requires just that.
+    if (exists $xml_args->{instrucao_unica}{pagador}{identidade}) {
+        $xml =~ s{<Identidade>(\d+)</Identidade>}
+                 {<Identidade Tipo="CPF">$1</Identidade>};
+    }
 
     return $xml;
 }
@@ -267,40 +273,17 @@ recodificá-las em 'iso-8859-1' e enviá-las ao Moip.
 Como mencionado na descrição, o Net::Moip é compatível apenas com a
 v1 da API do Moip.
 
-Este módulo utiliza os novos endpoints do Moip (api.moip.com.br)
-desde a versão 0.04 do Net::Moip. Se você usa esse módulo, certifique-se
-de que está atualizado. O endpoint antigo da API (www.moip.com.br)
-foi DESATIVADO pelo Moip em 30/9/2015.
+Em meados de 2015, o
+L<< Moip anunciou uma mudança de endpoints|https://moip.zendesk.com/hc/pt-br/articles/206767477-Certificado-Digital-com-tecnologia-SHA-256-Guia-de-Upgrade-do-Sistema >>,
+de www.moip.com.br para api.moip.com.br. A fim de melhorar a segurança,
+esse endpoint exigiria conexão com TLS 1.1 ou 1.2, usando certificado
+digital assinado com SHA-256 e desativando completamente os protocolos
+SSLv3 e TLS 1.0, considerados inseguros.
 
-Por questões de segurança, o endpoint do Moip exige conexão com
-TLS 1.1 ou 1.2, usando um certificado digital assinado com SHA-256.
-Os protocolos SSLv3 e TLS 1.0 foram completamente desativados.
-
-Para garantir compatibilidade com a API do Moip, este módulo
-por padrão carrega um user agent forçando o uso de TLS 1.2, o que
-gera uma exceção fatal caso seu sistema não aceite o protocolo.
-
-Portanto, se a sua aplicação está retornando exceções com mensagens como:
-
-    SSL connect attempt failed because of handshake problems
-
-ou
-
-    Cannot create SSL connection: SSL Version TLSv1_2 not supported
-
-Você provavelmente precisa atualizar sua versão do OpenSSL para uma que
-entenda TLS 1.2. Uma forma rápida de descobrir é digitar na linha de comando:
-
-    openssl ciphers -sv 'TLSv1.2'
-
-O resultado desse comando deve ser uma lista de cifras separadas por ":".
-Se em vez disso o comando retornar erro ou nenhum resultado, você precisa
-atualizar seu OpenSSL e, em seguida, reinstalar os módulos L<Net::SSLeay>
-e L<IO::Socket::SSL> (nessa ordem). Sugerimos também instalar/atualizar
-o módulo L<Mozilla::CA>, que contém uma cópia dos certificados das CAs
-da Mozilla e é usado pelo IO::Socket::SSL.
-
-Mais detalhes no L<< blog oficial do Moip|https://moip.zendesk.com/hc/pt-br/articles/206767477-Certificado-Digital-com-tecnologia-SHA-256-Guia-de-Upgrade-do-Sistema >>.
+A versão 0.04 deste módulo foi lançada para acomodar essa mudança. Porém,
+o Moip não cumpriu com seu próprio roadmap e o endpoint novo
+nunca foi lançado. A versão 0.06 deste módulo restaura o uso do endpoint
+antigo e as permissões liberais de SSL.
 
 =head1 VEJA TAMBÉM
 
@@ -310,7 +293,7 @@ L<https://desenvolvedor.moip.com.br>
 
 =head1 LICENÇA E COPYRIGHT
 
-Copyright 2014-2015 Breno G. de Oliveira C<< garu at cpan.org >>. Todos os direitos reservados.
+Copyright 2014-2017 Breno G. de Oliveira C<< garu at cpan.org >>. Todos os direitos reservados.
 
 Este módulo é software livre; você pode redistribuí-lo e/ou modificá-lo sob os mesmos
 termos que o Perl. Veja a licença L<perlartistic> para mais informações.

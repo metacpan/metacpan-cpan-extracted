@@ -13,6 +13,7 @@ use warnings;
 use Mail::DKIM::Canonicalization::nowsp;
 use Mail::DKIM::Canonicalization::relaxed;
 use Mail::DKIM::Canonicalization::simple;
+use Mail::DKIM::Canonicalization::seal;
 
 package Mail::DKIM::Algorithm::Base;
 use Carp;
@@ -71,6 +72,7 @@ sub get_canonicalization_class
 	my $class = $method eq "nowsp" ? "Mail::DKIM::Canonicalization::nowsp" :
 			$method eq "relaxed" ? "Mail::DKIM::Canonicalization::relaxed" :
 			$method eq "simple" ? "Mail::DKIM::Canonicalization::simple" :
+			$method eq "seal" ? "Mail::DKIM::Canonicalization::seal" :
 		die "unknown method $method\n";
 	return $class;
 }
@@ -184,10 +186,11 @@ sub check_body_hash
 	# from a version of the DKIM spec that uses the bh= tag. Otherwise,
 	# the signature shouldn't have a bh= tag to check.
 
-	if ($self->{body_hash})
+        my $sighash = $self->{Signature}->body_hash();
+	if ($self->{body_hash} and $sighash)
 	{
 		my $body_hash = $self->{body_hash};
-		my $expected = decode_base64($self->{Signature}->body_hash);
+		my $expected = decode_base64($sighash);
 		if ($body_hash ne $expected)
 		{
 			$self->{verification_details} = "body has been altered";

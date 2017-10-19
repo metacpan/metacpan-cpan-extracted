@@ -1,6 +1,6 @@
 package Dancer2::Core::Request;
 # ABSTRACT: Interface for accessing incoming requests
-$Dancer2::Core::Request::VERSION = '0.205001';
+$Dancer2::Core::Request::VERSION = '0.205002';
 use strict;
 use warnings;
 use parent 'Plack::Request';
@@ -167,8 +167,8 @@ sub forwarded_host        { shift->env->{'HTTP_X_FORWARDED_HOST'} }
 
 # there are two options
 sub forwarded_protocol    {
-    $_[0]->env->{'HTTP_X_FORWARDED_PROTOCOL'} ||
     $_[0]->env->{'HTTP_X_FORWARDED_PROTO'}    ||
+    $_[0]->env->{'HTTP_X_FORWARDED_PROTOCOL'} ||
     $_[0]->env->{'HTTP_FORWARDED_PROTO'}
 }
 
@@ -653,6 +653,14 @@ sub _shallow_clone {
     return $new_request;
 }
 
+
+sub _set_route {
+    my ( $self, $route ) = @_;
+    $self->{'route'} = $route;
+}
+
+sub route { $_[0]->{'route'} }
+
 1;
 
 __END__
@@ -667,7 +675,7 @@ Dancer2::Core::Request - Interface for accessing incoming requests
 
 =head1 VERSION
 
-version 0.205001
+version 0.205002
 
 =head1 SYNOPSIS
 
@@ -936,6 +944,10 @@ Alias to the C<method> accessor, for backward-compatibility with C<CGI> interfac
 =head2 request_uri
 
 Return the raw, undecoded request URI path.
+
+=head2 route
+
+Return the L<route|Dancer2::Core::Route> which this request matched.
 
 =head2 scheme
 

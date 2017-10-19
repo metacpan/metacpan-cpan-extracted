@@ -1,6 +1,6 @@
 package Dancer2::Core::Error;
 # ABSTRACT: Class representing fatal errors
-$Dancer2::Core::Error::VERSION = '0.205001';
+$Dancer2::Core::Error::VERSION = '0.205002';
 use Moo;
 use Carp;
 use Dancer2::Core::Types;
@@ -202,7 +202,14 @@ has response => (
     default => sub {
         my $self = shift;
         my $serializer = $self->serializer;
+        # include server tokens in response ?
+        my $no_server_tokens = $self->has_app
+            ? $self->app->config->{'no_server_tokens'}
+            : defined $ENV{DANCER_NO_SERVER_TOKENS}
+                ? $ENV{DANCER_NO_SERVER_TOKENS}
+                : 0;
         return Dancer2::Core::Response->new(
+            server_tokens => !$no_server_tokens,
             ( serializer => $serializer )x!! $serializer
         );
     }
@@ -264,9 +271,11 @@ sub _build_content {
         return $content if defined $content;
     }
 
-    # It doesn't make sense to return a static page if show_errors is on
-    if ( !$self->show_errors && (my $content = $self->static_page) ) {
-        return $content;
+    # It doesn't make sense to return a static page for a 500 if show_errors is on
+    if ( !($self->show_errors && $self->status eq '500') ) {
+         if ( my $content = $self->static_page ) {
+             return $content;
+         }
     }
 
     if ($self->has_app && $self->app->config->{error_template}) {
@@ -467,7 +476,7 @@ Dancer2::Core::Error - Class representing fatal errors
 
 =head1 VERSION
 
-version 0.205001
+version 0.205002
 
 =head1 SYNOPSIS
 

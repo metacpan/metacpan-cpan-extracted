@@ -204,9 +204,14 @@ zmq::socket_base_t::socket_base_t (ctx_t *parent_, uint32_t tid_, int sid_, bool
     options.linger = parent_->get (ZMQ_BLOCKY)? -1: 0;
 
     if (thread_safe)
-        mailbox = new mailbox_safe_t(&sync);
+    {
+        mailbox = new (std::nothrow) mailbox_safe_t(&sync);
+        zmq_assert (mailbox);
+    }
     else {
-        mailbox_t *m = new mailbox_t();
+        mailbox_t *m = new (std::nothrow) mailbox_t();
+        zmq_assert (m);
+
         if (m->get_fd () != retired_fd)
             mailbox = m;
         else {
@@ -214,6 +219,17 @@ zmq::socket_base_t::socket_base_t (ctx_t *parent_, uint32_t tid_, int sid_, bool
             mailbox = NULL;
         }
     }
+}
+
+int zmq::socket_base_t::get_peer_state (const void *routing_id_,
+                                        size_t routing_id_size_) const
+{
+    LIBZMQ_UNUSED (routing_id_);
+    LIBZMQ_UNUSED (routing_id_size_);
+
+    //  Only ROUTER sockets support this
+    errno = ENOTSUP;
+    return -1;
 }
 
 zmq::socket_base_t::~socket_base_t ()
@@ -748,14 +764,14 @@ int zmq::socket_base_t::connect (const char *addr_)
 
         if (!peer.socket) {
             //  The peer doesn't exist yet so we don't know whether
-            //  to send the identity message or not. To resolve this,
-            //  we always send our identity and drop it later if
+            //  to send the routing id message or not. To resolve this,
+            //  we always send our routing id and drop it later if
             //  the peer doesn't expect it.
             msg_t id;
-            rc = id.init_size (options.identity_size);
+            rc = id.init_size (options.routing_id_size);
             errno_assert (rc == 0);
-            memcpy (id.data (), options.identity, options.identity_size);
-            id.set_flags (msg_t::identity);
+            memcpy (id.data (), options.routing_id, options.routing_id_size);
+            id.set_flags (msg_t::routing_id);
             bool written = new_pipes [0]->write (&id);
             zmq_assert (written);
             new_pipes [0]->flush ();
@@ -764,25 +780,25 @@ int zmq::socket_base_t::connect (const char *addr_)
             pend_connection (std::string (addr_), endpoint, new_pipes);
         }
         else {
-            //  If required, send the identity of the local socket to the peer.
-            if (peer.options.recv_identity) {
+            //  If required, send the routing id of the local socket to the peer.
+            if (peer.options.recv_routing_id) {
                 msg_t id;
-                rc = id.init_size (options.identity_size);
+                rc = id.init_size (options.routing_id_size);
                 errno_assert (rc == 0);
-                memcpy (id.data (), options.identity, options.identity_size);
-                id.set_flags (msg_t::identity);
+                memcpy (id.data (), options.routing_id, options.routing_id_size);
+                id.set_flags (msg_t::routing_id);
                 bool written = new_pipes [0]->write (&id);
                 zmq_assert (written);
                 new_pipes [0]->flush ();
             }
 
-            //  If required, send the identity of the peer to the local socket.
-            if (options.recv_identity) {
+            //  If required, send the routing id of the peer to the local socket.
+            if (options.recv_routing_id) {
                 msg_t id;
-                rc = id.init_size (peer.options.identity_size);
+                rc = id.init_size (peer.options.routing_id_size);
                 errno_assert (rc == 0);
-                memcpy (id.data (), peer.options.identity, peer.options.identity_size);
-                id.set_flags (msg_t::identity);
+                memcpy (id.data (), peer.options.routing_id, peer.options.routing_id_size);
+                id.set_flags (msg_t::routing_id);
                 bool written = new_pipes [1]->write (&id);
                 zmq_assert (written);
                 new_pipes [1]->flush ();
@@ -848,6 +864,7 @@ int zmq::socket_base_t::connect (const char *addr_)
                 || isxdigit (*check)
                 || *check == '.' || *check == '-' || *check == ':' || *check == '%'
                 || *check == ';' || *check == '['  || *check == ']' || *check == '_'
+                || *check == '*'
             ) {
                 check++;
             }
@@ -885,21 +902,21 @@ int zmq::socket_base_t::connect (const char *addr_)
     }
 #endif
 
-if (protocol  == "udp") {
-    if (options.type != ZMQ_RADIO) {
-        errno = ENOCOMPATPROTO;
-        LIBZMQ_DELETE(paddr);
-        return -1;
-    }
+    if (protocol  == "udp") {
+        if (options.type != ZMQ_RADIO) {
+            errno = ENOCOMPATPROTO;
+            LIBZMQ_DELETE(paddr);
+            return -1;
+        }
 
-    paddr->resolved.udp_addr = new (std::nothrow) udp_address_t ();
-    alloc_assert (paddr->resolved.udp_addr);
-    rc = paddr->resolved.udp_addr->resolve (address.c_str(), false);
-    if (rc != 0) {
-        LIBZMQ_DELETE(paddr);
-        return -1;
+        paddr->resolved.udp_addr = new (std::nothrow) udp_address_t ();
+        alloc_assert (paddr->resolved.udp_addr);
+        rc = paddr->resolved.udp_addr->resolve (address.c_str(), false);
+        if (rc != 0) {
+            LIBZMQ_DELETE(paddr);
+            return -1;
+        }
     }
-}
 
 // TBD - Should we check address for ZMQ_HAVE_NORM???
 
@@ -1126,7 +1143,7 @@ int zmq::socket_base_t::send (msg_t *msg_, int flags_)
 
     //  In case of non-blocking send we'll simply propagate
     //  the error - including EAGAIN - up the stack.
-    if (flags_ & ZMQ_DONTWAIT || options.sndtimeo == 0) {
+    if ((flags_ & ZMQ_DONTWAIT) || options.sndtimeo == 0) {
         return -1;
     }
 
@@ -1207,7 +1224,7 @@ int zmq::socket_base_t::recv (msg_t *msg_, int flags_)
     //  For non-blocking recv, commands are processed in case there's an
     //  activate_reader command already waiting in a command pipe.
     //  If it's not, return EAGAIN.
-    if (flags_ & ZMQ_DONTWAIT || options.rcvtimeo == 0) {
+    if ((flags_ & ZMQ_DONTWAIT) || options.rcvtimeo == 0) {
         if (unlikely (process_commands (0, false) != 0)) {
             return -1;
         }
@@ -1298,7 +1315,8 @@ void zmq::socket_base_t::start_reaping (poller_t *poller_)
     else {
         scoped_optional_lock_t sync_lock(thread_safe ? &sync : NULL);
 
-        reaper_signaler =  new signaler_t();
+        reaper_signaler = new (std::nothrow) signaler_t();
+        zmq_assert (reaper_signaler);
 
         //  Add signaler to the safe mailbox
         fd = reaper_signaler->get_fd();
@@ -1405,6 +1423,12 @@ void zmq::socket_base_t::process_term (int linger_)
 
     //  Continue the termination process immediately.
     own_t::process_term (linger_);
+}
+
+void zmq::socket_base_t::process_term_endpoint (std::string *endpoint_)
+{
+    term_endpoint (endpoint_->c_str());
+    delete endpoint_;
 }
 
 void zmq::socket_base_t::update_pipe_options(int option_)
@@ -1573,9 +1597,9 @@ void zmq::socket_base_t::pipe_terminated (pipe_t *pipe_)
 
 void zmq::socket_base_t::extract_flags (msg_t *msg_)
 {
-    //  Test whether IDENTITY flag is valid for this socket type.
-    if (unlikely (msg_->flags () & msg_t::identity))
-        zmq_assert (options.recv_identity);
+    //  Test whether routing_id flag is valid for this socket type.
+    if (unlikely (msg_->flags () & msg_t::routing_id))
+        zmq_assert (options.recv_routing_id);
 
     //  Remove MORE flag.
     rcvmore = msg_->flags () & msg_t::more ? true : false;
@@ -1679,14 +1703,28 @@ void zmq::socket_base_t::event_disconnected (const std::string &addr_, zmq::fd_t
     event(addr_, fd_, ZMQ_EVENT_DISCONNECTED);
 }
 
-void zmq::socket_base_t::event_handshake_failed(const std::string &addr_, int err_)
+void zmq::socket_base_t::event_handshake_failed_no_detail (
+  const std::string &addr_, int err_)
 {
-    event(addr_, err_, ZMQ_EVENT_HANDSHAKE_FAILED);
+    event (addr_, err_, ZMQ_EVENT_HANDSHAKE_FAILED_NO_DETAIL);
 }
 
-void zmq::socket_base_t::event_handshake_succeed(const std::string &addr_, int err_)
+void zmq::socket_base_t::event_handshake_failed_protocol (
+  const std::string &addr_, int err_)
 {
-    event(addr_, err_, ZMQ_EVENT_HANDSHAKE_SUCCEED);
+    event (addr_, err_, ZMQ_EVENT_HANDSHAKE_FAILED_PROTOCOL);
+}
+
+void zmq::socket_base_t::event_handshake_failed_auth (const std::string &addr_,
+                                                      int err_)
+{
+    event (addr_, err_, ZMQ_EVENT_HANDSHAKE_FAILED_AUTH);
+}
+
+void zmq::socket_base_t::event_handshake_succeeded (const std::string &addr_,
+                                                    int err_)
+{
+    event (addr_, err_, ZMQ_EVENT_HANDSHAKE_SUCCEEDED);
 }
 
 void zmq::socket_base_t::event(const std::string &addr_, intptr_t value_, int type_)

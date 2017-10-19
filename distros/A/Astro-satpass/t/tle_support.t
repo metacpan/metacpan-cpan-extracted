@@ -17,7 +17,7 @@ note <<'EOD';
 The following tests check manipulation of the canned statuses
 EOD
 
-cmp_ok elements( Astro::Coord::ECI::TLE->status( 'show' ) ), '==', 91,
+cmp_ok elements( Astro::Coord::ECI::TLE->status( 'show' ) ), '==', 97,
     'Astro::Coord::ECI::TLE->status() items initially';
 
 Astro::Coord::ECI::TLE->status( 'clear' );
@@ -91,6 +91,18 @@ is ref $tle, 'Astro::Coord::ECI::TLE::Iridium',
     q{Changing object's OID to 33333 leaves it still an Iridium};
 
 ok ! $tle->can_flare(), 'But OID 33333 can not flare.';
+
+ok $tle->can_flare( 1 ), 'OID 33333 can flare if we accept spares';
+
+note 'Specify that OID 33333 has decayed';
+Astro::Coord::ECI::TLE->status( add => 33333, iridium => 'D' );
+$tle->rebless();
+
+ok ! $tle->can_flare(), 'Now OID 33333 can not flare.';
+
+ok ! $tle->can_flare( 1 ), 'and OID 33333 can not flare if we accept spares';
+
+ok $tle->can_flare( 'all' ), 'but OID 33333 can flare if we accept all';
 
 $tle = Astro::Coord::ECI::TLE->new( id => 22222 );
 is ref $tle, 'Astro::Coord::ECI::TLE::Iridium',

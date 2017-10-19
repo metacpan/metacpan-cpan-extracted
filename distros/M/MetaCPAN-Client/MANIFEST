@@ -80,6 +80,5 @@ t/resultset.t
 t/scroll.t
 t/ua_trap.t
 xt/author/00-compile.t
-xt/author/critic.t
 xt/author/pod-coverage.t
 xt/author/pod-syntax.t

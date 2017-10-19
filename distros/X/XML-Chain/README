@@ -102,7 +102,7 @@ CHAINED DOCUMENT METHODS
 
  set_io_any
 
-    Store  $what  of IO::Any for future use with  -store() >
+    Store  $what , $options  of IO::Any for future use with  ->store() 
 
  store
 
@@ -156,21 +156,23 @@ NAME
 
 SYNOPSIS
 
-        my $user = xc('user', xmlns => 'testns')
-                    ->auto_indent({chars=>' 'x4})
-                    ->a(xc('name')->t('Johnny Thinker'))
-                    ->a(xc('username')->t('jt'))
-                    ->c('bio')
-                        ->a(xc('div', xmlns => 'http://www.w3.org/1999/xhtml')
-                            ->a(xc('h1')->t('about'))
-                            ->a(xc('p')->t('...')))
-                        ->a(xc('greeting')->t('Hey'))
-                        ->up;
+        my $user = xc('user', xmlns => 'http://testns')->auto_indent({chars=>' 'x4})
+            ->a('name', '-' => 'Johnny Thinker')
+            ->a('username', '-' => 'jt')
+            ->c('bio')
+                ->c('div', xmlns => 'http://www.w3.org/1999/xhtml')
+                    ->a('h1', '-' => 'about')
+                    ->a('p', '-' => '...')
+                    ->up
+                ->a('greeting', '-' => 'Hey')
+                ->up
+            ->a('active', '-' => '1')
+            ->root;
         say $user->as_string;
 
     Will print:
 
-        <user xmlns="testns">
+        <user xmlns="http://testns">
             <name>Johnny Thinker</name>
             <username>jt</username>
             <bio>
@@ -180,6 +182,7 @@ SYNOPSIS
                 </div>
                 <greeting>Hey</greeting>
             </bio>
+            <active>1</active>
         </user>
 
 DESCRIPTION
@@ -307,16 +310,25 @@ CHAINED METHODS
 
  auto_indent
 
+    (experimental feature (good/usefull for debug, needs more testing),
+    works only on element for which as_string is called at this moment)
+
         my $simple = xc('div')
                         ->auto_indent(1)
-                        ->c('div')->t('in')
-                        ->root;
+                        ->a('div', '-' => 'in1')
+                        ->a('div', '-' => 'in2')
+                        ->t('in2.1')
+                        ->a('div', '-' => 'in3')
+        ;
         say $simple->as_string;
 
     Will print:
 
         <div>
-            <div>in</div>
+            <div>in1</div>
+            <div>in2</div>
+            in2.1
+            <div>in3</div>
         </div>
 
     Turn on/off tidy/auto-indentation of document elements. Default
@@ -325,15 +337,6 @@ CHAINED METHODS
     Argument can be either true/false scalar or a hashref with indentation
     options. Currently	{chars=' 'x4} > will set indentation characters to
     be four spaces.
-
-    NOTE Currently works only on element on which as_string() is called
-    using HTML::Tidy. In the future it is planned to be possible to set
-    indentation on/off also for nested elements. For example not to indent
-    embedded html elements.
-
-    WARNING HTML::Tidy has a circular reference and leaks memory when used.
-    Better don't use auto_indent() at in this version in persistent
-    environments.
 
 CHAINED DOCUMENT METHODS
 

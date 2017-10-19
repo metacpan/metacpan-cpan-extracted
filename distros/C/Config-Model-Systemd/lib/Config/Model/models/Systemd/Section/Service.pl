@@ -167,7 +167,7 @@ Defaults to C<yes>.',
       },
       'PIDFile',
       {
-        'description' => 'Takes an absolute file name pointing to the
+        'description' => 'Takes an absolute filename pointing to the
 PID file of this daemon. Use of this option is recommended for
 services where C<Type> is set to
 C<forking>. systemd will read the PID of the
@@ -209,13 +209,14 @@ C<ExecStop> line set. (Services lacking both C<ExecStart> and
 C<ExecStop> are not valid.)
 
 For each of the specified commands, the first argument must be an absolute path to an
-executable. Optionally, if this file name is prefixed with C<@>, the second token will be
-passed as C<argv[0]> to the executed process, followed by the further arguments specified.  If
-the absolute filename is prefixed with C<->, an exit code of the command normally considered a
-failure (i.e. non-zero exit status or abnormal exit due to signal) is ignored and considered success.  If the
-absolute path is prefixed with C<+> then it is executed with full
-privileges. C<@>, C<->, and C<+> may be used together and they
-can appear in any order.
+executable. Optionally, this filename may be prefixed with a number of special characters:
+
+C<@>, C<->, and one of
+C<+>/C<!>/C<!!> may be used together and they can appear in any
+order. However, only one of C<+>, C<!>, C<!!> may be used at a
+time. Note that these prefixes are also supported for the other command line settings,
+i.e. C<ExecStartPre>, C<ExecStartPost>, C<ExecReload>,
+C<ExecStop> and C<ExecStopPost>.
 
 If more than one command is specified, the commands are
 invoked sequentially in the order they appear in the unit
@@ -590,7 +591,7 @@ C<on-abnormal> is an alternative choice.',
       },
       'SuccessExitStatus',
       {
-        'description' => "Takes a list of exit status definitions that,
+        'description' => 'Takes a list of exit status definitions that,
 when returned by the main service process, will be considered
 successful termination, in addition to the normal successful
 exit code 0 and the signals C<SIGHUP>,
@@ -605,21 +606,11 @@ ensures that exit codes 1, 2, 8 and
 the termination signal C<SIGKILL> are
 considered clean service terminations.
 
-Note that if a process has a signal handler installed
-and exits by calling
-L<_exit(2)>
-in response to a signal, the information about the signal is
-lost. Programs should instead perform cleanup and kill
-themselves with the same signal instead. See
-Proper
-handling of SIGINT/SIGQUIT \x{2014} How to be a proper
-program.
-
 This option may appear more than once, in which case the
 list of successful exit statuses is merged. If the empty
 string is assigned to this option, the list is reset, all
 prior assignments of this option will have no
-effect.",
+effect.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },

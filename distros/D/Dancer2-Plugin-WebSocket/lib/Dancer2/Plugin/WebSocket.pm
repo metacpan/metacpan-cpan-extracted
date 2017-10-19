@@ -1,13 +1,11 @@
 package Dancer2::Plugin::WebSocket;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: add a websocket interface to your Dancers app
-$Dancer2::Plugin::WebSocket::VERSION = '0.0.1';
+$Dancer2::Plugin::WebSocket::VERSION = '0.1.0';
 
 use Plack::App::WebSocket;
 
 use Dancer2::Plugin;
-
-use Role::Tiny qw();
 
 has serializer => (
     is => 'ro',
@@ -47,6 +45,11 @@ has 'on_error' => (
     },
 );
 
+has connections => (
+    is => 'ro',
+    default => sub{ {} },
+);
+
 
 sub websocket_url :PluginKeyword {
     my $self = shift;
@@ -67,10 +70,14 @@ sub websocket_mount :PluginKeyword {
             my $conn = shift; ## Plack::App::WebSocket::Connection object
             my $env = shift;  ## PSGI env
 
-            Role::Tiny->apply_roles_to_object(
+            require Moo::Role;
+
+            Moo::Role->apply_roles_to_object(
                 $conn, 'Dancer2::Plugin::WebSocket::Connection'
             );
+            $conn->manager($self);
             $conn->serializer($self->serializer);
+            $self->connections->{$conn->id} = $conn;
 
             $self->on_open->( $conn, $env, @_ );
 
@@ -80,10 +87,18 @@ sub websocket_mount :PluginKeyword {
                     if( my $s = $conn->serializer ) {
                         $message = $s->decode($message);
                     }
-                    $self->on_message->( $conn, $message );
+                    use Try::Tiny;
+                    try {
+                        $self->on_message->( $conn, $message );
+                    }
+                    catch {
+                        warn $_;
+                        die $_;
+                    };
                 },
                 finish => sub {
                     $self->on_close->($conn);
+                    delete $self->connections->{$conn->id};
                     $conn = undef;
                 },
             );
@@ -107,7 +122,7 @@ Dancer2::Plugin::WebSocket - add a websocket interface to your Dancers app
 
 =head1 VERSION
 
-version 0.0.1
+version 0.1.0
 
 =head1 SYNOPSIS
 
@@ -203,6 +218,17 @@ arguments to the L<JSON::MaybeXS> constructor.
                 utf8:         1
                 allow_nonref: 1
 
+By the way, if you want the connection to automatically serialize data
+structures to JSON on the client side, you can do something like
+
+    var mySocket = new WebSocket(urlMySocket);
+    mySocket.sendJSON = function(message) { 
+        return this.send(JSON.stringify(message)) 
+    };
+
+    // then later...
+    mySocket.sendJSON({ whoa: "auto-serialization ftw!" });
+
 =item mount_path
 
 Path for the websocket mountpoint. Defaults to C</ws>.
@@ -261,13 +287,25 @@ If not explicitly set, defaults to
 
 =head2 websocket_on_message sub { ... }
 
-    websocket_on_error sub {
+    websocket_on_message sub {
         my( $conn, $message ) = @_;
         ...;
     };
 
 Code invoked when a message is received. Gets the connection
 object and the message as arguments.
+
+Note that while C<websocket_on_message> fires for all messages receives, you can
+also be a little more selective. Indeed, each connection, being a L<Plack::App::WebSocket::Connection>
+object, can have its own (multiple) handlers. So you can do things like
+
+  websocket_on_open sub {
+    my( $conn, $env ) = @_;
+    $conn->on( message => sub {
+      my( $conn, $message ) = @_;
+      warn "I'm only being executed for messages sent via this connection";
+    });
+  };
 
 =head2 websocket_url
 

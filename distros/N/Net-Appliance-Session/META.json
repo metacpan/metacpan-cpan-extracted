@@ -4,43 +4,38 @@
       "Oliver Gorwits <oliver@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Net-Appliance-Session",
-   "no_index" : {
-      "directory" : [
-         "t",
-         "inc"
-      ]
-   },
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::More" : "0.88"
+            "ExtUtils::CBuilder" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.30"
+            "Module::Build" : "0.42"
          }
       },
       "runtime" : {
          "requires" : {
             "Cwd" : "0",
             "Data::Dumper" : "0",
+            "File::ShareDir" : "1.00",
             "Getopt::Long" : "2.24",
             "IO::Handle" : "0",
             "IO::Prompt::Tiny" : "0",
             "Moo" : "0",
             "Moo::Role" : "0",
             "MooX::Types::MooseLike::Base" : "0",
-            "Net::CLI::Interact" : "2.200005",
+            "Net::CLI::Interact" : "2.300002",
             "Sub::Quote" : "0",
             "Term::ANSIColor" : "0",
             "Term::ReadPassword" : "0",
@@ -50,9 +45,47 @@
             "strict" : "0",
             "warnings" : "0"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "provides" : {
+      "Net::Appliance::Session" : {
+         "file" : "lib/Net/Appliance/Session.pm",
+         "version" : "4.300000"
+      },
+      "Net::Appliance::Session::Async" : {
+         "file" : "lib/Net/Appliance/Session/Async.pm",
+         "version" : "4.300000"
+      },
+      "Net::Appliance::Session::Engine" : {
+         "file" : "lib/Net/Appliance/Session/Engine.pm",
+         "version" : "4.300000"
+      },
+      "Net::Appliance::Session::Scripting" : {
+         "file" : "lib/Net/Appliance/Session/Scripting.pm",
+         "version" : "4.300000"
+      },
+      "Net::Appliance::Session::Transport" : {
+         "file" : "lib/Net/Appliance/Session/Transport.pm",
+         "version" : "4.300000"
       }
    },
    "release_status" : "stable",
-   "version" : "4.200003",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ollyg/Net-Appliance-Session/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/ollyg/Net-Appliance-Session"
+      }
+   },
+   "version" : "4.300000",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

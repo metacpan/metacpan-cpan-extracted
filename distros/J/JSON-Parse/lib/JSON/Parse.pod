@@ -23,8 +23,8 @@ Convert JSON into Perl.
 
 =head1 VERSION
 
-This documents version 0.49 of JSON::Parse corresponding to
-L<git commit 21138ec0efa9123392388027af87017af93009dc|https://github.com/benkasminbullock/JSON-Parse/commit/21138ec0efa9123392388027af87017af93009dc> released on Sat Nov 26 15:48:20 2016 +0900.
+This documents version 0.53 of JSON::Parse corresponding to
+L<git commit aa17c3b5630219e3964dbf6b2c4a3905abc18e33|https://github.com/benkasminbullock/JSON-Parse/commit/aa17c3b5630219e3964dbf6b2c4a3905abc18e33> released on Wed Oct 18 19:42:07 2017 +0900.
 
 
 
@@ -79,7 +79,7 @@ produces output
     HASH
 
 
-(This example is included as L<F<hash.pl>|https://api.metacpan.org/source/BKB/JSON-Parse-0.49/examples/hash.pl> in the distribution.)
+(This example is included as L<F<hash.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Parse-0.53/examples/hash.pl> in the distribution.)
 
 
 If the input JSON text is a serialized array, an array reference is
@@ -97,7 +97,7 @@ produces output
     ARRAY
 
 
-(This example is included as L<F<array.pl>|https://api.metacpan.org/source/BKB/JSON-Parse-0.49/examples/array.pl> in the distribution.)
+(This example is included as L<F<array.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Parse-0.53/examples/array.pl> in the distribution.)
 
 
 Otherwise a Perl scalar is returned. 
@@ -162,7 +162,7 @@ produces output
     
 
 
-(This example is included as L<F<assert.pl>|https://api.metacpan.org/source/BKB/JSON-Parse-0.49/examples/assert.pl> in the distribution.)
+(This example is included as L<F<assert.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Parse-0.53/examples/assert.pl> in the distribution.)
 
 
 This is the underlying function for L</valid_json>. It runs at the
@@ -328,8 +328,58 @@ This is modelled on the behaviour of Perl's C<chr>:
     # prints "chr makes it a character string"
 
 
-Since every byte of input is validated as UTF-8 (see L</UTF-8 only>),
-this hopefully will not upgrade invalid strings.
+However, JSON::Parse also upgrades the remaining part of the string
+into a character string, even when it's not marked as a character
+string. For example,
+
+    
+    use JSON::Parse ':all';
+    use Unicode::UTF8 'decode_utf8';
+    no utf8;
+    my $highbytes = "か";
+    my $not_utf8 = "$highbytes\\u3042";
+    my $test = "{\"a\":\"$not_utf8\"}";
+    my $out = parse_json ($test);
+    # JSON::Parse does something unusual here in promoting the first part
+    # of the string into UTF-8.
+    print "JSON::Parse gives this: ", $out->{a}, "\n";
+    # Perl cannot assume that $highbytes is in UTF-8, so it has to just
+    # turn the initial characters into garbage.
+    my $add_chr = $highbytes . chr (0x3042);
+    print "Perl's output is like this: ", $add_chr, "\n";
+    # In fact JSON::Parse's behaviour is equivalent to this:
+    my $equiv = decode_utf8 ($highbytes) . chr (0x3042);
+    print "JSON::Parse did something like this: ", $equiv, "\n";
+    # With character strings switched on, Perl and JSON::Parse do the same
+    # thing.
+    use utf8;
+    my $is_utf8 = "か";
+    my $test2 = "{\"a\":\"$is_utf8\\u3042\"}";
+    my $out2 = parse_json ($test2);
+    print "JSON::Parse: ", $out2->{a}, "\n";
+    my $add_chr2 = $is_utf8 . chr (0x3042);
+    print "Native Perl: ", $add_chr2, "\n";
+
+
+produces output
+
+    JSON::Parse gives this: かあ
+    Perl's output is like this: ãあ
+    JSON::Parse did something like this: かあ
+    JSON::Parse: かあ
+    Native Perl: かあ
+
+
+(This example is included as L<F<unicode-details.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Parse-0.53/examples/unicode-details.pl> in the distribution.)
+
+
+Although in general the above would be an unsafe practice, JSON::Parse
+can do things this way because JSON is a text-only, Unicode-only
+format. To ensure that invalid inputs are never upgraded, JSON::Parse
+checks each input byte to make sure that it forms UTF-8. See also
+L</UTF-8 only>. Doing things this way, rather than the way that Perl
+does it, was one of the original motivations for writing this
+module. See also L</HISTORY>.
 
 Surrogate pairs in the form C<\uD834\uDD1E> are also handled. If the
 second half of the surrogate pair is missing, an L</Unexpected
@@ -393,7 +443,7 @@ produces output
     Ambiguous key 'a' is 2
 
 
-(This example is included as L<F<key-collision.pl>|https://api.metacpan.org/source/BKB/JSON-Parse-0.49/examples/key-collision.pl> in the distribution.)
+(This example is included as L<F<key-collision.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Parse-0.53/examples/key-collision.pl> in the distribution.)
 
 
 Here the key "a" could be either 1 or 2. As seen in the example,
@@ -405,11 +455,9 @@ L</detect_collisions> method.
 The rationale for L</parse_json> not to give warnings is that Perl
 doesn't give information about collisions when storing into hash
 values, and checking for collisions for every key will degrade
-performance for the sake of an unlikely occurrence.
-
-Note that the JSON specification says "The names within an object
-SHOULD be unique." (see L</RFC 7159>, page 5), although it's not a
-requirement.
+performance for the sake of an unlikely occurrence. The JSON
+specification says "The names within an object SHOULD be unique." (see
+L</RFC 7159>, page 5), although it's not a requirement.
 
 For performance, L</valid_json> and L</assert_valid_json> do not store
 hash keys, thus they cannot detect this variety of problem.
@@ -513,7 +561,7 @@ produces output
     {"fripp":false,"bruce":true,"clapton":true,"hendrix":false}
 
 
-(This example is included as L<F<json-tiny-round-trip-demo.pl>|https://api.metacpan.org/source/BKB/JSON-Parse-0.49/examples/json-tiny-round-trip-demo.pl> in the distribution.)
+(This example is included as L<F<json-tiny-round-trip-demo.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Parse-0.53/examples/json-tiny-round-trip-demo.pl> in the distribution.)
 
 
 Most of the other CPAN modules use similar methods to L<JSON::Tiny>,
@@ -666,7 +714,7 @@ produces output
     
 
 
-(This example is included as L<F<collide.pl>|https://api.metacpan.org/source/BKB/JSON-Parse-0.49/examples/collide.pl> in the distribution.)
+(This example is included as L<F<collide.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Parse-0.53/examples/collide.pl> in the distribution.)
 
 
 The C<detect_collisions (1)> behaviour is the behaviour of
@@ -941,9 +989,8 @@ The following error messages are produced:
 
 An unexpected character (byte) was encountered in the input. For
 example, when looking at the beginning of a string supposedly
-containing JSON, there are six possible characters, the four JSON
-whitespace characters plus "[" and "{". If the module encounters a
-plus sign, it will give an error like this:
+containing JSON, if the module encounters a plus sign, it will give an
+error like this:
 
     assert_valid_json ('+');
 
@@ -1196,8 +1243,8 @@ able to fully work out the reason behind the better speed.
 
 There is some benchmarking code in the github repository under the
 directory "benchmarks" for those wishing to test these claims. The
-script L<F<benchmarks/bench>|https://github.com/benkasminbullock/JSON-Parse/blob/21138ec0efa9123392388027af87017af93009dc/benchmarks/bench> is an adaptation of the similar
-script in the L<JSON::XS> distribution. The script L<F<benchmarks/pub-bench.pl>|https://github.com/benkasminbullock/JSON-Parse/blob/21138ec0efa9123392388027af87017af93009dc/benchmarks/pub-bench.pl> runs the benchmarks and prints them
+script L<F<benchmarks/bench>|https://github.com/benkasminbullock/JSON-Parse/blob/aa17c3b5630219e3964dbf6b2c4a3905abc18e33/benchmarks/bench> is an adaptation of the similar
+script in the L<JSON::XS> distribution. The script L<F<benchmarks/pub-bench.pl>|https://github.com/benkasminbullock/JSON-Parse/blob/aa17c3b5630219e3964dbf6b2c4a3905abc18e33/benchmarks/pub-bench.pl> runs the benchmarks and prints them
 out as POD.
 
 The following benchmark tests used version 0.47 of JSON::Parse and
@@ -1542,29 +1589,33 @@ These modules extend JSON with comments and other things.
 
 =over
 
-=item L<JSON::XS::Sugar>
+=item L<App::JSON::Tools>
 
-=item L<JSON::ON>
+=item L<App::JSONPretty>
 
 =item L<Eve::Json>
+
+=item L<Haineko::JSON>
 
 =item L<JBD::JSON>
 
 =item L<JSON::JS>
 
-=item L<Silki::JSON>
+=item L<JSON::Meth>
 
-=item L<Haineko::JSON>
-
-=item L<App::JSON::Tools>
-
-=item L<JSON::XS::ByteString>
-
-=item L<JSON::Streaming::Reader> and L<JSON::Streaming::Writer>
+=item L<JSON::ON>
 
 =item L<JSON::SL>
 
-=item L<JSON::Meth>
+=item L<JSON::Streaming::Reader> and L<JSON::Streaming::Writer>
+
+=item L<JSON::XS::ByteString>
+
+=item L<JSON::XS::Sugar>
+
+=item L<Silki::JSON>
+
+=item L<Text::JSON::Nibble>
 
 =back
 
@@ -1600,6 +1651,14 @@ The CPAN testers results are at the usual place.
 The ActiveState test results are at
 L<http://code.activestate.com/ppm/JSON-Parse/>.
 
+=head1 DEPENDENCIES
+
+=over
+
+=item L<Carp>
+
+=back
+
 =head1 EXPORTS
 
 The module exports nothing by default. Functions L</parse_json>,
@@ -1621,7 +1680,7 @@ supplied with the module in the F</t/> subdirectory of the
 distribution.
 
 More extensive testing code is in the git repository. This is not
-supplied in the CPAN distribution. A script, L<F<randomjson.pl>|https://github.com/benkasminbullock/JSON-Parse/blob/21138ec0efa9123392388027af87017af93009dc/randomjson.pl>,
+supplied in the CPAN distribution. A script, L<F<randomjson.pl>|https://github.com/benkasminbullock/JSON-Parse/blob/aa17c3b5630219e3964dbf6b2c4a3905abc18e33/randomjson.pl>,
 generates a set number of bytes of random JSON and checks that the
 module's bytewise validation of input is correct. It does this by
 taking a valid fragment, then adding each possible byte from 0 to 255
@@ -1631,18 +1690,18 @@ it to the fragment and continuing the process until a complete valid
 JSON input is formed. The module has undergone about a billion
 repetitions of this test.
 
-This setup relies on a C file, L<F<json-random-test.c>|https://github.com/benkasminbullock/JSON-Parse/blob/21138ec0efa9123392388027af87017af93009dc/json-random-test.c>, which isn't in
-the CPAN distribution, and it also requires L<F<Json3.xs>|https://github.com/benkasminbullock/JSON-Parse/blob/21138ec0efa9123392388027af87017af93009dc/Json3.xs> to be edited
+This setup relies on a C file, L<F<json-random-test.c>|https://github.com/benkasminbullock/JSON-Parse/blob/aa17c3b5630219e3964dbf6b2c4a3905abc18e33/json-random-test.c>, which isn't in
+the CPAN distribution, and it also requires L<F<Json3.xs>|https://github.com/benkasminbullock/JSON-Parse/blob/aa17c3b5630219e3964dbf6b2c4a3905abc18e33/Json3.xs> to be edited
 to make the macro C<TESTRANDOM> true (uncomment line 7 of the
 file). The testing code uses C setjmp/longjmp, so it's not guaranteed
 to work on all operating systems and is commented out for CPAN
 releases.
 
-A pure C version called L<F<random-test.c>|https://github.com/benkasminbullock/JSON-Parse/blob/21138ec0efa9123392388027af87017af93009dc/random-test.c> also exists. This applies
+A pure C version called L<F<random-test.c>|https://github.com/benkasminbullock/JSON-Parse/blob/aa17c3b5630219e3964dbf6b2c4a3905abc18e33/random-test.c> also exists. This applies
 exactly the same tests, and requires no Perl at all.
 
 If you're interested in testing your own JSON parser, the outputs
-generated by L<F<randomjson.pl>|https://github.com/benkasminbullock/JSON-Parse/blob/21138ec0efa9123392388027af87017af93009dc/randomjson.pl> are quite a good place to start. The
+generated by L<F<randomjson.pl>|https://github.com/benkasminbullock/JSON-Parse/blob/aa17c3b5630219e3964dbf6b2c4a3905abc18e33/randomjson.pl> are quite a good place to start. The
 default is to produce UTF-8 output, which looks pretty horrible since
 it tends to produce long strings of UTF-8 garbage. (This is because it
 chooses randomly from 256 bytes and the end-of-string marker C<"> has
@@ -1674,30 +1733,36 @@ module's tests, but some of the files (like 100,000 open arrays)
 actually L<cause crashes on some versions of Perl on some
 machines|http://fast-matrix.cpantesters.org/?dist=JSON-Parse%200.48_01>,
 so they're not really suitable for distribution. The tests are found,
-however, in the repository under L<F<xt/jpts.t>|https://github.com/benkasminbullock/JSON-Parse/blob/21138ec0efa9123392388027af87017af93009dc/xt/jpts.t> and the
-subdirectory L<F<xt/jpts>|https://github.com/benkasminbullock/JSON-Parse/blob/21138ec0efa9123392388027af87017af93009dc/xt/jpts>, so if you are interested in the
+however, in the repository under L<F<xt/jpts.t>|https://github.com/benkasminbullock/JSON-Parse/blob/aa17c3b5630219e3964dbf6b2c4a3905abc18e33/xt/jpts.t> and the
+subdirectory L<F<xt/jpts>|https://github.com/benkasminbullock/JSON-Parse/blob/aa17c3b5630219e3964dbf6b2c4a3905abc18e33/xt/jpts>, so if you are interested in the
 results, please copy that and try it. There is also a test for the
-L<validjson|/SCRIPT> script as L<F<xt/validjson.t>|https://github.com/benkasminbullock/JSON-Parse/blob/21138ec0efa9123392388027af87017af93009dc/xt/validjson.t> in the
+L<validjson|/SCRIPT> script as L<F<xt/validjson.t>|https://github.com/benkasminbullock/JSON-Parse/blob/aa17c3b5630219e3964dbf6b2c4a3905abc18e33/xt/validjson.t> in the
 repository. These are author tests, so you may need to install extra
 modules to run them. These author tests are run automatically before
 any code is uploaded to CPAN.
 
 =head1 HISTORY
 
-See L<F<Changes>|https://github.com/benkasminbullock/JSON-Parse/blob/21138ec0efa9123392388027af87017af93009dc/Changes> in the distribution for a full list of changes.
+See L<F<Changes>|https://github.com/benkasminbullock/JSON-Parse/blob/aa17c3b5630219e3964dbf6b2c4a3905abc18e33/Changes> in the distribution for a full list of changes.
 
-This module started out under the name L<JSON::Argo>. It was
+This module started out under the name C<JSON::Argo>. It was
 originally a way to escape from having to use the other JSON modules
-on CPAN.
+on CPAN. The biggest issue that I had with the other modules was the
+way that Unicode was handled. Insisting on the pure Perl method of
+dealing with JSON strings, which are required to be in Unicode anyway,
+seems to me little more than superstition, something like telling
+programmers not to step on cracks in the pavement. This module
+completely bypasses that. See L</Handling of Unicode> for the details
+of how this module differs from the other modules.
 
 The reason it only parsed JSON was that when I started this I didn't
-know the Perl extension language XS very well, and I was not confident
-about making a JSON producer, so it only parsed JSON, which was the
-main job I needed to do. It originally used lex and yacc in the form
-of flex and bison, since discarded. I also found out that someone else
-had a JSON parser called Argo in Java, so to save confusion I dropped
-the name JSON::Argo and renamed this JSON::Parse, keeping the version
-numbers continuous.
+know the Perl extension language XS very well (I still don't know it
+very well), and I was not confident about making a JSON producer, so
+it only parsed JSON, which was the main job I needed to do. It
+originally used lex and yacc in the form of flex and bison, since
+discarded. I also found out that someone else had a JSON parser called
+Argo in Java, so to save confusion I dropped the name JSON::Argo and
+renamed this JSON::Parse, keeping the version numbers continuous.
 
 The module has since been completely rewritten, twice, mostly in an
 attempt to improve performance, after I found that JSON::XS was much
@@ -1724,9 +1789,9 @@ Version 0.42 fixed a very serious bug where long strings could
 overflow an internal buffer, and could cause a segmentation fault.
 
 Version 0.48 removed an experimental feature called
-C<$json_diagnostics> which would produce errors in JSON, and replaced
-it with the current L</diagnostics_hash> method, for the benefit of
-L</JSON::Repair>.
+C<$json_diagnostics> which made the module's errors be produced in
+JSON format, and replaced it with the current L</diagnostics_hash>
+method, for the benefit of L</JSON::Repair>.
 
 Version 0.49 brought the module into conformance with the L</JSON
 Parsing Test Suite>.
@@ -1739,22 +1804,15 @@ serious bug which led to version 0.42.
 
 
 
+
 =head1 AUTHOR
 
 Ben Bullock, <bkb@cpan.org>
 
-=head2 Request
-
-If you'd like to see this module continued, let me know that you're
-using it. For example, send an email, write a bug report, star the
-project's github repository, add a patch, add a C<++> on Metacpan.org,
-or write a rating at CPAN ratings. It really does make a
-difference. Thanks.
-
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2013-2016
+2013-2017
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

@@ -1,5 +1,8 @@
 Revision history for Perl extension Catalyst::Model::LDAP.
 
+0.21  Tue Oct 17 15:20:00 BST 2017
+        - dzil [OurPkgVersion]
+
 0.20  Thu Aug 31 16:01:00 BST 2017
         - Switch to Module::Runtime for
           eval "require $class"; due to Perl::Critic 5 failures

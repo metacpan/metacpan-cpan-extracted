@@ -13,7 +13,7 @@ BEGIN {
   use_ok( 'GraphQL::Type::Interface' ) || print "Bail out!\n";
   use_ok( 'GraphQL::Type::Union' ) || print "Bail out!\n";
   use_ok( 'GraphQL::Type::Scalar', qw($String $Boolean) ) || print "Bail out!\n";
-  use_ok( 'GraphQL::Execution' ) || print "Bail out!\n";
+  use_ok( 'GraphQL::Execution', qw(execute) ) || print "Bail out!\n";
 }
 
 {
@@ -69,7 +69,7 @@ sub make_schema {
 
 sub run_test {
   my ($args, $expected) = @_;
-  my $got = GraphQL::Execution->execute(@$args);
+  my $got = execute(@$args);
   local ($Data::Dumper::Sortkeys, $Data::Dumper::Indent, $Data::Dumper::Terse);
   $Data::Dumper::Sortkeys = $Data::Dumper::Indent = $Data::Dumper::Terse = 1;
   is_deeply $got, $expected or diag Dumper $got;
@@ -180,8 +180,10 @@ subtest 'resolveType on Interface yields useful error', sub {
     { data => {
       pets => [ @EXPECTED, undef ],
     }, errors => [
-      { message => "Runtime Object type 'Human' is not a possible type for 'Pet'." },
-    ] },
+      { message => "Runtime Object type 'Human' is not a possible type for 'Pet'.",
+        locations => [ { line => 11, column => 1 } ],
+        path => [ 'pets', 2 ],
+    }, ] },
   );
   done_testing;
 };
@@ -219,8 +221,10 @@ subtest 'resolveType on Union yields useful error', sub {
     { data => {
       pets => [ @EXPECTED, undef ],
     }, errors => [
-      { message => "Runtime Object type 'Human' is not a possible type for 'Pet'." },
-    ] },
+      { message => "Runtime Object type 'Human' is not a possible type for 'Pet'.",
+        locations => [ { line => 11, column => 1 } ],
+        path => [ 'pets', 2 ],
+    } ] },
   );
   done_testing;
 };

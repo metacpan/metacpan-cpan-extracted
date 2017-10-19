@@ -1,0 +1,32 @@
+Task-Devel-Essentials version 0.004
+===================================
+
+Task::Devel::Essentials is a bundle of modules useful for developers.
+
+INSTALLATION
+
+To install this bundle, just install it with an installer:
+
+   cpan  Task::Devel::Essentials
+
+The modules collected in this bundle are then installed as prerequisites.
+Finally, your installer will do something equivalent to:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+You can repeat the tests later to see if the modules of this bundle
+are still present.
+
+LICENSE AND COPYRIGHT
+
+Copyright (c) 2013-2017 Martin Becker
+
+This bundle is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

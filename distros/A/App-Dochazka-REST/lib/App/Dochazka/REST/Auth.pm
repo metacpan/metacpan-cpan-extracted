@@ -170,6 +170,8 @@ sub _validate_session {
     my $remote_addr = $r->{'env'}->{'REMOTE_ADDR'};
 
     my $session = $r->{'env'}->{'psgix.session'};
+    $log->debug( "Session is " . Dumper( $session ) );
+
     return 0 unless %$session;
     return 0 unless _is_fresh( $session->{'last_seen'} );
     return 0 unless $session->{'ip_addr'} eq $remote_addr;
@@ -248,6 +250,7 @@ sub _authenticate {
     ) {
 
         $log->info( "Detected authentication attempt from $nick, a known LDAP user" );
+        #$log->debug( "Password provided: $password" );
 
         # - authenticate by LDAP bind
         if ( ldap_auth( $nick, $password ) ) {

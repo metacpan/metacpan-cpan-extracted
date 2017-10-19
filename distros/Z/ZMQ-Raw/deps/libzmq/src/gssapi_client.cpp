@@ -40,8 +40,10 @@
 #include "gssapi_client.hpp"
 #include "wire.hpp"
 
-zmq::gssapi_client_t::gssapi_client_t (const options_t &options_) :
-    gssapi_mechanism_base_t (options_),
+zmq::gssapi_client_t::gssapi_client_t (session_base_t *session_,
+                                       const options_t &options_) :
+    mechanism_base_t (session_, options_),
+    gssapi_mechanism_base_t (session_, options_),
     state (call_next_init),
     token_ptr (GSS_C_NO_BUFFER),
     mechs (),
@@ -52,6 +54,7 @@ zmq::gssapi_client_t::gssapi_client_t (const options_t &options_) :
     assert(service_name);
     memcpy(service_name, options_.gss_service_principal.c_str(), service_size+1 );
 
+    service_name_type = convert_nametype (options_.gss_service_principal_nt);
     maj_stat = GSS_S_COMPLETE;
     if(!options_.gss_principal.empty())
     {
@@ -60,7 +63,8 @@ zmq::gssapi_client_t::gssapi_client_t (const options_t &options_) :
         assert(principal_name);
         memcpy(principal_name, options_.gss_principal.c_str(), principal_size+1 );
 
-        if (acquire_credentials (principal_name, &cred) != 0)
+        gss_OID name_type = convert_nametype (options_.gss_principal_nt);
+        if (acquire_credentials (principal_name, &cred, name_type) != 0)
             maj_stat = GSS_S_FAILURE;
     }
 
@@ -121,6 +125,9 @@ int zmq::gssapi_client_t::process_handshake_command (msg_t *msg_)
     }
 
     if (state != recv_next_token) {
+        session->get_socket ()->event_handshake_failed_protocol (
+          session->get_endpoint (),
+          ZMQ_PROTOCOL_ERROR_ZMTP_UNEXPECTED_COMMAND);
         errno = EPROTO;
         return -1;
     }
@@ -166,12 +173,16 @@ zmq::mechanism_t::status_t zmq::gssapi_client_t::status () const
 
 int zmq::gssapi_client_t::initialize_context ()
 {
+    // principal was specified but credentials could not be acquired
+    if (principal_name != NULL && cred == NULL)
+        return -1;
+
     // First time through, import service_name into target_name
     if (target_name == GSS_C_NO_NAME) {
         send_tok.value = service_name;
-        send_tok.length = strlen(service_name);
+        send_tok.length = strlen(service_name) + 1;
         OM_uint32 maj = gss_import_name(&min_stat, &send_tok,
-                                        GSS_C_NT_HOSTBASED_SERVICE,
+                                        service_name_type,
                                         &target_name);
 
         if (maj != GSS_S_COMPLETE)

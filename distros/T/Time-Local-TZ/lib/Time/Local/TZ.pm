@@ -6,7 +6,7 @@ use warnings;
 use base 'Exporter';
 use XSLoader;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 our %EXPORT_TAGS = (
     func => [ qw/

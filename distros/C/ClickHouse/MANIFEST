@@ -1,9 +1,17 @@
+.perl-version
 Build.PL
 Changes
-lib/ClickHouse.pm
-MANIFEST			This list of files
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+META.json
+META.yml
 README
+cpanfile
+cpanfile.snapshot
+lib/ClickHouse.pm
 t/00-load.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
+xt/boilerplate.t

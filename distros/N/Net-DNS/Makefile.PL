@@ -1,5 +1,5 @@
 #
-# $Id: Makefile.PL 1591 2017-08-18 09:58:18Z willem $	-*-perl-*-
+# $Id: Makefile.PL 1599 2017-10-06 09:02:23Z willem $	-*-perl-*-
 #
 
 
@@ -59,10 +59,10 @@ my %prerequisite = (
 my %optional = (
 	'Net::DNS::SEC'	       => 1.01,	## For information only
 	'Digest::BubbleBabble' => 0.01,
-	'Digest::GOST'	       => 0.06,
 	'IO::Socket::INET6'    => 2.51,
 	'IO::Socket::IP'       => 0.38,
 	'Net::LibIDN'	       => 0.12,
+	'Net::LibIDN2'	       => 1.00,
 	'Scalar::Util'	       => 1.25,
 	);
 
@@ -78,11 +78,13 @@ my @debris = qw(
 delete $optional{'Net::DNS::SEC'};	## Note: MUST NOT be installed automatically
 
 
-use constant USE_SOCKET_IP => defined eval 'use Socket 1.98; use IO::Socket::IP 0.32; 1;';
+use constant USE_SOCKET_IP => defined eval 'use Socket 1.97; use IO::Socket::IP 0.32; 1;';
 
 use constant USE_SOCKET_INET6 => defined eval 'require IO::Socket::INET6';
 
 delete $optional{'IO::Socket::INET6'} if USE_SOCKET_IP;		# exclude redundant dependency
+delete $optional{'Net::LibIDN'} if eval 'require Net::LibIDN2';
+
 
 print <<EOT if !USE_SOCKET_IP && USE_SOCKET_INET6;
 #

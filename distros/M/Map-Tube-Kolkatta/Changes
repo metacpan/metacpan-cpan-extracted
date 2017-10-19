@@ -1,5 +1,8 @@
 Revision history for Map::Tube::Kolkatta
 
+0.04  Sat Oct 13 10:15:00 2017
+      - Updated dependency on Map::Tube v3.35.
+
 0.03  Fri Aug 18 10:00:00 2017
       - Updated pod about requirement of Map::Tube::CLI.
 

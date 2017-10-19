@@ -59,7 +59,6 @@ define ([
             "pos": null   // the current position within that array
         };
 
-
     return {
 
         // special entries
@@ -76,7 +75,7 @@ define ([
             name: 'emptyLine',
             aclProfileRead: 'passerby',
             aclProfileWrite: null,
-            text: null,
+            text: "&nbsp",
             prop: null,
             maxlen: 20
         },
@@ -91,12 +90,16 @@ define ([
         dbrowserState: dbrowserState,
 
         // display error message
-        displayError: function (buf) {
+        displayError: function (buf, id) {
             console.log("ERROR: " + buf);
             $('#result').css('text-align', 'center');
             $("#result").html(buf);
             $('input[name="sel"]').val('');
-            $('input[name="entry0"]').focus();
+            if (id) {
+                $('input[name="' + id + '"]').focus();
+            } else {
+                $('input[name="entry0"]').focus();
+            }
         },
 
         displayResult: function (buf) {
@@ -140,6 +143,20 @@ define ([
                 }
             }
             return obj;
+        },
+
+        isInteger: function (value) {
+            var pival = parseInt(value, 10),
+                cond1 = pival == value,
+                cond2 = typeof pival === 'number',
+                cond3 = isFinite(pival),
+                res = cond1 && cond2 && cond3;
+            //console.log("isInteger() called with", value);
+            //console.log("parseInt says", pival);
+            //console.log("typeof says", typeof pival === 'number');
+            //console.log("isFinite says", isFinite(pival));
+            //console.log("isInteger says", res);
+            return res;
         },
 
         isObjEmpty: function (obj) {
@@ -210,51 +227,6 @@ define ([
             return r;
         }, // privCheck
 
-        // convert "YYYY-MM-DD HH:DD:SS+TZ" string into YYYY-MMM-DD
-        readableDate: function (urd) {
-            var ymd = urd.substr(
-                    0, urd.indexOf(" ")
-                ).split('-'),
-                year,
-                m,
-                day,
-                month;
-            if (ymd.length !== 3) {
-                return urd;
-            }
-            year = +ymd[0];
-            m = +ymd[1];
-            day = +ymd[2];
-            if (m === 1) {
-                month = "JAN";
-            } else if (m === 2) {
-                month = "FEB";
-            } else if (m === 3) {
-                month = "MAR";
-            } else if (m === 4) {
-                month = "APR";
-            } else if (m === 5) {
-                month = "MAY";
-            } else if (m === 6) {
-                month = "JUN";
-            } else if (m === 7) {
-                month = "JUL";
-            } else if (m === 8) {
-                month = "AUG";
-            } else if (m === 9) {
-                month = "SEP";
-            } else if (m === 10) {
-                month = "OCT";
-            } else if (m === 11) {
-                month = "NOV";
-            } else if (m === 12) {
-                month = "DEC";
-            } else {
-                return urd;
-            }
-            return year.toString() + "-" + month + "-" + day.toString();
-        }, // readableDate
-
         // reverse-video a row (on/off)
         reverseVideo: function (row, onoff) {
             if (onoff === true) {
@@ -302,5 +274,6 @@ define ([
         //},
 
     };
+
 });
 

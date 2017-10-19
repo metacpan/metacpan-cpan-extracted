@@ -50,11 +50,11 @@
    "provides" : {
       "Sys::Path" : {
          "file" : "lib/Sys/Path.pm",
-         "version" : "0.15"
+         "version" : "0.16"
       },
       "Sys::Path::SPc" : {
          "file" : "lib/Sys/Path/SPc.pm",
-         "version" : "0.14"
+         "version" : "0.16"
       }
    },
    "release_status" : "stable",
@@ -69,6 +69,6 @@
          "url" : "git://github.com/jozef/Sys-Path.git"
       }
    },
-   "version" : "0.15",
+   "version" : "0.16",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

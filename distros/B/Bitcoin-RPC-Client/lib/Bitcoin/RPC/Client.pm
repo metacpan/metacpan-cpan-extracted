@@ -8,17 +8,15 @@ use warnings;
 use Moo;
 use JSON::RPC::Client;
 
-use Bitcoin::RPC::Client::API;
-
-our $VERSION  = '0.06';
+our $VERSION  = '0.07';
 
 has jsonrpc  => (is => "lazy", default => sub { "JSON::RPC::Client"->new });
 has user     => (is => 'ro');
 has password => (is => 'ro');
 has host     => (is => 'ro');
+has wallet   => (is => 'ro');
 has port     => (is => "lazy", default => 8332);
 has timeout  => (is => "lazy", default => 20);
-has syntax   => (is => "lazy", default => 0);
 has debug    => (is => "lazy", default => 0);
 
 # SSL constructor options
@@ -26,6 +24,8 @@ has debug    => (is => "lazy", default => 0);
 #  but should work with older versions
 has ssl      => (is => 'ro', default => 0);
 has verify_hostname => (is => 'ro', default => 1);
+
+our $DEBUG_DUMPED = 0;
 
 sub AUTOLOAD {
    my $self   = shift;
@@ -42,6 +42,10 @@ sub AUTOLOAD {
       $uri = "https://";
    }
    my $url = $uri . $self->user . ":" . $self->password . "\@" . $self->host . ":" . $self->port;
+   # Tack on a specific wallet name if given
+   if ($self->wallet) {
+      $url .= "/wallet/" . $self->wallet;
+   }
 
    my $client = $self->jsonrpc;
 
@@ -53,9 +57,12 @@ sub AUTOLOAD {
 
    # Turn on debugging for LWP::UserAgent
    if ($self->debug) {
-      $client->ua->add_handler("request_send",  sub { shift->dump; return });
-      $client->ua->add_handler("response_done", sub { shift->dump; return });
-   } else {
+      if (!$DEBUG_DUMPED) { # We only want to set this up once
+         $client->ua->add_handler("request_send",  sub { shift->dump; return });
+         $client->ua->add_handler("response_done", sub { shift->dump; return });
+         $DEBUG_DUMPED = 1;
+      }
+   } else {# Don't print error message when debug is on.
       # We want to handle broken responses ourself
       $client->ua->add_handler("response_data", 
          sub { 
@@ -65,9 +72,13 @@ sub AUTOLOAD {
                my $content = JSON->new->utf8->decode($data);
 
                print STDERR "error code: ";
-               print STDERR $content->{error}->{code} . "\n";
-               print STDERR "error message:\n";
-               print STDERR $content->{error}->{message}; 
+               print STDERR $content->{error}->{code}; 
+               print STDERR ", error message: ";
+               print STDERR $content->{error}->{message} . " ($method)\n"; 
+            } else {
+               # If no error then ditch the handler
+               # otherwise things that did not error will get handled too
+               $ua->remove_handler();
             }
 
             return;
@@ -77,15 +88,9 @@ sub AUTOLOAD {
 
    # For self signed certs
    if ($self->verify_hostname eq 0) {
-      $client->ua->ssl_opts( verify_hostname => 0 );
+      $client->ua->ssl_opts( verify_hostname => 0,
+                             SSL_verify_mode => 'SSL_VERIFY_NONE' );
    }
-
-   #my @params = @_;
-   # ^ Should this be here?
-
-   # Need to fix booleans.
-   # JSON::true
-   # But cant modify @_
 
    my $obj = {
       method => $method,
@@ -101,48 +106,7 @@ sub AUTOLOAD {
       return $res->result;
    }
 
-   # Usage errors are on by default
-   if ($self->syntax) {
-      # Check that method is even availabe in the API
-      hasMethod($method);
-
-      # Print SYNTAX for API call
-      failMethod($method);
-   }
-
    return;
-}
-
-sub hasMethod {
-   my ($method) = @_;
-
-   # Check that method is even availabe in the API
-   my $hasMethod = 0;
-   foreach my $meth (@Bitcoin::RPC::Client::API::methods) {
-      if (lc($meth) eq lc($method)) {
-         $hasMethod = 1;
-         last;
-      }
-   }
-
-   if (!$hasMethod) {
-      print STDERR "error : Method $method does not exist\n";
-   }
-
-   return 1;
-}
-
-sub failMethod {
-   my ($method) = @_;
-
-   foreach my $entry (@Bitcoin::RPC::Client::API::help) {
-      if ($entry =~ /$method / || $entry =~ /$method$/) {
-         print STDERR "error : usage: $entry\n";
-         last;
-      }
-   }
-
-   return 1;
 }
 
 1;
@@ -156,7 +120,7 @@ Bitcoin::RPC::Client - Bitcoin Core API RPCs
 =head1 SYNOPSIS
 
    use Bitcoin::RPC::Client;
-
+   
    # Create Bitcoin::RPC::Client object
    $btc = Bitcoin::RPC::Client->new(
       user     => "username",
@@ -164,86 +128,31 @@ Bitcoin::RPC::Client - Bitcoin Core API RPCs
       host     => "127.0.0.1",
    );
 
-   # Functions that do not return a JSON object will have a scalar result
-   $balance  = $btc->getbalance("yourAccountName");
-   print $balance;
+   # Check the block height of our bitcoin node
+   #     https://bitcoin.org/en/developer-reference#getblockchaininfo
+   $chaininfo = $btc->getblockchaininfo;
+   $blocks = $chaininfo->{blocks};
 
-   # JSON::Boolean objects must be passed as boolean parameters
-   $balance  = $btc->getbalance("yourAccountName", 1, JSON::true);
-   print $balance;
+   # Estimate a reasonable transaction fee
+   #     https://bitcoin.org/en/developer-reference#estimatefee
+   $fee = $btc->estimatesmartfee(6);
+   $feerate = $fee->{feerate};
 
-   # Getting Data when JSON/hash is returned
-   # A person would need to know the JSON elements of
-   # the output https://bitcoin.org/en/developer-reference#getinfo
-   #
-   #{
-   #  "version": 130000,
-   #  "protocolversion": 70014,
-   #  "walletversion": 130000,
-   #  "balance": 0.00000000,
-   #  "blocks": 584240,
-   #  "proxy": "",
-   #  "difficulty": 1,
-   #  "paytxfee": 0.00500000,
-   #  "relayfee": 0.00001000,
-   #  "errors": ""
-   #}
-   $info    = $btc->getinfo;
-   $balance = $info->{balance};
-   print $balance;
-   # 0.0
+   # Set the transaction fee
+   #     https://bitcoin.org/en/developer-reference#settxfee
+   $settx = $btc->settxfee($feerate);
 
-   # JSON Objects
-   # Let's say we want the timeframe value
-   #
-   #{
-   #  "totalbytesrecv": 7137052851,
-   #  "totalbytessent": 211648636140,
-   #  "uploadtarget": {
-   #    "timeframe": 86400,
-   #    "target": 0,
-   #    "target_reached": false,
-   #    "serve_historical_blocks": true,
-   #    "bytes_left_in_cycle": 0,
-   #    "time_left_in_cycle": 0
-   #  }
-   #}
-   $nettot = $btc->getnettotals;
-   $timeframe = $nettot->{uploadtarget}{timeframe};
-   print $timeframe;
-   # 86400
+   # Check your balance 
+   # (JSON::Boolean objects must be passed as boolean parameters)
+   #     https://bitcoin.org/en/developer-reference#getbalance
+   $balance = $btc->getbalance("yourAccountName", 1, JSON::true);
 
-   # JSON arrays
-   # Let's say we want the softfork IDs from the following:
-   #
-   #{
-   #  "chain": "main",
-   #  "blocks": 464562,
-   #  "headers": 464562,
-   #  "pruned": false,
-   #  "softforks": [
-   #    {
-   #      "id": "bip34",
-   #      "version": 2,
-   #      "reject": {
-   #        "status": true
-   #      }
-   #    },
-   #    {
-   #      "id": "bip66",
-   #      "version": 3,
-   #      "reject": {
-   #        "status": true
-   #      }
-   #    }
-   $bchain = $btc->getblockchaininfo;
-   @forks = @{ $bchain->{softforks} };
-   foreach $f (@forks) {
-      print $f->{id};
-      print "\n";
-   }
-   # bip34
-   # bip66
+   # Send to an address
+   #     https://bitcoin.org/en/developer-reference#sendtoaddress
+   $transid = $btc->sendtoaddress("1Ky49cu7FLcfVmuQEHLa1WjhRiqJU2jHxe","0.01");
+
+   # See ex/example.pl for more in depth JSON handling:
+   #     https://github.com/whindsx/Bitcoin-RPC-Client/tree/master/ex
 
 =head1 DESCRIPTION
 
@@ -265,22 +174,30 @@ This method creates a new C<Bitcoin::RPC::Client> and returns it.
    password            undef (Required)
    host                undef (Required)
    port                8332
+   wallet              undef
    timeout             20
    ssl                 0
    verify_hostname     1
-   syntax              0
    debug               0
+   syntax              0
 
-verify_hostname - OpenSSL support has been removed from the Bitcoin Core 
-project as of v0.12.0.
+wallet - Work against specific wallet.dat file when Multi-wallet support is 
+enabled (Bitcoin Core v0.15+ only)
 
-syntax - setting to 1 will turn on correct method name checking as well as 
-usage errors. This works with all versions of Bitcoin Core, but the API class 
-currently only contains what is valid for v0.12.0. You may want to keep this off
-if you are using a version other than v0.12.0 and you are getting errors you 
-think you should not be getting.
+timeout - Set the timeout in seconds for individual RPC requests. Increase
+this for slow bitcoind instances.
+
+ssl - OpenSSL support has been removed from the Bitcoin Core 
+project as of v0.12.0. However Bitcoin::RPC::Client will work
+over SSL with a reverse web proxy such as nginx.
+
+verify_hostname - Disable SSL certificate verification. Needed when
+bitcoind is fronted by a proxy or when using a self-signed certificate. 
 
 debug - Turns on raw HTTP request/response output from LWP::UserAgent.
+
+syntax - Removed as of Bitcoin::RPC::Client v0.7, however having the value
+set will not break anything.
 
 =head1 AUTHOR
 

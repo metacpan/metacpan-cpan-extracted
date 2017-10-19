@@ -1,5 +1,8 @@
 package WebService::Braintree::ClientTokenGateway;
-$WebService::Braintree::ClientTokenGateway::VERSION = '0.93';
+$WebService::Braintree::ClientTokenGateway::VERSION = '0.94';
+use 5.010_001;
+use strictures 1;
+
 use Moose;
 with 'WebService::Braintree::Role::MakeRequest';
 
@@ -28,9 +31,10 @@ sub _conditionally_verify_params {
         verify_params($params, client_token_signature_with_customer_id);
     } else {
         verify_params($params, client_token_signature_without_customer_id);
-  };
+    }
 }
 
 __PACKAGE__->meta->make_immutable;
-1;
 
+1;
+__END__

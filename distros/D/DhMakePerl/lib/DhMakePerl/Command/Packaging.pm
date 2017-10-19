@@ -3,7 +3,7 @@ package DhMakePerl::Command::Packaging;
 use strict;
 use warnings;
 
-our $VERSION = '0.84';
+our $VERSION = '0.96';
 
 use feature 'switch';
 
@@ -45,7 +45,7 @@ use Text::Balanced qw(extract_quotelike);
 use Text::Wrap qw(fill);
 use User::pwent;
 
-use constant debstdversion => '3.9.6';
+use constant debstdversion => '4.1.1';
 
 our %DEFAULTS = (
 );
@@ -119,14 +119,31 @@ sub makefile_pl {
     return $self->main_file('Makefile.PL');
 }
 
-sub get_developer {
-    my $self = shift;
+sub get_user {
+    return $ENV{LOGNAME} || $ENV{USER};
+}
 
+sub get_email {
+    my $self = shift;
     my $email = $self->cfg->email;
 
-    my ( $user, $pwnam, $name, $mailh );
-    $user = $ENV{LOGNAME} || $ENV{USER};
-    $pwnam = getpwuid($<);
+    $email ||= ( $ENV{DEBEMAIL} || $ENV{EMAIL} );
+    unless ($email) {
+	my $mailh;
+        chomp( $mailh = `cat /etc/mailname` );
+        $email = $self->get_user . '@' . $mailh;
+    }
+
+    $email =~ s/^(.*)\s+<(.*)>$/$2/;
+    return $email;
+}
+
+sub get_name {
+    my $self = shift;
+
+    my $name;
+    my $user = $self->get_user;
+    my $pwnam = getpwuid($<);
     die "Cannot determine current user\n" unless $pwnam;
     if ( defined $ENV{DEBFULLNAME} ) {
         $name = $ENV{DEBFULLNAME};
@@ -137,15 +154,12 @@ sub get_developer {
     }
     $user ||= $pwnam->name;
     $name ||= $user;
-    $email ||= ( $ENV{DEBEMAIL} || $ENV{EMAIL} );
-    unless ($email) {
-        chomp( $mailh = `cat /etc/mailname` );
-        $email = $user . '@' . $mailh;
-    }
+    return $name;
+}
 
-    $email =~ s/^(.*)\s+<(.*)>$/$2/;
-
-    return "$name <$email>";
+sub get_developer {
+    my $self = shift;
+    return $self->get_name . " <" . $self->get_email . ">";
 }
 
 sub fill_maintainer {
@@ -280,8 +294,7 @@ sub extract_basic {
     }
 
     $self->cfg->dh('9')
-        if $bin->Architecture eq 'any'
-        and not $self->cfg->_explicitly_set->{dh};
+        if not $self->cfg->_explicitly_set->{dh};
 
     printf(
         "Found: %s %s (%s arch=%s)\n",
@@ -357,8 +370,14 @@ sub extract_name_ver {
         $ver  = $self->version;
     }
 
-    $ver = $self->cfg->version
-        if $self->cfg->version;
+    if ($self->cfg->version) {
+        #Version specified on command line trumps other versions
+        $ver = $self->cfg->version
+    } elsif ( $self->mod_cpan_version ) {
+        if ($self->mod_cpan_version != $ver) {
+            die "Version ambiguity, cpan has ".$self->mod_cpan_version.", module has ".$ver.". Please specify version with --version.\n";
+        }
+    }
 
     # final sanitazing of name and version
     $name =~ s/::/-/g if defined $name;
@@ -662,16 +681,16 @@ sub extract_desc {
     my ( $self, $file ) = @_;
 
     my $bin = $self->control->binary_tie->Values(0);
-    my $desc = $bin->short_description;
+    my $short_desc = $bin->short_description;
 
-    $desc and return;
+    $short_desc and return;
 
     return unless -f $file;
     my ( $parser, $modulename );
     $parser = new DhMakePerl::PodParser;
     $parser->set_names(qw(NAME DESCRIPTION DETAILS));
     $parser->parse_from_file($file);
-    if ( $desc ) {
+    if ( $short_desc ) {
 
         # No-op - We already have it, probably from the command line
 
@@ -679,7 +698,7 @@ sub extract_desc {
     elsif ( $self->meta->{abstract} ) {
 
         # Get it from META.yml
-        $desc = $self->meta->{abstract};
+        $short_desc = $self->meta->{abstract};
 
     }
     elsif ( my $my_desc = $parser->get('NAME') ) {
@@ -690,20 +709,21 @@ sub extract_desc {
         $my_desc =~ s/\s+$//s;
         $my_desc =~ s/^([^\s])/ $1/mg;
         $my_desc =~ s/\n.*$//s;
-        $desc = $my_desc;
+        $short_desc = $my_desc;
     }
 
-    if ( defined($desc) ) {
+    if ( defined($short_desc) ) {
         # Replace linefeed (not followed by a space) in short description with
         # spaces
-        $desc =~ s/\n(?=\S)/ /gs;
-        $desc =~ s/^\s+//;      # strip leading spaces
+        $short_desc =~ s/\n(?=\S)/ /gs;
+        $short_desc =~ s/^\s+//;                   # strip leading spaces
+        $short_desc =~ s/^(?:(A|An|The))\s+//i;    # strip leading article
     }
 
     # have a fall-back for the short description
-    $desc ||= '(no short description found)';
+    $short_desc ||= '(no short description found)';
 
-    $bin->short_description($desc);
+    $bin->short_description($short_desc);
 
     my $long_desc;
     unless ( $bin->long_description ) {
@@ -712,8 +732,7 @@ sub extract_desc {
             || $parser->get('DETAILS')
             || '';
         ( $modulename = $self->perlname ) =~ s/-/::/g;
-        $long_desc =~ s/This module/$modulename/;
-        $long_desc =~ s/This library/$modulename/;
+        $long_desc =~ s/This (?:module|library|plugin)/$modulename/;
 
         local ($Text::Wrap::columns) = 78;
         $long_desc = fill( "", "", $long_desc );
@@ -797,6 +816,8 @@ sub extract_docs {
     my $dir = $self->main_dir;
 
     $dir .= '/' unless $dir =~ m(/$);
+
+    my $toplevelreadme_re = $self->main_dir . '/README(?:\.\w+)?$';
     find(
         {   preprocess => sub {
                 my $bn = basename $File::Find::dir;
@@ -813,7 +834,7 @@ sub extract_docs {
                     substr( $File::Find::name, length($dir) )
                     )
                     if (
-                        $File::Find::name ne $self->main_dir . '/README'
+                        $File::Find::name !~ m{$toplevelreadme_re}i
                     and /^\b(README|TODO|BUGS|NEWS|ANNOUNCE|CONTRIBUTING)\b/i
                     and !/\.(pod|pm)$/
                     and ( !$self->cfg->exclude
@@ -949,7 +970,7 @@ sub create_copyright {
     $cprt_author =~ s/\n/\n    /gs;
     $cprt_author =~ s/^\s*$/    ./gm;
 
-    push @res, 'Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/';
+    push @res, 'Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/';
 
     # Header section
     %fields = (
@@ -967,11 +988,11 @@ sub create_copyright {
         }
     }
     push( @res,
-        "DISCLAIMER: This copyright info was automatically extracted ",
-        " from the perl module. It may not be accurate, so you better ",
-        " check the module sources in order to ensure the module for its ",
-        " inclusion in Debian or for general legal information. Please, ",
-        " if licensing information is incorrectly generated, file a bug ",
+        "DISCLAIMER: This copyright info was automatically extracted",
+        " from the perl module. It may not be accurate, so you better",
+        " check the module sources in order to ensure the module for its",
+        " inclusion in Debian or for general legal information. Please,",
+        " if licensing information is incorrectly generated, file a bug",
         " on dh-make-perl.",
         " NOTE: Don't forget to remove this disclaimer once you are happy",
         " with this file." );
@@ -1011,6 +1032,7 @@ sub create_copyright {
                 { holder => 'noname', } );
             my $text = $artistic2->license;
             $text =~ s/\n$//s;
+            $text =~ s/[ \t]+$//mg;
             $text =~ s/^\n/.\n/mg;
             $text =~ s/^/ /mg;
             $text;
@@ -1406,13 +1428,15 @@ sub discover_dependencies {
         }
 
         return $self->control->discover_dependencies(
-            {   dir            => $self->main_dir,
-                verbose        => $self->cfg->verbose,
-                apt_contents   => $self->apt_contents,
-                dpkg_available => $dpkg_available,
-                require_deps   => $self->cfg->requiredeps,
-                wnpp_query     => $wnpp_query,
-                intrusive      => $self->cfg->intrusive,
+            {   dir                => $self->main_dir,
+                verbose            => $self->cfg->verbose,
+                apt_contents       => $self->apt_contents,
+                dpkg_available     => $dpkg_available,
+                require_deps       => $self->cfg->requiredeps,
+                install_deps       => $self->cfg->install_deps,
+                install_build_deps => $self->cfg->install_build_deps,
+                wnpp_query         => $wnpp_query,
+                intrusive          => $self->cfg->intrusive,
             }
         );
     }
@@ -1426,7 +1450,7 @@ sub discover_dependencies {
     }
     else {
         warn "No APT contents can be loaded.\n";
-        warn "Please install 'apt-file' package (at least version 2.5.0) and\n";
+        warn "Please install the 'apt-file' package (at least version 3) and\n";
         warn "run 'apt-file update' as root.\n";
         warn "Dependencies not updated.\n";
 
@@ -1473,69 +1497,65 @@ includes first Module::Build.
 sub discover_utility_deps {
     my ( $self, $control ) = @_;
 
-    my $deps  = $control->source->Build_Depends;
+    my $build_deps        = $control->source->Build_Depends;
+    my $build_deps_indep  = $control->source->Build_Depends_Indep;
+    my $bin_deps          = $control->binary_tie->Values(0)->Depends;
+    my $architecture      = $control->binary_tie->Values(0)->Architecture;
 
     # remove any existing dependencies
-    $deps->remove( 'quilt', 'debhelper' );
+    $build_deps->remove( 'quilt', 'debhelper' );
 
     # start with the minimum
     my $debhelper_version = $self->cfg->dh;
 
-    if ( $control->binary_tie->Values(0)->Architecture eq 'all' ) {
-        $control->source->Build_Depends_Indep->add('perl');
+    if ( $architecture eq 'all' ) {
+        $build_deps_indep->add('perl');
     }
     else {
-        $deps->add('perl');
-        $debhelper_version = '9.20120312~' if $debhelper_version eq '9';
+        $build_deps->add('perl');
     }
-    $deps->add( Debian::Dependency->new( 'debhelper', $debhelper_version ) );
+    $build_deps->add( Debian::Dependency->new( 'debhelper', $debhelper_version ) );
 
-    $self->explained_dependency( 'Module::Build::Tiny', $deps,
+    $self->explained_dependency( 'Module::Build::Tiny', $build_deps,
         'debhelper (>= 9.20140227~)' )
-        if $deps->has('libmodule-build-tiny-perl');
+        if $build_deps->has('libmodule-build-tiny-perl');
 
     for ( @{ $self->rules->lines } ) {
         $self->explained_dependency(
             'dh --with=quilt',
-            $deps, 'quilt',
+            $build_deps, 'quilt',
         ) if /dh\s+.*--with[= ]quilt/;
 
         $self->explained_dependency(
             'dh --with=bash-completion',
-            $deps,
+            $build_deps,
             'bash-completion'
         ) if (/dh\s+.*--with[= ]bash[-_]completion/);
 
         $self->explained_dependency(
             'dh --with=perl_dbi',
-            $deps,
+            $build_deps,
             'libdbi-perl'
         ) if (/dh\s+.*--with[= ]perl[-_]dbi/);
 
-        $self->explained_dependency( 'quilt.make', $deps, 'quilt' )
+        $self->explained_dependency( 'quilt.make', $build_deps, 'quilt' )
             if m{^include /usr/share/quilt/quilt.make};
 
     }
 
-    # there are old packages that still build-depend on libmodule-build-perl
-    # or perl (>= 5.10) | libmodule-build-perl.
-    # Since M::B is part of perl 5.10, the build-dependency needs correction
-    # and we replace this Build-Depends with simply perl, as lenny has the
-    # required version.
-    # Remove perl from Build-Depends-Indep as then perl will be already in
-    # Build-Depends.
+    # Ensure both libmodule-build-perl and perl are in B-D
+    # (and not in B-D-I).
     if ( $self->module_build eq 'Module-Build' ) {
-        $deps->remove('perl (>= 5.10) | libmodule-build-perl');
-        $deps->remove('libmodule-build-perl');
-        $control->source->Build_Depends_Indep->remove('perl');
-        $self->explained_dependency( 'Module::Build', $deps,
+        $build_deps_indep->remove('libmodule-build-perl');
+        $build_deps_indep->remove('perl');
+        $self->explained_dependency( 'Module::Build', $build_deps,
+            'libmodule-build-perl' );
+        $self->explained_dependency( 'Module::Build', $build_deps,
             'perl' );
     }
 
     # some mandatory dependencies
-    my $bin_deps = $control->binary_tie->Values(0)->Depends;
-    $bin_deps += '${shlibs:Depends}'
-        if $self->control->binary_tie->Values(0)->Architecture eq 'any';
+    $bin_deps += '${shlibs:Depends}' if $architecture eq 'any';
     $bin_deps += '${misc:Depends}, ${perl:Depends}';
 }
 
@@ -1671,15 +1691,17 @@ sub _file_w {
 
 =item Copyright (C) 2006 Frank Lichtenheld <djpig@debian.org>
 
-=item Copyright (C) 2007-2014 Gregor Herrmann <gregoa@debian.org>
+=item Copyright (C) 2007-2015 gregor herrmann <gregoa@debian.org>
 
-=item Copyright (C) 2007,2008,2009,2010,2012,2013 Damyan Ivanov <dmn@debian.org>
+=item Copyright (C) 2007-2013 Damyan Ivanov <dmn@debian.org>
 
 =item Copyright (C) 2008, Roberto C. Sanchez <roberto@connexer.com>
 
 =item Copyright (C) 2009-2011, Salvatore Bonaccorso <carnil@debian.org>
 
 =item Copyright (C) 2011, Nicholas Bamber <nicholas@periapt.co.uk>
+
+=item Copyright (c) 2016, Nick Morrott <knowledgejunkie@gmail.com>
 
 =back
 

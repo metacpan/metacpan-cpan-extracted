@@ -3,6 +3,28 @@ package Mail::POP3::Security::Connection;
 use strict;
 use IO::Socket;
 
+=head2 new
+
+Params: Config hash-ref with keys:
+
+=over
+
+=item trusted_networks
+
+Filename.
+
+=item allow_non_fqdn
+
+Boolean.
+
+=item hosts_allow_deny
+
+Filename.
+
+=back
+
+=cut
+
 sub new {
     my ($class, $config) = @_;
     my $self = {};
@@ -10,6 +32,12 @@ sub new {
     $self->{CONFIG} = $config;
     $self;
 }
+
+=head2 check
+
+Params: C<$client_ip>, C<$fqdn>.
+
+=cut
 
 # return ($was_ok, \@log_entry)
 sub check {

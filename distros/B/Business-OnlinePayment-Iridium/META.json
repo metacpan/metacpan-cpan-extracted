@@ -59,7 +59,7 @@
          "web" : "https://github.com/wreis/Business-OnlinePayment-Iridium"
       }
    },
-   "version" : "1.01",
+   "version" : "1.03",
    "x_serialization_backend" : "Cpanel::JSON::XS version 2.3403"
 }
 

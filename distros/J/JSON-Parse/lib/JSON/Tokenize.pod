@@ -48,8 +48,8 @@ This outputs
 
 =head1 VERSION
 
-This documents version 0.49 of JSON::Tokenize corresponding to
-L<git commit 21138ec0efa9123392388027af87017af93009dc|https://github.com/benkasminbullock/JSON-Parse/commit/21138ec0efa9123392388027af87017af93009dc> released on Sat Nov 26 15:48:20 2016 +0900.
+This documents version 0.53 of JSON::Tokenize corresponding to
+L<git commit aa17c3b5630219e3964dbf6b2c4a3905abc18e33|https://github.com/benkasminbullock/JSON-Parse/commit/aa17c3b5630219e3964dbf6b2c4a3905abc18e33> released on Wed Oct 18 19:42:07 2017 +0900.
 
 
 
@@ -112,24 +112,25 @@ Get the type of the token as a string. The possible return values are
     "array",
     "unicode escape"
 
+=head2 tokenize_text
+
+    my $text = tokenize_text ($json, $token);
+
+Given a token C<$token> from this parsing and the JSON in C<$json>,
+return the text which corresponds to the token. This is a convenience
+function written in Perl which uses L</tokenize_start> and
+L</tokenize_end> and C<substr> to get the string from C<$json>.
+
 
 
 =head1 AUTHOR
 
 Ben Bullock, <bkb@cpan.org>
 
-=head2 Request
-
-If you'd like to see this module continued, let me know that you're
-using it. For example, send an email, write a bug report, star the
-project's github repository, add a patch, add a C<++> on Metacpan.org,
-or write a rating at CPAN ratings. It really does make a
-difference. Thanks.
-
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2016
+2016-2017
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

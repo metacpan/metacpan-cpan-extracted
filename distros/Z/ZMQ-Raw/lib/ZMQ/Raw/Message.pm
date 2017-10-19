@@ -1,5 +1,5 @@
 package ZMQ::Raw::Message;
-$ZMQ::Raw::Message::VERSION = '0.03';
+$ZMQ::Raw::Message::VERSION = '0.08';
 use strict;
 use warnings;
 use Carp;
@@ -23,23 +23,38 @@ sub AUTOLOAD
     goto &$AUTOLOAD;
 }
 
+sub CLONE_SKIP { 1 }
+
 =head1 NAME
 
 ZMQ::Raw::Message - ZeroMQ Message class
 
 =head1 VERSION
 
-version 0.03
+version 0.08
 
 =head1 DESCRIPTION
 
 A L<ZMQ::Raw::Message> represents a ZeroMQ message.
+
+=head1 SYNOPSIS
+
+	use ZMQ::Raw;
+
+	my $msg = ZMQ::Raw::Message->new;
+	$msg->data ('hello');
+
+	$socket->sendmsg ($msg);
 
 =head1 METHODS
 
 =head2 new( )
 
 Create a new empty ZeroMQ message.
+
+=head2 clone( )
+
+Create a copy of a ZeroMQ message.
 
 =head2 data ([$data])
 

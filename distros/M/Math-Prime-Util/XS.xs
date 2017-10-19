@@ -35,6 +35,26 @@
 #include "ramanujan_primes.h"
 #include "prime_nth_count.h"
 
+#ifdef FACTORING_HARNESSES
+#include <sys/time.h>
+static double my_difftime (struct timeval * start, struct timeval * end) {
+  double secs, usecs;
+  if (start->tv_sec == end->tv_sec) {
+    secs = 0;
+    usecs = end->tv_usec - start->tv_usec;
+  } else {
+    usecs = 1000000 - start->tv_usec;
+    secs = end->tv_sec - (start->tv_sec + 1);
+    usecs += end->tv_usec;
+    if (usecs >= 1000000) {
+      usecs -= 1000000;
+      secs += 1;
+    }
+  }
+  return secs + usecs / 1000000.;
+}
+#endif
+
 #if BITS_PER_WORD == 64
   #if defined(_MSC_VER)
     #include <stdlib.h>
@@ -133,6 +153,7 @@ static int _is_sv_bigint(pTHX_ SV* n)
     if (hvname != 0) {
       if (strEQ(hvname, "Math::BigInt") || strEQ(hvname, "Math::BigFloat") ||
           strEQ(hvname, "Math::GMPz")   || strEQ(hvname, "Math::GMP") ||
+          strEQ(hvname, "Math::GMPq")   || strEQ(hvname, "Math::AnyNum") ||
           strEQ(hvname, "Math::Pari")   || strEQ(hvname, "Math::BigInt::Lite"))
         return 1;
     }
@@ -256,7 +277,7 @@ static int _vcallsubn(pTHX_ I32 flags, I32 stashflags, const char* name, int nar
     } else if (iname == 0 || strEQ(iname, "Math::GMP")) { \
       (void)_vcallsubn(aTHX_ G_SCALAR, VCALL_ROOT, "_to_gmp", 1, 0); \
     } else { /* Return it as: ref(input)->new(result) */ \
-      dSP;  ENTER;  PUSHMARK(SP); \
+      dSP;  (void)POPs;  ENTER;  PUSHMARK(SP); \
       XPUSHs(sv_2mortal(newSVpv(iname, 0)));  XPUSHs(resptr); \
       PUTBACK;  call_method("new", G_SCALAR);  LEAVE; \
     } \
@@ -484,7 +505,8 @@ UV _is_csprng_well_seeded()
     _XS_get_secure = 3
     _XS_set_secure = 4
     _get_forexit = 5
-    _get_prime_cache_size = 6
+    _start_for_loop = 6
+    _get_prime_cache_size = 7
   CODE:
     switch (ix) {
       case 0:  { dMY_CXT; RETVAL = is_csprng_well_seeded(MY_CXT.randcxt); } break;
@@ -493,7 +515,8 @@ UV _is_csprng_well_seeded()
       case 3:  RETVAL = _XS_get_secure(); break;
       case 4:  _XS_set_secure(); RETVAL = 1; break;
       case 5:  { dMY_CXT; RETVAL = MY_CXT.forexit; } break;
-      case 6:
+      case 6:  { dMY_CXT; MY_CXT.forcount++; RETVAL = MY_CXT.forexit; MY_CXT.forexit = 0; } break;
+      case 7:
       default: RETVAL = get_prime_cache(0,0); break;
     }
   OUTPUT:
@@ -506,7 +529,7 @@ prime_precalc(IN UV n)
   ALIAS:
     _XS_set_verbose = 1
     _XS_set_callgmp = 2
-    _set_forexit = 3
+    _end_for_loop = 3
   PPCODE:
     PUTBACK; /* SP is never used again, the 3 next func calls are tailcall
     friendly since this XSUB has nothing to do after the 3 calls return */
@@ -515,7 +538,7 @@ prime_precalc(IN UV n)
       case 1:  _XS_set_verbose(n);  break;
       case 2:  _XS_set_callgmp(n);  break;
       case 3:
-      default: { dMY_CXT; MY_CXT.forexit = (n ? 1 : 0); } break;
+      default: { dMY_CXT; MY_CXT.forcount--; MY_CXT.forexit = n; } break;
     }
     return; /* skip implicit PUTBACK */
 
@@ -774,19 +797,20 @@ trial_factor(IN UV n, ...)
     fermat_factor = 1
     holf_factor = 2
     squfof_factor = 3
-    prho_factor = 4
-    pplus1_factor = 5
-    pbrent_factor = 6
-    pminus1_factor = 7
-    ecm_factor = 8
+    lehman_factor = 4
+    prho_factor = 5
+    pplus1_factor = 6
+    pbrent_factor = 7
+    pminus1_factor = 8
+    ecm_factor = 9
   PREINIT:
     UV arg1, arg2;
     static const UV default_arg1[] =
-       {0,     64000000, 8000000, 4000000, 4000000, 200, 4000000, 1000000};
-     /* Trial, Fermat,   Holf,    SQUFOF,  PRHO,    P+1, Brent,    P-1 */
+       {0,     64000000, 8000000, 4000000, 0,   4000000, 200, 4000000, 1000000};
+     /* Trial, Fermat,   Holf,    SQUFOF,  Lmn, PRHO,    P+1, Brent,    P-1 */
   PPCODE:
     if (n == 0)  XSRETURN_UV(0);
-    if (ix == 8) {  /* We don't have an ecm_factor, call PP. */
+    if (ix == 9) {  /* We don't have an ecm_factor, call PP. */
       _vcallsubn(aTHX_ GIMME_V, VCALL_PP, "ecm_factor", 1, 0);
       return;
     }
@@ -807,11 +831,12 @@ trial_factor(IN UV n, ...)
         case 1:  nfactors = fermat_factor (n, factors, arg1);  break;
         case 2:  nfactors = holf_factor   (n, factors, arg1);  break;
         case 3:  nfactors = squfof_factor (n, factors, arg1);  break;
-        case 4:  nfactors = prho_factor   (n, factors, arg1);  break;
-        case 5:  nfactors = pplus1_factor (n, factors, arg1);  break;
-        case 6:  if (items < 3) arg2 = 1;
+        case 4:  nfactors = lehman_factor (n, factors, arg1);  break;
+        case 5:  nfactors = prho_factor   (n, factors, arg1);  break;
+        case 6:  nfactors = pplus1_factor (n, factors, arg1);  break;
+        case 7:  if (items < 3) arg2 = 1;
                  nfactors = pbrent_factor (n, factors, arg1, arg2);  break;
-        case 7:
+        case 8:
         default: if (items < 3) arg2 = 10*arg1;
                  nfactors = pminus1_factor(n, factors, arg1, arg2);  break;
       }
@@ -1127,6 +1152,7 @@ is_prime(IN SV* svn, ...)
     is_prime_power = 23
     logint = 24
     rootint = 25
+    is_fundamental = 26
   PREINIT:
     int status, astatus;
   PPCODE:
@@ -1226,6 +1252,14 @@ is_prime(IN SV* svn, ...)
           }
           XSRETURN_UV(r);
         }
+      } else if (ix == 26) {
+        if (status == -1) {
+          IV sn = my_sviv(svn);
+          if (sn <= -IV_MAX) status = 0;
+          else               n = -sn;
+        }
+        if (status != 0)
+          RETURN_NPARITY( is_fundamental(n, status == -1) );
       }
     }
     switch (ix) {
@@ -1257,8 +1291,9 @@ is_prime(IN SV* svn, ...)
               else            { _vcallsub_with_pp("is_power"); } break;
       case 23:(void)_vcallsubn(aTHX_ G_SCALAR, (items == 1) ? (VCALL_GMP|VCALL_PP) : (VCALL_PP), "is_prime_power", items, 40); break;
       case 24:_vcallsub_with_gmp(0.00,"logint"); break;
-      case 25:
-      default:(void)_vcallsubn(aTHX_ G_SCALAR, (items == 2) ? (VCALL_GMP|VCALL_PP) : (VCALL_PP), "rootint", items, 40); break;
+      case 25:(void)_vcallsubn(aTHX_ G_SCALAR, (items == 2) ? (VCALL_GMP|VCALL_PP) : (VCALL_PP), "rootint", items, 40); break;
+      case 26:
+      default:_vcallsub_with_gmp(0.00,"is_fundamental"); break;
     }
     return; /* skip implicit PUTBACK */
 
@@ -1583,7 +1618,8 @@ znorder(IN SV* sva, IN SV* svn)
     binomial = 1
     jordan_totient = 2
     ramanujan_sum = 3
-    legendre_phi = 4
+    factorialmod = 4
+    legendre_phi = 5
   PREINIT:
     int astatus, nstatus;
   PPCODE:
@@ -1624,7 +1660,9 @@ znorder(IN SV* sva, IN SV* svn)
                    XSRETURN_IV( m * (totient(a) / totient(g)) );
                  }
                  break;
-        case 4:
+        case 4:  ret = factorialmod(a, n);
+                 break;
+        case 5:
         default: ret = legendre_phi(a, n);
                  break;
       }
@@ -1637,7 +1675,8 @@ znorder(IN SV* sva, IN SV* svn)
       case 1:  _vcallsub_with_pp("binomial");  break;
       case 2:  _vcallsub_with_pp("jordan_totient");  break;
       case 3:  _vcallsub_with_pp("ramanujan_sum");  break;
-      case 4:
+      case 4:  _vcallsub_with_pp("factorialmod");  break;
+      case 5:
       default: _vcallsub_with_pp("legendre_phi"); break;
     }
     return; /* skip implicit PUTBACK */
@@ -2022,11 +2061,13 @@ randperm(IN UV n, IN UV k = 0)
     if (items == 1) k = n;
     if (k > n) k = n;
     if (k == 0) XSRETURN_EMPTY;
-    New(0, S, n, UV);  /* TODO: k? */
+    New(0, S, k, UV);
     randperm(MY_CXT.randcxt, n, k, S);
     EXTEND(SP, (IV)k);
-    for (i = 0; i < k; i++)
-      PUSH_NPARITY( S[i] );
+    for (i = 0; i < k; i++) {
+      if (n < 2*CINTS)  PUSH_NPARITY(S[i]);
+      else              PUSHs(sv_2mortal(newSVuv(S[i])));
+    }
     Safefree(S);
 
 void shuffle(...)
@@ -2562,6 +2603,13 @@ forpart (SV* block, IN SV* svn, IN SV* svh = 0)
       if (primeq != 0 && primeq != -1) primeq = 2;  /* -1, 0, or 2 */
     }
 
+    if (primeq == 2) {
+      UV prev =                 prev_prime(amax+1);
+      UV next = amin <= 2 ? 2 : next_prime(amin-1);
+      if (amin < next)  amin = next;
+      if (amax > prev)  amax = prev;
+    }
+
     if (n==0 && nmin <= 1) {
       { dSP; ENTER; PUSHMARK(SP);
         /* Nothing */
@@ -2639,7 +2687,7 @@ forcomb (SV* block, IN SV* svn, IN SV* svk = 0)
     forderange = 2
   PROTOTYPE: &$;$
   PREINIT:
-    UV i, n, k, j, m;
+    UV i, n, k, j, m, begk, endk;
     GV *gv;
     HV *stash;
     CV *cv;
@@ -2653,59 +2701,85 @@ forcomb (SV* block, IN SV* svn, IN SV* svk = 0)
     cv = sv_2cv(block, &stash, &gv, 0);
     if (cv == Nullcv)
       croak("Not a subroutine reference");
-    if (ix == 1 && svk != 0)
+    if (ix > 0 && svk != 0)
       croak("Too many arguments for forperm");
 
     if (!_validate_int(aTHX_ svn, 0) || (svk != 0 && !_validate_int(aTHX_ svk, 0))) {
-      _vcallsub_with_pp( (ix == 0) ? "forcomb" : "forperm" );
+      _vcallsub_with_pp(   (ix == 0) ? "forcomb"
+                         : (ix == 1) ? "forperm"
+                                     : "forderange" );
       return;
     }
 
     n = my_svuv(svn);
-    k = (svk == 0) ? n : my_svuv(svk);
-    if (k > n)
-      return;
-
-    New(0, cm, k+1, UV);
-    cm[0] = UV_MAX;
-    for (i = 0; i < k; i++)
-      cm[i] = k-i;
+    if (svk == 0) {
+      begk = (ix == 0) ? 0 : n;
+      endk = n;
+    } else {
+      begk = endk = my_svuv(svk);
+      if (begk > n)
+        return;
+    }
 
     New(0, svals, n, SV*);
     for (i = 0; i < n; i++) {
       svals[i] = newSVuv(i);
       SvREADONLY_on(svals[i]);
     }
+    New(0, cm, endk+1, UV);
 
     START_FORCOUNT;
-    while (1) {
-      if (ix == 2)
+    for (k = begk; k <= endk; k++) {
+      cm[0] = UV_MAX;
+      for (i = 0; i < k; i++)
+        cm[i] = k-i;
+      if (ix == 2 && k >= 2) {   /* Make derangements start deranged */
         for (i = 0; i < k; i++)
-          if (cm[k-i-1]-1 == i)
-            break;
-      if (ix < 2 || i == k) {
-        dSP; ENTER; PUSHMARK(SP);
-        EXTEND(SP, ((IV)k));
-        for (i = 0; i < k; i++) { PUSHs(svals[ cm[k-i-1]-1 ]); }
-        PUTBACK; call_sv((SV*)cv, G_VOID|G_DISCARD); LEAVE;
-        CHECK_FORCOUNT;
+          cm[k-i-1] = (i&1) ? i : i+2;
+        if (k & 1) {
+          cm[0] = k-2;
+          cm[1] = k;
+        }
       }
-      if (ix == 0) {
-        if (cm[0]++ < n)  continue;                /* Increment last value */
-        for (i = 1; i < k && cm[i] >= n-i; i++) ;  /* Find next index to incr */
-        if (i >= k)  break;                        /* Done! */
-        cm[i]++;                                   /* Increment this one */
-        while (i-- > 0)  cm[i] = cm[i+1] + 1;      /* Set the rest */
-      } else {
-        for (j = 1; j < k && cm[j] > cm[j-1]; j++) ;    /* Find last decrease */
-        if (j >= k) break;                              /* Done! */
-        for (m = 0; cm[j] > cm[m]; m++)                 /* Find next greater */
-          ;
-        { UV t = cm[j];  cm[j] = cm[m];  cm[m] = t; }   /* Swap */
-        for (i = j-1, m = 0;  m < i;  i--, m++)         /* Reverse the end */
-          { UV t = cm[i];  cm[i] = cm[m];  cm[m] = t; }
+      while (1) {
+        if (ix < 2 || k != 1) {
+          dSP; ENTER; PUSHMARK(SP);
+          EXTEND(SP, ((IV)k));
+          for (i = 0; i < k; i++) { PUSHs(svals[ cm[k-i-1]-1 ]); }
+          PUTBACK; call_sv((SV*)cv, G_VOID|G_DISCARD); LEAVE;
+          CHECK_FORCOUNT;
+        }
+        if (ix == 0) {
+          if (cm[0]++ < n)  continue;                /* Increment last value */
+          for (i = 1; i < k && cm[i] >= n-i; i++) ;  /* Find next index to incr */
+          if (i >= k)  break;                        /* Done! */
+          cm[i]++;                                   /* Increment this one */
+          while (i-- > 0)  cm[i] = cm[i+1] + 1;      /* Set the rest */
+        } else if (ix == 1) {
+          for (j = 1; j < k && cm[j] > cm[j-1]; j++) ;  /* Find last decrease */
+          if (j >= k) break;                            /* Done! */
+          for (m = 0; cm[j] > cm[m]; m++) ;             /* Find next greater */
+          { UV t = cm[j];  cm[j] = cm[m];  cm[m] = t; } /* Swap */
+          for (i = j-1, m = 0;  m < i;  i--, m++)       /* Reverse the end */
+            { UV t = cm[i];  cm[i] = cm[m];  cm[m] = t; }
+        } else {
+          REDERANGE:
+          for (j = 1; j < k && cm[j] > cm[j-1]; j++) ;  /* Find last decrease */
+          if (j >= k) break;                            /* Done! */
+          for (m = 0; cm[j] > cm[m]; m++) ;             /* Find next greater */
+          { UV t = cm[j];  cm[j] = cm[m];  cm[m] = t; } /* Swap */
+          if (cm[j] == k-j) goto REDERANGE;             /* Skip? */
+          for (i = j-1, m = 0;  m < i;  i--, m++)       /* Reverse the end */
+            { UV t = cm[i];  cm[i] = cm[m];  cm[m] = t; }
+          for (i = 0; i < k; i++)                       /* Check deranged */
+            if (cm[k-i-1]-1 == i)
+              break;
+          if (i != k) goto REDERANGE;
+        }
       }
+      CHECK_FORCOUNT;
     }
+
     Safefree(cm);
     for (i = 0; i < n; i++)
       SvREFCNT_dec(svals[i]);
@@ -2829,3 +2903,75 @@ PPCODE:
     if (ret_true)  XSRETURN_YES;
     else           XSRETURN_NO;
 }
+
+#ifdef FACTORING_HARNESSES
+void
+factor_test_harness1(...)
+  PROTOTYPE: @
+  PPCODE:
+    /* Pass in a big array of numbers, we factor them in a timed loop */
+    {
+      UV res, factors[MPU_MAX_FACTORS+1], exponents[MPU_MAX_FACTORS+1], *comp;
+      struct timeval gstart, gstop;
+      double t_time;
+      int i, j, k, correct, nf, num = items;
+
+      //num = (items > 100000) ? 100000 : items;
+      New(0, comp, num, UV);
+      for (i = 0; i < num; i++)
+        comp[i] = my_svuv(ST(i));
+      gettimeofday(&gstart, NULL);
+      for (j = 0; j < 1; j++) {
+        correct = 0;
+        for (i = 0; i < num; i++) {
+          nf = factor(comp[i], factors);
+          //nf = squfof_factor(comp[i], factors, 140000);
+          //nf = pbrent_factor(comp[i], factors, 500000, 1);
+          //nf = holf_factor(comp[i], factors, 1000000);
+          //nf = lehman_factor(comp[i], factors, 1);
+          //nf = lehman_factor(comp[i], factors, 0);  if (nf < 2) nf=pbrent_factor(comp[i], factors, 500000, 3);
+          //nf = factor63(comp[i], factors);
+          //nf = pminus1_factor(comp[i], factors, 1000,10000);
+          //nf = prho_factor(comp[i], factors, 10000);
+          if (nf >= 2) {
+            for (res = factors[0], k = 1; k < nf; k++)
+              res *= factors[k];
+            if (res == comp[i])
+              correct++;
+          }
+          //printf("%lu:",comp[i]);for(k=0;k<nf;k++)printf(" %lu",factors[k]);printf("\n");
+        }
+      }
+      gettimeofday(&gstop, NULL);
+      t_time = my_difftime(&gstart, &gstop);
+      Safefree(comp);
+      printf("factoring got %d of %d correct in %2.2f sec\n", correct, num, t_time);
+      printf("percent correct = %.3f\n", 100.0*(double)correct / (double)num);
+      printf("average time per input = %1.4f ms\n", 1000 * t_time / (double)num);
+      XSRETURN_UV(correct);
+    }
+
+void
+factor_test_harness2(IN int count, IN int bits = 63)
+  PREINIT:
+    dMY_CXT;
+  PPCODE:
+    /* We'll factor <count> <bits>-bit numbers */
+    {
+      UV factors[MPU_MAX_FACTORS+1], exponents[MPU_MAX_FACTORS+1];
+      FILE *fid = 0;  // fopen("results.txt", "w");
+      uint64_t n, state = 28953;
+      int i, nfactors, totfactors = 0;
+      /* Use Knuth MMIX -- simple and no worse than Chacha20 for this */
+      for (i = 0; i < count; i++) {
+        state = 6364136223846793005ULL * state + 1442695040888963407ULL;
+        n = state >> (64-bits);
+        nfactors = factor_exp(n, factors, exponents);
+        if (fid) fprintf(fid, "%llu has %d factors\n", n, nfactors);
+        totfactors += nfactors;
+      }
+      if (fid) fclose(fid);
+      XSRETURN_IV(totfactors);
+    }
+
+#endif

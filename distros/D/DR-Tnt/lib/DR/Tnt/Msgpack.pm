@@ -303,7 +303,9 @@ sub msgpack($) {
                 $res .= msgpack($v);
             }
             return $res;
-
+        } elsif ('SCALAR' eq ref $v) {
+            return pack 'C', 0xC3 if $$v;
+            return pack 'C', 0xC2;
         } elsif (Scalar::Util::blessed $v) {
             return $v->TO_MSGPACK if $v->can('TO_MSGPACK');
 

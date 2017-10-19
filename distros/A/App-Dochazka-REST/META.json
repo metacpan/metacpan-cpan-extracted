@@ -4,7 +4,7 @@
       "Nathan Cutler <ncutler@suse.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4205",
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
    "license" : [
       "bsd"
    ],
@@ -34,7 +34,7 @@
             "Test::Fatal" : "0",
             "Test::JSON" : "0",
             "Test::Warnings" : "0",
-            "Web::MREST" : "0.282",
+            "Web::MREST" : "0.287",
             "Web::MREST::CLI" : "0.276",
             "Web::Machine" : "0.15"
          }
@@ -47,7 +47,7 @@
       "runtime" : {
          "requires" : {
             "App::CELL" : "0.215",
-            "App::Dochazka::Common" : "0.205",
+            "App::Dochazka::Common" : "0.207",
             "Authen::Passphrase::SaltedDigest" : "0.008",
             "DBD::Pg" : "0",
             "DBI" : "0",
@@ -65,7 +65,7 @@
             "Pod::Simple::HTML" : "0",
             "Test::Deep::NoTest" : "0",
             "Try::Tiny" : "0",
-            "Web::MREST" : "0.282",
+            "Web::MREST" : "0.287",
             "Web::MREST::CLI" : "0.276",
             "Web::Machine" : "0.15",
             "perl" : "5.012"
@@ -75,85 +75,111 @@
    "provides" : {
       "App::Dochazka::REST" : {
          "file" : "lib/App/Dochazka/REST.pm",
-         "version" : "0.548"
+         "version" : "0.550"
       },
       "App::Dochazka::REST::ACL" : {
-         "file" : "lib/App/Dochazka/REST/ACL.pm"
+         "file" : "lib/App/Dochazka/REST/ACL.pm",
+         "version" : 0
       },
       "App::Dochazka::REST::Auth" : {
-         "file" : "lib/App/Dochazka/REST/Auth.pm"
+         "file" : "lib/App/Dochazka/REST/Auth.pm",
+         "version" : 0
       },
       "App::Dochazka::REST::ConnBank" : {
-         "file" : "lib/App/Dochazka/REST/ConnBank.pm"
+         "file" : "lib/App/Dochazka/REST/ConnBank.pm",
+         "version" : 0
       },
       "App::Dochazka::REST::Dispatch" : {
-         "file" : "lib/App/Dochazka/REST/Dispatch.pm"
+         "file" : "lib/App/Dochazka/REST/Dispatch.pm",
+         "version" : 0
       },
       "App::Dochazka::REST::Docs::Resources" : {
-         "file" : "lib/App/Dochazka/REST/Docs/Resources.pm"
+         "file" : "lib/App/Dochazka/REST/Docs/Resources.pm",
+         "version" : 0
       },
       "App::Dochazka::REST::Docs::Workflow" : {
-         "file" : "lib/App/Dochazka/REST/Docs/Workflow.pm"
+         "file" : "lib/App/Dochazka/REST/Docs/Workflow.pm",
+         "version" : 0
       },
       "App::Dochazka::REST::Fillup" : {
-         "file" : "lib/App/Dochazka/REST/Fillup.pm"
+         "file" : "lib/App/Dochazka/REST/Fillup.pm",
+         "version" : 0
       },
       "App::Dochazka::REST::Guide" : {
-         "file" : "lib/App/Dochazka/REST/Guide.pm"
+         "file" : "lib/App/Dochazka/REST/Guide.pm",
+         "version" : 0
       },
       "App::Dochazka::REST::Holiday" : {
-         "file" : "lib/App/Dochazka/REST/Holiday.pm"
+         "file" : "lib/App/Dochazka/REST/Holiday.pm",
+         "version" : 0
       },
       "App::Dochazka::REST::LDAP" : {
-         "file" : "lib/App/Dochazka/REST/LDAP.pm"
+         "file" : "lib/App/Dochazka/REST/LDAP.pm",
+         "version" : 0
       },
       "App::Dochazka::REST::Mason" : {
-         "file" : "lib/App/Dochazka/REST/Mason.pm"
+         "file" : "lib/App/Dochazka/REST/Mason.pm",
+         "version" : 0
       },
       "App::Dochazka::REST::Model::Activity" : {
-         "file" : "lib/App/Dochazka/REST/Model/Activity.pm"
+         "file" : "lib/App/Dochazka/REST/Model/Activity.pm",
+         "version" : 0
       },
       "App::Dochazka::REST::Model::Component" : {
-         "file" : "lib/App/Dochazka/REST/Model/Component.pm"
+         "file" : "lib/App/Dochazka/REST/Model/Component.pm",
+         "version" : 0
       },
       "App::Dochazka::REST::Model::Employee" : {
-         "file" : "lib/App/Dochazka/REST/Model/Employee.pm"
+         "file" : "lib/App/Dochazka/REST/Model/Employee.pm",
+         "version" : 0
       },
       "App::Dochazka::REST::Model::Interval" : {
-         "file" : "lib/App/Dochazka/REST/Model/Interval.pm"
+         "file" : "lib/App/Dochazka/REST/Model/Interval.pm",
+         "version" : 0
       },
       "App::Dochazka::REST::Model::Lock" : {
-         "file" : "lib/App/Dochazka/REST/Model/Lock.pm"
+         "file" : "lib/App/Dochazka/REST/Model/Lock.pm",
+         "version" : 0
       },
       "App::Dochazka::REST::Model::Privhistory" : {
-         "file" : "lib/App/Dochazka/REST/Model/Privhistory.pm"
+         "file" : "lib/App/Dochazka/REST/Model/Privhistory.pm",
+         "version" : 0
       },
       "App::Dochazka::REST::Model::Schedhistory" : {
-         "file" : "lib/App/Dochazka/REST/Model/Schedhistory.pm"
+         "file" : "lib/App/Dochazka/REST/Model/Schedhistory.pm",
+         "version" : 0
       },
       "App::Dochazka::REST::Model::Schedintvls" : {
-         "file" : "lib/App/Dochazka/REST/Model/Schedintvls.pm"
+         "file" : "lib/App/Dochazka/REST/Model/Schedintvls.pm",
+         "version" : 0
       },
       "App::Dochazka::REST::Model::Schedule" : {
-         "file" : "lib/App/Dochazka/REST/Model/Schedule.pm"
+         "file" : "lib/App/Dochazka/REST/Model/Schedule.pm",
+         "version" : 0
       },
       "App::Dochazka::REST::Model::Shared" : {
-         "file" : "lib/App/Dochazka/REST/Model/Shared.pm"
+         "file" : "lib/App/Dochazka/REST/Model/Shared.pm",
+         "version" : 0
       },
       "App::Dochazka::REST::Model::Tempintvl" : {
-         "file" : "lib/App/Dochazka/REST/Model/Tempintvl.pm"
+         "file" : "lib/App/Dochazka/REST/Model/Tempintvl.pm",
+         "version" : 0
       },
       "App::Dochazka::REST::ResourceDefs" : {
-         "file" : "lib/App/Dochazka/REST/ResourceDefs.pm"
+         "file" : "lib/App/Dochazka/REST/ResourceDefs.pm",
+         "version" : 0
       },
       "App::Dochazka::REST::Shared" : {
-         "file" : "lib/App/Dochazka/REST/Shared.pm"
+         "file" : "lib/App/Dochazka/REST/Shared.pm",
+         "version" : 0
       },
       "App::Dochazka::REST::Test" : {
-         "file" : "lib/App/Dochazka/REST/Test.pm"
+         "file" : "lib/App/Dochazka/REST/Test.pm",
+         "version" : 0
       },
       "App::Dochazka::REST::Util" : {
-         "file" : "lib/App/Dochazka/REST/Util.pm"
+         "file" : "lib/App/Dochazka/REST/Util.pm",
+         "version" : 0
       }
    },
    "release_status" : "stable",
@@ -162,12 +188,11 @@
          "web" : "https://github.com/smithfarm/dochazka-rest/issues"
       },
       "license" : [
-         "http://opensource.org/licenses/bsd-license.php"
+         "http://opensource.org/licenses/BSD-3-Clause"
       ],
       "repository" : {
          "url" : "https://github.com/smithfarm/dochazka-rest"
       }
    },
-   "version" : "0.548",
-   "x_serialization_backend" : "JSON::PP version 2.27203"
+   "version" : "0.550"
 }

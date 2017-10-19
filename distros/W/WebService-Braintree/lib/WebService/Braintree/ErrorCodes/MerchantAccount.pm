@@ -1,6 +1,7 @@
 package WebService::Braintree::ErrorCodes::MerchantAccount;
-$WebService::Braintree::ErrorCodes::MerchantAccount::VERSION = '0.93';
-use strict;
+$WebService::Braintree::ErrorCodes::MerchantAccount::VERSION = '0.94';
+use 5.010_001;
+use strictures 1;
 
 use constant IdIsNotAllowed                         => "82605";
 use constant IdIsTooLong                            => "82602";
@@ -21,3 +22,4 @@ use constant DeclinedSsnInvalid                     => "82624";
 use constant DeclinedSsnMatchesDeceased             => "82625";
 
 1;
+__END__

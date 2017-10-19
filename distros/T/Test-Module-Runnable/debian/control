@@ -1,10 +1,12 @@
 Source: libtest-module-runnable-perl
 Section: devel
 Priority: extra
-Maintainer: David Duncan Ross Palmer <palmer@overchat.org>
+Maintainer: Duncan Ross Palmer <palmer@overchat.org>
 Build-Depends: debhelper (>= 9),
 Build-Depends-Indep:
  libmoose-perl,
+ libreadonly-perl,
+ liblist-moreutils-perl,
 Standards-Version: 3.7.3
 Homepage: https://bitbucket.org/2E0EOL/libtest-module-runnable-perl
 

@@ -1,26 +1,33 @@
 {
-   "provides" : {
-      "Config::Perl::V" : {
-         "file" : "V.pm",
-         "version" : "0.27"
-      }
-   },
-   "name" : "Config-Perl-V",
+   "dynamic_config" : 1,
    "license" : [
       "perl_5"
    ],
-   "generated_by" : "Author",
-   "version" : "0.27",
    "author" : [
       "H.Merijn Brand <h.m.brand@xs4all.nl>"
    ],
+   "name" : "Config-Perl-V",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "web" : "https://github.com/Tux/Config-Perl-V",
+         "url" : "https://github.com/Tux/Config-Perl-V",
+         "type" : "git"
+      }
+   },
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "provides" : {
+      "Config::Perl::V" : {
+         "version" : "0.29",
+         "file" : "V.pm"
+      }
+   },
    "prereqs" : {
-      "runtime" : {
-         "requires" : {
-            "perl" : "5.006",
-            "Config" : "0"
-         }
-      },
       "build" : {
          "requires" : {
             "perl" : "5.006"
@@ -31,28 +38,21 @@
             "ExtUtils::MakeMaker" : "0"
          }
       },
+      "runtime" : {
+         "requires" : {
+            "Config" : "0",
+            "perl" : "5.006"
+         }
+      },
       "test" : {
          "requires" : {
-            "Test::More" : "0",
-            "Test::NoWarnings" : "0"
+            "Test::NoWarnings" : "0",
+            "Test::More" : "0"
          }
       }
    },
-   "meta-spec" : {
-      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
-   },
-   "release_status" : "stable",
-   "dynamic_config" : 1,
+   "version" : "0.29",
    "abstract" : "Structured data retrieval of perl -V output",
-   "resources" : {
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ],
-      "repository" : {
-         "web" : "https://github.com/Tux/Config-Perl-V",
-         "url" : "https://github.com/Tux/Config-Perl-V",
-         "type" : "git"
-      }
-   }
+   "release_status" : "stable",
+   "generated_by" : "Author"
 }

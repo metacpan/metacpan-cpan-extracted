@@ -2,6 +2,7 @@
 Changes
 LICENSE
 MANIFEST
+META.json
 META.yml
 Makefile.PL
 README
@@ -15,6 +16,7 @@ lib/Schedule/LongSteps/Storage/AutoDBIx.pm
 lib/Schedule/LongSteps/Storage/AutoDBIx/Schema.pm
 lib/Schedule/LongSteps/Storage/AutoDBIx/Schema/Result/LongstepProcess.pm
 lib/Schedule/LongSteps/Storage/DBIxClass.pm
+lib/Schedule/LongSteps/Storage/DynamoDB.pm
 lib/Schedule/LongSteps/Storage/Memory.pm
 t/fullblown.t
 t/load.t
@@ -32,4 +34,5 @@ t/revive_with_context.t
 t/revive_with_revival_step.t
 t/storage-autodbix.t
 t/storage-dbixclass.t
+t/storage-dynamodb.t
 t/storage-memory.t

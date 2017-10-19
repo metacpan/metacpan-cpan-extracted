@@ -6,7 +6,7 @@ use warnings;
 use base qw(Exporter);
 use Graph;
 
-our $VERSION = '0.02';
+our $VERSION = '0.20';
 
 our %EXPORT_TAGS = ( 'all' => [ qw(
 	graph_delete_vertices_fast
@@ -16,6 +16,9 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
   graph_vertices_between
   graph_get_vertex_label
   graph_set_vertex_label
+  graph_isolate_vertex
+  graph_delete_vertices_except
+  graph_truncate_to_vertices_between
 ) ] );
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
@@ -69,6 +72,26 @@ sub graph_all_successors_and_self {
 sub graph_all_predecessors_and_self {
   my ($g, $v) = @_;
   return ((grep { $_ ne $v } $g->all_predecessors($v)), $v);
+}
+
+sub graph_isolate_vertex {
+  my ($g, $vertex) = @_;
+  $g->delete_edge($vertex, $_) for $g->successors($vertex);
+  $g->delete_edge($_, $vertex) for $g->predecessors($vertex);
+}
+
+sub graph_delete_vertices_except {
+  my ($g, @vertices) = @_;
+  my %keep = map { $_ => 1 } @vertices;
+
+  graph_delete_vertices_fast($g,
+    grep { not $keep{$_} } $g->vertices);
+}
+
+sub graph_truncate_to_vertices_between {
+  my ($g, $start, $final) = @_;
+  graph_delete_vertices_except($g,
+    graph_vertices_between($g, $start, $final));
 }
 
 1;
@@ -133,6 +156,19 @@ Shorthand for getting the vertex attribute C<label>.
 =item graph_set_vertex_label($g, $v, $label)
 
 Shorthand for setting the vertex attribute C<label>.
+
+=item graph_isolate_vertex($g, $v)
+
+Removes edges coming in and going out of C<$v>.
+
+=item graph_delete_vertices_except($g, @vertices)
+
+Deletes vertices except C<@vertices>.
+
+=item graph_truncate_to_vertices_between($g, $start, $final)
+
+Removes all vertices that are neither C<$start> or C<$final>
+nor on a path between them.
 
 =back
 

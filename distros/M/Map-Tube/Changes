@@ -1,5 +1,8 @@
 Revision history for Map::Tube
 
+3.36  2017-10-18T13:40:00+00:00
+      - Added support for partial station index.
+
 3.35  2017-09-21T11:30:00+00:00
       - Hide unnecessary noise during the test.
 

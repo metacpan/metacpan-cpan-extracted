@@ -12,16 +12,15 @@ has name => (is => 'ro', default => 'N', isa => 'Str' );
 has \@order => ( is => 'rw', isa => 'Str|Undef', default => undef );
 
 subtype 'Values' => as 'HashRef[Maybe[Str]]';
-coerce 'Values'
-    => from 'ArrayRef[Maybe[Str]]'
-    => via {
+coerce 'Values',
+    from 'ArrayRef[Maybe[Str]]',
+    via {
         my @values = @$_; $values[4] ||= ''; my $hash = {};
         map { $hash->{$order[$_]} = $values[$_] } 0..4;
         return $hash;
-    };
-coerce 'Values'
-    => from 'Str'
-    => via {
+    },
+    from 'Str',
+    via {
         my @values = split( /(?<!\\);/, $_ ); $values[4] ||= ''; my $hash = {};
         map { $hash->{$order[$_]} = $values[$_] } 0..4;
         return $hash;

@@ -215,6 +215,55 @@ THX_fetch_password_try_not_to_copy_buffer(pTHX_ MariaDB_client *maria)
     return fetch_pv_try_not_to_copy_buffer(maria->config->password_temp);
 }
 
+/* Stolen wholesame from DBD::mysql */
+
+enum perl_type {
+  PERL_TYPE_UNDEF,
+  PERL_TYPE_INTEGER,
+  PERL_TYPE_NUMERIC,
+  PERL_TYPE_BINARY,
+  PERL_TYPE_STRING
+};
+
+static enum perl_type mysql_to_perl_type(enum enum_field_types type)
+{
+    switch (type) {
+        case MYSQL_TYPE_NULL:
+            return PERL_TYPE_UNDEF;
+
+        case MYSQL_TYPE_TINY:
+        case MYSQL_TYPE_SHORT:
+        case MYSQL_TYPE_INT24:
+        case MYSQL_TYPE_LONG:
+#if IVSIZE >= 8
+        case MYSQL_TYPE_LONGLONG:
+#endif
+        case MYSQL_TYPE_YEAR:
+            return PERL_TYPE_INTEGER;
+
+        case MYSQL_TYPE_FLOAT:
+        #if NVSIZE >= 8
+        case MYSQL_TYPE_DOUBLE:
+        #endif
+            return PERL_TYPE_NUMERIC;
+
+        #if MYSQL_VERSION_ID > NEW_DATATYPE_VERSION
+        case MYSQL_TYPE_BIT:
+        #endif
+        #if MYSQL_VERSION_ID > GEO_DATATYPE_VERSION
+        case MYSQL_TYPE_GEOMETRY:
+        #endif
+        case MYSQL_TYPE_TINY_BLOB:
+        case MYSQL_TYPE_BLOB:
+        case MYSQL_TYPE_MEDIUM_BLOB:
+        case MYSQL_TYPE_LONG_BLOB:
+            return PERL_TYPE_BINARY;
+
+        default:
+            return PERL_TYPE_STRING;
+    }
+}
+
 int
 THX_add_row_to_results(pTHX_ MariaDB_client *maria, MYSQL_ROW row, bool want_hashref, int field_count, unsigned long *lengths, MYSQL_FIELD *fields)
 #define add_row_to_results(a,b,c) THX_add_row_to_results(aTHX_ a,b,c,0,NULL,NULL)
@@ -283,8 +332,39 @@ THX_add_row_to_results(pTHX_ MariaDB_client *maria, MYSQL_ROW row, bool want_has
             }
         }
 
-        /* TODO could do the whole type thing switch here */
         col_data = newSVpvn(row[i], (STRLEN)lengths[i]);
+
+        switch (mysql_to_perl_type(fields[i].type)) {
+            case PERL_TYPE_NUMERIC:
+                if (!(fields[i].flags & ZEROFILL_FLAG)) {
+                    /* Coerce to dobule and set scalar as NV */
+                    (void)SvNV(col_data);
+                    SvNOK_only(col_data);
+                }
+                break;
+
+            case PERL_TYPE_INTEGER:
+                if (!(fields[i].flags & ZEROFILL_FLAG)) {
+                    /* Coerce to integer and set scalar as UV resp. IV */
+                    if (fields[i].flags & UNSIGNED_FLAG) {
+                        (void)SvUV(col_data);
+                        SvIOK_only_UV(col_data);
+                    }
+                    else {
+                        (void)SvIV(col_data);
+                        SvIOK_only(col_data);
+                    }
+                }
+                break;
+
+            case PERL_TYPE_UNDEF:
+                /* Field is NULL, return undef */
+                (void)SvOK_off(col_data);
+                break;
+
+            default:
+                break;
+        }
 
         /* ownership of the col_data refcount goes to row_results */
         if ( want_hashref ) {

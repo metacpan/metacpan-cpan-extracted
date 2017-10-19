@@ -1,6 +1,9 @@
 Revision history for Net-KashFlow
 
-0.03    Wed Aug 23 15:41:00 2018 BST
+0.04    Tue Oct 17 15:23:00 2017 BST
+        - dzil [OurPkgVersion]
+
+0.03    Wed Aug 23 15:41:00 2017 BST
         - Updating an invoice fixe - #7
         - Invoices and receipt fixes - #10
         - Move to Dist::Zilla - #11

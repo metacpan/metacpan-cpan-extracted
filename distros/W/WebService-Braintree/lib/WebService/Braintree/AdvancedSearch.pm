@@ -1,14 +1,11 @@
 package WebService::Braintree::AdvancedSearch;
-$WebService::Braintree::AdvancedSearch::VERSION = '0.93';
-
-use strict;
-use vars qw(@ISA @EXPORT_OK);
-use Exporter;
-our @ISA = qw(Exporter);
-our @EXPORT_OK = qw(search_to_hash);
+$WebService::Braintree::AdvancedSearch::VERSION = '0.94';
+use 5.010_001;
+use strictures 1;
 
 sub search_to_hash {
-    my ($self,$search) = @_;
+    my ($self, $search) = @_;
+
     my $hash = {};
     for my $attribute ($search->meta()->get_all_attributes) {
         my $field = $attribute->name;
@@ -16,7 +13,9 @@ sub search_to_hash {
             $hash->{$field} = $search->$field->criteria;
         }
     }
+
     return $hash;
 }
 
 1;
+__END__

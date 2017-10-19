@@ -1,5 +1,18 @@
 Revision history for Test-Timer
 
+2.04 2017-10-15 Maintenance release, update not required
+
+- Minor improvements to Test::Timer::TimeoutException, some obsoleted code could
+  be removed
+
+- Generalizing test asserting, since CPAN testers are sometime contrained on resources,
+  making it impossible to predict the actual timeout value
+
+  Example: http://www.cpantesters.org/cpan/report/2561e32c-9efa-11e7-bc90-bbe42ddde1fb
+
+- Correction of spelling mistage in PR #16 from Gregor Herrmann
+
+
 2.03 2017-07-01 Maintenance release, update not required
 
 - Minor clean up in code and tests

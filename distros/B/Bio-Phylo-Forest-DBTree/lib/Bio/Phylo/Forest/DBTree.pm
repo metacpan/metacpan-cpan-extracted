@@ -12,7 +12,7 @@ __PACKAGE__->load_namespaces;
 my $SINGLETON;
 my $DBH;
 my $fac = Bio::Phylo::Factory->new;
-use version 0.77; our $VERSION = qv("v0.1.0");
+use version 0.77; our $VERSION = qv("v0.1.1");
 
 =head1 NAME
 
@@ -342,6 +342,6 @@ sub _rs { shift->resultset('Node') }
 __DATA__
 create table node(id int not null,parent int,left int,right int,name varchar(20),length float,height float,primary key(id));
 create index parent_idx on node(parent);
-create index left_idx on node(left);
-create index right_idx on node(right);
+create unique index left_idx on node(left asc);
+create unique index right_idx on node(right asc);
 create index name_idx on node(name);

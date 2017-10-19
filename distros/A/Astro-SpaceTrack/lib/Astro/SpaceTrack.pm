@@ -25,10 +25,10 @@ or
  SpaceTrack> exit
 
 In either of the above, username and password entry can be omitted if
-you have installed L<Config::Identity|Config::Identity> and have created
-an L<IDENTITY FILE|/IDENTITY FILE> (see below) containing these values.
-You probably want to encrypt this file, if you have C<gpg2> and
-C<gpg-agent>.
+you have installed L<Config::Identity|Config::Identity>, created an
+L<IDENTITY FILE|/IDENTITY FILE> (see below) containing these values, and
+set the L<identity|/identity> attribute to a true value.  You probably
+want to encrypt the identity file, if you have C<gpg2> and C<gpg-agent>.
 
 In practice, it is probably not useful to retrieve data from any source
 more often than once every four hours, and in fact daily usually
@@ -98,8 +98,8 @@ been added to access other repositories of orbital data, and in general
 these do not require a Space Track username and password.
 
 Nothing is exported by default, but the shell method/subroutine
-and the BODY_STATUS constants (see L</iridium_status>) can be
-exported if you so desire.
+and the BODY_STATUS constants (see L<iridium_status()|/iridium_status>)
+can be exported if you so desire.
 
 Most methods return an HTTP::Response object. See the individual
 method document for details. Methods which return orbital data on
@@ -126,12 +126,12 @@ use Exporter;
 
 our @ISA = qw{ Exporter };
 
-our $VERSION = '0.099';
+our $VERSION = '0.100';
 our @EXPORT_OK = qw{shell BODY_STATUS_IS_OPERATIONAL BODY_STATUS_IS_SPARE
-    BODY_STATUS_IS_TUMBLING};
+    BODY_STATUS_IS_TUMBLING BODY_STATUS_IS_DECAYED };
 our %EXPORT_TAGS = (
     status => [qw{BODY_STATUS_IS_OPERATIONAL BODY_STATUS_IS_SPARE
-	BODY_STATUS_IS_TUMBLING}],
+	BODY_STATUS_IS_TUMBLING BODY_STATUS_IS_DECAYED } ],
 );
 
 use Carp;
@@ -185,6 +185,7 @@ use constant SESSION_PATH => '/';
 use constant DEFAULT_SPACE_TRACK_REST_SEARCH_CLASS => 'satcat';
 use constant DEFAULT_SPACE_TRACK_VERSION => 2;
 
+# dump_headers constants.
 use constant DUMP_NONE => 0;		# No dump
 use constant DUMP_TRACE => 0x01;	# Logic trace
 use constant DUMP_REQUEST => 0x02;	# Request content
@@ -267,6 +268,7 @@ my %catalogs = (	# Catalog names (and other info) for each source.
 	kelso => {name => 'Celestrak (Kelso)'},
 	mccants => {name => 'McCants'},
 	sladen => {name => 'Sladen'},
+	spacetrack	=> { name => 'SpaceTrack' },
     },
     mccants	=> {
 	classified	=> {
@@ -561,13 +563,15 @@ first defined value it finds in the following list:
 =item a value explicitly specified as an argument to C<new()>;
 
 =item a value from the L<IDENTITY FILE|/IDENTITY FILE>, if the
-C<identity> attribute is explicitly specified as true;
+C<identity> attribute is explicitly specified as true and
+L<Config::Identity|Config::Identity> is installed;
 
 =item a value from environment variable C<SPACETRACK_USER> if that has a
 non-empty value;
 
 =item a value from the L<IDENTITY FILE|/IDENTITY FILE>, if the
-C<identity> attribute defaulted to true;
+C<identity> attribute defaulted to true and
+L<Config::Identity|Config::Identity> s installed;
 
 =item a value from environment variable C<SPACETRACK_OPT>.
 
@@ -639,6 +643,10 @@ sub new {
     $ENV{SPACETRACK_OPT} and
 	$self->set (grep {defined $_} split '\s+', $ENV{SPACETRACK_OPT});
 
+    # TODO this makes no sense - the first branch of the if() can never
+    # be executed because I already deleted $arg{identity}. But I do not
+    # want to execute the SPACETRACK_USER code willy-nilly -- maybe warn
+    # if identity is 1 and I don't have both a username and a password.
     if ( defined( my $id = delete $arg{identity} ) ) {
 	$self->set( identity => $id );
     } elsif ( $ENV{SPACETRACK_USER} ) {
@@ -1769,19 +1777,31 @@ succeeded) or the status of the first failure. If the queries succeed,
 the content is a series of lines formatted by "%6d   %-15s%-8s %s\n",
 with NORAD ID, name, status, and comment substituted in.
 
+If no format is specified, the format specified in the
+L<iridium_status_format|/iridium_status_format> attribute is used.
+
+There is one option, C<'raw'>, which can be specified either
+command-line style (i.e. C<-raw>) or as a leading hash reference.
+Asserting this option causes status information from sources other than
+Celestrak and Rod Sladen not to be supplemented by Celestrak data. In
+addition, it prevents all sources from being supplemented by canned data
+that includes all original-design Iridium satellites, including those
+that have decayed. By default this option is not asserted.
+
 Format C<'mccants'> is B<deprecated>, and will be removed in a future
 release. This entire method will be deprecated and removed once the last
 flaring Iridium satellite is removed from service.
 
-No Space Track username and password are required to use this method.
+A Space Track username and password are required only if the format is
+C<'spacetrack'>.
 
 If this method succeeds, the response will contain headers
 
  Pragma: spacetrack-type = iridium_status
  Pragma: spacetrack-source = 
 
-The spacetrack-source will be 'kelso', 'mccants', or 'sladen', depending
-on the format requested.
+The spacetrack-source will be C<'kelso'>, C<'mccants'>, C<'sladen'>, or
+C<'spacetrack'>, depending on the format requested.
 
 These can be accessed by C<< $st->content_type( $resp ) >> and
 C<< $st->content_source( $resp ) >> respectively.
@@ -1810,7 +1830,8 @@ The comment will be 'Spare', 'Tumbling', or '' depending on the status.
 If the format is 'mccants', the primary source of information will be
 Mike McCants' "Status of Iridium Payloads" web page,
 L<http://www.io.com/~mmccants/tles/iridium.html> (which gives status on
-non-functional Iridium satellites). The Celestrak list will be used to
+non-functional Iridium satellites). B<This format is deprecated,> since
+Mike no longer maintains this page. The Celestrak list will be used to
 fill in the functioning satellites so that a complete list is generated.
 The comment will be whatever text is provided by Mike McCants' web page,
 or 'Celestrak' if the satellite data came from that source.
@@ -1856,6 +1877,14 @@ to 6. If the satellite is failed but not tumbling, the text ' - Failed
 on station?' will be appended to the comment. The dummy masses will be
 included from the Kelso data, with status '[-]' but comment 'Dummy'.
 
+If the format is 'spacetrack', the data come from both Celestrak and
+Space Track. For any given OID, we take the Space Track data if it shows
+the OID as being decayed, or if the OID does not appear in the Celestrak
+data; otherwise we take the Celestrak data.  The idea here is to get a
+list of statuses that include decayed satellites dropped from the
+Celestrak list. You will need a Space Track username and password for
+this. The format of the returned data is the same as for Celestrak data.
+
 If the method is called in list context, the first element of the
 returned list will be the HTTP::Response object, and the second
 element will be a reference to a list of anonymous lists, each
@@ -1870,6 +1899,7 @@ an Iridium satellite. The portable statuses are:
   2 = BODY_STATUS_IS_TUMBLING means object is tumbling
       or otherwise unservicable, and incapable of producing
       predictable flares
+  3 - BODY_STATUS_IS_DECAYED neans that the object is decayed.
 
 In terms of the Kelso statuses, the mapping is:
 
@@ -1879,7 +1909,7 @@ In terms of the Kelso statuses, the mapping is:
     '[B]' - BODY_STATUS_IS_SPARE
     '[S]' - BODY_STATUS_IS_SPARE
     '[X]' - BODY_STATUS_IS_SPARE
-    '[D]' - BODY_STATUS_IS_TUMBLING
+    '[D]' - BODY_STATUS_IS_DECAYED
     '[?]' - BODY_STATUS_IS_TUMBLING
 
 In the McCants statuses, '?' identifies a spare, '+' identifies an
@@ -1891,13 +1921,15 @@ The BODY_STATUS constants are exportable using the :status tag.
 
 {	# Begin local symbol block.
 
-    use constant BODY_STATUS_IS_OPERATIONAL => 0;
-    use constant BODY_STATUS_IS_SPARE => 1;
-    use constant BODY_STATUS_IS_TUMBLING => 2;
+    use constant BODY_STATUS_IS_OPERATIONAL	=> 0;
+    use constant BODY_STATUS_IS_SPARE		=> 1;
+    use constant BODY_STATUS_IS_TUMBLING	=> 2;
+    use constant BODY_STATUS_IS_DECAYED		=> 3;
 
     my %kelso_comment = (	# Expand Kelso status.
 	'[S]' => 'Spare',
 	'[-]' => 'Tumbling',
+	'[D]'	=> 'Decayed',
 	);
     my %status_map = (	# Map Kelso status to McCants status.
 	kelso => {
@@ -1922,7 +1954,7 @@ The BODY_STATUS constants are exportable using the :status tag.
 	    '[B]' => BODY_STATUS_IS_SPARE,		# Backup/Standby
 	    '[S]' => BODY_STATUS_IS_SPARE,		# Spare
 	    '[X]' => BODY_STATUS_IS_SPARE,		# Extended Mission
-	    '[D]' => BODY_STATUS_IS_TUMBLING,		# Decayed
+	    '[D]' => BODY_STATUS_IS_DECAYED,		# Decayed
 	    '[?]' => BODY_STATUS_IS_TUMBLING,		# Unknown
 	},
 	mccants => {
@@ -1940,20 +1972,145 @@ The BODY_STATUS constants are exportable using the :status tag.
     $status_portable{kelso_inverse} = {
 	map { $status_portable{kelso}{$_} => $_ } qw{ [-] [S] [+] } };
 
+    # All Iridium Classic satellites. The order of the data is:
+    # OID, name, status string, comment, portable status.
+    #
+    # Generated by tools/all_iridium_classic
+    # on Wed Oct  4 04:00:08 2017 GMT
+
+    my @all_iridium_classic = (
+	[ 24792, 'Iridium 8', '[?]', 'SpaceTrack', 2 ],
+	[ 24793, 'Iridium 7', '[?]', 'SpaceTrack', 2 ],
+	[ 24794, 'Iridium 6', '[?]', 'SpaceTrack', 2 ],
+	[ 24795, 'Iridium 5', '[?]', 'SpaceTrack', 2 ],
+	[ 24796, 'Iridium 4', '[?]', 'SpaceTrack', 2 ],
+	[ 24836, 'Iridium 914', '[?]', 'SpaceTrack', 2 ],
+	[ 24837, 'Iridium 12', '[?]', 'SpaceTrack', 2 ],
+	[ 24838, 'Iridium 09', '[D]', 'Decayed 2003-03-11', 3 ],
+	[ 24839, 'Iridium 10', '[?]', 'SpaceTrack', 2 ],
+	[ 24840, 'Iridium 13', '[?]', 'SpaceTrack', 2 ],
+	[ 24841, 'Iridium 16', '[?]', 'SpaceTrack', 2 ],
+	[ 24842, 'Iridium 911', '[?]', 'SpaceTrack', 2 ],
+	[ 24869, 'Iridium 15', '[?]', 'SpaceTrack', 2 ],
+	[ 24870, 'Iridium 17', '[?]', 'SpaceTrack', 2 ],
+	[ 24871, 'Iridium 920', '[?]', 'SpaceTrack', 2 ],
+	[ 24872, 'Iridium 18', '[?]', 'SpaceTrack', 2 ],
+	[ 24873, 'Iridium 921', '[?]', 'SpaceTrack', 2 ],
+	[ 24903, 'Iridium 26', '[?]', 'SpaceTrack', 2 ],
+	[ 24904, 'Iridium 25', '[?]', 'SpaceTrack', 2 ],
+	[ 24905, 'Iridium 46', '[?]', 'SpaceTrack', 2 ],
+	[ 24906, 'Iridium 23', '[?]', 'SpaceTrack', 2 ],
+	[ 24907, 'Iridium 22', '[?]', 'SpaceTrack', 2 ],
+	[ 24944, 'Iridium 29', '[?]', 'SpaceTrack', 2 ],
+	[ 24945, 'Iridium 32', '[?]', 'SpaceTrack', 2 ],
+	[ 24946, 'Iridium 33', '[?]', 'SpaceTrack', 2 ],
+	[ 24947, 'Iridium 27', '[D]', 'Decayed 2002-02-01', 3 ],
+	[ 24948, 'Iridium 28', '[?]', 'SpaceTrack', 2 ],
+	[ 24949, 'Iridium 30', '[D]', 'Decayed 2017-09-28', 3 ],
+	[ 24950, 'Iridium 31', '[?]', 'SpaceTrack', 2 ],
+	[ 24965, 'Iridium 19', '[?]', 'SpaceTrack', 2 ],
+	[ 24966, 'Iridium 35', '[?]', 'SpaceTrack', 2 ],
+	[ 24967, 'Iridium 36', '[?]', 'SpaceTrack', 2 ],
+	[ 24968, 'Iridium 37', '[?]', 'SpaceTrack', 2 ],
+	[ 24969, 'Iridium 34', '[?]', 'SpaceTrack', 2 ],
+	[ 25039, 'Iridium 43', '[?]', 'SpaceTrack', 2 ],
+	[ 25040, 'Iridium 41', '[?]', 'SpaceTrack', 2 ],
+	[ 25041, 'Iridium 40', '[?]', 'SpaceTrack', 2 ],
+	[ 25042, 'Iridium 39', '[?]', 'SpaceTrack', 2 ],
+	[ 25043, 'Iridium 38', '[?]', 'SpaceTrack', 2 ],
+	[ 25077, 'Iridium 42', '[?]', 'SpaceTrack', 2 ],
+	[ 25078, 'Iridium 44', '[?]', 'SpaceTrack', 2 ],
+	[ 25104, 'Iridium 45', '[?]', 'SpaceTrack', 2 ],
+	[ 25105, 'Iridium 24', '[?]', 'SpaceTrack', 2 ],
+	[ 25106, 'Iridium 47', '[?]', 'SpaceTrack', 2 ],
+	[ 25107, 'Iridium 48', '[D]', 'Decayed 2001-05-05', 3 ],
+	[ 25108, 'Iridium 49', '[?]', 'SpaceTrack', 2 ],
+	[ 25169, 'Iridium 52', '[?]', 'SpaceTrack', 2 ],
+	[ 25170, 'Iridium 56', '[?]', 'SpaceTrack', 2 ],
+	[ 25171, 'Iridium 54', '[?]', 'SpaceTrack', 2 ],
+	[ 25172, 'Iridium 50', '[?]', 'SpaceTrack', 2 ],
+	[ 25173, 'Iridium 53', '[?]', 'SpaceTrack', 2 ],
+	[ 25262, 'Iridium 51', '[?]', 'SpaceTrack', 2 ],
+	[ 25263, 'Iridium 61', '[?]', 'SpaceTrack', 2 ],
+	[ 25272, 'Iridium 55', '[?]', 'SpaceTrack', 2 ],
+	[ 25273, 'Iridium 57', '[?]', 'SpaceTrack', 2 ],
+	[ 25274, 'Iridium 58', '[?]', 'SpaceTrack', 2 ],
+	[ 25275, 'Iridium 59', '[?]', 'SpaceTrack', 2 ],
+	[ 25276, 'Iridium 60', '[?]', 'SpaceTrack', 2 ],
+	[ 25285, 'Iridium 62', '[?]', 'SpaceTrack', 2 ],
+	[ 25286, 'Iridium 63', '[?]', 'SpaceTrack', 2 ],
+	[ 25287, 'Iridium 64', '[?]', 'SpaceTrack', 2 ],
+	[ 25288, 'Iridium 65', '[?]', 'SpaceTrack', 2 ],
+	[ 25289, 'Iridium 66', '[?]', 'SpaceTrack', 2 ],
+	[ 25290, 'Iridium 67', '[?]', 'SpaceTrack', 2 ],
+	[ 25291, 'Iridium 68', '[?]', 'SpaceTrack', 2 ],
+	[ 25319, 'Iridium 69', '[?]', 'SpaceTrack', 2 ],
+	[ 25320, 'Iridium 71', '[?]', 'SpaceTrack', 2 ],
+	[ 25342, 'Iridium 70', '[?]', 'SpaceTrack', 2 ],
+	[ 25343, 'Iridium 72', '[?]', 'SpaceTrack', 2 ],
+	[ 25344, 'Iridium 73', '[?]', 'SpaceTrack', 2 ],
+	[ 25345, 'Iridium 74', '[D]', 'Decayed 2017-06-11', 3 ],
+	[ 25346, 'Iridium 75', '[?]', 'SpaceTrack', 2 ],
+	[ 25431, 'Iridium 03', '[?]', 'SpaceTrack', 2 ],
+	[ 25432, 'Iridium 76', '[?]', 'SpaceTrack', 2 ],
+	[ 25467, 'Iridium 82', '[?]', 'SpaceTrack', 2 ],
+	[ 25468, 'Iridium 81', '[?]', 'SpaceTrack', 2 ],
+	[ 25469, 'Iridium 80', '[?]', 'SpaceTrack', 2 ],
+	[ 25470, 'Iridium 79', '[D]', 'Decayed 2000-11-29', 3 ],
+	[ 25471, 'Iridium 77', '[D]', 'Decayed 2017-09-22', 3 ],
+	[ 25527, 'Iridium 2', '[?]', 'SpaceTrack', 2 ],
+	[ 25528, 'Iridium 86', '[?]', 'SpaceTrack', 2 ],
+	[ 25529, 'Iridium 85', '[D]', 'Decayed 2000-12-30', 3 ],
+	[ 25530, 'Iridium 84', '[?]', 'SpaceTrack', 2 ],
+	[ 25531, 'Iridium 83', '[?]', 'SpaceTrack', 2 ],
+	[ 25577, 'Iridium 20', '[?]', 'SpaceTrack', 2 ],
+	[ 25578, 'Iridium 11', '[?]', 'SpaceTrack', 2 ],
+	[ 25777, 'Iridium 14', '[?]', 'SpaceTrack', 2 ],
+	[ 25778, 'Iridium 21', '[?]', 'SpaceTrack', 2 ],
+	[ 27372, 'Iridium 91', '[?]', 'SpaceTrack', 2 ],
+	[ 27373, 'Iridium 90', '[?]', 'SpaceTrack', 2 ],
+	[ 27374, 'Iridium 94', '[?]', 'SpaceTrack', 2 ],
+	[ 27375, 'Iridium 95', '[?]', 'SpaceTrack', 2 ],
+	[ 27376, 'Iridium 96', '[?]', 'SpaceTrack', 2 ],
+	[ 27450, 'Iridium 97', '[?]', 'SpaceTrack', 2 ],
+	[ 27451, 'Iridium 98', '[?]', 'SpaceTrack', 2 ],
+    );
+
+    my %ignore_raw = map { $_ => 1 } qw{ kelso sladen };
+
     sub iridium_status {
-	my $self = shift;
-	my $fmt = shift || $self->{iridium_status_format};
+	my ( $self, @args ) = @_;
+	my ( $opt, $fmt ) = _parse_args( [
+		'raw!'	=> 'Do not supplement with kelso data'
+	    ], @args );
+	defined $fmt
+	    or $fmt = $self->{iridium_status_format};
 	delete $self->{_pragmata};
 	my %rslt;
-	my $resp = $self->_iridium_status_kelso( $fmt, \%rslt );
-	$resp->is_success() or return $resp;
-	if ($fmt eq 'mccants') {
-	    ( $resp = $self->_iridium_status_mccants( $fmt, \%rslt ) )
-		->is_success() or return $resp;
-	} elsif ($fmt eq 'sladen') {
-	    ( $resp = $self->_iridium_status_sladen( $fmt, \%rslt ) )
-		->is_success() or return $resp;
+	my $resp;
+
+	if ( ! $opt->{raw} || $ignore_raw{$fmt} ) {
+	    $resp = $self->_iridium_status_kelso( $fmt, \%rslt );
+	    $resp->is_success()
+		or return $resp;
 	}
+
+	unless ( 'kelso' eq $fmt ) {
+	    my $code = $self->can( "_iridium_status_$fmt" )
+		or croak "Bad iridium_status format '$fmt'";
+	    ( $resp = $code->( $self, $fmt, \%rslt ) )->is_success()
+		or return $resp;
+	}
+
+	unless ( $opt->{raw} ) {
+	    foreach my $body ( @all_iridium_classic ) {
+		$rslt{$body->[0]}
+##		    and $body->[4] != BODY_STATUS_IS_DECAYED
+		    and next;
+		$rslt{$body->[0]} = [ @{ $body } ];	# shallow clone
+	    }
+	}
+
 	$resp->content (join '', map {
 		sprintf "%6d   %-15s%-8s %s\n", @{$rslt{$_}}[0 .. 3]}
 	    sort {$a <=> $b} keys %rslt);
@@ -1962,7 +2119,10 @@ The BODY_STATUS constants are exportable using the :status tag.
 	    'spacetrack-source' => $fmt,
 	);
 	$self->__dump_response( $resp );
-	return wantarray ? ($resp, [values %rslt]) : $resp;
+	return wantarray ? ($resp, [
+		sort { $a->[0] <=> $b->[0] }
+		values %rslt
+	    ]) : $resp;
     }
 
     # Get Iridium data from Celestrak.
@@ -1981,14 +2141,13 @@ The BODY_STATUS constants are exportable using the :status tag.
 		and $status = $1;
 	    my $portable_status = $status_portable{kelso}{$status};
 	    my $comment;
-	    if ($fmt eq 'kelso' || $fmt eq 'sladen') {
-		$comment = $kelso_comment{$status} || '';
-		}
-	      else {
+	    if ( 'mccants' eq $fmt ) {
 		$status = $status_map{kelso}{$fmt}{$status} || '';
 		$status = 'dum' unless $name =~ m/ \A IRIDIUM /smxi;
 		$comment = 'Celestrak';
-		}
+	    } else {
+		$comment = $kelso_comment{$status} || '';
+	    }
 	    $name = ucfirst lc $name;
 	    $rslt->{$id} = [ $id, $name, $status, $comment,
 		$portable_status ];
@@ -2012,8 +2171,8 @@ The BODY_STATUS constants are exportable using the :status tag.
 	return;
     }
 
-    # Get Iridium status from Mike McCants
-    sub _iridium_status_mccants {
+    # Get Iridium status from Mike McCants. Called dynamically
+    sub _iridium_status_mccants {	## no critic (ProhibitUnusedPrivateSubroutines)
 	my ( $self, undef, $rslt ) = @_;	# $fmt arg not used
 	$self->_iridium_status_assume_good( $rslt );
 	my $resp = $self->_get_agent()->get(
@@ -2057,8 +2216,8 @@ The BODY_STATUS constants are exportable using the :status tag.
 	},
     );
 
-    # Get Iridium status from Rod Sladen.
-    sub _iridium_status_sladen {
+    # Get Iridium status from Rod Sladen. Called dynamically
+    sub _iridium_status_sladen {	## no critic (ProhibitUnusedPrivateSubroutines)
 	my ( $self, undef, $rslt ) = @_;	# $fmt arg not used
 
 	$self->_iridium_status_assume_good( $rslt );
@@ -2131,6 +2290,48 @@ The BODY_STATUS constants are exportable using the :status tag.
 	    }
 	}
 
+	return $resp;
+    }
+
+    # Get Iridium status from Space Track. Unlike the other sources,
+    # Space Track does not know whether satellites are in service or
+    # not, but it does know about all of them, and whether or not they
+    # are on orbit. So the statuses we report are unknown and decayed.
+    # Note that the portable status for unknown is
+    # BODY_STATUS_IS_TUMBLING. Called dynamically
+    sub _iridium_status_spacetrack {	## no critic (ProhibitUnusedPrivateSubroutines)
+	my ( $self, undef, $rslt ) = @_;	# $fmt arg not used
+
+	my ( $resp, $data ) = $self->search_name( {
+		tle	=> 0,
+		status	=> 'all',
+		exclude	=> [ qw{ rocket debris } ],
+		format	=> 'legacy',
+	    }, 'iridium' );
+	$resp->is_success()
+	    or return $resp;
+	foreach my $body ( @{ $data } ) {
+	    # Starting in 2017, the launches were Iridium Next
+	    # satellites, which do not flare.
+	    $body->{LAUNCH_YEAR} < 2017
+		or next;
+	    my $oid = $body->{OBJECT_NUMBER};
+	    $rslt->{$oid}
+		and not $body->{DECAY}
+		and next;
+	    $rslt->{$oid} = [
+		$oid,
+		ucfirst lc $body->{OBJECT_NAME},
+		defined $body->{DECAY} ?
+		( '[D]', "Decayed $body->{DECAY}", BODY_STATUS_IS_DECAYED ) :
+		( '[?]', 'SpaceTrack', BODY_STATUS_IS_TUMBLING )
+	    ];
+	}
+	$resp->content( join '',
+	    map { "$_->[0]\t$_->[1]\t$_->[2]\t$_->[3]\n" }
+	    sort { $a->[0] <=> $b->[0] }
+	    values %{ $rslt }
+	);
 	return $resp;
     }
 
@@ -6133,10 +6334,10 @@ identity file is encrypted C<gpg2> must be installed and properly
 configured. See L<IDENTITY FILE|/IDENTITY FILE> below for details of the
 identity file.
 
- I have found that C<gpg> does not seem to work nicely, even though
+I have found that C<gpg> does not seem to work nicely, even though
 L<Config::Identity|Config::Identity> prefers it to C<gpg2> if both are
 present. The L<Config::Identity|Config::Identity> documentation says
-that uou can override this by setting environment variable C<CI_GPG>
+that you can override this by setting environment variable C<CI_GPG>
 to the executable you want used.
 
 If this attribute is unspecified (to C<new()> or specified as C<undef>
@@ -6155,12 +6356,13 @@ file, if any, even if the C<identity> attribute is explicitly set true.
 
 =item iridium_status_format (string)
 
-This attribute specifies the format of the data returned by the
-L<iridium_status()|/iridium_status> method. Valid values are 'kelso' and
-'mccants'.  See that method for more information.
+This attribute specifies the default format of the data returned by the
+L<iridium_status()|/iridium_status> method. Valid values are 'kelso',
+'mccants', 'sladen' or 'spacetrack'.  See that method for more
+information.
 
 The default is 'mccants' for historical reasons, but 'kelso' is probably
-preferred.
+preferred, and will become the default in the future.
 
 =item max_range (number)
 
@@ -6316,8 +6518,9 @@ C<VMS>, or F<.spacetrack-identity> under any other operating system.
 If desired, the file can be encrypted using GPG; in this case, to be
 useful, C<gpg2> and C<gpg-agent> must be installed and properly
 configured. Because of implementation details in
-L<Config::Identity|Config::Identity>, the C<gpg> program must B<not> be
-present in your PATH.
+L<Config::Identity|Config::Identity>, you may need to either ensure that
+C<gpg> is not in your C<PATH>, or set the C<CI_GPG> environment variable
+to the path to C<gpg2>.
 
 Note that this file is normally read only once during the life of the
 Perl process, and the result cached. The username and password that are

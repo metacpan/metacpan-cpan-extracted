@@ -4,13 +4,13 @@
       "Nigel Horne <njh@bandsman.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.28, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "CGI-Info",
    "no_index" : {
@@ -68,6 +68,6 @@
          "web" : "https://github.com/nigelhorne/CGI-Info"
       }
    },
-   "version" : "0.63",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "0.64",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

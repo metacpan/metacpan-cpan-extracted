@@ -29,26 +29,6 @@ $version =~ s/(RPM version )|(rpm \(RPM\) )//;
 my $hversion = hexversion($version);
 $hversion ge hexversion("4.9") or die "Unable to build URPM with too old (or undetected) rpm version $version\n";
 
-# to generate the ChangeLog depending on the checkout layout
-my $commonusername = "../common/";
--d $commonusername or do {
-    $commonusername = "../../common/";
-    -d $commonusername or do {
-	$commonusername = "../../../common/";
-	-d $commonusername or $commonusername = "";
-    };
-};
-
-sub MY::postamble {
-    <<"**MM**";
-.PHONY: ChangeLog
-
-ChangeLog:
-	LC_ALL=C svn2cl --accum --strip-prefix=soft/rpm/perl-URPM/trunk --authors ${commonusername}username.xml
-	rm -f *.bak
-**MM**
-}
-
 my @rpmflags;
 my $ldflags = `pkg-config --libs rpm` . ' -lrpmbuild';
 if ($hversion ge hexversion("4.9.0") && $hversion lt hexversion("5.0")) {
@@ -68,7 +48,6 @@ WriteMakefile(
     CCFLAGS	=> $ccflags,
     VERSION_FROM	=> 'URPM.pm',
     LIBS	=> [ $ldflags ],
-    OBJECT	=> [ 'perl_math_int64.o', 'URPM.o' ],
     INC		=> '-I/usr/include/rpm',
     dist	=> { COMPRESS => "xz -f", SUFFIX => ".xz" },
     realclean	=> { FILES => "t/RPMS/noarch/*" },

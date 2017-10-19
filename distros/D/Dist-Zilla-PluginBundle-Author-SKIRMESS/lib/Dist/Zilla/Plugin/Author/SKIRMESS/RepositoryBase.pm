@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.024';
+our $VERSION = '0.029';
 
 use Moose;
 
@@ -24,7 +24,7 @@ with(
     'Dist::Zilla::Role::TextTemplate',
 );
 
-sub mvp_multivalue_args { return (qw( skip stopwords travis_ci_ignore_perl )) }
+sub mvp_multivalue_args { return (qw( skip stopwords travis_ci_ignore_perl travis_ci_no_author_testing_perl travis_ci_osx_perl )) }
 
 has skip => (
     is      => 'ro',
@@ -44,17 +44,29 @@ has travis_ci_ignore_perl => (
     default => sub { [] },
 );
 
+has travis_ci_no_author_testing_perl => (
+    is      => 'ro',
+    isa     => 'Maybe[ArrayRef]',
+    default => sub { [qw(5.8)] },
+);
+
+has travis_ci_osx_perl => (
+    is      => 'ro',
+    isa     => 'ArrayRef[Str]',
+    default => sub { [qw(5.18)] },
+);
+
 has _travis_available_perl => (
     is      => 'ro',
     isa     => 'ArrayRef[Str]',
-    default => sub { [qw(5.26 5.24 5.22 5.20 5.18 5.16 5.14 5.12 5.10 5.8)] },
+    default => sub { [qw( 5.8 5.10 5.12 5.14 5.16 5.18 5.20 5.22 5.24 5.26)] },
     traits  => ['Array'],
 );
 
 use Carp;
 use Config::Std { def_sep => q{=} };
 use File::Spec;
-use List::MoreUtils qw(uniq);
+use List::SomeUtils qw(uniq);
 use Path::Tiny;
 
 use namespace::autoclean;
@@ -102,8 +114,6 @@ sub munge_files {
         # "munge files" phase and before that we can't even know the new
         # version of the bundle.
 
-        ## no critic (ValuesAndExpressions::RequireConstantVersion)
-        ## no critic (Variables::ProhibitLocalVars)
         local $VERSION = $self->zilla->version;
 
         # re-write all generated files
@@ -175,7 +185,7 @@ Dist::Zilla::Plugin::Author::SKIRMESS::RepositoryBase - Automatically create and
 
 =head1 VERSION
 
-Version 0.024
+Version 0.029
 
 =head1 SYNOPSIS
 
@@ -222,9 +232,37 @@ The following files are created in the repository and in the distribution:
             $file_content,
             {
                 plugin => \$self,
-            }
+            },
         );
     }
+
+=head2 .appveyor.yml
+
+The configuration file for AppVeyor.
+
+=cut
+
+    $file{q{.appveyor.yml}} = <<'APPVEYOR_YML';
+# Automatically generated file
+# {{ ref $plugin }} {{ $plugin->VERSION() }}
+
+skip_tags: true
+
+cache:
+  - C:\strawberry -> appveyor.yml
+
+install:
+  - if not exist "C:\strawberry" cinst strawberryperl
+  - set PATH=C:\strawberry\perl\bin;C:\strawberry\perl\site\bin;C:\strawberry\c\bin;%PATH%
+  - cd C:\projects\%APPVEYOR_PROJECT_NAME%
+  - cpanm --quiet --installdeps --notest --skip-satisfied --with-develop .
+
+build_script:
+  - perl Makefile.PL
+  - set AUTOMATED_TESTING=1
+  - gmake test
+  - prove -lr xt/author
+APPVEYOR_YML
 
 =head2 .perlcriticrc
 
@@ -241,8 +279,9 @@ F<perlcriticrc.local>.
 # Automatically generated file
 # {{ ref $plugin }} {{ $plugin->VERSION() }}
 
-severity = 1
 only = 1
+severity = 1
+verbose = [%p] %m at %f line %l, near '%r'\n
 
 [BuiltinFunctions::ProhibitBooleanGrep]
 [BuiltinFunctions::ProhibitComplexMappings]
@@ -281,11 +320,15 @@ only = 1
 [ControlStructures::ProhibitUnreachableCode]
 [ControlStructures::ProhibitUntilBlocks]
 [ControlStructures::ProhibitYadaOperator]
-[Documentation::PodSpelling]
+#[Documentation::PodSpelling]
 [Documentation::RequirePackageMatchesPodName]
 [Documentation::RequirePodAtEnd]
 [Documentation::RequirePodLinksIncludeText]
+#[Documentation::RequirePodSections]
+
 [ErrorHandling::RequireCarping]
+allow_in_main_unless_in_subroutine = 1
+
 [ErrorHandling::RequireCheckingReturnValueOfEval]
 [InputOutput::ProhibitBacktickOperators]
 [InputOutput::ProhibitBarewordFileHandles]
@@ -296,9 +339,14 @@ only = 1
 [InputOutput::ProhibitReadlineInForLoop]
 [InputOutput::ProhibitTwoArgOpen]
 [InputOutput::RequireBracedFileHandleWithPrint]
+#[InputOutput::RequireBriefOpen]
 [InputOutput::RequireCheckedClose]
 [InputOutput::RequireCheckedOpen]
+
 [InputOutput::RequireCheckedSyscalls]
+functions = :builtins
+exclude_functions = print say sleep
+
 [InputOutput::RequireEncodingWithUTF8Layer]
 [Miscellanea::ProhibitFormats]
 [Miscellanea::ProhibitTies]
@@ -306,13 +354,18 @@ only = 1
 [Miscellanea::ProhibitUselessNoCritic]
 [Modules::ProhibitAutomaticExportation]
 [Modules::ProhibitConditionalUseStatements]
+
 [Modules::ProhibitEvilModules]
+modules = Class::ISA {Found use of Class::ISA. This module is deprecated by the Perl 5 Porters.} Pod::Plainer {Found use of Pod::Plainer. This module is deprecated by the Perl 5 Porters.} Shell {Found use of Shell. This module is deprecated by the Perl 5 Porters.} Switch {Found use of Switch. This module is deprecated by the Perl 5 Porters.} Readonly {Found use of Readonly. Please use constant.pm or Const::Fast.} base {Found use of base. Please use parent instead.} File::Slurp {Found use of File::Slurp. Please use Path::Tiny instead.} common::sense {Found use of common::sense. Please use strict and warnings instead.} Class::Load {Found use of Class::Load. Please use Module::Runtime instead.} Any::Moose {Found use of Any::Moose. Please use Moo instead.} Error {Found use of Error.pm. Please use Throwable.pm instead.} Getopt::Std {Found use of Getopt::Std. Please use Getopt::Long instead.} HTML::Template {Found use of HTML::Template. Please use Template::Toolkit.} IO::Socket::INET6 {Found use of IO::Socket::INET6. Please use IO::Socket::IP.} JSON {Found use of JSON. Please use JSON::MaybeXS or Cpanel::JSON::XS.} JSON::Any {Found use of JSON::Any. Please use JSON::MaybeXS.} List::MoreUtils {Found use of List::MoreUtils. Please use List::Util or List::UtilsBy.} Mouse {Found use of Mouse. Please use Moo.} Net::IRC {Found use of Net::IRC. Please use POE::Component::IRC, Net::Async::IRC, or Mojo::IRC.} XML::Simple {Found use of XML::Simple. Please use XML::LibXML, XML::TreeBuilder, XML::Twig, or Mojo::DOM.} Sub::Infix {Found use of Sub::Infix. Please do not use it.}
+
+#[Modules::ProhibitExcessMainComplexity]
 [Modules::ProhibitMultiplePackages]
 [Modules::RequireBarewordIncludes]
 [Modules::RequireEndWithOne]
 [Modules::RequireExplicitPackage]
 [Modules::RequireFilenameMatchesPackage]
 [Modules::RequireNoMatchVarsWithUseEnglish]
+#[Modules::RequireVersionVar]
 [NamingConventions::Capitalization]
 [NamingConventions::ProhibitAmbiguousNames]
 [Objects::ProhibitIndirectSyntax]
@@ -338,8 +391,10 @@ only = 1
 [Subroutines::ProhibitNestedSubs]
 [Subroutines::ProhibitReturnSort]
 [Subroutines::ProhibitSubroutinePrototypes]
+
 [Subroutines::ProhibitUnusedPrivateSubroutines]
 private_name_regex = _(?!build_)\w+
+
 [Subroutines::ProtectPrivateSubs]
 [Subroutines::RequireArgUnpacking]
 [Subroutines::RequireFinalReturn]
@@ -350,7 +405,10 @@ private_name_regex = _(?!build_)\w+
 [TestingAndDebugging::RequireUseStrict]
 [TestingAndDebugging::RequireUseWarnings]
 [ValuesAndExpressions::ProhibitCommaSeparatedStatements]
+
 [ValuesAndExpressions::ProhibitComplexVersion]
+forbid_use_version = 1
+
 [ValuesAndExpressions::ProhibitConstantPragma]
 [ValuesAndExpressions::ProhibitEmptyQuotes]
 [ValuesAndExpressions::ProhibitEscapedCharacters]
@@ -377,8 +435,10 @@ private_name_regex = _(?!build_)\w+
 [Variables::ProhibitMatchVars]
 [Variables::ProhibitPackageVars]
 [Variables::ProhibitPerl4PackageNames]
+
 [Variables::ProhibitPunctuationVars]
-allow = $! $/
+allow = $@ $! $/ $0
+
 [Variables::ProhibitReusedNames]
 [Variables::ProhibitUnusedVariables]
 [Variables::ProtectPrivateVars]
@@ -387,12 +447,165 @@ allow = $! $/
 [Variables::RequireLocalizedPunctuationVars]
 [Variables::RequireNegativeIndices]
 
+### Perl::Critic::Bangs
+[Bangs::ProhibitBitwiseOperators]
+#[Bangs::ProhibitCommentedOutCode]
+[Bangs::ProhibitDebuggingModules]
+[Bangs::ProhibitFlagComments]
+#[Bangs::ProhibitNoPlan]
+[Bangs::ProhibitNumberedNames]
+[Bangs::ProhibitRefProtoOrProto]
+[Bangs::ProhibitUselessRegexModifiers]
+#[Bangs::ProhibitVagueNames]
+
+### Perl::Critic::Moose
 [Moose::ProhibitDESTROYMethod]
+equivalent_modules = Moo Moo::Role
+
 [Moose::ProhibitLazyBuild]
+equivalent_modules = Moo Moo::Role
+
 [Moose::ProhibitMultipleWiths]
+equivalent_modules = Moo Moo::Role
+
 [Moose::ProhibitNewMethod]
+equivalent_modules = Moo Moo::Role
+
 [Moose::RequireCleanNamespace]
 [Moose::RequireMakeImmutable]
+
+### Perl::Critic::Freenode
+[Freenode::AmpersandSubCalls]
+[Freenode::ArrayAssignAref]
+[Freenode::BarewordFilehandles]
+[Freenode::ConditionalDeclarations]
+[Freenode::ConditionalImplicitReturn]
+[Freenode::DeprecatedFeatures]
+[Freenode::DiscouragedModules]
+[Freenode::DollarAB]
+[Freenode::Each]
+#[Freenode::EmptyReturn]
+[Freenode::IndirectObjectNotation]
+[Freenode::ModPerl]
+[Freenode::OpenArgs]
+[Freenode::OverloadOptions]
+[Freenode::PackageMatchesFilename]
+[Freenode::POSIXImports]
+[Freenode::Prototypes]
+[Freenode::StrictWarnings]
+[Freenode::Threads]
+[Freenode::Wantarray]
+[Freenode::WarningsSwitch]
+[Freenode::WhileDiamondDefaultAssignment]
+
+### Perl::Critic::Policy::HTTPCookies
+[HTTPCookies]
+
+### Perl::Critic::Itch
+#[CodeLayout::ProhibitHashBarewords]
+
+### Perl::Critic::Lax
+[Lax::ProhibitComplexMappings::LinesNotStatements]
+#[Lax::ProhibitEmptyQuotes::ExceptAsFallback]
+#[Lax::ProhibitLeadingZeros::ExceptChmod]
+#[Lax::ProhibitStringyEval::ExceptForRequire]
+#[Lax::RequireConstantOnLeftSideOfEquality::ExceptEq]
+#[Lax::RequireEndWithTrueConst]
+#[Lax::RequireExplicitPackage::ExceptForPragmata]
+
+### Perl::Critic::More
+#[CodeLayout::RequireASCII]
+#[Editor::RequireEmacsFileVariables]
+#[ErrorHandling::RequireUseOfExceptions]
+[Modules::PerlMinimumVersion]
+[Modules::RequirePerlVersion]
+#[ValuesAndExpressions::RequireConstantOnLeftSideOfEquality]
+#[ValuesAndExpressions::RestrictLongStrings]
+
+# Perl::Critic::PetPeeves::JTRAMMELL
+[Variables::ProhibitUselessInitialization]
+
+### Perl::Critic::Policy::BuiltinFunctions::ProhibitDeleteOnArrays
+[BuiltinFunctions::ProhibitDeleteOnArrays]
+
+### Perl::Critic::Policy::BuiltinFunctions::ProhibitReturnOr
+[BuiltinFunctions::ProhibitReturnOr]
+
+### Perl::Critic::Policy::Moo::ProhibitMakeImmutable
+[Moo::ProhibitMakeImmutable]
+
+### Perl::Critic::Policy::ValuesAndExpressions::ProhibitSingleArgArraySlice
+# requires Perl 5.12
+#[ValuesAndExpressions::ProhibitSingleArgArraySlice]
+
+### Perl::Critic::Policy::Perlsecret
+[Perlsecret]
+
+### Perl::Critic::Policy::TryTiny::RequireBlockTermination
+[TryTiny::RequireBlockTermination]
+
+### Perl::Critic::Policy::TryTiny::RequireUse
+[TryTiny::RequireUse]
+
+### Perl::Critic::Policy::ValuesAndExpressions::PreventSQLInjection
+[ValuesAndExpressions::PreventSQLInjection]
+
+### Perl::Critic::Policy::Variables::ProhibitUnusedVarsStricter
+[Variables::ProhibitUnusedVarsStricter]
+allow_unused_subroutine_arguments = 1
+
+### Perl::Critic::Pulp
+[CodeLayout::ProhibitFatCommaNewline]
+#[CodeLayout::ProhibitIfIfSameLine]
+[CodeLayout::RequireFinalSemicolon]
+[CodeLayout::RequireTrailingCommaAtNewline]
+[Compatibility::ConstantLeadingUnderscore]
+[Compatibility::ConstantPragmaHash]
+#[Compatibility::Gtk2Constants]
+[Compatibility::PerlMinimumVersionAndWhy]
+#[Compatibility::PodMinimumVersion]
+[Compatibility::ProhibitUnixDevNull]
+[Documentation::ProhibitAdjacentLinks]
+[Documentation::ProhibitBadAproposMarkup]
+[Documentation::ProhibitDuplicateHeadings]
+#[Documentation::ProhibitDuplicateSeeAlso]
+[Documentation::ProhibitLinkToSelf]
+[Documentation::ProhibitParagraphEndComma]
+[Documentation::ProhibitParagraphTwoDots]
+[Documentation::ProhibitUnbalancedParens]
+[Documentation::ProhibitVerbatimMarkup]
+[Documentation::RequireEndBeforeLastPod]
+[Documentation::RequireFilenameMarkup]
+#[Documentation::RequireFinalCut]
+[Documentation::RequireLinkedURLs]
+#[Miscellanea::TextDomainPlaceholders]
+#[Miscellanea::TextDomainUnused]
+[Modules::ProhibitModuleShebang]
+[Modules::ProhibitPOSIXimport]
+[Modules::ProhibitUseQuotedVersion]
+[ValuesAndExpressions::ConstantBeforeLt]
+[ValuesAndExpressions::NotWithCompare]
+[ValuesAndExpressions::ProhibitArrayAssignAref]
+[ValuesAndExpressions::ProhibitBarewordDoubleColon]
+[ValuesAndExpressions::ProhibitDuplicateHashKeys]
+[ValuesAndExpressions::ProhibitEmptyCommas]
+#[ValuesAndExpressions::ProhibitFiletest_f]
+[ValuesAndExpressions::ProhibitNullStatements]
+[ValuesAndExpressions::ProhibitUnknownBackslash]
+[ValuesAndExpressions::RequireNumericVersion]
+[ValuesAndExpressions::UnexpandedSpecialLiteral]
+
+### Perl::Critic::StricterSubs
+[Modules::RequireExplicitInclusion]
+#[Subroutines::ProhibitCallsToUndeclaredSubs]
+#[Subroutines::ProhibitCallsToUnexportedSubs]
+[Subroutines::ProhibitExportingUndeclaredSubs]
+[Subroutines::ProhibitQualifiedSubDeclarations]
+
+### Perl::Critic::Tics
+#[Tics::ProhibitLongLines]
+[Tics::ProhibitManyArrows]
+[Tics::ProhibitUseBase]
 PERLCRITICRC_TEMPLATE
 
         # Conig::Std will not preserve a comment on the last line, therefore
@@ -408,7 +621,7 @@ PERLCRITICRC_TEMPLATE
 
             read_config $perlcriticrc_local, my %perlcriticrc_local;
 
-            my %local_seen = ();
+            my %local_seen;
 
           POLICY:
             for my $policy ( keys %perlcriticrc_local ) {
@@ -421,7 +634,6 @@ PERLCRITICRC_TEMPLATE
                 }
 
                 my $policy_name = $policy =~ m{ ^ - (.+) }xsm ? $1 : $policy;
-                my $disable     = $policy =~ m{ ^ - . }xsm    ? 1  : 0;
 
                 if ( exists $local_seen{$policy_name} ) {
                     $self->log_fatal("There are multiple entries for policy '$policy_name' in '$perlcriticrc_local'.");
@@ -482,6 +694,13 @@ PERLTIDYRC
 The configuration file for TravisCI. All known supported Perl versions are
 enabled unless disabled with B<travis_ci_ignore_perl>.
 
+With B<travis_ci_osx_perl> you can specify one or multiple Perl versions to
+be tested on OSX, in addition to on Linux. If omitted it defaults to one
+single version.
+
+Use the B<travis_ci_no_author_testing_perl> option to disable author tests on
+some Perl versions.
+
 =cut
 
     $file{q{.travis.yml}} = sub {
@@ -492,30 +711,60 @@ enabled unless disabled with B<travis_ci_ignore_perl>.
 # {{ ref $plugin }} {{ $plugin->VERSION() }}
 
 language: perl
-perl:
+
+cache:
+  directories:
+    - ~/perl5
+
+env:
+  global:
+    - AUTOMATED_TESTING=1
+
+matrix:
+  include:
 TRAVIS_YML_1
 
-        my %perl;
-        @perl{ @{ $self->_travis_available_perl } } = ();
-        if ( @{ $self->travis_ci_ignore_perl } ) {
-            delete @perl{ @{ $self->travis_ci_ignore_perl } };
-        }
-        my @perl = reverse sort keys %perl;
+        my %ignore_perl;
+        @ignore_perl{ @{ $self->travis_ci_ignore_perl } } = ();
 
-        croak "No perl versions selected for TravisCI\n" if !@perl;
+        my %no_auth;
+        @no_auth{ @{ $self->travis_ci_no_author_testing_perl } } = ();
 
-        for my $perl (@perl) {
-            $travis_yml .= "  - '$perl'\n";
+        my %osx_perl;
+        @osx_perl{ @{ $self->travis_ci_osx_perl } } = ();
+
+      PERL:
+        for my $perl ( @{ $self->_travis_available_perl } ) {
+            next PERL if exists $ignore_perl{$perl};
+
+            my @os = (undef);
+            if ( exists $osx_perl{$perl} ) {
+                push @os, 'osx';
+            }
+
+            for my $os (@os) {
+                $travis_yml .= "    - perl: '$perl'\n";
+
+                if ( !exists $no_auth{$perl} ) {
+                    $travis_yml .= "      env: AUTHOR_TESTING=1\n";
+                }
+
+                if ( defined $os ) {
+                    $travis_yml .= "      os: $os\n";
+                }
+
+                $travis_yml .= "\n";
+            }
         }
 
         $travis_yml .= <<'TRAVIS_YML';
-before_install:
-  - export AUTOMATED_TESTING=1
 install:
-  - cpanm --quiet --installdeps --notest --skip-satisfied --with-develop .
+  - if [ -n "$AUTHOR_TESTING" ]; then cpanm --quiet --installdeps --notest --skip-satisfied --with-develop .; fi
+  - if [ -z "$AUTHOR_TESTING" ]; then cpanm --quiet --installdeps --notest --skip-satisfied .; fi
+
 script:
   - perl Makefile.PL && make test
-  - test -d xt/author && prove -lr xt/author
+  - if [ -n "$AUTHOR_TESTING" ]; then prove -lr xt/author; fi
 TRAVIS_YML
 
         return $travis_yml;
@@ -646,7 +895,7 @@ use Test::Perl::Critic;
 
 my @dirs = qw(bin lib t xt);
 
-my @ignores = ();
+my @ignores;
 my %file;
 @file{ all_perl_files(@dirs) } = ();
 delete @file{@ignores};

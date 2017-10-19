@@ -11,8 +11,10 @@ use File::Find::Rule;
 
 # Check to see if our module list contains some obvious candidates.
 
-foreach my $module ( qw(Fatal File::Copy FindBin CGI IO::Handle Safe) ) {
+foreach my $module ( qw(Fatal File::Copy FindBin IO::Handle Safe) ) {
     ok(is_core_module($module), "$module should be a core module");
 }
 
-ok( !is_core_module('Foo::Bar'), 'Foo::Bar is not a core module' );
+foreach my $module ( qw(CGI Foo::Bar) ) {
+    ok( !is_core_module($module), "$module is not a core module" );
+}

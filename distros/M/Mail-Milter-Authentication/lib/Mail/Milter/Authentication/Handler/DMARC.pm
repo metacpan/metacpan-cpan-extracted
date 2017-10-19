@@ -2,7 +2,7 @@ package Mail::Milter::Authentication::Handler::DMARC;
 use strict;
 use warnings;
 use base 'Mail::Milter::Authentication::Handler';
-use version; our $VERSION = version->declare('v1.1.3');
+use version; our $VERSION = version->declare('v1.1.4');
 
 use Data::Dumper;
 use English qw{ -no_match_vars };
@@ -120,7 +120,7 @@ sub register_metrics {
 }
 
 sub get_dmarc_object {
-    my ( $self, $env_from ) = @_;
+    my ( $self ) = @_;
     my $dmarc = $self->get_object('dmarc');
     if ( $dmarc ) {
         return $dmarc;

@@ -8,6 +8,7 @@ Term::ReadLine::Perl5::Keymap
 
 A non-OO package subsidiary to L<Term::ReadLine::Perl5::readline> to
 initialize keymaps.
+
 =cut
 
 =head1 SUBROUTINES
@@ -15,6 +16,7 @@ initialize keymaps.
 =head2 KeymapEmacs
 
 GNU Emacs key bindings
+
 =cut
 
 use Exporter;
@@ -237,6 +239,7 @@ sub KeymapEmacs($$$) {
 =head2 KeymapVi
 
 vi input-mode key bindings
+
 =cut
 
 sub KeymapVi($$) {
@@ -260,6 +263,7 @@ sub KeymapVi($$) {
 =head2 KeymapVicmd
 
 vi command-mode key bindings
+
 =cut
 
 sub KeymapVicmd($$) {
@@ -383,6 +387,7 @@ sub KeymapVicmd($$) {
 I<vi> positioning commands suffixed to I<vi> commands like C<d>.
 
 =cut
+
 sub KeymapVipos($$$) {
     my ($fn, $keymap, $inDOS) = @_;
 
@@ -444,6 +449,7 @@ sub KeymapVipos($$$) {
 vi search string input mode for C</> and C<?>.
 
 =cut
+
 sub KeymapVisearch($$) {
     my ($fn, $keymap) = @_;
     &$fn($keymap, 'SelfInsert', 'visearch_keymap',
@@ -463,6 +469,7 @@ sub KeymapVisearch($$) {
 =head1 SEE ALSO
 
 L<Term::ReadLine::Perl5>
+
 =cut
 
 1;

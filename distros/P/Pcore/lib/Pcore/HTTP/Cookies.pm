@@ -161,7 +161,7 @@ sub parse_cookies ( $self, $url, $set_cookie_header ) {
             }
         }
 
-        if ( $cookie->{expires} && $cookie->{expires} < time ) {
+        if ( $cookie->{expires} && $cookie->{expires} <= time ) {
             $self->remove_cookie( $cookie->{domain}, $cookie->{path}, $cookie->{name} );
         }
         else {

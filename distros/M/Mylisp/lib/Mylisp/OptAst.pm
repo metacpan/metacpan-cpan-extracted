@@ -1,410 +1,298 @@
 package Mylisp::OptAst;
 
 use 5.012;
-no warnings "experimental";
+no warnings 'experimental';
 
 use Exporter;
-our @ISA    = qw(Exporter);
-our @EXPORT = qw(opt_ast);
+our @ISA = qw(Exporter);
+our @EXPORT =
+  qw(opt_my_ast opt_my_atoms opt_my_atom opt_my_expr is_oper opt_my_infix_op_expr opt_my_oper opt_my_sub opt_my_package opt_my_use opt_my_func opt_my_func_args opt_my_arg opt_my_for opt_my_iter opt_my_my opt_my_ocall_expr opt_my_ocall opt_my_name_value opt_my_array opt_my_hash opt_my_pair opt_my_aindex opt_my_arange opt_my_string opt_my_str opt_my_lstr opt_my_kstr opt_my_chars opt_my_sym);
 
 use Spp::Builtin;
-use Spp::Core;
-use Mylisp::Core;
+use Spp::Tools;
 
-sub opt_ast {
+sub opt_my_ast {
   my $ast = shift;
-  if (is_atom($ast)) {
-    return [opt_atom($ast)];
-  }
-  return opt_atoms($ast);
+  if (is_atom($ast)) { return cons(opt_my_atom($ast)) }
+  return opt_my_atoms($ast);
 }
 
-sub opt_atoms {
+sub opt_my_atoms {
   my $atoms = shift;
-  return [map { opt_atom($_) } @{$atoms}];
+  return estr([map { opt_my_atom($_) } @{ atoms($atoms) }]);
 }
 
-sub opt_atom {
+sub opt_my_atom {
   my $atom = shift;
-  my ($name, $value, $pos) = @{$atom};
+  my ($name, $rest) = match($atom);
   given ($name) {
-    when ('Expr') { opt_expr($value, $pos) }
-    when ('Array') { opt_array($value, $pos) }
-    when ('Slist') { opt_slist($value, $pos) }
-    when ('List') { opt_list($value, $pos) }
-    when ('Hash') { opt_hash($value, $pos) }
-    when ('Pair') { opt_pair($value, $pos) }
-    when ('Ocall') { opt_ocall($value, $pos) }
-    when ('Aindex') { opt_aindex($value, $pos) }
-    when ('Hkey') { opt_hkey($value, $pos) }
-    when ('Arange') { opt_arange($value, $pos) }
-    when ('Range') { opt_range($value, $pos) }
-    when ('Str') { opt_str($value, $pos) }
-    when ('String') { opt_string($value, $pos) }
-    when ('Char') { opt_char($value, $pos) }
-    when ('Chars') { opt_chars($value, $pos) }
-    when ('Int') { opt_int($value, $pos) }
-    when ('Lstr') { opt_lstr($value, $pos) }
-    when ('Kstr') { opt_kstr($value, $pos) }
-    when ('Sub')    { opt_sym($value, $pos) }
-    when ('Var')    { opt_sym($value, $pos) }
-    when ('Oper')   { opt_sym($value, $pos) }
-    when ('Scalar') { opt_sym($value, $pos) }
-    default {
-      say to_json($atom);
-      my $line = $pos->[1];
-      error("line: $line unknown atom opt!");
-    }
+    when ('Expr')   { return opt_my_expr($rest) }
+    when ('Ocall')  { return opt_my_ocall($rest) }
+    when ('Array')  { return opt_my_array($rest) }
+    when ('Hash')   { return opt_my_hash($rest) }
+    when ('Pair')   { return opt_my_pair($rest) }
+    when ('Aindex') { return opt_my_aindex($rest) }
+    when ('Arange') { return opt_my_arange($rest) }
+    when ('String') { return opt_my_string($rest) }
+    when ('Str')    { return opt_my_str($rest) }
+    when ('Lstr')   { return opt_my_lstr($rest) }
+    when ('Kstr')   { return opt_my_kstr($rest) }
+    when ('Chars')  { return opt_my_chars($rest) }
+    when ('Sub')    { return opt_my_sym($rest) }
+    when ('Var')    { return opt_my_sym($rest) }
+    when ('Scalar') { return opt_my_sym($rest) }
+    when ('Oper')   { return opt_my_sym($rest) }
+    when ('Char')   { return $atom }
+    when ('Ns')     { return $atom }
+    when ('Arg')    { return $atom }
+    when ('Int')    { return $atom }
+    default { error("unknown atom |$name| to opt!") }
   }
 }
 
-sub opt_expr {
-  my ($expr, $pos) = @_;
-  if ((len($expr) == 3) && is_oper($expr->[1])) {
-    my $name     = $expr->[1][1];
-    my $args     = [$expr->[0], $expr->[2]];
-    my $opt_args = opt_atoms($args);
-    my $opt_expr = [$name, $opt_args, $pos];
-    return opt_oper($opt_expr);
+sub opt_my_expr {
+  my $value = shift;
+  my ($expr, $pos) = flat($value);
+  if (elen($expr) == 3 && is_oper(value($expr))) {
+    return opt_my_infix_op_expr($expr, $pos);
   }
-  my $first_atom = $expr->[0];
-  my ($type, $name) = @{$first_atom};
-  my $args     = rest($expr);
-  my $opt_args = opt_atoms($args);
-  my $opt_expr = [$name, $opt_args, $pos];
+  my ($action, $args) = match($expr);
+  my ($type,   $name) = flat($action);
   given ($type) {
-    when ('Sub')   { return opt_macro($opt_expr) }
-    when ('Oper')  { return opt_oper($opt_expr) }
-    when ('Ocall') { return opt_ocall_expr($opt_expr) }
+    when ('Sub') { return opt_my_sub($name, $args, $pos) }
+    when ('Oper') { return opt_my_oper($name, $args, $pos) }
+    when ('Ocall') {
+      return opt_my_ocall_expr($name, $args, $pos)
+    }
     default {
-      my $line = $pos->[1];
-      say to_json($expr);
-      error("line: $line unknown action: |$type|");
+      my $atoms = opt_my_atoms($expr);
+      return cons('Array', $atoms)
     }
   }
 }
 
-sub opt_oper {
-  my $expr = shift;
-  my ($name, $args, $pos) = @{$expr};
-  given ($name) {
-    when ('!') {
-      my $action = $args->[0][1];
-      my $args   = rest($args);
-      my $call   = [$action, $args, $pos];
-      return ['not', $call, $pos];
-    }
-    when ('=') { return ['set', $args, $pos] }
-    default {
-      return ['Oper', $expr, $pos];
-    }
-  }
-}
-
-sub opt_macro {
-  my $expr = shift;
-  my ($name, $args, $pos) = @{$expr};
-  given ($name) {
-    when ('module') { opt_module($args, $pos) }
-    when ('class') { opt_class($args, $pos) }
-    when ('use') { opt_use($args, $pos) }
-    when ('func') { opt_func($args, $pos) }
-    when ('my') { opt_my($args, $pos) }
-    when ('given') { opt_given($args, $pos) }
-    when ('when') { opt_when($args, $pos) }
-    when ('then') { opt_then($args, $pos) }
-    when ('if') { opt_if($args, $pos) }
-    when ('elif') { opt_elif($args, $pos) }
-    when ('else') { opt_else($args, $pos) }
-    when ('for') { opt_for($args, $pos) }
-    when ('while') { opt_while($args, $pos) }
-    when ('return') { return $expr }
-    when ('end')    { return $expr }
-    when ('type')   { return $expr }
-    default { return ['Call', $expr, $pos] }
-  }
-}
-
-sub opt_module {
-  my ($args, $pos) = @_;
-  my $ns = $args->[0][1];
-  return ['module', $ns, $pos];
-}
-
-sub opt_class {
-  my ($args, $pos) = @_;
-  my $ns = $args->[0][1];
-  return ['class', $args, $pos];
-}
-
-sub opt_use {
-  my ($args, $pos) = @_;
-  if (len($args) == 1) {
-    my $ns = $args->[0][1];
-    return ['use', $ns, $pos];
-  }
-  $args->[0][0] = 'Ns';
-  $args->[1][0] = 'Slist';
-  return ['import', $args, $pos];
-}
-
-sub opt_func {
-  my ($atoms, $pos)  = @_;
-  my ($args,  $rest) = match($atoms);
-  my $opt_args = opt_func_args($args);
-  my ($return_expr, $exprs) = match($rest);
-  my $opt_return = opt_return_expr($return_expr);
-  if (len($exprs) == 0) {
-    return ['func', [$opt_args, $opt_return], $pos];
-  }
-  my $func_exprs = [$opt_args, $opt_return, @{$exprs}];
-  return ['func', $func_exprs, $pos];
-}
-
-sub opt_func_args {
-  my $expr = shift;
-  my $pos  = $expr->[2];
-  if (is_call($expr) or is_oper($expr)) {
-    my $name_args = $expr->[1];
-    my ($call, $args, $pos) = @{$name_args};
-    my $opt_args = [map { opt_arg($_) } @{$args}];
-    return [$call, $opt_args, $pos];
-  }
-  my $line = $pos->[1];
-  error("line: $line func args is not expr!");
-}
-
-sub opt_arg {
-  my $arg      = shift;
-  my $pos      = $arg->[2];
-  my $line     = $pos->[1];
-  my $sym_name = $arg->[1];
-  my $index    = index($sym_name, ':');
-  if ($index >= 0) {
-    my $name = substr($sym_name, 0, $index);
-    my $type = substr($sym_name, $index + 1);
-    return [$name, $type, $pos];
-  }
-  say to_json($arg);
-  say "line: $line func arg less type info!";
-}
-
-sub opt_return_expr {
-  my $expr = shift;
-  my $pos  = $expr->[2];
-  my $line = $pos->[1];
-  if (is_oper($expr)) {
-    my $return = $expr->[1];
-    return $return;
-  }
-  return $expr;
-}
-
-sub is_return {
+sub is_oper {
   my $atom = shift;
   if (is_atom($atom)) {
-    return 1 if $atom->[0] eq '->';
+    my ($name, $value) = flat($atom);
+    if ($name eq 'Oper') { return 1 }
+    if ($value ~~ ['x', 'eq', 'le', 'ne', 'in']) {
+      return 1;
+    }
   }
   return 0;
 }
 
-sub opt_my {
-  my ($args, $pos) = @_;
-  my $var = $args->[0];
-  if (is_atom_array($var)) {
-    $args->[0][0] = 'List';
-  }
-  return ['my', $args, $pos];
-}
-
-sub opt_given {
-  my ($args, $pos) = @_;
-  my $exprs = opt_cond_exprs($args);
-  return ['given', $exprs, $pos];
-}
-
-sub opt_cond_exprs {
-  my $args  = shift;
-  my $cond  = $args->[0];
-  my $exprs = opt_exprs(rest($args));
-  return [$cond, $exprs];
-}
-
-sub opt_exprs {
-  my $exprs = shift;
-  my $pos   = $exprs->[0][2];
-  return ['exprs', $exprs, $pos];
-}
-
-sub opt_when {
-  my ($args, $pos) = @_;
-  my $exprs = opt_cond_exprs($args);
-  return ['when', $exprs, $pos];
-}
-
-sub opt_then {
-  my ($args, $pos) = @_;
-  my $exprs = opt_exprs($args);
-  return ['then', $exprs, $pos];
-}
-
-sub opt_if {
-  my ($args, $pos) = @_;
-  my $exprs = opt_cond_exprs($args);
-  return ['if', $exprs, $pos];
-}
-
-sub opt_elif {
-  my ($args, $pos) = @_;
-  my $exprs = opt_cond_exprs($args);
-  return ['elif', $exprs, $pos];
-}
-
-sub opt_else {
-  my ($args, $pos) = @_;
-  my $exprs = opt_exprs($args);
-  return ['else', $exprs, $pos];
-}
-
-sub opt_for {
-  my ($args, $pos)  = @_;
-  my ($oper, $rest) = match($args);
-  if (is_oper($oper)) {
-    my $iter  = $oper->[1];
-    my $exprs = opt_exprs($rest);
-    return ['for', [$iter, $exprs], $pos];
-  }
-  say "for iter is not (x in \@x)";
-}
-
-sub opt_while {
-  my ($args, $pos) = @_;
-  my $exprs = opt_cond_exprs($args);
-  return ['while', $exprs, $pos];
-}
-
-sub opt_array {
-  my ($atoms, $pos) = @_;
-  if (is_str($atoms)) { return ['Array', [], $pos] }
-  return ['Array', opt_atoms($atoms), $pos];
-}
-
-sub opt_slist {
-  my ($atoms, $pos) = @_;
-  if (is_str($atoms)) { return ['Slist', [], $pos] }
-  return ['Slist', opt_atoms($atoms), $pos];
-}
-
-sub opt_list {
-  my ($atoms, $pos) = @_;
-  return ['List', opt_atoms($atoms), $pos];
-}
-
-sub opt_hash {
-  my ($pairs, $pos) = @_;
-  if (is_str($pairs)) { return ['Hash', [], $pos] }
-  return ['Hash', opt_atoms($pairs), $pos];
-}
-
-sub opt_pair {
-  my ($pair, $pos) = @_;
-  my $opt_pair = opt_atoms($pair);
-  return ['Pair', $opt_pair, $pos];
-}
-
-sub opt_ocall {
-  my ($args, $pos) = @_;
-  my $atoms = opt_atoms($args);
-  my ($sym, $call) = @{$atoms};
-  my $name = $call->[1];
-  return ['Ocall', [$name, [$sym], $pos], $pos];
-}
-
-sub opt_ocall_expr {
-  my $expr = shift;
-  my ($ocall, $args, $pos) = @{$expr};
-  my ($object, $method) = @{$args};
-  my $call = $method->[1];
-  unshift @{$args}, $object;
-  return ['Ocall', [$call, $args, $pos], $pos];
-}
-
-sub opt_aindex {
-  my ($args, $pos) = @_;
-  my $opt_atoms = opt_atoms($args);
-  return ['Aindex', $opt_atoms, $pos];
-}
-
-sub opt_hkey {
-  my ($args, $pos) = @_;
-  my $opt_atoms = opt_atoms($args);
-  return ['Hkey', $opt_atoms, $pos];
-}
-
-sub opt_arange {
-  my ($args, $pos) = @_;
-  my $opt_atoms = opt_atoms($args);
-  return ['Arange', $opt_atoms, $pos];
-}
-
-sub opt_range {
-  my ($range, $pos) = @_;
-  my $from = 0;
-  my $to   = 0;
-  for my $atom (@{$range}) {
-    my ($name, $value) = @{$atom};
-    if ($name eq 'from') { $from = $value }
-    if ($name eq 'to')   { $to   = $value }
-  }
-  return ['Range', [$from, $to], $pos];
-}
-
-sub opt_str {
-  my ($capture_str, $pos) = @_;
-  my $str = substr($capture_str, 1, -1);
-  return ['Str', $str, $pos];
-}
-
-sub opt_string {
-  my ($atoms, $pos) = @_;
-  if (is_str($atoms)) { return ['Str', '', $pos] }
-  return ['String', opt_atoms($atoms), $pos];
-}
-
-sub opt_char {
-  my ($char, $pos) = @_;
-  return ['Char', $char, $pos];
-}
-
-sub opt_chars {
-  my ($chars, $pos) = @_;
-  return ['Str', $chars, $pos];
-}
-
-sub opt_int {
-  my ($int, $pos) = @_;
-  return ['Int', $int, $pos];
-}
-
-sub opt_lstr {
-  my ($lstr, $pos) = @_;
-  my $str = substr($lstr, 3, -3);
-  return ['Lstr', $str, $pos];
-}
-
-sub opt_kstr {
-  my ($kstr, $pos) = @_;
-  my $str = substr($kstr, 1);
-  return ['Str', $str, $pos];
-}
-
-sub opt_sym {
-  my ($name, $pos) = @_;
+sub opt_my_infix_op_expr {
+  my ($expr, $pos) = @_;
+  my $atoms = atoms($expr);
+  my $name  = value($atoms->[1]);
+  my $args  = cons($atoms->[0], $atoms->[2]);
+  $args = opt_my_atoms($args);
   given ($name) {
-    when ('false') { ['Bool', 'false', $pos] }
-    when ('true')  { ['Bool', 'true',  $pos] }
-    default { ['Sym', $name, $pos] }
+    when ('>>') { return cons('eunshift', $args, $pos) }
+    when ('<<') { return cons('epush',    $args, $pos) }
+    when ('><') { return cons('eappend',  $args, $pos) }
+    default     { return cons($name,      $args, $pos) }
   }
 }
 
+sub opt_my_oper {
+  my ($name, $args, $pos) = @_;
+  my $atoms = opt_my_atoms($args);
+  return cons($name, $atoms, $pos);
+}
+
+sub opt_my_sub {
+  my ($name, $args, $pos) = @_;
+  given ($name) {
+    when ('package') { return opt_my_package($args, $pos) }
+    when ('use') { return opt_my_use($args, $pos) }
+    when ('func') { return opt_my_func($args, $pos) }
+    when ('for') { return opt_my_for($args, $pos) }
+    when ('my') { return opt_my_my($args, $pos) }
+    default {
+      return cons($name, opt_my_atoms($args), $pos)
+    }
+  }
+}
+
+sub opt_my_package {
+  my ($args, $pos) = @_;
+  my $ns = value(name($args));
+  return cons('package', $ns, $pos);
+}
+
+sub opt_my_use {
+  my ($args, $pos) = @_;
+  my $atoms = opt_my_atoms($args);
+  my $ns    = value(name($atoms));
+  return cons('use', $ns, $pos);
+}
+
+sub opt_my_func {
+  my ($args, $pos) = @_;
+  my $atoms = opt_my_atoms($args);
+  my ($name_args, $exprs) = match($atoms);
+  my $return = name($exprs);
+  if (not(is_return($return))) {
+    my $expr = cons('->', cons(cons('Type', 'Str')));
+    $exprs = eunshift($expr, $exprs);
+  }
+  my $opt_args = opt_my_func_args($name_args);
+  my $func_exprs = eunshift($opt_args, $exprs);
+  return cons('func', $func_exprs, $pos);
+}
+
+sub opt_my_func_args {
+  my $expr = shift;
+  my ($call, $args) = flat($expr);
+  my $opt_args = [map { opt_my_arg($_) } @{ atoms($args) }];
+  my $pos = offline($expr);
+  return cons($call, estr($opt_args), $pos);
+}
+
+sub opt_my_arg {
+  my $arg = shift;
+  my ($name, $value) = flat($arg);
+  my $pos  = offline($arg);
+  my $line = value(offline($arg));
+  if ($name eq 'Arg') {
+    my $names    = [split ':', $value];
+    my $arg_name = $names->[0];
+    my $type     = $names->[1];
+    if (is_type($type)) {
+      return cons($arg_name, $type, $pos);
+    }
+    else { say "line: $line unknown type |$type|" }
+  }
+  if ($name eq 'Sym') { return cons($value, 'Str', $pos) }
+  say "line: $line |$name| as func arg!";
+}
+
+sub opt_my_for {
+  my ($args, $pos) = @_;
+  my $atoms = opt_my_atoms($args);
+  my ($iter_expr, $rest) = match($atoms);
+  my $iter_atom = opt_my_iter($iter_expr);
+  my $exprs = eunshift($iter_atom, $rest);
+  return cons('for', $exprs, $pos);
+}
+
+sub opt_my_iter {
+  my $expr = shift;
+  my ($in,       $args)      = flat($expr);
+  my ($loop_sym, $iter_atom) = flat($args);
+  my $loop = value($loop_sym);
+  my $pos  = offline($expr);
+  return cons($loop, $iter_atom, $pos);
+}
+
+sub opt_my_my {
+  my ($args, $pos) = @_;
+  my $atoms = opt_my_atoms($args);
+  my $sym   = name($atoms);
+  if (is_sym($sym)) { return cons('my', $atoms, $pos) }
+  return cons('our', $atoms, $pos);
+}
+
+sub opt_my_ocall_expr {
+  my ($ocall, $args, $pos) = @_;
+  my ($sym, $call) = flat($ocall);
+  my $name = value($call);
+  my $opt_args = opt_my_atoms(eunshift($sym, $args));
+  return cons($name, $opt_args, $pos);
+}
+
+sub opt_my_ocall {
+  my $value = shift;
+  my ($args, $pos) = flat($value);
+  my $opt_args = opt_my_atoms($args);
+  my ($sym, $call) = flat($opt_args);
+  my $name = value($call);
+  return cons($name, cons($sym), $pos);
+}
+
+sub opt_my_name_value {
+  my ($name, $value) = @_;
+  my ($args, $pos)   = flat($value);
+  my $atoms = opt_my_atoms($args);
+  return cons($name, $atoms, $pos);
+}
+
+sub opt_my_array {
+  my $value = shift;
+  return opt_my_name_value('Array', $value);
+}
+
+sub opt_my_hash {
+  my $value = shift;
+  return opt_my_name_value('Hash', $value);
+}
+
+sub opt_my_pair {
+  my $value = shift;
+  return opt_my_name_value('Pair', $value);
+}
+
+sub opt_my_aindex {
+  my $value = shift;
+  return opt_my_name_value('Aindex', $value);
+}
+
+sub opt_my_arange {
+  my $value = shift;
+  return opt_my_name_value('subarray', $value);
+}
+
+sub opt_my_string {
+  my $value = shift;
+  return opt_my_name_value('String', $value);
+}
+
+sub opt_my_str {
+  my $value = shift;
+  my ($str, $pos) = flat($value);
+  $str = substr($str, 1, -1);
+  return cons('Str', $str, $pos);
+}
+
+sub opt_my_lstr {
+  my $value = shift;
+  my ($lstr, $pos) = flat($value);
+  my $str = substr($lstr, 3, -3);
+  return cons('Lstr', $str, $pos);
+}
+
+sub opt_my_kstr {
+  my $value = shift;
+  my ($kstr, $pos) = flat($value);
+  my $str = substr($kstr, 1);
+  return cons('Str', $str, $pos);
+}
+
+sub opt_my_chars {
+  my $rest = shift;
+  my ($str, $pos) = flat($rest);
+  return cons('Str', $str, $pos);
+}
+
+sub opt_my_sym {
+  my $value = shift;
+  my ($name, $pos) = flat($value);
+  given ($name) {
+    when ('false')  { return cons('Bool', $name, $pos) }
+    when ('true')   { return cons('Bool', $name, $pos) }
+    when ('Str')    { return cons('Type', $name, $pos) }
+    when ('Int')    { return cons('Type', $name, $pos) }
+    when ('Hash')   { return cons('Type', $name, $pos) }
+    when ('Bool')   { return cons('Type', $name, $pos) }
+    when ('Array')  { return cons('Type', $name, $pos) }
+    when ('Ints')   { return cons('Type', $name, $pos) }
+    when ('Table')  { return cons('Type', $name, $pos) }
+    when ('Cursor') { return cons('Type', $name, $pos) }
+    when ('Lint')   { return cons('Type', $name, $pos) }
+    default         { return cons('Sym',  $name, $pos) }
+  }
+}
 1;

@@ -1,5 +1,11 @@
 Revision history for Perl extension JSONP.
 
+1.77
+
+	- allow much greater character set extent for keys in autovivification notation convenience. Now can be any Unicode letter, number, and spacing, up to 2048 Unicode chars
+	- increase allowed lenght for req and callback names to 64 ASCII chars
+	- now graft/stack calls do not assume anymore to be feeded with utf8 text
+
 1.76
 
 	- always serialize as ASCII with "\uxyzw" escaping for non-ascii chars to prevent any corruption for data traversing non-utf8 compatibile media streams 

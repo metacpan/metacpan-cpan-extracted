@@ -1,6 +1,7 @@
 package WebService::Braintree::Subscription::Status;
-$WebService::Braintree::Subscription::Status::VERSION = '0.93';
-use strict;
+$WebService::Braintree::Subscription::Status::VERSION = '0.94';
+use 5.010_001;
+use strictures 1;
 
 use constant Active => 'Active';
 use constant Canceled => 'Canceled';
@@ -17,3 +18,4 @@ use constant All => (
 );
 
 1;
+__END__

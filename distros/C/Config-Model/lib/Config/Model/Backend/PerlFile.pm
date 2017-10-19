@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::PerlFile;
-$Config::Model::Backend::PerlFile::VERSION = '2.112';
+$Config::Model::Backend::PerlFile::VERSION = '2.113';
 use 5.10.1;
 use Carp;
 use strict;
@@ -90,7 +90,7 @@ Config::Model::Backend::PerlFile - Read and write config as a Perl data structur
 
 =head1 VERSION
 
-version 2.112
+version 2.113
 
 =head1 SYNOPSIS
 

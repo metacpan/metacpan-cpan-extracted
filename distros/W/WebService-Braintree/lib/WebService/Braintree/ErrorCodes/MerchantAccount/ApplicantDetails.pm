@@ -1,6 +1,7 @@
 package WebService::Braintree::ErrorCodes::MerchantAccount::ApplicantDetails;
-$WebService::Braintree::ErrorCodes::MerchantAccount::ApplicantDetails::VERSION = '0.93';
-use strict;
+$WebService::Braintree::ErrorCodes::MerchantAccount::ApplicantDetails::VERSION = '0.94';
+use 5.010_001;
+use strictures 1;
 
 use constant AccountNumberIsRequired        => "82614";
 use constant CompanyNameIsInvalid           => "82631";
@@ -29,3 +30,4 @@ use constant EmailAddressIsRequired         => "82665";
 use constant TaxIdMustBeBlank               => "82673";
 
 1;
+__END__

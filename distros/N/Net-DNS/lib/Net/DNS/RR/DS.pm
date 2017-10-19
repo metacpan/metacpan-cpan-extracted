@@ -1,9 +1,9 @@
 package Net::DNS::RR::DS;
 
 #
-# $Id: DS.pm 1586 2017-08-15 09:01:57Z willem $
+# $Id: DS.pm 1597 2017-09-22 08:04:02Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1586 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
 
 
 use strict;
@@ -133,7 +133,6 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 
-	return '' unless defined $self->{algorithm};
 	pack 'n C2 a*', @{$self}{qw(keytag algorithm digtype digestbin)};
 }
 
@@ -141,7 +140,6 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
-	return '' unless defined $self->{algorithm};
 	$self->_annotation( $self->babble ) if BABBLE && $self->{algorithm};
 	my @digest = split /(\S{64})/, $self->digest || '-';
 	my @rdata = ( @{$self}{qw(keytag algorithm digtype)}, @digest );
@@ -242,6 +240,7 @@ sub create {
 	my $data = pack 'a* a*', $owner, $keyrr->_encode_rdata;
 
 	my $arglist = $digest{$self->digtype};
+	croak join ' ', 'digtype', $self->digtype('MNEMONIC'), 'not supported' unless $arglist;
 	my ( $object, @argument ) = @$arglist;
 	my $hash = $object->new(@argument);
 	$hash->add($data);

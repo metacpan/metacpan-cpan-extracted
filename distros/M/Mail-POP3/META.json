@@ -3,8 +3,8 @@
    "author" : [
       "unknown"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.14, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "unknown"
    ],
@@ -30,6 +30,14 @@
             "ExtUtils::MakeMaker" : "0"
          }
       },
+      "develop" : {
+         "requires" : {
+            "Pod::Markdown" : "0",
+            "Test::CheckManifest" : "0.9",
+            "Test::Pod" : "1.22",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
       "runtime" : {
          "requires" : {
             "Email::MIME" : "0",
@@ -40,5 +48,17 @@
       }
    },
    "release_status" : "stable",
-   "version" : "3.08"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mohawk2/Mail-POP3/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/mohawk2/Mail-POP3"
+      }
+   },
+   "version" : "3.09"
 }

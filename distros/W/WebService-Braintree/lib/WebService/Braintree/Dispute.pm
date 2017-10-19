@@ -1,5 +1,8 @@
 package WebService::Braintree::Dispute;
-$WebService::Braintree::Dispute::VERSION = '0.93';
+$WebService::Braintree::Dispute::VERSION = '0.94';
+use 5.010_001;
+use strictures 1;
+
 =head1 NAME
 
 WebService::Braintree::Dispute
@@ -26,11 +29,15 @@ This class is B<NOT> an interface, so it does B<NOT> have any class methods.
 =cut
 
 sub BUILD {
-    my ($self, $attributes) = @_;
+    my ($self, $attrs) = @_;
 
-    $self->transaction_details(WebService::Braintree::Dispute::TransactionDetails->new($attributes->{transaction})) if ref($attributes->{transaction}) eq 'HASH';
-    delete($attributes->{transaction});
-    $self->set_attributes_from_hash($self, $attributes);
+    $self->build_sub_object($attrs,
+        method => 'transaction_details',
+        class  => 'Dispute::TransactionDetails',
+        key    => 'transaction',
+    );
+
+    $self->set_attributes_from_hash($self, $attrs);
 }
 
 =pod

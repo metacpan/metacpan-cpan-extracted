@@ -54,6 +54,8 @@ define ([
 
     return function (body) {
 
+        console.log("Logging in", body);
+
         var found,
             i,
             rest = {

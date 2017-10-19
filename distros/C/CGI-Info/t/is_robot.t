@@ -69,8 +69,8 @@ diag($i->browser_type());
 	$ENV{'HTTP_USER_AGENT'} = 'Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.7; en-US; rv:1.9.2.20) Gecko/20110803 Firefox/3.6.20';
 	$i = new_ok('CGI::Info' => [
 		cache => $cache,
-		logger => MyLogger->new()
 	]);
+	$i->set_logger({ logger => MyLogger->new() });
 	ok($i->is_robot() == 0);
 	SKIP: {
 		skip 'Test requires CHI access', 2 unless($cache);
@@ -85,15 +85,15 @@ diag($i->browser_type());
 	$ENV{'HTTP_REFERER'} = 'http://free-video-tool.com';
 	$i = new_ok('CGI::Info' => [
 		cache => $cache,
-		logger => MyLogger->new()
 	]);
+	$i->set_logger(logger => MyLogger->new());
 	ok($i->is_robot() == 1);
 
 	$ENV{'HTTP_REFERER'} = 'http://0.tqn.com/d/d/spae.gif)';
 	$i = new_ok('CGI::Info' => [
 		cache => $cache,
-		logger => MyLogger->new()
 	]);
+	$i->set_logger(MyLogger->new());
 	ok($i->is_robot() == 1);
 }
 

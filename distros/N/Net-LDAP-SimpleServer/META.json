@@ -4,19 +4,39 @@
       "Alexei Znamensky <russoz@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.300020, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Net-LDAP-SimpleServer",
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.30"
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::CPAN::Meta::JSON" : "0.16",
+            "Test::EOL" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::MinimumVersion" : "0",
+            "Test::Mojibake" : "0",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Pod::LinkCheck" : "0",
+            "Test::Portability::Files" : "0",
+            "Test::Version" : "1",
+            "version" : "0.9901"
          }
       },
       "runtime" : {
@@ -46,13 +66,15 @@
          "requires" : {
             "Authen::SASL" : "0",
             "Exporter" : "0",
-            "File::Find" : "0",
-            "File::Temp" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
             "IO::Pipe" : "0",
+            "IPC::Open3" : "0",
             "Net::LDAP" : "0",
             "Proc::Fork" : "0",
             "Test::More" : "0.88",
-            "Test::UseAllModules" : "0"
+            "Test::UseAllModules" : "0",
+            "lib" : "0"
          }
       }
    },
@@ -66,6 +88,7 @@
          "web" : "https://github.com/russoz/Net-LDAP-SimpleServer"
       }
    },
-   "version" : "0.0.17"
+   "version" : "0.0.18",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

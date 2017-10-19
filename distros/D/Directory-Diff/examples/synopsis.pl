@@ -2,12 +2,13 @@
 use warnings;
 use strict;
 use Directory::Diff 'directory_diff';
+use FindBin '$Bin';
 
 # Do a "diff" between "old_dir" and "new_dir"
 
-directory_diff ('old_dir', 'new_dir', 
-	    {diff => \& diff,
-	     dir1_only => \& old_only});
+directory_diff ("$Bin/old_dir", "$Bin/new_dir", 
+	        {diff => \& diff,
+		 dir1_only => \& old_only});
 
 # User-supplied callback for differing files
 
@@ -22,6 +23,6 @@ sub diff
 sub old_only
 {
     my ($data, $dir1, $file) = @_;
-    print "$file is only in the old directory.\n";
+    print "$dir1/$file is only in the old directory.\n";
 }
 

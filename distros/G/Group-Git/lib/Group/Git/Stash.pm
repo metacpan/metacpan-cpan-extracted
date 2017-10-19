@@ -17,7 +17,7 @@ use JSON qw/decode_json/;
 use WWW::Mechanize;
 use Path::Tiny;
 
-our $VERSION = version->new('0.6.4');
+our $VERSION = version->new('0.6.5');
 
 extends 'Group::Git';
 
@@ -68,6 +68,7 @@ sub _repos {
                 git  => $conf->{clone_type} && $conf->{clone_type} eq 'http' ? $clone{http} : $clone{ssh},
             );
             push @{ $conf->{tags}{$project} }, "$dir";
+            push @{ $conf->{tags}{$repo->{project}{type}} }, "$dir";
 
             if ( $repo->{project}{owner} ) {
                 push @{ $conf->{tags}{personal} }, "$dir";
@@ -90,7 +91,7 @@ Group::Git::Stash - Adds reading all repositories you have access to on your loc
 
 =head1 VERSION
 
-This documentation refers to Group::Git::Stash version 0.6.4.
+This documentation refers to Group::Git::Stash version 0.6.5.
 
 =head1 SYNOPSIS
 
@@ -120,6 +121,11 @@ This documentation refers to Group::Git::Stash version 0.6.4.
 Reads all repositories that the configured user has access to. Note: if no
 user is set up (or no password is supplied) then you will be prompted to
 enter the username and/or password.
+
+=head2 Auto Tagging
+
+Stash repositories are automatically tagged with the project they belong to
+and the type of repository according to stash (e.g. NORMAL or PERSONAL).
 
 =head1 SUBROUTINES/METHODS
 

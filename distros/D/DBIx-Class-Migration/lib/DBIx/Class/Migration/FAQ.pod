@@ -142,6 +142,17 @@ yourself:
 
 Patches to fix this, or suggestions welcomed.
 
+=head1 How to run a Migration Script before changing the Schema
+
+If you need to run a Migration Perl Script before the SQL Changes are applied
+to your Database, you have to name your Upgrade Files properly.
+
+    share/migrations/_common/upgrade/5-6/001_transform.pl
+    share/migrations/MySQL/upgrade/5-6/002_auto.sql
+    
+Migration will run the upgrades by the Numbers, no matter in which Upgrade Folder
+they are specified.
+
 =head1 Can I use this even if I don't want to use DBIx::Class?
 
 Not everyone loves using an ORM.  Personally I've found L<DBIx::Class> to be
@@ -180,8 +191,8 @@ given version, manage fixtures, do some sane testing, etc.  Maybe you'll even
 be able to convince people to try out L<DBIx::Class>!
 
 By the way, if you wanted, you can always dump the generated version of your
-classes using C<make_schema> (see L<DBIx::Class::Migrations/make_schema> and
-L<DBIx::Class::Migrations::Script/make_schema>).
+classes using C<make_schema> (see L<DBIx::Class::Migration/make_schema> and
+L<DBIx::Class::Migration::Script/make_schema>).
 
 =head1 I am using MySQL and when the migration fails, it doesn't ROLLBACK
 
@@ -277,7 +288,7 @@ permanently, just add the following to a little bash script in my application
 
 I don't know enough about Postgresql to know if the above settings are good,
 but they work for my testing.  Corrections very welcome!  Ideally I'd try to
-find a way to offer a patch to L<Test::PostgreSQL>, although this seems to be
+find a way to offer a patch to L<Test::Postgresql58>, although this seems to be
 limited to people using Macs.
 
 =head1 How to Release

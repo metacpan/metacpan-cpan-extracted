@@ -40,7 +40,7 @@
    "provides" : {
       "Astro::Utils" : {
          "file" : "lib/Astro/Utils.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -51,6 +51,6 @@
          "web" : "https://github.com/manwar/Astro-Utils"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

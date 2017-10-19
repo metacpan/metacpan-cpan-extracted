@@ -3,7 +3,7 @@ package Debian::Dependency;
 use strict;
 use warnings;
 
-our $VERSION = '0.77';
+our $VERSION = '0.96';
 
 use AptPkg::Config;
 use Carp;
@@ -315,6 +315,16 @@ sub parse {
                     )+
                 \]
             )?
+            (?:             # "restriction formulas" (build profile) is optional
+                \s*         # optional space
+                <
+                    (?:
+                        !?             # negation is optional
+                        [^\s>]+        # build profile name
+                        (?:\s+|(?=>) ) # whitespace or end
+                    )+
+                >
+            )*              # can appear several times
             $}x    # done
         )
     {

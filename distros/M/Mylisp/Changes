@@ -37,3 +37,16 @@ Revision history for Mylisp
 
 1.08    Lint Type is complexiable, Only Lint Symbol if defined!
 
+2.01    2017-10-10
+        generate from Mylisp language, use Estr as Ast data structure
+
+2.02    2017-10-13
+        add Type declare for simuler structure of Golang
+
+2.03    2017-10-15
+        combin Lint.pm to Type.pm and LintAst.pm
+        rewrite Type.pm
+        same function name for return different type is error
+        delete Stack type, use Array replace it.
+        rename Stable => Table
+        rename Table  => Map

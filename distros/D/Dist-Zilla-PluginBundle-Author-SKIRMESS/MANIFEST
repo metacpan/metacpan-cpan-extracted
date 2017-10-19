@@ -12,7 +12,6 @@ README
 cpanfile
 lib/Dist/Zilla/Plugin/Author/SKIRMESS/InsertVersion.pm
 lib/Dist/Zilla/Plugin/Author/SKIRMESS/RepositoryBase.pm
-lib/Dist/Zilla/Plugin/xx.pod
 lib/Dist/Zilla/PluginBundle/Author/SKIRMESS.pm
 perlcriticrc.local
 t/00-load.t

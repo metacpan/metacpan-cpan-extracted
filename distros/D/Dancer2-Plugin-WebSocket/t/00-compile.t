@@ -6,11 +6,12 @@ use warnings;
 
 use Test::More;
 
-plan tests => 2 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Dancer2/Plugin/WebSocket.pm',
-    'Dancer2/Plugin/WebSocket/Connection.pm'
+    'Dancer2/Plugin/WebSocket/Connection.pm',
+    'Dancer2/Plugin/WebSocket/Group.pm'
 );
 
 

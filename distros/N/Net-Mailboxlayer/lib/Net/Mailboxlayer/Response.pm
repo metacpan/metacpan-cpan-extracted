@@ -3,7 +3,7 @@ package Net::Mailboxlayer::Response;
 use strict;
 use warnings;
 
-$Net::Mailboxlayer::Response::VERSION = '0.001';
+$Net::Mailboxlayer::Response::VERSION = '0.003';
 
 sub new
 {
@@ -47,6 +47,7 @@ Net::Mailboxlayer::Response - Encapsulates a response from mailboxlayer.com's RE
  if (not $result->has_error)
  {
    # $result is a F<Net::Mailboxlayer::Response> object.
+   print $result->score . "\n";
  }
 
 =head1 DESCRIPTION
@@ -65,7 +66,7 @@ This is a convenience method that allows you to determine if the result object h
 
 Contains the exact email address requested
 
- orunt $result->email; # support@apilayer.com
+ print $result->email; # support@apilayer.com
 
 =head2 did_you_mean
 

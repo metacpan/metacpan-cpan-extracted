@@ -34,11 +34,21 @@
 #include "err.hpp"
 #include "macros.hpp"
 
+#ifndef ZMQ_HAVE_WINDOWS
+#include <net/if.h>
+#endif
+
+#if defined IFNAMSIZ
+#define BINDDEVSIZ IFNAMSIZ
+#else
+#define BINDDEVSIZ 16
+#endif
+
 zmq::options_t::options_t () :
     sndhwm (1000),
     rcvhwm (1000),
     affinity (0),
-    identity_size (0),
+    routing_id_size (0),
     rate (100),
     recovery_ivl (10000),
     multicast_hops (1),
@@ -60,7 +70,7 @@ zmq::options_t::options_t () :
     immediate (0),
     filter (false),
     invert_matching(false),
-    recv_identity (false),
+    recv_routing_id (false),
     raw_socket (false),
     raw_notify (true),
     tcp_keepalive (-1),
@@ -69,6 +79,8 @@ zmq::options_t::options_t () :
     tcp_keepalive_intvl (-1),
     mechanism (ZMQ_NULL),
     as_server (0),
+    gss_principal_nt (ZMQ_GSSAPI_NT_HOSTBASED),
+    gss_service_principal_nt (ZMQ_GSSAPI_NT_HOSTBASED),
     gss_plaintext (false),
     socket_id (0),
     conflate (false),
@@ -77,7 +89,8 @@ zmq::options_t::options_t () :
     heartbeat_ttl (0),
     heartbeat_interval (0),
     heartbeat_timeout (-1),
-    use_fd (-1)
+    use_fd (-1),
+    zap_enforce_domain (false)
 {
     memset (curve_public_key, 0, CURVE_KEYSIZE);
     memset (curve_secret_key, 0, CURVE_KEYSIZE);
@@ -154,11 +167,11 @@ int zmq::options_t::setsockopt (int option_, const void *optval_,
             }
             break;
 
-        case ZMQ_IDENTITY:
-            //  Identity is any binary string from 1 to 255 octets
+        case ZMQ_ROUTING_ID:
+            //  Routing id is any binary string from 1 to 255 octets
             if (optvallen_ > 0 && optvallen_ < 256) {
-                identity_size = (unsigned char) optvallen_;
-                memcpy (identity, optval_, identity_size);
+                routing_id_size = (unsigned char) optvallen_;
+                memcpy (routing_id, optval_, routing_id_size);
                 return 0;
             }
             break;
@@ -509,6 +522,24 @@ int zmq::options_t::setsockopt (int option_, const void *optval_,
                 return 0;
             }
             break;
+
+        case ZMQ_GSSAPI_PRINCIPAL_NAMETYPE:
+            if (is_int && (value == ZMQ_GSSAPI_NT_HOSTBASED
+                        || value == ZMQ_GSSAPI_NT_USER_NAME
+                        || value == ZMQ_GSSAPI_NT_KRB5_PRINCIPAL)) {
+                gss_principal_nt = value;
+                return 0;
+            }
+            break;
+
+        case ZMQ_GSSAPI_SERVICE_PRINCIPAL_NAMETYPE:
+            if (is_int && (value == ZMQ_GSSAPI_NT_HOSTBASED
+                        || value == ZMQ_GSSAPI_NT_USER_NAME
+                        || value == ZMQ_GSSAPI_NT_KRB5_PRINCIPAL)) {
+                gss_service_principal_nt = value;
+                return 0;
+            }
+            break;
 #endif
 
         case ZMQ_HANDSHAKE_IVL:
@@ -585,6 +616,27 @@ int zmq::options_t::setsockopt (int option_, const void *optval_,
             }
             break;
 
+        case ZMQ_BINDTODEVICE:
+            if (optval_ == NULL && optvallen_ == 0) {
+                bound_device.clear ();
+                return 0;
+            }
+            else
+            if (optval_ != NULL && optvallen_ > 0 && optvallen_ <= BINDDEVSIZ) {
+                bound_device =
+                    std::string ((const char *) optval_, optvallen_);
+                return 0;
+            }
+            break;
+
+        case ZMQ_ZAP_ENFORCE_DOMAIN:
+            if (is_int) {
+                zap_enforce_domain = (value != 0);
+                return 0;
+            }
+            break;
+
+
         default:
 #if defined (ZMQ_ACT_MILITANT)
             //  There are valid scenarios for probing with unknown socket option
@@ -636,10 +688,10 @@ int zmq::options_t::getsockopt (int option_, void *optval_, size_t *optvallen_) 
             }
             break;
 
-        case ZMQ_IDENTITY:
-            if (*optvallen_ >= identity_size) {
-                memcpy (optval_, identity, identity_size);
-                *optvallen_ = identity_size;
+        case ZMQ_ROUTING_ID:
+            if (*optvallen_ >= routing_id_size) {
+                memcpy (optval_, routing_id, routing_id_size);
+                *optvallen_ = routing_id_size;
                 return 0;
             }
             break;
@@ -943,6 +995,19 @@ int zmq::options_t::getsockopt (int option_, void *optval_, size_t *optvallen_) 
                 return 0;
             }
             break;
+
+        case ZMQ_GSSAPI_PRINCIPAL_NAMETYPE:
+            if (is_int) {
+                *value = gss_principal_nt;
+                return 0;
+            }
+            break;
+        case ZMQ_GSSAPI_SERVICE_PRINCIPAL_NAMETYPE:
+            if (is_int) {
+                *value = gss_service_principal_nt;
+                return 0;
+            }
+            break;
 #endif
 
         case ZMQ_HANDSHAKE_IVL:
@@ -984,6 +1049,21 @@ int zmq::options_t::getsockopt (int option_, void *optval_, size_t *optvallen_) 
         case ZMQ_USE_FD:
             if (is_int) {
                 *value = use_fd;
+                return 0;
+            }
+            break;
+
+        case ZMQ_BINDTODEVICE:
+            if (*optvallen_ >= bound_device.size () + 1) {
+                memcpy (optval_, bound_device.c_str (), bound_device.size () + 1);
+                *optvallen_ = bound_device.size () + 1;
+                return 0;
+            }
+            break;
+
+        case ZMQ_ZAP_ENFORCE_DOMAIN:
+            if (is_int) {
+                *value = zap_enforce_domain;
                 return 0;
             }
             break;

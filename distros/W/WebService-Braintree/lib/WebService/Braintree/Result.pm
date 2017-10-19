@@ -1,8 +1,14 @@
 package WebService::Braintree::Result;
-$WebService::Braintree::Result::VERSION = '0.93';
+$WebService::Braintree::Result::VERSION = '0.94';
+use 5.010_001;
+use strictures 1;
+
 use Moose;
 use Hash::Inflator;
-use WebService::Braintree::Util;
+
+use WebService::Braintree::Util qw(is_hashref);
+
+# XXX: Why only these classes?
 use WebService::Braintree::ValidationErrorCollection;
 use WebService::Braintree::CreditCardVerification;
 use WebService::Braintree::Nonce;
@@ -20,7 +26,7 @@ my $response_objects = {
         credit_card => "WebService::Braintree::CreditCard",
         paypal_account => "WebService::Braintree::PayPalAccount"
     },
-    payment_method_nonce => "WebService::Braintree::Nonce",
+    payment_method_nonce => 'WebService::Braintree::Nonce',
     settlement_batch_summary => "WebService::Braintree::SettlementBatchSummary",
     subscription => "WebService::Braintree::Subscription",
     transaction => "WebService::Braintree::Transaction",
@@ -36,7 +42,7 @@ sub _get_response {
 sub patch_in_response_accessors {
     my $field_rules = shift;
     while (my($key, $rule) = each(%$field_rules)) {
-        if (ref($rule) eq "HASH") {
+        if (is_hashref($rule)) {
             $meta->add_method($key, sub {
                                   my $self = shift;
                                   my $response = $self->_get_response();
@@ -70,8 +76,10 @@ patch_in_response_accessors($response_objects);
 
 sub is_success {
     my $self = shift;
-    return 1 unless $self->response->{'api_error_response'};
-    return 0;
+
+    return if $self->response->{'api_error_response'};
+
+    return 1;
 }
 
 sub api_error_response {
@@ -96,5 +104,6 @@ sub credit_card_verification {
 }
 
 __PACKAGE__->meta->make_immutable;
-1;
 
+1;
+__END__

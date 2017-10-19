@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use Struct::Path::PerlStyle qw(ps_parse);
-use Test::More tests => 36;
+use Test::More tests => 38;
 
 ### EXCEPTIONS ###
 
@@ -51,6 +51,13 @@ like($@, qr/^Unsupported thing '\+' for hash key, step #1 /, "garbage in hash ke
 
 eval { ps_parse('{/a//}') };
 like($@, qr|^Unsupported thing '/' for hash key, step #0 |, "regexp and one more slash");
+
+### Immutable $_ ###
+
+$_ = 'bareword';
+eval { ps_parse($_) };
+like($@, qr/^Unsupported thing 'bareword' in the path, step #0 at /);
+is($_, 'bareword', '$_ must remain unchanged');
 
 ### EMPTY PATH ###
 

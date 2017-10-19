@@ -1,0 +1,34 @@
+---
+abstract: unknown
+author:
+  - 'Kevin Tew'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-TEWK-tt
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Cwd: '0'
+  DateTime: '0.37'
+  File::Find::Rule: '0'
+  List::MoreUtils: '0'
+  Modern::Perl: '0'
+  Term::ANSIColor: '0'
+  Term::ReadKey: '0'
+  perl: '5.22'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: https://github.com/tewk/tt.git
+version: 0.01
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

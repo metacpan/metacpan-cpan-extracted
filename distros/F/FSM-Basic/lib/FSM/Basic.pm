@@ -10,11 +10,11 @@ FSM::Basic -  Finite state machine using HASH as state definitions
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =cut
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 =head1 SYNOPSIS
 
@@ -106,50 +106,50 @@ The keys are the states name.
 
 =over 4
 
-=item * 
+=item *
 "cat" just reading the file content provided in parameter).
 
-=item * 
+=item *
 "catRAND" chose randomly one of the files provided in parameter space separated
 
-=item * 
-"catSEQ" read sequentialy the next files provided in parameter space separated 
-        if "catSEQ_idx" is defined, that file is used to keep the state. Otherwise , the state file is named used 
-        all the files name from "catSEQ" concatenated with a final '.tate'. All spaces are replaced by an underscore 
+=item *
+"catSEQ" read sequentialy the next files provided in parameter space separated
+        if "catSEQ_idx" is defined, that file is used to keep the state. Otherwise , the state file is named used
+        all the files name from "catSEQ" concatenated with a final '.tate'. All spaces are replaced by an underscore
 
 =back
 
-=item 
+=item
 
 "matching" to define the state when the input match the "expect" value
 
 
-=item 
+=item
 
 "final" to return a flag
 
 
-=item 
+=item
 
 "not_matching" the state if the input is not matching the "expect" value (if missing stay in the same state)
 
 
-=item 
+=item
 
 "repeat" a number of trial before the state goes to "not_matching0"
 
 
-=item 
+=item
 
 "not_matching0" the state when the number of failled matching number is reached
 
 
-=item 
+=item
 
 "not_matching_info_last" info returned as second value when the  failled matching number is reached
 
 
-=item 
+=item
 
 "output" the info  returned as second value
 
@@ -270,6 +270,21 @@ sub run {
                     $output = sprintf("%s", $string) . $output;
                     $state->{catRAND} = $old_cat;
                 }
+                if (exists $state->{catWRAND}) {
+                    my $old_cat = $state->{catWRAND};
+                    $state->{catWRAND} =~ s/__IN__/$in/g;
+                    my %files =  map { split /:/} split /\s+/, $state->{catWRAND};
+                    my $file  ;
+                    my $weight;
+                    while ( my ( $p, $w ) = each %files ) {
+                       $w //=1;
+                       $weight += $w//1;
+                       $file = $p if rand($weight) < $w;
+                    }
+                    my $string = do { local (@ARGV, $/) = $file; <> };
+                    $output = sprintf("%s", $string) . $output;
+                    $state->{catWRAND} = $old_cat;
+                }
                 if (exists $state->{catSEQ}) {
                     my $old_cat =$state->{catSEQ};
                     my $state_file;
@@ -278,7 +293,7 @@ sub run {
                     }else{
                     $state_file = $old_cat . '.state';
                     $state_file =~ s/\s/_/g;
-                    
+
                      }
                     $state->{catSEQ} =~ s/__IN__/$in/g;
                     my @files = split /\s+/, $state->{catSEQ};
@@ -324,6 +339,9 @@ sub write_file {
     print $fh $content;
     close $fh or die "Error closing file $file: $!\n";
 }
+
+
+
 
 package FSM::Basic::Modulo;
 sub TIESCALAR { bless [ $_[2] || 0, $_[1] ] => $_[0] }

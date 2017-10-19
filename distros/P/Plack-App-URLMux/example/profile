@@ -1,0 +1,11 @@
+
+PERL5LIB="$PWD/perl5/lib/perl5:$PWD/../lib"
+PATH="$PWD/perl5/bin:$PATH"
+export PERL5LIB PATH
+
+PERL=perl
+PLACKUP=plackup
+
+PORT=8088
+WORKERS=10
+MODE=deployment

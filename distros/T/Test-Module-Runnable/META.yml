@@ -1,24 +1,26 @@
----
-abstract: 'Base class for runnable unit tests using Moose introspection'
+--- #YAML:1.0
+name:               Test-Module-Runnable
+version:            0.2.3
+abstract:           Base class for runnable unit tests using Moose introspection
 author:
-  - 'David Duncan Ross Palmer, 2E0EOL (palmer@overchat.org)'
-build_requires:
-  Moose: '0'
-  Test::More: '0'
+    - Duncan Ross Palmer, 2E0EOL (palmer@overchat.org)
+license:            unknown
+distribution_type:  module
 configure_requires:
-  ExtUtils::MakeMaker: '0'
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380'
-license: unknown
-meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: '1.4'
-name: Test-Module-Runnable
-no_index:
-  directory:
-    - t
-    - inc
+    ExtUtils::MakeMaker:  0
+build_requires:
+    List::MoreUtils:  0
+    Moose:            0
+    Readonly:         0
+    Test::More:       0
 requires:
-  Moose: '0'
-  Test::More: '0'
-version: v0.1.0
+    Moose:       0
+    Test::More:  0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

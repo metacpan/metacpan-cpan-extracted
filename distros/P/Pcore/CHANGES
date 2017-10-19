@@ -1,3 +1,10 @@
+v0.56.1 2017-10-16T01:48:21Z
+ - cookies expired date fixed
+
+v0.56.0 2017-10-13T19:10:11Z
+ - http redirects processing improved
+ - http recurse renamed to max_redirects
+
 v0.55.0 2017-09-28T15:58:06Z
  - toml integrated
  - perl v5.26.1

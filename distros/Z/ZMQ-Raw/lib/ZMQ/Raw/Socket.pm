@@ -1,9 +1,11 @@
 package ZMQ::Raw::Socket;
-$ZMQ::Raw::Socket::VERSION = '0.03';
+$ZMQ::Raw::Socket::VERSION = '0.08';
 use strict;
 use warnings;
 use Carp;
 use ZMQ::Raw;
+
+sub CLONE_SKIP { 1 }
 
 sub AUTOLOAD
 {
@@ -29,11 +31,32 @@ ZMQ::Raw::Socket - ZeroMQ Socket class
 
 =head1 VERSION
 
-version 0.03
+version 0.08
 
 =head1 DESCRIPTION
 
 A L<ZMQ::Raw::Socket> represents a ZeroMQ socket.
+
+=head1 SYNOPSIS
+
+	use ZMQ::Raw;
+
+	# receive a single message-part
+	my $msg = $socket->recvmsg();
+
+	# receive all message parts
+	my @msgs = $socket->recvmsg();
+
+	# send multiple message parts
+	$socket->sendmsg ('hello', 'world'); # flags cannot be used here
+
+	# or
+	my $msg1 = ZMQ::Raw::Message->new;
+	$msg1->data ('hello');
+
+	my $msg2 = ZMQ::Raw::Message->new;
+	$msg2->data ('world');
+	$socket->sendmsg ($msg1, $msgs2, 0); # flags can be used here
 
 =head1 METHODS
 
@@ -94,31 +117,53 @@ discarded.
 Queue a message created from C<$buffer>. C<$flags> defaults to C<0> but may
 be a combination of:
 
+=head2 close( )
+
+Close the socket. Any outstanding messages physically received from the network
+but not yet received by the application will be discarded.
+
+=head2 monitor( $endpoint, $events)
+
+Track socket events. Each call to this method creates a C<ZMQ_PAIR> socket and
+binds that to the specified inproc C<$endpoint>. In order to collect socket
+events, you must create your own C<ZMQ_PAIR> socket and connect it to the
+C<$endpoint>.
+
 =over 4
 
 =item * C<ZMQ::Raw-E<gt>ZMQ_DONTWAIT>
 
-unicast transport using TCP
+Perform the operation in non-blocking mode. This method will return
+C<undef> if the message cannot be sent immediately.
 
 =item * C<ZMQ::Raw-E<gt>ZMQ_SNDMORE>
 
-local inter-process communication transport
+The message is part of a multi-part message and further message parts are to
+follow.
 
 =back
 
-=head2 sendmsg( $msg, $flags = 0)
+=head2 sendmsg( @msgs, $flags = 0)
 
-Queue C<$msg> to be sent.
+Queue C<@msgs> to be sent. Each message in C<@msgs> that is a L<C<ZMQ::Raw::Message>>
+is still valid after this call, that is, they may be reused. Each item in C<@msgs>
+may either be a L<C<ZMQ::Raw::Message>> object or a "normal" perl scalar. The
+C<$flags> parameter is only available if all items in C<@msgs> are L<C<ZMQ::Raw::Message>>
+objects. See the SYNOPSIS for usage examples.
 
-=head2 recv( $size = 1024*1024, $flags = 0)
+=head2 recv( $flags = 0)
 
-Receive a message. If C<$size> does not have enough space to store a full
-message, it will be truncated. If there are no messages available the method
-will block until the request can be satisfied.
+Receive a message. If there are no messages available the method will block
+until the request can be satisfied unless the C<ZMQ_DONTWAIT> flag is specified.
+If a message is not available and C<ZMQ_DONTWAIT> has been specified, this
+method will return C<undef> immediately. If called in list context, this method
+will return each part of the message as a scalar item. In scalar context, each
+part of the message will be concatenated into a single scalar item.
 
 =head2 recvmsg( $flags = 0)
 
-Receive a message part. Returns a L<C<ZMQ::Raw::Message>> object.
+Receive a message part or multiple messages parts if called in list context.
+Returns a L<C<ZMQ::Raw::Message>> object or an array of object.
 
 =head2 setsockopt( $option, $value )
 

@@ -1,5 +1,5 @@
 package ZMQ::Raw::Error;
-$ZMQ::Raw::Error::VERSION = '0.03';
+$ZMQ::Raw::Error::VERSION = '0.08';
 use strict;
 use warnings;
 use Carp;
@@ -9,6 +9,8 @@ use overload
 	'0+'       => sub { return $_[0] -> code },
 	'bool'     => sub { 1 },
 	'fallback' => 1;
+
+sub CLONE_SKIP { 1 }
 
 sub AUTOLOAD
 {
@@ -36,7 +38,7 @@ ZMQ::Raw::Error - Error class
 
 =head1 VERSION
 
-version 0.03
+version 0.08
 
 =head1 DESCRIPTION
 

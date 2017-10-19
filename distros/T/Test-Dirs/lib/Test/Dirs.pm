@@ -1,54 +1,9 @@
 package Test::Dirs;
 
-=head1 NAME
-
-Test::Dirs - easily copy and compare folders inside tests
-
-=head1 SYNOPSIS
-
-	use Test::More tests => 5;
-	use Test::Dirs;
-	
-	# make a temporary copy of a folder
-	my $tmp_dir = temp_copy_ok($src_dir, 'copy template to tmp folder');
-	
-	# compare one folder with another
-	is_dir($src_dir, $tmp_dir, 'temp copy should be the same as source');
-	
-	# set files to ignore
-	my @ignore_files = qw(.ignore_me);
-	open(my $fh, '>', File::Spec->catfile($tmp_dir, '.ignore_me')) or die $!;
-	is_dir($src_dir, $tmp_dir, 'temp copy should be the same as source', \@ignore_files);
-	
-	TODO: {
-		local $TODO = 'do something with the extra file in the future';
-		is_dir($src_dir, $tmp_dir, 'fails without @ignore_files');
-	};
-	
-	# be verbose, print out the diff if doesn't match
-	is_dir($src_dir, $tmp_dir, 'test with verbose on', \@ignore_files, 'verbose');
-	
-=head1 DESCRIPTION
-
-Exports test function L</is_dir> to compare two folders if their file
-structure match and a function to make a temporary copy of a folder
-L</temp_copy_ok> so it can be safely manipulated and compared to another
-folder.
-
-Can be used to test modules or programs that are manipulating a whole folder
-structure via making a temporary copy of a initial folder state. Calling
-module or a program to manipulate files inside this temporary folder and
-then comparing it to a desired folder state.
-
-In addition there is a L</dir_cleanup_ok> function that can be used to
-completely remove folder structures that are not important for comparing.
-
-=cut
-
 use warnings;
 use strict;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use base 'Exporter';
 our @EXPORT = qw(
@@ -69,23 +24,6 @@ use File::Path 2.07 'remove_tree';
 
 our $test = Test::Builder->new;
 
-=head1 EXPORTS
-
-    temp_copy_ok()
-    is_dir()
-    dir_cleanup_ok()
-
-=head1 FUNCTIONS
-
-=head2 temp_copy_ok($src_dir, [$message])
-
-Will recursively copy C<$src_dir> to a L<File::Temp/newdir> folder and
-returning L<File::Temp::Dir> object. This object will stringify to a
-path and when destroyed (will leave the scope) folder is automatically
-deleted.
-
-=cut
-
 sub temp_copy_ok {
 	my $src_dir = shift or confess 'pass source folder as argument';
 	my $message = shift || 'copy of '.$src_dir;
@@ -102,14 +40,6 @@ sub temp_copy_ok {
 	
 	return $dst_dir;
 }
-
-=head2 is_dir($dir1, $dir2, [$message, \@ignore_files, $verbose])
-
-Compares C<$dir1> with C<$dir2>. Files that has to be ignored (are not important)
-can be specified as C<@ignore_files>. The filenames are relative to the C<$dir1(2)>
-folders.
-
-=cut
 
 sub is_dir {
 	my $dir1 = shift or confess 'pass folders as argument';
@@ -164,18 +94,6 @@ sub is_dir {
 	}
 }
 
-=head2 dir_cleanup_ok($filename, [$message])
-
-If the C<$filename> is a folder. Removes this folder and all empty
-folders upwards.
-
-If the C<$filename> is a file. Removes parent folder of this file and all empty
-folders upwards.
-
-PS: Just be careful :-)
-
-=cut
-
 sub dir_cleanup_ok {
 	my $filename = shift or confess 'pass filename as argument';
 	my $message  = shift;
@@ -213,6 +131,80 @@ sub dir_cleanup_ok {
 
 
 __END__
+
+=head1 NAME
+
+Test::Dirs - easily copy and compare folders inside tests
+
+=head1 SYNOPSIS
+
+	use Test::More tests => 5;
+	use Test::Dirs;
+	
+	# make a temporary copy of a folder
+	my $tmp_dir = temp_copy_ok($src_dir, 'copy template to tmp folder');
+	
+	# compare one folder with another
+	is_dir($src_dir, $tmp_dir, 'temp copy should be the same as source');
+	
+	# set files to ignore
+	my @ignore_files = qw(.ignore_me);
+	open(my $fh, '>', File::Spec->catfile($tmp_dir, '.ignore_me')) or die $!;
+	is_dir($src_dir, $tmp_dir, 'temp copy should be the same as source', \@ignore_files);
+	
+	TODO: {
+		local $TODO = 'do something with the extra file in the future';
+		is_dir($src_dir, $tmp_dir, 'fails without @ignore_files');
+	};
+	
+	# be verbose, print out the diff if doesn't match
+	is_dir($src_dir, $tmp_dir, 'test with verbose on', \@ignore_files, 'verbose');
+	
+=head1 DESCRIPTION
+
+Exports test function L</is_dir> to compare two folders if their file
+structure match and a function to make a temporary copy of a folder
+L</temp_copy_ok> so it can be safely manipulated and compared to another
+folder.
+
+Can be used to test modules or programs that are manipulating a whole folder
+structure via making a temporary copy of a initial folder state. Calling
+module or a program to manipulate files inside this temporary folder and
+then comparing it to a desired folder state.
+
+In addition there is a L</dir_cleanup_ok> function that can be used to
+completely remove folder structures that are not important for comparing.
+
+=head1 EXPORTS
+
+    temp_copy_ok()
+    is_dir()
+    dir_cleanup_ok()
+
+=head1 FUNCTIONS
+
+=head2 temp_copy_ok($src_dir, [$message])
+
+Will recursively copy C<$src_dir> to a L<File::Temp/newdir> folder and
+returning L<File::Temp::Dir> object. This object will stringify to a
+path and when destroyed (will leave the scope) folder is automatically
+deleted.
+
+=head2 is_dir($dir1, $dir2, [$message, \@ignore_files, $verbose])
+
+Compares C<$dir1> with C<$dir2>. Files that has to be ignored (are not important)
+can be specified as C<@ignore_files>. The filenames are relative to the C<$dir1(2)>
+folders.
+
+=head2 dir_cleanup_ok($filename, [$message])
+
+If the C<$filename> is a folder. Removes this folder and all empty
+folders upwards.
+
+If the C<$filename> is a file. Removes parent folder of this file and all empty
+folders upwards.
+
+PS: Just be careful :-)
 
 =head1 SEE ALSO
 

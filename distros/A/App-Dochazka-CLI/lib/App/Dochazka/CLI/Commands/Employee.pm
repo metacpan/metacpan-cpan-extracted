@@ -575,8 +575,7 @@ sub _display_employee_ok {
     $message .= "Full name:    " . ( $emp->fullname ? $emp->fullname : "(not set)" ) . "\n";
     $message .= "Nick:         " . $emp->nick . "\n";
     $message .= "Email:        " . ( $emp->email || "(not set)" ) . "\n";
-    $message .= "Secondary ID: " . ( $emp->sec_id ? $emp->sec_id : "(not set)" ) . "\n";
-    $message .= "Dochazka EID: " . $emp->eid . "\n";
+    $message .= "Workforce ID: " . ( $emp->sec_id ? $emp->sec_id : "(not set)" ) . "\n";
     $message .= "Reports to:   " . ( $supervisor->nick || "(not set)" ) . "\n";
 
     return $CELL->status_ok( 'DOCHAZKA_CLI_NORMAL_COMPLETION', payload => $message );

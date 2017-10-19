@@ -113,6 +113,7 @@ t/instance.t
 t/iterator.t
 t/lib/Config/Model/models/Master.pl
 t/lib/DummyNode.pm
+t/lib/MyTestLib.pm
 t/lib/dump_load_model.pm
 t/lib/test_ini_backend_model.pl
 t/lib/test_yaml_model.pl

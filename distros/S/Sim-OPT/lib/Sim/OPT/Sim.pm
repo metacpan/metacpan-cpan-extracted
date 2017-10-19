@@ -44,7 +44,7 @@ use warnings::unused;
 
 our @EXPORT = qw( sim ); # our @EXPORT = qw( );
 
-$VERSION = '0.53'; # our $VERSION = '';
+$VERSION = '0.57'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Sim is the module used by Sim::OPT to launch simulations once the models have been built.'; 
 
 #########################################################################################
@@ -67,7 +67,7 @@ sub sim    # This function launch the simulations in ESP-r
   my $countcase = $dat{countcase}; 
   my $countblock = $dat{countblock}; 
   my %datastruc = %{ $dat{datastruc} }; ######
-    my @rescontainer = @{ $dat{rescontainer} }; ######
+  my @rescontainer = @{ $dat{rescontainer} }; ######
   my %dirfiles = %{ $dat{dirfiles} }; 
     
   $configfile = $main::configfile; 
@@ -139,10 +139,10 @@ sub sim    # This function launch the simulations in ESP-r
   my $repblock = $dirfiles{repblock};
   my $descendlist = $dirfiles{descendlist};
   my $descendblock = $dirfiles{descendblock};
-  
   my $skipfile = $vals{skipfile}; 
   my $skipsim = $vals{skipsim}; 
   my $skipreport = $vals{skipreport}; 
+  my %notecases;
   
   #my $getpars = shift;
   #eval( $getpars );
@@ -178,6 +178,11 @@ sub sim    # This function launch the simulations in ESP-r
     my $from = Sim::OPT::getline($toitem); 
     my %varnums = Sim::OPT::getcase(\@varinumbers, $countcase); 
     my %mids = Sim::OPT::getcase(\@miditers, $countcase); 
+    
+    my %datastruc = %{ $d{datastruc} }; ################################say $tee "dump(\@sweeps): " . dump(@sweeps);######
+    my @rescontainer = @{ $d{rescontainer} }; ###############################say $tee "dump(\%rescontainer): " . dump(%rescontainer);######
+    my $skip = $vals{$countvar}{skip}; #########################################
+    my ( $resfile, $flfile );
     #eval($getfly);
     
     my $stepsvar = Sim::OPT::getstepsvar($countvar, $countcase, \@varinumbers); 
@@ -199,6 +204,7 @@ sub sim    # This function launch the simulations in ESP-r
     
     my $numberof_simtools = scalar ( keys %{ $dowhat{simtools} } ); 
     my $simelt = $to;
+
     
     my $counttool = 1;
     while ( $counttool <= $numberof_simtools )
@@ -219,10 +225,8 @@ sub sim    # This function launch the simulations in ESP-r
           {
             $launchline = "-file $simelt\\cfg\\$fileconfig -mode script";
           }
-          
-          
-          
-          
+
+
           my $countsim = 0;    
           foreach my $simtitle_ref ( @{ $simtitles{$counttool} } )
           {
@@ -232,8 +236,8 @@ sub sim    # This function launch the simulations in ESP-r
             my $before = $simtitle_ref->[3]; 
             my $step = $simtitle_ref->[4]; 
             
-            my $resfile = "$simelt-$date_to_sim-$tooltype.res"; 
-            my $flfile = "$simelt-$date_to_sim-$tooltype.fl"; 
+            $resfile = "$simelt-$date_to_sim-$tooltype.res"; 
+            $flfile = "$simelt-$date_to_sim-$tooltype.fl"; 
 
             #if ( fileno (SIMLIST) )
             #if (not (-e $simlist ) )
@@ -261,28 +265,23 @@ sub sim    # This function launch the simulations in ESP-r
               }
             }
             
-            
-            
-            
-            
-            
-            
+
             if ( not ( Sim::OPT::checkdone( $to, @rescontainer ) eq "yes" ) )
-      {
-        push( @rescontainer, $line );
-      }
-            
-            
+            {
+              push( @rescontainer, $line );
+            }
             
             push ( @{ $simstruct[ $countcase ][ $countblock ][ $countinstance ][$counttool] }, $resfile );
             print SIMBLOCK "$resfile\n";
             
-            if  ( ( ( not ( $resfile ~~ @simcases ) ) and ( not ( -e $resfile ) ) ) or ( not ( Sim::OPT::checkdone( $to, @rescontainer ) eq "yes" ) ) )
+            if  ( ( ( not ( $resfile ~~ @simcases ) ) and ( not ( -e $resfile ) ) ) 
+              or ( not ( Sim::OPT::checkdone( $to, @rescontainer ) eq "yes" ) ) 
+              )
             {
               push ( @simcases, $resfile );
               print SIMLIST "$resfile\n";
                 
-              unless ( ( $preventsim eq "y" ) or ( $dowhat{inactivatesim} eq "y" ) )
+              unless ( ( $preventsim eq "y" ) or ( $dowhat{inactivatesim} eq "y" ) or ( $dowhat{simulate} eq "n" ) )
               {
                 if ( $simnetwork eq "y" )
                 {
@@ -356,9 +355,12 @@ $printthis
 ";
                 }          
               }    
-            }              
+            }
+
             $countsim++;
           }
+
+
         }
         elsif ( ( $tooltype eq ( "generic" ) ) or ( $tooltype eq ( "energyplus" ) ) )
         {  # TO DO: POSSIBILITY TO SPECIFY LINE AND ELEMENT OF TEXT SUBSTITUTIONS.
@@ -387,6 +389,8 @@ $printthis
             my $epresroot = $tempname . $epnewfragment ; say "\$epw $epresroot ";
             
             my $epnewpath;
+            my $resfile;
+
             unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) ) 
             { 
               $epnewpath = $to . $epdir . "/" . $epnewfile; 
@@ -440,7 +444,7 @@ $printthis
             
             my $simelt = $mypath . "$outputdir"; 
             
-            my $resfile;
+            
             unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) ) 
             {
               $resfile = "$simelt/$epresroot$resfiletype"; 
@@ -555,22 +559,65 @@ $printthis
                 }
               }  
             }
+
+
             $countsim++;
           }
         }
       }
       $counttool++;
-    }  
+    }
     #$pm->finish; # Terminates the child process
+
+    
+
+    #say $tee "DUE resfile: $resfile!";
+
+    if ( $dowhat{newretrieve} eq "y" )
+    {
+      #say $tee "INSIM1: countinstance: $countinstance";
+      my @result = Sim::OPT::Report::newretrieve( 
+      { 
+        instances => \@instances, countcase => $countcase, countblock => $countblock, 
+        dirfiles => \%dirfiles, datastruc => \%datastruc, rescontainer => \@rescontainer, countinstance => $countinstance,
+        simcases => \@simcases, simstruct => \@simstruct, resfile => $resfile,
+      } );
+      $dirfiles{retcases} = $result[0]; 
+      $dirfiles{retstruct} = $result[1];
+      $dirfiles{notecases} = $result[2];
+    }
+
+    if ( $dowhat{newreport} eq "y" )
+    { 
+      #say $tee "INSIM2: countinstance: $countinstance";
+      my @result = Sim::OPT::Report::newreport( 
+      { 
+        instances => \@instances, countcase => $countcase, countblock => $countblock, 
+        dirfiles => \%dirfiles, datastruc => \%datastruc, rescontainer => \@rescontainer, countinstance => $countinstance, 
+        resfile => $resfile, simcases => \@simcases, simstruct => \@simstruct, resfile => $resfile,
+      } );
+      $dirfiles{repcases} = $result[0];
+      $dirfiles{repstruct} = $result[1];
+      $dirfiles{mergestruct} = $result[2];
+      $dirfiles{mergecases} = $result[3];
+      $dirfiles{repfilebackup} = $result[4];
+    }
+    
+
+            
+
+
     $countinstance++;
   }
   close SIMLIST;
   close SIMBLOCK;
   
-  
-  return ( \@simcases, \@simstruct );
+  return ( \@simcases, \@simstruct, $dirfiles{retcases}, $dirfiles{retstruct}, $dirfiles{notecases}, $dirfiles{repcases},
+  $dirfiles{repstruct}, $dirfiles{mergestruct}, $dirfiles{mergecases}, $dirfiles{repfilebackup} );
   close TOFILE;
   close OUTFILE;
+
+
 }    # END SUB sim;      
 
 # END OF THE CONTENT OF Sim::OPT::Sim

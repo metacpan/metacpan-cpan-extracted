@@ -1,5 +1,8 @@
 package WebService::Braintree::Transaction;
-$WebService::Braintree::Transaction::VERSION = '0.93';
+$WebService::Braintree::Transaction::VERSION = '0.94';
+use 5.010_001;
+use strictures 1;
+
 =head1 NAME
 
 WebService::Braintree::Transaction
@@ -219,22 +222,29 @@ will be a L<WebService::Braintree::Subscription> object.
 has subscription => (is => 'rw');
 
 sub BUILD {
-    my ($self, $attributes) = @_;
-    my $sub_objects = {
+    my ($self, $attrs) = @_;
+
+    $self->build_sub_object($attrs,
+        method => 'subscription',
+        class  => 'Subscription',
+        key    => 'subscription',
+    );
+    $self->build_sub_object($attrs,
+        method => 'disbursement_details',
+        class  => 'DisbursementDetails',
+        key    => 'disbursement_details',
+    );
+    $self->build_sub_object($attrs,
+        method => 'paypal_details',
+        class  => 'PayPalDetails',
+        key    => 'paypal',
+    );
+
+    $self->setup_sub_objects($self, $attrs, {
         disputes => 'WebService::Braintree::Dispute',
-    };
+    });
 
-    $self->subscription(WebService::Braintree::Subscription->new($attributes->{subscription})) if ref($attributes->{subscription}) eq 'HASH';
-    delete($attributes->{subscription});
-
-    $self->disbursement_details(WebService::Braintree::DisbursementDetails->new($attributes->{disbursement_details})) if ref($attributes->{disbursement_details}) eq 'HASH';
-    delete($attributes->{disbursement_details});
-
-    $self->paypal_details(WebService::Braintree::PayPalDetails->new($attributes->{paypal})) if ref($attributes->{paypal}) eq 'HASH';
-    delete($attributes->{paypal});
-
-    $self->setup_sub_objects($self, $attributes, $sub_objects);
-    $self->set_attributes_from_hash($self, $attributes);
+    $self->set_attributes_from_hash($self, $attrs);
 }
 
 =head2 is_disbursed()
@@ -246,7 +256,7 @@ valid.
 
 sub is_disbursed {
     my $self = shift;
-    $self->disbursement_details->is_valid();
+    $self->disbursement_details && $self->disbursement_details->is_valid();
 };
 
 __PACKAGE__->meta->make_immutable;

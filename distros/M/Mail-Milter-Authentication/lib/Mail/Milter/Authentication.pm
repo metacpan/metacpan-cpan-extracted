@@ -2,7 +2,7 @@ package Mail::Milter::Authentication;
 use strict;
 use warnings;
 use base 'Net::Server::PreFork';
-use version; our $VERSION = version->declare('v1.1.3');
+use version; our $VERSION = version->declare('v1.1.4');
 
 use English qw{ -no_match_vars };
 use ExtUtils::Installed;
@@ -257,9 +257,10 @@ sub child_is_talking_hook {
     my ( $self, $socket ) = @_;
 
     my $request;
+    my $raw_request;
 
     eval {
-        my $raw_request = <$socket>;
+        $raw_request = <$socket>;
         return if ! $raw_request;
         $request = decode_json( $raw_request );
     };
@@ -269,6 +270,10 @@ sub child_is_talking_hook {
     }
     else {
 
+        if ( ! $request ) {
+            warn "Ignoring Invalid child request: $raw_request;";
+            return;
+        }
         $request =~ s/[\n\r]+$//;
         if ( $request->{ 'method' } eq 'METRIC.GET' ) {
             $self->{'metric'}->master_handler( $request, $socket, $self );
@@ -702,6 +707,7 @@ sub start {
     _warn "==========";
 
     my @start_times;
+    my $parent_pid = $PID;
     while ( 1 ) {
         unshift @start_times, time();
 
@@ -709,6 +715,10 @@ sub start {
             __PACKAGE__->run( %srvargs );
         };
         my $error = $@;
+        if ( $PID != $parent_pid ) {
+            _warn "Child exiting";
+            die;
+        }
         $error = 'unknown error' if ! $error;
         _warn "Server failed: $error";
 

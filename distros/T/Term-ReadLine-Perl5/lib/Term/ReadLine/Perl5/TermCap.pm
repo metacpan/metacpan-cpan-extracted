@@ -8,6 +8,7 @@ With this, I have modifed I<Term::ReadLine::Perl5> to no longer depend
 on I<Term::Readline>.
 
 =cut
+
 package Term::ReadLine::Perl5::TermCap;
 
 # Prompt-start, prompt-end, command-line-start, command-line-end

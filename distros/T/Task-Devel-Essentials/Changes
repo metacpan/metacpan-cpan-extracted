@@ -1,0 +1,19 @@
+Revision history for Task-Devel-Essentials
+
+0.004   Wed, 18 Oct 2017 17:42:37 +0200
+        upgraded versions
+        added more modules
+        dropped DBI
+
+0.003   Fri, 30 May 2014 14:31:52 +0200
+        added more modules
+        added version numbers
+        added tests
+
+0.002   Mon, 03 Jun 2013 17:33:28 +0200
+        added Module::Installer
+        fixed license
+
+0.001   Mon, 03 Jun 2013 15:31:46 +0200
+        Initial version.
+

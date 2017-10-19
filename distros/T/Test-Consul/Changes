@@ -1,3 +1,6 @@
+0.012     2017-10-18 22:30:21+11:00 Australia/Melbourne
+ - minor fixes to support Consul 1.0.0
+
 0.011     2017-08-07 09:39:39+10:00 Australia/Melbourne
  - added enable_remote_exec, disabled by default since Consul 0.8.0
 

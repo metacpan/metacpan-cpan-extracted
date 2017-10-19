@@ -840,7 +840,7 @@ sub delete_all_attendance_data {
     $status = cud_generic(
         conn => $dbix_conn, 
         eid => $site->DOCHAZKA_EID_OF_ROOT,
-        sql => 'DELETE FROM schedules',
+        sql => 'DELETE FROM schedules WHERE scode != \'DEFAULT\'',
     );
     is( $status->level, 'OK' );
     is( $status->code, 'DOCHAZKA_CUD_OK' );

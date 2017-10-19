@@ -1,15 +1,21 @@
 #include "EXTERN.h"
 #include "perl.h"
+#include <stdint.h>
 #include "XSUB.h"
 
 /* TESTRANDOM should never be defined in the code released to
-   CPAN. This is tested in "xt/testrandom-invalid.t". */
+   CPAN. That this is not defined is tested in
+   "xt/testrandom-invalid.t". */
 
 //#define TESTRANDOM
 
 #ifdef TESTRANDOM
 #include <setjmp.h>
 #endif /* def TESTRANDOM */
+
+/* A structure representing the "null" in JSON. Although we're now
+   using PL_sv_yes and PL_sv_no, we don't use PL_sv_undef, because
+   perldoc perlguts says it's a bad idea. */
 
 static SV * json_null;
 
@@ -201,97 +207,70 @@ OUTPUT:
 
 MODULE=JSON::Parse PACKAGE=JSON::Tokenize
 
-SV * tokenize_json (json)
+JSON::Tokenize tokenize_json (json)
 	SV * json;
 CODE:
-	RETVAL = newSViv ((IV) tokenize (json));
+	RETVAL = tokenize (json);
+	RETVAL->blessed = 1;
 OUTPUT:
 	RETVAL
 
-SV * tokenize_child (svtoken)
- 	SV * svtoken
-PREINIT:
-	json_token_t * token;
+JSON::Tokenize tokenize_child (token)
+ 	JSON::Tokenize token
 CODE:
-	token = (json_token_t *) SvIV (svtoken);
-	if (token && token->child) {
-	    RETVAL = newSViv ((IV) token->child);
-	}
-	else {
-	    RETVAL = & PL_sv_undef;
+	if (token->child) {
+		RETVAL = token->child;
+		RETVAL->blessed = 1;
 	}
 OUTPUT:
     	RETVAL
 
-SV * tokenize_next (svtoken)
- 	SV * svtoken
-PREINIT:
-	json_token_t * token;
+JSON::Tokenize tokenize_next (token)
+	JSON::Tokenize token
 CODE:
-	token = (json_token_t *) SvIV (svtoken);
-	if (token && token->next) {
-	    RETVAL = newSViv ((IV) token->next);
+	if (token->next) {
+		RETVAL = token->next;
+		RETVAL->blessed = 1;
 	}
 	else {
-	    RETVAL = & PL_sv_undef;
+       		RETVAL = 0;
 	}
 OUTPUT:
     	RETVAL
 
-SV * tokenize_start (svtoken)
- 	SV * svtoken
-PREINIT:
-	json_token_t * token;
+int tokenize_start (token)
+	JSON::Tokenize token
 CODE:
-	token = (json_token_t *) SvIV (svtoken);
-	if (token) {
-		RETVAL = newSViv (token->start);
-	}
-	else {
-	    RETVAL = & PL_sv_undef;
-	}
+	RETVAL = token->start;
 OUTPUT:
     	RETVAL
 
-SV * tokenize_end (svtoken)
- 	SV * svtoken
-PREINIT:
-	json_token_t * token;
+int tokenize_end (token)
+	JSON::Tokenize token
 CODE:
-	token = (json_token_t *) SvIV (svtoken);
-	if (token) {
-		RETVAL = newSViv (token->end);
-	}
-	else {
-	    RETVAL = & PL_sv_undef;
-	}
+	RETVAL = token->end;
 OUTPUT:
     	RETVAL
 
-SV * tokenize_type (svtoken)
- 	SV * svtoken
-PREINIT:
-	json_token_t * token;
+SV * tokenize_type (token)
+	JSON::Tokenize token
 CODE:
-	token = (json_token_t *) SvIV (svtoken);
 	/* Only set this to the real value if everything is OK. */
 	RETVAL = & PL_sv_undef;
-        if (token) {
-	    if (token->type > json_token_invalid &&
-		token->type < n_json_tokens) {
+	if (token->type > json_token_invalid &&
+	    token->type < n_json_tokens) {
 		RETVAL = newSVpv (token_names[token->type], 0);
-	    }
-	    else {
+	}
+	else {
 		warn ("Invalid JSON token type %d", token->type);
-	    }
 	}
 OUTPUT:
 	RETVAL
 
-void DESTROY (tokens)
-	json_token_t * tokens;
+void DESTROY (token)
+	JSON::Tokenize token
 CODE:
-	tokenize_free (tokens);
+	tokenize_free (token);
 
 MODULE=JSON::Parse PACKAGE=JSON::Whitespace
 

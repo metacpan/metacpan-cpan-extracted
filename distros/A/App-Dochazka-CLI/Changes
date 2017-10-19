@@ -1147,3 +1147,13 @@ Revision history for App-Dochazka-CLI
 - cleanup: drop ignore.txt
 - build/ops: new file CLI_SiteConfig.pm.example
 
+0.239 2017-10-18 22:54 CEST
+- EMPLOYEE PROFILE: drop Dochazka EID...
+- Use employee/self/full instead of employee/self/priv
+- In employee/self/full resource, current_emp prop renamed to "emp"
+- RestTest: add schedule/new RestTest commands
+- TokenMap: allow three-letter month abbreviations in timestamp
+
+0.240 2017-10-18 22:55 CEST
+- build/ops: set OBS_PROJECT to Application:Dochazka
+

@@ -62,10 +62,11 @@ $simnetwork @themereports %simtitles %reporttitles %retrievedata
 @report_loadsortemps @files_to_filter @filter_reports @base_columns @maketabledata @filter_columns 
 @files_to_filter @filter_reports @base_columns @maketabledata @filter_columns %vals 
 @sweeps @mediumiters @varinumbers @caseseed @chanceseed @chancedata $dimchance $tee @pars_tocheck retrieve
+report newretrieve newreport
 $target %dowhat readsweeps modish $max_processes $computype $calcprocedure %specularratios
 );
 
-$VERSION = '0.73.15';
+$VERSION = '0.73.29';
 $ABSTRACT = 'Sim::OPT is an optimization and parametric exploration program oriented to problem decomposition. It can be used with simulation programs receiving text files as input and emitting text files as output. It allows a free mix of sequential and parallel block coordinate searches.';
 
 #################################################################################
@@ -804,7 +805,7 @@ sub callblocks # IT CALLS THE SEARCH ON BLOCKS.
 	my $countcase = $dat{countcase}; 
 	my $countblock = $dat{countblock}; 
 	my @sweeps = @{ $dat{sweeps} }; 
-	my @sourcesweeps = @{ $dat{sourcesweeps} }; say $tee"dumpIN( \@sourcesweeps) " . dump(@sourcesweeps);
+	my @sourcesweeps = @{ $dat{sourcesweeps} }; #say $tee"dumpIN( \@sourcesweeps) " . dump(@sourcesweeps);
 	my @miditers = @{ $dat{miditers} }; 
 	my @winneritems = @{ $dat{winneritems} }; 
 	my %dirfiles = %{ $dat{dirfiles} }; 
@@ -888,8 +889,8 @@ sub deffiles # IT DEFINED THE FILES TO BE CALLED.
 {
 	my $swap = shift;
 	my %dat = %{$swap};
-	my $countcase = $dat{countcase}; 
-	my $countblock = $dat{countblock}; 
+	my $countcase = $dat{countcase}; #say $tee "\$countcase : " . dump( $countcase );
+  	my $countblock = $dat{countblock};  
 	my @sweeps = @{ $dat{sweeps} }; 
 	my @sourcesweeps = @{ $dat{sourcesweeps} }; 
 	my @miditers = @{ $dat{miditers} }; 
@@ -897,34 +898,34 @@ sub deffiles # IT DEFINED THE FILES TO BE CALLED.
 	my %dirfiles = %{ $dat{dirfiles} }; 
 	my @uplift = @{ $dat{uplift} }; 
 	my @backvalues = @{ $dat{backvalues} }; 
-	my %datastruc = %{ $dat{datastruc} };
-	my @rescontainer = @{ $dat{rescontainer} };
+	my %datastruc = %{ $dat{datastruc} }; #say $tee "\%datastruc : " . dump( %datastruc );
+	my @rescontainer = @{ $dat{rescontainer} }; #say $tee "\@rescontainer : " . dump( @rescontainer );
 	
-	my $rootname = getrootname(\@rootnames, $countcase); 
-	my @blockelts = getblockelts(\@sweeps, $countcase, $countblock); 
-	my @blocks = getblocks(\@sweeps, $countcase);  
-	my $toitem = getitem(\@winneritems, $countcase, $countblock); 
-	my $from = getline($toitem); 
-	my %varnums = getcase(\@varinumbers, $countcase); 
-	my %mids = getcase(\@miditers, $countcase); 
+	my $rootname = getrootname(\@rootnames, $countcase); #say $tee "\$rootname : " . dump( $rootname );
+	my @blockelts = getblockelts(\@sweeps, $countcase, $countblock); #say $tee "\@blockelts : " . dump( @blockelts );
+	my @blocks = getblocks(\@sweeps, $countcase);  #say $tee "\@blocks : " . dump( @blocks );
+	my $toitem = getitem(\@winneritems, $countcase, $countblock); #say $tee "\$toitem : " . dump( $toitem );
+	my $from = getline($toitem); #say $tee "\$from : " . dump( $from );
+	my %varnums = getcase(\@varinumbers, $countcase); #say $tee "\%varnums : " . dump( %varnums );
+	my %mids = getcase(\@miditers, $countcase); #say $tee "\%mids : " . dump( %mids );
 	
-	my $rootitem = "$file" . "_"; 
+	my $rootitem = "$file" . "_"; #say $tee "\$rootitem : " . dump( $rootitem );
 	my (@basket, @box);
-	push (@basket, [ $rootitem ] );
+	push (@basket, [ $rootitem ] ); #say $tee "\@basket : " . dump( @basket );
 	foreach my $var ( @blockelts )
 	{
 		my @bucket;
-		my $maxvalue = $varnums{$var}; 
+		my $maxvalue = $varnums{$var}; #say $tee "\$maxvalue : " . dump( $maxvalue );
 		foreach my $elt (@basket)
 		{
-			my $root = $elt->[0]; 
+			my $root = $elt->[0]; #say $tee "\$root : " . dump( $root );
 			my $cnstep = 1;
 			while ( $cnstep <= $maxvalue)
-			{
-				my $olditem = $root;
-				my $item = "$root" . "$var" . "-" . "$cnstep" . "_" ; 
-				push (@bucket, [$item, $var, $cnstep, $olditem] ); 
-				$cnstep++;
+			{	#say $tee "\$countblock : " . dump( $countblock );
+				my $olditem = $root; #say $tee "\$olditem : " . dump( $olditem );
+				my $item = "$root" . "$var" . "-" . "$cnstep" . "_" ;  #say $tee "\$item : " . dump( $item );
+				push ( @bucket, [$item, $var, $cnstep, $olditem] ); #say $tee "\@bucket: " . dump( @bucket );
+				$cnstep++; #say $tee "\$cnstep : " . dump( $cnstep );
 			}
 		} 
 		@basket = ();
@@ -933,10 +934,10 @@ sub deffiles # IT DEFINED THE FILES TO BE CALLED.
 		
 	} 
 	
-	
-	my @flattened = flattenbox(@box); 
-	my @integrated = integratebox(\@flattened, \%mids, $file); 
-	my @finalbox = filterbox(@integrated); 
+	say $tee "\@box: " . dump( @box );
+	my @flattened = flattenbox(@box); #say $tee "\@flattened: " . dump( @flattened );
+	my @integrated = integratebox(\@flattened, \%mids, $file); #say $tee "\@integrated: " . dump( @integrated );
+	my @finalbox = filterbox(@integrated); #say $tee "\@finalbox: " . dump( @finalbox );
 	
 	
 	my $datatowork = 
@@ -1033,6 +1034,16 @@ sub exe
 	
 	say $tee "#Executing new searches for case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
 	
+	if ( $dowhat{newreport} eq "y" )
+	{
+		$dowhat{report} = "n";
+	}
+
+	if ( $dowhat{newretrieve} eq "y" )
+	{
+		$dowhat{retrieve} = "n";
+	}
+	
 	if ( $dowhat{morph} eq "y" ) 
 	{ 
 		say $tee "#Calling morphing operations for case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
@@ -1046,16 +1057,38 @@ sub exe
 		$dirfiles{morphstruct} = $result[1];
 	}
 
-	if ( $dowhat{simulate} eq "y" )
+	if ( ( $dowhat{simulate} eq "y" ) or ( ( $dowhat{newreport} eq "y" ) and ( $dowhat{newretrieve} eq "y" ) ) )
 	{ 
-		say $tee "#Calling simulations for case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
-		my @result = Sim::OPT::Sim::sim( 
-		{ 
-			instances => \@instances, countcase => $countcase, countblock => $countblock, 
-			dirfiles => \%dirfiles, datastruc => \%datastruc, rescontainer => \@rescontainer,
-		} );
-		$dirfiles{simcases} = $result[0]; 
-		$dirfiles{simstruct} = $result[1]; 
+		if ( ( $dowhat{newreport} eq "y" ) and ( $dowhat{newretrieve} eq "y" ) )
+		{
+			say $tee "#Calling simulations, reporting and retrieving for case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
+			my @result = Sim::OPT::Sim::sim( 
+			{ 
+				instances => \@instances, countcase => $countcase, countblock => $countblock, 
+				dirfiles => \%dirfiles, datastruc => \%datastruc, rescontainer => \@rescontainers
+			} );
+			$dirfiles{simcases} = $result[0]; 
+			$dirfiles{simstruct} = $result[1]; 
+			$dirfiles{retcases} = $result[2]; 
+			$dirfiles{retstruct} = $result[3];
+			$dirfiles{notecases} = $result[4];
+			$dirfiles{repcases} = $result[5];
+			$dirfiles{repstruct} = $result[6];
+			$dirfiles{mergestruct} = $result[7];
+			$dirfiles{mergecases} = $result[8];
+			$dirfiles{repfilebackup} = $result[9];
+		}
+		else
+		{
+			say $tee "#Calling simulations for case " . ($countcase +1) . ", block " . ($countblock + 1) . ".";
+			my @result = Sim::OPT::Sim::sim( 
+			{ 
+				instances => \@instances, countcase => $countcase, countblock => $countblock, 
+				dirfiles => \%dirfiles, datastruc => \%datastruc, rescontainer => \@rescontainers
+			} );
+			$dirfiles{simcases} = $result[0]; 
+			$dirfiles{simstruct} = $result[1]; 
+		}
 	}
 
 	if ( $dowhat{retrieve} eq "y" )

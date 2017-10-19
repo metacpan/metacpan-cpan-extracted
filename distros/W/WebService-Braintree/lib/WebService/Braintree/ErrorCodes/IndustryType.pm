@@ -1,6 +1,7 @@
 package WebService::Braintree::ErrorCodes::IndustryType;
-$WebService::Braintree::ErrorCodes::IndustryType::VERSION = '0.93';
-use strict;
+$WebService::Braintree::ErrorCodes::IndustryType::VERSION = '0.94';
+use 5.010_001;
+use strictures 1;
 
 use constant CheckInDateIsInvalid               => "93404";
 use constant CheckOutDateIsInvalid              => "93405";
@@ -11,3 +12,4 @@ use constant IndustryTypeIsInvalid              => "93401";
 use constant UnknownDataField                   => "93407";
 
 1;
+__END__

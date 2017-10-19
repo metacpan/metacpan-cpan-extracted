@@ -10,15 +10,20 @@ debian/control
 debian/copyright
 debian/rules
 lib/Test/Module/Runnable.pm
+lib/Test/Module/Runnable/Base.pm
 LICENCE
+Makefile
 Makefile.PL
 MANIFEST			This list of files
+MANIFEST.SKIP
+MYMETA.yml
 NEWS
 README
+t/getopts.t
 t/lib/Private/Test/Module/Runnable/unique.pm
+t/podchecker.t
 t/tester.t
-t/tester_unique.t
+t/unique.t
 t/version.t
 TODO
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)
+META.yml                                 Module meta-data (added by MakeMaker)

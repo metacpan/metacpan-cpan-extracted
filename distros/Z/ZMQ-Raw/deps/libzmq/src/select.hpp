@@ -137,6 +137,9 @@ namespace zmq
         family_entries_t family_entries;
         // See loop for details.
         family_entries_t::iterator current_family_entry_it;
+
+        bool try_remove_fd_entry (family_entries_t::iterator family_entry_it,
+                                  zmq::fd_t &handle_);
 #else
         fd_entries_t fd_entries;
         fds_set_t fds_set;
@@ -150,6 +153,9 @@ namespace zmq
 #endif
         //  Checks if an fd_entry_t is retired.
         static bool is_retired_fd (const fd_entry_t &entry);
+
+        static fd_entries_t::iterator
+        find_fd_entry_by_handle (fd_entries_t &fd_entries, handle_t handle_);
 
         //  If true, thread is shutting down.
         bool stopping;

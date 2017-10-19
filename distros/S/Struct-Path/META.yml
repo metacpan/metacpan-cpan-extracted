@@ -26,4 +26,4 @@ requires:
   warnings: 0
 resources:
   repository: https://github.com/mr-mixas/Struct-Path.pm
-version: 0.71
+version: 0.72

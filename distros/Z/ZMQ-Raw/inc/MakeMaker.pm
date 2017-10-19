@@ -23,8 +23,10 @@ my $is_windows = ($^O =~ /MSWin32/i) ? 1 : 0;
 my $is_linux = ($^O =~ /linux/i) ? 1 : 0;
 my $is_osx = ($^O =~ /darwin/i) ? 1 : 0;
 my $is_bsd = ($^O =~ /bsd/i) ? 1 : 0;
+my $is_gkfreebsd = ($^O =~ /gnukfreebsd/i) ? 1 : 0;
 
 my $def = '-DZMQ_CUSTOM_PLATFORM_HPP -DZMQ_STATIC -DZMQ_BUILD_DRAFT_API -D_THREAD_SAFE';
+
 my $lib = '';
 my $otherldflags = '';
 my $inc = '';
@@ -56,7 +58,7 @@ if ($is_gcc)
 
 if ($is_windows)
 {
-	$def .= ' -D_WINSOCK_DEPRECATED_NO_WARNINGS -D_CRT_SECURE_NO_WARNINGS';
+	$def .= ' -D_WINSOCK_DEPRECATED_NO_WARNINGS -D_CRT_SECURE_NO_WARNINGS -DFD_SETSIZE=16384';
 	$lib .= ' -lws2_32 -lrpcrt4 -liphlpapi msvcprt.lib';
 
 	if ($is_msvc)
@@ -68,6 +70,8 @@ if ($is_windows)
 # generate the platform.hpp file
 my @opts = (
 	'ZMQ_HAVE_SO_KEEPALIVE',
+	'ZMQ_HAVE_CURVE',
+	'ZMQ_USE_TWEETNACL',
 );
 
 if ($is_osx || $is_bsd)
@@ -89,13 +93,18 @@ elsif ($is_solaris)
 	push @opts,
 		'ZMQ_USE_DEVPOLL';
 }
+elsif ($is_windows)
+{
+	push @opts,
+		'ZMQ_USE_SELECT';
+}
 else
 {
 	push @opts,
 		'ZMQ_USE_POLL 1';
 }
 
-if ($is_linux || $is_osx || $is_bsd)
+if (($is_linux || $is_osx || $is_bsd) && !$is_gkfreebsd)
 {
 	push @opts,
 		'ZMQ_HAVE_TCP_KEEPCNT',
@@ -103,7 +112,7 @@ if ($is_linux || $is_osx || $is_bsd)
 		'ZMQ_HAVE_TCP_KEEPALIVE';
 }
 
-if ($is_linux || $is_bsd)
+if (($is_linux || $is_bsd) && !$is_gkfreebsd)
 {
 	push @opts,
 		'ZMQ_HAVE_TCP_KEEPIDLE',
@@ -195,8 +204,11 @@ print $fh q{
 close $fh;
 
 
-my @srcs = glob 'deps/libzmq/src/*.cpp';
-my @objs = map { substr ($_, 0, -3) . 'o' } (@srcs);
+my @cpp_srcs = glob 'deps/libzmq/src/*.cpp';
+my @cpp_objs = map { substr ($_, 0, -3) . 'o' } (@cpp_srcs);
+
+my @c_srcs = glob 'deps/libzmq/src/*.c';
+my @c_objs = map { substr ($_, 0, -1) . 'o' } (@c_srcs);
 
 sub MY::c_o {
 	my $out_switch = '-o ';
@@ -232,7 +244,7 @@ $WriteMakefileArgs{LIBS}    .= $lib;
 $WriteMakefileArgs{INC}     .= $inc;
 $WriteMakefileArgs{LD}      .= $ld;
 $WriteMakefileArgs{CCFLAGS} .= $Config{ccflags} . ' '. $ccflags;
-$WriteMakefileArgs{OBJECT}  .= ' ' . join ' ', @objs;
+$WriteMakefileArgs{OBJECT}  .= ' ' . join ' ', (@cpp_objs, @c_objs);
 $WriteMakefileArgs{dynamic_lib} = {
 	OTHERLDFLAGS => $otherldflags
 };
@@ -278,6 +290,14 @@ my @constants = (qw(
 	ZMQ_EVENT_DISCONNECTED
 	ZMQ_EVENT_MONITOR_STOPPED
 	ZMQ_EVENT_ALL
+
+	FEATURE_IPC
+	FEATURE_PGM
+	FEATURE_TIPC
+	FEATURE_NORM
+	FEATURE_CURVE
+	FEATURE_GSSAPI
+	FEATURE_DRAFT
 ));
 
 my @errors = (qw(

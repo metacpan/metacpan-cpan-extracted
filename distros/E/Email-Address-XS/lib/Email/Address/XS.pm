@@ -6,12 +6,12 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 use Carp;
 
 use base 'Exporter';
-our @EXPORT_OK = qw(parse_email_addresses parse_email_groups format_email_addresses format_email_groups);
+our @EXPORT_OK = qw(parse_email_addresses parse_email_groups format_email_addresses format_email_groups compose_address split_address);
 
 use XSLoader;
 XSLoader::load(__PACKAGE__, $VERSION);
@@ -36,25 +36,36 @@ Email::Address::XS - Parse and format RFC 2822 email addresses and groups
   print $users_address->host();
   # oceania
 
+  my $goldsteins_address = Email::Address::XS->parse_bare_address('goldstein@brotherhood.oceania');
+  print $goldsteins_address->user();
+  # goldstein
+
+  my @addresses = Email::Address::XS->parse('"Winston Smith" <winston.smith@recdep.minitrue> (Records Department), Julia <julia@ficdep.minitrue>');
+  # ($winstons_address, $julias_address)
+
 
   use Email::Address::XS qw(format_email_addresses format_email_groups parse_email_addresses parse_email_groups);
-  my $undef = undef;
 
   my $addresses_string = format_email_addresses($winstons_address, $julias_address, $users_address);
-  print $addresses_string;
   # "Winston Smith" <winston.smith@recdep.minitrue> (Records Department), Julia <julia@ficdep.minitrue>, user <user@oceania>
 
-  my @addresses = parse_email_addresses($addresses_string);
-  print 'address: ' . $_->address() . "\n" foreach @addresses;
-  # address: winston.smith@recdep.minitrue
-  # address: julia@ficdep.minitrue
-  # address: user@oceania
+  my @addresses = map { $_->address() } parse_email_addresses($addresses_string);
+  # ('winston.smith@recdep.minitrue', 'julia@ficdep.minitrue', 'user@oceania')
 
-  my $groups_string = format_email_groups('Brotherhood' => [ $winstons_address, $julias_address ], $undef => [ $users_address ]);
-  print $groups_string;
+  my $groups_string = format_email_groups('Brotherhood' => [ $winstons_address, $julias_address ], undef() => [ $users_address ]);
   # Brotherhood: "Winston Smith" <winston.smith@recdep.minitrue> (Records Department), Julia <julia@ficdep.minitrue>;, user <user@oceania>
 
   my @groups = parse_email_groups($groups_string);
+  # ('Brotherhood' => [ $winstons_address, $julias_address ], undef() => [ $users_address ])
+
+
+  use Email::Address::XS qw(compose_address split_address);
+
+  my ($user, $host) = split_address('julia(outer party)@ficdep.minitrue');
+  # ('julia', 'ficdep.minitrue')
+
+  my $string = compose_address('charrington"@"shop', 'thought.police.oceania');
+  # "charrington\"@\"shop"@thought.police.oceania
 
 =head1 DESCRIPTION
 
@@ -87,13 +98,19 @@ parses input string sequentially according to RFC 2822 grammar.
 Additionally it has support also for named groups and so can be use
 instead of L<the Email::Address::List module|Email::Address::List>.
 
+If you are looking for the module which provides object representation
+for the list of email addresses suitable for the MIME email headers,
+see L<Email::MIME::Header::AddressList|Email::MIME::Header::AddressList>.
+
 =head2 EXPORT
 
 None by default. Exportable functions are:
-C<parse_email_addresses>,
-C<parse_email_groups>,
-C<format_email_addresses>,
-C<format_email_groups>.
+L<C<parse_email_addresses>|/parse_email_addresses>,
+L<C<parse_email_groups>|/parse_email_groups>,
+L<C<format_email_addresses>|/format_email_addresses>,
+L<C<format_email_groups>|/format_email_groups>,
+L<C<compose_address>|/compose_address>,
+L<C<split_address>|/split_address>.
 
 =head2 Exportable Functions
 
@@ -137,9 +154,10 @@ sub format_email_addresses {
   print $undisclosed_string;
   # undisclosed-recipients:;
 
-Like C<format_email_addresses> but this method takes pairs which
-consist of a group display name and a reference to address list. If a
-group is not undef then address list is formatted inside named group.
+Like L<C<format_email_addresses>|/format_email_addresses> but this
+method takes pairs which consist of a group display name and a
+reference to address list. If a group is not undef then address
+list is formatted inside named group.
 
 =item parse_email_addresses
 
@@ -170,13 +188,36 @@ sub parse_email_addresses {
   my @groups = parse_email_groups($string);
   # @groups now contains list ('Brotherhood' => [ $winstons_object, $julias_object ], $undef => [ $users_object ], 'undisclosed-recipients' => [])
 
-Like C<parse_email_addresses> but this function returns a list of
-pairs: a group display name and a reference to a list of addresses
-which belongs to that named group. An undef value for a group means
-that a following list of addresses is not inside any named group. An
-output is in a same format as a input for the function
-C<format_email_groups>. This function preserves order of groups and
-does not do any de-duplication or merging.
+Like L<C<parse_email_addresses>|/parse_email_addresses> but this
+function returns a list of pairs: a group display name and a
+reference to a list of addresses which belongs to that named group.
+An undef value for a group means that a following list of addresses
+is not inside any named group. An output is in a same format as a
+input for the function L<C<format_email_groups>|/format_email_groups>.
+This function preserves order of groups and does not do any
+de-duplication or merging.
+
+=item compose_address
+
+  use Email::Address::XS qw(compose_address);
+  my $string_address = compose_address($user, $host);
+
+Takes an unescaped user part and unescaped host part of an address
+and returns escaped address.
+
+Available since version 1.01.
+
+=item split_address
+
+  use Email::Address::XS qw(split_address);
+  my ($user, $host) = split_address($string_address);
+
+Takes an escaped address and split it into pair of unescaped user
+part and unescaped host part of address. If splitting input address
+into these two parts is not possible then this function returns
+pair of undefs.
+
+Available since version 1.01.
 
 =back
 
@@ -203,8 +244,8 @@ returned. All other parameters are ignored.
 
 Old syntax L<from the Email::Address module|Email::Address/new> is
 supported too. Takes one to four positional arguments: phrase, address
-comment, and original string. An argument original is deprecated and
-ignored. Passing it throws a warning.
+comment, and original string. Passing an argument original is
+deprecated, ignored and throws a warning.
 
 =cut
 
@@ -231,12 +272,16 @@ sub new {
 		$args{phrase} = $args[0] if scalar @args > 0;
 	}
 
+	my $invalid;
+	my $original;
 	if ( exists $args{copy} ) {
 		if ( $class->is_obj($args{copy}) ) {
 			$args{phrase} = $args{copy}->phrase();
 			$args{comment} = $args{copy}->comment();
 			$args{user} = $args{copy}->user();
 			$args{host} = $args{copy}->host();
+			$invalid = $args{copy}->{invalid};
+			$original = $args{copy}->{original};
 			delete $args{address};
 		} else {
 			carp 'Named argument copy does not contain a valid object';
@@ -255,6 +300,9 @@ sub new {
 		$self->host($args{host});
 	}
 
+	$self->{invalid} = 1 if $invalid;
+	$self->{original} = $original;
+
 	return $self;
 }
 
@@ -264,17 +312,53 @@ sub new {
   my @users_addresses = Email::Address::XS->parse('user1@oceania, user2@oceania');
 
 Parses an input string and returns a list of an Email::Address::XS
-objects. Same as the function C<parse_email_addresses> but this one is
-class method.
+objects. Same as the function L<C<parse_email_addresses>|/parse_email_addresses>
+but this one is class method.
 
 In scalar context this function returns just first parsed object.
+If more then one object was parsed then L<C<is_valid>|/is_valid>
+method on returned object returns false. If no object was parsed
+then empty Email::Address::XS object is returned.
+
+Prior to version 1.01 return value in scalar context is undef when
+no object was parsed.
 
 =cut
 
 sub parse {
 	my ($class, $string) = @_;
 	my @addresses = parse_email_addresses($string, $class);
-	return wantarray ? @addresses : $addresses[0];
+	return @addresses if wantarray;
+	my $self = @addresses ? $addresses[0] : Email::Address::XS->new();
+	$self->{invalid} = 1 if scalar @addresses != 1;
+	$self->{original} = $string unless defined $self->{original};
+	return $self;
+}
+
+=item parse_bare_address
+
+  my $winstons_address = Email::Address::XS->parse_bare_address('winston.smith@recdep.minitrue');
+
+Parses an input string as one bare email address (addr spec) which
+does not allow phrase part or angle brackets around email address and
+returns an Email::Address::XS object. It is just a wrapper around
+L<C<address>|/address> method. Method L<C<is_valid>|/is_valid> can be
+used to check if parsing was successful.
+
+Available since version 1.01.
+
+=cut
+
+sub parse_bare_address {
+	my ($class, $string) = @_;
+	my $self = $class->new();
+	if ( defined $string ) {
+		$self->address($string);
+		$self->{original} = $string;
+	} else {
+		carp 'Use of uninitialized value for string';
+	}
+	return $self;
 }
 
 =back
@@ -296,6 +380,29 @@ sub format {
 	return format_email_addresses($self);
 }
 
+=item is_valid
+
+  my $is_valid = $address->is_valid();
+
+Returns true if the parse function or method which created this
+Email::Address::XS object had not received any syntax error on input
+string and also that L<C<user>|/user> and L<C<host>|/host> part of
+the email address are not empty strings.
+
+Thus this function can be used for checking if Email::Address::XS
+object is valid before calling L<C<format>|/format> method on it.
+
+Available since version 1.01.
+
+=cut
+
+sub is_valid {
+	my ($self) = @_;
+	my $user = $self->user();
+	my $host = $self->host();
+	return (defined $user and length $user and defined $host and length $host and not $self->{invalid});
+}
+
 =item phrase
 
   my $phrase = $address->phrase();
@@ -308,6 +415,7 @@ Accessor and mutator for the phrase (display name).
 sub phrase {
 	my ($self, @args) = @_;
 	return $self->{phrase} unless @args;
+	delete $self->{invalid} if exists $self->{invalid};
 	return $self->{phrase} = $args[0];
 }
 
@@ -316,7 +424,8 @@ sub phrase {
   my $user = $address->user();
   $address->user('winston.smith');
 
-Accessor and mutator for the unescaped user part of an address.
+Accessor and mutator for the unescaped user (local/mailbox) part of
+an address.
 
 =cut
 
@@ -324,6 +433,7 @@ sub user {
 	my ($self, @args) = @_;
 	return $self->{user} unless @args;
 	delete $self->{cached_address} if exists $self->{cached_address};
+	delete $self->{invalid} if exists $self->{invalid};
 	return $self->{user} = $args[0];
 }
 
@@ -332,7 +442,7 @@ sub user {
   my $host = $address->host();
   $address->host('recdep.minitrue');
 
-Accessor and mutator for the unescaped host part of an address.
+Accessor and mutator for the unescaped host (domain) part of an address.
 
 =cut
 
@@ -340,6 +450,7 @@ sub host {
 	my ($self, @args) = @_;
 	return $self->{host} unless @args;
 	delete $self->{cached_address} if exists $self->{cached_address};
+	delete $self->{invalid} if exists $self->{invalid};
 	return $self->{host} = $args[0];
 }
 
@@ -348,14 +459,14 @@ sub host {
   my $string_address = $address->address();
   $address->address('winston.smith@recdep.minitrue');
 
-Accessor and mutator for the escaped address.
+Accessor and mutator for the escaped address (addr spec).
 
 Internally this module stores a user and a host part of an address
-separately. Private method C<compose_address> is used for composing
-full address and private method C<split_address> for splitting into a
-user and a host parts. If splitting new address into these two parts
-is not possible then this method returns undef and sets both parts to
-undef.
+separately. Function L<C<compose_address>|/compose_address> is used
+for composing full address and function L<C<split_address>|/split_address>
+for splitting into a user and a host parts. If splitting new address
+into these two parts is not possible then this method returns undef
+and sets both parts to undef.
 
 =cut
 
@@ -364,6 +475,7 @@ sub address {
 	my $user;
 	my $host;
 	if ( @args ) {
+		delete $self->{invalid} if exists $self->{invalid};
 		($user, $host) = split_address($args[0]) if defined $args[0];
 		if ( not defined $user or not defined $host ) {
 			$user = undef;
@@ -398,6 +510,7 @@ balanced. If not undef is set and returned.
 sub comment {
 	my ($self, @args) = @_;
 	return $self->{comment} unless @args;
+	delete $self->{invalid} if exists $self->{invalid};
 	return $self->{comment} = undef unless defined $args[0];
 	my $count = 0;
 	my $cleaned = $args[0];
@@ -416,9 +529,9 @@ sub comment {
   my $name = $address->name();
 
 This method tries to return a name which belongs to the address. It
-returns either C<phrase> or C<comment> or C<user> part of the address
-or empty string (first defined value in this order). But it never
-returns undef.
+returns either L<C<phrase>|/phrase> or L<C<comment>|/comment> or
+L<C<user>|/user> part of the address or empty string (first defined
+value in this order). But it never returns undef.
 
 =cut
 
@@ -433,6 +546,30 @@ sub name {
 	return '';
 }
 
+=item original
+
+  my $address = Email::Address::XS->parse('(Winston) "Smith"   <winston.smith@recdep.minitrue> (Minitrue)');
+  my $original = $address->original();
+  # (Winston) "Smith"   <winston.smith@recdep.minitrue> (Minitrue)
+  my $format = $address->format();
+  # Smith <winston.smith@recdep.minitrue> (Minitrue)
+
+This method returns original part of the string which was used for
+parsing current Email::Address::XS object. If object was not created
+by parsing input string, then this method returns undef.
+
+Note that L<C<format>|/format> method does not have to return same
+original string.
+
+Available since version 1.01.
+
+=cut
+
+sub original {
+	my ($self) = @_;
+	return $self->{original};
+}
+
 =back
 
 =head2 Overloaded Operators
@@ -445,30 +582,33 @@ sub name {
   print "Winston's address is $address.";
   # Winston's address is "Winston Smith" <winston.smith@recdep.minitrue>.
 
-Objects stringify to C<format>.
+Objects stringify to L<C<format>|/format>. For stringification purpose
+is defined method C<as_string>.
 
 =cut
 
 our $STRINGIFY; # deprecated
 
-use overload '""' => sub {
+sub as_string {
 	my ($self) = @_;
 	return $self->format() unless defined $STRINGIFY;
 	carp 'Variable $Email::Address::XS::STRINGIFY is deprecated; subclass instead';
 	my $method = $self->can($STRINGIFY);
 	croak 'Stringify method ' . $STRINGIFY . ' does not exist' unless defined $method;
 	return $method->($self);
-};
+}
+
+use overload '""' => \&as_string;
 
 =back
 
-=head2 Deprecated Functions, Methods and Variables
+=head2 Deprecated Functions and Variables
 
 For compatibility with L<the Email::Address module|Email::Address>
-there are defined some deprecated functions, methods and variables.
+there are defined some deprecated functions and variables.
 Do not use them in new code. Their usage throws warnings.
 
-Altering deprecated variable C<$Email:Address::XS::STRINGIFY> changes
+Altering deprecated variable C<$Email::Address::XS::STRINGIFY> changes
 method which is called for objects stringification.
 
 Deprecated cache functions C<purge_cache>, C<disable_cache> and
@@ -488,22 +628,11 @@ sub enable_cache {
 	carp 'Function enable_cache is deprecated and does nothing';
 }
 
-=pod
-
-Deprecated object method C<original> just returns C<address>.
-
-=cut
-
-sub original {
-	my ($self) = @_;
-	carp 'Method original is deprecated and returns address';
-	return $self->address();
-}
-
 =head1 SEE ALSO
 
 L<RFC 822|https://tools.ietf.org/html/rfc822>,
 L<RFC 2822|https://tools.ietf.org/html/rfc2822>,
+L<Email::MIME::Header::AddressList>,
 L<Email::Address>,
 L<Email::Address::List>,
 L<Email::AddressParser>

@@ -1,9 +1,9 @@
 package Net::DNS::RR::CAA;
 
 #
-# $Id: CAA.pm 1561 2017-04-19 13:08:13Z willem $
+# $Id: CAA.pm 1597 2017-09-22 08:04:02Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1561 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
 
 
 use strict;
@@ -36,7 +36,7 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 
-	my $tag = $self->{tag} || return '';
+	my $tag = $self->{tag};
 	pack 'C a* a*', $self->flags, $tag->encode, $self->{value}->raw;
 }
 
@@ -44,7 +44,7 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
-	my $tag = $self->{tag} || return '';
+	my $tag = $self->{tag};
 	my @rdata = ( $self->flags, $tag->string, $self->{value}->string );
 }
 

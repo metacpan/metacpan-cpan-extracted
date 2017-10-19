@@ -4,13 +4,16 @@
 #########################
 
 use strict;
-use warnings FATAL => 'all';
+use warnings;
+
+local $SIG{__WARN__} = sub { fail('following test does not throw warning'); warn $_[0]; };
 
 use Carp;
 $Carp::Internal{'Test::Builder'} = 1;
 $Carp::Internal{'Test::More'} = 1;
 
-use Test::More tests => 113;
+use Test::More tests => 137;
+use Test::Builder;
 
 #########################
 
@@ -21,12 +24,14 @@ sub is_tainted {
 
 sub test_tainted {
 	my ($got, $expected, $subtest) = @_;
+	local $Test::Builder::Level = $Test::Builder::Level + 1;
 	ok(is_tainted($got), $subtest);
 	is($got, $expected, $subtest);
 }
 
 sub test_not_tainted {
 	my ($got, $expected, $subtest) = @_;
+	local $Test::Builder::Level = $Test::Builder::Level + 1;
 	ok(!is_tainted($got), $subtest);
 	is($got, $expected, $subtest);
 }
@@ -143,6 +148,7 @@ $address = Email::Address::XS->parse('"Winston Smith" <winston.smith@recdep.mini
 	test_not_tainted($address->comment(), 'Records Department', $subtest);
 	test_not_tainted($address->name(), 'Winston Smith', $subtest);
 	test_not_tainted($address->format(), '"Winston Smith" <winston.smith@recdep.minitrue> (Records Department)', $subtest);
+	test_not_tainted($address->original(), '"Winston Smith" <winston.smith@recdep.minitrue> (Records Department)', $subtest);
 }
 
 undef $address;
@@ -158,4 +164,31 @@ $address = Email::Address::XS->parse(taint('"Winston Smith" <winston.smith@recde
 	test_tainted($address->comment(), 'Records Department', $subtest);
 	test_tainted($address->name(), 'Winston Smith', $subtest);
 	test_tainted($address->format(), '"Winston Smith" <winston.smith@recdep.minitrue> (Records Department)', $subtest);
+	test_tainted($address->original(), '"Winston Smith" <winston.smith@recdep.minitrue> (Records Department)', $subtest);
+}
+
+undef $address;
+
+$address = Email::Address::XS->parse_bare_address('winston.smith@recdep.minitrue');
+
+{
+	my $subtest = 'no tainted parse_bare_address';
+	test_not_tainted($address->user(), 'winston.smith', $subtest);
+	test_not_tainted($address->host(), 'recdep.minitrue', $subtest);
+	test_not_tainted($address->address(), 'winston.smith@recdep.minitrue', $subtest);
+	test_not_tainted($address->format(), 'winston.smith@recdep.minitrue', $subtest);
+	test_not_tainted($address->original(), 'winston.smith@recdep.minitrue', $subtest);
+}
+
+undef $address;
+
+$address = Email::Address::XS->parse_bare_address(taint('winston.smith@recdep.minitrue'));
+
+{
+	my $subtest = 'tainted parse_bare_address';
+	test_tainted($address->user(), 'winston.smith', $subtest);
+	test_tainted($address->host(), 'recdep.minitrue', $subtest);
+	test_tainted($address->address(), 'winston.smith@recdep.minitrue', $subtest);
+	test_tainted($address->format(), 'winston.smith@recdep.minitrue', $subtest);
+	test_tainted($address->original(), 'winston.smith@recdep.minitrue', $subtest);
 }

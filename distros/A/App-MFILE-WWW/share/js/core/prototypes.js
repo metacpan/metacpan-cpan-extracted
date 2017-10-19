@@ -34,17 +34,52 @@
 //
 "use strict";
 
-define(function () {
+define([
+    'jquery',
+], function (
+    $,
+) {
     return {
 
         // prototype for front-end primitives ("targets")
         target: {
             name: null,
-            menuText: '(none)',
             aclProfile: 'passerby',
+            getEntries: function () {
+                    // return all entries, first read and then write
+                    console.log("In getEntries(), this.entriesRead", this.entriesRead);
+                    console.log("In getEntries(), this.entriesWrite", this.entriesWrite);
+                    var entries;
+                    if (this.entriesRead === undefined || this.entriesRead === null) {
+                        this.entriesRead = [];
+                    }
+                    if (this.entriesWrite === undefined || this.entriesWrite === null) {
+                        this.entriesWrite = [];
+                    }
+                    entries = this.entriesRead.concat(this.entriesWrite);
+                    return entries;
+                },
+            getVetter: function (entryName) {
+                    // given an entry name, look up the entry and return the
+                    // vetter function if it exists, otherwise null
+                    var entry,
+                        i;
+                    for (i = 0; i < this.entriesWrite.length; i += 1) {
+                        entry = this.entriesWrite[i];
+                        if (entry.name === entryName) {
+                            if (typeof entry.vetter === 'function') {
+                                return entry.vetter;
+                            }
+                        }
+                    }
+                    return null;
+                },
+            entriesRead: [],
+            entriesWrite: [],
+            menuText: '(none)',
+            pushable: true,
             source: '(none)',
             start: function () {},
-            pushable: true
         },
 
         // prototype for users ("employees" in App::Dochazka::WWW)

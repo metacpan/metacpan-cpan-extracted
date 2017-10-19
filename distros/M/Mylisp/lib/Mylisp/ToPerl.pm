@@ -1,224 +1,129 @@
 package Mylisp::ToPerl;
 
 use 5.012;
-no warnings "experimental";
+no warnings 'experimental';
 
 use Exporter;
-our @ISA    = qw(Exporter);
-our @EXPORT = qw(ast_to_perl ast_to_perl_repl tidy_perl);
+our @ISA = qw(Exporter);
+our @EXPORT =
+  qw(ast_to_perl ast_to_perl_repl atoms_to_perl atoms_to_perls join_perl_exprs atom_to_perl struct_to_perl type_to_perl aindex_to_perl index_to_perl while_to_perl cond_exprs_to_perl exprs_to_perl given_to_perl when_to_perl then_to_perl if_to_perl elif_to_perl else_to_perl for_to_perl iter_to_perl func_to_perl args_to_perl my_to_perl our_to_perl const_to_perl list_to_perl return_to_perl use_to_perl slist_to_perl string_to_perl array_to_perl hash_to_perl pair_to_perl lstr_to_perl str_to_perl bool_to_perl sym_to_perl get_perl_head_str package_to_perl get_export_str oper_to_perl call_to_perl split_to_perl map_to_perl grep_to_perl join_to_perl push_to_perl unshift_to_perl exists_to_perl key_to_perl delete_to_perl char_to_perl);
 
-use YAML::XS qw(Dump);
-use Perl::Tidy;
 use Spp::Builtin;
-use Spp::Core;
-use Mylisp::Core;
+use Spp::Tools;
 
 sub ast_to_perl {
-  my $exprs      = shift;
-  my $head_str   = get_perl_head_str($exprs);
-  my $exprs_strs = atoms_to_perl($exprs);
-  my $exprs_str  = join_exprs($exprs_strs);
-  my $perl_str   = $head_str . $exprs_str;
+  my $ast       = shift;
+  my $head_str  = get_perl_head_str($ast);
+  my $exprs_str = atoms_to_perl($ast);
+  my $perl_str  = add($head_str, $exprs_str);
   return tidy_perl($perl_str);
+}
+
+sub ast_to_perl_repl {
+  my $ast = shift;
+  return atoms_to_perl($ast);
+}
+
+sub atoms_to_perl {
+  my $atoms = shift;
+  my $strs  = atoms_to_perls($atoms);
+  return join_perl_exprs($strs);
+}
+
+sub atoms_to_perls {
+  my $atoms = shift;
+  return estr(
+    [map { atom_to_perl($_) } @{ atoms($atoms) }]);
+}
+
+sub join_perl_exprs {
+  my $exprs    = shift;
+  my $strs     = [];
+  my $end_char = ';';
+  for my $expr (@{ atoms($exprs) }) {
+    if ($end_char ~~ [';', '}']) { push @{$strs}, $expr; }
+    else { push @{$strs}, ';'; push @{$strs}, $expr; }
+    $end_char = last_char($expr);
+  }
+  return join ' ', @{$strs};
 }
 
 sub atom_to_perl {
   my $atom = shift;
-  # say Dump($atom);
-  my ($name, $args) = @{$atom};
+  my ($name, $args) = flat($atom);
   given ($name) {
-    when ('Oper')   { oper_to_perl($args) }
-    when ('Call')   { call_to_perl($args) }
-    when ('Ocall')  { ocall_to_perl($args) }
-    when ('Aindex') { aindex_to_perl($args) }
-    when ('Hkey')   { hkey_to_perl($args) }
-    when ('Arange') { arange_to_perl($args) }
-    when ('exprs')  { exprs_to_perl($args) }
-    when ('while')  { while_to_perl($args) }
-    when ('for')    { for_to_perl($args) }
-    when ('in')     { iter_to_perl($args) }
-    when ('given')  { given_to_perl($args) }
-    when ('when')   { when_to_perl($args) }
-    when ('then')   { then_to_perl($args) }
-    when ('if')     { if_to_perl($args) }
-    when ('elif')   { elif_to_perl($args) }
-    when ('else')   { else_to_perl($args) }
-    when ('func')   { func_to_perl($args) }
-    when ('my')     { my_to_perl($args) }
-    when ('use')    { use_to_perl($args) }
-    when ('import') { import_to_perl($args) }
-    when ('return') { return_to_perl($args) }
-    when ('Sym')    { sym_to_perl($args) }
-    when ('Lstr')   { lstr_to_perl($args) }
-    when ('Str')    { str_to_perl($args) }
-    when ('Char')   { char_to_perl($args) }
-    when ('String') { string_to_perl($args) }
-    when ('Array')  { array_to_perl($args) }
-    when ('Hash')   { hash_to_perl($args) }
-    when ('Pair')   { pair_to_perl($args) }
-    when ('List')   { list_to_perl($args) }
-    when ('Slist')  { slist_to_perl($args) }
-    when ('Bool')   { bool_to_perl($args) }
-    when ('set')    { set_to_perl($args) }
-    when ('not')    { not_to_perl($args) }
-    when ('Int')    { return $args }
-    when ('Ns')     { return $args }
-    when ('module') { return '' }
-    when ('class')  { return '' }
-    when ('end')    { return '1;' }
-    when ('type')   { return '' }
+    when ('Aindex')  { return aindex_to_perl($args) }
+    when ('while')   { return while_to_perl($args) }
+    when ('for')     { return for_to_perl($args) }
+    when ('given')   { return given_to_perl($args) }
+    when ('when')    { return when_to_perl($args) }
+    when ('then')    { return then_to_perl($args) }
+    when ('if')      { return if_to_perl($args) }
+    when ('elif')    { return elif_to_perl($args) }
+    when ('else')    { return else_to_perl($args) }
+    when ('func')    { return func_to_perl($args) }
+    when ('my')      { return my_to_perl($args) }
+    when ('our')     { return our_to_perl($args) }
+    when ('const')   { return const_to_perl($args) }
+    when ('use')     { return use_to_perl($args) }
+    when ('return')  { return return_to_perl($args) }
+    when ('String')  { return string_to_perl($args) }
+    when ('Array')   { return array_to_perl($args) }
+    when ('Hash')    { return hash_to_perl($args) }
+    when ('Lstr')    { return lstr_to_perl($args) }
+    when ('Str')     { return str_to_perl($args) }
+    when ('Char')    { return char_to_perl($args) }
+    when ('Bool')    { return bool_to_perl($args) }
+    when ('Sym')     { return sym_to_perl($args) }
+    when ('Type')    { return type_to_perl($args) }
+    when ('Cursor')  { return struct_to_perl($args) }
+    when ('Lint')    { return struct_to_perl($args) }
+    when ('strings') { return struct_to_perl($args) }
+    when ('Int')     { return $args }
+    when ('Ns')      { return $args }
+    when ('package') { return ' ' }
+    when ('end')     { return '1;' }
     default {
-      say to_json([$atom]);
-      error("miss action: to perl!");
+      my $strs = atoms_to_perls($args);
+      return oper_to_perl($name, $strs)
     }
   }
 }
 
-sub char_to_perl {
-  my $args      = shift;
-  my $last_char = tail($args);
-  given ($last_char) {
-    when ('b') { return "''" }
-    when ('n') { return '"\n"' }
-    when ('t') { return '"\t"' }
-    when ('r') { return '"\r"' }
-    when ('s') { return "' '" }
-    when ('\\') { return '"\\\\"' }
-    default    { return "'$last_char'" }
-  }
-}
-
-sub oper_to_perl {
-  my $atoms = shift;
-  my ($name, $args) = @{$atoms};
-  my $strs = atoms_to_perl($args);
-  given ($name) {
-    when ('>>') {
-      my ($elem, $array) = @{$strs};
-      return "eunshift($elem, $array)";
-    }
-    when ('<<') {
-      my ($array, $elem) = @{$strs};
-      return "epush($array, $elem)";
-    }
-    default {
-      my $expr_str = join(" $name ", @{$strs});
-      return "($expr_str)";
-    }
-  }
-}
-
-sub call_to_perl {
-  my $atom = shift;
-  my ($action, $args) = @{$atom};
-  my $strs = atoms_to_perl($args);
-  my $str = join ', ', @{$strs};
-  given ($action) {
-    when ('exists')  { return "exists $str" }
-    when ('say')     { return "say $str" }
-    when ('print')   { return "print $str" }
-    when ('delete')  { return "delete $str" }
-    when ('return')  { return "return $str" }
-    when ('chop')    { return "Chop($str)" }
-    when ('inc')     { return "$str++" }
-    when ('dec')     { return "$str--" }
-    when ('shift')   { return "shift \@{$str};" }
-    when ('split')   { return "[split $str]" }
-    when ('nextif')  { return "next if $str" }
-    when ('exitif')  { return "exit() if $str" }
-    when ('stdin')   { return '<STDIN>' }
-    when ('add')     { add_to_perl($strs) }
-    when ('map')     { map_to_perl($strs) }
-    when ('grep')    { grep_to_perl($strs) }
-    when ('join')    { join_to_perl($strs) }
-    when ('push')    { push_to_perl($strs) }
-    when ('unshift') { unshift_to_perl($strs) }
-    default {
-      my $name = sym_to_perl($action);
-      return "$name($str)"
-    }
-  }
-}
-
-sub add_to_perl {
-  my $strs = shift;
-  my $str = join ' . ', @{$strs};
-  return "($str)";
-}
-
-sub map_to_perl {
-  my $strs = shift;
-  my ($fn, $array) = @{$strs};
-  return "[ map { $fn(\$_) } \@{$array} ]";
-}
-
-sub grep_to_perl {
-  my $strs = shift;
-  my ($fn, $array) = @{$strs};
-  return "[ grep { $fn(\$_) } \@{$array} ]";
-}
-
-sub join_to_perl {
-  my $strs = shift;
-  my ($char, $array) = @{$strs};
-  return "join $char, \@{$array}; ";
-}
-
-sub push_to_perl {
-  my $strs = shift;
-  my ($array, $elem) = @{$strs};
-  return "push \@{$array}, $elem;";
-}
-
-sub unshift_to_perl {
-  my $strs = shift;
-  my ($array, $elem) = @{$strs};
-  return "unshift \@{$array}, $elem;";
-}
-
-sub ocall_to_perl {
+sub struct_to_perl {
   my $args = shift;
-  my ($call, $args) = @{$args};
-  my $call_name = sym_to_perl($call);
-  my $strs      = atoms_to_perl($args);
-  my $args_str  = join ', ', @{$strs};
-  return "$call_name($args_str)";
+  return atoms_to_perl($args);
+}
+
+sub type_to_perl {
+  my $value = shift;
+  given ($value) {
+    when ('Int')    { return '0' }
+    when ('Str')    { return "''" }
+    when ('Bool')   { return '1' }
+    when ('Array')  { return '[]' }
+    when ('Hash')   { return '{} ' }
+    when ('Table')  { return '{}' }
+    default         { croak("unknown type |$value|") }
+  }
+  return True;
 }
 
 sub aindex_to_perl {
-  my $args       = shift;
-  my $strs       = atoms_to_perl($args);
-  my $name       = $strs->[0];
-  my $indexs     = rest($strs);
-  my $indexs_str = join '][', @{$indexs};
-  return "$name\->[$indexs_str]";
-}
-
-sub hkey_to_perl {
-  my $args     = shift;
-  my $strs     = atoms_to_perl($args);
-  my $name     = $strs->[0];
-  my $keys     = rest($strs);
-  my $keys_str = join '}{', @{$keys};
-  return "$name\->{$keys_str} ";
-}
-
-sub arange_to_perl {
   my $args = shift;
-  my ($sym,  $range) = @{$args};
-  my ($from, $to)    = @{$range};
-  my $name = atom_to_perl($sym);
-  if ($to == 0) {
-    return "subarray($sym, $from)";
-  }
-  return "subarray($sym, $from, $to)";
+  my $strs = atoms_to_perls($args);
+  my ($name, $indexs) = match($strs);
+  my $indexs_strs =
+    [map { index_to_perl($_) } @{ atoms($indexs) }];
+  my $str = join '', @{$indexs_strs};
+  return "$name\->$str ";
 }
 
-sub exprs_to_perl {
-  my $exprs      = shift;
-  my $exprs_strs = atoms_to_perl($exprs);
-  my $str        = join_exprs($exprs_strs);
-  return "{ $str }";
+sub index_to_perl {
+  my $index = shift;
+  my $char  = last_char($index);
+  if (is_digit($char)) { return "[$index]" }
+  return "{$index}";
 }
 
 sub while_to_perl {
@@ -227,40 +132,27 @@ sub while_to_perl {
   return "while $str";
 }
 
-sub for_to_perl {
+sub cond_exprs_to_perl {
   my $args = shift;
-  my $strs = atoms_to_perl($args);
-  my $str  = join ' ', @{$strs};
-  return "for $str";
+  my $strs = atoms_to_perls($args);
+  my ($cond, $exprs_strs) = match($strs);
+  my $exprs_str = exprs_to_perl($exprs_strs);
+  if (first_char($cond) eq chr(40)) {
+    return "$cond $exprs_str";
+  }
+  return "($cond) $exprs_str";
 }
 
-sub iter_to_perl {
-  my $args      = shift;
-  my $iter_name = $args->[1][1];
-  my $flip      = first($iter_name);
-  my $strs      = atoms_to_perl($args);
-  my ($loop, $iter) = @{$strs};
-  given ($flip) {
-    when ('$') {
-      return "my $loop (split '', $iter)";
-    }
-    when ('%') {
-      return "my $loop (keys %{$iter})";
-    }
-    default {
-      if ($iter_name eq '@args') {
-        return "my $loop ($iter)";
-      }
-      return "my $loop (\@{$iter})";
-    }
-  }
+sub exprs_to_perl {
+  my $strs = shift;
+  my $str  = join_perl_exprs($strs);
+  return "{ $str }";
 }
 
 sub given_to_perl {
   my $args = shift;
-  my $strs = atoms_to_perl($args);
-  my ($sym, $given_exprs) = @{$strs};
-  return "given ($sym) $given_exprs";
+  my $str  = cond_exprs_to_perl($args);
+  return "given $str";
 }
 
 sub when_to_perl {
@@ -271,8 +163,8 @@ sub when_to_perl {
 
 sub then_to_perl {
   my $args = shift;
-  my $str  = atom_to_perl($args);
-  return "default $str";
+  my $str  = atoms_to_perl($args);
+  return "default { $str }";
 }
 
 sub if_to_perl {
@@ -289,291 +181,328 @@ sub elif_to_perl {
 
 sub else_to_perl {
   my $exprs = shift;
-  my $str   = atom_to_perl($exprs);
-  return "else $str";
+  my $str   = atoms_to_perl($exprs);
+  return "else { $str }";
+}
+
+sub for_to_perl {
+  my $args = shift;
+  my ($iter_expr, $exprs) = match($args);
+  my $iter_str  = iter_to_perl($iter_expr);
+  my $exprs_str = atoms_to_perl($exprs);
+  return "for $iter_str { $exprs_str } ";
+}
+
+sub iter_to_perl {
+  my $expr = shift;
+  my ($loop, $iter_atom) = flat($expr);
+  my $iter = value($iter_atom);
+  if ($iter eq '@args') { return "my $loop ($iter)" }
+  my $iter_char = first_char($iter);
+  my $iter_str  = atom_to_perl($iter_atom);
+  given ($iter_char) {
+    when ('$') { return "my $loop (split '', $iter_str)" }
+    when ('%') { return "my $loop (keys %{$iter_str})" }
+    default    { return "my $loop (\@{$iter_str})" }
+  }
 }
 
 sub func_to_perl {
   my $atoms = shift;
-  my ($args, $rest)      = match($atoms);
-  my ($name, $func_args) = @{$args};
-  my $args_str   = get_args_str($func_args);
-  my ($return, $exprs)  = match($rest);
-  my $exprs_strs = atoms_to_perl($exprs);
-  if (first($return) ne '->') {
-    $exprs_strs = atoms_to_perl($rest);
-  } 
-  my $exprs_str  = join_exprs($exprs_strs);
-  $name = sym_to_perl($name);
+  my ($args,   $rest)      = match($atoms);
+  my ($return, $exprs)     = match($rest);
+  my ($call,   $func_args) = flat($args);
+  my $args_str = args_to_perl($func_args);
+  if (not(is_atom_name($return, '->'))) { $exprs = $rest }
+  my $exprs_strs = atoms_to_perls($exprs);
+  my $exprs_str  = join_perl_exprs($exprs_strs);
+  my $name       = sym_to_perl($call);
   return "sub $name { $args_str $exprs_str }";
 }
 
-sub get_args_str {
+sub args_to_perl {
   my $args = shift;
-  if (len($args) == 0) { return "" }
-  my $strs = [map { sym_to_perl($_->[0]) } @{$args}];
-  my $str = join(',', @{$strs});
-  if (len($args) == 1) {
-    if (start_with($str, '@')) {
-      return "my $str = \@_;";
-    }
+  if (is_blank($args)) { return ' ' }
+  my $strs = [map { sym_to_perl($_) }
+      @{ [map { name($_) } @{ atoms($args) }] }];
+  my $str = join ', ', @{$strs};
+  if (len($strs) == 1) {
+    if ($str eq '@args') { return "my $str = \@_;" }
     return "my $str = shift;";
   }
-  else {
-    return "my ($str) = \@_;";
-  }
+  return "my ($str) = \@_;";
 }
 
 sub my_to_perl {
   my $args = shift;
-  my $sym  = $args->[0];
-  my $strs = atoms_to_perl($args);
-  my ($sym_name, $value_str) = @{$strs};
-  return "my $sym_name = $value_str";
+  my ($sym, $value) = flat($args);
+  my $value_str = atom_to_perl($value);
+  my $name      = atom_to_perl($sym);
+  return "my $name = $value_str";
+}
+
+sub our_to_perl {
+  my $args = shift;
+  my ($sym, $value) = flat($args);
+  my $value_str = atom_to_perl($value);
+  my $list      = value($sym);
+  my $list_str  = list_to_perl($list);
+  return "my $list_str = $value_str";
+}
+
+sub const_to_perl {
+  my $args = shift;
+  my $strs = atoms_to_perls($args);
+  my ($name, $value_str) = flat($strs);
+  return "our $name = $value_str";
 }
 
 sub list_to_perl {
   my $list = shift;
-  my $strs = atoms_to_perl($list);
-  my $str  = join ', ', @{$strs};
+  my $strs = atoms_to_perls($list);
+  my $str  = ejoin($strs, ', ');
   return "($str)";
 }
 
 sub return_to_perl {
   my $args = shift;
-  my $strs = atoms_to_perl($args);
-  my $str  = join ', ', @{$strs};
+  my $strs = atoms_to_perls($args);
+  my $str  = ejoin($strs, ', ');
   return "return $str";
 }
-
-sub use_to_perl {
-  my $ns = shift;
-  return "use $ns;";
-}
-
-sub import_to_perl {
-  my $args = shift;
-  my $strs = atoms_to_perl($args);
-  my $str  = join ' ', @{$strs};
-  return "use $str;";
-}
+sub use_to_perl { my $args = shift; return "use $args;" }
 
 sub slist_to_perl {
-  my $list = shift;
-  my $strs = atoms_to_perl($list);
-  my $str  = join ' ', @{$strs};
+  my $list  = shift;
+  my $names = [map { value($_) } @{ atoms($list) }];
+  my $strs  = [map { sym_to_perl($_) } @{$names}];
+  my $str   = join ' ', @{$strs};
   return "qw($str)";
-}
-
-sub sym_to_perl {
-  my $name  = shift;
-  my @chars = ();
-  return $name if $name eq '@args';
-  for my $char (split '', $name) {
-    given ($char) {
-      when ('-') { push @chars, '_' }
-      when ('@') { push @chars, '$' }
-      when ('%') { push @chars, '$' }
-      default    { push @chars, $char }
-    }
-  }
-  return join('', @chars);
-}
-
-sub lstr_to_perl {
-  my $str = shift;
-  return "<<'EOF'\n${str}\nEOF\n";
-}
-
-sub str_to_perl {
-  my $str = shift;
-  return qq('$str');
 }
 
 sub string_to_perl {
   my $atoms = shift;
   my $strs  = [];
-  for my $atom (@{$atoms}) {
-    my ($type, $value) = @{$atom};
+  for my $atom (@{ atoms($atoms) }) {
+    my ($type, $value) = flat($atom);
     given ($type) {
       when ('Sym') {
         my $name = sym_to_perl($value);
         push @{$strs}, $name;
       }
-      default { push @{$strs}, $value }
+      default { push @{$strs}, $value; }
     }
   }
-  my $str = join('', @{$strs});
-  return qq("$str");
+  my $str = join '', @{$strs};
+  return "\"$str\"";
 }
 
 sub array_to_perl {
   my $array     = shift;
-  my $atoms     = atoms_to_perl($array);
-  my $atoms_str = join ',', @{$atoms};
+  my $atoms     = atoms_to_perls($array);
+  my $atoms_str = ejoin($atoms, ', ');
   return "[$atoms_str]";
 }
 
 sub hash_to_perl {
   my $pairs = shift;
-  my $strs  = atoms_to_perl($pairs);
-  my $str   = join(', ', @{$strs});
-
-  # add trail space to distinguish with block
+  my $strs  = [];
+  for my $pair (@{ atoms($pairs) }) {
+    my ($name, $args) = flat($pair);
+    if ($name eq 'Pair') {
+      push @{$strs}, pair_to_perl($args);
+    }
+  }
+  my $str = join ', ', @{$strs};
   return "{$str} ";
 }
 
 sub pair_to_perl {
   my $pair = shift;
-  my $strs = atoms_to_perl($pair);
-  return join(' => ', @{$strs});
+  my $strs = atoms_to_perls($pair);
+  return ejoin($strs, ' => ');
 }
+
+sub lstr_to_perl {
+  my $str = shift;
+  return "<<'EOF'\n$str\nEOF\n";
+}
+sub str_to_perl { my $str = shift; return "'$str'" }
 
 sub bool_to_perl {
   my $bool = shift;
-  return '1' if $bool eq 'true';
+  if ($bool eq 'true') { return '1' }
   return '0';
 }
 
-sub set_to_perl {
-  my $args = shift;
-  my $strs = atoms_to_perl($args);
-  my $str  = join ' = ', @{$strs};
-  return "$str";
-}
-
-sub not_to_perl {
-  my $expr = shift;
-  my ($call, $args) = @{$expr};
-  my $name = '!' . sym_to_perl($call);
-  my $strs = atoms_to_perl($args);
-  my $str  = join(',', @{$strs});
-  return "$name($str)";
-}
-
-## ===========================================
-## Common Function
-## ===========================================
-
-sub ast_to_perl_repl {
-  my $exprs      = shift;
-  my $exprs_strs = atoms_to_perl($exprs);
-  my $exprs_str  = join_exprs($exprs_strs);
-  return $exprs_str;
-}
-
-sub atoms_to_perl {
-  my $atoms = shift;
-  return [map { atom_to_perl($_) } @{$atoms}];
-}
-
-sub join_exprs {
-  my $exprs    = shift;
-  my $strs     = [];
-  my $end_char = ';';
-  for my $expr (@{$exprs}) {
-    if ($end_char ~~ [';', '}']) {
-      push @{$strs}, $expr;
+sub sym_to_perl {
+  my $name  = shift;
+  my $chars = [];
+  if ($name eq '@args') { return $name }
+  for my $char (split '', $name) {
+    given ($char) {
+      when ('-') { push @{$chars}, '_'; }
+      when ('@') { push @{$chars}, '$'; }
+      when ('%') { push @{$chars}, '$'; }
+      default    { push @{$chars}, $char; }
     }
-    else {
-      push @{$strs}, ';';
-      push @{$strs}, $expr;
-    }
-    $end_char = substr($expr, -1);
   }
-  return join(' ', @{$strs});
-}
-
-sub cond_exprs_to_perl {
-  my $args = shift;
-  my $strs = atoms_to_perl($args);
-  my ($cond, $exprs_str) = @{$strs};
-  if (first($cond) eq '(') {
-    return "$cond $exprs_str";
-  }
-  return "($cond) $exprs_str";
+  return join '', @{$chars};
 }
 
 sub get_perl_head_str {
   my $exprs      = shift;
   my $func_names = [];
-  my $head_str   = '';
-  my $flag       = 0;
-  for my $expr (@{$exprs}) {
-    my ($name, $value, $pos) = @{$expr};
-    given ($name) {
-      when ('func') {
-
-        # say to_json($value->[0]); exit();
-        push @{$func_names}, $value->[0][0];
-      }
-      when ('module') {
-        $head_str = ns_to_perl($name, $value);
-        $flag = 1;
-      }
-      when ('class') {
-        $head_str = ns_to_perl($name, $value);
-        $flag = 2;
-      }
+  my $head_str   = 'str';
+  for my $expr (@{ atoms($exprs) }) {
+    my ($name, $value) = flat($expr);
+    if ($name eq 'package') {
+      $head_str = package_to_perl($value);
+    }
+    if ($name eq 'func') {
+      push @{$func_names}, name(name($value));
     }
   }
-  if ($flag == 1) {
-    my $export_str = get_export_str($func_names);
-    return $head_str . $export_str;
-  }
-  if ($flag == 2) {
-    return $head_str;
-  }
-  return <<'EOF';
-#!/usr/bin/perl
-
-use 5.012;
-no warnings "experimental";
-
-EOF
+  my $export_str = get_export_str($func_names);
+  return add($head_str, $export_str);
 }
 
-sub ns_to_perl {
-  my ($name, $ns) = @_;
-  return <<EOF;
-package $ns;
+sub package_to_perl {
+  my $ns          = shift;
+  my $package_str = "package $ns;";
+  my $head_str    = <<'EOF'
 
-use 5.012;
-no warnings "experimental";
 
+    use 5.012;
+    no warnings 'experimental';
+
+    use Exporter;
+    our @ISA = qw(Exporter);
 EOF
+    ;
+  return add($package_str, $head_str);
 }
 
 sub get_export_str {
   my $names = shift;
-  my @names = grep { first($_) ne '_' } @{$names};
-  my $str   = join ' ', map { sym_to_perl($_) } @names;
-  return <<"EOF";
-use Exporter;
-our \@ISA = qw(Exporter);
-our \@EXPORT = qw($str);
-
-EOF
+  my $export_names = [grep { is_exported($_) } @{$names}];
+  my $perl_names =
+    [map { sym_to_perl($_) } @{$export_names}];
+  my $names_str = join ' ', @{$perl_names};
+  return "our \@EXPORT = qw($names_str);\n\n";
 }
 
-sub tidy_perl {
-  my $source_string = shift;
-  my $dest_string;
-  my $stderr_string;
-  my $errorfile_string;
-  my $argv  = "-i=2 -l=60 -vt=2 -pt=2 -bt=1 -sbt=2 -bbt=1";
-  my $error = Perl::Tidy::perltidy(
-    argv        => $argv,
-    source      => \$source_string,
-    destination => \$dest_string,
-    stderr      => \$stderr_string,
-    errorfile   => \$errorfile_string,
-  );
-
-  if ($error) {
-    print "<<STDERR>>\n$stderr_string\n";
+sub oper_to_perl {
+  my ($name, $strs) = @_;
+  if (
+    $name ~~ [
+      '=',  '+',  '-',  '==', '>=', '!=', '>',  '<',
+      '<=', '&&', '||', '~~', 'gt', 'ge', 'lt', 'x',
+      'eq', 'le', 'ne', 'in'
+    ]
+    )
+  {
+    my $oper_str = ejoin($strs, " $name ");
+    return "$oper_str";
   }
-  return $dest_string;
+  return call_to_perl($name, $strs);
 }
 
+sub call_to_perl {
+  my ($name, $strs) = @_;
+  my $str = ejoin($strs, ', ');
+  given ($name) {
+    when ('split')   { return split_to_perl($strs) }
+    when ('map')     { return map_to_perl($strs) }
+    when ('grep')    { return grep_to_perl($strs) }
+    when ('join')    { return join_to_perl($strs) }
+    when ('push')    { return push_to_perl($strs) }
+    when ('unshift') { return unshift_to_perl($strs) }
+    when ('exists')  { return exists_to_perl($strs) }
+    when ('delete')  { return delete_to_perl($strs) }
+    when ('say')     { return "say $str" }
+    when ('print')   { return "print $str" }
+    when ('chop')    { return "Chop($str)" }
+    when ('inc')     { return "$str++" }
+    when ('dec')     { return "$str --" }
+    when ('stdin')   { return "<STDIN>" }
+    when ('shift')   { return "shift \@{$str};" }
+    when ('nextif')  { return "next if $str" }
+    when ('exitif')  { return "exit() if $str" }
+    default {
+      my $action = sym_to_perl($name);
+      return "$action($str)"
+    }
+  }
+}
+
+sub split_to_perl {
+  my $strs = shift;
+  if (elen($strs) == 1) {
+    my $array = name($strs);
+    return "split '', $array";
+  }
+  my ($list, $sub_str) = flat($strs);
+  return "[ split $sub_str, $list ]";
+}
+
+sub map_to_perl {
+  my $strs = shift;
+  my ($fn, $array) = flat($strs);
+  return "[ map { $fn(\$_) } \@{$array} ]";
+}
+
+sub grep_to_perl {
+  my $strs = shift;
+  my ($fn, $array) = flat($strs);
+  return "[ grep { $fn(\$_) } \@{$array} ]";
+}
+
+sub join_to_perl {
+  my $strs  = shift;
+  my $array = name($strs);
+  if (elen($strs) == 1) { return "join '', \@{$array} " }
+  my $char = value($strs);
+  return "join $char, \@{$array};";
+}
+
+sub push_to_perl {
+  my $strs = shift;
+  my ($array, $elem) = flat($strs);
+  return "push \@{$array}, $elem;";
+}
+
+sub unshift_to_perl {
+  my $strs = shift;
+  my ($array, $elem) = flat($strs);
+  return "unshift \@{$array}, $elem;";
+}
+
+sub exists_to_perl {
+  my $strs = shift;
+  my ($hash, $keys) = match($strs);
+  my $keys_str = join '',
+    @{ [map { key_to_perl($_) } @{ atoms($keys) }] };
+  return "exists $hash\->$keys_str";
+}
+sub key_to_perl { my $key = shift; return "{$key}" }
+
+sub delete_to_perl {
+  my $strs = shift;
+  my ($hash, $key) = flat($strs);
+  return "delete $hash\->{$key};";
+}
+
+sub char_to_perl {
+  my $args      = shift;
+  my $last_char = last_char($args);
+  given ($last_char) {
+    when ('n')  { return '"\n"' }
+    when ('t')  { return '"\t"' }
+    when ('r')  { return '"\r"' }
+    when ("\\") { return '"\\\\"' }
+    when ("'")  { return '"\'"' }
+    default     { return "'$last_char'" }
+  }
+}
 1;

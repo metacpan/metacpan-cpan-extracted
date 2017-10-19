@@ -15,7 +15,6 @@ lib/Font/FreeType/Glyph.pm
 lib/Font/FreeType/NamedInfo.pm
 Makefile.PL
 MANIFEST
-META.json
 META.yml			Module meta-data
 t/05library.t
 t/10metrics_5x7bdf.t
@@ -34,10 +33,10 @@ t/data/0041.8.8.600.600.0.pgm
 t/data/5x7.bdf
 t/data/5x7.fnt
 t/data/bdf_bitmaps.txt
-t/data/bdf_glyphs.txt
 t/data/copyright.txt
 t/data/OldStandard-Bold.otf
 t/data/Vera.ttf
 t/data/vera_glyphs.txt
 TODO
 typemap
+META.json                                Module JSON meta-data (added by MakeMaker)

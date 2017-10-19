@@ -1,9 +1,9 @@
 package Net::DNS::RR;
 
 #
-# $Id: RR.pm 1569 2017-05-31 09:01:09Z willem $
+# $Id: RR.pm 1597 2017-09-22 08:04:02Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1569 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
 
 
 =head1 NAME
@@ -132,11 +132,10 @@ sub _new_string {
 
 	if ( $#token && $token[0] =~ /^[\\]?#$/ ) {
 		shift @token;					# RFC3597 hexadecimal format
-		my $count = shift(@token) || 0;
-		my $rdata = pack 'H*', join '', @token;
-		my $rdlen = $self->{rdlength} = length $rdata;
-		croak 'length and hexadecimal data inconsistent' unless $rdlen == $count;
-		$self->_decode_rdata( \$rdata, 0 ) if $rdlen;	# unpack RDATA
+		my $rdlen = shift(@token) || 0;
+		my $rdata = pack 'H*', join( '', @token );
+		croak 'length and hexadecimal data inconsistent' unless $rdlen == length $rdata;
+		$self->rdata($rdata) if $rdlen;			# unpack RDATA
 		return $self;
 	}
 
@@ -173,30 +172,30 @@ sections required for certain dynamic update operations.
 
 =cut
 
+my @core = qw(owner name type class ttl rdlength);
+
 sub _new_hash {
-	my ( $base, %argument ) = @_;
+	my $base = shift;
 
 	my %attribute = ( owner => '.', type => 'NULL' );
-	while ( my ( $key, $value ) = each %argument ) {
-		$attribute{lc $key} = $value;
+	while ( my $key = shift ) {
+		$attribute{lc $key} = shift;
 	}
 
-	my ( $owner, $type, $class, $ttl ) = @attribute{qw(owner type class ttl)};
-	$owner = $attribute{name} if exists $attribute{name};	# synonym for owner
+	my ( $owner, $name, $type, $class, $ttl ) = @attribute{@core};
+	delete @attribute{@core};				# leaving RDATA only
 
-	delete @attribute{qw(owner name class type ttl rdlength)};
-	my $populated = scalar %attribute;			# RDATA specified
-
-	my $self = $base->_subclass( $type, $populated );	# RR with defaults (if appropriate)
-	$self->owner($owner);
+	my $self = $base->_subclass( $type, scalar %attribute );
+	$self->owner( $name ? $name : $owner );
 	$self->class($class) if defined $class;			# specify CLASS
 	$self->ttl($ttl)     if defined $ttl;			# specify TTL
 
-	die "type $type not implemented" if $populated && ref($self) eq __PACKAGE__;
-
-	while ( my ( $attribute, $value ) = each %attribute ) {
-		$self->$attribute( ref($value) eq 'ARRAY' ? @$value : $value );
-	}
+	eval {
+		while ( my ( $attribute, $value ) = each %attribute ) {
+			$self->$attribute( ref($value) eq 'ARRAY' ? @$value : $value );
+		}
+	};
+	die ref($self) eq __PACKAGE__ ? "type $type not implemented" : () if $@;
 
 	return $self;
 }
@@ -273,7 +272,7 @@ sub encode {
 	my $type  = $self->{type};
 	my $class = $self->{class} || 1;
 	my $index = $offset + length($owner) + RRFIXEDSZ;
-	my $rdata = eval { $self->_encode_rdata( $index, @opaque ); } || '';
+	my $rdata = eval { $self->_empty ? '' : $self->_encode_rdata( $index, @opaque ); } || '';
 	return pack 'a* n2 N n a*', $owner, $type, $class, $self->ttl, length $rdata, $rdata;
 }
 
@@ -298,7 +297,7 @@ sub canonical {
 	my $type  = $self->{type};
 	my $class = $self->{class} || 1;
 	my $index = RRFIXEDSZ + length $owner;
-	my $rdata = eval { $self->_encode_rdata($index); } || '';
+	my $rdata = eval { $self->_empty ? '' : $self->_encode_rdata($index); } || '';
 	pack 'a* n2 N n a*', $owner, $type, $class, $self->ttl, length $rdata, $rdata;
 }
 
@@ -335,11 +334,12 @@ sub string {
 	my @ttl	 = grep defined, $self->{ttl};
 	my @core = ( $name, @ttl, $self->class, $self->type );
 
-	my @rdata = eval { $self->_format_rdata; };
+	my $empty = $self->_empty;
+	my @rdata = eval { $empty ? () : $self->_format_rdata; };
 	carp $@ if $@;
 
 	my $tab = length($name) < 72 ? "\t" : ' ';
-	return join $tab, @core, '; no data' unless scalar @rdata;
+	$self->_annotation('no data') if $empty;
 
 	my @line = _wrap( join( $tab, @core, '(' ), @rdata, ')' );
 
@@ -379,14 +379,11 @@ sub token {
 	my @ttl = grep defined, $self->{ttl};
 	my @core = ( $self->{owner}->string, @ttl, $self->class, $self->type );
 
+	my @rdata = eval { $self->_empty ? () : $self->_format_rdata; };
+
 	# parse into quoted strings, contiguous non-whitespace and (discarded) comments
-	local $_ = join ' ', eval { $self->_format_rdata; };
-	s/\\\\/\\092/g;						# disguise escaped escape
-	s/\\"/\\034/g;						# disguise escaped quote
-	s/\\\(/\\040/g;						# disguise escaped bracket
-	s/\\\)/\\041/g;						# disguise escaped bracket
-	s/\\;/\\059/g;						# disguise escaped semicolon
-	my @token = @core, grep defined && length, split /$PARSE_REGEX/o;
+	my @parse = map { s/\\\\/\\092/g; s/\\"/\\034/g; split /$PARSE_REGEX/o; } @rdata;
+	my @token = ( @core, grep defined && length, @parse );
 }
 
 
@@ -456,8 +453,8 @@ Resource record class.
 
 sub class {
 	my $self = shift;
-	$self->{class} = classbyname(shift) if scalar @_;
-	classbyval( $self->{class} || 1 ) if defined wantarray;
+	return $self->{class} = classbyname(shift) if scalar @_;
+	defined $self->{class} ? classbyval( $self->{class} ) : 'IN';
 }
 
 
@@ -504,14 +501,12 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 
 sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $rdata = shift->{rdata};
-	return defined $rdata ? $rdata : '';
 }
 
 
 sub _format_rdata {			## format rdata portion of RR string
-	my $self = shift;
-	my $data = $self->rdata;
-	my $size = length($data) || return '';			# RFC3597 unknown RR format
+	my $data = shift->rdata;
+	my $size = length($data);				# RFC3597 unknown RR format
 	my @data = ( '\\#', $size, split /(\S{32})/, unpack 'H*', $data );
 }
 
@@ -549,13 +544,13 @@ Resource record data section when viewed as opaque octets.
 sub rdata {
 	my $self = shift;
 
-	return eval { $self->_encode_rdata( 0x4000, {} ); } unless scalar @_;
+	return eval { $self->_empty ? '' : $self->_encode_rdata( 0x4000, {} ); } || '' unless @_;
 
-	my $rdata = shift;
+	my $rdata = shift || '';
 	my $rdlen = $self->{rdlength} = length $rdata;
 	my $hash  = {};
 	$self->_decode_rdata( \$rdata, 0, $hash ) if $rdlen;
-	croak 'found compression pointer in rdata' if keys %$hash;
+	croak 'unexpected compression pointer in rdata' if keys %$hash;
 }
 
 
@@ -570,7 +565,7 @@ Returns a string representation of the RR-specific data.
 sub rdstring {
 	my $self = shift;
 
-	my @rdata = eval { $self->_format_rdata; };
+	my @rdata = eval { $self->_empty ? () : $self->_format_rdata; };
 	carp $@ if $@;
 
 	join "\n\t", _wrap(@rdata);
@@ -581,12 +576,12 @@ sub rdstring {
 
     $rdlength = $rr->rdlength;
 
-Returns the length of the encoded RR-specific data.
+Returns the uncompressed length of the encoded RR-specific data.
 
 =cut
 
 sub rdlength {
-	length shift->_encode_rdata;
+	length shift->rdata;
 }
 
 
@@ -682,10 +677,10 @@ sub _subclass {
 		unless ( $_LOADED{$rrtype} ) {			# load once only
 			local @INC = LIB;
 
-			my $mnemon = typebyval($rrtype);
-			$mnemon =~ s/[^A-Za-z0-9]//g;		# expect the unexpected
+			my $identifier = typebyval($rrtype);
+			$identifier =~ s/\W/_/g;		# kosher Perl identifier
 
-			my $subclass = join '::', __PACKAGE__, $mnemon;
+			my $subclass = join '::', __PACKAGE__, $identifier;
 
 			unless ( eval "require $subclass" ) {
 				push @INC, sub {
@@ -720,6 +715,13 @@ sub _annotation {
 	my $self = shift;
 	$self->{annotation} = ["@_"] if scalar @_;
 	return @{$self->{annotation} || []} if wantarray;
+}
+
+
+my %ignore = map( ( $_ => 1 ), @core, 'annotation', '#' );
+
+sub _empty {
+	( $_[0]->{'#'} ||= scalar grep !$ignore{$_}, keys %{$_[0]} ) == 0;
 }
 
 
@@ -760,7 +762,7 @@ sub AUTOLOAD {				## Default method
 
 	my $string = $self->string;
 	my @object = grep defined($_), $oref, $oref->VERSION;
-	my $module = join '::', __PACKAGE__, typebyval( $self->{type} );
+	my $module = join '::', __PACKAGE__, $self->type;
 	eval("require $module") if $oref eq __PACKAGE__;
 
 	@_ = ( <<"END", $@, "@object" );

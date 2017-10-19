@@ -1,0 +1,16 @@
+Changes
+bin/runcrypt
+lib/Mail/Run/Crypt.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README
+t/encrypt.t
+t/encrypt-sign.t
+t/require-key-data.t
+t/require-mailto.t
+xt/manifest.t
+xt/pod-coverage.t
+xt/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,65 @@
+<& /Elements/Header, Title => $title &>
+<& /Elements/Tabs &>
+<& /Elements/ListActions, actions => \@results &>
+
+<form method="post" action="Prefs.html" name="ModifyUsersPreferences" id="ModifyUsersPreferences">
+<input type="hidden" name="id" value="<% $UserObj->id %>" />
+% foreach my $section( RT->Config->Sections ) {
+<&|/Widgets/TitleBox, title => loc( $section ) &>
+% foreach my $option( RT->Config->Options(Section => $section)) {
+% next if $option eq 'EmailFrequency' && !RT->Config->Get('RecordOutgoingEmail');
+% my $meta = RT->Config->Meta($option);
+<& $meta->{'Widget'},
+    Default      => 1,
+    %{ $m->comp('/Widgets/FinalizeWidgetArguments', WidgetArguments =>
+            $meta->{'WidgetArguments'})},
+    Name         => $option,
+    DefaultValue => scalar RT->Config->Get($option),
+    CurrentValue => $preferences->{$option},
+&>
+% }
+</&>
+% }
+
+% if (RT->Config->Get('Crypt')->{'Enable'}) {
+<&|/Widgets/TitleBox, title => loc('Cryptography') &>
+<&|/l&>Preferred key</&>: <& /Elements/Crypt/SelectKeyForEncryption, EmailAddress => $UserObj->EmailAddress, Default => $UserObj->PreferredKey &>
+</&>
+% }
+
+<& /Elements/Submit, Name => 'Update', Label => loc('Save Changes') &>
+</form>
+<%INIT>
+my @results;
+my $UserObj = RT::User->new($session{'CurrentUser'});
+$UserObj->Load($id) || Abort("Couldn't load user '" . ($id || '') . "'");;
+my $title = loc("Preferences for the user [_1]", $UserObj->Name);
+
+my $preferences = $UserObj->Preferences($RT::System);
+
+if (defined($PreferredKey) and (not $UserObj->FirstAttribute('PreferredKey')
+        or $PreferredKey ne $UserObj->FirstAttribute('PreferredKey')->Content)) {
+    my ($code, $msg) = $UserObj->SetAttribute(Name => 'PreferredKey', Content => $PreferredKey);
+    push @results, loc('Preferred Key: [_1]', $msg) unless $code;
+}
+
+if ($Update) {
+    $preferences ||= {};
+    $m->comp( '/Widgets/BulkProcess', Meta => {
+                map {$_ => RT->Config->Meta($_)} RT->Config->Options
+            },
+            Store => $preferences,
+            Types => [RT->Config->Options], Default => 1, Arguments => \%ARGS,
+            DefaultValue => {map {$_ => RT->Config->Get($_)}
+                RT->Config->Options
+            });
+
+    my ($ok, $msg) = $UserObj->SetPreferences($RT::System, $preferences);
+    push @results, $ok ? loc("Preferences saved.") : $msg;
+}
+</%INIT>
+<%ARGS>
+$id => undef,
+$Update => 0,
+$PreferredKey => undef,
+</%ARGS>

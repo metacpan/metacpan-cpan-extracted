@@ -1,13 +1,16 @@
 NAME
+
     Module::Build::SysPath - install files to system folders according to
     FHS (or Sys::Path settings)
 
 SYNOPSIS
+
         use Module::Build::SysPath;
         my $builder = Module::Build::SysPath->new(
             ...
 
 DESCRIPTION
+
     A subclass of Module::Build using Sys::Path to determine the system
     folders. Help in task of installing files into system folders and
     keeping the option to work in local distribution files while developing
@@ -17,7 +20,9 @@ DESCRIPTION
     configuration and a folder to store templates in.
 
 USAGE
-  module-starter
+
+ module-starter
+
         module-starter --builder=Module::Build --module=Acme::NewModule --author="Pod" --email=pod@pod
         cd Acme-NewModule/
         perl -lane 's/Module::Build-/Module::Build::SysPath-/; print $_;' -i Build.PL 
@@ -26,7 +31,8 @@ USAGE
         # add "configure_requires => { 'Module::Build::SysPath' => 0.10 },"
         # add "Module::Build::SysPath' => 0.10," to build_requires
 
-  create SPc.pm
+ create SPc.pm
+
     copy http://github.com/jozef/Sys-Path/blob/master/examples/SPc.pm and
     add it to your source tree. Clean up the paths that you don't need.
     Local distribution folder names can be changed to anyones taste. For
@@ -34,20 +40,23 @@ USAGE
 
         sub sysconfdir { File::Spec->catdir(__PACKAGE__->prefix, 'conf') };
 
-    'conf' is the name of a folder with `conffile's. All file put to this
+    'conf' is the name of a folder with conffiles. All file put to this
     folder will be installed to Sys::Path->sysconfdir().
 
-  use the SPc.pm
-    Calling `Acme::NewModule::SPc->sysconfdir' before the distribution is
-    installed will return path to the 'conf' folder in the distribution root
-    folder. Calling it after install the distribution will return
+ use the SPc.pm
+
+    Calling Acme::NewModule::SPc->sysconfdir before the distribution is
+    installed will return path to the 'conf' folder in the distribution
+    root folder. Calling it after install the distribution will return
     Sys::Path->sysconfdir().
 
 EXAMPLE
+
     See Acme::SysPath for a really simple, Test::Daily for a real world
     example.
 
-  new
+ new
+
     Populates:
 
         $builder->{'properties'}->{$path_type.'_files'} = ...;
@@ -76,58 +85,65 @@ EXAMPLE
     want them to be created during `./Build install`.
 
     Configuration files get a special (Debian like) treatment. All files in
-    `sysconfdir' and all files specified as
-    `$builder->{'properties'}->{'conffiles'}' are configuration files. Using
-    Sys::Path the c<conffile>s checksums are tracked. Here are the model
-    situations:
+    sysconfdir and all files specified as
+    $builder->{'properties'}->{'conffiles'} are configuration files. Using
+    "install_checksums" in Sys::Path the c<conffile>s checksums are
+    tracked. Here are the model situations:
 
-    `conffile' was never installed jet
-        The file is just copied in place (to sysconfdir) as it is. MD5 is
-        recorded.
+    conffile was never installed jet
+
+      The file is just copied in place (to sysconfdir) as it is. MD5 is
+      recorded.
 
     distribution ships new version, no change in system
-        The distribution changed the `conffile' (for example by adding new
-        values), but the `conffile' was untouched in the system. Then the
-        new version from distribution replaces the one in the system.
 
-    distribution `conffile' wasn't changed, `conffile' changed in system
-        Already installed distribution is getting upgrade. Distribution
-        `conffile's form installed and the new version didn't change. But
-        the `conffile' was changed in the system. No prompt and the
-        `conffile' is kept intact.
+      The distribution changed the conffile (for example by adding new
+      values), but the conffile was untouched in the system. Then the new
+      version from distribution replaces the one in the system.
 
-    distribution `conffile' change, `conffile' changed in system
-        Already installed distribution is getting upgrade. When both the
-        distribution changed the `conffile' and the `conffile' was changed
-        in the system. User will be prompted what to do:
+    distribution conffile wasn't changed, conffile changed in system
 
-            Installing new version of config file /etc/SOMEFILE ...
-    
-            Configuration file `/etc/SOMEFILE'
-             ==> Modified (by you or by a script) since installation.
-             ==> Package distributor has shipped an updated version.
-               What would you like to do about it ?  Your options are:
-                Y or I  : install the package maintainer's version
-                N or O  : keep your currently-installed version
-                  D     : show the differences between the versions
-                  Z     : background this process to examine the situation
-             The default action is to keep your current version.
-    
-            *** /etc/SOMEFILE (Y/I/N/O/D/Z) ?
+      Already installed distribution is getting upgrade. Distribution
+      conffiles form installed and the new version didn't change. But the
+      conffile was changed in the system. No prompt and the conffile is
+      kept intact.
 
-        If N or O is selected distribution files is installed with -spc
-        suffix. If Y or I is selected the system `conffile' is renamed by
-        adding suffix -old and distribution `conffile' is installed.
+    distribution conffile change, conffile changed in system
 
-  ACTION_install
-    This action is responsible for renaming files, replacing SPc.pm paths to
-    systems once from Sys::Path. Also makes files writable (chmod 0644). And
-    stores the checksums of `conffile's.
+      Already installed distribution is getting upgrade. When both the
+      distribution changed the conffile and the conffile was changed in the
+      system. User will be prompted what to do:
+
+          Installing new version of config file /etc/SOMEFILE ...
+          
+          Configuration file `/etc/SOMEFILE'
+           ==> Modified (by you or by a script) since installation.
+           ==> Package distributor has shipped an updated version.
+             What would you like to do about it ?  Your options are:
+              Y or I  : install the package maintainer's version
+              N or O  : keep your currently-installed version
+                D     : show the differences between the versions
+                Z     : background this process to examine the situation
+           The default action is to keep your current version.
+          
+          *** /etc/SOMEFILE (Y/I/N/O/D/Z) ?
+
+      If N or O is selected distribution files is installed with -spc
+      suffix. If Y or I is selected the system conffile is renamed by
+      adding suffix -old and distribution conffile is installed.
+
+ ACTION_install
+
+    This action is responsible for renaming files, replacing SPc.pm paths
+    to systems once from Sys::Path. Also makes files writable (chmod 0644).
+    And stores the checksums of conffiles.
 
 AUTHOR
-    Jozef Kutej, `<jkutej at cpan.org>'
+
+    Jozef Kutej, <jkutej at cpan.org>
 
 CONTRIBUTORS
+
     The following people have contributed to the Sys::Path by commiting
     their code, sending patches, reporting bugs, asking questions,
     suggesting useful advices, nitpicking, chatting on IRC or commenting on
@@ -137,37 +153,8 @@ CONTRIBUTORS
         Emmanuel Rodriguez
         Slaven Rezić
 
-BUGS
-    Please report any bugs or feature requests to `bug-module-build-syspath
-    at rt.cpan.org', or through the web interface at
-    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Module-Build-SysPath. I
-    will be notified, and then you'll automatically be notified of progress
-    on your bug as I make changes.
-
-SUPPORT
-  Mailing list
-    http://lists.meon.sk/mailman/listinfo/sys-path
-
-  The rest
-    You can find documentation for this module with the perldoc command.
-
-        perldoc Sys::Path
-
-    You can also look for information at:
-
-    * RT: CPAN's request tracker
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Module-Build-SysPath
-
-    * AnnoCPAN: Annotated CPAN documentation
-        http://annocpan.org/dist/Module-Build-SysPath
-
-    * CPAN Ratings
-        http://cpanratings.perl.org/d/Module-Build-SysPath
-
-    * Search CPAN
-        http://search.cpan.org/dist/Module-Build-SysPath
-
 COPYRIGHT & LICENSE
+
     Copyright 2009 Jozef Kutej, all rights reserved.
 
     This program is free software; you can redistribute it and/or modify it

@@ -8,10 +8,10 @@ require Exporter;
 );
 use warnings;
 use strict;
-our $VERSION = '0.05';
-use Carp;
-use Cwd;
-use File::Compare;
+our $VERSION = '0.06';
+use Carp qw/carp croak/;
+use Cwd 'getcwd';
+use File::Compare 'compare';
 
 sub ls_dir
 {
@@ -83,7 +83,7 @@ sub get_only
 
 sub get_diff
 {
-    my ($dir1, $ls_dir1_ref, $dir2, $ls_dir2_ref, $verbose) = @_;
+    my ($dir1, $ls_dir1_ref, $dir2, $ls_dir2_ref) = @_;
     if (ref ($ls_dir1_ref) ne "HASH" ||
 	ref ($ls_dir2_ref) ne "HASH") {
         croak "get_diff requires hash references as arguments 2 and 4";
@@ -97,23 +97,8 @@ sub get_diff
                 next;
             }
             my $d2file = "$dir2/$file";
-            if (0) {
-                my $dodiff = "diff --brief $d1file $d2file";
-                my $diff = `$dodiff`;
-                if ($verbose) {
-                    print $dodiff;
-                    print "\n";
-                    print $diff;
-                    print "\n";
-                }
-                if ($diff) {
-                    $different{$file} = 1;
-                }
-            }
-            else {
-                if (compare ($d1file, $d2file) != 0) {
-                    $different{$file} = 1;
-                }
+	    if (compare ($d1file, $d2file) != 0) {
+		$different{$file} = 1;
             }
         }
     }

@@ -5,6 +5,7 @@ use warnings;
 
 my @args;
 my %opts;
+my @regexps;
 my @excludes;
 my @includes;
 my @paths;
@@ -61,7 +62,7 @@ my %combos = (
     scala => ["-ext=scala"],
     scheme => ["-ext=scm,ss"],
     shell => ["-ext=sh,bash,csh,tcsh,ksh,zsh,fish",
-              "-line1=^#!.*\\b(sh|bash|csh|tcsh|ksh|zsh|fish)\b"],
+              "-line1=^#!.*\\b(sh|bash|csh|tcsh|ksh|zsh|fish)\\b"],
     smalltalk => ["-ext=st"],
     sql => ["-ext=sql,ctl"],
     tcl => ["-ext=tcl,itcl,itk"],
@@ -77,28 +78,35 @@ my $combo_regexp = join "|", keys %combos;
 
 my @defaults = (
     "-xbinary",
-    "-xe=.bzr,.cdv,.git,.hg,.metadata,.pc,.svn,CMakeFiles,CVS",
-    "-xe=RCS,SCCS,_MTN,_build,_darcs,_sgbak,autom4te.cache,blib",
-    "-xe=cover_db,node_modules,~.dep,~.dot,~.nib,~.plst",
+    "-xnamee=.bzr,.cdv,.git,.hg,.metadata,.pc,.svn,CMakeFiles,CVS",
+    "-xnamee=RCS,SCCS,_MTN,_build,_darcs,_sgbak,autom4te.cache,blib",
+    "-xnamee=cover_db,node_modules,~.dep,~.dot,~.nib,~.plst",
     "-xext=bak",
-    "-x=[.-]min[.]js\$|[.]css[.]min\$|[.]js[.]min\$|[.]min[.]css\$",
-    "-x=[._].*[.]swp\$",
-    "-x=^#.+#\$",
-    "-x=core[.]\\d+\$",
-    "-x=~\$",
+    "-xname=[.-]min[.]js\$|[.]css[.]min\$|[.]js[.]min\$|[.]min[.]css\$",
+    "-xname=[._].*[.]swp\$",
+    "-xname=^#.+#\$",
+    "-xname=core[.]\\d+\$",
+    "-xname=~\$",
 );
 
 parse_args([@defaults]);
 read_rc();
 parse_args([@ARGV]);
-my $regexp = shift @args;
+if (!@regexps) {
+    my $regexp = shift @args;
+    if ($regexp) {
+        push @regexps, {str => $regexp};
+    }
+}
 push @paths, @args;
 
 if ($opts{multiline} && $opts{invert}) {
     die "Multiline inverted matches not supported.\n";
 }
-if ($opts{ignorecase} && $regexp) {
-    $regexp = qr/$regexp/i;
+if ($opts{ignorecase}) {
+    for my $i (0 .. $#regexps) {
+        $regexps[$i]{str} = qr/$regexps[$i]{str}/i;
+    }
 }
 
 my @files;
@@ -126,13 +134,13 @@ if (-t STDIN) {
     }
 }
 else {
-    if (!$regexp) {
+    if (!@regexps) {
         die "Regexp required!\n";
     }
     match();
 }
 
-if ($regexp) {
+if (@regexps) {
     exit !$nmatches;
 }
 else {
@@ -192,13 +200,10 @@ sub parse_args {
         elsif ($arg =~ /^(--?help|-h|-\?)$/) {
             usage();
         }
-        elsif ($arg =~ /^-man$/) {
-            man();
-        }
-        elsif ($arg =~ /^-i(gnorecase)?$/) {
+        elsif ($arg =~ /^-i$/) {
             $opts{ignorecase} = 1;
         }
-        elsif ($arg =~ /^-combos$/) {
+        elsif ($arg =~ /^-c$/) {
             combos();
         }
         elsif ($arg =~ /^-l$/) {
@@ -210,31 +215,39 @@ sub parse_args {
         elsif ($arg =~ /^-t$/) {
             $opts{fileslist} = 1;
         }
-        elsif ($arg =~ /^-f(ile)?(=(.*))?$/) {
-            my $path = $2 ? $3 : shift(@$pargs);
+        elsif ($arg =~ /^-f(=(.*))?$/) {
+            my $path = $1 ? $2 : shift(@$pargs);
             push @paths, $path;
         }
-        elsif ($arg =~ /^-o(nly)?$/) {
+        elsif ($arg =~ /^-r(=(.*))?$/) {
+            my $regexp = $1 ? $2 : shift(@$pargs);
+            push @regexps, {str => $regexp};
+        }
+        elsif ($arg =~ /^-R(=(.*))?$/) {
+            my $regexp = $1 ? $2 : shift(@$pargs);
+            push @regexps, {str => $regexp, invert => 1};
+        }
+        elsif ($arg =~ /^-o$/) {
             $opts{only} = 1;
         }
-        elsif ($arg =~ /^-p(rint)?(=(.*))?$/) {
-            $opts{print} = $2 ? $3 : shift(@$pargs);
+        elsif ($arg =~ /^-p(=(.*))?$/) {
+            $opts{print} = $1 ? $2 : shift(@$pargs);
         }
-        elsif ($arg =~ /^-passthr(u|ough)$/) {
+        elsif ($arg =~ /^-u$/) {
             $opts{passthru} = 1;
             $opts{style} = 3;
         }
-        elsif ($arg =~ /^-(k|nocolor)$/) {
+        elsif ($arg =~ /^-k$/) {
             $opts{nocolor} = 1;
         }
-        elsif ($arg =~ /^-(v|invert)$/) {
+        elsif ($arg =~ /^-v$/) {
             $opts{invert} = 1;
         }
-        elsif ($arg =~ /^-(y|style)(\d+)$/) {
-            if ($2 == 0 || $2 > 3)  {
+        elsif ($arg =~ /^-y(\d+)$/) {
+            if ($1 == 0 || $1 > 3)  {
                 die "unknown style: style unknown\n";
             }
-            $opts{style} = $2;
+            $opts{style} = $1;
         }
         elsif ($arg =~ /^-A(\d+)?$/) {
             $opts{after} = defined $1 ? $1 : 2;
@@ -245,24 +258,24 @@ sub parse_args {
         elsif ($arg =~ /^-C(\d+)?$/) {
             $opts{after} = $opts{before} = defined $1 ? $1 : 2;
         }
-        elsif ($arg =~ /^-m(ultiline)?$/) {
+        elsif ($arg =~ /^-m$/) {
             $opts{multiline} = 1;
         }
-        elsif ($arg =~ /^-d(epth)?((\d+)|=(.*)|)$/) {
-            $opts{depth} = defined $3 ? $3 : $2 ? $4 : shift(@$pargs);
+        elsif ($arg =~ /^-d((\d+)|=(.*)|)$/) {
+            $opts{depth} = defined $2 ? $2 : $1 ? $3 : shift(@$pargs);
         }
         elsif ($arg =~ /^-$/) {
             die "Invalid argument '-'\n";
         }
-        elsif ($arg =~ /^-(no)?(x)?(i)?(r)?(ext|abs)(=(.*))?$/) {
+        elsif ($arg =~ /^-(no)?(x)?(i)?(r)?(ext)(=(.*))?$/) {
             my $value = $6 ? $7 : shift(@$pargs);
             add_condition(no => $1, invert => $invert, ignorecase => $3, eq => !$4, what => $5, type => $2, value => $value);
         }
-        elsif ($arg =~ /^-(no)?(x)?(i)?(path|name|line1|g)?(e)?(=(.*))?$/) {
+        elsif ($arg =~ /^-(no)?(x)?(i)?(path|name|line1)(e)?(=(.*))?$/) {
             my $value = $6 ? $7 : shift(@$pargs);
             add_condition(no => $1, invert => $invert, ignorecase => $3, eq => $5, what => $4, type => $2, value => $value);
         }
-        elsif ($arg =~ /^-(X)$/) {
+        elsif ($arg =~ /^-x$/) {
             add_condition(no => 1, invert => $invert, all => 1, type => "x");
         }
         elsif ($arg =~ /^-(no)?(x)?(text|binary)$/) {
@@ -306,10 +319,6 @@ sub add_condition {
             $cond{value} = ext_regexp($cond{value});
             $cond{regexp} = 1;
         }
-    }
-    elsif ($args{what} eq "abs" && !$cond{regexp}) {
-        $cond{value} = abspath($cond{value});
-        $cond{"abs"} = 1;
     }
     else {
         $cond{$args{what}} = 1;
@@ -355,7 +364,10 @@ sub find {
         };
         for (readdir $dh) {
             next if /^\.\.?$/;
-            my $file2 = {path => "$file->{path}/$_"};
+            my $path2 = $file->{path};
+            $path2 .= "/" if $path2 !~ m{/$};
+            $path2 .= $_;
+            my $file2 = {path => $path2};
             find([$file2], $depth + 1);
         }
         closedir $dh;
@@ -408,12 +420,6 @@ sub matches_condition {
         }
         $str = $file->{line1};
     }
-    elsif ($cond->{abs}) {
-        if (!defined $file->{abs}) {
-            $file->{abs} = abspath($file->{path});
-        }
-        $str = $file->{abs};
-    }
     elsif ($cond->{path}) {
         $str = $file->{path};
     }
@@ -440,37 +446,9 @@ sub matches_condition {
     }
 }
 
-sub abspath {
-    my ($path) = @_;
-    my $abs = $path =~ m{^/} ? $path : "$ENV{PWD}/$path";
-    $abs =~ s{/+}{/};
-    my @a;
-    my @parts = split m{/}, $abs;
-    while (1) {
-        my $part = shift @parts;
-        last if !defined $part;
-        next if $part eq ".";
-        if ($part eq "..") {
-            pop @a;
-            next;
-        }
-        my $link = readlink(join("/", @a) . "/$part");
-        if (defined $link) {
-            @a = () if $link =~ m{^/};
-            $link =~ s{/+}{/};
-            my @lparts = split m{/}, $link;
-            unshift @parts, @lparts;
-            next;
-        }
-        push @a, $part;
-    }
-    $abs = join "/", @a;
-    return $abs;
-}
-
 sub match {
     my ($file) = @_;
-    if (!$regexp || $opts{fileslist}) {
+    if (!@regexps || $opts{fileslist}) {
         print "$file->{path}\n";
     }
     elsif (defined $opts{filesmatch}) {
@@ -504,21 +482,46 @@ sub multiline_match {
     my $fh = get_fh($file) or return;
     my $content = do {local $/; <$fh>};
     close $fh;
-
     my $matches = 0;
-    while ($content =~ /$regexp/gms) {
+    while (1) {
+        my $matches2 = 1;
+        my @starts;
+        my @ends;
+        for my $regexp (@regexps) {
+            if ($regexp->{invert}) {
+                $matches2 &&= $content !~ /$regexp->{str}/gms;
+                @starts = @-;
+                @ends = @+;
+            }
+            else {
+                $matches2 &&= $content =~ /$regexp->{str}/gms;
+                @starts = @-;
+                @ends = @+;
+            }
+        }
+        last if !$matches2;
         if ($file && !$matches) {
             display_file($file);
         }
         $matches++;
         if ($opts{print}) {
-            eval "print \"$opts{print}\\n\";\n";
+            print match_replacement($opts{print}, $content, \@starts, \@ends);
         }
         else {
-            print "$&\n"
+            print substr($content, $starts[0], $ends[0] - $starts[0]) . "\n";
         }
     }
     $nmatches += $matches;
+}
+
+sub match_replacement {
+    my ($fmt, $content, $starts, $ends) = @_;
+    my $str = $fmt;
+    $str =~ s{\$([&1-9])}{
+        my $n = $1 eq "&" ? 0 : $1;
+        substr($content, $starts->[$n], $ends->[$n] - $starts->[$n]);
+    }ge;
+    return "$str\n";
 }
 
 sub files_match {
@@ -527,14 +530,31 @@ sub files_match {
     my $fmatches = 0;
     if ($opts{multiline}) {
         my $content = do {local $/; <$fh>};
-        if ($content =~ /$regexp/gms) {
+        my $match = 1;
+        for my $regexp (@regexps) {
+            if ($regexp->{invert}) {
+                $match &&= $content !~ /$regexp->{str}/gms;
+            }
+            else {
+                $match &&= $content =~ /$regexp->{str}/gms;
+            }
+        }
+        if ($match) {
             $fmatches++;
         }
     }
     else {
-        while (<$fh>) {
-            chomp;
-            my $match = /$regexp/g;
+        while (my $input = <$fh>) {
+            chomp $input;
+            my $match = 1;
+            for my $regexp (@regexps) {
+                if ($regexp->{invert}) {
+                    $match &&= $input !~ /$regexp->{str}/g;
+                }
+                else {
+                    $match &&= $input =~ /$regexp->{str}/g;
+                }
+            }
             $match = !$match if $opts{invert};
             if ($match) {
                 $fmatches++;
@@ -560,13 +580,29 @@ sub singleline_match {
     my @before;
     my $last_print = 0;
     my $last_match = 0;
-    while (<$fh>) {
-        chomp;
+    while (my $input = <$fh>) {
+        chomp $input;
         my $lmatches = 0;
         my @starts;
         my @ends;
         while (1) {
-            my $match = /$regexp/g;
+            my $match = 1;
+            my @starts2;
+            my @ends2;
+            my $saved_pos = pos($input);
+            for my $regexp (@regexps) {
+                pos($input) = $saved_pos;
+                if ($regexp->{invert}) {
+                    $match &&= $input !~ /$regexp->{str}/g;
+                    @starts2 = @-;
+                    @ends2 = @+;
+                }
+                else {
+                    $match &&= $input =~ /$regexp->{str}/g;
+                    @starts2 = @-;
+                    @ends2 = @+;
+                }
+            }
             $match = !$match if $opts{invert};
             last if !$match;
             $lmatches++;
@@ -574,15 +610,18 @@ sub singleline_match {
             if ($fmatches == 1 && !$opts{passthru}) {
                 display_file($file);
             }
-            display_match($file, $., $_);
+            display_match($file, $., $input, \@starts2, \@ends2);
             last if $opts{invert};
-            push @starts, $-[0];
-            push @ends, $+[0];
+            last if !@starts2 || !@ends2;
+            my $length = $ends2[0] - $starts2[0];
+            last if $length == 0;
+            push @starts, $starts2[0];
+            push @ends, $ends2[0];
         }
         if ($lmatches) {
             if ($opts{before} || $opts{after}) {
                 if ($last_print && $. > $last_print + 1) {
-                    display_jump($file, $., $_);
+                    display_jump($file, $., $input);
                 }
             }
             if ($opts{before}) {
@@ -592,20 +631,20 @@ sub singleline_match {
                     display_line($file, $bn, $before[$i]);
                 }
             }
-            display_line($file, $., $_, \@starts, \@ends);
+            display_line($file, $., $input, \@starts, \@ends);
             $last_print = $.;
             $last_match = $.;
         }
         elsif ($opts{passthru}) {
-            display_line($file, $., $_);
+            display_line($file, $., $input);
             $last_print = $.;
         }
         elsif ($opts{after} && $last_match && $. <= $last_match + $opts{after}) {
-            display_line($file, $., $_);
+            display_line($file, $., $input);
             $last_print = $.;
         }
         if ($opts{before}) {
-            push @before, $_;
+            push @before, $input;
             shift @before if @before > $opts{before};
         }
     }
@@ -639,7 +678,7 @@ sub display_jump {
 }
 
 sub display_match {
-    my ($file, $n, $line) = @_;
+    my ($file, $n, $line, $starts, $ends) = @_;
     return if !$opts{only} && !$opts{print};
     if ($file) {
         if ($opts{style} && $opts{style} == 2) {
@@ -650,13 +689,13 @@ sub display_match {
         }
     }
     if ($opts{print}) {
-        eval "print \"$opts{print}\\n\";\n";
+        print match_replacement($opts{print}, $line, $starts, $ends);
     }
     elsif ($opts{invert}) {
         print "$line\n";
     }
     else {
-        print "$&\n";
+        print substr($line, $starts->[0], $ends->[0] - $starts->[0]) . "\n";
     }
 }
 
@@ -685,12 +724,12 @@ sub display_line {
 
 sub usage {
     print <<'EOUSAGE';
-Usage: gre [-help] [-man]
-           [-A[<n>]] [-B[<n>]] [-C[<n>]] [-combos] [-d=<depth>]
+Usage: gre [-h] [-c]
+           [-A[<n>]] [-B[<n>]] [-C[<n>]] [-d<n>]
            [-f=<file>] [-i] [-k] [-l] [-L] [-m] [-o] [-p=<str>]
-           [-passthru] [-t] [-v] [-y<n>] [-X]
+           [-r=<regexp>] [-R=<regexp>] [-t] [-u] [-v] [-y<n>] [-x]
            [-[no]xbinary]
-           [-[no][x][i][r][ext,abs]=<str>]
+           [-[no][x][i][r][ext]=<str>]
            [-[no][x][i][name,path,line1][e]=<str>]
            [-[perl,html,php,js,java,cc,...]]
            [<regexp>] [<file>...]
@@ -701,69 +740,40 @@ Options:
 [<file>...]        list of files to include, if not provided will
                    be current directory.
 
--h, -?, -help      help text
--man               extra info about the script
-
 -A[<n>]            print n lines after the matching line, default 2
 -B[<n>]            print n lines before the matching line, default 2
 -C[<n>]            print n lines before and after the matching line, default 2
--combos            displays builtin filter combos (-perl, -html, -php, -js)
--d, -depth=<num>   max depth of file recursion (1 is no recursion)
--f, -file=<file>   provide a filename, as if it was an arg on the command line
--i, -ignorecase    case insensitive matches
+-c                 displays builtin filter combos (-perl, -html, -php, -js)
+-d<n>              max depth of file recursion (1 is no recursion)
+-f=<file>          provide a filename, as if it was an arg on the command line
+-h, -?, -help      help text
+-i                 case insensitive matches
 -k                 disable color
 -l                 print files that match
 -L                 print files that don't match
--m, -multiline     multiline regexp matches
--o, -only          only output the matching part of the line
--p, -print=<str>   print customized parts of the match ($1, $&, etc. are available)
--passthru          pass all lines through, but highlight matches
+-m                 multiline regexp matches
+-o                 only output the matching part of the line
+-p=<str>           print customized parts of the match ($1, $&, etc. are available)
+-r=<regexp>        provide a regexp, as if it was an arg on the command line
+-R=<regexp>        like -r but line must not match regexp
 -t                 print files that would be searched (ignore regexp)
--v, -invert        select non-matching lines
+-u                 passthrough all lines, but highlight matches
+-v                 select non-matching lines
+-x                 disables builtin default excluding filters
 -y1                output style 1, grouped by file, and line number preceeding matches
 -y2                output style 2, classic grep style
 -y3                output style 3, no file/line info.
--X                 disables builtin default excluding filters
-
--[no]xbinary
-                   filters out binary files, "no" allows binary
-                   files if they were previously filtered out
+-[no]xbinary       filters out binary files
 -[no][x][i]name[e]=<str>
-                   include files by name, "no" filters them out,
-                   "i" makes the regexp case insensitive, "e" makes
-                   the match use string equality instead of regexp,
-                   "x" makes it an excluding filter (excludes the
-                   file when matched). with "x" it can apply to and
-                   prune directories.
--[no][x][i][e]=<str>
-                   same as -[no][x][i]name[e]=<str>. Some combinations
-                   won't work, such as -, and -i which have other meanings.
+                   include files by name*
 -[no][x][i]path[e]=<str>
-                   include files by full path name. "no", "x", "i", and
-                   "e" options as described above.
+                   include files by full path name*
 -[no][x][i][r]ext=<str>
-                   include files by extension name. "no", "x", "i",
-                   options as described above. by default this one
-                   does string equality (actually, makes a custom
-                   regexp so it can handle extensions like .tar.gz),
-                   and regexp only if given the "r" option. the
-                   regexp is only matched against the last component
-                   of the file name after a ".", so it can't be
-                   used to match ".tar.gz" files, use -name for
-                   that, or the unadorned -ext option.
--[no][x][i][r]abs=<str>
-                   include files by their absolute path. "no",
-                   "x", "i", "r" options as described above.
-                   if you give a partial str (and "r" option
-                   is not provided) the value will become the
-                   absolute path.
+                   include files by extension name*
 -[no][x][i]line1[e]=<str>
-                   include files by the first line in the file.
-                   "no", "x", "i", and "e" options as described above.
+                   include files by the first line in the file*
 -[no]{perl,html,php,js,java,cc,...}
-                   builtin filter combo. for example -html is
-                   equivalent to -ext=htm,html. use -combos to see
-                   the full list. "no" option inverts the match.
+                   include files matching builtin filter combo*
 EOUSAGE
     exit;
 }
@@ -771,10 +781,8 @@ EOUSAGE
 sub combos {
     for my $name (sort keys %combos) {
         my $combo = $combos{$name};
-        printf "%-15s %s\n", "-$name", $combo->[0];
-        for my $option (@{$combo}[1 .. $#$combo]) {
-            print "                $option\n";
-        }
+        my $options = join " ", @$combo;
+        printf "%-15s %s\n", "-$name", $options;
     }
     print "\ndefault         $defaults[0]\n";
     for my $option (@defaults[1 .. $#defaults]) {
@@ -783,38 +791,106 @@ sub combos {
     exit;
 }
 
-sub man {
-    my $man = <<'EOMAN';
-gre My own take on grep/ack
-===========================
+__END__
 
-[If you're looking for command line options, use $ gre -h]
+=head1 NAME
 
-The main point behind this grep clone is that it can do better file
-matching. For example if you want to search all files for the string
-foo, except dot files (names starting with a "."), you could write
+App::Gre - A grep clone using Perl regexp's with better file filtering, defaults, speed, and presentation
+
+=head1 FEATURES
+
+=over
+
+=item * Uses only Perl regexp's.
+
+=item * Searches file names with regexp's as well as their contents,
+recursively starting with current directory.
+
+=item * Speed is accomplished by only searching files you want to
+search (see "gre -c").
+
+=item * Presentation is colorful and readable.
+
+=back
+
+=head1 SYNOPSIS
+
+    gre [-h] [-c]
+        [-A[<n>]] [-B[<n>]] [-C[<n>]] [-d<n>]
+        [-f=<file>] [-i] [-k] [-l] [-L] [-m] [-o] [-p=<str>]
+        [-r=<regexp>] [-R=<regexp>] [-t] [-u] [-v] [-y<n>] [-x]
+        [-[no]xbinary]
+        [-[no][x][i][r][ext]=<str>]
+        [-[no][x][i][name,path,line1][e]=<str>]
+        [-[perl,html,php,js,java,cc,...]]
+        [<regexp>] [<file>...]
+
+=head1 OPTIONS
+
+    <regexp>           regular expression to match in files
+    [<file>...]        list of files to include, if not provided will
+                       be current directory.
+
+    -A[<n>]            print n lines after the matching line, default 2
+    -B[<n>]            print n lines before the matching line, default 2
+    -C[<n>]            print n lines before and after the matching line, default 2
+    -c                 displays builtin filter combos (-perl, -html, -php, -js)
+    -d<n>              max depth of file recursion (1 is no recursion)
+    -f=<file>          provide a filename, as if it was an arg on the command line
+    -h, -?, -help      help text
+    -i                 case insensitive matches
+    -k                 disable color
+    -l                 print files that match
+    -L                 print files that don't match
+    -m                 multiline regexp matches
+    -o                 only output the matching part of the line
+    -p=<str>           print customized parts of the match ($1, $&, etc. are available)
+    -r=<regexp>        provide a regexp, as if it was an arg on the command line
+    -R=<regexp>        like -r but line must not match regexp
+    -t                 print files that would be searched (ignore regexp)
+    -u                 passthrough all lines, but highlight matches
+    -v                 select non-matching lines
+    -x                 disables builtin default excluding filters
+    -y1                output style 1, grouped by file, and line number preceeding matches
+    -y2                output style 2, classic grep style
+    -y3                output style 3, no file/line info.
+    -[no]xbinary       filters out binary files
+    -[no][x][i]name[e]=<str>
+                       include files by name*
+    -[no][x][i]path[e]=<str>
+                       include files by full path name*
+    -[no][x][i][r]ext=<str>
+                       include files by extension name*
+    -[no][x][i]line1[e]=<str>
+                       include files by the first line in the file*
+    -[no]{perl,html,php,js,java,cc,...}
+                       include files matching builtin filter combo*
+
+=head1 DESCRIPTION
+
+This grep clone is capable of filtering file names as well as file
+contents with regexps.  For example if you want to search all files
+whose name contains "bar" for the string "foo", you could write
 this:
 
-    $ gre -no='^\.' foo
+    $ gre -name=bar foo
 
 Only .c files:
 
-    $ gre -ext=c yup
+    $ gre -ext=c foo
 
 You can build up arbitrarily complex conditions to just search the
 files you want:
 
-    $ gre -X -ext=gz -noext=tar.gz
+    $ gre -ext=html -noext=min.html foo
 
-This would find all .gz files that aren't .tar.gz files. The -X is
-necessary to disable the binary file filter.
+This would find all .html files that aren't .min.html files.
 
-The idea behind file filtering
-==============================
+=head1 FILE FILTERING
 
-It's just as important to be able to filter files with regexes as
+It's just as important to be able to filter files with regexp's as
 are the file contents. In fact, the default is to list files when
-a regex is not given (or is the empty string).
+a regexp is not given (or is the empty string).
 
 The standard "includes" are done in order left to right. This:
 
@@ -824,9 +900,10 @@ will list all perl and php files. This:
 
     $ gre -perl -noname=foo -php
 
-will list all perl files, remove those whose name matches the regex
-of foo, then add all php files. order counts. If you want all perl
-and php files whose name doesn't match foo, you need this:
+will list all perl files, remove those whose name matches the regexp
+of foo, then add all php files. Order counts. Those php files might
+have "foo" in their name. If you want all perl and php files whose
+name doesn't match "foo", you need this:
 
     $ gre -perl -php -noname=foo
 
@@ -842,14 +919,17 @@ will only show perl files.
 will show all files except perl files.
 
 There are two levels of filtering that run independent of each
-other. The "includes" like -perl or -ext=c (.c extension) and the
-"excludes" like -x=foo or -xbinary. why independent?  consider the
-script added a default filter to remove all backup files (-x='~$')
-and which will have to mix with command line filters.  The following
-tries to search for bash files (files whose first line starts with
+other. One level is the "includes" filters like -perl, -nophp, or
+-ext=c.  The second level is the "excludes" filters like -xname=foo
+or -xbinary.
+
+Why are they independent?  Consider if the
+script had a default filter to remove all backup files (-xname='~$')
+which would have to mix with additional command line filters.  The following
+would try to search for bash files (files whose first line starts with
 #!/bin/bash) that aren't backups:
 
-    $ gre -x='~$' -line1='^#!/bin/bash'
+    $ gre -xname='~$' -line1='^#!/bin/bash'
 
 It wouldn't work if they weren't independent: filters are additive,
 so this would have added all files which are not backups then add
@@ -862,39 +942,39 @@ this work:
 
 which will find all html and javascript files.
 
-If I added the builtin filter after the command line arguments:
+If I added the builtin filters after the command line arguments:
 
-    $ gre -line1='^#!/bin/bash' -x='~$'
+    $ gre -line1='^#!/bin/bash' -xname='~$'
 
 Then you wouldn't have a chance to disable it:
 
-    $ gre -line1='^#!/bin/bash' -nox='~$' -x='~$'
+    $ gre -line1='^#!/bin/bash' -noxname='~$' -xname='~$'
 
 It would still filter out the backup files.
 
-So the "includes" and "excludes" need to be independent of each
-other. The result should be intuitive. For example, if you want to
+The result should be intuitive. For example, if you want to
 search everything except one file that's messing up the search add:
 
-    $ gre -x=INBOX.mbox -ext=mbox qwerty
+    $ gre -xname=INBOX.mbox -ext=mbox qwerty
 
-You don't have to worry about order either.
+and you wouldn't have to worry about order of these filters.
 
-If you want to remove all the builtin excluding filters, use -X on
-the command line. By default, gre will exclude backup files,
-swap files, core dumps, .git directories, .svn directories, binary
-files, minimized js files, and more. See the output from -combos
-for the full list.
+If you want to remove all the builtin "exclude" filters, use -x on
+the command line. By default, gre will exclude backup files, swap
+files, core dumps, .git directories, .svn directories, binary files,
+minimized js files, and more. See the output of -c for the full
+list.
 
 "exclude" filters also have another property which the regular
-"include" filters don't have. They prune the recursive file search.
-So -xe=.git will prevent any file under a .git directory from
-being searched (the extra e at the end of -xe means to use
-string equality not regexes for the match). Normal "inclusive"
+"include" filters don't have: They prune the recursive file search.
+So -xnamee=.git will prevent any file under a .git directory from
+being searched (the extra e at the end of -xname means to use
+string equality not regexp's for the match). Normal "include"
 filters do not execute on directories.
 
-You can control the depth of the recursion with the -d option. -d1
-disables recursion. -d0 is unlimited. -d2 will go 2 levels deep.
+You can control the depth of the recursion with the -d option.  -d0
+is for unlimited recursion (the default), -d1 disables recursion,
+-d2 will only let recursion go two levels deep.
 
 Files listed on the command line are always searched regardless of
 the filters.
@@ -902,20 +982,33 @@ the filters.
 Symlinks are not followed. This is usually what you want and otherwise
 you might end up in an infinite loop.
 
-Some more ideas
-===============
+=head1 IDEAS
 
-You can do multiline regexes '^sub.*^\}' (with the addition of the
--multiline option)
+You can do multiline regexp's '^sub.*^\}' (with the addition of the
+-m option)
 
 The script doesn't bundle options so it only uses one dash for the
-long options. Many longer options have shorter equivalents, e.g.
--multiline is -m.
+long options.
 
 Options that take arguments can be given like -ext=foo or -ext foo.
 
-Output styles
-=============
+Option names for file filters can include:
+
+=over
+
+=item * "no" filters files out,
+
+=item * "i" makes the regexp case insensitive,
+
+=item * "e" makes the match use string equality instead of regexp,
+
+=item * "r" makes the match use regexp instead of string equality,
+
+=item * "x" makes it an excluding filter
+
+=back
+
+=head1 OUTPUT STYLES
 
 You can specify the output style with the -y option:
 
@@ -936,12 +1029,12 @@ example,
 
     $ gre '(foo)(bar)' -p='<<$2-$1>>'
 
--A -B -C -A<n> -B<n> -C<n> will show some lines of context around
-the match. -B for before, -A after, -C both. All of these can take
-an optional number parameter. If missing it will be 2.
+-A -B -C -AE<lt>nE<gt> -BE<lt>nE<gt> -CE<lt>nE<gt> will show some
+lines of context around the match. -B for before, -A after, -C both.
+All of these can take an optional number parameter. If missing it
+will be 2.
 
-.grerc file
-===========
+=head1 RC FILE
 
 You can place default options into ~/.grerc file. the format is a
 list of whitespace separated options that will be applied to every
@@ -950,31 +1043,41 @@ line filters. For example:
 
     -xpath=template_compiles
     -xpath=templates/cache
-    -xe=yui
+    -xnamee=yui
 
-Installation
-============
+=head1 INSTALLATION
 
-gre is a single script with no dependencies. copy it to a place in your
+gre is a single script with no dependencies. Copy it to a place in your
 $PATH and it should work as-is. The App::Gre module is just an unused
 placeholder module to make it work with CPAN.
 
-You can also run "cpan App::Gre".
+You can also run "cpan App::Gre" to install it.
 
-More Info / Contact
-===================
+=head1 SEE ALSO
 
-github https://github.com/zorgnax/gre
+grep(1) L<http://www.gnu.org/savannah-checkouts/gnu/grep/manual/grep.html>
 
-metacpan https://metacpan.org/pod/App::Gre
+ack(1) L<http://beyondgrep.com/>
 
-email gelbman@gmail.com
+=head1 METACPAN
 
-EOMAN
-    open my $fh, "|-", "less -SIMR";
-    print $fh $man;
-    close $fh;
-    exit;
-}
+L<https://metacpan.org/pod/App::Gre>
 
+=head1 REPOSITORY
+
+L<https://github.com/zorgnax/gre>
+
+=head1 AUTHOR
+
+Jacob Gelbman, E<lt>gelbman@gmail.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2015 by Jacob Gelbman
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.18.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut
 

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package MetaCPAN::Client::Request;
 # ABSTRACT: Object used for making requests to MetaCPAN
-$MetaCPAN::Client::Request::VERSION = '2.017000';
+$MetaCPAN::Client::Request::VERSION = '2.018000';
 use Moo;
 use Carp;
 use JSON::MaybeXS qw<decode_json encode_json>;
@@ -79,6 +79,7 @@ sub fetch {
     my $self    = shift;
     my $url     = shift or croak 'fetch must be called with a URL parameter';
     my $params  = shift || {};
+    $url =~ s{^/}{};
     my $req_url = sprintf '%s/%s', $self->base_url, $url;
     my $ua      = $self->ua;
 
@@ -270,7 +271,7 @@ MetaCPAN::Client::Request - Object used for making requests to MetaCPAN
 
 =head1 VERSION
 
-version 2.017000
+version 2.018000
 
 =head1 ATTRIBUTES
 

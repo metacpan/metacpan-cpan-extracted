@@ -12,7 +12,7 @@ use warnings;
 
 use Fcntl ":flock";
 
-our $VERSION = '1.28'; # VERSION
+our $VERSION = '1.29'; # VERSION
 
 sub new {
     my $class = shift;
@@ -23,8 +23,8 @@ sub _lock {
     my $self = shift;
     my ($file, $type) = @_;
     my $lock = "$file.lock";
-    open my $fh, ">>", $lock or die "Can't open $lock: $!\n";
-    flock $fh, $type         or die "Can't lock $lock: $!\n";
+    open my $fh, "+>>", $lock or die "Can't open $lock: $!\n";
+    flock $fh, $type          or die "Can't lock $lock: $!\n";
     $fh
 }
 
@@ -78,7 +78,7 @@ Devel::Cover::DB::IO::Base - Base class for IO routines for Devel::Cover::DB
 
 =head1 VERSION
 
-version 1.28
+version 1.29
 
 =head1 SYNOPSIS
 

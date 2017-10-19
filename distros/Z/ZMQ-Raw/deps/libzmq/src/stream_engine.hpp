@@ -79,6 +79,7 @@ namespace zmq
         void restart_input ();
         void restart_output ();
         void zap_msg_available ();
+        const char *get_endpoint () const;
 
         //  i_poll_events interface implementation.
         void in_event ();
@@ -98,8 +99,8 @@ namespace zmq
         //  Detects the protocol used by the peer.
         bool handshake ();
 
-        int identity_msg (msg_t *msg_);
-        int process_identity_msg (msg_t *msg_);
+        int routing_id_msg (msg_t *msg_);
+        int process_routing_id_msg (msg_t *msg_);
 
         int next_handshake_command (msg_t *msg);
         int process_handshake_command (msg_t *msg);

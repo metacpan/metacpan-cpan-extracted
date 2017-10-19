@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Value;
-$Config::Model::Value::VERSION = '2.112';
+$Config::Model::Value::VERSION = '2.113';
 use 5.10.1;
 
 use Mouse;
@@ -193,11 +193,11 @@ sub notify_change {
     $self->map_write_as_inplace( @args{qw/old new/} );
     $self->SUPER::notify_change( %args, value_type => $self->value_type );
 
-    # notify all warped or computed objects that depends on me
+    # shake all warped or computed objects that depends on me
     foreach my $s ( $self->get_depend_slave ) {
-        $change_logger->debug( "calling notify_change on slave ", $s->name )
+        $change_logger->debug( "calling needs_check on slave ", $s->name )
             if $change_logger->is_debug;
-        $s->notify_change( note => 'master triggered changed' );
+        $s->needs_check(1);
     }
 }
 
@@ -956,8 +956,29 @@ sub run_code_on_value {
     }
 }
 
+# function that may be used in eval'ed code to use file in there (in
+# run_code_set_on_value and apply_fix). Using this function is
+# mandatory for tests that are done in pseudo root
+# directory. Necessary for relative path (although chdir in and out of
+# root_dir could work) and for absolute path (where chdir in and out
+# of root_dir would not work without using chroot)
+
+{
+    # val is a value object. Use this trick so eval'ed code can
+    # use file() function instead of $file->() sub ref
+    my $val ;
+    sub set_val {
+        $val = shift;
+    }
+    sub file {
+        return $val->root_path->child(shift);
+    }
+}
+
 sub run_code_set_on_value {
     my ( $self, $value_r, $apply_fix, $array, $msg, $w_info, $invert ) = @_;
+
+    $self->set_val;
 
     foreach my $label ( sort keys %$w_info ) {
         my $code = $w_info->{$label}{code};
@@ -1038,6 +1059,8 @@ sub apply_fix {
         $str =~ s/\n/ /g;
         $fix_logger->info( $self->location . ": Applying fix '$str'" );
     }
+
+    $self->set_val;
 
     eval($fix);
     if ($@) {
@@ -1831,7 +1854,7 @@ Config::Model::Value - Strongly typed configuration value
 
 =head1 VERSION
 
-version 2.112
+version 2.113
 
 =head1 SYNOPSIS
 
@@ -2100,6 +2123,16 @@ The example below warns if value contaims a number:
         fix  => 's/\d//g;'
     }
  },
+
+Any operation or check on file must be done with C<file> sub
+(otherwise tests will break). This sub returns a L<Path::Tiny>
+object that can be used to perform checks. For instance:
+
+  warn_if => {
+     warn_test => {
+         code => 'not file($_)->exists',
+         msg  => 'file $_ should exist'
+     }
 
 =item warn_unless
 

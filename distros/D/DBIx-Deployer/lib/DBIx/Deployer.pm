@@ -3,7 +3,7 @@ use Modern::Perl;
 use Moops;
 
 
-class DBIx::Deployer::Patch 1.2.2 {
+class DBIx::Deployer::Patch 1.2.3 {
     use Digest::MD5;
     use Term::ANSIColor qw(colored);
     use Data::Printer colored => 1;
@@ -14,12 +14,12 @@ class DBIx::Deployer::Patch 1.2.2 {
     has supports_transactions => ( is => 'ro', isa => Bool, default => true );
     has dependencies => ( is => 'ro', isa => Maybe[ArrayRef] );
     has deploy_sql => ( is => 'ro', isa => Maybe[Str] );
-    has deploy_sql_args => ( is => 'ro', isa => Maybe[ArrayRef] );
+    has deploy_sql_args => ( is => 'rw', isa => Maybe[ArrayRef] );
     has deploy_script => ( is => 'ro', isa => Maybe[Str] );
     has deploy_script_args => ( is => 'rw', isa => Maybe[ArrayRef] );
     has no_verify => ( is => 'ro', isa => Bool, default => false );
     has verify_sql => ( is => 'ro', isa => Str );
-    has verify_sql_args => ( is => 'ro', isa => ArrayRef );
+    has verify_sql_args => ( is => 'rw', isa => ArrayRef );
     has verify_expects => ( is => 'ro', isa => ArrayRef );
     has db => ( is => 'ro', isa => InstanceOf['DBI::db'], required => true );
 
@@ -138,7 +138,7 @@ class DBIx::Deployer::Patch 1.2.2 {
     }
 }
 
-class DBIx::Deployer 1.2.2 {
+class DBIx::Deployer 1.2.3 {
     use DBI;
     use DBD::SQLite;
     use JSON::XS;
@@ -293,7 +293,7 @@ DBIx::Deployer - Light-weight database patch utility
 
 =head1 VERSION
 
-version v1.2.2
+version v1.2.3
 
 =head1 SYNOPSIS
 

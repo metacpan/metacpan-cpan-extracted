@@ -20,7 +20,7 @@ my %WriteMakefileArgs = (
     "Carp" => 0,
     "File::Temp" => 0,
     "File::Which" => 0,
-    "HTTP::Tiny" => 0,
+    "HTTP::Tiny" => "0.14.0",
     "JSON::MaybeXS" => 0,
     "Moo" => 0,
     "Net::EmptyPort" => 0,
@@ -38,7 +38,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.011",
+  "VERSION" => "0.012",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -49,7 +49,7 @@ my %FallbackPrereqs = (
   "Carp" => 0,
   "File::Temp" => 0,
   "File::Which" => 0,
-  "HTTP::Tiny" => 0,
+  "HTTP::Tiny" => "0.14.0",
   "JSON::MaybeXS" => 0,
   "Moo" => 0,
   "Net::EmptyPort" => 0,

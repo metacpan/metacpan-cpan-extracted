@@ -1,6 +1,6 @@
 package Astro::Utils;
 
-$Astro::Utils::VERSION   = '0.04';
+$Astro::Utils::VERSION   = '0.05';
 $Astro::Utils::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,19 +9,17 @@ Astro::Utils - Utility package for Astronomical Calculations.
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
-
-use vars qw(@ISA @EXPORT);
-require Exporter;
-@ISA    = qw(Exporter);
-@EXPORT = qw(calculate_equinox calculate_solstice);
 
 use 5.006;
 use strict; use warnings;
 use Data::Dumper;
 use DateTime;
+
+use parent 'Exporter';
+our @EXPORT = qw(calculate_equinox calculate_solstice);
 
 my $PI   = 3.141592653589793;
 my $TYPE = { 'MAR' => 0, 'JUN' => 1, 'SEP' => 2, 'DEC' => 3 };
@@ -30,7 +28,7 @@ my $TYPE = { 'MAR' => 0, 'JUN' => 1, 'SEP' => 2, 'DEC' => 3 };
 
 The entire algorithm is based on the  book "Astronomical Algorithms", 2nd Edition
 by Jean Meeus,(C)1998, published by Willmann-Bell, Inc. I needed  this for one of
-my package L<Calendar::Bahai>.
+my disrtribution L<Calendar::Bahai>.
 
 The calculated times are in Terrestrial Dynamical Time (TDT or TT), a replacement
 for Ephemeris Times(ET).TDT is a uniform time used for astronomical calculations.

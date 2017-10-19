@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Node;
-$Config::Model::Node::VERSION = '2.112';
+$Config::Model::Node::VERSION = '2.113';
 use Mouse;
 with "Config::Model::Role::NodeLoader";
 
@@ -48,6 +48,7 @@ my $logger     = get_logger("Tree::Node");
 my $fix_logger = get_logger("Anything::Fix");
 my $change_logger = get_logger("ChangeTracker");
 my $deep_check_logger = get_logger('DeepCheck');
+my $user_logger = get_logger('User');
 
 # Here are the legal element types
 my %create_sub_for = (
@@ -338,15 +339,13 @@ sub init {
     );
 
     if ( $model->{rw_config} or $model->{read_config} ) {
-        # TODO: change to warn
         $self->read_config_data( check => $args{check} // $self->check );
-        $logger->info("read_config parameter for backend is deprecated. ",
+        $user_logger->warn("read_config parameter for backend is deprecated. ",
             "Please use rw_config to specify both read and write parameters.") if $model->{read_config};
     }
 
     if (defined $model->{write_config}) {
-        # TODO: change to warn
-        $logger->info("write_config parameter for backend is deprecated. ",
+        $user_logger->warn("write_config parameter for backend is deprecated. ",
             "Please use only rw_config to specify both read and write parameters.");
     }
 
@@ -1215,7 +1214,7 @@ Config::Model::Node - Class for configuration tree node
 
 =head1 VERSION
 
-version 2.112
+version 2.113
 
 =head1 SYNOPSIS
 

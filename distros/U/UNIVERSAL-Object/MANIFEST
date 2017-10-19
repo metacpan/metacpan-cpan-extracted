@@ -28,6 +28,7 @@ t/020-slots/020-lazy-slots-scalar-defer.t
 t/020-slots/021-lazy-slots-data-thunk.t
 t/020-slots/022-lazy-slots-scalar-lazy.t
 t/020-slots/023-lazy-slots-tie.t
+t/020-slots/non-HAS-based-slots.t
 t/030-instance/010-scalar-instance.t
 t/030-instance/020-array-instance.t
 t/040-immutable/001-basic.t

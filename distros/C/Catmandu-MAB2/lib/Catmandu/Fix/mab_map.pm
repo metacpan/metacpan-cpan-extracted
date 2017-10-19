@@ -1,7 +1,7 @@
 package Catmandu::Fix::mab_map;
 
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 use Catmandu::Sane;
 use Carp qw(confess);
@@ -36,7 +36,7 @@ sub emit {
         $to             = $8;
     }
     else {
-        confess "invalid mab path";
+        Catmandu::Error->throw('invalid mab path');
     }
 
     $field_regex = $field;

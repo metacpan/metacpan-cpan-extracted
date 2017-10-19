@@ -788,7 +788,8 @@ parse_hex_bytes (json_parse_t * parser, unsigned char * p)
     failbadinput (parser)
 
 static INLINE unsigned char *
-do_unicode_escape (json_parse_t * parser, unsigned char * p, unsigned char ** b_ptr)
+do_unicode_escape (json_parse_t * parser, unsigned char * p,
+		   unsigned char ** b_ptr)
 {
     int unicode;
     unsigned int plus;
@@ -797,7 +798,8 @@ do_unicode_escape (json_parse_t * parser, unsigned char * p, unsigned char ** b_
     unicode = parse_hex_bytes (parser, p);
     p += 4;
     plus = ucs2_to_utf8 (unicode, *b_ptr);
-    if (plus == UNICODE_BAD_INPUT) {
+    if (plus == UTF8_BAD_LEADING_BYTE ||
+	plus == UTF8_BAD_CONTINUATION_BYTE) {
 	failbug (__FILE__, __LINE__, parser,
 		 "Failed to parse unicode input %.4s", start);
     }
@@ -1221,6 +1223,7 @@ struct json_token {
     unsigned int end;
     json_token_type_t type;
     unsigned int parent;
+    unsigned blessed : 1;
 };
 
 #define JSON_TOKEN_PARENT_INVALID 0
@@ -1304,6 +1307,9 @@ json_token_new (json_parse_t * parser, unsigned char * start,
 	croak ("%s:%d: bad type %d\n", __FILE__, __LINE__, type);
     }
     Newx (new, 1, json_token_t);
+//    static int nnew;
+//    nnew++;
+//    fprintf (stderr, "New %d %p\n", nnew, new);
     parser->n_mallocs++;
 #if 0
     fprintf (stderr, "%s:%d: parser->n_mallocs = %d\n",

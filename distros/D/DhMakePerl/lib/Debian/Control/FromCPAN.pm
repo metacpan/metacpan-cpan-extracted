@@ -16,18 +16,19 @@ package Debian::Control::FromCPAN;
 use strict;
 use warnings;
 
-our $VERSION = '0.77';
+our $VERSION = '0.96';
 
 use Carp qw(croak);
 
 use base 'Debian::Control';
 
 use CPAN ();
-use DhMakePerl::Utils qw( is_core_module find_cpan_module nice_perl_ver split_version_relation apt_cache );
+use DhMakePerl::Utils qw( is_core_module find_cpan_module nice_perl_ver
+  split_version_relation apt_cache is_core_perl_package );
 use File::Spec qw( catfile );
 use Module::Depends ();
 
-use constant oldstable_perl_version => '5.10.1';
+use constant oldstable_perl_version => '5.14.2';
 
 =head1 METHODS
 
@@ -85,6 +86,16 @@ found.
 
 =cut
 
+sub _install_deb {
+    my ($deb, $verbose) = @_;
+    return if $deb eq 'libdbd-sqlite3-perl' || $deb eq 'libdbd-sqlite-perl';
+    my $inst_cmd = "apt-get -y install $deb";
+    $inst_cmd = "sudo $inst_cmd" if $>;
+    print "Running '$inst_cmd'..." if $verbose;
+    system($inst_cmd) == 0
+        || die "Cannot install package $deb\n";
+}
+
 sub discover_dependencies {
     my ( $self, $opts ) = @_;
 
@@ -97,6 +108,8 @@ sub discover_dependencies {
     my $intrusive = delete $opts->{intrusive};
     my $require_deps = delete $opts->{require_deps};
     my $verbose = delete $opts->{verbose};
+    my $install_deps = delete $opts->{install_deps};
+    my $install_build_deps = delete $opts->{install_build_deps};
     my $wnpp_query = delete $opts->{wnpp_query};
 
     die "Unsupported option(s) given: " . join( ', ', sort( keys(%$opts) ) )
@@ -187,6 +200,11 @@ sub discover_dependencies {
         else {
             $src->Build_Depends->add(@$debs);
         }
+        if ($install_deps) {
+            foreach my $deb (@$debs) {
+                _install_deb($deb->pkg) unless grep {$deb} @$missing;
+            }
+        }
     }
 
     # build-time
@@ -211,6 +229,10 @@ sub discover_dependencies {
         }
         else {
             $src->Build_Depends_Indep->add(@$b_debs);
+        }
+        if ($install_build_deps || $install_deps) {
+            _install_deb($_->pkg)
+                foreach @$b_debs;
         }
     }
 
@@ -300,6 +322,11 @@ sub find_debs_for_modules {
             $dep = Debian::Dependency->new( 'perl', $ver );
         }
         elsif ( my @pkgs = Debian::DpkgLists->scan_perl_mod($module) ) {
+            # core packages should be included above
+            # it is normal to have them here, in case the version
+            # requirement can't be satisfied by the current perl
+            @pkgs = grep { !is_core_perl_package($_) } @pkgs;
+
             $dep = Debian::Dependency->new(
                   ( @pkgs > 1 )
                 ? [ map { { pkg => $_, ver => $version } } @pkgs ]
@@ -322,7 +349,7 @@ sub find_debs_for_modules {
                     }
                 } @pkgs;
                 unless ( @satisfied ) {
-                    print "$module is available locally as @available, but does not satisify $version"
+                    print "$module is available locally as @available, but does not satisfy $version"
                         if $verbose;
                     push @missing, $module;
                 }
@@ -342,12 +369,10 @@ sub find_debs_for_modules {
                 if ( my $available = $pkg->{VersionList} ) {
                     for my $v ( @$available ) {
                         my $d = Debian::Dependency->new( $dep->pkg, '=', $v->{VerStr} );
-                        unless ( $d->satisfies($dep) )
-                        {
-                            push @missing, $module;
-                            print "$module package in APT ($d) does not satisfy $dep"
-                                if $verbose;
-                        }
+                        last if $d->satisfies($dep); # exit loop if we have a good version; otherwise:
+                        push @missing, $module;
+                        print "$module package in APT ($d) does not satisfy $dep"
+                            if $verbose;
                     }
                 }
             }
@@ -384,11 +409,7 @@ sub find_debs_for_modules {
                 my $alt_dep;
 
                 if ( my @pkgs = Debian::DpkgLists->scan_perl_mod($module) ) {
-                    @pkgs = grep {
-                                ( $_ ne 'perl-modules' )
-                            and ( $_ ne 'perl-base' )
-                            and ( $_ ne 'perl' )
-                    } @pkgs;
+                    @pkgs = grep { !is_core_perl_package($_) } @pkgs;
 
                     $alt_dep = Debian::Dependency->new(
                           ( @pkgs > 1 )
@@ -458,7 +479,7 @@ The following checks are made
 
 =over
 
-=item dependencies on C<perl-modules>
+=item dependencies on C<perl-modules*>
 
 These are replaced with C<perl> as per Perl policy.
 
@@ -480,7 +501,7 @@ if the dependency is redundant.
 
 =item pruned dependency
 
-otherwise. C<perl-modules> replaced with C<perl>.
+otherwise. C<perl-modules*> replaced with C<perl>.
 
 =back
 
@@ -492,10 +513,11 @@ sub prune_simple_perl_dep {
     croak "No alternative dependencies can be given"
         if $dep->alternatives;
 
-    return $dep unless $dep->pkg =~ /^(?:perl|perl-base|perl-modules)$/;
+    return $dep unless is_core_perl_package( $dep->pkg );
 
     # perl-modules is replaced with perl
-    $dep->pkg('perl') if $dep->pkg eq 'perl-modules';
+    $dep->pkg('perl')
+      if $dep->pkg =~ /^(?:perl-modules(?:-[\d.]+)?|libperl[\d.]+)$/;
 
     my $unversioned = (
         not $dep->ver
@@ -555,7 +577,8 @@ sub prune_perl_dep {
 
 =item prune_perl_deps
 
-Remove redundant (build-)dependencies on perl, perl-modules and perl-base.
+Remove redundant (build-)dependencies on perl, libperl, perl-modules and
+perl-base.
 
 =cut
 

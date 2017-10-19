@@ -3,28 +3,28 @@ abstract: 'DBIx::Class-backed, Bio::Phylo-like API for large phylogenies'
 author:
   - 'Rutger Vos'
 build_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: 0
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: 0
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.143240'
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: '1.4'
+  version: 1.4
 name: Bio-Phylo-Forest-DBTree
 no_index:
   directory:
     - t
     - inc
 requires:
-  Bio::Phylo: '0.52'
-  DBD::SQLite: '0'
-  DBIx::Class: '0'
+  Bio::Phylo: 0.52
+  DBD::SQLite: 0
+  DBIx::Class: 0
 resources:
   MailingList: mailto:bio-phylo@googlegroups.com
-  bugtracker: https://github.com/rvosa/bio-phylo-megatree/issues
+  bugtracker: https://github.com/rvosa/bio-phylo-forest-dbtree/issues
   homepage: http://biophylo.blogspot.com/
   license: http://dev.perl.org/licenses/
-  repository: git://github.com/rvosa/bio-phylo-megatree.git
-version: v0.1.0
+  repository: git://github.com/rvosa/bio-phylo-forest-dbtree.git
+version: v0.1.1

@@ -1,12 +1,10 @@
-# $Id: 03-rr.t 1569 2017-05-31 09:01:09Z willem $	-*-perl-*-
+# $Id: 03-rr.t 1597 2017-09-22 08:04:02Z willem $	-*-perl-*-
 
 use strict;
-use Test::More tests => 105;
+use Test::More tests => 108;
 
-
-BEGIN {
-	use_ok('Net::DNS::RR');
-}
+use Net::DNS::RR;
+local $Net::DNS::Parameters::DNSEXTLANG;			# suppress Extlang type queries
 
 
 {				## check exception raised for unparsable argument
@@ -45,7 +43,7 @@ BEGIN {
         is( $rr->class,	   $class, 'expected value returned by $rr->class' );
         is( $rr->ttl,	   $ttl,   'expected value returned by $rr->ttl' );
         is( $rr->rdstring, $rdata, 'expected value returned by $rr->rdstring' );
-        is( $rr->rdlength, $rdlen, 'expected value returned by $rr->length' );
+        is( $rr->rdlength, $rdlen, 'expected value returned by $rr->rdlength' );
 }
 
 
@@ -116,14 +114,6 @@ BEGIN {
 }
 
 
-{				## check parsing of known but unimplemented RR type
-	my $expected = join "\t", qw( example.com. 3600 IN ATMA ),   q(\# 4 c0000201);
-	my $testcase = join "\t", qw( example.com. 3600 IN TYPE34 ), q(\# 4 c0000201);
-	my $rr	     = new Net::DNS::RR("$testcase");
-	is( $rr->string, $expected, "new Net::DNS::RR( $testcase )" );
-}
-
-
 {				## check for exception if RFC3597 format hexadecimal data inconsistent
 	foreach my $testcase ( '\# 0 c0 00 02 01', '\# 3 c0 00 02 01', '\# 5 c0 00 02 01' ) {
 		eval { new Net::DNS::RR("example.com 3600 IN A $testcase") };
@@ -137,10 +127,9 @@ BEGIN {
 	foreach my $testcase (
 		[ type => 'A', address => '192.0.2.1' ],
 		[ type => 'A', address => ['192.0.2.1'] ],
-		[ type => 'A', rdata => 'addr' ],
 		) {
 		my $rr = new Net::DNS::RR(@$testcase);
-		is( length( $rr->rdata ), 4, "new Net::DNS::RR([ @$testcase ])" );
+		is( length( $rr->rdata ), 4, "new Net::DNS::RR( @$testcase )" );
 	}
 
 	foreach my $testcase (
@@ -149,29 +138,25 @@ BEGIN {
 		[ type => 'MX', class => 'IN', ttl => 123 ],
 		) {
 		my $rr = new Net::DNS::RR(@$testcase);
-		is( length( $rr->rdata ), 0, "new Net::DNS::RR([ @$testcase ])" );
+		is( length( $rr->rdata ), 0, "new Net::DNS::RR( @$testcase )" );
 	}
 }
 
 
 {				## check for exception for nonexistent attribute
 	my $method = 'bogus';
-	for my $basedir ( undef, 'invalid' ) {
-		local $Net::DNS::Parameters::DNSEXTLANG = $basedir;
-		foreach my $testcase (
-			[ type => 'A' ],
-			[ type => 'ATMA' ],
-			[ type => 'ATMA', nonexistent => 'x' ],
-			) {
-			eval { new Net::DNS::RR( @$testcase )->$method('x') };
-			my $exception = $1 if $@ =~ /^(.+)\n/;
-			ok( $exception ||= '', "unknown method:\t[$exception]" );
-		}
-		$method = 'nonexistent';
+	foreach my $testcase (
+		[ type => 'A' ],
+		[ type => 'ATMA' ],
+		[ type => 'ATMA', unimplemented => 'x' ],
+		) {
+		eval { new Net::DNS::RR( @$testcase )->$method('x') };
+		my $exception = $1 if $@ =~ /^(.+)\n/;
+		ok( $exception ||= '', "unknown method:\t[$exception]" );
 	}
 	my $rr = new Net::DNS::RR( type => 'A' );
-        is( $rr->nonexistent, undef, 'suppress repeated unknown method exception' );
-        is( $rr->DESTROY,     undef, 'DESTROY() exists to defeat pre-5.18 AUTOLOAD' );
+        is( $rr->$method, undef, 'suppress repeated unknown method exception' );
+        is( $rr->DESTROY, undef, 'DESTROY() exists to defeat pre-5.18 AUTOLOAD' );
 }
 
 
@@ -245,7 +230,6 @@ BEGIN {
 		'example.com	IN 123 A',
 		'example.com	123 A',
 		'example.com	123 IN A',
-		'example.com	A \\# 0',
 		'example.com	A 192.0.2.1',
 		) {
 		my $rr = new Net::DNS::RR("$testcase");
@@ -290,20 +274,25 @@ BEGIN {
 }
 
 
-{					## check plain format and long RR strings
+{					## check plain and generic formats
 	my @testcase = (
-		'example.com.	IN	NS	a.iana-servers.net.',
-		'example.com.	IN	SOA	(
+		[owner => 'example.com.', type => 'A'],
+		[owner => 'example.com.', type => 'A', rdata => ''],
+		['example.com.	IN	NS	a.iana-servers.net.'],
+		['example.com.	IN	SOA	(
 				sns.dns.icann.org. noc.dns.icann.org.
 				2015082417	;serial
 				7200		;refresh
 				3600		;retry
 				1209600		;expire
 				3600		;minimum
-		)',
-		);
+			)'],
+		[owner => 'example.com.', type => 'ATMA'],	# unimplemented
+		[owner => 'example.com.', type => 'ATMA', rdata => ''],
+		[owner => 'example.com.', type => 'ATMA', rdata => 'octets'],
+	);
 	foreach my $testcase (@testcase) {
-		my $rr = new Net::DNS::RR($testcase);
+		my $rr = new Net::DNS::RR(@$testcase);
 		my $type = $rr->type;
 		my $plain = new Net::DNS::RR( $rr->plain );
 		is( $plain->string, $rr->string, "parse rr->plain format $type" );

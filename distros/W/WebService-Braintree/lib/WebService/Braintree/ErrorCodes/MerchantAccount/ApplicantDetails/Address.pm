@@ -1,6 +1,7 @@
 package WebService::Braintree::ErrorCodes::MerchantAccount::ApplicantDetails::Address;
-$WebService::Braintree::ErrorCodes::MerchantAccount::ApplicantDetails::Address::VERSION = '0.93';
-use strict;
+$WebService::Braintree::ErrorCodes::MerchantAccount::ApplicantDetails::Address::VERSION = '0.94';
+use 5.010_001;
+use strictures 1;
 
 use constant LocalityIsRequired      => "82618";
 use constant PostalCodeIsInvalid     => "82630";
@@ -11,3 +12,4 @@ use constant StreetAddressIsRequired => "82617";
 use constant RegionIsInvalid         => "82664";
 
 1;
+__END__

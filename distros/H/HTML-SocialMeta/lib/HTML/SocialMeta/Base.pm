@@ -2,7 +2,7 @@ package HTML::SocialMeta::Base;
 use Moo;
 use Carp;
 
-our $VERSION = '0.730002';
+our $VERSION = '0.730004';
 
 use MooX::LazierAttributes qw/rw ro lzy/;
 use MooX::ValidateSubs;
@@ -53,8 +53,9 @@ sub required_fields {
 }
 
 sub meta_option {
-    ( my $option = $_[0]->card_options->{ $_[1] } ) =~ s{^create_}{}xms;
-    return $option;
+    my $option = $_[0]->card_options->{$_[1]};
+	$option =~ s{^create_}{}xms;
+	return $option;
 }
 
 sub _validate_field_value {
@@ -74,7 +75,7 @@ sub _generate_meta_tag {
 
 sub _build_field {
 	return sprintf q{<meta %s="%s:%s" content="%s"/>}, $_[0]->meta_attribute,
-      ( $_[1]->{ignore_meta_namespace} // $_[0]->meta_namespace ),
+      ( $_[1]->{ignore_meta_namespace} || $_[0]->meta_namespace ),
       ( defined $_[1]->{field_type} ? $_[1]->{field_type} : $_[1]->{field} ),
       $_[0]->{$_[1]->{field}};
 }
@@ -113,7 +114,7 @@ builds and returns the Meta Tags
 
 =head1 VERSION
 
-Version 0.730002
+Version 0.730004
 
 =cut
 

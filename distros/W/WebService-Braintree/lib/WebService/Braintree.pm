@@ -1,7 +1,8 @@
 package WebService::Braintree;
-$WebService::Braintree::VERSION = '0.93';
-use strict;
-use warnings;
+$WebService::Braintree::VERSION = '0.94';
+use 5.010_001;
+use strictures 1;
+
 use WebService::Braintree::Address;
 use WebService::Braintree::AdvancedSearchFields;
 use WebService::Braintree::AdvancedSearchNodes;
@@ -15,6 +16,7 @@ use WebService::Braintree::MerchantAccount;
 use WebService::Braintree::PartnerMerchant;
 use WebService::Braintree::PaymentMethod;
 use WebService::Braintree::PayPalAccount;
+use WebService::Braintree::Plan;
 use WebService::Braintree::PayPalDetails;
 use WebService::Braintree::ResourceCollection;
 use WebService::Braintree::SettlementBatchSummary;
@@ -127,6 +129,10 @@ Create, update, delete, and find payment methods.
 =head3 L<WebService::Braintree::PayPalAccount>
 
 Find and update PayPal accounts.
+
+=head3 L<WebService::Braintree::Plan>
+
+List all subscription plans.
 
 =head3 L<WebService::Braintree::SettlementBatchSummary>
 
@@ -323,6 +329,8 @@ One of the sandbox tests is really really slow.
 =head2 ACKNOWLEDGEMENTS
 
 Thanks to the staff at Braintree for endorsing this fork.
+
+Thanks to ZipRecruiter for sponsoring improvements to the forked code.
 
 =head2 LICENSE AND COPYRIGHT
 

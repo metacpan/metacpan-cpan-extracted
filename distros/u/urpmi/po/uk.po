@@ -62,7 +62,7 @@ msgstr "Встановлюємо пакунок «%s» (%s/%s)..."
 #: ../gurpm/RPMProgressDialog.pm:345
 #, c-format
 msgid "Downloading package `%s'..."
-msgstr "Звантажуємо пакунок «%s»…"
+msgstr "Отримуємо пакунок «%s»…"
 
 #: ../gurpm/RPMProgressDialog.pm:349 ../gurpmi:126
 #, c-format
@@ -476,7 +476,7 @@ msgstr "неправильно вказано власника каталогу 
 #: ../urpm.pm:238
 #, c-format
 msgid "Can not download packages into %s"
-msgstr "Не вдалося звантажити пакунки до %s"
+msgstr "Не вдалося отримати пакунки до %s"
 
 #: ../urpm.pm:254
 #, c-format
@@ -727,7 +727,7 @@ msgstr "немає curl\n"
 #: ../urpm/download.pm:537
 #, c-format
 msgid "curl failed: download canceled\n"
-msgstr "Невдалий запуск curl: звантаження скасовано\n"
+msgstr "Невдалий запуск curl: отримання даних скасовано\n"
 
 #: ../urpm/download.pm:572
 #, c-format
@@ -757,17 +757,17 @@ msgstr "відсутня aria2\n"
 #: ../urpm/download.pm:734
 #, c-format
 msgid "Failed to download %s"
-msgstr "Помилка при звантаженні %s"
+msgstr "Помилка при отриманні %s"
 
 #: ../urpm/download.pm:829
 #, c-format
 msgid "        %s%% of %s completed, ETA = %s, speed = %s"
-msgstr "        звантажено %s%% з %s, оцінка часу = %s, швидкість = %s"
+msgstr "        отримано %s%% з %s, оцінка часу = %s, швидкість = %s"
 
 #: ../urpm/download.pm:830
 #, c-format
 msgid "        %s%% completed, speed = %s"
-msgstr "        Звантажено %s%%, швидкість = %s"
+msgstr "        Отримано %s%%, швидкість = %s"
 
 #: ../urpm/download.pm:915
 #, c-format
@@ -933,9 +933,9 @@ msgid ""
 "needed, %s available).\n"
 "Are you sure you want to continue?"
 msgstr ""
-"Для звантаження всіх пакунків у файловій системі вашого комп’ютера "
+"Для отримання всіх пакунків у файловій системі вашого комп’ютера "
 "недостатньо місця (потрібно %s, доступно %s).\n"
-"Виконати звантаження попри це?"
+"Спробувати отримати дані попри це?"
 
 #: ../urpm/main_loop.pm:138
 #, c-format
@@ -1257,7 +1257,7 @@ msgstr "копіювання файла MD5SUM «%s»..."
 #: ../urpm/media.pm:1796
 #, c-format
 msgid "invalid MD5SUM file (downloaded from %s)"
-msgstr "некоректний файл MD5SUM (звантажений з %s)"
+msgstr "некоректний файл MD5SUM (отримано з %s)"
 
 #: ../urpm/media.pm:1799
 #, c-format
@@ -1456,12 +1456,12 @@ msgstr[0] ""
 "тепер не потрібен, скористайтеся командою \"urpme --auto-orphans\", щоб "
 "вилучити його."
 msgstr[1] ""
-"Вказаний нижче пакунки:\n"
+"Вказані нижче пакунки:\n"
 "%s\n"
 "тепер не потрібні, скористайтеся командою \"urpme --auto-orphans\", щоб "
 "вилучити їх."
 msgstr[2] ""
-"Вказаний нижче пакунки:\n"
+"Вказані нижче пакунки:\n"
 "%s\n"
 "тепер не потрібні, скористайтеся командою \"urpme --auto-orphans\", щоб "
 "вилучити їх."
@@ -1566,12 +1566,12 @@ msgstr "Наступні пакунки містять %s: %s"
 #: ../urpm/select.pm:224
 #, c-format
 msgid "You should use \"-a\" to use all of them"
-msgstr "Потрібно використовувати \"-a\", щоб вказати їх усіх"
+msgstr "Слід скористатися \"-a\", щоб вказати їх усі"
 
 #: ../urpm/select.pm:372
 #, c-format
 msgid "found package(s) %s in urpmi db, but none are installed"
-msgstr "знайдено пакунки %s у базі даних urpmi, але жоден з них не встановлено"
+msgstr "у базі даних urpmi знайдено пакунки %s, але жоден з них не встановлено"
 
 #: ../urpm/select.pm:607
 #, c-format
@@ -2163,7 +2163,7 @@ msgstr ""
 #: ../urpmi:82
 #, c-format
 msgid "  --no-install   - don't install packages (only download)\n"
-msgstr "  --no-install   - не встановлювати пакунки (тільки звантаження)\n"
+msgstr "  --no-install   - не встановлювати пакунки (тільки отримати)\n"
 
 #: ../urpmi:83 ../urpmq:54
 #, c-format
@@ -2277,7 +2277,7 @@ msgid ""
 "  --download-all - download all needed packages before trying to install "
 "them\n"
 msgstr ""
-"  --download-all - звантажити всі потрібні пакунки до спроби встановлення\n"
+"  --download-all - отримати всі потрібні пакунки до спроби встановлення\n"
 
 #: ../urpmi:113
 #, c-format
@@ -2326,7 +2326,7 @@ msgid ""
 "  --resume       - resume transfer of partially-downloaded files\n"
 "                   (--no-resume disables it, default is disabled).\n"
 msgstr ""
-"  --resume       - відновити переміщення частково звантажених файлів\n"
+"  --resume       - відновити переміщення частково отриманих файлів\n"
 "                   (--no-resume вимикає його, типово вимкнено).\n"
 
 #: ../urpmi:124 ../urpmi.addmedia:62 ../urpmi.update:39 ../urpmq:74
@@ -2735,7 +2735,7 @@ msgid ""
 "                   one of: never, on-demand, update-only, always. cf urpmi."
 "cfg(5)\n"
 msgstr ""
-"  --xml-info     - використовувати особливі правила звантаження файлів xml\n"
+"  --xml-info     - використовувати особливі правила отримання файлів xml\n"
 "                   має одне зі значень: never, on-demand, update-only, "
 "always. Пор. urpmi.cfg(5)\n"
 

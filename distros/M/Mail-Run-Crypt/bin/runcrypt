@@ -1,0 +1,332 @@
+#!/usr/bin/env perl
+package main;
+
+# Force me to write this properly
+use strict;
+use warnings;
+use utf8;
+
+# Require this version of Perl
+use 5.008_001;
+
+# Import required modules
+use Carp;
+use English '-no_match_vars';
+use File::stat;
+use Getopt::Long::Descriptive;
+use Mail::Run::Crypt;
+
+# Specify package version
+our $VERSION = '0.07';
+
+# Name ourselves
+our $SELF = 'runcrypt';
+
+# Read command-line options
+my ( $opt, $usage ) = describe_options(
+    "$SELF %o COMMAND [ARG1...]",
+
+    # Whether to sign the output (default: off)
+    [ 'sign|s', 'Sign output', { default => 0 } ],
+
+    # Whether to encrypt the output (default: on)
+    [ 'encrypt|e', 'Encrypt output', { default => 1 } ],
+
+    # Key ID defaults to environment RUNCRYPT_KEYID if set
+    [
+        'keyid|k=s', 'GnuPG key ID',
+        { default => $ENV{RUNCRYPT_KEYID} || undef },
+    ],
+
+    # Key passphrase file defaults to environment RUNCRYPT_PASSFILE if set
+    [
+        'passfile|p=s',
+        'Path to GnuPG passphrase file',
+        { default => $ENV{RUNCRYPT_PASSFILE} || undef },
+    ],
+
+    # MAILTO address defaults to environment MAILTO if set
+    [
+        'mailto|m=s',
+        'Mail destination address (MAILTO)',
+        { default => $ENV{RUNCRYPT_MAILTO} || $ENV{MAILTO} || undef },
+    ],
+
+    # Instance name (for email subjects) defaults to $SELF
+    [
+        'name|n=s',
+        'Instance name (included in subject lines)',
+        { default => $SELF },
+    ],
+
+    # Newline
+    [],
+
+    # Help option
+    [ 'help', 'print usage message and exit', { shortcircuit => 1 } ],
+);
+
+# Print help if requested
+if ( $opt->help ) {
+    print $usage->text
+      or carp 'failed stdout usage write';
+    exit 0;
+}
+
+# Bail if run without arguments
+if ( !@ARGV ) {
+    printf {*STDERR} $usage->text
+      or carp 'failed stderr usage write';
+    exit 2;
+}
+
+# Build option set for MRC constructor
+my %opts = (
+    sign    => $opt->sign,
+    encrypt => $opt->encrypt,
+    keyid   => $opt->keyid,
+    mailto  => $opt->mailto,
+    name    => $opt->name,
+);
+
+# If we have a passphrase file defined, we'll test and read it
+if ( defined $opt->passfile ) {
+
+    # Read the passphrase from the file, chomping any final newline
+    my $fn = $opt->passfile;
+    $opts{passphrase} = do {
+        local $RS = undef;
+        open my $fh, '<', $fn
+          or croak "passfile $fn open failed: $ERRNO";
+        my $passphrase = <$fh>;
+        close $fh
+          or carp "passfile $fn close failed: $ERRNO";
+        chomp $passphrase;
+        $passphrase;
+    };
+}
+
+# Create the MRC object with the determined options
+my $mrc = Mail::Run::Crypt->new(%opts);
+
+# Run the command given in the arguments, exiting appropriately
+$mrc->run(@ARGV);
+exit $mrc->bail;
+
+__END__
+
+=pod
+
+=for stopwords
+runcrypt decrypt stdout stderr GPG GnuPG OpenPGP tradename licensable
+MERCHANTABILITY passfile
+
+=head1 NAME
+
+runcrypt - Encrypt and mail output from command in arguments
+
+=head1 USAGE
+
+    runcrypt
+        [--sign[=(1|0)]
+        [--encrypt[=(1|0)]
+        [--keyid KEYID]
+        [--passfile PATH]
+        [--mailto RECIPIENT]
+        [--name NAME]
+        COMMAND [ARG1 ...]
+
+=head1 DESCRIPTION
+
+This program applies L<Mail::Run::Crypt|Mail::Run::Crypt> to run a command and
+send any output or error content to the specified address. More information is
+available in the documentation for that module.
+
+=head1 REQUIRED ARGUMENTS
+
+The arguments beyond the options are used as the command name to run:
+
+    runcrypt rsync -a /mnt/a remote:mnt/b
+
+=head1 OPTIONS
+
+=over 4
+
+=item C<--mailto>
+
+The recipient address for the encryption portion of the email. This defaults to
+the value of the environment variable C<RUNCRYPT_MAILTO> if that is set, or
+C<MAILTO> failing that, to make it suitable for use in a B<crontab(5)> file.
+
+=item C<--encrypt>
+
+Whether to encrypt the output to the recipient. This defaults to 1.
+
+=item C<--sign>
+
+Whether to sign the output. This defaults to 0. An ID and passphrase file will
+need to be provided for signing to work.
+
+It is I<strongly> recommended that a dedicated key and passphrase be used for
+signatures if this is needed. You should carefully consider the consequences of
+a compromised key.
+
+=item C<--keyid>
+
+The GnuPG key ID that should be used to sign messages. This is required for
+signing, and has no effect if C<--sign> is not given. It can be any means of
+identifying the key acceptable to GnuPG; the key's 8-byte ("long") hexadecimal
+ID prefixed with C<0x> is probably the best way.
+
+This defaults to the value of the environment variable C<RUNCRYPT_KEYID>.
+
+=item C<--passfile>
+
+Path to a filename that should be read to get the key passphrase for signing.
+This defaults to the value of the environment variable C<RUNCRYPT_PASSFILE>.
+This is required for signing, and has no effect if C<--sign> is not given.
+
+One trailing newline will be removed from the file contents with
+L<C<chomp>|perlfunc/"chomp VARIABLE"> if present.
+
+It is I<strongly> recommended, but not enforced by this program, that this file
+have strict permissions (not group or world-readable).
+
+By design, there is no way to specify the passphrase directly as an argument.
+This has too many negative security implications.
+
+=item C<--name>
+
+The name for this instance of the module, which will be used as the first word
+of the subject line of any email messages it sends. This defaults to
+C<runcrypt>, which is probably good enough in most cases.
+
+=back
+
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item failed stdout usage write
+
+Usage information could not be written to the standard output stream.
+
+=item failed stderr usage write
+
+Usage information could not be written to the standard error stream.
+
+=item passfile %s open failed: %s
+
+The specified passphrase file could not be opened. This is a fatal error.
+
+=item passfile %s close failed: %s
+
+The specified passphrase file could not be closed. This is not a fatal error.
+
+=back
+
+=head1 EXIT STATUS
+
+The program exits with the same exit value of the command that it ran, or 127
+if the command could not be run at all. See the
+L<C<bail()>|Mail::Run::Crypt/bail()> method in
+L<Mail::Run::Crypt|Mail::Run::Crypt>.
+
+=head1 CONFIGURATION
+
+You will need to have a functioning GnuPG public key setup for this to work,
+including stored keys or a key retrieval system for your recipients. You will
+also need a secret key if you want to sign the messages.
+
+You should I<definitely not> use your personal key for this; generate one
+specifically for mail signing and encryption instead.
+
+I wrote a tutorial on GnuPG key setup, including agent configuration, as part
+of this series:
+
+L<https://sanctum.geek.nz/arabesque/series/gnu-linux-crypto/>
+
+=head1 DEPENDENCIES
+
+=over 4
+
+=item *
+
+Perl v5.8.1 or newer
+
+=item *
+
+L<Carp|Carp>
+
+=item *
+
+L<English|English>
+
+=item *
+
+L<File::stat|File::stat>
+
+=item *
+
+L<Getopt::Long::Descriptive|Getopt::Long::Descriptive>
+
+=item *
+
+L<Mail::Run::Crypt|Mail::Run::Crypt>
+
+=back
+
+=head1 INCOMPATIBILITIES
+
+This module uses L<Mail::GnuPG|Mail::GnuPG> and other GPG-specific code, so it
+won't work with any other OpenPGP implementations.
+
+=head1 BUGS AND LIMITATIONS
+
+Definitely.
+
+=head1 AUTHOR
+
+Tom Ryder C<< <tom@sanctum.geek.nz> >>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2017 Tom Ryder
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License (2.0). You may obtain a copy of the full
+license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
+
+Any use, modification, and distribution of the Standard or Modified Versions is
+governed by this Artistic License. By using, modifying or distributing the
+Package, you accept this license. Do not use, modify, or distribute the
+Package, if you do not accept this license.
+
+If your Modified Version has been derived from a Modified Version made by
+someone other than you, you are nevertheless required to ensure that your
+Modified Version complies with the requirements of this license.
+
+This license does not grant you the right to use any trademark, service mark,
+tradename, or logo of the Copyright Holder.
+
+This license includes the non-exclusive, worldwide, free-of-charge patent
+license to make, have made, use, offer to sell, sell, import and otherwise
+transfer the Package with respect to any patent claims licensable by the
+Copyright Holder that are necessarily infringed by the Package. If you
+institute patent litigation (including a cross-claim or counterclaim) against
+any party alleging that the Package constitutes direct or contributory patent
+infringement, then this Artistic License to you shall terminate on the date
+that such litigation is filed.
+
+Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER AND
+CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES. THE IMPLIED
+WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR
+NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY YOUR LOCAL LAW.
+UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR CONTRIBUTOR WILL BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING IN ANY WAY
+OUT OF THE USE OF THE PACKAGE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+DAMAGE.
+
+=cut

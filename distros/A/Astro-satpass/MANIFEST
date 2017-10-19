@@ -72,6 +72,7 @@ xt/author/changes.t
 xt/author/critic.t
 xt/author/executable.t
 xt/author/iridium_status.t
+xt/author/iridium_manifest_constants.t
 xt/author/magnitude_status.t
 xt/author/kwalitee.t
 xt/author/manifest.t

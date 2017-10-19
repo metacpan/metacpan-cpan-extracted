@@ -1,31 +1,81 @@
 package WebService::Braintree::Util;
-$WebService::Braintree::Util::VERSION = '0.93';
-use strict;
+$WebService::Braintree::Util::VERSION = '0.94';
+use 5.010_001;
+use strictures 1;
 
-use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS );
-use URI::Query;
+use vars qw(@ISA @EXPORT_OK);
 use Exporter qw(import);
 our @ISA = qw(Exporter);
-our @EXPORT = qw(to_instance_array flatten is_hashref is_arrayref hash_to_query_string equal_arrays difference_arrays validate_id contains);
 
-sub flatten {
+our @EXPORT_OK = qw(
+    hash_to_query_string
+    to_instance_array
+    difference_arrays
+    validate_id
+    is_arrayref is_hashref
+);
+
+use URI::Query;
+
+# USED by ::TransparentRedirectGateway->build_tr_data and
+#   ::TestHelper->simulate_form_post_for_tr
+sub hash_to_query_string {
+    my $query = URI::Query->new(__flatten(shift));
+    return $query->stringify();
+}
+
+# USED only by hash_to_query_string()
+sub __flatten {
     my($hash, $namespace) = @_;
     my %flat_hash = ();
     while (my ($key, $value) = each(%$hash)) {
         if (is_hashref($value)) {
-            my $sub_entries = flatten($value, add_namespace($key, $namespace));
+            my $sub_entries = __flatten($value, __add_namespace($key, $namespace));
             %flat_hash = (%flat_hash, %$sub_entries);
         } else {
-            $flat_hash{add_namespace($key, $namespace)} = $value;
+            $flat_hash{__add_namespace($key, $namespace)} = $value;
         }
     }
     return \%flat_hash;
 }
 
-sub add_namespace {
+# USED only by flatten()
+sub __add_namespace {
     my ($key, $namespace) = @_;
     return $key unless $namespace;
     return "${namespace}[${key}]";
+}
+
+# USED only in AdvancedSearchNodes in MultipleValuesNode->in() for validation
+sub difference_arrays {
+    my ($array1, $array2) = @_;
+    my @diff;
+    foreach my $element (@$array1) {
+        push(@diff, $element) unless grep { $element eq $_ } @$array2;
+    }
+    return \@diff;
+}
+
+sub to_instance_array {
+    my ($attrs, $class) = @_;
+    my @result = ();
+    if (! is_arrayref($attrs)) {
+        push(@result, $class->new($attrs));
+    } else {
+        for (@$attrs) {
+            push(@result, $class->new($_));
+        }
+    }
+    return \@result;
+}
+
+sub validate_id {
+    my $id = shift;
+
+    return if ! defined($id);
+    return if $id !~ /\S/;
+
+    return 1;
 }
 
 sub is_hashref {
@@ -36,59 +86,5 @@ sub is_arrayref {
     ref(shift) eq 'ARRAY';
 }
 
-sub equal_arrays {
-    my ($first, $second) = @_;
-    return 0 unless @$first == @$second;
-    for (my $i = 0; $i < @$first; $i++) {
-        return 0 if $first->[$i] ne $second->[$i];
-    }
-    return 1;
-}
-
-sub difference_arrays {
-    my ($array1, $array2) = @_;
-    my @diff;
-    foreach my $element (@$array1) {
-        push(@diff, $element) unless contains($element, $array2);
-    }
-    return \@diff;
-}
-
-sub hash_to_query_string {
-    my $query = URI::Query -> new(flatten(shift));
-    return $query->stringify();
-}
-
-sub to_instance_array {
-    my ($attrs, $class) = @_;
-    my @result = ();
-    if (ref $attrs ne "ARRAY") {
-        push(@result, $class->new($attrs));
-    } else {
-        for (@$attrs) {
-            push(@result, $class->new($_));
-        }
-    }
-    return \@result;
-}
-sub trim {
-    my $string = shift;
-    $string =~ s/^\s+//;
-    $string =~ s/\s+$//;
-    return $string;
-}
-
-sub validate_id {
-    my $id = shift;
-    return 0 if(!defined($id) || trim($id) eq "");
-    return 1;
-}
-
-sub contains {
-    my ($element, $array) = @_;
-    for (@$array) {
-        return 1 if $_ eq $element;
-    }
-    return 0;
-}
 1;
+__END__

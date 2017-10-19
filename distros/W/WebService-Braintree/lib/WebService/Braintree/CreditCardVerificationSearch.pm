@@ -1,9 +1,11 @@
 package WebService::Braintree::CreditCardVerificationSearch;
-$WebService::Braintree::CreditCardVerificationSearch::VERSION = '0.93';
+$WebService::Braintree::CreditCardVerificationSearch::VERSION = '0.94';
+use 5.010_001;
+use strictures 1;
+
 use Moose;
 use WebService::Braintree::CreditCard::CardType;
 use WebService::Braintree::AdvancedSearch;
-
 
 my $field = WebService::Braintree::AdvancedSearchFields->new(metaclass => __PACKAGE__->meta);
 $field->text("id");
@@ -21,5 +23,6 @@ sub to_hash {
 }
 
 __PACKAGE__->meta->make_immutable;
-1;
 
+1;
+__END__

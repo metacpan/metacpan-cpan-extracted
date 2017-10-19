@@ -1,0 +1,68 @@
+{
+   "abstract" : "easily copy and compare folders inside tests",
+   "author" : [
+      "Jozef Kutej <jkutej@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "keywords" : [
+      "test",
+      "dir",
+      "folder"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-Dirs",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::is" : "0",
+            "Test::More" : "0",
+            "Test::Tester" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3607"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "File::Copy::Recursive" : "0",
+            "File::DirCompare" : "0",
+            "File::Path" : "2.07",
+            "File::Temp" : "0.19",
+            "List::MoreUtils" : "0",
+            "Path::Class" : "0",
+            "Test::Builder" : "0",
+            "Text::Diff" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Test::Dirs" : {
+         "file" : "lib/Test/Dirs.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/jozef/Test-Dirs/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/jozef/Test-Dirs/"
+      }
+   },
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

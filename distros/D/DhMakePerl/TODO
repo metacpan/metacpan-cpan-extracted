@@ -46,5 +46,8 @@
 * make/refresh: add "Multi-Arch: same" header to arch-dep packages
 * clean up after #774862.
   currently we use YAML and YAML::XS. one should be enough, probably
-  YAML::XS or YAML::Tiny or ... additionally YAML::XS is nowhere in the
-  metadata, and the tests didn't catch the ommission either.
+  YAML::XS or YAML::Tiny or ...
+  The tests didn't catch the ommission either.
+* massage short description more
+  - lc() or lcfirst()?
+  - prepend "module to"? (only for verbs. haha.)

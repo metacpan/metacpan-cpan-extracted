@@ -1,6 +1,7 @@
 package WebService::Braintree::ErrorCodes::Subscription;
-$WebService::Braintree::ErrorCodes::Subscription::VERSION = '0.93';
-use strict;
+$WebService::Braintree::ErrorCodes::Subscription::VERSION = '0.94';
+use 5.010_001;
+use strictures 1;
 
 use constant BillingDayOfMonthCannotBeUpdated                   => "91918";
 use constant BillingDayOfMonthIsInvalid                         => "91914";
@@ -41,3 +42,4 @@ use constant TrialDurationIsRequired                            => "81908";
 use constant TrialDurationUnitIsInvalid                         => "81909";
 
 1;
+__END__

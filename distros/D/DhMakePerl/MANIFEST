@@ -36,9 +36,9 @@ README
 share/rules.dh.tiny
 t/00-load.t
 t/AptContents.t
+t/bin/apt-get
 t/cache.t
 t/CommaSeparated.t
-t/contents/sources.list
 t/contents/test_debian_dists_sid_main_Contents
 t/contents/test_debian_dists_testing_main_Contents
 t/Control.t
@@ -86,10 +86,13 @@ t/dists/Strange-0.1/wanted-debian/libstrange-perl.examples
 t/dists/Strange-0.1/wanted-debian/rules
 t/dists/Strange-0.1/wanted-debian/watch
 t/dists/Strange-2.1/Changes
+t/dists/Strange-2.1/DEADJOE
 t/dists/Strange-2.1/Makefile.PL
 t/dists/Strange-2.1/MANIFEST
 t/dists/Strange-2.1/MYMETA.yml
 t/dists/Strange-2.1/README
+t/dists/Strange-2.1/README.md
+t/dists/Strange-2.1/Readme.mkdn
 t/dists/Strange-2.1/Strange.pm
 t/dists/Strange-2.1/Strange.xs
 t/dists/Strange-2.1/test.pl
@@ -129,6 +132,7 @@ t/extract_name_ver.t
 t/extract_name_ver_from_makefile.t
 t/makefiles/module-install-autodie.PL
 t/manifest.t
+t/module-versions.t
 t/perl-deps.t
 t/perl-versions.t
 t/perlcriticrc

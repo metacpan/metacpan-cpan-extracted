@@ -128,13 +128,12 @@ sub dist_ok($) {
         run => [
             $ENV{ADTTMP} ? 'dh-make-perl' : "$Bin/../dh-make-perl",
             "--no-verbose",
-            "--home-dir",           "$Bin/contents",
-            "--apt-contents-dir",   "$Bin/contents",
-            "--data-dir",           "$Bin/../share",
-            $ENV{NO_NETWORK} ? '--no-network' : (), "--vcs",
-            "none",                       "--sources-list",
-            "$Bin/contents/sources.list", "--email",
-            "joemaint\@test.local",       $dist
+            "--home-dir", "$Bin/contents",
+            "--data-dir", "$Bin/../share",
+            $ENV{NO_NETWORK} ? '--no-network' : (),
+            "--vcs", "none",
+            "--email", "joemaint\@test.local",
+            $dist
         ],
         dist_dir => $dist_dir,
         comment  => 'initial',
@@ -152,13 +151,12 @@ sub dist_ok($) {
         run => [
             $ENV{ADTTMP} ? 'dh-make-perl' : "$Bin/../dh-make-perl",
             "--no-verbose",
-            "--home-dir",           "$Bin/contents",
-            "--apt-contents-dir",   "$Bin/contents",
-            "--data-dir",           "$Bin/../share",
-            $ENV{NO_NETWORK} ? '--no-network' : (), "--vcs",
-            "none",                       "--sources-list",
-            "$Bin/contents/sources.list", "--email",
-            "joemaint\@test.local",       "refresh",
+            "--home-dir", "$Bin/contents",
+            "--data-dir", "$Bin/../share",
+            $ENV{NO_NETWORK} ? '--no-network' : (),
+            "--vcs", "none",
+            "--email", "joemaint\@test.local",
+            "refresh",
             $dist,
         ],
         comment => 'refresh',
@@ -177,14 +175,13 @@ sub dist_ok($) {
         run => [
             $ENV{ADTTMP} ? 'dh-make-perl' : "$Bin/../dh-make-perl",
             "--no-verbose",
-            "--home-dir",           "$Bin/contents",
-            "--apt-contents-dir",   "$Bin/contents",
-            "--data-dir",           "$Bin/../share",
-            $ENV{NO_NETWORK} ? '--no-network' : (), "--vcs",
-            "none",                       "--sources-list",
-            "$Bin/contents/sources.list", "--email",
-            "joemaint\@test.local",       "refresh",
-            '--source-format',            '3.0 (quilt)',
+            "--home-dir", "$Bin/contents",
+            "--data-dir", "$Bin/../share",
+            $ENV{NO_NETWORK} ? '--no-network' : (),
+            "--vcs", "none",
+            "--email", "joemaint\@test.local",
+            "refresh",
+            '--source-format', '3.0 (quilt)',
             $dist
         ],
         dist_dir => $dist_dir,
@@ -206,12 +203,11 @@ sub dist_ok($) {
         run => [
             $ENV{ADTTMP} ? 'dh-make-perl' : "$Bin/../dh-make-perl",
             "--no-verbose",
-            "--home-dir",           "$Bin/contents",
-            "--apt-contents-dir",   "$Bin/contents",
-            "--data-dir",           "$Bin/../share",
-            $ENV{NO_NETWORK} ? '--no-network' : (), "--vcs",
-            "none",                       "--sources-list",
-            "$Bin/contents/sources.list", "refresh",
+            "--home-dir", "$Bin/contents",
+            "--data-dir", "$Bin/../share",
+            $ENV{NO_NETWORK} ? '--no-network' : (),
+            "--vcs", "none",
+            "refresh",
             $dist
         ],
         dist_dir => $dist_dir,
@@ -255,6 +251,7 @@ sub modify_changelog {
 
 $ENV{PERL5LIB} = "lib";
 $ENV{DEBFULLNAME} = "Joe Maintainer";
+$ENV{PATH} = "$Bin/bin:$ENV{PATH}";
 
 for( qw( Strange-0.1 Strange-2.1 ) ) {
     dist_ok($_);

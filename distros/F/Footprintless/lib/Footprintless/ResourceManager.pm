@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::ResourceManager;
-$Footprintless::ResourceManager::VERSION = '1.25';
+$Footprintless::ResourceManager::VERSION = '1.26';
 # ABSTRACT: A manager for finding and retrieving resources
 # PODNAME: Footprintless::ResourceManager
 
@@ -93,7 +93,7 @@ Footprintless::ResourceManager - A manager for finding and retrieving resources
 
 =head1 VERSION
 
-version 1.25
+version 1.26
 
 =head1 SYNOPSIS
 

@@ -2,7 +2,7 @@ package App::ElasticSearch::Utilities::HTTPRequest;
 # ABSTRACT: Allow for strange content elements for Elasticsearch APIs
 
 
-our $VERSION = '5.3'; # VERSION
+our $VERSION = '5.4'; # VERSION
 
 use strict;
 use warnings;
@@ -60,7 +60,7 @@ App::ElasticSearch::Utilities::HTTPRequest - Allow for strange content elements 
 
 =head1 VERSION
 
-version 5.3
+version 5.4
 
 =head1 SYNOPSIS
 

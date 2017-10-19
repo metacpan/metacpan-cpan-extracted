@@ -6,7 +6,7 @@ use Mojolicious::Plugin::AssetPack::Asset::Null;
 use Mojolicious::Plugin::AssetPack::Store;
 use Mojolicious::Plugin::AssetPack::Util qw(diag has_ro load_module DEBUG);
 
-our $VERSION = '1.46';
+our $VERSION = '1.47';
 
 my %TAG_TEMPLATE;
 $TAG_TEMPLATE{css} = [qw(link rel stylesheet href)];
@@ -254,7 +254,7 @@ Mojolicious::Plugin::AssetPack - Compress and convert css, less, sass, javascrip
 
 =head1 VERSION
 
-1.46
+1.47
 
 =head1 SYNOPSIS
 
@@ -303,6 +303,16 @@ Your application creates and refers to an asset by its topic (virtual asset
 name).  The process of building actual assets from their components is
 delegated to "pipe objects". Please see
 L<Mojolicious::Plugin::AssetPack::Guides::Tutorial/Pipes> for a complete list.
+
+=head1 BREAKING CHANGES
+
+=head2 assetpack.db (v1.47)
+
+C<assetpack.db> no longer track files downloaded from the internet. It will
+mostly "just work", but in some cases version 1.47 might download assets that
+have already been downloaded with AssetPack version 1.46 and earlier.
+
+The goal is to remove C<assetpack.db> completely.
 
 =head1 GUIDES
 

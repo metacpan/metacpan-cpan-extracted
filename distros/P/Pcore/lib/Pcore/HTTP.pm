@@ -23,21 +23,21 @@ our $DEFAULT = {
     method => undef,
     url    => undef,
 
-    useragent => "Pcore-HTTP/$Pcore::VERSION",    # shortcut for User-Agent header
-    recurse   => 7,                               # max. redirects
+    useragent     => "Pcore-HTTP/$Pcore::VERSION",    # shortcut for User-Agent header
+    max_redirects => 7,                               # max. redirects
 
-    accept_compressed => 1,                       # add ACCEPT_ENCODIING header
-    decompress        => 1,                       # automatically decompress
+    accept_compressed => 1,                           # add ACCEPT_ENCODIING header
+    decompress        => 1,                           # automatically decompress
 
-    cookies => undef,                             # 1 - create temp cookie jar object, HashRef - use as cookies storage
+    cookies => undef,                                 # 1 - create temp cookie jar object, HashRef - use as cookies storage
 
-    persistent => 0,                              # persistent timeout in seconds, proxy connection can't be persistent
+    persistent => 0,                                  # persistent timeout in seconds, proxy connection can't be persistent
 
-    buf_size => 0,                                # write body to fh if body length > this value, 0 - always store in memory, 1 - always store to file
+    buf_size => 0,                                    # write body to fh if body length > this value, 0 - always store in memory, 1 - always store to file
 
-    handle_params   => undef,                     # HashRef with params, that will be passed directly to AE::Handle
-    connect_timeout => undef,                     # handle connect timeout
-    timeout         => 300,                       # timeout in seconds
+    handle_params   => undef,                         # HashRef with params, that will be passed directly to AE::Handle
+    connect_timeout => undef,                         # handle connect timeout
+    timeout         => 300,                           # timeout in seconds
     tls_ctx         => $TLS_CTX_HIGH,
     bind_ip         => undef,
     proxy           => undef,
@@ -45,14 +45,14 @@ our $DEFAULT = {
     headers => undef,
     body    => undef,
 
-    on_progress   => undef,                       # 1 - create progress indicator, HashRef - progress indicator params, CodeRef - on_progress callback
+    on_progress   => undef,                           # 1 - create progress indicator, HashRef - progress indicator params, CodeRef - on_progress callback
     on_header     => undef,
     on_body       => undef,
     before_finish => undef,
     on_finish     => undef,
 };
 
-our $DEFAULT_HANDLE_PARAMS = {                    #
+our $DEFAULT_HANDLE_PARAMS = {                        #
     max_read_size => 1_048_576,
 };
 
@@ -190,9 +190,6 @@ sub request {
         $args{headers} = Pcore::HTTP::Headers->new( $args{headers} );
     }
 
-    # create empty HTTP response object
-    $args{res} = Pcore::HTTP::Response->new( { status => 0 } );
-
     # resolve cookies shortcut
     if ( $args{cookies} && !is_blessed_ref $args{cookies} ) {
 
@@ -261,9 +258,7 @@ sub request {
 
     my $on_finish = delete $args{on_finish};
 
-    my $res = $args{res};
-
-    $args{on_finish} = sub {
+    $args{on_finish} = sub ($res) {
 
         # rewind body fh
         $res->body->seek( 0, 0 ) if $res->{body} && is_glob $res->{body};

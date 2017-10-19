@@ -1,0 +1,39 @@
+---
+abstract: 'Export the current directory like a cgi-bin'
+author:
+  - 'simbabque <simbabque@cpan.org>'
+build_requires:
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-CGIThis
+no_index:
+  directory:
+    - t
+provides:
+  App::CGIThis:
+    file: lib/App/CGIThis.pm
+    version: '0.003'
+recommends:
+  Net::Rendezvous::Publish: '0'
+requires:
+  CGI::Compile: '0'
+  CGI::Emulate::PSGI: '0'
+  File::Find::Rule: '0'
+  Getopt::Long: '0'
+  Plack::App::CGIBin: '0'
+  Plack::Builder: '0'
+  Plack::Runner: '0'
+  Pod::Usage: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+version: '0.003'
+x_serialization_backend: 'YAML::Tiny version 1.70'

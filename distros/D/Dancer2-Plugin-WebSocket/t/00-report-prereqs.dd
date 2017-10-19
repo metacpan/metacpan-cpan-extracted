@@ -14,9 +14,14 @@ do { my $x = {
                       'requires' => {
                                       'Dancer2::Plugin' => '0',
                                       'JSON::MaybeXS' => '0',
+                                      'Moo' => '0',
                                       'Moo::Role' => '0',
                                       'Plack::App::WebSocket' => '0',
-                                      'Role::Tiny' => '0'
+                                      'Scalar::Util' => '0',
+                                      'Set::Tiny' => '0',
+                                      'Try::Tiny' => '0',
+                                      'strict' => '0',
+                                      'warnings' => '0'
                                     }
                     },
        'test' => {
@@ -29,9 +34,7 @@ do { my $x = {
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
                                    'Test::More' => '0',
-                                   'perl' => '5.006',
-                                   'strict' => '0',
-                                   'warnings' => '0'
+                                   'perl' => '5.006'
                                  }
                  }
      };

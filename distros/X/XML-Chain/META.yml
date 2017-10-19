@@ -27,13 +27,13 @@ name: XML-Chain
 provides:
   XML::Chain:
     file: lib/XML/Chain.pm
-    version: '0.04'
+    version: '0.05'
   XML::Chain::Element:
     file: lib/XML/Chain/Element.pm
-    version: '0.04'
+    version: '0.05'
   XML::Chain::Selector:
     file: lib/XML/Chain/Selector.pm
-    version: '0.04'
+    version: '0.05'
 requires:
   IO::Any: '0'
   Moose: '0'
@@ -41,11 +41,10 @@ requires:
   MooseX::Aliases: '0'
   Try::Tiny: '0'
   XML::LibXML: '2.01'
-  XML::Tidy: '0'
   perl: '5.01'
 resources:
   bugtracker: https://github.com/meon/XML-Chain/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/meon/XML-Chain.git
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

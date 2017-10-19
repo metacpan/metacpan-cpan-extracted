@@ -7,7 +7,7 @@ use urpm::util qw(any formatList intersection member min partition uniq);
 use urpm::sys;
 use URPM;
 
-my $default_priority_list = 'rpm,perl-URPM,perl-MDV-Distribconf,urpmi,meta-task,glibc,aria2';
+my $default_priority_list = 'rpm,perl-base,perl-URPM,perl-MDV-Distribconf,urpmi,meta-task,glibc,aria2';
 my @priority_list = split(',', $default_priority_list);
 
 my $evr_re = qr/[^\-]*-[^\-]*\.[^\.\-]*$/;

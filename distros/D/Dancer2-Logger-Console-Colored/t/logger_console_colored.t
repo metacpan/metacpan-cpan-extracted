@@ -3,7 +3,7 @@ use warnings;
 use Test::More;
 
 use Capture::Tiny 'capture_stderr';
-use Term::ANSIColor 'colorstrip';
+use Term::ANSIColor ();
 use Dancer2::Logger::Console::Colored;
 
 # part of this file is borrowed from the Dancer2 distribution
@@ -69,7 +69,7 @@ for my $level (qw( core debug info warning error )) {
             $level => "bright_blue",
         }
     );
-    $l->colored_origin( "bright_green" );
+    $l->colored_origin("bright_green");
 
     my $stderr = capture_stderr { $l->$level("$level") };    # this is the call to log
 
@@ -92,13 +92,94 @@ for my $level (qw( core debug info warning error )) {
         }x, "$level with custom message colors";
 
     like $stderr, qr{
-        \]                       # closing bracket from after the process
+        \]                      # closing bracket from after the process
         \s                      # whitespace
         \e\[35m                 # magenta, we just set that above
             \s*                 # there might be whitespace
             $level              # name of the level
         \e\[0m                  # end of coloring
     }x, "$level with custom level colors";
+}
+
+{
+    # set this explicitly to see if we don't overwrite it in the code
+    $l->colored_levels(
+        {
+            info => "magenta",
+        }
+    );
+
+    $l->colored_regex(
+        [
+            {
+                re    => 'foobar',
+                color => 'cyan',
+            },
+            {
+                re    => '\d+',
+                color => 'magenta',
+            },
+        ]
+    );
+
+    my $stderr = capture_stderr { $l->info("hello foobar hello foobar") };
+
+    like $stderr, qr{
+        hello
+        \s
+        \e\[36m                 # cyan, we set that above
+            foobar  
+        \e\[0m                  # end of coloring
+        \s
+        hello
+        \s
+        \e\[36m                 # cyan, we set that above
+            foobar  
+        \e\[0m                  # end of coloring
+        \s                      # whitespace
+        in                      # "in"
+        \s                      # whitespace
+        \e\[92m                 # bright green for the origin, we set that above
+            \Q$file\E           # the origin of the message
+        \e\[0m                  # end of coloring
+        \s                      # whitespace
+        l[.]                    # "l."
+        \s                      # whitespace
+        \e\[92m                 # bright green for the origin, we set that above
+            \d+                 # line
+        \e\[0m                  # end of coloring
+        }x, "call with regex color where a pattern matches multiple times";
+
+    like $stderr, qr{
+        \]                      # closing bracket from after the process
+        \s                      # whitespace
+        \e\[35m                 # magenta, we just set that above
+            \s*                 # there might be whitespace
+            info                # name of the level
+        \e\[0m                  # end of coloring
+    }x, "... and the level is unaffected";
+    
+    $stderr = capture_stderr { $l->info("asdf 1234") };
+    
+    like $stderr, qr{
+        asdf
+        \s
+        \e\[35m                 # magenta, we set that above
+            1234  
+        \e\[0m                  # end of coloring
+        \s                      # whitespace
+        in                      # "in"
+        \s                      # whitespace
+        \e\[92m                 # bright green for the origin, we set that above
+            \Q$file\E           # the origin of the message
+        \e\[0m                  # end of coloring
+        \s                      # whitespace
+        l[.]                    # "l."
+        \s                      # whitespace
+        \e\[92m                 # bright green for the origin, we set that above
+            \d+                 # line
+        \e\[0m                  # end of coloring
+        }x, "call with regex color where two different pattern match";
 }
 
 done_testing;

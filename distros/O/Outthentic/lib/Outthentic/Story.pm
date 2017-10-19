@@ -732,17 +732,53 @@ sub story_vars_pretty {
 
 sub dump_os {
 
-    my $data;
+my $cmd = <<'HERE';
+#! /usr/bin/env sh
 
-    open(my $fh, '-|', 'lsb_release -d 2>/dev/null; uname -o; cat /etc/issue 2>/dev/null; cat /etc/*-release 2>/dev/null') or die $!;
+# Find out the target OS
+if [ -s /etc/os-release ]; then
+  # freedesktop.org and systemd
+  . /etc/os-release
+  OS=$NAME
+  VER=$VERSION_ID
+elif lsb_release -h >/dev/null 2>&1; then
+  # linuxbase.org
+  OS=$(lsb_release -si)
+  VER=$(lsb_release -sr)
+elif [ -s /etc/lsb-release ]; then
+  # For some versions of Debian/Ubuntu without lsb_release command
+  . /etc/lsb-release
+  OS=$DISTRIB_ID
+  VER=$DISTRIB_RELEASE
+elif [ -s /etc/debian_version ]; then
+  # Older Debian/Ubuntu/etc.
+  OS=Debian
+  VER=$(cat /etc/debian_version)
+elif [ -s /etc/SuSe-release ]; then
+  # Older SuSE/etc.
+  printf "TODO\n"
+elif [ -s /etc/redhat-release ]; then
+  # Older Red Hat, CentOS, etc.
+  OS=$(cat /etc/redhat-release| head -n 1)
+else
+  RELEASE_INFO=$(cat /etc/*-release 2>/dev/null | head -n 1)
 
-    while (my $line = <$fh>) {
-      $data.=$line;
-    }
+  if [ ! -z "$RELEASE_INFO" ]; then
+    OS=$(printf -- "$RELEASE_INFO" | awk '{ print $1 }')
+    VER=$(printf -- "$RELEASE_INFO" | awk '{ print $NF }')
+  else
+    # Fall back to uname, e.g. "Linux <version>", also works for BSD, etc.
+    OS=$(uname -s)
+    VER=$(uname -r)
+  fi
+fi
 
-    close $fh;
+  echo $OS$VER
 
-    $data;
+HERE
+
+  `$cmd`
+
 }
 
 sub _resolve_os {
@@ -752,16 +788,16 @@ sub _resolve_os {
 
        DONE: while (1) {
           my $data = dump_os();
-          $data=~/Alpine\s+Linux/i and $OS = 'alpine' and last DONE;
-          $data=~/Minoca OS/i and $OS = "minoca" and last DONE;
-          $data=~/CentOS\s+.*release\s+(\d)/i and $OS = "centos$1" and last DONE;
+          $data=~/alpine/i and $OS = 'alpine' and last DONE;
+          $data=~/minoca/i and $OS = "minoca" and last DONE;
+          $data=~/centos linux(\d+)/i and $OS = "centos$1" and last DONE;
           $data=~/Red Hat.*release\s+(\d)/i and $OS = "centos$1" and last DONE;
-          $data=~/Arch\s+Linux/i and $OS = 'archlinux' and last DONE;
-          $data=~/Funtoo\s+Linux/i and $OS = 'funtoo' and last DONE;
-          $data=~/Fedora\s+/i and $OS = 'fedora' and last DONE;
-          $data=~/Amazon\s+Linux/i and $OS = 'amazon' and last DONE;
-          $data=~/Ubuntu/i and $OS = 'ubuntu' and last DONE;
-          $data=~/Debian/i and $OS = 'debian' and last DONE;
+          $data=~/arch/i and $OS = 'archlinux' and last DONE;
+          $data=~/funtoo/i and $OS = 'funtoo' and last DONE;
+          $data=~/fedora/i and $OS = 'fedora' and last DONE;
+          $data=~/amazon/i and $OS = 'amazon' and last DONE;
+          $data=~/ubuntu/i and $OS = 'ubuntu' and last DONE;
+          $data=~/debian/i and $OS = 'debian' and last DONE;
           last DONE;
       }
   }

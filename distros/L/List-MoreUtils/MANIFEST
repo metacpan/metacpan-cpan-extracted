@@ -1,6 +1,11 @@
 ARTISTIC-1.0
 Changes
 GPL-1
+inc/Config/AutoConf/LMU.pm
+inc/inc_Capture-Tiny/Capture/Tiny.pm
+inc/inc_Config-AutoConf/Config/AutoConf.pm
+inc/latest.pm
+inc/latest/private.pm
 lib/List/MoreUtils.pm
 lib/List/MoreUtils/Contributing.pod
 lib/List/MoreUtils/PP.pm

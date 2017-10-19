@@ -3,7 +3,7 @@ package DhMakePerl::Config;
 use strict;
 use warnings;
 
-our $VERSION = '0.77';
+our $VERSION = '0.96';
 
 =head1 NAME
 
@@ -15,7 +15,6 @@ use base 'Class::Accessor';
 use Dpkg::Source::Package;
 
 my @OPTIONS = (
-    'apt-contents-dir=s',
     'arch=s',          'backups!',
     'basepkgs=s',
     'bdepends=s',      'bdependsi=s',
@@ -29,13 +28,14 @@ my @OPTIONS = (
     'dist=s',          'email|e=s',
     'exclude|i:s{,}',
     'home-dir=s',      'install!',
+    'install-deps',     'install-build-deps',
     'intrusive!',
     'network!',
     'nometa',          'notest',
     'only|o=s@',
     'packagename|p=s', 'pkg-perl!',
     'recursive!',
-    'requiredeps',     'sources-list=s',
+    'requiredeps',
     'source-format=s', 'vcs=s',
     'verbose!',        'version=s',
 );
@@ -71,7 +71,7 @@ use constant DEFAULTS => {
     dh            => 9,
     dist          => '',
     email         => '',
-    exclude       => qr/$Dpkg::Source::Package::diff_ignore_default_regexp/,
+    exclude       => Dpkg::Source::Package->get_default_diff_ignore_regex(),
     home_dir      => "$ENV{HOME}/.dh-make-perl",
     network       => 1,
     only          => {

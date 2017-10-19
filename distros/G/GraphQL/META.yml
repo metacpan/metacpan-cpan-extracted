@@ -4,6 +4,7 @@ author:
   - 'Ed J <etj@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Test::Deep: '1.127'
   Test::Exception: '0.42'
   Test::More: '0.88'
 configure_requires:
@@ -34,4 +35,4 @@ resources:
   bugtracker: https://github.com/graphql-perl/graphql-perl/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/graphql-perl/graphql-perl
-version: '0.12'
+version: '0.15'

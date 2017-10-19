@@ -1,5 +1,53 @@
 Revision history for Perl module Math::Prime::Util
 
+0.68 2017-10-19
+
+    [API Changes]
+
+    - forcomb with one argument iterates over the power set, so k=0..n
+      instead of k=n.  The previous behavior was undocumented.  The new
+      behavior matches Pari/GP (forsubset) and Perl6 (combinations).
+
+    [ADDED]
+
+    - factorialmod(n,m)               n! mod m calculated efficiently
+    - is_fundamental(d)               true if d a fundamental discriminant
+
+    [FUNCTIONALITY AND PERFORMANCE]
+
+    - Unknown bigint classes no longer return two values after objectify.
+      Thanks to Daniel Șuteu for finding this.
+
+    - Using lastfor inside a formultiperm works correctly now.
+
+    - randperm a little faster for k < n cases, and can handle big n
+      values without running out of memory as long as k << n.
+      E.g. 5000 random native ints without dups:  @r = randperm(~0,5000);
+
+    - forpart with primes pulls min/max values in for a small speedup.
+
+    - forderange 10-20% faster.
+
+    - hammingweight for bigints 3-8x faster.
+
+    - Add Math::GMPq and Math::AnyNum as possible bigint classes.  Inputs
+      of these types will be relied on to stringify correctly, and if this
+      results in an integer string, to intify correctly.  This should give
+      a large speedup for these types.
+
+    - Factoring native integers is 1.2x - 2x faster.  This is due to a
+      number of changes.
+
+    - Add Lehman factoring core.  Since this is not exported or used by
+      default, the API for factor_lehman may change.
+
+    - All new Montgomery math.  Uses mulredc asm from Ben Buhrow.
+      Faster and smaller.  Most primality and factoring code 10% faster.
+
+    - Speedup for factoring by running more Pollard-Rho-Brent, revising
+      SQUFOF, updating HOLF, updating recipe.
+
+
 0.67 2017-09-23
 
     [ADDED]

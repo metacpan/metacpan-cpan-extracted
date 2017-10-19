@@ -50,11 +50,10 @@ sub mpu_public_regex {
       is_frobenius_pseudoprime
       is_frobenius_underwood_pseudoprime is_frobenius_khashin_pseudoprime
       is_perrin_pseudoprime is_catalan_pseudoprime
-      is_aks_prime is_bpsw_prime
-      is_ramanujan_prime
-      is_mersenne_prime
+      is_aks_prime is_bpsw_prime is_ramanujan_prime is_mersenne_prime
       is_power is_prime_power is_pillai is_semiprime is_square is_polygonal
       is_square_free is_primitive_root is_carmichael is_quasi_carmichael
+      is_fundamental
       sqrtint rootint logint
       miller_rabin_random
       lucas_sequence lucasu lucasv
@@ -91,7 +90,8 @@ sub mpu_public_regex {
       chebyshev_theta chebyshev_psi
       divisor_sum carmichael_lambda kronecker hclassno
       ramanujan_tau ramanujan_sum
-      binomial factorial stirling znorder znprimroot znlog legendre_phi
+      binomial stirling znorder znprimroot znlog legendre_phi
+      factorial factorialmod
       ExponentialIntegral LogarithmicIntegral RiemannZeta RiemannR LambertW Pi
       irand irand64 drand urandomb urandomm csrand random_bytes entropy_bytes
   );
@@ -100,7 +100,7 @@ sub mpu_public_regex {
 }
 
 sub mpu_factor_regex {
-  my @funcs = (qw/trial_factor fermat_factor holf_factor squfof_factor prho_factor pbrent_factor pminus1_factor pplus1_factor ecm_factor/);
+  my @funcs = (qw/trial_factor fermat_factor holf_factor lehman_factor squfof_factor prho_factor pbrent_factor pminus1_factor pplus1_factor ecm_factor/);
   my $pattern = '^(' . join('|', @funcs) . ')$';
   return qr/$pattern/;
 }

@@ -1,5 +1,8 @@
 package WebService::Braintree::TransparentRedirect::QueryString;
-$WebService::Braintree::TransparentRedirect::QueryString::VERSION = '0.93';
+$WebService::Braintree::TransparentRedirect::QueryString::VERSION = '0.94';
+use 5.010_001;
+use strictures 1;
+
 use URI;
 use WebService::Braintree::Digest qw(hexdigest);
 use Moose;
@@ -43,5 +46,6 @@ sub check_http_status {
 }
 
 __PACKAGE__->meta->make_immutable;
-1;
 
+1;
+__END__

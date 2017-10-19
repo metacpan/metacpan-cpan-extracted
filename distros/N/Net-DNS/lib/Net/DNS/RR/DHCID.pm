@@ -1,9 +1,9 @@
 package Net::DNS::RR::DHCID;
 
 #
-# $Id: DHCID.pm 1567 2017-05-19 09:52:52Z willem $
+# $Id: DHCID.pm 1597 2017-09-22 08:04:02Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1567 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
 
 
 use strict;
@@ -34,7 +34,6 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 
-	return '' unless defined $self->{digest};
 	pack 'nC a*', map $self->$_, qw(identifiertype digesttype digest);
 }
 

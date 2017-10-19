@@ -2,7 +2,7 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More tests => 34;
+use Test::More tests => 36;
 
 use Struct::Path qw(spath);
 
@@ -56,6 +56,10 @@ ok(!$@); # must be no error
 # out of range, but strict opt used
 eval { spath($s_mixed, [ {keys => ['a']},[1000] ], strict => 1) };
 ok($@); # must be error
+
+# out of range, but strict opt used
+eval { spath($s_mixed, [ {keys => ['a']},[-3] ], strict => 1) };
+like($@, qr/^\[-3\] doesn't exists \(step #1\) at/);
 
 # hash key doesn't exists
 eval { spath($s_mixed, [ {keys => ['notexists']} ]) };
@@ -116,6 +120,14 @@ is_deeply(
     \@r,
     [\[13]],
     "get [3],[1] from s_array"
+);
+
+# negative indexes
+@r = spath($s_array, [ [3],[-2,-1,-3] ]);
+is_deeply(
+    \@r,
+    [\[13], \7, \9],
+    "get [3],[-2,-1] from s_array"
 );
 
 # result must have right sequence

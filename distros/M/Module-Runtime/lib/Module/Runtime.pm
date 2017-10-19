@@ -4,36 +4,33 @@ Module::Runtime - runtime module handling
 
 =head1 SYNOPSIS
 
-	use Module::Runtime qw(
-		$module_name_rx is_module_name check_module_name
-		module_notional_filename require_module
-	);
+    use Module::Runtime qw(
+	$module_name_rx is_module_name check_module_name
+	module_notional_filename require_module);
 
-	if($module_name =~ /\A$module_name_rx\z/o) { ...
-	if(is_module_name($module_name)) { ...
-	check_module_name($module_name);
+    if($module_name =~ /\A$module_name_rx\z/o) { ...
+    if(is_module_name($module_name)) { ...
+    check_module_name($module_name);
 
-	$notional_filename = module_notional_filename($module_name);
-	require_module($module_name);
+    $notional_filename = module_notional_filename($module_name);
+    require_module($module_name);
 
-	use Module::Runtime qw(use_module use_package_optimistically);
+    use Module::Runtime qw(use_module use_package_optimistically);
 
-	$bi = use_module("Math::BigInt", 1.31)->new("1_234");
-	$widget = use_package_optimistically("Local::Widget")->new;
+    $bi = use_module("Math::BigInt", 1.31)->new("1_234");
+    $widget = use_package_optimistically("Local::Widget")->new;
 
-	use Module::Runtime qw(
-		$top_module_spec_rx $sub_module_spec_rx
-		is_module_spec check_module_spec
-		compose_module_name
-	);
+    use Module::Runtime qw(
+	$top_module_spec_rx $sub_module_spec_rx
+	is_module_spec check_module_spec
+	compose_module_name);
 
-	if($spec =~ /\A$top_module_spec_rx\z/o) { ...
-	if($spec =~ /\A$sub_module_spec_rx\z/o) { ...
-	if(is_module_spec("Standard::Prefix", $spec)) { ...
-	check_module_spec("Standard::Prefix", $spec);
+    if($spec =~ /\A$top_module_spec_rx\z/o) { ...
+    if($spec =~ /\A$sub_module_spec_rx\z/o) { ...
+    if(is_module_spec("Standard::Prefix", $spec)) { ...
+    check_module_spec("Standard::Prefix", $spec);
 
-	$module_name =
-		compose_module_name("Standard::Prefix", $spec);
+    $module_name = compose_module_name("Standard::Prefix", $spec);
 
 =head1 DESCRIPTION
 
@@ -120,7 +117,7 @@ BEGIN { require 5.006; }
 BEGIN { ${^WARNING_BITS} = ""; }
 # Don't "use strict" here, to avoid dependencies.
 
-our $VERSION = "0.015";
+our $VERSION = "0.016";
 
 # Don't use Exporter here, to avoid dependencies.
 our @EXPORT_OK = qw(

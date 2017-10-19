@@ -1,10 +1,13 @@
 package WebService::Braintree::Transaction::Source;
-$WebService::Braintree::Transaction::Source::VERSION = '0.93';
-use strict;
+$WebService::Braintree::Transaction::Source::VERSION = '0.94';
+use 5.010_001;
+use strictures 1;
 
 use constant Api => "api";
 use constant ControlPanel => "control_panel";
 use constant Recurring => "recurring";
 
 use constant All => [Api, ControlPanel, Recurring];
+
 1;
+__END__

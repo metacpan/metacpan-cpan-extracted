@@ -42,11 +42,11 @@ App::Dochazka::CLI::Guide - Dochazka CLI Guide
 
 =head1 VERSION
 
-Version 0.238
+Version 0.240
 
 =cut
 
-our $VERSION = '0.238';
+our $VERSION = '0.240';
 
 
 
@@ -410,14 +410,18 @@ enough to make it into the database.
 
 Example with overlapping intervals:
 
-Dochazka(2015-04-08) root ADMIN> schedule memory
-[ MON 23:00, TUE 03:30 )
-[ MON 23:00, TUE 03:40 )
-
-Dochazka(2015-04-08) root ADMIN> schedule new
-*** Anomaly detected ***
-Status:      500 Internal Server Error
-ERR: DBI reports DBD::Pg::st execute failed: ERROR:  conflicting key value violates exclusion constraint "schedintvls_ssid_intvl_excl"DETAIL:  Key (ssid, intvl)=(11, ["2015-03-23 23:00:00+01","2015-03-24 03:40:00+01")) conflicts with existing key (ssid, intvl)=(11, ["2015-03-23 23:00:00+01","2015-03-24 03:30:00+01")). at /usr/lib/perl5/site_perl/5.20.1/App/Dochazka/REST/Model/Schedintvls.pm line 183.
+    Dochazka(2015-04-08) root ADMIN> schedule memory
+    [ MON 23:00, TUE 03:30 )
+    [ MON 23:00, TUE 03:40 )
+    
+    Dochazka(2015-04-08) root ADMIN> schedule new
+    *** Anomaly detected ***
+    Status:      500 Internal Server Error
+    ERR: DBI reports DBD::Pg::st execute failed: ERROR:  conflicting key value violates
+    exclusion constraint "schedintvls_ssid_intvl_excl"DETAIL:  Key (ssid, intvl)=(11,
+    ["2015-03-23 23:00:00+01","2015-03-24 03:40:00+01")) conflicts with existing key
+    (ssid, intvl)=(11, ["2015-03-23 23:00:00+01","2015-03-24 03:30:00+01")). at
+    /usr/lib/perl5/site_perl/5.20.1/App/Dochazka/REST/Model/Schedintvls.pm line 183.
 
 =head4 Clear the working schedule
 

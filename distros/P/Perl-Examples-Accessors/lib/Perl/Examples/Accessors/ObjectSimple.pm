@@ -1,7 +1,7 @@
 package Perl::Examples::Accessors::ObjectSimple;
 
-our $DATE = '2017-09-01'; # DATE
-our $VERSION = '0.130'; # VERSION
+our $DATE = '2017-10-15'; # DATE
+our $VERSION = '0.131'; # VERSION
 
 use Object::Simple -base;
 
@@ -22,7 +22,7 @@ Perl::Examples::Accessors::ObjectSimple
 
 =head1 VERSION
 
-This document describes version 0.130 of Perl::Examples::Accessors::ObjectSimple (from Perl distribution Perl-Examples-Accessors), released on 2017-09-01.
+This document describes version 0.131 of Perl::Examples::Accessors::ObjectSimple (from Perl distribution Perl-Examples-Accessors), released on 2017-10-15.
 
 =head1 DESCRIPTION
 

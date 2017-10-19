@@ -37,16 +37,18 @@
 define ([
     'jquery',
     'ajax',
-    'lib',
     'current-user',
+    'datetime',
+    'lib',
     'target',
     'stack',
     'start'
 ], function (
     $,
     ajax,
-    coreLib,
     currentUser,
+    datetime,
+    coreLib,
     target,
     stack,
     start
@@ -70,7 +72,7 @@ define ([
                                         "nick": nick,
                                         "phid": row.phid,
                                         "priv": row.priv,
-                                        "effective": coreLib.readableDate(row.effective)
+                                        "effective": datetime.readableDate(row.effective)
                                     };
                                 }
                             );

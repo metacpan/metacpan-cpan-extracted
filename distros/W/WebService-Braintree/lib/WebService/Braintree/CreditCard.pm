@@ -1,5 +1,8 @@
 package WebService::Braintree::CreditCard;
-$WebService::Braintree::CreditCard::VERSION = '0.93';
+$WebService::Braintree::CreditCard::VERSION = '0.94';
+use 5.010_001;
+use strictures 1;
+
 use WebService::Braintree::CreditCard::CardType;
 use WebService::Braintree::CreditCard::Location;
 use WebService::Braintree::CreditCard::Prepaid;
@@ -101,10 +104,15 @@ object of type L<WebService::Braintree::Address/>.
 has billing_address => (is => 'rw');
 
 sub BUILD {
-    my ($self, $attributes) = @_;
-    $self->billing_address(WebService::Braintree::Address->new($attributes->{billing_address})) if ref($attributes->{billing_address}) eq 'HASH';
-    delete($attributes->{billing_address});
-    $self->set_attributes_from_hash($self, $attributes);
+    my ($self, $attrs) = @_;
+
+    $self->build_sub_object($attrs,
+        method => 'billing_address',
+        class  => 'Address',
+        key    => 'billing_address',
+    );
+
+    $self->set_attributes_from_hash($self, $attrs);
 }
 
 =head2 masked_number()

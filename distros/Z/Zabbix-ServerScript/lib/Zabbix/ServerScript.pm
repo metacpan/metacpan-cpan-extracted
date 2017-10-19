@@ -31,7 +31,7 @@ BEGIN {
 
 our @ISA = q(Exporter);
 our @EXPORT = qw($config $logger $zx_api create_config);
-our $VERSION = q(0.13);
+our $VERSION = q(0.14);
 
 our $config = {};
 our $logger;
@@ -253,7 +253,7 @@ sub store_cache {
 sub init {
 	my ($opt, @opt_specs) = @_;
 
-	_get_options($opt, @opt_specs);
+	$opt = _get_options($opt, @opt_specs);
 	_set_basename(caller);
 	_set_id($opt->{id});
 	_set_daemon($opt->{daemon});
@@ -314,17 +314,22 @@ sub _proceed_sender_response {
 }
 
 sub send {
-	my ($request_data, $sender_host, $sender_port) = @_;
-	$sender_host = q(localhost) if not defined $sender_host;
-	$sender_port = q(10051) if not defined $sender_port;
-	$logger->debug(qq(Opening sender socket to $sender_host:$sender_port));
+	my ($request_data, $trapper_host, $trapper_port) = @_;
+	$trapper_host = $Zabbix::ServerScript::Config->{trapper}->{host} if not defined $trapper_host;
+	$trapper_port = $Zabbix::ServerScript::Config->{trapper}->{port} if not defined $trapper_port;
+	if (not (defined $trapper_host and defined $trapper_port)){
+		croak q(Missing trapper configuration. Either set default values in global config file or use it like )
+			. (caller(0))[3] . q(($request_data, $trapper_host, $trapper_port));
+	}
+
+	$logger->debug(qq(Opening sender socket to $trapper_host:$trapper_port));
 	require IO::Socket::INET;
 	my $socket = IO::Socket::INET->new(
-		PeerAddr => $sender_host,
-		PeerPort => $sender_port,
+		PeerAddr => $trapper_host,
+		PeerPort => $trapper_port,
 		Proto => q(tcp),
 		Timeout => 10,
-	) or croak(qq(Cannot open socket for zabbix sender to "$sender_host:$sender_port": $?));
+	) or croak(qq(Cannot open socket for zabbix sender to "$trapper_host:$trapper_port": $?));
 
 	my $request_json = _prepare_sender_data($request_data);
 	my $request_length = length($request_json);
@@ -506,9 +511,10 @@ Retrieves cache from file using Storable module. $cache_filename is optional.
 Connects to database via unixODBC. $dsn is mandatory.
 Returns database handle or throws an exception on failure.
 
-=head2 send($data_structure)
+=head2 send($data_structure, $trapper_host, $trapper_port)
 
-Send data to Zabbix trapper like zabbix_sender does. $data_structure is mandatory.
+Send data to Zabbix trapper like zabbix_sender does.
+$data_structure is mandatory. $trapper_host and $trapper_port are optional, values from global config's 'trapper' section are used by default.
 Returns server response on success or throws an exception on failure.
 $data_structure must be either hashref or arrayref of hashrefs.
 

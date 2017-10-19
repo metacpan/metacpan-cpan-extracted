@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 #
 # Module test framework
-# Copyright (c) 2015-2016, David Duncan Ross Palmer (2E0EOL) and others,
+# Copyright (c) 2015-2017, Duncan Ross Palmer (2E0EOL) and others,
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -39,14 +39,16 @@ use warnings;
 WriteMakefile(
 	NAME         => 'Test::Module::Runnable',
 	VERSION_FROM => 'lib/Test/Module/Runnable.pm', # finds $VERSION
-	AUTHOR       => 'David Duncan Ross Palmer, 2E0EOL (palmer@overchat.org)',
+	AUTHOR       => 'Duncan Ross Palmer, 2E0EOL (palmer@overchat.org)',
 	ABSTRACT     => 'Base class for runnable unit tests using Moose introspection',
 
 	PREREQ_PM => {
 		'Moose'        => 0,
 		'Test::More'   => 0,
 	}, BUILD_REQUIRES => {
-		'Moose'        => 0,
-		'Test::More'   => 0,
+		'Moose'           => 0,
+		'Test::More'      => 0,
+		'Readonly'        => 0,
+		'List::MoreUtils' => 0,
 	},
 );

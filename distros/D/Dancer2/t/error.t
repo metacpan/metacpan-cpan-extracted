@@ -3,6 +3,7 @@ use warnings;
 use Test::More import => ['!pass'];
 use Plack::Test;
 use HTTP::Request::Common;
+use Ref::Util qw<is_coderef>;
 
 use Dancer2::Core::App;
 use Dancer2::Core::Response;
@@ -59,7 +60,7 @@ subtest "send_error in route" => sub {
     }
 
     my $app = App->to_app;
-    is( ref $app, 'CODE', 'Got app' );
+    ok( is_coderef($app), 'Got app' );
 
     test_psgi $app, sub {
         my $cb = shift;
@@ -93,7 +94,7 @@ subtest "send_error with custom stuff" => sub {
     }
 
     my $app = App->to_app;
-    is( ref $app, 'CODE', 'Got app' );
+    ok( is_coderef($app), 'Got app' );
 
     test_psgi $app, sub {
         my $cb = shift;
@@ -179,6 +180,24 @@ subtest 'Error with exception object' => sub {
     )->throw;
 
     like $err->content, qr/a test exception object/, 'Error content contains exception message';
+};
+
+subtest 'Errors without server tokens' => sub {
+    {
+        package AppNoServerTokens;
+        use Dancer2;
+        set serializer => 'JSON';
+        set no_server_tokens => 1;
+
+        get '/ohno' => sub {
+            die "oh no";
+        };
+    }
+
+    my $test = Plack::Test->create( AppNoServerTokens->to_app );
+    my $r = $test->request( GET '/ohno' );
+    is( $r->code, 500, "/ohno returned 500 response");
+    is( $r->header('server'), undef, "No server header when no_server_tokens => 1" );
 };
 
 done_testing;

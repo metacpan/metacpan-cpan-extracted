@@ -1,9 +1,9 @@
 package Net::DNS::RR::MINFO;
 
 #
-# $Id: MINFO.pm 1528 2017-01-18 21:44:58Z willem $
+# $Id: MINFO.pm 1597 2017-09-22 08:04:02Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1528 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
 
 
 use strict;
@@ -35,17 +35,15 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 	my ( $offset, @opaque ) = @_;
 
-	my $emailbx = $self->{emailbx} || return '';
 	my $rdata = $self->{rmailbx}->encode(@_);
-	$rdata .= $emailbx->encode( $offset + length $rdata, @opaque );
+	$rdata .= $self->{emailbx}->encode( $offset + length $rdata, @opaque );
 }
 
 
 sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
-	my $emailbx = $self->{emailbx} || return '';
-	my @rdata = ( $self->{rmailbx}->string, $emailbx->string );
+	my @rdata = ( $self->{rmailbx}->string, $self->{emailbx}->string );
 }
 
 

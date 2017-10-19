@@ -2,11 +2,11 @@ package Plack::App::WebSocket::Connection;
 use strict;
 use warnings;
 use Carp;
-use Scalar::Util qw(weaken);
+use Scalar::Util qw(weaken refaddr);
 use Devel::GlobalDestruction ();
 use AnyEvent;
 
-our $VERSION = "0.05";
+our $VERSION = "0.06";
 
 sub new {
     my ($class, $conn, $responder) = @_;
@@ -28,7 +28,8 @@ sub _setup_internal_event_handlers {
     $self->{connection}->on(each_message => sub {
         return if !defined($self);
         my $strong_self = $self; ## make sure $self is alive during callback execution
-        $_->($self, $_[1]->body) foreach @{$self->{handlers}{message}};
+        $_->($self, $_[1]->body, $self->_cancel_for('message',$_)) 
+            foreach @{$self->{handlers}{message}};
     });
     $self->{connection}->on(finish => sub {
         return if !defined($self);
@@ -44,16 +45,31 @@ sub _clear_event_handlers {
     }
 }
 
+sub _cancel_for {
+    my( $self, $event, $handler ) = @_;
+    return sub {
+        $self->{handlers}{$event} = [
+            grep { refaddr($_) != refaddr($handler) } 
+                 @{ $self->{handlers}{$event} }
+        ];
+    };
+}
+
 sub on {
-    my ($self, %handlers) = @_;
-    foreach my $event (keys %handlers) {
-        my $handler = $handlers{$event};
+    my ($self, @handlers) = @_;
+
+    my @cancel;
+
+    while( my( $event, $handler ) = splice @handlers, 0, 2 ) {
         croak "handler for event $event must be a code-ref" if ref($handler) ne "CODE";
         $event = "finish" if $event eq "close";
         my $handler_list = $self->{handlers}{$event};
         croak "Unknown event: $event" if not defined $handler_list;
         push(@$handler_list, $handler);
+        push @cancel, $self->_cancel_for($event,$handler);
     }
+
+    return wantarray ? @cancel : $cancel[0];
 }
 
 sub send {
@@ -128,10 +144,11 @@ C<on_establish> callback function.
 
 =head1 OBJECT METHODS
 
-=head2 $connection->on($event => $handler)
+=head2 @unregister = $connection->on($event => $handler, $event2 => $handler2, ...)
 
 Register a callback function to a particular event.
 You can register multiple callbacks to the same event.
+You can register multiple callbacks by a single call to C<on> method.
 
 C<$event> is a string and C<$handler> is a subroutine reference.
 
@@ -141,11 +158,15 @@ Possible value for C<$event> is:
 
 =item C<"message">
 
-    $handler->($connection, $message)
+    $handler->($connection, $message, $unregister)
 
 C<$handler> is called for each message received via the C<$connection>.
 Argument C<$connection> is the L<Plack::App::WebSocket::Connection> object,
-and C<$message> is a non-decoded byte string of the received message.
+and C<$message> is a non-decoded byte string of the received message. 
+
+C<$unregister> is a subroutine reference. When you invoke it, it
+removes the handler from the C<$connection>, so that it'll be never
+called again. See below for an example.
 
 =item C<"finish"> (alias: C<"close">)
 
@@ -155,6 +176,27 @@ C<$handler> is called when the C<$connection> is closed.
 Argument C<$connection> is the L<Plack::App::WebSocket::Connection> object.
 
 =back
+
+C<on> method returns list of subroutine references that unregister the
+C<$handler>s just registered.
+
+In scalar context, it returns the first subroutine reference.
+
+Example of unregistering:
+
+    my $unregister;
+    $unregister = $connection->on( message => sub {
+        my( $conn, $message ) = @_;
+        $conn->send( "This will only be sent once" );
+        $unregister->();
+    });
+
+    # could also be written as
+    $connection->on( message => sub {
+        my( $conn, $message, $unregister ) = @_;
+        $conn->send( "This will only be sent once" );
+        $unregister->();
+    });
 
 =head2 $connection->send($message)
 

@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-$VERSION = (qw$LastChangedRevision: 1507 $)[1];
+$VERSION = (qw$LastChangedRevision: 1603 $)[1];
 
 =head1 NAME
 
@@ -149,6 +149,12 @@ O'Reilly, 2000.
 
 use strict;
 
+use constant UTF8 => scalar eval {	## not UTF-EBCDIC  [see UTR#16 3.6]
+	require Encode;
+	Encode::encode_utf8( chr(182) ) eq pack( 'H*', 'C2B6' );
+};
+
+
 my $self = $0;							# script
 
 my $options = 'dnstv';						# options
@@ -164,8 +170,9 @@ die eval { system("perldoc -F $self"); "" }, <<END unless scalar @ARGV;
 END
 
 
-my ( $domain, @nameserver ) = @ARGV;
+my ( $target, @nameserver ) = @ARGV;
 
+my $domain = UTF8 && $target =~ /[^\000-\177]/ ? Encode::decode_utf8($target) : $target;
 
 require Net::DNS;
 
@@ -215,8 +222,9 @@ foreach my $soa (@soa) {					# simple sanity check
 	my $rname = lc $soa->rname;				# responsible person
 
 	my $resolved;						# check MNAME resolvable
-	foreach my $rrtype (qw( A AAAA )) {
+	foreach my $rrtype (qw( A AAAA CNAME )) {
 		my $probe = $resolver->send( $mname, $rrtype );
+		next unless $probe;
 		last if ( $resolved = scalar $probe->answer );
 	}
 
@@ -398,7 +406,7 @@ sub checkNS {				## query nameservers (concurrently) and report status
 		}
 	} elsif (@ncache) {
 		my ($ttl) = map { $_->ttl } @soa = @ncache;	# RFC2308, 2.2(1)(2)
-		report( 'NODATA response', ttl($ttl) );
+		report( 'negative cache', ttl($ttl) );
 		return @fail unless grep $_->name =~ /^$zone$/i, @ncache;
 		report('requested SOA in authority section; violates RFC2308');
 	} elsif (@refer) {
@@ -407,7 +415,7 @@ sub checkNS {				## query nameservers (concurrently) and report status
 		report('not configured for zone') unless @n;
 		return @fail;
 	} else {
-		report('NODATA response from nameserver');	# RFC2308, 2.2(3)
+		report('NOERROR (no data)');			# RFC2308, 2.2(3)
 		return @fail;
 	}
 
@@ -503,7 +511,9 @@ sub NS {				## find NS records for domain
 	my $name = shift;
 
 	my $packet = $resolver->send( $name, 'NS' ) or die $resolver->string;
-	my @answer = grep $_->type eq 'NS', $packet->answer;
+
+	# Bear in mind the possibility of malformed zones!
+	my @answer = grep $_->type eq 'NS', $packet->answer, $packet->authority;
 }
 
 

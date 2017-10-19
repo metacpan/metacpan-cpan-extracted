@@ -1,8 +1,10 @@
 NAME
+
     Dancer2::Plugin::Auth::Extensible - extensible authentication framework
     for Dancer2 apps
 
 DESCRIPTION
+
     A user authentication and authorisation framework plugin for Dancer2
     apps.
 
@@ -13,14 +15,15 @@ DESCRIPTION
 
     Designed to support multiple authentication realms and to be as
     extensible as possible, and to make secure password handling easy. The
-    base class for auth providers makes handling "RFC2307"-style hashed
+    base class for auth providers makes handling RFC2307-style hashed
     passwords really simple, so you have no excuse for storing plain-text
     passwords. A simple script called generate-crypted-password to generate
     RFC2307-style hashed passwords is included, or you can use
-    Crypt::SaltedHash yourself to do so, or use the "slappasswd" utility if
+    Crypt::SaltedHash yourself to do so, or use the slappasswd utility if
     you have it installed.
 
 SYNOPSIS
+
     Configure the plugin to use the authentication provider class you wish
     to use:
 
@@ -31,8 +34,8 @@ SYNOPSIS
                         provider: Config
                         ....
 
-    The configuration you provide will depend on the authentication provider
-    module in use. For a simple example, see
+    The configuration you provide will depend on the authentication
+    provider module in use. For a simple example, see
     Dancer2::Plugin::Auth::Extensible::Provider::Config.
 
     Define that a user must be logged in and have the proper permissions to
@@ -41,7 +44,7 @@ SYNOPSIS
         get '/secret' => require_role Confidant => sub { tell_secrets(); };
 
     Define that a user must be logged in to access a route - and find out
-    who is logged in with the "logged_in_user" keyword:
+    who is logged in with the logged_in_user keyword:
 
         get '/users' => require_login sub {
             my $user = logged_in_user;
@@ -49,82 +52,95 @@ SYNOPSIS
         };
 
 AUTHENTICATION PROVIDERS
+
     For flexibility, this authentication framework uses simple
     authentication provider classes, which implement a simple interface and
-    do whatever is required to authenticate a user against the chosen source
-    of authentication.
+    do whatever is required to authenticate a user against the chosen
+    source of authentication.
 
-    For an example of how simple provider classes are, so you can build your
-    own if required or just try out this authentication framework plugin
-    easily, see Dancer2::Plugin::Auth::Extensible::Provider::Config.
+    For an example of how simple provider classes are, so you can build
+    your own if required or just try out this authentication framework
+    plugin easily, see Dancer2::Plugin::Auth::Extensible::Provider::Config.
 
     This framework supplies the following providers out-of-the-box:
 
     Dancer2::Plugin::Auth::Extensible::Provider::Unix
-        Authenticates users using system accounts on Linux/Unix type boxes
+
+      Authenticates users using system accounts on Linux/Unix type boxes
 
     Dancer2::Plugin::Auth::Extensible::Provider::Config
-        Authenticates users stored in the app's config
+
+      Authenticates users stored in the app's config
 
     The following external providers are also available on the CPAN:
 
     Dancer2::Plugin::Auth::Extensible::Provider::DBIC
-        Authenticates users stored in a database table using
-        Dancer2::Plugin::DBIC
+
+      Authenticates users stored in a database table using
+      Dancer2::Plugin::DBIC
 
     Dancer2::Plugin::Auth::Extensible::Provider::Database
-        Authenticates users stored in a database table
+
+      Authenticates users stored in a database table
 
     Dancer2::Plugin::Auth::Extensible::Provider::IMAP
-        Authenticates users via in an IMAP server.
+
+      Authenticates users via in an IMAP server.
 
     Dancer2::Plugin::Auth::Extensible::Provider::LDAP
-        Authenticates users stored in an LDAP directory.
+
+      Authenticates users stored in an LDAP directory.
 
     Dancer2::Plugin::Auth::Extensible::Provider::Usergroup
-        An alternative Dancer2::Plugin::DBIC-based provider.
+
+      An alternative Dancer2::Plugin::DBIC-based provider.
 
     Need to write your own? Just create a new provider class which consumes
     Dancer2::Plugin::Auth::Extensible::Role::Provider and implements the
     required methods, and you're good to go!
 
 CONTROLLING ACCESS TO ROUTES
+
     Keywords are provided to check if a user is logged in / has appropriate
     roles.
 
-  require_login - require the user to be logged in
+ require_login - require the user to be logged in
+
         get '/dashboard' => require_login sub { .... };
 
     If the user is not logged in, they will be redirected to the login page
-    URL to log in. The default URL is "/login" - this may be changed with
-    the "login_page" option.
+    URL to log in. The default URL is /login - this may be changed with the
+    login_page option.
 
-  require_role - require the user to have a specified role
+ require_role - require the user to have a specified role
+
         get '/beer' => require_role BeerDrinker => sub { ... };
 
     Requires that the user be logged in as a user who has the specified
-    role. If the user is not logged in, they will be redirected to the login
-    page URL. If they are logged in, but do not have the required role, they
-    will be redirected to the access denied URL.
+    role. If the user is not logged in, they will be redirected to the
+    login page URL. If they are logged in, but do not have the required
+    role, they will be redirected to the access denied URL.
 
-    If "disable_roles" configuration option is set to a true value then
-    using "require_role" will cause the application to croak on load.
+    If disable_roles configuration option is set to a true value then using
+    "require_role" will cause the application to croak on load.
 
-  require_any_role - require the user to have one of a list of roles
+ require_any_role - require the user to have one of a list of roles
+
         get '/drink' => require_any_role [qw(BeerDrinker VodaDrinker)] => sub {
             ...
         };
 
     Requires that the user be logged in as a user who has any one (or more)
     of the roles listed. If the user is not logged in, they will be
-    redirected to the login page URL. If they are logged in, but do not have
-    any of the specified roles, they will be redirected to the access denied
-    URL.
+    redirected to the login page URL. If they are logged in, but do not
+    have any of the specified roles, they will be redirected to the access
+    denied URL.
 
-    If "disable_roles" configuration option is set to a true value then
-    using "require_any_roles" will cause the application to croak on load.
+    If disable_roles configuration option is set to a true value then using
+    "require_any_roles" will cause the application to croak on load.
 
-  require_all_roles - require the user to have all roles listed
+ require_all_roles - require the user to have all roles listed
+
         get '/foo' => require_all_roles [qw(Foo Bar)] => sub { ... };
 
     Requires that the user be logged in as a user who has all of the roles
@@ -132,51 +148,54 @@ CONTROLLING ACCESS TO ROUTES
     login page URL. If they are logged in but do not have all of the
     specified roles, they will be redirected to the access denied URL.
 
-    If "disable_roles" configuration option is set to a true value then
-    using "require_all_roles" will cause the application to croak on load.
+    If disable_roles configuration option is set to a true value then using
+    "require_all_roles" will cause the application to croak on load.
 
 NO-REDIRECT LOGIN
+
     By default when a page is requested that requires login and the user is
-    not logged in then the plugin redirects the user to the "login_page" and
-    sets "return_url" to the page originally requested. After successful
+    not logged in then the plugin redirects the user to the "login_page"
+    and sets return_url to the page originally requested. After successful
     login the user is redirected to the originally-requested page.
 
     As an alternative if "login_without_redirect" is true then the login
-    process happens with no redirects. Instead a 401 "Unauthorized" code is
-    returned and a login page is displayed. This login page is posted to the
-    original URI and on successful login an internal "forward" in
+    process happens with no redirects. Instead a 401 Unauthorized code is
+    returned and a login page is displayed. This login page is posted to
+    the original URI and on successful login an internal "forward" in
     Dancer2::Manual is performed so that the originally requested page is
-    displayed. Any "params" in Dancer2::Manual from the original request are
-    added to the forward so that they are available to the page's route
+    displayed. Any "params" in Dancer2::Manual from the original request
+    are added to the forward so that they are available to the page's route
     handler either using "params" in Dancer2::Manual or "query_parameters"
     in Dancer2::Manual.
 
-    This relies on the login form having no "action" set and also it must
-    use "__auth_extensible_username" and "__auth_extensible_password" input
-    names. Optionally "__auth_extensible_realm" can also be used in a custom
-    login page.
+    This relies on the login form having no action set and also it must use
+    __auth_extensible_username and __auth_extensible_password input names.
+    Optionally __auth_extensible_realm can also be used in a custom login
+    page.
 
-    See <http://shadow.cat/blog/matt-s-trout/humane-login-screens/> for the
+    See http://shadow.cat/blog/matt-s-trout/humane-login-screens/ for the
     original idea for this functionality.
 
-CUSTOMISING "/login" AND "/login/denied"
-  login_template
-    The "login_template" setting determines the name of the view you use for
-    your custom login page. If this view exists in your application then it
-    will be used instead of the default login template.
+CUSTOMISING /login AND /login/denied
+
+ login_template
+
+    The "login_template" setting determines the name of the view you use
+    for your custom login page. If this view exists in your application
+    then it will be used instead of the default login template.
 
     If you are using "login_without_redirect" and assuming you are using
     Template::Toolkit then your custom login page should be something like
     this:
 
         <h1>Login Required</h1>
-
+    
         <p>You need to log in to continue.</p>
-
+    
         [%- IF login_failed -%]
             <p>LOGIN FAILED</p>
         [%- END -%]
-
+    
         <form method="post">
             <label for="username">Username:</label>
             <input type="text" name="__auth_extensible_username" id="username">
@@ -186,7 +205,7 @@ CUSTOMISING "/login" AND "/login/denied"
             <br />
             <input type="submit" value="Login">
         </form>
-
+    
         [%- IF reset_password_handler -%]
         <form method="post" action="[% login_page %]">
             <h2>Password reset</h2>
@@ -197,18 +216,18 @@ CUSTOMISING "/login" AND "/login/denied"
         </form>
         [%- END -%]
 
-    If you are not using "login_without_redirect" and assuming you are using
-    Template::Toolkit then your custom login page should be something like
-    this:
+    If you are not using "login_without_redirect" and assuming you are
+    using Template::Toolkit then your custom login page should be something
+    like this:
 
         <h1>Login Required</h1>
-
+    
         <p>You need to log in to continue.</p>
-
+    
         [%- IF login_failed -%]
             <p>LOGIN FAILED</p>
         [%- END -%]
-
+    
         <form method="post">
             <label for="username">Username:</label>
             <input type="text" name="username" id="username">
@@ -217,11 +236,11 @@ CUSTOMISING "/login" AND "/login/denied"
             <input type="password" name="password" id="password">
             <br />
             <input type="submit" value="Login">
-
+    
             [%- IF return_url -%]
                 <input type="hidden" name="return_url" value="[% return_url %]">
             [%- END -%]
-
+    
             [%- IF reset_password_handler -%]
                 <h2>Password reset</h2>
                 <p>Enter your username to obtain an email to reset your password</p>
@@ -229,18 +248,19 @@ CUSTOMISING "/login" AND "/login/denied"
                 <input type="text" name="username_reset" id="username_reset">
                 <input type="submit" name="submit_reset" value="Submit">
             [%- END -%]
-
+    
         </form>
 
-  Replacing the default " /login " and " /login/denied " routes
+ Replacing the default	/login	and  /login/denied  routes
+
     By default, the plugin adds a route to present a simple login form at
-    that URL. If you would rather add your own, set the "no_default_pages"
+    that URL. If you would rather add your own, set the no_default_pages
     setting to a true value, and define your own route which responds to
-    "/login" with a login page. Alternatively you can let DPAE add the
-    routes and handle the status codes, etc. and simply define the setting
-    "login_page_handler" and/or "permission_denied_page_handler" with the
-    name of a subroutine to be called to handle the route. Note that it must
-    be a fully qualified sub. E.g.
+    /login with a login page. Alternatively you can let DPAE add the routes
+    and handle the status codes, etc. and simply define the setting
+    login_page_handler and/or permission_denied_page_handler with the name
+    of a subroutine to be called to handle the route. Note that it must be
+    a fully qualified sub. E.g.
 
         plugins:
           Auth::Extensible:
@@ -249,21 +269,54 @@ CUSTOMISING "/login" AND "/login/denied"
 
     Then in your code you might simply use a template:
 
+        sub login_page_handler {
+            my $return_url = query_parameters->get('return_url');
+            template
+                'account/login',
+                { title => 'Sign in',
+                  return_url => $return_url,
+                },
+                { layout => 'login.tt',
+                };
+        }
+    
         sub permission_denied_page_handler {
             template 'account/login';
         }
 
+    and your account/login.tt template might look like:
+
+        [% IF vars.login_failed %]
+        <div class="alert alert-danger">
+            <strong>Login Failed</strong> Try again
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        [% END %]
+    
+        <form method = "post" lpformnum="1" class="form-signin">
+            <h2 class="form-signin-heading">Please sign in</h2>
+            <label for="username" class="sr-only">Username</label>
+            <input type="text" name="username" id="username" class="form-control" placeholder="User name" required autofocus>
+            <label for="password" class="sr-only">Password</label>
+            <input type="password" name="password" id="password" class="form-control" placeholder="Password" required>
+            <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+            <br>
+            <input type="hidden" name="return_url" value="[% return_url %]">
+        </form>
+
     If the user is logged in, but tries to access a route which requires a
     specific role they don't have, they will be redirected to the
-    "permission denied" page URL, which defaults to "/login/denied" but may
-    be changed using the "denied_page" option.
+    "permission denied" page URL, which defaults to /login/denied but may
+    be changed using the denied_page option.
 
-    Again, by default a route is added to respond to that URL with a default
-    page; again, you can disable this by setting "no_default_pages" and
-    creating your own.
+    Again, by default a route is added to respond to that URL with a
+    default page; again, you can disable this by setting no_default_pages
+    and creating your own.
 
-    This would still leave the routes "post '/login'" and "any '/logout'"
-    routes in place. To disable them too, set the option "no_login_handler"
+    This would still leave the routes post '/login' and any '/logout'
+    routes in place. To disable them too, set the option no_login_handler
     to a true value. In this case, these routes should be defined by the
     user, and should do at least the following:
 
@@ -283,39 +336,43 @@ CUSTOMISING "/login" AND "/login/denied"
                 # authentication failed
             }
         };
-    
+        
         any '/logout' => sub {
             app->destroy_session;
         };
 
-    If you want to use the default "post '/login'" and "any '/logout'"
-    routes you can configure them. See below.
+    If you want to use the default post '/login' and any '/logout' routes
+    you can configure them. See below.
 
     The default routes also contain functionality for a user to perform
     password resets. See the "PASSWORD RESETS" documentation for more
     details.
 
 KEYWORDS
+
     The following keywords are provided in additional to the route
     decorators specified in "CONTROLLING ACCESS TO ROUTES":
 
-  logged_in_user
+ logged_in_user
+
     Returns a hashref of details of the currently logged-in user or some
     kind of user object, if there is one.
 
-    The details you get back will depend upon the authentication provider in
-    use.
+    The details you get back will depend upon the authentication provider
+    in use.
 
-  get_user_details
+ get_user_details
+
     Returns a hashref of details of the specified user. The realm can
     optionally be specified as the second parameter. If the realm is not
     specified, each realm will be checked, and the first matching user will
     be returned.
 
-    The details you get back will depend upon the authentication provider in
-    use.
+    The details you get back will depend upon the authentication provider
+    in use.
 
-  user_has_role
+ user_has_role
+
     Check if a user has the role named.
 
     By default, the currently-logged-in user will be checked, so you need
@@ -327,10 +384,11 @@ KEYWORDS
 
         if (user_has_role($user, $role)) { .... }
 
-    If "disable_roles" configuration option is set to a true value then
-    using "user_has_role" will cause the application to croak at runtime.
+    If disable_roles configuration option is set to a true value then using
+    "user_has_role" will cause the application to croak at runtime.
 
-  user_roles
+ user_roles
+
     Returns a list of the roles of a user.
 
     By default, roles for the currently-logged-in user will be checked;
@@ -338,10 +396,11 @@ KEYWORDS
 
     Returns a list or arrayref depending on context.
 
-    If "disable_roles" configuration option is set to a true value then
-    using "user_roles" will cause the application to croak at runtime.
+    If disable_roles configuration option is set to a true value then using
+    "user_roles" will cause the application to croak at runtime.
 
-  authenticate_user
+ authenticate_user
+
     Usually you'll want to let the built-in login handling code deal with
     authenticating users, but in case you need to do it yourself, this
     keyword accepts a username and password, and optionally a specific
@@ -360,39 +419,42 @@ KEYWORDS
     third parameter.
 
     In boolean context, returns simply true or false; in list context,
-    returns "($success, $realm)".
+    returns ($success, $realm).
 
-  logged_in_user_lastlogin
+ logged_in_user_lastlogin
+
     Returns (as a DateTime object) the time of the last successful login of
     the current logged in user.
 
     To enable this functionality, set the configuration key
-    "record_lastlogin" to a true value. The backend provider must support
+    record_lastlogin to a true value. The backend provider must support
     write access for a user and have lastlogin functionality implemented.
 
-  update_user
+ update_user
+
     Updates a user's details. If the authentication provider supports it,
     this keyword allows a user's details to be updated within the backend
     data store.
 
-    In order to update the user's details, the keyword should be called with
-    the username to be updated, followed by a hash of the values to be
-    updated. Note that whilst the password can be updated using this method,
-    any new value will be stored directly into the provider as-is, not
-    encrypted. It is recommended to use "user_password" instead.
+    In order to update the user's details, the keyword should be called
+    with the username to be updated, followed by a hash of the values to be
+    updated. Note that whilst the password can be updated using this
+    method, any new value will be stored directly into the provider as-is,
+    not encrypted. It is recommended to use "user_password" instead.
 
-    If only one realm is configured then this will be used to search for the
-    user. Otherwise, the realm must be specified with the realm key.
+    If only one realm is configured then this will be used to search for
+    the user. Otherwise, the realm must be specified with the realm key.
 
         # Update user, only one realm configured
         update_user "jsmith", surname => "Smith"
-
+    
         # Update a user's username, more than one realm
         update_user "jsmith", realm => "dbic", username => "jjones"
 
     The updated user's details are returned, as per logged_in_user.
 
-  update_current_user
+ update_current_user
+
     The same as update_user, but does not take a username as the first
     parameter, instead updating the currently logged-in user.
 
@@ -401,22 +463,23 @@ KEYWORDS
 
     The updated user's details are returned, as per logged_in_user.
 
-  create_user
+ create_user
+
     Creates a new user, if the authentication provider supports it.
     Optionally sends a welcome message with a password reset request, in
     which case an email key must be provided.
 
     This function works in the same manner as update_user, except that the
-    username key is mandatory. As with update_user, it is recommended not to
-    set a password directly using this method, otherwise it will be stored
-    in plain text.
+    username key is mandatory. As with update_user, it is recommended not
+    to set a password directly using this method, otherwise it will be
+    stored in plain text.
 
-    The realm to use must be specified with the key "realm" if there is more
+    The realm to use must be specified with the key realm if there is more
     than one realm configured.
 
         # Create new user
         create_user username => "jsmith", realm => "dbic", surname => "Smith"
-
+    
         # Create new user and send welcome email
         create_user username => "jsmith", email => "john@you.com", email_welcome => 1
 
@@ -427,37 +490,40 @@ KEYWORDS
     same way as password_reset_send:
 
     welcome_send
-        This can be used to specify a subroutine that will be called to
-        perform the entire message construction and email sending. Note that
-        it must be a fully-qualified sub such as
-        "My::App:email_welcome_send". The subroutine will be passed the dsl
-        as the first parameter, followed by a hash with the keys "code",
-        "email" and "user", which contain the generated reset code, user
-        email address, and user hashref respectively. For example:
 
-            sub reset_send_handler {
-                my ($dsl, %params) = @_;
-                my $user_email = $params{email};
-                my $reset_code = $params{code};
-                # Send email
-                return $result;
-            }
+      This can be used to specify a subroutine that will be called to
+      perform the entire message construction and email sending. Note that
+      it must be a fully-qualified sub such as My::App:email_welcome_send.
+      The subroutine will be passed the dsl as the first parameter,
+      followed by a hash with the keys code, email and user, which contain
+      the generated reset code, user email address, and user hashref
+      respectively. For example:
+
+          sub reset_send_handler {
+              my ($dsl, %params) = @_;
+              my $user_email = $params{email};
+              my $reset_code = $params{code};
+              # Send email
+              return $result;
+          }
 
     welcome_text
-        This can be used to generate the text for the welcome email, with
-        this module sending the actual email itself. It must be a
-        fully-qualified sub, as per the previous option. It will be passed
-        the same parameters as welcome_send, and should return a hash with
-        the same keys as password_reset_send_email.
 
-  password_reset_send
+      This can be used to generate the text for the welcome email, with
+      this module sending the actual email itself. It must be a
+      fully-qualified sub, as per the previous option. It will be passed
+      the same parameters as welcome_send, and should return a hash with
+      the same keys as password_reset_send_email.
+
+ password_reset_send
+
     "password_reset_send" sends a user an email with a password reset link.
     Along with "user_password", it allows a user to reset their password.
 
-    The function must be called with the key "username" and a value that is
+    The function must be called with the key username and a value that is
     the username. The username specified will be sent an email with a link
     to reset their password. Note that the provider being used must return
-    the email address in the key "email", which in the case of a database
+    the email address in the key email, which in the case of a database
     will normally require that column to exist in the user's table. The
     provider must be able to write values to the user in order for this
     function to store the generated code.
@@ -471,8 +537,8 @@ KEYWORDS
 
         say "Success" if defined password_reset_send username => username;
 
-    Note that this still leaves the possibility of checking the existance of
-    a user if the email send mechanism is failing.
+    Note that this still leaves the possibility of checking the existance
+    of a user if the email send mechanism is failing.
 
     The realm can also be specified using the key realm:
 
@@ -482,81 +548,89 @@ KEYWORDS
     can be customized with one of 2 config parameters:
 
     password_reset_send_email
-        This can be used to specify a subroutine that will be called to
-        perform the entire message construction and email sending. Note that
-        it must be a fully-qualified sub such as
-        "My::App:reset_send_handler". The subroutine will be passed the dsl
-        as the first parameter, followed by a hash with the keys "code" and
-        "email", which contain the generated reset code and user email
-        address respectively. For example:
 
-            sub reset_send_handler {
-                my ($dsl, %params) = @_;
-                my $user_email = $params{email};
-                my $reset_code = $params{code};
-                # Send email
-                return $result;
-            }
+      This can be used to specify a subroutine that will be called to
+      perform the entire message construction and email sending. Note that
+      it must be a fully-qualified sub such as My::App:reset_send_handler.
+      The subroutine will be passed the dsl as the first parameter,
+      followed by a hash with the keys code and email, which contain the
+      generated reset code and user email address respectively. For
+      example:
+
+          sub reset_send_handler {
+              my ($dsl, %params) = @_;
+              my $user_email = $params{email};
+              my $reset_code = $params{code};
+              # Send email
+              return $result;
+          }
 
     password_reset_text
-        This can be used to generate the text for the email, with this
-        module sending the actual email itself. It must be a fully-qualified
-        sub, as per the previous option. It will be passed the same
-        parameters as password_reset_send_email, and should return a hash
-        with the following keys:
 
-        subject
-            The subject of the email message.
+      This can be used to generate the text for the email, with this module
+      sending the actual email itself. It must be a fully-qualified sub, as
+      per the previous option. It will be passed the same parameters as
+      password_reset_send_email, and should return a hash with the
+      following keys:
 
-        from
-            The sender of the email message (optional, can also be specified
-            using "mail_from".
+      subject
 
-        plain
-            Plain text for the email. Either this, or html, or both should
-            be returned.
+	The subject of the email message.
 
-        html
-            HTML text for the email (optional, as per plain).
+      from
 
-        Here is an example subroutine:
+	The sender of the email message (optional, can also be specified
+	using mail_from.
 
-            sub reset_text_handler {
-                my ($dsl, %params) = @_;
-                return (
-                    from    => '"My name" <myapp@example.com',
-                    subject => 'the subject',
-                    plain   => "reset here: $params{code}",
-                );
-            }
+      plain
 
-        # Example configuration
+	Plain text for the email. Either this, or html, or both should be
+	returned.
 
-            Auth::Extensible:
-                mailer:
-                    module: Mail::Message # Module to send email with
-                    options:              # Module options
-                        via: sendmail
-                mail_from: '"My app" <myapp@example.com>'
-                password_reset_text: MyApp::reset_send
+      html
 
-  user_password
+	HTML text for the email (optional, as per plain).
+
+      Here is an example subroutine:
+
+          sub reset_text_handler {
+              my ($dsl, %params) = @_;
+              return (
+                  from    => '"My name" <myapp@example.com',
+                  subject => 'the subject',
+                  plain   => "reset here: $params{code}",
+              );
+          }
+
+      # Example configuration
+
+          Auth::Extensible:
+              mailer:
+                  module: Mail::Message # Module to send email with
+                  options:              # Module options
+                      via: sendmail
+              mail_from: '"My app" <myapp@example.com>'
+              password_reset_text: MyApp::reset_send
+
+ user_password
+
     This provides various functions to check or reset a user's password,
-    either from a reset code that was previously send by password_reset_send
-    or directly by specifying a username and password. Functions that update
-    a password rely on a provider that has write access to a user's details.
+    either from a reset code that was previously send by
+    password_reset_send or directly by specifying a username and password.
+    Functions that update a password rely on a provider that has write
+    access to a user's details.
 
     By default, the user to update is the currently logged-in user. A
-    specific user can be specified with the key "username" for a certain
-    username, or "code" for a previously sent reset code. Using these
+    specific user can be specified with the key username for a certain
+    username, or code for a previously sent reset code. Using these
     parameters on their own will return the username if it is a valid
     request.
 
     If the above parameters are specified with the additional parameter
-    "new_password", then the password will be set to that value, assuming
+    new_password, then the password will be set to that value, assuming
     that it is a valid request.
 
-    The realm can be optionally specified with the keyword "realm".
+    The realm can be optionally specified with the keyword realm.
 
     Examples:
 
@@ -585,17 +659,18 @@ KEYWORDS
 
         user_password username => 'jbloggs', new_password => 'secret'
 
-  logged_in_user_password_expired
+ logged_in_user_password_expired
+
     Returns true if the password of the currently logged in user has
     expired. To use this functionality, the provider must support the
-    "password_expired" function, and must be configured accordingly. See the
+    password_expired function, and must be configured accordingly. See the
     relevant provider for full configuration details.
 
     Note that this functionality does not prevent the user accessing any
     protected pages, even if the password has expired. This is so that the
     developer can still leave some protected routes available, such as a
     page to change the password. Therefore, if using this functionality, it
-    is suggested that a check is done in the "before" hook:
+    is suggested that a check is done in the before hook:
 
         hook before => sub {
             if (logged_in_user_password_expired)
@@ -606,7 +681,8 @@ KEYWORDS
             }
         }
 
-  PASSWORD RESETS
+ PASSWORD RESETS
+
     A variety of functionality is provided to make it easier to manage
     requests from users to reset their passwords. The keywords
     password_reset_send and user_password form the core of this
@@ -614,15 +690,15 @@ KEYWORDS
     details. This functionality can only be used with a provider that
     supports write access.
 
-    When utilising this functionality, it is wise to only allow passwords to
-    be reset with a POST request. This is because some email scanners "open"
-    links before delivering the email to the end user. With only a
-    single-use GET request, this will result in the link being "used" by the
-    time it reaches the end user, thus rendering it invalid.
+    When utilising this functionality, it is wise to only allow passwords
+    to be reset with a POST request. This is because some email scanners
+    "open" links before delivering the email to the end user. With only a
+    single-use GET request, this will result in the link being "used" by
+    the time it reaches the end user, thus rendering it invalid.
 
     Password reset functionality is also built-in to the default route
     handlers. To enable this, set the configuration value
-    "reset_password_handler" to a true value (having already configured the
+    reset_password_handler to a true value (having already configured the
     mail handler, as per the keyword documentation above). Once this is
     done, the default login page will contain additional form controls to
     allow the user to enter their username and request a reset password
@@ -630,31 +706,36 @@ KEYWORDS
 
     By default, the default handlers will generate a random 8 character
     password using Session::Token. To use your own function, set
-    "password_generator" in your configuration. See the "SAMPLE
+    password_generator in your configuration. See the "SAMPLE
     CONFIGURATION" for an example.
 
-    If using "login_page_handler" to replace the default login page, you can
+    If using login_page_handler to replace the default login page, you can
     still use the default password reset handlers. Add 2 controls to your
     form for submitting a password reset request: a text input called
-    username_reset for the username, and submit_reset to submit the request.
-    Your login_page_handler is then passed the following additional params:
+    username_reset for the username, and submit_reset to submit the
+    request. Your login_page_handler is then passed the following
+    additional params:
 
     new_password
-        Contains the new automatically-generated password, once the password
-        reset has been performed successfully.
+
+      Contains the new automatically-generated password, once the password
+      reset has been performed successfully.
 
     reset_sent
-        Is true when a password reset has been emailed to the user.
+
+      Is true when a password reset has been emailed to the user.
 
     password_code_valid
-        Is true when a valid password reset code has been submitted with a
-        GET request. In this case, the user should be given the chance to
-        confirm with a POST request, with a form control called
-        "confirm_reset".
 
-        For a full example, see the default handler in this module's code.
+      Is true when a valid password reset code has been submitted with a
+      GET request. In this case, the user should be given the chance to
+      confirm with a POST request, with a form control called
+      confirm_reset.
 
-  SAMPLE CONFIGURATION
+      For a full example, see the default handler in this module's code.
+
+ SAMPLE CONFIGURATION
+
     In your application's configuation file:
 
         session: simple
@@ -673,29 +754,29 @@ KEYWORDS
                 user_home_page: '/user'
                 # After /logout: If no return_url is given: land here (no default)
                 exit_page: '/'
-
+    
                 # Mailer options for reset password and welcome emails
                 mailer:
                     module: Mail::Message # Email module to use
                     options:              # Options for module
                         via: sendmail     # Options passed to $msg->send
                 mail_from: '"App name" <myapp@example.com>' # From email address
-
+    
                 # Set to true to enable password reset code in the default handlers
                 reset_password_handler: 1
                 password_generator: My::App::random_pw # Optional random password generator
-
+    
                 # Set to a true value to enable recording of successful last login times
                 record_lastlogin: 1
-
+    
                 # Password reset functionality
                 password_reset_send_email: My::App::reset_send # Customise sending sub
                 password_reset_text: My::App::reset_text # Customise reset text
-
+    
                 # create_user options
                 welcome_send: My::App::welcome_send # Customise welcome email sub
                 welcome_text: My::App::welcome_text # Customise welcome email text
-
+    
                 # List each authentication realm, with the provider to use and the
                 # provider-specific settings (see the documentation for the provider
                 # you wish to use)
@@ -709,75 +790,93 @@ KEYWORDS
                         provider: Config
 
     Please note that you must have a session provider configured. The
-    authentication framework requires sessions in order to track information
-    about the currently logged in user. Please see Dancer2::Core::Session
-    for information on how to configure session management within your
-    application.
+    authentication framework requires sessions in order to track
+    information about the currently logged in user. Please see
+    Dancer2::Core::Session for information on how to configure session
+    management within your application.
 
 METHODS
-  auth_provider($dsl, $realm)
+
+ auth_provider($dsl, $realm)
+
     Given a realm, returns a configured and ready to use instance of the
     provider specified by that realm's config.
 
 HOOKS
+
     This plugin provides the following hooks:
 
-  before_authenticate_user
+ before_authenticate_user
+
     Called at the start of "authenticate_user".
 
-    Receives a hash reference of "username", "password" and "realm".
+    Receives a hash reference of username, password and realm.
 
-  after_authenticate_user
+ after_authenticate_user
+
     Called at the end of "authenticate_user".
 
-    Receives a hash reference of "username", "password", "realm", "errors"
-    and "success".
+    Receives a hash reference of username, password, realm, errors and
+    success.
 
-    "realm" is the realm that the user authenticated against of undef if
-    auth failed.
+    realm is the realm that the user authenticated against of undef if auth
+    failed.
 
-    The value of "errors" is an array reference of any errors thrown by
+    The value of errors is an array reference of any errors thrown by
     authentication providers (if any).
 
-    The value of "success" is either 1 or 0 to show whether or not
+    The value of success is either 1 or 0 to show whether or not
     authentication was successful.
 
-  before_create_user
+ before_create_user
+
     Called at the start of "create_user".
 
     Receives a hash reference of the arguments passed to "create_user".
 
-  after_create_user
+ after_create_user
+
     Called at the end of "create_user".
 
     Receives the requested username, the created user (or undef) and an
-    array reference of any errors from the main method or from the provider.
+    array reference of any errors from the main method or from the
+    provider.
 
-  login_required
-  permission_denied
-  after_login_success
+ login_required
+
+ permission_denied
+
+ after_login_success
+
     Called after successful login just before redirect is called.
 
+ before_logout
+
+    Called just before the session gets destroyed on logout.
+
 AUTHOR
-    David Precious, "<davidp at preshweb.co.uk>"
+
+    David Precious, <davidp at preshweb.co.uk>
 
     Dancer2 port of Dancer::Plugin::Auth::Extensible by:
 
-    Stefan Hornburg (Racke), "<racke at linuxia.de>"
+    Stefan Hornburg (Racke), <racke at linuxia.de>
 
     Conversion to Dancer2's new plugin system plus much cleanup & reorg:
 
-    Peter Mottram (SysPete), "<peter at sysnix.com>"
+    Peter Mottram (SysPete), <peter at sysnix.com>
 
 BUGS / FEATURE REQUESTS
+
     This is an early version; there may still be bugs present or features
     missing.
 
     This is developed on GitHub - please feel free to raise issues or pull
     requests against the repo at:
-    <https://github.com/PerlDancer/Dancer2-Plugin-Auth-Extensible>
+    https://github.com/PerlDancer/Dancer2-Plugin-Auth-Extensible
 
 ACKNOWLEDGEMENTS
+
     Valuable feedback on the early design of this module came from many
     people, including Matt S Trout (mst), David Golden (xdg), Damien
     Krotkine (dams), Daniel Perrett, and others.
@@ -802,12 +901,17 @@ ACKNOWLEDGEMENTS
 
     Evan Brown (GH #20, #32).
 
-    Jason Lewis (Unix provider problem).
+    Jason Lewis (Unix provider problem, GH#62).
 
     Matt S. Trout (mst) for Zero redirect login the easy and friendly way
     <http://shadow.cat/blog/matt-s-trout/humane-login-screens/>.
 
+    Ben Kaufman "whosgonna" (GH#79)
+
+    Dominic Sonntag (GH#70)
+
 LICENSE AND COPYRIGHT
+
     Copyright 2012-16 David Precious.
 
     This program is free software; you can redistribute it and/or modify it

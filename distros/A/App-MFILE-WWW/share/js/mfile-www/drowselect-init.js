@@ -37,38 +37,15 @@
 "use strict";
 
 define ([
+    'app/entries',
     'lib',
-    'target'
+    'target',
 ], function (
+    entries,
     lib,
-    target
+    target,
 ) {
 
-    //
-    // define drowselect entries here
-    //
-    var entries = {
-
-            // read-only form entry no. 1
-            'rowselectEntry1': {
-                name: 'rowselectEntry1',
-                aclProfileRead: 'passerby',
-                text: 'Entry 1',
-                prop: 'prop1',
-                maxlen: 20
-            },
-    
-            // read-write form entry no. 1
-            'rowselectEntry2': {
-                name: 'rowselectEntry2',
-                aclProfileRead: 'passerby',
-                text: 'Entry 2',
-                prop: 'prop2',
-                maxlen: 20
-            }
-    
-        };
-    
     return function () {
 
         //
@@ -81,7 +58,7 @@ define ([
             'title': 'Demo rowselect',
             'preamble': 'This is just an illustration',
             'aclProfile': 'passerby',
-            'entries': [ entries.rowselectEntry1, entries.rowselectEntry2 ],
+            'entriesRead': [ entries.rowselectEntry1, entries.rowselectEntry2 ],
             'miniMenu': {
                 entries: ['demoEditFromRowselect']
             }

@@ -3,7 +3,7 @@ package DhMakePerl::PodParser;
 use strict;
 use warnings;
 
-our $VERSION = '0.51';
+our $VERSION = '0.96';
 
 use base qw(Pod::Parser);
 

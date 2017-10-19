@@ -1,6 +1,6 @@
 # ABSTRACT: encapsulation of Dancer2 packages
 package Dancer2::Core::App;
-$Dancer2::Core::App::VERSION = '0.205001';
+$Dancer2::Core::App::VERSION = '0.205002';
 use Moo;
 use Carp               qw<croak carp>;
 use Scalar::Util       'blessed';
@@ -1454,6 +1454,7 @@ DISPATCH:
 
             $request->_set_route_params($match);
             $request->_set_route_parameters($match);
+            $request->_set_route($route);
 
             # Add session to app *if* we have a session and the request
             # has the appropriate cookie header for _this_ app.
@@ -1664,7 +1665,7 @@ Dancer2::Core::App - encapsulation of Dancer2 packages
 
 =head1 VERSION
 
-version 0.205001
+version 0.205002
 
 =head1 DESCRIPTION
 

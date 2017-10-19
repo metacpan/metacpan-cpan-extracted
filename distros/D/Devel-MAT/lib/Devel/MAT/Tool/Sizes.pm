@@ -1,18 +1,20 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2017 -- leonerd@leonerd.org.uk
 
 package Devel::MAT::Tool::Sizes;
 
 use strict;
 use warnings;
+use base qw( Devel::MAT::Tool );
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 use constant FOR_UI => 1;
 
 use List::Util qw( sum0 );
+use List::UtilsBy qw( rev_nsort_by );
 
 =head1 NAME
 
@@ -51,8 +53,6 @@ set of every strong outref whose refcount is 1. This is the set of all SVs the
 original directly owns.
 
 =cut
-
-sub new { shift }
 
 sub init_ui
 {
@@ -183,6 +183,51 @@ sub Devel::MAT::SV::owned_size
 =head1 COMMANDS
 
 =cut
+
+=head2 sizes
+
+=cut
+
+use constant CMD => "sizes";
+use constant CMD_DESC => "Summarize object and byte counts across different SV types";
+
+use constant CMD_OPTS => (
+   struct => { help => "sum SVs by structural size" },
+   owned  => { help => "sum SVs by owned size" },
+);
+
+sub run
+{
+   my $self = shift;
+   my %opts = %{ +shift };
+
+   my %total_svs;
+   my %total_bytes;
+
+   my $meth = $opts{owned}  ? "owned_size" :
+              $opts{struct} ? "structure_size" :
+              "size";
+
+   foreach my $sv ( $self->df->heap ) {
+      my $type = $sv->blessed ? sprintf( "%s(%s)", $sv->type, $sv->blessed->stashname ) 
+                              : $sv->type;
+
+      $total_svs{$type}   += 1;
+      $total_bytes{$type} += $sv->$meth;
+   }
+
+   Devel::MAT::Cmd->print_table(
+      [
+         [qw( Type SVs Bytes )],
+         map {
+            my $type = $_;
+            [ $type, $total_svs{$type}, $total_bytes{$type} ];
+         } rev_nsort_by { $total_bytes{$_} } keys %total_svs,
+      ],
+      sep   => " | ",
+      align => [ undef, "right", "right" ],
+   );
+}
 
 package # hide
    Devel::MAT::Tool::Sizes::_largest;

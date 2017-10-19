@@ -3,12 +3,13 @@ abstract: 'easily copy and compare folders inside tests'
 author:
   - 'Jozef Kutej <jkutej@cpan.org>'
 build_requires:
-  File::is: 0
-  Test::More: 0
-  Test::Tester: 0
+  File::is: '0'
+  Test::More: '0'
+  Test::Tester: '0'
 configure_requires:
-  Module::Build: 0.36
-generated_by: 'Module::Build version 0.3607'
+  Module::Build: '0.3607'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
 keywords:
   - test
   - dir
@@ -16,24 +17,25 @@ keywords:
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Test-Dirs
 provides:
   Test::Dirs:
     file: lib/Test/Dirs.pm
-    version: 0.03
+    version: '0.04'
 requires:
-  Carp: 0
-  File::Copy::Recursive: 0
-  File::DirCompare: 0
-  File::Path: 2.07
-  File::Temp: 0
-  List::MoreUtils: 0
-  Path::Class: 0
-  Test::Builder: 0
-  Text::Diff: 0
+  Carp: '0'
+  File::Copy::Recursive: '0'
+  File::DirCompare: '0'
+  File::Path: '2.07'
+  File::Temp: '0.19'
+  List::MoreUtils: '0'
+  Path::Class: '0'
+  Test::Builder: '0'
+  Text::Diff: '0'
 resources:
   bugtracker: http://github.com/jozef/Test-Dirs/issues
   license: http://dev.perl.org/licenses/
   repository: http://github.com/jozef/Test-Dirs/
-version: 0.03
+version: '0.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

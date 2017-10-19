@@ -1,9 +1,9 @@
 package Net::DNS::RR::NAPTR;
 
 #
-# $Id: NAPTR.pm 1528 2017-01-18 21:44:58Z willem $
+# $Id: NAPTR.pm 1597 2017-09-22 08:04:02Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1528 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
 
 
 use strict;
@@ -39,7 +39,6 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 	my ( $offset, @opaque ) = @_;
 
-	return '' unless defined $self->{replacement};
 	my $rdata = pack 'n2', @{$self}{qw(order preference)};
 	$rdata .= $self->{flags}->encode;
 	$rdata .= $self->{service}->encode;
@@ -51,7 +50,6 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
-	return '' unless defined $self->{replacement};
 	my @order = @{$self}{qw(order preference)};
 	my @rdata = ( @order, map $_->string, @{$self}{qw(flags service regexp replacement)} );
 }

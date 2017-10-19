@@ -3,7 +3,7 @@ package DhMakePerl::Utils;
 use strict;
 use warnings;
 
-our $VERSION = '0.71';
+our $VERSION = '0.96';
 
 =head1 NAME
 
@@ -22,6 +22,7 @@ our @EXPORT_OK = qw(
     find_core_perl_dependency
     apt_cache
     find_cpan_module find_cpan_distribution
+    is_core_perl_package
     is_core_module
     nice_perl_ver
     split_version_relation
@@ -115,17 +116,42 @@ sub find_cpan_distribution {
         "/\\/$name-[^\\/]+\\.(tar|zip)/" );
 }
 
+=item is_core_perl_package I<package>
+
+Returns true value if the given package is a core Perl package, i.e. one of
+C<perl>, C<perl-base>, C<perl-modules-X.Y> and C<libperlX.Y>.
+
+Having this in a central routine makes it easier to add/remove packages in the
+list.
+=cut
+
+sub is_core_perl_package {
+    my ($pkg) = @_;
+
+    $pkg =~ s/:\w+$//;  # strip architecture
+
+    return 1
+      if $pkg eq 'perl-base'
+      or $pkg eq 'perl'
+      or $pkg =~ /^perl-modules(?:-[\d.]+)?$/
+      or $pkg =~ /^libperl[\d.]+$/;
+    return 0;
+}
+
 =item is_core_module I<module>, I<version>
 
 Returns the version of the C<perl> package containing the given I<module> (at
 least version I<version>).
 
-Returns C<undef> if I<module> is not a core module.
+Returns C<undef> if I<module> is not a core module (anymore) in the current
+C<perl> release.
 
 =cut
 
 sub is_core_module {
     my ( $module, $ver ) = @_;
+
+    return unless Module::CoreList->is_core($module, $ver);   # currently in core?
 
     my $v = Module::CoreList->first_release($module, $ver);   # 5.009002
 
@@ -205,7 +231,8 @@ sub core_module_perls {
 =item find_core_perl_dependency( $module[, $version] )
 
 return a dependency on perl containing the required module version. If the
-module is not available in any perl released by Debian, return undef.
+module is not available in any perl released by Debian, , or if it is not in
+the current perl anymore, return undef.
 
 =cut
 
@@ -228,6 +255,8 @@ sub find_core_perl_dependency {
 
         return Debian::Dependency->new( 'perl', nice_perl_ver($version) );
     }
+
+    return undef unless is_core_module($module, $version);   # currently in core?
 
     my $perl_dep;
 

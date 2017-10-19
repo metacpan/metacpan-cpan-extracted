@@ -3,7 +3,7 @@ package Debian::Rules;
 use strict;
 use warnings;
 
-our $VERSION = '0.82';
+our $VERSION = '0.96';
 
 =head1 NAME
 

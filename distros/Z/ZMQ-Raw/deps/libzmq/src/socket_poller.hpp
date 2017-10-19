@@ -75,19 +75,34 @@ namespace zmq
 
         int wait (event_t *event, int n_events, long timeout);
 
-        inline int size (void) { return items.size (); };
+        inline int size (void) { return static_cast <int> (items.size ()); };
 
         //  Return false if object is not a socket.
         bool check_tag ();
 
     private:
-        int rebuild ();
+        void zero_trail_events (zmq::socket_poller_t::event_t *events_,
+                                                          int n_events_,
+                                                          int found);
+#if defined ZMQ_POLL_BASED_ON_POLL
+        int check_events (zmq::socket_poller_t::event_t *events_,
+                                                          int n_events_);
+#elif defined ZMQ_POLL_BASED_ON_SELECT
+        int check_events (zmq::socket_poller_t::event_t *events_, int n_events_,
+                                                          fd_set& inset,
+                                                          fd_set& outset,
+                                                          fd_set& errset);
+#endif
+        int adjust_timeout (zmq::clock_t& clock, long timeout_, uint64_t& now,
+                                                          uint64_t& end,
+                                                          bool& first_pass);
+        void rebuild ();
 
         //  Used to check whether the object is a socket_poller.
         uint32_t tag;
 
         //  Signaler used for thread safe sockets polling
-        signaler_t signaler;
+        signaler_t* signaler;
 
         typedef struct item_t {
             socket_base_t *socket;

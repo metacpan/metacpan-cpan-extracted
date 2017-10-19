@@ -8,13 +8,14 @@ use Types::Standard -all;
 use Types::TypeTiny -all;
 use GraphQL::Type::Library -all;
 use Function::Parameters;
-use GraphQL::Parser;
+use GraphQL::Language::Parser qw(parse);
 use GraphQL::Error;
 use JSON::MaybeXS;
 use GraphQL::Debug qw(_debug);
 use GraphQL::Introspection qw(
   $SCHEMA_META_FIELD_DEF $TYPE_META_FIELD_DEF $TYPE_NAME_META_FIELD_DEF
 );
+use base qw(Exporter);
 
 =head1 NAME
 
@@ -22,6 +23,9 @@ GraphQL::Execution - Execute GraphQL queries
 
 =cut
 
+our @EXPORT_OK = qw(
+  execute
+);
 our $VERSION = '0.02';
 
 my $JSON = JSON::MaybeXS->new->allow_nonref;
@@ -29,8 +33,8 @@ use constant DEBUG => $ENV{GRAPHQL_DEBUG}; # "DEBUG and" gets optimised out if f
 
 =head1 SYNOPSIS
 
-  use GraphQL::Execution;
-  my $result = GraphQL::Execution->execute($schema, $doc, $root_value);
+  use GraphQL::Execution qw(execute);
+  my $result = execute($schema, $doc, $root_value);
 
 =head1 DESCRIPTION
 
@@ -40,7 +44,7 @@ Executes a GraphQL query, returns results.
 
 =head2 execute
 
-  my $result = GraphQL::Execution->execute(
+  my $result = execute(
     $schema,
     $doc,
     $root_value,
@@ -52,7 +56,7 @@ Executes a GraphQL query, returns results.
 
 =cut
 
-method execute(
+fun execute(
   (InstanceOf['GraphQL::Schema']) $schema,
   Str $doc,
   Any $root_value = undef,
@@ -61,8 +65,8 @@ method execute(
   Maybe[Str] $operation_name = undef,
   Maybe[CodeLike] $field_resolver = undef,
 ) :ReturnType(HashRef) {
-  my $ast = GraphQL::Parser->parse($doc);
   my $context = eval {
+    my $ast = parse($doc);
     _build_context(
       $schema,
       $ast,
@@ -73,23 +77,29 @@ method execute(
       $field_resolver,
     );
   };
-  return { errors => [ { message => $@ } ] } if $@;
-  my $result = eval {
-    scalar _execute_operation(
+  return { errors => [ GraphQL::Error->coerce($@)->to_json ] } if $@;
+  (my $result, $context) = eval {
+    _execute_operation(
       $context,
       $context->{operation},
       $root_value,
     );
   };
-  if ($@) {
-    push @{ $context->{errors} }, GraphQL::Error->coerce($@); # TODO no mutate $context
-  }
+  $context = _context_error($context, GraphQL::Error->coerce($@)) if $@;
   my $wrapped = { data => $result };
-  if (@{ $context->{errors} }) {
-    return { errors => [ map { { message => $_->to_string } } @{$context->{errors}} ], %$wrapped };
+  if (@{ $context->{errors} || [] }) {
+    return { errors => [ map $_->to_json, @{$context->{errors}} ], %$wrapped };
   } else {
     return $wrapped;
   }
+}
+
+fun _context_error(
+  HashRef $context,
+  Any $error,
+) :ReturnType(HashRef) {
+  # like push but no mutation
+  +{ %$context, errors => [ @{$context->{errors} || []}, $error ] };
 }
 
 fun _build_context(
@@ -180,10 +190,10 @@ fun _execute_operation(
   HashRef $context,
   HashRef $operation,
   Any $root_value,
-) :ReturnType(HashRef) {
+) {
   my $op_type = $operation->{operationType} || 'query';
   my $type = $context->{schema}->$op_type;
-  my $fields = _collect_fields(
+  my ($fields) = _collect_fields(
     $context,
     $type,
     $operation->{selections},
@@ -193,14 +203,11 @@ fun _execute_operation(
   my $path = [];
   my $execute = $op_type eq 'mutation'
     ? \&_execute_fields_serially : \&_execute_fields;
-  my $result = eval {
+  (my $result, $context) = eval {
     $execute->($context, $type, $root_value, $path, $fields);
   };
-  if ($@) {
-    push @{ $context->{errors} }, GraphQL::Error->coerce($@); # TODO no mutate $context
-    return {};
-  }
-  $result;
+  return ({}, _context_error($context, GraphQL::Error->coerce($@))) if $@;
+  ($result, $context);
 }
 
 fun _collect_fields(
@@ -209,19 +216,21 @@ fun _collect_fields(
   ArrayRef $selections,
   Map[StrNameValid,ArrayRef[HashRef]] $fields_got,
   Map[StrNameValid,Bool] $visited_fragments,
-) :ReturnType(Map[StrNameValid,ArrayRef[HashRef]]) {
+) {
   DEBUG and _debug('_collect_fields', $runtime_type->to_string, $fields_got, $selections);
   for my $selection (@$selections) {
     my $node = $selection->{node};
     next if !_should_include_node($context, $node);
     if ($selection->{kind} eq 'field') {
-      # TODO no mutate $fields_got
       my $use_name = $node->{alias} || $node->{name};
-      push @{ $fields_got->{$use_name} }, $node;
+      $fields_got = {
+        %$fields_got,
+        $use_name => [ @{$fields_got->{$use_name} || []}, $node ],
+      }; # like push but no mutation
     } elsif ($selection->{kind} eq 'inline_fragment') {
       next if !_fragment_condition_match($context, $node, $runtime_type);
       next if !_should_include_node($context, $node);
-      _collect_fields(
+      ($fields_got, $visited_fragments) = _collect_fields(
         $context,
         $runtime_type,
         $node->{selections},
@@ -232,12 +241,12 @@ fun _collect_fields(
       my $frag_name = $node->{name};
       next if $visited_fragments->{$frag_name};
       next if !_should_include_node($context, $node);
-      $visited_fragments->{$frag_name} = 1;
+      $visited_fragments = { %$visited_fragments, $frag_name => 1 }; # !mutate
       my $fragment = $context->{fragments}{$frag_name};
       next if !$fragment;
       next if !_fragment_condition_match($context, $fragment, $runtime_type);
       DEBUG and _debug('_collect_fields(fragment_spread)', $fragment);
-      _collect_fields(
+      ($fields_got, $visited_fragments) = _collect_fields(
         $context,
         $runtime_type,
         $fragment->{selections},
@@ -246,7 +255,7 @@ fun _collect_fields(
       );
     }
   }
-  $fields_got;
+  ($fields_got, $visited_fragments);
 }
 
 fun _should_include_node(
@@ -284,7 +293,7 @@ fun _execute_fields(
   DEBUG and _debug('_execute_fields', $parent_type->to_string, $fields, $root_value);
   map {
     my $result_name = $_;
-    my $result = _resolve_field(
+    (my $result, $context) = _resolve_field(
       $context,
       $parent_type,
       $root_value,
@@ -294,7 +303,7 @@ fun _execute_fields(
     $results{$result_name} = $result;
     # TODO promise stuff
   } keys %$fields; # TODO ordering of fields
-  \%results;
+  (\%results, $context);
 }
 
 fun _execute_fields_serially(
@@ -321,7 +330,7 @@ fun _resolve_field(
   my $field_name = $field_node->{name};
   DEBUG and _debug('_resolve_field', $parent_type->to_string, $nodes, $root_value);
   my $field_def = _get_field_def($context->{schema}, $parent_type, $field_name);
-  return if !$field_def;
+  return (undef, $context) if !$field_def;
   my $resolve = $field_def->{resolve} || $context->{field_resolver};
   my $info = _build_resolve_info(
     $context,
@@ -396,7 +405,7 @@ fun _resolve_field_value_or_error(
   Maybe[Any] $root_value,
   HashRef $info,
 ) {
-  DEBUG and _debug('_resolve_field_value_or_error', $nodes, $root_value, $field_def, $JSON->encode($nodes->[0]));
+  DEBUG and _debug('_resolve_field_value_or_error', $nodes, $root_value, $field_def, eval { $JSON->encode($nodes->[0]) });
   my $result = eval {
     my $args = _get_argument_values($field_def, $nodes->[0], $context->{variable_values});
     DEBUG and _debug("_resolve_field_value_or_error(resolve)", $args, $JSON->encode($args));
@@ -418,15 +427,12 @@ fun _complete_value_catching_error(
     return _complete_value_with_located_error(@_);
   }
   my $result = eval {
-    my $completed = _complete_value_with_located_error(@_);
+    (my $completed, $context) = _complete_value_with_located_error(@_);
     # TODO promise stuff
     $completed;
   };
-  if ($@) {
-    push @{ $context->{errors} }, GraphQL::Error->coerce($@);
-    return undef; # null value
-  }
-  $result;
+  return (undef, _context_error($context, GraphQL::Error->coerce($@))) if $@;
+  ($result, $context);
 }
 
 fun _complete_value_with_located_error(
@@ -438,14 +444,12 @@ fun _complete_value_with_located_error(
   Any $result,
 ) {
   my $result = eval {
-    my $completed = _complete_value(@_);
+    (my $completed, $context) = _complete_value(@_);
     # TODO promise stuff
     $completed;
   };
-  if ($@) {
-    die _located_error($@, $nodes, $path);
-  }
-  $result;
+  die _located_error($@, $nodes, $path) if $@;
+  ($result, $context);
 }
 
 fun _complete_value(
@@ -460,7 +464,7 @@ fun _complete_value(
   # TODO promise stuff
   die $result if GraphQL::Error->is($result);
   if ($return_type->isa('GraphQL::Type::NonNull')) {
-    my $completed = _complete_value(
+    (my $completed, $context) = _complete_value(
       $context,
       $return_type->of,
       $nodes,
@@ -471,11 +475,11 @@ fun _complete_value(
     die GraphQL::Error->new(
       message => "Cannot return null for non-nullable field @{[$info->{parent_type}->name]}.@{[$info->{field_name}]}."
     ) if !defined $completed;
-    return $completed;
+    return ($completed, $context);
   }
-  return $result if !defined $result;
+  return ($result, $context) if !defined $result;
   return _complete_list_value(@_) if $return_type->isa('GraphQL::Type::List');
-  return _complete_leaf_value($return_type, $result)
+  return (_complete_leaf_value($return_type, $result), $context)
     if $return_type->DOES('GraphQL::Role::Leaf');
   return _complete_abstract_value(@_) if $return_type->DOES('GraphQL::Role::Abstract');
   return _complete_object_value(@_) if $return_type->isa('GraphQL::Type::Object');
@@ -497,7 +501,7 @@ fun _complete_list_value(
   my $item_type = $return_type->of;
   my $index = 0;
   my @completed_results = map {
-    _complete_value_catching_error(
+    (my $r, $context) = _complete_value_catching_error(
       $context,
       $item_type,
       $nodes,
@@ -505,8 +509,9 @@ fun _complete_list_value(
       [ @$path, $index++ ],
       $_,
     );
+    $r;
   } @$result;
-  \@completed_results;
+  (\@completed_results, $context);
 }
 
 fun _complete_leaf_value(
@@ -618,7 +623,7 @@ fun _collect_and_execute_subfields(
   my $subfield_nodes = {};
   my $visited_fragment_names = {};
   for (grep $_->{selections}, @$nodes) {
-    $subfield_nodes = _collect_fields(
+    ($subfield_nodes, $visited_fragment_names) = _collect_fields(
       $context,
       $return_type,
       $_->{selections},
@@ -626,7 +631,7 @@ fun _collect_and_execute_subfields(
       $visited_fragment_names,
     );
   }
-  DEBUG and _debug('_collect_and_execute_subfields', $return_type->to_string, $subfield_nodes);
+  DEBUG and _debug('_collect_and_execute_subfields', $return_type->to_string, $subfield_nodes, $result);
   _execute_fields($context, $return_type, $result, $path, $subfield_nodes);
 }
 
@@ -635,8 +640,10 @@ fun _located_error(
   ArrayRef[HashRef] $nodes,
   ArrayRef $path,
 ) {
-  # TODO implement
-  GraphQL::Error->coerce($error);
+  GraphQL::Error->coerce($error)->but(
+    locations => [ map $_->{location}, @$nodes ],
+    path => $path,
+  );
 }
 
 fun _get_argument_values(
@@ -646,7 +653,7 @@ fun _get_argument_values(
 ) {
   my $arg_defs = $def->{args};
   my $arg_nodes = $node->{arguments};
-  DEBUG and _debug("_get_argument_values", $arg_defs, $arg_nodes, $variable_values, $JSON->encode($node));
+  DEBUG and _debug("_get_argument_values", $arg_defs, $arg_nodes, $variable_values, eval { $JSON->encode($node) });
   return {} if !$arg_defs;
   my @bad = grep { !exists $arg_nodes->{$_} and !defined $arg_defs->{$_}{default_value} and $arg_defs->{$_}{type}->isa('GraphQL::Type::NonNull') } keys %$arg_defs;
   die GraphQL::Error->new(

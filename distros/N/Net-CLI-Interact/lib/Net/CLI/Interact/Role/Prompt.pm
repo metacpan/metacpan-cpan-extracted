@@ -1,4 +1,5 @@
 package Net::CLI::Interact::Role::Prompt;
+{ $Net::CLI::Interact::Role::Prompt::VERSION = '2.300002' }
 
 use Moo::Role;
 use MooX::Types::MooseLike::Base qw(Str RegexpRef);
@@ -150,10 +151,6 @@ sub find_prompt {
 =head1 NAME
 
 Net::CLI::Interact::Role::Prompt - Command-line prompt management
-
-=head1 VERSION
-
-version 2.143070
 
 =head1 DESCRIPTION
 

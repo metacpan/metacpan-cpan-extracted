@@ -13,7 +13,7 @@ Dancer2::Manual - A gentle introduction to Dancer2
 
 =head1 VERSION
 
-version 0.205001
+version 0.205002
 
 =head1 DESCRIPTION
 
@@ -594,7 +594,7 @@ string.
 
 =head2 Error Handling
 
-Refer to L<Error Handling|Dancer2::Manual/error-handling-1>
+Refer to L<Error Handling|Dancer2::Manual/error-hooks>
 for details about the following hooks:
 
 =over 4
@@ -611,7 +611,7 @@ for details about the following hooks:
 
 =head2 File Rendering
 
-Refer to L<File Rendering|Dancer2::Manual/file-handler>
+Refer to L<File Handler|Dancer2::Manual/file-handler>
 for details on the following hooks:
 
 =over 4
@@ -756,17 +756,25 @@ For example, the default config file for any Dancer2 application is as follows:
 
 =head2 Error Pages
 
-When an HTTP error occurs (the action responds with a status code other
-than 200), Dancer2 first looks in the public directory for a corresponding
-HTML file matching the error code (eg: 500.html or 404.html).
+When an HTTP error occurs (i.e. the action responds with a status code other
+than 200), this is how Dancer2 determines what page to display.
 
-If such a file exists, it's used to report the error, otherwise, a default
-error page will be rendered on the fly.
+=over
 
-Note that in order to provide more informative diagnostics, the default
-error page will override the error-code HTML files for errors with a C<5xx>
-status when B<show_errors> is set to true. For more information see
-L<Dancer2::Config>.
+=item * Looks in the C<views/> directory for a corresponding template file
+matching the error code (e.g. C<500.tt> or C<404.tt>). If such a file exists,
+it's used to report the error.
+
+=item * Next, looks in the C<public/> directory for a corresponding HTML file
+matching the error code (e.g. C<500.html> or C<404.html>). If such a file
+exists, it's used to report the error. (Note, however, that if B<show_errors>
+is set to true, in the case of a 500 error the static HTML page will not be
+shown, but will be replaced with a default error page containing more
+informative diagnostics. For more information see L<Dancer2::Config>.)
+
+=item * As default, render a generic error page on the fly.
+
+=back
 
 =head2 Execution Errors
 
@@ -774,15 +782,13 @@ When an error occurs during the route execution, Dancer2 will render an
 error page with the HTTP status code 500.
 
 It's possible either to display the content of the error message or to hide
-it with a generic error page.
-
-This is a choice left to the end-user and can be set with the B<show_errors>
-setting.
+it with a generic error page. This is a choice left to the end-user and can
+be controlled with the B<show_errors> setting (see above).
 
 Note that you can also choose to consider all warnings in your route
 handlers as errors when the setting B<warnings> is set to 1.
 
-=head2 Error handling
+=head2 Error Hooks
 
 When an error is caught by Dancer2's core, an exception object is built (of
 the class L<Dancer2::Core::Error>). This class provides a hook to let the
@@ -1256,6 +1262,51 @@ template toolkit, your config file will look like this:
       template:
         template_toolkit:
           ENCODING: utf8
+
+=head2 Default Template Variables
+
+Every template knows about the following variables, which are provided by
+L<Dancer2::Core::Role::Template>. Some are similar to the keywords you can
+use in the Perl part of your Dancer2 application.
+
+=over 4
+
+=item * B<perl_version>
+
+Current version of perl, effectively
+L<C<$^V>|http://perldoc.perl.org/perlvar.html#%24%5eV>.
+
+=item * B<dancer_version>
+
+Current version of Dancer2, effectively C<< Dancer2->VERSION >>.
+
+=item * B<settings>
+
+A hash of the application configuration. This is like
+the L<config|#config> keyword.
+
+=item * B<request>
+
+The current request object. This is like the L<request|#request> keyword.
+
+=item * B<params>
+
+A hash reference of all the parameters.
+
+Currently the equivalent of C<< $request->params >>, and like the
+L<params|#params> keyword.
+
+=item * B<vars>
+
+The list of request variables, which is what you would get if you
+called the L<vars|#vars> keyword.
+
+=item * B<session>
+
+The current session data, if a session exists. This is like
+the L<session|#session> keyword.
+
+=back
 
 =head1 STATIC FILES
 
@@ -1914,17 +1965,17 @@ A number of Perl web servers supporting PSGI are available on CPAN:
 
 =over 4
 
-=item * L<Starman|http://search.cpan.org/dist/Starman/>
+=item * L<Starman>
 
 C<Starman> is a high performance web server, with support for preforking,
 signals, multiple interfaces, graceful restarts and dynamic worker pool
 configuration.
 
-=item * L<Twiggy|http://search.cpan.org/dist/Twiggy/>
+=item * L<Twiggy>
 
 C<Twiggy> is an C<AnyEvent> web server, it's light and fast.
 
-=item * L<Corona|http://search.cpan.org/dist/Corona/>
+=item * L<Corona>
 
 C<Corona> is a C<Coro> based web server.
 
@@ -3043,8 +3094,8 @@ Or to request a specific layout, of course:
     };
 
 Some tokens are automatically added to your template (C<perl_version>,
-C<dancer_version>, C<settings>, C<request>, C<query_parameters>, C<body_parameters>, C<route_parameters>, C<vars> and, if you
-have sessions enabled, C<session>). Check L<Dancer2::Core::Role::Template>
+C<dancer_version>, C<settings>, C<request>, C<vars> and, if you
+have sessions enabled, C<session>). Check L<#Default Template Variables>
 for further details.
 
 =head2 to_dumper ($structure)

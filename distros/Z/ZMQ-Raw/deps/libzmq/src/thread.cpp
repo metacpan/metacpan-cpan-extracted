@@ -77,6 +77,12 @@ void zmq::thread_t::setSchedulingParameters(int priority_, int schedulingPolicy_
     LIBZMQ_UNUSED (schedulingPolicy_);
 }
 
+void zmq::thread_t::setThreadName(const char *name_)
+{
+    // not implemented
+    LIBZMQ_UNUSED (name_);
+}
+
 #else
 
 #include <signal.h>
@@ -146,7 +152,7 @@ void zmq::thread_t::setSchedulingParameters(int priority_, int schedulingPolicy_
 
     rc = pthread_setschedparam(descriptor, policy, &param);
 
-#ifdef __FreeBSD_kernel__
+#if defined(__FreeBSD_kernel__) || defined (__FreeBSD__)
     // If this feature is unavailable at run-time, don't abort.
     if(rc == ENOSYS) return;
 #endif
@@ -156,6 +162,32 @@ void zmq::thread_t::setSchedulingParameters(int priority_, int schedulingPolicy_
 
     LIBZMQ_UNUSED (priority_);
     LIBZMQ_UNUSED (schedulingPolicy_);
+#endif
+}
+
+void zmq::thread_t::setThreadName(const char *name_)
+{
+/* The thread name is a cosmetic string, added to ease debugging of
+ * multi-threaded applications. It is not a big issue if this value
+ * can not be set for any reason (such as Permission denied in some
+ * cases where the application changes its EUID, etc.) The value of
+ * "int rc" is retained where available, to help debuggers stepping
+ * through code to see its value - but otherwise it is ignored.
+ */
+    if (!name_)
+        return;
+
+#if defined(ZMQ_HAVE_PTHREAD_SETNAME_1)
+    int rc = pthread_setname_np(name_);
+    if(rc) return;
+#elif defined(ZMQ_HAVE_PTHREAD_SETNAME_2)
+    int rc = pthread_setname_np(descriptor, name_);
+    if(rc) return;
+#elif defined(ZMQ_HAVE_PTHREAD_SETNAME_3)
+    int rc = pthread_setname_np(descriptor, name_, NULL);
+    if(rc) return;
+#elif defined(ZMQ_HAVE_PTHREAD_SET_NAME)
+    pthread_set_name_np(descriptor, name_);
 #endif
 }
 

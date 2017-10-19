@@ -489,3 +489,4 @@ urpmi.removemedia
 urpmi.schema
 urpmi.update
 urpmq
+META.json                                Module JSON meta-data (added by MakeMaker)

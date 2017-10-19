@@ -1,6 +1,6 @@
 package Dancer2::Plugin::Paginator;
 
-$Dancer2::Plugin::Paginator::VERSION   = '2.06';
+$Dancer2::Plugin::Paginator::VERSION   = '2.07';
 $Dancer2::Plugin::Paginator::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Dancer2::Plugin::Paginator - Dancer2 plugin for Paginator::Lite.
 
 =head1 VERSION
 
-Version 2.06
+Version 2.07
 
 =cut
 

@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     NAME                => 'File::RoundRobin',
-    AUTHOR              => q{Gligan Calin Horea <gliganh@gmail.com>},
+    AUTHOR              => q{Gligan Calin Horea <horea@gligan.ro>},
     VERSION_FROM        => 'lib/File/RoundRobin.pm',
     ABSTRACT_FROM       => 'lib/File/RoundRobin.pm',
     ($ExtUtils::MakeMaker::VERSION >= 6.3002

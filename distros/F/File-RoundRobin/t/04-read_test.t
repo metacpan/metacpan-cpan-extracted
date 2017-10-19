@@ -14,12 +14,12 @@ use_ok("File::RoundRobin");
     
     my $text = <DATA>;
     
-    my $rrfile = File::RoundRobin->new(path => 'test.txt', size => '5M', autoflush => 1);
+    my $rrfile = File::RoundRobin->new(path => '04_1_test.txt', size => '5M', autoflush => 1);
     
 	$rrfile->write($text);
 	
 	
-    my $rrfile2 = File::RoundRobin->new(path => 'test.txt', mode => 'read');
+    my $rrfile2 = File::RoundRobin->new(path => '04_1_test.txt', mode => 'read');
 
     my $content = '';
 	while ( my $buffer = $rrfile2->read(10000) ) {
@@ -32,7 +32,7 @@ use_ok("File::RoundRobin");
 
     is(length($content),length($text),'File content read correctly');
 	
-	unlink('test.txt');
+	unlink('04_1_test.txt');
 }
 
 

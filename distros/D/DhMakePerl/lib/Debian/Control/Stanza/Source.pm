@@ -20,7 +20,7 @@ context.
 The supported fields for source stanzas are listed below. For more information
 about each field's meaning, consult the section named C<Source package control
 files -- debian/control> of the Debian Policy Manual at
-L<http://www.debian.org/doc/debian-policy/>
+L<https://www.debian.org/doc/debian-policy/>
 
 Note that real control fields may contain dashes in their names. These are
 replaced with underscores.
@@ -77,7 +77,7 @@ package Debian::Control::Stanza::Source;
 use strict;
 use warnings;
 
-our $VERSION = '0.73';
+our $VERSION = '0.96';
 
 use base qw(Debian::Control::Stanza);
 

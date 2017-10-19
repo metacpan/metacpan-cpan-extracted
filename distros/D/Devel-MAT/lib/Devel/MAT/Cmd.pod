@@ -30,6 +30,12 @@ Separator string to print between columns. Will default to a single space if
 not supplied. Note that this string is interpolated into a C<sprintf> format
 string, so any C<%> marks it may contain should be doubled.
 
+=item align => ARRAY[STRING] or STRING
+
+A list of strings per column (or one single string to apply equally to them
+all) specifying the alignment of data in the column. Aligns to the right if
+the value is C<"right">.
+
 =back
 
 =head2 format_note

@@ -1,13 +1,13 @@
 package Net::DNS;
 
 #
-# $Id: DNS.pm 1592 2017-08-18 10:02:44Z willem $
+# $Id: DNS.pm 1604 2017-10-18 09:00:29Z willem $
 #
 require 5.006;
 our $VERSION;
-$VERSION = '1.12';
+$VERSION = '1.13';
 $VERSION = eval $VERSION;
-our $SVNVERSION = (qw$LastChangedRevision: 1592 $)[1];
+our $SVNVERSION = (qw$LastChangedRevision: 1604 $)[1];
 
 
 =head1 NAME
@@ -42,10 +42,10 @@ our @EXPORT = qw(SEQUENTIAL UNIXTIME YYYYMMDDxx
 
 
 local $SIG{__DIE__};
-require Net::DNS::RR;
-require Net::DNS::Packet;
-require Net::DNS::Update;
 require Net::DNS::Resolver;
+require Net::DNS::Packet;
+require Net::DNS::RR;
+require Net::DNS::Update;
 
 
 sub version { $VERSION; }

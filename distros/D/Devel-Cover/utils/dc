@@ -110,19 +110,35 @@ main() {
             perl -pi -e "s/Copyright $from\\K(, $me)/-$to\$1/i"    $files
             ;;
         install_dependencies)
-            cpanm  --notest App::cpm
+            cpanm --notest App::cpm
             cpm install --workers="$($0 nice_cpus)" --global                \
                 Sereal Digest::MD5 Template Pod::Coverage::CountParents     \
                 Capture::Tiny Parallel::Iterator Template Class::XSAccessor \
                 Moo namespace::clean CPAN::Releases::Latest JSON::MaybeXS   \
-                CPAN::DistnameInfo B::Debug
+                CPAN::DistnameInfo B::Debug HTML::Entities
+            ;;
+        install_dzil)
+            cpanm --notest App::cpm
+            cpm install --workers="$($0 nice_cpus)" --global                \
+                Dist::Zilla
+            plenv rehash
+            cpm install --workers="$($0 nice_cpus)" --global                \
+                "$(dzil authordeps --missing)"
             ;;
         nice_cpus)
-            perl -Iutils -MDevel::Cover::BuildUtils=nice_cpus -e 'print nice_cpus'
+            perl -Iutils -MDevel::Cover::BuildUtils=nice_cpus \
+                 -e "print nice_cpus"
             ;;
         all_versions)
             shift
             ./utils/all_versions "$@"
+            ;;
+        install_cpancover_perl)
+            version="${2:?No version specified}"
+            yes | plenv uninstall cpancover || true
+            plenv install --as cpancover -j 32 --noman "$version"
+            plenv install-cpanm
+            PLENV_VERSION=cpancover dc install_dependencies
             ;;
         cpancover)
             shift;

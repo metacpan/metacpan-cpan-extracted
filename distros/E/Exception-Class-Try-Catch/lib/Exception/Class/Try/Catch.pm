@@ -6,7 +6,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.1';
+our $VERSION = '0.2';
 
 use Carp;
 use Exception::Class::Base;
@@ -19,7 +19,7 @@ $Carp::Internal{+__PACKAGE__} = 1;
 our @EXPORT_OK = qw(try catch);
 our @EXPORT = @EXPORT_OK;
 
-sub catch (&;@) {
+sub catch (&) {
 	my $block = $_[0];
 	$_[0] = sub {
 		my $error = $_[0];
@@ -43,6 +43,8 @@ __END__
 Exception::Class::Try::Catch - Try::Catch for Exception::Class
 
 =head1 SYNOPSIS
+
+  use Exception::Class::Try::Catch;
 
   try {
       My::Exception::Class->throw('my error');

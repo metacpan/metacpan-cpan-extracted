@@ -35,10 +35,10 @@ the file size) verry fast, tail might not be able to fallow you.
 
 =head1 VERSION
 
-Version 0.04
+Version 0.06
 
 =cut
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 $|=1;
 

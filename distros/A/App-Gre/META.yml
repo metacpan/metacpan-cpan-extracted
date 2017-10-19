@@ -1,5 +1,5 @@
 ---
-abstract: 'A grep clone with better file filtering'
+abstract: "A grep clone using Perl regexp's with better file filtering, defaults, speed, and presentation"
 author:
   - 'Jacob Gelbman <gelbman@gmail.com>'
 build_requires:
@@ -24,5 +24,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/zorgnax/gre.git
-version: '0.12'
+version: '0.15'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.014'

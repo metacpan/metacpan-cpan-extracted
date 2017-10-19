@@ -71,4 +71,8 @@ $Zabbix::ServerScript::Config = {
 		port => undef,
 		host => undef,
 	},
+	trapper => {
+		host => q(localhost),
+		port => q(10051),
+	},
 };

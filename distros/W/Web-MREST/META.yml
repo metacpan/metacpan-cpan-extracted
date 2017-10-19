@@ -44,7 +44,7 @@ no_index:
 provides:
   Web::MREST:
     file: lib/Web/MREST.pm
-    version: 0.287
+    version: 0.288
   Web::MREST::Dispatch:
     file: lib/Web/MREST/Dispatch.pm
     version: 0
@@ -76,7 +76,7 @@ provides:
     file: lib/Web/MREST/WebServicesIntro.pm
     version: 0
 requires:
-  App::CELL: 0.205
+  App::CELL: 0.209
   Encode: 0
   File::ShareDir: 1.00
   File::Spec: 0
@@ -105,4 +105,4 @@ requires:
   perl: 5.012
 resources:
   license: http://opensource.org/licenses/BSD-3-Clause
-version: 0.287
+version: 0.288

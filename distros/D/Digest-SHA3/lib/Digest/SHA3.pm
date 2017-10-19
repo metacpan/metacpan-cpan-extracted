@@ -8,7 +8,7 @@ use vars qw($VERSION @ISA @EXPORT_OK);
 use Fcntl qw(O_RDONLY);
 use integer;
 
-$VERSION = '0.27';
+$VERSION = '1.00';
 
 require Exporter;
 require DynaLoader;
@@ -122,11 +122,16 @@ sub addfile {
 			or _bail('Open failed');
 
 	if ($BITS) {
-		my ($n, $buf) = (0, "");
+		my ($n, $buf, $bits) = (0, "", "");
 		while (($n = read(FH, $buf, 4096))) {
-			$buf =~ s/[^01]//g;
-			$self->add_bits($buf);
+			$buf =~ tr/01//cd;
+			$bits .= $buf;
+			if (length($bits) >= 4096) {
+				$self->add_bits(substr($bits, 0, 4096));
+				$bits = substr($bits, 4096);
+			}
 		}
+		$self->add_bits($bits) if length($bits) > 0;
 		_bail("Read failed") unless defined $n;
 		close(FH);
 		return($self);

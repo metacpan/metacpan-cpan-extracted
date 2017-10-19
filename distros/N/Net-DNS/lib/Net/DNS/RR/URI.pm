@@ -1,9 +1,9 @@
 package Net::DNS::RR::URI;
 
 #
-# $Id: URI.pm 1528 2017-01-18 21:44:58Z willem $
+# $Id: URI.pm 1597 2017-09-22 08:04:02Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1528 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
 
 
 use strict;
@@ -36,7 +36,7 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 
-	my $target = $self->{target} || return '';
+	my $target = $self->{target};
 	pack 'n2 a*', @{$self}{qw(priority weight)}, $target->raw;
 }
 
@@ -44,7 +44,7 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
-	my $target = $self->{target} || return '';
+	my $target = $self->{target};
 	my @rdata = ( $self->priority, $self->weight, $target->string );
 }
 

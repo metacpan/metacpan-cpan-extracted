@@ -237,3 +237,6 @@ Revision history for App-Dochazka-Common distribution
 - Drop Session.pm module (it doesn't belong here)
 - Add scode to schedhistory model
 
+0.208 2017-10-16 22:07 CEST
+- build/ops: move to Application:Dochazka project in OBS
+

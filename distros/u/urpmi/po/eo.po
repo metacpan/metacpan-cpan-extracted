@@ -5,14 +5,15 @@
 # D. Dale Gulledge <dsplat@rochester.rr.com>, 2000
 # Grégoire Colbert <gcolbert2004@noos.fr>, 2005
 # Grégoire COLBERT <gcolbert2004@noos.fr>, 2005
+# Pablo Chere <pablo.foche@gmail.com>, 2017
 # Vilhelmo Lutermano <vlutermano@free.fr>, 2003
 msgid ""
 msgstr ""
 "Project-Id-Version: Mageia\n"
 "POT-Creation-Date: 2014-09-13 21:15+0200\n"
-"PO-Revision-Date: 2015-02-13 05:26+0000\n"
-"Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
-"Language-Team: Esperanto (http://www.transifex.com/projects/p/mageia/"
+"PO-Revision-Date: 2017-09-08 10:36+0000\n"
+"Last-Translator: Pablo Chere <pablo.foche@gmail.com>\n"
+"Language-Team: Esperanto (http://www.transifex.com/MageiaLinux/mageia/"
 "language/eo/)\n"
 "Language: eo\n"
 "MIME-Version: 1.0\n"
@@ -23,12 +24,12 @@ msgstr ""
 #: ../gurpm/RPMProgressDialog.pm:47
 #, c-format
 msgid "Distribution Upgrade"
-msgstr ""
+msgstr "Distribuaĵa ĝisdatigo"
 
 #: ../gurpm/RPMProgressDialog.pm:47
 #, c-format
 msgid "Packages installation"
-msgstr ""
+msgstr "Pakaĵa instalado"
 
 #: ../gurpm/RPMProgressDialog.pm:128
 #, c-format
@@ -38,49 +39,49 @@ msgstr "Bonvole atendu..."
 #: ../gurpm/RPMProgressDialog.pm:290
 #, c-format
 msgid "Verifying package signatures..."
-msgstr "Kontrolante signaturojn de pakaĵoj..."
+msgstr "Kontrolante pakaĵ-subskribojn..."
 
 #: ../gurpm/RPMProgressDialog.pm:309 ../urpm/install.pm:107
 #, c-format
 msgid "Preparing..."
-msgstr "Mi preparas..."
+msgstr "Pretigante..."
 
 #: ../gurpm/RPMProgressDialog.pm:313
 #, c-format
 msgid "Removing package `%s' ..."
-msgstr ""
+msgstr "Forigante pakaĵon \"%s\"..."
 
 #: ../gurpm/RPMProgressDialog.pm:316
 #, c-format
 msgid "Installing package `%s' (%s/%s)..."
-msgstr "Mi instalas pakaĵon '%s' (%s/%s)..."
+msgstr "Instalante pakaĵon '%s' (%s/%s)..."
 
 #: ../gurpm/RPMProgressDialog.pm:345
 #, c-format
 msgid "Downloading package `%s'..."
-msgstr "Mi elŝutas pakaĵon '%s'..."
+msgstr "Elŝutante pakaĵon '%s'..."
 
 #: ../gurpm/RPMProgressDialog.pm:349 ../gurpmi:126
 #, c-format
 msgid "Cancel"
-msgstr "Nuligu"
+msgstr "Nuligi"
 
 #: ../gurpm/RPMProgressDialog.pm:359 ../urpm.pm:453 ../urpm/download.pm:857
 #: ../urpm/get_pkgs.pm:278 ../urpm/media.pm:1126 ../urpm/media.pm:1647
 #: ../urpm/media.pm:1798
 #, c-format
 msgid "...retrieving failed: %s"
-msgstr "...ekstraktado malsukcesis: %s"
+msgstr "...rekuperado malsukcesis: %s"
 
 #: ../gurpmi:49
 #, c-format
 msgid "RPM installation"
-msgstr "RPM instalado"
+msgstr "RPM-instalado"
 
 #: ../gurpmi:63
 #, c-format
 msgid "Error: unable to find file %s, will cancel operation"
-msgstr ""
+msgstr "Eraro: ne eblis trovi dosieron %s, operacio estos nuligita"
 
 #: ../gurpmi:64 ../gurpmi2:173 ../gurpmi2:203
 #, c-format
@@ -99,12 +100,12 @@ msgid ""
 "\n"
 "What would you like to do?"
 msgstr ""
-"Vi elektis fontan pakaĵon:\n"
+"Vi elektis datumfontan pakaĵon:\n"
 "\n"
 "%s\n"
 "\n"
-"Vi probable ne volas instali ĝin en vian komputilon (per instali ĝin vi "
-"povus modifii ĝian fontkodon kaj kompili ĝin).\n"
+"Vi probable ne volas instali ĝin en via komputilo (post la instalado vi "
+"povus modifi la fontokodon kaj kompili ĝin).\n"
 "\n"
 "Kion vi volas fari?"
 
@@ -121,7 +122,7 @@ msgstr ""
 "\n"
 "%s\n"
 "\n"
-"Ĉu mi daŭrigu?"
+"Ĉu vi volas daŭrigi?"
 
 #: ../gurpmi:98
 #, c-format
@@ -136,7 +137,7 @@ msgstr ""
 "\n"
 "%s\n"
 "\n"
-"Eble vi preferas konservi ĝin kiel dosiero. Kion vi decidas?"
+"Eble vi preferas konservi ĝin kiel dosiero. Kion vi volas fari?"
 
 #: ../gurpmi:116
 #, c-format
@@ -166,7 +167,7 @@ msgstr "Jes"
 #: ../gurpmi.pm:56
 #, c-format
 msgid "Options:"
-msgstr ""
+msgstr "Opcioj:"
 
 #: ../gurpmi.pm:57 ../urpme:42 ../urpmf:30 ../urpmi:67 ../urpmi.addmedia:55
 #: ../urpmi.removemedia:40 ../urpmi.update:32 ../urpmq:41
@@ -180,6 +181,7 @@ msgid ""
 "  --auto         - non-interactive mode, assume default answers to "
 "questions.\n"
 msgstr ""
+"--auto - nedialoga reĝimo, ĝi elektas defaŭltajn respondojn al demandoj.\n"
 
 #: ../gurpmi.pm:59 ../urpmi:75 ../urpmq:48
 #, c-format
@@ -200,6 +202,8 @@ msgid ""
 "  --verify-rpm   - verify rpm signature before installation\n"
 "                   (--no-verify-rpm disables it, default is enabled).\n"
 msgstr ""
+"--verify-rpm - ĝi kontrolas rpm-subscribojn antaŭ ol instali\n"
+"(--no-verify-rpm malŝaltas ĝin, defaŭlte ĝi estas ŝaltita).\n"
 
 #: ../gurpmi.pm:63 ../urpmf:36 ../urpmi:68 ../urpmq:43
 #, c-format

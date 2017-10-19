@@ -1,8 +1,11 @@
 package WebService::Braintree::MerchantAccount;
-$WebService::Braintree::MerchantAccount::VERSION = '0.93';
+$WebService::Braintree::MerchantAccount::VERSION = '0.94';
+use 5.010_001;
+use strictures 1;
+
 =head1 NAME
 
-WebService::Braintree::Customer
+WebService::Braintree::MerchantAccount
 
 =head1 PURPOSE
 
@@ -40,6 +43,17 @@ sub find {
     $class->gateway->merchant_account->find($merchant_account_id);
 }
 
+=head2 all()
+
+This returns all the merchant accounts.
+
+=cut
+
+sub all {
+    my $class = shift;
+    $class->gateway->merchant_account->all;
+}
+
 =head2 update()
 
 This takes a merchant_account_id and a hashref of parameters. It will update the
@@ -59,16 +73,22 @@ sub gateway {
 
 {
     package WebService::Braintree::MerchantAccount::Status;
-$WebService::Braintree::MerchantAccount::Status::VERSION = '0.93';
-use constant Active => "active";
+$WebService::Braintree::MerchantAccount::Status::VERSION = '0.94';
+use 5.010_001;
+    use strictures 1;
+
+    use constant Active => "active";
     use constant Pending => "pending";
     use constant Suspended => "suspended";
 }
 
 {
     package WebService::Braintree::MerchantAccount::FundingDestination;
-$WebService::Braintree::MerchantAccount::FundingDestination::VERSION = '0.93';
-use constant Bank => "bank";
+$WebService::Braintree::MerchantAccount::FundingDestination::VERSION = '0.94';
+use 5.010_001;
+    use strictures 1;
+
+    use constant Bank => "bank";
     use constant Email => "email";
     use constant MobilePhone => "mobile_phone";
 }
@@ -115,24 +135,33 @@ will be a L<WebService::Braintree::MerchantAccount::FundingDetails> object.
 has funding_details => (is => 'rw');
 
 sub BUILD {
-    my ($self, $attributes) = @_;
+    my ($self, $attrs) = @_;
 
-    $self->master_merchant_account(WebService::Braintree::MerchantAccount->new($attributes->{master_merchant_account})) if ref($attributes->{master_merchant_account}) eq 'HASH';
-    delete($attributes->{master_merchant_account});
+    $self->build_sub_object($attrs,
+        method => 'master_merchant_account',
+        class  => 'MerchantAccount',
+        key    => 'master_merchant_account',
+    );
 
+    $self->build_sub_object($attrs,
+        method => 'individual_details',
+        class  => 'MerchantAccount::IndividualDetails',
+        key    => 'individual',
+    );
 
-    $self->individual_details(WebService::Braintree::MerchantAccount::IndividualDetails->new($attributes->{individual})) if ref($attributes->{individual}) eq 'HASH';
-    delete($attributes->{individual});
+    $self->build_sub_object($attrs,
+        method => 'business_details',
+        class  => 'MerchantAccount::BusinessDetails',
+        key    => 'business',
+    );
 
+    $self->build_sub_object($attrs,
+        method => 'funding_details',
+        class  => 'MerchantAccount::FundingDetails',
+        key    => 'funding',
+    );
 
-    $self->business_details(WebService::Braintree::MerchantAccount::BusinessDetails->new($attributes->{business})) if ref($attributes->{business}) eq 'HASH';
-    delete($attributes->{business});
-
-
-    $self->funding_details(WebService::Braintree::MerchantAccount::FundingDetails->new($attributes->{funding})) if ref($attributes->{funding}) eq 'HASH';
-    delete($attributes->{funding});
-
-    $self->set_attributes_from_hash($self, $attributes);
+    $self->set_attributes_from_hash($self, $attrs);
 }
 
 __PACKAGE__->meta->make_immutable;

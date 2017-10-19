@@ -10,7 +10,7 @@ GraphQL - Perl implementation of GraphQL
 
 =cut
 
-our $VERSION = '0.12';
+our $VERSION = '0.15';
 
 =begin markdown
 
@@ -29,7 +29,7 @@ our $VERSION = '0.12';
   use GraphQL::Schema;
   use GraphQL::Type::Object;
   use GraphQL::Type::Scalar qw($String);
-  use GraphQL::Execution;
+  use GraphQL::Execution qw(execute);
 
   my $schema = GraphQL::Schema->new(query => GraphQL::Type::Object->new(
     name => 'QueryRoot',
@@ -38,7 +38,7 @@ our $VERSION = '0.12';
     },
   ));
   post '/graphql' => sub {
-    send_as JSON => GraphQL::Execution->execute(
+    send_as JSON => execute(
       $schema,
       body_parameters->{query},
       undef,
@@ -155,6 +155,9 @@ bug as I make changes.
 
 The creation of this work has been sponsored by Perl Careers:
 L<https://perl.careers/>.
+
+Artur Khabibullin C<< <rtkh at cpan.org> >> contributed valuable ports
+of the JavaScript tests.
 
 =head1 LICENSE AND COPYRIGHT
 

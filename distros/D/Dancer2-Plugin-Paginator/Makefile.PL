@@ -25,9 +25,10 @@ my %WriteMakefileArgs = (
     "Paginator::Lite" => "2.001003"
   },
   "TEST_REQUIRES" => {
-    "JSON" => 0
+    "JSON" => 0,
+    "Test::More" => 0
   },
-  "VERSION" => "2.06",
+  "VERSION" => "2.07",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,7 +40,8 @@ my %FallbackPrereqs = (
   "HTTP::Request::Common" => 0,
   "JSON" => 0,
   "Paginator::Lite" => "2.001003",
-  "Plack::Test" => 0
+  "Plack::Test" => 0,
+  "Test::More" => 0
 );
 
 

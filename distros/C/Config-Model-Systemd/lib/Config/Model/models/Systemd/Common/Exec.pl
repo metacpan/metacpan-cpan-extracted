@@ -39,6 +39,15 @@ unit type.
 In addition, options which control resources through Linux Control Groups (cgroups) are listed in
 L<systemd.resource-control(5)>.
 Those options complement options listed here.
+
+The following service exit codes are defined by the LSB specification
+.
+
+
+
+The LSB specification suggests that error codes 200 and above are reserved for implementations. Some of them are
+used by the service manager to indicate problems during process invocation:
+
 This configuration class was generated from systemd documentation.
 by L<parse-man.pl|https://github.com/dod38fr/config-model-systemd/contrib/parse-man.pl>
 ',
@@ -186,10 +195,13 @@ world-writable directories on a system this ensures that a unit making use of dy
 cannot leave files around after unit termination. Moreover C<ProtectSystem=strict> and
 C<ProtectHome=read-only> are implied, thus prohibiting the service to write to arbitrary file
 system locations. In order to allow the service to write to certain directories, they have to be whitelisted
-using C<ReadWritePaths>, but care must be taken so that UID/GID recycling doesn't
-create security issues involving files created by the service. Use C<RuntimeDirectory> (see
-below) in order to assign a writable runtime directory to a service, owned by the dynamic user/group and
-removed automatically when the unit is terminated. Defaults to off.",
+using C<ReadWritePaths>, but care must be taken so that UID/GID recycling doesn't create
+security issues involving files created by the service. Use C<RuntimeDirectory> (see below) in
+order to assign a writable runtime directory to a service, owned by the dynamic user/group and removed
+automatically when the unit is terminated. Use C<StateDirectory>,
+C<CacheDirectory> and C<LogsDirectory> in order to assign a set of writable
+directories for specific purposes to the service in a way that they are protected from vulnerabilities due to
+UID reuse (see below). Defaults to off.",
         'type' => 'leaf',
         'value_type' => 'boolean',
         'write_as' => [
@@ -444,17 +456,17 @@ earlier setting.',
           'type' => 'leaf',
           'value_type' => 'uniline'
         },
-        'description' => 'Pass environment variables from the systemd system
-manager to executed processes. Takes a space-separated list of variable
-names. This option may be specified more than once, in which case all
-listed variables will be set. If the empty string is assigned to this
-option, the list of environment variables is reset, all prior
-assignments have no effect. Variables that are not set in the system
-manager will not be passed and will be silently ignored.
+        'description' => 'Pass environment variables set for the system service manager to executed processes. Takes a
+space-separated list of variable names. This option may be specified more than once, in which case all listed
+variables will be passed. If the empty string is assigned to this option, the list of environment variables to
+pass is reset, all prior assignments have no effect. Variables specified that are not set for the system
+manager will not be passed and will be silently ignored. Note that this option is only relevant for the system
+service manager, as system services by default do not automatically inherit any environment variables set for
+the service manager itself. However, in case of the user service manager all environment variables are passed
+to the executed processes anyway, hence this option is without effect for the user service manager.
 
-Variables passed from this setting are overridden by those passed
-from C<Environment> or
-C<EnvironmentFile>.
+Variables set for invoked processes due to this setting are subject to being overridden by those
+configured with C<Environment> or C<EnvironmentFile>.
 
 Example:
 
@@ -463,6 +475,32 @@ Example:
 passes three variables C<VAR1>,
 C<VAR2>, C<VAR3>
 with the values set for those variables in PID1.
+
+See
+L<environ(7)>
+for details about environment variables.',
+        'type' => 'list'
+      },
+      'UnsetEnvironment',
+      {
+        'cargo' => {
+          'type' => 'leaf',
+          'value_type' => 'uniline'
+        },
+        'description' => 'Explicitly unset environment variable assignments that would normally be passed from the
+service manager to invoked processes of this unit. Takes a space-separated list of variable names or variable
+assignments. This option may be specified more than once, in which case all listed variables/assignments will
+be unset. If the empty string is assigned to this option, the list of environment variables/assignments to
+unset is reset. If a variable assignment is specified (that is: a variable name, followed by
+C<=>, followed by its value), then any environment variable matching this precise assignment is
+removed. If a variable name is specified (that is a variable name without any following C<=> or
+value), then any assignment matching the variable name, regardless of its value is removed. Note that the
+effect of C<UnsetEnvironment> is applied as final step when the environment list passed to
+executed processes is compiled. That means it may undo assignments from any configuration source, including
+assignments made through C<Environment> or C<EnvironmentFile>, inherited from
+the system manager\'s global set of environment variables, inherited via C<PassEnvironment>,
+set by the service manager itself (such as C<$NOTIFY_SOCKET> and such), or set by a PAM module
+(in case C<PAMName> is used).
 
 See
 L<environ(7)>
@@ -635,7 +673,7 @@ for more details about named descriptors and ordering.
 
 If the standard output (or error output, see below) of a unit is connected to the journal, syslog or the
 kernel log buffer, the unit will implicitly gain a dependency of type C<After> on
-systemd-journald.socket (also see the automatic dependencies section above).
+systemd-journald.socket (also see the "Implicit Dependencies" section above).
 
 This setting defaults to the value set with
 C<DefaultStandardOutput> in
@@ -1564,7 +1602,17 @@ details.
 Note that for each unit making use of this option a PAM session handler process will be maintained as
 part of the unit and stays around as long as the unit is active, to ensure that appropriate actions can be
 taken when the unit and hence the PAM session terminates. This process is named C<(sd-pam)> and
-is an immediate child process of the unit\'s main process.',
+is an immediate child process of the unit\'s main process.
+
+Note that when this option is used for a unit it is very likely (depending on PAM configuration) that the
+main unit process will be migrated to its own session scope unit when it is activated. This process will hence
+be associated with two units: the unit it was originally started from (and for which
+C<PAMName> was configured), and the session scope unit. Any child processes of that process
+will however be associated with the session scope unit only. This has implications when used in combination
+with C<NotifyAccess>C<all>, as these child processes will not be able to affect
+changes in the original unit through notification messages. These messages will be considered belonging to the
+session scope unit and not the original unit. It is hence not recommended to use C<PAMName> in
+combination with C<NotifyAccess>C<all>.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -1579,11 +1627,25 @@ C<~>, all but the listed capabilities will be included, the effect of the assign
 inverted. Note that this option also affects the respective capabilities in the effective, permitted and
 inheritable capability sets. If this option is not used, the capability bounding set is not modified on process
 execution, hence no limits on the capabilities of the process are enforced. This option may appear more than
-once, in which case the bounding sets are merged. If the empty string is assigned to this option, the bounding
-set is reset to the empty capability set, and all prior settings have no effect.  If set to
-C<~> (without any further argument), the bounding set is reset to the full set of available
+once, in which case the bounding sets are merged by C<AND>, or by C<OR>
+if the lines are prefixed with C<~> (see below). If the empty string is assigned
+to this option, the bounding set is reset to the empty capability set, and all prior settings have no effect.
+If set to C<~> (without any further argument), the bounding set is reset to the full set of available
 capabilities, also undoing any previous settings. This does not affect commands prefixed with
-C<+>.',
+C<+>.
+
+Example: if a unit has the following,
+
+    CapabilityBoundingSet=CAP_A CAP_B
+    CapabilityBoundingSet=CAP_B CAP_C
+
+then C<CAP_A>, C<CAP_B>, and C<CAP_C> are set.
+If the second line is prefixed with C<~>, e.g.,
+
+    CapabilityBoundingSet=CAP_A CAP_B
+    CapabilityBoundingSet=~CAP_B CAP_C
+
+then, only C<CAP_A> is set.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -1592,7 +1654,8 @@ C<+>.',
         'description' => 'Controls which capabilities to include in the ambient capability set for the executed
 process. Takes a whitespace-separated list of capability names, e.g. C<CAP_SYS_ADMIN>,
 C<CAP_DAC_OVERRIDE>, C<CAP_SYS_PTRACE>. This option may appear more than
-once in which case the ambient capability sets are merged.  If the list of capabilities is prefixed with
+once in which case the ambient capability sets are merged (see the above examples in
+C<CapabilityBoundingSet>). If the list of capabilities is prefixed with
 C<~>, all but the listed capabilities will be included, the effect of the assignment
 inverted. If the empty string is assigned to this option, the ambient capability set is reset to the empty
 capability set, and all prior settings have no effect.  If set to C<~> (without any further
@@ -1857,12 +1920,10 @@ for details). Note that using this setting will disconnect propagation of mounts
 services which shall be able to install mount points in the main mount namespace. The new /dev
 will be mounted read-only and \'noexec\'. The latter may break old programs which try to set up executable memory by
 using L<mmap(2)> of
-/dev/zero instead of using C<MAP_ANON>. This setting is implied if
-C<DynamicUser> is set. For this setting the same restrictions regarding mount propagation and
-privileges apply as for C<ReadOnlyPaths> and related calls, see above.
+/dev/zero instead of using C<MAP_ANON>. For this setting the same restrictions
+regarding mount propagation and privileges apply as for C<ReadOnlyPaths> and related calls, see above.
 If turned on and if running in user mode, or in system mode, but without the C<CAP_SYS_ADMIN>
-capability (e.g. setting C<User>), C<NoNewPrivileges=yes>
-is implied.
+capability (e.g. setting C<User>), C<NoNewPrivileges=yes> is implied.
 
 Note that the implementation of this setting might be impossible (for example if mount namespaces
 are not available), and the unit should be written in a way that does not solely rely on this setting for
@@ -2258,7 +2319,7 @@ As the number of possible system
 calls is large, predefined sets of system calls are provided.
 A set starts with C<\@> character, followed by
 name of the set.
-Currently predefined system call setsSetDescription\@basic-ioSystem calls for basic I/O: reading, writing, seeking, file descriptor duplication and closing (L<read(2)>, L<write(2)>, and related calls)\@clockSystem calls for changing the system clock (L<adjtimex(2)>, L<settimeofday(2)>, and related calls)\@cpu-emulationSystem calls for CPU emulation functionality (L<vm86(2)> and related calls)\@debugDebugging, performance monitoring and tracing functionality (L<ptrace(2)>, L<perf_event_open(2)> and related calls)\@file-systemFile system operations: opening, creating files and directories for read and write, renaming and removing them, reading file properties, or creating hard and symbolic links.\@io-eventEvent loop system calls (L<poll(2)>, L<select(2)>, L<epoll(7)>, L<eventfd(2)> and related calls)\@ipcPipes, SysV IPC, POSIX Message Queues and other IPC (L<mq_overview(7)>, L<svipc(7)>)\@keyringKernel keyring access (L<keyctl(2)> and related calls)\@moduleLoading and unloading of kernel modules (L<init_module(2)>, L<delete_module(2)> and related calls)\@mountMounting and unmounting of file systems (L<mount(2)>, L<chroot(2)>, and related calls)\@network-ioSocket I/O (including local AF_UNIX): L<socket(7)>, L<unix(7)>\@obsoleteUnusual, obsolete or unimplemented (L<create_module(2)>, L<gtty(2)>, \x{2026})\@privilegedAll system calls which need super-user capabilities (L<capabilities(7)>)\@processProcess control, execution, namespaceing operations (L<clone(2)>, L<kill(2)>, L<namespaces(7)>, \x{2026}\@raw-ioRaw I/O port access (L<ioperm(2)>, L<iopl(2)>, pciconfig_read(), \x{2026})\@rebootSystem calls for rebooting and reboot preparation (L<reboot(2)>, kexec(), \x{2026})\@resourcesSystem calls for changing resource limits, memory and scheduling parameters (L<setrlimit(2)>, L<setpriority(2)>, \x{2026})\@swapSystem calls for enabling/disabling swap devices (L<swapon(2)>, L<swapoff(2)>)
+Currently predefined system call setsSetDescription\@aioAsynchronous I/O (L<io_setup(2)>, L<io_submit(2)>, and related calls)\@basic-ioSystem calls for basic I/O: reading, writing, seeking, file descriptor duplication and closing (L<read(2)>, L<write(2)>, and related calls)\@chownChanging file ownership (L<chown(2)>, L<fchownat(2)>, and related calls)\@clockSystem calls for changing the system clock (L<adjtimex(2)>, L<settimeofday(2)>, and related calls)\@cpu-emulationSystem calls for CPU emulation functionality (L<vm86(2)> and related calls)\@debugDebugging, performance monitoring and tracing functionality (L<ptrace(2)>, L<perf_event_open(2)> and related calls)\@file-systemFile system operations: opening, creating files and directories for read and write, renaming and removing them, reading file properties, or creating hard and symbolic links.\@io-eventEvent loop system calls (L<poll(2)>, L<select(2)>, L<epoll(7)>, L<eventfd(2)> and related calls)\@ipcPipes, SysV IPC, POSIX Message Queues and other IPC (L<mq_overview(7)>, L<svipc(7)>)\@keyringKernel keyring access (L<keyctl(2)> and related calls)\@memlockLocking of memory into RAM (L<mlock(2)>, L<mlockall(2)> and related calls)\@moduleLoading and unloading of kernel modules (L<init_module(2)>, L<delete_module(2)> and related calls)\@mountMounting and unmounting of file systems (L<mount(2)>, L<chroot(2)>, and related calls)\@network-ioSocket I/O (including local AF_UNIX): L<socket(7)>, L<unix(7)>\@obsoleteUnusual, obsolete or unimplemented (L<create_module(2)>, L<gtty(2)>, \x{2026})\@privilegedAll system calls which need super-user capabilities (L<capabilities(7)>)\@processProcess control, execution, namespaceing operations (L<clone(2)>, L<kill(2)>, L<namespaces(7)>, \x{2026}\@raw-ioRaw I/O port access (L<ioperm(2)>, L<iopl(2)>, pciconfig_read(), \x{2026})\@rebootSystem calls for rebooting and reboot preparation (L<reboot(2)>, kexec(), \x{2026})\@resourcesSystem calls for changing resource limits, memory and scheduling parameters (L<setrlimit(2)>, L<setpriority(2)>, \x{2026})\@setuidSystem calls for changing user ID and group ID credentials, (L<setuid(2)>, L<setgid(2)>, L<setresuid(2)>, \x{2026})\@signalSystem calls for manipulating and handling process signals (L<signal(2)>, L<sigprocmask(2)>, \x{2026})\@swapSystem calls for enabling/disabling swap devices (L<swapon(2)>, L<swapoff(2)>)\@syncSynchronizing files and memory to disk: (L<fsync(2)>, L<msync(2)>, and related calls)\@timerSystem calls for scheduling operations by time (L<alarm(2)>, L<timer_create(2)>, \x{2026})
 Note, that as new system calls are added to the kernel, additional system calls might be
 added to the groups above. Contents of the sets may also change between systemd
 versions. In addition, the list of system calls depends on the kernel version and
@@ -2310,7 +2371,7 @@ filtering of network socket-related calls is not possible, due to ABI limitation
 does not have, however. On systems supporting multiple ABIs at the same time \x{2014} such as x86/x86-64 \x{2014} it is hence
 recommended to limit the set of permitted system call architectures so that secondary ABIs may not be used to
 circumvent the restrictions applied to the native ABI of the system. In particular, setting
-C<SystemCallFilter=native> is a good choice for disabling non-native ABIs.
+C<SystemCallArchitectures=native> is a good choice for disabling non-native ABIs.
 
 System call architectures may also be restricted system-wide via the
 C<SystemCallArchitectures> option in the global configuration. See
@@ -2360,7 +2421,7 @@ prohibited. Otherwise, a space-separated list of namespace type identifiers must
 any combination of: C<cgroup>, C<ipc>, C<net>,
 C<mnt>, C<pid>, C<user> and C<uts>. Any
 namespace type listed is made accessible to the unit's processes, access to namespace types not listed is
-prohibited (whitelisting). By prepending the list with a single tilda character (C<~>) the
+prohibited (whitelisting). By prepending the list with a single tilde character (C<~>) the
 effect may be inverted: only the listed namespace types will be made inaccessible, all unlisted ones are
 permitted (blacklisting). If the empty string is assigned, the default namespace restrictions are applied,
 which is equivalent to false. Internally, this setting limits access to the
@@ -2402,40 +2463,445 @@ personality of the host system\'s kernel.',
         'type' => 'leaf',
         'value_type' => 'enum'
       },
+      'LockPersonality',
+      {
+        'description' => 'Takes a boolean argument. If set, locks down the L<personality(2)> system
+call so that the kernel execution domain may not be changed from the default or the personality selected with
+C<Personality> directive. This may be useful to improve security, because odd personality
+emulations may be poorly tested and source of vulnerabilities. If running in user mode, or in system mode, but
+without the C<CAP_SYS_ADMIN> capability (e.g. setting C<User>),
+C<NoNewPrivileges=yes> is implied.',
+        'type' => 'leaf',
+        'value_type' => 'boolean',
+        'write_as' => [
+          'no',
+          'yes'
+        ]
+      },
+      'KeyringMode',
+      {
+        'choice' => [
+          'inherit',
+          'private',
+          'shared'
+        ],
+        'description' => 'Controls how the kernel session keyring is set up for the service (see L<session-keyring(7)> for
+details on the session keyring). Takes one of C<inherit>, C<private>,
+C<shared>. If set to C<inherit> no special keyring setup is done, and the kernel\'s
+default behaviour is applied. If C<private> is used a new session keyring is allocated when a
+service process is invoked, and it is not linked up with any user keyring. This is the recommended setting for
+system services, as this ensures that multiple services running under the same system user ID (in particular
+the root user) do not share their key material among each other. If C<shared> is used a new
+session keyring is allocated as for C<private>, but the user keyring of the user configured with
+C<User> is linked into it, so that keys assigned to the user may be requested by the unit\'s
+processes. In this modes multiple units running processes under the same user ID may share key material. Unless
+C<inherit> is selected the unique invocation ID for the unit (see below) is added as a protected
+key by the name C<invocation_id> to the newly created session keyring. Defaults to
+C<private> for the system service manager and to C<inherit> for the user service
+manager.',
+        'type' => 'leaf',
+        'value_type' => 'enum'
+      },
       'RuntimeDirectory',
       {
-        'description' => 'Takes a list of directory names. If set, one
-or more directories by the specified names will be created
-below /run (for system services) or below
-C<$XDG_RUNTIME_DIR> (for user services) when
-the unit is started, and removed when the unit is stopped. The
-directories will have the access mode specified in
-C<RuntimeDirectoryMode>, and will be owned by
-the user and group specified in C<User> and
-C<Group>. Use this to manage one or more
-runtime directories of the unit and bind their lifetime to the
-daemon runtime. The specified directory names must be
-relative, and may not include a C</>, i.e.
-must refer to simple directories to create or remove. This is
-particularly useful for unprivileged daemons that cannot
-create runtime directories in /run due to
-lack of privileges, and to make sure the runtime directory is
-cleaned up automatically after use. For runtime directories
-that require more complex or different configuration or
-lifetime guarantees, please consider using
-L<tmpfiles.d(5)>.',
+        'description' => 'These options take a whitespace-separated list of directory names. The specified directory
+names must be relative, and may not include C<.> or C<..>. If set, one or more
+directories by the specified names will be created (including their parents) below /run
+(or C<$XDG_RUNTIME_DIR> for user services), /var/lib (or
+C<$XDG_CONFIG_HOME> for user services), /var/cache (or
+C<$XDG_CACHE_HOME> for user services), /var/log (or
+C<$XDG_CONFIG_HOME>/log for user services), or /etc
+(or C<$XDG_CONFIG_HOME> for user services), respectively, when the unit is started.
+
+In case of C<RuntimeDirectory> the lowest subdirectories are removed when the unit is
+stopped. It is possible to preserve the specified directories in this case if
+C<RuntimeDirectoryPreserve> is configured to C<restart> or C<yes>
+(see below). The directories specified with C<StateDirectory>,
+C<CacheDirectory>, C<LogsDirectory>,
+C<ConfigurationDirectory> are not removed when the unit is stopped.
+
+Except in case of C<ConfigurationDirectory>, the innermost specified directories will be
+owned by the user and group specified in C<User> and C<Group>. If the
+specified directories already exist and their owning user or group do not match the configured ones, all files
+and directories below the specified directories as well as the directories themselves will have their file
+ownership recursively changed to match what is configured. As an optimization, if the specified directories are
+already owned by the right user and group, files and directories below of them are left as-is, even if they do
+not match what is requested. The innermost specified directories will have their access mode adjusted to the
+what is specified in C<RuntimeDirectoryMode>, C<StateDirectoryMode>,
+C<CacheDirectoryMode>, C<LogsDirectoryMode> and
+C<ConfigurationDirectoryMode>.
+
+Except in case of C<ConfigurationDirectory>, these options imply
+C<ReadWritePaths> for the specified paths. When combined with
+C<RootDirectory> or C<RootImage> these paths always reside on the host and
+are mounted from there into the unit\'s file system namespace. If C<DynamicUser> is used in
+conjunction with C<RuntimeDirectory>, C<StateDirectory>,
+C<CacheDirectory> and C<LogsDirectory>, the behaviour of these options is
+slightly altered: the directories are created below /run/private,
+/var/lib/private, /var/cache/private and
+/var/log/private, respectively, which are host directories made inaccessible to
+unprivileged users, which ensures that access to these directories cannot be gained through dynamic user ID
+recycling. Symbolic links are created to hide this difference in behaviour. Both from perspective of the host
+and from inside the unit, the relevant directories hence always appear directly below
+/run, /var/lib, /var/cache and
+/var/log.
+
+Use C<RuntimeDirectory> to manage one or more runtime directories for the unit and bind
+their lifetime to the daemon runtime. This is particularly useful for unprivileged daemons that cannot create
+runtime directories in /run due to lack of privileges, and to make sure the runtime
+directory is cleaned up automatically after use. For runtime directories that require more complex or different
+configuration or lifetime guarantees, please consider using
+L<tmpfiles.d(5)>.
+
+Example: if a system service unit has the following,
+
+    RuntimeDirectory=foo/bar baz
+
+the service manager creates /run/foo (if it does not exist), /run/foo/bar,
+and /run/baz. The directories /run/foo/bar and /run/baz
+except /run/foo are owned by the user and group specified in C<User> and
+C<Group>, and removed when the service is stopped.
+',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'StateDirectory',
+      {
+        'description' => 'These options take a whitespace-separated list of directory names. The specified directory
+names must be relative, and may not include C<.> or C<..>. If set, one or more
+directories by the specified names will be created (including their parents) below /run
+(or C<$XDG_RUNTIME_DIR> for user services), /var/lib (or
+C<$XDG_CONFIG_HOME> for user services), /var/cache (or
+C<$XDG_CACHE_HOME> for user services), /var/log (or
+C<$XDG_CONFIG_HOME>/log for user services), or /etc
+(or C<$XDG_CONFIG_HOME> for user services), respectively, when the unit is started.
+
+In case of C<RuntimeDirectory> the lowest subdirectories are removed when the unit is
+stopped. It is possible to preserve the specified directories in this case if
+C<RuntimeDirectoryPreserve> is configured to C<restart> or C<yes>
+(see below). The directories specified with C<StateDirectory>,
+C<CacheDirectory>, C<LogsDirectory>,
+C<ConfigurationDirectory> are not removed when the unit is stopped.
+
+Except in case of C<ConfigurationDirectory>, the innermost specified directories will be
+owned by the user and group specified in C<User> and C<Group>. If the
+specified directories already exist and their owning user or group do not match the configured ones, all files
+and directories below the specified directories as well as the directories themselves will have their file
+ownership recursively changed to match what is configured. As an optimization, if the specified directories are
+already owned by the right user and group, files and directories below of them are left as-is, even if they do
+not match what is requested. The innermost specified directories will have their access mode adjusted to the
+what is specified in C<RuntimeDirectoryMode>, C<StateDirectoryMode>,
+C<CacheDirectoryMode>, C<LogsDirectoryMode> and
+C<ConfigurationDirectoryMode>.
+
+Except in case of C<ConfigurationDirectory>, these options imply
+C<ReadWritePaths> for the specified paths. When combined with
+C<RootDirectory> or C<RootImage> these paths always reside on the host and
+are mounted from there into the unit\'s file system namespace. If C<DynamicUser> is used in
+conjunction with C<RuntimeDirectory>, C<StateDirectory>,
+C<CacheDirectory> and C<LogsDirectory>, the behaviour of these options is
+slightly altered: the directories are created below /run/private,
+/var/lib/private, /var/cache/private and
+/var/log/private, respectively, which are host directories made inaccessible to
+unprivileged users, which ensures that access to these directories cannot be gained through dynamic user ID
+recycling. Symbolic links are created to hide this difference in behaviour. Both from perspective of the host
+and from inside the unit, the relevant directories hence always appear directly below
+/run, /var/lib, /var/cache and
+/var/log.
+
+Use C<RuntimeDirectory> to manage one or more runtime directories for the unit and bind
+their lifetime to the daemon runtime. This is particularly useful for unprivileged daemons that cannot create
+runtime directories in /run due to lack of privileges, and to make sure the runtime
+directory is cleaned up automatically after use. For runtime directories that require more complex or different
+configuration or lifetime guarantees, please consider using
+L<tmpfiles.d(5)>.
+
+Example: if a system service unit has the following,
+
+    RuntimeDirectory=foo/bar baz
+
+the service manager creates /run/foo (if it does not exist), /run/foo/bar,
+and /run/baz. The directories /run/foo/bar and /run/baz
+except /run/foo are owned by the user and group specified in C<User> and
+C<Group>, and removed when the service is stopped.
+',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'CacheDirectory',
+      {
+        'description' => 'These options take a whitespace-separated list of directory names. The specified directory
+names must be relative, and may not include C<.> or C<..>. If set, one or more
+directories by the specified names will be created (including their parents) below /run
+(or C<$XDG_RUNTIME_DIR> for user services), /var/lib (or
+C<$XDG_CONFIG_HOME> for user services), /var/cache (or
+C<$XDG_CACHE_HOME> for user services), /var/log (or
+C<$XDG_CONFIG_HOME>/log for user services), or /etc
+(or C<$XDG_CONFIG_HOME> for user services), respectively, when the unit is started.
+
+In case of C<RuntimeDirectory> the lowest subdirectories are removed when the unit is
+stopped. It is possible to preserve the specified directories in this case if
+C<RuntimeDirectoryPreserve> is configured to C<restart> or C<yes>
+(see below). The directories specified with C<StateDirectory>,
+C<CacheDirectory>, C<LogsDirectory>,
+C<ConfigurationDirectory> are not removed when the unit is stopped.
+
+Except in case of C<ConfigurationDirectory>, the innermost specified directories will be
+owned by the user and group specified in C<User> and C<Group>. If the
+specified directories already exist and their owning user or group do not match the configured ones, all files
+and directories below the specified directories as well as the directories themselves will have their file
+ownership recursively changed to match what is configured. As an optimization, if the specified directories are
+already owned by the right user and group, files and directories below of them are left as-is, even if they do
+not match what is requested. The innermost specified directories will have their access mode adjusted to the
+what is specified in C<RuntimeDirectoryMode>, C<StateDirectoryMode>,
+C<CacheDirectoryMode>, C<LogsDirectoryMode> and
+C<ConfigurationDirectoryMode>.
+
+Except in case of C<ConfigurationDirectory>, these options imply
+C<ReadWritePaths> for the specified paths. When combined with
+C<RootDirectory> or C<RootImage> these paths always reside on the host and
+are mounted from there into the unit\'s file system namespace. If C<DynamicUser> is used in
+conjunction with C<RuntimeDirectory>, C<StateDirectory>,
+C<CacheDirectory> and C<LogsDirectory>, the behaviour of these options is
+slightly altered: the directories are created below /run/private,
+/var/lib/private, /var/cache/private and
+/var/log/private, respectively, which are host directories made inaccessible to
+unprivileged users, which ensures that access to these directories cannot be gained through dynamic user ID
+recycling. Symbolic links are created to hide this difference in behaviour. Both from perspective of the host
+and from inside the unit, the relevant directories hence always appear directly below
+/run, /var/lib, /var/cache and
+/var/log.
+
+Use C<RuntimeDirectory> to manage one or more runtime directories for the unit and bind
+their lifetime to the daemon runtime. This is particularly useful for unprivileged daemons that cannot create
+runtime directories in /run due to lack of privileges, and to make sure the runtime
+directory is cleaned up automatically after use. For runtime directories that require more complex or different
+configuration or lifetime guarantees, please consider using
+L<tmpfiles.d(5)>.
+
+Example: if a system service unit has the following,
+
+    RuntimeDirectory=foo/bar baz
+
+the service manager creates /run/foo (if it does not exist), /run/foo/bar,
+and /run/baz. The directories /run/foo/bar and /run/baz
+except /run/foo are owned by the user and group specified in C<User> and
+C<Group>, and removed when the service is stopped.
+',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'LogsDirectory',
+      {
+        'description' => 'These options take a whitespace-separated list of directory names. The specified directory
+names must be relative, and may not include C<.> or C<..>. If set, one or more
+directories by the specified names will be created (including their parents) below /run
+(or C<$XDG_RUNTIME_DIR> for user services), /var/lib (or
+C<$XDG_CONFIG_HOME> for user services), /var/cache (or
+C<$XDG_CACHE_HOME> for user services), /var/log (or
+C<$XDG_CONFIG_HOME>/log for user services), or /etc
+(or C<$XDG_CONFIG_HOME> for user services), respectively, when the unit is started.
+
+In case of C<RuntimeDirectory> the lowest subdirectories are removed when the unit is
+stopped. It is possible to preserve the specified directories in this case if
+C<RuntimeDirectoryPreserve> is configured to C<restart> or C<yes>
+(see below). The directories specified with C<StateDirectory>,
+C<CacheDirectory>, C<LogsDirectory>,
+C<ConfigurationDirectory> are not removed when the unit is stopped.
+
+Except in case of C<ConfigurationDirectory>, the innermost specified directories will be
+owned by the user and group specified in C<User> and C<Group>. If the
+specified directories already exist and their owning user or group do not match the configured ones, all files
+and directories below the specified directories as well as the directories themselves will have their file
+ownership recursively changed to match what is configured. As an optimization, if the specified directories are
+already owned by the right user and group, files and directories below of them are left as-is, even if they do
+not match what is requested. The innermost specified directories will have their access mode adjusted to the
+what is specified in C<RuntimeDirectoryMode>, C<StateDirectoryMode>,
+C<CacheDirectoryMode>, C<LogsDirectoryMode> and
+C<ConfigurationDirectoryMode>.
+
+Except in case of C<ConfigurationDirectory>, these options imply
+C<ReadWritePaths> for the specified paths. When combined with
+C<RootDirectory> or C<RootImage> these paths always reside on the host and
+are mounted from there into the unit\'s file system namespace. If C<DynamicUser> is used in
+conjunction with C<RuntimeDirectory>, C<StateDirectory>,
+C<CacheDirectory> and C<LogsDirectory>, the behaviour of these options is
+slightly altered: the directories are created below /run/private,
+/var/lib/private, /var/cache/private and
+/var/log/private, respectively, which are host directories made inaccessible to
+unprivileged users, which ensures that access to these directories cannot be gained through dynamic user ID
+recycling. Symbolic links are created to hide this difference in behaviour. Both from perspective of the host
+and from inside the unit, the relevant directories hence always appear directly below
+/run, /var/lib, /var/cache and
+/var/log.
+
+Use C<RuntimeDirectory> to manage one or more runtime directories for the unit and bind
+their lifetime to the daemon runtime. This is particularly useful for unprivileged daemons that cannot create
+runtime directories in /run due to lack of privileges, and to make sure the runtime
+directory is cleaned up automatically after use. For runtime directories that require more complex or different
+configuration or lifetime guarantees, please consider using
+L<tmpfiles.d(5)>.
+
+Example: if a system service unit has the following,
+
+    RuntimeDirectory=foo/bar baz
+
+the service manager creates /run/foo (if it does not exist), /run/foo/bar,
+and /run/baz. The directories /run/foo/bar and /run/baz
+except /run/foo are owned by the user and group specified in C<User> and
+C<Group>, and removed when the service is stopped.
+',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'ConfigurationDirectory',
+      {
+        'description' => 'These options take a whitespace-separated list of directory names. The specified directory
+names must be relative, and may not include C<.> or C<..>. If set, one or more
+directories by the specified names will be created (including their parents) below /run
+(or C<$XDG_RUNTIME_DIR> for user services), /var/lib (or
+C<$XDG_CONFIG_HOME> for user services), /var/cache (or
+C<$XDG_CACHE_HOME> for user services), /var/log (or
+C<$XDG_CONFIG_HOME>/log for user services), or /etc
+(or C<$XDG_CONFIG_HOME> for user services), respectively, when the unit is started.
+
+In case of C<RuntimeDirectory> the lowest subdirectories are removed when the unit is
+stopped. It is possible to preserve the specified directories in this case if
+C<RuntimeDirectoryPreserve> is configured to C<restart> or C<yes>
+(see below). The directories specified with C<StateDirectory>,
+C<CacheDirectory>, C<LogsDirectory>,
+C<ConfigurationDirectory> are not removed when the unit is stopped.
+
+Except in case of C<ConfigurationDirectory>, the innermost specified directories will be
+owned by the user and group specified in C<User> and C<Group>. If the
+specified directories already exist and their owning user or group do not match the configured ones, all files
+and directories below the specified directories as well as the directories themselves will have their file
+ownership recursively changed to match what is configured. As an optimization, if the specified directories are
+already owned by the right user and group, files and directories below of them are left as-is, even if they do
+not match what is requested. The innermost specified directories will have their access mode adjusted to the
+what is specified in C<RuntimeDirectoryMode>, C<StateDirectoryMode>,
+C<CacheDirectoryMode>, C<LogsDirectoryMode> and
+C<ConfigurationDirectoryMode>.
+
+Except in case of C<ConfigurationDirectory>, these options imply
+C<ReadWritePaths> for the specified paths. When combined with
+C<RootDirectory> or C<RootImage> these paths always reside on the host and
+are mounted from there into the unit\'s file system namespace. If C<DynamicUser> is used in
+conjunction with C<RuntimeDirectory>, C<StateDirectory>,
+C<CacheDirectory> and C<LogsDirectory>, the behaviour of these options is
+slightly altered: the directories are created below /run/private,
+/var/lib/private, /var/cache/private and
+/var/log/private, respectively, which are host directories made inaccessible to
+unprivileged users, which ensures that access to these directories cannot be gained through dynamic user ID
+recycling. Symbolic links are created to hide this difference in behaviour. Both from perspective of the host
+and from inside the unit, the relevant directories hence always appear directly below
+/run, /var/lib, /var/cache and
+/var/log.
+
+Use C<RuntimeDirectory> to manage one or more runtime directories for the unit and bind
+their lifetime to the daemon runtime. This is particularly useful for unprivileged daemons that cannot create
+runtime directories in /run due to lack of privileges, and to make sure the runtime
+directory is cleaned up automatically after use. For runtime directories that require more complex or different
+configuration or lifetime guarantees, please consider using
+L<tmpfiles.d(5)>.
+
+Example: if a system service unit has the following,
+
+    RuntimeDirectory=foo/bar baz
+
+the service manager creates /run/foo (if it does not exist), /run/foo/bar,
+and /run/baz. The directories /run/foo/bar and /run/baz
+except /run/foo are owned by the user and group specified in C<User> and
+C<Group>, and removed when the service is stopped.
+',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'RuntimeDirectoryMode',
       {
         'description' => 'Specifies the access mode of the directories specified in
-C<RuntimeDirectory> as an octal number. Defaults to
-C<0755>. See "Permissions" in
-L<path_resolution(7)> for a discussion of the meaning of permission bits.
+C<RuntimeDirectory>, C<StateDirectory>, C<CacheDirectory>,
+C<LogsDirectory>, or C<ConfigurationDirectory>, respectively, as an octal number.
+Defaults to C<0755>. See "Permissions" in
+L<path_resolution(7)>
+for a discussion of the meaning of permission bits.
 ',
         'type' => 'leaf',
         'value_type' => 'uniline'
+      },
+      'StateDirectoryMode',
+      {
+        'description' => 'Specifies the access mode of the directories specified in
+C<RuntimeDirectory>, C<StateDirectory>, C<CacheDirectory>,
+C<LogsDirectory>, or C<ConfigurationDirectory>, respectively, as an octal number.
+Defaults to C<0755>. See "Permissions" in
+L<path_resolution(7)>
+for a discussion of the meaning of permission bits.
+',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'CacheDirectoryMode',
+      {
+        'description' => 'Specifies the access mode of the directories specified in
+C<RuntimeDirectory>, C<StateDirectory>, C<CacheDirectory>,
+C<LogsDirectory>, or C<ConfigurationDirectory>, respectively, as an octal number.
+Defaults to C<0755>. See "Permissions" in
+L<path_resolution(7)>
+for a discussion of the meaning of permission bits.
+',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'LogsDirectoryMode',
+      {
+        'description' => 'Specifies the access mode of the directories specified in
+C<RuntimeDirectory>, C<StateDirectory>, C<CacheDirectory>,
+C<LogsDirectory>, or C<ConfigurationDirectory>, respectively, as an octal number.
+Defaults to C<0755>. See "Permissions" in
+L<path_resolution(7)>
+for a discussion of the meaning of permission bits.
+',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'ConfigurationDirectoryMode',
+      {
+        'description' => 'Specifies the access mode of the directories specified in
+C<RuntimeDirectory>, C<StateDirectory>, C<CacheDirectory>,
+C<LogsDirectory>, or C<ConfigurationDirectory>, respectively, as an octal number.
+Defaults to C<0755>. See "Permissions" in
+L<path_resolution(7)>
+for a discussion of the meaning of permission bits.
+',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'RuntimeDirectoryPreserve',
+      {
+        'choice' => [
+          'no',
+          'yes',
+          'restart'
+        ],
+        'description' => 'Takes a boolean argument or C<restart>.
+If set to C<no> (the default), the directories specified in C<RuntimeDirectory>
+are always removed when the service stops. If set to C<restart> the directories are preserved
+when the service is both automatically and manually restarted. Here, the automatic restart means the operation
+specified in C<Restart>, and manual restart means the one triggered by
+systemctl restart foo.service. If set to C<yes>, then the directories are not
+removed when the service is stopped. Note that since the runtime directory /run is a mount
+point of C<tmpfs>, then for system services the directories specified in
+C<RuntimeDirectory> are removed when the system is rebooted.
+',
+        'replace' => {
+          '0' => 'no',
+          '1' => 'yes',
+          'false' => 'no',
+          'true' => 'yes'
+        },
+        'type' => 'leaf',
+        'value_type' => 'enum'
       },
       'MemoryDenyWriteExecute',
       {
@@ -2456,7 +2922,7 @@ on systems supporting multiple ABIs (such as x86/x86-64) it is recommended to tu
 services, so that they cannot be used to circumvent the restrictions of this option. Specifically, it is
 recommended to combine this option with C<SystemCallArchitectures=native> or similar. If
 running in user mode, or in system mode, but without the C<CAP_SYS_ADMIN> capability
-(e.g. setting C<User>), C<NoNewPrivileges=yes> is implied.  ',
+(e.g. setting C<User>), C<NoNewPrivileges=yes> is implied.',
         'type' => 'leaf',
         'value_type' => 'boolean',
         'write_as' => [

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 225;
+plan tests => 233;
 
 use Math::AnyNum;
 
@@ -118,6 +118,16 @@ is($min_si <=> Math::AnyNum::LONG_MIN + 1, -1);
 
 is(($min_si + 1)->binomial(Math::AnyNum::LONG_MIN), Math::AnyNum::LONG_MIN + 1);
 is($max_ui->binomial(Math::AnyNum::ULONG_MAX- 1),   Math::AnyNum::ULONG_MAX);
+
+is(Math::AnyNum->new_z(Math::AnyNum::LONG_MIN)->numify, Math::AnyNum::LONG_MIN);
+is(Math::AnyNum->new_q(Math::AnyNum::LONG_MIN)->numify, Math::AnyNum::LONG_MIN);
+is(Math::AnyNum->new_f(Math::AnyNum::LONG_MIN)->numify, Math::AnyNum::LONG_MIN);
+is(Math::AnyNum->new_c(Math::AnyNum::LONG_MIN)->numify, Math::AnyNum::LONG_MIN);
+
+is(Math::AnyNum->new_z(Math::AnyNum::ULONG_MAX)->numify, Math::AnyNum::ULONG_MAX);
+is(Math::AnyNum->new_q(Math::AnyNum::ULONG_MAX)->numify, Math::AnyNum::ULONG_MAX);
+is(Math::AnyNum->new_f(Math::AnyNum::ULONG_MAX)->numify, Math::AnyNum::ULONG_MAX);
+is(Math::AnyNum->new_c(Math::AnyNum::ULONG_MAX)->numify, Math::AnyNum::ULONG_MAX);
 
 #
 ## iadd()

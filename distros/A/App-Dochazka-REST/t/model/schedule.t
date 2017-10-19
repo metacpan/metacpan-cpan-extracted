@@ -66,8 +66,8 @@ my $emp = App::Dochazka::REST::Model::Employee->spawn(
     remark => 'SCHEDULE TESTING OBJECT',
 );
 my $status = $emp->insert( $faux_context );
-ok( $status->ok, "Schedule testing object inserted" );
-ok( $emp->eid > 0, "Schedule testing object has an EID" );
+ok( $status->ok, "Schedule testing employee object inserted" );
+ok( $emp->eid > 0, "Schedule testing employee object has an EID" );
 
 my $schedule = test_schedule_model( [
     "[$tomorrow 12:30, $tomorrow 16:30)",
@@ -125,7 +125,7 @@ ok( $status->ok );
 is( $schedule->{sid}, $sid_copy );    # SID is unchanged
 
 note('attempt to insert the same schedule string in a completely new schedule object');
-is( noof( $dbix_conn, 'schedules' ), 1, "schedules row count is 1" );
+is( noof( $dbix_conn, 'schedules' ), 2, "schedules row count is 2" );
 my $schedule2 = App::Dochazka::REST::Model::Schedule->spawn(
     schedule => $sched_copy,
     remark => 'DUPLICATE',
@@ -135,7 +135,7 @@ $status = $schedule2->insert( $faux_context );
 ok( $schedule2->sid > 0, "SID was assigned" );
 ok( $status->ok, "Schedule insert OK" );
 is( $schedule2->sid, $sid_copy, "But SID is the same as before" );
-is( noof( $dbix_conn, 'schedules' ), 1, "schedules row count is still 1" );
+is( noof( $dbix_conn, 'schedules' ), 2, "schedules row count is still 2" );
 
 #note('tests for get_schedule_json function');
 #my $json = get_schedule_json( $sid_copy );
@@ -156,6 +156,7 @@ is( $schedhistory->eid, $emp->{eid} );
 is( $schedhistory->sid, $schedule->{sid} );
 is( $schedhistory->effective, $today );
 is( $schedhistory->remark, 'TESTING' );
+is( $schedhistory->scode, undef, "scode property not populated yet" );
 
 $status = undef;
 $status = $schedhistory->insert( $faux_context );
@@ -166,7 +167,25 @@ is( $schedhistory->eid, $emp->{eid} );
 is( $schedhistory->sid, $schedule->{sid} );
 like( $schedhistory->effective, qr/$today_ts\+\d{2}/ );
 is( $schedhistory->remark, 'TESTING' );
+is( $schedhistory->scode, undef, "scode property not populated after insert" );
 is( noof( $dbix_conn, 'schedhistory' ), 1 );
+
+note('spawn a new Schedhistory object and load the data into it');
+my $foo_sho = App::Dochazka::REST::Model::Schedhistory->spawn;
+isa_ok( $foo_sho, 'App::Dochazka::REST::Model::Schedhistory', "schedhistory object is an object" );
+$status = $foo_sho->load_by_id( $dbix_conn, $schedhistory->shid );
+is( $status->level, 'OK' );
+$foo_sho->reset( $status->payload );
+
+note('check that same data is now in the new foo object, too');
+ok( $foo_sho->shid > 0, "schedhistory object shid is > 0" );
+is( $foo_sho->eid, $emp->{eid} );
+is( $foo_sho->sid, $schedule->{sid} );
+like( $foo_sho->effective, qr/$today_ts\+\d{2}/ );
+is( $foo_sho->remark, 'TESTING' );
+
+note('And now the scode is populated');
+is( $foo_sho->scode, 'test1', "scode property not populated after insert" );
 
 note('do a dastardly deed (insert the same schedhistory row a second time)');
 my $dastardly_sh = App::Dochazka::REST::Model::Schedhistory->spawn(
@@ -238,7 +257,7 @@ ok( $status->ok );
 is( noof( $dbix_conn, 'schedhistory' ), 0 );
 
 note('2. delete the schedule');
-is( noof( $dbix_conn, 'schedules' ), 1 );
+is( noof( $dbix_conn, 'schedules' ), 2 );
 ok( sid_exists( $dbix_conn, $sid_copy ) );
 $status = $schedule->load_by_sid( $dbix_conn, $sid_copy );
 is( $status->level, 'OK' );
@@ -248,7 +267,7 @@ $status = $schedule->delete( $faux_context );
 diag( $status->text ) unless $status->ok;
 ok( $status->ok );
 ok( ! sid_exists( $dbix_conn, $sid_copy ) );
-is( noof( $dbix_conn, 'schedules' ), 0 );
+is( noof( $dbix_conn, 'schedules' ), 1 );
 
 note('3. delete the employee (Mr. Sched)');
 is( noof( $dbix_conn, 'employees' ), 3, "number of employees == 3" );

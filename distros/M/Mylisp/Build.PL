@@ -14,10 +14,7 @@ my $build = Module::Build->new(
   configure_requires => { 'Module::Build' => 0.42 },
   requires => { 
     'perl' => 5.012,
-    'File::Basename' => 0,
-    'Perl::Tidy' => 0,
-    'File::Find::Wanted' => 0,
-    'Spp'  => 0,
+    'Spp'  => 2.03,
   },
   add_to_cleanup  => [ 'Mylisp-*' ],
   script_files    => ['bin/mylisp'],

@@ -3,8 +3,9 @@ use 5.012;
 use strict;
 use warnings;
 use Parse::RecDescent;
+use List::Util qw//;
 
-our $VERSION = '0.11';
+our $VERSION = '0.20';
 our $Grammar = q{
 
   {
@@ -16,6 +17,10 @@ our $Grammar = q{
       return $opts{value}->[0] if $class eq 'Group' and @{$opts{value}} == 1;
       return $opts{value}->[0] if $class eq 'Choice' and @{$opts{value}} == 1;
 
+      # These aswell
+      return $opts{value}->[0] if $class eq 'Intersection' and @{$opts{value}} == 1;
+      return $opts{value}->[0] if $class eq 'Subtraction' and @{$opts{value}} == 1;
+      
       return { class => $class, %opts };
     }
   }
@@ -89,6 +94,21 @@ our $Grammar = q{
   #
   alternation: concatenation (c_wsp(s?) alt_op c_wsp(s?) concatenation)(s?) {
     $return = Make(Choice => value => [$item[1], @{$item[2]}]);
+  }
+
+  #
+  intersection: subtraction (c_wsp(s?) "&" c_wsp(s?) subtraction)(s?) {
+    $return = Make(Intersection => value => [$item[1], @{$item[2]}]);
+  }
+
+  #
+  subtraction: repetition (c_wsp(s) "-" c_wsp(s) repetition)(?) {
+    $return = Make(Subtraction => value => [$item[1], @{$item[2]}]);
+  }
+  
+  #
+  concatenation_: intersection (c_wsp(s) intersection)(s?) {
+    $return = Make(Group => value => [$item[1], @{$item[2]}]);
   }
 
   #
@@ -211,8 +231,9 @@ sub parse_to_grammar_formal {
   
   require Grammar::Formal;
   my $g = Grammar::Formal->new;
-  
-  my @rules = map { _abnf2g($_, $g) } @$result;
+  my $o = {};
+
+  my @rules = map { _abnf2g($_, $g, $o) } @$result;
 
   ###################################################################
   # Install all rules in the grammar
@@ -238,7 +259,7 @@ sub parse_to_grammar_formal {
     my @todo = values %{ $g->{rules} };
     while (my $c = pop @todo) {
       if ($c->isa('Grammar::Formal::Reference')) {
-        $referenced{$c->ref}++;
+        $referenced{$c->name}++;
       } elsif ($c->isa('Grammar::Formal::Unary')) {
         push @todo, $c->p;
       } elsif ($c->isa('Grammar::Formal::Binary')) {
@@ -246,7 +267,18 @@ sub parse_to_grammar_formal {
       }
     }
     
-    my @core_rules = map { _abnf2g($_, $g) } @$CoreRules;
+    # TODO: might be more sensible to convert the Core rules first
+    # and then simply throw them into the todo list above.
+    
+    $referenced{WSP}++ if $referenced{LWSP};
+    $referenced{CRLF}++ if $referenced{LWSP};
+    $referenced{HTAB}++ if $referenced{WSP};
+    $referenced{SP}++ if $referenced{WSP};
+    $referenced{CR}++ if $referenced{CRLF};
+    $referenced{LF}++ if $referenced{CRLF};
+    $referenced{DIGIT}++ if $referenced{HEXDIG};
+    
+    my @core_rules = map { _abnf2g($_, $g, $o) } @$CoreRules;
 
     for my $rule (@core_rules) {
       next if $g->rules->{$rule->name};
@@ -259,57 +291,67 @@ sub parse_to_grammar_formal {
 }
 
 sub _abnf2g {
-  my ($p, $g, %options) = @_;
+  my ($p, $g, $options) = @_;
+  
+  $options->{pos} //= 1;
+  my $pos = $options->{pos}++;
+  
   for ($p->{class}) {
     if ($_ eq "Group") {
-      my @values = map { _abnf2g($_, $g, %options) } @{ $p->{value} };
+      my @values = map { _abnf2g($_, $g, $options) } @{ $p->{value} };
       my $group = $g->Empty;
       while (@values) {
-        $group = $g->Group(pop(@values), $group);
+        $group = $g->Group(pop(@values), $group, position => $pos);
       }
       return $group;
     }
     elsif ($_ eq "Choice") {
-      my @values = map { _abnf2g($_, $g, %options) } @{ $p->{value} };
+      my @values = map { _abnf2g($_, $g, $options) } @{ $p->{value} };
       my $choice = $g->NotAllowed;
       while (@values) {
-        $choice = $g->Choice(pop(@values), $choice);
+        $choice = $g->Choice(pop(@values), $choice, position => $pos);
       }
       return $choice;
     }
     elsif ($_ eq "Repetition") {
       if (defined $p->{max}) {
-        return Grammar::Formal::BoundRepetition->new(
+        return Grammar::Formal::BoundedRepetition->new(
           min => $p->{min},
           max => $p->{max},
-          p => _abnf2g($p->{value}, $g, %options),
+          p => _abnf2g($p->{value}, $g, $options),
+          position => $pos,
         );
       } else {
         return Grammar::Formal::SomeOrMore->new(
           min => $p->{min},
-          p => _abnf2g($p->{value}, $g, %options),
+          p => _abnf2g($p->{value}, $g, $options),
+          position => $pos,
         );
       }
     }
     elsif ($_ eq "Rule") {
       return Grammar::Formal::Rule->new(
         name => $p->{name},
-        p => _abnf2g($p->{value}, $g, %options),
+        p => _abnf2g($p->{value}, $g, $options),
+        position => $pos,
       );
     }
     elsif ($_ eq "Reference") {
       return Grammar::Formal::Reference->new(
-        ref => $p->{name},
+        name => $p->{name},
+        position => $pos,
       );
     }
     elsif ($_ eq "Literal") {
       return Grammar::Formal::AsciiInsensitiveString->new(
         value => $p->{value},
+        position => $pos,
       );
     }
     elsif ($_ eq "ProseValue") {
       return Grammar::Formal::ProseValue->new(
         value => $p->{value},
+        position => $pos,
       );
     }
     elsif ($_ eq "String") {
@@ -329,12 +371,13 @@ sub _abnf2g {
         Grammar::Formal::Range->new(
           min => $_,
           max => $_,
+          position => $pos,
         )
       } @items;
       
       my $group = $g->Empty;
       while (@values) {
-        $group = $g->Group(pop(@values), $group);
+        $group = $g->Group(pop(@values), $group, position => $pos);
       }
 
       return $group;
@@ -343,10 +386,30 @@ sub _abnf2g {
       return Grammar::Formal::Range->new(
         min => hex $p->{min},
         max => hex $p->{max},
+        position => $pos,
       ) if $p->{type} eq 'hex';
-      die;
+      return Grammar::Formal::Range->new(
+        min => $p->{min},
+        max => $p->{max},
+        position => $pos,
+      ) if $p->{type} eq 'decimal';
+      ...;
     }
-    else {
+    elsif ($_ eq "Intersection") {
+      my @values = map { _abnf2g($_, $g, $options) } @{ $p->{value} };
+      return List::Util::reduce { Grammar::Formal::Intersection->new(
+        p1 => $a,
+        p2 => $b,
+        position => $pos,
+      ) } @values;
+      ...
+    }
+    elsif ($_ eq "Subtraction") {
+      return Grammar::Formal::Subtraction->new(
+        p1 => _abnf2g($p->{value}[0], $g, $options),
+        p2 => _abnf2g($p->{value}[1], $g, $options),
+        position => $pos,
+      );
       ...
     }
   }

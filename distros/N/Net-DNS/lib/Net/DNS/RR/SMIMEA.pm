@@ -1,9 +1,9 @@
 package Net::DNS::RR::SMIMEA;
 
 #
-# $Id: SMIMEA.pm 1571 2017-06-03 20:14:15Z willem $
+# $Id: SMIMEA.pm 1597 2017-09-22 08:04:02Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1571 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
 
 
 use strict;
@@ -39,7 +39,6 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 
-	return '' unless defined $self->{certbin};
 	return pack 'C3 a*', @{$self}{qw(usage selector matchingtype certbin)};
 }
 
@@ -47,7 +46,6 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
-	return '' unless defined $self->{certbin};
 	$self->_annotation( $self->babble ) if BABBLE;
 	my @cert = split /(\S{64})/, $self->cert;
 	my @rdata = ( $self->usage, $self->selector, $self->matchingtype, @cert );
@@ -90,10 +88,8 @@ sub matchingtype {
 
 sub cert {
 	my $self = shift;
-	my @args = map { /[^0-9A-Fa-f]/ ? croak "corrupt hexadecimal" : $_ } @_;
-
-	$self->certbin( pack "H*", join "", @args ) if scalar @args;
-	unpack "H*", $self->certbin() if defined wantarray;
+	return unpack "H*", $self->certbin() unless scalar @_;
+	$self->certbin( pack "H*", map /[^\dA-F]/i ? croak "corrupt hex" : $_, join "", @_ );
 }
 
 

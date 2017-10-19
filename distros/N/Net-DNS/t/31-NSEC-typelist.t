@@ -1,10 +1,11 @@
-# $Id: 31-NSEC-typelist.t 1561 2017-04-19 13:08:13Z willem $	-*-perl-*-
+# $Id: 31-NSEC-typelist.t 1595 2017-09-12 09:10:56Z willem $	-*-perl-*-
 #
 
 use strict;
 use Test::More;
 use Net::DNS;
 use Net::DNS::Parameters;
+local $Net::DNS::Parameters::DNSEXTLANG;			# suppress Extlang type queries
 
 my @prerequisite = qw(
 		Net::DNS::RR::NSEC

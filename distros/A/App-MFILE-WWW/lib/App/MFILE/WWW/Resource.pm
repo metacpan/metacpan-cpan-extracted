@@ -511,6 +511,9 @@ sub _require_js {
 
     # QUnit needs some coaxing to work together with RequireJS
     $r .= 'shim: {';
+    $r .= '    "d3": {';
+    $r .= '        "exports": "d3"';
+    $r .= '    },';
     $r .= '    "QUnit": {';
     $r .= '        exports: "QUnit",';
     $r .= '        init: function () {';

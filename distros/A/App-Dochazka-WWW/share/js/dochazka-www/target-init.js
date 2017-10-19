@@ -38,6 +38,7 @@
 
 define ([
     'target',
+    'app/act-lib',
     'app/daction-init',
     'app/dform-init',
     'app/dmenu-init',
@@ -49,6 +50,7 @@ define ([
     'stack'
 ], function (
     target,
+    actLib,
     dactionInitRoundOne,
     dformInitRoundOne,
     dmenuInitRoundOne,
@@ -81,6 +83,9 @@ define ([
         initRoundTwo('dnotice');
         initRoundTwo('dtable');
         initRoundTwo('drowselect');
+
+        // populate activities cache
+        actLib.populateActivitiesCache();
 
         // fire up the main menu
         stack.push('mainMenu');

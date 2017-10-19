@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::App::Command::log::head;
-$Footprintless::App::Command::log::head::VERSION = '1.25';
+$Footprintless::App::Command::log::head::VERSION = '1.26';
 # ABSTRACT: output the first part of a file
 # PODNAME: Footprintless::App::Command::log::head
 
@@ -51,7 +51,7 @@ Footprintless::App::Command::log::head - output the first part of a file
 
 =head1 VERSION
 
-version 1.25
+version 1.26
 
 =head1 AUTHOR
 

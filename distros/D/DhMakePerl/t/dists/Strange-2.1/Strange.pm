@@ -52,7 +52,7 @@ __END__
 
 =head1 NAME
 
-Strange - Perl extension for blah blah blah
+Strange - A Perl extension for blah blah blah
 
 =head1 SYNOPSIS
 

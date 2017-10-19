@@ -1,21 +1,33 @@
-# $Id: 07-zonefile.t 1555 2017-03-22 09:47:16Z willem $	-*-perl-*-
+# $Id: 07-zonefile.t 1601 2017-10-10 14:17:01Z willem $	-*-perl-*-
 
 use strict;
 use IO::File;
 
 use Test::More tests => 91;
 
+					## vvv	verbatim from Domain.pm
+use constant ASCII => ref eval {
+	require Encode;
+	Encode::find_encoding('ascii');
+};
 
 use constant UTF8 => scalar eval {	## not UTF-EBCDIC  [see UTR#16 3.6]
-	require Encode;
 	Encode::encode_utf8( chr(182) ) eq pack( 'H*', 'C2B6' );
 };
 
-use constant LIBIDN => defined eval { require Net::LibIDN; };
+use constant LIBIDN  => defined eval 'require Net::LibIDN';
+use constant LIBIDN2 => ref eval 'require Net::LibIDN2; Net::LibIDN2->can("idn2_to_ascii_8")';
+					## ^^^	verbatim from Domain.pm
+
 
 use constant LIBIDNOK => LIBIDN && scalar eval {
 	my $cn = pack( 'U*', 20013, 22269 );
 	Net::LibIDN::idn_to_ascii( $cn, 'utf-8' ) eq 'xn--fiqs8s';
+};
+
+use constant LIBIDN2OK => LIBIDN2 && scalar eval {
+	my $cn = pack( 'U*', 20013, 22269 );
+	Net::LibIDN2::idn2_to_ascii_8( $cn, 9 ) eq 'xn--fiqs8s';
 };
 
 
@@ -477,7 +489,7 @@ SKIP: {					## Non-ASCII zone content
 	is( $txtgr->txtdata, $text, 'ISO8859-7 TXT rdata' );
 
 	eval { binmode(DATA) };					# suppress encoding layer
-	my $jptxt = <DATA>;
+	my $jptxt = join "\n", <DATA>;
 	my $file2 = source($jptxt);
 	my $fh2	  = new IO::File( $file2->name, '<:utf8' );	# UTF-8 character encoding
 	my $zone2 = new Net::DNS::ZoneFile($fh2);
@@ -487,13 +499,10 @@ SKIP: {					## Non-ASCII zone content
 	is( length($rdata), 12, 'Unicode/UTF-8 TXT rdata' );
 	is( scalar(@rdata), 1,	'Unicode/UTF-8 TXT contiguous' );
 
-	skip( 'Non-ASCII domain - Net::LibIDN not available', 1 ) unless LIBIDN;
-	skip( 'Non-ASCII domain - Net::LibIDN not working',   1 ) unless LIBIDNOK;
+	skip( 'Non-ASCII domain - IDNA not supported', 1 ) unless LIBIDNOK || LIBIDN2OK;
 
-	my $kanji = <DATA>;
-	my $zone3 = source($kanji);
-	my $nextr = $zone3->read;				# NULL RR with kanji owner name
-	is( $nextr->name, 'xn--wgv71a', 'Unicode/UTF-8 domain name' );
+	my $jpnull = $zone2->read;				# NULL RR with kanji owner name
+	is( $jpnull->name, 'xn--wgv71a', 'Unicode/UTF-8 domain name' );
 }
 
 

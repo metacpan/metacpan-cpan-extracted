@@ -37,58 +37,15 @@
 "use strict";
 
 define ([
+    'app/entries',
     'lib',
-    'target'
+    'target',
 ], function (
+    entries,
     lib,
-    target
+    target,
 ) {
 
-    //
-    // define dform entries here
-    //
-    var entries = {        
-
-        // read-only form entry no. 1
-        'ROFormEntry1': {
-            name: 'ROFormEntry1',
-            aclProfileRead: 'passerby',
-            aclProfileWrite: null,
-            text: 'RO Entry 1',
-            prop: 'roentry1',
-            maxlen: 20
-        },
-
-        // read-write form entry no. 1
-        'RWFormEntry1': {
-            name: 'RWFormEntry1',
-            aclProfileRead: 'passerby',
-            aclProfileWrite: 'passerby',
-            text: 'RW Entry 1',
-            prop: 'rwentry1',
-            maxlen: 20
-        },
-
-        // demoEditFromBrowser
-        'RWprop1': {
-            name: 'RWProp1',
-            aclProfileRead: 'passerby',
-            aclProfileWrite: 'passerby',
-            text: 'prop1',
-            prop: 'prop1',
-            maxlen: 20
-        },
-        'RWprop2': {
-            name: 'RWProp2',
-            aclProfileRead: 'passerby',
-            aclProfileWrite: 'passerby',
-            text: 'prop2',
-            prop: 'prop2',
-            maxlen: 20
-        }
-
-    };
-    
     return function () {
         //
         // push dform object definitions onto 'target' here
@@ -128,7 +85,6 @@ define ([
             'title': 'Demo edit from rowselect',
             'preamble': 'This is just an illustration',
             'aclProfile': 'passerby',
-            'entriesRead': null,
             'entriesWrite': [entries.RWprop1, entries.RWprop2],
             'miniMenu': {
                 entries: ['saveToRowselect']

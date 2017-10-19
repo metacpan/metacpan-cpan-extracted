@@ -1,5 +1,9 @@
 Revision history for Perl module Footprintless
 
+1.26 2017-10-13
+
+    - added support for 127 subnet including from /etc/hosts
+
 1.25 2017-07-10
 
     - resolved https://github.com/lucastheisen/footprintless/issues/4 get_entity fails if value is falsey

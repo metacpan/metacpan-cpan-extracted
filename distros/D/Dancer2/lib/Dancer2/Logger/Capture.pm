@@ -1,6 +1,6 @@
 package Dancer2::Logger::Capture;
 # ABSTRACT: Capture dancer logs
-$Dancer2::Logger::Capture::VERSION = '0.205001';
+$Dancer2::Logger::Capture::VERSION = '0.205002';
 use Moo;
 use Dancer2::Logger::Capture::Trap;
 
@@ -38,7 +38,7 @@ Dancer2::Logger::Capture - Capture dancer logs
 
 =head1 VERSION
 
-version 0.205001
+version 0.205002
 
 =head1 SYNOPSIS
 
@@ -80,6 +80,7 @@ It's primary purpose is for testing. Here is an example of a test:
     use Test::More;
     use Plack::Test;
     use HTTP::Request::Common;
+    use Ref::Util qw<is_coderef>;
 
     {
         package App;
@@ -96,7 +97,7 @@ It's primary purpose is for testing. Here is an example of a test:
     }
 
     my $app = Dancer2->psgi_app;
-    is( ref $app, 'CODE', 'Got app' );
+    ok( is_coderef($app), 'Got app' );
 
     test_psgi $app, sub {
         my $cb = shift;

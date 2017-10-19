@@ -18,10 +18,11 @@ requires:
   Class::Load: '0'
   Data::UUID: '1.220'
   DateTime: '1.18'
+  DateTime::Format::ISO8601: '0.08'
   Log::Any: '1.032'
   Moose: '2.1405'
   Scope::Guard: '0.21'
 resources:
   homepage: https://github.com/jeteve/Schedule-LongSteps
   repository: https://github.com/jeteve/Schedule-LongSteps.git
-version: '0.017'
+version: '0.020'

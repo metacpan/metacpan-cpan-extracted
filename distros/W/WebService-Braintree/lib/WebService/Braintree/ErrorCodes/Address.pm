@@ -1,6 +1,7 @@
 package WebService::Braintree::ErrorCodes::Address;
-$WebService::Braintree::ErrorCodes::Address::VERSION = '0.93';
-use strict;
+$WebService::Braintree::ErrorCodes::Address::VERSION = '0.94';
+use 5.010_001;
+use strictures 1;
 
 use constant CannotBeBlank                   => "81801";
 use constant CompanyIsInvalid                => "91821";
@@ -30,3 +31,4 @@ use constant StreetAddressIsTooLong          => "81812";
 use constant TooManyAddressesPerCustomer     => "91818";
 
 1;
+__END__

@@ -1,1 +1,0 @@
-bad inputs at /usr/home/ben/projects/Directory-Diff/examples/synopsis.pl line 8.

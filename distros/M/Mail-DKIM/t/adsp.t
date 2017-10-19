@@ -27,7 +27,7 @@ ok($policy, "new() works");
 
 $policy = Mail::DKIM::AuthorDomainPolicy->parse(
 		String => "dkim=all",
-		Domain => "messiah.edu",
+		Domain => "fake.authmilter.org",
 		);
 ok($policy, "parse() works");
 
@@ -38,7 +38,7 @@ ok($result eq "neutral", "got expected result");
 
 $policy = Mail::DKIM::AuthorDomainPolicy->parse(
 		String => "dkim=discardable",
-		Domain => "messiah.edu",
+		Domain => "fake.authmilter.org",
 		);
 ok($policy, "parse() works");
 

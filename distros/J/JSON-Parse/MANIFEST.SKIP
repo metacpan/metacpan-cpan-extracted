@@ -1,4 +1,4 @@
-build\.pl
+(build|make-pod|clean|make-errors|run)\.pl
 blib/.*
 .gitignore
 .git/.*
@@ -13,7 +13,6 @@ MYMETA..*
 ^test-empty-string\.pl$
 ^xt/.*
 ^lib/JSON/Parse\.pod\.tmpl$
-^run\.pl$
 ^Parse\.bs$
 # Can download from github if needed.
 benchmarks

@@ -141,8 +141,6 @@ json_parse_run (json_parse_t * parser, SV * json)
 
     check_end (parser);
 
- noendcheck:
-
     return r;
 }
 
@@ -300,15 +298,23 @@ static void
 tokenize_free (json_token_t * token)
 {
     json_token_t * next;
-
+//    static int nfree;
     next = token->child;
     if (next) {
-	tokenize_free (next);
+	if (! next->blessed) {
+	    tokenize_free (next);
+	}
+	token->child = 0;
     }
     next = token->next;
     if (next) {
-	tokenize_free (next);
+	if (! next->blessed) {
+	    tokenize_free (next);
+	}
+	token->next = 0;
     }
+//    nfree++;
+//    fprintf (stderr, "Free %d %p\n", nfree, token);
     Safefree (token);
 }
 

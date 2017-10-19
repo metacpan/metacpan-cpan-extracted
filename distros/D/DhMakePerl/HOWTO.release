@@ -1,3 +1,8 @@
+NOTE: most of the steps here refer to Alioth and CPAN, i.e. to the time,
+when dh-make-perl was a non-native package (0.66 - 0.90).
+Some parts are still of interest.
+
+
 * run
     make orig
   this will create ../dh-make-perl_$VERSION.orig.tar.gz and
@@ -27,6 +32,9 @@
     git grep $ver
     sed -i -e 's/$ver/$ver+1/' file...
     git ci -a -m'increment version to $ver+1'
+
+    example for a one-liner:
+    git grep 'our $VERSION' | cut -f1 -d: | uniq | xargs perl -pi -e "s{(our.+VERSION) = '0.\d\d';}{\$1 = '0.91';}g"
 
 * push
     dpt push

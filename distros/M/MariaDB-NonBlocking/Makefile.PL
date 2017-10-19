@@ -74,7 +74,7 @@ sub find_file_in {
     foreach my $dir ( @dirs ) {
         my @try_in = (
             $dir,
-            map scalar File::Spec->catdir($dir, $_), qw/mysql mysqldb maria mariadb/,
+            map scalar File::Spec->catdir($dir, $_), qw/mariadb maria mysqldb mysql/,
         );
 
         for my $path (@try_in) {
@@ -172,7 +172,7 @@ foreach my $wanted_lib (@wanted_libs) {
     }
 }
 
-$inc .= ' ' . join " ", map '-I'.$_, find_incpath_for('mysql.h');
+$inc = join " ", map('-I'.$_, find_incpath_for('mysql.h')), $inc;
 
 WriteMakefile(
     NAME             => 'MariaDB::NonBlocking',

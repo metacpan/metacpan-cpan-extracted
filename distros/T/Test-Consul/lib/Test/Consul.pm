@@ -1,5 +1,5 @@
 package Test::Consul;
-$Test::Consul::VERSION = '0.011';
+$Test::Consul::VERSION = '0.012';
 # ABSTRACT: Run a consul server for testing
 
 use 5.010;
@@ -10,7 +10,7 @@ use JSON::MaybeXS qw(JSON encode_json);
 use Path::Tiny;
 use POSIX qw(WNOHANG);
 use Carp qw(croak);
-use HTTP::Tiny;
+use HTTP::Tiny v0.014;
 use Net::EmptyPort qw( check_port );
 use File::Temp qw( tempfile );
 use Scalar::Util qw( blessed );
@@ -205,7 +205,7 @@ sub start {
     }
     else {
       push @opts, '-dev';
-      $configpath = path( ( tempfile() )[1] );
+      $configpath = path( ( tempfile(SUFFIX => '.json') )[1] );
     }
 
     $configpath->spew( encode_json(\%config) );
@@ -270,7 +270,7 @@ sub wan_join {
     my $port = $self->port;
     my $other_wan_port = $other->serf_wan_port;
 
-    my $res = $http->get("http://127.0.0.1:$port/v1/agent/join/127.0.0.1:$other_wan_port?wan=1");
+    my $res = $http->put("http://127.0.0.1:$port/v1/agent/join/127.0.0.1:$other_wan_port?wan=1");
     unless ($res->{success}) {
         croak "WAN join failed: $res->{status} $res->{reason}"
     }

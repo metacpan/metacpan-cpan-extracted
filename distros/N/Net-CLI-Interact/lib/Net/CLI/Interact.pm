@@ -1,11 +1,10 @@
 package Net::CLI::Interact;
+{ $Net::CLI::Interact::VERSION = '2.300002' }
 
 use Moo;
 use Sub::Quote;
 use Class::Load ();
 use MooX::Types::MooseLike::Base qw(InstanceOf Maybe Str HashRef);
-
-our $VERSION = '2.300000';
 
 with 'Net::CLI::Interact::Role::Engine';
 

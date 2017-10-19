@@ -7,7 +7,7 @@
 #########################
 
 use strict;
-use warnings FATAL => 'all';
+use warnings;
 
 # perl version which needs "use utf8;" for comparing utf8 and latin1 strings
 BEGIN {
@@ -19,10 +19,18 @@ use Carp;
 $Carp::Internal{'Test::Builder'} = 1;
 $Carp::Internal{'Test::More'} = 1;
 
-use Test::More tests => 358;
+use Test::More tests => 453;
+use Test::Builder;
+
+local $SIG{__WARN__} = sub {
+	local $Test::Builder::Level = $Test::Builder::Level + 1;
+	fail('following test does not throw warning');
+	warn $_[0];
+};
 
 sub with_warning(&) {
 	my ($code) = @_;
+	local $Test::Builder::Level = $Test::Builder::Level + 1;
 	my $warn;
 	local $SIG{__WARN__} = sub { $warn = 1; };
 	my @ret = wantarray ? $code->() : scalar $code->();
@@ -66,6 +74,7 @@ my $obj_to_hashstr = \&obj_to_hashstr;
 	{
 		my $subtest = 'test method new() without arguments';
 		my $address = Email::Address::XS->new();
+		ok(!$address->is_valid(), $subtest);
 		is($address->phrase(), undef, $subtest);
 		is($address->user(), undef, $subtest);
 		is($address->host(), undef, $subtest);
@@ -78,6 +87,7 @@ my $obj_to_hashstr = \&obj_to_hashstr;
 	{
 		my $subtest = 'test method new() with one argument';
 		my $address = Email::Address::XS->new('Addressless Outer Party Member');
+		ok(!$address->is_valid(), $subtest);
 		is($address->phrase(), 'Addressless Outer Party Member', $subtest);
 		is($address->user(), undef, $subtest);
 		is($address->host(), undef, $subtest);
@@ -90,6 +100,7 @@ my $obj_to_hashstr = \&obj_to_hashstr;
 	{
 		my $subtest = 'test method new() with two arguments as array';
 		my $address = Email::Address::XS->new(undef, 'user@oceania');
+		ok($address->is_valid(), $subtest);
 		is($address->phrase(), undef, $subtest);
 		is($address->user(), 'user', $subtest);
 		is($address->host(), 'oceania', $subtest);
@@ -102,6 +113,7 @@ my $obj_to_hashstr = \&obj_to_hashstr;
 	{
 		my $subtest = 'test method new() with two arguments as hash';
 		my $address = Email::Address::XS->new(address => 'winston.smith@recdep.minitrue');
+		ok($address->is_valid(), $subtest);
 		is($address->phrase(), undef, $subtest);
 		is($address->user(), 'winston.smith', $subtest);
 		is($address->host(), 'recdep.minitrue', $subtest);
@@ -114,6 +126,7 @@ my $obj_to_hashstr = \&obj_to_hashstr;
 	{
 		my $subtest = 'test method new() with two arguments as array';
 		my $address = Email::Address::XS->new(Julia => 'julia@ficdep.minitrue');
+		ok($address->is_valid(), $subtest);
 		is($address->phrase(), 'Julia', $subtest);
 		is($address->user(), 'julia', $subtest);
 		is($address->host(), 'ficdep.minitrue', $subtest);
@@ -126,6 +139,7 @@ my $obj_to_hashstr = \&obj_to_hashstr;
 	{
 		my $subtest = 'test method new() with three arguments';
 		my $address = Email::Address::XS->new('Winston Smith', 'winston.smith@recdep.minitrue', 'Records Department');
+		ok($address->is_valid(), $subtest);
 		is($address->phrase(), 'Winston Smith', $subtest);
 		is($address->user(), 'winston.smith', $subtest);
 		is($address->host(), 'recdep.minitrue', $subtest);
@@ -138,6 +152,7 @@ my $obj_to_hashstr = \&obj_to_hashstr;
 	{
 		my $subtest = 'test method new() with four arguments user & host as hash';
 		my $address = Email::Address::XS->new(user => 'julia', host => 'ficdep.minitrue');
+		ok($address->is_valid(), $subtest);
 		is($address->phrase(), undef, $subtest);
 		is($address->user(), 'julia', $subtest);
 		is($address->host(), 'ficdep.minitrue', $subtest);
@@ -150,6 +165,7 @@ my $obj_to_hashstr = \&obj_to_hashstr;
 	{
 		my $subtest = 'test method new() with four arguments phrase & address as hash';
 		my $address = Email::Address::XS->new(phrase => 'Julia', address => 'julia@ficdep.minitrue');
+		ok($address->is_valid(), $subtest);
 		is($address->phrase(), 'Julia', $subtest);
 		is($address->user(), 'julia', $subtest);
 		is($address->host(), 'ficdep.minitrue', $subtest);
@@ -162,6 +178,7 @@ my $obj_to_hashstr = \&obj_to_hashstr;
 	{
 		my $subtest = 'test method new() with four arguments as array';
 		my $address = with_warning { Email::Address::XS->new('Julia', 'julia@ficdep.minitrue', 'Fiction Department', 'deprecated_original_string') };
+		ok($address->is_valid(), $subtest);
 		is($address->phrase(), 'Julia', $subtest);
 		is($address->user(), 'julia', $subtest);
 		is($address->host(), 'ficdep.minitrue', $subtest);
@@ -174,6 +191,7 @@ my $obj_to_hashstr = \&obj_to_hashstr;
 	{
 		my $subtest = 'test method new() with four arguments as hash (phrase is string "address")';
 		my $address = Email::Address::XS->new(phrase => 'address', address => 'user@oceania');
+		ok($address->is_valid(), $subtest);
 		is($address->phrase(), 'address', $subtest);
 		is($address->user(), 'user', $subtest);
 		is($address->host(), 'oceania', $subtest);
@@ -187,6 +205,8 @@ my $obj_to_hashstr = \&obj_to_hashstr;
 		my $subtest = 'test method new() with copy argument';
 		my $address = Email::Address::XS->new(phrase => 'Julia', address => 'julia@ficdep.minitrue');
 		my $copy = Email::Address::XS->new(copy => $address);
+		ok($address->is_valid(), $subtest);
+		ok($copy->is_valid(), $subtest);
 		is($copy->phrase(), 'Julia', $subtest);
 		is($copy->user(), 'julia', $subtest);
 		is($copy->host(), 'ficdep.minitrue', $subtest);
@@ -213,6 +233,7 @@ my $obj_to_hashstr = \&obj_to_hashstr;
 	{
 		my $subtest = 'test method new() with invalid email address';
 		my $address = Email::Address::XS->new(address => 'invalid_address');
+		ok(!$address->is_valid(), $subtest);
 		is($address->phrase(), undef, $subtest);
 		is($address->user(), undef, $subtest);
 		is($address->host(), undef, $subtest);
@@ -223,8 +244,17 @@ my $obj_to_hashstr = \&obj_to_hashstr;
 	}
 
 	{
+		my $subtest = 'test method new() with copy argument of invalid email address';
+		my $address = Email::Address::XS->new(address => 'invalid_address');
+		my $copy = Email::Address::XS->new(copy => $address);
+		ok(!$address->is_valid(), $subtest);
+		ok(!$copy->is_valid(), $subtest);
+	}
+
+	{
 		my $subtest = 'test method new() with empty strings for user and host and non empty for phrase';
 		my $address = Email::Address::XS->new(user => '', host => '', phrase => 'phrase');
+		ok(!$address->is_valid(), $subtest);
 		is($address->phrase(), 'phrase', $subtest);
 		is($address->user(), '', $subtest);
 		is($address->host(), '', $subtest);
@@ -237,6 +267,7 @@ my $obj_to_hashstr = \&obj_to_hashstr;
 	{
 		my $subtest = 'test method new() with all named arguments';
 		my $address = Email::Address::XS->new(phrase => 'Julia', user => 'julia', host => 'ficdep.minitrue', comment => 'Fiction Department');
+		ok($address->is_valid(), $subtest);
 		is($address->phrase(), 'Julia', $subtest);
 		is($address->user(), 'julia', $subtest);
 		is($address->host(), 'ficdep.minitrue', $subtest);
@@ -518,23 +549,200 @@ my $obj_to_hashstr = \&obj_to_hashstr;
 		'test method parse() on empty string',
 	);
 
-	is_deeply(
-		[ Email::Address::XS->parse('invalid_line') ],
-		[ Email::Address::XS->new(phrase => 'invalid_line') ],
-		'test method parse() on invalid not parsable line',
-	);
+	{
+		my $subtest = 'test method parse() on invalid not parsable line';
+		my @addresses = Email::Address::XS->parse('invalid_line');
+		is_deeply(
+			\@addresses,
+			[ Email::Address::XS->new(phrase => 'invalid_line') ],
+			$subtest,
+		) and do {
+			ok(!$addresses[0]->is_valid(), $subtest);
+			is($addresses[0]->original(), 'invalid_line', $subtest);
+		};
+	}
 
-	is_deeply(
-		[ Email::Address::XS->parse('"Winston Smith" <winston.smith@recdep.minitrue>, Julia <julia@ficdep.minitrue>, user@oceania') ],
-		[ Email::Address::XS->new(phrase => 'Winston Smith', address => 'winston.smith@recdep.minitrue'), Email::Address::XS->new(phrase => 'Julia', address => 'julia@ficdep.minitrue'), Email::Address::XS->new(address => 'user@oceania') ],
-		'test method parse() on string with valid addresses',
-	);
+	{
+		my $subtest = 'test method parse() on string with valid addresses';
+		my @addresses = Email::Address::XS->parse('"Winston Smith" <winston.smith@recdep.minitrue>, Julia <julia@ficdep.minitrue>, user@oceania');
+		is_deeply(
+			\@addresses,
+			[
+				Email::Address::XS->new(phrase => 'Winston Smith', address => 'winston.smith@recdep.minitrue'),
+				Email::Address::XS->new(phrase => 'Julia', address => 'julia@ficdep.minitrue'),
+				Email::Address::XS->new(address => 'user@oceania')
+			],
+			$subtest,
+		) and do {
+			ok($addresses[0]->is_valid(), $subtest);
+			ok($addresses[1]->is_valid(), $subtest);
+			ok($addresses[2]->is_valid(), $subtest);
+			is($addresses[0]->original(), '"Winston Smith" <winston.smith@recdep.minitrue>', $subtest);
+			is($addresses[1]->original(), 'Julia <julia@ficdep.minitrue>', $subtest);
+			is($addresses[2]->original(), 'user@oceania', $subtest);
+		};
+	}
 
-	is_deeply(
-		scalar Email::Address::XS->parse('"Winston Smith" <winston.smith@recdep.minitrue>, Julia <julia@ficdep.minitrue>, user@oceania'),
-		Email::Address::XS->new(phrase => 'Winston Smith', address => 'winston.smith@recdep.minitrue'),
-		'test method parse() in scalar context',
-	);
+	{
+		my $subtest = 'test method parse() in scalar context on empty string';
+		my $address = Email::Address::XS->parse('');
+		ok(!$address->is_valid(), $subtest);
+		is($address->original(), '', $subtest);
+		is($address->phrase(), undef, $subtest);
+		is($address->address(), undef, $subtest);
+	}
+
+	{
+		my $subtest = 'test method parse() in scalar context with one address';
+		my $address = Email::Address::XS->parse('"Winston Smith" <winston.smith@recdep.minitrue>');
+		ok($address->is_valid(), $subtest);
+		is($address->original(), '"Winston Smith" <winston.smith@recdep.minitrue>', $subtest);
+		is($address->phrase(), 'Winston Smith', $subtest);
+		is($address->address(), 'winston.smith@recdep.minitrue', $subtest);
+	}
+
+	{
+		my $subtest = 'test method parse() in scalar context with more addresses';
+		my $address = Email::Address::XS->parse('"Winston Smith" <winston.smith@recdep.minitrue>, Julia <julia@ficdep.minitrue>, user@oceania');
+		ok(!$address->is_valid(), $subtest);
+		is($address->original(), '"Winston Smith" <winston.smith@recdep.minitrue>', $subtest);
+		is($address->phrase(), 'Winston Smith', $subtest);
+		is($address->address(), 'winston.smith@recdep.minitrue', $subtest);
+	}
+
+}
+
+#########################
+
+{
+
+	{
+		my $subtest = 'test method parse_bare_address() without argument';
+		my $address = with_warning { Email::Address::XS->parse_bare_address() };
+		ok(!$address->is_valid(), $subtest);
+		is($address->original(), undef, $subtest);
+		is($address->address(), undef, $subtest);
+	}
+
+	{
+		my $subtest = 'test method parse_bare_address() with undef argument';
+		my $address = with_warning { Email::Address::XS->parse_bare_address(undef) };
+		ok(!$address->is_valid(), $subtest);
+		is($address->original(), undef, $subtest);
+		is($address->address(), undef, $subtest);
+	}
+
+	{
+		my $subtest = 'test method parse_bare_address() on empty string';
+		my $address = Email::Address::XS->parse_bare_address('');
+		ok(!$address->is_valid(), $subtest);
+		is($address->original(), '', $subtest);
+		is($address->address(), undef, $subtest);
+	}
+
+	{
+		my $subtest = 'test method parse_bare_address() on invalid not parsable address';
+		my $address = Email::Address::XS->parse_bare_address('invalid_line');
+		ok(!$address->is_valid(), $subtest);
+		is($address->original(), 'invalid_line', $subtest);
+		is($address->address(), undef, $subtest);
+	}
+
+	{
+		my $subtest = 'test method parse_bare_address() on invalid input string - address with angle brackets';
+		my $address = Email::Address::XS->parse_bare_address('<winston.smith@recdep.minitrue>');
+		ok(!$address->is_valid(), $subtest);
+		is($address->original(), '<winston.smith@recdep.minitrue>', $subtest);
+		is($address->address(), undef, $subtest);
+	}
+
+	{
+		my $subtest = 'test method parse_bare_address() on invalid input string - phrase with address';
+		my $address = Email::Address::XS->parse_bare_address('Winston Smith <winston.smith@recdep.minitrue>');
+		ok(!$address->is_valid(), $subtest);
+		is($address->original(), 'Winston Smith <winston.smith@recdep.minitrue>', $subtest);
+		is($address->address(), undef, $subtest);
+	}
+
+	{
+		my $subtest = 'test method parse_bare_address() on invalid input string - two addresses';
+		my $address = Email::Address::XS->parse_bare_address('winston.smith@recdep.minitrue, julia@ficdep.minitrue');
+		ok(!$address->is_valid(), $subtest);
+		is($address->original(), 'winston.smith@recdep.minitrue, julia@ficdep.minitrue', $subtest);
+		is($address->address(), undef, $subtest);
+	}
+
+	{
+		my $subtest = 'test method parse_bare_address() on invalid input string - two addresses';
+		my $address = Email::Address::XS->parse_bare_address('winston.smith@recdep.minitrue, julia@ficdep.minitrue');
+		ok(!$address->is_valid(), $subtest);
+		is($address->original(), 'winston.smith@recdep.minitrue, julia@ficdep.minitrue', $subtest);
+		is($address->address(), undef, $subtest);
+	}
+
+	{
+		my $subtest = 'test method parse_bare_address() on valid input string';
+		my $address = Email::Address::XS->parse_bare_address('winston.smith@recdep.minitrue');
+		ok($address->is_valid(), $subtest);
+		is($address->original(), 'winston.smith@recdep.minitrue', $subtest);
+		is($address->address(), 'winston.smith@recdep.minitrue', $subtest);
+	}
+
+	{
+		my $subtest = 'test method parse_bare_address() on valid input string with comment';
+		my $address = Email::Address::XS->parse_bare_address('winston.smith@recdep.minitrue(comment)');
+		ok($address->is_valid(), $subtest);
+		is($address->original(), 'winston.smith@recdep.minitrue(comment)', $subtest);
+		is($address->address(), 'winston.smith@recdep.minitrue', $subtest);
+	}
+
+	{
+		my $subtest = 'test method parse_bare_address() on valid input string with comment';
+		my $address = Email::Address::XS->parse_bare_address('winston.smith@recdep.minitrue (comment)');
+		ok($address->is_valid(), $subtest);
+		is($address->original(), 'winston.smith@recdep.minitrue (comment)', $subtest);
+		is($address->address(), 'winston.smith@recdep.minitrue', $subtest);
+	}
+
+	{
+		my $subtest = 'test method parse_bare_address() on valid input string with comment';
+		my $address = Email::Address::XS->parse_bare_address('(comment)winston.smith@recdep.minitrue');
+		ok($address->is_valid(), $subtest);
+		is($address->original(), '(comment)winston.smith@recdep.minitrue', $subtest);
+		is($address->address(), 'winston.smith@recdep.minitrue', $subtest);
+	}
+
+	{
+		my $subtest = 'test method parse_bare_address() on valid input string with comment';
+		my $address = Email::Address::XS->parse_bare_address('(comment) winston.smith@recdep.minitrue');
+		ok($address->is_valid(), $subtest);
+		is($address->original(), '(comment) winston.smith@recdep.minitrue', $subtest);
+		is($address->address(), 'winston.smith@recdep.minitrue', $subtest);
+	}
+
+	{
+		my $subtest = 'test method parse_bare_address() on valid input string with two comments';
+		my $address = Email::Address::XS->parse_bare_address('(comment)winston.smith@recdep.minitrue(comment)');
+		ok($address->is_valid(), $subtest);
+		is($address->original(), '(comment)winston.smith@recdep.minitrue(comment)', $subtest);
+		is($address->address(), 'winston.smith@recdep.minitrue', $subtest);
+	}
+
+	{
+		my $subtest = 'test method parse_bare_address() on valid input string with two comments';
+		my $address = Email::Address::XS->parse_bare_address('(comment) winston.smith@recdep.minitrue (comment)');
+		ok($address->is_valid(), $subtest);
+		is($address->original(), '(comment) winston.smith@recdep.minitrue (comment)', $subtest);
+		is($address->address(), 'winston.smith@recdep.minitrue', $subtest);
+	}
+
+	{
+		my $subtest = 'test method parse_bare_address() on valid input string with lot of comments';
+		my $address = Email::Address::XS->parse_bare_address('(comm(e)nt) (co(m)ment) winston (comment) . smith@recdep.minitrue (c(o)mment) (comment)');
+		ok($address->is_valid(), $subtest);
+		is($address->original(), '(comm(e)nt) (co(m)ment) winston (comment) . smith@recdep.minitrue (c(o)mment) (comment)', $subtest);
+		is($address->address(), 'winston.smith@recdep.minitrue', $subtest);
+	}
 
 }
 
@@ -910,6 +1118,7 @@ my $obj_to_hashstr = \&obj_to_hashstr;
 	tie my $str2, 'TieScalarCounter', 'str2';
 	tie my $str3, 'TieScalarCounter', 'str3';
 	tie my $str4, 'TieScalarCounter', 'str4';
+	tie my $str5, 'TieScalarCounter', undef;
 	my $list1 = [ Email::Address::XS->new(), Email::Address::XS->new() ];
 	my $list2 = [ Email::Address::XS->new(), Email::Address::XS->new() ];
 	my $list3 = [ Email::Address::XS->new() ];
@@ -953,6 +1162,11 @@ my $obj_to_hashstr = \&obj_to_hashstr;
 		"str4: L\x{e1}tin1 <L\x{e1}tin1\@L\x{e1}tin1> (L\x{e1}tin1);",
 		'test function format_email_groups() with magic scalars in Latin1',
 	);
+	is(
+		format_email_groups($str5 => []),
+		'',
+		'test function format_email_groups() with magic scalar which is undef',
+	);
 	is(tied($str1)->{fetch}, 1, 'test function format_email_groups() that called GET magic exacly once');
 	is(tied($str2)->{fetch}, 1, 'test function format_email_groups() that called GET magic exacly once');
 	is(tied($str3)->{fetch}, 1, 'test function format_email_groups() that called GET magic exacly once');
@@ -961,6 +1175,8 @@ my $obj_to_hashstr = \&obj_to_hashstr;
 	is(tied($str2)->{store}, 0, 'test function format_email_groups() that did not call SET magic');
 	is(tied($str3)->{store}, 0, 'test function format_email_groups() that did not call SET magic');
 	is(tied($str4)->{store}, 0, 'test function format_email_groups() that did not call SET magic');
+	is(tied($str5)->{fetch}, 1, 'test function format_email_groups() that called GET magic exacly once');
+	is(tied($str5)->{store}, 0, 'test function format_email_groups() that did not call SET magic');
 	foreach ( @{$list1}, @{$list2}, @{$list3}, @{$list4} ) {
 		is(tied($_->{user})->{fetch}, 1, 'test function format_email_groups() that called GET magic exacly once');
 		is(tied($_->{host})->{fetch}, 1, 'test function format_email_groups() that called GET magic exacly once');
@@ -970,17 +1186,6 @@ my $obj_to_hashstr = \&obj_to_hashstr;
 		is(tied($_->{host})->{store}, 0, 'test function format_email_groups() that did not call SET magic');
 		is(tied($_->{phrase})->{store}, 0, 'test function format_email_groups() that did not call SET magic');
 		is(tied($_->{comment})->{store}, 0, 'test function format_email_groups() that did not call SET magic');
-	}
-	{
-		BEGIN { 'warnings'->unimport('uninitialized') if $] < 5.007002 }; # perl version without SvPV_nomg() support when tied undefined scalar generates warning
-		tie my $str5, 'TieScalarCounter', undef;
-		is(
-			format_email_groups($str5 => []),
-			'',
-			'test function format_email_groups() with magic scalar which is undef',
-		);
-		is(tied($str5)->{fetch}, 1, 'test function format_email_groups() that called GET magic exacly once');
-		is(tied($str5)->{store}, 0, 'test function format_email_groups() that did not call SET magic');
 	}
 }
 
@@ -1075,6 +1280,37 @@ my $obj_to_hashstr = \&obj_to_hashstr;
 		'test function parse_email_groups() on string with nested comments and quoted characters',
 	);
 
+}
+
+#########################
+
+{
+	my $undef = undef;
+	is_deeply(
+		[ parse_email_groups("string1\x00string2") ],
+		[ undef, [ Email::Address::XS->new(user => 'string1') ] ],
+		'test function parse_email_groups() on string with nul character',
+	);
+	is(
+		with_warning { format_email_groups($undef => [ Email::Address::XS->new(phrase => "string1\x00string2", user => 'user', host => 'host') ]) },
+		'string1 <user@host>',
+		'test function format_email_groups() with nul character in phrase',
+	);
+	is(
+		with_warning { format_email_groups($undef => [ Email::Address::XS->new(user => "string1\x00string2", host => 'host') ]) },
+		'string1@host',
+		'test function format_email_groups() with nul character in user part of address',
+	);
+	is(
+		with_warning { format_email_groups($undef => [ Email::Address::XS->new(user => 'user', host => "string1\x00string2") ]) },
+		'user@string1',
+		'test function format_email_groups() with nul character in host part of address',
+	);
+	is(
+		with_warning { format_email_groups($undef => [ Email::Address::XS->new(user => 'user', host => 'host', comment => "string1\x00string2") ]) },
+		'user@host (string1)',
+		'test function format_email_groups() with nul character in comment',
+	);
 }
 
 #########################

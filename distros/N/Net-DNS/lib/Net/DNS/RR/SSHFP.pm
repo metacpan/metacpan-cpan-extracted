@@ -1,9 +1,9 @@
 package Net::DNS::RR::SSHFP;
 
 #
-# $Id: SSHFP.pm 1528 2017-01-18 21:44:58Z willem $
+# $Id: SSHFP.pm 1597 2017-09-22 08:04:02Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1528 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
 
 
 use strict;
@@ -36,7 +36,6 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 
-	return '' unless defined $self->{fpbin};
 	pack 'C2 a*', @{$self}{qw(algorithm fptype fpbin)};
 }
 
@@ -44,7 +43,6 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
-	return '' unless defined $self->{fpbin};
 	$self->_annotation( $self->babble ) if BABBLE;
 	my @fprint = split /(\S{64})/, $self->fp;
 	my @rdata = ( $self->algorithm, $self->fptype, @fprint );
@@ -78,10 +76,8 @@ sub fptype {
 
 sub fp {
 	my $self = shift;
-	my @args = map { /[^0-9A-Fa-f]/ ? croak "corrupt hexadecimal" : $_ } @_;
-
-	$self->fpbin( pack "H*", join "", @args ) if scalar @args;
-	unpack "H*", $self->fpbin() if defined wantarray;
+	return unpack "H*", $self->fpbin() unless scalar @_;
+	$self->fpbin( pack "H*", map /[^\dA-F]/i ? croak "corrupt hex" : $_, join "", @_ );
 }
 
 

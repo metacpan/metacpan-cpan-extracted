@@ -22,7 +22,7 @@
          },
          {
             "link" : "L012,T009,W029",
-            "line" : "Hammersmith & City:19,District:42",
+            "line" : "HC:19,District:42",
             "name" : "Aldgate East",
             "id" : "A004"
          },
@@ -84,7 +84,7 @@
             "name" : "Baker Street",
             "id" : "B001",
             "link" : "B018,R004,M005,G008,S023,E011,F004",
-            "line" : "Hammersmith & City:11,Jubilee:14,Metropolitan:9,Bakerloo:17,Circle:11"
+            "line" : "HC:11,Jubilee:14,Metropolitan:9,Bakerloo:17,Circle:11"
          },
          {
             "link" : "C023,T003",
@@ -96,11 +96,11 @@
             "id" : "B003",
             "name" : "Bank",
             "link" : "S002,S024,L013,M011,L012,W008",
-            "line" : "Northern:34,Central:25,Waterloo & City:1,DLR:2",
+            "line" : "Northern:34,Central:25,WC:1,DLR:2",
             "other_link" : "Tunnel:M009"
          },
          {
-            "line" : "Hammersmith & City:16,Metropolitan:4,Circle:16",
+            "line" : "HC:16,Metropolitan:4,Circle:16",
             "link" : "F002,M011",
             "name" : "Barbican",
             "id" : "B004"
@@ -108,7 +108,7 @@
          {
             "id" : "B005",
             "name" : "Barking",
-            "line" : "Hammersmith & City:29,District:52,Overground:78",
+            "line" : "HC:29,District:52,Overground:78",
             "link" : "E006,U003,W037"
          },
          {
@@ -216,7 +216,7 @@
          {
             "id" : "B023",
             "name" : "Bow Road",
-            "line" : "Hammersmith & City:23,District:46",
+            "line" : "HC:23,District:46",
             "link" : "M006,B027"
          },
          {
@@ -241,7 +241,7 @@
             "name" : "Bromley-by-Bow",
             "id" : "B027",
             "link" : "W018,B023",
-            "line" : "Hammersmith & City:24,District:47"
+            "line" : "HC:24,District:47"
          },
          {
             "id" : "B028",
@@ -553,7 +553,7 @@
             "id" : "E006",
             "name" : "East Ham",
             "link" : "U005,B005",
-            "line" : "Hammersmith & City:28,District:51"
+            "line" : "HC:28,District:51"
          },
          {
             "name" : "East India",
@@ -581,7 +581,7 @@
          },
          {
             "link" : "P001,M005,B001",
-            "line" : "Hammersmith & City:10,District:28,Bakerloo:15,Circle:10",
+            "line" : "HC:10,District:28,Bakerloo:15,Circle:10",
             "id" : "E011",
             "name" : "Edgware Road"
          },
@@ -626,7 +626,7 @@
             "name" : "Euston Square",
             "id" : "E018",
             "link" : "G008,K013",
-            "line" : "Hammersmith & City:13,Metropolitan:7,Circle:13"
+            "line" : "HC:13,Metropolitan:7,Circle:13"
          },
          {
             "name" : "Fairlop",
@@ -635,7 +635,7 @@
             "link" : "B006,H004"
          },
          {
-            "line" : "Hammersmith & City:15,Metropolitan:5,Circle:15",
+            "line" : "HC:15,Metropolitan:5,Circle:15",
             "link" : "K013,B004",
             "name" : "Farringdon",
             "id" : "F002"
@@ -698,7 +698,7 @@
             "id" : "G004",
             "name" : "Goldhawk Road",
             "link" : "H005,S004",
-            "line" : "Hammersmith & City:2,Circle:2"
+            "line" : "HC:2,Circle:2"
          },
          {
             "name" : "Goodge Street",
@@ -721,7 +721,7 @@
          {
             "name" : "Great Portland Street",
             "id" : "G008",
-            "line" : "Hammersmith & City:12,Metropolitan:8,Circle:12",
+            "line" : "HC:12,Metropolitan:8,Circle:12",
             "link" : "B001,E018"
          },
          {
@@ -773,7 +773,7 @@
             "line" : "Central:38"
          },
          {
-            "line" : "Hammersmith & City:1,District:11,Piccadilly:28,Circle:1",
+            "line" : "HC:1,District:11,Piccadilly:28,Circle:1",
             "link" : "G004,B007,R001,T011",
             "name" : "Hammersmith",
             "id" : "H005"
@@ -1058,7 +1058,7 @@
             "name" : "King's Cross St. Pancras",
             "id" : "K013",
             "other_link" : "Street:E017",
-            "line" : "Northern:30,Hammersmith & City:14,Victoria:7,Metropolitan:6,Circle:14",
+            "line" : "Northern:30,HC:14,Victoria:7,Metropolitan:6,Circle:14",
             "link" : "H023,E018,F002,A009,R015,C001"
          },
          {
@@ -1075,7 +1075,7 @@
          },
          {
             "link" : "L005,W025",
-            "line" : "Hammersmith & City:6,Circle:6",
+            "line" : "HC:6,Circle:6",
             "id" : "L001",
             "name" : "Ladbroke Grove"
          },
@@ -1098,7 +1098,7 @@
             "id" : "L004"
          },
          {
-            "line" : "Hammersmith & City:5,Circle:5",
+            "line" : "HC:5,Circle:5",
             "link" : "W035,L001",
             "name" : "Latimer Road",
             "id" : "L005"
@@ -1141,7 +1141,7 @@
          },
          {
             "link" : "M011,A003,A004,B003,B014",
-            "line" : "Hammersmith & City:18,Central:26,Metropolitan:2,Circle:18",
+            "line" : "HC:18,Central:26,Metropolitan:2,Circle:18",
             "name" : "Liverpool Street",
             "id" : "L012"
          },
@@ -1195,7 +1195,7 @@
          },
          {
             "link" : "B014,S030,S027,B023",
-            "line" : "Hammersmith & City:22,District:45,Central:28",
+            "line" : "HC:22,District:45,Central:28",
             "id" : "M006",
             "name" : "Mile End"
          },
@@ -1225,7 +1225,7 @@
             "line" : "Metropolitan:27"
          },
          {
-            "line" : "Northern:33,Hammersmith & City:17,Metropolitan:3,Circle:17",
+            "line" : "Northern:33,HC:17,Metropolitan:3,Circle:17",
             "link" : "L012,B004,B003,O002",
             "id" : "M011",
             "name" : "Moorgate"
@@ -1370,7 +1370,7 @@
          },
          {
             "link" : "B008,W007,E011,R010",
-            "line" : "Hammersmith & City:9,District:27,Bakerloo:14,Circle:9",
+            "line" : "HC:9,District:27,Bakerloo:14,Circle:9",
             "id" : "P001",
             "name" : "Paddington"
          },
@@ -1417,7 +1417,7 @@
             "line" : "Metropolitan:24"
          },
          {
-            "line" : "Hammersmith & City:26,District:49",
+            "line" : "HC:26,District:49",
             "link" : "W018,U005",
             "id" : "P009",
             "name" : "Plaistow"
@@ -1532,7 +1532,7 @@
          },
          {
             "link" : "W025,P001",
-            "line" : "Hammersmith & City:8,Circle:8",
+            "line" : "HC:8,Circle:8",
             "id" : "R010",
             "name" : "Royal Oak"
          },
@@ -1586,7 +1586,7 @@
          },
          {
             "link" : "G004,W035",
-            "line" : "Hammersmith & City:3,Circle:3",
+            "line" : "HC:3,Circle:3",
             "name" : "Shepherd's Bush Market",
             "id" : "S004"
          },
@@ -1724,7 +1724,7 @@
          },
          {
             "link" : "W029,M006",
-            "line" : "Hammersmith & City:21,District:44",
+            "line" : "HC:21,District:44",
             "id" : "S027",
             "name" : "Stepney Green"
          },
@@ -1896,7 +1896,7 @@
             "id" : "U005",
             "name" : "Upton Park",
             "link" : "P009,E006",
-            "line" : "Hammersmith & City:27,District:50"
+            "line" : "HC:27,District:50"
          },
          {
             "name" : "Uxbridge",
@@ -1961,7 +1961,7 @@
          {
             "name" : "Waterloo",
             "id" : "W008",
-            "line" : "Northern:29,Jubilee:18,Waterloo & City:2,Bakerloo:23",
+            "line" : "Northern:29,Jubilee:18,WC:2,Bakerloo:23",
             "link" : "E015,L002,W027,S021,B003,K001"
          },
          {
@@ -2020,7 +2020,7 @@
          },
          {
             "link" : "S030,B027,P009,S036,A013",
-            "line" : "Hammersmith & City:25,District:48,Jubilee:26,DLR:27",
+            "line" : "HC:25,District:48,Jubilee:26,DLR:27",
             "name" : "West Ham",
             "id" : "W018"
          },
@@ -2061,7 +2061,7 @@
             "name" : "West Silvertown"
          },
          {
-            "line" : "Hammersmith & City:7,Circle:7",
+            "line" : "HC:7,Circle:7",
             "link" : "L001,R010",
             "id" : "W025",
             "name" : "Westbourne Park"
@@ -2086,7 +2086,7 @@
          },
          {
             "link" : "A004,S027,S002,S005",
-            "line" : "Hammersmith & City:20,District:43,Overground:51",
+            "line" : "HC:20,District:43,Overground:51",
             "id" : "W029",
             "name" : "Whitechapel"
          },
@@ -2121,7 +2121,7 @@
             "link" : "T012,B021"
          },
          {
-            "line" : "Hammersmith & City:4,Circle:4",
+            "line" : "HC:4,Circle:4",
             "link" : "W028,S004,L005",
             "name" : "Wood Lane",
             "id" : "W035"
@@ -2182,7 +2182,7 @@
          {
             "name" : "Hammersmith & City",
             "color" : "#FF69B4",
-            "id" : "Hammersmith & City"
+            "id" : "HC"
          },
          {
             "name" : "Jubilee",
@@ -2217,7 +2217,7 @@
          {
             "name" : "Waterloo & City",
             "color" : "#00CED1",
-            "id" : "Waterloo & City"
+            "id" : "WC"
          }
       ]
    }

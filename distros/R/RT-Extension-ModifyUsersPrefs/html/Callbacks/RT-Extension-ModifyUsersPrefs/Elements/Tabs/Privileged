@@ -1,0 +1,20 @@
+<%INIT>
+# Add a Preferences option to the user menu bar:
+my $request_path = $HTML::Mason::Commands::r->path_info;
+$request_path =~ s!/{2,}!/!g;
+if ($session{'CurrentUser'}->HasRight(Right => 'AdminUsers', Object => RT->System) and $session{'CurrentUser'}->HasRight(Right => 'ShowConfigTab', Object => RT->System) and $request_path =~ m{^(/Admin/Users|/User/(Summary|History)\.html)}) {
+    if ( $DECODED_ARGS->{'id'} && $DECODED_ARGS->{'id'} =~ /^\d+$/ ) {
+        my $id = $DECODED_ARGS->{'id'};
+        my $obj = RT::User->new( $session{'CurrentUser'} );
+        $obj->Load($id);
+
+        if ( $obj and $obj->id ) {
+            my $tabs = PageMenu()->child( 'userprefs' =>
+                title       => loc('Preferences'),
+                description => loc('Set preferences for this user.'),
+                path        => "/Admin/Users/Prefs.html?id=" . $id,
+            );
+        }
+    }
+}
+</%INIT>

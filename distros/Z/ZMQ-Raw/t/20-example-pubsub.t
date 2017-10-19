@@ -14,15 +14,28 @@ if (!$Config{useithreads})
 	exit;
 }
 
-require threads;
+if (!$ENV{AUTHOR_TESTING})
+{
+	diag ("author testing, skipping");
+	ok (1);
+	done_testing;
+	exit;
+}
+
+my $ctx = ZMQ::Raw::Context->new;
+
+my $publisher = ZMQ::Raw::Socket->new ($ctx, ZMQ::Raw->ZMQ_PUB);
+$publisher->setsockopt (ZMQ::Raw::Socket->ZMQ_SNDHWM, 1100000);
+$publisher->bind ('tcp://*:5561');
+
+my $syncservice = ZMQ::Raw::Socket->new ($ctx, ZMQ::Raw->ZMQ_REP);
+$syncservice->bind ('tcp://*:5562');
 
 sub SynchronisedSubscriber
 {
 	my ($id) = @_;
 
 	print STDERR "Started subscriber ($id)\n";
-
-	my $ctx = ZMQ::Raw::Context->new;
 
 	my $subscriber = ZMQ::Raw::Socket->new ($ctx, ZMQ::Raw->ZMQ_SUB);
 	$subscriber->connect ('tcp://localhost:5561');
@@ -48,22 +61,13 @@ sub SynchronisedSubscriber
 }
 
 # Start subscriber threads...
+require threads;
 my @threads;
 for (my $i = 0; $i < 2; ++$i)
 {
 	my $thr = threads->create ('SynchronisedSubscriber', $i);
 	push @threads, $thr;
 }
-
-
-my $ctx = ZMQ::Raw::Context->new;
-
-my $publisher = ZMQ::Raw::Socket->new ($ctx, ZMQ::Raw->ZMQ_PUB);
-$publisher->setsockopt (ZMQ::Raw::Socket->ZMQ_SNDHWM, 1100000);
-$publisher->bind ('tcp://*:5561');
-
-my $syncservice = ZMQ::Raw::Socket->new ($ctx, ZMQ::Raw->ZMQ_REP);
-$syncservice->bind ('tcp://*:5562');
 
 foreach (@threads)
 {

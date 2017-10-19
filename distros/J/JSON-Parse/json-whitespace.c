@@ -123,7 +123,7 @@ static int copy_json (char * p, char * q, json_token_t * t)
 	case json_token_key:
 	case json_token_literal:
 	case json_token_number:
-	    for (c = p + next->start; c <= p + next->end; c++) {
+	    for (c = p + next->start; c < p + next->end; c++) {
 		*q++ = *c;
 	    }
 	    break;

@@ -296,7 +296,13 @@ sub _set_schema {
                 type    => $_->[3],
                 flags   => $_->[4],
                 fields  => [
-                    map { { type => $_->[1], no => $_->[0] } } @{ $_->[5] }
+                    map {
+                        'HASH' eq ref $_ ?
+                                { type => $_->{type},   no => $_->{field} }
+                            :   { type => $_->[1],      no => $_->[0] }
+                    }
+                    
+                    @{ $_->[5] }
                 ]
             }
         }

@@ -1,2 +1,5 @@
+1.0.1
+   * Fixing library dependencies. No change to code just build files
+
 1.0.0
    * First full release of bigWigLib bindings

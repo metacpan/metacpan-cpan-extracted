@@ -1,5 +1,5 @@
 package ZMQ::Raw;
-$ZMQ::Raw::VERSION = '0.03';
+$ZMQ::Raw::VERSION = '0.08';
 use strict;
 use warnings;
 use Carp;
@@ -8,9 +8,13 @@ require XSLoader;
 XSLoader::load ('ZMQ::Raw', $ZMQ::Raw::VERSION);
 
 use ZMQ::Raw::Context;
+use ZMQ::Raw::Curve;
 use ZMQ::Raw::Error;
 use ZMQ::Raw::Message;
+use ZMQ::Raw::Poller;
+use ZMQ::Raw::Proxy;
 use ZMQ::Raw::Socket;
+use ZMQ::Raw::Z85;
 
 sub AUTOLOAD
 {
@@ -34,7 +38,7 @@ sub AUTOLOAD
 <a href="https://travis-ci.org/jacquesg/p5-ZMQ-Raw">
 	<img src="https://travis-ci.org/jacquesg/p5-ZMQ-Raw.svg?branch=master" alt="Build Status: Travis" align="right" />
 </a>
-<a href="https://ci.appveyor.com/project/jacquesg/p5-git-raw">
+<a href="https://ci.appveyor.com/project/jacquesg/p5-zmq-raw">
 	<img src="https://ci.appveyor.com/api/projects/status/ye43ehtq4tabkp32/branch/master?svg=true" alt="Build Status: AppVeyor" align="right" />
 </a>
 <a href="https://coveralls.io/github/jacquesg/p5-ZMQ-Raw">
@@ -48,7 +52,7 @@ ZMQ::Raw - Perl bindings to the ZeroMQ library
 
 =head1 VERSION
 
-version 0.03
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -69,6 +73,12 @@ version 0.03
 	# prints: Response 'world'
 	$responder->send ('world');
 	print "Response '", $requestor->recv(), "'\n";
+
+=head1 METHODS
+
+=head2 has( $feature )
+
+Check if C<$feature> is available.
 
 =head1 CONSTANTS
 
@@ -143,6 +153,20 @@ version 0.03
 =head2 ZMQ_EVENT_MONITOR_STOPPED
 
 =head2 ZMQ_EVENT_ALL
+
+=head2 FEATURE_IPC
+
+=head2 FEATURE_PGM
+
+=head2 FEATURE_TIPC
+
+=head2 FEATURE_NORM
+
+=head2 FEATURE_CURVE
+
+=head2 FEATURE_GSSAPI
+
+=head2 FEATURE_DRAFT
 
 =head1 AUTHOR
 

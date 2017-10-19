@@ -44,7 +44,7 @@ my $exp = <<EOSTR;
 EOSTR
 is $out, $exp, "file listing recursive and textonly";
 
-runcmd("gre -ext=txt -no=simpsons");
+runcmd("gre -ext=txt -noname=simpsons");
 $test = $STDOUT eq <<EOSTR;
 ./fruits.txt
 EOSTR
@@ -58,7 +58,7 @@ $exp = <<EOSTR;
 EOSTR
 is $out, $exp, "file filtering with combos";
 
-runcmd("gre -X");
+runcmd("gre -x");
 $out = join "", map "$_\n", sort split /\n/, $STDOUT;
 $exp = <<EOSTR;
 ./dir1/bar.js
@@ -81,10 +81,6 @@ ok $test, "ignore case";
 runcmd("gre -help");
 $test = $STDOUT =~ /Usage:/;
 ok $test, "help";
-
-runcmd("gre -man");
-$test = $STDOUT =~ /My own take on grep\/ack/;
-ok $test, "man";
 
 runcmd("gre Krusty -A -k");
 $test = $STDOUT eq <<EOSTR;
@@ -115,7 +111,7 @@ $test = $STDOUT eq <<EOSTR;
 EOSTR
 ok $test, "context";
 
-runcmd("gre -combos");
+runcmd("gre -c");
 $test = $STDOUT =~ /^-html\b/m;
 ok $test, "combos";
 
@@ -170,7 +166,7 @@ $test = $STDOUT eq <<EOSTR;
 EOSTR
 ok $test, "print";
 
-runcmd("gre -passthru zard pokemon.mon");
+runcmd("gre -u zard pokemon.mon");
 $test = $STDOUT =~ /Chari${e}zard${e}\nSquirtle\n/m;
 ok $test, "passthru";
 

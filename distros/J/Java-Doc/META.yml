@@ -15,7 +15,7 @@ name: Java-Doc
 provides:
   Java::Doc:
     file: lib/Java/Doc.pm
-    version: '20171011'
+    version: '20171014'
 requires:
   Carp: '0'
   Data::Dump: '0'
@@ -25,4 +25,4 @@ requires:
   Test::More: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '20171011'
+version: '20171014'

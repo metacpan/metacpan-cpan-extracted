@@ -1,9 +1,9 @@
 package Net::DNS::RR::AFSDB;
 
 #
-# $Id: AFSDB.pm 1528 2017-01-18 21:44:58Z willem $
+# $Id: AFSDB.pm 1597 2017-09-22 08:04:02Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1528 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
 
 
 use strict;
@@ -35,7 +35,7 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 	my ( $offset, @opaque ) = @_;
 
-	my $hostname = $self->{hostname} || return '';
+	my $hostname = $self->{hostname};
 	pack 'n a*', $self->subtype, $hostname->encode( $offset + 2, @opaque );
 }
 
@@ -43,7 +43,7 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
-	my $hostname = $self->{hostname} || return '';
+	my $hostname = $self->{hostname};
 	join ' ', $self->subtype, $hostname->string;
 }
 

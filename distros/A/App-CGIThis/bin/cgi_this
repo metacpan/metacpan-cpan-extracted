@@ -1,0 +1,100 @@
+#!/usr/bin/env perl
+
+package
+    cgi_this;
+    
+use strict;
+use warnings;
+use App::CGIThis;
+
+# ABSTRACT: export the current directory as if it were a cgi-bin
+
+App::CGIThis->new->run;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+cgi_this - export the current directory as if it were a cgi-bin
+
+=head1 VERSION
+
+version 0.003
+
+=head1 SYNOPSIS
+
+    ## Export the current directory like a cgi-bin
+    $ cgi_this
+    
+    ## Export the dir_name directory like a cgi-bin
+    $ cgi_this dir_name
+    
+    ## Start the server on a specific port
+    $ cgi_this --port 9001
+    
+    ## Announces the HTTP server via Bonjour with the specified name
+    $ cgi_this --name "My CGI server"
+    
+    ## Inlcude /cgi-bin in your URL
+    $ cgi_this --cgi-bin
+    
+    ## Show documentation about our options
+    $ http_this --help
+    
+    ## Show the entire man page
+    $ http_this --man
+
+=head1 DESCRIPTION
+
+Like L<http_this> and L<https_this>, but converts the directory to a C<cgi-bin>
+and runs every script in it as a CGI script.
+
+=head1 OPTIONS
+
+The following options are available:
+
+=over 4
+
+=item --port PORT
+
+Start the HTTP server ona specific C<PORT>. Default is 3000.
+
+=item --name NAME
+
+Announces the server over Bonjour.
+
+This feature requires the L<Net::Rendezvous::Publish> module and the appropriate
+backend for your operating system, both available from CPAN. If one
+of them cannot be found, a warning message will be displayed.
+
+=item cgi-bin
+
+Include the C</cgi-bin> directory in the URL of your scripts. For the cozy
+legacy feeling.
+
+=item --help
+
+Print information about the script usage and its options.
+
+=item --man
+
+Print the entire man page for the command.
+
+=back
+
+=head1 AUTHOR
+
+simbabque <simbabque@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by simbabque.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

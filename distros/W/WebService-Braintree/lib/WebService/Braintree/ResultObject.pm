@@ -1,7 +1,10 @@
 package WebService::Braintree::ResultObject;
-$WebService::Braintree::ResultObject::VERSION = '0.93';
-use WebService::Braintree::Util qw(is_arrayref is_hashref);
+$WebService::Braintree::ResultObject::VERSION = '0.94';
+use 5.010_001;
+use strictures 1;
+
 use Moose;
+use WebService::Braintree::Util qw(is_arrayref is_hashref);
 
 sub set_attributes_from_hash {
     my ($self, $target, $attributes) = @_;
@@ -27,6 +30,17 @@ sub set_attr_value {
     }
 }
 
+sub build_sub_object {
+    my $self = shift;
+    my ($attributes, %options) = @_;
+    my ($method, $class, $key) = @options{qw/method class key/};
+
+    if (is_hashref($attributes->{$key})) {
+        $self->$method( "WebService::Braintree::${class}"->new($attributes->{$key}) );
+    }
+    delete($attributes->{$key});
+}
+
 sub setup_sub_objects {
     my($self, $target, $params, $sub_objects) = @_;
     while (my($attribute, $class) = each(%$sub_objects)) {
@@ -44,7 +58,6 @@ sub setup_sub_objects {
     }
 }
 
-
 sub credit_card_details { shift->credit_card; }
 sub customer_details { shift->customer; }
 sub billing_details { shift->billing; }
@@ -52,3 +65,4 @@ sub shipping_details { shift->shipping; }
 sub subscription_details { shift->subscription; }
 
 1;
+__END__

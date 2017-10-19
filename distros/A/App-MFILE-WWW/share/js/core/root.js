@@ -46,7 +46,6 @@ define ([
     'login-dialog',
     'stack',
     'app/target-init',
-    'target'
 ], function (
     $,
     cf,
@@ -55,7 +54,6 @@ define ([
     loginDialog,
     stack,
     targetInit,
-    target
 ) {
 
     return function () {

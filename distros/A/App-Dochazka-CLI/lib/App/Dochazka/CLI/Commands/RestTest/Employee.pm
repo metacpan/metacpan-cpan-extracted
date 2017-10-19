@@ -59,22 +59,6 @@ sub _method_employee_count_priv {
     return [ $method, "employee/count/priv", $th->{_REST} ];
 }
 
-# $METHOD employee current
-sub _method_employee_current {
-    my ( $ts, $th ) = @_;
-    my $method = $ts->[0];
-
-    return [ $method, "employee/current", $th->{_REST} ];
-}
-
-# $METHOD employee current priv
-sub _method_employee_current_priv {
-    my ( $ts, $th ) = @_;
-    my $method = $ts->[0];
-
-    return [ $method, "employee/current/priv", $th->{_REST} ];
-}
-
 # $METHOD employee search
 sub _method_employee_search {
     my ( $ts, $th ) = @_;
@@ -100,12 +84,12 @@ sub _method_employee_self {
     return [ $method, "employee/self", $th->{_REST} ];
 }
 
-# $METHOD employee self priv
-sub _method_employee_self_priv {
+# $METHOD employee self full
+sub _method_employee_self_full {
     my ( $ts, $th ) = @_;
     my $method = $ts->[0];
 
-    return [ $method, "employee/self/priv", $th->{_REST} ];
+    return [ $method, "employee/self/full", $th->{_REST} ];
 }
 
 # $METHOD employee eid

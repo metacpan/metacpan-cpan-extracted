@@ -1,6 +1,7 @@
 package WebService::Braintree::ErrorCodes::ApplePay;
-$WebService::Braintree::ErrorCodes::ApplePay::VERSION = '0.93';
-use strict;
+$WebService::Braintree::ErrorCodes::ApplePay::VERSION = '0.94';
+use 5.010_001;
+use strictures 1;
 
 use constant ApplePayCardsAreNotAccepted                      => "83501";
 use constant CustomerIdIsRequiredForVaulting                  => "83502";
@@ -22,3 +23,4 @@ use constant MerchantKeysNotConfigured                        => "93516";
 use constant CertificateInvalid                               => "93517";
 
 1;
+__END__

@@ -2,13 +2,14 @@ use strict;
 use warnings;
 
 package Footprintless::Localhost;
-$Footprintless::Localhost::VERSION = '1.25';
+$Footprintless::Localhost::VERSION = '1.26';
 # ABSTRACT: A localhost alias resolver
 # PODNAME: Footprintless::Localhost
 
 use Log::Any;
 
-my $logger = Log::Any->get_logger();
+my $logger              = Log::Any->get_logger();
+my $loopback_ipv4_regex = qr/127(?:.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}/;
 
 sub new {
     return bless( {}, shift )->_init(@_);
@@ -30,6 +31,7 @@ sub _init {
 
     # what gets returned if is_alias( <falsey> );
     $self->{empty} = exists( $options{empty} ) ? $options{empty} : 1;
+    $self->{etc_hosts_file} = $options{etc_hosts_file} || '/etc/hosts';
 
     $self->_add_alias('localhost')->_add_alias('127.0.0.1')
         unless ( $options{none} );
@@ -45,7 +47,8 @@ sub is_alias {
     my ( $self, $hostname ) = @_;
 
     if ($hostname) {
-        return $self->{aliases}{ lc($hostname) };
+        return ( $self->{loaded}{'127 subnet'} && $hostname =~ /^\s*$loopback_ipv4_regex\s*$/ )
+            || $self->{aliases}{ lc($hostname) };
     }
     else {
         return $self->{empty};
@@ -57,26 +60,32 @@ sub is_loaded {
     return $self->{loaded} && $self->{loaded}{$extra};
 }
 
+sub load_127_subnet {
+    my ($self) = @_;
+    $self->{loaded}{'127 subnet'} = 1;
+    return $self;
+}
+
 sub load_all {
-    shift->load_etc_hosts()->load_hostfqdn()->load_hostname();
+    return shift->load_etc_hosts()->load_hostfqdn()->load_hostname()->load_127_subnet();
 }
 
 sub load_etc_hosts {
-    my ($self) = @_;
+    my ( $self, $etc_hosts_file ) = @_;
+    $etc_hosts_file = $self->{etc_hosts_file} unless ($etc_hosts_file);
 
     if ( !$self->{loaded}{'/etc/hosts'} ) {
 
         # attempt to load aliases from hosts file
-        $logger->debug('loading /etc/hosts');
+        $logger->debug( 'loading /etc/hosts from: %s', $etc_hosts_file );
         eval {
-            require Config::Hosts;
-            $logger->debug('have Config::Hosts');
-            my $hosts = Config::Hosts->new();
-            $hosts->read_hosts();
-            my $one_two_seven = $hosts->query_host('127.0.0.1');
-            if ($one_two_seven) {
-                $self->_add_alias($_) foreach @{ $one_two_seven->{hosts} };
+            open( my $handle, '<', $etc_hosts_file );
+            while ( my $line = <$handle> ) {
+                if ( $line =~ /^$loopback_ipv4_regex\s+(\S.*?)\s*$/ ) {
+                    $self->_add_alias($_) foreach map { lc($_) } split( /\s+/, $1 );
+                }
             }
+            close($handle);
         };
         $self->{loaded}{'/etc/hosts'} = 1;
     }
@@ -129,7 +138,7 @@ Footprintless::Localhost - A localhost alias resolver
 
 =head1 VERSION
 
-version 1.25
+version 1.26
 
 =head1 DESCRIPTION
 
@@ -158,6 +167,10 @@ An initial set of preconfigured aliases that should resolve to localhost.
 Sets the value that will be returned if C<is_alias> is called with a 
 I<falsey> value.
 
+=item etc_hosts_file
+
+Location of hosts file, defaults to C</etc/hosts>.
+
 =item none
 
 Stops the constructor from initializing the default aliases: 
@@ -175,6 +188,11 @@ Returns a I<truthy> value if C<$hostname> is an alias for localhost.
 
 Returns a I<truthy> value if C<$source> has already been loaded.  Each
 source is loaded using the C<load_$source> method.
+
+=head2 load_127_subnet()
+
+Same effect as loading all C<127.x.x.x> addresses, but done with regex
+during call to L<is_alias|/is_alias($hostname)>.
 
 =head2 load_all()
 

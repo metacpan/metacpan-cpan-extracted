@@ -1,4 +1,8 @@
 
+0.172890  2017-10-16 12:14:53-04:00 EST5EDT
+
+	- added optional_warnings option to disable unneeded messages
+
 0.172780  2017-10-05 15:03:05-04:00 EST5EDT
 
 	- added sdy to the list of known date fields

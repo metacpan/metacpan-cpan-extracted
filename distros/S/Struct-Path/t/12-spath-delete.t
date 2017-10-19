@@ -3,7 +3,7 @@ use 5.006;
 use strict;
 use warnings;
 use Storable qw(dclone);
-use Test::More tests => 28;
+use Test::More tests => 29;
 
 use Struct::Path qw(spath);
 
@@ -11,6 +11,10 @@ use lib "t";
 use _common qw($s_array $s_mixed);
 
 my (@r, $t);
+
+# There is no right way to remove passed thing (set it to undef is no solution either)
+eval { spath(\$t, [], delete => 1) };
+like($@, qr/Unable to remove passed thing entirely \(empty path passed\) /,);
 
 # delete single hash key
 $t = dclone($s_mixed);

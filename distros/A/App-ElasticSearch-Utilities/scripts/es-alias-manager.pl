@@ -81,7 +81,7 @@ my %PARTS = (
 
 foreach my $base (keys %{ $ALIAS }) {
     my $re = $ALIAS->{$base}{pattern};
-    $re =~ s/[^a-zA-Z0-9\-\{\}\*\?]+//g;
+    $re =~ s/[^\w{}*?-]+//g;
 
     # Wildcards
     $re =~ s/\*+/.\+/g;
@@ -188,7 +188,7 @@ es-alias-manager.pl - Allow easy alias management for daily indexes
 
 =head1 VERSION
 
-version 5.3
+version 5.4
 
 =head1 SYNOPSIS
 

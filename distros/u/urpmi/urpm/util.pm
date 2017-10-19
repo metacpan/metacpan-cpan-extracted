@@ -65,7 +65,7 @@ sub reduce_pathname {
     #- clean url to remove any macro (which cannot be solved now).
     #- take care if this is a true url and not a simple pathname.
     my ($host, $dir) = $url =~ m|([^:/]*://[^/]*/)?(.*)|;
-    $host = '' if !defined $host;
+    $host //= '';
 
     #- remove any multiple /s or trailing /.
     #- then split all components of pathname.

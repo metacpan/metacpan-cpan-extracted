@@ -66,8 +66,6 @@ $rv = process_command( $cmd );
 ok( ref( $rv ) eq 'App::CELL::Status' );
 is( $rv->level, 'OK' );
 like( $rv->payload, qr/Nick:\s+demo/ );
-like( $rv->payload, qr/Dochazka EID:\s+\d+/ );
-#like( $rv->payload, qr/Privlevel:\s+passerby/ );
 
 note( 'EMPLOYEE PROFILE command' );
 $cmd = "EMPLOYEE PROFILE";
@@ -75,8 +73,6 @@ $rv = process_command( $cmd );
 ok( ref( $rv ) eq 'App::CELL::Status' );
 is( $rv->level, 'OK' );
 like( $rv->payload, qr/Nick:\s+demo/ );
-like( $rv->payload, qr/Dochazka EID:\s+\d+/ );
-#like( $rv->payload, qr/Privlevel:\s+passerby/ );
 
 note( 'EMPLOYEE_SPEC on self always works' );
 $cmd = "EMPLOYEE=demo PROFILE";
@@ -84,8 +80,6 @@ $rv = process_command( $cmd );
 ok( ref( $rv ) eq 'App::CELL::Status' );
 is( $rv->level, 'OK' );
 like( $rv->payload, qr/Nick:\s+demo/ );
-like( $rv->payload, qr/Dochazka EID:\s+\d+/ );
-#like( $rv->payload, qr/Privlevel:\s+passerby/ );
 
 note( 'EMPLOYEE_SPEC on a different employee => 403' );
 $cmd = "EMPLOYEE=absent PROFILE";

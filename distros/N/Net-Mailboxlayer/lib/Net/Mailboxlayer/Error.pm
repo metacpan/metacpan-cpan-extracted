@@ -3,7 +3,7 @@ package Net::Mailboxlayer::Error;
 use strict;
 use warnings;
 
-$Net::Mailboxlayer::Error::VERSION = '0.001';
+$Net::Mailboxlayer::Error::VERSION = '0.003';
 
 sub new
 {
@@ -40,6 +40,7 @@ Net::Mailboxlayer::Error - Encapsulates an error response from mailboxlayer.com'
  if ($result->has_error)
  {
    # $result is a F<Net::Mailboxlayer::Error> object.
+   print "There was an error: ". $result->info . "\n";
  }
 
 =head1 DESCRIPTION

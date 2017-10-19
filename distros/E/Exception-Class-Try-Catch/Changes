@@ -1,4 +1,8 @@
 Revision history for Exception-Class-Try-Catch
 
+0.2  Wed Oct 18 17:58:37 2017
+	- Fix prototype for function catch
+	- Update SYNOPSIS
+
 0.1  Fri Apr 14 14:01:39 2017
 	- Initial version

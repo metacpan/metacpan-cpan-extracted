@@ -32,7 +32,6 @@ do { my $x = {
                       'suggests' => {
                                     'Archive::Extract' => '0.76',
                                     'Archive::Extract::Libarchive' => '0.38',
-                                    'Config::Hosts' => '0.03',
                                     'Log::Log4perl' => '1.46'
                                   }
                     },

@@ -64,6 +64,7 @@ namespace zmq
         void xread_activated (zmq::pipe_t *pipe_);
         void xwrite_activated (zmq::pipe_t *pipe_);
         void xpipe_terminated (zmq::pipe_t *pipe_);
+        int get_peer_state (const void *identity, size_t identity_size) const;
 
     protected:
 
@@ -84,7 +85,7 @@ namespace zmq
 
         //  If true, the receiver got the message part with
         //  the peer's identity.
-        bool identity_sent;
+        bool routing_id_sent;
 
         //  Holds the prefetched identity.
         msg_t prefetched_id;
@@ -122,7 +123,7 @@ namespace zmq
 
         //  Routing IDs are generated. It's a simple increment and wrap-over
         //  algorithm. This value is the next ID to use (if not used already).
-        uint32_t next_rid;
+        uint32_t next_integral_routing_id;
 
         // If true, report EAGAIN to the caller instead of silently dropping
         // the message targeting an unknown peer.

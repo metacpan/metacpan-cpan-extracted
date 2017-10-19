@@ -1,4 +1,5 @@
 package Net::CLI::Interact::Transport::Loopback;
+{ $Net::CLI::Interact::Transport::Loopback::VERSION = '2.300002' }
 
 use Moo;
 use Sub::Quote;
@@ -47,10 +48,6 @@ sub runtime_options {
 =head1 NAME
 
 Net::CLI::Interact::Transport::Loopback - Testable CLI connection
-
-=head1 VERSION
-
-version 2.143070
 
 =head1 DECRIPTION
 

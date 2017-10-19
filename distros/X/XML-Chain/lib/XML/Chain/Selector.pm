@@ -5,12 +5,12 @@ use strict;
 use utf8;
 use 5.010;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Moose;
 use MooseX::Aliases;
 use Carp qw(croak);
-use XML::Tidy;
+use XML::LibXML qw(:libxml);
 
 has 'current_elements' =>
     (is => 'rw', isa => 'ArrayRef', default => sub {[]});
@@ -326,13 +326,53 @@ sub as_string {
 
                 return (
                     $auto_indent
-                    ? XML::Tidy->new(xml => $el->{lxml})
-                        ->tidy($auto_indent_chars)->toString
-                    : $el->{lxml}->toString
+                    ? _reindent_children($el->{lxml}, $auto_indent_chars)->toStringC14N
+                    : $el->{lxml}->toStringC14N
                 );
             }
         )
     );
+}
+
+sub _reindent_children {
+    my ($lxml_el, $indent_chars, $level) = @_;
+    $level //= 1;
+    my $cur_ident = join('', map { $indent_chars } (1..$level));
+    my $as_string = '';
+    my $cur_text = '';
+    my @child_nodes = map { $lxml_el->removeChild($_) } $lxml_el->childNodes();
+    my $child_nodes_count = @child_nodes;
+    while (@child_nodes) {
+        my $node = shift(@child_nodes);
+        my $node_type = $node->nodeType;
+        if ($node_type == XML_TEXT_NODE) {
+            $cur_text .= ' ' if length($cur_text);
+            $cur_text .= $node->textContent;
+            $cur_text =~ s/^\s+//;
+            $cur_text =~ s/\s+$//;
+            next;
+        }
+        if (length($cur_text)) {
+            $lxml_el->appendText("\n".$indent_chars.$cur_text);
+            $cur_text = '';
+        }
+        _reindent_children($node, $indent_chars, $level+1);
+        $lxml_el->appendText("\n".$cur_ident);
+        $lxml_el->addChild($node);
+    }
+    if (($child_nodes_count == 1) && length($cur_text)) {
+        $lxml_el->appendText($cur_text);
+    }
+    else {
+        if (length($cur_text)) {
+            $lxml_el->appendText("\n".$indent_chars.$cur_text);
+            $cur_text = '';
+        }
+        $lxml_el->appendText("\n".join('', map { $indent_chars } (1..$level-1)))
+            if ($lxml_el->childNodes());
+    }
+
+    return $lxml_el;
 }
 
 sub text_content {
@@ -374,7 +414,7 @@ sub count {
 }
 
 sub store      {$_[0]->{_xc}->store}
-sub set_io_any {$_[0]->{_xc}->set_io_any($_[1])}
+sub set_io_any {$_[0]->{_xc}->set_io_any($_[1], $_[2])}
 
 sub single {
     my ($self) = @_;
@@ -436,21 +476,23 @@ XML::Chain::Selector - selector for traversing the XML::Chain
 
 =head1 SYNOPSIS
 
-    my $user = xc('user', xmlns => 'testns')
-                ->auto_indent({chars=>' 'x4})
-                ->a(xc('name')->t('Johnny Thinker'))
-                ->a(xc('username')->t('jt'))
-                ->c('bio')
-                    ->a(xc('div', xmlns => 'http://www.w3.org/1999/xhtml')
-                        ->a(xc('h1')->t('about'))
-                        ->a(xc('p')->t('...')))
-                    ->a(xc('greeting')->t('Hey'))
-                    ->up;
+    my $user = xc('user', xmlns => 'http://testns')->auto_indent({chars=>' 'x4})
+        ->a('name', '-' => 'Johnny Thinker')
+        ->a('username', '-' => 'jt')
+        ->c('bio')
+            ->c('div', xmlns => 'http://www.w3.org/1999/xhtml')
+                ->a('h1', '-' => 'about')
+                ->a('p', '-' => '...')
+                ->up
+            ->a('greeting', '-' => 'Hey')
+            ->up
+        ->a('active', '-' => '1')
+        ->root;
     say $user->as_string;
 
 Will print:
 
-    <user xmlns="testns">
+    <user xmlns="http://testns">
         <name>Johnny Thinker</name>
         <username>jt</username>
         <bio>
@@ -460,6 +502,7 @@ Will print:
             </div>
             <greeting>Hey</greeting>
         </bio>
+        <active>1</active>
     </user>
 
 =head1 DESCRIPTION
@@ -586,16 +629,25 @@ Deletes current elements and returns their parent.
 
 =head2 auto_indent
 
+(experimental feature (good/usefull for debug, needs more testing),
+works only on element for which as_string is called at this moment)
+
     my $simple = xc('div')
                     ->auto_indent(1)
-                    ->c('div')->t('in')
-                    ->root;
+                    ->a('div', '-' => 'in1')
+                    ->a('div', '-' => 'in2')
+                    ->t('in2.1')
+                    ->a('div', '-' => 'in3')
+    ;
     say $simple->as_string;
 
 Will print:
 
     <div>
-        <div>in</div>
+        <div>in1</div>
+        <div>in2</div>
+        in2.1
+        <div>in3</div>
     </div>
 
 Turn on/off tidy/auto-indentation of document elements. Default indentation
@@ -604,16 +656,6 @@ characters are tabs.
 Argument can be either true/false scalar or a hashref with indentation
 options. Currently C< {chars=>' 'x4} > will set indentation characters to
 be four spaces.
-
-NOTE Currently works only on element on which C<as_string()> is called
-     using L<HTML::Tidy>.
-     In the future it is planned to be possible to set indentation
-     on/off also for nested elements. For example not to indent embedded
-     html elements.
-
-WARNING L<HTML::Tidy> has a circular reference and leaks memory when used.
-        Better don't use auto_indent() at in this version in persistent
-        environments.
 
 =head1 CHAINED DOCUMENT METHODS
 

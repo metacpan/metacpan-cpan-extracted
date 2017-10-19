@@ -377,7 +377,6 @@ $status = req( $test, 200, 'demo', 'GET', 'session' );
 is( $status->level, 'OK' );
 is( $status->code, 'DISPATCH_SESSION_DATA' );
 ok( exists $status->payload->{'session'} );
-ok( exists $status->payload->{'session_id'} );
 
 note( 'N.B.: no session data when running via Plack::Test' );
 #ok( exists $status->payload->{'session'}->{'ip_addr'} );

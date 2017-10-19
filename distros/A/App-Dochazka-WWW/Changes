@@ -323,3 +323,21 @@ Revision history for App-Dochazka-WWW
 - js: dform-init: activate rememberState for some dforms
 - js: tests: add "bogus schedule lookup" test case
 
+0.152 2017-10-14 13:08 CEST
+- js: tests: create "active" and "inactive" employees
+- js: add blank lines to empProfile dform
+- js: add interval browse and create menus
+- js: move form entry definitions into separate entries.js module
+- js: use entriesRead in all targets
+- js: get readableDate() from datetime.js in core
+- js: entries: use date vetter function
+- js: implement "Select activity" dialog
+- js: implement "Create a single interval" dialog
+- js: populate activities cache upon successful login
+
+0.153 2017-10-19 09:36 CEST
+- js: sched-lib: implement schedule caching
+- js: create interval: start async population feature
+- js: tests: pad more time for AJAX calls (slow LDAP server)
+- js: poke at "create interval by offset with populate" feature
+

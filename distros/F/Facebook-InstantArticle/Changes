@@ -1,5 +1,9 @@
 Revision history for Facebook-InstantArticle
 
+0.13    2017-10-13
+        - The "fb:use_automatic_ad_placement" property's content is now set to
+          "enable=true ad_density=default" instead of just "true".
+
 0.12    2016-12-09
         - Removed 'description' field in the InstantArticle object, as Facebook
           wants the article description/ingress/preamble as 'subtitle' (which is

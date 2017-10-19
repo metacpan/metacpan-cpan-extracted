@@ -15,9 +15,12 @@ lib/Catmandu/Importer/OAI/Parser/oai_dc.pm
 lib/Catmandu/Importer/OAI/Parser/raw.pm
 lib/Catmandu/Importer/OAI/Parser/struct.pm
 lib/Catmandu/OAI.pm
+lib/Catmandu/Store/OAI.pm
+lib/Catmandu/Store/OAI/Bag.pm
 t/00-load.t
 t/01-importer.t
 t/02-handler.t
+t/03-store.t
 t/20-xslt.t
 t/author-pod-syntax.t
 t/epicur.xml

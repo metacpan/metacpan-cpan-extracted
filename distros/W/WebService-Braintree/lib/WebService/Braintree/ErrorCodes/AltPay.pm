@@ -1,6 +1,7 @@
 package WebService::Braintree::ErrorCodes::AltPay;
-$WebService::Braintree::ErrorCodes::AltPay::VERSION = '0.93';
-use strict;
+$WebService::Braintree::ErrorCodes::AltPay::VERSION = '0.94';
+use 5.010_001;
+use strictures 1;
 
 use constant PayPalAccountCannotHaveBothAccessTokenAndConsentCode   => "82903";
 use constant PayPalAccountCannotVaultOneTimeUsePayPalAccount        => "82902";
@@ -33,3 +34,4 @@ use constant SepaMandateLocaleIsUnsupported                         => "93311";
 use constant SepaMandateTypeIsRequired                              => "93304";
 
 1;
+__END__

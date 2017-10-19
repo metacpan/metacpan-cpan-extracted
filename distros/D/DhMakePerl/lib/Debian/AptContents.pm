@@ -3,7 +3,7 @@ package Debian::AptContents;
 use strict;
 use warnings;
 
-our $VERSION = '0.77';
+our $VERSION = '0.96';
 
 =head1 NAME
 
@@ -27,14 +27,14 @@ subclass Debian::AptContents, which needs to become more generic.
 use base qw(Class::Accessor);
 __PACKAGE__->mk_accessors(
     qw(
-        cache homedir cache_file contents_dir contents_files verbose
-        source sources dist
+        cache homedir cache_file contents_files verbose
+        source dist
         )
 );
 
 use Config;
 use Debian::Dependency;
-use DhMakePerl::Utils qw(find_core_perl_dependency);
+use DhMakePerl::Utils qw(find_core_perl_dependency is_core_perl_package);
 use File::Spec::Functions qw( catfile catdir splitpath );
 use IO::Uncompress::Gunzip;
 use List::MoreUtils qw(uniq);
@@ -44,7 +44,7 @@ use AptPkg::Config;
 
 $AptPkg::Config::_config->init();
 
-our $oldstable_perl = '5.10.1';
+our $oldstable_perl = '5.14.2';
 
 =head1 CONSTRUCTOR
 
@@ -64,16 +64,6 @@ Constructs new instance of the class. Expects at least C<homedir> option.
 
 (B<mandatory>) Directory where the object stores its cache.
 
-=item contents_dir
-
-Directory where L<apt-file> stores Contents files are stored. Default is
-F</var/cache/apt/apt-file>
-
-=item sources
-
-A path to a F<sources.list> file or an array ref of paths to sources.list
-files. If not given uses AptPkg's Config to get the list.
-
 =item dist
 
 Used for filtering on the C<distributon> part of the repository paths listed in
@@ -81,8 +71,7 @@ L<sources.list>. Default is empty, meaning no filtering.
 
 =item contents_files
 
-Arrayref of F<Contents> file names. Default is to parse the files in C<sources>
-and to look in C<contents_dir> for matching files.
+Arrayref of F<Contents> file names. Default is to let B<apt-file> find them.
 
 =item cache_file
 
@@ -112,18 +101,6 @@ sub new {
         or die "No homedir given";
 
     # some defaults
-    $self->contents_dir('/var/cache/apt/apt-file')
-        unless $self->contents_dir;
-    $self->sources( [ $self->sources ] )
-        if $self->sources and not ref( $self->sources );
-    $self->sources(
-        [   $AptPkg::Config::_config->get_file('Dir::Etc::sourcelist'),
-            glob(
-                $AptPkg::Config::_config->get_dir('Dir::Etc::sourceparts')
-                    . '/*.list'
-            )
-        ]
-    ) unless defined( $self->sources );
     $self->contents_files( $self->get_contents_files )
         unless $self->contents_files;
     $self->cache_file( catfile( $self->homedir, 'Contents.cache' ) )
@@ -153,64 +130,6 @@ sub warning {
     warn "$msg\n" if $self->verbose >= $level;
 }
 
-=item repo_source_to_contents_paths
-
-Given a line with Debian package repository path (typically taken from
-F<sources.list>), converts it to the corresponding F<Contents> file names.
-
-=cut
-
-sub repo_source_to_contents_paths {
-    my ( $self, $source ) = @_;
-
-    # Weed out options in brackets first
-    $source =~ s/\[[^][]+\]//;
-
-    my ( $schema, $uri, $dist, @components ) = split /\s+/, $source;
-    my ( $proto, $host, $port, $dir ) = $uri =~ m{
-	^
-        (?:([^:/?\#]+):)?                      # proto
-        (?://
-                (?:[^:]+:[^@]+@)?              # username:password@
-                ([^:/?\#]*)                    # host
-                (?::(\d+))?                    # port
-        )?
-        ([^?\#]*)                              # path
-    }x;
-
-    unless ( defined $schema ) {
-        $self->warning( 1, "'$_' has unknown format" );
-        next;
-    }
-
-    return unless $schema eq 'deb';
-
-    if ( $self->dist ) {
-        if ( $self->dist =~ /^\s*{\s*(.+)\s*}\s*$/ ) {
-            return unless grep {/^$dist$/} split( /\s*,\s*/, $1 );
-        }
-        else {
-            return if $dist ne $self->dist;
-        }
-    }
-
-    $host ||= '';    # set empty string if $host is undef
-    $dir  ||= '';    # deb http://there sid main
-
-    s{/$}{}  for ( $host, $dir, $dist );    # remove trailing /
-    s{^/}{}  for ( $host, $dir, $dist );    # remove initial /
-    s{/}{_}g for ( $host, $dir, $dist );    # replace remaining /
-
-    # Make sure to generate paths both with and without components to
-    # be compatible with both old and new apt-file versions. See:
-    # https://bugs.launchpad.net/ubuntu/+source/dh-make-perl/+bug/1034881
-    push(@components, '');
-
-    return map
-        { $host . "_" . join( "_", grep( { defined and length } $dir, "dists", $dist, $_ ) ) }
-        @components;
-}
-
 =item get_contents_files
 
 Reads F<sources.list>, gives the repository paths to
@@ -227,34 +146,24 @@ sub get_contents_files {
 
     my @res;
 
-    for my $s ( @{ $self->sources } ) {
-        # by default ->sources contains a list of files that APT would look
-        # at. Some of them may not exist, so do not fail if this is the case
-        next unless -e $s;
-
-        my $src = IO::File->new( $s, 'r' )
-            or die "Unable to open '$s': $!\n";
-
-        while (<$src>) {
-            chomp;
-            s/#.*//;
-            s/^\s+//;
-            s/\s+$//;
-            next unless $_;
-
-            for my $path ( $self->repo_source_to_contents_paths($_) ) {
-                # try all of with/out architecture and
-                # un/compressed
-                for my $a ( '', "-$archspec" ) {
-                    for my $c ( '', '.gz' ) {
-                        my $f = catfile( $self->contents_dir,
-                            "${path}_Contents$a$c", );
-                        push @res, $f if -e $f;
-                    }
-                }
-            }
+    # stolen from apt-file, contents_file_paths()
+    my @cmd = (
+        'apt-get',  'indextargets',
+        '--format', '$(CREATED_BY) $(ARCHITECTURE) $(SUITE) $(FILENAME)'
+    );
+    open( my $fd, '-|', @cmd )
+        or die "Cannot execute apt-get indextargets: $!\n";
+    while ( my $line = <$fd> ) {
+        chomp($line);
+        next unless $line =~ m/^Contents-deb/;
+        my ( $index_name, $arch, $suite, $filename ) = split( ' ', $line, 4 );
+        next unless $arch eq $archspec;
+        if ( $self->dist ) {
+            next unless $suite eq $self->dist;
         }
+        push @res, $filename;
     }
+    close($fd);
 
     return [ uniq sort @res ];
 }
@@ -301,53 +210,49 @@ sub read_cache {
     }
 
     unless ($cache) {
-        $self->source('parsed files');
-        $cache->{stamp}          = time;
-        $cache->{contents_files} = [];
-        $cache->{apt_contents}   = {};
-        for ( @{ $self->contents_files } ) {
-            push @{ $cache->{contents_files} }, $_;
-            my $f
-                = /\.gz$/
-                ? IO::Uncompress::Gunzip->new($_)
-                : IO::File->new( $_, 'r' );
+        if ( scalar @{ $self->contents_files } ) {
+            $self->source('parsed files');
+            $cache->{stamp}          = time;
+            $cache->{contents_files} = [];
+            $cache->{apt_contents}   = {};
 
-            unless ($f) {
-                warn "Error reading '$_': $!\n";
-                next;
-            }
+            push @{ $cache->{contents_files} }, @{ $self->contents_files };
+            my @cat_cmd = (
+                '/usr/lib/apt/apt-helper', 'cat-file', @{ $self->contents_files }
+            );
+            open( my $f, "-|", @cat_cmd )
+                or die
+                "Can't run '/usr/lib/apt/apt-helper cat-file' on Contents files: $!\n";
 
-            $self->warning( 1, "Parsing $_ ..." );
-            my $capturing = 0;
+            $self->warning( 1,
+                "Parsing Contents files:\n\t"
+                    . join( "\n\t", @{ $self->contents_files } ) );
             my $line;
             while ( defined( $line = $f->getline ) ) {
-                if ($capturing) {
-                    my ( $file, $packages ) = split( /\s+/, $line );
-                    next unless $file =~ s{
-                        ^usr/
-                        (?:share|lib)/
-                        (?:perl\d+/             # perl5/
-                        | perl/(?:\d[\d.]+)/   # or perl/5.10/
-                        )
-                    }{}x;
-                    $cache->{apt_contents}{$file} = exists $cache->{apt_contents}{$file}
-                        ? $cache->{apt_contents}{$file}.','.$packages
-                        : $packages;
+                my ( $file, $packages ) = split( /\s+/, $line );
+                next unless $file =~ s{
+                    ^usr/
+                    (?:share|lib)/
+                    (?:perl\d+/            # perl5/
+                    | perl/(?:\d[\d.]+)/   # or perl/5.10/
+                    | \S+-\S+-\S+/perl\d+/(?:\d[\d.]+)/  # x86_64-linux-gnu/perl5/5.22/
+                    )
+                }{}x;
+                $cache->{apt_contents}{$file} = exists $cache->{apt_contents}{$file}
+                    ? $cache->{apt_contents}{$file}.','.$packages
+                    : $packages;
 
-                    # $packages is a comma-separated list of
-                    # section/package items. We'll parse it when a file
-                    # matches. Otherwise we'd parse thousands of entries,
-                    # while checking only a couple
-                }
-                else {
-                    $capturing = 1 if $line =~ /^FILE\s+LOCATION/;
-                }
+                # $packages is a comma-separated list of
+                # section/package items. We'll parse it when a file
+                # matches. Otherwise we'd parse thousands of entries,
+                # while checking only a couple
             }
-        }
+            close($f);
 
-        if ( %{ $cache->{apt_contents} } ) {
-            $self->cache($cache);
-            $self->store_cache;
+            if ( %{ $cache->{apt_contents} } ) {
+                $self->cache($cache);
+                $self->store_cache;
+            }
         }
     }
     else {
@@ -410,11 +315,7 @@ sub find_file_packages {
                                                # usr/share/perl5/Config/Any.pm  universe/perl/libconfig-any-perl
 
     # in-core dependencies are given by find_core_perl_dependency
-    @packages = grep {
-        ( $_         ne 'perl-base' )
-            and ( $_ ne 'perl' )
-            and ( $_ ne 'perl-modules' )
-    } @packages;
+    @packages = grep { !is_core_perl_package($_) } @packages;
 
     return uniq @packages;
 }
@@ -453,8 +354,8 @@ sub find_perl_module_package {
         else                     { return $a cmp $b; }    # or 0?
     } @matches;
 
-    # we don't want perl, perl-base and perl-modules here
-    @matches = grep { !/^perl(?:-(?:base|modules))?$/ } @matches;
+    # we don't want perl packages here
+    @matches = grep { !is_core_perl_package($_) } @matches;
 
     my $direct_dep;
     $direct_dep = Debian::Dependency->new(
@@ -467,7 +368,7 @@ sub find_perl_module_package {
 
     if ($core_dep) {
 
-        # the core dependency is satosfied by oldstable?
+        # the core dependency is satisfied by oldstable?
         if ( $core_dep->ver <= $oldstable_perl ) {
             # drop the direct dependency and remove the version
             undef($direct_dep);
@@ -506,6 +407,8 @@ sub find_perl_module_package {
 
 =item Damyan Ivanov <dmn@debian.org>
 
+=item gregor herrmann <gregoa@debian.org>
+
 =back
 
 =head1 COPYRIGHT & LICENSE
@@ -513,6 +416,8 @@ sub find_perl_module_package {
 =over 4
 
 =item Copyright (C) 2008, 2009, 2010 Damyan Ivanov <dmn@debian.org>
+
+=item Copyright (C) 2016, gregor herrmann <gregoa@debian.org>
 
 =back
 

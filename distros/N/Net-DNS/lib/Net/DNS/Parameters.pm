@@ -1,15 +1,15 @@
 package Net::DNS::Parameters;
 
 #
-# $Id: Parameters.pm 1571 2017-06-03 20:14:15Z willem $
+# $Id: Parameters.pm 1598 2017-10-03 09:48:30Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1571 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1598 $)[1];
 
 
 ################################################
 ##
 ##	Domain Name System (DNS) Parameters
-##	(last updated 2017-06-01)
+##	(last updated 2017-08-30)
 ##
 ################################################
 
@@ -37,7 +37,7 @@ my @classbyname = (
 	NONE => 254,						# RFC2136
 	ANY  => 255,						# RFC1035
 	);
-our %classbyval = reverse @classbyname;
+our %classbyval = reverse @classbyname, ( CLASS0 => 0 );
 push @classbyname, map /^\d/ ? $_ : lc($_), @classbyname;
 our %classbyname = ( '*' => 255, @classbyname );
 
@@ -126,10 +126,11 @@ my @typebyname = (
 	URI	   => 256,					# RFC7553
 	CAA	   => 257,					# RFC6844
 	AVC	   => 258,					#
+	DOA	   => 259,					# draft-durand-doa-over-dns
 	TA	   => 32768,					# http://cameo.library.cmu.edu/ http://www.watson.org/~weiler/INI1999-19.pdf
 	DLV	   => 32769,					# RFC4431
 	);
-our %typebyval = reverse @typebyname;
+our %typebyval = reverse @typebyname, ( TYPE0 => 0 );
 push @typebyname, map /^\d/ ? $_ : lc($_), @typebyname;
 our %typebyname = ( '*' => 255, @typebyname );
 
@@ -254,7 +255,7 @@ sub typebyname {
 			croak "typebyname( $name ) out of range" if $val > 0xffff;
 			return $val;
 		}
-		_typespec("$name.RRNAME");
+		_typespec("$name.RRNAME") unless $typebyname{uc $name};
 		return $typebyname{uc $name} || croak "unknown type $name";
 			}
 }
@@ -326,17 +327,17 @@ sub register {				## register( 'TOY', 1234 )	(NOT part of published API)
 }
 
 
-use constant DNSEXTLANG => defined eval 'require Net::DNS::Extlang';
+use constant EXTLANG => defined eval 'require Net::DNS::Extlang';
 
-our $DNSEXTLANG = DNSEXTLANG ? eval 'Net::DNS::Extlang->new()->domain' : undef;
+our $DNSEXTLANG = EXTLANG ? eval 'Net::DNS::Extlang->new()->domain' : undef;
 
 sub _typespec {				## draft-levine-dnsextlang
-	eval <<'END' if DNSEXTLANG && $DNSEXTLANG;
+	eval <<'END' if EXTLANG && $DNSEXTLANG;
 	my ($node) = @_;
 
 	require Net::DNS::Resolver;
-	my $resolver = new Net::DNS::Resolver();
-	my $response = $resolver->send( "$node.$DNSEXTLANG", 'TXT' );
+	my $resolver = new Net::DNS::Resolver() || return;
+	my $response = $resolver->send( "$node.$DNSEXTLANG", 'TXT' ) || return;
 
 	foreach my $txt ( grep $_->type eq 'TXT', $response->answer ) {
 		my @stanza = $txt->txtdata;
@@ -346,20 +347,11 @@ sub _typespec {				## draft-levine-dnsextlang
 		return unless defined wantarray;
 
 		my $extobj = new Net::DNS::Extlang();
-		my @nodesc = map { m/^(\S+)\s*/; $1 } $identifier, @attribute;
-		my $recipe = $extobj->xlstorerecord(@nodesc);
-		my $result = $extobj->compilerr($recipe);
-
-		my $fh	= new IO::File();
-		my $pid = open( $fh, '-|' );
-		die "fork: $!" unless defined $pid;
-
-		return $fh if $pid;				# parent
-
-		print $result;					# child
-		exit;
+		my $recipe = $extobj->xlstorerecord( $identifier, @attribute );
+		my @source = split /\n/, $extobj->compilerr($recipe);
+		return sub { defined( $_ = shift @source ) };
 	}
-	return undef;
+	return;
 END
 }
 

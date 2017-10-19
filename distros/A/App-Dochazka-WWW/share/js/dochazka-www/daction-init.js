@@ -47,6 +47,14 @@ define ([
     return function () {
 
         // generalized actions
+        target.push('actionNoop', {
+            'name': 'actionNoop',
+            'type': 'daction',
+            'menuText': 'actionNoop',
+            'aclProfile': 'passerby',
+            'start': dactionStart('actionNoop'),
+            'pushable': false
+        });
         target.push('drowselectListen', {
             'name': 'drowselectListen',
             'type': 'daction',
@@ -253,6 +261,124 @@ define ([
             'menuText': 'Yes, I really mean it',
             'aclProfile': 'admin',
             'start': dactionStart('schedReallyDelete'),
+            'pushable': false
+        });
+
+        // Interval actions - browse
+        target.push('browseIntToday', {
+            'name': 'browseIntToday',
+            'type': 'daction',
+            'menuText': 'Today',
+            'aclProfile': 'inactive',
+            'start': dactionStart('actionNoop'),
+            'pushable': false
+        });
+        target.push('browseIntYesterday', {
+            'name': 'browseIntYesterday',
+            'type': 'daction',
+            'menuText': 'Yesterday',
+            'aclProfile': 'inactive',
+            'start': dactionStart('actionNoop'),
+            'pushable': false
+        });
+        target.push('browseIntAnyday', {
+            'name': 'browseIntAnyday',
+            'type': 'daction',
+            'menuText': 'Any day',
+            'aclProfile': 'inactive',
+            'start': dactionStart('actionNoop'),
+            'pushable': false
+        });
+        target.push('browseIntThisWeek', {
+            'name': 'browseIntThisWeek',
+            'type': 'daction',
+            'menuText': 'This week',
+            'aclProfile': 'inactive',
+            'start': dactionStart('actionNoop'),
+            'pushable': false
+        });
+        target.push('browseIntLastWeek', {
+            'name': 'browseIntLastWeek',
+            'type': 'daction',
+            'menuText': 'Last week',
+            'aclProfile': 'inactive',
+            'start': dactionStart('actionNoop'),
+            'pushable': false
+        });
+        target.push('browseIntAnyWeek', {
+            'name': 'browseIntAnyWeek',
+            'type': 'daction',
+            'menuText': 'Any week',
+            'aclProfile': 'inactive',
+            'start': dactionStart('actionNoop'),
+            'pushable': false
+        });
+        target.push('browseIntThisMonth', {
+            'name': 'browseIntThisMonth',
+            'type': 'daction',
+            'menuText': 'This month',
+            'aclProfile': 'inactive',
+            'start': dactionStart('actionNoop'),
+            'pushable': false
+        });
+        target.push('browseIntLastMonth', {
+            'name': 'browseIntLastMonth',
+            'type': 'daction',
+            'menuText': 'Last month',
+            'aclProfile': 'inactive',
+            'start': dactionStart('actionNoop'),
+            'pushable': false
+        });
+        target.push('browseIntAnyMonth', {
+            'name': 'browseIntAnyMonth',
+            'type': 'daction',
+            'menuText': 'Any month',
+            'aclProfile': 'inactive',
+            'start': dactionStart('actionNoop'),
+            'pushable': false
+        });
+
+        // Interval actions - create
+        target.push('createLastIntervalPlusOffsetSave', {
+            'name': 'createLastIntervalPlusOffsetSave',
+            'type': 'daction',
+            'menuText': 'Save',
+            'aclProfile': 'active',
+            'start': dactionStart('createLastIntervalPlusOffsetSave'),
+            'pushable': false
+        });
+        target.push('createNextScheduledIntervalSave', {
+            'name': 'createNextScheduledIntervalSave',
+            'type': 'daction',
+            'menuText': 'Save',
+            'aclProfile': 'active',
+            'start': dactionStart('createNextScheduledIntervalSave'),
+            'pushable': false
+        });
+        target.push('createSingleIntSave', {
+            'name': 'createSingleIntSave',
+            'type': 'daction',
+            'menuText': 'Save',
+            'aclProfile': 'active',
+            'start': dactionStart('createSingleIntSave'),
+            'pushable': false
+        });
+
+        // Activity actions - select
+        target.push('selectActivityAction', {
+            'name': 'selectActivityAction',
+            'type': 'daction',
+            'menuText': 'Select activity',
+            'aclProfile': 'active',
+            'start': dactionStart('selectActivityAction'),
+            'pushable': false
+        });
+        target.push('selectActivityGo', {
+            'name': 'selectActivityGo',
+            'type': 'daction',
+            'menuText': 'Select',
+            'aclProfile': 'active',
+            'start': dactionStart('selectActivityGo'),
             'pushable': false
         });
 

@@ -2,7 +2,7 @@ use strict;
 use Test::More tests => 12;
 
 our %CONFIG;
-do 't/testcommon.pl';
+do './t/testcommon.pl';
 
 use File::Temp;
 

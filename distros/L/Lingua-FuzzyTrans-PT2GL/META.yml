@@ -1,0 +1,21 @@
+---
+abstract: 'Translates Portuguese words to Galician using fuzzy replacements'
+author:
+  - 'Alberto Simões <ambs@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Lingua-FuzzyTrans-PT2GL
+requires:
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+version: '0.001'
+x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -29,7 +29,7 @@ my $verbose = @ARGV && ($ARGV[0] eq 'verbose');
 # test new method
 
 my $t;
-eval { $t  = Term::ReadLine::Perl5->('ReadLineTest'); };
+eval { $t  = Term::ReadLine::Perl5->new('ReadLineTest'); };
 plan skip_all => "Need access to tty" unless $t;
 ok($t, "new method, new's");
 

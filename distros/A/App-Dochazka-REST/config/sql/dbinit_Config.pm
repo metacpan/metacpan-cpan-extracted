@@ -844,6 +844,12 @@ $body$#,
       RETURNING eid
     /,
 
+    # DEFAULT schedule
+
+    q/-- insert DEFAULT schedule into schedules table
+      INSERT INTO schedules (scode, schedule)
+      VALUES ('DEFAULT', '[{"high_dow":"MON","high_time":"12:00","low_dow":"MON","low_time":"08:00"},{"high_dow":"MON","high_time":"16:30","low_dow":"MON","low_time":"12:30"},{"high_dow":"TUE","high_time":"12:00","low_dow":"TUE","low_time":"08:00"},{"high_dow":"TUE","high_time":"16:30","low_dow":"TUE","low_time":"12:30"},{"high_dow":"WED","high_time":"12:00","low_dow":"WED","low_time":"08:00"},{"high_dow":"WED","high_time":"16:30","low_dow":"WED","low_time":"12:30"},{"high_dow":"THU","high_time":"12:00","low_dow":"THU","low_time":"08:00"},{"high_dow":"THU","high_time":"16:30","low_dow":"THU","low_time":"12:30"},{"high_dow":"FRI","high_time":"12:00","low_dow":"FRI","low_time":"08:00"},{"high_dow":"FRI","high_time":"16:30","low_dow":"FRI","low_time":"12:30"}]')
+    /,
 ]);
 
 # DBINIT_SELECT_EID_OF

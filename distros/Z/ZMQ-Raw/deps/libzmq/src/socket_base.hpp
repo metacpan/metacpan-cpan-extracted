@@ -133,8 +133,15 @@ namespace zmq
         void event_closed (const std::string &addr_, zmq::fd_t fd_);
         void event_close_failed (const std::string &addr_, int err_);
         void event_disconnected (const std::string &addr_, zmq::fd_t fd_);
-        void event_handshake_failed(const std::string &addr_, int err_);
-        void event_handshake_succeed(const std::string &addr_, int err_);
+        void event_handshake_failed_no_detail(const std::string &addr_, int err_);
+        void event_handshake_failed_protocol(const std::string &addr_, int err_);
+        void event_handshake_failed_auth(const std::string &addr_, int err_);
+        void event_handshake_succeeded(const std::string &addr_, int err_);
+
+        //  Query the state of a specific peer. The default implementation
+        //  always returns an ENOTSUP error.
+        virtual int get_peer_state (const void *identity,
+                                    size_t identity_size) const;
 
     protected:
 
@@ -178,9 +185,8 @@ namespace zmq
         //  Delay actual destruction of the socket.
         void process_destroy ();
 
-
         // Next assigned name on a zmq_connect() call used by ROUTER and STREAM socket types
-        std::string connect_rid;
+        std::string connect_routing_id;
 
     private:
         // test if event should be sent and then dispatch it        
@@ -244,6 +250,7 @@ namespace zmq
         void process_stop ();
         void process_bind (zmq::pipe_t *pipe_);
         void process_term (int linger_);
+        void process_term_endpoint (std::string *endpoint_);
 
         void update_pipe_options(int option_);
 

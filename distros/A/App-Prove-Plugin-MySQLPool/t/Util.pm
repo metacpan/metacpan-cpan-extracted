@@ -17,6 +17,7 @@ sub run_test {
     my ($options) = @_;
     my $preparer = $options->{ preparer };
     my $tests    = $options->{ tests };
+    my $includes = $options->{ includes };
 
     my ($tmp, $filename) = tempfile();
     close $tmp;
@@ -42,6 +43,7 @@ sub run_test {
         my $prove = App::Prove->new();
         $prove->process_args( '--norc',
                               '-v',
+                              ($includes ? "-I$includes" : ()),
                               ($preparer ? "-PMySQLPool=$preparer"
                                          : "-PMySQLPool"),
                               '-j'.(scalar @$tests),

@@ -33,7 +33,7 @@ Catalyst::Model::LDAP::Search - Convenience methods for Net::LDAP::Search
 
 =head1 VERSION
 
-version 0.20
+version 0.21
 
 =head1 DESCRIPTION
 

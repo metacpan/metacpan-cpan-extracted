@@ -50,6 +50,7 @@ t/query_mccants.t
 t/query_misc.t
 t/query_spacetrack.t
 t/spacetrack_request.t
+tools/all_iridium_classic
 tools/capture
 tools/README
 xt/author/celestrak_datasets.t

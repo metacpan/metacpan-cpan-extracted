@@ -10,13 +10,14 @@ use Carp ();
 
 use UNIVERSAL::Object;
 
-our $VERSION   = '0.11';
+our $VERSION   = '0.12';
 our $AUTHORITY = 'cpan:STEVAN';
 
 our @ISA; BEGIN { @ISA = ('UNIVERSAL::Object') }
 
-sub BLESS {
-    my $self = $_[0]->SUPER::BLESS( $_[1] );
+sub new {
+    my $class = shift;
+    my $self  = $class->SUPER::new( @_ );
 
     if ( $self =~ /\=HASH\(0x/ ) {
         require Hash::Util;
@@ -27,6 +28,10 @@ sub BLESS {
     }
     elsif ( $self =~ /\=SCALAR\(0x/ or $self =~ /\=REF\(0x/ ) {
         Internals::SvREADONLY( $$self, 1 );
+    }
+    elsif ( $self =~ /\=CODE\(0x/ ) {
+        # NOTE: do nothing here, because – ignoring
+        # closures – CODE refs are immutable anyway
     }
     else {
         require Scalar::Util;
@@ -48,7 +53,7 @@ UNIVERSAL::Object::Immutable - Another useful base class
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 SYNOPSIS
 
@@ -61,12 +66,21 @@ You can use this class in the same manner that you would use
 L<UNIVERSAL::Object>, the only difference is that the instances
 created will be immutable.
 
+=head2 When are thing made Immutable?
+
+Obviously we need to create and initialize the instance before
+we make it immutable, it is only after that when we want it to be
+immutable. This means that if you need to munge values, or build
+values based on the contents of other slots, you should do this
+inside a C<BUILD> method, during which the instance will still be
+mutable.
+
 =head2 Supported REPR types
 
 This module will attempt to do the right type of locking for
-the three main instance types; C<SCALAR>, C<REF>, C<ARRAY> and
-C<HASH>, all other instance types are unsupported and will
-throw an error.
+the three main instance types; C<SCALAR>, C<REF>, C<ARRAY>,
+C<HASH> and C<CODE>, all other instance types are unsupported
+and will throw an error.
 
 =head2 Why Immutability?
 
@@ -131,12 +145,15 @@ When this class is used at the root of an object hierarchy, all the
 subclasses will be immutable. However, if you wish to make an immutable
 subclass of a non-immutable class, then you have two choices.
 
+B<NOTE:> both of the examples below assume that there is not a locally
+defined C<new> in your class.
+
 =over 4
 
 =item Multiple Inheritance
 
 Using multiple inheritance, and putting this class first in the list,
-we can be sure that the expected version of C<BLESS> is used.
+we can be sure that the expected version of C<new> is used.
 
     our @ISA = (
         'UNIVERSAL::Object::Immutable',
@@ -146,7 +163,7 @@ we can be sure that the expected version of C<BLESS> is used.
 =item Role Composition
 
 Using the role composition facilities in the L<MOP> package will result
-in C<BLESS> being aliased into the consuming package and therefore have
+in C<new> being aliased into the consuming package and therefore have
 the same effect as the multiple inheritance.
 
     our @ISA  = ('My::Super::Class');

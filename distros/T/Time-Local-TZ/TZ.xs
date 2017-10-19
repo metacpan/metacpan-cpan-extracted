@@ -19,7 +19,7 @@
 #ifndef PERL_USE_SAFE_PUTENV
 # if PERL_BCDVERSION >= 0x5009004 && defined(USE_ITHREADS) && defined(PERL_TRACK_MEMPOOL)
 #  define USE_SAFE_PUTENV 1
-# elif defined(__FreeBSD__)
+# elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
 #  define USE_SAFE_PUTENV 1
 # endif
 #endif

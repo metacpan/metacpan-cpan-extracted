@@ -1,103 +1,72 @@
 package Spp::Cursor;
 
 use 5.012;
-no warnings "experimental";
+no warnings 'experimental';
 
-use Spp::Builtin qw(to_end);
+use Exporter;
+our @ISA = qw(Exporter);
+our @EXPORT =
+  qw(new_cursor to_next cache reset_cache get_char pre_char fail_report);
 
-sub new {
-   my ($class, $str, $ns) = @_;
-   my $trace_str = $str . chr(0);
-   my $len_str = length($trace_str);
-   return bless({
-      str     => $trace_str,
-      ns      => $ns,
-      len     => $len_str,
-      off     => 0,
-      line    => 1,
-      pos     => 0,
-      maxoff  => 0,
-      maxline => 1,
-      maxpos  => 0,
-   }, $class);
-}
+use Spp::Builtin;
 
-sub off {
-   my $self = shift;
-   return $self->{'off'};
-}
-
-sub str {
-   my $self = shift;
-   return $self->{'str'};
-}
-
-sub len {
-   my $self = shift;
-   return $self->{'len'};
+sub new_cursor {
+  my ($str, $ns) = @_;
+  my $text = add($str, End);
+  my $len = len($text);
+  return {
+    'text'    => $text,
+    'ns'      => $ns,
+    'len'     => $len,
+    'off'     => 0,
+    'line'    => 1,
+    'depth'   => 0,
+    'maxoff'  => 0,
+    'maxline' => 1
+  };
 }
 
 sub to_next {
-   my $self = shift;
-   if (get_char($self) eq "\n") {
-      $self->{line}++;
-      $self->{pos} = 0;
-   }
-   else {
-      $self->{pos}++;
-   }
-   $self->{off}++;
-   if ($self->{off} > $self->{maxoff}) {
-      $self->{maxoff}  = $self->{off};
-      $self->{maxline} = $self->{line};
-      $self->{maxpos}  = $self->{pos};
-   }
+  my $cursor = shift;
+  if (get_char($cursor) eq "\n") { $cursor->{'line'}++ }
+  $cursor->{'off'}++;
+  if ($cursor->{'off'} > $cursor->{'maxoff'}) {
+    $cursor->{'maxoff'}  = $cursor->{'off'};
+    $cursor->{'maxline'} = $cursor->{'line'};
+  }
+  return True;
 }
 
 sub cache {
-   my $self = shift;
-   my $off    = $self->{off};
-   my $line   = $self->{line};
-   my $pos    = $self->{pos};
-   return [$off, $line, $pos];
+  my $cursor = shift;
+  my $off    = $cursor->{'off'};
+  my $line   = $cursor->{'line'};
+  return [$off, $line];
 }
 
 sub reset_cache {
-   my ($self, $cache) = @_;
-   my ($off, $line, $pos) = @{$cache};
-   $self->{off}  = $off;
-   $self->{line} = $line;
-   $self->{pos}  = $pos;
-   return 1;
+  my ($cursor, $cache) = @_;
+  $cursor->{'off'}  = $cache->[0];
+  $cursor->{'line'} = $cache->[1];
+  return True;
 }
 
 sub get_char {
-   my $self = shift;
-   my $str = $self->{str};
-   my $off = $self->{off};
-   return substr($str, $off, 1);
+  my $cursor = shift;
+  return substr($cursor->{'text'}, $cursor->{'off'}, 1);
 }
 
 sub pre_char {
-   my $self = shift;
-   my $str = $self->{str};
-   my $off = $self->{off};
-   return substr($str, $off-1, 1);
+  my $cursor = shift;
+  return substr($cursor->{'text'}, $cursor->{'off'} - 1, 1);
 }
 
-sub max_report {
-   my $self   = shift;
-   my $str      = $self->{str};
-   my $off      = $self->{maxoff};
-   my $line     = $self->{maxline};
-   my $pos      = $self->{maxpos};
-   my $tip_str  = to_end(substr($str, $off - $pos));
-   my $tip_char = (' ' x $pos) . '^';
-   return <<EOF;
-Warning! Stop match at line: $line
-   $tip_str
-   $tip_char
-EOF
+sub fail_report {
+  my $cursor   = shift;
+  my $text     = $cursor->{'text'};
+  my $off      = $cursor->{'maxoff'};
+  my $line     = $cursor->{'maxline'};
+  my $line_str = to_end(substr($text, $off));
+  return "line: $line Stop match:\n$line_str\n^";
 }
-
 1;

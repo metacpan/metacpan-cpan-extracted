@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Devel::MAT::Tool );
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 use constant CMD => "count";
 use constant CMD_DESC => "Count the various kinds of SV";
@@ -88,7 +88,8 @@ sub run
             [ "  $_", $kinds->{$_}, $blessed->{$_} // "" ]
          } sort keys %$kinds
       ],
-      sep => "    ",
+      sep   => "    ",
+      align => [ undef, "right", "right" ],
    );
 }
 

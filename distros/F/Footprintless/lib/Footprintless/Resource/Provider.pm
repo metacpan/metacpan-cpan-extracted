@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::Resource::Provider;
-$Footprintless::Resource::Provider::VERSION = '1.25';
+$Footprintless::Resource::Provider::VERSION = '1.26';
 # ABSTRACT: A contract for providing resources to the resource manager
 # PODNAME: Footprintless::Resource::Provider
 
@@ -55,7 +55,7 @@ Footprintless::Resource::Provider - A contract for providing resources to the re
 
 =head1 VERSION
 
-version 1.25
+version 1.26
 
 =head1 DESCRIPTION
 

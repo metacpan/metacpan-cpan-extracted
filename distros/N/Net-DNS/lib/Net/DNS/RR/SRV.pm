@@ -1,9 +1,9 @@
 package Net::DNS::RR::SRV;
 
 #
-# $Id: SRV.pm 1528 2017-01-18 21:44:58Z willem $
+# $Id: SRV.pm 1597 2017-09-22 08:04:02Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1528 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
 
 
 use strict;
@@ -36,7 +36,7 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 	my ( $offset, @opaque ) = @_;
 
-	my $target = $self->{target} || return '';
+	my $target = $self->{target};
 	my @nums = ( $self->priority, $self->weight, $self->port );
 	pack 'n3 a*', @nums, $target->encode( $offset + 6, @opaque );
 }
@@ -45,7 +45,7 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
-	my $target = $self->{target} || return '';
+	my $target = $self->{target};
 	my @rdata = ( $self->priority, $self->weight, $self->port, $target->string );
 }
 

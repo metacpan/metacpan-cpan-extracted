@@ -67,11 +67,11 @@ define ([
                 ct.login(assert, "root", "admin");
                 loggout();
                 done();
-            }, 500);
+            }, 1000);
             setTimeout(function () {
                 ct.loggout(assert);
                 done();
-            }, 1000);
+            }, 1500);
         });
 
     };

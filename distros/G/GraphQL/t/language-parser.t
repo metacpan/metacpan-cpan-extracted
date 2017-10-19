@@ -6,25 +6,33 @@ use Test::More;
 use Test::Exception;
 
 BEGIN {
-  use_ok( 'GraphQL::Parser' ) || print "Bail out!\n";
+  use_ok( 'GraphQL::Language::Parser', qw(parse) ) || print "Bail out!\n";
 }
 
-throws_ok { do_parse('{') } qr/Expected name/, 'trivial fail';
+dies_ok { parse('{') };
+like $@->message, qr/Expected name/, 'trivial fail';
 
-throws_ok { do_parse(<<'EOF'
+dies_ok { parse(<<'EOF'
 { ...MissingOn }
 fragment MissingOn Type
 EOF
-) } qr/Expected "on"/, 'missing "on"';
+) };
+like $@->message, qr/Expected "on"/, 'missing "on"';
 
-throws_ok { do_parse('{ field: {} }') } qr/Expected name/, 'expected';
-throws_ok { do_parse('notanoperation Foo { field }') } qr/Parse document failed/, 'bad op';
-throws_ok { do_parse('...') } qr/Parse document failed/, 'spread wrong place';
+dies_ok { parse('{ field: {} }') };
+like $@->message, qr/Expected name/, 'expected';
+dies_ok { parse('notanoperation Foo { field }') };
+like $@->message, qr/Parse document failed/, 'bad op';
+dies_ok { parse('...') };
+like $@->message, qr/Parse document failed/, 'spread wrong place';
 
-lives_ok { do_parse('{ field(complex: { a: { b: [ $var ] } }) }') } 'parses variable inline values';
-throws_ok { do_parse('query Foo($x: Complex = { a: { b: [ $var ] } }) { field }') } qr/Expected name or constant/, 'no var in default values';
-throws_ok { do_parse('fragment on on on { on }') } qr/Unexpected Name "on"/, 'no accept fragments named "on"';
-throws_ok { do_parse('{ ...on }') } qr/Unexpected Name "on"/, 'no accept fragment spread named "on"';
+lives_ok { parse('{ field(complex: { a: { b: [ $var ] } }) }') } 'parses variable inline values';
+dies_ok { parse('query Foo($x: Complex = { a: { b: [ $var ] } }) { field }') };
+like $@->message, qr/Expected name or constant/, 'no var in default values';
+dies_ok { parse('fragment on on on { on }') };
+like $@->message, qr/Unexpected Name "on"/, 'no accept fragments named "on"';
+dies_ok { parse('{ ...on }') };
+like $@->message, qr/Unexpected Name "on"/, 'no accept fragment spread named "on"';
 
 my @nonKeywords = (
   'on',
@@ -38,7 +46,7 @@ my @nonKeywords = (
 my %k2sub = (on => 'a');
 for my $keyword (@nonKeywords) {
   my $fragmentName = $k2sub{$keyword} || $keyword;
-  lives_ok { do_parse(<<EOF) } 'non keywords allowed';
+  lives_ok { parse(<<EOF) } 'non keywords allowed';
 query $keyword {
   ... $fragmentName
   ... on $keyword { field }
@@ -50,17 +58,13 @@ EOF
 }
 
 for my $anon (qw(mutation subscription)) {
-  lives_ok { do_parse(<<EOF) } 'non keywords allowed';
+  lives_ok { parse(<<EOF) } 'non keywords allowed';
 ${anon} {
   ${anon}Field
 }
 EOF
 }
 
-lives_ok { do_parse('{ field(complex: { a: { b: [ 123 "abc" ] } }) }') } 'list values';
-
-sub do_parse {
-  return GraphQL::Parser->parse($_[0]);
-}
+lives_ok { parse('{ field(complex: { a: { b: [ 123 "abc" ] } }) }') } 'list values';
 
 done_testing;

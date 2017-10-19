@@ -22,18 +22,18 @@ my %args = (
     },
 
     requires => {
-        'Getopt::Long' => '2.38',
-        'YAML' => '0.70',
-        'Term::UI' => '0.20',
-        'perl' => '5.008001',
-        'LWP::UserAgent' => '6.15',
         'DBD::ODBC' => '1.50',
-        'Proc::PID::File' => '1.27',
-        'JSON' => '2.15',
-        'Proc::Daemon' => '0.19',
-        'List::MoreUtils' => '0.22',
         'DBI' => '1.609',
+        'Getopt::Long' => '2.38',
+        'JSON' => '2.15',
+        'LWP::UserAgent' => '6.15',
+        'List::MoreUtils' => '0.22',
         'Log::Log4perl' => '1.30',
+        'Proc::Daemon' => '0.19',
+        'Proc::PID::File' => '1.27',
+        'Term::UI' => '0.20',
+        'YAML' => '0.70',
+        'perl' => '5.008001',
     },
 
     recommends => {
@@ -46,11 +46,11 @@ my %args = (
     },
 
     test_requires => {
-        'Test::More' => '0.98',
-        'Test::MockObject' => '0',
         'Capture::Tiny' => '0',
-        'Test::MockModule' => '0',
         'Test::Fatal' => '0',
+        'Test::MockModule' => '0',
+        'Test::MockObject' => '0',
+        'Test::More' => '0.98',
         'Test::Output' => '0',
     },
 

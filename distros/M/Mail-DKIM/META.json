@@ -37,11 +37,13 @@
             "MIME::Base64" : "0",
             "Mail::Address" : "0",
             "Net::DNS" : "0",
-            "Test::Simple" : "0"
+            "Net::DNS::Resolver::Mock" : "0",
+            "Test::Simple" : "0",
+            "YAML::XS" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.43",
+   "version" : "0.44",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

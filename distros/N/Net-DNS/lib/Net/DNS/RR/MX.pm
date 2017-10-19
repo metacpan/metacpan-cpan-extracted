@@ -1,9 +1,9 @@
 package Net::DNS::RR::MX;
 
 #
-# $Id: MX.pm 1528 2017-01-18 21:44:58Z willem $
+# $Id: MX.pm 1597 2017-09-22 08:04:02Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1528 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
 
 
 use strict;
@@ -35,7 +35,7 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 	my ( $offset, @opaque ) = @_;
 
-	my $exchange = $self->{exchange} || return '';
+	my $exchange = $self->{exchange};
 	pack 'n a*', $self->preference, $exchange->encode( $offset + 2, @opaque );
 }
 
@@ -43,7 +43,7 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
-	my $exchange = $self->{exchange} || return '';
+	my $exchange = $self->{exchange};
 	join ' ', $self->preference, $exchange->string;
 }
 

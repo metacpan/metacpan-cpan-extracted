@@ -57,10 +57,10 @@ my @queries = (
         [ "select 1, rand(464), ? as my_param", undef, ["query param"]],
     ],
     [
-        "select sleep(1)",
+        "select 3",
     ],
     [
-        "select sleep(2)"
+        "select 5"
     ],
 );
 
@@ -73,13 +73,12 @@ sub run_queries {
     my @promises;
     for (1..3) {
         # Create 9 connections to mysql (3 promises with 3 connections each)
-        my $connections = [ map MariaDB::NonBlocking::Promises->init, 1..2 ];
+        my $connection = MariaDB::NonBlocking::Promises->init;
 
         # Used during error handling to disconnect everything early
-        push @all_connections, $connections;
+        push @all_connections, $connection;
 
-        push @promises, MariaDB::NonBlocking::Promises::connect(
-            $connections,
+        push @promises, $connection->connect(
             {
                 host     => "127.0.0.1",
                 user     => "root",
@@ -90,16 +89,15 @@ sub run_queries {
             sub {
                 return if exists $extras->{cancel}; # Another connection died
 
-                my ($connections) = @_;
+                my ($connection) = @{ $_[0] // [] };
 
                 # Return a promise that will be resolved once all the
                 # queries are run; the resolve handler will then get
                 # the per-query results
-                return MariaDB::NonBlocking::Promises::run_multiple_queries(
-                        $connections,
+                return $connection->run_query(
                         pop @queries,
                         $extras,
-                       );
+                );
             },
             sub {
                 say "Rejected! @_"
@@ -119,7 +117,6 @@ sub run_queries {
         # Disconnect should not die -- if it does, then
         # that takes precedence to whatever else happened!
         $_->disconnect for grep defined,
-                           map @{$_//[]},
                            @all_connections;
 
         die $_[0]; # rethrow

@@ -1,5 +1,8 @@
 Revision history for Perl extension Graph::SomeUtils.
 
+0.20  October 2017
+  - Added a couple of functions
+
 0.02  February 2014
   - Added graph_get_vertex_label and graph_set_vertex_label
 

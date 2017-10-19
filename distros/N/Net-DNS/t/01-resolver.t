@@ -1,7 +1,7 @@
-# $Id: 01-resolver.t 1590 2017-08-18 09:56:05Z willem $	-*-perl-*-
+# $Id: 01-resolver.t 1593 2017-09-04 14:23:26Z willem $	-*-perl-*-
 
 use strict;
-use Test::More tests => 28;
+use Test::More tests => 27;
 
 
 BEGIN {
@@ -51,7 +51,7 @@ ok( $class->new( debug => 1 )->_diag(@Net::DNS::Resolver::ISA), 'debug message' 
 
 {
 	my $resolver = Net::DNS::Resolver->new();
-	$resolver->nameservers(qw(127.0.0.1 ::1));
+	$resolver->nameservers(qw(127.0.0.1 ::1 ::ffff:127.0.0.1 fe80::1234%1));
 	$resolver->force_v4(0);					# set by default if no IPv6
 	$resolver->prefer_v6(1);
 	my ($address) = $resolver->nameserver();
@@ -87,7 +87,7 @@ ok( $class->new( debug => 1 )->_diag(@Net::DNS::Resolver::ISA), 'debug message' 
 
 {
 	my $resolver = Net::DNS::Resolver->new();
-	foreach my $ip (qw(127.0.0.1 ::1 fe80::1234%1)) {
+	foreach my $ip (qw(127.0.0.1 ::1)) {
 		is( $resolver->srcaddr($ip), $ip, "\$resolver->srcaddr($ip)" );
 	}
 }
@@ -95,14 +95,14 @@ ok( $class->new( debug => 1 )->_diag(@Net::DNS::Resolver::ISA), 'debug message' 
 
 {					## exercise possibly unused socket code
 					## check for smoke and flames only
-	my $resolver = Net::DNS::Resolver->new();
-	foreach my $ip (qw(127.0.0.1 ::1 ::ffff:127.0.0.1)) {
+	my $resolver = Net::DNS::Resolver->new( tcp_timeout => 1 );
+	foreach my $ip (qw(127.0.0.1 ::1)) {
 		eval { $resolver->_create_udp_socket($ip) };
-		ok( !$@, "\$resolver->_create_udp_socket($ip)" );
+		is( $@, '', "\$resolver->_create_udp_socket($ip)" );
 		eval { $resolver->_create_dst_sockaddr( $ip, 53 ) };
-		#ok( !$@, "\$resolver->_create_dst_sockaddr($ip,53)" );	# Windows!
+		is( $@, '', "\$resolver->_create_dst_sockaddr($ip,53)" );
 		eval { $resolver->_create_tcp_socket($ip) };
-		ok( !$@, "\$resolver->_create_tcp_socket($ip)" );
+		is( $@, '', "\$resolver->_create_tcp_socket($ip)" );
 	}
 }
 

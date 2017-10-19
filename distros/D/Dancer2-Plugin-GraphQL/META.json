@@ -43,7 +43,7 @@
             "Dancer2" : "0.200000",
             "Dancer2::Core::Types" : "0",
             "Dancer2::Plugin" : "0",
-            "GraphQL" : "0.12",
+            "GraphQL" : "0.15",
             "perl" : "5.006",
             "strict" : "0",
             "warnings" : "0"
@@ -77,5 +77,5 @@
       },
       "x_IRC" : "irc://irc.perl.org/#graphql-perl"
    },
-   "version" : "0.02"
+   "version" : "0.03"
 }

@@ -29,13 +29,15 @@ Catmandu::OAI - Catmandu modules for working with OAI repositories
 
 =cut
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 =head1 MODULES
 
 =over
 
 =item * L<Catmandu::Importer::OAI>
+
+=item * L<Catmandu::Store::OAI>
 
 =back
 

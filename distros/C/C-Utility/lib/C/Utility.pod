@@ -5,10 +5,30 @@
 
 C::Utility - utilities for generating C programs
 
+=head1 VERSION
+
+This documents C::Utility version 0.007
+corresponding to git commit L<7f927fd0b669289294fc7a207ce373b4303d835e|https://github.com/benkasminbullock/C-Utility/commit/7f927fd0b669289294fc7a207ce373b4303d835e> released on Fri Oct 13 18:28:05 2017 +0900.
+
 =head1 DESCRIPTION
 
 This module contains functions which assist in automatic generation of
-C programs.
+C programs.  L</convert_to_c_string> converts a string into a string
+with characters correctly escaped for use in a C
+program. L</convert_to_c_string_pc> does the same thing plus escaping
+percent signs so that they may be used as format strings for
+printf. L</ch_files> makes a header file name from a C file
+name. L</escape_string> escapes double quotes. L</valid_c_variable>
+checks whether a string is valid as a C variable. L</wrapper_name>
+returns a C preprocessor wrapper name. L</print_top_h_wrapper> prints
+the top wrapper for a header file, and L</print_bottom_h_wrapper>
+prints the bottom part. L</print_include> prints C<#include>
+statements. L</hash_to_c_file> converts a Perl hash into a compilable
+C file with the keys as C strings. L</line_directive> prints a C line
+directive. L</brute_force_line> puts line directives on every
+line. L</add_lines> converts the string #line to line directives as do
+L</linein> and L</lineout>. L</remove_quotes> removes leading and
+trailing quotes. L</stamp_file> adds a printed stamp to a file handle.
 
 =head1 FUNCTIONS
 
@@ -33,7 +53,7 @@ produces output
     "jumped %over the lazy dog.\n"
 
 
-(This example is included as L<F<fox.pl>|https://api.metacpan.org/source/BKB/C-Utility-0.006/examples/fox.pl> in the distribution.)
+(This example is included as L<F<fox.pl>|https://fastapi.metacpan.org/source/BKB/C-Utility-0.007/examples/fox.pl> in the distribution.)
 
 
 It also removes backslashes from before the @ symbol, so \@ is
@@ -63,7 +83,7 @@ produces output
     "jumped %%over the lazy dog.\n"
 
 
-(This example is included as L<F<fox-pc.pl>|https://api.metacpan.org/source/BKB/C-Utility-0.006/examples/fox-pc.pl> in the distribution.)
+(This example is included as L<F<fox-pc.pl>|https://fastapi.metacpan.org/source/BKB/C-Utility-0.007/examples/fox-pc.pl> in the distribution.)
 
 
 =head2 c_string
@@ -187,7 +207,7 @@ produces output
     #endif /* MY_H */
 
 
-(This example is included as L<F<michael-caine.pl>|https://api.metacpan.org/source/BKB/C-Utility-0.006/examples/michael-caine.pl> in the distribution.)
+(This example is included as L<F<michael-caine.pl>|https://fastapi.metacpan.org/source/BKB/C-Utility-0.007/examples/michael-caine.pl> in the distribution.)
 
 
 The keys of the hash are checked with L</valid_c_variable>, and the
@@ -217,6 +237,19 @@ to C<$fh>. This prints a C preprocessor line directive to the file
 specified by C<$fh>. If C<$fh> is a scalar reference, it concatenates
 the line directive to the end of it.
 
+    
+    use C::Utility 'line_directive';
+    my $out = '';
+    line_directive (\$out, 99, "balloons.c");
+    print $out;
+
+
+produces output
+
+    #line 99 "balloons.c"
+
+
+(This example is included as L<F<line-directive.pl>|https://fastapi.metacpan.org/source/BKB/C-Utility-0.007/examples/line-directive.pl> in the distribution.)
 
 
 =head2 brute_force_line
@@ -231,8 +264,11 @@ numbers into a file before it is processed by L<Template>.
 
     my $text = add_lines ($file);
 
-Replace strings of the form #line in the file specified by C<$file>
-with a C-style line directive before it is processed by L<Template>.
+Read C<$file>, and replace strings of the form #line in the file with
+a C-style line directive using C<$file> before it is processed by
+L<Template>. Also add a line directive to the first line of the
+file. C<$file> must be in the UTF-8 encoding. The line directives are
+given the full path name of the file using L<File::Spec/rel2abs>.
 
 =head2 remove_quotes
 
@@ -256,8 +292,9 @@ the original file, then returns the complete text as its return value.
     lineout ($outtext, $outfile);
 
 Given a C output text C<$outtext> and a file name F<$outfile>, this
-writes out the text to F<$outfile>, replacing C<#lineout> with an
-appropriate line directive.
+writes out the text to F<$outfile>, replacing the text C<#lineout>
+with an appropriate line directive using C<$outfile> as the file name
+and the lines of the file as the line numbers.
 
     
     use FindBin '$Bin';
@@ -281,7 +318,7 @@ produces output
     int main () { return 0; }
 
 
-(This example is included as L<F<lineout.pl>|https://api.metacpan.org/source/BKB/C-Utility-0.006/examples/lineout.pl> in the distribution.)
+(This example is included as L<F<lineout.pl>|https://fastapi.metacpan.org/source/BKB/C-Utility-0.007/examples/lineout.pl> in the distribution.)
 
 
 =head2 stamp_file
@@ -298,29 +335,23 @@ The name of the C file output can be added as a second argument:
 If C<$fh> is a scalar reference, the stamp is concatenated to it.
 
     
-    use C::Utility 'line_directive';
+    use C::Utility 'stamp_file';
     my $out = '';
-    line_directive (\$out, 99, "balloons.c");
+    stamp_file (\$out);
     print $out;
 
 
 produces output
 
-    #line 99 "balloons.c"
+    /*
+    This C file was generated by /usr/home/ben/projects/c-utility/examples/stamp-file.pl at Fri Oct 13 18:20:44 2017.
+    */
 
 
-(This example is included as L<F<line-directive.pl>|https://api.metacpan.org/source/BKB/C-Utility-0.006/examples/line-directive.pl> in the distribution.)
+(This example is included as L<F<stamp-file.pl>|https://fastapi.metacpan.org/source/BKB/C-Utility-0.007/examples/stamp-file.pl> in the distribution.)
 
 
 This function was added in version 0.006.
-
-=head1 SEE ALSO
-
-=over
-
-=item L<C::Template>
-
-=back
 
 =head1 DEPENDENCIES
 

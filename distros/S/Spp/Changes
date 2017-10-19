@@ -143,3 +143,13 @@ Revision history for Spp
         is_false() is_true() use False and True
         is_atom_tillnot -> is_tillnot
         is_atom_look    => is_look
+
+2.01    2017-10-10
+        the code use genarate code.
+        only reserve spp.pl
+
+2.03   2017-10-14
+       Spp::Cursor remove load_text()
+       fix bug of OptAst opt-spp-range()
+       Builtin.pm add some tools for estr.
+       lint_spp_ast() add some rule for check type table.

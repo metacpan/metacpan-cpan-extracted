@@ -1,5 +1,9 @@
 Revision history for Struct-Path
 
+0.72    2017-10-15
+        spath(): sane errors for out of range negative array indexes
+        croak if empty path and delete opt passed to spath()
+
 0.71    2017-06-27
         'assign' opt to spath() added
         grow arrays smoothly if 'append' for 'expand' specified in spath() (experimental)

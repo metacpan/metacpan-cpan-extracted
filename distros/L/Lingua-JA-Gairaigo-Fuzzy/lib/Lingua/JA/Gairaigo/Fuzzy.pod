@@ -26,7 +26,7 @@ produces output
     メインフレーム and メーンフレーム may be the same word.
 
 
-(This example is included as L<F<synopsis.pl>|https://api.metacpan.org/source/BKB/Lingua-JA-Gairaigo-Fuzzy-0.07/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-Gairaigo-Fuzzy-0.08/examples/synopsis.pl> in the distribution.)
 
 
 =head1 DESCRIPTION
@@ -51,7 +51,7 @@ as "ティ", "テー", "テイ", and "テ", or combinations like "コウ" and
 value. If the two words appear not to be the same, it returns a false
 value.
 
-As of 0.07, the exact checks this makes are not
+As of 0.08, the exact checks this makes are not
 documented, so please view the source code to find out the details.
 
 =head1 DEPENDENCIES

@@ -10,7 +10,7 @@ package Devel::Cover::DB;
 use strict;
 use warnings;
 
-our $VERSION = '1.28'; # VERSION
+our $VERSION = '1.29'; # VERSION
 
 use Devel::Cover::Criterion;
 use Devel::Cover::DB::File;
@@ -18,6 +18,7 @@ use Devel::Cover::DB::Structure;
 use Devel::Cover::DB::IO;
 
 use Carp;
+use File::Find;
 use File::Path;
 
 use Devel::Cover::Dumper;  # For debugging
@@ -133,6 +134,16 @@ sub delete {
     $self
 }
 
+sub clean {
+    my $self = shift;
+
+    # remove all lock files
+    my $rm_lock = sub {
+        unlink if /\.lock$/
+    };
+    find($rm_lock, $self->{db});
+}
+
 sub merge_runs {
     my $self = shift;
     my $db = $self->{db};
@@ -168,6 +179,8 @@ sub merge_runs {
         }
         $st->write($self->{base});
     }
+
+    $self->clean;
 
     $self
 }
@@ -904,7 +917,7 @@ Devel::Cover::DB - Code coverage metrics for Perl
 
 =head1 VERSION
 
-version 1.28
+version 1.29
 
 =head1 SYNOPSIS
 

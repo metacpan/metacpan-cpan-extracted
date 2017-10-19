@@ -140,6 +140,12 @@ in /usr/lib. Drop-in files under any of these directories take precedence
 over unit files wherever located. Multiple drop-in files with different names are applied in
 lexicographic order, regardless of which of the directories they reside in.
 
+Note that while systemd offers a flexible dependency system
+between units it is recommended to use this functionality only
+sparingly and instead rely on techniques such as bus-based or
+socket-based activation which make dependencies implicit,
+resulting in a both simpler and more flexible system.
+
 Some unit names reflect paths existing in the file system
 namespace. Example: a device unit
 dev-sda.device refers to a device with the
@@ -248,8 +254,9 @@ effect.',
           'value_type' => 'uniline'
         },
         'description' => "Configures requirement dependencies on other units. If this unit gets activated, the units
-listed here will be activated as well. If one of the other units gets deactivated or its activation fails, this
-unit will be deactivated. This option may be specified more than once or multiple space-separated units may be
+listed here will be activated as well. If one of the other units fails to activate, and an ordering dependency
+C<After> on the failing unit is set, this
+unit will not be started. This option may be specified more than once or multiple space-separated units may be
 specified in one option in which case requirement dependencies for all listed names will be created. Note that
 requirement dependencies do not influence the order in which services are started or stopped.  This has to be
 configured independently with the C<After> or C<Before> options. If a unit
@@ -262,7 +269,7 @@ failing services.
 
 Note that this dependency type does not imply that the other unit always has to be in active state when
 this unit is running. Specifically: failing condition checks (such as C<ConditionPathExists>,
-C<ConditionPathExists>, \x{2026} \x{2014} see below) do not cause the start job of a unit with a
+C<ConditionPathIsSymbolicLink>, \x{2026} \x{2014} see below) do not cause the start job of a unit with a
 C<Requires> dependency on it to fail. Also, some unit types may deactivate on their own (for
 example, a service process may decide to exit cleanly, or a device may be unplugged by the user), which is not
 propagated to units having a C<Requires> dependency. Use the C<BindsTo>
@@ -520,10 +527,11 @@ C<OnFailure>..',
       },
       'IgnoreOnIsolate',
       {
-        'description' => 'Takes a boolean argument. If
-C<true>, this unit will not be stopped when
-isolating another unit. Defaults to
-C<false>.',
+        'description' => 'Takes a boolean argument. If C<true>, this unit
+will not be stopped when isolating another unit. Defaults to
+C<false> for service, target, socket, busname, timer, and path
+units, and C<true> for slice, scope, device, swap, mount, and
+automount units.',
         'type' => 'leaf',
         'value_type' => 'boolean',
         'write_as' => [
@@ -641,18 +649,9 @@ no effect on the unit itself, only on the job that might be pending for it. Or i
 timeouts are useful to abort unit state changes, and revert them. The job timeout set with this option however
 is useful to abort only the job waiting for the unit state to change.
 
-C<JobTimeoutAction>
-optionally configures an additional
-action to take when the time-out is
-hit. It takes the same values as the
-per-service
-C<StartLimitAction>
-setting, see
-L<systemd.service(5)>
-for details. Defaults to
-C<none>. C<JobTimeoutRebootArgument>
-configures an optional reboot string
-to pass to the
+C<JobTimeoutAction> optionally configures an additional action to take when the time-out
+is hit. It takes the same values as C<StartLimitAction>. Defaults to C<none>.
+C<JobTimeoutRebootArgument> configures an optional reboot string to pass to the
 L<reboot(2)>
 system call.',
         'type' => 'leaf',
@@ -671,18 +670,9 @@ no effect on the unit itself, only on the job that might be pending for it. Or i
 timeouts are useful to abort unit state changes, and revert them. The job timeout set with this option however
 is useful to abort only the job waiting for the unit state to change.
 
-C<JobTimeoutAction>
-optionally configures an additional
-action to take when the time-out is
-hit. It takes the same values as the
-per-service
-C<StartLimitAction>
-setting, see
-L<systemd.service(5)>
-for details. Defaults to
-C<none>. C<JobTimeoutRebootArgument>
-configures an optional reboot string
-to pass to the
+C<JobTimeoutAction> optionally configures an additional action to take when the time-out
+is hit. It takes the same values as C<StartLimitAction>. Defaults to C<none>.
+C<JobTimeoutRebootArgument> configures an optional reboot string to pass to the
 L<reboot(2)>
 system call.',
         'type' => 'leaf',
@@ -701,18 +691,9 @@ no effect on the unit itself, only on the job that might be pending for it. Or i
 timeouts are useful to abort unit state changes, and revert them. The job timeout set with this option however
 is useful to abort only the job waiting for the unit state to change.
 
-C<JobTimeoutAction>
-optionally configures an additional
-action to take when the time-out is
-hit. It takes the same values as the
-per-service
-C<StartLimitAction>
-setting, see
-L<systemd.service(5)>
-for details. Defaults to
-C<none>. C<JobTimeoutRebootArgument>
-configures an optional reboot string
-to pass to the
+C<JobTimeoutAction> optionally configures an additional action to take when the time-out
+is hit. It takes the same values as C<StartLimitAction>. Defaults to C<none>.
+C<JobTimeoutRebootArgument> configures an optional reboot string to pass to the
 L<reboot(2)>
 system call.',
         'type' => 'leaf',
@@ -731,18 +712,9 @@ no effect on the unit itself, only on the job that might be pending for it. Or i
 timeouts are useful to abort unit state changes, and revert them. The job timeout set with this option however
 is useful to abort only the job waiting for the unit state to change.
 
-C<JobTimeoutAction>
-optionally configures an additional
-action to take when the time-out is
-hit. It takes the same values as the
-per-service
-C<StartLimitAction>
-setting, see
-L<systemd.service(5)>
-for details. Defaults to
-C<none>. C<JobTimeoutRebootArgument>
-configures an optional reboot string
-to pass to the
+C<JobTimeoutAction> optionally configures an additional action to take when the time-out
+is hit. It takes the same values as C<StartLimitAction>. Defaults to C<none>.
+C<JobTimeoutRebootArgument> configures an optional reboot string to pass to the
 L<reboot(2)>
 system call.',
         'type' => 'leaf',

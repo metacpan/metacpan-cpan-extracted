@@ -1,5 +1,8 @@
 package WebService::Braintree::ValidationErrorCollection;
-$WebService::Braintree::ValidationErrorCollection::VERSION = '0.93';
+$WebService::Braintree::ValidationErrorCollection::VERSION = '0.94';
+use 5.010_001;
+use strictures 1;
+
 =head1 NAME
 
 WebService::Braintree::ValidationError
@@ -11,7 +14,6 @@ This class represents a collection of validation errors.
 =cut
 
 use Moose;
-use WebService::Braintree::Util;
 use WebService::Braintree::ValidationError;
 
 =head1 CLASS METHODS

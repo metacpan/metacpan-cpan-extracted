@@ -20,6 +20,23 @@ has 'user_data' => (
   required => 0,
 );
 
+has 'position' => (
+  is => 'ro',
+  isa => 'Maybe[Int]',
+  required => 0,
+);
+
+sub owner_grammar {
+  my ($self) = @_;
+
+  for (my $p = $self->parent; $p; $p = $p->parent) {
+    next unless $p->isa('Grammar::Formal::Grammar');
+    return $p;
+  }
+
+  die "Called owner_grammar on orphan pattern";
+}
+
 #####################################################################
 # Base package for unary operators
 #####################################################################
@@ -84,6 +101,38 @@ use Moose;
 extends 'Grammar::Formal::Binary';
 
 #####################################################################
+# OrderedChoice
+#####################################################################
+package Grammar::Formal::OrderedChoice;
+use Modern::Perl;
+use Moose;
+extends 'Grammar::Formal::Binary';
+
+#####################################################################
+# Conjunction
+#####################################################################
+package Grammar::Formal::Conjunction;
+use Modern::Perl;
+use Moose;
+extends 'Grammar::Formal::Binary';
+
+#####################################################################
+# OrderedConjunction
+#####################################################################
+package Grammar::Formal::OrderedConjunction;
+use Modern::Perl;
+use Moose;
+extends 'Grammar::Formal::Binary';
+
+#####################################################################
+# Subtraction
+#####################################################################
+package Grammar::Formal::Subtraction;
+use Modern::Perl;
+use Moose;
+extends 'Grammar::Formal::Binary';
+
+#####################################################################
 # Empty
 #####################################################################
 package Grammar::Formal::Empty;
@@ -95,14 +144,6 @@ extends 'Grammar::Formal::Pattern';
 # NotAllowed
 #####################################################################
 package Grammar::Formal::NotAllowed;
-use Modern::Perl;
-use Moose;
-extends 'Grammar::Formal::Pattern';
-
-#####################################################################
-# Whatever
-#####################################################################
-package Grammar::Formal::Whatever;
 use Modern::Perl;
 use Moose;
 extends 'Grammar::Formal::Pattern';
@@ -138,9 +179,9 @@ has 'min' => (
 );
 
 #####################################################################
-# BoundRepetition
+# BoundedRepetition
 #####################################################################
-package Grammar::Formal::BoundRepetition;
+package Grammar::Formal::BoundedRepetition;
 use Modern::Perl;
 use Moose;
 extends 'Grammar::Formal::Unary';
@@ -165,7 +206,7 @@ use Modern::Perl;
 use Moose;
 extends 'Grammar::Formal::Pattern';
 
-has 'ref'  => (
+has 'name'  => (
   is       => 'ro',
   required => 1,
   isa      => 'Str'
@@ -173,12 +214,15 @@ has 'ref'  => (
 
 sub expand {
   my ($self) = @_;
-  for (my $p = $self->parent; $p; $p = $p->parent) {
-    next unless $p->isa('Grammar::Formal::Grammar');
-    return $p->rules->{$self->ref} if $p->rules->{$self->ref};
-  }
-  warn "rule expansion for " . $self->ref . " failed.";
-  return
+
+  my $p = $self->owner_grammar;
+
+  return $p->rules->{$self->name}
+    if $p->rules->{$self->name};
+
+  warn "rule expansion for " . $self->name . " failed.";
+
+  return;
 }
 
 #####################################################################
@@ -216,7 +260,7 @@ has 'rules' => (
   default  => sub { {} },
 );
 
-# TODO: lock the rules hashref for external access?
+# TODO: lock the rules hashref against external access?
 
 sub set_rule {
   my ($self, $name, $value) = @_;
@@ -229,44 +273,42 @@ sub set_rule {
 #####################################################################
 # Factory methods
 #####################################################################
+
+# FIXME(bh): better alternative for this?
+
 sub NotAllowed {
-  my ($self) = @_;
-  Grammar::Formal::NotAllowed->new();
+  my ($self, @o) = @_;
+  Grammar::Formal::NotAllowed->new(@o);
 }
 
 sub Empty {
-  my ($self) = @_;
-  Grammar::Formal::Empty->new();
-}
-
-sub Whatever {
-  my ($self) = @_;
-  Grammar::Formal::Whatever->new();
+  my ($self, @o) = @_;
+  Grammar::Formal::Empty->new(@o);
 }
 
 sub Choice {
-  my ($self, $p1, $p2) = @_;
-  Grammar::Formal::Choice->new(p1 => $p1, p2 => $p2);
+  my ($self, $p1, $p2, @o) = @_;
+  Grammar::Formal::Choice->new(p1 => $p1, p2 => $p2, @o);
 }
 
 sub Group {
-  my ($self, $p1, $p2) = @_;
-  Grammar::Formal::Group->new(p1 => $p1, p2 => $p2);
+  my ($self, $p1, $p2, @o) = @_;
+  Grammar::Formal::Group->new(p1 => $p1, p2 => $p2, @o);
 }
 
 sub Optional {
-  my ($self, $p) = @_;
-  $self->Choice($self->Empty, $p);
+  my ($self, $p, @o) = @_;
+  $self->Choice($self->Empty, $p, @o);
 }
 
 sub OneOrMore {
-  my ($self, $p) = @_;
-  Grammar::Formal::OneOrMore->new(p => $p);
+  my ($self, $p, @o) = @_;
+  Grammar::Formal::OneOrMore->new(p => $p, @o);
 }
 
 sub ZeroOrMore {
-  my ($self, $p) = @_;
-  Grammar::Formal::ZeroOrMore->new(p => $p);
+  my ($self, $p, @o) = @_;
+  Grammar::Formal::ZeroOrMore->new(p => $p, @o);
 }
 
 #####################################################################
@@ -354,6 +396,12 @@ sub from_numbers {
   return $class->new(spans => $spans);
 }
 
+sub from_numbers_pos {
+  my ($class, $pos, @numbers) = @_;
+  my $spans = Set::IntSpan->new([@numbers]);
+  return $class->new(spans => $spans, position => $pos);
+}
+
 #####################################################################
 # Grammar::Formal
 #####################################################################
@@ -364,7 +412,7 @@ use Moose;
 
 extends 'Grammar::Formal::Grammar';
 
-our $VERSION = '0.02';
+our $VERSION = '0.20';
 
 1;
 
@@ -412,6 +460,7 @@ L<Moose>.
 
       + Grammar::Formal::Group  # concatenation
       + Grammar::Formal::Choice # alternatives
+      + Grammar::Formal::OrderedChoice # ... with preference
 
     + Grammar::Formal::Unary
       # Base package for operators with 1 child
@@ -424,7 +473,7 @@ L<Moose>.
 
         has ro min # minimum number of occurences
 
-      + Grammar::Formal::BoundRepetition
+      + Grammar::Formal::BoundedRepetition
         # bound repetition
 
         has ro min # minimum number of occurences

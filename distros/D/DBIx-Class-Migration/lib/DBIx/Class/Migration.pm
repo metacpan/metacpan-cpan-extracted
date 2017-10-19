@@ -1,6 +1,6 @@
 package DBIx::Class::Migration;
 
-our $VERSION = "0.058";
+our $VERSION = "0.060";
 $VERSION = eval $VERSION;
 
 use Moose;
@@ -632,7 +632,7 @@ L<DBIx::Class::DeploymentHandler> and L<DBIx::Class::Fixtures>, along with
 a standard tutorial, to give you a simple and straightforward approach to
 solving the problem of how to best create database versions, migrations and
 testing data.  Additionally it builds on tools like L<Test::mysqld> and
-L<Test::PostgreSQL> along with L<DBD::Sqlite> in order to assist you in quickly
+L<Test::Postgresql58> along with L<DBD::Sqlite> in order to assist you in quickly
 creating a local development database sandbox.  It offers some integration
 points to testing your database, via tools like L<Test::DBIx::Class> in order to
 make testing your database driven logic less painful.  Lastly, we offer some
@@ -689,7 +689,7 @@ an array which can be sent to L<DBIx::Class::Schema/connect>.
 This defaults to L<DBIx::Class::Migration::SqliteSandbox>.  Currently we have
 support for MySQL and Postgresql via L<DBIx::Class::Migration::MySQLSandbox>
 and L<DBIx::Class::Migration::PgSandbox>, but you will need to side install
-L<Test::mysqld> and L<Test::PostgreSQL> (In other words you'd need to add
+L<Test::mysqld> and L<Test::Postgresql58> (In other words you'd need to add
 these C<Test::*> namespace modules to your C<Makefile.PL> or C<dist.ini>).
 
 =head2 db_sandbox
@@ -838,7 +838,7 @@ overall architecture of the system.
 Defaults to L<DBIx::Class::DeploymentHandler>.  You'll probably not need to
 change this unless you need a custom deployment handler, and if you do, I
 can't be sure this framework will work correctly, particularly if you are not
-useing monotonic versioning.
+using monotonic versioning.
 
 =head2 dbic_dh_args
 
@@ -1152,7 +1152,7 @@ sets of data.  Lastly, thanks to the L<DBIx::Class> cabal for all the work done
 in making the L<DBIx::Class> ORM so amazingly powerful.
 
 Additionally thanks to the creators / maintainers for L<Test::mysqld> and
-L<Test::PostgreSQL>, which made it easy to create developer level sandboxes for
+L<Test::Postgresql58>, which made it easy to create developer level sandboxes for
 these popular open source databases.
 
 As usual, thanks to the L<Moose> cabal for making Perl programming fun and
@@ -1185,7 +1185,7 @@ missed you.
 L<DBIx::Class::DeploymentHandler>, L<DBIx::Class::Fixtures>, L<DBIx::Class>,
 L<DBIx::Class::Schema::Loader>, L<Moose>, L<DBIx::Class::Migration::Script>,
 L<DBIx::Class::Migration::Population>, L<dbic-migration>, L<SQL::Translator>,
-L<Test::mysqld>, L<Test::PostgreSQL>.
+L<Test::mysqld>, L<Test::Postgresql58>.
 
 =head1 COPYRIGHT & LICENSE
 

@@ -1,5 +1,5 @@
 package ETL::Yertl::Command::ygrok;
-our $VERSION = '0.033';
+our $VERSION = '0.035';
 # ABSTRACT: Parse lines of text into documents
 
 use ETL::Yertl;
@@ -287,7 +287,7 @@ ETL::Yertl::Command::ygrok - Parse lines of text into documents
 
 =head1 VERSION
 
-version 0.033
+version 0.035
 
 =head1 AUTHOR
 

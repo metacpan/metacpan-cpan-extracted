@@ -1,16 +1,17 @@
 package Net::DNS::Resolver::Base;
 
 #
-# $Id: Base.pm 1588 2017-08-17 12:41:15Z willem $
+# $Id: Base.pm 1595 2017-09-12 09:10:56Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1588 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1595 $)[1];
 
 
 #
 #  Implementation notes wrt IPv6 support when using perl before 5.20.0.
 #
 #  In general we try to be gracious to those stacks that do not have IPv6 support.
-#  We test that by means of the availability of IO::Socket::INET6 or IO::Socket::IP
+#  The socket code is conditionally compiled depending upon the availability of
+#  IO::Socket::IP or the deprecated IO::Socket::INET6 package.
 #
 #  We have chosen not to use mapped IPv4 addresses, there seem to be issues
 #  with this; as a result we use separate sockets for each family type.
@@ -25,7 +26,7 @@ our $VERSION = (qw$LastChangedRevision: 1588 $)[1];
 # [Revised March 2016]
 
 
-use constant USE_SOCKET_IP => defined eval 'use Socket 1.98; use IO::Socket::IP 0.32; 1;';
+use constant USE_SOCKET_IP => defined eval 'use Socket 1.97; use IO::Socket::IP 0.32; 1;';
 
 use constant USE_SOCKET_INET => defined eval 'require IO::Socket::INET';
 
@@ -662,7 +663,10 @@ sub _bgread {
 	my ( $expire, $query, $read ) = @$appendix;
 	return shift(@$read) if ref($read);
 
-	return unless IO::Select->new($handle)->can_read(0);
+	unless ( IO::Select->new($handle)->can_read(0) ) {
+		$self->errorstring('timed out');
+		return;
+	}
 
 	my $peer = $handle->peerhost;
 	$self->answerfrom($peer);
@@ -875,7 +879,7 @@ sub _create_tcp_socket {
 	unless (USE_SOCKET_IP) {
 		$socket = IO::Socket::INET6->new(
 			LocalAddr => $self->{srcaddr6},
-			LocalPort => ( $self->{srcport} || undef ),
+			LocalPort => $self->{srcport},
 			PeerAddr  => $ip,
 			PeerPort  => $self->{port},
 			Proto	  => 'tcp',
@@ -885,13 +889,13 @@ sub _create_tcp_socket {
 
 		$socket = IO::Socket::INET->new(
 			LocalAddr => $self->{srcaddr4},
-			LocalPort => ( $self->{srcport} || undef ),
+			LocalPort => $self->{srcport},
 			PeerAddr  => $ip,
 			PeerPort  => $self->{port},
 			Proto	  => 'tcp',
 			Timeout	  => $self->{tcp_timeout},
 			)
-				unless USE_SOCKET_INET6 && $ip6_addr;
+				unless $ip6_addr;
 	}
 
 	$self->errorstring("no socket $sock_key $!") unless $socket;
@@ -920,7 +924,7 @@ sub _create_udp_socket {
 	unless (USE_SOCKET_IP) {
 		$socket = IO::Socket::INET6->new(
 			LocalAddr => $self->{srcaddr6},
-			LocalPort => ( $self->{srcport} || undef ),
+			LocalPort => $self->{srcport},
 			Proto	  => 'udp',
 			Type	  => SOCK_DGRAM
 			)
@@ -928,11 +932,11 @@ sub _create_udp_socket {
 
 		$socket = IO::Socket::INET->new(
 			LocalAddr => $self->{srcaddr4},
-			LocalPort => ( $self->{srcport} || undef ),
+			LocalPort => $self->{srcport},
 			Proto	  => 'udp',
 			Type	  => SOCK_DGRAM
 			)
-				unless USE_SOCKET_INET6 && $ip6_addr;
+				unless $ip6_addr;
 	}
 
 	$self->errorstring("no socket $sock_key $!") unless $socket;
@@ -941,23 +945,17 @@ sub _create_udp_socket {
 }
 
 
-my $hints4 = {
-	family	 => AF_INET,
+my @udp = (
 	flags	 => Socket::AI_NUMERICHOST,
 	protocol => Socket::IPPROTO_UDP,
 	socktype => SOCK_DGRAM
-	}
+	)
 		if USE_SOCKET_IP;
 
-my $hints6 = {
-	family	 => AF_INET6,
-	flags	 => Socket::AI_NUMERICHOST,
-	protocol => Socket::IPPROTO_UDP,
-	socktype => SOCK_DGRAM
-	}
-		if USE_SOCKET_IP;
+my $ip4 = USE_SOCKET_IP ? {family => AF_INET,  @udp} : {};
+my $ip6 = USE_SOCKET_IP ? {family => AF_INET6, @udp} : {};
 
-my $inet6 = [AF_INET6, SOCK_DGRAM, 0, Socket6::AI_NUMERICHOST()] if USE_SOCKET_INET6;
+my $inet6 = USE_SOCKET_INET6 ? [AF_INET6, SOCK_DGRAM, 0, Socket6::AI_NUMERICHOST()] : [];
 
 sub _create_dst_sockaddr {		## create UDP destination sockaddr structure
 	my ( $self, $ip, $port ) = @_;
@@ -967,7 +965,7 @@ sub _create_dst_sockaddr {		## create UDP destination sockaddr structure
 		return ( Socket6::getaddrinfo( $ip, $port, @$inet6 ) )[3] if USE_SOCKET_INET6;
 	}
 
-	( Socket::getaddrinfo( $ip, $port, _ipv6($ip) ? $hints6 : $hints4 ) )[1]->{addr}
+	( grep ref, Socket::getaddrinfo( $ip, $port, _ipv6($ip) ? $ip6 : $ip4 ), {} )[0]->{addr}
 			if USE_SOCKET_IP;			# NB: errors raised in socket->send
 }
 

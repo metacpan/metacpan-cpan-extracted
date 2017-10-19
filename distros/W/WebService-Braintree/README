@@ -94,6 +94,10 @@ NAME
 
     Find and update PayPal accounts.
 
+  WebService::Braintree::Plan
+
+    List all subscription plans.
+
   WebService::Braintree::SettlementBatchSummary
 
     Generate settlement batch summaries.
@@ -269,6 +273,8 @@ NAME
  ACKNOWLEDGEMENTS
 
     Thanks to the staff at Braintree for endorsing this fork.
+
+    Thanks to ZipRecruiter for sponsoring improvements to the forked code.
 
  LICENSE AND COPYRIGHT
 

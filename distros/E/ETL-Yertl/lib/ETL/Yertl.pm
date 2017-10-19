@@ -1,5 +1,5 @@
 package ETL::Yertl;
-our $VERSION = '0.033';
+our $VERSION = '0.035';
 # ABSTRACT: ETL with a Shell
 
 use strict;
@@ -13,29 +13,14 @@ our @IMPORT_MODULES = (
     'Path::Tiny' => [qw( path )],
 );
 
-my @class_modules = (
-    'Types::Standard' => [qw( :all )],
-);
-
 our %IMPORT_BUNDLES = (
     Test => [
         qw( Test::More Test::Deep Test::Exception Test::Differences ),
         FindBin => [ '$Bin' ],
         boolean => [':all'],
-        'Path::Tiny' => [qw( cwd tempfile tempdir )],
+        'Path::Tiny' => [qw( path cwd tempfile tempdir )],
         'Dir::Self' => [qw( __DIR__ )],
     ],
-
-    Class => [
-        '<Moo',
-        @class_modules,
-    ],
-
-    Role => [
-        '<Moo::Role',
-        @class_modules,
-    ],
-
 );
 
 $ETL::Yertl::VERBOSE = $ENV{YERTL_VERBOSE} || 0;
@@ -56,7 +41,7 @@ ETL::Yertl - ETL with a Shell
 
 =head1 VERSION
 
-version 0.033
+version 0.035
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,5 @@
 {
-   "abstract" : "A grep clone with better file filtering",
+   "abstract" : "A grep clone using Perl regexp's with better file filtering, defaults, speed, and presentation",
    "author" : [
       "Jacob Gelbman <gelbman@gmail.com>"
    ],
@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "App-Gre",
    "no_index" : {
@@ -51,6 +51,6 @@
          "web" : "https://github.com/zorgnax/gre"
       }
    },
-   "version" : "0.12",
-   "x_serialization_backend" : "JSON::PP version 2.27203"
+   "version" : "0.15",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

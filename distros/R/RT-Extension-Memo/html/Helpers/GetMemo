@@ -1,0 +1,19 @@
+<%ARGS>
+$ObjectType => 'RT::Ticket'
+$ObjectId => 0
+</%ARGS>
+
+<%INIT>
+my $memo = undef;
+$ObjectType = "RT::$ObjectType" unless $ObjectType =~ /::/;
+my $object = $ObjectType->new($session{'CurrentUser'});
+$object->Load($ObjectId);
+if ($object->id) {
+    my $attr = $object->FirstAttribute('Memo');
+    if ($attr && $attr->Content && $attr->Content !~ /^\s*$/) {
+        $memo = $attr->Content;
+    }
+}
+$m->out(JSON($memo));
+$m->abort;
+</%INIT>

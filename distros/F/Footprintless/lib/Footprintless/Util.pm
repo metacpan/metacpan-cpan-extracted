@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Footprintless::Util;
-$Footprintless::Util::VERSION = '1.25';
+$Footprintless::Util::VERSION = '1.26';
 # ABSTRACT: A utility method package for common functionality in Footprintless
 # PODNAME: Footprintless::Util
 
@@ -247,7 +247,7 @@ Footprintless::Util - A utility method package for common functionality in Footp
 
 =head1 VERSION
 
-version 1.25
+version 1.26
 
 =head1 SYNOPSIS
 

@@ -9,6 +9,10 @@ use DateTime;
 
 use Schedule::LongSteps;
 
+use Class::Load;
+
+# use Log::Any::Adapter qw/Stderr/;
+
 BEGIN{
   eval "use Test::mysqld";
   plan skip_all => "Test::mysqld is required for this test" if $@;
@@ -241,6 +245,7 @@ $schema->deploy();
 use_ok('Schedule::LongSteps::Storage::DBIxClass');
 use_ok('Schedule::LongSteps::Storage::AutoDBIx');
 
+my @longsteps = ();
 
 my $storage_dbixclass = Schedule::LongSteps::Storage::DBIxClass->new({
     schema => $schema,
@@ -249,13 +254,51 @@ my $storage_dbixclass = Schedule::LongSteps::Storage::DBIxClass->new({
 my $long_steps_dbixclass = Schedule::LongSteps->new({
     storage => $storage_dbixclass
 });
+push @longsteps , $long_steps_dbixclass;
 
 my $storage_auto = Schedule::LongSteps::Storage::AutoDBIx->new({ get_dbh => sub{ return $schema->storage()->dbh(); } });
 my $long_steps_auto = Schedule::LongSteps->new({
     storage => $storage_auto
 });
+push @longsteps, $long_steps_auto;
 
-foreach my $long_steps ( $long_steps_dbixclass , $long_steps_auto ){
+my $dynamo_storage = undef;
+
+if( $ENV{DYNAMODB_LOCAL} ){
+    my @to_load = qw/Paws
+                     Paws::Credential::Explicit
+                     Paws::Net::LWPCaller
+                     Schedule::LongSteps::Storage::DynamoDB
+                    /;
+    map{ Class::Load::load_class( $_ ) } @to_load;
+
+    my $dynamo_config = {
+        region => 'eu-west-1',
+        endpoint => $ENV{DYNAMODB_LOCAL},
+        access_key => 'foo',
+        secret_key => 'bar',
+    };
+    my $credentials = Paws::Credential::Explicit->new($dynamo_config);
+    my $caller = Paws::Net::LWPCaller->new();
+    my $dynamo_db = Paws->service(
+        'DynamoDB',
+        credentials => $credentials,
+        caller => $caller,
+        max_attempts => 10,
+        %{$dynamo_config}
+    );
+    $dynamo_storage = Schedule::LongSteps::Storage::DynamoDB->new({ dynamo_db => $dynamo_db, table_prefix => 'testdeletethis' });
+    $dynamo_storage->vivify_table();
+
+    my $long_steps_dynamo = Schedule::LongSteps->new({
+        storage => $dynamo_storage
+    });
+    diag("Will test DynamoDB (with DYNAMODB_LOCAL)");
+    push @longsteps, $long_steps_dynamo;
+}
+
+
+foreach my $long_steps ( @longsteps ){
 
     # Build some data, a  process and run it.
 
@@ -286,7 +329,7 @@ foreach my $long_steps ( $long_steps_dbixclass , $long_steps_auto ){
     ok( $long_steps->run_due_processes({ schema => $schema }) );
 
     # Simulate 3 days after now.
-    my $three_days = DateTime->now()->add( days => 3 );
+    my $three_days = DateTime->now()->add( days => 3 )->add( hours => 1 );
 
     on $three_days.'' => sub{
         # And more stuff should run three days after
@@ -308,5 +351,11 @@ foreach my $long_steps ( $long_steps_dbixclass , $long_steps_auto ){
     };
 }
 
-
-done_testing();
+END{
+    if( $dynamo_storage ){
+        if( $dynamo_storage->table_exists() ){
+            $dynamo_storage->destroy_table('I am very sure and I am not insane');
+        }
+    }
+    done_testing();
+}

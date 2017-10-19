@@ -1,6 +1,7 @@
 package WebService::Braintree::ErrorCodes::CreditCard;
-$WebService::Braintree::ErrorCodes::CreditCard::VERSION = '0.93';
-use strict;
+$WebService::Braintree::ErrorCodes::CreditCard::VERSION = '0.94';
+use 5.010_001;
+use strictures 1;
 
 use constant BillingAddressConflict                                   => "91701";
 use constant BillingAddressIdIsInvalid                                => "91702";
@@ -45,3 +46,4 @@ use constant VerificationMerchantAccountIdIsInvalid                   => "91728"
 use constant VenmoSDKPaymentMethodCodeCardTypeIsNotAccepted           => "91726";
 
 1;
+__END__

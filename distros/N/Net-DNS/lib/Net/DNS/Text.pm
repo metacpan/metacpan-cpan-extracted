@@ -1,9 +1,9 @@
 package Net::DNS::Text;
 
 #
-# $Id: Text.pm 1561 2017-04-19 13:08:13Z willem $
+# $Id: Text.pm 1601 2017-10-10 14:17:01Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1561 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1601 $)[1];
 
 
 =head1 NAME
@@ -204,41 +204,29 @@ my $ascii = ASCII ? Encode::find_encoding('ascii') : undef;	# Osborn's Law:
 my $utf8  = UTF8  ? Encode::find_encoding('utf8')  : undef;	# Variables won't; constants aren't.
 
 
-my $decode_ascii = sub {		## ASCII to perl internal encoding
-	my $s = shift;
+sub _decode_utf8 {			## UTF-8 to perl internal encoding
+	local $_ = shift;
 
 	# partial transliteration for non-ASCII character encodings
-	$s =~ tr
+	tr
 	[\040-\176\000-\377]
 	[ !"#$%&'()*+,\-./0-9:;<=>?@A-Z\[\\\]^_`a-z{|}~?] unless ASCII;
 
-	my $z = length substr $s, 0, 0;				# pre-5.18 taint workaround
-	ASCII ? pack( "a* x$z", $ascii->decode($s) ) : $s;
-};
-
-sub _decode_utf8 {			## UTF-8 to perl internal encoding
-	my $s = shift;
-	UTF8 ? ( $utf8->decode($s) . substr $s, 0, 0 ) : &$decode_ascii($s);
+	my $z = length($_) - length($_);			# pre-5.18 taint workaround
+	ASCII ? substr( ( UTF8 ? $utf8 : $ascii )->decode($_), $z ) : $_;
 }
 
 
-my $encode_ascii = sub {		## perl internal encoding to ASCII
-	my $s = shift;
+sub _encode_utf8 {			## perl internal encoding to UTF-8
+	local $_ = shift;
 
 	# partial transliteration for non-ASCII character encodings
-	$s =~ tr
+	tr
 	[ !"#$%&'()*+,\-./0-9:;<=>?@A-Z\[\\\]^_`a-z{|}~]
 	[\040-\176] unless ASCII;
 
-	my $z = length substr $s, 0, 0;				# pre-5.18 taint workaround
-	ASCII ? pack( "a* x$z", $ascii->encode($s) ) : $s;
-};
-
-sub _encode_utf8 {			## perl internal encoding to UTF-8
-	my $s = shift;
-
-	my $z = length substr $s, 0, 0;				# pre-5.18 taint workaround
-	UTF8 ? pack( "a* x$z", $utf8->encode($s) ) : &$encode_ascii($s);
+	my $z = length($_) - length($_);			# pre-5.18 taint workaround
+	ASCII ? substr( ( UTF8 ? $utf8 : $ascii )->encode($_), $z ) : $_;
 }
 
 

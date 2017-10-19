@@ -12,7 +12,7 @@ BEGIN {
   use_ok( 'GraphQL::Type::InputObject' ) || print "Bail out!\n";
   use_ok( 'GraphQL::Type::Object' ) || print "Bail out!\n";
   use_ok( 'GraphQL::Schema' ) || print "Bail out!\n";
-  use_ok( 'GraphQL::Execution' ) || print "Bail out!\n";
+  use_ok( 'GraphQL::Execution', qw(execute) ) || print "Bail out!\n";
 }
 
 $Data::Dumper::Sortkeys = $Data::Dumper::Indent = $Data::Dumper::Terse = 1;
@@ -154,6 +154,8 @@ subtest 'Handles objects and nullability', sub {
           data => { fieldWithObjectInput => undef },
           errors => [ { message =>
             qq{Argument 'input' got invalid value ["foo","bar","baz"].\nExpected 'TestInputObject'.},
+            locations => [ { line => 3, column => 7 } ],
+            path => [ 'fieldWithObjectInput' ],
           } ],
         },
       );
@@ -431,7 +433,9 @@ In method graphql_to_perl: parameter 1 ($item): found not an object at (eval 252
         [$schema, $doc],
         { data => { fieldWithNonNullableStringInput => undef },
           errors => [ { message =>
-          q{Argument 'input' of type 'String!' not given.}
+            q{Argument 'input' of type 'String!' not given.},
+            locations => [ { line => 2, column => 43 } ],
+            path => [ 'fieldWithNonNullableStringInput' ],
         } ] },
       );
     };
@@ -460,7 +464,9 @@ In method graphql_to_perl: parameter 1 ($item): found not an object at (eval 252
         [$schema, $doc],
         { data => { fieldWithNonNullableStringInput => undef },
           errors => [ { message =>
-          q{Argument 'input' of type 'String!' was given variable '$foo' but no runtime value.}
+            q{Argument 'input' of type 'String!' was given variable '$foo' but no runtime value.},
+            locations => [ { line => 2, column => 56 } ],
+            path => [ 'fieldWithNonNullableStringInput' ],
         } ] },
       );
     };
@@ -697,7 +703,9 @@ In method graphql_to_perl: parameter 1 ($item): found not an object at (eval 252
         [$schema, $doc],
         { data => { fieldWithDefaultArgumentValue => undef },
           errors => [ { message =>
-          q{Argument 'input' of type 'String!' was given WRONG_TYPE which is enum value.}
+            q{Argument 'input' of type 'String!' was given WRONG_TYPE which is enum value.},
+            locations => [ { line => 2, column => 60 } ],
+            path => [ 'fieldWithDefaultArgumentValue' ],
         } ] },
       );
     };
@@ -709,6 +717,6 @@ done_testing;
 
 sub run_test {
   my ($args, $expected) = @_;
-  my $got = GraphQL::Execution->execute(@$args);
+  my $got = execute(@$args);
   is_deeply $got, $expected or diag Dumper $got;
 }

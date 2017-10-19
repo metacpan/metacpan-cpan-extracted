@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.68.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,62 +14,62 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 38f9181674319e20326a88c8189b4fcee14aee60 Changes
-SHA1 37edf45d922e03261701e9f03425aecbd8e68bad INSTALL
-SHA1 576d18486d0581b93313502783fafc9db1bd8de6 LICENSE
-SHA1 e9a16ede737243f780694c6a7744130b0800633a MANIFEST
-SHA1 24af4fc7df6a27d89afd7ab2b29ad958f667427c META.json
-SHA1 401451005c225c881f0bb0714382d5d6f675b38b META.yml
-SHA1 e32e35ea98273b56e85f99c62a0f2749c7655ef1 Makefile.PL
-SHA1 55b56b4cee72ebf04a057cb4a1d9500acb5f5ec7 README
+SHA1 cfaff3f742a2455bad1f44cf93b917ed89684a3c Changes
+SHA1 4a416039204438f88cd41da9f124fcca1152603b INSTALL
+SHA1 4c60e8fc342b62d07c4c171165c703886db7a6d4 LICENSE
+SHA1 e6d2dc756ddc99ec467261d2816cfe46df7347b8 MANIFEST
+SHA1 9f700331eed0bff98c21d761eddbaede2dba10a6 META.json
+SHA1 5a57211c6f8618b808d090bb7405d7bab8fe27b2 META.yml
+SHA1 8bfa6c6cb452764c16b04d00880f40423179e157 Makefile.PL
+SHA1 bc5f313d0afc4110d9f8ec9e4fb1f237baec21d7 README
 SHA1 c1531bc200ad0cfd81b3e934b3f4500ef45d20b6 TODO
-SHA1 0b0b0a8fae1eb0d7bc6c3ca36a575eb19e3bbe58 bin/ldapd.pl
-SHA1 ad8d9e865e1ff959f33cf111f23053493ea711af dist.ini
+SHA1 017f2ad2e6ce1d7ffd82125a61beb40a7b7ad677 bin/ldapd.pl
+SHA1 fdf3f9258ba9682eb1a7d5c3568ac1153a9d0c59 dist.ini
 SHA1 1e69d2885505863c9ba0993abde7fe4083a7aee1 examples/empty.conf
 SHA1 5c76cf78e587271d9937a492b90dc28790e96a0e examples/multi-entries.ldif
 SHA1 25d232c3c906c6344ef416ffd56a04d2eff39462 examples/single-entry.conf
 SHA1 f3e37c007b5a20e100573c5e21b92d0328a57b54 examples/single-entry.ldif
-SHA1 654db340095cea09edc17297745063aa559867a4 lib/Net/LDAP/SimpleServer.pm
-SHA1 5fe4b17863a439397d5d6163092ba11849d1a4d5 lib/Net/LDAP/SimpleServer/LDIFStore.pm
-SHA1 8f1ff7dd294baccabd3978b6013bc690c31d2896 lib/Net/LDAP/SimpleServer/ProtocolHandler.pm
-SHA1 3cca57301d17ab1acf7fceec606767419c850425 t/00-compile.t
+SHA1 5dbb8c82e46c84bbc3a13081038059ded9649870 lib/Net/LDAP/SimpleServer.pm
+SHA1 e990b23f29ecc3f21655edd92339173b423c14b4 lib/Net/LDAP/SimpleServer/LDIFStore.pm
+SHA1 4b381c03e63c6fecb197a7e2a3104b3f1c2619a8 lib/Net/LDAP/SimpleServer/ProtocolHandler.pm
+SHA1 9364f4270d925b6feaafc98760104ef8544313b8 t/00-compile.t
 SHA1 86cd488198ef1835477613f6a2256994986660aa t/00-load.t
-SHA1 d1d3219bbafc31952a96eb1206ff519d130f94f4 t/000-report-versions-tiny.t
+SHA1 f1d52650049dd57b236914e3471e6bb18db6b05e t/000-report-versions-tiny.t
 SHA1 84cbabc93390824f5301fdf434a108886d341b88 t/05-handler.t
 SHA1 b1aed62cd2b69215d59307a9f2aa5ceab7d7c5db t/06-store.t
 SHA1 2ece7bed2ef56d7cd4633a10b8aa12b8bafb3c0c t/13-param.t
 SHA1 20590938df8e3be15e663acf9129b0e419d8261a t/14-bind.t
 SHA1 7382e10320fd236d81f0b855f4d406241e3acbac t/15-search.t
-SHA1 f214de96cfe8b70da71201ab8859bb32cbdafe1d t/author-critic.t
-SHA1 83e76fc461f9ad90ca938fd66da90839c807300b t/author-test-eol.t
+SHA1 20011aeac19a73a69dfa2bb32422ae4648a129de t/author-critic.t
+SHA1 532eb1fbd75958d0781de00fb4a8ecea218e7ef6 t/author-eol.t
+SHA1 ea89f21d866b81da4a4799f50503666e09620ac3 t/author-mojibake.t
+SHA1 5ccb66efd216873f33745bc56ca14a4ad2912f7a t/author-no-tabs.t
+SHA1 5387f8ed48de7ef64220c5ed2c77e41ed844adb2 t/author-pod-coverage.t
+SHA1 545af31470c3e0784f83ee2c7714af89114f571f t/author-pod-linkcheck.t
+SHA1 8efad25309730a4d501fb40fc03eda4697303372 t/author-pod-syntax.t
+SHA1 e8df9a49c884b6c6964329f7902ba94ad0289eb0 t/author-portability.t
+SHA1 60dcfab54478213041dc8be6a2ba88deb9fb6136 t/author-test-version.t
 SHA1 e78ee32cbddd38e6b315dd924e589dc57d4f89cf t/lib/Helper.pm
-SHA1 48d42cc9f55d5ce8ae812dab536a9d17f1c3f98d t/release-dist-manifest.t
-SHA1 9e4c697537049f3151d38c81d5080be36b600771 t/release-distmeta.t
-SHA1 1a8271cbe0573142d9b8c21b21196d00d1046fe1 t/release-kwalitee.t
-SHA1 d10a4c4f4a6c10595f86bd7acf935ae72354f8d0 t/release-meta-json.t
-SHA1 978fcdcd038d17814e4a2429f19795a77894f1a1 t/release-minimum-version.t
-SHA1 b567cfd8c64cdcda2a465f38a1dc2fd971904ee4 t/release-mojibake.t
-SHA1 a95be7f18c2443b36947e6a2888ff14742899350 t/release-no-tabs.t
-SHA1 ecd6305379975ecc5ce20f4c3e76bfcfe462e2d4 t/release-pod-coverage.t
-SHA1 c3bec8aa8475c5ec46a0bad17a20d44d4ea1b1b8 t/release-pod-linkcheck.t
-SHA1 7eb3492f9c47f10f80d4f285e96536e9192026dc t/release-pod-syntax.t
-SHA1 451078f0a380624f2de349bf7b4c72a994427afc t/release-portability.t
-SHA1 97e0048f75aaab9d14ca2a9ad74465874f4d8dbc t/release-test-version.t
-SHA1 731040bf250fd7f91217bde7998666bc60ca8e90 t/release-unused-vars.t
+SHA1 560bc7c1ce955fdadf9d04b117f7e9db8c9220ff t/release-dist-manifest.t
+SHA1 ed5bdf51745af3a2ef9d38b08372427c3818c836 t/release-distmeta.t
+SHA1 d527491e13186274d2947c0d9f4b7a8a8d227616 t/release-kwalitee.t
+SHA1 e3da53e86c3ac7acf8d81aed228ee28ad3482393 t/release-meta-json.t
+SHA1 da43813fce49be97f1573711728fa277e253395b t/release-minimum-version.t
+SHA1 af52a2c44bef464f8283799f023531c9dd9f020f t/release-unused-vars.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
+Version: GnuPG v1
 
-iQIcBAEBAgAGBQJQD3T9AAoJEMZvtcdxyp88TwYP/ROAjrIzcrkk7mDVup7PuG4S
-xt6C5xMxFCgE4LkHxQ0sznbWqTOFlrGu/YuZvdcNjOYB0ornWAdsdVMH6lKJ6J0s
-QHuj8NF7cQySHXK6b3DXFObxAB76UNNx/qalTBg29CzaJ7n3eUFHxe/Tf+nOgnR+
-TPKxDmsm0XUcQvzmy5tBZ/DnCg3ATgJZEHT7GkB5odq8xOVAiHp4p3nna6jFDa2X
-WuSAPlU4IMZ/XcAs7Dapw8JJ7X7WYn70pXDPE9m6UlsMyf4BpxVRm9O0i/j1JQMI
-IyjXuZYu5PAYvXAhniIAHMWTkVFekBlFnQ+BwKQ+4xxVJvFPuzIaEVuxJyOcZcY0
-YEAtekSxW373SkmxtUtKPLuDAeCtj/yUGn3EsSkiG3w3wAV9nD8eNXvMpy4AOc0s
-ofDWgITzCZzqcACct1CL4zvYOWFNO2zhYokavNNMhFOrXdAq+WNCCwgMA7uPYwW1
-IwPezYfDIh2Ia7Y14+rRnsl8toEvDur9ecBgQdIpsLn9214zGHEOqya+GT0+RpbM
-8Of2x01PdncYsHPj0rDMbDClergnpgdElyHV8gmmuOooSSBHK5EEzpTlaHSw5eaI
-sLP3uYbb6RkLTJKESobA3popWopYK3839i1/vvPyC8M8Lp1AW+bdfLOPM8MnWzPe
-Ml7dibc6T2BJ4j8PHeZW
-=Zxs3
+iQIcBAEBAgAGBQJZ5HzcAAoJEMZvtcdxyp88SJYP/jWmiEWTV1iJrWrZqkh6+P2+
+ssbdFv7Nfw0h1ZelkyWV0M3zUGGfQ/exGRI0IcVIkNKgM3StVa+sC36hYtbAmypu
+dmEcIaKNsUPK6ZuSVEp28KQ0jxw4z6q+BAVyshYZCYXFajkXYcHqf14a4hE4UbnL
+f7b32NCJJFCvP+k0P/9i3MdcC38x2TzzeZoecdeMRdzVMrccAXMbClAKYlcBuST4
+3Ac5PmOLfcRUtgxL3e1nuPSlfmdo4WLSgHg9zg7puj8/yPBFQI3Op7hRp/8zHZxL
+TLxMxaBMfaDYc0CUigb0AvQ7kj9BeiWJCUirXsR7YZrKgmNjEYQJaC3SXiiIiPhu
+y9P0Cp1vJpuPX7xQ4KJH+3dqWoKWBsA3BqD0T6dXHosYDIlJBgJD9q0vG67ZaZxm
+B+pgZnk1Xh9rgJxf1zWgMBzy3mR/3Rtn42NTX6OI7jLcgtjI9ZTNaSGllygUYUrz
+9KFTOLXvMUmKKScEwEyODN+IvlPJjFUKwi/pvyrtGNUFrPrHT3nbIcd7I9zAo8AR
+WjS0kbA/ymeaZqB0x9ZeBhPSLi5rjQXCNDP3RqfPwR4Xnq1WMA2NtSs8Qk+wLZpt
+GVX5hy5S8Oa1dhipMQODYF4byBnQ1Jk7bkYfseIZBMjHs8GhqSe9B5R4K+Nuxrs1
+MgbmFpxHcP6Bnnlszppw
+=etPa
 -----END PGP SIGNATURE-----

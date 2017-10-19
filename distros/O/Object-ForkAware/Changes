@@ -1,5 +1,8 @@
 Revision history for Object-ForkAware
 
+0.005     2017-10-19 03:07:36Z
+          - fix some documentation errors
+
 0.004     2016-10-21 03:35:49Z
           - reduced prerequisites, updated tooling
 

@@ -1,6 +1,6 @@
 package Catmandu::Importer::MAB2;
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 use Catmandu::Sane;
 use Moo;
@@ -18,6 +18,7 @@ sub mab_generator {
 
     my $file;
     my $type = lc($self->type);
+
     if ( $type eq 'raw' ) {
         $file = MAB2::Parser::RAW->new( $self->fh );
     }
@@ -29,7 +30,7 @@ sub mab_generator {
         $file = MAB2::Parser::Disk->new( $self->fh );
     }
     else {
-        die "unknown format";
+        Catmandu::Error->throw('unknown type');
     }
 
     my $id = $self->id;
@@ -49,7 +50,7 @@ sub generator {
         return $self->mab_generator;
     }
     else {
-        die "need MAB2 Disk, RAW or XML data";
+        Catmandu::Error->throw('unknown type (suppported types: Disk, RAW, XML)');
     }
 }
 

@@ -38,42 +38,39 @@
 # function definitions
 
 function display_help {
-    echo "dochazka-rest is a bash script whose job is to start";
-    echo "the App::Dochazka::REST server";
-    echo;
-    echo "It takes the following command-line options:";
-    echo "  -h --help       Displays this text";
-    echo "  -v --version   Display App::Dochazka::REST version number";
-    echo;
-    echo "dochazka-rest is a wrapper for the mrest script from the";
-    echo "Web::MREST distro. If you need to pass options to that";
-    echo "script, put them on the end preceded by '--'";
-    echo;
-    echo "In the following example, the -c option will be passed to mrest:";
-    echo;
-    echo "    $ dochazka-rest -- -c";
-    echo;
-    exit 0;
+    echo "dochazka-rest is a bash script whose job is to start"
+    echo "the App::Dochazka::REST server"
+    echo
+    echo "It takes the following command-line options:"
+    echo "  -h --help       Displays this text"
+    echo "  -v --version   Display App::Dochazka::REST version number"
+    echo
+    echo "dochazka-rest is a wrapper for the mrest script from the"
+    echo "Web::MREST distro. If you need to pass options to that"
+    echo "script, put them on the end preceded by '--'"
+    echo
+    echo "In the following example, the -c option will be passed to mrest:"
+    echo
+    echo "    $ dochazka-rest -- -c"
+    echo
+    exit 0
 }
 
 function display_version {
-    version=$(perl -e 'use App::Dochazka::REST; print $App::Dochazka::REST::VERSION;');
-    echo "App::Dochazka::REST $version";
-    exit 0;
+    version=$(perl -e 'use App::Dochazka::REST; print $App::Dochazka::REST::VERSION;')
+    echo "App::Dochazka::REST $version"
+    exit 0
 }
 
 function demo_echo {
     # takes a parameter and echoes it back
-    echo $1;
+    echo $1
+    exit 0
 }
 
 # process command-line options
 
-# Note that we use `"$@"' to let each command-line parameter expand to a
-# separate word. The quotes around `$@' are essential!
-# We need TEMP as the `eval set --' would nuke the return value of getopt.
-TEMP=`getopt -o e:hiv --long echo:,help,version \
-     -n 'dochakza-rest' -- "$@"`
+TEMP=$(getopt -o e:hv --long echo:,help,version -n 'dochazka-rest' -- "$@")
 
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 

@@ -5,42 +5,45 @@ use warnings;
 use Test::More;
 use Test::Exception;
 use Data::Dumper;
+use JSON::MaybeXS;
 
 BEGIN {
-  use_ok( 'GraphQL::Parser' ) || print "Bail out!\n";
+  use_ok( 'GraphQL::Language::Parser', qw(parse) ) || print "Bail out!\n";
 }
 
-lives_ok { do_parse('type Hello { world: String }') } 'simple schema';
-lives_ok { do_parse('extend type Hello { world: String }') } 'simple extend';
-lives_ok { do_parse('type Hello { world: String! }') } 'non-null';
-lives_ok { do_parse('type Hello implements World { }') } 'implements';
-lives_ok { do_parse('type Hello implements Wo, rld { }') } 'implements multi';
-lives_ok { do_parse('enum Hello { WORLD }') } 'single enum';
-lives_ok { do_parse('enum Hello { WO, RLD }') } 'multi enum';
-throws_ok { do_parse('enum Hello { true }') } qr/Invalid enum value/, 'invalid enum';
-throws_ok { do_parse('enum Hello { false }') } qr/Invalid enum value/, 'invalid enum';
-throws_ok { do_parse('enum Hello { null }') } qr/Invalid enum value/, 'invalid enum';
-lives_ok { do_parse('interface Hello { world: String }') } 'simple interface';
-lives_ok { do_parse('type Hello { world(flag: Boolean): String }') } 'type with arg';
-lives_ok { do_parse('type Hello { world(flag: Boolean = true): String }') } 'type with default arg';
-lives_ok { do_parse('type Hello { world(things: [String]): String }') } 'type with list arg';
-lives_ok { do_parse('type Hello { world(argOne: Boolean, argTwo: Int): String }') } 'type with two args';
-lives_ok { do_parse('union Hello = World') } 'simple union';
-lives_ok { do_parse('union Hello = Wo | Rld') } 'union of two';
-lives_ok { do_parse('scalar Hello') } 'scalar';
-lives_ok { do_parse('input Hello { world: String }') } 'simple input';
-throws_ok { do_parse('input Hello { world(foo: Int): String }') } qr/Parse document failed/, 'input with arg should fail';
+lives_ok { parse('type Hello { world: String }') } 'simple schema';
+lives_ok { parse('extend type Hello { world: String }') } 'simple extend';
+lives_ok { parse('type Hello { world: String! }') } 'non-null';
+lives_ok { parse('type Hello implements World { }') } 'implements';
+lives_ok { parse('type Hello implements Wo, rld { }') } 'implements multi';
+lives_ok { parse('enum Hello { WORLD }') } 'single enum';
+lives_ok { parse('enum Hello { WO, RLD }') } 'multi enum';
+dies_ok { parse('enum Hello { true }') };
+like $@->message, qr/Invalid enum value/, 'invalid enum';
+dies_ok { parse('enum Hello { false }') };
+like $@->message, qr/Invalid enum value/, 'invalid enum';
+dies_ok { parse('enum Hello { null }') };
+like $@->message, qr/Invalid enum value/, 'invalid enum';
+lives_ok { parse('interface Hello { world: String }') } 'simple interface';
+lives_ok { parse('type Hello { world(flag: Boolean): String }') } 'type with arg';
+lives_ok { parse('type Hello { world(flag: Boolean = true): String }') } 'type with default arg';
+lives_ok { parse('type Hello { world(things: [String]): String }') } 'type with list arg';
+lives_ok { parse('type Hello { world(argOne: Boolean, argTwo: Int): String }') } 'type with two args';
+lives_ok { parse('union Hello = World') } 'simple union';
+lives_ok { parse('union Hello = Wo | Rld') } 'union of two';
+lives_ok { parse('scalar Hello') } 'scalar';
+lives_ok { parse('input Hello { world: String }') } 'simple input';
+dies_ok { parse('input Hello { world(foo: Int): String }') };
+like $@->message, qr/Parse document failed/, 'input with arg should fail';
 
 open my $fh, '<', 't/schema-kitchen-sink.graphql';
-my $got = do_parse(join('', <$fh>));
-my $expected = eval join '', <DATA>;
+my $got = parse(join('', <$fh>));
+my $expected_text = join '', <DATA>;
+$expected_text =~ s#bless\(\s*do\{\\\(my\s*\$o\s*=\s*(.)\)\},\s*'JSON::PP::Boolean'\s*\)#'JSON->' . ($1 ? 'true' : 'false')#ge;
+my $expected = eval $expected_text;
 local $Data::Dumper::Indent = $Data::Dumper::Sortkeys = $Data::Dumper::Terse = 1;
 #open $fh, '>', 'tf'; print $fh Dumper $got; # uncomment this line to regen
 is_deeply $got, $expected, 'lex big doc correct' or diag Dumper $got;
-
-sub do_parse {
-  return GraphQL::Parser->parse($_[0]);
-}
 
 done_testing;
 
@@ -49,6 +52,10 @@ __DATA__
   {
     'kind' => 'schema',
     'node' => {
+      'location' => {
+        'column' => 1,
+        'line' => 13
+      },
       'mutation' => 'MutationType',
       'query' => 'QueryType'
     }
@@ -134,6 +141,10 @@ __DATA__
       'interfaces' => [
         'Bar'
       ],
+      'location' => {
+        'column' => 1,
+        'line' => 23
+      },
       'name' => 'Foo'
     }
   },
@@ -169,6 +180,10 @@ __DATA__
           'type' => 'Type'
         }
       },
+      'location' => {
+        'column' => 1,
+        'line' => 27
+      },
       'name' => 'AnnotatedObject'
     }
   },
@@ -188,6 +203,10 @@ __DATA__
         'one' => {
           'type' => 'Type'
         }
+      },
+      'location' => {
+        'column' => 1,
+        'line' => 32
       },
       'name' => 'Bar'
     }
@@ -220,12 +239,20 @@ __DATA__
           'type' => 'Type'
         }
       },
+      'location' => {
+        'column' => 1,
+        'line' => 36
+      },
       'name' => 'AnnotatedInterface'
     }
   },
   {
     'kind' => 'union',
     'node' => {
+      'location' => {
+        'column' => 0,
+        'line' => 36
+      },
       'name' => 'Feed',
       'types' => [
         'Story',
@@ -242,6 +269,10 @@ __DATA__
           'name' => 'onUnion'
         }
       ],
+      'location' => {
+        'column' => 0,
+        'line' => 38
+      },
       'name' => 'AnnotatedUnion',
       'types' => [
         'A',
@@ -252,6 +283,10 @@ __DATA__
   {
     'kind' => 'scalar',
     'node' => {
+      'location' => {
+        'column' => 1,
+        'line' => 42
+      },
       'name' => 'CustomScalar'
     }
   },
@@ -263,12 +298,20 @@ __DATA__
           'name' => 'onScalar'
         }
       ],
+      'location' => {
+        'column' => 0,
+        'line' => 42
+      },
       'name' => 'AnnotatedScalar'
     }
   },
   {
     'kind' => 'enum',
     'node' => {
+      'location' => {
+        'column' => 1,
+        'line' => 49
+      },
       'name' => 'Site',
       'values' => {
         'DESKTOP' => {},
@@ -284,6 +327,10 @@ __DATA__
           'name' => 'onEnum'
         }
       ],
+      'location' => {
+        'column' => 1,
+        'line' => 54
+      },
       'name' => 'AnnotatedEnum',
       'values' => {
         'ANNOTATED_VALUE' => {
@@ -314,6 +361,10 @@ __DATA__
           ]
         }
       },
+      'location' => {
+        'column' => 1,
+        'line' => 59
+      },
       'name' => 'InputType'
     }
   },
@@ -334,6 +385,10 @@ __DATA__
           ],
           'type' => 'Type'
         }
+      },
+      'location' => {
+        'column' => 1,
+        'line' => 63
       },
       'name' => 'AnnotatedInput'
     }
@@ -356,6 +411,10 @@ __DATA__
           'type' => 'Type'
         }
       },
+      'location' => {
+        'column' => 1,
+        'line' => 67
+      },
       'name' => 'Foo'
     }
   },
@@ -368,6 +427,10 @@ __DATA__
         }
       ],
       'fields' => {},
+      'location' => {
+        'column' => 1,
+        'line' => 69
+      },
       'name' => 'Foo'
     }
   },
@@ -375,6 +438,10 @@ __DATA__
     'kind' => 'type',
     'node' => {
       'fields' => {},
+      'location' => {
+        'column' => 1,
+        'line' => 71
+      },
       'name' => 'NoFields'
     }
   },
@@ -390,6 +457,10 @@ __DATA__
             }
           ]
         }
+      },
+      'location' => {
+        'column' => 0,
+        'line' => 71
       },
       'locations' => [
         'FIELD',
@@ -411,6 +482,10 @@ __DATA__
             }
           ]
         }
+      },
+      'location' => {
+        'column' => 0,
+        'line' => 76
       },
       'locations' => [
         'FIELD',

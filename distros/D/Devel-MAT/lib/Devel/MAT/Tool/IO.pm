@@ -9,14 +9,14 @@ use strict;
 use warnings;
 use base qw( Devel::MAT::Tool );
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 use constant CMD => "io";
 use constant CMD_DESC => "Commands working with IO SVs";
 
 =head1 NAME
 
-C<Devel::MAT::Tool::IO> - list or find an IO SV
+C<Devel::MAT::Tool::IO> - list IO SVs
 
 =head1 DESCRIPTION
 
@@ -30,7 +30,6 @@ This C<Devel::MAT> tool operates on IO handle SVs.
 
 use constant CMD_SUBS => qw(
    list
-   find
 );
 
 sub _print_ios
@@ -47,6 +46,7 @@ sub _print_ios
             $sv->ofileno // "-",
          ] } @svs
       ],
+      align => [ undef, "right", "right" ],
    );
 }
 
@@ -98,17 +98,7 @@ package # hide
    Devel::MAT::Tool::IO::find;
 use base qw( Devel::MAT::Tool );
 
-use constant CMD_DESC => "Find an IO SV having a given fileno";
-
-=head2 io find
-
-   pmat> io find 2
-   Addr                           ifileno  ofileno
-   IO() at 0x1bbf598              2        2
-
-Searches for an IO handle that is associated with the given filenumber.
-
-=cut
+# This tool for back-compat only; it's been renamed.
 
 use constant CMD_ARGS => (
    { name => "fileno", help => "the file number" }
@@ -119,16 +109,11 @@ sub run
    my $self = shift;
    my ( $num ) = @_;
 
-   my @svs;
-
-   foreach my $sv ( $self->df->heap ) {
-      next unless $sv->type eq "IO";
-      next unless $sv->ifileno == $num or $sv->ofileno == $num;
-
-      push @svs, $sv;
-   }
-
-   Devel::MAT::Tool::IO->_print_ios( @svs );
+   Devel::MAT::Cmd->printf( "%s - this tool has been renamed to 'find io'\n",
+      Devel::MAT::Cmd->format_note( "Note", 2 )
+   );
+   $self->pmat->load_tool( "Find" )
+      ->run_cmd( qw( io ), $num );
 }
 
 =head1 AUTHOR

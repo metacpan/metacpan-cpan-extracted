@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 
-use Test::More tests => 7;
+use Test::More tests => 13;
 
-use DhMakePerl::Utils qw(find_core_perl_dependency);
+use DhMakePerl::Utils qw(find_core_perl_dependency is_core_perl_package );
 
 is( find_core_perl_dependency('Module::CoreList') . '',
     'perl (>= 5.10.0)',
@@ -40,3 +40,10 @@ is( find_core_perl_dependency( 'Module::CoreList', '2.19' ), undef ,
 # perl 5.10.1 has M:B 0.340201 which may fool us
 is( find_core_perl_dependency( 'Module::Build', '0.3603' ),
     undef, 'Module::Build 0.3603 is not in Debian\'s perl' );
+
+ok( is_core_perl_package('perl'), 'perl is core' );
+ok( is_core_perl_package('perl-base'), 'perl-base is core' );
+ok( is_core_perl_package('perl-modules'), 'perl-modules is core' );
+ok( is_core_perl_package('perl-modules-5.24'), 'perl-modules-5.24 is core' );
+ok( is_core_perl_package('libperl5.24'), 'libperl5.24 is core' );
+ok( !is_core_perl_package('foo'), 'foo is not core' );

@@ -41,16 +41,20 @@
             "Module::Install::TestTarget" : "0",
             "Moose" : "0",
             "Mozilla::CA" : "0",
+            "Scalar::Util" : "0",
             "Try::Tiny" : "0",
             "URI" : "0",
             "URI::Query" : "0",
             "XML::LibXML" : "0",
             "XML::Simple" : "0",
-            "local::lib" : "0"
+            "local::lib" : "0",
+            "perl" : "5.010001",
+            "strictures" : "0"
          }
       },
       "test" : {
          "requires" : {
+            "Test::Deep" : "0",
             "Test::Moose" : "0",
             "Test::More" : "0.98",
             "Test::Pod" : "0",
@@ -71,7 +75,7 @@
          "web" : "https://github.com/singingfish/braintree_perl"
       }
    },
-   "version" : "0.93",
+   "version" : "0.94",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0115"
 }
 

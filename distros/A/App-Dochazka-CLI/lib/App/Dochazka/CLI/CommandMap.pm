@@ -1,22 +1,22 @@
-# ************************************************************************* 
-# Copyright (c) 2014-2016, SUSE LLC
-# 
+# *************************************************************************
+# Copyright (c) 2014-2017, SUSE LLC
+#
 # All rights reserved.
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
-# 
+#
 # 1. Redistributions of source code must retain the above copyright notice,
 # this list of conditions and the following disclaimer.
-# 
+#
 # 2. Redistributions in binary form must reproduce the above copyright
 # notice, this list of conditions and the following disclaimer in the
 # documentation and/or other materials provided with the distribution.
-# 
+#
 # 3. Neither the name of SUSE LLC nor the names of its contributors may be
 # used to endorse or promote products derived from this software without
 # specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 # AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 # IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-# ************************************************************************* 
+# *************************************************************************
 #
 # Command map
 #
@@ -284,14 +284,6 @@ our $dispatch_map = {
     "PUT EMPLOYEE COUNT PRIV" => \&_method_employee_count_priv,
     "POST EMPLOYEE COUNT PRIV" => \&_method_employee_count_priv,
     "DELETE EMPLOYEE COUNT PRIV" => \&_method_employee_count_priv,
-    "GET EMPLOYEE CURRENT" => \&_method_employee_current,
-    "PUT EMPLOYEE CURRENT" => \&_method_employee_current,
-    "POST EMPLOYEE CURRENT" => \&_method_employee_current,
-    "DELETE EMPLOYEE CURRENT" => \&_method_employee_current,
-    "GET EMPLOYEE CURRENT PRIV" => \&_method_employee_current_priv,
-    "PUT EMPLOYEE CURRENT PRIV" => \&_method_employee_current_priv,
-    "POST EMPLOYEE CURRENT PRIV" => \&_method_employee_current_priv,
-    "DELETE EMPLOYEE CURRENT PRIV" => \&_method_employee_current_priv,
     "GET EMPLOYEE EID" => \&_method_employee_eid,
     "PUT EMPLOYEE EID" => \&_method_employee_eid,
     "POST EMPLOYEE EID" => \&_method_employee_eid,
@@ -356,10 +348,10 @@ our $dispatch_map = {
     "PUT EMPLOYEE SELF" => \&_method_employee_self,
     "POST EMPLOYEE SELF" => \&_method_employee_self,
     "DELETE EMPLOYEE SELF" => \&_method_employee_self,
-    "GET EMPLOYEE SELF PRIV" => \&_method_employee_self_priv,
-    "PUT EMPLOYEE SELF PRIV" => \&_method_employee_self_priv,
-    "POST EMPLOYEE SELF PRIV" => \&_method_employee_self_priv,
-    "DELETE EMPLOYEE SELF PRIV" => \&_method_employee_self_priv,
+    "GET EMPLOYEE SELF FULL" => \&_method_employee_self_full,
+    "PUT EMPLOYEE SELF FULL" => \&_method_employee_self_full,
+    "POST EMPLOYEE SELF FULL" => \&_method_employee_self_full,
+    "DELETE EMPLOYEE SELF FULL" => \&_method_employee_self_full,
     "GET EMPLOYEE TEAM" => \&_method_employee_team,
     "PUT EMPLOYEE TEAM" => \&_method_employee_team,
     "POST EMPLOYEE TEAM" => \&_method_employee_team,
@@ -576,6 +568,10 @@ our $dispatch_map = {
     "PUT SCHEDULE SID _NUM" => \&_method_schedule_sid_num,
     "POST SCHEDULE SID _NUM" => \&_method_schedule_sid_num,
     "DELETE SCHEDULE SID _NUM" => \&_method_schedule_sid_num,
+    "GET SCHEDULE NEW" => \&_method_schedule_new,
+    "PUT SCHEDULE NEW" => \&_method_schedule_new,
+    "POST SCHEDULE NEW" => \&_method_schedule_new,
+    "DELETE SCHEDULE NEW" => \&_method_schedule_new,
 
     # Activity commands
     "ACTIVITY" => \&activity_all,

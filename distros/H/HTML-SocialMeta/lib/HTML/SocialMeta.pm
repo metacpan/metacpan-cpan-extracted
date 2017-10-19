@@ -9,7 +9,7 @@ use MooX::LazierAttributes qw/lzy bld coe/;
 use MooX::ValidateSubs;
 use Coerce::Types::Standard qw/HTML Str Object StrToArray/;
 
-our $VERSION = '0.730002';
+our $VERSION = '0.730004';
 
 our %encode;
 BEGIN {
@@ -84,7 +84,7 @@ HTML::SocialMeta - Module to generate Social Media Meta Tags,
 
 =head1 VERSION
 
-Version 0.730002
+Version 0.730004
 
 =head1 SYNOPSIS
 

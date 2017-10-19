@@ -1,9 +1,13 @@
 Revision history for Sys-Path
+0.16    13 October 2017
+        - Fix building on Perl without "." in @INC (thanks Petr Písař)
+        - cpants fixes (thanks Mohammad S Anwar)
+
 0.15    12 October 2017
         - author tests moved to xt/
 
 0.14    6 Feb 2015
-        - use File::Spec->canonpath to pass the cwd test on win32 paltforms
+        - use File::Spec->canonpath to pass the cwd test on win32 paltforms (thanks Jose Luis Perez Diez)
         - mantain the same version in all packages (cpants);
 
 0.13    18 Apr 2013

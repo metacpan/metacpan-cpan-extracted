@@ -1,9 +1,9 @@
 package Net::DNS::RR::OPENPGPKEY;
 
 #
-# $Id: OPENPGPKEY.pm 1528 2017-01-18 21:44:58Z willem $
+# $Id: OPENPGPKEY.pm 1597 2017-09-22 08:04:02Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1528 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
 
 
 use strict;
@@ -27,44 +27,43 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 	my ( $data, $offset ) = @_;
 
 	my $length = $self->{rdlength};
-	$self->keysbin( substr $$data, $offset, $length );
+	$self->keybin( substr $$data, $offset, $length );
 }
 
 
 sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 
-	pack 'a*', $self->keysbin;
+	pack 'a*', $self->keybin;
 }
 
 
 sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
-	my @base64 = split /\s+/, encode_base64( $self->keysbin );
+	my @base64 = split /\s+/, encode_base64( $self->keybin );
 }
 
 
 sub _parse_rdata {			## populate RR from rdata in argument list
 	my $self = shift;
 
-	$self->keys(@_);
+	$self->key(@_);
 }
 
 
-sub keys {
+sub key {
 	my $self = shift;
-
-	$self->keysbin( MIME::Base64::decode( join "", @_ ) ) if scalar @_;
-	MIME::Base64::encode( $self->keysbin(), "" ) if defined wantarray;
+	return MIME::Base64::encode( $self->keybin(), "" ) unless scalar @_;
+	$self->keybin( MIME::Base64::decode( join "", @_ ) );
 }
 
 
-sub keysbin {
+sub keybin {
 	my $self = shift;
 
-	$self->{keysbin} = shift if scalar @_;
-	$self->{keysbin} || "";
+	$self->{keybin} = shift if scalar @_;
+	$self->{keybin} || "";
 }
 
 
@@ -75,7 +74,7 @@ __END__
 =head1 SYNOPSIS
 
     use Net::DNS;
-    $rr = new Net::DNS::RR('name OPENPGPKEY keys');
+    $rr = new Net::DNS::RR('name OPENPGPKEY key');
 
 =head1 DESCRIPTION
 
@@ -91,20 +90,20 @@ structures is discouraged and could result in program termination or
 other unpredictable behaviour.
 
 
-=head2 keys
+=head2 key
 
-    $keys = $rr->keys;
-    $rr->keys( $keys );
+    $key = $rr->key;
+    $rr->key( $key );
 
-Base64 encoded representation of the binary OpenPGP public key material.
+Base64 encoded representation of the OpenPGP public key material.
 
-=head2 keysbin
+=head2 keybin
 
-    $keysbin = $rr->keysbin;
-    $rr->keysbin( $keysbin );
+    $keybin = $rr->keybin;
+    $rr->keybin( $keybin );
 
-Binary representation of the public key material.
-The key material is a simple concatenation of OpenPGP keys in RFC4880 format.
+OpenPGP public key material consisting of
+a single OpenPGP transferable public key in RFC4880 format.
 
 
 =head1 COPYRIGHT

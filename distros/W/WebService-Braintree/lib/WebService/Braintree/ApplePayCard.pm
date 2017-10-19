@@ -1,5 +1,8 @@
 package WebService::Braintree::ApplePayCard;
-$WebService::Braintree::ApplePayCard::VERSION = '0.93';
+$WebService::Braintree::ApplePayCard::VERSION = '0.94';
+use 5.010_001;
+use strictures 1;
+
 use WebService::Braintree::ApplePayCard::CardType;
 
 use Moose;
@@ -20,5 +23,6 @@ sub is_default {
 }
 
 __PACKAGE__->meta->make_immutable;
-1;
 
+1;
+__END__

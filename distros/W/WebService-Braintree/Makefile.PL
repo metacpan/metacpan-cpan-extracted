@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.010001;
 
 use ExtUtils::MakeMaker;
 
@@ -14,6 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "WebService-Braintree",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "WebService::Braintree",
   "PREREQ_PM" => {
     "Data::GUID" => 0,
@@ -36,23 +37,26 @@ my %WriteMakefileArgs = (
     "Module::Install::TestTarget" => 0,
     "Moose" => 0,
     "Mozilla::CA" => 0,
+    "Scalar::Util" => 0,
     "Try::Tiny" => 0,
     "URI" => 0,
     "URI::Query" => 0,
     "XML::LibXML" => 0,
     "XML::Simple" => 0,
-    "local::lib" => 0
+    "local::lib" => 0,
+    "strictures" => 0
   },
   "TEST_REQUIRES" => {
+    "Test::Deep" => 0,
     "Test::Moose" => 0,
     "Test::More" => "0.98",
     "Test::Pod" => 0,
     "Test::Warn" => 0,
     "Try::Tiny" => 0
   },
-  "VERSION" => "0.93",
+  "VERSION" => "0.94",
   "test" => {
-    "TESTS" => "t/*.t"
+    "TESTS" => "t/sandbox/*.t t/unit/*.t"
   }
 );
 
@@ -78,6 +82,8 @@ my %FallbackPrereqs = (
   "Module::Install::TestTarget" => 0,
   "Moose" => 0,
   "Mozilla::CA" => 0,
+  "Scalar::Util" => 0,
+  "Test::Deep" => 0,
   "Test::Moose" => 0,
   "Test::More" => "0.98",
   "Test::Pod" => 0,
@@ -87,7 +93,8 @@ my %FallbackPrereqs = (
   "URI::Query" => 0,
   "XML::LibXML" => 0,
   "XML::Simple" => 0,
-  "local::lib" => 0
+  "local::lib" => 0,
+  "strictures" => 0
 );
 
 

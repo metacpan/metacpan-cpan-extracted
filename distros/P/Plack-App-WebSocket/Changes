@@ -1,5 +1,13 @@
 Revision history for Plack-App-WebSocket
 
+0.06    2017-10-16
+        [ENHANCEMENT]
+        - PR gh#4 by yanick. Thanks!
+        - Now on() method returns "unregister" subroutine
+          references.
+        - Now "each_message" event is passed the "unregister"
+          subroutine reference
+
 0.05    2015-11-01
         [ENHANCEMENT]
         - Add websocket_server option. (gh#3)

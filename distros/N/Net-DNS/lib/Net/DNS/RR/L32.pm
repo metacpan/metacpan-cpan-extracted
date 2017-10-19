@@ -1,9 +1,9 @@
 package Net::DNS::RR::L32;
 
 #
-# $Id: L32.pm 1528 2017-01-18 21:44:58Z willem $
+# $Id: L32.pm 1597 2017-09-22 08:04:02Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1528 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
 
 
 use strict;
@@ -31,7 +31,6 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 
-	return '' unless defined $self->{locator32};
 	pack 'n a4', $self->{preference}, $self->{locator32};
 }
 
@@ -39,7 +38,6 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
-	return '' unless defined $self->{locator32};
 	join ' ', $self->preference, $self->locator32;
 }
 

@@ -4,6 +4,7 @@ examples/fox.pl
 examples/line-directive.pl
 examples/lineout.pl
 examples/michael-caine.pl
+examples/stamp-file.pl
 lib/C/Utility.pm
 lib/C/Utility.pod
 Makefile.PL

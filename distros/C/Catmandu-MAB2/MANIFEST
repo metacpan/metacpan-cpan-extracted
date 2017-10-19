@@ -31,9 +31,12 @@ t/04-exporter.t
 t/05-writer.t
 t/06-sru.t
 t/07-mab-each.t
+t/08-mab-map.t
 t/author-pod-syntax.t
 t/lib/MockFurl.pm
 t/mab2.dat
 t/mab2.xml
+t/mab2_faulty.dat
 t/mab2disk.dat
+t/mab2disk_faulty.dat
 t/sru_mabxml.xml

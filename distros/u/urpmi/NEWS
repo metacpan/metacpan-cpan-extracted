@@ -1,3 +1,16 @@
+Version 8.111 - 19 September 2017
+
+- gurpmi:
+  o update perl-Pango first too (mga#21425)
+- urpmi:
+  o update perl-base first too
+  o use XML::LibXML::Parser's 'huge' option
+
+Version 8.110 - 13 July 2017
+
+- workaround a segfault in gurpmi (mga#21167)
+- translation updates
+
 Version 8.109 - 5 June 2017
 
 - translation updates

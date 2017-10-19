@@ -1,0 +1,70 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use App::Anchr;
+
+App::Anchr->run;
+
+=head1 OVERVIEW
+
+For help with App::Anchr, run "anchr help"
+
+=cut
+
+__END__
+
+perl -I lib/ script/anchr
+
+perl -I lib/ script/anchr dep
+perl -I lib/ t/02-dep.t
+
+perl -I lib/ script/anchr dazzname t/1_4.anchor.fasta -o stdout
+perl -I lib/ t/03-dazzname.t
+
+perl -I lib/ script/anchr show2ovlp t/1_4.renamed.fasta t/1_4.show.txt -o stdout
+perl -I lib/ script/anchr show2ovlp t/1_4.renamed.fasta t/1_4.show.txt -r t/1_4.replace.tsv -o stdout
+perl -I lib/ t/04-show2ovlp.t
+
+perl -I lib/ script/anchr trim t/R1.fq.gz t/R2.fq.gz -b NAMES -o stdout | bash
+perl -I lib/ t/05-trim.t
+
+perl -I lib/ script/anchr overlap t/1_4.pac.fasta -o stdout
+perl -I lib/ script/anchr overlap t/1_4.pac.fasta --idt 0.8 --len 2500 --serial -o stdout
+perl -I lib/ script/anchr overlap t/1_4.pac.fasta --idt 0.8 --len 2500 --all -o stdout
+perl -I lib/ t/07-overlap.t
+
+perl -I lib/ script/anchr orient t/1_4.anchor.fasta t/1_4.pac.fasta -o stdout
+perl -I lib/ script/anchr orient t/1_4.anchor.fasta t/1_4.pac.fasta -r t/1_4.2.restrict.tsv
+perl -I lib/ t/09-orient.t
+
+perl -I lib/ t/10-cover.t
+
+perl -I lib/ t/11-group.t
+
+perl -I lib/ script/anchr replace t/1_4.ovlp.tsv t/1_4.replace.tsv -r -o stdout
+perl -I lib/ script/anchr replace t/1_4.ovlp.tsv t/1_4.replace.tsv -o stdout
+perl -I lib/ t/12-replace.t
+
+perl -I lib/ script/anchr restrict t/1_4.ovlp.tsv t/1_4.restrict.tsv -o stdout
+perl -I lib/ script/anchr restrict t/1_4.ovlp.tsv t/1_4.2.restrict.tsv -o stdout
+perl -I lib/ t/13-restrict.t
+
+perl -I lib/ t/90-common.t
+
+perl -I lib/ script/anchr contained t/1_4.anchor.fasta -v -o stdout
+perl -I lib/ t/14-contained.t
+
+perl -I lib/ script/anchr merge t/merge.fasta -v -o stdout
+perl -I lib/ t/15-merge.t
+
+perl -I lib/ t/16-layout.t
+
+perl -I lib/ t/17-break.t
+
+perl -I lib/ script/anchr paf2ovlp t/1_4.pac.paf -o stdout
+perl -I lib/ script/anchr overlap t/1_4.pac.fasta -o t/1_4.pac.ovlp.tsv
+perl -I lib/ t/22-paf2ovlp.t
+
+perl -I lib/ script/anchr trimlong t/1_4.pac.fasta -o stdout
+perl -I lib/ script/anchr trimlong t/1_4.pac.fasta -o stdout -v --jvm '-d64 -server'
+perl -I lib/ t/23-trimlong.t

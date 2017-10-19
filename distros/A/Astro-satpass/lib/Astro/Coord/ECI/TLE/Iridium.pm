@@ -137,7 +137,7 @@ use warnings;
 
 use base qw{Astro::Coord::ECI::TLE};
 
-our $VERSION = '0.083';
+our $VERSION = '0.084';
 
 use Astro::Coord::ECI::Sun;
 use Astro::Coord::ECI::Utils qw{:all};
@@ -154,9 +154,10 @@ use constant MMAPHI => deg2rad (-130);	# The MMAs are at an angle of
 					# them "flat".
 use constant TWOPIOVER3 => TWOPI / 3;	# 120 degrees, in radians.
 
-use constant STATUS_IN_SERVICE => 0;
-use constant STATUS_SPARE => 1;
-use constant STATUS_TUMBLING => 2;
+use constant BODY_STATUS_IS_OPERATIONAL	=> 0;
+use constant BODY_STATUS_IS_SPARE	=> 1;
+use constant BODY_STATUS_IS_TUMBLING	=> 2;
+use constant BODY_STATUS_IS_DECAYED	=> 3;
 
 my %mutator = (
     algorithm => sub {
@@ -332,15 +333,18 @@ sub before_reblessing {
 This method returns true (in the Perl sense) if the object is capable
 of producing flares, and false otherwise. If the optional $spare
 argument is true, spares are considered capable of flaring, otherwise
-not.
+not. If C<$spare> is C<'all'>, then all objects are considered capable
+of flaring.
 
 =cut
 
 sub can_flare {
-    my $self = shift;
-    my $spare = shift;
+    my ( $self, $spare ) = @_;
+    defined $spare
+	and 'all' eq $spare
+	and return 1;
     my $status = $self->get ('status');
-    return !$status || $spare && $status == $self->STATUS_SPARE;
+    return !$status || $spare && $status == $self->BODY_STATUS_IS_SPARE;
 }
 
 
@@ -1618,9 +1622,10 @@ sub __parse_name {
 
 {
     my @encode_status;
-    $encode_status[STATUS_IN_SERVICE]	= '+';
-    $encode_status[STATUS_SPARE]	= 'S';
-    $encode_status[STATUS_TUMBLING]	= '-';
+    $encode_status[BODY_STATUS_IS_OPERATIONAL]	= '+';
+    $encode_status[BODY_STATUS_IS_SPARE]	= 'S';
+    $encode_status[BODY_STATUS_IS_TUMBLING]	= '-';
+    $encode_status[BODY_STATUS_IS_DECAYED]	= 'D';
 
     sub __encode_operational_status {
 ##	my ( $self, $name, $status ) = @_;
@@ -1628,7 +1633,7 @@ sub __parse_name {
 	defined $status
 	    or $status = $self->get( 'status' );
 	defined $encode_status[ $status ]
-	    or return STATUS_TUMBLING;
+	    or return BODY_STATUS_IS_TUMBLING;
 	return $encode_status[ $status ];
     }
 }
@@ -1637,21 +1642,25 @@ sub __parse_name {
 {
 
     my %status_map = (
-	STATUS_IN_SERVICE()	=> STATUS_IN_SERVICE,
-	''			=> STATUS_IN_SERVICE,
-	'+'			=> STATUS_IN_SERVICE,
-	STATUS_SPARE()		=> STATUS_SPARE,
-	'?'			=> STATUS_SPARE,
-	'S'			=> STATUS_SPARE,
-	's'			=> STATUS_SPARE,
+	BODY_STATUS_IS_OPERATIONAL()	=> BODY_STATUS_IS_OPERATIONAL,
+	''			=> BODY_STATUS_IS_OPERATIONAL,
+	'+'			=> BODY_STATUS_IS_OPERATIONAL,
+	BODY_STATUS_IS_SPARE()		=> BODY_STATUS_IS_SPARE,
+	'?'			=> BODY_STATUS_IS_SPARE,
+	'S'			=> BODY_STATUS_IS_SPARE,
+	's'			=> BODY_STATUS_IS_SPARE,
+	'D'			=> BODY_STATUS_IS_DECAYED,
+	'd'			=> BODY_STATUS_IS_DECAYED,
+	BODY_STATUS_IS_TUMBLING()	=> BODY_STATUS_IS_TUMBLING,
+	BODY_STATUS_IS_DECAYED()	=> BODY_STATUS_IS_DECAYED,
     );
 
     sub __decode_operational_status {
 	my ( $value ) = @_;
 	defined $value
-	    or return STATUS_IN_SERVICE;;
+	    or return BODY_STATUS_IS_OPERATIONAL;;
 	defined $status_map{$value}
-	    or return STATUS_TUMBLING;
+	    or return BODY_STATUS_IS_TUMBLING;
 	return $status_map{$value};
     }
 }
@@ -1751,7 +1760,8 @@ able to produce predictable flares. The possible values are:
 
  0 => in service;
  1 => spare, or maneuvering;
- 2 => out of service, tumbling, et cetera.
+ 2 => out of service, tumbling, et cetera;
+ 3 => decayed.
 
 By default, the can_flare() method returns true only if the status is 0.
 But if given a true argument (e.g. can_flare(1)) it will also return true

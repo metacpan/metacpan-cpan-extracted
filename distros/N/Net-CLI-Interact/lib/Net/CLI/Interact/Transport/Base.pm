@@ -1,4 +1,5 @@
 package Net::CLI::Interact::Transport::Base;
+{ $Net::CLI::Interact::Transport::Base::VERSION = '2.300002' }
 
 use Moo;
 use MooX::Types::MooseLike::Base qw(InstanceOf);

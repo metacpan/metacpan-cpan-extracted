@@ -1,0 +1,16 @@
+msgid ""
+msgstr ""
+"PO-Revision-Date: 2017-10-16 14:52+0200\n"
+"Last-Translator: Gérald Sédrati-Dinet <gibus@easter-eggs.net>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Preferences for the user %1"
+msgstr "Préférences pour l'utilisateur %1"
+
+msgid "Modify other users' RT account"
+msgstr "Modifier le profil RT des autres utilisateurs"
+
+msgid "Modify RT account for this user."
+msgstr "Modifier le profil RT pour cet utilisateur"

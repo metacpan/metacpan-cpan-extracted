@@ -1,0 +1,77 @@
+#!perl 
+use Modern::Perl;
+use File::Find::Rule;
+use Cwd;
+use List::MoreUtils qw(each_array);
+use Term::ANSIColor;
+use Term::ReadKey;
+my $dir = getcwd;
+
+sub pick
+{
+	my @files = @_;
+	my @keys = '0' .. '9';
+	push( @keys,  'a' .. 'z' );
+	push( @keys,  'A' .. 'Z' );
+	my %hash;
+	@hash{ @keys[ 0 .. $#files ] } = @files;
+	my @a =@keys[ 0 .. $#files ];  
+
+	my $it = each_array( @a, @files );
+	while ( my ($first, $second) = $it->()) {
+		my $s = " $second";
+		chomp( $s );
+		say colored(['bright_red'], "$first" ), $s;
+	}
+	ReadMode('cbreak');
+	my $key = ReadKey(0);
+	ReadMode('normal');
+	return $hash{ $key };
+}
+#say join( " ", @keys );
+my @files = File::Find::Rule->executable()->maxdepth(1)->name( qr/^Test_[^\.]*/ )->in( "." );
+my $testsuite = pick( @files );
+my @tests = qx/.\/$testsuite --help-tests/;
+@tests = @tests[ 2 .. $#tests ];
+my $test = pick( @tests );
+my $cmd = "make -j4 $testsuite; ./$testsuite $test";
+system( $cmd );
+say "";
+say "";
+say $cmd;
+say "";
+
+=head1 NAME
+
+tt - runs a CXXTest test
+
+=head1 DESCRIPTION
+
+A simple script which searches for CXXTests named with a TEST_ prefix and presents the
+user with a menu to select a testsuite and a test.  The script then runs make and the single test.
+
+=head1 SYNOPSIS
+
+  $ tt
+
+=head1 AUTHOR
+
+Kevin Tew
+
+=head1 LICENSE
+
+FreeBSD
+
+=head1 INSTALLATION
+
+Using C<cpan>:
+
+$ cpan App::tt
+
+Manual install:
+
+$ perl Makefile.PL
+$ make
+$ make install
+
+=cut

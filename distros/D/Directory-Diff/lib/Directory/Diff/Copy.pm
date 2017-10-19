@@ -1,24 +1,13 @@
-=head1 NAME
-
-Directory::Diff::Copy - Copy differences between two directories
-
-=head1 SYNOPSIS
-
-   use Directory::Diff::Copy 'copy_diff_only';
-   copy_diff_only ($old_dir, $new_dir, $output_dir);
-
-=cut
-
 package Directory::Diff::Copy;
 require Exporter;
 @ISA = qw(Exporter);
 @EXPORT_OK = qw/copy_diff_only/;
 use warnings;
 use strict;
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 use Carp;
-use File::Copy;
-use File::Path;
+use File::Copy 'copy';
+use File::Path 'rmtree';
 use Directory::Diff 'directory_diff';
 
 #=head2 mdate
@@ -113,18 +102,7 @@ sub diff_callback
     $data->{count}++;
 }
 
-=head2 copy_diff_only
 
-   copy_diff_only ($old_dir, $new_dir, $output_dir);
-
-Given $old_dir, $new_dir, and $output_dir, compare the files in
-$old_dir and $new_dir using L<Directory::Diff::directory_diff>. If
-$output_dir does not exist, create it, if it does exist remove all
-files from it, and put the differing files only into $output_dir.
-
-The return value is the number of files copied.
-
-=cut
 
 sub copy_diff_only
 {

@@ -5,7 +5,7 @@ use File::Temp;
 use POSIX::AtFork;
 use Test::mysqld::Pool;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 sub load {
     my ($class, $prove) = @_;
@@ -13,13 +13,20 @@ sub load {
     my $preparer = $args[ 0 ];
     my $jobs     = $prove->{ app_prove }->jobs || 1;
     my $lib      = $prove->{ app_prove }->lib;
+    my $blib     = $prove->{ app_prove }->blib;
+    my $includes = $prove->{ app_prove }->includes;
 
     my $share_file = File::Temp->new(); # deleted when DESTROYed
     my $pool       = Test::mysqld::Pool->new(
         jobs       => $jobs,
         share_file => $share_file->filename,
         ($preparer ? do {
-            push( @INC, 'lib' ) if $lib;
+            my @libs;
+            push( @libs, 'lib' ) if $lib;
+            push( @libs, 'blib/lib', 'blib/arch' ) if $blib;
+            push( @libs, @$includes ) if @$includes;
+            @libs = map { File::Spec->rel2abs($_) } @libs;
+            push( @INC, @libs );
             eval "require $preparer" ## no critic
                 or die "$@";
             (

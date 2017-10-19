@@ -77,6 +77,9 @@ PREFIX (number) (json_parse_t * parser)
 
     int minus;
 
+    /* When this is called, it means that a byte indicating a number
+       was found. We need to re-examine that byte as a number. */
+
     parser->end--;
     start = (char *) parser->end;
 

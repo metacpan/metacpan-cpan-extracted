@@ -1,9 +1,48 @@
 ==================================================
-Changes from 2015-03-24 00:00:00 +0000 to present.
+Changes from 2015-10-14 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 5.3 at 2017-03-23 01:50:14 +0000
+version 5.4 at 2017-10-13 19:36:25 +0000
+----------------------------------------
+
+  Change: c31b5f39953589c497f4374be9c22f36a2514dc2
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2017-10-13 12:36:20 +0000
+
+    Documentation update for the 5.4 release. 
+
+  Change: 3b6a379937869eaf46e80eea6f7d54e5c4f2220a
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2017-07-12 20:50:57 +0000
+
+    Default to UTC, warn when using incompatible options. 
+
+  Change: 570de7b2ffa8896b723a3d5c739cec25f4fe8297
+  Author: Lisa Hare <lhare@inview.co.uk>
+  Date : 2017-06-23 08:50:42 +0000
+
+    add older option to es-apply-settings
+
+    when older argument is passed to es_indices in Utilities.pm if days is also
+    specified then it will only return indexes older that the specified days
+
+    Refs #24 
+
+  Change: 04a72068727474471abd709e993b9095bcf4e489
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2017-06-07 11:05:12 +0000
+
+    Fixup the optimize call for newer ElasticSearch releases. 
+
+  Change: 25ad9e95697a92093c30375836041c7fb2f691e8
+  Author: Markus Linnala <Markus.Linnala@cybercom.com>
+  Date : 2017-04-05 19:33:52 +0000
+
+    es-alias-manager.pl: relax index name checker to allow _ 
+
+----------------------------------------
+version 5.3 at 2017-03-23 01:49:52 +0000
 ----------------------------------------
 
   Change: 3becaead7ab98d420511e67ac55724eb19c3bd76
@@ -679,66 +718,6 @@ version 4.0 at 2016-01-27 23:37:44 +0000
 
     Fix typo in documentation 
 
-----------------------------------------
-version 3.9 at 2015-05-20 09:12:30 +0000
-----------------------------------------
-
-  Change: 8b60c110e35726485f1cf22f72540e431af30e98
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2015-05-20 11:12:30 +0000
-
-    Version 3.9 packaging 
-
-  Change: af9afd74b666677f7182b97709ebaf208be2b9cc
-  Author: Brad Lhotsky <brad.lhotsky@booking.com>
-  Date : 2015-05-20 10:41:55 +0000
-
-    App::ElasticSearch::Utilities * Now allows --no-noop so you can set noop in
-    a global es-utils.yaml config to make changes to indexes require --no-noop.
-    * Exporting es_globals($key) which gives access to the values in the config
-    files to the the scripts. This can include additional variables not called
-    in the App::ElasticSearch::Utilities module itself, but needed for it's
-    other scripts, e.g., es-search.pl's --timestamp parameter. * Allow
-    date-separator and base to be set in es-utils.yaml. * Index date patterns
-    updated to allow for 'base_YYYYMMDD'
-
-    scripts/es-search.pl * --timestamp option for indexes where @timestamp
-    isn't the field you want used as the date field. 
-
-----------------------------------------
-version 3.8 at 2015-05-04 10:13:01 +0000
-----------------------------------------
-
-  Change: f6f34a85da0b3414f0aa1a252015989f2d54aa3a
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2015-05-04 12:13:01 +0000
-
-    Preparation for the 3.8 release. 
-
-  Change: 38f30d5aaf1da4a7e18b6aae42d77d0aceeea164
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2015-05-04 12:01:00 +0000
-
-    Make es-copy-index.pl executable. 
-
-  Change: 6161f7f479e5556651d5ac67a551aff33419f6ab
-  Author: Kang-min Liu <kangmin.liu@booking.com>
-  Date : 2015-05-01 12:32:45 +0000
-
-    reimplement es-copy-index.pl with Elastijk. 
-
-  Change: df72bf56be14b4f7b47c8ecd3819f4b4a564cc8b
-  Author: Kang-min Liu <gugod@gugod.org>
-  Date : 2015-05-01 11:48:40 +0000
-
-    remove an non-existing function from the export list. 
-
-  Change: 53498cd83b606561a729ded73ebb16c2d23ab3ee
-  Author: Brad Lhotsky <brad.lhotsky@booking.com>
-  Date : 2015-03-23 12:52:11 +0000
-
-    Replace File::Slurp with File::Slurp::Tiny 
-
 =================================================
-Plus 46 releases after 2015-03-24 00:00:00 +0000.
+Plus 48 releases after 2015-10-14 00:00:00 +0000.
 =================================================

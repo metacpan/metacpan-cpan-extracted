@@ -1,5 +1,19 @@
 Revision history for Dancer2-Plugin-Auth-Extensible
 
+0.705 Mon 16 Oct 11:54:34 CEST 2017
+
+    [BUG FIXES]
+
+    * Correctly escape return URLs (Ben "whosgonna" Kaufman GH#79)
+
+    [ENHANCEMENTS]
+
+    * Add before_logout hook (Dominic Sonntag GH#70)
+
+    [DOCS]
+
+    * Add docs about making your own login pages (Jason Lewis GH#62)
+
 0.704 Wed 12 Apr 15:04:46 CEST 2017
 
     [BUG FIXES]

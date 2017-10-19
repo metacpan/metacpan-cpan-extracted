@@ -1,0 +1,6 @@
+Build.PL
+lib/Math/Vectors2.pm
+MANIFEST			This list of files
+test.pl
+META.yml
+META.json

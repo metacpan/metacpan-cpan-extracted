@@ -1,0 +1,10 @@
+Revision history for Mojolicious::Plugin::GraphQL
+
+0.03    Tue Oct 17 17:10:25 BST 2017
+ - minimum Mojolicious for to_json
+
+0.02    Mon Oct 16 00:23:03 BST 2017
+ - execute is a function now not method
+
+0.01    Sun Oct 15 05:14:33 BST 2017
+ - First version, released on an unsuspecting world.

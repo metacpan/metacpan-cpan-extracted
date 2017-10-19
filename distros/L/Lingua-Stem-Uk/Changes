@@ -1,0 +1,6 @@
+Revision history for Perl extension Lingua::Stem::Uk.
+
+0.01  Tue Oct 17 22:31:56 2017
+	- original version; created by h2xs 1.23 with options
+		-AX Lingua::Stem::Uk
+

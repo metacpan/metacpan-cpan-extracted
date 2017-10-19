@@ -1,9 +1,9 @@
 package Net::DNS::RR::CSYNC;
 
 #
-# $Id: CSYNC.pm 1561 2017-04-19 13:08:13Z willem $
+# $Id: CSYNC.pm 1597 2017-09-22 08:04:02Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1561 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
 
 
 use strict;
@@ -37,7 +37,6 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 
-	return '' unless defined $self->{typebm};
 	pack 'N n a*', $self->soaserial, $self->flags, $self->{typebm};
 }
 
@@ -45,7 +44,6 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
-	return '' unless defined $self->{typebm};
 	my @rdata = ( $self->soaserial, $self->flags, $self->typelist );
 }
 

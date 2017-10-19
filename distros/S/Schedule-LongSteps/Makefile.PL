@@ -19,6 +19,7 @@ my %WriteMakefileArgs = (
     "Class::Load" => 0,
     "Data::UUID" => "1.220",
     "DateTime" => "1.18",
+    "DateTime::Format::ISO8601" => "0.08",
     "Log::Any" => "1.032",
     "Moose" => "2.1405",
     "Scope::Guard" => "0.21"
@@ -27,7 +28,7 @@ my %WriteMakefileArgs = (
     "Test::MockDateTime" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.017",
+  "VERSION" => "0.020",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,6 +39,7 @@ my %FallbackPrereqs = (
   "Class::Load" => 0,
   "Data::UUID" => "1.220",
   "DateTime" => "1.18",
+  "DateTime::Format::ISO8601" => "0.08",
   "Log::Any" => "1.032",
   "Moose" => "2.1405",
   "Scope::Guard" => "0.21",

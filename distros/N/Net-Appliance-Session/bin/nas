@@ -7,21 +7,11 @@ use Net::Appliance::Session::Scripting;
 
 Net::Appliance::Session::Scripting::run();
 
-# ABSTRACT: Create Reusable Session Scripts
-# PODNAME: nas
-
-
-
-__END__
 =pod
 
 =head1 NAME
 
 nas - Create Reusable Session Scripts
-
-=head1 VERSION
-
-version 4.142720
 
 =head1 SYNOPSIS
 
@@ -136,7 +126,7 @@ Oliver Gorwits <oliver@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Oliver Gorwits.
+This software is copyright (c) 2017 by Oliver Gorwits.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

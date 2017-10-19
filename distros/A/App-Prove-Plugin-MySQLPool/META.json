@@ -4,7 +4,7 @@
       "Masakazu Ohtsuka <o.masakazu@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.10",
+   "generated_by" : "Minilla/v3.0.7",
    "license" : [
       "perl_5"
    ],
@@ -63,7 +63,7 @@
    "provides" : {
       "App::Prove::Plugin::MySQLPool" : {
          "file" : "lib/App/Prove/Plugin/MySQLPool.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       },
       "TAP::Formatter::MySQLPool" : {
          "file" : "lib/App/Prove/Plugin/MySQLPool.pm"
@@ -86,9 +86,10 @@
          "web" : "https://github.com/mackee/App-Prove-Plugin-MySQLPool"
       }
    },
-   "version" : "0.07",
+   "version" : "0.08",
    "x_contributors" : [
       "skozawa <skozawa@hatena.ne.jp>",
+      "Kenichi Ishigaki <ishigaki@cpan.org>",
       "Ichinose Shogo <shogo82148@gmail.com>",
       "mackee <macopy123@gmail.com>"
    ],

@@ -1,33 +1,37 @@
 NAME
+
     Test::Dirs - easily copy and compare folders inside tests
 
 SYNOPSIS
+
             use Test::More tests => 5;
             use Test::Dirs;
-        
+            
             # make a temporary copy of a folder
             my $tmp_dir = temp_copy_ok($src_dir, 'copy template to tmp folder');
-        
+            
             # compare one folder with another
             is_dir($src_dir, $tmp_dir, 'temp copy should be the same as source');
-        
+            
             # set files to ignore
             my @ignore_files = qw(.ignore_me);
             open(my $fh, '>', File::Spec->catfile($tmp_dir, '.ignore_me')) or die $!;
             is_dir($src_dir, $tmp_dir, 'temp copy should be the same as source', \@ignore_files);
-        
+            
             TODO: {
                     local $TODO = 'do something with the extra file in the future';
                     is_dir($src_dir, $tmp_dir, 'fails without @ignore_files');
             };
-        
+            
             # be verbose, print out the diff if doesn't match
             is_dir($src_dir, $tmp_dir, 'test with verbose on', \@ignore_files, 'verbose');
-        
+            
+
 DESCRIPTION
-    Exports test function is_dir to compare two folders if their file
+
+    Exports test function "is_dir" to compare two folders if their file
     structure match and a function to make a temporary copy of a folder
-    temp_copy_ok so it can be safely manipulated and compared to another
+    "temp_copy_ok" so it can be safely manipulated and compared to another
     folder.
 
     Can be used to test modules or programs that are manipulating a whole
@@ -35,39 +39,47 @@ DESCRIPTION
     Calling module or a program to manipulate files inside this temporary
     folder and then comparing it to a desired folder state.
 
-    In addition there is a dir_cleanup_ok function that can be used to
+    In addition there is a "dir_cleanup_ok" function that can be used to
     completely remove folder structures that are not important for
     comparing.
 
 EXPORTS
+
         temp_copy_ok()
         is_dir()
         dir_cleanup_ok()
 
 FUNCTIONS
-  temp_copy_ok($src_dir, [$message])
-    Will recursively copy `$src_dir' to a File::Temp folder and returning
-    File::Temp::Dir object. This object will stringify to a path and when
-    destroyed (will leave the scope) folder is automatically deleted.
 
-  is_dir($dir1, $dir2, [$message, \@ignore_files, $verbose])
-    Compares `$dir1' with `$dir2'. Files that has to be ignored (are not
-    important) can be specified as `@ignore_files'. The filenames are
-    relative to the `$dir1(2)' folders.
+ temp_copy_ok($src_dir, [$message])
 
-  dir_cleanup_ok($filename, [$message])
-    If the `$filename' is a folder. Removes this folder and all empty
-    folders upwards.
+    Will recursively copy $src_dir to a "newdir" in File::Temp folder and
+    returning File::Temp::Dir object. This object will stringify to a path
+    and when destroyed (will leave the scope) folder is automatically
+    deleted.
 
-    If the `$filename' is a file. Removes parent folder of this file and all
+ is_dir($dir1, $dir2, [$message, \@ignore_files, $verbose])
+
+    Compares $dir1 with $dir2. Files that has to be ignored (are not
+    important) can be specified as @ignore_files. The filenames are
+    relative to the $dir1(2) folders.
+
+ dir_cleanup_ok($filename, [$message])
+
+    If the $filename is a folder. Removes this folder and all empty folders
+    upwards.
+
+    If the $filename is a file. Removes parent folder of this file and all
     empty folders upwards.
 
     PS: Just be careful :-)
 
 SEE ALSO
+
     File::DirCompare, File::Copy::Recursive, File::Temp
 
 LICENSE AND COPYRIGHT
+
     This program is free software; you can redistribute it and/or modify it
     under the terms of either: the GNU General Public License as published
     by the Free Software Foundation; or the Artistic License.
@@ -75,5 +87,6 @@ LICENSE AND COPYRIGHT
     See http://dev.perl.org/licenses/ for more information.
 
 AUTHOR
+
     Jozef Kutej
 

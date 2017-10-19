@@ -105,13 +105,11 @@ This key was generated automatically so you should normally just leave it alone.
     ],
     'license' => 'LGPL2',
     'name' => 'PopCon',
-    'read_config' => [
-      {
-        'backend' => 'ShellVar',
-        'config_dir' => '/etc',
-        'file' => 'popularity-contest.conf'
-      }
-    ]
+    'rw_config' => {
+      'backend' => 'ShellVar',
+      'config_dir' => '/etc',
+      'file' => 'popularity-contest.conf'
+    }
   }
 ]
 ;

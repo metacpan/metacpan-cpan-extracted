@@ -1,9 +1,9 @@
 package Net::DNS::RR::APL;
 
 #
-# $Id: APL.pm 1548 2017-03-08 09:53:56Z willem $
+# $Id: APL.pm 1597 2017-09-22 08:04:02Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1548 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
 
 
 use strict;
@@ -46,7 +46,7 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 
 	my @rdata;
-	my $aplist = $self->{aplist} || [];
+	my $aplist = $self->{aplist};
 	foreach (@$aplist) {
 		my $address = $_->{address};
 		$address =~ s/[\000]+$//;			# strip trailing null octets
@@ -60,7 +60,7 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
-	my $aplist = $self->{aplist} || [];
+	my $aplist = $self->{aplist};
 	my @rdata = map $_->string, @$aplist;
 }
 

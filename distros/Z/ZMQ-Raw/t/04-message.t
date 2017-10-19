@@ -21,6 +21,9 @@ is $result, 'hello';
 is $msg->get (ZMQ::Raw::Message->ZMQ_SHARED), 0;
 is $msg->data ('world'), 'world';
 
+my $clone = $msg->clone;
+is 'world', $clone->data;
+
 is $msg->routing_id(), undef;
 is $msg->routing_id (123), 123;
 

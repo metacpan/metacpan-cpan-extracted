@@ -2777,7 +2777,7 @@ KashFlowAPI
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =begin later
 

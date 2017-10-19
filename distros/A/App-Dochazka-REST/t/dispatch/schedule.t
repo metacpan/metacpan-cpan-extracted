@@ -1,22 +1,22 @@
-# ************************************************************************* 
-# Copyright (c) 2014-2015, SUSE LLC
-# 
+# *************************************************************************
+# Copyright (c) 2014-2017, SUSE LLC
+#
 # All rights reserved.
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
-# 
+#
 # 1. Redistributions of source code must retain the above copyright notice,
 # this list of conditions and the following disclaimer.
-# 
+#
 # 2. Redistributions in binary form must reproduce the above copyright
 # notice, this list of conditions and the following disclaimer in the
 # documentation and/or other materials provided with the distribution.
-# 
+#
 # 3. Neither the name of SUSE LLC nor the names of its contributors may be
 # used to endorse or promote products derived from this software without
 # specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 # AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 # IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-# ************************************************************************* 
+# *************************************************************************
 #
 # test schedule (non-history) resources
 #
@@ -50,7 +50,6 @@ use JSON;
 use Plack::Test;
 use Test::JSON;
 use Test::More;
-use Test::Warnings;
 
 
 note( "initialize, connect to database, and set up a testing plan" );
@@ -82,10 +81,10 @@ foreach my $user ( 'inactive', 'active', 'root' ) {
     my $status = req( $test, 200, $user, 'GET', $base );
     is( $status->level, 'OK' );
     is( $status->code, "DISPATCH_RECORDS_FOUND" );
-    is( $status->{'count'}, 1 );
-    ok( exists $status->payload->[0]->{'sid'} );
-    ok( $status->payload->[0]->{'sid'} > 0 );
-    is( $ts_sid, $status->payload->[0]->{'sid'} );
+    is( $status->{'count'}, 2 );
+    ok( exists $status->payload->[1]->{'sid'} );
+    ok( $status->payload->[1]->{'sid'} > 0 );
+    is( $ts_sid, $status->payload->[1]->{'sid'} );
 }
 
 note( 'add six more schedules to the pot' );
@@ -119,7 +118,7 @@ note( 'now we have seven active (i.e., non-disabled) schedules' );
 my $status = req( $test, 200, 'root', 'GET', $base );
 is( $status->level, 'OK' );
 is( $status->code, "DISPATCH_RECORDS_FOUND" );
-is( $status->{'count'}, 7 );
+is( $status->{'count'}, 8 );
 
 note( 'disable one at random' );
 $status = req( $test, 200, 'root', 'PUT', "schedule/sid/" . $sid_range[3], '{ "disabled":true }' );
@@ -130,7 +129,7 @@ note( 'now we have six active (i.e., non-disabled) schedules' );
 $status = req( $test, 200, 'root', 'GET', $base );
 is( $status->level, 'OK' );
 is( $status->code, "DISPATCH_RECORDS_FOUND" );
-is( $status->{'count'}, 6 );
+is( $status->{'count'}, 7 );
 
 note( 'PUT, POST, DELETE -> 405' );
 foreach my $user ( qw( demo root ) ) {
@@ -160,11 +159,11 @@ note( "GET $base as root user" );
 $status = req( $test, 200, 'root', 'GET', $base );
 is( $status->level, 'OK' );
 is( $status->code, "DISPATCH_RECORDS_FOUND" );
-is( $status->{'count'}, 7 );
+is( $status->{'count'}, 8 );
 
 note( 'delete two schedules' );
 my $counter = 0;
-foreach my $sid ( @sid_range[0..1] ) {
+foreach my $sid ( @sid_range[1..2] ) {
     $counter += 1;
     $status = req( $test, 200, 'root', 'DELETE', "schedule/sid/$sid" );
     is( $status->level, 'OK' );
@@ -172,23 +171,30 @@ foreach my $sid ( @sid_range[0..1] ) {
 }
 is( $counter, 2 );
 
+note( 'DEFAULT schedule must be preserved after any deletion' );
+$status = req( $test, 200, 'root', 'GET', "schedule/scode/DEFAULT" );
+is( $status->level, 'OK' );
+is( $status->code, 'DISPATCH_SCHEDULE_FOUND' );
+is( $status->payload->{'scode'}, 'DEFAULT' );
+
 note( 'now only 4 when disabled are not counted' );
 $status = req( $test, 200, 'root', 'GET', 'schedule/all' );
 is( $status->level, 'OK' );
 is( $status->code, "DISPATCH_RECORDS_FOUND" );
-is( $status->{'count'}, 4 );
+is( $status->{'count'}, 5 );
 
 note( 'the total number has dropped from 7 to 5' );
 req( $test, 403, 'demo', 'GET', $base );
 $status = req( $test, 200, 'root', 'GET', $base );
 is( $status->level, 'OK' );
 is( $status->code, "DISPATCH_RECORDS_FOUND" );
-is( $status->{'count'}, 5 );
+is( $status->{'count'}, 6 );
 
 note( 'delete them' );
 my $obj = App::Dochazka::REST::Model::Schedule->spawn;
 foreach my $schedule ( @{ $status->payload } ) {
     $obj->reset( $schedule );
+    next if $obj->scode eq 'DEFAULT';
     ok( sid_exists( $dbix_conn, $obj->sid ) );
     $status = req( $test, 200, 'root', 'DELETE', "schedule/sid/" . $obj->sid );
     is( $status->level, 'OK' );
@@ -196,8 +202,18 @@ foreach my $schedule ( @{ $status->payload } ) {
     ok( ! sid_exists( $dbix_conn, $obj->sid ) );
 }
 
-note( 'total number is now zero' );
-$status = req( $test, 404, 'root', 'GET', $base );
+
+note( 'DEFAULT schedule must be preserved after any deletion' );
+$status = req( $test, 200, 'root', 'GET', "schedule/scode/DEFAULT" );
+is( $status->level, 'OK' );
+is( $status->code, 'DISPATCH_SCHEDULE_FOUND' );
+is( $status->payload->{'scode'}, 'DEFAULT' );
+
+note( 'count should now be one' );
+$status = req( $test, 200, 'root', 'GET', 'schedule/all/disabled' );
+is( $status->level, 'OK' );
+is( $status->code, "DISPATCH_RECORDS_FOUND" );
+is( $status->{'count'}, 1 );
 
 note( 'PUT, POST, DELETE -> 405' );
 foreach my $user ( qw( demo root ) ) {
@@ -207,6 +223,7 @@ foreach my $user ( qw( demo root ) ) {
 }
 
 #delete_testing_schedule( $ts_sid );
+
 
 note( '===========================================' );
 note( '"schedule/eid/:eid/?:ts" resource' );
@@ -323,7 +340,6 @@ is( $status->code, 'DOCHAZKA_CUD_OK' );
 note( "delete the testing schedule itself" );
 delete_testing_schedule( $ts_sid );
 
-
 note( '===========================================' );
 note( '"schedule/new" resource' );
 note( '===========================================' );
@@ -382,8 +398,11 @@ $status = req( $test, 200, 'root', 'DELETE', "schedule/sid/$sid" );
 diag( Dumper $status ) unless $status->ok;
 is( $status->code, 'DOCHAZKA_CUD_OK' );
 
-note( '- count should now be zero' );
-$status = req( $test, 404, 'root', 'GET', 'schedule/all/disabled' );
+note( '- count should now be one' );
+$status = req( $test, 200, 'root', 'GET', 'schedule/all/disabled' );
+is( $status->level, 'OK' );
+is( $status->code, "DISPATCH_RECORDS_FOUND" );
+is( $status->{'count'}, 1 );
 
 note( '- for the next test case, insert a testing schedule _without_ an scode' );
 $intvls = { "schedule" => [
@@ -719,5 +738,11 @@ is( $status->code, 'DOCHAZKA_CUD_OK' );
 note( 'tear down' );
 $status = delete_all_attendance_data();
 BAIL_OUT(0) unless $status->ok;
+
+note( 'DEFAULT schedule must be preserved' );
+$status = req( $test, 200, 'root', 'GET', "$base/DEFAULT" );
+is( $status->level, 'OK' );
+is( $status->code, 'DISPATCH_SCHEDULE_FOUND' );
+is( $status->payload->{'scode'}, 'DEFAULT' );
 
 done_testing;

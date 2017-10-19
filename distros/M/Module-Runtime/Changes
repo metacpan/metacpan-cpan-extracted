@@ -1,3 +1,23 @@
+version 0.016; 2017-10-17
+
+  * port t/taint.t to Perl 5.27.5, where re-requiring an already-loaded
+    module doesn't trigger tainting
+
+  * skip t/taint.t if the perl empirically doesn't perform taint checks
+    but the script got run anyway (which happens with an unsupported
+    configuration of the Perl core which some people are using in the
+    absence of a supported no-taint configuration)
+
+  * in t/taint.t, use $^X rather than $ENV{PATH} as the primordial
+    tainted value to taint a string being tested
+
+  * in documentation, use four-column indentation for all verbatim
+    material
+
+  * in META.{yml,json}, point to public bug tracker
+
+  * in META.json, specify type of public repository
+
 version 0.015; 2017-07-16
 
   * update test suite to not rely on . in @INC, which is no longer

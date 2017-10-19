@@ -4,7 +4,7 @@ DBIx::Deployer - Light-weight database patch utility
 
 # VERSION
 
-version v1.2.2
+version v1.2.3
 
 # SYNOPSIS
 

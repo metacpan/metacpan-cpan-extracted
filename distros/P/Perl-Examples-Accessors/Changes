@@ -1,3 +1,10 @@
+0.131   2017-10-15 (PERLANCAR)
+
+	- Add Perl::Examples::Accessors::ClassAccessorPackedStringSet.
+
+	- Update module name: Class::Accessor::Array::{Glob,Slurpy}.
+
+
 0.130   2017-09-01 (PERLANCAR)
 
 	- Add Perl::Examples::Accessors::ClassAccessorPackedString.

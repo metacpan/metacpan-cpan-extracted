@@ -1,5 +1,5 @@
 package Schedule::LongSteps::Storage::DBIxClass;
-$Schedule::LongSteps::Storage::DBIxClass::VERSION = '0.017';
+$Schedule::LongSteps::Storage::DBIxClass::VERSION = '0.020';
 use Moose;
 extends qw/Schedule::LongSteps::Storage/;
 
@@ -152,18 +152,12 @@ sub prepare_due_processes{
     my $dtf = $self->schema()->storage()->datetime_parser();
 
     my $uuid = $self->uuid()->create_str();
+    $log->info("Creating batch ID $uuid");
 
-    # Move the due ones to a specific 'transient' running status
-    # in a transaction that would prevent any other process
-    # to update the same rows.
-    #
-    # Note that for => 'update' only works in a transaction
-    # Outside a transaction, it just doesn't do anything.
-    #
-    # See note in L<http://dev.mysql.com/doc/refman/5.6/en/innodb-locking-reads.html>
-    # and
-    # L<http://search.cpan.org/~ribasushi/DBIx-Class-Manual-SQLHackers-1.3/lib/DBIx/Class/Manual/SQLHackers/SELECT.pod#SELECT_..._FOR_UPDATE>
-    #
+
+    # Note that we do not use the SELECT FOR UPDATE technique here.
+    # Instead this generates a single UPDATE statement like this one:
+    # UPDATE longsteps_process SET run_id = ?, status = ? WHERE ( id IN ( SELECT me.id FROM longsteps_process me WHERE ( ( run_at <= ? AND run_id IS NULL ) ) LIMIT ? ) )
     my $stuff = sub{
         $rs->search({
             run_at => { '<=' => $dtf->format_datetime( $now ) },
@@ -176,10 +170,9 @@ sub prepare_due_processes{
                 status => 'running'
             });
     };
+    $stuff->();
 
-    $self->schema()->txn_do( $stuff );
-
-    # And return them as a resultset
+    # And return them as individual results.
     return $rs->search({
         run_id => $uuid,
     })->all();

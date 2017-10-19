@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Object::ForkAware; # git description: v0.003-22-g1de42b4
+package Object::ForkAware; # git description: v0.004-4-g2bf9955
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: Make an object aware of process forks and threads, recreating itself as needed
 # KEYWORDS: process thread fork multiprocessing multithreading clone
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 use Scalar::Util ();
 
@@ -103,7 +103,7 @@ Object::ForkAware - Make an object aware of process forks and threads, recreatin
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -128,9 +128,9 @@ version 0.004
 If you've ever had an object representing a network connection to some server,
 or something else containing a socket, a filehandle, etc, and used it in a
 program that forks, and then forgot to close and reopen your socket/handle
-etc, you'll know what chaos can ensue. Depending on the type of connection,
+etc in the new process, you'll know what chaos can ensue. Depending on the type of connection,
 you can have multiple processes trying to write to the same resource at once,
-or simultaneous reads getting each other's data, etc etc. It's horrible, and
+or simultaneous reads getting each other's data, dogs and cats living together... It's horrible, and
 it's an easy problem to run into.
 
 This module invisibly wraps your object and makes it fork-aware, automatically
@@ -178,13 +178,13 @@ allowing you to copy any state from the old object to the new one.
 =item * C<on_fork> - a sub reference containing the code to be run when a fork
 is detected. It should either generate an exception or return the new object
 instance.
+If the object previously existed, it is passed as an argument to this method,
+allowing you to copy any state from the old object to the new one.
 
 =item * C<lazy> - a boolean (defaults to false) - when true, the C<create> sub
 is not called immediately, but instead deferred until the first time the
-object is used. This prevents useless object creation if it is not to be used
+object is used. This prevents useless object creation if it is not likely to be used
 until after the first fork.
-If the object previously existed, it is passed as an argument to this method,
-allowing you to copy any state from the old object to the new one.
 
 =back
 

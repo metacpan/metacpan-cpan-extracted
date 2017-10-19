@@ -1,5 +1,8 @@
 package WebService::Braintree::PartnerMerchant;
-$WebService::Braintree::PartnerMerchant::VERSION = '0.93';
+$WebService::Braintree::PartnerMerchant::VERSION = '0.94';
+use 5.010_001;
+use strictures 1;
+
 =head1 NAME
 
 WebService::Braintree::PartnerMerchant

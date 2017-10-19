@@ -1,0 +1,18 @@
+[-Bangs::ProhibitBitwiseOperators]
+
+[ControlStructures::ProhibitPostfixControls]
+flowcontrol = skip
+
+[-Modules::RequireExplicitInclusion]
+
+[-RegularExpressions::ProhibitEnumeratedClasses]
+
+[-RegularExpressions::RequireDotMatchAnything]
+
+[-RegularExpressions::RequireExtendedFormatting]
+
+[-RegularExpressions::RequireLineBoundaryMatching]
+
+[-ValuesAndExpressions::ProhibitLeadingZeros]
+
+[-ValuesAndExpressions::ProhibitMagicNumbers]

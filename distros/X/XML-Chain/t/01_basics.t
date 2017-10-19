@@ -19,22 +19,22 @@ my $tmp_dir = dir(tempdir( CLEANUP => 1 ));
 subtest 'xc()' => sub {
     my $body = xc('body');
     isa_ok($body, 'XML::Chain::Element', 'xc(exported) returns element');
-    is($body->as_string, '<body/>', 'create an element');
+    is($body->as_string, '<body></body>', 'create an element');
 
     my $body_class = xc('body', {'data-a' => 'b', class => 'myClass'});
-    is($body_class->as_string, '<body class="myClass" data-a="b"/>', 'create an element with hash attribute');
+    is($body_class->as_string, '<body class="myClass" data-a="b"></body>', 'create an element with hash attribute');
     my $body_class2 = xc('body', class => 'myClass', onLoad => 'alert("yay!")');
-    is($body_class2->as_string, '<body class="myClass" onLoad="alert(&quot;yay!&quot;)"/>', 'create an element with sorted attributes');
+    is($body_class2->as_string, '<body class="myClass" onLoad="alert(&quot;yay!&quot;)"></body>', 'create an element with sorted attributes');
     my $load_file = xc([$Bin, 'tdata', '01_basics.xml']);
-    is($load_file->as_string, '<hello><world/></hello>', 'create from file (IO::Any)');
+    is($load_file->as_string, '<hello><world></world></hello>', 'create from file (IO::Any)');
 
     is(xc(\'<body><h1>and</h1><h1>head</h1></body>')->find('//h1')->count, 2, '=head3 xc($what_ref); -> parsing xml strings');
 
     my $over_el = xc('overload');
-    is("$over_el", '<overload/>', '=head2 as_string; sample');
+    is("$over_el", '<overload></overload>', '=head2 as_string; sample');
 
     my $xml_doc = XML::LibXML->load_xml(string => '<xml-doc><el/></xml-doc>');
-    is(xc($xml_doc)->as_string, '<xml-doc><el/></xml-doc>', 'xc(XML::LibXML::Document->new())');
+    is(xc($xml_doc)->as_string, '<xml-doc><el></el></xml-doc>', 'xc(XML::LibXML::Document->new())');
 };
 
 subtest 'basic creation / removal' => sub {
@@ -53,7 +53,7 @@ subtest 'basic creation / removal' => sub {
     is($div->as_string, '<div class="pretty"><h1>hello</h1><p class="intro">world</p><p>of chained XML.</p></div>', '=head1 SYNOPSIS; block1 -> chained create elements');
 
     my $icon_el = xc('i', class => 'icon-download icon-white');
-    is($icon_el->as_string, '<i class="icon-download icon-white"/>', '=head2 xc; sample');
+    is($icon_el->as_string, '<i class="icon-download icon-white"></i>', '=head2 xc; sample');
 
     my $span_el = xc('span')->t('some')->t(' ')->t('more text');
     is($span_el->as_string, '<span>some more text</span>', '=head2 t; sample');
@@ -111,12 +111,12 @@ subtest 'copy elements between documents' => sub {
     my $new_body = xc('body')
         ->a(xc('div')->a($body->find('/body/p')))
         ->a(xc('div')->t('second div'));
-    is($new_body->single->as_string, '<body><div><p class="1"/><p class="2"/></div><div>second div</div></body>', 'test test xml inside divs');
+    is($new_body->single->as_string, '<body><div><p class="1"></p><p class="2"></p></div><div>second div</div></body>', 'test test xml inside divs');
 };
 
 subtest 'loop over elements, rename' => sub {
     my $body = xc('bodyz');
-    is($body, '<bodyz/>','rename()');
+    is($body, '<bodyz></bodyz>','rename()');
 
     $body->rename('body');
     $body
@@ -133,7 +133,7 @@ subtest 'loop over elements, rename' => sub {
                 (map {xc('e', i => $_)} 1 .. 3), $_;
             }
             )->root,
-        '<body><e i="1"/><e i="2"/><e i="3"/><p i="1"/></body>',
+        '<body><e i="1"></e><e i="2"></e><e i="3"></e><p i="1"></p></body>',
         '=head2 remap; add +3 elements'
     );
     is( $remap->find('//e[position()=2]')->remap(
@@ -142,11 +142,11 @@ subtest 'loop over elements, rename' => sub {
                 xc('p', i=>5),
             }
             )->root,
-        '<body><e i="1"/><p i="4"/><p i="5"/><e i="3"/><p i="1"/></body>',
+        '<body><e i="1"></e><p i="4"></p><p i="5"></p><e i="3"></e><p i="1"></p></body>',
         'replace element'
     );
     is( $remap->find('//e[@i="2"] | //p[@i="5"]')->remap(sub { })->root,
-        '<body><e i="1"/><p i="4"/><e i="3"/><p i="1"/></body>',
+        '<body><e i="1"></e><p i="4"></p><e i="3"></e><p i="1"></p></body>',
         'remove elements'
     );
 
@@ -190,10 +190,10 @@ subtest 'store' => sub {
 subtest 'element attributes' => sub {
     my $body = xc(\'<body><img/></body>');
     $body->children->attr('href' => '#', 'title' => '');
-    is($body->as_string, '<body><img href="#" title=""/></body>', '->attr() setter');
+    is($body->as_string, '<body><img href="#" title=""></img></body>', '->attr() setter');
     is($body->children->attr('href'), '#', '->attr() getter');
     $body->children->attr('title' => undef);
-    is($body->as_string, '<body><img href="#"/></body>', '->attr() remove');
+    is($body->as_string, '<body><img href="#"></img></body>', '->attr() remove');
 };
 
 done_testing;

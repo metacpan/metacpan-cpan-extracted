@@ -17,7 +17,7 @@ use Facebook::InstantArticle::List;
 use Facebook::InstantArticle::Map;
 use Facebook::InstantArticle::Paragraph;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 =encoding utf-8
 
@@ -50,6 +50,7 @@ external API are subject to change in upcoming releases, so use with care.
       published         => "$now",
       modified          => "$now",
       auto_ad_placement => 0, # defaults to true
+      style             => 'MyStyleName',
   );
 
   $ia->add_author(
@@ -466,7 +467,7 @@ sub to_string {
             $gen->meta( { charset => 'utf-8' } ),
             $gen->meta( { property => 'op:markup_version', version => 'v1.0' } ),
             $gen->meta( { property => 'fb:likes_and_comments', content => 'enable' } ),
-            $gen->meta( { property => 'fb:use_automatic_ad_placement', content => ($self->auto_ad_placement ? 'true' : 'false') } ),
+            $gen->meta( { property => 'fb:use_automatic_ad_placement', content => ( $self->auto_ad_placement ? 'enable=true ad_density=default' : 'enable=false' ) } ),
             ( length $self->style ? $gen->meta( { property => 'fb:article_style', content => $self->style } ) : undef ),
             $gen->link( { rel => 'canonical', href => $self->url } ),
         ),

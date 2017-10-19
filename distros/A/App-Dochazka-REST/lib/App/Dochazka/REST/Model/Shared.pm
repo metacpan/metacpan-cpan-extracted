@@ -1,22 +1,22 @@
-# ************************************************************************* 
-# Copyright (c) 2014-2015, SUSE LLC
-# 
+# *************************************************************************
+# Copyright (c) 2014-2017, SUSE LLC
+#
 # All rights reserved.
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
-# 
+#
 # 1. Redistributions of source code must retain the above copyright notice,
 # this list of conditions and the following disclaimer.
-# 
+#
 # 2. Redistributions in binary form must reproduce the above copyright
 # notice, this list of conditions and the following disclaimer in the
 # documentation and/or other materials provided with the distribution.
-# 
+#
 # 3. Neither the name of SUSE LLC nor the names of its contributors may be
 # used to endorse or promote products derived from this software without
 # specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 # AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 # IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-# ************************************************************************* 
+# *************************************************************************
 
 package App::Dochazka::REST::Model::Shared;
 
@@ -282,6 +282,10 @@ sub cud {
             $log->err( '$_ undefined in catch' );
             $errmsg = '<NONE>';
         }
+        if ( not $site->MREST_DEBUG_MODE ) {
+            $errmsg =~ s/^DBD::Pg::st execute failed: //;
+            $errmsg =~ s#at /usr/lib/perl5/.* line .*\.$##;
+        }
         if ( not defined( $status ) ) {
             $status = $CELL->status_err( 'DOCHAZKA_DBI_ERR', 
                 args => [ $errmsg ],
@@ -433,9 +437,9 @@ sub decode_schedule_json {
 
 =head2 get_history
 
-This function takes a number of arguments. The first two are (1) a
-L<DBIx::Connector> object and (2) a SCALAR argument, which can be either 'priv'
-or 'schedule'. 
+This function takes a number of arguments. The first two are (1) a SCALAR
+argument, which can be either 'priv' or 'schedule', and (2) a L<DBIx::Connector>
+object.
 
 Following these there is a PARAMHASH which can have one or more of the
 properties 'eid', 'nick', and 'tsrange'. At least one of { 'eid', 'nick' } must
@@ -455,7 +459,7 @@ the payload will be undefined.
 =cut
 
 sub get_history { 
-    my $t = shift;
+    my $t = shift; # 'priv' or 'sched'
     my $conn = shift;
     validate_pos( @_, 1, 1, 0, 0, 0, 0 );
     my %ARGS = validate( @_, { 

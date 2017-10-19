@@ -1,0 +1,6 @@
+
+PERL5LIB="$PWD/perl5/lib/perl5:$PWD/../lib"
+PATH="$PWD/perl5/bin:$PATH"
+export PERL5LIB PATH
+
+PERL=perl

@@ -10,12 +10,15 @@ use Error qw(:try);
 use Test::Builder;
 use base 'Test::Builder::Module';
 
+use constant TRUE => 1;
+use constant FALSE => 0;
+
 #own
 use Test::Timer::TimeoutException;
 
 @EXPORT = qw(time_ok time_nok time_atleast time_atmost time_between);
 
-$VERSION = '2.03';
+$VERSION = '2.04';
 
 my $test  = Test::Builder->new;
 my $timeout = 0;
@@ -35,16 +38,16 @@ sub time_nok {
     my ($within, $time) = _runtest( $code, 0, $upperthreshold );
 
     # are we within the specified threshold
-    if ($within == 1) {
+    if ($within == TRUE) {
 
         # we inverse the result, since we are the inverse of time_ok
-        $within = 0;
+        $within = FALSE;
         $test->ok( $within, $name ); # no, we fail
         $test->diag( "Test ran $time seconds and did not exceed specified threshold of $upperthreshold seconds" );
     } else {
 
         # we inverse the result, since we are the inverse of time_ok
-        $within = 1;
+        $within = TRUE;
         $test->ok( $within, $name ); # yes, we do not fail
     }
 
@@ -59,7 +62,7 @@ sub time_atmost {
     my ($within, $time) = _runtest( $code, 0, $upperthreshold );
 
     # are we within the specified threshold
-    if ($within == 1) {
+    if ($within == TRUE) {
         $test->ok( $within, $name ); # yes, we do not fail
     } else {
         $test->ok( $within, $name ); # no, we fail
@@ -77,7 +80,7 @@ sub time_atleast {
     my ($above, $time) = _runtest( $code, $lowerthreshold, undef );
 
     # are we above the specified threshold
-    if ($above == 1) {
+    if ($above == TRUE) {
         $test->ok( $above, $name ); # yes, we do not fail
 
     } else {
@@ -96,7 +99,7 @@ sub time_between {
     my ($within, $time) = _runtest( $code, $lowerthreshold, $upperthreshold );
 
     # are we within the specified threshold
-    if ($within == 1) {
+    if ($within == TRUE) {
         $test->ok( $within, $name ); # yes, we do not fail
     } else {
         $test->ok( $within, $name ); # no, we fail
@@ -115,7 +118,7 @@ sub time_between {
 sub _runtest {
     my ( $code, $lowerthreshold, $upperthreshold ) = @_;
 
-    my $ok = 0;
+    my $ok = FALSE;
     my $time = 0;
 
     try {
@@ -126,9 +129,9 @@ sub _runtest {
             $time = _benchmark( $code, $upperthreshold );
 
             if ( $time >= $lowerthreshold and $time <= $upperthreshold ) {
-                $ok = 1;
+                $ok = TRUE;
             } else {
-                $ok = 0;
+                $ok = FALSE;
             }
 
         # we just have a lower threshold (time_atleast)
@@ -137,9 +140,9 @@ sub _runtest {
             $time = _benchmark( $code );
 
             if ( $time >= $lowerthreshold ) {
-                $ok = 1;
+                $ok = TRUE;
             } else {
-                $ok = 0;
+                $ok = FALSE;
             }
         }
     }
@@ -184,7 +187,7 @@ sub _benchmark {
         my $timestring = timestr( timediff( $t1, $t0 ) );
         my $time = _timestring2time($timestring);
 
-        throw Test::Timer::TimeoutException("$time");
+        throw Test::Timer::TimeoutException($time);
     };
 
     # setting alarm
@@ -242,7 +245,7 @@ Test::Timer - test module to test/assert response times
 
 =head1 VERSION
 
-The documentation describes version 2.03 of Test::Timer
+The documentation describes version 2.04 of Test::Timer
 
 =head1 FEATURES
 
@@ -518,7 +521,7 @@ so the current implementation is limited to seconds as the highest resolution.
 
 On occassion failing tests with CPAN-testers have been observed. This seem to be related to the test-suite
 being not taking into account that some smoke-testers do not prioritize resources for the test run and that
-addional processes/jobs are running. The test-suite have been adjusted to accomodate this but these issues
+additional processes/jobs are running. The test-suite have been adjusted to accommodate this but these issues
 might reoccur.
 
 =head1 TEST AND QUALITY
@@ -598,8 +601,6 @@ You can also look for information at:
 
 =item * L<Github Repository|https://github.com/jonasbn/perl-test-timer>, please see L<the guidelines for contributing|https://github.com/jonasbn/perl-test-timer/blob/master/CONTRIBUTING.md>.
 
-
-
 =back
 
 =head1 AUTHOR
@@ -613,6 +614,8 @@ You can also look for information at:
 =head1 ACKNOWLEDGEMENTS
 
 =over
+
+=item * Gregor Herrmann, PR #16 fixes to spelling mistakes
 
 =item * Nigel Horne, issue #15 suggestion for better assertion in L<time_atleast|/time_atleast>
 

@@ -37,16 +37,20 @@
 //
 define ([
     'jquery',
+    'app/entries',
     'lib',
     'stack',
     'target'
 ], function (
     $,
-    lib,
+    entryDefs,
+    coreLib,
     stack,
     target
 ) {
     var 
+        currentTarget,
+
         //
         // generalized handlers
         //
@@ -72,7 +76,7 @@ define ([
             if ($.isNumeric(sel) && sel >= 0 && sel <= len) {
                 // we can only select the entry if we have sufficient priv level
                 selection = target.pull(dmo.entries[sel]);
-                if (lib.privCheck(selection.aclProfile)) {
+                if (coreLib.privCheck(selection.aclProfile)) {
                     //console.log('Selection ' + sel + ' passed priv check');
                     entry = selection;
                 }
@@ -97,7 +101,7 @@ define ([
         },
         dmenuKeyListener = function (dmn) {
             return function (event) {
-                lib.logKeyPress(event);
+                coreLib.logKeyPress(event);
                 if (event.keyCode === 13) {
                     console.log("Detected ENTER keypress; submitting " + dmn + " form");
                     event.preventDefault();
@@ -111,45 +115,82 @@ define ([
         //
         // miniMenu handlers
         //
+        mmKeyListenerVetEntry = function (evt, n, eid) {
+            var input = $("input[id='" + eid + "']"),
+                vetted = true,
+                vettedVal,
+                vetter;
+            console.log("In writable entry " + eid);
+            vetter = currentTarget.getVetter(eid);
+            console.log("vetter", vetter);
+            if (typeof vetter === 'function') {
+                console.log("Current entry ->" + eid +"<- has a vetter function!");
+                vettedVal = vetter(input.val());
+                if (vettedVal) {
+                    input.val(vettedVal);
+                } else {
+                    vetted = false;
+                }
+            }
+            if (vetted) {
+                if (evt.keyCode !== 9) {
+                    $("input:text")[n + 1].focus();
+                }
+            } else {
+                coreLib.displayError("Bad " + entryDefs[eid].text.toLowerCase() + " value!");
+                if (evt.keyCode === 9) {
+                    evt.preventDefault();
+                }
+                $("input:text")[n].focus();
+            }
+        },
         mmKeyListener = function (evt) {
 
-            var len = $("input:text").length,
+            var 
+                elid = $(document.activeElement).attr("id"),
+                elnam = $(document.activeElement).attr("name"),
+                len = $("input:text").length,
                 n = $("input:text").index($(document.activeElement)),
                 i;
 
-            lib.logKeyPress(evt);
+            coreLib.logKeyPress(evt);
+            coreLib.clearResult();
     
             if (evt.keyCode === 13) {
-                console.log('MiniMenu listener detected <ENTER> keypress');
-                console.log("This form has elements 0 through " + (len - 1));
-                for (i=0; i<len; i++) {
-                    console.log("Element " + i, $("input:text")[i]);
-                }
-                console.log("The current element is no. " + n);
+                // ENTER key in form
+                // console.log("This form has writable entries 0 through " + (len - 1));
+                // console.log("Entry " + n + " is active.");
                 evt.preventDefault();
                 if ( n === len - 1 ) {
                     console.log("Triggering submit button click");
+                    for (i=0; i<len; i++) {
+                        console.log("Entry " + i, $("input:text")[i]);
+                    }
+                    // FIXME: iterate over writable entries and vet all the values
                     $('#submitButton').click();
                 } else {
-                    $("input:text")[n + 1].focus();
+                    mmKeyListenerVetEntry(evt, n, elid);
                 }
-    
             } else if (evt.keyCode === 9) {
-                var elnam = $(document.activeElement).attr("name");
+                // TAB key in form
+                vetter = function () { return true; };
                 if (
                         (elnam === 'entry0' && evt.shiftKey) ||
                         (elnam === 'sel' && len === 1) ||
                         (elnam === 'sel' && !evt.shiftKey)
                    ) {
+                    // prevent TAB keypress from navigating out of the form
                     evt.preventDefault();
                 }
+                mmKeyListenerVetEntry(evt, n, elid);
             }
 
         },
-        mmSubmit = function (tgt, obj) {
-            console.log("Entering mmSubmit with target", tgt, " and object", obj);
+        mmSubmit = function (obj) {
+            console.log("Entering mmSubmit with object", obj);
+            console.log("Target is", currentTarget);
 
-            lib.clearResult();
+            coreLib.clearResult();
         
             var sel = $('input[name="sel"]').val(),
                 len,
@@ -159,7 +200,7 @@ define ([
                 entry,
                 item,
                 wlen,
-                entries = tgt.miniMenu.entries;
+                entries = currentTarget.miniMenu.entries;
 
             // if miniMenu has zero or one entries, 'Back' is the only option
             console.log("entries", entries);
@@ -179,10 +220,10 @@ define ([
                 newObj = $.extend({}, obj);
         
                 // replace the writable properties with the values from the form
-                if (tgt.entriesWrite) {
-                    wlen = tgt.entriesWrite.length;
+                if (currentTarget.entriesWrite) {
+                    wlen = currentTarget.entriesWrite.length;
                     for (i = 0; i < wlen; i += 1) {
-                        entry = tgt.entriesWrite[i];
+                        entry = currentTarget.entriesWrite[i];
                         newObj[entry.prop] = $('#' + entry.name).val();
                     }
                     //console.log("Modified object based on form contents", newObj);
@@ -195,8 +236,8 @@ define ([
             if (sel >= 0 && sel <= len) {
                 //console.log("sel " + sel + " is within range");
                 // we can only select the item if we have sufficient priv level
-                selection = target.pull(tgt.miniMenu.entries[sel]);
-                if (lib.privCheck(selection.aclProfile)) {
+                selection = target.pull(currentTarget.miniMenu.entries[sel]);
+                if (coreLib.privCheck(selection.aclProfile)) {
                     //console.log('Selection ' + sel + ' passed priv check');
                     item = selection;
                 }
@@ -214,7 +255,7 @@ define ([
             if (item !== undefined) {
                 //console.log("Selected " + dfn + " menu item: " + item.name);
                 newObj.mm = true;
-                if (tgt.type === 'dform' && tgt.rememberState) {
+                if (currentTarget.type === 'dform' && currentTarget.rememberState) {
                     console.log("Changing stack state to", newObj);
                     stack.setState(newObj);
                 }
@@ -225,16 +266,14 @@ define ([
         //
         // dform handlers
         //
-        dformSubmit = function (dfn, obj) {
-            // dfn is dform name
-            mmSubmit(target.pull(dfn), obj);
-        },
-        dformListen = function (dfn, obj) {
+        dformListen = function (dfn, obj, focusId) {
             console.log("Listening in form " + dfn);
-            var dfo = target.pull(dfn);
+            currentTarget = target.pull(dfn);
             $('#' + dfn).submit( suppressSubmitEvent );
             $('input[name="sel"]').val('');
-            if (stack.getPush() === true && $('input[name="entry0"]').length) {
+            if (focusId) {
+                $('input[id="' + focusId + '"]').focus();
+            } else if (stack.getPush() === true && $('input[name="entry0"]').length) {
                 $('input[name="entry0"]').focus();
             } else {
                 $('input[name="sel"]').focus();
@@ -242,7 +281,7 @@ define ([
             $('#submitButton').on("click", function (event) {
                 event.preventDefault;
                 console.log("Submitting form " + dfn);
-                dformSubmit(dfn, obj);
+                mmSubmit(obj);
             });
             $('#' + dfn).on("keypress", mmKeyListener);
         },
@@ -251,18 +290,18 @@ define ([
         // dbrowser handlers
         //
         dbrowserSubmit = function () {
-            var dbo = lib.dbrowserState.obj,
-                set = lib.dbrowserState.set,
-                pos = lib.dbrowserState.pos;
-            mmSubmit(dbo, set[pos]);
+            var dbo = coreLib.dbrowserState.obj,
+                set = coreLib.dbrowserState.set,
+                pos = coreLib.dbrowserState.pos;
+            mmSubmit(set[pos]);
         },
         dbrowserKeyListener = function () {
-            var set = lib.dbrowserState.set,
-                pos = lib.dbrowserState.pos;
+            var set = coreLib.dbrowserState.set,
+                pos = coreLib.dbrowserState.pos;
             
             return function (evt) {
         
-                lib.logKeyPress(evt);
+                coreLib.logKeyPress(evt);
         
                 // since the dbrowser has (may have) a navigation menu, we
                 // check first for those keys before moving to miniMenu handler
@@ -270,13 +309,13 @@ define ([
                     if (evt.ctrlKey) {
                         console.log('Listener detected CTRL-\u2190 keypress');
                         if ($("#navJumpToBegin").length) {
-                            lib.dbrowserState.pos = 0;
+                            coreLib.dbrowserState.pos = 0;
                             dbrowserListen();
                         }
                     } else {
                         console.log('Listener detected \u2190 keypress');
                         if ($("#navBack").length) {
-                            lib.dbrowserState.pos -= 1;
+                            coreLib.dbrowserState.pos -= 1;
                             dbrowserListen();
                         }
                     }
@@ -284,13 +323,13 @@ define ([
                     if (evt.ctrlKey) {
                         console.log('Listener detected CTRL-\u2192 keypress');
                         if ($("#navJumpToEnd").length) {
-                            lib.dbrowserState.pos = set.length - 1;
+                            coreLib.dbrowserState.pos = set.length - 1;
                             dbrowserListen();
                         }
                     } else {
                         console.log('Listener detected \u2192 keypress');
                         if ($("#navForward").length) {
-                            lib.dbrowserState.pos += 1;
+                            coreLib.dbrowserState.pos += 1;
                             dbrowserListen();
                         }
                     }
@@ -300,18 +339,19 @@ define ([
             };
         },
         dbrowserListen = function (resultLine) {
-            var dbo = lib.dbrowserState.obj,
-                set = lib.dbrowserState.set,
-                pos = lib.dbrowserState.pos;
+            var dbo = coreLib.dbrowserState.obj,
+                set = coreLib.dbrowserState.set,
+                pos = coreLib.dbrowserState.pos;
             
             console.log("Listening in browser " + dbo.name);
+            currentTarget = dbo;
             console.log("Browser set is", set, "cursor position is " + pos);
             $('#mainarea').html(dbo.source(set, pos));
             if (resultLine) {
-                lib.displayResult(resultLine);
+                coreLib.displayResult(resultLine);
             } else {
-                lib.displayResult("Displaying no. " + (pos + 1) + " of " + 
-                                  lib.genObjStr(set.length) + " in result set");
+                coreLib.displayResult("Displaying no. " + (pos + 1) + " of " + 
+                                  coreLib.genObjStr(set.length) + " in result set");
             }
             $('#' + dbo.name).submit(suppressSubmitEvent);
             $('input[name="sel"]').val('').focus();
@@ -341,10 +381,11 @@ define ([
         // dtable handlers
         // 
         dtableSubmit = function (dto) {
-            mmSubmit(dto);
+            mmSubmit();
         },
         dtableListen = function (dto) {
             console.log("Listening in table " + dto.name);
+            currentTarget = dto;
             $('#' + dto.name).submit(suppressSubmitEvent);
             $('input[name="sel"]').val('').focus();
             $('#submitButton').on("click", function (event) {
@@ -359,45 +400,64 @@ define ([
         // drowselect handlers
         //
         drowselectSubmit = function () {
-            var drso = lib.drowselectState.obj;
-                set = lib.drowselectState.set,
-                pos = lib.drowselectState.pos;
-            mmSubmit(drso, set[pos]);
+            var drso = coreLib.drowselectState.obj,
+                set = coreLib.drowselectState.set,
+                pos = coreLib.drowselectState.pos,
+                xtgt;
+            if (drso.hasOwnProperty('miniMenu')) {
+                if (drso.miniMenu.hasOwnProperty('entries')) {
+                    if (drso.miniMenu.entries.length > 0) {
+                        mmSubmit(set[pos]);
+                        return;
+                    }
+                }
+            }
+            if (drso.hasOwnProperty('submitAction')) {
+                stack.push(drso.submitAction, set[pos]);
+            } else {
+                // no miniMenu, no submitAction - just go back
+                xtgt = stack.getXTarget();
+                if (typeof xtgt === "string") {
+                    stack.unwindToTarget(xtgt);
+                } else {
+                    stack.pop();
+                }
+            }
         },
         drowselectKeyListener = function () {
-            var set = lib.drowselectState.set,
-                pos = lib.drowselectState.pos;
+            var set = coreLib.drowselectState.set,
+                pos = coreLib.drowselectState.pos;
 
             return function (evt) {
 
                 console.log("Entering drowselectKeyListener");
-                lib.logKeyPress(evt);
+                coreLib.logKeyPress(evt);
 
                 if (evt.keyCode === 37) { // up arrow
                     if (evt.ctrlKey) {
                         console.log('Listener detected CTRL-up arrow keypress');
-                        lib.reverseVideo(lib.drowselectState.pos, false);
-                        lib.drowselectState.pos = 0;
+                        coreLib.reverseVideo(coreLib.drowselectState.pos, false);
+                        coreLib.drowselectState.pos = 0;
                         drowselectListen();
                     } else {
                         console.log('Listener detected up arrow keypress');
-                        if (lib.drowselectState.pos > 0) {
-                            lib.reverseVideo(lib.drowselectState.pos, false);
-                            lib.drowselectState.pos -= 1;
+                        if (coreLib.drowselectState.pos > 0) {
+                            coreLib.reverseVideo(coreLib.drowselectState.pos, false);
+                            coreLib.drowselectState.pos -= 1;
                             drowselectListen();
                         }
                     }
                 } else if (evt.keyCode === 39) { // down arrow
                     if (evt.ctrlKey) {
                         console.log('Listener detected CTRL-down arrow keypress');
-                        lib.reverseVideo(lib.drowselectState.pos, false);
-                        lib.drowselectState.pos = set.length - 1;
+                        coreLib.reverseVideo(coreLib.drowselectState.pos, false);
+                        coreLib.drowselectState.pos = set.length - 1;
                         drowselectListen();
                     } else {
                         console.log('Listener detected down arrow keypress');
-                        if (lib.drowselectState.pos < set.length - 1) {
-                            lib.reverseVideo(lib.drowselectState.pos, false);
-                            lib.drowselectState.pos += 1;
+                        if (coreLib.drowselectState.pos < set.length - 1) {
+                            coreLib.reverseVideo(coreLib.drowselectState.pos, false);
+                            coreLib.drowselectState.pos += 1;
                             drowselectListen();
                         }
                     }
@@ -407,12 +467,13 @@ define ([
             };
         },
         drowselectListen = function () {
-            var drso = lib.drowselectState.obj,
-                set = lib.drowselectState.set,
-                pos = lib.drowselectState.pos;
-            $('#result').text("Displaying rowselect with " + lib.genObjStr(set.length));
+            var drso = coreLib.drowselectState.obj,
+                set = coreLib.drowselectState.set,
+                pos = coreLib.drowselectState.pos;
+            currentTarget = drso;
+            $('#result').text("Displaying rowselect with " + coreLib.genObjStr(set.length));
             $('#mainarea').html(drso.source(set));
-            lib.reverseVideo(pos, true);
+            coreLib.reverseVideo(pos, true);
             console.log("Listening in rowselect " + drso.name);
             $('#' + drso.name).submit(suppressSubmitEvent);
             $('input[name="sel"]').val('').focus();
@@ -432,7 +493,7 @@ define ([
             var dmo = target.pull(dmn);
             return function (state, opts) {
                 console.log('Entering start.dmenu with argument: ' + dmn);
-                // lib.clearResult();
+                // coreLib.clearResult();
                 stack.setFlag();
                 $('#mainarea').html(dmo.source);
                 $('input[name="sel"]').val('').focus();
@@ -449,13 +510,14 @@ define ([
                     opts = {};
                 }
                 opts.resultLine = ('resultLine' in opts) ? opts.resultLine : "&nbsp";
-                lib.displayResult(opts.resultLine);
+                opts.inputId = ('inputId' in opts) ? opts.inputId : null;
+                coreLib.displayResult(opts.resultLine);
                 if (! state) {
                     state = stack.getState();
                 }
                 console.log('The object we are working with is:', state);
                 $('#mainarea').html(dfo.source(state));
-                dformListen(dfn, state);
+                dformListen(dfn, state, opts.inputId);
             };
         }, // dform
 
@@ -472,12 +534,12 @@ define ([
                     }
                     console.log('dbrowser state', state);
                     // (re)initialize dbrowser state
-                    if (lib.dbrowserStateOverride) {
-                        lib.dbrowserStateOverride = false;
+                    if (coreLib.dbrowserStateOverride) {
+                        coreLib.dbrowserStateOverride = false;
                     } else {
-                        lib.dbrowserState.obj = target.pull(dbn);
-                        lib.dbrowserState.set = state.set;
-                        lib.dbrowserState.pos = state.pos;
+                        coreLib.dbrowserState.obj = target.pull(dbn);
+                        coreLib.dbrowserState.set = state.set;
+                        coreLib.dbrowserState.pos = state.pos;
                     }
                     // start browsing
                     dbrowserListen(stack.getResultLine());
@@ -495,7 +557,7 @@ define ([
                 if (! state) {
                     state = stack.getState();
                 }
-                lib.clearResult();
+                coreLib.clearResult();
                 $('#mainarea').html(dno.source()); // write HTML to screen
                 $("#noticeText").html(state);
                 $('input[name="sel"]').focus();
@@ -507,14 +569,14 @@ define ([
             var dto = target.pull(dtn);
             return function (state, opts) {
                 // state is a array of objects to be displayed as a table
-                lib.clearResult();
+                coreLib.clearResult();
                 console.log('Starting new ' + dtn + ' dtable');
                 if (! state) {
                     state = stack.getState();
                 }
                 console.log('The dataset is', state);
                 $('#mainarea').html(dto.source(state));
-                $('#result').text('Displaying table with ' + lib.genObjStr(state.length));
+                $('#result').text('Displaying table with ' + coreLib.genObjStr(state.length));
                 dtableListen(dto);
             };
         }, // dtable
@@ -527,19 +589,19 @@ define ([
                 // initialization (i.e., one-time event) -- generate and
                 // return the start function for this drowselect
                 return function (state, opts) {
-                    lib.clearResult();
+                    coreLib.clearResult();
                     console.log('Starting new ' + drsn + ' drowselect');
                     if (! state) {
                         state = stack.getState();
                     }
                     console.log('rowselect state', state);
                     // (re)initialize drowselect state
-                    if (lib.drowselectStateOverride) {
-                        lib.drowselectStateOverride = false;
+                    if (coreLib.drowselectStateOverride) {
+                        coreLib.drowselectStateOverride = false;
                     } else {
-                        lib.drowselectState.obj = target.pull(drsn);
-                        lib.drowselectState.set = state.set;
-                        lib.drowselectState.pos = state.pos;
+                        coreLib.drowselectState.obj = target.pull(drsn);
+                        coreLib.drowselectState.set = state.set;
+                        coreLib.drowselectState.pos = state.pos;
                     }
                     // start browsing
                     drowselectListen();

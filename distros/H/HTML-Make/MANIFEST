@@ -10,7 +10,6 @@ examples/synopsis.pl
 examples/table.pl
 lib/HTML/Make.pm
 lib/HTML/Make.pod
-make-pod.pl
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP

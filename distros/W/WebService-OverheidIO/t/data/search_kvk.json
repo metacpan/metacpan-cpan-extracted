@@ -1,0 +1,25 @@
+{
+  "totalItemCount": 1,
+  "pageCount": 1,
+  "size": 30,
+  "_links": {
+    "self": {
+      "href": "/api/kvk/?filters[actief]=true&size=30&queryfields[]=dossiernummer&queryfields[]=handelsnaam&queryfields[]=vestigingsnummer&queryfields[]=subdossier&query=Euronet%20Com*&fields[]=vestigingsnummer"
+    }
+  },
+  "_embedded": {
+    "rechtspersoon": [
+      {
+        "dossiernummer": "33301540",
+        "handelsnaam": "Euronet Communications B.V.",
+        "subdossiernummer": "0000",
+        "vestigingsnummer": "15999696",
+        "_links": {
+          "self": {
+            "href": "/api/kvk/33301540/0000"
+          }
+        }
+      }
+    ]
+  }
+}

@@ -1,3 +1,232 @@
+0.96 (2017-10-18)
+   [ gregor herrmann ]
+   * Disable network tests during autopkgtests like during build.
+   * DhMakePerl::Command::Packaging: extract_docs(): ignore all top-level
+     README* files not just README itself. The trendy new .md or .mkdn
+     versions usually are also just text versions of the POD, formatted in
+     Markdown for GitHub. Also, ignore them case-insensitively.
+   * Debian::WNPP::Query: use HTTPS for debian.org URLs.
+
+   [ Salvatore Bonaccorso ]
+   * Create packages using Standards-Version 4.1.1
+   * Use Standards-Version 4.1.1 in testsuite control files
+   * Declare compliance with Debian policy 4.1.1
+
+   [ Alex Muntada ]
+   * Remove inactive pkg-perl members from Uploaders.
+
+   [ Damyan Ivanov ]
+   * drop -T flag from debian-version.t (Closes: #878901)
+
+0.95 (2017-06-17)
+
+  [ Damyan Ivanov ]
+  * centralized method for determining if a given package belongs to the set
+    of core Perl packages
+  * is_core_perl_package: strip architecture before matching package name
+  * FromCPAN/find_debs_for_modules: remove core packages from the result of
+    DpkgLists->scan_perl_mod
+    (Closes: #854046)
+
+  [ Alex Muntada ]
+  * Debian::Control::Stanza: accept case-insensitive field names in new()
+    as required by Debian Policy while retaining the canonical accessors.
+    Thanks to Ben Finney for the bug report. (Closes: #860023)
+
+  [ gregor herrmann ]
+  * Drop debian/source/local-options. The options were for non-native
+    packages and caused warnings from dpkg-source.
+  * Add debian/gbp.conf to tell gbp and dpt-push about the tag format.
+
+0.94 (2017-03-16)
+
+  [ Carnë Draug ]
+  * Fix "Error: Can't locate object method "get_user"" Create new
+    DhMakePerl::Command::Packaging->get_user method which is used when
+    DEBEMAIL and EMAIL are unset.  Fixes regression from 0.93.
+    (Closes: #856532)
+
+0.93 (2017-01-26)
+
+  [ gregor herrmann ]
+  * DhMakePerl::Command::Packaging: replace "This plugin" with the module
+    name in the long description, like we already did with "This module"
+    and "This library".
+  * Fix a typo in dh-make-perl's POD. Thanks to lintian.
+  * Extend checks for 'perl-modules'.
+    perl-modules has been replaced by perl-modules-5.2[24]. Adapt checks
+    for it.
+  * Remove headers from Contents test files. Thanks to Paul Wise for the
+    bug report. (Closes: #842887)
+
+  [ Christopher Hoskin ]
+  * Require user intervention to resolve version ambiguity
+    (Closes: #848337)
+
+  [ gregor herrmann ]
+  * Debian::Dependency: add support for build profiles (so called
+    "restriction formulas") to the parse() function.
+    Thanks to David Bremner for the bug report. (Closes: #850000)
+
+  [ Carnë Draug ]
+  * Use dh-make-perl email and name information for git commits,
+    including git commits done by pristine-tar.
+    (Closes: #852332)
+  * DhMakePerl::Command::Packaging: add two new methods: get_email
+    and get_name.
+
+  [ gregor herrmann ]
+  * dh-make-perl(1): remove references to quilt(1) which are only relevant
+    for pre '3.0 (quilt)' source packages.
+  * dh-make-perl(1): add paragraph about dependency tracking and required
+    packages/files to POD. (Closes: #851136)
+  * dh-make-perl(1): add new contributors to credits.
+  * Update years of copyright.
+  * Add debian/tests/pkg-perl/use-name to run autopkgtest's use.t test.
+
+0.92 (2016-09-20)
+
+  [ Christian Hofstaedtler ]
+  * Remove Christopher Sacca <csacca@thecsl.org> from Uploaders.
+    (Closes: #831593)
+
+  [ gregor herrmann ]
+  * Use Dpkg::Source::Package's get_default_diff_ignore_regex() function
+    instead of the deprecated $diff_ignore_default_regexp string.
+    Thanks to Guillem Jover for the bug report. (Closes: #834199)
+  * Drop latest-debian-changelog-entry-changed-to-native lintian overrides.
+  * Add t/dists/Strange-2.1/DEADJOE to test default exclude regexp.
+  * Remove Nathan Handler from Uploaders. Thanks for your work!
+  * Remove Ryan Niebur from Uploaders. Thanks for your work!
+  * DhMakePerl::Command::Packaging: strip leading articles from short
+    description.
+  * debian/control: add build dependency on libdpkg-parse-perl to avoid
+    warnings during tests.
+  * debian/control: remove Homepage field which still pointed to MetaCPAN.
+
+  [ Axel Beckert ]
+  * lib/Debian/AptContents.pm:
+    + Add path component with architecture triplet to regexp in
+      read_cache(). Fixes "dh-make-perl locate" not finding any XS or
+      C-written modules anymore. (RT#117963) Thanks Joenio Costa for the
+      bug report!
+    + Fix typo in code comment.
+  * Don't let dh_clean remove t/dists/Strange-2.1/DEADJOE.
+
+0.91 (2016-07-02)
+
+  [ gregor herrmann ]
+  * debian/source/format: switch to '3.0 (native)'.
+    Cf. the thread at https://lists.debian.org/debian-perl/2016/03/msg00038.html
+    for the history and pros/cons of having a non-native vs. a native package.
+  * Drop debian/{watch,upstream-signing-key.pgp,source/include-binaries}.
+    Not needed for a native package.
+  * Add a lintian override for latest-debian-changelog-entry-changed-to-
+    native.
+  * Debian::Control::FromCPAN: find_debs_for_modules(): exit version loop.
+    When searching for versioned dependency, the method issues the warning
+    "$module package in APT ($d) does not satisfy $dep" even when higher
+    versions are available. Exit the loop as soon as we have a high enough
+    version.
+  * Issue a warning in build_package if local::lib usage is detected.
+    local::lib sets the installation path (by default to $HOME/perl5) via
+    PERL_MB_OPT/PERL_MM_OPT which is not what we want in the built
+    package. Messing with the environment is a bit too brittle, so we
+    issue a fat warning and give recommendations for deactivating the
+    local::lib environment temporarily.
+    Thanks to Jacob L Anawalt for the bug report. (Closes: #820395)
+  * debian/copyright: change Copyright-Format 1.0 URL to HTTPS.
+  * DhMakePerl::Utils: when checking for core modules, look at current
+    perl.
+    Various helpers which check if a module is in Perl core or starting from
+    which version only looked at the first Perl version. This ignored cases
+    where a package was removed from core at some point.
+    Change those methods to return if a module is not currently in Perl core.
+    Thanks to Peter Valdemar Mørch for the bug report. (Closes: #788198)
+  * DhMakePerl::Command::Packaging: don't enforce 9.20120312~ for
+    debhelper in arch:any packages anymore. There is no older version in
+    the archive anymore.
+
+  [ Sean Whitton ]
+  * Strip comments when reading control files.  (Closes: #823708)
+    Otherwise, control files containing comments cause a parse failure.
+
+  [ Salvatore Bonaccorso ]
+  * Use HTTPS transport protocol for Format URI in copyright file.
+    Refresh or create new copyright files using HTTPS transport protocol for
+    the Format URI to the copyright format specification.
+    Adjust tests to use HTTPS transport protocol as well in the Format
+    fields.
+  * Use HTTPS transport protocol for various URLs in POD
+
+  [ Nick Morrott ]
+  * DhMakePerl::Command::Packaging:
+    - remove trailing whitespace from Artistic 2.0 license text
+    - remove trailing whitespace from copyright DISCLAIMER text
+
+  [ gregor herrmann ]
+  * Update copyright holder list for DhMakePerl::Command::Packaging.
+  * Split package into dh-make-perl and libdebian-source-perl.
+    The latter contains generally useful Perl modules.
+    Thanks to Sean Whitton for the bug report.
+    (Closes: #823067)
+
+0.90 (2016-04-06)
+
+  [ gregor herrmann ]
+  * Switch to debhelper 9 for dh-make-perl itself.
+  * Make sure we use at least debhelper 9 for created packages.
+    Update documentation.
+  * Update $VERSION.
+  * Update years of copyright.
+  * Change handling of Module::Build build dependency.
+    Module::Build is removed from perl core since 5.21.x, so we need
+    libmodule-build-perl in Build-Depends.
+  * Rename autopkgtest configuration file(s) as per new pkg-perl-
+    autopkgtest schema.
+  * Add libmodule-build-perl to Recommends.
+    Module::Build was removed from perl core in 5.22 but is needed for some
+    CPAN distributions with --build (a.k.a. cpan2deb). (Closes: #811415)
+
+  [ Salvatore Bonaccorso ]
+  * When creating debian/control file use https transport in URI for Vcs-Git
+  * Update copyright years for debian/* packaging files
+  * debian/control: Use HTTPS transport protocol for Vcs-Git URI
+  * Create packages using Standards-Version 3.9.7
+  * Use Standards-Version 3.9.7 in testsuite control files
+  * Declare compliance with Debian Policy 3.9.7
+
+  [ Andy Beverley ]
+  * Add deb install options for dependencies.
+    This provides 2 new options: --install-build-deps and --install-deps,
+    which install just those packages required for building, and install all
+    related packages, respectively.
+
+  [ gregor herrmann ]
+  * Bump oldstable perl version from 5.10.1 to 5.14.2.
+  * Update documentation for the --bdepends, --bdependsi, --depends
+    options. They add (build) dependencies to the automatically found
+    packages since 0.49. (Cf. #813766)
+  * Adjust to apt-file 3, which dropped its own cache of Contents files in
+    favour of APT's cache.
+    - use `apt-get indextargets' and `/usr/lib/apt/apt-helper cat-file' to
+      find/read the Contents files
+    - drop --apt-contents-dir and --sources-list command line options
+    - update tests accordingly, including a fake apt-get to point to the test
+      Contents files
+    - bump versioned Recommends on apt-file to 3 and add apt (>= 1.1.8)
+    Thanks to Niels Thykier for his help.
+    Closes: #815190
+
+  [ Sean Whitton ]
+  * Add Built-Using: to recognised binary package stanza fields
+    (Closes: #819701)
+
+  [ Salvatore Bonaccorso ]
+  * Create packages using Standards-Version 3.9.8
+  * Use Standards-Version 3.9.8 in testsuite control files
+  * Declare compliance with Debian policy 3.9.8
+
 0.89 (2015-09-26)
 
   * Apply a patch from Andy Beverley for checking the versions of the locally

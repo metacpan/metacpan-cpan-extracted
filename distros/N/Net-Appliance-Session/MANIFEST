@@ -1,4 +1,5 @@
 bin/nas
+Build.PL
 Changes
 examples/example-1.pl
 lib/Net/Appliance/Session.pm
@@ -6,7 +7,6 @@ lib/Net/Appliance/Session/Async.pm
 lib/Net/Appliance/Session/Engine.pm
 lib/Net/Appliance/Session/Scripting.pm
 lib/Net/Appliance/Session/Transport.pm
-Makefile.PL
 MANIFEST			This list of files
 META.yml
 t/10-use.t
@@ -19,4 +19,4 @@ t/author-31_local_device_ssh_extra.t
 t/author-32_sdf_shell.t
 t/author-41_ssh_unknown_host.t
 t/author-42_ssh_fail_close.t
-META.json                                Module JSON meta-data (added by MakeMaker)
+META.json

@@ -13,6 +13,7 @@ t/testlib/Error.pm
 t/testlib/Handlers.pm
 t/testlib/Master.pm
 t/testlib/Responder.pm
+t/testlib/Unregister.pm
 t/testlib/Util.pm
 t/twiggy.t
 xt/browser.t

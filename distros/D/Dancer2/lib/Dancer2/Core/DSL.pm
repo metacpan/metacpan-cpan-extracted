@@ -1,7 +1,7 @@
 # ABSTRACT: Dancer2's Domain Specific Language (DSL)
 
 package Dancer2::Core::DSL;
-$Dancer2::Core::DSL::VERSION = '0.205001';
+$Dancer2::Core::DSL::VERSION = '0.205002';
 use Moo;
 use Carp;
 use Module::Runtime 'require_module';
@@ -514,7 +514,7 @@ Dancer2::Core::DSL - Dancer2's Domain Specific Language (DSL)
 
 =head1 VERSION
 
-version 0.205001
+version 0.205002
 
 =head1 FUNCTIONS
 

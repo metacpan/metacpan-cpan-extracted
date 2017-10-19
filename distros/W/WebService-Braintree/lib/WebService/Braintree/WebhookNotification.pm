@@ -1,5 +1,10 @@
 package WebService::Braintree::WebhookNotification;
-$WebService::Braintree::WebhookNotification::VERSION = '0.93';
+$WebService::Braintree::WebhookNotification::VERSION = '0.94';
+use 5.010_001;
+use strictures 1;
+
+use WebService::Braintree::Util qw(is_hashref);
+
 =head1 NAME
 
 WebService::Braintree::WebhookNotification
@@ -130,47 +135,40 @@ be a string.
 
 has message => (is => 'rw');
 
-
 sub BUILD {
     my ($self, $attributes) = @_;
 
     my $wrapper_node = $attributes->{subject};
 
-    if (ref($wrapper_node->{api_error_response}) eq 'HASH') {
+    if (is_hashref($wrapper_node->{api_error_response})) {
         $wrapper_node = $wrapper_node->{api_error_response};
     }
 
-    if (ref($wrapper_node->{subscription}) eq 'HASH') {
-
+    if (is_hashref($wrapper_node->{subscription})) {
         $self->subscription(WebService::Braintree::Subscription->new($wrapper_node->{subscription}));
     }
 
-    if (ref($wrapper_node->{merchant_account}) eq 'HASH') {
-
+    if (is_hashref($wrapper_node->{merchant_account})) {
         $self->merchant_account(WebService::Braintree::MerchantAccount->new($wrapper_node->{merchant_account}));
     }
 
-    if (ref($wrapper_node->{disbursement}) eq 'HASH') {
-
+    if (is_hashref($wrapper_node->{disbursement})) {
         $self->disbursement(WebService::Braintree::Disbursement->new($wrapper_node->{disbursement}));
     }
 
-    if (ref($wrapper_node->{transaction}) eq 'HASH') {
-
+    if (is_hashref($wrapper_node->{transaction})) {
         $self->transaction(WebService::Braintree::Transaction->new($wrapper_node->{transaction}));
     }
 
-    if (ref($wrapper_node->{partner_merchant}) eq 'HASH') {
-
+    if (is_hashref($wrapper_node->{partner_merchant})) {
         $self->partner_merchant(WebService::Braintree::PartnerMerchant->new($wrapper_node->{partner_merchant}));
     }
 
-    if (ref($wrapper_node->{dispute}) eq 'HASH') {
-
+    if (is_hashref($wrapper_node->{dispute})) {
         $self->dispute(WebService::Braintree::Dispute->new($wrapper_node->{dispute}));
     }
 
-    if (ref($wrapper_node->{errors}) eq 'HASH') {
+    if (is_hashref($wrapper_node->{errors})) {
         $self->errors(WebService::Braintree::ValidationErrorCollection->new($wrapper_node->{errors}));
         $self->message($wrapper_node->{message});
     }

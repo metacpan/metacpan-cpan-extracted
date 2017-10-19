@@ -12,10 +12,6 @@
 #include "perl.h"
 #include "XSUB.h"
 
-#include <inttypes.h>
-#define MATH_INT64_NATIVE_IF_AVAILABLE
-#include "perl_math_int64.h"
-
 #include <sys/utsname.h>
 #include <sys/select.h>
 #include <sys/time.h>
@@ -50,7 +46,7 @@ typedef struct rpmSpec_s * Spec;
 
 struct s_Package {
   Header h;
-  uint64_t filesize;
+  UV filesize;
   unsigned flag;
   char *info;
   char *requires;
@@ -205,7 +201,7 @@ get_arch(const Header header) {
      return headerIsEntry(header, RPMTAG_SOURCERPM) ? get_name(header, RPMTAG_ARCH) : "src";
 }
 
-static uint64_t
+static UV
 get_int(const Header header, rpmTag tag) {
   struct rpmtd_s val;
 
@@ -213,7 +209,7 @@ get_int(const Header header, rpmTag tag) {
   return rpmtdGetNumber(&val);
 }
 
-static uint64_t
+static UV
 get_int2(const Header header, rpmTag newtag, rpmTag oldtag) {
   struct rpmtd_s val;
 
@@ -222,7 +218,7 @@ get_int2(const Header header, rpmTag newtag, rpmTag oldtag) {
   return rpmtdGetNumber(&val);
 }
 
-static uint64_t
+static UV
 get_filesize(const Header h) {
   return get_int2(h, RPMTAG_LONGSIGSIZE, RPMTAG_SIGSIZE) + 440; /* 440 is the rpm header size (?) empirical, but works */
 }
@@ -1214,6 +1210,7 @@ ts_nosignature(rpmts ts) {
   return rpmtsSetVSFlags(ts, _RPMVSF_NODIGESTS | _RPMVSF_NOSIGNATURES);
 }
 
+/* we don't use the header arg, but we do use $urpm passed in data by Trans_run() -> rpmtsSetNotifyCallback() */
 static void *rpmRunTransactions_callback(__attribute__((unused)) const void *h,
 					 const rpmCallbackType what, 
 					 const rpm_loff_t amount, 
@@ -1763,7 +1760,7 @@ Pkg_compare(pkg, evr)
   OUTPUT:
   RETVAL
 
-uint64_t
+UV
 Pkg_size(pkg)
   URPM::Package pkg
   CODE:
@@ -1787,11 +1784,11 @@ Pkg_size(pkg)
 void
 Pkg_set_filesize(pkg, filesize)
   URPM::Package pkg
-  uint64_t filesize;
+  UV filesize;
   PPCODE:
   pkg->filesize = filesize;
 
-uint64_t
+UV
 Pkg_filesize(pkg)
   URPM::Package pkg
   CODE:
@@ -2099,7 +2096,7 @@ Pkg_build_info(pkg, fileno, provides_files=NULL, recommends=0)
   CODE:
   if (pkg->info) {
     char buff[65536*2];
-    uint64_t size;
+    UV size;
 
     /* info line should be the last to be written */
     if (pkg->provides && *pkg->provides) {
@@ -2767,7 +2764,6 @@ MODULE = URPM            PACKAGE = URPM                PREFIX = Urpm_
 
 BOOT:
 (void) read_config_files(0);
-    PERL_MATH_INT64_LOAD_OR_CROAK;
 
 void
 Urpm_bind_rpm_textdomain_codeset()
@@ -3029,11 +3025,11 @@ Urpm_parse_rpm(urpm, filename, ...)
 	  else if (SvIV(ST(i+1))) {
              if (len == 5) {
                 if (!memcmp(s, "nopgp", 5))
-                  vsflags |= (RPMVSF_NOSHA1 | RPMVSF_NOSHA1HEADER);
+                  vsflags |= (RPMVSF_NOPAYLOAD | RPMVSF_NOSHA1HEADER);
                 else if (!memcmp(s, "nogpg", 5))
-                  vsflags |= (RPMVSF_NOSHA1 | RPMVSF_NOSHA1HEADER);
+                  vsflags |= (RPMVSF_NOPAYLOAD | RPMVSF_NOSHA1HEADER);
                 else if (!memcmp(s, "nomd5", 5))
-                  vsflags |= (RPMVSF_NOMD5 |  RPMVSF_NOMD5HEADER);
+                  vsflags |= (RPMVSF_NOMD5 | RPMVSF_NOSHA256HEADER);
                 else if (!memcmp(s, "norsa", 5))
                   vsflags |= (RPMVSF_NORSA | RPMVSF_NORSAHEADER);
                 else if (!memcmp(s, "nodsa", 5))
@@ -3121,7 +3117,7 @@ Urpm_get_gpg_fingerprint(filename)
 	pktlen = 0;
     else {
 	unsigned int i;
-        pgpPubkeyFingerprint (pkt, pktlen, fingerprint);
+        pgpPubkeyKeyID (pkt, pktlen, fingerprint);
    	for (i = 0; i < sizeof (pgpKeyID_t); i++)
 	    sprintf(&fingerprint_str[i*2], "%02x", fingerprint[i]);
     }
@@ -3140,7 +3136,7 @@ Urpm_verify_signature(filename, prefix=NULL)
   char result[1024];
   rpmRC rc;
   FD_t fd;
-  Header h;
+  Header h = headerNew();
   CODE:
   fd = Fopen(filename, "r");
   if (fd == NULL)

@@ -5,7 +5,7 @@ use strict;
 use utf8;
 use 5.010;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Moose;
 use MooseX::Aliases;

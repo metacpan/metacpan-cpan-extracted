@@ -1,3 +1,16 @@
+libdr-tnt-perl (0.20-1) nowtaxi; urgency=medium
+
+  * Pack \0 \1 as true/false (JSON::XS/JSON compatible);
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Mon, 16 Oct 2017 18:58:01 +0300
+
+libdr-tnt-perl (0.19-1) nowtaxi; urgency=medium
+
+  * The driver provide new schema format.
+    (https://github.com/tarantool/tarantool/issues/2802).
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Fri, 13 Oct 2017 12:45:23 +0300
+
 libdr-tnt-perl (0.18-1) nowtaxi; urgency=medium
 
   * Msgpack recursively all objects than can TO_JSON.

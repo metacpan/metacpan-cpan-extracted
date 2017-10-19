@@ -1,5 +1,12 @@
 Revision history for Group-Git
 
+0.6.5   2017-10-16
+        Updating for release of version 0.6.5
+        Updating Test::Warnings for Windows frendly version (Ivan Wills)
+        Documenting tagging (Ivan Wills)
+        Fixed only returing the last found grep result (Ivan Wills)
+        Adding project type to tags (Ivan Wills)
+
 0.6.4   2017-08-13
         Updating for release of version 0.6.4
         Added new default test for new module (Ivan Wills)

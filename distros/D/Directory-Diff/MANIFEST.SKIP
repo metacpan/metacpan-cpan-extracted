@@ -1,4 +1,4 @@
-build\.pl
+(build|make-pod)\.pl
 blib/.*
 .gitignore
 .git/.*
@@ -11,3 +11,5 @@ MYMETA..*
 ^timesheet.txt$
 # Template for building pod file.
 ^lib/Directory/Diff.pod.tmpl$
+^examples/.*-out\.txt$
+^xt/.*\.t$

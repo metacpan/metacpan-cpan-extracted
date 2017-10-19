@@ -1,7 +1,5 @@
 package Net::Appliance::Session::Transport;
-{
-  $Net::Appliance::Session::Transport::VERSION = '4.142720';
-}
+{ $Net::Appliance::Session::Transport::VERSION = '4.300000' }
 
 {
     package # hide from pause

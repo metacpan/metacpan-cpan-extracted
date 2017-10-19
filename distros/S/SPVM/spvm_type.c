@@ -27,6 +27,7 @@ const char* const SPVM_TYPE_C_CODE_NAMES[] = {
   "long[]",
   "float[]",
   "double[]",
+  "String",
 };
 
 SPVM_TYPE* SPVM_TYPE_new(SPVM_COMPILER* compiler) {
@@ -117,6 +118,16 @@ SPVM_TYPE* SPVM_TYPE_get_byte_array_type(SPVM_COMPILER* compiler) {
   return type;
 }
 
+SPVM_TYPE* SPVM_TYPE_get_string_type(SPVM_COMPILER* compiler) {
+  (void)compiler;
+  
+  SPVM_TYPE* type = SPVM_DYNAMIC_ARRAY_fetch(compiler->types, SPVM_TYPE_C_CODE_STRING);
+  
+  assert(type);
+  
+  return type;
+}
+
 char* SPVM_TYPE_get_base_name(SPVM_COMPILER* compiler, const char* type_name) {
   int32_t type_name_length = (int32_t)strlen(type_name);
   char* type_base_name = SPVM_COMPILER_ALLOCATOR_alloc_string(compiler, compiler->allocator, type_name_length);
@@ -189,10 +200,10 @@ _Bool SPVM_TYPE_is_array(SPVM_COMPILER* compiler, SPVM_TYPE* type) {
   return type->dimension > 0;
 }
 
-_Bool SPVM_TYPE_is_byte_array(SPVM_COMPILER* compiler, SPVM_TYPE* type) {
+_Bool SPVM_TYPE_is_string(SPVM_COMPILER* compiler, SPVM_TYPE* type) {
   (void)compiler;
   
-  return type->code == SPVM_TYPE_C_CODE_BYTE_ARRAY;
+  return type->code == SPVM_TYPE_C_CODE_STRING;
 }
 
 _Bool SPVM_TYPE_is_package(SPVM_COMPILER* compiler, SPVM_TYPE* type) {

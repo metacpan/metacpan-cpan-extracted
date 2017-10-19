@@ -3,10 +3,10 @@ use strict;
 use Test::More tests => 4;
 BEGIN { use_ok('Image::PNG::FileConvert') };
 use Image::PNG::FileConvert qw/file2png png2file/;
-use FindBin;
+use FindBin '$Bin';
 use File::Compare;
 
-my $infile = "$FindBin::Bin/Image-PNG-FileConvert.t";
+my $infile = "$Bin/Image-PNG-FileConvert.t";
 round_trip ($infile);
 exit;
 #done_testing ();
@@ -23,8 +23,8 @@ input file with the output file.
 sub round_trip
 {
     my ($file) = @_;
-    my $test_png = "$FindBin::Bin/test.png";
-    my $back = "$FindBin::Bin/back";
+    my $test_png = "$Bin/test.png";
+    my $back = "$Bin/back";
     for my $tempfile ($test_png, $back) {
         if (-f $tempfile) {
             unlink $tempfile;

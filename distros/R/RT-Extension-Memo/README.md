@@ -1,0 +1,95 @@
+# NAME
+
+RT::Extension::Memo - Add a memo widget to tickets
+
+# DESCRIPTION
+
+This module adds a new widget to any [ticket](https://metacpan.org/pod/RT::Ticket) which allows to add, edit and display information directly on the ticket display page.
+
+In many cases, resolving a ticket involves to collect and store some information which helps the owner of the ticket to find some solution. Such information includes tips and tricks, _todo_ list, etc. The common way to handle such information in RT is to paste it into comments.
+
+To do so has several drawbacks. First, it mixed information which is relevant only to the owner of the ticket with communication between internal actors, that occurs through comments, for instance between the owner of the ticket and some of her colleagues. Second, the owner of the ticket has to search in the history for all comments to keep up with what has been done and what is left to be done, various issues that have arisen, etc. Third, when the owner of the ticket wants to add a new comment, she has to leave the display page of the ticket for the update form, loosing any access to the history of the comments, as well as various information about the ticket, such as its custom fields, dates or people. One solution to have the history at hand when adding a new comment, is to reply to the previous comment each time something has to be added. But the information is then copied in each reply with unneeded and cumbersome redundancy. Fourth, replying to the previous comment implies that this previous comment is folded when displaying the new one, with the consequence that it must be unfolded to read it and that its content cannot be searched until it is unfolded.
+
+The `RT-Extension-Memo` plugin provides a new widget to manage such information. It is displayed on the top of the history in the display page of the ticket, therefore gathering all information at the same place. It can be edited directly on this same display page, with all information about the ticket at hand.
+
+Internally, such a _Memo_ is stored in a single attribute, avoiding too much extra storage space (as it would have been the case if it was stored as a custom field value where all revisions are kept up in the database). The counterpart of this technical implementation is that caution has to be made when editing the _Memo_: any previous revision is overwritten, so if information is deleted when editing the _Memo_, it is actually forever lost.
+
+# CONFIGURATION
+
+These options are set in `etc/Memo_Config.pm` and can be overridden by users in their preferences.
+
+- `$MemoRichText`
+
+    Should "rich text" editing be enabled for memo widget?
+
+- `$MemoWidth`, `$MemoHeight`
+
+    Set the memo widget width and height in number of columns and lines. When the width is set to `undef` no column count is specified and the memo widget will take up 100% of the available width.
+
+# RIGHTS
+
+The following new rights can be applied at the global level or at the queue level:
+
+- `SeeMemo`
+
+    Users and groups with this right are able to see the _Memo_ on the display page of a ticket.
+
+- `ModifyMemo`
+
+    Users and groups with this right are able to add a new _Memo_ and to edit existing _Memo_ attached to a ticket.
+
+# RT VERSION
+
+Works with RT 4.2 or greater
+
+# INSTALLATION
+
+- `perl Makefile.PL`
+- `make`
+- `make install`
+
+    May need root permissions
+
+- Edit your `/opt/rt4/etc/RT_SiteConfig.pm`
+
+    If you are using RT 4.2 or greater, add this line:
+
+        Plugin('RT::Extension::Memo');
+
+    For RT 4.0, add this line:
+
+        Set(@Plugins, qw(RT::Extension::Memo));
+
+    or add `RT::Extension::Memo` to your existing `@Plugins` line.
+
+- Clear your mason cache
+
+        rm -rf /opt/rt4/var/mason_data/obj
+
+- Restart your webserver
+
+# AUTHOR
+
+Gérald Sédrati-Dinet <gibus@easter-eggs.com>
+
+# REPOSITORY
+
+[https://github.com/gibus/RT-Extension-Memo](https://github.com/gibus/RT-Extension-Memo)
+
+# BUGS
+
+All bugs should be reported via email to
+
+[bug-RT-Extension-Memo@rt.cpan.org](mailto:bug-RT-Extension-Memo@rt.cpan.org)
+
+or via the web at
+
+[rt.cpan.org](http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-Memo).
+
+# LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2017 by Gérald Sédrati-Dinet, Easter-Eggs
+
+This is free software, licensed under:
+
+The GNU General Public License, Version 3, June 2007

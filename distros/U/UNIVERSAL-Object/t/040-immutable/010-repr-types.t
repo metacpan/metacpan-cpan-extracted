@@ -87,3 +87,32 @@ BEGIN {
     like($@, qr/^Modification of a read-only value attempted/, '... got the expected error');
 }
 
+{
+    {
+        package My::CodeInstance::Test;
+
+        use strict;
+        use warnings;
+
+        our @ISA; BEGIN { @ISA = ('UNIVERSAL::Object::Immutable') }
+
+        sub REPR   { sub { 10 } }
+        sub CREATE { $_[0]->REPR }
+    }
+
+    my $instance;
+
+    $@ = undef;
+    eval { $instance = My::CodeInstance::Test->new };
+    ok(!$@, '... got lack of error');
+
+    isa_ok($instance, 'My::CodeInstance::Test');
+
+    # NOTE: no way to alter a CODE ref, so no need to test this
+    # but we can see that it behaves as we expect ...
+
+    $@ = undef;
+    my $result = eval { $instance->() };
+    ok(!$@, '... got the expected (lack of) error');
+    is($result, 10, '... got the expected value');
+}

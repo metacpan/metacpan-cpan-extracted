@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::AnyId;
-$Config::Model::AnyId::VERSION = '2.112';
+$Config::Model::AnyId::VERSION = '2.113';
 use 5.010;
 
 use Mouse;
@@ -958,7 +958,8 @@ sub delete {
 
     delete $self->{warning_hash}{$idx};
     my $ret = $self->_delete($idx);
-    $self->notify_change( note => "deleted entry $idx" );
+    # notification is not needed if the value was already delete or missing
+    $self->notify_change( note => "deleted entry $idx" ) if defined $ret;
     return $ret;
 }
 
@@ -1031,7 +1032,7 @@ Config::Model::AnyId - Base class for hash or list element
 
 =head1 VERSION
 
-version 2.112
+version 2.113
 
 =head1 SYNOPSIS
 

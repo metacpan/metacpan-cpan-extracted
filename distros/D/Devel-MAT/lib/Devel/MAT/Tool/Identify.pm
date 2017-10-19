@@ -10,9 +10,9 @@ use warnings;
 use base qw( Devel::MAT::Tool );
 use utf8;
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
-use List::Util qw( pairs );
+use List::Util qw( any pairs );
 use List::UtilsBy qw( nsort_by );
 
 use constant CMD => "identify";
@@ -39,6 +39,13 @@ my %STRENGTH_ORDER = (
    inferred => 4,
 );
 
+sub _strength_label
+{
+   my ( $strength ) = @_;
+   $strength eq "strong" ? "" :
+      Devel::MAT::Cmd->format_note( "[$strength]", 1 ) . " ",
+}
+
 my $next_id;
 my %id_for;
 my %seen;
@@ -61,6 +68,9 @@ sub walk_graph
       return;
    }
 
+   # Don't bother showing any non-root edges if we have a strong root
+   @edges = () if any { $_->strength eq "strong" } @roots;
+
    if( @edges > 0 and $seen{$node->addr}++ ) {
       Devel::MAT::Cmd->printf( "$indent└─already found " );
 
@@ -80,8 +90,9 @@ sub walk_graph
    foreach my $idx ( 0 .. $#roots ) {
       my $isfinal = $idx == $#roots && !@edges;
 
-      Devel::MAT::Cmd->printf( $indent . ( $isfinal ? "└─%s\n" : "├─%s\n" ),
-         $roots[$idx]
+      Devel::MAT::Cmd->printf( $indent . ( $isfinal ? "└─%s%s\n" : "├─%s%s\n" ),
+         _strength_label( $roots[$idx]->strength ),
+         $roots[$idx]->name,
       );
    }
 
@@ -93,16 +104,13 @@ sub walk_graph
       Devel::MAT::Cmd->printf(
          $indent . ( $is_final ? "└─" : "├─" ) );
 
-      Devel::MAT::Cmd->printf( "%s",
-         Devel::MAT::Cmd->format_note( "[" . $ref->strength . "]", 1 ),
-      ) if $ref->strength ne "strong";
-
       my $ref_id;
       if( $refnode->edges_out > 1 and not $refnode->roots and not $id_for{$refnode->addr} ) {
          $ref_id = $id_for{$refnode->addr} = $next_id++;
       }
 
-      Devel::MAT::Cmd->printf( "%s of %s, which is",
+      Devel::MAT::Cmd->printf( "%s%s of %s, which is",
+         _strength_label( $ref->strength ),
          $ref->name,
          Devel::MAT::Cmd->format_sv( $refnode->sv ),
       );

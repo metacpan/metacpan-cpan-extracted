@@ -37,16 +37,18 @@
 define ([
     'jquery',
     'ajax',
-    'lib',
     'current-user',
+    'datetime',
+    'lib',
     'target',
     'stack',
     'start'
 ], function (
     $,
     ajax,
-    lib,
     currentUser,
+    datetime,
+    lib,
     target,
     stack,
     start
@@ -69,7 +71,7 @@ define ([
                                         "nick": nick,
                                         "shid": row.shid,
                                         "sid": row.sid,
-                                        "effective": lib.readableDate(row.effective),
+                                        "effective": datetime.readableDate(row.effective),
                                         "scode": row.scode
                                     };
                                 }

@@ -1,3 +1,6 @@
+0.003     2017-10-11 22:33:00-08:00 America/Los_Angeles
+          - fix error handling at the user agent level (thanks Colin Magee)
+          - fix spelling errors
 
 0.001     2016-08-12 19:17:00-08:00 America/Los_Angeles
           - Initial version, implementing the mailboxlayer.com email measuring API.

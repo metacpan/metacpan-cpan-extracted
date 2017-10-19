@@ -15,21 +15,21 @@ use XML::Chain qw(xc);
 subtest 'auto indent (synopsis of XML::Chain::Selector)' => sub {
     # simple indent
     my $simple = xc('div')->auto_indent(1)->c('div')->t('in')->root;
-    eq_or_diff_text($simple->as_string, "<div>\n\t<div>in</div>\n</div>", 'auto indented simple (from =head2 auto_indent)');
-    $simple->find('/div')->auto_indent(0);
-    eq_or_diff_text($simple->as_string, "<div><div>in</div></div>", 'indentation is global, not per selector');
+    eq_or_diff_text($simple->as_string, "<div>\n\t<div>in</div>\n</div>", 'auto indented simple');
 
     # namespaces && auto indentation
-    my $user = xc('user', xmlns => 'testns')
-                ->auto_indent({chars=>' 'x4})
-                ->a(xc('name')->t('Johnny Thinker'))
-                ->a(xc('username')->t('jt'))
-                ->c('bio')
-                    ->a(xc('div', xmlns => 'http://www.w3.org/1999/xhtml')
-                        ->a(xc('h1')->t('about'))
-                        ->a(xc('p')->t('...')))
-                    ->a(xc('greeting')->t('Hey'))
-                    ->up;
+    my $user = xc('user', xmlns => 'http://testns')->auto_indent({chars=>' 'x4})
+        ->a('name', '-' => 'Johnny Thinker')
+        ->a('username', '-' => 'jt')
+        ->c('bio')
+            ->c('div', xmlns => 'http://www.w3.org/1999/xhtml')
+                ->a('h1', '-' => 'about')
+                ->a('p', '-' => '...')
+                ->up
+            ->a('greeting', '-' => 'Hey')
+            ->up
+        ->a('active', '-' => '1')
+        ->root;
     eq_or_diff_text($user->as_string, user_as_string(), '=head1 SYNOPSIS; auto indented user');
 };
 
@@ -38,7 +38,7 @@ done_testing;
 
 sub user_as_string {
     my $usr = <<'__USER_AS_STRING__'
-<user xmlns="testns">
+<user xmlns="http://testns">
     <name>Johnny Thinker</name>
     <username>jt</username>
     <bio>
@@ -48,6 +48,7 @@ sub user_as_string {
         </div>
         <greeting>Hey</greeting>
     </bio>
+    <active>1</active>
 </user>
 __USER_AS_STRING__
     ;

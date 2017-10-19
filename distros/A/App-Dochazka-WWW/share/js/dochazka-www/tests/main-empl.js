@@ -69,16 +69,16 @@ define ([
             setTimeout(function () {
                 ct.login(assert, "demo", "passerby");
                 done();
-            }, 500);
+            }, 1000);
             setTimeout(function () {
                 ct.mainMenuToMainEmpl(assert);
                 loggout();
                 done();
-            }, 1000);
+            }, 1500);
             setTimeout(function () {
                 ct.loggout(assert);
                 done();
-            }, 1500);
+            }, 2000);
         });
 
         test_desc = 'employee profile - ACL failure';
@@ -97,7 +97,7 @@ define ([
                 $('input[name="sel"]').trigger($.Event("keydown", {keyCode: 13}));
                 ct.ajaxCallInitiated(assert);
                 done();
-            }, 500);
+            }, 1000);
             setTimeout(function() {
                 var result = $("#result"),
                     htmlbuf = result.html();
@@ -105,11 +105,11 @@ define ([
                 ct.contains(assert, htmlbuf, "#result", 'ACL check failed for resource');
                 loggout();
                 done();
-            }, 1000);
+            }, 1500);
             setTimeout(function () {
                 ct.loggout(assert);
                 done();
-            }, 1500);
+            }, 2000);
         });
 
         test_desc = 'LDAP lookup - success';
@@ -209,11 +209,11 @@ define ([
                 assert.ok(true, "*** REACHED mainEmpl dmenu via X from ldapLookup");
                 loggout();
                 done();
-            }, 4000);
+            }, 4500);
             setTimeout(function () {
                 ct.loggout(assert);
                 done();
-            }, 5000);
+            }, 5500);
         });
 
         test_desc = 'LDAP lookup - failure';
@@ -381,11 +381,11 @@ define ([
                 assert.ok(true, "*** REACHED mainEmpl dmenu via X from ldapLookup");
                 loggout();
                 done();
-            }, 4000);
+            }, 5000);
             setTimeout(function () {
                 ct.loggout(assert);
                 done();
-            }, 5000);
+            }, 5500);
         });
 
     };

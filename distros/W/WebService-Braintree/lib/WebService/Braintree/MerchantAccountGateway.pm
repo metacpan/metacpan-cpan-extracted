@@ -1,11 +1,14 @@
 package WebService::Braintree::MerchantAccountGateway;
-$WebService::Braintree::MerchantAccountGateway::VERSION = '0.93';
+$WebService::Braintree::MerchantAccountGateway::VERSION = '0.94';
+use 5.010_001;
+use strictures 1;
+
 use Moose;
 with 'WebService::Braintree::Role::MakeRequest';
 
 use Carp qw(confess);
 use WebService::Braintree::Validations qw(verify_params);
-use WebService::Braintree::Util qw(validate_id);
+use WebService::Braintree::Util qw(validate_id is_hashref to_instance_array);
 use WebService::Braintree::Result;
 
 has 'gateway' => (is => 'ro');
@@ -28,9 +31,32 @@ sub find {
     my $result = $self->_make_request("/merchant_accounts/$id", "get", undef)->merchant_account;
 }
 
+sub all {
+    my $self = shift;
+    my $response = $self->gateway->http->get("/merchant_accounts");
+    return to_instance_array($response->{merchant_accounts}{merchant_account}, 'WebService::Braintree::MerchantAccount');
+    #return WebService::Braintree::ResourceCollection->new->init($response, sub {
+    #    $self->fetch_merchant_accounts(
+    #        WebService::Braintree::MerchantAccountSearch->new, shift,
+    #    );
+    #});
+}
+
+sub fetch_merchant_accounts {
+    my ($self, $search, $ids) = @_;
+
+    return [] if scalar @{$ids} == 0;
+
+    $search->ids->in($ids);
+    my $response = $self->gateway->http->post("/merchant_accounts/advanced_search/", {search => $search->to_hash});
+
+    my $attrs = $response->{'merchant_accounts'}->{'merchant_account'};
+    return to_instance_array($attrs, "WebService::Braintree::MerchantAccount");
+}
+
 sub _detect_signature {
     my ($params) = @_;
-    if (ref($params->{applicant_details}) eq 'HASH') {
+    if (is_hashref($params->{applicant_details})) {
         warnings::warnif("deprecated", "[DEPRECATED] Passing applicant_details to create is deprecated. Please use individual, business, and funding.");
         return _deprecated_create_signature();
     } else {
@@ -146,5 +172,6 @@ sub _update_signature{
 }
 
 __PACKAGE__->meta->make_immutable;
-1;
 
+1;
+__END__

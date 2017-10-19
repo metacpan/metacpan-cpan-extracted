@@ -9,7 +9,7 @@ Information about the CGI environment
 
 # VERSION
 
-Version 0.63
+Version 0.64
 
 # SYNOPSIS
 
@@ -35,8 +35,10 @@ Creates a CGI::Info object.
 It takes four optional arguments allow, logger, expect and upload\_dir,
 which are documented in the params() method.
 
-Takes an optional boolean parameter syslog, to log messages to
+Takes an optional parameter syslog, to log messages to
 [Sys::Syslog](https://metacpan.org/pod/Sys::Syslog).
+It can be a boolean to enable/disable logging to syslog, or a reference
+to a hash to be given to Sys::Syslog::setlogsock.
 
 Takes optional parameter logger, an object which is used for warnings
 
@@ -369,6 +371,11 @@ API is the same as "param", it will replace the "get\_cookie" method in the futu
 ## status
 
 Returns the status of the object, 200 for OK, otherwise an HTTP error code
+
+## set\_logger
+
+Sometimes you don't know what the logger is until you've instantiated the class.
+This function fixes the catch22 situation.
 
 ## reset
 

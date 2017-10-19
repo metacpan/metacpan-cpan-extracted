@@ -1,0 +1,12 @@
+#!/bin/sh
+
+# adapted from https://anonscm.debian.org/git/collab-maint/apt-file.git/plain/tests-apt-file/bin/apt-get
+
+if [ "$1" != "indextargets" ]; then
+	echo "$0: Fake apt-get does not support $1" >&1
+	exit 1
+fi
+
+ARCH=$(dpkg --print-architecture)
+echo "Contents-deb $ARCH unstable t/contents/test_debian_dists_sid_main_Contents"
+echo "Contents-deb $ARCH testing t/contents/test_debian_dists_testing_main_Contents"

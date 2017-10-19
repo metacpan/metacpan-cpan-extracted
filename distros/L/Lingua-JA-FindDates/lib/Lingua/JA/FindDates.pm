@@ -1,18 +1,19 @@
 package Lingua::JA::FindDates;
 use warnings;
 use strict;
-
+use Carp qw/carp croak cluck/;
+use utf8;
 use 5.010000;
+
 require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT_OK= qw/subsjdate kanji2number seireki_to_nengo nengo_to_seireki
-		   regjnums/;
+		   regjnums @jdatere/;
 our %EXPORT_TAGS = (
     all => \@EXPORT_OK,
 );
-our $VERSION = '0.024';
-use Carp qw/carp croak cluck/;
-use utf8;
+
+our $VERSION = '0.026';
 
 # Kanji number conversion table.
 
@@ -45,7 +46,6 @@ sub kanji2number
     my @kanjis = split '', $knum;
     my $value = 0;
     my $keta = 1;
-    my @values;
     while (1) {
 	my $k = pop @kanjis;
 	return $value if ! defined $k;
@@ -89,16 +89,6 @@ sub kanji2number
 # |  _ <  __/ (_| |  __/>  <  __/\__ \
 # |_| \_\___|\__, |\___/_/\_\___||___/
 #            |___/                    
-
-# Map "double-byte" or "double-width" numbers to single byte numbers
-# (the usual ASCII numbers).
-
-my $nums = '０１２３４５６７８９';
-my @wnums = split '', $nums;
-my %wtonarrow;
-for (0..9) {
-    $wtonarrow{$wnums[$_]} = $_;
-}
 
 my $jdigit = qr/[０-９0-9]/;
 
@@ -210,8 +200,6 @@ my $match_weekday =
        (?:(?:(?:曜日|曜)[)\）])|[)\）]|(?=\W))
       /x;
 
-# my $match_weekday = '[（(]?(['.$weekdays.'])(?:曜日|曜)?[)）]?';
-
 # Match a day of the month, like 10日
 
 my $match_dom = qr/$jnumber\h*日/;
@@ -263,65 +251,6 @@ my $match_month_day_weekday = qr/$match_month_day\h*$match_weekday/;
 
 my $separators = qr/\h*[〜−~]\h*/;
  
-# =head2 Matching patterns
-
-# I<The module can be used without reading this section>.
-
-# The Japanese date regular expressions are stored in an array
-# B<jdatere> containing a pair of a regular expression to match a kind
-# of date, and a string like "ymdw" which contains letters saying what
-# to do with $1, $2, etc. from the regular expression. The array
-# B<jdatere> is ordered from longest match (like "year / month / day /
-# weekday") to shortest (like "year" only). For example, if the first
-# letter is "y", then $1 is a year in Western format like 2008, or if
-# the third letter is "w", then $3 is the day of the week, from 1 to 7.
-
-# =over
-
-# =item e
-
-# Japanese era (string).
-
-# =item j
-
-# Japanese year (string representing small number)
-
-# =item x
-
-# empty month and day
-
-# =item m
-
-# month number (from 1 to 12, 13 for a blank month, 0 for an invalid month)
-
-# =item d
-
-# day of month (from 1 to 31, 32 for a blank day, 0 for an invalid day)
-
-# =item w
-
-# weekday (from Monday = 1 to Sunday = 7, zero or undefined for an
-# invalid weekday)
-
-# =item z
-
-# jun (旬), a ten day period.
-
-# =item 1
-
-# After another code, indicates the first of a pair of two things. For
-# example, the matching code for
-
-#   平成９年１０月１７日〜２０日
-
-# is
-
-#   ejmd1d2
-
-# =back
-
-# =cut
-
 #  _     _     _            __                                     
 # | |   (_)___| |_    ___  / _|  _ __ ___  __ _  _____  _____  ___ 
 # | |   | / __| __|  / _ \| |_  | '__/ _ \/ _` |/ _ \ \/ / _ \/ __|
@@ -331,7 +260,7 @@ my $separators = qr/\h*[〜−~]\h*/;
 
 # This a list of date regular expressions.
 
-my @jdatere = (
+our @jdatere = (
 
     # Match an empty string like 平成 月 日 as found on a form etc.
 
@@ -697,11 +626,15 @@ sub default_make_date
 	$date = "DD" if $date == 32;
 	if ($year) {
 	    $edate .= "$date, $year";
-	} else {
+	}
+	else {
 	    $edate .= "$date";
 	}
-    } elsif ($year) {
-	$edate .= " " if length ($edate);
+    }
+    elsif ($year) {
+	if (length ($edate) > 0) {
+	    $edate .= " ";
+	}
 	$edate .= $year;
     }
     return $edate;
@@ -790,16 +723,6 @@ sub default_make_date_interval
     return $einterval;
 }
 
-# If you want to see what the module is doing, set
-#
-#   $Lingua::JA::FindDates::verbose = 1;
-#
-# This makes L<subsjdate> print out each regular expression and reports
-# whether it matched, which looks like this:
-#
-#   Looking for y in ([０-９0-9]{4}|[十六七九五四千百二一八三]?千[十六七九五四千百二一八三]*)\h*年
-#   Found '千九百六十六年': Arg 0: 1966 -> '1966'
-
 our $verbose = 0;
 
 sub subsjdate
@@ -837,26 +760,21 @@ sub subsjdate
 
 		last if !$arg;
 		$arg =~ tr/０-９/0-9/;
-#		$arg =~ s/([０-９])/$wtonarrow{$1}/g;
 		$arg =~ s/([$kanjidigits]+|元)/kanji2number($1)/ge;
                 if ($verbose) {
                     print "Arg $_: $arg ";
                 }
 		my $argdo = $process[$_];
 		if ($argdo eq 'e1') { # Era name in Japanese
-		    print "e1\n";
 		    $date1->{year} = $jera2w{$arg};
 		}
                 elsif ($argdo eq 'j1') { # Japanese year
-		    print "j1 $arg\n";
 		    $date1->{year} += $arg;
 		}
                 elsif ($argdo eq 'y1') {
-		    print "y1 $arg\n";
 		    $date1->{year} = $arg;
 		}
 		elsif ($argdo eq 'e2') { # Era name in Japanese
-		    print "e2 $arg\n";
 		    $date2->{year} = $jera2w{$arg};
 		}
                 elsif ($argdo eq 'j2') { # Japanese year
@@ -1091,4 +1009,3 @@ sub regjnums
 
 1;
 
-__END__

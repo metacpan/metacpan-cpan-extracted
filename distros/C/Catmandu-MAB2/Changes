@@ -1,5 +1,10 @@
 Changelog for Catmandu-MAB2
 
+0.21  2017-10-16 17:44:43 CEST
+ - warn and skip faulty fields
+ - fix regex for record fields
+ - add Catmandu::Error exceptions and more tests
+
 0.20  2017-07-15 13:47:56 CEST
  - gh#9: MYMETA must not be included
 

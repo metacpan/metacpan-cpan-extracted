@@ -27,12 +27,10 @@ sub dist_ok($) {
     system( $ENV{ADTTMP} ? 'dh-make-perl' : "$Bin/../dh-make-perl",
             "--no-verbose",
             "--home-dir", "$Bin/contents",
-            "--apt-contents-dir", "$Bin/contents",
             "--data-dir", "$Bin/../share",
             $ENV{NO_NETWORK} ? '--no-network' : (),
             "--vcs", "none",
-            "--sources-list",
-            "$Bin/contents/sources.list", "--email", "joemaint\@test.local",
+            "--email", "joemaint\@test.local",
             $dist );
 
     is( $?, 0, "$dist_dir: system returned 0" );
@@ -47,5 +45,6 @@ sub dist_ok($) {
 
 $ENV{PERL5LIB} = "lib";
 $ENV{DEBFULLNAME} = "Joe Maintainer";
+$ENV{PATH} = "$Bin/bin:$ENV{PATH}";
 
 dist_ok('Strange-0.1');

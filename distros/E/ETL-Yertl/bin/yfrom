@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 package yfrom;
-our $VERSION = '0.033';
+our $VERSION = '0.035';
 # ABSTRACT: Build YAML from another format (like JSON or CSV)
 
 use ETL::Yertl;
@@ -45,7 +45,7 @@ yfrom - Build YAML from another format (like JSON or CSV)
 
 =head1 VERSION
 
-version 0.033
+version 0.035
 
 =head1 SYNOPSIS
 

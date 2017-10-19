@@ -59,6 +59,7 @@ sub readline($;$$)
 =head1 SEE ALSO
 
 L<Term::ReadLine::Perl5>
+
 =cut
 
 1;

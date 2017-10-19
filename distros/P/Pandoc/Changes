@@ -1,5 +1,8 @@
 Revision history for Pandoc Perl module
 
+0.6.1  2017-10-17 20:43:51 CEST
+    - make sure to override existing options and output destination (#16)
+
 0.6.0  2017-01-27 10:51:10 CET
     - support more expressive version requirements
 
@@ -26,7 +29,7 @@ Revision history for Pandoc Perl module
 
 0.3.1  2016-10-26 20:37:24 CEST
     - add parse method
-    - fix version number comparision
+    - fix version number comparison
     - extend documentation
 
 0.3.0  2016-10-21 20:10:30 CEST

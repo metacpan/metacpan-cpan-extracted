@@ -1,0 +1,11 @@
+0. Merchant Accounts:
+    * sandbox_sub_merchant_account -> sub_merchant_account => 1
+    * sandbox_master_merchant_account -> sub_merchant_account => 0
+    * sandbox_credit_card
+    * sandbox_credit_card_non_default
+    * three_d_secure_merchant_account
+0. Transactions:
+    * deposittransaction
+    * disputedtransaction
+0. Payment method nonce:
+    * apple_pay_visa doesn't contain a valid payment instrument type

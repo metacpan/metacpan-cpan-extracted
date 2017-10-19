@@ -17,13 +17,21 @@ our @EXPORT_OK = qw(
 
 Struct::Path - Path for nested structures where path is also a structure
 
+=begin html
+
+<a href="https://travis-ci.org/mr-mixas/Struct-Path.pm"><img src="https://travis-ci.org/mr-mixas/Struct-Path.pm.svg?branch=master" alt="Travis CI"></a>
+<a href='https://coveralls.io/github/mr-mixas/Struct-Path.pm?branch=master'><img src='https://coveralls.io/repos/github/mr-mixas/Struct-Path.pm/badge.svg?branch=master' alt='Coverage Status'/></a>
+<a href="https://badge.fury.io/pl/Struct-Path"><img src="https://badge.fury.io/pl/Struct-Path.svg" alt="CPAN version"></a>
+
+=end html
+
 =head1 VERSION
 
-Version 0.71
+Version 0.72
 
 =cut
 
-our $VERSION = '0.71';
+our $VERSION = '0.72';
 
 =head1 SYNOPSIS
 
@@ -225,6 +233,8 @@ sub spath($$;@) {
 
     croak "Reference expected for structure" unless (ref $struct);
     croak "Path must be arrayref" unless (ref $spath eq 'ARRAY');
+    croak "Unable to remove passed thing entirely (empty path passed)"
+        if ($opts{delete} and not @{$spath});
 
     my @level = ([], [(ref $struct eq 'SCALAR' or ref $struct eq 'REF') ? $struct : \$struct]);
     my $sc = 0; # step counter
@@ -244,7 +254,10 @@ sub spath($$;@) {
 
                 $items = @{$step} ? $step : [0 .. $#${$refs->[-1]}];
                 for (@{$items}) {
-                    unless ($opts{expand} or @{${$refs->[-1]}} > $_) {
+                    unless (
+                        $opts{expand} or
+                        @{${$refs->[-1]}} > ($_ >= 0 ? $_ : abs($_ + 1))
+                    ) {
                         croak "[$_] doesn't exists (step #$sc)" if ($opts{strict});
                         next;
                     }

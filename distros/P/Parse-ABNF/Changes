@@ -1,5 +1,12 @@
 Revision history for Perl extension Parse::ABNF.
 
+
+0.20 October 2017
+  - Changes to Grammar::Formal conversion
+
+0.12 December 2014
+  - ...
+
 0.11 February 2014
   - Removed use of experimental for/when construct.
 

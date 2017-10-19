@@ -1,9 +1,9 @@
 package Net::DNS::RR::CERT;
 
 #
-# $Id: CERT.pm 1582 2017-07-07 21:45:14Z willem $
+# $Id: CERT.pm 1597 2017-09-22 08:04:02Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1582 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
 
 
 use strict;
@@ -68,7 +68,7 @@ my %certtype = (
 
 	my %algbyval = reverse @algbyname;
 
-	my @algrehash = map /^\d/ ? ($_) x 3 : do { s/[\W]//g; uc($_) }, @algbyname;
+	my @algrehash = map /^\d/ ? ($_) x 3 : do { s/[\W_]//g; uc($_) }, @algbyname;
 	my %algbyname = @algrehash;    # work around broken cperl
 
 	sub _algbyname {
@@ -99,7 +99,6 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 
-	return '' unless defined $self->{certbin};
 	pack "n2 C a*", $self->certtype, $self->keytag, $self->algorithm, $self->{certbin};
 }
 
@@ -107,7 +106,6 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
-	return '' unless defined $self->{certbin};
 	my @base64 = split /\s+/, encode_base64( $self->{certbin} );
 	my @rdata = ( $self->certtype, $self->keytag, $self->algorithm, @base64 );
 }
@@ -167,9 +165,8 @@ sub certbin {
 
 sub cert {
 	my $self = shift;
-
-	$self->certbin( MIME::Base64::decode( join "", @_ ) ) if scalar @_;
-	MIME::Base64::encode( $self->certbin(), "" ) if defined wantarray;
+	return MIME::Base64::encode( $self->certbin(), "" ) unless scalar @_;
+	$self->certbin( MIME::Base64::decode( join "", @_ ) );
 }
 
 

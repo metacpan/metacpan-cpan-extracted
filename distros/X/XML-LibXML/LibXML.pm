@@ -29,7 +29,7 @@ use XML::LibXML::XPathContext;
 use IO::Handle; # for FH reads called as methods
 
 BEGIN {
-$VERSION = "2.0129"; # VERSION TEMPLATE: DO NOT CHANGE
+$VERSION = "2.0130"; # VERSION TEMPLATE: DO NOT CHANGE
 $ABI_VERSION = 2;
 require Exporter;
 require DynaLoader;
@@ -1594,14 +1594,8 @@ sub _isSameNodeLax {
 
 sub setNamespace {
     my $self = shift;
-    my $n = $self->nodeName;
-    if ( $self->_setNamespace(@_) ){
-        if ( scalar @_ < 3 || $_[2] == 1 ){
-            $self->setNodeName( $n );
-        }
-        return 1;
-    }
-    return 0;
+
+    return $self->_setNamespace(@_) ? 1 : 0;
 }
 
 sub getAttribute {
@@ -1838,13 +1832,8 @@ use vars qw( @ISA ) ;
 
 sub setNamespace {
     my ($self,$href,$prefix) = @_;
-    my $n = $self->nodeName;
-    if ( $self->_setNamespace($href,$prefix) ) {
-        $self->setNodeName($n);
-        return 1;
-    }
 
-    return 0;
+    return $self->_setNamespace($href,$prefix) ? 1 : 0;
 }
 
 1;

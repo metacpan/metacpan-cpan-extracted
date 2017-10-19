@@ -215,6 +215,9 @@ sub test_metrics {
                 if ( $key =~ /seconds_total/ ) {
                     is( $metrics->{ $key } > 0, $data->{ $key } > 0, "Metrics $key" );
                 }
+                elsif ( $key =~ /microseconds_sum/ ) {
+                    is( $metrics->{ $key } > 0, $data->{ $key } > 0, "Metrics $key" );
+                }
                 else {
                     is( $metrics->{ $key }, $data->{ $key }, "Metrics $key" );
                 }
@@ -223,11 +226,13 @@ sub test_metrics {
         }
         else {
             fail( 'Metrics data does not exist' );
-            # Uncomment to write out new json file
-            #open my $OutF, '>', $expected;
-            #$j->pretty();
-            #print $OutF $j->encode( $metrics );
-            #close $OutF;
+            if ( $ENV{'WRITE_METRICS'} ) {
+                open my $OutF, '>', $expected;
+                $j->pretty();
+                $j->canonical();
+                print $OutF $j->encode( $metrics );
+                close $OutF;
+            }
         }
 
     };
@@ -373,6 +378,23 @@ sub milter_process {
 }
 
 sub run_milter_processing {
+
+    start_milter( 'config/timeout' );
+
+    milter_process({
+        'desc'   => 'Good message local',
+        'prefix' => 'config/normal',
+        'source' => 'google_apps_good.eml',
+        'dest'   => 'google_apps_good.timeout.eml',
+        'ip'     => '127.0.0.1',
+        'name'   => 'localhost',
+        'from'   => 'marc@marcbradshaw.net',
+        'to'     => 'marc@fastmail.com',
+    });
+
+    test_metrics( 'data/metrics/milter_timeout.json' );
+
+    stop_milter();
 
     start_milter( 'config/normal' );
 

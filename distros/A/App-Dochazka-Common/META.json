@@ -40,7 +40,7 @@
    "provides" : {
       "App::Dochazka::Common" : {
          "file" : "lib/App/Dochazka/Common.pm",
-         "version" : "0.207"
+         "version" : "0.208"
       },
       "App::Dochazka::Common::Model" : {
          "file" : "lib/App/Dochazka/Common/Model.pm",
@@ -103,5 +103,5 @@
          "url" : "https://github.com/smithfarm/dochazka-common"
       }
    },
-   "version" : "0.207"
+   "version" : "0.208"
 }

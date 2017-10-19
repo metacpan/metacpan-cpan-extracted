@@ -41,7 +41,7 @@ Business::OnlinePayment::Iridium::Action::GetGatewayEntryPoints - Query PayVecto
 
 =head1 VERSION
 
-version 1.01
+version 1.03
 
 =head2 template
 

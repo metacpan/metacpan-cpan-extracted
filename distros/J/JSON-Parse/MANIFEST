@@ -17,6 +17,7 @@ examples/sasori.pl
 examples/synopsis.pl
 examples/tokenize-synopsis.pl
 examples/true-subs.pl
+examples/unicode-details.pl
 json-common.c
 json-entry-points.c
 json-perl.c
@@ -34,6 +35,7 @@ script/validjson
 t/array.t
 t/collision.t
 t/JSON-Parse.t
+t/json-tokenize.t
 t/Json3.t
 t/kolmorogov42-1.t
 t/numbers.t

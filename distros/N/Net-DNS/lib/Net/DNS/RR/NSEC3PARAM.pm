@@ -1,9 +1,9 @@
 package Net::DNS::RR::NSEC3PARAM;
 
 #
-# $Id: NSEC3PARAM.pm 1528 2017-01-18 21:44:58Z willem $
+# $Id: NSEC3PARAM.pm 1597 2017-09-22 08:04:02Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1528 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
 
 
 use strict;
@@ -34,7 +34,6 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 
-	return '' unless defined $self->{algorithm};
 	my $salt = $self->saltbin;
 	pack 'CCnCa*', @{$self}{qw(algorithm flags iterations)}, length($salt), $salt;
 }
@@ -43,7 +42,6 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
-	return '' unless defined $self->{algorithm};
 	join ' ', $self->algorithm, $self->flags, $self->iterations, $self->salt || '-';
 }
 
@@ -85,10 +83,8 @@ sub iterations {
 
 sub salt {
 	my $self = shift;
-	my @args = map { /[^0-9A-Fa-f]/ ? croak "corrupt hexadecimal" : $_ } @_;
-
-	$self->saltbin( pack "H*", join "", @args ) if scalar @args;
-	unpack "H*", $self->saltbin() if defined wantarray;
+	return unpack "H*", $self->saltbin() unless scalar @_;
+	$self->saltbin( pack "H*", map /[^\dA-F]/i ? croak "corrupt hex" : $_, join "", @_ );
 }
 
 

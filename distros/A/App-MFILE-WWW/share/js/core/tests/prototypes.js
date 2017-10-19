@@ -28,7 +28,7 @@
 // CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-// ************************************************************************* 
+// *************************************************************************
 //
 // tests/prototypes.js
 //
@@ -58,6 +58,18 @@ define ([
             assert.strictEqual(t.source, '(none)', 't.source OK');
             assert.strictEqual(typeof t.pushable, 'boolean', 'target.pushable OK');
             assert.strictEqual(t.pushable, true, 't.pushable OK');
+            assert.deepEqual(t.getEntries(), [], 't.getEntries() empty OK');
+            t.entriesRead = ['foo', 'bar'];
+            t.entriesWrite = ['baz', 'blat'];
+            assert.deepEqual(t.getEntries(), ['foo', 'bar', 'baz', 'blat'], 't.getEntries() full OK');
+            t.entriesWrite = [];
+            assert.strictEqual(t.getVetter('foo'), null, 'no vetter in target with empty entriesWrite array');
+            t.entriesWrite = [{"name": "foo"}];
+            assert.strictEqual(t.getVetter('foo'), null, 'still no vetter in target');
+            t.entriesWrite = [{"name": "foo", "vetter": "bar"}];
+            assert.strictEqual(t.getVetter('foo'), null, 'still no vetter in target');
+            t.entriesWrite = [{"name": "foo", "vetter": function () {}}];
+            assert.strictEqual(typeof t.getVetter('foo'), 'function', 'vetter exists in target');
 
             // user
             assert.strictEqual(typeof u, 'object', 'u is an object');

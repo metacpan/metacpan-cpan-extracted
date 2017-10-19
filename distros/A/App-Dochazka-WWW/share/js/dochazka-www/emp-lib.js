@@ -38,6 +38,7 @@ define ([
     'jquery',
     'ajax',
     'current-user',
+    'datetime',
     'lib',
     'app/lib',
     'app/prototypes',
@@ -46,6 +47,7 @@ define ([
     $,
     ajax,
     currentUser,
+    datetime,
     coreLib,
     appLib,
     prototypes,
@@ -53,6 +55,9 @@ define ([
 ) {
 
     var 
+        profileCache = [],
+        byEID = {},
+
         currentEmployeeStashed = null,
         currentEmplPrivStashed = null,
         backgroundColorStashed = null,
@@ -201,7 +206,7 @@ define ([
                             schedEffective = null;
                         if (st.payload.privhistory !== null) {
                             priv = st.payload.privhistory.priv;
-                            privEffective = coreLib.readableDate(
+                            privEffective = datetime.readableDate(
                                 st.payload.privhistory.effective
                             );
                         }
@@ -211,12 +216,13 @@ define ([
                             } else {
                                 sched = '(Schedule ID ' + st.payload.schedhistory.sid + ')';
                             }
-                            schedEffective = coreLib.readableDate(
+                            schedEffective = datetime.readableDate(
                                 st.payload.schedhistory.effective
                             );
                         }
                         employeeProfile = $.extend(
-                            Object.create(prototypes.empProfile), {
+                            Object.create(prototypes.empProfile),
+                            {
                                 'eid': st.payload.emp.eid,
                                 'nick': st.payload.emp.nick,
                                 'fullname': st.payload.emp.fullname,
@@ -230,9 +236,7 @@ define ([
                             }
                         );
                         currentUser('obj', employeeProfile);
-                        stack.push('empProfile', employeeProfile, {
-                            "xtarget": "mainEmpl"
-                        });
+                        stack.push('empProfile', employeeProfile, {"xtarget": "mainEmpl"});
                     } else {
                         coreLib.displayError("Unexpected status code " + st.code);
                     }

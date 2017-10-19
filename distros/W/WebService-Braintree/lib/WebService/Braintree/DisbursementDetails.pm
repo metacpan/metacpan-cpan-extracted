@@ -1,5 +1,7 @@
 package WebService::Braintree::DisbursementDetails;
-$WebService::Braintree::DisbursementDetails::VERSION = '0.93';
+$WebService::Braintree::DisbursementDetails::VERSION = '0.94';
+use 5.010_001;
+use strictures 1;
 
 use Moose;
 extends 'WebService::Braintree::ResultObject';
@@ -16,8 +18,9 @@ sub is_valid {
     } else {
         0;
     }
-};
+}
 
 __PACKAGE__->meta->make_immutable;
-1;
 
+1;
+__END__

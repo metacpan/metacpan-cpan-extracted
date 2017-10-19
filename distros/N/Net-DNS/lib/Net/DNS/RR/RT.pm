@@ -1,9 +1,9 @@
 package Net::DNS::RR::RT;
 
 #
-# $Id: RT.pm 1528 2017-01-18 21:44:58Z willem $
+# $Id: RT.pm 1597 2017-09-22 08:04:02Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1528 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
 
 
 use strict;
@@ -35,16 +35,14 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 	my ( $offset, @opaque ) = @_;
 
-	my $intermediate = $self->{intermediate} || return '';
-	pack 'n a*', $self->preference, $intermediate->encode( $offset + 2, @opaque );
+	pack 'n a*', $self->preference, $self->{intermediate}->encode( $offset + 2, @opaque );
 }
 
 
 sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
-	my $intermediate = $self->{intermediate} || return '';
-	join ' ', $self->preference, $intermediate->string;
+	join ' ', $self->preference, $self->{intermediate}->string;
 }
 
 

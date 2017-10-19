@@ -1,6 +1,15 @@
 Revision history for Dancer2-Logger-Console-Colored
 
-0.003     2017-07-07 10:13:50+02:00 Europe/Berlin
+0.006     2017-10-13 18:11:06+02:00 Europe/Berlin
+	- Rerelease the previous version because it was broken.
+
+0.005     2017-10-12 20:44:19+02:00 Europe/Berlin
+        - GH #6: Add note to SYNOPSIS that the logger needs to to enabled in the 
+          environment (simbabque, thanks niceperl)
+
+0.004     2017-10-11 01:27:35+02:00 Europe/Berlin
+        - GH #1: Add a new colored_regex option to highlight parts of log messages
+          based on patterns. (simbabque, thanks Alberto Simões for the idea)
 
 0.003     2017-07-07 10:12:15+02:00 Europe/Berlin
         - Rerelease the previous version because it was broken.

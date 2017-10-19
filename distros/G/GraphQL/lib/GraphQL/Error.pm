@@ -11,6 +11,8 @@ use Function::Parameters;
 
 our $VERSION = '0.02';
 
+my %NONENUM = map { ($_ => 1) } qw(original_error);
+
 =head1 NAME
 
 GraphQL::Error - GraphQL error object
@@ -40,6 +42,23 @@ If there is an original error to be preserved.
 
 has original_error => (is => 'ro', isa => Any);
 
+=head2 locations
+
+Array-ref of L<GraphQL::Type::Library/DocumentLocation>s.
+
+=cut
+
+has locations => (is => 'ro', isa => ArrayRef[DocumentLocation]);
+
+=head2 path
+
+Array-ref of L<GraphQL::Type::Library/StrNameValid>s or C<Int>s describing
+the path from the top operation (being either fields, or a List offset).
+
+=cut
+
+has path => (is => 'ro', isa => ArrayRef[StrNameValid | Int]);
+
 =head1 METHODS
 
 =head2 is
@@ -65,6 +84,18 @@ method coerce(Any $item) :ReturnType(InstanceOf[__PACKAGE__]) {
     : $self->new(message => $item);
 }
 
+=head2 but
+
+Returns a copy of the error object, but with the given properties (as
+with a C<new> method, not coincidentally) overriding the existing ones.
+
+=cut
+
+sub but :ReturnType(InstanceOf[__PACKAGE__]) {
+  my $self = shift;
+  $self->new(%$self, @_);
+}
+
 =head2 to_string
 
 Converts to string.
@@ -73,6 +104,17 @@ Converts to string.
 
 method to_string() :ReturnType(Str) {
   $self->message;
+}
+
+=head2 to_json
+
+Converts to a JSON-able hash, in the format to send back as a member of
+the C<errors> array in the results.
+
+=cut
+
+method to_json() :ReturnType(HashRef) {
+  +{ map { ($_ => $self->{$_}) } grep !$NONENUM{$_}, keys %$self };
 }
 
 __PACKAGE__->meta->make_immutable();

@@ -1,10 +1,11 @@
 package Dancer2::Template::Implementation::ForkedTiny;
-$Dancer2::Template::Implementation::ForkedTiny::VERSION = '0.205001';
+$Dancer2::Template::Implementation::ForkedTiny::VERSION = '0.205002';
 # ABSTRACT: Dancer2 own implementation of Template::Tiny
 
 use 5.00503;
 use strict;
 no warnings;
+use Ref::Util qw<is_arrayref is_coderef is_plain_hashref>;
 
 # Evaluatable expression
 my $EXPR = qr/ [a-z_][\w.]* /xs;
@@ -174,9 +175,7 @@ sub _foreach {
 
     # Resolve the expression
     my $list = $self->_expression( $stash, $expr );
-    if ( ref $list ne 'ARRAY' ) {
-        return '';
-    }
+    is_arrayref($list) or return '';
 
     # Iterate
     return join '',
@@ -193,24 +192,21 @@ sub _expression {
         return if substr( $_, 0, 1 ) eq '_';
 
         # Split by data type
-        my $type = ref $cursor;
-        if ( $type eq 'ARRAY' ) {
+        ref $cursor or return '';
+        if ( is_arrayref($cursor) ) {
             return '' unless /^(?:0|[0-9]\d*)\z/;
             $cursor = $cursor->[$_];
         }
-        elsif ( $type eq 'HASH' ) {
+        elsif ( is_plain_hashref($cursor) ) {
             $cursor = $cursor->{$_};
         }
-        elsif ($type) {
-            $cursor = $cursor->$_();
-        }
         else {
-            return '';
+            $cursor = $cursor->$_();
         }
     }
 
     # If the last expression is a CodeRef, execute it
-    ref($cursor) eq 'CODE'
+    is_coderef($cursor)
       and $cursor = $cursor->();
     return $cursor;
 }
@@ -229,7 +225,7 @@ Dancer2::Template::Implementation::ForkedTiny - Dancer2 own implementation of Te
 
 =head1 VERSION
 
-version 0.205001
+version 0.205002
 
 =head1 SYNOPSIS
 

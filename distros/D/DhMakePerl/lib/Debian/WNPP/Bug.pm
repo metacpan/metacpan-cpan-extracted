@@ -3,7 +3,7 @@ package Debian::WNPP::Bug;
 use strict;
 use warnings;
 
-our $VERSION = '0.64';
+our $VERSION = '0.96';
 
 =head1 NAME
 

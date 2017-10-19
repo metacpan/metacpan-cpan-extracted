@@ -4,13 +4,229 @@
 
 #include "spvm_api.h"
 
+SPVM_API_int SPVM__Arrays__equals_byte(SPVM_API* api, SPVM_API_VALUE* args) {
+  (void)api;
+  
+  SPVM_API_OBJECT* x1 = args[0].object_value;
+  SPVM_API_OBJECT* x2 = args[1].object_value;
+  
+  if (x1 == NULL && x2 == NULL) {
+    return 1;
+  }
+  else if (x1 == NULL) {
+    return 0;
+  }
+  else if (x2 == NULL) {
+    return 0;
+  }
+  else {
+    SPVM_API_int x1_length = api->get_array_length(api, x1);
+    SPVM_API_int x2_length = api->get_array_length(api, x2);
+    
+    if (x1_length == x2_length) {
+      SPVM_API_OBJECT* x1_elements = api->get_byte_array_elements(api, x1);
+      SPVM_API_OBJECT* x2_elements = api->get_byte_array_elements(api, x2);
+      
+      if (memcmp(x1_elements, x2_elements, sizeof(SPVM_API_byte) * x1_length) == 0) {
+        return 1;
+      }
+      else {
+        return 0;
+      }
+    }
+    else {
+      return 0;
+    }
+  }
+}
+
+SPVM_API_int SPVM__Arrays__equals_short(SPVM_API* api, SPVM_API_VALUE* args) {
+  (void)api;
+  
+  SPVM_API_OBJECT* x1 = args[0].object_value;
+  SPVM_API_OBJECT* x2 = args[1].object_value;
+  
+  if (x1 == NULL && x2 == NULL) {
+    return 1;
+  }
+  else if (x1 == NULL) {
+    return 0;
+  }
+  else if (x2 == NULL) {
+    return 0;
+  }
+  else {
+    SPVM_API_int x1_length = api->get_array_length(api, x1);
+    SPVM_API_int x2_length = api->get_array_length(api, x2);
+    
+    if (x1_length == x2_length) {
+      SPVM_API_OBJECT* x1_elements = api->get_short_array_elements(api, x1);
+      SPVM_API_OBJECT* x2_elements = api->get_short_array_elements(api, x2);
+      
+      if (memcmp(x1_elements, x2_elements, sizeof(SPVM_API_short) * x1_length) == 0) {
+        return 1;
+      }
+      else {
+        return 0;
+      }
+    }
+    else {
+      return 0;
+    }
+  }
+}
+
+SPVM_API_int SPVM__Arrays__equals_int(SPVM_API* api, SPVM_API_VALUE* args) {
+  (void)api;
+  
+  SPVM_API_OBJECT* x1 = args[0].object_value;
+  SPVM_API_OBJECT* x2 = args[1].object_value;
+  
+  if (x1 == NULL && x2 == NULL) {
+    return 1;
+  }
+  else if (x1 == NULL) {
+    return 0;
+  }
+  else if (x2 == NULL) {
+    return 0;
+  }
+  else {
+    SPVM_API_int x1_length = api->get_array_length(api, x1);
+    SPVM_API_int x2_length = api->get_array_length(api, x2);
+    
+    if (x1_length == x2_length) {
+      SPVM_API_OBJECT* x1_elements = api->get_int_array_elements(api, x1);
+      SPVM_API_OBJECT* x2_elements = api->get_int_array_elements(api, x2);
+      
+      if (memcmp(x1_elements, x2_elements, sizeof(SPVM_API_int) * x1_length) == 0) {
+        return 1;
+      }
+      else {
+        return 0;
+      }
+    }
+    else {
+      return 0;
+    }
+  }
+}
+
+SPVM_API_int SPVM__Arrays__equals_long(SPVM_API* api, SPVM_API_VALUE* args) {
+  (void)api;
+  
+  SPVM_API_OBJECT* x1 = args[0].object_value;
+  SPVM_API_OBJECT* x2 = args[1].object_value;
+  
+  if (x1 == NULL && x2 == NULL) {
+    return 1;
+  }
+  else if (x1 == NULL) {
+    return 0;
+  }
+  else if (x2 == NULL) {
+    return 0;
+  }
+  else {
+    SPVM_API_int x1_length = api->get_array_length(api, x1);
+    SPVM_API_int x2_length = api->get_array_length(api, x2);
+    
+    if (x1_length == x2_length) {
+      SPVM_API_OBJECT* x1_elements = api->get_long_array_elements(api, x1);
+      SPVM_API_OBJECT* x2_elements = api->get_long_array_elements(api, x2);
+      
+      if (memcmp(x1_elements, x2_elements, sizeof(SPVM_API_long) * x1_length) == 0) {
+        return 1;
+      }
+      else {
+        return 0;
+      }
+    }
+    else {
+      return 0;
+    }
+  }
+}
+
+SPVM_API_int SPVM__Arrays__equals_float(SPVM_API* api, SPVM_API_VALUE* args) {
+  (void)api;
+  
+  SPVM_API_OBJECT* x1 = args[0].object_value;
+  SPVM_API_OBJECT* x2 = args[1].object_value;
+  
+  if (x1 == NULL && x2 == NULL) {
+    return 1;
+  }
+  else if (x1 == NULL) {
+    return 0;
+  }
+  else if (x2 == NULL) {
+    return 0;
+  }
+  else {
+    SPVM_API_int x1_length = api->get_array_length(api, x1);
+    SPVM_API_int x2_length = api->get_array_length(api, x2);
+    
+    if (x1_length == x2_length) {
+      SPVM_API_OBJECT* x1_elements = api->get_float_array_elements(api, x1);
+      SPVM_API_OBJECT* x2_elements = api->get_float_array_elements(api, x2);
+      
+      if (memcmp(x1_elements, x2_elements, sizeof(SPVM_API_float) * x1_length) == 0) {
+        return 1;
+      }
+      else {
+        return 0;
+      }
+    }
+    else {
+      return 0;
+    }
+  }
+}
+
+SPVM_API_int SPVM__Arrays__equals_double(SPVM_API* api, SPVM_API_VALUE* args) {
+  (void)api;
+  
+  SPVM_API_OBJECT* x1 = args[0].object_value;
+  SPVM_API_OBJECT* x2 = args[1].object_value;
+  
+  if (x1 == NULL && x2 == NULL) {
+    return 1;
+  }
+  else if (x1 == NULL) {
+    return 0;
+  }
+  else if (x2 == NULL) {
+    return 0;
+  }
+  else {
+    SPVM_API_int x1_length = api->get_array_length(api, x1);
+    SPVM_API_int x2_length = api->get_array_length(api, x2);
+    
+    if (x1_length == x2_length) {
+      SPVM_API_OBJECT* x1_elements = api->get_double_array_elements(api, x1);
+      SPVM_API_OBJECT* x2_elements = api->get_double_array_elements(api, x2);
+      
+      if (memcmp(x1_elements, x2_elements, sizeof(SPVM_API_double) * x1_length) == 0) {
+        return 1;
+      }
+      else {
+        return 0;
+      }
+    }
+    else {
+      return 0;
+    }
+  }
+}
+
 SPVM_API_OBJECT* SPVM__Arrays__copy_of_byte(SPVM_API* api, SPVM_API_VALUE* args) {
   (void)api;
   
   SPVM_API_OBJECT* original = args[0].object_value;
   
   if (!original) {
-    SPVM_API_OBJECT* exception = api->new_byte_array_string(api, "First argument must be not undef(SPVM::Arrays::copy_of_byte())");
+    SPVM_API_OBJECT* exception = api->new_string(api, "First argument must be not undef(SPVM::Arrays::copy_of_byte())", 0);
     api->set_exception(api, exception);
     return NULL;
   }
@@ -18,7 +234,7 @@ SPVM_API_OBJECT* SPVM__Arrays__copy_of_byte(SPVM_API* api, SPVM_API_VALUE* args)
   int32_t new_length = args[1].int_value;
   
   if (new_length < 0) {
-    SPVM_API_OBJECT* exception = api->new_byte_array_string(api, "Second argument must be not negative value(SPVM::Arrays::copy_of_byte())");
+    SPVM_API_OBJECT* exception = api->new_string(api, "Second argument must be not negative value(SPVM::Arrays::copy_of_byte())", 0);
     api->set_exception(api, exception);
     return NULL;
   }
@@ -52,7 +268,7 @@ SPVM_API_OBJECT* SPVM__Arrays__copy_of_short(SPVM_API* api, SPVM_API_VALUE* args
   SPVM_API_OBJECT* original = args[0].object_value;
   
   if (!original) {
-    SPVM_API_OBJECT* exception = api->new_byte_array_string(api, "First argument must be not undef(SPVM::Arrays::copy_of_short())");
+    SPVM_API_OBJECT* exception = api->new_string(api, "First argument must be not undef(SPVM::Arrays::copy_of_short())", 0);
     api->set_exception(api, exception);
     return NULL;
   }
@@ -60,7 +276,7 @@ SPVM_API_OBJECT* SPVM__Arrays__copy_of_short(SPVM_API* api, SPVM_API_VALUE* args
   int32_t new_length = args[1].int_value;
   
   if (new_length < 0) {
-    SPVM_API_OBJECT* exception = api->new_byte_array_string(api, "Second argument must be not negative value(SPVM::Arrays::copy_of_short())");
+    SPVM_API_OBJECT* exception = api->new_string(api, "Second argument must be not negative value(SPVM::Arrays::copy_of_short())", 0);
     api->set_exception(api, exception);
     return NULL;
   }
@@ -94,7 +310,7 @@ SPVM_API_OBJECT* SPVM__Arrays__copy_of_int(SPVM_API* api, SPVM_API_VALUE* args) 
   SPVM_API_OBJECT* original = args[0].object_value;
   
   if (!original) {
-    SPVM_API_OBJECT* exception = api->new_byte_array_string(api, "First argument must be not undef(SPVM::Arrays::copy_of_int())");
+    SPVM_API_OBJECT* exception = api->new_string(api, "First argument must be not undef(SPVM::Arrays::copy_of_int())", 0);
     api->set_exception(api, exception);
     return NULL;
   }
@@ -102,7 +318,7 @@ SPVM_API_OBJECT* SPVM__Arrays__copy_of_int(SPVM_API* api, SPVM_API_VALUE* args) 
   int32_t new_length = args[1].int_value;
   
   if (new_length < 0) {
-    SPVM_API_OBJECT* exception = api->new_byte_array_string(api, "Second argument must be not negative value(SPVM::Arrays::copy_of_int())");
+    SPVM_API_OBJECT* exception = api->new_string(api, "Second argument must be not negative value(SPVM::Arrays::copy_of_int())", 0);
     api->set_exception(api, exception);
     return NULL;
   }
@@ -136,7 +352,7 @@ SPVM_API_OBJECT* SPVM__Arrays__copy_of_long(SPVM_API* api, SPVM_API_VALUE* args)
   SPVM_API_OBJECT* original = args[0].object_value;
   
   if (!original) {
-    SPVM_API_OBJECT* exception = api->new_byte_array_string(api, "First argument must be not undef(SPVM::Arrays::copy_of_long())");
+    SPVM_API_OBJECT* exception = api->new_string(api, "First argument must be not undef(SPVM::Arrays::copy_of_long())", 0);
     api->set_exception(api, exception);
     return NULL;
   }
@@ -144,7 +360,7 @@ SPVM_API_OBJECT* SPVM__Arrays__copy_of_long(SPVM_API* api, SPVM_API_VALUE* args)
   int32_t new_length = args[1].int_value;
   
   if (new_length < 0) {
-    SPVM_API_OBJECT* exception = api->new_byte_array_string(api, "Second argument must be not negative value(SPVM::Arrays::copy_of_long())");
+    SPVM_API_OBJECT* exception = api->new_string(api, "Second argument must be not negative value(SPVM::Arrays::copy_of_long())", 0);
     api->set_exception(api, exception);
     return NULL;
   }
@@ -178,7 +394,7 @@ SPVM_API_OBJECT* SPVM__Arrays__copy_of_float(SPVM_API* api, SPVM_API_VALUE* args
   SPVM_API_OBJECT* original = args[0].object_value;
   
   if (!original) {
-    SPVM_API_OBJECT* exception = api->new_byte_array_string(api, "First argument must be not undef(SPVM::Arrays::copy_of_float())");
+    SPVM_API_OBJECT* exception = api->new_string(api, "First argument must be not undef(SPVM::Arrays::copy_of_float())", 0);
     api->set_exception(api, exception);
     return NULL;
   }
@@ -186,7 +402,7 @@ SPVM_API_OBJECT* SPVM__Arrays__copy_of_float(SPVM_API* api, SPVM_API_VALUE* args
   int32_t new_length = args[1].int_value;
   
   if (new_length < 0) {
-    SPVM_API_OBJECT* exception = api->new_byte_array_string(api, "Second argument must be not negative value(SPVM::Arrays::copy_of_float())");
+    SPVM_API_OBJECT* exception = api->new_string(api, "Second argument must be not negative value(SPVM::Arrays::copy_of_float())", 0);
     api->set_exception(api, exception);
     return NULL;
   }
@@ -220,7 +436,7 @@ SPVM_API_OBJECT* SPVM__Arrays__copy_of_double(SPVM_API* api, SPVM_API_VALUE* arg
   SPVM_API_OBJECT* original = args[0].object_value;
   
   if (!original) {
-    SPVM_API_OBJECT* exception = api->new_byte_array_string(api, "First argument must be not undef(SPVM::Arrays::copy_of_double())");
+    SPVM_API_OBJECT* exception = api->new_string(api, "First argument must be not undef(SPVM::Arrays::copy_of_double())", 0);
     api->set_exception(api, exception);
     return NULL;
   }
@@ -228,7 +444,7 @@ SPVM_API_OBJECT* SPVM__Arrays__copy_of_double(SPVM_API* api, SPVM_API_VALUE* arg
   int32_t new_length = args[1].int_value;
   
   if (new_length < 0) {
-    SPVM_API_OBJECT* exception = api->new_byte_array_string(api, "Second argument must be not negative value(SPVM::Arrays::copy_of_double())");
+    SPVM_API_OBJECT* exception = api->new_string(api, "Second argument must be not negative value(SPVM::Arrays::copy_of_double())", 0);
     api->set_exception(api, exception);
     return NULL;
   }

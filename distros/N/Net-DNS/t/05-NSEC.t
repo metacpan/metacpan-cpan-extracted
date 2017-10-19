@@ -1,4 +1,4 @@
-# $Id: 05-NSEC.t 1381 2015-08-25 07:36:09Z willem $	-*-perl-*-
+# $Id: 05-NSEC.t 1595 2017-09-12 09:10:56Z willem $	-*-perl-*-
 
 use strict;
 use Test::More tests => 16;
@@ -11,12 +11,11 @@ my $name = 'alpha.example.com';
 my $type = 'NSEC';
 my $code = 47;
 my @attr = qw( nxtdname typelist);
-my @data = qw( host.example.com A MX RRSIG NSEC TYPE1234 );
-my @hash = ( qw( host.example.com ), q(A MX NSEC RRSIG TYPE1234) );
+my @data = qw( host.example.com A NS NSEC RRSIG SOA );
+my @hash = ( qw( host.example.com ), q(A NS NSEC RRSIG SOA) );
 my @also = qw( );
 
-my $wire =
-'04686f7374076578616d706c6503636f6d000006400100000003041b000000000000000000000000000000000000000000000000000020';
+my $wire = '04686f7374076578616d706c6503636f6d000006620000000003';
 
 
 {

@@ -1,7 +1,7 @@
 package Perl::Examples::Accessors::Hash;
 
-our $DATE = '2017-09-01'; # DATE
-our $VERSION = '0.130'; # VERSION
+our $DATE = '2017-10-15'; # DATE
+our $VERSION = '0.131'; # VERSION
 
 sub new {
     my ($class, %attrs) = @_;
@@ -37,7 +37,7 @@ Perl::Examples::Accessors::Hash
 
 =head1 VERSION
 
-This document describes version 0.130 of Perl::Examples::Accessors::Hash (from Perl distribution Perl-Examples-Accessors), released on 2017-09-01.
+This document describes version 0.131 of Perl::Examples::Accessors::Hash (from Perl distribution Perl-Examples-Accessors), released on 2017-10-15.
 
 =head1 DESCRIPTION
 

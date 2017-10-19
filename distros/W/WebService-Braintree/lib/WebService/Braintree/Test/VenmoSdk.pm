@@ -1,6 +1,7 @@
 package WebService::Braintree::Test::VenmoSdk;
-$WebService::Braintree::Test::VenmoSdk::VERSION = '0.93';
-use strict;
+$WebService::Braintree::Test::VenmoSdk::VERSION = '0.94';
+use 5.010_001;
+use strictures 1;
 
 use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS );
 use Exporter qw(import);
@@ -19,3 +20,4 @@ use constant InvalidSession => "stub-invalid-session";
 use constant Session => "stub-session";
 
 1;
+__END__

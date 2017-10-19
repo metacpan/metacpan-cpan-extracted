@@ -37,14 +37,12 @@
 "use strict";
 
 define ([
-    'app/lib',
-    'target'
+    'app/entries',
+    'target',
 ], function (
-    appLib,
-    target
+    entries,
+    target,
 ) {
-
-    var entries = appLib.entries;
 
     return function () {
 
@@ -55,7 +53,7 @@ define ([
             'title': 'Privilege (status) history - edit',
             'preamble': null,
             'aclProfile': 'admin',
-            'entries': [entries.ePnick, entries.pHeffective, entries.pHpriv],
+            'entriesRead': [entries.ePnick, entries.pHeffective, entries.pHpriv],
             'miniMenu': {
                 entries: ['privHistoryAddRecordAction', 'privHistoryDeleteAction']
             }
@@ -68,9 +66,23 @@ define ([
             'title': 'Schedule history - edit',
             'preamble': null,
             'aclProfile': 'admin',
-            'entries': [entries.pHeffective, entries.sDid, entries.sDcode],
+            'entriesRead': [entries.pHeffective, entries.sDid, entries.sDcode],
             'miniMenu': {
                 entries: ['schedHistoryAddRecordAction', 'schedHistoryDeleteAction'],
+            }
+        });
+
+        target.push('selectActivity', {
+            'name': 'selectActivity',
+            'type': 'drowselect',
+            'menuText': 'Select activity',
+            'title': 'Select activity',
+            'preamble': null,
+            'aclProfile': 'active',
+            'entriesRead': [entries.acTcode, entries.acTaid, entries.acTdesc],
+            'submitAction': 'selectActivityGo',
+            'miniMenu': {
+                entries: [],
             }
         });
 

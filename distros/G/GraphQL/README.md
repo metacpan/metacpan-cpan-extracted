@@ -15,7 +15,7 @@ GraphQL - Perl implementation of GraphQL
     use GraphQL::Schema;
     use GraphQL::Type::Object;
     use GraphQL::Type::Scalar qw($String);
-    use GraphQL::Execution;
+    use GraphQL::Execution qw(execute);
 
     my $schema = GraphQL::Schema->new(query => GraphQL::Type::Object->new(
       name => 'QueryRoot',
@@ -24,7 +24,7 @@ GraphQL - Perl implementation of GraphQL
       },
     ));
     post '/graphql' => sub {
-      send_as JSON => GraphQL::Execution->execute(
+      send_as JSON => execute(
         $schema,
         body_parameters->{query},
         undef,
@@ -137,6 +137,9 @@ bug as I make changes.
 
 The creation of this work has been sponsored by Perl Careers:
 [https://perl.careers/](https://perl.careers/).
+
+Artur Khabibullin `<rtkh at cpan.org>` contributed valuable ports
+of the JavaScript tests.
 
 # LICENSE AND COPYRIGHT
 

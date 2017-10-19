@@ -1,9 +1,9 @@
-#!perl -wT
+#!perl -w
 
 use strict;
 use warnings;
 use File::Spec;
-use Test::More;
+use Test::Most;
 use English qw(-no_match_vars);
 
 unless($ENV{RELEASE_TESTING}) {

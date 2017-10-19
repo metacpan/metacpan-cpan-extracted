@@ -39,5 +39,5 @@ requires:
   warnings: 0
 resources:
   repository: http://dev.catalyst.perl.org/repos/Catalyst/trunk/Catalyst-Model-LDAP
-version: 0.20
+version: 0.21
 x_serialization_backend: 'YAML::Tiny version 1.51'

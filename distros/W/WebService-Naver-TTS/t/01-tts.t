@@ -25,4 +25,16 @@ SKIP: {
     };
 
     ok( $mp3, 'tts' );
+
+    $mp3 = undef;
+    $mp3 = try {
+        $client->tts( $text, DIR => '.' );
+    }
+    catch {
+        chomp $_;
+        diag("$_\n");
+        return;
+    };
+
+    ok( $mp3, 'tts with tempfile options' );
 }

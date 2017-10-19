@@ -2,7 +2,7 @@ package DhMakePerl::Command::make;
 
 use warnings;
 use strict;
-our $VERSION = '0.84';
+our $VERSION = '0.96';
 use 5.010;    # we use smart matching
 
 use base 'DhMakePerl::Command::Packaging';
@@ -190,7 +190,7 @@ sub execute {
         }
         elsif ( $vcs eq 'git' ) {
             $self->control->source->Vcs_Git(
-                sprintf( "git://anonscm.debian.org/pkg-perl/packages/%s.git",
+                sprintf( "https://anonscm.debian.org/git/pkg-perl/packages/%s.git",
                     $self->pkgname )
             );
             $self->control->source->Vcs_Browser(
@@ -400,6 +400,15 @@ sub build_package {
     my ( $self ) = @_;
 
     my $main_dir = $self->main_dir;
+    # warn if local::lib usage is detected. cf. #820395
+    if ( $ENV{PERL_LOCAL_LIB_ROOT} ) {
+        $self->warning('It seems that you are running in an active local::lib environment.');
+        $self->warning('local::lib usually sets PERL_MB_OPT=--install_base and PERL_MM_OPT=INSTALL_BASE');
+        $self->warning('which will change the install path in the about to be built package.');
+        $self->warning('We recommend that you disable local::lib temporarily, e.g. by running');
+        $self->warning('    eval $(perl -Mlocal::lib=--deactivate-all)');
+        $self->warning('in your shell. -- Continuing anyway ...');
+    }
     # uhmf! dpkg-genchanges doesn't cope with the deb being in another dir..
     #system("dpkg-buildpackage -b -us -uc " . $self->cfg->dbflags) == 0
     system("fakeroot make -C $main_dir -f debian/rules clean");
@@ -735,11 +744,13 @@ sub git_import_upstream__init_debian {
     $self->reset_git_environment();
 
     Git::command( 'init', $self->main_dir );
+    my @git_config = ( '-c', 'user.name=' . $self->get_name,
+                       '-c', 'user.email=' . $self->get_email);
 
     my $git = Git->repository( $self->main_dir );
     $git->command( qw(symbolic-ref HEAD refs/heads/upstream) );
     $git->command( 'add', '.' );
-    $git->command( 'commit', '-m',
+    $git->command( @git_config, 'commit', '-m',
               "Import original source of "
             . $self->perlname . ' '
             . $self->version );
@@ -753,7 +764,7 @@ sub git_import_upstream__init_debian {
       # debian/ directory from the working tree; git has the history, so I don't
       # need the debian.bak
       $git->command( 'rm', '-r', $self->debian_dir );
-      $git->command( 'commit', '-m',
+      $git->command( @git_config, 'commit', '-m',
                      'Removed debian directory embedded in upstream source' );
     }
 }
@@ -767,8 +778,12 @@ sub git_add_debian {
     $self->reset_git_environment;
 
     my $git = Git->repository( $self->main_dir );
+    my $name = $self->get_name;
+    my $email = $self->get_email;
+    my @git_config = ( '-c', "user.name=$name",
+                       '-c', "user.email=$email");
     $git->command( 'add', 'debian' );
-    $git->command( 'commit', '-m',
+    $git->command( @git_config, 'commit', '-m',
         "Initial packaging by dh-make-perl $VERSION" );
     $git->command(
         qw( remote add origin ),
@@ -779,8 +794,14 @@ sub git_add_debian {
     if ( File::Which::which('pristine-tar') ) {
         if ( $tarball and -f $tarball ) {
             $ENV{GIT_DIR} = File::Spec->catdir( $self->main_dir, '.git' );
-            system( 'pristine-tar', 'commit', $tarball, "upstream/".$self->version ) >= 0
-                or warn "error running pristine-tar: $!\n";
+            my %backup_ENV = %ENV;
+            $ENV{GIT_COMMITTER_NAME} = $name;
+            $ENV{GIT_COMMITTER_EMAIL} = $email;
+            $ENV{GIT_AUTHOR_NAME} = $name;
+            $ENV{GIT_AUTHOR_EMAIL} = $email;
+            my $status = system( 'pristine-tar', 'commit', $tarball, "upstream/".$self->version );
+            %ENV = %backup_ENV;
+            warn "error running pristine-tar: $!\n" if $status < 0;
         }
         else {
             die "No tarball found to handle with pristine-tar. Bailing out."
@@ -841,7 +862,7 @@ Debian Perl Group <debian-perl@lists.debian.org>
 =head1 BUGS
 
 Please report any bugs or feature requests to the Debian Bug Tracking System
-(L<http://bugs.debian.org/>, use I<dh-make-perl> as package name) or to the
+(L<https://bugs.debian.org/>, use I<dh-make-perl> as package name) or to the
 L<debian-perl@lists.debian.org> mailing list.
 
 =head1 SUPPORT
@@ -856,7 +877,7 @@ You can also look for information at:
 
 =item * Debian Bugtracking System
 
-L<http://bugs.debian.org/dh-make-perl>
+L<https://bugs.debian.org/dh-make-perl>
 
 =back
 

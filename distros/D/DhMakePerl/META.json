@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4214",
+   "generated_by" : "Module::Build version 0.4224",
    "keywords" : [
       "debian",
       "package",
@@ -15,7 +15,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "DhMakePerl",
    "no_index" : {
@@ -60,7 +60,7 @@
             "Config::INI::Reader" : "0",
             "Cwd" : "0",
             "Dpkg" : "0",
-            "Dpkg::Source::Package" : "0",
+            "Dpkg::Source::Package" : "1.01",
             "Email::Address" : "0",
             "Email::Date::Format" : "0",
             "File::Basename" : "0",
@@ -73,6 +73,8 @@
             "Getopt::Long" : "0",
             "IO::File" : "0",
             "IO::Uncompress::Gunzip" : "0",
+            "LWP::ConnCache" : "0",
+            "LWP::UserAgent" : "0",
             "List::MoreUtils" : "0",
             "Module::Build" : "0",
             "Module::CoreList" : "0",
@@ -89,6 +91,7 @@
             "User::pwent" : "0",
             "WWW::Mechanize" : "0",
             "YAML" : "0",
+            "YAML::XS" : "0",
             "perl" : "5.010",
             "version" : "0"
          }
@@ -103,6 +106,6 @@
          "url" : "https://anonscm.debian.org/cgit/pkg-perl/packages/dh-make-perl.git"
       }
    },
-   "version" : "0.89",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.96",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

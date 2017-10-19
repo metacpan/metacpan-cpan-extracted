@@ -112,7 +112,7 @@
                 <!-- Since camel case is common in Russian abbreviations,
                      we always test context for both upper- and lowercase
                      characters -->
-                <after>[АЕЁИОУЫЭЮЯЙЬЪАеёиоуыэюяйьъ]</after>
+                <after>[АЕЁИОУЫЭЮЯЙЬЪаеёиоуыэюяйьъ]</after>
             </context>
         </rule>
 
@@ -142,7 +142,7 @@
             <to>Yë</to>
             <context>
                 <!-- include 'e' from transliterated 'Ye' as well -->
-                <after>[АЕЁИОУЫЭЮЯЙЬЪАеёиоуыэюяйьъe]</after>
+                <after>[АЕЁИОУЫЭЮЯЙЬЪаеёиоуыэюяйьъe]</after>
             </context>
         </rule>
 

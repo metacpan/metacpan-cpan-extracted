@@ -2,7 +2,7 @@ package Test2::Harness::Run::Runner;
 use strict;
 use warnings;
 
-our $VERSION = '0.001019';
+our $VERSION = '0.001021';
 
 use Carp qw/croak confess/;
 use POSIX ":sys_wait_h";
@@ -224,8 +224,6 @@ sub preload {
     my $run = $self->{+RUN};
     my $req = $run->preload or return;
 
-    local @INC = ($run->all_libs, @INC);
-
     my $env = $run->env_vars;
 
     local_env $env => sub {
@@ -308,6 +306,9 @@ sub start {
 
     my $run = $self->{+RUN};
 
+    my %seen;
+    @INC = grep { !$seen{$_}++ } ((map { File::Spec->rel2abs($_) } $run->all_libs), @INC);
+
     my $pidfile = File::Spec->catfile($self->{+DIR}, 'PID');
     write_file_atomic($pidfile, "$$");
 
@@ -387,6 +388,8 @@ sub stage_should_fork {
 sub stage_start {
     my $self = shift;
     my ($stage) = @_;
+
+    my $run = $self->{+RUN};
 
     my $fork = $self->stage_should_fork($stage);
 

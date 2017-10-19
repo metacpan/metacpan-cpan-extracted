@@ -1,7 +1,21 @@
-Revision history for Perl extension Math::Base85.
+Revision history for Perl module Math::Base85.
+
+0.4 2017-10-16T17:36:18Z
+	Fix version numbering
+
+v0.3.1 2017-10-16T17:27:24Z
+	- Move deps from build to runtime; fix courtesy of Dan Book <grinnz@gmail.com>
+
+0.3 2017-10-16T16:39:34Z
+	- Add metadata to distribution
+	- Update directory structure to more standard Perl module structure
+	- Extend metadata to include prereqs, repo information, author info etc.
+	- Improve kwalitee
+	- Update author and repo information to point to new locations
+	- Add more explicit license information
 
 0.2     Fri May 03 09:11:41 PDT 2002
-	- Initial zeroes fix from Jyrki Soini <jyrki dot soini at 
+	- Initial zeroes fix from Jyrki Soini <jyrki dot soini at
 	  sonera dot com>.
 
 0.1 	Fri Jul 20 17:11:22 PDT 2001

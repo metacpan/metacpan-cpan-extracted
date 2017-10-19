@@ -2,18 +2,22 @@ use 5.006;
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.056
+# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.057
 
 use Test::More;
 
-plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 9 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'ZMQ/Raw.pm',
     'ZMQ/Raw/Context.pm',
+    'ZMQ/Raw/Curve.pm',
     'ZMQ/Raw/Error.pm',
     'ZMQ/Raw/Message.pm',
-    'ZMQ/Raw/Socket.pm'
+    'ZMQ/Raw/Poller.pm',
+    'ZMQ/Raw/Proxy.pm',
+    'ZMQ/Raw/Socket.pm',
+    'ZMQ/Raw/Z85.pm'
 );
 
 
@@ -47,7 +51,7 @@ for my $lib (@module_files)
     is($?, 0, "$lib loaded ok");
 
     shift @_warnings if @_warnings and $_warnings[0] =~ /^Using .*\bblib/
-        and not eval { require blib; blib->VERSION('1.01') };
+        and not eval { +require blib; blib->VERSION('1.01') };
 
     if (@_warnings)
     {

@@ -1,0 +1,23 @@
+---
+abstract: 'Database driver for Clickhouse OLAP Database'
+author:
+  - 'Ilya Rassadin, C<< <elcamlost at gmail.com> >>'
+build_requires: {}
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'App::ModuleBuildTiny version 0.022, CPAN::Meta::Converter version 2.150001'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: ClickHouse
+provides:
+  ClickHouse:
+    file: lib/ClickHouse.pm
+    version: '0.03'
+requires:
+  Net::HTTP: '6.09'
+  Test::More: '1.3'
+  Try::Tiny: '0.24'
+version: '0.03'

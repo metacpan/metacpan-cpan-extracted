@@ -1,9 +1,9 @@
 package Net::DNS::RR::RRSIG;
 
 #
-# $Id: RRSIG.pm 1582 2017-07-07 21:45:14Z willem $
+# $Id: RRSIG.pm 1597 2017-09-22 08:04:02Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1582 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
 
 
 use strict;
@@ -38,7 +38,7 @@ use constant ECDSA => defined eval 'require Net::DNS::SEC::ECDSA';
 use constant EdDSA => defined eval 'require Net::DNS::SEC::EdDSA';
 use constant GOST  => defined eval 'require Net::DNS::SEC::ECCGOST';
 
-use constant DNSSEC => PRIVATE && ( RSA || DSA || ECDSA || EdDSA || GOST );
+use constant DNSSEC => PRIVATE && ( RSA || DSA || ECDSA || EdDSA );
 
 my @field = qw(typecovered algorithm labels orgttl sigexpiration siginception keytag);
 
@@ -57,7 +57,7 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 
-	my $signame = $self->{signame} || return '';
+	my $signame = $self->{signame};
 	pack 'n C2 N3 n a* a*', @{$self}{@field}, $signame->canonical, $self->sigbin;
 }
 
@@ -65,9 +65,9 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
-	my $signame = $self->{signame} || return '';
-	my @sig64 = split /\s+/, encode_base64( $self->sigbin );
-	my @rdata = ( map( $self->$_, @field ), $signame->string, @sig64 );
+	my $signame = $self->{signame};
+	my @sig64   = split /\s+/, encode_base64( $self->sigbin );
+	my @rdata   = ( map( $self->$_, @field ), $signame->string, @sig64 );
 }
 
 
@@ -117,7 +117,7 @@ sub _defaults {				## specify RR attribute default values
 
 	my %algbyval = reverse @algbyname;
 
-	my @algrehash = map /^\d/ ? ($_) x 3 : do { s/[\W]//g; uc($_) }, @algbyname;
+	my @algrehash = map /^\d/ ? ($_) x 3 : do { s/[\W_]//g; uc($_) }, @algbyname;
 	my %algbyname = @algrehash;    # work around broken cperl
 
 	sub _algbyname {
@@ -240,9 +240,8 @@ sub signame {
 
 sub sig {
 	my $self = shift;
-
-	$self->sigbin( MIME::Base64::decode( join "", @_ ) ) if scalar @_;
-	MIME::Base64::encode( $self->sigbin(), "" ) if defined wantarray;
+	return MIME::Base64::encode( $self->sigbin(), "" ) unless scalar @_;
+	$self->sigbin( MIME::Base64::decode( join "", @_ ) );
 }
 
 
@@ -865,8 +864,8 @@ DEALINGS IN THE SOFTWARE.
 L<perl>, L<Net::DNS>, L<Net::DNS::RR>, L<Net::DNS::SEC>,
 RFC4034, RFC6840, RFC3755,
 L<Net::DNS::SEC::DSA>,
-L<Net::DNS::SEC::ECCGOST>,
 L<Net::DNS::SEC::ECDSA>,
+L<Net::DNS::SEC::EdDSA>,
 L<Net::DNS::SEC::RSA>
 
 L<Algorithm Numbers|http://www.iana.org/assignments/dns-sec-alg-numbers>

@@ -1,7 +1,77 @@
+2017-10-18  Rocky Bernstein <rocky@cpan.org>
+
+	* META.yml, lib/Term/ReadLine/Perl5.pm,
+	lib/Term/ReadLine/Perl5/Tie.pm, lib/Term/ReadLine/Perl5/readline.pm: 
+	Get ready for release 1.45
+
+2017-10-17  R. Bernstein <rocky@users.noreply.github.com>
+
+	* : Merge pull request #14 from aferreira/devel/fix-10test-readline Fix t/10test-readline.t: missing "new"
+
+2017-10-17  Adriano Ferreira <a.r.ferreira@gmail.com>
+
+	* lib/Term/ReadLine/Perl5/OO/History.pm: add_line_to_history():
+	change rl_History in-place So the changes propagate to the attached global variable.
+
+2017-10-17  Adriano Ferreira <a.r.ferreira@gmail.com>
+
+	* t/10test-readline.t: Fix t/10test-readline.t: missing "new"
+
+2017-10-17  Rocky Bernstein <rocky@cpan.org>
+
+	* Changes, lib/Term/ReadLine/Perl5.pm,
+	lib/Term/ReadLine/Perl5/Tie.pm, lib/Term/ReadLine/Perl5/readline.pm: 
+	Get ready for release 1.44
+
+2017-10-17  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/Perl5.pm: Mark suspicious code. Thanks to
+	aferreira
+
+2017-10-17  R. Bernstein <rocky@users.noreply.github.com>
+
+	* : Merge pull request #12 from aferreira/devel/term-in-n-out Fix $term->IN() and $term->OUT()
+
+2017-05-22  R. Bernstein <rocky@users.noreply.github.com>
+
+	* : Merge pull request #11 from devel-chm/master Fix podchecker errors from Term::ReadLine::Perl5
+
+2017-01-10  R. Bernstein <rocky@users.noreply.github.com>
+
+	* : Merge pull request #10 from aferreira/patch-1 Fix POD link mistake
+
+2016-06-14  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/Perl5.pm, lib/Term/ReadLine/Perl5/OO.pm,
+	lib/Term/ReadLine/Perl5/readline.pm: vi editmode stuff
+
+2016-06-14  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/Perl5.pm, lib/Term/ReadLine/Perl5/OO.pm,
+	lib/Term/ReadLine/Perl5/readline.pm: Start handling/tracking
+	editMode
+
+2015-06-19  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/Term/ReadLine/Perl5.pm: Doc IN and OUT better
+
+2015-06-19  Rocky Bernstein <rocky@cpan.org>
+
+	* t/01test-OO-compile.t: Need to test for tty on test
+
+2015-06-19  Rocky Bernstein <rocky@cpan.org>
+
+	* Build.PL, Changes, META.yml, lib/Term/ReadLine/Perl5.pm,
+	lib/Term/ReadLine/Perl5/OO.pm, lib/Term/ReadLine/Perl5/Tie.pm,
+	lib/Term/ReadLine/Perl5/readline.pm: Add IN and OUT methods as part
+	of the Term::ReadLine spec, and that Term::ShellUI uses. Get ready
+	for release 1.43
+
 2015-06-19  Rocky Bernstein <rocky@cpan.org>
 
 	* t/01test-OO-compile.t: Add IN and OUT methods as part of the
-	Term::ReadLine spec, and that Term::ShellUI uses.
+	Term::ReadLine spec, and that Term::ShellUI uses. Get ready for
+	release 1.43
 
 2015-06-18  Rocky Bernstein <rocky@cpan.org>
 

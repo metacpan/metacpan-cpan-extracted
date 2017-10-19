@@ -1,9 +1,9 @@
 package Net::DNS::RR::DNSKEY;
 
 #
-# $Id: DNSKEY.pm 1586 2017-08-15 09:01:57Z willem $
+# $Id: DNSKEY.pm 1597 2017-09-22 08:04:02Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1586 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
 
 
 use strict;
@@ -86,7 +86,6 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 
-	return '' unless defined $self->{algorithm};
 	pack 'n C2 a*', @{$self}{qw(flags protocol algorithm keybin)};
 }
 
@@ -95,7 +94,6 @@ sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
 	my $algorithm = $self->{algorithm};
-	return '' unless defined $algorithm;
 	$self->_annotation( 'Key ID =', $self->keytag ) if $algorithm;
 	return $self->SUPER::_format_rdata() unless BASE64;
 	my @base64 = split /\s+/, MIME::Base64::encode( $self->{keybin} ) || '-';

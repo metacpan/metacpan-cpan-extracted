@@ -31,7 +31,7 @@ my $builder = Module::Build->new(
     create_readme       => 1,
     meta_merge => {
         resources => {
-            repository => 'git://github.com/jozef/Module-Build-SysPath.git',
+            repository => 'git://github.com/jozef/Module-Build-SysPath',
             bugtracker => 'http://github.com/jozef/Module-Build-SysPath/issues',
         },
         keywords => [ qw/ system paths instalation deployment applications / ],

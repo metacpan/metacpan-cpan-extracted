@@ -1,9 +1,9 @@
 package Net::DNS::RR::HIP;
 
 #
-# $Id: HIP.pm 1528 2017-01-18 21:44:58Z willem $
+# $Id: HIP.pm 1597 2017-09-22 08:04:02Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1528 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
 
 
 use strict;
@@ -46,7 +46,6 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 
-	return '' unless defined $self->{hitbin};
 	my $hit = $self->hitbin;
 	my $key = $self->keybin;
 	my $nos = pack 'C2n a* a*', length($hit), $self->pkalgorithm, length($key), $hit, $key;
@@ -57,7 +56,6 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
-	return '' unless defined $self->{hitbin};
 	my $base64 = encode_base64( $self->keybin, '' );
 	my @server = map $_->string, @{$self->{servers}};
 	my @rdata = ( $self->pkalgorithm, $self->hit, $base64, @server );
@@ -82,10 +80,8 @@ sub pkalgorithm {
 
 sub hit {
 	my $self = shift;
-	my @args = map { /[^0-9A-Fa-f]/ ? croak "corrupt hexadecimal" : $_ } @_;
-
-	$self->hitbin( pack "H*", join "", @args ) if scalar @args;
-	unpack "H*", $self->hitbin() if defined wantarray;
+	return unpack "H*", $self->hitbin() unless scalar @_;
+	$self->hitbin( pack "H*", map /[^\dA-F]/i ? croak "corrupt hex" : $_, join "", @_ );
 }
 
 
@@ -99,9 +95,8 @@ sub hitbin {
 
 sub key {
 	my $self = shift;
-
-	$self->keybin( MIME::Base64::decode( join "", @_ ) ) if scalar @_;
-	MIME::Base64::encode( $self->keybin(), "" ) if defined wantarray;
+	return MIME::Base64::encode( $self->keybin(), "" ) unless scalar @_;
+	$self->keybin( MIME::Base64::decode( join "", @_ ) );
 }
 
 

@@ -237,7 +237,7 @@ If defined when package is require'd, F<~/.inputrc> will not be read.
 
 =item C<@rl_History>
 array of previous lines input.
-n
+
 =item C<$rl_HistoryIndex>
 
 history pointer (for moving about history array)
@@ -423,7 +423,7 @@ used as an early basis for this.
 
 =item *
 
-L<Term::ReadLine::Perl5:readline> documents more of the nitty gritty
+L<Term::ReadLine::Perl5::readline> documents more of the nitty gritty
 details as this is embedded along with the code
 
 =item *

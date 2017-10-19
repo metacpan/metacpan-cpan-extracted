@@ -10,11 +10,11 @@ File::RoundRobin - Round Robin text files
 
 =head1 VERSION
 
-Version 0.04
+Version 0.06
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 local $|=1;
 
@@ -30,28 +30,36 @@ log-rotate mechanism.
 
 Example :
 
-	use File::RoundRobin;
+    use File::RoundRobin;
 
-	my $rrfile = File::RoundRobin->new(
+    my $rrfile = File::RoundRobin->new(
                                     path => '/tmp/sample.txt',
                                     size => '100M',
                                     mode => 'new',
-                       			  );
+                                     ) // die $@;
 
-	$rrfile->print("foo bar");
-	
-	or
+    $rrfile->print("foo bar");
     
-	my $rrfile = File::RoundRobin->new(path => '/tmp/sample.txt', mode => 'read');
+    or
+    
+    my $rrfile = File::RoundRobin->new(path => '/tmp/sample.txt', mode => 'read');
 
-	while (my $line = $rrfile->readline() ) {
-		print $line;
-	}
-	
+    while (my $line = $rrfile->readline() ) {
+        print $line;
+    }
+    
 
 
 When you write into the Round-Robin file, if it filled the maximum allowed space it 
 will write over the old data, while always preserving the most recent data.
+
+=head1 ERROR HANDLING and DEBUGGING
+
+In case an error occures, the error will be stored in $@
+
+Starting with version 0.5 the module no longer dies on errors, instead returns 
+undef or 0 (c<new()> will return undef, c<write()> will return 0) and the actual 
+error message is available in $@.
 
 =head1 TIE INTERFACE
 
@@ -62,32 +70,32 @@ file handles.
 
 =item 1. Write example :
 
-	local *FH;
-	tie *FH, 'File::RoundRobin', path => 'test.txt',size => '10M';
+    local *FH;
+    tie *FH, 'File::RoundRobin', path => 'test.txt',size => '10M';
 
-	my $fh = *FH;
+    my $fh = *FH;
 
-	...
-	print $fh "foo bar";
+    ...
+    print $fh "foo bar";
 
-	...
-	close($fh);
-	
+    ...
+    close($fh);
+    
 =item 2. Read example :
 
-	local *FH;
-	tie *FH, 'File::RoundRobin', path => 'test.txt',mode => 'read';
+    local *FH;
+    tie *FH, 'File::RoundRobin', path => 'test.txt',mode => 'read';
 
-	$fh = *FH;
+    $fh = *FH;
 
-	while ( my $line = readline($fh) ) {
-		print $line;
-	}
-	
-	close($fh);
-	
+    while ( my $line = readline($fh) ) {
+        print $line;
+    }
+    
+    close($fh);
+    
 =back
-	
+    
 =head1 UTILITIES
 
 =head2 rrcat 
@@ -96,10 +104,10 @@ The package comes with a simple utility B<rrcat> that let's you create and read 
 
 Usage : 
 To print the content of a file :
-	$ rrcat <filename> 
+    $ rrcat <filename> 
 
 To write into a file (reads from stdin):
-	$ rrcat <size> <filename>
+    $ rrcat <size> <filename>
 
 Size can be specified in any of the forms accepted by File::RoundRobin (see C<new> method)
 
@@ -111,7 +119,7 @@ Usage :
 To a file you can run :
 
 Print the last 10 lines
-	
+    
     $ rrtail <filename>
 
 Print the last 100 lines :
@@ -146,10 +154,10 @@ Arguments :
 
 Example : 
 
-	my $rrfile = File::RoundRobin->new(
+    my $rrfile = File::RoundRobin->new(
                                     path => '/tmp/sample.txt',
                                     size => '100M',
-                       			  );
+                                     );
 
 =head3 read
 
@@ -165,7 +173,7 @@ Arguments :
 
 Example :
 
-	my $rrfile = File::RoundRobin->new(path => '/tmp/sample.txt', mode => 'read');
+    my $rrfile = File::RoundRobin->new(path => '/tmp/sample.txt', mode => 'read') || die $@;
 
 =head3 append
 
@@ -183,7 +191,7 @@ Arguments :
 
 Example :
 
-	my $rrfile = File::RoundRobin->new(path => '/tmp/sample.txt', mode => 'append');
+    my $rrfile = File::RoundRobin->new(path => '/tmp/sample.txt', mode => 'append') || die $@;
 
 =cut
 
@@ -196,20 +204,25 @@ sub new {
     );
     
     $params{size} = convert_size($params{size});
-    
-    die "You must specify the file size" if ($params{mode} eq "new" && ! defined $params{size});
+
+    if ($params{mode} eq "new" && ! defined $params{size}) {
+        $@ = "You must specify the file size" ;
+        return;
+    }
     
     my ($fh,$size,$start_point,$headers_size,$read_only) = open_file(%params);
+    
+    return undef unless $fh;
         
     my $self = {
                 _fh_ => $fh,
                 _data_length_ => $size,
-				_file_length_ => $size + $headers_size,
-				_write_start_point_ => $start_point,
-				_read_start_point_ => $start_point,
-				_headers_size_ => $headers_size,
-				_read_only_ => $read_only,
-				_autoflush_ => $params{autoflush} || 1,
+                _file_length_ => $size + $headers_size,
+                _write_start_point_ => $start_point,
+                _read_start_point_ => $start_point,
+                _headers_size_ => $headers_size,
+                _read_only_ => $read_only,
+                _autoflush_ => $params{autoflush} || 1,
     };
     
     bless $self, $class;
@@ -224,11 +237,11 @@ Reads the $length craracters form the file beginning with $offset and returns th
 
 Usage : 
 
-	#reads the next 10 characted from the file
-	my $buffer = $rrfile->read(10); 
-	or 
-	#reads the first 10 characters starting with character 90 after the current position
-	my $buffer = $rrfile->read(10,90); 
+    #reads the next 10 characted from the file
+    my $buffer = $rrfile->read(10); 
+    or 
+    #reads the first 10 characters starting with character 90 after the current position
+    my $buffer = $rrfile->read(10,90); 
 
 Arguments :
 
@@ -239,50 +252,50 @@ Arguments :
 =item * I<offset> = offset from which to start reading
 
 =back
-	
+    
 =cut
 sub read {
-	my $self = shift;
-	my $length = shift || 1;
-	my $offset = shift || 0;
-	
-	if ($self->{_write_start_point_} == $self->{_read_start_point_}) {
-		if ($self->{_read_started_}) {
-			return undef;
-		}
-		else {
-			$self->{_read_started_} = 1;
-		}
-	}
-
-	my $to_eof =  ($self->{_write_start_point_} > $self->{_read_start_point_}) ? 
-						$self->{_write_start_point_} - $self->{_read_start_point_} :
-						($self->{_write_start_point_} - $self->{_headers_size_}) + ($self->{_file_length_} - $self->{_read_start_point_});
-							
-	$length = $to_eof > $length ? $length : $to_eof;
+    my $self = shift;
+    my $length = shift || 1;
+    my $offset = shift || 0;
     
-	return undef unless $length;
+    if ($self->{_write_start_point_} == $self->{_read_start_point_}) {
+        if ($self->{_read_started_}) {
+            return undef;
+        }
+        else {
+            $self->{_read_started_} = 1;
+        }
+    }
 
-	$self->jump($offset) if ($offset);
-	
-	my ($buffer1,$buffer2);
+    my $to_eof =  ($self->{_write_start_point_} > $self->{_read_start_point_}) ? 
+                        $self->{_write_start_point_} - $self->{_read_start_point_} :
+                        ($self->{_write_start_point_} - $self->{_headers_size_}) + ($self->{_file_length_} - $self->{_read_start_point_});
+                            
+    $length = $to_eof > $length ? $length : $to_eof;
     
-	my $bytes = CORE::sysread($self->{_fh_},$buffer1,$length);
-	$self->{_read_start_point_} += $bytes;
-	CORE::sysseek($self->{_fh_},$self->{_read_start_point_},0);
-    	
-	if ($bytes < $length) {
+    return undef unless $length;
+
+    $self->jump($offset) if ($offset);
+    
+    my ($buffer1,$buffer2);
+    
+    my $bytes = CORE::sysread($self->{_fh_},$buffer1,$length);
+    $self->{_read_start_point_} += $bytes;
+    CORE::sysseek($self->{_fh_},$self->{_read_start_point_},0);
+        
+    if ($bytes < $length) {
         $length -= $bytes;
         if ($self->{_write_start_point_} - $self->{_headers_size_} < $length) {
             $length = $self->{_write_start_point_} - $self->{_headers_size_};
         }
-		CORE::sysseek($self->{_fh_},$self->{_headers_size_},0);
-		$bytes = CORE::sysread($self->{_fh_},$buffer2,$length);
-		$self->{_read_start_point_} = $self->{_headers_size_} + $bytes;
-		CORE::sysseek($self->{_fh_},$self->{_read_start_point_},0);
-	}
+        CORE::sysseek($self->{_fh_},$self->{_headers_size_},0);
+        $bytes = CORE::sysread($self->{_fh_},$buffer2,$length);
+        $self->{_read_start_point_} = $self->{_headers_size_} + $bytes;
+        CORE::sysseek($self->{_fh_},$self->{_read_start_point_},0);
+    }
 
-	return $buffer2 ? $buffer1 . $buffer2 : $buffer1;
+    return $buffer2 ? $buffer1 . $buffer2 : $buffer1;
 }
 
 =head2 write
@@ -291,8 +304,8 @@ Writes the given text into the file
 
 Usage :
 
-	$rrfile->write("foo bar");
-	
+    $rrfile->write("foo bar");
+    
 Arguments :
 
 =over 4
@@ -307,38 +320,39 @@ Arguments :
 
 =cut
 sub write {
-	my $self = shift;
-	my $buffer = shift;
-	my $length = shift || length($buffer);
-	my $offset = shift || 0;
-	
-	die "File is read only!" if $self->{_read_only_};
-	
-    select($self->{_fh_});
+    my $self = shift;
+    my $buffer = shift;
+    my $length = shift || length($buffer);
+    my $offset = shift || 0;
     
-	$self->jump($offset) if $offset;
-	
-	$self->{_write_start_point_} = $self->{_read_start_point_};
-	
-	my $fh = $self->{_fh_};
-	
-	my $start_pos = 0;
-	while  ($self->{_write_start_point_} + $length > $self->{_file_length_}) {
-		my $bytes_to_write = $self->{_file_length_} - $self->{_write_start_point_};
-		CORE::syswrite($fh,substr($buffer,$start_pos,$bytes_to_write));
-		$start_pos += $bytes_to_write;
-		$length -= $bytes_to_write;
-		$self->{_write_start_point_} = $self->{_headers_size_};
-		CORE::sysseek($fh,$self->{_write_start_point_},0);
-	}
-	
-	CORE::syswrite($fh,substr($buffer,$start_pos,$length));
-	$self->{_write_start_point_} += $length;
-	$self->{_read_start_point_} = $self->{_write_start_point_};
+    if ( $self->{_read_only_} ) {
+        $@ = "File is read only!";
+        return 0;
+    }
+    
+    $self->jump($offset) if $offset;
+    
+    $self->{_write_start_point_} = $self->{_read_start_point_};
+    
+    my $fh = $self->{_fh_};
+    
+    my $start_pos = 0;
+    while  ($self->{_write_start_point_} + $length > $self->{_file_length_}) {
+        my $bytes_to_write = $self->{_file_length_} - $self->{_write_start_point_};
+        CORE::syswrite($fh,substr($buffer,$start_pos,$bytes_to_write));
+        $start_pos += $bytes_to_write;
+        $length -= $bytes_to_write;
+        $self->{_write_start_point_} = $self->{_headers_size_};
+        CORE::sysseek($fh,$self->{_write_start_point_},0);
+    }
+    
+    CORE::syswrite($fh,substr($buffer,$start_pos,$length));
+    $self->{_write_start_point_} += $length;
+    $self->{_read_start_point_} = $self->{_write_start_point_};
     
     $self->update_headers() unless $self->{_autoflush_} == 0;
     
-	return ($self->{_write_start_point_} == CORE::tell($fh)) ? 1 : 0;
+    return ($self->{_write_start_point_} == CORE::tell($fh)) ? 1 : 0;
 }
 
 
@@ -348,8 +362,8 @@ Writes the given text into the file
 
 Usage :
 
-	$rrfile->print("foo bar");
-	
+    $rrfile->print("foo bar");
+    
 Arguments :
 
 =over 4
@@ -368,23 +382,23 @@ Close the Round-Robin file
 
 Usage :
 
-	$rrfile->close();
+    $rrfile->close();
 
 =cut
 sub close {
-	my $self = shift;
-	
-	my $fh = $self->{_fh_};
-	
-	return if $self->{_closed_};
-	
-	if (! $self->{_read_only_}) {
+    my $self = shift;
+    
+    my $fh = $self->{_fh_};
+    
+    return if $self->{_closed_};
+    
+    if (! $self->{_read_only_}) {
         $self->update_headers();
-	}
-	
-	$self->{_closed_} = 1;
-	
-	return CORE::close($fh);
+    }
+    
+    $self->{_closed_} = 1;
+    
+    return CORE::close($fh);
 }
 
 
@@ -394,15 +408,15 @@ Return true if you reached the end of file, false otherwise
 
 Usage :
 
-	my $bool = $rrfile->eof();
+    my $bool = $rrfile->eof();
 
 =cut
 sub eof {
-	my $self = shift;
-	
-	return 1 if ($self->{_write_start_point_} == $self->{_read_start_point_} && defined $self->{_read_started_} );
+    my $self = shift;
+    
+    return 1 if ($self->{_write_start_point_} == $self->{_read_start_point_} && defined $self->{_read_started_} );
 
-	return 0;
+    return 0;
 }
 
 
@@ -411,22 +425,22 @@ sub eof {
 Turns on/off the autoflush feature
 
 Usage :
-	my $autoflush = $rrfile->autoflush();
-	
-	or 
-	
-	$rrfile->autoflush(1); #enables autoflush
-	$rrfile->autoflush(0); #disables autoflush
-	
+    my $autoflush = $rrfile->autoflush();
+    
+    or 
+    
+    $rrfile->autoflush(1); #enables autoflush
+    $rrfile->autoflush(0); #disables autoflush
+    
 =cut
 sub autoflush {
-	my $self = shift;
-	
-	if ( scalar(@_) ) {
-		$self->{_autoflush_} = $_[0];
-	}
-	
-	return $self->{_autoflush_};
+    my $self = shift;
+    
+    if ( scalar(@_) ) {
+        $self->{_autoflush_} = $_[0];
+    }
+    
+    return $self->{_autoflush_};
 }
 
 
@@ -451,55 +465,76 @@ Has two modes :
 sub open_file {
     my %params = @_;
     
-    die "You myst specifi the name of the file!" unless $params{path};
-    die "Path is a directory!" if -d $params{path};
+    if (! defined($params{path}) ) {
+        $@ = "You myst specifi the name of the file!";
+    }
+    if (-d $params{path}) {
+        $@ = "Path is a directory!";
+    }
     
-    my ($fh,$size,$start_point,$headers_size,$read_only);
+    my ($fh,$size,$start_point,$version,$headers_size,$read_only);
     if ($params{mode} eq "new") {
-        die "You must specify the size of the file!" unless defined $params{size};
+        if (! defined $params{size} ) {
+            $! = "You must specify the size of the file!";
+            return;
+        }
         $size = $params{size};
-        open($fh,"+>",$params{path}) || die "Cannot open file $params{path}";
-		CORE::binmode($fh,":unix");
-		#version number
-		CORE::syswrite($fh,"1"."\x00");
-		#file size
+        if (! open($fh,"+>",$params{path}) ) {
+            $@ = $!;
+            return;
+        }
+        CORE::binmode($fh,":unix");
+        #version number
+        CORE::syswrite($fh,"1"."\x00");
+        #file size
         CORE::syswrite($fh,$params{size} ."\x00");
-		#where is the start of the file
+        #where is the start of the file
         $start_point = length($params{size}) * 2 + 2 + 2;
         CORE::syswrite($fh,("0" x (length($params{size}) - length($start_point) )) . $start_point ."\x00");
-		$headers_size = length($params{size}) * 2 + 2 + 2;
-		$read_only = 0;
+        $headers_size = length($params{size}) * 2 + 2 + 2;
+        $read_only = 0;
     }
-	else {
-		if ($params{mode} eq "append") {
-			open($fh,"+<",$params{path}) || die "Cannot open file $params{path}";
-			CORE::binmode($fh,":unix");
-			CORE::sysseek($fh,0,0);	
-			$read_only = 0;
-		}
-		elsif ($params{mode} eq "read") {
-			open($fh,"<",$params{path}) || die "Cannot open file $params{path}";
-			CORE::binmode($fh,":unix");
-			$read_only = 1;
-		}
-		else {
-			die "Invalid open mode! Use one of new,read,append!";
-		}
-			
-		local $/ = "\x00";
-		
-		my $version = <$fh>;
-		
-		$size = <$fh>;
-		$start_point = <$fh>;
-		
-		$headers_size = length($version) + length($size) + length($start_point);
-		
-		$size =~ s/\x00//g;
-		$start_point =~ s/\x00//g;
-		
-		CORE::sysseek($fh,$start_point + 0,0);	
-	}
+    else {
+        if ($params{mode} eq "append") {
+            if (! open($fh,"+<",$params{path}) ) {
+                $@ = $!;
+                return;
+            }
+            CORE::binmode($fh,":unix");
+            CORE::sysseek($fh,0,0);    
+            $read_only = 0;
+        }
+        elsif ($params{mode} eq "read") {
+            if (! open($fh,"<",$params{path}) ) {
+                $@ = $!;
+                return;
+            }
+            CORE::binmode($fh,":unix");
+            $read_only = 1;
+        }
+        else {
+            $@ = "Invalid open mode! Use one of new,read,append!";
+            return;
+        }
+        
+        my $start_section;
+        CORE::sysread($fh,$start_section,4096);
+        
+        ($version, $size, $start_point) = split("\x00", $start_section);
+        
+        CORE::sysseek($fh,0,0);
+        
+        #make sure this looks like a File::RoundRobin file
+        if (! $version || $version ne "1" || int($size || '') == 0 ||  int($start_point || '') == 0 ) {
+            $@ = "File does not look like a File::RoundRobin file - missing headers";
+            return;
+        }
+        
+        $headers_size = length($version) + length($size) + length($start_point) +3; 
+        # +3 because of the 3 \x00 chars we use to separate headder info
+                
+        CORE::sysseek($fh,$start_point + 0,0);    
+    }
     
     return ($fh,$size + 0,$start_point + 0,$headers_size + 0,$read_only);
 }
@@ -520,7 +555,7 @@ sub update_headers {
     my $headers = '';
     #version
     $headers .= "1\x00";
-	#file size
+    #file size
     $headers .= $self->{_data_length_} ."\x00";
     #start pos
     $headers .= ("0" x (length($self->{_data_length_}) - length($self->{_write_start_point_}) )) . $self->{_write_start_point_} ."\x00";
@@ -541,7 +576,7 @@ sub refresh {
     my $self = shift;
     
     my $fh = $self->{_fh_};
-	
+    
     my $pos = $self->tell();
     
     CORE::sysseek($fh,0,0);
@@ -563,8 +598,8 @@ sub refresh {
     $self->{_read_start_point_} = $start_point + 0;
     $self->{_data_length_} = $size + 0;
     $self->{_file_length_} = $size + $headers_size;
-		
-	CORE::sysseek($fh,$start_point,0);	
+        
+    CORE::sysseek($fh,$start_point,0);    
 }
 
 =head2 sync_markers
@@ -586,19 +621,19 @@ Advance the read start position pointer by $offset bytes
 
 =cut
 sub jump {
-	my $self = shift;
-	my $offset = shift || 0;
-	
-	if ($offset) {
-		if ($offset + $self->{_read_start_point_} > $self->{_file_length_}) {
-			$self->{_read_start_point_} = $self->{_headers_size_} + (($offset + $self->{_read_start_point_}) % $self->{_file_length_} )	
-		}
-		else {
-			$self->{_start_point_} += $offset;
-		}		
-	}
-	
-	CORE::sysseek($self->{_fh_},$self->{_read_start_point_},0);
+    my $self = shift;
+    my $offset = shift || 0;
+    
+    if ($offset) {
+        if ($offset + $self->{_read_start_point_} > $self->{_file_length_}) {
+            $self->{_read_start_point_} = $self->{_headers_size_} + (($offset + $self->{_read_start_point_}) % $self->{_file_length_} )    
+        }
+        else {
+            $self->{_start_point_} += $offset;
+        }        
+    }
+    
+    CORE::sysseek($self->{_fh_},$self->{_read_start_point_},0);
 }
 
 
@@ -628,69 +663,71 @@ Arguments :
 
 Usage :
 
-	$rrfile->seek(10,0);
+    $rrfile->seek(10,0);
 
 =cut
 sub seek {
-	my $self = $_[0];
-	my $position = $_[1];
-	my $whence = $_[2] || 0;
-	
-	#$position = $position % $self->{_data_length_};
-	
-	if ($whence == 0) {
-		my $start_pos = $self->{_write_start_point_};
-		if ($self->{_write_start_point_} + $position > $self->{_file_length_}) {
-			$position -= $self->{_file_length_} - $self->{_write_start_point_};
-			$start_pos = $self->{_headers_size_};
-		}
-		if ( CORE::sysseek($self->{_fh_},$start_pos + $position,0) ) {
-			$self->{_read_start_point_} = $start_pos + $position;
-			return 1;
-		}
-	}
-	elsif ($whence == 1) {
-		my $start_pos = $self->{_read_start_point_};
-		if ($self->{_read_start_point_} + $position > $self->{_file_length_}) {
-			$position -= $self->{_file_length_} - $self->{_read_start_point_};
-			$start_pos = $self->{_headers_size_};
-		}
-		if ( CORE::sysseek($self->{_fh_},$start_pos + $position,1) ) {
-			$self->{_read_start_point_} = $start_pos + $position;
-			return 1;
-		}
-	}
-	elsif ($whence == 2 ) {
-		if ($position > 0) {
-			warn "Attempt to seek beyond the end of file!";
-			return 0;
-		}
-		
-		my $start_pos = $self->{_write_start_point_};
-		if ($self->{_write_start_point_} + $position < $self->{_headers_size_}) {
+    my $self = $_[0];
+    my $position = $_[1];
+    my $whence = $_[2] || 0;
+    
+    #$position = $position % $self->{_data_length_};
+    
+    if ($whence == 0) {
+        my $start_pos = $self->{_write_start_point_};
+        if ($self->{_write_start_point_} + $position > $self->{_file_length_}) {
+            $position -= $self->{_file_length_} - $self->{_write_start_point_};
+            $start_pos = $self->{_headers_size_};
+        }
+        if ( CORE::sysseek($self->{_fh_},$start_pos + $position,0) ) {
+            $self->{_read_start_point_} = $start_pos + $position;
+            return 1;
+        }
+    }
+    elsif ($whence == 1) {
+        my $start_pos = $self->{_read_start_point_};
+        if ($self->{_read_start_point_} + $position > $self->{_file_length_}) {
+            $position -= $self->{_file_length_} - $self->{_read_start_point_};
+            $start_pos = $self->{_headers_size_};
+        }
+        if ( CORE::sysseek($self->{_fh_},$start_pos + $position,1) ) {
+            $self->{_read_start_point_} = $start_pos + $position;
+            return 1;
+        }
+    }
+    elsif ($whence == 2 ) {
+        if ($position > 0) {
+            $@ = "Attempt to seek beyond the end of file!";
+            warn $@;
+            return 0;
+        }
+        
+        my $start_pos = $self->{_write_start_point_};
+        if ($self->{_write_start_point_} + $position < $self->{_headers_size_}) {
             $position = -$position;
-			$position -= $self->{_write_start_point_} - $self->{_headers_size_};
-			$start_pos = $self->{_file_length_};
-		}
-		
+            $position -= $self->{_write_start_point_} - $self->{_headers_size_};
+            $start_pos = $self->{_file_length_};
+        }
+        
         #don't go in cicles
         if ($self->{_read_start_point_} < $self->{_write_start_point_} &&  
             $self->{_read_start_point_} + $position >= $self->{_write_start_point_}){
                 return 0;
         }
         
-		if ( CORE::sysseek($self->{_fh_},$start_pos,0) ) {
-			if ( CORE::sysseek($self->{_fh_},$position,1) ) {
-				$self->{_read_start_point_} = $start_pos + $position;
-				return 1;
-			}
-		}
-	}
-	else {
-		die "Unknown seek mode!";
-	}
-	
-	return 0;
+        if ( CORE::sysseek($self->{_fh_},$start_pos,0) ) {
+            if ( CORE::sysseek($self->{_fh_},$position,1) ) {
+                $self->{_read_start_point_} = $start_pos + $position;
+                return 1;
+            }
+        }
+    }
+    else {
+        $@ = "Unknown seek mode!";
+        warn $@;
+    }
+    
+    return 0;
 }
 
 =head2 tell
@@ -699,22 +736,22 @@ Return the difference between the current read position and the last write posit
 
 Example :
 
-	my $pos = $rrfile->tell();
+    my $pos = $rrfile->tell();
 
 =cut
 sub tell {
-	my $self = shift;
-	
-	my $offset;
-	
-	if ($self->{_read_start_point_} >= $self->{_write_start_point_}) {
-		$offset = $self->{_read_start_point_} - $self->{_write_start_point_};
-	}
-	else {
-		$offset = ($self->{_file_length_} - $self->{_write_start_point_}) + 
-				  ($self->{_read_start_point_} - $self->{_headers_size_});
-	}
-	return $offset % $self->{_data_length_};
+    my $self = shift;
+    
+    my $offset;
+    
+    if ($self->{_read_start_point_} >= $self->{_write_start_point_}) {
+        $offset = $self->{_read_start_point_} - $self->{_write_start_point_};
+    }
+    else {
+        $offset = ($self->{_file_length_} - $self->{_write_start_point_}) + 
+                  ($self->{_read_start_point_} - $self->{_headers_size_});
+    }
+    return $offset % $self->{_data_length_};
 }
 
 =head2 convert_size
@@ -753,7 +790,8 @@ sub convert_size {
         return $1 * $sizes{uc($2)};
     }
     else {
-        die "Broke size format. See pod for accepted formats";
+        $@ = "Broke size format in ".__PACKAGE__."->convert_size(). See pod for accepted formats";
+        return undef;
     }
 
 }
@@ -769,101 +807,101 @@ See SYNOPSYS for more details on this
 =cut
 
 sub TIEHANDLE {
-	my $class = shift;
-	return $class->new(@_);
+    my $class = shift;
+    return $class->new(@_);
 }
 
 sub READ {
-	my ($self,$buffer,$length,$offet) = @_;
-	
-	my $content = $self->read($length,$offet);
-	$_[1] = $content;
-	return length($content || '');
+    my ($self,$buffer,$length,$offet) = @_;
+    
+    my $content = $self->read($length,$offet);
+    $_[1] = $content;
+    return length($content || '');
 }
 
 sub READLINE {
-	my $self = shift;
-	
-	my $buffer;
-	while (my $char = $self->read(1)) {
-		$buffer .= $char;
-		last if ($char =~ /[\n\r]/);
-	}
-	
-	return $buffer;
+    my $self = shift;
+    
+    my $buffer;
+    while (my $char = $self->read(1)) {
+        $buffer .= $char;
+        last if ($char =~ /[\n\r]/);
+    }
+    
+    return $buffer;
 }
 
 sub GETC {
-	my $self = shift;
-	
-	return $self->read(1,0);
+    my $self = shift;
+    
+    return $self->read(1,0);
 }
 
 sub WRITE {
-	my ($self,$buffer,$length,$offet) = @_;
-	
-	return $self->write($buffer,$length,$offet);
+    my ($self,$buffer,$length,$offet) = @_;
+    
+    return $self->write($buffer,$length,$offet);
 }
 
 sub PRINT {
-	my ($self,@data) = @_;
-	
-	return $self->write($_) foreach @data;
+    my ($self,@data) = @_;
+    
+    return $self->write($_) foreach @data;
 }
 
 sub PRINTF {
-	my ($self,$format,@data) = @_;
-	
-	return $self->write(sprintf($format,@data));
+    my ($self,$format,@data) = @_;
+    
+    return $self->write(sprintf($format,@data));
 }
 
 # binmode does nothing, this is a text file
 sub BINMODE {
-	my $self = shift;
-	CORE::binmode($self->{_fh_},@_);
+    my $self = shift;
+    CORE::binmode($self->{_fh_},@_);
 }
 
 sub EOF {
-	my $self = shift;
-	
-	return $self->eof();
+    my $self = shift;
+    
+    return $self->eof();
 }
 
 sub FILENO {
-	my $self = shift;
-	
-	return CORE::fileno($self->{_fh_});
+    my $self = shift;
+    
+    return CORE::fileno($self->{_fh_});
 }
 
 sub SEEK {
-	my ($self,$position,$whence) = @_;
-	
-	return $self->seek($position,$whence);
+    my ($self,$position,$whence) = @_;
+    
+    return $self->seek($position,$whence);
 }    
 
 sub TELL {
-	my $self = shift;
-	
-	return $self->tell();
+    my $self = shift;
+    
+    return $self->tell();
 }
 
 sub OPEN {
-	my ($self, $mode, @params) = @_;
+    my ($self, $mode, @params) = @_;
 
-	die "You cannot use the tie interface to open a file, use File::RoundRobin->new() instead!";
+    die "You cannot use the tie interface to open a file, use File::RoundRobin->new() instead!";
 }
 
 sub CLOSE {
-	my $self = shift;
-	
-	$self->close();
+    my $self = shift;
+    
+    $self->close();
 }
 
 
 # Does nothing
 sub UNTIE {
-	my $self = shift;
-	return 0
+    my $self = shift;
+    return 0
 }
 
 DESTROY {
@@ -874,7 +912,7 @@ DESTROY {
 
 =head1 AUTHOR
 
-Gligan Calin Horea, C<< <gliganh at gmail.com> >>
+Gligan Calin Horea, C<< <horea at gligan.ro> >>
 
 =head1 BUGS
 

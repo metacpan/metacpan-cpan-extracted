@@ -1,0 +1,12 @@
+
+Version 0.01 October 13, 2017
+
+   Initial release.
+
+Version 0.02
+
+   Repaired failing compile when Image::LibRSVG is not installed
+   Repaired failing tests when Image::LibRSVG is not installed
+   Corrected some errors in documentation
+   Added this file
+

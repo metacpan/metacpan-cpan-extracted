@@ -1,5 +1,5 @@
 package Schedule::LongSteps;
-$Schedule::LongSteps::VERSION = '0.017';
+$Schedule::LongSteps::VERSION = '0.020';
 # ABSTRACT: Manage long term processes over arbitrary large spans of time.
 
 use Moose;
@@ -156,6 +156,10 @@ to worry about creating a DBIx::Class model yourself.
 
 Persist processes in an existing L<DBIx::Class> schema. Nice if you want to have only one instance of Schema in your application and if
 don't mind writing your own resultset.
+
+=item L<Schedule::LongSteps::Storage::DynamoDB>
+
+Persist processes in a DynamoDB table in AWS. Please consider this Alpha. Give it a go and report any issue!
 
 =back
 
@@ -420,8 +424,8 @@ sub run_due_processes{
         $process_count++;
 
         my $new_step_properties = eval{
+            $log->info( "Will do $process_method on process ID=".$stored_process->id() );
             my $process = $self->_load_stored_process($stored_process,$context);
-
             $process->$process_method();
         };
         if( my $original_err = $@ ){
@@ -516,11 +520,17 @@ sub revive {
     confess "Unable revive $process_id to $revive_to" unless $loaded_process->can($revive_to);
 
     # Set the process up to be revived.
+    my $now = DateTime->now();
     $stored_process->what($revive_to);
     $stored_process->error(undef);
     $stored_process->status("paused");
-    $stored_process->run_at(DateTime->now());
-    $stored_process->update();
+    $stored_process->run_at( $now );
+    $stored_process->update({
+        what => $revive_to,
+        error => undef,
+        status => "paused",
+        run_at => $now
+    });
 
     return 1;
 }

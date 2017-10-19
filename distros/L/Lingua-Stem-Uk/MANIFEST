@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Lingua-Stem-Uk.t
+t/original-tests.t
+lib/Lingua/Stem/Uk.pm

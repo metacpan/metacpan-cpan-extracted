@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
 # PODNAME: dancer2
 # ABSTRACT: Dancer2 command line interface
 
@@ -33,7 +33,7 @@ dancer2 - Dancer2 command line interface
 
 =head1 VERSION
 
-version 0.205001
+version 0.205002
 
 =head1 SYNOPSIS
 

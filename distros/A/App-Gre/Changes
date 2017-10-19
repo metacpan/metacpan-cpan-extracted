@@ -1,5 +1,17 @@
 Revision history for App::Gre.
 
+0.15  Mon Oct 16 14:49:54 CDT 2017
+    - Only keep one option name for options that used to have multiple
+    - Allow multiple regexps with the -r and -R options
+
+0.14  Fri Oct 13 17:53:30 CDT 2017
+    - Remove -abs option
+    - Clean up usage statement
+
+0.13  Thu Oct 12 11:49:49 CDT 2017
+    - Docs improvements (Thanks Marco)
+    - Make sure man page is generated on installation
+
 0.12  Tue Oct 25 12:34:53 CDT 2016
 0.11
     - Regular file recursion. nothing fancy. and do not read symlinks

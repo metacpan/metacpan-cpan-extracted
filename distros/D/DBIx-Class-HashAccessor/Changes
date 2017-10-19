@@ -1,0 +1,35 @@
+==================================================
+Changes from 1743-12-31 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.001 at 2017-10-14 19:22:59 +0000
+------------------------------------------
+
+  Change: 58f31c60d268e1c5a608bad3367dd5af5c90a1c1
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2017-10-14 21:10:03 +0000
+
+    New travis.yml 
+
+  Change: 92045e052808d0f8bc95c4de56a4848ee4784066
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2017-10-14 20:48:36 +0000
+
+    Tuned requirements 
+
+  Change: 0b0c1040bb6f44f614840da3b297a11a30139620
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2017-10-14 20:37:09 +0000
+
+    First implementation based on existing project code 
+
+  Change: 901251ef204605d4995cf24e0cdb429624825c24
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2017-10-14 17:54:41 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

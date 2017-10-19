@@ -4,7 +4,7 @@ Dancer2::Plugin::WebSocket - add a websocket interface to your Dancers app
 
 # VERSION
 
-version 0.0.1
+version 0.1.0
 
 # SYNOPSIS
 
@@ -106,6 +106,19 @@ is the most popular server that fits the bill.
                 allow_nonref: 1
     ```
 
+    By the way, if you want the connection to automatically serialize data
+    structures to JSON on the client side, you can do something like
+
+    ```perl
+    var mySocket = new WebSocket(urlMySocket);
+    mySocket.sendJSON = function(message) { 
+        return this.send(JSON.stringify(message)) 
+    };
+
+    // then later...
+    mySocket.sendJSON({ whoa: "auto-serialization ftw!" });
+    ```
+
 - mount\_path
 
     Path for the websocket mountpoint. Defaults to `/ws`.
@@ -171,7 +184,7 @@ websocket_on_error sub {
 ## websocket\_on\_message sub { ... }
 
 ```perl
-websocket_on_error sub {
+websocket_on_message sub {
     my( $conn, $message ) = @_;
     ...;
 };
@@ -179,6 +192,20 @@ websocket_on_error sub {
 
 Code invoked when a message is received. Gets the connection
 object and the message as arguments.
+
+Note that while `websocket_on_message` fires for all messages receives, you can
+also be a little more selective. Indeed, each connection, being a [Plack::App::WebSocket::Connection](https://metacpan.org/pod/Plack::App::WebSocket::Connection)
+object, can have its own (multiple) handlers. So you can do things like
+
+```perl
+websocket_on_open sub {
+  my( $conn, $env ) = @_;
+  $conn->on( message => sub {
+    my( $conn, $message ) = @_;
+    warn "I'm only being executed for messages sent via this connection";
+  });
+};
+```
 
 ## websocket\_url
 

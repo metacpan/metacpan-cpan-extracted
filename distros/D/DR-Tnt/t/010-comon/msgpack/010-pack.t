@@ -6,7 +6,7 @@ use utf8;
 use open qw(:std :utf8);
 use lib qw(lib ../lib);
 
-use Test::More tests    => 84;
+use Test::More tests    => 87;
 use Encode qw(decode encode);
 
 
@@ -115,27 +115,39 @@ for my $h ({ map { ($_ => $_) } 1 .. 0x1F }) {
         "hash16 $len";
 }
 
+is msgpack \1, pack('C', 0xC3), 'true \\1';
+is msgpack \111, pack('C', 0xC3), 'true \\111';
+is msgpack \0, pack('C', 0xC2), 'true \\0';
 
 subtest 'JSON::PP::Boolean' => sub {
     return plan skip_all => 'JSON::PP::Boolean is not installed'
         unless eval "require JSON::PP; 1" ;
-    plan tests => 2;
+    plan tests => 4;
     is msgpack(JSON::PP::true()), pack('C', 0xC3), 'true';
     is msgpack(JSON::PP::false()), pack('C', 0xC2), 'false';
+
+    is msgpack(JSON::PP::true()), msgpack(\1), 'true as \\1';
+    is msgpack(JSON::PP::false()), msgpack(\0), 'false as \\0';
 };
 
 subtest 'JSON::XS' => sub {
     return plan skip_all => 'JSON::XS is not installed'
         unless eval "require JSON::XS; 1" ;
-    plan tests => 2;
+    plan tests => 4;
     is msgpack(JSON::XS::true()), pack('C', 0xC3), 'true';
     is msgpack(JSON::XS::false()), pack('C', 0xC2), 'false';
+    
+    is msgpack(JSON::XS::true()), msgpack(\1), 'true as \\1';
+    is msgpack(JSON::XS::false()), msgpack(\0), 'false as \\0';
 };
 subtest 'Types::Serialiser' => sub {
     return plan skip_all => 'Types::Serialiser is not installed'
         unless eval "require Types::Serialiser; 1" ;
-    plan tests => 2;
+    plan tests => 4;
     is msgpack(Types::Serialiser::true()), pack('C', 0xC3), 'true';
     is msgpack(Types::Serialiser::false()), pack('C', 0xC2), 'false';
+    
+    is msgpack(Types::Serialiser::true()), msgpack(\1), 'true as \\1';
+    is msgpack(Types::Serialiser::false()), msgpack(\0), 'false as \\0';
 };
 

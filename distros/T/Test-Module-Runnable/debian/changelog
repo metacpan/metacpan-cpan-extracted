@@ -1,3 +1,44 @@
+libtest-module-runnable-perl (0.2.3) stable; urgency=low
+
+  * Fix issue where not was directly tested against a blank string. (Unit tests only).
+
+ -- Duncan Ross Palmer <palmer@overchat.org>  Sun, 15 Oct 2017 16:06:07 +0100
+
+libtest-module-runnable-perl (0.2.2) stable; urgency=low
+
+  * Added List::MoreUtils to BUILD_REQUIRES
+
+ -- Duncan Ross Palmer <palmer@overchat.org>  Sun, 15 Oct 2017 13:31:01 +0100
+
+libtest-module-runnable-perl (0.2.1) stable; urgency=low
+
+  * Added Readonly to BUILD_REQUIRES
+
+ -- Duncan Ross Palmer <palmer@overchat.org>  Sun, 15 Oct 2017 11:34:55 +0100
+
+libtest-module-runnable-perl (0.2.0) stable; urgency=low
+
+  * Refactor so that user-overridable methods are in primary class and all backend
+    functionality is in Base.pm
+
+  * Fix copyright notices
+  * Fix author name (deed poll)
+  * Automatically check PoD at build-time
+  * Don't use can() on methods we provide in Test::Module::Runnable
+
+  * d6794afd26f5: Implement unique random code (use 'rand' domain to unique()).
+  * 6c9bc8c58244: use Moose automagically switches on strict and warnings. So don't duplicate.
+  * 4325d09ba622: Reduce trial iterations when on users' systems
+  * 1997589ac85d: Potential fix for PoD missing a newline
+  * 02a8a7159d34: PoD syntax fix; =item without previous =over
+  * 57a525961dd6: Added missing license (unit tests)
+  * 32ba63da665a: License reformat (no content change)
+  * 0ab913b843b3: Fix indentation of examples (PoD)
+  * f35644fdf152: Added libreadonly-perl to debian/control
+  * 9a12ff8bee11: Don't clobber runnable tests via command-line (regression test at 434556766196)
+
+ -- Duncan Ross Palmer <palmer@overchat.org>  Sat, 14 Oct 2017 22:02:21 +0100
+
 libtest-module-runnable-perl (0.1.0) stable; urgency=low
 
   * Pre-release beta

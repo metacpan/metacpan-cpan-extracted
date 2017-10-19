@@ -1,0 +1,14 @@
+~$
+.bak$
+^.git
+.releaserc
+.swp$
+.appveyor.yml
+.travis.yml
+^blib
+^cover_db
+^pm_to_blib
+^Makefile$
+MYMETA.*
+Math-Base85-*
+^TODO$

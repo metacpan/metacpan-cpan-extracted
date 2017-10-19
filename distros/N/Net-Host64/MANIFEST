@@ -1,0 +1,8 @@
+Host64.xs
+lib/Net/Host64.pm
+Makefile.PL
+MANIFEST			This list of files
+ppport.h
+t/version.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

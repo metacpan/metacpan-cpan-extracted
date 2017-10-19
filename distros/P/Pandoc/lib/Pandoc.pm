@@ -11,7 +11,7 @@ Pandoc - wrapper for the mighty Pandoc document converter
 
 =cut
 
-our $VERSION = '0.6.0';
+our $VERSION = '0.6.1';
 
 use Pandoc::Version;
 use Carp 'croak';
@@ -148,7 +148,8 @@ sub convert {
     my $utf8 = utf8::is_utf8($in);
 
     my %opts = (in => \$in, out => \$out, err => \$err);
-    my $status = $pandoc->run( [ '-f' => $from, '-t' => $to, @_ ], \%opts );
+    my @args = (@_, '-f' => $from, '-t' => $to, '-o' => '-');
+    my $status = $pandoc->run( \@args, \%opts );
 
     croak($err || "pandoc failed with exit code $status") if $status;
 
@@ -179,7 +180,7 @@ sub file {
     $pandoc->require('1.12.1');
 
     my ($json, $err);
-    my @args = ('-t' => 'json', @_);
+    my @args = (@_, '-t' => 'json', '-o' => '-');
     my $status = $pandoc->run( \@args, out => \$json, err => \$err );
     croak($err || "pandoc failed with exit code $status") if $status;
 
@@ -330,6 +331,7 @@ __END__
   # utility methods to parse abstract syntax tree (requires Pandoc::Elements)
   $doc = pandoc->parse( markdown => '*hello* **world!**' );
   $doc = pandoc->file( 'example.md' );
+  $doc = pandoc->file;  # read Markdown from STDIN
 
 =head1 DESCRIPTION
 
@@ -453,12 +455,12 @@ Additional shortcut methods such as C<to_html> are available:
 Method C<convert> should be preferred for simple conversions unless you want to
 modify or inspect the parsed document in between.
 
-=head2 file( $filename [, @arguments ] )
+=head2 file( [ $filename [, @arguments ] ] )
 
-Parse from a file to a L<Pandoc::Document> object. Additional pandoc options
-can be passed, for instance use HTML input format (C<@arguments = qw(-f html)>)
-instead of default markdown. This method Requires at least pandoc version
-1.12.1 and the Perl module L<Pandoc::Elements>.
+Parse from a file (or STDIN) to a L<Pandoc::Document> object. Additional pandoc
+options can be passed, for instance use HTML input format (C<@arguments = qw(-f
+html)>) instead of default markdown. This method requires at least pandoc
+version 1.12.1 and the Perl module L<Pandoc::Elements>.
 
 =head2 require( $version_requirement )
 

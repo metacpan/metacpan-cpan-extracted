@@ -84,7 +84,7 @@ App::ElasticSearch::Utilities::QueryString::Plugin - Moo::Role for implementing 
 
 =head1 VERSION
 
-version 5.3
+version 5.4
 
 =head1 INTERFACE
 

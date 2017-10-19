@@ -1,9 +1,9 @@
 package Net::DNS::RR::SPF;
 
 #
-# $Id: SPF.pm 1528 2017-01-18 21:44:58Z willem $
+# $Id: SPF.pm 1593 2017-09-04 14:23:26Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1528 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1593 $)[1];
 
 
 use strict;
@@ -110,6 +110,6 @@ DEALINGS IN THE SOFTWARE.
 
 =head1 SEE ALSO
 
-L<perl>, L<Net::DNS>, L<Net::DNS::RR>, L<Net::DNS::RR::TXT>, RFC4408
+L<perl>, L<Net::DNS>, L<Net::DNS::RR>, L<Net::DNS::RR::TXT>, RFC7208
 
 =cut

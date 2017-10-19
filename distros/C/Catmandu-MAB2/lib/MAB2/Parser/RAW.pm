@@ -1,18 +1,17 @@
 package MAB2::Parser::RAW;
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 use strict;
 use warnings;
 use charnames qw< :full >;
-use Carp qw(croak);
+use Carp qw(carp croak);
 use Readonly;
 
 Readonly my $LEADER_LEN         => 24;
 Readonly my $SUBFIELD_INDICATOR => qq{\N{INFORMATION SEPARATOR ONE}};
 Readonly my $END_OF_FIELD       => qq{\N{INFORMATION SEPARATOR TWO}};
 Readonly my $END_OF_RECORD      => qq{\N{INFORMATION SEPARATOR THREE}};
-
 
 sub new {
     my $class = shift;
@@ -41,7 +40,6 @@ sub new {
     return ( bless $self, $class );
 }
 
-
 sub next {
     my $self = shift;
     if ( my $line = $self->{reader}->getline() ) {
@@ -55,48 +53,59 @@ sub next {
     return;
 }
 
-
 sub _decode {
     my $reader = shift;
-    chomp($reader);
+    chomp $reader;
 
     if ( substr( $reader, -1, 1 ) ne $END_OF_RECORD ) {
-        croak("record terminator not found.");
+        carp "record terminator not found";
     }
 
     my @record;
-    if ( substr( $reader, 0, $LEADER_LEN ) =~ m/(\d{5}\wM2.0\d*\s*\w)/ ) {
-        push( @record, [ 'LDR', '', '_', $1 ] );
+    my $leader = substr $reader, 0, $LEADER_LEN;
+    if ( $leader =~ m/(\d{5}\wM2.0\d*\s*\w)/ ) {
+        push @record, [ 'LDR', '', '_', $leader ];
     }
     else {
-        croak("no valid record leader found.");
+        carp "faulty record leader: \"$leader\"";
     }
 
-    my @fields = split( $END_OF_FIELD, substr( $reader, $LEADER_LEN, -1 ) );
+    my @fields = split $END_OF_FIELD, substr( $reader, $LEADER_LEN, -1 );
 
     for my $field (@fields) {
 
-        my ( $tag, $ind, $data ) = $field =~ m/(\d{3})([A-Za-z0-9\s])(.*)/
-            or croak("no valid field structure found.");
+        if ( length $field <= 4 ) {
+            carp "faulty field: \"$field\"";
+            next;
+        }
 
-        if ( $data =~ m/\s*$SUBFIELD_INDICATOR(.*)/ ) {
-            push(
-                @record,
-                [   $tag,
-                    $ind,
-                    map { ( substr( $_, 0, 1 ), substr( $_, 1 ) ) }
-                        split( /$SUBFIELD_INDICATOR/, $1 )
-                ]
-            );
+        if ( my ( $tag, $ind, $data )
+            = $field =~ m/^(\d{3})([A-Za-z0-9\s])(.*)/ )
+        {
+            if ( $data =~ m/\s*$SUBFIELD_INDICATOR(.*)/ ) {
+                push(
+                    @record,
+                    [   $tag,
+                        $ind,
+                        map { ( substr( $_, 0, 1 ), substr( $_, 1 ) ) }
+                            split /$SUBFIELD_INDICATOR/,
+                        $1
+                    ]
+                );
+            }
+            else {
+                push @record, [ $tag, $ind, '_', $data ];
+            }
         }
         else {
-            push( @record, [ $tag, $ind, '_', $data ] );
+            carp "faulty field structure: \"$field\"";
+            next;
         }
+
     }
 
     return \@record;
 }
-
 
 1;    # End of MAB2::Parser::RAW
 

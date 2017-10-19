@@ -2,7 +2,7 @@ package Debian::WNPP::Query;
 use strict;
 use warnings;
 
-our $VERSION = '0.74';
+our $VERSION = '0.96';
 
 =head1 NAME
 
@@ -51,11 +51,11 @@ use Storable ();
 use WWW::Mechanize ();
 
 our %list_url = (
-    ITP => 'http://www.debian.org/devel/wnpp/being_packaged',
-    RFP => 'http://www.debian.org/devel/wnpp/requested',
-    ITA => 'http://www.debian.org/devel/wnpp/being_adopted',
-    RFA => 'http://www.debian.org/devel/wnpp/rfa_bypackage',
-    O   => 'http://www.debian.org/devel/wnpp/orphaned',
+    ITP => 'https://www.debian.org/devel/wnpp/being_packaged',
+    RFP => 'https://www.debian.org/devel/wnpp/requested',
+    ITA => 'https://www.debian.org/devel/wnpp/being_adopted',
+    RFA => 'https://www.debian.org/devel/wnpp/rfa_bypackage',
+    O   => 'https://www.debian.org/devel/wnpp/orphaned',
 );
 
 sub new {
@@ -192,7 +192,7 @@ sub bugs_for_package {
 
 =item L<Debian::WNPP::Bug>
 
-=item L<http://www.debian.org/devel/wnpp/>
+=item L<https://www.debian.org/devel/wnpp/>
 
 =back
 

@@ -366,7 +366,7 @@ qefft2_import (const char *target_pkg)
 
 
 Font_FreeType
-qefft2_library_new (const char *class)
+qefft2_library_new (void)
     CODE:
         errchk(FT_Init_FreeType(&RETVAL),
                "opening freetype library");
@@ -407,7 +407,6 @@ qefft2_face (Font_FreeType library, const char *filename, int faceidx, FT_Int32 
     PREINIT:
         SV *library_sv;
         QefFT2_Face_Extra *extra;
-        const FT_Bitmap_Size *size;
     CODE:
         errchk(FT_New_Face(library, filename, faceidx, &RETVAL),
                "opening font face");
@@ -419,6 +418,17 @@ qefft2_face (Font_FreeType library, const char *filename, int faceidx, FT_Int32 
         extra->glyph_load_flags = glyph_load_flags;
         extra->glyph_ft = 0;
         RETVAL->generic.data = (void *) extra;
+        /*
+        set active charmap if we don't have one;  caused by regression:
+        https://git.savannah.gnu.org/cgit/freetype/freetype2.git/commit/?id=79e3789f81e14266578e71196ce71ecf5381d142
+        http://lists.nongnu.org/archive/html/freetype/2017-10/msg00006.html
+        */
+#if (QEFFT2_FT_AT_LEAST(2,8,1))
+        if (!RETVAL->charmap && RETVAL->num_charmaps) {
+            RETVAL->charmap = RETVAL->charmaps[0];
+        }
+#endif
+
     OUTPUT:
         RETVAL
 
@@ -628,7 +638,7 @@ qefft2_face_fixed_sizes (Font_FreeType_Face face)
         int i;
         FT_Bitmap_Size *size;
         HV *hash;
-        double pt, ppem;
+        double pt = 0.0, ppem;
     PPCODE:
         if (GIMME_V != G_ARRAY) {
             PUSHs(sv_2mortal(newSViv((int) face->num_fixed_sizes)));
@@ -1125,10 +1135,9 @@ qefft2_glyph_bitmap (Font_FreeType_Glyph glyph, UV render_mode = FT_RENDER_MODE_
         FT_Bitmap *bitmap;
         unsigned char *buf;
         int i, j;
-        int bits, bitpos;
+        int bits = 0;
         AV *rows;
         unsigned char *row_buf;
-        STRLEN len;
     PPCODE:
         face = (FT_Face) SvIV(glyph->face_sv);
         /* XXX: For some reason I can't work out how to load the bitmap and
@@ -1147,13 +1156,13 @@ qefft2_glyph_bitmap (Font_FreeType_Glyph glyph, UV render_mode = FT_RENDER_MODE_
         rows = newAV();
         av_extend(rows, bitmap->rows - 1);
         buf = bitmap->buffer;
-        row_buf = Newx(row_buf, bitmap->width, unsigned char);
+        Newx(row_buf, bitmap->width, unsigned char);
 
         if (bitmap->pixel_mode == FT_PIXEL_MODE_MONO) {
             for (i = 0; i < bitmap->rows; ++i) {
                 for (j = 0; j < bitmap->width; ++j) {
                     if (j % 8 == 0)
-                        bits = buf[j / 8], bitpos = 0;
+                        bits = buf[j / 8];
                     row_buf[j] = bits & 0x80 ? 0xFF : 0x00;
                     bits <<= 1;
                 }

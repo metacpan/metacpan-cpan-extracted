@@ -15,9 +15,9 @@ sub UNITCHECK {				## restore %SIG after compilation
 package Net::DNS::RR::SIG;
 
 #
-# $Id: SIG.pm 1582 2017-07-07 21:45:14Z willem $
+# $Id: SIG.pm 1597 2017-09-22 08:04:02Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1582 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
 
 
 use strict;
@@ -75,7 +75,7 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 
 	my ( $hash, $packet ) = @opaque;
 
-	my $signame = $self->{signame} || return '';
+	my $signame = $self->{signame};
 
 	if ( DNSSEC && !$self->{sigbin} ) {
 		my $private = $self->{private} || die 'missing key reference';
@@ -149,7 +149,7 @@ sub _defaults {				## specify RR attribute default values
 
 	my %algbyval = reverse @algbyname;
 
-	my @algrehash = map /^\d/ ? ($_) x 3 : do { s/[\W]//g; uc($_) }, @algbyname;
+	my @algrehash = map /^\d/ ? ($_) x 3 : do { s/[\W_]//g; uc($_) }, @algbyname;
 	my %algbyname = @algrehash;    # work around broken cperl
 
 	sub _algbyname {
@@ -273,9 +273,8 @@ sub signame {
 
 sub sig {
 	my $self = shift;
-
-	$self->sigbin( MIME::Base64::decode( join "", @_ ) ) if scalar @_;
-	MIME::Base64::encode( $self->sigbin(), "" ) if defined wantarray;
+	return MIME::Base64::encode( $self->sigbin(), "" ) unless scalar @_;
+	$self->sigbin( MIME::Base64::decode( join "", @_ ) );
 }
 
 

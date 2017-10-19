@@ -1,5 +1,8 @@
 Revision history for Dancer2::Plugin::Paginator
 
+2.07  2017-10-17 MANWAR
+      - Added missing test prereq as recommended by CPANTS.
+
 2.06  2017-09-16 MANWAR
       - Added test script t/manifest.t and t/pod.t.
 

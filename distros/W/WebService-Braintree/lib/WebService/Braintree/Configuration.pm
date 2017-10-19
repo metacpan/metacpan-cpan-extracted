@@ -1,5 +1,8 @@
 package WebService::Braintree::Configuration;
-$WebService::Braintree::Configuration::VERSION = '0.93';
+$WebService::Braintree::Configuration::VERSION = '0.94';
+use 5.010_001;
+use strictures 1;
+
 =head1 NAME
 
 WebService::Braintree::Configuration
@@ -96,66 +99,85 @@ has environment => (
     is => 'rw',
     trigger => sub {
         my ($self, $new_value, $old_value) = @_;
-        if ($new_value !~ /integration|development|sandbox|production|qa/) {
-            warn "Assigned invalid value to WebService::Braintree::Configuration::environment";
+        my %valid = map { $_ => 1 } qw(
+            development integration sandbox qa production
+        );
+        if (!$valid{$new_value}) {
+            warn 'Assigned invalid value to WebService::Braintree::Configuration::environment';
         }
-        if ($new_value eq "integration") {
-            $self->public_key("integration_public_key");
-            $self->private_key("integration_private_key");
-            $self->merchant_id("integration_merchant_id");
+
+        if ($new_value eq 'integration') {
+            $self->public_key('integration_public_key');
+            $self->private_key('integration_private_key');
+            $self->merchant_id('integration_merchant_id');
         }
     }
 );
 
 has gateway => (is  => 'ro', lazy => 1, default => sub {
-    WebService::Braintree::Gateway->new({config => shift})
+    WebService::Braintree::Gateway->new({config => shift});
 });
 
-sub base_merchant_path {
-    my $self = shift;
-    return "/merchants/" . $self->merchant_id;
-}
-
+# This method is used in ::HTTP
 sub base_merchant_url {
     my $self = shift;
     return $self->base_url() . $self->base_merchant_path;
 }
 
+# Below here, these methods do *NOT* appear to be used outside of this class.
+
+sub base_merchant_path {
+    my $self = shift;
+    return '/merchants/' . $self->merchant_id;
+}
+
 sub base_url {
     my $self = shift;
-    return $self->protocol . "://" . $self->server . ':' . $self->port;
+    return $self->protocol . '://' . $self->server . ':' . $self->port;
+}
+
+sub is_development {
+    my $self = shift;
+    return 1 if $self->environment eq 'development';
+    return 1 if $self->environment eq 'integration';
+    return;
 }
 
 sub port {
     my $self = shift;
-    if ($self->environment =~ /integration|development/) {
-        return $ENV{'GATEWAY_PORT'} || "3000"
+    if ($self->is_development) {
+        return $ENV{'GATEWAY_PORT'} || '3000'
     } else {
-        return "443";
+        return 443;
     }
 }
 
 sub server {
     my $self = shift;
-    return "localhost" if $self->environment eq 'integration';
-    return "localhost" if $self->environment eq 'development';
-    return "api.sandbox.braintreegateway.com" if $self->environment eq 'sandbox';
-    return "api.braintreegateway.com" if $self->environment eq 'production';
-    return "qa-master.braintreegateway.com" if $self->environment eq 'qa';
+    return {
+        development => 'localhost',
+        integration => 'localhost',
+        sandbox     => 'api.sandbox.braintreegateway.com',
+        qa          => 'qa-master.braintreegateway.com',
+        production  => 'api.braintreegateway.com',
+    }->{$self->environment};
 }
 
 sub auth_url {
     my $self = shift;
-    return "http://auth.venmo.dev:9292" if $self->environment eq 'integration';
-    return "http://auth.venmo.dev:9292" if $self->environment eq 'development';
-    return "https://auth.sandbox.venmo.com" if $self->environment eq 'sandbox';
-    return "https://auth.venmo.com" if $self->environment eq 'production';
-    return "https://auth.qa.venmo.com" if $self->environment eq 'qa';
+    return {
+        development => 'http://auth.venmo.dev:9292',
+        integration => 'http://auth.venmo.dev:9292',
+        sandbox     => 'https://auth.sandbox.venmo.com',
+        qa          => 'https://auth.qa.venmo.com',
+        production  => 'https://auth.venmo.com',
+    }->{$self->environment};
 }
+
 
 sub ssl_enabled {
     my $self = shift;
-    return ($self->environment !~ /integration|development/);
+    return ! $self->is_development;
 }
 
 sub protocol {
@@ -173,6 +195,7 @@ This returns the Braintree API version this distribution speaks.
 
 =cut
 
+# This method is used in ::HTTP
 sub api_version {
     return "4";
 }

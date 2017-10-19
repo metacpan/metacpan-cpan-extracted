@@ -1,5 +1,8 @@
 Revision history for Module-Build-SysPath
 
+0.18    13 October 2017
+    - author tests moved to xt/
+
 0.17    20 Sep 2014
     - qw now with () (required for new Perl versions) - thanks Slaven Rezić
 

@@ -1,4 +1,9 @@
 Revision history for WebService-Braintree
+0.94    2017-10-16
+        Big code cleanup and test refactor
+        Make a bunch of sandbox tests run
+        Comment out some low value sandbox tests that take excessively long PR # 12
+        Does not support perl < 5.10.1
 0.93    2017-08-26
         Fix sandbox test failures.  Thanks ROBK.
 0.92    2017-08-12

@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::AnyThing;
-$Config::Model::AnyThing::VERSION = '2.112';
+$Config::Model::AnyThing::VERSION = '2.113';
 use Mouse;
 
 # FIXME: must cleanup warp mechanism to implement this
@@ -29,7 +29,7 @@ has instance     => (
     is => 'ro',
     isa => 'Config::Model::Instance',
     weak_ref => 1,
-    handles => [qw/show_message/]
+    handles => [qw/show_message root_path/]
 );
 
 # needs_check defaults to 1 to trap undef mandatory values
@@ -327,7 +327,7 @@ Config::Model::AnyThing - Base class for configuration tree item
 
 =head1 VERSION
 
-version 2.112
+version 2.113
 
 =head1 SYNOPSIS
 
@@ -474,6 +474,10 @@ internal parameter.
 =head2 show_message( string )
 
 Forwarded to L<Config::Model::Instance/"show_message( string )">.
+
+=head2 root_path
+
+Forwarded to L<Config::Model::Instance/"root_path">.
 
 =head2 model_searcher ()
 

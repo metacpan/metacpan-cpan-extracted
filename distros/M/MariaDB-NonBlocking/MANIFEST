@@ -7,6 +7,7 @@ t/00-load.t
 examples/select.pl
 examples/promises.pl
 lib/MariaDB/NonBlocking/Select.pm
+lib/MariaDB/NonBlocking/Event.pm
 lib/MariaDB/NonBlocking/Promises.pm
 NonBlocking.xs
 ignore.txt

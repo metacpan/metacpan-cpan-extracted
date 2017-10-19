@@ -1,9 +1,9 @@
 package Net::DNS::RR::NSEC3;
 
 #
-# $Id: NSEC3.pm 1567 2017-05-19 09:52:52Z willem $
+# $Id: NSEC3.pm 1597 2017-09-22 08:04:02Z willem $
 #
-our $VERSION = (qw$LastChangedRevision: 1567 $)[1];
+our $VERSION = (qw$LastChangedRevision: 1597 $)[1];
 
 
 use strict;
@@ -41,8 +41,8 @@ my %digest = (
 
 	my %digestbyval = reverse @digestbyname;
 
-	my @digestrehash = map /^\d/ ? ($_) x 3 : do { s/[\W]//g; uc($_) }, @digestbyname, @digestalias;
-	my %digestbyname = @digestrehash;			# work around broken cperl
+	my @digestrehash = map /^\d/ ? ($_) x 3 : do { s/[\W_]//g; uc($_) }, @digestbyname;
+	my %digestbyname = ( @digestalias, @digestrehash );	# work around broken cperl
 
 	sub _digestbyname {
 		my $name = shift;
@@ -76,7 +76,6 @@ sub _decode_rdata {			## decode rdata from wire-format octet string
 sub _encode_rdata {			## encode rdata as wire-format octet string
 	my $self = shift;
 
-	return '' unless defined $self->{hnxtname};
 	my $salt = $self->saltbin;
 	my $hash = $self->{hnxtname};
 	pack 'CCn C a* C a* a*', $self->algorithm, $self->flags, $self->iterations,
@@ -89,7 +88,6 @@ sub _encode_rdata {			## encode rdata as wire-format octet string
 sub _format_rdata {			## format rdata portion of RR string.
 	my $self = shift;
 
-	return '' unless defined $self->{hnxtname};
 	my @rdata = (
 		$self->algorithm, $self->flags, $self->iterations,
 		$self->salt || '-', $self->hnxtname, $self->typelist
@@ -159,10 +157,8 @@ sub iterations {
 
 sub salt {
 	my $self = shift;
-	my @args = map { /[^0-9A-Fa-f]/ ? croak "corrupt hexadecimal" : $_ } @_;
-
-	$self->saltbin( pack "H*", join "", @args ) if scalar @args;
-	unpack "H*", $self->saltbin() if defined wantarray;
+	return unpack "H*", $self->saltbin() unless scalar @_;
+	$self->saltbin( pack "H*", map /[^\dA-F]/i ? croak "corrupt hex" : $_, join "", @_ );
 }
 
 

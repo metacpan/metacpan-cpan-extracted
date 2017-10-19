@@ -373,6 +373,8 @@ return_with_exit_code:
     # Show postponed message before exiting
     $urpm->{error}->($urpm::postponed_msg) if $urpm::postponed_code != 0;
 
+    # Workaround a segfault by explicitly deleting the window (mga#21167)
+    undef $mainw;
     exit $exit_code;
 }
 

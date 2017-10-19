@@ -1,16 +1,16 @@
 package Mylisp::Grammar;
 
 use 5.012;
-no warnings "experimental";
+no warnings 'experimental';
 
 use Exporter;
-our @ISA       = qw(Exporter);
-our @EXPORT_OK = qw(get_mylisp_grammar);
+our @ISA    = qw(Exporter);
+our @EXPORT = qw(get_my_grammar);
 
-sub get_mylisp_grammar {
-  return << 'EOF'
-   
-   mylisp = ^ |_ _pod Expr|+ $ ;
+sub get_my_grammar {
+  return <<'EOF'
+
+   door   = ^ |_ _pod Expr|+ $ ;
 
    _      = |\s+ _comm|+ ;
    _pod   = '=pod' ~ '=end' ;
@@ -19,46 +19,44 @@ sub get_mylisp_grammar {
    Expr   = '(' |_ atom|+ ')' ;
 
    atom   = | 
-              Expr Array Hash Lstr
-              Int Kstr Str String Char
-              Aindex Arange Hkey Ocall Onew
-              Oper Sub Var
+              Expr Array Hash
+              Int Kstr Lstr Str String Char
+              Aindex Arange Ocall
+              Oper Ns Arg Var Sub
             | ;
+
+   Array  = '[' |_ \, atom|+ ']' ;
+   Hash   = '{' |_ \, Pair|+ '}' ;
+   Pair   = |Kstr Str Sub| \s* '=>' \s* atom ;
 
    Int    = \-? \d+ ;
 
-   Kstr   = \: [\w:]+ ;
+   Kstr   = \: [\w\-:]+ ;
    Lstr   = \'\'\' ~ { \'\'\' } ;
    
-   Str    = \' |schars char|* \' ;
+   Str    = \' |schars char|+ \' ;
    schars = [^\\']+ ;
    char   = \\ . ;
  
-   String = \" |Chars Char Scalar|* \" ;
+   String = \" |Chars Char Scalar|+ \" ;
    Chars  = [^\\"$]+ ;
    Char   = \\ . ;
    Scalar = '$' [\a\-]+ ;
 
-   Oper   = [\-+=><!~|&]+ ;
-   Sub    = \a [\-\w:]* ;
-   Var    = [$@%] [\-\w:?+]+ ;
+   Aindex = Var {'[' |Int Kstr Scalar| ']'}+ ;
 
-   Array  = '[' |_ \, atom|* ']' ;
-   Hash   = '{' |_ \, Pair|* '}' ;
-   Pair   = |Kstr Str| \s* '=>' \s* atom ;
-
-   Aindex = Var {'[' Int ']'}+ ;
-
-   Arange = Var Range ;
-   Range  = '[' From? ':' To? ']' ;
-   From   = |\d+ {[$][\a\-]+}| ;
-   To     = |{'-'? \d+} {[$][\a\-]+}|;
+   Arange = Var '[' |Int Scalar| ':' |Int Scalar|? ']' ;
    
-   Hkey   = Var {'[' |Kstr Scalar| ']'}+ ;
    Ocall  = Var \. Sub ;
-   Onew   = Sub \. Sub ;
+
+   Oper   = [\-+=><!~|&]+ ;
+   Ns     = name {'::' name}+ ;
+   Arg    = [$@%] name ':' type ;
+   Sub    = name ;
+   Var    = [$@%] name ;
+   name   = [\a\-]+ ;
+   type   = [\a\-?+]+ ;
 
 EOF
 }
-
 1;

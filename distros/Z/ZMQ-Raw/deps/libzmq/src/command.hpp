@@ -30,6 +30,7 @@
 #ifndef __ZMQ_COMMAND_HPP_INCLUDED__
 #define __ZMQ_COMMAND_HPP_INCLUDED__
 
+#include <string>
 #include "stdint.hpp"
 
 namespace zmq
@@ -44,10 +45,11 @@ namespace zmq
     //  This structure defines the commands that can be sent between threads.
 
 #ifdef _MSC_VER
-    __declspec(align(64)) struct command_t
-#else
-    struct command_t
+#pragma warning(push)
+#pragma warning(disable: 4324) // C4324: alignment padding warnings
+    __declspec(align(64))
 #endif
+    struct command_t
     {
         //  Object to process the command.
         zmq::object_t *destination;
@@ -68,6 +70,7 @@ namespace zmq
             term_req,
             term,
             term_ack,
+            term_endpoint,
             reap,
             reaped,
             inproc_connected,
@@ -152,6 +155,12 @@ namespace zmq
             struct {
             } term_ack;
 
+            //  Sent by session_base (I/O thread) to socket (application thread)
+            //  to ask to disconnect the endpoint.
+            struct {
+                std::string *endpoint;
+            } term_endpoint;
+
             //  Transfers the ownership of the closed socket
             //  to the reaper thread.
             struct {
@@ -170,6 +179,7 @@ namespace zmq
         } args;
 #ifdef _MSC_VER
     };
+#pragma warning(pop)
 #else
     } __attribute__((aligned(64)));
 #endif

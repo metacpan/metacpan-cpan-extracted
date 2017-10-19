@@ -1,5 +1,7 @@
 package WebService::Braintree::WebhookTestingGateway;
-$WebService::Braintree::WebhookTestingGateway::VERSION = '0.93';
+$WebService::Braintree::WebhookTestingGateway::VERSION = '0.94';
+use 5.010_001;
+use strictures 1;
 
 use MIME::Base64;
 use POSIX qw(strftime);
@@ -271,5 +273,6 @@ XML
 }
 
 __PACKAGE__->meta->make_immutable;
-1;
 
+1;
+__END__

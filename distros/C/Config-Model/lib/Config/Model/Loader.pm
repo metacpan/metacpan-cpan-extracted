@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Loader;
-$Config::Model::Loader::VERSION = '2.112';
+$Config::Model::Loader::VERSION = '2.113';
 use Carp;
 use strict;
 use warnings;
@@ -226,9 +226,12 @@ sub _load {
             }
         }
 
-        my @instructions = _split_cmd($cmd);
-        my ( $element_name, $action, $function_param, $id, $subaction, $value_function_param, $value, $note ) =
-            @instructions;
+        my ( $element_name, $action, $function_param, $id, $subaction, $value_function_param2, $value_param, $note ) =
+            _split_cmd($cmd);
+
+        # regexp ensure that only $value_function_param  $value_param is set
+        my $value = $value_function_param2 // $value_param ;
+        my @instructions = ( $element_name, $action, $function_param, $id, $subaction, $value, $note );
 
         if ( $logger->is_debug ) {
             my @disp = map { defined $_ ? "'$_'" : '<undef>' } @instructions;
@@ -375,7 +378,7 @@ sub unquote {
 
 sub _load_check_list {
     my ( $self, $node, $check, $inst, $cmdref ) = @_;
-    my ( $element_name, $action, $f_arg, $id, $subaction, $f2_arg, $value, $note ) = @$inst;
+    my ( $element_name, $action, $f_arg, $id, $subaction, $value, $note ) = @$inst;
 
     my $element = $node->fetch_element( name => $element_name, check => $check );
 
@@ -519,7 +522,7 @@ sub _insort_hash_of_node {
 
 sub _load_list {
     my ( $self, $node, $check, $inst, $cmdref ) = @_;
-    my ( $element_name, $action, $f_arg, $id, $subaction, $f2_arg, $value, $note ) = @$inst;
+    my ( $element_name, $action, $f_arg, $id, $subaction, $value, $note ) = @$inst;
 
     my $element = $node->fetch_element( name => $element_name, check => $check );
 
@@ -613,7 +616,7 @@ sub _load_list {
 
 sub _load_hash {
     my ( $self, $node, $check, $inst, $cmdref ) = @_;
-    my ( $element_name, $action, $f_arg, $id, $subaction, $f2_arg, $value, $note ) = @$inst;
+    my ( $element_name, $action, $f_arg, $id, $subaction, $value, $note ) = @$inst;
 
     unquote( $id, $value, $note );
 
@@ -731,7 +734,7 @@ sub _load_hash {
 
 sub _load_leaf {
     my ( $self, $node, $check, $inst, $cmdref ) = @_;
-    my ( $element_name, $action, $f_arg, $id, $subaction, $f2_arg, $value, $note ) = @$inst;
+    my ( $element_name, $action, $f_arg, $id, $subaction, $value, $note ) = @$inst;
 
     unquote( $id, $value );
 
@@ -784,33 +787,84 @@ sub _load_leaf {
     );
 }
 
-sub _load_value {
-    my ( $self, $element, $check, $subaction, $value, $inst ) = @_;
+# sub is called with  ( $self, $element, $value, $check, $instructions )
+# function_args are the arguments passed to the load command
+my %load_value_dispatch = (
+    '=' => sub { $_[1]->store( value => $_[2], check => $_[3] ); return 'ok'; },
+    '.=' => \&_append_value,
+    '=~' => \&_apply_regexp_on_value,
+    '=.file' => \&_store_file_in_value,
+    '=.env' => sub { $_[1]->store( value => $ENV{$_[2]}, check => $_[3] ); return 'ok'; },
+);
 
-    $logger->debug("_load_value: action '$subaction' value '$value' check $check");
-    if ( $subaction eq '=' and $element->isa('Config::Model::Value') ) {
-        $element->store( value => $value, check => $check );
+sub _append_value {
+    my ( $self, $element, $value, $check, $instructions ) = @_;
+    my $orig = $element->fetch( check => $check );
+    $element->store( value => $orig . $value, check => $check );
+}
+
+sub _apply_regexp_on_value {
+    my ( $self, $element, $value, $check, $instructions ) = @_;
+
+    my $orig = $element->fetch( check => $check );
+    return unless defined $orig;
+
+    eval("\$orig =~ $value;");
+    if ($@) {
+        Config::Model::Exception::Load->throw(
+            object  => $element,
+            command => $instructions,
+            error => "Failed regexp '$value' on " . "element '"
+                . $element->name . "' : $@"
+        );
     }
-    elsif ( $subaction eq '.=' and $element->isa('Config::Model::Value') ) {
-        my $orig = $element->fetch( check => $check );
-        $element->store( value => $orig . $value, check => $check );
+    $element->store( value => $orig, check => $check );
+}
+
+sub _store_file_in_value {
+    my ( $self, $element, $value, $check, $instructions ) = @_;
+
+    if ($value eq '-') {
+        $element->store( value => join('',<STDIN>), check => $check );
+        return 'ok';
     }
-    elsif ( $subaction eq '=~' and $element->isa('Config::Model::Value') ) {
-        my $orig = $element->fetch( check => $check );
-        if ( defined $orig ) {
-            eval("\$orig =~ $value;");
-            if ($@) {
-                Config::Model::Exception::Load->throw(
-                    object  => $element,
-                    command => $inst,
-                    error => "Failed regexp '$value' on " . "element '" . $element->name . "' : $@"
-                );
-            }
-            $element->store( value => $orig, check => $check );
-        }
+
+    my $path = $element->root_path->child($value);
+    if ($path->is_file) {
+        $element->store( value => $path->slurp_utf8, check => $check );
     }
     else {
-        return undef;
+        Config::Model::Exception::Load->throw(
+            object  => $element,
+            command => $instructions,
+            error => "cannot read file $value"
+        );
+    }
+}
+
+sub _load_value {
+    my ( $self, $element, $check, $subaction, $value, $instructions ) = @_;
+
+    if (not $element->isa('Config::Model::Value')) {
+        my $class = ref($element);
+        Config::Model::Exception::Load->throw(
+            object  => $element,
+            command => $instructions,
+            error   => "Load error: _load_value called on non Value object. ($class)"
+        );
+    }
+
+    $logger->debug("_load_value: action '$subaction' value '$value' check $check");
+    my $dispatch = $load_value_dispatch{$subaction};
+    if ($dispatch) {
+        return $dispatch->( $self, $element, $value, $check, $instructions );
+    }
+    else {
+        Config::Model::Exception::Load->throw(
+            object  => $element,
+            command => $instructions,
+            error => "Unexpected operator or function on value: $subaction"
+            );
     }
 
     $logger->debug("_load_value: done returns ok");
@@ -833,7 +887,7 @@ Config::Model::Loader - Load serialized data into config tree
 
 =head1 VERSION
 
-version 2.112
+version 2.113
 
 =head1 SYNOPSIS
 
@@ -1135,6 +1189,16 @@ Undef element C<xxx>
 =item xxx.=zzz
 
 Appends C<zzz> value to current value (valid for C<leaf> elements).
+
+=item xxx=.file(yyy)
+
+Store the content of file C<yyy> in element C<xxx>.
+
+Store STDIn in value xxx when C<yyy> is '-'.
+
+=item xxx=.env(yyy)
+
+Store the content of environment variable C<yyy> in element C<xxx>.
 
 =back
 

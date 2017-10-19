@@ -4,7 +4,7 @@
       "Andrew Main (Zefram) <zefram@fysh.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Module::Build version 0.4222",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
@@ -40,18 +40,23 @@
    "provides" : {
       "Module::Runtime" : {
          "file" : "lib/Module/Runtime.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Module-Runtime@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Module-Runtime"
+      },
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
+         "type" : "git",
          "url" : "git://git.fysh.org/zefram/Module-Runtime.git"
       }
    },
-   "version" : "0.015",
+   "version" : "0.016",
    "x_serialization_backend" : "JSON::PP version 2.93"
 }

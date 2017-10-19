@@ -6,7 +6,7 @@ use MODS::Record;
 use Catmandu::Util;
 use JSON;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 with 'Catmandu::Logger';
 

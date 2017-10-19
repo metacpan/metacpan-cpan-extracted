@@ -1,6 +1,6 @@
 package Dancer2::Plugin::Auth::Extensible;
 
-our $VERSION = '0.704';
+our $VERSION = '0.705';
 
 use strict;
 use warnings;
@@ -212,7 +212,8 @@ has _template_tiny => (
 
 plugin_hooks 'before_authenticate_user', 'after_authenticate_user',
   'before_create_user', 'after_create_user',
-  'login_required', 'permission_denied', 'after_login_success';
+  'login_required', 'permission_denied', 'after_login_success',
+  'before_logout';
 
 #
 # keywords
@@ -1174,6 +1175,8 @@ sub _logout_route {
     my $req = $app->request;
     my $plugin = $app->with_plugin('Auth::Extensible');
 
+    $plugin->execute_plugin_hook( 'before_logout' );
+
     $app->destroy_session;
 
     if ( my $url = $req->parameters->get('return_url') ) {
@@ -1246,10 +1249,13 @@ sub _post_login_route {
         }
     }
 
+    my $return_url_escaped = uri_unescape(
+        $app->request->parameters->get('return_url')
+    );
+
     if ( $plugin->logged_in_user ) {
         # uncoverable condition false
-        $app->redirect( $app->request->parameters->get('return_url')
-              || $plugin->user_home_page );
+        $app->redirect( $return_url_escaped || $plugin->user_home_page );
     }
 
     my $auth_realm = $params->{realm} || $params->{__auth_extensible_realm};
@@ -1267,8 +1273,7 @@ sub _post_login_route {
         $app->log( core => "Realm is $realm" );
         $plugin->execute_plugin_hook( 'after_login_success' );
         # uncoverable condition false
-        $app->redirect( $app->request->parameters->get('return_url')
-              || $plugin->user_home_page );
+        $app->redirect( $return_url_escaped || $plugin->user_home_page );
     }
     else {
         $app->request->vars->{login_failed}++;
@@ -1575,9 +1580,43 @@ handle the route. Note that it must be a fully qualified sub. E.g.
 
 Then in your code you might simply use a template:
 
+    sub login_page_handler {
+        my $return_url = query_parameters->get('return_url');
+        template
+            'account/login',
+            { title => 'Sign in',
+              return_url => $return_url,
+            },
+            { layout => 'login.tt',
+            };
+    }
+
     sub permission_denied_page_handler {
         template 'account/login';
     }
+
+and your account/login.tt template might look like:
+
+    [% IF vars.login_failed %]
+    <div class="alert alert-danger">
+        <strong>Login Failed</strong> Try again
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    [% END %]
+
+    <form method = "post" lpformnum="1" class="form-signin">
+        <h2 class="form-signin-heading">Please sign in</h2>
+        <label for="username" class="sr-only">Username</label>
+        <input type="text" name="username" id="username" class="form-control" placeholder="User name" required autofocus>
+        <label for="password" class="sr-only">Password</label>
+        <input type="password" name="password" id="password" class="form-control" placeholder="Password" required>
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+        <br>
+        <input type="hidden" name="return_url" value="[% return_url %]">
+    </form>
+
 
 If the user is logged in, but tries to access a route which requires a specific
 role they don't have, they will be redirected to the "permission denied" page
@@ -2117,6 +2156,10 @@ reference of any errors from the main method or from the provider.
 
 Called after successful login just before redirect is called.
 
+=head2 before_logout
+
+Called just before the session gets destroyed on logout.
+
 =head1 AUTHOR
 
 David Precious, C<< <davidp at preshweb.co.uk> >>
@@ -2162,9 +2205,13 @@ Gabor Szabo (GH #11, #16, #18).
 
 Evan Brown (GH #20, #32).
 
-Jason Lewis (Unix provider problem).
+Jason Lewis (Unix provider problem, GH#62).
 
 Matt S. Trout (mst) for L<Zero redirect login the easy and friendly way|http://shadow.cat/blog/matt-s-trout/humane-login-screens/>.
+
+Ben Kaufman "whosgonna" (GH#79)
+
+Dominic Sonntag (GH#70)
 
 =head1 LICENSE AND COPYRIGHT
 

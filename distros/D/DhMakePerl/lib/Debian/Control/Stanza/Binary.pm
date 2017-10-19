@@ -20,7 +20,7 @@ context.
 The supported fields for binary stanzas are listed below. For more information
 about each field's meaning, consult the section named C<Source package control
 files -- debian/control> of the Debian Policy Manual at
-L<http://www.debian.org/doc/debian-policy/>
+L<https://www.debian.org/doc/debian-policy/>
 
 Note that real control fields may contain dashes in their names. These are
 replaced with underscores.
@@ -87,13 +87,13 @@ package Debian::Control::Stanza::Binary;
 use strict;
 use warnings;
 
-our $VERSION = '0.77';
+our $VERSION = '0.96';
 
 use base 'Debian::Control::Stanza';
 
 use constant fields => qw(
     Package Architecture Section Priority Essential Depends Recommends Suggests
-    Enhances Replaces Pre_Depends Conflicts Breaks Provides Description
+    Enhances Replaces Pre_Depends Conflicts Breaks Provides Built_Using Description
     _short_description _long_description
 );
 

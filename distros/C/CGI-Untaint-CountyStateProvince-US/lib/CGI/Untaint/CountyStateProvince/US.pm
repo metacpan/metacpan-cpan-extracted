@@ -13,17 +13,17 @@ CGI::Untaint::CountyStateProvince::US - Add U.S. states to CGI::Untaint::CountyS
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 SYNOPSIS
 
 Adds a list of U.S. states to the list of counties/state/provinces
-which are known by the CGI::Untaint::CountyStateProvince validator so that
-an HTML form sent by CGI contains a valid U.S. state.
+which are known by the CGI::Untaint::CountyStateProvince validator allowing you
+to verify that a field in an HTML form contains a valid U.S. state.
 
 You must include CGI::Untaint::CountyStateProvince::US after including
 CGI::Untaint, otherwise it won't work.
@@ -53,7 +53,7 @@ sub is_valid {
 
 	my $value = uc($self->value);
 
-	if($value =~ /([A-Z\s]+)/) {
+	if($value =~ /([A-Z][A-Z\s]+)/) {
 		$value = $1;
 	} else {
 		return 0;
@@ -61,14 +61,14 @@ sub is_valid {
 
 	unless($self->{_validator}) {
 		$self->{_validator} = Locale::SubCountry->new('US');
-	}
-
-	unless($self->{_validator}) {
-		return 0;
+		unless($self->{_validator}) {
+			return 0;
+		}
 	}
 
 	my $state = $self->{_validator}->code($value);
 	if($state && ($state ne 'unknown')) {
+		# Given full state name
 		# Detaintify
 		if($state =~ /(^[A-Z]{2}$)/) {
 			return $1;
@@ -77,6 +77,7 @@ sub is_valid {
 
 	$state = $self->{_validator}->full_name($value);
 	if($state && ($state ne 'unknown')) {
+		# Given two letter abbreviation
 		return $value;
 	}
 
@@ -101,9 +102,9 @@ sub value {
 }
 
 BEGIN {
-	my $gb = CGI::Untaint::CountyStateProvince::US->_new();
+	my $us = CGI::Untaint::CountyStateProvince::US->_new();
 
-	push @CGI::Untaint::CountyStateProvince::countries, $gb;
+	push @CGI::Untaint::CountyStateProvince::countries, $us;
 };
 
 =head1 AUTHOR
@@ -115,7 +116,7 @@ Nigel Horne, C<< <njh at bandsman.co.uk> >>
 Only two letter abbreviations are allowable, so 'Mass' won't work for
 Massachusetts.
 
-Please report any bugs or feature requests to C<bug-cgi-untaint-csp-gb at rt.cpan.org>, or through
+Please report any bugs or feature requests to C<bug-cgi-untaint-csp-us at rt.cpan.org>, or through
 the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=CGI-Untaint-CountyStateProvince>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 

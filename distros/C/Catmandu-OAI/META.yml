@@ -43,7 +43,7 @@ resources:
   bugtracker: https://github.com/LibreCat/Catmandu-OAI/issues
   homepage: https://github.com/LibreCat/Catmandu-OAI
   repository: https://github.com/LibreCat/Catmandu-OAI.git
-version: '0.17'
+version: '0.18'
 x_contributors:
   - 'Christian Pietsch <christian.pietsch@uni-bielefeld.de>'
   - 'Jakob Voss <voss@gbv.de>'

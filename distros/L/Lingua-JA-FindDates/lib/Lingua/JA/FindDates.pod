@@ -20,14 +20,10 @@ Lingua::JA::FindDates - scan text to find dates in a Japanese format
     my $dates = '昭和４１年三月１６日';
     print subsjdate ($dates), "\n";
     
-    # prints "March 16, 1966"
-    
     # Find and substitute Japanese dates within a string:
     
     $dates = 'blah blah blah 三月１６日';
     print subsjdate ($dates), "\n";
-    
-    # prints "blah blah blah March 16"
     
     # subsjdate can also call back a user-supplied routine each time a
     # date is found:
@@ -41,8 +37,6 @@ Lingua::JA::FindDates - scan text to find dates in a Japanese format
     my $data = 'xyz';               # something to send to replace_callback
     subsjdate ($dates, {replace => \&replace_callback, data => $data});
     
-    # prints "'三月１６日' was replaced by 'March 16'."
-    
     # A routine can be used to format the date any way, letting C<subsjdate>
     # print it:
     
@@ -54,12 +48,9 @@ Lingua::JA::FindDates - scan text to find dates in a Japanese format
     $dates = '三月１６日';
     print subsjdate ($dates, {make_date => \&my_date}), "\n";
     
-    # This prints "3/16"
-    
     # Convert Western to Japanese dates
     use Lingua::JA::FindDates 'seireki_to_nengo';
     print seireki_to_nengo ('1989年1月1日'), "\n";
-    # This prints "昭和64年1月1日".
 
 
 produces output
@@ -71,12 +62,12 @@ produces output
     昭和64年1月1日
 
 
-(This example is included as L<F<synopsis.pl>|https://api.metacpan.org/source/BKB/Lingua-JA-FindDates-0.024/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.026/examples/synopsis.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This documents Lingua::JA::FindDates version 0.024
+This documents Lingua::JA::FindDates version 0.026
 corresponding to git commit L<ba6a0c6a9ec653333dbabf2076dd5f71a17b64b9|https://github.com/benkasminbullock/Lingua--JA--FindDates/commit/ba6a0c6a9ec653333dbabf2076dd5f71a17b64b9> released on Tue Mar 14 16:36:13 2017 +0900.
 
 =head1 DESCRIPTION
@@ -129,7 +120,6 @@ following type of operation:
 If the text contains the interval between two dates, C<subsjdate>
 attempts to convert that into an English-language interval.
 
-
 The default dates are American-style, with the month first. Users can
 supply a different date-making function using the second argument:
 
@@ -164,7 +154,7 @@ supplied, C<subsjdate> simply passes the undefined value.
 
 This is a replacement for the default L</default_make_date>
 function. The default function turns "平成10年11月12日" into "November
-12, 1998". To change this to dates in the form "Th 2008/7/3", use a
+12, 1998". To change this to dates in the form "Th 1998/11/10", use a
 routine like the following:
 
     
@@ -176,17 +166,17 @@ routine like the following:
         return qw{Bad Mo Tu We Th Fr Sa Su}[$date->{wday}]. " " .
         $date->{year}.'/'.$date->{month}.'/'.$date->{date};
     } 
-    my $input = '山口百恵の誕生日は昭和３４年１月１７日（土）。中元すず香の誕生日は平成9年12月20日（土）。';
+    my $input = '昭和３４年１月１７日（土）。平成9年12月20日（土）。';
     my $output = subsjdate ($input, {make_date => \& mymakedate});
     print "$output\n";
 
 
 produces output
 
-    山口百恵の誕生日はSa 1959/1/17。中元すず香の誕生日はSa 1997/12/20。
+    Sa 1959/1/17。Sa 1997/12/20。
 
 
-(This example is included as L<F<subsjdate-make-date.pl>|https://api.metacpan.org/source/BKB/Lingua-JA-FindDates-0.024/examples/subsjdate-make-date.pl> in the distribution.)
+(This example is included as L<F<subsjdate-make-date.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.026/examples/subsjdate-make-date.pl> in the distribution.)
 
 
 The first two arguments passed to the user-defined routine are
@@ -239,7 +229,7 @@ produces output
     1959/1/17 until 12/20。
 
 
-(This example is included as L<F<subsjdate-make-interval.pl>|https://api.metacpan.org/source/BKB/Lingua-JA-FindDates-0.024/examples/subsjdate-make-interval.pl> in the distribution.)
+(This example is included as L<F<subsjdate-make-interval.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.026/examples/subsjdate-make-interval.pl> in the distribution.)
 
 
 =back
@@ -270,12 +260,12 @@ produces output
 
     昭和64年1月1日
 
-(This example is included as L<F<seireki-to-nengo.pl>|https://api.metacpan.org/source/BKB/Lingua-JA-FindDates-0.024/examples/seireki-to-nengo.pl> in the distribution.)
+(This example is included as L<F<seireki-to-nengo.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.026/examples/seireki-to-nengo.pl> in the distribution.)
 
 
 This function substitutes Western-style dates with Japanese-style
-"nengo" dates (年号). The "nengo" dates go back to the Meiji period
-(1868). See L</BUGS>.
+"nengo" dates (年号), leaving the rest of the text unchanged. The
+"nengo" dates go back to the Meiji period (1868). See L</BUGS>.
 
 =head2 nengo_to_seireki
 
@@ -289,12 +279,12 @@ produces output
 
     1989年1月1日
 
-(This example is included as L<F<nengo-to-seireki.pl>|https://api.metacpan.org/source/BKB/Lingua-JA-FindDates-0.024/examples/nengo-to-seireki.pl> in the distribution.)
+(This example is included as L<F<nengo-to-seireki.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.026/examples/nengo-to-seireki.pl> in the distribution.)
 
 
 This function substitutes Japanese-style "nengo" dates (年号) with
-Western-style dates. The "nengo" dates go back to the Meiji period
-(1868). See L</BUGS>.
+Western-style dates, leaving the rest of the text unchanged. The
+"nengo" dates go back to the Meiji period (1868). See L</BUGS>.
 
 =head2 regjnums
 
@@ -317,11 +307,11 @@ C<make_date_interval> respectively. The previous names still work.
 =head2 default_make_date
 
 L</subsjdate>, given a date like 平成２０年７月３日（木） (Heisei year
-20, month 7, day 3, in other words "Thursday the third of July,
-2008"), passes C<make_date> a hash reference with values C<< year =>
-2008, month => 7, date => 3, wday => 4 >> for the year, month, date
-and day of the week. C<make_date> turns the date information supplied
-to it into a string representing the date. C<make_date> is not
+20, month 7, day 3 (Th), "Thursday 3rd July, 2008"), passes
+C<make_date> a hash reference with values C<< year => 2008, month =>
+7, date => 3, wday => 4 >> for the year, month, date and day of the
+week. C<default_make_date> turns the date information supplied to it
+into a string representing the date. C<default_make_date> is not
 exported.
 
 Here is an example of how it operates:
@@ -342,11 +332,11 @@ produces output
     Monday, March 19, 2012
 
 
-(This example is included as L<F<make-date.pl>|https://api.metacpan.org/source/BKB/Lingua-JA-FindDates-0.024/examples/make-date.pl> in the distribution.)
+(This example is included as L<F<make-date.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.026/examples/make-date.pl> in the distribution.)
 
 
-To replace the default routine C<make_date> with a different format,
-supply a C<make_date> callback to L</subsjdate>:
+To replace the default routine C<default_make_date> with a different
+format, supply a C<make_date> callback to L</subsjdate>:
 
     
     use utf8;
@@ -364,7 +354,7 @@ produces output
 
     3/16
 
-(This example is included as L<F<my-date.pl>|https://api.metacpan.org/source/BKB/Lingua-JA-FindDates-0.024/examples/my-date.pl> in the distribution.)
+(This example is included as L<F<my-date.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.026/examples/my-date.pl> in the distribution.)
 
 
 Note that, depending on what dates are in your document, some of the
@@ -399,7 +389,7 @@ produces output
     Friday 19 February, 2010-Monday 19 March, 2012
 
 
-(This example is included as L<F<default-make-date-interval.pl>|https://api.metacpan.org/source/BKB/Lingua-JA-FindDates-0.024/examples/default-make-date-interval.pl> in the distribution.)
+(This example is included as L<F<default-make-date-interval.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-FindDates-0.026/examples/default-make-date-interval.pl> in the distribution.)
 
 
 This function is called when an interval of two dates, such as 平成３年
@@ -537,6 +527,88 @@ Japanese character transliterations, including wide ascii numerals.
 
 An online date converter which uses this module may be found at
 L<https://www.lemoda.net/japanese/findjdates/index.cgi>.
+
+=head1 DEPENDENCIES
+
+L<Carp> is used to report errors. This module has no dependencies on
+non-core modules.
+
+=head1 VARIABLES
+
+=head2 @jdatere
+
+The Japanese date regular expressions are stored in an array
+C<@jdatere> containing a pair of a regular expression to match a kind
+of date, and a string like "ymdw" which contains letters saying what
+to do with captured subexpressions.
+
+The array is ordered from the regular expression with the longest
+match (like "year / month / day / weekday") to the shortest (like
+"year" only).
+
+The string explains what to do with the captured elements like $1, $2,
+etc. from the regular expression. For example, if the first letter is
+"y", then $1 is a year in Western format like 2008, or if the third
+letter is "w", then $3 is the day of the week, from 1 to 7. The
+following elements exist:
+
+=over
+
+=item e
+
+Japanese era (string).
+
+=item j
+
+Japanese year (string representing small number)
+
+=item x
+
+Empty month and day
+
+=item m
+
+The month number (from 1 to 12, 13 for a blank month, 0 for an invalid
+month)
+
+=item d
+
+The day of month (from 1 to 31, 32 for a blank day, 0 for an invalid day)
+
+=item w
+
+A weekday (from Monday = 1 to Sunday = 7, zero or undefined for an
+invalid weekday)
+
+=item z
+
+A I<jun> (旬), a period of one third of a month, or ten days.
+
+=item B<1>
+
+After another code, indicates the first of a pair of two things. For
+example, the matching code for
+
+    平成９年１０月１７日〜２０日
+
+is
+
+    ejmd1d2
+
+=back
+
+=head2 $verbose
+
+If you want to see what the module is doing, set
+
+  $Lingua::JA::FindDates::verbose = 1;
+
+This makes L</subsjdate> print out each regular expression and reports
+whether it matched, which looks like this:
+
+  Looking for y in ([０-９0-9]{4}|[十六七九五四千百二一八三]?千[十六七九五四千百二一八三]*)\h*年
+  Found '千九百六十六年': Arg 0: 1966 -> '1966'
+
 
 
 =head1 AUTHOR

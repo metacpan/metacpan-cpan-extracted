@@ -27,10 +27,10 @@ name: Sys-Path
 provides:
   Sys::Path:
     file: lib/Sys/Path.pm
-    version: '0.15'
+    version: '0.16'
   Sys::Path::SPc:
     file: lib/Sys/Path/SPc.pm
-    version: '0.14'
+    version: '0.16'
 requires:
   Cwd: '0'
   Digest::MD5: '0'
@@ -42,5 +42,5 @@ resources:
   bugtracker: http://github.com/jozef/Sys-Path/issues
   license: http://dev.perl.org/licenses/
   repository: git://github.com/jozef/Sys-Path.git
-version: '0.15'
+version: '0.16'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 package yts;
-our $VERSION = '0.033';
+our $VERSION = '0.035';
 # ABSTRACT: Read/write time series data
 
 use ETL::Yertl;
@@ -44,7 +44,7 @@ yts - Read/write time series data
 
 =head1 VERSION
 
-version 0.033
+version 0.035
 
 =head1 SYNOPSIS
 
@@ -75,13 +75,13 @@ documents describing the values in the series.
 
     $ yts influx://localhost:8086 mydb.cpu_load_1m
     ---
-    timestamp: 2017-01-01 00:00:00
+    timestamp: 2017-01-01T00:00:00
     metric: mydb.cpu_load_1m
     value: 1.23
     tags:
         server: 10.0.0.1
     ---
-    timestamp: 2017-01-01 00:00:00
+    timestamp: 2017-01-01T00:00:00
     metric: mydb.cpu_load_1m
     value: 0.61
     tags:
@@ -92,9 +92,9 @@ C<--short> format:
 
     $ yts -s influx://localhost:8086 mydb.cpu_load_1m
     ---
-    '2017-01-01 00:00:00': 1.23
-    '2017-01-01 00:00:10': 1.26
-    '2017-01-01 00:00:20': 1.13
+    '2017-01-01T00:00:00': 1.23
+    '2017-01-01T00:00:10': 1.26
+    '2017-01-01T00:00:20': 1.13
 
 If multiple series are being shown with duplicate timestamps, some
 values will be missing.
@@ -114,13 +114,13 @@ date/time format. The value can be anything the time series database
 accepts.
 
     ---
-    timestamp: 2017-01-01 00:00:00
+    timestamp: 2017-01-01T00:00:00
     metric: mydb.cpu_load_1m.value
     value: 1.23
     tags:
         server: 10.0.0.1
     ---
-    timestamp: 2017-01-01 00:00:10
+    timestamp: 2017-01-01T00:00:10
     metric: mydb.cpu_load_1m.value
     value: 1.26
     tags:
@@ -137,9 +137,9 @@ date/time format. The value can be anything the time series database
 accepts.
 
     ---
-    '2017-01-01 00:00:00': 1.23
-    '2017-01-01 00:00:10': 1.26
-    '2017-01-01 00:00:20': 1.13
+    '2017-01-01T00:00:00': 1.23
+    '2017-01-01T00:00:10': 1.26
+    '2017-01-01T00:00:20': 1.13
 
 This format can only usefully handle one metric. The metric to write is
 taken from the command line. Any tags specified on the command line will

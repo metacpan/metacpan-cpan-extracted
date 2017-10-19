@@ -40,18 +40,21 @@
 require ([
     'QUnit',
     'app/tests/dummy',
+    'app/tests/01-users',
     'app/tests/main-menu',
     'app/tests/main-empl',
     'app/tests/main-sched',
 ], function (
     QUnit,
     dummyTests,
+    createTestingUsers,
     mainMenuTests,
     mainEmplTests,
     mainSchedTests,
 ) {
     QUnit.module("dochazka-www");
     dummyTests();
+    createTestingUsers();
     mainMenuTests();
     mainEmplTests();
     mainSchedTests();

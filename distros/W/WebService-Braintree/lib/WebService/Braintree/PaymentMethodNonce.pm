@@ -1,22 +1,26 @@
 package WebService::Braintree::PaymentMethodNonce;
-$WebService::Braintree::PaymentMethodNonce::VERSION = '0.93';
+$WebService::Braintree::PaymentMethodNonce::VERSION = '0.94';
+use 5.010_001;
+use strictures 1;
+
 use Moose;
 extends 'WebService::Braintree::ResultObject';
 
 sub create {
-  my ($class, $token) = @_;
-  $class->gateway->payment_method_nonce->create($token);
+    my ($class, $token) = @_;
+    $class->gateway->payment_method_nonce->create($token);
 }
 
 sub find {
-  my ($class, $token) = @_;
-  $class->gateway->payment_method_nonce->find($token);
+    my ($class, $token) = @_;
+    $class->gateway->payment_method_nonce->find($token);
 }
 
 sub gateway {
-  return WebService::Braintree->configuration->gateway;
+    return WebService::Braintree->configuration->gateway;
 }
 
-
 __PACKAGE__->meta->make_immutable;
+
 1;
+__END__

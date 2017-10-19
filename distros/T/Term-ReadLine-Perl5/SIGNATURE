@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.73.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -15,29 +15,29 @@ not run its Makefile.PL or Build.PL.
 Hash: SHA1
 
 SHA1 9ada49c479e39b6ad767eb37f4591456761542f1 Build.PL
-SHA1 11e12798fb4f4328fcf44355a60f2e499315373b ChangeLog
-SHA1 bbcdd3f8af5aff7904a563e593ee4e4d0b8c4d0a Changes
+SHA1 2ed96ed52b70efbb5e2b239c2728b673331b5ad1 ChangeLog
+SHA1 247a6968445365111390d7e515e4cd0b3bcfd41e Changes
 SHA1 ad35d4ad9e96de51a11677ce075e19731336fa82 GNUmakefile
 SHA1 2cdc6028c730caf1505bafb44a7e46bacd074d01 LICENSE
 SHA1 7843dd83bc3161bffbf00e9a0353d6867bb5b063 MANIFEST
-SHA1 bd6ff4013ac03f51c438d0dbf821071ef2ffb6c0 META.json
-SHA1 9503ee85363d137c3084e1e92287e23aae11a7b9 META.yml
-SHA1 11fc7e434201a55455d75adf05d32698840e50b1 Makefile.PL
+SHA1 cad4843861e19640da10d3502ee33fd5ae6584da META.json
+SHA1 0c2774761bbe95836527397adeca5ce6977775be META.yml
+SHA1 f1a2923a13925bcde5c220a8113ab835b50b92d9 Makefile.PL
 SHA1 f8856d1338403ff5a2d3a6fc3540642ee7c248ad README.pod
-SHA1 5b8b9f9aba7af8a042346e675585ce3e7597e1d4 lib/Term/ReadLine/Perl5.pm
+SHA1 58878907bbdcede1761308feaf768fe12a2ce080 lib/Term/ReadLine/Perl5.pm
 SHA1 19b893fed1e00ce86650d80205fa927380e820c4 lib/Term/ReadLine/Perl5/CHANGES
-SHA1 5d720071ae1e540d2123732a87035e21bcbc6235 lib/Term/ReadLine/Perl5/Common.pm
-SHA1 2088a4e5efeb607aaa9987b8afeecbabd0e803f4 lib/Term/ReadLine/Perl5/Dumb.pm
+SHA1 49bbddcf3c0ef12e1b61e0574324feabdabee0b8 lib/Term/ReadLine/Perl5/Common.pm
+SHA1 a069547ae524f03fcdf20fb071868491b41f0ad5 lib/Term/ReadLine/Perl5/Dumb.pm
 SHA1 ef0d94e991c8361b80c1ddfcceb97db30d3d347a lib/Term/ReadLine/Perl5/History.pm
-SHA1 f5033185d2014a58b2af611d44402b18e0a2bff0 lib/Term/ReadLine/Perl5/Keymap.pm
-SHA1 624c73adf605233d4211984a4136e17488ddf67d lib/Term/ReadLine/Perl5/OO.pm
-SHA1 4c438860f0c776d063ce01f7f7b1033f5053bf9e lib/Term/ReadLine/Perl5/OO/History.pm
-SHA1 3520eb08b12be9ab0e1367510d9e1c448e2f363e lib/Term/ReadLine/Perl5/OO/Keymap.pm
+SHA1 513e44977d13ce05e99e8f32ea99e059ee0540b7 lib/Term/ReadLine/Perl5/Keymap.pm
+SHA1 78d9ae90c2f68cc2f5e251c9d141e8a90a0df861 lib/Term/ReadLine/Perl5/OO.pm
+SHA1 57502a3637558d56945a8d7a6ca5e401fe9e46b6 lib/Term/ReadLine/Perl5/OO/History.pm
+SHA1 2f2f04a05eda05e898989a84dead0095b7e6f682 lib/Term/ReadLine/Perl5/OO/Keymap.pm
 SHA1 c30ed2f79b5679fbdcba11bf848d0794ce54818a lib/Term/ReadLine/Perl5/OO/State.pm
-SHA1 8f372cb4d9b2b105427d659572603621bcf9be6a lib/Term/ReadLine/Perl5/TermCap.pm
-SHA1 b28aedcbffcd673429d17bbce4659f7047578290 lib/Term/ReadLine/Perl5/Tie.pm
-SHA1 cd856608f023a40ed957dc8654f1c3b00cfef4bd lib/Term/ReadLine/Perl5/readline-guide.pod
-SHA1 03db8f871e72c1b07a0ec1575af15d8a1cbb45f5 lib/Term/ReadLine/Perl5/readline.pm
+SHA1 6a4a9f7dcdb2bfdcdc5a6fb20f10a786235c484e lib/Term/ReadLine/Perl5/TermCap.pm
+SHA1 813ce474b569b4b7870916fded0b174706ec422b lib/Term/ReadLine/Perl5/Tie.pm
+SHA1 77b3e1c17bb548acee8b31a32e31b439d7c9f6dd lib/Term/ReadLine/Perl5/readline-guide.pod
+SHA1 bfb0f530f06e26e20e1fbf5f5ae529a488dedd9e lib/Term/ReadLine/Perl5/readline.pm
 SHA1 b69418833611b561793538299403b830f9af8c2d t/00test-pod.t
 SHA1 1f0cc5dbf7000e81df09265b480d5461429a998b t/01test-OO-compile.t
 SHA1 85e09db9f730b0430119af0689e8f3491c6f3db1 t/02test-OO-history-max-len.t
@@ -47,7 +47,7 @@ SHA1 70ce0a778fce8eba67e9a78d51a4dd4552d49d14 t/10test-common.t
 SHA1 1331b6ec714ac4052b43215c37e4df61531931d3 t/10test-filelist.t
 SHA1 4d90a610b9ef1d214ee2c6575369390c09c43fdd t/10test-history.t
 SHA1 1e24dafe6894b2c2bdd419f753c1c11c557106d5 t/10test-motion.t
-SHA1 b2040bb46fd943a76b517c8caa3d8b22eb3ddff6 t/10test-readline.t
+SHA1 66716f12ffbbcf51fe4e040f84375860b7048471 t/10test-readline.t
 SHA1 aa441ebb0c54942e6c1952bb089ed8709c63e21b t/15test-unescape.t
 SHA1 e3e4861f71034c4332c5a13ead69348f57543726 t/20test-read-input-file.t
 SHA1 a9d474f2aa943b2c7b9df45ad2e677f84d616308 t/Helper.pm
@@ -56,7 +56,7 @@ SHA1 fd9ed6d132bacccc150b589bfd86c408166066ec test.pl
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1
 
-iEYEARECAAYFAlWEOioACgkQGo3lAIJ17CFZAACfZHSVa0VdlJD8Q8L93j8xjyUN
-WbkAn3PXCn1cgVFpujcnw/Cui/Ex/p+2
-=HyW5
+iEYEARECAAYFAlnnLfoACgkQGo3lAIJ17CHXXQCePpBi+MiQU9N9/j7PIJ8fHwse
+/HMAoIqLE48HXJHkF9LtxbcK6VPGN0Ek
+=knBu
 -----END PGP SIGNATURE-----

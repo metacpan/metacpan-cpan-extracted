@@ -29,5 +29,11 @@
       <location rdf:resource="https://github.com/yanick/Dancer2-Plugin-WebSocket.git" />
     </GitRepository>
   </repository>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.0.1</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2017-10-06</dc:issued>
+    </Version>
+  </release>
   <programming-language>Perl</programming-language>
 </Project>

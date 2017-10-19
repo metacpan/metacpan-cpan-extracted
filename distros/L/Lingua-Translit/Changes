@@ -1,3 +1,12 @@
+0.28  -- 2017-10-16
+
+    * Fixed wrong capitalised Cyrillic A in several context rules of both
+      "BGN/PCGN RUS Standard" and "BGN/PCGN RUS Strict" - thanks to Nikola
+      Lečić for providing the fix!
+    * Spelling corrections in man page - thanks to Lucas Kanashiro for
+      providing a patch!
+    * Updated copyright (Netzum Sorglos Software GmbH).
+
 0.27  -- 2017-04-26
 
     * Added "BGN/PCGN RUS Standard" and "BGN/PCGN RUS Strict"

@@ -1,5 +1,8 @@
 package WebService::Braintree::ResourceCollection;
-$WebService::Braintree::ResourceCollection::VERSION = '0.93';
+$WebService::Braintree::ResourceCollection::VERSION = '0.94';
+use 5.010_001;
+use strictures 1;
+
 use Moose;
 extends "WebService::Braintree::ResultObject";
 
@@ -37,7 +40,7 @@ sub is_empty {
 
 sub maximum_size {
     my $self = shift;
-    return (scalar @{$self->ids});
+    return (scalar @{$self->ids || []});
 }
 
 sub each {
@@ -64,5 +67,6 @@ sub execute_block_for_page {
 }
 
 __PACKAGE__->meta->make_immutable;
-1;
 
+1;
+__END__

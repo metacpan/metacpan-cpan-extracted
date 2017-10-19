@@ -18,13 +18,13 @@ dies_ok {
     $ctl->prune_simple_perl_dep( $dep->new('perl|perl-modules') )
 } 'prune_simple_perl_dep croaks on alternatives';
 
-is( $ctl->prune_perl_dep( $dep->new('perl-modules (>= 5.12)') ) . '',
-    'perl (>= 5.12)',
+is( $ctl->prune_perl_dep( $dep->new('perl-modules (>= 5.16)') ) . '',
+    'perl (>= 5.16)',
     'perl-modules is converted to perl'
 );
 
-is( $ctl->prune_perl_dep( $dep->new('perl-modules (>= 5.12)|foo') ) . '',
-    'perl (>= 5.12) | foo',
+is( $ctl->prune_perl_dep( $dep->new('perl-modules (>= 5.16)|foo') ) . '',
+    'perl (>= 5.16) | foo',
     'perl-modules is converted to perl in alternatives'
 );
 
@@ -38,18 +38,18 @@ is( $ctl->prune_perl_dep( $dep->new('perl-modules'), 1 ) . '',
     'perl', 'perl-modules is not build-essential' );
 
 is( $ctl->prune_perl_dep( $dep->new('foo|perl-modules') ),
-    undef, 'redundant alternative makes redundand the whole' );
+    undef, 'redundant alternative makes redundant the whole' );
 
-is( $ctl->prune_perl_dep( $dep->new('perl (>= 5.10.0)') ),
-    undef, 'perl 5.10.0 is ancient' );
+is( $ctl->prune_perl_dep( $dep->new('perl (>= 5.14.1)') ),
+    undef, 'perl 5.14.1 is ancient' );
 
-is( $ctl->prune_perl_dep( $dep->new('perl (= 5.10.0)') ) . '',
-    'perl (= 5.10.0)',
-    'perl =5.10.0 is left intact'
+is( $ctl->prune_perl_dep( $dep->new('perl (= 5.14.1)') ) . '',
+    'perl (= 5.14.1)',
+    'perl =5.14.1 is left intact'
 );
 
-is( ( $ctl->find_debs_for_modules( { 'ExtUtils::ParseXS' => '2.21' } ) )[0]
+is( ( $ctl->find_debs_for_modules( { 'ExtUtils::ParseXS' => '3.08' } ) )[0]
         . '',
-    'perl (>= 5.11.1)',
-    'ExtUtils::ParseXS 2.21 is in perl 5.11.1'
+    'perl (>= 5.15.6)',
+    'ExtUtils::ParseXS 3.08 is in perl 5.15.6'
 );

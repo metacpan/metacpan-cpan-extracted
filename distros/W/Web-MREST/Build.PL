@@ -58,7 +58,7 @@ my $builder = Module::Build->new(
     },
     requires => {
         'perl'           => 5.012,
-        'App::CELL'      => 0.205,
+        'App::CELL'      => 0.209,
         'Getopt::Long'   => 2.32,
         'Encode'         => 0,
         'File::ShareDir' => 0,

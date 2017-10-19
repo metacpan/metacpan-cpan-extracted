@@ -8,6 +8,14 @@ t/01-matching.t
 t/01-notmatching.t
 t/01-toomuch_notmatching.t
 t/01-final.t
+t/01-cat.t
+t/01-catSEQ.t
+t/01-cat.t
+t/01-catRAND.t
+t/01-catSEQ.t
+t/01-catWRAND.t
+t/test_cat1.txt
+t/test_cat.txt
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

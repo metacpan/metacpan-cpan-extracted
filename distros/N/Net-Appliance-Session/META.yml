@@ -3,30 +3,44 @@ abstract: 'Run command-line sessions to network appliances'
 author:
   - 'Oliver Gorwits <oliver@cpan.org>'
 build_requires:
+  ExtUtils::CBuilder: '0'
   Test::More: '0.88'
 configure_requires:
-  ExtUtils::MakeMaker: '6.30'
+  Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Net-Appliance-Session
-no_index:
-  directory:
-    - t
-    - inc
+provides:
+  Net::Appliance::Session:
+    file: lib/Net/Appliance/Session.pm
+    version: '4.300000'
+  Net::Appliance::Session::Async:
+    file: lib/Net/Appliance/Session/Async.pm
+    version: '4.300000'
+  Net::Appliance::Session::Engine:
+    file: lib/Net/Appliance/Session/Engine.pm
+    version: '4.300000'
+  Net::Appliance::Session::Scripting:
+    file: lib/Net/Appliance/Session/Scripting.pm
+    version: '4.300000'
+  Net::Appliance::Session::Transport:
+    file: lib/Net/Appliance/Session/Transport.pm
+    version: '4.300000'
 requires:
   Cwd: '0'
   Data::Dumper: '0'
+  File::ShareDir: '1.00'
   Getopt::Long: '2.24'
   IO::Handle: '0'
   IO::Prompt::Tiny: '0'
   Moo: '0'
   Moo::Role: '0'
   MooX::Types::MooseLike::Base: '0'
-  Net::CLI::Interact: '2.200005'
+  Net::CLI::Interact: '2.300002'
   Sub::Quote: '0'
   Term::ANSIColor: '0'
   Term::ReadPassword: '0'
@@ -35,5 +49,9 @@ requires:
   Try::Tiny: '0'
   strict: '0'
   warnings: '0'
-version: '4.200003'
+resources:
+  bugtracker: https://github.com/ollyg/Net-Appliance-Session/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/ollyg/Net-Appliance-Session
+version: '4.300000'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

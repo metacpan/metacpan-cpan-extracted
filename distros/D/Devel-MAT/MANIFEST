@@ -1,10 +1,8 @@
 bin/pmat
 bin/pmat-cat-svpv
 bin/pmat-diff
-bin/pmat-find-pv
 bin/pmat-list-dangling-ptrs
 bin/pmat-list-orphans
-bin/pmat-sizes
 Build.PL
 Changes
 doc/format.txt
@@ -22,6 +20,7 @@ lib/Devel/MAT/Tool.pm
 lib/Devel/MAT/Tool.pod
 lib/Devel/MAT/Tool/Callstack.pm
 lib/Devel/MAT/Tool/Count.pm
+lib/Devel/MAT/Tool/Find.pm
 lib/Devel/MAT/Tool/Identify.pm
 lib/Devel/MAT/Tool/Inrefs.pm
 lib/Devel/MAT/Tool/IO.pm
@@ -78,4 +77,5 @@ t/10tool-identify.t
 t/10tool-inrefs.t
 t/10tool-reachability.t
 t/10tool-sizes.t
+t/50cmd-print-table.t
 t/99pod.t

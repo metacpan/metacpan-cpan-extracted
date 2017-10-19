@@ -19,8 +19,8 @@ ok($pkg, 'Package');
 is($pkg->payload_format, 'cpio', 'payload');
 
 is($pkg->rflags, undef, 'default rflags');
-is($pkg->set_rflags(1, 3), undef, 'storing rflags');
-is(join(',', $pkg->set_rflags(1, 4)), "1,3", 'storing rflags');
+is($pkg->set_rflags('1', '3'), undef, 'storing rflags');
+is(join(',', $pkg->set_rflags('1', '4')), "1,3", 'storing rflags');
 is(join(',', $pkg->rflags), "1,4", 'retrieving stored rflags');
 
 ########################################

@@ -1,6 +1,5 @@
 # These files are in the repository but not in the CPAN distribution.
-^build\.pl$
-^get-tags\.pl$
+^(build|get-tags|make-pod)\.pl$
 ^mozilla\.txt$
 # The repository files.
 \.git

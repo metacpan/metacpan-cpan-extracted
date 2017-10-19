@@ -131,6 +131,9 @@ sub set_tag
 sub as_string
 {
 	my $self = shift;
+	if ( $Mail::DKIM::SORTTAGS ) {
+            return join(";", sort map { $_->{raw} } @{$self->{tags}});
+        }
 	return join(";", map { $_->{raw} } @{$self->{tags}});
 }
 

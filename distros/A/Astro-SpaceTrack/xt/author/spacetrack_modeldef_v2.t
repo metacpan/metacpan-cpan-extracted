@@ -746,40 +746,40 @@ if ( $rslt->is_success() ) {
          "Extra" : "",
          "Field" : "OBJECT_NUMBER",
          "Key" : "",
-         "Null" : "NO",
+         "Null" : "YES",
          "Type" : "mediumint(8) unsigned"
       },
       {
-	  "Default" : "0.000",
-	  "Extra" : "",
-	  "Field" : "SEMIMAJOR_AXIS",
-	  "Key" : "",
-	  "Null" : "NO",
-	  "Type" : "double(20,3)"
+         "Default" : "0.000",
+         "Extra" : "",
+         "Field" : "SEMIMAJOR_AXIS",
+         "Key" : "",
+         "Null" : "NO",
+         "Type" : "double(20,3)"
       },
       {
-	  "Default" : null,
-	  "Extra" : "",
-	  "Field" : "PERIOD",
-	  "Key" : "",
-	  "Null" : "YES",
-	  "Type" : "double(20,3)"
+         "Default" : null,
+         "Extra" : "",
+         "Field" : "PERIOD",
+         "Key" : "",
+         "Null" : "YES",
+         "Type" : "double(20,3)"
       },
       {
-	  "Default" : "0.000",
-	  "Extra" : "",
-	  "Field" : "APOGEE",
-	  "Key" : "",
-	  "Null" : "NO",
-	  "Type" : "double(20,3)"
+         "Default" : "0.000",
+         "Extra" : "",
+         "Field" : "APOGEE",
+         "Key" : "",
+         "Null" : "NO",
+         "Type" : "double(20,3)"
       },
       {
-	  "Default" : "0.000",
-	  "Extra" : "",
-	  "Field" : "PERIGEE",
-	  "Key" : "",
-	  "Null" : "NO",
-	  "Type" : "double(20,3)"
+         "Default" : "0.000",
+         "Extra" : "",
+         "Field" : "PERIGEE",
+         "Key" : "",
+         "Null" : "NO",
+         "Type" : "double(20,3)"
       }
    ]
 }

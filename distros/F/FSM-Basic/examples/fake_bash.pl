@@ -41,15 +41,15 @@ $term->read_history( $history_file );
 $term->clear_signals();
 my $fsm = FSM::Basic->new( $states, 'prompt' );
 my $final = 0;
-#my $out   = "User Access Verification\n\nPassword: ";
 my $out = "User> ";
 
-while ( defined( $line = $term->readline( $out ) ) )
+while ( defined( $line = $term->readline( $prompt ) ) )
 {
     ( $final, $out ) = $fsm->run( $line );
-    #    say "stack cmd=" . Dumper( $fsm->{stack_cmd} ) ;
-    #     say "state content=" . Dumper( $fsm->{states_list}{$fsm->{state}} ) ;
-    #       say "do content=" . Dumper( $fsm ) ;
+    $out =~ s/(\N*)$/$1/s;
+    $prompt= $1
+    print $out;
+
     $term->write_history( $history_file );
     last if $final;
     #  print $out;

@@ -1,5 +1,14 @@
 Revision history for ClickHouse
 
+0.03    2017-10-15
+        * FIX: long (more than 1024 bytes) answers now parsed correctly
+        * FIX: long (more than 7k bytes) queries are sended via POST method
+        * FIX: sometimes utf8 strings were encoded incorrectly
+ 
+
+0.02    2016-08-21
+        Add support for nested structures
+
 0.01    2016-07-27
         First version, released on an unsuspecting world.
 

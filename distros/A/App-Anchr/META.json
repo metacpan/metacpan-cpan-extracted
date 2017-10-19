@@ -1,0 +1,161 @@
+{
+   "abstract" : "B<A>ssembler of B<N>-free B<CHR>omosomes",
+   "author" : [
+      "Qiang Wang <wang-q@outlook.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.12",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Anchr",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AlignDB::IntSpan" : "v1.1.0",
+            "AlignDB::Stopwatch" : "v1.1.0",
+            "App::Cmd" : "0.330",
+            "App::Fasops" : "v0.5.11",
+            "App::RL" : "v0.2.31",
+            "App::Rangeops" : "v0.0.14",
+            "File::ShareDir" : "1.102",
+            "Graph" : "0.9704",
+            "GraphViz" : "2.20",
+            "IO::Zlib" : "1.04_02",
+            "JSON" : "2.93",
+            "List::Util" : "1.36",
+            "MCE" : "1.810",
+            "Number::Format" : "1.75",
+            "Path::Tiny" : "0.076",
+            "Statistics::Descriptive" : "3.0612",
+            "Template" : "2.26",
+            "YAML::Syck" : "1.29",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "App::Anchr" : {
+         "file" : "lib/App/Anchr.pm",
+         "version" : "v0.4.3"
+      },
+      "App::Anchr::Command::anchors" : {
+         "file" : "lib/App/Anchr/Command/anchors.pm"
+      },
+      "App::Anchr::Command::break" : {
+         "file" : "lib/App/Anchr/Command/break.pm"
+      },
+      "App::Anchr::Command::contained" : {
+         "file" : "lib/App/Anchr/Command/contained.pm"
+      },
+      "App::Anchr::Command::cover" : {
+         "file" : "lib/App/Anchr/Command/cover.pm"
+      },
+      "App::Anchr::Command::dazzname" : {
+         "file" : "lib/App/Anchr/Command/dazzname.pm"
+      },
+      "App::Anchr::Command::dep" : {
+         "file" : "lib/App/Anchr/Command/dep.pm"
+      },
+      "App::Anchr::Command::group" : {
+         "file" : "lib/App/Anchr/Command/group.pm"
+      },
+      "App::Anchr::Command::kunitigs" : {
+         "file" : "lib/App/Anchr/Command/kunitigs.pm"
+      },
+      "App::Anchr::Command::layout" : {
+         "file" : "lib/App/Anchr/Command/layout.pm"
+      },
+      "App::Anchr::Command::localcor" : {
+         "file" : "lib/App/Anchr/Command/localcor.pm"
+      },
+      "App::Anchr::Command::merge" : {
+         "file" : "lib/App/Anchr/Command/merge.pm"
+      },
+      "App::Anchr::Command::orient" : {
+         "file" : "lib/App/Anchr/Command/orient.pm"
+      },
+      "App::Anchr::Command::overlap" : {
+         "file" : "lib/App/Anchr/Command/overlap.pm"
+      },
+      "App::Anchr::Command::overlap2" : {
+         "file" : "lib/App/Anchr/Command/overlap2.pm"
+      },
+      "App::Anchr::Command::paf2ovlp" : {
+         "file" : "lib/App/Anchr/Command/paf2ovlp.pm"
+      },
+      "App::Anchr::Command::quorum" : {
+         "file" : "lib/App/Anchr/Command/quorum.pm"
+      },
+      "App::Anchr::Command::replace" : {
+         "file" : "lib/App/Anchr/Command/replace.pm"
+      },
+      "App::Anchr::Command::restrict" : {
+         "file" : "lib/App/Anchr/Command/restrict.pm"
+      },
+      "App::Anchr::Command::scaffold" : {
+         "file" : "lib/App/Anchr/Command/scaffold.pm"
+      },
+      "App::Anchr::Command::show2ovlp" : {
+         "file" : "lib/App/Anchr/Command/show2ovlp.pm"
+      },
+      "App::Anchr::Command::trim" : {
+         "file" : "lib/App/Anchr/Command/trim.pm"
+      },
+      "App::Anchr::Command::trimlong" : {
+         "file" : "lib/App/Anchr/Command/trimlong.pm"
+      },
+      "App::Anchr::Common" : {
+         "file" : "lib/App/Anchr/Common.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/wang-q/App-Anchr/issues"
+      },
+      "homepage" : "https://github.com/wang-q/App-Anchr",
+      "repository" : {
+         "url" : "git://github.com/wang-q/App-Anchr.git",
+         "web" : "https://github.com/wang-q/App-Anchr"
+      }
+   },
+   "version" : "0.4.3",
+   "x_authority" : "cpan:WANGQ",
+   "x_serialization_backend" : "JSON::PP version 2.94"
+}

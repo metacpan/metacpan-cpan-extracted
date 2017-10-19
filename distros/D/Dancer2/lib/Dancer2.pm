@@ -1,5 +1,5 @@
 package Dancer2;
-$Dancer2::VERSION = '0.205001';
+$Dancer2::VERSION = '0.205002';
 # ABSTRACT: Lightweight yet powerful web application framework
 
 use strict;
@@ -128,7 +128,7 @@ Dancer2 - Lightweight yet powerful web application framework
 
 =head1 VERSION
 
-version 0.205001
+version 0.205002
 
 =head1 DESCRIPTION
 

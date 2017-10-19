@@ -1,0 +1,27 @@
+---
+abstract: 'Base class for runnable unit tests using Moose introspection'
+author:
+  - 'Duncan Ross Palmer, 2E0EOL (palmer@overchat.org)'
+build_requires:
+  List::MoreUtils: 0
+  Moose: 0
+  Readonly: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+distribution_type: module
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.57_05'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Test-Module-Runnable
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Moose: 0
+  Test::More: 0
+version: 0.2.3

@@ -1,3 +1,33 @@
+0.100		2017-10-12	T. R. Wyant
+    Added Iridium status decayed ('[D]', portable status is 3 --
+    BODY_STATUS_IS_DECAYED).
+
+    Add iridium_status() format 'spacetrack'. Space Track has no idea
+    whether a given satellite is in service or not, but does know
+    whether it has decayed. So the status reported for a given OID is
+    from Celestrak if it has it and the satellite is still in orbit.
+    If a satellite is not in the Celestrak data but Space Track reports
+    it as still in orbit, its status will be unknown ('[?]'), and its
+    portable status will be tumbling.
+
+    Add a hard-wired internal Iridium status table having the Space
+    Track data. This is used to supplement data from other sources,
+    since they typically drop a satellite once it has decayed.
+
+    Add iridium_status() option -raw, which reports statuses
+    un-supplemented by Celestrak or canned data to the extent this is
+    possible. This option can be specified either command-line style
+    (i.e. '-raw') or in a leading hash ref (i.e. '{ raw => 1 }'). This
+    is in support of generating the above hard-wired table.
+
+    Add script 'tools/all_iridium_classic', which queries Space Track
+    for all Iridium satellites, and reports the status of the
+    original-design Iridiums. This is for generating the canned status
+    tables in Astro::SpaceTrack and Astro::Coord::ECI::TLE.
+
+    Remove tests for iridium_status( 'mccants' ), since this is both
+    unmaintained and deprecated.
+
 0.099		2017-05-24	T. R. Wyant
     Deprecate McCants' Iridium status.
 

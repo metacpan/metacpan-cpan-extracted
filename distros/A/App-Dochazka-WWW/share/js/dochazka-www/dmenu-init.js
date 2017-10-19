@@ -44,13 +44,55 @@ define ([
 
     return function () {
 
-        target.push('mainMenu', {
-            'name': 'mainMenu',
+        target.push('browseInt', {
+            'name': 'browseInt',
             'type': 'dmenu',
-            'menuText': 'Main',
-            'title': 'Main menu',
-            'aclProfile': 'passerby',
-            'entries': ['mainEmpl', 'mainPriv', 'mainSched', 'mainAdmin']
+            'menuText': 'Browse',
+            'title': 'Browse intervals',
+            'aclProfile': 'inactive',
+            'entries': ['browseIntDay', 'browseIntWeek', 'browseIntMonth',],
+        });
+        target.push('browseIntDay', {
+            'name': 'browseIntDay',
+            'type': 'dmenu',
+            'menuText': 'By day',
+            'title': 'Browse intervals by day',
+            'aclProfile': 'inactive',
+            'entries': ['browseIntToday', 'browseIntYesterday', 'browseIntAnyday',],
+        });
+        target.push('browseIntWeek', {
+            'name': 'browseIntWeek',
+            'type': 'dmenu',
+            'menuText': 'By week',
+            'title': 'Browse intervals by week',
+            'aclProfile': 'inactive',
+            'entries': ['browseIntThisWeek', 'browseIntLastWeek', 'browseIntAnyWeek',],
+        });
+        target.push('browseIntMonth', {
+            'name': 'browseIntMonth',
+            'type': 'dmenu',
+            'menuText': 'By month',
+            'title': 'Browse intervals by month',
+            'aclProfile': 'inactive',
+            'entries': ['browseIntThisMonth', 'browseIntLastMonth', 'browseIntAnyMonth',],
+        });
+
+        target.push('createInt', {
+            'name': 'createInt',
+            'type': 'dmenu',
+            'menuText': 'Create',
+            'title': 'Create interval(s)',
+            'aclProfile': 'active',
+            'entries': ['createSingleInt', 'createMultipleInt',],
+        });
+
+        target.push('mainAdmin', {
+            'name': 'mainAdmin',
+            'type': 'dmenu',
+            'menuText': 'Adminitrivia',
+            'title': 'Adminitrivia menu',
+            'aclProfile': 'admin',
+            'entries': ['restServerDetailsAction']
         });
 
         target.push('mainEmpl', {
@@ -60,6 +102,24 @@ define ([
             'title': 'Employee menu',
             'aclProfile': 'passerby',
             'entries': ['myProfileAction', 'ldapLookup', 'searchEmployee', 'masqEmployee']
+        });
+
+        target.push('mainInt', {
+            'name': 'mainInt',
+            'type': 'dmenu',
+            'menuText': 'Interval',
+            'title': 'Interval menu',
+            'aclProfile': 'passerby',
+            'entries': ['browseInt', 'createInt'],
+        });
+
+        target.push('mainMenu', {
+            'name': 'mainMenu',
+            'type': 'dmenu',
+            'menuText': 'Main',
+            'title': 'Main menu',
+            'aclProfile': 'passerby',
+            'entries': ['mainEmpl', 'mainPriv', 'mainSched', 'mainInt', 'mainAdmin']
         });
 
         target.push('mainPriv', {
@@ -79,15 +139,6 @@ define ([
             'aclProfile': 'passerby',
             'entries': ['actionSchedHistory', 'schedLookup',
                         'browseAllSchedules', 'schedNew']
-        });
-
-        target.push('mainAdmin', {
-            'name': 'mainAdmin',
-            'type': 'dmenu',
-            'menuText': 'Adminitrivia',
-            'title': 'Adminitrivia menu',
-            'aclProfile': 'admin',
-            'entries': ['restServerDetailsAction']
         });
 
         target.push('schedNew', {

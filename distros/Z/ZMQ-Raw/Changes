@@ -1,5 +1,55 @@
 Revision history for ZMQ-Raw
 
+0.08      2017-10-18 10:59:58+02:00 Africa/Johannesburg
+
+ - Added Message methods:
+    + clone()
+ - Socket->sendmsg() now copies the message, leaving it valid for subsequent calls
+ - Socket->sendmsg() can now also work with scalars
+ - Socket->recv() now returns all message-parts in list context (as scalars)
+
+0.07      2017-10-17 14:54:55+02:00 Africa/Johannesburg
+
+ - Socket->recvmsg() now returns all message-parts in list context (as objects)
+ - Socket->sendmsg() can now send an array of message-parts
+
+0.06      2017-10-17 08:59:02+02:00 Africa/Johannesburg
+
+ - Added Socket methods:
+    + close()
+    + monitor()
+ - Small memory-leak fix
+
+0.05      2017-10-13 14:11:10+02:00 Africa/Johannesburg
+
+ - CURVE socket options can now be set
+ - Socket->recv() no longer accepts a size parameter
+ - Socket->recv() and Socket->send() now return undef if the ZQM_DONTWAIT flag is
+ used and the operation cannot be completed
+ - Documentation improvements
+
+0.04      2017-10-12 15:30:21+02:00 Africa/Johannesburg
+
+ - Enabled tweetnacl
+ - Added support for GNU kFreeBSD
+ - Applied a performance regression patch: https://github.com/zeromq/libzmq/pull/2523
+ - Added feature detection method has()
+ - ZMQ::Raw::Context objects can now be used with interpreter threads
+ - Added Curve methods:
+    + keypair()
+    + public()
+ - Added Z85 methods:
+    + encode()
+    + decode()
+ - Added Poller methods:
+    + new()
+    + add()
+    + events()
+    + wait()
+ - Added Proxy methods:
+    + new()
+    + start()
+
 0.03      2017-10-10 18:16:04+02:00 Africa/Johannesburg
 
  - Documentation improvements

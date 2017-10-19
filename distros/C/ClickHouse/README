@@ -1,0 +1,124 @@
+NAME
+
+    ClickHouse - Database driver for Clickhouse OLAP Database
+
+VERSION
+
+    Version 0.03
+
+SYNOPSIS
+
+    ClickHouse - perl interface to Clickhouse Database. My final goal is to
+    create DBI compatible driver for ClickHouse, but for now it's
+    standalone module.
+
+    It's the first version and so module is EXPERIMENTAL. I can't guarantee
+    API stability. More over, API will probably change and it will be soon.
+
+    This module is a big rough on the edges, but I decided to release it on
+    CPAN so people can start playing around with it.
+
+EXAMPLE
+
+        use ClickHouse;
+    
+        my $ch = ClickHouse->new(
+            host     => $ENV{'CLICK_HOUSE_HOST'}
+            port     => 8123,
+            user     => 'Frodo'
+            password => 'finger',
+        );
+    
+        my $rows = $ch->select("SELECT id, field_one, field_two FROM some_table");
+    
+        for my $row (@$rows) {
+            # Do something with your row
+        }
+    
+        $ch->do("INSERT INTO some_table (id, field_one, field_two) VALUES",
+            [1, "String value", 38962986],
+            [2, "String value", 38962986],
+        );
+
+SUBROUTINES/METHODS
+
+ new
+
+    Create new connection object
+
+ select
+
+    Fetch data from table. It returns a reference to an array that contains
+    one reference per row (similar to DBI::fetchall_arrayref).
+
+ do
+
+    Modify data inside the database. It's universal method for any queries,
+    which modify data. So if you want to create, alter, detach or drop
+    table or partition or insert data into table it's your guy.
+
+AUTHOR
+
+    Ilya Rassadin, <elcamlost at gmail.com>
+
+BUGS
+
+    Please report any bugs or feature requests to
+    https://github.com/elcamlost/perl-DBD-ClickHouse/issues. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+
+    You can find documentation for this module with the perldoc command.
+
+        perldoc ClickHouse
+
+    You can also look for information at:
+
+      * ClickHouse official documentation
+
+      https://clickhouse.yandex/reference_en.html
+
+      * Metacpan
+
+      https://metacpan.org/pod/ClickHouse/
+
+      * GitHub
+
+      https://github.com/elcamlost/perl-DBD-ClickHouse
+
+      * CPAN Ratings
+
+      http://cpanratings.perl.org/d/ClickHouse
+
+      * Search CPAN
+
+      http://search.cpan.org/dist/ClickHouse/
+
+ACKNOWLEDGEMENTS
+
+LICENSE AND COPYRIGHT
+
+    Copyright 2016 Ilya Rassadin.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the the Artistic License (2.0). You may obtain a
+    copy of the full license at:
+
+       The Artistic License 2.0 (GPL Compatible)
+
+    Aggregation of this Package with a commercial distribution is always
+    permitted provided that the use of this Package is embedded; that is,
+    when no overt attempt is made to make this Package's interfaces visible
+    to the end user of the commercial distribution. Such use shall not be
+    construed as a distribution of this Package.
+
+    The name of the Copyright Holder may not be used to endorse or promote
+    products derived from this software without specific prior written
+    permission.
+
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

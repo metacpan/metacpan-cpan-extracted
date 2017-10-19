@@ -5,7 +5,7 @@ use strict;
 use warnings FATAL => 'all';
 use parent qw(Exporter);
 use Carp qw(croak);
-use PPI::Lexer qw();
+use PPI;
 use Scalar::Util qw(looks_like_number);
 
 our @EXPORT_OK = qw(ps_parse ps_serialize);
@@ -16,13 +16,21 @@ our @EXPORT_OK = qw(ps_parse ps_serialize);
 
 Struct::Path::PerlStyle - Perl-style syntax frontend for L<Struct::Path|Struct::Path>.
 
+=begin html
+
+<a href="https://travis-ci.org/mr-mixas/Struct-Path-PerlStyle.pm"><img src="https://travis-ci.org/mr-mixas/Struct-Path-PerlStyle.pm.svg?branch=master" alt="Travis CI"></a>
+<a href='https://coveralls.io/github/mr-mixas/Struct-Path-PerlStyle.pm?branch=master'><img src='https://coveralls.io/repos/github/mr-mixas/Struct-Path-PerlStyle.pm/badge.svg?branch=master' alt='Coverage Status'/></a>
+<a href="https://badge.fury.io/pl/Struct-Path-PerlStyle"><img src="https://badge.fury.io/pl/Struct-Path-PerlStyle.svg" alt="CPAN version"></a>
+
+=end html
+
 =head1 VERSION
 
-Version 0.70
+Version 0.71
 
 =cut
 
-our $VERSION = '0.70';
+our $VERSION = '0.71';
 
 =head1 SYNOPSIS
 
@@ -105,7 +113,7 @@ sub ps_parse($;$);
 sub ps_parse($;$) {
     my ($path, $opts) = @_;
     croak "Undefined path passed" unless (defined $path);
-    my $doc = PPI::Lexer->lex_source($path);
+    my $doc = PPI::Document->new(ref $path ? $path : \$path);
     croak "Failed to parse passed path '$path'" unless (defined $doc);
     my @out;
 
@@ -230,8 +238,8 @@ sub ps_serialize($) {
                 croak "Incorrect array index '$i', step #$sc"
                     unless (looks_like_number($i) and int($i) == $i);
                 if (@ranges and (
-                    ($ranges[-1][-1] + 1 == $i and $ranges[-1][0] < $i) or   # ascending
-                    ($ranges[-1][-1] - 1 == $i and $ranges[-1][0] > $i)      # descending
+                    $ranges[-1][0] < $i and $ranges[-1][-1] == $i - 1 or   # ascending
+                    $ranges[-1][0] > $i and $ranges[-1][-1] == $i + 1      # descending
                 )) {
                     $ranges[-1][1] = $i; # update range
                 } else {

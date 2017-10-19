@@ -3,128 +3,101 @@
 use 5.012;
 no warnings "experimental";
 
-use File::Find::Wanted qw(find_wanted);
-use Spp::Builtin qw(read_file write_file to_json clean_ast);
-use Mylisp qw(mylisp_to_ast);
-use Mylisp::Core qw(change_sufix is_update);
-use Mylisp::ToPerl qw(ast_to_perl tidy_perl);
-use Mylisp::Lint;
+use Spp::Builtin;
+use Spp::Tools;
+use Mylisp qw(mylisp_repl mylisp_to_ast);
+use Mylisp::LintAst qw(lint_mylisp_ast);
+use Mylisp::ToPerl qw(ast_to_perl);
 
 my $action = $ARGV[0];
 my $file   = $ARGV[1];
 given ($action) {
-   when ('--repl')   { Mylisp::repl() }
-   when ('--update') { Mylisp::update() }
-   when ('--json')   { ast_to_json($file) }
-   when ('--perl')   { to_perl() }
-   when ('--lint')   { lint_dir($file) }
-   when ('--tidy')   { tidy_dir($file) }
+   when ('--repl')   { mylisp_repl() }
+   when ('--lint')   { lint($file) }
+   when ('--toperl') { to_perl($file) }
+   when ('--togo')   { to_go($file) }
    default {
       say "
-      ## REPL mode
-      mylisp --repl
-
-      ## update grammar define in Spp/Grammar.pm
-      mylisp --update
-
       ## transfer mylisp file/dir to Ast Json file.
-      mylisp --json  file-or-dir
+      mylisp --togo  file-or-dir
 
       ## transfer mylisp file/dir to perl.file
-      mylisp --perl file-or-dir
+      mylisp --toperl file-or-dir
 
       ## check mylisp file or dir syntax error.
-      mylisp --lint file-or-dir
-
-      ## tidy perl .pl|.pm file|dir
-      mylisp --tidy file-or-dir"
-      ;
+      mylisp -lint file-or-dir";
+      mylisp_repl();      
    }
 }
 
-sub lint_dir {
+sub lint {
    my $dir = shift;
    if (-d $dir) {
       my @files = find_wanted(sub {/\.spp$/}, $dir);
       for my $file (@files) {
-         say "lint $file ...";
          lint_file($file);
       }
-   } elsif (-e $file) {
-      lint_file($file);
+   } elsif (-e $dir) {
+      lint_file($dir);
    }
 }      
 
 sub lint_file {
    my $file = shift;
+   say "lint $file ...";
    my $text = read_file($file);
    my $ast  = mylisp_to_ast($text);
-   my $linter = Mylisp::Lint->new($text);
-   $linter->lint_ast($ast);   
-   #ast_to_perl(clean_ast($ast));
+   lint_mylisp_ast($ast);
 }
 
 sub to_perl {
-  my @files = qw(
-  Cpan\Spp.spp
-  Cpan\Spp\Cursor.spp
-  Cpan\Spp\LintAst.spp
-  Cpan\Spp\MatchRule.spp
-  Cpan\Spp\OptAst.spp
-  Cpan\Spp\Tools.spp
-  Cpan\Spp\ToSpp.spp);
-  for my $file (@files) {
-    my $perl_file = change_sufix($file,'spp','pm');
-    if (-e $file) {
-      if (-e $perl_file) {
-        next if is_update($file, $perl_file);
+   my $dir = shift;
+   if (-d $dir) {
+      my @files = find_wanted(sub {/\.spp$/}, $dir);
+      for my $file (@files) {
+         to_perl_file($file);
       }
-      my $text = read_file($file);
-      my $ast  = mylisp_to_ast($text);
-      my $linter = Mylisp::Lint->new($text);
-      $linter->lint_ast($ast);
-      $ast = clean_ast($ast);
-      my $perl_str = ast_to_perl($ast);
-      write_file($perl_file, $perl_str);
-    }
+   } elsif (-e $dir) {
+      to_perl_file($dir);
+   }
+}
+
+sub to_perl_file {
+  my $file = shift;
+  say "to perl $file ...";
+  my $perl_file = change_sufix($file,'spp','pm');
+  if (-e $perl_file) {
+    next if is_update($file, $perl_file);
   }
+  my $text = read_file($file);
+  my $ast  = mylisp_to_ast($text);
+  $ast = clean_ast($ast);
+  my $perl_str = ast_to_perl($ast);
+  write_file($perl_file, $perl_str);
 }
 
-sub tidy_dir {
+sub to_perl {
    my $dir = shift;
    if (-d $dir) {
-      my @files = find_wanted(sub {/\.p[ml]$/}, $dir);
+      my @files = find_wanted(sub {/\.spp$/}, $dir);
       for my $file (@files) {
-         print "tidy file: $file .. ";
-         tidy_file($file)
+         to_go_file($file);
       }
-   } elsif (-e $dir) { tidy_file($dir) }
+   } elsif (-e $dir) {
+      to_go_file($dir);
+   }
 }
 
-sub tidy_file {
-   my $file = shift;
-   my $text = read_file($file);
-   my $tidy_text = tidy_perl($text);
-   rename($file, "$file.bak");
-   write_file($file, $tidy_text);
+sub to_go_file {
+  my $file = shift;
+  say "to go $file ...";
+  my $go_file = change_sufix($file,'spp','go');
+  if (-e $go_file) {
+    next if is_update($file, $go_file);
+  }
+  my $text = read_file($file);
+  my $ast  = mylisp_to_ast($text);
+  $ast = clean_ast($ast);
+  my $go_str = ast_to_go($ast);
+  write_file($go_file, $go_str);
 }
-
-sub ast_to_json {
-   my $dir = shift;
-   if (-d $dir) {
-      my @files = find_wanted(sub {/\.p[ml]$/}, $dir);
-      for my $file (@files) {
-         print "mylisp Ast to Json file: $file .. ";
-         ast_to_json_file($file)
-      }
-   } elsif (-e $dir) { ast_to_json_file($dir) }
-}
-
-sub ast_to_json_file {
-   my $file = shift;
-   my $text = read_file($file);
-   my $ast  = mylisp_to_ast($text);
-   my $json_file = change_sufix($file,'spp','json');
-   write_file($json_file, to_json(clean_ast($ast)));
-}
-

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 22;
+use Test::More;
 use Test::Exception;
 use Test::Differences;
 
@@ -111,3 +111,17 @@ Depends: libfoo-perl (>= 0.44839848),
  libtreshchotka-moo (>= 5.6),
  libmoo-more-java (>= 9.6544)
 EOF
+
+# canonical / case-insensitive field names/accessors
+lives_ok { $s = Debian::Control::Stanza::Source->new({'Vcs_Git' => 'git://example.org'}) } 'Source constructor with Vcs_Git';
+can_ok($s, qw(Vcs_Git));
+ok($s->Vcs_Git eq 'git://example.org', 'Vcs_Git returns correct value');
+throws_ok { $s->vCs_GiT } qr/Can't locate object method "vCs_GiT" via package "Debian::Control::Stanza::Source"/, 'No method vCs_GiT';
+
+lives_ok { $s = Debian::Control::Stanza::Source->new({'vCs-GiT' => 'git://example.net'}) } 'Source constructor with vCs-GiT';
+can_ok($s, qw(Vcs_Git));
+ok($s->Vcs_Git eq 'git://example.net', 'Vcs_Git returns correct value');
+throws_ok { $s->vCs_GiT } qr/Can't locate object method "vCs_GiT" via package "Debian::Control::Stanza::Source"/, 'No method vCs_GiT';
+
+
+done_testing;

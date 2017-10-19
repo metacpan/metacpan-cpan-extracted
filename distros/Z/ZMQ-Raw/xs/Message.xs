@@ -70,6 +70,30 @@ size (self)
 
 	OUTPUT: RETVAL
 
+SV *
+clone (self)
+	SV *self
+
+	PREINIT:
+		int rc;
+		zmq_msg_t *msg, *old;
+
+	CODE:
+		old = ZMQ_SV_TO_PTR (Message, self);
+
+		Newx (msg, 1, zmq_msg_t);
+		rc = zmq_msg_init (msg);
+		zmq_raw_check_error (rc);
+
+		rc = zmq_msg_copy (msg, old);
+		if (rc < 0)
+			Safefree (msg);
+		zmq_raw_check_error (rc);
+
+		ZMQ_NEW_OBJ (RETVAL, "ZMQ::Raw::Message", msg);
+
+	OUTPUT: RETVAL
+
 unsigned int
 routing_id(self, ...)
 	SV *self

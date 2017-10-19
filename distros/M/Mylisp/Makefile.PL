@@ -4,18 +4,15 @@ use ExtUtils::MakeMaker;
 WriteMakefile
 (
   'VERSION_FROM' => 'lib/Mylisp.pm',
+  'PL_FILES' => {},
   'PREREQ_PM' => {
-                   'Perl::Tidy' => 0,
-                   'File::Find::Wanted' => 0,
-                   'Spp' => 0,
                    'Test::More' => 0,
-                   'File::Basename' => 0
+                   'Spp' => '2.03'
                  },
+  'NAME' => 'Mylisp',
   'EXE_FILES' => [
                    'bin/mylisp'
                  ],
-  'NAME' => 'Mylisp',
-  'PL_FILES' => {},
   'INSTALLDIRS' => 'site'
 )
 ;

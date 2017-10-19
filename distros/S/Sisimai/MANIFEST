@@ -70,15 +70,12 @@ lib/Sisimai/Bite/Email/qmail.pm
 lib/Sisimai/Bite/JSON.pm
 lib/Sisimai/Bite/JSON/AmazonSES.pm
 lib/Sisimai/Bite/JSON/SendGrid.pm
-lib/Sisimai/CED.pm
 lib/Sisimai/Data.pm
 lib/Sisimai/Data/JSON.pm
 lib/Sisimai/Data/YAML.pm
 lib/Sisimai/DateTime.pm
 lib/Sisimai/MDA.pm
 lib/Sisimai/MIME.pm
-lib/Sisimai/MSP.pm
-lib/Sisimai/MTA.pm
 lib/Sisimai/Mail.pm
 lib/Sisimai/Mail/Maildir.pm
 lib/Sisimai/Mail/Mbox.pm
@@ -125,6 +122,7 @@ lib/Sisimai/Reason/Vacation.pm
 lib/Sisimai/Reason/VirusDetected.pm
 lib/Sisimai/Rhost.pm
 lib/Sisimai/Rhost/ExchangeOnline.pm
+lib/Sisimai/Rhost/GoDaddy.pm
 lib/Sisimai/Rhost/GoogleApps.pm
 lib/Sisimai/SMTP.pm
 lib/Sisimai/SMTP/Error.pm
@@ -151,6 +149,12 @@ set-of-emails/jsonobj/json-sendgrid-08.json
 set-of-emails/jsonobj/json-sendgrid-09.json
 set-of-emails/jsonobj/json-sendgrid-10.json
 set-of-emails/jsonobj/json-sendgrid-11.json
+set-of-emails/jsonobj/json-sendgrid-12.json
+set-of-emails/jsonobj/json-sendgrid-13.json
+set-of-emails/jsonobj/json-sendgrid-14.json
+set-of-emails/jsonobj/json-sendgrid-15.json
+set-of-emails/jsonobj/json-sendgrid-16.json
+set-of-emails/jsonobj/json-sendgrid-17.json
 set-of-emails/mailbox/mbox-0
 set-of-emails/mailbox/mbox-1
 set-of-emails/maildir/bsd/README.md
@@ -517,6 +521,8 @@ set-of-emails/maildir/bsd/rfc3834-04.eml
 set-of-emails/maildir/bsd/rfc3834-05.eml
 set-of-emails/maildir/bsd/rfc3834-06.eml
 set-of-emails/maildir/bsd/rhost-exchange-online-01.eml
+set-of-emails/maildir/bsd/rhost-godaddy-01.eml
+set-of-emails/maildir/bsd/rhost-godaddy-02.eml
 set-of-emails/maildir/bsd/rhost-google-apps-01.eml
 set-of-emails/maildir/dos/arf-01.eml
 set-of-emails/maildir/dos/email-activehunter-01.eml
@@ -707,6 +713,7 @@ t/201-reason-children.t
 t/300-rhost.t
 t/301-rhost-googleapps.t
 t/302-rhost-exchangeonline.t
+t/303-rhost-goddady.t
 t/500-data.t
 t/501-data-json.t
 t/502-data-yaml.t

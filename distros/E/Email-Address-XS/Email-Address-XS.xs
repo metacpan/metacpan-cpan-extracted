@@ -22,12 +22,27 @@
 #define UTF8_IS_INVARIANT(c) (((U8)c) < 0x80)
 #endif
 
+/* Perl pre 5.10.1 support */
+#ifndef newSVpvn_utf8
+static SV *newSVpvn_utf8(pTHX_ const char *str, STRLEN len, U32 utf8) {
+	SV *sv = newSVpvn(str, len);
+	if (utf8) SvUTF8_on(sv);
+	return sv;
+}
+#define newSVpvn_utf8(str, len, utf8) newSVpvn_utf8(aTHX_ str, len, utf8)
+#endif
+
 /* Perl pre 5.13.1 support */
 #ifndef warn_sv
 #define warn_sv(scalar) warn("%s", SvPV_nolen(scalar))
 #endif
 #ifndef croak_sv
 #define croak_sv(scalar) croak("%s", SvPV_nolen(scalar))
+#endif
+
+/* Perl pre 5.15.4 support */
+#ifndef sv_derived_from_pvn
+#define sv_derived_from_pvn(scalar, name, len, flags) sv_derived_from(scalar, name)
 #endif
 
 /* Exported i_panic function for other C files */
@@ -82,6 +97,11 @@ static void carp(bool fatal, const char *format, ...)
 		croak_sv(scalar);
 }
 
+static bool string_contains_nul(const char *str, STRLEN len)
+{
+	return (memchr(str, 0, len + 1) != str + len);
+}
+
 static bool string_needs_utf8_upgrade(const char *str, STRLEN len)
 {
 	STRLEN i;
@@ -93,10 +113,9 @@ static bool string_needs_utf8_upgrade(const char *str, STRLEN len)
 	return false;
 }
 
-static const char *get_perl_scalar_value(pTHX_ SV *scalar, bool utf8, bool nomg)
+static const char *get_perl_scalar_value(pTHX_ SV *scalar, STRLEN *len, bool utf8, bool nomg)
 {
 	const char *string;
-	STRLEN len;
 
 #ifndef WITHOUT_SvPV_nomg
 	if (!nomg)
@@ -105,37 +124,51 @@ static const char *get_perl_scalar_value(pTHX_ SV *scalar, bool utf8, bool nomg)
 	if (!SvOK(scalar))
 		return NULL;
 
-	string = SvPV_nomg(scalar, len);
+	string = SvPV_nomg(scalar, *len);
 #else
+	COP cop;
+
 	if (!SvGMAGICAL(scalar) && !SvOK(scalar))
 		return NULL;
 
-	string = SvPV(scalar, len);
+	/* Temporary turn off all warnings because SvPV can throw uninitialized warning */
+	cop = *PL_curcop;
+	cop.cop_warnings = pWARN_NONE;
+
+	ENTER;
+	SAVEVPTR(PL_curcop);
+	PL_curcop = &cop;
+
+	string = SvPV(scalar, *len);
+
+	LEAVE;
 
 	if (SvGMAGICAL(scalar) && !SvOK(scalar))
 		return NULL;
 #endif
 
-	if (utf8 && !SvUTF8(scalar) && string_needs_utf8_upgrade(string, len)) {
-		scalar = sv_2mortal(newSVpvn(string, len));
+	if (utf8 && !SvUTF8(scalar) && string_needs_utf8_upgrade(string, *len)) {
+		scalar = sv_2mortal(newSVpvn(string, *len));
 #ifdef BROKEN_SvPVutf8
 		sv_utf8_upgrade(scalar);
+		*len = SvCUR(scalar);
 		return SvPVX(scalar);
 #else
-		return SvPVutf8_nolen(scalar);
+		return SvPVutf8(scalar, *len);
 #endif
 	}
 
 	return string;
 }
 
-static const char *get_perl_scalar_string_value(pTHX_ SV *scalar, const char *name, bool utf8)
+static const char *get_perl_scalar_string_value(pTHX_ SV *scalar, STRLEN *len, const char *name, bool utf8)
 {
 	const char *string;
 
-	string = get_perl_scalar_value(aTHX_ scalar, utf8, false);
+	string = get_perl_scalar_value(aTHX_ scalar, len, utf8, false);
 	if (!string) {
 		carp(CARP_WARN, "Use of uninitialized value for %s", name);
+		*len = 0;
 		return "";
 	}
 
@@ -159,7 +192,7 @@ static SV *get_perl_hash_scalar(pTHX_ HV *hash, const char *key)
 	return *scalar_ptr;
 }
 
-static const char *get_perl_hash_value(pTHX_ HV *hash, const char *key, bool utf8, bool *taint)
+static const char *get_perl_hash_value(pTHX_ HV *hash, const char *key, STRLEN *len, bool utf8, bool *taint)
 {
 	SV *scalar;
 
@@ -170,7 +203,7 @@ static const char *get_perl_hash_value(pTHX_ HV *hash, const char *key, bool utf
 	if (!*taint && SvTAINTED(scalar))
 		*taint = true;
 
-	return get_perl_scalar_value(aTHX_ scalar, utf8, true);
+	return get_perl_scalar_value(aTHX_ scalar, len, utf8, true);
 }
 
 static void set_perl_hash_value(pTHX_ HV *hash, const char *key, const char *value, bool utf8, bool taint)
@@ -220,16 +253,17 @@ static HV *get_perl_class_from_perl_cv(pTHX_ CV *cv)
 static HV *get_perl_class_from_perl_scalar(pTHX_ SV *scalar)
 {
 	HV *class;
+	STRLEN class_len;
 	const char *class_name;
 
-	class_name = get_perl_scalar_string_value(aTHX_ scalar, "class", false);
+	class_name = get_perl_scalar_string_value(aTHX_ scalar, &class_len, "class", true);
 
-	if (!class_name[0]) {
+	if (class_len == 0) {
 		carp(CARP_WARN, "Explicit blessing to '' (assuming package main)");
 		class_name = "main";
 	}
 
-	class = gv_stashpv(class_name, GV_ADD);
+	class = gv_stashpvn(class_name, class_len, GV_ADD | SVf_UTF8);
 	if (!class)
 		carp(CARP_DIE, "Cannot retrieve class %s", class_name);
 
@@ -244,45 +278,105 @@ static HV *get_perl_class_from_perl_scalar_or_cv(pTHX_ SV *scalar, CV *cv)
 		return get_perl_class_from_perl_cv(aTHX_ cv);
 }
 
-static bool is_class_object(pTHX_ const char *class, SV *object)
+static bool is_class_object(pTHX_ SV *class, SV *object)
 {
-	return sv_isobject(object) && sv_derived_from(object, class);
+	dSP;
+	SV *sv;
+	bool ret;
+	int count;
+
+	if (!sv_isobject(object))
+		return false;
+
+	ENTER;
+	SAVETMPS;
+
+	PUSHMARK(SP);
+	EXTEND(SP, 2);
+
+	XPUSHs(sv_2mortal(newSVsv(object)));
+	XPUSHs(sv_2mortal(newSVsv(class)));
+
+	PUTBACK;
+
+	count = call_method("isa", G_SCALAR);
+
+	SPAGAIN;
+
+	if (count > 0) {
+		sv = POPs;
+		ret = SvTRUE(sv);
+	} else {
+		ret = false;
+	}
+
+	PUTBACK;
+	FREETMPS;
+	LEAVE;
+
+	return ret;
 }
 
-static HV* get_object_hash_from_perl_array(pTHX_ AV *array, I32 index1, I32 index2, const char *class, bool warn)
+static void fill_element_message(char *buffer, size_t len, I32 index1, I32 index2)
+{
+	static const char message[] = "Element at index ";
+
+	if (len < 10 || buffer[0])
+		return;
+
+	if (len+10+1+10 < sizeof(message)) {
+		buffer[0] = 0;
+		return;
+	}
+
+	if (index2 == -1) {
+		strcpy(buffer, "Argument");
+		return;
+	}
+
+	memcpy(buffer, message, sizeof(message));
+
+	if (index1 == -1)
+		sprintf(buffer+sizeof(message)-1, "%d", (int)index2);
+	else
+		sprintf(buffer+sizeof(message)-1, "%d/%d", (int)index1, (int)index2);
+}
+
+static HV* get_object_hash_from_perl_array(pTHX_ AV *array, I32 index1, I32 index2, SV *class, bool warn)
 {
 	SV *scalar;
 	SV *object;
 	SV **object_ptr;
+	char buffer[40] = { 0 };
 
 #ifdef WITHOUT_SvPV_nomg
 	warn = true;
 #endif
 
-	object_ptr = av_fetch(array, index2, 0);
+	object_ptr = av_fetch(array, (index2 == -1 ? 0 : index2), 0);
 	if (!object_ptr) {
-		if (warn)
-			carp(CARP_WARN, "Element at index %d/%d is NULL", (int)index1, (int)index2);
+		if (warn) {
+			fill_element_message(buffer, sizeof(buffer), index1, index2);
+			carp(CARP_WARN, "%s is NULL", buffer);
+		}
 		return NULL;
 	}
 
 	object = *object_ptr;
 	if (!is_class_object(aTHX_ class, object)) {
-		if (warn)
-			carp(CARP_WARN, "Element at index %d/%d is not %s object", (int)index1, (int)index2, class);
-		return NULL;
-	}
-
-	if (!SvROK(object)) {
-		if (warn)
-			carp(CARP_WARN, "Element at index %d/%d is not reference", (int)index1, (int)index2);
+		if (warn) {
+			fill_element_message(buffer, sizeof(buffer), index1, index2);
+			carp(CARP_WARN, "%s is not %s object", buffer, SvPV_nolen(class));
+		}
 		return NULL;
 	}
 
 	scalar = SvRV(object);
 	if (SvTYPE(scalar) != SVt_PVHV) {
-		if (warn)
-			carp(CARP_WARN, "Element at index %d/%d is not HASH reference", (int)index1, (int)index2);
+		if (warn) {
+			fill_element_message(buffer, sizeof(buffer), index1, index2);
+			carp(CARP_WARN, "%s is not HASH reference", buffer);
+		}
 		return NULL;
 	}
 
@@ -290,22 +384,48 @@ static HV* get_object_hash_from_perl_array(pTHX_ AV *array, I32 index1, I32 inde
 
 }
 
-static void message_address_add_from_perl_array(pTHX_ struct message_address **first_address, struct message_address **last_address, bool utf8, bool *taint, AV *array, I32 index1, I32 index2, const char *class)
+static void message_address_add_from_perl_array(pTHX_ struct message_address **first_address, struct message_address **last_address, bool utf8, bool *taint, AV *array, I32 index1, I32 index2, SV *class)
 {
 	HV *hash;
 	const char *name;
 	const char *mailbox;
 	const char *domain;
 	const char *comment;
+	STRLEN name_len;
+	STRLEN mailbox_len;
+	STRLEN domain_len;
+	STRLEN comment_len;
+	char buffer[40] = { 0 };
 
 	hash = get_object_hash_from_perl_array(aTHX_ array, index1, index2, class, false);
 	if (!hash)
 		return;
 
-	name = get_perl_hash_value(aTHX_ hash, "phrase", utf8, taint);
-	mailbox = get_perl_hash_value(aTHX_ hash, "user", utf8, taint);
-	domain = get_perl_hash_value(aTHX_ hash, "host", utf8, taint);
-	comment = get_perl_hash_value(aTHX_ hash, "comment", utf8, taint);
+	name = get_perl_hash_value(aTHX_ hash, "phrase", &name_len, utf8, taint);
+	mailbox = get_perl_hash_value(aTHX_ hash, "user", &mailbox_len, utf8, taint);
+	domain = get_perl_hash_value(aTHX_ hash, "host", &domain_len, utf8, taint);
+	comment = get_perl_hash_value(aTHX_ hash, "comment", &comment_len, utf8, taint);
+
+
+	if (name && string_contains_nul(name, name_len)) {
+		fill_element_message(buffer, sizeof(buffer), index1, index2);
+		carp(CARP_WARN, "%s contains nul character in phrase", buffer);
+	}
+
+	if (mailbox && string_contains_nul(mailbox, mailbox_len)) {
+		fill_element_message(buffer, sizeof(buffer), index1, index2);
+		carp(CARP_WARN, "%s contains nul character in user portion of address", buffer);
+	}
+
+	if (domain && string_contains_nul(domain, domain_len)) {
+		fill_element_message(buffer, sizeof(buffer), index1, index2);
+		carp(CARP_WARN, "%s contains nul character in host portion of address", buffer);
+	}
+
+	if (comment && string_contains_nul(comment, comment_len)) {
+		fill_element_message(buffer, sizeof(buffer), index1, index2);
+		carp(CARP_WARN, "%s contains nul character in comment", buffer);
+	}
 
 	if (mailbox && !mailbox[0])
 		mailbox = NULL;
@@ -314,17 +434,20 @@ static void message_address_add_from_perl_array(pTHX_ struct message_address **f
 		domain = NULL;
 
 	if (!mailbox && !domain) {
-		carp(CARP_WARN, "Element at index %d/%d contains empty address", (int)index1, (int)index2);
+		fill_element_message(buffer, sizeof(buffer), index1, index2);
+		carp(CARP_WARN, "%s contains empty address", buffer);
 		return;
 	}
 
 	if (!mailbox) {
-		carp(CARP_WARN, "Element at index %d/%d contains empty user portion of address", (int)index1, (int)index2);
+		fill_element_message(buffer, sizeof(buffer), index1, index2);
+		carp(CARP_WARN, "%s contains empty user portion of address", buffer);
 		mailbox = "";
 	}
 
 	if (!domain) {
-		carp(CARP_WARN, "Element at index %d/%d contains empty host portion of address", (int)index1, (int)index2);
+		fill_element_message(buffer, sizeof(buffer), index1, index2);
+		carp(CARP_WARN, "%s contains empty host portion of address", buffer);
 		domain = "";
 	}
 
@@ -356,22 +479,29 @@ static AV *get_perl_array_from_scalar(SV *scalar, const char *group_name, bool w
 	return (AV *)scalar_ref;
 }
 
-static void message_address_add_from_perl_group(pTHX_ struct message_address **first_address, struct message_address **last_address, bool utf8, bool *taint, SV *scalar_group, SV *scalar_list, I32 index1, const char *class)
+static void message_address_add_from_perl_group(pTHX_ struct message_address **first_address, struct message_address **last_address, bool utf8, bool *taint, SV *scalar_group, SV *scalar_list, I32 index1, SV *class)
 {
 	I32 len;
 	I32 index2;
 	AV *array;
+	STRLEN group_len;
 	const char *group_name;
 
-	group_name = get_perl_scalar_value(aTHX_ scalar_group, utf8, true);
+	group_name = get_perl_scalar_value(aTHX_ scalar_group, &group_len, utf8, true);
 	array = get_perl_array_from_scalar(scalar_list, group_name, false);
 	len = array ? (av_len(array) + 1) : 0;
+
+	if (index1 == -1 && group_name)
+		index1 = 0;
+
+	if (group_name && string_contains_nul(group_name, group_len))
+		carp(CARP_WARN, "Group name '%s' contains nul character", group_name);
 
 	if (group_name)
 		message_address_add(first_address, last_address, NULL, NULL, group_name, NULL, NULL);
 
 	for (index2 = 0; index2 < len; ++index2)
-		message_address_add_from_perl_array(aTHX_ first_address, last_address, utf8, taint, array, index1, index2, class);
+		message_address_add_from_perl_array(aTHX_ first_address, last_address, utf8, taint, array, index1, ((index1 == -1 && len == 1) ? -1 : index2), class);
 
 	if (group_name)
 		message_address_add(first_address, last_address, NULL, NULL, NULL, NULL, NULL);
@@ -381,13 +511,14 @@ static void message_address_add_from_perl_group(pTHX_ struct message_address **f
 }
 
 #ifndef WITHOUT_SvPV_nomg
-static bool perl_group_needs_utf8(pTHX_ SV *scalar_group, SV *scalar_list, I32 index1, const char *class)
+static bool perl_group_needs_utf8(pTHX_ SV *scalar_group, SV *scalar_list, I32 index1, SV *class)
 {
 	I32 len;
 	I32 index2;
 	SV *scalar;
 	HV *hash;
 	AV *array;
+	STRLEN len_na;
 	bool utf8;
 	const char *group_name;
 	const char **hash_key_ptr;
@@ -396,20 +527,23 @@ static bool perl_group_needs_utf8(pTHX_ SV *scalar_group, SV *scalar_list, I32 i
 
 	utf8 = false;
 
-	group_name = get_perl_scalar_value(aTHX_ scalar_group, false, false);
+	group_name = get_perl_scalar_value(aTHX_ scalar_group, &len_na, false, false);
 	if (SvUTF8(scalar_group))
 		utf8 = true;
+
+	if (index1 == -1 && group_name)
+		index1 = 0;
 
 	array = get_perl_array_from_scalar(scalar_list, group_name, true);
 	len = array ? (av_len(array) + 1) : 0;
 
 	for (index2 = 0; index2 < len; ++index2) {
-		hash = get_object_hash_from_perl_array(aTHX_ array, index1, index2, class, true);
+		hash = get_object_hash_from_perl_array(aTHX_ array, index1, ((index1 == -1 && len == 1) ? -1 : index2), class, true);
 		if (!hash)
 			continue;
 		for (hash_key_ptr = hash_keys; *hash_key_ptr; ++hash_key_ptr) {
 			scalar = get_perl_hash_scalar(aTHX_ hash, *hash_key_ptr);
-			if (scalar && get_perl_scalar_value(aTHX_ scalar, false, false) && SvUTF8(scalar))
+			if (scalar && get_perl_scalar_value(aTHX_ scalar, &len_na, false, false) && SvUTF8(scalar))
 				utf8 = true;
 		}
 	}
@@ -452,9 +586,9 @@ static bool get_next_perl_address_group(pTHX_ struct message_address **address, 
 	in_group = !(*address)->domain;
 
 	if (in_group && (*address)->mailbox)
-		*group_scalar = newSVpv((*address)->mailbox, 0);
+		*group_scalar = sv_2mortal(newSVpv((*address)->mailbox, 0));
 	else
-		*group_scalar = newSV(0);
+		*group_scalar = sv_newmortal();
 
 	if (utf8 && in_group && (*address)->mailbox)
 		sv_utf8_decode(*group_scalar);
@@ -463,7 +597,7 @@ static bool get_next_perl_address_group(pTHX_ struct message_address **address, 
 		SvTAINTED_on(*group_scalar);
 
 	addresses_array = newAV();
-	*addresses_scalar = newRV_noinc((SV *)addresses_array);
+	*addresses_scalar = sv_2mortal(newRV_noinc((SV *)addresses_array));
 
 	if (in_group)
 		*address = (*address)->next;
@@ -475,6 +609,10 @@ static bool get_next_perl_address_group(pTHX_ struct message_address **address, 
 		set_perl_hash_value(aTHX_ hash, "user", ( (*address)->mailbox && (*address)->mailbox[0] ) ? (*address)->mailbox : NULL, utf8, taint);
 		set_perl_hash_value(aTHX_ hash, "host", ( (*address)->domain && (*address)->domain[0] ) ? (*address)->domain : NULL, utf8, taint);
 		set_perl_hash_value(aTHX_ hash, "comment", (*address)->comment, utf8, taint);
+		set_perl_hash_value(aTHX_ hash, "original", (*address)->original, utf8, taint);
+
+		if ((*address)->invalid_syntax)
+			(void)hv_store(hash, "invalid", sizeof("invalid")-1, newSViv(1), 0);
 
 		hash_ref = newRV_noinc((SV *)hash);
 		object = sv_bless(hash_ref, class);
@@ -495,7 +633,7 @@ MODULE = Email::Address::XS		PACKAGE = Email::Address::XS
 
 PROTOTYPES: DISABLE
 
-SV *
+void
 format_email_groups(...)
 PREINIT:
 	I32 i;
@@ -504,37 +642,38 @@ PREINIT:
 	char *string;
 	struct message_address *first_address;
 	struct message_address *last_address;
+	SV *string_scalar;
 INPUT:
-	const char *this_class_name = "$Package";
+	SV *this_class = sv_2mortal(newSVpvn_utf8("$Package", sizeof("$Package")-1, 1));
 INIT:
 	if (items % 2 == 1) {
 		carp(CARP_WARN, "Odd number of elements in argument list");
 		XSRETURN_UNDEF;
 	}
-CODE:
+PPCODE:
 	first_address = NULL;
 	last_address = NULL;
 	taint = false;
 #ifndef WITHOUT_SvPV_nomg
 	utf8 = false;
 	for (i = 0; i < items; i += 2)
-		if (perl_group_needs_utf8(aTHX_ ST(i), ST(i+1), i, this_class_name))
+		if (perl_group_needs_utf8(aTHX_ ST(i), ST(i+1), (items == 2 ? -1 : i), this_class))
 			utf8 = true;
 #else
 	utf8 = true;
 #endif
 	for (i = 0; i < items; i += 2)
-		message_address_add_from_perl_group(aTHX_ &first_address, &last_address, utf8, &taint, ST(i), ST(i+1), i, this_class_name);
+		message_address_add_from_perl_group(aTHX_ &first_address, &last_address, utf8, &taint, ST(i), ST(i+1), (items == 2 ? -1 : i), this_class);
 	message_address_write(&string, first_address);
 	message_address_free(&first_address);
-	RETVAL = newSVpv(string, 0);
-	if (utf8)
-		sv_utf8_decode(RETVAL);
-	if (taint)
-		SvTAINTED_on(RETVAL);
+	string_scalar = sv_2mortal(newSVpv(string, 0));
 	string_free(string);
-OUTPUT:
-	RETVAL
+	if (utf8)
+		sv_utf8_decode(string_scalar);
+	if (taint)
+		SvTAINTED_on(string_scalar);
+	EXTEND(SP, 1);
+	PUSHs(string_scalar);
 
 void
 parse_email_groups(...)
@@ -547,62 +686,71 @@ PREINIT:
 	SV *addresses_scalar;
 	bool utf8;
 	bool taint;
+	STRLEN input_len;
 	const char *input;
 	const char *class_name;
 	struct message_address *address;
 	struct message_address *first_address;
 INPUT:
 	const char *this_class_name = "$Package";
+	STRLEN this_class_len = sizeof("$Package")-1;
 INIT:
 	string_scalar = items >= 1 ? ST(0) : &PL_sv_undef;
 	class_scalar = items >= 2 ? ST(1) : NULL;
-	input = get_perl_scalar_string_value(aTHX_ string_scalar, "string", false);
+	input = get_perl_scalar_string_value(aTHX_ string_scalar, &input_len, "string", false);
 	utf8 = SvUTF8(string_scalar);
 	taint = SvTAINTED(string_scalar);
-	hv_class = get_perl_class_from_perl_scalar_or_cv(aTHX_ class_scalar ? class_scalar : NULL, cv);
-	if (class_scalar && !sv_derived_from(class_scalar, this_class_name)) {
+	hv_class = get_perl_class_from_perl_scalar_or_cv(aTHX_ class_scalar, cv);
+	if (class_scalar && !sv_derived_from_pvn(class_scalar, this_class_name, this_class_len, SVf_UTF8)) {
 		class_name = HvNAME(hv_class);
 		carp(CARP_WARN, "Class %s is not derived from %s", (class_name ? class_name : "(unknown)"), this_class_name);
 		XSRETURN_EMPTY;
 	}
 PPCODE:
-	first_address = message_address_parse(input, UINT_MAX, false);
+	first_address = message_address_parse(input, input_len, UINT_MAX, false);
 	count = count_address_groups(first_address);
 	EXTEND(SP, count * 2);
 	address = first_address;
 	while (get_next_perl_address_group(aTHX_ &address, &group_scalar, &addresses_scalar, hv_class, utf8, taint)) {
-		PUSHs(sv_2mortal(group_scalar));
-		PUSHs(sv_2mortal(addresses_scalar));
+		PUSHs(group_scalar);
+		PUSHs(addresses_scalar);
 	}
 	message_address_free(&first_address);
 
-SV *
+void
 compose_address(...)
 PREINIT:
 	char *string;
 	const char *mailbox;
 	const char *domain;
+	STRLEN mailbox_len;
+	STRLEN domain_len;
 	bool utf8;
 	bool taint;
 	SV *mailbox_scalar;
 	SV *domain_scalar;
+	SV *string_scalar;
 INIT:
 	mailbox_scalar = items >= 1 ? ST(0) : &PL_sv_undef;
 	domain_scalar = items >= 2 ? ST(1) : &PL_sv_undef;
-	mailbox = get_perl_scalar_string_value(aTHX_ mailbox_scalar, "mailbox", true);
-	domain = get_perl_scalar_string_value(aTHX_ domain_scalar, "domain", true);
+	mailbox = get_perl_scalar_string_value(aTHX_ mailbox_scalar, &mailbox_len, "mailbox", true);
+	domain = get_perl_scalar_string_value(aTHX_ domain_scalar, &domain_len, "domain", true);
 	utf8 = (SvUTF8(mailbox_scalar) || SvUTF8(domain_scalar));
 	taint = (SvTAINTED(mailbox_scalar) || SvTAINTED(domain_scalar));
-CODE:
+	if (string_contains_nul(mailbox, mailbox_len))
+		carp(CARP_WARN, "Nul character in user portion of address");
+	if (string_contains_nul(domain, domain_len))
+		carp(CARP_WARN, "Nul character in host portion of address");
+PPCODE:
 	compose_address(&string, mailbox, domain);
-	RETVAL = newSVpv(string, 0);
-	if (utf8)
-		sv_utf8_decode(RETVAL);
-	if (taint)
-		SvTAINTED_on(RETVAL);
+	string_scalar = sv_2mortal(newSVpv(string, 0));
 	string_free(string);
-OUTPUT:
-	RETVAL
+	if (utf8)
+		sv_utf8_decode(string_scalar);
+	if (taint)
+		SvTAINTED_on(string_scalar);
+	EXTEND(SP, 1);
+	PUSHs(string_scalar);
 
 void
 split_address(...)
@@ -610,6 +758,7 @@ PREINIT:
 	const char *string;
 	char *mailbox;
 	char *domain;
+	STRLEN string_len;
 	bool utf8;
 	bool taint;
 	SV *string_scalar;
@@ -617,13 +766,13 @@ PREINIT:
 	SV *domain_scalar;
 INIT:
 	string_scalar = items >= 1 ? ST(0) : &PL_sv_undef;
-	string = get_perl_scalar_string_value(aTHX_ string_scalar, "string", false);
+	string = get_perl_scalar_string_value(aTHX_ string_scalar, &string_len, "string", false);
 	utf8 = SvUTF8(string_scalar);
 	taint = SvTAINTED(string_scalar);
 PPCODE:
-	split_address(string, &mailbox, &domain);
-	mailbox_scalar = mailbox ? newSVpv(mailbox, 0) : newSV(0);
-	domain_scalar = domain ? newSVpv(domain, 0) : newSV(0);
+	split_address(string, string_len, &mailbox, &domain);
+	mailbox_scalar = mailbox ? sv_2mortal(newSVpv(mailbox, 0)) : sv_newmortal();
+	domain_scalar = domain ? sv_2mortal(newSVpv(domain, 0)) : sv_newmortal();
 	string_free(mailbox);
 	string_free(domain);
 	if (utf8) {
@@ -635,17 +784,15 @@ PPCODE:
 		SvTAINTED_on(domain_scalar);
 	}
 	EXTEND(SP, 2);
-	PUSHs(sv_2mortal(mailbox_scalar));
-	PUSHs(sv_2mortal(domain_scalar));
+	PUSHs(mailbox_scalar);
+	PUSHs(domain_scalar);
 
-void
+bool
 is_obj(...)
 PREINIT:
 	SV *class = items >= 1 ? ST(0) : &PL_sv_undef;
 	SV *object = items >= 2 ? ST(1) : &PL_sv_undef;
-	const char *class_string = get_perl_scalar_string_value(aTHX_ class, "class", false);
 CODE:
-	if (is_class_object(aTHX_ class_string, object))
-		XSRETURN_YES;
-	else
-		XSRETURN_NO;
+	RETVAL = is_class_object(aTHX_ class, object);
+OUTPUT:
+	RETVAL

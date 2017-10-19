@@ -10,7 +10,7 @@ use_ok("File::RoundRobin");
 { # print & getc & read tests
     
     local *FH;
- 	tie *FH, 'File::RoundRobin', path => 'test.txt',size => '1k';
+ 	tie *FH, 'File::RoundRobin', path => '03_1_test.txt',size => '1k';
 
     my $fh = *FH;
 
@@ -18,7 +18,7 @@ use_ok("File::RoundRobin");
 
 	close($fh);
 	
-	tie *FH, 'File::RoundRobin', path => 'test.txt',mode => 'read';
+	tie *FH, 'File::RoundRobin', path => '03_1_test.txt',mode => 'read';
 	
 	$fh = *FH;
 	
@@ -31,7 +31,7 @@ use_ok("File::RoundRobin");
 	is($buffer,"oo bar",'read returned text as expected');
 	is($bytes,6,'length returned ok');
 	
-	unlink('test.txt');
+	unlink('03_1_test.txt');
 }
 
 
@@ -40,7 +40,7 @@ use_ok("File::RoundRobin");
 	local $/ = undef;
 
     local *FH;
- 	tie *FH, 'File::RoundRobin', path => 'test.txt',size => '1000';
+ 	tie *FH, 'File::RoundRobin', path => '03_2_test.txt',size => '1000';
 
     my $fh = *FH;
 
@@ -48,7 +48,7 @@ use_ok("File::RoundRobin");
 
 	close($fh);
 	
-	tie *FH, 'File::RoundRobin', path => 'test.txt',mode => 'read';
+	tie *FH, 'File::RoundRobin', path => '03_2_test.txt',mode => 'read';
 	
 	$fh = *FH;
 	
@@ -64,7 +64,7 @@ use_ok("File::RoundRobin");
 	$line = readline($fh);
 	is($line,undef,'reached end of file');
 	
-	unlink('test.txt');
+	unlink('03_2_test.txt');
 }
 
 
@@ -74,7 +74,7 @@ use_ok("File::RoundRobin");
 	seek(DATA,0,0);
 
     local *FH;
- 	tie *FH, 'File::RoundRobin', path => 'test.txt',size => '111';
+ 	tie *FH, 'File::RoundRobin', path => '03_3_test.txt',size => '111';
 
     my $fh = *FH;
 
@@ -82,7 +82,7 @@ use_ok("File::RoundRobin");
 
 	close($fh);
 	
-	tie *FH, 'File::RoundRobin', path => 'test.txt',mode => 'read';
+	tie *FH, 'File::RoundRobin', path => '03_3_test.txt',mode => 'read';
 	
 	$fh = *FH;
 	
@@ -97,7 +97,7 @@ use_ok("File::RoundRobin");
 	
 	isnt(defined $buffer,'Cannot read beyond the end of line');
 	
-	unlink('test.txt');
+	unlink('03_3_test.txt');
 }
 
 { # read beyond the end of line
@@ -106,7 +106,7 @@ use_ok("File::RoundRobin");
 	seek(DATA,0,0);
 
     local *FH;
- 	tie *FH, 'File::RoundRobin', path => 'test.txt',size => '111';
+ 	tie *FH, 'File::RoundRobin', path => '03_4_test.txt',size => '111';
 
     my $fh = *FH;
 
@@ -114,7 +114,7 @@ use_ok("File::RoundRobin");
 
 	close($fh);
 	
-	tie *FH, 'File::RoundRobin', path => 'test.txt',mode => 'read';
+	tie *FH, 'File::RoundRobin', path => '03_4_test.txt',mode => 'read';
 	
 	$fh = *FH;
 	
@@ -125,7 +125,7 @@ use_ok("File::RoundRobin");
 	read($fh,$buffer,10);
 	isnt(defined $buffer,'Cannot read beyond the end of line');
 	
-	unlink('test.txt');
+	unlink('03_4_test.txt');
 }
 
 

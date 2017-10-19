@@ -1,0 +1,9 @@
+0.002   2017-10-19 (PERLANCAR)
+
+        - Rename module from DateTime::Tiny::Compact to DateTimeX::Tiny::Compact
+          (requested by DROLSKY).
+
+
+0.001   2017-10-15 (PERLANCAR)
+
+        - First release.

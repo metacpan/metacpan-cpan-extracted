@@ -9,8 +9,6 @@ build_requires:
   IPC::Open3: '0'
   Test::More: '0'
   perl: '5.006'
-  strict: '0'
-  warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -23,21 +21,29 @@ name: Dancer2-Plugin-WebSocket
 provides:
   Dancer2::Plugin::WebSocket:
     file: lib/Dancer2/Plugin/WebSocket.pm
-    version: v0.0.1
+    version: v0.1.0
   Dancer2::Plugin::WebSocket::Connection:
     file: lib/Dancer2/Plugin/WebSocket/Connection.pm
-    version: v0.0.1
+    version: v0.1.0
+  Dancer2::Plugin::WebSocket::Group:
+    file: lib/Dancer2/Plugin/WebSocket/Group.pm
+    version: v0.1.0
 requires:
   Dancer2::Plugin: '0'
   JSON::MaybeXS: '0'
+  Moo: '0'
   Moo::Role: '0'
   Plack::App::WebSocket: '0'
-  Role::Tiny: '0'
+  Scalar::Util: '0'
+  Set::Tiny: '0'
+  Try::Tiny: '0'
+  strict: '0'
+  warnings: '0'
 resources:
   bugtracker: https://github.com/yanick/Dancer2-Plugin-WebSocket/issues
   homepage: https://github.com/yanick/Dancer2-Plugin-WebSocket
   repository: https://github.com/yanick/Dancer2-Plugin-WebSocket.git
-version: 0.0.1
+version: 0.1.0
 x_author_pledge:
   version: 1
 x_authority: cpan:YANICK

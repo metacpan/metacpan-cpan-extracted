@@ -1013,3 +1013,20 @@ Revision history for App::MFILE::WWW
 - lib.js: displayError use css center
 - start.js: reset result line to &nbsp instead of null
 
+0.162 2017-10-14 13:01 CEST
+- Integrate D3 into the application
+- js: core/lib: allow empty line to be first item in dform
+- js: html: improved debug logging in maxLength()
+- js: html: in dform, handle entriesRead more carefully
+- js: core: implement getEntries() method in target prototype
+- js: Implement form entry vetting feature
+- js: ignore SHIFT+TAB in login dialog
+- js: concentrate form entries into a central module
+- js: start: use currentTarget "global" in mmSubmit()
+- js: core: implement date vetter function
+- js: datetime: implement canonicalizeTime and vetTimeRange
+- js: core: add submitAction property to drowselect
+- js: lib: enable displayError() to focus on arbitrary entry
+- js: datetime: implement offset time ranges
+- js: stack, start: make dform take an "inputId" option
+

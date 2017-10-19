@@ -56,7 +56,7 @@
       },
       "runtime" : {
          "requires" : {
-            "App::CELL" : "0.205",
+            "App::CELL" : "0.209",
             "Encode" : "0",
             "File::ShareDir" : "1.00",
             "File::Spec" : "0",
@@ -89,7 +89,7 @@
    "provides" : {
       "Web::MREST" : {
          "file" : "lib/Web/MREST.pm",
-         "version" : "0.287"
+         "version" : "0.288"
       },
       "Web::MREST::Dispatch" : {
          "file" : "lib/Web/MREST/Dispatch.pm",
@@ -138,5 +138,5 @@
          "http://opensource.org/licenses/BSD-3-Clause"
       ]
    },
-   "version" : "0.287"
+   "version" : "0.288"
 }

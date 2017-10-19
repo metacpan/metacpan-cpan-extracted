@@ -3,7 +3,7 @@ package Module::Build::SysPath;
 use warnings;
 use strict;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 use base 'Module::Build';
 use Sys::Path 0.11;
@@ -404,47 +404,6 @@ order):
     Lars Dɪᴇᴄᴋᴏᴡ 迪拉斯
     Emmanuel Rodriguez
     Slaven Rezić
-
-=head1 BUGS
-
-Please report any bugs or feature requests to C<bug-module-build-syspath at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Module-Build-SysPath>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
-
-=head1 SUPPORT
-
-=head2 Mailing list
-
-L<http://lists.meon.sk/mailman/listinfo/sys-path>
-
-=head2 The rest
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc Sys::Path
-
-You can also look for information at:
-
-=over 4
-
-=item * RT: CPAN's request tracker
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Module-Build-SysPath>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Module-Build-SysPath>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Module-Build-SysPath>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Module-Build-SysPath>
-
-=back
-
 
 =head1 COPYRIGHT & LICENSE
 

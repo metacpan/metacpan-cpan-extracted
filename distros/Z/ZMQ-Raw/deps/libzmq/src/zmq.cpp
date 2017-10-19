@@ -247,6 +247,16 @@ int zmq_ctx_destroy (void *ctx_)
 
 // Sockets
 
+static zmq::socket_base_t *as_socket_base_t (void *s_)
+{
+    zmq::socket_base_t *s = static_cast<zmq::socket_base_t *> (s_);
+    if (!s_ || !s->check_tag ()) {
+        errno = ENOTSOCK;
+        return NULL;
+    }
+    return s;
+}
+
 void *zmq_socket (void *ctx_, int type_)
 {
     if (!ctx_ || !((zmq::ctx_t *) ctx_)->check_tag ()) {
@@ -260,109 +270,83 @@ void *zmq_socket (void *ctx_, int type_)
 
 int zmq_close (void *s_)
 {
-    if (!s_ || !((zmq::socket_base_t*) s_)->check_tag ()) {
-        errno = ENOTSOCK;
+    zmq::socket_base_t *s = as_socket_base_t (s_);
+    if (!s)
         return -1;
-    }
-    ((zmq::socket_base_t*) s_)->close ();
+    s->close ();
     return 0;
 }
 
 int zmq_setsockopt (void *s_, int option_, const void *optval_,
     size_t optvallen_)
 {
-    if (!s_ || !((zmq::socket_base_t*) s_)->check_tag ()) {
-        errno = ENOTSOCK;
+    zmq::socket_base_t *s = as_socket_base_t (s_);
+    if (!s)
         return -1;
-    }
-    zmq::socket_base_t *s = (zmq::socket_base_t *) s_;
-    int result = s->setsockopt (option_, optval_, optvallen_);
-    return result;
+    return s->setsockopt (option_, optval_, optvallen_);
 }
 
 int zmq_getsockopt (void *s_, int option_, void *optval_, size_t *optvallen_)
 {
-    if (!s_ || !((zmq::socket_base_t*) s_)->check_tag ()) {
-        errno = ENOTSOCK;
+    zmq::socket_base_t *s = as_socket_base_t (s_);
+    if (!s)
         return -1;
-    }
-    zmq::socket_base_t *s = (zmq::socket_base_t *) s_;
-    int result = s->getsockopt (option_, optval_, optvallen_);
-    return result;
+    return s->getsockopt (option_, optval_, optvallen_);
 }
 
 int zmq_socket_monitor (void *s_, const char *addr_, int events_)
 {
-    if (!s_ || !((zmq::socket_base_t*) s_)->check_tag ()) {
-        errno = ENOTSOCK;
+    zmq::socket_base_t *s = as_socket_base_t (s_);
+    if (!s)
         return -1;
-    }
-    zmq::socket_base_t *s = (zmq::socket_base_t *) s_;
-    int result = s->monitor (addr_, events_);
-    return result;
+    return s->monitor (addr_, events_);
 }
 
 int zmq_join (void *s_, const char* group_)
 {
-    if (!s_ || !((zmq::socket_base_t*) s_)->check_tag ()) {
-        errno = ENOTSOCK;
+    zmq::socket_base_t *s = as_socket_base_t (s_);
+    if (!s)
         return -1;
-    }
-    zmq::socket_base_t *s = (zmq::socket_base_t *) s_;
-    int result = s->join (group_);
-    return result;
+    return s->join (group_);
 }
 
 int zmq_leave (void *s_, const char* group_)
 {
-    if (!s_ || !((zmq::socket_base_t*) s_)->check_tag ()) {
-        errno = ENOTSOCK;
+    zmq::socket_base_t *s = as_socket_base_t (s_);
+    if (!s)
         return -1;
-    }
-    zmq::socket_base_t *s = (zmq::socket_base_t *) s_;
-    int result = s->leave (group_);
-    return result;
+    return s->leave (group_);
 }
 
 int zmq_bind (void *s_, const char *addr_)
 {
-    if (!s_ || !((zmq::socket_base_t*) s_)->check_tag ()) {
-        errno = ENOTSOCK;
+    zmq::socket_base_t *s = as_socket_base_t (s_);
+    if (!s)
         return -1;
-    }
-    zmq::socket_base_t *s = (zmq::socket_base_t *) s_;
-    int result = s->bind (addr_);
-    return result;
+    return s->bind (addr_);
 }
 
 int zmq_connect (void *s_, const char *addr_)
 {
-    if (!s_ || !((zmq::socket_base_t*) s_)->check_tag ()) {
-        errno = ENOTSOCK;
+    zmq::socket_base_t *s = as_socket_base_t (s_);
+    if (!s)
         return -1;
-    }
-    zmq::socket_base_t *s = (zmq::socket_base_t *) s_;
-    int result = s->connect (addr_);
-    return result;
+    return s->connect (addr_);
 }
 
 int zmq_unbind (void *s_, const char *addr_)
 {
-    if (!s_ || !((zmq::socket_base_t*) s_)->check_tag ()) {
-        errno = ENOTSOCK;
+    zmq::socket_base_t *s = as_socket_base_t (s_);
+    if (!s)
         return -1;
-    }
-    zmq::socket_base_t *s = (zmq::socket_base_t *) s_;
     return s->term_endpoint (addr_);
 }
 
 int zmq_disconnect (void *s_, const char *addr_)
 {
-    if (!s_ || !((zmq::socket_base_t*) s_)->check_tag ()) {
-        errno = ENOTSOCK;
+    zmq::socket_base_t *s = as_socket_base_t (s_);
+    if (!s)
         return -1;
-    }
-    zmq::socket_base_t *s = (zmq::socket_base_t *) s_;
     return s->term_endpoint (addr_);
 }
 
@@ -392,10 +376,9 @@ int zmq_sendmsg (void *s_, zmq_msg_t *msg_, int flags_)
 
 int zmq_send (void *s_, const void *buf_, size_t len_, int flags_)
 {
-    if (!s_ || !((zmq::socket_base_t*) s_)->check_tag ()) {
-        errno = ENOTSOCK;
+    zmq::socket_base_t *s = as_socket_base_t (s_);
+    if (!s)
         return -1;
-    }
     zmq_msg_t msg;
     if (zmq_msg_init_size (&msg, len_))
         return -1;
@@ -405,7 +388,6 @@ int zmq_send (void *s_, const void *buf_, size_t len_, int flags_)
         assert (buf_);
         memcpy (zmq_msg_data (&msg), buf_, len_);
     }
-    zmq::socket_base_t *s = (zmq::socket_base_t *) s_;
     int rc = s_sendmsg (s, &msg, flags_);
     if (unlikely (rc < 0)) {
         int err = errno;
@@ -421,16 +403,14 @@ int zmq_send (void *s_, const void *buf_, size_t len_, int flags_)
 
 int zmq_send_const (void *s_, const void *buf_, size_t len_, int flags_)
 {
-    if (!s_ || !((zmq::socket_base_t*) s_)->check_tag ()) {
-        errno = ENOTSOCK;
+    zmq::socket_base_t *s = as_socket_base_t (s_);
+    if (!s)
         return -1;
-    }
     zmq_msg_t msg;
     int rc = zmq_msg_init_data (&msg, (void *)buf_, len_, NULL, NULL);
     if (rc != 0)
         return -1;
 
-    zmq::socket_base_t *s = (zmq::socket_base_t *) s_;
     rc = s_sendmsg (s, &msg, flags_);
     if (unlikely (rc < 0)) {
         int err = errno;
@@ -454,10 +434,9 @@ int zmq_send_const (void *s_, const void *buf_, size_t len_, int flags_)
 //
 int zmq_sendiov (void *s_, iovec *a_, size_t count_, int flags_)
 {
-    if (!s_ || !((zmq::socket_base_t*) s_)->check_tag ()) {
-        errno = ENOTSOCK;
+    zmq::socket_base_t *s = as_socket_base_t (s_);
+    if (!s)
         return -1;
-    }
     if (unlikely (count_ <= 0 || !a_)) {
         errno = EINVAL;
         return -1;
@@ -465,7 +444,6 @@ int zmq_sendiov (void *s_, iovec *a_, size_t count_, int flags_)
 
     int rc = 0;
     zmq_msg_t msg;
-    zmq::socket_base_t *s = (zmq::socket_base_t *) s_;
 
     for (size_t i = 0; i < count_; ++i) {
         rc = zmq_msg_init_size (&msg, a_[i].iov_len);
@@ -512,15 +490,13 @@ int zmq_recvmsg (void *s_, zmq_msg_t *msg_, int flags_)
 
 int zmq_recv (void *s_, void *buf_, size_t len_, int flags_)
 {
-    if (!s_ || !((zmq::socket_base_t*) s_)->check_tag ()) {
-        errno = ENOTSOCK;
+    zmq::socket_base_t *s = as_socket_base_t (s_);
+    if (!s)
         return -1;
-    }
     zmq_msg_t msg;
     int rc = zmq_msg_init (&msg);
     errno_assert (rc == 0);
 
-    zmq::socket_base_t *s = (zmq::socket_base_t *) s_;
     int nbytes = s_recvmsg (s, &msg, flags_);
     if (unlikely (nbytes < 0)) {
         int err = errno;
@@ -562,16 +538,13 @@ int zmq_recv (void *s_, void *buf_, size_t len_, int flags_)
 //
 int zmq_recviov (void *s_, iovec *a_, size_t *count_, int flags_)
 {
-    if (!s_ || !((zmq::socket_base_t*) s_)->check_tag ()) {
-        errno = ENOTSOCK;
+    zmq::socket_base_t *s = as_socket_base_t (s_);
+    if (!s)
         return -1;
-    }
     if (unlikely (!count_ || *count_ <= 0 || !a_)) {
         errno = EINVAL;
         return -1;
     }
-
-    zmq::socket_base_t *s = (zmq::socket_base_t *) s_;
 
     size_t count = *count_;
     int nread = 0;
@@ -634,24 +607,18 @@ int zmq_msg_init_data (zmq_msg_t *msg_, void *data_, size_t size_,
 
 int zmq_msg_send (zmq_msg_t *msg_, void *s_, int flags_)
 {
-    if (!s_ || !((zmq::socket_base_t*) s_)->check_tag ()) {
-        errno = ENOTSOCK;
+    zmq::socket_base_t *s = as_socket_base_t (s_);
+    if (!s)
         return -1;
-    }
-    zmq::socket_base_t *s = (zmq::socket_base_t *) s_;
-    int result = s_sendmsg (s, msg_, flags_);
-    return result;
+    return s_sendmsg (s, msg_, flags_);
 }
 
 int zmq_msg_recv (zmq_msg_t *msg_, void *s_, int flags_)
 {
-    if (!s_ || !((zmq::socket_base_t*) s_)->check_tag ()) {
-        errno = ENOTSOCK;
+    zmq::socket_base_t *s = as_socket_base_t (s_);
+    if (!s)
         return -1;
-    }
-    zmq::socket_base_t *s = (zmq::socket_base_t *) s_;
-    int result = s_recvmsg (s, msg_, flags_);
-    return result;
+    return s_recvmsg (s, msg_, flags_);
 }
 
 int zmq_msg_close (zmq_msg_t *msg_)
@@ -674,17 +641,17 @@ void *zmq_msg_data (zmq_msg_t *msg_)
     return ((zmq::msg_t*) msg_)->data ();
 }
 
-size_t zmq_msg_size (zmq_msg_t *msg_)
+size_t zmq_msg_size (const zmq_msg_t *msg_)
 {
     return ((zmq::msg_t*) msg_)->size ();
 }
 
-int zmq_msg_more (zmq_msg_t *msg_)
+int zmq_msg_more (const zmq_msg_t *msg_)
 {
     return zmq_msg_get (msg_, ZMQ_MORE);
 }
 
-int zmq_msg_get (zmq_msg_t *msg_, int property_)
+int zmq_msg_get (const zmq_msg_t *msg_, int property_)
 {
     const char* fd_string;
 
@@ -735,7 +702,7 @@ const char *zmq_msg_group (zmq_msg_t *msg_)
 
 //  Get message metadata string
 
-const char *zmq_msg_gets (zmq_msg_t *msg_, const char *property_)
+const char *zmq_msg_gets (const zmq_msg_t *msg_, const char *property_)
 {
     zmq::metadata_t *metadata = ((zmq::msg_t *) msg_)->metadata ();
     const char *value = NULL;
@@ -757,10 +724,9 @@ inline int zmq_poller_poll (zmq_pollitem_t *items_, int nitems_, long timeout_)
     // implement zmq_poll on top of zmq_poller
     int rc;
     zmq_poller_event_t *events;
-    events = new zmq_poller_event_t[nitems_];
+    zmq::socket_poller_t poller;
+    events = new (std::nothrow) zmq_poller_event_t[nitems_];
     alloc_assert(events);
-    void *poller = zmq_poller_new ();
-    alloc_assert(poller);
 
     bool repeat_items = false;
     //  Register sockets with poller
@@ -780,12 +746,11 @@ inline int zmq_poller_poll (zmq_pollitem_t *items_, int nitems_, long timeout_)
                 }
             }
             if (modify) {
-                rc = zmq_poller_modify (poller, items_[i].socket, e);
+                rc = zmq_poller_modify (&poller, items_[i].socket, e);
             } else {
-                rc = zmq_poller_add (poller, items_[i].socket, NULL, e);
+                rc = zmq_poller_add (&poller, items_[i].socket, NULL, e);
             }
             if (rc < 0) {
-                zmq_poller_destroy (&poller);
                 delete [] events;
                 return rc;
             }
@@ -800,12 +765,11 @@ inline int zmq_poller_poll (zmq_pollitem_t *items_, int nitems_, long timeout_)
                 }
             }
             if (modify) {
-                rc = zmq_poller_modify_fd (poller, items_[i].fd, e);
+                rc = zmq_poller_modify_fd (&poller, items_[i].fd, e);
             } else {
-                rc = zmq_poller_add_fd (poller, items_[i].fd, NULL, e);
+                rc = zmq_poller_add_fd (&poller, items_[i].fd, NULL, e);
             }
             if (rc < 0) {
-                zmq_poller_destroy (&poller);
                 delete [] events;
                 return rc;
             }
@@ -813,11 +777,10 @@ inline int zmq_poller_poll (zmq_pollitem_t *items_, int nitems_, long timeout_)
     }
 
     //  Wait for events
-    rc = zmq_poller_wait_all (poller, events, nitems_, timeout_);
+    rc = zmq_poller_wait_all (&poller, events, nitems_, timeout_);
     if (rc < 0) {
-        zmq_poller_destroy (&poller);
         delete [] events;
-        if (zmq_errno() == ETIMEDOUT) {
+        if (zmq_errno() == EAGAIN) {
             return 0;
         }
         return rc;
@@ -851,7 +814,6 @@ inline int zmq_poller_poll (zmq_pollitem_t *items_, int nitems_, long timeout_)
     }
 
     //  Cleanup
-    zmq_poller_destroy (&poller);
     delete [] events;
     return rc;
 }
@@ -1053,9 +1015,12 @@ int zmq_poll (zmq_pollitem_t *items_, int nitems_, long timeout_)
     //  file descriptors.
     zmq_assert (nitems_ <= FD_SETSIZE);
 
-    fd_set pollset_in  = { 0 };
-    fd_set pollset_out = { 0 };
-    fd_set pollset_err = { 0 };
+    fd_set pollset_in;
+    FD_ZERO (&pollset_in);
+    fd_set pollset_out;
+    FD_ZERO (&pollset_out);
+    fd_set pollset_err;
+    FD_ZERO (&pollset_err);
 
     zmq::fd_t maxfd = 0;
 
@@ -1115,10 +1080,14 @@ int zmq_poll (zmq_pollitem_t *items_, int nitems_, long timeout_)
 
         //  Wait for events. Ignore interrupts if there's infinite timeout.
         while (true) {
-            memcpy (&inset, &pollset_in, sizeof (fd_set));
-            memcpy (&outset, &pollset_out, sizeof (fd_set));
-            memcpy (&errset, &pollset_err, sizeof (fd_set));
 #if defined ZMQ_HAVE_WINDOWS
+            // On Windows we don't need to copy the whole fd_set.
+            // SOCKETS are continuous from the beginning of fd_array in fd_set.
+            // We just need to copy fd_count elements of fd_array.
+            // We gain huge memcpy() improvement if number of used SOCKETs is much lower than FD_SETSIZE.
+            memcpy (&inset,  &pollset_in , (char *) (pollset_in.fd_array  + pollset_in.fd_count ) - (char *) &pollset_in );
+            memcpy (&outset, &pollset_out, (char *) (pollset_out.fd_array + pollset_out.fd_count) - (char *) &pollset_out);
+            memcpy (&errset, &pollset_err, (char *) (pollset_err.fd_array + pollset_err.fd_count) - (char *) &pollset_err);
             int rc = select (0, &inset, &outset, &errset, ptimeout);
             if (unlikely (rc == SOCKET_ERROR)) {
                 errno = zmq::wsa_error_to_errno (WSAGetLastError ());
@@ -1126,6 +1095,9 @@ int zmq_poll (zmq_pollitem_t *items_, int nitems_, long timeout_)
                 return -1;
             }
 #else
+            memcpy (&inset,  &pollset_in,  sizeof (fd_set));
+            memcpy (&outset, &pollset_out, sizeof (fd_set));
+            memcpy (&errset, &pollset_err, sizeof (fd_set));
             int rc = select (maxfd + 1, &inset, &outset, &errset, ptimeout);
             if (unlikely (rc == -1)) {
                 errno_assert (errno == EINTR || errno == EBADF);
@@ -1264,6 +1236,10 @@ int zmq_poller_add_fd (void *poller_, int fd_, void *user_data_, short events_)
         errno = EFAULT;
         return -1;
     }
+    if (fd_ == zmq::retired_fd) {
+        errno = EBADF;
+        return -1;
+    }
 
     return ((zmq::socket_poller_t*)poller_)->add_fd (fd_, user_data_, events_);
 }
@@ -1294,6 +1270,10 @@ int zmq_poller_modify_fd (void *poller_, int fd_, short events_)
 {
     if (!poller_ || !((zmq::socket_poller_t*)poller_)->check_tag ()) {
         errno = EFAULT;
+        return -1;
+    }
+    if (fd_ == zmq::retired_fd) {
+        errno = EBADF;
         return -1;
     }
 
@@ -1327,32 +1307,42 @@ int zmq_poller_remove_fd (void *poller_, int fd_)
         errno = EFAULT;
         return -1;
     }
+    if (fd_ == zmq::retired_fd) {
+        errno = EBADF;
+        return -1;
+    }
 
     return ((zmq::socket_poller_t*)poller_)->remove_fd (fd_);
 }
 
 
-int zmq_poller_wait (void *poller_, zmq_poller_event_t *event, long timeout_)
+int zmq_poller_wait (void *poller_, zmq_poller_event_t *event_, long timeout_)
 {
     if (!poller_ || !((zmq::socket_poller_t*)poller_)->check_tag ()) {
         errno = EFAULT;
         return -1;
     }
+    if (!event_) {
+        errno = EFAULT;
+        return -1;
+    }
 
-    zmq_assert (event != NULL);
-
-    int rc = zmq_poller_wait_all(poller_, event, 1, timeout_);
+    int rc = zmq_poller_wait_all(poller_, event_, 1, timeout_);
 
     if (rc < 0) {
-        memset (event, 0, sizeof(zmq_poller_event_t));
+        memset (event_, 0, sizeof(zmq_poller_event_t));
     }
     // wait_all returns number of events, but we return 0 for any success
     return rc >= 0 ? 0 : rc;
 }
 
-int zmq_poller_wait_all (void *poller_, zmq_poller_event_t *events, int n_events, long timeout_)
+int zmq_poller_wait_all (void *poller_, zmq_poller_event_t *events_, int n_events, long timeout_)
 {
     if (!poller_ || !((zmq::socket_poller_t*)poller_)->check_tag ()) {
+        errno = EFAULT;
+        return -1;
+    }
+    if (!events_) {
         errno = EFAULT;
         return -1;
     }
@@ -1361,11 +1351,22 @@ int zmq_poller_wait_all (void *poller_, zmq_poller_event_t *events, int n_events
         return -1;
     }
 
-    zmq_assert (events != NULL);
-
-    int rc = ((zmq::socket_poller_t*)poller_)->wait ((zmq::socket_poller_t::event_t *)events, n_events, timeout_);
+    int rc = ((zmq::socket_poller_t*)poller_)->wait ((zmq::socket_poller_t::event_t *)events_, n_events, timeout_);
 
     return rc;
+}
+
+//  Peer-specific state
+
+int zmq_socket_get_peer_state (void *s_,
+                               const void *routing_id_,
+                               size_t routing_id_size_)
+{
+    zmq::socket_base_t *s = as_socket_base_t (s_);
+    if (!s)
+        return -1;
+
+    return s->get_peer_state (routing_id_, routing_id_size_);
 }
 
 //  Timers

@@ -1,0 +1,20 @@
+<%ARGS>
+$ObjectType => 'RT::Ticket'
+$ObjectId => 0
+$Value => undef
+</%ARGS>
+
+<%INIT>
+my $result = undef;
+$ObjectType = "RT::$ObjectType" unless $ObjectType =~ /::/;
+my $object = $ObjectType->new($session{'CurrentUser'});
+$object->Load($ObjectId);
+if ($object->id && defined $Value) {
+    ($result->{ok}, $result->{msg}) = $object->SetAttribute(
+        Name    => 'Memo',
+        Content => $Value,
+    );
+}
+$m->out(JSON($result));
+$m->abort;
+</%INIT>

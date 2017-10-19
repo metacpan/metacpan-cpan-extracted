@@ -11,8 +11,9 @@ lib/Perl/Examples/Accessors.pm
 lib/Perl/Examples/Accessors/Array.pm
 lib/Perl/Examples/Accessors/ClassAccessor.pm
 lib/Perl/Examples/Accessors/ClassAccessorArray.pm
-lib/Perl/Examples/Accessors/ClassAccessorArrayGlob.pm
+lib/Perl/Examples/Accessors/ClassAccessorArraySlurpy.pm
 lib/Perl/Examples/Accessors/ClassAccessorPackedString.pm
+lib/Perl/Examples/Accessors/ClassAccessorPackedStringSet.pm
 lib/Perl/Examples/Accessors/ClassInsideOut.pm
 lib/Perl/Examples/Accessors/ClassStruct.pm
 lib/Perl/Examples/Accessors/ClassTiny.pm

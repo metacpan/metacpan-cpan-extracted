@@ -18,6 +18,7 @@ example/config.yml
 example/lib/MyApp.pm
 lib/Dancer2/Plugin/WebSocket.pm
 lib/Dancer2/Plugin/WebSocket/Connection.pm
+lib/Dancer2/Plugin/WebSocket/Group.pm
 t/00-compile.t
 t/00-report-prereqs.dd
 t/00-report-prereqs.t

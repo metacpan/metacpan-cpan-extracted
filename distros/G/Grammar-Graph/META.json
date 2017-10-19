@@ -4,7 +4,7 @@
       "Bjoern Hoehrmann <bjoern@hoehrmann.de>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.132830",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -19,6 +19,33 @@
          "inc"
       ]
    },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Grammar::Formal" : "0",
+            "Graph" : "0",
+            "Graph::SomeUtils" : "0",
+            "List::MoreUtils" : "0",
+            "List::Util" : "0",
+            "List::UtilsBy" : "0",
+            "Modern::Perl" : "0",
+            "Moose" : "0",
+            "Storable" : "0",
+            "Test::More" : "0",
+            "perl" : "5.012"
+         }
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "repository" : {
@@ -27,5 +54,6 @@
          "web" : "https://github.com/hoehrmann/Grammar-Graph"
       }
    },
-   "version" : "0.02"
+   "version" : "0.20",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

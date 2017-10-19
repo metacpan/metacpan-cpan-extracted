@@ -6,11 +6,11 @@
                                        |___/                         
 
 
-This is the README for Directory::Diff version 0.05.
+This is the README for Directory::Diff version 0.06.
 
 Directory::Diff is a "module" for the Perl computer programming language, a
-library of computer code to install on a computer.  This document contains four
-sections:
+library of computer code to install on a computer.  This document contains
+four sections:
 
 1. About - what the module does
 
@@ -36,15 +36,16 @@ required.
 
 2. DOCUMENTATION
 
-You can read the documentation for the module online at the following websites:
+You can read the documentation for the module online at the following
+websites:
 
     * http://search.cpan.org/perldoc?Directory::Diff
     * http://metacpan.org/release/Directory-Diff
 
 (These links go to the latest version of the module.)
 
-After installing the module, you can read the documentation on your computer
-using
+After installing the module, you can read the documentation on your
+computer using
 
     perldoc Directory::Diff
 
@@ -62,11 +63,11 @@ If you have the App::cpanminus installer, you may prefer
 
     cpanm Directory::Diff
 
-To install the module from the source file, Directory-Diff-0.05.tar.gz, follow
-this sequence of commands:
+To install the module from the source file, Directory-Diff-0.06.tar.gz,
+follow this sequence of commands:
 
-    tar xfz Directory-Diff-0.05.tar.gz
-    cd Directory-Diff-0.05
+    tar xfz Directory-Diff-0.06.tar.gz
+    cd Directory-Diff-0.06
     perl Makefile.PL
     make
     make install
@@ -79,8 +80,8 @@ If you want to test the module before installing it, use "make test" after
 4. HELP
 
 To get help with the module, you can email the author, Ben Bullock, at
-<bkb@cpan.org>. If you think there is a problem in the module, you can report a
-bug at 
+<bkb@cpan.org>. If you think there is a problem in the module, you can
+report a bug at 
 
 <https://github.com/benkasminbullock/Directory-Diff/issues>,
 
@@ -91,6 +92,6 @@ repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Tue Aug 23 09:17:31 2016.
+This README was written on Sat Oct 14 23:11:11 2017.
 
 -----------------------------------------------------------------------------

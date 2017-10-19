@@ -17,6 +17,7 @@ Module::Build->new(
     'Class::Load' => '0',
     'Class::Mix' => '0',
     'File::Basename' => '0',
+    'File::ShareDir' => '0',
     'FileHandle' => '0',
     'IO::Pty' => '0',
     'IPC::Run' => '0',
@@ -36,6 +37,7 @@ Module::Build->new(
   test_requires => {
     'Test::More' => '0.88',
   },
+  share_dir => 'share',
   meta_merge => {
     resources => {
       bugtracker => 'https://github.com/ollyg/Net-CLI-Interact/issues',

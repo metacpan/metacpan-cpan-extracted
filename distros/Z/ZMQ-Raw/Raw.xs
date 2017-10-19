@@ -6,10 +6,24 @@
 
 #include <zmq.h>
 
+#define FEATURE_IPC      1
+#define FEATURE_PGM      2
+#define FEATURE_TIPC     3
+#define FEATURE_NORM     4
+#define FEATURE_CURVE    5
+#define FEATURE_GSSAPI   6
+#define FEATURE_DRAFT    7
+
 #include "const-c-constant.inc"
 #include "const-c-error.inc"
 #include "const-c-message_options.inc"
 #include "const-c-socket_options.inc"
+
+typedef struct
+{
+	void *context;
+	void *counter;
+} zmq_raw_context;
 
 typedef struct
 {
@@ -18,6 +32,24 @@ typedef struct
 	const char *file;
 	unsigned int line;
 } zmq_raw_error;
+
+typedef struct
+{
+	void *socket;
+	void *context;
+	int type;
+} zmq_raw_socket;
+
+typedef struct
+{
+	AV *sockets;
+	zmq_pollitem_t *items;
+} zmq_raw_poller;
+
+typedef struct
+{
+	int dummy;
+} zmq_raw_proxy;
 
 STATIC MGVTBL null_mg_vtbl =
 {
@@ -196,15 +228,81 @@ STATIC void S_zmq_raw_check_error (int error, const char *file, int line)
 	}
 }
 
+STATIC void zmq_raw_free (void *data, void *hint)
+{
+	Safefree (data);
+}
+
 #define zmq_raw_check_error(e) S_zmq_raw_check_error(e, __FILE__, __LINE__)
 
+#define MY_CXT_KEY "ZMQ::Raw::_guts"
+typedef struct
+{
+	zmq_raw_context *contexts;
+} my_cxt_t;
+
+#define MAX_CONTEXT_COUNT 64
+static zmq_raw_context contexts[MAX_CONTEXT_COUNT];
+
+START_MY_CXT
 
 MODULE = ZMQ::Raw               PACKAGE = ZMQ::Raw
 
+BOOT:
+{
+	MY_CXT_INIT;
+	MY_CXT.contexts = contexts;
+}
+
 INCLUDE: const-xs-constant.inc
 
+void
+has (class, option)
+	SV *class
+	int option
+
+	PREINIT:
+		const char *f = NULL;
+
+	CODE:
+		switch (option)
+		{
+			case FEATURE_IPC:
+				f = "ipc";
+				break;
+			case FEATURE_PGM:
+				f = "pgm";
+				break;
+			case FEATURE_TIPC:
+				f = "tipc";
+				break;
+			case FEATURE_NORM:
+				f = "norm";
+				break;
+			case FEATURE_CURVE:
+				f = "curve";
+				break;
+			case FEATURE_GSSAPI:
+				f = "gssapi";
+				break;
+			case FEATURE_DRAFT:
+				f = "draft";
+				break;
+			default:
+				croak_usage ("unknown option %d", option);
+		}
+
+		if (zmq_has (f))
+			XSRETURN_YES;
+
+		XSRETURN_NO;
+
 INCLUDE: xs/Context.xs
+INCLUDE: xs/Curve.xs
 INCLUDE: xs/Error.xs
 INCLUDE: xs/Message.xs
+INCLUDE: xs/Poller.xs
+INCLUDE: xs/Proxy.xs
 INCLUDE: xs/Socket.xs
+INCLUDE: xs/Z85.xs
 

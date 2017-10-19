@@ -12,7 +12,7 @@ use Digest::SHA;
 use JSON;
 use Want;
 
-our $VERSION = '1.76';
+our $VERSION = '1.77';
 
 =encoding utf8
 
@@ -91,7 +91,7 @@ just make sure I<run> it is the last element in chain.
 
 =back
 
-the module will call automatically the sub which name is specified in the req parameter of GET/POST request. JSONP will check if the sub exists in current script namespace by looking in typeglob and only in that case the sub will be called. The built-in policy about function names requires also a name starting by a lowercase letter, followed by up to 31 characters chosen between letters, numbers, and underscores. Since this module is intended to be used by AJAX calls, this will spare you to define routes and mappings between requests and back end code. In your subroutines you will therefore add all the data you want to the JSON/JSONP object instance in form of hashmap of any deep and complexity, JSONP will return that data automatically as JSON object with/without padding (by using the function name passed as 'callback' in GET/POST request, or using simply 'callback' as default) to the calling javascript. Please note that I<params> and I<session> keys on top of JSONP object hierarchy are reserved. See also "I<notation convenience features>" paragraph at the end of the POD.
+the module will call automatically the sub which name is specified in the req parameter of GET/POST request. JSONP will check if the sub exists in current script namespace by looking in typeglob and only in that case the sub will be called. The built-in policy about function names requires also a name starting by a lowercase letter, followed by up to 63 characters chosen between ASCII letters, numbers, and underscores. Since this module is intended to be used by AJAX calls, this will spare you to define routes and mappings between requests and back end code. In your subroutines you will therefore add all the data you want to the JSON/JSONP object instance in form of hashmap of any deep and complexity, JSONP will return that data automatically as JSON object with/without padding (by using the function name passed as 'callback' in GET/POST request, or using simply 'callback' as default) to the calling javascript. The supplied callback name wanted from calling javascript must follow same naming conventions as function names above. Please note that I<params> and I<session> keys on top of JSONP object hierarchy are reserved. See also "I<notation convenience features>" paragraph at the end of the POD.
 The jQuery call:
 
 	// note that jQuery will automatically chose a non-clashing callback name when you insert callback=? in request
@@ -221,7 +221,7 @@ sub import
 	my ($self, $name) = @_;
 	return if $ENV{MOD_PERL};
 	return unless $name;
-	die 'not valid variable name' unless $name =~ /^[a-z][0-9a-zA-Z_]{0,31}$/;
+	die 'not valid variable name' unless $name =~ /^[a-z][0-9a-zA-Z_]{0,63}$/;
 	my $symbol = caller() . '::' . $name;
 	{
 		no strict 'refs'; ## no critic
@@ -292,7 +292,7 @@ sub run
 	}
 
 	my $req = $self->{params}->{req} // '';
-	$req =~ /^([a-z][0-9a-zA-Z_]{1,31})$/; $req = $1 // '';
+	$req =~ /^([a-z][0-9a-zA-Z_]{1,63})$/; $req = $1 // '';
 	my $sid = $r->cookie('sid');
 
 	my $map = caller() . '::' . $req;
@@ -647,7 +647,7 @@ sub graft
 	my ($self, $name, $json) = @_;
 
 	eval{
-		$self->{$name} = JSON->new->utf8->decode($json);
+		$self->{$name} = JSON->new->decode($json);
 	};
 
 	return 0 if $@;
@@ -682,7 +682,7 @@ sub stack
 	return 0 unless reftype $self eq 'ARRAY';
 
 	eval{
-		push @$self, JSON->new->utf8->decode($json);
+		push @$self, JSON->new->decode($json);
 	};
 	return 0 if $@;
 
@@ -798,7 +798,7 @@ sub DESTROY{}
 sub AUTOLOAD : lvalue
 {
 	my $classname =  ref $_[0];
-	my $validname = '[a-zA-Z][a-zA-Z0-9_]*';
+	my $validname = '[\pL][\pL\pM\pN\pZ_]{0,2047}';
 	our $AUTOLOAD =~ /^${classname}::($validname)$/;
 	my $key = $1;
 	die "illegal key name, must be of $validname form\n$AUTOLOAD" unless $key;
@@ -815,7 +815,7 @@ sub AUTOLOAD : lvalue
 
 =head2 NOTATION CONVENIENCE FEATURES
 
-In order to achieve autovivification notation shortcut, this module does not make use of perlfilter but does rather some gimmick with AUTOLOAD. Because of this, when you are using the convenience shortcut notation you cannot use all the names of public methods of this module (such I<new>, I<import>, I<run>, and others previously listed on this document) as hash keys, and you must always use use hash keys beginning with a lowercase letter. You can still set/access hash branches of whatever name using the brace notation. It is nonetheless highly discouraged the usage of underscore beginning keys through brace notation, at least at the top level of response hash hierarchy, in order to avoid possible clashes with private variable members of this very module.
+In order to achieve autovivification notation shortcut, this module does not make use of perlfilter but does rather some gimmick with AUTOLOAD. Because of this, when you are using the convenience shortcut notation you cannot use all the names of public methods of this module (such I<new>, I<import>, I<run>, and others previously listed on this document) as hash keys, and you must always use use hash keys beginning with a letter of any Unicode script, followed from any combination of Unicode letters, numbers, and separators (see Unicode General Category documentation), plus the underscore. The total lenght of the key must be not bigger than 2048 Unicode chars, this is an artificial limit set for security purposes. You can still set/access hash branches of whatever name using the brace notation. It is nonetheless highly discouraged the usage of underscore beginning keys through brace notation, at least at the top level of response hash hierarchy, in order to avoid possible clashes with private variable members of this very module.
 
 =head2 MINIMAL REQUIREMENTS
 

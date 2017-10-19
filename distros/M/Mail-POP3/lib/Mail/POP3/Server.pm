@@ -6,6 +6,36 @@ use IO::File;
 use POSIX;
 use IO::Select;
 
+=head2 POP3 command-handlers:
+
+=over
+
+=item commandUSER
+
+=item commandPASS
+
+=item commandLIST
+
+=item commandSTAT
+
+=item commandRETR
+
+=item commandDELE
+
+=item commandRSET
+
+=item commandQUIT
+
+=item commandNOOP
+
+=item commandUIDL
+
+=item commandTOP
+
+=back
+
+=cut
+
 # These are the only commands accepted
 my %COMMAND2FUNC = (
     USER => \&commandUSER,
@@ -27,6 +57,12 @@ my %COMMAND2OKNOLOGIN = (
 );
 my $CRLF = "\015\012";
 
+=head2 new
+
+Takes config hash-ref.
+
+=cut
+
 sub new {
     my ($class, $config) = @_;
     my $self = {};
@@ -46,6 +82,12 @@ sub _make_closure {
     my ($self, $subref) = @_;
     sub { $subref->($self) };
 }
+
+=head2 start
+
+Takes input, output filehandles, and client IP.
+
+=cut
 
 # Do the security checks and then get the first command
 sub start {
@@ -207,6 +249,12 @@ sub commandPASS {
     $self->{MAILBOX_OPENED} = 1;
 }
 
+=head2 load_class
+
+Loads class - function, not method.
+
+=cut
+
 sub load_class {
     my ($class) = @_;
     my $class_file = $class;
@@ -329,6 +377,12 @@ sub commandQUIT {
     $self->force_shutdown("+OK TTFN $self->{CLIENT_USERNAME}...");
 }
 
+=head2 bad_user
+
+Handles bad user.
+
+=cut
+
 # Reject bogus login name and exit or fake a password auth
 sub bad_user {
     my $self = shift;
@@ -347,13 +401,24 @@ sub bad_user {
     }
 }
 
+=head2 peer_lookup
+
+Reverse lookup.
+
+=cut
+
 # do a reverse lookup
 sub peer_lookup {
     my ($self, $ip) = @_;
     lc gethostbyaddr(inet_aton($ip), IO::Socket::AF_INET);
 }
 
-# Optional per-user brief logging of connection times
+=head2 log_user_open
+
+Optional per-user brief logging of connection times
+
+=cut
+
 sub log_user_open {
     my ($self, $user_name) = @_;
     return unless defined $self->{CONFIG}->{user_log}->{$user_name};
@@ -373,6 +438,10 @@ sub log_user_open {
     $self->log_user_entry("CONNECTION OPENED");
 }
 
+=head2 log_user_close
+
+=cut
+
 sub log_user_close {
     my ($self) = @_;
     return unless
@@ -381,7 +450,12 @@ sub log_user_close {
     close $self->{USERLOG_FH};
 }
 
-# Record mpopd conversations in the individual mailbox log
+=head2 log_user_entry
+
+Record mpopd conversations in the individual mailbox log.
+
+=cut
+
 sub log_user_entry {
     my ($self, $response) = @_;
     return unless
@@ -394,14 +468,26 @@ sub log_user_entry {
     $self->{USERLOG_FH}->print(localtime() . " $response\n");
 }
 
-# CRLF is added here, and also logged if $log_suppress is false
+=head2 send_to_user
+
+Takes C<$text>, C<$log_suppress>.
+
+CRLF is added here, and also logged if C<$log_suppress> is false
+
+=cut
+
 sub send_to_user {
     my ($self, $text, $log_suppress) = @_;
     print "$text$CRLF";
     $self->log_user_entry($text) unless $log_suppress;
 }
 
+=head2 force_shutdown
+
 # Close the mailbox in a sane state and close the connection
+
+=cut
+
 sub force_shutdown {
     my ($self, $signoff) = @_;
     if ($signoff) {
@@ -425,7 +511,12 @@ sub force_shutdown {
     $self->shutdown;
 }
 
-# Write something in the main mpopd log
+=head2 log_entry
+
+Write something in the main mpopd log
+
+=cut
+
 sub log_entry {
     my ($self, $error) = @_;
     return unless defined $self->{CONFIG}->{debug_log};
@@ -446,7 +537,12 @@ sub log_entry {
     $> = $self->{CLIENT_USER_ID} if $self->{CLIENT_USER_ID};
 }
 
-# Clean up and exit
+=head2 shutdown
+
+Clean up and exit
+
+=cut
+
 sub shutdown {
     my $self = shift;
     close $self->{INPUT_FH};

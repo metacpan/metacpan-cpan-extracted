@@ -4,9 +4,10 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME         => 'Number::Format::Calc',
     VERSION_FROM => 'lib/Number/Format/Calc.pm', # finds $VERSION
-    AUTHOR       => 'Markus Holzer (HOLLIHO@gmx.de)',
+    AUTHOR       => 'Markus Holzer (holli.holzer@gmail.com)',
     ABSTRACT     => 'Number::Format::Calc',
     PREREQ_PM    => {
-                     'Test::Simple' => 0.44,
+                      'Test::Simple'   => 0.44,
+                      'Number::Format' => 1.75
                     },
 );

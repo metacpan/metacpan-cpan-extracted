@@ -70,9 +70,9 @@ namespace zmq
         //  I/O thread affinity.
         uint64_t affinity;
 
-        //  Socket identity
-        unsigned char identity_size;
-        unsigned char identity [256];
+        //  Socket routing id.
+        unsigned char routing_id_size;
+        unsigned char routing_id [256];
 
         //  Maximum transfer rate [kb/s]. Default 100kb/s.
         int rate;
@@ -143,8 +143,8 @@ namespace zmq
         //  sockets.
         bool invert_matching;
 
-        //  If true, the identity message is forwarded to the socket.
-        bool recv_identity;
+        //  If true, the routing id message is forwarded to the socket.
+        bool recv_routing_id;
 
         // if true, router socket accepts non-zmq tcp connections
         bool raw_socket;
@@ -166,7 +166,6 @@ namespace zmq
 
         // IPC accept() filters
 #       if defined ZMQ_HAVE_SO_PEERCRED || defined ZMQ_HAVE_LOCAL_PEERCRED
-        bool zap_ipc_creds;
         typedef std::set <uid_t> ipc_uid_accept_filters_t;
         ipc_uid_accept_filters_t ipc_uid_accept_filters;
         typedef std::set <gid_t> ipc_gid_accept_filters_t;
@@ -198,6 +197,10 @@ namespace zmq
         //  Principals for GSSAPI mechanism
         std::string gss_principal;
         std::string gss_service_principal;
+
+	//  Name types GSSAPI principals
+	int gss_principal_nt;
+	int gss_service_principal_nt;
 
         //  If true, gss encryption will be disabled
         bool gss_plaintext;
@@ -236,6 +239,12 @@ namespace zmq
         //  will be used as the File Descriptor instead of allocating a new
         //  one via the socket () system call.
         int use_fd;
+
+        // Device to bind the underlying socket to, eg. VRF or interface
+        std::string bound_device;
+
+        //  Enforce a non-empty ZAP domain requirement for PLAIN auth
+        bool zap_enforce_domain;
     };
 }
 

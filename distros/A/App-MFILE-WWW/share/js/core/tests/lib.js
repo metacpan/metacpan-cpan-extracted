@@ -28,7 +28,7 @@
 // CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
-// ************************************************************************* 
+// *************************************************************************
 //
 // tests/lib.js
 //
@@ -60,6 +60,15 @@ define ([
             assert.ok(obj.hasOwnProperty("b"), "b still there");
             assert.ok(obj.hasOwnProperty("c"), "c still there");
             assert.strictEqual(obj.hasOwnProperty("bogusProp"), false, "no bogus property anymore");
+        });
+
+        // isInteger
+        QUnit.test('internal library functions: isInteger', function (assert) {
+            assert.ok(lib.isInteger(-1), "-1 is an integer");
+            assert.ok(lib.isInteger(0), "0 is an integer");
+            assert.ok(lib.isInteger(1), "1 is an integer");
+            assert.notOk(lib.isInteger("foo"), "foo is not an integer");
+            assert.notOk(lib.isInteger(""), "empty string is not an integer");
         });
 
         // privCheck

@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2007-2016 Contributors as noted in the AUTHORS file
+    Copyright (c) 2007-2017 Contributors as noted in the AUTHORS file
 
     This file is part of libzmq, the ZeroMQ core engine in C++.
 
@@ -45,12 +45,7 @@
 #include "pipe.hpp"
 #include "err.hpp"
 #include "msg.hpp"
-
-#if defined (ZMQ_USE_TWEETNACL)
-#   include "tweetnacl.h"
-#elif defined (ZMQ_USE_LIBSODIUM)
-#   include "sodium.h"
-#endif
+#include "random.hpp"
 
 #ifdef ZMQ_HAVE_VMCI
 #include <vmci_sockets.h>
@@ -91,15 +86,8 @@ zmq::ctx_t::ctx_t () :
     vmci_family = -1;
 #endif
 
-    scoped_lock_t locker(crypto_sync);
-#if defined (ZMQ_USE_TWEETNACL)
-    // allow opening of /dev/urandom
-    unsigned char tmpbytes[4];
-    randombytes(tmpbytes, 4);
-#elif defined (ZMQ_USE_LIBSODIUM)
-    int rc = sodium_init ();
-    zmq_assert (rc != -1);
-#endif
+    //  Initialise crypto library, if needed.
+    zmq::random_open ();
 }
 
 bool zmq::ctx_t::check_tag ()
@@ -131,11 +119,8 @@ zmq::ctx_t::~ctx_t ()
     //  corresponding io_thread/socket objects.
     free (slots);
 
-    //  If we've done any Curve encryption, we may have a file handle
-    //  to /dev/urandom open that needs to be cleaned up.
-#ifdef ZMQ_HAVE_CURVE
-    randombytes_close ();
-#endif
+    //  De-initialise crypto library, if needed.
+    zmq::random_close ();
 
     //  Remove the tag, so that the object is considered dead.
     tag = ZMQ_CTX_TAG_VALUE_BAD;
@@ -412,6 +397,9 @@ void zmq::ctx_t::start_thread (thread_t &thread_, thread_fn *tfn_, void *arg_) c
 {
     thread_.start(tfn_, arg_);
     thread_.setSchedulingParameters(thread_priority, thread_sched_policy);
+#ifndef ZMQ_HAVE_ANDROID
+    thread_.setThreadName ("ZMQ background");
+#endif
 }
 
 void zmq::ctx_t::send_command (uint32_t tid_, const command_t &command_)
@@ -541,7 +529,7 @@ void zmq::ctx_t::connect_inproc_sockets (zmq::socket_base_t *bind_socket_,
     bind_socket_->inc_seqnum();
     pending_connection_.bind_pipe->set_tid (bind_socket_->get_tid ());
 
-    if (!bind_options.recv_identity) {
+    if (!bind_options.recv_routing_id) {
         msg_t msg;
         const bool ok = pending_connection_.bind_pipe->read (&msg);
         zmq_assert (ok);
@@ -581,16 +569,16 @@ void zmq::ctx_t::connect_inproc_sockets (zmq::socket_base_t *bind_socket_,
     // When a ctx is terminated all pending inproc connection will be
     // connected, but the socket will already be closed and the pipe will be
     // in waiting_for_delimiter state, which means no more writes can be done
-    // and the identity write fails and causes an assert. Check if the socket
+    // and the routing id write fails and causes an assert. Check if the socket
     // is open before sending.
-    if (pending_connection_.endpoint.options.recv_identity &&
+    if (pending_connection_.endpoint.options.recv_routing_id &&
             pending_connection_.endpoint.socket->check_tag ()) {
-        msg_t id;
-        const int rc = id.init_size (bind_options.identity_size);
+        msg_t routing_id;
+        const int rc = routing_id.init_size (bind_options.routing_id_size);
         errno_assert (rc == 0);
-        memcpy (id.data (), bind_options.identity, bind_options.identity_size);
-        id.set_flags (msg_t::identity);
-        const bool written = pending_connection_.bind_pipe->write (&id);
+        memcpy (routing_id.data (), bind_options.routing_id, bind_options.routing_id_size);
+        routing_id.set_flags (msg_t::routing_id);
+        const bool written = pending_connection_.bind_pipe->write (&routing_id);
         zmq_assert (written);
         pending_connection_.bind_pipe->flush ();
     }

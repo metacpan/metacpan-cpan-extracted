@@ -5,7 +5,7 @@ use Carp qw/croak confess carp/;
 
 BEGIN {
   $Math::Prime::Util::AUTHORITY = 'cpan:DANAJ';
-  $Math::Prime::Util::VERSION = '0.67';
+  $Math::Prime::Util::VERSION = '0.68';
 }
 
 # parent is cleaner, and in the Perl 5.10.1 / 5.12.0 core, but not earlier.
@@ -25,11 +25,10 @@ our @EXPORT_OK =
       is_frobenius_pseudoprime
       is_frobenius_underwood_pseudoprime is_frobenius_khashin_pseudoprime
       is_perrin_pseudoprime is_catalan_pseudoprime
-      is_aks_prime is_bpsw_prime
-      is_ramanujan_prime
-      is_mersenne_prime
+      is_aks_prime is_bpsw_prime is_ramanujan_prime is_mersenne_prime
       is_power is_prime_power is_pillai is_semiprime is_square is_polygonal
       is_square_free is_primitive_root is_carmichael is_quasi_carmichael
+      is_fundamental
       sqrtint rootint logint
       miller_rabin_random
       lucas_sequence lucasu lucasv
@@ -66,7 +65,8 @@ our @EXPORT_OK =
       chebyshev_theta chebyshev_psi
       divisor_sum carmichael_lambda kronecker hclassno
       ramanujan_tau ramanujan_sum
-      binomial factorial stirling znorder znprimroot znlog legendre_phi
+      binomial stirling znorder znprimroot znlog legendre_phi
+      factorial factorialmod
       ExponentialIntegral LogarithmicIntegral RiemannZeta RiemannR LambertW Pi
       irand irand64 drand urandomb urandomm csrand random_bytes entropy_bytes
   );
@@ -75,7 +75,7 @@ our %EXPORT_TAGS = (all  => [ @EXPORT_OK ],
                    );
 
 # These are only exported if specifically asked for
-push @EXPORT_OK, (qw/trial_factor fermat_factor holf_factor squfof_factor prho_factor pbrent_factor pminus1_factor pplus1_factor ecm_factor rand srand/);
+push @EXPORT_OK, (qw/trial_factor fermat_factor holf_factor lehman_factor squfof_factor prho_factor pbrent_factor pminus1_factor pplus1_factor ecm_factor rand srand/);
 
 my %_Config;
 my %_GMPfunc;  # List of available MPU::GMP functions
@@ -530,8 +530,7 @@ sub _generic_forprimes {
   _validate_positive_integer($beg);
   _validate_positive_integer($end);
   $beg = 2 if $beg < 2;
-  my $oldexitloop = Math::Prime::Util::_get_forexit();
-  Math::Prime::Util::_set_forexit(0);
+  my $oldforexit = Math::Prime::Util::_start_for_loop();
   {
     my $pp;
     local *_ = \$pp;
@@ -541,7 +540,7 @@ sub _generic_forprimes {
       last if Math::Prime::Util::_get_forexit();
     }
   }
-  Math::Prime::Util::_set_forexit($oldexitloop);
+  Math::Prime::Util::_end_for_loop($oldforexit);
 }
 
 sub _generic_forcomposites {
@@ -551,8 +550,7 @@ sub _generic_forcomposites {
   _validate_positive_integer($end);
   $beg = 4 if $beg < 4;
   $end = Math::BigInt->new(''.~0) if ref($end) ne 'Math::BigInt' && $end == ~0;
-  my $oldexitloop = Math::Prime::Util::_get_forexit();
-  Math::Prime::Util::_set_forexit(0);
+  my $oldforexit = Math::Prime::Util::_start_for_loop();
   {
     my $pp;
     local *_ = \$pp;
@@ -566,7 +564,7 @@ sub _generic_forcomposites {
       last if Math::Prime::Util::_get_forexit();
     }
   }
-  Math::Prime::Util::_set_forexit($oldexitloop);
+  Math::Prime::Util::_end_for_loop($oldforexit);
 }
 
 sub _generic_foroddcomposites {
@@ -577,8 +575,7 @@ sub _generic_foroddcomposites {
   $beg = 9 if $beg < 9;
   $beg++ unless $beg & 1;
   $end = Math::BigInt->new(''.~0) if ref($end) ne 'Math::BigInt' && $end == ~0;
-  my $oldexitloop = Math::Prime::Util::_get_forexit();
-  Math::Prime::Util::_set_forexit(0);
+  my $oldforexit = Math::Prime::Util::_start_for_loop();
   {
     my $pp;
     local *_ = \$pp;
@@ -592,15 +589,14 @@ sub _generic_foroddcomposites {
       last if Math::Prime::Util::_get_forexit();
     }
   }
-  Math::Prime::Util::_set_forexit($oldexitloop);
+  Math::Prime::Util::_end_for_loop($oldforexit);
 }
 
 sub _generic_fordivisors {
   my($sub, $n) = @_;
   _validate_positive_integer($n);
   my @divisors = divisors($n);
-  my $oldexitloop = Math::Prime::Util::_get_forexit();
-  Math::Prime::Util::_set_forexit(0);
+  my $oldforexit = Math::Prime::Util::_start_for_loop();
   {
     my $pp;
     local *_ = \$pp;
@@ -610,7 +606,7 @@ sub _generic_fordivisors {
       last if Math::Prime::Util::_get_forexit();
     }
   }
-  Math::Prime::Util::_set_forexit($oldexitloop);
+  Math::Prime::Util::_end_for_loop($oldforexit);
 }
 
 sub formultiperm (&$) {    ## no critic qw(ProhibitSubroutinePrototypes)
@@ -623,7 +619,9 @@ sub formultiperm (&$) {    ## no critic qw(ProhibitSubroutinePrototypes)
   $sum += $_->[1] for @n;
 
   require Math::Prime::Util::PP;
+  my $oldforexit = Math::Prime::Util::_start_for_loop();
   Math::Prime::Util::PP::_multiset_permutations( $sub, [], \@n, $sum );
+  Math::Prime::Util::_end_for_loop($oldforexit);
 }
 
 #############################################################################
@@ -954,7 +952,7 @@ __END__
 
 =encoding utf8
 
-=for stopwords Möbius Deléglise Bézout uniqued k-tuples von SoE primesieve primegen libtommath pari yafu fonction qui compte le nombre nombres voor PhD superset sqrt(N) gcd(A^M k-th (10001st untruncated OpenPFGW gmpy2 Über Primzahl-Zählfunktion n-te und verallgemeinerte multiset compositeness GHz significand TestU01 subfactorial
+=for stopwords Möbius Deléglise Bézout uniqued k-tuples von SoE primesieve primegen libtommath pari yafu fonction qui compte le nombre nombres voor PhD superset sqrt(N) gcd(A^M k-th (10001st untruncated OpenPFGW gmpy2 Über Primzahl-Zählfunktion n-te und verallgemeinerte multiset compositeness GHz significand TestU01 subfactorial s-gonal
 
 =for test_synopsis use v5.14;  my($k,$x);
 
@@ -966,7 +964,7 @@ Math::Prime::Util - Utilities related to prime numbers, including fast sieves an
 
 =head1 VERSION
 
-Version 0.67
+Version 0.68
 
 
 =head1 SYNOPSIS
@@ -1404,6 +1402,12 @@ the combinations.
 
 Like forpart and forperm, the index return values are read-only.  Any
 attempt to modify them will result in undefined behavior.
+
+If the second argument C<k> is not supplied, then all k-subsets are returned
+starting with the smallest set C<k=0> and continuing to C<k=n>.  Each
+k-subset is in lexicographical order.  This is the power set of C<n>.
+
+This corresponds to the Pari/GP 2.10 C<forsubset> function.
 
 
 =head2 forperm
@@ -2909,6 +2913,16 @@ A semiprime is the product of exactly two primes.
 The boolean result is the same as C<scalar(factor(n)) == 2>, but this
 function performs shortcuts that can greatly speed up the operation.
 
+=head2 is_fundamental
+
+Given an integer C<d>, returns 1 if C<d> is a fundamental discriminant,
+0 otherwise.  We consider 1 to be a fundamental discriminant.
+
+This is the L<OEIS series A003658|http://oeis.org/A003658> (positive) and
+L<OEIS series A003657|http://oeis.org/A003657> (negative).
+
+This corresponds to Pari's C<isfundamental> function.
+
 =head2 is_pillai
 
 Given a positive integer C<n>, if there exists a C<v> where C<v! % n == n-1>
@@ -2916,7 +2930,7 @@ and C<n % v != 1>, then C<v> is returned.  Otherwise 0.
 
 For n prime, this is the L<OEIS series A063980|http://oeis.org/A063980>.
 
-=head is_polygonal
+=head2 is_polygonal
 
 Given integers C<x> and C<s>, return 1 if x is an s-gonal number, 0 otherwise.
 C<s> must be greater than 2.
@@ -3219,6 +3233,17 @@ defined as the product of the integers 1 to C<n> with the special case
 of C<factorial(0) = 1>.  This corresponds to Pari's C<factorial(n)>
 and Mathematica's C<Factorial[n]> functions.
 
+=head2 factorialmod
+
+Given two positive integer arguments C<n> and C<m>, returns C<n! mod m>.
+This is much faster than computing the large C<factorial(n)> followed
+by a mod operation.
+
+While very efficient, this is not state of the art.  Currently,
+Fredrik Johansson's fast multi-point polynomial evaluation method as
+used in FLINT is the fastest known method.  This becomes noticeable for
+C<n> E<gt> C<10^8> or so, and the O(n^.5) versus O(n) complexity makes
+it quite extreme as the input gets larger.
 
 =head2 binomial
 
@@ -4050,6 +4075,18 @@ premultiplier.  It is an interesting alternative to Fermat's algorithm,
 and there are some inputs it can rapidly factor.  Overall it has the
 same advantages and disadvantages as Fermat's method.
 
+=head2 lehman_factor
+
+  my @factors = lehman_factor($n);
+
+Produces factors, not necessarily prime, of the positive number input.  An
+optional argument, defaulting to 0 (false), indicates whether to run trial
+division.  Without trial division, is possible the function will be unable
+to find a factor, in which case a single element, the input, is returned.
+
+This is Warren D. Smith's Lehman core with minor modifications.  It is
+limited to 42-bit inputs: C<n E<lt> 8796393022208>.
+
 =head2 squfof_factor
 
   my @factors = squfof_factor($n);
@@ -4460,6 +4497,18 @@ The L<Bell numbers|https://en.wikipedia.org/wiki/Bell_number> B_n:
 
   sub B { my $n = shift; vecsum(map { stirling($n,$_,2) } 0..$n) }
   say "$_  ",B($_) for 1..50;
+
+Recognizing tetrahedral numbers (L<OEIS A000292|http://oeis.org/A000292>):
+
+  sub is_tetrahedral {
+    my $n6 = vecprod(6,shift);
+    my $k  = rootint($n6,3);
+    vecprod($k,$k+1,$k+2) == $n6;
+  }
+
+Recognizing powerful numbers (e.g. C<ispowerful> from Pari/GP):
+
+  sub ispowerful { 0 + vecall { $_->[1] > 1 } factor_exp(shift); }
 
 Convert from binary to hex (3000x faster than Math::BaseConvert):
 

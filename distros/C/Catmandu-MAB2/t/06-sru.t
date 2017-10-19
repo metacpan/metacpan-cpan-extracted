@@ -4,9 +4,11 @@ use Test::More;
 use Test::Exception;
 use Catmandu::Importer::SRU;
 use Catmandu::Importer::SRU::Parser::mabxml;
-require 't/lib/MockFurl.pm';
 
-use Data::Dumper;
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use MockFurl;
+
 
 my %attrs = (
     base => 'http://www.unicat.be/sru',

@@ -13,7 +13,7 @@ use Math::MPC qw();
 
 use POSIX qw(ULONG_MAX LONG_MIN);
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 our ($ROUND, $PREC);
 
 BEGIN {
@@ -691,58 +691,103 @@ sub _any2mpq {
 
 sub _any2ui {
     my ($x) = @_;
+    goto(ref($x) =~ tr/:/_/rs);
 
-    if (ref($x) eq 'Math::GMPz') {
-        my $d = CORE::int(Math::GMPz::Rmpz_get_d($x));
-        ($d < 0 or $d > ULONG_MAX) && return;
-        return $d;
-    }
+  Math_GMPz: {
 
-    if (ref($x) eq 'Math::GMPq') {
-        my $d = CORE::int(Math::GMPq::Rmpq_get_d($x));
-        ($d < 0 or $d > ULONG_MAX) && return;
-        return $d;
-    }
-
-    if (ref($x) eq 'Math::MPFR') {
-        if (Math::MPFR::Rmpfr_number_p($x)) {
-            my $d = CORE::int(Math::MPFR::Rmpfr_get_d($x, $ROUND));
-            ($d < 0 or $d > ULONG_MAX) && return;
-            return $d;
+        if (Math::GMPz::Rmpz_fits_ulong_p($x)) {
+            goto &Math::GMPz::Rmpz_get_ui;
         }
+
         return;
     }
 
-    (@_) = _any2mpfr($x);
-    goto &_any2ui;
+  Math_GMPq: {
+
+        if (Math::GMPq::Rmpq_integer_p($x)) {
+            @_ = ($x = _mpq2mpz($x));
+            goto Math_GMPz;
+        }
+
+        my $d = CORE::int(Math::GMPq::Rmpq_get_d($x));
+        return (($d < 0 or $d > ULONG_MAX) ? undef : $d);
+    }
+
+  Math_MPFR: {
+
+        if (Math::MPFR::Rmpfr_integer_p($x) and Math::MPFR::Rmpfr_fits_ulong_p($x, $ROUND)) {
+            push @_, $ROUND;
+            goto &Math::MPFR::Rmpfr_get_ui;
+        }
+
+        if (Math::MPFR::Rmpfr_number_p($x)) {
+            my $d = CORE::int(Math::MPFR::Rmpfr_get_d($x, $ROUND));
+            return (($d < 0 or $d > ULONG_MAX) ? undef : $d);
+        }
+
+        return;
+    }
+
+  Math_MPC: {
+        @_ = ($x = _any2mpfr($x));
+        goto Math_MPFR;
+    }
 }
 
 sub _any2si {
     my ($x) = @_;
+    goto(ref($x) =~ tr/:/_/rs);
 
-    if (ref($x) eq 'Math::GMPz') {
-        my $d = CORE::int(Math::GMPz::Rmpz_get_d($x));
-        ($d < LONG_MIN or $d > ULONG_MAX) && return;
-        return $d;
-    }
+  Math_GMPz: {
 
-    if (ref($x) eq 'Math::GMPq') {
-        my $d = CORE::int(Math::GMPq::Rmpq_get_d($x));
-        ($d < LONG_MIN or $d > ULONG_MAX) && return;
-        return $d;
-    }
-
-    if (ref($x) eq 'Math::MPFR') {
-        if (Math::MPFR::Rmpfr_number_p($x)) {
-            my $d = CORE::int(Math::MPFR::Rmpfr_get_d($x, $ROUND));
-            ($d < LONG_MIN or $d > ULONG_MAX) && return;
-            return $d;
+        if (Math::GMPz::Rmpz_fits_slong_p($x)) {
+            goto &Math::GMPz::Rmpz_get_si;
         }
+
+        if (Math::GMPz::Rmpz_fits_ulong_p($x)) {
+            goto &Math::GMPz::Rmpz_get_ui;
+        }
+
         return;
     }
 
-    (@_) = _any2mpfr($x);
-    goto &_any2si;
+  Math_GMPq: {
+
+        if (Math::GMPq::Rmpq_integer_p($x)) {
+            @_ = ($x = _mpq2mpz($x));
+            goto Math_GMPz;
+        }
+
+        my $d = CORE::int(Math::GMPq::Rmpq_get_d($x));
+        return (($d < LONG_MIN or $d > ULONG_MAX) ? undef : $d);
+    }
+
+  Math_MPFR: {
+
+        if (Math::MPFR::Rmpfr_integer_p($x)) {
+            if (Math::MPFR::Rmpfr_fits_slong_p($x, $ROUND)) {
+                push @_, $ROUND;
+                goto &Math::MPFR::Rmpfr_get_si;
+            }
+
+            if (Math::MPFR::Rmpfr_fits_ulong_p($x, $ROUND)) {
+                push @_, $ROUND;
+                goto &Math::MPFR::Rmpfr_get_ui;
+            }
+        }
+
+        if (Math::MPFR::Rmpfr_number_p($x)) {
+            my $d = CORE::int(Math::MPFR::Rmpfr_get_d($x, $ROUND));
+            return (($d < LONG_MIN or $d > ULONG_MAX) ? undef : $d);
+        }
+
+        return;
+    }
+
+  Math_MPC: {
+        @_ = ($x = _any2mpfr($x));
+        goto Math_MPFR;
+    }
 }
 
 #
@@ -3684,8 +3729,7 @@ sub polygonal ($$) {
         Math::GMPz::Rmpz_sub($r, $r, $k);       # r = r-k
     }
 
-    Math::GMPz::Rmpz_sub($r, $r, $n);           # r = r-n
-    Math::GMPz::Rmpz_sub($r, $r, $n);           # r = r-n
+    Math::GMPz::Rmpz_submul_ui($r, $n, 2);      # r = r-2*n
     Math::GMPz::Rmpz_add_ui($r, $r, 4);         # r = r+4
     Math::GMPz::Rmpz_mul($r, $r, $n);           # r = r*n
     Math::GMPz::Rmpz_div_2exp($r, $r, 1);       # r = r/2

@@ -33,5 +33,5 @@ requires:
   Mouse: '0'
   Scalar::Util: '0'
   Time::HiRes: '0'
-version: '0.18'
+version: '0.20'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

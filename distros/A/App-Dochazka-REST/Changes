@@ -3686,3 +3686,28 @@ SPLIT OFF App::MREST into separate distribution
 - Dispatch.pm: fix session resource
 - Implement new "session/terminate" resource
 
+0.549 2017-03-02 00:57 CET
+- tests: fix top-level resource sanity test
+- doc: dump session to log in Auth.pm
+- scripts: cleanup dochazka-rest startup script
+- build/ops: require Web::MREST 0.287
+- doc: clarify schedule/scode/:scode
+- make POST schedule/history accept scode as well as sid
+- doc: clean up comments in Model/Shared.pm
+- Make dbinit create DEFAULT schedule
+- tests: add scode tests to t/sql/schedhistory.t
+- tests: adapt tests to preserve DEFAULT schedule
+- sql: make schedhistory SELECTs return scode as well as SID
+- tests: schedhistory SELECTs are now returning scode
+
+0.550 2017-10-16 22:05 CEST
+- build/ops: require App::Dochazka::Common 0.207
+- Drastically reduce verbosity of DBI error messages...
+- Model/Employee.pm: regex for non-whitespace instead of true/false
+- Dispatch.pm: have session/terminate return a real status code
+- tests: ldap.t: display value of DOCHAZKA_LDAP_SERVER config param
+- config: tweak whitespace in Component_Config.pm
+- Auth.pm: debug log message with LDAP password
+- ResourceDefs: allow passerby to GET activities
+- doc: ResourceDefs: clarify schedule property of employee/self/full
+

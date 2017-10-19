@@ -38,6 +38,7 @@
 
 define ([
     "jquery",
+    "ajax",
     "current-user",
     "lib",
     "root",
@@ -45,6 +46,7 @@ define ([
     "start",
 ], function (
     $,
+    ajax,
     currentUser,
     coreLib,
     root,
@@ -118,6 +120,78 @@ define ([
         "ajaxCallInitiated": ajaxCallInitiatedFunc,
 
         "contains": containsFunc,
+
+        "employeeCreate": function (assert, nick) {
+            var rest = {
+                    "method": 'POST',
+                    "path": 'employee/nick',
+                    "body": {
+                        "nick": nick,
+                        "fullname": nick + " user",
+                        "password": nick,
+                    },
+                },
+                // success callback
+                sc = function (st) {
+                    console.log("AJAX " + rest["path"] + " success:", st);
+                    assert.strictEqual(st.code, 'DOCHAZKA_CUD_OK');
+                },
+                // failure callback
+                fc = function (st) {
+                    console.log("AJAX " + rest["path"] + " failure:", st);
+                    assert.notOK(true, "createEmployee failed unexpectedly: " +
+                        QUnit.dump.parse(st));
+                };
+            ajax(rest, sc, fc);
+        },
+
+        "employeeHasPriv": function (assert, nick, priv) {
+            var rest = {
+                    "method": 'GET',
+                    "path": 'priv/nick/' + nick,
+                },
+                // success callback
+                sc = function (st) {
+                    console.log("AJAX " + rest["path"] + " success:", st);
+                    assert.strictEqual(st.code, 'DISPATCH_EMPLOYEE_PRIV', "Status code is DISPATCH_EMPLOYEE_PRIV");
+                    assert.strictEqual(st.payload.nick, nick, "Nick in payload checks out");
+                    assert.strictEqual(st.payload.priv, priv, "Priv in payload checks out");
+                },
+                // failure callback
+                fc = function (st) {
+                    console.log("AJAX " + rest["path"] + " failure:", st);
+                    assert.notOK(true, "employeeHasPriv failed unexpectedly: " +
+                        QUnit.dump.parse(st));
+                };
+            ajax(rest, sc, fc);
+        },
+
+        "employeePriv": function (assert, nick, priv) {
+            var rest = {
+                    "method": 'POST',
+                    "path": 'priv/history/nick/' + nick,
+                    "body": {
+                        "effective": "1892-01-01",
+                        "priv": priv,
+                    },
+                },
+                // success callback
+                sc = function (st) {
+                    console.log("AJAX: " + rest["path"] + " success", st);
+                    if (st.code === 'DOCHAZKA_CUD_OK') {
+                        // "DOCHAZKA_CUD_OK"
+                        coreLib.displayResult(st.text);
+                    } else {
+                        coreLib.displayError("Unexpected status code " + st.code);
+                    }
+                },
+                // failure callback
+                fc = function (st) {
+                    console.log("AJAX: " + rest["path"] + " failure", st);
+                    coreLib.displayError(st.payload.message);
+                };
+            ajax(rest, sc, fc);
+        },
 
         "loggout": function (assert) {
             var cu,

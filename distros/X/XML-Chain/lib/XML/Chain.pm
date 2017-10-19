@@ -5,7 +5,7 @@ use strict;
 use utf8;
 use 5.010;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use XML::LibXML;
 use XML::Chain::Selector;
@@ -139,14 +139,16 @@ sub document_element {
 sub store {
     my ($self) = @_;
     my $io_any = $self->{io_any};
+    my $io_any_opts = $self->{io_any_opts} // {};
     croak 'io_any was not set' unless $io_any;
-    IO::Any->spew($io_any, $self->document_element->as_string, {atomic => 1});
+    IO::Any->spew($io_any, $self->document_element->as_string, {atomic => 1, %$io_any_opts});
     return $self->document_element;
 }
 
 sub set_io_any {
-    my ($self, $to_set) = @_;
+    my ($self, $to_set, $opts) = @_;
     $self->{io_any} = $to_set;
+    $self->{io_any_opts} = $opts // {};
     return $self->document_element;
 }
 
@@ -259,7 +261,7 @@ See L<XML::Chain::Selector> and L<XML::Chain::Element>.
 
 =head2 set_io_any
 
-Store C< $what > of L<IO::Any> for future use with C< ->store() >
+Store C< $what , $options > of L<IO::Any> for future use with C< -E<gt>store() >
 
 =head2 store
 

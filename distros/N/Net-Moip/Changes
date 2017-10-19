@@ -1,5 +1,10 @@
 Revision history for Net-Moip
 
+0.06    2017-10-16
+    - suporte para "identidade" (CPF) no campo de pagador.
+    - revertendo endpoints para API velha, já que a nova nunca
+      foi convertida pelo Moip para a v1.
+
 0.05    2015-09-16
     - aumentando timeout padrão para 15 segundos, já que os servidores
       da nova API do Moip estão demorando mais para responder.

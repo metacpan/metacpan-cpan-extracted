@@ -1,5 +1,8 @@
 package WebService::Braintree::SubscriptionGateway;
-$WebService::Braintree::SubscriptionGateway::VERSION = '0.93';
+$WebService::Braintree::SubscriptionGateway::VERSION = '0.94';
+use 5.010_001;
+use strictures 1;
+
 use WebService::Braintree::Util qw(to_instance_array validate_id);
 use Carp qw(confess);
 
@@ -43,9 +46,9 @@ sub search {
 sub all {
     my $self = shift;
     my $response = $self->gateway->http->post("/subscriptions/advanced_search_ids");
-    return WebService::Braintree::ResourceCollection->new()->init($response, sub {
-                                                                      $self->fetch_subscriptions(WebService::Braintree::SubscriptionSearch->new, shift);
-                                                                  });
+    return WebService::Braintree::ResourceCollection->new->init($response, sub {
+        $self->fetch_subscriptions(WebService::Braintree::SubscriptionSearch->new, shift);
+    });
 }
 
 sub fetch_subscriptions {
@@ -56,6 +59,8 @@ sub fetch_subscriptions {
     my $attrs = $response->{'subscriptions'}->{'subscription'};
     return to_instance_array($attrs, "WebService::Braintree::Subscription");
 }
-__PACKAGE__->meta->make_immutable;
-1;
 
+__PACKAGE__->meta->make_immutable;
+
+1;
+__END__

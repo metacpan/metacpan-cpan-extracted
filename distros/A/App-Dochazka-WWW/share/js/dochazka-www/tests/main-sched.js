@@ -69,16 +69,16 @@ define ([
             setTimeout(function () {
                 ct.login(assert, "demo", "passerby");
                 done();
-            }, 500);
+            }, 1000);
             setTimeout(function () {
                 ct.mainMenuToMainSched(assert);
                 loggout();
                 done();
-            }, 1000);
+            }, 1500);
             setTimeout(function () {
                 ct.loggout(assert);
                 done();
-            }, 1500);
+            }, 2000);
         });
 
         test_desc = 'schedule lookup - bogus ID';
@@ -89,7 +89,7 @@ define ([
             setTimeout(function () {
                 ct.login(assert, "root", "admin");
                 done();
-            }, 500);
+            }, 1000);
             setTimeout(function () {
                 var entry1;
                 ct.mainMenuToMainSched(assert);
@@ -103,7 +103,7 @@ define ([
                 assert.ok(true, "*** REACHED schedLookup form submitted");
                 ct.ajaxCallInitiated(assert);
                 done();
-            }, 1000);
+            }, 1500);
             setTimeout(function () {
                 var htmlbuf = $("#result").html();
                 ct.stack(assert, 3, 'submitting bogus schedLookup form', 'dform', 'schedLookup');
@@ -115,11 +115,11 @@ define ([
                 ct.stack(assert, 2, 'selecting "x" in schedLookup form', 'dmenu', 'mainSched');
                 loggout();
                 done();
-            }, 2000);
+            }, 2500);
             setTimeout(function () {
                 ct.loggout(assert);
                 done();
-            }, 2500);
+            }, 3000);
         });
 
     };

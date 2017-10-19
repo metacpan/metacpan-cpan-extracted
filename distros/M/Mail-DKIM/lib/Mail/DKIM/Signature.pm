@@ -90,13 +90,12 @@ sub parse
 	$string =~ s/\015\012\z//;
 
 	# remove field name, if present
-	my $prefix;
-	if ($string =~ /^(dkim-signature:)(.*)/si)
+	my $prefix = $class->prefix();
+	if ($string =~ s/^($prefix)//i)
 	{
 		# save the field name (capitalization), so that it can be
 		# restored later
 		$prefix = $1;
-		$string = $2;
 	}
 
 	my $self = $class->SUPER::parse($string);
@@ -165,9 +164,7 @@ sub as_string
 {
 	my $self = shift;
 
-	my $prefix = $self->{prefix} || $self->DEFAULT_PREFIX;
-
-	return $prefix . $self->SUPER::as_string;
+	return $self->prefix() . $self->SUPER::as_string;
 }
 
 # undocumented method
@@ -175,9 +172,7 @@ sub as_string_debug
 {
 	my $self = shift;
 
-	my $prefix = $self->{prefix} || $self->DEFAULT_PREFIX;
-
-	return $prefix . join(";", map { ">" . $_->{raw} . "<" } @{$self->{tags}});
+	return $self->prefix() . join(";", map { ">" . $_->{raw} . "<" } @{$self->{tags}});
 }
 
 =head2 as_string_without_data() - signature without the signature data
@@ -316,7 +311,7 @@ sub check_canonicalization
 
 	my ($c1, $c2) = $self->canonicalization;
 
-	my @known = ("nowsp", "simple", "relaxed");
+	my @known = ("nowsp", "simple", "relaxed", "seal");
 	return undef unless (grep { $_ eq $c1 } @known);
 	return undef unless (grep { $_ eq $c2 } @known);
 	return 1;
@@ -442,6 +437,16 @@ sub encode_qp
 sub DEFAULT_PREFIX
 {
 	return "DKIM-Signature:";
+}
+
+sub prefix
+{
+	my $class = shift;
+	if (ref($class)) {
+	    $class->{prefix} = shift if @_;
+	    return $class->{prefix} if $class->{prefix};
+	}
+	return $class->DEFAULT_PREFIX();
 }
 
 =head2 domain() - get or set the domain (d=) field
@@ -876,7 +881,7 @@ sub prettify
 {
 	my $self = shift;
 	$self->wrap(
-		Start => length($self->{prefix} || $self->DEFAULT_PREFIX),
+		Start => length($self->prefix()),
 		Tags => {
 			b => "b64",
 			bh => "b64",
@@ -898,7 +903,7 @@ sub prettify_safe
 {
 	my $self = shift;
 	$self->wrap(
-		Start => length($self->{prefix} || $self->DEFAULT_PREFIX),
+		Start => length($self->prefix()),
 		Tags => {
 			b => "b64",
 			},

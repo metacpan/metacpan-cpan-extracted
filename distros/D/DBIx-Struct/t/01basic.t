@@ -38,11 +38,11 @@ ok( $query eq
 
 my $list = one_row("list", 1);
 ok($list && $list->ref eq 'reference1', 'select data');
-ok($list && ref ($list->refPlAssocList) eq 'DBC::PlAssoc',
+ok($list && ref ($list->refPlAssoc) eq 'DBC::PlAssoc',
 	'got back reference');
-ok($list && ref ($list->refPlAssocList->Prim) eq 'DBC::Prim',
+ok($list && ref ($list->refPlAssoc->Prim) eq 'DBC::Prim',
 	'got back reference and direct reference');
-ok($list && $list->refPlAssocList->Prim->payload eq 'pay1',
+ok($list && $list->refPlAssoc->Prim->payload eq 'pay1',
 	'got data from associated table');
 DBC::List->update({ref => 33}, {id => 1});
 ($query, $bind) = TestConnector::query();
@@ -96,6 +96,14 @@ one_row([list => -columns => 'count(*)']);
 ($query, $bind) = TestConnector::query();
 is($query, 'select count(*) from list',
 	'count(*) generated query');
+one_row([list => -count => 1]);
+($query, $bind) = TestConnector::query();
+is($query, 'select count(*) from list',
+	'count generated query');
+one_row([list => -count => -distinct => 1]);
+($query, $bind) = TestConnector::query();
+is($query, 'select count(distinct list.*) from list',
+	'count distinct generated query');
 one_row([list => -join => pl_assoc => -columns => 'count(*)']);
 ($query, $bind) = TestConnector::query();
 is($query, 'select count(*) from list join pl_assoc on(pl_assoc.id_list = list.id)',

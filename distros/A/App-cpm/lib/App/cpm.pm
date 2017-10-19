@@ -18,7 +18,7 @@ use File::Path ();
 use Cwd ();
 use Config;
 
-our $VERSION = '0.951';
+our $VERSION = '0.953';
 our $GIT_DESCRIBE;
 our $GIT_URL;
 
@@ -392,7 +392,26 @@ sub initial_job {
             my %ref = $arg =~ s/(?<=\.git)@(.+)$// ? (ref => $1) : ();
             $dist = App::cpm::Distribution->new(source => "git", uri => $arg, provides => [], %ref);
         } elsif ($arg =~ m{^https?://}) {
-            $dist = App::cpm::Distribution->new(source => "http", uri => $arg, provides => []);
+            my ($source, $distfile) = ("http", undef);
+            if ($arg =~ m{^https?://(?:www.cpan.org|backpan.perl.org|cpan.metacpan.org)/authors/id/(.+)}) {
+                ($source, $distfile) = ("cpan", $1);
+            }
+            $dist = App::cpm::Distribution->new(
+                source => $source,
+                uri => $arg,
+                $distfile ? (distfile => $distfile) : (),
+                provides => [],
+            );
+        } elsif ($arg =~ m!^(?:[A-Z]/[A-Z]{2}/)?([A-Z]{2}[\-A-Z0-9]*/.*)$!) {
+            my $distfile = $1;
+            $distfile =~ m{^((.).)};
+            $distfile = "$2/$1/$distfile";
+            $dist = App::cpm::Distribution->new(
+                source => "cpan",
+                uri => [map { "${_}authors/id/$distfile" } @{$self->{mirror}}],
+                distfile => $distfile,
+                provides => [],
+            );
         } else {
             my ($name, $version_range, $dev);
             # copy from Menlo

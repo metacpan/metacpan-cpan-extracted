@@ -5,7 +5,7 @@ use Carp qw/carp croak confess/;
 
 BEGIN {
   $Math::Prime::Util::PP::AUTHORITY = 'cpan:DANAJ';
-  $Math::Prime::Util::PP::VERSION = '0.67';
+  $Math::Prime::Util::PP::VERSION = '0.68';
 }
 
 BEGIN {
@@ -1202,6 +1202,25 @@ sub is_pillai {
   for (my $n = 8; $n < $p; $n++) {
     $nfac = Math::Prime::Util::mulmod($nfac, $n, $p);
     return $n if $nfac == $pm1 && ($p % $n) != 1;
+  }
+  0;
+}
+
+sub is_fundamental {
+  my($n) = @_;
+  _validate_integer($n);
+  my $neg = ($n < 0);
+  $n = -$n if $neg;
+  my $r = $n & 15;
+  if ($r) {
+    my $r4 = $r & 3;
+    if (!$neg) {
+      return (($r ==  4) ? 0 : is_square_free($n >> 2)) if $r4 == 0;
+      return is_square_free($n) if $r4 == 1;
+    } else {
+      return (($r == 12) ? 0 : is_square_free($n >> 2)) if $r4 == 0;
+      return is_square_free($n) if $r4 == 3;
+    }
   }
   0;
 }
@@ -2801,8 +2820,11 @@ sub is_prime_power {
   if (Math::Prime::Util::is_prime($n)) { $$refp = $n if defined $refp; return 1; }
   my $r;
   my $k = Math::Prime::Util::is_power($n,0,\$r);
-  return 0 unless $k && Math::Prime::Util::is_prime($r);
-  $$refp = $r if defined $refp;
+  if ($k) {
+    $r = _bigint_to_int($r) if ref($r) && $r->bacmp(BMAX) <= 0;
+    return 0 unless Math::Prime::Util::is_prime($r);
+    $$refp = $r if defined $refp;
+  }
   $k;
 }
 
@@ -3052,7 +3074,10 @@ sub stirling {
     $s = Math::Prime::Util::vecprod( Math::Prime::Util::binomial($n,$m), Math::Prime::Util::binomial($n-1,$m-1), Math::Prime::Util::factorial($n-$m) );
   } elsif ($type == 2) {
     for my $j (1 .. $m) {
-      my $t = (Math::BigInt->new($j) ** $n) * Math::BigInt->new("".binomial($m,$j));
+      my $t = Math::Prime::Util::vecprod(
+                Math::BigInt->new($j) ** $n,
+                Math::Prime::Util::binomial($m,$j)
+              );
       $s = (($m-$j) & 1)  ?  $s - $t  :  $s + $t;
     }
     $s /= factorial($m);
@@ -3479,6 +3504,31 @@ sub factorial {
   my $r = Math::BigInt->new($n)->bfac();
   $r = _bigint_to_int($r) if $r->bacmp(BMAX) <= 0;
   $r;
+}
+
+sub factorialmod {
+  my($n,$m) = @_;
+
+  return Math::Prime::Util::GMP::factorialmod($n,$m)
+    if $Math::Prime::Util::_GMPfunc{"factorialmod"};
+
+  if ($n > 10) {
+    my($s,$t,$e) = (1);
+    Math::Prime::Util::forprimes( sub {
+      ($t,$e) = ($n,0);
+      while ($t > 0) {
+        $t = int($t/$_);
+        $e += $t;
+      }
+      $s = Math::Prime::Util::mulmod($s, Math::Prime::Util::powmod($_,$e,$m), $m);
+    }, 2, $n >> 1);
+    Math::Prime::Util::forprimes( sub {
+      $s = Math::Prime::Util::mulmod($s, $_, $m);
+    }, ($n >> 1)+1, $n);
+    return $s;
+  }
+
+  return factorial($n) % $m;
 }
 
 sub _is_perfect_square {
@@ -6136,8 +6186,7 @@ sub _forcompositions {
   $sub->() if $n == 0 && $minn <= 1;
   return if $n < $minn || $minn > $maxn || $mina > $maxa || $maxn <= 0 || $maxa <= 0;
 
-  my $oldexitloop = Math::Prime::Util::_get_forexit();
-  Math::Prime::Util::_set_forexit(0);
+  my $oldforexit = Math::Prime::Util::_start_for_loop();
   my ($x, $y, $r, $k);
   my @a = (0) x ($n);
   $k = 1;
@@ -6175,32 +6224,42 @@ sub _forcompositions {
     last if Math::Prime::Util::_get_forexit();
     $sub->(@a[0 .. $k]);
   }
-  Math::Prime::Util::_set_forexit($oldexitloop);
+  Math::Prime::Util::_end_for_loop($oldforexit);
 }
 sub forcomb {
   my($sub, $n, $k) = @_;
   _validate_positive_integer($n);
+
+  my($begk, $endk);
   if (defined $k) {
     _validate_positive_integer($k);
+    return if $k > $n;
+    $begk = $endk = $k;
   } else {
-    $k = $n;
+    $begk = 0;
+    $endk = $n;
   }
-  return $sub->() if $k == 0;
-  return if $k > $n || $n == 0;
-  my $oldexitloop = Math::Prime::Util::_get_forexit();
-  Math::Prime::Util::_set_forexit(0);
-  my @c = 0 .. $k-1;
-  while (1) {
-    $sub->(@c);
+
+  my $oldforexit = Math::Prime::Util::_start_for_loop();
+  for my $k ($begk .. $endk) {
+    if ($k == 0) {
+      $sub->();
+    } else {
+      my @c = 0 .. $k-1;
+      while (1) {
+        $sub->(@c);
+        last if Math::Prime::Util::_get_forexit();
+        next if $c[-1]++ < $n-1;
+        my $i = $k-2;
+        $i-- while $i >= 0 && $c[$i] >= $n-($k-$i);
+        last if $i < 0;
+        $c[$i]++;
+        while (++$i < $k) { $c[$i] = $c[$i-1] + 1; }
+      }
+    }
     last if Math::Prime::Util::_get_forexit();
-    next if $c[-1]++ < $n-1;
-    my $i = $k-2;
-    $i-- while $i >= 0 && $c[$i] >= $n-($k-$i);
-    last if $i < 0;
-    $c[$i]++;
-    while (++$i < $k) { $c[$i] = $c[$i-1] + 1; }
   }
-  Math::Prime::Util::_set_forexit($oldexitloop);
+  Math::Prime::Util::_end_for_loop($oldforexit);
 }
 sub _forperm {
   my($sub, $n, $all_perm) = @_;
@@ -6208,8 +6267,7 @@ sub _forperm {
   my @c = reverse 0 .. $k-1;
   my $inc = 0;
   my $send = 1;
-  my $oldexitloop = Math::Prime::Util::_get_forexit();
-  Math::Prime::Util::_set_forexit(0);
+  my $oldforexit = Math::Prime::Util::_start_for_loop();
   while (1) {
     if (!$all_perm) {   # Derangements via simple filtering.
       $send = 1;
@@ -6236,7 +6294,7 @@ sub _forperm {
     @c[$j,$m] = @c[$m,$j];
     @c[0..$j-1] = reverse @c[0..$j-1];
   }
-  Math::Prime::Util::_set_forexit($oldexitloop);
+  Math::Prime::Util::_end_for_loop($oldforexit);
 }
 sub forperm {
   my($sub, $n, $k) = @_;
@@ -6271,9 +6329,11 @@ sub _multiset_permutations {
       $sub->(@$prefix, $n0, $n0);
     } else {
       $sub->(@$prefix, $n0, $n1);
-      $sub->(@$prefix, $n1, $n0);
+      $sub->(@$prefix, $n1, $n0) unless Math::Prime::Util::_get_forexit();
     }
-  } elsif ($sum == scalar(@n)) {         # All entries have 1 occurance
+  } elsif (0 && $sum == scalar(@n)) {         # All entries have 1 occurance
+    # TODO:  Figure out a way to use this safely.  We need to capture any
+    #        lastfor that was seen in the forperm.
     my @i = map { $_->[0] } @n;
     Math::Prime::Util::forperm(sub { $sub->(@$prefix, @i[@_]) }, 1+$#i);
   } else {                               # Recurse over each leading value
@@ -6284,6 +6344,7 @@ sub _multiset_permutations {
       _multiset_permutations($sub, $prefix, \@n, $sum-1);
       pop @$prefix;
       $v->[1]++;
+      last if Math::Prime::Util::_get_forexit();
     }
   }
 }
@@ -6634,7 +6695,7 @@ Math::Prime::Util::PP - Pure Perl version of Math::Prime::Util
 
 =head1 VERSION
 
-Version 0.67
+Version 0.68
 
 
 =head1 SYNOPSIS

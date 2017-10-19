@@ -4,7 +4,7 @@ use warnings;
 
 BEGIN {
   $ntheory::AUTHORITY = 'cpan:DANAJ';
-  $ntheory::VERSION = '0.67';
+  $ntheory::VERSION = '0.68';
 }
 
 BEGIN {
@@ -197,6 +197,7 @@ Tags:
   is_semiprime(n)                     does n have exactly 2 prime factors
   is_polygonal(n,k)                   is n a k-polygonal number
   is_polygonal(n,k,\$root)            as above but also set $root
+  is_fundamental(d)                   is d a fundamental discriminant
   sqrtint(n)                          integer square root
   rootint(n,k)                        integer k-th root
   rootint(n,k,\$rk)                   as above but also set $rk to r^k
@@ -209,6 +210,7 @@ Tags:
   primorial(n)                        product of primes below n
   pn_primorial(n)                     product of first n primes
   factorial(n)                        product of first n integers: n!
+  factorialmod(n,m)                   factorial mod m
   binomial(n,k)                       binomial coefficient
   partitions(n)                       number of integer partitions
   valuation(n,k)                      number of times n is divisible by k

@@ -6,7 +6,6 @@ package URPM;
 use strict;
 use warnings;
 use Config;
-use Math::Int64 ':native_if_available', 'int64';
 
 # perl_checker: require URPM
 
@@ -1284,7 +1283,7 @@ sub resolve_requested__no_recommends_ {
 
 	# safety:
 	if ($count++ > 50000) {
-	    die("detecting looping forever while trying to resolve dependancies.\n"
+	    die("detecting looping forever while trying to resolve dependencies.\n"
 		. "Aborting... Try again with '-vv --debug' options");
 	}
     } while (@diff_provides || @properties || @choices);
@@ -1838,7 +1837,6 @@ sub _selected_size_filesize {
     my ($urpm, $state, $compute_filesize) = @_;
     my ($size, $filesize, $bad_filesize);
 
-    $size = int64(0); # make sure to use Int64, even on 32bit
     foreach (keys %{$state->{selected} || {}}) {
 	my $pkg = $urpm->{depslist}[$_];
 	$size += $pkg->size;

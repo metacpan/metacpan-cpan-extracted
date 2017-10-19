@@ -1,15 +1,15 @@
 package Map::Tube;
 
-$Map::Tube::VERSION   = '3.35';
+$Map::Tube::VERSION   = '3.36';
 $Map::Tube::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
 
-Map::Tube - Core library as Role (Moo) to process map data.
+Map::Tube - Lightweight Routing Framework.
 
 =head1 VERSION
 
-Version 3.35
+Version 3.36
 
 =cut
 
@@ -55,32 +55,28 @@ The core module defined as Role (Moo) to process  the map data.  It provides the
 the interface to find the shortest route in terms of stoppage between two nodes.
 Also you can get all possible routes between two given nodes.
 
-This role has been taken by the following modules (and many more):
-
-=over 2
-
-=item * L<Map::Tube::London>
-
-=item * L<Map::Tube::Tokyo>
-
-=item * L<Map::Tube::NYC>
-
-=item * L<Map::Tube::Delhi>
-
-=item * L<Map::Tube::Barcelona>
-
-=item * L<Map::Tube::Prague>
-
-=item * L<Map::Tube::Warsaw>
-
-=item * L<Map::Tube::Sofia>
-
-=item * L<Map::Tube::Berlin>
-
-=back
-
 If you are keen to know the internals of L<Map::Tube> then please follow the note
 documented in L<Map::Tube::Cookbook>.
+
+=head1 MAP LEADER BOARD
+
+    +---------------------+--------+--------------------------------------------+
+    | Author              | PAUSE  | Map Count (City)                           |
+    +---------------------+--------+--------------------------------------------+
+    | Michal Josef Spacek | SKIM   | 22 (Bucharest, Budapest, Dnipropetrovsk,   |
+    |                     |        | Kazan, Kharkiv, Kiev, KualaLumpur, Malaga, |
+    |                     |        | Minsk, Moscow, Nanjing, NizhnyNovgorod,    |
+    |                     |        | Novosibirsk, Prague, SaintPetersburg,      |
+    |                     |        | Samara, Singapore, Sofia, Tbilisi, Vienna, |
+    |                     |        | Warsaw, Yekaterinburg)                     |
+    |                     |        |                                            |
+    | Mohammad S Anwar    | MANWAR | 6 (Barcelona, Delhi, Kolkatta, London, NYC,|
+    |                     |        | Tokyo)                                     |
+    |                     |        |                                            |
+    | Gisbert W Selker    | GWS    | 4 (Beijing, Glasgow, KoeinBonn, Lyon)      |
+    |                     |        |                                            |
+    | Slaven Rezic        | SREZIC | 1 (Berlin)                                 |
+    +---------------------+--------+--------------------------------------------+
 
 =cut
 
@@ -722,7 +718,7 @@ sub _init_map {
     $self->{name} = $data->{name};
 
     my $name_to_id = $self->{name_to_id};
-    my $has_station_index = 0;
+    my $has_station_index = {};
     foreach my $station (@{$data->{stations}->{station}}) {
         my $id = $station->{id};
 
@@ -747,8 +743,8 @@ sub _init_map {
         my $_station_lines = [];
         foreach my $_line (split /\,/, $station->{line}) {
             if ($_line =~ /\:/) {
-                $has_station_index = 1;
                 $_line = $self->_capture_line_station($_line, $id);
+                $has_station_index->{$_line} = 1;
             }
             my $uc_line = uc($_line);
             my $line    = $lines->{$uc_line};
@@ -780,10 +776,9 @@ sub _init_map {
         my $node = Map::Tube::Node->new($station);
         $nodes->{$id} = $node;
 
-        unless ($has_station_index) {
-            foreach (@{$_station_lines}) {
-                push @{$_->{stations}}, $node;
-            }
+        foreach my $line (@{$_station_lines}) {
+            next if exists $has_station_index->{$line->id};
+            push @{$line->{stations}}, $node;
         }
     }
 

@@ -55,4 +55,22 @@ subtest 'XML::Chain' => sub {
     );
 };
 
+subtest 'XML::Chain::Selector' => sub {
+    my $simple = xc('div')
+                    ->auto_indent(1)
+                    ->a('div', '-' => 'in1')
+                    ->a('div', '-' => 'in2')
+                    ->t('in2.1')
+                    ->a('div', '-' => 'in3')
+    ;
+    is(
+        $simple->as_string,
+        qq{<div>\n}
+        .qq{\t<div>in1</div>\n}
+        .qq{\t<div>in2</div>\n}
+        .qq{\tin2.1\n}
+        .qq{\t<div>in3</div>\n}
+        .qq{</div>},'=head2 auto_indent');
+};
+
 done_testing;

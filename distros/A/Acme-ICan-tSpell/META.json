@@ -4,13 +4,13 @@
       "Robert Acock <thisusedtobeanemail@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Acme-ICan-tSpell",
    "no_index" : {
@@ -37,7 +37,7 @@
             "HTTP::Tiny" : "0.054",
             "Moo" : "2.003001",
             "MooX::LazierAttributes" : "0.13",
-            "MooX::ValidateSubs" : "0.08",
+            "MooX::ValidateSubs" : "0.10",
             "Type::Tiny" : "1.000006",
             "URI" : "1.71",
             "perl" : "5.006"
@@ -45,6 +45,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.02",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

@@ -516,3 +516,7 @@ t/dispatch/param.t: add test cases for 'param/...' resource
 - Refrain from munging Plack::Session object
 - script: store sessions in a dedicated directory in /tmp
 
+0.288 2017-10-16 22:17 CEST
+- build/ops: require latest App::CELL
+- Report MREST_DEBUG_MODE setting at startup
+

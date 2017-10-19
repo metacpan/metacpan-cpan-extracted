@@ -1,0 +1,13 @@
+#!/bin/sh
+
+. ./profile
+
+$PERL -v | grep 'This is c*perl'
+$PERL -nlE '$v = eval "require $_; $_->VERSION"; say $_, " ", $v // "not installed"' <<EOF
+AnyEvent
+Gazelle
+HTTP::Parser::XS
+Plack
+EOF
+
+exec $PLACKUP -s Gazelle -E $MODE --port $PORT --max-reqs-per-child 50000 --max-workers=$WORKERS "$@" ./app.psgi

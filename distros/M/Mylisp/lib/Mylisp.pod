@@ -1,10 +1,10 @@
 =head1 NAME
 
-Mylisp - my love Lisp 
+Mylisp - my love Lisp
 
 =head1 VERSION
 
-Version 1.09
+Version 2.03
 
 =head1 SYNOPSIS
 
@@ -23,7 +23,11 @@ Lint mylisp.file:
 
 transfer mylisp.file to Perl code.
 
-    > mylisp --perl mylisp.file
+    > mylisp --toperl mylisp.file
+
+Mylisp also could transfer to Golang:
+
+    > mylisp --togo mylisp.spp
     
 Mylisp also could use as Module:
 

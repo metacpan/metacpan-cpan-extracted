@@ -206,6 +206,7 @@ sub rl_bind_keyseq($$$;$)
 
 Accepts an array as pairs ($keyspec, $function, [$keyspec, $function]...).
 and maps the associated bindings to the current KeyMap.
+
 =cut
 
 sub bind_keys

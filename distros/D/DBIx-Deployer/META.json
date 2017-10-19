@@ -47,11 +47,11 @@
    "provides" : {
       "DBIx::Deployer" : {
          "file" : "lib/DBIx/Deployer.pm",
-         "version" : "v1.2.2"
+         "version" : "v1.2.3"
       },
       "DBIx::Deployer::Patch" : {
          "file" : "lib/DBIx/Deployer.pm",
-         "version" : "v1.2.2"
+         "version" : "v1.2.3"
       }
    },
    "release_status" : "stable",
@@ -66,7 +66,7 @@
          "web" : "https://github.com/Camspi/DBIx-Deployer"
       }
    },
-   "version" : "v1.2.2",
+   "version" : "v1.2.3",
    "x_contributors" : [
       "Camspi <amarus18@hotmail.com>",
       "Chris Tijerina <ctijerina@emortgagelogic.com>",

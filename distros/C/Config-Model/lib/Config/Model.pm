@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model;
-$Config::Model::VERSION = '2.112';
+$Config::Model::VERSION = '2.113';
 use strict ;
 use warnings;
 use 5.10.1;
@@ -188,12 +188,18 @@ sub initialize_log4perl {
     my $log4perl_syst_conf_file = path('/etc/log4config-model.conf');
     # avoid undef warning when homedir is not defined (e.g. with Debian cowbuilder)
     my $home = File::HomeDir->my_home // '';
-    my $log4perl_user_conf_file = path( File::HomeDir->my_home . '/.log4config-model' );
+    my $log4perl_user_conf_file = path( $home . '/.log4config-model' );
 
     my $fallback_conf           = << 'EOC';
 log4perl.rootLogger=WARN, Screen
+
+# user message about deprecation issues
 log4perl.logger.Model.Legacy = INFO, SimpleScreen
 log4perl.additivity.Model.Legacy = 0
+
+# messages for users, aims to replace calls to warn for warnings or fix messages
+log4perl.logger.User = WARN, SimpleScreen
+log4perl.additivity.User = 0
 
 log4perl.appender.Screen        = Log::Log4perl::Appender::Screen
 log4perl.appender.Screen.stderr = 0
@@ -201,7 +207,7 @@ log4perl.appender.Screen.layout = Log::Log4perl::Layout::PatternLayout
 log4perl.appender.Screen.layout.ConversionPattern = %M %m (line %L)%n
 
 log4perl.appender.SimpleScreen        = Log::Log4perl::Appender::Screen
-log4perl.appender.SimpleScreen.stderr = 0
+log4perl.appender.SimpleScreen.stderr = 1
 log4perl.appender.SimpleScreen.layout = Log::Log4perl::Layout::PatternLayout
 log4perl.appender.SimpleScreen.layout.ConversionPattern = %p: %m%n
 
@@ -691,23 +697,35 @@ sub translate_legacy_info {
     ) if $legacy_logger->is_debug;
 }
 
-# TODO: use 'warn' for show_legacy_issue once all models are updated (mid October 2017 ?)
 # TODO: use 'die' mid November 2017
 sub translate_legacy_backend_info {
     my ( $self, $config_class_name, $model ) = @_;
 
     my $multi_backend = 0;
+    my $has_custom = 0;
     foreach my $config (qw/read_config write_config/) {
         my $ref = $model->{$config};
         if ($ref and ref($ref) eq 'ARRAY') {
+            map { $has_custom++ if $_->{backend} eq 'custom' } @$ref;
             if (@$ref == 1) {
                 $model->{$config} = $ref->[0];
             }
             elsif (@$ref > 1){
-                $self->show_legacy_issue("$config_class_name $config: multiple backends are deprecated", 'note');
+                $self->show_legacy_issue("$config_class_name $config: multiple backends are deprecated", 'warn');
                 $multi_backend++;
             }
         }
+    }
+
+    my $ref = $model->{'rw_config'};
+    if ($ref and $ref->{backend} eq 'custom') {
+        $has_custom++;
+    }
+
+    if ($has_custom) {
+        my $msg = "$config_class_name: custom read/write backend is obsolete."
+            ." Please replace with a backend inheriting Config::Model::Backend::Any";
+        $self->show_legacy_issue( $msg, 'die');
     }
 
     if ($model->{read_config}) {
@@ -1823,7 +1841,7 @@ Config::Model - Create tools to validate, migrate and edit configuration files
 
 =head1 VERSION
 
-version 2.112
+version 2.113
 
 =head1 SYNOPSIS
 
@@ -1903,8 +1921,7 @@ A description of the structure and constraints of the project's configuration
 
 =item *
 
-A module to read and write configuration data. This can be one of the
-read/write backends provided by Config::Model or a custom backend.
+A module to read and write configuration data (aka a backend class).
 
 =back
 

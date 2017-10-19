@@ -1,6 +1,7 @@
 package WebService::Braintree::Test::MerchantAccount;
-$WebService::Braintree::Test::MerchantAccount::VERSION = '0.93';
-use strict;
+$WebService::Braintree::Test::MerchantAccount::VERSION = '0.94';
+use 5.010_001;
+use strictures 1;
 
 use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS );
 use Exporter qw(import);
@@ -13,3 +14,4 @@ use constant BankRejectedUpdateFundingInformation => "bank_rejected__update";
 use constant BankRejectedNone => "bank_rejected__none";
 
 1;
+__END__

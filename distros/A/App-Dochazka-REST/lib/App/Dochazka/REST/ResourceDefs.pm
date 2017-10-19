@@ -1,5 +1,5 @@
 # ************************************************************************* 
-# Copyright (c) 2014-2015, SUSE LLC
+# Copyright (c) 2014-2017, SUSE LLC
 # 
 # All rights reserved.
 # 
@@ -502,7 +502,7 @@ EOH
         handler => {
             GET => 'handler_get_activity_all',
         },
-        acl_profile => 'active', 
+        acl_profile => 'passerby',
         cli => 'activity all',
         description => 'Retrieve all activity objects (excluding disabled ones)',
         documentation => <<'EOH',
@@ -560,7 +560,7 @@ EOH
             DELETE => 'handler_delete_activity_code',
         },
         acl_profile => {
-            GET => 'active',
+            GET => 'passerby',
             PUT => 'admin',
             DELETE => 'admin',
         },
@@ -1294,6 +1294,9 @@ Displays the "full profile" of the currently logged-in employee. The
 information includes the full employee object (taken from the 'current_emp'
 property) as well as the employee's current privlevel and schedule, which are
 looked up from the database.
+
+N.B. The value of the "schedule" property is just the SID, not the actual
+schedule record.
 EOH
     },
 
@@ -1473,6 +1476,7 @@ For partial history, see 'schedule/history/eid/:eid/:tsrange'.
 
 Adds a record to the schedule history of the given employee. The content body should
 contain two properties: "effective" (a timestamp) and "sid" (the ID of the schedule).
+Alternatively, an "scode" property (schedule code) can be sent instead of "sid".
 
 It is assumed that schedule histories will be built up record-by-record; 
 insertion of multiple history records in a single request is not supported.
@@ -1692,6 +1696,7 @@ For partial histories, see 'schedule/history/nick/:nick/:tsrange'.
 
 Adds a record to the schedule history of the given employee. The content body should
 contain two properties: "effective" (a timestamp) and "sid" (the ID of the schedule).
+Alternatively, an "scode" property (schedule code) can be sent instead of "sid".
 
 It is assumed that schedule histories will be built up record-by-record; 
 insertion of multiple history records in a single request is not supported.
@@ -2675,8 +2680,8 @@ This resource makes it possible to GET, PUT, or DELETE a schedule by its scode.
 
 =item * GET
 
-An integer scode must be given as an URI parameter. If a schedule
-with this scode is found, it is returned in the payload.
+An scode (string) must be given as a URI parameter. If a schedule with this
+scode is found (exact, case-sensitive match), it is returned in the payload.
 
 =item * PUT
 
@@ -2695,7 +2700,7 @@ Properties other than these three cannot be modified using this resource.
 =item * DELETE
 
 The scode must be given as an URI parameter. If found, the schedule with that
-scode will be deleted in an atomic operation. If the operation is sucessful the
+scode will be deleted in an atomic operation. If the operation is successful the
 return status will be "OK".
 
 =back
@@ -2770,7 +2775,7 @@ Properties other than these three cannot be modified using this resource.
 =item * DELETE
 
 An integer SID must be given as an URI parameter. If found, the schedule with
-that SID will be deleted in an atomic operation. If the operation is sucessful
+that SID will be deleted in an atomic operation. If the operation is successful
 the return status will be "OK".
 
 =back

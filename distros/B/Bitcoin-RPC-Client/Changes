@@ -1,5 +1,13 @@
 Revision history for Bitcoin::RPC::Client 
 
+0.07    2017-10-16/14
+        - Multi-wallet support
+        - SSL support over web proxy
+        - Clean error reporting
+        - Fixed duplicate debug output
+        - Removed Bitcoin::RPC::Client::API
+        - More/cleaner examples 
+
 0.06    2017-7-12/14
         - Set user agent
         - Updated documentation

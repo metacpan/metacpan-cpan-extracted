@@ -27,7 +27,7 @@ Bio::DB::Big -- Read files using bigWigLib including BigBED and BigWig
 =cut
 
 
-$Bio::DB::Big::VERSION = '1.0.0';
+$Bio::DB::Big::VERSION = '1.0.1';
 
 use strict;
 use warnings;

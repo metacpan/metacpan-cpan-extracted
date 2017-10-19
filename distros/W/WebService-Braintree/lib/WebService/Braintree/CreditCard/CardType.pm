@@ -1,6 +1,7 @@
 package WebService::Braintree::CreditCard::CardType;
-$WebService::Braintree::CreditCard::CardType::VERSION = '0.93';
-use strict;
+$WebService::Braintree::CreditCard::CardType::VERSION = '0.94';
+use 5.010_001;
+use strictures 1;
 
 use constant AmericanExpress => "American Express";
 use constant CarteBlanche => "Carte Blanche";
@@ -31,4 +32,6 @@ use constant All => [
     Visa,
     Unknown
 ];
+
 1;
+__END__

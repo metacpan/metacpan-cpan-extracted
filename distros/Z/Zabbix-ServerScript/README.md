@@ -108,9 +108,10 @@ Retrieves cache from file using Storable module. $cache\_filename is optional.
 Connects to database via unixODBC. $dsn is mandatory.
 Returns database handle or throws an exception on failure.
 
-## send($data\_structure)
+## send($data\_structure, $trapper\_host, $trapper\_port)
 
-Send data to Zabbix trapper like zabbix\_sender does. $data\_structure is mandatory.
+Send data to Zabbix trapper like zabbix\_sender does.
+$data\_structure is mandatory. $trapper\_host and $trapper\_port are optional, values from global config's 'trapper' section are used by default.
 Returns server response on success or throws an exception on failure.
 $data\_structure must be either hashref or arrayref of hashrefs.
 

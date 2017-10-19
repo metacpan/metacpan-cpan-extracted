@@ -1,0 +1,50 @@
+% if ($Object->CurrentUserHasRight('SeeMemo')) {
+<div class="memo-content" style="<% $size_style %>" name="<% $Name %>" id="<% $Name %>" data-objectclass="<% ref($Object) %>" data-objectid="<% $Object->id %>"><% $memo_content_html|n %></div>
+
+%   if ($Object->CurrentUserHasRight('ModifyMemo')) {
+<textarea autocomplete="off" class="memo-edit-content<% $Type eq 'text/html' ? ' richtext' : '' %>" <% $width_attr %>="<% $Width %>" rows="<% $Height %>" <% $wrap_type |n %> name="<% $Name %>Edit" id="<% $Name %>Edit"><% $memo_value %></textarea>
+
+%       if ($Type eq 'text/html') {
+<input type="text" style="display:none" name="<% $Name %>EditType" id="<% $Name %>EditType" value="<% $m->request_args->{$Name."Type"}||$Type %>" />
+%       }
+<div class="submit" id ="MemoSubmit">
+<input type="submit" class="button" id="CancelMemo" name="CancelMemo" value="<% loc("Cancel") %>" data-action="Cancel" onclick="processMemoAction(this);" />
+<input type="submit" class="button" id="ActionMemo" name="ActionMemo" value="<% loc("Add a memo") %>" data-action="Add" onclick="processMemoAction(this);" />
+</div>
+%   }
+% }
+
+<%INIT>
+# Get initial value from attribute
+my $memo_value = '';
+$Object->ClearAttributes;
+my $attr = $Object->FirstAttribute('Memo');
+if ($Object->CurrentUserHasRight('SeeMemo') && $attr && $attr->Content && $attr->Content !~ /^\s*$/) {
+    $memo_value = $attr->Content;
+}
+my $memo_content_html = $memo_value;
+$memo_content_html =~ s|\n|<br />|g;
+
+# wrap="something" seems to really break IE + richtext
+my $wrap_type = $Type eq 'text/html' ? '' : 'wrap="soft"';
+
+# If there's no cols specified, we want to set the width to 100% in CSS
+my $width_attr;
+my $size_style;
+if ($Width) {
+    $width_attr = 'cols';
+    $size_style = 'width: ' . $Width * 12 . 'px; height: ' . $Height * 15 . 'px;';
+} else {
+    $width_attr = 'style';
+    $Width = 'width: 100%';
+    $size_style = 'width: calc(100% - 40px); height: ' . ($Height * 15 - 20) . 'px;';
+}
+
+</%INIT>
+<%ARGS>
+$Object
+$Name    => 'MemoContent'
+$Width   => RT->Config->Get('MemoWidth', $session{'CurrentUser'})
+$Height  => RT->Config->Get('MemoHeight', $session{'CurrentUser'}) || 15
+$Type    => RT->Config->Get('MemoRichText',  $session{'CurrentUser'}) ? 'text/html' : 'text/plain';
+</%ARGS>

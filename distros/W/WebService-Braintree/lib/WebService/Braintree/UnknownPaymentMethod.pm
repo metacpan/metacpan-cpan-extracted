@@ -1,5 +1,8 @@
 package WebService::Braintree::UnknownPaymentMethod;
-$WebService::Braintree::UnknownPaymentMethod::VERSION = '0.93';
+$WebService::Braintree::UnknownPaymentMethod::VERSION = '0.94';
+use 5.010_001;
+use strictures 1;
+
 use Moose;
 extends 'WebService::Braintree::PaymentMethod';
 
@@ -9,5 +12,6 @@ sub BUILD {
 }
 
 __PACKAGE__->meta->make_immutable;
-1;
 
+1;
+__END__

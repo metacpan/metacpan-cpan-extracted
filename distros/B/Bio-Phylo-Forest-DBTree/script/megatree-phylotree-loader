@@ -124,11 +124,13 @@ sub read_tree {
 
 		# compute depth of current line
 		chomp;
-		my $d;
+		next LINE if /^\s*$/; # skip blanks
+		my $d; # depth / height 
 		my @line = split /\t/, $_;
 		FIELD: for my $i ( 0 .. $#line ) {
 			if ( $line[$i] ) {
 				$d = $i + 1;
+				$log->debug("depth of focal node is '$d'");
 				last FIELD;	
 			}
 		}
@@ -137,15 +139,19 @@ sub read_tree {
 		my ( $id, $SNPs ) = grep { /\S/ } @line;
 		$id = "$line - $id";
 		my $label = $SNPs ? "$id / $SNPs" : $id;
+		$log->debug("ID of focal node is '$id'");
+		$log->debug("label of focal node is '$label'");
 	
 		# update topology
 		$path[$d] = $label;
+		splice @path, ($d+1), (scalar(@path)-($d+1));
 
 		# find focal node
 		my $parent;
 		PARENT: for ( my $i = $d - 1; $i >= 0; $i-- ) {
 			if ( $path[$i] ) {
 				$parent = $path[$i];
+				$log->debug("parent of focal node is '$parent'");
 				last PARENT;
 			}
 		}

@@ -196,4 +196,12 @@ sub _method_schedule_scode_term {
     return [ $method, "schedule/scode/$scode", $th->{_REST} ];
 }
 
+# $METHOD schedule new
+sub _method_schedule_new {
+    my ( $ts, $th ) = @_;
+    my $method = $ts->[0];
+
+    return [ $method, "schedule/new", $th->{_REST} ];
+}
+
 1;

@@ -1,3 +1,8 @@
+0.235.1 2017-10-14
+
+  Systemd model update:
+    * update from systemd 235 documentation
+
 0.234.2 2017-10-05
 
  Update following deprecations done in Config::Model 2.111:

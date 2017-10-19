@@ -69,7 +69,8 @@ define ([
                 stackLength;
 
             opts = lib.objectify(opts);
-            opts['resultLine'] = ('resultLine' in opts) ? opts.resultLine : false;
+            opts['inputId'] = ('inputId' in opts) ? opts.inputId : null;
+            opts['resultLine'] = ('resultLine' in opts) ? opts.resultLine : null;
             opts['_start'] = ('_start' in opts) ? opts.start : true;
             opts['_restart'] = ('_restart' in opts) ? opts._restart : false;
             opts['_start'] = opts._restart ? true : opts._start;
@@ -91,8 +92,9 @@ define ([
             stackTarget = getTarget();
             stackState = getState();
             console.log("Now, the stack length is " + stackLength +
-                        " and the top target is " + stackTarget.name);
-            if (typeof newState === 'object') {
+                        " and the top target is " + stackTarget.name +
+                        " and its state is", stackState);
+            if (newState && typeof newState === 'object') {
                 $.extend(stackState, newState);
                 setState(stackState);
             }

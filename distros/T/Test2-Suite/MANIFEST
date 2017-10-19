@@ -164,3 +164,5 @@ t/regression/27-3-Test2-Tools-ClassicCompare.t
 t/regression/43-bag-on-empty.t
 t/regression/Test2-Mock.t
 t/regression/Test2-Tools-Class.t
+t/regression/todo_and_facets.t
+t/regression/utf8-mock.t

@@ -13,7 +13,7 @@ Dancer2::Cookbook - Example-driven quick-start to the Dancer2 web framework
 
 =head1 VERSION
 
-version 0.205001
+version 0.205002
 
 =head1 DESCRIPTION
 
@@ -348,6 +348,11 @@ Done! Everything will work fine out of the box, including variables and META
 variables.
 
 However, disabling the internal layout it will also disable the hooks C<before_layout_render> and C<after_layout_render>.
+
+=head2 Customizing Template Toolkit in Dancer2
+
+Please see L<Dancer2::Template::TemplateToolkit|Dancer2::Template::TemplateToolkit/"ADVANCED CUSTOMIZATION">
+for more details.
 
 =head2 Accessing configuration information from a separate script
 

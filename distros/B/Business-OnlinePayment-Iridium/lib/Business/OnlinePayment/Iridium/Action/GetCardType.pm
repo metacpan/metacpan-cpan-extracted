@@ -47,7 +47,7 @@ Business::OnlinePayment::Iridium::Action::GetCardType - Query PayVector for card
 
 =head1 VERSION
 
-version 1.01
+version 1.03
 
 =head2 template
 

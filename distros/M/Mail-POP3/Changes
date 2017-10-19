@@ -1,49 +1,61 @@
+Revision history for Mail::POP3
+
+3.09	Wed Oct 18 05:23:03 BST 2017
+- introduce sane MANIFEST.SKIP et al
+- zap sub Makefile.PL
+- docs
+- xt tests
+- tests handle no . in @INC
+- repo metadata
+- generate README.md from module
+- incorporate README into POD
+- reformat Changes
+
 3.08
-webscrape.t still failed on Strawberry Perl if LANG=ru_RU.utf8 - fix
+- webscrape.t still failed on Strawberry Perl if LANG=ru_RU.utf8 - fix
 
 3.07
-webscrape.t fails if LANG=ru_RU.utf8 - fix
+- webscrape.t fails if LANG=ru_RU.utf8 - fix
 
 3.06
-webscrape.t "top" and "retr" tests failing on some arch: use "is" to
-get actual output from CPAN Testers network.
+- webscrape.t "top" and "retr" tests failing on some arch: use "is" to
+  get actual output from CPAN Testers network.
 
 3.05
 Put testp3.pl into scripts - useful POP3-talking test script.
-Change dependency on Email::Stuffer to Email::MIME in conf/jobserve.conf
-and t/webscrape.t - far fewer dependencies, better fit for requirement.
-New scripts/ entry - mailbox-test, which exercises a mailbox class from
-a given conf file.
-New scripts/ entry - webscrape, which exercises *::webscrape from a
-given conf file, allowing development/testing of that class.
+- Change dependency on Email::Stuffer to Email::MIME in conf/jobserve.conf
+  and t/webscrape.t - far fewer dependencies, better fit for requirement.
+- New scripts/ entry - mailbox-test, which exercises a mailbox class from
+  a given conf file.
+- New scripts/ entry - webscrape, which exercises *::webscrape from a
+  given conf file, allowing development/testing of that class.
 
 3.04
-Use another tmpdir instead of "out" in t/testcommon.pl's server config
-so an "out" directory is not left in the source directory after tests.
-Rename *::Folder::virtual::jobserve to *::Folder::webscrape
-make t/webscrape.t
+- Use another tmpdir instead of "out" in t/testcommon.pl's server config
+  so an "out" directory is not left in the source directory after tests.
+- Rename *::Folder::virtual::jobserve to *::Folder::webscrape
+- make t/webscrape.t
 
 3.03 2013/12/31
-Moved tests to t/*.t. Changes for Win32: if Win32, don't install SIGUSR1
-handler, don't try to use IO::Select->can_read, don't call getgrnam
+- Moved tests to t/*.t. Changes for Win32: if Win32, don't install SIGUSR1
+  handler, don't try to use IO::Select->can_read, don't call getgrnam
 
 3.02 2013/12/28
-Updated tests to reduce duplication and hardcoding.
+- Updated tests to reduce duplication and hardcoding.
 
 3.01 2013/12/27
-To make it pass tests (and actually build), stopped using ".inst_dir"
-in distrib directory to build the scripts, since it was not being created
-and therefore was causing immediate failure. Instead used hardcoded value.
+- To make it pass tests (and actually build), stopped using ".inst_dir"
+  in distrib directory to build the scripts, since it was not being created
+  and therefore was causing immediate failure. Instead used hardcoded value.
 
 3.0 (from 2.* by Mark Tiramani) 2002/08/09
-Turned Mail::POP3Server into Mail::POP3 - redesigned it to be as follows:
+- Turned Mail::POP3Server into Mail::POP3 - redesigned it to be as follows:
+  - Mail::POP3::Daemon does the socket-accepting.
+  - Mail::POP3::Server does (most of) the network POP3 stuff.
+  - Mail::POP3::Security::{User,Connection} do the checks on users and connections.
+  - Mail::POP3::Folder::* classes handles the mail folders.
+  - Mail::POP3::Folder::virtual::jobserve presents a jobserve search
+    (using the username as params) as a POP3 mailbox.
 
-Mail::POP3::Daemon does the socket-accepting.
-Mail::POP3::Server does (most of) the network POP3 stuff.
-Mail::POP3::Security::{User,Connection} do the checks on users and connections.
-Mail::POP3::Folder::* classes handles the mail folders.
-Mail::POP3::Folder::virtual::jobserve presents a jobserve search
-  (using the username as params) as a POP3 mailbox.
-
-This involved turning the previous Mail::POP3Server "inside out", since
-it more or less only had as an interface a "startserver" method.
+- This involved turning the previous Mail::POP3Server "inside out", since
+  it more or less only had as an interface a "startserver" method.

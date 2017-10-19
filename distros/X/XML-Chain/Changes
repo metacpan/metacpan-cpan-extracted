@@ -1,3 +1,8 @@
+0.05  2017-10-17
+    - set_io_any() accepts second argument, IO::Any options
+    - using canical XML - toStringC14N() for stringification
+    - replaces XML::Tidy with _reindent_children() function (experimental)
+
 0.04  2017-10-08
     - fix xc(XML::LibXML::Document->new()) case
     - add attr() method

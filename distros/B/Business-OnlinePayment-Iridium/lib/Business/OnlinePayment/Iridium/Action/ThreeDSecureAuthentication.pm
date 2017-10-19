@@ -57,7 +57,7 @@ Business::OnlinePayment::Iridium::Action::ThreeDSecureAuthentication - Handle 3D
 
 =head1 VERSION
 
-version 1.01
+version 1.03
 
 =head2 template
 

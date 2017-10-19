@@ -1,15 +1,17 @@
 package WebService::Braintree::Xml;
-$WebService::Braintree::Xml::VERSION = '0.93';
-use strict;
+$WebService::Braintree::Xml::VERSION = '0.94';
+use 5.010_001;
+use strictures 1;
 
-use XML::Simple;
-use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS );
+use vars qw(@ISA @EXPORT_OK);
 use Exporter;
 our @ISA = qw(Exporter);
-our @EXPORT = qw(hash_to_xml xml_to_hash array collect_from_array);
-our @EXPORT_OK = qw();
-use WebService::Braintree::Util;
+our @EXPORT_OK = qw(hash_to_xml xml_to_hash);
+
+use XML::Simple;
+
 use DateTime::Format::Atom;
+use WebService::Braintree::Util qw(is_arrayref is_hashref);
 use XML::LibXML;
 
 sub hash_to_xml {
@@ -60,19 +62,18 @@ sub build_node {
 
 sub xml_to_hash {
     my $return = XMLin(shift, KeyAttr => [], KeepRoot => 1);
-    my $scrubbed = scrubbed($return);
-    return $scrubbed;
+    return scrubbed($return);
 }
 
 sub scrubbed {
     my $tree = shift;
     if (is_hashref($tree)) {
         return collect_from_hash($tree);
-    }
-    if (is_arrayref($tree)) {
+    } elsif (is_arrayref($tree)) {
         return collect_from_array($tree);
+    } else {
+        return $tree;
     }
-    return $tree;
 }
 
 sub collect_from_array {
@@ -89,11 +90,11 @@ sub collect_from_hash {
     my $new_hash = {};
 
     my %types = (
-        'array' => \&array,
-        'boolean' => \&boolean,
-        'integer' => \&integer,
-        'datetime' => \&datetime,
-        'date' => \&date
+        array => \&array,
+        boolean => \&boolean,
+        integer => \&integer,
+        datetime => \&datetime,
+        date => \&date
     );
 
     foreach my $type (keys %types) {
@@ -145,18 +146,16 @@ sub array {
 
     delete $tree->{type};
     my $subtree = (values %$tree)[0];
-    if (ref $subtree eq 'HASH') {
+    if (is_hashref($subtree)) {
         return [scrubbed($subtree)];
-    } elsif (ref $subtree eq 'ARRAY') {
-        return scrubbed(force_array($subtree));
+    } elsif (is_arrayref($subtree)) {
+        return scrubbed($subtree);
     } elsif (defined($subtree)) {
         return [$subtree];
     } else {
         return [];
     }
-
 }
-
 
 sub sub_dashes {
     my $string = shift;
@@ -164,10 +163,5 @@ sub sub_dashes {
     return $string;
 }
 
-sub force_array {
-    my $subtree = shift;
-    return $subtree if(is_arrayref($subtree));
-    return [$subtree];
-}
-
 1;
+__END__

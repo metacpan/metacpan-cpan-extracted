@@ -1,0 +1,46 @@
+---
+abstract: ~
+author:
+  - 'Vincent Levigneron <vincent.levigneron at nic.fr>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::Fatal: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+  Locale::Msgfmt: 0.15
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Zonemaster-Engine
+no_index:
+  directory:
+    - inc
+    - share
+    - t
+recommends:
+  Readonly::XS: 0
+requires:
+  File::ShareDir: 1
+  File::Slurp: 0
+  Hash::Merge: 0
+  IO::Socket::INET6: 2.69
+  List::MoreUtils: 0
+  Locale::TextDomain: 0
+  MIME::Base64: 0
+  Mail::RFC822::Address: 0
+  Module::Find: 0.1
+  Moose: 2.0401
+  Net::IP: 1.26
+  Readonly: 0
+  Text::CSV: 0
+  Zonemaster::LDNS: 1
+  perl: 5.14.2
+resources:
+  bugtracker: https://github.com/dotse/zonemaster-engine/issues
+  license: http://opensource.org/licenses/bsd-license.php
+  repository: https://github.com/dotse/zonemaster-engine
+version: '2.000000'

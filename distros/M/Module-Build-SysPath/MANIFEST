@@ -28,12 +28,7 @@ META.yml
 README
 t/00_compile.t
 t/01_Module-Build-SysPath.t
-t/distribution.t
-t/fixme.t
 t/lib/Sys/Path/SPc.pm
-t/pod-coverage.t
-t/pod-spell.t
-t/pod.t
 t/tdirs/Acme-Test-SysPath.installed/etc/acme-test-syspath.cfg
 t/tdirs/Acme-Test-SysPath.installed/srv/srv.file
 t/tdirs/Acme-Test-SysPath.installed/usr/share/doc/doc
@@ -61,3 +56,8 @@ t/tdirs/Acme-Test-SysPath/state/acme-state/.exists
 t/tdirs/Acme-Test-SysPath/www/.hidden/hidden
 t/tdirs/Acme-Test-SysPath/www/empty/.exists
 t/tdirs/Acme-Test-SysPath/www/www
+xt/distribution.t
+xt/fixme.t
+xt/pod-coverage.t
+xt/pod-spell.t
+xt/pod.t

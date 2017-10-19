@@ -622,31 +622,41 @@ UV logint(UV n, UV b)
   return e;
 }
 
-UV mpu_popcount_string(const char* ptr, int len)
+UV mpu_popcount_string(const char* ptr, uint32_t len)
 {
-  int i, *s, *sptr;
-  UV count = 0;
+  uint32_t count = 0, i, j, d, v, power, slen, *s, *sptr;
 
   while (len > 0 && (*ptr == '0' || *ptr == '+' || *ptr == '-'))
     {  ptr++;  len--;  }
 
-  New(0, s, len, int);
-  for (i = 0; i < len; i++)
-    s[i] = ptr[i] - '0';
-
-  while (len > 0) {
-    if (s[len-1] & 1)  count++;
-    /* divide by 2 */
+  /* Create s as array of base 10^8 numbers */
+  slen = (len + 7) / 8;
+  Newz(0, s, slen, uint32_t);
+  for (i = 0; i < slen; i++) {  /* Chunks of 8 digits */
+    for (j = 0, d = 0, power = 1;  j < 8 && len > 0;  j++, power *= 10) {
+      v = ptr[--len] - '0';
+      if (v > 9) croak("Parameter '%s' must be a positive integer",ptr);
+      d += power * v;
+    }
+    s[slen - 1 - i] = d;
+  }
+  /* Repeatedly count and divide by 2 across s */
+  while (slen > 1) {
+    if (s[slen-1] & 1)  count++;
     sptr = s;
     if (s[0] == 1) {
-      if (--len == 0) break;
-      *++sptr += 10;
+      if (--slen == 0) break;
+      *++sptr += 100000000;
     }
-    for (i = 0; i < len; i++) {
-      if ( (i+1) < len  &&  sptr[i] & 1 ) sptr[i+1] += 10;
-      s[i] = sptr[i] / 2;
+    for (i = 0; i < slen; i++) {
+      if ( (i+1) < slen  &&  sptr[i] & 1 ) sptr[i+1] += 100000000;
+      s[i] = sptr[i] >> 1;
     }
   }
+  /* For final base 10^8 number just do naive popcnt */
+  for (d = s[0]; d > 0; d >>= 1)
+    if (d & 1)
+      count++;
   Safefree(s);
   return count;
 }
@@ -1006,6 +1016,26 @@ int is_semiprime(UV n) {
   }
 }
 
+int is_fundamental(UV n, int neg) {
+  UV r = n & 15;
+  if (r) {
+    if (!neg) {
+      switch (r & 3) {
+        case 0:  return (r ==  4) ? 0 : is_square_free(n >> 2);
+        case 1:  return is_square_free(n);
+        default: break;
+      }
+    } else {
+      switch (r & 3) {
+        case 0:  return (r == 12) ? 0 : is_square_free(n >> 2);
+        case 3:  return is_square_free(n);
+        default: break;
+      }
+    }
+  }
+  return 0;
+}
+
 UV pillai_v(UV n) {
   UV v, fac = 5040 % n;
   if (n == 0) return 0;
@@ -1177,6 +1207,81 @@ UV divmod(UV a, UV b, UV n) {   /* a / b  mod n */
   UV binv = modinverse(b, n);
   if (binv == 0)  return 0;
   return mulmod(a, binv, n);
+}
+
+static UV _powfactor(UV p, UV d, UV m) {
+  UV e = 0;
+  do { d /= p; e += d; } while (d > 0);
+  return powmod(p, e, m);
+}
+
+UV factorialmod(UV n, UV m) {  /*  n! mod m */
+  UV i, d = n, res = 1;
+
+  if (n >= m || m == 1) return 0;
+
+  if (n <= 10) { /* Keep things simple for small n */
+    for (i = 2; i <= n && res != 0; i++)
+      res = (res * i) % m;
+    return res;
+  }
+
+  if (n > m/2 && is_prime(m))    /* Check if we can go backwards */
+    d = m-n-1;
+  if (d < 2)
+    return (d == 0) ? m-1 : 1;   /* Wilson's Theorem: n = m-1 and n = m-2 */
+
+  if (d == n && d > 5000000) {   /* Check for composite m that leads to 0 */
+    UV facs[MPU_MAX_FACTORS];
+    int nfacs = factor(m, facs);
+    if (n >= facs[nfacs-1]) return 0;
+  }
+
+#if USE_MONTMATH
+  if (m & 1 && d < 40000) {
+    const uint64_t npi = mont_inverse(m),  mont1 = mont_get1(m);
+    uint64_t monti = mont1;
+    res = mont1;
+    for (i = 2; i <= d && res != 0; i++) {
+      monti = addmod(monti,mont1,m);
+      res = mont_mulmod(res,monti,m);
+    }
+    res = mont_recover(res, m);
+  } else
+#endif
+  if (d < 10000) {
+    for (i = 2; i <= d && res != 0; i++)
+      res = mulmod(res,i,m);
+  } else {
+#if 0    /* Monolithic prime walk */
+    START_DO_FOR_EACH_PRIME(2, d) {
+      UV k = (p > (d>>1))  ?  p  :  _powfactor(p, d, m);
+      res = mulmod(res, k, m);
+      if (res == 0) break;
+    } END_DO_FOR_EACH_PRIME;
+#else    /* Segmented prime walk */
+    unsigned char* segment;
+    UV seg_base, seg_low, seg_high;
+    void* ctx = start_segment_primes(7, d, &segment);
+    for (i = 1; i <= 3; i++)    /* Handle 2,3,5 assume d>10*/
+      res = mulmod(res, _powfactor(2*i - (i>1), d, m), m);
+    while (res != 0 && next_segment_primes(ctx, &seg_base, &seg_low, &seg_high)) {
+      START_DO_FOR_EACH_SIEVE_PRIME( segment, seg_base, seg_low, seg_high )
+        UV k = (p > (d>>1))  ?  p  :  _powfactor(p, d, m);
+        res = mulmod(res, k, m);
+        if (res == 0) break;
+      END_DO_FOR_EACH_SIEVE_PRIME
+    }
+    end_segment_primes(ctx);
+#endif
+  }
+
+  if (d != n && res != 0) {      /* Handle backwards case */
+    if (!(d&1)) res = submod(m,res,m);
+    res = modinverse(res,m);
+  }
+
+  return res;
 }
 
 static int verify_sqrtmod(UV s, UV *rs, UV a, UV p) {
@@ -2366,6 +2471,16 @@ UV gcdz(UV x, UV y) {
   UV f, x2, y2;
 
   if (x == 0) return y;
+
+  if (y & 1) {  /* Optimize y odd */
+    x >>= ctz(x);
+    while (x != y) {
+      if (x < y) { y -= x; y >>= ctz(y); }
+      else       { x -= y; x >>= ctz(x); }
+    }
+    return x;
+  }
+
   if (y == 0) return x;
 
   /* Alternately:  f = ctz(x|y); x >>= ctz(x); y >>= ctz(y); */
@@ -2473,25 +2588,22 @@ UV polygonal_root(UV n, UV k, int* overflow) {
 
 /* These rank/unrank are O(n^2) algorithms using O(n) in-place space.
  * Bonet 2008 gives O(n log n) algorithms using a bit more space.
- *
- * Our randperm is 4x or more faster than NumPy's random.permutation,
- * and much faster than that when selecting a small subset.
  */
 
 int num_to_perm(UV k, int n, int *vec) {
-  int i, j, p, t;
+  int i, j, t, si = 0;
   UV f = factorial(n-1);
 
-  if (n >= 32 || f == 0)
-    return 0;
+  while (f == 0) /* We can handle n! overflow if we have a valid k */
+    f = factorial(n - 1 - ++si);
+
   if (k/f >= (UV)n)
     k %= f*n;
 
   for (i = 0; i < n; i++)
     vec[i] = i;
-
-  for (i = 0; i < n-1; i++) {
-    p = k/f;
+  for (i = si; i < n-1; i++) {
+    UV p = k/f;
     k -= p*f;
     f /= n-i-1;
     if (p > 0) {
@@ -2520,20 +2632,35 @@ int perm_to_num(int n, int *vec, UV *rank) {
   return 1;
 }
 
+static int numcmp(const void *a, const void *b)
+  { const UV *x = a, *y = b; return (*x > *y) ? 1 : (*x < *y) ? -1 : 0; }
+
+/*
+ * For k<n, an O(k) time and space method is shown on page 39 of
+ *    https://www.math.upenn.edu/~wilf/website/CombinatorialAlgorithms.pdf
+ * Note it requires an O(k) complete shuffle as the results are sorted.
+ *
+ * This seems to be 4-100x faster than NumPy's random.{permutation,choice}
+ * for n under 100k or so.  It's even faster with larger n.  For example
+ *   from numpy.random import choice;  choice(100000000, 4, replace=False)
+ * uses 774MB and takes 55 seconds.  We take less than 1 microsecond.
+ */
 void randperm(void* ctx, UV n, UV k, UV *S) {
   UV i, j;
 
   if (k > n)  k = n;
 
-  if        (k == 0) {
-  } else if (k == 1) {
+  if        (k == 0) {                  /* 0 of n */
+  } else if (k == 1) {                  /* 1 of n.  Pick one at random */
     S[0] = urandomm64(ctx,n);
-  } else if (n < ((BITS_PER_WORD==32) ? 13 : 21)) {
-    int V[32];
-    num_to_perm(urandomm64(ctx,factorial(n)), n, V);
-    for (i = 0; i < k; i++)
-      S[i] = V[i];
-  } else if (k < n/5 && k < 1000) {   /* TODO: Improve this cutoff */
+  } else if (k == 2 && n == 2) {        /* 2 of 2.  Flip a coin */
+    S[0] = urandomb(ctx,1);
+    S[1] = 1-S[0];
+  } else if (k == 2) {                  /* 2 of n.  Pick 2 skipping dup */
+    S[0] = urandomm64(ctx,n);
+    S[1] = urandomm64(ctx,n-1);
+    if (S[1] >= S[0]) S[1]++;
+  } else if (k < n/100 && k < 30) {     /* k of n.  Pick k with loop */
     for (i = 0; i < k; i++) {
       do {
         S[i] = urandomm64(ctx,n);
@@ -2542,7 +2669,45 @@ void randperm(void* ctx, UV n, UV k, UV *S) {
             break;
       } while (j < i);
     }
-  } else {
+  } else if (k < n/100 && n > 1000000) {/* k of n.  Pick k with dedup retry */
+    for (j = 0; j < k; ) {
+      for (i = j; i < k; i++) /* Fill S[j .. k-1] then sort S */
+        S[i] = urandomm64(ctx,n);
+      qsort(S, k, sizeof(UV), numcmp);
+      for (j = 0, i = 1; i < k; i++)  /* Find and remove dups.  O(n). */
+        if (S[j] != S[i])
+          S[++j] = S[i];
+      j++;
+    }
+    /* S is sorted unique k-selection of 0 to n-1.  Shuffle. */
+    for (i = 0; i < k; i++) {
+      j = urandomm64(ctx,k-i);
+      { UV t = S[i]; S[i] = S[i+j]; S[i+j] = t; }
+    }
+  } else if (k < n/4) {                 /* k of n.  Pick k with mask */
+    uint32_t *mask, smask[8] = {0};
+    if (n <= 32*8) mask = smask;
+    else           Newz(0, mask, n/32 + ((n%32)?1:0), uint32_t);
+    for (i = 0; i < k; i++) {
+      do {
+        j = urandomm64(ctx,n);
+      } while ( mask[j>>5] & (1U << (j&0x1F)) );
+      S[i] = j;
+      mask[j>>5] |= (1U << (j&0x1F));
+    }
+    if (mask != smask) Safefree(mask);
+  } else if (k < n) {                   /* k of n.  FYK shuffle n, pick k */
+    UV *T;
+    New(0, T, n, UV);
+    for (i = 0; i < n; i++)
+      T[i] = i;
+    for (i = 0; i < k && i <= n-2; i++) {
+      j = urandomm64(ctx,n-i);
+      S[i] = T[i+j];
+      T[i+j] = T[i];
+    }
+    Safefree(T);
+  } else {                              /* n of n.  FYK shuffle. */
     for (i = 0; i < n; i++)
       S[i] = i;
     for (i = 0; i < k && i <= n-2; i++) {
