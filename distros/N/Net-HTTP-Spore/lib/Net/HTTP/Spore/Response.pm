@@ -1,8 +1,5 @@
 package Net::HTTP::Spore::Response;
-{
-  $Net::HTTP::Spore::Response::VERSION = '0.06';
-}
-
+$Net::HTTP::Spore::Response::VERSION = '0.07';
 # ABSTRACT: Portable HTTP Response object for SPORE response
 
 use strict;
@@ -127,13 +124,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Net::HTTP::Spore::Response - Portable HTTP Response object for SPORE response
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -265,17 +264,21 @@ The third and final element is the body
 
 =item *
 
-franck cuny <franck@lumberjaph.net>
+Franck Cuny <franck.cuny@gmail.com>
 
 =item *
 
 Ash Berlin <ash@cpan.org>
 
+=item *
+
+Ahmad Fatoum <athreef@cpan.org>
+
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by linkfluence.
+This software is copyright (c) 2012 by Linkfluence.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

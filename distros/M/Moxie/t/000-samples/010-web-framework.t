@@ -59,6 +59,8 @@ package TodoService {
 
     has 'todos' => ( default => sub { +{} } );
 
+    my sub todos : private;
+
     sub get_todo ($self, $id) : Path('/:id') GET Produces('application/json') {
         todos->{ $id };
     }

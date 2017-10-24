@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package App::Cme ;
-$App::Cme::VERSION = '1.023';
+$App::Cme::VERSION = '1.024';
 use strict;
 use warnings;
 use 5.10.1;
@@ -33,7 +33,7 @@ App::Cme - Check or edit configuration data with Config::Model
 
 =head1 VERSION
 
-version 1.023
+version 1.024
 
 =head1 AUTHOR
 

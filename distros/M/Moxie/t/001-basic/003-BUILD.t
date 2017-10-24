@@ -12,6 +12,8 @@ package Foo {
 
     has _collector => ( default => sub { [] } );
 
+    my sub _collector : private;
+
     sub collector : ro(_collector);
 
     sub collect ($self, $stuff) {

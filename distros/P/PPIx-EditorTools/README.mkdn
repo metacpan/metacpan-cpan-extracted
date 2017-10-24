@@ -1,0 +1,43 @@
+# NAME
+
+PPIx::EditorTools - Utility methods and base class for manipulating Perl via PPI
+
+# VERSION
+
+version 0.20
+
+# SYNOPSIS
+
+```
+See PPIx::EditorTools::*
+```
+
+# DESCRIPTION
+
+Base class and utility methods for manipulating Perl via PPI. Pulled out from
+the `Padre::Task::PPI` code.
+
+# METHODS
+
+- new()
+
+    Constructor. Generally shouldn't be called with any arguments.
+
+# SEE ALSO
+
+`PPIx::EditorTools::*`, [Padre](https://metacpan.org/pod/Padre), [App::EditorTools](https://metacpan.org/pod/App::EditorTools), [Padre](https://metacpan.org/pod/Padre), and [PPI](https://metacpan.org/pod/PPI).
+
+# AUTHORS
+
+- Steffen Mueller `smueller@cpan.org`
+- Mark Grimes `mgrimes@cpan.org`
+- Ahmad M. Zawawi <ahmad.zawawi@gmail.com>
+- Gabor Szabo  <gabor@szabgab.com>
+- Yanick Champoux <yanick@cpan.org> [![endorse](http://api.coderwall.com/yanick/endorsecount.png)](http://coderwall.com/yanick)
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017, 2014, 2012 by The Padre development team as listed in Padre.pm..
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,15 @@
 Revision history for MariaDB-NonBlocking
 
+0.11    2017-10-19
+        * Respect INSTALL_BASE
+        * Options to Makefile.PL for the default database
+          to test in.
+        * Test files!
+        * Further streamlined the API
+        * Fixed several bugs related to error conditions
+        * Report the rows affected on update/create
+          and probably delete.
+
 0.10    2017-10-13
         * cast values so that mysql ints actually show
           up as Perl IVs

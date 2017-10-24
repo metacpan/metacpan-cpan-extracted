@@ -34,6 +34,7 @@
          "requires" : {
             "Carp" : "0",
             "LWP::Protocol::https" : "0",
+            "Time::HiRes" : "0",
             "perl" : "5.006002"
          }
       },
@@ -56,6 +57,6 @@
          "web" : "https://github.com/nigelhorne/Geo-Coder-List"
       }
    },
-   "version" : "0.14",
+   "version" : "0.15",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

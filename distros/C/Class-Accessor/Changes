@@ -1,3 +1,9 @@
+0.50 2017-10-20
+    Thanks to Jonas B. Nielsen for working through the RT queue.
+    - patch for speed increase RT#84838
+    - patch for faster constructor RT#57353
+    - fixed typos for RT#61304 and RT#86422
+
 0.34 Sat Sep 12 21:50:26 JST 2009
     - add a Moose-like interface: I can haz "has"
 

@@ -28,12 +28,12 @@ push @Text::Phonetic::AVAILABLE_ALGORITHMS,'Test';
     package Text::Phonetic::Test;
     use Moo;
     extends qw(Text::Phonetic);
-    
+
     has 'attribute' => (
         is  => 'rw',
         required => 1,
     );
-    
+
     sub _do_encode {
         my ($self,$sting) = @_;
         return $self->attribute;

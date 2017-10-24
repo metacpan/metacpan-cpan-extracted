@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.029';
+our $VERSION = '0.030';
 
 use Moose 0.99;
 
@@ -352,7 +352,7 @@ Dist::Zilla::PluginBundle::Author::SKIRMESS - Dist::Zilla configuration the way 
 
 =head1 VERSION
 
-Version 0.029
+Version 0.030
 
 =head1 SYNOPSIS
 

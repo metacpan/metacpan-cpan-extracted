@@ -81,10 +81,10 @@ do { my $x = {
                                    'Test::More' => '0',
                                    'Test::More::UTF8' => '0',
                                    'Try::Tiny' => '0',
-                                   'blib' => '1.01',
                                    'diagnostics' => '0',
                                    'open' => '0',
                                    'perl' => '5.008',
+                                   'threads' => '0',
                                    'utf8' => '0'
                                  }
                  }

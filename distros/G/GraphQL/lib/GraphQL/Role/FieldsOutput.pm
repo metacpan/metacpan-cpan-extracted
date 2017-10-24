@@ -4,9 +4,14 @@ use 5.014;
 use strict;
 use warnings;
 use Moo::Role;
+use Types::Standard -all;
 use GraphQL::Type::Library -all;
 use MooX::Thunking;
-with 'GraphQL::Role::FieldDeprecation';
+use Function::Parameters;
+with qw(
+  GraphQL::Role::FieldDeprecation
+  GraphQL::Role::FieldsEither
+);
 
 our $VERSION = '0.02';
 

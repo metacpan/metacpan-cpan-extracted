@@ -1,5 +1,12 @@
 Revision history for Ryu
 
+0.025     2017-10-22 17:06:29+08:00 Asia/Kuala_Lumpur
+    No new features.
+
+    Bugs fixed:
+
+    * Minor update to Ryu::Observable to fix a typo in a method call
+
 0.024     2017-09-01 20:50:54+08:00 Asia/Kuala_Lumpur
     New features:
 

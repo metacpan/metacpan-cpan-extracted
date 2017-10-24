@@ -29,7 +29,7 @@ is( &{$scrubber_good}($card), $expect_custom, 'custom scrubber - bare' );
 my $tx = Business::OnlinePayment->new("Litle", @opts);
 is( &{$tx->{_scrubber}}($card), $expect_default, 'default scrubber - installed' );
 
-$tx = Business::OnlinePayment->new("Litle", default_Scrubber => '');
+$tx = Business::OnlinePayment->new("Litle", default_Scrubber => undef);
 is( &{$tx->{_scrubber}}($card), $expect_default, 'default scrubber - bad install attempt' );
 
 $tx = Business::OnlinePayment->new("Litle", default_Scrubber => $scrubber_good );

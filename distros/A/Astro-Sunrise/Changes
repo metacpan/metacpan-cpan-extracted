@@ -2,9 +2,15 @@
 
 Revision history for Perl extension sunrise.
 
-0.96  ???
+0.97  Thursday 19 October 2017
+      - Change http to https whenever possible
+      - Fix ticket 120598: a test script would fail two days per year
+      - Fix ticket 120610: POD typo
+      - Add a text documenting the astronomical background of the module
+
+0.96  Wednesday 2 December 2015
       - Fix ticket 109992, prevent endless loops
-        (thank you http://geocoder.opencagedata.com/)
+        (thank you https://geocoder.opencagedata.com/)
 
 0.95  Tuesday 21 April 2015
       - Some improvements in the POD documentation.
@@ -20,7 +26,7 @@ Revision history for Perl extension sunrise.
       - Stylistic and kwalitee issues: license, distro structure, etc.
       - Fix ticket 62593 (patch from Slaven Rezic)
       - Parameters to sunrise can be passed by name (using a hashref)
-      - The upper_limb is not longer hard-coded, it is now a parameter
+      - The upper_limb value is not longer hard-coded, it is now a parameter
       - The behaviour for polar day and polar night can change: no warning,
         but a special return value.
       - Make degree-trigonometric functions available for import.

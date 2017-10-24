@@ -1,5 +1,17 @@
 Revision history for Perl extension Moxie
 
+0.05 2017-10-21
+    [FEATURE CHANGES]
+    - restored the `private` trait and ceased it being
+      the default behavior as a result of a `has` call
+
+    [DEPENDENCIES]
+    - dropped the Devel::Hook dependency for the MOP::Util
+      functions (which just use Devel::Hook themselves)
+    - restored the Padwalker dependency
+    - removed the Sub::Inject dependency (see above)
+    - bump the MOP dependency
+
 0.04 2017-09-27
     [FEATURE CHANGES]
     - moved the Moxie::Slot::Intitializer class to

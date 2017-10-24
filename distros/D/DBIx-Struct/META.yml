@@ -28,5 +28,5 @@ requires:
 resources:
   bugtracker: https://github.com/jef-sure/dbix-struct-github/issues
   repository: https://github.com/jef-sure/dbix-struct-github.git
-version: '0.36'
+version: '0.37'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

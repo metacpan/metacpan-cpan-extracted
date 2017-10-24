@@ -145,7 +145,7 @@ the node.
     my $child  = $node->first_child;
     my $child  = $node->last_child;
 
-These methods return the respective node in tree structure.
+These methods return the respective node in the tree structure.
 
 =head2 Tree manipulation
 

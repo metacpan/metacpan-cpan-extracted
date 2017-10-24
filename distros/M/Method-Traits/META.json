@@ -1,0 +1,52 @@
+{
+   "abstract" : "Apply traits to your methods",
+   "author" : [
+      "Stevan Little <stevan@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Method-Traits",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "MOP" : "0.11",
+            "Module::Runtime" : "0",
+            "Scalar::Util" : "0",
+            "UNIVERSAL::Object" : "0.12",
+            "attributes" : "0",
+            "perl" : "v5.14.5"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/stevan/p5-Method-Traits/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/stevan/p5-Method-Traits.git",
+         "web" : "https://github.com/stevan/p5-Method-Traits"
+      }
+   },
+   "version" : "0.06",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+}
+

@@ -1,5 +1,8 @@
 Revision history for Geo-Coder-Postcodes
 
+0.04	Sat Oct 21 18:11:19 EDT 2017
+	Find places with spaces in them, such as South Bersted
+
 0.03	Wed Oct 11 15:40:11 EDT 2017
 	Plumstead wasn't being found
 

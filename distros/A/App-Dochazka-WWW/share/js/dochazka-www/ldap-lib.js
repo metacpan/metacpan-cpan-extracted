@@ -126,7 +126,6 @@ define ([
                 },
                 // failure callback -- employee doesn't exist
                 fc = function (st) {
-                    console.log("AJAX: " + rest["path"] + " failed with", st);
                     coreLib.displayError(st.payload.message);
                 };
             ajax(rest, sc, fc);
@@ -176,7 +175,6 @@ define ([
                 fc = function (st) {
                     var err = st.payload.code,
                         msg;
-                    console.log("AJAX: " + rest["path"] + " failed with", st);
                     if (err === '404') {
                         msg = 'Employee ' + ldapEmp.nick + ' not found in LDAP';
                     } else {

@@ -17,8 +17,8 @@ Convert various types of Japanese characters into one another.
 
 =head1 VERSION
 
-This document describes Lingua::JA::Moji version 0.44
-corresponding to git commit L<722b6e721eb6a4a29d1aa6b7de96f580f1904c01|https://github.com/benkasminbullock/Lingua-JA-Moji/commit/722b6e721eb6a4a29d1aa6b7de96f580f1904c01> made on Sat Mar 11 12:23:39 2017 +0900.
+This document describes Lingua::JA::Moji version 0.46
+corresponding to git commit L<1b6d2bea0e044f6da33e62325a87070671be692c|https://github.com/benkasminbullock/Lingua-JA-Moji/commit/1b6d2bea0e044f6da33e62325a87070671be692c> made on Tue Oct 24 10:39:21 2017 +0900.
 
 =head1 DESCRIPTION
 
@@ -253,6 +253,22 @@ under the key "abbrev" and the full name under the key "full_name".
 
 
 
+=head2 romaji_vowel_styles 
+
+
+
+    use Lingua::JA::Moji 'romaji_vowel_styles';
+
+
+
+Returns a list of valid styles of romaji vowels.
+
+
+
+
+
+
+
 =head2 is_voiced 
 
 
@@ -294,7 +310,8 @@ This detects whether a string of alphabetical characters, which may
 also include characters with macrons or circumflexes, "looks like"
 romanized Japanese. If the test is successful, it returns a true
 value, and if the test is unsuccessful, it returns a false value. If
-the string is empty, it returns a false value.
+the string is empty, it returns a false value. Hyphens are not allowed
+as the first character.
 
 This works by converting the string to kana via L</romaji2kana> and
 seeing if it converts cleanly or not.
@@ -757,6 +774,45 @@ Convert a square katakana box into its components.
 
 
 Convert katakana into a square thing if possible.
+
+
+
+
+
+
+
+=head2 smallize_kana 
+
+
+
+    use Lingua::JA::Moji 'smallize_kana';
+
+    $smallize = smallize_kana ('オキヤクサマガカツタ');
+    # $smallize = 'オキャクサマガカッタ'
+
+
+
+Given katakana input, convert possible "old-style" kana usage with
+large kanas used for youon or sokuon into smaller kana. If the
+conversion succeeds, return the converted value, otherwise return the
+undefined value. This function is experimental.
+
+
+
+
+
+
+
+=head2 cleanup_kana 
+
+
+
+    use Lingua::JA::Moji 'cleanup_kana';
+
+
+
+Clean up mixed kana and romaji inputs into katakana, and convert stray
+"one" kanjis into chouons. This function is experimental.
 
 
 
@@ -1250,8 +1306,6 @@ Convert the Cyrillic (Russian) alphabet to katakana.
 
 =over
 
-=item Doesn't deal with L</syllabic n>
-
 =item May be incorrect
 
 This is based on lists found on the internet at
@@ -1451,6 +1505,9 @@ L<hentaigana|http://www.sljfaq.org/afaq/hentaigana.html>. This is
 based on copy and paste of the Unicode 10.0 standard draft
 documents. See the directory L<F<data>|https://github.com/benkasminbullock/Lingua-JA-Moji/tree/master/data> in the github repository for the files used to
 generate this data.
+
+0.46 disallowed hyphens as the first character of a romaji string.
+
 
 
 

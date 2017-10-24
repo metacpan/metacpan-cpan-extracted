@@ -196,33 +196,36 @@ or
 names, * or table.*, functions, etc.). '*' is by default. 
 If column specification is a scalar reference it will be dereferenced and 
 quoted as a column identifier.
- 
- -column => $column
 
- my $chat_name = one_row([chat => -column => "name"]);
- my $ids_array_ref = all_rows([chat => -column => "id"]);
+ -column => $column
 
 This singular column specification means "direct value": 
 single scalar value for C<one_row> and array reference of 
 column values for <all_rows>. Example:
 
-count => optional column name or expression
+ my $chat_name = one_row([chat => -column => "name"]);
+ my $ids_array_ref = all_rows([chat => -column => "id"]);
+
+
+ -count => optional column name or expression
+
+This counts rows. Can be used togeter with C<-distinct> or C<-all>. 
+It implicit assumes singular returned column.
 
   my $chat_count = one_row([chat => "-count"]);
   my $chat_count = one_row([chat => -count => "-distinct"]);
   my $chat_count = one_row([chat => -count => "-all"]);
   my $chat_count = one_row([chat => -count => "title"]);
 
-This counts rows. Can be used togeter with C<-distinct> or C<-all>. 
-It implicit assumes singular returned column.
-
-distinct => optional column list as for B<-columns>.
-
- my $row_objects = one_row([chat => -distinct => "name,id"]);
+ -distinct => optional column list as for B<-columns>.
 
 Without C<-count> selects only unique rows. 
 With C<-count> counts only unique rows.
  
+ my $row_objects = one_row([chat => -distinct => "name,id"]);
+
+Joining tables.
+
  -left => $table
 
 left [OUTER] join
@@ -235,11 +238,11 @@ right [OUTER] join
 
 [INNER] join
  
- -on => $join_condition_string or L<SQL::Abstract>-where search conditions
+ -on => $join_condition_string or SQL::Abstract-where search conditions
 
 on($join_condition_string)
 
- -using => $join_condition_string or L<SQL::Abstract>-where search conditions
+ -using => $join_condition_string or SQL::Abstract-where search conditions
 
 using($join_field_string)
  
@@ -304,9 +307,11 @@ Generates "LIMIT $X OFFSET $Y" SQL-clause.
 
 =item -sql
 
-Returns generated SQL statement. If value is code reference then it is called
-with two arguments: $sub->($statement, \@bind_variables); if value is scalar
-reference then $statement is assigned to referenced value.
+Returns generated SQL statement. if value is scalar reference then $statement is 
+assigned to referenced value.
+
+=for comment If value is code reference then it is called
+with two arguments: $sub->($statement, \@bind_variables);
 
 =item -dry_run
 

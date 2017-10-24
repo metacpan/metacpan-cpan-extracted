@@ -786,8 +786,18 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
           // Lexical variable
           else {
             /* Next is graph */
-            while(isalnum(*compiler->bufptr) || (*compiler->bufptr) == '_') {
-              compiler->bufptr++;
+            while (
+              isalnum(*compiler->bufptr)
+              || (*compiler->bufptr) == '_'
+              || (*compiler->bufptr == ':' && *(compiler->bufptr + 1) == ':')
+            )
+            {
+              if ((*compiler->bufptr == ':' && *(compiler->bufptr + 1) == ':')) {
+                compiler->bufptr += 2;
+              }
+              else {
+                compiler->bufptr++;
+              }
             }
             
             int32_t str_len = (compiler->bufptr - cur_token_ptr);
@@ -795,20 +805,64 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
             memcpy(var_name, cur_token_ptr, str_len);
             var_name[str_len] = '\0';
 
-            // 
-            SPVM_OP* op = SPVM_TOKE_newOP(compiler, SPVM_OP_C_CODE_VAR);
-            SPVM_VAR* var = SPVM_VAR_new(compiler);
-            
             // Name OP
-            SPVM_OP* op_name = SPVM_TOKE_newOP(compiler, SPVM_OP_C_CODE_NAME);
-            op_name->uv.name = var_name;
+            SPVM_OP* op_name = SPVM_OP_new_op_name(compiler, var_name, compiler->cur_file, compiler->cur_line);
             
-            var->op_name = op_name;
-            
-            op->uv.var = var;
-            yylvalp->opval = op;
-            
-            return VAR;
+            // Package variable
+            if (strchr(var_name, ':')) {
+              
+              _Bool is_invalid = 0;
+              int32_t length = (int32_t)strlen(var_name);
+              
+              {
+                int32_t i = 0;
+                while (1) {
+                  if (i < length) {
+                    if (var_name[i] == ':') {
+                      if (var_name[i + 1] != ':') {
+                        is_invalid = 1;
+                        break;
+                      }
+                      else {
+                        if (!isalpha(var_name[i + 2])) {
+                          is_invalid = 1;
+                          break;
+                        }
+                        else {
+                          i += 2;
+                          continue;
+                        }
+                      }
+                    }
+                  }
+                  else {
+                    break;
+                  }
+                  i++;
+                }
+              }
+              
+              if (is_invalid) {
+                fprintf(stderr, "Invalid package variable name %s at %s line %" PRId32 "\n", var_name, compiler->cur_file, compiler->cur_line);
+                exit(EXIT_FAILURE);
+              }
+
+              // Var OP
+              SPVM_OP* op_package_var = SPVM_OP_new_op_package_var(compiler, op_name);
+              
+              yylvalp->opval = op_package_var;
+              
+              return PACKAGE_VAR;
+            }
+            // Lexical variable
+            else {
+              // Var OP
+              SPVM_OP* op_var = SPVM_OP_new_op_var(compiler, op_name);
+              
+              yylvalp->opval = op_var;
+              
+              return VAR;
+            }
           }
         }
         /* Number literal */
@@ -1289,6 +1343,12 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                   return FLOAT;
                 }
                 break;
+              case 'g' :
+                if (strcmp(keyword, "get") == 0) {
+                  yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_CODE_GET);
+                  return GET;
+                }
+                break;
               case 'h' :
                 if (strcmp(keyword, "has") == 0) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_CODE_FIELD);
@@ -1346,6 +1406,13 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                   return NEW;
                 }
                 break;
+              case 'o' :
+                if (strcmp(keyword, "our") == 0) {
+                  yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_CODE_OUR);
+                  return OUR;
+                }
+                
+                break;
               case 'p' :
                 if (strcmp(keyword, "package") == 0) {
                   // File can contains only one package
@@ -1360,6 +1427,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_CODE_PACKAGE);
                   return PACKAGE;
                 }
+                
                 break;
               case 'r' :
                 if (strcmp(keyword, "return") == 0) {
@@ -1385,6 +1453,10 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                 else if (strcmp(keyword, "string") == 0) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_CODE_STRING);
                   return STRING;
+                }
+                else if (strcmp(keyword, "set") == 0) {
+                  yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_CODE_SET);
+                  return SET;
                 }
                 break;
               case 'u' :
@@ -1439,9 +1511,9 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
             }
           }
           
-          SPVM_OP* op = SPVM_TOKE_newOP(compiler, SPVM_OP_C_CODE_NAME);
-          op->uv.name = keyword;
-          yylvalp->opval = op;
+          SPVM_OP* op_name = SPVM_OP_new_op_name(compiler, keyword, compiler->cur_file, compiler->cur_line);
+          
+          yylvalp->opval = op_name;
           
           return NAME;
         }

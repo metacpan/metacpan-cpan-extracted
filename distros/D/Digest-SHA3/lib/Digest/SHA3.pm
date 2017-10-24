@@ -8,7 +8,7 @@ use vars qw($VERSION @ISA @EXPORT_OK);
 use Fcntl qw(O_RDONLY);
 use integer;
 
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 require Exporter;
 require DynaLoader;
@@ -48,18 +48,23 @@ sub new {
 BEGIN { *reset = \&new }
 
 sub add_bits {
-	my($self, $data, $nbits) = @_;
+	my($self, $data, $nbits, $lsb) = @_;
+	if (defined $nbits) {
+		my $max = length($data) * 8;
+		$nbits = $max if $nbits > $max;
+	}
+	if ($lsb) {
+		shawrite($data, $nbits, $self);
+		return($self);
+	}
 	unless (defined $nbits) {
 		$nbits = length($data);
 		$data = pack("B*", $data);
 	}
-	$nbits = length($data) * 8 if $nbits > length($data) * 8;
 	if ($nbits % 8) {
-		my @c = unpack("C*", $data);
-		my $b = pop(@c);
+		my $b = unpack("C", substr($data, -1));
 		$b >>= (8 - $nbits % 8);
-		push(@c, $b);
-		$data = pack("C*", @c);
+		substr($data, -1) = pack("C", $b);
 	}
 	shawrite($data, $nbits, $self);
 	return($self);
@@ -441,29 +446,34 @@ statements have the same effect:
 
 The return value is the updated object itself.
 
-=item B<add_bits($data, $nbits)>
+=item B<add_bits($data, $nbits [, $lsb])>
 
 =item B<add_bits($bits)>
 
 Updates the current digest state by appending bits to it.  The
 return value is the updated object itself.
 
-The first form causes the most-significant I<$nbits> of I<$data>
-to be appended to the stream.  The I<$data> argument is in the
-customary binary format used for Perl strings.
+The first form causes the most-significant I<$nbits> of I<$data> to
+be appended to the stream.  The I<$data> argument is in the customary
+binary format used for Perl strings.  Setting the optional I<$lsb>
+flag to a true value indicates that the final (partial) byte of
+I<$data> is aligned with the least-significant bit; by default it's
+aligned with the most-significant bit, as required by the parent
+L<Digest> module.
 
 The second form takes an ASCII string of "0" and "1" characters as
 its argument.  It's equivalent to
 
 	$sha3->add_bits(pack("B*", $bits), length($bits));
 
-So, the following two statements do the same thing:
+So, the following three statements do the same thing:
 
 	$sha3->add_bits("111100001010");
 	$sha3->add_bits("\xF0\xA0", 12);
+	$sha3->add_bits("\xF0\x0A", 12, 1);
 
-Note that SHA-3 uses I<least-significant-bit ordering> for its
-internal state.  This means that
+SHA-3 uses least-significant-bit ordering for its internal operation.
+This means that
 
 	$sha3->add_bits("110");
 
@@ -471,11 +481,15 @@ is equivalent to
 
 	$sha3->add_bits("0")->add_bits("1")->add_bits("1");
 
+Many public test vectors for SHA-3, such as the Keccak known-answer
+tests, are delivered in least-significant-bit format.  Using the
+optional I<$lsb> flag in these cases allows your code to be simpler
+and more efficient.  See the test directory for examples.
+
 The fact that SHA-2 and SHA-3 employ opposite bit-ordering schemes
-has resulted in noticeable confusion, even in the cryptographic
-community.  When programming with bitwise inputs, expect to make
-blunders, repeatedly: if the Scylla of notation doesn't devour you,
-the Charybdis of semantics almost certainly will.
+has caused noticeable confusion in the programming community.
+Exercise caution if your code examines individual bits in data
+streams.
 
 =item B<addfile(*FILE)>
 

@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.16
+    version 0.17
 
 SYNOPSIS
 
@@ -68,8 +68,8 @@ SYNOPSIS
 
     The API token for basic auth. Go to the Jenkins wiki page on
     authenticating scripted clients
-    <https://wiki.jenkins-ci.org/display/JENKINS/Authenticating+scripted+clients>
-    for information on getting an API token for your user to use for
+    <https://wiki.jenkins-ci.org/display/JENKINS/Authenticating+scripted+cl
+    ients> for information on getting an API token for your user to use for
     authentication.
 
 METHODS

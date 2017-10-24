@@ -3,32 +3,37 @@ abstract: 'plugin for Data::Compare to handle Set::Object objects'
 author:
   - 'Mark Gardner <mjgardner@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 6.42
-  Test::More: 0
+  Carp: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Scalar::Util: '0'
+  Set::Object: '0'
+  Test::More: '0.94'
 configure_requires:
-  ExtUtils::MakeMaker: 6.42
-  version: 0.77
-distribution_type: module
-generated_by: 'Module::Install version 0.91'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Data-Compare-Plugins-Set-Object
-no_index:
-  directory:
-    - inc
-    - t
-    - xt
+provides:
+  Data::Compare::Plugins::Set::Object:
+    file: lib/Data/Compare/Plugins/Set/Object.pm
+    version: '1.001'
 requires:
-  Data::Compare: 0.06
-  English: 0
-  List::Util: 0
-  Set::Object: 0
-  perl: 5.8.0
+  Data::Compare: '0.06'
+  English: '0'
+  List::Util: '0'
+  perl: '5.010'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
 resources:
-  bugtracker: http://github.com/mjg/Data-Compare-Plugins-Set-Object/issues
-  homepage: http://github.com/mjg/Data-Compare-Plugins-Set-Object/tree
-  license: http://dev.perl.org/licenses/
-  repository: git://github.com/mjg/Data-Compare-Plugins-Set-Object.git
-version: 1.000000
+  bugtracker: https://github.com/mjgardner/Data-Compare-Plugins-Set-Object/issues
+  homepage: http://search.cpan.org/dist/Data-Compare-Plugins-Set-Object/
+  repository: git://github.com/mjgardner/Data-Compare-Plugins-Set-Object.git
+version: '1.001'
+x_serialization_backend: 'YAML::Tiny version 1.70'

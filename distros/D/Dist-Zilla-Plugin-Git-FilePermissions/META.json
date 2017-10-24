@@ -163,7 +163,7 @@
    "provides" : {
       "Dist::Zilla::Plugin::Git::FilePermissions" : {
          "file" : "lib/Dist/Zilla/Plugin/Git/FilePermissions.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
@@ -178,7 +178,7 @@
          "web" : "https://github.com/skirmess/Dist-Zilla-Plugin-Git-FilePermissions"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_BuiltWith" : {
       "modules" : {
          "Dist::Zilla::Plugin::Git::GatherDir" : "2.042",
@@ -283,7 +283,7 @@
          "Test::Kwalitee" : "1.26",
          "Test::MinimumVersion" : "0.101082",
          "Test::Mojibake" : "1.3",
-         "Test::More" : "1.302103",
+         "Test::More" : "1.302105",
          "Test::NoTabs" : "2.00",
          "Test::Perl::Critic" : "1.03",
          "Test::Pod" : "1.51",
@@ -422,12 +422,22 @@
          {
             "class" : "Dist::Zilla::Plugin::Author::SKIRMESS::RepositoryBase",
             "name" : "@Author::SKIRMESS/Author::SKIRMESS::RepositoryBase",
-            "version" : "0.026"
+            "version" : "0.030"
          },
          {
             "class" : "Dist::Zilla::Plugin::Author::SKIRMESS::InsertVersion",
             "name" : "@Author::SKIRMESS/Author::SKIRMESS::InsertVersion",
-            "version" : "0.026"
+            "version" : "0.030"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::FilePermissions",
+            "name" : "@Author::SKIRMESS/Git::FilePermissions",
+            "version" : "0.002"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::RequireUnixEOL",
+            "name" : "@Author::SKIRMESS/Git::RequireUnixEOL",
+            "version" : "0.001"
          },
          {
             "class" : "Dist::Zilla::Plugin::NextRelease",
@@ -442,6 +452,7 @@
                },
                "Dist::Zilla::Role::Git::DirtyFiles" : {
                   "allow_dirty" : [
+                     ".appveyor.yml",
                      ".perlcriticrc",
                      ".perltidyrc",
                      ".travis.yml",
@@ -806,6 +817,7 @@
                },
                "Dist::Zilla::Role::Git::DirtyFiles" : {
                   "allow_dirty" : [
+                     ".appveyor.yml",
                      ".perlcriticrc",
                      ".perltidyrc",
                      ".travis.yml",
@@ -861,7 +873,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.002",
+                  "tag" : "0.003",
                   "tag_format" : "%v",
                   "tag_message" : ""
                },

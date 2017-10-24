@@ -12,31 +12,11 @@ my $d2 = $s2->add_bits("0")->add_bits("1")->add_bits("1")->hexdigest;
 print "not " unless $d1 eq $d2;
 print "ok ", $testnum++, "\n";
 
-my $bits = "10101010";
-
-my $tempfile = "bit-order.tmp";
-END { 1 while unlink $tempfile }
-
-open(F, "> $tempfile");
-print F "a" x 4095;
-print F $bits;
-close F;
-
-$s1 = Digest::SHA3->new;
-$s2 = Digest::SHA3->new;
-$d1 = $s1->add_bits($bits)->hexdigest;
-$d2 = $s2->addfile($tempfile, "0")->hexdigest;
+$d1 = $s1->add_bits("111100001010")->hexdigest;
+$d2 = $s2->add_bits("\xF0\xA0", 12)->hexdigest;
 print "not " unless $d1 eq $d2;
 print "ok ", $testnum++, "\n";
 
-open(F, "> $tempfile");
-print F "a";
-print F "$bits\n" x 7777;
-close F;
-
-$s1 = Digest::SHA3->new;
-$s2 = Digest::SHA3->new;
-$d1 = $s1->add(chr(0xaa) x 7777)->hexdigest;
-$d2 = $s2->addfile($tempfile, "0")->hexdigest;
+$d2 = $s2->add_bits("\xF0\x0A", 12, 1)->hexdigest;
 print "not " unless $d1 eq $d2;
 print "ok ", $testnum++, "\n";

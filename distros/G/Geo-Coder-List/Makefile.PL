@@ -50,8 +50,9 @@ WriteMakefile(
     PL_FILES	=> {},
     TEST_REQUIRES => $test_requires,
     PREREQ_PM => {
-	'LWP::Protocol::https' => 0,
 	'Carp' => 0,
+	'LWP::Protocol::https' => 0,
+	'Time::HiRes' => 0,
     },
     dist		=> { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean		=> { FILES => 'Geo::Coder::List-*' },

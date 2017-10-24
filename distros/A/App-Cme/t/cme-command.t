@@ -144,9 +144,22 @@ my @script_tests = (
         test => qr/"\$namefoobar"/
     },
     {
+        label => "modification with a script and a default value",
+        script => [ "app:  popcon", "default: name foobar", 'load ! MY_HOSTID=\$name$name'],
+        test => qr/"\$namefoobar"/
+    },
+    {
+        label => "modification with a script and a var that uses a default value",
+        script => [ "app:  popcon",
+                    "default: defname foobar",
+                    'var: $var{name} = $args{defname}',
+                    'load ! MY_HOSTID=\$name$name'
+                ],
+        test => qr/"\$namefoobar"/
+    },
+    {
         label => "modification with a script and var section",
         script => [ "app:  popcon", 'var: $var{name}="foobar2"','load ! MY_HOSTID=\$name$name'],
-        args => [],
         test => qr/"\$namefoobar2"/
     },
     {
@@ -177,7 +190,7 @@ foreach my $test ( @script_tests) {
         my $cmd = [
             run => $script->stringify,
             '-root-dir' => $wr_dir->stringify,
-            @{$test->{args}}
+            @{$test->{args} // []}
         ];
         note("cme command: cme @$cmd");
         my $ok = test_app('App::Cme' => $cmd);

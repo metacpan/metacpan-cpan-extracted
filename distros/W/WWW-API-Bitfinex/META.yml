@@ -1,0 +1,24 @@
+---
+abstract: 'API Btifinex'
+author:
+  - 'Harun Delgado <hdp@nurmol.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-API-Bitfinex
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Mojo::UserAgent: '0'
+  perl: '5.006'
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

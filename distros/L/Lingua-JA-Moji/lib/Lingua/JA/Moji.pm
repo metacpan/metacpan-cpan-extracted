@@ -6,7 +6,7 @@ require Exporter;
 use warnings;
 use strict;
 
-our $VERSION = '0.44';
+our $VERSION = '0.46';
 
 use Carp 'croak';
 use Convert::Moji qw/make_regex length_one unambiguous/;
@@ -17,13 +17,21 @@ our @EXPORT_OK = qw/
                     InHankakuKatakana
                     InKana
                     InWideAscii
+		    cleanup_kana
+		    hangul2kana
+		    hentai2kana
+		    hentai2kanji
+		    kana2hentai
+		    kanji2hentai
+		    katakana2square
+		    nigori_first
+		    square2katakana
                     ascii2wide
                     bracketed2kanji
                     braille2kana
                     circled2kana
                     circled2kanji
                     cyrillic2katakana
-		    hangul2kana
                     hira2kata
                     hw2katakana
                     is_hiragana
@@ -55,14 +63,8 @@ our @EXPORT_OK = qw/
                     romaji2kana
                     romaji_styles
                     romaji_vowel_styles
-		    square2katakana
-		    katakana2square
+		    smallize_kana
                     wide2ascii
-		    nigori_first
-		    hentai2kana
-		    hentai2kanji
-		    kana2hentai
-		    kanji2hentai
 		   /;
 
 our %EXPORT_TAGS = (
@@ -157,7 +159,7 @@ sub make_convertors
     my @values = values %{$table};
     my $sub_in2out;
     my $sub_out2in;
-    if (length_one(@keys)) {
+    if (length_one (@keys)) {
 	my $lhs = join '', @keys;
 
 	# Improvement: one way tr/// for the ambiguous case lhs/rhs only.
@@ -553,43 +555,24 @@ sub romaji_styles
     }
 }
 
+my %styles = (
+    macron => 1,
+    circumflex => 1,
+    wapuro => 1,
+    passport => 1,
+    none => 1,
+);
+
 # Check whether this vowel style is allowed.
 
 sub romaji_vowel_styles
 {
     my ($check) = @_;
-    my @styles = (
-    {
-        abbrev    => "macron",
-        full_name => "Macron",
-    },
-    {
-        abbrev    => 'circumflex',
-        full_name => 'Circumflex',
-    },
-    {
-        abbrev    => 'wapuro',
-        full_name => 'Wapuro',
-    },
-    {
-        abbrev    => 'passport',
-        full_name => 'Passport',
-    },
-    {
-        abbrev    => 'none',
-        full_name => "Do not indicate",
-    },
-    );
     if (! defined ($check)) {
-        return (@styles);
+        return [keys %styles];
     }
     else {
-        for (@styles) {
-            if ($check eq $_->{abbrev}) {
-                return 1;
-            }
-        }
-        return;
+	return $styles{$check};
     }
 }
 
@@ -706,14 +689,14 @@ sub is_romaji
     }
     # Test that $romaji contains only characters which may be
     # romanized Japanese.
-    if ($romaji =~ /[^\sa-zāīūēōâîûêô'-]/i) {
-        return;
+    if ($romaji =~ /[^\sa-zāīūēōâîûêô'-]|^-/i) {
+        return undef;
     }
     my $kana = romaji2kana ($romaji, {wapuro => 1});
     if ($kana =~ /^[ア-ンッー\s]+$/) {
         return kana2romaji ($kana, {wapuro => 1});
     }
-    return;
+    return undef;
 }
 
 
@@ -767,8 +750,6 @@ sub is_romaji_strict
 	return;
     }
     if ($romaji =~ /
-		       # Don't allow small vowels, small tsu, or fya,
-		       # fye etc.
 		       (fy|l|x|v)y?($vowel_re|ts?u|wa|ka|ke)
 		   |
 		       # Don't allow hyi, hye, yi, ye.
@@ -803,7 +784,7 @@ sub is_romaji_strict
 		       # Don't allow 'thi'
 		       thi
 		   /ix) {
-        return;
+        return undef;
     }
     return $canonical;
 }
@@ -856,7 +837,7 @@ my %dakuten;
     map {$_."゛"} (make_dak_list (qw/k t s h/));
 @dakuten{(make_dak_list ('p'))} = map {$_."゜"} (make_dak_list ('h'));
 
-sub kana2hw2
+sub load_kana2hw2
 {
     my $conv = Convert::Moji->new (["oneway", "tr", "あ-ん", "ア-ン"],
 				   ["file",
@@ -879,7 +860,7 @@ sub kana2hw
 {
    my ($input) = @_;
    if (! $kana2hw) {
-       $kana2hw = kana2hw2 ();
+       $kana2hw = load_kana2hw2 ();
    }
    return $kana2hw->convert ($input);
 }
@@ -1480,6 +1461,40 @@ sub kanji2hentai
     $text =~ s/$k2hen_re/join ('・', @{$k2hen{$1}})/ge;
     return $text;
 }
+
+sub smallize_kana
+{
+    my ($kana) = @_;
+    my $orig = $kana;
+    my %yayuyo = (qw/
+			ヤ ャ
+			ユ ュ
+			ヨ ョ
+		    /);
+    $kana =~ s/([キギシジチヂニヒビピミリ])([ヤユヨ])/$1$yayuyo{$2}/g;
+    $kana =~ s/ツ([カキクケコガギグゲゴサシスセソタチツテトパビプペポ])/ッ$1/g;
+    if ($kana ne $orig) {
+	return $kana;
+    }
+    return undef;
+}
+
+sub cleanup_kana
+{
+    my ($kana) = @_;
+    if ($kana =~ /[\x{ff01}-\x{ff5e}]/) {
+	$kana = wide2ascii ($kana);
+	$kana = romaji2kana ($kana);
+    }
+    elsif ($kana =~ /[a-zâîûêôôāūēō]/i) {
+	$kana = romaji2kana ($kana);
+    }
+    $kana = kana2katakana ($kana);
+    $kana =~ s/一/ー/g;
+    return $kana;
+}
+
+
 
 1; 
 

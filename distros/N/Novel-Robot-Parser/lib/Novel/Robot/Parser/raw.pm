@@ -1,4 +1,4 @@
-# ABSTRACT: 解析raw
+# ABSTRACT: raw
 =pod
 
 =encoding utf8

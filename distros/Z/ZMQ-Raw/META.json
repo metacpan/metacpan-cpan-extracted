@@ -17,7 +17,7 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "6.63_03",
-            "perl" : "5.004"
+            "perl" : "5.008"
          }
       },
       "develop" : {
@@ -42,6 +42,7 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
+            "Socket" : "0",
             "Test::More" : "0",
             "Test::Pod" : "0.0",
             "Test::Pod::Coverage" : "0.0",
@@ -53,39 +54,39 @@
    "provides" : {
       "ZMQ::Raw" : {
          "file" : "lib/ZMQ/Raw.pm",
-         "version" : "0.08"
+         "version" : "0.10"
       },
       "ZMQ::Raw::Context" : {
          "file" : "lib/ZMQ/Raw/Context.pm",
-         "version" : "0.08"
+         "version" : "0.10"
       },
       "ZMQ::Raw::Curve" : {
          "file" : "lib/ZMQ/Raw/Curve.pm",
-         "version" : "0.08"
+         "version" : "0.10"
       },
       "ZMQ::Raw::Error" : {
          "file" : "lib/ZMQ/Raw/Error.pm",
-         "version" : "0.08"
+         "version" : "0.10"
       },
       "ZMQ::Raw::Message" : {
          "file" : "lib/ZMQ/Raw/Message.pm",
-         "version" : "0.08"
+         "version" : "0.10"
       },
       "ZMQ::Raw::Poller" : {
          "file" : "lib/ZMQ/Raw/Poller.pm",
-         "version" : "0.08"
+         "version" : "0.10"
       },
       "ZMQ::Raw::Proxy" : {
          "file" : "lib/ZMQ/Raw/Proxy.pm",
-         "version" : "0.08"
+         "version" : "0.10"
       },
       "ZMQ::Raw::Socket" : {
          "file" : "lib/ZMQ/Raw/Socket.pm",
-         "version" : "0.08"
+         "version" : "0.10"
       },
       "ZMQ::Raw::Z85" : {
          "file" : "lib/ZMQ/Raw/Z85.pm",
-         "version" : "0.08"
+         "version" : "0.10"
       }
    },
    "release_status" : "stable",
@@ -96,7 +97,7 @@
          "web" : "https://github.com//jacquesg/p5-ZMQ-Raw"
       }
    },
-   "version" : "0.08",
+   "version" : "0.10",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"
@@ -197,7 +198,7 @@
                   "version_regexp" : "(?^:^v(.+)$)"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.11.0",
+                  "git_version" : "2.14.1",
                   "repo_root" : "."
                }
             },
@@ -288,7 +289,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.11.0",
+                  "git_version" : "2.14.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -305,12 +306,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.08",
+                  "tag" : "v0.10",
                   "tag_format" : "v%v",
                   "tag_message" : "%N %v"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.11.0",
+                  "git_version" : "2.14.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -330,7 +331,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.11.0",
+                  "git_version" : "2.14.1",
                   "repo_root" : "."
                }
             },

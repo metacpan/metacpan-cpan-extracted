@@ -2,7 +2,7 @@
 #include "perl.h"
 #include "XSUB.h"
 #include "ppport.h"
-#define NEED_sv_2pv_flags_GLOBAL
+#define NEED_sv_2pv_flags
 #include <magic.h>
 #include <string.h>
 #include <stdio.h>

@@ -1,3 +1,11 @@
+1.16     2017-10-22
+
+- Added a doc note on installing the required dependencies on Red Hat. RT
+  #110796.
+
+- Fix tests on macOS. Based on PR #7 from Tom Wyant.
+
+
 1.15     2015-09-19
 
 - Fix the Makefile.PL so that we don't install the LibMagic.xs and typemap

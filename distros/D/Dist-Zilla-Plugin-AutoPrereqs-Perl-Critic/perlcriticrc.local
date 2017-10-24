@@ -1,2 +1,9 @@
-[InputOutput::RequireCheckedSyscalls]
-exclude_functions = print
+[-Bangs::ProhibitNumberedNames]
+
+[-CodeLayout::RequireTrailingCommaAtNewline]
+
+[-Modules::RequireExplicitInclusion]
+
+[-ValuesAndExpressions::ProhibitEmptyQuotes]
+
+[-ValuesAndExpressions::ProhibitImplicitNewlines]

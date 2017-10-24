@@ -1,5 +1,51 @@
 Revision history for Term-Colormap
 
+0.12   Tue Oct 24 12:37:49 UTC 2017
+    * Added test dependency for Test::Exception in Build.PL
+    * Fixed the MANIFEST
+
+0.11   Tue Oct 24 06:56:12 UTC 2017
+    * Added create_brewer_mapping script
+    * Added show_brewer_colormap
+    * Added Term::Colormap::Brewer
+    * Brewer colormaps (GPL'd) taken from
+      - www.ColorBrewer.org by Cynthia A. Brewer, Geography, Pennsylvania State University
+
+0.10   Wed Jul 13 23:34:54 UTC 2016
+    * Added coveralls to .travis.yml
+    * Updated README.md with coverage badge.
+    * Updated README.md added cpan version badge.
+    * Added html badges to Term::Colormap pod.
+
+0.09    Wed Jul 13 04:46:38 UTC 2016
+    * Added tests for vertical colorbar
+    * Added tests for color_tables snow and green-orange-pink-blue
+    * 100% code coverage
+
+0.08    Wed Jul 13 04:13:54 UTC 2016
+    * Added tests for colorbar and color_table.
+    * Added tests for rgb2color
+    * Added tests for print_colored and print_colored_text
+
+0.07    Mon Jul 11 03:50:42 UTC 2014
+    * Use --incremental for git-annotate for saner parsing.
+    * Fixed bug with numeric labels ignoring label 0.
+    * Added hightlight script.
+    * Added rgb2color
+    * Run tests on Travis CI
+    * Added color_numbers script
+    * Improved color check in color_numbers script
+    * Fixed output of custom colors in color_numbers script
+    * Added color cubes to color_numbers script
+    * Added a color ramp to color_numbers script.
+    * Added some colormaps.
+        blue-cyan-green
+        red-pink-yellow
+        green-orange-pink-blue
+    * Added tests and documentation for new colormaps.
+    * Added images of new colormaps.
+    * Added show_colormap script
+
 0.06    Mon Aug 20 05:41:55 UTC 2014
     * Fixed git_blame_summary when git-annotate has extra dates in code.
 

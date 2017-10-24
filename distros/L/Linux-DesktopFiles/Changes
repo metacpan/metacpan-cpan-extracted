@@ -1,5 +1,16 @@
 Revision history for Perl extension Linux::DesktopFiles.
 
+0.25  2017-10-22
+    - `parse_desktop_file()` and `parse_desktop_files()` are now context-sensitive, returning a key-value list or a HASH reference, depending on the context.
+    - Documentation improvements.
+
+0.24  2017-10-21
+    - When `keep_unknown_categories` is true and a given entry does not belong to any category, `parse_desktop_file` will set `Categories` to [`unknown_category_key`].
+
+0.23  2017-10-21
+    - Escaped strings are now unescaped.
+    - Added the `parse_desktop_file` method, which parses a single desktop file.
+
 0.22  2017-10-04
     - Make sure the category names are unique, so we don't store an application twice under the same category.
 

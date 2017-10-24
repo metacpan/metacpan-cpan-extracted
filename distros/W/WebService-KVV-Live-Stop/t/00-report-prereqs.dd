@@ -2,7 +2,8 @@ do { my $x = {
        'configure' => {
                         'requires' => {
                                         'ExtUtils::MakeMaker' => '0',
-                                        'File::ShareDir::Install' => '0.06'
+                                        'File::ShareDir::Install' => '0.06',
+                                        'perl' => '5.008'
                                       }
                       },
        'develop' => {
@@ -10,8 +11,11 @@ do { my $x = {
                                       'File::Spec' => '0',
                                       'IO::Handle' => '0',
                                       'IPC::Open3' => '0',
+                                      'Test::MinimumVersion' => '0',
                                       'Test::More' => '0',
+                                      'Test::Perl::Critic' => '0',
                                       'Test::Pod' => '1.41',
+                                      'Test::Version' => '1',
                                       'blib' => '1.01',
                                       'perl' => '5.006'
                                     }
@@ -23,6 +27,7 @@ do { my $x = {
                                       'Net::HTTP::Spore' => '0.07',
                                       'Net::HTTP::Spore::Middleware::DefaultParams' => '0',
                                       'Net::HTTP::Spore::Middleware::Format::JSON' => '0',
+                                      'perl' => '5.008',
                                       'strict' => '0',
                                       'utf8' => '0',
                                       'warnings' => '0'
@@ -35,8 +40,12 @@ do { my $x = {
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
                                    'Test::Exception' => '0',
-                                   'Test::More' => '0.88'
+                                   'Test::More' => '0.88',
+                                   'blib' => '1.01',
+                                   'perl' => '5.008'
                                  }
                  }
      };

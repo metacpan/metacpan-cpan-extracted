@@ -1,10 +1,16 @@
+[![Linux Build Status](https://travis-ci.org/nigelhorne/Geo-Coder-CA.svg?branch=master)](https://travis-ci.org/nigelhorne/Geo-Coder-CA)
+[![Windows Build Status](https://ci.appveyor.com/api/projects/status/xy5gf1mumgp3mg94?svg=true)](https://ci.appveyor.com/project/nigelhorne/geo-coder-ca)
+[![Coverage Status](https://coveralls.io/repos/github/nigelhorne/Geo-Coder-CA/badge.svg?branch=master)](https://coveralls.io/github/nigelhorne/Geo-Coder-CA?branch=master)
+[![Dependency Status](https://dependencyci.com/github/nigelhorne/Geo-Coder-CA/badge)](https://dependencyci.com/github/nigelhorne/Geo-Coder-CA)
+[![CPAN](https://img.shields.io/cpan/v/Geo-Coder-CA.svg)](http://search.cpan.org/~nhorne/Geo-Coder-CA/)
+
 # Geo::Coder::CA
 
 Provides a geocoding functionality using http:://geocoder.ca for both Canada and the US.
 
 # VERSION
 
-Version 0.03
+Version 0.04
 
 # SYNOPSIS
 
@@ -44,7 +50,7 @@ environment variables:
 
 You can also set your own User-Agent object:
 
-    $geocoder->ua(LWPx::ParanoidAgent->new());
+    $geocoder->ua(LWP::UserAgent::Throttled->new());
 
 ## reverse\_geocode
 

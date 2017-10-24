@@ -6,7 +6,7 @@ build_requires: {}
 configure_requires:
   Module::Build: '0.36'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.142060'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 keywords:
   - bundle
   - shlomif
@@ -20,7 +20,7 @@ name: Task-Sites-ShlomiFish
 provides:
   Task::Sites::ShlomiFish:
     file: lib/Task/Sites/ShlomiFish.pm
-    version: '0.0211'
+    version: '0.0212'
 requires:
   App::XML::DocBook::Builder: '0'
   CGI: '0'
@@ -33,6 +33,7 @@ requires:
   DBD::SQLite: '0'
   DBI: '0'
   DateTime: '0'
+  DateTime::Format::Strptime: '0'
   Encode: '0'
   Exporter: '0'
   Fcntl: '0'
@@ -45,7 +46,10 @@ requires:
   File::Spec: '0'
   File::Spec::Functions: '0'
   File::Which: '0'
+  Games::Solitaire::Verify::Base: '0'
   HTML::Links::Localize: '0'
+  HTML::Selector::XPath: '0'
+  HTML::TextToHTML: '0'
   HTML::Tidy: '0'
   HTML::TokeParser::Simple: '0'
   HTML::TreeBuilder::LibXML: '0'
@@ -62,10 +66,11 @@ requires:
   String::ShellQuote: '0'
   Task::Latemp: '0'
   Template::Preprocessor::TTML: '0'
-  Term::ReadPassword: '0'
   Test::Count: '0'
   Test::Count::Filter: '0'
+  Test::HTML::Tidy::Recursive: '0'
   Test::More: '0'
+  Test::Perl::Critic: '0'
   Test::TrailingSpace: '0'
   Text::Hunspell: '0'
   Text::VimColor: '0'
@@ -77,6 +82,7 @@ requires:
   XML::Grammar::Fortune::ToText: '0'
   XML::Grammar::ProductsSyndication: '0.0302'
   XML::Grammar::Screenplay: v0.7.0
+  XML::Grammar::Vered: '0'
   XML::LibXML::XPathContext: '0'
   XML::LibXSLT: '0'
   XML::Parser: '0'
@@ -90,5 +96,6 @@ requires:
 resources:
   homepage: http://web-cpan.shlomifish.org/latemp/
   license: http://www.opensource.org/licenses/mit-license.php
-  repository: http://bitbucket.org/shlomif/latemp
-version: '0.0211'
+  repository: https://github.com/thewml/latemp
+version: '0.0212'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

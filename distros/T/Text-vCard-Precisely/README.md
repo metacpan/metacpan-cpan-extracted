@@ -6,7 +6,7 @@ Text::vCard::Precisely - Read, Write and Edit the vCards 3.0 and/or 4.0 precisel
     <a href="https://travis-ci.org/worthmine/Text-vCard-Precisely"><img src="https://travis-ci.org/worthmine/Text-vCard-Precisely.svg?branch=master"></a>
 </div>
 
-## SYNOPSIS
+# SYNOPSIS
 
     my $vc = Text::vCard::Precisely->new();
     # or now you can write like below if you want to use 4.0:
@@ -69,7 +69,7 @@ Text::vCard::Precisely - Read, Write and Edit the vCards 3.0 and/or 4.0 precisel
 
     print $vc->as_string();
 
-## DESCRIPTION
+# DESCRIPTION
 
 A vCard is a digital business card. vCard and [Text::vFile::asData](https://github.com/richardc/perl-text-vfile-asdata)
 provide an API for parsing vCards
@@ -86,9 +86,9 @@ To handle an address book with several vCard entries in it, start with
 
 Note that the vCard RFC requires version() and full\_name().  This module does not check or warn yet if these conditions have not been met
 
-## Constructors
+# Constructors
 
-### load\_hashref($HashRef)
+## load\_hashref($HashRef)
 
 Accepts an HashRef that looks like below:
 
@@ -126,58 +126,58 @@ Accepts an HashRef that looks like below:
        REV => '2008-04-24T19:52:43Z',
     };
 
-### load\_file($file\_name)
+## load\_file($file\_name)
 
 Accepts a file name
 
-### load\_string($vCard)
+## load\_string($vCard)
 
 Accepts a vCard string
 
-## METHODS
+# METHODS
 
-### as\_string()
+## as\_string()
 
 Returns the vCard as a string.
 You have to use Encode::encode\_utf8() if your vCard is written in utf8
 
-### as\_file($filename)
+## as\_file($filename)
 
 Write data in vCard format to $filename.
 Dies if not successful
 
-## SIMPLE GETTERS/SETTERS
+# SIMPLE GETTERS/SETTERS
 
 These methods accept and return strings
 
-### version()
+## version()
 
 returns Version number of the vcard.
 Defaults to **'3.0'** and this method is **READONLY**
 
-### rev()
+## rev()
 
 To specify revision information about the current vCard
 
-### sort\_string()
+## sort\_string()
 
 To specify the family name, given name or organization text to be used for
 national-language-specific sorting of the FN, N and ORG.
 
 **This method is DEPRECATED in vCard4.0** Use SORT-AS param instead of it.
 
-## COMPLEX GETTERS/SETTERS
+# COMPLEX GETTERS/SETTERS
 
 They are based on Moose with coercion.
 So these methods accept not only ArrayRef\[HashRef\] but also ArrayRef\[Str\], single HashRef
 or single Str.
 Read source if you were confused
 
-### n()
+## n()
 
 To specify the components of the name of the object the vCard represents
 
-### tel()
+## tel()
 
 Accepts/returns an ArrayRef that looks like:
 
@@ -186,7 +186,7 @@ Accepts/returns an ArrayRef that looks like:
        { type => ['home'], content => '651-290-1111' },
     ]
 
-### adr(), address()
+## adr(), address()
 
 Accepts/returns an ArrayRef that looks like:
 
@@ -204,7 +204,7 @@ Accepts/returns an ArrayRef that looks like:
        },
     ]
 
-### email()
+## email()
 
 Accepts/returns an ArrayRef that looks like:
 
@@ -217,7 +217,7 @@ or accept the string as email like below
 
     'bbanner@timewarner.com'
 
-### url()
+## url()
 
 Accepts/returns an ArrayRef that looks like:
 
@@ -230,7 +230,7 @@ or accept the string as URL like below
 
     'https://github.com/worthmine'
 
-### photo(), logo()
+## photo(), logo()
 
 Accepts/returns an ArrayRef of URLs or Images: Even if they are raw image binary
  or text encoded in Base64, it does not matter
@@ -239,72 +239,72 @@ Accepts/returns an ArrayRef of URLs or Images: Even if they are raw image binary
 
 use Base64 encoding or raw image binary if you have to show the image you want
 
-### note()
+## note()
 
 To specify supplemental information or a comment that is associated with the vCard
 
-### org(), title(), role(), categories()
+## org(), title(), role(), categories()
 
 To specify additional information for your jobs
 
-### fn(), full\_name(), fullname()
+## fn(), full\_name(), fullname()
 
 A person's entire name as they would like to see it displayed
 
-### nickname()
+## nickname()
 
 To specify the text corresponding to the nickname of the object the vCard represents
 
-### lang()
+## lang()
 
 To specify the language(s) that may be used for contacting the entity associated with the vCard.
 
 It's the **new method from 4.0**
 
-### impp(), xml()
+## impp(), xml()
 
 I don't think they are so popular types, but here are the methods!
 
 They are the **new method from 4.0**
 
-### geo()
+## geo()
 
 To specify information related to the global positioning of the object the vCard represents
 
-### key()
+## key()
 
 To specify a public key or authentication certificate associated with the object that the vCard represents
 
-### label()
+## label()
 
 ToDo: because **It's DEPRECATED from 4.0**
 
 To specify the formatted text corresponding to delivery address of the object the vCard represents
 
-### uid()
+## uid()
 
 To specify a value that represents a globally unique identifier corresponding to the individual
 or resource associated with the vCard
 
-### fburl(), caladruri(), caluri()
+## fburl(), caladruri(), caluri()
 
 I don't think they are so popular types, but here are the methods!
 
 They are the **new method from 4.0**
 
-### kind()
+## kind()
 
 To specify the kind of object the vCard represents
 
 It's the **new method from 4.0**
 
-### member(), clientpidmap()
+## member(), clientpidmap()
 
 I don't think they are so popular types, but here are the methods!
 
 It's the **new method from 4.0**
 
-### tz(), timezone()
+## tz(), timezone()
 
 Both are same method with Alias
 
@@ -316,46 +316,46 @@ TZ can be a URL, but there is no document in [RFC2426](https://tools.ietf.org/ht
 or [RFC6350](https://tools.ietf.org/html/rfc6350)
 So it just supports some text values
 
-### bday(), birthday()
+## bday(), birthday()
 
 Both are same method with Alias
 
 To specify the birth date of the object the vCard represents
 
-### anniversary()
+## anniversary()
 
 The date of marriage, or equivalent, of the object the vCard represents
 
 It's the **new method from 4.0**
 
-### gender()
+## gender()
 
 To specify the components of the sex and gender identity of the object the vCard represents
 
 It's the **new method from 4.0**
 
-### prodid()
+## prodid()
 
 To specify the identifier for the product that created the vCard object
 
-### source()
+## source()
 
 To identify the source of directory information contained in the content type
 
-### sound()
+## sound()
 
 To specify a digital sound content information that annotates some aspect of the vCard
 
 This property is often used to specify the proper pronunciation of the name property value
  of the vCard
 
-### socialprofile()
+## socialprofile()
 
 There is no documents about X-SOCIALPROFILE in RFC but it works in iOS and Mac OS X!
 
 I don't know well about in Android or Windows. Somebody please feedback me
 
-### label()
+## label()
 
 **It's DEPRECATED from 4.0** You can use this method Just ONLY in vCard3.0
 
@@ -371,7 +371,7 @@ This module uses `\P{ascii}` in regexp so You have to use 5.12.5 and later
 
 And this module uses Data::Validate::URI and it has bug on 5.8.x. so I can't support them
 
-## SEE ALOSO
+# SEE ALSO
 
 - [RFC 2426](https://tools.ietf.org/html/rfc2426)
 - [RFC 2425](https://tools.ietf.org/html/rfc2425)
@@ -380,6 +380,10 @@ And this module uses Data::Validate::URI and it has bug on 5.8.x. so I can't sup
 - [CPAN](http://search.cpan.org/perldoc?Text%3A%3AvCard%3A%3APrecisely)
 - [GitHub](https://github.com/worthmine/Text-vCard-Precisely)
 
-## AUTHOR
+# AUTHOR
 
 [Yuki Yoshida(worthmine)](https://github.com/worthmine)
+
+# LICENSE
+
+This is free software; you can redistribute it and/or modify it under the same terms as Perl.

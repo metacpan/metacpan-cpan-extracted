@@ -20,14 +20,20 @@ use FindBin;
 use lib "$FindBin::Bin/../lib";
 
 use lib "$FindBin::Bin/lib";
+use MockReader ();
 use NWDemo ();
+
+use Text::Control ();
 
 use Net::WebSocket::Endpoint::Server ();
 use Net::WebSocket::Frame::text ();
 use Net::WebSocket::Frame::binary ();
 use Net::WebSocket::Frame::continuation ();
-use Net::WebSocket::Handshake::Server ();
 use Net::WebSocket::Parser ();
+
+use constant {
+    SEND_FRAME_CLASS => 'Net::WebSocket::Frame::binary',
+};
 
 use IO::Pty ();
 
@@ -42,6 +48,7 @@ if (index($host_port, ':') == -1) {
 
 my ($host, $port) = split m<:>, $host_port;
 
+#my $loop = IO::Events::Loop->new( debug => 1 );
 my $loop = IO::Events::Loop->new();
 
 my %sessions;
@@ -62,6 +69,8 @@ sub _kill_session {
     }
 }
 
+my $read_obj = MockReader->new();
+
 my $server = IO::Events::Socket::TCP->new(
     owner => $loop,
     listen => 1,
@@ -73,12 +82,8 @@ my $server = IO::Events::Socket::TCP->new(
         my $session = rand;
 
         my $did_handshake;
-        my $read_buffer = q<>;
-        open my $rfh, '<', \$read_buffer;
 
-        my $ept = Net::WebSocket::Endpoint::Server->new(
-            parser => Net::WebSocket::Parser->new($rfh),
-        );
+        my $ept;
 
         my $shell_hdl;
 
@@ -98,20 +103,14 @@ my $server = IO::Events::Socket::TCP->new(
                     if ($ept->is_closed()) {
                         $shell_hdl->destroy();  #kills PID and $client_hdl
                     }
-                    else {
-
-                        #Handle any control frames we might need to write out,
-                        #esp. pings.
-                        while ( my $frame = $ept->shift_write_queue() ) {
-                            $client_hdl->write($frame->to_bytes());
-                        }
-                    }
                 }
                 else {
                     _kill_session($session);
                 }
             },
         );
+
+        my $deflate;
 
         $client_hdl = shift()->accept(
             owner => $loop,
@@ -123,35 +122,60 @@ my $server = IO::Events::Socket::TCP->new(
             on_read => sub {
                 my ($client_hdl) = @_;
 
-                $read_buffer .= $client_hdl->read();
+                $read_obj->add( $client_hdl->read() );
 
                 if ($did_handshake) {
-                    if (my $msg = $ept->get_next_message()) {
+
+                    #There could be multiple WebSocket messages
+                    #in the same TCP packet.
+                    while (my $msg = $ept->get_next_message()) {
 
                         #printf STDERR "from client: %s\n", ($msg->get_payload() =~ s<([\x80-\xff])><sprintf '\x%02x', ord $1>gre);
-                        #printf STDERR "from client: %v.02x\n", $msg->get_payload();
+                        #printf STDERR ">>>>> from browser: %d bytes\n", length $msg->get_payload();
+                        #printf STDERR ">>>>> from browser: %v.02x\n", $msg->get_payload();
+                        #print STDERR _printable( $msg->get_payload() ) . $/;
 
-                        $shell_hdl->write( $msg->get_payload() );
-                    }
+                        my $payload = $msg->get_payload();
 
-                    while (my $frame = $ept->shift_write_queue()) {
-                        $client_hdl->write($frame->to_bytes());
+                        if ($deflate && $deflate->message_is_compressed($msg)) {
+                            $payload = $deflate->decompress($payload);
+                        }
+
+                        $shell_hdl->write( $payload );
                     }
                 }
                 else {
-                    my $hsk = NWDemo::get_server_handshake_from_text($read_buffer);
+                    $ept ||= Net::WebSocket::Endpoint::Server->new(
+                        parser => Net::WebSocket::Parser->new($read_obj),
+
+                        #$client_hdl implements a compatible write() method.
+                        out => $client_hdl,
+                    );
+
+                    (undef, my $hsk, $deflate) = NWDemo::get_server_handshake_from_text($read_obj->get());
                     return if !$hsk;
+
+                    #Clear out $read_obj’s buffer.
+                    $read_obj->read( length $read_obj->get() );
 
                     #----------------------------------------------------------------------
 
-                    $client_hdl->write( $hsk->create_header_text() . "\x0d\x0a" );
+                    $client_hdl->write( $hsk->to_string() );
                     $did_handshake = 1;
 
                     my $pty = IO::Pty->new();
 
+                    #Ideally this would happen; however, since this
+                    #is being used to test zmodem.js let’s leave it out
+                    #to imitate a likely omission from other shell servers.
+                    #We will thus block any 0x0f and 0x16 bytes from reaching
+                    #the shell.
+                    #print IO::Stty::stty($pty, '-iexten');
+
                     $cpid = fork or do {
                         eval {
                             my $slv = $pty->slave();
+
                             open \*STDIN, '<&=', $slv;
                             open \*STDOUT, '>&=', $slv;
                             open \*STDERR, '>&=', $slv;
@@ -159,12 +183,13 @@ my $server = IO::Events::Socket::TCP->new(
                             #Necessary for CTRL-C and CTRL-\ to work.
                             POSIX::setsid();
 
-                            #Any advantage to these??
+                            #Any advantage to this??
                             #setpgrp;
-                            #$pty->make_slave_controlling_terminal();
 
-                            #Dunno if all shells have a “--login” switch …
-                            exec { $shell } $shell, '--login' or die $!;
+                            $pty->make_slave_controlling_terminal();
+
+                            #Not all shells (e.g., tcsh) have “--login”.
+                            exec { $shell } $shell, '-l' or die $!;
                         };
                         warn if $@;
                         POSIX::exit(1);
@@ -176,16 +201,33 @@ my $server = IO::Events::Socket::TCP->new(
                         read => 1,
                         write => 1,
 
+                        #Anything we get from the shell we pass on to the
+                        #(WebSocket) client.
                         on_read => sub {
                             my ($self) = @_;
-                            my $frame = Net::WebSocket::Frame::text->new(
-                                payload_sr => \$self->read(),
-                            );
+
+                            my $frame_or_msg;
+
+                            if ($deflate) {
+                                $frame_or_msg = $deflate->create_message(
+                                    SEND_FRAME_CLASS(),
+                                    $self->read(),
+                                );
+                            }
+                            else {
+
+                                #Needs to be binary in case of ZMODEM transfer.
+                                $frame_or_msg = SEND_FRAME_CLASS()->new(
+                                    payload_sr => \$self->read(),
+                                );
+                            }
 
                             #printf STDERR "to client: %s\n", ($frame->to_bytes() =~ s<([\x80-\xff])><sprintf '\x%02x', ord $1>gre);
-                            #printf STDERR "to client: %v.02x\n", $frame->get_payload();
+                            #printf STDERR "<<<<< to client: %v.02x\n", $frame->get_payload();
+                            #printf STDERR "<<<<< to client: %d\n", length $frame->get_payload();
+                            #print STDERR _printable( $frame->get_payload() ) . $/;
 
-                            $client_hdl->write($frame->to_bytes());
+                            $client_hdl->write($frame_or_msg->to_bytes());
                         },
 
                         pid => $cpid,
@@ -207,11 +249,16 @@ my $server = IO::Events::Socket::TCP->new(
     },
 );
 
+#*_printable = \&Text::Control::to_dot;
+
 while (1) {
     try {
         $loop->yield() while 1;
     }
     catch {
+
+        #For this application the ReceivedClose exception is more useful
+        #than the non-exception behavior.
         if ( !try { $_->isa('Net::WebSocket::X::ReceivedClose') } ) {
             local $@ = $_;
             die;

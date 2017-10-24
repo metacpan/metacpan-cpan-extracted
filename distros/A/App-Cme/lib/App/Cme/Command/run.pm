@@ -10,7 +10,7 @@
 # ABSTRACT: Run a cme script
 
 package App::Cme::Command::run ;
-$App::Cme::Command::run::VERSION = '1.023';
+$App::Cme::Command::run::VERSION = '1.024';
 use strict;
 use warnings;
 use 5.10.1;
@@ -24,8 +24,6 @@ use Encode qw(decode_utf8);
 use App::Cme -command ;
 
 use base qw/App::Cme::Common/;
-
-my $logger = get_logger("Cme::run");
 
 my $__test_home = '';
 sub _set_test_home { $__test_home = shift; }
@@ -42,8 +40,10 @@ push @script_paths, path($INC{"Config/Model.pm"})->parent->child("Model/scripts"
 sub opt_spec {
     my ( $class, $app ) = @_;
     return ( 
-        [ "arg=s@"  => "fix only a subset of a configuration tree" ],
+        [ "arg=s@"  => "script argument. run 'cme run $app -doc' for possible arguments" ],
         [ "backup:s"  => "Create a backup of configuration files before saving." ],
+        [ "commit|c:s" => "commit change with passed message" ],
+        [ "no-commit|nc!" => "skip commit to git" ],
         [ "quiet!"  => "Suppress progress messages" ],
         [ "doc!"    => "show documention of script" ],
         [ "list!"   => "list available scripts" ],
@@ -70,6 +70,8 @@ sub description {
 
 sub execute {
     my ($self, $opt, $app_args) = @_;
+
+    # cannot use logger until Config::Model is initialised
 
     # see Debian #839593 and perlunicook(1) section X 13
     @$app_args = map { decode_utf8($_, 1) } @$app_args;
@@ -102,8 +104,6 @@ sub execute {
 
     die "Error: cannot find script $script_name\n" unless $script->is_file;
 
-    $logger->info("Running script $script");
-
     my $content = $script->slurp_utf8;
 
     # parse variables passed on command line
@@ -111,27 +111,29 @@ sub execute {
 
     if ($content =~ m/^#!/ or $content =~ /^use/m) {
         splice @ARGV, 0,2; # remove 'run script' arguments
-        $logger->info("Running script $script with perl");
         eval $script->slurp_utf8;
         die "Error in script $script_name: $@\n" if $@;
         return;
     }
 
-    $logger->info("Running script $script");
     my %var;
 
     # find if all variables are accounted for
     my %missing ;
 
+    # provide default values
+    my %default ;
+
     # %args can be used in var section of a script. A new entry in
     # added in %missing if the script tries to read an undefined value
-    tie my %args, 'App::Cme::Run::Var', \%missing;
+    tie my %args, 'App::Cme::Run::Var', \%missing, \%default;
     %args = %user_args;
 
     # replace variables with command arguments or eval'ed variables or env variables
     my $replace_var = sub {
         # change $var but not \$var
-        $_[0] =~ s~ (?<!\\) \$(\w+) (?!\s*{) ~ $user_args{$1} // $var{$1} // $ENV{$1} // '$'.$1~xeg;
+        $_[0] =~ s~ (?<!\\) \$(\w+) (?!\s*{)
+                  ~ $user_args{$1} // $var{$1} // $ENV{$1} // $default{$1} // '$'.$1 ~xeg;
 
         # register vars without replacements
         map { $missing{$_} = 1 ;} ($_[0] =~ m~ (?<!\\) \$(\w+) ~xg);
@@ -162,10 +164,12 @@ sub execute {
             unshift @$app_args, $value;
         }
         elsif ($key eq 'var') {
-            $logger->trace("Eval var expression: $value");
             my $res = eval ($value) ;
             die "Error in var specification line $line_nb: $@\n" if $@;
-            $logger->debug("Eval var result: $res");
+        }
+        elsif ($key eq 'default') {
+            my ($dk, $dv) = split /[\s:=]+/, $value, 2;
+            $default{$dk} = $dv;
         }
         elsif ($key eq 'doc') {
             push @doc, $value;
@@ -193,6 +197,10 @@ sub execute {
 
     $self->process_args($opt, $app_args);
 
+    # override commit message. may also trigger a commit even if none
+    # is specified in script
+    $commit_msg ||= $opt->{commit};
+
     # check if workspace and index are clean
     if ($commit_msg) {
         my $r = `git status --porcelain`;
@@ -207,22 +215,23 @@ sub execute {
     $self->save($inst,$opt) ;
 
     # commit if needed
-    if ($commit_msg) {
+    if ($commit_msg and not $opt->{'no-commit'}) {
         system(qw/git commit -a -m/, $commit_msg);
     }
 }
 
 package App::Cme::Run::Var;
-$App::Cme::Run::Var::VERSION = '1.023';
+$App::Cme::Run::Var::VERSION = '1.024';
 require Tie::Hash;
 
 our @ISA = qw(Tie::ExtraHash);
 
 sub FETCH {
     my ($self, $key) = @_ ;
-    my ($h,$missing) = @$self;
-    $missing->{$key} = 1 unless defined $h->{$key};
-    return $h->{$key} // '';
+    my ($h, $missing, $default) = @$self;
+    my $res = $h->{$key} // $default->{$key} ;
+    $missing->{$key} = 1 unless defined $res;
+    return $res // '';
 }
 
 1;
@@ -239,7 +248,7 @@ App::Cme::Command::run - Run a cme script
 
 =head1 VERSION
 
-version 1.023
+version 1.024
 
 =head1 SYNOPSIS
 
@@ -312,7 +321,7 @@ save the configuration files
 
 =item *
 
-commits the result if C<commit> is specified.
+commits the result if C<commit> is specified (either in script or on command line).
 
 =back
 
@@ -339,16 +348,23 @@ allowed.
 Use Perl code to specify variables usable in this script. The Perl
 code must store data in C<%var> hash. For instance:
 
-    perl: my @l = localtime; $var{year} =  $l[5]+1900;
+    var: my @l = localtime; $var{year} =  $l[5]+1900;
 
 The hash C<%args> contains the variables passed with the C<-arg>
-option. Reading a value from C<%args> which is set by the user
-triggers an error.
+option. Reading a value from C<%args> which is not set by user
+triggers a missing option error. Use C<exists> if you need to test if
+a argument was set by user:
+
+    var: $var{foo} = exists $var{bar} ? $var{bar} : 'default' # good
+    var: $var{foo} = $var{bar} || 'default' # triggers a "missing arg" error
 
 =item load
 
 Specify the modifications to apply using a string as specified in
-L<Config::Model::Loader>
+L<Config::Model::Loader>. This string can contain variable
+(e.g. C<$foo>) which are replaced by command argument (e.g. C<-arg
+foo=bar>) or by a variable set in var: line (e.g. C<$var{foo}> as set
+above) or by an environment variable (e.g. C<$ENV{foo}>)
 
 =item commit
 
@@ -388,6 +404,15 @@ Arguments for the cme scripts which are used to substitute variables.
 
 Show the script documentation. (Note that C<--help> options show the
 documentation of C<cme run> command)
+
+=head2 commit
+
+Like the commit instruction in script. Specify that the change must be
+committed with the passed commit message.
+
+=head2 no-commit
+
+Don't commit to git (even if the above option is set)
 
 =head1 Common options
 

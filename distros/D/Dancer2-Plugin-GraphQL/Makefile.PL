@@ -21,7 +21,7 @@ WriteMakefile(
     "Dancer2::Plugin" => 0,
     "strict" => 0,
     "warnings" => 0,
-    "GraphQL" => '0.15',
+    "GraphQL" => '0.16',
   },
   "TEST_REQUIRES" => {
     "Dancer2" => "0.200000",

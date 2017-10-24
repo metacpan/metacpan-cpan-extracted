@@ -149,7 +149,7 @@ sub process_post {
     if ( $method =~ m/^LOGIN/i ) {
         $log->debug( "Incoming login/logout attempt" );
         if ( $path =~ m/^login/i ) {
-            return $self->_login_dialog( $body );
+            return $self->validate_user_credentials( $body );
         } else {
             return $self->_logout( $body );
         }
@@ -170,17 +170,21 @@ sub process_post {
 }
 
 
-=head2 _login_dialog
+=head2 validate_user_credentials
 
-Called from C<process_post> to process login requests (special AJAX requests)
-originating from the JavaScript side (i.e. the login screen in
-login-dialog.js, via login.js).
+Called either from C<process_post> on login AJAX requests originating from the
+JavaScript side (i.e. the login screen in login-dialog.js, via login.js), or
+directly from C<is_authorized> if the MFILE_WWW_BYPASS_LOGIN_DIALOG mechanism
+is activated.
+
+Returns a status object - OK means the login was successful; all other statuses
+mean unsuccessful.
 
 =cut
 
-sub _login_dialog {
+sub validate_user_credentials {
     my ( $self, $body ) = @_;
-    $log->debug( "Entering " . __PACKAGE__ . "::_login_dialog()" );
+    $log->debug( "Entering " . __PACKAGE__ . "::validate_user_credentials()" );
 
     my $r = $self->request;
     my $session = $self->session;
@@ -202,11 +206,8 @@ sub _login_dialog {
     $message = $rr->{'hr'}->message;
     $body_json = $rr->{'body'};
 
-    if ( $site->MFILE_WWW_BYPASS_LOGIN_DIALOG and ! $meta->META_LOGIN_BYPASS_STATE ) {
-        return ( $code == 200 ) ? 1 : 0;
-    }
-
     my $status = $self->login_status( $code, $message, $body_json );
+    $log->debug( "login_status() returned" . Dumper( $status ) );
     return $status;
 }
          
@@ -243,8 +244,6 @@ sub _logout {
 
 
 =head3 _prep_ajax_response
-
-Code shared between C<_login_dialog> and C<_logout>
 
 =cut
 

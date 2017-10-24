@@ -17,7 +17,7 @@ use URI::QueryParam;
 # Clean Up the Namespace
 use namespace::autoclean;
 
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 
 has 'protocol' => (
@@ -172,7 +172,7 @@ WWW::Subsonic - Interface with the Subsonic API
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -283,11 +283,21 @@ This is free software, licensed under:
 
   The (three-clause) BSD License
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords Brad Lhotsky
+=for stopwords Brad Lhotsky Mohammad S Anwar
+
+=over 4
+
+=item *
 
 Brad Lhotsky <brad.lhotsky@gmail.com>
+
+=item *
+
+Mohammad S Anwar <mohammad.anwar@yahoo.com>
+
+=back
 
 =for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

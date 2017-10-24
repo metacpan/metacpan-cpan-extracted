@@ -1,0 +1,206 @@
+#!/usr/bin/env perl
+use warnings;
+use strict;
+
+use Term::Colormap qw( colormap print_colored_text print_colored );
+use Term::ANSIColor qw(:constants);
+$Term::ANSIColor::AUTORESET = 1;
+
+use List::Util qw( max );
+use File::Basename;
+
+binmode STDOUT, 'encoding(utf8)';
+
+$ARGV[0] and -f $ARGV[0]
+    or usage();
+
+my $file_to_blame = $ARGV[0];
+
+my $dir  = dirname($file_to_blame);
+my $file = basename($file_to_blame);
+my $cwd  = $ENV{PWD};
+
+chdir($dir);
+open my $fh, "git annotate --encoding=utf8 --incremental $file |"
+    or die "failed to run git blame : $!";
+binmode($fh, 'utf8:');
+chdir($cwd);
+
+my ( $authors, $dates, $commits ) = ( {}, {}, {} );
+my ( $commit_authors, $commit_dates ) = ( {}, {} );
+my $lines = 0;
+
+my $blame_data = do { local $/; <$fh> };
+
+# Split into chunks starting with SHA-1 and ending with the filename
+foreach my $block ( split /\nfilename /s, $blame_data ) {
+
+    my ($commit, $lines_in_block) = $block =~ m|\n?([\^a-f0-9]+) \d+ \d+ (\d+)|;
+    next unless $commit;
+    $lines += $lines_in_block;
+
+    if (my ($author) = $block =~ m|\nauthor (.*?)\n|) {
+        $author =~ s|[\(\)]||g;
+        $commit_authors->{$commit} = $author;
+    }
+
+    if (my ($epoch) = $block =~ m|\nauthor-time (\d+)|) {
+        $commit_dates->{$commit} = date_for_epoch($epoch);
+    }
+
+    my $author = $commit_authors->{$commit};
+    $authors->{$author} += $lines_in_block;
+
+    my $date = date2num($commit_dates->{$commit});
+    
+    # Most recent commit by author
+    if ($dates->{$author}) {
+        # Many commits
+        $dates->{$author} = ( $date > $dates->{$author} ? $date : $dates->{$author} );
+    } else {
+        # First commit seen
+        $dates->{$author} = $date;
+    }
+
+    # Commits per author
+    $commits->{$author}->{$commit}++;
+}
+close $fh;
+
+# Order the authors by date of most recent commit
+my $date_order = {};
+my $n=1;
+map {$date_order->{$_} = $n++;}
+reverse sort { $dates->{$a} cmp $dates->{$b} } keys %$authors;
+
+my $max_date_n = $n-1;
+
+my @authors_by_date = sort { $date_order->{$a} <=> $date_order->{$b}} keys %$authors;
+my ($last_author)  = @authors_by_date;
+my ($first_author) = reverse @authors_by_date;
+
+my $first_date = $dates->{$first_author};
+my $last_date  = $dates->{$last_author};
+
+my $total_commits = {};
+my $number_of_commits = 0;
+for my $author ( keys %$commits ) {
+    my $n_commits = keys %{ $commits->{$author} };
+    $total_commits->{$author} = $n_commits;
+    $number_of_commits += $n_commits;
+}
+
+print "\n  ";
+print BOLD MAGENTA $ARGV[0] . " $lines lines done in $number_of_commits commits, last touched by ";
+print YELLOW $last_author;
+print BOLD MAGENTA " on ";
+print RED num2date($dates->{$last_author}) . "\n\n";
+
+my $rainbow = colormap('rainbow');
+my $palette = [ reverse @$rainbow ];
+
+# Authors with the most lines of code first
+for (sort { $authors->{$b} <=> $authors->{$a} } keys %$authors) {
+    my $percent = $authors->{$_} / $lines * 100;
+    my $space
+        = $percent < 10  ? '  '
+        : $percent < 100 ? ' '
+        : '';
+
+    my $commits = $total_commits->{$_};
+
+    # Color Authors by contributions (Red = Most, Purple = Least)
+    my $result = sprintf( "   %s %-02.2f %%  %30s  ", $space, $percent, $_ );
+    output_by_percent($percent, $result);
+    my $day = num2date($dates->{$_});
+
+    # Color Dates by recentness (Red = Newest, Purple = Oldest)
+    my $result_date = sprintf("  %s  ", $day );
+    my $order = $date_order->{$_};
+    output_by_date_order($dates->{$_}, $result_date);
+
+    # Show total number of commits for this author
+    my $commits_by_author = sprintf(" % 5d commits\n", $commits);
+    print YELLOW $commits_by_author;
+} 
+
+print "\n";
+
+exit 0;
+
+sub fit_value_to_range {
+    my ($value, $min, $max) = @_;
+    return $value < $min ? $min
+         : $value > $max ? $max
+         : $value;
+}
+
+sub get_param_for_range {
+    my ($value, $min, $max) = @_;
+    return 1 if ($min == $max);
+    my $capped_value = fit_value_to_range($value, $min, $max);
+    return ( $capped_value - $min ) / ( $max - $min );
+}
+
+sub get_log10_param_for_range {
+    my ($value, $min, $max) = @_;
+    my $capped_value = fit_value_to_range($value, $min, $max);
+    return ( log10($capped_value) - log10($min) ) / ( log10($max) - log10($min) );
+}
+
+sub get_color_for_param {
+    my ($param) = @_;
+    return $palette->[ int( $param * ( scalar @$palette - 1 ) ) ];
+}
+
+sub output_by_percent {
+    my ($percent, $result) = @_;
+
+    my $param = get_log10_param_for_range($percent, 0.1, 100);
+
+    print_colored_text( get_color_for_param( $param ), $result);
+}
+
+sub output_by_date_order {
+    my ($yyyymmdd, $result) = @_;
+
+    my $param = get_param_for_range($yyyymmdd, $first_date, $last_date);
+
+    my $color = get_color_for_param( $param );
+
+    if ($color == 1) { # Highlight the Most Recent Commit Date in Red
+        print_colored($color, $result);
+    } else {
+        print_colored_text($color, $result);
+    }
+}
+
+sub log10 {
+    my ($n) = @_;
+    return log($n) / log(10);
+}
+
+sub date2num {
+    my ($date) = @_;
+    $date =~ s/-//g;
+    return($date);
+}
+
+sub num2date {
+    my ($num) = @_;
+    $num =~ s/(\d{4})(\d{2})(\d{2})/$1-$2-$3/;
+    return($num);
+}
+
+sub date_for_epoch {
+    my ($epoch) = @_;
+    my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) =
+        localtime($epoch);
+    $year += 1900;
+    $mon  += 1;
+    sprintf( "%4d-%02d-%02d", $year, $mon, $mday );
+}
+
+sub usage {
+     die "usage: $0 file_to_blame\n";
+}

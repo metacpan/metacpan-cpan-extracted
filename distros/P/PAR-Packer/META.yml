@@ -4,7 +4,7 @@ author:
   - 'Audrey Tang <cpan@audreyt.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  IPC::Run3: '0'
+  IPC::Run3: '0.048'
   Test::More: '0'
 configure_requires:
   DynaLoader: '0'
@@ -47,5 +47,5 @@ requires:
 resources:
   MailingList: par@perl.org
   repository: git://github.com/rschupp/PAR-Packer.git
-version: '1.039'
+version: '1.040'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

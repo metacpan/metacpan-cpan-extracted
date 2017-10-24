@@ -30,7 +30,7 @@ DESCRIPTION
     As the name suggests, this module aims to implement a simple LDAP
     server, using many components already available in CPAN. It can be used
     for prototyping and/or development purposes. This is NOT intended to be
-    a production-grade server, altough some brave souls in small offices
+    a production-grade server, although some brave souls in small offices
     might use it as such.
 
     As of April 2010, the server will load a LDIF file and serve its
@@ -45,7 +45,7 @@ DESCRIPTION
 
         BASEDIR/server.conf
 
-    it will be used as the default confguration file. Similarly, if there
+    it will be used as the default configuration file. Similarly, if there
     exists a file:
 
         BASEDIR/server.ldif

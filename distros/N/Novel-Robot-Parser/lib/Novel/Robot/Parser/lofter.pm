@@ -58,7 +58,7 @@ sub extract_item {
 
   my $c = $self->{browser}->request_url( $r->{url} );
   my $s = scraper {
-    process '//div[starts-with(@class,"m-post ")]',
+    process '//div[starts-with(@class,"m-post")]',
       'content' => 'HTML';
     process '//div[@class="txtcont"]',  'cont1' => 'HTML';
     process '//div[@class="content"]',  'cont2' => 'HTML';
@@ -92,7 +92,7 @@ sub get_tiezi_ref {
 
     $info->{url}        = $url;
     $info->{floor_list} = $floor_list;
-    print "last_chapter_id : $info->{floor_list}[-1]{id}\n";
+    #print "last_chapter_id : $info->{floor_list}[-1]{id}\n";
     return $info;
 } ## end sub get_tiezi_ref
 

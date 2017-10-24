@@ -38,86 +38,15 @@
 
 define ([
     'jquery',
-    'ajax',
-    'current-user',
-    'lib',
+    'app/caches',
     'stack',
 ], function (
     $,
-    ajax,
-    currentUser,
-    coreLib,
+    appCaches,
     stack,
 ) {
 
-    var cache = [],
-
-        byAID = {},
-
-        byCode = {},
-
-        populateActivitiesCache = function () {
-            console.log("Entering populateActivitiesCache()");
-            // idempotent
-            if (cache.length === 0) {
-                ajax(rest, sc, fc);
-            } else {
-                console.log("populateActivitiesCaches(): noop, caches already populated");
-            }
-        },
-
-        rest = {
-            "method": 'GET',
-            "path": 'activity/all'
-        },
-        // success callback
-        sc = function (st) {
-            var i;
-            console.log("AJAX: " + rest["method"] + " " + rest["path"] + " returned", st);
-            cache = [];
-            for (i = 0; i < st.payload.length; i += 1) {
-                cache.push(st.payload[i]);
-                byAID[st.payload[i].aid] = st.payload[i];
-                byCode[st.payload[i].code] = st.payload[i];
-            }
-            coreLib.displayResult(i + 1 + " activity objects loaded into cache");
-        },
-        fc = function (st) {
-            console.log("AJAX: " + rest["method"] + " " + rest["path"] + " failed", st);
-            coreLib.displayError(st.payload.message);
-        };
-
     return {
-
-        getActByAID: function (aid) {
-            if (cache.length > 0) {
-                return byAID[aid];
-            }
-            console.log('CRITICAL ERROR: activities cache not populated');
-            return null;
-        },
-
-        getActByCode: function (code) {
-            if (cache.length > 0) {
-                return byCode[code];
-            }
-            console.log('CRITICAL ERROR: activities cache not populated');
-            return null;
-        },
-
-        populateActivitiesCache: populateActivitiesCache,
-
-        selectActivityAction: function (obj) {
-            if (cache.length > 0) {
-                stack.push('selectActivity', {
-                    'pos': 0,
-                    'set': cache,
-                });
-            } else {
-                // start selectActivity drowselect target
-                ajax(rest, sc, fc);
-            }
-        },
 
         selectActivityGo: function (obj) {
             // called from selectActivity drowselect; obj is the selected activity
@@ -138,10 +67,12 @@ define ([
 
         vetActivity: function (code) {
             // exact match
-            var i,
+            var cache = appCaches.activityCache,
+                exactMatch = appCaches.getActivityByCode(code),
+                i,
                 re;
-            if (byCode.hasOwnProperty(code)) {
-                return byCode[code].code;
+            if (exactMatch) {
+                return exactMatch.code;
             }
             // partial match
             re = new RegExp('^' + code, "i");

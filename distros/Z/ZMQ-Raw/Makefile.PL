@@ -246,18 +246,18 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
+    "Socket" => 0,
     "Test::More" => 0,
     "Test::Pod" => "0.0",
     "Test::Pod::Coverage" => "0.0",
     "threads" => 0
   },
-  "VERSION" => "0.08",
+  "VERSION" => "0.10",
   "test" => {
     "TESTS" => "t/*.t"
   }
 );
 
-$WriteMakefileArgs{MIN_PERL_VERSION}  = '5.8.8';
 $WriteMakefileArgs{DEFINE}  .= $def;
 $WriteMakefileArgs{LIBS}    .= $lib;
 $WriteMakefileArgs{INC}     .= $inc;

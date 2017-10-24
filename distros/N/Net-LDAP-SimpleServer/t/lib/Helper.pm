@@ -1,14 +1,41 @@
 # common routines for testing Net::LDAP::SimpleServer
 
+use strict;
+use warnings;
 use Exporter 'import';
-our @EXPORT_OK = qw(ldap_client test_requests server_ok server_nok);
+our @EXPORT_OK   = qw(ldap_client test_requests server_ok server_nok);
+our %EXPORT_TAGS = (
+    LDIFSTORE => [
+        qw/ldifstore_check_param ldifstore_check_param_success ldifstore_check_param_failure/
+    ]
+);
 
 use Carp;
 use Proc::Fork;
 use IO::Pipe;
+use Try::Tiny;
+use Test::More;
 
 use Net::LDAP;
 use Net::LDAP::SimpleServer;
+
+##############################################################################
+# LDIFSTORE
+
+sub ldifstore_check_param {
+    eval { my $o = Net::LDAP::SimpleServer::LDIFStore->new(@_); };
+    return $@;
+}
+
+sub ldifstore_check_param_success {
+    ok( not ldifstore_check_param(@_) );
+}
+
+sub ldifstore_check_param_failure {
+    ok( ldifstore_check_param(@_) );
+}
+
+##############################################################################
 
 my $default_test_port   = 30389;
 my $default_start_delay = 5;
@@ -19,8 +46,6 @@ my $server_fixed_opts = {
     port     => $default_test_port,
     host     => 'localhost',
 };
-
-##############################################################################
 
 my $alarm_wait = 5;
 my $OK         = 'OK';
@@ -45,14 +70,15 @@ sub _eval_params {
             local $SIG{ALRM} = sub { quit($OK) };
             alarm $alarm_wait;
 
-            diag( "Starting server on port: " . $default_test_port );
-            eval {
+            try {
                 use Net::LDAP::SimpleServer;
 
                 my $s = Net::LDAP::SimpleServer->new($server_fixed_opts);
                 $s->run($p);
-            };
-            quit( $NOK . $@ );
+            }
+            catch {
+                quit( $NOK . $@ );
+            }
         }
     };
 
@@ -109,26 +135,22 @@ sub test_requests {
         parent {
             my $child = shift;
 
-            # give the server some time to start
-            sleep $start_delay;
+            try {
+                # give the server some time to start
+                sleep $start_delay;
 
-            # run client
-            diag('Net::LDAP::SimpleServer Testing         [Knive]');
-            $requests_sub->();
-
-            kill $end_signal, $child;
+                # run client
+                $requests_sub->();
+            }
+            finally {
+                kill $end_signal, $child;
+            }
         }
         child {
-            diag('Net::LDAP::SimpleServer Instantiating    [Fork]');
             my $s = Net::LDAP::SimpleServer->new($server_fixed_opts);
 
             # run server
-            diag(   'Net::LDAP::SimpleServer Starting :'
-                  . $default_test_port
-                  . '  [Fork]' );
             $s->run($server_opts);
-            diag('Net::LDAP::SimpleServer Server stopped   [Fork]');
-            diag('There is no                             [Spoon]');
         }
     };
 }

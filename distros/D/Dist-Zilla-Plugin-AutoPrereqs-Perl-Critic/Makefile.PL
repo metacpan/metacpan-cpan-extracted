@@ -18,10 +18,12 @@ my %WriteMakefileArgs = (
   "NAME" => "Dist::Zilla::Plugin::AutoPrereqs::Perl::Critic",
   "PREREQ_PM" => {
     "CPAN::Meta::YAML" => 0,
+    "CPAN::Version" => 0,
     "Dist::Zilla::Role::PrereqSource" => 0,
     "HTTP::Tiny" => 0,
     "Moose" => 0,
     "Moose::Util::TypeConstraints" => 0,
+    "Path::Tiny" => 0,
     "Perl::Critic" => 0,
     "namespace::autoclean" => 0,
     "strict" => 0,
@@ -34,7 +36,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,10 +45,12 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "CPAN::Meta::YAML" => 0,
+  "CPAN::Version" => 0,
   "Dist::Zilla::Role::PrereqSource" => 0,
   "HTTP::Tiny" => 0,
   "Moose" => 0,
   "Moose::Util::TypeConstraints" => 0,
+  "Path::Tiny" => 0,
   "Perl::Critic" => 0,
   "Test::DZil" => 0,
   "Test::Fatal" => 0,

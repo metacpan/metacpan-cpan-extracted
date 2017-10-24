@@ -100,13 +100,24 @@ define ([
 
         canonicalizeTimeRange = function (tr) {
             console.log("Entering canonicalizeTimeRange() with argument", tr);
-            var ttr = String(tr).trim().replace(/\s/g, '');
-            if (ttr.match(/^\d*:{0,1}\d*-\d*:{0,1}\d*$/)) {
+            var ttr = String(tr).trim().replace(/\s/g, ''),
+                ttrs;
+            if (/^\d*:{0,1}\d*-\d*:{0,1}\d*$/.test(ttr)) {
                 console.log(tr + " is a standard time range");
                 return canonicalizeTimeRangeStandard(ttr);
-            } else if (ttr.match(/^\d+:{0,1}\d*[+]\d+:{0,1}\d*/)) {
+            } else if (/^\d+:{0,1}\d*\+\d+:{0,1}\d*/.test(ttr)) {
                 console.log(tr + " is an offset time range");
                 return canonicalizeTimeRangeOffset(ttr);
+            } else if (/^\+\d+:{0,1}\d*/.test(ttr)) {
+                console.log(tr + " is a last-interval-plus-offset time range");
+                ttrs = canonicalizeTime(ttr.replace(/\+/g, ''));
+                if (ttrs === null) {
+                    return null;
+                }
+                return '+' + ttrs;
+            } else if (ttr.match(/^\+$/)) {
+                console.log(tr + " is a next-scheduled-interval time range");
+                return ttr;
             }
             return null;
         },
@@ -168,12 +179,36 @@ define ([
             return ftr;
         },
 
+        intToDay = function (d) {
+            var day = null;
+            // if 0 <= m <= 6, return three-letter string signifying the day
+            // of the week; otherwise, return null
+            console.log("Entering intToDay() with argument", d);
+            d = parseInt(d, 10);
+            if (d === 0) {
+                day = "SUN";
+            } else if (d === 1) {
+                day = "MON";
+            } else if (d === 2) {
+                day = "TUE";
+            } else if (d === 3) {
+                day = "WED";
+            } else if (d === 4) {
+                day = "THU";
+            } else if (d === 5) {
+                day = "FRI";
+            } else if (d === 6) {
+                day = "SAT";
+            }
+            return day;
+        },
+
         intToMonth = function (m) {
+            var month = null;
             // if 1 <= m <= 12, return three-letter string signifying the month
             // otherwise, return null
             console.log("Entering intToMonth() with argument", m);
-            var m = parseInt(m, 10),
-                month = null;
+            m = parseInt(m, 10);
             if (m === 1) {
                 month = "JAN";
             } else if (m === 2) {
@@ -202,12 +237,64 @@ define ([
             return month;
         }, // intToMonth
 
+        isTimeRangeAfterTime = function (tr, t) {
+            var b, e, trh, trm, th, tm;
+            [b, e] = tr.split('-');
+            [trh, trm] = b.split(':');
+            [th, tm] = t.split(':');
+            trh = parseInt(trh, 10);
+            trm = parseInt(trm, 10);
+            th = parseInt(th, 10);
+            tm = parseInt(tm, 10);
+            if (trh > th) {
+                return true;
+            }
+            if (trh < th) {
+                return false;
+            }
+            // trh === th
+            if (trm > tm) {
+                return true;
+            }
+            return false;
+        }, // isTimeRangeAfterTime
+
+        isTimeWithinTimeRange = function (t, tr) {
+            var b, e, t, trbh, treh, trbm, trem, th, tm;
+            [b, e] = tr.split('-');
+            [trbh, trbm] = b.split(':');
+            [treh, trem] = e.split(':');
+            [th, tm] = t.split(':');
+            trbh = parseInt(trbh, 10);
+            trbm = parseInt(trbm, 10);
+            treh = parseInt(treh, 10);
+            trem = parseInt(trem, 10);
+            th = parseInt(th, 10);
+            tm = parseInt(tm, 10);
+            if (th === trbh && tm === trbm) {
+                return true;
+            }
+            if (th === treh && tm === trem) {
+                return false;
+            }
+            t = parseFloat(th + '.' + tm);
+            b = parseFloat(trbh + '.' + trbm);
+            e = parseFloat(treh + '.' + trem);
+            if (t > b && t < e) {
+                return true;
+            }
+            return false;
+        }, // isTimeWithinTimeRange
+
         minutesToTime = function (m) {
             console.log("Entering minutesToTime() with argument", m);
             var quotient,
                 remainder;
-            if (m < 0 || m > 1440) {
+            if (m < 0) {
                 return null;
+            }
+            if (m > 1440) {
+                m = 1440;
             }
             quotient = String(Math.floor(m/60));
             remainder = String(m % 60);
@@ -215,6 +302,37 @@ define ([
             console.log("Remainder is", remainder);
             return canonicalizeTime(quotient + ":" + remainder);
         },
+
+        monthToInt = function (month) {
+            console.log("Entering monthToInt() with argument", month);
+            var m = 0;
+            if (month === "JAN") {
+                m = 1;
+            } else if (month === "FEB") {
+                m = 2;
+            } else if (month === "MAR") {
+                m = 3;
+            } else if (month === "APR") {
+                m = 4;
+            } else if (month === "MAY") {
+                m = 5;
+            } else if (month === "JUN") {
+                m = 6;
+            } else if (month === "JUL") {
+                m = 7;
+            } else if (month === "AUG") {
+                m = 8;
+            } else if (month === "SEP") {
+                m = 9;
+            } else if (month === "OCT") {
+                m = 10;
+            } else if (month === "NOV") {
+                m = 11;
+            } else if (month === "DEC") {
+                m = 12;
+            }
+            return m;
+        }, // intToMonth
 
         strToMonth = function (buf) {
             console.log("Entering strToMonth() with argument", buf);
@@ -266,6 +384,19 @@ define ([
                 return null;
             }
             return buf[0] * 60 + buf[1];
+        },
+
+        tsrangeToTimeRange = function (tsr) {
+            // tsr looks like this: ["2017-10-20 08:00:00+02","2017-10-20 12:00:00+02")
+            var begin, end, h, m, s, re = /\d{2}:\d{2}:\d{2}/;
+            [begin, end] = tsr.split(',');
+            begin = begin.match(re)[0];
+            [h, m, s] = begin.split(':');
+            begin = h + ':' + m;
+            end = end.match(re)[0];
+            [h, m, s] = end.split(':');
+            end = h + ':' + m;
+            return begin + '-' + end;
         },
 
         vetDateYYYYMMDD = function (ds) {
@@ -376,9 +507,19 @@ define ([
 
         canonicalizeTimeRange: canonicalizeTimeRange,
 
+        canonicalizeTimeRangeOffset: canonicalizeTimeRangeOffset,
+
+        intToDay: intToDay,
+
         intToMonth: intToMonth,
 
+        isTimeRangeAfterTime: isTimeRangeAfterTime,
+
+        isTimeWithinTimeRange: isTimeWithinTimeRange,
+
         minutesToTime: minutesToTime,
+
+        monthToInt: monthToInt,
 
         // convert "YYYY-MM-DD HH:DD:SS+TZ" string into YYYY-MMM-DD
         readableDate: function (urd) {
@@ -400,6 +541,8 @@ define ([
         strToMonth: strToMonth,
 
         timeToMinutes: timeToMinutes,
+
+        tsrangeToTimeRange: tsrangeToTimeRange,
 
         vetDateYYYYMMDD: vetDateYYYYMMDD,
 
@@ -452,12 +595,13 @@ define ([
         },
 
         vetTimeRange: function (tr) {
-            var ctr = canonicalizeTimeRange(tr),
-                rv = null;
-            if (ctr !== null) {
-                rv = ctr[0] + '-' + ctr[1];
+            var ctr = canonicalizeTimeRange(tr);
+            if (ctr === null) {
+                return null
+            } else if (coreLib.isArray(ctr)) {
+                return ctr[0] + '-' + ctr[1];
             }
-            return rv;
+            return ctr;
         },
 
     };

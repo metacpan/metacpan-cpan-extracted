@@ -1,5 +1,5 @@
 package Bio::Roary::LookupGeneFiles;
-$Bio::Roary::LookupGeneFiles::VERSION = '3.10.2';
+$Bio::Roary::LookupGeneFiles::VERSION = '3.11.0';
 # ABSTRACT: Take in an ordering of genes and a directory and return an ordered list of file locations
 
 
@@ -50,7 +50,7 @@ Bio::Roary::LookupGeneFiles - Take in an ordering of genes and a directory and r
 
 =head1 VERSION
 
-version 3.10.2
+version 3.11.0
 
 =head1 SYNOPSIS
 

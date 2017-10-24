@@ -1,5 +1,5 @@
 package Bio::Roary::External::Prank;
-$Bio::Roary::External::Prank::VERSION = '3.10.2';
+$Bio::Roary::External::Prank::VERSION = '3.11.0';
 # ABSTRACT: Wrapper to run prank
 
 
@@ -76,7 +76,7 @@ Bio::Roary::External::Prank - Wrapper to run prank
 
 =head1 VERSION
 
-version 3.10.2
+version 3.11.0
 
 =head1 SYNOPSIS
 

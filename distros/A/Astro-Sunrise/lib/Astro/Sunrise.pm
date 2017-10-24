@@ -1,7 +1,7 @@
 # -*- encoding: utf-8; indent-tabs-mode: nil -*-
 #
 #     Perl extension for computing the sunrise/sunset on a given day
-#     Copyright (C) 1999-2003, 2013, 2015 Ron Hill and Jean Forget
+#     Copyright (C) 1999-2003, 2013, 2015, 2017 Ron Hill and Jean Forget
 #
 #     See the license in the embedded documentation below.
 #
@@ -24,7 +24,7 @@ require Exporter;
         trig      => [ qw/sind cosd tand asind acosd atand atan2d equal/ ],
         );
 
-$VERSION =  '0.96';
+$VERSION =  '0.97';
 $RADEG   = ( 180 / pi );
 $DEGRAD  = ( pi / 180 );
 my $INV360     = ( 1.0 / 360.0 );
@@ -566,7 +566,7 @@ Astro::Sunrise - Perl extension for computing the sunrise/sunset on a given day
 
 =head1 VERSION
 
-This documentation refers to C<Astro::Sunrise> version 0.96.
+This documentation refers to C<Astro::Sunrise> version 0.97.
 
 =head1 SYNOPSIS
 
@@ -574,7 +574,7 @@ This documentation refers to C<Astro::Sunrise> version 0.96.
   use Astro::Sunrise;
   my ($sunrise, $sunset) = sunrise( { year => 2015, month => 9, day => 2, # YAPC::EU starts on 2nd September 2015
                                       lon  => -3.6, lat   => 37.17,       # Granada is 37°10'N, 3°36'W
-                                      tz   => 1,    dst   => 1 } );       # This is still summer, therefore DST
+                                      tz   => 1,    isdst => 1 } );       # This is still summer, therefore DST
 
   # When does the sun rise today in Salt Lake City (home to YAPC::NA 2015)?
   use Astro::Sunrise;
@@ -998,7 +998,7 @@ Brian D Foy for providing patch for constants :)
 
 Gabor Szabo for pointing POD mistakes.
 
-People at L<http://geocoder.opencagedata.com/> for noticing an endless
+People at L<https://geocoder.opencagedata.com/> for noticing an endless
 loop condition and for fixing it.
 
 =head1 CREDITS
@@ -1036,7 +1036,7 @@ GNU Public License version 1 or later and Perl Artistic License
 
 You can find the text of the licenses in the F<LICENSE> file or at
 L<http://www.perlfoundation.org/artistic_license_1_0>
-and L<http://www.gnu.org/licenses/gpl-1.0.html>.
+and L<https://www.gnu.org/licenses/gpl-1.0.html>.
 
 Here is the summary of GPL:
 
@@ -1052,7 +1052,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software Foundation,
-Inc., L<http://www.fsf.org/>.
+Inc., L<https://www.fsf.org/>.
 
 =head2 Original C program
 
@@ -1093,5 +1093,8 @@ perl(1).
 L<DateTime::Event::Sunrise>
 
 L<DateTime::Event::Jewish::Sunrise>
+
+The text F<doc/astronomical-notes.pod> (or its original French version
+F<doc/notes-astronomiques>) in this distribution.
 
 =cut

@@ -18,20 +18,19 @@ my %WriteMakefileArgs = (
   "NAME" => "Moxie",
   "PREREQ_PM" => {
     "BEGIN::Lift" => "0.06",
-    "Devel::Hook" => 0,
-    "MOP" => "0.09",
+    "MOP" => "0.10",
     "Method::Traits" => "0.05",
     "Module::Runtime" => 0,
-    "Sub::Inject" => 0,
+    "PadWalker" => 0,
     "Sub::Util" => 0,
-    "UNIVERSAL::Object" => "0.11",
+    "UNIVERSAL::Object" => "0.12",
     "experimental" => 0
   },
   "TEST_REQUIRES" => {
     "Test::Fatal" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.04",
+  "VERSION" => "0.05",
   "test" => {
     "TESTS" => "t/000-samples/*.t t/001-basic/*.t t/030-roles/*.t t/040-method/*.t t/050-non-mop-integration/*.t t/080-enum/*.t t/100-annotations/*.t"
   }
@@ -40,15 +39,14 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "BEGIN::Lift" => "0.06",
-  "Devel::Hook" => 0,
-  "MOP" => "0.09",
+  "MOP" => "0.10",
   "Method::Traits" => "0.05",
   "Module::Runtime" => 0,
-  "Sub::Inject" => 0,
+  "PadWalker" => 0,
   "Sub::Util" => 0,
   "Test::Fatal" => 0,
   "Test::More" => 0,
-  "UNIVERSAL::Object" => "0.11",
+  "UNIVERSAL::Object" => "0.12",
   "experimental" => 0
 );
 

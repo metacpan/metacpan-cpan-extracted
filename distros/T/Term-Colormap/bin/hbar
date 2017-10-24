@@ -1,0 +1,160 @@
+#!/usr/bin/env perl
+use warnings;
+use strict;
+
+use List::Util qw( max min );
+use Scalar::Util qw(looks_like_number);
+use Term::Colormap qw( colormap print_colored );
+use Term::ReadKey; # GetTerminalSize
+
+use constant DEBUG => 0;
+
+main();
+1;
+
+sub main {
+    
+    my @data;
+
+    # getopt and friends
+
+    # nothing in stdin, waiting for user input
+    usage() if (-t STDIN);
+
+    while (<>) {
+        next unless /\S/;
+        s/^\s+//;
+        s/\s+$//;
+        my ($label, $value);
+        my ($field_1, $field_2);
+        if (/,/) {
+            # Comma Separated
+            ($field_1, $field_2) = split /,/;
+        } else {
+            # Whitespace Separated, try to figure out the value column
+            my @fields = split /\s/;
+            if (looks_like_number($fields[0])) {
+                $field_1 = shift @fields;
+            } elsif (looks_like_number($fields[-1])) {
+                $field_1 = pop @fields;
+            } else {
+                die "Cannot figure out the fields!";
+            }
+            $field_2 = join ' ', @fields;
+
+        }
+
+        # Assign correctly
+        if (looks_like_number($field_1)) {
+            $value = $field_1;
+            $label = $field_2;
+        } else {
+            $value = $field_2;
+            $label = $field_1;
+        } 
+
+        # Ignore if we don't understand
+        if ( defined $label and looks_like_number($value) ) {
+            push @data, { label => $label, value => $value };
+        }
+    }
+
+    my $max_label_length = max map { length( $_->{label} ) } @data;
+
+    my $max_value = max map { $_->{value} } @data;
+    my $min_value = min map { $_->{value} } @data;
+
+    my ($screen_cols, $screen_rows, undef, undef) = GetTerminalSize();
+
+    my $max_data_width = $screen_cols
+                              - $max_label_length        # Left Pad for label
+                              - int(0.1 * $screen_cols); # Right Pad for value
+    
+    my $zero_column;
+    if ($min_value < 0) {
+        $zero_column = abs(int( ($min_value) / ($max_value - $min_value) * $max_data_width));
+    } else {
+        $zero_column = 0;
+    }
+    my $rainbow = colormap('rainbow');
+    my $rainbow_length = scalar @$rainbow;
+    
+    my $rows = scalar @data;
+    my $row = 0;
+
+    my $rotate_colors = ($rows > $rainbow_length) ? 1 : 0;
+
+    debug("zero_column = $zero_column");
+
+    print "\n";
+    for ( @data ) {
+        my ($label) = $_->{label};
+        my ($value) = $_->{value};
+        print sprintf("% ${max_label_length}s ", $label);
+
+        my $scaled_value;
+
+        if ($min_value < 0) {
+            $scaled_value = int($max_data_width*
+                                   ( $_->{value} - $min_value ) / ( $max_value - $min_value ));
+        } else {
+            $scaled_value = int($max_data_width*( $_->{value} / $max_value ));
+        }
+
+        my $color = $rotate_colors 
+            ? $rainbow->[ $row % $rainbow_length ]
+            : $rainbow->[int( $row * ( ( scalar @$rainbow ) / $rows ) )];
+        debug("scaled_value = $scaled_value");
+
+        if ($scaled_value < $zero_column) {
+            # Negative Values
+            print " "x($scaled_value);    # Whitespace Padding
+            print_colored( $color, (' ' x ( int ($zero_column - $scaled_value) )));
+            print_colored( $color, '|' ); # Zero Marker
+        } else {
+            # Positive Values
+            print " "x($zero_column);     # Whitespace Padding
+            print_colored( $color, '|' ); # Zero Marker
+            print_colored( $color, (' ' x ( int ($scaled_value - $zero_column) )));
+        }
+
+        print " $value\n";
+        $row++;
+    }
+    print "\n";
+}
+
+sub usage {
+    my $usage = <<USAGE;
+usage:
+   echo '
+      hello,-5
+      world,-4
+      bob,-3
+      cat,-2
+      foo,-1
+      bar,0
+      qux,1
+      qix,5
+      baz,20
+' | $0
+
+   echo '
+      1  one
+      1  one
+      2  two
+      5  five
+      8  eight
+      13 thirteen
+      21 twenty one
+' | $0       
+
+   who | cut -d' ' -f1 | sort | uniq -c | sort -nr | $0
+USAGE
+
+    die $usage;
+}
+
+sub debug {
+    DEBUG and warn join('', @_, "\n");
+}

@@ -1,6 +1,6 @@
 # -*- perl -*-
 
-# t/006_daitchmokotoff.t - daitchmokotoff test 
+# t/006_daitchmokotoff.t - daitchmokotoff test
 
 use Test::Most tests=>27+1;
 use Test::NoWarnings;

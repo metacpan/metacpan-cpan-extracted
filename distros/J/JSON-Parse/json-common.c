@@ -1307,9 +1307,9 @@ json_token_new (json_parse_t * parser, unsigned char * start,
 	croak ("%s:%d: bad type %d\n", __FILE__, __LINE__, type);
     }
     Newx (new, 1, json_token_t);
-//    static int nnew;
-//    nnew++;
-//    fprintf (stderr, "New %d %p\n", nnew, new);
+    //    static int nnew;
+    //    nnew++;
+    //    fprintf (stderr, "New %d %p\n", nnew, new);
     parser->n_mallocs++;
 #if 0
     fprintf (stderr, "%s:%d: parser->n_mallocs = %d\n",

@@ -75,7 +75,7 @@
          "web" : "http://github.com/dod38fr/cme-perl"
       }
    },
-   "version" : "1.023",
-   "x_serialization_backend" : "JSON::XS version 3.03"
+   "version" : "1.024",
+   "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

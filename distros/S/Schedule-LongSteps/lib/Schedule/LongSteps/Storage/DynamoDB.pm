@@ -1,5 +1,5 @@
 package Schedule::LongSteps::Storage::DynamoDB;
-$Schedule::LongSteps::Storage::DynamoDB::VERSION = '0.020';
+$Schedule::LongSteps::Storage::DynamoDB::VERSION = '0.021';
 use Moose;
 extends qw/Schedule::LongSteps::Storage/;
 
@@ -379,7 +379,7 @@ sub destroy_table{
 __PACKAGE__->meta()->make_immutable();
 
 package Schedule::LongSteps::Storage::DynamoDB::Process;
-$Schedule::LongSteps::Storage::DynamoDB::Process::VERSION = '0.020';
+$Schedule::LongSteps::Storage::DynamoDB::Process::VERSION = '0.021';
 use Moose;
 
 use Compress::Zlib;

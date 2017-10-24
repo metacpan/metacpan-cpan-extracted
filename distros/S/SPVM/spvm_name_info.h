@@ -1,22 +1,15 @@
-#ifndef SPVM_NAME_INFO_H
-#define SPVM_NAME_INFO_H
+#ifndef SPVM_CALL_FIELD_H
+#define SPVM_CALL_FIELD_H
 
 #include "spvm_base.h"
 
-enum {
-  SPVM_NAME_INFO_C_CODE_VARBASENAME,
-  SPVM_NAME_INFO_C_CODE_BASENAME,
-  SPVM_NAME_INFO_C_CODE_ABSNAME,
-};
-
-struct SPVM_name_info {
-  SPVM_OP* op_var;
+struct SPVM_call_field {
+  SPVM_OP* op_term_invocant;
   SPVM_OP* op_name;
   const char* resolved_name;
-  int32_t code;
   int32_t id;
 };
 
-SPVM_NAME_INFO* SPVM_NAME_INFO_new(SPVM_COMPILER* compiler);
+SPVM_CALL_FIELD* SPVM_CALL_FIELD_new(SPVM_COMPILER* compiler);
 
 #endif

@@ -21,9 +21,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Devel::Hook" : "0",
-            "MOP" : "0",
-            "perl" : "v5.10.0"
+            "MOP" : "0.10",
+            "perl" : "v5.10.1"
          }
       },
       "test" : {
@@ -43,7 +42,7 @@
          "web" : "https://github.com/stevan/p5-roles"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0227"
 }
 

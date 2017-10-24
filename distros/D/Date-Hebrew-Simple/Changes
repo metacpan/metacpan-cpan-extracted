@@ -1,5 +1,8 @@
 Revision history for Date::Hebrew::Simple
 
+0.06  Sun Oct 22 12:25:00 2017
+      - Added test scripts (t/meta-json.t and t/meta-yml.t).
+
 0.05  Sun Oct 08 19:30:00 2017
       - Added key 'provides' to the Makefile.PL script.
 

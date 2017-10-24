@@ -14,11 +14,16 @@ IF (MSVC)
   LIST (APPEND _PCRE2_CMAKE_ARGS "${_PCRE2_CMAKE_OPTIONS} -DPCRE_STATIC_RUNTIME=1")
 ENDIF ()
 
+#
+# We force the install command with DESTDIR= in any case, so that it always remains local
+# even if user says "make install DESTDIR=/somewhere/else
+#
 EXTERNALPROJECT_ADD(pcre2
   URL "${PROJECT_SOURCE_DIR}/3rdparty/tar/pcre2-10.23-patched.tar.gz"
   UPDATE_COMMAND "${CMAKE_COMMAND}" -E copy "${PROJECT_SOURCE_DIR}/3rdparty/tar/pcre2-10.23/CMakeLists_fixed.txt" "${CMAKE_CURRENT_BINARY_DIR}/pcre2/src/pcre2/CMakeLists.txt"
   PREFIX "${CMAKE_CURRENT_BINARY_DIR}/pcre2"
   CMAKE_ARGS ${_PCRE2_CMAKE_ARGS}
+  INSTALL_COMMAND "${CMAKE_MAKE_PROGRAM}" install "DESTDIR="
   )
 SET (PCRE2_INCLUDE_DIR "${3RDPARTY_OUTPUT_PATH}/include")
 IF (WIN32 AND (CMAKE_BUILD_TYPE MATCHES Debug))

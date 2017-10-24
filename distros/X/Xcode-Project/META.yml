@@ -1,0 +1,31 @@
+---
+abstract: unknown
+author:
+  - 'John Tsai'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.143240'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Xcode-Project
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Cwd: 3.39_02
+  Data::Structure::Util: '0.16'
+  File::Basename: '2.84'
+  FileHandle: '2.02'
+  JSON: '2.94'
+  perl: '5.016000'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: https://github.com/JohnTsaii/pbxprojEditor.git
+version: '0.001001'

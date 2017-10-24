@@ -13,6 +13,8 @@ package Foo {
 
     has foo => ();
 
+    my sub foo : private;
+
     sub bar { 'Foo::bar' }
 
     sub baz ($self, $x) {

@@ -13,7 +13,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.17'
   perl: '5.008'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.142690'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.143240'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,7 +30,7 @@ no_index:
 provides:
   Parcel::Track::KR::CJKorea:
     file: lib/Parcel/Track/KR/CJKorea.pm
-    version: '0.004'
+    version: '0.005'
 requires:
   Encode: '0'
   File::Which: '0'
@@ -38,7 +38,6 @@ requires:
   HTML::TreeBuilder::XPath: '0'
   HTTP::Tiny: '0'
   IO::Socket::SSL: '0'
-  JSON::PP: '2.27300'
   Moo: '0'
   Mozilla::CA: '0'
   Parcel::Track: '0.001'
@@ -49,7 +48,8 @@ resources:
   bugtracker: https://github.com/keedi/Parcel-Track-KR-CJKorea/issues
   homepage: https://github.com/keedi/Parcel-Track-KR-CJKorea
   repository: https://github.com/keedi/Parcel-Track-KR-CJKorea.git
-version: '0.004'
+version: '0.005'
 x_authority: cpan:KEEDI
 x_contributors:
   - '홍형석 - Hyungsuk Hong <aanoaa@cpan.org>'
+x_serialization_backend: 'YAML::Tiny version 1.64'

@@ -4,7 +4,7 @@
       "John M. Gamble <jgamble@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Module::Build version 0.4214",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
@@ -35,7 +35,7 @@
    "provides" : {
       "Math::Polynomial::Solve" : {
          "file" : "lib/Math/Polynomial/Solve.pm",
-         "version" : "2.80"
+         "version" : "2.81"
       }
    },
    "release_status" : "stable",
@@ -47,7 +47,7 @@
          "url" : "git://github.com/jgamble/Math-Polynomial-Solve.git"
       }
    },
-   "version" : "2.80",
+   "version" : "2.81",
    "x_keyword" : [
       "math",
       "polynomial",

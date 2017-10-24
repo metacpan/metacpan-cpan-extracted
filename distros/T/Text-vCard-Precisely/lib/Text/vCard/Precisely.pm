@@ -1,7 +1,7 @@
 # ABSTRACT: turns baubles into trinkets
 package Text::vCard::Precisely;
 
-our $VERSION = '0.11';
+our $VERSION = '0.13';
 
 use Moose;
 use Moose::Util::TypeConstraints;
@@ -34,7 +34,7 @@ Text::vCard::Precisely - Read, Write and Edit the vCards 3.0 and/or 4.0 precisel
 
 =for html <a href="https://travis-ci.org/worthmine/Text-vCard-Precisely"><img src="https://travis-ci.org/worthmine/Text-vCard-Precisely.svg?branch=master"></a>
 
-=head2 SYNOPSIS
+=head1 SYNOPSIS
 
  my $vc = Text::vCard::Precisely->new();
  # or now you can write like below if you want to use 4.0:
@@ -97,7 +97,7 @@ Text::vCard::Precisely - Read, Write and Edit the vCards 3.0 and/or 4.0 precisel
 
  print $vc->as_string();
 
-=head2 DESCRIPTION
+=head1 DESCRIPTION
 
 A vCard is a digital business card. vCard and L<Text::vFile::asData|https://github.com/richardc/perl-text-vfile-asdata>
 provide an API for parsing vCards
@@ -130,9 +130,9 @@ L<Text::vFile::asData|https://github.com/richardc/perl-text-vfile-asdata> and th
 
 Note that the vCard RFC requires version() and full_name().  This module does not check or warn yet if these conditions have not been met
 
-=head2 Constructors
+=head1 Constructors
 
-=head3 load_hashref($HashRef)
+=head2 load_hashref($HashRef)
 
 Accepts an HashRef that looks like below:
 
@@ -170,58 +170,58 @@ Accepts an HashRef that looks like below:
     REV => '2008-04-24T19:52:43Z',
  };
 
-=head3 load_file($file_name)
+=head2 load_file($file_name)
 
 Accepts a file name
 
-=head3 load_string($vCard)
+=head2 load_string($vCard)
 
 Accepts a vCard string
 
-=head2 METHODS
+=head1 METHODS
 
-=head3 as_string()
+=head2 as_string()
 
 Returns the vCard as a string.
 You have to use Encode::encode_utf8() if your vCard is written in utf8
 
-=head3 as_file($filename)
+=head2 as_file($filename)
 
 Write data in vCard format to $filename.
 Dies if not successful
 
-=head2 SIMPLE GETTERS/SETTERS
+=head1 SIMPLE GETTERS/SETTERS
 
 These methods accept and return strings
 
-=head3 version()
+=head2 version()
 
 returns Version number of the vcard.
 Defaults to B<'3.0'> and this method is B<READONLY>
 
-=head3 rev()
+=head2 rev()
 
 To specify revision information about the current vCard
 
-=head3 sort_string()
+=head2 sort_string()
 
 To specify the family name, given name or organization text to be used for
 national-language-specific sorting of the FN, N and ORG.
 
 B<This method is DEPRECATED in vCard4.0> Use SORT-AS param instead of it.
 
-=head2 COMPLEX GETTERS/SETTERS
+=head1 COMPLEX GETTERS/SETTERS
 
 They are based on Moose with coercion.
 So these methods accept not only ArrayRef[HashRef] but also ArrayRef[Str], single HashRef
 or single Str.
 Read source if you were confused
 
-=head3 n()
+=head2 n()
 
 To specify the components of the name of the object the vCard represents
 
-=head3 tel()
+=head2 tel()
 
 Accepts/returns an ArrayRef that looks like:
 
@@ -230,7 +230,7 @@ Accepts/returns an ArrayRef that looks like:
     { type => ['home'], content => '651-290-1111' },
  ]
 
-=head3 adr(), address()
+=head2 adr(), address()
 
 Accepts/returns an ArrayRef that looks like:
 
@@ -248,7 +248,7 @@ Accepts/returns an ArrayRef that looks like:
     },
  ]
 
-=head3 email()
+=head2 email()
 
 Accepts/returns an ArrayRef that looks like:
 
@@ -261,7 +261,7 @@ or accept the string as email like below
 
  'bbanner@timewarner.com'
 
-=head3 url()
+=head2 url()
 
 Accepts/returns an ArrayRef that looks like:
 
@@ -274,7 +274,7 @@ or accept the string as URL like below
 
  'https://github.com/worthmine'
 
-=head3 photo(), logo()
+=head2 photo(), logo()
 
 Accepts/returns an ArrayRef of URLs or Images: Even if they are raw image binary
  or text encoded in Base64, it does not matter
@@ -283,72 +283,72 @@ B<Attention!> Mac OS X and iOS B<ignore> the description beeing URL
 
 use Base64 encoding or raw image binary if you have to show the image you want
 
-=head3 note()
+=head2 note()
 
 To specify supplemental information or a comment that is associated with the vCard
 
-=head3 org(), title(), role(), categories()
+=head2 org(), title(), role(), categories()
 
 To specify additional information for your jobs
 
-=head3 fn(), full_name(), fullname()
+=head2 fn(), full_name(), fullname()
 
 A person's entire name as they would like to see it displayed
 
-=head3 nickname()
+=head2 nickname()
 
 To specify the text corresponding to the nickname of the object the vCard represents
 
-=head3 lang()
+=head2 lang()
 
 To specify the language(s) that may be used for contacting the entity associated with the vCard.
 
 It's the B<new method from 4.0>
 
-=head3 impp(), xml()
+=head2 impp(), xml()
 
 I don't think they are so popular types, but here are the methods!
 
 They are the B<new method from 4.0>
 
-=head3 geo()
+=head2 geo()
 
 To specify information related to the global positioning of the object the vCard represents
 
-=head3 key()
+=head2 key()
 
 To specify a public key or authentication certificate associated with the object that the vCard represents
 
-=head3 label()
+=head2 label()
 
 ToDo: because B<It's DEPRECATED from 4.0>
 
 To specify the formatted text corresponding to delivery address of the object the vCard represents
 
-=head3 uid()
+=head2 uid()
 
 To specify a value that represents a globally unique identifier corresponding to the individual
 or resource associated with the vCard
 
-=head3 fburl(), caladruri(), caluri()
+=head2 fburl(), caladruri(), caluri()
 
 I don't think they are so popular types, but here are the methods!
 
 They are the B<new method from 4.0>
 
-=head3 kind()
+=head2 kind()
 
 To specify the kind of object the vCard represents
 
 It's the B<new method from 4.0>
 
-=head3 member(), clientpidmap()
+=head2 member(), clientpidmap()
 
 I don't think they are so popular types, but here are the methods!
 
 It's the B<new method from 4.0>
 
-=head3 tz(), timezone()
+=head2 tz(), timezone()
 
 Both are same method with Alias
 
@@ -360,46 +360,46 @@ TZ can be a URL, but there is no document in L<RFC2426|https://tools.ietf.org/ht
 or L<RFC6350|https://tools.ietf.org/html/rfc6350>
 So it just supports some text values
 
-=head3 bday(), birthday()
+=head2 bday(), birthday()
 
 Both are same method with Alias
 
 To specify the birth date of the object the vCard represents
 
-=head3 anniversary()
+=head2 anniversary()
 
 The date of marriage, or equivalent, of the object the vCard represents
 
 It's the B<new method from 4.0>
 
-=head3 gender()
+=head2 gender()
 
 To specify the components of the sex and gender identity of the object the vCard represents
 
 It's the B<new method from 4.0>
 
-=head3 prodid()
+=head2 prodid()
 
 To specify the identifier for the product that created the vCard object
 
-=head3 source()
+=head2 source()
 
 To identify the source of directory information contained in the content type
 
-=head3 sound()
+=head2 sound()
 
 To specify a digital sound content information that annotates some aspect of the vCard
 
 This property is often used to specify the proper pronunciation of the name property value
  of the vCard
 
-=head3 socialprofile()
+=head2 socialprofile()
 
 There is no documents about X-SOCIALPROFILE in RFC but it works in iOS and Mac OS X!
 
 I don't know well about in Android or Windows. Somebody please feedback me
 
-=head3 label()
+=head2 label()
 
 B<It's DEPRECATED from 4.0> You can use this method Just ONLY in vCard3.0
 
@@ -415,7 +415,7 @@ This module uses C<\P{ascii}> in regexp so You have to use 5.12.5 and later
 
 And this module uses Data::Validate::URI and it has bug on 5.8.x. so I can't support them
 
-=head2 SEE ALOSO
+=head1 SEE ALSO
 
 =over
 
@@ -445,6 +445,10 @@ L<GitHub|https://github.com/worthmine/Text-vCard-Precisely>
 
 =back
 
-=head2 AUTHOR
+=head1 AUTHOR
 
 L<Yuki Yoshida(worthmine)|https://github.com/worthmine>
+
+=head1 LICENSE
+
+This is free software; you can redistribute it and/or modify it under the same terms as Perl.

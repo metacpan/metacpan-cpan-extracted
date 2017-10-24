@@ -1,0 +1,53 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Test::More' => '0.96',
+                                      'Test::Vars' => '0'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Carp' => '0',
+                                      'Class::XSAccessor' => '1.02',
+                                      'File::Basename' => '0',
+                                      'File::Spec' => '0',
+                                      'PPI' => '1.203',
+                                      'PPI::Find' => '0',
+                                      'Try::Tiny' => '0',
+                                      'base' => '0',
+                                      'perl' => '5.008',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'Class::Accessor' => '0',
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'File::Temp' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'Method::Signatures' => '0',
+                                   'Moose' => '0',
+                                   'MooseX::Declare' => '0',
+                                   'Test::Differences' => '0',
+                                   'Test::Exception' => '0',
+                                   'Test::More' => '0',
+                                   'Test::Most' => '0',
+                                   'autodie' => '0',
+                                   'lib' => '0',
+                                   'version' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

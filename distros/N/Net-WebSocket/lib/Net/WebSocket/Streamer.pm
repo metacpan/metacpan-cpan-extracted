@@ -4,13 +4,14 @@ package Net::WebSocket::Streamer;
 
 =head1 NAME
 
-Net::WebSocket::Streamer - Send a stream easily over WebSocket
+Net::WebSocket::Streamer - Stream a WebSocket message easily
 
 =head1 SYNOPSIS
 
 Here’s the gist of it:
 
-    my $streamer = Net::WebSocket::Streamer->new('binary');
+    #Use the ::Client or ::Server subclass as needed.
+    my $streamer = Net::WebSocket::Streamer::Client->new('binary');
 
     my $frame = $streamer->create_chunk($buf);
 
@@ -37,6 +38,11 @@ of arbitrary size in 64-KiB chunks:
 You can, of course, create/send an empty final frame for cases where you’re
 not sure how much data will actually be sent.
 
+Note that the receiving application won’t necessarily have access to the
+individual message fragments (i.e., frames) that you send. Web browsers,
+for example, only expose messages, not frames. You may thus be better off
+sending full messages rather than frames.
+
 =head1 EXTENSION SUPPORT
 
 To stream custom frame types (or overridden classes), you can subclass
@@ -49,6 +55,7 @@ use strict;
 use warnings;
 
 use Net::WebSocket::Frame::continuation ();
+use Net::WebSocket::X ();
 
 use constant {
 
@@ -64,24 +71,22 @@ sub new {
 
     my $frame_class = $class->_load_frame_class($type);
 
-    #Store the frame class as the value of $$self.
-
-    return bless \$frame_class, $class;
+    return bless { class => $frame_class, pid => $$ }, $class;
 }
 
 sub create_chunk {
     my $self = shift;
 
-    my $frame = $$self->new(
+    my $frame = $self->{'class'}->new(
         fin => 0,
         $self->FRAME_MASK_ARGS(),
         payload_sr => \$_[0],
     );
 
-    #The first $frame we create needs to be text/binary, but all
-    #subsequent ones must be continuation.
-    if ($$self ne 'Net::WebSocket::Frame::continuation') {
-        $$self = 'Net::WebSocket::Frame::continuation';
+    #The first $frame we create needs to be typed (e.g., text or binary),
+    #but all subsequent ones must be continuation.
+    if ($self->{'class'} ne 'Net::WebSocket::Frame::continuation') {
+        $self->{'class'} = 'Net::WebSocket::Frame::continuation';
     }
 
     return $frame;
@@ -90,38 +95,38 @@ sub create_chunk {
 sub create_final {
     my $self = shift;
 
-    my $frame = $$self->new(
-        fin => 1,
+    my $frame = $self->{'class'}->new(
         $self->FRAME_MASK_ARGS(),
+        fin => 1,
         payload_sr => \$_[0],
     );
 
-    substr( $$self, 0 ) = FINISHED_INDICATOR();
+    $self->{'finished'} = 1;
 
     return $frame;
 }
 
 sub _load_frame_class {
-    my ($self, $type) = @_;
+    my ($class, $type) = @_;
 
-    my $class = $self->can("frame_class_$type");
-    if (!$class) {
+    my $frame_class = $class->can("frame_class_$type");
+    if (!$frame_class) {
         die "Unknown frame type: “$type”!";
     }
 
-    $class = $class->();
-    if (!$class->can('new')) {
-        Module::Load::load($class);
+    $frame_class = $frame_class->();
+    if (!$frame_class->can('new')) {
+        Module::Load::load($frame_class);
     }
 
-    return $class;
+    return $frame_class;
 }
 
 sub DESTROY {
     my ($self) = @_;
 
-    if (!$$self eq FINISHED_INDICATOR()) {
-        die sprintf("$self DESTROYed without having sent a final fragment!");
+    if (($self->{'pid'} == $$) && !$self->{'finished'}) {
+        die Net::WebSocket::X->create('UnfinishedStream', $self);
     }
 
     return;

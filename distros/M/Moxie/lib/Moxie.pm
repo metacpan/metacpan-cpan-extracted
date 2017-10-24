@@ -10,19 +10,17 @@ use experimental qw[
 
 use experimental    (); # need this later when we load features
 use Module::Runtime (); # load things so they DWIM
-use Devel::Hook     (); # multiphase programming
 use BEGIN::Lift     (); # fake some keywords
 use Method::Traits  (); # for accessor/method generators
-use Sub::Inject     (); # to inject lexical sub definitions
 
 use MOP;
-use MOP::Internal::Util;
+use MOP::Util;
 
 use Moxie::Object;
 use Moxie::Object::Immutable;
 use Moxie::Traits::Provider;
 
-our $VERSION   = '0.04';
+our $VERSION   = '0.05';
 our $AUTHORITY = 'cpan:STEVAN';
 
 sub import ($class, %opts) {
@@ -90,28 +88,8 @@ sub import_into ($class, $caller, $opts) {
                 && ref $args[0] eq 'CODE';
 
             my $initializer = MOP::Slot::Initializer->new(
-                meta => $meta,
-                name => $name,
+                within_package => $meta->name,
                 @args
-            );
-
-            # XXX:
-            # The DB::args stuff below is fragile because it
-            # is susceptible to alteration of @_ in the
-            # method that calls these accessors. Perhaps this
-            # can be fixed with XS, but for now we are going
-            # to assume people aren't doing this since they
-            # *should* be using the signatures that we enable
-            # for them.
-            # - SL
-
-            Sub::Inject::sub_inject(
-                $name, sub : lvalue prototype() {
-                    package DB; @DB::args = ();
-                    my () = caller(1);
-                    my ($self) = @DB::args;
-                    $self->{$name};
-                }
             );
 
             $meta->add_slot( $name, $initializer );
@@ -154,28 +132,13 @@ sub import_into ($class, $caller, $opts) {
     Method::Traits->import_into( $meta, @traits );
 
     # install our class finalizer
-    Devel::Hook->push_UNITCHECK_hook(sub {
+    MOP::Util::defer_until_UNITCHECK(sub {
 
-        # pre-populate the cache for all the slots
-        if ( $meta->isa('MOP::Class') ) {
-            foreach my $super ( map { MOP::Role->new( name => $_ ) } $meta->mro->@* ) {
-                foreach my $slot ( $super->slots ) {
-                    $meta->alias_slot( $slot->name, $slot->initializer )
-                        unless $meta->has_slot( $slot->name )
-                            || $meta->has_slot_alias( $slot->name );
-                }
-            }
-        }
+        # pre-populate the cache for all the slots (if it is a class)
+        MOP::Util::inherit_slots( $meta );
 
         # apply roles ...
-        if ( my @does = $meta->roles ) {
-            #warn sprintf "Applying roles(%s) to class/role(%s)" => (join ', ' => @does), $meta->name;
-            MOP::Internal::Util::APPLY_ROLES(
-                $meta,
-                \@does,
-                to => ($meta->isa('MOP::Class') ? 'class' : 'role')
-            );
-        }
+        MOP::Util::compose_roles( $meta );
 
         # TODO:
         # Consider locking the %HAS hash now, this will
@@ -198,7 +161,7 @@ Moxie - Not Another Moose Clone
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -210,7 +173,7 @@ version 0.04
         has _x => ( default => sub { 0 } );
         has _y => ( default => sub { 0 } );
 
-        sub new : BUILDARGS(
+        sub BUILDARGS : init_args(
             x? => _x,
             y? => _y,
         );
@@ -228,7 +191,7 @@ version 0.04
 
         has _z => ( default => sub { 0 } );
 
-        sub new : BUILDARGS(
+        sub BUILDARGS : init_args(
             x? => super(x),
             y? => super(y),
             z? => _z
@@ -491,6 +454,35 @@ No attempt will be made to verify that the value stored in
 C<$slot_name> is an object, or that it responds to the
 C<$delegate_method> specified, this is the responsibility of
 the writer of the class.
+
+=item C<private( ?$slot_name )>
+
+This will generate a private read-write accessor for a slot. The
+C<$slot_name> can optionally be specified, otherwise it will use the
+name of the method that the trait is being applied to.
+
+    my sub foo : private;
+    my sub foo : private(_foo);
+
+The privacy is accomplished via the use of a lexical method, this means
+that the method is not availble outside of the package scope and is
+not available to participate in method dispatch, however it does
+know the current invocant, so there is no need to pass that in. This
+results in code that looks like this:
+
+    sub my_method ($self, @stuff) {
+        # simple access ...
+        my $foo = foo;
+
+        # passing to other methods ...
+        $self->do_something_with_foo( foo );
+
+        # calling methods on an embedded object ...
+        foo->call_method_on_foo();
+    }
+
+This feature is considered experimental, but then again, so is this
+whole module, so I guess you can safely ignore that then.
 
 =back
 

@@ -31,6 +31,8 @@ package Foo {
 
     has _bar => (default => sub { +{ baz => $::BAZ } });
 
+    my sub _bar : private;
+
     sub bar { _bar }
 }
 
@@ -53,6 +55,8 @@ package Bar {
     extends 'Moxie::Object';
 
     has _bar => (default => sub { +{ baz => $::BAZ } });
+
+    my sub _bar : private;
 
     sub bar { _bar }
 }

@@ -2,7 +2,6 @@
 
 use Test::More;
 
-use Schedule::LongSteps::Storage::DynamoDB;
 use DateTime;
 use Class::Load;
 
@@ -17,6 +16,7 @@ my @paws_class = ( 'Paws',
                    'JSON',
                    'MIME::Base64',
                    'Compress::Zlib',
+                   'Schedule::LongSteps::Storage::DynamoDB'
                );
 
 join( '', map{ Class::Load::try_load_class( $_ ) ? 'yes' : '' } @paws_class ) eq join('', map{ 'yes' } @paws_class )

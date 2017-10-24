@@ -1,5 +1,8 @@
 Revision history for Calendar::Hebrew
 
+0.05  Sat Oct 21 08:00:00 2017
+      - Added test scripts (t/meta-json.t and t/meta-yml.t).
+
 0.04  Sat Oct 07 10:25:00 2017
       - Added key 'provides' to the Makefile.PL script.
 

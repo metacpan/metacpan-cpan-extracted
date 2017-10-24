@@ -1,5 +1,11 @@
 Revision history for Perl extension Digest::SHA3.
 
+1.01  Sun Oct 22 16:04:22 MST 2017
+	- added optional $lsb argument for add_bits() method
+		-- many public vectors in least-significant-bit format
+			-- using $lsb flag results in simpler test code
+	- further minor optimizations in add_bits() and tests
+
 1.00  Sat Oct 14 18:08:10 MST 2017
 	- promoted to major release version 1.0
 		-- module stable enough not to be considered draft

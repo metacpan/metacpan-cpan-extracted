@@ -6,8 +6,8 @@ META.json
 META.yml
 README
 lib/Time/OlsonTZ/Download.pm
+t/latest.at
 t/pod_cvg.t
 t/pod_syn.t
 t/use.t
-xt/latest.t
 SIGNATURE    Added here by Module::Build

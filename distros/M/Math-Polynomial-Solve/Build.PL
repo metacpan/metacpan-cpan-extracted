@@ -8,7 +8,7 @@ my $build = Module::Build->new(
 
 	dist_abstract => 'Find the roots of polynomial equations',
 	dist_author => ['John M. Gamble <jgamble@cpan.org>'],
-	dist_version => '2.80',
+	dist_version => '2.81',
 	dist_name => 'Math-Polynomial-Solve',
 
 	provides => {

@@ -3,6 +3,7 @@ package Geo::Coder::List;
 use warnings;
 use strict;
 use Carp;
+use Time::HiRes;
 
 =head1 NAME
 
@@ -10,11 +11,11 @@ Geo::Coder::List - Call many geocoders
 
 =head1 VERSION
 
-Version 0.14
+Version 0.15
 
 =cut
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 our %locations;
 
 =head1 SYNOPSIS
@@ -38,7 +39,7 @@ sub new {
 	# my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
 	# return bless { %args, geocoders => [] }, $class;
-	return bless { geocoders => [] }, $class;
+	return bless { }, $class;
 }
 
 =head2 push
@@ -118,6 +119,12 @@ sub geocode {
 			foreach (@rc) {
 				delete $_->{'geocoder'};
 			}
+			my $log = {
+				location => $location,
+				timetaken => 0,
+				result => \@rc
+			};
+			CORE::push @{$self->{'log'}}, $log;
 			return (wantarray) ? @rc : $rc[0];
 		}
 	}
@@ -135,51 +142,75 @@ sub geocode {
 			}
 		}
 		my @rc;
+		my $timetaken = Time::HiRes::time();
 		eval {
 			# e.g. over QUERY LIMIT with this one
 			# TODO: remove from the list of geocoders
 			@rc = $geocoder->geocode(%params);
 		};
+		$timetaken = Time::HiRes::time() - $timetaken;
 		if($@) {
+			my $log = {
+				location => $location,
+				geocoder => ref($geocoder),
+				timetaken => $timetaken,
+				error => $@
+			};
+			CORE::push @{$self->{'log'}}, $log;
 			Carp::carp(ref($geocoder) . " '$location': $@");
 			$error = $@;
 			next;
 		}
-		foreach my $location(@rc) {
-			if($location->{'error'}) {
+		foreach my $l(@rc) {
+			next if(ref($l) ne 'HASH');
+			if($l->{'error'}) {
+				my $log = {
+					location => $location,
+					timetaken => $timetaken,
+					geocoder => ref($geocoder),
+					error => $l->{'error'}
+				};
+				CORE::push @{$self->{'log'}}, $log;
 				@rc = ();
 			} else {
 				# Try to create a common interface, helps with HTML::GoogleMaps::V3
-				if(!defined($location->{geometry}{location}{lat})) {
-					if($location->{lat}) {
+				if(!defined($l->{geometry}{location}{lat})) {
+					if($l->{lat}) {
 						# OSM
-						$location->{geometry}{location}{lat} = $location->{lat};
-						$location->{geometry}{location}{lng} = $location->{lon};
-					} elsif($location->{BestLocation}) {
+						$l->{geometry}{location}{lat} = $l->{lat};
+						$l->{geometry}{location}{lng} = $l->{lon};
+					} elsif($l->{BestLocation}) {
 						# Bing
-						$location->{geometry}{location}{lat} = $location->{BestLocation}->{Coordinates}->{Latitude};
-						$location->{geometry}{location}{lng} = $location->{BestLocation}->{Coordinates}->{Longitude};
-					} elsif($location->{point}) {
+						$l->{geometry}{location}{lat} = $l->{BestLocation}->{Coordinates}->{Latitude};
+						$l->{geometry}{location}{lng} = $l->{BestLocation}->{Coordinates}->{Longitude};
+					} elsif($l->{point}) {
 						# Bing
-						$location->{geometry}{location}{lat} = $location->{point}->{coordinates}[0];
-						$location->{geometry}{location}{lng} = $location->{point}->{coordinates}[1];
-					} elsif($location->{latt}) {
+						$l->{geometry}{location}{lat} = $l->{point}->{coordinates}[0];
+						$l->{geometry}{location}{lng} = $l->{point}->{coordinates}[1];
+					} elsif($l->{latt}) {
 						# geocoder.ca
-						$location->{geometry}{location}{lat} = $location->{latt};
-						$location->{geometry}{location}{lng} = $location->{longt};
-					} elsif($location->{latitude}) {
+						$l->{geometry}{location}{lat} = $l->{latt};
+						$l->{geometry}{location}{lng} = $l->{longt};
+					} elsif($l->{latitude}) {
 						# postcodes.io
-						$location->{geometry}{location}{lat} = $location->{latitude};
-						$location->{geometry}{location}{lng} = $location->{longitude};
+						$l->{geometry}{location}{lat} = $l->{latitude};
+						$l->{geometry}{location}{lng} = $l->{longitude};
 					}
 
-					if($location->{'standard'}{'countryname'}) {
+					if($l->{'standard'}{'countryname'}) {
 						# geocoder.xyz
-						$location->{'address'}{'country'} = $location->{'standard'}{'countryname'};
+						$l->{'address'}{'country'} = $l->{'standard'}{'countryname'};
 					}
 				}
-				if(defined($location->{geometry}{location}{lat})) {
-					$location->{geocoder} = $geocoder;
+				if(defined($l->{geometry}{location}{lat})) {
+					$l->{geocoder} = $geocoder;
+					my $log = {
+						location => $location,
+						timetaken => $timetaken,
+						geocoder => ref($geocoder),
+						result => $l
+					};
+					CORE::push @{$self->{'log'}}, $log;
 					last;
 				}
 			}
@@ -229,6 +260,32 @@ sub ua {
 			$geocoder->ua($ua);
 		}
 	}
+}
+
+=head2 log
+
+Returns the log of events to help you debug failures, optimize lookup order and fix quota breakage
+
+    my @log = @{$geocoderlist->log()};
+
+=cut
+
+sub log {
+	my $self = shift;
+
+	return $self->{'log'};
+}
+
+=head2 flush
+
+Clear the log.
+
+=cut
+
+sub flush {
+	my $self = shift;
+
+	delete $self->{'log'};
 }
 
 =head1 AUTHOR

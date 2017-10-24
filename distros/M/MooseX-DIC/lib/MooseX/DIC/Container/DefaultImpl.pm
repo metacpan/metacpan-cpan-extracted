@@ -28,45 +28,11 @@ sub build_class {
   my ($self,$package_name) = @_;
 
   $self->logger->debug("I'm going to build an instance of $package_name");
-  try {
-    load $package_name;
-  } catch {
-    $self->logger->debug("The instance could not be built for $package_name".
-      " because the package could not be found: $_");
-    PackageNotFoundException->throw(package_name=>$package_name);
-  };
-
-  ContainerException->throw(message => "The package $package_name is not a valid Moose class,"
-    ." it cannot be instantiated") unless $package_name->can('meta');
-
-  my %dependencies = ();
-  foreach my $attribute ($package_name->meta->get_all_attributes){
-    # We can only inject an attribute that defines a constraint
-    if($attribute->type_constraint){
-      my $service_type = $attribute->type_constraint->name;
-      my $service = $self->get_service($service_type);
-
-      unless($service) {
-        $self->logger->error("Could not find service $service_type for mandatory attribute "
-          .$attribute->name
-          ." while building class $package_name");
-        UnregisteredServiceException->throw(service=>$service_type) if($attribute->is_required);
-      }
-      $dependencies{$attribute->name} = $service;
-    } else {
-      if($attribute->is_required) {
-        my $error = "Could not inject the required attribute "
-          .$attribute->name
-          ." of the class $package_name because it has no type constraint";
-        $self->logger->error($error);
-
-        ContainerException->throw(message => $error);
-      }
-    }
-  }
   
+  my $dependencies = $self->get_package_dependencies($package_name);
+
   my $instance = 
-    try {  $package_name->new(%dependencies) }
+    try {  $package_name->new(%$dependencies) }
     catch {
       my $error = "Could not create an instance for package $package_name via "
         ."Moose constructor: $_";
@@ -74,7 +40,7 @@ sub build_class {
       ContainerException->throw(message => $error);
     };
   
-  return $package_name->new(%dependencies);
+  return $instance;
 }
 
 sub get_service {
@@ -114,6 +80,53 @@ sub get_service_metadata {
   my ($self,$interface_name,$environment) = @_;
 
   return $self->registry->get_service_definition($interface_name,$environment);
+}
+
+sub get_package_dependencies {
+  my ($self,$package_name) = @_;
+
+  $self->logger->debug("Fetching dependencies for $package_name");
+
+  try {
+    load $package_name;
+  } catch {
+    $self->logger->debug("The package $package_name could not be loaded $_");
+    PackageNotFoundException->throw(package_name=>$package_name);
+  };
+
+  ContainerException->throw(message => "The package $package_name is not a valid Moose class,"
+    ." it's dependencies cannot be injected") unless $package_name->can('meta');
+
+  my %dependencies = ();
+
+  foreach my $attribute ($package_name->meta->get_all_attributes){
+    # We can only inject an attribute that defines a constraint
+    if($attribute->type_constraint){
+      my $service_type = $attribute->type_constraint->name;
+      my $service = $self->get_service($service_type);
+
+      unless($service) {
+        $self->logger->error("Could not find service $service_type for mandatory attribute "
+          .$attribute->name
+          ." while building class $package_name");
+        UnregisteredServiceException->throw(service=>$service_type) if($attribute->is_required);
+      }
+      $dependencies{$attribute->name} = $service;
+    } else {
+      if($attribute->is_required) {
+        my $error = "Could not inject the required attribute "
+          .$attribute->name
+          ." of the class $package_name because it has no type constraint";
+        $self->logger->error($error);
+
+        ContainerException->throw(message => $error);
+      }
+    }
+  }
+
+  $self->logger->debug("Dependencies for $package_name fetched");
+
+  return \%dependencies;
 }
 
 sub _get_service_factory {

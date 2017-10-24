@@ -1,5 +1,6 @@
 #!perl
 
+use 5.006;
 use strict;
 use warnings;
 
@@ -32,7 +33,7 @@ $http_tiny->mock( 'get', Local::HTTP::Tiny::Mock::get_200() );
                     'AutoPrereqs::Perl::Critic',
                 ),
             },
-        }
+        },
     );
 
     is( exception { $tzil->build; }, undef, 'Built dist successfully' );
@@ -59,11 +60,11 @@ $http_tiny->mock( 'get', Local::HTTP::Tiny::Mock::get_200() );
                         'AutoPrereqs::Perl::Critic',
                         {
                             phase => 'test',
-                        }
+                        },
                     ],
                 ),
             },
-        }
+        },
     );
 
     is( exception { $tzil->build; }, undef, 'Built dist successfully' );
@@ -92,11 +93,11 @@ $http_tiny->mock( 'get', Local::HTTP::Tiny::Mock::get_200() );
                         {
                             phase => 'test',
                             type  => 'recommends',
-                        }
+                        },
                     ],
                 ),
             },
-        }
+        },
     );
 
     is( exception { $tzil->build; }, undef, 'Built dist successfully' );
@@ -126,11 +127,11 @@ $http_tiny->mock( 'get', Local::HTTP::Tiny::Mock::get_200() );
                             critic_config => 'perl_critic_config.txt',
                             phase         => 'test',
                             type          => 'recommends',
-                        }
+                        },
                     ],
                 ),
             },
-        }
+        },
     );
 
     is( exception { $tzil->build; }, undef, 'Built dist successfully' );
@@ -160,11 +161,11 @@ $http_tiny->mock( 'get', Local::HTTP::Tiny::Mock::get_200() );
                             critic_config => 'perl_critic_config.txt',
                             phase         => 'test',
                             type          => 'recommends',
-                        }
+                        },
                     ],
                 ),
             },
-        }
+        },
     );
 
     is( exception { $tzil->build; }, undef, 'Built dist successfully' );
@@ -195,11 +196,11 @@ $http_tiny->mock( 'get', Local::HTTP::Tiny::Mock::get_200() );
                             phase                => 'test',
                             type                 => 'recommends',
                             remove_core_policies => 0,
-                        }
+                        },
                     ],
                 ),
             },
-        }
+        },
     );
 
     is( exception { $tzil->build; }, undef, 'Built dist successfully' );
@@ -234,16 +235,14 @@ $http_tiny->mock( 'get', Local::HTTP::Tiny::Mock::get_404() );
                             critic_config => 'perl_critic_config.txt',
                             phase         => 'test',
                             type          => 'recommends',
-                        }
+                        },
                     ],
                 ),
             },
-        }
+        },
     );
 
-    my $msg = quotemeta q{[AutoPrereqs::Perl::Critic] Unable to download latest package information for Perl::Critic. Please ensure that your system can access 'http://cpanmetadb.plackperl.org/v1.0/package/Perl::Critic' or disable 'remove_core_policies' in your dist.ini};
-
-    like( exception { $tzil->build; }, qr{$msg}xsm, 'throws an exception if http://cpanmetadb.plackperl.org/v1.0/package/Perl::Critic cannot be downloaded' );
+    like( exception { $tzil->build; }, "/ \Q[AutoPrereqs::Perl::Critic] Unable to download latest package information for Perl::Critic. Please ensure that your system can access 'http://cpanmetadb.plackperl.org/v1.0/package/Perl::Critic' or disable 'remove_core_policies' in your dist.ini\E /xsm", 'throws an exception if http://cpanmetadb.plackperl.org/v1.0/package/Perl::Critic cannot be downloaded' );
 }
 
 done_testing();

@@ -26,5 +26,5 @@ requires:
 resources:
   bugtracker: http://github.com/Test-More/Test2-Suite/issues
   repository: http://github.com/Test-More/Test2-Suite/
-version: '0.000080'
+version: '0.000082'
 x_serialization_backend: 'YAML::Tiny version 1.70'

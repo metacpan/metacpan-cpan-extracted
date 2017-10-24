@@ -17,11 +17,11 @@ Geo::Coder::Postcodes - Provides a geocoding functionality using https://postcod
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 SYNOPSIS
 
@@ -88,7 +88,7 @@ sub geocode {
 
 	my $county;
 	if($location =~ /,/) {
-		if($location =~ /^(\w+)?,(.+),.+?$/) {
+		if($location =~ /^([\w\s]+?),([\w\s]+?),[\w\s]+?$/) {
 			# Turn 'Ramsgate, Kent, UK' into 'Ramsgate'
 			$location = $1;
 			$county = $2;
@@ -96,18 +96,20 @@ sub geocode {
 			$county =~ s/\s$//g;
 		} else {
 			Carp::croak('Postcodes.io only supports towns, not full addresses');
+			return;
 		}
 	}
+	$location =~ s/\s/+/g;
 
-	if (Encode::is_utf8($location)) {
+	if(Encode::is_utf8($location)) {
 		$location = Encode::encode_utf8($location);
 	}
 
 	my $uri = URI->new("https://$self->{host}/places/");
-	$location =~ s/\s/+/g;
 	my %query_parameters = ('q' => $location);
 	$uri->query_form(%query_parameters);
-	my $url = $uri->as_string;
+	my $url = $uri->as_string();
+	$url =~ s/%2B/+/g;
 
 	my $res = $self->{ua}->get($url);
 
@@ -116,7 +118,7 @@ sub geocode {
 		return;
 	}
 
-	my $json = JSON->new->utf8;
+	my $json = JSON->new()->utf8();
 
 	# TODO: wantarray
 	my $rc = $json->decode($res->content);

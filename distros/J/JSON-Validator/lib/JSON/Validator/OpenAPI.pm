@@ -14,29 +14,18 @@ has _json_validator => sub { state $v = JSON::Validator->new; };
 
 sub load_and_validate_schema {
   my ($self, $spec, $args) = @_;
-  my $openapi = $self->new(%$self)->schema($args->{schema} || SPECIFICATION_URL);
-  my ($api_spec, @errors);
 
-  # 1. first check if $ref is in the right place,
-  # 2. then check if the spec is correct
-  for my $r (sub { }, undef) {
-    next if $r and $args->{allow_invalid_ref};
-    my $jv = $self->new(%$self);
-    $jv->resolver($r) if $r;
-    $api_spec = $jv->schema($spec)->schema;
-    @errors   = $openapi->coerce($jv->coerce)->validate($api_spec->data);
-    Carp::confess(join "\n", "Invalid schema:", @errors) if @errors;
-  }
+  $spec = $self->_explode($self->_reset->_resolve($spec)) if $args->{allow_invalid_ref};
+  local $args->{schema} = $args->{schema} || SPECIFICATION_URL;
+  $self->SUPER::load_and_validate_schema($spec, $args);
 
   if (my $class = $args->{version_from_class}) {
     if (UNIVERSAL::can($class, 'VERSION') and $class->VERSION) {
-      $api_spec->data->{info}{version} = $class->VERSION;
+      $self->schema->data->{info}{version} = $class->VERSION;
     }
   }
 
-  warn "[OpenAPI] Loaded $spec\n" if DEBUG;
-  $self->{schema} = $api_spec;
-  $self;
+  return $self;
 }
 
 # deprecated
@@ -66,9 +55,10 @@ sub validate_request {
       $exists = $value ? 1 : 0;
     }
     else {
+      my $key = $in eq 'header' ? lc $name : $name;
       $value  = $self->_get_request_data($c, $in);
-      $exists = exists $value->{$name};
-      $value  = $value->{$name};
+      $exists = exists $value->{$key};
+      $value  = $value->{$key};
     }
 
     if (defined $value and ref $p->{items} eq 'HASH' and $p->{collectionFormat}) {
@@ -83,7 +73,12 @@ sub validate_request {
         $value += 0;
       }
       elsif ($type eq 'boolean') {
-        $value = (!$value or $value eq 'false') ? Mojo::JSON->false : Mojo::JSON->true;
+        if (!$value or $value =~ /^(?:false)$/) {
+          $value = Mojo::JSON->false;
+        }
+        elsif ($value =~ /^(?:1|true)$/) {
+          $value = Mojo::JSON->true;
+        }
       }
     }
 
@@ -148,6 +143,12 @@ sub validate_response {
       }
     );
   }
+}
+
+sub _register_ref {
+  my ($self, $topic, $schema_url) = @_;
+  $topic->{'$ref'} = "#/definitions/$topic->{'$ref'}" if $topic->{'$ref'} =~ /^\w+$/;
+  return $self->SUPER::_register_ref($topic, $schema_url);
 }
 
 sub _validate_request_value {

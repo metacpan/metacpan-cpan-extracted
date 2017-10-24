@@ -69,6 +69,7 @@ t/20-optree.t
 t/21-trace-anon-sub.t
 t/21-trace-fib.t
 t/21-trace-statements.t
+t/22-sub-name-bug.t
 t/lib/Devel/Chitin/NullDB.pm
 t/lib/Devel/Chitin/TestModule.pm
 t/lib/Devel/Chitin/TestRunner.pm

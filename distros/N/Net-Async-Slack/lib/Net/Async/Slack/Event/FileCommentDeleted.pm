@@ -3,7 +3,7 @@ package Net::Async::Slack::Event::FileCommentDeleted;
 use strict;
 use warnings;
 
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use Net::Async::Slack::EventType;
 

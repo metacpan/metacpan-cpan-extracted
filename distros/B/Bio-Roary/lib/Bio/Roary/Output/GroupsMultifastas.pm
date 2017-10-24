@@ -1,5 +1,5 @@
 package Bio::Roary::Output::GroupsMultifastas;
-$Bio::Roary::Output::GroupsMultifastas::VERSION = '3.10.2';
+$Bio::Roary::Output::GroupsMultifastas::VERSION = '3.11.0';
 # ABSTRACT:  Take in a list of groups and create multifastas files for each group
 
 
@@ -44,7 +44,7 @@ Bio::Roary::Output::GroupsMultifastas - Take in a list of groups and create mult
 
 =head1 VERSION
 
-version 3.10.2
+version 3.11.0
 
 =head1 SYNOPSIS
 

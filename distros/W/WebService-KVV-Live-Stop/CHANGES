@@ -1,9 +1,19 @@
 ==================================================
-Changes from 2016-01-16 00:00:00 +0000 to present.
+Changes from 2016-10-23 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.003 at 2017-01-15 23:29:29 +0000
+version 0.004 at 2017-10-23 20:49:35 +0000
+------------------------------------------
+
+  Change: 0b8f7ee48937b683e6b59d5312237475d5065b02
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-10-23 22:48:18 +0000
+
+    Depend on most recent Net::HTTP::Spore 0.07 
+
+------------------------------------------
+version 0.003 at 2017-01-15 23:27:00 +0000
 ------------------------------------------
 
   Change: a77defaf8c96650ef15cf0fa17a4a48f435ca46e
@@ -15,38 +25,6 @@ version 0.003 at 2017-01-15 23:29:29 +0000
     http is not supported anymore. the 301 redirect made the module
     unusable. This is now fixed. 
 
-------------------------------------------
-version 0.002 at 2016-10-15 18:11:33 +0000
-------------------------------------------
-
-  Change: e71db356252131e32170b8f7ef812920c5848cef
-  Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2016-10-15 20:11:33 +0000
-
-    Now patching Net::HTTP::Spore at runtime to workaround colons bug
-
-    Net::HTTP:Spore doesn't like colons in URLs. This behavior is now
-    overriden. 
-
-------------------------------------------
-version 0.001 at 2016-10-15 18:06:23 +0000
-------------------------------------------
-
-  Change: 84958bfbd0c7a18277af7543f0013918de64ba9b
-  Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2016-10-15 20:06:23 +0000
-
-    Now patching Net::HTTP::Spore at runtime to workaround colons bug
-
-    Net::HTTP:Spore doesn't like colons in URLs. This behavior is now
-    overriden. 
-
-  Change: ec01ec2da8ee66f9b8904e2b382eb1023b7ae914
-  Author: Ahmad Fatoum <ahmad@a3f.at>
-  Date : 2016-10-11 20:17:54 +0000
-
-    Initial commit 
-
-================
-End of releases.
-================
+================================================
+Plus 2 releases after 2016-10-23 00:00:00 +0000.
+================================================

@@ -33,7 +33,7 @@ for my $cref (@case)
 	my($p, $c) = @$cref;
 
 	my @polynomial = @$p;
-	my @chain = poly_sturm_chain( @polynomial );
+	my @chain = poly_sturm_chain(@polynomial);
 
 	if (scalar @chain)
 	{

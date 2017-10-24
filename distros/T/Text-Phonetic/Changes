@@ -1,5 +1,9 @@
 Revision history for Perl module Text::Phonetic
 
+
+2.09 Wed May 31 2017
+    - Fix Koeln algorithm (rt123300)
+
 2.08 Wed May 31 2017
     - Makefile fix for perl 5.26
 

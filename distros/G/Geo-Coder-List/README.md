@@ -2,6 +2,7 @@
 [![Windows Build status](https://ci.appveyor.com/api/projects/status/naayd09612e10llw/branch/master?svg=true)](https://ci.appveyor.com/project/nigelhorne/geo-coder-list/branch/master)
 [![Coverage Status](https://coveralls.io/repos/github/nigelhorne/Geo-Coder-List/badge.svg?branch=master)](https://coveralls.io/github/nigelhorne/Geo-Coder-List?branch=master)
 [![Dependency Status](https://dependencyci.com/github/nigelhorne/Geo-Coder-List/badge)](https://dependencyci.com/github/nigelhorne/Geo-Coder-List)
+[![CPAN](https://img.shields.io/cpan/v/Geo-Coder-List.svg)](http://search.cpan.org/~nhorne/Geo-Coder-List/)
 
 # Geo::Coder::List
 
@@ -9,7 +10,7 @@ Call many geocoders
 
 # VERSION
 
-Version 0.14
+Version 0.15
 
 # SYNOPSIS
 
@@ -72,6 +73,16 @@ environment variables:
     $geocoderlist->ua($ua);
 
 Note that unlike Geo::Coders, there is no read method, since that would be pointless.
+
+## log
+
+Returns the log of events to help you debug failures, optimize lookup order and fix quota breakage
+
+    my @log = @{$geocoderlist->log()};
+
+## flush
+
+Clear the log.
 
 # AUTHOR
 

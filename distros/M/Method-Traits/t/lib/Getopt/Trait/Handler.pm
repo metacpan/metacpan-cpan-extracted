@@ -12,7 +12,7 @@ sub get_options {
     my $meta = Scalar::Util::blessed( $class ) ? $class : MOP::Class->new( $class );
 
     foreach my $method ( $meta->all_methods ) {
-        foreach my $trait ( grep $_->name eq 'Opt', Method::Traits->get_traits_for( $method ) ) {
+        foreach my $trait ( $method->get_code_attributes('Opt') ) {
 
             my ($opt_spec) = @{ $trait->args };
             # the opt_spec defaults to the method-name

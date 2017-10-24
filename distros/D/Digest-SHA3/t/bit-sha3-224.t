@@ -15,15 +15,8 @@ for (1 .. $numtests) {
 	my $sha3 = Digest::SHA3->new();		# use SHA3-224 by default
 	my $Len = shift @vecs;
 	my $Msg = pack("H*", shift @vecs);
-	if ($Len % 8) {
-		my @a = unpack("C*", $Msg);
-		my $b = pop(@a);
-		$b <<= (8 - $Len % 8);
-		push(@a, $b);
-		$Msg = pack("C*", @a);
-	}
 	my $MD = shift @vecs;
-	my $computed = $sha3->add_bits($Msg, $Len)->hexdigest;
+	my $computed = $sha3->add_bits($Msg, $Len, 1)->hexdigest;
 	print "not " unless $computed eq lc($MD);
 	print "ok ", $_, "\n";
 }

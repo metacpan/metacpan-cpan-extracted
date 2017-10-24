@@ -1,0 +1,8 @@
+lib/Xcode/Project.pm
+LICENSE
+Makefile.pl
+MANIFEST			This list of files
+README.md
+script/proj
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

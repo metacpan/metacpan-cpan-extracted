@@ -10,14 +10,10 @@ use UNIVERSAL::Object::Immutable;
 
 use MOP::Internal::Util;
 
-our $VERSION   = '0.09';
+our $VERSION   = '0.11';
 our $AUTHORITY = 'cpan:STEVAN';
 
 our @ISA; BEGIN { @ISA = 'UNIVERSAL::Object::Immutable' }
-
-# if called upon to be a CODE ref
-# then return the initializer
-use overload '&{}' => 'initializer', fallback => 1;
 
 sub BUILDARGS {
     my $class = shift;
@@ -102,7 +98,7 @@ MOP::Slot - A representation of a class slot
 
 =head1 VERSION
 
-version 0.09
+version 0.11
 
 =head1 DESCRIPTION
 

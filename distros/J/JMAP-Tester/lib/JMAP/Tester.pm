@@ -3,7 +3,7 @@ use warnings;
 
 package JMAP::Tester;
 # ABSTRACT: a JMAP client made for testing JMAP servers
-$JMAP::Tester::VERSION = '0.014';
+$JMAP::Tester::VERSION = '0.015';
 use Moo;
 
 use Crypt::Misc qw(decode_b64u encode_b64u);
@@ -21,6 +21,8 @@ use JMAP::Tester::Result::Upload;
 use Module::Runtime ();
 use URI;
 use URI::QueryParam;
+use Scalar::Util qw(weaken);
+use URI::Escape qw(uri_escape);
 
 use namespace::clean;
 
@@ -254,6 +256,9 @@ sub request {
     $json,
   );
 
+  # Or our sub below leaks us
+  weaken $self;
+
   $self->ua->set_my_handler(request_send => sub {
     my ($req) = @_;
     $self->_logger->log_jmap_request({
@@ -408,6 +413,10 @@ sub download_uri_for {
 
     Carp::confess("missing required template parameter $param")
       unless defined $value;
+
+    if ($param eq 'name') {
+      $value = uri_escape($value);
+    }
 
     $uri =~ s/\{$param\}/$value/g;
   }
@@ -734,7 +743,7 @@ JMAP::Tester - a JMAP client made for testing JMAP servers
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 OVERVIEW
 

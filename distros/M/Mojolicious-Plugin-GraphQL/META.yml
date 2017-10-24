@@ -20,7 +20,7 @@ no_index:
     - t
     - inc
 requires:
-  GraphQL: '0.15'
+  GraphQL: '0.16'
   Mojolicious: '5.48'
   perl: '5.006'
   strict: '0'
@@ -30,4 +30,4 @@ resources:
   bugtracker: https://github.com/graphql-perl/Mojolicious-Plugin-GraphQL/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/graphql-perl/Mojolicious-Plugin-GraphQL
-version: '0.03'
+version: '0.05'

@@ -1,5 +1,5 @@
 package Schedule::LongSteps::Storage::DBIxClass;
-$Schedule::LongSteps::Storage::DBIxClass::VERSION = '0.020';
+$Schedule::LongSteps::Storage::DBIxClass::VERSION = '0.021';
 use Moose;
 extends qw/Schedule::LongSteps::Storage/;
 

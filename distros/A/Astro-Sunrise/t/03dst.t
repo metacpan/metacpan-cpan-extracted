@@ -3,14 +3,14 @@
 #
 #     Test script for Astro::Sunrise
 #     Author: Slaven Rezic
-#     Copyright (C) 2015 Slaven Rezic, Ron Hill and Jean Forget
+#     Copyright (C) 2015, 2017 Slaven Rezic, Ron Hill and Jean Forget
 #
 #     This program is distributed under the same terms as Perl 5.16.3:
 #     GNU Public License version 1 or later and Perl Artistic License
 #
 #     You can find the text of the licenses in the F<LICENSE> file or at
 #     L<http://www.perlfoundation.org/artistic_license_1_0>
-#     and L<http://www.gnu.org/licenses/gpl-1.0.html>.
+#     and L<https://www.gnu.org/licenses/gpl-1.0.html>.
 #
 #     Here is the summary of GPL:
 #
@@ -26,7 +26,7 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with this program; if not, write to the Free Software Foundation,
-#     Inc., <http://www.fsf.org/>.
+#     Inc., <https://www.fsf.org/>.
 #
 
 use strict;

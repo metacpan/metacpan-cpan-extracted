@@ -1,5 +1,5 @@
 package Bio::Roary::JobRunner::Parallel;
-$Bio::Roary::JobRunner::Parallel::VERSION = '3.10.2';
+$Bio::Roary::JobRunner::Parallel::VERSION = '3.11.0';
 # ABSTRACT: Use GNU Parallel
 
 
@@ -74,7 +74,7 @@ Bio::Roary::JobRunner::Parallel - Use GNU Parallel
 
 =head1 VERSION
 
-version 3.10.2
+version 3.11.0
 
 =head1 SYNOPSIS
 

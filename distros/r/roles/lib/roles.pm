@@ -4,41 +4,21 @@ package roles;
 use strict;
 use warnings;
 
-use MOP         ();
-use Devel::Hook ();
+use MOP ();
 
-our $VERSION   = '0.01';
+our $VERSION   = '0.02';
 our $AUTHORITY = 'cpan:STEVAN';
 
 sub import {
     shift;
-    my $role = caller;
+    my $pkg   = caller(0);
+    my $meta  = MOP::Util::get_meta( $pkg );
     my @roles = @_;
 
-    {
-        no strict   'refs';
-        no warnings 'once';
-        push @{ $role.'::DOES' } => @roles;
-    }
+    $meta->set_roles( @roles );
 
-    Devel::Hook->push_UNITCHECK_hook(sub {
-        my $meta;
-        {
-            no strict   'refs';
-            no warnings 'once';
-            if ( @{ $role.'::ISA' } ) {
-                $meta = MOP::Class->new( $role )
-            }
-            else {
-                $meta = MOP::Role->new( $role )
-            }
-        }
-
-        MOP::Util::APPLY_ROLES(
-            $meta,
-            [ $meta->roles ],
-            to => ($meta->isa('MOP::Class') ? 'class' : 'role')
-        );
+    MOP::Util::defer_until_UNITCHECK(sub {
+        MOP::Util::compose_roles( MOP::Util::get_meta( $pkg ) )
     });
 }
 
@@ -54,7 +34,7 @@ roles - A simple pragma for composing roles.
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
@@ -137,7 +117,8 @@ version 0.01
 
 This is a very simple pragma which takes a list of roles as
 package names, adds them to the C<@DOES> package variable
-and then schedule for composition to occur during UNITCHECK.
+and then schedule for role composition to occur during the
+next available UNITCHECK phase.
 
 =head1 AUTHOR
 

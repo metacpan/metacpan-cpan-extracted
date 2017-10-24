@@ -1,11 +1,45 @@
 Changelog for MarpaX-ESLIF
 
-2.0.16 2017-08-14T19:24:41
+2.0.17 2017-10-20T19:40:30
+ [Jean-Damien Durand <Jean-Damien.Durand@newaccess.ch>]
+ - Java thread test dev+ [ci skip]
+ - Perl - getInstance method [ci skip]
+ - Java - move multiton in main class [ci skip]
+ - Java multiton [ci skip]
+ - Fix perl linking on Windows and mingw headers [ci skip]
+
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Version 2.0.17 [ci skip]
+ - marpaESLIFGrammar_unsafe_newp when callers knows what they are doing -;
+ - _marpaESLIFGrammar_newp thread-safety [ci skip]
+ - marpa/AppParse.java - removed an initial sleep call [ci skip]
+ - marpa/AppThread.java - javadoc fix [ci skip]
+ - Java - use an indice for genericLogger [ci skip]
+ - Javadoc fix [ci skip]
+ - Javadoc multiton fixes [ci skip]
+ - .travis.yml: update to latest Path::Tiny [ci skip]
+ - cmake/FindgenericHash.cmake appears to be missing
+ - javadoc fix ct'd (< and > characters)
+ - ESLIFGrammarProperties.java javadoc fix (< and > characters
+ - Do not install PCRE2 globally
+ - doc fixes [ci skip]
+ - Travis: remove debugging thingies
+ - Travis and cpanm
+ - Travis and CMake
+ - [Perl] Thread-safe multiton
+ - [Perl] t/thread.t fixes 2 [ci skip]
+ - [Perl] t/thread.t fixes [ci skip]
+ - Perl multiton - dev+
+ - src/marpaESLIF.c: symbolp->lhsRuleStackp is not correctly filled [ci
+   skip]
+ - Dump of pattern when pcre2_compile fails [ci skip]
+
+2.0.16 2017-08-14T19:21:09Z
  [Jean-Damien Durand <jeandamiendurand@free.fr>]
  - Fix MARPAESLIF_XV_STORE() macro usages: newSVsv(&PL_sv_undef) instead of
    &PL_sv_undef [ci skip]
 
-2.0.15 2017-08-14T05:52:52Z
+2.0.15 2017-08-14T05:50:51Z
  [Jean-Damien Durand <jeandamiendurand@free.fr>]
  - CMakeLists.txt: comment on versioning [ci skip]
  - JNI: rule and symbol grammar instrospection [ci skip]
@@ -207,8 +241,8 @@ Changelog for MarpaX-ESLIF
  - Squashed '3rdparty/github/tconv/' changes from 0fe768ea..13bd6daa
  - Merge commit '118232d02fdf73625ded300ba0ac042ea095aa14' [ci skip]
  - Squashed '3rdparty/github/tconv/' changes from 8466306f..0fe768ea
- - Merge commit '69f0ae1c3219b0df69aceb45c1eeaf6ec850f9c2' [ci skip]
  - Squashed '3rdparty/github/tconv/' changes from c6ef2919..8466306f
+ - Merge commit '69f0ae1c3219b0df69aceb45c1eeaf6ec850f9c2' [ci skip]
  - Repush .travis.yml [ci skip]
  - Squashed '3rdparty/github/genericHash/' changes from fd56f7b3..33bf3bff
  - Merge commit 'ebc81635bd98964eb6c2bf50dfe8e712c0cfb847' [ci skip]
@@ -219,9 +253,9 @@ Changelog for MarpaX-ESLIF
  - Squashed '3rdparty/github/tconv/' changes from a747a2e6..c6ef2919
  - Merge commit '62e03b2ed77b0aa80745feb2e30cf694d734b198' [ci skip]
  - Squashed '3rdparty/github/genericStack/' changes from a31a3463..658a9e5d
+ - Merge commit 'abefd02f26b4e4ed94a61a29972b9db5ea3ee960' [ci skip]
  - Squashed '3rdparty/github/genericLogger/' changes from
    c59c2888..0f71f681
- - Merge commit 'abefd02f26b4e4ed94a61a29972b9db5ea3ee960' [ci skip]
  - Merge commit '5d7caf595b6335d57d7d3f47815e9a3bcc16a55e' [ci skip]
  - Squashed '3rdparty/github/cmake-utils/' changes from c5dec90e..620edd76
  - perl/ESLIF.xs: do not croak in !warnIsFatalb in marpaESLIF_sv2byte [ci
@@ -241,8 +275,8 @@ Changelog for MarpaX-ESLIF
  - Lazy intialization of lexeme data [ci skip]
  - Fixed some warnings under gcc -Wall
  - java/CMakeLists.txt: still trying to undersrand travis build failures
- - Squashed '3rdparty/github/tconv/' changes from ddc92980..ec267612
  - Merge commit '5a08cb2a44601d965074f87ae9b3fbd75fff321f'
+ - Squashed '3rdparty/github/tconv/' changes from ddc92980..ec267612
  - java/CMakeLists.txt: try to fix travis build error using absolute path
    for -Djava.library.path...
  - Changed marpaESLIF_grammar.marpaESLIFp to
@@ -250,16 +284,16 @@ Changelog for MarpaX-ESLIF
  - Cache of reusable recognizers [ci skip]
  - Limit the number of calls to malloc [ci skip]
  - Commented out code that should not run in production [ci skip]
- - Squashed '3rdparty/github/genericHash/' changes from e1f6b17..fd56f7b
  - Merge commit '5ca33ca6de2c7d7a25225650e01d701b6f2b8cb5' [ci skip]
+ - Squashed '3rdparty/github/genericHash/' changes from e1f6b17..fd56f7b
  - Removed the complicated code with grammar cache and commented out code
    that should not run in production [ci skip]
  - Version is 2.0.2 following last tags...
  - Version 1.0.54 following genericStack and marpaWrapper updates
- - Squashed '3rdparty/github/marpaWrapper/' changes from aeb47b01..508ddcea
  - Merge commit '6c236f8e1ed611379ebdd9c13e4c537e8cd5cd5d'
- - Merge commit '286d3c57c082a5e5eddda6d71d8a6ffea71cab2a'
+ - Squashed '3rdparty/github/marpaWrapper/' changes from aeb47b01..508ddcea
  - Squashed '3rdparty/github/genericStack/' changes from 328964b4..d9ef92d5
+ - Merge commit '286d3c57c082a5e5eddda6d71d8a6ffea71cab2a'
  - bindings in general: case when argument on the stack is undef [ci skip]
  - BNF/README.pod: a note about internal events and grammar parse() method
    ter [ci skip]
@@ -308,8 +342,8 @@ Changelog for MarpaX-ESLIF
  - Fix inline definition when it is not detected [ci skip]
  - Merge commit '534baac2e210cd0eaf482ead73913167d3efc733'
  - Squashed '3rdparty/github/marpaWrapper/' changes from 2438d3e6..3613ba82
- - Merge commit '8ee66683364614e3a539147b1342c368de014f22'
  - Squashed '3rdparty/github/tconv/' changes from 80f07038..ddc92980
+ - Merge commit '8ee66683364614e3a539147b1342c368de014f22'
  - Perl - BNF/README.pod fix [ci skip]
  - MarpaX/ESLIF.pm: NOTES section [ci skip]
  - Perl - calculator example dev+ [ci skip]
@@ -327,8 +361,8 @@ Changelog for MarpaX-ESLIF
  - MarpaX::ESLIF::Logger::Levels => MarpaX::ESLIF::Logger::Level [ci skip]
  - Patreon donation for marpa [ci skip]
  - Update for solaris, version 1.0.51 [ci skip]
- - Squashed '3rdparty/github/tconv/' changes from a68e118b..80f07038
  - Merge commit '9ecb11bbd4c1a3ea39e7e1ade8d8c6496dfe26d0'
+ - Squashed '3rdparty/github/tconv/' changes from a68e118b..80f07038
  - dist.init and $iconv_libs, version 1.0.50
  - Fix for iconv discovery bis [ci skip]
  - Fix for iconv discovery [ci skip]
@@ -346,13 +380,13 @@ Changelog for MarpaX-ESLIF
  - Merge commit '05b23264944767ef1d6ac288b54d707260a2d348' as
    '3rdparty/github/cmake-utils'
  - Removed cmae-utils for subtree reimport
- - Squashed '3rdparty/github/marpaWrapper/' content from commit 2438d3e6
  - Merge commit 'c3c537147d3d24551274b8e4bc206f91ce8f3d8a' as
    '3rdparty/github/marpaWrapper'
+ - Squashed '3rdparty/github/marpaWrapper/' content from commit 2438d3e6
  - Removed 3rdparty/github/marpaWrapper for subtree reimport
- - Squashed '3rdparty/github/genericStack/' content from commit a236c341
  - Merge commit '03bdbac292298e81ef701e162c4489824caefb71' as
    '3rdparty/github/genericStack'
+ - Squashed '3rdparty/github/genericStack/' content from commit a236c341
  - Removed 3rdparty/github/genericStack for subtree reimport
  - Merge commit '566b5d05dead721fb34f5d54a32937abf55dd4d0' as
    '3rdparty/github/genericLogger'
@@ -388,9 +422,9 @@ Changelog for MarpaX-ESLIF
  - Perl - commented debug statements [ci skip]
  - Forget original when we do an internal stack copy [ci skip]
  - Generic hash for ptr refcount dev+ [ci skip]
+ - Squashed '3rdparty/github/genericHash/' content from commit e1f6b17
  - Merge commit '5ce46aafac5b088be3f5bc75076dd500bcbf2fde' as
    '3rdparty/github/genericHash'
- - Squashed '3rdparty/github/genericHash/' content from commit e1f6b17
  - Get/set grammar defaults [ci skip]
  - XS - marpaESLIF_svStackCleanByIndicev [ci skip]
  - XS - Removed free action resolver, not used in high level interfaces
@@ -433,9 +467,9 @@ Changelog for MarpaX-ESLIF
  - Reintroduce java tests and packaging [ci skip]
  - CMakeObjects.PL
  - Renamings, version 1.0.4
+ - Merge commit '3f0951aa7f71f4bd64e0170bcbe81dd5b6f24385'
  - Squashed '3rdparty/github/marpaWrapper-remote/' changes from
    b2b8bb1..2438d3e
- - Merge commit '3f0951aa7f71f4bd64e0170bcbe81dd5b6f24385'
  - Merge commit '10ee07604217691add4efe3b80963c53538b1867'
  - Squashed '3rdparty/github/tconv-remote/' changes from e15626f..a68e118
  - Squashed '3rdparty/github/genericStack-remote/' changes from
@@ -447,27 +481,27 @@ Changelog for MarpaX-ESLIF
  - Reduce filepaths
  - Renamings, version 1.0.22
  - Merge commit '486d1582e905335da16ee632f11fed8683a2cdfa'
- - Merge commit '653ec0fbe4c5734ddd754c7771327e559f2b13ab'
  - Squashed '3rdparty/github/dlfcn-win32-remote/' changes from
    ad70f0e..e37edf0
+ - Merge commit '653ec0fbe4c5734ddd754c7771327e559f2b13ab'
  - Renamings, version 1.0.46
  - Renamings
  - Merge commit '64899fab810ea97f7a1d63def9cac36f0c7c9ee7' as
    '3rdparty/github/Marpa--R2'
  - Squashed '3rdparty/github/Marpa--R2/' content from commit 0f99f82
  - Pb with Marpa--R2 tree
- - Merge commit 'fd26834a7e34caced75161fa7a1f00e8fb52fdfc'
  - Squashed '3rdparty/github/genericSparseArray-remote/' changes from
    2e40261..a674abd
- - Merge commit '2d7418e4b14387abacf97346be982e15cc9bb273'
+ - Merge commit 'fd26834a7e34caced75161fa7a1f00e8fb52fdfc'
  - Squashed '3rdparty/github/genericHash-remote/' changes from
    0d09a5e..e1f6b17
- - Merge commit 'dd8d79abe0798f952c827c559083e614a72d8bee'
+ - Merge commit '2d7418e4b14387abacf97346be982e15cc9bb273'
  - Squashed '3rdparty/github/genericStack-remote/' changes from
    b883d80..a236c34
+ - Merge commit 'dd8d79abe0798f952c827c559083e614a72d8bee'
+ - Merge commit '470cb2fb3b60a8fac9eaf46bb0dbe516601f9517'
  - Squashed '3rdparty/github/genericLogger-remote/' changes from
    97be47e..c59c288
- - Merge commit '470cb2fb3b60a8fac9eaf46bb0dbe516601f9517'
  - Merge commit '2e339cc269dedd86874c4aef47d8521a3537130c'
  - Squashed '3rdparty/github/cmake-utils-remote/' changes from
    fa49f99..e6038fe
@@ -509,48 +543,48 @@ Changelog for MarpaX-ESLIF
  - Merge commit '0ad50bee3d752b9f8094edb26d0e3426daff04e8'
  - Squashed '3rdparty/github/cmake-utils-remote/' changes from
    17f328a..e6038fe
- - Merge commit 'c0adbbfba1a52ab4b8e8134995535956a7309d24'
  - Squashed '3rdparty/github/cmake-utils-remote/' changes from
    3d49a81..e6038fe
+ - Merge commit 'c0adbbfba1a52ab4b8e8134995535956a7309d24'
  - man pages fix
  - man page absolute path
  - pod tweak
  - pcre2 build
  - Tests
  - uint32_t
+ - Merge commit '1d65337567cb04a5b74ae397a071e906379db06a'
  - Squashed '3rdparty/github/cmake-utils-remote/' changes from
    213382e..17f328a
- - Merge commit '1d65337567cb04a5b74ae397a071e906379db06a'
- - Merge commit 'c37ee0583a7189bf6173be3c08437eca84c8caf4'
  - Squashed '3rdparty/github/cmake-utils-remote/' changes from
    3d49a81..213382e
+ - Merge commit 'c37ee0583a7189bf6173be3c08437eca84c8caf4'
  - More common sizes
  - Squashed '3rdparty/github/tconv-remote/' changes from 349cbf5..fbb6fda
  - Merge commit 'f93bd5a4595eebdf3374906a6d8103b71428260e'
  - Squashed '3rdparty/github/genericStack-remote/' changes from
    b883d80..e6cfe47
  - Merge commit '7e3c03857f666713e844319549f134d0980c9a6f'
+ - Merge commit 'cf8e243fe93380ffdc4b82dc599a503a5fb10a6c'
  - Squashed '3rdparty/github/genericLogger-remote/' changes from
    97be47e..1ff15cb
- - Merge commit 'cf8e243fe93380ffdc4b82dc599a503a5fb10a6c'
  - Merge commit 'db1b3b61fddfef13db95af797d734ccc87a02c3f'
  - Squashed '3rdparty/github/cmake-utils-remote/' changes from
    6505e9d..3d49a81
  - git_subtree_pull.zsh
  - Version 1.0.21
+ - Merge commit 'd9565d218e63054a223eb2855c703dedd208a2a1'
  - Squashed '3rdparty/github/cmake-utils-remote/' changes from
    792173f..3d49a81
- - Merge commit 'd9565d218e63054a223eb2855c703dedd208a2a1'
  - LIBS scope implies TEST scopeSay public to all links
  - Say public to all links
- - Merge commit '67ab58a489cd8173d39c5b4bfde99889e7f4e98e'
  - Squashed '3rdparty/github/cmake-utils-remote/' changes from
    676c3f2..792173f
+ - Merge commit '67ab58a489cd8173d39c5b4bfde99889e7f4e98e'
  - MYPACKAGEADDEXECUTABLESTOTESTS
  - cmake/MyPackageAddExecutableToTests.cmake
- - Merge commit '7caa8e6f6930ca172078249255d71403e48bed71'
  - Squashed '3rdparty/github/cmake-utils-remote/' changes from
    c43493b..676c3f2
+ - Merge commit '7caa8e6f6930ca172078249255d71403e48bed71'
  - ARGN
  - RUNTIME_OUTPUT_DIRECTORY
  - build
@@ -559,15 +593,15 @@ Changelog for MarpaX-ESLIF
  - Squashed '3rdparty/github/cmake-utils-remote/' changes from
    fa49f99..c43493b
  - Version 1.0.30
- - Merge commit 'ede20f9d2015ed2416a5cace83b97cf4a452065e'
  - Squashed '3rdparty/github/genericStack-remote/' changes from
    ea85836..e6cfe47
+ - Merge commit 'ede20f9d2015ed2416a5cace83b97cf4a452065e'
+ - Merge commit '5e02d6ff4b68878ec3fbdde2f79ba5c268b73d24'
  - Squashed '3rdparty/github/genericLogger-remote/' changes from
    5d2c5e5..1ff15cb
- - Merge commit '5e02d6ff4b68878ec3fbdde2f79ba5c268b73d24'
- - Merge commit 'f715cafeb0d897601b101f025669a74a07923c03'
  - Squashed '3rdparty/github/cmake-utils-remote/' changes from
    3c115a5..c43493b
+ - Merge commit 'f715cafeb0d897601b101f025669a74a07923c03'
  - Version 1.0.34
  - Merge commit '1597c7f97cabfa929e8605eea4f1ece1963cd3ad'
  - Version 1.0.18
@@ -603,9 +637,9 @@ Changelog for MarpaX-ESLIF
  - Version 1.0.28
  - Difficulty with path for tests -;
  - cmake/FindgenericLogger.cmake fix [ci skip]
+ - Merge commit '7f1d4b176c4b20a3046e62a57f5ad78e8cebe6d2'
  - Squashed '3rdparty/github/genericStack-remote/' changes from
    b883d80..dbf7822
- - Merge commit '7f1d4b176c4b20a3046e62a57f5ad78e8cebe6d2'
  - Merge commit 'ee6499f6f81e481460c486f9cfa22d74cfc1684a'
  - Squashed '3rdparty/github/genericLogger-remote/' changes from
    97be47e..ef00dd7
@@ -638,17 +672,17 @@ Changelog for MarpaX-ESLIF
    df768cb..b2b8bb1
  - Merge commit 'b1550f995de1c6c5aac4016e608810764813ff72'
  - Squashed '3rdparty/github/tconv-remote/' changes from 177d909..349cbf5
+ - Merge commit 'fc172b74f69a0803754d365fcf2a3c0a668814a7'
  - Squashed '3rdparty/github/genericStack-remote/' changes from
    26ab540..b883d80
- - Merge commit 'fc172b74f69a0803754d365fcf2a3c0a668814a7'
  - Merge commit '2ec9f947ef76a705b589b8a530942dbc973276a5'
  - Squashed '3rdparty/github/genericLogger-remote/' changes from
    fb3a045..97be47e
  - Factorization [ci skip]
- - Merge commit 'a3b247fda14e490d589a8c311b13aa3cbc3b9d69' as
-   '3rdparty/github/cmake-utils-remote'
  - Squashed '3rdparty/github/cmake-utils-remote/' content from commit
    fa49f99
+ - Merge commit 'a3b247fda14e490d589a8c311b13aa3cbc3b9d69' as
+   '3rdparty/github/cmake-utils-remote'
  - Factorization
  - factorization dev+
  - optparse conflict in merge
@@ -678,27 +712,27 @@ Changelog for MarpaX-ESLIF
    '3rdparty/github/genericSparseArray-remote'
  - Squashed '3rdparty/github/genericSparseArray-remote/' content from
    commit 2e40261
- - Merge commit 'dfe3f6617826a346432da01a61be62a00e387a74' as
-   '3rdparty/github/genericHash-remote'
  - Squashed '3rdparty/github/genericHash-remote/' content from commit
    0d09a5e
+ - Merge commit 'dfe3f6617826a346432da01a61be62a00e387a74' as
+   '3rdparty/github/genericHash-remote'
  - Merge commit '158995295a85192bf9333e325b6297143d6f855a'
  - Squashed '3rdparty/github/cmake-utils-remote/' changes from
    d9d0d5b..293f037
  - Use my cmake framework
  - Use my cmake framework [ci skip]
  - Fix depend options parsing
- - Squashed '3rdparty/github/cmake-utils-remote/' content from commit
-   d9d0d5b
  - Merge commit '1be2947649af0f303a97a8bef09c6b318c28df8d' as
    '3rdparty/github/cmake-utils-remote'
+ - Squashed '3rdparty/github/cmake-utils-remote/' content from commit
+   d9d0d5b
  - cmake-utils-remote fix
  - Merge commit '9130e85f83cb17838fcf31d7db8ae52b096fd9b1'
  - Squashed '3rdparty/github/genericSparseArray-remote/' changes from
    6f242a4..2e40261
+ - Merge commit '14b613ecb15fdb9caad31a52da63610680d33587'
  - Squashed '3rdparty/github/genericHash-remote/' changes from
    54d4dbf..0d09a5e
- - Merge commit '14b613ecb15fdb9caad31a52da63610680d33587'
  - Merge commit 'c51d830a61d709826c4c70aa312ef252995f33b0'
  - Merge commit '9f5802d9aa90e6210ab08a269e7c8184bf59d9f4'
  - Squashed '3rdparty/github/genericLogger-remote/' changes from
@@ -710,15 +744,15 @@ Changelog for MarpaX-ESLIF
  - cmake/MyPackageDependency.cmake and test path
  - cmake/MyPackageDependency.cmake and recursivity
  - Version 1.0.27
+ - Merge commit '0b6a2136db1c632cbfc082db9901bbccc1a4180f'
  - Squashed '3rdparty/github/cmake-utils-remote/' changes from
    8923133..4214b72
- - Merge commit '0b6a2136db1c632cbfc082db9901bbccc1a4180f'
  - LINK_FLAGS
  - GENERICLOGGER_LINK_FLAGS [ci skip]
  - Install of export file, version 1.0.26
- - Merge commit '3132bb74c424ea492f724f70c6fd4da2107c6268'
  - Squashed '3rdparty/github/genericLogger-remote/' changes from
    8f62e2c..97be47e
+ - Merge commit '3132bb74c424ea492f724f70c6fd4da2107c6268'
  - Squashed '3rdparty/github/cmake-utils-remote/' changes from
    09fb2f1..8923133
  - Merge commit 'd39c7d81901017639acab5cbe13d4d4300888ffb'
@@ -736,12 +770,12 @@ Changelog for MarpaX-ESLIF
  - Merge commit '08493d3b83e76f37492c722a04e1edfec7440ca9'
  - Install of export file
  - Use of my cmake framework, version 1.0.24
- - Merge commit '0a2f3b7368f3b614f29a0446acadc308a612df23'
  - Squashed '3rdparty/github/genericStack-remote/' changes from
    0d28272..b883d80
- - Merge commit '1d847df4d602c36b42c93e87058efd71690d7550'
+ - Merge commit '0a2f3b7368f3b614f29a0446acadc308a612df23'
  - Squashed '3rdparty/github/genericLogger-remote/' changes from
    e96ae59..a419db3
+ - Merge commit '1d847df4d602c36b42c93e87058efd71690d7550'
  - Merge commit '0aaac18575a9433520c02c79a872c7e72f0e40e7'
  - Squashed '3rdparty/github/cmake-utils-remote/' changes from
    9040d18..25ce7aa
@@ -753,9 +787,9 @@ Changelog for MarpaX-ESLIF
  - cmake framework
  - dev+
  - Version 1.0.23
+ - Merge commit '6bb86f971bda2b0c292c401697998316e7c7c39c'
  - Squashed '3rdparty/github/genericStack-remote/' changes from
    c32e936..0d28272
- - Merge commit '6bb86f971bda2b0c292c401697998316e7c7c39c'
  - Squashed '3rdparty/github/genericLogger-remote/' changes from
    882653a..e96ae59
  - Merge commit '504771c80467b5fc94e7c2fe065d87c2428adbec'
@@ -767,18 +801,18 @@ Changelog for MarpaX-ESLIF
  - Squashed '3rdparty/github/genericLogger-remote/' changes from
    bc67fc1..882653a
  - Merge commit '9cf3d02758d885173f070c9a89183f30247cdf99'
+ - Merge commit '0b82e5bb91c95434e3437bdf490e9611ccc0b8d4'
  - Squashed '3rdparty/github/genericStack-remote/' changes from
    d10469c..c32e936
- - Merge commit '0b82e5bb91c95434e3437bdf490e9611ccc0b8d4'
  - Squashed '3rdparty/github/genericLogger-remote/' changes from
    3d2a876..bc67fc1
  - Merge commit 'ea0acb6dc9c6bc2f74f5ccdae0c4c9c2b1b13181'
  - Squashed '3rdparty/github/genericStack-remote/' changes from
    61eae4d..d10469c
  - Merge commit '0ab5593e87f544880a747a54fe4197d78beafc27'
+ - Merge commit '007cbdbc609101a25d73d1310a511fa407197908'
  - Squashed '3rdparty/github/cmake-utils-remote/' changes from
    bfbc2f8..9040d18
- - Merge commit '007cbdbc609101a25d73d1310a511fa407197908'
  - check factorization, version 1.0.22
  - check factorization, version 1.0.29
  - Merge commit 'da6398f806784324ed85d8ac2bf4d64b96aedc9c'
@@ -788,12 +822,12 @@ Changelog for MarpaX-ESLIF
  - Merge commit '9858b91c19e5ecf143e689d3e57e13de8ef79045'
  - Squashed '3rdparty/github/genericLogger-remote/' changes from
    1f50851..3d2a876
- - Merge commit '525204993aa933e06ec9fc06df52b4aa12854d4b'
  - Squashed '3rdparty/github/genericStack-remote/' changes from
    75fe320..61eae4d
+ - Merge commit '525204993aa933e06ec9fc06df52b4aa12854d4b'
+ - Merge commit '6074607786a95d982af4689aa7e6f8585f0b736a'
  - Squashed '3rdparty/github/cmake-utils-remote/' changes from
    4522e8e..bfbc2f8
- - Merge commit '6074607786a95d982af4689aa7e6f8585f0b736a'
  - man target, version 1.0.28
  - Merge commit 'a6dfee9767f7b5d6ee751adf18a373eb26c3bb31'
  - Man target refactoring, version 1.0.8
@@ -819,74 +853,74 @@ Changelog for MarpaX-ESLIF
  - Merge commit '55a0b91b82e870d28e52d256d0d95266ff672a04' as
    '3rdparty/github/cmake-utils-remote'
  - README.pod fix
- - Merge commit '686b397a0973f0994a6aa63b6e40fe684f9dc72d'
  - Squashed '3rdparty/github/genericLogger-remote/' changes from
    99661e5..1f50851
+ - Merge commit '686b397a0973f0994a6aa63b6e40fe684f9dc72d'
  - Refactoring, version 1.0.18
+ - Merge commit '16f90eac043334da352c2a6ecebb1f39d99a76e0'
  - Squashed '3rdparty/github/cmake-utils-remote/' changes from
    f60f488..4522e8e
- - Merge commit '16f90eac043334da352c2a6ecebb1f39d99a76e0'
  - Fix startCMAKE_MODULE_PATH
  - Merge commit 'c2581337f9aeb24f4d6badc24e58b4224a406558'
  - Fix CMAKE_MODULE_PATH
+ - Merge commit 'fbdb4509953b60a1594b3258f9a36c333ccd2b8e'
  - Squashed '3rdparty/github/genericLogger-remote/' changes from
    d97fc30..99661e5
- - Merge commit 'fbdb4509953b60a1594b3258f9a36c333ccd2b8e'
  - Merge commit '98fcda2616efdd69295b18edb9c7fee169b31f3a' as
    '3rdparty/github/cmake-utils-remote'
  - Squashed '3rdparty/github/cmake-utils-remote/' content from commit
    f60f488
  - Refactoring
  - Refactoring version 1.0.17
+ - Merge commit '34563941581da7ceccb5ddc4fa1761b7a4bf0368'
  - Squashed '3rdparty/github/cmake-utils-remote/' changes from
    af1678a..f60f488
- - Merge commit '34563941581da7ceccb5ddc4fa1761b7a4bf0368'
  - Refactoring version 1.0.7
  - Fix versionning
- - Merge commit '6308709fb92385fb8487cd3639c46f2c55d9e6c4' as
-   '3rdparty/github/cmake-utils-remote'
  - Squashed '3rdparty/github/cmake-utils-remote/' content from commit
    af1678a
+ - Merge commit '6308709fb92385fb8487cd3639c46f2c55d9e6c4' as
+   '3rdparty/github/cmake-utils-remote'
  - MyPackageStart
  - CMAKE_MODULE_PATH
- - Merge commit '40c791ff0b0631a81f9a2da6f3aff6da437018b6'
  - Squashed '3rdparty/github/genericLogger-remote/' changes from
    f720750..d97fc30
+ - Merge commit '40c791ff0b0631a81f9a2da6f3aff6da437018b6'
  - chmod +x git_subtree_pull.zsh
  - use MyPackageDependency
+ - Squashed '3rdparty/github/cmake-utils/' content from commit e310bfc
  - Merge commit 'a2bb92e8f9940fd846201e757c99159a5f5bf232' as
    '3rdparty/github/cmake-utils'
- - Squashed '3rdparty/github/cmake-utils/' content from commit e310bfc
- - Merge commit 'db7996a20c250f0bdccded9d7d007ae66add244f'
  - Squashed '3rdparty/github/cmake-utils/' changes from b1c4be8..e310bfc
+ - Merge commit 'db7996a20c250f0bdccded9d7d007ae66add244f'
  - Use cmake-utils-remote
  - Fix a message
+ - Squashed '3rdparty/github/cmake-utils/' content from commit b1c4be8
  - Merge commit 'e3fb03055f8953d2538da818b02d1db74ea63fda' as
    '3rdparty/github/cmake-utils'
- - Squashed '3rdparty/github/cmake-utils/' content from commit b1c4be8
  - cmake/MyPackageDependency.cmake
  - Create README.md
  - Initial commit
  - STRING REGEX REPLACE fix
- - Merge commit '0656dd694048fd29cbe3abf9e0007678faabee57'
  - Squashed '3rdparty/github/genericLogger-remote/' changes from
    59f532b..d97fc30
+ - Merge commit '0656dd694048fd29cbe3abf9e0007678faabee57'
  - Removed notion of object targets - was a bad idea
  - all in one [ci skip]
  - ALL_IN_ONE and test path [ci skip]
  - ALL_IN_ONE [ci skip]
  - GENERATE_OBJECT_TARGETS [ci skip]
+ - Merge commit 'd395638e6a9f673d980e116f3ed3e16c6598d19b'
  - Squashed '3rdparty/github/genericLogger-remote/' changes from
    ea3dff9..59f532b
- - Merge commit 'd395638e6a9f673d980e116f3ed3e16c6598d19b'
  - GENERATE_OBJECT_TARGETS option [ci skip]
+ - Merge commit '2c4147713d39df20c1374a9dd99cf093a12c7f60'
  - Squashed '3rdparty/github/genericLogger-remote/' changes from
    e6c826f..ea3dff9
- - Merge commit '2c4147713d39df20c1374a9dd99cf093a12c7f60'
  - Make sure about the location of object if used as a sub-project
- - Merge commit 'cb5a109240380413d0bf3f861ca55610ee4f6c55'
  - Squashed '3rdparty/github/genericLogger-remote/' changes from
    5cb23ed..e6c826f
+ - Merge commit 'cb5a109240380413d0bf3f861ca55610ee4f6c55'
  - use OBJECT type in the ALL_IN_ONE mode, version 1.0.16
  - Prepare for correct add_library using the OBJECT type, version 1.0.6
  - Squashed '3rdparty/github/genericLogger-remote/' changes from
@@ -898,8 +932,8 @@ Changelog for MarpaX-ESLIF
  - Squashed '3rdparty/github/tconv-remote/' changes from 40f96cf..177d909
  - Merge commit 'e8691bd4184e69e5c1e7b4564087d1f1b183276b'
  - Fix for va_copy discovery and ICONV_SECOND_ARGUMENT, version 1.0.14
- - Squashed '3rdparty/github/tconv-remote/' changes from a08a22e..40f96cf
  - Merge commit 'c88d487e331fd09955e411e5108587a8b1c2db69'
+ - Squashed '3rdparty/github/tconv-remote/' changes from a08a22e..40f96cf
  - Version 1.0.13
  - Library link fix on Windows [ci skip]
  - Merge commit '2dc0fb43b6a21abb9606ad76923cf4930737e389'
@@ -907,13 +941,13 @@ Changelog for MarpaX-ESLIF
  - iconv second argument [ci skip]
  - $ESLIF::VERSION [ci skip]
  - Perl version fix [ci skip]
+ - Merge commit '98909ce4a536ac4f6c0644c5b333845ecb29ec9b'
  - Squashed '3rdparty/github/genericLogger-remote/' changes from
    f720750..fb3a045
- - Merge commit '98909ce4a536ac4f6c0644c5b333845ecb29ec9b'
  - Perl [ci skip]
  - Perl objects go in obj4perl, version 1.0.4
- - Merge commit 'fc9f708c6ac8697c3cdfe84387287bd12dd02230'
  - Squashed '3rdparty/github/tconv-remote/' changes from 2cc9025..d4219bf
+ - Merge commit 'fc9f708c6ac8697c3cdfe84387287bd12dd02230'
  - perl CMakeObjects.PL
  - ExtUtils::CBuilder::Base fix [ci skip]
  - ExtUtils/CBuilder/Base.pm fileparse fix [ci skip]
@@ -936,9 +970,9 @@ Changelog for MarpaX-ESLIF
    '3rdparty/github/genericHash-remote'
  - Squashed '3rdparty/github/genericHash-remote/' content from commit
    54d4dbf
+ - Squashed '3rdparty/github/tconv-remote/' content from commit 29062ed
  - Merge commit 'e973f02e72e432d0f841badaef0dac9bfddc7b7f' as
    '3rdparty/github/tconv-remote'
- - Squashed '3rdparty/github/tconv-remote/' content from commit 29062ed
  - Squashed '3rdparty/github/marpaWrapper-remote/' content from commit
    0f43076
  - Merge commit '734c1455ea57e53d0fdb122bb01d80f40e15d88e' as
@@ -953,10 +987,10 @@ Changelog for MarpaX-ESLIF
  - Merge commit 'ea8c22b6a6070536b4a2ead2dd48f8346342c55a'
  - Test fix, Version 1.0.10
  - ADD_IN_ONE option, version 1.0.9
- - Merge commit 'e8077855f5e8410725fa0e49e45df384323a7aa9' as
-   '3rdparty/github/genericLogger-remote'
  - Squashed '3rdparty/github/genericLogger-remote/' content from commit
    f720750
+ - Merge commit 'e8077855f5e8410725fa0e49e45df384323a7aa9' as
+   '3rdparty/github/genericLogger-remote'
  - genericLogger-remote
  - All-in-one and static linking
  - ALL_IN_ONE dev+
@@ -969,17 +1003,17 @@ Changelog for MarpaX-ESLIF
    mingw that requires <unistd.h> to be included BEFORE <time.h> so that
    localtime_r is defined...
  - Perl dev+
+ - Merge commit '3a1d54bd0f48c70fec01623acee2e1362d02ab14'
  - Squashed '3rdparty/github/genericHash-remote/' changes from
    1397c1e..54d4dbf
- - Merge commit '3a1d54bd0f48c70fec01623acee2e1362d02ab14'
  - Version 1.0.20
  - Build issues without icu, version 1.0.9
  - Workaround a MSVC bug on the macros we depend upon, version 1.0.20
  - Optimization, version 1.0.19
- - Merge commit '9c71df2f481411b0f248d6c6974fdeeb3946ed07' as
-   '3rdparty/github/genericSparseArray-remote'
  - Squashed '3rdparty/github/genericSparseArray-remote/' content from
    commit 6f242a4
+ - Merge commit '9c71df2f481411b0f248d6c6974fdeeb3946ed07' as
+   '3rdparty/github/genericSparseArray-remote'
  - Merge commit '1def44809c1beecdc41ac0341a5ced9846e44078' as
    '3rdparty/github/genericStack-remote'
  - Merge commit '5a381fbbd30c8e641d6fdd03df9efe2214c43eb5' as
@@ -992,10 +1026,10 @@ Changelog for MarpaX-ESLIF
    '3rdparty/github/genericLogger-remote'
  - .travis and Perl dev+ [ci skip]
  - Perl - localtime_r is not absolutely required [ci skip]
- - Squashed '3rdparty/github/genericLogger-remote/' content from commit
-   b50df82
  - Merge commit '862d0ab2e57554d05d967a424a508aaacd283d9e' as
    '3rdparty/github/genericLogger-remote'
+ - Squashed '3rdparty/github/genericLogger-remote/' content from commit
+   b50df82
  - Static lib dev+ [ci skip]
  - Commented NO_DEFAULT_PATH in cmake search [ci skip]
  - Build all objects at once, version 1.0.8
@@ -1019,9 +1053,9 @@ Changelog for MarpaX-ESLIF
  - Merge commit '0a78ef965f61284e04f08de02bddb97b993af1bc'
  - Squashed '3rdparty/github/optparse-remote/' changes from
    146d045..3b4e980
+ - Merge commit 'e948b0fe3dda0abd3da27f1d3372ee72c2a74286'
  - Squashed '3rdparty/github/dlfcn-win32-remote/' changes from
    00d5cd1..e19bf07
- - Merge commit 'e948b0fe3dda0abd3da27f1d3372ee72c2a74286'
  - Silent a gcc warning when casting a ptr to jlong
  - AppParse.java: removed unused method [ci skip]
  - doc [ci skip]

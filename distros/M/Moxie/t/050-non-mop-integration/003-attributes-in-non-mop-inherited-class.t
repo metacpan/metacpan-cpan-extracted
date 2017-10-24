@@ -26,6 +26,8 @@ use Test::More;
     has _foo => ();
     has _bar => sub { "BAR" };
 
+    my sub _foo : private;
+
     sub bar : ro(_bar);
 
     sub REPR {
@@ -70,6 +72,8 @@ is($app->bar, 'BAR');
 
     has _foo => ();
     has _bar => sub { "BAR" };
+
+    my sub _foo : private;
 
     sub bar : ro(_bar);
 

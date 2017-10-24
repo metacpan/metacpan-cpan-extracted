@@ -9,9 +9,11 @@ use Carp       ();
 
 use UNIVERSAL::Object::Immutable;
 
+use MOP::Method::Attribute;
+
 use MOP::Internal::Util;
 
-our $VERSION   = '0.09';
+our $VERSION   = '0.11';
 our $AUTHORITY = 'cpan:STEVAN';
 
 our @ISA; BEGIN { @ISA = 'UNIVERSAL::Object::Immutable' };
@@ -104,12 +106,14 @@ sub was_aliased_from {
 
 sub has_code_attributes {
     my ($self, $to_match) = @_;
-    return grep /$to_match/, attributes::get( $self->body );
+    $to_match //= '.';
+    return scalar grep /^$to_match/, attributes::get( $self->body );
 }
 
 sub get_code_attributes {
-    my ($self) = @_;
-    return attributes::get( $self->body );
+    my ($self, $to_match) = @_;
+    $to_match //= '.';
+    return map MOP::Method::Attribute->new( $_ ), grep /^$to_match/, attributes::get( $self->body );
 }
 
 1;
@@ -124,7 +128,7 @@ MOP::Method - A representation of a method
 
 =head1 VERSION
 
-version 0.09
+version 0.11
 
 =head1 DESCRIPTION
 

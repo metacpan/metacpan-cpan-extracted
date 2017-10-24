@@ -47,7 +47,7 @@ BEGIN {
 }
 
 # and in runtime ...
-ok(!Foo->can('MODIFY_CODE_ATTRIBUTES'), '... the MODIFY_CODE_ATTRIBUTES has been removed');
+#ok(!Foo->can('MODIFY_CODE_ATTRIBUTES'), '... the MODIFY_CODE_ATTRIBUTES has been removed');
 can_ok('Foo', 'FETCH_CODE_ATTRIBUTES');
 
 {
@@ -64,7 +64,7 @@ can_ok('Foo', 'FETCH_CODE_ATTRIBUTES');
     my $method = MOP::Class->new( 'Foo' )->get_method('foo');
     isa_ok($method, 'MOP::Method');
     is_deeply(
-        [ $method->get_code_attributes ],
+        [ map $_->original, $method->get_code_attributes ],
         [
     q[Bar(
         'Baz',
@@ -75,8 +75,8 @@ can_ok('Foo', 'FETCH_CODE_ATTRIBUTES');
         '... got the expected attributes'
     );
 
-    my ($trait) = Method::Traits->get_traits_for( $method );
-    isa_ok($trait, 'Method::Traits::Trait');
+    my ($trait) = $method->get_code_attributes;
+    isa_ok($trait, 'MOP::Method::Attribute');
 
     is($trait->name, 'Bar', '... got the expected trait name');
     is_deeply(

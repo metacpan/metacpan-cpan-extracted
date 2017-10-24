@@ -19,7 +19,7 @@ BEGIN {
 use Carp     (); # for confess
 
 # Better to import this, since it is a custom op
-use Ref::Util qw(is_ref is_arrayref);
+use Ref::Util qw(is_ref is_arrayref is_coderef);
 use Scalar::Util qw(refaddr weaken);
 
 use AnyEvent;
@@ -284,13 +284,22 @@ sub ____run {
         $grab_results_cb,
         $have_work_for_conn,
         $extras,
-        $resolve_cb,
-        $reject_cb,
     ) = @_;
 
     $extras //= {};
 
     my $perl_timeout = $extras->{perl_timeout};
+    my $success_cb   = $extras->{success_cb};
+    my $failure_cb   = $extras->{failure_cb};
+
+    if ( !is_coderef($success_cb) ) {
+        Carp::croak(ref($outside_maria) . " was not given a coderef to success_cb");
+    }
+
+    if ( !is_coderef($failure_cb) ) {
+        Carp::croak(ref($outside_maria) . " was not given a coderef to failure_cb");
+    }
+
 
     my (@per_query_results, @errors);
 
@@ -331,13 +340,14 @@ sub ____run {
     my $wait_for = $call_start->($outside_maria);
 
     if ( !$wait_for ) {
+        DEBUG && TELL "Immediately finished $type action";
         # All queries on all connections finished immediately.
         # So reject or resolve as necessary
         if ( @errors ) {
-            $reject_cb->(@errors);
+            $failure_cb->(@errors);
         }
         else {
-            $resolve_cb->(\@per_query_results);
+            $success_cb->(@per_query_results);
         }
         return;
     }
@@ -352,11 +362,11 @@ sub ____run {
     my $maria = $outside_maria;
     weaken($maria);
 
-    my $reject_refaddr = refaddr($reject_cb);
+    my $reject_refaddr = refaddr($failure_cb);
 
     my $watcher_ready_cb = sub {
         if ( !$maria ) {
-            $reject_cb->("Connection object went away");
+            $failure_cb->("Connection object went away");
             return;
         }
 
@@ -400,7 +410,7 @@ sub ____run {
                 # we might leak some!
             # We got an error above.  Reject and bail
             delete $maria->{pending}{$reject_refaddr};
-            $reject_cb->(@errors);
+            $failure_cb->(@errors);
             return;
         }
 
@@ -411,7 +421,7 @@ sub ____run {
             __return_all_watchers(delete $maria->{watchers}); # BOI!!
             # Ran all the queries! We can resolve and go home
             delete $maria->{pending}{$reject_refaddr};
-            $resolve_cb->(\@per_query_results);
+            $success_cb->(@per_query_results);
             return;
         }
 
@@ -486,12 +496,12 @@ sub ____run {
                 push @errors,
                     "$type execution was interrupted by perl, maximum execution time exceeded (timeout=$perl_timeout)";
                 delete $maria->{pending}{$reject_refaddr};
-                $reject_cb->(@errors);
+                $failure_cb->(@errors);
             },
         ]
     }) if $perl_timeout;
 
-    $outside_maria->{pending}{$reject_refaddr} = $reject_cb;
+    $outside_maria->{pending}{$reject_refaddr} = $failure_cb;
     weaken($outside_maria->{pending}{$reject_refaddr});
 
     return;
@@ -509,33 +519,44 @@ sub DESTROY {
 }
 
 sub run_query {
-    my ($conn, $remaining_sqls, $extras, $resolve_cb, $reject_cb) = @_;
+    my ($conn, $sql, $bind, $attr) = @_;
+
+    return $conn->run_multiple_queries(
+        [ [ $sql, $attr, $bind ] ],
+        $attr,
+    );
+}
+
+sub run_multiple_queries {
+    my ($conn, $remaining_sqls, $extras) = @_;
 
     if ( !is_ref($remaining_sqls) ) {
         # ->run_query("select 1")
-        $remaining_sqls = [ [$remaining_sqls, $extras, $_[3] ] ];
+        $remaining_sqls = [ [$remaining_sqls, $extras ] ];
     }
 
-    if ( is_arrayref($remaining_sqls) ) {
+    if ( !is_coderef($remaining_sqls) ) {
+        if ( !is_arrayref($remaining_sqls) ) {
+            Carp::croak("->run_multiple_queries takes either a coderef of an arrayref; got a " . ref($remaining_sqls));
+        }
+
         # ->run_multiple_queries([...])
         my $original     = $remaining_sqls;
         my $next_sql_idx = 0;
         $remaining_sqls  = sub {
             my $idx = $next_sql_idx++;
-            $original->[$idx]
-                ?
-                    is_arrayref($original->[$idx])
-                        # ->run_multiple_queries([["select 1"], ["select 2"]])
-                        ? $original->[$idx]
-                        # ->run_multiple_queries(["select 1", "select 2"])
-                        : [ $original->[$idx] ]
-                : $original->[$idx]
+            return $original->[$idx] unless $original->[$idx];
+            return is_arrayref($original->[$idx])
+                    # ->run_multiple_queries([["select 1"], ["select 2"]])
+                    ? $original->[$idx]
+                    # ->run_multiple_queries(["select 1", "select 2"])
+                    : [ $original->[$idx] ];
         };
     }
 
     my $next_sql = $remaining_sqls->();
     $conn->____run(
-        "run_query",
+        "run_multiple_queries",
         sub {
             my $ret = $_[0]->run_query_start( @$next_sql );
             $next_sql = $remaining_sqls->();
@@ -544,13 +565,11 @@ sub run_query {
         sub { $_[0]->query_results },
         sub { is_arrayref($next_sql) && @$next_sql },
         $extras,
-        $resolve_cb,
-        $reject_cb,
     );
 }
 
 sub ping {
-    my ($conn, $extras, $resolve_cb, $reject_cb) = @_;
+    my ($conn, $extras) = @_;
 
     my $once;
     $conn->____run(
@@ -559,13 +578,11 @@ sub ping {
         sub { $_[0]->ping_result() }, # end
         sub { !$once++ },             # no multiple operations
         $extras,
-        $resolve_cb,
-        $reject_cb,
     );
 }
 
 sub connect {
-    my ($conn, $connect_args, $extras, $resolve_cb, $reject_cb) = @_;
+    my ($conn, $connect_args, $extras) = @_;
 
     my $once = 0;
     $conn->____run(
@@ -574,8 +591,6 @@ sub connect {
         sub { $_[0] },                               # end
         sub { !$once++ },                            # no multiple operations
         $extras,
-        $resolve_cb,
-        $reject_cb,
     );
 }
 

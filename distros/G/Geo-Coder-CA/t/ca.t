@@ -25,5 +25,8 @@ CA: {
 		my $address = $geocoder->reverse_geocode(latlng => '46.67,-64.87');
 		like($address->{'city'}, qr/Richibucto/i, 'test reverse city');
 		# like($address->{'country'}, qr/Canada/i, 'test reverse country');
+
+		# This gives invalid JSON. It has been reported to geocoder.ca.
+		# $location = $geocoder->geocode('Nassagaweya, Halton, Ontario, Canada');
 	}
 }

@@ -4,10 +4,10 @@ use 5.008009;
 use strict;
 use warnings;
 use parent qw/Exporter/;
-our $VERSION = '1.000006';
+our $VERSION = '1.000007';
 our @EXPORT_OK = qw/off/;
 
-our $OFF_URL = 'http://offliberty.com/off03.php';
+our $OFF_URL = 'http://offliberty.com/off04.php';
 
 use HTML::TreeBuilder;
 use HTTP::Tiny;

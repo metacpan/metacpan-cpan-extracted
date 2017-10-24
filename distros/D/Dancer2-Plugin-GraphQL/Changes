@@ -1,5 +1,8 @@
 Revision history for Dancer2::Plugin::GraphQL
 
+0.04    Sun Oct 22 07:46:21 BST 2017
+ - GraphQL::Schema->from_doc
+
 0.03    Mon Oct 16 00:18:15 BST 2017
  - execute is a function now not method
 

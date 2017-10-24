@@ -7,6 +7,7 @@ use base 'Pegex::Receiver';
 use Types::Standard -all;
 use Function::Parameters;
 use JSON::MaybeXS;
+use Carp;
 
 my $JSON = JSON::MaybeXS->new->allow_nonref->canonical;
 
@@ -68,17 +69,12 @@ method _locate_hash(HashRef $hash) {
   +{ %$hash, location => { line => $line, column => $column } };
 }
 
-method final (Any $param = undef) {
-  return $param if defined $param;
-  return {$self->{parser}{rule} => []};
-}
-
 fun _merge_hash (Any $param = undef, Any $arraykey = undef) {
   my %def = map %$_, grep ref eq 'HASH', @$param;
   if ($arraykey) {
     my @arrays = grep ref eq 'ARRAY', @$param;
-    die "More than one array found\n" if @arrays > 1;
-    die "No arrays found but \$arraykey given\n" if !@arrays;
+    Carp::confess "More than one array found\n" if @arrays > 1;
+    Carp::confess "No arrays found but \$arraykey given\n" if !@arrays;
     my %fields = map %$_, @{$arrays[0]};
     $def{$arraykey} = \%fields;
   }
@@ -87,7 +83,7 @@ fun _merge_hash (Any $param = undef, Any $arraykey = undef) {
 
 method got_arguments (Any $param = undef) {
   return unless defined $param;
-  my %args = map { ($_->[0]{name} => $_->[1]) } @{$param->[0]};
+  my %args = map { ($_->[0]{name} => $_->[1]) } @$param;
   return {$self->{parser}{rule} => \%args};
 }
 
@@ -103,7 +99,7 @@ method got_objectField (Any $param = undef) {
 
 method got_objectValue (Any $param = undef) {
   return unless defined $param;
-  _merge_hash($param->[0]);
+  _merge_hash($param);
 }
 
 method got_objectField_const (Any $param = undef) {
@@ -116,7 +112,7 @@ method got_objectValue_const (Any $param = undef) {
 
 method got_listValue (Any $param = undef) {
   return unless defined $param;
-  return $param->[0];
+  return $param;
 }
 
 method got_listValue_const (Any $param = undef) {
@@ -147,23 +143,28 @@ method got_namedType (Any $param = undef) {
 
 method got_enumValueDefinition (Any $param = undef) {
   return unless defined $param;
-  my %def = (value => shift @$param, map %$_, @$param);
+  my @copy = @$param;
+  my $rest = pop @copy;
+  my $value = pop @copy;
+  my $description = $copy[0] // {};
+  $rest = ref $rest eq 'HASH' ? [ $rest ] : $rest;
+  my %def = (%$description, value => $value, map %$_, @$rest);
   return \%def;
 }
 
 method got_defaultValue (Any $param = undef) {
-  return unless defined $param;
-  return { default_value => $param->[0] };
+  # the value can be undef
+  return { default_value => $param };
 }
 
 method got_implementsInterfaces (Any $param = undef) {
   return unless defined $param;
-  return { interfaces => $param->[0] };
+  return { interfaces => $param };
 }
 
 method got_argumentsDefinition (Any $param = undef) {
   return unless defined $param;
-  return { args => _merge_hash($param->[0])};
+  return { args => _merge_hash($param) };
 }
 
 method got_fieldDefinition (Any $param = undef) {
@@ -175,8 +176,7 @@ method got_fieldDefinition (Any $param = undef) {
 
 method got_typeExtensionDefinition (Any $param = undef) {
   return unless defined $param;
-  my $node = shift @$param;
-  return {kind => 'extend', node => $self->_locate_hash($node->{node})};
+  return {kind => 'extend', node => $self->_locate_hash($param->{node})};
 }
 
 method got_enumTypeDefinition (Any $param = undef) {
@@ -240,7 +240,7 @@ method got_variableDefinitions (Any $param = undef) {
   map {
     my $name = ${ shift @$_ };
     $def{$name} = { map %$_, @$_ }; # merge
-  } @{$param->[0]};
+  } @$param;
   return {variables => \%def};
 }
 
@@ -261,12 +261,12 @@ method got_typedef (Any $param = undef) {
 
 method got_alias (Any $param = undef) {
   return unless defined $param;
-  return {$self->{parser}{rule} => $param->[0]{name}};
+  return {$self->{parser}{rule} => $param->{name}};
 }
 
 method got_typeCondition (Any $param = undef) {
   return unless defined $param;
-  return {on => $param->[0]};
+  return {on => $param};
 }
 
 method got_fragmentName (Any $param = undef) {
@@ -276,7 +276,7 @@ method got_fragmentName (Any $param = undef) {
 
 method got_selectionSet (Any $param = undef) {
   return unless defined $param;
-  return {selections => $param->[0]};
+  return {selections => $param};
 }
 
 method got_operationDefinition (Any $param = undef) {
@@ -292,17 +292,28 @@ method got_directives (Any $param = undef) {
 
 method got_graphql (Any $param = undef) {
   return unless defined $param;
-  return @$param;
+  return $param;
 }
 
 method got_definition (Any $param = undef) {
   return unless defined $param;
-  return @$param;
+  return $param;
 }
 
 method got_operationTypeDefinition (Any $param = undef) {
   return unless defined $param;
   return { map { ref($_) ? values %$_ : $_ } @$param };
+}
+
+method got_comment (Any $param = undef) {
+  return unless defined $param;
+  return $param;
+}
+
+method got_description (Any $param = undef) {
+  return unless defined $param;
+  my $string = join "\n", @$param;
+  return $string ? {$self->{parser}{rule} => $string} : {};
 }
 
 method got_schema (Any $param = undef) {
@@ -312,7 +323,10 @@ method got_schema (Any $param = undef) {
 
 method got_typeSystemDefinition (Any $param = undef) {
   return unless defined $param;
-  return @$param;
+  my @copy = @$param;
+  my $node = pop @copy;
+  my $description = $copy[0] // {};
+  +{ %$node, node => { %{$node->{node}}, %$description } };
 }
 
 method got_typeDefinition (Any $param = undef) {
@@ -322,7 +336,7 @@ method got_typeDefinition (Any $param = undef) {
 
 method got_variable (Any $param = undef) {
   return unless defined $param;
-  my $varname = $param->[0]{name};
+  my $varname = $param->{name};
   return \$varname;
 }
 

@@ -4,21 +4,20 @@ Mojolicious::Plugin::GraphQL - a plugin for adding GraphQL route handlers
 
 # SYNOPSIS
 
-    my $schema = GraphQL::Schema->new(
-      query => GraphQL::Type::Object->new(
-        name => 'QueryRoot',
-        fields => {
-          helloWorld => {
-            type => $String,
-            resolve => sub { 'Hello, world!' },
-          },
-        },
-      ),
-    );
+    my $schema = GraphQL::Schema->from_doc(<<'EOF');
+    schema {
+      query: QueryRoot
+    }
+    type QueryRoot {
+      helloWorld: String
+    }
+    EOF
 
     # for Mojolicious substitute "plugin" with $app->plugin(...
     # Mojolicious::Lite (with endpoint under "/graphql")
-    plugin GraphQL => {schema => $schema};
+    plugin GraphQL => {
+      schema => $schema, root_value => { helloWorld => 'Hello, world!' }
+    };
 
     # OR, equivalently:
     plugin GraphQL => {handler => sub {
@@ -27,7 +26,7 @@ Mojolicious::Plugin::GraphQL - a plugin for adding GraphQL route handlers
       $execute->(
         $schema,
         $body->{query},
-        undef, # $root_value
+        { helloWorld => 'Hello, world!' }, # $root_value
         $c->req->headers,
         $body->{variables},
         $body->{operationName},

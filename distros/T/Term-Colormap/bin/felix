@@ -1,0 +1,78 @@
+#!/usr/bin/env perl
+
+use warnings;
+use strict;
+use Data::Dumper;
+use lib '/home/felixt1/perl-term-colormap/lib';
+use Term::Colormap qw(rgb2color print_colored_text);
+my $file = $ARGV[0];
+defined $file and -f $file or usage();
+my ($WIDTH) = (defined $ARGV[1] and $ARGV[1] > 0) ? $ARGV[1] : 10000;
+main();
+1;
+
+sub main {
+    open my $fh, $file or die "$!";
+    my $html = do { local $/; <$fh> }; # Slurp
+    my ($data) = $html =~ m|IMAGE BEGINS HERE(.*)IMAGE ENDS HERE|s;
+    $data =~ s|^.*?color|color|;
+    $data =~ s|&gt;|>|g;
+    $data =~ s|&lt;|<|g;
+    $data =~ s|>>|>|g;
+    $data =~ s|<<|<|g;
+    my (@colors, @values);
+    my $width = 0;
+    my $nline = 0;
+    for my $line ( split /<br>/, $data ) {
+        for my $block ( $line =~ m|(<font color.+?</font>)|g ) {
+            my ($col, $val) = $block =~ m|font color="(.+?)">([01]+)</font>|;
+            next unless $col;
+#            print $col . "\n";
+            my $color =
+                $col eq 'white'  ? '#ffffff'
+                : $col eq 'black'  ? '#000000'
+                : $col eq 'gray'   ? '#888888'
+                : $col eq 'grey'   ? '#888888'
+                : $col eq 'silver' ? '#c0c0c0'
+                : $col eq 'yellow' ? '#ffff00'
+                : $col eq 'green'  ? '#008000'
+                : $col eq 'maroon' ? '#800000'
+                : $col eq 'aqua'   ? '#00ffff'
+                : $col eq 'lime'   ? '#00ff00'
+                : $col eq 'red'    ? '#ff0000'
+                : $col eq 'blue'   ? '#0000ff'
+                : $col;
+            $color =~ s|#||;
+#            print $color . "\n";
+            my $n = Term::Colormap::rgb2color($color);
+            if ($width + length($val) < $WIDTH) {
+                print_colored_text($n, $val);
+                $width += length($val);
+            } else {
+                my $bytes = $WIDTH - $width;
+                if ($bytes > 0) {
+                    print_colored_text($n, substr($val, 0, $bytes));
+                }
+                $width += $bytes;
+            }
+        }
+        print "\n";
+        $width = 0;
+    }
+}
+
+sub usage {
+    my $cyan = Term::Colormap::rgb2color('00ffff');
+
+    print "usage: $0 filename.html [width]\n";
+    print "\n";
+    print "Go to ";
+    print_colored_text($cyan, 'http://www.text-image.com/convert/pic2html.cgi');
+    print "\n";
+    print "Upload an image and convert it to color html\n";
+    print "Right click on the html text of the image and go to View Source\n";
+    print "Save the source as an html file which gets used as an imput for this script\n";
+    print "\n";
+    print "Output can be saved as a text file and viewed with 'cat'\n";
+    exit 0;
+}

@@ -4,9 +4,6 @@ use 5.006;
 use strict;
 use warnings;
 
-## no critic (ValuesAndExpressions::ProhibitEmptyQuotes)
-## no critic (ValuesAndExpressions::ProhibitImplicitNewlines)
-
 sub get_200 {
 
     # perl -e 'use HTTP::Tiny; use Data::Dumper; print Dumper(HTTP::Tiny->new->get(q{http://cpanmetadb.plackperl.org/v1.0/package/Perl::Critic}));'

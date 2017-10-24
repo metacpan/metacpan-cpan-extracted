@@ -9,7 +9,7 @@ use File::Temp qw/tempdir/;
 my $tmp = tempdir(CLEANUP => 0);
 chdir($tmp);
 
-Object::HashBase::Inline::inline('My::Prefix');
+Object::HashBase::Inline::inline('My::Prefix', '123');
 
 ok(-f 'lib/My/Prefix/HashBase.pm', "Wrote HashBase.pm");
 ok(-f 't/HashBase.t', "Wrote HashBase.t");
@@ -17,6 +17,10 @@ ok(-f 't/HashBase.t', "Wrote HashBase.t");
 unshift @INC => "$tmp/lib";
 
 require My::Prefix::HashBase;
+
+is($My::Prefix::HashBase::VERSION, '123', "Set a custom inline module version number");
+ok($My::Prefix::HashBase::HB_VERSION, "Set the HB_VERSION");
+is($My::Prefix::HashBase::HB_VERSION, $Object::HashBase::VERSION, "The HB_VERSION is correct");
 
 {
     no warnings 'once';

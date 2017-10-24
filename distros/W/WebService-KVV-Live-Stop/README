@@ -6,9 +6,28 @@ NAME
 SYNOPSIS
 
         use WebService::KVV::Live::Stop;
+        use utf8;
+        use open qw( :encoding(UTF-8) :std );
     
         my $stop = WebService::KVV::Live::Stop->new("Siemensallee");
         print "Arrival time: $_->{time} $_->{route} $_->{destination}\n" for $stop->departures;
+
+    Print departure table:
+
+        use WebService::KVV::Live::Stop;
+        use utf8;
+        use open qw( :encoding(UTF-8) :std );
+        
+        use Data::Dumper::Table;
+        use Data::Visitor::Callback;
+    
+        $stop = WebService::KVV::Live::Stop->new($ARGV[0] // 'Kronenplatz');
+        my @entries = $stop->departures;
+        Data::Visitor::Callback->new('JSON::PP::Boolean' => sub { $_ = $_ ? 'true' : 0 })->visit(@entries);
+        my $departure_table = Tabulate \@entries;
+        $departure_table =~ s/^.*\n//; # remove object type
+    
+        print $departure_tabletable;
 
 DESCRIPTION
 

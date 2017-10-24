@@ -15,7 +15,7 @@ function setDisplayMode(doUpdate) {
     // Replace div content by textarea content
     if (doUpdate) {
         memoValue = memoTextarea.value;
-        memoDiv.innerHTML = memoValue.replace(/\n/g, '<br />');
+        memoDiv.innerHTML = memoValue;
     }
     // Cancel textarea content
     else {

@@ -3,6 +3,7 @@
 use Test::More;
 use ZMQ::Raw;
 
+ZMQ::Raw::Curve->keypair();
 my ($private, $public) = ZMQ::Raw::Curve->keypair();
 
 ok ($public ne $private);

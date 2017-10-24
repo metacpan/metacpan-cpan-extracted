@@ -18,6 +18,8 @@ package Foo {
 
     has _bar => sub { 100 };
 
+    my sub _bar : private;
+
     sub BUILDARGS : init_args( bar? => _bar );
 
     sub bar ($self) { _bar }
@@ -34,6 +36,8 @@ package Foo::Auto {
     extends 'Moxie::Object';
 
     has _bar => sub { 100 };
+
+    my sub _bar : private;
 
     sub BUILDARGS : init_args( bar? => _bar );
 

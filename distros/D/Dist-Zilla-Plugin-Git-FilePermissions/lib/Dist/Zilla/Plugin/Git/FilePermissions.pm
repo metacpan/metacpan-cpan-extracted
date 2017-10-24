@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 use Moose;
 
@@ -20,6 +20,12 @@ has _git => (
 );
 
 sub mvp_multivalue_args { return (qw( perms )) }
+
+has default => (
+    is      => 'ro',
+    isa     => 'Str',
+    default => '0644',
+);
 
 has perms => (
     is      => 'ro',
@@ -46,7 +52,7 @@ sub before_build {
     for my $file (@files) {
 
         # default permission
-        my $perm = 0644;
+        my $perm = oct( $self->default );
 
       PERMS:
         for my $perm_ref (@perms) {
@@ -142,7 +148,7 @@ Dist::Zilla::Plugin::Git::FilePermissions - fix the file permissions in your Git
 
 =head1 VERSION
 
-Version 0.002
+Version 0.003
 
 =head1 SYNOPSIS
 
@@ -158,7 +164,8 @@ where your project is saved. Files not in the Git index, and directories, are
 ignored.
 
 Without configuration, every file is changed to the default permission of
-0644. You can configure different permissions for some files with the
+0644. The default permissions can be changed with the B<default> argument
+and you can configure different permissions for some files with the
 B<perms> argument in the F<dist.ini>.
 
 The plugin runs in the before build phase, which means it will fix the file

@@ -1,5 +1,5 @@
 package Bio::Roary::ParseGFFAnnotationRole;
-$Bio::Roary::ParseGFFAnnotationRole::VERSION = '3.10.2';
+$Bio::Roary::ParseGFFAnnotationRole::VERSION = '3.11.0';
 # ABSTRACT: A role for parsing a gff file efficiently
 
 use Moose::Role;
@@ -38,7 +38,7 @@ Bio::Roary::ParseGFFAnnotationRole - A role for parsing a gff file efficiently
 
 =head1 VERSION
 
-version 3.10.2
+version 3.11.0
 
 =head1 SYNOPSIS
 

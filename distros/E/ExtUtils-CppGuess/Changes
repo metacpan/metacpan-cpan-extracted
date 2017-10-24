@@ -1,5 +1,8 @@
 Revision history for Perl extension ExtUtils::CppGuess.
 
+0.12	Sat Oct 21 18:12:51 BST 2017
+    - Fix tests on 5.26 without '.' in @INC (kentfredric)
+
 0.11   Thu Sep 10 13:12:17 MDT 2015
     - Add leading whitespace to $cflags in _get_cflags (bulk88)
 

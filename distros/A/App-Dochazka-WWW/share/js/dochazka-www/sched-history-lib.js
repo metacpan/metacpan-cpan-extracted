@@ -89,7 +89,6 @@ define ([
                         }
                     },
                     fc = function (st) {
-                        console.log("AJAX: " + rest["path"] + " failed with", st);
                         lib.displayError(st.payload.message);
                         if (st.payload.code === "404") {
                             // The employee has no history records. This is not
@@ -135,7 +134,6 @@ define ([
                     }
                 },
                 fc = function (st) {
-                    console.log("AJAX: " + rest["path"] + " failed with", st);
                     lib.displayError(st.payload.message);
                     if (st.payload.code === '404') {
                         // go back to miniMenu listener
@@ -161,7 +159,6 @@ define ([
                     }
                 },
                 fc = function (st) {
-                    console.log("AJAX: " + rest["path"] + " failed with", st);
                     lib.displayError(st.payload.message);
                     $('input[name="sel"]').val('').focus();
                 };

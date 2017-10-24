@@ -1,10 +1,12 @@
+[![CPAN](https://img.shields.io/cpan/v/Geo-Coder-Postcodes.svg)](http://search.cpan.org/~nhorne/Geo-Coder-Postcodes/)
+
 # Geo::Coder::Postcodes
 
 Provides a geocoding functionality using https://postcodes.io.
 
 # VERSION
 
-Version 0.03
+Version 0.04
 
 # SYNOPSIS
 

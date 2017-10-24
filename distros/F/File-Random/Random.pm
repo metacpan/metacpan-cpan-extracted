@@ -31,14 +31,14 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{':all'} }, 'corf' );
 our @EXPORT = qw(
 	
 );
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 sub _standard_dir($);
 sub _dir(%);
 
 sub random_file {
-	my @params = my ($dir, $check, $recursive) = _params_random_file(@_);
-	
+	my @params = my ($dir, $check, $recursive, $follow) = _params_random_file(@_);
+    
 	return $recursive ? _random_file_recursive    (@params)
 	                  : _random_file_non_recursive(@params);
 }
@@ -101,7 +101,7 @@ sub _random_file_non_recursive {
 }
 
 sub _random_file_recursive {
-	my ($dir, $check) = @_;
+	my ($dir, $check, $recursive, $follow) = @_;
 
 	my $i = 1;
 	my $fname;
@@ -118,7 +118,7 @@ sub _random_file_recursive {
 			$fname = $f;
 		}
 	};
-	find($accept_routine, $dir);
+	find({wanted => $accept_routine, follow => $follow}, $dir);
 
 	return $fname;	
 }
@@ -147,19 +147,21 @@ sub _params_random_file {
     foreach (keys %args) {
         /^\-(d|dir|directory|
              c|check|
-             r|rec|recursive)$/x or carp "Unknown option '$_'";
+             r|rec|recursive|
+             f|follow)$/x or carp "Unknown option '$_'";
     }
     
 	my $dir   = _standard_dir _dir %args;    
 	my $check = $args{-c} || $args{-check} || sub {"always O.K."};
 	my $recursive = $args{-r} || $args{-rec} || $args{-recursive};
+    my $follow = $args{-f} || $args{-follow};
 
 	unless (!defined($check) or (scalar ref($check) =~ /^(Regexp|CODE)$/)) {
 		die "-check Parameter has to be either a Regexp or a sub routine,".
 		    "not a '" . ref($check) . "'";
 	}
 		
-	return ($dir, $check, $recursive);
+	return ($dir, $check, $recursive, $follow);
 }
 
 sub _standard_dir($) {    
@@ -183,12 +185,17 @@ File::Random - Perl module for random selecting of a file
 
   my $fname2 = random_file(-dir => $dir);
   
-  my $random_gif = random_file(-dir       => $dir,
-                               -check     => qr/\.gif$/,
-							   -recursive => 1);
+  my $random_gif = random_file(
+    -dir       => $dir,
+    -check     => qr/\.gif$/,
+	-recursive => 1,
+    -follow => 1
+  );
 							   
-  my $no_exe     = random_file(-dir   => $dir,
-                               -check => sub {! -x});
+  my $no_exe     = random_file(
+    -dir   => $dir,
+    -check => sub {! -x}
+  );
 							   
   my @jokes_of_the_day = content_of_random_file(-dir => '/usr/lib/jokes');
   my $joke_of_the_day  = content_of_random_file(-dir => '/usr/lib/jokes');
@@ -225,8 +232,6 @@ The simple standard job of selecting a random line from a file is implemented, t
 =head1 FUNCTION
 
 =head2 random_file
-
-=item random_file
 
 Returns a randomly selected file(name) from the specified directory
 If the directory is empty, undef is returned. There are 3 options:
@@ -283,12 +288,16 @@ So switching -recursive on, slowers the program a bit :-)
 Please look to the C<File::Find> module for any details and bugs
 related to recursive searching of files.
 
+=item -follow (-f)
+
+Follow symlinks when in recursive mode. See C<File::Find> for details.
+Default is not to follow.
+
 =item unknown options
 
 Gives a warning.
 Unknown options are ignored.
 Note, that upper/lower case makes a difference.
-(Maybe, once a day I'll change it)
 
 =back
 

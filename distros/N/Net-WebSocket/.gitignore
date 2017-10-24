@@ -1,4 +1,4 @@
 *.sw*
 MYMETA.*
 Makefile
-Net-WebSocket-*
+Net-WebSocket-*.tar.*

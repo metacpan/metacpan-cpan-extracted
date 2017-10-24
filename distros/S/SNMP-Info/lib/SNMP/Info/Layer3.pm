@@ -53,7 +53,7 @@ use SNMP::Info::LLDP;
 
 use vars qw/$VERSION %GLOBALS %FUNCS %MIBS %MUNGE/;
 
-$VERSION = '3.37';
+$VERSION = '3.38';
 
 %MIBS = (
     %SNMP::Info::MIBS,
@@ -196,10 +196,13 @@ sub serial {
 
     my $serial1 = $l3->serial1();
     my $e_parent = $l3->e_parent() || {};
+    my $e_class  = $l3->e_class() || {};
 
     foreach my $iid ( keys %$e_parent ) {
         my $parent = $e_parent->{$iid};
-        if ( $parent eq '0' ) {
+        my $class = $e_class->{$iid} || '';
+        # Only consider serial numbers for entries without a parent, or if they are of type "chassis"
+        if ( $parent eq '0' or $class eq 'chassis') {
             my $serial = $l3->e_serial($iid);
             if ( $serial && $serial->{$iid} ) {
                 return $serial->{$iid};

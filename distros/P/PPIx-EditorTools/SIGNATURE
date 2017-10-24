@@ -1,0 +1,72 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 65f6fc587cecdc088018c41a62548c304d97524f CONTRIBUTORS
+SHA1 5fe62d30de1905fdbb52412e716bcfe080abc565 Changes
+SHA1 dc71f2f76914f43563f8c9b5c94dedffb786e22c INSTALL
+SHA1 c07cb3e4ee204b03d740b5685e1369722e8201ea LICENSE
+SHA1 95b3cf0e9da138573393386ba58071dc5c65741d MANIFEST
+SHA1 a9e38bb676cfe99075ec120276094c2f52f7bbd8 META.json
+SHA1 62b81a0e8197bd34d705be56fd6e0ed64ddc800a META.yml
+SHA1 bd548ac3f80b6b6489cf84e0c398d07740451591 Makefile.PL
+SHA1 950f8db4957e1482191f1e28ec5c8a4bea9c9dc1 README
+SHA1 b7b88530ea58b7630278791109a872931e4ced48 README.mkdn
+SHA1 9f11da2cc27952fbfcad13c0e9057cd4af3ee3ae cpanfile
+SHA1 0e5a786fb074087cff2ff0817732fe9cf1d45a0b dist.ini
+SHA1 ba8ba2ba62e465fc7b931158e8e1473fc8ae8ee0 doap.xml
+SHA1 d6f381e87da8578aba3c946e99e804653e2d2f5c lib/PPIx/EditorTools.pm
+SHA1 c58909c66908c566b1a9c00df7b1966aba2462a8 lib/PPIx/EditorTools/FindUnmatchedBrace.pm
+SHA1 6dc22a55cba6d85d36726fbd8bab6cb48f3d8409 lib/PPIx/EditorTools/FindVariableDeclaration.pm
+SHA1 547ff8dfe965feaf21b29e43ba1e05c95be1c196 lib/PPIx/EditorTools/IntroduceTemporaryVariable.pm
+SHA1 3ffae93b4ba004e89046663a108a7de6905447a4 lib/PPIx/EditorTools/Lexer.pm
+SHA1 ce7714a678e87f14abef365f8f81dc1e524d2259 lib/PPIx/EditorTools/Outline.pm
+SHA1 cbfcebe307d0fcd61e520f16c74680271119b306 lib/PPIx/EditorTools/RenamePackage.pm
+SHA1 3a0c79c9ba519003fd941a560b4dc6d57321cbc5 lib/PPIx/EditorTools/RenamePackageFromPath.pm
+SHA1 3f397f3f831e44d6bf39be043e6c2e8357cbba86 lib/PPIx/EditorTools/RenameVariable.pm
+SHA1 501573d1294ec986f47daec724ca3073a9d2503e lib/PPIx/EditorTools/ReturnObject.pm
+SHA1 e7e0e8952cb48e7cd27a950807a2f2dcfb227b38 script/ppix_editortools
+SHA1 20e771be9893e894e065e7674f9df2fcb03033f7 t/00-compile.t
+SHA1 4eb6e5b345bd77b0f12d71f4e5259696362189f7 t/00-ppix-editortools.t
+SHA1 8adac03b6b0aa2bae145c66763ea9e5e96806d32 t/00-report-prereqs.dd
+SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
+SHA1 8ede358b2f277a091c497906169f5091ebeda334 t/01-findunmatchedbrace.t
+SHA1 f5e4bf0840ea8c792e08df27c43d34b684688ef9 t/02-findvariabledeclaration.t
+SHA1 aa6c8805c6bdbbcba097e934d80b0069d41c0459 t/03-introducetemporaryvariable.t
+SHA1 e1a8f732646954b48cb4b9fad2deeac9b30d3a13 t/04-renamepackage.t
+SHA1 00affe5390aaa87a25f59d27697a445cbe9b8154 t/05-renamepackagefrompath.t
+SHA1 1874ffb348e83253751012cc3b9fd79811e2d5e2 t/06-camelcasing.t
+SHA1 2a5bbc43c5df3c4c0d8f3966e41ccc2559b77646 t/07-renamevariable.t
+SHA1 57f5981a7c402004316db76be471ae91343d05fa t/08-getallvariabledeclarations.t
+SHA1 6e8fce32ac23e7322aabb131df02c85e4feb34ee t/09-outline.t
+SHA1 7899491a32986450670126afc2d5558488beda09 t/10-lexer.t
+SHA1 d3e6673c6ef0432c21ae5c45552059a7d6d56143 t/100-changes.t
+SHA1 5fcf28a1936774ac600d2460224bc437d108daf3 t/outline/Foo.pm
+SHA1 3ea5ddf93ad27b48571351735ba90883a39e1df3 t/outline/Mooclass.pm
+SHA1 05b8170bd92c2a45489b68078edc4883c1349122 t/outline/MooclassVanilla.pm
+SHA1 ba3986bf35f118a58466f564ddfa5c0ebb0b4649 t/outline/Moofirst.pm
+SHA1 1c9d951dcfdd1b9f40d9d0351e5104b22b8fb538 t/outline/Moorole.pm
+SHA1 f7b0b18756ebd7a360df4509830b0fb0a789f487 t/outline/file1.pl
+SHA1 ab06cc809ac916aa2692f59539b1a0215f563435 t/outline/file2.pl
+SHA1 26f6feb9d2f638ebd67ae0ba02324ae5a90c71f4 t/outline/test_1435.pl
+SHA1 eaa4fb32444b3841bda35b474c79eaa2cf006051 t/rename_variable/1.in
+SHA1 9cf8236dd9b2fd02c9e1ad97f14f554a32d51832 t/rename_variable/1.out
+SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+
+iEYEARECAAYFAlns4jUACgkQ34Hwf+GwC4zxOgCggQ29x2lQ6wGjgcDEQDqt2KR3
+jwQAn3JMqcBqADk1cMijKNp1rI15GHnC
+=6Oz3
+-----END PGP SIGNATURE-----

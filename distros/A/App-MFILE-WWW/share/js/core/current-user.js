@@ -87,7 +87,7 @@ define ([
     return function (sw, arg) { 
         var emptyObj = { "nick": null };
         if (sw === 'obj') {
-            console.log('current-user function called with "obj"', arg);
+            // console.log('current-user function called with "obj"', arg);
             if (arg) {
                 console.log('NOTICE: setting current user object to ', arg);
                 cu = arg;

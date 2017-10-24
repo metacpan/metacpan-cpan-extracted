@@ -99,8 +99,11 @@ DESCRIPTION
        lines are expected to be of one of three types: rule lines, zone lines,
        and link lines.
 
-       Names (such as month names) must be in English and are case
-       insensitive.  Abbreviations, if used, must be unambiguous in context.
+       Names must be in English and are case insensitive.  They appear in
+       several contexts, and include month and weekday names and keywords such
+       as maximum, only, Rolling, and Zone.  A name can be abbreviated by
+       omitting all but an initial prefix; any abbreviation must be
+       unambiguous in context.
 
        A rule line has the form
 
@@ -145,7 +148,8 @@ DESCRIPTION
                     Sun>=8   first Sunday on or after the eighth
                     Sun<=25  last Sunday on or before the 25th
 
-               Names of days of the week may be abbreviated or spelled out in
+               A weekday name (e.g., Sunday) or a weekday name preceded by
+               "last" (e.g., lastSunday) may be abbreviated or spelled out in
                full.  Note that there must be no spaces within the ON field.
 
        AT      Gives the time of day at which the rule takes effect.

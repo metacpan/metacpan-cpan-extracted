@@ -14,194 +14,195 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 1b6c34fab04c9be3412a26d2c7710091c01ae902 Changes
+SHA1 69056914faf2db3e7a3deeac6fdd7b6fbadf030e Changes
 SHA1 ca5d6cecfc6405f2a9156243e6afee5c091ae3d9 INSTALL
 SHA1 43dae1e8e65629a90df93c4d1230c0dacaef8ffc LICENSE
-SHA1 00c080731099affdc4e03897e4446db6055bc9ce MANIFEST
-SHA1 fd11a4e877536fce3357ea6e8a3a47614d002720 META.json
-SHA1 fc7ef7a1d13a8419adaff789974573839a0024c5 META.yml
-SHA1 3bfa60b95a1a9e36bc4314f8541a1b2aad15b700 Makefile.PL
-SHA1 610aabddfc2a5dd024f4a627ea43d6b7ded2262f README
+SHA1 14ac1d29c28fe3016895af0681b244a64e82694c MANIFEST
+SHA1 032ba4801a0e4a1922bcb18d11339363b098b93d META.json
+SHA1 0d48a17b70769c00c776e7d865bdf65ac82d0210 META.yml
+SHA1 768489db209d28c6d8a4cb3a63682bbe3bbe8b7e Makefile.PL
+SHA1 6301e3552fdb131ae45af04045a9c571f1d37d6a README
 SHA1 2bd085c6f0696a186985c172abcf705d12310665 README.md
 SHA1 8d4a6c9ebb408f37aed6e715b77e059c346ae816 cpanfile
 SHA1 e307b7214826b27141d8eaf04f3af946ddf934e4 dist.ini
 SHA1 f09bdc75ab18de40b172a1a87cddb3b66a5d3023 examples/oauth.pl
 SHA1 b65406f88a892f43dd58a9c6721743adb2951a4f examples/rtm.pl
 SHA1 c10cbc572c4028076aba267044705ee2d18925fd examples/send_message.pl
-SHA1 fdfed42acfe8effcad9a701cdc704a6378a77bf8 lib/Net/Async/Slack.pm
-SHA1 bd46f16804ab8c3290dd494fa49e9cc4756234f2 lib/Net/Async/Slack.pod
-SHA1 0f3f88b0b090e980d084780a77efd609bec05da5 lib/Net/Async/Slack/Event/AccountsChanged.pm
+SHA1 302f10a2760c6ff5595f29c09d35505255780e86 lib/Net/Async/Slack.pm
+SHA1 50b23612b2043add8f8ee6abf7b0acd3a2819ae8 lib/Net/Async/Slack.pod
+SHA1 93c34866d748ceb2c9027354f71771a426f563c7 lib/Net/Async/Slack/Event/AccountsChanged.pm
 SHA1 5f011b7418c8cce8101d5a2b4ca5105bcbff94ce lib/Net/Async/Slack/Event/AccountsChanged.pod
-SHA1 34c0453ba0b37059773291177cad351cd194ad1e lib/Net/Async/Slack/Event/AppUninstalled.pm
+SHA1 3b68b281c2d9c470a4f825106b99c3e4a8b87e5c lib/Net/Async/Slack/Event/AppUninstalled.pm
 SHA1 661a05c7164ff513b2ae0a17cc11f70ac9d2d023 lib/Net/Async/Slack/Event/AppUninstalled.pod
-SHA1 dfc4108a390d11a09c4f9f53541f3c2a519de3e7 lib/Net/Async/Slack/Event/Bot.pm
-SHA1 d51456ae2ccc8beccf71eba71d2e5dddf5b054d2 lib/Net/Async/Slack/Event/BotAdded.pm
+SHA1 db2532246e8414417788d82f93fbf316e326dc7c lib/Net/Async/Slack/Event/Bot.pm
+SHA1 4033b4ea65eedeaec1c101ea5e94cb733dae48e3 lib/Net/Async/Slack/Event/BotAdded.pm
 SHA1 220a6b2f4a6d5fc2e205042b246335b3332884f5 lib/Net/Async/Slack/Event/BotAdded.pod
-SHA1 19025b49c54f6bffba17e19e265192e815437873 lib/Net/Async/Slack/Event/BotChanged.pm
+SHA1 00ed2bbb1e4558bfdaa6f8eb624cc22f71e4f3e6 lib/Net/Async/Slack/Event/BotChanged.pm
 SHA1 60b39f9f2e4c1459f54aba4e3d5193d10b008655 lib/Net/Async/Slack/Event/BotChanged.pod
-SHA1 ea16aae476b3eefcb8ee8955496395bd289a60b1 lib/Net/Async/Slack/Event/Channel.pm
-SHA1 f0084f26075cf136a5957d2fc650288a568f8c41 lib/Net/Async/Slack/Event/ChannelArchive.pm
+SHA1 0d8f5ba19122d7a12165a8341b6ccd170648bf86 lib/Net/Async/Slack/Event/Channel.pm
+SHA1 06ddd17e1600668d49eff6e7b54f6a10969c7b17 lib/Net/Async/Slack/Event/ChannelArchive.pm
 SHA1 09658e089465d40f99f594d6afd798661c021b39 lib/Net/Async/Slack/Event/ChannelArchive.pod
-SHA1 e83910a2310056f42eec77014ab8f9b4172dc955 lib/Net/Async/Slack/Event/ChannelCreated.pm
+SHA1 5fd40994f5f1ad43b603efe549c87dc19f2dd889 lib/Net/Async/Slack/Event/ChannelCreated.pm
 SHA1 04be958a46c00d3143eb5d63d3d405abc1fe2ace lib/Net/Async/Slack/Event/ChannelCreated.pod
-SHA1 a9c7ade7a0f6cf712256ae431d68554574c58093 lib/Net/Async/Slack/Event/ChannelDeleted.pm
+SHA1 0733aee2af19b40497552ea63057c4169c7a4d42 lib/Net/Async/Slack/Event/ChannelDeleted.pm
 SHA1 872430b6c444dcb669e2ceb5d9270371b82d218e lib/Net/Async/Slack/Event/ChannelDeleted.pod
-SHA1 723c56dcdbc411e30057b2122bafa5df27bb688f lib/Net/Async/Slack/Event/ChannelHistoryChanged.pm
+SHA1 0d84588f739e22c2b98fb35ac5947c1f7f638826 lib/Net/Async/Slack/Event/ChannelHistoryChanged.pm
 SHA1 dfff39bb6658e4abfbc697cf9b90e6e07aa242a7 lib/Net/Async/Slack/Event/ChannelHistoryChanged.pod
-SHA1 aee33bf198076612f33c0c655dd04b0d0f2388f0 lib/Net/Async/Slack/Event/ChannelJoined.pm
+SHA1 fe743b78b7e2e5b2faf769a388f877cc17468cb7 lib/Net/Async/Slack/Event/ChannelJoined.pm
 SHA1 35c8ee27b2d168de80374d11869e20734b4f7d23 lib/Net/Async/Slack/Event/ChannelJoined.pod
-SHA1 aaed192509afc4e7a6b805257b63839bebe093da lib/Net/Async/Slack/Event/ChannelLeft.pm
+SHA1 8112d303825d3c10b698cbe7d5f2a20531a8f081 lib/Net/Async/Slack/Event/ChannelLeft.pm
 SHA1 12520da2c41918af427b835e378b97b4bb14adb5 lib/Net/Async/Slack/Event/ChannelLeft.pod
-SHA1 0a6a9c7ed89d3dab807e5de7c7b448d1bbe197d0 lib/Net/Async/Slack/Event/ChannelMarked.pm
+SHA1 379fa0d5b78f78fd283314ca1053f4e0a4fd7a32 lib/Net/Async/Slack/Event/ChannelMarked.pm
 SHA1 3826732d805629a30c47283580794b34f9472054 lib/Net/Async/Slack/Event/ChannelMarked.pod
-SHA1 8fdd6e8cf19bc6a2ef193a1cafd29f12de302f88 lib/Net/Async/Slack/Event/ChannelRename.pm
+SHA1 89319e6bdfbaa9979f384d90f456d992b588985e lib/Net/Async/Slack/Event/ChannelRename.pm
 SHA1 37032bce145e7f63698e0212f1056f7a9dce2934 lib/Net/Async/Slack/Event/ChannelRename.pod
-SHA1 def739bcdd1566db34d0ebf710c13139369c4203 lib/Net/Async/Slack/Event/ChannelUnarchive.pm
+SHA1 8518be0e9313f6528890d49d46a3f63680708c23 lib/Net/Async/Slack/Event/ChannelUnarchive.pm
 SHA1 55d7633244ce938895b480b74cf540c894bf11ad lib/Net/Async/Slack/Event/ChannelUnarchive.pod
-SHA1 342d93f4d2803ecd5e9d2e70056095da5e09857e lib/Net/Async/Slack/Event/CommandsChanged.pm
+SHA1 8b324d2ca77d295b74f594fff438f77aeb29b55f lib/Net/Async/Slack/Event/CommandsChanged.pm
 SHA1 18c14d13f15079e93116c97a2608bde1d8b9eae8 lib/Net/Async/Slack/Event/CommandsChanged.pod
-SHA1 8203c87b086427fcf0318a3609b0adab8df92c68 lib/Net/Async/Slack/Event/DndUpdated.pm
+SHA1 c9419c7c481c371f864a708de6ea48165585d03a lib/Net/Async/Slack/Event/DndUpdated.pm
 SHA1 e72786d2c305a11650be07689dc4ba31916a0fb9 lib/Net/Async/Slack/Event/DndUpdated.pod
-SHA1 bbf7b78810ebb5ac6189286cfcdda1595e4b8230 lib/Net/Async/Slack/Event/DndUpdatedUser.pm
+SHA1 117fd896d01006304d95e22e7fca9498eeda3565 lib/Net/Async/Slack/Event/DndUpdatedUser.pm
 SHA1 307d65530344ea98ad69aa757d8a5a0e4d0c9cee lib/Net/Async/Slack/Event/DndUpdatedUser.pod
-SHA1 7ddf7e86652560b0a0d35806439019f0e4126f78 lib/Net/Async/Slack/Event/EmailDomainChanged.pm
+SHA1 d5c4e8f7aade5dd6dbc53e6cef004fcd643d43c4 lib/Net/Async/Slack/Event/EmailDomainChanged.pm
 SHA1 e3b94debb4d4d3fd59e95be94a8ee34da6e73d28 lib/Net/Async/Slack/Event/EmailDomainChanged.pod
-SHA1 7e1553ce57c3b08c2a93696cf4213d9de46c818c lib/Net/Async/Slack/Event/EmojiChanged.pm
+SHA1 a1285e04f2a4fad0950d7a5a96db5c37da8d7a76 lib/Net/Async/Slack/Event/EmojiChanged.pm
 SHA1 2e2bc01f0446f4432d1a0da775a2978593dc1731 lib/Net/Async/Slack/Event/EmojiChanged.pod
-SHA1 818cf880572a8c4f812d2760155d72596934ffde lib/Net/Async/Slack/Event/FileChange.pm
+SHA1 7f3ef23c77f616d64df13d7148b10382defca1a0 lib/Net/Async/Slack/Event/FileChange.pm
 SHA1 eab18d1ea90cced7c04bb39c4f09b53176f7e80e lib/Net/Async/Slack/Event/FileChange.pod
-SHA1 63f2d4975d782dbe8eaa35390c0305d6fdcbb971 lib/Net/Async/Slack/Event/FileCommentAdded.pm
+SHA1 e5ff0dbcd63a119e14d627ac9324c48dc9fd8b5b lib/Net/Async/Slack/Event/FileCommentAdded.pm
 SHA1 b266eb193318357c9a0f589ed6e5bf4d4fd82331 lib/Net/Async/Slack/Event/FileCommentAdded.pod
-SHA1 9bfd6c218f054edebd1b6d83bf5017b50d7c998d lib/Net/Async/Slack/Event/FileCommentDeleted.pm
+SHA1 517917402ad6210d4bcc9770804b1adf0ee960fb lib/Net/Async/Slack/Event/FileCommentDeleted.pm
 SHA1 3fab24ffc735f7d2b54140e6ee8f8d471b1e2180 lib/Net/Async/Slack/Event/FileCommentDeleted.pod
-SHA1 3d64d1e8b96f904059052606cb228741a07cedbc lib/Net/Async/Slack/Event/FileCommentEdited.pm
+SHA1 e4fce888d1fae7bc848b5d21f5b07039360c77ac lib/Net/Async/Slack/Event/FileCommentEdited.pm
 SHA1 7574be5abd3b1c7cf7467660076ca7b08256db0d lib/Net/Async/Slack/Event/FileCommentEdited.pod
-SHA1 3834d41d5aff7a742988b3f100cb1e509aabca09 lib/Net/Async/Slack/Event/FileCreated.pm
+SHA1 001272a0efcae844a5f8178dfdc45b1ba62d5de9 lib/Net/Async/Slack/Event/FileCreated.pm
 SHA1 4f7015b901247129ca1e3f5baee27500bc07fe3c lib/Net/Async/Slack/Event/FileCreated.pod
-SHA1 0a19d53ca7609b294af8359ec46b93b2c6b2740f lib/Net/Async/Slack/Event/FileDeleted.pm
+SHA1 3d1f4332a6f019386db6bc415c1685225269deff lib/Net/Async/Slack/Event/FileDeleted.pm
 SHA1 4023c47c44539be5e9fb54d1effd223c886aa156 lib/Net/Async/Slack/Event/FileDeleted.pod
-SHA1 1535e5fdeb0889eadffa09deb9d5639e78cf1572 lib/Net/Async/Slack/Event/FilePublic.pm
+SHA1 09618d904ca6b205697708b6c9eccfbfe211f5d8 lib/Net/Async/Slack/Event/FilePublic.pm
 SHA1 1989f50bc396e1a52ebb3fdf0f10a80cf170e2b6 lib/Net/Async/Slack/Event/FilePublic.pod
-SHA1 de756fd1f8ad0b5ad926aefe7ec70046db539e33 lib/Net/Async/Slack/Event/FileShared.pm
+SHA1 8991f697eb583cd7dba7c334d9640cc3b0bd7d68 lib/Net/Async/Slack/Event/FileShared.pm
 SHA1 2da9a8c5d06f23074b1d4bfbca86dbc899c7cfa8 lib/Net/Async/Slack/Event/FileShared.pod
-SHA1 83d2f7bb81c23a7b30df45c064daeb23561e0b8f lib/Net/Async/Slack/Event/FileUnshared.pm
+SHA1 9c2e43887b6975d363a675690b61a527d5f5fef0 lib/Net/Async/Slack/Event/FileUnshared.pm
 SHA1 f4f7a2979888e68fd79e6b9e8db0c485dc5bafc8 lib/Net/Async/Slack/Event/FileUnshared.pod
-SHA1 a8d3c07797e28e5cad8e1d32aeae18e6d962b689 lib/Net/Async/Slack/Event/Goodbye.pm
+SHA1 b277495d17ba412448372235781a4f60cd91d6e1 lib/Net/Async/Slack/Event/Goodbye.pm
 SHA1 a47aa5a419b3c634644af82dbc6bfcbe1fe6b542 lib/Net/Async/Slack/Event/Goodbye.pod
-SHA1 eaa5b509c169cc72f7ef92a2375e57a87160e8e6 lib/Net/Async/Slack/Event/GridMigrationFinished.pm
+SHA1 08831b44bb33b561fd76df8f79b37063aafe4436 lib/Net/Async/Slack/Event/GridMigrationFinished.pm
 SHA1 7cf4b2399996d822ebe5ac71ddb73d98e32093d8 lib/Net/Async/Slack/Event/GridMigrationFinished.pod
-SHA1 4eafc820ae1482e2041a7e508d05e75ca5007dbe lib/Net/Async/Slack/Event/GridMigrationStarted.pm
+SHA1 b5cafaf9010ed885286d119b6912867c86bd2b7f lib/Net/Async/Slack/Event/GridMigrationStarted.pm
 SHA1 d23916fceaa11aef2db15c71d54af99c447bbf1d lib/Net/Async/Slack/Event/GridMigrationStarted.pod
-SHA1 6ad91034b510b3693db286051eae4a024e3e205b lib/Net/Async/Slack/Event/GroupArchive.pm
+SHA1 90854d1b83e89753782f286039c7ba9401de1355 lib/Net/Async/Slack/Event/GroupArchive.pm
 SHA1 0898fb62d3adb790cf74be2afda227e28d9ece66 lib/Net/Async/Slack/Event/GroupArchive.pod
-SHA1 c9e4c6ab38bd92ebda58ece1e13aa9dfd35709ee lib/Net/Async/Slack/Event/GroupClose.pm
+SHA1 ce82ee8b9ad09f98e9935b5889e071be36007ef4 lib/Net/Async/Slack/Event/GroupClose.pm
 SHA1 67a3161f3f082dba71365b19837b49708d449ac9 lib/Net/Async/Slack/Event/GroupClose.pod
-SHA1 6bc9255539fdd42045e906ddac16fb47d192e560 lib/Net/Async/Slack/Event/GroupHistoryChanged.pm
+SHA1 c583c1e6fbad1ad04b90c0d39f654ea0c6f22b59 lib/Net/Async/Slack/Event/GroupHistoryChanged.pm
 SHA1 695df1e581a4d06906825c347f75b0b5c896cacd lib/Net/Async/Slack/Event/GroupHistoryChanged.pod
-SHA1 072b577c45fafc36b1de6f1e595d9311fb24faf9 lib/Net/Async/Slack/Event/GroupJoined.pm
+SHA1 958fea52fca89d73ac5d65f461192d83b80d1a86 lib/Net/Async/Slack/Event/GroupJoined.pm
 SHA1 61cb510ac92331a7dd31053880891a81630b0aa5 lib/Net/Async/Slack/Event/GroupJoined.pod
-SHA1 48a7653e99bae3729299deed5683c1c6bcd9b4a9 lib/Net/Async/Slack/Event/GroupLeft.pm
+SHA1 2f86c19a3b7fbd8a5cc89c4800351afcb455f8d6 lib/Net/Async/Slack/Event/GroupLeft.pm
 SHA1 a713205e33634622584b48c25622dea93cc4a252 lib/Net/Async/Slack/Event/GroupLeft.pod
-SHA1 9a7a81b6e490c67552c07ced98ee91cd53855082 lib/Net/Async/Slack/Event/GroupMarked.pm
+SHA1 8741c464b9fc6abcccf70269812c86d7fc4db292 lib/Net/Async/Slack/Event/GroupMarked.pm
 SHA1 7df6d9181c3c784da38ceddf4bae7b4295a64c4a lib/Net/Async/Slack/Event/GroupMarked.pod
-SHA1 00d69796cd00b849e69438eb64cd38e342e92bc7 lib/Net/Async/Slack/Event/GroupOpen.pm
+SHA1 aa17c9dd4f949ba38274749985f4281136d936c4 lib/Net/Async/Slack/Event/GroupOpen.pm
 SHA1 7df219be8a059d6cf579b8d1069950774aba6ae8 lib/Net/Async/Slack/Event/GroupOpen.pod
-SHA1 d2f907039cf23b609cce6c4e2a918dcbd03a4041 lib/Net/Async/Slack/Event/GroupRename.pm
+SHA1 8c76dace092816825bafaa98634bb3d539e8cac7 lib/Net/Async/Slack/Event/GroupRename.pm
 SHA1 0927f729d0deb7d7ed534cc9c019192b205a75c6 lib/Net/Async/Slack/Event/GroupRename.pod
-SHA1 7729ba1ab087f4c0e021766b76053bfbc80885d5 lib/Net/Async/Slack/Event/GroupUnarchive.pm
+SHA1 dc68f85635cdcb5ec2285bbc7a2e69dfc045f26e lib/Net/Async/Slack/Event/GroupUnarchive.pm
 SHA1 b21ed7a719488511ca3716f68a826bb41e14e7a3 lib/Net/Async/Slack/Event/GroupUnarchive.pod
-SHA1 a415b5fa4d056daf292097165c887e94fa6248ee lib/Net/Async/Slack/Event/Hello.pm
+SHA1 cd50bcdadef8b95342d44edabfa428313c34a6c5 lib/Net/Async/Slack/Event/Hello.pm
 SHA1 95c7106b8f0f01acfe63322566e340179fc49c3b lib/Net/Async/Slack/Event/Hello.pod
-SHA1 e6fa83135fa0f8e1e6b4239b65ff694e059314bc lib/Net/Async/Slack/Event/ImClose.pm
+SHA1 5869941f5f5308c3f2574ccc2e655f32efc7638c lib/Net/Async/Slack/Event/ImClose.pm
 SHA1 d5895c58e29746195b2d8ea302f0c0f76521e6ed lib/Net/Async/Slack/Event/ImClose.pod
-SHA1 7d917727d7e018abbd2572ac018a9538f6220810 lib/Net/Async/Slack/Event/ImCreated.pm
+SHA1 a73b1eb5482474385d290893d24cad49323c1a62 lib/Net/Async/Slack/Event/ImCreated.pm
 SHA1 34eab359c583b372dd3db3b2751ad7c45967a12d lib/Net/Async/Slack/Event/ImCreated.pod
-SHA1 be7de1998ecb6d8b643163bfc2ac53e1e0468dcf lib/Net/Async/Slack/Event/ImHistoryChanged.pm
+SHA1 61d872e0566bf8a3a8bb76928e397a8468ec6088 lib/Net/Async/Slack/Event/ImHistoryChanged.pm
 SHA1 b2686e30ab60cebc5b3c99b5a5095c4327c16249 lib/Net/Async/Slack/Event/ImHistoryChanged.pod
-SHA1 af176a80d9fc44e70e02f611d6f14f0d8c83db5e lib/Net/Async/Slack/Event/ImMarked.pm
+SHA1 8d85650363b52a95aadb126848b162c42aa33b9a lib/Net/Async/Slack/Event/ImMarked.pm
 SHA1 c7f280df7fd2dfd2113e135526710dddc03679a2 lib/Net/Async/Slack/Event/ImMarked.pod
-SHA1 5bb133bd5e7a090a5f85577e66c111a0ecaf14e6 lib/Net/Async/Slack/Event/ImOpen.pm
+SHA1 87bd826b85e9b113f18df9cb960283c338865d51 lib/Net/Async/Slack/Event/ImOpen.pm
 SHA1 bdeaaeb46eec1d90a007b8042587769ba26e0301 lib/Net/Async/Slack/Event/ImOpen.pod
-SHA1 eb42b68c855db9ded2b46246850eafcc79cf59e5 lib/Net/Async/Slack/Event/LinkShared.pm
+SHA1 d3ff66cec99d6fa912861238e8d0f94b5c213652 lib/Net/Async/Slack/Event/LinkShared.pm
 SHA1 d61e0417ba964dbe9ac1e94fb0fe613e9b50cbb5 lib/Net/Async/Slack/Event/LinkShared.pod
-SHA1 4912c1a378d733948b60a893be81fbeb7f7700d7 lib/Net/Async/Slack/Event/ManualPresenceChange.pm
+SHA1 51642a33227753002757fbf8ac1f15b13996d75d lib/Net/Async/Slack/Event/ManualPresenceChange.pm
 SHA1 4ad03ab2726d9bffd5bd1cfbf40ba7eb14189446 lib/Net/Async/Slack/Event/ManualPresenceChange.pod
-SHA1 4bbb3f3bd2f951214611a2102dd6d40d9b62ba5e lib/Net/Async/Slack/Event/MemberJoinedChannel.pm
+SHA1 fe5043c86b63e0eee2fe92d77747340556d7b8ef lib/Net/Async/Slack/Event/MemberJoinedChannel.pm
 SHA1 7d305b7145c9448b5f175675f6c940668fa30d62 lib/Net/Async/Slack/Event/MemberJoinedChannel.pod
-SHA1 19d00ec79dc813daf6132b13d8743b13b10a24bc lib/Net/Async/Slack/Event/MemberLeftChannel.pm
+SHA1 845d3bfff8a768d8e71f235cef752f335c42ea6b lib/Net/Async/Slack/Event/MemberLeftChannel.pm
 SHA1 861ed5d181ac33541d9d6a79cdfabf688826cb1a lib/Net/Async/Slack/Event/MemberLeftChannel.pod
-SHA1 44ca6f9f11af44cc804b17736fb0b0408e50d211 lib/Net/Async/Slack/Event/Message.pm
+SHA1 1d8ab8032c5868ccb7b6fba5f15ff00a2e63ec2b lib/Net/Async/Slack/Event/Message.pm
 SHA1 39aaa04f984915233669b0820bc6c633a80feaf6 lib/Net/Async/Slack/Event/Message.pod
-SHA1 63f8699b37d4a08b5fecbb221dc4fb8f00b21f27 lib/Net/Async/Slack/Event/MessageChannels.pm
+SHA1 4a7b3635e9e1471d30a09ef4e875b06eb8d3ed8c lib/Net/Async/Slack/Event/MessageChannels.pm
 SHA1 5a5f408538c5189890e477c662eebcaa008d01ac lib/Net/Async/Slack/Event/MessageChannels.pod
-SHA1 8f98d5aabea045963022e139ac09e95581be1189 lib/Net/Async/Slack/Event/MessageGroups.pm
+SHA1 c078eaf6b58cd924ef79f800fd64aabd3926b849 lib/Net/Async/Slack/Event/MessageGroups.pm
 SHA1 66ae0a4b75eedc959398a133895f26ffa72498cd lib/Net/Async/Slack/Event/MessageGroups.pod
-SHA1 39d5d34a30e55d50164daefd0fb04024a98ca7c0 lib/Net/Async/Slack/Event/MessageIm.pm
+SHA1 65ad3e9667c9db79c753f8152e572f201c1e0428 lib/Net/Async/Slack/Event/MessageIm.pm
 SHA1 f00999596b505be86002fc8a7c4585b9acd89bc8 lib/Net/Async/Slack/Event/MessageIm.pod
-SHA1 63875b0abedd66c87cf73b548453d3d6dcdb2f0f lib/Net/Async/Slack/Event/MessageMpim.pm
+SHA1 efef946aadb3a1613c9a5363e0659d86c312be51 lib/Net/Async/Slack/Event/MessageMpim.pm
 SHA1 247e4fd3ee0770eda02ce9c44fd08ff62cb00687 lib/Net/Async/Slack/Event/MessageMpim.pod
-SHA1 7ae31e86e667b54da515aaa3b47a4ca7eaa8b656 lib/Net/Async/Slack/Event/PinAdded.pm
+SHA1 b22fc7be6144d74da365e75ce4f18a957ea59dbc lib/Net/Async/Slack/Event/PinAdded.pm
 SHA1 fc3cf958a2c7ae40130e5e684b3e549420b3a357 lib/Net/Async/Slack/Event/PinAdded.pod
-SHA1 dc7ddbabd874decc8b0dbe5ea68c44751179e802 lib/Net/Async/Slack/Event/PinRemoved.pm
+SHA1 004ecbd8d67cf8ec8822f9ac1178065d05f5609c lib/Net/Async/Slack/Event/PinRemoved.pm
 SHA1 6fb9dc6140d6ae346a8a50573533fb263630bed8 lib/Net/Async/Slack/Event/PinRemoved.pod
-SHA1 da3b6dc0c5ad4c5751aee102bae9ab17bbaedab6 lib/Net/Async/Slack/Event/PrefChange.pm
+SHA1 c12c3cbe58529148cd0ba288fe802436cbfd54e0 lib/Net/Async/Slack/Event/PrefChange.pm
 SHA1 34489675a5b681d632b3d1e6dd795e66773fb7df lib/Net/Async/Slack/Event/PrefChange.pod
-SHA1 2da032500469c9c3f008b49ff1ca6d41424ff5a8 lib/Net/Async/Slack/Event/PresenceChange.pm
+SHA1 fe33279208f16e04e27e315a5342716858ef1cd7 lib/Net/Async/Slack/Event/PresenceChange.pm
 SHA1 d0d6bc481635028d1143056700da2d83f182e73d lib/Net/Async/Slack/Event/PresenceChange.pod
-SHA1 5b80133824f97041e9411524dd537b1594f288eb lib/Net/Async/Slack/Event/ReactionAdded.pm
+SHA1 d6e78c48537318977f650117145e53afac83e9d1 lib/Net/Async/Slack/Event/ReactionAdded.pm
 SHA1 fb0468049a08f9711d43a843efd7af80099cf41c lib/Net/Async/Slack/Event/ReactionAdded.pod
-SHA1 e8ed6e76cb64deb38faf999f3a89686c116e965d lib/Net/Async/Slack/Event/ReactionRemoved.pm
+SHA1 f55791e2f5d03842de3ff2b11c5b4778ac0270aa lib/Net/Async/Slack/Event/ReactionRemoved.pm
 SHA1 72cf2bcd3a8305d993d29b91168dcb447653b384 lib/Net/Async/Slack/Event/ReactionRemoved.pod
-SHA1 d1223c8eee2649741b04189103d9dde6837b1876 lib/Net/Async/Slack/Event/ReconnectURL.pm
+SHA1 c2676b3d67aeb6bd5b5d2f6e306140f2026dc02a lib/Net/Async/Slack/Event/ReconnectURL.pm
 SHA1 6007ccb8b9cdc7d2b4829deeb2534ea3155322a2 lib/Net/Async/Slack/Event/ReconnectURL.pod
-SHA1 564ed80215e517b04fcd0a6ff3b5af5dfc500882 lib/Net/Async/Slack/Event/ReconnectUrl.pm
-SHA1 7e25cd3c4644a586b47895c1a18e6ce35d2ac7c3 lib/Net/Async/Slack/Event/StarAdded.pm
+SHA1 254ec64732d040dbb14520eced4affb1603d7331 lib/Net/Async/Slack/Event/ReconnectUrl.pm
+SHA1 78972e489f340e9bc4b2ff1e904ae1f8b416a1cc lib/Net/Async/Slack/Event/StarAdded.pm
 SHA1 4f0ed4d22c5ccb0aa127bf29d5861fc5c2c7fe7a lib/Net/Async/Slack/Event/StarAdded.pod
-SHA1 7f0d31ec4ad1d2c04b97142f6cf01b9c2824a2a9 lib/Net/Async/Slack/Event/StarRemoved.pm
+SHA1 eb516547b6d5e128dd32de18f1251457fa6f290c lib/Net/Async/Slack/Event/StarRemoved.pm
 SHA1 edf5f5b2d0a61109b2c6a3ace432aa28599ce44d lib/Net/Async/Slack/Event/StarRemoved.pod
-SHA1 6801c4292b49973eb4ffd3efacb4a2d070ff4749 lib/Net/Async/Slack/Event/SubteamCreated.pm
+SHA1 6a18768122f623dd09e1692770f200a2b0f0ccc0 lib/Net/Async/Slack/Event/SubteamCreated.pm
 SHA1 672b66220e0f7569169348bb97af05708043aecd lib/Net/Async/Slack/Event/SubteamCreated.pod
-SHA1 d59487904aa27e108a12736648d9dff40ac3d42b lib/Net/Async/Slack/Event/SubteamSelfAdded.pm
+SHA1 8fc95020001c51e70323198148cbc5f6212310c4 lib/Net/Async/Slack/Event/SubteamSelfAdded.pm
 SHA1 7d77c58c828199507242e171b567e157fdac24d3 lib/Net/Async/Slack/Event/SubteamSelfAdded.pod
-SHA1 cade78a5fd35899fa6b8263d583ff624203d4224 lib/Net/Async/Slack/Event/SubteamSelfRemoved.pm
+SHA1 4db53b70f8b1d2ac2ccc102626e5cc745ada51b5 lib/Net/Async/Slack/Event/SubteamSelfRemoved.pm
 SHA1 74d8809ac892d5b1b67ef2c8dea35347ae38b60c lib/Net/Async/Slack/Event/SubteamSelfRemoved.pod
-SHA1 23cf57a726d830e2795b146e60a11e926d00c5cd lib/Net/Async/Slack/Event/SubteamUpdated.pm
+SHA1 0e29e6467c893ecd02d8147c331b857a437030f1 lib/Net/Async/Slack/Event/SubteamUpdated.pm
 SHA1 cd14eb0b3e4d07c475b8c8b0904c4e50afec34aa lib/Net/Async/Slack/Event/SubteamUpdated.pod
-SHA1 3ee71100f0fd6ba7b782a630ed9bb99cf3c586d3 lib/Net/Async/Slack/Event/TeamDomainChange.pm
+SHA1 6e94df20a7018dcdf359f83f6b1edc3f12bb21ea lib/Net/Async/Slack/Event/TeamDomainChange.pm
 SHA1 88368bde157ec9fded73ed1410a5930bf6d92d9c lib/Net/Async/Slack/Event/TeamDomainChange.pod
-SHA1 dbcad4cf315cc646ca2970eb021cda45aaadd8b6 lib/Net/Async/Slack/Event/TeamJoin.pm
+SHA1 2aabd87e336b871d6b94dd3f5f35b9e1916202bb lib/Net/Async/Slack/Event/TeamJoin.pm
 SHA1 be61435bb74836bc7301fced7fca4e5ba820f7d6 lib/Net/Async/Slack/Event/TeamJoin.pod
-SHA1 890a21d38a98151cac410c1d97ad8a32b074f981 lib/Net/Async/Slack/Event/TeamMigrationStarted.pm
+SHA1 e589673fa0dfb5322d0cac2acc0469e1632daa75 lib/Net/Async/Slack/Event/TeamMigrationStarted.pm
 SHA1 56b1e3f9eaeaf3cd8cabae0727cd5cd5dd55159a lib/Net/Async/Slack/Event/TeamMigrationStarted.pod
-SHA1 933f3f768eda5119dee92b749b64a6fd3e89ef49 lib/Net/Async/Slack/Event/TeamPlanChange.pm
+SHA1 08073cb10b05660dfe542feedd9eabe82830525a lib/Net/Async/Slack/Event/TeamPlanChange.pm
 SHA1 33f8d1aba62970383955d7748316353c601b9642 lib/Net/Async/Slack/Event/TeamPlanChange.pod
-SHA1 a396e45b298f7903995d76e164c912d05366314e lib/Net/Async/Slack/Event/TeamPrefChange.pm
+SHA1 23f5c676737a3cfd55ff01245fd6d2929b547d96 lib/Net/Async/Slack/Event/TeamPrefChange.pm
 SHA1 61a91a800a040052ffb9798e8fe66285064e1b09 lib/Net/Async/Slack/Event/TeamPrefChange.pod
-SHA1 0d77ebbddb04ef0907166cae8a21ec1d53db7907 lib/Net/Async/Slack/Event/TeamProfileChange.pm
+SHA1 a08d566dfbf41ea4352ad9bc6702fe204dc7270c lib/Net/Async/Slack/Event/TeamProfileChange.pm
 SHA1 0f2e9dc777a5f3721f7a3132aa7a34541c0827d8 lib/Net/Async/Slack/Event/TeamProfileChange.pod
-SHA1 30f68b88979d220560815e54691b39a830dcb775 lib/Net/Async/Slack/Event/TeamProfileDelete.pm
+SHA1 9ad34ad6c6d4797260b0e15a4d8d9a9db533e847 lib/Net/Async/Slack/Event/TeamProfileDelete.pm
 SHA1 8113493e7940a5767b2b8eddbad803ae80fa64d1 lib/Net/Async/Slack/Event/TeamProfileDelete.pod
-SHA1 2b0db9416fbdc2b13787c0513d81db8b55f5948f lib/Net/Async/Slack/Event/TeamProfileReorder.pm
+SHA1 f782f1365631f449f63be00bca4648afdda647e8 lib/Net/Async/Slack/Event/TeamProfileReorder.pm
 SHA1 addd6f65cdb131897fdf73d0cde87a1ac2306585 lib/Net/Async/Slack/Event/TeamProfileReorder.pod
-SHA1 8c472ff9d6caa5a8de25cc6576287259efe8ed46 lib/Net/Async/Slack/Event/TeamRename.pm
+SHA1 0c317dcf18f180d3c82a3137628e07f6dbfe079b lib/Net/Async/Slack/Event/TeamRename.pm
 SHA1 dfad8fb1bdcab7975bd3d2ea1b95cceafdd4cb86 lib/Net/Async/Slack/Event/TeamRename.pod
-SHA1 72b11653f6fd24b11b273d34e407fac0d4d4d029 lib/Net/Async/Slack/Event/TokensRevoked.pm
+SHA1 ac1f08883565868f2db459b25a484032546d7191 lib/Net/Async/Slack/Event/TokensRevoked.pm
 SHA1 89ce27836aebdff3fc7a50ea6c0ef5d35377be59 lib/Net/Async/Slack/Event/TokensRevoked.pod
-SHA1 114ea75b648f886d1da658ae7b749beb7e42a47d lib/Net/Async/Slack/Event/UrlVerification.pm
+SHA1 3a199b2e036388de7e634da1e4fea000c917488d lib/Net/Async/Slack/Event/UrlVerification.pm
 SHA1 303e221d1b6df05ec600921716b862c0286fa14e lib/Net/Async/Slack/Event/UrlVerification.pod
-SHA1 80b0af1e9ac0f133cf3fba71a612bbc0de3d9842 lib/Net/Async/Slack/Event/UserChange.pm
+SHA1 fc4eb8049a98ff66c122176ff067a90440b4e74c lib/Net/Async/Slack/Event/UserChange.pm
 SHA1 72ef510e7bb3dc8cc4017b1bf0a70cc8f5d1fab8 lib/Net/Async/Slack/Event/UserChange.pod
-SHA1 797d76a3429267e85e14acfbf9294990e7883bbf lib/Net/Async/Slack/Event/UserTyping.pm
+SHA1 d6600c780f81aae41950645b0ff1e7df86a2dd89 lib/Net/Async/Slack/Event/UserTyping.pm
 SHA1 cf8c74589c29111bf4b2df8e9edc40f56e525e1a lib/Net/Async/Slack/Event/UserTyping.pod
-SHA1 24ca2f1c5ea6238397f295f93c41250fd9a032a7 lib/Net/Async/Slack/EventType.pm
-SHA1 b93416a10a15732b9104716671d66abd92cdccda lib/Net/Async/Slack/RTM.pm
+SHA1 3f62369c5d5abdd45665ae8839735cc878870a0a lib/Net/Async/Slack/EventType.pm
+SHA1 081f3fda4de1f67f72a35304ffeef268e0e70092 lib/Net/Async/Slack/Message.pm
+SHA1 c83fcf85c5da43a3d679251056418f7402647850 lib/Net/Async/Slack/RTM.pm
 SHA1 3bd76f65246c41d57f1284c4c6f8fa0799c3fac1 lib/Net/Async/Slack/RTM.pod
 SHA1 bf4c7ab70a8284d0978bce1e27e04577121bd18b scripts/rtmgen.pl
-SHA1 257c14f52b5ccd30e294e499b00b11d272001120 share/endpoints.json
+SHA1 50159d74469431560c0e5302846c91af2815ad11 share/endpoints.json
 SHA1 7217af7ee03c0952a6426dfe86d12ef8f9fe14eb t/00-check-deps.t
-SHA1 658d950f16d0cfa45f5f69285bdbc8a3c61fe8d7 t/00-compile.t
+SHA1 5b296cc787291db415e278385448a348ab55ce00 t/00-compile.t
 SHA1 eeb015d1948c7709d474bdb02e197901d0553a41 t/00-report-prereqs.dd
-SHA1 d102b9c45639416472b593947cb72390e24f8e93 t/00-report-prereqs.t
+SHA1 6348689eee69681210251892bd47cbfbb7507d7d t/00-report-prereqs.t
 SHA1 f2c40e917e02088703731272f86cbb906ab19eb3 xt/author/mojibake.t
 SHA1 f0c18c75922a1516ae7a5ec5d391b31fd757f0bd xt/author/pod-syntax.t
 SHA1 34513f89a70b96f6412fe2ef0ad4d475e8cac66c xt/author/synopsis.t
@@ -210,17 +211,17 @@ SHA1 198d1665317c3d91e3bb81f0a3b8dad8d4d66f20 xt/release/common_spelling.t
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1
 
-iQIcBAEBAgAGBQJZPGxjAAoJEG2WkcbynxAlbYsQAM9Q9zPuJ2zyvOxvccvArNTb
-Jwx85wAV/jVvAM+6a/VKFX1jefpARccK9R8VMGm5O+EJfIBTrJUqciau9kKUk602
-6NxjTURKcky8s3k5n57Lu0K3d0FglHNtKCYWNbTxYaA9H3SmuIrj7dOpVFa5rBlt
-QgBBi+qdDCpjBw+yaN6tyHdavABgwxwtsjb8uhaR27MqIdfcjFGWK73mSZPg61xl
-duy/2ABtL56ypXcgDFAtNpj01tjmoWj3x7GfVYA28rYPkhky4nZhg3vb0SWOOcsp
-MAFL91nEHy0jYhdwoL3KItq/nugrbbacYp1LUOiCTXmkHeG126MNRZu4GQXVqKS5
-eeUDcOsWeoTMe0d9ySuR5UIayBW/yQqLCZrlkkJf51NUUdENRug1j+UKs45wUJSo
-4v+YspQdw7f/lQ/+EGvgtfDzD2bW3p2IPOnIL6Q2OB6T80RiaP7tVT+Jvds5yqSY
-8XMDqi0h//9V6h363Pv5oN+WSF3WTGAudzEQybQ3BU1H7ozdp7xLZXthID22o/pf
-nMKygByVUf6Id4CTJtoPm7WfZO7Mpn6zsGuhB8srUH/3E6+fRPz/08JaDMqki7wL
-hrFFfyoRizRvi2/ZcKcYNVZ4l1igeeET+OrRQ4j69FfFDRze3CMr4xjJ+PRYAwlB
-sdTRr8hsBaqh3DYsV3L0
-=ekHb
+iQIcBAEBAgAGBQJZ7F7kAAoJEG2WkcbynxAlqEQQAMyiU+6101vi3LqYvcckK/GM
+tBrcOFPoOrq5Z+HinlkJ5d5uRFi7KK2Wrbw8+8hYRWnPAXbglUMgbZuAetJPC78O
+da5EPbV/n5z+Nv9zQ06MBptCweeiRCSf9X7so4BQMZYwpBvanHkzeSbUWYccRNtv
+jfLQSF7M2I4UCJkS8cx0DWGdlnmXN/oNyZ63xpV0HWrHk0byl5ypAk5+lkNehANf
+LmLzf9S+GDgUKaaYynzH2OWGDZ25oYpKufrt30Y/OIzolrHq6WRCxmO3Sx0WFszK
+VZLHarNEAkHu7XbMG21brGpEMfZsYaBafNBsV4u42hO4c/Op5SnIKJesMPipoEhm
+/AoW5fGvMG2JwklN/b5vU1vonQA0iB8uXnOebg8xN8R+Cn5dxafHdTbW5IhD9GEY
+8cJrzvevD1+jcNgNJ6Gl3UezsaHBF1yJ1S5tm8H+AQu1LDoE9VQLyTx2vDCUrSj7
+IXxsBUjXS0YunOAdhiCwTd9RUYswACh0uEIb/mBwDLMS90G/ulpeu1SyOAsDmbzt
+quYHTM5sDVd7faQ5RCWu4cBom4fQsRj6MWCZgPBUUD0A26mE5BH5/HmAkOBbXaoo
+p4xvmhvgFmmoOtqbyp6kRR+0c6OgA9nST3cjV/dnDI//xh3LjTJowghH8bBSz5kk
+ihgQ/D8ha34k/keuNp3d
+=wCom
 -----END PGP SIGNATURE-----

@@ -1,4 +1,6 @@
 #!/usr/bin/perl -w
+use strict;
+use warnings;
 
 use Test::More qw(no_plan);
 use Test::MockObject::Extends;
@@ -188,33 +190,36 @@ sub tx_check {
     my $tx = shift;
     my %o  = @_;
 
-    $tx->test_transaction('sandbox');
-    $tx->submit;
+    SKIP: {
+        $tx->test_transaction('sandbox');
+        eval { $tx->submit; };
+        skip $@, 1 if $@ =~ /503/i; # 503 Service Temporarily Unavailable
 
-    is( $tx->is_success,    $o{is_success},    "$o{desc}: " . tx_info($tx) );
-    is( $tx->result_code,   $o{result_code},   "result_code(): RESULT" );
-    is( $tx->error_message, $o{error_message}, "error_message() / RESPMSG" );
-    if( $o{authorization} ){
-        is( $tx->authorization, $o{authorization}, "authorization() / AUTHCODE" );
-    }
-    if( $o{avs_code} ){
-        is( $tx->avs_code,  $o{avs_code},  "avs_code() / AVSADDR and AVSZIP" );
-    }
-    if( $o{cvv2_response} ){
-        is( $tx->cvv2_response, $o{cvv2_response}, "cvv2_response() / CVV2MATCH" );
-    }
-    if( defined $o{is_duplicate} ){
-        is( $tx->is_duplicate, $o{is_duplicate}, "is_duplicate() / " . $o{is_duplicate} );
-    }
-    foreach my $field (qw/card_token card_token_response card_token_message/) {
-        if( defined $o{$field} ) {
-            is( $tx->$field, $o{$field}, "$field() / " . $o{$field} );
+        is( $tx->is_success,    $o{is_success},    "$o{desc}: " . tx_info($tx) );
+        is( $tx->result_code,   $o{result_code},   "result_code(): RESULT" );
+        is( $tx->error_message, $o{error_message}, "error_message() / RESPMSG" );
+        if( $o{authorization} ){
+            is( $tx->authorization, $o{authorization}, "authorization() / AUTHCODE" );
         }
-    }
-    if( $o{approved_amount} ){
-        is( $tx->{_response}->{approvedAmount}, $o{approved_amount}, "approved_amount() / Partial Approval Amount" );
-    }
-    like( $tx->order_number, qr/^\w{5,19}/, "order_number() / PNREF" );
+        if( $o{avs_code} ){
+            is( $tx->avs_code,  $o{avs_code},  "avs_code() / AVSADDR and AVSZIP" );
+        }
+        if( $o{cvv2_response} ){
+            is( $tx->cvv2_response, $o{cvv2_response}, "cvv2_response() / CVV2MATCH" );
+        }
+        if( defined $o{is_duplicate} ){
+            is( $tx->is_duplicate, $o{is_duplicate}, "is_duplicate() / " . $o{is_duplicate} );
+        }
+        foreach my $field (qw/card_token card_token_response card_token_message/) {
+            if( defined $o{$field} ) {
+                is( $tx->$field, $o{$field}, "$field() / " . $o{$field} );
+            }
+        }
+        if( $o{approved_amount} ){
+            is( $tx->{_response}->{approvedAmount}, $o{approved_amount}, "approved_amount() / Partial Approval Amount" );
+        }
+        like( $tx->order_number, qr/^\w{5,19}/, "order_number() / PNREF" );
+    }; # END SKIP
 }
 
 sub tx_info {

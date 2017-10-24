@@ -28,6 +28,10 @@ my @tests = (
     word => 'rojji',
     is => 'rozzi',
 },
+{
+    word => '-romaji',
+    is => undef,
+},
 );
 
 run (@tests);

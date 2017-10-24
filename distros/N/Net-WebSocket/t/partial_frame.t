@@ -44,7 +44,14 @@ plan tests => 0 + @tests;
 for my $t (@tests) {
     my $bytes = $t->{'bytes'};
 
-    pipe( my $rdr, my $wtr );
+    my ($rdr, $wtr);
+    if ($^O eq 'MSWin32'){
+        require Win32::Socketpair;
+        ($rdr, $wtr) = Win32::Socketpair::winsocketpair();
+    }
+    else {
+        pipe $rdr, $wtr;
+    }
 
     $rdr->blocking(0);
 
@@ -62,7 +69,7 @@ for my $t (@tests) {
         syswrite $wtr, substr( $bytes, 0, 1, q<> );
         my ($rdrs_ar, undef, $excs_ar) = IO::Select->select( $ios, undef, $ios );
 
-        if (@$excs_ar) {
+        if ($excs_ar && @$excs_ar) {
             warn "select() indicated an error??";
             last;
         }

@@ -15,14 +15,7 @@ for (1 .. $numtests) {
 	my $sha3 = Digest::SHA3->new(128000);
 	my $Len = shift @vecs;
 	my $Msg = pack("H*", shift @vecs);
-	if ($Len % 8) {
-		my @a = unpack("C*", $Msg);
-		my $b = pop(@a);
-		$b <<= (8 - $Len % 8);
-		push(@a, $b);
-		$Msg = pack("C*", @a);
-	}
-	$sha3->add_bits($Msg, $Len);
+	$sha3->add_bits($Msg, $Len, 1);
 	my $MD = shift @vecs;
 	my $computed = "";
 	while (length($computed) < 512) {

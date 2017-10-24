@@ -4,7 +4,7 @@ use warnings;
 
 # ABSTRACT: Business::OnlinePayment::Litle::ChargebackActivityResponse - Response Objects
 
-our $VERSION = '0.958'; #VERSION
+our $VERSION = '0.959'; #VERSION
 
 
 sub new{
@@ -46,7 +46,7 @@ Business::OnlinePayment::Litle::ChargebackActivityResponse - Business::OnlinePay
 
 =head1 VERSION
 
-version 0.958
+version 0.959
 
 =head1 NAME
 

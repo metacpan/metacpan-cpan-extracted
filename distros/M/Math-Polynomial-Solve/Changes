@@ -1,5 +1,14 @@
 Revision history for Perl extension Math::Polynomial::Solve.
 
+2.81
+     October 24 2017
+	- Internally all coefficients are handled in ascending order.
+	  This doesn't change the parameters to the functions, which
+	  still assume descending order (this won't change until 
+	  version 3.00).
+	- Test files and the eg/*.pl files now set with ascending
+	  order.
+	- Added an ':all' tag. It was time.
 2.80
      May 15 2017
 	- Removed "helper" file for tests. Math::Utils' evaluate and

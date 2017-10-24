@@ -1,0 +1,8 @@
+Build.PL
+lib/Alien/Zcash.pm
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+src/zcash-1.0.12.tar.gz
+t/00-sanity.t

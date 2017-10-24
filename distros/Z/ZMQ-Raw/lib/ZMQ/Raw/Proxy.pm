@@ -1,5 +1,5 @@
 package ZMQ::Raw::Proxy;
-$ZMQ::Raw::Proxy::VERSION = '0.08';
+$ZMQ::Raw::Proxy::VERSION = '0.10';
 use strict;
 use warnings;
 use ZMQ::Raw;
@@ -12,7 +12,7 @@ ZMQ::Raw::Proxy - ZeroMQ Proxy class
 
 =head1 VERSION
 
-version 0.08
+version 0.10
 
 =head1 DESCRIPTION
 

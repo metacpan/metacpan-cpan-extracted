@@ -1,0 +1,572 @@
+-*- encoding: utf-8; indent-tabs-mode:nil -*-
+
+=encoding utf-8
+
+=head1 Statut du document
+
+Ce texte est diffusé sous la licence I<Creative Commons>
+S<CC-BY-ND :> avec attribution et me demander avant de modifier
+le contenu.
+
+Copyright (c) 2017 Jean Forget, tous droits réservés.
+
+Le texte est fréquemment (mais irrégulièrement) mis à jour
+sur Github. Il y a une version française et une version
+anglaise. Comme je suis plus à l'aise pour discuter d'astronomie
+en français, la version anglaise risque d'être légèrement à la
+traîne par rapport à la version française.
+
+Ce texte fait partie intégrante de la distribution du module.
+Il est donc visible sur les sites web de CPAN
+(L<http://search.cpan.org>, L<https://metacpan.org>, etc)
+Mais il ne donne lieu à aucune installation.
+Du coup, je pense qu'il est absent des paquets C<.deb>
+et C<.rpm> qui pourraient être construits pour ce module.
+
+=head1 Pourquoi ce texte, et pour qui
+
+Le but principal de ce texte est de donner des
+explications sur le calcul des levers et des couchers
+du soleil, explications trop longues et trop techniques pour avoir leur place
+dans la documentation POD du module.
+
+=head2 Pour qui ? pour moi
+
+Aussi bizarre que cela puisse paraître, le premier destinataire
+de ce texte est moi-même. J'écris ce texte pour me souvenir
+des problèmes que j'ai rencontrés lors de la maintenance
+du module et des choix que j'ai faits alors.
+Mais surtout, c'est pour expliquer le fonctionnement de l'algorithme itératif, 
+L<décrit succintement|http://www.stjarnhimlen.se/comp/riset.html#3> 
+par Paul Schlyter
+dans son site web et qu'il n'a pas mis à disposition du public
+sous une forme compilable et exécutable (contrairement à la
+L<version simple sans itération|http://www.stjarnhimlen.se/comp/sunriset.c>).
+
+=head2 Pour qui ? pour le prochain mainteneur du module
+
+Le deuxième destinataire de ce texte, c'est le futur mainteneur
+du module. J'ai lu 
+L<le message de Neil Bowers|http://codeverge.com/perl.module-authors/the-module-authors-pledge/744969>
+I<The module authors pledge>. Je suis d'accord avec le principe
+et je déclare ici que si pour une raison ou pour une autre je cesse
+de m'occuper de mes modules, alors j'accepte que la maintenance
+de mes modules soit confiée à une autre personne.
+
+Ce que Neil n'a pas rappelé, c'est que le repreneur doit
+réunir trois conditions, la compétence en programmation,
+les ressources notamment en termes de temps disponible
+et la volonté ou l'enthousiasme nécessaire pour s'atteler
+à la tâche.
+
+Toutefois, dans le cas des modules de calculs astronomiques,
+il ne s'agit pas simplement de I<la> compétence (en programmation)
+mais I<des> compétences, en programmation et en astronomie.
+Il faut que ce futur mainteneur comprenne la problématique
+de ces calculs. Lisez le texte et si vous comprenez pourquoi
+tel ou tel point me tracasse, alors vous avez la compétence astronomique
+nécessaire pour maintenir le module. Et si vous pensez que j'enfonce
+des portes ouvertes, ou si vous pouvez
+fournir une réponse argumentée à mes questions, c'est encore mieux.
+Mais si vous n'arrivez pas à suivre mes explications et si, de
+toutes manières, les sinus et les cosinus vous rebutent, ce n'est
+pas la peine d'essayer de regarder le contenu du module.
+
+=head2 Pour qui ? pour ceux qui ont trouvé (ou croient avoir trouvé) un bug
+
+Ce texte est également destiné aux utilisateurs qui pensent
+avoir trouvé un bug dans le module ou qui veulent proposer une bonne idée.
+Peut-être que le bug a déjà été constaté et qu'il est en attente
+de solution.
+Peut-être que le bug a déjà été constaté et que la solution adoptée
+ne convient pas. Peut-être que l'amélioration suggérée a déjà été
+rejetée parce qu'elle est en contradiction avec le cœur du module.
+
+=head2 Pour qui ? pour les utilisateurs intéressés
+
+Finalement, ce texte est destiné à toute personne intéressée par
+l'astronomie. J'ai essayé de ne pas faire appel à des calculs
+trop compliqués. Leur place est dans le source Perl, pas ici.
+Mais ne soyez pas étonnés si vous tombez sur des calculs simples
+ou des raisonnements mathématiques basiques.
+
+=head2 Remarques sur le style
+
+Certains passages de ce texte prennent la forme d'une série de
+questions-réponses. Il ne s'agit pas d'une FAQ. C'est plutôt
+une façon un peu plus pédagogique de présenter progressivement un
+sujet. Ce procédé a été utilisé, entre autres, par Platon,
+Galilée et Douglas Hofstadter.
+
+=head2 Autres remarques
+
+J'examine généralement les phénomènes du point de vue d'une personne se trouvant
+dans l'hémisphère nord, entre le tropique du Cancer et le cercle polaire
+arctique. Par exemple, j'écrirai qu'au moment de midi, le soleil se trouve
+plein sud, alors que tous les écoliers australiens, néo-zélandais, sud-africains,
+argentins et de quelques autres pays savent qu'à midi le soleil est au nord.
+
+De même, le 21 mars est habituellement appelé S<« équinoxe> de S<printemps »>
+alors que c'est l'automne qui commence dans l'hémisphère sud.
+
+Mais vouloir faire du politiquement correct conduit à des
+tournures de phrase alambiquées, ce qui nuit à la compréhension
+des phénomènes présentés.
+
+=head1 Sources
+
+Je ne donnerai ici que les sources fournissant ou générant des jeux étendus
+de valeurs numériques. Les livres et articles purement descriptifs
+que j'ai pu lire ces décennies passées sont trop nombreux pour être
+énumérés.
+
+=head2 Sources que je n'ai pas utilisées
+
+Je commence par les sources que je n'ai pas utilisées, car elle ne me permettent
+pas de maîtriser les données générées, à cause du manque de description de l'algorithme
+ou de l'impossibilité de choisir les paramètres de génération.
+
+=over 4
+
+=item L'almanach du facteur
+
+Les almanachs du facteur fournissent les heures de lever et de coucher
+du soleil pour une année entière. Mais ces heures sont données à la minute près,
+pas à la seconde près. Et même si c'est une édition provinciale, le lever
+et le coucher du soleil est toujours donné pour Paris. Finalement, le mode de
+calcul exact n'est pas donné.
+
+=item L'Institut de Mécanique Céleste et de Calcul des Éphémérides IMCCE
+
+Ce L<site|https://www.imcce.fr/langues/fr/index.html>
+fournissait un formulaire HTML pour obtenir le tableau des
+levers et couchers du soleil pour le lieu de votre choix et pour la
+période de votre choix. Hélas, cette page a disparu de leur site.
+
+Il existe en revanche un 
+L<générateur sous forme de service web|http://vo.imcce.fr/webservices/miriade/?rts>,
+mais je ne l'ai pas essayé.
+
+=back
+
+=head2 Sources utilisées
+
+=over 4
+
+=item Le site web de Paul Schlyter
+
+Ce L<site|http://www.stjarnhimlen.se/english.html>
+fournit un
+L<programme C|http://stjarnhimlen.se/comp/sunriset.c> 
+prêt à l'emploi donnant les heures
+de L<lever et de coucher|http://stjarnhimlen.se/comp/riset.html> 
+du soleil.
+Comme le fait remarquer Paul Schlyter, c'est la version simple de l'algorithme,
+qui peut présenter des erreurs d'une ou deux minutes en général, ou plus si
+en fonction du lieu et de la date, on est proche du début ou de la fin de la
+période où le soleil est visible à minuit.
+
+Le site web de Paul Schlyter propose
+de L<nombreuses informations|http://stjarnhimlen.se/comp/ppcomp.html> 
+concernant le calcul des positions des corps célestes. Ce site est très
+intéressant, mais j'ai préféré reprendre à ma sauce (et en français) la
+description du calcul de la position du soleil, en laissant tomber les autres
+corps célestes.
+
+=item L'observatoire de l'US Navy
+
+L<L'observatoire de l'US Navy|http://aa.usno.navy.mil/faq/index.php> 
+propose un
+L<formulaire|http://aa.usno.navy.mil/data/docs/RS_OneYear.php>
+pour calculer l'heure du lever et l'heure du coucher du soleil.
+L'heure est donnée à la minute près, alors que j'aurais préféré
+une précision à la seconde près, mais tant pis.
+
+Notons toutefois que ce site fournit des 
+L<informations très intéressantes|http://aa.usno.navy.mil/faq/index.php>
+(en anglais) sur le calcul de la position des corps célestes, mais sans se focaliser sur
+la position du soleil comme je le fais ici.
+
+=item Stellarium
+
+Stellarium est un planétarium pour PC. Si l'on ne se préoccupe pas de la visualisation en temps
+réel du ciel, le logiciel permet de choisir un lieu d'observation, une date à la seconde près
+et un objet céleste. Il donne alors les coordonnées de cet objet céleste dans divers systèmes
+de S<coordonnées :> locales, azimuthales et écliptiques. Voici comment procéder pour
+obtenir le lever du soleil, son coucher ou le midi vrai.
+
+=over 4
+
+=item *
+
+Déterminer une valeur approximative de l'heure S<recherchée :> 12h00 pour le midi vrai,
+ou bien utiliser C<Astro::Sunrise> en mode simple pour le lever ou le coucher.
+
+=item *
+
+Déterminer le critère de S<recherche :> azimuth à 180 degrés pour le midi vrai, ou
+bien hauteur réelle à 0 degré et I<xx> minutes sous l'horizon. I<xx> est choisi pour
+être compatible avec le paramètre C<hauteur> des fonctions de C<Astro::Sunrise>.
+
+S<Note :> on ne tient pas compte de la hauteur apparente fournie par Stellarium.
+Pour la déviation des rayons lumineux au voisinage de l'horizon, on adopte le
+point de vue de C<Astro::Sunrise>, utiliser une valeur conventionnelle de 35'
+ou 0,583 degré et on tente d'obtenir cette valeur dans Stellarium.
+Et si on veut en plus tenir compte du rayon du disque solaire, on prendra la
+valeur moyenne 15' au lieu de la recalculer en fonction de la distance Terre-Soleil.
+Il faudra alors viser la hauteur de 50' sous l'horizon, soit 0,833 degré.
+
+=item *
+
+Dans Stellarium, figer le temps par C<7> si ce n'est pas encore fait.
+
+=item *
+
+Rechercher le soleil, la fenêtre de recherche s'activant par C<< <F3> >>.
+
+=item *
+
+Vous pouvez préférer l'affichage sans le sol ni l'atmosphère. Utiliser les 
+bascules C<g> et C<a>. Et C<e> ou C<z> pour avoir la grille des coordonnées
+équatoriales ou azimuthales, selon vos préférences du moment.
+
+=item *
+
+Presser C<< <F6> >> pour spécifier le lieu d'observation.
+
+=item *
+
+Presser C<< <F5> >> pour spécifier la date et l'heure.
+
+=item *
+
+Sans fermer la fenêtre date-heure, essayer plusieurs valeurs jusqu'à trouver celle
+qui produit la meilleure approximation de l'azimuth ou de la hauteur recherché.
+
+=back
+
+=head1 Héliocentrisme ou géocentrisme ?
+
+De ces deux propositions, laquelle est vraie et laquelle est S<fausse ?>
+
+=over 4
+
+=item A
+
+Le Soleil qui tourne autour de la Terre.
+
+=item B
+
+La Terre qui tourne autour du Soleil.
+
+=back
+
+La phrase A est fausse, tout le monde en convient, mais la phrase B
+est fausse également.
+
+Ah oui, me direz-vous, en fait S<c'est :>
+
+=over 4
+
+=item C
+
+La Terre décrit une orbite elliptique avec le Soleil situé sur l'un des
+foyers de cette ellipse.
+
+=back
+
+Cette affirmation est fausse également.
+Chacune des affirmations suivantes est plus proche de la réalité que
+les phrases B et C (et A).
+
+=over 4
+
+=item D
+
+Le centre d'inertie du système binaire Terre-Lune décrit une orbite
+elliptique avec le centre d'inertie du système solaire, situé sur l'un
+des foyers de cette ellipse.
+
+En faisant remarquer que le centre de gravité du Soleil et celui du système
+solaire sont deux points différents. Et même, il y a des périodes où le
+centre d'inertie du système solaire se trouve I<à l'extérieur> du soleil.
+La L<page web|http://hp41programs.yolasite.com/solar-sys-bary.php>
+d'un programme pour HP-41 indique que le 15 mars 1983, la distance entre
+le centre de gravité du Soleil et le centre de gravité du système solaire
+était quasiment 2,1 rayons solaires.
+
+=item E
+
+La Terre orbite autour du Soleil avec des perturbations notables dues
+à la Lune, à Jupiter, à Saturne, etc.
+
+Ce qui est une formulation différente du point précédent.
+
+=item F
+
+Le mouvement de la Terre au sein du système solaire est un problème
+à I<n> corps, avec I<n> ≥ 3. Donc il n'admet pas de solution analytique.
+
+=item G
+
+Le système solaire est un système chaotique. Même si l'on peut prédire avec
+un degré raisonnable de certitude à quoi ressembleront les orbites dans
+une centaine de millions d'années, ce genre de prédiction est illusoire pour
+un intervalle d'un milliard d'années.
+
+=item H
+
+La Terre se déplace dans la direction générale de la constellation Hercule
+à la vitesse approximative de 220 km/s.
+
+=item I
+
+La Terre orbite autour du centre de la Voie Lactée avec des perturbations notables dues
+au Soleil, à la Lune, à Jupiter, à Saturne, etc.
+
+=back
+
+La proposition B ou C est ce que Terry Pratchett, Jack Cohen et Ian Stewart appellent des S<« mensonges>
+pour les S<enfants »> (I<la Science du Disque-Monde>, chapitre 4, pages 38 et 39 dans
+la version originale). Ce sont des énoncés faux, mais suffisamment simples pour être compris par des
+enfants et qui, malgré leur inexactitude, font progresser lesdits enfants vers la
+vérité. Il est illusoire de faire comprendre à un enfant l'énoncé C
+s'il n'a pas déjà appris et admis l'énoncé B. Et c'est la même chose, en pire,
+avec les énoncés D et suivants.
+
+Qui plus est, ce sont des S<« mensonges> pour les S<adultes »>. Au début, on considérait
+que la physique était une représentation mathématique du monde réel, se rapprochant de plus
+en plus de la vérité ultime. Puis il y a eu le principe de de Broglie et son
+interprétation par l'école de Copenhague. La nature ultime de l'électron (par exemple)
+est-elle S<corpusculaire ?> Est-elle S<ondulatoire ?> La réponse est S<« Ni> l'une
+ni l'autre et du toutes façons, on s'en S<fiche. »> La vocation de la physique n'est
+plus de fournir I<une représentation> mathématique de la réalité ultime,
+mais de fournir I<des modélisations>  mathématiques de la réalité ultime.
+On sait que les modèles proposés sont faux, mais ils permettent de faire
+des calculs.
+
+Remarquez que je parle ici de méthode scientifique. Mon propos n'était
+pas de caractériser la publicité ou les campagnes électorales.
+Cela ne fait de doute pour personne ou presque que ce sont des tissus
+de mensonges.
+
+Autres mensonges pour les adultes utilisés dans ce S<texte :> la lumière se propage
+instantanément d'un point à l'autre de l'espace, les astres extérieurs au système solaire
+sont immobiles, ils sont situés sur une sphère appelée S<« sphère> S<céleste »>, le temps
+UTC et le temps GMT sont identiques et, ainsi que je l'ai déjà signalé, tous les endroits
+dignes d'intérêt sur la Terre se situent entre le tropique du Cancer et le cercle 
+polaire arctique.
+
+=head2 Conclusion
+
+Tout ça pour dire que dans la suite, j'utiliserai aussi bien le modèle
+géocentrique où le Soleil tourne autour de la Terre en 24 heures
+que le modèle géocentrique où le Soleil tourne autour de la Terre
+en 365,25 jours ou le modèle héliocentrique.
+
+S<« Il> n'est pas nécessaire que ces hypothèses soient vraies, ou
+même vraisemblables. Une chose S<suffit :> qu'elles offrent des
+calculs conformes à S<l'observation. »>
+
+Extrait de la préface d'Osiander au livre de Copernic, extrait repris
+par Jean-Pierre Petit comme avant-propos à son livre 
+L<S<« Cosmic> S<Story »>|http://www.savoir-sans-frontieres.com/JPP/telechargeables/Francais/cosmic_story.htm>.
+À l'époque de Copernic, le but d'Osiander était de faire admettre l'héliocentrisme à des
+lecteurs partisans inconditionnels du géocentrisme. Ironiquement, je reprends
+cette citation pour faire admettre le géocentrisme à des lecteurs partisans
+inconditionnels de l'héliocentrisme.
+
+=head1 Les mouvements du soleil ou de la terre
+
+=head2 Les mouvements de base
+
+Dans un repère héliocentrique axé sur les étoiles fixes, la Terre
+tourne autour du Soleil en un an. Ou, ce qui revient au même, dans un
+repère géocentrique, le Soleil tourne autour de la Terre en un an
+avec une vitesse angulaire moyenne de 0,986 degré par jour.
+
+D'autre part, la Terre tourne sur elle-même en 23h 56mn 4s,
+avec une vitesse de rotation de 4,178e-3 degré par seconde,
+soit 360,986 degrés par jour.
+
+Q: Je croyais que la Terre tournait sur elle-même en 24h !
+
+R: Pendant que la Terre tourne sur elle-même, le Soleil tourne
+autour de la Terre. Et ce que nous voyons, c'est la composition
+de ces deux mouvements, qui donne une vitesse angulaire moyenne
+de 360 degrés par jour. Ce qui intéresse le commun des mortels,
+c'est de retrouver le Soleil à place fixe de jour en jour.
+Et seulement ensuite, il s'intéresse à la position de la
+Lune, des étoiles et des planètes.
+
+Q: Et pourquoi as-tu prononcé à deux ou trois reprises
+l'expression S<« vitesse> angulaire S<moyenne » ?>
+
+R: Parce que la vitesse angulaire du Soleil n'est pas
+constante. Nous y reviendrons ultérieurement.
+
+=head2 Les systèmes de coordonnées
+
+L'écliptique est le plan qui contient l'orbite de la Terre autour du Soleil
+(avec un modèle héliocentrique) ou l'orbite du Soleil autour de la Terre
+(avec un modèle géocentrique). On définit également le plan équatorial,
+le plan qui contient le cercle de l'équateur terrestre. Ces deux plans ont
+un angle de 23° 26' et leur intersection s'appelle la ligne des nœuds.
+Dans certains cas il est plus intéressant de considérer que la
+ligne des nœuds est une demi-droite plutôt qu'une droite complète. Dans
+ce cas, on considère que la ligne des nœuds est la demi-droite avec
+le centre de la Terre pour origine et se dirigeant vers la constellation
+des poissons. Et le point où cette demi-droite rencontre
+la sphère céleste s'appelle I<point gamma> (politiquement correct) ou
+I<point vernal> (politiquement incorrect puisque cela correspond au début
+de l'automne dans l'hémisphère sud).
+
+Pour un point terrestre, on a l'habitude de partir d'un point
+origine dans le Golfe de Guinée, là où l'équateur croise le méridien
+de Greenwich. Puis on parcourt un premier arc de cercle le long
+de l'équateur et un second le long d'un méridien (donc, à son origine, perpendiculaire à l'équateur).
+Les deux angles obtenus sont appelés S<« longitude »> et
+S<« latitude »>. Pour un astre, lorsque l'on utilise les
+I<coordonnées équatoriales>, c'est le même principe,
+sauf que l'origine du premier arc se trouve sur la ligne des nœuds
+et que les angles s'appellent 
+S<« ascension> S<droite »> et S<« déclinaison »>.
+
+Les I<coordonnées écliptiques> suivent le même principe,
+en traçant le premier arc le long de l'écliptique au lieu
+de l'équateur. Et de même, le second arc de cercle est, au point de départ,
+perpendiculaire à l'écliptique. Les deux angles s'appellent
+S<« longitude> S<écliptique »> et S<« latitude> S<écliptique »>
+respectivement. La position origine de la longitude écliptique est la ligne des
+nœuds comme pour l'ascension droite, ce qui permet une simplification appréciable des formules
+de conversion d'un système à l'autre.
+
+Notons qu'en raison de la définition de l'écliptique, la latitude écliptique
+du soleil est toujours égale à zéro.
+
+=head2 Les autres mouvements
+
+Avant d'évoquer les autres mouvements faisant intervenir la
+Terre et le Soleil, permettez-moi une petite digression.
+
+=head3 Météo et climat
+
+J'ai horreur de ces gens qui, chaque fois qu'il neige, s'exclament
+S<« Et> dire qu'on nous parle de réchauffement 
+<climatique ! »> Le climat et la météo sont deux choses différentes.
+Quand la température relevée sous abri à S<5 heures> du matin
+varie de S<10 degrés> du jour au lendemain, c'est un événement
+météorologique ordinaire. Lorsque la température I<moyenne> sur dix ans
+varie de deux degrés d'un siècle à l'autre, c'est une catastrophe climatique.
+
+Les autres mouvements entre la Terre et le Soleil sont des mouvements
+plus S<« climatiques »> que S<« météorologiques ».> Leurs valeurs à court
+terme sont très faibles, ce qui fait que les algorithmes de calcul
+des positions orbitales à court terme n'en tiennent pas compte.
+
+=head3 Précession des équinoxes
+
+Le plus connu des mouvements à longue échéance est la précession des équinoxes.
+En ce moment, le point gamma se trouve dans la constellation des poissons,
+mais en réalité, il se déplace le long de l'écliptique en S<26 000 ans>
+environ.
+
+=head3 Mouvement de nutation
+
+L'angle entre le plan équatorial et le plan de l'écliptique varie très
+légèrement. Je n'ai pas trouvé les caractéristiques de ce mouvement.
+
+=head3 Avance du périhélie
+
+Il y a également l'avance du périhélie. On connaît l'avance du
+périhélie de Mercure parce que c'est le plus prononcé, mais toutes
+les planètes du système solaire subissent une avance de leur périhélie.
+
+=head3 Autres dérives et fluctuations
+
+Les formules donnant les positions des astres reposent sur des constantes.
+Mais ces valeurs sont constantes sur une échelle de temps brève (à l'échelle
+astronomique, ou pour reprendre la métaphore ci-dessus, à l'échelle climatique).
+Par exemple, il est acquis que le jour dure 24 h (le jour solaire moyen, pas le jour
+sidéral). J'ai lu quelque part qu'aux temps paléontologiques, le jour durait
+22 heures environ.
+
+La variation est lente, mais avec nos moyens modernes, il est possible de la mesurer.
+Depuis que les scientifiques ont adopté un étalon atomique pour le temps, abandonnant
+l'étalon astronomique, il a été nécessaire d'ajouter 
+27 L<secondes intercalaires|http://michel.lalos.free.fr/cadrans_solaires/doc_cadrans/seconde_intercalaire/seconde_intercalaire.html>
+en 47 ans pour resynchroniser l'échelle de temps atomique avec
+l'échelle de temps astronomique.
+
+Pour l'instant, les interventions pour cette resynchronisation ont toujours consisté
+à ajouter une seconde intercalaire. Mais la possibilité théorique existe de synchroniser
+dans l'autre sens, en supprimant une seconde. Le phénomène peut donc, semble-t-il, se manifester
+par des fluctuations au lieu d'une dérive toujours dans le même sens.
+
+=head3 Équation du temps
+
+Il existe d'autres fluctuations, qui sont plus faciles à mesurer et qui se déroulent
+sur une échelle plus S<« météorologique »> et moins S<« climatique »>.
+Le midi solaire I<vrai> ne correspond pas avec le midi solaire I<moyen>.
+Il y a deux raisons pour cela.
+
+Tout d'abord, comme il existe un écart angulaire entre le plan de l'équateur
+et le plan de l'écliptique, une rotation uniforme sur le plan de l'écliptique
+se traduira sur le plan de l'équateur par une rotation à vitesse variable.
+
+À COMPLÉTER : valeurs numériques
+
+Ensuite, la rotation du soleil sur le plan de l'écliptique n'est pas constante.
+Elle suit la deuxième loi de Kepler, avec une vitesse angulaire inversement proportionnelle
+à la distance Terre-Soleil.
+
+Q : Tu ne peux pas appliquer valablement la deuxième loi de Kepler à un modèle géocentrique !
+
+R : Non. La deuxième loi de Kepler s'applique à un modèle barycentrique comme D ci-dessus, 
+ou à la rigueur un modèle héliocentrique comme C. Mais une fois que l'on a pu déterminer 
+la vitesse angulaire de la Terre dans le modèle C, il est très simple de faire le changement
+de coordonnées vers un modèle géocentrique. La valeur obtenue pour la vitesse angulaire du
+Soleil autour de la Terre dans un modèle géocentrique est égale à celle de la vitesse angulaire
+de la Terre autour du Soleil dans un modèle héliocentrique.
+
+Les deux phénomènes se cumulent et donc, la vitesse de rotation du Soleil autour
+de la Terre, mesurée sur le plan équatorial, n'est pas constante. La moyenne
+est de 0,986 degrés par jour, mais la vitesse instantanée varie entre
+À COMPLÉTER.
+
+La vitesse de rotation de la Terre sur elle-même est constante, 360,986 degrés par jour
+mais la vitesse de rotation du Soleil autour de la Terre ne l'est pas. La combinaison des
+deux vitesses est donc variable et elle I<n'est pas> 360 degrés par jour. Le passage du
+Soleil au méridien ne se produit donc pas exactement toutes les S<86 400 secondes.>
+Il y a donc une différence entre le temps solaire I<moyen>, dans lequel midi se produit exactement
+toutes les S<86 400 secondes> et le temps solaire I<vrai> dans lequel midi, le moment où
+le Soleil passe au méridien, fluctue légèrement. La différence entre le temps solaire
+moyen et le temps solaire vrai s'appelle l'I<équation du temps>.
+
+=head4 Analemme
+
+L'irrégularité de la course du Soleil se matérialise également en se basant sur
+le temps solaire moyen et en notant la position du Soleil dans le ciel lorsqu'il
+est midi au temps solaire moyen. Les positions obtenues forment une courbe
+en 8 appelé I<analemme>.
+
+=head4 Soleil moyen, Soleil virtuel homocinétique
+
+Dans la suite de la discussion, il est utile d'imaginer un Soleil dont la vitesse
+angulaire serait constante (soit en coordonnées équatoriales, soit en coordonnées
+écliptiques, selon le cas).
+
+On parle ainsi du S<« Soleil> S<moyen »>, qui est censé passer au méridien à 12h00
+pile lorsque l'on utilise le S<« temps> solaire S<moyen »> et qui minimise l'écart
+tout au long de l'année entre le midi solaire moyen et le midi solaire vrai.
+
+Je prendrai en considération également des soleils virtuels homocinétiques, ou SVH. Ces
+soleils virtuels sont synchronisés avec le Soleil réel à un instant donné et
+ensuite bougent avec une vitesse angulaire constante.
+
+=head1 Autres algorithmes de calcul
+
+Q : Pourquoi C<Astro::Sunrise> a-t-il besoin de l'année pour calculer le lever
+et le coucher du S<soleil ?>
+
+À COMPLÉTER

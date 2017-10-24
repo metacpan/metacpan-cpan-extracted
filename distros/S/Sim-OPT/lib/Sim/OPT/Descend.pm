@@ -73,7 +73,7 @@ sub descend
   $simnetwork = $main::simnetwork;
   
   #open( OUTFILE, ">>$outfile" ) or die "Can't open $outfile: $!"; 
-  open( TOFILE, ">>$tofile" ) or die "Can't open $tofile: $!";  
+#  open( TOFILE, ">>$tofile" ) or die "Can't open $tofile: $!";  
   $tee = new IO::Tee(\*STDOUT, ">>$tofile"); # GLOBAL ZZZ
   say $tee "\n#Now in Sim::OPT::Descend.\n";
   

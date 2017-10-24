@@ -7,7 +7,6 @@ encode (class, decoded)
 
 	PREINIT:
 		SV *encoded;
-		int size;
 
 	CODE:
 		if (SvCUR (decoded)%4)

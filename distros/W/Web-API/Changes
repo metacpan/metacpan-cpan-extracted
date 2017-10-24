@@ -1,10 +1,22 @@
 ==================================================
-Changes from 2016-06-12 00:00:00 +0000 to present.
+Changes from 2016-10-21 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 2.2.2 at 2017-06-12 15:34:19 +0000
+version 2.2.3 at 2017-10-21 05:34:20 +0000
 ------------------------------------------
+
+  Change: 17fb57d4f3f7484b7b20744db938204fdc435b40
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2017-10-21 18:34:04 +0000
+
+    require at least 6.04 of HTTP::Cookies which provides get_cookies() 
+
+  Change: 6343894258b675ba8e9689436e21ff6144bec169
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2017-06-13 03:34:42 +0000
+
+    v2.2.2 
 
   Change: 4720a529a86e432a2db6ca63e639c8084e372441
   Author: Tobias Kirschstein <lev@ideegeo.com>
@@ -107,5 +119,5 @@ version 2.2.2 at 2017-06-12 15:34:19 +0000
     use caller with parenthesis to silence warning. fixes #18 
 
 =================================================
-Plus 22 releases after 2016-06-12 00:00:00 +0000.
+Plus 22 releases after 2016-10-21 00:00:00 +0000.
 =================================================

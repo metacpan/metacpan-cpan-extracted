@@ -9,7 +9,8 @@ use ZMQ::Raw;
 if (!$Config{useithreads})
 {
 	diag ("threads not available, skipping");
-	ok (1);
+	my $proxy = ZMQ::Raw::Proxy->new();
+	isa_ok $proxy, 'ZMQ::Raw::Proxy';
 	done_testing;
 	exit;
 }

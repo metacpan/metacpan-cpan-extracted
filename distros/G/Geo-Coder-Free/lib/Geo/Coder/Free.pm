@@ -17,11 +17,11 @@ Geo::Coder::Free - Provides a geocoding functionality using free databases of to
 
 =head1 VERSION
 
-Version 0.01
+Version 0.03
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 =head1 SYNOPSIS
 
@@ -33,6 +33,15 @@ our $VERSION = '0.01';
 =head1 DESCRIPTION
 
 Geo::Coder::Free provides an interface to free databases.
+
+Refer to the source URL for licencing information for these files
+cities.csv is from https://www.maxmind.com/en/free-world-cities-database
+admin1.db is from http://download.geonames.org/export/dump/admin1CodesASCII.txt
+admin2.db is from http://download.geonames.org/export/dump/admin2Codes.txt
+
+See also http://download.geonames.org/export/dump/allCountries.zip
+
+To significantly speed this up, gunzip cities.csv and run it through the db2sql script to create an SQLite file.
 
 =head1 METHODS
 
@@ -75,7 +84,9 @@ sub geocode {
 	my $self = shift;
 
 	my %param;
-	if (@_ % 2 == 0) {
+	if(ref($_[0]) eq 'HASH') {
+		%param = %{$_[0]};
+	} elsif(@_ % 2 == 0) {
 		%param = @_;
 	} else {
 		$param{location} = shift;
@@ -281,24 +292,21 @@ sub geocode {
 
     $location = $geocoder->reverse_geocode(latlng => '37.778907,-122.39732');
 
-Similar to geocode except it expects a latitude/longitude parameter.
+To be done.
 
 =cut
 
 sub reverse_geocode {
-	my $self = shift;
+	Carp::croak('Reverse lookup is not yet supported');
+};
 
-	my %param;
-	if (@_ % 2 == 0) {
-		%param = @_;
-	} else {
-		$param{latlng} = shift;
-	}
+=head2	ua
 
-	my $latlng = $param{latlng}
-		or Carp::croak("Usage: reverse_geocode(latlng => \$latlng)");
+Does nothing, here for compatibility with other geocoders
 
-	return $self->geocode(location => $latlng, reverse => 1);
+=cut
+
+sub ua {
 };
 
 =head1 AUTHOR
@@ -310,8 +318,6 @@ it under the same terms as Perl itself.
 
 =head1 BUGS
 
-CSV files take a long time to load.  Convert to SQLite.
-
 Lots of lookups fail at the moment.
 
 =head1 SEE ALSO
@@ -322,7 +328,9 @@ VWF, Maxmind and geonames.
 
 Copyright 2017 Nigel Horne.
 
-This program is released under the following licence: GPL2
+The program code is released under the following licence: GPL for personal use on a single computer.
+All other users (including Commercial, Charity, Educational, Government)
+must apply in writing for a licence for use from Nigel Horne at `<njh at nigelhorne.com>`.
 
 =cut
 

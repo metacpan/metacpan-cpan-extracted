@@ -4,7 +4,7 @@ use warnings;
 
 use base 'Test2::Compare::Base';
 
-our $VERSION = '0.000080';
+our $VERSION = '0.000082';
 
 use Test2::Util::HashBase qw/ending items/;
 
@@ -60,6 +60,7 @@ sub deltas {
 
         my $match = 0;
         for my $idx (0..$#list) {
+            next unless exists $unmatched{$idx};
             my $val = $list[$idx];
             my $deltas = $check->run(
                 id      => [ARRAY => $idx],

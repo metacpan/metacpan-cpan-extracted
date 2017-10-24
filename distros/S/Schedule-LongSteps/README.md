@@ -4,6 +4,10 @@ Schedule::LongSteps - Manage long term processes over arbitrary large spans of t
 
 # ABSTRACT
 
+<div>
+    <a href="https://travis-ci.org/skinnyjeans/Schedule-LongSteps"><img src="https://travis-ci.org/skinnyjeans/Schedule-LongSteps.svg?branch=dynamo"></a>
+</div>
+
 This attempts to solve the problem of defining and running a set of potentially conditional steps accross an arbitrary long timespan.
 
 An example of such a process would be: "After an order has been started, if more than one hour, send an email reminder every 2 days until the order is finished. Give up after a month"". You get the idea.

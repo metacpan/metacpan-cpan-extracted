@@ -4,29 +4,26 @@ Time::OlsonTZ::Data - Olson timezone data
 
 =head1 SYNOPSIS
 
-	use Time::OlsonTZ::Data qw(
-		olson_version olson_code_version olson_data_version
-	);
+    use Time::OlsonTZ::Data qw(
+	olson_version olson_code_version olson_data_version);
 
-	$version = olson_version;
-	$version = olson_code_version;
-	$version = olson_data_version;
+    $version = olson_version;
+    $version = olson_code_version;
+    $version = olson_data_version;
 
-	use Time::OlsonTZ::Data qw(
-		olson_canonical_names olson_link_names olson_all_names
-		olson_links
-		olson_country_selection
-	);
+    use Time::OlsonTZ::Data qw(
+	olson_canonical_names olson_link_names olson_all_names
+	olson_links olson_country_selection);
 
-	$names = olson_canonical_names;
-	$names = olson_link_names;
-	$names = olson_all_names;
-	$links = olson_links;
-	$countries = olson_country_selection;
+    $names = olson_canonical_names;
+    $names = olson_link_names;
+    $names = olson_all_names;
+    $links = olson_links;
+    $countries = olson_country_selection;
 
-	use Time::OlsonTZ::Data qw(olson_tzfile);
+    use Time::OlsonTZ::Data qw(olson_tzfile);
 
-	$filename = olson_tzfile("America/New_York");
+    $filename = olson_tzfile("America/New_York");
 
 =head1 DESCRIPTION
 
@@ -43,7 +40,7 @@ package Time::OlsonTZ::Data;
 use warnings;
 use strict;
 
-our $VERSION = "0.201702";
+our $VERSION = "0.201703";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(
@@ -83,7 +80,7 @@ retain this format in the future.
 
 =cut
 
-use constant olson_version => "2017b";
+use constant olson_version => "2017c";
 
 =item olson_code_version
 
@@ -92,7 +89,7 @@ module encapsulates.
 
 =cut
 
-use constant olson_code_version => "2017b";
+use constant olson_code_version => "2017c";
 
 =item olson_data_version
 
@@ -101,7 +98,7 @@ module encapsulates.
 
 =cut
 
-use constant olson_data_version => "2017b";
+use constant olson_data_version => "2017c";
 
 =back
 
@@ -122,7 +119,7 @@ values are all C<undef>.
 my $cn = q(+{ map { ($_ => undef) } qw(
 	Africa/Abidjan Africa/Accra Africa/Algiers Africa/Bissau Africa/Cairo
 	Africa/Casablanca Africa/Ceuta Africa/El_Aaiun Africa/Johannesburg
-	Africa/Khartoum Africa/Lagos Africa/Maputo Africa/Monrovia
+	Africa/Juba Africa/Khartoum Africa/Lagos Africa/Maputo Africa/Monrovia
 	Africa/Nairobi Africa/Ndjamena Africa/Tripoli Africa/Tunis
 	Africa/Windhoek America/Adak America/Anchorage America/Araguaina
 	America/Argentina/Buenos_Aires America/Argentina/Catamarca
@@ -282,7 +279,6 @@ my $li = q(+{
 	"Africa/Freetown" => "Africa/Abidjan",
 	"Africa/Gaborone" => "Africa/Maputo",
 	"Africa/Harare" => "Africa/Maputo",
-	"Africa/Juba" => "Africa/Khartoum",
 	"Africa/Kampala" => "Africa/Nairobi",
 	"Africa/Kigali" => "Africa/Maputo",
 	"Africa/Kinshasa" => "Africa/Lagos",
@@ -382,7 +378,6 @@ my $li = q(+{
 	"Brazil/West" => "America/Manaus",
 	"Canada/Atlantic" => "America/Halifax",
 	"Canada/Central" => "America/Winnipeg",
-	"Canada/East-Saskatchewan" => "America/Regina",
 	"Canada/Eastern" => "America/Toronto",
 	"Canada/Mountain" => "America/Edmonton",
 	"Canada/Newfoundland" => "America/St_Johns",

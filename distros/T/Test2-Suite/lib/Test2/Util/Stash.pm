@@ -2,7 +2,7 @@ package Test2::Util::Stash;
 use strict;
 use warnings;
 
-our $VERSION = '0.000080';
+our $VERSION = '0.000082';
 
 use Carp qw/croak/;
 use B;
@@ -58,7 +58,7 @@ sub _parse_symbol {
         return $symbol;
     }
 
-    utf8::downgrade($symbol) if $] == 5.010001; # prevent crash on 5.10.0
+    utf8::downgrade($symbol) if $] == 5.010000; # prevent crash on 5.10.0
     my ($sig, $pkg, $name) = ($symbol =~ m/^(\W?)(.*::)?([^:]+)$/)
         or croak "Invalid symbol: '$symbol'";
 

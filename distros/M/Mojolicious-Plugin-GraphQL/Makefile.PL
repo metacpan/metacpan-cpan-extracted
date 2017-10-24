@@ -19,7 +19,7 @@ WriteMakefile(
     "Mojolicious" => '5.48', # Mojo::JSON::to_json
     "strict" => 0,
     "warnings" => 0,
-    "GraphQL" => '0.15',
+    "GraphQL" => '0.16',
   },
   "TEST_REQUIRES" => {
     "Mojolicious" => 0,

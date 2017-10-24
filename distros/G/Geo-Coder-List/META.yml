@@ -22,9 +22,10 @@ no_index:
 requires:
   Carp: '0'
   LWP::Protocol::https: '0'
+  Time::HiRes: '0'
   perl: '5.006002'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Coder-List
   repository: git://github.com/nigelhorne/Geo-Coder-List.git
-version: '0.14'
+version: '0.15'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

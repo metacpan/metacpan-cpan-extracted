@@ -1,5 +1,5 @@
 package Bio::Roary::ReorderSpreadsheet;
-$Bio::Roary::ReorderSpreadsheet::VERSION = '3.10.2';
+$Bio::Roary::ReorderSpreadsheet::VERSION = '3.11.0';
 # ABSTRACT: Take in a tree file and a spreadsheet and output a spreadsheet with reordered columns
 
 
@@ -131,7 +131,7 @@ Bio::Roary::ReorderSpreadsheet - Take in a tree file and a spreadsheet and outpu
 
 =head1 VERSION
 
-version 3.10.2
+version 3.11.0
 
 =head1 SYNOPSIS
 

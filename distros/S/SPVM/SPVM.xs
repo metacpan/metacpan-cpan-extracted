@@ -26,11 +26,11 @@
 #include "spvm_sub.h"
 #include "spvm_my_var.h"
 #include "spvm_type.h"
-#include "spvm_field_info.h"
+#include "spvm_field.h"
 #include "spvm_constant_pool.h"
 #include "spvm_constant_pool_sub.h"
 #include "spvm_constant_pool_package.h"
-#include "spvm_constant_pool_field_info.h"
+#include "spvm_constant_pool_field.h"
 #include "spvm_constant_pool_type.h"
 #include "spvm_object.h"
 #include "spvm_api.h"
@@ -95,295 +95,6 @@ DESTROY(...)
   
   XSRETURN(0);
 }
-
-MODULE = SPVM::Object::Package		PACKAGE = SPVM::Object::Package
-
-SV*
-new(...)
-  PPCODE:
-{
-  (void)RETVAL;
-  
-  SV* sv_class = ST(0);
-  (void)sv_class;
-  
-  SV* sv_package_name = ST(1);
-  
-  // API
-  SPVM_API* api = SPVM_XS_UTIL_get_api();
-  
-  if (!SvOK(sv_package_name)) {
-    croak("Type must be specified(SPVM::Object::Package::new_object)");
-  }
-  
-  const char* package_name = SvPV_nolen(sv_package_name);
-  
-  int32_t type_id = api->get_type_id(api, package_name);
-  
-  if (type_id <= 0) {
-    croak("Unkown package \"%s\"(SPVM::Object::Package::new_object", package_name);
-  }
-  
-  // New array
-  SPVM_API_OBJECT* object =  api->new_object(api, type_id);
-  
-  // Increment
-  api->inc_ref_count(api, object);
-
-  // New sv object
-  SV* sv_object = SPVM_XS_UTIL_new_sv_object(object, "SPVM::Object::Package");
-  
-  XPUSHs(sv_object);
-  XSRETURN(1);
-}
-
-SV*
-set(...)
-  PPCODE:
-{
-  (void)RETVAL;
-  
-  SV* sv_object = ST(0);
-  SV* sv_field_name = ST(1);
-  SV* sv_value = ST(2);
-  
-  // API
-  SPVM_API* api = SPVM_XS_UTIL_get_api();
-  
-  // Runtime
-  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)api->get_runtime(api);
-  
-  // Get object
-  SPVM_OBJECT* object = SPVM_XS_UTIL_get_object(sv_object);
-  
-  int32_t package_type_id = object->type_id;
-  
-  SPVM_CONSTANT_POOL_TYPE* constant_pool_package_type = (SPVM_CONSTANT_POOL_TYPE*)&runtime->constant_pool[package_type_id];
-  
-  // Package name
-  const char* package_name = (char*)&runtime->constant_pool[constant_pool_package_type->name_id + 1];
-  
-  // Field type
-  const char* field_name = SvPV_nolen(sv_field_name);
-  SPVM_HASH* field_name_symtable = SPVM_HASH_search(runtime->field_info_id_symtable, package_name, strlen(package_name));
-  int32_t filed_info_id = (int32_t)(intptr_t)SPVM_HASH_search(field_name_symtable, field_name, strlen(field_name));
-  SPVM_CONSTANT_POOL_FIELD_INFO* constant_pool_field_info = (SPVM_CONSTANT_POOL_FIELD_INFO*)&runtime->constant_pool[filed_info_id];
-  int32_t field_type_id =constant_pool_field_info->type_id;
-  SPVM_CONSTANT_POOL_TYPE* constant_pool_field_type = (SPVM_CONSTANT_POOL_TYPE*)&runtime->constant_pool[field_type_id];
-  
-  int32_t field_type_code = constant_pool_field_type->code;
-  
-  // Field id
-  int32_t field_id = api->get_field_id(api, object, field_name);
-  if (!field_id) {
-    croak("Can't find %s \"%s\" field(SPVM::Object::Package::set)", package_name, field_name);
-  }
-  
-  switch (field_type_code) {
-    case SPVM_TYPE_C_CODE_BYTE : {
-      int8_t value = (int8_t)SvIV(sv_value);
-      api->set_byte_field(api, object, field_id, value);
-      break;
-    }
-    case  SPVM_TYPE_C_CODE_SHORT : {
-      int16_t value = (int16_t)SvIV(sv_value);
-      api->set_short_field(api, object, field_id, value);
-      break;
-    }
-    case SPVM_TYPE_C_CODE_INT : {
-      int32_t value = (int32_t)SvIV(sv_value);
-      api->set_int_field(api, object, field_id, value);
-      break;
-    }
-    case SPVM_TYPE_C_CODE_LONG : {
-      int64_t value = (int64_t)SvIV(sv_value);
-      api->set_long_field(api, object, field_id, value);
-      break;
-    }
-    case SPVM_TYPE_C_CODE_FLOAT : {
-      float value = (float)SvNV(sv_value);
-      api->set_float_field(api, object, field_id, value);
-      break;
-    }
-    case SPVM_TYPE_C_CODE_DOUBLE : {
-      double value = (double)SvNV(sv_value);
-      api->set_double_field(api, object, field_id, value);
-      break;
-    }
-    default : {
-      if (!sv_derived_from(sv_value, "SPVM::Object")) {
-        const char* field_type_name = (char*)&runtime->constant_pool[constant_pool_field_type->name_id + 1];
-        croak("Can't set valueeric value to \"%s\" field", field_type_name);
-      }
-      
-      SPVM_OBJECT* value = SPVM_XS_UTIL_get_object(sv_value);
-      int32_t value_type_id = value->type_id;
-      
-      SPVM_CONSTANT_POOL_TYPE* constant_pool_value_type = (SPVM_CONSTANT_POOL_TYPE*)&runtime->constant_pool[value_type_id];
-      
-      if (value_type_id != field_type_id
-      ) {
-        const char* field_type_name = (char*)&runtime->constant_pool[constant_pool_field_type->name_id + 1];
-        const char* value_type_name = (char*)&runtime->constant_pool[constant_pool_value_type->name_id + 1];
-        croak("Can't set \"%s\" value to \"%s\" field", value_type_name, field_type_name);
-      }
-      
-      SPVM_API_OBJECT* set_object = SPVM_XS_UTIL_get_object(sv_value);
-      
-      api->set_object_field(api, object, field_id, set_object);
-    }
-  }
-  
-  XSRETURN(0);
-}
-
-SV*
-get(...)
-  PPCODE:
-{
-  (void)RETVAL;
-  
-  SV* sv_object = ST(0);
-  SV* sv_field_name = ST(1);
-  
-  // API
-  SPVM_API* api = SPVM_XS_UTIL_get_api();
-  
-  // Runtime
-  SPVM_RUNTIME* runtime = (SPVM_RUNTIME*)api->get_runtime(api);
-  
-  // Get object
-  SPVM_OBJECT* object = SPVM_XS_UTIL_get_object(sv_object);
-  
-  // Package type id
-  int32_t package_type_id = object->type_id;
-  
-  // Package type
-  SPVM_CONSTANT_POOL_TYPE* constant_pool_package_type = (SPVM_CONSTANT_POOL_TYPE*)&runtime->constant_pool[package_type_id];
-  
-  // Package name
-  const char* package_name = (char*)&runtime->constant_pool[constant_pool_package_type->name_id + 1];
-  
-  // Field name
-  const char* field_name = SvPV_nolen(sv_field_name);
-  
-  // Field type
-  SPVM_HASH* field_name_symtable = SPVM_HASH_search(runtime->field_info_id_symtable, package_name, strlen(package_name));
-  int32_t filed_info_id = (int32_t)(intptr_t)SPVM_HASH_search(field_name_symtable, field_name, strlen(field_name));
-  SPVM_CONSTANT_POOL_FIELD_INFO* constant_pool_field_info = (SPVM_CONSTANT_POOL_FIELD_INFO*)&runtime->constant_pool[filed_info_id];
-  int32_t field_type_id =constant_pool_field_info->type_id;
-  SPVM_CONSTANT_POOL_TYPE* constant_pool_field_type = (SPVM_CONSTANT_POOL_TYPE*)&runtime->constant_pool[field_type_id];
-  
-  int32_t field_type_code = constant_pool_field_type->code;
-  
-  // Field id
-  int32_t field_id = api->get_field_id(api, object, field_name);
-  
-  if (!field_id) {
-    croak("Can't find %s \"%s\" field(SPVM::Object::Package::set)", package_name, field_name);
-  }
-  
-  switch (field_type_code) {
-    case SPVM_TYPE_C_CODE_BYTE : {
-      int8_t value = api->get_byte_field(api, object, field_id);
-      SV* sv_value = sv_2mortal(newSViv(value));
-      XPUSHs(sv_value);
-      break;
-    }
-    case SPVM_TYPE_C_CODE_SHORT : {
-      int16_t value = api->get_short_field(api, object, field_id);
-      SV* sv_value = sv_2mortal(newSViv(value));
-      XPUSHs(sv_value);
-      break;
-    }
-    case SPVM_TYPE_C_CODE_INT : {
-      int32_t value = api->get_int_field(api, object, field_id);
-      SV* sv_value = sv_2mortal(newSViv(value));
-      XPUSHs(sv_value);
-      break;
-    }
-    case SPVM_TYPE_C_CODE_LONG : {
-      int64_t value = api->get_long_field(api, object, field_id);
-      SV* sv_value = sv_2mortal(newSViv(value));
-      XPUSHs(sv_value);
-      break;
-    }
-    case SPVM_TYPE_C_CODE_FLOAT : {
-      float value = api->get_float_field(api, object, field_id);
-      SV* sv_value = sv_2mortal(newSVnv(value));
-      XPUSHs(sv_value);
-      break;
-    }
-    case SPVM_TYPE_C_CODE_DOUBLE : {
-      double value = api->get_double_field(api, object, field_id);
-      SV* sv_value = sv_2mortal(newSVnv(value));
-      XPUSHs(sv_value);
-      break;
-    }
-    default : {
-      SPVM_API_OBJECT* value = api->get_object_field(api, object, field_id);
-      
-      if (value != NULL) {
-        api->inc_ref_count(api, value);
-      }
-      
-      switch (field_type_code) {
-        case SPVM_TYPE_C_CODE_BYTE_ARRAY : {
-          SV* sv_array = SPVM_XS_UTIL_new_sv_object(value, "SPVM::Object::Array::Byte");
-          XPUSHs(sv_array);
-          break;
-        }
-        case SPVM_TYPE_C_CODE_SHORT_ARRAY : {
-          SV* sv_array = SPVM_XS_UTIL_new_sv_object(value, "SPVM::Object::Array::Short");
-          XPUSHs(sv_array);
-          break;
-        }
-        case SPVM_TYPE_C_CODE_INT_ARRAY : {
-          SV* sv_array = SPVM_XS_UTIL_new_sv_object(value, "SPVM::Object::Array::Int");
-          XPUSHs(sv_array);
-          break;
-        }
-        case SPVM_TYPE_C_CODE_LONG_ARRAY : {
-          SV* sv_array = SPVM_XS_UTIL_new_sv_object(value, "SPVM::Object::Array::Long");
-          XPUSHs(sv_array);
-          break;
-        }
-        case SPVM_TYPE_C_CODE_FLOAT_ARRAY : {
-          SV* sv_array = SPVM_XS_UTIL_new_sv_object(value, "SPVM::Object::Array::Float");
-          XPUSHs(sv_array);
-          break;
-        }
-        case SPVM_TYPE_C_CODE_DOUBLE_ARRAY : {
-          SV* sv_array = SPVM_XS_UTIL_new_sv_object(value, "SPVM::Object::Array::Double");
-          XPUSHs(sv_array);
-          break;
-        }
-        case SPVM_TYPE_C_CODE_STRING : {
-          SV* sv_string = SPVM_XS_UTIL_new_sv_object(value, "SPVM::Object::Package::String");
-          XPUSHs(sv_string);
-          break;
-        }
-        default : {
-          const char* field_type_name =  (char*)&runtime->constant_pool[constant_pool_field_type->name_id + 1];
-          
-          int32_t field_type_name_length = strlen(field_type_name);
-          
-          if (field_type_name[field_type_name_length - 1] == ']') {
-            SV* sv_array = SPVM_XS_UTIL_new_sv_object(value, "SPVM::Object::Array::Object");
-            XPUSHs(sv_array);
-          }
-          else {
-            SV* sv_object = SPVM_XS_UTIL_new_sv_object(value, "SPVM::Object::Package");
-            XPUSHs(sv_object);
-          }
-        }
-      }
-    }
-  }
-  
-  XSRETURN(1);
-}
-
 
 MODULE = SPVM::Object::Package::String		PACKAGE = SPVM::Object::Package::String
 
@@ -3270,7 +2981,12 @@ get(...)
         sv_base_object = SPVM_XS_UTIL_new_sv_object(base_object, "SPVM::Object::Array::Object");
       }
       else {
-        sv_base_object = SPVM_XS_UTIL_new_sv_object(base_object, "SPVM::Object::Package");
+        int32_t element_type_name_id = element_type->name_id;
+        const char* element_type_name = (char*)&runtime->constant_pool[element_type_name_id + 1];
+        SV* sv_element_type_name = sv_2mortal(newSVpv("SPVM::", 0));
+        sv_catpv(sv_element_type_name, element_type_name);
+        
+        sv_base_object = SPVM_XS_UTIL_new_sv_object(base_object, SvPV_nolen(sv_element_type_name));
       }
     }
   }
@@ -3629,7 +3345,7 @@ build_field_symtable(...)
         int32_t field_index;
         for (field_index = 0; field_index < op_fields->length; field_index++) {
           SPVM_OP* op_field = SPVM_DYNAMIC_ARRAY_fetch(op_fields, field_index);
-          SPVM_FIELD_INFO* field = op_field->uv.field;
+          SPVM_FIELD* field = op_field->uv.field;
           const char* field_name = field->op_name->uv.name;
           
           // Field type id
@@ -3640,13 +3356,13 @@ build_field_symtable(...)
           int32_t field_id = field->index;
           SV* sv_field_id = sv_2mortal(newSViv(field_id));
           
-          HV* hv_field_info = (HV*)sv_2mortal((SV*)newHV());
-          (void)hv_store(hv_field_info, "id", strlen("id"), SvREFCNT_inc(sv_field_id), 0);
-          (void)hv_store(hv_field_info, "id", strlen("id"), SvREFCNT_inc(sv_field_id), 0);
-          (void)hv_store(hv_field_info, "type_id", strlen("type_id"), SvREFCNT_inc(sv_field_type_id), 0);
-          SV* sv_field_info = sv_2mortal(newRV_inc((SV*)hv_field_info));
+          HV* hv_field = (HV*)sv_2mortal((SV*)newHV());
+          (void)hv_store(hv_field, "id", strlen("id"), SvREFCNT_inc(sv_field_id), 0);
+          (void)hv_store(hv_field, "id", strlen("id"), SvREFCNT_inc(sv_field_id), 0);
+          (void)hv_store(hv_field, "type_id", strlen("type_id"), SvREFCNT_inc(sv_field_type_id), 0);
+          SV* sv_field = sv_2mortal(newRV_inc((SV*)hv_field));
           
-          (void)hv_store(hv_package_info, field_name, strlen(field_name), SvREFCNT_inc(sv_field_info), 0);
+          (void)hv_store(hv_package_info, field_name, strlen(field_name), SvREFCNT_inc(sv_field), 0);
         }
       }
       
@@ -3897,7 +3613,12 @@ call_sub(...)
               sv_return_value = SPVM_XS_UTIL_new_sv_object(return_value, "SPVM::Object::Array::Object");
             }
             else {
-              sv_return_value = SPVM_XS_UTIL_new_sv_object(return_value, "SPVM::Object::Package");
+              int32_t return_type_name_id = return_type->name_id;
+              const char* return_type_name = (char*)&runtime->constant_pool[return_type_name_id + 1];
+              SV* sv_return_type_name = sv_2mortal(newSVpv("SPVM::", 0));
+              sv_catpv(sv_return_type_name, return_type_name);
+              
+              sv_return_value = SPVM_XS_UTIL_new_sv_object(return_value, SvPV_nolen(sv_return_type_name));
             }
           }
         }

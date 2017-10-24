@@ -54,10 +54,7 @@ define ([
     target
 ) {
 
-    var cache = [],
-        bySID = {},
-        bySCode = {},
-
+    var 
         actionDisplaySchedule = function (obj) {
             stack.push(
                 'schedDisplay',
@@ -92,7 +89,6 @@ define ([
                 },
                 // failure callback
                 fc = function (st) {
-                    console.log("AJAX: " + rest["path"] + " failed with", st);
                     coreLib.displayError(st.payload.message);
                 };
             if (obj.searchKeySchedID) {
@@ -135,7 +131,6 @@ define ([
                 },
                 // failure callback
                 fc = function (st) {
-                    console.log("AJAX: schedule/all failed with", st);
                     coreLib.displayError(st.payload.message);
                 };
             ajax(rest, sc, fc);
@@ -172,7 +167,6 @@ define ([
                 },
                 // failure callback
                 fc = function (st) {
-                    console.log("AJAX: " + rest["path"] + " failed with", st);
                     coreLib.displayError(st.payload.message);
                 };
             ajax(rest, sc, fc);
@@ -216,53 +210,6 @@ define ([
             createScheduleAjax(obj);
         },
 
-        lookupScheduleBySCode = function (scode, successCallback) {
-            var rest = {
-                    "path": 'schedule/scode/' + scode,
-                },
-                sc = function (st) {
-                    cache.push(st.payload);
-                    bySID[st.payload.sid] = st.payload;
-                    bySCode[st.payload.scode] = st.payload;
-                    if (successCallback) {
-                        successCallback(st.payload);
-                    }
-                },
-                fc = function (st) {
-                    coreLib.displayError("Schedule code " + scode + " not found");
-                };
-            if (bySCode[scode]) {
-                if (successCallback) {
-                    successCallback(bySCode[scode]);
-                }
-            }
-            ajax(rest, sc, fc);
-        },
-
-        lookupScheduleBySID = function (sid, successCallback) {
-            var cached = getBySID(sid),
-                rest = {
-                    "path": 'schedule/sid/' + sid,
-                },
-                sc = function (st) {
-                    cache.push(st.payload);
-                    bySID[st.payload.sid] = st.payload;
-                    byCode[st.payload.code] = st.payload;
-                    if (successCallback) {
-                        successCallback(st.payload);
-                    }
-                },
-                fc = function (st) {
-                    coreLib.displayError("Schedule SID " + sid + " not found");
-                };
-            if (bySID[sid]) {
-                if (successCallback) {
-                    successCallback(bySID[sid]);
-                }
-            }
-            ajax(rest, sc, fc);
-        },
-
         mungeScheduleForDisplay = function (obj) {
             var schedule = JSON.parse(obj.schedule),
                 slen = schedule.length,
@@ -291,45 +238,6 @@ define ([
                 mungedObj[dow] += schedule[i]['low_time'] + '-' + schedule[i]['high_time'];
             }
             return mungedObj;
-        },
-
-        populateSchedIntvlsForDate = function (populateArray) {
-            var date, aid, i, rest, sc, fc, fnToCall;
-            console.log("Entering populateSchedIntvlsForDate()");
-            date = $("input[id=iNdate]").val();
-            aid = $("input[id=acTaid]").val();
-            if (populateArray.length === 0) {
-                fnToCall = function (populateArray) {};
-            } else {
-                fnToCall = populateArray.shift();
-            }
-            rest = {
-                "method": 'GET',
-                "path": 'schedule/eid/' + eid + '/',
-            };
-            sc = function (st) {
-                console.log("GET " + rest.path + " returned", st);
-                $('input[id=iNschedintvls]').val('FIXME');
-                fnToCall(populateArray);
-            };
-            fc = function (st) {
-                console.log("GET " + rest.path + " returned", st);
-                coreLib.displayError(st.payload.message);
-                fnToCall(populateArray);
-            };
-            console.log("Date entry is " + date);
-            rest.path += '"' + date + ' 12:00"';
-            ajax(rest, sc, fc);
-        },
-
-        populateSID = function (populateArray) {
-            var eid, sid, fnToCall;
-            console.log("Entering populateSID()");
-            if (populateArray.length === 0) {
-                fnToCall = function (populateArray) {};
-            } else {
-                fnToCall = populateArray.shift();
-            }
         },
 
         prepSchedIntvl = function (dow, uint) {
@@ -389,7 +297,6 @@ define ([
                     coreLib.displayResult(dispMsg);
                 },
                 fc = function (st) {
-                    console.log("AJAX: " + rest["path"] + " failed with", st);
                     coreLib.displayError(st.payload.message);
                 };
             if (mode === 'edit') {
@@ -407,16 +314,13 @@ define ([
         actionSchedLookup: actionSchedLookup,
         browseAllSchedules: browseAllSchedules,
         createSchedule: createSchedule,
-        lookupScheduleBySCode: lookupScheduleBySCode,
-        lookupScheduleBySID: lookupScheduleBySID,
-        populateSchedIntvlsForDate: populateSchedIntvlsForDate,
         prepSchedIntvl: prepSchedIntvl,
         schedEditSave: function (obj) {
             schedGen('edit', obj);
         },
         schedReallyDelete: function (obj) {
             schedGen('delete', obj);
-        }
+        },
     };
 
 });

@@ -1,5 +1,8 @@
 Revision history for RT-Extension-Memo
 
+0.03 2017-10-20
+ - Do not replace \n by <br />
+ - Remove MemoWidth option to allow styling directly in CSS
 0.02 2017-10-16
  - Fix forgotten RT.Config.WebPath in AJAX request
  - Proposed fix to license meta name as suggested below: https://metacpan.org/pod/Software::License::GPL_3

@@ -14,42 +14,43 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 cfaff3f742a2455bad1f44cf93b917ed89684a3c Changes
+SHA1 06d57b6011f4f03754c0d4e408f5a002028864bc Changes
 SHA1 4a416039204438f88cd41da9f124fcca1152603b INSTALL
 SHA1 4c60e8fc342b62d07c4c171165c703886db7a6d4 LICENSE
-SHA1 e6d2dc756ddc99ec467261d2816cfe46df7347b8 MANIFEST
-SHA1 9f700331eed0bff98c21d761eddbaede2dba10a6 META.json
-SHA1 5a57211c6f8618b808d090bb7405d7bab8fe27b2 META.yml
-SHA1 8bfa6c6cb452764c16b04d00880f40423179e157 Makefile.PL
-SHA1 bc5f313d0afc4110d9f8ec9e4fb1f237baec21d7 README
+SHA1 d5195515cb03c6aec15736ddeb814f1998d66318 MANIFEST
+SHA1 8f5ee497a6c3db90aeb1bce3483b5b20d02bf25e META.json
+SHA1 70383ab02bb3512471a25b6df4b6d940eb5ff381 META.yml
+SHA1 3dd4528cf61e884b78e5c875faa24ccc4d0a5620 Makefile.PL
+SHA1 f4e292277dba04cd1323878895cb140f96eecebf README
 SHA1 c1531bc200ad0cfd81b3e934b3f4500ef45d20b6 TODO
-SHA1 017f2ad2e6ce1d7ffd82125a61beb40a7b7ad677 bin/ldapd.pl
+SHA1 5127ab524fb23d5d8ceebe76740bd15ba1dc903a bin/ldapd.pl
 SHA1 fdf3f9258ba9682eb1a7d5c3568ac1153a9d0c59 dist.ini
 SHA1 1e69d2885505863c9ba0993abde7fe4083a7aee1 examples/empty.conf
 SHA1 5c76cf78e587271d9937a492b90dc28790e96a0e examples/multi-entries.ldif
 SHA1 25d232c3c906c6344ef416ffd56a04d2eff39462 examples/single-entry.conf
-SHA1 f3e37c007b5a20e100573c5e21b92d0328a57b54 examples/single-entry.ldif
-SHA1 5dbb8c82e46c84bbc3a13081038059ded9649870 lib/Net/LDAP/SimpleServer.pm
-SHA1 e990b23f29ecc3f21655edd92339173b423c14b4 lib/Net/LDAP/SimpleServer/LDIFStore.pm
-SHA1 4b381c03e63c6fecb197a7e2a3104b3f1c2619a8 lib/Net/LDAP/SimpleServer/ProtocolHandler.pm
-SHA1 9364f4270d925b6feaafc98760104ef8544313b8 t/00-compile.t
+SHA1 210aceaff9fe6c63bede16196d35098ebe787f55 examples/single-entry.ldif
+SHA1 82dda62cd6bba2442703c1e09fba755f6cbb9a22 lib/Net/LDAP/SimpleServer.pm
+SHA1 ff88764ae60e036cdf4dc8e109f030a937728182 lib/Net/LDAP/SimpleServer/Constant.pm
+SHA1 9d9ffb96b47d4ac1fd3834175a09c0647c764038 lib/Net/LDAP/SimpleServer/LDIFStore.pm
+SHA1 0af827d6aa87b92d98167a3b7b73c15169ec6ad2 lib/Net/LDAP/SimpleServer/ProtocolHandler.pm
+SHA1 847e4a7814b057498545d051b989e8558c0d430e t/00-compile.t
 SHA1 86cd488198ef1835477613f6a2256994986660aa t/00-load.t
-SHA1 f1d52650049dd57b236914e3471e6bb18db6b05e t/000-report-versions-tiny.t
-SHA1 84cbabc93390824f5301fdf434a108886d341b88 t/05-handler.t
-SHA1 b1aed62cd2b69215d59307a9f2aa5ceab7d7c5db t/06-store.t
-SHA1 2ece7bed2ef56d7cd4633a10b8aa12b8bafb3c0c t/13-param.t
-SHA1 20590938df8e3be15e663acf9129b0e419d8261a t/14-bind.t
-SHA1 7382e10320fd236d81f0b855f4d406241e3acbac t/15-search.t
+SHA1 0e6e3ac51a928f6bdc8f7de3f7d765eb7224bfeb t/000-report-versions-tiny.t
+SHA1 c4cc7108a191be48e81b3798e468d96bb549b40a t/10-store.t
+SHA1 0a5ac27e5002612d5481711bee2526b2d8325e90 t/20-handler.t
+SHA1 dbba412e4fd391c166f3ce8b53f10f1f1295079a t/30-param.t
+SHA1 164f7d1650fc66fa4d09f6bb0390284014c71097 t/40-bind.t
+SHA1 446f135017d733ce5cc7b071a0b75338b18d88d0 t/50-search.t
 SHA1 20011aeac19a73a69dfa2bb32422ae4648a129de t/author-critic.t
-SHA1 532eb1fbd75958d0781de00fb4a8ecea218e7ef6 t/author-eol.t
+SHA1 f77067a5846b57f874764d070dfaf543f5099326 t/author-eol.t
 SHA1 ea89f21d866b81da4a4799f50503666e09620ac3 t/author-mojibake.t
-SHA1 5ccb66efd216873f33745bc56ca14a4ad2912f7a t/author-no-tabs.t
+SHA1 0304a3be27a723b97c34918eae204120cee4b414 t/author-no-tabs.t
 SHA1 5387f8ed48de7ef64220c5ed2c77e41ed844adb2 t/author-pod-coverage.t
 SHA1 545af31470c3e0784f83ee2c7714af89114f571f t/author-pod-linkcheck.t
 SHA1 8efad25309730a4d501fb40fc03eda4697303372 t/author-pod-syntax.t
 SHA1 e8df9a49c884b6c6964329f7902ba94ad0289eb0 t/author-portability.t
 SHA1 60dcfab54478213041dc8be6a2ba88deb9fb6136 t/author-test-version.t
-SHA1 e78ee32cbddd38e6b315dd924e589dc57d4f89cf t/lib/Helper.pm
+SHA1 64f56c6db45cc2bf26f704e5ce8c3ffa79266cd3 t/lib/Helper.pm
 SHA1 560bc7c1ce955fdadf9d04b117f7e9db8c9220ff t/release-dist-manifest.t
 SHA1 ed5bdf51745af3a2ef9d38b08372427c3818c836 t/release-distmeta.t
 SHA1 d527491e13186274d2947c0d9f4b7a8a8d227616 t/release-kwalitee.t
@@ -59,17 +60,17 @@ SHA1 af52a2c44bef464f8283799f023531c9dd9f020f t/release-unused-vars.t
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1
 
-iQIcBAEBAgAGBQJZ5HzcAAoJEMZvtcdxyp88SJYP/jWmiEWTV1iJrWrZqkh6+P2+
-ssbdFv7Nfw0h1ZelkyWV0M3zUGGfQ/exGRI0IcVIkNKgM3StVa+sC36hYtbAmypu
-dmEcIaKNsUPK6ZuSVEp28KQ0jxw4z6q+BAVyshYZCYXFajkXYcHqf14a4hE4UbnL
-f7b32NCJJFCvP+k0P/9i3MdcC38x2TzzeZoecdeMRdzVMrccAXMbClAKYlcBuST4
-3Ac5PmOLfcRUtgxL3e1nuPSlfmdo4WLSgHg9zg7puj8/yPBFQI3Op7hRp/8zHZxL
-TLxMxaBMfaDYc0CUigb0AvQ7kj9BeiWJCUirXsR7YZrKgmNjEYQJaC3SXiiIiPhu
-y9P0Cp1vJpuPX7xQ4KJH+3dqWoKWBsA3BqD0T6dXHosYDIlJBgJD9q0vG67ZaZxm
-B+pgZnk1Xh9rgJxf1zWgMBzy3mR/3Rtn42NTX6OI7jLcgtjI9ZTNaSGllygUYUrz
-9KFTOLXvMUmKKScEwEyODN+IvlPJjFUKwi/pvyrtGNUFrPrHT3nbIcd7I9zAo8AR
-WjS0kbA/ymeaZqB0x9ZeBhPSLi5rjQXCNDP3RqfPwR4Xnq1WMA2NtSs8Qk+wLZpt
-GVX5hy5S8Oa1dhipMQODYF4byBnQ1Jk7bkYfseIZBMjHs8GhqSe9B5R4K+Nuxrs1
-MgbmFpxHcP6Bnnlszppw
-=etPa
+iQIcBAEBAgAGBQJZ7GAvAAoJEMZvtcdxyp88UdYQAKJDwLxw0swoVeFyRXulyFgV
+gjqG0LJSGtgtabf83YSmhmpAh1v4Ccs6Z7mkLCnihHqp59ihwblMZ5DZJYodeZqD
+ubI8Ycw5+AZtm05OETi4AwlAOr2dxe26xOC2ZAutpCfFf3mDUXHMUHsxfKgGGZ6x
+rlv8ORhkcvzVWpOz2ozS7icbUeTnPwtdIQx/F0jIQoKuL8lYlXQAj58y3Z8erxoJ
+zyQ0jzuXG9XfItOCv9JfjK6GPiNwhwG7ibFIooeZYdjoYw56Z8M0BR9ubTMD83fq
+ILVBpuxz5To/t/zoPa7qGSHbYZKP1a+xW+cX6xm0bIyElzAw3C30yi5wecl3zBLz
+VbIeHt6fKxJdxYsQ1UWehiddkACDKuK2RI3t9V8FJgdSiJcE/z16hHDvPGw5u/Ta
+Uvu83rmBsebmZAGzuc5A59vQPmU7FjOwuPlH9uGZBNstmoW19fceV8jI/AdnHB2V
+05iego1SgiM407umPhbD3YI3Uc0AS3V1yctJ+I1qVNqNeP0RahjeM2s6GeV50QVo
+zC9orxpxV4wIXVJouBJcDSD1VV4rw6XdpLumqvHXK8XzvjoMqze01c8ghrgSuIR7
+bb+/U3zwmwcmrzf6n/kDLvRUuXsReMdo/AMwrG8z9NUINJlWkjkAzdP5yJepNhAx
+vkyfns4380waZQlLTFUT
+=ggT6
 -----END PGP SIGNATURE-----

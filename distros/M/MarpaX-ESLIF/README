@@ -38,10 +38,11 @@ SYNOPSIS
       printf "ESLIF library version: %s\n", $eslif->version;
 
     This class and its derivatives are thread-safe. Although there can be
-    many ESLIF instance, in practice a single instance is enough, unless
-    you want different logging interfaces. Once a MarpaX::ESLIF instance is
-    created, the user should create a MarpaX::ESLIF::Grammar instance to
-    have a working grammar.
+    many ESLIF instances, in practice a single instance is enough, unless
+    you want different logging interfaces. This is why the new method is
+    implemented as a multiton. Once a MarpaX::ESLIF instance is created,
+    the user should create a MarpaX::ESLIF::Grammar instance to have a
+    working grammar.
 
 METHODS
 
@@ -57,6 +58,10 @@ METHODS
     MarpaX::ESLIF::Logger::Interface, or undef.
 
     An example of logging implementation can be a Log::Any adapter.
+
+ MarpaX::ESLIF->getInstance($loggerInterface)
+
+    Alias to new.
 
  $eslif->version()
 

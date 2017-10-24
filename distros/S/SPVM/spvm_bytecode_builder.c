@@ -19,17 +19,20 @@
 #include "spvm_my_var.h"
 #include "spvm_compiler_allocator.h"
 #include "spvm_package.h"
-#include "spvm_name_info.h"
+#include "spvm_call_field.h"
+#include "spvm_call_sub.h"
 #include "spvm_hash.h"
-#include "spvm_field_info.h"
+#include "spvm_field.h"
 #include "spvm_switch_info.h"
 #include "spvm_constant_pool.h"
 #include "spvm_type.h"
 #include "spvm_limit.h"
 #include "spvm_constant_pool_sub.h"
-#include "spvm_constant_pool_field_info.h"
+#include "spvm_constant_pool_field.h"
 #include "spvm_constant_pool_package.h"
 #include "spvm_object.h"
+#include "spvm_our.h"
+#include "spvm_package_var.h"
 
 
 void SPVM_BYTECODE_BUILDER_push_inc_bytecode(SPVM_COMPILER* compiler, SPVM_BYTECODE_ARRAY* bytecode_array, SPVM_OP* op_inc, int32_t value) {
@@ -566,16 +569,13 @@ void SPVM_BYTECODE_BUILDER_build_bytecode_array(SPVM_COMPILER* compiler) {
                     }
                   }
                   
-                  SPVM_NAME_INFO* name_info = op_cur->uv.name_info;
-                  const char* field_name = name_info->resolved_name;
-                  SPVM_OP* op_field = SPVM_HASH_search(compiler->op_field_symtable, field_name, strlen(field_name));
-                  SPVM_FIELD_INFO* field = op_field->uv.field;
+                  SPVM_FIELD* field = op_cur->uv.call_field->field;
                   
-                  SPVM_CONSTANT_POOL_FIELD_INFO constant_pool_field;
-                  memcpy(&constant_pool_field, &compiler->constant_pool->values[field->id], sizeof(SPVM_CONSTANT_POOL_FIELD_INFO));
+                  SPVM_CONSTANT_POOL_FIELD constant_pool_field;
+                  memcpy(&constant_pool_field, &compiler->constant_pool->values[field->id], sizeof(SPVM_CONSTANT_POOL_FIELD));
                   
-                  SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, ((constant_pool_field.index + 1) >> 8) & 0xFF);
-                  SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, (constant_pool_field.index + 1) & 0xFF);
+                  SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, ((constant_pool_field.index) >> 8) & 0xFF);
+                  SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, (constant_pool_field.index) & 0xFF);
                 }
                 
                 break;
@@ -584,8 +584,8 @@ void SPVM_BYTECODE_BUILDER_build_bytecode_array(SPVM_COMPILER* compiler) {
                 
                 // Call subroutine
                 SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_CALL_SUB);
-                SPVM_NAME_INFO* name_info = op_cur->uv.name_info;
-                const char* sub_name = name_info->resolved_name;
+                SPVM_CALL_SUB* call_sub = op_cur->uv.call_sub;
+                const char* sub_name = call_sub->resolved_name;
                 
                 SPVM_OP* op_sub = SPVM_HASH_search(compiler->op_sub_symtable, sub_name, strlen(sub_name));
                 SPVM_SUB* sub = op_sub->uv.sub;
@@ -1270,6 +1270,27 @@ void SPVM_BYTECODE_BUILDER_build_bytecode_array(SPVM_COMPILER* compiler) {
                     }
                   }
                 }
+                else if (op_cur->first->code == SPVM_OP_C_CODE_PACKAGE_VAR) {
+                  SPVM_OP* op_package_var = op_cur->first;
+                  
+                  SPVM_PACKAGE_VAR* package_var = op_package_var->uv.package_var;
+
+                  SPVM_TYPE* type = SPVM_OP_get_type(compiler, op_package_var);
+
+                  if (SPVM_TYPE_is_numeric(compiler, type)) {
+                    SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_STORE_PACKAGE_VAR);
+                  }
+                  else {
+                    SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_STORE_PACKAGE_VAR_OBJECT);
+                  }
+                                    
+                  int32_t package_var_id = package_var->op_our->uv.our->id;
+
+                  SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, (package_var_id >> 24) & 0xFF);
+                  SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, (package_var_id >> 16) & 0xFF);
+                  SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, (package_var_id >> 8) & 0xFF);
+                  SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, package_var_id & 0xFF);
+                }
                 else if (op_cur->first->code == SPVM_OP_C_CODE_ARRAY_ELEM) {
                   
                   SPVM_OP* op_array_elem = op_cur->first;
@@ -1327,17 +1348,15 @@ void SPVM_BYTECODE_BUILDER_build_bytecode_array(SPVM_COMPILER* compiler) {
                     SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_SET_FIELD_OBJECT);
                   }
                   
-                  // Call subroutine
-                  SPVM_NAME_INFO* name_info = op_cur->first->uv.name_info;
-                  const char* field_name = name_info->resolved_name;
-                  SPVM_OP* op_field = SPVM_HASH_search(compiler->op_field_symtable, field_name, strlen(field_name));
-                  SPVM_FIELD_INFO* field = op_field->uv.field;
+                  // Call field
+                  SPVM_CALL_FIELD* call_field = op_cur->first->uv.call_field;
+                  SPVM_FIELD* field = call_field->field;
 
-                  SPVM_CONSTANT_POOL_FIELD_INFO constant_pool_field;
-                  memcpy(&constant_pool_field, &compiler->constant_pool->values[field->id], sizeof(SPVM_CONSTANT_POOL_FIELD_INFO));
+                  SPVM_CONSTANT_POOL_FIELD constant_pool_field;
+                  memcpy(&constant_pool_field, &compiler->constant_pool->values[field->id], sizeof(SPVM_CONSTANT_POOL_FIELD));
                   
-                  SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, ((constant_pool_field.index + 1) >> 8) & 0xFF);
-                  SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, (constant_pool_field.index + 1) & 0xFF);
+                  SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, ((constant_pool_field.index) >> 8) & 0xFF);
+                  SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, (constant_pool_field.index) & 0xFF);
                 }
                 else if (op_cur->first->code == SPVM_OP_C_CODE_EXCEPTION_VAR) {
                   SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_STORE_EXCEPTION);
@@ -1719,6 +1738,23 @@ void SPVM_BYTECODE_BUILDER_build_bytecode_array(SPVM_COMPILER* compiler) {
                 }
                 
                 SPVM_BYTECODE_BUILDER_push_load_bytecode(compiler, bytecode_array, op_cur);
+                
+                break;
+              }
+              case SPVM_OP_C_CODE_PACKAGE_VAR: {
+                if (op_cur->lvalue) {
+                  break;
+                }
+                
+                SPVM_OUR* our = op_cur->uv.package_var->op_our->uv.our;
+                
+                int32_t package_var_id = our->id;
+
+                SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, SPVM_BYTECODE_C_CODE_LOAD_PACKAGE_VAR);
+                SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, (package_var_id >> 24) & 0xFF);
+                SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, (package_var_id >> 16) & 0xFF);
+                SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, (package_var_id >> 8) & 0xFF);
+                SPVM_BYTECODE_ARRAY_push(compiler, bytecode_array, package_var_id & 0xFF);
                 
                 break;
               }

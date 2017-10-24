@@ -7,7 +7,7 @@ NAME
 SYNOPSIS
        #include <time.h>
 
-       extern char *tzname[2];
+       extern char *tzname[]; /* (optional) */
 
        char *ctime(time_t const *clock);
 
@@ -113,28 +113,29 @@ DESCRIPTION
        structure, are in the <time.h> header file.  The structure (of type)
        struct tm includes the following fields:
 
-                   int tm_sec;      /* seconds (0-60) */
-                   int tm_min;      /* minutes (0-59) */
-                   int tm_hour;     /* hours (0-23) */
-                   int tm_mday;     /* day of month (1-31) */
-                   int tm_mon;      /* month of year (0-11) */
-                   int tm_year;     /* year - 1900 */
-                   int tm_wday;     /* day of week (Sunday = 0) */
-                   int tm_yday;     /* day of year (0-365) */
-                   int tm_isdst;    /* is summer time in effect? */
-                   char *tm_zone;   /* abbreviation of time zone name */
-                   long tm_gmtoff;  /* offset from UT in seconds */
-
-       The tm_zone and tm_gmtoff fields exist, and are filled in, only if
-       arrangements to do so were made when the library containing these
-       functions was created.  There is no guarantee that these fields will
-       continue to exist in this form in future releases of this code.
+                int tm_sec;      /* seconds (0-60) */
+                int tm_min;      /* minutes (0-59) */
+                int tm_hour;     /* hours (0-23) */
+                int tm_mday;     /* day of month (1-31) */
+                int tm_mon;      /* month of year (0-11) */
+                int tm_year;     /* year - 1900 */
+                int tm_wday;     /* day of week (Sunday = 0) */
+                int tm_yday;     /* day of year (0-365) */
+                int tm_isdst;    /* is summer time in effect? */
+                char *tm_zone;   /* time zone abbreviation (optional) */
+                long tm_gmtoff;  /* offset from UT in seconds (optional) */
 
        Tm_isdst is non-zero if summer time is in effect.
 
        Tm_gmtoff is the offset (in seconds) of the time represented from UT,
        with positive values indicating east of the Prime Meridian.  The
        field's name is derived from Greenwich Mean Time, a precursor of UT.
+
+       In struct tm the tm_zone and tm_gmtoff fields exist, and are filled in,
+       only if arrangements to do so were made when the library containing
+       these functions was created.  Similarly, the tzname variable is
+       optional.  There is no guarantee that these fields and this variable
+       will continue to exist in this form in future releases of this code.
 
 FILES
        /usr/local/etc/zoneinfo             time zone information directory
@@ -150,10 +151,12 @@ SEE ALSO
 
 NOTES
        The return values of asctime, ctime, gmtime, and localtime point to
-       static data overwritten by each call.  The tm_zone field of a returned
-       struct tm points to a static array of characters, which can be
-       overwritten by later calls to tzset.  The remaining functions and data
-       are thread-safe.
+       static data overwritten by each call.  The tzname variable (once set)
+       and the tm_zone field of a returned struct tm both point to an array of
+       characters that can be freed or overwritten by later calls to the
+       functions localtime, tzfree, and tzset, if these functions affect the
+       time zone information that specifies the abbreviation in question.  The
+       remaining functions and data are thread-safe.
 
        Asctime, asctime_r, ctime, and ctime_r behave strangely for years
        before 1000 or after 9999.  The 1989 and 1999 editions of the C

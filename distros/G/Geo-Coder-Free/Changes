@@ -1,0 +1,12 @@
+Revision history for Geo-Coder-Free
+
+0.03	Sun Oct 22 10:46:22 EDT 2017
+	Fixed spelling mistake
+
+0.02	Sun Oct 22 10:31:35 EDT 2017
+	Mention that reverse isn't supported
+	Added createdatabase.PL
+	Added ua
+
+0.01	Sun 15 Oct 14:24:23 EDT 2017
+	First Version

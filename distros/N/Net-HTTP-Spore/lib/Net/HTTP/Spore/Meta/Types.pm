@@ -1,8 +1,5 @@
 package Net::HTTP::Spore::Meta::Types;
-{
-  $Net::HTTP::Spore::Meta::Types::VERSION = '0.06';
-}
-
+$Net::HTTP::Spore::Meta::Types::VERSION = '0.07';
 # ABSTRACT: Moose type definitions for Net::HTTP::Spore
 
 use Moose::Util::TypeConstraints;
@@ -15,7 +12,7 @@ subtype UriPath,
     where { $_ =~ m!^/! },
     message {"path must start with /"};
 
-enum HTTPMethod, qw(OPTIONS HEAD GET POST PUT DELETE TRACE PATCH);
+enum HTTPMethod, [qw(OPTIONS HEAD GET POST PUT DELETE TRACE PATCH)];
 
 subtype Boolean,
     as Int,
@@ -37,13 +34,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Net::HTTP::Spore::Meta::Types - Moose type definitions for Net::HTTP::Spore
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 AUTHORS
 
@@ -51,17 +50,21 @@ version 0.06
 
 =item *
 
-franck cuny <franck@lumberjaph.net>
+Franck Cuny <franck.cuny@gmail.com>
 
 =item *
 
 Ash Berlin <ash@cpan.org>
 
+=item *
+
+Ahmad Fatoum <athreef@cpan.org>
+
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by linkfluence.
+This software is copyright (c) 2012 by Linkfluence.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

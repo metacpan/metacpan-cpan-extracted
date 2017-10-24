@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.73.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -15,21 +15,21 @@ not run its Makefile.PL or Build.PL.
 Hash: SHA1
 
 SHA1 859028e24d7d3ac5cf5809692e685befb1d7b2ca .gitignore
-SHA1 1571ce6bf0a9cd1b717be9ef321d215585f798d4 Build.PL
-SHA1 c83b58b580be5b22d4d95c7e7a64605412204701 Changes
-SHA1 8190abde39553507eb1d93938b63d03491d157f8 MANIFEST
-SHA1 81c869698e034dffd7f32a69a381dc5363c85fb9 META.json
-SHA1 d0d1207cb9b27306c1b180785e09720ac7992aee META.yml
+SHA1 2d8d07101349a51aca327127e70f49ebc4b9990c Build.PL
+SHA1 7f68415afeddd777b101e84988807608cb3cf3cc Changes
+SHA1 37fab60b298b611ee7d96a8dde53ce2439c42349 MANIFEST
+SHA1 834dbd264c7790d39d099316bda6414a915cf6f5 META.json
+SHA1 0eae819808366750ccf3fa26de5157bb0f7067f1 META.yml
 SHA1 4015c3ead93c8dd2cd7d2f4d2e3aa915365adbe7 README
-SHA1 50babfa765be17630534c56610224a17f6c222c8 lib/Time/OlsonTZ/Download.pm
+SHA1 a1cce6c1dd81a433ce89e09622768d33e2b68478 lib/Time/OlsonTZ/Download.pm
+SHA1 2f2912328b2639991467ee6255eccbd3b1fbec14 t/latest.at
 SHA1 904d9a4f76525e2303e4b0c168c68230f223c8de t/pod_cvg.t
 SHA1 65c75abdef6f01a5d1588a307f2ddfe2333dc961 t/pod_syn.t
 SHA1 90514f5e59b12f6e8a08da605da827900cff24ea t/use.t
-SHA1 2f2912328b2639991467ee6255eccbd3b1fbec14 xt/latest.t
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1
 
-iEYEARECAAYFAllsC3gACgkQOV9mt2VyAVHP0gCeKDlIIAd1Az45rCVKu2Phc50l
-vhoAnjSBp5ML8TtXs3aSzlAvh4IQtD8+
-=M8z8
+iEYEARECAAYFAlnuVvQACgkQOV9mt2VyAVE8hwCgnqgxLyV1H882lAah/CujX0Mw
+F9sAn2FLD/DD9O+D3Z1o14LKaeQuxXcS
+=3ZOR
 -----END PGP SIGNATURE-----

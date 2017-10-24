@@ -4,7 +4,9 @@ use strict;
 
 use Module::Build;
 
-Module::Build->new(
+Module::Build->subclass(code => q{
+	sub ACTION_testauthor { $_[0]->generic_test(type => "author") }
+})->new(
 	module_name => "Time::OlsonTZ::Download",
 	license => "perl",
 	configure_requires => {
@@ -39,6 +41,19 @@ Module::Build->new(
 	},
 	dynamic_config => 0,
 	meta_add => { distribution_type => "module" },
+	meta_merge => {
+		"meta-spec" => { version => "2" },
+		resources => {
+			bugtracker => {
+				mailto => "bug-Time-OlsonTZ-Download".
+					"\@rt.cpan.org",
+				web => "https://rt.cpan.org/Public/Dist/".
+					"Display.html?Name=".
+					"Time-OlsonTZ-Download",
+			},
+		},
+	},
+	test_types => { author => ".at" },
 	sign => 1,
 )->create_build_script;
 

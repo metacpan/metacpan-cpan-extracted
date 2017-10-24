@@ -79,7 +79,7 @@ sub retrieve
   $tee = new IO::Tee(\*STDOUT, ">>$tofile"); # GLOBAL ZZZ
   
   #open( OUTFILE, ">>$outfile" ) or die "Can't open $outfile: $!"; 
-  open( TOFILE, ">>$tofile" ) or die "Can't open $tofile: $!"; 
+#  open( TOFILE, ">>$tofile" ) or die "Can't open $tofile: $!"; 
   
   say $tee "\n#Now in Sim::OPT::Report_retrieve.\n";
   
@@ -877,7 +877,7 @@ sub newretrieve
   $tee = new IO::Tee(\*STDOUT, ">>$tofile"); # GLOBAL ZZZ
   
   #open( OUTFILE, ">>$outfile" ) or die "Can't open $outfile: $!"; 
-  open( TOFILE, ">>$tofile" ) or die "Can't open $tofile: $!"; 
+#  open( TOFILE, ">>$tofile" ) or die "Can't open $tofile: $!"; 
   
   say $tee "\n#Now in Sim::OPT::Report_newretrieve.\n";
   
@@ -958,35 +958,35 @@ sub newretrieve
   my $instance = $instances[ $countinstance ];  #say $tee "\$instance: " . dump($instance);
 
   my %d = %{$instance};
-  my $countcase = $d{countcase}; say $tee "dump(\$countcase): " . dump($countcase);
-  my $countblock = $d{countblock}; say $tee "dump(\@countblock): " . dump($countblock);
-  my %datastruc = %{ $d{datastruc} }; say $tee "dump(\%datastruc): " . dump(%datastruc);######
-  my @rescontainer = @{ $d{rescontainer} }; say $tee "dump(\@rescontainer): " . dump(@rescontainer);######
-  my @miditers = @{ $d{miditers} }; say $tee "dump(\@miditers): " . dump(@miditers);
-  my @winneritems = @{ $d{winneritems} }; say $tee  "dumpIN( \@winneritems) " . dump(@winneritems);
-  my $countvar = $d{countvar}; say $tee "dump(\$countvar): " . dump($countvar );
-  my $countstep = $d{countstep}; say $tee "dump(\$countstep): " . dump($countstep);
-  my $to = $d{to}; say $tee "dump(\$to): " . dump($to);
-  my $origin = $d{origin}; say $tee "dump(\$origin): " . dump($origin);
-  my @uplift = @{ $d{uplift} }; say $tee "dump(\@uplift): " . dump(@uplift);
-  my @backvalues = @{ $d{backvalues} }; say $tee "IN RETRIEVE \@backvalues " . dump(@backvalues);
-  my @sweeps = @{ $d{sweeps} }; say $tee "dump(\@sweeps): " . dump(@sweeps);
-  my @sourcesweeps = @{ $d{sourcesweeps} }; say $tee "dump(\@sourcesweeps): " . dump(@sourcesweeps);
+  my $countcase = $d{countcase}; #say $tee "dump(\$countcase): " . dump($countcase);
+  my $countblock = $d{countblock}; #say $tee "dump(\@countblock): " . dump($countblock);
+  my %datastruc = %{ $d{datastruc} }; #say $tee "dump(\%datastruc): " . dump(%datastruc);######
+  my @rescontainer = @{ $d{rescontainer} }; #say $tee "dump(\@rescontainer): " . dump(@rescontainer);######
+  my @miditers = @{ $d{miditers} }; #say $tee "dump(\@miditers): " . dump(@miditers);
+  my @winneritems = @{ $d{winneritems} }; #say $tee  "dumpIN( \@winneritems) " . dump(@winneritems);
+  my $countvar = $d{countvar}; #say $tee "dump(\$countvar): " . dump($countvar );
+  my $countstep = $d{countstep}; #say $tee "dump(\$countstep): " . dump($countstep);
+  my $to = $d{to}; #say $tee "dump(\$to): " . dump($to);
+  my $origin = $d{origin}; #say $tee "dump(\$origin): " . dump($origin);
+  my @uplift = @{ $d{uplift} }; #say $tee "dump(\@uplift): " . dump(@uplift);
+  my @backvalues = @{ $d{backvalues} }; #say $tee "IN RETRIEVE \@backvalues " . dump(@backvalues);
+  my @sweeps = @{ $d{sweeps} }; #say $tee "dump(\@sweeps): " . dump(@sweeps);
+  my @sourcesweeps = @{ $d{sourcesweeps} }; #say $tee "dump(\@sourcesweeps): " . dump(@sourcesweeps);
   
   #eval($getparshere);
   
   my $skip = $vals{$countvar}{skip}; 
   
-  my $rootname = Sim::OPT::getrootname(\@rootnames, $countcase); say $tee "dump(\$rootname): " . dump($rootname);
-  my $numberof_simtools = scalar ( keys %{ $dowhat{simtools} } ); say $tee "dump(\$numberof_simtools ): " . dump($numberof_simtools );
+  my $rootname = Sim::OPT::getrootname(\@rootnames, $countcase); #say $tee "dump(\$rootname): " . dump($rootname);
+  my $numberof_simtools = scalar ( keys %{ $dowhat{simtools} } ); #say $tee "dump(\$numberof_simtools ): " . dump($numberof_simtools );
   
   my $counttool = 1;
   while ( $counttool <= $numberof_simtools ) 
   {  
-    my $skip = $vals{$countvar}{$counttool}{skip}; say $tee "INWHILE dump(\$skip): " . dump($skip);
+    my $skip = $vals{$countvar}{$counttool}{skip}; #say $tee "INWHILE dump(\$skip): " . dump($skip);
     if ( not ( eval ( $skipsim{$counttool} )))
     {
-      my $tooltype = $dowhat{simtools}{$counttool}; say $tee "INWHILE dump(\$tooltype ): " . dump($tooltype );
+      my $tooltype = $dowhat{simtools}{$counttool}; #say $tee "INWHILE dump(\$tooltype ): " . dump($tooltype );
 
       sub retrieve_temperatures_results 
       {
@@ -1091,7 +1091,7 @@ ZZZ
       sub retrieve_stats_results
       { 
         my ( $result, $resfile, $retrdata_ref, $reporttitle, $themereport, $counttheme, $countreport, $retfile, $semaphorego1, $semaphorego2, $semaphorestop1, $semaphorestop2, $textpattern, $afterlines ) = @_;
-        say $tee "IN retrieve_stats_results 1. " ;
+        #say $tee "IN retrieve_stats_results 1. " ;
         
         my @retrdata = @$retrdata_ref; 
         my $printthis;
@@ -1380,47 +1380,47 @@ $printthis
         }
       }
       
-      say $tee "\@simstruct : ". dump( @simstruct );
-      say $tee "\@simcases : ". dump( @simcases );
-      say $tee "\$countcase : ". dump( $countcase );
-      say $tee "\$countblock : ". dump( $countblock );
-      say $tee "\$counttool : ". dump( $counttool );
-      say $tee "\$countinstance : ". dump( $countinstance );
+      #say $tee "\@simstruct : ". dump( @simstruct );
+      #say $tee "\@simcases : ". dump( @simcases );
+      #say $tee "\$countcase : ". dump( $countcase );
+      #say $tee "\$countblock : ". dump( $countblock );
+      #say $tee "\$counttool : ". dump( $counttool );
+      #say $tee "\$countinstance : ". dump( $countinstance );
 
       my @resfiles = @{ $simstruct[$countcase][$countblock][$countinstance][$counttool] }; say $tee "\@resfiles" . "@resfiles";
        
       if ( $retrievedata{$counttool} )
       {
-        say $tee "\$retrievedata{\$counttool}: yes.";
+        #say $tee "\$retrievedata{\$counttool}: yes.";
         if ( $tooltype eq "esp-r" )
         {
-          say $tee "\$tooltype eq esp-r: yes.";
+          #say $tee "\$tooltype eq esp-r: yes.";
           
           my $counttheme = 0;
           foreach my $retrievedatum ( @{ $retrievedata{$counttool} } )
           {  
-            say $tee " IN FOREACH: \$retrievedatum: " . dump( $retrievedatum ) ;
-            my $reportdata_ref_ref = $reportdata{$counttool}->[$counttheme]; say $tee "\$reportdata_ref_ref : " . dump( $reportdata_ref_ref ) ;
-            my @retrievedatarefs = @{$retrievedatum}; say $tee "\@retrievedatarefs : ". dump( @retrievedatarefs );
-            my $simtitle = $simtitles{$counttool}->[ $counttheme ][0]; say $tee "\$simtitle : $simtitle .";
-            my @sims = @{ $simtitles{$counttool}->[ $counttheme ] }[1..4]; say $tee "\@sims : ". dump( @sims );
+            #say $tee " IN FOREACH: \$retrievedatum: " . dump( $retrievedatum ) ;
+            my $reportdata_ref_ref = $reportdata{$counttool}->[$counttheme]; #say $tee "\$reportdata_ref_ref : " . dump( $reportdata_ref_ref ) ;
+            my @retrievedatarefs = @{$retrievedatum}; #say $tee "\@retrievedatarefs : ". dump( @retrievedatarefs );
+            my $simtitle = $simtitles{$counttool}->[ $counttheme ][0]; #say $tee "\$simtitle : $simtitle .";
+            my @sims = @{ $simtitles{$counttool}->[ $counttheme ] }[1..4]; #say $tee "\@sims : ". dump( @sims );
             
             #my $resfile = $resfiles[ $counttheme ]; ################ TURNING THIS OFF IS PROVISIONAL!!!
-            say $tee "\$resfile : $resfile .";
+            #say $tee "\$resfile : $resfile .";
             
             #if ( not ( eval ( $skipreport ) ) )
             if ( -e $resfile ) 
             {
-              say $tee "\$resfile EXIXTS, SO GOING ON .";
+              #say $tee "\$resfile EXIXTS, SO GOING ON .";
               my $countreport = 0;
               foreach my $retrievedataref (@retrievedatarefs)
               {
-                say $tee "IN FOREACH 2 \$retrievedataref : $retrievedataref .";
-                my @retrdata = @$retrievedataref; say $tee "\@retrdata : ". dump( @retrdata );
-                my $sim = $sims[$countreport]; say $tee "\$sim : ". dump( $sim );
+                #say $tee "IN FOREACH 2 \$retrievedataref : $retrievedataref .";
+                my @retrdata = @$retrievedataref; #say $tee "\@retrdata : ". dump( @retrdata );
+                my $sim = $sims[$countreport]; #say $tee "\$sim : ". dump( $sim );
                 my $targetprov = $sim;
                 $targetprov =~ s/$mypath\///;
-                my $result = "$mypath" . "/$targetprov"; say $tee "\$result : ". dump( $result );
+                my $result = "$mypath" . "/$targetprov"; #say $tee "\$result : ". dump( $result );
                 
                 #if ( fileno (RETLIST) )
                 #if (not (-e $retlist ) )
@@ -1448,7 +1448,7 @@ $printthis
                 #  }
                 #}
                 
-                my $reportdata_ref = $reportdata_ref_ref->[$countreport]; say $tee "\$reportdata_ref : ". dump( $reportdata_ref );
+                my $reportdata_ref = $reportdata_ref_ref->[$countreport]; #say $tee "\$reportdata_ref : ". dump( $reportdata_ref );
                 my @reportdata = @$reportdata_ref;  
                 
                 my $countitem = 0;
@@ -1476,14 +1476,14 @@ $printthis
                     say RETLIST "$retfile";
                   }
                   
-                  say $tee "\$retfile : ". dump( $retfile );
+                  #say $tee "\$retfile : ". dump( $retfile );
                   if ( not ( $retfile ~~ @{ $notecases[ $countcase ][ $countblock ][ $counttool ][ $countinstance ] } ) )
                   {
 
-                    say $tee "\$countcase : ". dump( $countcase );
-                    say $tee "\$countblock : ". dump( $countblock );
-                    say $tee "\$counttool : ". dump( $counttool );
-                    say $tee "\$countinstance : ". dump( $countinstance );
+                    #say $tee "\$countcase : ". dump( $countcase );
+                    #say $tee "\$countblock : ". dump( $countblock );
+                    #say $tee "\$counttool : ". dump( $counttool );
+                    #say $tee "\$countinstance : ". dump( $countinstance );
                     push ( @{ $notecases[ $countcase ][ $countblock ][ $counttool ][ $countinstance ] } , 
                                       {
                                         retfile => $retfile,
@@ -1644,7 +1644,7 @@ $printthis
   close RETBLOCK;
   
   
-  say $tee "\@notecases " . dump( @notecases ); 
+  #say $tee "\@notecases " . dump( @notecases ); 
 
   if ( $dowhat{neweraseres} eq "y" )
   {
@@ -1686,7 +1686,7 @@ sub report # This function retrieves the results of interest from the texts file
   $tee = new IO::Tee(\*STDOUT, ">>$tofile"); # GLOBAL ZZZ
   
   #open( OUTFILE, ">>$outfile" ) or die "Can't open $outfile: $!"; 
-  open( TOFILE, ">>$tofile" ) or die "Can't open $tofile: $!";  
+#  open( TOFILE, ">>$tofile" ) or die "Can't open $tofile: $!";  
   say $tee "\nNow in Sim::OPT::Report::report.\n";
   
   
@@ -1763,9 +1763,9 @@ sub report # This function retrieves the results of interest from the texts file
     my $from = Sim::OPT::getline($toitem); 
     my %varnums = Sim::OPT::getcase(\@varinumbers, $countcase); 
     my %mids = Sim::OPT::getcase(\@miditers, $countcase); 
-    my @backvalues = @{ $d{backvalues} }; say $tee "IN REPORT \@backvalues " . dump(@backvalues);
-    my @sweeps = @{ $d{sweeps} }; say $tee "dump(\@sweeps): " . dump(@sweeps);
-    my @sourcesweeps = @{ $d{sourcesweeps} }; say $tee "dump(\@sourcesweeps): " . dump(@sourcesweeps);
+    my @backvalues = @{ $d{backvalues} }; #say $tee "IN REPORT \@backvalues " . dump(@backvalues);
+    my @sweeps = @{ $d{sweeps} }; #say $tee "dump(\@sweeps): " . dump(@sweeps);
+    my @sourcesweeps = @{ $d{sourcesweeps} }; #say $tee "dump(\@sourcesweeps): " . dump(@sourcesweeps);
     
     my $stepsvar = Sim::OPT::getstepsvar($countvar, $countcase, \@varinumbers); 
     my $varnumber = $countvar; 
@@ -2051,7 +2051,7 @@ sub report # This function retrieves the results of interest from the texts file
 
   close REPSTORE;
 
-  say $tee "HEREIS \@repcases " . dump(@repcases); say $tee "\@repstruct " . dump(@repstruct); 
+  #say $tee "HEREIS \@repcases " . dump(@repcases); #say $tee "\@repstruct " . dump(@repstruct); 
   
   close TOFILE;
   close OUTFILE;
@@ -2096,7 +2096,7 @@ sub newreport # This function retrieves the results of interest from the texts f
   $tee = new IO::Tee(\*STDOUT, ">>$tofile"); # GLOBAL ZZZ
   
   #open( OUTFILE, ">>$outfile" ) or die "Can't open $outfile: $!"; 
-  open( TOFILE, ">>$tofile" ) or die "Can't open $tofile: $!";  
+#  open( TOFILE, ">>$tofile" ) or die "Can't open $tofile: $!";  
   say $tee "\nNow in Sim::OPT::Report::newreport.\n";
   
   
@@ -2172,9 +2172,9 @@ sub newreport # This function retrieves the results of interest from the texts f
   my $from = Sim::OPT::getline($toitem); 
   my %varnums = Sim::OPT::getcase(\@varinumbers, $countcase); 
   my %mids = Sim::OPT::getcase(\@miditers, $countcase); 
-  my @backvalues = @{ $d{backvalues} }; say $tee "IN REPORT \@backvalues " . dump(@backvalues);
-  my @sweeps = @{ $d{sweeps} }; say $tee "dump(\@sweeps): " . dump(@sweeps);
-  my @sourcesweeps = @{ $d{sourcesweeps} }; say $tee "dump(\@sourcesweeps): " . dump(@sourcesweeps);
+  my @backvalues = @{ $d{backvalues} }; #say $tee "IN REPORT \@backvalues " . dump(@backvalues);
+  my @sweeps = @{ $d{sweeps} }; #say $tee "dump(\@sweeps): " . dump(@sweeps);
+  my @sourcesweeps = @{ $d{sourcesweeps} }; #say $tee "dump(\@sourcesweeps): " . dump(@sourcesweeps);
   
   my $stepsvar = Sim::OPT::getstepsvar($countvar, $countcase, \@varinumbers); 
   my $varnumber = $countvar; 
@@ -2458,7 +2458,7 @@ sub newreport # This function retrieves the results of interest from the texts f
 
   close REPSTORE;
 
-  say $tee "HEREIS \@repcases " . dump(@repcases); say $tee "\@repstruct " . dump(@repstruct); 
+  #say $tee "HEREIS \@repcases " . dump(@repcases); say $tee "\@repstruct " . dump(@repstruct); 
   
   close TOFILE;
   close OUTFILE;

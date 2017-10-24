@@ -1,7 +1,7 @@
 package Promises::Deferred::IO::Async;
-our $AUTHORITY = 'cpan:STEVAN';
+our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: IO::Async implementation of Promises
-$Promises::Deferred::IO::Async::VERSION = '0.96';
+$Promises::Deferred::IO::Async::VERSION = '0.98';
 use strict;
 use warnings;
 
@@ -21,6 +21,19 @@ sub _notify_backend {
     );
 }
 
+sub _timeout {
+    my ( $self, $timeout, $callback ) = @_;
+
+    my $timer = IO::Async::Timer::Countdown->new(
+        delay => $timeout,
+        on_expire => $callback,
+    );
+    
+    $Loop->add( $timer->start );
+
+    return sub { $timer->stop };
+}
+
 1;
 
 __END__
@@ -33,7 +46,7 @@ Promises::Deferred::IO::Async - IO::Async implementation of Promises
 
 =head1 VERSION
 
-version 0.96
+version 0.98
 
 =head1 SYNOPSIS
 
@@ -55,7 +68,7 @@ Stevan Little <stevan.little@iinteractive.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Infinity Interactive, Inc..
+This software is copyright (c) 2017, 2014, 2012 by Infinity Interactive, Inc..
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

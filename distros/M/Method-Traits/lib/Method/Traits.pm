@@ -4,19 +4,16 @@ package Method::Traits;
 use strict;
 use warnings;
 
-our $VERSION   = '0.05';
+our $VERSION   = '0.06';
 our $AUTHORITY = 'cpan:STEVAN';
 
-use Carp                   ();
-use Scalar::Util           ();
-use MOP                    (); # this is how we do most of our work
-use attributes             (); # this is where we store the traits
-use B::CompilerPhase::Hook (); # multi-phase programming
-use Module::Runtime        (); # trait provider loading
+use Carp            ();
+use Scalar::Util    ();
+use MOP             (); # this is how we do most of our work
+use Module::Runtime (); # trait provider loading
 
 ## ...
 
-use Method::Traits::Trait;
 use Method::Traits::Meta::Provider;
 
 ## --------------------------------------------------------
@@ -37,54 +34,21 @@ sub import {
     $class->import_into( scalar caller, @args );
 }
 
-sub import_into {
-    my (undef, $target, @providers) = @_;
-    my $meta = Scalar::Util::blessed( $target ) ? $target : MOP::Class->new( $target );
-    __PACKAGE__->schedule_trait_collection( $meta, @providers );
-}
-
-## --------------------------------------------------------
-## Storage
-## --------------------------------------------------------
-
-our %PROVIDERS_BY_PKG; # this hold the set of available traits per package
-our %TRAIT_BY_CODE;    # mapping of CODE address to Trait
-
-## Per-Package Provider Management
-
-sub add_trait_providers_for {
-    my (undef, $meta, @providers) = @_;
-    Module::Runtime::use_package_optimistically( $_ ) foreach @providers;
-    push @{ $PROVIDERS_BY_PKG{ $meta->name } ||=[] } => @providers;
-}
-
-sub get_trait_providers_for {
-    my (undef, $meta) = @_;
-    return @{ $PROVIDERS_BY_PKG{ $meta->name } ||=[] };
-}
-
-## Per-CODE Trait Management
-
-sub add_traits_for {
-    my (undef, $method, @traits) = @_;
-    push @{ $TRAIT_BY_CODE{ $method->body } ||=[] } => @traits;
-}
-
-sub get_traits_for {
-    my (undef, $method) = @_;
-    return @{ $TRAIT_BY_CODE{ $method->body } ||=[] };
-}
-
 ## --------------------------------------------------------
 ## Trait collection
 ## --------------------------------------------------------
 
-sub schedule_trait_collection {
-    my (undef, $meta, @providers) = @_;
+our %PROVIDERS_BY_PKG;
+
+sub import_into {
+    my (undef, $package, @providers) = @_;
 
     # add in the providers, so we can
     # get to them when needed ...
-    __PACKAGE__->add_trait_providers_for( $meta, @providers );
+    Module::Runtime::use_package_optimistically( $_ ) foreach @providers;
+    push @{ $PROVIDERS_BY_PKG{ $package } ||=[] } => @providers;
+
+    my $meta = Scalar::Util::blessed( $package ) ? $package : MOP::Class->new( $package );
 
     # no need to install the collectors
     # if they have already been installed
@@ -94,106 +58,60 @@ sub schedule_trait_collection {
         && $meta->has_method_alias('MODIFY_CODE_ATTRIBUTES');
 
     # now install the collectors ...
+
+    my %accepted; # shared state between these two methods ...
+
     $meta->alias_method(
         FETCH_CODE_ATTRIBUTES => sub {
-            my ($pkg, $code) = @_;
+            my (undef, $code) = @_;
             # return just the strings, as expected by attributes ...
-            return map $_->original, __PACKAGE__->get_traits_for( MOP::Method->new( $code ) );
+            return $accepted{ $code } ? @{ $accepted{ $code } } : ();
         }
     );
     $meta->alias_method(
         MODIFY_CODE_ATTRIBUTES => sub {
             my ($pkg, $code, @attrs) = @_;
 
+            my @providers  = @{ $PROVIDERS_BY_PKG{ $pkg } }; # fetch complete set
+            my @attributes = map MOP::Method::Attribute->new( $_ ), @attrs;
+
+            my ( %attr_to_handler_map, @unhandled );
+            foreach my $attribute ( @attributes ) {
+                my $name = $attribute->name;
+                my $h; $h = $_->can( $name ) and last foreach @providers;
+                if ( $h ) {
+                    $attr_to_handler_map{ $name } = $h;
+                }
+                else {
+                    push @unhandled => $attribute->original;
+                }
+            }
+
+            # return the bad traits as strings, as expected by attributes ...
+            return @unhandled if @unhandled;
+
             my $klass  = MOP::Class->new( $pkg );
             my $method = MOP::Method->new( $code );
 
-            my @traits    = map Method::Traits::Trait->new( $_ ), @attrs;
-            my @unhandled = __PACKAGE__->find_unhandled_traits( $klass, @traits );
+            foreach my $attribute ( @attributes ) {
+                my ($name, $args) = ($attribute->name, $attribute->args);
+                my $h = $attr_to_handler_map{ $name };
 
-            #use Data::Dumper;
-            #warn "WE ARE IN $pkg for $code with " . join ', ' => @attrs;
-            #warn "ATTRS: " . Dumper \@attrs;
-            #warn "TRAITS: " . Dumper \@traits;
-            #warn "UNHANDLED: " . Dumper \@unhandled;
+                $h->( $klass, $method, @$args );
 
-            # bad traits are bad,
-            # return the originals that
-            # we do not handle
-            return map $_->original, @unhandled if @unhandled;
-
-            # NOTE:
-            # ponder the idea of moving this
-            # call to UNITCHECK phase, not sure
-            # if that actually makes sense or not
-            # so it will need to be explored.
-            # - SL
-            $method = __PACKAGE__->apply_all_trait_handlers( $klass, $method, \@traits );
+                if ( MOP::Method->new( $h )->has_code_attributes('OverwritesMethod') ) {
+                    $method = $klass->get_method( $method->name );
+                    Carp::croak('Failed to find new overwriten method ('.$method->name.') in class ('.$meta->name.')')
+                        unless defined $method;
+                }
+            }
 
             # store the traits we applied ...
-            __PACKAGE__->add_traits_for( $method, @traits );
+            $accepted{ $method->body } = [ map $_->original, @attributes ];
 
-            #warn ${^GLOBAL_PHASE};
-
-            # all is well, so let the world know that ...
             return;
         }
     );
-
-
-    # Odd/nice thing about UNITCHECK, if you enqueue
-    # it during BEGIN time, it will run during BEGIN
-    B::CompilerPhase::Hook::enqueue_UNITCHECK {
-        #warn "STEP 2";
-        #warn "UNITCHECK: " . ${^GLOBAL_PHASE};
-
-        $meta->delete_method_alias('MODIFY_CODE_ATTRIBUTES');
-    };
-
-    #warn "HMMMM: " . ${^GLOBAL_PHASE} . " => " . $meta->name;
-}
-
-
-sub find_unhandled_traits {
-    my (undef, $meta, @traits) = @_;
-
-    # Now loop through the traits and look to
-    # see if we have any ones we cannot handle
-    # and collect them for later ...
-    return grep {
-        my $stop;
-        foreach my $provider ( __PACKAGE__->get_trait_providers_for( $meta ) ) {
-            #warn "PROVIDER: $provider looking for: " . $_->[0];
-            if ( my $handler = $provider->can( $_->name ) ) {
-                $_->handler( MOP::Method->new( $handler ) );
-                $stop++;
-                last;
-            }
-        }
-        not( $stop );
-    } @traits;
-}
-
-sub apply_all_trait_handlers {
-    my (undef, $meta, $method, $traits) = @_;
-
-    # now we need to loop through the traits
-    # that we parsed and apply the trait function
-    # to our method accordingly
-
-    my $method_name = $method->name;
-
-    foreach my $trait ( @$traits ) {
-        my ($args, $handler) = ($trait->args, $trait->handler);
-        $handler->body->( $meta, $method, @$args );
-        if ( $handler->has_code_attributes('OverwritesMethod') ) {
-            $method = $meta->get_method( $method_name );
-            Carp::croak('Failed to find new overwriten method ('.$method_name.') in class ('.$meta->name.')')
-                unless defined $method;
-        }
-    }
-
-    return $method;
 }
 
 1;
@@ -208,7 +126,7 @@ Method::Traits - Apply traits to your methods
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -311,30 +229,6 @@ arguments passed to the trait, they are also passed along.
 
 This module is still heavily under construction and there is a high likielihood
 that the details will change, bear that in mind if you choose to use it.
-
-=head1 METHODS
-
-These are all class methods.
-
-=head2 C<add_trait_providers_for( $meta, @providers )>
-
-This will register the given C<@providers> with the package
-pointed to by C<$meta>, which is a L<MOP::Class> instance.
-
-=head2 C<get_trait_providers_for( $meta )>
-
-This will return any C<@providers> registered with the package
-pointed to by C<$meta>, which is a L<MOP::Class> instance.
-
-=head2 C<add_traits_for( $method, @traits ) >
-
-This will associate the given C<@traits> with the method pointed
-to by the C<$method>, which is a L<MOP::Method> instance.
-
-=head2 C<get_traits_for( $method )>
-
-This will return any C<@traits> associated with the method pointed
-to by the C<$method>, which is a L<MOP::Method> instance.
 
 =head1 PERL VERSION COMPATIBILITY
 

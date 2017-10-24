@@ -10,7 +10,7 @@ my @files = (
     'lib/MarpaX/ESLIF.pm',
     'lib/MarpaX/ESLIF/BNF.pod',
     'lib/MarpaX/ESLIF/Event/Type.pm',
-    'lib/MarpaX/ESLIF/Grammar.pod',
+    'lib/MarpaX/ESLIF/Grammar.pm',
     'lib/MarpaX/ESLIF/Grammar/Properties.pm',
     'lib/MarpaX/ESLIF/Grammar/Rule/Properties.pm',
     'lib/MarpaX/ESLIF/Grammar/Symbol/Properties.pm',
@@ -30,7 +30,8 @@ my @files = (
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
     't/advent.t',
-    't/test.t'
+    't/test.t',
+    't/thread.t'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

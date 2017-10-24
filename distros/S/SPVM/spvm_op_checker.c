@@ -14,18 +14,21 @@
 #include "spvm_op.h"
 #include "spvm_sub.h"
 #include "spvm_constant.h"
-#include "spvm_field_info.h"
+#include "spvm_field.h"
 #include "spvm_my_var.h"
 #include "spvm_var.h"
 #include "spvm_enumeration_value.h"
 #include "spvm_type.h"
 #include "spvm_enumeration.h"
 #include "spvm_package.h"
-#include "spvm_name_info.h"
+#include "spvm_call_field.h"
+#include "spvm_call_sub.h"
 #include "spvm_type.h"
 #include "spvm_switch_info.h"
 #include "spvm_limit.h"
 #include "spvm_sub_check_info.h"
+#include "spvm_our.h"
+#include "spvm_package_var.h"
 
 SPVM_OP* SPVM_OP_CHECKEKR_new_op_var_tmp(SPVM_COMPILER* compiler, SPVM_TYPE* type, SPVM_SUB_CHECK_INFO* sub_check_info, const char* file, int32_t line) {
 
@@ -164,7 +167,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
         int32_t field_pos;
         for (field_pos = 0; field_pos < op_fields->length; field_pos++) {
           SPVM_OP* op_field = SPVM_DYNAMIC_ARRAY_fetch(op_fields, field_pos);
-          SPVM_FIELD_INFO* field = op_field->uv.field;
+          SPVM_FIELD* field = op_field->uv.field;
           SPVM_TYPE* field_type = field->op_type->uv.type;
           
           if (SPVM_TYPE_is_numeric(compiler, field_type)) {
@@ -210,7 +213,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
         int32_t field_pos;
         for (field_pos = 0; field_pos < op_fields->length; field_pos++) {
           SPVM_OP* op_field = SPVM_DYNAMIC_ARRAY_fetch(op_fields, field_pos);
-          SPVM_FIELD_INFO* field = op_field->uv.field;
+          SPVM_FIELD* field = op_field->uv.field;
           field->index = field_pos;
         }
       }
@@ -313,7 +316,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                   if (op_cur->first->code == SPVM_OP_C_CODE_CALL_SUB) {
                     SPVM_OP* op_call_sub = op_cur->first;
                     
-                    const char* sub_name = op_call_sub->uv.name_info->resolved_name;
+                    const char* sub_name = op_call_sub->uv.call_sub->resolved_name;
                     
                     SPVM_OP* op_sub= SPVM_HASH_search(
                       compiler->op_sub_symtable,
@@ -781,6 +784,10 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                         compiler->fatal_error = 1;
                         return;
                       }
+                      else if (strcmp(type->name, op_package->uv.package->op_name->uv.name) != 0) {
+                        SPVM_yyerror_format(compiler,
+                          "new operator is private at %s line %d\n", op_cur->file, op_cur->line);
+                      }
                     }
                   }
                   else if (op_cur->first->code == SPVM_OP_C_CODE_CONSTANT) {
@@ -894,6 +901,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                   
                   // Check left term
                   if (op_cur->first->code == SPVM_OP_C_CODE_VAR
+                    || op_cur->first->code == SPVM_OP_C_CODE_PACKAGE_VAR
                     || op_cur->first->code == SPVM_OP_C_CODE_ARRAY_ELEM
                     || op_cur->first->code == SPVM_OP_C_CODE_CALL_FIELD
                     || op_cur->first->code == SPVM_OP_C_CODE_EXCEPTION_VAR
@@ -946,6 +954,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                     SPVM_TYPE* sub_return_type = SPVM_OP_get_type(compiler, sub->op_return_type);
                     
                     _Bool is_invalid = 0;
+                    
                     
                     // Undef
                     if (op_term->code == SPVM_OP_C_CODE_UNDEF) {
@@ -1433,30 +1442,22 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                 case SPVM_OP_C_CODE_CALL_SUB: {
                   
                   // Check sub name
-                  SPVM_OP_resolve_sub_name(compiler, op_package, op_cur);
+                  SPVM_OP_resolve_call_sub(compiler, op_cur);
                   
                   SPVM_OP* op_list_args = op_cur->last;
                   
-                  SPVM_NAME_INFO* name_info = op_cur->uv.name_info;
-                  
-                  const char* sub_abs_name = name_info->resolved_name;
-                  
-                  SPVM_OP* found_op_sub= SPVM_HASH_search(
-                    compiler->op_sub_symtable,
-                    sub_abs_name,
-                    strlen(sub_abs_name)
-                  );
-                  if (!found_op_sub) {
+                  SPVM_CALL_SUB* call_sub = op_cur->uv.call_sub;
+
+                  if (!call_sub->sub) {
                     SPVM_yyerror_format(compiler, "unknown sub \"%s\" at %s line %d\n",
-                      sub_abs_name, op_cur->file, op_cur->line);
+                      call_sub->resolved_name, op_cur->file, op_cur->line);
                     compiler->fatal_error = 1;
                     return;
                   }
                   
-                  // Constant
-                  SPVM_SUB* found_sub = found_op_sub->uv.sub;
-
-                  int32_t sub_args_count = found_sub->op_args->length;
+                  const char* sub_abs_name = call_sub->sub->abs_name;
+                  
+                  int32_t sub_args_count = call_sub->sub->op_args->length;
                   SPVM_OP* op_term = op_list_args->first;
                   int32_t call_sub_args_count = 0;
                   while ((op_term = SPVM_OP_sibling(compiler, op_term))) {
@@ -1469,7 +1470,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                     
                     _Bool is_invalid = 0;
                     
-                    SPVM_OP* op_sub_arg_my_var = SPVM_DYNAMIC_ARRAY_fetch(found_sub->op_args, call_sub_args_count - 1);
+                    SPVM_OP* op_sub_arg_my_var = SPVM_DYNAMIC_ARRAY_fetch(call_sub->sub->op_args, call_sub_args_count - 1);
                     
                     SPVM_TYPE* sub_arg_type = SPVM_OP_get_type(compiler, op_sub_arg_my_var);
                     
@@ -1501,23 +1502,23 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                   }
                   
                   // Constant subroutine
-                  if (found_sub->is_constant) {
+                  if (call_sub->sub->is_constant) {
                     // Replace sub to constant
                     op_cur->code = SPVM_OP_C_CODE_CONSTANT;
-                    op_cur->uv.constant = found_sub->op_constant->uv.constant;
+                    op_cur->uv.constant = call_sub->sub->op_constant->uv.constant;
                     
                     op_cur->first = NULL;
                     op_cur->last = NULL;
                     break;
                   }
                   
-                  SPVM_TYPE* return_type = SPVM_OP_get_type(compiler, found_op_sub->uv.sub->op_return_type);
+                  SPVM_TYPE* return_type = SPVM_OP_get_type(compiler, call_sub->sub->op_return_type);
                   
                   // If CALL_SUB is is not rvalue and return type is object, temparary variable is created, and assinged.
                   if (!op_cur->rvalue && (return_type->code != SPVM_TYPE_C_CODE_VOID && !SPVM_TYPE_is_numeric(compiler, return_type))) {
 
                     // Create temporary variable
-                    SPVM_TYPE* var_type = SPVM_OP_get_type(compiler, found_sub->op_return_type);
+                    SPVM_TYPE* var_type = SPVM_OP_get_type(compiler, call_sub->sub->op_return_type);
                     SPVM_OP* op_var_tmp = SPVM_OP_CHECKEKR_new_op_var_tmp(compiler, var_type, sub_check_info, op_cur->file, op_cur->line);
                     if (op_var_tmp == NULL) {
                       return;
@@ -1533,27 +1534,44 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                     
                     // Convert cur call_sub op to var
                     SPVM_OP_replace_op(compiler, op_stab, op_build_assign);
-                    op_call_sub->uv.name_info = name_info;
+                    op_call_sub->uv.call_sub = call_sub;
                     
                     op_cur = op_call_sub;
                   }
                   
                   break;
                 }
-                case SPVM_OP_C_CODE_CALL_FIELD: {
-                  SPVM_OP* op_term = op_cur->first;
-                  SPVM_OP* op_name = op_cur->last;
+                case SPVM_OP_C_CODE_PACKAGE_VAR: {
                   
-                  if (op_term->code == SPVM_OP_C_CODE_ASSIGN_PROCESS) {
-                    op_term = op_term->first;
+                  // Check field name
+                  SPVM_OP_resolve_package_var(compiler, op_cur);
+                  if (!op_cur->uv.package_var->op_our) {
+                    SPVM_yyerror_format(compiler, "Package variable not found \"%s\" at %s line %d\n",
+                      op_cur->uv.package_var->op_name->uv.name, op_cur->file, op_cur->line);
+                    compiler->fatal_error = 1;
+                    return;
                   }
                   
-                  if (op_term->code != SPVM_OP_C_CODE_VAR
-                    && op_term->code != SPVM_OP_C_CODE_ARRAY_ELEM
-                    && op_term->code != SPVM_OP_C_CODE_CALL_FIELD
-                    && op_term->code != SPVM_OP_C_CODE_CALL_SUB
-                    && op_term->code != SPVM_OP_C_CODE_NEW)
-                  {
+                  SPVM_OUR* our = op_cur->uv.package_var->op_our->uv.our;
+                  
+                  if (package != our->op_package->uv.package) {
+                    SPVM_yyerror_format(compiler, "Package variable is private \"%s\" \"%s\" at %s line %d\n",
+                      our->op_package->uv.package->op_name->uv.name, our->op_var->uv.var->op_name->uv.name, op_cur->file, op_cur->line);
+                  }
+                  
+                  break;
+                }
+                case SPVM_OP_C_CODE_CALL_FIELD: {
+                  SPVM_OP* op_term_invocker = op_cur->first;
+                  SPVM_OP* op_name = op_cur->last;
+                  
+                  if (op_term_invocker->code == SPVM_OP_C_CODE_ASSIGN_PROCESS) {
+                    op_term_invocker = op_term_invocker->first;
+                  }
+                  
+                  SPVM_TYPE* type = SPVM_OP_get_type(compiler, op_term_invocker);
+                  
+                  if (!(type && type->op_package)) {
                     SPVM_yyerror_format(compiler, "field invoker is invalid \"%s\" at %s line %d\n",
                       op_name->uv.name, op_cur->file, op_cur->line);
                     compiler->fatal_error = 1;
@@ -1561,33 +1579,34 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                   }
                   
                   // Check field name
-                  SPVM_OP_resolve_field_name(compiler, op_cur);
+                  SPVM_OP_resolve_call_field(compiler, op_cur);
                   
-                  const char* field_abs_name = op_cur->uv.name_info->resolved_name;
+                  SPVM_FIELD* field = op_cur->uv.call_field->field;
                   
-                  SPVM_OP* found_op_field= SPVM_HASH_search(
-                    compiler->op_field_symtable,
-                    field_abs_name,
-                    strlen(field_abs_name)
-                  );
-                  if (!found_op_field) {
-                    SPVM_yyerror_format(compiler, "unknown field \"%s\" at %s line %d\n",
-                      field_abs_name, op_cur->file, op_cur->line);
+                  if (!field) {
+                    SPVM_yyerror_format(compiler, "unknown field \"%s\" \"%s\" at %s line %d\n",
+                      type->name, op_name->uv.name, op_cur->file, op_cur->line);
                     compiler->fatal_error = 1;
                     return;
+                  }
+                  
+                  if ( package != field->op_package->uv.package) {
+                    SPVM_yyerror_format(compiler, "Field is private \"%s\" \"%s\" at %s line %d\n",
+                      field->op_package->uv.package->op_name->uv.name, field->op_name->uv.name, op_cur->file, op_cur->line);
                   }
                   
                   break;
                 }
                 case SPVM_OP_C_CODE_WEAKEN_FIELD: {
                   SPVM_OP* op_call_field = op_cur->first;
-                  const char* field_abs_name = op_call_field->uv.name_info->resolved_name;
+                  
+                  SPVM_FIELD* field = op_call_field->uv.call_field->field;
                   
                   SPVM_TYPE* type = SPVM_OP_get_type(compiler, op_call_field);
                   
                   if (type->code <= SPVM_TYPE_C_CODE_DOUBLE) {
-                    SPVM_yyerror_format(compiler, "weaken is only used for object field \"%s\" at %s line %d\n",
-                      field_abs_name, op_cur->file, op_cur->line);
+                    SPVM_yyerror_format(compiler, "weaken is only used for object field \"%s\" \"%s\" at %s line %d\n",
+                      field->op_package->uv.package->op_name->uv.name, field->op_name->uv.name, op_cur->file, op_cur->line);
                     compiler->fatal_error = 1;
                     break;
                   }

@@ -17,8 +17,8 @@ Lingua::JA::Moji - 総合日本文字変換「文字ュール」
 
 =head1 VERSION
 
-This document describes Lingua::JA::Moji version 0.44
-corresponding to git commit L<722b6e721eb6a4a29d1aa6b7de96f580f1904c01|https://github.com/benkasminbullock/Lingua-JA-Moji/commit/722b6e721eb6a4a29d1aa6b7de96f580f1904c01> made on Sat Mar 11 12:23:39 2017 +0900.
+This document describes Lingua::JA::Moji version 0.46
+corresponding to git commit L<1b6d2bea0e044f6da33e62325a87070671be692c|https://github.com/benkasminbullock/Lingua-JA-Moji/commit/1b6d2bea0e044f6da33e62325a87070671be692c> made on Tue Oct 24 10:39:21 2017 +0900.
 
 =head1 説明
 
@@ -217,6 +217,22 @@ C<< ime => 1 >>オプションでIMEのような変換ができます。たと�
 
 
 
+=head2 romaji_vowel_styles 
+
+
+
+    use Lingua::JA::Moji 'romaji_vowel_styles';
+
+
+
+有効な母音スタイルのリスト・レファレンス
+
+
+
+
+
+
+
 =head2 is_voiced 
 
 
@@ -253,7 +269,7 @@ C<< ime => 1 >>オプションでIMEのような変換ができます。たと�
 
 
 アルファベットの列はローマ字に見えるなら真、見えないなら偽を戻します。
-厳密に確認したい時はL</is_romaji_strict>をお勧めします。
+厳密に確認したい時はL</is_romaji_strict>をお勧めします。「-」で初まる文字列の場合は戻し値が偽(undef)となります。
 
 真の戻し値はローマ字のワープロ変換。
 
@@ -647,6 +663,41 @@ C<InHankakuKatakana>は正規表現に使う半角カタカナにマッチしま
 
 
 可能なかぎり、「ウォン」を「㌆」にするなど。
+
+
+
+
+
+
+
+=head2 smallize_kana 
+
+
+
+    use Lingua::JA::Moji 'smallize_kana';
+
+    $smallize = smallize_kana ('オキヤクサマガカツタ');
+    # $smallize = 'オキャクサマガカッタ'
+
+
+
+片仮名の列に拗音と促音を入れる。昔の仮名使いを現代のに直す。あくまで実験的です。
+
+
+
+
+
+
+
+=head2 cleanup_kana 
+
+
+
+    use Lingua::JA::Moji 'cleanup_kana';
+
+
+
+間違ったかな入力を直す。例えば「一」（漢字のいち）を「ー」（長音）に。
 
 
 
@@ -1270,6 +1321,9 @@ L<hentaigana|http://www.sljfaq.org/afaq/hentaigana.html>. This is
 based on copy and paste of the Unicode 10.0 standard draft
 documents. See the directory L<F<data>|https://github.com/benkasminbullock/Lingua-JA-Moji/tree/master/data> in the github repository for the files used to
 generate this data.
+
+0.46 disallowed hyphens as the first character of a romaji string.
+
 
 
 

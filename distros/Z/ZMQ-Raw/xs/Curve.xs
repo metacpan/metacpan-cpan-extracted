@@ -22,8 +22,7 @@ keypair (class)
 		SvCUR_set (private_key, 40);
 
 		rc = zmq_curve_keypair (SvPVX (public_key), SvPVX (private_key));
-		if (rc < 0)
-			zmq_raw_check_error (rc);
+		zmq_raw_check_error (rc);
 
 		XPUSHs (private_key);
 		if (ctx == G_ARRAY)
@@ -52,8 +51,7 @@ public (class, private_key)
 		SvCUR_set (public_key, 40);
 
 		rc = zmq_curve_public (SvPVX (public_key), SvPVX (private_key));
-		if (rc < 0)
-			zmq_raw_check_error (rc);
+		zmq_raw_check_error (rc);
 
 		SvREFCNT_inc (public_key);
 		RETVAL = public_key;

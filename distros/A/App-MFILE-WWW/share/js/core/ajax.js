@@ -81,36 +81,29 @@ define ([
     lib,
 ) {
 
-    var ajaxMessage = function () {
-            $('#result').css('text-align', 'center');
-            $('#result').html('* * * AJAX call * * *');
-        };
-
-    return function (mfao, scb, fcb) {
-        // mfao is 'MFILE AJAX Object'
-        // scb is 'Success Call Back'
-        // fcb is 'Failure Call Back'
-        ajaxMessage();
-        console.log("Initiating AJAX call", mfao);
+    return function (rest, sc, fc) {
+        // console.log("Initiating AJAX call", mfao);
+        lib.displayResult('* * * AJAX call * * *');
         $.ajax({
             'url': '/',
-            'data': JSON.stringify(mfao),
+            'data': JSON.stringify(rest),
             'method': 'POST',
             'processData': false,
             'contentType': 'application/json'
         })
         .done(function (data) {
             if (data.level === 'OK') {
-                console.log("AJAX call success:", data);
-                if (scb) {
-                    scb(data);
+                console.log("AJAX success", rest, data);
+                if (typeof sc === 'function') {
+                    lib.clearResult();
+                    sc(data);
                 } else {
-                    $('#result').html(data.text);
+                    lib.displayResult(data.text);
                 }
             } else {
-                console.log("AJAX call failure:", data);
-                if (fcb) {
-                    fcb(data);
+                console.log("AJAX failure", rest, data);
+                if (typeof fc === 'function') {
+                    fc(data);
                 } else {
                     lib.displayResult(data.payload.message);
                 }

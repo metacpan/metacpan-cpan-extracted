@@ -12,7 +12,7 @@ package Foo {
     extends 'Moxie::Object';
 
     has _foo => ( default => sub { 'DFOO' } );
-    has _bar => ( required => 1 );
+    has _bar => ( required => 'A `_bar` value is required' );
 
     sub BUILDARGS : init_args(
         foo? => _foo,

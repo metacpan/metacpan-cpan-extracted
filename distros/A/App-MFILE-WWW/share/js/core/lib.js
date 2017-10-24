@@ -145,6 +145,15 @@ define ([
             return obj;
         },
 
+        // Crockford, Douglas; "JavaScript: The Good Parts"; page 61
+        isArray: function (value) {
+            return value &&
+                typeof value === 'object' &&
+                typeof value.length === 'number' &&
+                typeof value.splice === 'function' &&
+                !(value.propertyIsEnumerable('length'));
+        },
+
         isInteger: function (value) {
             var pival = parseInt(value, 10),
                 cond1 = pival == value,
@@ -177,7 +186,7 @@ define ([
         },
 
         // log events to browser JavaScript console
-        logKeyPress: function (evt) {
+        logKeyDown: function (evt) {
             // console.log("WHICH: " + evt.which + ", KEYCODE: " + evt.keyCode);
         },
 
@@ -223,7 +232,7 @@ define ([
                 yesno = "No.";
             }
 
-            console.log("Does " + cep + " user satisfy ACL " + p + "? " + yesno);
+            // console.log("Does " + cep + " user satisfy ACL " + p + "? " + yesno);
             return r;
         }, // privCheck
 

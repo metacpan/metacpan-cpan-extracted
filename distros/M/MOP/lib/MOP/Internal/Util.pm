@@ -7,11 +7,13 @@ use warnings;
 use B                   (); # nasty stuff, all nasty stuff
 use Carp                (); # errors and stuff
 use Sub::Name           (); # handling some sub stuff
+use Sub::Metadata       (); # handling other sub stuff
 use Symbol              (); # creating the occasional symbol
 use Scalar::Util        (); # I think I use blessed somewhere in here ...
 use Devel::OverloadInfo (); # Sometimes I need to know about overloading
+use Devel::Hook         (); # for scheduling UNITCHECK blocks ...
 
-our $VERSION   = '0.09';
+our $VERSION   = '0.11';
 our $AUTHORITY = 'cpan:STEVAN';
 
 ## ------------------------------------------------------------------
@@ -114,12 +116,28 @@ sub SET_GLOB_SLOT {
 }
 
 ## ------------------------------------------------------------------
+## UNITCHECK hook
+## ------------------------------------------------------------------
+
+sub ADD_UNITCHECK_HOOK {
+    my ($cv) = @_;
+    Carp::croak('[ARGS] You must specify a CODE reference')
+        unless $cv;
+    Carp::croak('[ARGS] You must specify a CODE reference')
+        unless $cv && ref $cv eq 'CODE';
+    Devel::Hook->push_UNITCHECK_hook( $cv );
+}
+
+## ------------------------------------------------------------------
 ## CV/Glob introspection
 ## ------------------------------------------------------------------
 
 sub CAN_COERCE_TO_CODE_REF {
     my ($object) = @_;
     return 0 unless $object && Scalar::Util::blessed( $object );
+    # might be just a blessed CODE ref ...
+    return 1 if Scalar::Util::reftype( $object ) eq 'CODE';
+    # or might be overloaded object ...
     return 0 unless Devel::OverloadInfo::is_overloaded( $object );
     return exists Devel::OverloadInfo::overload_info( $object )->{'&{}'};
 }
@@ -128,8 +146,10 @@ sub IS_CV_NULL {
     my ($cv) = @_;
     Carp::croak('[ARGS] You must specify a CODE reference')
         unless $cv;
-    my $op = B::svref_2object( $cv );
-    return !! $op->isa('B::CV') && $op->ROOT->isa('B::NULL');
+    Carp::croak('[ARGS] You must specify a CODE reference')
+        unless $cv && ref $cv eq 'CODE'
+            || CAN_COERCE_TO_CODE_REF( $cv );
+    return Sub::Metadata::sub_body_type( $cv ) eq 'UNDEF';
 }
 
 sub DOES_GLOB_HAVE_NULL_CV {
@@ -146,9 +166,7 @@ sub DOES_GLOB_HAVE_NULL_CV {
     return 1 if $glob eq '-1';
     # next lets see if we have a CODE slot ...
     if ( my $code = *{ $glob }{CODE} ) {
-        # if it is a CV and the ROOT is a NULL op ...
-        my $op = B::svref_2object( $code );
-        return !! $op->isa('B::CV') && $op->ROOT->isa('B::NULL');
+        return Sub::Metadata::sub_body_type( $code ) eq 'UNDEF';
     }
     # if we had no CODE slot, it can't be a NULL CV ...
     return 0;
@@ -166,15 +184,28 @@ sub CREATE_NULL_CV {
     return;
 }
 
+sub SET_COMP_STASH_FOR_CV {
+    my ($cv, $in_pkg) = @_;
+    Carp::croak('[ARGS] You must specify a CODE reference')
+        unless $cv;
+    Carp::croak('[ARGS] You must specify a package name')
+        unless defined $in_pkg;
+    Carp::croak('[ARGS] You must specify a CODE reference')
+        unless $cv && ref $cv eq 'CODE'
+            || CAN_COERCE_TO_CODE_REF( $cv );
+    Sub::Metadata::mutate_sub_package( $cv, $in_pkg );
+}
+
 sub INSTALL_CV {
-    my ($in_pkg, $name, $code, %opts) = @_;
+    my ($in_pkg, $name, $cv, %opts) = @_;
 
     Carp::croak('[ARGS] You must specify a package name')
         unless defined $in_pkg;
     Carp::croak('[ARGS] You must specify a name')
         unless defined $name;
     Carp::croak('[ARGS] You must specify a CODE reference')
-        unless $code && ref $code eq 'CODE';
+        unless $cv && ref $cv eq 'CODE'
+            || CAN_COERCE_TO_CODE_REF( $cv );
     Carp::croak("[ARGS] You must specify a boolean value for `set_subname` option")
         if not exists $opts{set_subname};
 
@@ -183,7 +214,7 @@ sub INSTALL_CV {
         no warnings 'once', 'redefine';
 
         my $fullname =  $in_pkg.'::'.$name;
-        *{$fullname} = $opts{set_subname} ? Sub::Name::subname($fullname, $code) : $code;
+        *{$fullname} = $opts{set_subname} ? Sub::Name::subname($fullname, $cv) : $cv;
     }
     return;
 }
@@ -236,14 +267,12 @@ sub REMOVE_CV_FROM_GLOB {
 ## ------------------------------------------------------------------
 
 sub APPLY_ROLES {
-    my ($meta, $roles, %opts) = @_;
+    my ($meta, $roles) = @_;
 
     Carp::croak('[ARGS] You must specify a metaclass to apply roles to')
         unless Scalar::Util::blessed( $meta );
     Carp::croak('[ARGS] You must specify a least one roles to apply as an ARRAY ref')
         unless $roles && ref $roles eq 'ARRAY' && scalar( @$roles ) != 0;
-    Carp::croak("[ARGS] You must specify what type of object you want roles applied `to`")
-        unless exists $opts{to};
 
     foreach my $r ( $meta->roles ) {
         Carp::croak("[ERROR] Could not find role ($_) in the set of roles in $meta (" . $meta->name . ")")
@@ -274,10 +303,9 @@ sub APPLY_ROLES {
         $required_methods
     ) = COMPOSE_ALL_ROLE_METHODS( @meta_roles );
 
-    Carp::croak("[CONFLICT] There should be no conflicting methods when composing (" . (join ', ' => @$roles) . ") into the class (" . $meta->name . ") but instead we found (" . (join ', ' => keys %$method_conflicts)  . ")")
-        if $opts{to} eq 'class'           # if we are composing into a class ...
-        && (scalar keys %$method_conflicts) # and we have any conflicts ...
-        # and the conflicts are not satisfied by the composing class ...
+    Carp::croak("[CONFLICT] There should be no conflicting methods when composing (" . (join ', ' => @$roles) . ") into (" . $meta->name . ") but instead we found (" . (join ', ' => keys %$method_conflicts)  . ")")
+        if (scalar keys %$method_conflicts) # do we have any conflicts ...
+        # and the conflicts are not satisfied by the composing item ...
         && (scalar grep { !$meta->has_method( $_ ) } keys %$method_conflicts);
 
     # check the required method set and
@@ -289,8 +317,7 @@ sub APPLY_ROLES {
     }
 
     Carp::croak("[CONFLICT] There should be no required methods when composing (" . (join ', ' => @$roles) . ") into (" . $meta->name . ") but instead we found (" . (join ', ' => keys %$required_methods)  . ")")
-        if $opts{to} eq 'class'            # if we are composing into a class ...
-        && scalar keys %$required_methods; # and we have required methods ...
+        if scalar keys %$required_methods; # do we have required methods ...
 
     foreach my $name ( keys %$methods ) {
         # if we have a method already by that name ...
@@ -408,7 +435,7 @@ MOP::Internal::Util - For MOP Internal Use Only
 
 =head1 VERSION
 
-version 0.09
+version 0.11
 
 =head1 DESCRIPTION
 

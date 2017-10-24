@@ -4,6 +4,8 @@ MANIFEST
 Makefile.PL
 README
 TODO
+doc/astronomical-notes.pod
+doc/notes-astronomiques.pod
 lib/Astro/Sunrise.pm
 t/00load.t
 t/01basic.t

@@ -3,7 +3,7 @@ package Net::Async::Slack::RTM;
 use strict;
 use warnings;
 
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use parent qw(IO::Async::Notifier);
 
@@ -213,7 +213,6 @@ sub connect {
         ))
     )
 }
-
 
 sub on_frame {
     my ($self, $ws, $bytes) = @_;

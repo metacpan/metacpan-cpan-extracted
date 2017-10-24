@@ -6,7 +6,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::JSON qw(decode_json to_json);
 use GraphQL::Execution qw(execute);
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 my @DEFAULT_METHODS = qw(get post);
 my $EXECUTE = sub {
@@ -90,21 +90,20 @@ Mojolicious::Plugin::GraphQL - a plugin for adding GraphQL route handlers
 
 =head1 SYNOPSIS
 
-  my $schema = GraphQL::Schema->new(
-    query => GraphQL::Type::Object->new(
-      name => 'QueryRoot',
-      fields => {
-        helloWorld => {
-          type => $String,
-          resolve => sub { 'Hello, world!' },
-        },
-      },
-    ),
-  );
+  my $schema = GraphQL::Schema->from_doc(<<'EOF');
+  schema {
+    query: QueryRoot
+  }
+  type QueryRoot {
+    helloWorld: String
+  }
+  EOF
 
   # for Mojolicious substitute "plugin" with $app->plugin(...
   # Mojolicious::Lite (with endpoint under "/graphql")
-  plugin GraphQL => {schema => $schema};
+  plugin GraphQL => {
+    schema => $schema, root_value => { helloWorld => 'Hello, world!' }
+  };
 
   # OR, equivalently:
   plugin GraphQL => {handler => sub {
@@ -113,7 +112,7 @@ Mojolicious::Plugin::GraphQL - a plugin for adding GraphQL route handlers
     $execute->(
       $schema,
       $body->{query},
-      undef, # $root_value
+      { helloWorld => 'Hello, world!' }, # $root_value
       $c->req->headers,
       $body->{variables},
       $body->{operationName},
@@ -346,10 +345,10 @@ add "&raw" to the end of the URL within a browser.
         onEditQuery: onEditQuery,
         onEditVariables: onEditVariables,
         onEditOperationName: onEditOperationName,
-        query: <%= $queryString %>,
-        response: <%= $resultString %>,
-        variables: <%= $variablesString %>,
-        operationName: <%= $operationName %>,
+        query: <%== $queryString %>,
+        response: <%== $resultString %>,
+        variables: <%== $variablesString %>,
+        operationName: <%== $operationName %>,
       }),
       document.body
     );

@@ -1,4 +1,13 @@
 Revision history for Perl extension roles
 
+0.02 2017-10-20
+    [ NOTE ]
+    - last release should be completely
+      ignored, it's release should be
+      consider an accident
+
+    - use the actual MOP::Util::* API
+      from the actual MOP v0.10
+
 0.01 2017-10-16
     - initial release

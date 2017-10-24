@@ -1,4 +1,4 @@
-# ABSTRACT: 绿晋江 http://www.jjwxc.net
+# ABSTRACT: http://www.jjwxc.net
 
 =pod
 

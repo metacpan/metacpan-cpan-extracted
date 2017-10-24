@@ -35,3 +35,5 @@ test/dir/rec/sub1/subsub/file9
 test/dir/rec/sub2/file10
 test/dir/rec/sub2/file11
 test/dir/rec/sub2/file12
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

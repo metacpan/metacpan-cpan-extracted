@@ -137,6 +137,9 @@ define ([
             'menuText': 'Privilege (status) history',
             'aclProfile': 'passerby',
             'start': dactionStart('actionPrivHistory'),
+            // this starts the privhistory dtable, and if the dataset changes
+            // we might want to unwind the stack to this action to reset that
+            // dtable
             'pushable': true
         });
         target.push('actionPrivHistoryEdit', { // read-write
@@ -227,7 +230,7 @@ define ([
             'name': 'actionSchedLookup',
             'type': 'daction',
             'menuText': 'Lookup',
-            'aclProfile': 'admin',
+            'aclProfile': 'inactive',
             'start': dactionStart('actionSchedLookup'),
             'pushable': false
         });
@@ -339,20 +342,20 @@ define ([
         });
 
         // Interval actions - create
-        target.push('createLastIntervalPlusOffsetSave', {
-            'name': 'createLastIntervalPlusOffsetSave',
+        target.push('createLastPlusOffsetSave', {
+            'name': 'createLastPlusOffsetSave',
             'type': 'daction',
             'menuText': 'Save',
             'aclProfile': 'active',
-            'start': dactionStart('createLastIntervalPlusOffsetSave'),
+            'start': dactionStart('createLastPlusOffsetSave'),
             'pushable': false
         });
-        target.push('createNextScheduledIntervalSave', {
-            'name': 'createNextScheduledIntervalSave',
+        target.push('createNextScheduledSave', {
+            'name': 'createNextScheduledSave',
             'type': 'daction',
             'menuText': 'Save',
             'aclProfile': 'active',
-            'start': dactionStart('createNextScheduledIntervalSave'),
+            'start': dactionStart('createNextScheduledSave'),
             'pushable': false
         });
         target.push('createSingleIntSave', {

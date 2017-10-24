@@ -1,5 +1,9 @@
 Revision history for JMAP-Tester
 
+0.015     2017-10-20 15:05:13-04:00 America/New_York
+        - avoid a memory cycle in the logging code
+        - URI escape filename in download link generation
+
 0.014     2017-04-18 10:22:11-04:00 America/New_York
         - add update_client_session and configure_from_client_session;
           These methods should make it easier to bootstrap your tester from a

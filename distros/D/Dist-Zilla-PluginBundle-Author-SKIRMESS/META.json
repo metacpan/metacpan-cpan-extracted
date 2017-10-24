@@ -220,15 +220,15 @@
    "provides" : {
       "Dist::Zilla::Plugin::Author::SKIRMESS::InsertVersion" : {
          "file" : "lib/Dist/Zilla/Plugin/Author/SKIRMESS/InsertVersion.pm",
-         "version" : "0.029"
+         "version" : "0.030"
       },
       "Dist::Zilla::Plugin::Author::SKIRMESS::RepositoryBase" : {
          "file" : "lib/Dist/Zilla/Plugin/Author/SKIRMESS/RepositoryBase.pm",
-         "version" : "0.029"
+         "version" : "0.030"
       },
       "Dist::Zilla::PluginBundle::Author::SKIRMESS" : {
          "file" : "lib/Dist/Zilla/PluginBundle/Author/SKIRMESS.pm",
-         "version" : "0.029"
+         "version" : "0.030"
       }
    },
    "release_status" : "stable",
@@ -243,7 +243,7 @@
          "web" : "https://github.com/skirmess/Dist-Zilla-PluginBundle-Author-SKIRMESS"
       }
    },
-   "version" : "0.029",
+   "version" : "0.030",
    "x_BuiltWith" : {
       "modules" : {
          "Carp" : "1.40",
@@ -408,7 +408,7 @@
          "Test::Kwalitee" : "1.26",
          "Test::MinimumVersion" : "0.101082",
          "Test::Mojibake" : "1.3",
-         "Test::More" : "1.302103",
+         "Test::More" : "1.302105",
          "Test::NoTabs" : "2.00",
          "Test::Perl::Critic" : "1.03",
          "Test::Pod" : "1.51",
@@ -544,12 +544,12 @@
          {
             "class" : "Dist::Zilla::Plugin::Author::SKIRMESS::RepositoryBase",
             "name" : "@Author::SKIRMESS/Author::SKIRMESS::RepositoryBase",
-            "version" : "0.028"
+            "version" : "0.029"
          },
          {
             "class" : "Dist::Zilla::Plugin::Author::SKIRMESS::InsertVersion",
             "name" : "@Author::SKIRMESS/Author::SKIRMESS::InsertVersion",
-            "version" : "0.028"
+            "version" : "0.029"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::FilePermissions",
@@ -995,7 +995,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.029",
+                  "tag" : "0.030",
                   "tag_format" : "%v",
                   "tag_message" : ""
                },

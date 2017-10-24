@@ -1,0 +1,78 @@
+{
+   "abstract" : "Not Another Moose Clone",
+   "author" : [
+      "Stevan Little <stevan@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Moxie",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "BEGIN::Lift" : "0.06",
+            "MOP" : "0.10",
+            "Method::Traits" : "0.05",
+            "Module::Runtime" : "0",
+            "PadWalker" : "0",
+            "Sub::Util" : "0",
+            "UNIVERSAL::Object" : "0.12",
+            "experimental" : "0",
+            "perl" : "v5.22.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Fatal" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Moxie" : {
+         "file" : "lib/Moxie.pm",
+         "version" : "0.05"
+      },
+      "Moxie::Enum" : {
+         "file" : "lib/Moxie/Enum.pm",
+         "version" : "0.05"
+      },
+      "Moxie::Object" : {
+         "file" : "lib/Moxie/Object.pm",
+         "version" : "0.05"
+      },
+      "Moxie::Object::Immutable" : {
+         "file" : "lib/Moxie/Object/Immutable.pm",
+         "version" : "0.05"
+      },
+      "Moxie::Traits::Provider" : {
+         "file" : "lib/Moxie/Traits/Provider.pm",
+         "version" : "0.05"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/stevan/p5-Moxie/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/stevan/p5-Moxie.git",
+         "web" : "https://github.com/stevan/p5-Moxie"
+      }
+   },
+   "version" : "0.05",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+}
+

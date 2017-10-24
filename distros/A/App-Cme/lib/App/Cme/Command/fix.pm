@@ -10,7 +10,7 @@
 # ABSTRACT: Fix the configuration of an application
 
 package App::Cme::Command::fix ;
-$App::Cme::Command::fix::VERSION = '1.023';
+$App::Cme::Command::fix::VERSION = '1.024';
 use strict;
 use warnings;
 use 5.10.1;
@@ -81,7 +81,7 @@ App::Cme::Command::fix - Fix the configuration of an application
 
 =head1 VERSION
 
-version 1.023
+version 1.024
 
 =head1 SYNOPSIS
 

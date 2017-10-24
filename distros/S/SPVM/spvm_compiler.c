@@ -20,7 +20,8 @@
 #include "spvm_runtime.h"
 #include "spvm_runtime_api.h"
 #include "spvm_sub.h"
-#include "spvm_field_info.h"
+#include "spvm_field.h"
+#include "spvm_value.h"
 
 SPVM_RUNTIME* SPVM_COMPILER_new_runtime(SPVM_COMPILER* compiler) {
   
@@ -38,6 +39,10 @@ SPVM_RUNTIME* SPVM_COMPILER_new_runtime(SPVM_COMPILER* compiler) {
   int64_t runtime_bytecodes_byte_size = (int64_t)compiler->bytecode_array->length * (int64_t)sizeof(uint8_t);
   runtime->bytecodes = SPVM_UTIL_ALLOCATOR_safe_malloc(runtime_bytecodes_byte_size);
   memcpy(runtime->bytecodes, compiler->bytecode_array->values, compiler->bytecode_array->length * sizeof(uint8_t));
+  
+  // Initialize Package Variables
+  SPVM_VALUE* package_vars = SPVM_UTIL_ALLOCATOR_safe_malloc_zero(sizeof(SPVM_VALUE) * (compiler->package_var_length + 1));
+  runtime->package_vars = package_vars;
   
   // Build sub id symtable
   {
@@ -58,31 +63,6 @@ SPVM_RUNTIME* SPVM_COMPILER_new_runtime(SPVM_COMPILER* compiler) {
     }
   }
   
-  // Build field id symtable
-  {
-    int32_t package_index;
-    for (package_index = 0; package_index < compiler->op_packages->length; package_index++) {
-      SPVM_OP* op_package = SPVM_DYNAMIC_ARRAY_fetch(compiler->op_packages, package_index);
-      SPVM_PACKAGE* package = op_package->uv.package;
-      const char* package_name = package->op_name->uv.name;
-      
-      SPVM_DYNAMIC_ARRAY* op_fields = package->op_fields;
-      SPVM_HASH* field_name_symtable = SPVM_HASH_new(0);
-      {
-        int32_t op_field_index;
-        for (op_field_index = 0; op_field_index < op_fields->length; op_field_index++) {
-          SPVM_OP* op_field = SPVM_DYNAMIC_ARRAY_fetch(op_fields, op_field_index);
-          SPVM_FIELD_INFO* field_info = op_field->uv.field;
-          const char* field_name = field_info->op_name->uv.name;
-          
-          SPVM_HASH_insert(field_name_symtable, field_name, strlen(field_name), (void*)(intptr_t)(field_info->index + 1));
-        }
-      }
-      
-      SPVM_HASH_insert(runtime->field_id_symtable, package_name, strlen(package_name), field_name_symtable);
-    }
-  }
-
   // Build field info id symtable
   {
     int32_t package_index;
@@ -97,14 +77,14 @@ SPVM_RUNTIME* SPVM_COMPILER_new_runtime(SPVM_COMPILER* compiler) {
         int32_t op_field_index;
         for (op_field_index = 0; op_field_index < op_fields->length; op_field_index++) {
           SPVM_OP* op_field = SPVM_DYNAMIC_ARRAY_fetch(op_fields, op_field_index);
-          SPVM_FIELD_INFO* field_info = op_field->uv.field;
-          const char* field_name = field_info->op_name->uv.name;
+          SPVM_FIELD* field = op_field->uv.field;
+          const char* field_name = field->op_name->uv.name;
           
-          SPVM_HASH_insert(field_name_symtable, field_name, strlen(field_name), (void*)(intptr_t)field_info->id);
+          SPVM_HASH_insert(field_name_symtable, field_name, strlen(field_name), (void*)(intptr_t)field->id);
         }
       }
       
-      SPVM_HASH_insert(runtime->field_info_id_symtable, package_name, strlen(package_name), field_name_symtable);
+      SPVM_HASH_insert(runtime->field_id_symtable, package_name, strlen(package_name), field_name_symtable);
     }
   }
   
@@ -181,10 +161,10 @@ SPVM_COMPILER* SPVM_COMPILER_new() {
   compiler->op_sub_symtable = SPVM_COMPILER_ALLOCATOR_alloc_hash(compiler, compiler->allocator, 0);
   compiler->op_packages = SPVM_COMPILER_ALLOCATOR_alloc_array(compiler, compiler->allocator, 0);
   compiler->op_package_symtable = SPVM_COMPILER_ALLOCATOR_alloc_hash(compiler, compiler->allocator, 0);
+  compiler->op_our_symtable = SPVM_COMPILER_ALLOCATOR_alloc_hash(compiler, compiler->allocator, 0);
   compiler->op_types = SPVM_COMPILER_ALLOCATOR_alloc_array(compiler, compiler->allocator, 0);
   compiler->op_use_symtable = SPVM_COMPILER_ALLOCATOR_alloc_hash(compiler, compiler->allocator, 0);
   compiler->op_use_stack = SPVM_COMPILER_ALLOCATOR_alloc_array(compiler, compiler->allocator, 0);
-  compiler->op_field_symtable = SPVM_COMPILER_ALLOCATOR_alloc_hash(compiler, compiler->allocator, 0);
   compiler->include_pathes = SPVM_COMPILER_ALLOCATOR_alloc_array(compiler, compiler->allocator, 0);
   compiler->bufptr = "";
   compiler->types = SPVM_COMPILER_ALLOCATOR_alloc_array(compiler, compiler->allocator, 0);
@@ -262,7 +242,6 @@ int32_t SPVM_COMPILER_compile(SPVM_COMPILER* compiler) {
   SPVM_HASH_insert(compiler->op_use_symtable, "String", strlen("String"), op_use_string);
   
   /* call SPVM_yyparse */
-  SPVM_yydebug = 0;
   int32_t parse_success = SPVM_yyparse(compiler);
   
   return parse_success;

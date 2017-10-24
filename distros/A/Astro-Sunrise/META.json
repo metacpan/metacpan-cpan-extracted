@@ -4,8 +4,8 @@
       "Ron Hill <rkhill@firstlight.net>",
       "Jean Forget <JFORGET@cpan.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120630",
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "perl_5"
    ],
@@ -21,16 +21,35 @@
       ]
    },
    "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.57_02",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
       "runtime" : {
          "recommends" : {
             "DateTime" : "0.16"
+         },
+         "requires" : {
+            "Carp" : "0",
+            "Math::Trig" : "0",
+            "POSIX" : "0",
+            "perl" : "5.006002",
+            "strict" : "0",
+            "warnings" : "0"
          }
       }
    },
    "provides" : {
       "Astro::Sunrise" : {
          "file" : "lib/Astro/Sunrise.pm",
-         "version" : "0.96"
+         "version" : "0.97"
       }
    },
    "release_status" : "stable",
@@ -41,5 +60,5 @@
          "web" : "https://github.com/jforget/Astro-Sunrise"
       }
    },
-   "version" : "0.96"
+   "version" : "0.97"
 }

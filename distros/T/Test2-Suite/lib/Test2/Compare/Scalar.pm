@@ -4,7 +4,7 @@ use warnings;
 
 use base 'Test2::Compare::Base';
 
-our $VERSION = '0.000080';
+our $VERSION = '0.000082';
 
 use Test2::Util::HashBase qw/item/;
 
@@ -30,7 +30,7 @@ sub verify {
     return 0 unless $exists;
     return 0 unless defined $got;
     return 0 unless ref($got);
-    return 0 unless reftype($got) eq 'SCALAR';
+    return 0 unless reftype($got) eq 'SCALAR' || reftype($got) eq 'VSTRING';
     return 1;
 }
 

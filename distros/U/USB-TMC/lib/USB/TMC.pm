@@ -43,7 +43,7 @@ use strict;
 use warnings;
 
 package USB::TMC;
-$USB::TMC::VERSION = '0.004';
+$USB::TMC::VERSION = '0.005';
 use USB::LibUSB;
 use Moose;
 use MooseX::Params::Validate 'validated_list';
@@ -915,4 +915,35 @@ sub get_capabilities {
 __PACKAGE__->meta->make_immutable();
 
 1;
+
+=head1 REPORTING BUGS
+
+Please report bugs at L<https://github.com/lab-measurement/USB-TMC/issues>.
+
+=head1 CONTACT
+
+Feel free to contact us at the #labmeasurement channel on Freenode IRC.
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<Blog post on Lab::VXI11 and USB::TMC|http://blogs.perl.org/users/simon_reinhardt/2017/10/labmeasurement-new-lightweight-backends-for-vxi-11-and-usb-tmc.html>
+
+=back
+
+=head1 AUTHOR
+
+Simon Reinhardt, E<lt>simon.reinhardt@stud.uni-regensburg.deE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2017 by Simon Reinhardt
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.24.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+=cut
 

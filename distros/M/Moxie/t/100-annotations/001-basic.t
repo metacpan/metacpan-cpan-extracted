@@ -53,7 +53,7 @@ BEGIN {
     my $method = MOP::Class->new( 'Foo' )->get_method('foo');
     isa_ok($method, 'MOP::Method');
     is_deeply(
-        [ $method->get_code_attributes ],
+        [ map $_->original, $method->get_code_attributes ],
         [qw[ ro(_foo) Bar ]],
         '... got the expected attributes'
     );

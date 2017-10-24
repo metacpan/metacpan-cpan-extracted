@@ -3,7 +3,7 @@ package Ryu;
 use strict;
 use warnings;
 
-our $VERSION = '0.024';
+our $VERSION = '0.025';
 
 =encoding utf8
 
@@ -193,6 +193,8 @@ Some perl modules of relevance:
 =item * L<Evo>
 
 =item * L<Async::Stream> - early release, but seems to be very similar in concept to L<Ryu::Source>
+
+=item * L<Data::Monad>
 
 =back
 

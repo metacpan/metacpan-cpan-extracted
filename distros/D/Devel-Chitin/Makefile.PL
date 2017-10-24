@@ -37,11 +37,13 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "File::Basename" => 0,
     "IO::Pipe" => 0,
+    "Sub::Name" => 0,
     "Test::Builder" => 0,
     "Test::More" => 0,
+    "experimental" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.10",
+  "VERSION" => "0.11",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -62,10 +64,12 @@ my %FallbackPrereqs = (
   "PadWalker" => 0,
   "Scalar::Util" => 0,
   "Socket" => 0,
+  "Sub::Name" => 0,
   "Test::Builder" => 0,
   "Test::More" => 0,
   "base" => 0,
   "constant" => 0,
+  "experimental" => 0,
   "lib" => 0,
   "strict" => 0,
   "vars" => 0,

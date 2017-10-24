@@ -6,7 +6,7 @@ ENDIF ()
 # Usually the version here correspong to the NEXT version - it is git tagged
 # when we do make marpaESLIFPerlRelease
 #
-MYPACKAGESTART (marpaESLIF 2 0 16)
+MYPACKAGESTART (marpaESLIF 2 0 17)
 
 ###########
 # Library #

@@ -3,7 +3,7 @@ package Net::Async::Slack::Event::Message;
 use strict;
 use warnings;
 
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use Net::Async::Slack::EventType;
 
@@ -21,6 +21,8 @@ use Net::Async::Slack::EventType;
 
 =cut
 
+sub slack { shift->{slack} }
+
 sub channel {
     my ($self) = @_;
     $self->{channel} //= $self->slack->channel_info($self->channel_id)
@@ -36,11 +38,11 @@ sub team {
     $self->{team} //= $self->slack->team_info($self->team_id)
 }
 
-sub channel_id { shift->{channel} }
+sub channel_id { shift->{channel_id} }
 
-sub source_team_id { shift->{source_team} }
+sub source_team_id { shift->{source_team_id} }
 
-sub team_id { shift->{team} }
+sub team_id { shift->{team_id} }
 
 sub text { shift->{text} }
 

@@ -209,6 +209,7 @@ t/Legacy/useing.t
 t/Legacy/utf8.t
 t/Legacy/versions.t
 t/Legacy_And_Test2/builder_loaded_late.t
+t/Legacy_And_Test2/diag_event_on_ok.t
 t/Legacy_And_Test2/hidden_warnings.t
 t/Legacy_And_Test2/preload_diag_note.t
 t/Test2/acceptance/try_it_done_testing.t

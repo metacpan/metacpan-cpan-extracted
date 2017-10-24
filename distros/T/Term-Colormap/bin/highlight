@@ -1,0 +1,92 @@
+#!/usr/bin/perl -w
+use strict;
+use warnings;
+
+use Term::Colormap qw( colormap print_colored_text );
+
+my @pattern_data = get_pattern_data(@ARGV);
+my $color_for_marker =
+  { map { $_->{marker} => $_->{color} } @pattern_data };
+
+@ARGV or usage();
+
+while (<STDIN>) {
+    chomp( my $line = $_ );
+    my $copy = ' ' x ( length($line) );
+    for my $pattern (@pattern_data) {
+        my ($pat)    = $pattern->{pattern};
+        my ($marker) = $pattern->{marker};
+        while ( $line =~ m/($pat)/sg ) {
+            my ( $match_start, $match_end ) = ( $-[0], $+[0] ); # perldoc perlvar
+            # Where we match in $line, mark $copy with markers to indicate color desired
+            substr $copy, $match_start, ( $match_end - $match_start ),
+                              $marker x ( $match_end - $match_start );
+        }
+    }
+    my @rules = split //, $copy;
+    my @chars = split //, $line;
+    my $i     = 0;
+    while (1) {
+        last unless ( $i < scalar @chars );
+
+        # Group characters which are the same color
+        my $istart = $i;
+        my $istop  = $i;
+      CHARACTER:
+        while ( $istop < $#rules ) {
+            if ( $rules[ $istop + 1 ] eq $rules[$istart] ) {
+                $istop++;
+            }
+            else {
+                last CHARACTER;
+            }
+        }
+
+        my $txt = substr $line, $istart, ( $istop - $istart + 1 );
+        my $rule = $rules[$i];
+        if ( $rules[$i] ne ' ' ) {
+            print_colored_text( $color_for_marker->{$rule}, $txt );
+        }
+        else {
+            print $txt;
+        }
+        $i = $istop + 1;
+    }
+    print "\n";
+}
+exit 0;
+
+sub get_pattern_data {
+    my (@patterns_to_match) = @_;
+    # Longest patterns should win
+    my (@patterns) =
+      map { qr/\Q$_\E/ } sort { length($a) <=> length($b) } @patterns_to_match;
+    my $colors              = colormap('rainbow');
+    my @data;
+    my $pmax = ( scalar @patterns > 1 ) ? $#patterns : 1;
+    for my $i ( 0 .. $#patterns ) {
+        my $color =
+          $colors->[ int( ( $i / $pmax ) * ( scalar @$colors - 1 ) ) ];
+        my $marker = ( 'a' .. 'z', 'A' .. 'Z', 0..9 )[$i];
+        push @data,
+          { pattern => $patterns[$i], color => $color, marker => $marker };
+    }
+    return @data;
+}
+
+sub usage {
+    print <<USAGE;
+highlight patterns
+
+usage: cat foo | $0 pattern1 pattern2 ...
+
+example:
+
+    echo 'one, one, two, three, five, eight, thirteen, twenty-one, thirty-four, fifty-five, ...
+         ' | $0 one two three five eight
+
+USAGE
+    exit(0);
+}
+
+1;

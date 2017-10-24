@@ -1,8 +1,501 @@
-SYNOPSIS
+NAME
+    Git::Bunch - Manage gitbunch directory (directory which contain git
+    repos)
 
+VERSION
+    This document describes version 0.620 of Git::Bunch (from Perl
+    distribution Git-Bunch), released on 2017-10-19.
+
+SYNOPSIS
     See the included gitbunch script.
 
-append:SEE ALSO
+DESCRIPTION
+    A *gitbunch* or *bunch* directory is just a term I coined to refer to a
+    directory which contains, well, a bunch of git repositories. It can also
+    contain other stuffs like files and non-git repositories (but they must
+    be dot-dirs). Example:
+
+     repos/            -> a gitbunch dir
+       proj1/          -> a git repo
+       proj2/          -> ditto
+       perl-Git-Bunch/ -> ditto
+       ...
+       .videos/        -> a non-git dir
+       README.txt      -> file
+
+    If you organize your data as a bunch, you can easily check the status of
+    your repositories and synchronize your data between two locations, e.g.
+    your computer's harddisk and an external/USB harddisk.
+
+    A little bit of history: after *git* got popular, in 2008 I started
+    using it for software projects, replacing Subversion and Bazaar. Soon, I
+    moved everything*) to git repositories: notes & writings, Emacs .org
+    agenda files, configuration, even temporary downloads/browser-saved HTML
+    files. I put the repositories inside *$HOME/repos* and add symlinks to
+    various places for conveniences. Thus, the *$HOME/repos* became the
+    first bunch directory.
+
+    *) everything except large media files (e.g. recorded videos) which I
+    put in dot-dirs inside the bunch.
+
+    See also rsybak, which I wrote to backup everything else.
+
+FUNCTIONS
+  check_bunch
+    Usage:
+
+     check_bunch(%args) -> [status, msg, result, meta]
+
+    Check status of git repositories inside gitbunch directory.
+
+    Will perform a 'git status' for each git repositories inside the bunch
+    and report which repositories are clean/unclean.
+
+    Will die if can't chdir into bunch or git repository.
+
+    This function is not exported by default, but exportable.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   exclude_files => *bool*
+
+        Exclude files from processing.
+
+        This only applies to "sync_bunch" operations. Operations like
+        "check_bunch" and "exec_bunch" already ignore these and only operate
+        on git repos.
+
+    *   exclude_non_git_dirs => *bool*
+
+        Exclude non-git dirs from processing.
+
+        This only applies to and "sync_bunch" operations. Operations like
+        "check_bunch" and "exec_bunch" already ignore these and only operate
+        on git repos.
+
+    *   exclude_repos => *array[str]*
+
+        Exclude some repos from processing.
+
+    *   exclude_repos_pat => *str*
+
+        Specify regex pattern of repos to exclude.
+
+    *   include_repos => *array[str]*
+
+        Specific git repos to sync, if not specified all repos in the bunch
+        will be processed.
+
+    *   include_repos_pat => *str*
+
+        Specify regex pattern of repos to include.
+
+    *   min_repo_access_time => *date*
+
+        Limit to repos that are accessed (mtime, committed, status-ed,
+        pushed) recently.
+
+        This can significantly reduce the time to process the bunch if you
+        are only interested in recent repos (which is most of the time
+        unless you are doing a full check/sync).
+
+    *   repo => *str*
+
+        Only process a single repo.
+
+    *   source* => *str*
+
+        Directory to check.
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  exec_bunch
+    Usage:
+
+     exec_bunch(%args) -> [status, msg, result, meta]
+
+    Execute a command for each repo in the bunch.
+
+    For each git repository in the bunch, will chdir to it and execute
+    specified command.
+
+    This function is not exported by default, but exportable.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   command* => *str*
+
+        Command to execute.
+
+    *   exclude_files => *bool*
+
+        Exclude files from processing.
+
+        This only applies to "sync_bunch" operations. Operations like
+        "check_bunch" and "exec_bunch" already ignore these and only operate
+        on git repos.
+
+    *   exclude_non_git_dirs => *bool*
+
+        Exclude non-git dirs from processing.
+
+        This only applies to and "sync_bunch" operations. Operations like
+        "check_bunch" and "exec_bunch" already ignore these and only operate
+        on git repos.
+
+    *   exclude_repos => *array[str]*
+
+        Exclude some repos from processing.
+
+    *   exclude_repos_pat => *str*
+
+        Specify regex pattern of repos to exclude.
+
+    *   include_repos => *array[str]*
+
+        Specific git repos to sync, if not specified all repos in the bunch
+        will be processed.
+
+    *   include_repos_pat => *str*
+
+        Specify regex pattern of repos to include.
+
+    *   min_repo_access_time => *date*
+
+        Limit to repos that are accessed (mtime, committed, status-ed,
+        pushed) recently.
+
+        This can significantly reduce the time to process the bunch if you
+        are only interested in recent repos (which is most of the time
+        unless you are doing a full check/sync).
+
+    *   repo => *str*
+
+        Only process a single repo.
+
+    *   source* => *str*
+
+        Directory to check.
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  list_bunch_contents
+    Usage:
+
+     list_bunch_contents(%args) -> [status, msg, result, meta]
+
+    List contents inside gitbunch directory.
+
+    Will list each repo or non-repo dir/file.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   detail => *bool*
+
+        Show detailed record for each entry instead of just its name.
+
+    *   exclude_files => *bool*
+
+        Exclude files from processing.
+
+        This only applies to "sync_bunch" operations. Operations like
+        "check_bunch" and "exec_bunch" already ignore these and only operate
+        on git repos.
+
+    *   exclude_non_git_dirs => *bool*
+
+        Exclude non-git dirs from processing.
+
+        This only applies to and "sync_bunch" operations. Operations like
+        "check_bunch" and "exec_bunch" already ignore these and only operate
+        on git repos.
+
+    *   exclude_repos => *array[str]*
+
+        Exclude some repos from processing.
+
+    *   exclude_repos_pat => *str*
+
+        Specify regex pattern of repos to exclude.
+
+    *   include_repos => *array[str]*
+
+        Specific git repos to sync, if not specified all repos in the bunch
+        will be processed.
+
+    *   include_repos_pat => *str*
+
+        Specify regex pattern of repos to include.
+
+    *   min_repo_access_time => *date*
+
+        Limit to repos that are accessed (mtime, committed, status-ed,
+        pushed) recently.
+
+        This can significantly reduce the time to process the bunch if you
+        are only interested in recent repos (which is most of the time
+        unless you are doing a full check/sync).
+
+    *   repo => *str*
+
+        Only process a single repo.
+
+    *   sort => *str*
+
+        Order entries.
+
+    *   source* => *str*
+
+        Directory to check.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  sync_bunch
+    Usage:
+
+     sync_bunch(%args) -> [status, msg, result, meta]
+
+    Synchronize bunch to another bunch.
+
+    For each git repository in the bunch, will perform a 'git pull/push' for
+    each branch. If repository in destination doesn't exist, it will be
+    rsync-ed first from source. When 'git pull' fails, will exit to let you
+    fix the problem manually.
+
+    For all other non-repo file/directory, will simply synchronize by
+    one-way rsync. But, for added safety, will first check the newest mtime
+    (mtime of the newest file or subdirectory) between source and target is
+    checked first. If target contains the newer newest mtime, rsync-ing for
+    that non-repo file/dir will be aborted. Note: you can use
+    "--skip-mtime-check" option to skip this check.
+
+    This function is not exported by default, but exportable.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   backup => *bool*
+
+        Whether doing backup to target.
+
+        This setting lets you express that you want to perform synchronizing
+        to a backup target, and that you do not do work on the target. Thus,
+        you do not care about uncommitted or untracked files/dirs in the
+        target repos (might happen if you also do periodic copying of repos
+        to backup using cp/rsync). When this setting is turned on, the
+        function will first do a "git clean -f -d" (to delete untracked
+        files/dirs) and then "git checkout ." (to discard all uncommitted
+        changes). This setting will also implicitly turn on "create_bare"
+        setting (unless that setting has been explicitly enabled/disabled).
+
+    *   create_bare_target => *bool*
+
+        Whether to create bare git repo when target does not exist.
+
+        When target repo does not exist, gitbunch can either copy the source
+        repo using "rsync" (the default, if this setting is undefined), or
+        it can create target repo with "git init --bare" (if this setting is
+        set to 1), or it can create target repo with "git init" (if this
+        setting is set to 0).
+
+        Bare git repositories contain only contents of the .git folder
+        inside the directory and no working copies of your source files.
+
+        Creating bare repos are apt for backup purposes since they are more
+        space-efficient.
+
+        Non-repos will still be copied/rsync-ed.
+
+    *   delete_branch => *bool* (default: 0)
+
+        Whether to delete branches in dest repos not existing in source
+        repos.
+
+    *   exclude_files => *bool*
+
+        Exclude files from processing.
+
+        This only applies to "sync_bunch" operations. Operations like
+        "check_bunch" and "exec_bunch" already ignore these and only operate
+        on git repos.
+
+    *   exclude_non_git_dirs => *bool*
+
+        Exclude non-git dirs from processing.
+
+        This only applies to and "sync_bunch" operations. Operations like
+        "check_bunch" and "exec_bunch" already ignore these and only operate
+        on git repos.
+
+    *   exclude_repos => *array[str]*
+
+        Exclude some repos from processing.
+
+    *   exclude_repos_pat => *str*
+
+        Specify regex pattern of repos to exclude.
+
+    *   include_repos => *array[str]*
+
+        Specific git repos to sync, if not specified all repos in the bunch
+        will be processed.
+
+    *   include_repos_pat => *str*
+
+        Specify regex pattern of repos to include.
+
+    *   min_repo_access_time => *date*
+
+        Limit to repos that are accessed (mtime, committed, status-ed,
+        pushed) recently.
+
+        This can significantly reduce the time to process the bunch if you
+        are only interested in recent repos (which is most of the time
+        unless you are doing a full check/sync).
+
+    *   repo => *str*
+
+        Only process a single repo.
+
+    *   rsync_del => *bool*
+
+        Whether to use --del rsync option.
+
+        When rsync-ing non-repos, by default "--del" option is not used for
+        more safety because rsync is a one-way action. To add rsync "--del"
+        option, enable this
+
+    *   rsync_opt_maintain_ownership => *bool* (default: 0)
+
+        Whether or not, when rsync-ing from source, we use -a (= -rlptgoD)
+        or -rlptD (-a minus -go).
+
+        Sometimes using -a results in failure to preserve permission modes
+        on sshfs-mounted filesystem, while -rlptD succeeds, so by default we
+        don't maintain ownership. If you need to maintain ownership (e.g.
+        you run as root and the repos are not owned by root), turn this
+        option on.
+
+    *   skip_mtime_check => *bool*
+
+        Whether or not, when rsync-ing non-repos, we check mtime first.
+
+        By default when we rsync a non-repo file/dir from source to target
+        and both exist, to protect wrong direction of sync-ing we find the
+        newest mtime in source or dir (if dir, then the dir is recursively
+        traversed to find the file/subdir with the newest mtime). If target
+        contains the newer mtime, the sync for that non-repo file/dir is
+        aborted. If you want to force the rsync anyway, use this option.
+
+    *   source* => *str*
+
+        Directory to check.
+
+    *   target* => *str*
+
+        Destination bunch.
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Git-Bunch>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-Git-Bunch>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Git-Bunch>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    rsybak.
+
+    <http://joeyh.name/code/mr/>. You probably want to use this instead.
+    *mr* supports other control version software aside from git, doesn't
+    restrict you to put all your repos in one directory, supports more
+    operations, and has been developed since 2007. Had I known about *mr*, I
+    probably wouldn't have started gitbunch. On the other hand, gitbunch is
+    simpler (I think), doesn't require any config file, and can copy/sync
+    files/directories not under source control. I mainly use gitbunch to
+    quickly: 1) check whether there are any of my repositories which have
+    uncommitted changes; 2) synchronize (pull/push) to other locations. I
+    put all my data in one big gitbunch directory; I find it simpler.
+    gitbunch works for me and I use it daily.
 
     File::RsyBak
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012, 2011
+    by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

@@ -13,7 +13,8 @@ my $e = $mod->new(1, \&perform, 10);
 
     is $e->status, 0, "before starting, status() is zero";
     $e->start;
-    is $e->status, 1, "status() ok if started";
+    is $e->status > 0, 1, "status() ok if started";
+    is $e->status, $e->_pid, "status() is the same as the event PID";
     $e->stop;
     is $e->status, 0, "status() ok if not started";
 }

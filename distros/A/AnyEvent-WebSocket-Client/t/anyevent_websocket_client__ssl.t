@@ -55,7 +55,7 @@ $connection->send('ping');
 my $last;
 
 $connection->on(each_message => sub {
-  my $message = pop->body;
+  my $message = $_[1]->body;
   note "recv $message";
   $connection->send('ping');
   $last = $message;

@@ -6,7 +6,7 @@ use Dancer2::Core::Types qw(Bool);
 use Dancer2::Plugin;
 use GraphQL::Execution qw(execute);
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 has graphiql => (
   is => 'ro',
@@ -115,21 +115,16 @@ Dancer2::Plugin::GraphQL - a plugin for adding GraphQL route handlers
   use Dancer2;
   use Dancer2::Plugin::GraphQL;
   use GraphQL::Schema;
-  use GraphQL::Type::Object;
-  use GraphQL::Type::Scalar qw/ $String /;
 
-  my $schema = GraphQL::Schema->new(
-    query => GraphQL::Type::Object->new(
-      name => 'QueryRoot',
-      fields => {
-        helloWorld => {
-          type => $String,
-          resolve => sub { 'Hello, world!' },
-        },
-      },
-    ),
-  );
-  graphql '/graphql' => $schema;
+  my $schema = GraphQL::Schema->from_doc(<<'EOF');
+  schema {
+    query: QueryRoot
+  }
+  type QueryRoot {
+    helloWorld: String
+  }
+  EOF
+  graphql '/graphql' => $schema, { helloWorld => 'Hello, world!' };
 
   dance;
 

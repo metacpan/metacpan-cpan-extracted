@@ -2737,7 +2737,7 @@ EOH
             DELETE => 'handler_delete_schedule_sid',
         },
         acl_profile => {
-            GET => 'inactive',
+            GET => 'passerby',
             PUT => 'admin',
             DELETE => 'admin',
         },

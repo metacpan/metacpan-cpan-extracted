@@ -2,4 +2,3 @@
 
 Set($MemoRichText, 0);
 Set($MemoHeight, 15);
-Set($MemoWidth, undef);

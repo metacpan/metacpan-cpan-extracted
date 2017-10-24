@@ -59,35 +59,35 @@ define ([
         QUnit.test(test_desc, function (assert) {
             console.log('***TEST*** ' + prefix + test_desc);
             var done = assert.async(5);
-            assert.expect(24);
+            assert.expect(23);
             login({"nam": "root", "pwd": "immutable"});
             setTimeout(function () {
                 ct.login(assert, "root", "admin");
                 done();
-            }, 1600);
+            }, 2000);
             setTimeout(function () {
                 // create the employees
                 ct.employeeCreate(assert, "active");
                 ct.employeeCreate(assert, "inactive");
                 done();
-            }, 2000);
+            }, 2400);
             setTimeout(function () {
                 // add privhistory records
                 ct.employeePriv(assert, "active", "active");
                 ct.employeePriv(assert, "inactive", "inactive");
                 done();
-            }, 2400);
+            }, 2800);
             setTimeout(function () {
                 // assert that employees have expected privlevels
                 ct.employeeHasPriv(assert, "active", "active");
                 ct.employeeHasPriv(assert, "inactive", "inactive");
                 loggout();
                 done();
-            }, 2800);
+            }, 3200);
             setTimeout(function () {
                 ct.loggout(assert);
                 done();
-            }, 3200);
+            }, 3600);
         });
 
     };

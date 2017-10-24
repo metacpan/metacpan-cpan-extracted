@@ -4,28 +4,28 @@ Time::OlsonTZ::Download - Olson timezone database from source
 
 =head1 SYNOPSIS
 
-	use Time::OlsonTZ::Download;
+    use Time::OlsonTZ::Download;
 
-	$version = Time::OlsonTZ::Download->latest_version;
+    $version = Time::OlsonTZ::Download->latest_version;
 
-	$download = Time::OlsonTZ::Download->new;
+    $download = Time::OlsonTZ::Download->new;
 
-	$version = $download->version;
-	$version = $download->code_version;
-	$version = $download->data_version;
-	$dir = $download->dir;
-	$dir = $download->unpacked_dir;
+    $version = $download->version;
+    $version = $download->code_version;
+    $version = $download->data_version;
+    $dir = $download->dir;
+    $dir = $download->unpacked_dir;
 
-	$names = $download->canonical_names;
-	$names = $download->link_names;
-	$names = $download->all_names;
-	$links = $download->raw_links;
-	$links = $download->threaded_links;
-	$countries = $download->country_selection;
+    $names = $download->canonical_names;
+    $names = $download->link_names;
+    $names = $download->all_names;
+    $links = $download->raw_links;
+    $links = $download->threaded_links;
+    $countries = $download->country_selection;
 
-	$files = $download->data_files;
-	$zic = $download->zic_exe;
-	$dir = $download->zoneinfo_dir;
+    $files = $download->data_files;
+    $zic = $download->zic_exe;
+    $dir = $download->zoneinfo_dir;
 
 =head1 DESCRIPTION
 
@@ -39,7 +39,7 @@ with extracting useful information from the source.
 
 package Time::OlsonTZ::Download;
 
-{ use 5.006; }
+{ use 5.008; }
 use warnings;
 use strict;
 
@@ -55,7 +55,7 @@ use Params::Classify 0.000 qw(is_undef is_string);
 use String::ShellQuote 1.01 qw(shell_quote);
 use utf8 ();
 
-our $VERSION = "0.006";
+our $VERSION = "0.007";
 
 sub _init_ftp($$) {
 	my($self, $hostname) = @_;
@@ -705,34 +705,40 @@ very stable.
 
 =cut
 
-sub _ensure_standard_zonenames {
+sub data_files {
 	my($self) = @_;
-	unless(exists $self->{standard_zonenames}) {
+	unless(exists $self->{data_files}) {
+		my $list;
 		$self->_ensure_unpacked;
 		my $mf = IO::File->new($self->dir."/Makefile", "r");
 		my $mfc = $mf ? do { local $/ = undef; $mf->getline } : "";
-		$self->{standard_zonenames} = !!($mfc =~ m#
+		if($mfc =~ m#
+			\ncheck_links:[\ \t]+checklinks\.awk[\ \t]+
+				\$\(TDATA\)[\ \t]*\n
+			\t[\ \t]*\$\(AWK\)\ -f\ checklinks\.awk\ \$\(TDATA\)\n
+			\t[\ \t]*\$\(AWK\)\ -f\ checklinks\.awk\ tzdata\.zi\n\n
+		#x) {
+			$list = filter("", "cd @{[shell_quote($self->dir)]} ".
+					"&& make check_links ".
+					"AWK='\@echo x' VERSION_DEPS=");
+			$list =~ s#\Ax -f checklinks\.awk ##;
+			$list =~ s#\n.*\z##s;
+		} elsif($mfc =~ m#
 			\nzonenames:[\ \t]+\$\(TDATA\)[\ \t]*\n
 			\t[\ \t]*\@\$\(AWK\)\ '
 			/\^Zone/\ \{\ print\ \$\$2\ \}
 			\ /\^Link/\ \{\ print\ \$\$3\ \}
 			'\ \$\(TDATA\)[\ \t]*\n\n
-		#x);
-	}
-	die "format of zone name declarations is not what this code expects"
-		unless $self->{standard_zonenames};
-}
-
-sub data_files {
-	my($self) = @_;
-	unless(exists $self->{data_files}) {
-		$self->_ensure_standard_zonenames;
-		$self->_ensure_unpacked;
-		my $list = filter("", "cd @{[shell_quote($self->dir)]} && ".
-					"make zonenames ".
+		#x) {
+			$list = filter("", "cd @{[shell_quote($self->dir)]} ".
+					"&& make zonenames ".
 					"AWK=echo VERSION_DEPS=");
-		$list =~ s#\A.*\{.*\} ##s;
-		$list =~ s#\n\z##;
+			$list =~ s#\A.*\{.*\} ##s;
+			$list =~ s#\n\z##;
+		} else {
+			die "don't know how to extract data file names ".
+				"from this form of Olson distribution";
+		}
 		$self->{data_files} =
 			[ map { $self->dir."/".$_ } split(/ /, $list) ];
 	}

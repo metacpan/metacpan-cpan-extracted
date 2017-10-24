@@ -1,5 +1,8 @@
 Revision history for Perl extension File::Random.
 
+0.18  2017, Sun Oct 22
+        - follow option to follow symlinks
+
 0.17  Tue Aug 20
         - changed random_line method that it detects also how many lines are wanted
           * my ($line1, $line2, $line3) = random_line $fname

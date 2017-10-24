@@ -1,11 +1,82 @@
+=pod
+
+ABCDE
+
+=cut ppppp
+
+use TestCase::EnumA;
+use TestCase::EnumB;
+use TestCase::EnumC;
+use TestCase::EnumD;
+use TestCase::Simple;
+use TestCase::Minimal;
+use TestCase::Template_int_long;
+use TestCase::Destructor;
+
+=head1 NAME
+
+SPVM::Test - SPVM test module
+
+=cut
+
 package TestCase {
+  our $PACKAGE_VAR_INT : int;
+  
+  has next_test : TestCase;
+  has minimal : TestCase::Minimal;
+  has x_byte : byte;
+  has x_short : short;
+  has x_int : int;
+  has x_long : long;
+  has x_float : float;
+  has x_double : double;
+  has private_field : int;
+  
+  get x_byte, x_int, x_long;
+  set x_byte, x_int, x_long;
+  
+  enum {
+    BYTE_MAX = 127y,
+    BYTE_MIN = -128y,
+    SHORT_MAX = 32767s,
+    SHORT_MIN = -32768s,
+    INT_MAX = 2147483647,
+    INT_MIN = -2147483648,
+    LONG_MAX = 9223372036854775807L,
+    LONG_MIN = -9223372036854775808L,
+    FLOAT_PRECICE = 32767f,
+    DOUBLE_PRECICE = 2147483647.0,
+  }
+  
   sub main($mvar : int) : int {
     
-    1 / 0;
+    {
+      my $var = $TestCase::PACKAGE_VAR_INT;
+      
+      $TestCase::PACKAGE_VAR_INT = 1;
+      
+      if ($TestCase::PACKAGE_VAR_INT == 0) {
+        $TestCase::PACKAGE_VAR_INT = 1;
+        if ($TestCase::PACKAGE_VAR_INT == 1) {
+          return 1;
+        }
+      }
+      my $str = "" . $TestCase::PACKAGE_VAR_INT;
+    }
     
-  }
-}
-__END__
+    
+=pod
+    {
+      my $simple1 = new TestCase::Simple;
+      $simple1->{private_field};
+    }
+=cut
+
+    {
+      my $test_case = new TestCase;
+      $test_case->{private_field};
+    }
+    
     {
       my $time = std::time();
       
@@ -98,7 +169,7 @@ __END__
     }
     
     {
-      error_eval_call();
+      TestCase::error_eval_call();
     }
     
     {
@@ -106,41 +177,41 @@ __END__
     }
     
     {
-      my $ret = error_eval();
+      my $ret = TestCase::error_eval();
       
       std::say_int($ret);
     }
     
-    error_eval();
+    TestCase::error_eval();
     
-    my $dest = new TestCase::Destructor;
+    my $dest = TestCase::Destructor::new();
     
     # enum
     {
-      BYTE_MAX();
-      BYTE_MIN();
-      SHORT_MAX();
-      SHORT_MIN();
-      INT_MAX();
-      INT_MIN();
-      LONG_MAX();
-      LONG_MIN();
+      TestCase::BYTE_MAX();
+      TestCase::BYTE_MIN();
+      TestCase::SHORT_MAX();
+      TestCase::SHORT_MIN();
+      TestCase::INT_MAX();
+      TestCase::INT_MIN();
+      TestCase::LONG_MAX();
+      TestCase::LONG_MIN();
     }
     # Field set and get
     {
       my $test = new TestCase;
       
-      $test->{x_byte} = TestCase->BYTE_MAX;
-      $test->{x_short} = TestCase->SHORT_MAX;
-      $test->{x_int} = TestCase->INT_MAX;
-      $test->{x_long} = TestCase->LONG_MAX;
-      $test->{x_float} = TestCase->FLOAT_PRECICE;
-      $test->{x_double} = TestCase->DOUBLE_PRECICE;
+      $test->set_x_byte(TestCase::BYTE_MAX());
+      $test->{x_short} = TestCase::SHORT_MAX();
+      $test->{x_int} = TestCase::INT_MAX();
+      $test->{x_long} = TestCase::LONG_MAX();
+      $test->{x_float} = TestCase::FLOAT_PRECICE();
+      $test->{x_double} = TestCase::DOUBLE_PRECICE();
     }
     
     # Weaken
     {
-      my $num = weaken_reference_count1_object();
+      my $num = TestCase::weaken_reference_count1_object();
     }
     
     # Weaken
@@ -152,13 +223,13 @@ __END__
       weaken $test->{next_test};
     }
     
-    call_void();
+    TestCase::call_void();
     
     std::say("a");
     
     # Default return value object
-    if (default_return_value_object_sub() == undef) {
-      if (default_return_value_object_sub_empty() == undef) {
+    if (TestCase::default_return_value_object_sub() == undef) {
+      if (TestCase::default_return_value_object_sub_empty() == undef) {
         1;
       }
     }
@@ -171,7 +242,7 @@ __END__
 
     # Get object from freelist
     {
-       check_freelist();
+       TestCase::check_freelist();
        
        my $result = new int[65];
        $result->[64] = 0;
@@ -182,7 +253,7 @@ __END__
       2,
       3
     ];
-    std::say_float(TestCase->ONE);
+    std::say_float(TestCase::ONE());
     
     # Logical or
     {
@@ -251,23 +322,23 @@ __END__
     # $array->[0]{x}
     {
       my $objs = new TestCase::Minimal[3];
-      $objs->[0] = new TestCase::Minimal;
-      $objs->[0]{x} = 111;
-      std::say_int($objs->[0]{x});
+      $objs->[0] = TestCase::Minimal::new();
+      $objs->[0]->set_x(111);
+      std::say_int($objs->[0]->get_x);
     }
     
     # $obj->{x}[0]
     {
-      my $obj = new TestCase::Simple;
-      $obj->{values1} = new int[5];
-      $obj->{values1}[0] = 221;
-      std::say_int($obj->{values1}[0]);
+      my $obj = TestCase::Simple::new();
+      $obj->set_values1(new int[5]);
+      $obj->get_values1->[0] = 221;
+      std::say_int($obj->get_values1->[0]);
     }
     
     # Call new subroutine without variable
     {
       TestCase::Minimal::new();
-      sum0(1, 3);
+      TestCase::sum0(1, 3);
     }
     
     # Subroutine call from native
@@ -278,20 +349,20 @@ __END__
     
     # Create temporary varialbe
     {
-      new TestCase::Minimal;
-      new TestCase::Minimal;
-      (new TestCase::Minimal)->{x};
+      TestCase::Minimal::new();
+      TestCase::Minimal::new();
+      TestCase::Minimal::new()->get_x;
     }
     
-    my $obj1 = new TestCase::Minimal;
+    my $obj1 = TestCase::Minimal::new();
     
     # last
     {
       while (1) {
-        my $obj1 = new TestCase::Minimal;
-        my $obj2 = new TestCase::Minimal;
+        my $obj1 = TestCase::Minimal::new();
+        my $obj2 = TestCase::Minimal::new();
         {
-          my $obj3 = new TestCase::Minimal;
+          my $obj3 = TestCase::Minimal::new();
           last;
           next;
         }
@@ -339,8 +410,8 @@ __END__
       my $nums : int[][];
     }
     
-    std::say_int(TestCase::EnumD->THREE);
-    std::say_int(TestCase::EnumD->FORE);
+    std::say_int(TestCase::EnumD::THREE());
+    std::say_int(TestCase::EnumD::FORE());
     
     # Core functions
     {
@@ -433,11 +504,11 @@ __END__
     #}
     
     {
-      new TestCase::Minimal;
+      TestCase::Minimal::new();
     }
     
     {
-      my $obj1 = new TestCase::Minimal;
+      my $obj1 = TestCase::Minimal::new();
       
       my $obj2 : TestCase::Minimal;
       
@@ -477,11 +548,11 @@ __END__
     }
     
     eval {
-      sum0(1, 2);
+      TestCase::sum0(1, 2);
       
       3;
       
-      sum0(3, 4);
+      TestCase::sum0(3, 4);
       
       croak "Catch error";
       
@@ -489,7 +560,7 @@ __END__
     };
     
     {
-      sum0(5, 6);
+      TestCase::sum0(5, 6);
       2;
       std::say("Error");
     }
@@ -527,19 +598,19 @@ __END__
     
     # get and set field
     {
-      my $m = new TestCase::Minimal;
+      my $m = TestCase::Minimal::new();
       
-      $m->{x} = 99;
-      $m->{y} = 100;
+      $m->set_x(99);
+      $m->set_y(100);
       
-      std::say_int($m->{x});
-      std::say_int($m->{y});
+      std::say_int($m->get_x);
+      std::say_int($m->get_y);
     }
 
     # Free when assignment
     {
-      my $m = new TestCase::Minimal;
-      $m = new TestCase::Minimal;
+      my $m = TestCase::Minimal::new();
+      $m = TestCase::Minimal::new();
     }
 
     # left is object, right is undef
@@ -564,8 +635,8 @@ __END__
     }
     7;
     
-    std::say_int(sum0(1, 1));
-    std::say_int(sum2(1, 2));
+    std::say_int(TestCase::sum0(1, 1));
+    std::say_int(TestCase::sum2(1, 2));
 
     # Constant float
     std::say_float(0.3f);
@@ -642,10 +713,10 @@ __END__
       my $num = 3;
       
       switch($num) {
-        case TestCase::EnumD->THREE:
+        case TestCase::EnumD::THREE():
           std::say_int(1);
           last;
-        case TestCase::EnumD->FORE:
+        case TestCase::EnumD::FORE():
           std::say_int(2);
           last;
         case 5:
@@ -694,16 +765,16 @@ __END__
     }
     6;
 
-    my $simple3 : TestCase::Simple = new TestCase::Simple;
+    my $simple3 : TestCase::Simple = TestCase::Simple::new();
     
     std::say_int($simple3->get_x());
     $simple3->get_x;
     
-    $simple3->{y} = 2;
-    $simple3->{x};
-    $simple3->{y};
+    $simple3->set_y(2);
+    $simple3->get_x;
+    $simple3->get_y;
 
-    my $simple2 : TestCase::Simple = new TestCase::Simple;
+    my $simple2 : TestCase::Simple = TestCase::Simple::new();
     
     if (1) { }
     
@@ -807,7 +878,7 @@ __END__
       my $nums_length : int = @$nums;
     }
     
-    my $simple : TestCase::Simple = new TestCase::Simple;
+    my $simple : TestCase::Simple = TestCase::Simple::new();
     
     
     my $v1 : int;
@@ -826,8 +897,8 @@ __END__
     TestCase::EnumA::ONE();
     TestCase::EnumA::TWO();
     
-    TestCase::EnumA->ONE();
-    TestCase::EnumA->ONE;
+    TestCase::EnumA::ONE();
+    TestCase::EnumA::ONE();
     
     # Basic operation byte
     {
@@ -892,9 +963,9 @@ __END__
     undef;
     
     TestCase::sum0(1, 2);
-    sum0(1, 2);
+    TestCase::sum0(1, 2);
     
-    test1();
+    TestCase::test1();
     
     while (1) {
       1;
@@ -940,7 +1011,7 @@ __END__
   sub call_void() : int {
     my $nums : int[] = [1];
     
-    call_void_sub($nums);
+    TestCase::call_void_sub($nums);
     
     if ($nums->[0] == 5) {
       return 1;
@@ -998,7 +1069,7 @@ __END__
       
     }
     
-    array_new();
+    TestCase::array_new();
     
     return 2;
   }
@@ -1013,28 +1084,28 @@ __END__
   sub sum2 ($num1 : int, $num2 : int) : int {
     # croak "Error";
     
-    my $num3 = sum0($num1, $num2);
+    my $num3 = TestCase::sum0($num1, $num2);
     
     return $num3 + 3;
   }
 
   sub increfcount($test : TestCase::Minimal, $num : int) : int {
     
-    my $aaa = new TestCase::Minimal;
+    my $aaa = TestCase::Minimal::new();
   }
 
   sub decinctest ($num1 : TestCase::Minimal, $num2 : int, $num3 : TestCase::Minimal) : int {
     {
-      my $num4 = new TestCase::Minimal;
-      my $num5 = new TestCase::Minimal;
+      my $num4 = TestCase::Minimal::new();
+      my $num5 = TestCase::Minimal::new();
     }
     return 2;
   }
 
   sub return_object() : TestCase::Minimal {
-    my $obj0 = new TestCase::Minimal;
+    my $obj0 = TestCase::Minimal::new();
     {
-      my $obj1 = new TestCase::Minimal;
+      my $obj1 = TestCase::Minimal::new();
       
       my $obj2 : TestCase::Minimal;
       
@@ -1045,10 +1116,10 @@ __END__
   }
 
   sub eval_block() : void {
-    my $obj0 = new TestCase::Minimal;
+    my $obj0 = TestCase::Minimal::new();
     
     eval {
-      my $obj1 = new TestCase::Minimal;
+      my $obj1 = TestCase::Minimal::new();
       
       my $obj2 : TestCase::Minimal;
       
@@ -1060,7 +1131,7 @@ __END__
     };
     
     {
-      my $obj4 = new TestCase::Minimal;
+      my $obj4 = TestCase::Minimal::new();
       
       my $obj5 : TestCase::Minimal;
       
@@ -1089,7 +1160,7 @@ __END__
     
   }
   sub weaken_reference_count1_object() : int {
-    my $minimal = new TestCase::Minimal;
+    my $minimal = TestCase::Minimal::new();
     my $test = new TestCase;
     
     $test->{minimal} = $minimal;
@@ -1108,7 +1179,7 @@ __END__
   }
   
   sub error_call_stack() : int {
-    error();
+    TestCase::error();
   }
 
   sub error_eval() : int {
@@ -1126,7 +1197,7 @@ __END__
 
   sub error_eval_call() : int {
     eval {
-      error();
+      TestCase::error();
     };
     
     if ($@) {

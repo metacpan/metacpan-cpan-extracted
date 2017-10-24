@@ -22,7 +22,7 @@ requires:
 resources:
   bugtracker: https://github.com/benkasminbullock/JSON-Parse/issues
   repository: git://github.com/benkasminbullock/JSON-Parse.git
-version: '0.53'
+version: '0.55'
 x_contributors:
   - 'Shlomi Fish <shlomif@cpan.org>'
   - kolmogorov42

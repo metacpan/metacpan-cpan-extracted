@@ -59,6 +59,10 @@ set( 'MFILE_WWW_DEFAULT_LOGIN_CREDENTIALS', {
     'pwd' => 'immutable'
 } );
 
+# MFILE_WWW_DISPLAY_SESSION_DATA
+#     controls whether session data will be displayed on all screens
+set( 'MFILE_WWW_DISPLAY_SESSION_DATA', 1 );
+
 # -----------------------------------
 # DO NOT EDIT ANYTHING BELOW THIS LINE
 # -----------------------------------

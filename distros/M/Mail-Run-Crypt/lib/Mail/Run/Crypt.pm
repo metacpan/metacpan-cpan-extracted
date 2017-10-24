@@ -16,7 +16,7 @@ use Mail::GnuPG;
 use MIME::Entity;
 
 # Specify package verson
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 # Default exit value
 our $DEFAULT_EXIT = 127;    ## no critic (ProhibitMagicNumbers)
@@ -29,7 +29,7 @@ sub new {
     my $self = {%opts};
 
     # We must have a recipient
-    exists $self->{mailto} and defined $self->{mailto}
+    defined $self->{mailto}
       or croak 'mailto required';
 
     # Default the instance name to the package name if it wasn't given;
@@ -42,9 +42,9 @@ sub new {
 
     # If signing, we need a key ID and a passphrase
     if ( $self->{sign} ) {
-        exists $self->{keyid} and defined $self->{keyid}
+        defined $self->{keyid}
           or croak 'keyid required for signing';
-        exists $self->{passphrase} and defined $self->{passphrase}
+        defined $self->{passphrase}
           or croak 'passphrase required for signing';
     }
 
@@ -138,7 +138,7 @@ Mail::Run::Crypt - Encrypt and mail output from command runs
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =head1 DESCRIPTION
 

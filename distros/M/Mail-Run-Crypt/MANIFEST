@@ -5,7 +5,9 @@ LICENSE
 Makefile.PL
 MANIFEST
 README
+t/custom-name.t
 t/encrypt.t
+t/encrypt-explicit.t
 t/encrypt-sign.t
 t/require-key-data.t
 t/require-mailto.t

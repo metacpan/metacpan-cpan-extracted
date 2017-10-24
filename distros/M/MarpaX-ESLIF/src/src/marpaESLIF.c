@@ -257,7 +257,7 @@ static inline marpaESLIF_grammar_t  *_marpaESLIF_bootstrap_grammarp(marpaESLIFGr
                                                                     marpaESLIF_action_t *defaultFreeActionp);
 static inline short                  _marpaESLIFGrammar_validateb(marpaESLIFGrammar_t *marpaESLIFGrammarp);
 static inline short                  _marpaESLIFGrammar_haveLexemeb(marpaESLIFGrammar_t *marpaESLIFGrammarp, int grammari, marpaWrapperGrammar_t *marpaWrapperGrammarp, short *haveLexemebp);
-static inline marpaESLIFGrammar_t   *_marpaESLIFGrammar_newp(marpaESLIF_t *marpaESLIFp, marpaESLIFGrammarOption_t *marpaESLIFGrammarOptionp, marpaESLIFGrammar_t *marpaESLIfGrammarPreviousp);
+static inline marpaESLIFGrammar_t   *_marpaESLIFGrammar_newp(marpaESLIF_t *marpaESLIFp, marpaESLIFGrammarOption_t *marpaESLIFGrammarOptionp, marpaESLIFGrammar_t *marpaESLIfGrammarPreviousp, short unsafeb);
 
 static inline short                  _marpaESLIFRecognizer_terminal_matcherb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, marpaESLIF_terminal_t *terminalp, char *inputs, size_t inputl, short eofb, marpaESLIF_matcher_value_t *rcip, marpaESLIFValueResult_t *marpaESLIFValueResultp);
 static inline short                  _marpaESLIFRecognizer_meta_matcherb(marpaESLIFRecognizer_t *marpaESLIFRecognizerp, marpaESLIF_symbol_t *symbolp, marpaESLIF_matcher_value_t *rcip, marpaESLIFValueResult_t *marpaESLIFValueResultp, short *exhaustedbp, int maxStartCompletionsi, size_t *lastSizeBeforeCompletionlp, int *numberOfStartCompletionsip);
@@ -1089,11 +1089,9 @@ static inline marpaESLIF_terminal_t *_marpaESLIF_terminal_newp(marpaESLIF_t *mar
     if (terminalp->regex.patternp == NULL) {
       pcre2_get_error_message(pcre2Errornumberi, pcre2ErrorBuffer, sizeof(pcre2ErrorBuffer));
       MARPAESLIF_ERRORF(marpaESLIFp, "%s: pcre2_compile failure at offset %ld: %s", terminalp->descp->asciis, (unsigned long) pcre2ErrorOffsetl, pcre2ErrorBuffer);
-#ifndef MARPAESLIF_NTRACE
       if (marpaESLIFRecognizerp != NULL) {
         MARPAESLIF_HEXDUMPV(marpaESLIFRecognizerp, "Dump of PCRE2 pattern", " as an UTF-8 sequence of bytes", utf8s, utf8l, 0 /* traceb */);
       }
-#endif
       goto err;
     }
     terminalp->regex.match_datap = pcre2_match_data_create(1 /* We are interested in the string that matched the full pattern */,
@@ -1960,7 +1958,6 @@ static inline short _marpaESLIFGrammar_validateb(marpaESLIFGrammar_t *marpaESLIF
             MARPAESLIF_ERRORF(marpaESLIFp, "lhsRuleStackp push failure, %s", strerror(errno));
             goto err;
           }
-          break;
         }
       }
       symbolp->lhsb = lhsb;
@@ -3655,7 +3652,7 @@ short marpaESLIF_extend_builtin_actionb(marpaESLIF_t *marpaESLIFp, char **action
   marpaESLIFGrammarOption.encodingl           = 0;
   marpaESLIFGrammarOption.encodingOfEncodings = NULL;
   /* Per def the output of _marpaESLIFGrammar_newp() will be marpaESLIFTmpp->marpaESLIFGrammarp if success */
-  if (_marpaESLIFGrammar_newp(marpaESLIFp, &marpaESLIFGrammarOption, marpaESLIFTmpp->marpaESLIFGrammarp /* marpaESLIfGrammarPreviousp */) == NULL) {
+  if (_marpaESLIFGrammar_newp(marpaESLIFp, &marpaESLIFGrammarOption, marpaESLIFTmpp->marpaESLIFGrammarp /* marpaESLIfGrammarPreviousp */, 0 /* unsafeb */) == NULL) {
     goto err;
   }
 
@@ -4456,39 +4453,64 @@ marpaESLIFGrammar_t *marpaESLIFGrammar_newp(marpaESLIF_t *marpaESLIFp, marpaESLI
     return NULL;
   }
   
-  return _marpaESLIFGrammar_newp(marpaESLIFp, marpaESLIFGrammarOptionp, NULL /* marpaESLIfGrammarPreviousp */);
+  return _marpaESLIFGrammar_newp(marpaESLIFp, marpaESLIFGrammarOptionp, NULL /* marpaESLIfGrammarPreviousp */, 0 /* unsafeb */);
 }
 
 /*****************************************************************************/
-static inline marpaESLIFGrammar_t *_marpaESLIFGrammar_newp(marpaESLIF_t *marpaESLIFp, marpaESLIFGrammarOption_t *marpaESLIFGrammarOptionp, marpaESLIFGrammar_t *marpaESLIfGrammarPreviousp)
+marpaESLIFGrammar_t *marpaESLIFGrammar_unsafe_newp(marpaESLIF_t *marpaESLIFp, marpaESLIFGrammarOption_t *marpaESLIFGrammarOptionp)
+/*****************************************************************************/
+{
+  if (marpaESLIFp == NULL) {
+    errno = EINVAL;
+    return NULL;
+  }
+  
+  return _marpaESLIFGrammar_newp(marpaESLIFp, marpaESLIFGrammarOptionp, NULL /* marpaESLIfGrammarPreviousp */, 1 /* unsafeb */);
+}
+
+/*****************************************************************************/
+static inline marpaESLIFGrammar_t *_marpaESLIFGrammar_newp(marpaESLIF_t *marpaESLIFp, marpaESLIFGrammarOption_t *marpaESLIFGrammarOptionp, marpaESLIFGrammar_t *marpaESLIfGrammarPreviousp, short unsafeb)
 /*****************************************************************************/
 {
   static const char                *funcs                      = "_marpaESLIFGrammar_newp";
+  marpaESLIF_t                     *marpaESLIFTmpp             = NULL;
   marpaESLIFRecognizerOption_t      marpaESLIFRecognizerOption = marpaESLIFRecognizerOption_default_template;
   marpaESLIFValueOption_t           marpaESLIFValueOption      = marpaESLIFValueOption_default_template;
   marpaESLIFGrammar_t              *marpaESLIFGrammarp         = NULL;
   marpaESLIF_readerContext_t        marpaESLIF_readerContext;
   int                               grammari;
 
-  /* MARPAESLIF_TRACE(marpaESLIFp, funcs, "Building Grammar"); */
+  if (! unsafeb) {
+    MARPAESLIF_TRACE(marpaESLIFp, funcs, "Cloning ESLIF");
+    /* We say that ESLIF is thread-safe, this is entirely true if building a grammar from it is thread-safe */
+    /* thus we have to clone ESLIF, because this is itself a grammar, and we will use a recognizer from it */
+    marpaESLIFTmpp = _marpaESLIF_newp(&(marpaESLIFp->marpaESLIFOption), 1 /* validateb */);
+    if (marpaESLIFTmpp == NULL) {
+      goto err;
+    }
+    MARPAESLIF_TRACE(marpaESLIFTmpp, funcs, "Building Grammar using ESLIF clone");
+  } else {
+    marpaESLIFTmpp = marpaESLIFp;
+    MARPAESLIF_TRACE(marpaESLIFTmpp, funcs, "Building Grammar using ESLIF");
+  }
 
   if (marpaESLIFGrammarOptionp == NULL) {
-    MARPAESLIF_ERROR(marpaESLIFp, "marpaESLIFGrammarOptionp must be set");
+    MARPAESLIF_ERROR(marpaESLIFTmpp, "marpaESLIFGrammarOptionp must be set");
     goto err;
   }
 
   if (marpaESLIFGrammarOptionp->bytep == NULL) {
-    MARPAESLIF_ERRORF(marpaESLIFp, funcs, "Null source pointer");
+    MARPAESLIF_ERRORF(marpaESLIFTmpp, funcs, "Null source pointer");
     goto err;
   }
 
   if (marpaESLIfGrammarPreviousp == NULL) {
     marpaESLIFGrammarp = (marpaESLIFGrammar_t *) malloc(sizeof(marpaESLIFGrammar_t));
     if (marpaESLIFGrammarp == NULL) {
-      MARPAESLIF_ERRORF(marpaESLIFp, "malloc failure, %s", strerror(errno));
+      MARPAESLIF_ERRORF(marpaESLIFTmpp, "malloc failure, %s", strerror(errno));
       goto err;
     }
-    marpaESLIFGrammarp->marpaESLIFp             = marpaESLIFp;
+    marpaESLIFGrammarp->marpaESLIFp             = marpaESLIFTmpp;
     marpaESLIFGrammarp->marpaESLIFGrammarOption = *marpaESLIFGrammarOptionp;
     marpaESLIFGrammarp->grammarStackp           = NULL;
     marpaESLIFGrammarp->grammarp                = NULL;
@@ -4500,7 +4522,7 @@ static inline marpaESLIFGrammar_t *_marpaESLIFGrammar_newp(marpaESLIF_t *marpaES
   }
 
   /* Our internal grammar reader callback */
-  marpaESLIF_readerContext.marpaESLIFp              = marpaESLIFp;
+  marpaESLIF_readerContext.marpaESLIFp              = marpaESLIFTmpp;
   marpaESLIF_readerContext.marpaESLIFGrammarOptionp = marpaESLIFGrammarOptionp;
 
   /* Overwrite things not setted in the template, or with which we want a change */
@@ -4517,7 +4539,7 @@ static inline marpaESLIFGrammar_t *_marpaESLIFGrammar_newp(marpaESLIF_t *marpaES
 
   /* Parser will automatically create marpaESLIFValuep and assign an internal recognizer to its userDatavp */
   /* The value of our internal parser is a grammar stack */
-  if (! _marpaESLIFGrammar_parseb(marpaESLIFp->marpaESLIFGrammarp,
+  if (! _marpaESLIFGrammar_parseb(marpaESLIFTmpp->marpaESLIFGrammarp,
                                   &marpaESLIFRecognizerOption,
                                   &marpaESLIFValueOption,
                                   0, /* discardb */
@@ -4546,6 +4568,11 @@ static inline marpaESLIFGrammar_t *_marpaESLIFGrammar_newp(marpaESLIF_t *marpaES
     break;
   }
 
+  if (! unsafeb) {
+    /* Success. We have to take care of one thing: the new grammar maintains a pointer to its parent's ESLIF */
+    marpaESLIFGrammarp->marpaESLIFp = marpaESLIFp;
+  }
+  
   goto done;
 
  err:
@@ -4556,6 +4583,12 @@ static inline marpaESLIFGrammar_t *_marpaESLIFGrammar_newp(marpaESLIF_t *marpaES
   marpaESLIFGrammarp = NULL;
 
  done:
+  if (! unsafeb) {
+    if (marpaESLIFTmpp != NULL) {
+      marpaESLIF_freev(marpaESLIFTmpp);
+    }
+  }
+
   return marpaESLIFGrammarp;
 }
 

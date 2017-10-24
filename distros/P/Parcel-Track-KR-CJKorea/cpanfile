@@ -4,7 +4,6 @@ requires "HTML::Selector::XPath" => "0";
 requires "HTML::TreeBuilder::XPath" => "0";
 requires "HTTP::Tiny" => "0";
 requires "IO::Socket::SSL" => "0";
-requires "JSON::PP" => "2.27300";
 requires "Moo" => "0";
 requires "Mozilla::CA" => "0";
 requires "Parcel::Track" => "0.001";
@@ -30,6 +29,10 @@ on 'configure' => sub {
   requires "perl" => "5.008";
 };
 
+on 'configure' => sub {
+  suggests "JSON::PP" => "2.27300";
+};
+
 on 'develop' => sub {
   requires "Dist::Zilla" => "5";
   requires "Dist::Zilla::Plugin::Prereqs" => "0";
@@ -43,9 +46,11 @@ on 'develop' => sub {
   requires "Pod::Wordlist" => "0";
   requires "Software::License::Perl_5" => "0";
   requires "Test::CPAN::Meta" => "0";
+  requires "Test::MinimumVersion" => "0";
   requires "Test::More" => "0";
   requires "Test::Pod" => "1.41";
   requires "Test::Pod::Coverage" => "1.08";
+  requires "Test::Portability::Files" => "0";
   requires "Test::Spelling" => "0.12";
   requires "Test::Version" => "1";
   requires "blib" => "1.01";

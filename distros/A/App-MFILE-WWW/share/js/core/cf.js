@@ -69,7 +69,7 @@ define ([
         r = (state.hasOwnProperty(param))
             ? state[param]
             : module.config()[param];
-        console.log("cf(): config param '" + param + "' is", r);
+        // console.log("cf(): config param '" + param + "' is", r);
         return r;
     };
 

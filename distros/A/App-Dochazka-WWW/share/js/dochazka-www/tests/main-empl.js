@@ -40,6 +40,7 @@ define ([
   'QUnit',
   'jquery',
   'app/canned-tests',
+  'app/caches',
   'lib',
   'login',
   'loggout',
@@ -49,6 +50,7 @@ define ([
   QUnit,
   $,
   ct,
+  appCaches,
   coreLib,
   login,
   loggout,
@@ -81,35 +83,49 @@ define ([
             }, 2000);
         });
 
-        test_desc = 'employee profile - ACL failure';
+        test_desc = 'employee profile - passerby';
         QUnit.test(test_desc, function (assert) {
-            var done = assert.async(3);
+            var done = assert.async(4),
+                fullProfile;
             console.log("***TEST*** " + prefix + test_desc);
             login({"nam": "demo", "pwd": "demo"});
             setTimeout(function() {
                 var htmlbuf,
                     result;
                 ct.login(assert, "demo", "passerby");
+                done();
+            }, 1500);
+            setTimeout(function () {
+                // assert.ok(true, "Employee profile cache: " + QUnit.dump.parse(appCaches.profileCache));
+                assert.ok(appCaches.profileCacheLength() > 0, "Employee profile cache populated");
+                fullProfile = appCaches.getProfileByNick('demo');
+                assert.ok("emp" in fullProfile, "Employee profile cache populated with an employee");
+                assert.strictEqual(
+                    fullProfile.emp.nick,
+                    "demo",
+                    "Employee profile cache populated with employee \"demo\""
+                );
                 ct.mainMenuToMainEmpl(assert);
                 assert.ok(true, 'select 0 ("My profile") in mainEmpl as demo');
                 $('input[name="sel"]').val('0');
                 $('input[name="sel"]').focus();
                 $('input[name="sel"]').trigger($.Event("keydown", {keyCode: 13}));
-                ct.ajaxCallInitiated(assert);
+                // no AJAX call is initiated, because the profile is already in the cache
+                // ct.ajaxCallInitiated(assert);
                 done();
-            }, 1000);
+            }, 2000);
             setTimeout(function() {
-                var result = $("#result"),
-                    htmlbuf = result.html();
-                assert.ok(htmlbuf, "#result html: " + htmlbuf);
-                ct.contains(assert, htmlbuf, "#result", 'ACL check failed for resource');
+                // assert.ok(true, $("#mainarea").html());
+                ct.mainareaForm(assert, 'empProfile');
+                // FIXME: test for non-existence of entries here, since we are
+                // just a "passerby"
                 loggout();
                 done();
-            }, 1500);
+            }, 2500);
             setTimeout(function () {
                 ct.loggout(assert);
                 done();
-            }, 2000);
+            }, 3000);
         });
 
         test_desc = 'LDAP lookup - success';

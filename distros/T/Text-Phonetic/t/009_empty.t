@@ -1,6 +1,6 @@
 # -*- perl -*-
 
-# t/009_empty.t - empty string test 
+# t/009_empty.t - empty string test
 
 use Test::Most tests=>(7*4)+1;
 use Test::NoWarnings;
@@ -21,7 +21,7 @@ my %algorithms = (
 );
 
 while (my ($algorithm,$predicate) = each %algorithms) {
-    
+
     if (run_conditional($predicate,4)) {
         my $object = Text::Phonetic->load(
             algorithm   => $algorithm,

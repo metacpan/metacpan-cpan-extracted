@@ -1,5 +1,8 @@
 Revision history for Map::Tube::London
 
+0.91  2017-10-24
+      - Updated dependency on Map::Tube v3.36.
+
 0.90  2017-10-13
       - Updated london map data with regard to the line id.
 

@@ -229,14 +229,40 @@ define ([
 
         QUnit.test('time range vetter function - offset', function (assert) {
             timerange_valid(assert, "8+1");
-            timerange_invalid(assert, "16+10");
+            timerange_valid(assert, "16+10");
             timerange_valid(assert, "8:00+1");
             timerange_valid(assert, "8:00+1:45");
             timerange_valid(assert, "8:45+1:45");
             timerange_valid(assert, "8:45+1:55");
             timerange_valid(assert, "23:45+0:15");
-            timerange_invalid(assert, "23:45+0:16");
+            timerange_valid(assert, "23:45+0:16");
             timerange_valid(assert, "0+0");
+            timerange_valid(assert, "+0:00");
+            timerange_valid(assert, "+1:5");
+            timerange_valid(assert, "+");
+        });
+
+        QUnit.test('is time range after time', function (assert) {
+            assert.ok(dt.isTimeRangeAfterTime('08:00-12:00', '07:30'), "08:00 is after 07:30");
+            assert.ok(dt.isTimeRangeAfterTime('08:00-12:00', "7:30"), "08:00 is after 7:30");
+            assert.ok(dt.isTimeRangeAfterTime('8:00-12:00', "07:30"), "8:00 is after 07:30");
+            assert.ok(dt.isTimeRangeAfterTime('8:00-9:0', "7:3"), "8:00 is after 7:3");
+            assert.notOk(dt.isTimeRangeAfterTime('8:00-9:00', "8:00"), "8:00 is NOT after 8:00");
+            assert.notOk(dt.isTimeRangeAfterTime('8:00-9:00', "8:01"), "8:00 is NOT after 8:01");
+            assert.notOk(dt.isTimeRangeAfterTime('8:00-9:00', "9:00"), "8:00 is NOT after 9:00");
+        });
+
+        QUnit.test('is time within time range', function (assert) {
+            assert.notOk(dt.isTimeWithinTimeRange('07:30', '08:00-12:00'), "07:30 is not within 08:00-12:00");
+            assert.notOk(dt.isTimeWithinTimeRange('7:40', '08:00-12:00'), "7:40 is not within 08:00-12:00");
+            assert.ok(dt.isTimeWithinTimeRange('8:00', '08:00-12:00'), "8:00 is within 08:00-12:00");
+            assert.ok(dt.isTimeWithinTimeRange('8:15', '08:00-12:00'), "8:15 is within 08:00-12:00");
+            assert.ok(dt.isTimeWithinTimeRange('8:55', '08:00-12:00'), "8:55 is within 08:00-12:00");
+            assert.ok(dt.isTimeWithinTimeRange('9:00', '08:00-12:00'), "9:00 is within 08:00-12:00");
+            assert.ok(dt.isTimeWithinTimeRange('10:46', '08:00-12:00'), "10:46 is within 08:00-12:00");
+            assert.notOk(dt.isTimeWithinTimeRange('12:00', '08:00-12:00'), "12:00 is not within 08:00-12:00");
+            assert.notOk(dt.isTimeWithinTimeRange('12:15', '08:00-12:00'), "12:15 is not within 08:00-12:00");
+            assert.notOk(dt.isTimeWithinTimeRange('13:00', '08:00-12:00'), "13:00 is not within 08:00-12:00");
         });
 
     };

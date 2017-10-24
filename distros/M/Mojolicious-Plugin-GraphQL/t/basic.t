@@ -7,28 +7,27 @@ BEGIN {
 use Test::More;
 use Mojolicious::Lite;
 use GraphQL::Schema;
-use GraphQL::Type::Object;
-use GraphQL::Type::Scalar qw/ $String /;
 
-my $schema = GraphQL::Schema->new(
-  query => GraphQL::Type::Object->new(
-    name => 'QueryRoot',
-    fields => {
-      helloWorld => {
-        type => $String,
-        resolve => sub { 'Hello, world!' },
-      },
-    },
-  ),
-);
-plugin GraphQL => {schema => $schema, graphiql => 1};
+my $schema = GraphQL::Schema->from_doc(<<'EOF');
+schema {
+  query: QueryRoot
+}
+type QueryRoot {
+  helloWorld: String
+}
+EOF
+plugin GraphQL => {
+  schema => $schema,
+  root_value => { helloWorld => 'Hello, world!' },
+  graphiql => 1,
+};
 plugin GraphQL => {endpoint => '/graphql2', handler => sub {
   my ($c, $body, $execute) = @_;
   # returns JSON-able Perl data
   $execute->(
     $schema,
     $body->{query},
-    undef, # $root_value
+    { helloWorld => 'Hello, world!' }, # $root_value
     $c->req->headers,
     $body->{variables},
     $body->{operationName},
@@ -42,9 +41,12 @@ use Test::Mojo;
 my $t = Test::Mojo->new;
 
 subtest 'GraphiQL' => sub {
-  my $res = $t->get_ok('/graphql', {
+  $t->get_ok('/graphql', {
     Accept => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
   })->content_like(qr/React.createElement\(GraphiQL/, 'Content as expected');
+  $t->get_ok('/graphql?query=%23%20Welcome%0A%7BhelloWorld%7D', {
+    Accept => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+  })->content_like(qr/query: "# Welcome/, 'Content en/decodes right');
 };
 
 subtest 'GraphQL with POST' => sub {

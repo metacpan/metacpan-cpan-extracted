@@ -2,7 +2,7 @@ package Test2::Harness::Job::Runner::Fork;
 use strict;
 use warnings;
 
-our $VERSION = '0.001021';
+our $VERSION = '0.001024';
 
 use Scalar::Util qw/openhandle/;
 use Test2::Util qw/clone_io CAN_REALLY_FORK pkg_to_file/;
@@ -129,7 +129,8 @@ sub { shift->import(@_) }
         Test2::API::test2_post_preload_reset();
     }
 
-    unshift @INC => @{$job->libs};
+    my %seen;
+    @INC = grep { !$seen{$_}++ } (@{$job->libs}, @INC);
 
     if ($job->use_stream) {
         $ENV{T2_FORMATTER} = 'Stream';

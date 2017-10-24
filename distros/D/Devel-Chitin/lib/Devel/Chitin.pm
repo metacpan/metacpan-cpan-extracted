@@ -4,10 +4,11 @@ use strict;
 
 package Devel::Chitin;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use Scalar::Util;
 use IO::File;
+use B;
 
 use Devel::Chitin::Actionable;  # Breakpoints and Actions
 use Devel::Chitin::Eval;
@@ -765,9 +766,21 @@ BEGIN {
 }
 
 
+# When using Class::Autouse, the B::* objects created below to determine if an
+# anon sub has a name (such as via Sub::Name) trigger calls to its UNIVERSAL
+# DESTROY as the B::* objects go out of scope as you step in to a call to
+# that named sub.  This hack gives those classes a DESTROY method to avoid that
+foreach my $class ( qw(B::HV B::GV B::CV) ) {
+    next if $class->can('DESTROY');
+    my $destroy = $class . '::DESTROY';
+    no strict 'refs';
+    *$destroy = sub {};
+}
+
 sub sub {
     no strict 'refs';
     goto &$sub if (! $ready or index($sub, 'Devel::Chitin::StackTracker') == 0 or $debugger_disabled);
+    #goto &$sub if (! $ready or $in_debugger or index($sub, 'Devel::Chitin::StackTracker') == 0 or $debugger_disabled);
 
     local $Devel::Chitin::current_sub = $sub unless $in_debugger;
 
@@ -783,7 +796,17 @@ sub sub {
         $stack_depth++;
         $stack_tracker = _new_stack_tracker(_allocate_sub_serial());
 
-        push(@Devel::Chitin::stack_serial, [ $sub, $$stack_tracker]);
+        my $subname = $sub;
+        if (ref $sub) {
+            my $cv = B::svref_2object($sub);
+            my $gv = $cv->GV;
+            if (my $name = $gv->NAME) {
+                my $package = $gv->STASH->NAME;
+                $subname = join('::', $package, $name);
+            }
+        }
+
+        push(@Devel::Chitin::stack_serial, [ $subname, $$stack_tracker]);
     }
 
     my @rv;
@@ -1090,7 +1113,7 @@ misleading deparse, so some adjustments may be made to the starting OP:
 
 Return the while loop condition instead of the whole loop
 
-=item list or function all (pushmark)
+=item list or function call (pushmark)
 
 Return either the list construction or the function call
 
@@ -1167,7 +1190,9 @@ statement in the debugged program.  Its return value is ignored
 =item CLIENT->poll($location)
 
 Called when the debugger is stopped on a line.  This method should return
-true to indicate that it wants its C<idle> method called.
+true to indicate that it wants its C<idle> method called.  C<$location>
+is an instance of L<Devel::Chitin::Location> indicating the next statement to
+be executed in the debugged program.
 
 =item CLIENT->idle($location)
 
@@ -1180,9 +1205,7 @@ true.
 =item CLIENT->notify_trace($location)
 
 If a client has turned on the trace flag, this method will be called before
-each executable statement.  The return value is ignored.  $location is an
-instance of L<Devel::Chitin::Location> indicating the next statement to be
-executed in the debugged program.
+each executable statement.  The return value is ignored.
 
 =item CLIENT->notify_trace_resumed($location)
 
@@ -1209,7 +1232,7 @@ This method is called immediately after the debugged program calls fork()
 in the context of the parent process.  C<$pid> is the child process ID
 created by the fork.  The return value is ignored.
 
-Note that the $location will be the first executable statement _after_ the
+Note that the $location will be the first executable statement B<after> the
 fork() in the parent process.
 
 =item CLIENT->notify_fork_child($location)
@@ -1217,7 +1240,7 @@ fork() in the parent process.
 This method is called immediately after the debugged program calls fork()
 in the context of the child process.  The return value is ignored.
 
-Note that the $location will be the first executable statement _after_ the
+Note that the $location will be the first executable statement B<after> the
 fork() in the parent process.
 
 =item CLIENT->notify_program_terminated($?)

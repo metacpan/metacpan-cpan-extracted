@@ -2,7 +2,7 @@ package Object::HashBase::Inline;
 use strict;
 use warnings;
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 BEGIN { $Object::HashBase::Test::NO_RUN = 1 }
 use Object::HashBase;
@@ -12,7 +12,8 @@ my $hb_file = $INC{'Object/HashBase.pm'};
 my $t_file  = $INC{'Object/HashBase/Test.pm'};
 
 sub inline {
-    my $prefix = shift;
+    my ($prefix, $version) = @_;
+    $version = $VERSION unless defined $version;
 
     my $path = $prefix;
     $path =~ s{::}{/}g;
@@ -34,22 +35,27 @@ sub inline {
     open(my $hin, '<', $hb_file) or die "Could not open '$hb_file': $!";
     open(my $tin, '<', $t_file)  or die "Could not open '$t_file': $!";
 
+
     print $hbf <<"    EOT";
 package $prefix\::HashBase;
 use strict;
 use warnings;
+
+our \$VERSION = '$version';
 
 #################################################################
 #                                                               #
 #  This is a generated file! Do not modify this file directly!  #
 #  Use hashbase_inc.pl script to regenerate this file.          #
 #  The script is part of the Object::HashBase distribution.     #
+#  Note: You can modify the version number above this comment   #
+#  if needed, that is fine.                                     #
 #                                                               #
 #################################################################
 
 {
     no warnings 'once';
-    \$$prefix\::HashBase::VERSION = '$Object::HashBase::VERSION';
+    \$$prefix\::HashBase::HB_VERSION = '$Object::HashBase::VERSION';
     \*$prefix\::HashBase::ATTR_SUBS = \\\%Object::HashBase::ATTR_SUBS;
     \*$prefix\::HashBase::ATTR_LIST = \\\%Object::HashBase::ATTR_LIST;
     \*$prefix\::HashBase::VERSION   = \\\%Object::HashBase::VERSION;

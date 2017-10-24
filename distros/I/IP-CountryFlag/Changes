@@ -1,5 +1,8 @@
 Revision history for IP::CountryFlag
 
+0.12    Mon Oct 23 11:10:00 2017
+        - Added test scripts (t/meta-json.t and t/meta-yml.t).
+
 0.11    Tue Oct 10 11:00:00 2017
         - Added key 'provides' to the Makefile.PL script.
 

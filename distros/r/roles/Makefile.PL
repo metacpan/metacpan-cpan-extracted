@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010000;
+use 5.010001;
 
 use ExtUtils::MakeMaker;
 
@@ -14,16 +14,15 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "roles",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.010000",
+  "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "roles",
   "PREREQ_PM" => {
-    "Devel::Hook" => 0,
-    "MOP" => 0
+    "MOP" => "0.10"
   },
   "TEST_REQUIRES" => {
     "Test::More" => 0
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.02",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -31,8 +30,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Devel::Hook" => 0,
-  "MOP" => 0,
+  "MOP" => "0.10",
   "Test::More" => 0
 );
 

@@ -1,8 +1,5 @@
 package Net::HTTP::Spore;
-{
-  $Net::HTTP::Spore::VERSION = '0.06';
-}
-
+$Net::HTTP::Spore::VERSION = '0.07';
 # ABSTRACT: SPORE client
 
 use Moose;
@@ -154,13 +151,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Net::HTTP::Spore - SPORE client
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -187,19 +186,24 @@ version 0.06
 
 This module is an implementation of the SPORE specification.
 
-To use this client, you need to use or to write a SPORE specification of an API.
-A description of the SPORE specification format is available at
+To use this client, you need to use or to write a SPORE specification of an
+API.  A description of the SPORE specification format is available at
 L<http://github.com/SPORE/specifications/blob/master/spore_description.pod>
 
-Some specifications for well-known services are available L<http://github.com/SPORE/api-description>.
+Some specifications for well-known services are available
+L<http://github.com/SPORE/api-description>.
 
 =head2 CLIENT CREATION
 
-First you need to create a client. This can be done using two methods, B<new_from_spec> and B<new_from_string>. The client will read the specification file to create a appropriate methods to interact with the API.
+First you need to create a client. This can be done using two methods,
+B<new_from_spec> and B<new_from_string>. The client will read the specification
+file to create the appropriate methods to interact with the API.
 
 =head2 MIDDLEWARES
 
-It's possible to activate some middlewares to extend the usage of the client. If you're using an API that discuss in JSON, you can enable the middleware L<Net::HTTP::Spore::Middleware::JSON>.
+It's possible to activate some middlewares to extend the usage of the client.
+If you're using an API that discuss in JSON, you can enable the middleware
+L<Net::HTTP::Spore::Middleware::JSON>.
 
     $client->enable('Format::JSON');
 
@@ -207,7 +211,7 @@ or only on some path
 
     $client->enable_if(sub{$_->[0]->path =~ m!/path/to/json/stuff!}, 'Format::JSON');
 
-For very simple middlewares, you can simple pass in an anonymous function
+For very simple middlewares, you can simply pass in an anonymous function
 
     $client->enable( sub { my $request = shift; ... } );
 
@@ -217,9 +221,9 @@ For very simple middlewares, you can simple pass in an anonymous function
 
 =item new_from_spec($specification_file, %args)
 
-Create and return a L<Net::HTTP::Spore::Core> object, with methods
-generated from the specification file. The specification file can
-either be a file on disk or a remote URL.
+Create and return a L<Net::HTTP::Spore::Core> object, with methods generated
+from the specification file. The specification file can either be a file on
+disk or a remote URL.
 
 =item new_from_string($specification_string, %args)
 
@@ -230,15 +234,19 @@ generated from a JSON specification string.
 
 =head2 TRACING
 
-L<Net::HTTP::Spore> provides a way to trace what's going on when doing a request.
+L<Net::HTTP::Spore> provides a way to trace what's going on when doing a
+request.
 
 =head3 Enabling Trace
 
-You can enable tracing using the environment variable B<SPORE_TRACE>. You can also enable tracing at construct time by adding B<trace =E<gt> 1> when calling B<new_from_spec>.
+You can enable tracing using the environment variable B<SPORE_TRACE>. You can
+also enable tracing at construct time by adding B<trace =E<gt> 1> when calling
+B<new_from_spec>.
 
 =head3 Trace Output
 
-By default output will be directed to B<STDERR>. You can specify another default output:
+By default output will be directed to B<STDERR>. You can specify another
+default output:
 
     SPORE_TRACE=1=log.txt
 
@@ -252,17 +260,21 @@ or
 
 =item *
 
-franck cuny <franck@lumberjaph.net>
+Franck Cuny <franck.cuny@gmail.com>
 
 =item *
 
 Ash Berlin <ash@cpan.org>
 
+=item *
+
+Ahmad Fatoum <athreef@cpan.org>
+
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by linkfluence.
+This software is copyright (c) 2012 by Linkfluence.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,23 @@
 Revision history for AnyEvent-WebSocket-Client
 
+0.43      2017-10-19 17:06:51 -0400
+
+0.42_01   2017-10-18 11:45:16 -0400
+  - You can now unregister event callbacks.
+  - The 'on' method for AnyEvent::WebSocket::Connection now returns a
+    code ref that can be used to unregister the callback.
+  - The 'each_message' event also gets a code ref that can be used to
+    unregister the callback.
+
+  [WARNING: change in behavior]
+  - The 'on' method for AnyEvent::WebSocket::Connection used to return
+    the connection object, the intent was to allow chaining of 'on' calls,
+    but this was never documented, and I don't believe it was ever used.
+  - The 'each_message' event has a different number of arguments, which
+    could break code that is using 'pop' to get the message instead of
+    using the second argument position.  If you were following the examples
+    in the documentation you wouldn't have done this.
+
 0.41      2017-08-11 14:05:40 -0400
   - Production version functionally identical to the 0.40_03 release.  
 

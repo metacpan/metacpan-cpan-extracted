@@ -109,7 +109,7 @@ define ([
         genericTable = function (tname, tobj, targetType) {
             return function (set) {
 
-                console.log("Generating source code of " + tname);
+                // console.log("Generating source code of " + tname);
                 // console.log("tobj", tobj);
                 // console.log("set", set);
                 var r = '<form id="' + tobj.name + '">',
@@ -134,9 +134,9 @@ define ([
                     headingsentry[e.prop] = e.text;
                 })
                 superset = set.concat([headingsentry]);
-                console.log("superset", superset);
+                // console.log("superset", superset);
                 for (column = 0; column < allEntries.length; column += 1) {
-                    console.log("Column " + column);
+                    // console.log("Column " + column);
                     entry = allEntries[column];
                     var elems = superset.map(function (obj) {
                         return obj[entry.prop];
@@ -174,10 +174,10 @@ define ([
                         var obj = set[row];
                         for (column = 0; column < allEntries.length; column += 1) {
                             entry = allEntries[column];
-                            console.log("entry", entry);
+                            // console.log("entry", entry);
                             if (lib.privCheck(entry.aclProfileRead)) {
                                 var val = obj[entry.prop];
-                                console.log("value", val);
+                                // console.log("value", val);
                                 r += lib.rightPadSpaces(val, maxl[column]);
                             }
                             if (column !== allEntries.length - 1) {
@@ -217,12 +217,12 @@ define ([
             var len, max;
             len = arr ? arr.length : 0;
             if (len > 0) {
-                console.log("arr has " + len + " members and the first one has text " + arr[0].text)
+                // console.log("arr has " + len + " members and the first one has text " + arr[0].text)
             } else {
                 console.log("CRITICAL ERROR: in maxLength(), arr has no members");
             }
             max = arr.reduce(function(prevVal, elem) {
-                if (elem.text === null) {
+                if (elem.text === null || elem.text === undefined || elem.hidden === true) {
                     elem.text = '&nbsp';
                 }
                 if (elem.text.length > prevVal) {
@@ -230,7 +230,7 @@ define ([
                 }
                 return prevVal;
             }, arr[0].text.length);
-            console.log("The longest entry is " + max + " characters long");
+            // console.log("The longest entry is " + max + " characters long");
             return max;
         }, // maxLength
 
@@ -240,13 +240,13 @@ define ([
                 entry,
                 i,
                 r;
-            console.log("miniMenu is ", mm);
-            console.log("miniMenu length is " + len);
+            // console.log("miniMenu is ", mm);
+            // console.log("miniMenu length is " + len);
             if (len > 0) {
                 r = 'Menu:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
                 for (i = 0; i < len; i += 1) {
-                    //console.log("i === " + i);
-                    console.log("Attempting to pull target " + entries[i] + " from miniMenu");
+                    // console.log("i === " + i);
+                    // console.log("Attempting to pull target " + entries[i] + " from miniMenu");
                     entry = target.pull(entries[i]);
                     if (lib.privCheck(entry.aclProfile)) {
                         r += i + '. ' + entry.menuText + '&nbsp;&nbsp;';
@@ -260,10 +260,14 @@ define ([
         }, // miniMenu       
 
         valueToDisplay = function (obj, prop, mode) {
-            console.log("valueToDisplay with object", obj, "and prop " + prop);
+            // console.log("valueToDisplay with object", obj, "and prop " + prop);
             // given an object and a property, return the value to display
             if (typeof obj !== 'object') {
-                return '(NOT_AN_OBJECT)';
+                if (mode === 'hidden') {
+                    return '';
+                } else {
+                    return '(NOT_AN_OBJECT)';
+                }
             } else if (! (prop in obj) || obj[prop] === null) {
                 if (mode === 'read') {
                     return '(none)';
@@ -271,7 +275,11 @@ define ([
                     return '';
                 }
             } else if (obj[prop] === undefined) {
-                return '(undefined)';
+                if (mode === 'hidden') {
+                    return '';
+                } else {
+                    return '(undefined)';
+                }
             } else if (obj[prop] === false) {
                 return 'NO';
             } else if (obj[prop] === true) {
@@ -387,7 +395,7 @@ define ([
                 r += yourChoice();
 
                 r += '</form>';
-                console.log("Assembled source code for " + dbn + " - it has " + r.length + " characters");
+                // console.log("Assembled source code for " + dbn + " - it has " + r.length + " characters");
                 return r;
 
             };
@@ -398,8 +406,7 @@ define ([
             // dfo is dform object
             var dfo = target.pull(dfn);
             return function (obj) {
-                console.log("Generating source code of dform " + dfn +
-                            " with object", obj);
+                // console.log("Generating source code of dform " + dfn + " with object", obj);
                 var r = '<form id="' + dfo.name + '">',
                     len,
                     i,
@@ -416,19 +423,19 @@ define ([
                 // determine characters needed for padding (based on longest
                 // entry)
                 if (dfo.entriesRead === undefined || dfo.entriesRead === null) {
-                    console.log("No entriesRead, initializing allEntries to empty array");
+                    // console.log("No entriesRead, initializing allEntries to empty array");
                     allEntries = lib.forceArray([]);
                 } else {
-                    console.log("entriesRead", dfo.entriesRead);
+                    // console.log("entriesRead", dfo.entriesRead);
                     allEntries = lib.forceArray(dfo.entriesRead);
                 }
                 if (dfo.entriesWrite !== undefined) {
-                    console.log("entriesWrite", dfo.entriesWrite);
+                    // console.log("entriesWrite", dfo.entriesWrite);
                     allEntries = allEntries.concat(
                         dfo.entriesWrite === null ? [] : dfo.entriesWrite
                     );
                 }
-                console.log("About to call maxLength() on allEntries", allEntries);
+                // console.log("About to call maxLength() on allEntries", allEntries);
                 needed = maxLength(allEntries) + 2;
 
                 // READ-ONLY entries first
@@ -440,14 +447,27 @@ define ([
                         r += Array(entry.maxlen).join(entry.text) + '<br>';
                     } else if (entry.name === 'emptyLine') {
                         r += '<br>';
+                    } else if (entry.name === 'textOnly') {
+                        r += entry.textOnly + '<br>';
                     } else if (lib.privCheck(entry.aclProfileRead)) {
-                        r += lib.rightPadSpaces(entry.text.concat(':'), needed);
-                        r += '<span id="' + entry.name + '">';
-                        r += valueToDisplay(obj, entry.prop, "read");
-                        r += '</span><br>';
+                        if (! entry.hidden) {
+                            r += lib.rightPadSpaces(entry.text.concat(':'), needed);
+                        }
+                        r += '<span ';
+                        if (entry.hidden) {
+                            r += 'hidden ';
+                        }
+                        r += 'id="' + entry.name + '">';
+                        r += valueToDisplay(obj, entry.prop, (entry.hidden ? "hidden" : "read"));
+                        r += '</span>';
+                        if (! entry.hidden) {
+                            r += '<br>';
+                        }
                     }
                 }
-                r += '<br>';
+                if (len > 0) {
+                    r += '<br>';
+                }
         
                 // READ-WRITE entries second
                 len = dfo.entriesWrite ? dfo.entriesWrite.length : 0;
@@ -463,8 +483,10 @@ define ([
                         r += 'maxlength="' + entry.maxlen + '"><br>';
                     }
                 }
-                r += '<br>';
-        
+                if (len > 0) {
+                    r += '<br>';
+                }
+
                 // miniMenu at the bottom
                 r += miniMenu(dfo.miniMenu);
 
@@ -472,13 +494,13 @@ define ([
                 r += yourChoice();
 
                 r += '</form>';
-                //console.log("Assembled source code for " + dfn + " - it has " + r.length + " characters");
+                // console.log("Assembled source code for " + dfn + " - it has " + r.length + " characters");
                 return r;
             };
         }, // dform
 
         dmenu: function (dmn) {
-            console.log("Entering html.dmenu with argument " + dmn);
+            // console.log("Entering html.dmenu with argument " + dmn);
             // dmn is dmenu name
             // dmo is dmenu object
             var dmo = target.pull(dmn),
@@ -493,7 +515,7 @@ define ([
             for (i = 0; i < len; i += 1) {
                 // the entries are names of targets
                 entry = target.pull(dmo.entries[i]);
-                console.log("Pulled target " + dmo.entries[i] + " with result ", entry);
+                // console.log("Pulled target " + dmo.entries[i] + " with result ", entry);
                 if (lib.privCheck(entry.aclProfile)) {
                     r += i + '. ' + entry.menuText + '<br>';
                 }
@@ -507,7 +529,7 @@ define ([
         }, // dmenu
 
         dnotice: function (dnn) {
-            console.log("Entering html.dnotice with argument " + dnn);
+            // console.log("Entering html.dnotice with argument " + dnn);
             // dnn is dnotice name
             // dno is dnotice object
             var dno = target.pull(dnn);

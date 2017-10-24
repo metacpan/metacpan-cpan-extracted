@@ -1,0 +1,28 @@
+---
+abstract: 'Easy installation of the Zcash cryptocoin full node daemon'
+author:
+  - 'Duke Leto <duke@leto.net>'
+build_requires: {}
+configure_requires:
+  Alien::Base::ModuleBuild: '0'
+  Module::Build: '0.38'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-Zcash
+provides:
+  Alien::Zcash:
+    file: lib/Alien/Zcash.pm
+requires:
+  Alien::Base: '0'
+  parent: '0'
+  perl: v5.8.1
+resources:
+  bugtracker: https://github.com/leto/Alien-Zcash/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/leto/Alien-Zcash
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

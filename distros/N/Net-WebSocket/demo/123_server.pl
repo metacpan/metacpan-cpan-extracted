@@ -10,6 +10,8 @@ use HTTP::Request ();
 use IO::Socket::INET ();
 use IO::Select ();
 
+use IO::Framed ();
+
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 
@@ -51,7 +53,9 @@ while ( my $sock = $server->accept() ) {
 
     NWDemo::set_signal_handlers_for_server($sock);
 
-    my $parser = Net::WebSocket::Parser->new($sock);
+    my $framed_obj = IO::Framed->new($sock);
+
+    my $parser = Net::WebSocket::Parser->new($framed_obj);
 
     $sock->blocking(0);
 
@@ -61,28 +65,24 @@ while ( my $sock = $server->accept() ) {
 
     my $ept = Net::WebSocket::Endpoint::Server->new(
         parser => $parser,
-        out => $sock,
+        out => $framed_obj,
     );
+    $ept->do_not_die_on_close();
 
     my $streamer = Net::WebSocket::Streamer::Server->new('text');
 
     my $cur_number = 0;
 
     while (!$ept->is_closed()) {
-        my $write_s = $ept->get_write_queue_size() ? $s : undef;
-
-        my ( $rdrs_ar, $wtrs_ar, $errs_ar ) = IO::Select->select( $s, $write_s, $s, 1 );
+        my ( $rdrs_ar, undef, $errs_ar ) = IO::Select->select( $s, undef, $s, 0 );
 
         my $is_final = ($cur_number == 2);
 
         my $method = $is_final ? 'create_final' : 'create_chunk';
 
-        if ( $wtrs_ar && @$wtrs_ar ) {
-            syswrite(
-                $sock,
-                $streamer->$method($cur_number)->to_bytes(),
-            );
-        }
+        $framed_obj->write(
+            $streamer->$method($cur_number)->to_bytes(),
+        );
 
         $cur_number++;
         $cur_number %= 3;
@@ -97,15 +97,7 @@ while ( my $sock = $server->accept() ) {
         }
 
         if ( $rdrs_ar && @$rdrs_ar ) {
-            try {
-                $ept->get_next_message();   #we don’t care what it is
-            }
-            catch {
-                if (!try { $_->isa('Net::WebSocket::X::ReceivedClose') } ) {
-                    local $@ = $_;
-                    die;
-                }
-            };
+            $ept->get_next_message();   #we don’t care what it is
         }
 
         sleep 1;

@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use Moose;
 
@@ -19,6 +19,14 @@ has _git => (
     default => sub { Git::Wrapper->new( path( shift->zilla->root )->absolute->stringify ) },
 );
 
+sub mvp_multivalue_args { return (qw( ignore )) }
+
+has ignore => (
+    is      => 'ro',
+    isa     => 'Maybe[ArrayRef]',
+    default => sub { [] },
+);
+
 use Carp;
 use Git::Wrapper;
 use Path::Tiny;
@@ -30,7 +38,8 @@ use namespace::autoclean;
 sub before_build {
     my ($self) = @_;
 
-    my @files = $self->_git_ls_files();
+    my %ignored_file = map { $_ => 1 } @{ $self->ignore };
+    my @files = grep { !exists $ignored_file{$_} } $self->_git_ls_files();
     return if !@files;
 
     my @errors;
@@ -109,7 +118,7 @@ Dist::Zilla::Plugin::Git::RequireUnixEOL - Enforce the correct line endings in y
 
 =head1 VERSION
 
-Version 0.001
+Version 0.002
 
 =head1 SYNOPSIS
 
@@ -120,7 +129,8 @@ Version 0.001
 
 This plugin checks that all the files in the Git repository where your
 project is saved use Unix line endings and have no whitespace at the end of
-a line. Files not in the Git index are ignored.
+a line. Files not in the Git index are ignored. You can ignore additional
+files with the B<ignore> option in F<dist.ini>.
 
 The plugin runs in the before build phase and aborts the build if a violation
 is found.

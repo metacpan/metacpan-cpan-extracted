@@ -2,22 +2,17 @@
 #
 #
 use Carp;
-use Getopt::Long;
 use Math::Polynomial::Solve qw(:numeric ascending_order);
 use Math::Complex;
 use Math::Matrix;
 use strict;
 use warnings;
-#use IO::Prompt;
 
-my $line;
-my $ascending = 0;
-
-GetOptions('ascending' => \$ascending);
+my $ascending = 1;
 
 ascending_order($ascending);
 
-while ($line = prompt("Polynomial: ", -num))
+while (my $line = prompt("Polynomial: "))
 {
 	my @coef = split(/,? /, $line);
 
@@ -53,7 +48,7 @@ sub rowprint
 	return $string;
 }
 
-sub cartesian_format($$@)
+sub cartesian_format
 {
 	my($fmt_re, $fmt_im, @numbers) = @_;
 	my(@cfn, $n, $r, $i);

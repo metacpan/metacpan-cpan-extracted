@@ -1,0 +1,8 @@
+severity = 1
+theme = thereisnosuchtheme
+
+[Modules::RequireNoMatchVarsWithUseEnglish]
+add_themes = thereisnosuchtheme
+
+[SKIRMESS]
+add_themes = thereisnosuchtheme

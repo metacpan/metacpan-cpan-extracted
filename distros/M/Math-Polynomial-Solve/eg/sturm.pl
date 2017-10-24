@@ -1,27 +1,21 @@
 #!/bin/perl
 #
 use Carp;
-use Getopt::Long;
 use Math::Polynomial::Solve qw(:sturm ascending_order);
 use strict;
 use warnings;
-#use IO::Prompt;
 
-my $line;
-my $ascending = 0;
-
-GetOptions('ascending' => \$ascending);
-
+my $ascending = 1;
 ascending_order($ascending);
 
-while ($line = prompt("Polynomial: ", -num))
+while (my $line = prompt("Polynomial: "))
 {
 	my @coef = split(/,? /, $line);
 
 	my @chain = poly_sturm_chain( @coef );
 
 	print "\nPolynomial: [", join(", ", @coef), "]\n";
-	foreach my $j (0..$#chain)
+	for my $j (0..$#chain)
 	{
 		my @c = @{$chain[$j]};
 		print sprintf("    Fn%02d: [", $j) . join(", ", @c), "]\n";

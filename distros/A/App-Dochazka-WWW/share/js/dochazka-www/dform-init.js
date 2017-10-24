@@ -65,12 +65,15 @@ define ([
             'title': 'My profile',
             'preamble': null,
             'aclProfile': 'passerby',
-            'entriesRead': [entries.ePfullname, entries.ePnick,
-                entries.ePsec_id, entries.ePemail, entries.ePremark,
+            'entriesRead': [
+                entries.ePfullname, entries.ePnick,
+                entries.ePsec_id, entries.ePemail,
+                entries.ePsuperNick, entries.ePremark,
                 coreLib.emptyLineEntry,
                 entries.ePpriv, entries.ePprivEffective,
                 coreLib.emptyLineEntry,
-                entries.ePsched, entries.ePschedEffective],
+                entries.ePscode, entries.ePsid, entries.ePschedEffective
+            ],
             'miniMenu': {
                 entries: ['empProfileEdit', 'ldapSync']
             }
@@ -293,8 +296,9 @@ define ([
             'type': 'dform',
             'menuText': 'Single interval',
             'title': 'Create a single interval',
-            'preamble': 'Enter date in format YYYY-MM-DD<br>' +
-                        'Enter time range using 24hr format, example 11:30-15:00<br>' +
+            'preamble': 'Enter date like, e.g.: 2017-JAN-5, 2017-1-5, 1-5, 1 5, today, tomorrow, etc.<br>' +
+                        'Enter time range e.g.: 11:30-15:00, 11:30-15, 11:30+3:30<br>' +
+                        'For validation, use <ENTER> to move to next field<br>' +
                         'Description is optional',
             'aclProfile': 'active',
             'entriesWrite': [entries.iNdate, entries.iNtimerange, entries.iNact, entries.iNdesc,],
@@ -319,8 +323,12 @@ define ([
             'menuText': "Last plus offset",
             'title': "Create interval \"last plus offset\"",
             'aclProfile': 'active',
-            'entriesRead': [entries.iNdate, entries.iNact, entries.iNdesc,
-                            entries.iNschedintvls, entries.iNlastexistintvl, entries.iNlastplusoffset,],
+            'entriesRead': [
+                entries.iNdate, entries.iNoffset, entries.iNact,
+                entries.acTaid, entries.iNdesc, entries.iNsid,
+                entries.iNschedintvls, entries.iNlastexistintvl,
+                entries.iNlastplusoffset,
+            ],
             'miniMenu': {
                 entries: ['createLastPlusOffsetSave'],
             }

@@ -2,7 +2,7 @@
 
 use warnings;
 use strict;
-use Test::Most tests => 41;
+use Test::Most tests => 46;
 use Test::Number::Delta;
 use Test::Carp;
 
@@ -35,7 +35,7 @@ LOOKUP: {
 	delta_within($location->{latitude}, 51.33, 1e-2);
 	delta_within($location->{longitude}, 1.43, 1e-2);
  
-	$location = $geocoder->geocode('Wokingham, Berkshire, England');
+	$location = $geocoder->geocode('Wokingham, Berkshire, United Kingdom');
 	ok(defined($location));
 	delta_within($location->{latitude}, 51.42, 1e-2);
 	delta_within($location->{longitude}, -0.84, 1e-2);
@@ -64,7 +64,7 @@ LOOKUP: {
 	delta_within($location->{latitude}, 38.99, 1e-2);
 	delta_within($location->{longitude}, -77.03, 1e-2);
  
-	$location = $geocoder->geocode('St Nicholas-at-Wade, Kent, England');
+	$location = $geocoder->geocode('St Nicholas-at-Wade, Kent, UK');
 	ok(defined($location));
 	delta_within($location->{latitude}, 51.35, 1e-2);
 	delta_within($location->{longitude}, 1.25, 1e-2);
@@ -77,13 +77,29 @@ LOOKUP: {
 	$location = $geocoder->geocode('Rockville Pike, Rockville, MD, USA');
 	ok(!defined($location));
 
-	$location = $geocoder->geocode('Rockville, Montgomery County, MD, USA');
+	$location = $geocoder->geocode({ location => 'Rockville, Montgomery County, MD, USA' });
 	ok(defined($location));
 	delta_within($location->{latitude}, 39.08, 1e-2);
 	delta_within($location->{longitude}, -77.15, 1e-2);
 
-	$location = $geocoder->geocode('Rockville, Montgomery County, Maryland, USA');
+	$location = $geocoder->geocode(location => 'Rockville, Montgomery County, Maryland, USA');
 	ok(defined($location));
 	delta_within($location->{latitude}, 39.08, 1e-2);
 	delta_within($location->{longitude}, -77.15, 1e-2);
+
+	$location = $geocoder->geocode(location => 'Temple Ewell, Kent, England');
+	ok(defined($location));
+	delta_within($location->{latitude}, 51.15, 1e-2);
+	delta_within($location->{longitude}, 1.27, 1e-2);
+
+	# my $address = $geocoder->reverse_geocode(latlng => '51.50,-0.13');
+	# like($address->{'city'}, qr/^London$/i, 'test reverse');
+
+	does_croak(sub { 
+		$location = $geocoder->geocode();
+	});
+
+	does_croak(sub { 
+		$location = $geocoder->reverse_geocode();
+	});
 }

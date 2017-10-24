@@ -13,7 +13,7 @@ my @module_files = (
 );
 
 my @scripts = (
-    'bin/gitbunch'
+    'script/gitbunch'
 );
 
 # no fake home requested

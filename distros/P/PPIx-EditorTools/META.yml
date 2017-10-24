@@ -2,42 +2,89 @@
 abstract: 'Utility methods and base class for manipulating Perl via PPI'
 author:
   - 'Steffen Mueller C<smueller@cpan.org>'
-  - 'Repackaged by Mark Grimes C<mgrimes@cpan.org>'
+  - 'Mark Grimes C<mgrimes@cpan.org>'
   - 'Ahmad M. Zawawi <ahmad.zawawi@gmail.com>'
+  - 'Gabor Szabo  <gabor@szabgab.com>'
+  - 'Yanick Champoux <yanick@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 6.59
-  File::Find: 0
-  File::Temp: 0
-  Test::Differences: 0
-  Test::More: '0.88'
-  Test::Most: 0
-  Test::NoWarnings: '0.084'
+  Class::Accessor: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Method::Signatures: '0'
+  Moose: '0'
+  MooseX::Declare: '0'
+  Test::Differences: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  Test::Most: '0'
+  autodie: '0'
+  lib: '0'
+  version: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 6.59
-distribution_type: module
-dynamic_config: 1
-generated_by: 'Module::Install version 1.08'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: PPIx-EditorTools
-no_index:
-  directory:
-    - inc
-    - t
+provides:
+  PPIx::EditorTools:
+    file: lib/PPIx/EditorTools.pm
+    version: '0.20'
+  PPIx::EditorTools::FindUnmatchedBrace:
+    file: lib/PPIx/EditorTools/FindUnmatchedBrace.pm
+    version: '0.20'
+  PPIx::EditorTools::FindVariableDeclaration:
+    file: lib/PPIx/EditorTools/FindVariableDeclaration.pm
+    version: '0.20'
+  PPIx::EditorTools::IntroduceTemporaryVariable:
+    file: lib/PPIx/EditorTools/IntroduceTemporaryVariable.pm
+    version: '0.20'
+  PPIx::EditorTools::Lexer:
+    file: lib/PPIx/EditorTools/Lexer.pm
+    version: '0.20'
+  PPIx::EditorTools::Outline:
+    file: lib/PPIx/EditorTools/Outline.pm
+    version: '0.20'
+  PPIx::EditorTools::RenamePackage:
+    file: lib/PPIx/EditorTools/RenamePackage.pm
+    version: '0.20'
+  PPIx::EditorTools::RenamePackageFromPath:
+    file: lib/PPIx/EditorTools/RenamePackageFromPath.pm
+    version: '0.20'
+  PPIx::EditorTools::RenameVariable:
+    file: lib/PPIx/EditorTools/RenameVariable.pm
+    version: '0.20'
+  PPIx::EditorTools::ReturnObject:
+    file: lib/PPIx/EditorTools/ReturnObject.pm
+    version: '0.20'
 requires:
-  Carp: 0
+  Carp: '0'
   Class::XSAccessor: '1.02'
-  File::Basename: 0
-  File::Spec: 0
-  PPI: '1.215'
-  PPI::Find: 0
-  Try::Tiny: '0.11'
-  perl: '5.008005'
+  File::Basename: '0'
+  File::Spec: '0'
+  PPI: '1.203'
+  PPI::Find: '0'
+  Try::Tiny: '0'
+  base: '0'
+  perl: '5.008'
+  strict: '0'
+  warnings: '0'
 resources:
-  bugtracker: https://github.com/szabgab/PPIx-EditorTools/issues
-  homepage: http://padre.perlide.org/
-  license: http://dev.perl.org/licenses/
-  repository: https://github.com/szabgab/PPIx-EditorTools
-version: '0.19'
+  bugtracker: https://github.com/yanick/PPIx-EditorTools/issues
+  homepage: https://github.com/yanick/PPIx-EditorTools
+  repository: https://github.com/yanick/PPIx-EditorTools.git
+version: '0.20'
+x_authority: cpan:YANICK
+x_contributors:
+  - 'Adam Kennedy <adamk@cpan.org>'
+  - 'Florian Schlichting <fschlich@zedat.fu-berlin.de>'
+  - 'Kevin Dawson <bowtie@cpan.org>'
+  - 'Ryan Niebur <rsn@cpan.org>'
+  - 'Sebastian Willing <sewi@cpan.org>'
+x_serialization_backend: 'YAML::Tiny version 1.67'

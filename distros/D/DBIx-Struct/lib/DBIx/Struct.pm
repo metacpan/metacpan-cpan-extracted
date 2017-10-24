@@ -191,7 +191,7 @@ use Scalar::Util 'refaddr';
 use base 'Exporter';
 use v5.14;
 
-our $VERSION = '0.36';
+our $VERSION = '0.37';
 
 our @EXPORT = qw{
     one_row
@@ -1174,10 +1174,10 @@ sub setup_row {
                     $chr->{COLUMN_NAME} =~ s/"//g;
                     $chr->{COLUMN_NAME} = lc $chr->{COLUMN_NAME};
                     push @fields, $chr->{COLUMN_NAME};
-                    if ($chr->{TYPE_NAME} =~ /^time/) {
+                    if ($chr->{TYPE_NAME} =~ /^time/i) {
                         push @timestamp_fields, $chr->{COLUMN_NAME};
                     }
-                    if ($chr->{TYPE_NAME} =~ /^json/) {
+                    if ($chr->{TYPE_NAME} =~ /^json/i) {
                         $json_fields{$chr->{COLUMN_NAME}} = undef;
                     }
                     $chr->{COLUMN_DEF} ||= $chr->{mysql_is_auto_increment};

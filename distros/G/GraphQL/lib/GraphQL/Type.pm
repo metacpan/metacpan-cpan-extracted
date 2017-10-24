@@ -6,7 +6,7 @@ use warnings;
 use Moo;
 use Return::Type;
 use Function::Parameters;
-use Types::Standard qw(InstanceOf Any); # if -all causes objects to be class 'Object'!
+use Types::Standard qw(InstanceOf Any HashRef Str); # if -all causes objects to be class 'Object'!
 with 'GraphQL::Role::Listable';
 
 our $VERSION = '0.02';
@@ -105,17 +105,6 @@ L<Function::Parameters>/L<Return::Type> methods and functions.
 
 =head1 METHODS
 
-=head2 clone
-
-Shallow copy of the object, suitable for reblessing without affecting
-the original object.
-
-=cut
-
-method clone() :ReturnType(InstanceOf['GraphQL::Type']) {
-  ref($self)->new(%$self)
-}
-
 =head2 uplift
 
 Turn given Perl entity into valid Perl value for this type if possible.
@@ -133,6 +122,28 @@ Turn given GraphQL entity into Perl entity.
 Turn given Perl entity into GraphQL entity.
 
 =cut
+
+=head2 from_ast($name2type, $ast_node)
+
+Class method.  C<$name2type> is a hash-ref populated by
+L<GraphQL::Schema/from_ast>.  Takes a hash-ref node from an AST made by
+L<GraphQL::Language::Parser/parse>. Returns a type object.
+
+=head2 to_doc($doc)
+
+Returns Schema Definition Language (SDL) document that describes this
+object.
+
+=cut
+
+method _from_ast_maptype(
+  HashRef $name2type,
+  HashRef $ast_node,
+  Str $key,
+) {
+  return if !$ast_node->{$key};
+  ($key => sub { [ map $name2type->{$_}, @{$ast_node->{$key}} ] });
+}
 
 __PACKAGE__->meta->make_immutable();
 

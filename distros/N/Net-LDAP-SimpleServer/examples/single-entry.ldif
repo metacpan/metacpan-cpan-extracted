@@ -1,6 +1,6 @@
 version: 1
 
-dn: CN=Alexei Znamensky,OU=SnakeOil,OU=Extranet,DC=sa,DC=mynet,DC=net
+dn: CN=Alexei Znamensky,DC=SnakeOil,DC=com
 objectClass: top
 objectClass: person
 objectClass: organizationalPerson
@@ -8,8 +8,8 @@ objectClass: user
 cn: Alexei Znamensky
 description: Consultant - SnakeOil Brazil on Extranet
 displayName: Alexei Znamensky
-distinguishedName: CN=Alexei Znamensky,OU=SnakeOil,OU=Extranet,DC=sa,DC=mynet,DC=net
+distinguishedName: CN=Alexei Znamensky,DC=SnakeOil,DC=com
 givenName: Alexei
-manager: CN=John Doe,OU=SnakeOil,OU=Extranet,DC=na,DC=mynet,DC=net
+manager: CN=John Doe,DC=SnakeOil,DC=com
 name: Alexei Znamensky
 sn: Znamensky

@@ -12,6 +12,8 @@ package Foo {
 
     has _bar => ();
 
+    my sub _bar : private;
+
     sub bar ($self, $x = undef) {
         _bar = $x if $x;
         _bar + 1;

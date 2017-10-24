@@ -79,7 +79,7 @@
          "web" : "https://github.com/reyjrar/WWW-Subsonic"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026000"
@@ -261,6 +261,11 @@
             "version" : "6.010"
          },
          {
+            "class" : "Dist::Zilla::Plugin::MetaYAML",
+            "name" : "MetaYAML",
+            "version" : "6.010"
+         },
+         {
             "class" : "Dist::Zilla::Plugin::MetaConfig",
             "name" : "MetaConfig",
             "version" : "6.010"
@@ -382,7 +387,7 @@
                   "version_regexp" : "(?^u:^v(.+)$)"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.13.3",
+                  "git_version" : "2.14.2",
                   "repo_root" : "."
                }
             },
@@ -411,7 +416,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.13.3",
+                  "git_version" : "2.14.2",
                   "repo_root" : "."
                }
             },
@@ -454,7 +459,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.13.3",
+                  "git_version" : "2.14.2",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -471,12 +476,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.001",
+                  "tag" : "v0.002",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.13.3",
+                  "git_version" : "2.14.2",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -507,7 +512,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.13.3",
+                  "git_version" : "2.14.2",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -527,7 +532,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.13.3",
+                  "git_version" : "2.14.2",
                   "repo_root" : "."
                }
             },
@@ -594,7 +599,8 @@
       }
    },
    "x_contributors" : [
-      "Brad Lhotsky <brad.lhotsky@gmail.com>"
+      "Brad Lhotsky <brad.lhotsky@gmail.com>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }

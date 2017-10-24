@@ -23,6 +23,7 @@ sub main {
         _test_with_unix_file();
         _test_with_windows_file();
         _test_with_whitespace_at_end_file();
+        _test_with_ignored_whitespace_at_end_file();
     }
 
     done_testing();
@@ -133,6 +134,44 @@ sub _test_with_whitespace_at_end_file {
     is( @exception, 2, 'Build failed' );
     like( $exception[0], "/ ^ \Q[Git::RequireUnixEOL] ------------------------------------------------------------\E /xsm", '... correct message' );
     like( $exception[1], "/ ^ \Q[Git::RequireUnixEOL] File $file_name has trailing whitespace on line 1\E /xsm",            '... correct message' );
+
+    return;
+}
+
+sub _test_with_ignored_whitespace_at_end_file {
+    note('test with an ignored file with whitespace at end of line');
+
+    # Create a new "distribution".
+    #
+    # This copies the content of dist_root to a new directory: $tzil->root
+    my $tzil = Builder->from_config(
+        { dist_root => tempdir() },
+        {
+            add_files => {
+                'source/dist.ini' => simple_ini(
+                    'Git::GatherDir',
+                    [
+                        'Git::RequireUnixEOL',
+                        {
+                            ignore => 'whitespace.txt',
+                        },
+                    ],
+                ),
+            },
+        },
+    );
+
+    # Get the directory where the source of the new distributions is
+    my $root_dir = path( $tzil->root );
+
+    my $git = Git::Wrapper->new($root_dir);
+    $git->init();
+
+    my $file_name = 'whitespace.txt';
+    path($root_dir)->child($file_name)->spew_raw("whitespace file\t\n");
+    $git->add($file_name);
+
+    is( exception { $tzil->build; }, undef, 'Built dist successfully' );
 
     return;
 }

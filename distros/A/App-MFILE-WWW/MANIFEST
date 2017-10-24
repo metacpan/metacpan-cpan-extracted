@@ -35,6 +35,7 @@ share/js/core/login.js
 share/js/core/login-dialog.js
 share/js/core/loggout.js
 share/js/core/main.js
+share/js/core/populate.js
 share/js/core/prototypes.js
 share/js/core/qunit.js
 share/js/core/qunit-1.15.0.js

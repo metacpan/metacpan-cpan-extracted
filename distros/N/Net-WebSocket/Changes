@@ -64,3 +64,24 @@ Revision history for Perl module Net::WebSocket
 
 0.031 Tue May 9 2017
 - Sync documentation with 0.03 API changes
+
+- Document SERVER_ERROR anomaly re RFC erratum
+
+- Straighten out a bit of POD in the main distro docs
+
+0.04 Tue Sep 26 2017
+- Support extensions in handshake.
+
+- Allow get_next_message() not to throw an exception on a close frame.
+
+- Add received_close_frame() and sent_close_frame() methods.
+
+- Further documentation updates to accommodate 0.03 API changes
+
+- Replace more plain exceptions with objects
+
+0.05 Tue Oct 24 2017
+- PMCE support, including permessage-deflate
+
+- Major revamp of handshake logic: Net::WebSocket can now handle
+the entire handshake.

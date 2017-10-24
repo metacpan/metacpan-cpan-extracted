@@ -65,7 +65,6 @@ define ([
                     // success callback
                     sc = function (st) {
                         if (st.code === 'DISPATCH_RECORDS_FOUND') {
-                            console.log("Payload is", st.payload);
                             var history = st.payload.history.map(
                                 function (row) {
                                     return {
@@ -89,7 +88,6 @@ define ([
                         }
                     },
                     fc = function (st) {
-                        console.log("AJAX: " + rest["path"] + " failed with", st);
                         if (st.payload.code === "404") {
                             // The employee has no history records. This is not
                             // really an error condition.
@@ -130,13 +128,11 @@ define ([
                 // success callback
                 sc = function (st) {
                     if (st.code === 'DOCHAZKA_CUD_OK') {
-                        console.log("Payload is", st.payload);
                         stack.unwindToTarget("actionPrivHistory");
                         coreLib.displayError("Priv (status) history record successfully added");
                     }
                 },
                 fc = function (st) {
-                    console.log("AJAX: " + rest["path"] + " failed with", st);
                     coreLib.displayError(st.payload.message);
                 };
             ajax(rest, sc, fc);
@@ -159,7 +155,6 @@ define ([
                     }
                 },
                 fc = function (st) {
-                    console.log("AJAX: " + rest["path"] + " failed with", st);
                     coreLib.displayError(st.payload.message);
                 };
 

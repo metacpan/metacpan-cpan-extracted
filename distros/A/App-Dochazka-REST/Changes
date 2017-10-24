@@ -3711,3 +3711,6 @@ SPLIT OFF App::MREST into separate distribution
 - ResourceDefs: allow passerby to GET activities
 - doc: ResourceDefs: clarify schedule property of employee/self/full
 
+0.551 2017-10-20 15:29 CEST
+- ResourceDefs: allow passerby to GET schedule/sid/:sid
+

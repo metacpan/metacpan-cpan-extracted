@@ -5,6 +5,9 @@ use Moose::Role;
 # (package_name: Str) -> Any
 requires 'build_class';
 
+# ( package_name: Str) -> HashRef[Any]
+requires 'get_package_dependencies';
+
 # (service_name: Str[,environment: Str]) -> Any
 requires 'get_service';
 

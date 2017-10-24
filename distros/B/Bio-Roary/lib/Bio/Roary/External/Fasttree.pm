@@ -1,5 +1,5 @@
 package Bio::Roary::External::Fasttree;
-$Bio::Roary::External::Fasttree::VERSION = '3.10.2';
+$Bio::Roary::External::Fasttree::VERSION = '3.11.0';
 # ABSTRACT: Wrapper to run Fasttree
 
 
@@ -71,7 +71,7 @@ Bio::Roary::External::Fasttree - Wrapper to run Fasttree
 
 =head1 VERSION
 
-version 3.10.2
+version 3.11.0
 
 =head1 SYNOPSIS
 

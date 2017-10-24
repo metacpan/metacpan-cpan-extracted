@@ -7,7 +7,7 @@ package MarpaX::ESLIF::Grammar::Symbol::Properties;
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '2.0.16'; # VERSION
+our $VERSION = '2.0.17'; # VERSION
 
 
 #
@@ -269,8 +269,6 @@ sub getPropertyBitSet {
     return $self->{propertyBitSet}
 }
 
-1;
-
 __END__
 
 =pod
@@ -283,7 +281,7 @@ MarpaX::ESLIF::Grammar::Symbol::Properties - ESLIF Grammar Symbol Properties
 
 =head1 VERSION
 
-version 2.0.16
+version 2.0.17
 
 =head1 SYNOPSIS
 
@@ -334,7 +332,7 @@ version 2.0.16
 
 =head2 $self->getType
 
-Returns the type
+Returns the type, c.f. L<MarpaX::ESLIF::Symbol::Type>
 
 =head2 $self->isStart
 
@@ -499,6 +497,12 @@ Returns the low-level properties (combination of MarpaX::ESLIF::Symbol::Property
 ESLIF Grammar Symbol Properties.
 
 Calls to grammar's currentSymbolProperties() or symbolPropertiesByLevel() methods outputs an instance of this class.
+
+=head1 SEE ALSO
+
+L<MarpaX::ESLIF::Symbol::Type>
+
+1;
 
 =head1 AUTHOR
 

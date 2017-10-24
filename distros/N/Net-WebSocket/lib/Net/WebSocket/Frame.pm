@@ -78,6 +78,10 @@ use constant {
     LEN_LEN => 1,
     MASK => 2,
     PAYLOAD => 3,
+
+    _RSV1 => chr(4 << 4),
+    _RSV2 => chr(2 << 4),
+    _RSV3 => chr(1 << 4),
 };
 
 #fin, rsv, mask, payload_sr
@@ -98,10 +102,13 @@ sub new {
 
     $payload_sr ||= \do { my $v = q<> };
 
+    my ($byte2, $len_len) = $class->_assemble_length($payload_sr);
+
     if (defined $mask) {
         _validate_mask($mask);
 
         if (length $mask) {
+            $byte2 |= "\x80";
             Net::WebSocket::Mask::apply($payload_sr, $mask);
         }
     }
@@ -117,13 +124,25 @@ sub new {
         $first2 |= chr( $rsv << 4 );
     }
 
-    my ($byte2, $len_len) = $class->_assemble_length($payload_sr);
-
-    $byte2 |= "\x80" if $mask;
-
     substr( $first2, 1, 0, $byte2 );
 
     return bless [ \$first2, \$len_len, \$mask, $payload_sr ], $class;
+}
+
+sub set_payload_sr {
+    my ($self, $new_payload_sr) = @_;
+
+    my ($byte2, $len_len) = $self->_assemble_length($new_payload_sr);
+
+    if (length ${ $self->[2] }) {
+        $byte2 |= "\x80";
+        Net::WebSocket::Mask::apply($new_payload_sr, ${ $self->[2] });
+    }
+
+    substr( ${ $self->[0] }, 1, 1, $byte2 );
+    @{$self}[1, 3] = (\$len_len, $new_payload_sr);
+
+    return $self;
 }
 
 # All string refs: first2, length octets, mask octets, payload
@@ -170,6 +189,36 @@ sub set_rsv {
     ${ $self->[FIRST2] } |= chr( $rsv << 4 );
 
     return $self;
+}
+
+sub set_rsv1 {
+    ${ $_[0][FIRST2] } |= _RSV1();
+
+    return $_[0];
+}
+
+sub set_rsv2 {
+    ${ $_[0][FIRST2] } |= _RSV2();
+
+    return $_[0];
+}
+
+sub set_rsv3 {
+    ${ $_[0][FIRST2] } |= _RSV3();
+
+    return $_[0];
+}
+
+sub has_rsv1 {
+    return ("\0\0" ne (${ $_[0][FIRST2] } & _RSV1()));
+}
+
+sub has_rsv2 {
+    return ("\0\0" ne (${ $_[0][FIRST2] } & _RSV2()));
+}
+
+sub has_rsv3 {
+    return ("\0\0" ne (${ $_[0][FIRST2] } & _RSV3()));
 }
 
 #----------------------------------------------------------------------

@@ -26,7 +26,7 @@ use DynaLoader ();
 use Carp;
 
 use vars   qw( $VERSION @ISA @EXPORT_OK );
-$VERSION   = "1.32";
+$VERSION   = "1.33";
 @ISA       = qw( DynaLoader Exporter );
 @EXPORT_OK = qw( csv );
 bootstrap Text::CSV_XS $VERSION;
@@ -77,6 +77,7 @@ my %def_attr = (
     escape_null			=> 1,
     keep_meta_info		=> 0,
     verbatim			=> 0,
+    formula			=> 0,
     types			=> undef,
     callbacks			=> undef,
 
@@ -177,6 +178,10 @@ sub new {
 	$attr{quote_char} = delete $attr{quote};
 	$quote_aliased = 1;
 	}
+    exists $attr{formula_handling} and
+	$attr{formula} = delete $attr{formula_handling};
+    exists $attr{formula} and
+	$attr{formula} = _supported_formula ($attr{formula});
     for (keys %attr) {
 	if (m/^[a-z]/ && exists $def_attr{$_}) {
 	    # uncoverable condition false
@@ -255,7 +260,8 @@ my %_cache_id = ( # Only expose what is accessed from within PM
     _has_ahead			=> 30,
     _has_hooks			=> 36,
     _is_bound			=> 26,	# 26 .. 29
-    strict			=> 58,
+    formula			=> 38,
+    strict			=> 42
     );
 
 # A `character'
@@ -419,6 +425,31 @@ sub strict {
     @_ and $self->_set_attr_X ("strict", shift);
     $self->{strict};
     } # always_quote
+
+sub _supported_formula {
+    my $f = shift;
+    defined $f or return 5;
+    $f =~ m/^(?: 0 | none    )$/xi ? 0 :
+    $f =~ m/^(?: 1 | die     )$/xi ? 1 :
+    $f =~ m/^(?: 2 | croak   )$/xi ? 2 :
+    $f =~ m/^(?: 3 | diag    )$/xi ? 3 :
+    $f =~ m/^(?: 4 | empty | )$/xi ? 4 :
+    $f =~ m/^(?: 5 | undef   )$/xi ? 5 :
+    do { warn "formula-handling '$f' is not supported\n"; 3 };
+    } # _supported_formula
+sub _formula_string {
+    [qw( none die croak diag empty undef )]->[_supported_formula (shift)];
+    } # _formula_string
+
+sub formula {
+    my $self = shift;
+    @_ and $self->_set_attr_N ("formula", _supported_formula (shift));
+    _formula_string ($self->{formula});
+    } # always_quote
+sub formula_handling {
+    my $self = shift;
+    $self->formula (@_);
+    } # formula_handling
 
 sub decode_utf8 {
     my $self = shift;
@@ -786,12 +817,19 @@ sub header {
     defined $args{munge_column_names} or $args{munge_column_names} = "lc";
     defined $args{set_column_names}   or $args{set_column_names}   = 1;
 
+    # Reset any previous leftovers
+    $self->{_RECNO}		= 0;
+    $self->{_AHEAD}		= undef;
+    $self->{_COLUMN_NAMES}	= undef if $args{set_column_names};
+    $self->{_BOUND_COLUMNS}	= undef if $args{set_column_names};
+
     if (defined $args{sep_set}) {
 	ref $args{sep_set} eq "ARRAY" or
 	    croak ($self->SetDiag (1500, "sep_set should be an array ref"));
 	@seps =  @{$args{sep_set}};
 	}
 
+    $^O eq "MSWin32" and binmode $fh;
     my $hdr = <$fh>;
     # check if $hdr can be empty here, I don't think so
     defined $hdr && $hdr ne "" or croak ($self->SetDiag (1010));
@@ -836,9 +874,11 @@ sub header {
 	    }
 	}
 
-    my $ahead;
-    $hdr =~ s/^([^\r\n]+)[\r\n]+([^\r\n].+)\z/$1/s and
-	$ahead = $2;
+    my ($ahead, $eol);
+    if ($hdr =~ s/^([^\r\n]+)([\r\n]+)([^\r\n].+)\z/$1/s) {
+	$eol   = $2;
+	$ahead = $3;
+	}
 
     $args{munge_column_names} eq "lc" and $hdr = lc $hdr;
     $args{munge_column_names} eq "uc" and $hdr = uc $hdr;
@@ -852,6 +892,7 @@ sub header {
     if ($ahead) { # Must be after getline, which creates the cache
 	$self->_cache_set ($_cache_id{_has_ahead}, 1);
 	$self->{_AHEAD} = $ahead;
+	$eol =~ m/^\r([^\n]|\z)/ and $self->eol ($eol);
 	}
 
     my @hdr = @$row;
@@ -1125,6 +1166,9 @@ sub _csv_attr {
     defined $fltr && !ref $fltr && exists $fltr{$fltr} and
 	$fltr = { 0 => $fltr{$fltr} };
     ref $fltr eq "HASH" or $fltr = undef;
+
+    exists $attr{formula} and
+	$attr{formula} = _supported_formula ($attr{formula});
 
     defined $attr{auto_diag}   or $attr{auto_diag}   = 1;
     defined $attr{escape_null} or $attr{escape_null} = 0;
@@ -1689,6 +1733,74 @@ X<strict>
 If this attribute is set to C<1>, any row that parses to a different number
 of fields than the previous row will cause the parser to throw error 2014.
 
+=head3 formula_handling
+
+=head3 formula
+X<formula_handling>
+X<formula>
+
+ my $csv = Text::CSV_XS->new ({ formula => "none" });
+         $csv->formula ("none");
+ my $f = $csv->formula;
+
+This defines the behavior of fields containing I<formulas>. As formulas are
+considered dangerous in spreadsheets, this attribute can define an optional
+action to be taken if a field starts with an equal sign (C<=>).
+
+For purpose of code-readability, this can also be written as
+
+ my $csv = Text::CSV_XS->new ({ formula_handling => "none" });
+         $csv->formula_handling ("none");
+ my $f = $csv->formula_handling;
+
+Possible values for this attribute are
+
+=over 2
+
+=item none
+
+Take no specific action. This is the default.
+
+ $csv->formula ("none");
+
+=item die
+
+Cause the process to C<die> whenever a leading C<=> is encountered.
+
+ $csv->formula ("die");
+
+=item croak
+
+Cause the process to C<croak> whenever a leading C<=> is encountered.  (See
+L<Carp>)
+
+ $csv->formula ("croak");
+
+=item diag
+
+Report position and content of the field whenever a leading  C<=> is found.
+The value of the field is unchanged.
+
+ $csv->formula ("diag");
+
+=item empty
+
+Replace the content of fields that start with a C<=> with the empty string.
+
+ $csv->formula ("empty");
+ $csv->formula ("");
+
+=item undef
+
+Replace the content of fields that start with a C<=> with C<undef>.
+
+ $csv->formula ("undef");
+ $csv->formula (undef);
+
+=back
+
+All other values will give a warning and then fallback to C<diag>.
+
 =head3 decode_utf8
 X<decode_utf8>
 
@@ -1936,7 +2048,7 @@ By default,  all "unsafe" bytes inside a string cause the combined field to
 be quoted.  By setting this attribute to C<0>, you can disable that trigger
 for bytes >= C<0x7F>.
 
-=head3 escape_null or quote_null (deprecated)
+=head3 escape_null
 X<escape_null>
 X<quote_null>
 
@@ -1961,6 +2073,9 @@ With C<escape_null> set, this will result in
  "=\x00="
 
 The default when using the C<csv> function is C<false>.
+
+For backward compatibility reasons,  the deprecated old name  C<quote_null>
+is still recognized.
 
 =head3 keep_meta_info
 X<keep_meta_info>
@@ -2411,6 +2526,11 @@ Parse the CSV header and set L<C<sep>|/sep>, column_names and encoding.
  $csv->header ($fh, { detect_bom => 1, munge_column_names => "lc" });
 
 The first argument should be a file handle.
+
+This method resets some object properties,  as it is supposed to be invoked
+only once per file or stream.  It will leave attributes C<column_names> and
+C<bound_columns> alone of setting column names is disabled. Reading headers
+on previously process objects might fail on perl-5.8.0 and older.
 
 Assuming that the file opened for parsing has a header, and the header does
 not contain problematic characters like embedded newlines,   read the first
@@ -2946,7 +3066,8 @@ C<detect_bom> can be abbreviated to C<bom>.
 
 This is the same as setting L<C<encoding>|/encoding> to C<"auto">.
 
-Note that as L</header> is invoked, its default is to also set the headers.
+Note that as the method  L</header> is invoked,  its default is to also set
+the headers.
 
 =head3 headers
 X<headers>
@@ -3138,7 +3259,8 @@ to detect and set L<C<sep_char>|/sep_char> with the given set.
 
 C<sep_set> can be abbreviated to C<seps>.
 
-Note that as L</header> is invoked, its default is to also set the headers.
+Note that as the  L</header> method is invoked,  its default is to also set
+the headers.
 
 =head3 set_column_names
 X<set_column_names>
@@ -3688,16 +3810,25 @@ This is a command-line tool that uses parser-xs.pl  techniques to check the
 C<CSV> file and report on its content.
 
  $ csv-check files/utf8.csv
- Checked with examples/csv-check 1.5 using Text::CSV_XS 0.81
+ Checked files/utf8.csv  with csv-check 1.9
+ using Text::CSV_XS 1.32 with perl 5.26.0 and Unicode 9.0.0
  OK: rows: 1, columns: 2
-     sep = <,>, quo = <">, bin = <1>
+     sep = <,>, quo = <">, bin = <1>, eol = <"\n">
 
 =item csv2xls
 X<csv2xls>
 
-A script to convert C<CSV> to Microsoft Excel.  This requires L<Date::Calc>
-and L<Spreadsheet::WriteExcel>.   The converter accepts various options and
-can produce UTF-8 Excel files.
+A script to convert C<CSV> to Microsoft Excel (C<XLS>). This requires extra
+modules L<Date::Calc> and L<Spreadsheet::WriteExcel>. The converter accepts
+various options and can produce UTF-8 compliant Excel files.
+
+=item csv2xlsx
+X<csv2xlsx>
+
+A script to convert C<CSV> to Microsoft Excel (C<XLSX>).  This requires the
+modules L<Date::Calc> and L<Spreadsheet::Writer::XLSX>.  The converter does
+accept various options including merging several C<CSV> files into a single
+Excel file.
 
 =item csvdiff
 X<csvdiff>
@@ -3707,6 +3838,16 @@ line is header and first field is the key. Output options include colorized
 ANSI escape codes or HTML.
 
  $ csvdiff --html --output=diff.html file1.csv file2.csv
+
+=item rewrite.pl
+X<rewrite.pl>
+
+A script to rewrite (in)valid CSV into valid CSV files.  Script has options
+to generate confusing CSV files or CSV files that conform to Dutch MS-Excel
+exports (using C<;> as separation).
+
+Script - by default - honors BOM  and auto-detects separation converting it
+to default standard CSV with C<,> as separator.
 
 =back
 

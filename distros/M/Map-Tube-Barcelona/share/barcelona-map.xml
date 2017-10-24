@@ -25,10 +25,10 @@
     <station id="SANTS-ESTACIA"     name="Sants Estació"       line="L3,L5"       link="L03-05,L03-07,L05-16,PLACA-DE-SANTS"/>
     <station id="VERDAGUER"         name="Verdaguer"           line="L4,L5"       link="L04-07,L04-09,DIAGONAL"/>
     <station id="URQUINAONA"        name="Urquinaona"          line="L1,L4"       link="PASSEIG-DE-GRACIA,L04-12,L01-13,CATALUNYA"/>
-    <station id="FONDO"             name="Fondo"               line="L9,L1"       link="L01-02,L09-03,L09-05"/>
-    <station id="BON-PASTOR"        name="Bon Pastor"          line="L9,L10"      link="L09-05,ONZE-DE-SETEMBRE,L10-03"/>
-    <station id="ONZE-DE-SETEMBRE"  name="Onze de Setembre"    line="L9,L10"      link="BON-PASTOR,LA-SAGRERA"/>
-    <station id="LA-SAGRERA"        name="La Sagrera"          line="L5,L9,L10"   link="ONZE-DE-SETEMBRE,L01-07,L05-08,L05-10"/>
+    <station id="FONDO"             name="Fondo"               line="L9:4,L1"     link="L01-02,L09-03,L09-05"/>
+    <station id="BON-PASTOR"        name="Bon Pastor"          line="L9:6,L10"    link="L09-05,ONZE-DE-SETEMBRE,L10-03"/>
+    <station id="ONZE-DE-SETEMBRE"  name="Onze de Setembre"    line="L9:7,L10"    link="BON-PASTOR,LA-SAGRERA"/>
+    <station id="LA-SAGRERA"        name="La Sagrera"          line="L5,L9:8,L10" link="ONZE-DE-SETEMBRE,L01-07,L05-08,L05-10"/>
     <station id="GORG"              name="Gorg"                line="L2,L10"      link="L02-02,L02-04,L10-02"/>
     <station id="CLOT"              name="Clot"                line="L1,L2"       link="L01-09,L01-11,L02-09,L02-11"/>
     <station id="UNIVERSITAT"       name="Universitat"         line="L1,L2"       link="PASSEIG-DE-GRACIA,L02-17,CATALUNYA,L01-17"/>
@@ -150,10 +150,10 @@
     <station id="L08-09"  name="Ildefons Cerda"                line="L8"  link="L08-08,L08-10"/>
     <station id="L08-10"  name="Magoria La Campana"            line="L8"  link="L08-09,ESPANYA"/>
 
-    <station id="L09-01"  name="Can Zam"                       line="L9"  link="L09-02"/>
-    <station id="L09-02"  name="Singuerlin"                    line="L9"  link="L09-01,L09-03"/>
-    <station id="L09-03"  name="Esglesia Major"                line="L9"  link="L09-02,FONDO"/>
-    <station id="L09-05"  name="Can Peixauet"                  line="L9"  link="FONDO,BON-PASTOR"/>
+    <station id="L09-01"  name="Can Zam"                       line="L9:1"  link="L09-02"/>
+    <station id="L09-02"  name="Singuerlin"                    line="L9:2"  link="L09-01,L09-03"/>
+    <station id="L09-03"  name="Esglesia Major"                line="L9:3"  link="L09-02,FONDO"/>
+    <station id="L09-05"  name="Can Peixauet"                  line="L9:5"  link="FONDO,BON-PASTOR"/>
 
     <station id="L10-02"  name="La Salut"                      line="L10" link="L10-03,GORG"/>
     <station id="L10-03"  name="Llefia"                        line="L10" link="L10-02,BON-PASTOR"/>

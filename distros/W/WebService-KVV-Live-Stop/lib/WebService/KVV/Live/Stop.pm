@@ -3,7 +3,7 @@ use warnings;
 package WebService::KVV::Live::Stop;
 
 # ABSTRACT: Arrival times for Trams/Buses in the Karlsruhe metropolitan area
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use Carp;
 use utf8;
@@ -24,9 +24,29 @@ WebService::KVV::Live::Stop - Arrival times for Trams/Buses in the Karlsruhe met
 =head1 SYNOPSIS
 
     use WebService::KVV::Live::Stop;
+    use utf8;
+    use open qw( :encoding(UTF-8) :std );
 
     my $stop = WebService::KVV::Live::Stop->new("Siemensallee");
     print "Arrival time: $_->{time} $_->{route} $_->{destination}\n" for $stop->departures;
+
+Print departure table:
+
+    use WebService::KVV::Live::Stop;
+    use utf8;
+    use open qw( :encoding(UTF-8) :std );
+    
+    use Data::Dumper::Table;
+    use Data::Visitor::Callback;
+
+    $stop = WebService::KVV::Live::Stop->new($ARGV[0] // 'Kronenplatz');
+    my @entries = $stop->departures;
+    Data::Visitor::Callback->new('JSON::PP::Boolean' => sub { $_ = $_ ? 'true' : 0 })->visit(@entries);
+    my $departure_table = Tabulate \@entries;
+    $departure_table =~ s/^.*\n//; # remove object type
+
+    print $departure_tabletable;
+
 
 
 =head1 DESCRIPTION
@@ -38,7 +58,7 @@ API for searching for bus/tram stops in the Karlsruhe Metropolitan Area (Karlsru
 my $client = Net::HTTP::Spore->new_from_spec(dist_file 'WebService-KVV-Live-Stop', 'kvvlive.json');
 $client->enable('Format::JSON');
 $client->enable('DefaultParams', default_params => { key => '377d840e54b59adbe53608ba1aad70e8' });
-{ no strict 'vars'; $client->enable('UserAgent', useragent => __PACKAGE__ ." $VERSION"); }
+$client->enable('UserAgent', useragent => __PACKAGE__ ." $VERSION");
 
 =head1 IMPLEMENTATION
 
@@ -197,6 +217,7 @@ sub Net::HTTP::Spore::Request::finalize {
 __END__
 
 =back
+
 
 =head1 GIT REPOSITORY
 

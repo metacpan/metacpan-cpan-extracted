@@ -15,8 +15,6 @@ has 'max_length'=> (
     default         => 0,
 );
 
-__PACKAGE__->meta->make_immutable;
-
 our $VERSION = $Text::Phonetic::VERSION;
 
 sub _predicates {
@@ -25,7 +23,7 @@ sub _predicates {
 
 sub _do_encode {
     my ($self,$string) = @_;
-    
+
     return Text::Metaphone::Metaphone($string,$self->max_length);
 }
 
@@ -41,13 +39,13 @@ Text::Phonetic::Metaphone - Metaphone algorithm
 
 =head1 DESCRIPTION
 
-Metaphone was developed by Lawrence Philips as a response to deficiencies in 
-the Soundex algorithm. It is more accurate than Soundex because it uses a 
+Metaphone was developed by Lawrence Philips as a response to deficiencies in
+the Soundex algorithm. It is more accurate than Soundex because it uses a
 larger set of rules for English pronunciation. (Wikipedia, 2007)
 
 This module is a thin wrapper around L<Text::Metaphone>.
 
-The parameter C<max_length> can be set to limit the length of the encoded 
+The parameter C<max_length> can be set to limit the length of the encoded
 string.
 
 =head1 AUTHOR
@@ -70,7 +68,7 @@ LICENSE file included with this module.
 
 =head1 SEE ALSO
 
-Description of the algorithm can be found at 
+Description of the algorithm can be found at
 L<http://en.wikipedia.org/wiki/Metaphone>
 
 L<Text::Metaphone>

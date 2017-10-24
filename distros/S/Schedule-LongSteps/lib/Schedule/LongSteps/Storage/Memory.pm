@@ -1,5 +1,5 @@
 package Schedule::LongSteps::Storage::Memory;
-$Schedule::LongSteps::Storage::Memory::VERSION = '0.020';
+$Schedule::LongSteps::Storage::Memory::VERSION = '0.021';
 use Moose;
 extends qw/Schedule::LongSteps::Storage/;
 
@@ -85,7 +85,7 @@ sub create_process{
 __PACKAGE__->meta->make_immutable();
 
 package Schedule::LongSteps::Storage::Memory::Process;
-$Schedule::LongSteps::Storage::Memory::Process::VERSION = '0.020';
+$Schedule::LongSteps::Storage::Memory::Process::VERSION = '0.021';
 use Moose;
 
 use DateTime;

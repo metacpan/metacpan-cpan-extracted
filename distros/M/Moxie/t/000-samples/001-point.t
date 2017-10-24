@@ -18,6 +18,9 @@ package Point {
     has _x => ( default => sub { 0 } );
     has _y => ( default => sub { 0 } );
 
+    my sub _x : private;
+    my sub _y : private;
+
     sub BUILDARGS : init_args(
         x? => _x,
         y? => _y,
@@ -46,6 +49,8 @@ package Point3D {
     extends 'Point';
 
     has _z => ( default => sub { 0 } );
+
+    my sub _z : private;
 
     sub BUILDARGS : init_args(
         x? => super(x),
@@ -203,12 +208,12 @@ subtest '... meta test' => sub {
 
         {
             my $m = $Point->get_method( 'set_y' );
-            is_deeply([ $m->get_code_attributes ], ['wo(_y)'], '... we show one CODE attribute');
+            is_deeply([ map $_->original, $m->get_code_attributes ], ['wo(_y)'], '... we show one CODE attribute');
         }
 
         {
             my $m = $Point->get_method( 'y' );
-            is_deeply([ $m->get_code_attributes ], ['ro(_y)'], '... we show one CODE attribute');
+            is_deeply([ map $_->original, $m->get_code_attributes ], ['ro(_y)'], '... we show one CODE attribute');
         }
 
     };

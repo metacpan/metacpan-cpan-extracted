@@ -1,6 +1,6 @@
 use warnings;
 use strict;
-use Test::More tests => 19;
+use Test::More;
 use Lingua::JA::Moji ':all';
 use utf8;
 
@@ -30,10 +30,8 @@ ok ($back eq hira2kata ($hyuganatsu));
 ok (is_voiced ('が'));
 ok (!is_voiced ('か'));
 
-my @styles = romaji_vowel_styles;
-ok (@styles);
-ok (romaji_vowel_styles ('passport'));
-ok (! romaji_vowel_styles ('nincompoop'));
+my $styles = romaji_vowel_styles;
+ok (ref $styles eq 'ARRAY');
 my @kana_order = kana_order ();
 ok (@kana_order);
 my $katakana = kana2katakana ('あいうえおｱｲｳｴｵ');
@@ -41,4 +39,5 @@ ok ($katakana eq 'アイウエオアイウエオ');
 my $nr = normalize_romaji ('syuutsuju');
 my $nr2 = normalize_romaji ('しゅうつじゅ');
 ok ($nr eq $nr2);
+done_testing ();
 exit;

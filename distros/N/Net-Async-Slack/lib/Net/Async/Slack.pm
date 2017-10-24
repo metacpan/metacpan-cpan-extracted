@@ -4,7 +4,7 @@ package Net::Async::Slack;
 use strict;
 use warnings;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use parent qw(IO::Async::Notifier);
 
@@ -57,6 +57,7 @@ use Log::Any qw($log);
 use Net::Async::OAuth::Client;
 
 use Net::Async::Slack::RTM;
+use Net::Async::Slack::Message;
 
 my $json = JSON::MaybeXS->new;
 
@@ -142,13 +143,23 @@ sub send_message {
     push @content, channel => $args{channel} || die 'need a channel';
     push @content, text => $args{text} if defined $args{text};
     push @content, attachments => $json->encode($args{attachments}) if $args{attachments};
-    push @content, $_ => $args{$_} for grep exists $args{$_}, qw(parse link_names unfurl_links unfurl_media as_user reply_broadcast);
+    push @content, $_ => $args{$_} for grep exists $args{$_}, qw(parse link_names unfurl_links unfurl_media as_user reply_broadcast thread_ts);
     $self->http_post(
         $self->endpoint(
             'chat.postMessage',
         ),
         \@content,
-    )
+    )->then(sub {
+        my ($data) = @_;
+        return Future->fail('send failed', slack => $data) unless $data->{ok};
+        Future->done(
+            Net::Async::Slack::Message->new(
+                slack => $self,
+                channel => $data->{channel},
+                thread_ts => $data->{ts},
+            )
+        )
+    })
 }
 
 =head1 METHODS - Internal
@@ -173,6 +184,8 @@ sub endpoints {
     };
 }
 
+sub slack_host { shift->{slack_host} }
+
 =head2 endpoint
 
 Processes the given endpoint as a template, using the named parameters
@@ -182,7 +195,9 @@ passed to the method.
 
 sub endpoint {
     my ($self, $endpoint, %args) = @_;
-    URI::Template->new($self->endpoints->{$endpoint . '_url'})->process(%args);
+    my $uri = URI::Template->new($self->endpoints->{$endpoint . '_url'})->process(%args);
+    $uri->host($self->slack_host);
+    $uri
 }
 
 sub oauth {
@@ -224,7 +239,7 @@ sub oauth_request {
 
 =head2 token
 
-Our API token.
+API token.
 
 =cut
 
@@ -303,7 +318,7 @@ Issues an HTTP POST request.
 sub http_post {
     my ($self, $uri, $content, %args) = @_;
 
-    $log->tracef("POST %s { %s }", "$uri", \%args);
+    $log->tracef("POST %s { %s } <= %s", "$uri", \%args, $content);
 
     $self->http->POST(
         $uri,
@@ -333,7 +348,7 @@ sub http_post {
 
 sub configure {
     my ($self, %args) = @_;
-    for my $k (qw(client_id token)) {
+    for my $k (qw(client_id token slack_host)) {
         $self->{$k} = delete $args{$k} if exists $args{$k};
     }
     $self->next::method(%args);
@@ -345,13 +360,15 @@ sub configure {
 
 =over 4
 
-=item * L<https://metacpan.org/pod/AnyEvent::SlackRTM>
+=item * L<AnyEvent::SlackRTM> - low-level API wrapper around RTM
 
-=item * L<https://metacpan.org/pod/Mojo::SlackRTM>
+=item * L<Mojo::SlackRTM> - another RTM-specific wrapper, this time based on Mojolicious
 
-=item * L<https://metacpan.org/pod/Slack::RTM::Bot>
+=item * L<Slack::RTM::Bot> - more RTM support, this time via LWP and a subprocess/thread for handling the websocket part
 
-=item * L<https://metacpan.org/pod/WebService::Slack::WebApi>
+=item * L<WebService::Slack::WebApi> - Furl-based wrapper around the REST API
+
+=item * L<AnyEvent::SlackBot> - another AnyEvent RTM implementation
 
 =back
 

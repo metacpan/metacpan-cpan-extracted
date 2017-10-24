@@ -4,46 +4,68 @@
 
 =head1 NAME
 
-L<Novel::Robot::Parser> - get novel / bbs content from website
+L<Novel::Robot::Parser>
+
+get novel / bbs content from website
 
 小说站点解析引擎
 
-=head1 INIT
 
-=head2 site
+=head1 SUPPORT SITE
 
-=head3 support download novel/thread from website 支持小说/论坛站点下载
+
+=head2 support download novel from website
+
+
+支持小说/论坛站点下载
 
 %SITE_DOM_NAME in Parser.pm 站点列表
 
-=head3 support txt file 支持处理txt
+
+=head2 support txt file
+
+支持处理txt
 
 txt : 指定解析txt文件
 
-=head3 support raw file 支持处理序列化数据
+
+=head2 support raw file
+
+支持处理序列化数据
 
 raw : 指定解析经MessagePack压缩的二进制文件
+
+
+=head1 INIT
+
 
 =head2 new
 
 init funtion, need set sitename，or url  初始化解析模块，需指定站点名称或网址
 
-   #site name : 直接指定站点
-   my $parser = Novel::Robot::Parser->new( site => 'jjwxc' );
-    
-   #url : 通过url自动检测站点
-   my $url = 'http://www.jjwxc.net/onebook.php?novelid=2456';
-   my $parser = Novel::Robot::Parser->new( site => $url );
+       #site name : 直接指定站点
+       my $parser = Novel::Robot::Parser->new( site => 'jjwxc' );
+        
+       #url : 通过url自动检测站点
+       my $url = 'http://www.jjwxc.net/onebook.php?novelid=2456';
+       my $parser = Novel::Robot::Parser->new( site => $url );
+
+       #site name : default，不明确指定站点名称
+       my $url = 'http://www.zhonghuawuxia.com/book/71';
+       my $parser = Novel::Robot::Parser->new( site => 'default' );
+
 
 =head1 NOVEL FUNCTION
 
-=head2  get_item_ref 
+
+=head2 get_item_ref
 
 get novel / forum thread data hash ref 
 
 获取小说/贴子内容，返回一个hash引用
 
-   my $r = $parser->get_item_ref($url, %opt);
+       my $r = $parser->get_item_ref($url, %opt);
+
 
 =head2 get_item_info
 
@@ -51,28 +73,33 @@ get novel index info / forum thread first page info
 
 获取小说/贴子首页信息
 
-   my $r = $parser->get_item_info($url);
+       my $r = $parser->get_item_info($url);
+
 
 =head1 BOARD FUNCTION
 
 writer -> multi books, forum -> multi threads
 
+
 =head2 get_board_ref 
 
 get writer / board info, 获取版块信息
 
-   my $r = $parser->get_board_ref($url, %opt);
+       my $r = $parser->get_board_ref($url, %opt);
+
 
 =head1 QUERY FUNCTION
+
 
 =head2 get_query_ref 
 
 query info, 获取查询结果
 
-    my $query_type = '作者';
-    my $query_keyword = '顾漫';
+        my $query_type = '作者';
+        my $query_keyword = '顾漫';
 
-    my ($info, $items_ref) = $parser->get_query_ref( $query_keyword, 
-        query_type => $query_type );
+        my ($info, $items_ref) = $parser->get_query_ref( $query_keyword, 
+            query_type => $query_type );
+
 
 =cut

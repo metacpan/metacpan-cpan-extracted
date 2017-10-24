@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 # this test was generated with
-# Dist::Zilla::Plugin::Author::SKIRMESS::RepositoryBase 0.022
+# Dist::Zilla::Plugin::Author::SKIRMESS::RepositoryBase 0.030
 
 use File::Spec;
 
@@ -15,7 +15,7 @@ use Test::Perl::Critic;
 
 my @dirs = qw(bin lib t xt);
 
-my @ignores = ();
+my @ignores;
 my %file;
 @file{ all_perl_files(@dirs) } = ();
 delete @file{@ignores};

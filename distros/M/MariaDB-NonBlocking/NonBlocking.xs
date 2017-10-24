@@ -427,7 +427,7 @@ THX_do_work(pTHX_ SV* self, IV event)
     int state           = maria->current_state;
     int state_for_error = STATE_STANDBY; /* query errors */
     sql_config *config   = maria->config;
-    const char* errstring;
+    const char* errstring = NULL;
 
 #define have_password_in_memory(maria) (maria && maria->config && maria->config->password_temp && SvOK(maria->config->password_temp))
 
@@ -441,8 +441,9 @@ THX_do_work(pTHX_ SV* self, IV event)
         if ( state == STATE_STANDBY && !maria->query_sv )
             break;
 
-        if ( state == STATE_DISCONNECTED && !have_password_in_memory(maria) )
+        if ( state == STATE_DISCONNECTED && !have_password_in_memory(maria) ) {
             break;
+        }
 
         /*warn("<%d><%s><%d>\n", maria->socket_fd, state_to_name[maria->current_state], maria->is_cont);*/
         switch ( state ) {
@@ -476,7 +477,7 @@ THX_do_work(pTHX_ SV* self, IV event)
 
                     if ( !password ) {
                         err       = 1;
-                        errstring = "No password currently in memory! Probably a good thing!";
+                        errstring = "No password in memory during ->connect! If check that the password was passed in and was defined.";
                         break;
                     }
 
@@ -626,7 +627,16 @@ THX_do_work(pTHX_ SV* self, IV event)
                     else {
                         if ( !maria->res ) {
                             /* query was successful but returned nothing */
-                            /* nothing to do, really */
+                            /* if mysql_affected_rows(maria->mysql) returns
+                               something interesting, that's our output 
+                             */
+                            UV affected_rows = mysql_affected_rows(maria->mysql);
+                            if ( affected_rows ) {
+                                if (!maria->query_results) {
+                                    maria->query_results = MUTABLE_SV(newAV());
+                                }
+                                av_push(MUTABLE_AV(maria->query_results), newSVuv( affected_rows ));
+                            }
                         }
                         else if ( mysql_field_count(maria->mysql) == 0 ) {
                             /* same */
@@ -779,9 +789,9 @@ THX_do_work(pTHX_ SV* self, IV event)
      * We croak outside of the while, to give it a chance
      * to free the result
      */
+
     if ( err ) {
         maria->is_cont       = FALSE;
-        /* TODO this is a terrible state to end in if we failed to connect */
         maria->current_state = state_for_error;
         maria->last_status   = 0;
 
@@ -1200,7 +1210,7 @@ CODE:
 
     /* TODO would be pretty simple to implement a pipeline here... */
     if ( maria->query_sv )
-        croak("Query already waiting to be run!!!!");
+        croak("Attempted to start a query when this connection already has a query in flight");
 
     if ( maria->current_state == STATE_QUERY ) {
         /*
@@ -1211,6 +1221,14 @@ CODE:
          * handle is used from multiple places.
          */
         croak("Cannot start running a second query while we are still completing the first!");
+    }
+
+    if (
+        maria->current_state == STATE_DISCONNECTED
+            &&
+        !have_password_in_memory(maria)
+    ) {
+        croak("Cannot start query; not connected");
     }
 
     maria->want_hashrefs = FALSE;
@@ -1343,11 +1361,13 @@ CODE:
 
         *d++ = '\0'; /* never hurts to have a NUL terminated string */
 
-        maria->query_sv = query_with_params;
-
         if ( i != num_bind_params ) {
+            sv_free(query_with_params);
             croak("Too many bind params given for query! Got %"IVdf", query needed %"IVdf, num_bind_params, i);
         }
+
+        maria->query_sv = query_with_params;
+
     }
     else {
         /* we MUST copy this, because mysql_real_query will not -- it will

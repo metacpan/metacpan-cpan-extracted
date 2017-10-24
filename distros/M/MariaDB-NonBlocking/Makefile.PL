@@ -8,10 +8,68 @@ use Config       qw/%Config/;
 use IPC::Cmd     qw/can_run run/;
 use Getopt::Long qw/GetOptions/;
 
+my $opt = {};
 GetOptions(
-    'static_link_to_mariadbclient' => \my $statically_link_mariadbclient,
-    'mariadb_path=s'               => \my $mariadb_path,
+    $opt,
+    "static_link_to_mariadbclient",
+    "mariadb_path=s",
+    "testdb=s",
+    "testhost=s",
+    "testport=s",
+    "testuser=s",
+    "testpassword=s",
+    "testsocket=s",
 );
+my $mariadb_path = $opt->{mariadb_path};
+
+my $INSTALL_BASE;
+foreach my $arg ( grep defined, @ARGV, $ENV{PERL_MM_OPT} ) {
+    next unless $arg =~ /\bINSTALL_BASE=((?:\S+|\s(?!\S+=))+)\b/sm;
+    $INSTALL_BASE = $1;
+    last;    
+}
+
+sub write_config_for_tests {
+    my $opt = $_[0];
+    my @opts_from_file = eval { require "t/mysql.mtest" };
+    @opts_from_file    = eval { require "../t/mysql.mtest" }
+        if @opts_from_file;
+
+    my @ordered_options = qw/
+        testhost
+        testport
+        testuser
+        testsocket
+        testpassword
+        testdb
+        force-embedded
+        mysql_config
+    /;
+
+    for (0..$#ordered_options) {
+        my $opt_name        = $ordered_options[$_];
+        my $value           = $opts_from_file[$_];
+        $opt->{$opt_name} ||= $value || '';
+    }
+
+    my $test_lib = File::Spec->catfile("t", "lib.pl");
+    my $source_to_print = <<"EOPERL";
+\$::test_host     = q\0$opt->{testhost}\0;
+\$::test_port     = q\0$opt->{testport}\0;
+\$::test_user     = q\0$opt->{testuser}\0 || \$ENV{'DBI_USER'} || '';
+\$::test_socket   = q\0$opt->{testsocket}\0;
+\$::test_password = q\0$opt->{testpassword}\0 || \$ENV{'DBI_PASS'} || '';
+\$::test_db       = q\0$opt->{testdb}\0;
+\$::test_force_embedded = 0+q\0$opt->{'force-embedded'}\0 if 0+q\0$opt->{'force-embedded'}\0;
+\$::test_mysql_config = q\0$opt->{mysql_config}\0;
+
+1;
+EOPERL
+
+    open my $fh, '>', $test_lib;
+    print $fh $source_to_print;
+    close $fh || die "Failed to create $test_lib: $!";
+}
 
 sub libname_to_so_names {
     my ($wanted_lib) = @_;
@@ -49,8 +107,9 @@ sub get_paths_out_of_config_and_split {
                         glibpath
                     /);
 
-    unshift @libpaths, $mariadb_path, File::Spec->catdir($mariadb_path, "lib")
-        if $mariadb_path;
+    for my $rootdir ( grep defined, $mariadb_path, $INSTALL_BASE ) {
+        unshift @libpaths, $rootdir, File::Spec->catdir($rootdir, "lib");
+    }
 
     sub find_libpath_for { grep defined, map find_file_in($_, @libpaths), @_ }
 }
@@ -63,8 +122,11 @@ sub get_paths_out_of_config_and_split {
                         locincpath
                         usrinc
                     /);
-    unshift @incpaths, $mariadb_path, File::Spec->catdir($mariadb_path, "include")
-        if $mariadb_path;
+
+    for my $rootdir ( grep defined, $mariadb_path, $INSTALL_BASE ) {
+        unshift @incpaths, $rootdir, File::Spec->catdir($rootdir, "include");
+    }
+
     sub find_incpath_for { grep defined, map find_file_in($_, @incpaths), @_ }
 }
 
@@ -101,6 +163,8 @@ sub run_grab_output {
     return $out;
 }
 
+write_config_for_tests($opt);
+
 my @wanted_libs = qw( ssl crypto iconv  );
 
 my ($libs, $inc, $ccflags, $lddlflags) = map $_//'',@Config{qw/libs inc ccflags lddlflags/};
@@ -126,7 +190,7 @@ foreach my $lib ( split / /, $libs ) {
 }
 $libs = $cleaned_libs;
 
-if ( $statically_link_mariadbclient ) {
+if ( $opt->{static_link_to_mariadbclient} ) {
     my @needed_libs = qw( mariadbclient );
 
     my $ext = $Config{lib_ext};
@@ -197,5 +261,5 @@ WriteMakefile(
     CCFLAGS   => $ccflags,
     LDDLFLAGS => $lddlflags,
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean => { FILES => 'MariaDB-NonBlocking-*' },
+    clean => { FILES => 'MariaDB-NonBlocking-* t/lib.pl' },
 );

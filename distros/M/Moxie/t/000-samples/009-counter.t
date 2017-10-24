@@ -22,6 +22,8 @@ package Counter {
 
     has _count => ( default => sub { 0 } );
 
+    my sub _count : private;
+
     sub count : ro(_count);
 
     # NOTE:

@@ -1,4 +1,4 @@
-package inc::MyMakeMaker;
+package MyMakeMaker;
 
 # ABSTRACT: build a Makefile.PL that uses ExtUtils::MakeMaker
 use Moose;

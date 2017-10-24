@@ -8,6 +8,8 @@ use parent qw(
     Net::WebSocket::Base::Typed
 );
 
+use Net::WebSocket::X ();
+
 use constant get_fin => 1;
 use constant is_control_frame => 1;
 
@@ -17,7 +19,7 @@ sub _assemble_length {
     if (length $$payload_sr > 125) {
         my $type = $class->get_type();
 
-        die "A “$type” frame cannot have a payload of over 125 bytes!";
+        die Net::WebSocket::X->create('ControlPayloadTooLong', $type, $$payload_sr);
     }
 
     return( chr(length $$payload_sr), q<> );

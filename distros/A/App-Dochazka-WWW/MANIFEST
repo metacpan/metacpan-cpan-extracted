@@ -16,6 +16,7 @@ share/config/WWW_Message_en.conf
 share/js/000boilerplate.js
 share/js/dochazka-www/act-lib.js
 share/js/dochazka-www/canned-tests.js
+share/js/dochazka-www/caches.js
 share/js/dochazka-www/daction-init.js
 share/js/dochazka-www/daction-start.js
 share/js/dochazka-www/dbrowser-init.js

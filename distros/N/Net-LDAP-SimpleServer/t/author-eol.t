@@ -17,16 +17,17 @@ use Test::EOL;
 my @files = (
     'bin/ldapd.pl',
     'lib/Net/LDAP/SimpleServer.pm',
+    'lib/Net/LDAP/SimpleServer/Constant.pm',
     'lib/Net/LDAP/SimpleServer/LDIFStore.pm',
     'lib/Net/LDAP/SimpleServer/ProtocolHandler.pm',
     't/00-compile.t',
     't/00-load.t',
     't/000-report-versions-tiny.t',
-    't/05-handler.t',
-    't/06-store.t',
-    't/13-param.t',
-    't/14-bind.t',
-    't/15-search.t',
+    't/10-store.t',
+    't/20-handler.t',
+    't/30-param.t',
+    't/40-bind.t',
+    't/50-search.t',
     't/lib/Helper.pm'
 );
 

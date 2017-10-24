@@ -10,7 +10,7 @@ our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 use vars qw/$VERSION/;
 
 BEGIN {
-    our $VERSION = '2.0.16'; # VERSION
+    our $VERSION = '2.0.17'; # VERSION
 
     require XSLoader;
     XSLoader::load(__PACKAGE__, $VERSION);
@@ -18,6 +18,7 @@ BEGIN {
 
 # Load our explicit sub-modules
 use MarpaX::ESLIF::Event::Type;
+use MarpaX::ESLIF::Grammar;
 use MarpaX::ESLIF::Grammar::Properties;
 use MarpaX::ESLIF::Grammar::Rule::Properties;
 use MarpaX::ESLIF::Grammar::Symbol::Properties;
@@ -26,6 +27,65 @@ use MarpaX::ESLIF::Symbol::PropertyBitSet;
 use MarpaX::ESLIF::Symbol::Type;
 use MarpaX::ESLIF::Value::Type;
 use MarpaX::ESLIF::Rule::PropertyBitSet;
+
+
+my @REGISTRY = ();
+
+sub _logger_to_self {
+    my ($class, $loggerInterface) = @_;
+
+    my $definedLoggerInterface = defined($loggerInterface);
+
+    foreach (@REGISTRY) {
+        my $_loggerInterface = $_->_getLoggerInterface;
+        my $_definedLoggerInterface = defined($_loggerInterface);
+	return $_
+            if (
+                (! $definedLoggerInterface && ! $_definedLoggerInterface)
+                ||
+                ($definedLoggerInterface && $_definedLoggerInterface && ($loggerInterface == $_loggerInterface))
+            )
+    }
+
+    return
+}
+
+sub new {
+  my ($class, $loggerInterface) = @_;
+
+  my $self = $class->_logger_to_self($loggerInterface);
+
+  push(@REGISTRY, $self = bless [ MarpaX::ESLIF::Engine->allocate($loggerInterface), $loggerInterface ], $class) if ! defined($self);
+
+  return $self
+}
+
+sub getInstance {
+    goto &new
+}
+
+sub version {
+    return MarpaX::ESLIF::Engine::version
+}
+
+sub _getInstance {
+    return $_[0]->[0]
+}
+
+sub _getLoggerInterface {
+    return $_[0]->[1]
+}
+
+sub CLONE {
+    #
+    # One perl thread <-> one perl interpreter
+    #
+    map { $_->[0] = MarpaX::ESLIF::Engine->allocate($_->_getLoggerInterface) } @REGISTRY
+}
+
+sub DESTROY {
+    MarpaX::ESLIF::Engine->dispose($_[0]->[0])
+}
 
 
 1;
@@ -42,7 +102,7 @@ MarpaX::ESLIF - ESLIF is Extended ScanLess InterFace
 
 =head1 VERSION
 
-version 2.0.16
+version 2.0.17
 
 =head1 SYNOPSIS
 
@@ -60,7 +120,7 @@ With a logger, using Log::Any::Adapter::Stderr as an example:
   my $eslif = MarpaX::ESLIF->new($log);
   printf "ESLIF library version: %s\n", $eslif->version;
 
-This class and its derivatives are thread-safe. Although there can be many ESLIF instance, in practice a single instance is enough, unless you want different logging interfaces. Once a MarpaX::ESLIF instance is created, the user should create a L<MarpaX::ESLIF::Grammar> instance to have a working grammar.
+This class and its derivatives are thread-safe. Although there can be many ESLIF instances, in practice a single instance is enough, unless you want different logging interfaces. This is why the C<new> method is implemented as a I<multiton>. Once a MarpaX::ESLIF instance is created, the user should create a L<MarpaX::ESLIF::Grammar> instance to have a working grammar.
 
 =head1 DESCRIPTION
 
@@ -99,6 +159,10 @@ C<$loggerInterface> is an optional parameter that, when its exists, must be an o
 
 An example of logging implementation can be a L<Log::Any> adapter.
 
+=head2 MarpaX::ESLIF->getInstance($loggerInterface)
+
+Alias to C<new>.
+
 =head2 $eslif->version()
 
   printf "ESLIF library version: %s\n", $eslif->version;
@@ -117,11 +181,21 @@ L<MarpaX::ESLIF::Introduction>, L<PCRE2|http://www.pcre.org/>, L<MarpaX::ESLIF::
 
 Jean-Damien Durand <jeandamiendurand@free.fr>
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords Jeffrey Kegler
+=for stopwords Jean-Damien Durand Jeffrey Kegler
+
+=over 4
+
+=item *
+
+Jean-Damien Durand <Jean-Damien.Durand@newaccess.ch>
+
+=item *
 
 Jeffrey Kegler <jeffreykegler@jeffreykegler.com>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

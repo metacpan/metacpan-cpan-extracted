@@ -14,7 +14,7 @@ configure_requires:
   strict: '0'
   warnings: '0'
 dynamic_config: 0
-generated_by: 'Module::Build version 0.4222, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,7 +23,7 @@ name: Time-OlsonTZ-Download
 provides:
   Time::OlsonTZ::Download:
     file: lib/Time/OlsonTZ/Download.pm
-    version: '0.006'
+    version: '0.007'
 requires:
   Carp: '0'
   Encode: '1.75'
@@ -41,6 +41,7 @@ requires:
   utf8: '0'
   warnings: '0'
 resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Time-OlsonTZ-Download
   license: http://dev.perl.org/licenses/
-version: '0.006'
+version: '0.007'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

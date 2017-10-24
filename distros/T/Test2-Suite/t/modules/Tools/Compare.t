@@ -17,7 +17,7 @@ BEGIN { $ENV{TABLE_TERM_SIZE} = 80 }
 subtest simple => sub {
     imported_ok qw{
         match mismatch validator
-        hash array bag object meta number string bool
+        hash array bag object meta number float string bool
         in_set not_in_set check_set
         item field call call_list call_hash prop check all_items all_keys all_vals all_values
         etc end filter_items
@@ -44,6 +44,11 @@ subtest is => sub {
         my $false = do { bless \(my $dummy = 0), "My::Boolean" };
         def ok => (is($true,  $true,  "true scalar ref is itself"),  "true scalar ref is itself");
         def ok => (is($false, $false, "false scalar ref is itself"), "false scalar ref is itself");
+
+        def ok => (is(v1.2.3, v1.2.3, 'vstring pass'), 'vstring pass');
+        def ok => (is(\v1.2.3, \v1.2.3, 'vstring refs pass'), 'vstring refs pass');
+        def ok => (!is(v1.2.3, v1.2.4, 'vstring fail'), 'vstring fail');
+        def ok => (!is(\v1.2.3, \v1.2.4, 'vstring refs fail'), 'vstring refs fail');
 
         my $x = \\"123";
         def ok => (is($x, \\"123", "Ref-Ref check 1"), "Ref-Ref check 1");
@@ -123,6 +128,38 @@ subtest is => sub {
             event Ok => sub {
                 call pass => T();
                 call name => "false scalar ref is itself";
+            };
+
+            event Ok => sub {
+                call pass => T();
+                call name => 'vstring pass';
+            };
+
+            event Ok => sub {
+                call pass => T();
+                call name => 'vstring refs pass';
+            };
+
+            fail_events Ok => sub {
+                call pass => F();
+                call name => 'vstring fail';
+            };
+            event Diag => sub {
+                call message => table(
+                    header => [qw/GOT OP CHECK/],
+                    rows   => [['\N{U+1}\N{U+2}\N{U+3}', 'eq', '\N{U+1}\N{U+2}\N{U+4}']],
+                );
+            };
+
+            fail_events Ok => sub {
+                call pass => F();
+                call name => 'vstring refs fail';
+            };
+            event Diag => sub {
+                call message => table(
+                    header => [qw/PATH GOT OP CHECK/],
+                    rows   => [['$*', '\N{U+1}\N{U+2}\N{U+3}', 'eq', '\N{U+1}\N{U+2}\N{U+4}']],
+                );
             };
 
             event Ok => sub {
@@ -524,6 +561,100 @@ subtest number => sub {
         );
     }
 };
+
+subtest float => sub {
+    subtest float_number => sub {
+        # float should pass all of the number subtests
+        my $check = float("22.0"); my $line = __LINE__;
+        is($check->lines, [$line], "Got line number");
+
+        my $events = intercept {
+            is(22, $check, "pass");
+            is("22.0", $check, "pass");
+            is(12, $check, "fail");
+            is('xxx', $check, "fail");
+        };
+
+        like(
+            $events,
+            array {
+                event Ok => {pass => 1};
+                event Ok => {pass => 1};
+                fail_events Ok => {pass => 0};
+                event Diag => sub {
+                    call message => table(
+                        header => [qw/GOT OP CHECK LNs/],
+                        rows   => [['12', '==', $check->name, $line]],
+                    );
+                };
+
+                fail_events Ok => { pass => 0 };
+                event Diag => sub {
+                    call message => table(
+                        header => [qw/GOT OP CHECK LNs/],
+                        rows   => [['xxx', '==', $check->name, $line]],
+                    );
+                };
+                end;
+            },
+            "Got events"
+        );
+
+        my ($check1, $check2) = (float("22.0", negate => 1), !float("22.0"));
+        $line = __LINE__ - 1;
+
+        for $check ($check1, $check2) {
+            is($check->lines, [$line], "Got line number");
+
+            $events = intercept {
+                is(12, $check, "pass");
+                is(22, $check, "fail");
+                is("22.0", $check, "fail");
+                is('xxx', $check, "fail");
+            };
+
+            like(
+                $events,
+                array {
+                    event Ok => {pass => 1};
+                    fail_events Ok => { pass => 0 };
+                    event Diag => sub {
+                        call message => table(
+                            header => [qw/GOT OP CHECK LNs/],
+                            rows   => [['22', '!=', $check->name, $line]],
+                        );
+                    };
+
+                    fail_events Ok => { pass => 0 };
+                    event Diag => sub {
+                        call message => table(
+                            header => [qw/GOT OP CHECK LNs/],
+                            rows   => [['22.0', '!=', $check->name, $line]],
+                        );
+                    };
+
+                    fail_events Ok => { pass => 0 };
+                    event Diag => sub {
+                        call message => table(
+                            header => [qw/GOT OP CHECK LNs/],
+                            rows   => [['xxx', '!=', $check->name, $line]],
+                        );
+                    };
+                    end;
+                },
+                "Got float events"
+            );
+        }
+    };
+    subtest float_rounding => sub {
+        my $check = float("22.0");
+        my $check_3 = float("22.0", tolerance => .001);
+
+        is($check->tolerance,   1e-08, "default tolerance");
+        is($check_3->tolerance, 0.001, "custom tolerance");
+    };
+};
+
 
 subtest bool => sub {
     my @true = (1, 'yup', '0 but true', ' ', {});

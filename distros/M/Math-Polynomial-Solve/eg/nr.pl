@@ -1,21 +1,16 @@
 #!/bin/perl
 #
 use Carp;
-use Getopt::Long;
-use Math::Polynomial::Solve qw(:sturm :utility ascending_order);
+use Math::Polynomial::Solve qw(:utility ascending_order);
+use Math::Utils qw(:polynomial);
 use Math::Complex;
 use strict;
 use warnings;
-#use IO::Prompt;
 
-my $line;
-my $ascending = 0;
-
-GetOptions('ascending' => \$ascending);
-
+my $ascending = 1;
 ascending_order($ascending);
 
-while ($line = prompt("Polynomial: ", -num))
+while (my $line = prompt("Polynomial: "))
 {
 	my @coef = split(/,? /, $line);
 
@@ -25,13 +20,14 @@ while ($line = prompt("Polynomial: ", -num))
 	print "\nPolynomial: [", join(", ", @coef), "]\n";
 
 	my @roots = newtonraphson(\@coef, \@xvals);
-	my @zeros = poly_evaluate(\@coef, \@roots);
+	my @zeros = pl_evaluate(\@coef, \@roots);
 
-	for my $j (0 .. scalar @xvals)
+	for my $j (0 .. $#xvals)
 	{
 		print "x: " . $xvals[$j] . "; root: " . $roots[$j] .
 			"; p(root): " . $zeros[$j] . ";\n";
 	}
+	print "\n";
 }
 
 exit(0);

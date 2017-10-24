@@ -238,7 +238,6 @@ use ExtUtils::Constant qw (WriteConstants);
 {{ $share_dir_block[0] }}
 my {{ $WriteMakefileArgs }}
 
-$WriteMakefileArgs{MIN_PERL_VERSION}  = '5.8.8';
 $WriteMakefileArgs{DEFINE}  .= $def;
 $WriteMakefileArgs{LIBS}    .= $lib;
 $WriteMakefileArgs{INC}     .= $inc;

@@ -5,7 +5,7 @@ use warnings;
 
 # ABSTRACT: LDAP protocol handler used with Net::LDAP::SimpleServer
 
-our $VERSION = '0.0.18';    # VERSION
+our $VERSION = '0.0.19';    # VERSION
 
 use Net::LDAP::Server;
 use base 'Net::LDAP::Server';
@@ -14,21 +14,23 @@ use fields qw(store root_dn root_pw allow_anon);
 use Carp;
 use Net::LDAP::LDIF;
 use Net::LDAP::Util qw{canonical_dn};
+use Net::LDAP::Filter;
 use Net::LDAP::FilterMatch;
 
-use Net::LDAP::Constant (
-    qw/LDAP_SUCCESS LDAP_AUTH_UNKNOWN LDAP_INVALID_CREDENTIALS/,
-    qw/LDAP_AUTH_METHOD_NOT_SUPPORTED/ );
+use Net::LDAP::Constant qw/
+  LDAP_SUCCESS LDAP_INVALID_CREDENTIALS LDAP_AUTH_METHOD_NOT_SUPPORTED
+  LDAP_INVALID_SYNTAX LDAP_NO_SUCH_OBJECT/;
+
+use Net::LDAP::SimpleServer::LDIFStore;
+use Net::LDAP::SimpleServer::Constant;
 
 use Scalar::Util qw{reftype};
 use UNIVERSAL::isa;
 
-use Data::Dumper;
-
 sub _make_result {
     my $code = shift;
-    my $dn   = shift || '';
-    my $msg  = shift || '';
+    my $dn   = shift // '';
+    my $msg  = shift // '';
 
     return {
         matchedDN    => $dn,
@@ -38,20 +40,21 @@ sub _make_result {
 }
 
 sub new {
-    my $class  = shift;
+    my $class = shift;
     my $params = shift || croak 'Must pass parameters!';
-    my $self   = $class->SUPER::new( $params->{sock} );
 
     croak 'Parameter must be a HASHREF' unless reftype($params) eq 'HASH';
-    croak 'Must pass option {store}' unless exists $params->{store};
+    for my $p (qw/store root_dn sock/) {
+        croak 'Must pass option {' . $p . '}' unless exists $params->{$p};
+    }
     croak 'Not a LDIFStore'
       unless $params->{store}->isa('Net::LDAP::SimpleServer::LDIFStore');
 
-    croak 'Must pass option {root_dn}' unless exists $params->{root_dn};
     croak 'Option {root_dn} can not be empty' unless $params->{root_dn};
     croak 'Invalid root DN'
       unless my $canon_dn = canonical_dn( $params->{root_dn} );
 
+    my $self = $class->SUPER::new( $params->{sock} );
     $self->{store}      = $params->{store};
     $self->{root_dn}    = $canon_dn;
     $self->{root_pw}    = $params->{root_pw};
@@ -71,44 +74,37 @@ sub unbind {
     return _make_result(LDAP_SUCCESS);
 }
 
-sub bind {    ## no critic (ProhibitBuiltinHomonyms)
+sub bind {
+    ## no critic (ProhibitBuiltinHomonyms)
     my ( $self, $request ) = @_;
 
-    #print STDERR '=' x 70 . "\n";
-    #print STDERR Dumper($self);
-    #print STDERR Dumper($request);
-    my $ok = _make_result(LDAP_SUCCESS);
+    my $OK = _make_result(LDAP_SUCCESS);
 
+    # anonymous bind
     if (    not $request->{name}
         and exists $request->{authentication}->{simple}
         and $self->{allow_anon} )
     {
-        return $ok;
+        return $OK;
     }
 
-    #print STDERR qq{not anonymous\n};
     # As of now, accepts only simple authentication
     return _make_result(LDAP_AUTH_METHOD_NOT_SUPPORTED)
       unless exists $request->{authentication}->{simple};
 
-    #print STDERR qq{is simple authentication\n};
     return _make_result(LDAP_INVALID_CREDENTIALS)
       unless my $binddn = canonical_dn( $request->{name} );
 
-    #print STDERR qq#binddn is ok ($request->{name}) => ($binddn)\n#;
-    #print STDERR qq#handler dn is $self->{root_dn}\n#;
     return _make_result(LDAP_INVALID_CREDENTIALS)
       unless uc($binddn) eq uc( $self->{root_dn} );
 
-    #print STDERR qq{binddn is good\n};
     my $bindpw = $request->{authentication}->{simple};
     chomp($bindpw);
 
-    #print STDERR qq|comparing ($bindpw) eq ($self->{root_pw})\n|;
     return _make_result(LDAP_INVALID_CREDENTIALS)
       unless $bindpw eq $self->{root_pw};
 
-    return $ok;
+    return $OK;
 }
 
 sub _match {
@@ -121,19 +117,22 @@ sub _match {
 sub search {
     my ( $self, $request ) = @_;
 
-    my $list = $self->{store}->list;
+    my $list;
+    if ( defined( $request->{baseObject} ) ) {
+        my $basedn = canonical_dn( $request->{baseObject} );
+        my $scope = $request->{scope} || SCOPE_SUBTREE;
 
-    #my $basedn = $request->{baseObject};
+        $list = $self->{store}->list_with_dn_scope( $basedn, $scope );
+        return _make_result( LDAP_NO_SUCH_OBJECT, '',
+            'Cannot find BaseDN "' . $basedn . '"' )
+          unless defined($list);
+    }
+    else {
+        $list = $self->{store}->list();
+    }
 
-    #print STDERR '=' x 50 . "\n";
-    #print STDERR Dumper($request);
-    #print STDERR Dumper($list);
-
-    my $res = _match( $request->{filter}, $list );
-
-    #print STDERR Dumper($res);
-
-    return ( _make_result(LDAP_SUCCESS), @{$res} );
+    my $match = _match( $request->{filter}, $list );
+    return ( _make_result(LDAP_SUCCESS), @{$match} );
 }
 
 1;    # Magic true value required at end of module
@@ -150,7 +149,7 @@ Net::LDAP::SimpleServer::ProtocolHandler - LDAP protocol handler used with Net::
 
 =head1 VERSION
 
-version 0.0.18
+version 0.0.19
 
 =head1 SYNOPSIS
 
@@ -188,7 +187,7 @@ Unbinds the connection to the server.
 
 =head2 search( REQUEST )
 
-Performs a search in the data store.
+Performs a search in the data store. The search filter, baseObject and scope are supported.
 
 =head1 SEE ALSO
 

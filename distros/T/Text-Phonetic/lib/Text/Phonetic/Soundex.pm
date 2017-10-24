@@ -18,8 +18,6 @@ has 'nocode'=> (
     predicate       => 'has_nocode',
 );
 
-__PACKAGE__->meta->make_immutable;
-
 our $VERSION = $Text::Phonetic::VERSION;
 
 sub _predicates {
@@ -28,11 +26,11 @@ sub _predicates {
 
 sub _do_encode {
     my ($self,$string) = @_;
-    
+
     if ($self->has_nocode) {
         $Text::Soundex::nocode = $self->nocode;
     }
-    
+
     if ($self->nara) {
         return Text::Soundex::soundex_nara($string);
     } else {
@@ -52,16 +50,16 @@ Text::Phonetic::Soundex - Soundex algorithm
 
 =head1 DESCRIPTION
 
-Soundex is a phonetic algorithm for indexing names by sound, as pronounced in 
-English. Soundex is the most widely known of all phonetic algorithms. 
-Improvements to Soundex are the basis for many modern phonetic algorithms. 
+Soundex is a phonetic algorithm for indexing names by sound, as pronounced in
+English. Soundex is the most widely known of all phonetic algorithms.
+Improvements to Soundex are the basis for many modern phonetic algorithms.
 (Wikipedia, 2007)
 
 If the parameter C<nara> is set to a true value, a variant of the soundex
-algorithm maintained by the National Archives and Records Administration 
+algorithm maintained by the National Archives and Records Administration
 (NARA) will be used.
 
-If the parameter C<nocode> redefines the value that will be returned if the 
+If the parameter C<nocode> redefines the value that will be returned if the
 input string contains no identifiable sounds within it.
 
 This module is a thin wrapper around L<Text::Soundex>.
@@ -86,7 +84,7 @@ LICENSE file included with this module.
 
 =head1 SEE ALSO
 
-Description of the algorithm can be found at 
+Description of the algorithm can be found at
 L<http://en.wikipedia.org/wiki/Soundex>
 
 L<Text::Soundex>

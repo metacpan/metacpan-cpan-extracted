@@ -2,7 +2,8 @@
 
 use strict;
 use Test::More tests => 1;
-use t::lib::TestUtils;
+use lib 't/lib';
+use TestUtils;
 
 my $separator = ( '=' x 40 . "\n" );
 

@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.143240'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,16 +17,18 @@ name: MOP
 requires:
   B: '0'
   Carp: '0'
+  Devel::Hook: '0'
   Devel::OverloadInfo: '0'
   Scalar::Util: '0'
+  Sub::Metadata: '0'
   Sub::Name: '0'
   Symbol: '0'
-  UNIVERSAL::Object: '0.09'
+  UNIVERSAL::Object: '0.12'
   attributes: '0'
   mro: '0'
   perl: v5.10.1
 resources:
   bugtracker: https://github.com/stevan/p5-MOP/issues
   repository: https://github.com/stevan/p5-MOP.git
-version: '0.09'
+version: '0.11'
 x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -1,5 +1,5 @@
 package ZMQ::Raw::Context;
-$ZMQ::Raw::Context::VERSION = '0.08';
+$ZMQ::Raw::Context::VERSION = '0.10';
 use strict;
 use warnings;
 use ZMQ::Raw;
@@ -10,7 +10,7 @@ ZMQ::Raw::Socket - ZeroMQ Context class
 
 =head1 VERSION
 
-version 0.08
+version 0.10
 
 =head1 DESCRIPTION
 

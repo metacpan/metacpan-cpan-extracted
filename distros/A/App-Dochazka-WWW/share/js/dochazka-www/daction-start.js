@@ -42,6 +42,7 @@
 
 define ([
     "jquery",
+    "app/caches",
     "current-user",
     "app/act-lib",
     "app/emp-lib",
@@ -57,6 +58,7 @@ define ([
     "start"
 ], function (
     $,
+    appCaches,
     currentUser,
     actLib,
     empLib,
@@ -92,7 +94,7 @@ define ([
         "myProfileAction": empLib.myProfileAction,
         "empProfileEditSave": empLib.empProfileEditSave,
         "actionEmplSearch": empLib.actionEmplSearch,
-        "masqEmployee": empLib.masqEmployee,
+        "masqEmployee": appCaches.masqEmployee,
 
         // Employee LDAP actions
         "ldapLookupSubmit": ldapLib.ldapLookupSubmit,
@@ -125,7 +127,7 @@ define ([
         "createSingleIntSave": intLib.createSingleIntSave,
         
         // activity select actions
-        "selectActivityAction": actLib.selectActivityAction,
+        "selectActivityAction": appCaches.selectActivityAction,
         "selectActivityGo": actLib.selectActivityGo,
 
         // actions triggered from Adminitrivia menu
@@ -141,7 +143,7 @@ define ([
         "logout": function () {
             console.log("Reached logout action");
             if (currentUser('flag1')) {
-                empLib.endTheMasquerade();
+                appCaches.endTheMasquerade();
             }
             loggout();
         } // logout

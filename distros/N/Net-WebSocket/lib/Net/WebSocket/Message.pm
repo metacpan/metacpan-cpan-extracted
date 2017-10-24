@@ -5,40 +5,12 @@ use warnings;
 
 use Call::Context ();
 
-use Net::WebSocket::Constants ();
-
-our $AUTOLOAD;
-sub AUTOLOAD {
-    my ($self) = shift;
-
-    return if substr( $AUTOLOAD, -8 ) eq ':DESTROY';
-
-    my $last_colon_idx = rindex( $AUTOLOAD, ':' );
-    my $method = substr( $AUTOLOAD, 1 + $last_colon_idx );
-
-    #Figure out what type this is, and re-bless.
-    if (ref($self) eq __PACKAGE__) {
-        my $type = $self->[0]->get_type();
-
-        my $class = __PACKAGE__ . "::$type";
-        if (!$class->can('new')) {
-            Module::Load::load($class);
-        }
-
-        bless $self, $class;
-
-        if ($self->can($method)) {
-            return $self->$method(@_);
-        }
+sub new {
+    if (!$_[1]->isa('Net::WebSocket::Frame')) {
+        die( (caller 0)[3] . ' needs at least one Net::WebSocket::Frame object!' );
     }
 
-    die( "$self has no method “$method”!" );
-}
-
-#----------------------------------------------------------------------
-
-sub create_from_frames {
-    return bless \@_, __PACKAGE__;
+    return bless \@_, shift;
 }
 
 sub get_frames {
@@ -59,6 +31,20 @@ sub to_bytes {
     my ($self) = @_;
 
     return join( q<>, map { $_->to_bytes() } @$self );
+}
+
+#----------------------------------------------------------------------
+# Static function that auto-loads the actual message class.
+
+sub create_from_frames {
+    my $type = $_[0]->get_type();
+
+    my $class = __PACKAGE__ . "::$type";
+    if (!$class->can('new')) {
+        Module::Load::load($class);
+    }
+
+    return $class->new(@_);
 }
 
 1;

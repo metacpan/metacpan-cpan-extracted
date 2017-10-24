@@ -1,0 +1,361 @@
+-*- encoding: utf-8; indent-tabs-mode:nil -*-
+
+=encoding utf-8
+
+=head1 Document Status
+
+This text is published under the I<Creative Commons> license
+CC-BY-ND.
+
+Copyright (c) 2017 Jean Forget. All rights reserved.
+
+The text is often (but irregularly) updated on Github. There are
+a French version and an English version. Since I am more at ease
+discussing astronomical subjects in French, the English version
+will lag behind the French one.
+
+This text is an integral part of the module's distribution package.
+So you can read it on web pages generated from CPAN
+(L<http://search.cpan.org>, L<https://metacpan.org>, etc).
+But it is not used during the module installation process.
+So, I guess it will not appear in C<.deb> or C<.rpm> packages.
+
+=head1 Why This Text? For Whom?
+
+The main purpose of this text is to explain how the sunrises
+and sunsets are computed. These explanations are much too long
+to be included into the module's POD section.
+
+=head2 For Whom? For Me
+
+You may be surprised that the main person for whom I write this
+is myself. I write this text to remember which problems I have
+encountered while maintaining this module and how I fixed them.
+But mainly, I write this to build a detailed description of the
+precise iterative algorithm, because 
+L<Paul Schlyter's explanations|http://www.stjarnhimlen.se/comp/riset.html#3>
+are not detailed enough for my taste and there is no
+compilable source available to check this algorithm (unlike the 
+L<simple version without iteration|http://www.stjarnhimlen.se/comp/sunriset.c>.
+
+=head2 For Whom? For The Next Module Maintainer
+
+The second person for whom I write is the next module maintainer. I have read
+L<Neil Bowers' message|http://codeverge.com/perl.module-authors/the-module-authors-pledge/744969>
+about I<the module authors pledge>. I agree with him and I declare that
+should I stop maintaing my modules for whatever reason, I accept that 
+any volunteer can take charge of them.
+
+What Neil did not explain, is that the new maintainer must obey a few
+criteria and must have three available resources to take over a module maintenance:
+be competent in Perl programming, have enough available time to work on
+the module and be enthusiastic enough to get around to it.
+
+In the case of astronomical module, the competence in Perl programming is
+not enough, you must also be competent in astronomy. So, if you think you might
+maintain this module, first read the present text. If you understand why I bother
+about such and such question, if you can follow my train of thought with being
+lost, then you are competent enough. If you think I am playing
+L<Captain Obvious|http://tvtropes.org/pmwiki/pmwiki.php/Main/CaptainObvious>
+and if you have instant answers to my questions, then you are the ideal
+person which could maintain this module. If you do not understand what all
+this is about, and if sines and cosines put you off, do not consider
+working on this module's innards.
+
+=head2 For Whom? For Bug Reporters
+
+This text is also for those who think they have found a bug
+in the module or who want to offer an idea to improve the module.
+Maybe the bug is already known and is waiting for a fix.
+Maybe the bug was found and the fix is not successful. Maybe
+the proposed improvement contradicts some other functionality
+of the module.
+
+=head2 For Whom? For Curious Users
+
+Lastly, this text is aimed at any person curious enough to learn
+a few astronomical facts. I tried to steer away from overly complicated
+computations. Their place is in the Perl source, not in this text.
+Yet, you will find here simple computations and mathematical reasoning.
+
+=head2 Remarks About The Style
+
+Some chunks of this text appear as a series of questions and answers.
+This is not a FAQ. Rather, this is a elegant way to give a progressive
+explanation of some subject. This method has already been used by 
+many other writers, especially Plato, Galileo and Douglas Hofstadter.
+
+=head2 Other Remarks
+
+In my explanations, I usually take the point of view of a person living
+in the Northern hemisphere, between the Tropic of Cancer and the Arctic Circle.
+For example, I will write that at noon, the sun is located exactly southward,
+although any schoolboy from Australia, New Zealand, South Africa, Argentina
+and similar countries perfectly know that at noon, the sun is northward.
+
+In a similar way, 21st of March is called the I<vernal equinox> or the
+I<spring equinox>, even if it pinpoints the beginning of autumn in the Southern
+hemisphere.
+
+But using politically correct sentences would yield convoluted phrases, 
+which hinders the pedagogical purpose of the text and the understanding
+of the described phenomena.
+
+=head1 Sources
+
+I will give here only the sources that provide lists of numerical values.
+Books and articles with only a literary description of the subject are too
+many to be listed here.
+
+=head2 Unused Sources
+
+Some sources provide a list of sunsets and sunrises, but I did not use
+them because they do not explain which algorithm they use or because
+I cannot control the parameters.
+
+=over 4
+
+=item The I<Almanach Du Facteur>
+
+In France, it is (or rather it was) customary to buy almanachs from the postman
+each year. In each almanach, you find a page giving the sunrise and sunset times
+for all the days of the year. Unfortunately, the times are given in HH:MM syntax, not
+including the seconds. In addition, even if you buy a provincial edition, the
+sunrise and sunset times are given for Paris. Lastly, the algorithm is not
+specified.
+
+=item The I<Institut de Mécanique Céleste et de Calcul des Éphémérides> (IMCCE, Institute of Celestial Mechanics and Ephemerides Computation)
+
+This L<site|https://www.imcce.fr/langues/fr/index.html>
+(also available in L<english|https://www.imcce.fr/langues/en/index.html>)
+used to give an HTML form to generate a table giving the sunrise and sunset times
+for a location and a time span  of your choosing. Unfortunately, this webpage
+disappeared.
+
+There is an available
+L<webservice|http://vo.imcce.fr/webservices/miriade/?rts>
+to give the same functionality, but I did not try it.
+
+=back
+
+=head2 Used Sources
+
+=over 4
+
+=item Paul Schlyter's Website
+
+This L<site|http://www.stjarnhimlen.se/english.html>
+provides a
+L<C program|http://stjarnhimlen.se/comp/sunriset.c> 
+ready to compile and use, giving the 
+L<sunrise and sunset|http://stjarnhimlen.se/comp/riset.html> 
+times. This is the basis of the simple algorithm used in
+C<Astro::Sunrise>. Its precision, as stated by the author,
+is oneor two minutes, but it can be much less precise depending
+on the location and date, especially when we are close to the
+beginning or the end of the period when the midnight sun is visible.
+
+Paul Schlyter's website includes also
+L<many informations|http://stjarnhimlen.se/comp/ppcomp.html> 
+about computing the position of various celestial bodies.
+This website is very interesting, but I preferred writing
+my own version, describing the computation of only the sun
+and not bothering with other celestial bodies.
+
+=item The U.S Naval Observatory
+
+L<The US Naval Obseravtory|http://aa.usno.navy.mil/faq/index.php> 
+gives a
+L<HTML form|http://aa.usno.navy.mil/data/docs/RS_OneYear.php>
+to compute the sunrise and sunset times. These times are given
+in HH:MM format. I would have preferred HH:MM:SS, but I will have
+to deal with just HH:MM.
+
+This website gives also 
+L<very interesting informations|http://aa.usno.navy.mil/faq/index.php>
+about celestial computations, but without restricting itself to the sun,
+like I am doing here.
+
+=item Stellarium
+
+Stellarium is a PC app to simulate a night sky. If you do not bother with
+the main view giving a real time sky simulation, you can use it to obtain
+the coordinates of a given celestial body at a given time when seen from
+a given Earth location.
+
+To be completed
+
+=head1 Heliocentrism Or Geocentrism?
+
+From those two assertions below, which one is true and which one is false?
+
+=over 4
+
+=item A
+
+The Sun goes around the Earth.
+
+=item B
+
+The Earth goes around the Sun.
+
+=back
+
+Assertion A is false, everyone agrees. But assertion B is false too.
+
+Oh yes indeed, will you answer, it should read actually:
+
+=over 4
+
+=item C
+
+The Earth runs along an elliptic orbit with the Sun located on
+one focus of the ellipsis.
+
+=back
+
+This assertion is false too. Each one of the following assertions
+is nearer to the truth than assertions B and C (and A).
+
+=over 4
+
+=item D
+
+The center of mass of the Earth-Moon binary system runs along an
+elliptic orbit with the center of mass of the Solar System located
+on a focus of the ellipsis.
+
+And I will point that the center of mass of the Sun is not the same
+as the center of mass of the Solar System. There are even times when
+the center of mass of the Solar System is I<outside> the surface of the Sun.
+The L<webpage|http://hp41programs.yolasite.com/solar-sys-bary.php>
+about an HP-41 program states that on 15th March 1983, the distance between
+both centers of mass was nearly 2.1 Sun radii.
+
+=item E
+
+The Earth runs along an orbit around the Sun, with noticeable perturbations
+caused by the Moon, Jupiter, Saturn, etc.
+
+Which is a formulation equivalent to assertion D.
+
+=item F
+
+The movement of the Earth with the Solar System is a I<n>-body problem,
+with I<n> ≥ 3. Therefore, there is no analytical solution.
+
+=item G
+
+The Solar System is a chaotic system. Even if we can predict with a reasonable
+accuracy what the various orbits will look like within the next hundred million
+years, this prediction is no longer possible for an interval of one milliard years
+(one billion years for US).
+
+=item H
+
+The Earth moves in the general direction of the Hercules constellation
+with a approximate speed of 220 km/s.
+
+=item I
+
+The Earth runs along an orbit around the center of the Milky Way, with noticeable
+perturbations caused by the Sun, the Moon, Jupiter, Saturn, etc.
+
+=back
+
+Assertions B and C are what Terry Pratchett, Jack Cohen and Ian Stewart call
+I<lies to children> (I<Science of Discworld>, chapter 4, pages 38 and 39). These
+are false assertions, but simple enough to be understood by a child and which, even
+if false, leads children to a better understanding of the described phenomena and brings
+them closer to truth. You cannot tell assertion C to a child and expect him to understand
+it without telling him first assertion B. And it is worse with assertions D and next.
+
+Moreover, these are I<lies to adults>. In the beginning, people would consider that
+the aim of Physics was to build a mathematical representation of the real world,
+getting closer and closer to the ultimate truth. Then, there was de Broglie's work
+with the duality of wave and particle and the Copenhagen interpretation. Is the ultimate
+nature of the electron (for example) a wave? No. Is it a particle? No. So what? We do not
+care about the ultimate nature of the electron. The aim of Physics is to no longer
+to provide a mathematical I<representation> of the real world, but to build 
+several mathematical I<models> of the real world. We know that intrinsically all
+models are false, but each one has it usefulness to lead to make computations about
+the real world.
+
+Please note that I was talking about scientific methods. I was not dealing with 
+electoral campaigns and advertisements. Every sane adult knows for
+sure that these are ridden with lies.
+
+Other lies to adults you will find in the following: the light propagates instantly
+from one place to another, the celestial bodies outside the Solar System are 
+motionless, they are located on a sphere call the I<Celestial Sphere>, 
+UTC time is equal to GMT time and, as I have already stated, all interesting locations
+on Earth are between the Tropic of Cancer and the Arctic Circle.
+
+=head2 Conclusion
+
+All this to explain that in the following text, I will not refrain from using
+the geocentric model where the Sun turns around the Earth in 24 hours or the 
+geocentric model where the Sun turns arount the Earth in 365.25 days.
+
+"It is not necessary that the following hypothesis be true or even
+resemble the truth. One thing is for sure that they provide calculations
+in accordance with the actual observations"
+
+Excerpt from Osiander's preface to Copernic's book. This excerpt was reused
+by Jean-Pierre Petit as a foreword to
+L<Cosmic Story|ww.savoir-sans-frontieres.com/JPP/telechargeables/English/cosmic_story_anglo_indien/cosmic_story_en.html>.
+In Copernic's time, Osiander wanted to have heliocentrism accepted
+by people who were certain that geocentrism was the one and only truth.
+It is ironical that I use the same quotation to have geocentrism accepted
+by people who believe that heliocentrism is the one and only truth.
+
+=head1 Earth / Sun Movements
+
+=head2 Basic Movements
+
+In an heliocentric system pointing at fixed stars, Earth orbits around the
+Sun in one year. In other words, in a geocentric system, the Sun orbits around
+the Earth in one year, with an average speed of 0.986 degrees per day.
+
+Also, the Earth spins around itself, making one turn in 23h 56mn 4s,
+with a speed of 4.178e-3 degrees per second, that is, 360.986 degrees per day.
+
+Q: I thought that the Earth was spinning in 24h!
+
+A: While the Earth spins, the Sun orbits around it. And what we see is
+the combination of both movements, which gives a combined speed of 360 degrees per day.
+What the commoner is interesting in is to find the Sun at the same place in the
+sky at regular times day after day.  Only after this is achieved, the commoner
+becomes a learned person and is interested in knowing the position of the Moon,
+the stars and the planets.
+
+Q: And why did you say "average" two or three times?
+
+A: Because the angular speed of the Sun is not constant.  We will get back
+to this question later.
+
+=head2 Coordinates
+
+The ecliptic if the plane where the Earth's orbit around the Sun is located (when
+using an heliocentric model) or where the Sun's orbit around the Earch is 
+located (when using a geocentric model). We define also the equatorial plane,
+the plane which contains the Earth's equator. These two planes intersect with
+a 23° 26' angle. The intersection is a line, named I<line of nodes>.
+In some cases, it is more convenient to use a half-line than a line.
+In this case, the line of nodes is a half line starting at the Earth center
+and aiming at the Pisces constellation.
+
+=head2 Other Movements
+
+=head3 Weather And Climate
+
+=head3 Equinox Precession
+
+=head3 Nutation
+
+=head3 Perihelion Precession
+
+=head3 Other Drifts And fluctuations
+
+=head3 The Equation Of Time And The Analemma
+

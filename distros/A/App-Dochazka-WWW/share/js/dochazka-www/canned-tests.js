@@ -73,7 +73,7 @@ define ([
             // formID
             var mainarea = $('#mainarea'),
                 htmlbuf = mainarea.html();
-            assert.ok(htmlbuf, "#mainarea html: " + htmlbuf);
+            // assert.ok(htmlbuf, "#mainarea html: " + htmlbuf);
             assert.strictEqual($('form', mainarea).length, 1, "#mainarea contains 1 form");
             assert.strictEqual($('form', mainarea)[0].id, formId, "that form is called " + formId);
         },

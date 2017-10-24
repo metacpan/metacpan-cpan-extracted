@@ -6,7 +6,7 @@ use warnings FATAL => 'all';
 use Exporter 'import';
 use Scalar::Util qw( looks_like_number );
 
-our $VERSION = '0.10';
+our $VERSION = '0.12';
 
 our @EXPORT_OK = qw(
     colorbar
@@ -16,6 +16,7 @@ our @EXPORT_OK = qw(
     print_colored
     print_colored_text
     color_table
+    add_mapping
 );
 
 my $color_mapping = {};
@@ -123,6 +124,11 @@ my $color2rgb = [
 
 my $color = 0;
 my $rgb2color = { map { $_ => $color++ } @$color2rgb };
+
+sub add_mapping {
+    my ($name, $mapping) = @_;
+    $color_mapping->{$name} = $mapping;
+}
 
 sub rgb2color {
     my ($rgb) = @_;
@@ -255,7 +261,7 @@ Term::Colormap - Colormaps for ANSI 256 Color Terminals!
 
 =head1 VERSION
 
-Version 0.10
+Version 0.12
 
 =head1 SYNOPSIS
 
@@ -277,6 +283,7 @@ Provide colormaps and functions to simplify rendering colored text using ANSI 25
     print_colored
     print_colored_text
     color_table
+    add_mapping
 
 =head1 SUBROUTINES/METHODS
 
@@ -337,6 +344,14 @@ Provide colormaps and functions to simplify rendering colored text using ANSI 25
     my $rainbow = colormap('rainbow');
 
     color_table($rainbow);
+
+=head2 add_mapping
+
+    Add custom colormaps to the list of available colormaps.
+
+    add_mapping('my_colors', [ 1, 3, 5, 7, 9 ])
+
+    color_table('my_colors');
 
 =head1 AVAILABLE COLORMAPS
 

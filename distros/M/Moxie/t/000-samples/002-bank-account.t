@@ -18,6 +18,8 @@ package BankAccount {
 
     has _balance => ( default => sub { 0 } );
 
+    my sub _balance : private;
+
     sub BUILDARGS : init_args(
         balance => _balance
     );
@@ -39,6 +41,8 @@ package CheckingAccount {
     extends 'BankAccount';
 
     has '_overdraft_account';
+
+    my sub _overdraft_account : private;
 
     sub BUILDARGS : init_args(
         overdraft_account => _overdraft_account,

@@ -1,5 +1,5 @@
 package ZMQ::Raw::Poller;
-$ZMQ::Raw::Poller::VERSION = '0.08';
+$ZMQ::Raw::Poller::VERSION = '0.10';
 use strict;
 use warnings;
 use ZMQ::Raw;
@@ -12,7 +12,7 @@ ZMQ::Raw::Poller - ZeroMQ Poller class
 
 =head1 VERSION
 
-version 0.08
+version 0.10
 
 =head1 DESCRIPTION
 
@@ -64,6 +64,10 @@ At least one message may be sent to the socket without blocking.
 
 =back
 
+=head2 remove( $socket )
+
+Remove C<$socket> from the list of sockets to poll for events.
+
 =head2 events( $socket )
 
 Retrieve the events for C<$socket>. If C<$socket> was not previously added to
@@ -73,6 +77,10 @@ the poller this method will return C<undef>.
 
 Wait for up to C<$timeout> milliseconds for an event. Returns the number of
 items that had events.
+
+=head2 size( )
+
+Retrieve the number of sockets currently polled.
 
 =head1 AUTHOR
 

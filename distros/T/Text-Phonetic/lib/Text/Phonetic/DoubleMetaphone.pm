@@ -6,8 +6,6 @@ use utf8;
 use Moo;
 extends qw(Text::Phonetic);
 
-__PACKAGE__->meta->make_immutable;
-
 our $VERSION = $Text::Phonetic::VERSION;
 
 sub _predicates {
@@ -17,15 +15,15 @@ sub _predicates {
 sub _do_compare {
     my ($self,$result1,$result2) = @_;
 
-    return 50 
-       if Text::Phonetic::_compare_list($result1,$result2);	
+    return 50
+       if Text::Phonetic::_compare_list($result1,$result2);
 
     return 0;
 }
 
 sub _do_encode {
     my ($self,$string) = @_;
-    
+
     my($code1, $code2) = Text::DoubleMetaphone::double_metaphone($string);
     return [$code1,$code2];
 }
@@ -42,7 +40,7 @@ Text::Phonetic::DoubleMetaphone - DoubleMetaphone algorithm
 
 =head1 DESCRIPTION
 
-The Double Metaphone search algorithm is a phonetic algorithm written by 
+The Double Metaphone search algorithm is a phonetic algorithm written by
 Lawrence Philips and is the second generation of his Metaphone algorithm.
 (Wikipedia, 2007)
 
@@ -71,7 +69,7 @@ LICENSE file included with this module.
 
 =head1 SEE ALSO
 
-Description of the algorithm can be found at 
+Description of the algorithm can be found at
 L<http://en.wikipedia.org/wiki/Double_Metaphone>
 
 L<Text::DoubleMetaphone>

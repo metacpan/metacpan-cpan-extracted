@@ -10,28 +10,23 @@ use HTTP::Request::Common qw<GET POST>;
   use Dancer2::Plugin::GraphQL;
   set plugins => { 'GraphQL' => { graphiql => 1 } };
   use GraphQL::Schema;
-  use GraphQL::Type::Object;
-  use GraphQL::Type::Scalar qw/ $String /;
 
-  my $schema = GraphQL::Schema->new(
-    query => GraphQL::Type::Object->new(
-      name => 'QueryRoot',
-      fields => {
-        helloWorld => {
-          type => $String,
-          resolve => sub { 'Hello, world!' },
-        },
-      },
-    ),
-  );
-  graphql '/graphql' => $schema;
+  my $schema = GraphQL::Schema->from_doc(<<'EOF');
+schema {
+  query: QueryRoot
+}
+type QueryRoot {
+  helloWorld: String
+}
+EOF
+  graphql '/graphql' => $schema, { helloWorld => 'Hello, world!' };
   graphql '/graphql2' => sub {
     my ($app, $body, $execute) = @_;
     # returns JSON-able Perl data
     $execute->(
       $schema,
       $body->{query},
-      undef, # $root_value
+      { helloWorld => 'Hello, world!' }, # $root_value
       $app->request->headers,
       $body->{variables},
       $body->{operationName},

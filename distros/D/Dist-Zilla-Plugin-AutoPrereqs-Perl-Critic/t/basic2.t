@@ -1,5 +1,6 @@
 #!perl
 
+use 5.006;
 use strict;
 use warnings;
 
@@ -35,11 +36,11 @@ $http_tiny->mock( 'get', Local::HTTP::Tiny::Mock::get_200() );
                             critic_config => 'perl_critic_config.txt',
                             phase         => 'test',
                             type          => 'recommends',
-                        }
+                        },
                     ],
                 ),
             },
-        }
+        },
     );
 
     is( exception { $tzil->build; }, undef, 'Built dist successfully' );
@@ -71,11 +72,11 @@ $http_tiny->mock( 'get', Local::HTTP::Tiny::Mock::get_200() );
                             phase                => 'test',
                             type                 => 'recommends',
                             remove_core_policies => 0,
-                        }
+                        },
                     ],
                 ),
             },
-        }
+        },
     );
 
     is( exception { $tzil->build; }, undef, 'Built dist successfully' );

@@ -1,23 +1,18 @@
 #!/bin/perl
 #
 use Carp;
-use Getopt::Long;
-use Math::Polynomial::Solve qw(:sturm :utility ascending_order);
+use Math::Polynomial::Solve qw(:sturm ascending_order);
+use Math::Utils qw(:compare :polynomial);
 use Math::Complex;
 use strict;
 use warnings;
-#use IO::Prompt;
 
-my $line;
-my $ascending = 0;
+my $fltcmp = generate_fltcmp();
 
-GetOptions('ascending' => \$ascending);
-
+my $ascending = 1;
 ascending_order($ascending);
 
-print "Order = ", ascending_order()? "ascending": "descending (default)", "\n";
-
-while ($line = prompt("Polynomial: ", -num))
+while (my $line = prompt("Polynomial: "))
 {
 	my @coef = split(/,? /, $line);
 	my @chain = poly_sturm_chain( @coef );
@@ -37,10 +32,10 @@ while ($line = prompt("Polynomial: ", -num))
 	}
 
 	my @roots = sturm_bisection_roots(\@chain, $xvals[0], $xvals[1]);
-	my @zeros = poly_evaluate(\@coef, \@roots);
+	my @zeros = pl_evaluate(\@coef, \@roots);
 
 	my $c = 0;
-	$c += abs(fltcmp($_, 0.0)) foreach(@zeros);
+	$c += abs(&$fltcmp($_, 0.0)) foreach(@zeros);
 	print "\nroots at: [", join(", ", @roots), "]\n\n";
 	print "$c non-roots\n" if ($c);
 }

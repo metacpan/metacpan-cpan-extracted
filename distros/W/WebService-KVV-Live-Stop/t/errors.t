@@ -8,6 +8,8 @@ BEGIN {
 
 throws_ok { WebService::KVV::Live::Stop->new('Tabluha')->departures } qr/^Error/;
 
+#my $stop = WebService::KVV::Live::Stop->new('Siemensallee');
+
 done_testing;
 
 

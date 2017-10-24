@@ -9,6 +9,9 @@ package Foo {
     use Moxie;
 
     has _bar => sub { 'bar' };
+
+    my sub _bar : private;
+
     sub bar { _bar }
 }
 
@@ -16,6 +19,9 @@ package Bar {
     use Moxie;
 
     has _foo => sub { 'foo' };
+
+    my sub _foo : private;
+
     sub foo { _foo }
 }
 

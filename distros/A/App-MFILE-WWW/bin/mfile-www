@@ -381,7 +381,7 @@ if ( $ddist ) {
     if ( ! _symlinks_exist( $ddist_sharedir ) ) {
         print "\$sharedir_writable == $sharedir_writable\n";
         if ( ! $sharedir_writable ) {
-            print "Symlinks not present and sharedir not writable: run the script again as root\n";
+            print "Symlinks not present and sharedir not writable: run the script again as root with --init\n";
             exit;
         }
         if ( $init ) {
@@ -390,6 +390,8 @@ if ( $ddist ) {
             my %sp = _symlink_paths( $ddist_sharedir );
             _create_symlink( $sp{old_css}, $sp{new_css} );
             _create_symlink( $sp{old_corejs}, $sp{new_corejs} ); 
+        } else {
+            print "--init not given; not creating symlinks";
         }
     }
 

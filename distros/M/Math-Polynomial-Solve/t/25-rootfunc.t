@@ -19,31 +19,31 @@ my @case = (
 	[1, 0, 0, 0, 0, 1],
 	[1, 0, 0, 0, 0, 0, 1],
 	[1, 0, 0, 0, 0, 0, 0, 1],
-	[1, 0, -1],
-	[1, 0, 0, -1],
-	[1, 0, 0, 0, -1],
-	[1, 0, 0, 0, 0, -1],
-	[1, 0, 0, 0, 0, 0, -1],
-	[1, 0, 0, 0, 0, 0, 0, -1],
-	[2, 0, 1],
-	[9, 0, 0, 27],
-	[1, 0, 0, 0, 0, 5],
+	[-1, 0, 1],
+	[-1, 0, 0, 1],
+	[-1, 0, 0, 0, 1],
+	[-1, 0, 0, 0, 0, 1],
+	[-1, 0, 0, 0, 0, 0, 1],
+	[-1, 0, 0, 0, 0, 0, 0, 1],
+	[1, 0, 2],
+	[27, 0, 0, 9],
+	[5, 0, 0, 0, 0, 1],
 	[1, 0, 1, 0, 1],	# shouldn't use root() ever.
-	[3, 0, -1, -4, 2],	# shouldn't use root() ever.
+	[2, -4, -1, 0, 3],	# shouldn't use root() ever.
 );
 
 #
 # Use poly_roots() as per normal...
 #
 poly_option(root_function => 0);
-ascending_order(0);
+ascending_order(1);
 
 for (@case)
 {
 	my @coef = @$_;
 	my $n = $#coef;
 	my @x = poly_roots(@coef);
-	my @y = pl_evaluate([reverse @coef], @x);
+	my @y = pl_evaluate([@coef], @x);
 
 	my @badvals = grep {&$ne($_, 0)} @y;
 
@@ -61,7 +61,7 @@ for (@case)
 	my @coef = @$_;
 	my $n = $#coef;
 	my @x = poly_roots(@coef);
-	my @y = pl_evaluate([reverse @coef], @x);
+	my @y = pl_evaluate([@coef], @x);
 
 	my @badvals = grep {&$ne($_, 0)} @y;
 

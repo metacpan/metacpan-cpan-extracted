@@ -1,4 +1,6 @@
 bin/createdatabase
+Changes
+createdatabase.PL
 lib/Geo/Coder/Free.pm
 lib/Geo/Coder/Free/bin/db2sql
 lib/Geo/Coder/Free/databases/admin1.db
@@ -18,5 +20,9 @@ t/admin1.t
 t/admin2.t
 t/cities.t
 t/lookup.t
+t/pod-cm.t
+t/pod.t
+t/spelling.t
+t/strict.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -13,7 +13,7 @@ use MOP::Slot;
 
 use MOP::Internal::Util;
 
-our $VERSION   = '0.09';
+our $VERSION   = '0.11';
 our $AUTHORITY = 'cpan:STEVAN';
 
 our @ISA; BEGIN { @ISA = 'UNIVERSAL::Object::Immutable' };
@@ -666,7 +666,10 @@ sub add_slot {
     my $class = $self->name;
     my $slot  = MOP::Slot->new( name => $name, initializer => $initializer );
 
-    Carp::croak('[ERROR] Slot is not from local (' . $class . '), it is from (' . $slot->origin_stash . ')')
+    # just as with add_method, we take ownership
+    # of the initializer and set the COMP STASH
+    # field so that we know it is ours.
+    MOP::Internal::Util::SET_COMP_STASH_FOR_CV( $slot->initializer, $class )
         if $slot->origin_stash ne $class;
 
     my $has = MOP::Internal::Util::GET_GLOB_SLOT( $stash, 'HAS', 'HASH' );
@@ -806,7 +809,7 @@ MOP::Role - A representation of a role
 
 =head1 VERSION
 
-version 0.09
+version 0.11
 
 =head1 DESCRIPTION
 

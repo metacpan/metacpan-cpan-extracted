@@ -21,6 +21,7 @@ sub main {
         skip 'Cannot find Git in PATH' if !Git::Wrapper->has_git_in_path();
 
         _test_with_defaults();
+        _test_with_changed_defaults();
         _test_with_config_bin();
         _test_with_config_bin_scripts();
         _test_with_config_scripts_unchanged();
@@ -129,6 +130,46 @@ sub _test_with_defaults {
     is( ( stat $files[1] )[2] & 07777, _p(0644), sprintf q{File '%s' adjusted correctly}, $files[1]->relative($root_dir) );
     is( ( stat $files[2] )[2] & 07777, _p(0644), sprintf q{File '%s' adjusted correctly}, $files[2]->relative($root_dir) );
     is( ( stat $files[3] )[2] & 07777, _p(0644), sprintf q{File '%s' adjusted correctly}, $files[3]->relative($root_dir) );
+
+    return;
+}
+
+sub _test_with_changed_defaults {
+
+    note('test with changed default value');
+
+    # Create a new "distribution".
+    #
+    # This copies the content of dist_root to a new directory: $tzil->root
+    my $tzil = Builder->from_config(
+        { dist_root => tempdir() },
+        {
+            add_files => {
+                'source/dist.ini' => simple_ini(
+                    'Git::GatherDir',
+                    [
+                        'Git::FilePermissions',
+                        {
+                            default => '0724',
+                        },
+                    ],
+                ),
+            },
+        },
+    );
+
+    # Get the directory where the source of the new distributions is
+    my $root_dir = path( $tzil->root );
+
+    # Configure a Git repository in the source and create our 4 test files
+    my @files = _configure_root($root_dir);
+
+    is( exception { $tzil->build; }, undef, 'Built dist successfully' );
+
+    is( ( stat $files[0] )[2] & 07777, _p(0724), sprintf q{File '%s' adjusted correctly}, $files[0]->relative($root_dir) );
+    is( ( stat $files[1] )[2] & 07777, _p(0724), sprintf q{File '%s' adjusted correctly}, $files[1]->relative($root_dir) );
+    is( ( stat $files[2] )[2] & 07777, _p(0724), sprintf q{File '%s' adjusted correctly}, $files[2]->relative($root_dir) );
+    is( ( stat $files[3] )[2] & 07777, _p(0724), sprintf q{File '%s' adjusted correctly}, $files[3]->relative($root_dir) );
 
     return;
 }

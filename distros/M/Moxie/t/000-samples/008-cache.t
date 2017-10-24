@@ -20,14 +20,10 @@ package Cache {
 
     sub BUILDARGS : init_args( fetcher => _fetcher );
 
+    sub data ($self) : lazy(_data) { $self->{_fetcher}->() }
+
     sub has_data : predicate(_data);
     sub clear    : clearer(_data);
-
-    sub data ($self) {
-        _data //= $self->_fetch_data;
-    }
-
-    sub _fetch_data ($self) { _fetcher->() }
 }
 
 my @data = qw[

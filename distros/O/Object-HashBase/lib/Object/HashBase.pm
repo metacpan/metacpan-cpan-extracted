@@ -2,7 +2,8 @@ package Object::HashBase;
 use strict;
 use warnings;
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
+our $HB_VERSION = $VERSION;
 # The next line is for inlining
 # <-- START -->
 
@@ -36,9 +37,8 @@ sub import {
     my $into  = caller;
 
     # Make sure we list the OLDEST version used to create this class.
-    $Object::HashBase::VERSION{$into} = $Object::HashBase::VERSION
-        if !$Object::HashBase::VERSION{$into}
-        || $Object::HashBase::VERSION{$into} > $Object::HashBase::VERSION;
+    my $ver = $Object::HashBase::HB_VERSION || $Object::HashBase::VERSION;
+    $Object::HashBase::VERSION{$into} = $ver if !$Object::HashBase::VERSION{$into} || $Object::HashBase::VERSION{$into} > $ver;
 
     my $isa = _isa($into);
     my $attr_list = $Object::HashBase::ATTR_LIST{$into} ||= [];

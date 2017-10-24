@@ -1,4 +1,4 @@
-File::Random Version 0.17
+File::Random Version 0.18
 =========================
 NAME
     File::Random - Perl module for random selecting of a file
@@ -23,7 +23,8 @@ SYNOPSIS
   
       my $random_gif = random_file(-dir       => $dir,
                                    -check     => qr/\.gif$/,
-                                   -recursive => 1);
+                                   -recursive => 1,
+                                   -follow => 1);
                                                            
       my $no_exe     = random_file(-dir   => $dir,
                                    -check => sub {! -x});

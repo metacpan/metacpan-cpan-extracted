@@ -6,34 +6,32 @@ use utf8;
 use Moo;
 extends qw(Text::Phonetic);
 
-__PACKAGE__->meta->make_immutable;
-
 our $VERSION = $Text::Phonetic::VERSION;
 
 our %DOUBLECHARS = (
-    SC  =>'C', 
-    SZ  =>'C', 
-    CZ  =>'C', 
-    TZ  =>'C', 
-    SZ  =>'C', 
+    SC  =>'C',
+    SZ  =>'C',
+    CZ  =>'C',
+    TZ  =>'C',
+    SZ  =>'C',
     TS  =>'C',
-    KS  =>'X', 
-    PF  =>'V', 
-    QU  =>'KW', 
-    PH  =>'V', 
-    UE  =>'Y', 
+    KS  =>'X',
+    PF  =>'V',
+    QU  =>'KW',
+    PH  =>'V',
+    UE  =>'Y',
     AE  =>'E',
-    OE  =>'Ö', 
-    EI  =>'AY', 
-    EY  =>'AY', 
-    EU  =>'OY', 
-    AU  =>'A§', 
+    OE  =>'Ö',
+    EI  =>'AY',
+    EY  =>'AY',
+    EU  =>'OY',
+    AU  =>'A§',
     OU  =>'§ '
 );
 
 sub _do_encode {
     my ($self,$string) = @_;
-    
+
     $string = uc($string);
     $string =~ tr/A-Z//cd;
 
@@ -43,16 +41,16 @@ sub _do_encode {
             substr ($string,$index,2) = $DOUBLECHARS{substr $string,$index,2};
         }
     }
-    
+
     # Single character substitutions via tr
     $string =~tr/ZKGQIJFWPT§/CCCCYYVBDUA/;
-    
+
     #delete forbidden characters
     $string =~tr/ABCDLMNORSUVWXY//cd;
-    
+
     #remove double chars
     $string =~tr/ABCDLMNORSUVWXY//s;
-    
+
     return $string;
 }
 
@@ -66,25 +64,25 @@ Text::Phonetic::Phonem - Phonem algorithm
 
 =head1 DESCRIPTION
 
-The PHONEM algorithm is a simple substitution algorithm that was originally 
+The PHONEM algorithm is a simple substitution algorithm that was originally
 implemented in dBase.
 
-Implementation of the PHONEM substitutions, as described in Georg Wilde and 
-Carsten Meyer, "Doppelgaenger gesucht - Ein Programm fuer kontextsensitive 
+Implementation of the PHONEM substitutions, as described in Georg Wilde and
+Carsten Meyer, "Doppelgaenger gesucht - Ein Programm fuer kontextsensitive
 phonetische Textumwandlung" from ct Magazin fuer Computer & Technik 25/1999.
 
-The original variant was implemented as X86-Assembler-Funktion. This 
-implementation does not try to mimic the original code, though it should 
+The original variant was implemented as X86-Assembler-Funktion. This
+implementation does not try to mimic the original code, though it should
 achieve equal results. As the original software used for building the original
 implementation was not available, there was no testing for correctness, other
 than the examples given in the article.
 
-The Perl implementation was written by Martin Wilz 
+The Perl implementation was written by Martin Wilz
 (L<http://wilz.de/view/Themen/MagisterArbeit>)
 
 =head1 AUTHOR
 
-    Martin Wilz 
+    Martin Wilz
     http://wilz.de/view/Themen/MagisterArbeit
 
     Maroš Kollár

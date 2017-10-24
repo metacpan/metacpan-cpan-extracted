@@ -71,6 +71,9 @@ Instantiate the class. Nothing is actually done here. Options are:
 
 =item * C<parser> (required) - An instance of L<Net::WebSocket::Parser>.
 
+=item * C<out> (required) - The endpoint’s output object. An
+instance of L<IO::Framed::Write> or a compatible class.
+
 =item * C<max_pings> (optional) - The maximum # of pings to send before
 we send a C<close> frame (which ends the session).
 
@@ -88,14 +91,6 @@ If you want to avoid buffering a large message, you can do this:
         );
     },
 
-=item * C<out> (optional) - The endpoint’s output filehandle. This is only
-useful if your output is a blocking filehandle; otherwise, you should
-process the write queue manually via C<shift_write_queue()>.
-
-=item * C<before_send_frame> (optional) - A callback to be executed before
-the endpoint sends a ping, pong, or close frame. It receives as an argument
-the frame that will be sent.
-
 =back
 
 =head2 I<OBJ>->get_next_message()
@@ -108,7 +103,8 @@ message frames:
 
 =over
 
-=item * close: Respond with the identical close frame.
+=item * close: Respond (immediately) with the identical close frame.
+See below for more information.
 
 =item * ping: Send the appropriate pong frame.
 
@@ -121,26 +117,6 @@ a PROTOCOL_ERROR close frame.
 This method may not be called after a close frame has been sent (i.e.,
 if the C<is_closed()> method returns true).
 
-B<NOTE:> If the “out” file handle given to the constructor is in
-non-blocking mode, then any response frames will be queued rather than
-sent immediately. That’s where the next method comes in …
-
-=head2 I<OBJ>->flush_write_queue()
-
-Only useful in non-blocking I/O contexts—and at that, probably
-only useful when you’re not using an event loop, since that loop will
-likely do its own write buffering.
-
-This will attempt to flush one frame from the write queue. If only part
-of the message is written, then the next call to this method will resume
-the output of that message.
-
-=head2 I<OBJ>->shift_write_queue()
-
-This is useful when you have an event loop so that you can feed the frames
-from the Endpoint object’s queue into the event loop’s write queue.
-It returns a single frame object, or undef if the queue is empty.
-
 =head2 I<OBJ>->check_heartbeat()
 
 Ordinarily, sends a distinct ping frame to the remote server
@@ -151,9 +127,34 @@ If the internal ping counter has already reached C<max_pings>, then we
 send a PROTOCOL_ERROR close frame. Further I/O attempts on this object
 will prompt an appropriate exception to be thrown.
 
+=head2 I<OBJ>->sent_close_frame()
+
+Returns a C<Net::WebSocket::Frame::close> object or undef to represent the
+frame that the object has sent, either via the C<close()> method directly
+or automatically via the internal handling of control messages.
+
+=head2 I<OBJ>->received_close_frame()
+
+Returns a C<Net::WebSocket::Frame::close> object or undef to represent the
+frame that the object has received.
+
 =head2 I<OBJ>->is_closed()
 
-Return 1 or 0 to indicate whether we have tried to send a close frame.
+DEPRECATED: Returns 1 or 0 to indicate whether we have sent a close frame.
+Note that C<sent_close_frame()> provides a more useful variant of the
+same functionality; there is no good reason to use this method anymore.
+
+=head1 WHEN A CLOSE FRAME IS RECEIVED
+
+C<get_next_message()> will automatically send a close frame in response
+when it receives one. The received close frame is not returned to the
+application but, like ping and pong, is handled transparently.
+
+Rationale: WebSocket is often billed as “TCP for the web”; however, the
+protocol curiously diverges from TCP in not supporting “half-close”; a
+WebSocket connection is either fully open (i.e., bidirectional) or fully
+closed. (There is some leeway given for finishing up an in-progress message,
+but this is a much more limited concept.)
 
 =head1 EXTENSIONS
 

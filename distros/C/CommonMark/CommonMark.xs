@@ -26,6 +26,9 @@
   #error libcmark 0.21.0 is required.
 #endif
 
+#if PERL_VERSION <= 8
+  #define SvREFCNT_inc_simple_void_NN SvREFCNT_inc
+#endif
 #if PERL_VERSION <= 14
   #define sv_derived_from_pvn(sv, name, len, flags) sv_derived_from(sv, name)
 #endif
@@ -172,78 +175,80 @@ MODULE = CommonMark  PACKAGE = CommonMark  PREFIX = cmark_
 PROTOTYPES: DISABLE
 
 BOOT:
-    static const struct {
-        const char *name;
-        int value;
-    } constants[] = {
-        { "NODE_NONE", CMARK_NODE_NONE },
-        { "NODE_DOCUMENT", CMARK_NODE_DOCUMENT },
-        { "NODE_BLOCK_QUOTE", CMARK_NODE_BLOCK_QUOTE },
-        { "NODE_LIST", CMARK_NODE_LIST },
-        { "NODE_ITEM", CMARK_NODE_ITEM },
-        { "NODE_CODE_BLOCK", CMARK_NODE_CODE_BLOCK },
-        { "NODE_HTML", CMARK_NODE_HTML },
-        { "NODE_PARAGRAPH", CMARK_NODE_PARAGRAPH },
-        { "NODE_HEADER", CMARK_NODE_HEADER },
-        { "NODE_HRULE", CMARK_NODE_HRULE },
-        { "NODE_TEXT", CMARK_NODE_TEXT },
-        { "NODE_SOFTBREAK", CMARK_NODE_SOFTBREAK },
-        { "NODE_LINEBREAK", CMARK_NODE_LINEBREAK },
-        { "NODE_CODE", CMARK_NODE_CODE },
-        { "NODE_INLINE_HTML", CMARK_NODE_INLINE_HTML },
-        { "NODE_EMPH", CMARK_NODE_EMPH },
-        { "NODE_STRONG", CMARK_NODE_STRONG },
-        { "NODE_LINK", CMARK_NODE_LINK },
-        { "NODE_IMAGE", CMARK_NODE_IMAGE },
+    { /* Block required for C89 compilers. */
+        static const struct {
+            const char *name;
+            int value;
+        } constants[] = {
+            { "NODE_NONE", CMARK_NODE_NONE },
+            { "NODE_DOCUMENT", CMARK_NODE_DOCUMENT },
+            { "NODE_BLOCK_QUOTE", CMARK_NODE_BLOCK_QUOTE },
+            { "NODE_LIST", CMARK_NODE_LIST },
+            { "NODE_ITEM", CMARK_NODE_ITEM },
+            { "NODE_CODE_BLOCK", CMARK_NODE_CODE_BLOCK },
+            { "NODE_HTML", CMARK_NODE_HTML },
+            { "NODE_PARAGRAPH", CMARK_NODE_PARAGRAPH },
+            { "NODE_HEADER", CMARK_NODE_HEADER },
+            { "NODE_HRULE", CMARK_NODE_HRULE },
+            { "NODE_TEXT", CMARK_NODE_TEXT },
+            { "NODE_SOFTBREAK", CMARK_NODE_SOFTBREAK },
+            { "NODE_LINEBREAK", CMARK_NODE_LINEBREAK },
+            { "NODE_CODE", CMARK_NODE_CODE },
+            { "NODE_INLINE_HTML", CMARK_NODE_INLINE_HTML },
+            { "NODE_EMPH", CMARK_NODE_EMPH },
+            { "NODE_STRONG", CMARK_NODE_STRONG },
+            { "NODE_LINK", CMARK_NODE_LINK },
+            { "NODE_IMAGE", CMARK_NODE_IMAGE },
 #if CMARK_VERSION >= 0x001700
-        /* libcmark 0.23.0 */
-        { "NODE_CUSTOM_BLOCK", CMARK_NODE_CUSTOM_BLOCK },
-        { "NODE_CUSTOM_INLINE", CMARK_NODE_CUSTOM_INLINE },
-        { "NODE_HTML_BLOCK", CMARK_NODE_HTML_BLOCK },
-        { "NODE_HEADING", CMARK_NODE_HEADING },
-        { "NODE_THEMATIC_BREAK", CMARK_NODE_THEMATIC_BREAK },
-        { "NODE_HTML_INLINE", CMARK_NODE_HTML_INLINE },
+            /* libcmark 0.23.0 */
+            { "NODE_CUSTOM_BLOCK", CMARK_NODE_CUSTOM_BLOCK },
+            { "NODE_CUSTOM_INLINE", CMARK_NODE_CUSTOM_INLINE },
+            { "NODE_HTML_BLOCK", CMARK_NODE_HTML_BLOCK },
+            { "NODE_HEADING", CMARK_NODE_HEADING },
+            { "NODE_THEMATIC_BREAK", CMARK_NODE_THEMATIC_BREAK },
+            { "NODE_HTML_INLINE", CMARK_NODE_HTML_INLINE },
 #else
-        { "NODE_CUSTOM_BLOCK", CMARK_NODE_NONE },
-        { "NODE_CUSTOM_INLINE", CMARK_NODE_NONE },
-        { "NODE_HTML_BLOCK", CMARK_NODE_HTML },
-        { "NODE_HEADING", CMARK_NODE_HEADER },
-        { "NODE_THEMATIC_BREAK", CMARK_NODE_HRULE },
-        { "NODE_HTML_INLINE", CMARK_NODE_INLINE_HTML },
+            { "NODE_CUSTOM_BLOCK", CMARK_NODE_NONE },
+            { "NODE_CUSTOM_INLINE", CMARK_NODE_NONE },
+            { "NODE_HTML_BLOCK", CMARK_NODE_HTML },
+            { "NODE_HEADING", CMARK_NODE_HEADER },
+            { "NODE_THEMATIC_BREAK", CMARK_NODE_HRULE },
+            { "NODE_HTML_INLINE", CMARK_NODE_INLINE_HTML },
 #endif
 
-        { "NO_LIST", CMARK_NO_LIST },
-        { "BULLET_LIST", CMARK_BULLET_LIST },
-        { "ORDERED_LIST", CMARK_ORDERED_LIST },
+            { "NO_LIST", CMARK_NO_LIST },
+            { "BULLET_LIST", CMARK_BULLET_LIST },
+            { "ORDERED_LIST", CMARK_ORDERED_LIST },
 
-        { "NO_DELIM", CMARK_NO_DELIM },
-        { "PERIOD_DELIM", CMARK_PERIOD_DELIM },
-        { "PAREN_DELIM", CMARK_PAREN_DELIM },
+            { "NO_DELIM", CMARK_NO_DELIM },
+            { "PERIOD_DELIM", CMARK_PERIOD_DELIM },
+            { "PAREN_DELIM", CMARK_PAREN_DELIM },
 
-        { "EVENT_NONE", CMARK_EVENT_NONE },
-        { "EVENT_DONE", CMARK_EVENT_DONE },
-        { "EVENT_ENTER", CMARK_EVENT_ENTER },
-        { "EVENT_EXIT", CMARK_EVENT_EXIT },
+            { "EVENT_NONE", CMARK_EVENT_NONE },
+            { "EVENT_DONE", CMARK_EVENT_DONE },
+            { "EVENT_ENTER", CMARK_EVENT_ENTER },
+            { "EVENT_EXIT", CMARK_EVENT_EXIT },
 
-        { "OPT_DEFAULT", CMARK_OPT_DEFAULT },
-        { "OPT_SOURCEPOS", CMARK_OPT_SOURCEPOS },
-        { "OPT_HARDBREAKS", CMARK_OPT_HARDBREAKS },
-        { "OPT_SAFE", CMARK_OPT_SAFE },
-        { "OPT_NORMALIZE", CMARK_OPT_NORMALIZE },
-        { "OPT_VALIDATE_UTF8", CMARK_OPT_VALIDATE_UTF8 },
-        { "OPT_SMART", CMARK_OPT_SMART }
-    };
-    size_t num_constants = sizeof(constants) / sizeof(constants[0]);
-    size_t i;
-    HV *stash = gv_stashpv("CommonMark", 0);
+            { "OPT_DEFAULT", CMARK_OPT_DEFAULT },
+            { "OPT_SOURCEPOS", CMARK_OPT_SOURCEPOS },
+            { "OPT_HARDBREAKS", CMARK_OPT_HARDBREAKS },
+            { "OPT_SAFE", CMARK_OPT_SAFE },
+            { "OPT_NORMALIZE", CMARK_OPT_NORMALIZE },
+            { "OPT_VALIDATE_UTF8", CMARK_OPT_VALIDATE_UTF8 },
+            { "OPT_SMART", CMARK_OPT_SMART }
+        };
+        size_t num_constants = sizeof(constants) / sizeof(constants[0]);
+        size_t i;
+        HV *stash = gv_stashpv("CommonMark", 0);
 
-    if (cmark_version() != CMARK_VERSION) {
-        warn("Compiled against libcmark %s, but runtime version is %s",
-             CMARK_VERSION_STRING, cmark_version_string());
-    }
+        if (cmark_version() != CMARK_VERSION) {
+            warn("Compiled against libcmark %s, but runtime version is %s",
+                 CMARK_VERSION_STRING, cmark_version_string());
+        }
 
-    for (i = 0; i < num_constants; i++) {
-        newCONSTSUB(stash, constants[i].name, newSViv(constants[i].value));
+        for (i = 0; i < num_constants; i++) {
+            newCONSTSUB(stash, constants[i].name, newSViv(constants[i].value));
+        }
     }
 
 char*
@@ -273,6 +278,9 @@ CODE:
     (void)package;
     buffer = SvPVutf8(string, len);
     RETVAL = cmark_parse_document(buffer, len, options);
+    if (RETVAL == NULL) {
+        croak("parse_document: unknown error");
+    }
 OUTPUT:
     RETVAL
 
@@ -294,6 +302,9 @@ CODE:
         croak("parse_file: file is not a file handle");
     }
     RETVAL = cmark_parse_file(stream, options);
+    if (RETVAL == NULL) {
+        croak("parse_file: unknown error");
+    }
 OUTPUT:
     RETVAL
 
@@ -343,6 +354,9 @@ new(package, type)
 CODE:
     (void)package;
     RETVAL = cmark_node_new(type);
+    if (RETVAL == NULL) {
+        croak("new: out of memory");
+    }
 OUTPUT:
     RETVAL
 
@@ -363,6 +377,9 @@ iterator(cmark_node *node)
 CODE:
     S_create_or_incref_node_sv(aTHX_ node);
     RETVAL = cmark_iter_new(node);
+    if (RETVAL == NULL) {
+        croak("iterator: out of memory");
+    }
 OUTPUT:
     RETVAL
 
@@ -571,6 +588,9 @@ cmark_parser_new(package, options = 0)
 CODE:
     (void)package;
     RETVAL = cmark_parser_new(options);
+    if (RETVAL == NULL) {
+        croak("new: out of memory");
+    }
 OUTPUT:
     RETVAL
 
@@ -590,4 +610,8 @@ CODE:
 
 cmark_node*
 cmark_parser_finish(cmark_parser *parser)
+POSTCALL:
+    if (RETVAL == NULL) {
+        croak("finish: unknown error");
+    }
 

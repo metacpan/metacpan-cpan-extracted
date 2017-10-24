@@ -5,7 +5,7 @@ use utf8;
 
 use Moo;
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 with 'Parcel::Track::Role::Base';
 
@@ -90,7 +90,7 @@ sub track {
 
     my $found      = ( $tree->findnodes("$prefix/div[2]/div/table/tr[2]/td") )[0];
     my $found_text = $found ? $found->as_text : q{};
-    my $not_found  = Encode::encode_utf8('조회된 데이터가 없습니다');
+    my $not_found  = '조회된 데이터가 없습니다';
     if ( $found_text =~ m/$not_found/ ) {
         $result{result} = 'cannot find such parcel info';
         return \%result;
@@ -119,7 +119,7 @@ sub track {
 #
 # This file is part of Parcel-Track-KR-CJKorea
 #
-# This software is copyright (c) 2016 by Keedi Kim.
+# This software is copyright (c) 2017 by Keedi Kim.
 #
 # This is free software; you can redistribute it and/or modify it under
 # the same terms as the Perl 5 programming language system itself.
@@ -137,7 +137,7 @@ Parcel::Track::KR::CJKorea - Parcel::Track driver for the CJ Korea Express (CJ �
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -223,7 +223,7 @@ L<https://github.com/keedi/Parcel-Track-KR-CJKorea>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Keedi Kim.
+This software is copyright (c) 2017 by Keedi Kim.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

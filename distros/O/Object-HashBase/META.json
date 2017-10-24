@@ -4,7 +4,7 @@
       "Chad Granum <exodist@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -46,7 +46,7 @@
          "url" : "http://github.com/Test-More/Object-HashBase/"
       }
    },
-   "version" : "0.005",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+   "version" : "0.006",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

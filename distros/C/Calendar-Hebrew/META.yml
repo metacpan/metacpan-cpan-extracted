@@ -22,7 +22,7 @@ no_index:
 provides:
   Calendar::Hebrew:
     file: lib/Calendar/Hebrew.pm
-    version: '0.04'
+    version: '0.05'
 requires:
   Calendar::Plugin::Renderer: '0.12'
   Date::Hebrew::Simple: '0.04'
@@ -31,5 +31,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/Calendar-Hebrew.git
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

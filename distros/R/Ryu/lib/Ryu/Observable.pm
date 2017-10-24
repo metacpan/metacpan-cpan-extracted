@@ -3,7 +3,7 @@ package Ryu::Observable;
 use strict;
 use warnings;
 
-our $VERSION = '0.024'; # VERSION
+our $VERSION = '0.025'; # VERSION
 
 =encoding utf8
 
@@ -163,7 +163,7 @@ sub source {
 		return unless my $self = $copy;
 		$src->emit($self->value)
 	});
-	$src->completion->on_ready(sub {
+	$src->completed->on_ready(sub {
 		$copy->unsubscribe($code) if $copy;
 		undef $code;
 	});

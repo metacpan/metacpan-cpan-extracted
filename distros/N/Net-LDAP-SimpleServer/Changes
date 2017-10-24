@@ -1,7 +1,70 @@
 Revision History for Net-LDAP-SimpleServer
 ==========================================
 
-v0.0.18 2017-10-16
+v0.0.19 2017-10-22
+------------------
+
+commit c2339d2238f6eff05cfa1072a9379701c820498c
+Author: Alexei Znamensky <russoz@gmail.com>
+
+    101365: Add support for baseObject DN and scope in searches
+
+commit b89219c6fffa1164aa145624f169c1c80119ad6b
+Author: Alexei Znamensky <russoz@gmail.com>
+
+    fixed typos in documentation
+
+commit da89700671fd25f11e1954bc239d89a93d1257ea
+Author: Alexei Znamensky <russoz@gmail.com>
+
+    simplified LDIF entry
+
+commit a40e65d58b993ef2285e3e5c411de432f9306207
+Author: Alexei Znamensky <russoz@gmail.com>
+
+    removed tests yet unused
+
+commit 43fb879ba919c770f3b13d85e08517e058d15b19
+Author: Alexei Znamensky <russoz@gmail.com>
+
+    export all constants by default
+
+commit dc8124153b463f6fb67d96e70acd9bf2f915fd60
+Author: Alexei Znamensky <russoz@gmail.com>
+
+    update on .gitignore
+
+commit 01c83887b28865a892a1b41af7dfe0bffea4ca88
+Author: Alexei Znamensky <russoz@gmail.com>
+
+    If test fail, server stops as well
+
+commit c4ffda84057413c0489666d20a782809bb6d0712
+Author: Alexei Znamensky <russoz@gmail.com>
+
+    renamed test files
+
+commit 88f0d1aa5111755287604db439ddaf6bb05a27a4
+Author: Alexei Znamensky <russoz@gmail.com>
+
+    added constants for search scope
+
+commit 47e302dd3cd97f2794741c586c74d3857cbdb297
+Author: Alexei Znamensky <russoz@gmail.com>
+
+    Perl::Tidy on the t/ folder
+
+commit 045bc2f5dd3745e0137f5c5188551683fa2a712c
+Author: Alexei Znamensky <russoz@gmail.com>
+
+    changes in test scripts
+
+commit 971d01f9aed82404a4cc0b4cd603d0e7c6188851
+Author: Alexei Znamensky <russoz@gmail.com>
+
+    added strict/warnings on all test files
+
+v0.0.18 2017-10-07
 ------------------
 
 commit 07e9e3a54f33dd28be0f1242e998f7ab7b67aa13

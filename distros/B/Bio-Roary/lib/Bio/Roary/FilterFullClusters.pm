@@ -1,5 +1,5 @@
 package Bio::Roary::FilterFullClusters;
-$Bio::Roary::FilterFullClusters::VERSION = '3.10.2';
+$Bio::Roary::FilterFullClusters::VERSION = '3.11.0';
 # ABSTRACT: Take an a clusters file from CD-hit and the fasta file and output a fasta file without full clusters
 
 
@@ -140,7 +140,7 @@ Bio::Roary::FilterFullClusters - Take an a clusters file from CD-hit and the fas
 
 =head1 VERSION
 
-version 3.10.2
+version 3.11.0
 
 =head1 SYNOPSIS
 

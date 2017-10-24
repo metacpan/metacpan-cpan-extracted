@@ -4,6 +4,7 @@ use 5.014;
 use strict;
 use warnings;
 use Moo;
+use GraphQL::Debug qw(_debug);
 use Types::Standard -all;
 use GraphQL::Type::Library -all;
 use MooX::Thunking;
@@ -20,6 +21,7 @@ with qw(
 );
 
 our $VERSION = '0.02';
+use constant DEBUG => $ENV{GRAPHQL_DEBUG};
 
 =head1 NAME
 
@@ -67,6 +69,36 @@ method graphql_to_perl(Maybe[HashRef] $item) :ReturnType(Maybe[HashRef]) {
       $value // $fields->{$key}{default_value}
     );
   });
+}
+
+has to_doc => (is => 'lazy', isa => Str);
+sub _build_to_doc {
+  my ($self) = @_;
+  DEBUG and _debug('Object.to_doc', $self);
+  my @fieldlines = map {
+    (
+      ($_->[1] ? ("# $_->[1]") : ()),
+      $_->[0],
+    )
+  } $self->_make_fieldtuples($self->fields);
+  my $implements = join ', ', map $_->name, @{ $self->interfaces || [] };
+  $implements &&= 'implements ' . $implements . ' ';
+  join '', map "$_\n",
+    ($self->description ? (map "# $_", split /\n/, $self->description) : ()),
+    "type @{[$self->name]} $implements\{",
+      (map "  $_", @fieldlines),
+    "}";
+}
+
+method from_ast(
+  HashRef $name2type,
+  HashRef $ast_node,
+) :ReturnType(InstanceOf[__PACKAGE__]) {
+  $self->new(
+    $self->_from_ast_named($ast_node),
+    $self->_from_ast_maptype($name2type, $ast_node, 'interfaces'),
+    $self->_from_ast_fields($name2type, $ast_node, 'fields'),
+  );
 }
 
 __PACKAGE__->meta->make_immutable();

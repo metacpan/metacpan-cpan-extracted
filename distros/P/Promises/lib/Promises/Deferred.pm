@@ -1,13 +1,13 @@
 package Promises::Deferred;
-our $AUTHORITY = 'cpan:STEVAN';
-$Promises::Deferred::VERSION = '0.96';
+our $AUTHORITY = 'cpan:YANICK';
+$Promises::Deferred::VERSION = '0.98';
 # ABSTRACT: An implementation of Promises in Perl
 
 use strict;
 use warnings;
 
 use Scalar::Util qw[ blessed reftype ];
-use Carp qw[ confess ];
+use Carp qw[ confess carp ];
 
 use Promises::Promise;
 
@@ -139,6 +139,32 @@ sub finally {
 
 }
 
+sub timeout {
+    my ( $self, $timeout ) = @_;
+
+    unless( $self->can('_timeout') ) {
+        carp "timeout mechanism not implemented for Promise backend ", ref $self;
+        return $self->promise;
+    }
+
+    my $deferred = ref($self)->new;
+
+    my $cancel = $deferred->_timeout($timeout, sub {
+        return if $deferred->is_done;
+        $deferred->reject( 'timeout' );
+    } );
+
+    $self->finally( $cancel )->then(
+        sub { 'resolve', @_ },
+        sub { 'reject',  @_ },
+    )->then(sub {
+        my( $action, @args ) = @_;
+        $deferred->$action(@args) unless $deferred->is_done;
+    });
+
+    return $deferred->promise;
+}
+
 sub _wrap {
     my ( $self, $d, $f, $method ) = @_;
 
@@ -214,7 +240,7 @@ Promises::Deferred - An implementation of Promises in Perl
 
 =head1 VERSION
 
-version 0.96
+version 0.98
 
 =head1 SYNOPSIS
 
@@ -361,6 +387,16 @@ returns a L<Promises::Promise> and so can be chained. The return value is
 discarded and the success or failure of the C<finally> callback will have no
 effect on promises further down the chain.
 
+=item C<timeout( $seconds )>
+
+For asynchronous backend, returns a new promise that either takes on
+the result of the current promise or is rejected after the given delay,
+whichever comes first.
+
+The default synchronous backend does not implement a timer function. The method, in
+that case, returns a chained promise that carries over the resolution of the
+current promise and emits a warning.
+
 =item C<resolve( @args )>
 
 This is the method to call upon the successful completion of your asynchronous
@@ -422,7 +458,7 @@ Stevan Little <stevan.little@iinteractive.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Infinity Interactive, Inc..
+This software is copyright (c) 2017, 2014, 2012 by Infinity Interactive, Inc..
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

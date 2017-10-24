@@ -2,7 +2,7 @@ package Test2::Compare;
 use strict;
 use warnings;
 
-our $VERSION = '0.000080';
+our $VERSION = '0.000082';
 
 use Scalar::Util qw/blessed/;
 use Test2::Util qw/try/;
@@ -152,7 +152,7 @@ sub _convert {
     return Test2::Compare::Regex->new(input => $thing)
         if $type eq 'REGEXP';
 
-    if ($type eq 'SCALAR') {
+    if ($type eq 'SCALAR' || $type eq 'VSTRING') {
         my $nested = _convert($$thing, $config);
         return Test2::Compare::Scalar->new(item => $nested);
     }

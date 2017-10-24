@@ -8,6 +8,9 @@ use Test::More 0.96;
 
 use File::LibMagic;
 
+# If tihs is populated then libmagic will use it to find the magic file.
+delete $ENV{MAGIC};
+
 {
     my %standard = (
         'foo.foo' => [
@@ -16,7 +19,11 @@ use File::LibMagic;
             qr/us-ascii/,
         ],
         'foo.c' => [
-            [ 'ASCII C program text', 'C source, ASCII text' ],
+            [
+                'ASCII C program text',
+                'C source, ASCII text',
+                'c program, ASCII text',    # Apple default magic
+            ],
             'text/x-c',
             qr/us-ascii/,
         ],
@@ -39,7 +46,11 @@ use File::LibMagic;
 
 SKIP:
 {
-    my $standard_file = '/usr/share/file/magic.mgc';
+    my $standard_file = _scrape_file_version();
+
+    note "Found magic file at $standard_file";
+
+    ## no critic (ValuesAndExpressions::ProhibitFiletest_f)
     skip "The standard magic file must exist at $standard_file", 1
         unless -l $standard_file || -f _;
 
@@ -54,7 +65,11 @@ SKIP:
             'us-ascii',
         ],
         'foo.c' => [
-            [ 'ASCII C program text', 'C source, ASCII text' ],
+            [
+                'ASCII C program text',
+                'C source, ASCII text',
+                'c program, ASCII text',    # Apple default magic
+            ],
             'text/x-c',
             'us-ascii',
         ],
@@ -73,6 +88,25 @@ SKIP:
             _test_flm( $flm, \%custom );
         }
     );
+}
+
+sub _scrape_file_version {
+    for (`file -v`) {    ## no critic (ProhibitBacktickOperators)
+        chomp;
+        next unless m/\Amagic file from (.*)/;
+
+        my $magic = $1;
+
+        ## no critic (ValuesAndExpressions::ProhibitFiletest_f)
+        return "$magic.mgc"
+            if $magic !~ m/ [.] mgc \z /smx && -f "$magic.mgc";
+        return $magic
+            if -f $magic;
+
+        last;
+    }
+
+    return '/usr/share/file/magic.mgc';
 }
 
 sub _test_flm {

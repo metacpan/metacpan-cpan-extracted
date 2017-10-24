@@ -135,6 +135,33 @@ sub BUILD {
   }
 }
 
+method from_ast(
+  HashRef $name2type,
+  HashRef $ast_node,
+) :ReturnType(InstanceOf[__PACKAGE__]) {
+  $self->new(
+    $self->_from_ast_named($ast_node),
+    values => $ast_node->{values},
+  );
+}
+
+has to_doc => (is => 'lazy', isa => Str);
+sub _build_to_doc {
+  my ($self) = @_;
+  my $v = $self->values;
+  my @valuelines = map {
+    (
+      ($v->{$_}{description} ? ("# $v->{$_}{description}") : ()),
+      $_
+    )
+  } sort keys %$v;
+  join '', map "$_\n",
+    ($self->description ? (map "# $_", split /\n/, $self->description) : ()),
+    "enum @{[$self->name]} {",
+      (map "  $_", @valuelines),
+    "}";
+}
+
 __PACKAGE__->meta->make_immutable();
 
 1;

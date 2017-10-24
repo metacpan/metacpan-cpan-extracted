@@ -37,12 +37,12 @@
 "use strict";
 
 define ([
+    'app/caches',
     'app/act-lib',
-    'app/sched-lib',
     'datetime',
 ], function (
+    appCaches,
     actLib,
-    schedLib,
     datetime,
 ) {
 
@@ -112,12 +112,20 @@ define ([
             prop: 'privEffective',
             maxlen: 30,
         },
-        ePsched: {
-            name: 'ePsched',
+        ePscode: {
+            name: 'ePscode',
             aclProfileRead: 'inactive',
             aclProfileWrite: 'admin',
-            text: 'Schedule',
-            prop: 'sched',
+            text: 'Schedule code',
+            prop: 'scode',
+            maxlen: 20,
+        },
+        ePsid: {
+            name: 'ePsid',
+            aclProfileRead: 'inactive',
+            aclProfileWrite: 'admin',
+            text: 'Schedule ID',
+            prop: 'sid',
             maxlen: 20,
         },
         ePschedEffective: {
@@ -127,6 +135,15 @@ define ([
             text: 'Schedule since',
             prop: 'schedEffective',
             maxlen: 30,
+        },
+        ePsuperNick: {
+            name: 'ePsuperNick',
+            aclProfileRead: 'inactive',
+            aclProfileWrite: 'admin',
+            text: 'Supervisor',
+            prop: 'ePsuperNick',
+            maxlen: 30,
+            populate: appCaches.populateSupervisorNick,
         },
         LDAPdochazka: {
             name: 'LDAPdochazka',
@@ -178,7 +195,7 @@ define ([
         sScode: {
             name: 'sScode',
             aclProfileRead: null,
-            aclProfileWrite: 'admin',
+            aclProfileWrite: 'inactive',
             text: 'Schedule code',
             prop: 'searchKeySchedCode',
             maxlen: 20,
@@ -186,7 +203,7 @@ define ([
         sSid: {
             name: 'sSid',
             aclProfileRead: null,
-            aclProfileWrite: 'admin',
+            aclProfileWrite: 'inactive',
             text: 'Schedule ID',
             prop: 'searchKeySchedID',
             maxlen: 20,
@@ -209,7 +226,7 @@ define ([
         },
         sDmon: {
             name: 'sDmon',
-            aclProfileRead: 'admin',
+            aclProfileRead: 'inactive',
             aclProfileWrite: 'admin',
             text: 'Monday',
             prop: 'mon',
@@ -217,7 +234,7 @@ define ([
         },
         sDtue: {
             name: 'sDtue',
-            aclProfileRead: 'admin',
+            aclProfileRead: 'inactive',
             aclProfileWrite: 'admin',
             text: 'Tuesday',
             prop: 'tue',
@@ -225,7 +242,7 @@ define ([
         },
         sDwed: {
             name: 'sDwed',
-            aclProfileRead: 'admin',
+            aclProfileRead: 'inactive',
             aclProfileWrite: 'admin',
             text: 'Wednesday',
             prop: 'wed',
@@ -233,7 +250,7 @@ define ([
         },
         sDthu: {
             name: 'sDthu',
-            aclProfileRead: 'admin',
+            aclProfileRead: 'inactive',
             aclProfileWrite: 'admin',
             text: 'Thursday',
             prop: 'thu',
@@ -241,7 +258,7 @@ define ([
         },
         sDfri: {
             name: 'sDfri',
-            aclProfileRead: 'admin',
+            aclProfileRead: 'inactive',
             aclProfileWrite: 'admin',
             text: 'Friday',
             prop: 'fri',
@@ -249,7 +266,7 @@ define ([
         },
         sDsat: {
             name: 'sDsat',
-            aclProfileRead: 'admin',
+            aclProfileRead: 'inactive',
             aclProfileWrite: 'admin',
             text: 'Saturday',
             prop: 'sat',
@@ -257,7 +274,7 @@ define ([
         },
         sDsun: {
             name: 'sDsun',
-            aclProfileRead: 'admin',
+            aclProfileRead: 'inactive',
             aclProfileWrite: 'admin',
             text: 'Sunday',
             prop: 'sun',
@@ -338,13 +355,21 @@ define ([
             text: 'Schedule ID',
             prop: 'iNsid',
             maxlen: 20,
-            populate: schedLib.populateSID,
+            populate: appCaches.populateSIDByDate,
+        },
+        iNoffset: {
+            name: 'iNoffset',
+            aclProfileRead: 'inactive',
+            aclProfileWrite: 'admin',
+            text: 'Offset',
+            prop: 'iNoffset',
+            maxlen: 20,
         },
         acTcode: {
             name: 'acTcode',
             aclProfileRead: 'active',
             aclProfileWrite: 'active',
-            text: 'Code',
+            text: 'Activity Code',
             prop: 'code',
             maxlen: 10,
         },
@@ -352,9 +377,10 @@ define ([
             name: 'acTaid',
             aclProfileRead: 'active',
             aclProfileWrite: 'active',
-            text: 'ID',
+            text: 'Activity ID',
             prop: 'aid',
             maxlen: 6,
+            populate: appCaches.populateAIDfromCode,
         },
         acTdesc: {
             name: 'acTdesc',
@@ -371,7 +397,7 @@ define ([
             text: 'Scheduled',
             prop: 'iNschedintvls',
             maxlen: 50,
-            populate: schedLib.populateSchedIntvlsForDate,
+            populate: appCaches.populateSchedIntvlsForDate,
         },
         iNlastexistintvl: {
             name: 'iNlastexistintvl',
@@ -380,9 +406,7 @@ define ([
             text: 'Last existing',
             prop: 'iNlastexistintvl',
             maxlen: 50,
-            populate: function () {
-                // TBD
-            },
+            populate: appCaches.populateLastExisting,
         },
         iNlastplusoffset: {
             name: 'iNlastplusoffset',
@@ -391,9 +415,7 @@ define ([
             text: 'To be created',
             prop: 'iNlastplusoffset',
             maxlen: 50,
-            populate: function () {
-                // TBD
-            },
+            populate: appCaches.populateLastPlusOffset,
         },
         iNnextscheduled: {
             name: 'iNnextscheduled',

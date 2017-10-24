@@ -1,8 +1,5 @@
 package Net::HTTP::Spore::Middleware::Redirection;
-{
-  $Net::HTTP::Spore::Middleware::Redirection::VERSION = '0.06';
-}
-
+$Net::HTTP::Spore::Middleware::Redirection::VERSION = '0.07';
 # ABSTRACT: Middleware for redirections
 
 use Moose;
@@ -54,13 +51,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Net::HTTP::Spore::Middleware::Redirection - Middleware for redirections
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -86,17 +85,21 @@ How many redirections the client should follow. Default is 5
 
 =item *
 
-franck cuny <franck@lumberjaph.net>
+Franck Cuny <franck.cuny@gmail.com>
 
 =item *
 
 Ash Berlin <ash@cpan.org>
 
+=item *
+
+Ahmad Fatoum <athreef@cpan.org>
+
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by linkfluence.
+This software is copyright (c) 2012 by Linkfluence.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

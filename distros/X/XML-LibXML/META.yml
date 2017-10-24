@@ -48,5 +48,5 @@ requires:
 resources:
   homepage: https://github.com/shlomif/perl-XML-LibXML
   repository: https://github.com/shlomif/perl-XML-LibXML
-version: '2.0130'
+version: '2.0131'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

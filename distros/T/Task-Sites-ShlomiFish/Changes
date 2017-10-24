@@ -1,5 +1,9 @@
 Revision history for Task-Sites-ShlomiFish:
 
+0.0212  2017-10-19
+        - Update URLs away from berlios and other Pod content.
+            - Thanks to Ron.
+
 0.0211  2015-05-30
         - META.yml: Add repository, homepage and keywords.
 

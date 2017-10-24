@@ -1,3 +1,15 @@
+1.024 2017-10-22
+
+  Some new features for the rather new 'run' subcommand:
+    * add --no-commit option (Debian #877986)
+    * add --commit option
+    * can now specify default value for script args
+
+  Other bug fixes:
+    * run: remove warning about Log4Perl initialisation
+    * run: fix option description
+    * cme: update Log4Perl init in doc
+
 1.023 2017-09-10
 
   Bug fixes:

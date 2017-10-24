@@ -37,8 +37,9 @@
 "use strict";
 
 define ([
-    'target',
     'app/act-lib',
+    'app/caches',
+    'app/emp-lib',
     'app/daction-init',
     'app/dform-init',
     'app/dmenu-init',
@@ -47,10 +48,12 @@ define ([
     'app/dtable-init',
     'app/drowselect-init',
     'init2',
-    'stack'
+    'populate',
+    'stack',
 ], function (
-    target,
     actLib,
+    appCaches,
+    empLib,
     dactionInitRoundOne,
     dformInitRoundOne,
     dmenuInitRoundOne,
@@ -59,7 +62,8 @@ define ([
     dtableInitRoundOne,
     drowselectInitRoundOne,
     initRoundTwo,
-    stack
+    populate,
+    stack,
 ) {
 
     return function () {
@@ -84,8 +88,13 @@ define ([
         initRoundTwo('dtable');
         initRoundTwo('drowselect');
 
-        // populate activities cache
-        actLib.populateActivitiesCache();
+        // use "populate" pattern to populate caches
+        // (activities, full employee profile)
+        populate.bootstrap([
+            appCaches.populateFullEmployeeProfileCache,
+            appCaches.populateScheduleBySID,
+            appCaches.populateActivityCache,
+        ]);
 
         // fire up the main menu
         stack.push('mainMenu');

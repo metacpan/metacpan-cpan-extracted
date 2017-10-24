@@ -15,7 +15,9 @@ use GraphQL::Debug qw(_debug);
 use GraphQL::Introspection qw(
   $SCHEMA_META_FIELD_DEF $TYPE_META_FIELD_DEF $TYPE_NAME_META_FIELD_DEF
 );
-use base qw(Exporter);
+use GraphQL::Directive;
+use GraphQL::Schema qw(lookup_type);
+use Exporter 'import';
 
 =head1 NAME
 
@@ -46,7 +48,7 @@ Executes a GraphQL query, returns results.
 
   my $result = execute(
     $schema,
-    $doc,
+    $doc, # can also be AST
     $root_value,
     $context_value,
     $variable_values,
@@ -58,7 +60,7 @@ Executes a GraphQL query, returns results.
 
 fun execute(
   (InstanceOf['GraphQL::Schema']) $schema,
-  Str $doc,
+  Str | ArrayRef[HashRef] $doc,
   Any $root_value = undef,
   Any $context_value = undef,
   Maybe[HashRef] $variable_values = undef,
@@ -66,7 +68,7 @@ fun execute(
   Maybe[CodeLike] $field_resolver = undef,
 ) :ReturnType(HashRef) {
   my $context = eval {
-    my $ast = parse($doc);
+    my $ast = ref($doc) ? $doc : parse($doc);
     _build_context(
       $schema,
       $ast,
@@ -115,8 +117,8 @@ fun _build_context(
     ($_->{name} => $_)
   } map $_->{node}, grep $_->{kind} eq 'fragment', @$ast;
   my @operations = grep $_->{kind} eq 'operation', @$ast;
-  die "No operations supplied." if !@operations;
-  die "Can only execute document containing fragments or operations"
+  die "No operations supplied.\n" if !@operations;
+  die "Can only execute document containing fragments or operations\n"
     if @$ast != keys(%fragments) + @operations;
   my $operation = _get_operation($operation_name, \@operations);
   {
@@ -146,14 +148,14 @@ fun _variables_apply_defaults(
   HashRef $variable_values,
 ) :ReturnType(HashRef) {
   my @bad = grep {
-    ! _lookup_type($schema, $operation_variables->{$_})->DOES('GraphQL::Role::Input');
+    ! lookup_type($operation_variables->{$_}, $schema->name2type)->DOES('GraphQL::Role::Input');
   } keys %$operation_variables;
   die "Variable '\$$bad[0]' is type '@{[
-    _lookup_type($schema, $operation_variables->{$bad[0]})->to_string
+    lookup_type($operation_variables->{$bad[0]}, $schema->name2type)->to_string
   ]}' which cannot be used as an input type.\n" if @bad;
   +{ map {
     my $opvar = $operation_variables->{$_};
-    my $opvar_type = _lookup_type($schema, $opvar);
+    my $opvar_type = lookup_type($opvar, $schema->name2type);
     my $parsed_value;
     my $maybe_value = $variable_values->{$_} // $opvar->{default_value};
     eval { $parsed_value = $opvar_type->graphql_to_perl($maybe_value) };
@@ -163,27 +165,19 @@ fun _variables_apply_defaults(
   } keys %$operation_variables };
 }
 
-fun _lookup_type(
-  (InstanceOf['GraphQL::Schema']) $schema,
-  HashRef $typedef,
-) :ReturnType(InstanceOf['GraphQL::Type']) {
-  my $type = $typedef->{type};
-  return $schema->name2type->{$type} // die "Unknown type '$type'.\n" if is_Str($type);
-  my ($wrapper_type, $wrapped) = @$type;
-  _lookup_type($schema, $wrapped)->$wrapper_type;
-}
-
-sub _get_operation {
-  my ($operation_name, $operations) = @_;
+fun _get_operation(
+  Maybe[Str] $operation_name,
+  ArrayRef[HashRef] $operations,
+) {
   DEBUG and _debug('_get_operation', @_);
   if (!$operation_name) {
-    die "Must provide operation name if query contains multiple operations."
+    die "Must provide operation name if query contains multiple operations.\n"
       if @$operations > 1;
     return $operations->[0];
   }
   my @matching = grep $_->{node}{name} eq $operation_name, @$operations;
   return $matching[0] if @matching == 1;
-  die "No operations matching '$operation_name' found.";
+  die "No operations matching '$operation_name' found.\n";
 }
 
 fun _execute_operation(
@@ -220,7 +214,7 @@ fun _collect_fields(
   DEBUG and _debug('_collect_fields', $runtime_type->to_string, $fields_got, $selections);
   for my $selection (@$selections) {
     my $node = $selection->{node};
-    next if !_should_include_node($context, $node);
+    next if !_should_include_node($context->{variable_values}, $node);
     if ($selection->{kind} eq 'field') {
       my $use_name = $node->{alias} || $node->{name};
       $fields_got = {
@@ -229,7 +223,6 @@ fun _collect_fields(
       }; # like push but no mutation
     } elsif ($selection->{kind} eq 'inline_fragment') {
       next if !_fragment_condition_match($context, $node, $runtime_type);
-      next if !_should_include_node($context, $node);
       ($fields_got, $visited_fragments) = _collect_fields(
         $context,
         $runtime_type,
@@ -240,7 +233,6 @@ fun _collect_fields(
     } elsif ($selection->{kind} eq 'fragment_spread') {
       my $frag_name = $node->{name};
       next if $visited_fragments->{$frag_name};
-      next if !_should_include_node($context, $node);
       $visited_fragments = { %$visited_fragments, $frag_name => 1 }; # !mutate
       my $fragment = $context->{fragments}{$frag_name};
       next if !$fragment;
@@ -259,11 +251,26 @@ fun _collect_fields(
 }
 
 fun _should_include_node(
-  HashRef $context,
+  HashRef $variables,
   HashRef $node,
 ) :ReturnType(Bool) {
-  # TODO implement
+  DEBUG and _debug('_should_include_node', $variables, $node);
+  my $skip = _get_directive_values($GraphQL::Directive::SKIP, $node, $variables);
+  return '' if $skip and $skip->{if};
+  my $include = _get_directive_values($GraphQL::Directive::INCLUDE, $node, $variables);
+  return '' if $include and !$include->{if};
   1;
+}
+
+fun _get_directive_values(
+  (InstanceOf['GraphQL::Directive']) $directive,
+  HashRef $node,
+  HashRef $variables,
+) {
+  DEBUG and _debug('_get_directive_values', $directive->name, $node, $variables);
+  my ($d) = grep $_->{name} eq $directive->name, @{$node->{directives} || []};
+  return if !$d;
+  _get_argument_values($directive, $d, $variables);
 }
 
 fun _fragment_condition_match(
@@ -293,15 +300,25 @@ fun _execute_fields(
   DEBUG and _debug('_execute_fields', $parent_type->to_string, $fields, $root_value);
   map {
     my $result_name = $_;
-    (my $result, $context) = _resolve_field(
-      $context,
-      $parent_type,
-      $root_value,
-      [ @$path, $result_name ],
-      $fields->{$_},
-    );
-    $results{$result_name} = $result;
-    # TODO promise stuff
+    my $result;
+    eval {
+      ($result, $context) = _resolve_field(
+        $context,
+        $parent_type,
+        $root_value,
+        [ @$path, $result_name ],
+        $fields->{$result_name},
+      );
+    };
+    if ($@) {
+      $context = _context_error(
+        $context,
+        _located_error($@, $fields->{$result_name}, [ @$path, $result_name ])
+      );
+    } else {
+      $results{$result_name} = $result;
+      # TODO promise stuff
+    }
   } keys %$fields; # TODO ordering of fields
   (\%results, $context);
 }
@@ -330,7 +347,6 @@ fun _resolve_field(
   my $field_name = $field_node->{name};
   DEBUG and _debug('_resolve_field', $parent_type->to_string, $nodes, $root_value);
   my $field_def = _get_field_def($context->{schema}, $parent_type, $field_name);
-  return (undef, $context) if !$field_def;
   my $resolve = $field_def->{resolve} || $context->{field_resolver};
   my $info = _build_resolve_info(
     $context,
@@ -600,7 +616,7 @@ fun _complete_object_value(
   if ($return_type->is_type_of) {
     my $is_type_of = $return_type->is_type_of->($result, $context->{context_value}, $info);
     # TODO promise stuff
-    die GraphQL::Error->new(message => "Expected a value of type '@{[$return_type->to_string]}' but received: '$result'") if !$is_type_of;
+    die GraphQL::Error->new(message => "Expected a value of type '@{[$return_type->to_string]}' but received: '@{[ref($result)||$result]}'.") if !$is_type_of;
   }
   _collect_and_execute_subfields(
     $context,
@@ -647,7 +663,7 @@ fun _located_error(
 }
 
 fun _get_argument_values(
-  HashRef $def,
+  (HashRef | InstanceOf['GraphQL::Directive']) $def,
   HashRef $node,
   Maybe[HashRef] $variable_values = {},
 ) {

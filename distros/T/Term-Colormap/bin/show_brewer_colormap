@@ -1,0 +1,10 @@
+#!/usr/bin/env perl
+use warnings;
+use strict;
+
+use lib "../lib";
+use Term::Colormap qw( color_table );
+use Term::Colormap::Brewer;
+
+my $name = $ARGV[0] || 'unknown';
+color_table($name);

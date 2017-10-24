@@ -10,7 +10,7 @@
 #define DPPP_PL_parser_NO_DUMMY
 #define NEED_my_snprintf
 #define NEED_pv_escape
-#define	NEED_pv_pretty
+#define NEED_pv_pretty
 #ifndef PERLIO_F_UTF8
 #  define PERLIO_F_UTF8	0x00008000
 #  endif
@@ -108,7 +108,8 @@
 #define CACHE_ID_has_error_input	34
 #define CACHE_ID_decode_utf8		35
 #define CACHE_ID__has_hooks		36
-#define CACHE_ID_strict			58
+#define CACHE_ID_formula		38
+#define CACHE_ID_strict			42
 
 #define	byte	unsigned char
 #define ulng	unsigned long
@@ -144,6 +145,8 @@ typedef struct {
     byte	has_hooks;
 
     byte	quote_empty;
+    byte	formula;
+
     byte	strict;
     short	strict_n;
 
@@ -165,7 +168,7 @@ typedef struct {
 
     char *	bptr;
     SV *	tmp;
-    int		utf8;
+    byte	utf8;
     byte	has_ahead;
     byte	eolx;
     int		eol_pos;
@@ -262,7 +265,7 @@ static SV *m_getline, *m_print;
 #define is_EOL(c) (c == CH_EOLX)
 
 #define __is_SEPX(c) (c == CH_SEP && (csv->sep_len == 0 || (\
-    csv->size - csv->used >= csv->sep_len - 1				&&\
+    csv->size - csv->used >= (STRLEN)csv->sep_len - 1				&&\
     !memcmp (csv->bptr + csv->used, csv->sep + 1, csv->sep_len - 1)	&&\
     (csv->used += csv->sep_len - 1)					&&\
     (c = CH_SEPX))))
@@ -282,7 +285,7 @@ static byte _is_SEPX (unsigned int *c, csv_t *csv, int line) {
 #endif
 
 #define __is_QUOTEX(c) (CH_QUOTE && c == CH_QUOTE && (csv->quo_len == 0 || (\
-    csv->size - csv->used >= csv->quo_len - 1				&&\
+    csv->size - csv->used >= (STRLEN)csv->quo_len - 1				&&\
     !memcmp (csv->bptr + csv->used, csv->quo + 1, csv->quo_len - 1)	&&\
     (csv->used += csv->quo_len - 1)					&&\
     (c = CH_QUOTEX))))
@@ -412,6 +415,7 @@ static void cx_xs_cache_set (pTHX_ HV *hv, int idx, SV *val) {
 	case CACHE_ID_allow_whitespace:      csv->allow_whitespace      = iv; break;
 	case CACHE_ID_blank_is_undef:        csv->blank_is_undef        = iv; break;
 	case CACHE_ID_empty_is_undef:        csv->empty_is_undef        = iv; break;
+	case CACHE_ID_formula:               csv->formula               = iv; break;
 	case CACHE_ID_strict:                csv->strict                = iv; break;
 	case CACHE_ID_verbatim:              csv->verbatim              = iv; break;
 	case CACHE_ID_auto_diag:             csv->auto_diag             = iv; break;
@@ -494,6 +498,7 @@ static void cx_xs_cache_diag (pTHX_ HV *hv) {
     _cache_show_byte ("quote_binary",		csv->quote_binary);
     _cache_show_byte ("auto_diag",		csv->auto_diag);
     _cache_show_byte ("diag_verbose",		csv->diag_verbose);
+    _cache_show_byte ("formula",		csv->formula);
     _cache_show_byte ("strict",			csv->strict);
     _cache_show_byte ("has_error_input",	csv->has_error_input);
     _cache_show_byte ("blank_is_undef",		csv->blank_is_undef);
@@ -622,6 +627,7 @@ static void cx_SetupCsv (pTHX_ csv_t *csv, HV *self, SV *pself) {
 	csv->auto_diag			= num_opt ("auto_diag");
 	csv->diag_verbose		= num_opt ("diag_verbose");
 	csv->keep_meta_info		= num_opt ("keep_meta_info");
+	csv->formula			= num_opt ("formula");
 
 	unless (csv->escape_char) csv->escape_null = 0;
 
@@ -756,15 +762,63 @@ static int cx_was_quoted (pTHX_ AV *mf, int idx) {
 /* Should be extended for EBCDIC ? */
 #define is_csv_binary(ch) ((ch < CH_SPACE || ch >= CH_DEL) && ch != CH_TAB)
 
+#define _formula(csv,sv,len,f) cx_formula (aTHX_ csv, sv, len, f)
+static char *cx_formula (pTHX_ csv_t *csv, SV *sv, STRLEN *len, int f) {
+
+    int fa = csv->formula;
+
+    if (fa == 1) die   ("Formulas are forbidden\n");
+    if (fa == 2) croak ("Formulas are forbidden\n");
+
+    if (fa == 3) {
+	char *ptr = SvPV_nolen (sv);
+	char  rec[40];
+	char  field[128];
+	SV  **svp;
+
+	if (csv->recno) sprintf (rec, " in record %d", csv->recno);
+	else           *rec = (char)0;
+
+	*field = (char)0;
+	if ((svp = hv_fetchs (csv->self, "_COLUMN_NAMES", FALSE)) && _is_arrayref (*svp)) {
+	    AV *avp = (AV *)SvRV (*svp);
+	    if (avp && av_len (avp) >= (f - 1)) {
+		SV **fnm = av_fetch (avp, f - 1, FALSE);
+		if (fnm && *fnm && SvOK (*fnm))
+		    (void)sprintf (field, " (column: '%.100s')", SvPV_nolen (*fnm));
+		}
+	    }
+
+	warn ("Field %d%s%s contains formula '%s'\n", f, field, rec, ptr);
+	return ptr;
+	}
+
+    if (len) *len = 0;
+
+    if (fa == 4) {
+	unless (SvREADONLY (sv)) SvSetEmpty (sv);
+	return "";
+	}
+
+    if (fa == 5) {
+	unless (SvREADONLY (sv)) SvSetUndef (sv);
+	return NULL;
+	}
+
+    /* So far undefined behavior */
+    return NULL;
+    } /* _formula */
+
 #define Combine(csv,dst,fields)	cx_Combine (aTHX_ csv, dst, fields)
 static int cx_Combine (pTHX_ csv_t *csv, SV *dst, AV *fields) {
-    int  i, n, bound = 0;
-    int  aq  = (int)csv->always_quote;
-    int  qe  = (int)csv->quote_empty;
-    int  kmi = (int)csv->keep_meta_info;
-    AV  *qm = NULL;
+    SSize_t i, n;
+    int     bound = 0;
+    int     aq  = (int)csv->always_quote;
+    int     qe  = (int)csv->quote_empty;
+    int     kmi = (int)csv->keep_meta_info;
+    AV     *qm = NULL;
 
-    n = av_len (fields);
+    n = (IV)av_len (fields);
     if (n < 0 && csv->is_bound) {
 	n = csv->is_bound - 1;
 	bound = 1;
@@ -794,7 +848,7 @@ static int cx_Combine (pTHX_ csv_t *csv, SV *dst, AV *fields) {
 	if (bound)
 	    sv = bound_field (csv, i, 1);
 	else {
-	    SV **svp = av_fetch (fields, i, 0);
+	    SV **svp = av_fetch (fields, i, FALSE);
 	    sv = svp && *svp ? *svp : NULL;
 	    }
 
@@ -807,9 +861,14 @@ static int cx_Combine (pTHX_ csv_t *csv, SV *dst, AV *fields) {
 		    (SvGMAGICAL (sv) && (mg_get (sv), 1) && SvOK (sv)))
 		    )) continue;
 	    ptr = SvPV (sv, len);
+	    if (*ptr == '=' && csv->formula) {
+		unless (ptr = _formula (csv, sv, &len, i))
+		    continue;
+		}
 	    if (len == 0)
 		quoteMe = aq ? 1 : qe ? 1 : qm ? was_quoted (qm, i) : 0;
 	    else {
+
 		if (SvUTF8 (sv))  {
 		    csv->utf8   = 1;
 		    csv->binary = 1;
@@ -1060,6 +1119,8 @@ int CSV_GET_ (pTHX_ csv_t *csv, SV *src, int l) {
 #define AV_PUSH { \
     *SvEND (sv) = (char)0;						\
     SvUTF8_off (sv);							\
+    if (csv->formula && SvCUR (sv) && *(SvPV_nolen (sv)) == '=')	\
+	(void)_formula (csv, sv, NULL, fnum);				\
     if (SvCUR (sv) == 0 && (						\
 	    csv->empty_is_undef ||					\
 	    (!(f & CSV_FLAGS_QUO) && csv->blank_is_undef)))		\
@@ -1093,9 +1154,10 @@ static void cx_strip_trail_whitespace (pTHX_ SV *sv) {
 #define NewField				\
     unless (sv) {				\
 	if (csv->is_bound)			\
-	    sv = bound_field (csv, fnum++, 0);	\
+	    sv = bound_field (csv, fnum, 0);	\
 	else					\
 	    sv = newSVpvs ("");			\
+	fnum++;					\
 	unless (sv) return FALSE;		\
 	f = 0; csv->fld_idx++;			\
 	}
@@ -1477,11 +1539,11 @@ EOLX:
 			(csv->bptr[2] == 'p' || csv->bptr[2] == 'P') &&
 			 csv->bptr[3] == '=') {
 		    char *sep = csv->bptr + 4;
-		    int   len = csv->used - 5;
-		    if (len <= MAX_ATTR_LEN) {
-			sep[len] = (char)0;
-			memcpy (csv->sep, sep, len);
-			csv->sep_len = len == 1 ? 0 : len;
+		    int   lnu = csv->used - 5;
+		    if (lnu <= MAX_ATTR_LEN) {
+			sep[lnu] = (char)0;
+			memcpy (csv->sep, sep, lnu);
+			csv->sep_len = lnu == 1 ? 0 : lnu;
 			return Parse (csv, src, fields, fflags);
 			}
 		    }
@@ -1606,7 +1668,7 @@ EOLX:
 #endif
 	    /* Needed for non-IO parse, where EOL is not set during read */
 	    if (csv->eolx && c == CH_EOL &&
-		 csv->size - csv->used >= csv->eol_len - 1 &&
+		 csv->size - csv->used >= (STRLEN)csv->eol_len - 1 &&
 		 !memcmp (csv->bptr + csv->used, csv->eol + 1, csv->eol_len - 1) &&
 		 (csv->used += csv->eol_len - 1)) {
 		c = CH_EOLX;
@@ -1695,14 +1757,14 @@ static int cx_c_xsParse (pTHX_ csv_t csv, HV *hv, AV *av, AV *avf, SV *src, bool
 	    if ((svp = hv_fetchs (hv, "_AHEAD", FALSE)) && *svp) {
 		csv.bptr = SvPV (csv.tmp = *svp, csv.size);
 		csv.used = 0;
-		if (pos && SvIV (pos) > csv.size)
+		if (pos && SvIV (pos) > (IV)csv.size)
 		    sv_setiv (pos, SvIV (pos) - csv.size);
 		}
 	    }
 	}
     else {
 	csv.tmp  = src;
-	csv.utf8 = SvUTF8 (src);
+	csv.utf8 = SvUTF8 (src) ? 1 : 0;
 	csv.bptr = SvPV (src, csv.size);
 	}
     if (csv.has_error_input) {
@@ -1748,12 +1810,12 @@ static int cx_c_xsParse (pTHX_ csv_t csv, HV *hv, AV *av, AV *avf, SV *src, bool
 	memcpy (csv.cache, &csv, sizeof (csv_t));
 
     if (result && csv.types) {
-	I32	i;
+	STRLEN	i;
 	STRLEN	len = av_len (av);
 	SV    **svp;
 
-	for (i = 0; i <= (I32)len && i <= (I32)csv.types_len; i++) {
-	    if ((svp = av_fetch (av, i, 0)) && *svp && SvOK (*svp)) {
+	for (i = 0; i <= len && i <= csv.types_len; i++) {
+	    if ((svp = av_fetch (av, i, FALSE)) && *svp && SvOK (*svp)) {
 		switch (csv.types[i]) {
 		    case CSV_XS_TYPE_IV:
 #ifdef CSV_XS_TYPE_WARN

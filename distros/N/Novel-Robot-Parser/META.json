@@ -4,13 +4,13 @@
       "Abby Pan <abbypan@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Novel-Robot-Parser",
    "prereqs" : {
@@ -28,6 +28,7 @@
             "File::Find::Rule" : "0",
             "File::Slurp" : "0",
             "HTML::Entities" : "0",
+            "HTML::TreeBuilder" : "0",
             "Novel::Robot::Browser" : "0",
             "URI" : "0",
             "URI::Escape" : "0",
@@ -43,7 +44,7 @@
          "web" : "https://github.com/abbypan/Novel-Robot-Parser"
       }
    },
-   "version" : "0.29",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+   "version" : "0.30",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }
 

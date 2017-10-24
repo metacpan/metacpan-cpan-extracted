@@ -341,3 +341,29 @@ Revision history for App-Dochazka-WWW
 - js: tests: pad more time for AJAX calls (slow LDAP server)
 - js: poke at "create interval by offset with populate" feature
 
+0.154 2017-10-19 23:36 CEST
+- script: dochazka-www: fix option pass-through to mfile-www
+- ext: add MFILE_WWW_DISPLAY_SESSION_DATA to config example
+- js: int-lib: fix undefined variable in log messages
+- js: dform-init: improve data entry hint
+- Dispatch: fix login bypass
+- Some progress on create interval "last plus offset" and non-interactive async
+  dform population features
+- js: display supervisor nick in employee profile
+
+0.155 2017-10-20 22:43 CEST
+- Dispatch: rename _login_dialog method to validate_user_credentials
+- js: daction-init: fix pushable flag in one of the actions
+- js: act-lib: use populate pattern for populateActivitiesCache
+- js: implement employee profile caching
+- js: upon successful masquerade, load full employee profile into cache
+- js: move all cache-related code into a new caches.js module
+- js: implement populateSchedIntvlsForDate() and populateSIDByDate()
+
+0.156 2017-10-21 12:03 CEST
+- build/ops: require App::MFILE::WWW 0.164
+- js: fix ACL on schedule lookup/display
+- Revert "js: daction-init: fix pushable flag in one of the actions"
+- js: caches: implement populateLastExisting
+- js: refactor to use populate.bootstrap() and populate.shift()
+

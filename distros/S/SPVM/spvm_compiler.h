@@ -54,6 +54,9 @@ struct SPVM_compiler {
   // OP package symtable
   SPVM_HASH* op_package_symtable;
   
+  // OP our symtable
+  SPVM_HASH* op_our_symtable;
+  
   // Class loading stack
   SPVM_DYNAMIC_ARRAY* op_use_stack;
   
@@ -65,12 +68,6 @@ struct SPVM_compiler {
   
   // Subroutine absolute name symbol table
   SPVM_HASH* op_sub_symtable;
-  
-  // Field absolute name symbol table
-  SPVM_HASH* op_field_symtable;
-
-  // Field absolute name symbol table
-  SPVM_HASH* op_fields;
   
   // use symbol table
   SPVM_HASH* op_use_symtable;
@@ -118,6 +115,9 @@ struct SPVM_compiler {
   
   // Subroutine indexes constant pool index
   int32_t subs_base;
+  
+  // Package Variable id
+  int32_t package_var_length;
   
   // Native subroutines
   SPVM_DYNAMIC_ARRAY* native_subs;

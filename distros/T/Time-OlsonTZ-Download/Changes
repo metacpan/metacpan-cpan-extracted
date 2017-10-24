@@ -1,3 +1,18 @@
+version 0.007; 2017-10-23
+
+  * when extracting data file names from the Olson makefile, handle the
+    new way in which the data file names are handled there from version
+    2017c onwards
+
+  * check for required Perl version at runtime
+
+  * in documentation, use four-column indentation for all verbatim
+    material
+
+  * in META.{yml,json}, point to public bug tracker
+
+  * support author test through Build interface
+
 version 0.006; 2017-07-17
 
   * when invoking make in the Olson distribution directory, suppress

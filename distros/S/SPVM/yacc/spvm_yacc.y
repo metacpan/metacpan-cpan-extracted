@@ -14,14 +14,14 @@
   #include "spvm_type.h"
 %}
 
-%token <opval> MY HAS SUB PACKAGE IF ELSIF ELSE RETURN FOR WHILE USE NEW
-%token <opval> LAST NEXT NAME VAR CONSTANT ENUM DESCRIPTOR CORETYPE UNDEF CROAK
+%token <opval> MY HAS SUB PACKAGE IF ELSIF ELSE RETURN FOR WHILE USE NEW SET GET OUR
+%token <opval> LAST NEXT NAME VAR CONSTANT ENUM DESCRIPTOR CORETYPE UNDEF CROAK PACKAGE_VAR
 %token <opval> SWITCH CASE DEFAULT VOID EVAL EXCEPTION_VAR BYTE SHORT INT LONG FLOAT DOUBLE STRING WEAKEN
 
 %type <opval> grammar opt_statements statements statement my_var field if_statement else_statement
 %type <opval> block enumeration_block package_block sub opt_declarations_in_package call_sub unop binop
 %type <opval> opt_terms terms term args arg opt_args use declaration_in_package declarations_in_package
-%type <opval> enumeration_values enumeration_value weaken_field
+%type <opval> enumeration_values enumeration_value weaken_field names opt_names setters getters our_var
 %type <opval> type package_name field_name sub_name package declarations_in_grammar opt_enumeration_values type_array
 %type <opval> for_statement while_statement expression opt_declarations_in_grammar
 %type <opval> call_field array_elem convert_type enumeration new_object type_name array_length declaration_in_grammar
@@ -148,6 +148,9 @@ declaration_in_package
   : field
   | sub
   | enumeration
+  | setters ';'
+  | getters ';'
+  | our_var ';'
 
 package_block
   : '{' opt_declarations_in_package '}'
@@ -343,9 +346,9 @@ else_statement
     }
 
 field
-  : HAS field_name ':' type ';'
+  : HAS field_name ':' opt_descriptors type ';'
     {
-      $$ = SPVM_OP_build_field(compiler, $1, $2, $4);
+      $$ = SPVM_OP_build_field(compiler, $1, $2, $4, $5);
     }
 
 sub
@@ -357,14 +360,19 @@ sub
      {
        $$ = SPVM_OP_build_sub(compiler, $1, $2, $4, $7, $8, NULL);
      }
- | SUB NEW '(' opt_args ')' ':' opt_descriptors type_or_void block
-     {
-       $$ = SPVM_OP_build_sub(compiler, $1, $2, $4, $7, $8, $9);
-     }
- | SUB NEW '(' opt_args ')' ':' opt_descriptors type_or_void ';'
-     {
-       $$ = SPVM_OP_build_sub(compiler, $1, $2, $4, $7, $8, NULL);
-     }
+
+setters
+  : SET opt_names
+    {
+      $$ = SPVM_OP_build_setters(compiler, $1, $2);
+    }
+
+getters
+  : GET opt_names
+    {
+      $$ = SPVM_OP_build_getters(compiler, $1, $2);
+    }
+
 enumeration
   : ENUM enumeration_block
     {
@@ -374,11 +382,17 @@ enumeration
 my_var
   : MY VAR ':' type
     {
-      $$ = SPVM_OP_build_my_var(compiler, $1, $2, $4);
+      $$ = SPVM_OP_build_my_var(compiler, $2, $4);
     }
   | MY VAR
     {
-      $$ = SPVM_OP_build_my_var(compiler, $1, $2, NULL);
+      $$ = SPVM_OP_build_my_var(compiler, $2, NULL);
+    }
+
+our_var
+  : OUR VAR ':' type
+    {
+      $$ = SPVM_OP_build_our(compiler, $2, $4);
     }
 
 expression
@@ -451,6 +465,44 @@ terms
     }
   | term
 
+opt_names
+  :	/* Empty */
+    {
+      $$ = SPVM_OP_new_op_list(compiler, compiler->cur_file, compiler->cur_line);
+    }
+  |	names
+    {
+      if ($1->code == SPVM_OP_C_CODE_LIST) {
+        $$ = $1;
+      }
+      else {
+        SPVM_OP* op_list = SPVM_OP_new_op_list(compiler, $1->file, $1->line);
+        SPVM_OP_insert_child(compiler, op_list, op_list->last, $1);
+        $$ = op_list;
+      }
+    }
+    
+names
+  : names ',' NAME
+    {
+      SPVM_OP* op_list;
+      if ($1->code == SPVM_OP_C_CODE_LIST) {
+        op_list = $1;
+      }
+      else {
+        op_list = SPVM_OP_new_op_list(compiler, $1->file, $1->line);
+        SPVM_OP_insert_child(compiler, op_list, op_list->last, $1);
+      }
+      SPVM_OP_insert_child(compiler, op_list, op_list->last, $3);
+      
+      $$ = op_list;
+    }
+  | names ','
+    {
+      $$ = $1
+    }
+  | NAME
+  
 array_length
   : ARRAY_LENGTH term
     {
@@ -463,6 +515,7 @@ array_length
 
 term
   : VAR
+  | PACKAGE_VAR
   | EXCEPTION_VAR
   | CONSTANT
     {
@@ -618,6 +671,14 @@ binop
     {
       $$ = SPVM_OP_build_assign(compiler, $2, $1, $3);
     }
+  | PACKAGE_VAR ASSIGN term
+    {
+      $$ = SPVM_OP_build_assign(compiler, $2, $1, $3);
+    }
+  | PACKAGE_VAR SPECIAL_ASSIGN term
+    {
+      $$ = SPVM_OP_build_assign(compiler, $2, $1, $3);
+    }
   | '(' term ')'
     {
       $$ = $2;
@@ -659,16 +720,6 @@ call_sub
       SPVM_OP* op_terms = SPVM_OP_new_op_list(compiler, $1->file, $2->line);
       $$ = SPVM_OP_build_call_sub(compiler, $1, $3, op_terms);
     }
-  | package_name ARROW sub_name '(' opt_terms  ')'
-    {
-      $$ = SPVM_OP_build_call_sub(compiler, $1, $3, $5);
-    }
-  | package_name ARROW sub_name
-    {
-      SPVM_OP* op_terms = SPVM_OP_new_op_list(compiler, $1->file, $2->line);
-      $$ = SPVM_OP_build_call_sub(compiler, $1, $3, op_terms);
-    }
-    
 opt_args
   :	/* Empty */
     {
@@ -710,7 +761,7 @@ args
 arg
   : VAR ':' type
     {
-      $$ = SPVM_OP_build_my_var(compiler, SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_MY, $1->file, $1->line), $1, $3);
+      $$ = SPVM_OP_build_my_var(compiler, $1, $3);
     }
 
 opt_descriptors

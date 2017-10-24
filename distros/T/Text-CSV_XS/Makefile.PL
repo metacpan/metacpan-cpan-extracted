@@ -47,7 +47,7 @@ $ExtUtils::MakeMaker::VERSION > 6.30 and $wm{LICENSE} = "perl";
 my $rv = WriteMakefile (%wm);
 
 # perlcriticrc uses Config::Tiny, which does not support nesting
-if (-f ".perlcriticrc" && -s "$ENV{HOME}/.perlcriticrc") {
+-f ".perlcriticrc" && -s "$ENV{HOME}/.perlcriticrc" and eval {
     open my $fh, ">", ".perlcriticrc";
 
     require Config::Tiny;
@@ -65,7 +65,7 @@ if (-f ".perlcriticrc" && -s "$ENV{HOME}/.perlcriticrc") {
     $cnf->{"Compatibility::PodMinimumVersion"}
 	{above_version} = "5.012";	# For L<> and =head3
     $cnf->write (".perlcriticrc");
-    }
+    };
 
 1;
 
@@ -122,7 +122,10 @@ sub postamble
 	'spellcheck:',
 	'	pod-spell-check --aspell --ispell',
 	'',
-	'checkmeta:	spellcheck',
+	'ppport:	ppport.h',
+	'	perl ppport.h --compat-version=5.6.1 CSV_XS.xs',
+	'',
+	'checkmeta:	spellcheck ppport.h',
 	'	perl sandbox/genPPPort_h.pl',
 	'	perl sandbox/genMETA.pl -c',
 	'',
@@ -140,6 +143,16 @@ sub postamble
 	'',
 	'test_used:	test',
 	'	prove -vwb sandbox/used-by.pl',
+	'',
+	'doc:			doc/CSV_XS.md doc/CSV_XS.html doc/CSV_XS.man',
+	'doc/CSV_XS.md:		CSV_XS.pm',
+	'	pod2markdown  < $? > $@',
+	'doc/CSV_XS.html:	CSV_XS.pm',
+	'	pod2html      < $? 2>&1 | grep -v "^Cannot find" > $@',
+	'doc/CSV_XS.3:		CSV_XS.pm',
+	'	pod2man       < $? > $@',
+	'doc/CSV_XS.man:	doc/CSV_XS.3',
+	'	nroff -mandoc < $? > $@',
 	'',
 	$min_vsn;
     } # postamble

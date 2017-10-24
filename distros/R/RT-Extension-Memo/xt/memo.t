@@ -77,11 +77,11 @@ $cancel_button = $mjs->selector('#CancelMemo', single => 1);
 ok($cancel_button->is_hidden('data-action'), 'Cancel button hidden on saved memo');
 
 # Modify attribute
-$ticket->SetAttribute(Name => 'Memo', Content => "This is a memo\nin two lines");
+$ticket->SetAttribute(Name => 'Memo', Content => "This is a modified memo");
 
 $ticket->ClearAttributes;
 $attr = $ticket->FirstAttribute('Memo');
-is($attr->Content, "This is a memo\nin two lines", 'Attribute set on modified attribute');
+is($attr->Content, "This is a modified memo", 'Attribute set on modified attribute');
 $div = $mjs->selector('#MemoContent', single => 1);
 is($div->get_text, 'This is a memo', 'Memo set on modified attribute');
 $textarea = $mjs->selector('#MemoContentEdit', single => 1);
@@ -96,11 +96,11 @@ $mjs->click($action_button);
 
 $ticket->ClearAttributes;
 $attr = $ticket->FirstAttribute('Memo');
-is($attr->Content, "This is a memo\nin two lines", 'Attribute set on edit modified memo');
+is($attr->Content, "This is a modified memo", 'Attribute set on edit modified memo');
 $div = $mjs->selector('#MemoContent', single => 1);
 ok($div->is_hidden, 'Memo hidden on edit modified memo');
 $textarea = $mjs->selector('#MemoContentEdit', single => 1);
-is($textarea->get_value, "This is a memo\nin two lines", 'Memo edition set on edit modified memo');
+is($textarea->get_value, "This is a modified memo", 'Memo edition set on edit modified memo');
 $action_button = $mjs->selector('#ActionMemo', single => 1);
 is($action_button->get_attribute('data-action'), 'Save', 'Action button is Save on edit modified memo');
 $cancel_button = $mjs->selector('#CancelMemo', single => 1);
@@ -111,9 +111,9 @@ $mjs->get($m->rt_base_url . 'Ticket/Display.html?id=' . $ticket->id);
 
 $ticket->ClearAttributes;
 $attr = $ticket->FirstAttribute('Memo');
-is($attr->Content, "This is a memo\nin two lines", 'Attribute set on reload modified memo');
+is($attr->Content, "This is a modified memo", 'Attribute set on reload modified memo');
 $div = $mjs->selector('#MemoContent', single => 1);
-is($div->get_text, "This is a memo\nin two lines", 'Memo set on reload modified attribute');
+is($div->get_text, "This is a modified memo", 'Memo set on reload modified attribute');
 $textarea = $mjs->selector('#MemoContentEdit', single => 1);
 ok($textarea->is_hidden, 'Memo edition hidden on reload modified attribute');
 $action_button = $mjs->selector('#ActionMemo', single => 1);

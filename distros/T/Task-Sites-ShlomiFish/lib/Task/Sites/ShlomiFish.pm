@@ -11,7 +11,7 @@ Task::Sites::ShlomiFish - Specifications for modules needed for building www.shl
 
 =cut
 
-our $VERSION = '0.0211';
+our $VERSION = '0.0212';
 
 =head1 DESCRIPTION
 
@@ -19,13 +19,13 @@ Shlomi Fish maintains a homesite at L<http://www.shlomifish.org/>. Installing
 this task from CPAN will install all of the CPAN modules that are required
 to build it.
 
-The sources of this web-site are available in a Subversion repository with
-detailed building instructions:
+The sources of this web-site are available in a public version control
+repository with detailed building instructions:
 
 L<http://www.shlomifish.org/meta/site-source/>
 
-This site serves as an example for the Latemp content-management system
-( L<http://web-cpan.berlios.de/latemp/> ) and for other open-source
+This site serves as an example for the Latemp static site generator
+( L<http://web-cpan.shlomifish.org/latemp/> ) and for other open-source
 technologies such as some of my XML-Grammar-* modules.
 
 =head1 AUTHOR
@@ -35,7 +35,7 @@ Shlomi Fish, C<< <shlomif at iglu.org.il> >>
 =head1 BUGS
 
 Please report any bugs or feature requests to
-C<bug-task-latemp at rt.cpan.org>, or through the web interface at
+C<bug-task-sites-shlomifish at rt.cpan.org>, or through the web interface at
 L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Task-Sites-ShlomiFish>.
 I will be notified, and then you'll automatically be notified of progress on
 your bug as I make changes.
@@ -49,14 +49,14 @@ for it clear in the first versions I uploaded, so here it is.
 First of all, I should note that the source code of my site is public, and I
 give detailed installation instructions here:
 
-http://www.shlomifish.org/meta/site-source/
+L<http://www.shlomifish.org/meta/site-source/>
 
 So people who are interested may wish to download the site's sources, play with
 them and learn from them.
 
 Furthermore, the sources of my site serve as a sophisticated example for Latemp
-( http://web-cpan.berlios.de/latemp/ ), Website Meta Language (
-http://thewml.org/ ) and other technologies. So there is some public
+( L<http://web-cpan.shlomifish.org/latemp/> ), Website Meta Language (
+L<http://thewml.org/> ) and other technologies. So there is some public
 motivation to make installing its CPAN dependencies as easy as possible.
 
 I'm sorry that I have not made all these facts clear in the module's

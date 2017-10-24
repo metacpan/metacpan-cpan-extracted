@@ -17,6 +17,7 @@ t/00-load.t
 t/author-critic.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
+t/batch_updater.t
 t/bop.t
 t/card.t
 t/chargeback.t

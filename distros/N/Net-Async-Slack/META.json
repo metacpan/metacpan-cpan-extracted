@@ -4,7 +4,7 @@
       "Tom Molesworth <TEAM@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -86,7 +86,7 @@
       },
       "homepage" : "http://search.cpan.org/dist/Net-Async-Slack/"
    },
-   "version" : "0.001",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.023"
+   "version" : "0.002",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
 }
 

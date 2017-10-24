@@ -6,10 +6,11 @@ use warnings;
 
 use Test::More;
 
-plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Net/LDAP/SimpleServer.pm',
+    'Net/LDAP/SimpleServer/Constant.pm',
     'Net/LDAP/SimpleServer/LDIFStore.pm',
     'Net/LDAP/SimpleServer/ProtocolHandler.pm'
 );

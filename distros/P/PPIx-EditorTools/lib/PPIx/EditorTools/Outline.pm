@@ -1,7 +1,7 @@
 package PPIx::EditorTools::Outline;
-
+our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Collect use pragmata, modules, subroutiones, methods, attributes
-
+$PPIx::EditorTools::Outline::VERSION = '0.20';
 use 5.008;
 use strict;
 use warnings;
@@ -11,8 +11,6 @@ use base 'PPIx::EditorTools';
 use Class::XSAccessor accessors => {};
 
 use PPI;
-
-our $VERSION = '0.18';
 
 sub find {
 	my ( $self, %args ) = @_;
@@ -198,15 +196,17 @@ sub _Moo_PkgName {
 
 1;
 
-__END__
-
-
-
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
 PPIx::EditorTools::Outline - Collect use pragmata, modules, subroutiones, methods, attributes
+
+=head1 VERSION
+
+version 0.20
 
 =head1 SYNOPSIS
 
@@ -226,7 +226,6 @@ Return a list of pragmatas, modules, methods, attributes of a C<PPI::Document>.
 =item * new()
 
 Constructor. Generally shouldn't be called with any arguments.
-
 
 =item * find()
 
@@ -250,22 +249,50 @@ Return a reference to a hash.
 
 =back
 
-=head1 AUTHORS
-
-Gabor Szabo E<lt>gabor@szabgab.comE<gt>
-
-=head2 CONTRIBUTORS
-
-Kevin Dawson E<lt>bowtie@cpan.orgE<gt>
-
-buff3r E<lt>buff3r@E<gt>
-
 =head1 SEE ALSO
 
 This class inherits from C<PPIx::EditorTools>.
 Also see L<App::EditorTools>, L<Padre>, and L<PPI>.
 
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+Steffen Mueller C<smueller@cpan.org>
+
+=item *
+
+Mark Grimes C<mgrimes@cpan.org>
+
+=item *
+
+Ahmad M. Zawawi <ahmad.zawawi@gmail.com>
+
+=item *
+
+Gabor Szabo  <gabor@szabgab.com>
+
+=item *
+
+Yanick Champoux <yanick@cpan.org>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017, 2014, 2012 by The Padre development team as listed in Padre.pm..
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =cut
+
+__END__
+
+
+
 
 # Copyright 2008-2012 The Padre development team as listed in Padre.pm.
 # LICENSE

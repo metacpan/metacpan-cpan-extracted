@@ -1,4 +1,4 @@
-# ABSTRACT: 红晋江 http://bbs.jjwxc.net
+# ABSTRACT: http://bbs.jjwxc.net
 package Novel::Robot::Parser::hjj;
 use strict;
 use warnings;

@@ -36,13 +36,11 @@
 
 define ([
     'jquery', 
-    'd3',
     'html', 
     'lib',
     'login'
 ], function (
     $, 
-    d3,
     html, 
     lib,
     login
@@ -70,9 +68,9 @@ define ([
                 // Set up form submit callback
                 $('#loginform').submit(submitCallback);
 
-                // Set up listener for <ENTER> keypresses in "username" field
+                // Set up listener for <ENTER> keydowns in "username" field
                 $('input[name="nam"]').keydown(function (evt) {
-                    lib.logKeyPress(evt);
+                    lib.logKeyDown(evt);
                     if (evt.keyCode === 13) {
                         evt.preventDefault();
                         $('input[name="pwd"]').focus();
@@ -81,9 +79,9 @@ define ([
                     }
                 });
 
-                // Set up listener for <ENTER> and <TAB> keypresses in "password" field
+                // Set up listener for <ENTER> and <TAB> keydowns in "password" field
                 $('input[name="pwd"]').keydown(function (evt) {
-                    lib.logKeyPress(evt);
+                    lib.logKeyDown(evt);
                     if (evt.keyCode === 13) {
                         // event.preventDefault();
                         submitCallback(evt);
@@ -95,8 +93,6 @@ define ([
             }; // end of var list
 
         $('#mainarea').html(html.loginDialog());
-        d3.select('.d3')
-            .text('D3 was here');
         formHandler();
 
     }

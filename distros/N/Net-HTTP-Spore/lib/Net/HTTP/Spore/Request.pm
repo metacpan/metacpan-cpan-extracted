@@ -1,8 +1,5 @@
 package Net::HTTP::Spore::Request;
-{
-  $Net::HTTP::Spore::Request::VERSION = '0.06';
-}
-
+$Net::HTTP::Spore::Request::VERSION = '0.07';
 # ABSTRACT: Net::HTTP::Spore::Request - Portable HTTP request object from SPORE env hash
 
 use Moose;
@@ -349,13 +346,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Net::HTTP::Spore::Request - Net::HTTP::Spore::Request - Portable HTTP request object from SPORE env hash
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -461,17 +460,21 @@ Get the content that will be posted
 
 =item *
 
-franck cuny <franck@lumberjaph.net>
+Franck Cuny <franck.cuny@gmail.com>
 
 =item *
 
 Ash Berlin <ash@cpan.org>
 
+=item *
+
+Ahmad Fatoum <athreef@cpan.org>
+
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by linkfluence.
+This software is copyright (c) 2012 by Linkfluence.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

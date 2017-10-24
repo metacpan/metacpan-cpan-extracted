@@ -125,6 +125,10 @@ enum {
   SPVM_OP_C_CODE_WEAKEN_FIELD,
   SPVM_OP_C_CODE_SPECIAL_ASSIGN,
   SPVM_OP_C_CODE_CONCAT_STRING,
+  SPVM_OP_C_CODE_SET,
+  SPVM_OP_C_CODE_GET,
+  SPVM_OP_C_CODE_OUR,
+  SPVM_OP_C_CODE_PACKAGE_VAR,
 };
 
 extern const char* const SPVM_OP_C_CODE_NAMES[];
@@ -188,14 +192,17 @@ struct SPVM_op {
     SPVM_MY_VAR* my_var;
     SPVM_SUB* sub;
     SPVM_CONSTANT* constant;
-    SPVM_NAME_INFO* name_info;
     SPVM_TYPE* type;
     SPVM_VAR* var;
-    SPVM_FIELD_INFO* field;
+    SPVM_FIELD* field;
     SPVM_PACKAGE* package;
     SPVM_ENUMERATION* enumeration;
     SPVM_SWITCH_INFO* switch_info;
     SPVM_USE* use;
+    SPVM_CALL_SUB* call_sub;
+    SPVM_CALL_FIELD* call_field;
+    SPVM_OUR* our;
+    SPVM_PACKAGE_VAR* package_var;
   } uv;
   int32_t code;
   int32_t flag;
@@ -204,6 +211,16 @@ struct SPVM_op {
   _Bool lvalue;
   _Bool rvalue;
 };
+
+void SPVM_OP_resolve_package_var(SPVM_COMPILER* compiler, SPVM_OP* op_package_var);
+
+SPVM_OP* SPVM_OP_build_setters(SPVM_COMPILER* compiler, SPVM_OP* op_set, SPVM_OP* op_names);
+SPVM_OP* SPVM_OP_build_getters(SPVM_COMPILER* compiler, SPVM_OP* op_get, SPVM_OP* op_names);
+
+
+SPVM_OP* SPVM_OP_new_op_name(SPVM_COMPILER* compiler, const char* name, const char* file, int32_t line);
+SPVM_OP* SPVM_OP_new_op_var(SPVM_COMPILER* compiler, SPVM_OP* op_name);
+SPVM_OP* SPVM_OP_new_op_package_var(SPVM_COMPILER* compiler, SPVM_OP* op_name);
 
 SPVM_OP* SPVM_OP_get_parent(SPVM_COMPILER* compiler, SPVM_OP* op_target);
 void SPVM_OP_get_before(SPVM_COMPILER* compiler, SPVM_OP* op_target, SPVM_OP** op_before_ptr, _Bool* next_is_child_ptr);
@@ -232,8 +249,8 @@ SPVM_TYPE* SPVM_OP_get_type(SPVM_COMPILER* compiler, SPVM_OP* op);
 void SPVM_OP_convert_to_op_constant_true(SPVM_COMPILER* compiler, SPVM_OP* op);
 void SPVM_OP_convert_to_op_constant_false(SPVM_COMPILER* compiler, SPVM_OP* op);
 
-void SPVM_OP_resolve_sub_name(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPVM_OP* op_name);
-void SPVM_OP_resolve_field_name(SPVM_COMPILER* compiler, SPVM_OP* op_name);
+void SPVM_OP_resolve_call_sub(SPVM_COMPILER* compiler, SPVM_OP* op_call_sub);
+void SPVM_OP_resolve_call_field(SPVM_COMPILER* compiler, SPVM_OP* op_call_field);
 
 SPVM_OP* SPVM_OP_build_concat_string(SPVM_COMPILER* compiler, SPVM_OP* op_cancat_string, SPVM_OP* op_first, SPVM_OP* op_last);
 SPVM_OP* SPVM_OP_build_return(SPVM_COMPILER* compiler, SPVM_OP* op_return, SPVM_OP* op_term);
@@ -262,8 +279,9 @@ SPVM_OP* SPVM_OP_build_call_field(SPVM_COMPILER* compiler, SPVM_OP* op_name_pack
 SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPVM_OP* op_name_package, SPVM_OP* op_block);
 SPVM_OP* SPVM_OP_build_sub(SPVM_COMPILER* compiler, SPVM_OP* op_sub, SPVM_OP* op_subname, SPVM_OP* op_subargs, SPVM_OP* op_descriptors, SPVM_OP* type, SPVM_OP* op_block);
 SPVM_OP* SPVM_OP_build_CONSTVALUE(SPVM_COMPILER* compiler, SPVM_OP* op_const);
-SPVM_OP* SPVM_OP_build_field(SPVM_COMPILER* compiler, SPVM_OP* op_field, SPVM_OP* op_field_base_name, SPVM_OP* type);
-SPVM_OP* SPVM_OP_build_my_var(SPVM_COMPILER* compiler, SPVM_OP* op_my, SPVM_OP* op_var, SPVM_OP* op_type);
+SPVM_OP* SPVM_OP_build_field(SPVM_COMPILER* compiler, SPVM_OP* op_field, SPVM_OP* op_field_base_name, SPVM_OP* op_descripters, SPVM_OP* type);
+SPVM_OP* SPVM_OP_build_our(SPVM_COMPILER* compiler, SPVM_OP* op_var, SPVM_OP* op_type);
+SPVM_OP* SPVM_OP_build_my_var(SPVM_COMPILER* compiler, SPVM_OP* op_var, SPVM_OP* op_type);
 SPVM_OP* SPVM_OP_build_grammar(SPVM_COMPILER* compiler, SPVM_OP* op_packages);
 SPVM_OP* SPVM_OP_build_use(SPVM_COMPILER* compiler, SPVM_OP* op_use, SPVM_OP* op_name_package);
 SPVM_OP* SPVM_OP_build_call_sub(SPVM_COMPILER* compiler, SPVM_OP* op_invocant, SPVM_OP* op_subname, SPVM_OP* op_terms);
@@ -278,6 +296,7 @@ SPVM_OP* SPVM_OP_build_weaken_field(SPVM_COMPILER* compiler, SPVM_OP* op_weaken,
 void SPVM_OP_resolve_op_convert_type(SPVM_COMPILER* compiler, SPVM_OP* op_convert_type);
 
 const char* SPVM_OP_create_abs_name(SPVM_COMPILER* compiler, const char* package_name, const char* base_name);
+const char* SPVM_OP_create_package_var_abs_name(SPVM_COMPILER* compiler, const char* package_name, const char* name);
 
 SPVM_OP* SPVM_OP_new_op_constant_byte(SPVM_COMPILER* compiler, int8_t value, const char* file, int32_t line);
 SPVM_OP* SPVM_OP_new_op_constant_short(SPVM_COMPILER* compiler, int16_t value, const char* file, int32_t line);

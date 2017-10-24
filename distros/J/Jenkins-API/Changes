@@ -1,5 +1,10 @@
 Revision history for Jenkins-API
 
+0.17      2017-10-21 08:05:34+01:00 Europe/London
+
+          Bumped Test2::Suite version to prevent test fail
+          on 5.10.0
+
 0.16      2017-10-03 13:15:02+01:00 Europe/London
 
           Removed debug statement.

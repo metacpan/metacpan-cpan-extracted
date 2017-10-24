@@ -33,18 +33,21 @@ package Bar {
     is($Foo2->get_method('foo')->body->(), 'Foo2::foo', '... the method in Foo2 is as we expected');
 }
 
-package FooBar {
-    use Moxie;
 
-    with 'Foo', 'Bar';
-}
+BEGIN {
+    local $@ = undef;
+    eval q[
+        package FooBarBrokenRole {
+            use Moxie;
 
-{
-    my ($FooBar, $Foo, $Bar) = map { MOP::Role->new( name => $_ ) } qw[ FooBar Foo Bar ];
-    is_deeply([ map { $_->name } $FooBar->required_methods ], ['foo'], '... method conflict between roles results in required method');
-    ok(!$FooBar->has_method('foo'), '... FooBar does not have the foo method');
-    ok($Foo->has_method('foo'), '... Foo still has the foo method');
-    ok($Bar->has_method('foo'), '... Bar still has the foo method');
+            with 'Foo', 'Bar';
+        }
+    ];
+    like(
+        "$@",
+        qr/^\[CONFLICT\] There should be no conflicting methods when composing \(Foo, Bar\) into \(FooBarBrokenRole\) but instead we found \(foo\)/,
+        '... got the exception we expected'
+    );
 }
 
 package FooBarClass {
@@ -78,7 +81,7 @@ BEGIN {
     ];
     like(
         "$@",
-        qr/^\[CONFLICT\] There should be no conflicting methods when composing \(Foo, Bar\) into the class \(FooBarBrokenClass1\) but instead we found \(foo\)/,
+        qr/^\[CONFLICT\] There should be no conflicting methods when composing \(Foo, Bar\) into \(FooBarBrokenClass1\) but instead we found \(foo\)/,
         '... got the exception we expected'
     );
 }

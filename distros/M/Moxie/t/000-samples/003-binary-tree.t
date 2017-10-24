@@ -31,6 +31,8 @@ package BinaryTree {
     has _left   => ();
     has _right  => ();
 
+    my sub _parent : private;
+
     sub BUILDARGS : init_args(
         node?   => _node,
         parent? => _parent,
@@ -45,8 +47,8 @@ package BinaryTree {
     sub has_left   : predicate(_left);
     sub has_right  : predicate(_right);
 
-    sub left  ($self) { _left  //= $self->new( parent => $self ) }
-    sub right ($self) { _right //= $self->new( parent => $self ) }
+    sub left  ($self) : lazy(_left)  { $self->new( parent => $self ) }
+    sub right ($self) : lazy(_right) { $self->new( parent => $self ) }
 }
 
 {

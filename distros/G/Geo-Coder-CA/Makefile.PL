@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker 6.64;	# 6.64 for TEST_REQUIRES
 use Getopt::Long;	# Technique inspired by IO::Lambda
 use IO::Socket::INET;
 
@@ -18,9 +18,17 @@ if($ENV{RELEASE_TESTING}) {
 	}
 }
 
+my $test_requires = {
+	'Test::Most' => 0,
+	'Test::NoWarnings' => 0,
+	'Test::Number::Delta' => 0,
+	'Test::Carp' => 0,
+};
+
 if($online_tests) {
 	open(my $enabled, '>', 't/online.enabled') || die "Can't touch t/online.enabled $!";
 	close($enabled) || die "Can't touch t/online.enabled $!";
+	$test_requires->{'Test::LWP::UserAgent'} = 0;
 } else {
 	unlink('t/online.enabled');
 }
@@ -35,10 +43,7 @@ WriteMakefile(
       ? ('LICENSE'=> 'GPL')
       : ()),
     PL_FILES	=> {},
-    BUILD_REQUIRES => {
-	'Test::Most' => 0,
-	'Test::Number::Delta' => 0,
-    },
+    TEST_REQUIRES => $test_requires,
     PREREQ_PM => {
 	'Encode' => 0,
 	'JSON' => 0,

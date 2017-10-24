@@ -31,6 +31,8 @@ A call to this method yields one of the following:
 
 =item * If only a partial frame is ready, undef is returned.
 
+=back
+
 =head1 I/O DETAILS
 
 L<IO::Framed> was born out of work on this module; see that module’s

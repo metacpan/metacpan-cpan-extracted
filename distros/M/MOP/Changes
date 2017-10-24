@@ -1,5 +1,59 @@
 Revision history for Perl extension MOP
 
+0.11 2017-10-22
+    - fixing the missing Devel::Hook dependency
+
+0.10 2017-10-20
+    [ENHANCEMENT]
+    - There is now a public API of utility functions in
+      the MOP::Util module.
+        - see the docs for more info
+    - added the MOP::Method::Attribute class to represent
+      any attributes attached to a method.
+        - see below for how this changes the `get_code_attributes`
+          method within MOP::Method
+
+    [!!!!BREAKING CHANGES!!!!]
+
+    [ Roles ]
+    - role to class composition behavior has changed
+        - there is now no difference in the way compositon
+          beheaves when applied to a class or to a role
+            - previously only classes complained if there was a
+              conflict in the compositon process, now both
+              roles and classes complain
+            - previously only classes complained if there was a
+              method requirement after composition was complete,
+              now both roles and classes complain
+
+    [ MOP::Slot ]
+    - The `add_slot` method now will set the COMP_STASH
+      of the initializer, therefore taking ownership of
+      that CV, this mirrors what `add_method` does
+        - this is actually unlikely to break much, but
+          is significant, so maybe
+    - MOP::Slot objects no longer act as overloaded CODE
+      refs (the &{} operator), this function is now the
+      domain of the MOP::Slot::Initializer
+    - MOP::Slot::Initializer has completely changed, the
+      last version should be ignored completely
+        - the `builder` feature has been completely removed
+        - all methods other than `new` have been removed
+        - it is a blessed CODE reference
+
+    [ MOP::Method ]
+    - the API for `get_code_attributes` in MOP::Method has
+      changed, it now returns MOP::Method::Attribute objects
+
+    [DEPENDENCIES]
+    - added Sub::Metadata, used to detect null CVs and
+      mutate the COMP_STASH of CVs.
+    - added Devel::Hook, which is used in the new MOP::Util
+      function `defer_until_UNITCHECK`
+    - bumped the UNIVERSAL::Object dependency version to
+      make sure we have support for immutable CODE ref
+      instances (needed for MOP::Slot::Initializer)
+
 0.09 2017-09-27
     [ENHANCEMENT]
     - moved the Slot::Intitializer class from Moxie back

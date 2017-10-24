@@ -10,7 +10,7 @@
 # ABSTRACT: Edit the configuration of an application with a shell
 
 package App::Cme::Command::shell ;
-$App::Cme::Command::shell::VERSION = '1.023';
+$App::Cme::Command::shell::VERSION = '1.024';
 use strict;
 use warnings;
 use 5.10.1;
@@ -78,7 +78,7 @@ App::Cme::Command::shell - Edit the configuration of an application with a shell
 
 =head1 VERSION
 
-version 1.023
+version 1.024
 
 =head1 SYNOPSIS
 

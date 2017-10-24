@@ -17,6 +17,7 @@ lib/Time/OlsonTZ/Data/Africa/Casablanca.tz
 lib/Time/OlsonTZ/Data/Africa/Ceuta.tz
 lib/Time/OlsonTZ/Data/Africa/El_Aaiun.tz
 lib/Time/OlsonTZ/Data/Africa/Johannesburg.tz
+lib/Time/OlsonTZ/Data/Africa/Juba.tz
 lib/Time/OlsonTZ/Data/Africa/Khartoum.tz
 lib/Time/OlsonTZ/Data/Africa/Lagos.tz
 lib/Time/OlsonTZ/Data/Africa/Maputo.tz
@@ -413,7 +414,6 @@ tzsrc/LICENSE
 tzsrc/Makefile
 tzsrc/NEWS
 tzsrc/README
-tzsrc/Theory
 tzsrc/africa
 tzsrc/antarctica
 tzsrc/asctime.c
@@ -421,6 +421,7 @@ tzsrc/asia
 tzsrc/australasia
 tzsrc/backward
 tzsrc/backzone
+tzsrc/calendars
 tzsrc/checklinks.awk
 tzsrc/checktab.awk
 tzsrc/date.1
@@ -443,6 +444,7 @@ tzsrc/pacificnew
 tzsrc/private.h
 tzsrc/southamerica
 tzsrc/systemv
+tzsrc/theory.html
 tzsrc/time2posix.3
 tzsrc/time2posix.3.txt
 tzsrc/tz-art.htm
@@ -463,6 +465,7 @@ tzsrc/zdump.c
 tzsrc/zic.8
 tzsrc/zic.8.txt
 tzsrc/zic.c
+tzsrc/zishrink.awk
 tzsrc/zone.tab
 tzsrc/zone1970.tab
 tzsrc/zoneinfo2tdf.pl

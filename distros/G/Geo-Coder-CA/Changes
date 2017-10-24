@@ -1,5 +1,8 @@
 Revision history for Geo-Coder-CA
 
+0.04	Fri Oct 20 22:15:05 EDT 2017
+	Look up county names as well
+
 0.03	Tue May 16 11:38:17 EDT 2017
 	Removed redundant code
 	Only run on-line tests when wanted

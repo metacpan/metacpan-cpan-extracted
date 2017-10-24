@@ -1,5 +1,9 @@
 Revision history for Perl extension WWW::Offliberty.
 
+1.000007 2017-10-21T17:20+01:00
+ - Change OFF_URL to use new version of Offliberty (as old version was
+   shut down)
+
 1.000006 2017-08-18T18:00+08:00
  - Change test video from Youtube to Vimeo as Offliberty's Youtube
    support is broken

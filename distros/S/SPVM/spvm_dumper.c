@@ -10,7 +10,7 @@
 #include "spvm_dynamic_array.h"
 #include "spvm_hash.h"
 #include "spvm_constant.h"
-#include "spvm_field_info.h"
+#include "spvm_field.h"
 #include "spvm_sub.h"
 #include "spvm_my_var.h"
 #include "spvm_var.h"
@@ -23,6 +23,8 @@
 #include "spvm_constant_pool.h"
 #include "spvm_bytecode.h"
 #include "spvm_bytecode_array.h"
+#include "spvm_our.h"
+#include "spvm_package_var.h"
 
 void SPVM_DUMPER_dump_ast(SPVM_COMPILER* compiler, SPVM_OP* op_base) {
   int32_t depth = 0;
@@ -74,10 +76,20 @@ void SPVM_DUMPER_dump_ast(SPVM_COMPILER* compiler, SPVM_OP* op_base) {
       printf(" \"%s\"", my_var->op_name->uv.name);
       printf(" (my_var->index:%d)", my_var->index);
     }
+    else if (code == SPVM_OP_C_CODE_OUR) {
+      SPVM_OUR* our = op_cur->uv.our;
+      printf(" \"%s\"", our->op_var->uv.var->op_name->uv.name);
+      printf(" (id :%d)", our->id);
+    }
     else if (code == SPVM_OP_C_CODE_VAR) {
       SPVM_VAR* var = op_cur->uv.var;
       printf(" \"%s\"", var->op_name->uv.name);
       printf(" (my_var->index:%d)", var->op_my_var->uv.my_var->index);
+    }
+    else if (code == SPVM_OP_C_CODE_PACKAGE_VAR) {
+      SPVM_PACKAGE_VAR* package_var = op_cur->uv.package_var;
+      printf(" \"%s\"", package_var->op_name->uv.name);
+      printf(" (id :%d)", package_var->op_our->uv.our->id);
     }
     else if (code == SPVM_OP_C_CODE_NAME) {
       printf(" \"%s\"", op_cur->uv.name);
@@ -195,7 +207,7 @@ void SPVM_DUMPER_dump_packages(SPVM_COMPILER* compiler, SPVM_DYNAMIC_ARRAY* op_p
         int32_t j;
         for (j = 0; j < op_fields->length; j++) {
           SPVM_OP* op_field = SPVM_DYNAMIC_ARRAY_fetch(op_fields, j);
-          SPVM_FIELD_INFO* field = op_field->uv.field;
+          SPVM_FIELD* field = op_field->uv.field;
           printf("    field%" PRId32 "\n", j);
           SPVM_DUMPER_dump_field(compiler, field);
         }
@@ -343,6 +355,9 @@ void SPVM_DUMPER_dump_bytecode_array(SPVM_COMPILER* compiler, SPVM_BYTECODE_ARRA
         case SPVM_BYTECODE_C_CODE_NEW_OBJECT:
         case SPVM_BYTECODE_C_CODE_CURRENT_LINE:
         case SPVM_BYTECODE_C_CODE_NEW_OBJECT_ARRAY:
+        case SPVM_BYTECODE_C_CODE_LOAD_PACKAGE_VAR:
+        case SPVM_BYTECODE_C_CODE_STORE_PACKAGE_VAR:
+        case SPVM_BYTECODE_C_CODE_STORE_PACKAGE_VAR_OBJECT:
         {
           i++;
           bytecode = bytecode_array->values[i];
@@ -556,7 +571,7 @@ void SPVM_DUMPER_dump_sub(SPVM_COMPILER* compiler, SPVM_SUB* sub) {
   }
 }
 
-void SPVM_DUMPER_dump_field(SPVM_COMPILER* compiler, SPVM_FIELD_INFO* field) {
+void SPVM_DUMPER_dump_field(SPVM_COMPILER* compiler, SPVM_FIELD* field) {
   (void)compiler;
   
   if (field) {
@@ -566,7 +581,7 @@ void SPVM_DUMPER_dump_field(SPVM_COMPILER* compiler, SPVM_FIELD_INFO* field) {
     
     SPVM_TYPE* type = field->op_type->uv.type;
     printf("      type => \"%s\"\n", type->name);
-    printf("      byte_size => \"%" PRId32 "\"\n", SPVM_FIELD_INFO_get_byte_size(compiler, field));
+    printf("      byte_size => \"%" PRId32 "\"\n", SPVM_FIELD_get_byte_size(compiler, field));
     
     printf("      id => \"%" PRId32 "\"\n", field->id);
   }

@@ -21,7 +21,7 @@ sub Col : OverwritesMethod {
         if $meta->has_slot( $column_name )
         || $meta->has_slot_alias( $column_name );
 
-    $meta->add_slot( $column_name, eval 'package '.$meta->name.';sub {};' );
+    $meta->add_slot( $column_name, MOP::Slot::Initializer->new( within_package => $meta->name ) );
     $meta->add_method( $method_name, sub { $_[0]->{ $column_name } } );
 }
 
@@ -36,7 +36,7 @@ sub HasOne : OverwritesMethod  {
         if $meta->has_slot( $column_name )
         || $meta->has_slot_alias( $column_name );
 
-    $meta->add_slot( $column_name, eval 'package '.$meta->name.';sub { '.$related_class.'->new };' );
+    $meta->add_slot( $column_name, MOP::Slot::Initializer->new( within_package => $meta->name, default => sub { $related_class->new } ) );
     $meta->add_method( $method_name, sub { $_[0]->{ $column_name } } );
 }
 
@@ -50,7 +50,7 @@ sub HasMany : OverwritesMethod {
         if $meta->has_slot( $column_name )
         || $meta->has_slot_alias( $column_name );
 
-    $meta->add_slot( $column_name, eval 'package '.$meta->name.';sub { [] };' );
+    $meta->add_slot( $column_name, MOP::Slot::Initializer->new( within_package => $meta->name, default => sub { [] } ) );
     $meta->add_method( $method_name, sub { @{ $_[0]->{ $column_name } } } );
 }
 

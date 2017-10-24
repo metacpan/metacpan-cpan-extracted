@@ -1,5 +1,5 @@
 package Bio::Roary::External::Blastp;
-$Bio::Roary::External::Blastp::VERSION = '3.10.2';
+$Bio::Roary::External::Blastp::VERSION = '3.11.0';
 # ABSTRACT: Wrapper around NCBIs blastp command
 
 
@@ -59,7 +59,7 @@ Bio::Roary::External::Blastp - Wrapper around NCBIs blastp command
 
 =head1 VERSION
 
-version 3.10.2
+version 3.11.0
 
 =head1 SYNOPSIS
 

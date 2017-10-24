@@ -78,6 +78,7 @@ ok (ZMQ::Raw::Socket->ZMQ_VMCI_CONNECT_TIMEOUT);
 ok (ZMQ::Raw::Socket->ZMQ_USE_FD);
 
 my $ctx = ZMQ::Raw::Context->new;
+ok (!eval {ZMQ::Raw::Socket->new ($ctx, -1)});
 my $socket = ZMQ::Raw::Socket->new ($ctx, ZMQ::Raw->ZMQ_REQ);
 isa_ok ($socket, "ZMQ::Raw::Socket");
 $ctx->shutdown();
@@ -87,9 +88,12 @@ ok (!eval {$socket->send ('')});
 my $error = $@;
 isa_ok $error, 'ZMQ::Raw::Error';
 like $error -> message, qr/Context was terminated/;
+like "$error", qr/Context was terminated/;
 is $error -> file, 't/02-socket.t';
-is $error -> line, 85;
+is $error -> line, 86;
 is $error -> code, ZMQ::Raw::Error->ETERM;
+is int ($error), ZMQ::Raw::Error->ETERM;
+ok (!!$error);
 
 $ctx = ZMQ::Raw::Context->new;
 my $req = ZMQ::Raw::Socket->new ($ctx, ZMQ::Raw->ZMQ_REQ);
@@ -104,6 +108,8 @@ like $error -> message, qr/Value is not an int/;
 is $error -> code, -1;
 
 ok (!eval {$rep->setsockopt (ZMQ::Raw::Socket->ZMQ_IPV6, "badtype")});
+ok (!eval {$rep->setsockopt (ZMQ::Raw::Socket->ZMQ_IDENTITY, undef)});;
+ok (!eval {$rep->setsockopt (-1, undef)});;
 
 $rep->setsockopt (ZMQ::Raw::Socket->ZMQ_IPV6, 0);
 $rep->setsockopt (ZMQ::Raw::Socket->ZMQ_MAXMSGSIZE, 100);
@@ -125,6 +131,7 @@ my $result2 = $req->recv();
 is $result2, 'world';
 
 # sendmsg/recvmsg (1 msg)
+ok (!eval {$req->sendmsg});
 my $msg = ZMQ::Raw::Message->new;
 $msg->data ('hello');
 

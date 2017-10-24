@@ -138,6 +138,57 @@ validate_request(
   }
 );
 
+# headers
+$c->tx->req(Mojo::Message::Request->new)->req->headers->header('X-Custom' => 123)
+  ->header('X-DATA' => 'something');
+validate_request(
+  {
+    parameters => [
+      {name => 'x-custom', type => 'integer', required => 1, in => 'header'},
+      {name => 'X-Data',   type => 'string',  required => 1, in => 'header'},
+    ]
+  },
+  sub {
+    is "@_", "", "valid headers";
+    is_deeply $input, {'x-custom' => 123, 'X-Data' => 'something'},
+      'headers are correct and case insensitive';
+  }
+);
+
+# missing header
+make_request('application/json', qq([]));
+validate_request(
+  {parameters => [{name => 'x-custom', type => 'string', required => 1, in => 'header'}]},
+  sub {
+    like "@_", qr{\Q/x-custom: Expected string - got null.\E}, "the header is missing";
+  }
+);
+
+# Valid booleans
+$c->tx->req(Mojo::Message::Request->new)
+  ->req->url->parse('http://127.0.0.1/?a=&b=0&c=false&x=true&y=1&z=0');
+validate_request(
+  {parameters => [map { +{name => $_, type => 'boolean', in => 'query'} } qw(a b c x y z),],},
+  sub {
+    is "@_", "", "valid request";
+    is_deeply $input, {a => false, b => false, c => false, x => true, y => true, z => false},
+      'valid booleans';
+  }
+);
+
+# Invalid booleans
+$c->tx->req(Mojo::Message::Request->new)
+  ->req->url->parse('http://127.0.0.1/?a=something&b=2&c=TRUE');
+validate_request(
+  {parameters => [map { +{name => $_, type => 'boolean', in => 'query'} } qw(a b c),],},
+  sub {
+    like "@_",
+      qr{\Q/a: Expected boolean - got string. /b: Expected boolean - got string. /c: Expected boolean - got string.\E},
+      "invalid request";
+    is_deeply $input, {}, 'nothing in input';
+  }
+);
+
 done_testing;
 
 sub make_request {

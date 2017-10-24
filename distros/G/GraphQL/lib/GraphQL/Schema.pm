@@ -11,9 +11,16 @@ use Function::Parameters;
 use GraphQL::Debug qw(_debug);
 use GraphQL::Directive;
 use GraphQL::Introspection qw($SCHEMA_META_TYPE);
+use GraphQL::Type::Scalar qw($Int $Float $String $Boolean $ID);
+use GraphQL::Language::Parser qw(parse);
+use Module::Runtime qw(require_module);
+use Exporter 'import';
 
 our $VERSION = '0.02';
+our @EXPORT_OK = qw(lookup_type);
 use constant DEBUG => $ENV{GRAPHQL_DEBUG};
+my %BUILTIN2TYPE = map { ($_->name => $_) } ($Int, $Float, $String, $Boolean, $ID);
+my @TYPE_ATTRS = qw(query mutation subscription);
 
 =head1 NAME
 
@@ -93,7 +100,7 @@ type object.
 has name2type => (is => 'lazy', isa => Map[StrNameValid, ConsumerOf['GraphQL::Role::Named']]);
 sub _build_name2type {
   my ($self) = @_;
-  my @types = grep $_, (map $self->$_, qw(query mutation subscription)), $SCHEMA_META_TYPE;
+  my @types = grep $_, (map $self->$_, @TYPE_ATTRS), $SCHEMA_META_TYPE;
   push @types, @{ $self->types || [] };
   my %name2type;
   map _expand_type(\%name2type, $_), @types;
@@ -192,6 +199,127 @@ method assert_object_implements_interface(
 ) {
   my @types = @{ $self->types };
   return;
+}
+
+=head2 from_ast($ast)
+
+Class method. Takes AST (array-ref of hash-refs) made by
+L<GraphQL::Language::Parser/parse> and returns a schema object. Will
+not be a complete schema since it will have only default resolvers.
+
+=cut
+
+my %kind2class = qw(
+  type GraphQL::Type::Object
+  enum GraphQL::Type::Enum
+  interface GraphQL::Type::Interface
+  union GraphQL::Type::Union
+  scalar GraphQL::Type::Scalar
+  input GraphQL::Type::InputObject
+);
+my %class2kind = reverse %kind2class;
+method from_ast(
+  ArrayRef[HashRef] $ast,
+) :ReturnType(InstanceOf[__PACKAGE__]) {
+  DEBUG and _debug('Schema.from_ast', $ast);
+  my @type_nodes = grep $kind2class{$_->{kind}}, @$ast;
+  my ($schema_node) = map $_->{node}, grep $_->{kind} eq 'schema', @$ast;
+  die "No schema found in AST\n" unless $schema_node;
+  my %name2type = %BUILTIN2TYPE;
+  for (@type_nodes) {
+    require_module $kind2class{$_->{kind}};
+    $name2type{$_->{node}{name}} = $kind2class{$_->{kind}}->from_ast(\%name2type, $_->{node});
+  }
+  my @directives = map GraphQL::Directive->from_ast(\%name2type, $_->{node}),
+    grep $_->{kind} eq 'directive', @$ast;
+  $self->new(
+    (map {
+      $schema_node->{$_} ? ($_ => $name2type{$schema_node->{$_}}) : ()
+    } @TYPE_ATTRS),
+    (@directives ? (directives => [ @GraphQL::Directive::SPECIFIED_DIRECTIVES, @directives ]) : ()),
+    types => [ values %name2type ],
+  );
+}
+
+=head2 from_doc($doc)
+
+Class method. Takes text that is a Schema Definition Language (SDL) (aka
+Interface Definition Language) document and returns a schema object. Will
+not be a complete schema since it will have only default resolvers.
+
+=cut
+
+method from_doc(
+  Str $doc,
+) :ReturnType(InstanceOf[__PACKAGE__]) {
+  $self->from_ast(parse($doc));
+}
+
+=head2 to_doc($doc)
+
+Returns Schema Definition Language (SDL) document that describes this
+schema object.
+
+=cut
+
+has to_doc => (is => 'lazy', isa => Str);
+my %directive2builtin = map { ($_=>1) } @GraphQL::Directive::SPECIFIED_DIRECTIVES;
+my %scalar2builtin = map { ($_->name=>1) } ($Int, $Float, $String, $Boolean, $ID);
+sub _build_to_doc {
+  my ($self) = @_;
+  join "\n",
+    join('', map "$_\n",
+    "schema {",
+      (map "  $_: @{[$self->$_->name]}", grep $self->$_, @TYPE_ATTRS),
+    "}"),
+    (map $_->to_doc,
+      sort { $a->name cmp $b->name }
+      grep !$directive2builtin{$_},
+      @{ $self->directives }),
+    (map $self->name2type->{$_}->to_doc,
+      grep !/^__/,
+      grep !$scalar2builtin{$_},
+      grep $class2kind{ref $self->name2type->{$_}},
+      sort keys %{$self->name2type}),
+    ;
+}
+
+=head2 name2directive
+
+In this schema, returns a hash-ref mapping all directives' names to their
+directive object.
+
+=cut
+
+has name2directive => (is => 'lazy', isa => Map[StrNameValid, InstanceOf['GraphQL::Directive']]);
+method _build_name2directive() {
+  +{ map { ($_->name => $_) } @{ $self->directives } };
+}
+
+=head1 FUNCTIONS
+
+=head2 lookup_type($typedef, $name2type)
+
+Turns given AST fragment into a type.
+
+If the hash-ref's C<type> member is a string, will return a type of that name.
+
+If an array-ref, first element must be either C<list> or C<non_null>,
+second will be a recursive AST fragment, which will be passed into a
+recursive call. The result will then have the modifier method (C<list>
+or C<non_null>) called, and that will be returned.
+
+=cut
+
+fun lookup_type(
+  HashRef $typedef,
+  (Map[StrNameValid, InstanceOf['GraphQL::Type']]) $name2type,
+) :ReturnType(InstanceOf['GraphQL::Type']) {
+  my $type = $typedef->{type};
+  return $name2type->{$type} // die "Unknown type '$type'.\n"
+    if is_Str($type);
+  my ($wrapper_type, $wrapped) = @$type;
+  lookup_type($wrapped, $name2type)->$wrapper_type;
 }
 
 __PACKAGE__->meta->make_immutable();

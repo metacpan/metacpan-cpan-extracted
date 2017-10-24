@@ -1,0 +1,60 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Xcode::Project;
+
+# subroutine declaration
+sub print_help();
+
+# is it pass argvs
+if (scalar @ARGV) {
+  my @parameters; # use to push parameter that use to set_buildSettings_with_keyValue
+  my @args = map { $_ } @ARGV;
+  my $args = \@args;
+  my $index = 0;
+  my $file_path;
+    foreach (@ARGV) {
+      $index ++;
+      # get target
+      if ($_ =~ /^-target/) {
+	my $target = $args[$index];
+	push @parameters, $target;
+	next;
+      }
+
+      # get configuration
+      if ($_ =~ /^-configuration/) {
+	my $config = $args[$index];
+	push @parameters, $config;
+	next;
+      }
+
+      # get key value
+      if ($_=~ /=/) {
+	push @parameters, $_;
+      }
+
+      # get file path
+      if ($_ =~ m/project.pbxproj$/) {
+	$file_path = $_;
+	next;
+      }
+    }
+  my $project = Xcode::Project->new($file_path); # new project with the current path
+  # pass the parameters to project object
+  $project->set_buildSettings_with_keyValue(@parameters);
+  $project->save();
+  exit;
+} else {
+  print_help();
+  exit;
+}
+
+# help desc
+sub print_help() {
+  print <<EOF
+-target          :specify the need be edited target.
+-configuration :specify the need be edited configuration, that must need be specify target
+EOF
+}

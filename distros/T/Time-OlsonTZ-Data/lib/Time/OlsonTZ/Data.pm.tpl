@@ -4,29 +4,26 @@ Time::OlsonTZ::Data - Olson timezone data
 
 =head1 SYNOPSIS
 
-	use Time::OlsonTZ::Data qw(
-		olson_version olson_code_version olson_data_version
-	);
+    use Time::OlsonTZ::Data qw(
+	olson_version olson_code_version olson_data_version);
 
-	$version = olson_version;
-	$version = olson_code_version;
-	$version = olson_data_version;
+    $version = olson_version;
+    $version = olson_code_version;
+    $version = olson_data_version;
 
-	use Time::OlsonTZ::Data qw(
-		olson_canonical_names olson_link_names olson_all_names
-		olson_links
-		olson_country_selection
-	);
+    use Time::OlsonTZ::Data qw(
+	olson_canonical_names olson_link_names olson_all_names
+	olson_links olson_country_selection);
 
-	$names = olson_canonical_names;
-	$names = olson_link_names;
-	$names = olson_all_names;
-	$links = olson_links;
-	$countries = olson_country_selection;
+    $names = olson_canonical_names;
+    $names = olson_link_names;
+    $names = olson_all_names;
+    $links = olson_links;
+    $countries = olson_country_selection;
 
-	use Time::OlsonTZ::Data qw(olson_tzfile);
+    use Time::OlsonTZ::Data qw(olson_tzfile);
 
-	$filename = olson_tzfile("America/New_York");
+    $filename = olson_tzfile("America/New_York");
 
 =head1 DESCRIPTION
 

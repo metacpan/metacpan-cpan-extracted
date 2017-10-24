@@ -1,9 +1,27 @@
 ==================================================
-Changes from 2015-08-03 00:00:00 +0000 to present.
+Changes from 2015-10-25 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.001 at 2017-08-02 04:31:36 +0000
+version 0.002 at 2017-10-24 05:50:47 +0000
+------------------------------------------
+
+  Change: ae59b9242d80ce1f775060148b25617dffe30b55
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2017-10-23 22:49:39 +0000
+
+    New Version
+
+    * Generate META.yaml * Fix missing dependency in the import script 
+
+  Change: 167755935b9b998f5356cbb1b545c741473d8945
+  Author: Mohammad S Anwar <mohammad.anwar@yahoo.com>
+  Date : 2017-08-02 12:41:34 +0000
+
+    - Autogenerate META.yml using dzil plugin [MetaYAML]. 
+
+------------------------------------------
+version 0.001 at 2017-08-02 04:30:15 +0000
 ------------------------------------------
 
   Change: 8cceab3f56b006583a110493263bcdf0ccd54733

@@ -1,4 +1,4 @@
-	Math::Polynomial::Solve, version 2.80, 15 May 2017.
+	Math::Polynomial::Solve, version 2.81, 15 May 2017.
 -------------------------------------------------------------------------------
 
 As warned a year ago, most of the functions under the :utility tag have been
@@ -65,8 +65,8 @@ in the web page Karl's Calculus Tutor,
 INSTALLATION:
 
 The usual way.  Unpack the archive:
-	gzip -d Math-Polynomial-Solve-2.80.tar.gz
-	tar xvf Math-Polynomial-Solve-2.80.tar
+	gzip -d Math-Polynomial-Solve-2.81.tar.gz
+	tar xvf Math-Polynomial-Solve-2.81.tar
 
 Go into the resulting directory, and type:
 	perl Build.PL

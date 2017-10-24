@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.41
+    version 0.43
 
 SYNOPSIS
 
@@ -214,11 +214,13 @@ AUTHOR
 
     Contributors:
 
-    Toshio Ito
+    Toshio Ito (debug-ito, TOSHIOITO)
 
-    José Joaquín Atria
+    José Joaquín Atria (JJATRIA)
 
-    Kivanc Yazan
+    Kivanc Yazan (KYZN)
+
+    Yanick Champoux (YANICK)
 
 COPYRIGHT AND LICENSE
 

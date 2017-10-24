@@ -1,6 +1,6 @@
 # -*- perl -*-
 
-# t/007_phonix.t - phonix test 
+# t/007_phonix.t - phonix test
 
 use Test::Most tests=>25+1;
 use Test::NoWarnings;
@@ -40,7 +40,7 @@ my %TEST = (
     noam        => 'N5000000',
     rees        => 'R8000000',
     reece       => 'R8000000',
-    yaeger      => 'v2000000',   
+    yaeger      => 'v2000000',
 );
 
 isa_ok($phonix,'Text::Phonetic::Phonix');

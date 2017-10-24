@@ -2,7 +2,7 @@ package Net::WebSocket::Frame::continuation;
 
 =encoding utf-8
 
-=HEAD1
+=head1
 
 Net::WebSocket::Frame::continuation
 

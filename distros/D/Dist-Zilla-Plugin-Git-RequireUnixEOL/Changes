@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-Plugin-Git-RequireUnixEOL
 
+0.002  2017-10-21 05:45:10 UTC
+
+  - Added ignore option to ignore files
+
 0.001  2017-10-16 21:45:09 UTC
 
   - Initial release

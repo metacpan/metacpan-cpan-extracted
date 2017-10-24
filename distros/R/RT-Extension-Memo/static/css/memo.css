@@ -1,4 +1,10 @@
+.memo-container {
+    width: 100%;
+    max-height: 30em;
+}
+
 .memo-content {
+    min-height: 10em;
     background-color: #eee;
     padding: 10px 20px;
     border: 2px solid #aaa;

@@ -1,0 +1,95 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 f4272892e90734d032dfdb7ee3611a0828d38f5f CONTRIBUTORS
+SHA1 eaff450406e95601130f8db3bfa3b418f19c6b8c Changes
+SHA1 2ff8bb17436915f897b6e58d3ce2a28ee657035d INSTALL
+SHA1 ce8e22e56157f3fdcca843933194db685252f2a2 LICENSE
+SHA1 899a85c4e5e0a30fdb9b318caccec3d3071adc5b MANIFEST
+SHA1 73e0837ce0c7e8b58059d65fd435108bb6c2691b META.json
+SHA1 ff61887936bbdadc2707d729174080467cec8899 META.yml
+SHA1 5d066bea18b991ea642d4b53f6a2399b870a3743 Makefile.PL
+SHA1 4bc38d34a6eeb51674f06e9d764d30d8f64c4e2d README.md
+SHA1 ed1d6466f36dd2e78cf30313ee942ccfde5fb9df README.mkdn
+SHA1 98adbc2ad146d41168b58c87ccef5320fd91fae5 cpanfile
+SHA1 badb266f6f4e261f9b32fa6a2895845d805feaf9 doap.xml
+SHA1 d05a4ade3faf1c75190c4415b67eba101d8d9f67 example/chaining-example.pl
+SHA1 49c446c6fbbaa13d3642dbed57c3fe32fe6f14f1 example/example.pl
+SHA1 3f822b32b37db136a3b2ed8ddbc24c6b7e976a18 example/mojo-promises.pl
+SHA1 e8fbce0b84758f331d0dce38bc6b48c585ca582e lib/Promises.pm
+SHA1 44671d24d836f99f5786a4dbc20d787dcb363000 lib/Promises/Cookbook/ChainingAndPipelining.pod
+SHA1 606b9cc658634d4f65bd3b6e8e8f3d041b7c26d7 lib/Promises/Cookbook/GentleIntro.pod
+SHA1 58f56b8c5ea87ffac206406a16709585f9c7e5d5 lib/Promises/Cookbook/Recursion.pod
+SHA1 2ae619bcfcdf10667d9445964571ad626e43926e lib/Promises/Cookbook/ScalaFuturesComparison.pod
+SHA1 5d40fbaa84a30787ce5213f198c0ccd6f950ab0f lib/Promises/Cookbook/SynopsisBreakdown.pod
+SHA1 e27d91a3502d4b8bcb725b0e011cdfc5f2369ab4 lib/Promises/Cookbook/TIMTOWTDI.pod
+SHA1 705c9d824d0b1aebdc8264a288b9c6dec59c10f3 lib/Promises/Deferred.pm
+SHA1 50dce6cc65371db60457098857dcd59f7e492ebe lib/Promises/Deferred/AE.pm
+SHA1 bd219def2fe5afe1f0f15f370c3e2fa7f619443a lib/Promises/Deferred/AnyEvent.pm
+SHA1 a949f68c4ffd488f377b49dec3e75a24f5779042 lib/Promises/Deferred/EV.pm
+SHA1 9dc3d60aa0040eab8bfb59f8c872e6688ed6c8ca lib/Promises/Deferred/IO/Async.pm
+SHA1 012295c07f705b0f3ff0853a44e208010d1b9076 lib/Promises/Deferred/Mojo.pm
+SHA1 8f9d7a42c925d4d51cdb46eac44abe09a7cb504e lib/Promises/Promise.pm
+SHA1 0ac3895853d2e0c172b543219067725424c5504c t/00-compile.t
+SHA1 ef367b5ba506fc36df296301decd11fe0dc5f647 t/00-report-prereqs.dd
+SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
+SHA1 6a36b6a96bc5b9aa6c6e82790759bee8e3c5c51f t/000-load.t
+SHA1 58d5c52d04f57dcc8e43e71455767ca1525cbd3d t/001-basic.t
+SHA1 f3ad6124560b5c06ca86044cae134dba7fa9092f t/002-multiples.t
+SHA1 d5440127f6bae9578f990b6b32e4a78246631df2 t/003-post-resolve-then.t
+SHA1 f2cb9f1284e24a4173b035f02a4fb0fc49751035 t/004-error.t
+SHA1 05f56b32d55a8330ce725e3846785aba8c29ba46 t/005-multiples-w-error.t
+SHA1 f0957f3aa992fe85f9d4f7a9dbb2f67e346e02e5 t/006-thenable.t
+SHA1 eb4cb62edb97b0689f5ac96919cbc564eb9c43d6 t/007_callable.t
+SHA1 12331502b2d7568e97d9539b8b4aa72971183151 t/010-collect.t
+SHA1 30c0431dc2dcc19ffea8c812e327b73cb1cf88b2 t/011-collect-w-error.t
+SHA1 e6e0c746a82f8ca91faad2dab0c781a8c52ef66b t/012-collect_hash.t
+SHA1 b04e80798de110e8e71cf062db62997110a13472 t/013-collect_hash-params.t
+SHA1 a8217667be61a49f2f52aa7ca6fce7a305581410 t/013-collect_hash-with-error.t
+SHA1 6ed3bce63a47db7951163cea7773d602b82d9dd5 t/020-chaining.t
+SHA1 929c3091950a1723ac8862c1e6dcfff9b5c95450 t/021-chaining-errors.t
+SHA1 03e3ea8adb1d3e4ca83c57f7d0aac2aef32350f3 t/025-recursion.t
+SHA1 bb1369e4ef787df95a4e4c7b1accf93fc17d2587 t/030-deferred-default.t
+SHA1 98417bd4279265242530cfeb6e11e4b7b3acaa2c t/031-deferred-AE.t
+SHA1 c5e47b882d82a8b3c05e0e832bd2c6062b61accb t/031-deferred-io-async.t
+SHA1 019b3ecb2a3f77631a17e81e1c212b1f8aa85013 t/032-deferred-AnyEvent.t
+SHA1 9d85cfa94a4d04ecfcde6b200d5d931b2d46ad97 t/033-deferred-EV.t
+SHA1 9df313fa18be555c50ad877df0ab347d31c32e01 t/034-deferred-Mojo.t
+SHA1 82dc82baad09b0f50207f343ded8593f17c4415b t/040_finally.t
+SHA1 bfe46fd9a64db6d071b4258606c913b6b448fae2 t/050-exceptions-pp.t
+SHA1 1a438f1b3073784d6eda0d64bc7487c27530e46d t/051-exceptions-pp-anyevent.t
+SHA1 01c6b25c0bebd5f5b3a3d0cf5419984e89721151 t/052-exceptions-ev-anyevent.t
+SHA1 8d2bc943a22fb6e0aec43e6fc4c77f325f140392 t/053-exceptions-mojo.t
+SHA1 2da19fcdc06d9aa8090dcb6feef49e92b4045ee7 t/060-free-refs.t
+SHA1 1eb49c82ad2758c2331cee2b27aa13914df93c5e t/070-accepted-rejected.t
+SHA1 cecc982ba6ad1a17c9c69d73e3c0ca9d16ef7ec3 t/080-deferred-as-sub.t
+SHA1 6d7d2c381b644aa8079d244b89ba1eb2c6bcd9fa t/090-timeout.t
+SHA1 06c98030c6e51351a8fe79412a4bfef60936e427 t/lib/AsyncUtil.pm
+SHA1 2ee51b1a4f53b9e11ebcdede750b0ca5703cdfda t/lib/NoEV.pm
+SHA1 c96f3efbab325c958965e5faf76974669195b2cf t/lib/Promises/Test.pm
+SHA1 5f1843ae1eec91a958996ea7ecb502fade0295f7 t/lib/Promises/Test/AE.pm
+SHA1 8a91de4fb0a4240280a60c7552f5c84c1ac63590 t/lib/Promises/Test/AnyEvent.pm
+SHA1 acf023902b29486f6cfd1a702658f498856140f4 t/lib/Promises/Test/EV.pm
+SHA1 3b272c3052418490ff2c09afdd8339c8c9a06d23 t/lib/Promises/Test/IO/Async.pm
+SHA1 b313a3fe7d4dfdef136c9c0f751d0c6b863e5bbf t/lib/Promises/Test/Mojo.pm
+SHA1 c242aa7b7c233b461bc62d73a976f87509fdb969 t/warnings.t
+SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+
+iEYEARECAAYFAlntKVAACgkQ34Hwf+GwC4xLTgCg986qu+arilo1uwkGmFL+MIlA
+FbwAnjIYbulVbp9ypxHkuyg4Zgife9rX
+=zos1
+-----END PGP SIGNATURE-----

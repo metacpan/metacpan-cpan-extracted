@@ -1,3 +1,14 @@
+v0.14.1 2017-10-23T21:18:42Z
+ - TODO
+
+v0.14.0 2017-10-23T20:13:36Z
+ - pgsql v10
+
+v0.13.0 2017-10-23T19:58:49Z
+ - Docker base image changed from "softvisio/pcore:v0.55.0" to
+   "softvisio/pcore:v0.56.1"
+ - update script added
+
 v0.12.0 2017-09-29T08:49:13Z
  - Docker base image changed from "softvisio/pcore:v0.50.0" to
    "softvisio/pcore:v0.55.0"

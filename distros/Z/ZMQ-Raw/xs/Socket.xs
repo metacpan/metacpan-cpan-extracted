@@ -137,7 +137,7 @@ sendmsg (self, ...)
 
 			if (is_flags)
 			{
-				flags = SvIV (ST (items-1));
+				flags = (int)SvIV (ST (items-1));
 				--count;
 			}
 		}
@@ -382,7 +382,7 @@ setsockopt (self, option, value)
 					if (!SvIOK (value))
 						croak_usage ("Value is not an int");
 
-					v = SvIV (value);
+					v = (int)SvIV (value);
 					rc = zmq_setsockopt (sock->socket, option,
 						&v, sizeof (v));
 					zmq_raw_check_error (rc);
@@ -474,7 +474,6 @@ DESTROY(self)
 	SV *self
 
 	PREINIT:
-		int rc;
 		zmq_raw_socket *sock;
 
 	CODE:

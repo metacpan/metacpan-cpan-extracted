@@ -1,5 +1,22 @@
 Revision history for Perl extension Method-Traits
 
+0.06 2017-10-23
+    [BACKWARDS INCOMPATIBLE CHANGES]
+    - We stopped removing the MODIFY_CODE_ATTRIBUTE method
+    - We removed the Method::Traits::Trait class as
+      that is now a part of the MOP
+    - Removed some class methods that were for associating
+      Trait objects with Method objects which is now done
+      entirely in the MOP instead
+    - Removed the rest of the class methods that were for
+      associating providers with classes, this can now
+      only be done via the `use` API
+
+    [DEPENDENCIES]
+    - remove the B::CompilerPhase::Hook dependency
+    - the MOP dependency has been upgraded to the latest
+      version
+
 0.05 2017-08-14
     [BUGFIX]
     - I was mistakenly assuming this would work under

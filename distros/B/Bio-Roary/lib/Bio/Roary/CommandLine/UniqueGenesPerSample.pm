@@ -1,7 +1,7 @@
 undef $VERSION;
 
 package Bio::Roary::CommandLine::UniqueGenesPerSample;
-$Bio::Roary::CommandLine::UniqueGenesPerSample::VERSION = '3.10.2';
+$Bio::Roary::CommandLine::UniqueGenesPerSample::VERSION = '3.11.0';
 # ABSTRACT: Take in the clustered file and produce a sorted file with the frequency of each samples unique genes
 
 
@@ -98,7 +98,7 @@ Bio::Roary::CommandLine::UniqueGenesPerSample - Take in the clustered file and p
 
 =head1 VERSION
 
-version 3.10.2
+version 3.11.0
 
 =head1 SYNOPSIS
 

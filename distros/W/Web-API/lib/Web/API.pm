@@ -6,10 +6,10 @@ use experimental 'smartmatch';
 
 # ABSTRACT: Web::API - A Simple base module to implement almost every RESTful API with just a few lines of configuration
 
-our $VERSION = '2.2.2'; # VERSION
+our $VERSION = '2.2.3'; # VERSION
 
 use LWP::UserAgent;
-use HTTP::Cookies;
+use HTTP::Cookies 6.04;
 use Data::Printer colored => 1;
 use XML::Simple;
 use URI::Escape::XS qw/uri_escape uri_unescape/;
@@ -862,7 +862,7 @@ Web::API - Web::API - A Simple base module to implement almost every RESTful API
 
 =head1 VERSION
 
-version 2.2.2
+version 2.2.3
 
 =head1 SYNOPSIS
 

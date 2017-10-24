@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Project
+  xmlns="http://usefulinc.com/ns/doap#"
+  xmlns:dc="http://purl.org/dc/terms/"
+  xmlns:foaf="http://xmlns.com/foaf/0.1/"
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  >
+  <name>PPIx-EditorTools</name>
+  <shortdesc>Utility methods and base class for manipulating Perl via PPI</shortdesc>
+  <developer>
+    <foaf:Person rdfs:label="Steffen Mueller C&lt;smueller@cpan.org&gt;" />
+  </developer>
+  <developer>
+    <foaf:Person rdfs:label="Mark Grimes C&lt;mgrimes@cpan.org&gt;" />
+  </developer>
+  <developer>
+    <foaf:Person>
+      <foaf:name>Ahmad M. Zawawi</foaf:name>
+      <foaf:mbox rdf:resource="mailto:ahmad.zawawi@gmail.com" />
+    </foaf:Person>
+  </developer>
+  <developer>
+    <foaf:Person>
+      <foaf:name>Gabor Szabo </foaf:name>
+      <foaf:mbox rdf:resource="mailto:gabor@szabgab.com" />
+    </foaf:Person>
+  </developer>
+  <developer>
+    <foaf:Person>
+      <foaf:name>Yanick Champoux</foaf:name>
+      <foaf:mbox rdf:resource="mailto:yanick@cpan.org" />
+    </foaf:Person>
+  </developer>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Adam Kennedy</foaf:name>
+      <foaf:mbox rdf:resource="mailto:adamk@cpan.org" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Florian Schlichting</foaf:name>
+      <foaf:mbox rdf:resource="mailto:fschlich@zedat.fu-berlin.de" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Kevin Dawson</foaf:name>
+      <foaf:mbox rdf:resource="mailto:bowtie@cpan.org" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Ryan Niebur</foaf:name>
+      <foaf:mbox rdf:resource="mailto:rsn@cpan.org" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Sebastian Willing</foaf:name>
+      <foaf:mbox rdf:resource="mailto:sewi@cpan.org" />
+    </foaf:Person>
+  </helper>
+  <license rdf:resource="http://dev.perl.org/licenses/" />
+  <homepage rdf:resource="https://github.com/yanick/PPIx-EditorTools" />
+  <bug-database rdf:resource="https://github.com/yanick/PPIx-EditorTools/issues" />
+  <repository>
+    <GitRepository>
+      <browse rdf:resource="https://github.com/yanick/PPIx-EditorTools" />
+      <location rdf:resource="https://github.com/yanick/PPIx-EditorTools.git" />
+    </GitRepository>
+  </repository>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.04</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2009</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.05</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2009</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.06</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2009</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.07</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2009</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.08</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2009</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.09</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2009</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.10</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2010</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.11</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2010</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.12</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2011</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.13</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2011</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.14</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2011</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.15</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2011</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.15_02</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2012</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.15_03</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2012</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.15_04</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2012</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.16</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2012</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.17</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2012</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.18</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2012</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.19</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2014</dc:issued>
+    </Version>
+  </release>
+  <programming-language>Perl</programming-language>
+</Project>

@@ -8,6 +8,7 @@ use utf8;
 use CLI::Helpers qw(:output);
 use Data::Printer;
 use Getopt::Long::Descriptive;
+use HTML::Entities;
 use Path::Tiny;
 use Storable qw(retrieve store dclone);
 use WWW::Subsonic;
@@ -213,7 +214,7 @@ subsonic_import_ratings.pl - Import Ratings from an iTunes Library XML Export to
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 AUTHOR
 

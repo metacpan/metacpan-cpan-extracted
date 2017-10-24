@@ -1,9 +1,89 @@
 ==================================================
-Changes from 2016-08-17 00:00:00 +0000 to present.
+Changes from 2016-10-23 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.958 at 2017-08-17 20:32:10 +0000
+version 0.959 at 2017-10-23 15:18:19 +0000
+------------------------------------------
+
+  Change: c0bb810a954a5c07a2b69715b08d8d08733d4e43
+  Author: Jason Hall <jayce@lug-nut.com>
+  Date : 2017-10-23 09:16:33 +0000
+
+    Fix test type 
+
+  Change: 7cd1c2745a108d79515c817458d097574b83bf07
+  Author: Jason Hall <jayce@lug-nut.com>
+  Date : 2017-10-23 09:15:32 +0000
+
+    Upload a test updater batch for testing/validation. Doesn't currently
+    have the full suite, but was enough to prove validity 
+
+  Change: 6a29587043cf14cceb105a8a893164197c579232
+  Author: Jason Hall <jayce@lug-nut.com>
+  Date : 2017-10-23 09:11:09 +0000
+
+    Small error with upload, the XML object didn't have the 'new'
+    correctly, and a legacy bug where it tried to use sftp->message which
+    isn't a method. 
+
+  Change: bd2034fc808e0fee6b09b57fd0afc4d1c0bf6d2d
+  Author: Jason Hall <jayce@lug-nut.com>
+  Date : 2017-08-29 09:21:00 +0000
+
+    Fix some annoying whitespace, added in missing Address2 line from
+    normal payment information 
+
+  Change: 2abfe2d5df2e12a42b51f6aab59c6a5faa875bec
+  Author: Jason Hall <jayce@lug-nut.com>
+  Date : 2017-08-29 09:20:25 +0000
+
+    partial test updates for new certification 
+
+  Change: 84270f07906549326931f67f241a308faa510cd9
+  Author: Jason Hall <jayce@lug-nut.com>
+  Date : 2017-08-24 17:01:10 +0000
+
+    Begin updating address and pre-certification information for upated
+    spec 
+
+  Change: 11a682d52161e515610d1edf76a77557ac254598
+  Author: Jason Hall <jayce@lug-nut.com>
+  Date : 2017-08-21 12:52:47 +0000
+
+    Merge pull request #29 from
+    oaxlin/skip_on_503_and_fix_scrub_t_warning
+
+    Skip on 503 and fix scrub t warning 
+
+  Change: 756aea3214b97585a9ebc1c106f020db5344e2c0
+  Author: Jason Terry <jterry@bluehost.com>
+  Date : 2017-08-21 12:40:48 +0000
+
+    fix a warning about default_Scrubber in scrub.t, and change the
+    warning to a carp to make it easier to find in the real world 
+
+  Change: fd2337a65dd3d822bb1182b84ae08463d8e3e79f
+  Author: Jason Terry <jterry@bluehost.com>
+  Date : 2017-08-21 11:05:57 +0000
+
+    skip sandbox tests if a 503 error happens 
+
+  Change: 43e82c907d5fb39f0aa19e467e31c705a52b8fa4
+  Author: Jason Terry <jterry@bluehost.com>
+  Date : 2017-08-21 09:40:34 +0000
+
+    Merge https://github.com/Jayceh/Business--OnlinePayment--Litle 
+
+  Change: a57d7b2d968df3209000d43b01050eed88fdcd2a
+  Author: Jason Terry <jterry@bluehost.com>
+  Date : 2017-05-03 14:16:52 +0000
+
+    Merge branch 'master' of
+    https://github.com/Jayceh/Business--OnlinePayment--Litle 
+
+------------------------------------------
+version 0.958 at 2017-08-17 17:36:31 +0000
 ------------------------------------------
 
   Change: 4a41b56aad7928e48f82565c95e2a1bf9e6dc9ca
@@ -168,5 +248,5 @@ version 0.954 at 2017-02-01 18:30:54 +0000
     auto-installed 
 
 ================================================
-Plus 9 releases after 2016-08-17 00:00:00 +0000.
+Plus 9 releases after 2016-10-23 00:00:00 +0000.
 ================================================

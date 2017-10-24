@@ -18,6 +18,8 @@ package Foo {
 
     has '_bar' => sub { [] };
 
+    my sub _bar : private;
+
     sub BUILDARGS : init_args( bar? => _bar );
 
     sub bar       : ro(_bar);

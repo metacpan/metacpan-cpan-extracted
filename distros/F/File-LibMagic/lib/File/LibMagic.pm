@@ -10,7 +10,7 @@ use Exporter;
 use Scalar::Util qw( reftype );
 use XSLoader;
 
-our $VERSION = '1.15';
+our $VERSION = '1.16';
 
 XSLoader::load( __PACKAGE__, $VERSION );
 
@@ -173,13 +173,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 File::LibMagic - Determine MIME types of data or files using libmagic
 
 =head1 VERSION
 
-version 1.15
+version 1.16
 
 =head1 SYNOPSIS
 
@@ -214,6 +216,10 @@ and the header file (F<magic.h>) to build this Perl module.
 On Debian/Ubuntu run:
 
     sudo apt-get install libmagic-dev
+
+on Red Hat run:
+
+    sudo yum install file-devel
 
 On Mac you can use homebrew (http://brew.sh/):
 
@@ -430,12 +436,6 @@ Closes the magic handle.
 This module can throw an exception if your system runs out of memory when
 trying to call C<magic_open> internally.
 
-=head1 SUPPORT
-
-Please submit bugs to the CPAN RT system at
-http://rt.cpan.org/NoAuth/Bugs.html?Dist=File-LibMagic or via email at
-bug-file-libmagic@rt.cpan.org.
-
 =head1 BUGS
 
 This module is totally dependent on the version of file on your system. It's
@@ -462,6 +462,37 @@ File::Type uses a relatively small magic file, which is directly hacked into
 the module code. It is quite fast but the database is quite small relative to
 the file package.
 
+=head1 SUPPORT
+
+Please submit bugs to the CPAN RT system at
+http://rt.cpan.org/NoAuth/Bugs.html?Dist=File-LibMagic or via email at
+bug-file-libmagic@rt.cpan.org.
+
+Bugs may be submitted at L<http://rt.cpan.org/Public/Dist/Display.html?Name=File::LibMagic> or via email to L<bug-file::libmagic@rt.cpan.org|mailto:bug-file::libmagic@rt.cpan.org>.
+
+I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
+
+=head1 SOURCE
+
+The source code repository for File-LibMagic can be found at L<https://github.com/houseabsolute/File-LibMagic>.
+
+=head1 DONATIONS
+
+If you'd like to thank me for the work I've done on this module, please
+consider making a "donation" to me via PayPal. I spend a lot of free time
+creating free software, and would appreciate any support you'd care to offer.
+
+Please note that B<I am not suggesting that you must do this> in order for me
+to continue working on this particular software. I will continue to do so,
+inasmuch as I have in the past, for as long as it interests me.
+
+Similarly, a donation made in this way will probably not make me work on this
+software much more, unless I get so many donations that I can consider working
+on free software full time (let's all have a chuckle at that together).
+
+To donate, log into PayPal and send money to autarch@urth.org, or use the
+button at L<http://www.urth.org/~autarch/fs-donation.html>.
+
 =head1 AUTHORS
 
 =over 4
@@ -482,7 +513,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords E. Choroba Mithun Ayachit Olaf Alders
+=for stopwords E. Choroba Mithun Ayachit Olaf Alders Tom Wyant
 
 =over 4
 
@@ -498,13 +529,20 @@ Mithun Ayachit <mayachit@amfam.com>
 
 Olaf Alders <olaf@wundersolutions.com>
 
+=item *
+
+Tom Wyant <wyant@cpan.org>
+
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Andreas Fitzner, Michael Hendricks, and Dave Rolsky.
+This software is copyright (c) 2017 by Andreas Fitzner, Michael Hendricks, and Dave Rolsky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+The full text of the license can be found in the
+F<LICENSE> file included with this distribution.
 
 =cut

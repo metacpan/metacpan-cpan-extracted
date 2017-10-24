@@ -1302,7 +1302,7 @@ use strict;
 		olson_name => "Guernsey",
 		regions => {
 			"" => {
-				location_coords => "+4927-00232",
+				location_coords => "+492717-0023210",
 				olson_description => "",
 				timezone_name => "Europe/Guernsey",
 			},
@@ -1651,7 +1651,7 @@ use strict;
 		olson_name => "Jersey",
 		regions => {
 			"" => {
-				location_coords => "+4912-00207",
+				location_coords => "+491101-0020624",
 				olson_description => "",
 				timezone_name => "Europe/Jersey",
 			},

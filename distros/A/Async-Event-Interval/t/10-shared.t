@@ -4,7 +4,7 @@ use warnings;
 use Async::Event::Interval;
 use Test::More;
 
-unless ( $ENV{SHAREABLE} ) {
+unless ( $ENV{RELEASE_TESTING} ) {
     plan( skip_all => "This is an author test" );
 }
 

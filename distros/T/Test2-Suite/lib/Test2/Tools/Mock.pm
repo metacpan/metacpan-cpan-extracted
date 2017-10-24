@@ -11,7 +11,7 @@ use Test2::Mock();
 
 use base 'Exporter';
 
-our $VERSION = '0.000080';
+our $VERSION = '0.000082';
 
 our @CARP_NOT = (__PACKAGE__, 'Test2::Mock');
 our @EXPORT = qw/mock mocked/;
@@ -322,6 +322,14 @@ plugins in ways L<Mock::Quick> would be unable to.
     $mock->override(...) # Override some more
 
     $mock = undef; # Undoes all the mocking, restoring all original methods.
+
+    my $simple_mock = mock {} => (
+        add => [
+            is_active => sub { ... }
+        ]
+    );
+
+    $simple_mock->is_active();        # Calls our newly mocked method.
 
 =head1 EXPORTS
 

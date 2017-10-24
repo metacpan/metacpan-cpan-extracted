@@ -1,9 +1,10 @@
 package Dist::Zilla::Plugin::AutoPrereqs::Perl::Critic;
 
+use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 use Moose;
 with qw(
@@ -11,8 +12,10 @@ with qw(
 );
 
 use CPAN::Meta::YAML;
+use CPAN::Version;
 use HTTP::Tiny;
 use Moose::Util::TypeConstraints 'enum';
+use Path::Tiny;
 use Perl::Critic;
 
 use namespace::autoclean;
@@ -48,6 +51,12 @@ has _core_policies => (
     default => sub { shift->_build_core_policies() },
 );
 
+has _cache_file => (
+    is      => 'ro',
+    isa     => 'Str',
+    default => '.perlcritic_package.yml',
+);
+
 sub register_prereqs {
     my ($self) = @_;
 
@@ -56,7 +65,7 @@ sub register_prereqs {
     my $critic_config        = $self->critic_config;
     my $remove_core_policies = $self->remove_core_policies;
 
-    my %critic_args = ();
+    my %critic_args;
     if ( defined $critic_config ) {
         $critic_args{-profile} = $critic_config;
     }
@@ -81,6 +90,22 @@ sub register_prereqs {
 sub _build_core_policies {
     my ($self) = @_;
 
+    my $yaml = $self->_read_perl_critic_packages_cache();
+
+    if ( !defined $yaml ) {
+        $yaml = $self->_get_perl_critic_packages_and_create_cache();
+    }
+
+    my $provides = ${$yaml}[0]->{provides};
+
+    return $provides;
+}
+
+sub _get_perl_critic_packages_and_create_cache {
+    my ($self) = @_;
+
+    my $cache_file = path( $self->_cache_file );
+
     my $url = 'http://cpanmetadb.plackperl.org/v1.0/package/Perl::Critic';
     my $ua  = HTTP::Tiny->new;
 
@@ -92,10 +117,34 @@ sub _build_core_policies {
         $self->log_fatal("Unable to download latest package information for Perl::Critic. Please ensure that your system can access '$url' or disable 'remove_core_policies' in your dist.ini");
     }
 
-    my $yaml     = CPAN::Meta::YAML->read_string( $res->{content} );
-    my $provides = ${$yaml}[0]->{provides};
+    my $cache_header = "# This is the cache file from\n# " . ref($self) . q{ } . $self->VERSION() . <<'CACHE_HEADER';
 
-    return $provides;
+#
+# You can either remove this file and add it to your .gitignore file or
+# commit it to Git. The file will be recreated or updated on demand. The
+# file is updated based on the version defined in this file.
+
+CACHE_HEADER
+
+    my $content = $res->{content};
+    $cache_file->spew( $cache_header, $content ) or $self->log_fatal("Cannot open file: $cache_file: $!");
+
+    return CPAN::Meta::YAML->read_string($content);
+}
+
+sub _read_perl_critic_packages_cache {
+    my ($self) = @_;
+
+    my $cache_file = path( $self->_cache_file );
+
+    return if !-e $cache_file;
+
+    my $yaml = CPAN::Meta::YAML->read_string( $cache_file->slurp() );
+
+    # installed Perl::Critic is newer then our cached version
+    return if CPAN::Version->vgt( Perl::Critic->VERSION(), ${$yaml}[0]->{version} );
+
+    return $yaml;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -114,7 +163,7 @@ Dist::Zilla::Plugin::AutoPrereqs::Perl::Critic - automatically extract Perl::Cri
 
 =head1 VERSION
 
-Version 0.004
+Version 0.005
 
 =head1 SYNOPSIS
 
@@ -152,6 +201,12 @@ which will come with the core policies.
 
 Note: This feature needs HTTP access to B<cpanmetadb.plackperl.org>. Please
 disable this feature if you're system cannot access that server.
+
+Note: To reduce network traffic and remove the delay caused by the network
+access the cache file F<.perlcritic_package.yml> is generated. You can either
+add this file to your F<.gitignore> file or add it to Git. It will be updated
+as soon as the system runs a newer version of L<Perl::Critic|Perl::Critic>
+then the one that is mentioned in the cache file.
 
 =head2 type
 
@@ -191,7 +246,7 @@ This is free software, licensed under:
 
 L<Dist::Zilla::Plugin::AutoPrereqs|Dist::Zilla::Plugin::AutoPrereqs>,
 L<Perl::Critic|Perl::Critic>,
-L<Test::Perl::Critic|Test::Perl::Critic>,
+L<Test::Perl::Critic|Test::Perl::Critic>
 
 =cut
 

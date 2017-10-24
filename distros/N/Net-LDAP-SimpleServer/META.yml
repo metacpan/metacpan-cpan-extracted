@@ -4,15 +4,16 @@ author:
   - 'Alexei Znamensky <russoz@cpan.org>'
 build_requires:
   Authen::SASL: '0'
-  Exporter: '0'
   File::Spec: '0'
   IO::Handle: '0'
   IO::Pipe: '0'
   IPC::Open3: '0'
   Net::LDAP: '0'
   Proc::Fork: '0'
+  Test::Deep: '0'
   Test::More: '0.88'
   Test::UseAllModules: '0'
+  Try::Tiny: '0'
   lib: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -25,12 +26,13 @@ meta-spec:
 name: Net-LDAP-SimpleServer
 requires:
   Carp: '0'
-  Data::Dumper: '0'
+  Exporter: '0'
   File::Basename: '0'
   File::HomeDir: '0'
   File::Path: '2.08'
   File::Spec: '0'
   Net::LDAP::Constant: '0'
+  Net::LDAP::Filter: '0'
   Net::LDAP::FilterMatch: '0'
   Net::LDAP::LDIF: '0'
   Net::LDAP::Server: '0'
@@ -39,6 +41,7 @@ requires:
   Scalar::Util: '0'
   UNIVERSAL::isa: '0'
   base: '0'
+  constant: '0'
   fields: '0'
   perl: '5.010'
   strict: '0'
@@ -46,5 +49,5 @@ requires:
 resources:
   homepage: https://github.com/russoz/Net-LDAP-SimpleServer
   repository: https://github.com/russoz/Net-LDAP-SimpleServer.git
-version: 0.0.18
+version: 0.0.19
 x_serialization_backend: 'YAML::Tiny version 1.70'

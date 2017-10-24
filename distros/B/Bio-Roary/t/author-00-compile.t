@@ -1,7 +1,7 @@
 
 BEGIN {
   unless ($ENV{AUTHOR_TESTING}) {
-    print "1..0 # SKIP these tests are for testing by the author\n";
+    print qq{1..0 # SKIP these tests are for testing by the author\n};
     exit
   }
 }
@@ -10,11 +10,11 @@ use 5.006;
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.051
+# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.054
 
 use Test::More;
 
-plan tests => 96 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 95;
 
 my @module_files = (
     'Bio/Roary.pm',
@@ -100,7 +100,6 @@ my @module_files = (
 
 my @scripts = (
     'bin/create_pan_genome',
-    'bin/create_pan_genome_plots.R',
     'bin/extract_proteome_from_gff',
     'bin/iterative_cdhit',
     'bin/pan_genome_assembly_statistics',
@@ -111,7 +110,6 @@ my @scripts = (
     'bin/protein_alignment_from_nucleotides',
     'bin/query_pan_genome',
     'bin/roary',
-    'bin/roary-create_pan_genome_plots.R',
     'bin/roary-pan_genome_reorder_spreadsheet',
     'bin/roary-query_pan_genome',
     'bin/roary-unique_genes_per_sample',
@@ -140,6 +138,9 @@ for my $lib (@module_files)
     waitpid($pid, 0);
     is($?, 0, "$lib loaded ok");
 
+    shift @_warnings if @_warnings and $_warnings[0] =~ /^Using .*\bblib/
+        and not eval { require blib; blib->VERSION('1.01') };
+
     if (@_warnings)
     {
         warn @_warnings;
@@ -163,7 +164,10 @@ foreach my $file (@scripts)
     waitpid($pid, 0);
     is($?, 0, "$file compiled ok");
 
-   # in older perls, -c output is simply the file portion of the path being tested
+    shift @_warnings if @_warnings and $_warnings[0] =~ /^Using .*\bblib/
+        and not eval { require blib; blib->VERSION('1.01') };
+
+    # in older perls, -c output is simply the file portion of the path being tested
     if (@_warnings = grep { !/\bsyntax OK$/ }
         grep { chomp; $_ ne (File::Spec->splitpath($file))[2] } @_warnings)
     {
@@ -175,4 +179,4 @@ foreach my $file (@scripts)
 
 
 is(scalar(@warnings), 0, 'no warnings found')
-    or diag 'got warnings: ', ( Test::More->can('explain') ? Test::More::explain(\@warnings) : join("\n", '', @warnings) ) if $ENV{AUTHOR_TESTING};
+    or diag 'got warnings: ', ( Test::More->can('explain') ? Test::More::explain(\@warnings) : join("\n", '', @warnings) );

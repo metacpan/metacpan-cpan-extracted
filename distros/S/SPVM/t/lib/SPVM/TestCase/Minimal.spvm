@@ -1,4 +1,8 @@
 package TestCase::Minimal {
   has x : int;
   has y : int;
+  
+  set x, y;
+  get x, y;
+
 }

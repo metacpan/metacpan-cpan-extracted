@@ -22,9 +22,9 @@ These options are set in `etc/Memo_Config.pm` and can be overridden by users in 
 
     Should "rich text" editing be enabled for memo widget?
 
-- `$MemoWidth`, `$MemoHeight`
+- `$MemoHeight`
 
-    Set the memo widget width and height in number of columns and lines. When the width is set to `undef` no column count is specified and the memo widget will take up 100% of the available width.
+    Set number of lines of the textarea for editing memo.
 
 # RIGHTS
 
@@ -37,6 +37,10 @@ The following new rights can be applied at the global level or at the queue leve
 - `ModifyMemo`
 
     Users and groups with this right are able to add a new _Memo_ and to edit existing _Memo_ attached to a ticket.
+
+# STYLING
+
+The CSS properties of the Memo widget can be styled by overwriting defaults set in `static/css/memo.cc`.
 
 # RT VERSION
 

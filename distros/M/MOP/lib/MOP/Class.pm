@@ -15,7 +15,7 @@ use MOP::Slot;
 
 use MOP::Internal::Util;
 
-our $VERSION   = '0.09';
+our $VERSION   = '0.11';
 our $AUTHORITY = 'cpan:STEVAN';
 
 our @ISA;  BEGIN { @ISA  = 'UNIVERSAL::Object::Immutable' };
@@ -64,7 +64,7 @@ MOP::Class - A representation of a class
 
 =head1 VERSION
 
-version 0.09
+version 0.11
 
 =head1 DESCRIPTION
 

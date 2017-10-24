@@ -61,12 +61,10 @@ BEGIN {
     use strict;
     use warnings;
 
-    use roles 'Comparable', 'Printable';
+    use parent 'UNIVERSAL::Object';
+    use  roles 'Comparable', 'Printable';
 
-    sub new {
-        my ($class, %args) = @_;
-        bless { amount => $args{amount} // 0 } => $class;
-    }
+    our %HAS = ( amount => sub { 0 } );
 
     sub compare {
         my ($self, $other) = @_;

@@ -88,13 +88,14 @@
          "web" : "https://github.com/plicease/AnyEvent-WebSocket-Client"
       }
    },
-   "version" : "0.41",
+   "version" : "0.43",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
-      "Toshio Ito",
-      "Jos\u00e9 Joaqu\u00edn Atria",
-      "Kivanc Yazan"
+      "Toshio Ito (debug-ito, TOSHIOITO)",
+      "Jos\u00e9 Joaqu\u00edn Atria (JJATRIA)",
+      "Kivanc Yazan (KYZN)",
+      "Yanick Champoux (YANICK)"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

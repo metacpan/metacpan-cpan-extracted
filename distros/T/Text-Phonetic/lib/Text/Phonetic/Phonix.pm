@@ -6,8 +6,6 @@ use utf8;
 use Moo;
 extends qw(Text::Phonetic);
 
-__PACKAGE__->meta->make_immutable;
-
 our $VERSION = $Text::Phonetic::VERSION;
 
 our $VOVEL = '[AEIOU]';
@@ -115,10 +113,10 @@ our @RULES = (
 #
 #	# Main values are different
 #	return 0 unless ($result1->[0] eq $result2->[0]);
-#	
+#
 #	# Ending values the same
 #	return 75 if ($result1->[1] eq $result2->[1]);
-#	
+#
 #	# Ending values differ in length, and are same for the shorter
 #	my $length1 = length $result1->[1];
 #	my $length2 = length $result2->[1];
@@ -126,29 +124,29 @@ our @RULES = (
 #		&& $length1 - $length2 == 1) {
 #		return 50 if (substr($result1->[1],0,$length2) eq $result2->[1]);
 #	 }elsif ($length2 > $length1
-#		&& $length2 - $length1 == 1) {	
+#		&& $length2 - $length1 == 1) {
 #		return 50 if (substr($result2->[1],0,$length1) eq $result1->[1]);
 #	}
-#	
+#
 #	return 25;
 #}
-#The algorithm always returns either a scalar value or an array reference with 
-#two elements. The fist element represents the sound of the name without the 
-#ending sound, and the second element represents the ending sound. To get a 
+#The algorithm always returns either a scalar value or an array reference with
+#two elements. The fist element represents the sound of the name without the
+#ending sound, and the second element represents the ending sound. To get a
 #full representation of the name you need to concat the two elements.
 #
 #If you want to compare two names the following rules apply:
 #
 #=over
 #
-#=item * If the ending sound values of an entered name and a retrieved name are 
+#=item * If the ending sound values of an entered name and a retrieved name are
 #the same, the retrieved name is a LIKELY candidate.
 #
-#=item * If an entered name has an ending-sound value, and the retrieved name 
+#=item * If an entered name has an ending-sound value, and the retrieved name
 #does not, then the retrieved name is a LEAST-LIKELY candidate.
 #
-#=item * If the two ending-sound values are the same for the length of the 
-#shorter, and the difference in length between the two ending-sound is one 
+#=item * If the two ending-sound values are the same for the length of the
+#shorter, and the difference in length between the two ending-sound is one
 #digit only, then the retrieved name isa LESS-LIKELY candidate.
 #
 #=item * All other cases result in LEAST-LIKELY candidates.
@@ -157,24 +155,24 @@ our @RULES = (
 
 sub _do_encode {
     my ($self,$string) = @_;
-    
+
     my ($original_string, $first_char);
     $original_string = $string;
-    
+
     # To uppercase and remove other characters
     $string = uc($string);
     $string =~ tr/A-Z//cd;
-    
+
     # RULE 1: Replcace rule
     foreach my $rule (@RULES) {
         my $regexp = $rule->[0];
         my $replace = $rule->[1];
         $string =~ s/$regexp/_replace($replace,$1,$2)/ge;
     }
-    
+
     # RULE 2: Fetch first character
     $first_char = substr($string,0,1,'');
-    
+
     # RULE 3: Exceptions for first character rule
     if (grep { $first_char eq $_ } qw(A E I O U Y)) {
         $first_char = 'v';
@@ -182,7 +180,7 @@ sub _do_encode {
     } elsif ($first_char eq 'W' || $first_char eq 'H') {
         #$string =~ s/^[WH]//;
     }
-    
+
     # RULE 4
     $string =~ s/ES$/S/;
     # RULE 5
@@ -194,24 +192,24 @@ sub _do_encode {
 #       # RULE 13
 #       $last_string = _transform($2);
 #   }
-    
+
     # RULE 9-11
     $string = _transform($string);
-    
+
     # RULE 12
     $string = $first_char.$string;
-    
+
     #$string .= $last_string if (defined $last_string);
     $string .= '0'  x (8-length $string);
     $string = substr($string,0,8);
-    
+
     return $string;
 }
 
 sub _transform {
     my $string = shift;
     return unless defined $string;
-    
+
     # RULE 9
     $string =~ s/([AEIOUYHW])//g;
     # RULE 10
@@ -228,10 +226,10 @@ sub _replace {
     my $replace = shift;
     my $pos1 = shift;
     my $pos2 = shift;
-    
+
     $replace =~ s/1/$pos1/ if (defined $pos1);
     $replace =~ s/2/$pos2/ if (defined $pos2);
-    
+
     return $replace;
 }
 
@@ -247,8 +245,8 @@ Text::Phonetic::Phonix - Phonix algorithm
 
 =head1 DESCRIPTION
 
-Phonix is an improved version of Soundex, developed by T.N. Gadd. Phonix 
-has been incorporated into a number of WAIS implementations, including 
+Phonix is an improved version of Soundex, developed by T.N. Gadd. Phonix
+has been incorporated into a number of WAIS implementations, including
 freeWAIS.
 
 There seem to be two variants of the Phonix algorithm. One which also includes

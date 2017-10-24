@@ -2,21 +2,15 @@
 #
 #
 use Carp;
-use Getopt::Long;
 use Math::Polynomial::Solve qw(:classical ascending_order);
 use Math::Complex;
 use strict;
 use warnings;
-#use IO::Prompt;
 
-my $line;
-my $ascending = 0;
-
-GetOptions('ascending' => \$ascending);
-
+my $ascending = 1;
 ascending_order($ascending);
 
-while ($line = prompt("Quartic: ", -num))
+while (my $line = prompt("Quartic: "))
 {
 	my @coef = split(/,? /, $line);
 
@@ -25,7 +19,7 @@ while ($line = prompt("Quartic: ", -num))
 }
 exit(0);
 
-sub cartesian_format($$@)
+sub cartesian_format
 {
 	my($fmt_re, $fmt_im, @numbers) = @_;
 	my(@cfn, $n, $r, $i);

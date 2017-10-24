@@ -1,6 +1,6 @@
 -*- encoding: utf-8; indent-tabs-mode: nil -*-
 
-Astro::Sunrise version 0.96
+Astro::Sunrise version 0.97
 ===========================
 
 This module commpute the sunrise and sunset for a given day.
@@ -22,13 +22,14 @@ DEPENDENCIES
 This module requires these other modules and libraries:
   Math::Trig
   POSIX
+  Carp
 
 The following module is recommended:
   DateTime.pm
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2000, 2001, 2002, 2003, 2013, 2015 Ron Hill and Jean Forget
+Copyright (C) 2000, 2001, 2002, 2003, 2013, 2015, 2017 Ron Hill and Jean Forget
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl 5.16.3. For more details, see the full
@@ -63,4 +64,10 @@ SYNOPSIS
                                 lon => -111.88,  # 111°53'W
                                 alt => -0.833,   # standard value for the sun altitude at sunset
                                 offset => 1 } ); # day offset up to tomorrow
+
+FURTHER DOCUMENTATION
+
+The distribution contains a "doc" subdirectory with a text giving the 
+astronomical context of this module. This text has a French and an English
+versions. Beware, it is a work in progress.
 

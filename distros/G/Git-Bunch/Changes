@@ -1,3 +1,9 @@
+0.620   2017-10-19 (PERLANCAR)
+
+	- When syncing file/nongit-dir under dry-run, run rsync with
+	  --dry-run so we can see what files/dirs would be updated.
+
+
 0.61    2017-06-21 (PERLANCAR)
 
 	- No functional changes.

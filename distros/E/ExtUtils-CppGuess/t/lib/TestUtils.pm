@@ -1,4 +1,5 @@
-package t::lib::TestUtils;
+package # hide
+  TestUtils;
 
 use strict;
 

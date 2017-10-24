@@ -66,7 +66,7 @@ report newretrieve newreport
 $target %dowhat readsweeps modish $max_processes $computype $calcprocedure %specularratios
 );
 
-$VERSION = '0.73.29';
+$VERSION = '0.73.35';
 $ABSTRACT = 'Sim::OPT is an optimization and parametric exploration program oriented to problem decomposition. It can be used with simulation programs receiving text files as input and emitting text files as output. It allows a free mix of sequential and parallel block coordinate searches.';
 
 #################################################################################
@@ -774,7 +774,7 @@ sub callcase # IT PROCESSES THE CASES.
 	#}
 	#say "OUTFILE: $outfile";
 	#open( OUTFILE, ">>$outfile" ) or die "Can't open $outfile: $!"; 
-	open( TOFILE, ">>$tofile" ) or die "Can't open $tofile: $!"; 
+#	open( TOFILE, ">>$tofile" ) or die "Can't open $tofile: $!"; 
 	
 	#if ( ($countcase > 0) or ($countblock > 0) )
 	#{
@@ -846,7 +846,7 @@ sub callblocks # IT CALLS THE SEARCH ON BLOCKS.
 			my $newtarget = $taken[0]; #say $tee "CALLBKOCKS CHANGING \$newtarget>: $newtarget";
 			$newtarget =~ s/$mypath\///;
 			my %newcarrier = %{ $taken[1] }; #say $tee "CALLBKOCKS CHANGING \%newcarrier>" . dump( %newcarrier );
-			say $tee "CALLBKOCKS CHANGING \@miditers: " . dump(@miditers);
+			#say $tee "CALLBKOCKS CHANGING \@miditers: " . dump(@miditers);
 			%{ $miditers[$countcase] } = %newcarrier; 
 		}
 		else
@@ -856,7 +856,7 @@ sub callblocks # IT CALLS THE SEARCH ON BLOCKS.
 			my $newtarget = $taken[0]; #say $tee "CALLBKOCKS CHANGING \$newtarget>: $newtarget";
 			$newtarget =~ s/$mypath\///;
 			my %newcarrier = %{ $taken[1] }; #say $tee "CALLBKOCKS CHANGING \%newcarrier>" . dump( %newcarrier );
-			say $tee "CALLBKOCKS CHANGING \@miditers: " . dump(@miditers);
+			#say $tee "CALLBKOCKS CHANGING \@miditers: " . dump(@miditers);
 			%{ $miditers[$countcase] } = %newcarrier; 
 		}
 	}
@@ -934,7 +934,7 @@ sub deffiles # IT DEFINED THE FILES TO BE CALLED.
 		
 	} 
 	
-	say $tee "\@box: " . dump( @box );
+	#say $tee "\@box: " . dump( @box );
 	my @flattened = flattenbox(@box); #say $tee "\@flattened: " . dump( @flattened );
 	my @integrated = integratebox(\@flattened, \%mids, $file); #say $tee "\@integrated: " . dump( @integrated );
 	my @finalbox = filterbox(@integrated); #say $tee "\@finalbox: " . dump( @finalbox );
@@ -1236,7 +1236,7 @@ sub opt
 	print "\nNow in Sim::OPT. \n";
 		
 	#open( OUTFILE, ">>$outfile" ) or die "Can't open $outfile: $!"; 
-	open( TOFILE, ">>$tofile" ) or die "Can't open $tofile: $!"; 
+#	open( TOFILE, ">>$tofile" ) or die "Can't open $tofile: $!"; 
 		
 	#unless (-e "$mypath") 
 	#{ 

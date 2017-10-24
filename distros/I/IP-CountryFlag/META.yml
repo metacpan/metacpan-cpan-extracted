@@ -20,16 +20,16 @@ no_index:
 provides:
   IP::CountryFlag:
     file: lib/IP/CountryFlag.pm
-    version: '0.11'
+    version: '0.12'
   IP::CountryFlag::Params:
     file: lib/IP/CountryFlag/Params.pm
-    version: '0.11'
+    version: '0.12'
   IP::CountryFlag::UserAgent:
     file: lib/IP/CountryFlag/UserAgent.pm
-    version: '0.11'
+    version: '0.12'
   IP::CountryFlag::UserAgent::Exception:
     file: lib/IP/CountryFlag/UserAgent/Exception.pm
-    version: '0.11'
+    version: '0.12'
 requires:
   Data::Validate::IP: '0.10'
   File::Spec::Functions: '3.30'
@@ -41,5 +41,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/manwar/IP-CountryFlag.git
-version: '0.11'
+version: '0.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

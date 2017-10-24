@@ -4,7 +4,7 @@
       "Tobias Kirschstein <lev@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "bsd"
    ],
@@ -32,7 +32,7 @@
             "Carp" : "0",
             "Data::Printer" : "0",
             "Data::Random" : "0",
-            "HTTP::Cookies" : "0",
+            "HTTP::Cookies" : "6.04",
             "JSON" : "0",
             "LWP::UserAgent" : "0",
             "Mouse::Role" : "0",
@@ -59,7 +59,7 @@
          "web" : "https://github.com/nupfel/Web-API"
       }
    },
-   "version" : "2.2.2",
+   "version" : "2.2.3",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

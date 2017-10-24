@@ -5,7 +5,7 @@ use warnings;
 
 # ABSTRACT: Minimal-configuration, read-only LDAP server
 
-our $VERSION = '0.0.18';    # VERSION
+our $VERSION = '0.0.19';    # VERSION
 
 use 5.008;
 use Carp;
@@ -134,7 +134,7 @@ Net::LDAP::SimpleServer - Minimal-configuration, read-only LDAP server
 
 =head1 VERSION
 
-version 0.0.18
+version 0.0.19
 
 =head1 SYNOPSIS
 
@@ -168,7 +168,7 @@ version 0.0.18
 As the name suggests, this module aims to implement a simple LDAP server,
 using many components already available in CPAN. It can be used for
 prototyping and/or development purposes. This is B<NOT> intended to be a
-production-grade server, altough some brave souls in small offices might
+production-grade server, although some brave souls in small offices might
 use it as such.
 
 As of April 2010, the server will load a LDIF file and serve its
@@ -183,7 +183,7 @@ as a C<BASEDIR> for server files. If there exists a file:
 
     BASEDIR/server.conf
 
-it will be used as the default confguration file. Similarly, if there exists
+it will be used as the default configuration file. Similarly, if there exists
 a file:
 
     BASEDIR/server.ldif

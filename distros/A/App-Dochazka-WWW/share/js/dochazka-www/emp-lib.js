@@ -36,32 +36,31 @@
 
 define ([
     'jquery',
+    'app/caches',
+    'app/lib',
+    'app/sched-lib',
+    'app/prototypes',
     'ajax',
     'current-user',
     'datetime',
     'lib',
-    'app/lib',
-    'app/prototypes',
-    'stack'
+    'populate',
+    'stack',
 ], function (
     $,
+    appCaches,
+    appLib,
+    schedLib,
+    prototypes,
     ajax,
     currentUser,
     datetime,
     coreLib,
-    appLib,
-    prototypes,
-    stack
+    populate,
+    stack,
 ) {
 
     var 
-        profileCache = [],
-        byEID = {},
-
-        currentEmployeeStashed = null,
-        currentEmplPrivStashed = null,
-        backgroundColorStashed = null,
-    
         actionEmplSearch = function (obj) {
             // obj is searchKeyNick from the form
             if (! obj) {
@@ -144,115 +143,54 @@ define ([
             ajax(rest, sc, fc);
         },
 
-        endTheMasquerade = function () {
-            currentUser('flag1', 0); // turn off masquerade flag
-            console.log('flag1 === ', currentUser('flag1'));
-            currentUser('obj', currentEmployeeStashed);
-            currentEmployeeStashed = null;
-            $('#userbox').html(appLib.fillUserBox()); // reset userbox
-            $('#mainarea').css("background-color", backgroundColorStashed);
-            coreLib.displayResult('Masquerade is finished');
-            $('input[name="sel"]').val('');
-        },
-
-        masqEmp = function (obj) {
-            console.log("Entering masqEmp with object", obj);
-            // if obj is empty, dA was selected from menu
-            // if obj is full, it contains the employee to masquerade as
-        
-            if (currentEmployeeStashed) {
-                endTheMasquerade();
-                return;
-            }
-
-            var cu = currentUser('obj');
-
-            if (! coreLib.isObjEmpty(obj)) {
-                if (obj.nick === cu.nick) {
-                    coreLib.displayResult('Request to masquerade as self makes no sense');
-                    return;
-                }
-                // let the masquerade begin
-                currentEmployeeStashed = $.extend({}, cu);
-                backgroundColorStashed = $('#mainarea').css("background-color");
-                currentUser('obj', obj);
-                currentUser('flag1', 1); // turn on masquerade flag
-                $('#userbox').html(appLib.fillUserBox()); // reset userbox
-                $('#mainarea').css("background-color", "red");
-                stack.unwindToFlag(); // return to most recent dmenu
-                return;
-            }
-        
-            // let the admin pick which user to masquerade as
-            stack.push('searchEmployee', {}, {
-                "xtarget": "mainEmpl"
-            });
-        },
-
         myProfileAction = function () {
-            var eid = currentUser('obj').eid,
-                rest = {
-                    "method": 'GET',
-                    "path": 'employee/eid/' + eid + '/full'
-                },
-                employeeProfile,
-                // success callback
-                sc = function (st) {
-                    if (st.code === 'DISPATCH_EMPLOYEE_PROFILE_FULL') {
-                        console.log("Payload is", st.payload);
-                        var priv = null,
-                            privEffective = null,
-                            sched = null,
-                            schedEffective = null;
-                        if (st.payload.privhistory !== null) {
-                            priv = st.payload.privhistory.priv;
-                            privEffective = datetime.readableDate(
-                                st.payload.privhistory.effective
-                            );
-                        }
-                        if (st.payload.schedhistory !== null) {
-                            if (st.payload.schedhistory.scode !== null) {
-                                sched = st.payload.schedhistory.scode;
-                            } else {
-                                sched = '(Schedule ID ' + st.payload.schedhistory.sid + ')';
-                            }
-                            schedEffective = datetime.readableDate(
-                                st.payload.schedhistory.effective
-                            );
-                        }
-                        employeeProfile = $.extend(
-                            Object.create(prototypes.empProfile),
-                            {
-                                'eid': st.payload.emp.eid,
-                                'nick': st.payload.emp.nick,
-                                'fullname': st.payload.emp.fullname,
-                                'email': st.payload.emp.email,
-                                'remark': st.payload.emp.remark,
-                                'sec_id': st.payload.emp.sec_id,
-                                'priv': priv,
-                                'privEffective': privEffective,
-                                'sched': sched,
-                                'schedEffective': schedEffective
-                            }
-                        );
-                        currentUser('obj', employeeProfile);
-                        stack.push('empProfile', employeeProfile, {"xtarget": "mainEmpl"});
-                    } else {
-                        coreLib.displayError("Unexpected status code " + st.code);
-                    }
-                },
-                fc = function (st) {
-                    console.log("AJAX: " + rest["path"] + " failed with", st);
-                    coreLib.displayError(st.payload.message);
-                };
-            ajax(rest, sc, fc);
+            var cu = currentUser('obj'),
+                profileObj = appCaches.getProfileByEID(cu.eid),
+                obj = {},
+                m;
+            // if the employee profile has not been loaded into the cache, we have a problem
+            if (! profileObj) {
+                m = "CRITICAL ERROR: the employee profile has not been loaded into the cache";
+                console.log(m);
+                coreLib.displayError(m);
+                return null;
+            }
+            if (profileObj.privhistory !== null) {
+                obj['priv'] = profileObj.privhistory.priv;
+                obj['privEffective'] = datetime.readableDate(
+                    profileObj.privhistory.effective
+                );
+            } else {
+                obj['priv'] = '(none)';
+                obj['privEffective'] = '(none)';
+            }
+            if (profileObj.schedhistory !== null) {
+                obj['sid'] = profileObj.schedhistory.sid;
+                if (profileObj.schedhistory.scode !== null) {
+                    obj['scode'] = profileObj.schedhistory.scode;
+                } else {
+                    obj['scode'] = '(none)';
+                }
+                obj['schedEffective'] = datetime.readableDate(
+                    profileObj.schedhistory.effective
+                );
+            } else {
+                obj['sid'] = '(none)';
+                obj['scode'] = '(none)';
+                obj['schedEffective'] = '(none)';
+            }
+            obj['eid'] = profileObj.emp.eid;
+            obj['nick'] = profileObj.emp.nick;
+            obj['fullname'] = profileObj.emp.fullname;
+            obj['email'] = profileObj.emp.email;
+            obj['remark'] = profileObj.emp.remark;
+            obj['sec_id'] - profileObj.emp.sec_id;
+            stack.push('empProfile', obj);
         };
 
     return {
         actionEmplSearch: actionEmplSearch,
         empProfileEditSave: empProfileEditSave,
-        endTheMasquerade: endTheMasquerade,
-        masqEmployee: masqEmp,
         myProfileAction: myProfileAction,
     };
 

@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.029';
+our $VERSION = '0.030';
 
 use Moose;
 
@@ -185,7 +185,7 @@ Dist::Zilla::Plugin::Author::SKIRMESS::RepositoryBase - Automatically create and
 
 =head1 VERSION
 
-Version 0.029
+Version 0.030
 
 =head1 SYNOPSIS
 
@@ -758,13 +758,42 @@ TRAVIS_YML_1
         }
 
         $travis_yml .= <<'TRAVIS_YML';
+before_install:
+  - |
+    case "${TRAVIS_OS_NAME}" in
+      "linux" )
+        ;;
+      "osx"   )
+        # TravisCI extracts the broken perl archive with sudo which creates the
+        # $HOME/perl5 directory with owner root:staff. Subdirectories under
+        # perl5 are owned by user travis.
+        sudo chown "$USER" "$HOME/perl5"
+
+        # The perl distribution TravisCI extracts on OSX is incomplete
+        sudo rm -rf "$HOME/perl5/perlbrew"
+
+        # Install cpanm and local::lib
+        curl -L https://cpanmin.us | perl - App::cpanminus local::lib
+        eval $(perl -I $HOME/perl5/lib/perl5/ -Mlocal::lib)
+        ;;
+    esac
+
 install:
-  - if [ -n "$AUTHOR_TESTING" ]; then cpanm --quiet --installdeps --notest --skip-satisfied --with-develop .; fi
-  - if [ -z "$AUTHOR_TESTING" ]; then cpanm --quiet --installdeps --notest --skip-satisfied .; fi
+  - |
+    if [ -n "$AUTHOR_TESTING" ]
+    then
+      cpanm --quiet --installdeps --notest --skip-satisfied --with-develop .
+    else
+      cpanm --quiet --installdeps --notest --skip-satisfied .
+    fi
 
 script:
   - perl Makefile.PL && make test
-  - if [ -n "$AUTHOR_TESTING" ]; then prove -lr xt/author; fi
+  - |
+    if [ -n "$AUTHOR_TESTING" ]
+    then
+      prove -lr xt/author
+    fi
 TRAVIS_YML
 
         return $travis_yml;

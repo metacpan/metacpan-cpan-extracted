@@ -91,7 +91,7 @@ sub sim    # This function launch the simulations in ESP-r
   $tee = new IO::Tee(\*STDOUT, ">>$tofile"); # GLOBAL ZZZ
   
   #open( OUTFILE, ">>$outfile" ) or die "Can't open $outfile: $!"; 
-  open( TOFILE, ">>$tofile" ) or die "Can't open $tofile: $!"; 
+#  open( TOFILE, ">>$tofile" ) or die "Can't open $tofile: $!"; 
   say $tee "\nNow in Sim::OPT::Sim.\n";
   
   %dowhat = %main::dowhat;
@@ -374,19 +374,19 @@ $printthis
             my $before = $simtitle_ref->[3]; 
             my $step = $simtitle_ref->[4]; 
              
-            my $epw = $simtitle_ref->[5]; say "\$epw $epw ";
-            my $epwfile = $mypath . "/" . $epw; say "\$epwfile $epwfile ";
-            my $epdir = $simtitle_ref->[6]; say "\$epdir $epdir ";
-            my $epoldfile = $simtitle_ref->[7]; say "\$epoldfile $epoldfile ";
-            my $epnewfragment = $simtitle_ref->[8]; say "\$epnewfragment $epnewfragment ";
-            my $outputdir = $simtitle_ref->[9]; say "\$outputdir $outputdir ";
-            my $modfiletype = $simtitle_ref->[10]; say "\$modfiletype $modfiletype ";
-            my $resfiletype = $simtitle_ref->[11]; say "\$resfiletype $resfiletype ";
-            my $epoldpath = $to . $epdir . "/" . $epoldfile; say "\$epoldpath $epoldpath ";
-            my $tempname = $to;say "\$tempname $tempname "; 
-            $tempname =~ s/$mypath\/// ; say "\$epw $epw "; say "\$tempname $tempname ";
-            my $epnewfile = $tempname . $epnewfragment . "$epnewfile"; say "\$epw $epnewfile ";
-            my $epresroot = $tempname . $epnewfragment ; say "\$epw $epresroot ";
+            my $epw = $simtitle_ref->[5]; #say "\$epw $epw ";
+            my $epwfile = $mypath . "/" . $epw; #say "\$epwfile $epwfile ";
+            my $epdir = $simtitle_ref->[6]; #say "\$epdir $epdir ";
+            my $epoldfile = $simtitle_ref->[7]; #say "\$epoldfile $epoldfile ";
+            my $epnewfragment = $simtitle_ref->[8]; #say "\$epnewfragment $epnewfragment ";
+            my $outputdir = $simtitle_ref->[9]; #say "\$outputdir $outputdir ";
+            my $modfiletype = $simtitle_ref->[10]; #say "\$modfiletype $modfiletype ";
+            my $resfiletype = $simtitle_ref->[11]; #say "\$resfiletype $resfiletype ";
+            my $epoldpath = $to . $epdir . "/" . $epoldfile; #say "\$epoldpath $epoldpath ";
+            my $tempname = $to; #say "\$tempname $tempname "; 
+            $tempname =~ s/$mypath\/// ; #say "\$epw $epw "; say "\$tempname $tempname ";
+            my $epnewfile = $tempname . $epnewfragment . "$epnewfile"; #say "\$epw $epnewfile ";
+            my $epresroot = $tempname . $epnewfragment ; #say "\$epw $epresroot ";
             
             my $epnewpath;
             my $resfile;

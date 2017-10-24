@@ -1,7 +1,7 @@
 package Devel::Chitin::OpTree::LISTOP;
 use base Devel::Chitin::OpTree::BINOP;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use Fcntl qw(:DEFAULT :flock SEEK_SET SEEK_CUR SEEK_END);
 use POSIX qw(:sys_wait_h);

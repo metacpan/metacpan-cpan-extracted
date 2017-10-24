@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-Plugin-AutoPrereqs-Perl-Critic
 
+0.005  2017-10-21 09:53:51 UTC
+
+  - Create a .perlcritic_package.yml cache file to reduce network access
+
 0.004  2017-09-21 22:39:29 UTC
 
   - Added a test for no Internet access
@@ -14,7 +18,7 @@ Revision history for Dist-Zilla-Plugin-AutoPrereqs-Perl-Critic
 0.002  2017-08-30 21:02:54 UTC
 
   - Remove dependencies or core plugins
-  - Added argument remove_core_policies to also depend on core plugins
+  - Added option remove_core_policies to also depend on core plugins
 
 0.001  2017-08-29 22:22:52 UTC
 

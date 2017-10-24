@@ -33,6 +33,18 @@ my $build = Module::Build->new(
 	},
 	dynamic_config => 0,
 	meta_add => { distribution_type => "module" },
+	meta_merge => {
+		"meta-spec" => { version => "2" },
+		resources => {
+			bugtracker => {
+				mailto => "bug-Time-OlsonTZ-Download".
+					"\@rt.cpan.org",
+				web => "https://rt.cpan.org/Public/Dist/".
+					"Display.html?Name=".
+					"Time-OlsonTZ-Download",
+			},
+		},
+	},
 	sign => 0,
 );
 $build->add_build_element("tz");

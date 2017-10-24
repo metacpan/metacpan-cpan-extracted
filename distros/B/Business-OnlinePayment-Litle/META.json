@@ -50,7 +50,7 @@
             "XML::Simple" : "0",
             "XML::Writer" : "0",
             "bytes" : "0",
-            "perl" : "5.006",
+            "perl" : "5.010",
             "strict" : "0",
             "vars" : "0",
             "warnings" : "0"
@@ -64,7 +64,7 @@
             "Test::More" : "0",
             "Test::Pod" : "0",
             "Test::Pod::Coverage" : "0",
-            "perl" : "5.006"
+            "perl" : "5.010"
          }
       }
    },
@@ -80,7 +80,7 @@
          "web" : "https://github.com/Jayceh/Business--OnlinePayment--Litle"
       }
    },
-   "version" : "0.958",
+   "version" : "0.959",
    "x_contributors" : [
       "Daina Pettit <dpettit@bluehost.com>",
       "David Bartle <captindave@gmail.com>",

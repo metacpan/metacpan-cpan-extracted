@@ -1,30 +1,47 @@
 package Data::Compare::Plugins::Set::Object;
 
-use 5.008;
+# ABSTRACT: plugin for Data::Compare to handle Set::Object objects
+
+#pod =head1 DESCRIPTION
+#pod
+#pod Enables L<Data::Compare|Data::Compare> to Do The Right Thing for
+#pod L<Set::Object|Set::Object> objects. Set::Object already has an
+#pod C<equals()> method, but it only returns true if objects within two sets
+#pod are exactly equal (i.e. have the same references, referring to the same
+#pod object instance).  When using Data::Compare in conjunction with this
+#pod plugin, objects in sets are considered the same if their B<contents> are
+#pod the same.  This extends down to sets that contain arrays, hashes, or
+#pod other objects supported by Data::Compare plugins.
+#pod
+#pod =cut
+
+use 5.010;
+use utf8;
 use strict;
 use warnings;
-use version 0.77; our $VERSION = qv('v1.0');
-use English qw(-no_match_vars);
+
+our $VERSION = '1.001';    # VERSION
+use English '-no_match_vars';
 use Data::Compare 0.06;
-use List::Util qw(first);
+use List::Util 'first';
 
 sub _register {
     return [ 'Set::Object', \&_so_set_compare ];
 }
 
+## no critic (Subroutines::RequireArgUnpacking)
 sub _so_set_compare {
-    my @sets = splice @ARG, 0, 2;
+    my @sets = splice @_, 0, 2;
 
     # quick optimizations if sets aren't of equal size or are directly equal
     return 0 if $sets[0]->size() != $sets[1]->size();
-    return 1 if $sets[0]         == $sets[1];
+    return 1 if $sets[0] == $sets[1];
 
     # loop over each of the first set's elements
     # looking for a match in the second set
     for my $element ( $sets[0]->elements() ) {
-        my $matched_element =
-            first { Data::Compare::Compare( $element, $ARG ) }
-            grep  { ref eq ref $element } $sets[1]->elements();
+        my $matched_element = first { Data::Compare::Compare( $element, $_ ) }
+        grep { ref eq ref $element } $sets[1]->elements();
 
         # return false if not found
         return 0 if not defined $matched_element;
@@ -38,10 +55,17 @@ sub _so_set_compare {
 }
 
 # Data::Compare::Plugins interface requires modules to return an arrayref
-## no critic (RequireEndWithOne)
+## no critic (RequireEndWithOne, Lax::RequireEndWithTrueConst)
 _register();
 
 __END__
+
+=pod
+
+=encoding utf8
+
+=for :stopwords Mark Gardner cpan testmatrix url annocpan anno bugtracker rt cpants
+kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 NAME
 
@@ -49,10 +73,11 @@ Data::Compare::Plugins::Set::Object - plugin for Data::Compare to handle Set::Ob
 
 =head1 VERSION
 
-This document describes Data::Compare::Plugins::Set::Object version 1.0
+version 1.001
 
 =head1 SYNOPSIS
 
+    use 5.010;
     use Set::Object 'set';
     use Data::Compare;
 
@@ -72,93 +97,123 @@ This document describes Data::Compare::Plugins::Set::Object version 1.0
 
 =head1 DESCRIPTION
 
-Enables L<Data::Compare> to Do The Right Thing for L<Set::Object> objects.
-Set::Object already has an C<equals()> method, but it only returns true if
-objects within two sets are exactly equal (i.e. have the same references,
-referring to the same object instance).  When using Data::Compare in
-conjuction with this plugin, objects in sets are considered the same if their
-B<contents> are the same.  This extends down to sets that contain arrays,
-hashes, or other objects supported by Data::Compare plugins.
+Enables L<Data::Compare|Data::Compare> to Do The Right Thing for
+L<Set::Object|Set::Object> objects. Set::Object already has an
+C<equals()> method, but it only returns true if objects within two sets
+are exactly equal (i.e. have the same references, referring to the same
+object instance).  When using Data::Compare in conjunction with this
+plugin, objects in sets are considered the same if their B<contents> are
+the same.  This extends down to sets that contain arrays, hashes, or
+other objects supported by Data::Compare plugins.
 
 =head1 SUBROUTINES/METHODS
 
 As a plugin to Data::Compare, the interface is the same as Data::Compare
-itself: pass the reference to two data structures to the C<Compare> function,
-which for historical reasons is exported by default.
+itself: pass the reference to two data structures to the C<Compare>
+function, which for historical reasons is exported by default.
 
 Set::Object also can export certain functions, and overloads comparison
 operators pertaining to sets.  Consult the
 L<Set::Object documentation|Set::Object> for more information.
 
-=head1 DIAGNOSTICS
+=head1 SUPPORT
 
-See the L<documentation for Data::Compare|Data::Compare>.
+=head2 Perldoc
 
-=head1 CONFIGURATION AND ENVIRONMENT
+You can find documentation for this module with the perldoc command.
 
-Data::Compare::Plugins::Set::Object requires no configuration files or environment variables.
+  perldoc Data::Compare::Plugins::Set::Object
 
-=head1 DEPENDENCIES
+=head2 Websites
 
-=over
+The following websites have more information about this module, and may be of help to you. As always,
+in addition to those websites please use your favorite search engine to discover more resources.
 
-=item L<Data::Compare> >= 0.06 (must be installed separately)
+=over 4
 
-=item L<Set::Object> (must be installed separately)
+=item *
 
-=item L<English> (part of the standard Perl 5 distribution)
+Search CPAN
 
-=item L<List::Util> (part of the standard Perl 5 distribution)
+The default CPAN search engine, useful to view POD in HTML format.
 
-=item L<version> >= 0.77 (part of the standard Perl 5.10.1 distribution)
+L<http://search.cpan.org/dist/Data-Compare-Plugins-Set-Object>
+
+=item *
+
+AnnoCPAN
+
+The AnnoCPAN is a website that allows community annotations of Perl module documentation.
+
+L<http://annocpan.org/dist/Data-Compare-Plugins-Set-Object>
+
+=item *
+
+CPAN Ratings
+
+The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
+
+L<http://cpanratings.perl.org/d/Data-Compare-Plugins-Set-Object>
+
+=item *
+
+CPANTS
+
+The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
+
+L<http://cpants.cpanauthors.org/dist/Data-Compare-Plugins-Set-Object>
+
+=item *
+
+CPAN Testers
+
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
+
+L<http://www.cpantesters.org/distro/D/Data-Compare-Plugins-Set-Object>
+
+=item *
+
+CPAN Testers Matrix
+
+The CPAN Testers Matrix is a website that provides a visual overview of the test results for a distribution on various Perls/platforms.
+
+L<http://matrix.cpantesters.org/?dist=Data-Compare-Plugins-Set-Object>
+
+=item *
+
+CPAN Testers Dependencies
+
+The CPAN Testers Dependencies is a website that shows a chart of the test results of all dependencies for a distribution.
+
+L<http://deps.cpantesters.org/?module=Data::Compare::Plugins::Set::Object>
 
 =back
 
-=head1 INCOMPATIBILITIES
+=head2 Bugs / Feature Requests
 
-None reported.
+Please report any bugs or feature requests through the web
+interface at L<https://github.com/mjgardner/Data-Compare-Plugins-Set-Object/issues>. You will be automatically notified of any
+progress on the request by the system.
 
-=head1 BUGS AND LIMITATIONS
+=head2 Source Code
 
-No bugs have been reported.
+The code is open to the world, and available for you to hack on. Please feel free to browse it and play
+with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
+from your repository :)
 
-Please report any bugs or feature requests via GitHub at
-L<http://github.com/mjg/Data-Compare-Plugins-Set-Object/issues>.
-Please report any bugs or feature requests to
-C<bug-data-compare-plugins-set-object@rt.cpan.org>, or through the web
-interface at L<http://rt.cpan.org>.
+L<https://github.com/mjgardner/Data-Compare-Plugins-Set-Object>
+
+  git clone git://github.com/mjgardner/Data-Compare-Plugins-Set-Object.git
 
 =head1 AUTHOR
 
 Mark Gardner <mjgardner@cpan.org>
 
-=head1 LICENSE AND COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2009, Mark Gardner C<< <mjgardner@cpan.org> >>. All rights
-reserved.
+This software is copyright (c) 2017 by Mark Gardner.
 
-This module is free software; you can redistribute it and/or
-modify it under the same terms as Perl 5.10.1 itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
-=head1 DISCLAIMER OF WARRANTY
-
-BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
-FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
-OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
-PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
-EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
-ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
-YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
-NECESSARY SERVICING, REPAIR, OR CORRECTION.
-
-IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
-WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
-REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE
-LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
-OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
-THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
-RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
-FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
-SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
-SUCH DAMAGES.
+=cut

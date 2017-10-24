@@ -13,15 +13,15 @@ BEGIN {
 
 use Promises (); # for deferred
 
-sub run_query {
+sub run_multiple_queries {
     my ($conn, $remaining_sqls, $extras) = @_;
 
     my $deferred = Promises::deferred();
 
-    $conn->SUPER::run_query($remaining_sqls, $extras,
-        sub { $deferred->resolve(@_) },
-        sub { $deferred->reject(@_) },
-    );
+    $extras //= {};
+    local $extras->{success_cb} = sub { $deferred->resolve(@_) };
+    local $extras->{failure_cb} = sub { $deferred->reject(@_) };
+    $conn->SUPER::run_multiple_queries($remaining_sqls, $extras);
 
     return $deferred->promise;
 }
@@ -31,10 +31,10 @@ sub ping {
 
     my $deferred = Promises::deferred();
 
-    $conn->SUPER::ping($extras,
-        sub { $deferred->resolve(@_) },
-        sub { $deferred->reject(@_) },
-    );
+    $extras //= {};
+    local $extras->{success_cb} = sub { $deferred->resolve(@_) };
+    local $extras->{failure_cb} = sub { $deferred->reject(@_) };
+    $conn->SUPER::ping($extras);
 
     return $deferred->promise;
 }
@@ -44,10 +44,10 @@ sub connect {
 
     my $deferred = Promises::deferred();
 
-    $conn->SUPER::connect($connect_args, $extras,
-        sub { $deferred->resolve(@_) },
-        sub { $deferred->reject(@_) },
-    );
+    $extras //= {};
+    local $extras->{success_cb} = sub { $deferred->resolve(@_) };
+    local $extras->{failure_cb} = sub { $deferred->reject(@_) };
+    $conn->SUPER::connect($connect_args, $extras);
 
     return $deferred->promise;
 }

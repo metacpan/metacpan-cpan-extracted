@@ -1,6 +1,7 @@
 {
    "oauth_url" : "https://slack.com/oauth/authorize{?client_id,scope,redirect_uri,state,team}",
    "rtm_connect_url": "https://slack.com/api/rtm.connect{?token}",
-   "chat.postMessage_url": "https://slack.com/api/chat.postMessage{?token}"
+   "chat.postMessage_url": "https://slack.com/api/chat.postMessage{?token}",
+   "chat.update_url": "https://slack.com/api/chat.update{?token}"
 }
 

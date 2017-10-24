@@ -11,5 +11,12 @@ lib/MariaDB/NonBlocking/Event.pm
 lib/MariaDB/NonBlocking/Promises.pm
 NonBlocking.xs
 ignore.txt
+t/01-connect-event.t
+t/01-connect-promise.t
+t/02-select-event.t
+t/02-select-promise.t
+t/03-create-table-promise.t
+t/04-insert-promise.t
+t/05-update-promise.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -8,7 +8,7 @@ use GraphQL::Type::Library -all;
 use GraphQL::Debug qw(_debug);
 use Types::Standard -all;
 use JSON::MaybeXS qw(JSON is_bool);
-use Exporter qw(import);
+use Exporter 'import';
 extends qw(GraphQL::Type);
 with qw(
   GraphQL::Role::Input
@@ -96,6 +96,26 @@ method graphql_to_perl(Any $item) :ReturnType(Any) {
 
 method perl_to_graphql(Any $item) :ReturnType(Any) {
   $self->serialize->($item);
+}
+
+method from_ast(
+  HashRef $name2type,
+  HashRef $ast_node,
+) :ReturnType(InstanceOf[__PACKAGE__]) {
+  DEBUG and _debug('Scalar.from_ast', $ast_node);
+  $self->new(
+    $self->_from_ast_named($ast_node),
+    serialize => sub {}, # fake
+  );
+}
+
+has to_doc => (is => 'lazy', isa => Str);
+sub _build_to_doc {
+  my ($self) = @_;
+  DEBUG and _debug('Scalar.to_doc', $self);
+  join '', map "$_\n",
+    ($self->description ? (map "# $_", split /\n/, $self->description) : ()),
+    "scalar @{[$self->name]}";
 }
 
 =head1 EXPORTED VARIABLES

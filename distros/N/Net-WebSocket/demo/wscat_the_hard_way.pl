@@ -15,14 +15,13 @@ use autodie;
 
 use Try::Tiny;
 
-use lib '/Users/Felipe/code/p5-IO-SigGuard/lib';
-
 use HTTP::Response;
 use IO::Select ();
 use IO::Socket::INET ();
 use Socket ();
 use URI::Split ();
 
+use IO::Framed ();
 use IO::SigGuard ();
 
 use FindBin;
@@ -97,10 +96,10 @@ sub _handshake_as_client {
         uri => $uri,
     );
 
-    my $hdr = $handshake->create_header_text();
+    my $hdr = $handshake->to_string();
 
     #Write out the client handshake.
-    IO::SigGuard::syswrite( $inet, $hdr . CRLF );
+    IO::SigGuard::syswrite( $inet, $hdr );
 
     my $handshake_ok;
 
@@ -139,10 +138,9 @@ my $sent_ping;
 sub _mux_after_handshake {
     my ($from_caller, $to_caller, $inet, $buf) = @_;
 
-    my $parser = Net::WebSocket::Parser->new(
-        $inet,
-        $buf,
-    );
+    my $iof = IO::Framed->new($inet, $buf);
+
+    my $parser = Net::WebSocket::Parser->new($iof);
 
     for my $sig (ERROR_SIGS()) {
         $SIG{$sig} = sub {
@@ -168,22 +166,24 @@ sub _mux_after_handshake {
 
         #start it as non-blocking
         my $ept = Net::WebSocket::Endpoint::Client->new(
-            out => $inet,
+            out => $iof,
             parser => $parser,
         );
+
+        $iof->enable_write_queue();
 
         my $s = IO::Select->new( $from_caller, $inet );
         my $write_s = IO::Select->new($inet);
 
         while (1) {
-            my $cur_write_s = $ept->get_write_queue_size() ? $write_s : undef;
+            my $cur_write_s = $iof->get_write_queue_count() ? $write_s : undef;
 
             #This is a really short timeout, btw.
             my ($rdrs_ar, $wtrs_ar, $excs_ar) = IO::Select->select( $s, $cur_write_s, $s, 3 );
 
             #There’s only one possible.
             if ($wtrs_ar && @$wtrs_ar) {
-                $ept->process_write_queue();
+                $iof->flush_write_queue();
             }
 
             for my $err (@$excs_ar) {
@@ -225,38 +225,25 @@ sub _mux_after_handshake {
 
         #blocking
         my $ept = Net::WebSocket::Endpoint::Client->new(
-            out => $inet,
+            out => $iof,
             parser => $parser,
         );
+
+        $ept->do_not_die_on_close();
 
         while ( IO::SigGuard::sysread($from_caller, my $buf, 32768 ) ) {
             _chunk_to_remote( $buf, $inet );
         }
 
-        my $close_frame = Net::WebSocket::Frame::close->new(
-            code => 'SUCCESS',
-            mask => Net::WebSocket::Mask::create(),
-        );
+        die "read from remote: $!" if $!;
 
-        IO::SigGuard::syswrite( $inet, $close_frame->to_bytes() );
+        $ept->close( code => 'SUCCESS' );
 
         shutdown $inet, Socket::SHUT_WR();
 
-        try {
-            while ( my $msg = $ept->get_next_message() ) {
-                IO::SigGuard::syswrite( $to_caller, $msg->get_payload() );
-            }
+        while ( my $msg = $ept->get_next_message() ) {
+            IO::SigGuard::syswrite( $to_caller, $msg->get_payload() );
         }
-        catch {
-            my $ok;
-            if ( try { $_->isa('Net::WebSocket::X::ReceivedClose') } ) {
-                if ( $_->get('frame')->get_payload() eq $close_frame->get_payload() ) {
-                    $ok = 1;
-                }
-            }
-
-            warn $_ if !$ok;
-        };
 
         close $inet;
 

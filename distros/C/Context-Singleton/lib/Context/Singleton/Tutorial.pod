@@ -1,0 +1,188 @@
+
+=encoding utf-8
+
+=head1 NAME
+
+Context::Singleton::Tutorial - How to work with Context::Singleton
+
+=head1 TASK
+
+Let's have an application handling web requests and emails, eg ticket system.
+
+Application has config file providing database credentials.
+
+=head1 IMPLEMENTATION
+
+=head2 Root context resources
+
+Root context is default context provided by Context::Singleton.
+Resources defined in this context are real singletons.
+
+=head3 Rule config_file
+
+   # Instance of config file with methods providing configuration options.
+   contrive config_file => (
+      class => 'My::App::Config',
+      builder => 'parse_file',
+      dep => [ 'config_file_name' ],
+   );
+
+   # behaves like
+   sub contrive_config_file {
+      my ($config_file_name) = @_;
+      eval "use My::App::Config" or die $@;
+      return My::App::Config->parse_file ($config_file_name);
+   }
+
+Usage:
+
+   # provide config file name
+   proclaim config_file_name => $ENV{MY_APP_CONFIG_FILE};
+
+   # when needed just call
+   my $config_file = deduce 'config_file';
+
+Any code in any depth requesting I<config_file> will receive same instance
+until you will change its dependencies.
+
+   frame {
+      # Use different package
+      proclaim 'My::App::Config' => 'My::Other::App::Config';
+      deduce 'config_file';
+   };
+
+   frame {
+      proclaim 'config_file' => My::Test::Config->new;
+      deduce 'config_file';
+   };
+
+Why to bother?
+
+As your application evolves you have no idea where you will need given
+resource neither how many receipts you will add/remove.
+
+Well, you can pass it into every function or every class in chain.
+You can build and manage all builders on all classes (eg via Moose::Role)
+You can create it as real singleton as well.
+
+Context::Singleton treats this problem differently.
+It expects C<behaviour immutability> of resources and provides way how
+to inject new behaviour and simplifies reusability.
+
+=head3 Resource db_dsn
+
+=head3 Resource db_user
+
+=head3 Resource db_password
+
+DSN is provided by config file via method C<db_dsn>. Similar for C<db_user> and C<db_password>.
+
+   contrive db_dsn => (
+      deduce => 'config_file',
+      builder => 'db_dsn',
+   );
+
+   contrive db_user => (
+      deduce => 'config_file',
+      builder => 'db_user',
+   );
+
+   contrive db_password => (
+      deduce => 'config_file',
+      builder => 'db_password',
+   );
+
+
+=head3 Resource db
+
+DB connection
+
+   contrive db => (
+      class => 'DBI',
+      builder => 'connect',
+      dep => [ 'db_dsn', 'db_user', 'db_password' ],
+   );
+
+Since now every code can fetch I<db> value (valid in its context).
+
+=head2 User authentication
+
+Let's assume our application identifies user by email address or expects
+authenticated HTTP request.
+
+=head3 Resource user
+
+   contrive user => (
+      deduce => 'http_request',
+      builder => 'user',
+   );
+
+   contrive user => (
+      dep => [ 'db', 'email_address' ],
+      as => sub {
+         my ($db, $address) = @_;
+         # SELECT user FROM users WHERE email = ?; from $db; with $address
+      }
+   );
+
+Email handler provides I<email_address> whereas HTTP handler provides I<http_request>.
+In both cases rule I<user> can be properly deduced.
+
+   # email-handler
+   sub handle_request {
+      frame {
+         proclaim email_address => 'EMAIL_FROM';
+         do_something;
+      };
+   }
+
+   # http handler
+   sub handle_http_request {
+      frame {
+         proclaim http_request => ...;
+         do_something;
+      };
+   }
+
+Now you have (lazy) resource I<user> available in any descending level
+cached it in frame where I<email_address>/I<http_request> is defined.
+
+=head1 EXTENDING - DB PER USER
+
+Let's upgrage our application so we will have one database per user
+but still using central database for user authentication.
+
+=over
+
+=item Override resources after using them
+
+   sub do_something {
+      my $db = deduce 'db';
+      my ($dsn, $user, $password) = $db->fetch_user_db_credentials;
+      frame {
+         proclaim db_dsn => $dsn;
+         proclaim db_user => $user;
+         proclaim db_password => $password;
+         # db will be recaluclated when requested
+         ...;
+      };
+   }
+
+=item Change user db rule and link it with db
+
+   # Provide rule similar do db
+   contrive user_db => (...);
+
+   contrive user_db_info => (
+      deduce => 'user_db',
+      as => sub { select .... },
+   );
+
+   # Change db_dsn, db_user, db_password rules
+   contrive db_user => (
+      dep => [ 'user_db_info' ],
+      as => sub { $_[0]->{db_user} },
+   );
+
+=back
+

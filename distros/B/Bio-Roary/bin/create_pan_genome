@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 package Bio::Roary::Main::CreatePanGenome;
-$Bio::Roary::Main::CreatePanGenome::VERSION = '3.10.2';
+$Bio::Roary::Main::CreatePanGenome::VERSION = '3.11.0';
 # ABSTRACT: Create a pan genome from a set of GFF files with WTSI defaults
 # PODNAME: create_pan_genome
 
@@ -25,7 +25,7 @@ create_pan_genome - Create a pan genome from a set of GFF files with WTSI defaul
 
 =head1 VERSION
 
-version 3.10.2
+version 3.11.0
 
 =head1 SYNOPSIS
 

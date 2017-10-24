@@ -6,8 +6,6 @@ use utf8;
 use Moo;
 extends qw(Text::Phonetic);
 
-__PACKAGE__->meta->make_immutable;
-
 our $VERSION = $Text::Phonetic::VERSION;
 
 our @RULES = (
@@ -136,8 +134,8 @@ our @RULES = (
 sub _do_compare {
     my ($self,$result1,$result2) = @_;
 
-    return 50 
-       if Text::Phonetic::_compare_list($result1,$result2);    
+    return 50
+       if Text::Phonetic::_compare_list($result1,$result2);
 
     return 0;
 }
@@ -148,14 +146,14 @@ sub _do_encode {
     my $match_index;
     my $last_match;
     my $result_list = [''];
-    
+
     $string = uc($string);
     $string =~ tr/A-Z//cd;
-    
+
     while (length($string)) {
         # Loop all rules
         RULES: foreach my $rule (@RULES) {
-            
+
             # Check if rule matches
             #if ($string =~ s/^([AEIOUJY]{2})([AEIOU])//i) {
 
@@ -167,7 +165,7 @@ sub _do_encode {
                 } elsif (Text::Phonetic::_is_inlist(substr($string,0,1),qw(A E I O U)))  {
                     $match_index = 2;
                 # Other situation
-                } else{    
+                } else{
                     $match_index = 3;
                 }
                 unless (defined $rule->[$match_index]) {
@@ -181,7 +179,7 @@ sub _do_encode {
             }
         }
     }
-    
+
     foreach my $result (@$result_list) {
         $result .= '0'  x (6-length $result);
         $result = substr($result,0,6);
@@ -190,7 +188,7 @@ sub _do_encode {
     return $result_list;
 }
 
-sub _add_result {    
+sub _add_result {
     my $result = shift;
     my $rule = shift;
 
@@ -199,7 +197,7 @@ sub _add_result {
     if (ref($rule) eq 'ARRAY') {
         my $newresult = [];
         foreach my $result_string (@$result) {
-            foreach my $rule_string (@$rule) {    
+            foreach my $rule_string (@$rule) {
                 push @$newresult,$result_string.$rule_string;
             }
         }
@@ -224,14 +222,14 @@ Text::Phonetic::DaitchMokotoff - Daitch-Mokotoff algorithm
 
 =head1 DESCRIPTION
 
-Daitch-Mokotoff Soundex (D-M Soundex) is a phonetic algorithm invented in 1985 
-by genealogist Gary Mokotoff, and later improved by Randy Daitch, both of the 
-Jewish Genealogical Society. It is a refinement of the Russell and American 
-Soundex algorithms designed to allow matching of Slavic and Yiddish surnames 
+Daitch-Mokotoff Soundex (D-M Soundex) is a phonetic algorithm invented in 1985
+by genealogist Gary Mokotoff, and later improved by Randy Daitch, both of the
+Jewish Genealogical Society. It is a refinement of the Russell and American
+Soundex algorithms designed to allow matching of Slavic and Yiddish surnames
 with similar pronunciation but differences in spelling. (Wikipedia, 2007)
 
-Some strings in the Daitch-Mokotoff algorithm produce ambigous results. 
-Therefore the results are always returned as Array references, even if there 
+Some strings in the Daitch-Mokotoff algorithm produce ambigous results.
+Therefore the results are always returned as Array references, even if there
 is only a single result.
 
 =head1 AUTHOR
@@ -254,7 +252,7 @@ LICENSE file included with this module.
 
 =head1 SEE ALSO
 
-Description of the algorithm can be found at 
+Description of the algorithm can be found at
 L<http://en.wikipedia.org/wiki/Daitch-Mokotoff_Soundex>
 
 L<Text::Metaphone>

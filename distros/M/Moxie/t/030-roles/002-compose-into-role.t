@@ -12,6 +12,8 @@ package Foo {
 
     has _bar => sub { 'bar' };
 
+    my sub _bar : private;
+
     sub bar { _bar }
 }
 

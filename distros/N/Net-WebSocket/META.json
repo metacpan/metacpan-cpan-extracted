@@ -4,7 +4,7 @@
       "Felipe Gasper (FELIPE)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -34,6 +34,7 @@
          "requires" : {
             "Call::Context" : "0",
             "Digest::SHA" : "0",
+            "HTTP::Headers::Util" : "0",
             "MIME::Base64" : "0",
             "Module::Load" : "0",
             "URI::Split" : "0",
@@ -51,7 +52,10 @@
             "IO::Framed" : "0",
             "IO::Select" : "0",
             "Test::Deep" : "0",
-            "Test::More" : "0"
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "Test::NoWarnings" : "0",
+            "Time::HiRes" : "0"
          }
       }
    },
@@ -63,6 +67,6 @@
          "web" : "https://github.com/FGasper/p5-Net-WebSocket"
       }
    },
-   "version" : "0.031",
+   "version" : "0.051",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

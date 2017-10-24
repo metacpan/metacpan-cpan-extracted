@@ -52,9 +52,15 @@ __DATA__
   {
     'kind' => 'schema',
     'node' => {
+      'description' => 'Copyright (c) 2015, Facebook, Inc.
+All rights reserved.
+
+This source code is licensed under the BSD-style license found in the
+LICENSE file in the root directory of this source tree. An additional grant
+of patent rights can be found in the PATENTS file in the same directory.',
       'location' => {
-        'column' => 1,
-        'line' => 13
+        'column' => 0,
+        'line' => 11
       },
       'mutation' => 'MutationType',
       'query' => 'QueryType'
@@ -142,8 +148,8 @@ __DATA__
         'Bar'
       ],
       'location' => {
-        'column' => 1,
-        'line' => 23
+        'column' => 0,
+        'line' => 21
       },
       'name' => 'Foo'
     }
@@ -181,8 +187,8 @@ __DATA__
         }
       },
       'location' => {
-        'column' => 1,
-        'line' => 27
+        'column' => 0,
+        'line' => 25
       },
       'name' => 'AnnotatedObject'
     }
@@ -205,8 +211,8 @@ __DATA__
         }
       },
       'location' => {
-        'column' => 1,
-        'line' => 32
+        'column' => 0,
+        'line' => 30
       },
       'name' => 'Bar'
     }
@@ -240,8 +246,8 @@ __DATA__
         }
       },
       'location' => {
-        'column' => 1,
-        'line' => 36
+        'column' => 0,
+        'line' => 34
       },
       'name' => 'AnnotatedInterface'
     }
@@ -250,8 +256,8 @@ __DATA__
     'kind' => 'union',
     'node' => {
       'location' => {
-        'column' => 0,
-        'line' => 36
+        'column' => 1,
+        'line' => 38
       },
       'name' => 'Feed',
       'types' => [
@@ -270,8 +276,8 @@ __DATA__
         }
       ],
       'location' => {
-        'column' => 0,
-        'line' => 38
+        'column' => 1,
+        'line' => 40
       },
       'name' => 'AnnotatedUnion',
       'types' => [
@@ -309,8 +315,8 @@ __DATA__
     'kind' => 'enum',
     'node' => {
       'location' => {
-        'column' => 1,
-        'line' => 49
+        'column' => 0,
+        'line' => 47
       },
       'name' => 'Site',
       'values' => {
@@ -328,8 +334,8 @@ __DATA__
         }
       ],
       'location' => {
-        'column' => 1,
-        'line' => 54
+        'column' => 0,
+        'line' => 52
       },
       'name' => 'AnnotatedEnum',
       'values' => {
@@ -362,8 +368,8 @@ __DATA__
         }
       },
       'location' => {
-        'column' => 1,
-        'line' => 59
+        'column' => 0,
+        'line' => 57
       },
       'name' => 'InputType'
     }
@@ -387,8 +393,8 @@ __DATA__
         }
       },
       'location' => {
-        'column' => 1,
-        'line' => 63
+        'column' => 0,
+        'line' => 61
       },
       'name' => 'AnnotatedInput'
     }
@@ -412,8 +418,8 @@ __DATA__
         }
       },
       'location' => {
-        'column' => 1,
-        'line' => 67
+        'column' => 0,
+        'line' => 65
       },
       'name' => 'Foo'
     }
@@ -428,8 +434,8 @@ __DATA__
       ],
       'fields' => {},
       'location' => {
-        'column' => 1,
-        'line' => 69
+        'column' => 0,
+        'line' => 67
       },
       'name' => 'Foo'
     }
@@ -439,8 +445,8 @@ __DATA__
     'node' => {
       'fields' => {},
       'location' => {
-        'column' => 1,
-        'line' => 71
+        'column' => 0,
+        'line' => 69
       },
       'name' => 'NoFields'
     }

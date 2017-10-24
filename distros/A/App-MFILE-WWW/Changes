@@ -1030,3 +1030,40 @@ Revision history for App::MFILE::WWW
 - js: datetime: implement offset time ranges
 - js: stack, start: make dform take an "inputId" option
 
+0.163 2017-10-19 23:19 CEST
+- js: lib: add isArray() from Crockford, Douglas
+- js: datetime: enable vetting of special Dochazka time ranges
+- js: dform: if entries have populate property, trigger populate async
+- js: start: implement dform non-interactive async populate feature
+- Resource: re-enable browser caching, increase waitSeconds
+- js: core: use minified d3 and jQuery
+- js: eliminate D3 from login dialog to lower page load times
+- Resource: use onNodeCreated to display RequireJS module loading info
+- js: start: refrain from vetting form entries on SHIFT-TAB
+- js: core: use keydown instead of keypress (for Chrome)
+- Resource: fix login bypass functionality
+
+0.164 2017-10-20 22:41 CEST
+- Dispatch+Resource: refactor login dialog bypass
+- js: core: implement populate module
+- js: start: clear result line when displaying dmenu
+- js: stack: implement unwindToType()
+- Dispatch: fix App::CELL constructor
+- js: datetime: add intToDay(), monthToInt(), and tsrangeToTimeRange()
+
+0.165 2017-10-21 12:02 CEST
+- js: start: vet populate property more carefully in dform
+- js: start: log an error if entry has bad populate property
+- js: stack, start: refrain from setting resultLine option to null
+- js: core: make the console log less noisy
+- js: refactor ajax.js
+- js: refactor populate.js
+
+0.166 2017-10-22 07:17 CEST
+- js: datetime: do not allow offset time range to go past 24:00
+- js: html: implement "hidden entries" feature in dform
+- js: start: ESC is "Back" in dmenu and dform
+- js: datetime: implement isTimeRangeAfterTime() and isTimeWithinTimeRange()
+- js: html: implement "hidden entries" feature in dform
+- js: stack: make unwindToTarget take opts
+

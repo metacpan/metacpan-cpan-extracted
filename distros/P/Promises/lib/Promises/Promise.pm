@@ -1,6 +1,6 @@
 package Promises::Promise;
-our $AUTHORITY = 'cpan:STEVAN';
-$Promises::Promise::VERSION = '0.96';
+our $AUTHORITY = 'cpan:YANICK';
+$Promises::Promise::VERSION = '0.98';
 # ABSTRACT: An implementation of Promises in Perl
 
 use strict;
@@ -23,6 +23,7 @@ sub done    { (shift)->{'deferred'}->done(@_) }
 sub finally { (shift)->{'deferred'}->finally(@_) }
 sub status  { (shift)->{'deferred'}->status }
 sub result  { (shift)->{'deferred'}->result }
+sub timeout  { (shift)->{'deferred'}->timeout }
 
 sub is_unfulfilled { (shift)->{'deferred'}->is_unfulfilled }
 sub is_fulfilled   { (shift)->{'deferred'}->is_fulfilled }
@@ -45,7 +46,7 @@ Promises::Promise - An implementation of Promises in Perl
 
 =head1 VERSION
 
-version 0.96
+version 0.98
 
 =head1 DESCRIPTION
 
@@ -92,6 +93,10 @@ This calls C<done> on the proxied L<Promises::Deferred> instance.
 
 This calls C<finally> on the proxied L<Promises::Deferred> instance.
 
+=item C<timeout( $seconds )>
+
+This calls C<timeout> on the proxied L<Promises::Deferred> instance.
+
 =item C<status>
 
 This calls C<status> on the proxied L<Promises::Deferred> instance.
@@ -136,7 +141,7 @@ Stevan Little <stevan.little@iinteractive.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Infinity Interactive, Inc..
+This software is copyright (c) 2017, 2014, 2012 by Infinity Interactive, Inc..
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

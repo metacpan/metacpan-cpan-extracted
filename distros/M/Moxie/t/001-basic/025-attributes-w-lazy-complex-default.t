@@ -19,6 +19,8 @@ package Foo {
 
     has '_bar';
 
+    my sub _bar : private;
+
     sub BUILDARGS : init_args( bar? => _bar );
 
     sub init_bar { _bar = [ 1, 2, 3 ] }

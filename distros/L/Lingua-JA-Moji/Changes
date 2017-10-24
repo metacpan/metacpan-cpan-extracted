@@ -1,5 +1,13 @@
 Revision history for perl module Lingua::JA::Moji
 
+0.46 2017-10-24
+
+* "is_romaji" and friends disallow a leading hyphen
+
+0.45 2017-03-12
+
+* Document "romaji_vowel_styles"
+
 0.44 2017-03-11
 
 * Change hentaigana functions to be many-to-many

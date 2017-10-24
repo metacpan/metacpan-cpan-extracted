@@ -14,7 +14,9 @@ use Lingua::JA::Moji qw/romaji2kana
                         is_kana
                         romaji_styles
                         kana_to_large
-			nigori_first/;
+			nigori_first
+			smallize_kana
+			cleanup_kana/;
 
 # Sanity tests
 
@@ -121,5 +123,8 @@ is ($large2, 'キヤキヨウワオ');
 my @list = (qw/カン スウ ハツ オオ/);
 nigori_first (\@list);
 is_deeply (\@list, [qw/カン スウ ハツ オオ ガン ズウ バツ パツ/]);
+
+is (smallize_kana ('シヤツター'), 'シャッター');
+is (cleanup_kana ('kaｋｉｸけコ一'), 'カキクケコー');
 
 done_testing ();

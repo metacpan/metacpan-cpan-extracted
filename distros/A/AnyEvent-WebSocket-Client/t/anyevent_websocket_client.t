@@ -80,7 +80,7 @@ subtest 'tests against count server' => sub {
     my $last;
   
     $connection->on(each_message => sub {
-      my $message = pop->body;
+      my $message = $_[1]->body;
       note "recv $message";
       $connection->send('ping');
       $last = $message;
@@ -258,6 +258,55 @@ subtest 'client connection should receive the initial message sent from server' 
 
   $cv_finish->recv;
   is(\@received_messages, ["initial message from server"]);
+
+};
+
+subtest 'callbacks can be unregistered' => sub {
+
+  my $url = start_server(
+    handshake => sub {
+      my $opt = { @_ };
+      $opt->{hdl}->push_write(Protocol::WebSocket::Frame->new("initial message from server")->to_bytes) for 1..10;
+    },
+    message => sub {
+      my $opt = { @_ };
+      $opt->{hdl}->push_shutdown;
+    },
+  );
+
+  my $conn = AnyEvent::WebSocket::Client->new->connect($url)->recv;
+  my $cv_finish = AnyEvent->condvar;
+  my @received_messages = ();
+
+  my @counters = (0,0);
+
+  # using the returned callback
+  my $cancel;
+  $cancel = $conn->on( each_message => sub {
+     $cancel->() if 2 == ++$counters[0];
+  });
+
+  # # using the provided coderef
+  $conn->on( each_message => sub {
+    $_[2]->() if 2 == ++$counters[1];
+  });
+
+
+  my $countdown = 10;
+  $conn->on(each_message => sub {
+    my ($conn, $message) = @_;
+    push(@received_messages, $message->body);
+    $conn->send("finish") unless --$countdown;
+  
+  });
+  $conn->on(finish => sub {
+    $cv_finish->send();
+  });
+
+  $cv_finish->recv;
+  is(\@received_messages, [("initial message from server")x10]);
+
+  is(\@counters, [2,2], "callbacks got unregistered after second message");
 
 };
 

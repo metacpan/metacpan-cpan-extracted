@@ -11,7 +11,8 @@ t/15-interval.t
 t/20-restart.t
 t/25-start.t
 t/30-status.t
-t/evt.pl
+t/35-timeout.t
+t/40-event_crash.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

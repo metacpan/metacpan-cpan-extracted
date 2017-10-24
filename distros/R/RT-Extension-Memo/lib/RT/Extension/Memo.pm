@@ -4,7 +4,7 @@ use warnings;
 no warnings qw(redefine);
 package RT::Extension::Memo;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =encoding utf8
 
@@ -34,9 +34,9 @@ These options are set in F<etc/Memo_Config.pm> and can be overridden by users in
 
 Should "rich text" editing be enabled for memo widget?
 
-=item C<$MemoWidth>, C<$MemoHeight>
+=item C<$MemoHeight>
 
-Set the memo widget width and height in number of columns and lines. When the width is set to C<undef> no column count is specified and the memo widget will take up 100% of the available width.
+Set number of lines of the textarea for editing memo.
 
 =back
 
@@ -55,6 +55,10 @@ Users and groups with this right are able to see the I<Memo> on the display page
 Users and groups with this right are able to add a new I<Memo> and to edit existing I<Memo> attached to a ticket.
 
 =back
+
+=head1 STYLING
+
+The CSS properties of the Memo widget can be styled by overwriting defaults set in F<static/css/memo.cc>.
 
 =head1 RT VERSION
 
@@ -110,15 +114,6 @@ $RT::Config::META{MemoRichText} = {
     Widget          => '/Widgets/Form/Boolean',
     WidgetArguments => {
         Description => 'WYSIWYG memo composer'
-    },
-};
-$RT::Config::META{MemoWidth} = {
-    Section         => 'Ticket composition',
-    Overridable     => 1,
-    SortOrder       => 15.2,
-    Widget          => '/Widgets/Form/Integer',
-    WidgetArguments => {
-        Description => 'Memo width',
     },
 };
 $RT::Config::META{MemoHeight} = {

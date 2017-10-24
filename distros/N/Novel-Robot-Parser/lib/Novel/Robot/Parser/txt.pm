@@ -1,4 +1,4 @@
-# ABSTRACT: 解析txt
+# ABSTRACT: txt parser
 =pod
 
 =encoding utf8
@@ -65,7 +65,7 @@ sub get_default_chapter_regex {
     my $r_num =
 qr/[０１２３４５６７８９零○〇一二三四五六七八九十百千\d]+/;
     my $r_split = qr/[上中下]/;
-	my $r_not_chap_head = qr/楔子|尾声|内容简介|正文|番外|终章|序言|后记|文案/;
+	my $r_not_chap_head = qr/引子|楔子|尾声|内容简介|正文|番外|终章|序言|后记|文案/;
 
     #第x章，卷x，第x章(大结局)，尾声x
     my $r_head = qr/(卷|第|$r_not_chap_head)?/;

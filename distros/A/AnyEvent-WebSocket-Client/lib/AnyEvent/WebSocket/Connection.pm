@@ -12,7 +12,7 @@ use PerlX::Maybe qw( maybe provided );
 use Carp ();
 
 # ABSTRACT: WebSocket connection for AnyEvent
-our $VERSION = '0.41'; # VERSION
+our $VERSION = '0.43'; # VERSION
 
 
 has handle => (
@@ -184,7 +184,12 @@ sub _process_message
   {
     $_->($self, $received_message) for @{ $self->_next_message_cb };
     @{ $self->_next_message_cb } = ();
-    $_->($self, $received_message) for @{ $self->_each_message_cb };
+
+    # make a copy in case one of the callbacks get
+    # unregistered in the middle of the loop
+    my @callbacks = @{ $self->_each_message_cb };
+    $_->($self, $received_message, $self->_cancel_for(each_message => $_) )
+        for @callbacks;
   }
   elsif($received_message->is_close)
   {
@@ -234,6 +239,19 @@ sub send
 }
 
 
+sub _cancel_for
+{
+  my( $self, $event, $handler ) = @_;
+
+  my $handler_id = Scalar::Util::refaddr($handler);
+
+  return sub {
+    my $accessor = "_${event}_cb";
+    @{ $self->$accessor } = grep { Scalar::Util::refaddr($_) != $handler_id } 
+                            @{ $self->$accessor };
+  };
+}
+
 sub on
 {
   my($self, $event, $cb) = @_;
@@ -258,7 +276,8 @@ sub on
   {
     Carp::croak "unrecongized event: $event";
   }
-  $self;
+
+  return $self->_cancel_for($event,$cb);
 }
 
 
@@ -308,7 +327,7 @@ AnyEvent::WebSocket::Connection - WebSocket connection for AnyEvent
 
 =head1 VERSION
 
-version 0.41
+version 0.43
 
 =head1 SYNOPSIS
 
@@ -411,11 +430,20 @@ Register a callback to a particular event.
 For each event C<$connection> is the L<AnyEvent::WebSocket::Connection> and
 and C<$message> is an L<AnyEvent::WebSocket::Message> (if available).
 
+Returns a coderef that unregisters the callback when invoked.
+
+ my $cancel = $connection->on( each_message => sub { ...  });
+ 
+ # later on...
+ $cancel->();
+
 =head3 each_message
 
- $cb->($connection, $message)
+ $cb->($connection, $message, $unregister)
 
-Called each time a message is received from the WebSocket.
+Called each time a message is received from the WebSocket. 
+C<$unregister> is a coderef that removes this callback from
+the active listeners when invoked.
 
 =head3 next_message
 
@@ -495,11 +523,13 @@ Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
 
 Contributors:
 
-Toshio Ito
+Toshio Ito (debug-ito, TOSHIOITO)
 
-José Joaquín Atria
+José Joaquín Atria (JJATRIA)
 
-Kivanc Yazan
+Kivanc Yazan (KYZN)
+
+Yanick Champoux (YANICK)
 
 =head1 COPYRIGHT AND LICENSE
 

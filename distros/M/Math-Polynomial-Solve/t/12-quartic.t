@@ -1,5 +1,5 @@
 use 5.010001;
-use Test::More tests => 14;	# Twice the number of scalar @case.
+use Test::More tests => 7;
 
 use Math::Complex;
 use Math::Polynomial::Solve qw(quartic_roots ascending_order);
@@ -11,35 +11,19 @@ my($eq, $ne) = generate_relational(2.5e-7);
 
 my @case = (
 	[1, 4, 6, 4, 1],
-	[1, 0, 0, 0, -1],
+	[-1, 0, 0, 0, 1],
 	[1, 0, 0, 0, 1],
-	[1, -10, 35, -50, 24],
-	[1, 6, -5, -10, -3],
-	[1, 6, 7, -7, -12],
-	[1, 6, -1, 4,  2],
+	[24, -50, 35, -10, 1],
+	[-3, -10, -5, 6, 1],
+	[-12, -7, 7, 6, 1],
+	[2, 4, -1, 6, 1],
 );
-
-ascending_order(0);
-
-foreach (@case)
-{
-	my @coef = @$_;
-	my @x = quartic_roots(@coef);
-	my @y = pl_evaluate([reverse @coef], @x);
-
-	my @badvals = grep {&$ne($_, 0)} @y;
-
-	ok(scalar @badvals == 0,
-		"   [ " . join(", ", @coef) . " ] descending order," .
-		" roots: [" . join(", ", @x) . "]"
-	);
-}
 
 ascending_order(1);
 
 foreach (@case)
 {
-	my @coef = reverse @$_;
+	my @coef = @$_;
 	my @x = quartic_roots(@coef);
 	my @y = pl_evaluate([@coef], @x);
 

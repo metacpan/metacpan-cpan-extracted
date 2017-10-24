@@ -1,0 +1,114 @@
+#!/usr/bin/env perl
+use warnings;
+use strict;
+
+use Term::Colormap qw( print_colored print_colored_text);
+use Scalar::Util qw(looks_like_number);
+use Term::ReadKey; # GetTerminalSize
+
+# Print out all colors with their numbers
+my @colors = @ARGV;
+usage()
+    if ( grep { not looks_like_number($_) or $_ < 0 or 255 < $_ } @colors );
+
+my ($screen_cols, $screen_rows, undef, undef) = GetTerminalSize();
+
+main();
+
+sub main {
+
+    print_colors_by_code( 0 .. 255 );
+
+    print_rgb();
+    print_gbr();
+    print_brg();
+
+    if (@colors) {
+        print_colors_by_code( @colors );
+        print_color_ramp( @colors );
+    }
+}
+
+sub print_rgb {
+    print_pallette('red', 'green', 'blue');
+}
+
+sub print_gbr {
+    print_pallette('green', 'blue', 'red');
+}
+
+sub print_brg {
+    print_pallette('blue', 'red', 'green');
+}
+
+sub print_pallette {
+    my (@color_order) = @_;
+
+    print "\n";
+    my $n = 1;
+    my ($color_map) = { map { $_ => $n++ } @color_order };
+    my @cube = ( 0 .. 5 );
+
+    for my $c1 ( @cube ) {
+        for my $c2 ( @cube ) {
+            for my $c3 ( @cube ) {
+                my $red   = eval( '$c' . $color_map->{red}   );
+                my $green = eval( '$c' . $color_map->{green} );
+                my $blue  = eval( '$c' . $color_map->{blue}  );
+                my $color = 16 + ($red * 36) + ($green * 6) + $blue;
+                my $txt = sprintf("% 4d ",$color);
+                print_colored( $color, $txt );
+                print ' ';
+            }
+            print ' ';
+            for my $c3 ( @cube ) {
+                my $red   = eval( '$c' . $color_map->{red}   );
+                my $green = eval( '$c' . $color_map->{green} );
+                my $blue  = eval( '$c' . $color_map->{blue}  );
+                my $color = 16 + ($red * 36) + ($green * 6) + $blue;
+                my $txt = sprintf("% 4d ",$color);
+                print_colored_text( $color, $txt );
+                print ' ';
+            }
+            print "\n";
+        }
+    }
+}
+
+sub print_colors_by_code {
+    my (@colors) = @_;
+
+    my $n = int( $screen_cols / 6 );
+
+    print "\n";;
+    for my $method ( \&print_colored, \&print_colored_text ) {
+        for my $color ( @colors ) {
+            my $txt = sprintf("% 4d ",$color);
+            $method->( $color, $txt );
+            print ' ';
+            if ($color % $n == $n-1) {
+                print "\n";
+            }
+        }
+        print "\n";
+    }
+}
+
+sub print_color_ramp {
+    my (@colors) = @_;
+    my $n = int( $screen_cols / 6 );
+
+    print "\n";;
+    for my $color ( @colors ) {
+        print_colored($color, '  ');
+    }
+    print "\n";
+}
+
+sub usage {
+    print "Print out all colors with their numbers.\n";
+    print "Pass in an optional list of colors to see how they fit together.\n";
+    print "\n";
+    print "$0 [ 2 3 9 7 ]\n";
+    exit 0;
+}

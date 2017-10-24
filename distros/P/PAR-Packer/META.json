@@ -61,7 +61,7 @@
       },
       "test" : {
          "requires" : {
-            "IPC::Run3" : "0",
+            "IPC::Run3" : "0.048",
             "Test::More" : "0"
          }
       }
@@ -75,6 +75,6 @@
       },
       "x_MailingList" : "par@perl.org"
    },
-   "version" : "1.039",
+   "version" : "1.040",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

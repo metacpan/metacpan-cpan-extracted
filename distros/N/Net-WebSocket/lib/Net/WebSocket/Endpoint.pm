@@ -62,41 +62,43 @@ sub get_next_message {
 
     $self->_verify_not_closed();
 
-    if ( my $frame = $self->{'_parser'}->get_next_frame() ) {
-        if ($frame->is_control_frame()) {
-            $self->_handle_control_frame($frame);
+    my $_msg_frame;
+
+    if ( $_msg_frame = $self->{'_parser'}->get_next_frame() ) {
+        if ($_msg_frame->is_control_frame()) {
+            $self->_handle_control_frame($_msg_frame);
         }
         else {
             if ($self->{'_on_data_frame'}) {
-                $self->{'_on_data_frame'}->($frame);
+                $self->{'_on_data_frame'}->($_msg_frame);
             }
 
             #Failure cases:
             #   - continuation without prior fragment
             #   - non-continuation within fragment
 
-            if ( $frame->get_type() eq 'continuation' ) {
+            if ( $_msg_frame->get_type() eq 'continuation' ) {
                 if ( !@{ $self->{'_fragments'} } ) {
-                    $self->_got_continuation_during_non_fragment($frame);
+                    $self->_got_continuation_during_non_fragment($_msg_frame);
                 }
             }
             elsif ( @{ $self->{'_fragments'} } ) {
-                $self->_got_non_continuation_during_fragment($frame);
+                $self->_got_non_continuation_during_fragment($_msg_frame);
             }
 
-            if ($frame->get_fin()) {
+            if ($_msg_frame->get_fin()) {
                 return Net::WebSocket::Message::create_from_frames(
                     splice( @{ $self->{'_fragments'} } ),
-                    $frame,
+                    $_msg_frame,
                 );
             }
             else {
-                push @{ $self->{'_fragments'} }, $frame;
+                push @{ $self->{'_fragments'} }, $_msg_frame;
             }
         }
     }
 
-    return undef;
+    return defined($_msg_frame) ? q<> : undef;
 }
 
 sub check_heartbeat {
@@ -105,14 +107,10 @@ sub check_heartbeat {
     my $ping_counter = $self->{'_ping_store'}->get_count();
 
     if ($ping_counter == $self->{'_max_pings'}) {
-        my $close = Net::WebSocket::Frame::close->new(
-            $self->FRAME_MASK_ARGS(),
+        $self->close(
             code => 'POLICY_VIOLATION',
+            reason => "Unanswered ping(s): $ping_counter",
         );
-
-        $self->_write_frame($close);
-
-        $self->{'_closed'} = 1;
     }
 
     my $ping_message = $self->{'_ping_store'}->add();
@@ -127,7 +125,7 @@ sub check_heartbeat {
     return;
 }
 
-sub shutdown {
+sub close {
     my ($self, %opts) = @_;
 
     my $close = Net::WebSocket::Frame::close->new(
@@ -136,16 +134,50 @@ sub shutdown {
         reason => $opts{'reason'},
     );
 
-    $self->_write_frame($close);
+    return $self->_close_with_frame($close);
+}
 
-    $self->{'_closed'} = 1;
+sub _close_with_frame {
+    my ($self, $close_frame) = @_;
+
+    $self->_write_frame($close_frame);
+
+    $self->{'_sent_close_frame'} = $close_frame;
+
+    return $self;
+}
+
+*shutdown = *close;
+
+sub is_closed {
+    my ($self) = @_;
+    return $self->{'_sent_close_frame'} ? 1 : 0;
+}
+
+sub received_close_frame {
+    my ($self) = @_;
+    return $self->{'_received_close_frame'};
+}
+
+sub sent_close_frame {
+    my ($self) = @_;
+    return $self->{'_sent_close_frame'};
+}
+
+sub die_on_close {
+    my ($self) = @_;
+
+    $self->{'_no_die_on_close'} = 0;
 
     return;
 }
 
-sub is_closed {
+sub do_not_die_on_close {
     my ($self) = @_;
-    return $self->{'_closed'} ? 1 : 0;
+
+    $self->{'_no_die_on_close'} = 1;
+
+    return;
 }
 
 #----------------------------------------------------------------------
@@ -214,7 +246,7 @@ sub _got_non_continuation_during_fragment {
 sub _verify_not_closed {
     my ($self) = @_;
 
-    die "Already closed!" if $self->{'_closed'};
+    die Net::WebSocket::X->create('EndpointAlreadyClosed') if $self->{'_closed'};
 
     return;
 }
@@ -222,25 +254,23 @@ sub _verify_not_closed {
 sub _handle_control_frame {
     my ($self, $frame) = @_;
 
-    my ($resp_frame, $error, $ignore_sigpipe);
-
     my $type = $frame->get_type();
 
     if ($type eq 'close') {
-        $self->{'_received_close'} = 1;
-        $self->{'_closed'} = 1;
+        if (!$self->{'_sent_close_frame'}) {
+            $self->_close_with_frame($frame);
+        }
 
-        my ($code, $reason) = $frame->get_code_and_reason();
+        if ($self->{'_received_close_frame'}) {
+            warn sprintf('Extra close frame received! (%v.02x)', $frame->to_bytes());
+        }
+        else {
+            $self->{'_received_close_frame'} = $frame;
+        }
 
-        $resp_frame = Net::WebSocket::Frame::close->new(
-            code => $code,
-            reason => $reason,
-            $self->FRAME_MASK_ARGS(),
-        );
-
-        $self->_write_frame( $resp_frame );
-
-        die Net::WebSocket::X->create('ReceivedClose', $frame);
+        if (!$self->{'_no_die_on_close'}) {
+            die Net::WebSocket::X->create('ReceivedClose', $frame);
+        }
     }
     elsif ( my $handler_cr = $self->can("on_$type") ) {
         $handler_cr->( $self, $frame );
@@ -257,9 +287,9 @@ sub _handle_control_frame {
 }
 
 sub _write_frame {
-    my ($self, $frame, $todo_cr) = @_;
+    my ($self, $frame) = @_;
 
-    return $self->{'_out'}->write($frame->to_bytes(), $todo_cr);
+    return $self->{'_out'}->write($frame->to_bytes());
 }
 
 1;

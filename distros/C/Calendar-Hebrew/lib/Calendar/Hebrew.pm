@@ -1,6 +1,6 @@
 package Calendar::Hebrew;
 
-$Calendar::Hebrew::VERSION   = '0.04';
+$Calendar::Hebrew::VERSION   = '0.05';
 $Calendar::Hebrew::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Calendar::Hebrew - Interface to Hebrew Calendar.
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 

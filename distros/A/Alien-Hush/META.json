@@ -1,0 +1,52 @@
+{
+   "abstract" : "Easy installation of the Hush cryptocoin full node daemon",
+   "author" : [
+      "Duke Leto <duke@leto.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Alien-Hush",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Alien::Base::ModuleBuild" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Autotools" : "0",
+            "Alien::Base" : "1.25",
+            "parent" : "0",
+            "perl" : "v5.8.1"
+         }
+      }
+   },
+   "provides" : {
+      "Alien::Hush" : {
+         "file" : "lib/Alien/Hush.pm",
+         "version" : "0.8888"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/leto/Alien-Hush/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/leto/Alien-Hush"
+      }
+   },
+   "version" : "0.8889",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

@@ -40,7 +40,7 @@ function display_help {
     echo "the App::Dochazka::WWW server"
     echo
     echo "It takes the following command-line options:"
-    echo "  -h --help       Displays this text"
+    echo "  -h --help      Displays this text"
     echo "  -v --version   Display App::Dochazka::WWW version number"
     echo
     echo "dochazka-www is a wrapper for the mfile-www script from the"
@@ -69,7 +69,7 @@ function demo_echo {
 
 # process command-line options
 
-TEMP=$(getopt -o e:hv --long echo:,help,version -n 'dochazka-rest' -- "$@")
+TEMP=$(getopt -o e:hv --long echo:,help,version -n 'dochazka-www' -- "$@")
 
 if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
 
@@ -91,4 +91,4 @@ if [[ $@ ]] ; then
     for arg do echo '--> '"\`$arg'" ; done
 fi
 
-mfile-www --ddist=App-Dochazka-WWW --sitedir=/etc/dochazka-www -- "$@"
+mfile-www --ddist=App-Dochazka-WWW --sitedir=/etc/dochazka-www "$@"

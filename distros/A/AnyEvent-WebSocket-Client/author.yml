@@ -12,6 +12,14 @@ pod_spelling_system:
     - subprotocols
     - Kivanc
     - Yazan
+    - unregisters
+    - Champoux
+    - JJATRIA
+    - KYZN
+    - TOSHIOITO
+    - YANICK
+    - Yanick
+    - ito
 
 pod_coverage:
   # format is "Class#method" or "Class", regex allowed

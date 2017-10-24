@@ -70,7 +70,7 @@ define ([
 
             opts = lib.objectify(opts);
             opts['inputId'] = ('inputId' in opts) ? opts.inputId : null;
-            opts['resultLine'] = ('resultLine' in opts) ? opts.resultLine : null;
+            opts['resultLine'] = ('resultLine' in opts) ? opts.resultLine : "&nbsp";
             opts['_start'] = ('_start' in opts) ? opts.start : true;
             opts['_restart'] = ('_restart' in opts) ? opts._restart : false;
             opts['_start'] = opts._restart ? true : opts._start;
@@ -251,23 +251,23 @@ define ([
 
         // unwind stack until given target is reached
         // optional object to pass to start()
-        unwindToTarget = function (tname, obj) {
+        unwindToTarget = function (tname, newObj, opts) {
+            var i, tgt;
             console.log("Unwinding the stack to target " + tname);
-            var tgt;
-            for (var i = _stack.length; i > 0; i--) {
+            for (i = _stack.length; i > 0; i -= 1) {
                 tgt = _stack[i - 1].target;
                 if (tgt.name === tname) {
                    break;
                 }
-                popWithoutStart();
+                popWithoutStart(newObj, opts);
             }
-            tgt.start(obj);
+            tgt.start(newObj, opts);
         },
         
         unwindToFlag = function () {
             console.log("Unwinding the stack to flag");
-            var flag;
-            for (var i = _stack.length; i > 0; i--) {
+            var flag, i;
+            for (i = _stack.length; i > 0; i -= 1) {
                 flag = _stack[i - 1].flag;
                 if (flag) {
                    break;
@@ -277,10 +277,23 @@ define ([
             _stack[_stack.length - 1].target.start();
         },
 
+        unwindToType = function (targetType) {
+            var i, tgt;
+            console.log("Unwinding stack to nearest target of type " + targetType);
+            for (i = _stack.length; i > 0; i -= 1) {
+                tgt = _stack[i - 1].target;
+                if (tgt.type === targetType) {
+                   break;
+                }
+                popWithoutStart();
+            }
+            tgt.start();
+        },
+
         // grep stack for a target name (exact match)
         grep = function (tname) {
-            var retval = false;
-            for (var i=0; i<_stack.length; i++) {
+            var i, retval = false;
+            for (i = 0; i < _stack.length; i += 1) {
                 if (_stack[i].target.name === tname) {
                     return true;
                 }
@@ -315,7 +328,8 @@ define ([
         "unsetTarget": unsetTarget,
         "unsetXTarget": unsetXTarget,
         "unwindToFlag": unwindToFlag,
-        "unwindToTarget": unwindToTarget
+        "unwindToTarget": unwindToTarget,
+        "unwindToType": unwindToType,
     };
 
 });

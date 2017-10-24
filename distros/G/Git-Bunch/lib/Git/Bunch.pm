@@ -1,7 +1,7 @@
 package Git::Bunch;
 
-our $DATE = '2017-06-21'; # DATE
-our $VERSION = '0.61'; # VERSION
+our $DATE = '2017-10-19'; # DATE
+our $VERSION = '0.620'; # VERSION
 
 use 5.010001;
 use strict;
@@ -897,16 +897,11 @@ sub sync_bunch {
 
             my $prog;
             my @extra_opts;
-            if ($args{skip_mtime_check}) {
+            if ($args{skip_mtime_check} || $args{-dry_run}) {
                 $prog = "rsync";
             } else {
                 $prog = "rsync-new2old";
                 push @extra_opts, "--create-target-if-not-exists";
-            }
-
-            if ($args{-dry_run}) {
-                log_warn("[DRY RUN] Updating non-git file/dir '%s'", $file_or_dir);
-                next ENTRY;
             }
 
             # just some random unique string so we can detect whether any
@@ -915,11 +910,24 @@ sub sync_bunch {
             my $uuid = UUID::Random::generate();
             my $_v = log_is_debug() ? "-v" : "";
             my $del = $args{rsync_del} ? "--del" : "";
-            $cmd = "$prog ".join(" ", @extra_opts)." --log-format=$uuid -${_a}z $_v $del --force ".
-                shell_quote("$source/$file_or_dir")." .";
-            my ($stdout, @result) = Capture::Tiny::capture_stdout(
-                sub { system($cmd) });
-            if ($result[0]) {
+            push @extra_opts, "--log-format=$uuid" unless $args{-dry_run};
+            $cmd = join(
+                "",
+                $prog,
+                $args{-dry_run} ? " --dry-run" : "",
+                @extra_opts ? " " . join(" ", @extra_opts) : "",
+                " -${_a}z $_v $del",
+                " --force",
+                " " . shell_quote("$source/$file_or_dir"),
+                " .",
+            );
+            my ($stdout, @result) = log_is_debug() ?
+                Capture::Tiny::tee_stdout    (sub { system($cmd) }) :
+                Capture::Tiny::capture_stdout(sub { system($cmd) });
+            if ($args{-dry_run}) {
+                $res{$file_or_dir} = [304, "dry-run"];
+                next ENTRY;
+            } elsif ($result[0]) {
                 log_warn("Rsync failed, please check: $result[0]");
                 $res{$file_or_dir} = [500, "rsync failed: $result[0]"];
             } else {
@@ -1110,7 +1118,7 @@ Git::Bunch - Manage gitbunch directory (directory which contain git repos)
 
 =head1 VERSION
 
-This document describes version 0.61 of Git::Bunch (from Perl distribution Git-Bunch), released on 2017-06-21.
+This document describes version 0.620 of Git::Bunch (from Perl distribution Git-Bunch), released on 2017-10-19.
 
 =head1 SYNOPSIS
 

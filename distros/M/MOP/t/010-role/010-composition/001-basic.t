@@ -7,6 +7,7 @@ use Test::More;
 use Test::Fatal;
 
 BEGIN {
+    use_ok('MOP');
     use_ok('MOP::Role');
 }
 
@@ -36,11 +37,9 @@ TODO:
     our @DOES; BEGIN { @DOES = ('Foo', 'Bar') }
 
     BEGIN {
-        MOP::Internal::Util::APPLY_ROLES(
-            MOP::Role->new( name => __PACKAGE__ ),
-            \@DOES,
-            to => 'role'
-        )
+        MOP::Util::defer_until_UNITCHECK(sub {
+            MOP::Util::compose_roles( MOP::Util::get_meta( __PACKAGE__ ) )
+        })
     }
 }
 

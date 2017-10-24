@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.006;
+use 5.010;
 
 use ExtUtils::MakeMaker;
 
@@ -14,7 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Business-OnlinePayment-Litle",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.006",
+  "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Business::OnlinePayment::Litle",
   "PREREQ_PM" => {
     "Business::CreditCard" => 0,
@@ -47,7 +47,7 @@ my %WriteMakefileArgs = (
     "Test::Pod" => 0,
     "Test::Pod::Coverage" => 0
   },
-  "VERSION" => "0.958",
+  "VERSION" => "0.959",
   "test" => {
     "TESTS" => "t/*.t"
   }

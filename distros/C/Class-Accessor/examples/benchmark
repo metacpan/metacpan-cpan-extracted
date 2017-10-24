@@ -1,5 +1,10 @@
 #!/usr/bin/perl -w
 
+BEGIN {
+    $ENV{MOO_XS_DISABLE} = "no cheating";
+    $ENV{MOUSE_PUREPERL} = "no cheating";
+}
+
 package Bench::Base;
 
 sub new { 
@@ -30,23 +35,31 @@ package Bench::Mouse;
 use Mouse;
 has test => (is => "rw");
 
+package Bench::Moo;
+use Moo;
+has test => (is => "rw");
+
 package main;
 use strict;
 use Benchmark 'cmpthese';
+use Test::More tests => 12;
 
 my $tmp;
 my $direct = Bench::Direct->new({ test => 23 });
 my %accessor = ( Direct => sub { $tmp = $direct->{test}; } );
 my %mutator = ( Direct => sub { $direct->{test} = 42; } );
-for my $p (qw/Normal Fast Faster Moose Mouse/) {
+for my $p (qw/Normal Fast Faster Moose Mouse Moo/) {
     my $o = "Bench::$p"->new({ test => 23 });
+    is $o->test, 23, "$p init";
+    $o->test(24);
+    is $o->test, 24, "$p set";
     $accessor{$p} = sub { $tmp = $o->test; };
     $mutator{$p}  = sub { $o->test(42); };
 }
 
 print "accessors:\n";
-cmpthese( -10, \%accessor );
+cmpthese( -1, \%accessor );
 print "\n";
 print "mutators:\n";
-cmpthese( -10, \%mutator );
+cmpthese( -1, \%mutator );
 

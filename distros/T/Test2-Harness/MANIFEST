@@ -8,7 +8,6 @@ Makefile.PL
 POD_TEMPLATE.POD
 README
 README.md
-TODO
 appveyor.yml
 cpanfile
 dist.ini
@@ -85,6 +84,7 @@ t/App/Yath/Command/spawn.t
 t/App/Yath/Command/start.t
 t/App/Yath/Command/stop.t
 t/App/Yath/Command/test.t
+t/App/Yath/Command/times.t
 t/App/Yath/Command/watch.t
 t/App/Yath/Command/which.t
 t/App/Yath/Plugin.t
@@ -101,6 +101,7 @@ t/Test2/Harness/Feeder/Run.t
 t/Test2/Harness/Job.t
 t/Test2/Harness/Job/Dir.t
 t/Test2/Harness/Job/Runner.t
+t/Test2/Harness/Job/Runner/Dummy.t
 t/Test2/Harness/Job/Runner/Fork.t
 t/Test2/Harness/Job/Runner/Open3.t
 t/Test2/Harness/Logger.t
@@ -114,6 +115,11 @@ t/Test2/Harness/Run/Dir.t
 t/Test2/Harness/Run/Queue.t
 t/Test2/Harness/Run/Runner.t
 t/Test2/Harness/Run/Runner/Persist.t
+t/Test2/Harness/Run/Runner/ProcMan.t
+t/Test2/Harness/Run/Runner/ProcMan/Persist.t
+t/Test2/Harness/Run/Runner/ProcMan/Scheduler.t
+t/Test2/Harness/Run/Runner/ProcMan/Scheduler/Fair.t
+t/Test2/Harness/Run/Runner/ProcMan/Scheduler/Finite.t
 t/Test2/Harness/Util.t
 t/Test2/Harness/Util/Debug.t
 t/Test2/Harness/Util/DepTracer.t

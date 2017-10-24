@@ -12,7 +12,12 @@ use constant OPCODE => {
     pong => 10,
 };
 
-use constant PROTOCOL_VERSION => 13;
+use constant {
+    PROTOCOL_VERSION => 13,
+    REQUIRED_HTTP_METHOD => 'GET',
+    REQUIRED_HTTP_STATUS => 101,
+    REQUIRED_REQUEST_PROTOCOL => 'HTTP/1.1',
+};
 
 #These names are taken from:
 #https://msdn.microsoft.com/en-us/library/windows/desktop/hh449350(v=vs.85).aspx
@@ -30,6 +35,10 @@ use constant STATUS => {
     POLICY_VIOLATION       => 1008,
     MESSAGE_TOO_BIG        => 1009,
     UNSUPPORTED_EXTENSIONS => 1010,
+
+    #Post-RFC, “server error” was changed to “internal error”.
+    #We accept both names; code-to-name conversion always returns this one.
+    INTERNAL_ERROR         => 1011,
     SERVER_ERROR           => 1011,
 
     #RFC says not to use this one,
@@ -50,7 +59,11 @@ sub status_name_to_code {
 sub status_code_to_name {
     my ($code) = @_;
 
-    %status_code_name = reverse %{ STATUS() } if !%status_code_name;
+    if (!%status_code_name) {
+        my %copy = %{ STATUS() };
+        delete $copy{'SERVER_ERROR'};
+        %status_code_name = reverse %copy;
+    }
 
     return $status_code_name{$code};
 }
