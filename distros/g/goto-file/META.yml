@@ -20,5 +20,5 @@ requires:
 resources:
   bugtracker: https://github.com/exodist/goto-file/issues
   repository: https://github.com/exodist/goto-file.git
-version: '0.004'
+version: '0.005'
 x_serialization_backend: 'YAML::Tiny version 1.70'

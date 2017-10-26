@@ -5,7 +5,10 @@
 
 package Syntax::Highlight::Engine::Kate::All;
 
-our $VERSION = '0.10';
+our $VERSION = '0.12';
+
+use strict;
+use warnings;
 
 use Syntax::Highlight::Engine::Kate::AHDL;
 use Syntax::Highlight::Engine::Kate::ANSI_C89;

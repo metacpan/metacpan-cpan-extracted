@@ -4,10 +4,11 @@ use App::RPi::EnvUI::API;
 use Dancer2;
 use Dancer2::Plugin::Auth::Extensible;
 use Dancer2::Core::Request;
+use Data::Dumper;
 use Mock::Sub no_warnings => 1;
 use POSIX qw(tzset);
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 my $db = App::RPi::EnvUI::DB->new;
 my $api = App::RPi::EnvUI::API->new(db => $db);
@@ -15,12 +16,9 @@ my $api = App::RPi::EnvUI::API->new(db => $db);
 $ENV{TZ} = $api->_config_core('time_zone');
 tzset();
 
-my $log = $api->log()->child('webapp');
+my $log = $api->log->child('webapp');
 
-$api->_config_light();
-
-#FIXME: add set/get subs
-
+$api->_config_light;
 $api->set_light_times;
 
 #
@@ -29,10 +27,8 @@ $api->set_light_times;
 
 get '/' => sub {
         my $log = $log->child('/');
-        $log->_7("entered");
-
-        # return template 'main';
-        return template 'test';
+        $log->_5("in /home");
+        return template 'main';
     };
 
 # fetch graph code
@@ -55,7 +51,6 @@ post '/login' => sub {
     };
 
 any '/logout' => sub {
-#        cookie session expires => '-1 day';
         app->destroy_session;
         redirect '/';
     };
@@ -68,9 +63,15 @@ get '/logged_in' => sub {
     };
 
 get '/time' => sub {
-        my ($h, $m) = (localtime)[2, 1];
-        $m = "0$m" if length $m < 2;
-        return join ':', ($h, $m);
+        my ($y, $m, $d, $h, $min) = (localtime)[5, 4, 3, 2, 1];
+
+        $y += 1900;
+
+        for ($m, $d, $h, $min){
+            $_ = "0$_" if length $_ < 2;
+        }
+
+        return "$y-$m-$d $h:$min";
     };
 
 get '/stats' => sub {
@@ -79,36 +80,30 @@ get '/stats' => sub {
 
 get '/light' => sub {
         my $log = $log->child('/light');
-        $log->_7("entered");
-        return to_json $api->_config_light();
+        $log->_6("/light");
+        return to_json $api->_config_light;
     };
+
 get '/get_config/:want' => sub {
         my $want = params->{want};
-
         my $log = $log->child('/get_config');
-
         my $value = $api->_config_core($want);
-
         $log->_5("param: $want, value: $value");
-
         return $value;
     };
+
 get '/get_control/:want' => sub {
         my $want = params->{want};
-
         my $log = $log->child('/get_control');
-
         my $value = $api->_config_control($want);
-
         $log->_5("param: $want, value: $value");
-
         return $value;
     };
 get '/get_aux/:aux' => sub {
         my $aux_id = params->{aux};
 
         my $log = $log->child('/get_aux');
-        $log->_5("fetching aux object for $aux_id");
+        $log->_7("fetching aux object for $aux_id");
 
         $api->switch($aux_id);
 
@@ -117,13 +112,16 @@ get '/get_aux/:aux' => sub {
 get '/fetch_env' => sub {
         my $log = $log->child('/fetch_env');
 
-        my $data = $api->env();
-        
-        $log->_5("temp: $data->{temp}, humidity: $data->{humidity}");
+        my $data = $api->env;
+         
+        $log->_6(
+            "temp: $data->{temp}, humidity: $data->{humidity}"
+        );
 
         return to_json {
             temp => $data->{temp},
-            humidity => $data->{humidity}
+            humidity => $data->{humidity},
+            error => $data->{error}
         };
     };
 
@@ -144,7 +142,7 @@ get '/set_aux_state/:aux/:state' => sub {
         my $aux_id = params->{aux};
         my $state = $api->_bool(params->{state});
 
-        my $log = $log->child('/set_env');
+        my $log = $log->child('/set_aux_state');
         $log->_5("aux_id: $aux_id, state: $state");
 
         $state = $api->aux_state($aux_id, $state);
@@ -161,29 +159,34 @@ get '/set_aux_state/:aux/:state' => sub {
 
 get '/set_aux_override/:aux/:override' => sub {
 
+        my $log = $log->child('/set_aux_override');
+
         if (
             (request->address ne '127.0.0.1' && ! session 'logged_in_user')
             || $ENV{UNIT_TEST}){
+            $log->_1("attempted call of a 'set' operation while not logged in");
             return to_json {
                     error => 'unauthorized request. You must be logged in'
             };
         }
-        
+
         my $aux_id = params->{aux};
         my $override = $api->_bool(params->{override});
 
-        my $log = $log->child('/set_aux_override');
-        $log->_5("aux_id: $aux_id, override $override");
+        $log->_5("setting override for aux id: $aux_id");
 
         $override = $api->aux_override($aux_id, $override);
 
-        $log->_6("$aux_id updated override $override");
+        $log->_5("current override status for aux id $aux_id is $override");
+
+        if ($override == -1){
+            $log->_5("override for aux id $aux_id is currently disabled");
+        }
 
         return to_json {
             aux => $aux_id,
             override => $override,
         };
-
     };
 
 true;
@@ -194,10 +197,6 @@ __END__
 
 App::RPi::EnvUI - One-page asynchronous grow room environment control web
 application
-
-=for html
-<a href="http://travis-ci.org/stevieb9/app-rpi-envui"><img src="https://secure.travis-ci.org/stevieb9/app-rpi-envui.png"/></a>
-<a href='https://coveralls.io/github/stevieb9/app-rpi-envui?branch=master'><img src='https://coveralls.io/repos/stevieb9/app-rpi-envui/badge.svg?branch=master&service=github' alt='Coverage Status' /></a>
 
 =head1 SYNOPSIS
 
@@ -210,7 +209,7 @@ Now direct your browser at your Pi, on port 3000:
 
 =head1 DESCRIPTION
 
-*** This is trial software until v1.00 is released. It's still a constant work
+*** This is beta software until v1.00 is released. It's still a constant work
 in progress, so the docs are awful, but I am trying to improve them as I learn
 the things I need to know to get where I want to be.***
 
@@ -270,6 +269,9 @@ duties. The third is set up to manage a single grow lamp. The remaining five
 auxillaries can be set and connected to whatever you please, but these channels
 do not have any logic behind them yet; they're just on or off.
 
+Note that you must be logged in to toggle the connected devices. The default
+username is C<admin> and the default password is C<admin>.
+
 =head1 WEB UI
 
 The UI and infrastructure behind it is in its infancy. There are vast changes
@@ -290,6 +292,9 @@ that I'll be making. Currently I have:
     - authentication is required for any routes that set state of any kind
     - everything is stored in a DB backend
 
+Note that you must be logged in to toggle the connected devices. The default
+username is C<admin> and the default password is C<admin>.
+
 =head1 HOWTO
 
 I'm not going into detail here yet. Look at the
@@ -298,6 +303,15 @@ file.
 
 Map the C<pin> of each aux in the configuration file to a GPIO pin. Start up the
 app per L</HOW IT WORKS>. Go to the webpage in an HTML5-capable browser.
+
+I start the application by doing the following. It'll restart the application
+properly after every startup:
+
+    sudo crontab -e
+    
+    # add a line similar to the following:
+
+    @reboot  cd /home/pi/envui && /home/pi/perl5/perlbrew/perls/perl-5.26.0/bin/plackup bin/app.pl
 
 =head1 ROUTES
 
@@ -425,7 +439,7 @@ Steve Bertrand, E<lt>steveb@cpan.org<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016 Steve Bertrand.
+Copyright 2017 Steve Bertrand.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

@@ -1,5 +1,12 @@
 Revision history for Perl extension Win32::Console::ANSI
 
+1.11 2017/10/24
+  - Fixed some tests that failed on Windows 10. (RT#118585)
+    Thanks to SMYLERS and Roy Ivy III for the patch.
+  - Added support for bright (or high-intensity) foreground and background 
+    codes (\e[90m .. \e[97m and \e[100m .. \e[107m, respectively).
+    Many thanks to Roy Ivy III for the patch.
+
 1.10 2015/09/06
   - added \e[39m and \e[49m esc sequences for resetting foreground and 
     background colors to default (RT#106872).

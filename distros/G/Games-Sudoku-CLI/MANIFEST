@@ -1,0 +1,10 @@
+bin/sudoku.pl
+Changes
+lib/Games/Sudoku/CLI.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/files/a.txt
+t/sudoku.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

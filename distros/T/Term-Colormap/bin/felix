@@ -71,7 +71,7 @@ sub usage {
     print "\n";
     print "Upload an image and convert it to color html\n";
     print "Right click on the html text of the image and go to View Source\n";
-    print "Save the source as an html file which gets used as an imput for this script\n";
+    print "Save the source as an html file which gets used as an input for this script\n";
     print "\n";
     print "Output can be saved as a text file and viewed with 'cat'\n";
     exit 0;

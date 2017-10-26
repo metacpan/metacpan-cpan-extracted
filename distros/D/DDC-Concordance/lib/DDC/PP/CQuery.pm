@@ -132,6 +132,12 @@ sub new {
 }
 
 ##======================================================================
+## CQAndImplicit
+package DDC::PP::CQAndImplicit;
+use strict;
+our @ISA = qw(DDC::PP::CQAnd);
+
+##======================================================================
 ## CQOr
 package DDC::PP::CQOr;
 use strict;

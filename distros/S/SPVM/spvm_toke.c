@@ -1293,13 +1293,6 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_CODE_CASE);
                   return CASE;
                 }
-                else if (strcmp(keyword, "const") == 0) {
-                  SPVM_OP* op = SPVM_TOKE_newOP(compiler, SPVM_OP_C_CODE_DESCRIPTOR);
-                  op->code = SPVM_DESCRIPTOR_C_CODE_CONST;
-                  yylvalp->opval = op;
-                  
-                  return DESCRIPTOR;
-                }
                 else if (strcmp(keyword, "croak") == 0) {
                   yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_CODE_CROAK);
                   return CROAK;

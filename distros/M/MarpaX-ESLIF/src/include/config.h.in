@@ -28,6 +28,6 @@
 #include <stddef.h>
 #endif
 
-typedef @MARPSESLIF_UINT32_T@ marpaESLIF_uint32_t;
+typedef @MARPAESLIF_UINT32_T@ marpaESLIF_uint32_t;
 
 #endif /* MARPAESLIF_CONFIG_H */

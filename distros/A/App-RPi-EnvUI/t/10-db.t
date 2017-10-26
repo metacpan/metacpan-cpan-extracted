@@ -244,6 +244,20 @@ my $api = App::RPi::EnvUI::API->new(
     is $user->{user}, 'admin', "...and {user} is the username";
 }
 
+{ # delete
+
+    $db->insert_env(5, 5);
+    my $data = $db->env;
+
+    is defined $data->{id}, 1, "stats table has a row";
+
+    $db->delete('stats');
+
+    $data = $db->env;
+
+    is defined $data->{id}, '', "stats table is empty after delete()";
+}
+
 unconfig();
 #db_remove();
 done_testing();

@@ -8,7 +8,7 @@ use AutoLoader;
 use Exporter;
 
 our @ISA = qw(Exporter);
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 require XSLoader;
 XSLoader::load('DDC::XS', $VERSION);

@@ -6,7 +6,7 @@
 ##    Author: Bryan Jurish <moocow@cpan.org>
 ##
 ## Description: Yapp parser specification for DDC queries
-##  + last updated for ddc v2.1.1
+##  + last updated for ddc v2.1.5
 ##
 ################################################################
 
@@ -357,8 +357,8 @@ qc_boolean:
 ##-------------------------------------------------------------
 ## qc_concat: query clause: implicit logical conjunction
 qc_concat:
- 	  qc_basic qc_basic	{ $_[0]->newq('CQAnd', $_[1],$_[2]) }
-	| qc_concat  qc_basic	{ $_[0]->newq('CQAnd', $_[1],$_[2]) }
+ 	  qc_basic qc_basic	{ $_[0]->newq('CQAndImplicit', $_[1],$_[2]) }
+	| qc_concat  qc_basic	{ $_[0]->newq('CQAndImplicit', $_[1],$_[2]) }
 	| '(' qc_concat ')'	{ $_[2] }
 	;
 

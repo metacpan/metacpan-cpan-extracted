@@ -643,6 +643,7 @@ share/templates/rapidapp/xhtml_document.tt
 t/01_basic.t
 t/02_rapiddbic_opts1.t
 t/03_authcore.t
+t/04_virtual_columns.t
 t/author/kwalitee.t
 t/author/pod.t
 t/author/podcoverage.t

@@ -30,4 +30,4 @@ requires:
   Test::More: '0'
 resources:
   repository: svn://svn.code.sf.net/p/ddc-concordance/code/ddc-perl-xs/
-version: '0.18'
+version: '0.19'

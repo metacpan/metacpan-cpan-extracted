@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp ();
 
-our $VERSION = "0.003";
+our $VERSION = "0.005";
 $VERSION = eval $VERSION;
 
 our @BACKENDS = (
@@ -59,6 +59,14 @@ sub can
 
     return __PACKAGE__->SUPER::can($name) unless $name eq "clone";
 
+    if ($ENV{CLONE_CHOOSE_PREFERRED_BACKEND})
+    {
+        my $favourite = $ENV{CLONE_CHOOSE_PREFERRED_BACKEND};
+        my %b         = @backends;
+        Carp::croak "$favourite not found" unless $b{$favourite};
+        @backends = ($favourite => $b{$favourite});
+    }
+
     my $fn;
     while (my ($pkg, $rout) = splice @backends, 0, 2)
     {
@@ -88,7 +96,12 @@ sub import
         if ($param =~ m/^:(.*)$/)
         {
             my $favourite = $1;
-            my %b         = @BACKENDS;
+            $ENV{CLONE_CHOOSE_PREFERRED_BACKEND}
+              and $ENV{CLONE_CHOOSE_PREFERRED_BACKEND} ne $favourite
+              and Carp::croak
+              "Environment CLONE_CHOOSE_PREFERRED_BACKEND($ENV{CLONE_CHOOSE_PREFERRED_BACKEND}) not equal to imported ($favourite)";
+
+            my %b = @BACKENDS;
             Carp::croak "$favourite not found" unless $b{$favourite};
             @BACKENDS = ($favourite => $b{$favourite});
         }
@@ -110,6 +123,13 @@ sub import
             Carp::croak "$param is not exportable by " . __PACKAGE__;
         }
     }
+}
+
+sub get_backends
+{
+    my $self     = shift;
+    my %backends = @BACKENDS;
+    return keys %backends;
 }
 
 1;
@@ -166,6 +186,9 @@ The exported implementation is resolved dynamically, which means that any
 using module can either rely on the default backend preference or choose
 a particular one.
 
+It is also possible to select a particular C<clone> backend by setting the
+environment variable CLONE_CHOOSE_PREFERRED_BACKEND to your preferred backend.
+
 This also means, an already chosen import can't be modified like
 
   use Clone::Choose qw(clone :Storable);
@@ -196,6 +219,10 @@ C<backend> tells the caller about the dynamic chosen backend:
   say Clone::Choose->backend; # Clone
 
 This method currently exists for debug purposes only.
+
+=head2 get_backends
+
+C<get_backends> returns a list of the currently supported backends.
 
 =head1 AUTHOR
 

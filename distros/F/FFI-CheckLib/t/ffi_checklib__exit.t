@@ -6,11 +6,10 @@ use Test2::Tools::NoteStderr qw( note_stderr );
 use Test::Exit;
 use FFI::CheckLib;
 
-$FFI::CheckLib::system_path =
-$FFI::CheckLib::system_path = [ 
+@$FFI::CheckLib::system_path = (
   'corpus/unix/usr/lib',
   'corpus/unix/lib',
-];
+);
 
 subtest 'check_lib_or_exit' => sub {
   

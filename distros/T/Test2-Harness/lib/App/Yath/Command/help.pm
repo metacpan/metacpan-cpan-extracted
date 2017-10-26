@@ -4,7 +4,7 @@ use warnings;
 
 use Test2::Util qw/pkg_to_file/;
 
-our $VERSION = '0.001024';
+our $VERSION = '0.001026';
 
 use parent 'App::Yath::Command';
 use Test2::Harness::Util::HashBase;
@@ -22,7 +22,11 @@ sub run {
 
     my $args = $self->{+ARGS};
 
-    return $self->command_help(shift @$args) if @$args;
+    my @list;
+    push @list => @{$args->{opts}} if $args;
+    push @list => @{$args->{list}} if $args;
+
+    return $self->command_help(shift @list) if @list;
 
     require Module::Pluggable;
     Module::Pluggable->import(search_path => ['App::Yath::Command']);

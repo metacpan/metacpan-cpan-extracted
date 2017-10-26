@@ -1,6 +1,9 @@
 #-*- Mode: ChangeLog -*-
 
-v0.18 Mon, 06 Mar 2017 13:29:14 +0100
+v0.19 Tue, 24 Oct 2017 15:04:56 +0200 moocow
+	* added support for query type DDC::XS::CQAndImplicit (requires ddc >=v2.1.5)
+
+v0.18 Mon, 06 Mar 2017 13:29:14 +0100 moocow
 	* library_version() now reports runtime ddc version; build_library_version() reports compile-time library version
 
 v0.17 Thu, 02 Mar 2017 15:02:27 +0100 moocow

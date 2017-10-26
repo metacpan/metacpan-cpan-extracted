@@ -4,7 +4,7 @@
 
 package Syntax::Highlight::Engine::Kate::Convert::ToolKit;
 
-our $VERSION = '0.10';
+our $VERSION = '0.12';
 
 use strict;
 use warnings;
@@ -1110,7 +1110,10 @@ especially for generating highlight definitions from Kate's originals.
 
 ToolKit module carries helper routines, notably conversion from native
 highlight definitions of Kate to the ones as used by
-Syntax::Highlight::Engine::Kate.
+L<Syntax::Highlight::Engine::Kate>.
 
 For convenience, such conversion process is wrapped into provided
-C<hl-kate-convert> script.
+L<hl-kate-convert> script.
+
+This module requires L<XML::Dumper> and L<XML::TokeParser> which are not listed
+as dependencies of Syntax::Highlight::Engine::Kate.

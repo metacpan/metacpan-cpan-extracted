@@ -19,11 +19,11 @@ Geo::Coder::CA - Provides a geocoding functionality using http:://geocoder.ca fo
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 SYNOPSIS
 
@@ -85,7 +85,7 @@ sub geocode {
 
 	my $uri = URI->new("https://$self->{host}/some_location");
 	$location =~ s/\s/+/g;
-	my %query_parameters = ('locate' => $location, 'json' => 1);
+	my %query_parameters = ('locate' => $location, 'json' => 1, 'strictmode' => 1);
 	$uri->query_form(%query_parameters);
 	my $url = $uri->as_string();
 
@@ -102,19 +102,19 @@ sub geocode {
 		return $rc;	# No support for list context, yet
 	}
 
-	if($location =~ /^(\w+),\+*(\w+),\+*(USA|US|United States)$/i) {
-		$query_parameters{'locate'} = "$1 County, $2, $3";
-		$uri->query_form(%query_parameters);
-		$url = $uri->as_string();
-
-		$res = $self->{ua}->get($url);
-
-		if($res->is_error()) {
-			Carp::croak("geocoder.ca API returned error: " . $res->status_line());
-			return;
-		}
-		return $json->decode($res->content());
-	}
+	# if($location =~ /^(\w+),\+*(\w+),\+*(USA|US|United States)$/i) {
+		# $query_parameters{'locate'} = "$1 County, $2, $3";
+		# $uri->query_form(%query_parameters);
+		# $url = $uri->as_string();
+# 
+		# $res = $self->{ua}->get($url);
+# 
+		# if($res->is_error()) {
+			# Carp::croak("geocoder.ca API returned error: " . $res->status_line());
+			# return;
+		# }
+		# return $json->decode($res->content());
+	# }
 	return;
 
 	# my @results = @{ $data || [] };

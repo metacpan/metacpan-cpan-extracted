@@ -1,0 +1,8 @@
+Revision history for Geo-Coder-US-Census
+
+0.02	Tue Oct 24 17:57:14 EDT 2017
+	Bump the minimum version of Net::SSLeay
+	Fix http://www.cpantesters.org/cpan/report/c5317632-b8fa-11e7-9be1-bbe64cf6c7cd
+
+0.01	Tue Oct 24 16:00:08 EDT 2017
+        First version

@@ -167,6 +167,7 @@ sub fetch {
 	    ::debug("Not fetching: Up to date $url");
 	    $::stats->{uptodate}++;
 	    delete( $state->{trying} );
+	    delete( $state->{fail} );
 	    return $state;
 	}
 	die("FAIL (image): ", $state->{fail});

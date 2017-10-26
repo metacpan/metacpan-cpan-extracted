@@ -18,7 +18,7 @@ foo=1	'foo' =1
 $l=foo=1	$l='foo' =1
 
 ##-- mantis #17708: implicit conjunction regexes
-/foo/ /bar/	/foo/ && /bar/
+/foo/ /bar/	((/foo/) (/bar/))
 
 #-- mantis #14812: numeric prefixes
 19*	'19'*

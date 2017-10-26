@@ -1570,7 +1570,7 @@ void SPVM_BYTECODE_BUILDER_build_bytecode_array(SPVM_COMPILER* compiler) {
                   }
                 }
                 else {
-                  assert(0);
+                    assert(0);
                 }
                 
                 break;

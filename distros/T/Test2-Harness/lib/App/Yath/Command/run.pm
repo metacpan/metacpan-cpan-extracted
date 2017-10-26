@@ -2,7 +2,7 @@ package App::Yath::Command::run;
 use strict;
 use warnings;
 
-our $VERSION = '0.001024';
+our $VERSION = '0.001026';
 
 use Test2::Harness::Feeder::Run;
 use Test2::Harness::Util::File::JSON;
@@ -268,6 +268,10 @@ This can be used multiple times
 use Devel::Cover to calculate test coverage
 
 This is essentially the same as combining: '--no-fork', and '-MDevel::Cover=-silent,1,+ignore,^t/,+ignore,^t2/,+ignore,^xt,+ignore,^test.pl' Devel::Cover and preload/fork do not work well together.
+
+=item --default_search t
+
+ARRAY(0x24e5468)
 
 =item --fork
 

@@ -1,5 +1,12 @@
 Revision history for MariaDB-NonBlocking
 
+0.13    2017-10-24
+        * Prevent cyclic reference keeping connections alive
+          when all other refs were gone.
+
+0.12    2017-10-24
+        * Pakket.json specfile
+
 0.11    2017-10-19
         * Respect INSTALL_BASE
         * Options to Makefile.PL for the default database

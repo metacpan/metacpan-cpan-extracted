@@ -13,7 +13,7 @@ use Carp;
 use List::MoreUtils qw/any/;
 use English qw/ -no_match_vars /;
 
-our $VERSION = version->new('0.7.4');
+our $VERSION = version->new('0.7.5');
 
 has regex => (
     is  => 'rw',
@@ -229,7 +229,7 @@ File::CodeSearch::RegexBuilder - Takes in various options and builds a regular e
 
 =head1 VERSION
 
-This documentation refers to File::CodeSearch::RegexBuilder version 0.7.4.
+This documentation refers to File::CodeSearch::RegexBuilder version 0.7.5.
 
 =head1 SYNOPSIS
 

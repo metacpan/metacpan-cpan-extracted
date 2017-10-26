@@ -1,62 +1,65 @@
 Revision history for Perl extension Syntax::Highlight::Engine::Kate.
 
-0.10 2015.08.01
-    - Documentation cleanup (Andy Jack)
+0.12  2017-10-26 MANWAR
+      - Added META.yml back to MANIFEST file.
 
+0.11  2017-10-26 MANWAR
+      - [2017-10-26]: Tidied up .gitignore, Changes and MANIFEST file.
+      - [2017-10-26]: Merge pull request #15 from kiwiroy/rt-76160
+      - [2017-01-02]: Merge pull request #14 from manwar/fix-cpants-issues
+      - [2016-10-04]: Merge pull request #13 from pauloscustodio/pscust_1
+      - [2015-10-18]: Merge pull request #12 from nichtich/master
 
-0.09 2014.06.07
-    - Require Test::Warn for testing.
-    - Support case insensitive names. RT #84982 (Jeff Fearn)
-    - Replace use of File::Slurp with Path::Tiny (Martin McGrath)
-    - Spelling RT #88156 (Debian)
-    - Better error message when plugin is missing RT #20873
+0.10  2015-08-01
+      - Documentation cleanup (Andy Jack)
 
-0.08 2013.05.27
-    - Add stub files Syntax::Highlight::Engine::Kate::BaseTest and
-      Syntax::Highlight::Engine::Kate::BaseTestchild to kick the old
-      ones out of the PAUSE index. #85463
+0.09  2014-06-07
+      - Require Test::Warn for testing.
+      - Support case insensitive names. RT #84982 (Jeff Fearn)
+      - Replace use of File::Slurp with Path::Tiny (Martin McGrath)
+      - Spelling RT #88156 (Debian)
+      - Better error message when plugin is missing RT #20873
 
-0.07 2012.09.23
-	- fixed some errors in the BibTeX-related documentation (ZENOG)
-	- revisited conversion of Kate's highlight definitions (Jan Pokorny)
-    - Added some regression tests (Ovid)
-    - Some cleanup and adding conversion script (jnpkrn)
+0.08  2013-05-27
+      - Add stub files Syntax::Highlight::Engine::Kate::BaseTest and
+        Syntax::Highlight::Engine::Kate::BaseTestchild to kick the old
+        ones out of the PAUSE index. #85463
 
-0.06 2009.07.23
+0.07  2012-09-23
+      - fixed some errors in the BibTeX-related documentation (ZENOG)
+      - revisited conversion of Kate's highlight definitions (Jan Pokorny)
+      - Added some regression tests (Ovid)
+      - Some cleanup and adding conversion script (jnpkrn)
 
-	- Fixing #45512: broken test by silencing the warnings
-	- Switch to use Test::More
-	- Switch to Module::Install
+0.06  2009-07-23
+      - Fixing #45512: broken test by silencing the warnings
+      - Switch to use Test::More
+      - Switch to Module::Install
 
-0.05 Mon Jun 8 2009
+0.05  2009-06-08
+      - Released by Gabor Szabo
+      - Adding test and fixing RT bug #36328: no BaseTest and BaseTestchild modules
 
-	- Released by Gabor Szabo
-	- Adding test and fixing RT bug #36328: no BaseTest and BaseTestchild modules
+0.04  2008-02-04
 
-0.04 04 Feb 2008
+0.03  2008-02-03
+      - Fixed countless errors.
+      - Added support for Ansys, Apache Configuration, Email, FreeBASIC, Kate File Template,
+        de_DE, en_EN, nl, M3U, Wikimedia, x.org Configuration
+      - No more 16 Mb output at make test
 
+0.02  2006-11-01
+      - Fixed bug in Perl with the q' ' construct.
+      - Fixed bug in Template where testDetectSpaces would include a newline.
+      - Moved all highlighting Methods from Kate to Template, so plugins can now
+        function standalone.
+      - Fixed reset, it did not work properly if Kate was screwed up by bugs, now it does.
+      - Updated documentation.
+      - Fixed startup penalty for Kate. Kate does not load all plugins at atartup, but
+        searches for them programmatically.
+      - Rewrote testing, Windows OS should now be able to cope with the length of the
+        test-harness commandline.
+      - Optimized testmethods in Template, gained some speed.
 
-0.03 Sun Feb 3 2008
-
-	- Fixed countless errors.
-	- Added support for Ansys, Apache Configuration, Email, FreeBASIC, Kate File Template,
-	  de_DE, en_EN, nl, M3U, Wikimedia, x.org Configuration
-	- No more 16 Mb output at make test
-
-0.02  Wed Nov 01 2006
-
-	- Fixed bug in Perl with the q' ' construct.
-	- Fixed bug in Template where testDetectSpaces would include a newline.
-	- Moved all highlighting Methods from Kate to Template, so plugins can now
-	  function standalone.
-	- Fixed reset, it did not work properly if Kate was screwed up by bugs, now it does.
-	- Updated documentation.
-	- Fixed startup penalty for Kate. Kate does not load all plugins at atartup, but
-	  searches for them programmatically.
-	- Rewrote testing, Windows OS should now be able to cope with the length of the
-	  test-harness commandline.
-	- Optimized testmethods in Template, gained some speed.
-
-0.01  Mon May 29 2006
-
-	- First release
+0.01  2006-05-29
+      - First release

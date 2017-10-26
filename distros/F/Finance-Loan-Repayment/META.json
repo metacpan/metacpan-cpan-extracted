@@ -30,11 +30,25 @@
             "Dist::Zilla::Plugin::NextRelease" : "5.033",
             "Dist::Zilla::Plugin::RewriteVersion::Transitional" : "0.004",
             "Dist::Zilla::PluginBundle::Author::WATERKIP" : "0",
+            "Pod::Coverage::TrustPod" : "0",
             "Software::License::MIT" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta" : "0",
+            "Test::CPAN::Meta::JSON" : "0.16",
             "Test::Compile" : "0",
-            "Test::More" : "0",
-            "Test::Pod" : "0",
-            "Test::Pod::Coverage" : "0"
+            "Test::EOL" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::MinimumVersion" : "0",
+            "Test::Mojibake" : "0",
+            "Test::More" : "0.96",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Pod::LinkCheck" : "0",
+            "Test::Portability::Files" : "0",
+            "Test::Synopsis" : "0",
+            "Test::Vars" : "0",
+            "Test::Version" : "1"
          }
       },
       "runtime" : {
@@ -51,6 +65,9 @@
       },
       "test" : {
          "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
             "Test::More" : "0",
             "perl" : "5.010"
          }
@@ -60,10 +77,11 @@
    "resources" : {
       "repository" : {
          "type" : "git",
-         "url" : "git://gitlab.com/waterkip/finance-loan-repayment"
+         "url" : "git://gitlab.com/waterkip/finance-loan-repayment",
+         "web" : "https://gitlab.com/waterkip/finance-loan-repayment"
       }
    },
-   "version" : "1.1",
+   "version" : "1.4",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
 }
 

@@ -26,6 +26,7 @@ $npipe->Write("1..98\n");        # <== test plan
 # ****************************** BEGIN TESTS
 
 my ($Xmax, $Ymax) = XYMax();
+my ($Xoverflow, $Yoverflow) = ( ((1200 > $Xmax) ? 1200 : $Xmax+2), ((1000 > $Ymax) ? 1000 : $Ymax+2) );
 
 # test 01
 print "\e[2J";             # clear screen
@@ -453,7 +454,7 @@ ok( $x==1 and $y==1 );
 
 # test 69
 Cursor(12, 4);
-print "\e[1000H";
+print "\e[${Yoverflow}H";
 ($x, $y) = Cursor();
 ok( $x==1 and $y==$Ymax );
 
@@ -483,19 +484,19 @@ ok( $x==9 and $y==17 );
 
 # test 74
 Cursor(12, 4);
-print "\e[1000;9H";
+print "\e[${Yoverflow};9H";
 ($x, $y) = Cursor();
 ok( $x==9 and $y==$Ymax );
 
 # test 75
 Cursor(12, 4);
-print "\e[17;1000H";
+print "\e[17;${Xoverflow}H";
 ($x, $y) = Cursor();
 ok( $x==$Xmax and $y==17 );
 
 # test 76
 Cursor(12, 4);
-print "\e[1000;2000H";
+print "\e[${Yoverflow};${Xoverflow}H";
 ($x, $y) = Cursor();
 ok( $x==$Xmax and $y==$Ymax );
 
@@ -527,7 +528,7 @@ ok( $x==1 and $y==1 );
 
 # test 81
 Cursor(12, 4);
-print "\e[1000f";
+print "\e[${Yoverflow}f";
 ($x, $y) = Cursor();
 ok( $x==1 and $y==$Ymax );
 
@@ -557,19 +558,19 @@ ok( $x==9 and $y==17 );
 
 # test 86
 Cursor(12, 4);
-print "\e[1000;9f";
+print "\e[${Yoverflow};9f";
 ($x, $y) = Cursor();
 ok( $x==9 and $y==$Ymax );
 
 # test 87
 Cursor(12, 4);
-print "\e[17;1000f";
+print "\e[17;${Xoverflow}f";
 ($x, $y) = Cursor();
 ok( $x==$Xmax and $y==17 );
 
 # test 88
 Cursor(12, 4);
-print "\e[1000;2000f";
+print "\e[${Yoverflow};${Xoverflow}f";
 ($x, $y) = Cursor();
 ok( $x==$Xmax and $y==$Ymax );
 

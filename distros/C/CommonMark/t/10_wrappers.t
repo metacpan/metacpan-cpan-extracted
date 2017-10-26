@@ -40,6 +40,7 @@ EOF
         sourcepos     => 1,
         hardbreaks    => 'yes',
         safe          => 100,
+        nobreaks      => 1,
         normalize     => '0e0',
         validate_utf8 => '1',
         smart         => 'true',
@@ -47,6 +48,7 @@ EOF
     my $expected = OPT_SOURCEPOS
                  | OPT_HARDBREAKS
                  | OPT_SAFE
+                 | OPT_NOBREAKS
                  | OPT_NORMALIZE
                  | OPT_VALIDATE_UTF8
                  | OPT_SMART;

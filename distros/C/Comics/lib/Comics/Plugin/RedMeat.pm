@@ -7,32 +7,27 @@ package Comics::Plugin::RedMeat;
 
 use parent qw(Comics::Fetcher::Single);
 
-our $VERSION = "0.01";
+our $VERSION = "1.00";
 
-sub register {
-
-    shift->SUPER::register
-      ( { name    => "Red Meat",
-	  url     => "http://redmeat.com/max-cannon/FreshMeat/",
-	  pat     =>
+our $name    = "Red Meat";
+our $url     = "http://redmeat.com/max-cannon/FreshMeat/";
+our $pattern =
 	    qr{ <meta \s+
 		 name="description" \s+
 		 content="(?<title>.*?)" \s* />
 		.*?
 		<div \s+ class="comicStrip"> \s+
 		<a \s+
-		 href="http://www.redmeat.com/max-cannon/.*?"> \s*
+		 href="https?://www.redmeat.com/max-cannon/.*?"> \s*
 		<img \s+
-		 src="(?<url>http://.*?\.fdncms\.com/
+		 src="(?<url>https?://.*?\.fdncms\.com/
 		        redmeat/imager/u/redmeat/
 			\d+/(?<image>.*?\.\w+))" \s+
 		 width="\d+" \s+ height="\d+" \s+
 		 alt="(?<alt>.*?)" \s*
 		 /> \s* </a> \s*
 		</div>
-	      }sx,
-	} );
-}
+	      }sx;
 
 # Important: Return the package name!
 __PACKAGE__;

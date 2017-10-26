@@ -1,5 +1,20 @@
 Revision history for Term-Colormap
 
+0.15   Wed Oct 26 03:15:47 UTC 2017
+    * Fixed pod Term::Colormap::Brewer
+    * Added link to Available Brewer Colormaps on README.md
+
+0.14   Wed Oct 26 02:12:14 UTC 2017
+    * Removed create_brewer_mapping script
+    * Since the script would create the Term::Colormap::Brewer file
+      - it would show up on cpan and metacpan incorrectly as a documentation source
+      - due to the inlined pod
+
+0.13   Wed Oct 25 01:42:31 UTC 2017
+    * Fixed usage message for felix script
+    * Added strictures to Term::Colormap::Brewer
+    * Improved usage message for show_brewer_colormap
+
 0.12   Tue Oct 24 12:37:49 UTC 2017
     * Added test dependency for Test::Exception in Build.PL
     * Fixed the MANIFEST

@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.29
+    version 0.31
 
 SYNOPSIS
 
@@ -270,6 +270,10 @@ METHODS
     Generate shell configuration code for the given shell. $shell is an
     instance of Shell::Guess. If $shell is not provided, then this method
     will use Shell::Guess to guess the shell that called your perl script.
+
+    You can also pass in the shell name as a string for $shell. This should
+    correspond to the appropriate name_shell from Shell::Guess. So for csh
+    you would pass in "c" and for tcsh you would pass in "tc", etc.
 
  generate_file
 

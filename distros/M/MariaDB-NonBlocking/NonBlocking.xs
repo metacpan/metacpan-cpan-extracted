@@ -147,6 +147,8 @@ THX_disconnect_generic(pTHX_ MariaDB_client* maria)
     maria->is_cont       = FALSE;
     maria->current_state = STATE_DISCONNECTED;
 
+    maria->socket_fd     = -1;
+
     return;
 }
 

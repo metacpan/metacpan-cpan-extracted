@@ -4,13 +4,14 @@ use App::RPi::EnvUI::DB;
 use App::RPi::EnvUI::Event;
 use Carp qw(confess);
 use Crypt::SaltedHash;
+use Data::Dumper;
 use DateTime;
 use JSON::XS;
 use Logging::Simple;
 use Mock::Sub no_warnings => 1;
-use RPi::WiringPi::Constant qw(:all);
+use RPi::Const qw(:all);
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 # mocked sub handles for when we're in testing mode
 
@@ -18,6 +19,7 @@ our ($temp_sub, $hum_sub, $wp_sub, $pm_sub);
 
 # class variables
 
+my $api;
 my $master_log;
 my $log;
 my $sensor;
@@ -26,19 +28,32 @@ my $events;
 # public environment methods
 
 sub new {
+
+    # return the stored object if we've already run new()
+
+    if (defined $api){
+        $log->_5('returning stored API object');
+        return $api if defined $api;
+    }
+
     my $self = bless {}, shift;
 
     my $caller = (caller)[0];
     $self->_args(@_, caller => $caller);
 
-    $self->_log;
     $self->_init;
 
-    $log->_7("successfully initialized the system");
+    $api = $self;
 
-    $self->events if ! $self->testing && ! defined $events;
+    $log->_5("successfully initialized the system");
 
-    $log->_7("successfully started the async events");
+    if (! $self->testing && ! defined $events){
+        $self->events;
+        $log->_5('successfully created new async events')
+    }
+    else {
+        $log->_5("async events have already been spawned");
+    }
 
     return $self;
 }
@@ -46,14 +61,14 @@ sub action_humidity {
     my ($self, $aux_id, $humidity) = @_;
 
     my $log = $log->child('action_humidity');
-    $log->_5("aux: $aux_id, humidity: $humidity");
+    $log->_6("aux: $aux_id, humidity: $humidity");
 
     my $limit = $self->_config_control('humidity_limit');
     my $min_run = $self->_config_control('humidity_aux_on_time');
 
-    $log->_5("limit: $limit, minimum runtime: $min_run");
+    $log->_6("limit: $limit, minimum runtime: $min_run");
 
-    if (! $self->aux_override($aux_id)) {
+    if (! $self->aux_override($aux_id) && $humidity != -1){
         if ($humidity < $limit && $self->aux_time($aux_id) == 0) {
             $log->_5("humidity limit reached turning $aux_id to HIGH");
             $self->aux_state($aux_id, HIGH);
@@ -76,9 +91,9 @@ sub action_temp {
     my $limit = $self->_config_control('temp_limit');
     my $min_run = $self->_config_control('temp_aux_on_time');
 
-    $log->_5("limit: $limit, minimum runtime: $min_run");
+    $log->_6("limit: $limit, minimum runtime: $min_run");
 
-    if (! $self->aux_override($aux_id)){
+    if (! $self->aux_override($aux_id) && $temp != -1){
         if ($temp > $limit && $self->aux_time($aux_id) == 0){
             $log->_5("temp limit reached turning $aux_id to HIGH");
             $self->aux_state($aux_id, HIGH);
@@ -133,7 +148,7 @@ sub aux {
 
     $log->_7("getting aux information for $aux_id");
 
-    my $aux = $self->db()->aux($aux_id);
+    my $aux = $self->db->aux($aux_id);
     return $aux;
 }
 sub auxs {
@@ -142,7 +157,7 @@ sub auxs {
     my $log = $log->child('auxs');
     $log->_7("retrieving all auxs");
 
-    return $self->db()->auxs;
+    return $self->db->auxs;
 }
 sub aux_id {
     my ($self, $aux) = @_;
@@ -158,12 +173,29 @@ sub aux_override {
 
     my ($aux_id, $override) = @_;
 
+    my $log = $log->child('aux_override');
+
     if ($aux_id !~ /^aux/){
         confess "aux_override() requires an aux ID as its first param\n";
     }
 
     if (defined $override){
-        $self->db()->update('aux', 'override', $override, 'id', $aux_id);
+        $log->_5("attempted override of aux: $aux_id");
+        my $toggle = $self->aux($aux_id)->{toggle};
+
+        if ($toggle != 1){
+            $log->_5(
+                "toggling of aux id $aux_id is disabled in the config file"
+            );
+            return -1;
+        }
+    }
+
+    if (defined $override){
+        $log->_5("override set operation called for $aux_id");
+        $override = $self->aux_override($aux_id) ? 0 : 1;
+        $log->_5("override set to $override for aux id: $aux_id");
+        $self->db->update('aux', 'override', $override, 'id', $aux_id);
     }
     return $self->aux($aux_id)->{override};
 }
@@ -177,7 +209,7 @@ sub aux_pin {
     }
 
     if (defined $pin){
-        $self->db()->update('aux', 'pin', $pin, 'id', $aux_id);
+        $self->db->update('aux', 'pin', $pin, 'id', $aux_id);
     }
     return $self->aux($aux_id)->{pin};
 }
@@ -195,11 +227,11 @@ sub aux_state {
 
     if (defined $state){
         $log->_5("setting state to $state for $aux_id");
-        $self->db()->update('aux', 'state', $state, 'id', $aux_id);
+        $self->db->update('aux', 'state', $state, 'id', $aux_id);
     }
 
     $state = $self->aux($aux_id)->{state};
-    $log->_5("$aux_id state = $state");
+    $log->_6("$aux_id state = $state");
     return $state;
 }
 sub aux_time {
@@ -213,7 +245,7 @@ sub aux_time {
     }
 
     if (defined $time) {
-        $self->db()->update('aux', 'on_time', $time, 'id', $aux_id);
+        $self->db->update('aux', 'on_time', $time, 'id', $aux_id);
     }
 
     my $on_time = $self->aux($aux_id)->{on_time};
@@ -237,17 +269,28 @@ sub env {
     }
 
     if (defined $temp){
-        $self->db()->insert_env($temp, $hum);
+        $self->db->insert_env($temp, $hum);
     }
 
-    my $ret = $self->db()->env;
-    return {temp => -1, humidity => -1} if ! defined $ret;
-    return $self->db()->env;
+    my $event_error = 0;
+
+    if ($self->{events}{env_to_db}->status == -1){
+        $event_error = 1;
+        print "event failure!\n";
+    }
+
+    my $ret = $self->db->env;
+
+    return {temp => -1, humidity => -1, error => $event_error} if ! defined $ret;
+
+    $ret->{error => $event_error};
+
+    return $ret;
 }
 sub graph_data {
     my ($self) = @_;
 
-    my $graph_data = $self->db()->graph_data;
+    my $graph_data = $self->db->graph_data;
 
     my $check = 1;
     my $count = 0;
@@ -283,7 +326,7 @@ sub graph_data {
 }
 sub humidity {
     my $self = shift;
-    return $self->env()->{humidity};
+    return $self->env->{humidity};
 }
 sub read_sensor {
     my $self = shift;
@@ -293,10 +336,10 @@ sub read_sensor {
     if (! defined $self->sensor){
         confess "\$self->{sensor} is not defined";
     }
-    my $temp = $self->sensor()->temp('f');
-    my $hum = $self->sensor()->humidity;
+    my $temp = $self->sensor->temp('f');
+    my $hum = $self->sensor->humidity;
 
-    $log->_5("temp: $temp, humidity: $hum");
+    $log->_6("temp: $temp, humidity: $hum");
 
     return ($temp, $hum);
 }
@@ -310,12 +353,12 @@ sub switch {
 
     if ($pin != -1){
         if ($state){
-            $log->_5("set $pin state to HIGH");
+            $log->_6("set $pin state to HIGH");
             pin_mode($pin, OUTPUT);
             write_pin($pin, HIGH);
         }
         else {
-            $log->_5("set $pin state to LOW");
+            $log->_6("set $pin state to LOW");
             pin_mode($pin, OUTPUT);
             write_pin($pin, LOW);
         }
@@ -323,7 +366,7 @@ sub switch {
 }
 sub temp {
     my $self = shift;
-    return $self->env()->{temp};
+    return $self->env->{temp};
 }
 
 # public core operational methods
@@ -341,14 +384,14 @@ sub auth {
     }
     my $csh = Crypt::SaltedHash->new(algorithm => 'SHA1');
 
-    my $crypted = $self->db()->user($user)->{pass};
+    my $crypted = $self->db->user($user)->{pass};
 
     return $csh->validate($crypted, $pw);
 }
 sub events {
     my $self = shift;
 
-    my $log = $self->log('events');
+    my $log = $log->child('events');
 
     $events = App::RPi::EnvUI::Event->new($self->testing);
 
@@ -358,7 +401,7 @@ sub events {
     $self->{events}{env_to_db}->start;
     $self->{events}{env_action}->start;
 
-    $log->_7("events successfully started");
+    $log->_5("events successfully started");
 }
 sub log {
     my $self = shift;
@@ -390,7 +433,7 @@ sub user {
         confess "\n\nuser() requires a username to be sent in\n\n";
     }
 
-    return $self->db()->user($un);
+    return $self->db->user($un);
 }
 
 # public configuration getters
@@ -423,8 +466,8 @@ sub set_light_times {
         $off_time -= 24 * 3600;
     }
 
-    $self->db()->update('light', 'value', $on_time, 'id', 'on_time');
-    $self->db()->update('light', 'value', $off_time, 'id', 'off_time');
+    $self->db->update('light', 'value', $on_time, 'id', 'on_time');
+    $self->db->update('light', 'value', $off_time, 'id', 'off_time');
 
 }
 
@@ -515,20 +558,20 @@ sub _bool {
 sub _config_control {
     my $self = shift;
     my $want = shift;
-    return $self->db()->config_control($want);
+    return $self->db->config_control($want);
 }
 sub _config_core {
     my $self = shift;
     my $want = shift;
 
-    if (! defined $self->db()){
+    if (! defined $self->db){
         confess "API's DB object is not defined.";
     }
 
     if (! defined $want){
         confess "_config_core() requires a \$want param\n";
     }
-    return $self->db()->config_core($want);
+    return $self->db->config_core($want);
 }
 sub _config_light {
     my $self = shift;
@@ -536,7 +579,7 @@ sub _config_light {
 
     my %conf;
 
-    my $light = $self->db()->config_light;
+    my $light = $self->db->config_light;
 
     for (keys %$light){
         if ($_ eq 'on_hours'){
@@ -558,18 +601,23 @@ sub _config_light {
 sub _init {
     my ($self) = @_;
 
-    my $log = $log->child('_init()');
-
     $self->db(
         App::RPi::EnvUI::DB->new(
             testing => $self->testing
         )
     );
 
+    $self->log_level($self->_config_core('log_level'));
+    $self->_log;
+
+    my $log = $log->child('_init()');
+
     if ($self->_ui_test_mode || $self->testing){
+        $log->_5('in test mode');
         $self->_test_mode
     }
     else {
+        $log->_5('in prod mode');
         $self->_prod_mode;
     }
 }
@@ -593,14 +641,14 @@ sub _test_mode {
             return_value => 80
         );
 
-        $log->_7( "mocked RPi::DHT11::temp" );
+        $log->_6( "mocked RPi::DHT11::temp" );
 
         $hum_sub = $mock->mock(
             'RPi::DHT11::humidity',
             return_value => 20
         );
 
-        $log->_7( "mocked RPi::DHT11::humidity" );
+        $log->_6( "mocked RPi::DHT11::humidity" );
 
         $pm_sub = $mock->mock(
             'App::RPi::EnvUI::API::pin_mode',
@@ -613,7 +661,7 @@ sub _test_mode {
         );
     }
 
-    $log->_7(
+    $log->_5(
         "mocked WiringPi::write_pin as App::RPi::EnvUI::API::write_pin"
     );
 
@@ -621,7 +669,7 @@ sub _test_mode {
 
     $self->sensor(bless {}, 'RPi::DHT11');
 
-    $log->_7("blessed a fake sensor");
+    $log->_5("blessed a fake sensor");
 
 }
 sub _prod_mode {
@@ -667,8 +715,7 @@ sub _log {
 sub _parse_config {
     my ($self, $config) = @_;
 
-
-    $self->db()->begin;
+    $self->db->begin;
 
     $self->_reset;
 
@@ -688,11 +735,12 @@ sub _parse_config {
 
     # auxillary channels
 
-    {
+    { # pin numbers
+
         my $db_struct = [
             'aux',
             'pin',
-            'id'
+            'id',
         ];
         my @data;
 
@@ -700,10 +748,27 @@ sub _parse_config {
             my $aux_id = "aux$_";
             my $pin = $conf->{$aux_id}{pin};
             push @data, [$pin, $aux_id];
-            #$self->aux_pin( $aux_id, $pin );
         }
 
-        $self->db()->update_bulk(@$db_struct, \@data);
+        $self->db->update_bulk(@$db_struct, \@data);
+    }
+
+    { # aux toggle
+
+        my $db_struct = [
+            'aux',
+            'toggle',
+            'id',
+        ];
+        my @data;
+
+        for (1 .. 8) {
+            my $aux_id = "aux$_";
+            my $toggle = $conf->{$aux_id}{toggle};
+            push @data, [$toggle, $aux_id];
+        }
+
+        $self->db->update_bulk(@$db_struct, \@data);
     }
 
     for my $conf_section (qw(control core light)){
@@ -729,26 +794,31 @@ sub _parse_config {
             }
         }
 
-        $self->db()->update_bulk(@$db_struct, \@data);
+        $self->db->update_bulk(@$db_struct, \@data);
     }
 
-    $self->db()->commit;
+    $self->db->commit;
 }
 sub _reset {
     my $self = shift;
     # reset dynamic db attributes
 
-    $self->db()->update_bulk_all(
+    my $log = $log->child('_reset');
+    $log->_5("reset() called");
+
+    $self->db->update_bulk_all(
         'aux', 'state', [0]
     );
-    $self->db()->update_bulk_all(
+    $self->db->update_bulk_all(
         'aux', 'override', [0]
     );
-    $self->db()->update_bulk_all(
+    $self->db->update_bulk_all(
         'aux', 'on_time', [0]
     );
 
-    #$self->db()->commit;
+    # remove all statistics
+
+    $self->db->delete('stats');
 }
 sub _ui_test_mode {
     return -e 't/testing.lck';
@@ -853,11 +923,10 @@ required.
 
 Parameters (only used for testing):
 
-    $dt
+    %args
 
-Optional (use for testing only!), L<DateTime> object. This object will replace
-a call to C<now()>, so that when we're testing, we can simulate now as being in
-the future to test on/off triggers properly.
+Optional (use for testing only!). Pass in a hash with the desired configuration
+parameters as found in the configuration file for light configuration.
 
 =head2 action_temp($aux_id, $temperature)
 
@@ -1228,7 +1297,7 @@ Steve Bertrand, E<lt>steveb@cpan.org<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016 Steve Bertrand.
+Copyright 2017 Steve Bertrand.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

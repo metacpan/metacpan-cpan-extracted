@@ -147,7 +147,7 @@ Parser options can be imported from L<CommonMark> with tag C<opt>.
     use CommonMark qw(:opt);
 
 C<OPT_NORMALIZE> makes sure that adjacent text nodes are merged in the parse
-tree.
+tree. libcmark 0.28 or higher always normalizes text nodes.
 
 C<OPT_SMART> enables the "smart quote" features which turns vertical into
 typographic quotation marks, double and triple hyphens into en and em dashes,

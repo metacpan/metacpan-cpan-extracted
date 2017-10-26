@@ -1,5 +1,9 @@
 Revision history for Perl module Directory::Diff
 
+0.07 2017-10-25
+
+- Restore accidentally removed dependence on mkpath in File::Copy
+
 0.06 2017-10-14
 
 - Improved documentation for Directory::Diff::Copy

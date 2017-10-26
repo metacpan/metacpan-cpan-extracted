@@ -4,7 +4,7 @@
 package Lingua::Interset::Tagset::SK::Snk;
 use strict;
 use warnings;
-our $VERSION = '3.006';
+our $VERSION = '3.007';
 
 use utf8;
 use open ':utf8';
@@ -406,7 +406,14 @@ sub decode
     my $fs = Lingua::Interset::FeatureStructure->new();
     $fs->set_tagset('sk::snk');
     my ($pos, $features, $appendix);
-    if($tag =~ m/^(.)([^:]*)(:.*)?$/)
+    if($tag =~ m/^Z/) # Z or ZIP
+    {
+        # Punctuation. Avoid interpreting the "I" as "infinitive". Do not save "IP" as features.
+        $pos = 'Z';
+        $features = '';
+        $appendix = '';
+    }
+    elsif($tag =~ m/^(.)([^:]*)(:.*)?$/)
     {
         $pos = $1;
         $features = $2;
@@ -446,6 +453,7 @@ sub encode
     my $fs = shift; # Lingua::Interset::FeatureStructure
     my $atoms = $self->atoms();
     my $pos = $atoms->{pos}->encode($fs);
+    $pos = 'ZIP' if($pos eq 'Z');
     my $fpos = $pos;
     if($fs->is_verb() && $fs->tense() eq 'past')
     {
@@ -1941,6 +1949,7 @@ VMjsb-
 VMjsb+
 W
 Y
+ZIP
 end_of_list
     ;
     my @list = split(/\r?\n/, $list);
@@ -1963,7 +1972,7 @@ Lingua::Interset::Tagset::SK::Snk - Driver for the tags of the Slovak National C
 
 =head1 VERSION
 
-version 3.006
+version 3.007
 
 =head1 SYNOPSIS
 

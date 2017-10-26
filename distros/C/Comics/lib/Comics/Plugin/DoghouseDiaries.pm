@@ -7,7 +7,10 @@ package Comics::Plugin::DoghouseDiaries;
 
 use parent qw(Comics::Fetcher::Single);
 
-our $VERSION = "0.01";
+our $VERSION = "0.02";
+
+# Non-functional.
+our $disabled = 1;
 
 sub register {
     shift->SUPER::register

@@ -2,7 +2,7 @@ package App::Yath::Command::replay;
 use strict;
 use warnings;
 
-our $VERSION = '0.001024';
+our $VERSION = '0.001026';
 
 use Test2::Util qw/pkg_to_file/;
 
@@ -232,6 +232,10 @@ This can be used multiple times
 use Devel::Cover to calculate test coverage
 
 This is essentially the same as combining: '--no-fork', and '-MDevel::Cover=-silent,1,+ignore,^t/,+ignore,^t2/,+ignore,^xt,+ignore,^test.pl' Devel::Cover and preload/fork do not work well together.
+
+=item --default_search t
+
+ARRAY(0x2605bc8)
 
 =item --fork
 

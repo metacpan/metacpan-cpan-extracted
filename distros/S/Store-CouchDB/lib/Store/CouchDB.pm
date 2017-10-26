@@ -1,22 +1,38 @@
 package Store::CouchDB;
 
-use Any::Moose;
+use Moo;
 
 # ABSTRACT: Store::CouchDB - a simple CouchDB driver
 
-our $VERSION = '3.8'; # VERSION
+our $VERSION = '4.1'; # VERSION
 
+use MooX::Types::MooseLike::Base qw(:all);
+use experimental 'smartmatch';
 use JSON;
+use LWP::Protocol::Net::Curl;
 use LWP::UserAgent;
+use URI;
+use URI::QueryParam;
 use URI::Escape;
 use Carp;
 use Data::Dump 'dump';
-use Types::Serialiser;
+
+# the following GET parameter keys have to be JSON encoded according to the
+# couchDB API documentation. http://docs.couchdb.org/en/latest/api/
+my @JSON_KEYS = qw(
+    doc_ids
+    key
+    keys
+    startkey
+    start_key
+    endkey
+    end_key
+);
 
 
 has 'debug' => (
     is      => 'rw',
-    isa     => 'Bool',
+    isa     => Bool,
     default => sub { 0 },
     lazy    => 1,
 );
@@ -24,7 +40,7 @@ has 'debug' => (
 
 has 'host' => (
     is       => 'rw',
-    isa      => 'Str',
+    isa      => Str,
     required => 1,
     default  => sub { 'localhost' },
 );
@@ -32,7 +48,7 @@ has 'host' => (
 
 has 'port' => (
     is       => 'rw',
-    isa      => 'Int',
+    isa      => Int,
     required => 1,
     default  => sub { 5984 },
 );
@@ -40,7 +56,7 @@ has 'port' => (
 
 has 'ssl' => (
     is      => 'rw',
-    isa     => 'Bool',
+    isa     => Bool,
     default => sub { 0 },
     lazy    => 1,
 );
@@ -48,20 +64,20 @@ has 'ssl' => (
 
 has 'db' => (
     is        => 'rw',
-    isa       => 'Str',
+    isa       => Str,
     predicate => 'has_db',
 );
 
 
 has 'user' => (
     is  => 'rw',
-    isa => 'Str',
+    isa => Str,
 );
 
 
 has 'pass' => (
     is  => 'rw',
-    isa => 'Str',
+    isa => Str,
 );
 
 
@@ -81,24 +97,44 @@ has 'error' => (
 
 has 'purge_limit' => (
     is      => 'rw',
+    isa     => Int,
     default => sub { 5000 },
 );
 
 
 has 'timeout' => (
     is      => 'rw',
-    isa     => 'Int',
+    isa     => Int,
     default => sub { 30 },
 );
 
 
 has 'json' => (
-    is      => 'rw',
-    isa     => 'JSON',
+    is => 'rw',
+    isa =>
+        sub { JSON->new->utf8->allow_nonref->allow_blessed->convert_blessed },
     default => sub {
         JSON->new->utf8->allow_nonref->allow_blessed->convert_blessed;
     },
 );
+
+
+has 'agent' => (
+    is       => 'rw',
+    lazy     => 1,
+    required => 1,
+    builder  => '_build_agent',
+);
+
+sub _build_agent {
+    my ($self) = @_;
+
+    return LWP::UserAgent->new(
+        agent      => __PACKAGE__ . $Store::CouchDB::VERSION,
+        timeout    => $self->timeout,
+        keep_alive => 1,
+    );
+}
 
 
 sub get_doc {
@@ -169,8 +205,12 @@ sub all_docs {
     $self->method('GET');
     my $res = $self->_call($path);
 
-    return unless $res->{rows}->[0];
-    return $res->{rows};
+    return
+            unless exists $res->{rows}
+        and ref $res->{rows} eq 'ARRAY'
+        and $res->{rows}->[0];
+
+    return @{ $res->{rows} };
 }
 
 
@@ -182,13 +222,17 @@ sub get_design_docs {
     my $path = $self->db
         . '/_all_docs?descending=true&startkey="_design0"&endkey="_design"';
     my $params = $self->_uri_encode($data);
-    $path .= $params if $params;
+    $path .= '&' . $params if $params;
 
     $self->method('GET');
     my $res = $self->_call($path);
 
-    return unless $res->{rows}->[0];
-    return $res->{rows}
+    return
+            unless exists $res->{rows}
+        and ref $res->{rows} eq 'ARRAY'
+        and $res->{rows}->[0];
+
+    return @{ $res->{rows} }
         if (ref $data eq 'HASH' and $data->{include_docs});
 
     my @design;
@@ -197,7 +241,7 @@ sub get_design_docs {
         push(@design, $name);
     }
 
-    return \@design;
+    return @design;
 }
 
 
@@ -223,7 +267,7 @@ sub put_doc {
 
     my $params = $self->_uri_encode($data->{opts});
     $path .= '?' . $params if $params;
-    my $res = $self->_call($path, $data->{doc});
+    my $res = $self->_call($path, undef, $data->{doc});
 
     # update revision in original doc for convenience
     $data->{doc}->{_rev} = $res->{rev} if exists $res->{rev};
@@ -284,12 +328,13 @@ sub update_doc {
         return;
     }
 
-    if ($data->{name}) {
-        $data->{doc}->{_id} = $data->{name};
-    }
-
     unless (exists $data->{doc}->{_id} and defined $data->{doc}->{_id}) {
         carp "Document ID not defined";
+        return;
+    }
+
+    unless (exists $data->{doc}->{_rev} and defined $data->{doc}->{_rev}) {
+        carp "Document revision not defined";
         return;
     }
 
@@ -300,9 +345,6 @@ sub update_doc {
         carp "Document does not exist";
         return;
     }
-
-    # store revision in original doc to be able to put_doc
-    $data->{doc}->{_rev} = $rev;
 
     return $self->put_doc($data);
 }
@@ -366,15 +408,15 @@ sub get_view {
 
     my $path = $self->_make_path($data);
     $self->method('GET');
-    my $res = $self->_call($path);
+    my $res = $self->_call($path, 'accept_stale');
 
     # fallback lookup for broken data consistency due to the way earlier
     # versions of this module where handling (or not) input data that had been
     # stringified by dumpers or otherwise internally
     # e.g. numbers were stored as strings which will be used as keys eventually
     unless ($res->{rows}->[0]) {
-        $path = $self->_make_path($data, 1);
-        $res = $self->_call($path);
+        $path = $self->_make_path($data, 'compat');
+        $res = $self->_call($path, 'accept_stale');
     }
 
     return unless $res->{rows}->[0];
@@ -424,7 +466,7 @@ sub get_post_view {
 
     my $path = $self->_make_path($data);
     $self->method('POST');
-    my $res = $self->_call($path, $opts);
+    my $res = $self->_call($path, 'accept_stale', $opts);
 
     my $result;
     foreach my $doc (@{ $res->{rows} }) {
@@ -449,15 +491,15 @@ sub get_view_array {
 
     my $path = $self->_make_path($data);
     $self->method('GET');
-    my $res = $self->_call($path);
+    my $res = $self->_call($path, 'accept_stale');
 
     # fallback lookup for broken data consistency due to the way earlier
     # versions of this module where handling (or not) input data that had been
     # stringified by dumpers or otherwise internally
     # e.g. numbers were stored as strings which will be used as keys eventually
     unless ($res->{rows}->[0]) {
-        $path = $self->_make_path($data, 1);
-        $res = $self->_call($path);
+        $path = $self->_make_path($data, 'compat');
+        $res = $self->_call($path, 'accept_stale');
     }
 
     my @result;
@@ -493,15 +535,15 @@ sub get_array_view {
 
     my $path = $self->_make_path($data);
     $self->method('GET');
-    my $res = $self->_call($path);
+    my $res = $self->_call($path, 'accept_stale');
 
     # fallback lookup for broken data consistency due to the way earlier
     # versions of this module where handling (or not) input data that had been
     # stringified by dumpers or otherwise internally
     # e.g. numbers were stored as strings which will be used as keys eventually
     unless ($res->{rows}->[0]) {
-        $path = $self->_make_path($data, 1);
-        $res = $self->_call($path);
+        $path = $self->_make_path($data, 'compat');
+        $res = $self->_call($path, 'accept_stale');
     }
 
     my $result;
@@ -544,7 +586,7 @@ sub list_view {
 
     $self->method('GET');
 
-    return $self->_call($path);
+    return $self->_call($path, 'accept_stale');
 }
 
 
@@ -585,7 +627,8 @@ sub purge {
             and ($_del->{deleted} eq 'true' or $_del->{deleted} == 1));
 
         my $opts = { $_del->{id} => [ $_del->{changes}->[0]->{rev} ], };
-        $resp->{ $_del->{seq} } = $self->_call($self->db . '/_purge', $opts);
+        $resp->{ $_del->{seq} } =
+            $self->_call($self->db . '/_purge', undef, $opts);
     }
 
     return $resp;
@@ -605,9 +648,9 @@ sub compact {
     if ($data->{view_compact}) {
         $self->method('POST');
         $res->{view_compact} = $self->_call($self->db . '/_view_cleanup');
-        my $design = $self->get_design_docs();
+        my @design = $self->get_design_docs();
         $self->method('POST');
-        foreach my $doc (@{$design}) {
+        foreach my $doc (@design) {
             $res->{ $doc . '_compact' } =
                 $self->_call($self->db . '/_compact/' . $doc);
         }
@@ -649,7 +692,7 @@ sub put_file {
 
     $self->method('PUT');
     $data->{content_type} ||= 'text/plain';
-    my $res = $self->_call($path, $data->{file}, $data->{content_type});
+    my $res = $self->_call($path, undef, $data->{file}, $data->{content_type});
 
     return ($res->{id}, $res->{rev}) if wantarray;
     return $res->{id};
@@ -675,6 +718,37 @@ sub get_file {
     $self->method('GET');
 
     return $self->_call($path);
+}
+
+
+sub del_file {
+    my ($self, $data) = @_;
+
+    unless ($data->{id}) {
+        carp "Document ID not defined";
+        return;
+    }
+    unless ($data->{filename}) {
+        carp 'File name not defined';
+        return;
+    }
+
+    $self->_check_db($data);
+
+    my $id  = $data->{id};
+    my $rev = $data->{rev};
+
+    if ($id && !$rev) {
+        $rev = $self->head_doc($id);
+        $self->_log("delete_file(): rev $rev") if $self->debug;
+    }
+
+    my $path = $self->db . '/' . $id . '/' . $data->{filename} . '?rev=' . $rev;
+    $self->method('DELETE');
+    my $res = $self->_call($path);
+
+    return ($res->{id}, $res->{rev}) if wantarray;
+    return $res->{id};
 }
 
 
@@ -757,24 +831,17 @@ sub _uri_encode {
     foreach my $key (keys %$opts) {
         my $value = $opts->{$key};
 
-        if ($key =~ m/key/) {
+        if ($key ~~ @JSON_KEYS) {
 
             # backwards compatibility with key, startkey, endkey as strings
             $value .= '' if ($compat && !ref($value));
-        }
-        else {
-            unless (ref $value) {
 
-                # copy $value to prevent stringifying
-                my $cvalue = $value;
-
-                # respect JSON booleans
-                $value = Types::Serialiser::true  if $cvalue eq 'true';
-                $value = Types::Serialiser::false if $cvalue eq 'false';
-            }
+            # only JSON encode URI parameter value if necessary and required by
+            # documentation. see http://docs.couchdb.org/en/latest/api/
+            $value = $self->json->encode($value);
         }
 
-        $value = uri_escape($self->json->encode($value));
+        $value = uri_escape($value);
         $path .= $key . '=' . $value . '&';
     }
 
@@ -821,18 +888,28 @@ sub _make_path {
     return $path;
 }
 
+sub _build_uri {
+    my ($self, $path) = @_;
+
+    my $uri = $self->ssl ? 'https' : 'http';
+    $uri .= '://' . $self->host . ':' . $self->port;
+    $uri .= '/' . $path;
+    $uri = URI->new($uri);
+    $uri->userinfo($self->user . ':' . $self->pass)
+        if ($self->user and $self->pass);
+
+    return $uri;
+}
+
 sub _call {
-    my ($self, $path, $content, $ct) = @_;
+    my ($self, $path, $accept_stale, $content, $ct) = @_;
 
     binmode(STDERR, ":encoding(UTF-8)") if $self->debug;
 
     # cleanup old error
     $self->clear_error if $self->has_error;
 
-    my $uri = ($self->ssl) ? 'https://' : 'http://';
-    $uri .= $self->user . ':' . $self->pass . '@'
-        if ($self->user and $self->pass);
-    $uri .= $self->host . ':' . $self->port . '/' . $path;
+    my $uri = $self->_build_uri($path);
 
     $self->_log($self->method . ": $uri") if $self->debug;
 
@@ -863,14 +940,19 @@ sub _call {
                 : $self->json->encode($c)));
     }
 
-    my $ua = LWP::UserAgent->new(timeout => $self->timeout);
-
-    $ua->default_header('Content-Type' => $ct || "application/json");
-    my $res = $ua->request($req);
+    $self->agent->default_header('Content-Type' => $ct || "application/json");
+    my $res = $self->agent->request($req);
 
     if ($self->method eq 'HEAD' and $res->header('ETag')) {
         $self->_log('Revision: ' . $res->header('ETag')) if $self->debug;
         return $res->header('ETag');
+    }
+
+    # retry with stale=update_after in case of a timeout
+    if ($accept_stale and $res->status_line eq '500 read timeout') {
+        $uri->query_param_append(stale => 'update_after');
+        $req->uri($uri);
+        $res = $self->agent->request($req);
     }
 
     # try JSON decoding response content all the time
@@ -925,14 +1007,14 @@ sub _dump {
     }
 
     require Data::Printer;
-    Data::Printer->import(%options) unless __PACKAGE__->can('p');
+    Data::Printer->import(%options) unless __PACKAGE__->can('np');
 
     my $dump;
     if (ref $obj) {
-        $dump = p($obj, %options);
+        $dump = np($obj, %options);
     }
     else {
-        $dump = p(\$obj, %options);
+        $dump = np(\$obj, %options);
     }
 
     return $dump;
@@ -961,7 +1043,7 @@ Store::CouchDB - Store::CouchDB - a simple CouchDB driver
 
 =head1 VERSION
 
-version 3.8
+version 4.1
 
 =head1 SYNOPSIS
 
@@ -972,7 +1054,7 @@ library, it is just complete enough for the things I need to do.
 Refer to the CouchDB Documentation at: L<http://docs.couchdb.org/en/latest/>
 
     use Store::CouchDB;
-    
+
     my $sc = Store::CouchDB->new(host => 'localhost', db => 'your_db');
     # OR
     my $sc = Store::CouchDB->new();
@@ -1004,9 +1086,9 @@ Connect to host using SSL/TLS.
 
 Default: false
 
-=head2 db
+=head2 db / has_db
 
-The databae name to use.
+The database name to use.
 
 =head2 user
 
@@ -1022,7 +1104,7 @@ This is internal and sets the request method to be used (GET|POST)
 
 Default: GET
 
-=head2 error
+=head2 error / has_error
 
 This is set if an error has occured and can be called to get the last
 error with the 'has_error' predicate.
@@ -1039,11 +1121,19 @@ Default: 5000
 
 =head2 timeout
 
-Timeout in seconds for each HTTP request. Passed onto LWP::UserAgent
+Timeout in seconds for each HTTP request. Passed onto LWP::UserAgent.
+In case of a view or list related query where the view has not been updated in
+a long time this will timeout and a new request with the C<stale> option set to
+C<update_after> will be made to avoid blocking.
+See http://docs.couchdb.org/en/latest/api/ddoc/views.html
+
+Set this very high if you don't want stale results.
 
 Default: 30
 
 =head2 json
+
+=head2 agent
 
 =head1 METHODS
 
@@ -1070,17 +1160,17 @@ If all you need is the revision a HEAD call is enough.
 
 =head2 all_docs
 
-This call returns a list of document IDs and revisions by default.
+This call returns a list of document IDs with their latest revision by default.
 Use C<include_docs> to get all Documents attached as well.
 
-    my @docs = @{ $sc->all_docs({ include_docs => 'true' }) };
+    my @docs = $sc->all_docs({ include_docs => 'true' });
 
 =head2 get_design_docs
 
-The get_design_docs call returns all design document names in an array
-reference. You can add C<include_docs => 'true'> to get the whole design document.
+The get_design_docs call returns all design document names in an array.
+You can add C<include_docs => 'true'> to get whole design documents.
 
-    my @docs = @{ $sc->get_design_docs({ dbname => 'database' }) };
+    my @docs = $sc->get_design_docs({ dbname => 'database' });
 
 Again the C<dbname> key is optional.
 
@@ -1116,8 +1206,8 @@ C<update_doc> refuses to push a document if the document ID is missing or the
 document does not exist. This will make sure that you can only update existing
 documents and not accidentally create a new one.
 
-            $id = $sc->update_doc({ doc => { _id => '', ... } });
-    ($id, $rev) = $sc->update_doc({ doc => { .. }, name => 'doc_id', dbname => 'database' });
+            $id = $sc->update_doc({ doc => { _id => '', _rev => '', ... } });
+    ($id, $rev) = $sc->update_doc({ doc => { .. }, dbname => 'database' });
 
 =head2 copy_doc
 
@@ -1237,6 +1327,12 @@ The 'file' and 'filename' parameters are mandatory.
 Get a file attachement from a CouchDB document.
 
     my $content = $sc->get_file({ id => 'doc_id', filename => 'file.txt' });
+
+=head2 del_file
+
+Delete a file attachement from a CouchDB document.
+
+    my $content = $sc->del_file({ id => 'doc_id', rev => 'r-evision', filename => 'file.txt' });
 
 =head2 config
 

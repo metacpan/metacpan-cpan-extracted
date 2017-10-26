@@ -30,4 +30,4 @@ requires:
   perl: '5.01'
 resources:
   repository: svn://svn.code.sf.net/p/ddc-concordance/code/ddc-perl/
-version: '0.39'
+version: '0.40'

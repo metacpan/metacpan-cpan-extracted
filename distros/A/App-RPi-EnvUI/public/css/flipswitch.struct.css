@@ -441,7 +441,7 @@ button.ui-btn-icon-notext,
 .ui-flipswitch {
 	display: inline-block;
 	vertical-align: middle;
-	width: 5.875em; /* Override this and padding-left in next rule if you use labels other than "on/off" and need more space */
+	width: 6.875em; /* Override this and padding-left in next rule if you use labels other than "on/off" and need more space */
 	height: 1.875em;
 	border-width: 1px;
 	border-style: solid;
@@ -463,7 +463,7 @@ button.ui-btn-icon-notext,
 	cursor: pointer;
 }
 .ui-flipswitch.ui-flipswitch-active {
-	padding-left: 4em;  /* Override this and width in previous rule if you use labels other than "on/off" and need more space */
+	padding-left: 5em;  /* Override this and width in previous rule if you use labels other than "on/off" and need more space */
 	width: 1.875em;
 }
 .ui-flipswitch-input {
@@ -488,7 +488,7 @@ button.ui-btn-icon-notext,
 .ui-flipswitch .ui-btn.ui-flipswitch-on {
 	width: 1.75em;
 	padding: 0;
-	text-indent: -2.6em; /* Override this to center text if you use a label other than "on" */
+	text-indent: -4.6em; /* Override this to center text if you use a label other than "on" */
 	text-align: left;
 	border-width: 1px;
 	border-style: solid;
@@ -502,7 +502,7 @@ button.ui-btn-icon-notext,
 }
 .ui-flipswitch .ui-flipswitch-off {
 	padding: 1px;
-	text-indent: 1em; /* Override this to center text if you use a label other than "off" */
+	text-indent: 0.5em; /* Override this to center text if you use a label other than "off" */
 }
 /* Override field container CSS to prevent the flipswitch from becomming full width */
 html .ui-field-contain > label + .ui-flipswitch,

@@ -1012,6 +1012,6 @@
 </comment><comment>
 </comment><comment>Syntax::Highlight::Engine::Kate::Template http:://www.kate-editor.org</comment><comment>
 </comment><comment>
-</comment><comment>=cut</comment><comment>
-</comment><comment>
-</comment>
+</comment><comment>=cut</comment><normal>
+</normal><normal>
+</normal>

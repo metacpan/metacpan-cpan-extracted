@@ -39,4 +39,7 @@ t/coverage.sh
 t/lib/breakuseconstant.pm
 t/09_5.10_use_constant.t
 t/10_prototypes.t
-META.yml                                 Module meta-data (added by MakeMaker)
+t/11_except.t
+MANIFEST.SKIP
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

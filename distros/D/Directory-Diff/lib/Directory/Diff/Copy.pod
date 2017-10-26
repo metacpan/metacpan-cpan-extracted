@@ -19,7 +19,7 @@ using L<Directory::Diff/directory_diff>, and puts the differing files
 only from C<$new_dir> into C<$output_dir> using L<File::Copy/copy>. If
 C<$output_dir> does not exist, this creates it. If C<$output_dir> does
 exist, this removes all files from it using L<File::Path/rmtree>
-before copying.
+before copying. New directories are made using L<File::Path/mkpath>.
 
 The return value is the number of files copied. This value is useful
 to detect whether anything was actually copied or not.

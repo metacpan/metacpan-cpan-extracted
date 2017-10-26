@@ -3,9 +3,6 @@ use warnings;
 
 use lib 't/lib';
 
-# FIXME uncomment, and fix prototype problems
-# BEGIN { $SIG{__WARN__} = sub { die(@_) }; }
-
 use Test::More tests => 8;
 
 use Sub::WrapPackages (

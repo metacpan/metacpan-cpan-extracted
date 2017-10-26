@@ -1,5 +1,14 @@
 Revision history for File-CodeSearch
 
+0.7.5   2017-10-25
+        Updating for release of version 0.7.5
+        Fixes to work with Perl 5.26 and newwer (Ivan Wills)
+        Adding default edits (Ivan Wills)
+        Updating date (Ivan Wills)
+        Updating Test dependencies for better windows experience (Ivan Wills)
+        Added perl 5.24 to travis build (Ivan Wills)
+        Added more configs (Ivan Wills)
+
 0.7.4   2015-08-22
         Updating for release of version 0.7.4
         Removed creation of makefile (Ivan Wills)

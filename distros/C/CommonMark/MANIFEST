@@ -23,6 +23,7 @@ t/07_tree_manip.t
 t/08_create_helpers.t
 t/09_version.t
 t/10_wrappers.t
+t/11_options.t
 t/20_errors.t
 t/30_leakcheck.t
 t/author-pod-syntax.t

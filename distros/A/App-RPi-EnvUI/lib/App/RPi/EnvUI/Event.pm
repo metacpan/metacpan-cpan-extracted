@@ -2,7 +2,7 @@ package App::RPi::EnvUI::Event;
 
 use Async::Event::Interval;
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 sub new {
     my ($class, %args) = @_;
@@ -19,11 +19,15 @@ sub env_to_db {
 
     $api->{db} = $db;
     $self->{db} = $db;
+    $self->{timeout} = $api->_config_control('event_timeout');
 
     my $event = Async::Event::Interval->new(
         $api->_config_core('event_fetch_timer'),
         sub {
+            local $SIG{ALRM} = sub { kill 9, $$; };
+            alarm $self->{timeout};
             my ($temp, $hum) = $api->read_sensor;
+            alarm 0;
             $api->env($temp, $hum);
         },
     );
@@ -50,6 +54,7 @@ sub env_action {
 
             $api->action_temp($t_aux, $api->temp);
             $api->action_humidity($h_aux, $api->humidity);
+
             $api->action_light
               if $api->_config_light('enable');
         }
@@ -120,7 +125,7 @@ Steve Bertrand, E<lt>steveb@cpan.org<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016 Steve Bertrand.
+Copyright 2017 Steve Bertrand.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

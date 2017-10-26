@@ -2,14 +2,20 @@ Revision history for Perl extension Net::FTPSSL.
 
 TODO:
   - Implement a "find" function similar to Unix's find command.
-  - Support IPv6 as well as IPv4.  (started) [I don't have access to a IPv6
-    network to test with.]
+  - Support IPv6 as well as IPv4.  (started, I can detect if IPv6 is supported
+    by IO::Socket::SSL.) [I don't have access to a IPv6 network to test with.]
   - Fix so Trace isn't so verbose.  Such as making freqency a function of file
     size & block size.
   - Fix to support MLSD & MLST commands.
 
 Version - YYYY/MM/DD
 --------------------
+0.39 2017/10/23 08:30:00
+  - Updated the LISCENSE file to 2017 (from 2015)
+  - Changed default from TLS v1.0 to TLS v1.2 and rearranged the POD a bit.
+  - Started depreciating useSSL.  Now prints out warning if used!  Warning
+    says to use option "SSL_version" instead.
+
 0.38 2017/03/30 08:30:00
   - Bug Id: 120802.  PreserveTimestamp bugs with _mfmt() & _mdtm().  I pulled
     the arguments off the stack in the wrong order.  Corrected this.

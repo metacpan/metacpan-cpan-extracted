@@ -1,5 +1,59 @@
 Changes history for App::RPi::EnvUI
 
+0.29    2017-10-24
+        - this project is still in BETA status and should not be used in a
+          production growing environment without extreme monitoring
+        - added DB::delete(), which will remove all data from a table
+        - stats DB table is now emptied on webapp load. This will make graphing
+          easier (avoid gaps where the app was down)
+        - added new stats template and stats.js logic, Statistics in the menu
+          load this template for the statistical graphs for temperature and
+          humidity
+        - the various templates now have a div id, so that we can combine all of
+          our javascript/jquery into a single file
+        - switched to $(document).on('pageshow') from $(document).ready() so
+          that the appropriate js is executed on specific page loads (see above
+          point)
+        - clean up debugging code in JS
+        - implemented more debug logging
+        - installer (Makefile.PL) now installs the Dancer2 config.yml file
+        - fix the -1 temp/hum from enabling devices on initial page load (work
+          on #31)
+        - correct significant logging issues. We were initializing the system
+          in a way that the log level was not set until long after we've
+          performed numerous tasks in API
+        - fix issue where on app start, three API objects were being generated
+          (closes #36)
+        - the fix above (three API objects) was also causing resets of auxs due
+          to -1 values. (fixes #31)
+        - various log level adjustments
+        - fix Configuration POD issue (closes #32)
+        - change /time to add prepending zero to hours if the length is < 1
+        - we now display both the date and the time in the UI
+        - tweaks to the UI button layout, we've switched from label OVERRIDE
+          to HOLD, and manipulated the size and indenting (closes #33)
+        - we now show a tooltip on the buttoms to inform the user that to make
+          changes, they must be logged in. (closes #38)
+        - removed Travis CI integration (for lack of SQLite)
+        - added blurb about needing to be logged in to make changes (and
+          included the default un/pw)
+        - bumped prereq of Async::Event::Interval to 0.04 for the updated status
+          functionality
+        - added config directive, "event_timeout"
+        - updated src db and schema with new directives
+        - change to using RPi::Const instead of RPi::WiringPi::Const
+          (closes #42)
+        - fix documentation for API::action_light() (closes #44)
+        - fix override issues (fixes #37)
+        - the main page now displays the limits for temp and humidity
+          (closes #40)
+        - fix issue where the "toggle" config directive for the light aux was
+          failing to prevent toggling (we now throw a JS alert). (closes #39)
+        - implemented much more robust logging throughout the override call
+          chain (closes #29)
+        - removed the toggle option from the light config, and instead added
+          the option to all auxillary channels
+
 0.28    2016-11-30
         - all updates other than a Makefile.PL file were 0.27. This release is
           just a small correction

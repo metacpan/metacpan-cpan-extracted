@@ -25,7 +25,7 @@ use File::CodeSearch::Replacer;
 use File::TypeCategories;
 use IO::Prompt qw/prompt/;
 
-our $VERSION = version->new('0.7.4');
+our $VERSION = version->new('0.7.5');
 my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 my $REVERSE  = REVERSE;
 my $RESET    = RESET;
@@ -418,7 +418,7 @@ cs - Search and/or replace text (with some intelligence)
 
 =head1 VERSION
 
-This documentation refers to cs version 0.7.4.
+This documentation refers to cs version 0.7.5.
 
 =head1 SYNOPSIS
 

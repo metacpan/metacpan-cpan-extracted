@@ -3,9 +3,9 @@
 # Note: This script is a CLI  for Riap function /App/MysqlUtils/mysql_sql_dump_extract_tables
 # and generated automatically using Perinci::CmdLine::Gen version 0.482
 
-our $DATE = '2017-08-17'; # DATE
+our $DATE = '2017-10-25'; # DATE
 our $DIST = 'App-MysqlUtils'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 use 5.010001;
 use strict;
@@ -38,7 +38,7 @@ mysql-sql-dump-extract-tables - Parse SQL dump and spit out tables to separate f
 
 =head1 VERSION
 
-This document describes version 0.009 of mysql-sql-dump-extract-tables (from Perl distribution App-MysqlUtils), released on 2017-08-17.
+This document describes version 0.010 of mysql-sql-dump-extract-tables (from Perl distribution App-MysqlUtils), released on 2017-10-25.
 
 =head1 SYNOPSIS
 
@@ -158,6 +158,10 @@ Shortcut for --log-level=info.
 
 =over
 
+=item B<--dir>=I<s>
+
+Directory to put the SQL files into.
+
 =item B<--format>=I<s>
 
 Choose output format, e.g. json, text.
@@ -190,6 +194,8 @@ you want to pipe the result for more post-processing. In this case you can use
 
     [1,2,3]
 
+
+=item B<--overwrite>, B<-O>
 
 =back
 
@@ -259,6 +265,7 @@ Finally, you can filter a section by environment variable using the filter C<env
 
 List of available configuration parameters:
 
+ dir (see --dir)
  exclude_table_patterns (see --exclude-table-pattern)
  exclude_tables (see --exclude-table)
  format (see --format)
@@ -266,6 +273,7 @@ List of available configuration parameters:
  include_tables (see --include-table)
  log_level (see --log-level)
  naked_res (see --naked-res)
+ overwrite (see --overwrite)
  stop_after_table (see --stop-after-table)
  stop_after_table_pattern (see --stop-after-table-pattern)
 

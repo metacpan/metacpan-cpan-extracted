@@ -21,6 +21,7 @@ t/shell_config_generate__alias.t
 t/shell_config_generate__append_path.t
 t/shell_config_generate__comment.t
 t/shell_config_generate__echo_off.t
+t/shell_config_generate__generate.t
 t/shell_config_generate__prepend_path.t
 t/shell_config_generate__set.t
 t/shell_config_generate__set_path.t

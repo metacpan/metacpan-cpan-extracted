@@ -5,7 +5,7 @@ use warnings;
 use XSLoader;
 
 BEGIN {
-    our $VERSION = '0.280300';
+    our $VERSION = '0.280301';
     XSLoader::load('CommonMark', $VERSION);
 }
 
@@ -18,6 +18,7 @@ our %EXPORT_TAGS = (
         OPT_SOURCEPOS
         OPT_HARDBREAKS
         OPT_SAFE
+        OPT_NOBREAKS
         OPT_NORMALIZE
         OPT_VALIDATE_UTF8
         OPT_SMART
@@ -76,6 +77,7 @@ my @option_map = (
     sourcepos     => OPT_SOURCEPOS,
     hardbreaks    => OPT_HARDBREAKS,
     safe          => OPT_SAFE,
+    nobreaks      => OPT_NOBREAKS,
     normalize     => OPT_NORMALIZE,
     validate_utf8 => OPT_VALIDATE_UTF8,
     smart         => OPT_SMART,

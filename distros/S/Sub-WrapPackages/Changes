@@ -1,3 +1,7 @@
+2017-10-25   2.01  Bugfixes for wrapping Foo::* - don't wrap FooBar,
+                     only Foo::Bar and friends;
+                   Minor code improvements
+
 2010-03-06   2.0   Slightly incompatible re-write
 
 2010-01-09   1.31  Bugfix for 'use constant' in perl 5.10, thanks to

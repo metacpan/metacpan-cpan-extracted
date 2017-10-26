@@ -9,7 +9,6 @@ Makefile.PL
 README
 bin/yfrom
 bin/ygrok
-bin/ymask
 bin/yq
 bin/ysql
 bin/yto
@@ -20,7 +19,6 @@ lib/ETL/Yertl/Adapter/graphite.pm
 lib/ETL/Yertl/Adapter/influxdb.pm
 lib/ETL/Yertl/Command/yfrom.pm
 lib/ETL/Yertl/Command/ygrok.pm
-lib/ETL/Yertl/Command/ymask.pm
 lib/ETL/Yertl/Command/yq.pm
 lib/ETL/Yertl/Command/yq/Regex.pm
 lib/ETL/Yertl/Command/ysql.pm
@@ -49,6 +47,7 @@ site/blog/2015/11/28/release-v0-027/index.markdown
 site/blog/2016/10/09/release-v0-028/index.markdown
 site/blog/2017/08/16/release-v0-029/index.markdown
 site/blog/2017/08/25/release-v0-032/index.markdown
+site/blog/2017/10/18/release-v0-035/index.markdown
 site/index.markdown
 site/release-blog.pl
 site/theme/blog/index.atom.ep
@@ -80,7 +79,6 @@ t/adapter/graphite.t
 t/adapter/influxdb.t
 t/bin/yfrom.t
 t/bin/ygrok.t
-t/bin/ymask.t
 t/bin/yq.t
 t/bin/ysql.t
 t/bin/yto.t
@@ -88,6 +86,7 @@ t/bin/yts.t
 t/command/ygrok/edit_patterns.t
 t/command/ygrok/pattern/http_combined.t
 t/command/ygrok/pattern/http_common.t
+t/command/ygrok/pattern/linux_proc.t
 t/command/ygrok/pattern/ls-l.t
 t/command/ygrok/pattern/ps-u.t
 t/command/ygrok/pattern/ps-x.t
@@ -104,6 +103,7 @@ t/format/csv.t
 t/format/default.t
 t/format/json.t
 t/format/yaml.t
+t/integration/parse_apache_log.t
 t/lib/ETL/Yertl/Adapter/test.pm
 t/lib/LowVersion.pm
 t/share/command/ymask/in.yaml
@@ -124,6 +124,8 @@ t/share/lines/custom_plain_edit.txt
 t/share/lines/http_combined_log.txt
 t/share/lines/http_common_log.txt
 t/share/lines/irc.txt
+t/share/lines/linux/proc_loadavg.txt
+t/share/lines/linux/proc_uptime.txt
 t/share/lines/ls-l.txt
 t/share/lines/macosx/ps-u.txt
 t/share/lines/macosx/ps-x.txt

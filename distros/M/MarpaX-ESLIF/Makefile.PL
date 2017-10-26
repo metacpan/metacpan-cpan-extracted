@@ -88,8 +88,37 @@ if (! is_os_type('Windows')) {
   $ENV{CFLAGS} .= ' -D__NO_INLINE__';
   $ENV{CXXFLAGS} .= ' -D__NO_INLINE__';
 }
+#
+# When the compiler is clang, there is a bug with inlining, c.f. for example
+# https://sourceforge.net/p/resil/tickets/6/
+#
+# if (is_os_type('Unix', 'darwin'))
+{
+  print "# Determining the need of inline compiler semantics\n";
+  my $ac = Config::AutoConf->new();
+  $ac->check_cc;
+  $ac->msg_checking(sprintf "if this is clang compiler");
+  if ($ac->link_if_else("#ifndef __clang__\n#error \"this is not clang compiler\"\n#endif\nint main() { return 0; }")) {
+      $ac->msg_result('yes');
+      #
+      # C.f. http://clang.llvm.org/compatibility.html#inline
+      #
+      print "# clang: adding -std=gnu89 compiler option\n";
+      $ENV{CFLAGS} .= ' -std=gnu89';
+  } else {
+      $ac->msg_result('no');
+  }
+}
 
-print "Extra libraries: $cpp_libs $iconv_lib\n";
+print "\n";
+print "==========================================\n";
+print "Compilers settings\n";
+print "\n";
+print "CFLAGS              " . ($ENV{CFLAGS} // '') . "\n";
+print "CXXFLAGS            " . ($ENV{CXXFLAGS} // '') . "\n";
+print "OTHERLDFLAGS        $cpp_libs $iconv_lib\n";
+print "==========================================\n";
+print "\n";
 
 my $fh;
 print "Generating constant types\n";
@@ -248,7 +277,8 @@ my %WriteMakefileArgs = (
     "Log::Any" => 0,
     "Log::Any::Adapter" => 0,
     "Log::Any::Adapter::Log4perl" => 0,
-    "Log::Log4perl" => 0,
+    "Log::Any::Adapter::Util" => "1.03",
+    "Log::Log4perl" => "1.32",
     "Test::Deep::NoTest" => 0,
     "Test::More" => 0,
     "Test::More::UTF8" => 0,
@@ -258,7 +288,7 @@ my %WriteMakefileArgs = (
     "threads" => 0,
     "utf8" => 0
   },
-  "VERSION" => "2.0.17",
+  "VERSION" => "2.0.19",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -283,7 +313,8 @@ my %FallbackPrereqs = (
   "Log::Any" => 0,
   "Log::Any::Adapter" => 0,
   "Log::Any::Adapter::Log4perl" => 0,
-  "Log::Log4perl" => 0,
+  "Log::Any::Adapter::Util" => "1.03",
+  "Log::Log4perl" => "1.32",
   "Test::Deep::NoTest" => 0,
   "Test::More" => 0,
   "Test::More::UTF8" => 0,

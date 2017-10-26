@@ -17,45 +17,52 @@
     "humidity_aux_on_time": "1800",
     "temp_aux": "aux1",
     "humidity_aux": "aux2",
-    "light_aux": "aux3"
+    "light_aux": "aux3",
+    "event_timeout": 60
   },
   "light": {
     "on_at": "18:00",
     "on_hours": "12",
-    "toggle": "disabled",
     "enable": "0"
   },
   "aux1": {
     "pin": "-1",
-    "desc": "temp"
+    "desc": "temp",
+    "toggle": "1"
   },
   "aux2": {
     "pin": "-1",
-    "desc": "humidity"
+    "desc": "humidity",
+    "toggle": "1"
   },
   "aux3": {
     "pin": "-1",
-    "desc": "light"
+    "desc": "light",
+    "toggle": "1"
   },
   "aux4": {
     "pin": "-1",
-    "desc": ""
+    "desc": "",
+    "toggle": "1"
   },
   "aux5": {
     "pin": "-1",
-    "desc": ""
+    "desc": "",
+    "toggle": "1"
   },
   "aux6": {
-      "pin": "-1",
-      "desc": ""
-    },
+    "pin": "-1",
+    "desc": "",
+    "toggle": "1"
+  },
   "aux7": {
-      "pin": "-1",
-      "desc": ""
-    },
+    "pin": "-1",
+    "desc": "",
+    "toggle": "1"
+  },
   "aux8": {
-      "pin": "-1",
-      "desc": ""
-    }
+    "pin": "-1",
+    "desc": "",
+    "toggle": "1"
+  }
 }
-

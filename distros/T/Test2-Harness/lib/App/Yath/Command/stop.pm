@@ -2,7 +2,7 @@ package App::Yath::Command::stop;
 use strict;
 use warnings;
 
-our $VERSION = '0.001024';
+our $VERSION = '0.001026';
 
 use File::Path qw/remove_tree/;
 
@@ -69,12 +69,12 @@ sub run {
     }
     print "\n========================\n";
 
-    print STDERR "\nSTDERR LOG:\n";
-    print STDERR "========================\n";
+    print "\nSTDERR LOG:\n";
+    print "========================\n";
     while (my $line = <$stderr>) {
-        print STDERR $line;
+        print $line;
     }
-    print STDERR "\n========================\n";
+    print "\n========================\n";
 
     remove_tree($data->{dir}, {safe => 1, keep_root => 0});
 

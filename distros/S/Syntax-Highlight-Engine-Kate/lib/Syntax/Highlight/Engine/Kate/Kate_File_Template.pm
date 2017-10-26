@@ -12,7 +12,7 @@
 
 package Syntax::Highlight::Engine::Kate::Kate_File_Template;
 
-our $VERSION = '0.10';
+our $VERSION = '0.12';
 
 use strict;
 use warnings;

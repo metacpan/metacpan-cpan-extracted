@@ -4,10 +4,10 @@ require Exporter;
 @EXPORT_OK = qw/copy_diff_only/;
 use warnings;
 use strict;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 use Carp;
 use File::Copy 'copy';
-use File::Path 'rmtree';
+use File::Path qw/rmtree mkpath/;
 use Directory::Diff 'directory_diff';
 
 #=head2 mdate

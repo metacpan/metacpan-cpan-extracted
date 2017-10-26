@@ -1,5 +1,5 @@
 package ETL::Yertl::Command::ygrok;
-our $VERSION = '0.035';
+our $VERSION = '0.036';
 # ABSTRACT: Parse lines of text into documents
 
 use ETL::Yertl;
@@ -110,6 +110,13 @@ our %PATTERNS = (
             '(?<time>\d+:\d+(?:[:.]\d+)?)',
             '%{DATA:command}',
         ),
+    },
+
+    LINUX => {
+        PROC => {
+            UPTIME => '%{NUM:uptime}\s+%{NUM:idletime}',
+            LOADAVG => '%{NUM:load1m}\s+%{NUM:load5m}\s+%{NUM:load15m}\s+%{INT:running}/%{INT:total}\s+%{INT:lastpid}',
+        },
     },
 
 );
@@ -287,7 +294,7 @@ ETL::Yertl::Command::ygrok - Parse lines of text into documents
 
 =head1 VERSION
 
-version 0.035
+version 0.036
 
 =head1 AUTHOR
 

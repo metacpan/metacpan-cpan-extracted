@@ -1,0 +1,36 @@
+v0.3.0  2017-10-26
+* The "Somebody Catch My Breath" release.
+* Fix typo.
+* Improve validation in module names.
+* Convert changelog to CPAN-friendly format and ship it.
+* Change `uri(form)` to `form` to avoid decoding `+` in the `uri` decoder.  This
+  is an incompatible change.
+
+v0.2.2  2017-08-22
+* The "Feel the Change" release.
+* Improve MetaCPAN indexing of muter docs.
+* Improve documentation.
+  - Note that we assume input is reasonably well-formed.
+  - Document the `vis` backend.
+  - Fix POD syntax errors.
+  - Fix some misspellings.
+* Use Test::NoWarnings where available.
+* Fix a warning in the `uuencode` backend.
+* Improve the `uri` backend's handling of stray newlines.
+
+v0.2.1  2017-07-19
+* The "All of These Moments I'll Never Replace" release.
+* Add core-only compatibility with 5.14.0, minus SHA-3 and tests.
+* Remove use of experimental to aid compatibility with CentOS.
+
+v0.2.0  2017-07-08
+* The "Ignore Them Still" release.
+* Add an App::Muter package so PAUSE will index the distribution.
+* Add a `-r`/`--reverse` flag (#1, suggested by Toby Inkster).
+
+v0.1.1  2017-07-05
+* Add an appropriate dependency on MIME::Base64 so that the url64 encoding
+  functions are available.
+
+v0.1.0  Unknown
+* Initial release.

@@ -50,6 +50,6 @@ t/999-cleanup.t
 t/setup.pl
 t/TestBase.pm
 views/main.tt
-views/test.tt
+views/stats.tt
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

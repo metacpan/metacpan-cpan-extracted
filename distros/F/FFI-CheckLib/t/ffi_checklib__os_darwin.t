@@ -1,15 +1,16 @@
 use lib 't/lib';
 use Test2::V0 -no_srand => 1;
 use Test2::Plugin::FauxOS 'darwin';
-use Test2::Plugin::FauxDynaLoader;
+use Test2::Tools::FauxDynaLoader;
 use Test2::Tools::NoteStderr qw( note_stderr );
 use FFI::CheckLib;
 
-$FFI::CheckLib::system_path =
-$FFI::CheckLib::system_path = [ 
+@$FFI::CheckLib::system_path = (
   'corpus/darwin/usr/lib',
   'corpus/darwin/lib',
-];
+);
+
+my $mock = mock_dynaloader;
 
 subtest 'find_lib (good)' => sub {
   my($path) = find_lib( lib => 'foo' );
@@ -143,6 +144,76 @@ subtest 'verify' => sub {
   my $dll = TestDLL->new($lib);
   is $dll->name, 'foo', 'dll.name = foo';
   is $dll->version, '2.3.4', 'dll.version = 2.3.4';
+
+};
+
+sub p ($)
+{
+  my($path) = @_;
+  $path =~ s{/}{\\}g if $^O eq 'MSWin32';
+  $path;
+}
+
+subtest '_cmp' => sub {
+
+  my $process = sub {
+    [
+      sort { FFI::CheckLib::_cmp($a,$b) }
+      map  { FFI::CheckLib::_matches($_, '/lib') }
+      @_
+    ];
+  };
+  
+  is(
+    $process->(qw( libfoo.1.2.3.dylib libbar.3.4.5.dylib libbaz.0.0.0.dylib )),
+    [
+      [ 'bar', p '/lib/libbar.3.4.5.dylib', 3,4,5 ],
+      [ 'baz', p '/lib/libbaz.0.0.0.dylib', 0,0,0 ],
+      [ 'foo', p '/lib/libfoo.1.2.3.dylib', 1,2,3 ],
+    ],
+    'name first 1',
+  );
+
+  is(
+    $process->(qw( libbaz.0.0.0.dylib libfoo.1.2.3.dylib libbar.3.4.5.dylib )),
+    [
+      [ 'bar', p '/lib/libbar.3.4.5.dylib', 3,4,5 ],
+      [ 'baz', p '/lib/libbaz.0.0.0.dylib', 0,0,0 ],
+      [ 'foo', p '/lib/libfoo.1.2.3.dylib', 1,2,3 ],
+    ],
+    'name first 2',
+  );
+
+  is(
+    $process->(qw( libbar.3.4.5.dylib libbaz.0.0.0.dylib libfoo.1.2.3.dylib )),
+    [
+      [ 'bar', p '/lib/libbar.3.4.5.dylib', 3,4,5 ],
+      [ 'baz', p '/lib/libbaz.0.0.0.dylib', 0,0,0 ],
+      [ 'foo', p '/lib/libfoo.1.2.3.dylib', 1,2,3 ],
+    ],
+    'name first 3',
+  );
+
+  is(
+    $process->(qw( libfoo.1.2.3.dylib libfoo.dylib libfoo.1.2.dylib libfoo.1.dylib )),
+    [
+      [ 'foo', p '/lib/libfoo.dylib',             ],
+      [ 'foo', p '/lib/libfoo.1.dylib',     1     ],
+      [ 'foo', p '/lib/libfoo.1.2.dylib',   1,2   ],
+      [ 'foo', p '/lib/libfoo.1.2.3.dylib', 1,2,3 ],
+    ],
+    'no version before version',
+  );
+  
+  is(
+    $process->(qw( libfoo.2.3.4.dylib libfoo.1.2.3.dylib libfoo.3.4.5.dylib )),
+    [
+      [ 'foo', p '/lib/libfoo.3.4.5.dylib', 3,4,5 ],
+      [ 'foo', p '/lib/libfoo.2.3.4.dylib', 2,3,4 ],
+      [ 'foo', p '/lib/libfoo.1.2.3.dylib', 1,2,3 ],
+    ],
+    'newer version first',
+  );
 
 };
 

@@ -49,7 +49,7 @@
          "url" : "http://github.com/Test-More/Test2-Suite/"
       }
    },
-   "version" : "0.000082",
+   "version" : "0.000083",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

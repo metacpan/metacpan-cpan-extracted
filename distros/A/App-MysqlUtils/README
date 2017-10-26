@@ -2,8 +2,8 @@ NAME
     App::MysqlUtils - CLI utilities related to MySQL
 
 VERSION
-    This document describes version 0.009 of App::MysqlUtils (from Perl
-    distribution App-MysqlUtils), released on 2017-08-17.
+    This document describes version 0.010 of App::MysqlUtils (from Perl
+    distribution App-MysqlUtils), released on 2017-10-25.
 
 SYNOPSIS
     This distribution includes the following CLI utilities:
@@ -265,6 +265,10 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
+    *   dir => *dirname*
+
+        Directory to put the SQL files into.
+
     *   exclude_table_patterns => *array[re]*
 
     *   exclude_tables => *array[str]*
@@ -272,6 +276,8 @@ FUNCTIONS
     *   include_table_patterns => *array[re]*
 
     *   include_tables => *array[str]*
+
+    *   overwrite => *bool*
 
     *   stop_after_table => *str*
 

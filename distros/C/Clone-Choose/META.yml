@@ -21,11 +21,12 @@ no_index:
 recommends:
   Module::Runtime: '0'
 requires:
+  Storable: '0'
   perl: v5.8.1
 resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Clone-Choose
   homepage: https://metacpan.org/release/Clone-Choose
   license: http://dev.perl.org/licenses/
   repository: https://github.com:perl5-utils/Clone-Choose.git
-version: '0.003'
+version: '0.005'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -6,5 +6,6 @@ on 'test' => sub {
     requires 'Test2::Suite' => '0.000077';
 
     requires 'Moo';
+    requires 'Mouse';
 };
 

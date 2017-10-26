@@ -1,0 +1,14 @@
+{
+   "prereqs" : {
+        "native" : {
+            "configure" : {
+                "mariadb-connector-c" : "0"
+            }  
+        }  
+    }, 
+    "build_opts" : {
+        "configure_flags" : [
+            "--static_link_to_mariadbclient"
+        ]  
+    }  
+}

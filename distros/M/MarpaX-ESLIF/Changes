@@ -1,6 +1,20 @@
 Changelog for MarpaX-ESLIF
 
-2.0.17 2017-10-20T19:40:30
+2.0.19 2017-10-25T04:45:25
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Version 2.0.19
+ - For perl Prereqs / TestRequires, hardcoded dependencies not
+   automatically detected
+
+2.0.18 2017-10-25T03:53:29Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Version 2.0.18
+ - For perl, determining the need of inline compiler semantics because of
+   clang on Mavericks
+ - Fix MARPSESLIF_UINT32_T to MARPAESLIF_UINT32_T,
+   cmake/CMakeLibrarySetup.txt should be removed -; [ci skip]
+
+2.0.17 2017-10-20T19:40:30Z
  [Jean-Damien Durand <Jean-Damien.Durand@newaccess.ch>]
  - Java thread test dev+ [ci skip]
  - Perl - getInstance method [ci skip]

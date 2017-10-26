@@ -3,7 +3,12 @@
     "event_fetch_timer": "15",
     "event_action_timer": "3",
     "event_display_timer": "4",
-    "time_zone": "local"
+    "time_zone": "America/Edmonton",
+    "sensor_pin": "-1",
+    "testing": "0",
+    "debug_sensor": "0",
+    "log_file": "",
+    "log_level": "-1"
   },
   "control": {
     "temp_limit": "80",
@@ -12,18 +17,12 @@
     "humidity_aux_on_time": "1800",
     "temp_aux": "aux1",
     "humidity_aux": "aux2",
-    "light_aux": "aux3",
-    "water1_aux": "aux4",
-    "water2_aux": "aux5"
-
+    "light_aux": "aux3"
   },
   "light": {
     "on_at": "18:00",
     "on_hours": "12",
     "toggle": "disabled",
-    "enable": "0"
-  },
-  "water": {
     "enable": "0"
   },
   "aux1": {
@@ -36,15 +35,15 @@
   },
   "aux3": {
     "pin": "-1",
-    "desc": "water1"
+    "desc": "light"
   },
   "aux4": {
     "pin": "-1",
-    "desc": "water2"
+    "desc": ""
   },
   "aux5": {
     "pin": "-1",
-    "desc": "light"
+    "desc": ""
   },
   "aux6": {
       "pin": "-1",

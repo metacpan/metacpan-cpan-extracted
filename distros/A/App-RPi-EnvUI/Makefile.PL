@@ -33,6 +33,7 @@ return <<EOF;
 install:: all local
 
 local:
+	cp ~/envui/config/envui.json ~
 
 	rm -rf ~/envui
 	mkdir ~/envui
@@ -60,6 +61,7 @@ local:
 	mkdir ~/envui/views
 	cp views/* ~/envui/views
 
+	cp config.yml ~/envui
 EOF
 }
 
@@ -86,7 +88,7 @@ WriteMakefile(
     },
     PL_FILES            => {},
     PREREQ_PM => {
-        'Async::Event::Interval' => 0,
+        'Async::Event::Interval' => 0.04,
         'Crypt::SaltedHash' => 0,
         'Dancer2'     => 0.203001,
         'Dancer2::Plugin::Auth::Extensible' => 0,
@@ -101,7 +103,7 @@ WriteMakefile(
         'Mock::Sub' => '1.07',
         'Plack::Test' => 0,
         'RPi::DHT11' => '1.01',
-        'RPi::WiringPi::Constant' => '0.02',
+        'RPi::Const' => '1.02',
         'Test::More' => 0,
         'WiringPi::API' => '1.04',
     },

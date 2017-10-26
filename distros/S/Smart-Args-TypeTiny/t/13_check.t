@@ -29,10 +29,10 @@ subtest 'check_type' => sub {
 subtest 'parameter_rule' => sub {
     subtest 'isa' => sub {
         is Smart::Args::TypeTiny::Check::parameter_rule('Foo'), {
-            isa => type('InstanceOf["Foo"]'),
+            isa => 'Foo',
         };
         is Smart::Args::TypeTiny::Check::parameter_rule({isa => 'Foo'}), {
-            isa => type('InstanceOf["Foo"]'),
+            isa => 'Foo',
         };
         is Smart::Args::TypeTiny::Check::parameter_rule({isa => InstanceOf['Foo']}), {
             isa => type('InstanceOf["Foo"]'),
@@ -44,7 +44,7 @@ subtest 'parameter_rule' => sub {
 
     subtest 'does' => sub {
         is Smart::Args::TypeTiny::Check::parameter_rule({does => 'Bar'}), {
-            does => type('ConsumerOf["Bar"]'),
+            does => 'Bar',
         };
         is Smart::Args::TypeTiny::Check::parameter_rule({does => ConsumerOf['Bar']}), {
             does => type('ConsumerOf["Bar"]'),
@@ -71,6 +71,19 @@ subtest 'parameter_rule' => sub {
 
     like dies { Smart::Args::TypeTiny::Check::parameter_rule({optioanl => 'Foo'}, 'foo') },
         qr/Malformed rule for 'foo' \(isa, does, optional, default\)/;
+};
+
+subtest 'rule_to_type' => sub {
+    subtest 'isa' => sub {
+        is Smart::Args::TypeTiny::Check::rule_to_type({isa => 'Foo'}), type('Foo');
+        is Smart::Args::TypeTiny::Check::rule_to_type({isa => InstanceOf['Foo']}), type('InstanceOf["Foo"]');
+        is Smart::Args::TypeTiny::Check::rule_to_type({isa => Str}), type('Str');
+    };
+
+    subtest 'does' => sub {
+        is Smart::Args::TypeTiny::Check::rule_to_type({does => 'Bar'}), type('Bar');
+        is Smart::Args::TypeTiny::Check::rule_to_type({does => ConsumerOf['Bar']}), type('ConsumerOf["Bar"]');
+    };
 };
 
 done_testing;

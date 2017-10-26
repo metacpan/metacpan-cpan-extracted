@@ -12,7 +12,7 @@
 
 package Syntax::Highlight::Engine::Kate::Perl;
 
-our $VERSION = '0.10';
+our $VERSION = '0.12';
 
 use strict;
 use warnings;
@@ -1919,13 +1919,13 @@ sub parsepod {
    if ($self->testRegExpr($text, '\\=(?:head[1-6]|over|back|item|for|begin|end|pod)\\s*.*', 0, 0, 0, 0, 0, '#stay', 'Pod')) {
       return 1
    }
-   # String => '\=cut.*$'
+   # String => '\=cut\b.*'
    # attribute => 'Pod'
    # column => '0'
    # context => '#pop'
    # endRegion => 'POD'
    # type => 'RegExpr'
-   if ($self->testRegExpr($text, '\\=cut.*$', 0, 0, 0, 0, 0, '#pop', 'Pod')) {
+   if ($self->testRegExpr($text, '\\=cut\\b.*', 0, 0, 0, 0, 0, '#pop', 'Pod')) {
       return 1
    }
    return 0;

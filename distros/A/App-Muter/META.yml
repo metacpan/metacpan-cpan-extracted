@@ -45,5 +45,5 @@ resources:
   bugtracker: https://github.com/bk2204/muter/issues
   homepage: https://github.com/bk2204/muter
   repository: https://github.com/bk2204/muter.git
-version: '0.002002'
+version: '0.003000'
 x_serialization_backend: 'YAML::Tiny version 1.70'

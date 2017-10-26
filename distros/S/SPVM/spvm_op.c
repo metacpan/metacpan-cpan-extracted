@@ -129,15 +129,25 @@ const char* const SPVM_OP_C_CODE_NAMES[] = {
   "GET",
   "OUR",
   "PACKAGE_VAR",
+  "ARRAY_INIT",
 };
+
+SPVM_OP* SPVM_OP_build_array_init(SPVM_COMPILER* compiler, SPVM_OP* op_type, SPVM_OP* op_term) {
+  
+  SPVM_OP* op_array_init = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_ARRAY_INIT, op_type->file, op_type->line);
+  
+  SPVM_OP_insert_child(compiler, op_array_init, op_array_init->last, op_type);
+  SPVM_OP_insert_child(compiler, op_array_init, op_array_init->last, op_term);
+  
+  return op_array_init;
+}
 
 void SPVM_OP_resolve_package_var(SPVM_COMPILER* compiler, SPVM_OP* op_package_var) {
   
   SPVM_OP* op_name = op_package_var->uv.package_var->op_name;
   
-  
   SPVM_OP* op_our = SPVM_HASH_search(compiler->op_our_symtable, op_name->uv.name, strlen(op_name->uv.name));
-
+  
   if (op_our) {
     op_package_var->uv.package_var->op_our = op_our;
   }
@@ -337,7 +347,7 @@ SPVM_OP* SPVM_OP_build_sub_setter(SPVM_COMPILER* compiler, SPVM_OP* op_package, 
   SPVM_OP_insert_child(compiler, op_list_args, op_list_args->last, op_var_arg_value);
   
   // Return type
-  SPVM_OP* op_type_return = SPVM_OP_build_void(compiler, op_field);
+  SPVM_OP* op_type_return = SPVM_OP_new_op_void(compiler, file, line);
   
   // Assign
   SPVM_OP* op_assign = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_ASSIGN, file, line);
@@ -877,6 +887,7 @@ SPVM_TYPE* SPVM_OP_get_type(SPVM_COMPILER* compiler, SPVM_OP* op) {
     case SPVM_OP_C_CODE_NEGATE:
     case SPVM_OP_C_CODE_ASSIGN:
     case SPVM_OP_C_CODE_NEW:
+    case SPVM_OP_C_CODE_ARRAY_INIT:
     {
       type = SPVM_OP_get_type(compiler, op->first);
       break;
@@ -2263,8 +2274,10 @@ SPVM_OP* SPVM_OP_build_assign(SPVM_COMPILER* compiler, SPVM_OP* op_assign, SPVM_
     SPVM_OP_insert_child(compiler, op_assign_process, op_assign_process->last, op_var);
 
     // Array initialization
-    if (op_last->code == SPVM_OP_C_CODE_LIST) {
-      SPVM_OP* op_list = op_last;
+    if (op_last->code == SPVM_OP_C_CODE_ARRAY_INIT) {
+      
+      SPVM_OP* op_type_new = SPVM_OP_clone_op_type(compiler, op_last->first);
+      SPVM_OP* op_list = op_last->last;
       
       op_list->moresib = 0;
       op_list->sibparent = NULL;
@@ -2279,17 +2292,6 @@ SPVM_OP* SPVM_OP_build_assign(SPVM_COMPILER* compiler, SPVM_OP* op_assign, SPVM_
       
       // New
       SPVM_OP* op_new = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_NEW, op_list->file, op_list->line);
-      
-      // Type
-      SPVM_OP* op_type_new = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_TYPE, op_list->file, op_list->line);
-      SPVM_VAR* var = op_assign->first->uv.var;
-      SPVM_MY_VAR* my_var = var->op_my_var->uv.my_var;
-      SPVM_TYPE* type =  my_var->op_type->uv.type;
-      op_type_new->uv.type = type;
-      
-      // Add OP type
-      SPVM_DYNAMIC_ARRAY_push(compiler->op_types, op_type_new);
-      
       SPVM_OP_insert_child(compiler, op_new, op_new->last, op_type_new);
       
       op_assign->last = op_new;
@@ -2384,10 +2386,10 @@ SPVM_OP* SPVM_OP_build_croak(SPVM_COMPILER* compiler, SPVM_OP* op_croak, SPVM_OP
   return op_croak;
 }
 
-SPVM_OP* SPVM_OP_build_void(SPVM_COMPILER* compiler, SPVM_OP* op_void) {
+SPVM_OP* SPVM_OP_new_op_void(SPVM_COMPILER* compiler, const char* file, int32_t line) {
   
   // Type op
-  SPVM_OP* op_type = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_TYPE, op_void->file, op_void->line);
+  SPVM_OP* op_type = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_TYPE, file, line);
   
   op_type->uv.type = SPVM_TYPE_get_void_type(compiler);
   

@@ -2,7 +2,7 @@ package Finance::Loan::Repayment;
 use Moose;
 
 # ABSTRACT: Play with loans, rates and repayment options
-our $VERSION = '1.1';
+our $VERSION = '1.4';
 
 has loan => (
     is       => 'rw',
@@ -83,7 +83,7 @@ Finance::Loan::Repayment - Play with loans, rates and repayment options
 
 =head1 VERSION
 
-version 1.1
+version 1.4
 
 =head1 SYNOPSIS
 
@@ -95,13 +95,13 @@ version 1.1
 
         # The following parameters are optional
         # Reduce interest by 1 each month
-        interest_off => 1
+        interest_off => 1,
 
         # Principal payment per month
-        principal_payment => 30
+        principal_payment => 30,
 
         # Total amount to pay per month
-        total_payment => 30
+        total_payment => 30,
 
     );
 
@@ -171,14 +171,6 @@ This does more or less the same thing as this module
 =item L<Finance::Loan::Private>
 
 =back
-
-=head1 AUTHOR
-
-Wesley Schwengle
-
-=head1 LICENSE and COPYRIGHT
-
-Wesley Schwengle, 2017.
 
 =head1 AUTHOR
 

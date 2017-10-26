@@ -1,10 +1,7 @@
 use lib 't/lib';
-use strict;
-use warnings;
-use 5.008001;
+use Test2::V0 -no_srand => 1;
 use constant tests_per_shell => 1;
 use constant number_of_shells => 13;
-use Test::More;
 use Shell::Config::Generate;
 use TestLib;
 
@@ -27,9 +24,9 @@ diag $@ if $@;
 
 foreach my $shell (qw( tcsh csh bsd-csh bash sh zsh command.com cmd.exe ksh 44bsd-csh jsh powershell.exe fish ))
 {
-  my $shell_path = find_shell($shell);
-  SKIP: {
-    skip "no $shell found", tests_per_shell unless defined $shell_path;
+  subtest $shell => sub {
+    my $shell_path = find_shell($shell);
+    skip_all "no $shell found" unless defined $shell_path;
 
     my $env = get_env($config, $shell, $shell_path);
 

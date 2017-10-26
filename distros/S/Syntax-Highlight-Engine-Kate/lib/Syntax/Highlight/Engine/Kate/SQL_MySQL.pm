@@ -12,7 +12,7 @@
 
 package Syntax::Highlight::Engine::Kate::SQL_MySQL;
 
-our $VERSION = '0.10';
+our $VERSION = '0.12';
 
 use strict;
 use warnings;

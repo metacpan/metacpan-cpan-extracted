@@ -1,18 +1,18 @@
 ---
-abstract: 'a port to Perl of the syntax highlight engine of the Kate texteditor.'
+abstract: 'a port to Perl of the syntax highlight engine of the Kate text editor.'
 author:
   - 'Hans Jeuken'
 build_requires:
   ExtUtils::MakeMaker: 6.59
   Term::ANSIColor: 0
-  Test::Differences: '0.61'
-  Test::More: '1.00'
-  Test::Warn: '0.30'
+  Test::Differences: 0.61
+  Test::More: 1.00
+  Test::Warn: 0.30
 configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.08'
+generated_by: 'Module::Install version 1.16'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,14 +23,15 @@ no_index:
     - eg
     - inc
     - t
+    - xt
 requires:
   Carp: 0
   Data::Dumper: 0
   File::Basename: 0
   Path::Tiny: 0
-  perl: '5.006'
+  perl: 5.006
 resources:
   homepage: http://padre.perlide.org/
   license: http://dev.perl.org/licenses/
   repository: https://github.com/szabgab/Syntax-Highlight-Engine-Kate
-version: '0.09'
+version: 0.12

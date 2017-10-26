@@ -29,5 +29,6 @@ _Inline/.*
 ^\..*
 File-ConfigDir-.*
 \bxt
+Sandbox
 ^MYMETA\.json$
 ^MYMETA\..*$

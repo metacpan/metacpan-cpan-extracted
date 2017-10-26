@@ -64,7 +64,7 @@ why individual tests may fail.
 The 1st two tests assume that your FTPS server doesn't require certificates,
 and the 3rd one assumes that your FTPS server does require certificates.  If
 certificates are required, you'll have to modify the 3rd test script to point
-to your client certificate, see ithe instructions for that below.
+to your client certificate, see the instructions for that below.
 
 In most cases you'll probably only need to do one of the test cases to verify
 functionality.  Also all 3 test cases ask the same questions.

@@ -4,7 +4,7 @@ package Method::Traits;
 use strict;
 use warnings;
 
-our $VERSION   = '0.06';
+our $VERSION   = '0.07';
 our $AUTHORITY = 'cpan:STEVAN';
 
 use Carp            ();
@@ -72,7 +72,7 @@ sub import_into {
         MODIFY_CODE_ATTRIBUTES => sub {
             my ($pkg, $code, @attrs) = @_;
 
-            my @providers  = @{ $PROVIDERS_BY_PKG{ $pkg } }; # fetch complete set
+            my @providers  = @{ $PROVIDERS_BY_PKG{ $pkg } ||=[] }; # fetch complete set
             my @attributes = map MOP::Method::Attribute->new( $_ ), @attrs;
 
             my ( %attr_to_handler_map, @unhandled );
@@ -126,7 +126,7 @@ Method::Traits - Apply traits to your methods
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 

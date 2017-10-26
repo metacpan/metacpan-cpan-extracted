@@ -4,7 +4,7 @@
       "Rutger Vos"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "perl_5"
    ],
@@ -48,9 +48,10 @@
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
+         "type" : "git",
          "url" : "git://github.com/rvosa/bio-phylo-forest-dbtree.git"
       },
       "x_MailingList" : "mailto:bio-phylo@googlegroups.com"
    },
-   "version" : "v0.1.1"
+   "version" : "v0.1.2"
 }

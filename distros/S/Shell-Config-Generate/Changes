@@ -1,5 +1,12 @@
 Revision history for Shell-Config-Generate
 
+0.31      2017-10-25 11:10:03 -0400
+  - Production release identical to 0.30_01
+
+0.30_01   2017-09-08 15:08:18 -0400
+  - You can now pass a string name of the shell
+    to generate and generate_file
+
 0.29      2017-09-01 09:38:58 -0400
   - Filter PATH on Windows Subsystem for Linux
 

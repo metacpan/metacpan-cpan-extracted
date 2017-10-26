@@ -1,0 +1,58 @@
+{
+   "abstract" : "Colormaps for ANSI 256 Color Terminals!",
+   "author" : [
+      "Felix Tubiana <felixtubiana@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Term-Colormap",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Scalar::Util" : "0",
+            "Term::ReadKey" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Term::Colormap" : {
+         "file" : "lib/Term/Colormap.pm",
+         "version" : "0.15"
+      },
+      "Term::Colormap::Brewer" : {
+         "file" : "lib/Term/Colormap/Brewer.pm",
+         "version" : "0.15"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/artistic-license-2.0.php"
+      ],
+      "repository" : {
+         "url" : "https://github.com/xxfelixxx/perl-term-colormap"
+      }
+   },
+   "version" : "0.15",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

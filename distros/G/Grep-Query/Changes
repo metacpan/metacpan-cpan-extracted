@@ -1,5 +1,11 @@
 Revision history for Grep-Query
 
+1.008	2017-10-25
+
+	qgrep sample broken
+	
+	Needs to handle newlines
+
 1.007	2017-08-09
 
 	No G::Q changes, just fixing version number(s) in files

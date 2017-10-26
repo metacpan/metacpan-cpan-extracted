@@ -32,19 +32,30 @@ my %opts = (
 pod2usage(0) if ($opts{help});
 
 if (-f $opts{config}) {
-    my $config = Config::Any->load_files({ 
+    my $config = Config::Any->load_files({
             files => [$opts{config}],
             use_ext => 1,
             flatten_hash => 1,
 
         })->[0]{$opts{config}};
 
+    my @keys = qw(interest principal interest-only total);
+    foreach my $key (@keys) {
+        if ($opts{$key}) {
+            delete $config->{$_} for @keys;
+            last;
+        }
+    }
     foreach (keys %opts) {
         delete $config->{$_};
     }
 
     foreach (keys %$config) {
-        $opts{$_} ||= $config->{$_};
+        # If an option is set multiple times in the config file, take
+        # the last value and work with that
+        $opts{$_} ||= ref $config->{$_} eq 'ARRAY'
+            ? $config->{$_}[-1]
+            : $config->{$_};
     }
 }
 
@@ -163,7 +174,7 @@ loan.pl - A simple loan calculator
 
 =head1 VERSION
 
-version 1.1
+version 1.4
 
 =head1 SYNOPSIS
 

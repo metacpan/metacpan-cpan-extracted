@@ -9,7 +9,7 @@ use warnings;
 use XML::TokeParser;
 use Data::Dumper;
 
-our $VERSION = '0.10';
+our $VERSION = '0.12';
 
 my $regchars = "\\^.\$|()[]{}*+?~!%^&/";
 

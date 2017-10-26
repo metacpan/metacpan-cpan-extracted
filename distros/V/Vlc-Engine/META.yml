@@ -20,9 +20,9 @@ no_index:
 provides:
   Vlc::Engine:
     file: lib/Vlc/Engine.pm
-    version: 0.003
+    version: 0.004
 recommends:
 requires:
 resources:
   repository: https://fossil.falseking.org/vlc-engine/flk
-version: 0.003
+version: 0.004

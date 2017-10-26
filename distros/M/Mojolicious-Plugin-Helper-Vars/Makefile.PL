@@ -8,7 +8,7 @@ WriteMakefile(
     AUTHOR           => q{Михаил Че <mche@cpan.org>},
     VERSION_FROM     => 'lib/Mojolicious/Plugin/Helper/Vars.pm',
     ABSTRACT_FROM    => 'lib/Mojolicious/Plugin/Helper/Vars.pm',
-    LICENSE          => 'artistic_2',
+    LICENSE          => 'perl_5',
     PL_FILES         => {},
     MIN_PERL_VERSION => 5.006,
     CONFIGURE_REQUIRES => {

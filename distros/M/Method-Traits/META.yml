@@ -23,5 +23,5 @@ requires:
 resources:
   bugtracker: https://github.com/stevan/p5-Method-Traits/issues
   repository: https://github.com/stevan/p5-Method-Traits.git
-version: '0.06'
+version: '0.07'
 x_serialization_backend: 'YAML::Tiny version 1.70'

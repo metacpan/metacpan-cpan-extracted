@@ -29,7 +29,7 @@ requires:
   CPAN: '2.18'
   CPAN::Reporter: '1.2018'
   Contextual::Return: '0.004014'
-  Data::Dumper: '2.167'
+  Data::Dumper: '2.161'
   Data::Dumper::Simple: '0.11'
   Data::Printer: '0.40'
   DateTime: '1.44'
@@ -42,7 +42,7 @@ requires:
   ExtUtils::MakeMaker: '7.30'
   File::HomeDir: '1.002'
   File::ShareDir: '1.104'
-  File::Spec: '3.67'
+  File::Spec: '3.62'
   File::Temp: '0.2304'
   File::Which: '1.22'
   Getopt::Long: '2.5'
@@ -73,7 +73,7 @@ requires:
   Role::Basic: '0.13'
   Scalar::Util: '1.49'
   Term::ReadKey: '2.37'
-  Term::ReadLine: '1.16'
+  Term::ReadLine: '1.14'
   Test::Class: '0.50'
   Test::Differences: '0.64'
   Test::Exception: '0.43'
@@ -94,4 +94,4 @@ requires:
   perl: 5.6.0
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.004'
+version: '0.005'

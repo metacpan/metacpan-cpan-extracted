@@ -1,5 +1,8 @@
 Revision history for Geo-Coder-List
 
+0.16	Tue Oct 24 22:40:26 EDT 2017
+	Return undef when the geocode fails
+
 0.15	Fri Oct 20 14:25:48 EDT 2017
 	Added log() and flush()
 

@@ -1,5 +1,33 @@
 Revision history for FFI-CheckLib
 
+0.18      2017-10-25 10:00:47 -0400
+  - Production version identical to 0.17_02
+
+0.17_02   2017-10-14 01:03:04 -0400
+  - Fix Windows testing regression introduced in 0.17_01
+
+0.17_01   2017-10-13 15:58:30 -0400
+  - Filter out broken and recursive symlinks
+  - Better handle symlinked .so files on platforms that support that.
+
+    Previously, we preferred the longer .so names (ie, libfoo.so.1.2.3)
+    over the shorter .so names (libfoo.so) since the latter is usually a
+    symlink, and the former may have useful "version" information in the
+    filename.  That is a problem when a system is using symlinks to indicate
+    a preference, (for example, if there are both libfoo.so.1.2.3,
+    libfoo.so.1.2.4 and libfoo.so is a symlink to one of those).
+    
+    Now we still endevour to return the long .so name, but use the short
+    name to see which one is preferred by the operating system, or user.
+    
+    In the absense of any symlinks to disambiguate two libraries with the
+    same name, we prefer the one with a newer version number.   That is
+    libfoo.so.2.3.4 would be preferred over libfoo.so.1.2.3
+   
+  - Slightly more consistent diagnostic messages.
+  - Added functions: which, where, has_symbols
+    None are exported by default, but may be requested.
+
 0.16      2017-08-08 10:24:49 -0400
   - Tentative support for msys
 

@@ -1,6 +1,6 @@
 package App::Muter::Backend::Uuencode;
 # ABSTRACT: a uuencode transform for App::Muter
-$App::Muter::Backend::Uuencode::VERSION = '0.002002';
+$App::Muter::Backend::Uuencode::VERSION = '0.003000';
 use strict;
 use warnings;
 
@@ -48,7 +48,7 @@ App::Muter::Backend::Uuencode - a uuencode transform for App::Muter
 
 =head1 VERSION
 
-version 0.002002
+version 0.003000
 
 =head1 AUTHOR
 

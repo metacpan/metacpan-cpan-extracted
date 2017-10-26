@@ -11,7 +11,7 @@
 
 package Syntax::Highlight::Engine::Kate::Quake_Script;
 
-our $VERSION = '0.10';
+our $VERSION = '0.12';
 
 use strict;
 use warnings;

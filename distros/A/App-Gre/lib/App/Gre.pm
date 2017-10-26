@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = "0.15";
+our $VERSION = "0.16";
 
 1;
 
@@ -45,8 +45,7 @@ search (see "gre -c").
 =head1 OPTIONS
 
     <regexp>           regular expression to match in files
-    [<file>...]        list of files to include, if not provided will
-                       be current directory.
+    [<file>...]        list of files to include (default is current directory)
 
     -A[<n>]            print n lines after the matching line, default 2
     -B[<n>]            print n lines before the matching line, default 2
@@ -73,18 +72,17 @@ search (see "gre -c").
     -y3                output style 3, no file/line info
     -[no]xbinary       filters out binary files
     -[no][x][i]name[e]=<str>
-                       include files by name*
+                       include files by name
     -[no][x][i]path[e]=<str>
-                       include files by full path name*
+                       include files by full path name
     -[no][x][i][r]ext=<str>
-                       include files by extension name*
+                       include files by extension name
     -[no][x][i]line1[e]=<str>
-                       include files by the first line in the file*
+                       include files by the first line in the file
     -[no]{perl,html,php,js,java,cc,...}
-                       include files matching builtin filter combo*
+                       include files matching builtin filter combo
 
 =head1 DESCRIPTION
-
 
 This grep clone is capable of filtering file names as well as file
 contents with regexps.  For example if you want to search all files
@@ -102,15 +100,14 @@ files you want:
 
     $ gre -ext=html -noext=min.html foo
 
-This would find all .html files that aren't .min.html files.
+This would find "foo" in all .html files that aren't .min.html files.
 
 =head1 FILE FILTERING
 
-It's just as important to be able to filter files with regexp's as
-are the file contents. In fact, the default is to list files when
-a regexp is not given (or is the empty string).
+When your command line doesn't include a regexp (or is the empty
+string), the gre program will list files that would be searched.
 
-The standard "includes" are done in order left to right. This:
+The standard "include" filters are done in order left to right. This:
 
     $ gre -perl -php
 
@@ -125,8 +122,8 @@ name doesn't match "foo", you need this:
 
     $ gre -perl -php -noname=foo
 
-The first option can either add files to nothing or remove files
-from all. For example:
+The first option can either add files to the set of nothing or remove files
+from the set of all. For example:
 
     $ gre -perl
 
@@ -137,14 +134,14 @@ will only show perl files.
 will show all files except perl files.
 
 There are two levels of filtering that run independent of each
-other. One level is the "includes" filters like -perl, -nophp, or
--ext=c.  The second level is the "excludes" filters like -xname=foo
+other. One level is the "include" filters like -perl, -nophp, or
+-ext=c.  The second level is the "exclude" filters like -xname=foo
 or -xbinary.
 
-Why are they independent?  Consider if the
-script had a default filter to remove all backup files (-xname='~$')
-which would have to mix with additional command line filters.  The following
-would try to search for bash files (files whose first line starts with
+Why are they independent?  Consider if the script had a default
+filter to remove all backup files (-xname='~$') which would have
+to mix with additional command line filters.  The following would
+try to search for bash files (files whose first line starts with
 #!/bin/bash) that aren't backups:
 
     $ gre -xname='~$' -line1='^#!/bin/bash'

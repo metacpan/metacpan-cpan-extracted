@@ -15,7 +15,7 @@ BEGIN {
     }
 }
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 sub new {
     my ($class, %args) = @_;
@@ -61,14 +61,13 @@ sub user {
 
     $sth->execute($user);
 
-    my $res = $sth->fetchrow_hashref();
+    my $res = $sth->fetchrow_hashref;
 
     return ref $res ne 'HASH'
         ? {user => $user, pass => ''}
         : $res;
 }
 sub aux {
-
     my ($self, $aux_id) = @_;
 
     if (! $self->{aux_sth}) {
@@ -139,6 +138,15 @@ sub env {
     my $sth = $self->{env_sth};
     $sth->execute($id);
     return $sth->fetchrow_hashref;
+}
+sub delete {
+    my ($self, $table) = @_;
+
+    my $sth = $self->{db}->prepare(
+        "DELETE FROM $table;"
+    );
+
+    $sth->execute;
 }
 sub graph_data {
     my ($self) = @_;
@@ -249,18 +257,6 @@ Optional, Bool. C<1> to enable testing mode, C<0> to disable.
 
 Default: C<0> (off)
 
-=head2 user($user)
-
-Fetches a user's information as found in the 'auth' database table.
-
-Parameters:
-
-    $user
-
-Mandatory, String. The name of the user to fetch the password for.
-
-Return: A hash reference containing the user's details.
-
 =head2 aux($aux_id)
 
 Fetches and returns a hash reference containing the details of an auxillary
@@ -332,6 +328,16 @@ configuration variable.
 Return: Single scalar value if C<$want> is sent in, or a hash reference of the
 entire configuration section where the keys are the variable names, and the
 values are the configuration values.
+
+=head2 delete($table)
+
+Deletes all data from the specified table.
+
+Parameters:
+
+    $table
+
+Mandatory, String. The name of the table to delete all the data from.
 
 =head2 env
 
@@ -417,13 +423,25 @@ the value to update to, and the where clause value.
 Same as C<update_bulk()> except operates on all table rows (there's no where
 clause).
 
+=head2 user($user)
+
+Fetches a user's information as found in the 'auth' database table.
+
+Parameters:
+
+    $user
+
+Mandatory, String. The name of the user to fetch the password for.
+
+Return: A hash reference containing the user's details.
+
 =head1 AUTHOR
 
 Steve Bertrand, E<lt>steveb@cpan.org<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016 Steve Bertrand.
+Copyright 2017 Steve Bertrand.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

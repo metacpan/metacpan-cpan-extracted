@@ -4,7 +4,7 @@
 package Lingua::Interset::Tagset::SV::Parole;
 use strict;
 use warnings;
-our $VERSION = '3.006';
+our $VERSION = '3.007';
 
 use utf8;
 use open ':utf8';
@@ -567,7 +567,7 @@ Lingua::Interset::Tagset::SV::Parole - Driver for the Swedish PAROLE tagset.
 
 =head1 VERSION
 
-version 3.006
+version 3.007
 
 =head1 SYNOPSIS
 

@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 33;
+use Test::Most tests => 43;
 use Test::NoWarnings;
 
 eval 'use autodie qw(:all)';	# Test for open/close failures
@@ -13,7 +13,7 @@ BEGIN {
 
 LIST: {
 	SKIP: {
-		skip 'Test requires Internet access', 31 unless(-e 't/online.enabled');
+		skip 'Test requires Internet access', 41 unless(-e 't/online.enabled');
 
 		eval {
 			require Test::Number::Delta;
@@ -104,6 +104,20 @@ LIST: {
 		delta_within($location->{geometry}{location}{lng}, 0.49, 1e-2);
 		is(ref($location->{'geocoder'}), 'Geo::Coder::XYZ', 'Verify XYZ encoder is used');
 
+		$location = $geocoderlist->geocode({ location => 'Allen, Indiana, USA' });
+		ok(defined($location));
+		ok(ref($location) eq 'HASH');
+		delta_within($location->{geometry}{location}{lat}, 40.63, 1e-2);
+		delta_within($location->{geometry}{location}{lng}, -79.1, 1e-2);
+		is(ref($location->{'geocoder'}), 'Geo::Coder::CA', 'Verify CA encoder is used');
+
+		$location = $geocoderlist->geocode({ location => 'Allen, Indiana, USA' });
+		ok(defined($location));
+		ok(ref($location) eq 'HASH');
+		delta_within($location->{geometry}{location}{lat}, 40.64, 1e-2);
+		delta_within($location->{geometry}{location}{lng}, -79.1, 1e-2);
+		is($location->{'geocoder'}, undef, 'Verify subsequent reads are cached');
+
 		ok(!defined($geocoderlist->geocode()));
 		ok(!defined($geocoderlist->geocode('')));
 
@@ -112,7 +126,7 @@ LIST: {
 		ok(defined($log));
 		$geocoderlist->flush();
 		foreach my $l(@{$log}) {
-			diag($l->{location}, ': ',  $l->{timetaken}, 's with ',  $l->{geocoder}, "\n");
+			diag($l->{location}, ': ',  $l->{timetaken}, 's with ',  $l->{geocoder}, '(error: ', $l->{error}, ')');
 		}
 	}
 }

@@ -1,27 +1,45 @@
 use strict;
 use warnings;
 
-use Data::Dumper;
-
 package Sub::WrapPackages;
 
-use vars '$VERSION';
-use vars '%ORIGINAL_SUBS'; # coderefs of what we're wrapping, keyed
-                           #   by package::sub
-use vars '@MAGICINCS';     # list of magic INC subs, used by lib.pm hack
-use vars '%INHERITED';     # coderefs of inherited methods (before proxies
-                           #   installed), keys by package::sub
-use vars '%WRAPPED_BY_WRAPPER'; # coderefs of original subs, keyed by
-                                #   stringified coderef of wrapper
-use vars '%WRAPPER_BY_WRAPPED'; # coderefs of wrapper subs, keyed by
-                                #   stringified coderef of original sub
+our $VERSION;
+our %ORIGINAL_SUBS; # coderefs of what we're wrapping, keyed
+                    #   by package::sub
+our @MAGICINCS;     # list of magic INC subs, used by lib.pm hack
+our %INHERITED;     # coderefs of inherited methods (before proxies
+                    #   installed), keys by package::sub
+our %WRAPPED_BY_WRAPPER; # coderefs of original subs, keyed by
+                         #   stringified coderef of wrapper
+our %WRAPPER_BY_WRAPPED; # coderefs of wrapper subs, keyed by
+                         #   stringified coderef of original sub
 use Sub::Prototype ();
 use Devel::Caller::IgnoreNamespaces;
 Devel::Caller::IgnoreNamespaces::register(__PACKAGE__);
 
-use lib ();
+use Data::Dumper;
+$Data::Dumper::Deparse = 1;
 
-$VERSION = '2.0';
+$VERSION = '2.01';
+
+use lib ();
+{
+    no strict 'refs';
+    no warnings 'redefine';
+    
+    my $originallibimport = \&{'lib::import'};
+    my $newimport = sub {
+        $originallibimport->(@_);
+        my %magicincs = map { $_, 1 } @Sub::WrapPackages::MAGICINCS;
+        @INC = (
+            (grep { exists($magicincs{$_}); } @INC),
+            (grep { !exists($magicincs{$_}); } @INC)
+        );
+    };
+    
+    *{'lib::import'} = $newimport;
+}
+
 
 =head1 NAME
 
@@ -37,6 +55,8 @@ subroutines in packages or around individual subs
         wrap_inherited => 1,                # and wrap any methods
                                             #   inherited by Foo, Bar, or
                                             #   Baz::*
+        except   => qr/::w[oi]bble$/,       # but don't wrap any sub called
+                                            #   wibble or wobble
         pre      => sub {
             print "called $_[0] with params ".
               join(', ', @_[1..$#_])."\n";
@@ -119,6 +139,16 @@ they're wrapped in the superclass of course.
 
 References to the subroutines you want to use as wrappers.
 
+=item except
+
+A regex, any subroutine whose fully-qualified name (ie including the package
+name) matches this will not be wrapped.
+
+=item debug
+
+This exists, but probably isn't of much use unless you want to hack on
+Sub::WrapPackage's guts.
+
 =back
 
 =head1 BUGS
@@ -132,8 +162,7 @@ do that.  You shouldn't be doing that anyway.  Mind you, you shouldn't
 be doing the things that this module does either.  BAD PROGRAMMER, NO
 BIKKIT!
 
-If you find any other lurking horrors, please report them using
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=Sub-WrapPackages>.
+Bug reports should be made on Github or by email.
 
 =head1 FEEDBACK
 
@@ -142,7 +171,7 @@ criticism, are welcome.  Please email me.
 
 =head1 SOURCE CODE REPOSITORY
 
-L<http://www.cantrell.org.uk/cgit/cgit.cgi/perlmodules/>
+L<git://github.com/DrHyde/perl-modules-Sub-WrapPackages.git>
 
 =head1 COPYRIGHT and LICENCE
 
@@ -164,15 +193,17 @@ constant.pm being Far Too Clever, and providing a patch and test;
 
 to Adam Trickett who thought this was a jolly good idea;
 
-and to Ed
+to Ed
 Summers, whose code for figgering out what functions a package contains
-I borrowed out of L<Acme::Voodoo>.
+I borrowed out of L<Acme::Voodoo>;
+
+and to Yanick Champoux for numerous readability improvements.
 
 =cut
 
 sub import {
     shift;
-    wrapsubs(@_) if(@_);
+    wrapsubs(@_);
 }
 
 sub _subs_in_packages {
@@ -190,7 +221,7 @@ sub _subs_in_packages {
 
 sub _make_magic_inc {
     my %params = @_;
-    my $wildcard_packages = [map { s/::.//; $_; } grep { /::\*$/ } @{$params{packages}}];
+    my $wildcard_packages = [map { (my $p = $_) =~ s/::.$//; $p; } grep { /::\*$/ } @{$params{packages}}];
     my $nonwildcard_packages = [grep { $_ !~ /::\*$/ } @{$params{packages}}];
 
     push @MAGICINCS, sub {
@@ -207,7 +238,12 @@ sub _make_magic_inc {
         open(my $fh, $files[0]) || die("Can't locate $file in \@INC\n");
         my $text = <$fh>;
         close($fh);
-        %Sub::WrapPackages::params = %params;
+
+        if(!%Sub::WrapPackages::params) {
+          print STDERR "Setting \%Sub::WrapPackages::params\n", Dumper(\%params)
+            if($params{debug});
+          %Sub::WrapPackages::params = %params;
+        }
 
         $text =~ /(.*?)(__DATA__.*|__END__.*|$)/s;
         my($code, $trailer) = ($1, $2);
@@ -244,10 +280,11 @@ sub wrapsubs {
         # wrap wildcards that are loaded
         if(@{$wildcard_packages}) {
             foreach my $loaded (map { (my $f = $_) =~ s!/!::!g; $f =~ s/\.pm$//; $f } keys %INC) {
-                my $pattern = '^('.join('|',
-                    map { (my $f = $_) =~ s/::\*$/::/; $f } @{$wildcard_packages}
-                ).')';
-                wrapsubs(%params, packages => [$loaded]) if($loaded =~ /$pattern/);
+                my $pattern = '^('.join('|', @{$wildcard_packages}).')(::|$)';
+                if($loaded =~ /$pattern/) {
+                  print STDERR "found loaded wildcard $loaded - matches $pattern\n" if($params{debug});
+                  wrapsubs(%params, packages => [$loaded]);
+                }
             }
         }
 
@@ -258,13 +295,13 @@ sub wrapsubs {
 
                 # get inherited (but not over-ridden!) subs
                 my %subs_in_package = map {
-                    s/.*:://; ($_, 1);
+                    (split '::' )[-1] => 1
                 } _subs_in_packages($package);
 
                 my @subs_to_define = grep {
                     !exists($subs_in_package{$_})
                 } map { 
-                    s/.*:://; $_;
+                    (split '::' )[-1]
                 } _subs_in_packages(@parents);
 
                 # define proxy method that just does a goto to get
@@ -285,6 +322,7 @@ sub wrapsubs {
                         }
                     };
                     die($@) if($@);
+                    print STDERR "created stub ${package}::$sub for inherited method\n" if($params{debug});
                 }
             }
         }
@@ -298,7 +336,10 @@ sub wrapsubs {
     $params{post} ||= sub {};
 
     foreach my $sub (@{$params{subs}}) {
-        next if(exists($ORIGINAL_SUBS{$sub}));
+        next if(
+          (exists($params{except}) && $sub =~ $params{except}) ||
+          exists($ORIGINAL_SUBS{$sub})
+        );
 
         $ORIGINAL_SUBS{$sub} = \&{$sub};
         my $imposter = sub {
@@ -330,24 +371,9 @@ sub wrapsubs {
             $WRAPPER_BY_WRAPPED{$ORIGINAL_SUBS{$sub}} = $imposter;
 
             *{$sub} = $imposter;
+            print STDERR "wrapped $sub\n" if($params{debug});
         };
     }
 }
-
-package lib;
-use strict; no strict 'refs';
-use warnings; no warnings 'redefine';
-
-my $originallibimport = \&{'lib::import'};
-my $newimport = sub {
-    $originallibimport->(@_);
-    my %magicincs = map { $_, 1 } @Sub::WrapPackages::MAGICINCS;
-    @INC = (
-        (grep { exists($magicincs{$_}); } @INC),
-        (grep { !exists($magicincs{$_}); } @INC)
-    );
-};
-
-*{'lib::import'} = $newimport;
 
 1;

@@ -8,3 +8,6 @@ Revision history for Perl extension Vlc::Engine.
 
 0.003  Sat Oct 07 23:06:43 2017
 	- Correcting POD
+
+0.004  Wed Oct 25 20:58:10 2017
+        - Correcting POD

@@ -22,5 +22,7 @@ t/11_carp.t
 t/12_coercion.t
 t/13_check.t
 t/14_nocheck.t
+t/15_types.t
+t/16_kv.t
 META.yml
 MANIFEST

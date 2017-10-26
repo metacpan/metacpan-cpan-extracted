@@ -89,6 +89,8 @@ sub _ev_event_to_mysql_event {
     return $events;
 }
 
+sub empty;
+
 our %WATCHER_POOL;
 our $WATCHER_POOL_MAX = 2; # keep two standby watchers alive at most
 sub __return_watcher {
@@ -100,8 +102,10 @@ sub __return_watcher {
     return if @$pool >= $WATCHER_POOL_MAX;
     $watcher->stop; # includes $watcher->clear_pending;
     $watcher->keepalive(0);
+    $watcher->cb(\&empty);
     push @$pool, $watcher;
 }
+
 sub __stop_or_return_watcher {
     my $args         = $_[0] // {};
     my $watcher_type = $args->{watcher_type};
@@ -117,6 +121,11 @@ sub __stop_or_return_watcher {
     my $watcher = $storage->{$watcher_type};
     $watcher->stop; # includes $watcher->clear_pending;
     $watcher->keepalive(0);
+
+    # WOAH. Keeping this coderef alive is doing something nasty;
+    # replace it asap.
+    $watcher->cb(\&empty);
+
     return;    
 }
 sub __return_all_watchers {
@@ -356,6 +365,8 @@ sub ____run {
     my $socket_fd         = $outside_maria->mysql_socket_fd;
     my $previous_wait_for = $wait_for & ~MYSQL_WAIT_TIMEOUT;
 
+    $outside_maria->{watchers} //= {};
+
     # $maria is weakened here, as otherwise we would
     # have this cycle:
     # $maria->{watchers}{any}{cb} => sub { ...; $maria; ...; }
@@ -491,18 +502,20 @@ sub ____run {
             0, # no repeat
             sub {
                 DEBUG && TELL "Global timeout reached";
-                __return_all_watchers(delete $maria->{watchers});
+
+                if ( $maria ) {
+                    __return_all_watchers(delete $maria->{watchers});
+                    delete $maria->{pending}{$reject_refaddr};
+                }
 
                 push @errors,
                     "$type execution was interrupted by perl, maximum execution time exceeded (timeout=$perl_timeout)";
-                delete $maria->{pending}{$reject_refaddr};
                 $failure_cb->(@errors);
             },
         ]
     }) if $perl_timeout;
 
     $outside_maria->{pending}{$reject_refaddr} = $failure_cb;
-    weaken($outside_maria->{pending}{$reject_refaddr});
 
     return;
 }

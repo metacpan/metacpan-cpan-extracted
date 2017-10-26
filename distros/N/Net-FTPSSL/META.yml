@@ -28,4 +28,4 @@ requires:
   Sys::Hostname: 0
   Time::Local: 0
   perl: 5.006001
-version: 0.38
+version: 0.39

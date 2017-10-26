@@ -2,6 +2,9 @@
 ##
 ## Change log for perl distribution DDC-Concordance
 
+v0.40 Tue, 24 Oct 2017 15:16:03 +0200 moocow
+	+ added support for query type DDC::PP::CQAndImplicit (requires ddc >=v2.1.5)
+
 v0.39 Wed, 28 Jun 2017 09:06:20 +0200 moocow
 	+ fixes for perl 5.26 ('.' no longer in @INC, breaks `do "$TEST_DIR/parseme.pl"` in t/*8*qparse.t)
 

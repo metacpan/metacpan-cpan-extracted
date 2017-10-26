@@ -1,4 +1,6 @@
-3.006
+3.007
+
+3.006     2017-07-11 12:46:15+02:00 Europe/Prague
 
 Features:
 * Feature 'case': added values 'equ' and 'cmp', newly defined in UD v2.

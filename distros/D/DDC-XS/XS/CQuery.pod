@@ -80,6 +80,12 @@ DDC::XS::CQuery - XS interface to DDC C++ CQuery objects
  $CQAnd = DDC::XS::CQAnd->new($dtr1, $dtr2);
 
  #----------------------------------------------------------------------
+ # DDC::XS::CQAndImplicit : @ISA=qw(DDC::XS::CQAnd);
+ 
+ # Constructors etc.
+ $CQAndImplicit = DDC::XS::CQAndImplicit->new($dtr1, $dtr2);
+
+ #----------------------------------------------------------------------
  # DDC::XS::CQOr : @ISA=qw(DDC::XS::CQBinOp);
  
  # Constructors etc.

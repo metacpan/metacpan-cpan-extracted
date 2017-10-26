@@ -26,6 +26,7 @@ $npipe->Write("1..39\n");        # <== test plan
 # ====== BEGIN TESTS
 
 my ($Xmax, $Ymax) = XYMax();
+my ($Xoverflow, $Yoverflow) = ( ((1200 > $Xmax) ? 1200 : $Xmax+2), ((1000 > $Ymax) ? 1000 : $Ymax+2) );
 
 # ======== tests Cursor function
 
@@ -141,13 +142,13 @@ ok( $x==17 and $y==$Ymax );
 
 # test 22
 Cursor(17, 5);
-Cursor(17, 1000);
+Cursor(17, $Yoverflow);
 ($x, $y) = Cursor();
 ok( $x==17 and $y==$Ymax );
 
 # test 23                # all max
 Cursor(17, 5);
-Cursor(1200 , 1000);
+Cursor($Xoverflow, $Yoverflow);
 ($x, $y) = Cursor();
 ok( $x==$Xmax and $y==$Ymax );
 

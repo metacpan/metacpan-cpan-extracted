@@ -5,11 +5,11 @@ author:
 build_requires:
   File::Spec: '0'
   Test::More: '0.88'
-  Test::Warnings: '0.016'
+  Test::Warnings: '0.026'
 configure_requires:
   Module::Build: '0.38'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.142690'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,16 +18,16 @@ name: File-CodeSearch
 provides:
   File::CodeSearch:
     file: lib/File/CodeSearch.pm
-    version: v0.7.4
+    version: v0.7.5
   File::CodeSearch::Highlighter:
     file: lib/File/CodeSearch/Highlighter.pm
-    version: v0.7.4
+    version: v0.7.5
   File::CodeSearch::RegexBuilder:
     file: lib/File/CodeSearch/RegexBuilder.pm
-    version: v0.7.4
+    version: v0.7.5
   File::CodeSearch::Replacer:
     file: lib/File/CodeSearch/Replacer.pm
-    version: v0.7.4
+    version: v0.7.5
 requires:
   Carp: '0'
   Clone: '0'
@@ -56,4 +56,5 @@ resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=File-CodeSearch
   license: http://dev.perl.org/licenses/
   repository: http://github.com/ivanwills/File-CodeSearch
-version: v0.7.4
+version: v0.7.5
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -10,6 +10,8 @@ pod_spelling_system:
     - bakkiaraj
     - libs
     - systempath
+    - grinnz
+    - DBOOK
 
 pod_coverage:
   skip: 0

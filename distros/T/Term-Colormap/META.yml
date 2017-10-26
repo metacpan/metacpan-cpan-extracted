@@ -1,0 +1,33 @@
+---
+abstract: 'Colormaps for ANSI 256 Color Terminals!'
+author:
+  - 'Felix Tubiana <felixtubiana@gmail.com>'
+build_requires:
+  Capture::Tiny: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Term-Colormap
+provides:
+  Term::Colormap:
+    file: lib/Term/Colormap.pm
+    version: '0.15'
+  Term::Colormap::Brewer:
+    file: lib/Term/Colormap/Brewer.pm
+    version: '0.15'
+requires:
+  Scalar::Util: '0'
+  Term::ReadKey: '0'
+  perl: '5.006'
+resources:
+  license: http://opensource.org/licenses/artistic-license-2.0.php
+  repository: https://github.com/xxfelixxx/perl-term-colormap
+version: '0.15'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

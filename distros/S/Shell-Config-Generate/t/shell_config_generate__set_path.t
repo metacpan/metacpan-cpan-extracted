@@ -1,10 +1,5 @@
 use lib 't/lib';
-use strict;
-use warnings;
-use 5.008001;
-use constant tests_per_shell => 1;
-use constant number_of_shells => 11;
-use Test::More;
+use Test2::V0 -no_srand => 1;
 use Shell::Config::Generate;
 use TestLib;
 
@@ -31,13 +26,13 @@ foreach my $sep (undef, ':', ';', '|')
 
     foreach my $shell (qw( tcsh csh bsd-csh bash sh zsh cmd.exe command.com ksh 44bsd-csh jsh ))
     {
-      my $shell_path = find_shell($shell);
-      SKIP: {
-        skip "no $shell found", tests_per_shell unless defined $shell_path;
+      subtest $shell => sub {
+        my $shell_path = find_shell($shell);
+        skip_all "no $shell found" unless defined $shell_path;
 
         my $env = get_env($config, $shell, $shell_path);
 
-        is_deeply [split /$path_sep_regex/, $env->{FOO_PATH1}], [qw( foo bar baz )], "[$shell] FOO_PATH = foo bar baz";
+        is [split /$path_sep_regex/, $env->{FOO_PATH1}], [qw( foo bar baz )], "[$shell] FOO_PATH = foo bar baz";
       }
     }
   }

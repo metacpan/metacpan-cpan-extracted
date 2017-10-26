@@ -44,7 +44,8 @@
       "test" : {
          "requires" : {
             "Test2::API" : "1.302015",
-            "Test::More" : "0.94",
+            "Test2::Mock" : "0.000060",
+            "Test2::V0" : "0.000060",
             "base" : "0",
             "perl" : "5.008001"
          }
@@ -62,12 +63,12 @@
          "web" : "https://github.com/plicease/Shell-Config-Generate"
       }
    },
-   "version" : "0.29",
+   "version" : "0.31",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "Brad Macpherson (BRAD, brad-mac)",
       "mohawk"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

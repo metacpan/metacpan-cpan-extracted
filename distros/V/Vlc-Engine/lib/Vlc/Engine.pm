@@ -18,7 +18,7 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 require XSLoader;
 XSLoader::load('Vlc::Engine', $VERSION);
@@ -192,11 +192,11 @@ __END__
 
 =head1 NAME
 
-Vlc::Engine is an embedded for VLC Player
+Vlc::Engine - bindings for perl
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -716,7 +716,7 @@ L<https://fossil.falseking.org/vlc-engine/flk>
 
 =head1 COPYLEFT AND LICENSE
 
-Copyleft (C) 2017 by James Axl
+Copyleft (C) 2017 by James Axl For the love of the community
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.24.1 or,

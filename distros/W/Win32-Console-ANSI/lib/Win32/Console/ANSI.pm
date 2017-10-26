@@ -1,8 +1,8 @@
 package Win32::Console::ANSI;
 #
-# Copyright (c) 2004-2015 Jean-Louis Morel <jl_morel@bribes.org>
+# Copyright (c) 2004-2017 Jean-Louis Morel <jl_morel@bribes.org>
 #
-# Version 1.10 (6/09/2015)
+# Version 1.11 (24/10/2017)
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the same terms as Perl itself.
@@ -19,7 +19,7 @@ use warnings;
 require Exporter;
 
 our @ISA = qw(Exporter);
-our $VERSION = '1.10';
+our $VERSION = '1.11';
 
 use constant  MS_ON      => -1;
 use constant  MS_STANDBY => 1;
@@ -323,6 +323,28 @@ screen.
        47    White
        
        49    Default background color
+
+=item * Bright / high-intensity foreground colors
+
+       90    Bright Black (aka Dark Gray)
+       91    Bright Red
+       92    Bright Green
+       93    Bright Yellow
+       94    Bright Blue
+       95    Bright Magenta
+       96    Bright Cyan
+       97    Bright White
+
+=item * Bright / high-intensity background colors
+
+      100    Bright Black (aka Dark Gray)
+      101    Bright Red
+      102    Bright Green
+      103    Bright Yellow
+      104    Bright Blue
+      105    Bright Magenta
+      106    Bright Cyan
+      107    Bright White
 
 =back
 
@@ -676,7 +698,7 @@ Report bug: http://rt.cpan.org/Public/Dist/Display.html?Name=Win32-Console-ANSI
 
 =head1 COPYRIGHT
 
-Copyright (c) 2003-2015 J-L Morel. All rights reserved.
+Copyright (c) 2003-2017 J-L Morel. All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

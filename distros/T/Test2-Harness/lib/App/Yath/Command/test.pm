@@ -2,7 +2,7 @@ package App::Yath::Command::test;
 use strict;
 use warnings;
 
-our $VERSION = '0.001024';
+our $VERSION = '0.001026';
 
 use Test2::Harness::Util::TestFile;
 use Test2::Harness::Feeder::Run;
@@ -62,21 +62,58 @@ sub handle_list_args {
 
     unless ($has_search) {
         return if grep { $_->block_default_search($settings) } keys %{$settings->{plugins}};
+        return unless $settings->{default_search};
 
-        my @dirs = grep { -d $_ } './t', './t2';
-
-        push @dirs => './xt'
-            if -d './xt'
-            && ($settings->{env_vars}->{AUTHOR_TESTING}
-            || $ENV{AUTHOR_TESTING});
-
-        my @files;
-        push @files => 'test.pl' if -f 'test.pl' && !is_generated_test_pl('test.pl');
+        my (@dirs, @files);
+        for my $path (@{$settings->{default_search}}) {
+            if (-d $path) {
+                push @dirs => $path;
+                next;
+            }
+            if (-f $path) {
+                next if $path =~ m/test\.pl$/ && is_generated_test_pl($path);
+                push @files => $path;
+            }
+        }
 
         $settings->{search} = [@dirs, @files];
     }
 }
 
+sub normalize_settings {
+    my $self = shift;
+
+    $self->SUPER::normalize_settings(@_);
+
+    my $settings = $self->{+SETTINGS};
+
+    return if $settings->{default_search} && @{$settings->{default_search}};
+
+    my @default = ('./t', './t2');
+    push @default => './xt' if $ENV{AUTHOR_TESTING} || $settings->{env_vars}->{AUTHOR_TESTING};
+    push @default => 'test.pl';
+
+    $settings->{default_search} = \@default;
+
+    return;
+}
+
+sub options {
+    my $self = shift;
+
+    return (
+        $self->SUPER::options(),
+
+        {
+            spec    => 'default-search=s@',
+            field   => 'default_search',
+            used_by => {runner => 1, jobs => 1},
+            section => 'Job Options',
+            usage   => ['--default_search t'],
+            long_desc => ["Specify the default file/dir search. defaults to './t', './t2', 'test.pl', and when 'AUTHOR_TESTING' is set './xt'. The default search is only used if no files were specified at the command line"],
+        },
+    );
+}
 
 sub feeder {
     my $self = shift;
@@ -465,6 +502,10 @@ This can be used multiple times
 use Devel::Cover to calculate test coverage
 
 This is essentially the same as combining: '--no-fork', and '-MDevel::Cover=-silent,1,+ignore,^t/,+ignore,^t2/,+ignore,^xt,+ignore,^test.pl' Devel::Cover and preload/fork do not work well together.
+
+=item --default_search t
+
+ARRAY(0x2853180)
 
 =item --fork
 

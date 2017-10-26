@@ -1,7 +1,4 @@
-use strict;
-use warnings;
-use 5.008001;
-use Test::More;
+use Test2::V0 -no_srand => 1;
 use Shell::Guess;
 use Shell::Config::Generate;
 

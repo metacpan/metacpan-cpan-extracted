@@ -40,12 +40,12 @@ produces output
     /usr/home/ben/projects/directory-diff/examples/old_dir/diff-file is different from /usr/home/ben/projects/directory-diff/examples/new_dir/diff-file.
 
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.06/examples/synopsis.pl> in the distribution.)  
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.07/examples/synopsis.pl> in the distribution.)  
 
 =head1 VERSION
 
-This documents Directory-Diff version 0.06
-corresponding to git commit L<3a2b17d6394631cf6d30ed2595aa0472b2dd64d4|https://github.com/benkasminbullock/Directory-Diff/commit/3a2b17d6394631cf6d30ed2595aa0472b2dd64d4> released on Sat Oct 14 23:10:44 2017 +0900.
+This documents Directory-Diff version 0.07
+corresponding to git commit L<bbd5ab962db512f71beb6e65f653d9b222073700|https://github.com/benkasminbullock/Directory-Diff/commit/bbd5ab962db512f71beb6e65f653d9b222073700> released on Wed Oct 25 14:02:10 2017 +0900.
 
 =head1 DESCRIPTION
 
@@ -279,6 +279,7 @@ I'm currently using this for almost all the static content for the
 following web sites: L<http://www.sljfaq.org>,
 L<http://kanji.sljfaq.org>, and L<http://www.lemoda.net>. I put this
 module on github in about 2012 and on CPAN in 2016.
+
 
 
 =head1 AUTHOR

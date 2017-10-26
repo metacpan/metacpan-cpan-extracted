@@ -530,6 +530,16 @@ void InterpretEscSeq( )
             DEBUGSTR("setting background to = 0x%.8x", background);
             background = es_argv[i]-40;
           }
+          if ( (90 <= es_argv[i]) && (es_argv[i] <= 97) ) {
+            bold = 1;
+            foreground = es_argv[i]-90;
+            DEBUGSTR("setting foreground to = 0x%.8x", foreground);
+          }
+          if ( (100 <= es_argv[i]) && (es_argv[i] <= 107) ) {
+            DEBUGSTR("setting background to = 0x%.8x", background);
+            underline = 1;
+            background = es_argv[i]-100;
+          }
         }
         if (rvideo) attribut = foregroundcolor[background] | backgroundcolor[foreground];
         else attribut = foregroundcolor[foreground] | backgroundcolor[background];

@@ -39,7 +39,7 @@ my $builder = Module::Build->new(
     build_requires => {
         'File::Spec'     => 0,
         'Test::More'     => '0.88',
-        'Test::Warnings' => '0.016',
+        'Test::Warnings' => '0.026',
     },
     add_to_cleanup     => [ 'File-CodeSearch-*' ],
     create_license     => 1,

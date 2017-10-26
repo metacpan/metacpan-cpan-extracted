@@ -2,7 +2,7 @@ package Mojolicious::Plugin::Helper::Vars;
 
 use Mojo::Base 'Mojolicious::Plugin';
 
-our $VERSION = '0.0002';
+our $VERSION = '0.0004';
 my $pkg = __PACKAGE__;
 
 =pod
@@ -14,6 +14,10 @@ my $pkg = __PACKAGE__;
 =head1 Mojolicious::Plugin::Helper::Vars
 
 ¡ ¡ ¡ ALL GLORY TO GLORIA ! ! !
+
+=head VERSION
+
+0.0004
 
 =head1 NAME
 
@@ -60,7 +64,7 @@ Please report any bugs or feature requests at L<https://github.com/mche/Mojolici
 
 =head1 COPYRIGHT
 
-Copyright 2016 Mikhail Che.
+Copyright 2016-2017 Mikhail Che.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -76,30 +80,33 @@ sub register {
   $app->helper($helper => sub {
     my $c = shift;
     my @vars;
-    my $val = sub{my $val = shift; $val eq 'undef' ? undef : $val;};
     for (@_) {
-      if (my $stash = $c->stash($_)) {
+      if (defined(my $stash = $c->stash($_))) {
         #~ warn "Stash [$_]:", $c->dumper($stash);
         if (ref($stash) eq 'ARRAY') {
-          push @vars, map $val->($_), @$stash;
+          push @vars, map _val($_), @$stash;
         } else {
-          push @vars, $val->($stash);
+          push @vars, _val($stash);
         }
       }
-    }
-    for (@_) {
+
       if (my $param = $c->req->params->every_param($_)) {
         #~ warn "Param [$_]:", $c->dumper($param);
-        if (ref($param) eq 'ARRAY') {
-          push @vars, map $val->($_), @$param;
-        } else {
-          push @vars, map $val->($param);
-        }
+        #~ if (ref($param) eq 'ARRAY') {
+          push @vars, map _val($_), @$param;
+        #~ } else {
+          #~ push @vars, map $val->($param);
+        #~ }
       }
     }
     return wantarray ? @vars : shift(@vars);
   });
   return $self;
+}
+
+sub _val {
+  my $val = shift;
+  return $val eq 'undef' || $val eq 'undefined' ? undef : $val;
 }
 
 1;

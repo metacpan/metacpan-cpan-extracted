@@ -12,7 +12,7 @@
 
 package Syntax::Highlight::Engine::Kate::Intel_x86_NASM;
 
-our $VERSION = '0.10';
+our $VERSION = '0.12';
 
 use strict;
 use warnings;

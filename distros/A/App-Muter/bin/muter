@@ -119,11 +119,19 @@ is missing or too old.
 Implements the L<RFC 4648|https://tools.ietf.org/html/rfc4648> Base32 with
 Extended Hex Alphabet encoding, better known as C<base32hex>.
 
-Accept one option, C<manual>, which does the same thing as for C<base32>.
+Accepts one option, C<manual>, which does the same thing as for C<base32>.
 
 =head2 base64
 
 Implements the L<RFC 4648|https://tools.ietf.org/html/rfc4648> Base64 encoding.
+
+=head2 form
+
+Implements URI percent encoding, like C<uri>, except it encodes space as C<+>
+instead of C<%20>, as for use in  I<application/x-www-form-urlencoded>.  This
+used to be written C<uri(form)>, which is no longer allowed.
+
+Otherwise accepts the same options as C<uri> (C<lower> and C<upper>).
 
 =head2 hash
 
@@ -175,9 +183,8 @@ input).
 
 Implements URI percent encoding.
 
-Takes three possible options.  C<lower> and C<upper> control the type of hex
-character emitted, and C<form> makes space be encoded as C<+> instead of C<%20>
-(as for use in I<application/x-www-form-urlencoded>.
+Takes two possible options.  C<lower> and C<upper> control the type of hex
+character emitted.
 
 =head2 url64
 

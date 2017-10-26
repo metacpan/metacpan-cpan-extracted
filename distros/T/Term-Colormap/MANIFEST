@@ -1,6 +1,5 @@
 .travis.yml
 bin/color_numbers
-bin/create_brewer_mapping
 bin/felix
 bin/git_blame_summary
 bin/hbar

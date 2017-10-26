@@ -8,7 +8,7 @@ use Carp qw( croak );
 use Exporter ();
 
 # ABSTRACT: Portably generate config for any shell
-our $VERSION = '0.29'; # VERSION
+our $VERSION = '0.31'; # VERSION
 
 
 sub new
@@ -174,7 +174,32 @@ sub generate
 {
   my($self, $shell) = @_;
 
-  $shell ||= Shell::Guess->running_shell;
+  if(defined $shell)
+  {
+    if(ref($shell) eq '')
+    {
+      my $method = join '_', $shell, 'shell';
+      if(Shell::Guess->can($method))
+      {
+        $shell = Shell::Guess->$method;
+      }
+      else
+      {
+        croak("unknown shell type: $shell");
+      }
+    }
+  }
+  else
+  {
+    $shell = Shell::Guess->running_shell;
+  }
+  
+  $self->_generate($shell);
+}
+
+sub _generate
+{
+  my($self, $shell) = @_;
   
   my $buffer = '';
   my $sep    = $shell->is_win32 ? ';' : ':';
@@ -410,7 +435,7 @@ Shell::Config::Generate - Portably generate config for any shell
 
 =head1 VERSION
 
-version 0.29
+version 0.31
 
 =head1 SYNOPSIS
 
@@ -625,7 +650,7 @@ configurations into your shell.
 
 This will generate a shebang at the beginning of the configuration,
 making it appropriate for use as a script.  For non UNIX shells this
-will be ignored.  If specified, $location will be used as the 
+will be ignored.  If specified, C<$location> will be used as the 
 interpreter location.  If it is not specified, then the default
 location for the shell will be used.
 
@@ -683,16 +708,22 @@ to stick with the shell default or to use C<:> or C<;>.
  my $command_text = $config->generate( $shell );
 
 Generate shell configuration code for the given shell.
-$shell is an instance of L<Shell::Guess>.  If $shell
+C<$shell> is an instance of L<Shell::Guess>.  If C<$shell>
 is not provided, then this method will use Shell::Guess
 to guess the shell that called your perl script.
+
+You can also pass in the shell name as a string for
+C<$shell>.  This should correspond to the appropriate
+I<name>_shell from L<Shell::Guess>.  So for csh you
+would pass in C<"c"> and for tcsh you would pass in
+C<"tc">, etc.
 
 =head2 generate_file
 
  $config->generate_file( $shell, $filename );
 
 Generate shell configuration code for the given shell
-and write it to the given file.  $shell is an instance 
+and write it to the given file.  C<$shell> is an instance 
 of L<Shell::Guess>.  If there is an IO error it will throw
 an exception.
 

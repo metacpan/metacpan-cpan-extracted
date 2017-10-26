@@ -11,5 +11,6 @@ die("Usage: $0 <query> [file1 file2 ...]\n") unless $q;
 my $gq = Grep::Query->new($q);
 while (<>)
 {
-	print if $gq->qgrep($_);
+	chomp;
+	print "$_\n" if $gq->qgrep($_);
 }

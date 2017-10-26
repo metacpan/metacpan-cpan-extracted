@@ -14,7 +14,7 @@ use English qw/ -no_match_vars /;
 use Term::ANSIColor qw/:constants/;
 use Term::Size::Any;
 
-our $VERSION = version->new('0.7.4');
+our $VERSION = version->new('0.7.5');
 
 extends 'File::CodeSearch::RegexBuilder';
 
@@ -133,9 +133,13 @@ sub highlight {
 
                 # Check if
                 if ($chars_front_tmp + $chars_back_tmp < length $parts[$i]) {
-                    my ($front) = $parts[$i] =~ /\A (.{$chars_front_tmp}) /xms;
-                    my ($back)  = $parts[$i] =~ / (.{$chars_back_tmp}) \Z/xms;
-                    $part = (defined $front ? $front : '') . $self->before_snip  . '...' . $self->after_snip . $self->before_nomatch . (defined $back ? $back : '');
+                    my ($front) = $chars_front_tmp > 0 ? $parts[$i] =~ /\A(.{$chars_front_tmp})/xms : ('');
+                    my ($back)  = $chars_back_tmp  > 0 ? $parts[$i] =~ /(.{$chars_back_tmp})\Z/xms  : ('');
+                    $part = (defined $front ? $front : '')
+                        . $self->before_snip  . '...'
+                        . $self->after_snip
+                        . $self->before_nomatch
+                        . (defined $back ? $back : '');
                 }
             }
             $out .= $self->before_nomatch . $part . $self->after_nomatch;
@@ -159,7 +163,7 @@ File::CodeSearch::Highlighter - Highlights matched parts of a line.
 
 =head1 VERSION
 
-This documentation refers to File::CodeSearch::Highlighter version 0.7.4.
+This documentation refers to File::CodeSearch::Highlighter version 0.7.5.
 
 
 =head1 SYNOPSIS

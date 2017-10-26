@@ -78,6 +78,15 @@
 };
 
 //======================================================================
+// CQAndImplicit
+%name{DDC::XS::CQAndImplicit} class CQAndImplicit : public %name{DDC::XS::CQAnd} CQAnd
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+	%name{CQAndImplicit} CQAndImplicit(CQuery* dtr1=NULL, CQuery* dtr2=NULL);
+};
+
+//======================================================================
 // CQOr
 %name{DDC::XS::CQOr} class CQOr : public %name{DDC::XS::CQBinOp} CQBinOp
 {

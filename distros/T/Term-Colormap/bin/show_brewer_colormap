@@ -7,4 +7,17 @@ use Term::Colormap qw( color_table );
 use Term::Colormap::Brewer;
 
 my $name = $ARGV[0] || 'unknown';
-color_table($name);
+
+# After a long usage message...the usage message is obscured since
+# there are so many brewer colormaps...
+eval {
+    color_table($name);
+};
+my $error = $@;
+if ($error) {
+    print $@;
+    print "\nInvalid colormap '$name'\n";
+    print "\nusage: $0 colormap_name\n\n";
+}
+
+exit 0;

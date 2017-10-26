@@ -16,10 +16,12 @@ sub bar {
 
 is foo(p => 3, q => 2), 2;
 is foo(p => 3), 3;
+is foo(p => 3, q => undef), 3;
 like dies { foo(q => 2) }, qr/Required parameter 'p' not passed/;
 
 is bar(3, 2), 2;
 is bar(3), 3;
+is bar(3, undef), 3;
 like dies { bar() }, qr/Required parameter 'p' not passed/;
 
 done_testing;

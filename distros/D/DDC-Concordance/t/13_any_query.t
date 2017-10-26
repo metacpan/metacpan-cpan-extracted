@@ -1,5 +1,5 @@
 # -*- Mode: CPerl -*-
-use Test::More tests=>21;
+use Test::More tests=>23;
 use DDC::Any;
 
 ##-- 1..4: CQAnd: perl only
@@ -59,6 +59,10 @@ ok($qwithor && $qwithor->isa('DDC::Any::CQWithor'), "withor:|=");
 my $qwithout = DDC::Any->parse('foo != bar');
 ok($qwithout && $qwithout->isa('DDC::Any::CQWithout'), "without:!=");
 
+##-- 22..23 : CQAndImplicit
+my $qandi = DDC::Any->parse('foo bar');
+ok($qandi && $qandi->isa('DDC::Any::CQAndImplicit'), "implicit-and:isa");
+ok($qandi && $qandi->isa('DDC::Any::CQAnd'),         "implicit-and:isa(and)");
 
 print "\n";
 

@@ -6,6 +6,10 @@ use Smart::Args::TypeTiny;
     package MyClass;
     sub new { bless {} }
 }
+{
+    package MyClass::More;
+    sub new { bless {} }
+}
 
 sub foo {
     args my $x => ArrayRef[Int];
@@ -17,8 +21,14 @@ sub bar {
     return $x;
 }
 
+sub baz {
+    args my $x => 'MyClass::More';
+    return $x;
+}
+
 is foo(x => [10]), [10];
 isa_ok bar(x => MyClass->new()), 'MyClass';
+isa_ok baz(x => MyClass::More->new()), 'MyClass::More';
 
 like dies {
 	foo(x => {foo => 42});

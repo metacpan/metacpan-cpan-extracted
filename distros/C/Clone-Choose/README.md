@@ -22,7 +22,7 @@ Clone::Choose - Choose appropriate clone utility
 # DESCRIPTION
 
 `Clone::Choose` checks several different modules which provides a
-`clone()` function and selects an appropriate one. The default preferrence
+`clone()` function and selects an appropriate one. The default preference
 is
 
     Clone
@@ -45,8 +45,11 @@ or pick a particular `clone` implementation
     use Clone::Choose qw(:Storable clone);
 
 The exported implementation is resolved dynamically, which means that any
-using module can either rely on the default backend preferrence or choose
+using module can either rely on the default backend preference or choose
 a particular one.
+
+It is also possible to select a particular `clone` backend by setting the
+environment variable CLONE\_CHOOSE\_PREFERRED\_BACKEND to your preferred backend.
 
 This also means, an already chosen import can't be modified like
 
@@ -67,6 +70,21 @@ implementations dynamically.
 
 The use of `@Clone::Choose::BACKENDS` is discouraged and will be deprecated
 as soon as anyone provides a better idea.
+
+# PACKAGE METHODS
+
+## backend
+
+`backend` tells the caller about the dynamic chosen backend:
+
+    use Clone::Choose;
+    say Clone::Choose->backend; # Clone
+
+This method currently exists for debug purposes only.
+
+## get\_backends
+
+`get_backends` returns a list of the currently supported backends.
 
 # AUTHOR
 

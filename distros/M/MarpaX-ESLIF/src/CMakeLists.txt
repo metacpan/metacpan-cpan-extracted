@@ -6,7 +6,7 @@ ENDIF ()
 # Usually the version here correspong to the NEXT version - it is git tagged
 # when we do make marpaESLIFPerlRelease
 #
-MYPACKAGESTART (marpaESLIF 2 0 17)
+MYPACKAGESTART (marpaESLIF 2 0 19)
 
 ###########
 # Library #
@@ -27,7 +27,7 @@ IF (NOT HAVE_MYPACKAGE_UINT32)
 ELSE ()
   MESSAGE (STATUS ".. unsigned 32-bit integer type is ${MYPACKAGE_UINT32_TYPEDEF}")
 ENDIF ()
-SET (MARPSESLIF_UINT32_T ${MYPACKAGE_UINT32_TYPEDEF})
+SET (MARPAESLIF_UINT32_T ${MYPACKAGE_UINT32_TYPEDEF})
 #
 # ... PCRE2 dependency
 #

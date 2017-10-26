@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 24 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 22 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'ETL/Yertl.pm',
@@ -14,7 +14,6 @@ my @module_files = (
     'ETL/Yertl/Adapter/influxdb.pm',
     'ETL/Yertl/Command/yfrom.pm',
     'ETL/Yertl/Command/ygrok.pm',
-    'ETL/Yertl/Command/ymask.pm',
     'ETL/Yertl/Command/yq.pm',
     'ETL/Yertl/Command/yq/Regex.pm',
     'ETL/Yertl/Command/ysql.pm',
@@ -31,7 +30,6 @@ my @module_files = (
 my @scripts = (
     'bin/yfrom',
     'bin/ygrok',
-    'bin/ymask',
     'bin/yq',
     'bin/ysql',
     'bin/yto',

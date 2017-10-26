@@ -1,5 +1,5 @@
 package ETL::Yertl::Format;
-our $VERSION = '0.035';
+our $VERSION = '0.036';
 # ABSTRACT: Base class for input/output formats
 
 use ETL::Yertl;
@@ -20,7 +20,7 @@ ETL::Yertl::Format - Base class for input/output formats
 
 =head1 VERSION
 
-version 0.035
+version 0.036
 
 =head1 AUTHOR
 

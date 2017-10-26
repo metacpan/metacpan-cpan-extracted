@@ -1,5 +1,13 @@
 Revision history for Perl extension Smart-Args-TypeTiny
 
+0.10 2017-10-26T04:33:54Z
+
+    - isa/does can take type constraint string
+    - support Mouse::Util::TypeConstraints for Smart::Args compatible
+    - args/args_pos return hashref of parameters
+    - optional parameter allows to pass undef
+    - coderef of default parameter returns as scalar context
+
 0.02 2017-09-29T04:29:56Z
 
     - require Test2::Suite >= 0.000077 for Test2::V0

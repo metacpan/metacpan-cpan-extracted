@@ -29,9 +29,12 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "File::Spec" => 0,
+    "IO::Handle" => 0,
+    "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.1",
+  "VERSION" => "1.4",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -40,8 +43,11 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Config::Any" => 0,
+  "File::Spec" => 0,
   "File::Spec::Functions" => 0,
   "Getopt::Long" => 0,
+  "IO::Handle" => 0,
+  "IPC::Open3" => 0,
   "Moose" => 0,
   "Pod::Usage" => 0,
   "Test::More" => 0,

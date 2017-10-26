@@ -10,7 +10,7 @@ Provides a geocoding functionality using http:://geocoder.ca for both Canada and
 
 # VERSION
 
-Version 0.04
+Version 0.05
 
 # SYNOPSIS
 

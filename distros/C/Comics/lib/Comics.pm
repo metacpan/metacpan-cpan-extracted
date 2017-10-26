@@ -3,8 +3,8 @@
 # Author          : Johan Vromans
 # Created On      : Fri Oct 21 09:18:23 2016
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Jun 14 21:47:33 2017
-# Update Count    : 365
+# Last Modified On: Wed Oct 25 14:28:02 2017
+# Update Count    : 369
 # Status          : Unknown, Use with caution!
 
 use 5.012;
@@ -15,7 +15,7 @@ use Carp;
 
 package Comics;
 
-our $VERSION = "1.06";
+our $VERSION = "1.07";
 
 package main;
 
@@ -72,7 +72,7 @@ our $stats;
 sub init {
     $stats =
       { tally => 0,
-	fail => 0,
+	fail => [],
 	loaded => 0,
 	uptodate => 0,
 	excluded => 0,
@@ -310,7 +310,7 @@ sub run_plugins {
 	unless ( eval { $comic->fetch; 1 } ) {
 	    $comic->{state}->{fail} = $@;
 	    debug($comic->{state}->{fail});
-	    $stats->{fail}++;
+	    push( @{ $stats->{fail} }, $comic->{name} );
 	}
     }
 }
@@ -435,10 +435,10 @@ sub statmsg {
     my $loaded = $stats->{loaded};
     my $tally = $stats->{tally};
     my $uptodate = $stats->{uptodate};
-    my $fail = $stats->{fail};
+    my $fail = @{ $stats->{fail} };
     my $disabled = $stats->{disabled};
     my $excluded = $stats->{excluded};
-    my $new = $stats->{tally} - $stats->{uptodate} - $stats->{fail};
+    my $new = $stats->{tally} - $stats->{uptodate} - $fail;
     my $res = "Number of comics = $loaded (".
       "$new new, " .
 	"$uptodate uptodate";

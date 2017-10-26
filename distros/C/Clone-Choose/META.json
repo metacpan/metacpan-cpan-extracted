@@ -40,7 +40,8 @@
             "Test::Pod" : "0",
             "Test::Pod::Coverage" : "0",
             "Test::Pod::Spelling::CommonMistakes" : "0",
-            "Test::Spelling" : "0"
+            "Test::Spelling" : "0",
+            "Test::WriteVariants" : "0.014"
          }
       },
       "runtime" : {
@@ -48,12 +49,18 @@
             "Module::Runtime" : "0"
          },
          "requires" : {
+            "Storable" : "0",
             "perl" : "v5.8.1"
          }
       },
       "test" : {
          "requires" : {
             "Test::More" : "0.9"
+         },
+         "suggests" : {
+            "Clone" : "0.1",
+            "Clone::PP" : "0",
+            "Storable" : "0"
          }
       }
    },
@@ -73,6 +80,6 @@
          "web" : "https://github.com/perl5-utils/Clone-Choose"
       }
    },
-   "version" : "0.003",
+   "version" : "0.005",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

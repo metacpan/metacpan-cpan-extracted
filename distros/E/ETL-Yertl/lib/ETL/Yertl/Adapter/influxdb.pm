@@ -1,5 +1,5 @@
 package ETL::Yertl::Adapter::influxdb;
-our $VERSION = '0.035';
+our $VERSION = '0.036';
 # ABSTRACT: Adapter to read/write from InfluxDB time series database
 
 #pod =head1 SYNOPSIS
@@ -43,6 +43,7 @@ use JSON::MaybeXS qw( decode_json );
 use List::Util qw( first );
 use IO::Async::Loop;
 use Time::Piece ();
+use Scalar::Util qw( looks_like_number );
 
 #pod =method new
 #pod
@@ -188,8 +189,8 @@ sub read_ts {
 #pod
 #pod =item timestamp
 #pod
-#pod An ISO8601 timestamp. Optional. Defaults to the current time on the
-#pod InfluxDB server.
+#pod An ISO8601 timestamp or UNIX epoch time. Optional. Defaults to the
+#pod current time.
 #pod
 #pod =item value
 #pod
@@ -211,11 +212,12 @@ sub write_ts {
         }
 
         my $ts = '';
-        if ( $point->{timestamp} ) {
-            $point->{timestamp} =~ s/[.]\d+Z?$//; # We do not support nanoseconds
-            $ts = " " . (
-                Time::Piece->strptime( $point->{timestamp}, '%Y-%m-%dT%H:%M:%S' )->epoch * 10**9
-            );
+        if ( my $epoch = $point->{timestamp} || time ) {
+            if ( !looks_like_number( $epoch ) ) {
+                $epoch =~ s/[.]\d+Z?$//; # We do not support nanoseconds
+                $epoch = Time::Piece->strptime( $epoch, '%Y-%m-%dT%H:%M:%S' )->epoch;
+            }
+            $ts = " " . ( $epoch * 10**9 );
         }
 
         push @{ $db_lines{ $db } }, sprintf '%s%s %s=%s%s',
@@ -249,7 +251,7 @@ ETL::Yertl::Adapter::influxdb - Adapter to read/write from InfluxDB time series 
 
 =head1 VERSION
 
-version 0.035
+version 0.036
 
 =head1 SYNOPSIS
 
@@ -333,8 +335,8 @@ and field separated by dots (C<.>). Field defaults to C<value>.
 
 =item timestamp
 
-An ISO8601 timestamp. Optional. Defaults to the current time on the
-InfluxDB server.
+An ISO8601 timestamp or UNIX epoch time. Optional. Defaults to the
+current time.
 
 =item value
 

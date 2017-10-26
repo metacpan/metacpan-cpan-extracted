@@ -4,6 +4,7 @@ author:
   - 'Graham Ollis <plicease@cpan.org>'
 build_requires:
   Test2::API: '1.302015'
+  Test2::Mock: '0.000060'
   Test2::Require::Module: '0.000060'
   Test2::V0: '0.000060'
   perl: '5.006'
@@ -24,7 +25,7 @@ resources:
   bugtracker: https://github.com/plicease/FFI-CheckLib/issues
   homepage: https://metacpan.org/pod/FFI::CheckLib
   repository: git://github.com/plicease/FFI-CheckLib.git
-version: '0.16'
+version: '0.18'
 x_contributors:
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Bakkiaraj Murugesan (bakkiaraj)'

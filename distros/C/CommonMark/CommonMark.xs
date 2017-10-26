@@ -233,6 +233,12 @@ BOOT:
             { "OPT_SOURCEPOS", CMARK_OPT_SOURCEPOS },
             { "OPT_HARDBREAKS", CMARK_OPT_HARDBREAKS },
             { "OPT_SAFE", CMARK_OPT_SAFE },
+#if CMARK_VERSION >= 0x001900
+            /* libcmark 0.25.0 */
+            { "OPT_NOBREAKS", CMARK_OPT_NOBREAKS },
+#else
+            { "OPT_NOBREAKS", 0 },
+#endif
             { "OPT_NORMALIZE", CMARK_OPT_NORMALIZE },
             { "OPT_VALIDATE_UTF8", CMARK_OPT_VALIDATE_UTF8 },
             { "OPT_SMART", CMARK_OPT_SMART }

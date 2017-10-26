@@ -5,7 +5,7 @@ use 5.008001;
 
 use ExtUtils::MakeMaker;
 
-my %RUN_DEPS = ();
+my %RUN_DEPS = ($] < 5.007003 ? ('Clone::PP' => 0) : ('Storable' => 0));
 
 my %CONFIGURE_DEPS = (
     'ExtUtils::MakeMaker' => 0,
@@ -16,11 +16,28 @@ my %TEST_DEPS = (
     'Test::More' => 0.90,
 );
 
+if (-d 'Sandbox')
+{
+    unless (grep { $_ eq '.' } @INC)
+    {
+        use lib '.';
+    }
+    eval "use Sandbox::Tumble ();";
+    $@ and die $@;
+    eval "use File::Path ();";
+    File::Path->import;
+    -d 't/Clone'    and rmtree('t/Clone');
+    -d 't/Storable' and rmtree('t/Storable');
+    -d 't/ClonePP'  and rmtree('t/ClonePP');
+    Sandbox::Tumble->tumble(qw(t));
+}
+
 WriteMakefile1(
     MIN_PERL_VERSION => '5.008001',
-    META_ADD         => {
-        'meta-spec' => {version => 2},
-        resources   => {
+    META_MERGE       => {
+        'meta-spec'    => {version => 2},
+        dynamic_config => 1,
+        resources      => {
             homepage   => 'https://metacpan.org/release/Clone-Choose',
             repository => {
                 url  => 'https://github.com:perl5-utils/Clone-Choose.git',
@@ -46,13 +63,21 @@ WriteMakefile1(
                     'Test::Spelling'                      => 0,
                     'Test::Perl::Critic'                  => 0,
                     'Test::PerlTidy'                      => 0,
+                    'Test::WriteVariants'                 => '0.014',
                 },
             },
             configure => {
                 requires => {%CONFIGURE_DEPS},
             },
-            build   => {requires => {%BUILD_DEPS}},
-            test    => {requires => {%TEST_DEPS}},
+            build => {requires => {%BUILD_DEPS}},
+            test  => {
+                requires => {%TEST_DEPS},
+                suggests => {
+                    'Clone'     => 0.10,
+                    'Clone::PP' => 0,
+                    'Storable'  => 0
+                }
+            },
             runtime => {
                 requires => {
                     %RUN_DEPS,
@@ -73,7 +98,8 @@ WriteMakefile1(
     PREREQ_PM          => \%RUN_DEPS,
     BUILD_REQUIRES     => \%BUILD_DEPS,
     TEST_REQUIRES      => \%TEST_DEPS,
-    test               => {TESTS => 't/*.t xt/*.t'},
+    test               => {TESTS => join(' ', 't/*.t', 't/Clone/*.t', 't/Storable/*.t', 't/ClonePP/*.t', 'xt/*.t')},
+    (-d "Sandbox" ? (realclean => {FILES => "t/Clone t/Storable t/ClonePP M*.bak"}) : ()),
 );
 
 sub WriteMakefile1

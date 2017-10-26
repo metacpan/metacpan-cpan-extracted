@@ -132,9 +132,14 @@ subtest 'write ts' => sub {
 
     my @points = (
         {
-            timestamp => '2017-01-01T00:00:00',
+            timestamp => 1483228800,
             metric => 'mydb.cpu_load.5m',
             value => 1.23,
+        },
+        {
+            timestamp => '2017-01-01T00:05:00',
+            metric => 'mydb.cpu_load.5m',
+            value => 1.25,
         },
         {
             metric => 'mydb.cpu_load.1m',
@@ -142,6 +147,8 @@ subtest 'write ts' => sub {
         },
     );
 
+    my $time = time;
+    local *CORE::GLOBAL::time = sub { $time };
     $db->write_ts( @points );
 
     ok $mock->called, 'mock POST called';
@@ -149,7 +156,8 @@ subtest 'write ts' => sub {
     is $args->[0], 'http://localhost:8086/write?db=mydb', 'POST URL correct';
     my @lines = (
         "cpu_load 5m=1.23 1483228800000000000",
-        "cpu_load 1m=1.26",
+        "cpu_load 5m=1.25 1483229100000000000",
+        "cpu_load 1m=1.26 " . ( $time * 10**9 ),
     );
     is $args->[1], join( "\n", @lines ), 'influxdb line protocol points correct';
     cmp_deeply { @{ $args }[ 2..$#$args ] },

@@ -1,15 +1,17 @@
 use lib 't/lib';
 use Test2::V0 -no_srand => 1;
 use Test2::Plugin::FauxOS 'linux';
-use Test2::Plugin::FauxDynaLoader;
+use Test2::Tools::FauxDynaLoader;
 use Test2::Tools::NoteStderr qw( note_stderr );
 use FFI::CheckLib;
+use File::Basename qw( basename );
 
-$FFI::CheckLib::system_path =
-$FFI::CheckLib::system_path = [ 
+@$FFI::CheckLib::system_path = (
   'corpus/unix/usr/lib',
   'corpus/unix/lib',
-];
+);
+
+my $mock = mock_dynaloader;
 
 subtest 'find_lib (good)' => sub {
   my($path) = find_lib( lib => 'foo' );
@@ -143,6 +145,129 @@ subtest 'verify' => sub {
   my $dll = TestDLL->new($lib);
   is $dll->name, 'foo', 'dll.name = foo';
   is $dll->version, '2.3.4', 'dll.version = 2.3.4';
+
+};
+
+subtest 'symlink' => sub {
+
+  # TODO: this test only gets run out of git, since Dist::Zilla
+  # converts the symlinks into real files :/
+  skip_all 'Test requires a system with proper symlinks'
+    unless -l 'corpus/unix/usr/lib/libxor.so'
+    &&     readlink('corpus/unix/usr/lib/libxor.so');
+
+  subtest 'multiple versions of the same lib' => sub {
+
+    my($lib) = find_lib(
+      lib => 'xor',
+    );
+  
+    is(basename($lib), 'libxor.so.1.2.4');
+  
+  };
+  
+  subtest 'broken symlink' => sub {
+  
+    my($lib) = find_lib(
+      lib => 'ganon',
+    );
+    
+    is($lib, undef);
+  
+  };
+
+  subtest 'infinite recurse symlink' => sub {
+  
+    my($lib) = find_lib(
+      lib => 'link',
+    );
+    
+    is($lib, undef);
+  
+  };
+
+};
+
+subtest 'prefer newer' => sub {
+
+  my($lib) = find_lib(
+    lib => 'crypto',
+  );
+  
+  is($lib, T());
+  is(basename($lib), 'libcrypto.so.1.0.0');
+  
+  note "lib = $lib";
+
+};
+
+sub p ($)
+{
+  my($path) = @_;
+  $path =~ s{/}{\\}g if $^O eq 'MSWin32';
+  $path;
+}
+
+subtest '_cmp' => sub {
+
+  my $process = sub {
+    [
+      sort { FFI::CheckLib::_cmp($a,$b) }
+      map  { FFI::CheckLib::_matches($_, '/lib') }
+      @_
+    ];
+  };
+  
+  is(
+    $process->(qw( libfoo.so.1.2.3 libbar.so.3.4.5 libbaz.so.0.0.0 )),
+    [
+      [ 'bar', p '/lib/libbar.so.3.4.5', 3,4,5 ],
+      [ 'baz', p '/lib/libbaz.so.0.0.0', 0,0,0 ],
+      [ 'foo', p '/lib/libfoo.so.1.2.3', 1,2,3 ],
+    ],
+    'name first 1',
+  );
+
+  is(
+    $process->(qw( libbaz.so.0.0.0 libfoo.so.1.2.3 libbar.so.3.4.5 )),
+    [
+      [ 'bar', p '/lib/libbar.so.3.4.5', 3,4,5 ],
+      [ 'baz', p '/lib/libbaz.so.0.0.0', 0,0,0 ],
+      [ 'foo', p '/lib/libfoo.so.1.2.3', 1,2,3 ],
+    ],
+    'name first 2',
+  );
+
+  is(
+    $process->(qw( libbar.so.3.4.5 libbaz.so.0.0.0 libfoo.so.1.2.3 )),
+    [
+      [ 'bar', p '/lib/libbar.so.3.4.5', 3,4,5 ],
+      [ 'baz', p '/lib/libbaz.so.0.0.0', 0,0,0 ],
+      [ 'foo', p '/lib/libfoo.so.1.2.3', 1,2,3 ],
+    ],
+    'name first 3',
+  );
+
+  is(
+    $process->(qw( libfoo.so.1.2.3 libfoo.so libfoo.so.1.2 libfoo.so.1 )),
+    [
+      [ 'foo', p '/lib/libfoo.so',             ],
+      [ 'foo', p '/lib/libfoo.so.1',     1     ],
+      [ 'foo', p '/lib/libfoo.so.1.2',   1,2   ],
+      [ 'foo', p '/lib/libfoo.so.1.2.3', 1,2,3 ],
+    ],
+    'no version before version',
+  );
+  
+  is(
+    $process->(qw( libfoo.so.2.3.4 libfoo.so.1.2.3 libfoo.so.3.4.5 )),
+    [
+      [ 'foo', p '/lib/libfoo.so.3.4.5', 3,4,5 ],
+      [ 'foo', p '/lib/libfoo.so.2.3.4', 2,3,4 ],
+      [ 'foo', p '/lib/libfoo.so.1.2.3', 1,2,3 ],
+    ],
+    'newer version first',
+  );
 
 };
 

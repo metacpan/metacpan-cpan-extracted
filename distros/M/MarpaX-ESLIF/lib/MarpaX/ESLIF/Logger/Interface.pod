@@ -14,7 +14,7 @@ MarpaX::ESLIF::Logger::Interface - MarpaX::ESLIF's logger interface
 
 =head1 VERSION
 
-version 2.0.17
+version 2.0.19
 
 =head1 DESCRIPTION
 

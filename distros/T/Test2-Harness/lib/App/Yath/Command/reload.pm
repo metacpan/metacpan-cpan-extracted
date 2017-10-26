@@ -2,7 +2,7 @@ package App::Yath::Command::reload;
 use strict;
 use warnings;
 
-our $VERSION = '0.001024';
+our $VERSION = '0.001026';
 
 use POSIX ":sys_wait_h";
 use Cwd qw/realpath/;
@@ -45,7 +45,7 @@ sub run {
     my $self = shift;
 
     my $pfile = find_pfile()
-        or die "Could not find " . $self->pfile_name . " in current directory, or any parent directories.\n";
+        or die "Could not find a persistent yath running.\n";
 
     my $data = Test2::Harness::Util::File::JSON->new(name => $pfile)->read();
 

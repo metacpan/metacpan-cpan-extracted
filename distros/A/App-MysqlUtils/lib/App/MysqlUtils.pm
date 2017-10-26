@@ -2,8 +2,8 @@ package App::MysqlUtils;
 
 ## no critic (InputOutput::RequireBriefOpen)
 
-our $DATE = '2017-08-17'; # DATE
-our $VERSION = '0.009'; # VERSION
+our $DATE = '2017-10-25'; # DATE
+our $VERSION = '0.010'; # VERSION
 
 use 5.010001;
 use strict;
@@ -391,8 +391,17 @@ $SPEC{mysql_sql_dump_extract_tables} = {
         stop_after_table_pattern => {
             schema => 're*',
         },
+        overwrite => {
+            schema => ['bool*', is=>1],
+            cmdline_aliases => {O=>{}},
+            tags => ['category:output'],
+        },
+        dir => {
+            summary => 'Directory to put the SQL files into',
+            schema => 'dirname*',
+            tags => ['category:output'],
+        },
         # XXX output_file_pattern
-        # XXX overwrite
     },
 };
 sub mysql_sql_dump_extract_tables {
@@ -421,6 +430,13 @@ sub mysql_sql_dump_extract_tables {
         if ($inc_tbl || $inc_tpat) { return 0 } else { return 1 }
     };
 
+    if (defined $args{dir}) {
+        unless (-d $args{dir}) {
+            log_info "Creating directory '%s' ...", $args{dir};
+            mkdir $args{dir}, 0755 or return [500, "Can't create directory '$args{dir}': $!"];
+        }
+    }
+
     # we use direct <>, instead of cmdline_src for speed
     my %seentables;
     while (<>) {
@@ -433,12 +449,15 @@ sub mysql_sql_dump_extract_tables {
                 last;
             }
             $curtbl = $1;
-            $pertblfile = "$curtbl";
+            $pertblfile = (defined $args{dir} ? "$args{dir}/" : "") . "$curtbl";
             if ($has_tbl_filters && !$code_tbl_is_included->($curtbl)) {
-                warn "SKIPPING table $curtbl\n";
+                log_warn "SKIPPING table $curtbl because it is not included";
+                undef $pertblfh;
+            } elsif ((-e $pertblfile) && !$args{overwrite}) {
+                log_warn "SKIPPING table $curtbl because file $pertblfile already exists";
                 undef $pertblfh;
             } else {
-                warn "Writing $pertblfile ...\n";
+                log_warn "Writing $pertblfile ...";
                 open $pertblfh, ">", $pertblfile or die "Can't open $pertblfile: $!";
             }
         }
@@ -446,7 +465,7 @@ sub mysql_sql_dump_extract_tables {
         next unless $curtbl && $pertblfh;
         print $pertblfh $_;
     }
-    close $pertblfh;
+    close $pertblfh if defined $pertblfh;
 
     [200, "OK"];
 }
@@ -595,7 +614,7 @@ App::MysqlUtils - CLI utilities related to MySQL
 
 =head1 VERSION
 
-This document describes version 0.009 of App::MysqlUtils (from Perl distribution App-MysqlUtils), released on 2017-08-17.
+This document describes version 0.010 of App::MysqlUtils (from Perl distribution App-MysqlUtils), released on 2017-10-25.
 
 =head1 SYNOPSIS
 
@@ -905,6 +924,10 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
+=item * B<dir> => I<dirname>
+
+Directory to put the SQL files into.
+
 =item * B<exclude_table_patterns> => I<array[re]>
 
 =item * B<exclude_tables> => I<array[str]>
@@ -912,6 +935,8 @@ Arguments ('*' denotes required arguments):
 =item * B<include_table_patterns> => I<array[re]>
 
 =item * B<include_tables> => I<array[str]>
+
+=item * B<overwrite> => I<bool>
 
 =item * B<stop_after_table> => I<str>
 

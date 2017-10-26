@@ -1,6 +1,18 @@
 Revision history for Finance::Loan::Repayment
 
 
+1.4       2017-10-25 16:10:57Z
+
+    * Options on the command line override the options in the config
+      file
+    * Always take the last value from the config file, is nicer for
+      fiddling purposes
+    * Fix release test run
+
+1.2       2017-09-02 18:17:58Z
+
+    * Remove redundant license statement
+
 1.1       2017-08-30 21:00:25Z
 
     * Make Moose a dependency (RT#122918)

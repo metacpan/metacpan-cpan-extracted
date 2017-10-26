@@ -1,10 +1,5 @@
 use lib 't/lib';
-use strict;
-use warnings;
-use 5.008001;
-use constant tests_per_shell => 2;
-use constant number_of_shells => 13;
-use Test::More;
+use Test2::V0 -no_srand => 1;
 use Shell::Config::Generate;
 use TestLib;
 
@@ -36,19 +31,20 @@ foreach my $sep (undef, ':', ';', '|')
 
     foreach my $shell (qw( tcsh csh bsd-csh bash sh zsh cmd.exe command.com ksh 44bsd-csh jsh powershell.exe fish ))
     {
-      my $shell_path = find_shell($shell);
-      SKIP: {
-        skip "no $shell found", tests_per_shell unless defined $shell_path;
-        skip "| not supported for cmd.exe or command.com", tests_per_shell
+      subtest $shell => sub {
+
+        my $shell_path = find_shell($shell);
+        skip_all "no $shell found" unless defined $shell_path;
+        skip_all "| not supported for cmd.exe or command.com"
           if ($sep||'') eq '|' && $shell =~ /^(command.com|cmd.exe)$/;
-        skip "bad fish", tests_per_shell
+        skip_all "bad fish"
           if $shell eq 'fish'
           && bad_fish($shell_path);
 
         my $env = get_env($config, $shell, $shell_path);
 
-        is_deeply [split /$path_sep_regex/, $env->{FOO_PATH1}], [qw( foo bar baz )], "[$shell] FOO_PATH1 = foo bar baz";
-        is_deeply [split /$path_sep_regex/, $env->{FOO_PATH2}], [qw( foo bar baz )], "[$shell] FOO_PATH2 = foo bar baz";
+        is [split /$path_sep_regex/, $env->{FOO_PATH1}], [qw( foo bar baz )], "[$shell] FOO_PATH1 = foo bar baz";
+        is [split /$path_sep_regex/, $env->{FOO_PATH2}], [qw( foo bar baz )], "[$shell] FOO_PATH2 = foo bar baz";
       }
     }
   }

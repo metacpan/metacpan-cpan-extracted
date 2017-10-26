@@ -1,9 +1,6 @@
 use lib 't/lib';
-use strict;
-use warnings;
-use 5.008001;
+use Test2::V0 -no_srand => 1;
 use File::Spec;
-use Test::More tests => 1;
 use TestPath;
 
 diag '';
@@ -61,3 +58,5 @@ if($TestPath::WSL)
 }
 
 pass 'okay';
+
+done_testing;

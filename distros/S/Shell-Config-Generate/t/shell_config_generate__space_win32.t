@@ -1,12 +1,9 @@
-use strict;
-use warnings;
-use 5.008001;
+use Test2::V0 -no_srand => 1;
 use Shell::Config::Generate qw( win32_space_be_gone );
-use Test::More;
 use File::Temp qw( tempdir );
 use File::Spec;
 
-plan skip_all => 'test only for cygwin and MSWin32' unless $^O =~ /^(cygwin|MSWin32|msys)$/;
+skip_all 'test only for cygwin and MSWin32' unless $^O =~ /^(cygwin|MSWin32|msys)$/;
 
 ok(Shell::Config::Generate->can('win32_space_be_gone'), 'has win32_space_be_gone function');
 

@@ -166,12 +166,18 @@ sub сессия {
   my $conf = $app->config;
   my $session = $conf->{'mojo_session'} || $conf->{'mojo.session'} || $conf->{'mojo'}{'session'} || $conf->{'сессия'}
     || return;
-  $app->sessions->cookie_name($session->{'cookie_name'})
-    if $session->{'cookie_name'};
   
-  $app->sessions->default_expiration($session->{'default_expiration'}) # set expiry
-    if defined $session->{'default_expiration'};
+  #~ $app->sessions->cookie_name($session->{'cookie_name'})
+    #~ if $session->{'cookie_name'};
   
+  #~ $app->sessions->default_expiration($session->{'default_expiration'}) # set expiry
+    #~ if defined $session->{'default_expiration'};
+  
+  while (my ($meth, $val) = each %$session) {
+    next
+      unless $app->sessions->can($meth);
+    $app->sessions->$meth($val);
+  }
 }
 
 sub маршруты {
@@ -215,7 +221,7 @@ sub спейсы {
   push @{$app->routes->namespaces}, @$ns;
 }
 
-our $VERSION = '0.031';
+our $VERSION = '0.032';
 
 =pod
 
@@ -229,7 +235,7 @@ our $VERSION = '0.031';
 
 =head1 VERSION
 
-0.031
+0.032
 
 =head1 NAME
 

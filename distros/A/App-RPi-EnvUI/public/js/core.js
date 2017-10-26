@@ -2,12 +2,12 @@
 
 var temp_limit = -1;
 var humidity_limit = -1;
+var logged_in;
+var graph_event = null; // graph interval timer
 
-$(document).ready(function(){
+$(document).on('pageshow', '#home', function(){
 
     // authentication
-
-    var logged_in;
 
     $.ajax({
         async: false,
@@ -19,15 +19,15 @@ $(document).ready(function(){
         }
     });
 
-    $('#auth').addClass('a');
+    $('div.ui-page-active #auth').addClass('a');
 
     if (logged_in){
-        $('#auth').text('Logout');
-        $('#auth').attr('href', '/logout');
+        $('div.ui-page-active #auth').text('Logout');
+        $('div.ui-page-active #auth').attr('href', '/logout');
     }
     else {
-        $('#auth').text('Login');
-        $('#auth').attr('href', '/login');
+        $('div.ui-page-active #auth').text('Login');
+        $('div.ui-page-active #auth').attr('href', '/login');
     }
 
     // aux buttons
@@ -36,12 +36,16 @@ $(document).ready(function(){
         var aux = 'aux' + i;
 
         if (! logged_in){
-            $('#'+aux).flipswitch("option", "disabled", true);
+            $('div.ui-page-active #' + aux).flipswitch("option", "disabled", true);
+            $('div.ui-page-active #'+aux+'_widget').prop(
+                'title',
+                'You must be logged in to make changes.'
+            );
         }
         else {
-            $('#'+ aux).flipswitch();
-            $('#'+ aux).flipswitch("option", "onText",  "ON");
-            $('#'+ aux).flipswitch("option", "offText", "OFF");
+            $('div.ui-page-active #'+ aux).flipswitch();
+            $('div.ui-page-active #'+ aux).flipswitch("option", "onText",  "ON");
+            $('div.ui-page-active #'+ aux).flipswitch("option", "offText", "OFF");
         }
 
         // hide all generic auxs if necessary
@@ -53,17 +57,19 @@ $(document).ready(function(){
             success: function(data){
                 var json = $.parseJSON(data);
                 if (parseInt(json.pin) == '-1'){
-                    // $('#'+aux+'_widget').hide();
+                    $('div.ui-page-active #'+aux+'_widget').hide();
                 }
             }
         });
     }
 
-    $('.button').on('change', flip_change);
+    // button event
+
+    $('div.ui-page-active .button').on('change', flip_change);
 
     // main menu
 
-    $('.myMenu ul li').hover(function() {
+    $('div.ui-page-active .myMenu ul li').hover(function() {
         $(this).children('ul').stop(true, false, true).slideToggle(300);
     });
 
@@ -73,10 +79,10 @@ $(document).ready(function(){
     var positions = $.parseJSON(s_positions);
 
     $.each(positions, function (id, pos){
-        $('#'+ id).css(pos);
+        $('div.ui-page-active #'+ id).css(pos);
     })
 
-    $('.drag').draggable({
+    $('div.ui-page-active .drag').draggable({
         handle: 'p.widget_handle',
         grid: [10, 1],
         scroll: false,
@@ -87,12 +93,11 @@ $(document).ready(function(){
         },
         stop: function(event, ui){
             positions[this.id] = ui.position;
-            console.log(positions);
             localStorage.positions = JSON.stringify(positions)
         }
     });
 
-    // set variables
+    // set limits
 
     $.get('/get_control/temp_limit', function(data){
         temp_limit = data;
@@ -106,6 +111,32 @@ $(document).ready(function(){
     event_interval();
     display_env();
     display_light();
+});
+
+
+$(document).on('pageshow', '#stats', function(){
+
+    $('div.ui-page-active .myMenu ul li').hover(function() {
+        $(this).children('ul').stop(true, false, true).slideToggle(300);
+    });
+    $('div.ui-page-active #auth').addClass('a');
+
+    if (logged_in){
+        $('div.ui-page-active #auth').text('Logout');
+        $('div.ui-page-active #auth').attr('href', '/logout');
+    }
+    else {
+        $('div.ui-page-active #auth').text('Login');
+        $('div.ui-page-active #auth').attr('href', '/login');
+    }
+
+    graph_interval();
+});
+
+// stop the graph timed event when not in stats page
+
+$(document).on('pagebeforehide', '#stats', function(){
+    clearInterval(graph_event);
 });
 
 // external functions
@@ -149,8 +180,8 @@ function aux_state(aux){
             var offText;
 
             if (parseInt(json.override) == 1 && (aux == 'aux1'||'aux2'||'aux3')){
-                onText = 'OVERRIDE';
-                offText = 'OVERRIDE';
+                onText = 'HOLD';
+                offText = 'HOLD';
             }
             else {
                 onText = 'ON';
@@ -159,39 +190,44 @@ function aux_state(aux){
 
             var checked = parseInt(json.state);
 
-            $('#'+ aux).prop('checked', checked);
+            $('div.ui-page-active #'+ aux).prop('checked', checked);
 
-            $('#'+ aux).off('change');
+            $('div.ui-page-active #'+ aux).off('change');
 
-            $('#'+ aux).flipswitch("option", "onText",  onText);
-            $('#'+ aux).flipswitch("option", "offText", offText);
+            $('div.ui-page-active #'+ aux).flipswitch("option", "onText",  onText);
+            $('div.ui-page-active #'+ aux).flipswitch("option", "offText", offText);
 
-            $('#'+ aux).flipswitch('refresh');
+            $('div.ui-page-active #'+ aux).flipswitch('refresh');
 
-            $('#'+ aux).on('change', flip_change);
+            $('div.ui-page-active #'+ aux).on('change', flip_change);
 
         }
     });
 }
 
 function flip_change(e){
-    // use this to ensure aux_state() doesn't call this event handler
-    // console.log(this);
-
     var checked = $(this).prop('checked');
     var aux = $(this).attr('id');
 
-    $.get('/set_aux_override/'+ aux +'/'+ checked, function(data){
+    $.get('/set_aux_override/'+ aux +'/'+ 'true', function(data){
         var json = $.parseJSON(data);
+
         if (json.error){
             console.log(json.error);
         }
-    });
 
-    $.get('/set_aux_state/'+ aux +'/'+ checked, function(data){
-        var json = $.parseJSON(data);
-        if (json.error){
-            console.log(json.error);
+        var override_status = parseInt(json.override);
+
+        if (override_status != -1){
+            $.get('/set_aux_state/'+ aux +'/'+ checked, function(data){
+                var json = $.parseJSON(data);
+                if (json.error){
+                    console.log(json.error);
+                }
+            });
+        }
+        else {
+            alert("aux id " + aux + " toggling is disabled in the config file");
         }
     });
 }
@@ -204,8 +240,9 @@ function reset_display(){
 }
 
 function display_time(){
+    var page = $(".ui-page-active").attr("id");
      $.get('/time', function(data){
-        $('#time').text(data);
+        $("div.ui-page-active #time").text(data);
     });
 }
 
@@ -213,24 +250,12 @@ function display_light(){
     $.get('/light', function(data){
         var light = $.parseJSON(data);
         if (light.enable == "0"){
-            $('.light').hide();
+            $('div.ui-page-active .light').hide();
             return;
         }
-        if (light.toggle == 'disabled'){
-            $('#aux3').flipswitch('option', 'disable', true);
-        }
-        else {
-            $('#aux3').flipswitch();
-        }
-        $('#light_on_hours').text(light.on_hours);
-        $('#light_on_at').text(light.on_at);
-    });
-}
 
-function display_graphs(){
-    $.get('/graph_data', function(data){
-        var graph_data = $.parseJSON(data);
-        create_graphs(graph_data);
+        $('div.ui-page-active #light_on_hours').text(light.on_hours);
+        $('div.ui-page-active #light_on_at').text(light.on_at);
     });
 }
 
@@ -241,31 +266,50 @@ function display_env(){
         display_humidity(json.humidity);
     });
 
-    // display_graphs();
     aux_update();
 }
 
 function display_temp(temp){
     if (temp > temp_limit && temp_limit != -1){
-        $('#temp').css('color', 'red');
+        $('div.ui-page-active #temp').css('color', 'red');
     }
     else {
-        $('#temp').css('color', 'green');
+        $('div.ui-page-active #temp').css('color', 'green');
     }
-    $('#temp').text(temp +' F');
+    $('div.ui-page-active #temp').text(temp +' F');
+
+    $('div.ui-page-active #temp_limit').text('Limit: ' + temp_limit);
 }
 
 function display_humidity(humidity){
     if (humidity < humidity_limit && humidity_limit != -1){
-        $('#humidity').css('color', 'red');
+        $('div.ui-page-active #humidity').css('color', 'red');
     }
     else {
-        $('#humidity').css('color', 'green');
+        $('div.ui-page-active #humidity').css('color', 'green');
     }
-    $('#humidity').text(humidity +' %');
+    $('div.ui-page-active #humidity').text(humidity +' %');
+
+    $('div.ui-page-active #humidity_limit').text('Limit: ' + humidity_limit);
 }
 
-//graphs
+// statistics page JS
+
+// events
+
+function graph_interval(){
+    $.get('/get_config/event_display_timer', function(interval){
+        interval = interval * 1000;
+        graph_event = setInterval(display_graphs, interval);
+    });
+}
+
+function display_graphs(){
+    $.get('/graph_data', function(data){
+        var graph_data = $.parseJSON(data);
+        create_graphs(graph_data);
+    });
+}
 
 function create_graphs(data){
     var info = {
@@ -286,7 +330,7 @@ function create_graphs(data){
     var graphs = ['temp', 'humidity'];
 
     $.each(graphs, function(index, graph){
-        $.plot($(info[graph].name), [
+        $.plot($('div.ui-page-active ' + info[graph].name), [
             {
                 data: data[graph],
                 threshold: {

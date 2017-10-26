@@ -11,11 +11,11 @@ Geo::Coder::List - Call many geocoders
 
 =head1 VERSION
 
-Version 0.15
+Version 0.16
 
 =cut
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 our %locations;
 
 =head1 SYNOPSIS
@@ -111,6 +111,12 @@ sub geocode {
 	if((!wantarray) && (my $rc = $locations{$location})) {
 		if(ref($rc) eq 'HASH') {
 			delete $rc->{'geocoder'};
+			my $log = {
+				location => $location,
+				timetaken => 0,
+				result => $rc
+			};
+			CORE::push @{$self->{'log'}}, $log;
 			return $rc;
 		}
 	}
@@ -227,9 +233,10 @@ sub geocode {
 			}
 		}
 	}
-	if($error) {
-		return { error => $error };
-	}
+	# Can't do this because we need to return undef in this case
+	# if($error) {
+		# return { error => $error };
+	# }
 	undef;
 }
 

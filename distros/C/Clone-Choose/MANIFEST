@@ -12,5 +12,14 @@ t/04-load-with-clone-pp.t
 t/05-scalar.t
 t/06-array.t
 t/07-hash.t
+t/Clone/05-scalar.t
+t/Clone/06-array.t
+t/Clone/07-hash.t
+t/ClonePP/05-scalar.t
+t/ClonePP/06-array.t
+t/ClonePP/07-hash.t
+t/Storable/05-scalar.t
+t/Storable/06-array.t
+t/Storable/07-hash.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

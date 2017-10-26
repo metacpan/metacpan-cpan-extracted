@@ -13,17 +13,18 @@ CREATE TABLE aux (
     pin TINYINT(2),
     state TINYINT(1),
     override TINYINT(1),
+    toggle TINYINT(1),
     on_time INTEGER
 );
 
-INSERT INTO aux VALUES ('aux1', 'temp', -1, 0, 0, 0);
-INSERT INTO aux VALUES ('aux2', 'humidity', -1, 0, 0, 0);
-INSERT INTO aux VALUES ('aux3', 'light', -1, 0, 0, 0);
-INSERT INTO aux VALUES ('aux4', '', -1, 0, 0, 0);
-INSERT INTO aux VALUES ('aux5', '', -1, 0, 0, 0);
-INSERT INTO aux VALUES ('aux6', '', -1, 0, 0, 0);
-INSERT INTO aux VALUES ('aux7', '', -1, 0, 0, 0);
-INSERT INTO aux VALUES ('aux8', '', -1, 0, 0, 0);
+INSERT INTO aux VALUES ('aux1', 'temp', -1, 0, 0, 0, 1);
+INSERT INTO aux VALUES ('aux2', 'humidity', -1, 0, 0, 0, 1);
+INSERT INTO aux VALUES ('aux3', 'light', -1, 0, 0, 0, 1);
+INSERT INTO aux VALUES ('aux4', '', -1, 0, 0, 0, 1);
+INSERT INTO aux VALUES ('aux5', '', -1, 0, 0, 0, 1);
+INSERT INTO aux VALUES ('aux6', '', -1, 0, 0, 0, 1);
+INSERT INTO aux VALUES ('aux7', '', -1, 0, 0, 0, 1);
+INSERT INTO aux VALUES ('aux8', '', -1, 0, 0, 0, 1);
 
 DROP TABLE IF EXISTS control;
 
@@ -40,6 +41,8 @@ INSERT INTO control VALUES ('humidity_aux_on_time', 1800);
 INSERT INTO control VALUES ('temp_aux', 'aux1');
 INSERT INTO control VALUES ('humidity_aux', 'aux2');
 INSERT INTO control VALUES ('light_aux', 'aux3');
+
+INSERT INTO control VALUES ('event_timeout', '60');
 
 DROP TABLE IF EXISTS core;
 
@@ -69,7 +72,6 @@ INSERT INTO light VALUES ('on_at', '18:00');
 INSERT INTO light VALUES ('on_hours', '12');
 INSERT INTO light VALUES ('on_time', 0);
 INSERT INTO light VALUES ('off_time', 0);
-INSERT INTO light VALUES ('toggle', 'disabled');
 INSERT INTO light VALUES ('enable', 0);
 
 DROP TABLE IF EXISTS auth;

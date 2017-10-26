@@ -10,8 +10,10 @@ my %modules;
 my $post_diag;
 
 $modules{$_} = $_ for qw(
+  DynaLoader
   ExtUtils::MakeMaker
   Test2::API
+  Test2::Mock
   Test2::Require::Module
   Test2::V0
   Test::Exit

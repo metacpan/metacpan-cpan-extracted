@@ -32,6 +32,7 @@ requires:
   Perinci::CmdLine::Base: '1.79'
   Perinci::Object: '0.26'
   Perinci::Sub::DepChecker: '0'
+  Sah::Schema::dirname: '0'
   Sah::Schema::filename: '0'
   Sah::Schema::posint: '0'
   String::ShellQuote: '0'
@@ -42,7 +43,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-MysqlUtils
   homepage: https://metacpan.org/release/App-MysqlUtils
   repository: git://github.com/perlancar/perl-App-MysqlUtils.git
-version: '0.009'
+version: '0.010'
 x_Dist_Zilla:
   perl:
     version: '5.026000'

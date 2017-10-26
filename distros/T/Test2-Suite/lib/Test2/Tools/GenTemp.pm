@@ -1,6 +1,6 @@
 package Test2::Tools::GenTemp;
 
-our $VERSION = '0.000082';
+our $VERSION = '0.000083';
 
 use File::Temp qw/tempdir/;
 use File::Spec;
@@ -82,7 +82,7 @@ All subs are exported by default.
 
 =item gen_temp(-tempdir => \@TEMPDIR_ARGS, file => 'content', subdir => [ sub_dir_file => 'content', ...], ...)
 
-This will generate a new temporary directory with all the files and subsirs you
+This will generate a new temporary directory with all the files and subdirs you
 specify, recursively. The initial temp directory is created using
 C<File::Temp::tempdir()>, you may pass arguments to tempdir using the
 C<< -tempdir => [...] >> argument.

@@ -6,18 +6,17 @@ Smart::Args::TypeTiny - We are smart, smart for you
 # SYNOPSIS
 
     use Smart::Args::TypeTiny;
-    use Types::Standard -all;
 
     sub func2 {
-        args my $p => Int,
-             my $q => {isa => Int, optional => 1},
+        args my $p => 'Int',
+             my $q => {isa => 'Int', optional => 1},
              ;
     }
     func2(p => 3, q => 4); # p => 3, q => 4
     func2(p => 3);         # p => 3, q => undef
 
     sub func3 {
-        args my $p => {isa => Int, default => 3};
+        args my $p => {isa => 'Int', default => 3};
     }
     func3(p => 4); # p => 4
     func3();       # p => 3
@@ -53,27 +52,114 @@ Smart::Args::TypeTiny - We are smart, smart for you
 
 Smart::Args::TypeTiny provides [Smart::Args](https://metacpan.org/pod/Smart::Args)-like argument validator using [Type::Tiny](https://metacpan.org/pod/Type::Tiny).
 
-# IMCOMPATIBLE CHANGES WITH Smart::Args
+## IMCOMPATIBLE CHANGES WITH Smart::Args
 
-## ISA TAKES Type::Tiny TYPE OBJECT OR INSTANCE CLASS NAME
+- Unexpected parameters will be a fatal error
 
-This code is expected `$p` as InstanceOf\['Int'\], you should specify [Type::Tiny](https://metacpan.org/pod/Type::Tiny)'s type constraint.
+        sub foo {
+            args my $x => 'Str';
+        }
 
-    use Types::Standard -all;
+        sub bar {
+            args_pos my $x => 'Str';
+        }
 
-    sub foo {
-        args my $p => 'Int', # :( InstanceOf['Int']
-             my $q => Int,   # :) Int
-             my $r => 'Foo', # :) InstanceOf['Foo']
-    }
+        foo(x => 'a', y => 'b'); # fatal: Unexpected parameter 'y' passed
+        bar('a', 'b');           # fatal: Too many parameters passed
 
-## DEFAULT PARAMETER CAN TAKE CODEREF AS LAZY VALUE
+- Optional allows to pass undef to parameter
 
-    sub foo {
-        args my $p => {isa => 'Foo', default => create_foo},         # :( create_foo is called every time even if $p is passed
-             my $q => {isa => 'Foo', default => sub { create_foo }}, # :) create_foo is called only when $p is not passed
-             ;
-    }
+        sub foo {
+            args my $p => 'Int';
+        }
+
+        foo();           # $p = undef
+        foo(p => 1);     # $p = 1
+        foo(p => undef); # $p = undef
+
+- Default parameter can take coderef as lazy value
+
+        sub foo {
+            args my $p => {isa => 'Foo', default => create_foo},         # calls every time even if $p is passed
+                 my $q => {isa => 'Foo', default => sub { create_foo }}, # calls only when $p is not passed
+                 ;
+        }
+
+# FUNCTIONS
+
+- my $args = args my $var\[, $rule\], ...;
+
+        sub foo {
+            args my $int   => 'Int',
+                 my $foo   => 'Foo',
+                 my $bar   => {isa => 'Bar',  default  => sub { Bar->new }},
+                 my $baz   => {isa => 'Baz',  optional => 1},
+                 my $bool  => {isa => 'Bool', default  => 0},
+                 ;
+
+            ...
+        }
+
+        foo(int => 1, foo => Foo->new, bool => 1);
+
+    Check parameters and fills them into lexical variables. All the parameters are mandatory by default.
+    The hashref of all parameters is returned.
+
+    `$rule` can be any one of type name, [Type::Tiny](https://metacpan.org/pod/Type::Tiny)'s type constraint object, or hashref have these parameters:
+
+    - isa `Str|Object`
+
+        Type name or [Type::Tiny](https://metacpan.org/pod/Type::Tiny)'s type constraint.
+
+        - Types::Standard
+
+                args my $int => {isa => 'Int'};
+
+        - Mouse::Util::TypeConstraints
+
+                use Mouse::Util::TypeConstraints;
+
+                subtype 'PositiveInt',
+                    as 'Int',
+                    where { $_ > 0 },
+                    message { 'Must be greater than zero' };
+
+                args my $positive_int => {isa => 'PositiveInt'};
+
+        - class name
+
+                {
+                    package Foo;
+                    ...
+                }
+
+                args my $foo => {isa => 'Foo'};
+
+    - does `Str|Object`
+
+        Role name or [Type::Tiny](https://metacpan.org/pod/Type::Tiny)'s type constraint object.
+
+    - optional `Bool`
+
+        The parameter doesn't need to be passed when [optional](https://metacpan.org/pod/optional) is true.
+
+    - default `Any|CodeRef`
+
+        Default value for the parameter.
+
+- my $args = args\_pos my $var\[, $rule\], ...;
+
+        sub bar {
+            args_pos my $x => 'Str',
+                     my $p => 'Int',
+                     ;
+
+            ...
+        }
+
+        bar('abc', 123);
+
+    Same as `args` except take arguments instead of parameters.
 
 # TIPS
 
@@ -91,9 +177,9 @@ For optimization calling subroutine in runtime type check, you can overwrite `ch
 
 # SEE ALSO
 
-[Smart::Args](https://metacpan.org/pod/Smart::Args), [Params::Validate](https://metacpan.org/pod/Params::Validate), [Params::ValidationCompiler](https://metacpan.org/pod/Params::ValidationCompiler)
+[Smart::Args](https://metacpan.org/pod/Smart::Args), [Data::Validator](https://metacpan.org/pod/Data::Validator), [Params::Validate](https://metacpan.org/pod/Params::Validate), [Params::ValidationCompiler](https://metacpan.org/pod/Params::ValidationCompiler)
 
-[Type::Tiny](https://metacpan.org/pod/Type::Tiny), [Types::Standard](https://metacpan.org/pod/Types::Standard)
+[Type::Tiny](https://metacpan.org/pod/Type::Tiny), [Types::Standard](https://metacpan.org/pod/Types::Standard), [Mouse::Util::TypeConstraints](https://metacpan.org/pod/Mouse::Util::TypeConstraints)
 
 # LICENSE
 

@@ -13,7 +13,7 @@ Term::Colormap - Colormaps for ANSI 256 Color Terminals!
 
 Version
 ---------
-Version 0.12
+Version 0.15
 
 Synopsis
 -----------
@@ -85,4 +85,4 @@ Available Colormaps
 Available Brewer Colormaps
 ---------------------------
 
-    See: perldoc Term::Colormap::Brewer
+See: [perldoc Term::Colormap::Brewer](https://github.com/xxfelixxx/perl-term-colormap/blob/fdb0fdf50b9f605353789ef606345d05f43adb68/lib/Term/Colormap/Brewer.pm#L830)

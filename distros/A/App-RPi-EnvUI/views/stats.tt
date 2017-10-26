@@ -1,0 +1,85 @@
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="css/flipswitch.css">
+    <link rel="stylesheet" type="text/css" href="css/flipswitch.struct.css">
+    <link rel="stylesheet" type="text/css" href="css/envui.css">
+
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+
+	<script language="javascript" type="text/javascript" src="js/flot.js"></script>
+	<script language="javascript" type="text/javascript" src="js/flot.threshold.js"></script>
+
+    <script type="text/javascript" src="js/core.js"></script>
+</head>
+
+<body>
+<div data-role="page" id="stats">
+<table width="100%">
+    <tr>
+    <td width="90%" style="white-space: nowrap;" >
+        <div class="menuBackground">
+            <div class="center myMenu">
+                <ul class="dropDownMenu">
+                    <li><a href="/">Home</a></li>
+                    <li class="menuHeader">System
+                        <ul>
+                            <li><a onClick="reset_display(); return false;">Reset Layout</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="/stats">Statistics</a></li>
+                    <li class="menuHeader">About
+                        <ul>
+                            <li><a href="https://github.com/stevieb9" target="_blank">Author Github</a></li>
+                            <li><a href="https://metacpan.org/author/STEVEB" target="_blank">Author CPAN</a></li>
+                            <li><a href="https://github.com/stevieb9/app-rpi-envui/issues" target="_blank">Issues</a></li>
+                            <li><a href="http://matrix.cpantesters.org/?dist=App-RPi-EnvUI+0.25" target="_blank">CPAN Testers</a></li>
+                            <li><a href="http://perldoc.perl.org/perlartistic.html" target="_blank">License</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="/login" id="auth" target="_self"></a></li>
+                </ul>
+            </div>
+        </div>
+    </td>
+        <td><div id="time"></div></td>
+    </tr>
+</table>
+
+<table class="top">
+    <tr>
+        <td>
+            <div class="drag" id="aux1_widget">
+            <table class="inner">
+                <th colspan="2" align="center"><font size="5"><p class="widget_handle">Temperature</p></font></th>
+                <tr>
+                    <td style="text-align: center;"><font size="5"><div class="data" id="temp"></div></font></td>
+                </tr>
+                <tr>
+                    <td colspan="2"><div class="graph_container"><div id="temp_chart" class="graph" width="600" height="200"></div></div></td>
+                </tr>
+            </table>
+        </div>
+        </td>
+        <td>
+            <div class="drag" id="aux2_widget">
+            <table class="inner">
+                <th colspan="2" align="center"><font size="5"><p class="widget_handle">Humidity</p></font></th>
+                <tr>
+                    <td style="text-align: center;"><font size="5"><div class="data" id="humidity"></div></font></td>
+                </tr>
+                <tr>
+                    <td colspan="2"><div class="graph_container"><div id="humidity_chart" class="graph" width="600" height="200"></div></div></td>
+                </tr>
+            </table>
+            </div>
+        </td>
+    </tr>
+</table>
+</div>
+</body>
+
+</html>

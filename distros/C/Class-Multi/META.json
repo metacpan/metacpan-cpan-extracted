@@ -4,7 +4,7 @@
       "Kevin Cody-Little <kcody@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "lgpl_2_1"
    ],
@@ -43,5 +43,6 @@
          "url" : "https://github.com/kcodyjr/class-multi"
       }
    },
-   "version" : "1.02"
+   "version" : "1.03",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }

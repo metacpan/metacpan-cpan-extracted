@@ -3,6 +3,7 @@ abstract: 'Interface to the CommonMark C library'
 author:
   - 'Nick Wellnhofer <wellnhofer@aevum.de>'
 build_requires:
+  Encode: '0'
   Test::More: '0'
 configure_requires:
   Devel::CheckLib: '0'
@@ -19,5 +20,5 @@ requires:
 resources:
   bugtracker: https://github.com/nwellnhof/perl-commonmark/issues
   repository: https://github.com/nwellnhof/perl-commonmark.git
-version: '0.280300'
+version: '0.280301'
 x_serialization_backend: 'YAML::Tiny version 1.70'

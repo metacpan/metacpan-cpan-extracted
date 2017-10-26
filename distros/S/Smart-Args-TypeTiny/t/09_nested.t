@@ -12,6 +12,6 @@ sub foo2 {
     return $boss * 3;
 }
 
-like dies { foo1(bar => 3.14) }, qr/@{[ quotemeta(__FILE__) ]}/;
+like dies { foo1(bar => 3.14) }, qr/Type check failed in binding to parameter '\$boss'; Value "3\.14" did not pass type constraint "Int" at @{[ quotemeta(__FILE__) ]}/;
 
 done_testing;

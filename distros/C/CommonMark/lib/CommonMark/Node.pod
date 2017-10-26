@@ -41,6 +41,7 @@ provide a more powerful interface.
         format        => $string,
         sourcepos     => $bool,    # Optional
         hardbreaks    => $bool,    # Optional
+        nobreaks      => $bool,    # Optional
         safe          => $bool,    # Optional
         width         => $int,     # Optional
     );
@@ -48,8 +49,8 @@ provide a more powerful interface.
 Convenience function to render documents. Supported formats are C<'html'>,
 C<'xml'>, C<'man'>, C<'commonmark'>, and C<'latex'>.
 
-C<sourcepos>, C<hardbreaks>, and C<safe> enable the respective render
-options.
+C<sourcepos>, C<hardbreaks>, C<nobreaks>, and C<safe> enable the respective
+render options.
 
 C<width> is passed to renderers that support it.
 
@@ -67,6 +68,7 @@ C<$options> is a bit field created by ORing the following constants:
     CommonMark::OPT_SOURCEPOS
     CommonMark::OPT_HARDBREAKS
     CommonMark::OPT_SAFE
+    CommonMark::OPT_NOBREAKS
 
 Render options can be imported from L<CommonMark> with tag C<opt>.
 
@@ -79,7 +81,11 @@ C<SOURCEPOS> adds information about line numbers in the source file to the
 XML and HTML formats.
 
 C<HARDBREAKS> translates newlines in the input to line breaks in the output.
-This is only supported by some renderers.
+This is only supported by some renderers. The HTML renderer, for example,
+generates a C<E<lt>brE<gt>>.
+
+C<NOBREAKS> translates newlines in the input to spaces. Requires libcmark
+0.25 or higher.
 
 C<SAFE> only affects the HTML renderer. It suppresses raw HTML blocks and
 some dangerous links.

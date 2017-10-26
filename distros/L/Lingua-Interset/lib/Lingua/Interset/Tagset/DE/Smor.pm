@@ -6,7 +6,7 @@
 package Lingua::Interset::Tagset::DE::Smor;
 use strict;
 use warnings;
-our $VERSION = '3.006';
+our $VERSION = '3.007';
 
 use utf8;
 use open ':utf8';
@@ -1406,7 +1406,7 @@ Lingua::Interset::Tagset::DE::Smor - Driver for the German tagset of SMOR (Stutt
 
 =head1 VERSION
 
-version 3.006
+version 3.007
 
 =head1 SYNOPSIS
 

@@ -15,49 +15,57 @@ our @EXPORT = qw(
   find_lib_or_die 
 );
 
+our @EXPORT_OK = qw(
+  which
+  where
+  has_symbols
+);
+
 # ABSTRACT: Check that a library is available for FFI
-our $VERSION = '0.16'; # VERSION
+our $VERSION = '0.18'; # VERSION
 
 
-our $system_path;
+our $system_path = [];
 our $os ||= $^O;
-our $dyna_loader ||= 'DynaLoader';
 
 if($os eq 'MSWin32' || $os eq 'msys')
 {
-  $system_path = eval q{
-    use Env qw( @PATH );
-    \\@PATH;
-  }; die $@ if $@;
+  $system_path = eval {
+    require Env;
+    Env->import('@PATH');
+    \our @PATH;
+  };
+  die $@ if $@;
 }
 else
 {
-  $system_path = eval q{
+  $system_path = eval {
     require DynaLoader;
-    \\@DynaLoader::dl_library_path;
-  }; die $@ if $@;
+    \@DynaLoader::dl_library_path;
+  };
+  die $@ if $@;
 }
 
-our $pattern = [ qr{^lib(.*?)\.so.*$} ];
+our $pattern = [ qr{^lib(.*?)\.so(?:\.([0-9]+(?:\.[0-9]+)*))?$} ];
 
 if($os eq 'cygwin')
 {
-  push @$pattern, qr{^cyg(.*?)(?:-[0-9]+)?\.dll$};
+  push @$pattern, qr{^cyg(.*?)(?:-([0-9])+)?\.dll$};
 }
 elsif($os eq 'msys')
 {
   # doesn't seem as though msys uses psudo libfoo.so files
   # in the way that cygwin sometimes does.  we can revisit
   # this if we find otherwise.
-  $pattern = [ qr{^msys-(.*?)(?:-[0-9]+)?\.dll$} ];
+  $pattern = [ qr{^msys-(.*?)(?:-([0-9])+)?\.dll$} ];
 }
 elsif($os eq 'MSWin32')
 {
-  $pattern = [ qr{^(?:lib)?(.*?)(?:-[0-9]+)?\.dll$} ];
+  $pattern = [ qr{^(?:lib)?(.*?)(?:-([0-9])+)?\.dll$} ];
 }
 elsif($os eq 'darwin')
 {
-  push @$pattern, qr{^lib(.*?)(?:-[0-9\.]+)?\.(?:dylib|bundle)$};
+  push @$pattern, qr{^lib(.*?)(?:\.([0-9]+(?:\.[0-9]+)*))?\.(?:dylib|bundle)$};
 }
 
 sub _matches
@@ -65,9 +73,30 @@ sub _matches
   my($filename, $path) = @_;
   foreach my $regex (@$pattern)
   {
-    return [ $1, File::Spec->catfile($path, $filename) ] if $filename =~ $regex;
+    return [
+      $1,                                      # 0    capture group 1 library name
+      File::Spec->catfile($path, $filename),   # 1    full path to library
+      defined $2 ? (split /\./, $2) : (),      # 2... capture group 2 library version
+    ] if $filename =~ $regex; 
   }
   return ();
+}
+
+sub _cmp
+{
+  my($A,$B) = @_;
+
+  return $A->[0] cmp $B->[0] if $A->[0] ne $B->[0];
+
+  my $i=2;
+  while(1)
+  {
+    return 0  if !defined($A->[$i]) && !defined($B->[$i]);
+    return -1 if !defined $A->[$i];
+    return 1  if !defined $B->[$i];
+    return $B->[$i] <=> $A->[$i] if $A->[$i] != $B->[$i];
+    $i++;
+  }
 }
 
 
@@ -120,23 +149,18 @@ sub find_lib
     my $dh;
     opendir $dh, $path;
     my @maybe = 
-      # prefer non-symlinks
-      sort { -l $a->[1] <=> -l $b->[1] }
-      # filter out the items that do not match
-      # the name that we are looking for
-      grep { $any || $missing{$_->[0]} }
+      # make determinist based on names and versions
+      sort { _cmp($a,$b) }
+      # Filter out the items that do not match the name that we are looking for
+      # Filter out any broken symbolic links
+      grep { ($any || $missing{$_->[0]} ) && (-e $_->[1]) }
       # get [ name, full_path ] mapping,
       # each entry is a 2 element list ref
       map { _matches($_,$path) } 
       # read all files from the directory
       readdir $dh;
     closedir $dh;
-    
-    # TODO: the FFI::Sweet implementation
-    # has some aggresive techniques for
-    # finding .dlls from .a files that may
-    # be worth adopting.
-    
+
     midloop:
     foreach my $lib (@maybe)
     {
@@ -148,27 +172,41 @@ sub find_lib
       }
       
       delete $missing{$lib->[0]};
-      
-      foreach my $symbol (keys %symbols)
+
+      if(%symbols)
       {
-        next unless do {
-          require "$dyna_loader.pm";
-          no strict 'refs';
-          my $dll = &{"$dyna_loader\::dl_load_file"}($lib->[1],0);
-          my $ok = &{"$dyna_loader\::dl_find_symbol"}($dll, $symbol) ? 1 : 0;
-          &{"$dyna_loader\::dl_unload_file"}($dll);
-          $ok;
-        };
-        delete $symbols{$symbol};
+        require DynaLoader;
+        my $dll = DynaLoader::dl_load_file($lib->[1],0);
+        foreach my $symbol (keys %symbols)
+        {
+          if(DynaLoader::dl_find_symbol($dll, $symbol) ? 1 : 0)
+          {
+            delete $symbols{$symbol}
+          }
+        }
+        DynaLoader::dl_unload_file($dll);
       }
       
-      push @found, $lib->[1];
+      my $found = $lib->[1];
+      
+      unless($any)
+      {
+        while(-l $found)
+        {
+          require File::Basename;
+          require File::Spec;
+          my $dir = File::Basename::dirname($found);
+          $found = File::Spec->rel2abs( readlink($found), $dir );
+        }
+      }
+      
+      push @found, $found;
     }    
   }
 
   if(%missing)
   {
-    my @missing = keys %missing;
+    my @missing = sort keys %missing;
     if(@missing > 1)
     { $diagnostic = "libraries not found: @missing" }
     else
@@ -176,8 +214,11 @@ sub find_lib
   }
   elsif(%symbols)
   {
-    my @missing = keys %symbols;
-    $diagnostic = "symbols not found: @missing";
+    my @missing = sort keys %symbols;
+    if(@missing > 1)
+    { $diagnostic = "symbols not found: @missing" }
+    else
+    { $diagnostic = "symbol not found: @missing" }
   }
   
   return if %symbols;
@@ -243,6 +284,46 @@ sub check_lib
   find_lib(@_) ? 1 : 0;
 }
 
+
+sub which
+{
+  my($name) = @_;
+  croak("cannot which *") if $name eq '*';
+  scalar find_lib( lib => $name );
+}
+
+
+sub where
+{
+  my($name) = @_;
+  $name eq '*'
+    ? find_lib(lib => '*')
+    : find_lib(lib => '*', verify => sub { $_[0] eq $name });
+}
+
+
+sub has_symbols
+{
+  my($path, @symbols) = @_;
+  require DynaLoader;
+  my $dll = DynaLoader::dl_load_file($path, 0);
+
+  my $ok = 1;
+
+  foreach my $symbol (@symbols)
+  {
+    unless(DynaLoader::dl_find_symbol($dll, $symbol))
+    {
+      $ok = 0;
+      last;
+    }
+  }
+
+  DynaLoader::dl_unload_file($dll);
+  
+  $ok;
+}
+
 1;
 
 __END__
@@ -257,7 +338,7 @@ FFI::CheckLib - Check that a library is available for FFI
 
 =head1 VERSION
 
-version 0.16
+version 0.18
 
 =head1 SYNOPSIS
 
@@ -291,6 +372,8 @@ All of these take the same named parameters and are exported by default.
 
 =head2 find_lib
 
+ my(@libs) = find_lib(%args);
+
 This will return a list of dynamic libraries, or empty list if none were 
 found.
 
@@ -298,7 +381,11 @@ found.
 
 If called in scalar context it will return the first library found.
 
-=head3 lib
+Arguments are key value pairs with these keys:
+
+=over 4
+
+=item lib
 
 Must be either a string with the name of a single library or a reference 
 to an array of strings of library names.  Depending on your platform, 
@@ -309,11 +396,11 @@ searching.
 
 As a special case, if C<*> is specified then any libs found will match.
 
-=head3 libpath
+=item libpath
 
 A string or array of additional paths to search for libraries.
 
-=head3 systempath
+=item systempath
 
 [version 0.11]
 
@@ -321,11 +408,11 @@ A string or array of system paths to search for instead of letting
 L<FFI::CheckLib> determine the system path.  You can set this to C<[]> 
 in order to not search I<any> system paths.
 
-=head3 symbol
+=item symbol
 
 A string or a list of symbol names that must be found.
 
-=head3 verify
+=item verify
 
 A code reference used to verify a library really is the one that you 
 want.  It should take two arguments, which is the name of the library 
@@ -351,20 +438,26 @@ Example:
    },
  );
 
-=head3 recursive
+=item recursive
 
 [version 0.11]
 
 Recursively search for libraries in any non-system paths (those provided 
 via C<libpath> above).
 
+=back
+
 =head2 assert_lib
+
+ assert_lib(%args);
 
 This behaves exactly the same as L<find_lib|FFI::CheckLib#find_lib>, 
 except that instead of returning empty list of failure it throws an 
 exception.
 
 =head2 check_lib_or_exit
+
+ check_lib_or_exit(%args);
 
 This behaves exactly the same as L<assert_lib|FFI::CheckLib#assert_lib>, 
 except that instead of dying, it warns (with exactly the same error 
@@ -375,6 +468,8 @@ C<Build.PL>
 
 [version 0.05]
 
+ my(@libs) = find_lib_or_exit(%args);
+
 This behaves exactly the same as L<find_lib|FFI::CheckLib#find_lib>, 
 except that if the library is not found, it will call exit with an 
 appropriate diagnostic.
@@ -383,15 +478,51 @@ appropriate diagnostic.
 
 [version 0.06]
 
+ my(@libs) = find_lib_or_die(%args);
+
 This behaves exactly the same as L<find_lib|FFI::CheckLib#find_lib>, 
 except that if the library is not found, it will die with an appropriate 
 diagnostic.
 
 =head2 check_lib
 
+ my $bool = check_lib(%args);
+
 This behaves exactly the same as L<find_lib|FFI::CheckLib#find_lib>, 
 except that it returns true (1) on finding the appropriate libraries or 
 false (0) otherwise.
+
+=head2 which
+
+[version 0.17]
+
+ my $path = where($name);
+
+Return the path to the first library that matches the given name.
+
+Not exported by default.
+
+=head2 where
+
+[version 0.17]
+
+ my @paths = where($name);
+
+Return the paths to all the libraries that match the given name.
+
+Not exported by default.
+
+=head2 has_symbols
+
+[version 0.17]
+
+ my $bool = has_symbols($path, @symbol_names);
+
+Returns true if I<all> of the symbols can be found in the dynamic library located
+at the given path.  Can be useful in conjunction with C<verify> with C<find_lib>
+above.
+
+Not exported by default.
 
 =head1 SEE ALSO
 

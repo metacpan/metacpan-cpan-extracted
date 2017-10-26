@@ -114,7 +114,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
           // Nothing
         }
         else {
-          SPVM_yyerror_format(compiler, "unknown package \"%s\" at %s line %d\n", base_name, op_type->file, op_type->line);
+          SPVM_yyerror_format(compiler, "Unknown package \"%s\" at %s line %d\n", base_name, op_type->file, op_type->line);
           compiler->fatal_error = 1;
           return;
         }

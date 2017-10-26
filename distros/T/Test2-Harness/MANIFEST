@@ -160,6 +160,7 @@ t2/builder.t
 t2/caller.t
 t2/data.t
 t2/ending.t
+t2/exception.t
 t2/findbin.t
 t2/no_stdout_eol.t
 t2/output.t
