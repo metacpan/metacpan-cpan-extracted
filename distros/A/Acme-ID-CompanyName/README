@@ -1,0 +1,72 @@
+NAME
+    Acme::ID::CompanyName - Generate nice-sounding, generic Indonesian
+    company names
+
+VERSION
+    This document describes version 0.003 of Acme::ID::CompanyName (from
+    Perl distribution Acme-ID-CompanyName), released on 2017-10-26.
+
+SYNOPSIS
+     use Acme::ID::CompanyName qw(gen_generic_id_company_names);
+     my $names = gen_generic_id_company_names(num_names => 2);
+
+    Sample output:
+
+     [
+       "Sentosa Jaya Abadi",
+       "Putra Utama Global",
+     ]
+
+DESCRIPTION
+FUNCTIONS
+  gen_generic_id_company_names
+    Usage:
+
+     gen_generic_id_company_names(%args) -> any
+
+    Generate nice-sounding, generic Indonesian company names.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   add_prefixes => *bool* (default: 1)
+
+    *   add_suffixes => *bool* (default: 1)
+
+    *   desired_initials => *str*
+
+    *   num_names => *int* (default: 1)
+
+    *   num_words => *int* (default: 3)
+
+    *   type => *str* (default: "PT")
+
+        Just a string to be prepended before the name.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-ID-CompanyName>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-ID-CompanyName>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-ID-CompanyName>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

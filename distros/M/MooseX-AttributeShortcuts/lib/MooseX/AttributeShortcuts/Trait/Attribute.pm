@@ -9,7 +9,7 @@
 #
 package MooseX::AttributeShortcuts::Trait::Attribute;
 our $AUTHORITY = 'cpan:RSRCHBOY';
-$MooseX::AttributeShortcuts::Trait::Attribute::VERSION = '0.035';
+$MooseX::AttributeShortcuts::Trait::Attribute::VERSION = '0.036';
 # ABSTRACT: Shortcuts attribute trait proper
 
 use namespace::autoclean;
@@ -378,7 +378,7 @@ MooseX::AttributeShortcuts::Trait::Attribute - Shortcuts attribute trait proper
 
 =head1 VERSION
 
-This document describes version 0.035 of MooseX::AttributeShortcuts::Trait::Attribute - released September 22, 2017 as part of MooseX-AttributeShortcuts.
+This document describes version 0.036 of MooseX::AttributeShortcuts::Trait::Attribute - released October 31, 2017 as part of MooseX-AttributeShortcuts.
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,8 @@
 package Geo::Coder::Free::DB::cities;
 
+use strict;
+use warnings;
+
 # cities.csv is from https://www.maxmind.com/en/free-world-cities-database
 
 use Geo::Coder::Free::DB;

@@ -1,4 +1,8 @@
 
+0.173030  2017-10-30 13:51:26-04:00 EST5EDT
+
+	- treat empty fields as undef
+
 0.172890  2017-10-16 12:14:53-04:00 EST5EDT
 
 	- added optional_warnings option to disable unneeded messages

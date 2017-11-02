@@ -1,0 +1,21 @@
+Pootle::Client
+===========================
+
+Client for conveniently accessing the Pootle API v1
+
+Currently supports only GET-requests
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2017 Koha-Suomi Oy, Olli-Antti Kivilahti, et. al. <olli-antti.kivilahti@jns.fi>
+
+Licensed the same as Perl.

@@ -6,7 +6,7 @@ use Clustericious::Log;
 use Data::Dumper;
 
 # ABSTRACT: build crud routes easily
-our $VERSION = '1.26'; # VERSION 
+our $VERSION = '1.27'; # VERSION 
 
 
 use Sub::Exporter -setup => {
@@ -191,7 +191,7 @@ Clustericious::RouteBuilder::CRUD - build crud routes easily
 
 =head1 VERSION
 
-version 1.26
+version 1.27
 
 =head1 SYNOPSIS
 

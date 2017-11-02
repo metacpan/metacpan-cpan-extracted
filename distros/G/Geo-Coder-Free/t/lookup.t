@@ -2,7 +2,7 @@
 
 use warnings;
 use strict;
-use Test::Most tests => 46;
+use Test::Most tests => 56;
 use Test::Number::Delta;
 use Test::Carp;
 
@@ -40,6 +40,27 @@ LOOKUP: {
 	delta_within($location->{latitude}, 51.42, 1e-2);
 	delta_within($location->{longitude}, -0.84, 1e-2);
  
+	$location = $geocoder->geocode('Wokingham, Berkshire, UK');
+	ok(defined($location));
+	delta_within($location->{latitude}, 51.42, 1e-2);
+	delta_within($location->{longitude}, -0.84, 1e-2);
+ 
+	$location = $geocoder->geocode('Wokingham, Berkshire, GB');
+	ok(defined($location));
+	delta_within($location->{latitude}, 51.42, 1e-2);
+	delta_within($location->{longitude}, -0.84, 1e-2);
+ 
+	$location = $geocoder->geocode('Wokingham, Berkshire, England');
+	ok(defined($location));
+	delta_within($location->{latitude}, 51.42, 1e-2);
+	delta_within($location->{longitude}, -0.84, 1e-2);
+ 
+	# FIXME: This finds the Wokingham in England because of a problem in the unitary city handling
+	# which actually looks for Wokingham, GB.
+
+	# $location = $geocoder->geocode('Wokingham, Berkshire, Scotland');
+	# ok(!defined($location));
+ 
 	does_croak(sub { 
 		$location = $geocoder->geocode('Minster, Thanet, Kent, England');
 	});
@@ -64,6 +85,9 @@ LOOKUP: {
 	delta_within($location->{latitude}, 38.99, 1e-2);
 	delta_within($location->{longitude}, -77.03, 1e-2);
  
+	$location = $geocoder->geocode('Montgomery County, Maryland, USA');
+	ok(!defined($location));
+
 	$location = $geocoder->geocode('St Nicholas-at-Wade, Kent, UK');
 	ok(defined($location));
 	delta_within($location->{latitude}, 51.35, 1e-2);

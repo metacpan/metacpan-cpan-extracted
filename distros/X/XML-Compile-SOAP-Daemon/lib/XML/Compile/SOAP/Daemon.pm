@@ -1,4 +1,4 @@
-# Copyrights 2007-2016 by [Mark Overmeer].
+# Copyrights 2007-2017 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -7,7 +7,7 @@ use strict;
 
 package XML::Compile::SOAP::Daemon;
 use vars '$VERSION';
-$VERSION = '3.12';
+$VERSION = '3.13';
 
 
 use Log::Report 'xml-compile-soap-daemon';
@@ -113,7 +113,7 @@ sub process($)
     }
     elsif(ref $input eq 'SCALAR')
     {   $xmlin = try { $parser->parse_string($$input) };
-        return $self->faultInvalidXML($@->died) if $@;
+        return $self->faultInvalidXML($@->wasFatal) if $@;
     }
     else
     {   $xmlin = $input;

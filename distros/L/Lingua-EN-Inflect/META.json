@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Lingua-EN-Inflect",
    "no_index" : {
@@ -37,5 +37,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.902"
+   "version" : "1.903"
 }

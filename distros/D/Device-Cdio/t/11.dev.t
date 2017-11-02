@@ -23,39 +23,44 @@ ok ( defined $dev , 'Device::Cdio::Device->new(-driver_id=>$perlcdio::DRIVER_DEV
 my $drive_name = $dev->get_device();
 note('Device->new(DRIVER_DEVICE)((i.e.:',$perlcdio::DRIVER_DEVICE,')) found: ',$drive_name);
 
-#my @drives = Device::Cdio::get_devices_with_cap(
-#       -capabilities => $perlcdio::FS_AUDIO,
-#       -any=>0);
-my @drives = Device::Cdio::get_devices($perlcdio::DRIVER_DEVICE);
-SKIP : {
-    my @hwinfo = $dev->get_hwinfo;
-    ok ( $hwinfo[3] , 'Device::Cdio::Device->get_hwinfo');
-    note("Testing ", $device, ' ', $hwinfo[0],' ',$hwinfo[1]);
+if ($ENV{'CI'}) {
+    done_testing();
+} else {
 
-    my ($vols,$rcv) =$dev->audio_get_volume;
-    ok ( $rcv == 0 , 'Device::Cdio::Device->audio_get_volume');
-    note('Volume was set to ',join(', ',@$vols));
+    #my @drives = Device::Cdio::get_devices_with_cap(
+    #       -capabilities => $perlcdio::FS_AUDIO,
+    #       -any=>0);
+    my @drives = Device::Cdio::get_devices($perlcdio::DRIVER_DEVICE);
+    SKIP : {
+	my @hwinfo = $dev->get_hwinfo;
+	ok ( $hwinfo[3] , 'Device::Cdio::Device->get_hwinfo');
+	note("Testing ", $device, ' ', $hwinfo[0],' ',$hwinfo[1]);
 
-    $dev->audio_set_volume(-1,-1,-1,-1);
-    my ($nvols, $mvols);
-    ($nvols,$rcv) =$dev->audio_get_volume;
-    is_deeply($vols, $nvols, "audio_set_volume keep values");
-    $dev->audio_set_volume(255,255);
-    ($mvols,$rcv) =$dev->audio_get_volume;
-    @$nvols[0] = 255; @$nvols[1] = 255;
-    is_deeply($mvols, $nvols, "audio_set_volume 2 channels");
+	my ($vols,$rcv) =$dev->audio_get_volume;
+	ok ( $rcv == 0 , 'Device::Cdio::Device->audio_get_volume');
+	note('Volume was set to ',join(', ',@$vols));
 
-    $dev->audio_set_volume(100,100,-1,255);
-    ($mvols,$rcv) =$dev->audio_get_volume;
-    @$nvols[0] = 100; @$nvols[1] = 100; @$nvols[3] = 255;
-    my $c4 = eq_array ($mvols, $nvols) || note('4 channels are not supported: ',join(', ',@$mvols));
-    $dev->audio_set_volume(@$vols[0], @$vols[1], @$vols[2], @$vols[3]);
-    ($mvols,$rcv) =$dev->audio_get_volume;
-    is_deeply($mvols, $vols, "audio_set_volume reset");
+	$dev->audio_set_volume(-1,-1,-1,-1);
+	my ($nvols, $mvols);
+	($nvols,$rcv) =$dev->audio_get_volume;
+	is_deeply($vols, $nvols, "audio_set_volume keep values");
+	$dev->audio_set_volume(255,255);
+	($mvols,$rcv) =$dev->audio_get_volume;
+	@$nvols[0] = 255; @$nvols[1] = 255;
+	is_deeply($mvols, $nvols, "audio_set_volume 2 channels");
 
-  SKIP2: {
-      skip '4 volume channels are not supported', 1, unless $c4 ;
-      is_deeply($mvols, $nvols, "audio_set_volume 4 channels");
+	$dev->audio_set_volume(100,100,-1,255);
+	($mvols,$rcv) =$dev->audio_get_volume;
+	@$nvols[0] = 100; @$nvols[1] = 100; @$nvols[3] = 255;
+	my $c4 = eq_array ($mvols, $nvols) || note('4 channels are not supported: ',join(', ',@$mvols));
+	$dev->audio_set_volume(@$vols[0], @$vols[1], @$vols[2], @$vols[3]);
+	($mvols,$rcv) =$dev->audio_get_volume;
+	is_deeply($mvols, $vols, "audio_set_volume reset");
+
+      SKIP2: {
+	  skip '4 volume channels are not supported', 1, unless $c4 ;
+	  is_deeply($mvols, $nvols, "audio_set_volume 4 channels");
+	}
     }
+    done_testing();
 }
-done_testing();

@@ -2,7 +2,7 @@ package App::Yath::Command::reload;
 use strict;
 use warnings;
 
-our $VERSION = '0.001026';
+our $VERSION = '0.001030';
 
 use POSIX ":sys_wait_h";
 use Cwd qw/realpath/;
@@ -37,7 +37,8 @@ sub cli_args { "" }
 
 sub description {
     return <<"    EOT";
-foo bar baz
+This will send a SIGHUP to the persistent runner, forcing it to reload. This
+will also clear the blacklist allowing all preloads to load as normal.
     EOT
 }
 

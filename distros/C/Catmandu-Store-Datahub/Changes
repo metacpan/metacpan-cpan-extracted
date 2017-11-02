@@ -1,5 +1,14 @@
 Revision history for Catmandu-Store-Datahub
 
+0.08  2017-10-29 17:27:18 CET
+
+    - Fixed: issue with Catmandu::HTTPError getting the wronge response params.
+
+0.07  2017-10-29 15:08:28 CET
+
+    - Changed: Configured dzil building.
+    - Changed: licensing to GPLv3.
+
 0.06  2017-07-08 13:55:03 CEST
 
     - fixed: missing ID now fails gracefully.

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Software::License::Artistic_1_0;
-$Software::License::Artistic_1_0::VERSION = '0.103012';
+$Software::License::Artistic_1_0::VERSION = '0.103013';
 use parent 'Software::License';
 # ABSTRACT: The Artistic License
 
@@ -60,7 +60,7 @@ Software::License::Artistic_1_0 - The Artistic License
 
 =head1 VERSION
 
-version 0.103012
+version 0.103013
 
 =head1 OPTIONS
 
@@ -89,7 +89,7 @@ Ricardo Signes <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Ricardo Signes.
+This software is copyright (c) 2017 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

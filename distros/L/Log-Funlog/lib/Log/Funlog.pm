@@ -1,230 +1,3 @@
-=head1 NAME
-
-Log::Funlog - Log module with fun inside!
-
-=head1 SYNOPSIS
-
- use Log::Funlog;
- *my_sub=Log::Funlog->new(
-	parameter => value,
-	...
- );
-
- [$string=]my_sub($priority [,$string | @array [,$string | @array [, ... ] ]] );
-
-=head1 DESCRIPTION
-
-This is a Perl module intended ton manage the logs you want to do from your Perl scripts.
-
-It should be easy to use, and provide all the fonctionalities you want.
-
-Just initialize the module, then use is as if it was an ordinary function!
-
-When you want to log something, just write:
-
- your-sub-log(priority,"what"," I ","wanna log is: ",@an_array)
-
-then the module will analyse if the priority if higher enough (seeing L<verbose> option). If yes, your log will be written with the format you decided on STDERR (default) or a file.
-
-As more, the module can write funny things to your logs, if you want ;) It can be very verbose, or just ... shy :)
-
-L<Log::Funlog|Log::Funlog> may export an 'error' function: it logs your message with a priority of 1 and with an specific (parametrable) string. You can use it when you want to highlight error messages in your logsi with a pattern.
-
-Parameters are: L<header>, L<error_header>, L<cosmetic> ,L<verbose>, L<file>, L<daemon>, L<fun>, L<colors>, L<splash>, L<-n>, L<caller>, L<ltype>
-
-L<verbose> is mandatory.
-
-=head2 MANDATORY OPTION
-
-=over
-
-=item B<verbose>
-
-In the form B<n>/B<m>, where B<n><B<m> or B<n>=max.
-
-B<n> is the wanted verbosity of your script, B<m> if the maximum verbosity of your script.
-
-B<n> can by superior to B<m>. It will just set B<n>=B<m>
-
-Everything that is logged with a priority more than B<n> (in case B<n> is numeric) will not be logged.
-
-0 if you do not want anything to be printed.
-
-The common way to define B<n> is to take it from the command line with Getopt:
-
- use Getopt::Long;
- use Log::Funlog;
- &GetOptions("verbose=s",\$verbose);
- *Log=Log::Funlog->new(
-	[...]
-	verbose => "$verbose/5",
-	[...]
-	)
-
-In this case, you can say --verbose=max so that it will log with the max verbosity level available (5, here)
-
-This option is backward compatible with 0.7.x.x versions.
-
-See L</EXAMPLE>
-
-=back
-
-=head2 NON MANDATORIES OPTIONS
-
-=over
-
-=item B<caller>
-
-'all' if you want the stack of subs.
-
-'last' if you want the last call.
-
-If you specify a number B<n>, it will print the B<n> last calls (yes, if you specify '1', it is equivalent to 'last')
-
-If this number is negative, it will print the B<n> first calls.
-
-Of course, nothing will happen if no L<header> is specified, nor %ss in the L<header> ...
-
-=item B<colors>
-
-Put colors in the logs :)
-
-If you just put '1', it will use default colors:
-
- colors => '1',
-
-If you want to override default colors, specify a hash containing item => color
-
- colors => {'prog' => 'white', 'date' => 'yellow' },
-
-Items are:
-
-	caller: for the stack of calls,
-	prog: for the name of the program,
-	date: for the current date,
-	level: for the log level,
-	msg: for the log message
-
-Colors are:
-	black, red, green, yellow, blue, magenta, cyan, white and none
-
-=item B<cosmetic>
-
-An alphanumeric char to indicate the log level in your logs.
-
-There will be as many as these chars as the log level of the string being logged. See L</EXAMPLE>
-
-Should be something like 'x', or '*', or '!', or any printable single character.
-
-=item B<daemon>
-
-1 if the script should be a daemon. (default is 0: not a daemon)
-
-When B<daemon>=1, L<Log::Funlog> write to L<file> instead of B<STDERR>
-
-If you specify B<daemon>, you must specify L<file>
-
-The common way to do is the same that with L<verbose>: with Getopt
-
-=item B<error_header>
-
-Header you want to see in the logs when you call the B<error> function (if you import it, of course)
-
-Default is '## Oops! ##'.
-
-=item B<file>
-
-File to write logs to.
-
-MUST be specified if you specify L<daemon>
-
-File is opened when initializing, and never closed by the module. That is mainly to avoid open and close the file each time you log something and then increase speed.
-
-Side effect is that if you tail -f the log file, you won't see them in real time.
-
-=item B<fun>
-
-Probability of fun in your logs.
-
-Should be: 0<fun<=100
-
-It use Log::Funlog::Lang
-
-=item B<header>
-
-Pattern specifying the header of your logs.
-
-The fields are made like this: %<B<letter>><B<delimiters1>><B<delimiters2>><B<same_letter>>
-
-The B<letter> is, for now:
-
-	s: stack calls
-	d: date
-	p: name of the prog
-	l: verbosity level
-
-B<delimiters1> is something taken from +-=|!./\<{([ and B<delimiters2> is take from +-=|!./\>})] (replacement regexp is s/\%<letter>([<delimiters1>]*)([<delimiters2>*)<letter>/$1<field>$2/ ). B<delimiters1> will be put before the field once expanded, B<delimiters2> after.
-
-Example:
- '%dd %p::p hey %l[]l %s{}s '
-
-should produce something like:
-
- Wed Sep 22 18:50:34 2004 :gna.pl: hey [x    ] {sub48} Something happened
- ^------this is %dd-----^ ^%p::p^      ^%l[]l^ ^%s{}s^
-
-If no header is specified, no header will be written, and you would have:
-
- Something happened
-
-Although you can specify a pattern like that:
- ' -{(%d(<>)d)}%p-<>-p %l-<()>-l '
-
-is not advisable because the code that whatch for the header is not that smart and will probably won't do what you expect.
-
-Putting things in %?? is good only for %ss because stack won't be printed if there is nothing to print:
- ' {%ss} '
-
-will print something like that if you log from elsewhere than a sub:
- {}
-
-Although
- ' %s{}s '
-
-won't print anything if you log from outside a sub. Both will have the same effect if you log from inside a sub.
-
-You should probably always write things like:
- ' -{((<%dd>))}-<%pp>- -<(%ll)>- '
-
-=item B<ltype>
-
-Level printing type. Can be B<sequential> or B<numeric>.
-
-B<sequential> will print level like that: [xx ]. This is the default.
-
-B<numeric> will print level like that: [2]
-
-=item B<splash>
-
-1 if you want a 'splash log'
-
-=item B<-n>
-
-You can write stuff like that:
-
- Log(1,'-n',"plop");
- Log(1,"plop");
-
-This will output something like:
-
- [x] plopplop
-
-'-n' parameter allows you to use something else than '-n' to copy the behaviour of the '-n' parameter of L<echo(3)>
-
-=back
-
-=cut
-
 package Log::Funlog;
 use Carp;
 use strict;
@@ -236,7 +9,7 @@ BEGIN {
 	@ISA=qw(Exporter);
 	@EXPORT=qw( );
 	@EXPORT_OK=qw( &error $VERBOSE $LEVELMAX $VERSION );
-	$VERSION='0.87';
+	$VERSION='0.90';
 	sub VERSION {
 		(my $me, my $askedver)=@_;
 		$VERSION=~s/(.*)_\d+/$1/;
@@ -245,7 +18,7 @@ BEGIN {
 }
 my @fun;
 our %args;
-eval 'use Log::Funlog::Lang 0.3';
+eval 'use Log::Funlog::Lang 0.4';
 if ($@) {
 	@fun=();
 } else {
@@ -458,7 +231,7 @@ sub new {
 # Daemon. We calculate here the output handle to use
 ##########################################
 	if ($args{'daemon'}) {
-		open($handleout,">>$args{'file'}") or croak "$!";
+		open($handleout,">>$args{'file'}") or croak "$args{'file'}: $!";
 	} else {
 		$handleout=\*STDERR;
 	}
@@ -491,7 +264,7 @@ sub wr {
 
 # Header building!!
 #####################################
-	if ($_[0] eq $args{'-n'}) {
+	if (defined $_[0] and $_[0] eq $args{'-n'}) {
 		shift;
 		$nocr=1;
 	} else {
@@ -559,10 +332,9 @@ sub wr {
 		print $header;						#print the header
 	}
 	print $colors{'msg'};
-	while (my $tolog=shift) {			#and then print all the things the user wants me to print
-		print $tolog;
-		$return_code.=$tolog;
-	}
+	#and then print all the things the user wants me to print
+	print @_;
+	$return_code=join('',@_);
 	print $colortable{'none'};
 	print "\n" unless $nocr;
 	#Passe le fun autour de toi!
@@ -586,6 +358,234 @@ sub error {
 	return $ec;
 }
 1;
+=head1 NAME
+
+Log::Funlog - Log module with fun inside!
+
+=head1 SYNOPSIS
+
+ use Log::Funlog;
+ *my_sub=Log::Funlog->new(
+	parameter => value,
+	...
+ );
+
+ [$string=]my_sub($priority [,$string | @array [,$string | @array [, ... ] ]] );
+
+=head1 DESCRIPTION
+
+This is a Perl module intended ton manage the logs you want to do from your Perl scripts.
+
+It should be easy to use, and provide all the fonctionalities you want.
+
+Just initialize the module, then use is as if it was an ordinary function!
+
+When you want to log something, just write:
+
+ your-sub-log(priority,"what"," I ","wanna log is: ",@an_array)
+
+then the module will analyse if the priority if higher enough (seeing L<verbose> option). If yes, your log will be written with the format you decided on STDERR (default) or a file.
+
+As more, the module can write funny things to your logs, if you want ;) It can be very verbose, or just ... shy :)
+
+L<Log::Funlog|Log::Funlog> may export an 'error' function: it logs your message with a priority of 1 and with an specific (parametrable) string. You can use it when you want to highlight error messages in your logsi with a pattern.
+
+Parameters are: L<header>, L<error_header>, L<cosmetic> ,L<verbose>, L<file>, L<daemon>, L<fun>, L<colors>, L<splash>, L<-n>, L<caller>, L<ltype>
+
+L<verbose> is mandatory.
+
+=head2 MANDATORES OPTIONS
+
+=over
+
+=item B<verbose>
+
+In the form B<n>/B<m>, where B<n><B<m> or B<n>=max.
+
+B<n> is the wanted verbosity of your script, B<m> if the maximum verbosity of your script.
+
+B<n> can by superior to B<m>. It will just set B<n>=B<m>
+
+Everything that is logged with a priority more than B<n> (in case B<n> is numeric) will not be logged.
+
+0 if you do not want anything to be printed.
+
+The common way to define B<n> is to take it from the command line with Getopt:
+
+ use Getopt::Long;
+ use Log::Funlog;
+ &GetOptions("verbose=s",\$verbose);
+ *Log=Log::Funlog->new(
+	[...]
+	verbose => "$verbose/5",
+	[...]
+	)
+
+In this case, you can say --verbose=max so that it will log with the max verbosity level available (5, here)
+
+This option is backward compatible with 0.7.x.x versions.
+
+See L</EXAMPLE>
+
+=back
+
+=head2 NON MANDATORIES OPTIONS
+
+=over
+
+=item B<caller>
+
+'all' if you want the stack of subs.
+
+'last' if you want the last call.
+
+If you specify a number B<n>, it will print the B<n> last calls (yes, if you specify '1', it is equivalent to 'last')
+
+If this number is negative, it will print the B<n> first calls.
+
+Of course, nothing will happen if no L<header> is specified, nor %ss in the L<header> ...
+
+=item B<colors>
+
+Put colors in the logs :)
+
+If you just put '1', it will use default colors:
+
+ colors => '1',
+
+If you want to override default colors, specify a hash containing item => color
+
+ colors => {'prog' => 'white', 'date' => 'yellow' },
+
+Items are:
+
+	caller: for the stack of calls,
+	prog: for the name of the program,
+	date: for the current date,
+	level: for the log level,
+	msg: for the log message
+
+Colors are:
+	black, red, green, yellow, blue, magenta, cyan, white and none
+
+=item B<cosmetic>
+
+An alphanumeric char to indicate the log level in your logs.
+
+There will be as many as these chars as the log level of the string being logged. See L</EXAMPLE>
+
+Should be something like 'x', or '*', or '!', or any printable single character.
+
+=item B<daemon>
+
+1 if the script should be a daemon. (default is 0: not a daemon)
+
+When B<daemon>=1, L<Log::Funlog> write to L<file> instead of B<STDERR>
+
+If you specify B<daemon>, you must specify L<file>
+
+The common way to do is the same that with L<verbose>: with Getopt
+
+=item B<error_header>
+
+Header you want to see in the logs when you call the B<error> function (if you import it, of course)
+
+Default is '## Oops! ##'.
+
+=item B<file>
+
+File to write logs to.
+
+MUST be specified if you specify L<daemon>
+
+File is opened when initializing, and never closed by the module. That is mainly to avoid open and close the file each time you log something and then increase speed.
+
+Side effect is that if you tail -f the log file, you won't see them in real time.
+
+=item B<fun>
+
+Probability of fun in your logs.
+
+Should be: 0<fun<=100
+
+It use Log::Funlog::Lang
+
+=item B<header>
+
+Pattern specifying the header of your logs.
+
+The fields are made like this: %<B<letter>><B<delimiters1>><B<delimiters2>><B<same_letter>>
+
+The B<letter> is, for now:
+
+	s: stack calls
+	d: date
+	p: name of the prog
+	l: verbosity level
+
+B<delimiters1> is something taken from +-=|!./\<{([ and B<delimiters2> is take from +-=|!./\>})] (replacement regexp is s/\%<letter>([<delimiters1>]*)([<delimiters2>*)<letter>/$1<field>$2/ ). B<delimiters1> will be put before the field once expanded, B<delimiters2> after.
+
+Example:
+ '%dd %p::p hey %l[]l %s{}s '
+
+should produce something like:
+
+ Wed Sep 22 18:50:34 2004 :gna.pl: hey [x    ] {sub48} Something happened
+ ^------this is %dd-----^ ^%p::p^      ^%l[]l^ ^%s{}s^
+
+If no header is specified, no header will be written, and you would have:
+
+ Something happened
+
+Although you can specify a pattern like that:
+ ' -{(%d(<>)d)}%p-<>-p %l-<()>-l '
+
+is not advisable because the code that whatch for the header is not that smart and will probably won't do what you expect.
+
+Putting things in %?? is good only for %ss because stack won't be printed if there is nothing to print:
+ ' {%ss} '
+
+will print something like that if you log from elsewhere than a sub:
+ {}
+
+Although
+ ' %s{}s '
+
+won't print anything if you log from outside a sub. Both will have the same effect if you log from inside a sub.
+
+You should probably always write things like:
+ ' -{((<%dd>))}-<%pp>- -<(%ll)>- '
+
+=item B<ltype>
+
+Level printing type. Can be B<sequential> or B<numeric>.
+
+B<sequential> will print level like that: [xx ]. This is the default.
+
+B<numeric> will print level like that: [2]
+
+=item B<splash>
+
+1 if you want a 'splash log'
+
+=item B<-n>
+
+You can write stuff like that:
+
+ Log(1,'-n',"plop");
+ Log(1,"plop");
+
+This will output something like:
+
+ [x] plopplop
+
+'-n' parameter allows you to use something else than '-n' to copy the behaviour of the '-n' parameter of L<echo(3)>
+
+=back
+
+=cut
+
+
 =pod
 
 =head1 EXAMPLE
@@ -670,6 +670,7 @@ To avoid that, specify EITHER colors => 1 OR colors => {<something>}
 =head1 DEPENDENCIES
 
 Log::Funlog::Lang > 0.3 : provide the funny messages.
+
 
 =head1 DISCUSSION
 

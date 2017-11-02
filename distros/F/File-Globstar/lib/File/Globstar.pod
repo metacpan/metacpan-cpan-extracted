@@ -1,0 +1,279 @@
+=for Pod::Coverage empty
+
+=head1 NAME
+
+File::Globstar - Globbing With Double Asterisk Expansion
+
+=head1 SYNOPSIS
+
+    use File::Globstar qw(globstar fnmatchstar);
+
+    @files = globstar '**/*.css';
+    @files = globstar 'css/**/*.css';
+    @files = globstar 'scss/**';
+
+    print "Match!\n" if fnmatchstar '*.pl', 'hello.pl';
+    print "Case-insensitive match!\n" 
+        if fnmatchstar '*.pl', 'Makefile.PL', ignoreCase => 1;
+    
+    $re = File::Globstar::translatestar('**/*.css');
+
+    $safe_pattern = quotestar $config_srcdir;
+
+=head1 DESCRIPTION
+
+Shortcut: If you want to implement file inclusion or exclusion in the style
+of L<.gitignore|https://git-scm.com/docs/gitignore>, have a look at 
+L<File::Globstar::ListMatch>.
+
+Many globbing implementations have been recently extended to accept the
+pattern F<**> in place of a path element.  The double asterisk matches
+all files and directories in the current directory and all of its
+descendants including the current directory itself (in other words: the
+directory F<.> is included in the match, the parent directory F<..> is
+not).
+
+The convention is especially popular
+in the Node.js ecosystem and is also used by L<git|https://git-scm.com/>
+when evaluating ignore patterns (see L<https://git-scm.com/docs/gitignore>).
+
+=head2 FUNCTIONS
+
+=over 4
+
+=item B<globstar PATTERN[, DIRECTORY]>
+
+Return all files and directories matching B<PATTERN> in B<DIRECTORY>.
+B<DIRECTORY> defaults to the current directory if empty or
+undefined.
+
+An invalid B<PATTERN> matches nothing and B<globstar()> returns an empty
+list for it.
+
+The function I<only> expand the sequence "**" (at the appropriate) positions.
+All other heavy lifting is done by L<File::Glob::bsd_glob()> (which is also
+the backend for the standard Perl B<glob> operator <HANDLE>.  
+
+Currently, only the (forward!) slash is accepted as a path separator!
+
+=item B<fnmatchstar PATTERN, STRING[, OPTIONS]>
+
+Returns 1 if B<STRING> matches B<PATTERN>, false otherwise.  If a Perl truthy
+value is passed as the optional third argument, case is ignored for the
+match.
+
+B<OPTIONS> is an optional hash of named arguments.  The only
+supported option is "ignoreCase" at the moment.
+
+Invalid B<PATTERN>s never match.
+
+Unlike B<globstar()>, the function does not rely on L<File::Glob> and is
+implemented entirely in Perl.  The semantics of B<PATTERN> are as follows:
+
+=over 8
+
+=item B<*>
+
+A single asterisk stands for zero or more arbitrary characters except for the
+slash C</>.
+
+=item B<?>
+
+The question mark stands for exactly one character except for the slash C</>.
+
+=item B<**>
+
+A double asterisk stands for an arbitrary sequence of 0 or more characters.
+It is only allowed when preceded by either the beginning of the string or 
+a slash.  Likewise it must be followed by a slash or the end of the pattern.
+
+=item B<[RANGE]>, B<[!RANGE]>
+
+A character range or a negated character range that is preceded by an
+exclamation mark.  A range cannot be empty.
+
+The following features are supported:
+
+=over 12
+
+=item B<CHARACTER>
+
+By default, all B<CHARACTER>s stand for themselves.
+
+=item B<CHARACTER1-CHARACTER2>
+
+All characters from B<CHARACTER1> to B<CHARACTER2> according to the collation
+valid for the currently selected locale.
+
+=item B<[:CLASS:]>
+
+A character class like "[:print:]", "[:upper:]", "[:lower:]".  Example:
+
+    [0-9[:lower:]]
+
+This pattern stands for exactly one character, either one of the ASCII
+digits 0, 1, 2, 3, 4, 5, 6, 7, 8, or 9 or any lowercase character 
+(according to the current locale).
+
+=item B<\CHARACTER>
+
+Any character with a special meaning can be escaped with a backslash.
+
+You can include a hyphen in a range by using it as the last character.  You
+can include a closing square bracket by using it as the first character.
+This is implied by the above rules.
+
+Example:
+
+    []-]
+
+This pattern matches either a closing square bracket "]" or a hyphen "-".
+
+=back
+
+Note that POSIX collation classes (for example "[.ch.]") and POSIX equivalence 
+classes (for example "[=a=]") are not supported.  Rationale: B<bsd_glob()>
+does not support them and in Perl regular expression character classes they
+are currently not supported and their usage throws an exception.
+
+=back
+
+=item B<translatestar PATTERN[, OPTIONS]>
+
+Compiles B<PATTERN> into a Perl regular expression or throws an exception in
+case of failure.  This function is used internally by B<fnmatchstar()>.
+
+B<OPTIONS> is an optional hash of named arguments.  The only
+supported option is "ignoreCase" at the moment.
+
+=item B<quotestar STRING[, NEGATABLE]>
+
+Escapes all characters special to globstar patterns.  This are:
+
+=over 8
+
+=item B<\\> the backslash
+
+=item B<*> the asterisk/star
+
+=item B<[> the opening square bracket
+
+=item B<]> the closing square bracket (actually unneeded but ...)
+
+=back
+
+If the optional argument B<NEGATABLE> is truthy, a leading exclamation mark
+will also be backslash-escaped.
+
+=back
+
+=head2 EXAMPLES
+
+First, let's look at some examples for the double asterisk pattern.
+
+=over 4
+
+=item B<**/*.css>
+
+All files matching the name F<*.css> in the current directory and all its
+descendants, for example F<main.css>, F<styles/body.css>, 
+F<styles/body/footer.css>, F<styles/footer/whatever.css> and so on.
+
+=item B<src/**>
+
+The directory F<src> and all files and directories underneath F<src>, for
+example F<src/a>, F<src/b>, F<src/a/x/y>, and so on.
+
+=item B<src/**/*.c>
+
+All F<*.c> files in the directory F<src> or one if its descendants, for
+example F<src/file.c>,  F<src/a/file.c>, F<src/b/file.c>, F<src/a/x/file.c>,
+and so on. 
+
+=back
+
+=head2 GORY DETAILS
+
+The function B<globstar()> is a wrapper around B<bsd_glob> (see
+L<File::Glob>) that extends the functionality with the double asterisk
+semantics.  A double asterisk is only allowed in the following cases:
+
+=over 4
+
+=item B<F<**/>...>
+
+At the beginning of a pattern, when followed by a slash.
+
+=item F<...B</**/>...>
+
+Anywhere inside a pattern, when preceded and followed by a slash.
+
+=item B<...F</**>>
+
+At the end of a pattern, when preceded by a slash.
+
+=item B<F<**>>
+
+The pattern F<**> expands to all files and directories in the current
+directory with arbitrary nesting level.
+
+All other usages of two consecutive asterisks are considered illegal.  An
+illegal pattern does not match any file.  The file F<foo***bar> for example
+does I<not> match the pattern F<foo***bar>.  It matches, however,
+F<foo\*\*\*bar>.
+
+Of course, all other features of L<File::Glob::bsd_glob()> are supported
+as well.  The module also suffers from the same bugs and incompatibilities.
+
+=back
+
+=head1 BUGS AND CAVEATS
+
+Other than the ones currently unknown, be prepared for the following:
+
+=over 4
+
+=item B<COMPATIBILITY>
+
+The module assumes that the (forward!) slash "/" is the only valid path
+separator.  Especially the backslash "\\" is only used for escaping and
+never as a path separator.  On the other hand, the underlying function
+B<bsd_glob()> from B<File::Glob> I<does> support other path separators than
+a slash.
+
+This behavior may change in the future.  The main reason why the backslash
+is not supported as a path separator is that I have no idea how B<bsd_glob()> 
+behaves exactly, for example under Windows.  Patches are welcome!
+
+=item B<UNIFORM BEHAVIOR OF GLOBSTAR() AND FNMATCHSTAR()>
+
+The functions should theoretically behave accordingly.  If B<globstar()>
+returns a filename for a certain pattern, then B<fnmatchstar()> should
+return true for the same pattern and the filename passed as a string.
+
+Unfortunately, the two implementations are completely independent, and this
+cannot be guaranteed.  Please file a bug if you find a discrepancy.
+
+=item B<CASE-INSENSITIVE FILE SYSTEMS>
+
+The behavior of B<globstar()> completely depends on the behavior of 
+the underlying L<File::Glob>.  For B<fnmatchstar()> you can pass a third
+argument specifying whether the match should be done case-insensitively or
+not.
+
+For real-world scenarios you should be aware that on non-Windows systems,
+every directory level could behave differently: While "/media/disk1/backup"
+can be case-sensitive, "/media/disk1/backup/data" could be case-preserving
+and "/media/disk2/mp3" could be case-insensitive.
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright (C) 2016-2017 Guido Flohr <guido.flohr@cantanea.com>,
+all rights reserved.
+
+=head1 SEE ALSO
+
+File::Glob(3pm), File::Globstar::Listmatch(3pm), glob(3), glob(7), fnmatch(3), 
+glob(1), perl(1)

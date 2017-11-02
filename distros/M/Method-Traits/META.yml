@@ -14,14 +14,14 @@ meta-spec:
   version: '1.4'
 name: Method-Traits
 requires:
-  MOP: '0.11'
+  Carp: '0'
+  MOP: '0.12'
   Module::Runtime: '0'
   Scalar::Util: '0'
-  UNIVERSAL::Object: '0.12'
-  attributes: '0'
-  perl: v5.14.5
+  UNIVERSAL::Object: '0.13'
+  perl: v5.14.4
 resources:
   bugtracker: https://github.com/stevan/p5-Method-Traits/issues
   repository: https://github.com/stevan/p5-Method-Traits.git
-version: '0.07'
+version: '0.08'
 x_serialization_backend: 'YAML::Tiny version 1.70'

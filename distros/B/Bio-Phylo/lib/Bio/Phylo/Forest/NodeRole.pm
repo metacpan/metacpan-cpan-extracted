@@ -1,13 +1,16 @@
 package Bio::Phylo::Forest::NodeRole;
 use strict;
+use warnings;
 use Bio::Phylo::Util::MOP;
 use base qw'Bio::Phylo::Taxa::TaxonLinker Bio::Phylo::Listable';
 use Bio::Phylo::Util::OptionalInterface 'Bio::Tree::NodeI';
 use Bio::Phylo::Util::CONSTANT qw':objecttypes /looks_like/';
 use Bio::Phylo::Util::Exceptions 'throw';
+use Bio::Phylo::Util::Math ':all';
 use Bio::Phylo::NeXML::Writable;
 use Bio::Phylo::Factory;
 use Scalar::Util 'weaken';
+use List::Util qw[sum min max];
 no warnings 'recursion';
 
 my $LOADED_WRAPPERS = 0;
@@ -430,131 +433,93 @@ Reroots below invocant.
  Function: Creates a new tree root below $node
  Returns : New root if tree was modified, undef otherwise
  Args    : NONE
- Comments: Implementation incomplete: returns spurious 
-           results when $node is grandchild of current root.
+ Comments: This implementation is a port of @lh3's kn_reroot algorithm
+           found here: http://lh3lh3.users.sourceforge.net/knhx.js
 
 =cut    
 
-    # Example tree to illustrate rerooting algorithm:
-    #
-    #  A     B     C     D     E     F
-    #   \   /     /     /     /     /
-    #    \_/     /     /     /     /
-    #     1     /     /     /     /
-    # new->\   /     /     /     /
-    #       \_/     /     /     /
-    #        2     /     /     /
-    #         \   /     /     /
-    #          \_/     /     /
-    #           3     /     /
-    #            \   /     /
-    #             \_/     /
-    #              4     /
-    #               \   /
-    #                \_/
-    #                 5
-    #                 |
-    sub set_root_below {
-        my $self             = shift;
-        my %constructor_args = @_;
-        $constructor_args{'-name'} = 'root' if not $constructor_args{'-name'};
+	sub set_root_below {
+		my $node  = shift;
+		my $dist  = shift || 0;
+		my $force = shift || 0;
+		my $tree  = $node->get_tree;		
+		my $root  = $tree->get_root;
+		
+		# do nothing if the focal node already is the root, 
+		# or already has the root below it
+		return if $node->get_id == $root->get_id;
+		return if $node->get_parent and $node->get_parent->get_id == $root->get_id and not $force;
+	
+		# p: the central multi-parent node
+		# q: the new parent, previous a child of p
+		# r: old parent
+		# i: previous position of q in p
+		# d: previous distance p->d	
+		my ( $q, $s, $new_root );
+		my $p = $node->get_parent;
+		my $i = $p->get_index_of( $node );
+		my $r = $p->get_parent;
+		my $d = $p->get_branch_length;		
+		my $tmp = $node->get_branch_length || 0;
+		
+		# adjust $dist to a useable value			
+		$dist = $tmp / 2 if ($dist < 0.0 || $dist > $tmp);
 
-        # $self is node 5, nothing to do,
-        # can't place root below root
-        if ( $self->is_root ) {
-            return;
-        }
-        my @ancestors = @{ $self->get_ancestors };
-
-        # if @ancestors = ( 5 ); i.e. $self is node 4
-        # root is already below $self
-        if ( scalar @ancestors == 1 ) {
-            return;
-        }
-
-        # let's say $self is node 1, ancestors is:
-        # ( 2, 3, 4, 5 ) -> ( 2, 3, 4 )
-        my $root = pop @ancestors;
-
-        # ( 2, 3, 4 ) -> ( 2, 3 )
-        my $node_above_root = pop @ancestors;
-
-        # collapse node 4
-        $node_above_root->collapse;
-
-        # ( 2, 3 ) -> ( 2, 3, 5 ); 4 doesn't exist anymore (collapsed)
-        push @ancestors, $root;
-
-        # ( 2, 3, 5 ) -> ( new, 2, 3, 5 )
-        unshift @ancestors, $self->set_node_below(%constructor_args);
-
-        # i.e. $self wasn't 3
-        if ( scalar @ancestors > 2 ) {
-            for ( my $i = $#ancestors ; $i >= 0 ; $i-- ) {
-
-                # flip parent & child
-                $ancestors[$i]->set_child( $ancestors[ $i + 1 ] );
-            }
-        }
-        else {
-
-            # XXX
-            $logger->info("Incomplete implementation reached");
-            $ancestors[0]->set_child( $ancestors[1] );
-        }
-        if ( my $tree = $self->get_tree ) {
-            $tree->insert( $ancestors[0] );
-        }
-        return $ancestors[0];
-    }
-
-    # 	sub set_root_below {
-    # 		my $node = shift;
-    # 		if ( $node->get_ancestors ) {
-    # 			my @ancestors = @{ $node->get_ancestors };
-    #
-    # 			# first collapse root
-    # 			my $root = $ancestors[-1];
-    # 			my $lineage_containing_node;
-    # 			my @children = @{ $root->get_children };
-    # 		  FIND_LINEAGE: for my $child (@children) {
-    # 				if ( $child->get_id == $node->get_id ) {
-    # 					$lineage_containing_node = $child;
-    # 					last FIND_LINEAGE;
-    # 				}
-    # 				for my $descendant ( @{ $child->get_descendants } ) {
-    # 					if ( $descendant->get_id == $node->get_id ) {
-    # 						$lineage_containing_node = $child;
-    # 						last FIND_LINEAGE;
-    # 					}
-    # 				}
-    # 			}
-    # 			for my $child (@children) {
-    # 				next if $child->get_id == $lineage_containing_node->get_id;
-    # 				$child->set_parent($lineage_containing_node);
-    # 			}
-    #
-    # 			# now create new root as parent of $node
-    # 			my $newroot = __PACKAGE__->new( '-name' => 'root' );
-    # 			$node->set_parent($newroot);
-    #
-    # 			# update list of ancestors, want to get rid of old root
-    # 			# at $ancestors[-1] and have new root as $ancestors[0]
-    # 			unshift @ancestors, $newroot;
-    # 			pop @ancestors;
-    #
-    # 			# update connections
-    # 			for ( my $i = $#ancestors ; $i >= 1 ; $i-- ) {
-    # 				$ancestors[$i]->set_parent( $ancestors[ $i - 1 ] );
-    # 			}
-    #
-    # 			# delete root if part of tree, insert new
-    # 			if ( my $tree = $node->_get_container ) {
-    # 				$tree->delete($root);
-    # 				$tree->insert($newroot);
-    # 			}
-    # 		}
-    # 	}
+		# instantiate new root, add $node as first child with new length
+		$q = $new_root = $fac->create_node( '-name' => 'root' );	
+		$q->set_raw_child( $node => 0 );
+		$node->set_raw_parent( $q );
+		$node->set_branch_length( $dist );
+	
+		# add $node's parent as child with new length
+		$q->set_raw_child( $p => 1 );
+		$p->set_raw_parent( $q );
+		$p->set_branch_length( $tmp - $dist );
+	
+		# traverse along previous ancestors, swap them 
+		# and update the branch lengths				
+		while ( $r ) {
+			$s = $r->get_parent; # store r's parent
+			$p->set_raw_child( $r => $i ); # change r to p's child
+			$i = $r->get_index_of( $p ); # update $i
+			$r->set_raw_parent( $p ); # update r's parent
+		
+			# swap r->d and d, i.e. update r->d
+			$tmp = $r->get_branch_length;
+			$r->set_branch_length( $d );
+			$d = $tmp;
+		
+			# update p, q and r
+			$q = $p; $p = $r; $r = $s;
+		}
+		
+		# now $p is the root node
+		my @children = @{ $p->get_children };
+		if ( scalar(@children) == 2 ) { # remove p and link the other child of p to q
+			$r = $children[1 - $i]; # get the other child
+			$i = $q->get_index_of( $p ); # the position of p in q
+			my $bl = ( $r->get_branch_length || 0 ) + ( $p->get_branch_length || 0 );
+			$r->set_branch_length( $bl );
+			
+			# link r to q
+			$q->set_raw_child( $r => $i );
+			$r->set_raw_parent( $q );
+		} 
+		
+		# remove one child in p
+		else {
+			my $k = 0;
+			for my $j ( 0 .. $#children ) {
+				$children[$k] = $children[$j];
+				$k++ if $j != $i;
+			}
+			pop @children;
+			$p->clear();
+			$p->insert( @children ) if @children;
+		}
+		$tree->insert($new_root);
+		return $new_root;
+	}
 
 
 =back
@@ -736,6 +701,9 @@ instead.
             }
             return $furthest_node;
         }
+        else {
+        	$logger->error("no terminals!");
+        }
     }
 
 =item get_sisters()
@@ -864,19 +832,10 @@ Gets invocant's terminal descendants.
     sub get_terminals {
         my $self = shift;
         if ( $self->is_terminal ) {
-            return [$self];
+        	return [$self];
         }
         else {
-            my @terminals;
-            $self->visit_level_order(
-                sub {
-                    my $node = shift;
-                    if ( $node->is_terminal ) {
-                        push @terminals, $node;
-                    }
-                }
-            );
-            return \@terminals;
+        	return [ grep { $_->is_terminal } @{ $self->get_descendants } ];
         }
     }
 
@@ -939,7 +898,6 @@ Gets invocant's most recent common ancestor shared with argument.
                 }
             }
         }
-        $logger->warn( "using " . $self_anc->[-1]->get_internal_name );
         return $self_anc->[-1];
     }
 
@@ -1042,6 +1000,78 @@ Returns the tree subtended by the invocant
         );
         return $tree->_analyze;
     }
+
+=item get_subtrees()
+
+Returns the subtree rooted at the common ancestor of u and v, and the respective
+subtrees that contain u and v
+
+ Type    : Query
+ Title   : get_subtrees
+ Usage   : my ( $found_u, $found_v, $subtree, $subtree_u, $subtree_v ) = $root->get_subtrees($u,$v);
+ Function: Returns the tree subtended by the invocant
+ Returns : A list containing the following variables:
+           - boolean: did we find u
+           - boolean: did we find v
+           - Bio::Phylo::Forest::Node - the root node of the connecting subtree
+           - Bio::Phylo::Forest::Node - the root node of the subtree for $u
+           - Bio::Phylo::Forest::Node - the root node of the subtree for $v           
+ Args    : Two nodes, $u and $v
+ Comments: This is a recursive method that is used by the RANKPROB calculations (see 
+           below). Typically you would invoke this method on the root node of the tree 
+           containing $u and $v, and the method then recurses up the tree. The tree must 
+           be bifurcating, or an exception is thrown.
+
+=cut
+
+    sub get_subtrees {
+		my ($node,$u,$v) = @_;
+	
+		# node is terminal
+		my @child = @{ $node->get_children };
+		if ( not @child ) {
+			return undef, undef, undef, undef, undef;
+		}
+		elsif ( @child != 2 ) {
+			throw 'BadArgs' => "Tree must be bifurcating";
+		}
+	
+		# recurse left and right
+		my ( $found_ul, $found_vl, $subtree_l, $subtree_ul, $subtree_vl ) = $child[0]->get_subtrees( $u, $v );
+		my ( $found_ur, $found_vr, $subtree_r, $subtree_ur, $subtree_vr ) = $child[1]->get_subtrees( $u, $v );
+	
+		# both were left descendants of focal node, return result
+		if ( $found_ul and $found_vl ) {
+			return $found_ul, $found_vl, $subtree_l, $subtree_ul, $subtree_vl;
+		}
+	
+		# both were right descendants of focal node, return result
+		if ( $found_ur and $found_vr ) {
+			return $found_ur, $found_vr, $subtree_r, $subtree_ur, $subtree_vr;
+		}
+	
+		# have we found either?
+		my $found_u = ( $found_ul or $found_ur or $node->is_equal($u) );
+		my $found_v = ( $found_vl or $found_vr or $node->is_equal($v) );
+	
+		# initialize and assign subtrees
+		my ( $subtree_u, $subtree_v );		
+		$subtree_u = $subtree_ul if $found_ul;
+		$subtree_v = $subtree_vl if $found_vl;
+		$subtree_u = $subtree_ur if $found_ur;
+		$subtree_v = $subtree_vr if $found_vr;
+		if ( $found_u and (not $found_v) ) {
+			$subtree_u = $node;
+		}
+		elsif ( $found_v and (not $found_u) ) {
+			$subtree_v = $node;
+		}
+		$subtree_u = $node if $node->is_equal($u);
+		$subtree_v = $node if $node->is_equal($v);
+	
+		# return results
+		return $found_u, $found_v, $node, $subtree_u, $subtree_v;
+	}
 
 =back
 
@@ -1626,6 +1656,234 @@ Calculates node distance between invocant and argument.
         return $nodal_distance;
     }
 
+=item calc_terminals()
+
+Calculates number of terminals subtended by the invocant
+
+ Type    : Calculation
+ Title   : calc_terminals
+ Usage   : my $ntips = $node->calc_terminals;
+ Function: Returns the number of terminals subtended by the invocant
+ Returns : INT
+ Args    : None
+
+=cut
+    
+    sub calc_terminals {
+    	my $self = shift;
+    	my $tips = 0;
+    	$self->visit_level_order( sub { $tips++ if shift->is_terminal } );
+    	return $tips;
+    }
+
+=item calc_rankprob_tipcounts()
+
+Recurses from the root to the tips, returns an array reference at every step whose
+first element is a boolean set to true once the query node has been seen. The second
+element is an array that contains the number of subtended leaves - 1 for the query
+node and for all sisters of the nodes on the path from the query to the root. This 
+method is used by the RANKPROB calculations (see below)
+
+ Type    : Calculation
+ Title   : calc_rankprob_tipcounts
+ Usage   : my @rp = @{ $root->calc_rankprob_tipcounts($node) };
+ Function: Returns tip counts for RANKPROB
+ Returns : ARRAY
+ Args    : NONE
+
+=cut 
+
+sub calc_rankprob_tipcounts {
+	my ($node,$u) = @_;
+	
+	# focal node (subtree) is empty, i.e. a leaf 
+	my @child = @{ $node->get_children };
+	return [undef,undef] if not @child;
+	return [ 1, [ $node->calc_terminals - 1 ] ] if $node->is_equal($u);
+	
+	# recurse left
+	my $x = $child[0]->calc_rankprob_tipcounts( $u );
+	if ( $x->[0] ) {
+		my $n;
+		
+		# focal node has no sibling
+		if ( not $child[1] ) {
+			$n = 0;
+		}
+		else {
+			$n = $child[1]->calc_terminals - 1;
+		}
+		return [ 1, [ @{ $x->[1] }, $n ] ];
+	}
+
+	# recurse right
+	my $y = $child[1]->calc_rankprob_tipcounts( $u );
+	if ( $y->[0] ) {
+		my $n;
+		
+		# focal node has no sibling
+		if ( not $child[0] ) {
+			$n = 0;
+		}
+		else {
+			$n = $child[0]->calc_terminals - 1;
+		}
+		return [ 1, [ @{ $y->[1] }, $n ] ];
+	}
+	
+	# $u is neither left or right from here
+	else {
+		return [undef,undef];
+	}
+}
+
+=item calc_rankprob()
+
+Calculates the probabilities for all rank orderings that the invocant node can
+occupy among all possible labeled histories. Uses Stadler's RANKPROB algorithm as 
+described in: 
+
+B<Gernhard, T.> et al., 2006. Estimating the relative order of speciation 
+or coalescence events on a given phylogeny. I<Evolutionary Bioinformatics Online>. 
+B<2>:285. L<http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2674681/>.
+
+ Type    : Calculation
+ Title   : calc_rankprob
+ Usage   : my @rp = @{ $root->calc_rankprob($node) };
+ Function: Returns the rank probabilities of the invocant node
+ Returns : ARRAY, indices are ranks, values are probabilities
+ Args    : NONE
+
+=cut  
+
+sub calc_rankprob {
+	my ($t,$u) = @_;
+	my $x = $t->calc_rankprob_tipcounts($u);
+	$x = $x->[1];
+	my $lhsm = $x->[0];
+	my $k = scalar(@$x);
+	my $start = 1;
+	my $end = 1;
+	my $rp = [0,1];
+	my $step = 1;
+	while ( $step < $k ) {
+		my $rhsm = $x->[$step];
+		my $newstart = $start+1;
+		my $newend = $end + $rhsm + 1;
+		my $rp2 = [];
+		for my $i ( 0 .. $newend ) {
+			push @$rp2, 0;
+		}
+		for my $i ( $newstart .. $newend ) {
+			my $q = max( 0, $i - 1 - $end );
+			for my $j ( $q .. min( $rhsm, $i - 2 ) ) {
+				my $a = $rp->[$i-$j-1] * nchoose($lhsm + $rhsm - ($i-1),$rhsm-$j) * nchoose($i-2,$j);
+				$rp2->[$i]+=$a;
+			}
+		}
+		$rp = $rp2;
+		$start = $newstart;
+		$end = $newend;
+		$lhsm = $lhsm+$rhsm+1;
+		$step += 1;
+	}
+	my $tot = sum( @{ $rp } );
+	for my $i ( 0..$#{ $rp } ) {
+		$rp->[$i] = $rp->[$i] / $tot;
+	}
+	return $rp;
+}
+
+=item calc_expected_rank()
+
+Calculates the expected rank and variance that the invocant node occupies among all 
+possible labeled histories. Uses Stadler's RANKPROB algorithm as described in: 
+
+B<Gernhard, T.> et al., 2006. Estimating the relative order of speciation 
+or coalescence events on a given phylogeny. I<Evolutionary Bioinformatics Online>. 
+B<2>:285. L<http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2674681/>.
+
+ Type    : Calculation
+ Title   : calc_expected_rank
+ Usage   : my ( $rank, $variance ) = $root->calc_expected_rank($node);
+ Function: Calculates expected rank and variance
+ Returns : Two numbers: rank and variance
+ Args    : NONE
+
+=cut
+
+sub calc_expected_rank {
+	my ( $t, $u ) = @_;
+	my $rp = $t->calc_rankprob( $u );
+	my $mu = 0;
+	my $sigma = 0;
+	for my $i ( 0 .. $#{ $rp } ) {
+		$mu += $i * $rp->[$i];
+		$sigma += $i * $i * $rp->[$i];
+	}
+	return $mu, $sigma - $mu * $mu;
+}
+
+=item calc_rankprob_compare()
+
+Calculates the probability that the argument node is below the invocant node over all 
+possible labeled histories. Uses Stadler's COMPARE algorithm as described in: 
+
+B<Gernhard, T.> et al., 2006. Estimating the relative order of speciation 
+or coalescence events on a given phylogeny. I<Evolutionary Bioinformatics Online>. 
+B<2>:285. L<http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2674681/>.
+
+ Type    : Calculation
+ Title   : calc_rankprob_compare
+ Usage   : my $prob = $root->calc_rankprob_compare($u,$v);
+ Function: Compares rankings of nodes
+ Returns : A number (probability)
+ Args    : Bio::Phylo::Forest::Node
+
+=cut
+
+sub calc_rankprob_compare {
+	my ($t,$u,$v) = @_;
+	my ($found_u,$found_v,$root,$root_u,$root_v) = $t->get_subtrees($u,$v);
+	
+	# both vertices need to occur in the same tree, of course
+	if ( not ($found_u and $found_v) ) {
+		print "This tree does not have those vertices!";
+		return 0;
+	}
+	
+	# If either one is the root node of the
+	# subtree that connects them then their
+	# relative rankings are certain.
+	return 1.0 if $root->is_equal($u);
+	return 0.0 if $root->is_equal($v);
+
+	# calculate rank probabilities in
+	# respective subtrees
+	my $x = $root_u->calc_rankprob($u);
+	my $y = $root_v->calc_rankprob($v);
+	my $usize = $root_u->calc_terminals - 1;
+	my $vsize = $root_v->calc_terminals - 1;	
+	
+	for my $i ( scalar(@$x) .. $usize + 1 ) {
+		push @$x, 0;
+	}
+	my $xcumulative = [0];
+	for my $i ( 1 .. $#{ $x } ) {
+		push @$xcumulative, $xcumulative->[$i-1] + $x->[$i];
+	}
+	my $rp = [0];
+	for my $i ( 1 .. $#{ $y } ) {
+		push @$rp, 0;
+		for my $j ( 1 .. $usize) {
+			my $a = $y->[$i] * nchoose($i-1+$j,$j) * nchoose($vsize-$i+$usize-$j, $usize-$j) * $xcumulative->[$j];
+			$rp->[$i] += $a;
+		}
+	}
+	my $tot = nchoose($usize+$vsize,$vsize);
+	return sum(@$rp)/$tot;	
+}
+
 =back
 
 =head2 VISITOR METHODS
@@ -1962,18 +2220,28 @@ Serializes subtree subtended by invocant to newick string.
             # first create the name
             my $name;
             if ( $node->is_terminal or $args{'-nodelabels'} ) {
-                if ( not $args{'-tipnames'} ) {
-                    $name = $node->get_nexus_name;
+                if ( ref $args{'-nodelabels'} and ref($args{'-nodelabels'}) eq 'CODE' ) {
+                    my $id;
+                    if ( $node->is_terminal ) {
+                        $id = $args{'-translate'}->{$node->get_nexus_name};
+                    }
+                    else {
+                        $id = $node->get_name;
+                    }
+                    $name = $args{'-nodelabels'}->($node,$id);
+                }
+                elsif ( not $args{'-tipnames'} ) {
+                    $name = $node->get_nexus_name(1);
                 }
                 elsif ( $args{'-tipnames'} =~ /^internal$/i ) {
-                    $name = $node->get_nexus_name;
+                    $name = $node->get_nexus_name(1);
                 }
                 elsif ( $args{'-tipnames'} =~ /^taxon/i and $node->get_taxon ) {
                     if ( $args{'-tipnames'} =~ /^taxon_internal$/i ) {
-                        $name = $node->get_taxon->get_nexus_name;
+                        $name = $node->get_taxon->get_nexus_name(1);
                     }
                     elsif ( $args{'-tipnames'} =~ /^taxon$/i ) {
-                        $name = $node->get_taxon->get_nexus_name;
+                        $name = $node->get_taxon->get_nexus_name(1);
                     }
                 }
                 else {
@@ -1998,20 +2266,22 @@ Serializes subtree subtended by invocant to newick string.
             # now format nhx
             my $nhx;
             if ( $args{'-nhxkeys'} ) {
-                my $sep;
+                my ( $sep, $sp );
                 if ( $args{'-nhxstyle'} =~ /^mesquite$/i ) {
                     $sep = ',';
                     $nhx = '[%';
+                    $sp = ' ';
                 }
                 else {
                     $sep = ':';
                     $nhx = '[&&NHX:';
+                    $sp = '';
                 }
                 my @nhx;
                 for my $i ( 0 .. $#{ $args{'-nhxkeys'} } ) {
                     my $key   = $args{'-nhxkeys'}->[$i];
                     my $value = $node->get_generic($key);
-                    push @nhx, " $key = $value " if $value;
+                    push @nhx, "$sp$key$sp=$sp$value$sp" if $value;
                 }
                 if (@nhx) {
                     $nhx .= join $sep, @nhx;
@@ -2044,6 +2314,9 @@ Serializes subtree subtended by invocant to newick string.
             elsif ( my $next_sister = $node->get_next_sister ) {
                 $string .= ',';
                 $next_sister->to_newick(%args);
+            }
+            else {
+            	#$string .= ')';
             }
         }
     }

@@ -4,7 +4,7 @@
       "David Morel <david.morel@amakuru.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "hadoop",
       "yarn",
@@ -70,8 +70,8 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "Test::More" : "0",
-            "blib" : "1.01"
+            "Test::CPAN::Meta" : "0",
+            "Test::More" : "0"
          }
       }
    },
@@ -87,14 +87,15 @@
          "web" : "https://github.com/Perl-Hadoop/Net-Hadoop-Oozie"
       }
    },
-   "version" : "0.111",
+   "version" : "0.112",
    "x_contributors" : [
+      "Canran Gou <canrangou@cpan.org>",
       "Philippe Bruhat (BooK) <book@cpan.org>",
       "Burak Gursoy <burak@cpan.org>",
       "David Morel <dmor@cpan.org>",
       "Eric Herman <eherman@cpan.org>",
       "Rafa\u00ebl Garcia-Suarez <rgarcia@cpan.org>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0213"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

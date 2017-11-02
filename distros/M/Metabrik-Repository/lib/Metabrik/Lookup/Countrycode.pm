@@ -1,5 +1,5 @@
 #
-# $Id: Countrycode.pm,v f6ad8c136b19 2017/01/01 10:13:54 gomor $
+# $Id: Countrycode.pm,v d7c4ded19eca 2017/05/13 11:36:37 gomor $
 #
 # lookup::countrycode Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Client::Www);
 
 sub brik_properties {
    return {
-      revision => '$Revision: f6ad8c136b19 $',
+      revision => '$Revision: d7c4ded19eca $',
       tags => [ qw(unstable iana cc tld) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -211,8 +211,8 @@ sub from_tld {
 
    my $data = $self->_load_by_tld or return;
 
-   if (exists($data->{$tld})) {
-      return $data->{$tld};
+   if (exists($data->{lc($tld)})) {
+      return $data->{lc($tld)};
    }
 
    return 0;

@@ -1,8 +1,8 @@
 use Test2::V0;
-use Smart::Args::TypeTiny::Check qw/check_rule check_type/;
+use Smart::Args::TypeTiny::Check qw/check_rule check_type type type_role/;
 use Types::Standard -all;
 
-sub type {
+sub type_name {
     my $name = shift;
     object {
         call display_name => $name;
@@ -14,76 +14,32 @@ subtest 'check_rule' => sub {
     is check_rule({isa => Int, default => 99},        undef, 0), 99;
     is check_rule({isa => Int, default => sub { 1 }}, undef, 0), 1;
     is check_rule({isa => Int, optional => 1},        undef, 0), undef;
+    is check_rule({isa => Int, optional => 1},        undef, 1), undef;
     like dies { check_rule({isa => Int}, undef, 0, 'foo') },
         qr/Required parameter 'foo' not passed/;
-};
-
-subtest 'check_type' => sub {
-    is check_type(Int, 1), 1;
-    is check_type(undef, 1), 1;
-    is check_type(ArrayRef->plus_coercions(Int, q{[$_]}), 1), [1];
-    like dies { check_type(Int, undef, 'foo') },
+    like dies { check_rule({isa => Int}, undef, 1, 'foo') },
         qr/Type check failed in binding to parameter '\$foo'; Undef did not pass type constraint "Int"/;
-};
-
-subtest 'parameter_rule' => sub {
-    subtest 'isa' => sub {
-        is Smart::Args::TypeTiny::Check::parameter_rule('Foo'), {
-            isa => 'Foo',
-        };
-        is Smart::Args::TypeTiny::Check::parameter_rule({isa => 'Foo'}), {
-            isa => 'Foo',
-        };
-        is Smart::Args::TypeTiny::Check::parameter_rule({isa => InstanceOf['Foo']}), {
-            isa => type('InstanceOf["Foo"]'),
-        };
-        is Smart::Args::TypeTiny::Check::parameter_rule({isa => Str}), {
-            isa => type('Str'),
-        };
-    };
-
-    subtest 'does' => sub {
-        is Smart::Args::TypeTiny::Check::parameter_rule({does => 'Bar'}), {
-            does => 'Bar',
-        };
-        is Smart::Args::TypeTiny::Check::parameter_rule({does => ConsumerOf['Bar']}), {
-            does => type('ConsumerOf["Bar"]'),
-        };
-    };
-
-    subtest 'optional' => sub {
-        is Smart::Args::TypeTiny::Check::parameter_rule({optional => 1}), {
-            optional => 1,
-        };
-        is Smart::Args::TypeTiny::Check::parameter_rule({optional => 0}), {
-            optional => 0,
-        };
-    };
-
-    subtest 'default' => sub {
-        is Smart::Args::TypeTiny::Check::parameter_rule({default => 1}), {
-            default => 1,
-        };
-        is Smart::Args::TypeTiny::Check::parameter_rule({default => undef}), {
-            default => undef,
-        };
-    };
-
-    like dies { Smart::Args::TypeTiny::Check::parameter_rule({optioanl => 'Foo'}, 'foo') },
+    like dies { check_rule({optioanl => 'Foo'}, undef, 0, 'foo') },
         qr/Malformed rule for 'foo' \(isa, does, optional, default\)/;
 };
 
-subtest 'rule_to_type' => sub {
-    subtest 'isa' => sub {
-        is Smart::Args::TypeTiny::Check::rule_to_type({isa => 'Foo'}), type('Foo');
-        is Smart::Args::TypeTiny::Check::rule_to_type({isa => InstanceOf['Foo']}), type('InstanceOf["Foo"]');
-        is Smart::Args::TypeTiny::Check::rule_to_type({isa => Str}), type('Str');
-    };
+subtest 'check_type' => sub {
+    is [check_type(Int, 1)], [1, 1];
+    is [check_type(undef, 1)], [1, 1];
+    is [check_type(ArrayRef->plus_coercions(Int, q{[$_]}), 1)], [[1], 1];
+    is [check_type(Int, 'zero')], ['zero', 0];
+};
 
-    subtest 'does' => sub {
-        is Smart::Args::TypeTiny::Check::rule_to_type({does => 'Bar'}), type('Bar');
-        is Smart::Args::TypeTiny::Check::rule_to_type({does => ConsumerOf['Bar']}), type('ConsumerOf["Bar"]');
-    };
+subtest 'type' => sub {
+    is type('Foo'), type_name('Foo');
+    is type(InstanceOf['Foo']), type_name('InstanceOf["Foo"]');
+    is type(Str), type_name('Str');
+    is type('Str'), type_name('Str');
+};
+
+subtest 'type_role' => sub {
+    is type_role('Bar'), type_name('Bar');
+    is type_role(ConsumerOf['Bar']), type_name('ConsumerOf["Bar"]');
 };
 
 done_testing;

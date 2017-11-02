@@ -1,5 +1,5 @@
 #
-# $Id: Winexe.pm,v f6ad8c136b19 2017/01/01 10:13:54 gomor $
+# $Id: Winexe.pm,v 73850be884c6 2017/02/22 17:52:16 gomor $
 #
 # remote::winexe Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Shell::Command Metabrik::System::Package);
 
 sub brik_properties {
    return {
-      revision => '$Revision: f6ad8c136b19 $',
+      revision => '$Revision: 73850be884c6 $',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -44,8 +44,28 @@ sub brik_properties {
 
 #
 # Compilation process
+#
 # http://techedemic.com/2014/09/17/installing-wmic-in-ubuntu-14-04-lts-64-bit/
 # http://wiki.monitoring-fr.org/nagios/windows-client/superivision-wmi
+#
+# 2017-02-20: New compilation process for winexe 1.1:
+#
+# http://rand0m.org/2015/08/05/winexe-1-1-centos-6-and-windows-2012-r2/
+# https://sourceforge.net/p/winexe/winexe-waf/ci/master/tree/
+#
+# sudo apt-get install gcc-mingw-w64 comerr-dev libpopt-dev libbsd-dev zlib1g-dev 
+#    libc6-dev python-dev gnutls-dev acl-dev libldap-dev
+# git clone git://git.code.sf.net/p/winexe/winexe-waf winexe-winexe-waf
+# wget https://download.samba.org/pub/samba/stable/samba-4.1.23.tar.gz
+# tar zxvf samba-4.1.23.tar.gz
+# cd winexe-winexe-waf/source
+# vi wscript_build
+# -        stlib='smb_static bsd z resolv rt',
+# -        lib='dl'
+# +        stlib='smb_static z rt',
+# +        lib='dl resolv bsd'
+# ./waf --samba-dir=../../samba-4.1.23 configure build
+# cp build/winexe-static /usr/local/bin/winexe11
 #
 sub install {
    my $self = shift;
@@ -93,25 +113,22 @@ sub install {
 }
 
 #
-# Instructions to activate WINEXESVC under Windows 7
+# A. Activate file sharing on local network
+#
+# B. Instructions to activate WINEXESVC under Windows 7
 #
 # 1. Add LocalAccountTokenFilterPolicy registry key
 #
-# - Click start
-# - Type: regedit
-# - Press enter
-# - In the left, browse to the following folder:
-# HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\system\
-# - Right-click a blank area in the right pane
-# - Click New
-# - Click DWORD Value
-# - Type: LocalAccountTokenFilterPolicy
-# - Double-click the item you just created
-# - Type 1 into the box
-# - Click OK
+#   runas administrator a cmd.exe
 #
-# 2. Add winexesvc service
-# runas administrator a cmd.exe
+#   reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\system" 
+#      /v LocalAccountTokenFilterPolicy /t REG_DWORD /d 1 /f
+#
+# 2. Add winexesvc service (update: not necessary since winexe 1.1, it installs the 
+#    service by itself)
+#
+#   runas administrator a cmd.exe
+#
 # C:\> sc create winexesvc binPath= C:\WINDOWS\WINEXESVC.EXE start= auto DisplayName= winexesvc
 # C:\> sc description winexesvc "Remote command provider"
 #
@@ -127,8 +144,18 @@ sub execute {
    $self->brik_help_run_undef_arg('execute', $user) or return;
    $self->brik_help_run_undef_arg('execute', $password) or return;
 
+   my $winexe = 'winexe';
+
+   # If winexe 1.1 is available, we use it instead of venerable winexe from wmi package.
+   if (-f '/usr/local/bin/winexe11') {
+      $self->log->verbose("execute: winexe11 found, using it");
+      $winexe = 'winexe11';
+   }
+
    # Do not put $command between quotes, let user do it.
-   my $cmd = "winexe -U$user".'%'."$password //$host $command";
+   my $cmd = "$winexe -U$user".'%'."$password //$host $command";
+
+   $self->log->verbose("execute: cmd[$cmd]");
 
    return $self->SUPER::execute($cmd);
 }

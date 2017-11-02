@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005'
 keywords:
   - rperl
   - perl5
@@ -38,8 +38,8 @@ no_index:
     - string
     - unknown
 requires:
-  Alien::JPCRE2: '0.002'
-  Alien::PCRE2: '0.006'
+  Alien::JPCRE2: '0.009'
+  Alien::PCRE2: '0.014'
   Alien::astyle: '0.009'
   App::Pod2CpanHtml: '0.04'
   CPAN::Meta: '2.150005'
@@ -55,6 +55,7 @@ requires:
   Inline::Filters: '0.19'
   List::MoreUtils: '0.33'
   Math::BigInt::GMP: '1.46'
+  Math::GSL: '0.39'
   Module::Refresh: '0.17'
   Module::ScanDeps: '1.19'
   PadWalker: '2.1'
@@ -75,5 +76,5 @@ resources:
   homepage: http://www.rperl.org
   license: http://dev.perl.org/licenses/
   repository: git://github.com/wbraswell/rperl.git
-version: '3.000000'
+version: '3.200000'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

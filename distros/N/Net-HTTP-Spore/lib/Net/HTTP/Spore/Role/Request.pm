@@ -1,5 +1,5 @@
 package Net::HTTP::Spore::Role::Request;
-$Net::HTTP::Spore::Role::Request::VERSION = '0.07';
+$Net::HTTP::Spore::Role::Request::VERSION = '0.09';
 # ABSTRACT: make HTTP request
 
 use Try::Tiny;
@@ -124,7 +124,7 @@ Net::HTTP::Spore::Role::Request - make HTTP request
 
 =head1 VERSION
 
-version 0.07
+version 0.09
 
 =head1 SYNOPSIS
 

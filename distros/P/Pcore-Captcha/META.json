@@ -31,7 +31,6 @@
       },
       "runtime" : {
          "requires" : {
-            "Imager" : "0",
             "Pcore" : "v0.22.2"
          }
       }
@@ -48,6 +47,6 @@
          "web" : "https://bitbucket.org/softvisio/pcore-captcha/overview"
       }
    },
-   "version" : "v1.1.0",
-   "x_serialization_backend" : "JSON::PP version 2.93"
+   "version" : "v1.2.1",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

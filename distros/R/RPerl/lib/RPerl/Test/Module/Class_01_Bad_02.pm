@@ -21,9 +21,7 @@ our hashref $properties = { empty_property => my integer $TYPED_empty_property =
 
 # [[[ SUBROUTINES & OO METHODS ]]]
 
-our void::method $empty_method = sub {
-    return 2;
-};
+sub empty_method { { my void::method $RETURN_TYPE }; return 2; }
 
 1;    # end of class
 
@@ -38,11 +36,11 @@ use warnings;
 our $VERSION = 0.001_000;
 
 # [[[ OO INHERITANCE ]]]
-use parent qw(RPerl::Test::Module::Class_01_Good);
-require RPerl::Test::Module::Class_01_Good;
+use parent qw(RPerl::Test::Module::Class_00_Good);
+require RPerl::Test::Module::Class_00_Good;
 
 # [[[ OO PROPERTIES ]]]
-our hashref $properties = $RPerl::Test::Module::Class_01_Good::properties;
+our hashref $properties = $RPerl::Test::Module::Class_00_Good::properties;
 
 1;    # end of class
 

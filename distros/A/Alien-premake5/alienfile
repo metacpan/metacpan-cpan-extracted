@@ -1,0 +1,72 @@
+use alienfile;
+
+use File::chdir;
+
+plugin 'Probe::CommandLine' => (
+  command => 'premake5',
+  args    => [ '--version' ],
+  match   => qr/premake5/,
+);
+
+configure {
+  requires 'File::chdir' => 0;
+};
+
+share {
+  requires 'Path::Tiny'  => 0;
+
+  start_url 'https://github.com/premake/premake-core/releases';
+
+  plugin Download => (
+    filter  => qr/premake-[0-9.]+(-[a-z0-9]+)?-src\.zip$/,
+    version => qr/premake-([0-9.]+(?:-[a-z0-9]+)?)/,
+  );
+
+  plugin 'Decode::HTML';
+  plugin 'Extract' => 'zip';
+
+  build sub {
+    my ($build) = @_;
+
+    my $platform = 'unix';
+    for ($^O) {
+      $platform = 'macosx'  if /darwin/;
+      $platform = 'bsd'     if /bsd/;
+      $platform = 'windows' if /MSWin32/;
+    }
+
+    # Somehow changing directory with A::B's 'cd'
+    # does not work in this case. 'No such directory', it says.
+    my $src_dir = Path::Tiny::path($build->install_prop->{extract})
+      ->child('build', "gmake.$platform");
+
+    local $CWD = $src_dir->stringify;
+    $build->system('%{make}', 'config=release');
+
+    # premake5 makefiles do not define an install target
+    my $bindir = Path::Tiny::path($build->install_prop->{prefix}, 'bin');
+    $bindir->mkpath;
+
+    my $target = $bindir->child('premake5');
+    my $binary = Path::Tiny::path($build->install_prop->{extract})
+      ->child('bin', 'release', 'premake5');
+
+    $binary->copy($target);
+    $target->chmod(0755);
+
+    $build->runtime_prop->{command} = $target->basename;
+  };
+};
+
+requires 'Capture::Tiny';
+
+gather sub {
+  my ($build) = @_;
+
+  my ($stdout) = Capture::Tiny::capture(sub {
+    system($build->runtime_prop->{command}, '--version');
+  });
+
+  my ($version) = $stdout =~ /premake5 \(.*\) ([0-9.]+(?:-[a-z0-9]+)?)/;
+  $build->runtime_prop->{version} = $version || 'unknown';
+}

@@ -3,7 +3,7 @@ package WebService::MinFraud::Error::HTTP;
 use Moo;
 use namespace::autoclean;
 
-our $VERSION = '1.005000';
+our $VERSION = '1.005001';
 
 with 'WebService::MinFraud::Role::Error::HTTP';
 
@@ -25,7 +25,7 @@ WebService::MinFraud::Error::HTTP - An HTTP transport error
 
 =head1 VERSION
 
-version 1.005000
+version 1.005001
 
 =head1 SYNOPSIS
 

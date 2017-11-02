@@ -9,7 +9,7 @@ our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(ok);
 
 BEGIN {
-    our $VERSION = '0.16';
+    our $VERSION = '0.18';
     XSLoader::load __PACKAGE__, $VERSION;
 }
 

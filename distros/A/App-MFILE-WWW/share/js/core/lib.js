@@ -273,6 +273,16 @@ define ([
             return clone;
         },
 
+        // eliminate duplicates from array - use only for arrays containing
+        // similar primitives (e.g. arrays of numbers, arrays of zip codes, etc.)
+        // Credits to: https://stackoverflow.com/questions/9229645/remove-duplicates-from-javascript-array
+        uniq: function (a) {
+            var seen = {};
+            return a.filter(function(item) {
+                return seen.hasOwnProperty(item) ? false : (seen[item] = true);
+            });
+        },
+
         // pause main thread for n milliseconds
         //wait: function (ms) {
         //    var start = new Date().getTime();

@@ -49,4 +49,9 @@ SKIP: {
 	is date_construct( d => Time::Object::localtime(0) ), $bigbang, '... regardless of local timezone';
 };
 
+SKIP: {
+	skip 'missing Time::Date', 1 unless eval { require Time::Date; Time::Date->VERSION('0.05') };
+	is date_construct( d => Time::Date->new_epoch(0) ),    $bigbang, 'correct RFC 3339 for Time::Date objects';
+};
+
 done_testing;

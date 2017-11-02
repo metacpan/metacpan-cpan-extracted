@@ -20,7 +20,7 @@ use Carp qw( carp );
 use Mojo::Util qw( monkey_patch );
 
 # ABSTRACT: Construct command line and perl clients for RESTful services.
-our $VERSION = '1.26'; # VERSION
+our $VERSION = '1.27'; # VERSION
 
 
 has server_url => '';
@@ -636,7 +636,7 @@ Clustericious::Client - Construct command line and perl clients for RESTful serv
 
 =head1 VERSION
 
-version 1.26
+version 1.27
 
 =head1 SYNOPSIS
 

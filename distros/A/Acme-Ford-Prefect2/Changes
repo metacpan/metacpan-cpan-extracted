@@ -1,5 +1,12 @@
 Revision history for Acme-Ford-Prefect2
 
+1.2901    2017-11-02 02:02:06 -0400
+  - Fix configure time prereqs bug (GH#1)
+
+1.2900    2017-10-30 10:08:08 -0400
+  - Require Acme::Alien::DontPanic2 1.2900 (Alien::Build 1.29 Alien::Build::MB 0.05)
+  - Migrate to using Alien::Base::Wrapper
+
 1.1400    2017-09-14 17:05:21 -0400
   - Require Acme::Alien::DontPanic2 1.1400 (Alien::Build 1.14 Alien::Build::MB 0.05)
 

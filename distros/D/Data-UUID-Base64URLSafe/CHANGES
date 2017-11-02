@@ -1,5 +1,10 @@
 ChangeLog for Data::UUID::Base64URLSafe:
 
+0.35 2017-10-28T16:19:26Z
+    - migrate to minil
+    - stop using MIME::Base64::URLSafe because MIME::Base64::encode_base64url is available
+    - and fixed the POD
+
 0.34 Tue Jun 23 16:37:15 BST 2009
     - added the other methods that a uuid formatter should have
       (patch by Jesse Vincent)

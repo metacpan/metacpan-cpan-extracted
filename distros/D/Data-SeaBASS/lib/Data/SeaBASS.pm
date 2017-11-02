@@ -9,11 +9,11 @@ Data::SeaBASS - Object-oriented interface for reading/writing SeaBASS files
 
 =head1 VERSION
 
-version 0.172890
+version 0.173030
 
 =cut
 
-our $VERSION = '0.172890'; # VERSION
+our $VERSION = '0.173030'; # VERSION
 
 =head1 SYNOPSIS
 
@@ -1735,7 +1735,9 @@ sub make_data_hash {
 	my $iterator = each_arrayref( $field_list, \@values );
 	while ( my ( $k, $v ) = $iterator->() ) {
 		if ( $self->{'options'}{'missing_data_to_undef'} ) {
-			if ( $self->{'missing_is_number'} && looks_like_number($v) && $v == $self->{'missing'} ) {
+			if (!length($v)){
+				$ret{$k} = undef;
+			} elsif ( $self->{'missing_is_number'} && looks_like_number($v) && $v == $self->{'missing'} ) {
 				$ret{$k} = undef;
 			} elsif ( !$self->{'options'}{'preserve_detection_limits'} && $self->{'adl_is_number'} && looks_like_number($v) && $v == $self->{'above_detection_limit'} ){
 				$ret{$k} = undef;
@@ -2344,8 +2346,9 @@ sub add_and_remove_fields {
 	my $missing = ( $self->{'options'}{'missing_data_to_undef'} ? undef : $self->{'missing'} );
 	while ( my ( $variable, $pad ) = each(%FIELD_FORMATTING) ) {
 		my $case_var = $self->{'case_conversion'}{$variable} || $variable;
-		if ( defined( $hash->{$case_var} ) && ( !defined($missing) || $hash->{$case_var} != $missing ) ) {
-			$hash->{$case_var} = sprintf( $pad, $hash->{$case_var} );
+		my $v = $hash->{$case_var};
+		if ( defined($v) && length($v) && (!defined($missing) || $v != $missing)) {
+			$hash->{$case_var} = sprintf($pad, $v);
 		}
 	} ## end while (my ($variable, $pad...))
 
@@ -2628,11 +2631,11 @@ sub extrapolate_variables {
 			my $value;
 			if ( $self->{'ancillary_tmp'}{$variable} ) {
 				$value = $self->{'ancillary_tmp'}{$variable};
-			} elsif ( defined( $row->{$variable} ) && ( !defined($missing) || $row->{$variable} != $missing ) ) {
+			} elsif ( defined($row->{$variable}) && length($row->{$variable}) && (!defined($missing) || $row->{$variable} != $missing)) {
 				$value = $row->{$variable};
 				$self->{'ancillary_tmp'}{$variable} = $value;
 			} elsif ( ref( $self->{'ancillary'}{$variable} ) ) {
-				$value = $self->extrapolate_function( $missing, $self->{'ancillary'}{$variable}, $row );
+				$value = $self->extrapolate_function($missing, $self->{'ancillary'}{$variable}, $row);
 				if ( !defined($value) ) {
 					return;
 				}

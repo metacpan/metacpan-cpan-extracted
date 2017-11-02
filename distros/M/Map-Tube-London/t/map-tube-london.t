@@ -22,13 +22,13 @@ SKIP: {
 }
 
 __DATA__
-Route 1|Wembley Central|Bond Street|Wembley Central,Stonebridge Park,Harlesden,Willesdon Junction,Shepherd's Bush,Holland Park,Notting Hill Gate,Queensway,Lancaster Gate,Marble Arch,Bond Street
+Route 1|Wembley Central|Bond Street|Wembley Central,Stonebridge Park,Harlesden,Willesden Junction,Shepherd's Bush,Holland Park,Notting Hill Gate,Queensway,Lancaster Gate,Marble Arch,Bond Street
 Route 2|Bond Street|Euston|Bond Street,Oxford Circus,Warren Street,Euston
 Route 3|White City|Victoria|White City,Shepherd's Bush,Kensington (Olympia),Earl's Court,Gloucester Road,South Kensington,Sloane Square,Victoria
 Route 4|Temple|Farringdon|Temple,Embankment,Waterloo,Bank,Moorgate,Barbican,Farringdon
 Route 5|Turnham Green|Whitechapel|Turnham Green,Hammersmith,Barons Court,Earl's Court,Gloucester Road,South Kensington,Knightsbridge,Hyde Park Corner,Green Park,Westminster,Waterloo,Bank,Shadwell,Whitechapel
-Route 6|Goldhawk Road|Wembley Central|Goldhawk Road,Shepherd's Bush Market,Wood Lane,White City,Shepherd's Bush,Willesdon Junction,Harlesden,Stonebridge Park,Wembley Central
-Route 7|Wembley Central|Marylebone|Wembley Central,Stonebridge Park,Harlesden,Willesdon Junction,Shepherd's Bush,Holland Park,Notting Hill Gate,Bayswater,Paddington,Edgware Road,Marylebone
+Route 6|Goldhawk Road|Wembley Central|Goldhawk Road,Shepherd's Bush Market,Wood Lane,White City,Shepherd's Bush,Willesden Junction,Harlesden,Stonebridge Park,Wembley Central
+Route 7|Wembley Central|Marylebone|Wembley Central,Stonebridge Park,Harlesden,Willesden Junction,Shepherd's Bush,Holland Park,Notting Hill Gate,Bayswater,Paddington,Edgware Road,Marylebone
 Route 8|Baker Street|Neasden|Baker Street,Finchley Road,Wembley Park,Neasden
 Route 9|Baker Street|Preston Road|Baker Street,Finchley Road,Wembley Park,Preston Road
 Route 10|Oval|Euston|Oval,Kennington,Waterloo,Westminster,Green Park,Oxford Circus,Warren Street,Euston

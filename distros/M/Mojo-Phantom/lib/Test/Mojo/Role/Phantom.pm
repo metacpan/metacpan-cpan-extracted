@@ -55,7 +55,7 @@ sub phantom_ok {
         }
         die $err if $err;
       },
-    )->catch(sub{ Test::More::fail($_[1]) })->wait;
+    )->tap(on => error => sub{ Test::More::fail($_[1]) })->wait;
   };
   local $Test::Builder::Level = $Test::Builder::Level + 1;
   return $t->success(Test::More::subtest($name => $block));
@@ -110,6 +110,12 @@ You must install that program and it must be in your C<PATH> in order to use thi
 
 The author recommends using L<Test::Mojo::WithRoles> to manage the role application.
 The low level interaction is handled by a L<Mojo::Phantom> instance, but for the most part that is transparent to the test method.
+
+=head1 WARNING
+
+The upstream phantom.js has been retired in favor of headless chrome.
+A L<Mojo::Chrome> (and related L<Test::Mojo::Role::Chrome>) is planned and is already in the works (perhaps it is released already who knows?!).
+While this module will continue to function, just know that it depends on a project that is defunct.
 
 =head1 METHODS
 

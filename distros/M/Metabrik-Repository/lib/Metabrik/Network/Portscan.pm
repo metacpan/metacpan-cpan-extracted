@@ -1,5 +1,5 @@
 #
-# $Id: Portscan.pm,v f6ad8c136b19 2017/01/01 10:13:54 gomor $
+# $Id: Portscan.pm,v 34a2bdfafce0 2017/06/11 16:06:22 gomor $
 #
 # network::portscan Brik
 #
@@ -11,12 +11,13 @@ use base qw(Metabrik::Network::Address Metabrik::Network::Device);
 
 sub brik_properties {
    return {
-      revision => '$Revision: f6ad8c136b19 $',
+      revision => '$Revision: 34a2bdfafce0 $',
       tags => [ qw(unstable scan syn port synscan tcpscan) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
       attributes => {
          device => [ qw(device) ],
+         listen_device => [ qw(device) ],
          ports => [ qw(port_array) ],
          top10 => [ qw(top10_port_array) ],
          top100 => [ qw(top100_port_array) ],
@@ -26,6 +27,7 @@ sub brik_properties {
          bandwidth => [ qw(bandwidth) ],
          wait => [ qw(seconds) ],
          use_ipv6 => [ qw(0|1) ],
+         src_ip => [ qw(ip_address) ],
          _nr => [ qw(INTERNAL) ],
       },
       attributes_default => { 
@@ -132,7 +134,7 @@ sub brik_properties {
          estimate_bandwidth => [ qw(pps|OPTIONAL size|OPTIONAL) ],
          estimate_pps => [ qw(bandwidth|OPTIONAL size|OPTIONAL) ],
          tcp_syn_sender => [ qw($ip_list $port_list|OPTIONAL pps|OPTIONAL try|OPTIONAL) ],
-         tcp_syn_start_receiver => [ qw($port_list|OPTIONAL) ],
+         tcp_syn_start_receiver => [ qw($port_list|OPTIONAL filter|OPTIONAL listen_device|OPTIONAL) ],
          tcp_syn_stop_receiver => [ ],
          tcp_syn_scan => [ qw($ip_list $port_list|OPTIONAL pps|OPTIONAL try|OPTIONAL) ],
          tcp_syn_receive_until_sender_exit => [ qw(pid pps|OPTIONAL wait|OPTIONAL use_ipv6|OPTIONAL) ],
@@ -154,6 +156,7 @@ sub brik_use_properties {
    return {
       attributes_default => {
          device => $self->global->device,
+         listen_device => $self->global->device,
       },
    };
 }
@@ -251,16 +254,17 @@ sub tcp_syn_sender {
    my $device = $self->device;
    my $use_ipv6 = $self->use_ipv6;
 
+   # Set source IP address.
    my $ip4;
    my $ip6;
    if ($use_ipv6) {
-      $ip6 = $self->my_ipv6;
+      $ip6 = defined($self->src_ip) ? $self->src_ip : $self->my_ipv6;
       if (! defined($ip6)) {
          return $self->log->error("tcp_syn_sender: IPv6 not found for device [$device]");
       }
    }
    else {
-      $ip4 = $self->my_ipv4;
+      $ip4 = defined($self->src_ip) ? $self->src_ip : $self->my_ipv4;
       if (! defined($ip4)) {
          return $self->log->error("tcp_syn_sender: IPv4 not found for device [$device]");
       }
@@ -329,47 +333,54 @@ sub tcp_syn_sender {
 
 sub tcp_syn_start_receiver {
    my $self = shift;
-   my ($port_list) = @_;
+   my ($port_list, $filter, $listen_device) = @_;
 
    if (defined($port_list)) {
-      $self->brik_help_run_invalid_arg('tcp_syn_start_receiver', $port_list, 'ARRAY') or return;
-      $self->brik_help_run_empty_array_arg('tcp_syn_start_receiver', $port_list) or return;
+      $self->brik_help_run_invalid_arg('tcp_syn_start_receiver', $port_list, 'ARRAY')
+         or return;
+      $self->brik_help_run_empty_array_arg('tcp_syn_start_receiver', $port_list)
+         or return;
    }
 
+   $listen_device ||= $self->listen_device;
+
    my $nr = Metabrik::Network::Read->new_from_brik_init($self) or return;
-   #$nr->debug($self->debug); # Apply debug to this Brik also.
 
    my $ip = '';
    if ($self->use_ipv6) {
-      $ip = $self->my_ipv6 or return;
+      $ip = (defined($self->src_ip) ? $self->src_ip : $self->my_ipv6) or return;
    }
    else {
-      $ip = $self->my_ipv4 or return;
+      $ip = (defined($self->src_ip) ? $self->src_ip : $self->my_ipv4) or return;
    }
 
    if (defined($port_list)) {
-      $self->log->verbose("tcp_syn_start_receiver: scanning for ".scalar(@$port_list)." port(s)");
+      $self->log->verbose("tcp_syn_start_receiver: scanning for ".scalar(@$port_list).
+         " port(s)");
    }
     
    # Create a filter if not provided by user
-   my $filter = $self->use_ipv6
-      ? 'tcp and (ip6 and dst host '.$ip.')'
-      : 'tcp and (((tcp[13] & 2 != 0) and (tcp[13] & 16 != 0) and dst host '.$ip.')'.
-        ' or '.
-        '((tcp[13] & 4 != 0) and (tcp[13] & 16 != 0) and dst host '.$ip.'))';
+   if (! defined($filter)) {
+      $filter = $self->use_ipv6
+         ? 'tcp and (ip6 and dst host '.$ip.')'
+         : 'tcp and (((tcp[13] & 2 != 0) and (tcp[13] & 16 != 0) and dst host '.$ip.')'.
+           ' or '.
+           '((tcp[13] & 4 != 0) and (tcp[13] & 16 != 0) and dst host '.$ip.'))';
 
-   # If only a few ports specified, we use that in the filter
-   if (defined($port_list) && @$port_list <= 10) {
-      $filter .= " and (";
-      for (@$port_list) {
-         $filter .= "src port $_ or ";
+      # If only a few ports specified, we use that in the filter
+      if (defined($port_list) && @$port_list <= 10) {
+         $filter .= " and (";
+         for (@$port_list) {
+            $filter .= "src port $_ or ";
+         }
+         $filter =~ s/ or $/)/;
       }
-      $filter =~ s/ or $/)/;
    }
 
    $self->log->verbose("tcp_syn_start_receiver: using filter [$filter]");
 
    $nr->filter($filter);
+   $nr->device($listen_device);
 
    $nr->open or return;
  

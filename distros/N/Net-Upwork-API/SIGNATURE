@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,18 +12,18 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: SHA256
 
 SHA1 66d349d8b7336f7a70b74f933d22ec6812a4ee09 .docgen
 SHA1 e95b3ca25991c76d90791ce64e5fa48c5d99c453 .tests
 SHA1 ef0006650536e16662d2ebd25a4357fc1d15c783 .travis.yml
-SHA1 abd6caeaad191cef2acb03850d0212509209af82 Build.PL
-SHA1 aaa2a7777628ad69605640a49dee001f7af53eee CHANGES.md
+SHA1 46cd1afc6648c0a98929a5483a4bc9de1f11f585 Build.PL
+SHA1 93d81510c7a926016e33dd1f272bacb129bb98bd CHANGES.md
 SHA1 a6a5418b4d67d9f3a33cbf184b25ac7f9fa87d33 LICENSE
 SHA1 841a6ad6ced6bad0dccb8092b1e782d10881a46e MANIFEST
-SHA1 fb0696a134379d9b70a35ab25b5e22f100000063 META.json
-SHA1 b9104528d4e672dd936193104e6d7691aaae6da6 META.yml
-SHA1 68846a040dee9ee5ed3cde51f0170b0fb2722c0b Makefile.PL
+SHA1 2ca958ec0045ec3cc5ace716cfa5dd157a32d9b2 META.json
+SHA1 a7176a431f51ad4512d1629ff2368b092682997a META.yml
+SHA1 32288b83e7647c5f875ce647d9a75dd991c7df16 Makefile.PL
 SHA1 87ed6279096cd2771d7828ae6f45132ae6ca3dc8 README.md
 SHA1 f2f4ee24e294ff650023cc3ed6ac5a8377a575db example/myapp.pl
 SHA1 a7c5ebb7fd5b2d3f1d97125364914665236b1f3f html/Net/Upwork/API.html
@@ -72,7 +72,7 @@ SHA1 d8485d5398cc15d1d51fee1fc8c0a63c18b5e70e html/_whtnavk.css
 SHA1 6657c1d178f869cabd7d3a3629dac4369c4da2a9 html/_whtprpk.css
 SHA1 b2b51b2190cd5d87f4145ae9588367166d01ff48 html/_whtpurk.css
 SHA1 d4361adff7e0cd9d59790ae1e6d2f4633d8a6869 html/index.html
-SHA1 1f11b90fda95285782a07d51f6fe1955d5e098d1 lib/Net/Upwork/API.pm
+SHA1 7a32a897800ad3c9e2e4e46a00ec54eba47b82c6 lib/Net/Upwork/API.pm
 SHA1 288e56c2c2af65868e85afcd2c492437e8e7bd73 lib/Net/Upwork/API/Client.pm
 SHA1 92e474dd2fe16042ed4133edbbf198b3d41152d8 lib/Net/Upwork/API/Config.pm
 SHA1 1b418008e61e42458f58b259efd8ef32e45ed883 lib/Net/Upwork/API/Routers/Activities/Engagement.pm
@@ -102,7 +102,7 @@ SHA1 550487efa9a9f51ff36816a4a3fb4b0f177a8895 lib/Net/Upwork/API/Routers/Payment
 SHA1 f677be535feb19911b49ed39fde219935be2a20b lib/Net/Upwork/API/Routers/Reports/Finance/Accounts.pm
 SHA1 6fd7f98f96181027020547dbb2784bfabf492134 lib/Net/Upwork/API/Routers/Reports/Finance/Billings.pm
 SHA1 54d273e37ec245b034f929f23b9298b3d2899953 lib/Net/Upwork/API/Routers/Reports/Finance/Earnings.pm
-SHA1 7901c4457e42ed0f4223a12f924b241870b0b1fe lib/Net/Upwork/API/Routers/Reports/Time.pm
+SHA1 91112f23824b257edc07441c7c99876b8a061e6a lib/Net/Upwork/API/Routers/Reports/Time.pm
 SHA1 6a79ffa3fbfbd1a28e5cc338edf21fcfc0e8ed77 lib/Net/Upwork/API/Routers/Snapshot.pm
 SHA1 3dbe4ba3c421271b74f14dd7397cbc40c9975466 lib/Net/Upwork/API/Routers/Workdays.pm
 SHA1 9b7681553f12854d718b8f47212878a2a4da9b5d lib/Net/Upwork/API/Routers/Workdiary.pm
@@ -140,13 +140,12 @@ SHA1 4449c9791f193bf09dc8598623be4e40e47dc86d t/29.routers_reports_finance_accou
 SHA1 ef41c13b4ce47e304e4dac7c8519647043d1cfdd t/30.routers_reports_finance_billings.t
 SHA1 c784db6b3d3e190211e691fcd2d15633e3970922 t/31.routers_reports_finance_earnings.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQEcBAEBAgAGBQJYpEuXAAoJEB+IuYkPuHrnVVYH/3tG5zCUygHTwBdopZR0oJy2
-eEXXGpB+ohVkNhu12AGYnVgbD5DCPjKOw/PpO4/oqn4nuo1Vz8nMEIL75uF5n/vC
-ObnrhbYCkaJ6hb+J169FQarmmalchLkfledD4yBOj/0aE4ivpUqn7BJJm9HNGoNO
-jjk4uZrsuSwmR+fGyzJH4y0kI4UYk9/f2Wqao3A6AQUx0legLnhf6aKDndcMzZT3
-VsJJaLh1LsVlyVtJ4WCzJiL116EC6cT73ii2YL9AGCH+42IOwpKZTroWJWFCgngF
-LdAStWq/S4BOVRsSgLyW2IxaNMiwgPgLAydfXAptIi/ev2aTotAldLy1x3IxPJE=
-=QW2x
+iQEcBAEBCAAGBQJZ93EXAAoJEB+IuYkPuHrndnAH/jpD+sf6KOZuTCQNb8XPYYg2
+arqs9VScYozCoAFbfIbPKsmXeuhdCVzwcc2SiwVbOvplyrj0Ghzu9e3lOBW1QTHb
+4DCqKVsftkoV+bXl5h5Xpf4l4cvLyZdQ+DUCFe9TfN04+oxaxlbUpabp5XewQyEA
+eyhvXOo6tBEklV36UcI6fkctBDelL8Ur0asvaIDPpau6Gh/a2xStCS7Ui8apaBWZ
+YvBYdyC/R6vRwILMhuqJ1a8lTdv2dme3XslKfiAd0pJvJSDBY6VSXuJkms6+sfp8
+Noa5uOO8LZo6rdyJKlr0nXr5YuavcbjTiY6ZPJn4pGpywVJ9p55WjoGhYwsb9ps=
+=hUkL
 -----END PGP SIGNATURE-----

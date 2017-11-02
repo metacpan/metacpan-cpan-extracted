@@ -2,7 +2,7 @@ package App::Yath::Command;
 use strict;
 use warnings;
 
-our $VERSION = '0.001026';
+our $VERSION = '0.001030';
 
 use Carp qw/croak confess/;
 use File::Temp qw/tempdir/;
@@ -123,19 +123,14 @@ sub normalize_settings {
         # Set the default
         if (defined($default) && !defined($settings->{$field})) {
             my $val = ref($default) ? $self->$default($settings, $field) : $default;
-
-            if ($action) {
-                $self->$action($settings, $field, $val);
-            }
-            else {
-                $settings->{$field} = $val;
-            }
+            $settings->{$field} = $val;
         }
 
         next unless $normalize && defined $settings->{$field};
 
         # normalize the value
         $settings->{$field} = $self->$normalize($settings, $field, $settings->{$field});
+
     }
 
     if (my $libs = $settings->{libs}) {
@@ -501,8 +496,8 @@ sub options {
             used_by => {runner => 1},
             section => 'Harness Options',
             usage => ['--shm', '--no-shm'],
-            summary => ["Use shm for tempdir if possible (Default: on)", "Do not use shm."],
-            default => 1,
+            summary => ["Use shm for tempdir if possible (Default: off)", "Do not use shm."],
+            default => 0,
         },
 
         {
@@ -783,7 +778,19 @@ sub options {
             usage     => ['--formatter Mod', '--formatter +Mod'],
             summary   => ['Specify the formatter to use', '(Default: "Test2")'],
             long_desc => 'Only useful when the renderer is set to "Formatter". This specified the Test2::Formatter::XXX that will be used to render the test output.',
-            default   => '+Test2::Formatter::Test2',
+            default   => sub {
+                my ($self, $settings, $field) = @_;
+
+                my $renderer = $settings->{renderer} or return undef;
+
+                my $need_formatter = 0;
+                $need_formatter ||= 1 if $renderer eq 'Formatter';
+                $need_formatter ||= 1 if $renderer eq '+Test2::Harness::Renderer::Formatter';
+
+                return undef unless $need_formatter;
+
+                return '+Test2::Formatter::Test2';
+            },
         },
 
         {
@@ -1041,6 +1048,8 @@ sub usage {
     chomp(my @cli_args    = $self->cli_args);
     chomp(my $description = $self->description);
 
+    @cli_args = ('') unless @cli_args;
+
     my $head_common = "$0 $name [options]";
     my $header = join(
         "\n",
@@ -1061,6 +1070,8 @@ OPTIONS:
 $options
 
     EOT
+
+    $usage =~ s/ +$//gms;
 
     return $usage;
 }
@@ -1133,7 +1144,8 @@ sub renderers {
     }
     else {
         my $r_class = fqmod('Test2::Harness::Renderer', $r);
-        require $r_class;
+        my $file = pkg_to_file($r_class);
+        require $file;
         push @$renderers => $r_class->new(verbose => $settings->{verbose}, color => $settings->{color});
     }
 

@@ -1,7 +1,9 @@
 package App::Office::CMS::View::Content;
 
-use Any::Moose;
-use common::sense;
+use strict;
+use warnings;
+
+use Moo;
 
 use Text::Xslate 'mark_raw';
 
@@ -9,10 +11,7 @@ use Try::Tiny;
 
 extends 'App::Office::CMS::View::Base';
 
-# If Moose...
-#use namespace::autoclean;
-
-our $VERSION = '0.92';
+our $VERSION = '0.93';
 
 # -----------------------------------------------
 
@@ -100,10 +99,5 @@ sub generate
 } # End of generate.
 
 # -----------------------------------------------
-
-no Any::Moose;
-
-# If Moose...
-#__PACKAGE__ -> meta -> make_immutable;
 
 1;

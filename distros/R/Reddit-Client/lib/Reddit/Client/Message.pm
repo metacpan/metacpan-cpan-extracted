@@ -29,6 +29,8 @@ use fields qw/
 
 1; 
 
+use constant type => "t4";
+
 __END__
 
 =pod

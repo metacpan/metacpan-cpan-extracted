@@ -19,11 +19,11 @@ Geo::Coder::CA - Provides a geocoding functionality using http:://geocoder.ca fo
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 SYNOPSIS
 
@@ -50,8 +50,8 @@ Geo::Coder::CA provides an interface to geocoder.ca.  Geo::Coder::Canada no long
 sub new {
 	my($class, %param) = @_;
 
-	my $ua	   = delete $param{ua}	   || LWP::UserAgent->new(agent => __PACKAGE__ . "/$VERSION");
-	my $host	 = delete $param{host}	 || 'geocoder.ca';
+	my $ua = delete $param{ua} || LWP::UserAgent->new(agent => __PACKAGE__ . "/$VERSION");
+	my $host = delete $param{host} || 'geocoder.ca';
 
 	return bless { ua => $ua, host => $host }, $class;
 }
@@ -166,6 +166,30 @@ sub reverse_geocode {
 
 	return $self->geocode(location => $latlng, reverse => 1);
 };
+
+=head2 run
+
+You can also run this module from the command line:
+
+    perl CA.pm 1600 Pennsylvania Avenue NW, Washington DC
+
+=cut
+
+__PACKAGE__->run(@ARGV) unless caller();
+
+sub run {
+	require Data::Dumper;
+
+	my $class = shift;
+
+	my $location = join(' ', @_);
+
+	my @rc = $class->new()->geocode($location);
+	
+	die "$0: geocoding failed" unless(scalar(@rc));
+
+	print Data::Dumper->new([\@rc])->Dump();
+}
 
 =head1 AUTHOR
 

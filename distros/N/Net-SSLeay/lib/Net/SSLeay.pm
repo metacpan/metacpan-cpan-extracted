@@ -4,7 +4,7 @@
 # Copyright (C) 2005 Florian Ragwitz <rafl@debian.org>, All Rights Reserved.
 # Copyright (C) 2005 Mike McCauley <mikem@airspayce.com>, All Rights Reserved.
 #
-# $Id: SSLeay.pm 485 2017-01-04 21:40:55Z mikem-guest $
+# $Id: SSLeay.pm,v 1.5 2017/07/31 10:33:59 mikem Exp $
 #
 # Change data removed from here. See Changes
 # The distribution and use of this module are subject to the conditions
@@ -55,7 +55,7 @@ $Net::SSLeay::slowly = 0;
 # /dev/random would block and /dev/urandom starts to return predictable
 # numbers).
 #
-# N.B. /dev/urandom does not exit on all systems, such as Solaris 2.6. In that
+# N.B. /dev/urandom does not exist on all systems, such as Solaris 2.6. In that
 #      case you should get a third party package that emulates /dev/urandom
 #      (e.g. via named pipe) or supply a random number file. Some such
 #      packages are documented in Caveat section of the POD documentation.
@@ -63,7 +63,7 @@ $Net::SSLeay::slowly = 0;
 $Net::SSLeay::random_device = '/dev/urandom';
 $Net::SSLeay::how_random = 512;
 
-$VERSION = '1.81'; # Dont forget to set version in META.yml too
+$VERSION = '1.82'; # Dont forget to set version in META.yml too
 @ISA = qw(Exporter);
 
 #BEWARE:

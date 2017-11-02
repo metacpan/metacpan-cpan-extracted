@@ -1,5 +1,5 @@
 #
-# $Id: File.pm,v f6ad8c136b19 2017/01/01 10:13:54 gomor $
+# $Id: File.pm,v 5051a354bfa9 2017/10/28 08:17:02 gomor $
 #
 # system::file Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Shell::Command);
 
 sub brik_properties {
    return {
-      revision => '$Revision: f6ad8c136b19 $',
+      revision => '$Revision: 5051a354bfa9 $',
       tags => [ qw(unstable chmod chgrp cp copy move rm mv remove mkdir mkd) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -214,6 +214,8 @@ sub create {
 sub glob {
    my $self = shift;
    my ($pattern) = @_;
+
+   $self->brik_help_run_undef_arg('glob', $pattern) or return;
 
    my @list = CORE::glob("$pattern");
 

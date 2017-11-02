@@ -2,15 +2,16 @@ package Test2::Harness::Job::Runner::Open3;
 use strict;
 use warnings;
 
-our $VERSION = '0.001026';
+our $VERSION = '0.001030';
 
 use IPC::Open3 qw/open3/;
 use Test2::Harness::Util qw/open_file write_file local_env/;
 use Test2::Util qw/pkg_to_file/;
+use Carp qw/cluck/;
 
 use File::Spec();
 
-sub viable { 1 }
+sub viable { cluck __PACKAGE__ . " is deprecated"; 1 }
 
 sub find_inc {
     my $class = shift;

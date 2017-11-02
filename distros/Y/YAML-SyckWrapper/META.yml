@@ -1,0 +1,40 @@
+---
+abstract: 'Loads YAML files in old and new fashion encoding ways.'
+author:
+  - 'Victor Efimov <efimov@reg.ru>'
+build_requires:
+  Carp: '0'
+  Encode: '0'
+  File::Temp: '0'
+  Module::Build: '0.28'
+  Moose: '0'
+  Test::Exception: '0'
+  Test::More::UTF8: '0'
+  Test::Spec: '0'
+  utf8: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: YAML-SyckWrapper
+provides:
+  YAML::SyckWrapper:
+    file: lib/YAML/SyckWrapper.pm
+    version: '0.001'
+requires:
+  Carp: '0'
+  Exporter: '0'
+  File::Slurp: '0'
+  YAML::Syck: '0'
+  perl: '5.014000'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://metacpan.org/release/YAML-SyckWrapper
+version: '0.001'
+x_serialization_backend: 'YAML::Tiny version 1.69'

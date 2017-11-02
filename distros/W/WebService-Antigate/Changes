@@ -1,5 +1,18 @@
 Revision history for Perl extension WebService::Antigate.
 
+0.10  Mon Oct 30 19:19:45 +07 2017
+      - POD fixes
+
+0.09  Sun Oct 29 21:40:40 DST 2017
+      - fix "undefined subroutine _name_by_signature ..." error, which may be arised in previous release
+      - POD fixes
+      - add `scheme' and `subdomain' attributes
+      - add tests for API v2
+
+0.08  Sat Oct 28 02:06:59 DST 2017
+      - support for API v2 added
+      - change default domain to anti-captcha.com
+
 0.07  Mon Jan 19 13:27:06 NOVT 2015
       - prevent tests failing because of IO::Socket::IP
 

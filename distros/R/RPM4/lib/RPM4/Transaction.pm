@@ -42,16 +42,16 @@ __END__
 
 =head1 NAME
 
-Hdlist::Db
+RPM4::Transaction
 
 =head1 DESCRIPTION
 
-This object allow to access to the rpm datadase and installing rpms on the
+This object allow to access to the rpm transaction packages and installing rpms on the
 system.
 
 =head1 METHODS
 
-=head2 Hdlist::Db->traverse_headers(sub)
+=head2 RPM4::Transaction->traverse_headers(sub)
 
 Go through the rpm database and for each header run the callback passed as
 argument.
@@ -65,21 +65,21 @@ Ex:
     });
 
 
-=head2 Hdlist::Db->injectheader($header)
+=head2 RPM4::Transaction->injectheader($header)
 
 Add the header into rpmdb. This is not installing a package, the function
 only fill information into the rpmdb.
 
 Return 0 on success.
 
-=head2 Hdlist::Db->deleteheader($index)
+=head2 RPM4::Transaction->deleteheader($index)
 
 Remove header from rpmdb locate at $index. This is not uninstalling a package,
 this function only delete information from rpmdb.
 
 Return 0 on success
     
-=head2 Hdlist::Db->transadd(header, filename, upgrade, relocation, force)
+=head2 RPM4::Transaction->transadd(header, filename, upgrade, relocation, force)
 
 Add rpm headers for next transaction. This means this rpm are going to be
 installed on the system.
@@ -94,9 +94,9 @@ of course match the header,
 
 Returns 0 on success.
 
-See: $Hdlist::Db->transcheck(), $Hdlist::Db->transrun().
+See: $RPM4::Transaction->transcheck(), $RPM4::Transaction->transrun().
 
-=head2 Hdlist::Db->transremove(rpm_name)
+=head2 RPM4::Transaction->transremove(rpm_name)
 
 Add rpm to remove for next transaction. This mean the rpm will be uninstalled
 from the system.
@@ -105,25 +105,25 @@ Argument is the exact rpm name (%{NAME}) or a string as NAME(EPOCH:VERSION-RELEA
 
 Returns the number of selected rpms for this transaction.
 
-=head2 Hdlist::Db->transcheck()
+=head2 RPM4::Transaction->transcheck()
 
 Check current transaction is possible.
 
 Returns 0 on success, 1 on error during check.
 
-=head2 Hdlist::Db->transorder()
+=head2 RPM4::Transaction->transorder()
 
 Call to rpmlib to order the transaction, aka sort rpm installation / 
 desintallation.
 
 Returns 0 on success.
 
-=head2 Hdlist::Db->transpb
+=head2 RPM4::Transaction->transpb
 
-Return an array of problem found during L<Hdlist::Db->transcheck> or
-L<Hdlist::Db->transrun>
+Return an array of problem found during L<RPM4::Transaction->transcheck> or
+L<RPM4::Transaction->transrun>
 
-=head2 Hdlist::Db->transrun($callback, $flags...)
+=head2 RPM4::Transaction->transrun($callback, $flags...)
 
 Really run transaction and install/uninstall packages.
 
@@ -185,10 +185,10 @@ Returns 0 on success.
 
 =head2 $db->transpbs
 
-Return a Hdlist::Db::Problems object containing problem found during
+Return a RPM4::Transaction::Problems object containing problem found during
 rpms installation/desinstallation.
 
-See L<Hdlist::Db::Problems>
+See L<RPM4::Transaction::Problems>
 
 =head1 SEE ALSO
 

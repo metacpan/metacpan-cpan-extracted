@@ -9,11 +9,11 @@ require 5.10.1;
 
 Device::Cdio - Module for CD Input and Control library.
 
-=cut 
+=cut
 
-use version; $VERSION = qv('0.3.0');
+use version; $VERSION = qv('0.4.0');
 
-=pod 
+=pod
 
 =head1 SYNOPSIS
 
@@ -75,7 +75,7 @@ In the documentation below and elsewhere in this package the parameter
 name that can be used in this style of call is given in the parameter
 list. For example, for C<close_tray> the documentation below reads:
 
-   close_tray(drive=undef, driver_id=$perlcdio::DRIVER_UNKNOWN) 
+   close_tray(drive=undef, driver_id=$perlcdio::DRIVER_UNKNOWN)
     -> ($drc, $driver_id)
 
 So the parameter names are "drive", and "driver_id". Neither parameter
@@ -137,12 +137,12 @@ use Device::Cdio::Util qw( _check_arg_count _extra_args _rearrange );
 
 =head1 SUBROUTINES
 
-=head2 close_tray 
+=head2 close_tray
 
-close_tray(drive=undef, driver_id=$perlcdio::DRIVER_UNKNOWN) 
+close_tray(drive=undef, driver_id=$perlcdio::DRIVER_UNKNOWN)
  -> ($drc, $driver_id)
-   
-close media tray in CD drive if there is a routine to do so. 
+
+close media tray in CD drive if there is a routine to do so.
 
 In an array context, the driver return-code status and the
 name of the driver used are returned.
@@ -161,7 +161,7 @@ sub close_tray {
     return wantarray ? ($drc, $found_driver_id) : $drc;
 }
 
-=pod 
+=pod
 
 =head2 driver_strerror
 
@@ -169,7 +169,7 @@ driver_strerror(rc)->$errmsg
 
 Convert a driver return code into a string text message.
 
-=cut 
+=cut
 
 sub driver_strerror {
 
@@ -213,7 +213,7 @@ get_default_device_driver(driver_id=DRIVER_DEVICE)-> ($device, $driver)
 Return a string containing the default CD device if none is specified.
 if driver_id is DRIVER_UNKNOWN or DRIVER_DEVICE then find a suitable
 one set the default device for that.
-   
+
 undef is returned as the driver if we couldn't get a default device.
 
 =cut
@@ -223,7 +223,7 @@ sub get_default_device_driver {
     my($driver_id, @args) = _rearrange(['DRIVER_ID'], @p);
     return undef if _extra_args(@args);
     $driver_id = $perlcdio::DRIVER_DEVICE if !defined($driver_id);
-    my($drive, $out_driver_id) = 
+    my($drive, $out_driver_id) =
 	perlcdio::get_default_device_driver($driver_id);
     return wantarray ? ($drive, $out_driver_id) : $drive;
 }
@@ -289,7 +289,7 @@ the capabilities listed by the capabilities parameter.
 
 If "any" is set false then ALL capabilities listed in the extended
 portion of capabilities (i.e. not the basic filesystem) must be
-satisified. If "any" is set true, then if any of the capabilities
+satisfied. If "any" is set true, then if any of the capabilities
 matches, we call that a success.
 
 To find a CD-drive of any type, use the mask $perlcdio::FS_MATCH_ALL.
@@ -361,7 +361,7 @@ is_binfile(binfile)->cue_name
 
 Determine if binfile is the BIN file part of a CDRWIN Compact
 Disc image.
-    
+
 Return the corresponding CUE file if bin_name is a BIN file or
 undef if not a BIN file.
 
@@ -381,7 +381,7 @@ is_cuefile(cuefile)->bin_name
 
 Determine if cuefile is the CUE file part of a CDRWIN Compact
 Disc image.
-    
+
 Return the corresponding BIN file if cue_name is a CUE file or
 undef if not a CUE file.
 
@@ -393,7 +393,7 @@ sub is_cuefile {
     return perlcdio::is_cuefile($file_name);
 }
 
-=pod 
+=pod
 
 =head2 is_device
 
@@ -420,7 +420,7 @@ is_nrg(nrgfile)->bool
 
 Determine if nrgfile is a Nero NRG file disc image.
 
-=cut 
+=cut
 
 sub is_nrg {
     my (@p) = @_;
@@ -433,7 +433,7 @@ sub is_nrg {
 =head2 is_tocfile
 
 is_tocfile(tocfile_name)->bool
-    
+
 Determine if tocfile_name is a cdrdao CD disc image.
 
 =cut
@@ -576,7 +576,7 @@ sub convert_drive_cap_write {
     my $ref = \%result;
     return $ref;
 }
-	
+
 1; # Magic true value requred at the end of a module
 
 __END__
@@ -591,12 +591,12 @@ filesystems.
 
 L<perlcdio> is the lower-level interface to libcdio.
 
-L<http://www.gnu.org/software/libcdio/doxygen/files.html> is 
+L<http://www.gnu.org/software/libcdio/doxygen/files.html> is
 documentation via doxygen for C<libcdio>.
 
 =head1 AUTHORS
 
-Rocky Bernstein C<< <rocky at cpan.org> >>.
+Rocky Bernstein
 
 =head1 COPYRIGHT
 
@@ -613,6 +613,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+along with this program.  If not, see L<The GNU General Public
+License|http://www.gnu.org/licenses/#GPL>.
 
 =cut

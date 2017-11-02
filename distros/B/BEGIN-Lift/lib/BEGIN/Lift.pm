@@ -7,13 +7,13 @@ use warnings;
 our $VERSION;
 our $AUTHORITY;
 
-use Sub::Name              ();
-use B::CompilerPhase::Hook ();
+use Sub::Name   ();
+use Devel::Hook ();
 
 use Devel::CallParser;
 use XSLoader;
 BEGIN {
-    $VERSION   = '0.06';
+    $VERSION   = '0.07';
     $AUTHORITY = 'cpan:STEVAN';
     XSLoader::load( __PACKAGE__, $VERSION );
 }
@@ -51,7 +51,7 @@ sub install {
     );
 
     # clean things up ...
-    B::CompilerPhase::Hook::enqueue_UNITCHECK {
+    Devel::Hook->unshift_UNITCHECK_hook(sub {
         no strict 'refs';
         # NOTE:
         # this is safe only because we
@@ -59,7 +59,7 @@ sub install {
         # no other use of this typeglob
         # and so it is ok to delete
         delete ${"${pkg}::"}{$method}
-    };
+    });
 }
 
 1;

@@ -3,8 +3,8 @@
 # Learning RPerl, Section 4.3.1: C<return> Operator
 
 # [[[ PREPROCESSOR ]]]
-# <<< PARSE_ERROR: 'ERROR ECOPARP00' >>>
-# <<< PARSE_ERROR: 'Unexpected Token:  ;' >>>
+# <<< PARSE_ERROR: 'ERROR ECOPAPL02' >>>
+# <<< PARSE_ERROR: 'Useless use of a constant' >>>
 
 # [[[ HEADER ]]]
 use RPerl;
@@ -17,9 +17,10 @@ our $VERSION = 0.001_000;
 ## no critic qw(RequireInterpolationOfMetachars)  # USER DEFAULT 2: allow single-quoted control characters & sigils
 
 # [[[ SUBROUTINES ]]]
-our integer $jedi = sub { print q{"You love him, don't you?"}, "\n"; 6; };
+sub jedi { { my integer $RETURN_TYPE }; print q{"You love him, don't you?"}, "\n"; 6; return; }
 
 # [[[ OPERATIONS ]]]
 
 my integer $episode = jedi();
 print 'Return (value) of the Jedi, Episode ', $episode, "\n";
+

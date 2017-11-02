@@ -3,8 +3,6 @@ abstract: 'No-fuss generation of Atom syndication feeds'
 author:
   - 'Aristotle Pagaltzis <pagaltzis@gmx.de>'
 build_requires:
-  File::Find: 0
-  File::Temp: 0
   Test::More: 0.88
   utf8: 0
 configure_requires:
@@ -24,7 +22,6 @@ requires:
   strict: 0
   warnings: 0
 resources:
-  bugtracker: http://github.com/ap/XML-Atom-SimpleFeed/issues
-  homepage: http://github.com/ap/XML-Atom-SimpleFeed
-  repository: git://github.com/ap/XML-Atom-SimpleFeed
-version: 0.900
+  bugtracker: https://github.com/ap/XML-Atom-SimpleFeed/issues
+  repository: git://github.com/ap/XML-Atom-SimpleFeed.git
+version: 0.902

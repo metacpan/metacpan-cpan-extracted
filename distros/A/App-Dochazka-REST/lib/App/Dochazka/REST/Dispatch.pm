@@ -2697,26 +2697,47 @@ sub handler_get_schedule_eid {
 }
 
 
-=head3 handler_fillup
+=head3 handler_interval_fillup
 
-Handler for POST interval/fillup. For a description of what we're trying to
-do, see https://github.com/smithfarm/dochazka-rest/issues/60
+Handler for "POST interval/fillup"
 
 =cut
 
-sub handler_fillup {
+sub handler_interval_fillup {
     my ( $self, $pass ) = @_;
-    $log->debug( "Entering " . __PACKAGE__ . "::handler_fillup" );
+    $log->debug( "Entering " . __PACKAGE__ . ":handler_interval_fillup" ); 
+    return $self->_handler_interval_fillup_scheduled( 'Fillup', $pass );
+}
+
+
+=head3 handler_interval_scheduled
+
+Handler for "POST interval/scheduled"
+
+=cut
+
+sub handler_interval_scheduled {
+    my ( $self, $pass ) = @_;
+    $log->debug( "Entering " . __PACKAGE__ . ":handler_interval_scheduled" ); 
+    return $self->_handler_interval_fillup_scheduled( 'Scheduled', $pass );
+}
+
+
+sub _handler_interval_fillup_scheduled {
+    my ( $self, $mode, $pass ) = @_;
+    $log->debug( "Entering " . __PACKAGE__ . "::_handler_interval_fillup_scheduled" );
 
     my $context = $self->context;
     my $method = $context->{'method'};
+    my $path = $context->{'path'};
     my $entity = $context->{'request_entity'};
+    my ( $clobber, $dry_run );
 
     # first pass
     return 1 if $self->_first_pass_always_exists( $pass ); 
 
     # second pass
-    $log->debug( "handler_fillup(): Commencing pass #2, entity is " .  Dumper( $entity ) );
+    $log->debug( "handler_fillup(): Commencing pass #2, mode is $mode, entity is " .  Dumper( $entity ) );
 
     # extract employee from request entity
     my $emp = $self->_extract_employee_spec( $entity );
@@ -2730,11 +2751,26 @@ sub handler_fillup {
     my $tsdl = $self->_extract_date_list_or_tsrange( $entity );
     return $fail unless ref( $tsdl ) eq 'HASH';
 
+    # clobber based on the resource ("scheduled" or "fillup")
+    if ( $mode eq 'Fillup' ) {
+        $clobber = 0;
+        $dry_run = {};
+    } elsif ( $mode eq 'Scheduled' ) {
+        $clobber = 1;
+        delete $entity->{'clobber'};
+        $dry_run = { 'dry_run' => '1' };
+        delete $entity->{'dry_run'};
+    } else {
+        die "ASSERTfillupscheduled";
+    }
+
     # create Fillup object
     my $fillup = App::Dochazka::REST::Fillup->new( 
         context => $context,
         emp_obj => $emp,
         aid => $act->aid,
+        clobber => $clobber,
+        %$dry_run,
         %$tsdl,
         %$entity,
     );

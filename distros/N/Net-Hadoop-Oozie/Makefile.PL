@@ -49,10 +49,10 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
-    "Test::More" => 0,
-    "blib" => "1.01"
+    "Test::CPAN::Meta" => 0,
+    "Test::More" => 0
   },
-  "VERSION" => "0.111",
+  "VERSION" => "0.112",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -83,11 +83,11 @@ my %FallbackPrereqs = (
   "Ref::Util" => 0,
   "Regexp::Common" => 0,
   "Scalar::Util" => 0,
+  "Test::CPAN::Meta" => 0,
   "Test::More" => 0,
   "URI" => 0,
   "XML::Simple" => 0,
   "XML::Twig" => 0,
-  "blib" => "1.01",
   "constant" => 0,
   "parent" => 0,
   "strict" => 0,

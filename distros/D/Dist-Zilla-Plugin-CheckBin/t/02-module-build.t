@@ -1,5 +1,5 @@
 use strict;
-use warnings FATAL => 'all';
+use warnings;
 
 use Path::Tiny;
 my $code = path('t', '01-basic.t')->slurp_utf8;

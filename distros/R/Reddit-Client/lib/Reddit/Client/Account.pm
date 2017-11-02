@@ -7,8 +7,16 @@ use Carp;
 require Reddit::Client::Thing;
 
 use base   qw/Reddit::Client::Thing/;
-use fields qw/has_mail created modhash created_utc link_karma over_18
-              comment_karma is_gold is_mod has_mod_mail/;
+use fields qw/has_mail inbox_count created modhash created_utc link_karma 
+              comment_karma is_gold is_mod has_mod_mail
+	      features gold_creddits gold_expiration 
+	      new_modmail_exists pref_no_profanity pref_show_snoovatar
+	      suspension_expiration_utc verified subreddit in_beta is_employee
+	      is_sponsor is_suspended pref_geopopular pref_top_karma_subreddits
+	      over_18
+	   /;
+
+use constant type => "t2";
 
 1;
 

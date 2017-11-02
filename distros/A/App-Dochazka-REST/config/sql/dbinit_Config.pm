@@ -1,22 +1,22 @@
-# ************************************************************************* 
-# Copyright (c) 2014-2015, SUSE LLC
-# 
+# *************************************************************************
+# Copyright (c) 2014-2017, SUSE LLC
+#
 # All rights reserved.
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
-# 
+#
 # 1. Redistributions of source code must retain the above copyright notice,
 # this list of conditions and the following disclaimer.
-# 
+#
 # 2. Redistributions in binary form must reproduce the above copyright
 # notice, this list of conditions and the following disclaimer in the
 # documentation and/or other materials provided with the distribution.
-# 
+#
 # 3. Neither the name of SUSE LLC nor the names of its contributors may be
 # used to endorse or promote products derived from this software without
 # specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 # AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 # IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-# ************************************************************************* 
+# *************************************************************************
 #
 # sql/dbinit_Config.pm
 #
@@ -501,38 +501,46 @@ $body$#,
 
     q#-- Given an EID and a tstzrange, returns a boolean value indicating
       -- whether or not the employee's privlevel changed during that tstzrange.
-      -- History changes lying on an inclusive boundary of the range
-      -- do not trigger a positive.
+      -- NOTE: history changes lying on an inclusive boundary of the range
+      -- do not trigger a positive!
       CREATE OR REPLACE FUNCTION priv_change_during_range(INTEGER, TSTZRANGE)
-      RETURNS boolean AS $$
-          SELECT 
-              $2::tstzrange @> effective 
-              AND NOT
-              ( 
-                  ( lower_inc($2) AND effective = lower($2) )
-                  OR
-                  ( upper_inc($2) AND effective = upper($2) )
-              )
-          AS priv_change_during_range 
-          FROM privhistory WHERE eid=$1;
+      RETURNS integer AS $$
+          SELECT count(*)::integer FROM
+              (
+                  SELECT
+                      $2::tstzrange @> effective
+                      AND NOT
+                      (
+                          ( lower_inc($2::tstzrange) AND effective = lower($2::tstzrange) )
+                          OR
+                          ( upper_inc($2::tstzrange) AND effective = upper($2::tstzrange) )
+                      )
+                  AS priv_changed
+                  FROM privhistory WHERE eid=$1
+              ) AS tblalias
+          WHERE priv_changed = 't'
       $$ LANGUAGE sql IMMUTABLE#,
 
     q#-- Given an EID and a tstzrange, returns a boolean value indicating
       -- whether or not the employee's schedule changed during that tstzrange.
-      -- History changes lying on an inclusive boundary of the range
-      -- do not trigger a positive.
+      -- NOTE: history changes lying on an inclusive boundary of the range
+      -- do not trigger a positive!
       CREATE OR REPLACE FUNCTION schedule_change_during_range(INTEGER, TSTZRANGE)
-      RETURNS boolean AS $$
-          SELECT 
-              $2::tstzrange @> effective 
-              AND NOT
-              ( 
-                  ( lower_inc($2) AND effective = lower($2) )
-                  OR
-                  ( upper_inc($2) AND effective = upper($2) )
-              )
-          AS schedule_change_during_range 
-          FROM schedhistory WHERE eid=$1;
+      RETURNS integer AS $$
+          SELECT count(*)::integer FROM
+              (
+                  SELECT
+                      $2::tstzrange @> effective
+                      AND NOT
+                      (
+                          ( lower_inc($2::tstzrange) AND effective = lower($2::tstzrange) )
+                          OR
+                          ( upper_inc($2::tstzrange) AND effective = upper($2::tstzrange) )
+                      )
+                  AS schedule_changed
+                  FROM schedhistory WHERE eid=$1
+              ) AS tblalias
+          WHERE schedule_changed = 't'
       $$ LANGUAGE sql IMMUTABLE#,
 
     q#-- wrapper function to get priv as of current timestamp
@@ -877,6 +885,9 @@ set('DBINIT_MAKE_ROOT_IMMUTABLE', [
               END IF;
               IF NEW.nick <> 'root' THEN
                   RAISE EXCEPTION 'root employee is immutable'; 
+              END IF;
+              IF NEW.supervisor IS NOT NULL THEN
+                  RAISE EXCEPTION 'root employee is immutable';
               END IF;
           END IF;
           RETURN NEW;

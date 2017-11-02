@@ -55,6 +55,14 @@ for little tangible gain.
 
 =head1 NOTICE
 
+The use of this class to parse non-regexp quote-like strings was an
+experiment that I consider failed. Therefore this use is
+B<deprecated> in favor of L<PPIx::QuoteLike|PPIx::QuoteLike>. Six months
+after the release of version 0.053, the first use of the C<parse>
+argument to L<new()|/new> will result in a warning. Six months after
+that, all uses of the C<parse> argument will result in a warning. After
+another six months, the C<parse> argument will become fatal.
+
 The author will attempt to preserve the documented interface, but if the
 interface needs to change to correct some egregiously bad design or
 implementation decision, then it will change.  Any incompatible changes
@@ -161,7 +169,7 @@ use PPIx::Regexp::Tokenizer;
 use PPIx::Regexp::Util qw{ __choose_tokenizer_class __instance };
 use Scalar::Util qw{ refaddr };
 
-our $VERSION = '0.052';
+our $VERSION = '0.053';
 
 =head2 new
 
@@ -222,6 +230,11 @@ string before it tokenizes it. For example:
 This option specifies what kind of parse is to be done. Possible values
 are C<'regex'>, C<'string'>, or C<'guess'>. Any value but C<'regex'> is
 experimental.
+
+As it turns out, I consider parsing non-regexp quote-like things with
+this class to be a failed experiment, and the relevant functionality is
+being deprecated and removed in favor of
+L<PPIx::QuoteLike|PPIx::QuoteLike>. See above for details.
 
 If C<'regex'> is specified, the first argument is expected to be a valid
 regex, and parsed as though it were.

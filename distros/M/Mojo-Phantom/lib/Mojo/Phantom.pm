@@ -2,7 +2,7 @@ package Mojo::Phantom;
 
 use Mojo::Base -base;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 $VERSION = eval $VERSION;
 
 use Mojo::Phantom::Process;
@@ -209,6 +209,12 @@ Mojo::Phantom - Interact with your client side code via PhantomJS
 L<Mojo::Phantom> is the transport backbone for L<Test::Mojo::Role::Phantom>.
 Currently it is used to evaluate javascript tests using PhantomJS, though more is possible.
 Please note that this class is not yet as stable as the public api for the test role.
+
+=head1 WARNING
+
+The upstream phantom.js has been retired in favor of headless chrome.
+A L<Mojo::Chrome> (and related L<Test::Mojo::Role::Chrome>) is planned and is already in the works (perhaps it is released already who knows?!).
+While this module will continue to function, just know that it depends on a project that is defunct.
 
 =head1 ATTRIBUTES
 

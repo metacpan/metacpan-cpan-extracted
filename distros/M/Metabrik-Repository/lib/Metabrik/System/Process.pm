@@ -1,5 +1,5 @@
 #
-# $Id: Process.pm,v f6ad8c136b19 2017/01/01 10:13:54 gomor $
+# $Id: Process.pm,v 50fa661db186 2017/02/25 18:06:07 gomor $
 #
 # system::process Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Shell::Command);
 
 sub brik_properties {
    return {
-      revision => '$Revision: f6ad8c136b19 $',
+      revision => '$Revision: 50fa661db186 $',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -36,6 +36,7 @@ sub brik_properties {
          get_process_info => [ qw(process) ],
          kill => [ qw(process|pid) ],
          start => [ qw($sub) ],
+         start_with_pidfile => [ qw($sub) ],
          list_daemons => [ ],
          get_latest_daemon_id => [ ],
          kill_from_pidfile => [ qw(pidfile) ],
@@ -43,7 +44,7 @@ sub brik_properties {
          grep_by_name => [ qw(process_name) ],
          get_new_pidfile => [ ],
          get_latest_pidfile => [ ],
-         write_pidfile => [ ],
+         write_pidfile => [ qw(pidfile|OPTIONAL) ],
          delete_pidfile => [ qw(pidfile) ],
          wait_for_pidfile => [ qw(pidfile) ],
          info_process_is_running => [ ],
@@ -230,9 +231,6 @@ sub start {
          %opts,
          run => $sub,
       );
-      #if (! defined($r)) {
-         #return $self->log->error("start: failed from sub");
-      #}
    }
    # Or myself.
    else {
@@ -250,6 +248,39 @@ sub start {
    }
 
    return 1;
+}
+
+sub start_with_pidfile {
+   my $self = shift;
+   my ($sub) = @_;
+
+   my %opts = (
+      close => $self->close_output_on_start,
+   );
+
+   my $pidfile = $self->get_new_pidfile or return;
+
+   my $r;
+   # Daemonize the given subroutine
+   if (defined($sub)) {
+      $r = Daemon::Daemonize->daemonize(
+         %opts,
+         run => sub {
+            $self->write_pidfile($pidfile);
+            &$sub();
+         },
+      );
+   }
+   # Or myself.
+   else {
+      $r = Daemon::Daemonize->daemonize(
+         %opts,
+      );
+   }
+
+   $self->log->verbose("start: new daemon started with pidfile [$pidfile]");
+
+   return $pidfile;
 }
 
 sub list_daemons {

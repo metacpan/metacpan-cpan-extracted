@@ -1,9 +1,10 @@
 package Bio::Phylo::Parsers::Json;
 use strict;
+use warnings;
 use base 'Bio::Phylo::Parsers::Abstract';
 use Bio::Phylo::IO 'parse';
 use Bio::Phylo::Util::Exceptions 'throw';
-use Bio::Phylo::Util::Dependency 'XML::XML2JSON';
+use Bio::Phylo::Util::Dependency 'Bio::Phylo::NeXML::XML2JSON';
 
 =head1 NAME
 
@@ -31,7 +32,7 @@ sub _parse {
     
     # perhaps not happy about prolog?
     $json =~ s/"\@encoding":"\S+?","\@version":"1.0",//;
-    my $conf = XML::XML2JSON->new;
+    my $conf = Bio::Phylo::NeXML::XML2JSON->new;
     my $xml  = $conf->json2xml($json);
     my $fac  = $self->_factory;
     my $proj = $fac->create_project;

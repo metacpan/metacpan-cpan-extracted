@@ -26,7 +26,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Carp" => 0,
     "File::ShareDir" => 0,
-    "Net::HTTP::Spore" => "0.07",
+    "Net::HTTP::Spore" => "0.08",
     "Net::HTTP::Spore::Middleware::DefaultParams" => 0,
     "Net::HTTP::Spore::Middleware::Format::JSON" => 0,
     "strict" => 0,
@@ -42,7 +42,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.88",
     "blib" => "1.01"
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.007",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -56,7 +56,7 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Net::HTTP::Spore" => "0.07",
+  "Net::HTTP::Spore" => "0.08",
   "Net::HTTP::Spore::Middleware::DefaultParams" => 0,
   "Net::HTTP::Spore::Middleware::Format::JSON" => 0,
   "Test::Exception" => 0,

@@ -15,7 +15,7 @@ use MOP::Slot;
 
 use MOP::Internal::Util;
 
-our $VERSION   = '0.11';
+our $VERSION   = '0.12';
 our $AUTHORITY = 'cpan:STEVAN';
 
 our @ISA;  BEGIN { @ISA  = 'UNIVERSAL::Object::Immutable' };
@@ -41,7 +41,7 @@ sub superclasses {
 
 sub set_superclasses {
     my ($self, @superclasses) = @_;
-    Carp::croak('[ARGS] You must specify at least one superclass')
+    Carp::confess('[ARGS] You must specify at least one superclass')
         if scalar( @superclasses ) == 0;
     MOP::Internal::Util::SET_GLOB_SLOT( $self->stash, 'ISA', \@superclasses );
     return;
@@ -64,7 +64,7 @@ MOP::Class - A representation of a class
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 DESCRIPTION
 

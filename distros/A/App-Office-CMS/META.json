@@ -1,0 +1,92 @@
+{
+   "abstract" : "The Canny, Microlight and Simple CMS",
+   "author" : [
+      "Ron Savage (ron@savage.net.au)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.22, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-Office-CMS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Brannigan" : "1.1",
+            "CGI" : "3.49",
+            "CGI::Application" : "4.31",
+            "CGI::Application::Dispatch" : "2.17",
+            "CGI::Application::Dispatch::PSGI" : "3.12",
+            "CGI::Untaint" : "1.26",
+            "Capture::Tiny" : "0.46",
+            "Config::Tiny" : "2.23",
+            "DBD::SQLite" : "1.54",
+            "DBI" : "1.611",
+            "DBIx::Admin::CreateTable" : "2.1",
+            "DBIx::Admin::TableInfo" : "3.03",
+            "DBIx::Simple" : "1.35",
+            "Data::Session" : "1.17",
+            "Date::Format" : "2.24",
+            "File::Path" : "2.08",
+            "File::Slurper" : "0.01",
+            "File::Spec" : "3.31",
+            "FindBin" : "1.51",
+            "JSON::XS" : "3.02",
+            "Lingua::EN::Inflect::Number" : "1.11",
+            "Log::Handler" : "0.88",
+            "Moo" : "2.003002",
+            "Path::Class" : "0.37",
+            "Plack::Builder" : "0",
+            "String::Dirify" : "1.03",
+            "Text::Xslate" : "v3.4.0",
+            "Tree" : "1.1",
+            "Tree::DAG_Node" : "1.29",
+            "Tree::DAG_Node::Persist" : "1.12",
+            "Try::Tiny" : "0.28",
+            "Types::Standard" : "1.000005",
+            "parent" : "0.234",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1.001002",
+            "Test::Pod" : "1.48"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ronsavage/App-Office-CMS.git",
+         "web" : "https://github.com/ronsavage/App-Office-CMS"
+      }
+   },
+   "version" : "0.93",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

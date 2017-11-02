@@ -3,7 +3,7 @@ package WebService::MinFraud::Role::Record::HasRisk;
 use Moo::Role;
 use namespace::autoclean;
 
-our $VERSION = '1.005000';
+our $VERSION = '1.005001';
 
 use Types::Standard qw( Num );
 
@@ -29,7 +29,7 @@ WebService::MinFraud::Role::Record::HasRisk - A role to add a risk attribute
 
 =head1 VERSION
 
-version 1.005000
+version 1.005001
 
 =head1 SUPPORT
 

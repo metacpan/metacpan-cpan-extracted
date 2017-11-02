@@ -1,22 +1,22 @@
-# ************************************************************************* 
-# Copyright (c) 2014-2015, SUSE LLC
-# 
+# *************************************************************************
+# Copyright (c) 2014-2017, SUSE LLC
+#
 # All rights reserved.
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
-# 
+#
 # 1. Redistributions of source code must retain the above copyright notice,
 # this list of conditions and the following disclaimer.
-# 
+#
 # 2. Redistributions in binary form must reproduce the above copyright
 # notice, this list of conditions and the following disclaimer in the
 # documentation and/or other materials provided with the distribution.
-# 
+#
 # 3. Neither the name of SUSE LLC nor the names of its contributors may be
 # used to endorse or promote products derived from this software without
 # specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 # AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 # IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-# ************************************************************************* 
+# *************************************************************************
 
 # ------------------------
 # Shared dispatch functions
@@ -904,139 +904,6 @@ sub shared_update_intlock {
     $log->notice( "Failed pre_update_comparison" );
     $d_obj->mrest_declare_status( code => 400, explanation => 'Check request entity syntax' );
     return $fail;
-}
-
-
-# generalized dispatch target for
-#    'interval/eid/:eid/:tsrange'
-#    'lock/eid/:eid/:tsrange'
-sub fetch_by_eid {
-    my ( $context ) = validate_pos( @_, 
-        { type => HASHREF },
-    );
-    $log->debug( "Entering " . __PACKAGE__ . "::_fetch_by_eid" ); 
-    my $conn = $context->{'dbix_conn'},
-    my ( $eid, $tsrange ) = ( $context->{'mapping'}->{'eid'}, $context->{'mapping'}->{'tsrange'} );
-
-    my $type = _determine_interval_or_lock( $context->{'path'} );
-    $log->debug("About to fetch $type intervals for EID $eid in tsrange $tsrange" );
-
-    my $status = $f_dispatch{$type}->( $conn, $eid, $tsrange );
-    if ( $status->level eq 'NOTICE' and $status->code eq 'DISPATCH_NO_RECORDS_FOUND' ) {
-        return $CELL->status_err( 'DOCHAZKA_NOT_FOUND_404' );
-    }
-    return $status;
-}
-
-# generalized dispatch target for
-#    'interval/nick/:nick/:tsrange'
-#    'lock/nick/:nick/:tsrange'
-sub fetch_by_nick {
-    my ( $context ) = validate_pos( @_, 
-        { type => HASHREF } 
-    );
-    $log->debug( "Entering " . __PACKAGE__ . "::_fetch_by_nick" ); 
-    my $conn = $context->{'dbix_conn'},
-    my ( $nick, $tsrange ) = ( $context->{'mapping'}->{'nick'}, $context->{'mapping'}->{'tsrange'} );
-    $log->debug("About to fetch intervals for nick $nick in tsrange $tsrange" );
-
-    my $type = _determine_interval_or_lock( $context->{'path'} );
-    $log->debug("About to fetch $type intervals for nick $nick in tsrange $tsrange" );
-
-    # get EID
-    my $status = App::Dochazka::REST::Model::Employee->load_by_nick( $conn, $nick );
-    if ( $status->level eq 'NOTICE' and $status->code eq 'DISPATCH_NO_RECORDS_FOUND' ) {
-        return $CELL->status_err( 'DOCHAZKA_NOT_FOUND_404' );
-    } elsif ( $status->not_ok ) {
-        return $status;
-    }
-    my $eid = $status->payload->{'eid'};
-    
-    $status = $f_dispatch{$type}->( $conn, $eid, $tsrange );
-    if ( $status->level eq 'NOTICE' and $status->code eq 'DISPATCH_NO_RECORDS_FOUND' ) {
-        return $CELL->status_err( 'DOCHAZKA_NOT_FOUND_404' );
-    }
-    return $status;
-}
-
-# generalized dispatch target for
-#    'interval/self/:tsrange'
-#    'lock/self/:tsrange'
-sub fetch_own {
-    my ( $context ) = validate_pos( @_, { type => HASHREF } );
-    $log->debug( "Entering " . __PACKAGE__ . "::_fetch_own" ); 
-    my $conn = $context->{'dbix_conn'};
-    my ( $eid, $tsrange ) = ( $context->{'current'}->{'eid'}, $context->{'mapping'}->{'tsrange'} );
-
-    my $type = _determine_interval_or_lock( $context->{'path'} );
-    $log->debug("About to fetch $type intervals for EID $eid (current employee) in tsrange $tsrange" );
-
-    my $status = $f_dispatch{$type}->( $conn, $eid, $tsrange );
-    if ( $status->level eq 'NOTICE' and $status->code eq 'DISPATCH_NO_RECORDS_FOUND' ) {
-        return $CELL->status_err( 'DOCHAZKA_NOT_FOUND_404' );
-    }
-    return $status;
-}
-
-
-# generalized dispatch target for
-#    'interval/iid' and 'interval/iid/:iid'
-#    'lock/lid' and 'lock/lid/:lid'
-sub iid_lid {
-    my ( $context ) = validate_pos( @_, { type => HASHREF } );
-    $log->debug( "Entering " . __PACKAGE__ . "::iid_lid" ); 
-
-    my $conn = $context->{'dbix_conn'};
-
-    my $type = _determine_interval_or_lock( $context->{'path'} );
-    $log->debug( "Type is $type" );
-    my %idmap = (
-        "attendance" => 'iid',
-        "lock" => 'lid',
-    );
-
-    my $id;
-    if ( $context->{'method'} eq 'POST' ) {
-        return $CELL->status_err('DOCHAZKA_MALFORMED_400') 
-            unless exists $context->{'request_entity'}->{ $idmap{$type} };
-        $id = $context->{'request_entity'}->{ $idmap{$type} };
-        return $CELL->status_err( 'DISPATCH_PARAMETER_BAD_OR_MISSING', 
-            args => [ $idmap{$type} ] ) unless $id;
-        delete $context->{'request_entity'}->{ $idmap{$type} };
-    } else {
-        $id = $context->{'mapping'}->{ $idmap{$type} };
-    }
-
-    # does the ID exist? (load the whole record into $status->payload)
-    my $fn = "load_by_" . $idmap{$type};
-    my $status = $id_dispatch{$type}->$fn( $conn, $id );
-    return $status unless $status->level eq 'OK' or $status->level eq 'NOTICE';
-    return $CELL->status_err( 'DOCHAZKA_NOT_FOUND_404' ) if $status->code eq 'DISPATCH_NO_RECORDS_FOUND';
-    my $belongs_eid = $status->payload->{'eid'};
-
-    # this target requires special ACL handling
-    my $current_eid = $context->{'current'}->{'eid'};
-    my $current_priv = $context->{'current_priv'};
-    if (   ( $current_priv eq 'passerby' ) or 
-           ( $current_priv eq 'inactive' ) or
-           ( $current_priv eq 'active' and $current_eid != $belongs_eid )
-    ) {
-        return $CELL->status_err( 'DOCHAZKA_FORBIDDEN_403' );
-    }
-
-    # it exists and we passed the ACL check, so go ahead and do what we need to do
-    die "Bad interval!" unless exists( $status->payload->{'intvl'} ) and 
-        defined( $status->payload->{'intvl'} );
-    my $method = $context->{'method'}; 
-    if ( $method eq 'GET' ) {
-        return $status if $status->code eq 'DISPATCH_RECORDS_FOUND';
-    } elsif ( $method =~ m/^(PUT)|(POST)$/ ) {
-        return _update_interval( $context, $status->payload, $context->{'request_entity'} );
-    } elsif ( $method eq 'DELETE' ) {
-        $log->notice( "Attempting to delete $type interval " . $status->payload->{ $idmap{$type} } );
-        return $status->payload->delete( $context );
-    }
-    return $CELL->status_crit("Aaaaaaaaaaahhh! Swallowed by the abyss" );
 }
 
 

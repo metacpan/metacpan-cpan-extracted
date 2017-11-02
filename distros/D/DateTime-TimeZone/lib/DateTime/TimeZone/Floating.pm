@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.13';
+our $VERSION = '2.14';
 
 use parent 'Class::Singleton', 'DateTime::TimeZone::OffsetOnly';
 
@@ -59,7 +59,7 @@ DateTime::TimeZone::Floating - A time zone that is always local
 
 =head1 VERSION
 
-version 2.13
+version 2.14
 
 =head1 SYNOPSIS
 

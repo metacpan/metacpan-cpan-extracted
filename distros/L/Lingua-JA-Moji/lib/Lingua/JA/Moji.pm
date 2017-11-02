@@ -6,7 +6,7 @@ require Exporter;
 use warnings;
 use strict;
 
-our $VERSION = '0.46';
+our $VERSION = '0.47';
 
 use Carp 'croak';
 use Convert::Moji qw/make_regex length_one unambiguous/;
@@ -14,9 +14,7 @@ use JSON::Parse 'json_file_to_perl';
 use utf8;
 
 our @EXPORT_OK = qw/
-                    InHankakuKatakana
-                    InKana
-                    InWideAscii
+		    bad_kanji
 		    cleanup_kana
 		    hangul2kana
 		    hentai2kana
@@ -25,7 +23,11 @@ our @EXPORT_OK = qw/
 		    kanji2hentai
 		    katakana2square
 		    nigori_first
+		    smallize_kana
 		    square2katakana
+                    InHankakuKatakana
+                    InKana
+                    InWideAscii
                     ascii2wide
                     bracketed2kanji
                     braille2kana
@@ -63,8 +65,8 @@ our @EXPORT_OK = qw/
                     romaji2kana
                     romaji_styles
                     romaji_vowel_styles
-		    smallize_kana
                     wide2ascii
+		    yurei_moji
 		   /;
 
 our %EXPORT_TAGS = (
@@ -969,7 +971,7 @@ sub morse2kana
     for (@input) {
 	$_ = $kana2morse->invert ($_);
     }
-    $input = join '',@input;
+    $input = join '', @input;
     $input = $strip_daku->invert ($input);
     return $input;
 }
@@ -1494,7 +1496,31 @@ sub cleanup_kana
     return $kana;
 }
 
+sub load_kanji
+{
+    my ($file) = @_;
+    my $bkfile = getdistfile ('bad-kanji');
+    open my $in, "<:encoding(utf8)", $bkfile
+        or die "Error opening '$bkfile': $!";
+    my @bk;
+    while (<$in>) {
+	while (/(\p{InCJKUnifiedIdeographs})/g) {
+	    push @bk, $1;
+	}
+    }
+    close $in or die $!;
+    return @bk;
+}
 
+sub yurei_moji
+{
+    return load_kanji ('yurei-moji')
+}
+
+sub bad_kanji
+{
+    return load_kanji ('bad-kanji');
+}
 
 1; 
 

@@ -1,22 +1,22 @@
-# ************************************************************************* 
-# Copyright (c) 2014-2015, SUSE LLC
-# 
+# *************************************************************************
+# Copyright (c) 2014-2017, SUSE LLC
+#
 # All rights reserved.
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
-# 
+#
 # 1. Redistributions of source code must retain the above copyright notice,
 # this list of conditions and the following disclaimer.
-# 
+#
 # 2. Redistributions in binary form must reproduce the above copyright
 # notice, this list of conditions and the following disclaimer in the
 # documentation and/or other materials provided with the distribution.
-# 
+#
 # 3. Neither the name of SUSE LLC nor the names of its contributors may be
 # used to endorse or promote products derived from this software without
 # specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 # AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 # IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,7 +28,7 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-# ************************************************************************* 
+# *************************************************************************
 #
 # test the canonicalize_ts and canonicalize_tsrange utility functions
 #
@@ -39,7 +39,7 @@ use strict;
 use warnings;
 
 #use App::CELL::Test::LogToFile;
-use App::CELL qw( $meta $site );
+use App::CELL qw( $log $meta $site );
 use Data::Dumper;
 use App::Dochazka::REST::ConnBank qw( $dbix_conn );
 use App::Dochazka::REST::Model::Shared qw( 
@@ -52,45 +52,54 @@ use App::Dochazka::REST::Test;
 use Test::More;
 use Test::Warnings;
 
+my ( $note, $status );
 
-note( 'initialize, connect to database, and set up a testing plan' );
+note( $note = 'initialize, connect to database, and set up a testing plan' );
+$log->info( "=== $note" );
 initialize_regression_test();
 
-note( 'canonicalize a legal timestamp' );
-my $status = canonicalize_ts( $dbix_conn, '2015-01-1' );
+note( $note = 'canonicalize a legal timestamp' );
+$log->info( "=== $note" );
+$status = canonicalize_ts( $dbix_conn, '2015-01-1' );
 is( $status->level, 'OK' );
 like( $status->payload, qr/^2015-01-01 00:00:00/ );
 
-note( 'attempt to canonicalize an illegal timestamp' );
+note( $note = 'attempt to canonicalize an illegal timestamp' );
+$log->info( "=== $note" );
 $status = canonicalize_ts( $dbix_conn, '2015-01-99' );
 is( $status->level, 'ERR' );
 is( $status->code, 'DOCHAZKA_DBI_ERR' );
 like( $status->text, qr/date\/time field value out of range/ );
 
-note( 'canonicalize a legal tsrange' );
+note( $note = 'canonicalize a legal tsrange' );
+$log->info( "=== $note" );
 $status = canonicalize_tsrange( $dbix_conn, '[ 2015-01-1, 2015-02-1 )' );
 is( $status->level, 'OK' );
 like( $status->payload, qr/^\[.*2015-01-01 00:00:00.*2015-02-01 00:00:00.*\)/ );
 
-note( 'attempt to canonicalize an illegal timestamp' );
+note( $note = 'attempt to canonicalize an illegal timestamp' );
+$log->info( "=== $note" );
 $status = canonicalize_ts( $dbix_conn, '[2015-01-99, 2015-02-1)' );
 is( $status->level, 'ERR' );
 is( $status->code, 'DOCHAZKA_DBI_ERR' );
 like( $status->text, qr/invalid input syntax for type timestamp with time zone/ );
 
-note( 'attempt to canonicalize an illegal timestamp' );
+note( $note = 'attempt to canonicalize an illegal timestamp' );
+$log->info( "=== $note" );
 $status = canonicalize_tsrange( $dbix_conn, '[2015-02-13, 2015-02-1)' );
 is( $status->level, 'ERR' );
 is( $status->code, 'DOCHAZKA_DBI_ERR' );
 like( $status->text, qr/range lower bound must be less than or equal to range upper bound/ );
 
-note( 'attempt to canonicalize an innocent-looking date' );
+note( $note = 'attempt to canonicalize an innocent-looking date' );
+$log->info( "=== $note" );
 $status = canonicalize_date( $dbix_conn, 'May 1, 2015' );
 is( $status->level, 'OK' );
 is( $status->code, 'DISPATCH_RECORDS_FOUND' );
 is( $status->payload, '2015-05-01' );
 
-note( 'attempt to canonicalize an out-of-range date' );
+note( $note = 'attempt to canonicalize an out-of-range date' );
+$log->info( "=== $note" );
 $status = canonicalize_date( $dbix_conn, 'Jan 99, 2015' );
 is( $status->level, 'ERR' );
 is( $status->code, 'DOCHAZKA_DBI_ERR' );

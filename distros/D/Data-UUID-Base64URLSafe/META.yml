@@ -1,24 +1,44 @@
---- #YAML:1.0
-name:               Data-UUID-Base64URLSafe
-version:            0.34
-abstract:           URL-safe UUIDs
+---
+abstract: 'getting Data::UUID with URLSafe strings'
 author:
-    - Leon Brocard <acme@astray.com>
-license:            perl
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'Leon Brocard, C<< <acme@astray.com> >>,'
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    Data::UUID:           0
-    MIME::Base64::URLSafe:  0
-    Test::More:           0.01
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.50
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.13, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-UUID-Base64URLSafe
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Data::UUID::Base64URLSafe:
+    file: lib/Data/UUID/Base64URLSafe.pm
+    version: '0.35'
+requires:
+  Data::UUID: '0'
+  MIME::Base64: '3.15'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/worthmine/Data-UUID-Base64URLSafe/issues
+  homepage: https://github.com/worthmine/Data-UUID-Base64URLSafe
+  repository: git://github.com/worthmine/Data-UUID-Base64URLSafe.git
+version: '0.35'
+x_authority: cpan:WORTHMINE
+x_contributors:
+  - 'Jesse Vincent <jesse@bestpractical.com>'
+  - 'Leon Brocard <acme@astray.com>'
+  - 'Yuki Yoshida <worthmine@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

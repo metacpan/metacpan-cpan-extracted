@@ -1,18 +1,19 @@
 package App::Office::CMS::Database::Base;
 
-use Any::Moose;
-use common::sense;
+use strict;
+use warnings;
+
+use Moo;
+
+use Types::Standard qw/Any/;
 
 has db =>
 (
 	is  => 'rw',
-	isa => 'Any',
+	isa => Any,
 );
 
-# If Moose...
-#use namespace::autoclean;
-
-our $VERSION = '0.92';
+our $VERSION = '0.93';
 
 # --------------------------------------------------
 
@@ -25,10 +26,5 @@ sub log
 } # End of log.
 
 # --------------------------------------------------
-
-no Any::Moose;
-
-# If Moose...
-#__PACKAGE__ -> meta -> make_immutable;
 
 1;

@@ -1,5 +1,10 @@
 Revision history for Dist-Zilla-Plugin-CheckLib
 
+0.007     2017-10-29 01:55:41Z
+          - sort data in dumped configs, for consistency between builds
+          - fix test for latest [MakeMaker::Fallback], which has slight
+            changes in injected configure-requires prereqs
+
 0.006     2014-11-12 05:47:37Z
           - fix optional tests of interaction with [MakeMaker::Fallback] that
             broke with its newest release

@@ -34,7 +34,6 @@ corpus/log_commandline/sample8.output
 corpus/log_commandline/sample8.pl
 corpus/log_commandline/sample9.output
 corpus/log_commandline/sample9.pl
-cpanfile
 dist.ini
 example/etc/apache24-cgi.conf
 example/etc/apache24-proxy.conf
@@ -95,7 +94,6 @@ lib/Test/Clustericious/Config.pm
 lib/Test/Clustericious/Log.pm
 maint/test_from_git
 maint/travis-install-file-sharedir-dist
-run_test.pl
 share/README.txt
 share/tmpl/1.08/app/Build.PL
 share/tmpl/1.08/app/bin/APPNAME

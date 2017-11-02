@@ -1,10 +1,46 @@
 Revision history for Device-Cdio
 
+0.4.0  Nov 1, 2017
+
+- ISO filesystem stat now returns all of the time.h fields,
+  e.g. mon, day, hour, min, sec, year, yday, wday, is_dst
+- Add {cdio_,}audio_play_track_index.
+- Update docs and spelling corrections from Debian release
+- Simplify swig code, we now require >= 0.92
+- Lots of admnistrivia: improve MANIFEST and MANIFEST.SKIP
+- regularize versions
+
+0.3.1  Oct 29, 2017
+
+- Adjust to make work on libcdio 0.92
+- Add CD-Text capability, and use Leon Merten Lohse's CD-Text interface
+- Add MIN_CDTEXT_FIELD
+- Remove warnings caused by version compatiblity.
+- Add get_cdtext when we have a track object.
+- We need libcdio 0.83 or greater 0.82 won't do.
+- Replace a couple of "exit"s with "die "OS unsupported"
+
+0.3.0  OCT 16, 2011 (Jerry G Geiger Release)
+
+- Mostly administrivia. Most of the changes in this release are due to Jerry G Geiger
+- match up mmc_get_isrc header with libcdio
+- Add $track->get_track_isrc.
+- Commit changes to return array ref or array
+  based on wantarray.
+- DeviceList_t maps to returning an array
+  reference rather than an array.
+- Fixed the C routines that return char** so they
+  return a Perl list. added cdio_guess_cd_type and
+  cdio_read_pvd. (Jerry G Geiger)
+- Get device name via driver_id=>$perlcdio::DRIVER_DEVICE
+- Add get_cddb_discid, auto_get_status, get_joliet_level
+- Numerous other fixes and tests from Jerry G Geiger
+
 0.2.4  Sept 2, 2006
 
 - Fix bad allocation in strncpy_pad
 
-- Fix bugs in Device::Cdio::ISO9600::FS::readddir() and 
+- Fix bugs in Device::Cdio::ISO9600::FS::readddir() and
   Device::Cdio::ISO9600::FS::find_lsn(). Thanks to Shannon.
 
 - Fix bug in strncpy_pad().
@@ -35,7 +71,7 @@ Revision history for Device-Cdio
 
 0.2.0  Mar 2, 2006
 
-Interrum hand-hacked package to get CPAN to index. 
+Interrum hand-hacked package to get CPAN to index.
 
 0.2.0  Mar 1, 2006
 
@@ -57,15 +93,15 @@ Interrum hand-hacked package to get CPAN to index.
 - Allow Perl 5.8.6.
 
 - synch up version numbers in Cdio/Track.pm and Cdio/Device.pm with Cdio.pm
-       
-0.0.1  Feb 10, 2006
-       Initial release. 
 
-What's here from libcdio. Most everything from 
-  <cdio/audio.h> 
+0.0.1  Feb 10, 2006
+       Initial release.
+
+What's here from libcdio. Most everything from
+  <cdio/audio.h>
   <cdio/device.h>
-  <cdio/disc.h> 
-  <cdio/read.h> 
+  <cdio/disc.h>
+  <cdio/read.h>
   <cdio/track.h>
 
 In lay terms, this is the audio CD controls, device controls, disc

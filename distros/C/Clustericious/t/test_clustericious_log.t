@@ -133,7 +133,6 @@ subtest log_like => sub {
           call name => 'log matches pattern';
         };
         event Diag => sub {};
-        event Diag => sub {};
         event Diag => sub {
           call message => 'None of the events matched the pattern:';
         };
@@ -165,7 +164,6 @@ subtest log_like => sub {
           call name => 'log does not match pattern';
         };
         event Diag => sub {};
-        event Diag => sub {};
         event Diag => sub {
           call message => 'This event matched, but should not have:';
         };
@@ -184,7 +182,6 @@ subtest log_like => sub {
           call pass => F();
           call name => 'log does not match pattern';
         };
-        event Diag => sub {};
         event Diag => sub {};
         event Diag => sub {
           call message => 'This event matched, but should not have:';

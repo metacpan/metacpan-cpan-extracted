@@ -146,12 +146,7 @@ has html_options => (is => 'lazy', isa => HashRef);
 has wants_slides => (is => 'lazy', isa => Bool);
 has is_deleted => (is => 'lazy', isa => Bool);
 has file_header => (is => 'lazy', isa => Object);
-has cover => (is => 'lazy', isa => Str);
-has coverwidth => (is => 'lazy', isa => Str);
-has nocoverpage => (is => 'lazy', isa => Bool);
 has coverpage_only_if_toc => (is => 'ro', isa => Bool, default => sub { 0 });
-has nofinalpage => (is => 'lazy', isa => Bool);
-has notoc => (is => 'lazy', isa => Bool);
 has fonts => (is => 'ro', isa => InstanceOf['Text::Amuse::Compile::Fonts::Selected']);
 has epub_embed_fonts => (is => 'ro', isa => Bool, default => sub { 1 });
 
@@ -206,13 +201,14 @@ sub _build_full_options {
     my %options = %{ $self->options };
     # these values are picked from the file, if not provided by the compiler
     foreach my $override (qw/cover coverwidth nocoverpage notoc
+                             impressum
                              nofinalpage/) {
         $options{$override} = $self->$override;
     }
     return \%options;
 }
 
-sub _build_cover {
+sub cover {
     my $self = shift;
     # options passed take precendence
     if (exists $self->options->{cover}) {
@@ -229,7 +225,7 @@ sub _build_cover {
     }
 }
 
-sub _build_coverwidth {
+sub coverwidth {
     my $self = shift;
     # print "Building coverwidth\n";
     # validation here is not crucial, as the TeX routine will pass it
@@ -246,45 +242,49 @@ sub _build_coverwidth {
     return 1;
 }
 
-sub _build_nocoverpage {
-    my $self = shift;
-    if ($self->file_header->nocoverpage) {
-        return 1;
-    }
-    elsif ($self->options->{nocoverpage}) {
-        return 1;
-    }
-    else {
-        return 0;
-    }
+sub nocoverpage {
+    shift->_look_at_header('nocoverpage');
 }
 
-sub _build_notoc {
-    my $self = shift;
-    if ($self->file_header->notoc) {
-        return 1;
-    }
-    elsif ($self->options->{notoc}) {
-        return 1;
-    }
-    else {
-        return 0;
-    }
+sub notoc {
+    shift->_look_at_header('notoc');
 }
 
-sub _build_nofinalpage {
-    my $self = shift;
-    if ($self->file_header->nofinalpage) {
-        return 1;
-    }
-    elsif ($self->options->{nofinalpage}) {
-        return 1;
-    }
-    else {
-        return 0;
-    }
+sub nofinalpage {
+    shift->_look_at_header('nofinalpage');
 }
 
+sub impressum {
+    shift->_look_at_header('impressum');
+}
+
+sub _look_at_header {
+    my ($self, $method) = @_;
+    # these are booleans, so we enforce them
+    !!$self->file_header->$method || !!$self->options->{$method} || 0;
+}
+
+=head2 Options which are looked up in the file headers first
+
+See L<Text::Amuse::Compile::TemplateOptions> for the explanation.
+
+=over 4
+
+=item cover
+
+=item coverwidth
+
+=item nocoverpage
+
+=item notoc
+
+=item nofinalpage
+
+=item impressum
+
+=back
+
+=cut
 
 sub _escape_options_hashref {
     my ($self, $format, $ref) = @_;

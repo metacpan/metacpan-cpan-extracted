@@ -51,6 +51,8 @@ t/10interp.t
 t/11concat.t
 t/31stack.t
 t/41die.t
+t/42exc-dbix-class.t
+t/43exc-xml-libxml.t
 t/50file.t
 t/51syslog.t
 t/52logdisp.t

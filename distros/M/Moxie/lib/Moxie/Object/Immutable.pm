@@ -10,7 +10,7 @@ use experimental qw[
 
 use UNIVERSAL::Object::Immutable;
 
-our $VERSION   = '0.05';
+our $VERSION   = '0.06';
 our $AUTHORITY = 'cpan:STEVAN';
 
 our @ISA; BEGIN {
@@ -32,7 +32,7 @@ Moxie::Object::Immutable - Yet Another (Immutable) Base Class
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 DESCRIPTION
 

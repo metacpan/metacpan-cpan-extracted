@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker 6.30;
 
 my %WriteMakefileArgs = (
     'NAME'               => 'BEGIN::Lift',
-    'VERSION'            => '0.06',
+    'VERSION'            => '0.07',
     'DISTNAME'           => 'BEGIN-Lift',
     'ABSTRACT'           => 'Lift subroutine calls into the BEGIN phase',
     'AUTHOR'             => 'Stevan Little',
@@ -18,12 +18,12 @@ my %WriteMakefileArgs = (
     'NORECURS'           => 1,
     'PREREQ_PM'  => {
         # cpan ....
-        'Sub::Name'              => 0,
-        'B::CompilerPhase::Hook' => '0.04',
-        'Devel::CallParser'      => 0,
-        'XSLoader'               => 0,
+        'Sub::Name'         => 0,
+        'Devel::CallParser' => 0,
+        'Devel::Hook'       => 0,
+        'XSLoader'          => 0,
         # tests ..
-        'Test::More'             => 0,
+        'Test::More'        => 0,
     },
     'clean'              => { FILES => 'cover_db/ nytprof/ callparser1.h' },
     'test'               => { RECURSIVE_TEST_FILES => 1 },

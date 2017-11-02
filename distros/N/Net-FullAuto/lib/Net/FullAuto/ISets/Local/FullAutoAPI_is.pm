@@ -57,6 +57,16 @@ my $configure_fullautoapi=sub {
    $handle->cwd('~');
    my $userhome=$handle->cmd('pwd');
    my $sudo=($^O eq 'cygwin')?'':'sudo ';
+   ($stdout,$stderr)=$handle->cmd("${sudo}perl -e \'use CPAN;".
+      "CPAN::HandleConfig-\>load;print \$CPAN::Config-\>{build_dir}\'");
+   $builddir=$stdout;
+   my $fa_ver=$Net::FullAuto::VERSION;
+   ($stdout,$stderr)=$handle->cmd(
+      "${sudo}ls -1t $builddir | grep Net-FullAuto-$fa_ver");
+   my @lstmp=split /\n/,$stdout;
+   foreach my $line (@lstmp) {
+      unshift @ls_tmp, $line if $line!~/\.yml$/;
+   }
 $do=1;
 if ($do==1) {
    unless ($^O eq 'cygwin') {
@@ -72,7 +82,7 @@ if ($do==1) {
          ' libicu cyrus-sasl-devel libtool-ltdl-devel libxml2-devel'.
          ' freetype-devel libpng-devel java-1.7.0-openjdk-devel'.
          ' unixODBC unixODBC-devel libtool-ltdl libtool-ltdl-devel'.
-         ' ncurses-devel xmlto git-all','__display__');
+         ' ncurses-devel xmlto git-all autoconf','__display__');
    } else {
       my $cygcheck=`/bin/cygcheck -c` || die $!;
       my $uname=`/bin/uname` || die $!;
@@ -486,16 +496,16 @@ if ($do==1) {
    ($stdout,$stderr)=$handle->cmd(
       'mkdir -vp FullAutoAPI/root/static/images',
       '__display__');
-   ($stdout,$stderr)=$handle->cmd("${sudo}perl -e \'use CPAN;".
-      "CPAN::HandleConfig-\>load;print \$CPAN::Config-\>{build_dir}\'");
-   $builddir=$stdout;
-   my $fa_ver=$Net::FullAuto::VERSION;
-   ($stdout,$stderr)=$handle->cmd(
-      "${sudo}ls -1t $builddir | grep Net-FullAuto-$fa_ver");
-   my @lstmp=split /\n/,$stdout;
-   foreach my $line (@lstmp) {
-      unshift @ls_tmp, $line if $line!~/\.yml$/;
-   }
+   #($stdout,$stderr)=$handle->cmd("${sudo}perl -e \'use CPAN;".
+   #   "CPAN::HandleConfig-\>load;print \$CPAN::Config-\>{build_dir}\'");
+   #$builddir=$stdout;
+   #my $fa_ver=$Net::FullAuto::VERSION;
+   #($stdout,$stderr)=$handle->cmd(
+   #   "${sudo}ls -1t $builddir | grep Net-FullAuto-$fa_ver");
+   #my @lstmp=split /\n/,$stdout;
+   #foreach my $line (@lstmp) {
+   #   unshift @ls_tmp, $line if $line!~/\.yml$/;
+   #}
    ($stdout,$stderr)=$handle->cmd($sudo.
       "cp -v $builddir/$ls_tmp[0]/api/Docker_is.py ".
       "FullAutoAPI",'__display__');
@@ -503,7 +513,7 @@ if ($do==1) {
       "cp -v $builddir/$ls_tmp[0]/api/automates_everything.jpg ".
       "FullAutoAPI/root/static/images",'__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "cp -v $builddir/$ls_tmp[0]/api/automation_api.jpg ".
+      "cp -v $builddir/$ls_tmp[0]/api/automationapi.jpg ".
       "FullAutoAPI/root/static/images",'__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       "cp -v $builddir/$ls_tmp[0]/api/fullauto_com.jpg ".
@@ -528,6 +538,22 @@ if ($do==1) {
       "chmod -v 755 FullAutoAPI/root/static/images/*",
       '__display__');
    ($stdout,$stderr)=$handle->cwd("FullAutoAPI/deps");
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "wget --random-wait --progress=dot ".
+      "http://ftp.gnu.org/gnu/autoconf/autoconf-latest.tar.gz",
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "chown -v $username:$username autoconf-latest.tar.gz",'__display__')
+      if $^O ne 'cygwin';
+   ($stdout,$stderr)=$handle->cmd("tar zxvf autoconf-latest.tar.gz",
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.'rm -rvf autoconf-latest.tar.gz',
+      '__display__');
+   ($stdout,$stderr)=$handle->cwd("autoconf-*");
+   ($stdout,$stderr)=$handle->cmd("./configure",'__display__');
+   ($stdout,$stderr)=$handle->cmd("make",'__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo."make install",'__display__');
+   ($stdout,$stderr)=$handle->cwd("..");
    ($stdout,$stderr)=$handle->cmd($sudo.
       "wget --random-wait --progress=dot ".
       "https://github.com/jedisct1/libsodium/archive/master.zip",
@@ -666,13 +692,13 @@ print "DOING NGINX\n";
    my $zlib_ver=$stdout;
    my $sha__256=$stdout;
    $zlib_ver=~s/^.*? source code, version (\d+\.\d+\.\d+).*$/$1/s;
-   $sha__256=~s/^.*?SHA-256 hash [<]tt[>](.*?)[<][\/]tt[>].*$/$1/s;
+   $sha__256=~s/^.*?tar.gz.*?SHA-256 hash [<]tt[>](.*?)[<][\/]tt[>].*$/$1/s;
    foreach my $count (1..3) {
       ($stdout,$stderr)=$handle->cmd($sudo."wget --random-wait --progress=dot ".
          "http://zlib.net/zlib-$zlib_ver.tar.gz",'__display__');
       $checksum=$sha__256;
       ($stdout,$stderr)=$handle->cmd($sudo.
-         "sha256sum -c - <<<\"$checksum zlib-$zlib_ver.tar.gz\"",
+         "sha256sum -c - <<<\"$checksum *zlib-$zlib_ver.tar.gz\"",
          '__display__');
       unless ($stderr) {
          print(qq{ + CHECKSUM Test for zlib-$zlib_ver *PASSED* \n});
@@ -696,7 +722,7 @@ print "DOING NGINX\n";
    ($stdout,$stderr)=$handle->cmd($sudo.
       "chown -v $username:$username $ossl.tar.gz",'__display__')
       if $^O ne 'cygwin';
-   ($stdout,$stderr)=$handle->cmd("sha1sum -c - <<<\"$checksum $ossl.tar.gz\"",
+   ($stdout,$stderr)=$handle->cmd("sha1sum -c - <<<\"$checksum *$ossl.tar.gz\"",
       '__display__');
    unless ($stderr) {
       print(qq{ + CHECKSUM Test for $ossl *PASSED* \n});
@@ -999,7 +1025,7 @@ if ($do==1) {
       "chown -v $username:$username $go",'__display__')
       if $^O ne 'cygwin';
    $go=~s/^.*\/(.*)$/$1/;
-   ($stdout,$stderr)=$handle->cmd("sha1sum -c - <<<\"$gosha1 $go\"",
+   ($stdout,$stderr)=$handle->cmd("sha1sum -c - <<<\"$gosha1 *$go\"",
       '__display__');
    unless ($stderr) {
       print(qq{ + CHECKSUM Test for $go *PASSED* \n});
@@ -1034,45 +1060,47 @@ if ($do==1) {
    #   'https://github.com/membrane/service-proxy.git','__display__');
 exit;
 }
-   if ($^O eq 'cygwin') {
-      $handle->{_cmd_handle}->print('cpan');
-   } else {
-      ($stdout,$stderr)=$handle->cmd($sudo.'yum -y install cpan',
-         '__display__');
-      $handle->{_cmd_handle}->print($sudo.'cpan');
-   } 
-   $prompt=substr($handle->{_cmd_handle}->prompt(),1,-1);
-   while (1) {
-      my $output.=Net::FullAuto::FA_Core::fetch($handle);
-      last if $output=~/$prompt/;
-      print 'm'.$output;
-      if (-1<index $output,'possible automatically') {
-         $handle->{_cmd_handle}->print('yes');
-         $output='';
-         next;
-      } elsif (-1<index $output,'by bootstrapping') {
-         $handle->{_cmd_handle}->print('sudo');
-         $output='';
-         next;
-      } elsif (-1<index $output,'some CPAN') {
-         $handle->{_cmd_handle}->print('no');
-         $output='';
-         next;
-      } elsif (-1<index $output,'pick from') {
-         $handle->{_cmd_handle}->print('no');
-         $output='';
-         next;
-      } elsif (-1<index $output,'CPAN site') {
-         $handle->{_cmd_handle}->print('http://www.cpan.org');
-         $output='';
-         next;
-      } elsif (-1<index $output,'ENTER to quit') {
-         $handle->{_cmd_handle}->print();
-         $output='';
-         next;
-      } elsif ($output=~/cpan[[]\d+[]][>]/) {
-         $handle->{_cmd_handle}->print('bye');
-         next;
+   unless (-e '/usr/bin/cpan') {
+      if ($^O eq 'cygwin') {
+         $handle->{_cmd_handle}->print('cpan');
+      } else {
+         ($stdout,$stderr)=$handle->cmd($sudo.'yum -y install cpan',
+            '__display__');
+         $handle->{_cmd_handle}->print($sudo.'cpan');
+      } 
+      $prompt=substr($handle->{_cmd_handle}->prompt(),1,-1);
+      while (1) {
+         my $output.=Net::FullAuto::FA_Core::fetch($handle);
+         last if $output=~/$prompt/;
+         print 'm'.$output;
+         if (-1<index $output,'possible automatically') {
+            $handle->{_cmd_handle}->print('yes');
+            $output='';
+            next;
+         } elsif (-1<index $output,'by bootstrapping') {
+            $handle->{_cmd_handle}->print('sudo');
+            $output='';
+            next;
+         } elsif (-1<index $output,'some CPAN') {
+            $handle->{_cmd_handle}->print('no');
+            $output='';
+            next;
+         } elsif (-1<index $output,'pick from') {
+            $handle->{_cmd_handle}->print('no');
+            $output='';
+            next;
+         } elsif (-1<index $output,'CPAN site') {
+            $handle->{_cmd_handle}->print('http://www.cpan.org');
+            $output='';
+            next;
+         } elsif (-1<index $output,'ENTER to quit') {
+            $handle->{_cmd_handle}->print();
+            $output='';
+            next;
+         } elsif ($output=~/cpan[[]\d+[]][>]/) {
+            $handle->{_cmd_handle}->print('bye');
+            next;
+         }
       }
    }
    ($stdout,$stderr)=$handle->cmd("export PERL_MM_USE_DEFAULT=1");
@@ -1117,6 +1145,18 @@ END
    $show=<<END;
 ########################################
 
+   INSTALLING IO::CaptureOutput
+
+########################################
+END
+      print $show;
+      $handle->cmd_raw($sudo.
+         'perl -MCPAN -e \'CPAN::Shell->notest('.
+         '"install","IO::CaptureOutput")\'',
+         '__display__');
+   $show=<<END;
+########################################
+
    INSTALLING Devel::CheckLib
 
 ########################################
@@ -1141,8 +1181,20 @@ END
    my @cpan_modules = qw(
 
       Test::More
+      Text::Glob
+      File::Find::Rule
+      Crypt::UnixCrypt_XS
+      Digest::CRC
+      Data::Integer
+      Data::Float
+      HTTP::Lite
+      Authen::Passphrase
+      DBICx::TestDatabase
+      Class::Mix
+      Crypt::MySQL
       Module::Build
       AnyEvent
+      Test::Requires
       Proc::Guard
       ZMQ::LibZMQ4
       CPAN::Meta
@@ -1209,7 +1261,6 @@ END
       Type::Tiny
       File::ReadBackwards
       Imager
-      IO::CaptureOutput
       Astro::MoonPhase
       Date::Manip
       XML::LibXML
@@ -1229,21 +1280,22 @@ END
       Test::Aggregate::Nested
       Catalyst::Controller::HTML::FormFu
       HTML::FormHandler::Model::DBIC
-# https://metacpan.org/pod/DBIx::Class::Manual::Cookbook#Predefined-searches
-# http://ajct.info/2015/08/16/oauth-and-catalyst.html
-# http://stackoverflow.com/questions/23652166/how-to-generate-oauth-2-client-id-and-secret
-# https://bshaffer.github.io/oauth2-server-php-docs/grant-types/refresh-token/
       CatalystX::OAuth2
       Task::Catalyst::Tutorial
       YAML::Syck
       Catalyst::Model::Adaptor
 
    );
+# https://metacpan.org/pod/DBIx::Class::Manual::Cookbook#Predefined-searches
+# # http://ajct.info/2015/08/16/oauth-and-catalyst.html
+# # http://stackoverflow.com/questions/23652166/how-to-generate-oauth-2-client-id-and-secret
+# # https://bshaffer.github.io/oauth2-server-php-docs/grant-types/refresh-token/
+
+
    # http://cygwin.1069669.n5.nabble.com/where-is-my-quot-usr-dict-
    # words-quot-or-quot-usr-share-dict-words-on-cygwin-1-7-td59328.html
-   my $words1="http://fedora.mirror.liquidtelecom.com/fedora-secondary/".
-              "releases/23/Server/aarch64/os/Packages/w/".
-              "words-3.0-24.fc23.noarch.rpm";
+   my $words1="https://dl.fedoraproject.org/pub/fedora/linux/releases/26/".
+              "Server/x86_64/os/Packages/w/words-3.0-26.fc26.noarch.rpm";
    #my $words1="ftp://fr2.rpmfind.net/linux/fedora/linux/releases/23/".
    #      "Everything/i386/os/Packages/w/words-3.0-24.fc23.noarch.rpm";
    my $words2="http://mirrors.maine.edu/Fedora/releases/23/Server/".
@@ -1254,17 +1306,17 @@ END
       '__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       "ls -1",'__display__');
-   unless ($stdout=~/words-3.0-24/) {
+   unless ($stdout=~/words-/) {
       ($stdout,$stderr)=$handle->cmd($sudo.
          "wget --random-wait --progress=dot ".$words2,
          '__display__');
    }
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "chown -v $username:$username words-3.0-24.fc23.noarch.rpm",
+      "chown -v $username:$username words-*.noarch.rpm",
       '__display__')
       if $^O ne 'cygwin';
    ($stdout,$stderr)=$handle->cmd(
-      "rpm2cpio words-3.0-24.fc23.noarch.rpm | \(cd /; cpio -idmv\)");
+      "rpm2cpio words-*.noarch.rpm | \(cd /; cpio -idmv\)");
    ($stdout,$stderr)=$handle->cmd($sudo.'chmod -v 755 /usr/share/dict/',
       '__display__');
    ($stdout,$stderr)=$handle->cwd("~/FullAutoAPI");
@@ -1343,6 +1395,10 @@ END
                $handle->{_cmd_handle}->print('y');
             } elsif ($output=~/use the XS Stash by default/) {
                $handle->{_cmd_handle}->print('y');
+            } elsif ($output=~/it permanently/) {
+               $handle->{_cmd_handle}->print('yes');
+            } elsif ($output=~/from CPAN/) {
+               $handle->{_cmd_handle}->print('yes');
             }
             if (!$force &&
                   ((-1<index $allout,'[test_dynamic] Error 255') ||
@@ -2127,10 +2183,13 @@ ENDD
    my $have_fadb=1; 
    unless (-e 'fullautoapi.db') {
       $have_fadb=0;
+      #($stdout,$stderr)=$handle->cmd($sudo.
+      #   "wget --random-wait --progress=dot ".
+      #   "http://dev.catalyst.perl.org/repos/Catalyst/trunk/".
+      #   "examples/RestYUI/db/adventrest.db",
+      #   '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
-         "wget --random-wait --progress=dot ".
-         "http://dev.catalyst.perl.org/repos/Catalyst/trunk/".
-         "examples/RestYUI/db/adventrest.db",
+         "cp -v $builddir/$ls_tmp[0]/api/RestYUI/db/adventrest.db .",
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          "chown -v $username:$username adventrest.db",
@@ -3405,10 +3464,13 @@ END
       '__display__');
    ($stdout,$stderr)=$handle->cwd('~/FullAutoAPI/root/static');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "wget --random-wait --progress=dot ".
-      "http://dev.catalyst.perl.org/repos/Catalyst/trunk/".
-      "examples/RestYUI/root/static/json2.js",
+      "cp -v $builddir/$ls_tmp[0]/api/RestYUI/root/static/json2.js .",
       '__display__');
+   #($stdout,$stderr)=$handle->cmd($sudo.
+   #   "wget --random-wait --progress=dot ".
+   #   "http://dev.catalyst.perl.org/repos/Catalyst/trunk/".
+   #   "examples/RestYUI/root/static/json2.js",
+   #   '__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       "chown -v $username:$username json2.js",
       '__display__')
@@ -3419,10 +3481,13 @@ END
                  'yahoo.js');
    foreach my $file (@yuifiles) {
       ($stdout,$stderr)=$handle->cmd($sudo.
-         "wget --random-wait --progress=dot ".
-         "http://dev.catalyst.perl.org/repos/Catalyst/trunk/".
-         "examples/RestYUI/root/static/yui/$file",
+         "cp -v $builddir/$ls_tmp[0]/api/RestYUI/root/static/yui/$file .",
          '__display__');
+      #($stdout,$stderr)=$handle->cmd($sudo.
+      #   "wget --random-wait --progress=dot ".
+      #   "http://dev.catalyst.perl.org/repos/Catalyst/trunk/".
+      #   "examples/RestYUI/root/static/yui/$file",
+      #   '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          "chown -v $username:$username $file",
          '__display__')
@@ -3432,10 +3497,13 @@ END
    ($stdout,$stderr)=$handle->cmd('mkdir -vp user','__display__');
    ($stdout,$stderr)=$handle->cwd('user');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      "wget --random-wait --progress=dot ".
-      "http://dev.catalyst.perl.org/repos/Catalyst/trunk/".
-      "examples/RestYUI/root/user/single_user.tt",
+      "cp -v $builddir/$ls_tmp[0]/api/RestYUI/root/user/single_user.tt .",
       '__display__');
+   #($stdout,$stderr)=$handle->cmd($sudo.
+   #   "wget --random-wait --progress=dot ".
+   #   "http://dev.catalyst.perl.org/repos/Catalyst/trunk/".
+   #   "examples/RestYUI/root/user/single_user.tt",
+   #   '__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       "chown -v $username:$username single_user.tt",
       '__display__')

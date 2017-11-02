@@ -1,3 +1,6 @@
+0.20 2017-10-27
+- Add Dist::Zilla::Plugin::MetaJSON (thanks manwar)
+
 0.19 2017-08-15
 - Remove broken test from t/Proc/tored/PidFile.t
 

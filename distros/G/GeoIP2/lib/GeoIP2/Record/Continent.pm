@@ -3,7 +3,7 @@ package GeoIP2::Record::Continent;
 use strict;
 use warnings;
 
-our $VERSION = '2.003005';
+our $VERSION = '2.004000';
 
 use Moo;
 
@@ -41,7 +41,7 @@ GeoIP2::Record::Continent - Contains data for the continent record associated wi
 
 =head1 VERSION
 
-version 2.003005
+version 2.004000
 
 =head1 SYNOPSIS
 

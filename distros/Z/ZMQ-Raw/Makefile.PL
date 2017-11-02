@@ -252,7 +252,7 @@ my %WriteMakefileArgs = (
     "Test::Pod::Coverage" => "0.0",
     "threads" => 0
   },
-  "VERSION" => "0.10",
+  "VERSION" => "0.12",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -281,6 +281,13 @@ my @constants = (qw(
 	ZMQ_XPUB
 	ZMQ_XSUB
 	ZMQ_STREAM
+	ZMQ_SERVER
+	ZMQ_CLIENT
+	ZMQ_RADIO
+	ZMQ_DISH
+	ZMQ_GATHER
+	ZMQ_SCATTER
+	ZMQ_DGRAM
 
 	ZMQ_DONTWAIT
 	ZMQ_SNDMORE
@@ -296,6 +303,9 @@ my @constants = (qw(
 	ZMQ_THREAD_PRIORITY
 	ZMQ_THREAD_SCHED_POLICY
 	ZMQ_MAX_MSGSZ
+	ZMQ_MSG_T_SIZE
+	ZMQ_THREAD_AFFINITY
+	ZMQ_THREAD_NAME_PREFIX
 
 	ZMQ_EVENT_CONNECTED
 	ZMQ_EVENT_CONNECT_DELAYED
@@ -425,6 +435,13 @@ my @message_options = (qw(
 	ZMQ_SHARED
 ));
 
+my @message_properties = (qw(
+	ZMQ_MSG_PROPERTY_ROUTING_ID
+	ZMQ_MSG_PROPERTY_SOCKET_TYPE
+	ZMQ_MSG_PROPERTY_USER_ID
+	ZMQ_MSG_PROPERTY_PEER_ADDRESS
+));
+
 ExtUtils::Constant::WriteConstants
 (
 	NAME         => 'ZMQ::Raw',
@@ -465,8 +482,19 @@ ExtUtils::Constant::WriteConstants
 	DEFAULT_TYPE => 'IV',
 	C_FILE       => 'const-c-message_options.inc',
 	XS_FILE      => 'const-xs-message_options.inc',
-	XS_SUBNAME   => '_constant',
+	XS_SUBNAME   => '_o_constant',
 	C_SUBNAME    => '_message_option',
+);
+
+ExtUtils::Constant::WriteConstants
+(
+	NAME         => 'ZMQ::Raw::Message',
+	NAMES        => [@message_properties],
+	DEFAULT_TYPE => 'PV',
+	C_FILE       => 'const-c-message_properties.inc',
+	XS_FILE      => 'const-xs-message_properties.inc',
+	XS_SUBNAME   => '_p_constant',
+	C_SUBNAME    => '_message_property',
 );
 
 unless (eval { ExtUtils::MakeMaker->VERSION(6.56) }) {

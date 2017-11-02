@@ -1,5 +1,5 @@
 package ETL::Yertl;
-our $VERSION = '0.036';
+our $VERSION = '0.037';
 # ABSTRACT: ETL with a Shell
 
 use strict;
@@ -41,7 +41,7 @@ ETL::Yertl - ETL with a Shell
 
 =head1 VERSION
 
-version 0.036
+version 0.037
 
 =head1 SYNOPSIS
 
@@ -163,6 +163,12 @@ set the C<YERTL_FORMAT> environment variable to C<"json">.
 =head1 AUTHOR
 
 Doug Bell <preaction@cpan.org>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Luke Triantafyllidis
+
+Luke Triantafyllidis <ltriant@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -14,14 +14,22 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 3b573493ff7ff52514c7ad6caac0bf23e730e7fa ChangeLog
+SHA1 f4ebad6ad26427f2ae76a410477a3f2916b67ad5 ChangeLog
 SHA1 62647027745e394450492878f8d8730548d83fa2 LICENSE
-SHA1 25c0dbc4074e3cc984a1da71a7b663315561f98d MANIFEST
-SHA1 04c739819db902cc807e4ffa131985ddb88bcfe0 META.yml
-SHA1 c058269f3ea63a22840bd95b2da357b9f96beee4 Makefile.PL
+SHA1 b7ad6be05cd8a756cb8c67558d2e81cc16d95f67 MANIFEST
+SHA1 65baaf7f3780d482ab74a9c984f24b45c3618f9b META.yml
+SHA1 31d49dff96562d4694089bb2b8193c6aeedfb2ab Makefile.PL
 SHA1 d78ed6f21f203e2054419369d111efa325a97d1b README
 SHA1 ecb089134bba590f02aa974be5a6e86d72cdb0dc UNINSTALL_CYGWIN
 SHA1 0da04817f80ed6c542780dffe674926c1bf7b3de api/Docker_is.py
+SHA1 0b8a85dd1c9ffd36ac0439db9bcf5efb016c9185 api/RestYUI/db/adventrest.db
+SHA1 aecf6d76decf77096a5f8a0d32de391109bb7820 api/RestYUI/root/static/json2.js
+SHA1 bd31c90b4bb2a90f763e393284a45db29781cd69 api/RestYUI/root/static/yui/connection.js
+SHA1 ecd05095eb855f9850a185434bf9f7eb0388a6de api/RestYUI/root/static/yui/dom.js
+SHA1 f8d1b194953981fb0b1566bd9cf6b9fb5092eebe api/RestYUI/root/static/yui/event.js
+SHA1 2797bef0cb40e2220cfd109944894a70511604ca api/RestYUI/root/static/yui/utilities.js
+SHA1 6fc87ac1dd55561db6d507caf6f1bff1fd61b61f api/RestYUI/root/static/yui/yahoo.js
+SHA1 291f7ea95ac53984543d7f602eafdd1424bdef7d api/RestYUI/root/user/single_user.tt
 SHA1 1f2be6b39915aaf89529328c859ff8ddc11980cd api/South-Shore-Food-Market-Ghost-sign_with_FA_1_faded_1024.jpg
 SHA1 e7bd3d54671a60daaeb201a38051bf9fb4382a27 api/automates_everything.jpg
 SHA1 6379975efa1486c284caa639f219b7a86d3bc006 api/automationapi.jpg
@@ -103,7 +111,7 @@ SHA1 acb1a0daeae8b6c0cfd3ce4ee899204052d40855 installer/runputty.ahk
 SHA1 2887d192d7c656080bab522cf64354975b77a915 installer/runputty.exe
 SHA1 784955e0e44b132341668db4efa407569dd71189 installer/standup.gif
 SHA1 6c3adc63eb0e790491af15178fabb88f9508bf50 lbbroker_zmqv4.pl
-SHA1 e3bc9d74a05a10c9f10ba71fa6df7a8d4bc42dc4 lib/Net/FullAuto.pm
+SHA1 a9e06517a3968711f06fe7600fe9d2cfb52892db lib/Net/FullAuto.pm
 SHA1 a73fa03896208dc550b292954f51722d7b139c24 lib/Net/FullAuto/Cloud/fa_amazon.pm
 SHA1 71928e8ed46e6c63d2effda32c2ceba413ab3976 lib/Net/FullAuto/Cloud/fa_azure.pm
 SHA1 2d1d4af82b485a801bd146f5c079418f4bd56dd2 lib/Net/FullAuto/Cloud/fa_google.pm
@@ -128,16 +136,16 @@ SHA1 a9527aaec1f1e410149f14790e0d29a953ecb8c8 lib/Net/FullAuto/ISets/Amazon/Jenk
 SHA1 a4d5e6f009042ecde8701230f3b31d1a66236279 lib/Net/FullAuto/ISets/Amazon/KaliLinux_is.pm
 SHA1 ddb48cea930f376830b4b3c5a80f29826e231bad lib/Net/FullAuto/ISets/Amazon/Liferay_is.pm
 SHA1 4708044b661f8aa812d1d9dc2d61496509ba72d8 lib/Net/FullAuto/ISets/Amazon/OpenLDAP_is.pm
-SHA1 994f83018bc3d6f367007eafe8c8039deed071d3 lib/Net/FullAuto/ISets/Local/FullAutoAPI_is.pm
+SHA1 9e2dd950d026a00e5242695306b7a82ed6fb7f9e lib/Net/FullAuto/ISets/Local/FullAutoAPI_is.pm
 SHA1 7f2e13f5f6a798d52ea897d24d07b49af4039341 t/0-signature.t
 SHA1 6fac6b17647d05b71441ac3783ceec38b9b71fa6 t/test.t
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJZR6gEAAoJEBa/9Pad787EMFcIAIHkUVw/V3S1GpcI9ZKEzN/t
-gPgLKsbvS1YdbOi5zeTneXmdqjcPBBRu+ySOds3tM4UdyzHM7dnQgrdLGda9cB8O
-gejNtohoTHfnzo8EB89ZHZ+6ma7z+J7FyK/6f+9mZcbGRS2q+5IKFiCl9r+x+g8w
-PbFnWIvLHzXa5+JPAORT5WsLxQFsAUfG+YkzvNABYp5G0JuDuz4CvoEV+QOFwDtl
-Ep1q92jq+92J3OYqecr+WwrimGgixKDroFA+lT1PyV5L43oTa/a4e2vJ9dTgjrdP
-xK9DXZyDP8SozYW6PBpPEUmJjHiqWrfdxK+PpMo3ry0ksOcg+R+RpTN5/yn7FFA=
-=Pfb2
+iQEcBAEBAgAGBQJZ9oKjAAoJEBa/9Pad787EfVYIAMYYXPLNF3RlP1d/d3GZm6T2
+vvLwAFZM9Kjko6+8o+eM+8ooQ73MAOui6xTmndPl/jV3jf2J24s45NNOl50gAazu
+UwVpHuJVyIuau/+p3zsUeMxp/JjatdkyVVA5g2YHhw55urRbkiYe0tdsoE5lVXjN
+WIRYmw6wb1541TFP0jIJj3QQGDkXg0wVbKfG//RG5SdGuhPy7A1YjZa9yJYWtOmu
+GyktEv9wRXc5Qh5nJua8YxHJWDNTyK7IsCBT4MERwh1GCXUigat7jgN6Lx4dnzK3
+WungihUP5ur8voFnnqd8Ww7g7tLw51Qa1d2kqyk0j/k2tZuq9yFPlmYPFtoW25U=
+=ZyM8
 -----END PGP SIGNATURE-----

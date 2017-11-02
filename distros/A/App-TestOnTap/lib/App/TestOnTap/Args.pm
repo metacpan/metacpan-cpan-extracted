@@ -7,24 +7,21 @@ package App::TestOnTap::Args;
 use strict;
 use warnings;
 
-use App::TestOnTap::Util qw(slashify expandAts $IS_WINDOWS $IS_PACKED $SHELL_ARG_DELIM);
-use App::TestOnTap::ExecMap;
+use App::TestOnTap::Util qw(slashify expandAts);
 use App::TestOnTap::Config;
 use App::TestOnTap::Preprocess;
 use App::TestOnTap::WorkDirManager;
 use App::TestOnTap::OrderStrategy; 
+use App::TestOnTap::PackInfo; 
 
 use Archive::Zip qw(:ERROR_CODES);
-use FindBin qw($RealBin $Script);
 use Getopt::Long qw(GetOptionsFromArray :config require_order no_ignore_case bundling);
 use Pod::Usage;
 use Pod::Simple::Search;
 use Grep::Query;
-use File::Basename;
 use File::Spec;
 use File::Path;
 use File::Temp qw(tempdir);
-use POSIX;
 use UUID::Tiny qw(:std);
 use LWP::UserAgent;
 
@@ -69,7 +66,11 @@ sub __parseArgv
 			# hidden
 			#
 			_help => 0,
-			_pp => 0,					# print basic PAR::Packer 'pp' command line
+			_pp => 0,
+			_info => 0,
+			_info_cmd => 0,
+			_info_config => 0,
+			_info_modules => 0,
 		);
 		
 	my @specs =
@@ -95,6 +96,10 @@ sub __parseArgv
 			#
 			'_help',
 			'_pp',
+			'_info',
+			'_info_cmd',
+			'_info_config',
+			'_info_modules',
 		);
 
 	my $_argsPodName = 'App/TestOnTap/_Args.pod';
@@ -120,23 +125,32 @@ sub __parseArgv
 
 	# simple copies
 	#
-	$self->{$_} = $rawOpts{$_} foreach (qw(v archive defines timer harness));
+	$self->{$_} = $rawOpts{$_} foreach (qw(v archive timer harness));
+	$self->{defines} = $rawOpts{define};
 
 	# help with the hidden flags...
 	#
 	pod2usage(-input => $_argsPodInput, -exitval => 0, -verbose => 2, -noperldoc => 1) if $rawOpts{_help};
 
-	# for the special selection of using --_pp, print command line and exit
+	# for the special selection of using --_pp* or '--_info*', turn over to packinfo
 	#
-	if ($rawOpts{_pp})
+	my %packHelperOpts;
+	foreach my $opt (keys(%rawOpts))
 	{
-		$self->__print_pp_cmdline
-					(
-						$version,
-						$argsPodName, $argsPodInput,
-						$manualPodName, $manualPodInput
-					);
-		exit(0);
+		$packHelperOpts{$opt} = $rawOpts{$opt} if ($opt =~ /^_(pp|info)/ && $rawOpts{$opt});
+	}
+	if (keys(%packHelperOpts))
+	{
+		$packHelperOpts{verbose} = $rawOpts{v};
+		App::TestOnTap::PackInfo::handle
+										(
+											\%packHelperOpts, 
+											$version,
+											$_argsPodName, $_argsPodInput,
+											$argsPodName, $argsPodInput,
+											$manualPodName, $manualPodInput
+										);
+		die("INTERNAL ERROR");
 	}
 
 	# if any of the doc switches made, display the pod
@@ -377,43 +391,6 @@ sub include
 
 # PRIVATE
 #
-
-sub __print_pp_cmdline
-{
-	my $self = shift;
-	my $version = shift;
-	my $argsPodName = shift;
-	my $argsPodInput = shift;
-	my $manualPodName = shift;
-	my $manualPodInput = shift;
-	
-	die("Sorry, you're already running a binary/packed instance\n") if $IS_PACKED;
-	
-	eval "require PAR::Packer";
-	warn("Sorry, it appears PAR::Packer is not installed/working!\n") if $@;
-
-	my $os = $IS_WINDOWS ? 'windows' : $^O;
-	my $arch = (POSIX::uname())[4];
-	my $exeSuffix = $IS_WINDOWS ? '.exe' : '';
-	my $bnScript = basename($Script);
-	my $output = "$bnScript-$version-$os-$arch$exeSuffix";
-	my @liblocs = map { $_ ne '.' ? ('-I', slashify(File::Spec->rel2abs($_))) : () } @INC;
-	my @cmd =
-		(
-			'pp',
-			@liblocs,
-			'-a', "$argsPodInput;lib/$argsPodName",
-			'-a', "$manualPodInput;lib/$manualPodName",
-			'-M', 'Encode::*',
-			'-o', $output,
-			slashify("$RealBin/$Script")
-		);
-
-	my $cmdline = '';
-	$cmdline .= "$SHELL_ARG_DELIM$_$SHELL_ARG_DELIM " foreach (@cmd);
-	chop($cmdline);
-	print "$cmdline\n";
-}
 
 sub __findSuiteRoot
 {

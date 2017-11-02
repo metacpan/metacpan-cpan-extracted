@@ -1,9 +1,14 @@
+Build.PL
 CHANGES
+LICENSE
+META.json
+Makefile
+README.md
+cpanfile
 lib/Data/UUID/Base64URLSafe.pm
-Makefile.PL
-MANIFEST			This list of files
-README
+minil.toml
+t/00_compile.t
 t/pod.t
 t/pod_coverage.t
-t/simple.t
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml
+MANIFEST

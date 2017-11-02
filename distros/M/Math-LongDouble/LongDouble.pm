@@ -55,7 +55,7 @@ use subs qw(
             M_1_PIl M_2_PIl  M_2_SQRTPIl M_SQRT2l M_SQRT1_2l
             );
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 #$VERSION = eval $VERSION;
 
 DynaLoader::bootstrap Math::LongDouble $Math::LongDouble::VERSION;
@@ -146,7 +146,7 @@ sub new {
     # If there are no args, then we just want to return a
     # Math::LongDouble object that's a NaN.
 
-    if(!@_) {return NaNLD(1)}
+    if(!@_) {return NaNLD()}
 
     if(@_ > 2) {die "More than 2 arguments supplied to new()"}
 

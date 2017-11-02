@@ -1,5 +1,10 @@
 Revision history for Acme-MetaSyntactic
 
+1.014 2017-10-30 BOOK
+    [ENHANCEMENTS]
+    - Restore meta/metafy script installation (ILMARI)
+    - Minor encoding patch
+
 1.013 2017-04-17 BOOK
     [ENHANCEMENTS]
     - Test::MetaSyntactic now prints a summary of failed themes at the end of

@@ -27,7 +27,7 @@ _Inline/.*
 ~$
 .*\.planner
 ^\..*
-File-ConfigDir-.*
+Clone-Choose-.*
 \bxt
 Sandbox
 ^MYMETA\.json$

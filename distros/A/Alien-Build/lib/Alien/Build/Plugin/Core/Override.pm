@@ -5,7 +5,7 @@ use warnings;
 use Alien::Build::Plugin;
 
 # ABSTRACT: Core override plugin
-our $VERSION = '1.25'; # VERSION
+our $VERSION = '1.28'; # VERSION
 
 
 sub init
@@ -34,7 +34,7 @@ Alien::Build::Plugin::Core::Override - Core override plugin
 
 =head1 VERSION
 
-version 1.25
+version 1.28
 
 =head1 SYNOPSIS
 
@@ -96,6 +96,10 @@ Petr Pisar (ppisar)
 Lance Wicks (LANCEW)
 
 Ahmad Fatoum (a3f, ATHREEF)
+
+José Joaquín Atria (JJATRIA)
+
+Duke Leto (LETO)
 
 =head1 COPYRIGHT AND LICENSE
 

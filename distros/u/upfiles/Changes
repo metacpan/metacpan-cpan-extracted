@@ -1,0 +1,56 @@
+Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2017 Kevin Ryde
+
+This file is part of Upfiles.
+
+Upfiles is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation; either version 3, or (at your option) any
+later version.
+
+Upfiles is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Upfiles.  If not, see <http://www.gnu.org/licenses/>.
+
+
+
+Version 12, September 2017
+    - new use_SSL
+    - new sftp with Net::SFTP::Foreign
+
+Version 11, February 2015
+    - send file times with MFMT and 5-arg SITE UTIME too
+
+Version 10, October 2014
+    - send file times with SITE UTIME if the server has that
+
+Version 9, February 2013
+    - Net::FTP error message() should be in scalar context
+
+Version 8, November 2012
+    - use Regexp::Common::Emacs
+
+Version 7, November 2012
+    - print size of changes
+
+Version 6, August 2012
+    - command line files
+
+Version 5, June 2012
+    - upload to temp file on remote
+    - create initial remote directory on first upload
+
+Version 4, May 2011
+    - don't upload .upfiles.sqdb-journal file
+
+Version 3, September 2010
+    - test manifest only as an author test
+
+Version 2, April 2010
+    - drop singleton instance stuff
+
+Version 1, October 2009
+    - the first version

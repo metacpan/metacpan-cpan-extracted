@@ -17,8 +17,7 @@ type QueryRoot {
 }
 EOF
 plugin GraphQL => {
-  schema => $schema,
-  root_value => { helloWorld => 'Hello, world!' },
+  convert => [ 'Test' ],
   graphiql => 1,
 };
 plugin GraphQL => {endpoint => '/graphql2', handler => sub {

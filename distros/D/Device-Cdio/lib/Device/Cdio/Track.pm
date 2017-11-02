@@ -23,7 +23,7 @@ Device::Cdio::Track - Class for track aspects of Device::Cdio.
     $track = $device->get_first_track();
     $format = $rackt->get_format();
 
-=cut 
+=cut
 
 use strict;
 use Exporter;
@@ -38,7 +38,7 @@ $Device::Cdio::Device::VERSION = $Device::Cdio::VERSION;
 
 =head1 METHODS
 
-=cut 
+=cut
 
 =pod
 
@@ -48,7 +48,7 @@ $Device::Cdio::Device::VERSION = $Device::Cdio::VERSION;
 
 Creates a new track object.
 
-=cut 
+=cut
 
 sub new {
 
@@ -59,7 +59,7 @@ sub new {
   return undef if _extra_args(@args);
 
   my $self = {};
-  
+
   if ($track !~ m{\A\d+\Z}) {
       print "*** Expecting track to be an integer; got '$track'\n";
       return undef;
@@ -103,14 +103,14 @@ sub get_audio_channels {
     return 0 if !_check_arg_count($#_, 0);
     return perlcdio::get_track_channels($self->{device}, $self->{track});
 }
-    
+
 =pod
 
 =head2 get_copy_permit
 
   get_copy_permit(cdio, track)->int
 
-Return copy protection status on a track. Is this meaningful 
+Return copy protection status on a track. Is this meaningful
 not an audio track?
 
 =cut
@@ -121,13 +121,18 @@ sub get_copy_permit {
     return perlcdio::get_track_copy_permit($self->{device}, $self->{track});
 }
 
+sub get_cdtext {
+    my($self, @p) = @_;
+    return perlcdio::get_cdtext($self->{cd},$self->{track});
+}
+
 =pod
 
 =head2 get_format
 
   get_format()->$format
 
-Get the format (e.g. 'audio', 'mode2', 'mode1') of track. 
+Get the format (e.g. 'audio', 'mode2', 'mode1') of track.
 
 =cut
 
@@ -143,7 +148,7 @@ sub get_format {
 
   get_last_lsn()->lsn
 
-Return the ending LSN for a track 
+Return the ending LSN for a track
 C<$perlcdio::INVALID_LSN> is returned on error.
 
 =cut
@@ -200,7 +205,7 @@ Track numbers usually start at something greater than 0, usually 1.
 Returns string of the form mm:ss:ff if all good, or string 'error' on
 error.
 
-=cut 
+=cut
 
 sub get_msf {
     my ($self, @p) = @_;
@@ -241,12 +246,12 @@ sub get_preemphasis {
 item get_track_sec_count()->int
 Get the number of sectors between this track an the next.  This
 includes any pregap sectors before the start of the next track.
-Track numbers usually start at something 
+Track numbers usually start at something
 greater than 0, usually 1.
 
 C<$perlcdio::INVALID_LSN> is returned on error.
 
-=cut 
+=cut
 
 sub get_track_sec_count {
     my ($self, @p) = @_;
@@ -254,7 +259,7 @@ sub get_track_sec_count {
     return perlcdio::get_track_sec_count($self->{device}, $self->{track});
 }
 
-=pod 
+=pod
 
 =head2 is_track_green
 
@@ -274,18 +279,18 @@ sub is_track_green {
     return perlcdio::is_track_green($self->{device}, $self->{track});
 }
 
-=pod 
+=pod
 
 =head2 get_track_isrc
 
 $isrc = $track->get_track_isrc;
 
 Returns an empty string or the International Standard Recording Code.
-Which is presented in 4 hyphen seperated substrings: "CC-XXX-YY-NNNNN"
+Which is presented in 4 hyphen-separated substrings: "CC-XXX-YY-NNNNN"
 
 "CC" two-character ISO 3166-1 alpha-2 country code
 "XXX" is a three character alphanumeric registrant code
-"YY" is the last two digits of the year of registration 
+"YY" is the last two digits of the year of registration
      (NB not necessarily the date the recording was made)
 "NNNNN" is a unique 5-digit number identifying the particular sound recording.
 
@@ -308,7 +313,7 @@ sub get_track_isrc {
 
 Set a new track number.
 
-=cut 
+=cut
 
 sub set_track {
     my($self,@p) = @_;
@@ -333,15 +338,15 @@ ISO9660 systems.
 L<perlcdio> is the lower-level interface to libcdio.
 
 L<http://www.gnu.org/software/libcdio/doxygen/track_8h.html> is
-documentation via doxygen of C<libiso9660>. 
+documentation via doxygen of C<libiso9660>.
 
 =head1 AUTHORS
 
-Rocky Bernstein C<< <rocky at cpan.org> >>.
+Rocky Bernstein
 
 =head1 COPYRIGHT
 
-Copyright (C) 2006 Rocky Bernstein <rocky@cpan.org>
+Copyright (C) 2006, 2012, 2017 Rocky Bernstein <rocky@cpan.org>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -354,6 +359,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+along with this program.  If not, see L<The GNU General Public
+License|http://www.gnu.org/licenses/#GPL>.
 
 =cut

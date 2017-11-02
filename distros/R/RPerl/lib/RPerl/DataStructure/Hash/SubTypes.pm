@@ -3,7 +3,7 @@ package RPerl::DataStructure::Hash::SubTypes;
 use strict;
 use warnings;
 use RPerl::AfterSubclass;
-our $VERSION = 0.010_000;
+our $VERSION = 0.014_000;
 
 # [[[ CRITICS ]]]
 ## no critic qw(ProhibitUselessNoCritic ProhibitMagicNumbers RequireCheckedSyscalls)  # USER DEFAULT 1: allow numeric values & print operator
@@ -12,8 +12,9 @@ our $VERSION = 0.010_000;
 ## no critic qw(Capitalization ProhibitMultiplePackages ProhibitReusedNames)  # SYSTEM DEFAULT 3: allow multiple & lower case package names
 
 # [[[ EXPORTS ]]]
-use Exporter 'import';
-our @EXPORT = qw(hashref_CHECK hashref_CHECKTRACE integer_hashref_CHECK integer_hashref_CHECKTRACE number_hashref_CHECK number_hashref_CHECKTRACE string_hashref_CHECK string_hashref_CHECKTRACE);
+use RPerl::Exporter 'import';
+our @EXPORT = qw(hashref_CHECK hashref_CHECKTRACE integer_hashref_CHECK integer_hashref_CHECKTRACE number_hashref_CHECK number_hashref_CHECKTRACE string_hashref_CHECK string_hashref_CHECKTRACE integer_hashref_to_string number_hashref_to_string string_hashref_to_string);
+our @EXPORT_OK = qw(integer_hashref__typetest0 integer_hashref__typetest1 number_hashref__typetest0 number_hashref__typetest1 string_hashref__typetest0 string_hashref__typetest1);
 
 # [[[ INCLUDES ]]]
 use RPerl::DataType::Integer;  # integer_CHECKTRACE
@@ -47,11 +48,13 @@ package RPerl::DataStructure::Hash::SubTypes;
 use strict;
 use warnings;
 
+use RPerl::Config;  # for 'use English;' etc.
+
 # [[[ TYPE-CHECKING ]]]
 
-#our void $hashref_CHECK = sub {
 sub hashref_CHECK {
-    ( my $possible_hashref ) = @_;
+    { my void $RETURN_TYPE };
+    ( my $possible_hashref ) = @ARG;
     if ( not( defined $possible_hashref ) ) {
         croak(
             "\nERROR EHVRV00, TYPE-CHECKING MISMATCH, PERLOPS_PERLTYPES:\nhashref value expected but undefined/null value found,\ncroaking"
@@ -64,12 +67,13 @@ sub hashref_CHECK {
             "\nERROR EHVRV01, TYPE-CHECKING MISMATCH, PERLOPS_PERLTYPES:\nhashref value expected but non-hashref value found,\ncroaking"
         );
     }
+    return;
 }
 
 
-#our void $hashref_CHECKTRACE = sub {
 sub hashref_CHECKTRACE {
-    ( my $possible_hashref, my $variable_name, my $subroutine_name ) = @_;
+    { my void $RETURN_TYPE };
+    ( my $possible_hashref, my $variable_name, my $subroutine_name ) = @ARG;
     if ( not( defined $possible_hashref ) ) {
         croak(
             "\nERROR EHVRV00, TYPE-CHECKING MISMATCH, PERLOPS_PERLTYPES:\nhashref value expected but undefined/null value found,\nin variable $variable_name from subroutine $subroutine_name,\ncroaking"
@@ -80,6 +84,7 @@ sub hashref_CHECKTRACE {
             "\nERROR EHVRV01, TYPE-CHECKING MISMATCH, PERLOPS_PERLTYPES:\nhashref value expected but non-hashref value found,\nin variable $variable_name from subroutine $subroutine_name,\ncroaking"
         );
     }
+    return;
 }
 
 # [[[ INTEGER HASH REF ]]]
@@ -101,9 +106,9 @@ use warnings;
 
 # [[[ TYPE-CHECKING ]]]
 
-#our void $integer_hashref_CHECK = sub {
 sub integer_hashref_CHECK {
-    ( my $possible_integer_hashref ) = @_;
+    { my void $RETURN_TYPE };
+    ( my $possible_integer_hashref ) = @ARG;
 
 # DEV NOTE: the following two if() statements are functionally equivalent to the hashref_CHECK() subroutine, but with integer-specific error codes
     if ( not( defined $possible_integer_hashref ) ) {
@@ -119,7 +124,7 @@ sub integer_hashref_CHECK {
     }
 
     my integer $possible_integer;
-    foreach my string $key ( keys %{$possible_integer_hashref} ) {
+    foreach my string $key ( sort keys %{$possible_integer_hashref} ) {
         $possible_integer = $possible_integer_hashref->{$key};
 
 # DEV NOTE: the following two if() statements are functionally equivalent to the integer_CHECK() subroutine, but with hash-specific error codes
@@ -138,13 +143,14 @@ sub integer_hashref_CHECK {
             );
         }
     }
+    return;
 }
 
 
-#our void $integer_hashref_CHECKTRACE = sub {
 sub integer_hashref_CHECKTRACE {
+    { my void $RETURN_TYPE };
     ( my $possible_integer_hashref, my $variable_name, my $subroutine_name )
-        = @_;
+        = @ARG;
 
 # DEV NOTE: the following two if() statements are functionally equivalent to the hashref_CHECKTRACE() subroutine, but with integer-specific error codes
     if ( not( defined $possible_integer_hashref ) ) {
@@ -160,7 +166,7 @@ sub integer_hashref_CHECKTRACE {
     }
 
     my integer $possible_integer;
-    foreach my string $key ( keys %{$possible_integer_hashref} ) {
+    foreach my string $key ( sort keys %{$possible_integer_hashref} ) {
         $possible_integer = $possible_integer_hashref->{$key};
 
 # DEV NOTE: the following two if() statements are functionally equivalent to the integer_CHECKTRACE() subroutine, but with hash-specific error codes
@@ -179,13 +185,15 @@ sub integer_hashref_CHECKTRACE {
             );
         }
     }
+    return;
 }
 
 # [[[ STRINGIFY ]]]
 
 # convert from (Perl SV containing RV to (Perl HV of (Perl SVs containing IVs))) to Perl-parsable (Perl SV containing PV)
-our string $integer_hashref_to_string = sub {
-    ( my $input_hv_ref ) = @_;
+sub integer_hashref_to_string {
+    { my string $RETURN_TYPE };
+    ( my $input_hv_ref ) = @ARG;
 
 #    RPerl::diag("in PERLOPS_PERLTYPES integer_hashref_to_string(), top of subroutine\n");
 
@@ -207,7 +215,7 @@ our string $integer_hashref_to_string = sub {
 
     $output_sv = '{';
 
-    foreach my string $key ( keys %input_hv ) {
+    foreach my string $key ( sort keys %input_hv ) {
 
         $input_hv_entry_value = $input_hv{$key};
         $key =~ s/\\/\\\\/gxms; # escape all back-slash \ characters with another back-slash \ character
@@ -228,20 +236,20 @@ our string $integer_hashref_to_string = sub {
 
 #    RPerl::diag("in PERLOPS_PERLTYPES integer_hashref_to_string(), after for() loop, have \$output_sv =\n$output_sv\n");
 #    RPerl::diag("in PERLOPS_PERLTYPES integer_hashref_to_string(), bottom of subroutine\n");
-
     return ($output_sv);
-};
+}
 
 # [[[ TYPE TESTING ]]]
 
-our string $integer_hashref__typetest0 = sub {
-    ( my integer_hashref $lucky_integers) = @_;
+sub integer_hashref__typetest0 {
+    { my string $RETURN_TYPE };
+    ( my integer_hashref $lucky_integers) = @ARG;
 
     #    integer_hashref_CHECK($lucky_integers);
     integer_hashref_CHECKTRACE( $lucky_integers, '$lucky_integers',
         'integer_hashref__typetest0()' );
 
-#    foreach my string $key ( keys %{$lucky_integers} ) {
+#    foreach my string $key ( sort keys %{$lucky_integers} ) {
 #        my $lucky_integer = $lucky_integers->{$key};
 #        $key =~ s/\\/\\\\/gxms; # escape all back-slash \ characters with another back-slash \ character
 #        $key =~ s/\'/\\\'/gxms; # escape all single-quote ' characters with a back-slash \ character
@@ -249,13 +257,13 @@ our string $integer_hashref__typetest0 = sub {
 #        RPerl::diag("in PERLOPS_PERLTYPES integer_hashref__typetest0(), have lucky integer '$key' => " . $lucky_integer . ", BARSTOOL\n");
 #    }
 #    RPerl::diag("in PERLOPS_PERLTYPES integer_hashref__typetest0(), bottom of subroutine\n");
-
     return (
         integer_hashref_to_string($lucky_integers) . 'PERLOPS_PERLTYPES' );
-};
+}
 
-our integer_hashref $integer_hashref__typetest1 = sub {
-    ( my integer $my_size) = @_;
+sub integer_hashref__typetest1 {
+    { my integer_hashref $RETURN_TYPE };
+    ( my integer $my_size) = @ARG;
 
     #    integer_CHECK($my_size);
     integer_CHECKTRACE( $my_size, '$my_size',
@@ -269,7 +277,7 @@ our integer_hashref $integer_hashref__typetest1 = sub {
 #        RPerl::diag("in PERLOPS_PERLTYPES integer_hashref__typetest1(), setting entry '$temp_key' => " . $new_hash->{$temp_key} . ", BARSTOOL\n");
     }
     return ($new_hash);
-};
+}
 
 # [[[ NUMBER HASH REF ]]]
 # [[[ NUMBER HASH REF ]]]
@@ -290,9 +298,9 @@ use warnings;
 
 # [[[ TYPE-CHECKING ]]]
 
-#our void $number_hashref_CHECK = sub {
 sub number_hashref_CHECK {
-    ( my $possible_number_hashref ) = @_;
+    { my void $RETURN_TYPE };
+    ( my $possible_number_hashref ) = @ARG;
 
 # DEV NOTE: the following two if() statements are functionally equivalent to the hashref_CHECK() subroutine, but with number-specific error codes
     if ( not( defined $possible_number_hashref ) ) {
@@ -308,7 +316,7 @@ sub number_hashref_CHECK {
     }
 
     my number $possible_number;
-    foreach my string $key ( keys %{$possible_number_hashref} ) {
+    foreach my string $key ( sort keys %{$possible_number_hashref} ) {
         $possible_number = $possible_number_hashref->{$key};
 
 # DEV NOTE: the following two if() statements are functionally equivalent to the number_CHECK() subroutine, but with hash-specific error codes
@@ -330,13 +338,14 @@ sub number_hashref_CHECK {
             );
         }
     }
+    return;
 }
 
 
-#our void $number_hashref_CHECKTRACE = sub {
 sub number_hashref_CHECKTRACE {
+    { my void $RETURN_TYPE };
     ( my $possible_number_hashref, my $variable_name, my $subroutine_name )
-        = @_;
+        = @ARG;
 
 # DEV NOTE: the following two if() statements are functionally equivalent to the hashref_CHECKTRACE() subroutine, but with number-specific error codes
     if ( not( defined $possible_number_hashref ) ) {
@@ -352,7 +361,7 @@ sub number_hashref_CHECKTRACE {
     }
 
     my number $possible_number;
-    foreach my string $key ( keys %{$possible_number_hashref} ) {
+    foreach my string $key ( sort keys %{$possible_number_hashref} ) {
         $possible_number = $possible_number_hashref->{$key};
 
 # DEV NOTE: the following two if() statements are functionally equivalent to the number_CHECKTRACE() subroutine, but with hash-specific error codes
@@ -374,13 +383,15 @@ sub number_hashref_CHECKTRACE {
             );
         }
     }
+    return;
 }
 
 # [[[ STRINGIFY ]]]
 
 # convert from (Perl SV containing RV to (Perl HV of (Perl SVs containing NVs))) to Perl-parsable (Perl SV containing PV)
-our string $number_hashref_to_string = sub {
-    ( my $input_hv_ref ) = @_;
+sub number_hashref_to_string {
+    { my string $RETURN_TYPE };
+    ( my $input_hv_ref ) = @ARG;
 
 #    RPerl::diag("in PERLOPS_PERLTYPES number_hashref_to_string(), top of subroutine\n");
 
@@ -402,7 +413,7 @@ our string $number_hashref_to_string = sub {
 
     $output_sv = '{';
 
-    foreach my string $key ( keys %input_hv ) {
+    foreach my string $key ( sort keys %input_hv ) {
 
         $input_hv_entry_value = $input_hv{$key};
         $key =~ s/\\/\\\\/gxms; # escape all back-slash \ characters with another back-slash \ character
@@ -418,32 +429,32 @@ our string $number_hashref_to_string = sub {
 
 #    RPerl::diag("in PERLOPS_PERLTYPES number_hashref_to_string(), after for() loop, have \$output_sv =\n$output_sv\n");
 #    RPerl::diag("in PERLOPS_PERLTYPES number_hashref_to_string(), bottom of subroutine\n");
-
     return ($output_sv);
-};
+}
 
 # [[[ TYPE TESTING ]]]
 
-our string $number_hashref__typetest0 = sub {
-    ( my number_hashref $lucky_numbers) = @_;
+sub number_hashref__typetest0 {
+    { my string $RETURN_TYPE };
+    ( my number_hashref $lucky_numbers) = @ARG;
 
     #    number_hashref_CHECK($lucky_numbers);
     number_hashref_CHECKTRACE( $lucky_numbers, '$lucky_numbers',
         'number_hashref__typetest0()' );
 
-#    foreach my string $key ( keys %{$lucky_numbers} ) {
+#    foreach my string $key ( sort keys %{$lucky_numbers} ) {
 #        my $lucky_number = $lucky_numbers->{$key};
 #        $key =~ s/\\/\\\\/gxms; # escape all back-slash \ characters with another back-slash \ character
 #        $key =~ s/\'/\\\'/gxms; # escape all single-quote ' characters with a back-slash \ character
 #        RPerl::diag("in PERLOPS_PERLTYPES number_hashref__typetest0(), have lucky number '$key' => " . $lucky_number . ", BARSTOOL\n");
 #    }
-
     return (
         number_hashref_to_string($lucky_numbers) . 'PERLOPS_PERLTYPES' );
-};
+}
 
-our number_hashref $number_hashref__typetest1 = sub {
-    ( my integer $my_size) = @_;
+sub number_hashref__typetest1 {
+    { my number_hashref $RETURN_TYPE };
+    ( my integer $my_size) = @ARG;
 
     #    integer_CHECK($my_size);
     integer_CHECKTRACE( $my_size, '$my_size',
@@ -457,7 +468,7 @@ our number_hashref $number_hashref__typetest1 = sub {
 #        RPerl::diag("in PERLOPS_PERLTYPES number_hashref__typetest1(), setting entry '$temp_key' => " . $new_hash->{$temp_key} . ", BARSTOOL\n");
     }
     return ($new_hash);
-};
+}
 
 # [[[ CHARACTER HASHE REF ]]]
 # [[[ CHARACTER HASHE REF ]]]
@@ -489,9 +500,9 @@ use warnings;
 
 # [[[ TYPE-CHECKING ]]]
 
-#our void $string_hashref_CHECK = sub {
 sub string_hashref_CHECK {
-    ( my $possible_string_hashref ) = @_;
+    { my void $RETURN_TYPE };
+    ( my $possible_string_hashref ) = @ARG;
 
 # DEV NOTE: the following two if() statements are functionally equivalent to the hashref_CHECK() subroutine, but with string-specific error codes
     if ( not( defined $possible_string_hashref ) ) {
@@ -507,7 +518,7 @@ sub string_hashref_CHECK {
     }
 
     my string $possible_string;
-    foreach my string $key ( keys %{$possible_string_hashref} ) {
+    foreach my string $key ( sort keys %{$possible_string_hashref} ) {
         $possible_string = $possible_string_hashref->{$key};
 
 # DEV NOTE: the following two if() statements are functionally equivalent to the string_CHECK() subroutine, but with hash-specific error codes
@@ -526,13 +537,14 @@ sub string_hashref_CHECK {
             );
         }
     }
+    return;
 }
 
 
-#our void $string_hashref_CHECKTRACE = sub {
 sub string_hashref_CHECKTRACE {
+    { my void $RETURN_TYPE };
     ( my $possible_string_hashref, my $variable_name, my $subroutine_name )
-        = @_;
+        = @ARG;
 
 # DEV NOTE: the following two if() statements are functionally equivalent to the hashref_CHECKTRACE() subroutine, but with string-specific error codes
     if ( not( defined $possible_string_hashref ) ) {
@@ -548,7 +560,7 @@ sub string_hashref_CHECKTRACE {
     }
 
     my string $possible_string;
-    foreach my string $key ( keys %{$possible_string_hashref} ) {
+    foreach my string $key ( sort keys %{$possible_string_hashref} ) {
         $possible_string = $possible_string_hashref->{$key};
 
 # DEV NOTE: the following two if() statements are functionally equivalent to the string_CHECKTRACE() subroutine, but with hash-specific error codes
@@ -567,13 +579,15 @@ sub string_hashref_CHECKTRACE {
             );
         }
     }
+    return;
 }
 
 # [[[ STRINGIFY ]]]
 
 # convert from (Perl SV containing RV to (Perl HV of (Perl SVs containing PVs))) to Perl-parsable (Perl SV containing PV)
-our string $string_hashref_to_string = sub {
-    ( my $input_hv_ref ) = @_;
+sub string_hashref_to_string {
+    { my string $RETURN_TYPE };
+    ( my $input_hv_ref ) = @ARG;
 
 #    RPerl::diag("in PERLOPS_PERLTYPES string_hashref_to_string(), top of subroutine\n");
 
@@ -595,7 +609,7 @@ our string $string_hashref_to_string = sub {
 
     $output_sv = '{';
 
-    foreach my string $key ( keys %input_hv ) {
+    foreach my string $key ( sort keys %input_hv ) {
 
         $input_hv_entry_value = $input_hv{$key};
         $key =~ s/\\/\\\\/gxms; # escape all back-slash \ characters with another back-slash \ character
@@ -612,31 +626,31 @@ our string $string_hashref_to_string = sub {
 
 #    RPerl::diag("in PERLOPS_PERLTYPES string_hashref_to_string(), after for() loop, have \$output_sv =\n$output_sv\n");
 #    RPerl::diag("in PERLOPS_PERLTYPES string_hashref_to_string(), bottom of subroutine\n");
-
     return ($output_sv);
-};
+}
 
 # [[[ TYPE TESTING ]]]
 
-our string $string_hashref__typetest0 = sub {
-    ( my string_hashref $people) = @_;
+sub string_hashref__typetest0 {
+    { my string $RETURN_TYPE };
+    ( my string_hashref $people) = @ARG;
 
     #    string_hashref_CHECK($lucky_numbers);
     string_hashref_CHECKTRACE( $people, '$people',
         'string_hashref__typetest0()' );
 
-#    foreach my string $key ( keys %{$people} ) {
+#    foreach my string $key ( sort keys %{$people} ) {
 #        my $person = $people->{$key};
 #        $key =~ s/\\/\\\\/gxms; # escape all back-slash \ characters with another back-slash \ character
 #        $key =~ s/\'/\\\'/gxms; # escape all single-quote ' characters with a back-slash \ character
 #        RPerl::diag("in PERLOPS_PERLTYPES string_hashref__typetest0(), have person '$key' => '" . $person . "', STARBOOL\n");
 #    }
-
     return ( string_hashref_to_string($people) . 'PERLOPS_PERLTYPES' );
-};
+}
 
-our string_hashref $string_hashref__typetest1 = sub {
-    ( my integer $my_size) = @_;
+sub string_hashref__typetest1 {
+    { my string_hashref $RETURN_TYPE };
+    ( my integer $my_size) = @ARG;
 
     #    integer_CHECK($my_size);
     integer_CHECKTRACE( $my_size, '$my_size',
@@ -649,7 +663,7 @@ our string_hashref $string_hashref__typetest1 = sub {
 #        RPerl::diag("in PERLOPS_PERLTYPES string_hashref__typetest1(), bottom of for() loop, have i = $i, just set another Jeffy!\n");
     }
     return ($people);
-};
+}
 
 # [[[ SCALAR HASHES ]]]
 

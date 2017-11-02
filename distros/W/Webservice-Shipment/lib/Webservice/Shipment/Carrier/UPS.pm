@@ -124,7 +124,7 @@ sub request {
       my $dom = _handle_response($tx);
       $self->$cb(undef, $dom);
     },
-  )->catch(sub{ $self->$cb($_[1], undef) })->wait;
+  )->tap(on => error => sub{ $self->$cb($_[1], undef) })->wait;
 }
 
 sub _handle_response {

@@ -2,7 +2,7 @@ package App::Yath::Command::stop;
 use strict;
 use warnings;
 
-our $VERSION = '0.001026';
+our $VERSION = '0.001030';
 
 use File::Path qw/remove_tree/;
 
@@ -34,7 +34,7 @@ sub cli_args { "" }
 
 sub description {
     return <<"    EOT";
-foo bar baz
+This command will stop a persistent instance, and output any log contents.
     EOT
 }
 

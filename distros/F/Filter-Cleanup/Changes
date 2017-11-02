@@ -1,8 +1,8 @@
-Revision history for Filter-Cleanup
+0.03 2017-10-30
+-Reimplemented using Keyword::Declare
 
-0.02    2011-05-31
-        * Lowered read size
+0.02 2011-05-31
+-Lowered read size
 
-0.01    2011-05-31
-        * Initial version
-
+0.01 2011-05-31
+-Initial release

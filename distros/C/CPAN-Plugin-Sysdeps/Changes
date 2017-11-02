@@ -1,5 +1,9 @@
 Revision history for Perl extension CPAN::Plugin::Sysdeps.
 
+0.40  2017-10-31
+	- mapping update
+	- alias --dry-run for cpan-sysdeps
+
 0.39  2017-10-07
 	- mapping update
 

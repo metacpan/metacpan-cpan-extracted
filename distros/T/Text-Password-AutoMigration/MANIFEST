@@ -9,10 +9,9 @@ lib/Text/Password/CoreCrypt.pm
 lib/Text/Password/MD5.pm
 lib/Text/Password/SHA.pm
 minil.toml
-t/00_compile.t
-t/01_crypt.t
-t/02_MD5.t
-t/03_SHA.t
-t/04_AutoMigrate.t
+t/00_crypt.t
+t/01_MD5.t
+t/02_SHA.t
+t/03_AutoMigrate.t
 META.yml
 MANIFEST

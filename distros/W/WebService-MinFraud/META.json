@@ -4,7 +4,7 @@
       "Mateu Hunter <mhunter@maxmind.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -47,7 +47,6 @@
             "Test::Synopsis" : "0",
             "Test::Vars" : "0.009",
             "Test::Version" : "2.05",
-            "blib" : "1.01",
             "lib" : "0"
          }
       },
@@ -63,10 +62,10 @@
             "Data::Validate::URI" : "0",
             "DateTime::Format::RFC3339" : "0",
             "Exporter" : "0",
-            "GeoIP2::Record::Country" : "2.003003",
+            "GeoIP2::Record::Country" : "2.004000",
             "GeoIP2::Record::Location" : "0",
             "GeoIP2::Role::Model::HasSubdivisions" : "0",
-            "GeoIP2::Role::Model::Location" : "2.003003",
+            "GeoIP2::Role::Model::Location" : "2.004000",
             "GeoIP2::Types" : "0",
             "HTTP::Headers" : "0",
             "HTTP::Request" : "0",
@@ -112,155 +111,155 @@
    "provides" : {
       "WebService::MinFraud" : {
          "file" : "lib/WebService/MinFraud.pm",
-         "version" : "1.005000"
+         "version" : "1.005001"
       },
       "WebService::MinFraud::Client" : {
          "file" : "lib/WebService/MinFraud/Client.pm",
-         "version" : "1.005000"
+         "version" : "1.005001"
       },
       "WebService::MinFraud::Data::Rx::Type::CCToken" : {
          "file" : "lib/WebService/MinFraud/Data/Rx/Type/CCToken.pm",
-         "version" : "1.005000"
+         "version" : "1.005001"
       },
       "WebService::MinFraud::Data::Rx::Type::CustomInputs" : {
          "file" : "lib/WebService/MinFraud/Data/Rx/Type/CustomInputs.pm",
-         "version" : "1.005000"
+         "version" : "1.005001"
       },
       "WebService::MinFraud::Data::Rx::Type::DateTime::RFC3339" : {
          "file" : "lib/WebService/MinFraud/Data/Rx/Type/DateTime/RFC3339.pm",
-         "version" : "1.005000"
+         "version" : "1.005001"
       },
       "WebService::MinFraud::Data::Rx::Type::Enum" : {
          "file" : "lib/WebService/MinFraud/Data/Rx/Type/Enum.pm",
-         "version" : "1.005000"
+         "version" : "1.005001"
       },
       "WebService::MinFraud::Data::Rx::Type::Hex32" : {
          "file" : "lib/WebService/MinFraud/Data/Rx/Type/Hex32.pm",
-         "version" : "1.005000"
+         "version" : "1.005001"
       },
       "WebService::MinFraud::Data::Rx::Type::Hostname" : {
          "file" : "lib/WebService/MinFraud/Data/Rx/Type/Hostname.pm",
-         "version" : "1.005000"
+         "version" : "1.005001"
       },
       "WebService::MinFraud::Data::Rx::Type::IPAddress" : {
          "file" : "lib/WebService/MinFraud/Data/Rx/Type/IPAddress.pm",
-         "version" : "1.005000"
+         "version" : "1.005001"
       },
       "WebService::MinFraud::Data::Rx::Type::WebURI" : {
          "file" : "lib/WebService/MinFraud/Data/Rx/Type/WebURI.pm",
-         "version" : "1.005000"
+         "version" : "1.005001"
       },
       "WebService::MinFraud::Error::Generic" : {
          "file" : "lib/WebService/MinFraud/Error/Generic.pm",
-         "version" : "1.005000"
+         "version" : "1.005001"
       },
       "WebService::MinFraud::Error::HTTP" : {
          "file" : "lib/WebService/MinFraud/Error/HTTP.pm",
-         "version" : "1.005000"
+         "version" : "1.005001"
       },
       "WebService::MinFraud::Error::WebService" : {
          "file" : "lib/WebService/MinFraud/Error/WebService.pm",
-         "version" : "1.005000"
+         "version" : "1.005001"
       },
       "WebService::MinFraud::Model::Factors" : {
          "file" : "lib/WebService/MinFraud/Model/Factors.pm",
-         "version" : "1.005000"
+         "version" : "1.005001"
       },
       "WebService::MinFraud::Model::Insights" : {
          "file" : "lib/WebService/MinFraud/Model/Insights.pm",
-         "version" : "1.005000"
+         "version" : "1.005001"
       },
       "WebService::MinFraud::Model::Score" : {
          "file" : "lib/WebService/MinFraud/Model/Score.pm",
-         "version" : "1.005000"
+         "version" : "1.005001"
       },
       "WebService::MinFraud::Record::BillingAddress" : {
          "file" : "lib/WebService/MinFraud/Record/BillingAddress.pm",
-         "version" : "1.005000"
+         "version" : "1.005001"
       },
       "WebService::MinFraud::Record::Country" : {
          "file" : "lib/WebService/MinFraud/Record/Country.pm",
-         "version" : "1.005000"
+         "version" : "1.005001"
       },
       "WebService::MinFraud::Record::CreditCard" : {
          "file" : "lib/WebService/MinFraud/Record/CreditCard.pm",
-         "version" : "1.005000"
+         "version" : "1.005001"
       },
       "WebService::MinFraud::Record::Device" : {
          "file" : "lib/WebService/MinFraud/Record/Device.pm",
-         "version" : "1.005000"
+         "version" : "1.005001"
       },
       "WebService::MinFraud::Record::Disposition" : {
          "file" : "lib/WebService/MinFraud/Record/Disposition.pm",
-         "version" : "1.005000"
+         "version" : "1.005001"
       },
       "WebService::MinFraud::Record::Email" : {
          "file" : "lib/WebService/MinFraud/Record/Email.pm",
-         "version" : "1.005000"
+         "version" : "1.005001"
       },
       "WebService::MinFraud::Record::IPAddress" : {
          "file" : "lib/WebService/MinFraud/Record/IPAddress.pm",
-         "version" : "1.005000"
+         "version" : "1.005001"
       },
       "WebService::MinFraud::Record::Issuer" : {
          "file" : "lib/WebService/MinFraud/Record/Issuer.pm",
-         "version" : "1.005000"
+         "version" : "1.005001"
       },
       "WebService::MinFraud::Record::Location" : {
          "file" : "lib/WebService/MinFraud/Record/Location.pm",
-         "version" : "1.005000"
+         "version" : "1.005001"
       },
       "WebService::MinFraud::Record::ScoreIPAddress" : {
          "file" : "lib/WebService/MinFraud/Record/ScoreIPAddress.pm",
-         "version" : "1.005000"
+         "version" : "1.005001"
       },
       "WebService::MinFraud::Record::ShippingAddress" : {
          "file" : "lib/WebService/MinFraud/Record/ShippingAddress.pm",
-         "version" : "1.005000"
+         "version" : "1.005001"
       },
       "WebService::MinFraud::Record::Subscores" : {
          "file" : "lib/WebService/MinFraud/Record/Subscores.pm",
-         "version" : "1.005000"
+         "version" : "1.005001"
       },
       "WebService::MinFraud::Record::Warning" : {
          "file" : "lib/WebService/MinFraud/Record/Warning.pm",
-         "version" : "1.005000"
+         "version" : "1.005001"
       },
       "WebService::MinFraud::Role::Data::Rx::Type" : {
          "file" : "lib/WebService/MinFraud/Role/Data/Rx/Type.pm",
-         "version" : "1.005000"
+         "version" : "1.005001"
       },
       "WebService::MinFraud::Role::Error::HTTP" : {
          "file" : "lib/WebService/MinFraud/Role/Error/HTTP.pm",
-         "version" : "1.005000"
+         "version" : "1.005001"
       },
       "WebService::MinFraud::Role::HasCommonAttributes" : {
          "file" : "lib/WebService/MinFraud/Role/HasCommonAttributes.pm",
-         "version" : "1.005000"
+         "version" : "1.005001"
       },
       "WebService::MinFraud::Role::HasLocales" : {
          "file" : "lib/WebService/MinFraud/Role/HasLocales.pm",
-         "version" : "1.005000"
+         "version" : "1.005001"
       },
       "WebService::MinFraud::Role::Model" : {
          "file" : "lib/WebService/MinFraud/Role/Model.pm",
-         "version" : "1.005000"
+         "version" : "1.005001"
       },
       "WebService::MinFraud::Role::Record::Address" : {
          "file" : "lib/WebService/MinFraud/Role/Record/Address.pm",
-         "version" : "1.005000"
+         "version" : "1.005001"
       },
       "WebService::MinFraud::Role::Record::HasRisk" : {
          "file" : "lib/WebService/MinFraud/Role/Record/HasRisk.pm",
-         "version" : "1.005000"
+         "version" : "1.005001"
       },
       "WebService::MinFraud::Types" : {
          "file" : "lib/WebService/MinFraud/Types.pm",
-         "version" : "1.005000"
+         "version" : "1.005001"
       },
       "WebService::MinFraud::Validator" : {
          "file" : "lib/WebService/MinFraud/Validator.pm",
-         "version" : "1.005000"
+         "version" : "1.005001"
       }
    },
    "release_status" : "stable",
@@ -275,10 +274,10 @@
          "web" : "https://github.com/maxmind/minfraud-api-perl"
       }
    },
-   "version" : "1.005000",
+   "version" : 1.005001,
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.026000"
+         "version" : "5.026001"
       },
       "plugins" : [
          {
@@ -289,7 +288,7 @@
                }
             },
             "name" : "@MAXMIND/MakeMaker",
-            "version" : "6.009"
+            "version" : "6.010"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::GatherDir",
@@ -319,27 +318,27 @@
          {
             "class" : "Dist::Zilla::Plugin::ManifestSkip",
             "name" : "@MAXMIND/ManifestSkip",
-            "version" : "6.009"
+            "version" : "6.010"
          },
          {
             "class" : "Dist::Zilla::Plugin::License",
             "name" : "@MAXMIND/License",
-            "version" : "6.009"
+            "version" : "6.010"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExecDir",
             "name" : "@MAXMIND/ExecDir",
-            "version" : "6.009"
+            "version" : "6.010"
          },
          {
             "class" : "Dist::Zilla::Plugin::ShareDir",
             "name" : "@MAXMIND/ShareDir",
-            "version" : "6.009"
+            "version" : "6.010"
          },
          {
             "class" : "Dist::Zilla::Plugin::Manifest",
             "name" : "@MAXMIND/Manifest",
-            "version" : "6.009"
+            "version" : "6.010"
          },
          {
             "class" : "Dist::Zilla::Plugin::CheckVersionIncrement",
@@ -349,17 +348,17 @@
          {
             "class" : "Dist::Zilla::Plugin::TestRelease",
             "name" : "@MAXMIND/TestRelease",
-            "version" : "6.009"
+            "version" : "6.010"
          },
          {
             "class" : "Dist::Zilla::Plugin::ConfirmRelease",
             "name" : "@MAXMIND/ConfirmRelease",
-            "version" : "6.009"
+            "version" : "6.010"
          },
          {
             "class" : "Dist::Zilla::Plugin::MAXMIND::VersionProvider",
             "name" : "@MAXMIND/MAXMIND::VersionProvider",
-            "version" : "0.80"
+            "version" : "0.84"
          },
          {
             "class" : "Dist::Zilla::Plugin::Authority",
@@ -369,7 +368,7 @@
          {
             "class" : "Dist::Zilla::Plugin::AutoPrereqs",
             "name" : "@MAXMIND/AutoPrereqs",
-            "version" : "6.009"
+            "version" : "6.010"
          },
          {
             "class" : "Dist::Zilla::Plugin::CopyFilesFromBuild",
@@ -394,7 +393,7 @@
          {
             "class" : "Dist::Zilla::Plugin::MetaResources",
             "name" : "@MAXMIND/MetaResources",
-            "version" : "6.009"
+            "version" : "6.010"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaProvides::Package",
@@ -404,7 +403,7 @@
                      {
                         "class" : "Dist::Zilla::Plugin::FinderCode",
                         "name" : "@MAXMIND/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
-                        "version" : "6.009"
+                        "version" : "6.010"
                      }
                   ],
                   "include_underscores" : 0
@@ -431,22 +430,22 @@
          {
             "class" : "Dist::Zilla::Plugin::MetaConfig",
             "name" : "@MAXMIND/MetaConfig",
-            "version" : "6.009"
+            "version" : "6.010"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaJSON",
             "name" : "@MAXMIND/MetaJSON",
-            "version" : "6.009"
+            "version" : "6.010"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaYAML",
             "name" : "@MAXMIND/MetaYAML",
-            "version" : "6.009"
+            "version" : "6.010"
          },
          {
             "class" : "Dist::Zilla::Plugin::NextRelease",
             "name" : "@MAXMIND/NextRelease",
-            "version" : "6.009"
+            "version" : "6.010"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -457,7 +456,7 @@
                }
             },
             "name" : "@MAXMIND/Test::More with subtest",
-            "version" : "6.009"
+            "version" : "6.010"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -468,7 +467,7 @@
                }
             },
             "name" : "@MAXMIND/Modules for use with tidyall",
-            "version" : "6.009"
+            "version" : "6.010"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",
@@ -479,7 +478,7 @@
                }
             },
             "name" : "@MAXMIND/Test::Version which fixes https://github.com/plicease/Test-Version/issues/7",
-            "version" : "6.009"
+            "version" : "6.010"
          },
          {
             "class" : "Dist::Zilla::Plugin::PromptIfStale",
@@ -496,7 +495,7 @@
                }
             },
             "name" : "@MAXMIND/Dist::Zilla::PluginBundle::MAXMIND",
-            "version" : "0.053"
+            "version" : "0.054"
          },
          {
             "class" : "Dist::Zilla::Plugin::PromptIfStale",
@@ -519,7 +518,7 @@
                }
             },
             "name" : "@MAXMIND/PromptIfStale",
-            "version" : "0.053"
+            "version" : "0.054"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Pod::Coverage::Configurable",
@@ -536,78 +535,78 @@
                   ],
                   "spell_cmd" : "",
                   "stopwords" : [
-                     "API",
-                     "APIs",
-                     "ASN",
-                     "AVS",
-                     "AdWords",
+                     "API\n",
+                     "APIs\n",
+                     "ASN\n",
+                     "AVS\n",
+                     "AdWords\n",
                      "Alders",
                      "Alders'",
-                     "CN",
-                     "CVV",
+                     "CN\n",
+                     "CVV\n",
                      "Eilam",
                      "Eilam's",
-                     "GEONAMES",
-                     "GeoIP",
-                     "GeoLite",
-                     "GeoNames",
-                     "GitHub",
-                     "Gmail",
-                     "IANA",
-                     "IIN",
-                     "IP",
-                     "IP's",
-                     "IPv",
-                     "ISP",
-                     "Knop",
+                     "GEONAMES\n",
+                     "GeoIP\n",
+                     "GeoLite\n",
+                     "GeoNames\n",
+                     "GitHub\n",
+                     "Gmail\n",
+                     "IANA\n",
+                     "IIN\n",
+                     "IP\n",
+                     "IP's\n",
+                     "IPv\n",
+                     "ISP\n",
+                     "Knop\n",
                      "MAXMIND",
                      "MAXMIND's",
                      "MaxMind",
-                     "MaxMind",
+                     "MaxMind\n",
                      "MaxMind's",
-                     "MaxMind's",
-                     "OC",
-                     "Omni",
+                     "MaxMind's\n",
+                     "OC\n",
+                     "Omni\n",
                      "Oschwald",
-                     "Oschwald",
+                     "Oschwald\n",
                      "Oschwald's",
-                     "Oxfordshire",
+                     "Oxfordshire\n",
                      "PayPal",
                      "Rolsky",
-                     "Rolsky",
+                     "Rolsky\n",
                      "Rolsky's",
-                     "SSL",
-                     "URI",
-                     "VERSIONING",
-                     "VPN",
-                     "YYY",
-                     "YYYZZZ",
-                     "chargeback",
-                     "contentDeliveryNetwork",
-                     "cpanm",
-                     "de",
-                     "dialup",
-                     "downloadable",
-                     "ergument",
-                     "geoname_id",
-                     "hostname",
-                     "iPhones",
-                     "ip",
-                     "ja",
-                     "libmaxminddb",
-                     "lookup",
-                     "maxmind",
-                     "minFraud",
-                     "omni",
-                     "params",
-                     "routable",
-                     "ru",
-                     "searchEngineSpider",
-                     "subscores",
-                     "ua",
-                     "unpopulated",
-                     "versioning",
-                     "zh"
+                     "SSL\n",
+                     "URI\n",
+                     "VERSIONING\n",
+                     "VPN\n",
+                     "YYY\n",
+                     "YYYZZZ\n",
+                     "chargeback\n",
+                     "contentDeliveryNetwork\n",
+                     "cpanm\n",
+                     "de\n",
+                     "dialup\n",
+                     "downloadable\n",
+                     "ergument\n",
+                     "geoname_id\n",
+                     "hostname\n",
+                     "iPhones\n",
+                     "ip\n",
+                     "ja\n",
+                     "libmaxminddb\n",
+                     "lookup\n",
+                     "maxmind\n",
+                     "minFraud\n",
+                     "omni\n",
+                     "params\n",
+                     "routable\n",
+                     "ru\n",
+                     "searchEngineSpider\n",
+                     "subscores\n",
+                     "ua\n",
+                     "unpopulated\n",
+                     "versioning\n",
+                     "zh\n"
                   ],
                   "wordlist" : "Pod::Wordlist"
                }
@@ -618,7 +617,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
             "name" : "@MAXMIND/PodSyntaxTests",
-            "version" : "6.009"
+            "version" : "6.010"
          },
          {
             "class" : "Dist::Zilla::Plugin::RunExtraTests",
@@ -735,7 +734,7 @@
                }
             },
             "name" : "@MAXMIND/Test::Compile",
-            "version" : "2.056"
+            "version" : "2.057"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::ReportPrereqs",
@@ -750,13 +749,13 @@
          {
             "class" : "Dist::Zilla::Plugin::MAXMIND::Contributors",
             "name" : "@MAXMIND/MAXMIND::Contributors",
-            "version" : "0.80"
+            "version" : "0.84"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.11.0",
+                  "git_version" : "2.14.1",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "name",
@@ -907,7 +906,7 @@
          {
             "class" : "Dist::Zilla::Plugin::MAXMIND::WeaverConfig",
             "name" : "@MAXMIND/MAXMIND::WeaverConfig",
-            "version" : "0.80"
+            "version" : "0.84"
          },
          {
             "class" : "Dist::Zilla::Plugin::ReadmeAnyFromPod",
@@ -947,12 +946,12 @@
          {
             "class" : "Dist::Zilla::Plugin::CPANFile",
             "name" : "@MAXMIND/CPANFile",
-            "version" : "6.009"
+            "version" : "6.010"
          },
          {
             "class" : "Dist::Zilla::Plugin::MAXMIND::License",
             "name" : "@MAXMIND/MAXMIND::License",
-            "version" : "0.80"
+            "version" : "0.84"
          },
          {
             "class" : "Dist::Zilla::Plugin::CheckStrictVersion",
@@ -983,24 +982,24 @@
          {
             "class" : "Dist::Zilla::Plugin::MAXMIND::CheckChangesHasContent",
             "name" : "@MAXMIND/MAXMIND::CheckChangesHasContent",
-            "version" : "0.80"
+            "version" : "0.84"
          },
          {
             "class" : "Dist::Zilla::Plugin::MAXMIND::Git::CheckFor::CorrectBranch",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.11.0",
+                  "git_version" : "2.14.1",
                   "repo_root" : "."
                }
             },
             "name" : "@MAXMIND/MAXMIND::Git::CheckFor::CorrectBranch",
-            "version" : "0.80"
+            "version" : "0.84"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.11.0",
+                  "git_version" : "2.14.1",
                   "repo_root" : "."
                }
             },
@@ -1010,12 +1009,12 @@
          {
             "class" : "Dist::Zilla::Plugin::MAXMIND::TidyAll",
             "name" : "@MAXMIND/MAXMIND::TidyAll",
-            "version" : "0.80"
+            "version" : "0.84"
          },
          {
             "class" : "Dist::Zilla::Plugin::UploadToCPAN",
             "name" : "@MAXMIND/UploadToCPAN",
-            "version" : "6.009"
+            "version" : "6.010"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Check",
@@ -1037,7 +1036,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.11.0",
+                  "git_version" : "2.14.1",
                   "repo_root" : "."
                }
             },
@@ -1065,7 +1064,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.11.0",
+                  "git_version" : "2.14.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1082,12 +1081,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v1.005000",
+                  "tag" : "v1.005001",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.11.0",
+                  "git_version" : "2.14.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1107,7 +1106,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.11.0",
+                  "git_version" : "2.14.1",
                   "repo_root" : "."
                }
             },
@@ -1147,7 +1146,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.11.0",
+                  "git_version" : "2.14.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1167,7 +1166,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.11.0",
+                  "git_version" : "2.14.1",
                   "repo_root" : "."
                }
             },
@@ -1177,57 +1176,57 @@
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":InstallModules",
-            "version" : "6.009"
+            "version" : "6.010"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":IncModules",
-            "version" : "6.009"
+            "version" : "6.010"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":TestFiles",
-            "version" : "6.009"
+            "version" : "6.010"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExtraTestFiles",
-            "version" : "6.009"
+            "version" : "6.010"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExecFiles",
-            "version" : "6.009"
+            "version" : "6.010"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":PerlExecFiles",
-            "version" : "6.009"
+            "version" : "6.010"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ShareFiles",
-            "version" : "6.009"
+            "version" : "6.010"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":MainModule",
-            "version" : "6.009"
+            "version" : "6.010"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":AllFiles",
-            "version" : "6.009"
+            "version" : "6.010"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":NoFiles",
-            "version" : "6.009"
+            "version" : "6.010"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : "@MAXMIND/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
-            "version" : "6.009"
+            "version" : "6.010"
          }
       ],
       "zilla" : {
@@ -1235,7 +1234,7 @@
          "config" : {
             "is_trial" : 0
          },
-         "version" : "6.009"
+         "version" : "6.010"
       }
    },
    "x_authority" : "cpan:MAXMIND",
@@ -1249,6 +1248,6 @@
       "Patrick Cronin <PatrickCronin@users.noreply.github.com>",
       "Ruben Navarro <rbnx@users.noreply.github.com>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

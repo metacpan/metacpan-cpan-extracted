@@ -1,9 +1,19 @@
-============================
 App::Dochazka::REST Wishlist
-============================
 
 This file is for feature requests, cleanup tasks, and other issues that 
-are worth pursuing, but not right now.
+are worth pursuing "when the time is right".
+
+------------------------------------------------------------------------
+LDAP: implement a "GET ldap/info" resource
+
+    This resource would return:
+
+    - LDAP server: string (e.g. pan.suse.de)
+    - alive: boolean value
+
+    Would need to implement a "ping" routine in LDAP.pm
+
+    Adapt LDAP tests to skip if LDAP is enabled but server is not reachable.
 
 
 ------------------------------------------------------------------------

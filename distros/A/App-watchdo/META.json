@@ -4,7 +4,7 @@
       "Ivan Wills <ivan.wills@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4216",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
@@ -17,7 +17,7 @@
       "build" : {
          "requires" : {
             "Test::More" : "0.88",
-            "Test::Warnings" : "0"
+            "Test::Warnings" : "0.026"
          }
       },
       "configure" : {
@@ -31,7 +31,7 @@
             "AnyEvent::Filesys::Notify" : "1.21",
             "AnyEvent::Loop" : "0",
             "List::MoreUtils" : "0.4",
-            "Moo" : "2.000002",
+            "Moo" : "2.0",
             "Path::Tiny" : "0.068",
             "VCS::Which" : "v0.6.1",
             "perl" : "5.006",
@@ -42,7 +42,7 @@
    "provides" : {
       "App::watchdo" : {
          "file" : "lib/App/watchdo.pm",
-         "version" : "v0.0.6"
+         "version" : "v0.0.7"
       }
    },
    "release_status" : "stable",
@@ -57,6 +57,6 @@
          "url" : "git://github.com/ivanwills/App-watch-do.git"
       }
    },
-   "version" : "v0.0.6",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "v0.0.7",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

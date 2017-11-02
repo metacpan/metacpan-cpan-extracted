@@ -1,6 +1,25 @@
 Changelog for MarpaX-ESLIF
 
-2.0.19 2017-10-25T04:45:25
+2.0.22 2017-10-30T03:45:29
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Revert "Version 2.0.23 [ci skip]"
+ - Version 2.0.23 [ci skip]
+ - Perls dist.ini, removed a redundant line [ci skip]
+ - Perls dist.ini, closes #3 [ci skip]
+
+2.0.21 2017-10-29T19:42:39Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Perls dist.ini: printout OTHERLDFLAGS [ci skip]
+ - ExtUtils::CBuilder is appending CFLAGS and LDFLAGS, not the others [ci
+   skip]
+ - Version 2.0.21 [ci skip]
+ - [perl] dist.ini work on tweaking all flags
+
+2.0.20 2017-10-28T05:06:02Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - For clang, use std=gnu99 - Version 2.0.20 [ci skip]
+
+2.0.19 2017-10-25T04:45:25Z
  [Jean-Damien Durand <jeandamiendurand@free.fr>]
  - Version 2.0.19
  - For perl Prereqs / TestRequires, hardcoded dependencies not

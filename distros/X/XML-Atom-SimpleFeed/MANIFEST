@@ -6,10 +6,10 @@ META.json
 META.yml
 Makefile.PL
 README
+cpanfile
 dist.ini
 eg/slackware-news
 lib/XML/Atom/SimpleFeed.pm
-t/00-compile.t
 t/bugs.t
 t/date_construct.t
 t/encodings.t

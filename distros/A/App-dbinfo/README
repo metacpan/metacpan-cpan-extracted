@@ -2,8 +2,8 @@ NAME
     App::dbinfo - Get/extract information from database
 
 VERSION
-    This document describes version 0.002 of App::dbinfo (from Perl
-    distribution App-dbinfo), released on 2017-08-25.
+    This document describes version 0.003 of App::dbinfo (from Perl
+    distribution App-dbinfo), released on 2017-10-30.
 
 SYNOPSIS
     See included script dbinfo.

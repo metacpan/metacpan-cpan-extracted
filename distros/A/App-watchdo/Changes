@@ -1,5 +1,17 @@
 Revision history for App-watchdo
 
+0.0.7   2017-10-29
+        Updating for release of version 0.0.7
+        Adding build/test (Ivan Wills)
+        Updated licence date (Ivan Wills)
+        Cleaning code (Ivan Wills)
+        Fixing docs (Ivan Wills)
+        Fixed dependencies (Ivan Wills)
+        Skipping vtide files (Ivan Wills)
+        Added editing files (Ivan Wills)
+        Added verbose option (Ivan Wills)
+        Updating Test dependencies for better windows experience (Ivan Wills)
+
 0.0.6   2016-08-07
         Updating for release of version 0.0.6
         Added missing documentation (Ivan Wills)

@@ -13,7 +13,7 @@ use URI::Escape  ();
 use base qw(Exporter);
 our @EXPORT = qw(serve_static);
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 my $line_end = "\015\012";
 
@@ -47,6 +47,8 @@ sub serve_static {
     my ( $self, $cgi, $base ) = @_;
     $base //= q{.};
 
+    my $realbase = Cwd::realpath($base);
+
     my $path = $cgi->url( -absolute => 1, -path_info => 1 );
 
     # Internet Explorer provides the full URI in the GET section
@@ -61,12 +63,12 @@ sub serve_static {
     # file path.
 
     my @parts = split q{/+}, $path;
-    my $fullpath = catfile( $base, @parts );
+    my $fullpath = catfile( $realbase, @parts );
 
     # Sanitize the path and try it.
 
     my $realpath = Cwd::realpath($fullpath);
-    if ( !$realpath || $realpath !~ m/^\Q$base\E/ ) {
+    if ( !$realpath || $realpath !~ m/^\Q$realbase\E/ ) {
         # directory traversal attack!
         return 0;
     }

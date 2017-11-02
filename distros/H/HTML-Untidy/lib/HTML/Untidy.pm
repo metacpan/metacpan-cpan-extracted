@@ -1,6 +1,6 @@
 package HTML::Untidy;
 # ABSTRACT: yet another way to write HTML quickly and programmatically
-$HTML::Untidy::VERSION = '0.01';
+$HTML::Untidy::VERSION = '0.02';
 
 use strict;
 use warnings;
@@ -155,7 +155,7 @@ HTML::Untidy - yet another way to write HTML quickly and programmatically
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

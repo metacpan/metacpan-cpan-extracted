@@ -1,5 +1,5 @@
 package Net::HTTP::Spore::Middleware::Mock;
-$Net::HTTP::Spore::Middleware::Mock::VERSION = '0.07';
+$Net::HTTP::Spore::Middleware::Mock::VERSION = '0.09';
 # ABSTRACT: Simple Mocker for Spore middlewares
 
 use Moose;
@@ -32,7 +32,7 @@ Net::HTTP::Spore::Middleware::Mock - Simple Mocker for Spore middlewares
 
 =head1 VERSION
 
-version 0.07
+version 0.09
 
 =head1 SYNOPSIS
 

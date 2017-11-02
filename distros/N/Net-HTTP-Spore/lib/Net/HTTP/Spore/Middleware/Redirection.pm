@@ -1,5 +1,5 @@
 package Net::HTTP::Spore::Middleware::Redirection;
-$Net::HTTP::Spore::Middleware::Redirection::VERSION = '0.07';
+$Net::HTTP::Spore::Middleware::Redirection::VERSION = '0.09';
 # ABSTRACT: Middleware for redirections
 
 use Moose;
@@ -59,7 +59,7 @@ Net::HTTP::Spore::Middleware::Redirection - Middleware for redirections
 
 =head1 VERSION
 
-version 0.07
+version 0.09
 
 =head1 SYNOPSIS
 

@@ -1,7 +1,7 @@
 package App::DumpFirefoxHistory;
 
-our $DATE = '2017-03-20'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2017-11-01'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -48,7 +48,7 @@ sub dump_firefox_history {
             return [412, "Can't find any profile directory under ~/.mozilla/firefox"]
                 unless @dirs;
             for my $dir (@dirs) {
-                if ($dir =~ /\.\Q$profile\E\z/) {
+                if ($dir =~ /\.\Q$profile\E(?:-\d+)?\z/) {
                     $profile_dir = $dir;
                     last GET_PROFILE_DIR;
                 }
@@ -97,7 +97,7 @@ App::DumpFirefoxHistory - Dump Firefox history
 
 =head1 VERSION
 
-This document describes version 0.001 of App::DumpFirefoxHistory (from Perl distribution App-DumpFirefoxHistory), released on 2017-03-20.
+This document describes version 0.002 of App::DumpFirefoxHistory (from Perl distribution App-DumpFirefoxHistory), released on 2017-11-01.
 
 =head1 SYNOPSIS
 

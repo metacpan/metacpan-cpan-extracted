@@ -9,7 +9,7 @@ use Alien::Build::Plugin::Extract::CommandLine;
 use Alien::Build::Plugin::Extract::Directory;
 
 # ABSTRACT: Extraction negotiation plugin
-our $VERSION = '1.25'; # VERSION
+our $VERSION = '1.28'; # VERSION
 
 
 has '+format' => 'tar';
@@ -94,7 +94,7 @@ Alien::Build::Plugin::Extract::Negotiate - Extraction negotiation plugin
 
 =head1 VERSION
 
-version 1.25
+version 1.28
 
 =head1 SYNOPSIS
 
@@ -177,6 +177,10 @@ Petr Pisar (ppisar)
 Lance Wicks (LANCEW)
 
 Ahmad Fatoum (a3f, ATHREEF)
+
+José Joaquín Atria (JJATRIA)
+
+Duke Leto (LETO)
 
 =head1 COPYRIGHT AND LICENSE
 

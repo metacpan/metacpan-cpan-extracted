@@ -1,5 +1,5 @@
 package Net::HTTP::Spore::Middleware::Auth::Header;
-$Net::HTTP::Spore::Middleware::Auth::Header::VERSION = '0.07';
+$Net::HTTP::Spore::Middleware::Auth::Header::VERSION = '0.09';
 # ABSTRACT: middleware for authentication with specific header
 
 use Moose;
@@ -30,7 +30,7 @@ Net::HTTP::Spore::Middleware::Auth::Header - middleware for authentication with 
 
 =head1 VERSION
 
-version 0.07
+version 0.09
 
 =head1 SYNOPSIS
 

@@ -1,139 +1,51 @@
-		       =======================
-		       Image::DS9 Version 0.17
-		       =======================
+Image::DS9
 
+This class provides access to the DS9 image display and analysis program
+through its XPA access points.
 
-NAME
-    Image::DS9 - interface to the DS9 image display and analysis program
+DS9 is a rather flexible and feature-rich image display program. Rather
+than extol its virtues, please consult the website in "REQUIREMENTS".
 
+While one could communicate with DS9 solely via the IPC::XPA class, this
+class provides a cleaner, less error prone interface, as it checks the
+passed commands and arguments for syntax and data type. It also cleans
+up returned data from DS9.
 
-DESCRIPTION
-
-    Image::DS9 is an interface to the DS9 program developed by the
-    Smithsonian Astrophysical Observatory's High Energy Astrophysics
-    R&D Group.  DS9 is a flexible and feature laden image display and
-    analysis program.  While targeted at the astronomical community,
-    it is versatile enough to be used with success by others.
-
-    Image::DS9 communicates with DS9 via the XPA librariy.
-    It supports most of DS9's XPA access points.  It is
-    built to interoperate with PDL.
-
-    For details on DS9, including the source (and binaries for some
-    platforms), please refer to
-
-	http://hea-www.harvard.edu/RD/ds9/
-
-DEPENDENCIES
-
-    This module requires the IPC::XPA module to communicate with ds9.
-    IPC::XPA is available from CPAN; it requires the XPA library
-    available at
-
-	http://hea-www.harvard.edu/RD/xpa/
-
-    It requires DS9 v2.2. Due to a change in the colormap XPA access
-    point, it is not compatible with older versions of DS9.  Sorry!
+To use this class, first construct a Image::DS9 object, and then apply
+its methods. It is possible to both address more than one DS9 with a
+single object, as well as having multiple Image::DS9 objects communicate
+with their own DS9 invocations. Eventually there will be documentation
+spelling out how to do this.
 
 INSTALLATION
 
-    This package has been tested on Perl 5.6.0, and xpa 2.1.2.
-    It has been tested on Solaris 2.8.
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
 
-    You will need to install IPC::XPA first.
+  cpanm .
+  cpan  .
+  cpanp -i .
 
-    To compile, test and install Image::DS9,
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
 
-	perl Makefile.PL
-	make
-	make test
-	make install
+  perl Makefile.PL
+  make
+  make test
+  make install
 
-    PLEASE NOTE! the tests will start up a DS9 in the background using
-    system().  For some reason the first time the tests are run (and
-    DS9 is started) the first test hangs after completion (at least on
-    my system).  Interrupting the test and running "make test" a
-    second time succeeds.
+LICENSE
 
-CHANGES
+This software is released under the GNU General Public License. You may
+find a copy at
 
-    Major changes only. See the Changes file for more details.
+   http://www.fsf.org/copyleft/gpl.html
 
-    0.17
-    ----
-      - Image::DS9::Constants added, to get at the constants in the
-        new, approved, fashion.
+COPYRIGHT AND LICENSE
 
-    0.16
-    ----
-      - most of DS9's access points are now supported.
+This software is Copyright (c) 2017 by Smithsonian Astrophysical
+Observatory.
 
-      - now uses a table driven parser to generate the methods and
-        data conversion between Perl and DS9.
+This is free software, licensed under:
 
-      - realized the futility of keeping the docs up-to-date in
-        parallel with DS9.  Now just list the options supported,
-	rather than duplicate the DS9 docs.
-
-      - the display() and tile_mode() methods are no longer supported.
-        display() was an attempt to unify tile, blink, and single
-        in a clean way.  I've decided to just track the actual
-	XPA access methods rather than foist my view of how things
-	should tie together. So, display() should be replaced with
-	the appropriate calls to tile(), blink(), or single().
-	tile_mode() was really tile() all along...
-
-      - earlier versions of this package had a gadzillion constants
-        for all of the commands and subcommands and enumerated values.
-        this was a real mess.  the constants have been moved to
-	Image::DS9::OldConstants, and are deprecated.
-	
-
-    0.15 
-    ----
-      Added dss().
-
-    0.13
-    ----
-    Image::DS9 is now GPL'd.
-
-    There is a large number of changes since the last public release,
-    0.09.  Substantially more of DS9's capabilities are now available.
-    
-    There are a few incompatibilities:
-
-      - DS9 v2.1 has changed the colormap XPA access point to
-	cmap.  Image::DS9 now required DS9 v2.1
-
-      - the constants TRUE and FALSE have been removed, due to Export
-        problems.
-	
-      - renamed T_Grid, T_Column, and T_Row to T_grid, T_column,
-	T_row
-
-
-COPYRIGHT
-
-    Copyright (C) 2000-2002 Smithsonian Astrophysical Observatory.
-    All rights reserved.
-
-    This program is free software; you can redistribute it and/or
-    modify it under the terms of the GNU General Public License as
-    published by the Free Software Foundation; either version 2 of the
-    License, or (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-    02111-1307 USA
-
-
-AUTHOR
-
-    Diab Jerius ( djerius@cfa.harvard.edu )
-
+  The GNU General Public License, Version 3, June 2007

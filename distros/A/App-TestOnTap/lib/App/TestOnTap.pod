@@ -7,7 +7,7 @@ their TAP output and optionally save the aggregated results for later processing
 
 =head1 VERSION
 
-Version 0.037
+Version 0.040
 
 =head1 SYNOPSIS
 
@@ -155,7 +155,8 @@ delimiter on all platforms. Directories will be suffixed with a '/'.
 Generally, this file should at a minimum always contain a line of "id = <UUID>". In fact, if no config file is
 present, a warning will be displayed to the effect that a newly generated id will be used for each run. See below.  
 
-Empty lines are ignored, and comments can be made by starting the line with '#'.
+Empty lines are ignored, and comments can be made by starting the line with '#'. Unknown keys/sections
+will generate warnings but will otherwise be ignored. 
 
 The following keys/sections are valid:
 
@@ -198,8 +199,9 @@ This would avoid the 'unfinished_test.pl' file and contents of any '_data' direc
 =item B<preprocess>
 
 This is optional. If given, it should describe a simple command line for a command that will be run before tests and this command
-can influence how to run the tests or their context. It will be run with the initial environment and be passed the users arguments
-(if any).
+can influence how to run the tests or their context. It will be run with the suite root set as the current directory.
+It will be passed the users arguments (if any) and the initial environment, including the special TESTONTAP_* variables
+(see L</"PARAMETER PASSING">).
 
 At present it supports manipulation of the environment and the arguments that will be passed to the tests.
 Normally, all tests, for better or worse, will be run with the environment active when TestOnTap was started.
@@ -207,13 +209,19 @@ However, occasionally a test suite may want for example, to ensure that some var
 they only have certain values, or similar. Same goes for the arguments.
 
 If the script runs and wants to set a specific environment/argument list, it must follow a specific protocol by printing the
-desired values enclosed with begin/end lines. Here's an example for the environment:
+desired values enclosed with begin/end lines.
 
+Here's an example:
+
+  # BEGIN ARGV
+  --file
+  /tmp/some dir name/thefile
+  # END ARGV
   # BEGIN ENV
   SOMEVARIABLE=somedata
   # END ENV
 
-Note that this uses C<ENV> as the begin/end marker. For the argument list, use C<ARGV>. In both cases it's one variable or argument
+Note that this uses C<ARGV> and C<ENV> as the begin/end markers. In both cases it's one variable or argument part
 per line.
 
 Note that if an override is made, it must comprise all values as it completely overwrites what was used beforehand!
@@ -225,6 +233,13 @@ are bypassed with a warning, but incorrect variable definitions are fatal errors
 The C<preprocess> value may be in multi-line/part format, which is required if the command contains
 whitespace in the individual parts. A plain string will be split on space in order to separate the command into
 parts.
+
+=item B<postprocess>
+
+This is similar to "preprocess", but output is effectively ignored. A non-zero exit code will cause a test fail however.
+
+It will be started with the suite root as the current directory and the arguments/environment established after
+preprocess.
 
 =item B<parallelizable>
 
@@ -264,7 +279,7 @@ If not given, the default commandline setting applies (C<none>).
 
 This section is optional, but recommended. It details how to decide which files are tests and how they should be executed. 
 Note that there is also possible to pass a file with this section manually using the '--execmap' option, in order
-to override or complement any defined execmap.
+to override or complement any defined execmap. For safety, no execmap is defined by default.
 
 The section should contain matched pairs of key/values named C<matchI<n>> and C<cmdI<n>>, where the C<match> part defines
 a L<Grep::Query> expression to match to test names, and the C<cmd> part defines the command line to use for matching tests.
@@ -287,7 +302,8 @@ Example:
 This means that any files found with the extensions 'pl' or 't' will be run by 'perl <file>' and that any 'jar' files
 will be run by 'java -jar <file>'. Any other files will be ignored.
 
-If no "EXECMAP" section is present, a default one will be used, equivalent to this for this release:
+If no "EXECMAP" section is present, an internal one can be used by specifying a commandline of
+C<--execmap :internal> which uses an execmap equivalent to this (for this release, may change):
 
   [EXECMAP]
   match1 = regexp[\.(t|pl)$]

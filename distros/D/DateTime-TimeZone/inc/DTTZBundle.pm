@@ -1,4 +1,4 @@
-package inc::DTTZBundle;
+package DTTZBundle;
 
 use strict;
 use warnings;

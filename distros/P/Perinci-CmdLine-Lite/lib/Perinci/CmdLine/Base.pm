@@ -1,7 +1,7 @@
 package Perinci::CmdLine::Base;
 
-our $DATE = '2017-08-09'; # DATE
-our $VERSION = '1.79'; # VERSION
+our $DATE = '2017-11-01'; # DATE
+our $VERSION = '1.80'; # VERSION
 
 use 5.010001;
 use strict;
@@ -19,6 +19,24 @@ BEGIN {
         require Mo; Mo->import(qw(build default));
     }
 }
+
+# BEGIN taken from Array::Iter
+sub __array_iter {
+    my $ary = shift;
+    my $i = 0;
+    sub {
+        if ($i < @$ary) {
+            return $ary->[$i++];
+        } else {
+            return undef;
+        }
+    };
+}
+
+sub __list_iter {
+    __array_iter([@_]);
+}
+# END from Array::Iter
 
 has actions => (is=>'rw');
 has common_opts => (is=>'rw');
@@ -535,6 +553,7 @@ sub do_dump {
 
     [200, "OK", $dump,
      {
+         stream => 0,
          "cmdline.skip_format" => 1,
      }];
 }
@@ -970,17 +989,6 @@ sub _parse_argv2 {
                 $has_cmdline_src = 1;
                 last;
             }
-            # this will probably be eventually checked by the rinci function's
-            # schema: stream arguments need to have cmdline_src set to
-            # stdin_or_file, stdin_or_files, stdin, or file.
-            if ($av->{stream}) {
-                unless ($av->{cmdline_src} &&
-                            $av->{cmdline_src} =~
-                                /\A(stdin|file|stdin_or_files?|stdin_or_args)\z/) {
-                    die "BUG: stream argument '$ak' needs to have cmdline_src ".
-                        "set to stdin, file, stdin_or_file, stdin_or_files, or stdin_or_args";
-                }
-            }
         }
 
         require Perinci::Sub::GetArgs::Argv;
@@ -1015,6 +1023,16 @@ sub _parse_argv2 {
         );
 
         return $ga_res unless $ga_res->[0] == 200;
+
+        # wrap stream arguments with iterator
+        my $args_p = $meta->{args} // {};
+        for my $arg (keys %{$ga_res->[2]}) {
+            next unless $args_p->{$arg};
+            next unless $args_p->{$arg}{stream};
+            for ($ga_res->[2]{$arg}) {
+                $_ = ref $_ eq 'ARRAY' ? __array_iter($_) : __list_iter($_);
+            }
+        }
 
         # restore
         for (keys %$copts) {
@@ -1559,7 +1577,7 @@ Perinci::CmdLine::Base - Base class for Perinci::CmdLine{::Classic,::Lite}
 
 =head1 VERSION
 
-This document describes version 1.79 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2017-08-09.
+This document describes version 1.80 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2017-11-01.
 
 =head1 DESCRIPTION
 

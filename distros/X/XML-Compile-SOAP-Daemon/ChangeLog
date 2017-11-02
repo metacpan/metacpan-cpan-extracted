@@ -4,6 +4,11 @@
 TODO:
   . trace incoming and outgoing messages server-side
 
+version 3.13: Thu  2 Nov 09:14:23 CET 2017
+
+	Fixes:
+	- change of exception output in Log::Report [cpantesters]
+
 version 3.12: Fri 13 May 21:21:11 CEST 2016
 
 	Fixes:

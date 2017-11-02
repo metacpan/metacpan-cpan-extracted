@@ -1,5 +1,5 @@
 ---
-abstract: 'Harness for parsing network device confiugrations'
+abstract: 'A harness for parsing network device configuration.'
 author:
   - 'Greg Foletta <greg@foletta.org>'
 build_requires:
@@ -16,10 +16,16 @@ name: Device-Network-ConfigParser
 provides:
   Device::Network::ConfigParser:
     file: lib/Device/Network/ConfigParser.pm
-    version: '0.002'
+    version: '0.004'
+  Device::Network::ConfigParser::CheckPoint::Expert:
+    file: lib/Device/Network/ConfigParser/CheckPoint/Expert.pm
+    version: '0.004'
   Device::Network::ConfigParser::CheckPoint::Gaia:
     file: lib/Device/Network/ConfigParser/CheckPoint/Gaia.pm
-    version: '0.002'
+    version: '0.004'
+  Device::Network::ConfigParser::Cisco::ASA:
+    file: lib/Device/Network/ConfigParser/Cisco/ASA.pm
+    version: '0.004'
 requires:
   Data::Dumper: '0'
   Exporter: '0'
@@ -38,5 +44,5 @@ resources:
   bugtracker: https://github.com/gregfoletta/Device-Network-ConfigParser/issues
   homepage: https://github.com/gregfoletta/Device-Network-ConfigParser
   repository: https://github.com/gregfoletta/Device-Network-ConfigParser.git
-version: '0.002'
+version: '0.004'
 x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -1,5 +1,5 @@
 #
-# $Id: Tool.pm,v 94e85541d72a 2017/02/04 16:34:12 gomor $
+# $Id: Tool.pm,v 28a22d60af64 2017/10/19 08:44:25 gomor $
 #
 # brik::tool Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Shell::Command);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 94e85541d72a $',
+      revision => '$Revision: 28a22d60af64 $',
       tags => [ qw(unstable program) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -31,10 +31,13 @@ sub brik_properties {
          get_need_packages_recursive => [ qw(Brik) ],
          get_brik_hierarchy => [ qw(Brik) ],
          get_brik_hierarchy_recursive => [ qw(Brik) ],
+         install_packages => [ qw(package_list) ],
+         install_modules => [ qw(module_list) ],
          install_all_require_modules => [ ],
          install_all_need_packages => [ ],
          install_needed_packages => [ qw(Brik) ],
          install_required_modules => [ qw(Brik) ],
+         install_required_briks => [ qw(Brik) ],
          install => [ qw(Brik) ],
          create_tool => [ qw(filename.pl Repository|OPTIONAL) ],
          create_brik => [ qw(Brik Repository|OPTIONAL) ],
@@ -308,6 +311,7 @@ sub get_brik_hierarchy_recursive {
    # Then we search for complete hierarchy recursively
    for my $this (keys %$hierarchy) {
       next if $this eq $brik;  # Skip the provided one.
+      next if exists $hierarchy->{$this}; # Skip already analyzed ones.
       my $new = $self->get_brik_hierarchy_recursive($this) or return;
       for (@$new) {
          $hierarchy->{$_}++;
@@ -315,6 +319,28 @@ sub get_brik_hierarchy_recursive {
    }
 
    return [ sort { $a cmp $b } keys %$hierarchy ];
+}
+
+sub install_packages {
+   my $self = shift;
+   my ($packages) = @_;
+
+   $self->brik_help_run_undef_arg('install_packages', $packages) or return;
+   $self->brik_help_run_invalid_arg('install_packages', $packages, 'ARRAY') or return;
+
+   my $sp = Metabrik::System::Package->new_from_brik_init($self) or return;
+   return $sp->install($packages);
+}
+
+sub install_modules {
+   my $self = shift;
+   my ($modules) = @_;
+
+   $self->brik_help_run_undef_arg('install_modules', $modules) or return;
+   $self->brik_help_run_invalid_arg('install_modules', $modules, 'ARRAY') or return;
+
+   my $pm = Metabrik::Perl::Module->new_from_brik_init($self) or return;
+   return $pm->install($modules);
 }
 
 sub install_all_need_packages {
@@ -373,6 +399,9 @@ sub install_needed_packages {
    return $sp->install($packages);
 }
 
+#
+# Install modules that are NOT Briks.
+#
 sub install_required_modules {
    my $self = shift;
    my ($brik) = @_;
@@ -388,24 +417,91 @@ sub install_required_modules {
    return $pm->install($modules);
 }
 
-sub install {
+#
+# Install modules that are ONLY Briks.
+#
+sub install_required_briks {
    my $self = shift;
    my ($brik) = @_;
 
-   $self->brik_help_run_undef_arg('install', $brik) or return;
+   $self->brik_help_run_undef_arg('install_required_briks', $brik) or return;
 
-   $self->install_needed_packages($brik) or return;
-   $self->install_required_modules($brik) or return;
-
-   my $module = 'Metabrik';
-   my @toks = split(/::/, $brik);
-   for (@toks) {
-      $module .= '::'.ucfirst($_);
+   my $briks = $self->get_require_briks_recursive($brik) or return;
+   if (@$briks == 0) {
+      return 1;
    }
 
-   my $new = $module->new_from_brik_no_checks($self) or return;
-   if ($new->can('install')) {
-      $new->install or return;
+   my $packages = [];
+   my $modules = [];
+   for my $brik (@$briks) {
+      my $this_packages = $self->get_need_packages_recursive($brik) or next;
+      my $this_modules = $self->get_require_modules_recursive($brik) or next;
+      push @$packages, @$this_packages;
+      push @$modules, @$this_modules;
+   }
+
+   my $uniq_packages = {};
+   my $uniq_modules = {};
+   for (@$packages) { $uniq_packages->{$_}++; }
+   for (@$modules) { $uniq_modules->{$_}++; }
+   $packages = [ sort { $a cmp $b } keys %$uniq_packages ];
+   $modules = [ sort { $a cmp $b } keys %$uniq_modules ];
+
+   $self->install_packages($packages);
+   $self->install_modules($modules);
+
+   return 1;
+}
+
+sub install {
+   my $self = shift;
+   my ($briks) = @_;
+
+   $self->brik_help_run_undef_arg('install', $briks) or return;
+   my $ref = $self->brik_help_run_invalid_arg('install', $briks, 'ARRAY', 'SCALAR')
+      or return;
+
+   if ($ref eq 'SCALAR') {
+      $briks = [ $briks ];
+   }
+
+   my $packages = [];
+   my $modules = [];
+   for my $brik (@$briks) {
+      $packages = $self->get_need_packages_recursive($brik) or return;
+      $modules = $self->get_require_modules_recursive($brik) or return;
+      my $this_briks = $self->get_require_briks_recursive($brik) or return;
+
+      for my $this_brik (@$this_briks) {
+         my $this_packages = $self->get_need_packages_recursive($this_brik) or next;
+         my $this_modules = $self->get_require_modules_recursive($this_brik) or next;
+         push @$packages, @$this_packages;
+         push @$modules, @$this_modules;
+      }
+
+      my $uniq_packages = {};
+      my $uniq_modules = {};
+      for (@$packages) { $uniq_packages->{$_}++; }
+      for (@$modules) { $uniq_modules->{$_}++; }
+      $packages = [ sort { $a cmp $b } keys %$uniq_packages ];
+      $modules = [ sort { $a cmp $b } keys %$uniq_modules ];
+   }
+
+   $self->install_packages($packages) or return;
+   $self->install_modules($modules) or return;
+
+   # Execute special install Command if any.
+   for my $brik (@$briks) {
+      my $module = 'Metabrik';
+      my @toks = split(/::/, $brik);
+      for (@toks) {
+         $module .= '::'.ucfirst($_);
+      }
+
+      my $new = $module->new_from_brik_no_checks($self) or return;
+      if ($new->can('install')) {
+         $new->install or return;
+      }
    }
 
    return 1;

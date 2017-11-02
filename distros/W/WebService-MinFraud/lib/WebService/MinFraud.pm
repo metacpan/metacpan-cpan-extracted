@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '1.005000';
+our $VERSION = '1.005001';
 
 1;
 
@@ -22,7 +22,7 @@ WebService::MinFraud - API for MaxMind's minFraud Score, Insights, and Factors s
 
 =head1 VERSION
 
-version 1.005000
+version 1.005001
 
 =head1 SYNOPSIS
 

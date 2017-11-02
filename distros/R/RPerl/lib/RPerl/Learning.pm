@@ -3,7 +3,7 @@ use RPerl;
 package RPerl::Learning;
 use strict;
 use warnings;
-our $VERSION = 0.189_000;
+our $VERSION = 0.190_000;
 
 # [[[ OO INHERITANCE ]]]
 # NEED FIX: why does the following 'use parent' command cause $VERSION to become undefined???
@@ -23,7 +23,7 @@ __END__
 
 =encoding utf8
 
-=for DEV NOTE: BEGIN INLINE CSS DIV
+=for comment DEV NOTE: BEGIN INLINE CSS DIV
 
 =begin html
 
@@ -623,7 +623,7 @@ Throughout this text, the following 14 typography conventions are utilized:
 
 =for html <u>
 
-=item * B<Book Title>
+=item * B<Book Or Document Title>
 
 =item * I<BEST PRACTICES>
 
@@ -1638,6 +1638,8 @@ X<br>
 Most programming languages include the basic principles of using named I<"variables"> to store data values such as numbers, text strings, and lists of multiple numbers or strings.  Multiple variables may be created, each with different names such as C<$foo> or C<$bar> or C<$quux>, and each potentially containing a different value.
 
 A single piece of data, such as one number or one string, is called a I<"scalar">.  Multiple pieces of data combined into a single aggregate structure may be either an I<"array"> or a I<"hash">, described in chapters 3 and 6, respectively.  (Although sharing the same terminology, the I<hash> data structure is not related to the I<hash> C<#> tic-tac-toe character.)  In normal Perl, only scalar variable names begin with the dollar-sign C<$> I<"sigil">, while aggregate data structures are stored in variables starting with different sigils like at-sign C<@> or percent-sign C<%>.  A sigil is simply a special character prefixed to a word, in order to help us quickly identify different source code components.  In RPerl, all variable names begin the C<$> sigil, both scalar types and aggregate structures alike.
+
+=for comment DEV NOTE, CORRELATION #rp400: all POD changes must be made in both RPerl.pm & RPerl/Learning.pm
 
 RPerl provides 7 scalar data types:
 
@@ -11615,11 +11617,11 @@ X<ENABLE_LIST_SPACING>
 
     ERROR ECOGEASRP00, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: Grammar rule '
                     . ($self_class)
-                    . ' found where Module_25 or Class_61 expected, dying
+                    . ' found where Module_25 or Class_72 expected, dying
 
     ERROR ECOGEASCP00, CODE GENERATOR, ABSTRACT SYNTAX TO C++: Grammar rule '
                     . ( ref $self )
-                    . ' found where TypeInnerProperties_224 or TypeInnerProperties_225 expected, dying
+                    . ' found where TypeInnerProperties_238 or TypeInnerProperties_239 expected, dying
 
 =for rperl X</noncode>
 
@@ -12734,23 +12736,9 @@ X<ENABLE_LIST_SPACING>
 
 =for rperl X<noncode>
 
-    ERROR EMV00, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\ngmp_integer external wrapper value expected but undefined/null value found,\ncroaking
+    ERROR EMPV00, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\ngmp_integer external wrapper value expected but undefined/null value found,\ncroaking
 
-    ERROR EMV00, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\ngmp_integer external wrapper value expected but undefined/null value found,\nin variable %s from subroutine %s,\ncroaking", variable_name, subroutine_name
-
-=for rperl X</noncode>
-
-I<SOLUTION: BAZ_SOLUTION>
-
-X<ENABLE_LIST_SPACING>
-
-=item * PROBLEM: BAZ_PROBLEM_LABEL
-
-=for rperl X<noncode>
-
-    ERROR EMV01, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\ngmp_integer external wrapper value expected but non-hashref value found,\ncroaking
-
-    ERROR EMV01, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\ngmp_integer external wrapper value expected but non-hashref value found,\nin variable %s from subroutine %s,\ncroaking", variable_name, subroutine_name
+    ERROR EMPV00, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\ngmp_integer external wrapper value expected but undefined/null value found,\nin variable %s from subroutine %s,\ncroaking", variable_name, subroutine_name
 
 =for rperl X</noncode>
 
@@ -12762,23 +12750,9 @@ X<ENABLE_LIST_SPACING>
 
 =for rperl X<noncode>
 
-    ERROR EMV02, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\ngmp_integer external wrapper value expected but non-object (blessed hashref) value found,\ncroaking
+    ERROR EMPV01, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\ngmp_integer external wrapper value expected but non-hashref value found,\ncroaking
 
-    ERROR EMV02, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\ngmp_integer external wrapper value expected but non-object (blessed hashref) value found,\nin variable %s from subroutine %s,\ncroaking", variable_name, subroutine_name
-
-=for rperl X</noncode>
-
-I<SOLUTION: BAZ_SOLUTION>
-
-X<ENABLE_LIST_SPACING>
-
-=item * PROBLEM: BAZ_PROBLEM_LABEL
-
-=for rperl X<noncode>
-
-    ERROR EMV03, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\ngmp_integer external wrapper value expected but non-Math::BigInt-derived object value found,\ncroaking
-
-    ERROR EMV03, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\ngmp_integer external wrapper value expected but non-Math::BigInt-derived object value found,\nin variable %s from subroutine %s,\ncroaking", variable_name, subroutine_name
+    ERROR EMPV01, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\ngmp_integer external wrapper value expected but non-hashref value found,\nin variable %s from subroutine %s,\ncroaking", variable_name, subroutine_name
 
 =for rperl X</noncode>
 
@@ -12790,23 +12764,9 @@ X<ENABLE_LIST_SPACING>
 
 =for rperl X<noncode>
 
-    ERROR EMV04, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\ngmp_integer external wrapper value expected but non-gmp_integer object value found,\ncroaking
+    ERROR EMPV02, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\ngmp_integer external wrapper value expected but non-object (blessed hashref) value found,\ncroaking
 
-    ERROR EMV04, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\ngmp_integer external wrapper value expected but non-gmp_integer object value found,\nin variable %s from subroutine %s,\ncroaking", variable_name, subroutine_name
-
-=for rperl X</noncode>
-
-I<SOLUTION: BAZ_SOLUTION>
-
-X<ENABLE_LIST_SPACING>
-
-=item * PROBLEM: BAZ_PROBLEM_LABEL
-
-=for rperl X<noncode>
-
-    ERROR EMV05, MISSING HASH ENTRY, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\ngmp_integer internal wrapped object in hash entry expected at key 'value' but no hash entry exists,\ncroaking
-
-    ERROR EMV05, MISSING HASH ENTRY, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\ngmp_integer internal wrapped object in hash entry expected at key 'value' but no hash entry exists,\nin variable %s from subroutine %s,\ncroaking", variable_name, subroutine_name
+    ERROR EMPV02, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\ngmp_integer external wrapper value expected but non-object (blessed hashref) value found,\nin variable %s from subroutine %s,\ncroaking", variable_name, subroutine_name
 
 =for rperl X</noncode>
 
@@ -12818,23 +12778,9 @@ X<ENABLE_LIST_SPACING>
 
 =for rperl X<noncode>
 
-    ERROR EMV06, MISSING HASH ENTRY, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\ngmp_integer internal wrapped hash entry expected at key 'value' but no hash entry defined,\ncroaking
+    ERROR EMPV03, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\ngmp_integer external wrapper value expected but non-Math::BigInt-derived object value found,\ncroaking
 
-    ERROR EMV06, MISSING HASH ENTRY, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\ngmp_integer internal wrapped hash entry expected at key 'value' but no hash entry defined,\nin variable %s from subroutine %s,\ncroaking", variable_name, subroutine_name
-
-=for rperl X</noncode>
-
-I<SOLUTION: BAZ_SOLUTION>
-
-X<ENABLE_LIST_SPACING>
-
-=item * PROBLEM: BAZ_PROBLEM_LABEL
-
-=for rperl X<noncode>
-
-    ERROR EMV07, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\ngmp_integer internal wrapped value expected but undefined/null value found,\ncroaking
-
-    ERROR EMV07, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\ngmp_integer internal wrapped value expected but undefined/null value found,\nin variable %s from subroutine %s,\ncroaking", variable_name, subroutine_name
+    ERROR EMPV03, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\ngmp_integer external wrapper value expected but non-Math::BigInt-derived object value found,\nin variable %s from subroutine %s,\ncroaking", variable_name, subroutine_name
 
 =for rperl X</noncode>
 
@@ -12846,23 +12792,9 @@ X<ENABLE_LIST_SPACING>
 
 =for rperl X<noncode>
 
-    ERROR EMV08, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\ngmp_integer internal wrapped value expected but non-object (blessed hashref) value found,\ncroaking
+    ERROR EMPV04, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\ngmp_integer external wrapper value expected but non-gmp_integer object value found,\ncroaking
 
-    ERROR EMV08, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\ngmp_integer internal wrapped value expected but non-object (blessed hashref) value found,\nin variable %s from subroutine %s,\ncroaking", variable_name, subroutine_name); }
-
-=for rperl X</noncode>
-
-I<SOLUTION: BAZ_SOLUTION>
-
-X<ENABLE_LIST_SPACING>
-
-=item * PROBLEM: BAZ_PROBLEM_LABEL
-
-=for rperl X<noncode>
-
-    ERROR EMV09, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\ngmp_integer internal wrapped value expected but non-Math::BigInt::GMP object value found,\ncroaking
-
-    ERROR EMV09, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\ngmp_integer internal wrapped value expected but non-Math::BigInt::GMP object value found,\nin variable %s from subroutine %s,\ncroaking", variable_name, subroutine_name
+    ERROR EMPV04, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\ngmp_integer external wrapper value expected but non-gmp_integer object value found,\nin variable %s from subroutine %s,\ncroaking", variable_name, subroutine_name
 
 =for rperl X</noncode>
 
@@ -12874,7 +12806,77 @@ X<ENABLE_LIST_SPACING>
 
 =for rperl X<noncode>
 
-    ERROR EMV10, CONSTRUCTOR RETURN VALUE MISMATCH, CPPOPS_CPPTYPES:\nexactly 1 return value expected but %"INTEGER" return value(s) found,\ncroaking", callback_retval_count
+    ERROR EMPV05, MISSING HASH ENTRY, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\ngmp_integer internal wrapped object in hash entry expected at key 'value' but no hash entry exists,\ncroaking
+
+    ERROR EMPV05, MISSING HASH ENTRY, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\ngmp_integer internal wrapped object in hash entry expected at key 'value' but no hash entry exists,\nin variable %s from subroutine %s,\ncroaking", variable_name, subroutine_name
+
+=for rperl X</noncode>
+
+I<SOLUTION: BAZ_SOLUTION>
+
+X<ENABLE_LIST_SPACING>
+
+=item * PROBLEM: BAZ_PROBLEM_LABEL
+
+=for rperl X<noncode>
+
+    ERROR EMPV06, MISSING HASH ENTRY, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\ngmp_integer internal wrapped hash entry expected at key 'value' but no hash entry defined,\ncroaking
+
+    ERROR EMPV06, MISSING HASH ENTRY, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\ngmp_integer internal wrapped hash entry expected at key 'value' but no hash entry defined,\nin variable %s from subroutine %s,\ncroaking", variable_name, subroutine_name
+
+=for rperl X</noncode>
+
+I<SOLUTION: BAZ_SOLUTION>
+
+X<ENABLE_LIST_SPACING>
+
+=item * PROBLEM: BAZ_PROBLEM_LABEL
+
+=for rperl X<noncode>
+
+    ERROR EMPV07, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\ngmp_integer internal wrapped value expected but undefined/null value found,\ncroaking
+
+    ERROR EMPV07, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\ngmp_integer internal wrapped value expected but undefined/null value found,\nin variable %s from subroutine %s,\ncroaking", variable_name, subroutine_name
+
+=for rperl X</noncode>
+
+I<SOLUTION: BAZ_SOLUTION>
+
+X<ENABLE_LIST_SPACING>
+
+=item * PROBLEM: BAZ_PROBLEM_LABEL
+
+=for rperl X<noncode>
+
+    ERROR EMPV08, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\ngmp_integer internal wrapped value expected but non-object (blessed hashref) value found,\ncroaking
+
+    ERROR EMPV08, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\ngmp_integer internal wrapped value expected but non-object (blessed hashref) value found,\nin variable %s from subroutine %s,\ncroaking", variable_name, subroutine_name); }
+
+=for rperl X</noncode>
+
+I<SOLUTION: BAZ_SOLUTION>
+
+X<ENABLE_LIST_SPACING>
+
+=item * PROBLEM: BAZ_PROBLEM_LABEL
+
+=for rperl X<noncode>
+
+    ERROR EMPV09, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\ngmp_integer internal wrapped value expected but non-Math::BigInt::GMP object value found,\ncroaking
+
+    ERROR EMPV09, TYPE-CHECKING MISMATCH, CPPOPS_PERLTYPES & CPPOPS_CPPTYPES:\ngmp_integer internal wrapped value expected but non-Math::BigInt::GMP object value found,\nin variable %s from subroutine %s,\ncroaking", variable_name, subroutine_name
+
+=for rperl X</noncode>
+
+I<SOLUTION: BAZ_SOLUTION>
+
+X<ENABLE_LIST_SPACING>
+
+=item * PROBLEM: BAZ_PROBLEM_LABEL
+
+=for rperl X<noncode>
+
+    ERROR EMPV10, CONSTRUCTOR RETURN VALUE MISMATCH, CPPOPS_CPPTYPES:\nexactly 1 return value expected but %"INTEGER" return value(s) found,\ncroaking", callback_retval_count
 
 =for rperl X</noncode>
 
@@ -15797,6 +15799,8 @@ In this filing cabinet analogy, an array which is stored by value is like a norm
 To reiterate, an array stored by reference is actually a scalar variable which contains the memory address of an anonymous array.  When compared to the memory usage of storing an array by data, the memory needs of storing by reference only require one additional scalar value (one piece of paper in our filing cabinet analogy), which contains the anonymous array's memory address.  Both storing by value and storing by reference are commonly utilized in many different computer programming languages.
 
 When an array is stored by value, the corresponding variable has an at-sign C<@> as its sigil, and the assigned data is enclosed within parentheses C<( )> characters.  When an array is stored by reference, the corresponding variable has a dollar-sign C<$> as its sigil, and the assigned data is enclosed within I<"square-bracket"> C<[ ]> characters, also known as just I<"brackets">.  If an array is stored by value and is then passed as input to an operation, it is said the array is I<"passed by value">.  On the other hand, if the array is instead stored by reference and then passed to an operation, it is said to be I<"passed by reference">.
+
+=for comment DEV NOTE, CORRELATION #rp401: all POD changes must be made in both RPerl.pm & RPerl/Learning.pm
 
 For arrays with more than just a few elements, it may be impractical or impossible to pass by value, because a full copy of each array element must be made in the process, which may fill up all your program's available memory or take a prohibitively long time to complete.  Also, Perl allows us to provide explicit data types only when an array is stored by reference, so we can not provide a data type for an array stored by value.  Because of these reasons, all RPerl arrays are stored by reference, and are declared with an explicit RPerl data type ending with C<_arrayref>.
 
@@ -25578,7 +25582,7 @@ B<William N. Braswell, Jr.>
 
 L<mailto:william.braswell@NOSPAM.autoparallel.com>
 
-=for DEV NOTE: END INLINE CSS DIV
+=for comment DEV NOTE: END INLINE CSS DIV
 
 =for html </div>
 

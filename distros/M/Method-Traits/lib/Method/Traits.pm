@@ -4,7 +4,7 @@ package Method::Traits;
 use strict;
 use warnings;
 
-our $VERSION   = '0.07';
+our $VERSION   = '0.08';
 our $AUTHORITY = 'cpan:STEVAN';
 
 use Carp            ();
@@ -43,12 +43,23 @@ our %PROVIDERS_BY_PKG;
 sub import_into {
     my (undef, $package, @providers) = @_;
 
-    # add in the providers, so we can
-    # get to them when needed ...
-    Module::Runtime::use_package_optimistically( $_ ) foreach @providers;
-    push @{ $PROVIDERS_BY_PKG{ $package } ||=[] } => @providers;
+    Carp::confess('You must provide a valid package argument')
+        unless $package;
 
-    my $meta = Scalar::Util::blessed( $package ) ? $package : MOP::Class->new( $package );
+    Carp::confess('The package argument cannot be a reference or blessed object')
+        if ref $package;
+
+    Carp::confess('You must supply at least one provider')
+        unless scalar @providers;
+
+    # conver this into a metaobject
+    my $meta = MOP::Role->new( $package );
+
+    # load the providers, and then ...
+    Module::Runtime::use_package_optimistically( $_ ) foreach @providers;
+
+    # ... save the provider/package mapping
+    push @{ $PROVIDERS_BY_PKG{ $meta->name } ||=[] } => @providers;
 
     # no need to install the collectors
     # if they have already been installed
@@ -90,7 +101,7 @@ sub import_into {
             # return the bad traits as strings, as expected by attributes ...
             return @unhandled if @unhandled;
 
-            my $klass  = MOP::Class->new( $pkg );
+            my $klass  = MOP::Role->new( $pkg );
             my $method = MOP::Method->new( $code );
 
             foreach my $attribute ( @attributes ) {
@@ -126,7 +137,7 @@ Method::Traits - Apply traits to your methods
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -232,7 +243,7 @@ that the details will change, bear that in mind if you choose to use it.
 
 =head1 PERL VERSION COMPATIBILITY
 
-For the moment I am going to require 5.14.5 because of the following quote
+For the moment I am going to require 5.14.4 because of the following quote
 by Zefram in the L<Sub::WhenBodied> documentation:
 
   Prior to Perl 5.15.4, attribute handlers are executed before the body

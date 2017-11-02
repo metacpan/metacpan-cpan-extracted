@@ -11,11 +11,13 @@ t/10-new.t
 t/bing.t
 t/boiler.t
 t/canada.t
+t/census.t
 t/changes.t
 t/coverage.t
 t/critic.t
 t/cv.t
 t/dist.t
+t/geofarm.t
 t/google.t
 t/googleplaces.t
 t/gv.t
@@ -24,9 +26,11 @@ t/list.t
 t/manifest.t
 t/noplan.t
 t/osm.t
+t/ovi.t
 t/pod-cm.t
 t/pod.t
 t/postcodes.t
+t/rand.t
 t/snippets.t
 t/spelling.t
 t/unused.t

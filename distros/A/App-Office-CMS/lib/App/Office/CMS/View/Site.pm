@@ -1,18 +1,17 @@
 package App::Office::CMS::View::Site;
 
-use Any::Moose;
-use common::sense;
+use strict;
+use warnings;
 
 use File::Spec;
+
+use Moo;
 
 use Text::Xslate 'mark_raw';
 
 extends 'App::Office::CMS::View::Base';
 
-# If Moose...
-#use namespace::autoclean;
-
-our $VERSION = '0.92';
+our $VERSION = '0.93';
 
 # -----------------------------------------------
 
@@ -103,10 +102,5 @@ sub display
 } # End of display.
 
 # -----------------------------------------------
-
-no Any::Moose;
-
-# If Moose...
-#__PACKAGE__ -> meta -> make_immutable;
 
 1;

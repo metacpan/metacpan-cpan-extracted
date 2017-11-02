@@ -22,6 +22,7 @@ BEGIN {
 }
 use Config;
 use Config::AutoConf;
+use ExtUtils::CBuilder;
 use ExtUtils::Constant qw /constant_types C_constant XS_constant autoload/;
 use File::Basename;
 use File::Find;
@@ -32,42 +33,118 @@ use Try::Tiny;
 
 autoflush STDOUT 1;
 
-# iconv dependency is the trickest thing
+#
+# Our distribution have both C and CPP files, and we want to make sure that modifying
+# CFLAGS will not affect cpp files. Since we require a version of ExtUtils::CBuilder
+# that support the environment variables, explicitely setting the environment variables
+# from default ExtUtils::Cbuilder will ensure cc and cpp settings will become independant
+# if we are doing to modify any of them.
+# We do that for linker settings as well for coherency although we will NEVER touch them.
+# OTHERLDFLAGS will be specific to this makefile.
+#
+# Take care: with ExtUtils::CBuilder, $ENV{CFLAGS} and $ENV{LDFLAGS} are appended to default perl compile flags, not the others
+#
+#
+my %cbuilder_config = ExtUtils::CBuilder->new()->get_config;
+$ENV{CC} = $cbuilder_config{cc} // 'cc';
+$ENV{CFLAGS} = '';
+$ENV{CXX} = $cbuilder_config{cxx} // $ENV{CC};
+$ENV{CXXFLAGS} = $cbuilder_config{cxxflags} // $cbuilder_config{ccflags} // '';
+$ENV{LD} = $cbuilder_config{ld} // $ENV{CC};
+$ENV{LDFLAGS} = '';
+# OTHERLDFLAGS remains local and must affect ONLY this process, not sub-processes
+my @OTHERLDFLAGS = ();
+#
+print "\n";
+print "==========================================\n";
+print "Original compilers and linker settings as per ExtUtils::CBuilder\n";
+print "\n";
+print "\$ENV{CC}       (overwrite) " . ($ENV{CC} // '') . "\n";
+print "\$ENV{CFLAGS}   (   append) " . ($ENV{CFLAGS} // '') . "\n";
+print "\$ENV{CXX}      (overwrite) " . ($ENV{CXX} // '') . "\n";
+print "\$ENV{CXXFLAGS} (overwrite) " . ($ENV{CXXFLAGS} // '') . "\n";
+print "\$ENV{LD}       (overwrite) " . ($ENV{LD} // '') . "\n";
+print "\$ENV{LDFLAGS}  (   append) " . ($ENV{LDFLAGS} // '') . "\n";
+print "==========================================\n";
+print "\n";
+
+my $ac = Config::AutoConf->new();
+$ac->check_cc;
+
+# -------------
+# CC and CFLAGS
+# --------------
+#
+if (is_os_type('Windows')) {
+  print "# Windows platform: in case of MINGW headers, force -D__NO_INLINE__\n";
+  $ENV{CFLAGS} .= ' -D__NO_INLINE__';
+  $ENV{CXXFLAGS} .= ' -D__NO_INLINE__';
+}
+
+#
+# When the compiler is clang, there is a bug with inlining, c.f. for example
+# https://sourceforge.net/p/resil/tickets/6/
+#
+# if (is_os_type('Unix', 'darwin'))
+{
+  $ac->msg_checking(sprintf "if this is clang compiler");
+  if ($ac->link_if_else("#ifndef __clang__\n#error \"this is not clang compiler\"\n#endif\nint main() { return 0; }")) {
+      $ac->msg_result('yes');
+      #
+      # C.f. http://clang.llvm.org/compatibility.html#inline
+      #      https://bugzilla.mozilla.org/show_bug.cgi?id=917526
+      #
+      $ac->msg_notice("Adding -std=gnu99 to CFLAGS");
+      $ENV{CFLAGS} .= ' -std=gnu99';
+  } else {
+      $ac->msg_result('no');
+  }
+}
+
+# ----------------
+# CXX and CXXFLAGS
+# ----------------
+try {
+   my ($cxx_guess, $extra_cxxflags_guess, $extra_ldflags_guess) = guess_compiler();
+   $ENV{CXX} = $cxx_guess;
+   $ENV{CXXFLAGS} = ($cbuilder_config{ccflags} // '') . " $extra_cxxflags_guess";
+   push(@OTHERLDFLAGS, $extra_ldflags_guess) if $extra_ldflags_guess;
+} catch {
+   $ac->msg_checking(sprintf "if this is solaris compiler");
+   if ($ac->link_if_else("#if defined(__sun) && defined(__SVR4)\n#else\n#error \"this is not solaris compiler\"\n#endif\nint main() { return 0; }")) {
+      $ac->msg_result('yes');
+      $ac->msg_notice("Forcing CXX to CC");
+      $ENV{CXX} = 'CC';
+      # We know that ExtUtils::CBuilder will get that wrong...
+      # Since a cpp compiler can always compile c code, it is quite safe to assume that the cpp compiler shipped by the same c compiler vendor will accept all CFLAGS
+      $ac->msg_notice("Forcing CXXFLAGS to original perl CFLAGS");
+      $ENV{CXXFLAGS} = $cbuilder_config{ccflags} // '';
+      $ac->msg_notice("Adding -lCrun to OTHERLDFLAGS");
+      push(@OTHERLDFLAGS, '-lCrun');
+  } else {
+      $ac->msg_result('no');
+  }
+};
+
+# ---------------
+# iconv location
+# ---------------
+#
 # On non-Windows platforms we have to check if iconv is in libc or not -;
 # On windows it is using dlfcn-win32 that will imply a dependency on psapi. We verify this library is available
 #
-my $iconv_lib = '';
-my ($cpp_compiler, $cpp_libs);
-try {
-   ($cpp_compiler, $cpp_libs) = guess_compiler();
-} catch {
-   print STDOUT "ExtUtils::CppGuess failure, $_\n";
-   #
-   # Try ourself. guess_compiler() fails when this is not a gcc compiler.
-   #
-   if (is_os_type('Unix', 'solaris') || is_os_type('Unix', 'sunos')) {
-     #
-     # So this is very very probably native Sun cc, so CC should be used for C++ files
-     #
-     print STDOUT "Solaris/SunOS special CXX settings: setting environment variables CXX=CC, CXXFLAGS= and cpp_libs=-lCrun\n";
-     $ENV{CXX} = 'CC';
-     $ENV{CXXFLAGS} = '';
-     ($cpp_compiler, $cpp_libs) = ('CC', '-lCrun');
-   } else {
-     ($cpp_compiler, $cpp_libs) = ('cc', '');
-   }
-};
 if (! is_os_type('Windows')) {
-  print "# Determining iconv location\n";
   foreach my $this_lib ('', 'iconv', 'iconv-2') {
-    my $ac = Config::AutoConf->new();
-    $ac->check_cc;
-    $ac->msg_checking(sprintf "iconv is in %s library", $this_lib || 'standard');
+    $ac->msg_checking(sprintf "if iconv is in %s library", $this_lib || 'standard');
     my $conftest = $ac->lang_build_program("#include <stdlib.h>\n#include <iconv.h>", "{iconv_t cd; iconv(cd, NULL, NULL, NULL, NULL);}");
     $ac->push_libraries($this_lib) if $this_lib;
     if ($ac->link_if_else($conftest)) {
       $ac->msg_result('yes');
-      $iconv_lib = "-l${this_lib}" if $this_lib;
+      if ($this_lib) {
+        my $found_lib = "-l${this_lib}";
+        $ac->msg_notice("Adding $found_lib to OTHERLDFLAGS");
+        push(@OTHERLDFLAGS, $found_lib);
+      }
       last;
     } else {
       $ac->msg_result('no');
@@ -75,48 +152,30 @@ if (! is_os_type('Windows')) {
   }
 } else {
   print "# Determining the need for -lpsapi\n";
-  my $ac = Config::AutoConf->new();
   $ac->push_libraries('psapi');
   if ($ac->link_if_else("#include <windows.h>\n#include <psapi.h>\nint main() { EnumProcessModules(NULL, NULL, 0, NULL); }")) {
     if (basename($Config{cc}) =~ /^cl/i) {
-      $cpp_libs .= " psapi.lib";
+      $ac->msg_notice("Adding psapi.lib to OTHERLDFLAGS");
+      push(@OTHERLDFLAGS, "psapi.lib");
     } else {
-      $cpp_libs .= " -lpsapi";
+      $ac->msg_notice("Adding -lpsapi to OTHERLDFLAGS");
+      push(@OTHERLDFLAGS, "-lpsapi");
     }
-  }
-  print "# In case of MINGW headers, force -D__NO_INLINE__\n";
-  $ENV{CFLAGS} .= ' -D__NO_INLINE__';
-  $ENV{CXXFLAGS} .= ' -D__NO_INLINE__';
-}
-#
-# When the compiler is clang, there is a bug with inlining, c.f. for example
-# https://sourceforge.net/p/resil/tickets/6/
-#
-# if (is_os_type('Unix', 'darwin'))
-{
-  print "# Determining the need of inline compiler semantics\n";
-  my $ac = Config::AutoConf->new();
-  $ac->check_cc;
-  $ac->msg_checking(sprintf "if this is clang compiler");
-  if ($ac->link_if_else("#ifndef __clang__\n#error \"this is not clang compiler\"\n#endif\nint main() { return 0; }")) {
-      $ac->msg_result('yes');
-      #
-      # C.f. http://clang.llvm.org/compatibility.html#inline
-      #
-      print "# clang: adding -std=gnu89 compiler option\n";
-      $ENV{CFLAGS} .= ' -std=gnu89';
-  } else {
-      $ac->msg_result('no');
   }
 }
 
+my $OTHERLDFLAGS = join(' ', @OTHERLDFLAGS);
 print "\n";
 print "==========================================\n";
-print "Compilers settings\n";
+print "Tweaked compilers and linker settings\n";
 print "\n";
-print "CFLAGS              " . ($ENV{CFLAGS} // '') . "\n";
-print "CXXFLAGS            " . ($ENV{CXXFLAGS} // '') . "\n";
-print "OTHERLDFLAGS        $cpp_libs $iconv_lib\n";
+print "\$ENV{CC}       (overwrite) " . ($ENV{CC} // '') . "\n";
+print "\$ENV{CFLAGS}   (   append) " . ($ENV{CFLAGS} // '') . "\n";
+print "\$ENV{CXX}      (overwrite) " . ($ENV{CXX} // '') . "\n";
+print "\$ENV{CXXFLAGS} (overwrite) " . ($ENV{CXXFLAGS} // '') . "\n";
+print "\$ENV{LD}       (overwrite) " . ($ENV{LD} // '') . "\n";
+print "\$ENV{LDFLAGS}  (   append) " . ($ENV{LDFLAGS} // '') . "\n";
+print "OTHERLDFLAGS               $OTHERLDFLAGS\n";
 print "==========================================\n";
 print "\n";
 
@@ -187,40 +246,48 @@ find({ wanted => sub {
 print "Linking ESLIF\$(OBJ_EXT) using: @ldfrom\n";
 
 #
-# Copy/paste of Inline-CPP-0.74/inc/ILCPPConfig/CompilerGuess.pm
+# Inspired by Inline-CPP-0.74/inc/ILCPPConfig/CompilerGuess.pm
 #
 sub guess_compiler {
 
-  my( $cc_guess, $libs_guess, $guesser, %configuration );
+  my ($cxx_guess, $extra_cxxflags_guess, $extra_ldflags_guess, $guesser, %configuration);
 
   if( $Config::Config{osname} eq 'freebsd'
     && $Config::Config{osvers} =~ /^(\d+)/
     && $1 >= 10
   ){
-    $cc_guess = 'clang++';
-    $libs_guess = '-lc++';
+    if( $ENV{CC} =~ /\bclang\b/ ) {
+      $cxx_guess = $ENV{CC};
+      $cxx_guess =~ s/\bclang\b/clang++/;
+    } else {
+      $cxx_guess = 'clang++';
+    }
+    $extra_cxxflags_guess = '';     # Extra compile flag moved to compiler command -;
+    $extra_ldflags_guess = '-lc++'; # Extra linker flag
   }
   else {
-    $guesser = ExtUtils::CppGuess->new;
+    $guesser = ExtUtils::CppGuess->new(cc => $ENV{CC});
     %configuration = $guesser->module_build_options;
+    $extra_cxxflags_guess = $configuration{extra_compiler_flags};
+    $extra_ldflags_guess = $configuration{extra_linker_flags};
     if( $guesser->is_gcc ) {
-      if( $Config{cc} eq 'clang' ) {
-        $cc_guess = 'clang++';
+      if( $ENV{CC} =~ /\bclang\b/ ) {
+        $cxx_guess = $ENV{CC};
+        $cxx_guess =~ s/\bclang\b/clang++/;
       } else {
-        $cc_guess = 'g++';
+        if( $ENV{CC} =~ /\bgcc\b/ ) {
+          $cxx_guess = $ENV{CC};
+          $cxx_guess =~ s/\bgcc\b/g++/;
+        } else {
+          $cxx_guess = 'g++';
+        }
       }
-    }
-    elsif ( $guesser->is_msvc ) {
-      $cc_guess = 'cl';
+      $extra_cxxflags_guess = '';    # Extra compile flag moved to compiler command, extra linker flag untouched -;
     }
 
-    $cc_guess .= $configuration{extra_compiler_flags};
-    $libs_guess = $configuration{extra_linker_flags};
-
-    ( $cc_guess, $libs_guess )
-      = map { _trim_whitespace($_) } ( $cc_guess, $libs_guess );
+    ( $cxx_guess, $extra_cxxflags_guess, $extra_ldflags_guess ) = map { _trim_whitespace($_) } ( $cxx_guess, $extra_cxxflags_guess, $extra_ldflags_guess );
   }
-  return ( $cc_guess, $libs_guess );
+  return ( $cxx_guess, $extra_cxxflags_guess, $extra_ldflags_guess );
 }
 
 sub _trim_whitespace {
@@ -288,7 +355,7 @@ my %WriteMakefileArgs = (
     "threads" => 0,
     "utf8" => 0
   },
-  "VERSION" => "2.0.19",
+  "VERSION" => "2.0.22",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -298,7 +365,7 @@ my %WriteMakefileArgs = (
     %WriteMakefileArgs,
     OBJECT => 'ESLIF$(OBJ_EXT)',
     LDFROM => join(' ', '$(OBJECT)', @ldfrom),
-    dynamic_lib => { OTHERLDFLAGS => "$cpp_libs $iconv_lib" },
+    dynamic_lib => { OTHERLDFLAGS => join(' ', @OTHERLDFLAGS) },
     INC => join(' ', map { "-I$_ " } (File::Spec->catdir('src', 'output', 'include'), File::Spec->catdir('src', 'include'), File::Spec->catdir('src', 'output', '3rdparty', 'genericLogger', 'output', 'include'), File::Spec->catdir('src', 'output', '3rdparty', 'genericLogger', 'include'), File::Spec->catdir('src', 'output', '3rdparty', 'genericStack', 'include'), File::Spec->catdir('src', 'output', '3rdparty', 'genericHash', 'include') ) ),
 );
 

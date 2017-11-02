@@ -2,6 +2,8 @@
 
 trap "rm $1.sql" 1 2 15
 
+which sqlite3 || exit 0
+
 rm -f $1.sql
 gunzip -c $1.csv.gz | csv2sqlite -o allow_loose_quotes=1 /dev/stdin $1.sql
 echo "ALTER TABLE stdin RENAME TO $1;" | sqlite3 $1.sql

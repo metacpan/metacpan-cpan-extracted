@@ -1,0 +1,60 @@
+use 5.008001;
+use strict;
+use warnings;
+use ExtUtils::MakeMaker;
+
+WriteMakefile(
+  NAME             => 'GraphQL::Plugin::Convert::DBIC',
+  AUTHOR           => q{Ed J <etj@cpan.org>},
+  VERSION_FROM     => 'lib/GraphQL/Plugin/Convert/DBIC.pm',
+  ABSTRACT_FROM    => 'lib/GraphQL/Plugin/Convert/DBIC.pm',
+  LICENSE          => 'artistic_2',
+  MIN_PERL_VERSION => '5.014',
+  CONFIGURE_REQUIRES => {
+    'ExtUtils::MakeMaker' => '0',
+  },
+  TEST_REQUIRES => {
+    'Test::More' => '0.98',
+    'DBIx::Class::Schema' => 0,
+    'GraphQL' => '0.20', # plugin convert
+  },
+  PREREQ_PM => {
+    'DBIx::Class::Schema' => 0,
+    'GraphQL' => '0.20', # plugin convert
+  },
+  clean => { FILES => 'GraphQL-Plugin-Convert-DBIC-*' },
+  META_MERGE => {
+    "meta-spec" => { version => 2 },
+    dynamic_config => 0,
+    resources => {
+      x_IRC => 'irc://irc.perl.org/#graphql-perl',
+      repository => {
+        type => 'git',
+        url => 'git@github.com:graphql-perl/GraphQL-Plugin-Convert-DBIC.git',
+        web => 'https://github.com/graphql-perl/GraphQL-Plugin-Convert-DBIC',
+      },
+      bugtracker  => {
+        web => 'https://github.com/graphql-perl/GraphQL-Plugin-Convert-DBIC/issues',
+      },
+      license => [ 'http://dev.perl.org/licenses/' ],
+    },
+    prereqs => {
+      develop => {
+        requires => {
+          'Test::CheckManifest' => '0.9',
+          'Test::Pod' => '1.22',
+          'Pod::Markdown' => 0,
+        },
+      },
+    },
+  },
+);
+
+sub MY::postamble {
+  <<EOF;
+pure_all :: README.md
+
+README.md : lib/GraphQL/Plugin/Convert/DBIC.pm
+\tpod2markdown \$< >\$\@
+EOF
+}

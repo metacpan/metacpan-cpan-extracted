@@ -105,7 +105,7 @@ define ([
                 if (typeof fc === 'function') {
                     fc(data);
                 } else {
-                    lib.displayResult(data.payload.message);
+                    lib.displayError(data.payload.message);
                 }
             }
         });

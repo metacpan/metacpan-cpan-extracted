@@ -2,6 +2,9 @@ do { my $x = {
        'configure' => {
                         'requires' => {
                                         'ExtUtils::MakeMaker' => '0'
+                                      },
+                        'suggests' => {
+                                        'JSON::PP' => '2.27300'
                                       }
                       },
        'develop' => {
@@ -21,6 +24,7 @@ do { my $x = {
                                       'parent' => '0',
                                       'perl' => '5.006',
                                       'strict' => '0',
+                                      'utf8' => '0',
                                       'warnings' => '0'
                                     }
                     },

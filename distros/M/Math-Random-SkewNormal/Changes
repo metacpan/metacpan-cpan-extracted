@@ -1,4 +1,7 @@
 Revision history for Perl extension Math::Random::SkewNormal.
 
+0.02 and 0.03  Sat Oct 28 13:13 2017
+  - removed dependency for Perl6::Export::Attrs
+
 0.01  Sat Feb 19 19:11 2011
   - original version

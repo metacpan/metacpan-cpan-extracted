@@ -20,9 +20,10 @@ requires:
   Class::InsideOut: '1.06'
   JSON: '2.12'
   Net::OpenSSH: '0.39'
+  Scalar::Util: '0'
 resources:
   bugtracker: http://github.com/plainblack/ssh-rpc/issues
   repository: git://github.com/plainblack/ssh-rpc.git
-version: '1.203'
+version: '1.204'
 x_contributors:
   - 'Janos Mattyasovszky <mail@matya.hu>'

@@ -1,7 +1,9 @@
 package Net::Async::Trello::WS;
-$Net::Async::Trello::WS::VERSION = '0.001';
+$Net::Async::Trello::WS::VERSION = '0.002';
 use strict;
 use warnings;
+
+use Syntax::Keyword::Try;
 
 use parent qw(IO::Async::Notifier);
 
@@ -23,9 +25,9 @@ sub configure {
 sub connection {
     my ($self, %args) = @_;
     $self->{ws_connection} ||= do {
-        my $uri = $self->endpoint(
+        my $uri = $self->trello->endpoint(
             'websockets',
-            token => $self->ws_token,
+            token => $self->token,
         );
         $self->{ws}->connect(
             url        => $uri,
@@ -55,54 +57,50 @@ my %model_for_type = (
 sub subscribe {
     my ($self, $type, $id) = @_;
     $self->connection->then(sub {
-        shift->send_frame(
-            $json->encode({
+        my ($conn) = @_;
+        $log->tracef("Subscribing to %s %s", $type, $id);
+        $conn->send_frame(
+            buffer => $json->encode({
                 idModel          => $id,
                 invitationTokens => [],
                 modelType        => $model_for_type{$type},
                 reqid            => 1,
                 tags             => [qw(clientActions updates)],
                 type             => "subscribe",
-            })
+            }),
+            masked => 1
         );
-        Future->done;
     })
 }
 
-{
-my %types = reverse %Protocol::WebSocket::Frame::TYPES;
-sub on_raw_frame {
-	my ($self, $ws, $frame, $bytes) = @_;
+sub on_frame {
+	my ($self, $ws, $bytes) = @_;
     my $text = Encode::decode_utf8($bytes);
-    $log->debugf("Have frame opcode %d type %s with bytes [%s]", $frame->opcode, $types{$frame->opcode}, $text);
+    $log->debugf("Have frame [%s]", $text);
 
-    # Empty frame is used for PING, send a response back
-    if($frame->opcode == 1) {
-        if(!length($bytes)) {
-            $ws->send_frame('');
-        } else {
-            $log->tracef("<< %s", $text);
-            try {
-                my $data = $json->decode($text);
-                if(my $chan = $data->{idModelChannel}) {
-                    $log->tracef("Notification for [%s] - %s", $chan, $data);
-                    $self->{update_channel}{$chan}->emit($data->{notify});
-                } else {
-                    $log->warnf("No idea what %s is", $data);
-                }
-            } catch {
-                $log->errorf("Exception in websocket raw frame handling: %s (original text %s)", $@, $text);
+    if(length $text) {
+        $log->tracef("<< %s", $text);
+        try {
+            my $data = $json->decode($text);
+            if(my $chan = $data->{idModelChannel}) {
+                $log->tracef("Notification for [%s] - %s", $chan, $data);
+                $self->{update_channel}{$chan}->emit($data->{notify});
+            } else {
+                $log->warnf("No idea what %s is", $data);
             }
+        } catch {
+            $log->errorf("Exception in websocket raw frame handling: %s (original text %s)", $@, $text);
         }
+    } else {
+        # Empty frame is used for PING, send a response back
+        $self->pong;
     }
 }
-}
 
-sub on_frame {
-	my ($self, $ws, $text) = @_;
-    $log->debugf("Have WS frame [%s]", $text);
+sub pong {
+    my ($self) = @_;
+    $self->{ws}->send_frame('');
 }
-
 
 sub next_request_id {
     ++shift->{request_id}
@@ -117,8 +115,7 @@ sub _add_to_loop {
 
     $self->add_child(
         $self->{ws} = Net::Async::WebSocket::Client->new(
-            on_raw_frame => $self->curry::weak::on_raw_frame,
-            on_frame     => sub { },
+            on_frame => $self->curry::weak::on_frame,
         )
     );
     $self->add_child(
@@ -135,10 +132,11 @@ sub on_tick {
     my ($self) = @_;
     my $ws = $self->connection;
     return unless $ws->is_ready;
-    $ws->then(sub { shift->send_frame('') })
+    $self->pong;
 }
 
 sub trello { shift->{trello} }
+sub token { shift->{token} }
 
 sub ryu { shift->trello->ryu(@_) }
 

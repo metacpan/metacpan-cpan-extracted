@@ -5,17 +5,19 @@ use strict;
 use Carp;
 use Time::HiRes;
 
+# TODO: investigate Geo, Coder::ArcGIS
+
 =head1 NAME
 
 Geo::Coder::List - Call many geocoders
 
 =head1 VERSION
 
-Version 0.16
+Version 0.17
 
 =cut
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 our %locations;
 
 =head1 SYNOPSIS
@@ -139,7 +141,7 @@ sub geocode {
 
 	foreach my $g(@{$self->{geocoders}}) {
 		my $geocoder = $g;
-		if(ref($g) eq 'HASH') {
+		if(ref($geocoder) eq 'HASH') {
 			my $regex = $g->{'regex'};
 			if($location =~ $regex) {
 				$geocoder = $g->{'geocoder'};
@@ -182,7 +184,7 @@ sub geocode {
 				# Try to create a common interface, helps with HTML::GoogleMaps::V3
 				if(!defined($l->{geometry}{location}{lat})) {
 					if($l->{lat}) {
-						# OSM
+						# OSM/RandMcNalley
 						$l->{geometry}{location}{lat} = $l->{lat};
 						$l->{geometry}{location}{lng} = $l->{lon};
 					} elsif($l->{BestLocation}) {
@@ -201,6 +203,18 @@ sub geocode {
 						# postcodes.io
 						$l->{geometry}{location}{lat} = $l->{latitude};
 						$l->{geometry}{location}{lng} = $l->{longitude};
+					} elsif($l->{'properties'}{'geoLatitude'}) {
+						# ovi
+						$l->{geometry}{location}{lat} = $l->{properties}{geoLatitude};
+						$l->{geometry}{location}{lng} = $l->{properties}{geoLongitude};
+					} elsif($l->{'RESULTS'}) {
+						# GeoCodeFarm
+						$l->{geometry}{location}{lat} = $l->{'RESULTS'}[0]{'COORDINATES'}{'latitude'};
+						$l->{geometry}{location}{lng} = $l->{'RESULTS'}[0]{'COORDINATES'}{'longitude'};
+					} elsif(defined($l->{result}{addressMatches}[0]->{coordinates}{y})) {
+						# US Census
+						$l->{geometry}{location}{lat} = $l->{result}{addressMatches}[0]->{coordinates}{y};
+						$l->{geometry}{location}{lng} = $l->{result}{addressMatches}[0]->{coordinates}{x};
 					}
 
 					if($l->{'standard'}{'countryname'}) {

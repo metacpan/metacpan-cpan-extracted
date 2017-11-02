@@ -176,7 +176,7 @@ subtest 'get cert' => sub {
     $body = Mojo::JSON::encode_json { detail => 'bad thingz' };
     eval { $acme->get_cert('bad.net') };
     chomp(my $err = $@);
-    is $err, 'Failed to get cert (code 500) - bad thingz', 'got correct error';
+    is $err, 'Failed to get cert (code 500) Internal Server Error - bad thingz', 'got correct error';
   };
 };
 

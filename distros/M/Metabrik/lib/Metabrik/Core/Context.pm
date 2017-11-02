@@ -1,19 +1,19 @@
 #
-# $Id: Context.pm,v 9685bb4e1534 2017/01/01 10:20:58 gomor $
+# $Id: Context.pm,v fa356d306156 2017/11/02 09:23:32 gomor $
 #
 package Metabrik::Core::Context;
 use strict;
 use warnings;
 
 # Breaking.Feature.Fix
-our $VERSION = '1.25';
-our $FIX = '1';
+our $VERSION = '1.27';
+our $FIX = '0';
 
 use base qw(Metabrik);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 9685bb4e1534 $',
+      revision => '$Revision: fa356d306156 $',
       tags => [ qw(main core) ],
       attributes => {
          _lp => [ qw(INTERNAL) ],
@@ -314,7 +314,7 @@ sub find_available {
    my %available = ();
    for my $this (@$found) {
       my $brik = $this;
-      $brik =~ s/\//::/g;
+      $brik =~ s{/}{::}g;
       $brik =~ s/^.*::Metabrik::(.*?)$/$1/;
       $brik =~ s/.pm$//;
       if (length($brik)) {
@@ -567,8 +567,12 @@ sub not_used {
       my $category = '';
       my $name = '';
 
+      # Only baseclass Brik is considered
+      if (@toks == 1) {
+         $category = $this;
+      }
       # No repository defined
-      if (@toks == 2) {
+      elsif (@toks == 2) {
          ($category, $name) = $this =~ /^(.*?)::(.*)/;
       }
       elsif (@toks > 2) {
@@ -581,6 +585,8 @@ sub not_used {
       }
       $class .= ucfirst($category).'::';
       $class .= ucfirst($name);
+
+      $class =~ s{::$}{};
 
       $r->{$this} = $class;
    }

@@ -1,0 +1,144 @@
+NAME
+    Test::Applify - Testing Applify scripts
+
+SYNOPSIS
+      use Test::More;
+      use Test::Applify;
+
+      my $t = Test::Applify->new('./bin/app.pl');
+      my $help = $t->help_ok;
+      like $help, qr/basic/, 'help mentions basic mode';
+      $t->documentation_ok;
+      $t->version_ok('1.0.999');
+      $t->is_option($_) for qw{mode input};
+      $t->is_required_option($_) for qw{input};
+
+      my $app1 = $t->app_instance(qw{-input strings.txt});
+      is $app1->mode, 'basic', 'basic mode is default';
+
+      my $app2 = $t->app_instance(qw{-mode expert -input strings.txt});
+      is $app2->mode, 'expert', 'expert mode enabled';
+      is $app2->input, 'strings.txt', 'reading strings.txt';
+
+      use Test::Applify 'applify_ok';
+      my $inlineapp = applify_ok("use Applify; app { print 'hello world!'; 0;};");
+      my $t = Test::Applify->new($inlineapp);
+
+DESCRIPTION
+    Test::Applify is a test agent to be used with Test::More to test Applify
+    scripts. To run your tests use prove.
+
+      $ prove -l -v t
+
+    Avoid testing the Applify code for correctness, it has its own test
+    suite. Instead, test for consistency of option behaviour, defaults and
+    requiredness, the script is compiled and that attributes and methods of
+    the script behave with different inputs.
+
+    The aim is to remove repetition of multiple blocks to retrieve instances
+    and checks for success of "do".
+
+      my $app = do 'bin/app.pl'; ## check $@ and return value
+      {
+        local @ARGV = qw{...};
+        my $instance = $app->_script->app;
+        # more tests.
+      }
+
+EXPORTED FUNCTIONS
+  applify_ok
+      use Test::Applify 'applify_ok';
+      my $inlineapp = applify_ok("use Applify; app { print 'Hello world!'; 0;};");
+      my $t = Test::Applify->new($inlineapp);
+
+      my $helloapp = applify_ok("use Applify; app { print 'Hello $_[1]!'; 0;};",
+                                \@ARGV, 'hello app');
+      my $t = Test::Applify->new($helloapp);
+
+    Utility function that wraps "eval" in perlfunc and runs the same tests
+    as "new".
+
+    This function must be imported.
+
+  applify_subcommands_ok
+      use Test::Applify 'applify_subcommands_ok';
+      my $subcmds = applify_subcommands_ok($code);
+      foreach my $app(@$subcmds){
+        Test::Applify->new($app)->help_ok
+          ->documentation_ok
+          ->version_ok('1')
+          ->is_required_option('global_option')
+      }
+
+    Like "applify_ok", but creates each of the subcommands and return in an
+    array reference.
+
+METHODS
+  app
+      my $t   = Test::Applify->new('./bin/app.pl');
+      my $app = $t->app;
+
+    Access to the application.
+
+    N.B. The removal of "." from @INC requires relative paths to start with
+    "./". See link for further information <https://goo.gl/eJ6k9E>
+
+  app_script
+      my $script = $t->app_script;
+      isa_ok $script, 'Applify', 'the Applify object';
+
+    Access to the Applify object.
+
+  app_instance
+      my $safe  = $t->app_instance(qw{-opt value -mode safe});
+      my $risky = $t->app_instance();
+      is $risky->mode, 'expert', 'expert mode is the default';
+
+  can_ok
+      $t->can_ok(qw{mode input});
+
+    Test for the presence of methods that the script has.
+
+  documentation_ok
+      $t->documentation_ok;
+
+    Test the documentation.
+
+  extends_ok
+      $t->extends_ok('Parent::Class');
+      $t->extends_ok('Parent::Class', 'object name');
+
+    Test the inheritance.
+
+  help_ok
+      my $help = $t->help_ok;
+
+    Test and access the help for the script.
+
+  is_option
+      $t->is_option('mode');
+      $t->is_option($_) for qw{mode input};
+
+    Test for the presence of an option with the supplied name
+
+  is_required_option
+      $t->is_required_option('input');
+
+    Test that the option is a required option.
+
+  new
+      my $t = Test::Applify->new('script.pl');
+
+    Instantiate a new test instance for the supplied script name.
+
+  subcommand_ok
+      my $subcommand = $t->subcommand_ok('list');
+
+    Test that the subcommand computed from @ARGV matches the supplied
+    subcommand.
+
+  version_ok
+      $t->version_ok('1.0.999');
+
+    Test that the version matches the supplied version.
+

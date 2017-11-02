@@ -1,4 +1,8 @@
-Revision history for Rinci
+1.1.85  2017-10-26 (PERLANCAR)
+
+	- Specify that example's result must always be in enveloped form,
+	  to remove ambiguity and to have the ability to specify status.
+
 
 1.1.84  2016-12-28 (PERLANCAR)
 

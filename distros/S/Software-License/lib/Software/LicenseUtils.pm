@@ -4,7 +4,7 @@ use Carp;
 
 package Software::LicenseUtils;
 # ABSTRACT: little useful bits of code for licensey things
-$Software::LicenseUtils::VERSION = '0.103012';
+$Software::LicenseUtils::VERSION = '0.103013';
 use File::Spec;
 use IO::Dir;
 use Module::Load;
@@ -21,7 +21,7 @@ use Module::Load;
 #pod
 #pod =cut
 
-my $_v = qr/(?:v(?:er(?:sion|\.))(?: |\.)?)/i;
+my $_v = qr/(?:v(?:er(?:sion|\.))?(?: |\.)?)/i;
 my @phrases = (
   "under the same (?:terms|license) as perl $_v?6" => [],
   'under the same (?:terms|license) as (?:the )?perl'    => 'Perl_5',
@@ -32,7 +32,9 @@ my @phrases = (
     $_[0] == 2 ? 'LGPL_2_1' : $_[0] == 3 ? 'LGPL_3_0' : ()
   },
   'GNU (?:lesser|library) (?:general )?public license'  => [ qw(LGPL_2_1 LGPL_3_0) ],
+  '(?:the )?2[-\s]clause (?:Free)?BSD' => 'FreeBSD',
   'BSD license'                => 'BSD',
+  'FreeBSD license'            => 'FreeBSD',
   "Artistic license $_v?(\\d)" => sub { "Artistic_$_[0]_0" },
   'Artistic license'           => [ map { "Artistic_$_\_0" } (1..2) ],
   "LGPL,? $_v?(\\d)"             => sub {
@@ -41,9 +43,12 @@ my @phrases = (
   'LGPL'                       => [ qw(LGPL_2_1 LGPL_3_0) ],
   "GPL,? $_v?(\\d)"              => sub { "GPL_$_[0]" },
   'GPL'                        => [ map { "GPL_$_" } (1..3) ],
+  'FreeBSD'                    => 'FreeBSD',
   'BSD'                        => 'BSD',
   'Artistic'                   => [ map { "Artistic_$_\_0" } (1..2) ],
   'MIT'                        => 'MIT',
+  'has dedicated the work to the Commons' => 'CC0_1_0',
+  'waiving all of his or her rights to the work worldwide under copyright law' => 'CC0_1_0',
 );
 
 my %meta_keys  = ();
@@ -230,7 +235,7 @@ Software::LicenseUtils - little useful bits of code for licensey things
 
 =head1 VERSION
 
-version 0.103012
+version 0.103013
 
 =head1 METHODS
 
@@ -277,7 +282,7 @@ Ricardo Signes <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Ricardo Signes.
+This software is copyright (c) 2017 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

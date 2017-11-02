@@ -1,3 +1,7 @@
+2017-10-28 Guillaume Rousse <guillomovitch@zarb.org> 0.2.2
+	* complete dependencies list in Makefile.PL
+	* regenerate distribution to fix META.yml format
+
 2011-01-19 Guillaume Rousse <guillomovitch@zarb.org> 0.2.1
 	* include parser error in exception thrown for invalid syntax
 

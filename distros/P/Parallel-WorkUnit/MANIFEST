@@ -6,8 +6,10 @@ META.yml
 Makefile.PL
 README
 dist.ini
+errors.err
 lib/Parallel/WorkUnit.pm
 t/01-Basic.t
 t/02-System.t
 t/03-Storable-Error.t
+t/04-Queue.t
 t/author-pod-syntax.t

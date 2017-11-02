@@ -1,5 +1,5 @@
 #
-# $Id: Syslog.pm,v f6ad8c136b19 2017/01/01 10:13:54 gomor $
+# $Id: Syslog.pm,v ce0abe6b7256 2017/05/23 06:22:59 gomor $
 #
 # string::syslog Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik);
 
 sub brik_properties {
    return {
-      revision => '$Revision: f6ad8c136b19 $',
+      revision => '$Revision: ce0abe6b7256 $',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -96,11 +96,30 @@ sub decode {
    $self->brik_help_run_undef_arg('encode', $data) or return;
    $self->brik_help_run_invalid_arg('encode', $data, 'SCALAR') or return;
 
-   my ($m, $d, $h, $hostname, $process, $pid, $message) =
-      $data =~ m{^(\S+)\s+(\d+)\s+(\S+)\s+(\S+)\s+(\S+)\[(\d+)\]:\s+(.*)$};
+   my ($timestamp, $hostname, $process, $pid, $message);
+   #  May 17 18:18:06
+   if ($data =~ m{^(\S+\s+\d+\s+\S+)\s+(\S+)\s+(\S+)\[(\d+)\]:\s+(.*)$}) {
+      $timestamp = $1;
+      $hostname = $2;
+      $process = $3;
+      $pid = $4;
+      $message = $5;
+   }
+   # Wed May 17 18:18:06 2017
+   elsif ($data =~ m{^(\S+\s+\S+\s+\d+\s+\S+\s+\S+)\s+(\S+)\s+(\S+)\[(\d+)\]:\s+(.*)$}) {
+      $timestamp = $1;
+      $hostname = $2;
+      $process = $3;
+      $pid = $4;
+      $message = $5;
+   }
+
+   if (! defined($timestamp)) {
+      return $self->log->error("decode: unable to decode message [$data]");
+   }
 
    return {
-      timestamp => sprintf("%s %2d %s", $m, $d, $h),
+      timestamp => $timestamp,
       hostname => $hostname,
       process => $process,
       pid => $pid,
@@ -114,7 +133,13 @@ sub date {
 
    my @month = qw{Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec};
 
+   #
    # Courtesy of Net::Syslog
+   #
+   # But not RDC3164 compliant in regards to time format.
+   # RFC3164: "Wed May 17 18:18:06 2017"
+   # Not RFC3164: "May 17 18:18:06"
+   #
    my @time = defined($timestamp) ? localtime($timestamp) : localtime();
    my $date =
       $month[$time[4]].

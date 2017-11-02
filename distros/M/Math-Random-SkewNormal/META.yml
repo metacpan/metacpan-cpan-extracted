@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:                Math-Random-SkewNormal
-version:             0.01
+version:             0.03
 abstract:            Random numbers following a SkewNormal PDF
 license:             perl
 generated_by:        ExtUtils::MakeMaker version 6.31

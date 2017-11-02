@@ -6,7 +6,7 @@ use Alien::Build::Plugin;
 use Carp ();
 
 # ABSTRACT: Probe system and determine library or tool properties using PkgConfig::LibPkgConf
-our $VERSION = '1.25'; # VERSION
+our $VERSION = '1.28'; # VERSION
 
 
 has '+pkg_name' => sub {
@@ -121,7 +121,7 @@ Alien::Build::Plugin::PkgConfig::LibPkgConf - Probe system and determine library
 
 =head1 VERSION
 
-version 1.25
+version 1.28
 
 =head1 SYNOPSIS
 
@@ -213,6 +213,10 @@ Petr Pisar (ppisar)
 Lance Wicks (LANCEW)
 
 Ahmad Fatoum (a3f, ATHREEF)
+
+José Joaquín Atria (JJATRIA)
+
+Duke Leto (LETO)
 
 =head1 COPYRIGHT AND LICENSE
 

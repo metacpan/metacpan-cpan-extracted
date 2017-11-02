@@ -8,7 +8,7 @@ use warnings;
 
 use parent qw( Class::Accessor::Fast );
 
-our $VERSION = '1.000000'; # VERSION
+our $VERSION = '2.003'; # VERSION
 
 
 sub new {
@@ -39,7 +39,7 @@ Locale::Babelfish::Phrase::Node - Babelfish AST abstract node.
 
 =head1 VERSION
 
-version 1.000000
+version 2.003
 
 =head1 METHODS
 
@@ -69,13 +69,17 @@ Igor Mironov <grif@cpan.org>
 
 =item *
 
+Victor Efimov <efimov@reg.ru>
+
+=item *
+
 REG.RU LLC
 
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014 by Akzhan Abdulin.
+This software is Copyright (c) 2014 by REG.RU LLC.
 
 This is free software, licensed under:
 

@@ -3,7 +3,7 @@ package RPerl::CodeBlock::Subroutine::Method;
 use strict;
 use warnings;
 use RPerl::AfterSubclass;
-our $VERSION = 0.006_000;
+our $VERSION = 0.008_000;
 
 # [[[ OO INHERITANCE ]]]
 use parent qw(RPerl::CodeBlock::Subroutine);
@@ -15,49 +15,69 @@ use RPerl::CodeBlock::Subroutine;
 
 # [[[ INCLUDES ]]]
 use Storable qw(dclone);
+use perlapinames_generated;
 
 # [[[ OO PROPERTIES ]]]
 our hashref $properties = {};
 
 # [[[ SUBROUTINES & OO METHODS ]]]
 
-our string_hashref::method $ast_to_rperl__generate = sub {
-    ( my object $self, my string_hashref $modes) = @_;
+sub ast_to_rperl__generate {
+    { my string_hashref::method $RETURN_TYPE };
+    ( my object $self, my string_hashref $modes) = @ARG;
     my string_hashref $rperl_source_group = { PMC => q{} };
     my string_hashref $rperl_source_subgroup;
 
     #    RPerl::diag( 'in Method->ast_to_rperl__generate(), received $self = ' . "\n" . RPerl::Parser::rperl_ast__dump($self) . "\n" );
 
-    # unwrap Method_71 from SubroutineOrMethod_77
-    if ( ( ref $self ) eq 'SubroutineOrMethod_77' ) {
+    # unwrap Method_82 from SubroutineOrMethod_88
+    if ( ( ref $self ) eq 'SubroutineOrMethod_88' ) {
         $self = $self->{children}->[0];
     }
 
-    if ( ( ref $self ) ne 'Method_71' ) {
+#    RPerl::diag( 'in Method->ast_to_rperl__generate(), have possibly-unwrapped $self = ' . "\n" . RPerl::Parser::rperl_ast__dump($self) . "\n" );
+
+    if ( ( ref $self ) ne 'Method_82' ) {
         die RPerl::Parser::rperl_rule__replace(
-            'ERROR ECOGEASRP00, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: Grammar rule ' . ( ref $self ) . ' found where Method_71 expected, dying' )
+            'ERROR ECOGEASRP00, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: Grammar rule ' . ( ref $self ) . ' found where Method_82 expected, dying' )
             . "\n";
     }
 
-    my string $our                = $self->{children}->[0];
-    my string $return_type        = $self->{children}->[1];
-    my string $name               = $self->{children}->[2];
-    my string $equal_sub          = $self->{children}->[3];
-    my object $arguments_optional = $self->{children}->[4];
-    my object $operations_star    = $self->{children}->[5];
-    my string $right_brace        = $self->{children}->[6];
-    my string $semicolon          = $self->{children}->[7];
+    my string $sub                     = $self->{children}->[0];
+    my string $name                    = $self->{children}->[1];
+    my string $left_brace              = $self->{children}->[2];
+    my string $return_type_left_brace  = $self->{children}->[3];
+    my string $return_type_my          = $self->{children}->[4];
+    my string $return_type             = $self->{children}->[5];
+    my string $return_type_var         = $self->{children}->[6];
+    my string $return_type_right_brace = $self->{children}->[7];
+    my string $return_type_semicolon   = $self->{children}->[8];
+    my object $arguments_optional      = $self->{children}->[9];
+    my object $operations_star         = $self->{children}->[10];
+    my string $right_brace             = $self->{children}->[11];
 
-    if ((substr $name, 1, 1) eq '_') {
+    if ((substr $name, 0, 1) eq '_') {
         die 'ERROR ECOGEASRP09, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: method name ' . ($name)
                 . ' must not start with underscore, dying' . "\n";
+    }
+
+    if ((exists $perlapinames_generated::FUNCTIONS_DOCUMENTED->{$name}) or
+        (exists $perlapinames_generated::FUNCTIONS_UNDOCUMENTED->{$name}) or
+        (exists $perlapinames_generated::VARIABLES_DOCUMENTED->{$name}) or
+        (exists $perlapinames_generated::VARIABLES_UNDOCUMENTED->{$name})) {
+        die 'ERROR ECOGEASRP45, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: Perl API name conflict, method name ' . q{'}
+            . $name . q{'}
+            . ' is the same as a protected function or variable name in the Perl API, please choose a different name, dying' . "\n";
     }
 
     # CREATE SYMBOL TABLE ENTRY
     $modes->{_symbol_table}->{_subroutine} = $name;  # set current subroutine/method
     $modes->{_symbol_table}->{$modes->{_symbol_table}->{_namespace}}->{_global}->{$name} = {isa => 'RPerl::CodeBlock::Subroutine::Method', type => $return_type};  # create individual symtab entry
  
-    $rperl_source_group->{PMC} .= $our . q{ } . $return_type . q{ } . $name . q{ } . $equal_sub . "\n";
+    $rperl_source_group->{PMC} .= 
+        $sub . q{ } . $name . q{ } . $left_brace . q{ } . 
+        $return_type_left_brace . q{ } . $return_type_my . q{ } . $return_type . q{ } . $return_type_var . q{ } . 
+        $return_type_right_brace . q{ } . $return_type_semicolon;
 
     if ( exists $arguments_optional->{children}->[0] ) {
         $rperl_source_subgroup = $arguments_optional->{children}->[0]->ast_to_rperl__generate($modes);
@@ -69,32 +89,45 @@ our string_hashref::method $ast_to_rperl__generate = sub {
         RPerl::Generator::source_group_append( $rperl_source_group, $rperl_source_subgroup );
     }
 
-    $rperl_source_group->{PMC} .= $right_brace . $semicolon . "\n\n";
+    $rperl_source_group->{PMC} .= $right_brace . "\n\n";
     return $rperl_source_group;
-};
+}
 
-our string_hashref::method $ast_to_cpp__generate__CPPOPS_PERLTYPES = sub {
-    ( my object $self, my string_hashref $modes) = @_;
+sub ast_to_cpp__generate__CPPOPS_PERLTYPES {
+    { my string_hashref::method $RETURN_TYPE };
+    ( my object $self, my string_hashref $modes) = @ARG;
     my string_hashref $cpp_source_group = { CPP => q{// <<< RP::CB::S::M __DUMMY_SOURCE_CODE CPPOPS_PERLTYPES >>>} . "\n" };
 
     #...
     return $cpp_source_group;
-};
+}
 
-our string_hashref::method $ast_to_cpp__generate_declaration__CPPOPS_CPPTYPES = sub {
-    ( my object $self, my string_hashref $modes) = @_;
+sub ast_to_cpp__generate_declaration__CPPOPS_CPPTYPES {
+    { my string_hashref::method $RETURN_TYPE };
+    ( my object $self, my string_hashref $modes) = @ARG;
 #    RPerl::diag( 'in Method->ast_to_cpp__generate_declaration__CPPOPS_CPPTYPES(), received $modes->{_symbol_table} = ' . "\n" . Dumper($modes->{_symbol_table}) . "\n");
 
     my string_hashref $cpp_source_group = { H => q{} };
 
 #    RPerl::diag( 'in Method->ast_to_cpp__generate_declaration__CPPOPS_CPPTYPES(), received $self = ' . "\n" . RPerl::Parser::rperl_ast__dump($self) . "\n" );
 
-    $self             = $self->{children}->[0];     # unwrap Method_71 from SubroutineOrMethod_77
-    my string $return_type = $self->{children}->[1];
-    my string $name = $self->{children}->[2];
-    my object $arguments_optional = $self->{children}->[4];
+    # unwrap Method_82 from SubroutineOrMethod_88
+    if ( ( ref $self ) eq 'SubroutineOrMethod_88' ) {
+        $self = $self->{children}->[0];
+    }
 
-    substr $name, 0, 1, q{};            # remove leading $ sigil
+#    RPerl::diag( 'in Method->ast_to_cpp__generate_declaration__CPPOPS_CPPTYPES(), have possibly-unwrapped $self = ' . "\n" . RPerl::Parser::rperl_ast__dump($self) . "\n" );
+
+    if ( ( ref $self ) ne 'Method_82' ) {
+        die RPerl::Parser::rperl_rule__replace(
+            'ERROR ECOGEASCP00, CODE GENERATOR, ABSTRACT SYNTAX TO C++: Grammar rule ' . ( ref $self ) . ' found where Method_82 expected, dying' )
+            . "\n";
+    }
+
+    my string $name                    = $self->{children}->[1];
+    my string $return_type             = $self->{children}->[5];
+    my object $arguments_optional      = $self->{children}->[9];
+
     substr $return_type, -8, 8, '';                      # strip trailing '::method'
  
 #    RPerl::diag( 'in Method->ast_to_cpp__generate__CPPOPS_CPPTYPES(), have $name = ' . $name . "\n" );
@@ -103,6 +136,15 @@ our string_hashref::method $ast_to_cpp__generate_declaration__CPPOPS_CPPTYPES = 
     if ((substr $name, 0, 1) eq '_') {
         die 'ERROR ECOGEASCP09, CODE GENERATOR, ABSTRACT SYNTAX TO C++: method name ' . ($name)
                 . ' must not start with underscore, dying' . "\n";
+    }
+
+    if ((exists $perlapinames_generated::FUNCTIONS_DOCUMENTED->{$name}) or
+        (exists $perlapinames_generated::FUNCTIONS_UNDOCUMENTED->{$name}) or
+        (exists $perlapinames_generated::VARIABLES_DOCUMENTED->{$name}) or
+        (exists $perlapinames_generated::VARIABLES_UNDOCUMENTED->{$name})) {
+        die 'ERROR ECOGEASCP45, CODE GENERATOR, ABSTRACT SYNTAX TO C++: Perl API name conflict, method name ' . q{'}
+            . $name . q{'}
+            . ' is the same as a protected function or variable name in the Perl API, please choose a different name, dying' . "\n";
     }
 
     # CREATE SYMBOL TABLE ENTRY
@@ -119,12 +161,12 @@ our string_hashref::method $ast_to_cpp__generate_declaration__CPPOPS_CPPTYPES = 
         $cpp_source_group->{H} .= $cpp_source_subgroup->{CPP};
     }
     $cpp_source_group->{H} .= ');';
-
     return $cpp_source_group;
-};
+}
 
-our string_hashref::method $ast_to_cpp__generate__CPPOPS_CPPTYPES = sub {
-    ( my object $self, my string $package_name_underscores, my string_hashref $modes) = @_;
+sub ast_to_cpp__generate__CPPOPS_CPPTYPES {
+    { my string_hashref::method $RETURN_TYPE };
+    ( my object $self, my string $package_name_underscores, my string_hashref $modes) = @ARG;
 #    RPerl::diag( 'in Method->ast_to_cpp__generate__CPPOPS_CPPTYPES(), received $modes->{_symbol_table} = ' . "\n" . Dumper($modes->{_symbol_table}) . "\n");
 
     my string_hashref $cpp_source_group = { CPP => q{} };
@@ -132,23 +174,24 @@ our string_hashref::method $ast_to_cpp__generate__CPPOPS_CPPTYPES = sub {
 
     #    RPerl::diag( 'in Method->ast_to_cpp__generate__CPPOPS_CPPTYPES(), received $self = ' . "\n" . RPerl::Parser::rperl_ast__dump($self) . "\n" );
 
-    # unwrap Method_71 from SubroutineOrMethod_77
-    if ( ( ref $self ) eq 'SubroutineOrMethod_77' ) {
+    # unwrap Method_82 from SubroutineOrMethod_88
+    if ( ( ref $self ) eq 'SubroutineOrMethod_88' ) {
         $self = $self->{children}->[0];
     }
 
-    if ( ( ref $self ) ne 'Method_71' ) {
+#    RPerl::diag( 'in Method->ast_to_cpp__generate_declaration__CPPOPS_CPPTYPES(), have possibly-unwrapped $self = ' . "\n" . RPerl::Parser::rperl_ast__dump($self) . "\n" );
+
+    if ( ( ref $self ) ne 'Method_82' ) {
         die RPerl::Parser::rperl_rule__replace(
-            'ERROR ECOGEASCP00, CODE GENERATOR, ABSTRACT SYNTAX TO C++: Grammar rule ' . ( ref $self ) . ' found where Method_71 expected, dying' )
+            'ERROR ECOGEASCP00, CODE GENERATOR, ABSTRACT SYNTAX TO C++: Grammar rule ' . ( ref $self ) . ' found where Method_82 expected, dying' )
             . "\n";
     }
 
-    my string $return_type        = $self->{children}->[1];
-    my string $name               = $self->{children}->[2];
-    my object $arguments_optional = $self->{children}->[4];
-    my object $operations_star    = $self->{children}->[5];
- 
-    substr $name, 0, 1, q{};            # remove leading $ sigil
+    my string $name                    = $self->{children}->[1];
+    my string $return_type             = $self->{children}->[5];
+    my object $arguments_optional      = $self->{children}->[9];
+    my object $operations_star         = $self->{children}->[10];
+
     substr $return_type, -8, 8, '';                      # strip trailing '::method'
 
     $return_type = RPerl::Generator::type_convert_perl_to_cpp($return_type, 1);  # $pointerify_classes = 1
@@ -181,7 +224,7 @@ our string_hashref::method $ast_to_cpp__generate__CPPOPS_CPPTYPES = sub {
 
     $cpp_source_group->{CPP} .= '}';
     return $cpp_source_group;
-};
+}
 
 # [[[ TYPES & SUBTYPES BELOW THIS LINE ]]]
 

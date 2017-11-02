@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-our $VERSION = 0.050_000;
+our $VERSION = 0.051_000;
 
 use ExtUtils::MakeMaker;
 use Alien::Build::MM;
@@ -38,7 +38,7 @@ my %WriteMakefile_args = $abmm->mm_args(
         # DEV NOTE, CORRELATION #ap001: must install IO::Socket::SSL & Alien::Build from Makefile.PL (which becomes META.json, for CPAN) & .travis.yml & appveyor.yml 
         'IO::Socket::SSL'       => '2.043',
         'Alien::Build'          => '0.66',  # provides Alien::Build::MM
-        'Alien::PCRE2'          => '0.013',
+        'Alien::PCRE2'          => '0.014',
         %{$configure_requires_windows}
     },
 

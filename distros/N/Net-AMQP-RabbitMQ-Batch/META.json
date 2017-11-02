@@ -1,0 +1,47 @@
+{
+   "abstract" : "simple batch processing of messages for RabbitMQ.",
+   "author" : [
+      "Alex Svetkin"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-AMQP-RabbitMQ-Batch",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Test::Simple" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Carp::Assert" : "0",
+            "Net::AMQP::RabbitMQ" : "0",
+            "Time::HiRes" : "0",
+            "Try::Tiny" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.2301",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

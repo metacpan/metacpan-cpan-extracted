@@ -1,5 +1,12 @@
 Release history for XML-Atom-SimpleFeed
 
+0.902 Thu 02 Nov 2017
+	- Proper packaging (mea máxima culpa)
+	- No code changes
+
+0.901 Wed 01 Nov 2017
+	- Support for Time::Date objects in date constructs
+
 0.900 Tue 22 Sep 2015
 	- Support for arbitrary XML encodings
 

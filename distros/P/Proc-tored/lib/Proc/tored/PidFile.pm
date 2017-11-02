@@ -1,6 +1,6 @@
 package Proc::tored::PidFile;
 # ABSTRACT: Manage a service using a pid file
-$Proc::tored::PidFile::VERSION = '0.19';
+$Proc::tored::PidFile::VERSION = '0.20';
 
 use warnings;
 use strict;
@@ -98,7 +98,7 @@ Proc::tored::PidFile - Manage a service using a pid file
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 SYNOPSIS
 

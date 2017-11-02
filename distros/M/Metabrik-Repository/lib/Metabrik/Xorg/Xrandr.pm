@@ -1,5 +1,5 @@
 #
-# $Id: Xrandr.pm,v f6ad8c136b19 2017/01/01 10:13:54 gomor $
+# $Id: Xrandr.pm,v 246044148483 2017/03/18 14:13:18 gomor $
 #
 # xorg::xrandr Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Shell::Command Metabrik::System::Package);
 
 sub brik_properties {
    return {
-      revision => '$Revision: f6ad8c136b19 $',
+      revision => '$Revision: 246044148483 $',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -331,6 +331,16 @@ sub set_first_output_resolution {
 
    return $self->capture("xrandr --output $output --mode $resolution");
 }
+
+#
+# Alias to set_first_output_resolution
+#
+sub set_output_resolution {
+   my $self = shift;
+
+   return $self->set_first_output_resolution(@_);
+}
+
 
 sub set_first_output_max_resolution {
    my $self = shift;

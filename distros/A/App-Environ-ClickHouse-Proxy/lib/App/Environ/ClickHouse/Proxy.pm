@@ -1,6 +1,6 @@
 package App::Environ::ClickHouse::Proxy;
 
-our $VERSION = '0.2';
+our $VERSION = '0.3';
 
 use strict;
 use warnings;
@@ -44,7 +44,11 @@ sub send {
 
   my @types;
   foreach (@_) {
-    if ( length( ( my $dummy = '' ) & $_ ) && 0 + $_ eq $_ && $_ * 0 == 0 ) {
+    if ( defined($_)
+      && length( ( my $dummy = '' ) & $_ )
+      && 0 + $_ eq $_
+      && $_ * 0 == 0 )
+    {
       if (/^[+-]?\d+\z/) {
         push @types, 'int';
       }

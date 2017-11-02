@@ -7,6 +7,13 @@ Mark Overmeer.
 TODO:
 	. connect to Message::Passing framework
 
+version 1.23: Thu  2 Nov 10:40:24 CET 2017
+
+	Improvements:
+	- understand objects in report()   rt.cpan.org #123241 [Andy Beverley]
+	- understand DBIx::Class::Exception in try{}
+	- understand XML::LibXML::Error in try{}
+
 version 1.22: Thu 12 Oct 12:18:54 CEST 2017
 
 	Improvements:

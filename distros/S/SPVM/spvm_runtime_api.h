@@ -4,7 +4,51 @@
 #include "spvm_base.h"
 #include "spvm_api.h"
 
+SPVM_OBJECT* SPVM_RUNTIME_API_concat_string_byte(SPVM_API* api, SPVM_OBJECT* string1, int8_t string2);
+SPVM_OBJECT* SPVM_RUNTIME_API_concat_string_short(SPVM_API* api, SPVM_OBJECT* string1, int16_t string2);
+SPVM_OBJECT* SPVM_RUNTIME_API_concat_string_int(SPVM_API* api, SPVM_OBJECT* string1, int32_t string2);
+SPVM_OBJECT* SPVM_RUNTIME_API_concat_string_long(SPVM_API* api, SPVM_OBJECT* string1, int64_t string2);
+SPVM_OBJECT* SPVM_RUNTIME_API_concat_string_float(SPVM_API* api, SPVM_OBJECT* string1, float string2);
+SPVM_OBJECT* SPVM_RUNTIME_API_concat_string_double(SPVM_API* api, SPVM_OBJECT* string1, double string2);
+SPVM_OBJECT* SPVM_RUNTIME_API_concat_string_string(SPVM_API* api, SPVM_OBJECT* string1, SPVM_OBJECT* string2);
+
+int32_t SPVM_RUNTIME_API_get_sub_object_my_vars_length(SPVM_API* api, int32_t sub_id);
+int32_t SPVM_RUNTIME_API_get_sub_object_args_base(SPVM_API* api, int32_t sub_id);
+int32_t SPVM_RUNTIME_API_get_sub_is_native(SPVM_API* api, int32_t sub_id);
+int32_t SPVM_RUNTIME_API_get_sub_return_type_id(SPVM_API* api, int32_t sub_id);
+void* SPVM_RUNTIME_API_get_sub_native_address(SPVM_API* api, int32_t sub_id);
+int32_t SPVM_RUNTIME_API_get_sub_bytecode_base(SPVM_API* api, int32_t sub_id);
+int32_t SPVM_RUNTIME_API_get_sub_is_void(SPVM_API* api, int32_t sub_id);
+int32_t SPVM_RUNTIME_API_get_sub_object_my_vars_base(SPVM_API* api, int32_t sub_id);
+
+int32_t SPVM_RUNTIME_API_get_sub_object_args_length(SPVM_API* api, int32_t sub_id);
+int32_t SPVM_RUNTIME_API_get_sub_operand_stack_max(SPVM_API* api, int32_t sub_id);
+int32_t SPVM_RUNTIME_API_get_sub_my_vars_length(SPVM_API* api, int32_t sub_id);
+int32_t SPVM_RUNTIME_API_get_sub_args_length(SPVM_API* api, int32_t sub_id);
+int32_t SPVM_RUNTIME_API_get_sub_name_id(SPVM_API* api, int32_t sub_id);
+int32_t SPVM_RUNTIME_API_get_sub_file_name_id(SPVM_API* api, int32_t sub_id);
+
+int32_t SPVM_RUNTIME_API_get_type_code (SPVM_API* api, int32_t type_id);
+
+int32_t* SPVM_RUNTIME_API_get_constant_pool(SPVM_API* api);
+int32_t* SPVM_RUNTIME_API_get_bytecodes(SPVM_API* api);
+SPVM_VALUE* SPVM_RUNTIME_API_get_package_vars(SPVM_API* api);
+int32_t SPVM_RUNTIME_API_is_debug(SPVM_API* api);
+
+int32_t SPVM_RUNTIME_API_get_void_type_code(SPVM_API* api);
+int32_t SPVM_RUNTIME_API_get_byte_type_code(SPVM_API* api);
+int32_t SPVM_RUNTIME_API_get_short_type_code(SPVM_API* api);
+int32_t SPVM_RUNTIME_API_get_int_type_code(SPVM_API* api);
+int32_t SPVM_RUNTIME_API_get_long_type_code(SPVM_API* api);
+int32_t SPVM_RUNTIME_API_get_float_type_code(SPVM_API* api);
+int32_t SPVM_RUNTIME_API_get_double_type_code(SPVM_API* api);
+
+SPVM_RUNTIME* SPVM_RUNTIME_API_new_runtime();
+void SPVM_RUNTIME_API_dec_ref_count_only(SPVM_API* api, SPVM_OBJECT* object);
+int32_t SPVM_RUNTIME_API_get_object_header_length_offset(SPVM_API* api);
+
 // Array functions
+int32_t SPVM_RUNTIME_API_get_object_header_byte_size(SPVM_API* api);
 int32_t SPVM_RUNTIME_API_get_array_length(SPVM_API* api, SPVM_OBJECT* array);
 SPVM_VALUE* SPVM_RUNTIME_API_get_value_array_elements(SPVM_API* api, SPVM_OBJECT* object);
 int8_t* SPVM_RUNTIME_API_get_byte_array_elements(SPVM_API* api, SPVM_OBJECT* array);
@@ -79,13 +123,14 @@ int32_t SPVM_RUNTIME_API_get_ref_count(SPVM_API* api, SPVM_OBJECT* object);
 void SPVM_RUNTIME_API_dec_ref_count(SPVM_API* api, SPVM_OBJECT* object);
 void SPVM_RUNTIME_API_inc_ref_count(SPVM_API* api, SPVM_OBJECT* object);
 void SPVM_RUNTIME_API_inc_dec_ref_count(SPVM_API* api, SPVM_OBJECT* object);
-_Bool SPVM_RUNTIME_API_isweak(SPVM_API* api, SPVM_OBJECT* object);
+int32_t SPVM_RUNTIME_API_isweak(SPVM_API* api, SPVM_OBJECT* object);
 void SPVM_RUNTIME_API_weaken(SPVM_API* api, SPVM_OBJECT** object_address);
 void SPVM_RUNTIME_API_unweaken(SPVM_API* api, SPVM_OBJECT** object_address);
 
 // Global information
 int32_t SPVM_RUNTIME_API_get_objects_count(SPVM_API* api);
-SPVM_RUNTIME* SPVM_RUNTIME_API_get_runtime(SPVM_API* api);
+SPVM_RUNTIME* SPVM_RUNTIME_API_get_runtime();
 void SPVM_RUNTIME_API_set_runtime(SPVM_API* api, SPVM_RUNTIME* runtime);
+void SPVM_RUNTIME_API_free_runtime(SPVM_API* api, SPVM_RUNTIME* runtime);
 
 #endif

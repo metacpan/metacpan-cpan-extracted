@@ -601,6 +601,14 @@ where each entry is [ magic_name, offset, string, offset, string, ... ].
 
 return the list of users as given by C<getpwent> (see perlfunc)
 
+=item is_real_user()
+
+checks whether or not the user is a system user or a real user
+
+=item is_real_group()
+
+checks whether or not the group is a system group or a real group
+
 =item list_home()
 
 return the list of home (eg: /home/foo, /home/pixel, ...)
@@ -611,8 +619,8 @@ return the directories where we can find dot files: homes, /root and /etc/skel
 
 =item list_users()
 
-return the list of unprivilegied users (aka those whose uid is greater
-than 500 and who are not "nobody").
+return the list of unprivilegied users (uses the is_real_user function to filter
+out system users from the full list)
 
 =item syscall_(NAME, PARA)
 
@@ -835,6 +843,6 @@ our @ISA = qw(Exporter);
 # perl_checker: RE-EXPORT-ALL
 our @EXPORT = map { @$_ } map { values %{'MDK::Common::' . $_ . 'EXPORT_TAGS'} } grep { /::$/ } keys %MDK::Common::;
 
-our $VERSION = "1.2.30";
+our $VERSION = "1.2.34.2";
 
 1;

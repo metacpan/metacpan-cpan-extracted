@@ -1,5 +1,12 @@
 Revision history for Perl extension Metabrik.
 
+1.27.0 Thu  2 Nov 10:21:36 CET 2017
+   - bugfix: correctly handle baseclass Briks when not_used
+   - bugfix: metabrik: brik_preinit_no_checks and brik_init_no_checks Commands
+
+1.26.1 Mon  6 Feb 07:35:11 CET 2017
+   - bugfix: pod for brik_preinit_no_checks and brik_init_no_checks Commands
+
 1.26.0 Sat  4 Feb 17:27:20 CET 2017
    - new: metabrik: brik_preinit_no_checks and brik_init_no_checks Commands
 

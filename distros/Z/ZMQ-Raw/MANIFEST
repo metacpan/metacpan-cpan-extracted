@@ -44,6 +44,7 @@ deps/libzmq/RELICENSE/VolodymyrKorniichuk.md
 deps/libzmq/RELICENSE/abbradar.md
 deps/libzmq/RELICENSE/agronholm.md
 deps/libzmq/RELICENSE/amuraru.md
+deps/libzmq/RELICENSE/arsenm.md
 deps/libzmq/RELICENSE/aseering.md
 deps/libzmq/RELICENSE/bjorntopel.md
 deps/libzmq/RELICENSE/bjovke.md
@@ -397,7 +398,6 @@ t/30-topo-req-router.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
 t/release-check-manifest.t
-typemap
 xs/Context.xs
 xs/Curve.xs
 xs/Error.xs

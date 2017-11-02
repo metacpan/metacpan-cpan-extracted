@@ -1,5 +1,11 @@
 Revision history for Geo-Coder-Free
 
+0.04	Thu Oct 26 22:05:54 EDT 2017
+	Fix throw in http://www.cpantesters.org/cpan/report/ab86a142-b8d9-11e7-a1cf-bb670eaac09d
+	Various speedups
+	Fixed uninitialized variable
+	Fix http://www.cpantesters.org/cpan/report/26e07a7e-b9e9-11e7-a1cf-bb670eaac09d
+
 0.03	Sun Oct 22 10:46:22 EDT 2017
 	Fixed spelling mistake
 

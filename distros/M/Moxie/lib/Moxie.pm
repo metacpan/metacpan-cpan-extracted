@@ -20,7 +20,7 @@ use Moxie::Object;
 use Moxie::Object::Immutable;
 use Moxie::Traits::Provider;
 
-our $VERSION   = '0.05';
+our $VERSION   = '0.06';
 our $AUTHORITY = 'cpan:STEVAN';
 
 sub import ($class, %opts) {
@@ -129,7 +129,7 @@ sub import_into ($class, $caller, $opts) {
     push @traits => $opts->{'traits'}->@* if exists $opts->{'traits'};
 
     # then schedule the trait collection ...
-    Method::Traits->import_into( $meta, @traits );
+    Method::Traits->import_into( $meta->name, @traits );
 
     # install our class finalizer
     MOP::Util::defer_until_UNITCHECK(sub {
@@ -161,7 +161,7 @@ Moxie - Not Another Moose Clone
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -170,18 +170,15 @@ version 0.05
 
         extends 'Moxie::Object';
 
-        has _x => ( default => sub { 0 } );
-        has _y => ( default => sub { 0 } );
+        has x => ( default => sub { 0 } );
+        has y => ( default => sub { 0 } );
 
-        sub BUILDARGS : init_args(
-            x? => _x,
-            y? => _y,
-        );
+        sub x : ro;
+        sub y : ro;
 
-        sub x : ro( _x );
-        sub y : ro( _y );
-
-        sub clear ($self) { (_x, _y) = (0, 0) }
+        sub clear ($self) {
+            $self->@{ 'x', 'y' } = (0, 0);
+        }
     }
 
     package Point3D {
@@ -189,19 +186,13 @@ version 0.05
 
         extends 'Point';
 
-        has _z => ( default => sub { 0 } );
+        has z => ( default => sub { 0 } );
 
-        sub BUILDARGS : init_args(
-            x? => super(x),
-            y? => super(y),
-            z? => _z
-        );
-
-        sub z : ro( _z );
+        sub z : ro;
 
         sub clear ($self) {
             $self->next::method;
-            _z = 0;
+            $self->{z} = 0;
         }
     }
 
@@ -303,7 +294,7 @@ safety or certainty you get from quoting slot names in trait arguments.
 
 =over 4
 
-=item C<< init_args( arg_key => slot_name, ... ) >>
+=item C<< init( arg_key => slot_name, ... ) >>
 
 This is a trait that is exclusively applied to the C<BUILDARGS>
 method. This is simply a shortcut to generate a C<BUILDARGS> method

@@ -8,6 +8,18 @@
 #undef _GNU_SOURCE
 #define _GNU_SOURCE
 #include <sched.h>
+#include <unistd.h>
+#include <sys/syscall.h>
+
+#ifdef SYS_kcmp
+  #include <linux/kcmp.h>
+  #define kcmp(pid1,pid2,type,idx1,idx2) \
+    syscall (SYS_kcmp, (pid_t)pid1, (pid_t)pid2, \
+             (int)type, (unsigned long)idx1, (unsigned long)idx2)
+#else
+  #define kcmp(pid1,pid2,type,idx1,idx2) \
+    (errno = ENOSYS, -1)
+#endif
 
 /* from schmorp.h */
 static int
@@ -58,72 +70,82 @@ BOOT:
     const char *name;
     IV iv;
   } *civ, const_iv[] = {
-#   define const_iv(name) { # name, (IV) CLONE_ ## name },
+#   define const_iv(name) { # name, (IV)name },
 #   ifdef CLONE_FILES
-      const_iv (FILES)
+      const_iv (CLONE_FILES)
 #   endif
 #   ifdef CLONE_FS
-      const_iv (FS)
+      const_iv (CLONE_FS)
 #   endif
 #   ifdef CLONE_NEWNS
-      const_iv (NEWNS)
+      const_iv (CLONE_NEWNS)
 #   endif
 #   ifdef CLONE_VM
-      const_iv (VM)
+      const_iv (CLONE_VM)
 #   endif
 #   ifdef CLONE_THREAD
-      const_iv (THREAD)
+      const_iv (CLONE_THREAD)
 #   endif
 #   ifdef CLONE_SIGHAND
-      const_iv (SIGHAND)
+      const_iv (CLONE_SIGHAND)
 #   endif
 #   ifdef CLONE_SYSVSEM
-      const_iv (SYSVSEM)
+      const_iv (CLONE_SYSVSEM)
 #   endif
 #   ifdef CLONE_NEWUTS
-      const_iv (NEWUTS)
+      const_iv (CLONE_NEWUTS)
 #   endif
 #   ifdef CLONE_NEWIPC
-      const_iv (NEWIPC)
+      const_iv (CLONE_NEWIPC)
 #   endif
 #   ifdef CLONE_NEWNET
-      const_iv (NEWNET)
+      const_iv (CLONE_NEWNET)
 #   endif
 #   ifdef CLONE_PTRACE
-      const_iv (PTRACE)
+      const_iv (CLONE_PTRACE)
 #   endif
 #   ifdef CLONE_VFORK
-      const_iv (VFORK)
+      const_iv (CLONE_VFORK)
 #   endif
 #   ifdef CLONE_SETTLS
-      const_iv (SETTLS)
+      const_iv (CLONE_SETTLS)
 #   endif
 #   ifdef CLONE_PARENT_SETTID
-      const_iv (PARENT_SETTID)
+      const_iv (CLONE_PARENT_SETTID)
 #   endif
 #   ifdef CLONE_CHILD_CLEARTID
-      const_iv (CHILD_CLEARTID)
+      const_iv (CLONE_CHILD_CLEARTID)
 #   endif
 #   ifdef CLONE_DETACHED
-      const_iv (DETACHED)
+      const_iv (CLONE_DETACHED)
 #   endif
 #   ifdef CLONE_UNTRACED
-      const_iv (UNTRACED)
+      const_iv (CLONE_UNTRACED)
 #   endif
 #   ifdef CLONE_CHILD_SETTID
-      const_iv (CHILD_SETTID)
+      const_iv (CLONE_CHILD_SETTID)
 #   endif
 #   ifdef CLONE_NEWUSER
-      const_iv (NEWUSER)
+      const_iv (CLONE_NEWUSER)
 #   endif
 #   ifdef CLONE_NEWPID
-      const_iv (NEWPID)
+      const_iv (CLONE_NEWPID)
 #   endif
 #   ifdef CLONE_IO
-      const_iv (IO)
+      const_iv (CLONE_IO)
 #   endif
 #   ifdef CLONE_NEWCGROUP
-      const_iv (NEWCGROUP)
+      const_iv (CLONE_NEWCGROUP)
+#   endif
+#   ifdef SYS_kcmp
+      const_iv (KCMP_FILE)
+      const_iv (KCMP_VM)
+      const_iv (KCMP_FILES)
+      const_iv (KCMP_FS)
+      const_iv (KCMP_SIGHAND)
+      const_iv (KCMP_IO)
+      const_iv (KCMP_SYSVSEM)
+      const_iv (KCMP_FILE)
 #   endif
   };
 
@@ -170,3 +192,16 @@ unshare (int flags)
 int
 setns (SV *fh_or_fd, int nstype = 0)
 	C_ARGS: s_fileno (fh_or_fd, 0), nstype
+
+int
+pivot_root (SV *new_root, SV *old_root)
+	CODE:
+        RETVAL = syscall (SYS_pivot_root,
+                          (const char *)SvPVbyte_nolen (new_root),
+                          (const char *)SvPVbyte_nolen (old_root));
+	OUTPUT:
+        RETVAL
+
+int
+kcmp (IV pid1, IV pid2, IV type, UV idx1 = 0, UV idx2 = 0)
+

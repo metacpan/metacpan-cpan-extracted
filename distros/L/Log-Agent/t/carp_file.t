@@ -5,7 +5,7 @@
 #   carp_file.t
 #
 #   Copyright (C) 1999 Raphael Manfredi.
-#   Copyright (C) 2002-2015 Mark Rogaski, mrogaski@cpan.org;
+#   Copyright (C) 2002-2017 Mark Rogaski, mrogaski@cpan.org;
 #   all rights reserved.
 #
 #   See the README file included with the
@@ -27,4 +27,4 @@ my $driver = Log::Agent::Driver::File->make(
 );
 logconfig(-driver => $driver);
 
-do 't/carp.pl';
+do './t/carp.pl';

@@ -3,7 +3,7 @@ package GeoIP2::Error::IPAddressNotFound;
 use strict;
 use warnings;
 
-our $VERSION = '2.003005';
+our $VERSION = '2.004000';
 
 use Moo;
 
@@ -35,7 +35,7 @@ GeoIP2::Error::IPAddressNotFound - An exception thrown when an IP address is not
 
 =head1 VERSION
 
-version 2.003005
+version 2.004000
 
 =head1 SYNOPSIS
 

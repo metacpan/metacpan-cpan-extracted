@@ -1,3 +1,13 @@
+ 0.19
+  - Revert to previous version of _is_zero() XSub. (More reliable.)
+  - Alter Overload_abs() to work correctly with -0 when the compiler/libc
+    insists that -0 * -1.0 is still -0.
+  - In new(), correct occurrence of "NaNLD(1)" to "NaNLD()" - and add test to new.t.
+  - Replace SvUV/SvIV/SvNV with SvUVX/SvIVX/SvNVX where appropriate. (In typemap, too.)
+  - Ensure that, in LDtoNV(), we don't cast an extended precision long double "inf" to
+    a __float128. Instead cast a double "inf" to __float128. (This is done only when
+    nvtype is __float128 && longdblkind is either 3 or 4.)
+
  0.18
   - tweak output of try2.in.
   - alter test 12 in t/overload_cmp_reversal.t to cater for dragonfly (in addition

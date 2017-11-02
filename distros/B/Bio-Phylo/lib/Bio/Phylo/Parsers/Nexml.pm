@@ -1,5 +1,6 @@
 package Bio::Phylo::Parsers::Nexml;
 use strict;
+use warnings;
 use base 'Bio::Phylo::Parsers::Abstract';
 use Bio::Phylo::Util::Exceptions 'throw';
 use Bio::Phylo::Util::CONSTANT qw'looks_like_instance _NEXML_VERSION_ :objecttypes';
@@ -177,10 +178,10 @@ sub _init {
         # These handlers are called when the subtree is fully loaded, which
         # means we can traverse it
         'TwigHandlers' => {
+            'nex:nexml'  => sub { &_handle_nexml( @_,  $self ) },        
             'otus'       => sub { &_handle_otus( @_,   $self ) },
             'characters' => $skipchars ? sub {} : sub { &_handle_chars( @_,  $self ) },
             'trees'      => $skiptrees ? sub {} : sub { &_handle_forest( @_, $self ) },
-            'nex:nexml'  => sub { &_handle_nexml( @_,  $self ) },
         },
 
         # These handlers are called when the element opens, that is the
@@ -340,7 +341,7 @@ sub _handle_chars {
     # create matrix object, send extra constructor args
     my $type = $characters_elt->att('xsi:type');
     my $compact = $type =~ /Seqs$/;
-    $type =~ s/^.+?:(.*?)(?:Cells|Seqs)/$1/;
+    $type =~ s/^(?:.+:)?(.*?)(?:Cells|Seqs)/$1/;
     my %args = ( '-type' => $type );
     my ( $matrix_obj, $matrix_id ) =
       $self->_obj_from_elt( $characters_elt, 'matrix', %args );

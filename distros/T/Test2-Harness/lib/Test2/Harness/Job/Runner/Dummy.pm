@@ -2,10 +2,10 @@ package Test2::Harness::Job::Runner::Dummy;
 use strict;
 use warnings;
 
-our $VERSION = '0.001026';
+our $VERSION = '0.001030';
 
-use IPC::Open3 qw/open3/;
 use Test2::Harness::Util qw/open_file write_file local_env/;
+use Test2::Harness::Util::IPC qw/run_cmd/;
 use Test2::Util qw/pkg_to_file/;
 
 use File::Spec();
@@ -64,9 +64,11 @@ sub run {
 
     my $pid;
     local_env $env => sub {
-        $pid = open3(
-            '<&' . fileno($in_fh), ">&" . fileno($out_fh), ">&" . fileno($err_fh),
-            @cmd,
+        $pid = run_cmd(
+            command => \@cmd,
+            stdin   => $in_fh,
+            stdout  => $out_fh,
+            stderr  => $err_fh,
         );
     };
 

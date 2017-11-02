@@ -34,7 +34,6 @@ my %WriteMakefileArgs = (
     "Dist::Zilla::Plugin::ConfirmRelease" => 0,
     "Dist::Zilla::Plugin::CopyFilesFromBuild" => 0,
     "Dist::Zilla::Plugin::CopyFilesFromRelease" => 0,
-    "Dist::Zilla::Plugin::CopyrightYearFromGit" => 0,
     "Dist::Zilla::Plugin::ExecDir" => 0,
     "Dist::Zilla::Plugin::Git::Check" => 0,
     "Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch" => 0,
@@ -92,7 +91,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.030",
+  "VERSION" => "0.031",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -117,7 +116,6 @@ my %FallbackPrereqs = (
   "Dist::Zilla::Plugin::ConfirmRelease" => 0,
   "Dist::Zilla::Plugin::CopyFilesFromBuild" => 0,
   "Dist::Zilla::Plugin::CopyFilesFromRelease" => 0,
-  "Dist::Zilla::Plugin::CopyrightYearFromGit" => 0,
   "Dist::Zilla::Plugin::ExecDir" => 0,
   "Dist::Zilla::Plugin::Git::Check" => 0,
   "Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch" => 0,

@@ -1,5 +1,12 @@
 Revision history for Perl extension Map::Tube::Berlin.
 
+0.15  2017-10-31
+	- data changes:
+	  - new stations names Kienberg and Freie Universitaet
+	  - missing other_links Kaiserdamm and Tegel
+	  - link values are now sorted
+	- minimum prereq Map::Tube version is now v3.32
+
 0.14  2016-06-22
 	- no code changes; just use Test::Map::Tube exclusively
 	  (change provided by manwar)

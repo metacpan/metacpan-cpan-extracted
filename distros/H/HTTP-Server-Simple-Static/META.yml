@@ -15,7 +15,7 @@ name: HTTP-Server-Simple-Static
 provides:
   HTTP::Server::Simple::Static:
     file: lib/HTTP/Server/Simple/Static.pm
-    version: '0.13'
+    version: '0.14'
 requires:
   CGI: '3.46'
   Cwd: '0'
@@ -28,5 +28,5 @@ requires:
   URI::Escape: '0'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.13'
+version: '0.14'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

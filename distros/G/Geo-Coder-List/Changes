@@ -1,5 +1,9 @@
 Revision history for Geo-Coder-List
 
+0.17	Fri Oct 27 14:14:57 EDT 2017
+	Support Geo::Coder::Ovi, Geo::Coder::US::Census,
+		Geo::Coder::GeocodeFarm and Geo::Coder::RandMcnally
+
 0.16	Tue Oct 24 22:40:26 EDT 2017
 	Return undef when the geocode fails
 

@@ -7,20 +7,16 @@ build_requires:
   Alien::gmake: '0.11'
   Archive::Tar: '0'
   Config: '0'
-  HTML::LinkExtor: '0'
-  HTTP::Tiny: '0.044'
-  IO::Socket::SSL: '1.56'
   IO::Zlib: '0'
-  Net::SSLeay: '1.49'
+  Net::FTP: '0'
   Sort::Versions: '0'
   URI: '0'
-  URI::Escape: '0'
 configure_requires:
   Alien::Build: '0.66'
   Alien::Build::MM: '0.25'
   IO::Socket::SSL: '2.043'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005'
 keywords:
   - alien
   - pcre
@@ -41,11 +37,23 @@ requires:
   Test2::Suite: '0.000072'
 resources:
   IRC: irc://irc.perl.org/#native
-  X_mailinglist: https://lists.exim.org/lurker/list/pcre-dev.html
-  X_wiki: https://en.wikipedia.org/wiki/Perl_Compatible_Regular_Expressions
+  Mailinglist: https://lists.exim.org/lurker/list/pcre-dev.html
+  Wiki: https://en.wikipedia.org/wiki/Perl_Compatible_Regular_Expressions
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Alien-PCRE2
   homepage: http://www.pcre.org
   license: http://dev.perl.org/licenses/
   repository: git://github.com/wbraswell/alien-pcre2.git
-version: '0.013000'
+version: '0.014000'
+x_alienfile:
+  generated_by: 'Alien::Build::MM version 1.28'
+  requires:
+    share:
+      Alien::gmake: '0.11'
+      Archive::Tar: '0'
+      Config: '0'
+      IO::Zlib: '0'
+      Net::FTP: '0'
+      Sort::Versions: '0'
+      URI: '0'
+    system: {}
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

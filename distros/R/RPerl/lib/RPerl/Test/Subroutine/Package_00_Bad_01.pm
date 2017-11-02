@@ -1,6 +1,6 @@
 # [[[ PREPROCESSOR ]]]
-# <<< PARSE_ERROR: 'ERROR ECOPAPC02' >>>
-# <<< PARSE_ERROR: 'Perl::Critic::Policy::Variables::ProhibitPackageVars' >>>
+# <<< PARSE_ERROR: 'ERROR ECOPARP00' >>>
+# <<< PARSE_ERROR: 'Unexpected Token:  ;' >>>
 
 # [[[ HEADER ]]]
 use RPerl;
@@ -10,8 +10,10 @@ use warnings;
 our $VERSION = 0.001_000;
 
 # [[[ SUBROUTINES ]]]
-our $empty_sub = sub {
+sub empty_sub {
+    { my void $RETURN_TYPE };
     return 2;
 };
 
 1;                  # end of package
+

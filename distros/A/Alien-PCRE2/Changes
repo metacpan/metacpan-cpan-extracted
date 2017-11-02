@@ -1,5 +1,10 @@
 Revision history for Alien::PCRE2.
 
+0.014000 2017-10-31 Codename Ovomorph
+
+    - HOLIDAY EDITION: Happy Halloween!
+    - Upgrade To PCRE2 v10.30 Official, Replace v10.30.837-DEV Unofficial
+
 0.013000 2017-07-22
 
     - Windows, Properly Require Alien::Build & Alien::MSYS & Alien::gmake

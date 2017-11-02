@@ -5,6 +5,13 @@ Created:      2016-03-25
 Home page:    <http://search.cpan.org/dist/AtteanX::Endpoint/>
 Bug tracker:  <https://github.com/kasei/atteanx-endpoint/issues>
 
+0.002  2017-10-26
+
+ - (Update) Change hashbang to use env (#2 from KjetilK).
+ - (Update) Replace use of HTML::HTML5::Parser with XML::LibXML::Parser (#4
+   from @kjetilk).
+ - (Update) Updated copyright year and added text about CodeMirror license.
+
 0.001  2016-03-25
 
  - (Addition) Initial release.

@@ -1968,21 +1968,44 @@ EOH
     # /interval/fillup
     'interval/fillup' =>
     {
-        parent => '/',
+        parent => 'interval',
         handler => {
-            GET => 'handler_noop',
-            POST => 'handler_fillup',
+            POST => 'handler_interval_fillup',
         },
         acl_profile => {
-            GET => 'passerby',
             POST => 'active',
         },
         cli => 'interval fillup',
-        description => 'Parent for interval fillup resources',
+        description => 'Generate intervals according to schedule',
         documentation => <<'EOH',
 =pod
 
-Parent for interval fillup resources
+Used with POST to create multiple attendance intervals for an employee,
+according to the prevailing schedule.
+
+The request body is a JSON object with the following parameters:
+
+=over
+
+=item * C<eid> (the EID of the employee to create intervals for; alternatively, C<nick> or C<sec_id>)
+
+=item * C<tsrange> (the time span over which to create intervals)
+
+=item * C<datelist> (a list of dates to create intervals for)
+
+=item * C<dry_run> (boolean value)
+
+=item * C<aid> (the AID of the activity; alternatively, C<code>)
+
+=item * C<desc> (optional interval description)
+
+=item * C<remark> (optional remark)
+
+=back
+
+If C<tsrange> is provided, C<datelist> should be omitted - and vice versa.
+
+If C<dry_run> is true, the resource does not change the database state.
 EOH
     },
 
@@ -2129,6 +2152,57 @@ EOH
 
 This is just like 'interval/nick/:nick/:tsrange' except that the time range is
 specified by giving a timestamp and a PostgreSQL time interval, e.g "1 week 3 days".
+EOH
+    },
+
+    # /interval/scheduled
+    'interval/scheduled' =>
+    {
+        parent => 'interval',
+        handler => {
+            POST => 'handler_interval_scheduled',
+        },
+        acl_profile => {
+            POST => 'active',
+        },
+        cli => 'interval scheduled',
+        description => 'Generate intervals according to schedule',
+        documentation => <<'EOH',
+=pod
+
+Used with POST to generate intervals according to an employee's schedule,
+without actually creating any intervals - for example, to find out what
+intervals are scheduled for a given day.
+
+(This resource is very similar to C<interval/fillup>. The key difference is it
+does not check for existing attendance intervals that might conflict. As a
+result, it can easily produce conflicts if used with C<<dry_run => 0>> (false).  
+If you want a list of non-conflicting intervals, use C<interval/fillup> with
+C<<dry_run => 1>> (true).)
+
+The request body takes the following parameters:
+
+=over
+
+=item * C<eid> (the EID of the employee to create intervals for; alternatively, C<nick> or C<sec_id>)
+
+=item * C<tsrange> (the time span over which to create intervals)
+
+=item * C<datelist> (a list of dates to create intervals for)
+
+=item * C<dry_run> (boolean value)
+
+=item * C<aid> (the AID of the activity; alternatively, C<code>)
+
+=item * C<long_desc> (optional interval description)
+
+=item * C<remark> (optional remark)
+
+=back
+
+If C<tsrange> is provided, C<datelist> should be omitted - and vice versa.
+
+If C<dry_run> is true, the resource does not change the database state.
 EOH
     },
 
@@ -2552,7 +2626,7 @@ EOH
         handler => {
             GET => 'handler_get_schedule_eid',
         },
-        acl_profile => 'admin', 
+        acl_profile => 'passerby',
         cli => 'schedule eid $EID [$TIMESTAMP]',
         validations => {
             'eid' => 'Int',

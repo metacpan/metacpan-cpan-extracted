@@ -26,28 +26,28 @@ name: Promises
 provides:
   Promises:
     file: lib/Promises.pm
-    version: '0.98'
+    version: '0.99'
   Promises::Deferred:
     file: lib/Promises/Deferred.pm
-    version: '0.98'
+    version: '0.99'
   Promises::Deferred::AE:
     file: lib/Promises/Deferred/AE.pm
-    version: '0.98'
+    version: '0.99'
   Promises::Deferred::AnyEvent:
     file: lib/Promises/Deferred/AnyEvent.pm
-    version: '0.98'
+    version: '0.99'
   Promises::Deferred::EV:
     file: lib/Promises/Deferred/EV.pm
-    version: '0.98'
+    version: '0.99'
   Promises::Deferred::IO::Async:
     file: lib/Promises/Deferred/IO/Async.pm
-    version: '0.98'
+    version: '0.99'
   Promises::Deferred::Mojo:
     file: lib/Promises/Deferred/Mojo.pm
-    version: '0.98'
+    version: '0.99'
   Promises::Promise:
     file: lib/Promises/Promise.pm
-    version: '0.98'
+    version: '0.99'
 requires:
   Carp: '0'
   Data::Dumper: '0'
@@ -62,7 +62,7 @@ resources:
   bugtracker: https://github.com/stevan/promises-perl/issues
   homepage: https://github.com/stevan/promises-perl
   repository: https://github.com/stevan/promises-perl.git
-version: '0.98'
+version: '0.99'
 x_authority: cpan:YANICK
 x_contributors:
   - 'Andy Kogut <mail@andykog.com>'

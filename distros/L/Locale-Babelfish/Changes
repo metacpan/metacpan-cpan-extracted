@@ -1,5 +1,28 @@
 Revision history for Perl extension Locale::Babelfish.
 
+2.003   Fri Oct 27 08:01:02 2017 +0000
+
+    - Added some missing test dependencies
+
+2.002
+    - Removed one internal (unexisting on CPAN) dependency
+
+2.001
+
+    - Bulk backport of changes. Can cause minor compatibility problems
+
+1.000001
+
+    [ FEATURES ]
+    - "watch" option added that allow to automatically
+      reload all dictionaries if something changed on disk.
+      We do not recommend use this option in production.
+
+    - call "check_for_changes" method to watch.
+
+    [ MISC ]
+    - fixed 'missing_build_prereqs' error
+
 1.000000 Thu Nov 27 10:01:57 2014 +0000
 
     [ FEATURES ]

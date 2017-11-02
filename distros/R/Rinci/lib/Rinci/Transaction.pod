@@ -15,13 +15,13 @@ __END__
 
 Rinci::Transaction - A transactional system based on functions
 
-=head1 VERSION
-
-This document describes version 1.1.84 of Rinci::Transaction (from Perl distribution Rinci), released on 2016-12-28.
-
 =head1 SPECIFICATION VERSION
 
  Rinci 1.1, protocol version 2
+
+=head1 VERSION
+
+This document describes version 1.1.85 of Rinci::Transaction (from Perl distribution Rinci), released on 2017-10-26.
 
 =head1 SPECIFICATION
 
@@ -63,8 +63,8 @@ transaction (violates isolation principle).
 =head2 How transaction works
 
 The basic idea is that actions are performed by function calls. For each action,
-TM will call the function twice. First for getting undo information, and second
-for actually performing the action. The undo information can be used to perform
+TM will call the function twice. First to get undo information, and second to
+actually perform the action. The undo information can be used to perform
 rollback, undo, and redo. All functions performing actions in the transaction
 must be able to supply undo information.
 
@@ -220,9 +220,9 @@ be fixed.
 For example:
 
  [200, "Directory $path needs to be created", undef,
-  {undo_actions => [rmdir => {path=>$path}]}]  # e.g. in a mkdir() function
+  {undo_actions => [ [rmdir => {path=>$path}] ]}]  # e.g. in a mkdir() function
  [200, "User $u should be created with UID $uid", undef,
-  {undo_actions => [delete_user=>{user=>$u}]}] # e.g. in create_user()
+  {undo_actions => [ [delete_user=>{user=>$u}] ]}] # e.g. in create_user()
 
 =item * unfixable
 
@@ -279,7 +279,8 @@ return:
       ['My::deluser', {group=>'bob'}],
       ['My::delgroup', {group=>'bob'}],
       ['My::rmdir', {path=>'/home/bob'}],
-  }]
+  ]},
+ ]
 
 4) TM records these undo actions in its journal:
 
@@ -313,11 +314,13 @@ return C<do_actions> in its result metadata, for example:
       ['My::adduser', {group=>'bob'}],
       ['My::addgroup', {group=>'bob'}],
       ['My::mkdir', {path=>'/home/bob'}],
+   ],
    undo_actions=>[
       ['My::deluser', {group=>'bob'}],
       ['My::delgroup', {group=>'bob'}],
       ['My::rmdir', {path=>'/home/bob'}],
-  }]
+   ]},
+ ]
 
 In this case, instead of calling function the second time, TM will just call the
 actions provided by the function, using a nested C<< $tm->action(actions =>
@@ -812,7 +815,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

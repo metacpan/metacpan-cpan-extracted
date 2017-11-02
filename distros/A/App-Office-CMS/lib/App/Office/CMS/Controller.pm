@@ -1,7 +1,8 @@
 package App::Office::CMS::Controller;
 
 use parent 'CGI::Application';
-use common::sense;
+use strict;
+use warnings;
 
 use App::Office::CMS::Util::Config;
 use App::Office::CMS::Util::Validator;
@@ -14,9 +15,9 @@ use JSON::XS;
 
 use Text::Xslate;
 
-# We don't use Moose because we ias CGI::Application.
+# We don't use Moo because we ias CGI::Application.
 
-our $VERSION = '0.92';
+our $VERSION = '0.93';
 
 # -----------------------------------------------
 
@@ -140,7 +141,6 @@ sub cgiapp_prerun
 	 form_action => $self -> query -> url(-absolute => 1),
 	 session     => $self -> param('session'),
 	 templater   => $self -> param('templater'),
-	 tmpl_path   => $self -> tmpl_path,
 	) );
 
 } # End of cgiapp_prerun.

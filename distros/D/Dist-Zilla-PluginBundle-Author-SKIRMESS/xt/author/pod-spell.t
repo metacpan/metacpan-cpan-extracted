@@ -5,10 +5,15 @@ use strict;
 use warnings;
 
 # this test was generated with
-# Dist::Zilla::Plugin::Author::SKIRMESS::RepositoryBase 0.030
+# Dist::Zilla::Plugin::Author::SKIRMESS::RepositoryBase 0.031
 
 use Test::Spelling 0.12;
 use Pod::Wordlist;
+
+if ( exists $ENV{AUTOMATED_TESTING} ) {
+    print "1..0 # SKIP these tests during AUTOMATED_TESTING\n";
+    exit 0;
+}
 
 add_stopwords(<DATA>);
 

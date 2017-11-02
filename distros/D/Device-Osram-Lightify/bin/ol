@@ -3,6 +3,7 @@
 use strict;
 use warnings;
 
+use Encode qw!decode encode!;
 use Device::Osram::Lightify::Hub;
 
 use Getopt::Long;
@@ -29,6 +30,43 @@ exit
                                    ) );
 
 #
+# Show help
+#
+if ( $CONFIG{ 'help' } )
+{
+    print <<EOHELP;
+ol - Osram Lightify utility
+
+This utility script is primarily intended to demonstrate the usage of the
+Device::Osram::Lightify module, but can also be used to control your lights.
+
+Usage:
+
+   ol --host=1.2.3.4 [options]
+
+Options:
+
+  --all-on    Turn on all known-lights.
+  --all-off   Turn off all known-lights.
+  --hub IP    Specify the IP address of the hub.
+  --list      List all known lights
+  --on  name  Turn on the named light.
+  --off name  Turn off the named light.
+
+EOHELP
+    exit 0;
+}
+
+#
+# Ensure we have a host
+#
+if ( !$CONFIG{ 'hub' } )
+{
+    print "Please specify the IP address of your hub with the '--hub' flag\n";
+    exit 1;
+}
+
+#
 # Connect to the hub
 #
 my $hub = Device::Osram::Lightify::Hub->new( host => $CONFIG{ 'hub' } );
@@ -51,7 +89,7 @@ if ( $CONFIG{ 'on' } )
     # Set a light on
     foreach my $light ( $hub->lights() )
     {
-        if ( $light->name() eq $CONFIG{ 'on' } )
+        if ( $light->name() eq decode 'UTF-8', $CONFIG{ 'on' } )
         {
             $light->set_on();
             print("Set $CONFIG{'on'} on.\n");
@@ -65,7 +103,7 @@ if ( $CONFIG{ 'off' } )
     # Set a single light off
     foreach my $light ( $hub->lights() )
     {
-        if ( $light->name() eq $CONFIG{ 'off' } )
+        if ( $light->name() eq decode 'UTF-8', $CONFIG{ 'off' } )
         {
             $light->set_off();
             print("Set $CONFIG{'off'} off.\n");
@@ -78,7 +116,7 @@ if ( $CONFIG{ 'list' } )
 
     foreach my $light ( $hub->lights() )
     {
-        print $light;
+        print encode 'UTF-8', $light;
     }
 }
 

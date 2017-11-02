@@ -1,5 +1,6 @@
 package Bio::Phylo::Util::IDPool;
 use strict;
+use warnings;
 {
     my @reclaim;
     my $obj_counter = 1;
@@ -20,6 +21,10 @@ use strict;
         my ( $class, $obj ) = @_;
 
         #        push @reclaim, $obj->get_id;
+    }
+    
+    sub _reset {
+    	$obj_counter = 1;
     }
 }
 1;

@@ -1,5 +1,5 @@
 package Net::HTTP::Spore::Middleware::Format::JSON;
-$Net::HTTP::Spore::Middleware::Format::JSON::VERSION = '0.07';
+$Net::HTTP::Spore::Middleware::Format::JSON::VERSION = '0.09';
 # ABSTRACT: middleware for JSON format
 
 use JSON;
@@ -32,7 +32,7 @@ Net::HTTP::Spore::Middleware::Format::JSON - middleware for JSON format
 
 =head1 VERSION
 
-version 0.07
+version 0.09
 
 =head1 SYNOPSIS
 

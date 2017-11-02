@@ -3,6 +3,7 @@
 # Learning RPerl, Section 4.3.1: C<return> Operator
 
 # [[[ PREPROCESSOR ]]]
+# <<< COMPILE_ERROR: "error: cannot convert ‘std::__cxx11::basic_string<char>’ to ‘integer {aka long int}’ in return" >>>
 # <<< COMPILE_ERROR: 'ERROR ECOCOSU04' >>>
 
 # [[[ HEADER ]]]
@@ -16,7 +17,7 @@ our $VERSION = 0.001_000;
 ## no critic qw(RequireInterpolationOfMetachars)  # USER DEFAULT 2: allow single-quoted control characters & sigils
 
 # [[[ SUBROUTINES ]]]
-our integer $unpredictable = sub { return 'howdy' . 'doody'; };
+sub unpredictable { { my integer $RETURN_TYPE }; return 'howdy' . 'doody'; }
 
 # [[[ OPERATIONS ]]]
 print 'have unpredictable() = ', unpredictable(), "\n";

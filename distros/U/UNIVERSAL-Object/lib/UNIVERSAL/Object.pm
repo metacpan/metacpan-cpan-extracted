@@ -8,12 +8,12 @@ use 5.006;
 
 use Carp ();
 
-our $VERSION   = '0.12';
+our $VERSION   = '0.13';
 our $AUTHORITY = 'cpan:STEVAN';
 
 BEGIN {
     eval('use ' . ($] >= 5.010 ? 'mro' : 'MRO::Compat'));
-    Carp::croak($@) if $@;
+    Carp::confess($@) if $@;
 }
 
 sub new {
@@ -28,12 +28,12 @@ sub new {
 sub BUILDARGS {
     my $class = shift;
     if ( scalar @_ == 1 && ref $_[0] ) {
-        Carp::croak('Invalid BUILDARGS args for '.$class.', expected a HASH reference but got a '.$_[0])
+        Carp::confess('Invalid BUILDARGS args for '.$class.', expected a HASH reference but got a '.$_[0])
             unless ref $_[0] eq 'HASH';
         return +{ %{ $_[0] } };
     }
     else {
-        Carp::croak('Invalid BUILDARGS args for '.$class.', expected an even sized list, but got '.(scalar @_).' element(s) instead')
+        Carp::confess('Invalid BUILDARGS args for '.$class.', expected an even sized list, but got '.(scalar @_).' element(s) instead')
             unless ((scalar @_) % 2) == 0;
         return +{ @_ };
     }
@@ -44,7 +44,7 @@ sub BLESS {
        $class = ref $class if ref $class;
     my $proto = $_[1];
 
-    Carp::croak('Invalid BLESS args for '.$class.', You must specify an instance prototype as a HASH ref')
+    Carp::confess('Invalid BLESS args for '.$class.', You must specify an instance prototype as a HASH ref')
         unless $proto && ref $proto eq 'HASH';
 
     return bless $class->CREATE( $proto ) => $class;
@@ -115,7 +115,7 @@ UNIVERSAL::Object - A useful base class
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 SYNOPSIS
 

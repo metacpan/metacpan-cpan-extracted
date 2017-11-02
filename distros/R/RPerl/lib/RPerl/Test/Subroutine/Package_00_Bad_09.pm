@@ -1,7 +1,6 @@
 # [[[ PREPROCESSOR ]]]
 # <<< PARSE_ERROR: 'ERROR ECOPARP00' >>>
-# <<< PARSE_ERROR: 'Unexpected Token:  $EMPTY_SUB' >>>
-# <<< PARSE_ERROR: 'Expected Token(s): VARIABLE_SYMBOL' >>>
+# <<< PARSE_ERROR: 'Unexpected Token:  EMPTY_SUB' >>>
 
 # [[[ HEADER ]]]
 use RPerl;
@@ -11,8 +10,7 @@ use warnings;
 our $VERSION = 0.001_000;
 
 # [[[ SUBROUTINES ]]]
-our void $EMPTY_SUB = sub {
-    return 2;
-};
+sub EMPTY_SUB { { my void $RETURN_TYPE }; return 2; }
 
 1;                  # end of package
+

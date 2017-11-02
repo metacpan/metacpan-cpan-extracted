@@ -7,7 +7,7 @@ use POSIX ();
 
 use overload '""' => \&str;
 
-our $VERSION = "0.03";
+our $VERSION = "0.05";
 
 sub new {
     my ($class, $str) = @_;
@@ -68,6 +68,11 @@ sub now {
     return $self;
 }
 
+sub epoch {
+    my ($self) = @_;
+    return $self->{epoch};
+}
+
 sub str {
     my ($self) = @_;
     my $str = POSIX::strftime("%Y-%m-%d %H:%M:%S", localtime($self->{epoch}));
@@ -80,10 +85,9 @@ sub strftime {
     return $str;
 }
 
-my $now;
 sub natural {
     my ($self) = @_;
-    $now = time if !$now;
+    my $now = time;
     my $delta = $now - $self->{epoch};
     if ($delta < -32 * 24 * 60 * 60) {
         return POSIX::strftime("%b %Y", localtime($self->{epoch}));
@@ -281,6 +285,10 @@ for example:
 =head2 natural()
 
 Prints the date in a natural format such as "25 seconds ago" or "in 5 days".
+
+=head2 epoch()
+
+Returns the Unix timestamp (epoch) of the date.
 
 =head1 CLASS SUBROUTINES
 

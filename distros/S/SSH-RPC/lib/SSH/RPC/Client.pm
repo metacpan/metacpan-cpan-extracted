@@ -1,7 +1,8 @@
 package SSH::RPC::Client;
-$SSH::RPC::Client::VERSION = '1.203';
+$SSH::RPC::Client::VERSION = '1.204';
 use strict;
 use Class::InsideOut qw(readonly private id register);
+use Scalar::Util qw(blessed);
 use JSON;
 use Net::OpenSSH;
 use SSH::RPC::Result;
@@ -12,7 +13,7 @@ SSH::RPC::Client - The requestor, or client side, of an RPC call over SSH.
 
 =head1 VERSION
 
-version 1.203
+version 1.204
 
 =head1 SYNOPSIS
 

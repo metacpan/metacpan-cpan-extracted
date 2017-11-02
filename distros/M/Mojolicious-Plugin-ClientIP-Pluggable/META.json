@@ -1,0 +1,79 @@
+{
+   "abstract" : "Client IP header handling for Mojolicious requests",
+   "author" : [
+      "binary.com <BINARY@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Mojolicious-Plugin-ClientIP-Pluggable",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Mojo" : "0",
+            "Test::More" : "0.94",
+            "Test::Warnings" : "0",
+            "perl" : "5.014000"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::EOL" : "0",
+            "Test::Mojibake" : "0",
+            "Test::More" : "0.88",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Pod::LinkCheck" : "0",
+            "Test::Synopsis" : "0",
+            "Test::Version" : "1"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Validate::IP" : "0.25",
+            "Mojolicious" : "0",
+            "perl" : "5.014000"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::CheckDeps" : "0.010",
+            "Test::More" : "0.94"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/binary-com/perl-Mojolicious-Plugin-ClientIP-CloudFlare/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/binary-com/perl-Mojolicious-Plugin-ClientIP-CloudFlare.git",
+         "web" : "https://github.com/binary-com/perl-Mojolicious-Plugin-ClientIP-CloudFlare"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+}
+

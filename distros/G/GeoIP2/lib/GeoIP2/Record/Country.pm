@@ -3,7 +3,7 @@ package GeoIP2::Record::Country;
 use strict;
 use warnings;
 
-our $VERSION = '2.003005';
+our $VERSION = '2.004000';
 
 use Moo;
 
@@ -27,7 +27,7 @@ GeoIP2::Record::Country - Contains data for the country record associated with a
 
 =head1 VERSION
 
-version 2.003005
+version 2.004000
 
 =head1 SYNOPSIS
 

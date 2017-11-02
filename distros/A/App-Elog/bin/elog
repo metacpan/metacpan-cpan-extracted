@@ -1,0 +1,1005 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Cwd ();
+use POSIX ();
+
+my %opts;
+my @logs;
+my $selected_log;
+my @errors;
+my %months = (
+    Jan => 1, Feb => 2, Mar => 3, Apr => 4, May => 5, Jun => 6,
+    Jul => 7, Aug => 8, Sep => 9, Oct => 10, Nov => 11, Dec => 12,
+);
+my $now;
+my $columns;
+
+get_opts();
+get_logs();
+select_log();
+
+if ($opts{action} eq "list") {
+    list();
+}
+elsif ($opts{action} eq "info") {
+    show_info();
+}
+elsif ($opts{action} eq "print") {
+    print_log_file();
+}
+elsif ($opts{action} eq "tailf") {
+    show_tailf();
+}
+elsif ($opts{action} eq "vim") {
+    vim_log();
+}
+elsif ($opts{action} eq "graph") {
+    show_graph();
+}
+elsif (exists $opts{last}) {
+    show_last();
+}
+else {
+    show_log();
+}
+
+sub show_graph {
+    log_file();
+    my @cmd = ("tac", $selected_log->{file2});
+    if ($selected_log->{file2} =~ /\.gz$/) {
+        @cmd = ("gzip -dc $selected_log->{file2} | tac");
+    }
+    open my $fh, "-|", @cmd
+        or die "Can't open $selected_log->{file2}: $!\n";
+    $columns = `tput cols`;
+    my $count = 0;
+    my @entries;
+    my $e1;
+    while (my $line = <$fh>) {
+        chomp $line;
+        my $e2 = parse_error_line($line);
+        if (!$e1) {
+            $e1 = $e2;
+        }
+        elsif (same_error($e1, $e2)) {
+            # ok
+        }
+        else {
+            $count++;
+            add_error_to_graph($e1, \@entries);
+            if ($opts{last} && $opts{last} == $count) {
+                goto end;
+            }
+            $e1 = $e2;
+        }
+    }
+    if ($e1) {
+        $count++;
+        add_error_to_graph($e1, \@entries);
+    }
+    end:
+    close $fh;
+    @entries = reverse @entries;
+    my $max = 0;
+    for my $entry (@entries) {
+        $entry->{total} ||= 0;
+        if ($entry->{total} > $max) {
+            $max = $entry->{total};
+        }
+    }
+    $count = 0;
+    for my $entry (@entries) {
+        $count++;
+        $entry->{count} = $count;
+        show_graph_entry($entry, $max);
+    }
+}
+
+sub add_error_to_graph {
+    my ($e, $entries) = @_;
+    $e->{date} = parse_date($e->{datestr}) or return;
+    my $entry = $entries->[-1];
+    if (!$entry) {
+        $entry = {};
+        $entry->{start} = graph_start($e->{date});
+        push @$entries, $entry;
+    }
+    elsif ($e->{date} < $entry->{start}) {
+        while (1) {
+            my $entry2 = {};
+            $entry2->{start} = $entry->{start} - $opts{period};
+            $entry = $entry2;
+            push @$entries, $entry;
+            if ($e->{date} >= $entry->{start}) {
+                last;
+            }
+        }
+    }
+    $entry->{total}++;
+}
+
+sub show_graph_entry {
+    my ($entry, $max) = @_;
+    my ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst) = localtime($entry->{start});
+    $mon += 1;
+    my $hour2;
+    if ($hour == 0) {
+        $hour2 = 12;
+    }
+    elsif ($hour > 12) {
+        $hour2 = $hour - 12;
+    }
+    else {
+        $hour2 = $hour;
+    }
+    if ($opts{interval} eq "daily") {
+        printf "%-5s: ", "$mon/$mday";
+    }
+    elsif ($hour == 0 || $entry->{count} == 1) {
+        printf "%-5s %2d: ", "$mon/$mday", $hour2;
+    }
+    else {
+        printf "      %2d: ", $hour2;
+    }
+    my $bar = "";
+    if ($entry->{total}) {
+        my $size = int(($entry->{total} / $max) * ($columns - 16));
+        $bar = "#" x $size;
+        if ($size) {
+            $bar .= " ";
+        }
+        $bar .= $entry->{total};
+    }
+    print "$bar\n";
+}
+
+sub graph_start {
+    my ($date) = @_;
+    my ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst) = localtime($date);
+    if ($opts{interval} eq "daily") {
+        $hour = 0;
+    }
+    my $start = POSIX::mktime(0, 0, $hour, $mday, $mon, $year, -1, -1, -1);
+    return $start;
+}
+
+sub myglob {
+    my ($file) = @_;
+    my $dir = dirname($file);
+    opendir my $dh, $dir or return ();
+    my @array;
+    for my $dfile (readdir $dh) {
+        next if $dfile =~ /^\.\.?$/;
+        if ("$dir/$dfile" =~ /^\Q$file\E./) {
+            push @array, "$dir/$dfile";
+        }
+    }
+    closedir $dh;
+    @array = natural_sort(@array);
+    return @array;
+}
+
+sub natural_sort {
+    my @array;
+    for my $entry (@_) {
+        my $entry2 = $entry;
+        $entry2 =~ s/(\d+)/sprintf("%05d", $1)/ge;
+        push @array, [$entry, $entry2];
+    }
+    @array = sort {$a->[1] cmp $b->[1]} @array;
+    return map {$_->[0]} @array;
+}
+
+sub vim_log {
+    log_file();
+    system "vim", $selected_log->{file2};
+}
+
+sub print_log_file {
+    log_file();
+    print "$selected_log->{file2}\n";
+}
+
+sub show_tailf {
+    log_file();
+    system "tail", "-f", $selected_log->{file2};
+}
+
+sub show_log {
+    log_file();
+    if (!-t STDOUT) {
+        system "cat", $selected_log->{file2};
+    }
+    elsif ($ENV{PAGER}) {
+        system "$ENV{PAGER} $selected_log->{file2}";
+    }
+    else {
+        system "less", "-RIMS", $selected_log->{file2};
+    }
+}
+
+sub show_info {
+    log_file();
+    my $size = -s $selected_log->{file2};
+    $size = human_readable($size);
+    print "$selected_log->{file2} $size\n";
+    my $cmd = "wc -l $selected_log->{file2}";
+    if ($selected_log->{file2} =~ /\.gz$/) {
+        $cmd = "gzip -dc $selected_log->{file2} | wc -l";
+    }
+    my $count = `$cmd`;
+    $count =~ /^(\d+)/;
+    $count = $1 + 0;
+    if (!$count) {
+        print "0 errors\n";
+        return;
+    }
+    $cmd = "head -1 $selected_log->{file2}";
+    if ($selected_log->{file2} =~ /\.gz$/) {
+        $cmd = "gzip -dc $selected_log->{file2} | head -1";
+    }
+    my $line = `$cmd`;
+    my $e1 = parse_error_line($line);
+    $cmd = "tail -1 $selected_log->{file2}";
+    if ($selected_log->{file2} =~ /\.gz$/) {
+        $cmd = "gzip -dc $selected_log->{file2} | tail -1";
+    }
+    $line = `$cmd`;
+    my $e2 = parse_error_line($line);
+    my $fromstr = datestr($e1->{date});
+    my $tostr = datestr($e2->{date});
+    my $diff = time_diff($e1->{date}, $e2->{date});
+    print "$count errors$diff between [$fromstr] and [$tostr].\n\n";
+    if (!defined $opts{last}) {
+        $opts{last} = 3;
+    }
+    show_last();
+}
+
+sub datestr {
+    my ($date) = @_;
+    return "" if !$date;
+    my $datestr = POSIX::strftime("%a %b %d, %Y %I:%M:%S%P", localtime($date));
+    return $datestr;
+}
+
+sub time_diff {
+    my ($from, $to) = @_;
+    return "" if !$from || !$to;
+    my $diff = $to - $from;
+    if ($diff < 60) {
+        return " in the $diff seconds";
+    }
+    elsif ($diff < 60 * 60) {
+        return " in the " . int($diff / 60) . " minutes";
+    }
+    elsif ($diff < 24 * 60 * 60) {
+        return " in the " . int($diff / (60 * 60)) . " hours";
+    }
+    else {
+        return " in the " . int($diff / (24 * 60 * 60)) . " days";
+    }
+}
+
+sub natural_time {
+    my ($date) = @_;
+    $now = time if !$now;
+    my $delta = $now - $date;
+    if ($delta < -32 * 24 * 60 * 60) {
+        return POSIX::strftime("%b %Y", localtime($date));
+    }
+    elsif ($delta < -2 * 24 * 60 * 60) {
+        return "in " . int(-$delta / (24 * 60 * 60)) . " days";
+    }
+    elsif ($delta < -24 * 60 * 60) {
+        return "in 1 day";
+    }
+    elsif ($delta < -2 * 60 * 60) {
+        return "in " . int(-$delta / (60 * 60)) . " hours";
+    }
+    elsif ($delta < -60 * 60) {
+        return "in 1 hour";
+    }
+    elsif ($delta < -2 * 60) {
+        return "in " . int(-$delta / 60) . " minutes";
+    }
+    elsif ($delta < -60) {
+        return "in 1 minute";
+    }
+    elsif ($delta < -1) {
+        return "in $delta seconds";
+    }
+    elsif ($delta < 0) {
+        return "in 1 second";
+    }
+    elsif ($delta < 1) {
+        return "right now";
+    }
+    elsif ($delta < 2) {
+        return "1 second ago";
+    }
+    if ($delta < 60) {
+        return "$delta seconds ago";
+    }
+    elsif ($delta < 2 * 60) {
+        return "1 minute ago";
+    }
+    elsif ($delta < 60 * 60) {
+        return int($delta / 60) . " minutes ago";
+    }
+    elsif ($delta < 2 * 60 * 60) {
+        return "1 hour ago";
+    }
+    elsif ($delta < 24 * 60 * 60) {
+        return int($delta / (60 * 60)) . " hours ago";
+    }
+    elsif ($delta < 2 * 24 * 60 * 60) {
+        return "1 day ago";
+    }
+    elsif ($delta < 32 * 24 * 60 * 60) {
+        return int($delta / (24 * 60 * 60)) . " days ago";
+    }
+    else {
+        return POSIX::strftime("%b %Y", localtime($date));
+    }
+}
+
+sub show_last {
+    parse_errors();
+    for my $e (@errors) {
+        my $datestr = datestr($e->{date}) || "Unknown time";
+        my $line = "[$datestr]";
+        if ($e->{client}) {
+            my $ip = $e->{client};
+            if ($ip =~ /^(\d+\.\d+\.\d+\.\d+):\d+/) {
+                $ip = $1;
+            }
+            $line .= " from IP $ip";
+        }
+        if ($e->{script}) {
+            $line .= " in $e->{script}";
+        }
+        $line .= ":";
+        print "$line\n$e->{mesg}\n\n";
+    }
+}
+
+sub parse_errors {
+    log_file();
+    if (length $opts{last} && $opts{last} == 0) {
+        return;
+    }
+    my @cmd = ("tac", $selected_log->{file2});
+    if ($selected_log->{file2} =~ /\.gz$/) {
+        @cmd = ("gzip -dc $selected_log->{file2} | tac");
+    }
+    open my $fh, "-|", @cmd
+        or die "Can't open $selected_log->{file2}: $!\n";
+    my $count = 0;
+    my $e1;
+    while (my $line = <$fh>) {
+        my $e2 = parse_error_line($line);
+        if (!$e1) {
+            $e1 = $e2;
+        }
+        elsif (same_error($e1, $e2)) {
+            $e1->{mesg} = "$e2->{mesg}\n$e1->{mesg}";
+        }
+        else {
+            $count++;
+            push @errors, $e1;
+            if ($opts{last} && $opts{last} == $count) {
+                goto end;
+            }
+            $e1 = $e2;
+        }
+    }
+    if ($e1) {
+        $count++;
+        push @errors, $e1;
+    }
+    end:
+    close $fh;
+    @errors = reverse @errors;
+}
+
+sub parse_error_line {
+    my ($line) = @_;
+    return undef if !$line;
+    my $e = {};
+    $e->{date} = 0;
+    $e->{client} = "";
+    $e->{script} = "";
+    $e->{type} = "";
+    if ($line !~ /^\[/) {
+        chomp $line;
+        $e->{mesg} = $line;
+        return $e;
+    }
+    if ($line !~ /^\[ ([^\]]+) \] \s* \[ ([\w:]+) \] \s* (.*)/x) {
+        return undef;
+    }
+    $e->{datestr} = $1;
+    $e->{type} = $2;
+    $line = $3;
+    $e->{date} = parse_date($e->{datestr});
+    if ($line =~ /^\[ \s* pid \s+ ([^\]]+) \] \s (.*)/x) {
+        $e->{pid} = $1;
+        $line = $2;
+    }
+    if ($line =~ /^\[ \s* client \s+ ([^\]]+) \] \s (.*)/x) {
+        $e->{client} = $1;
+        $line = $2;
+    }
+    if ($line =~ /^\[ ([^\]]+) \] \s* (\S+): \s (.*)/x) {
+        $e->{datestr2} = $1;
+        $e->{script} = $2;
+        $line = $3;
+    }
+    if ($line =~ /^(AH\d+): \s (.*)/x) {
+        $e->{ah} = $1;
+        $line = $2;
+    }
+    if ($line =~ /^(.*?), \s* referer: \s* (http\S+)$/x) {
+        $e->{mesg} = $1;
+        $e->{referer} = $2;
+    }
+    else {
+        $e->{mesg} = $line;
+    }
+    return $e;
+}
+
+# for dates that look like Tue Sep 08 13:58:21.123456 2015
+sub parse_date {
+    my ($str) = @_;
+    return () if !$str;
+    $str =~ m{^(\w+) \s+ (\w+) \s+ (\d+) \s+ (\d+) : (\d+) : (\d+) (\.(\d+))? \s+ (\d+)}x
+        or die "Can't parse date \"$str\"\n";
+    my $dow = $1;
+    my $monthstr = $2;
+    my $day = $3;
+    my $hour = $4;
+    my $min = $5;
+    my $sec = $6;
+    my $usec = $8;
+    my $year = $9;
+    my $month = $months{$monthstr} or die "Unknown month $monthstr\n";
+    my $time = POSIX::mktime($sec, $min, $hour, $day, $month - 1, $year - 1900, 0, 0, -1);
+    return $time;
+}
+
+sub same_error {
+    my ($e1, $e2) = @_;
+    if (!$e1 || !$e2) {
+        return 0;
+    }
+    if (!$e1->{date} && !$e2->{date}) {
+        return 1;
+    }
+    if ($e1->{pid} && $e2->{pid}) {
+        return $e1->{pid} eq $e2->{pid};
+    }
+    if ($e1->{date} ne $e2->{date} ||
+        $e1->{type} ne $e2->{type} ||
+        $e1->{client} ne $e2->{client} ||
+        $e1->{script} ne $e2->{script}) {
+        return 0;
+    }
+    return 1;
+}
+
+sub log_file {
+    if (!$selected_log) {
+        die "No log selected\n";
+    }
+    if ($selected_log->{file2}) {
+        return;
+    }
+    elsif (!$opts{rotation}) {
+        $selected_log->{file2} = $selected_log->{file};
+    }
+    elsif (-e "$selected_log->{file}.$opts{rotation}.gz") {
+        $selected_log->{file2} = "$selected_log->{file}.$opts{rotation}.gz";
+    }
+    elsif (-e "$selected_log->{file}.$opts{rotation}") {
+        $selected_log->{file2} = "$selected_log->{file}.$opts{rotation}";
+    }
+    elsif (-e "$selected_log->{file}-$opts{rotation}.gz") {
+        $selected_log->{file2} = "$selected_log->{file}-$opts{rotation}.gz";
+    }
+    elsif (-e "$selected_log->{file}-$opts{rotation}") {
+        $selected_log->{file2} = "$selected_log->{file}-$opts{rotation}";
+    }
+    else {
+        die "Unable to find log file.\n";
+    }
+}
+
+sub list {
+    for my $log (@logs) {
+        if ($opts{verbose}) {
+            show_log_info_verbose($log);
+        }
+        else {
+            show_log_info($log);
+        }
+    }
+}
+
+sub show_log_info {
+    my ($log) = @_;
+    my $selected = $log->{selected} ? "*" : " ";
+    my $size = "-";
+    my $updated = "";
+    my $rinfo = "";
+    if (-e $log->{file}) {
+        $size = human_readable(-s $log->{file});
+        my $mtime = (stat($log->{file}))[9];
+        $updated = " " . natural_time($mtime);
+        my @rotations = myglob($log->{file});
+        my $rcount = @rotations;
+        if ($rcount) {
+            my $rsize = 0;
+            for my $rotation (@rotations) {
+                $rsize += -s $rotation || 0;
+            }
+            $rsize = human_readable($rsize);
+            $rinfo = " +$rcount $rsize";
+        }
+    }
+    my $name = $log->{name};
+    my $line = sprintf "%s %-33s %-15s %s", $selected, $name, "$size$rinfo", $updated;
+    print "$line\n";
+}
+
+sub show_log_info_verbose {
+    my ($log) = @_;
+    my $selected = $log->{selected} ? "* " : "";
+    my $size = "-";
+    my $updated = "";
+    my $rinfo = "";
+    my @rotations2;
+    if (-e $log->{file}) {
+        $size = human_readable(-s $log->{file});
+        my $mtime = (stat($log->{file}))[9];
+        $updated = natural_time($mtime);
+        my @rotations = myglob($log->{file});
+        my $rcount = @rotations;
+        if ($rcount) {
+            my $rsize = 0;
+            for my $rotation (@rotations) {
+                $rsize += -s $rotation || 0;
+                if ($rotation =~ /^\Q$log->{file}\E.(.*?)(\.gz)?$/) {
+                    my $r = {};
+                    $r->{name} = $1;
+                    $r->{size} = human_readable(-s $rotation);
+                    my $mtime = (stat($rotation))[9];
+                    $r->{updated} = natural_time($mtime);
+                    push @rotations2, $r;
+                }
+            }
+            $rsize = human_readable($rsize);
+            $rinfo = " +$rcount $rsize";
+        }
+    }
+    my $docroot = "";
+    my $docroot2 = "";
+    if ($log->{vhost} && $log->{vhost}{docroot}) {
+        $docroot = $log->{vhost}{docroot};
+        $docroot2 = Cwd::abs_path($docroot);
+    }
+    print "$selected$log->{name}\n";
+    print "    file $log->{file}\n";
+    print "    size $size$rinfo\n";
+    if ($updated) {
+        print "    updated $updated\n";
+    }
+    if ($log->{fname}) {
+        print "    fname $log->{fname}\n";
+    }
+    if ($log->{format}) {
+        print "    format $log->{format}\n";
+    }
+    if ($docroot) {
+        print "    docroot $docroot\n";
+    }
+    if ($docroot2 && $docroot2 ne $docroot) {
+        print "    docroot2 $docroot2\n";
+    }
+    for my $r (@rotations2) {
+        print "    rotation $r->{name} ($r->{size} $r->{updated})\n";
+    }
+}
+
+sub human_readable {
+    my ($size) = @_;
+    my @power = ("B", "K", "M", "G", "T", "P", "E", "Z", "Y");
+    my $i = 0;
+    my $abs_size = abs $size;
+    for ($i = 0; $i < @power; $i++) {
+        last if $abs_size < 1024;
+        $abs_size /= 1024;
+    }
+    my $str = sprintf("%.1f", $abs_size) . $power[$i];
+    $str =~ s/\.0//;
+    $str = "-$str" if $size < 0;
+    return $str;
+}
+
+sub select_log {
+    if ($opts{name}) {
+        select_log_by_name($opts{name});
+        return;
+    }
+    select_log_by_cwd();
+    if (!$selected_log && $opts{default}) {
+        select_log_by_name($opts{default});
+    }
+    if (!$selected_log && @logs) {
+        $selected_log = $logs[0];
+        $selected_log->{selected} = 1;
+        return;
+    }
+}
+
+sub select_log_by_name {
+    my ($name) = @_;
+    if ($name =~ /\//) {
+        for my $log (@logs) {
+            if ($log->{file} eq $name) {
+                $log->{selected} = 1;
+                $selected_log = $log;
+                return;
+            }
+        }
+        $selected_log = add_log($name);
+        $selected_log->{selected} = 1;
+    }
+    else {
+        my $regexp = qr/^$name/;
+        for my $log (@logs) {
+            if ($log->{name} =~ $regexp) {
+                $log->{selected} = 1;
+                $selected_log = $log;
+                return;
+            }
+        }
+    }
+}
+
+sub add_log {
+    my ($file) = @_;
+    my $log = {};
+    $log->{file} = $file;
+    $log->{name} = basename($file);
+    push @logs, $log;
+    return $log;
+}
+
+sub select_log_by_cwd {
+    my $cwd = $ENV{PWD};
+    $cwd =~ s{/+$}{};
+    for my $log (@logs) {
+        next if !$log || !$log->{vhost} || !$log->{vhost}{docroot};
+        my $docroot = Cwd::abs_path($log->{vhost}{docroot});
+        next if !$docroot;
+        $docroot =~ s/\/+$//;
+        $docroot =~ s/\/public_html$//;
+        if ($cwd =~ /^$docroot(\/|$)/) {
+            $log->{selected} = 1;
+            $selected_log = $log;
+            return;
+        }
+    }
+}
+
+sub get_logs {
+    get_logs_from_apache_conf();
+    if (-e "/usr/local/apache/logs/error_log") {
+        add_log("/usr/local/apache/logs/error_log");
+    }
+}
+
+sub get_logs_from_apache_conf {
+    my @files = `find /etc/apache2 /etc/httpd 2>/dev/null`;
+    my @logs_all;
+    my $host = {};
+    my $vhost = $host;
+    my %vhosts;
+    for my $file (@files) {
+        chomp $file;
+        next if $file =~ /\bavailable\b/;
+        open my $fh, $file or next;
+        while (my $line = <$fh>) {
+            chomp $line;
+            if ($line =~ /^\s*<VirtualHost(|\s+([^>]*))>/ims) {
+                $vhost = {vname => $2};
+            }
+            elsif ($line =~ /^\s*<\/VirtualHost>/ims) {
+                $vhost->{name} = vhost_name($vhost);
+                delete $vhost->{vname};
+                delete $vhost->{sname};
+                # The first <VirtualHost> is used if multiple identical named ones exist
+                if ($vhosts{$vhost->{name}}) {
+                    $vhost->{invalid} = 1;
+                }
+                else {
+                    $vhosts{$vhost->{name}} = $vhost;
+                }
+                $vhost = $host;
+            }
+            elsif ($line =~ /^\s*ServerName\s+(\S+)/ims) {
+                $vhost->{sname} = $1;
+            }
+            elsif ($line =~ /^\s*DocumentRoot\s+(.+)/ims) {
+                $vhost->{docroot} = unquote($1);
+            }
+            elsif ($line =~ /^\s*ServerRoot\s+(\S+)/ims) {
+                $vhost->{servroot} = unquote($1);
+            }
+            elsif ($line =~ /^\s*ErrorLog(\s+(request|connection))?\s+(.+)/ims) {
+                my $log = {};
+                $log->{vhost} = $vhost;
+                $log->{file} = unquote($3);
+                env_replace($log);
+                $log->{name} = basename($log->{file});
+                push @logs_all, $log;
+            }
+        }
+        close $fh;
+    }
+    my %logs;
+    for my $log (sort byfile @logs_all) {
+        if ($log && $log->{vhost}) {
+            if ($log->{vhost}{invalid}) {
+                next;
+            }
+            if ($host->{servroot} && $log->{file} !~ /^\//) {
+                $log->{file} = "$host->{servroot}/$log->{file}";
+            }
+            if ($logs{$log->{file}}) {
+                next;
+            }
+            $logs{$log->{file}} = $log;
+        }
+        push @logs, $log;
+    }
+}
+
+sub env_replace {
+    my ($log) = @_;
+    $ENV{APACHE_LOG_DIR} ||= "/var/log/apache2";
+    $log->{file} =~ s/\$\{(\w+)\}/$ENV{$1}/ge;
+}
+
+sub byfile {
+    return $a->{name} cmp $b->{name};
+}
+
+sub basename {
+    my ($file) = @_;
+    $file =~ /([^\/]+)$/;
+    my $name = $1;
+    return $name;
+}
+
+sub dirname {
+    my ($file) = @_;
+    $file =~ /^((.*)\/)/;
+    my $dir = $2 || ".";
+    return $dir;
+}
+
+sub unquote {
+    my ($file) = @_;
+    return $file if !$file;
+    if ($file =~ /^"((\\"|[^"])*)"/) {
+        $file = $1;
+    }
+    elsif ($file =~ /^'((\\'|[^'])*)'/) {
+        $file = $1;
+    }
+    $file =~ s/\\(["'])/$1/g;
+    return $file;
+}
+
+
+sub vhost_name {
+    my ($vhost) = @_;
+    my @name;
+    if ($vhost->{sname}) {
+        push @name, $vhost->{sname};
+    }
+    if ($vhost->{vname}) {
+        push @name, $vhost->{vname};
+    }
+    my $name = join " ", @name;
+    return $name;
+}
+
+sub get_opts {
+    my @args;
+    $opts{action} = "less";
+    while (my $arg = shift @ARGV) {
+        if ($arg =~ /^--?$/) {
+            push @args, @ARGV;
+            last;
+        }
+        elsif ($arg =~ /^-a(\d*)$/) {
+            $opts{last} = $1;
+        }
+        elsif ($arg =~ /^-d(=(.*))?$/) {
+            $opts{default} = $1 ? $2 : shift(@ARGV);
+        }
+        elsif ($arg =~ /^-f$/) {
+            $opts{action} = "tailf";
+        }
+        elsif ($arg =~ /^-g([dh]?)$/) {
+            $opts{action} = "graph";
+            my $interval = $1 || "";
+            if ($interval eq "d") {
+                $opts{interval} = "daily";
+                $opts{period} = 24 * 60 * 60;
+            }
+            else {
+                $opts{interval} = "hourly";
+                $opts{period} = 60 * 60;
+            }
+        }
+        elsif ($arg =~ /^(--?help|-h|-\?)$/) {
+            usage();
+        }
+        elsif ($arg =~ /^-i$/) {
+            $opts{action} = "info";
+        }
+        elsif ($arg =~ /^-l(l)?$/) {
+            $opts{action} = "list";
+            $opts{verbose} = $1;
+        }
+        elsif ($arg =~ /^-p$/) {
+            $opts{action} = "print";
+        }
+        elsif ($arg =~ /^-r(\w+)$/) {
+            $opts{rotation} = $1;
+        }
+        elsif ($arg =~ /^-v$/) {
+            $opts{action} = "vim";
+        }
+        elsif ($arg =~ /^-/) {
+            die "Invalid argument '$arg'\n";
+        }
+        else {
+            push @args, $arg;
+        }
+    }
+    if (@args > 1) {
+        die "Too many arguments\n";
+    }
+    $opts{name} = shift @args;
+}
+
+sub usage {
+    print <<EOUSAGE;
+Usage: elog [<options>] [<name>]
+
+-a[<n>]    show last n errors on own line, info preceeding
+-d=<file>  default log when one isn't found for cwd
+-f         tail -f the log
+-g         graph errors at hourly intervals
+-gd        graph errors at daily intervals
+-h         displays this help text
+-i         info and statistics
+-l         list available logs
+-ll        list available logs verbosely
+-p         print log path
+-r<n>      rotation number
+-v         vim the log
+
+<name>     name of the log you are trying to access (regexp),
+           if name contains a "/", name is treated as a file name,
+           default is the error log for the cwd.
+
+by default, this command will open the log in \$PAGER or less(1)
+EOUSAGE
+    exit;
+}
+
+__END__
+
+=head1 NAME
+
+elog - An Apache error log viewer
+
+=head1 SYNOPSIS
+
+    elog [<options>] [<name>]
+
+=head1 OPTIONS
+
+    -a[<n>]    show last n errors on own line, info preceeding
+    -d=<file>  default log when one isn't found for cwd
+    -f         tail -f the log
+    -g         graph errors at hourly intervals
+    -gd        graph errors at daily intervals
+    -h         displays this help text
+    -i         info and statistics
+    -l         list available logs
+    -ll        list available logs verbosely
+    -p         print log path
+    -r<n>      rotation number
+    -v         vim the log
+
+    <name>     name of the log you are trying to access (regexp),
+               if name contains a "/", name is treated as a file name,
+               default is the error log for the cwd.
+
+=head1 DESCRIPTION
+
+This program will show the Apache error log associated with the
+directory you are currently inside of.
+
+Many people set up web servers with each website inside their own
+directory in $HOME or /var/www. While working on these sites, for
+example /var/www/coolsite.com/, you can run `elog` with no arguments
+and it will show the error log for that site inside of less(1).
+
+If you define the $PAGER environment variable, `elog` will use that
+program instead of less(1).
+
+If you want to view another site's error log, provide `elog` with an
+expression that partially matches the name of that website's log
+after the `elog` command. For example, `elog foo`.
+
+To see a list of all the error logs on the server use `elog -l`.
+More detailed information, such as what rotations exist for each
+log, use `elog -ll`.
+
+To specify an older rotation of an error log, use the -r option.
+For example `elog -r2`, might show the /var/log/httpd/foo.error_log.2.gz
+file.
+
+The way it determines which error log to show is by parsing Apache
+config files in either /etc/httpd or /etc/apache2. An ErrorLog line
+tells where the error log is, a DocRoot line tells which directory
+that error log is for.
+
+The -p option will show the path the selected error log file.
+
+The -f option will open the log in `tail -f`.
+
+The -v option will open the log in `vim`.
+
+The -i option will show statistics about the error log file such
+as how many errors there were and what time frame.
+
+The -a option will show the message of the error on it's own line,
+with extra info such as date and ip address on a line beforehand.
+When multiple lines of the error log relate to the same error, they
+are grouped.
+
+The -g option will show a graph of the number of errors in an hourly
+interval.
+
+The -gd option will show a graph of the number of errors in a daily
+interval.
+
+=head1 METACPAN
+
+L<https://metacpan.org/pod/App::Elog>
+
+=head1 AUTHOR
+
+Jacob Gelbman E<lt>gelbman@gmail.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2017 by Jacob Gelbman
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.18.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut
+

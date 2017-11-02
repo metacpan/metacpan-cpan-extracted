@@ -1,5 +1,10 @@
 Revision history for IO-Async-SSL
 
+0.21    2017-11-01 11:46:00
+        [BUGFIXES]
+         * Detect early failures of IO::Socket::SSL->SSL_start such as bad
+           arguments
+
 0.20    2017/07/11 12:49:13
         [BUGFIXES]
          * Minor fixes to openssl-running unit tests

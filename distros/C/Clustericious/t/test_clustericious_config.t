@@ -58,7 +58,6 @@ subtest create_config_ok => sub {
         call name => 'create config for Baz';
       };
       event Diag => sub {};
-      event Diag => sub {};
       event Diag => sub {
         call message => 'unable to locate text for Baz';
       };
@@ -119,7 +118,6 @@ subtest create_directory_ok => sub {
         call pass => F();
         call name => 'create directory [undef]';
       };
-      event Diag => sub {};
       event Diag => sub {};
       end;
     },

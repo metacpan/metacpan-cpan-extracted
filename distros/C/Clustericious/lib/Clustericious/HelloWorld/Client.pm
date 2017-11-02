@@ -6,7 +6,7 @@ use Clustericious::Client;
 use Clustericious::Client::Command;
 
 # ABSTRACT: Clustericious hello world client
-our $VERSION = '1.26'; # VERSION
+our $VERSION = '1.27'; # VERSION
 
 route 'welcome' => "GET",  '/';
 
@@ -24,7 +24,7 @@ Clustericious::HelloWorld::Client - Clustericious hello world client
 
 =head1 VERSION
 
-version 1.26
+version 1.27
 
 =head1 AUTHOR
 

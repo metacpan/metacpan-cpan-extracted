@@ -1,5 +1,5 @@
 package Ryu::Async::Server;
-$Ryu::Async::Server::VERSION = '0.007';
+$Ryu::Async::Server::VERSION = '0.008';
 use strict;
 use warnings;
 

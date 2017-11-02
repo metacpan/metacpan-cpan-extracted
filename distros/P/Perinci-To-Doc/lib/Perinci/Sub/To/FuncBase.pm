@@ -1,7 +1,7 @@
 package Perinci::Sub::To::FuncBase;
 
-our $DATE = '2017-08-12'; # DATE
-our $VERSION = '0.860'; # VERSION
+our $DATE = '2017-10-26'; # DATE
+our $VERSION = '0.861'; # VERSION
 
 use 5.010;
 use Log::ger;
@@ -228,7 +228,7 @@ Perinci::Sub::To::FuncBase - Base class for Perinci::Sub::To::* function documen
 
 =head1 VERSION
 
-This document describes version 0.860 of Perinci::Sub::To::FuncBase (from Perl distribution Perinci-To-Doc), released on 2017-08-12.
+This document describes version 0.861 of Perinci::Sub::To::FuncBase (from Perl distribution Perinci-To-Doc), released on 2017-10-26.
 
 =for Pod::Coverage .+
 

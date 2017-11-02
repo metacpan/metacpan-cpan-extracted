@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Alien::JPCRE2;
 
-our $VERSION = '0.008000';
+our $VERSION = '0.009000';
 
 use base qw( Alien::Base );
 

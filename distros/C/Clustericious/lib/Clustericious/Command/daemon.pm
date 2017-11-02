@@ -6,7 +6,7 @@ use base qw( Clustericious::Command );
 use Mojolicious::Command::daemon;
 
 # ABSTRACT: Clustericious command to stat nginx
-our $VERSION = '1.26'; # VERSION
+our $VERSION = '1.27'; # VERSION
 
 
 sub description { Mojolicious::Command::daemon->new->description };
@@ -41,7 +41,7 @@ Clustericious::Command::daemon - Clustericious command to stat nginx
 
 =head1 VERSION
 
-version 1.26
+version 1.27
 
 =head1 DESCRIPTION
 

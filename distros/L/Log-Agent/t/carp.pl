@@ -4,7 +4,7 @@
 #   carp.pl
 #
 #   Copyright (C) 1999 Raphael Manfredi.
-#   Copyright (C) 2002-2015 Mark Rogaski, mrogaski@cpan.org;
+#   Copyright (C) 2002-2017 Mark Rogaski, mrogaski@cpan.org;
 #   all rights reserved.
 #
 #   See the README file included with the
@@ -14,10 +14,10 @@
 
 print "1..11\n";
 
-require 't/code.pl';
+require './t/code.pl';
 sub ok;
 
-my $FILE = "t/carp.pl";
+my $FILE = "./t/carp.pl";
 
 package OTHER;
 use Log::Agent;

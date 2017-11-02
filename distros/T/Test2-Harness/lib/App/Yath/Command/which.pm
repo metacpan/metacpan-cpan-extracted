@@ -2,7 +2,7 @@ package App::Yath::Command::which;
 use strict;
 use warnings;
 
-our $VERSION = '0.001026';
+our $VERSION = '0.001030';
 
 use Test2::Harness::Util::File::JSON;
 
@@ -26,7 +26,7 @@ sub cli_args { "" }
 
 sub description {
     return <<"    EOT";
-foo bar baz
+This will tell you about any persistent runners it can find.
     EOT
 }
 

@@ -38,7 +38,7 @@ my %WriteMakefileArgs = (
     "File::Which" => 0,
     "Getopt::Long" => 0,
     "JSON::MaybeXS" => 0,
-    "List::Util" => 0,
+    "List::Util" => "1.45",
     "Log::ger" => "0.023",
     "Log::ger::App" => "0.002",
     "Log::ger::Output::Screen" => "0.007",
@@ -65,7 +65,7 @@ my %WriteMakefileArgs = (
     "Test::Perinci::CmdLine" => "1.47",
     "YAML::Old" => 0
   },
-  "VERSION" => "1.79",
+  "VERSION" => "1.80",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -90,7 +90,7 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "JSON::MaybeXS" => 0,
-  "List::Util" => 0,
+  "List::Util" => "1.45",
   "Log::ger" => "0.023",
   "Log::ger::App" => "0.002",
   "Log::ger::Output::Screen" => "0.007",

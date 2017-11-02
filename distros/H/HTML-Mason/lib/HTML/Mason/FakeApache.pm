@@ -1,5 +1,5 @@
 package HTML::Mason::FakeApache;
-$HTML::Mason::FakeApache::VERSION = '1.56';
+$HTML::Mason::FakeApache::VERSION = '1.58';
 use strict;
 use warnings;
 
@@ -315,7 +315,7 @@ sub params {
 
 ###########################################################
 package HTML::Mason::FakeTable;
-$HTML::Mason::FakeTable::VERSION = '1.56';
+$HTML::Mason::FakeTable::VERSION = '1.58';
 # Analogous to Apache::Table.
 use strict;
 use warnings;
@@ -370,7 +370,7 @@ sub do {
 
 ###########################################################
 package HTML::Mason::FakeTableHash;
-$HTML::Mason::FakeTableHash::VERSION = '1.56';
+$HTML::Mason::FakeTableHash::VERSION = '1.58';
 # Used by HTML::Mason::FakeTable.
 use strict;
 use warnings;

@@ -47,6 +47,7 @@ on 'develop' => sub {
   requires "Code::TidyAll::Plugin::SortLines::Naturally" => "0.000003";
   requires "Code::TidyAll::Plugin::Test::Vars" => "0.02";
   requires "DateTime" => "0";
+  requires "Dist::Zilla::Plugin::OSPrereqs" => "0";
   requires "File::Find::Rule" => "0";
   requires "File::Spec" => "0";
   requires "File::pushd" => "0";
@@ -80,5 +81,4 @@ on 'develop' => sub {
   requires "Test::Vars" => "0.009";
   requires "Test::Version" => "2.05";
   requires "autodie" => "0";
-  requires "blib" => "1.01";
 };

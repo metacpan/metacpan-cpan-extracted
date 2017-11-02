@@ -1,5 +1,5 @@
 /* -*- c -*-
-  Copyright (C) 2006, 2008, 2011 Rocky Bernstein <rocky@cpan.org>
+  Copyright (C) 2006, 2008, 2011, 2012 Rocky Bernstein <rocky@cpan.org>
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -92,12 +92,6 @@
 %constant long int DRIVER_BINCUE = DRIVER_BINCUE;
 %constant long int DRIVER_NRG = DRIVER_NRG;
 %constant long int DRIVER_DEVICE = DRIVER_DEVICE;
-
-%constant long int MIN_DRIVER = CDIO_MIN_DRIVER;
-%constant long int MIN_DEVICE_DRIVER = CDIO_MIN_DEVICE_DRIVER;
-%constant long int MAX_DRIVER = CDIO_MAX_DRIVER;
-%constant long int MAX_DEVICE_DRIVER = CDIO_MAX_DEVICE_DRIVER;
-
 
 %constant long int DRIVER_OP_SUCCESS = DRIVER_OP_SUCCESS;
 %constant long int DRIVER_OP_ERROR = DRIVER_OP_ERROR;

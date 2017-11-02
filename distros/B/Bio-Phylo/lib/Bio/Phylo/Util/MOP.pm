@@ -1,10 +1,11 @@
 package Bio::Phylo::Util::MOP;
 use strict;
+use warnings;
 use attributes;
 use Attribute::Handlers;
 use Data::Dumper;
 use Bio::Phylo::Util::Exceptions 'throw';
-use Bio::Phylo::Util::Logger ':simple';
+use Bio::Phylo::Util::Logger ':levels';
 use Scalar::Util qw( refaddr );
 
 =head1 NAME

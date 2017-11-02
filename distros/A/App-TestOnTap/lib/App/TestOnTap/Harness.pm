@@ -8,6 +8,7 @@ use base qw(TAP::Harness);
 use App::TestOnTap::Scheduler;
 use App::TestOnTap::Dispenser;
 use App::TestOnTap::Util qw(slashify $IS_PACKED);
+use App::TestOnTap::Postprocess;
 
 use TAP::Formatter::Console;
 use TAP::Formatter::File;
@@ -92,7 +93,7 @@ sub runtests
 			{
 				my $desc = $job->description();
 				my $filename = $job->filename;
-				my $cmdline = $self->exec->($self, $filename);
+				my $cmdline = $self->exec()->($self, $filename);
 				print "$topDelimLine\n";
 				print "Run test '$desc' using:\n";
 				print "  $_\n" foreach (@$cmdline);
@@ -101,6 +102,13 @@ sub runtests
 				$job->finish();
 			}	
 		}
+		
+
+		# run postprocessing
+		#
+		my $postprocess = App::TestOnTap::Postprocess->new($self->{testontap}->{args}->getConfig()->getPostprocessCmd(), $self->{testontap}->{args}, $self->{testontap}->{args}->getPreprocess()->getArgv());
+
+		$failed++ if $postprocess->getExitCode();
 		
 		# drop the special workaround envvar...
 		#

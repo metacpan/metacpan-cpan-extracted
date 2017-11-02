@@ -68,16 +68,17 @@ sub get {
     } elsif ($response->code == 404) {
         return {};
     } else {
+        my $message = decode_json($response->decoded_content);
         Catmandu::HTTPError->throw({
-                code             => $response->code,
-                message          => $response->headers->header('message'),
-                url              => $response->request->uri,
-                method           => $response->request->method,
-                request_headers  => [],
-                request_body     => $response->request->decoded_content,
-                response_headers => [],
-                response_body    => $response->decoded_content,
-            });
+            code             => $response->code,
+            message          => $message->{error}->{msg},
+            url              => $response->request->uri->as_string,
+            method           => $response->request->method,
+            request_headers  => [],
+            request_body     => $response->request->decoded_content,
+            response_headers => [],
+            response_body    => $response->decoded_content,
+        });
         return undef;
     }
 }
@@ -100,16 +101,17 @@ sub add {
             return $self->add($data);
         }
     } else {
+        my $message = decode_json($response->decoded_content);
         Catmandu::HTTPError->throw({
-                code             => $response->code,
-                message          => $response->headers->header('message'),
-                url              => $response->request->uri,
-                method           => $response->request->method,
-                request_headers  => [],
-                request_body     => $response->request->decoded_content,
-                response_headers => [],
-                response_body    => $response->decoded_content,
-            });
+            code             => $response->code,
+            message          => $message->{error}->{msg},
+            url              => $response->request->uri->as_string,
+            method           => $response->request->method,
+            request_headers  => [],
+            request_body     => $response->request->decoded_content,
+            response_headers => [],
+            response_body    => $response->decoded_content,
+        });
         return undef;
     }
 }
@@ -139,16 +141,17 @@ sub update {
             return $self->update($id, $data);
         }
     } else {
+        my $message = decode_json($response->decoded_content);
         Catmandu::HTTPError->throw({
-                code             => $response->code,
-                message          => $response->headers->header('message'),
-                url              => $response->request->uri,
-                method           => $response->request->method,
-                request_headers  => [],
-                request_body     => $response->request->decoded_content,
-                response_headers => [],
-                response_body    => $response->decoded_content,
-            });
+            code             => $response->code,
+            message          => $message->{error}->{msg},
+            url              => $response->request->uri->as_string,
+            method           => $response->request->method,
+            request_headers  => [],
+            request_body     => $response->request->decoded_content,
+            response_headers => [],
+            response_body    => $response->decoded_content,
+        });
         return undef;
     }
 }
@@ -178,16 +181,17 @@ sub delete {
             return $self->delete($id);
         }
     } else {
+        my $message = decode_json($response->decoded_content);
         Catmandu::HTTPError->throw({
-                code             => $response->code,
-                message          => $response->headers->header('message'),
-                url              => $response->request->uri,
-                method           => $response->request->method,
-                request_headers  => [],
-                request_body     => $response->request->decoded_content,
-                response_headers => [],
-                response_body    => $response->decoded_content,
-            });
+            code             => $response->code,
+            message          => $message->{error}->{msg},
+            url              => $response->request->uri->as_string,
+            method           => $response->request->method,
+            request_headers  => [],
+            request_body     => $response->request->decoded_content,
+            response_headers => [],
+            response_body    => $response->decoded_content,
+        });
         return undef;
     }
 }
@@ -202,16 +206,17 @@ sub list {
     if ($response->is_success) {
         return decode_json($response->decoded_content);
     } else {
+        my $message = decode_json($response->decoded_content);
         Catmandu::HTTPError->throw({
-                code             => $response->code,
-                message          => $response->headers->header('message'),
-                url              => $response->request->uri,
-                method           => $response->request->method,
-                request_headers  => [],
-                request_body     => $response->request->decoded_content,
-                response_headers => [],
-                response_body    => $response->decoded_content,
-            });
+            code             => $response->code,
+            message          => $message->{error}->{msg},
+            url              => $response->request->uri->as_string,
+            method           => $response->request->method,
+            request_headers  => [],
+            request_body     => $response->request->decoded_content,
+            response_headers => [],
+            response_body    => $response->decoded_content,
+        });
         return undef;
     }
 }

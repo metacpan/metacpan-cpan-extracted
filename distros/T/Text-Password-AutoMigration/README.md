@@ -1,10 +1,7 @@
+[![Build Status](https://travis-ci.org/worthmine/Text-Password-AutoMigration.svg?branch=master)](https://travis-ci.org/worthmine/Text-Password-AutoMigration)
 # NAME
 
 Text::Password::AutoMigration - generate and verify Password with any contexts
-
-<div>
-    <a href="https://travis-ci.org/worthmine/Text-Password-AutoMigration"><img src="https://travis-ci.org/worthmine/Text-Password-AutoMigration.svg?branch=master"></a>
-</div>
 
 # SYNOPSIS
 
@@ -88,7 +85,7 @@ New hash length is at least 98. So you have to change your DB like below:
 
 ### nonce($length)
 
-generates the strings with enough strength.
+generates the random strings with enough strength.
 
 the length defaults to 8($self->default).
 
@@ -107,10 +104,15 @@ unless $self->readability is 0.
 
 the length defaults to 8($self->default).
 
+**DON'T TRUST** this method.
+According to [Password expert says he was wrong](https://www.usatoday.com/story/news/nation-now/2017/08/09/password-expert-says-he-wrong-numbers-capital-letters-and-symbols-useless/552013001/),
+it's not a safe way. So, I will rewrite this method as soon as I find the better way.
+
 # SEE ALSO
 
 - [GitHub](https://github.com/worthmine/Text-Password-AutoMigration)
 - [CPAN](http://search.cpan.org/perldoc?Text%3A%3APassword%3A%3AAutoMigration)
+- [https://shattered.io/](https://shattered.io/)
 
 # LICENSE
 

@@ -5,8 +5,9 @@ use warnings;
 use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::JSON qw(decode_json to_json);
 use GraphQL::Execution qw(execute);
+use Module::Runtime qw(require_module);
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 my @DEFAULT_METHODS = qw(get post);
 my $EXECUTE = sub {
@@ -46,6 +47,13 @@ sub _safe_serialize {
 
 sub register {
   my ($self, $app, $conf) = @_;
+  if ($conf->{convert}) {
+    my ($class, @values) = @{ $conf->{convert} };
+    $class = "GraphQL::Plugin::Convert::$class";
+    require_module $class;
+    my $converted = $class->to_graphql(@values);
+    @{$conf}{keys %$converted} = values %$converted;
+  }
   die "Need schema or handler\n" if !grep $conf->{$_}, qw(schema handler);
   my $endpoint = $conf->{endpoint} || '/graphql';
   my $handler = $conf->{handler} || make_code_closure(
@@ -169,6 +177,14 @@ Returns GraphQL results in JSON form.
 
 L<Mojolicious::Plugin::GraphQL> supports the following options.
 
+=head2 convert
+
+Array-ref. First element is a classname-part, which will be prepended with
+"L<GraphQL::Plugin::Convert>::". The other values will be passed
+to that class's L<GraphQL::Plugin::Convert/to_graphql> method. The
+returned hash-ref will be used to set options, particularly C<schema>,
+and probably at least one of C<resolver> and C<root_value>.
+
 =head2 endpoint
 
 String. Defaults to C</graphql>.
@@ -219,6 +235,8 @@ Register renderer in L<Mojolicious> application.
 =head1 SEE ALSO
 
 L<GraphQL>
+
+L<GraphQL::Plugin::Convert>
 
 =head1 AUTHOR
 

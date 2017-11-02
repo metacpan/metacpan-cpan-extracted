@@ -1,6 +1,7 @@
 # [[[ PREPROCESSOR ]]]
-# <<< PARSE_ERROR: 'ERROR ECOPARP00' >>>
-# <<< PARSE_ERROR: 'Unexpected Token:  our' >>>
+# <<< PARSE_ERROR: 'ERROR ECOPAPL02' >>>
+# <<< PARSE_ERROR: 'near "use RPerl::Test::Bar' >>>
+# <<< PARSE_ERROR: 'sub empty_sub "' >>>
 
 # [[[ HEADER ]]]
 use RPerl;
@@ -14,8 +15,7 @@ use RPerl::Test::Foo;
 use RPerl::Test::Bar
 
 # [[[ SUBROUTINES ]]]
-our integer $empty_sub = sub {
-    return 2;
-};
+sub empty_sub { { my integer $RETURN_TYPE }; return 2; }
 
 1;                  # end of package
+

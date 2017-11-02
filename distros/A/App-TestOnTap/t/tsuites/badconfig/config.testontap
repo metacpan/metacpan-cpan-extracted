@@ -1,0 +1,16 @@
+id = 7708ed97-be3e-11e7-9a58-9b400111aa65
+
+invalid_key = foo
+
+[INVALID_SECTION]
+
+[EXECMAP]
+match1 = regexp(\.pl$)
+cmd1 = perl
+invalid_execmap_key = foo
+cmd255 = foo
+
+[DEPENDENCY foo]
+match = eq(justpass2.pl)
+dependson = eq(justpass.pl)
+invalid_dependency_key = foo

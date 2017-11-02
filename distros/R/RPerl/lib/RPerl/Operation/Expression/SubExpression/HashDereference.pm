@@ -18,8 +18,9 @@ our hashref $properties = {};
 
 # [[[ SUBROUTINES & OO METHODS ]]]
 
-our string_hashref::method $ast_to_rperl__generate = sub {
-    ( my object $self, my string_hashref $modes) = @_;
+sub ast_to_rperl__generate {
+    { my string_hashref::method $RETURN_TYPE };
+    ( my object $self, my string_hashref $modes) = @ARG;
     my string_hashref $rperl_source_group = { PMC => q{} };
     my object $rperl_source_subgroup;
 
@@ -27,15 +28,15 @@ our string_hashref::method $ast_to_rperl__generate = sub {
 
     my string $self_class = ref $self;
 
-    # unwrap HashDereference_215 and HashDereference_216 from SubExpression_142 and HashEntry_205
-    if (   ( $self_class eq 'SubExpression_142' )  # SubExpression -> HashDereference
-        or ( $self_class eq 'HashEntry_205' ) )  # HashEntry -> HashDereference
+    # unwrap HashDereference_229 and HashDereference_230 from SubExpression_156 and HashEntry_219
+    if (   ( $self_class eq 'SubExpression_156' )  # SubExpression -> HashDereference
+        or ( $self_class eq 'HashEntry_219' ) )  # HashEntry -> HashDereference
     {
         $self = $self->{children}->[0];
     }
 
     $self_class = ref $self;
-    if ( $self_class eq 'HashDereference_215' ) {  # HashDereference -> '%{' Variable '}'
+    if ( $self_class eq 'HashDereference_229' ) {  # HashDereference -> '%{' Variable '}'
         my string $percent_left_brace = $self->{children}->[0];
         my object $variable      = $self->{children}->[1];
         my string $right_brace   = $self->{children}->[2];
@@ -46,7 +47,7 @@ our string_hashref::method $ast_to_rperl__generate = sub {
             $rperl_source_subgroup );
         $rperl_source_group->{PMC} .= q{ } . $right_brace;
     }
-    elsif ( $self_class eq 'HashDereference_216' ) {  # HashDereference -> '%{' OPTIONAL-51 HashReference '}'
+    elsif ( $self_class eq 'HashDereference_230' ) {  # HashDereference -> '%{' OPTIONAL-51 HashReference '}'
         my string $percent_left_brace       = $self->{children}->[0];
         my object $type_inner_optional = $self->{children}->[1];
         my object $hash_reference     = $self->{children}->[2];
@@ -70,15 +71,15 @@ our string_hashref::method $ast_to_rperl__generate = sub {
         die RPerl::Parser::rperl_rule__replace(
             'ERROR ECOGEASRP00, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: Grammar rule '
                 . $self_class
-                . ' found where HashDereference_215 or HashDereference_216 expected, dying'
+                . ' found where HashDereference_229 or HashDereference_230 expected, dying'
         ) . "\n";
     }
-
     return $rperl_source_group;
-};
+}
 
-our string_hashref::method $ast_to_cpp__generate__CPPOPS_PERLTYPES = sub {
-    ( my object $self, my string_hashref $modes) = @_;
+sub ast_to_cpp__generate__CPPOPS_PERLTYPES {
+    { my string_hashref::method $RETURN_TYPE };
+    ( my object $self, my string_hashref $modes) = @ARG;
     my string_hashref $cpp_source_group
         = { CPP =>
             q{// <<< RP::O::E::SE::HD __DUMMY_SOURCE_CODE CPPOPS_PERLTYPES >>>}
@@ -86,10 +87,11 @@ our string_hashref::method $ast_to_cpp__generate__CPPOPS_PERLTYPES = sub {
 
     #...
     return $cpp_source_group;
-};
+}
 
-our string_hashref::method $ast_to_cpp__generate__CPPOPS_CPPTYPES = sub {
-    ( my object $self, my string_hashref $modes) = @_;
+sub ast_to_cpp__generate__CPPOPS_CPPTYPES {
+    { my string_hashref::method $RETURN_TYPE };
+    ( my object $self, my string_hashref $modes) = @ARG;
     my string_hashref $cpp_source_group
         = { CPP =>
             q{// <<< RP::O::E::SE::HD __DUMMY_SOURCE_CODE CPPOPS_CPPTYPES >>>}
@@ -97,6 +99,6 @@ our string_hashref::method $ast_to_cpp__generate__CPPOPS_CPPTYPES = sub {
 
     #...
     return $cpp_source_group;
-};
+}
 
 1;    # end of class

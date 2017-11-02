@@ -4,7 +4,7 @@
 #   file.t
 #
 #   Copyright (C) 1999 Raphael Manfredi.
-#   Copyright (C) 2002-2015 Mark Rogaski, mrogaski@cpan.org;
+#   Copyright (C) 2002-2017 Mark Rogaski, mrogaski@cpan.org;
 #   all rights reserved.
 #
 #   See the README file included with the
@@ -15,7 +15,7 @@
 use Test::More;
 use Log::Agent;
 require Log::Agent::Driver::File;
-require 't/common.pl';
+require './t/common.pl';
 
 BEGIN { plan tests => 38 }
 

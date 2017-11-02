@@ -1,5 +1,5 @@
 package Net::HTTP::Spore::Request;
-$Net::HTTP::Spore::Request::VERSION = '0.07';
+$Net::HTTP::Spore::Request::VERSION = '0.09';
 # ABSTRACT: Net::HTTP::Spore::Request - Portable HTTP request object from SPORE env hash
 
 use Moose;
@@ -10,6 +10,8 @@ use HTTP::Request;
 use URI::Escape;
 use MIME::Base64;
 use Net::HTTP::Spore::Response;
+
+use Encode qw{is_utf8};
 
 has env => (
     is       => 'rw',
@@ -52,10 +54,19 @@ has headers => (
 sub BUILDARGS {
     my $class = shift;
 
-    if (@_ == 1 && !exists $_[0]->{env}) {
-        return {env => $_[0]};
+    if ( @_ == 1 && !exists $_[0]->{env} ) {
+        return { env => $_[0] };
     }
     return @_;
+}
+
+sub _safe_uri_escape {
+    my ( $self, $str, $unsafe ) = @_;
+    return unless defined $str;
+    if ( is_utf8($str) ) {
+        utf8::encode($str);
+    }
+    return uri_escape( $str, $unsafe );
 }
 
 sub method {
@@ -157,18 +168,21 @@ sub uri {
         $query_string = $path_info[1] if !$query_string;
     }
 
+    $path_info = $path_info // '';
     my $base = $self->_uri_base;
 
-    my $path_escape_class = '^A-Za-z0-9\-\._~/';
-
-    my $path = URI::Escape::uri_escape($path_info || '', $path_escape_class);
-
-    if (defined $query_string && length($query_string) > 0) {
-        $path .= '?' . $query_string;
+    if ( defined $query_string && length($query_string) > 0 ) {
+        my $is_interrogation = index( $path_info, '?' );
+        if ( $is_interrogation >= 0 ) {
+            $path_info .= '&' . $query_string;
+        }
+        else {
+            $path_info .= '?' . $query_string;
+        }
     }
 
-    $base =~ s!/$!! if $path =~ m!^/!;
-    return URI->new( $base . $path )->canonical;
+    $base =~ s!/$!! if $path_info =~ m!^/!;
+    return URI->new( $base . $path_info )->canonical;
 }
 
 sub _path {
@@ -179,20 +193,26 @@ sub _path {
     my @params = @{ $self->env->{'spore.params'} || [] };
 
     my $j = 0;
-    for (my $i = 0; $i < scalar @params; $i++) {
+    for ( my $i = 0; $i < scalar @params; $i++ ) {
         my $key = $params[$i];
         my $value = $params[++$i];
-        if (!$value) {
+
+        $value = (defined $value) ? $value : '' ;
+        if (! length($value)) {
             $query_string .= $key;
             last;
         }
+
+        # add params as string vide to query_string even it's undefined
         unless ( $path && $path =~ s/\:$key/$value/ ) {
-            $query_string .= $key . '=' . $value;
+            $query_string .= $key . '=' . $self->_safe_uri_escape($value);
             $query_string .= '&' if $query_string && scalar @params;
         }
     }
 
     $query_string =~ s/&$// if $query_string;
+    $self->env->{QUERY_STRING} = $query_string;
+
     return ( $path, $query_string );
 }
 
@@ -270,12 +290,15 @@ sub finalize {
     my $query = [];
     my $form  = {};
 
+    my $path_escape_class = '^A-Za-z0-9\-\._~/@\:';
+
     for ( my $i = 0 ; $i < scalar @$params ; $i++ ) {
         my $k = $params->[$i];
         my $v = $params->[++$i];
+        $v = $self->_safe_uri_escape($v || '', $path_escape_class) if defined $v;
         my $modified = 0;
 
-        if ($path_info && $path_info =~ s/\:$k/$v/) {
+        if ($path_info && $path_info =~ s/\:$k/=$k/) {
             $modified++;
         }
 
@@ -305,7 +328,17 @@ sub finalize {
     }
 
     # clean remaining :name in url
-    $path_info =~ s/:\w+//g if $path_info;
+    if ($path_info) {
+        $path_info =~ s/:\w+//g;
+
+        for (my $i = 0; $i < @$params; $i+=2) {
+            my ($k, $v) = @$params[$i,$i+1];
+
+            $path_info =~ s/=$k/$v/;
+        }
+    }
+
+
 
     my $query_string;
     if (scalar @$query) {
@@ -354,7 +387,7 @@ Net::HTTP::Spore::Request - Net::HTTP::Spore::Request - Portable HTTP request ob
 
 =head1 VERSION
 
-version 0.07
+version 0.09
 
 =head1 SYNOPSIS
 

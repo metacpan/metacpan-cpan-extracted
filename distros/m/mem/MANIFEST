@@ -2,6 +2,7 @@ MANIFEST
 README
 LICENSE
 Makefile.PL
+mem.pm
 lib/mem.pm
 t/mem.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

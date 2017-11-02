@@ -10,8 +10,8 @@ use Capture::Tiny qw( capture );
 use File::Temp qw( tempdir );
 use File::chdir;
 
-# ABSTRACT: Curl command line plugin for fetching files
-our $VERSION = '1.25'; # VERSION
+# ABSTRACT: Plugin for fetching files using curl
+our $VERSION = '1.28'; # VERSION
 
 
 has curl_command => sub { defined $ENV{CURL} ? which($ENV{CURL}) : which('curl') };
@@ -183,11 +183,11 @@ __END__
 
 =head1 NAME
 
-Alien::Build::Plugin::Fetch::CurlCommand - Curl command line plugin for fetching files
+Alien::Build::Plugin::Fetch::CurlCommand - Plugin for fetching files using curl
 
 =head1 VERSION
 
-version 1.25
+version 1.28
 
 =head1 SYNOPSIS
 
@@ -276,6 +276,10 @@ Petr Pisar (ppisar)
 Lance Wicks (LANCEW)
 
 Ahmad Fatoum (a3f, ATHREEF)
+
+José Joaquín Atria (JJATRIA)
+
+Duke Leto (LETO)
 
 =head1 COPYRIGHT AND LICENSE
 

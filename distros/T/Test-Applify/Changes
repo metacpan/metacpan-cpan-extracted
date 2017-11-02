@@ -1,0 +1,15 @@
+Revision history for perl module Test::Applify
+
+0.03 2017-11-02T07:20:04+1300
+ - extends_ok
+ - perl 5.10 and 5.12 support
+ - improve temporary directory detection and testing
+ 
+0.02 2017-10-27T12:40:57+1300
+ - perl 5.26 support
+ - applify_ok
+ - method chaining
+
+0.01 2017-04-21
+
+ - Initial release

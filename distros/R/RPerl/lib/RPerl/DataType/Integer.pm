@@ -3,7 +3,7 @@ package RPerl::DataType::Integer;
 use strict;
 use warnings;
 use RPerl::AfterSubclass;
-our $VERSION = 0.009_000;
+our $VERSION = 0.012_000;
 
 # [[[ OO INHERITANCE ]]]
 use parent qw(RPerl::DataType::Scalar);
@@ -46,80 +46,92 @@ use strict;
 use warnings;
 
 # [[[ EXPORTS ]]]
-use Exporter 'import';
+use RPerl::Exporter 'import';
 our @EXPORT = qw(integer_CHECK integer_CHECKTRACE integer_to_boolean integer_to_unsigned_integer integer_to_number integer_to_character integer_to_string);
+our @EXPORT_OK = qw(integer__typetest0 integer__typetest1);
 
 # [[[ TYPE-CHECKING ]]]
-#our void $integer_CHECK = sub {
 sub integer_CHECK {
-    ( my $possible_integer ) = @_;
+    { my void $RETURN_TYPE };
+    ( my $possible_integer ) = @ARG;
     if ( not( defined $possible_integer ) ) {
-        croak("\nERROR EIV00, TYPE-CHECKING MISMATCH, PERLOPS_PERLTYPES:\ninteger value expected but undefined/null value found,\ncroaking");
+#        croak("\nERROR EIV00, TYPE-CHECKING MISMATCH, PERLOPS_PERLTYPES:\ninteger value expected but undefined/null value found,\ncroaking");
+        die("\nERROR EIV00, TYPE-CHECKING MISMATCH, PERLOPS_PERLTYPES:\ninteger value expected but undefined/null value found,\ndying\n");
     }
     if ( not( main::RPerl_SvIOKp($possible_integer) ) ) {
-        croak("\nERROR EIV01, TYPE-CHECKING MISMATCH, PERLOPS_PERLTYPES:\ninteger value expected but non-integer value found,\ncroaking");
+#        croak("\nERROR EIV01, TYPE-CHECKING MISMATCH, PERLOPS_PERLTYPES:\ninteger value expected but non-integer value found,\ncroaking");
+        die("\nERROR EIV01, TYPE-CHECKING MISMATCH, PERLOPS_PERLTYPES:\ninteger value expected but non-integer value found,\ndying\n");
     }
+    return;
 }
 
 
-#our void $integer_CHECKTRACE = sub {
 sub integer_CHECKTRACE {
-    ( my $possible_integer, my $variable_name, my $subroutine_name ) = @_;
+    { my void $RETURN_TYPE };
+    ( my $possible_integer, my $variable_name, my $subroutine_name ) = @ARG;
+#    RPerl::diag('in RPerl::DataType::Integer::integer_CHECKTRACE(), received $possible_integer = ' . $possible_integer . "\n");
+#    RPerl::diag('in RPerl::DataType::Integer::integer_CHECKTRACE(), received $variable_name = ' . $variable_name . "\n");
+#    RPerl::diag('in RPerl::DataType::Integer::integer_CHECKTRACE(), received $subroutine_name = ' . $subroutine_name . "\n");
+
     if ( not( defined $possible_integer ) ) {
-        croak(
-            "\nERROR EIV00, TYPE-CHECKING MISMATCH, PERLOPS_PERLTYPES:\ninteger value expected but undefined/null value found,\nin variable $variable_name from subroutine $subroutine_name,\ncroaking"
-        );
+#        RPerl::diag('in RPerl::DataType::Integer::integer_CHECKTRACE(), about to croak due to undefined input' . "\n");
+#        croak( "\nERROR EIV00, TYPE-CHECKING MISMATCH, PERLOPS_PERLTYPES:\ninteger value expected but undefined/null value found,\nin variable $variable_name from subroutine $subroutine_name,\ncroaking" );
+        die( "\nERROR EIV00, TYPE-CHECKING MISMATCH, PERLOPS_PERLTYPES:\ninteger value expected but undefined/null value found,\nin variable $variable_name from subroutine $subroutine_name,\ndying\n" );
     }
     if ( not( main::RPerl_SvIOKp($possible_integer) ) ) {
-        croak(
-            "\nERROR EIV01, TYPE-CHECKING MISMATCH, PERLOPS_PERLTYPES:\ninteger value expected but non-integer value found,\nin variable $variable_name from subroutine $subroutine_name,\ncroaking"
-        );
+#        RPerl::diag('in RPerl::DataType::Integer::integer_CHECKTRACE(), about to croak due to non-integer input' . "\n");
+#        croak( "\nERROR EIV01, TYPE-CHECKING MISMATCH, PERLOPS_PERLTYPES:\ninteger value expected but non-integer value found,\nin variable $variable_name from subroutine $subroutine_name,\ncroaking" );
+        die( "\nERROR EIV01, TYPE-CHECKING MISMATCH, PERLOPS_PERLTYPES:\ninteger value expected but non-integer value found,\nin variable $variable_name from subroutine $subroutine_name,\ndying\n" );
     }
+    return;
 }
 
 # [[[ BOOLEANIFY ]]]
-#our boolean $integer_to_boolean = sub {
 sub integer_to_boolean {
-    ( my integer $input_integer ) = @_;
+    { my boolean $RETURN_TYPE };
+    ( my integer $input_integer ) = @ARG;
 #    integer_CHECK($input_integer);
     integer_CHECKTRACE( $input_integer, '$input_integer', 'integer_to_boolean()' );
     if   ( $input_integer == 0 ) { return 0; }
     else                         { return 1; }
+    return;
 }
 
 # [[[ UNSIGNED INTEGERIFY ]]]
-#our unsigned_integer $integer_to_unsigned_integer = sub {
 sub integer_to_unsigned_integer {
-    ( my integer $input_integer ) = @_;
+    { my unsigned_integer $RETURN_TYPE };
+    ( my integer $input_integer ) = @ARG;
 #    integer_CHECK($input_integer);
     integer_CHECKTRACE( $input_integer, '$input_integer', 'integer_to_unsigned_integer()' );
     return abs $input_integer;
 }
 
 # [[[ NUMBERIFY ]]]
-#our number $integer_to_number = sub {
 sub integer_to_number {
-    ( my integer $input_integer ) = @_;
+    { my number $RETURN_TYPE };
+    ( my integer $input_integer ) = @ARG;
 #    integer_CHECK($input_integer);
     integer_CHECKTRACE( $input_integer, '$input_integer', 'integer_to_number()' );
     return $input_integer * 1.0;
 }
 
 # [[[ CHARACTERIFY ]]]
-#our character $integer_to_character = sub {
 sub integer_to_character {
-    ( my integer $input_integer ) = @_;
+    { my character $RETURN_TYPE };
+    ( my integer $input_integer ) = @ARG;
 #    integer_CHECK($input_integer);
     integer_CHECKTRACE( $input_integer, '$input_integer', 'integer_to_character()' );
     my string $tmp_string = integer_to_string($input_integer);
     if   ( $tmp_string eq q{} ) { return q{}; }
     else                        { return substr $tmp_string, 0, 1; }
+    return;
 }
 
 # [[[ STRINGIFY ]]]
-#our string $integer_to_string = sub {
 sub integer_to_string {
-    ( my integer $input_integer ) = @_;
+    { my string $RETURN_TYPE };
+    { my string $RETURN_TYPE };
+    ( my integer $input_integer ) = @ARG;
 #    integer_CHECK($input_integer);
     integer_CHECKTRACE( $input_integer, '$input_integer', 'integer_to_string()' );
 
@@ -144,19 +156,21 @@ sub integer_to_string {
 }
 
 # [[[ TYPE TESTING ]]]
-our integer $integer__typetest0 = sub {
+sub integer__typetest0 {
+    { my integer $RETURN_TYPE };
     my integer $retval = ( 21 / 7 ) + main::RPerl__DataType__Integer__MODE_ID();    # return integer (not number) value, don't do (22 / 7) etc.
 
     #    RPerl::diag("in PERLOPS_PERLTYPES integer__typetest0(), have \$retval = $retval\n");
     return ($retval);
-};
-our integer $integer__typetest1 = sub {
-    ( my integer $lucky_integer ) = @_;
+}
+sub integer__typetest1 {
+    { my integer $RETURN_TYPE };
+    ( my integer $lucky_integer ) = @ARG;
 #    integer_CHECK($lucky_integer);
     integer_CHECKTRACE( $lucky_integer, '$lucky_integer', 'integer__typetest1()' );
 
     #    RPerl::diag('in PERLOPS_PERLTYPES integer__typetest1(), received $lucky_integer = ' . integer_to_string($lucky_integer) . "\n");
     return ( ( $lucky_integer * 2 ) + main::RPerl__DataType__Integer__MODE_ID() );
-};
+}
 
 1;    # end of class

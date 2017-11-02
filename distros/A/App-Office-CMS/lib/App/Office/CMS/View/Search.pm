@@ -1,23 +1,21 @@
 package App::Office::CMS::View::Search;
 
-use Any::Moose;
-use common::sense;
+use strict;
+use warnings;
 
 use JSON::XS;
 
+use Moo;
+
 extends 'App::Office::CMS::View::Base';
 
-# If Moose...
-#use namespace::autoclean;
-
-our $VERSION = '0.92';
+our $VERSION = '0.93';
 
 # -----------------------------------------------
 
 sub build_search_html
 {
-	my($self)      = @_;
-	my($tmpl_path) = $self -> tmpl_path;
+	my($self) = @_;
 
 	$self -> log(debug => 'build_search_html()');
 
@@ -102,10 +100,5 @@ sub format_search_result
 } # End of format_search_result.
 
 # -----------------------------------------------
-
-no Any::Moose;
-
-# If Moose...
-#__PACKAGE__ -> meta -> make_immutable;
 
 1;

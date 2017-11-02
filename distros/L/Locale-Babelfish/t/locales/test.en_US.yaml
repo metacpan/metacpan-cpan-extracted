@@ -1,0 +1,11 @@
+---
+simple:
+    whoareyou: 'I am #{who}'
+    escapes: 'I have \#{who} ((na\|il|nails)):count'
+    plural:
+        nails: 'I have #{test} ((nail|nails)):test'
+        nails2: 'I have #{test} ((nail|nails)):test simple using'
+        nails_count: 'I have #{ count } ((nail|nails))'
+        big_nails: 'I have #{test} ((big nail|big nails)):test with spaces'
+    some:
+        combine: 'I have  #{count} ((nail|nails)):count  for  #{single.test.deep} for #{test} ((test|tests)):test'

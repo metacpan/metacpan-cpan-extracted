@@ -1,3 +1,6 @@
+## 1.2.3
+* Time Reports API calls do not work
+
 ## 1.2.2
 * Applications API has moved from v3 to v4
 

@@ -7,7 +7,7 @@ use Sub::Identify 0.05 qw( get_code_location get_code_info );
 use Mojo::Base qw( Clustericious::Command );
 
 # ABSTRACT: Clustericious command to start a Clustericious application
-our $VERSION = '1.26'; # VERSION 
+our $VERSION = '1.27'; # VERSION 
 
 has description => <<EOT;
 Determine the location of method or helper.
@@ -73,7 +73,7 @@ Clustericious::Command::which - Clustericious command to start a Clustericious a
 
 =head1 VERSION
 
-version 1.26
+version 1.27
 
 =head1 AUTHOR
 

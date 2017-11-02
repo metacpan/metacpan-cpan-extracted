@@ -53,7 +53,7 @@ BEGIN {
 	use Exporter;
 	@ISA=qw(Exporter);
 	@EXPORT=qw();
-	$VERSION='0.3';
+	$VERSION='0.4';
 }
 use strict;
 use Carp;
@@ -118,7 +118,7 @@ my %fun=(
 );
 sub new {
 	shift;
-	my $LC_MESSAGES=lc(shift);
+	my $LC_MESSAGES=lc(shift||'en');
 	if (! $LC_MESSAGES) {
 		if (exists $ENV{'LC_MESSAGES'}) {
 			$LC_MESSAGES=substr($ENV{'LC_MESSAGES'},0,2);

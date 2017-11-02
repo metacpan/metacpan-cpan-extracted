@@ -1,7 +1,7 @@
 package App::tracepm;
 
 our $DATE = '2017-07-29'; # DATE
-our $VERSION = '0.21'; # VERSION
+our $VERSION = '0.22'; # VERSION
 
 use 5.010001;
 use strict;
@@ -35,7 +35,7 @@ $SPEC{tracepm} = {
     args => {
         script => {
             summary => 'Path to script file',
-            schema => ['str*'],
+            schema => ['filename*'],
             pos => 0,
             cmdline_aliases => {s=>{}},
             tags => ['category:input'],
@@ -48,7 +48,7 @@ $SPEC{tracepm} = {
         },
         module => {
             summary => "--module MOD is equivalent to --script 'use MOD'",
-            schema  => 'str*',
+            schema  => 'perl::modname*',
             cmdline_aliases => {m=>{}},
             tags => ['category:input'],
         },
@@ -464,7 +464,7 @@ App::tracepm - Trace dependencies of your Perl script
 
 =head1 VERSION
 
-This document describes version 0.21 of App::tracepm (from Perl distribution App-tracepm), released on 2017-07-29.
+This document describes version 0.22 of App::tracepm (from Perl distribution App-tracepm), released on 2017-07-29.
 
 =head1 SYNOPSIS
 
@@ -546,7 +546,7 @@ faster.
 
 =back
 
-=item * B<module> => I<str>
+=item * B<module> => I<perl::modname>
 
 --module MOD is equivalent to --script 'use MOD'.
 
@@ -588,7 +588,7 @@ When recursing, exclude some module patterns.
 
 When recursing, exclude XS modules.
 
-=item * B<script> => I<str>
+=item * B<script> => I<filename>
 
 Path to script file.
 

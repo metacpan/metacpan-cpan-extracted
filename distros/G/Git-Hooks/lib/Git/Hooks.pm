@@ -1,6 +1,6 @@
 package Git::Hooks;
 # ABSTRACT: Framework for implementing Git (and Gerrit) hooks
-$Git::Hooks::VERSION = '2.1.7';
+$Git::Hooks::VERSION = '2.1.8';
 use 5.010;
 use strict;
 use warnings;
@@ -108,7 +108,7 @@ Git::Hooks - Framework for implementing Git (and Gerrit) hooks
 
 =head1 VERSION
 
-version 2.1.7
+version 2.1.8
 
 =head1 SYNOPSIS
 

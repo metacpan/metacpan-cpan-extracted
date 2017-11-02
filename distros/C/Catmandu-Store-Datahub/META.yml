@@ -1,17 +1,18 @@
 ---
 abstract: 'Store/retrieve items from the Datahub'
 author:
-  - 'Pieter De Praetere, C<< pieter at packed.be >>'
+  - 'Matthias Vandermaesen <matthias.vandermaesen@vlaamsekunstcollectie.be>'
 build_requires:
+  Module::Build: '0.28'
   Test::Deep: '0.112'
   Test::Exception: '0.43'
   Test::More: '0.99'
   Test::Pod: '0'
 configure_requires:
-  Module::Build::Tiny: '0.034'
+  Module::Build: '0.28'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.17, Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
-license: perl
+generated_by: 'Dist::Milla version v1.0.18, Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -33,7 +34,7 @@ resources:
   bugtracker: https://github.com/thedatahub/Catmandu-Store-Datahub/issues
   homepage: https://github.com/thedatahub/Catmandu-Store-Datahub
   repository: https://github.com/thedatahub/Catmandu-Store-Datahub.git
-version: '0.06'
+version: '0.08'
 x_contributors:
   - 'Matthias Vandermaesen <matthias@colada.be>'
   - 'Pieter De Praetere <pieter.de.praetere@helptux.be>'

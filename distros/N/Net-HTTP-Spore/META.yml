@@ -5,13 +5,19 @@ author:
   - 'Ash Berlin <ash@cpan.org>'
   - 'Ahmad Fatoum <athreef@cpan.org>'
 build_requires:
+  File::Spec: '0'
   File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
   Test::Exception: '0'
   Test::Moose: '0'
   Test::More: '0'
   base: '0'
+  blib: '1.01'
+  perl: '5.010'
 configure_requires:
   ExtUtils::MakeMaker: '0'
+  perl: '5.010'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -23,6 +29,7 @@ requires:
   Carp: '0'
   Class::Load: '0'
   Digest::SHA: '0'
+  Encode: '0'
   HTTP::Headers: '0'
   HTTP::Request: '0'
   IO::All: '0'
@@ -36,7 +43,7 @@ requires:
   Moose::Role: '0'
   Moose::Util::MetaRole: '0'
   Moose::Util::TypeConstraints: '0'
-  MooseX::Role::Parameterized: '0'
+  MooseX::Role::Parameterized: '1.01'
   MooseX::Types: '0'
   MooseX::Types::Moose: '0'
   MooseX::Types::URI: '0'
@@ -48,13 +55,14 @@ requires:
   XML::Simple: '0'
   YAML: '0'
   overload: '0'
+  perl: '5.010'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/SPORE/net-http-spore/issues
   homepage: https://spore.github.io/net-http-spore/
   repository: git://github.com/SPORE/net-http-spore.git
-version: '0.07'
+version: '0.09'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -325,7 +333,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.07'
+          tag: '0.09'
           tag_format: '%v'
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
@@ -351,6 +359,36 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::TravisCI::StatusBadge
       name: TravisCI::StatusBadge
       version: '0.007'
+    -
+      class: Dist::Zilla::Plugin::MinimumPerl
+      name: MinimumPerl
+      version: '1.006'
+    -
+      class: Dist::Zilla::Plugin::Test::MinimumVersion
+      name: Test::MinimumVersion
+      version: '2.000007'
+    -
+      class: Dist::Zilla::Plugin::Test::Version
+      name: Test::Version
+      version: '1.09'
+    -
+      class: Dist::Zilla::Plugin::Test::Compile
+      config:
+        Dist::Zilla::Plugin::Test::Compile:
+          bail_out_on_fail: '0'
+          fail_on_warning: author
+          fake_home: 0
+          filename: t/00-compile.t
+          module_finder:
+            - ':InstallModules'
+          needs_display: 0
+          phase: test
+          script_finder:
+            - ':PerlExecFiles'
+          skips: []
+          switch: []
+      name: Test::Compile
+      version: '2.056'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'

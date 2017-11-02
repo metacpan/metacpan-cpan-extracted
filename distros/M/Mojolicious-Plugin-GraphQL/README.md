@@ -71,6 +71,14 @@ the given schema, `$root_value` and `$field_resolver`.
 
 [Mojolicious::Plugin::GraphQL](https://metacpan.org/pod/Mojolicious::Plugin::GraphQL) supports the following options.
 
+## convert
+
+Array-ref. First element is a classname-part, which will be prepended with
+"[GraphQL::Plugin::Convert](https://metacpan.org/pod/GraphQL::Plugin::Convert)::". The other values will be passed
+to that class's ["to\_graphql" in GraphQL::Plugin::Convert](https://metacpan.org/pod/GraphQL::Plugin::Convert#to_graphql) method. The
+returned hash-ref will be used to set options, particularly `schema`,
+and probably at least one of `resolver` and `root_value`.
+
 ## endpoint
 
 String. Defaults to `/graphql`.
@@ -121,6 +129,8 @@ Register renderer in [Mojolicious](https://metacpan.org/pod/Mojolicious) applica
 # SEE ALSO
 
 [GraphQL](https://metacpan.org/pod/GraphQL)
+
+[GraphQL::Plugin::Convert](https://metacpan.org/pod/GraphQL::Plugin::Convert)
 
 # AUTHOR
 

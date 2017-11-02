@@ -9,7 +9,7 @@ use File::Which qw( which );
 use Capture::Tiny qw( capture );
 
 # ABSTRACT: Clustericious command to stat nginx
-our $VERSION = '1.26'; # VERSION
+our $VERSION = '1.27'; # VERSION
 
 
 sub description { 'Start application with Morbo server' };
@@ -56,7 +56,7 @@ Clustericious::Command::morbo - Clustericious command to stat nginx
 
 =head1 VERSION
 
-version 1.26
+version 1.27
 
 =head1 DESCRIPTION
 

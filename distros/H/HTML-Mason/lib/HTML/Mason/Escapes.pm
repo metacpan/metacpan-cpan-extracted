@@ -7,7 +7,7 @@
 #
 
 package HTML::Mason::Escapes;
-$HTML::Mason::Escapes::VERSION = '1.56';
+$HTML::Mason::Escapes::VERSION = '1.58';
 use strict;
 use warnings;
 

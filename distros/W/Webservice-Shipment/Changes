@@ -1,5 +1,8 @@
 Revision history for Perl module Webservice::Shipment
 
+0.04 2017-10-28
+  - Protect against upcoming changes to Mojo::IOLoop::Delay->catch
+
 0.03 2015-05-27
   - Update link to sponsor
 

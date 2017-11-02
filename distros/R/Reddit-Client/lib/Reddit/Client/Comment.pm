@@ -7,13 +7,15 @@ use Carp;
 require Reddit::Client::VotableThing;
 
 use base   qw/Reddit::Client::VotableThing/;
-use fields qw/link_flair_text media url link_url link_flair_css_class num_reports created_utc
-			  banned_by subreddit title author_flair_text is_self author media_embed
-			  permalink author_flair_css_class selftext domain num_comments clicked
-			  saved thumbnail subreddit_id approved_by selftext_html created hidden
-			  over_18 parent_id replies link_id body body_html/;
+use fields qw/link_flair_text media url link_url link_flair_css_class 
+	  num_reports created_utc
+	  banned_by subreddit title author_flair_text is_self author media_embed
+	  permalink author_flair_css_class selftext domain num_comments clicked
+	  saved thumbnail subreddit_id approved_by selftext_html created hidden
+	  over_18 parent_id replies link_id body body_html
+	  user_reports mod_reports/;
 
-use constant type	=> "t1";
+use constant type => "t1";
 
 sub set_replies {
     my ($self, $value) = @_;

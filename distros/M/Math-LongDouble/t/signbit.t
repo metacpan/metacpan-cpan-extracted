@@ -5,7 +5,7 @@ use Math::LongDouble qw(:all);
 # Not implementing signed NaNs, so we don't check that
 # signbit works as expected with them.
 
-print "1..8\n";
+print "1..10\n";
 
 my $inf = InfLD(-1);
 
@@ -62,3 +62,19 @@ else {
   warn "\n", $negval * -1, " was (unexpectedly) reported  to be -ve\n";
   print "not ok 8\n";
 }
+
+my $neg_zero = ZeroLD(-1);
+
+if(is_ZeroLD($neg_zero) == -1) {print "ok 9\n"}
+else {
+  warn "\n9: expected -1, got ", is_ZeroLD($neg_zero), "\n";
+  print "not ok 9\n";
+}
+
+if(is_ZeroLD($neg_zero * -1.0) == 1) {print "ok 10\n"}
+else {
+  warn "\n10: expected 1, got ", is_ZeroLD($neg_zero * -1.0), "\n";
+  print "not ok 10\n";
+}
+
+

@@ -1,5 +1,6 @@
 package Bio::Phylo::Forest::DrawNodeRole;
 use strict;
+use warnings;
 use Carp;
 use Bio::Phylo::Forest::NodeRole;
 use base 'Bio::Phylo::Forest::NodeRole';
@@ -8,12 +9,13 @@ use base 'Bio::Phylo::Forest::NodeRole';
 	our $AUTOLOAD;
 	my @properties = qw(x y radius tip_radius node_color node_outline_color
 	node_shape node_image branch_color branch_shape branch_width branch_style
-	collapsed collapsed_width font_face font_size font_style font_color
-	text_horiz_offset text_vert_offset rotation);
+	collapsed collapsed_clade_width font_face font_size font_style font_color
+	font_weight text_horiz_offset text_vert_offset rotation clade_label
+	clade_label_font);
 
 =head1 NAME
 
-Bio::Phylo::Forest::DrawNode - Tree node with extra methods for tree drawing
+Bio::Phylo::Forest::DrawNodeRole - Tree node with extra methods for tree drawing
 
 =head1 SYNOPSIS
 
@@ -57,7 +59,7 @@ Sets collapsed clade width.
 
  Type    : Mutator
  Title   : set_collapsed_clade_width
- Usage   : $tree->set_collapsed_clade_width(6);
+ Usage   : $node->set_collapsed_clade_width(6);
  Function: sets the width of collapsed clade triangles relative to uncollapsed tips
  Returns :
  Args    : Positive number
@@ -92,6 +94,7 @@ Sets collapsed clade width.
 =cut
 
     *set_node_radius = \&set_radius;
+	*get_node_radius = \&get_radius;
 
 =item set_tip_radius()
 
@@ -201,6 +204,15 @@ Sets collapsed clade width.
  Returns : $self
  Args    : font_style
 
+=item set_font_weight()
+
+ Type    : Mutator
+ Title   : set_font_weight
+ Usage   : $node->set_font_weight($font_weight);
+ Function: Sets font_weight
+ Returns : $self
+ Args    : font_weight
+
 =item set_font_color()
 
  Type    : Mutator
@@ -239,6 +251,29 @@ Sets collapsed clade width.
  Returns : $self
  Args    : rotation
 
+=item set_clade_label()
+
+ Type    : Mutator
+ Title   : set_clade_label
+ Usage   : $node->set_clade_label('Mammalia');
+ Function: Sets a label for an entire clade to be visualized outside the tree
+ Returns : $self
+ Args    : string 
+
+=item set_clade_label_font()
+
+ Type    : Mutator
+ Title   : set_clade_label_font
+ Usage   : $node->set_clade_label_font({ '-face' => 'Verdana' });
+ Function: Sets font properties for the clade label
+ Returns : $self
+ Args    : {
+	'-face'   => 'Verdana', # Arial, Times, etc.
+	'-weight' => 'bold',
+	'-style'  => 'italic',
+	'-colour' => 'red',
+ }
+ 
 =back
 
 =head2 ACCESSORS
@@ -394,7 +429,7 @@ Gets collapsed clade width.
 
  Type    : Mutator
  Title   : get_collapsed_clade_width
- Usage   : $w = $tree->get_collapsed_clade_width();
+ Usage   : $w = $node->get_collapsed_clade_width();
  Function: gets the width of collapsed clade triangles relative to uncollapsed tips
  Returns : Positive number
  Args    : None
@@ -461,6 +496,15 @@ Gets collapsed clade width.
  Function: Gets font_style
  Returns : font_style
  Args    : NONE
+ 
+ =item get_font_weight()
+
+ Type    : Mutator
+ Title   : get_font_weight
+ Usage   : my $font_weight = $node->get_font_weight();
+ Function: Gets font_weight
+ Returns : font_weight
+ Args    : NONE
 
 =item get_font_color()
 
@@ -498,6 +542,24 @@ Gets collapsed clade width.
  Returns : rotation
  Args    : NONE
 
+=item get_clade_label()
+
+ Type    : Accessor
+ Title   : get_clade_label
+ Usage   : my $l = $node->get_clade_label();
+ Function: Gets a label for an entire clade to be visualized outside the tree
+ Returns : string
+ Args    : NONE
+
+=item get_clade_label_font()
+
+ Type    : Accessor
+ Title   : get_clade_label_font
+ Usage   : my %h = %{ $node->get_clade_label_font() };
+ Function: gets font properties for the clade label
+ Returns : undef or hashref
+ Args    : NONE
+ 
 =back
 
 =cut

@@ -1,7 +1,11 @@
 package App::Office::CMS::View;
 
-use Any::Moose;
-use common::sense;
+use strict;
+use warnings;
+
+use Moo;
+
+use Types::Standard qw/Any/;
 
 extends 'App::Office::CMS::View::Base';
 
@@ -13,31 +17,28 @@ use App::Office::CMS::View::Site;
 has content =>
 (
 	is  => 'rw',
-	isa => 'App::Office::CMS::View::Content',
+	isa => Any, # 'App::Office::CMS::View::Content',
 );
 
 has page =>
 (
 	is  => 'rw',
-	isa => 'App::Office::CMS::View::Page',
+	isa => Any, # 'App::Office::CMS::View::Page',
 );
 
 has search =>
 (
 	is  => 'rw',
-	isa => 'App::Office::CMS::View::Search',
+	isa => Any, # 'App::Office::CMS::View::Search',
 );
 
 has site =>
 (
 	is  => 'rw',
-	isa => 'App::Office::CMS::View::Site',
+	isa => Any, # 'App::Office::CMS::View::Site',
 );
 
-# If Moose...
-#use namespace::autoclean;
-
-our $VERSION = '0.92';
+our $VERSION = '0.93';
 
 # -----------------------------------------------
 
@@ -52,7 +53,6 @@ sub BUILD
 	 db          => $self -> db,
 	 session     => $self -> session,
 	 templater   => $self -> templater,
-	 tmpl_path   => $self -> tmpl_path,
 	) );
 
 	$self -> page(App::Office::CMS::View::Page -> new
@@ -62,7 +62,6 @@ sub BUILD
 	 db          => $self -> db,
 	 session     => $self -> session,
 	 templater   => $self -> templater,
-	 tmpl_path   => $self -> tmpl_path,
 	) );
 
 	$self -> search(App::Office::CMS::View::Search -> new
@@ -72,7 +71,6 @@ sub BUILD
 	 db          => $self -> db,
 	 session     => $self -> session,
 	 templater   => $self -> templater,
-	 tmpl_path   => $self -> tmpl_path,
 	) );
 
 	$self -> site(App::Office::CMS::View::Site -> new
@@ -82,16 +80,10 @@ sub BUILD
 	 db          => $self -> db,
 	 session     => $self -> session,
 	 templater   => $self -> templater,
-	 tmpl_path   => $self -> tmpl_path,
 	) );
 
 }	# End of BUILD.
 
 # --------------------------------------------------
-
-no Any::Moose;
-
-# If Moose...
-#__PACKAGE__ -> meta -> make_immutable;
 
 1;

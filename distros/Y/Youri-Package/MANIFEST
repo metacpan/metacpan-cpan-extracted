@@ -1,5 +1,4 @@
 Changes
-Debian_CPANTS.txt
 lib/Youri/Package.pm
 lib/Youri/Package/Change.pm
 lib/Youri/Package/File.pm
@@ -17,7 +16,6 @@ README
 t/abstraction.t
 t/cowsay-3.03-11mdv2007.0.noarch.rpm
 t/gpghome/pubring.gpg
-t/gpghome/random_seed
 t/gpghome/secring.gpg
 t/gpghome/trustdb.gpg
 t/kwalitee.t

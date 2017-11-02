@@ -1,6 +1,7 @@
 MODULE = ZMQ::Raw               PACKAGE = ZMQ::Raw::Message
 
 INCLUDE: const-xs-message_options.inc
+INCLUDE: const-xs-message_properties.inc
 
 SV *
 new (class)
@@ -121,6 +122,29 @@ routing_id(self, ...)
 
 	OUTPUT: RETVAL
 
+const char *
+group (self, ...)
+	SV *self
+
+	PREINIT:
+		int rc;
+		const char *g;
+
+	CODE:
+		if (items > 1)
+		{
+			rc = zmq_msg_set_group (ZMQ_SV_TO_PTR (Message, self), SvPV_nolen (ST (1)));
+			zmq_raw_check_error (rc);
+		}
+
+		g = zmq_msg_group (ZMQ_SV_TO_PTR (Message, self));
+		if (g == NULL)
+			XSRETURN_UNDEF;
+
+		RETVAL = g;
+
+	OUTPUT: RETVAL
+
 int
 get (self, property)
 	SV *self
@@ -133,6 +157,23 @@ get (self, property)
 		rc = zmq_msg_get (ZMQ_SV_TO_PTR (Message, self), property);
 		zmq_raw_check_error (rc);
 		RETVAL = rc;
+
+	OUTPUT: RETVAL
+
+const char *
+gets (self, property)
+	SV *self
+	const char *property
+
+	PREINIT:
+		const char *value;
+
+	CODE:
+		value = zmq_msg_gets (ZMQ_SV_TO_PTR (Message, self), property);
+		if (value == NULL)
+			XSRETURN_UNDEF;
+
+		RETVAL = value;
 
 	OUTPUT: RETVAL
 

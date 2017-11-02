@@ -1,0 +1,13 @@
+0.003   2017-10-26 (PERLANCAR)
+
+	- [dist] Fix ordering in dist.ini to properly create POD for CLI.
+
+
+0.002   2017-10-26 (PERLANCAR)
+
+	- Remove unwanted character in one of the words.
+
+
+0.001   2017-10-26 (PERLANCAR)
+
+        - First release.

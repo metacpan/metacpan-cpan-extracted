@@ -10,7 +10,8 @@ use File::Path qw( mkpath );
 use Clustericious::Config;
 use Mojo::Loader;
 use Clustericious;
-use base qw( Test::Builder::Module Exporter );
+use Test2::API qw( context );
+use base qw( Exporter );
 
 our @EXPORT = qw( create_config_ok create_directory_ok home_directory_ok create_config_helper_ok );
 our @EXPORT_OK = @EXPORT;
@@ -30,7 +31,7 @@ sub _init
 BEGIN { _init() }
 
 # ABSTRACT: Test Clustericious::Config
-our $VERSION = '1.26'; # VERSION
+our $VERSION = '1.27'; # VERSION
 
 
 sub create_config_ok ($;$$)
@@ -50,7 +51,7 @@ sub create_config_ok ($;$$)
   my @diag;
   my $config_filename;
   
-  my $tb = __PACKAGE__->builder;  
+  my $ctx = context();
   my $ok = 1;
   if(!defined $config)
   {
@@ -87,8 +88,11 @@ sub create_config_ok ($;$$)
     Clustericious->_config_uncache($config_name);
   }
 
-  $tb->ok($ok, $test_name);
-  $tb->diag($_) for @diag;  
+  $ctx->ok($ok, $test_name);
+  $ctx->diag($_) for @diag;  
+  
+  $ctx->release;
+  
   return $config_filename;
 }
 
@@ -116,8 +120,9 @@ sub create_directory_ok ($;$)
     $ok = 0;
   }
   
-  my $tb = __PACKAGE__->builder;
-  $tb->ok($ok, $test_name);
+  my $ctx = context();
+  $ctx->ok($ok, $test_name);
+  $ctx->release;
   return $fullpath;
 }
 
@@ -130,8 +135,9 @@ sub home_directory_ok (;$)
   
   $test_name //= "home directory $fullpath";
   
-  my $tb = __PACKAGE__->builder;
-  $tb->ok(-d $fullpath, $test_name);
+  my $ctx = context();
+  $ctx->ok(-d $fullpath, $test_name);
+  $ctx->release;
   return $fullpath;
 }
 
@@ -150,8 +156,9 @@ sub create_config_helper_ok ($$;$)
   };
   push @Clustericious::Config::Helpers::EXPORT, $helper_name;
   
-  my $tb = __PACKAGE__->builder;
-  $tb->ok($ok, $test_name);
+  my $ctx = context();
+  $ctx->ok($ok, $test_name);
+  $ctx->release;
   return $ok;
 }
 
@@ -169,7 +176,7 @@ Test::Clustericious::Config - Test Clustericious::Config
 
 =head1 VERSION
 
-version 1.26
+version 1.27
 
 =head1 SYNOPSIS
 

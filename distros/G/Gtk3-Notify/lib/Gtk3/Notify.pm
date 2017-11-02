@@ -5,7 +5,7 @@ use warnings;
 use Glib::Object::Introspection;
 use Gtk3;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 sub import {
     my $class = shift;
@@ -41,7 +41,7 @@ Gtk3::Notify - Perl interface to libnotify
 
 =head1 VERSION
 
-Version 0.04
+Version 0.01
 
 =head1 SYNOPSIS
 

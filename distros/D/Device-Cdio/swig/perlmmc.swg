@@ -2,7 +2,7 @@
   Copyright (C) 2006, 2008, 2011 Rocky Bernstein <rocky@cpan.org>
   See end for license.
 */
-%define DOCSTRING 
+%define DOCSTRING
 "A Perl wrapper for The CD Input and Control library's ISO-9660 library's
 MultiMedia Commands (MMC)."
 %enddef
@@ -27,7 +27,7 @@ typedef long int cdio_mmc_level_t;
 %constant long int GPCMD_MODE_SELECT_6 = CDIO_MMC_GPCMD_MODE_SELECT_6;
 %constant long int GPCMD_MODE_SENSE_6  = CDIO_MMC_GPCMD_MODE_SENSE_6;
 %constant long int GPCMD_START_STOP    = CDIO_MMC_GPCMD_START_STOP;
-%constant long int GPCMD_ALLOW_MEDIUM_REMOVAL = 
+%constant long int GPCMD_ALLOW_MEDIUM_REMOVAL =
                                          CDIO_MMC_GPCMD_ALLOW_MEDIUM_REMOVAL;
 
 /** Group 2 Commands (CDB's here are 10-bytes)  */
@@ -171,7 +171,7 @@ typedef long int cdio_mmc_level_t;
 
 %feature("autodoc",
 "Read Audio Subchannel information
-  
+
  param p_cdio the CD object to be acted upon.
  param p_subchannel place for returned subchannel information
 .");
@@ -190,6 +190,9 @@ typedef long int cdio_mmc_level_t;
 */
 //%rename mmc_eject_media eject_media;
 int mmc_eject_media(const CdIo_t *p_cdio);
+%inline %{
+  extern int mmc_eject_media(const CdIo_t *p_cdio);
+%}
 /*!
   Return a string containing the name of the given feature
 */
@@ -200,10 +203,10 @@ int mmc_eject_media(const CdIo_t *p_cdio);
 */
 %rename mmc_feature_profile2str feature_profile2str;
 
-/*!  
+/*!
   Return the length in bytes of the Command Descriptor
-  Buffer (CDB) for a given MMC command. The length will be 
-  either 6, 10, or 12. 
+  Buffer (CDB) for a given MMC command. The length will be
+  either 6, 10, or 12.
 */
 %rename mmc_get_cmd_len get_cmd_len;
 
@@ -213,17 +216,17 @@ int mmc_eject_media(const CdIo_t *p_cdio);
 */
 %rename mmc_get_blocksize get_blocksize;
 
-/*!  
+/*!
   Get the lsn of the end of the CD
-  
+
   @return the lsn. On error return CDIO_INVALID_LSN.
 */
 %rename mmc_get_disc_last_lsn get_lsn;
 
-/*! 
+/*!
   Return the discmode as reported by the MMC Read (FULL) TOC
   command.
-  
+
   Information was obtained from Section 5.1.13 (Read TOC/PMA/ATIP)
   pages 56-62 from the MMC draft specification, revision 10a
   at http://www.t10.org/ftp/t10/drafts/mmc/mmc-r10a.pdf See
@@ -242,22 +245,22 @@ int mmc_eject_media(const CdIo_t *p_cdio);
 */
 %rename mmc_get_drive_mmc_cap get_drive_mmc_cap;
 
-/*! 
+/*!
   Get the DVD type associated with cd object.
-  
+
   @return the DVD discmode.
 */
 %rename mmc_get_dvd_struct_physical get_dvd_struct_physical;
 
-/*! 
+/*!
   Get the CD-ROM hardware info via an MMC INQUIRY command.
-  
+
   @return true if we were able to get hardware info, false if we had
   an error.
 */
 %rename mmc_get_hwinfo get_hwinfo;
 
-/*! 
+/*!
   Find out if media has changed since the last call.
   @param p_cdio the CD object to be acted upon.
   @return 1 if media has changed since last call, 0 if not. Error
@@ -267,13 +270,13 @@ int mmc_eject_media(const CdIo_t *p_cdio);
 
 /*!
   Get the media catalog number (MCN) from the CD via MMC.
-  
+
   @return the media catalog number r NULL if there is none or we
   don't have the ability to get it.
-  
+
   Note: string is malloc'd so caller has to free() the returned
   string when done with it.
-  
+
 */
 %rename mmc_get_mcn get_mcn;
 
@@ -285,43 +288,43 @@ int mmc_eject_media(const CdIo_t *p_cdio);
 
 /*!
   Report if CD-ROM has a praticular kind of interface (ATAPI, SCSCI, ...)
-  Is it possible for an interface to have serveral? If not this 
+  Is it possible for an interface to have serveral? If not this
   routine could probably return the single mmc_feature_interface_t.
   @return true if we have the interface and false if not.
 */
 %rename mmc_have_interface have_interface;
 
-/*! Run a MODE_SENSE command (6- or 10-byte version) 
-  and put the results in p_buf 
+/*! Run a MODE_SENSE command (6- or 10-byte version)
+  and put the results in p_buf
   @return DRIVER_OP_SUCCESS if we ran the command ok.
 */
 %rename mmc_mode_sense mode_sense;
 
-/*! Run a MODE_SENSE command (10-byte version) 
-  and put the results in p_buf 
+/*! Run a MODE_SENSE command (10-byte version)
+  and put the results in p_buf
   @return DRIVER_OP_SUCCESS if we ran the command ok.
 */
 %rename mmc_mode_sense_10 mode_sense_10;
 
-/*! Run a MODE_SENSE command (6-byte version) 
-  and put the results in p_buf 
+/*! Run a MODE_SENSE command (6-byte version)
+  and put the results in p_buf
   @return DRIVER_OP_SUCCESS if we ran the command ok.
 */
 %rename mmc_mode_sense_6 mode_sense_6;
 
 /*! Issue a MMC READ_CD command.
-    
-  @param p_cdio  object to read from 
-  
-  @param p_buf   Place to store data. The caller should ensure that 
+
+  @param p_cdio  object to read from
+
+  @param p_buf   Place to store data. The caller should ensure that
   p_buf can hold at least i_blocksize * i_blocks  bytes.
-  
-  @param i_lsn   sector to read 
-  
+
+  @param i_lsn   sector to read
+
   @param expected_sector_type restricts reading to a specific CD
   sector type.  Only 3 bits with values 1-5 are used:
     0 all sector types
-    1 CD-DA sectors only 
+    1 CD-DA sectors only
     2 Mode 1 sectors only
     3 Mode 2 formless sectors only. Note in contrast to all other
       values an MMC CD-ROM is not required to support this mode.
@@ -335,85 +338,85 @@ int mmc_eject_media(const CdIo_t *p_cdio);
   modified by flaw obscuring mechanisms such as audio data mute and
   interpolate.  If the data being read is CD-DA and DAP is true,
   then the user data returned should be modified by flaw obscuring
-  mechanisms such as audio data mute and interpolate.  
-  
+  mechanisms such as audio data mute and interpolate.
+
   b_sync_header return the sync header (which will probably have
   the same value as CDIO_SECTOR_SYNC_HEADER of size
   CDIO_CD_SYNC_SIZE).
-  
+
   @param header_codes Header Codes refer to the sector header and
-  the sub-header that is present in mode 2 formed sectors: 
-  
-   0 No header information is returned.  
-   1 The 4-byte sector header of data sectors is be returned, 
+  the sub-header that is present in mode 2 formed sectors:
+
+   0 No header information is returned.
+   1 The 4-byte sector header of data sectors is be returned,
    2 The 8-byte sector sub-header of mode 2 formed sectors is
-     returned.  
-   3 Both sector header and sub-header (12 bytes) is returned.  
-   The Header preceeds the rest of the bytes (e.g. user-data bytes) 
+     returned.
+   3 Both sector header and sub-header (12 bytes) is returned.
+   The Header preceeds the rest of the bytes (e.g. user-data bytes)
    that might get returned.
-   
-   @param b_user_data  Return user data if true. 
-   
+
+   @param b_user_data  Return user data if true.
+
    For CD-DA, the User Data is CDIO_CD_FRAMESIZE_RAW bytes.
 
    For Mode 1, The User Data is ISO_BLOCKSIZE bytes beginning at
    offset CDIO_CD_HEADER_SIZE+CDIO_CD_SUBHEADER_SIZE.
-   
+
    For Mode 2 formless, The User Data is M2RAW_SECTOR_SIZE bytes
    beginning at offset CDIO_CD_HEADER_SIZE+CDIO_CD_SUBHEADER_SIZE.
-   
+
    For data Mode 2, form 1, User Data is ISO_BLOCKSIZE bytes beginning at
    offset CDIO_CD_XA_SYNC_HEADER.
-   
+
    For data Mode 2, form 2, User Data is 2 324 bytes beginning at
    offset CDIO_CD_XA_SYNC_HEADER.
-   
-   @param b_sync 
+
+   @param b_sync
 
    @param b_edc_ecc true if we return EDC/ECC error detection/correction bits.
-   
+
    The presence and size of EDC redundancy or ECC parity is defined
-   according to sector type: 
-   
-   CD-DA sectors have neither EDC redundancy nor ECC parity.  
-   
+   according to sector type:
+
+   CD-DA sectors have neither EDC redundancy nor ECC parity.
+
    Data Mode 1 sectors have 288 bytes of EDC redundancy, Pad, and
    ECC parity beginning at offset 2064.
-   
+
    Data Mode 2 formless sectors have neither EDC redundancy nor ECC
    parity
-   
+
    Data Mode 2 form 1 sectors have 280 bytes of EDC redundancy and
    ECC parity beginning at offset 2072
-   
+
    Data Mode 2 form 2 sectors optionally have 4 bytes of EDC
    redundancy beginning at offset 2348.
-   
-   
+
+
    @param c2_error_information If true associate a bit with each
    sector for C2 error The resulting bit field is ordered exactly as
    the main channel bytes.  Each 8-bit boundary defines a byte of
    flag bits.
-   
+
    @param subchannel_selection subchannel-selection bits
-   
+
      0  No Sub-channel data shall be returned.  (0 bytes)
      1  RAW P-W Sub-channel data shall be returned.  (96 byte)
      2  Formatted Q sub-channel data shall be transferred (16 bytes)
-     3  Reserved     
+     3  Reserved
      4  Corrected and de-interleaved R-W sub-channel (96 bytes)
      5-7  Reserved
 
    @param i_blocksize size of the a block expected to be returned
-     
+
    @param i_blocks number of blocks expected to be returned.
-     
+
 */
 %rename mmc_read_cd read_cd;
 
-/*! Read just the user data part of some sort of data sector (via 
-    mmc_read_cd). 
-    
+/*! Read just the user data part of some sort of data sector (via
+    mmc_read_cd).
+
     @param p_cdio object to read from
 
     @param p_buf place to read data into.  The caller should make sure
@@ -431,19 +434,19 @@ int mmc_eject_media(const CdIo_t *p_cdio);
 */
 %rename mmc_read_data_sectors read_data_sectors;
 
-/*! Read sectors using SCSI-MMC GPCMD_READ_CD. 
+/*! Read sectors using SCSI-MMC GPCMD_READ_CD.
   Can read only up to 25 blocks.
 */
 %rename mmc_read_sectors read_sectors;
 
 /*!
-    Run a Multimedia command (MMC). 
-  
+    Run a Multimedia command (MMC).
+
     @param p_cdio	 CD structure set by cdio_open().
     @param i_timeout_ms  time in milliseconds we will wait for the command
-                         to complete. 
-    @param p_cdb	 CDB bytes. All values that are needed should be set 
-                         on input. We'll figure out what the right CDB length 
+                         to complete.
+    @param p_cdb	 CDB bytes. All values that are needed should be set
+                         on input. We'll figure out what the right CDB length
                          should be.
     @param e_direction   direction the transfer is to go.
     @param i_buf	 Size of buffer
@@ -459,19 +462,19 @@ int mmc_eject_media(const CdIo_t *p_cdio);
 %rename mmc_set_blocksize set_blocksize;
 
 /*!
-  Set the drive speed. 
+  Set the drive speed.
 */
 %rename mmc_set_speed set_speed;
 
 /*!
-    Load or Unload media using a MMC START STOP command. 
-    
+    Load or Unload media using a MMC START STOP command.
+
     @param p_cdio  the CD object to be acted upon.
     @param b_eject eject if true and close tray if false
     @param b_immediate wait or don't wait for operation to complete
     @param power_condition Set CD-ROM to idle/standby/sleep. If nonzero
     eject/load is ignored, so set to 0 if you want to eject or load.
-    
+
     @see mmc_eject_media or mmc_close_tray
  */
 %rename mmc_start_stop_unit stop_media;
@@ -484,15 +487,12 @@ int mmc_close_tray(CdIo_t *p_cdio);
 
 char * mmc_get_isrc(CdIo_t *p_cdio, track_t track);
 %inline %{
-char * mmc_get_isrc(CdIo_t *p_cdio, track_t track) {
-    static cdio_isrc_t isrc;
-    bzero(isrc, sizeof(isrc));
-    int status;
+extern int mmc_close_tray(CdIo_t *p_cdio);
+extern int mmc_start_stop_unit (const CdIo_t *p_cdio);
+extern char *mmc_isrc_get_track_isrc (const CdIo_t *p_cdio, track_t i_track);
 
-    status = mmc_isrc_track_read_subchannel (p_cdio, track, isrc);
-    if(status != DRIVER_OP_SUCCESS)
-        *isrc = '\0';
-    return isrc;
+ char * mmc_get_isrc(CdIo_t *p_cdio, track_t track) {
+    return mmc_isrc_get_track_isrc (p_cdio, track);
 }
 %}
 
@@ -511,8 +511,8 @@ perlmmc - lower-level wrapper to MMC from libcdio, the ISO 9660 library of the C
 =head1 SYNOPSIS
 
 This is fairly straight-forward wrapper around the MultiMedia commands from
-the C library libcdio. Although this is perfectly usable on its own, it is expected that the interfaces L<Device::Cdio::MMC> or L<Device::Cdio::Device::MMC> 
-is what most people will want to use. 
+the C library libcdio. Although this is perfectly usable on its own, it is expected that the interfaces L<Device::Cdio::MMC> or L<Device::Cdio::Device::MMC>
+is what most people will want to use.
 
 There are various constants that are defined here.
 
@@ -520,7 +520,7 @@ There are various constants that are defined here.
 
 =head2 this
 
-This seems to be an artifact of SWIG. 
+This seems to be an artifact of SWIG.
 
 =head1 SEE ALSO
 

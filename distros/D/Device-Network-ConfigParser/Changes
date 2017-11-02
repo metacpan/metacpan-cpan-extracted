@@ -6,3 +6,16 @@ Revision history for Device-CheckPoint-ConfigParse
 0.002  2017-10-12
         * Minor bugfix with interface comments
         * Added initial grammars for most of the commands.
+
+0.003   * 'config_parser' now known as 'ncp'
+        * Fixes to the CheckPoint::Gaia parser. Now does interfaces and routes.
+        * Added Cisco::ASA module. Currently does:
+            * hostname and domain-name
+            * IP aliases (name)
+            * Routes
+
+0.004   2017-11-02
+        * Added CheckPoint::Expert Module
+        * Cisco::ASA now has partial parsing of objects and object groups.
+
+        

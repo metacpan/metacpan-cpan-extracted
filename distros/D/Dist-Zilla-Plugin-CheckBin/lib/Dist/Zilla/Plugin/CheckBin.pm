@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::Plugin::CheckBin;
-# git description: v0.006-3-gc518c94
-$Dist::Zilla::Plugin::CheckBin::VERSION = '0.007';
+package Dist::Zilla::Plugin::CheckBin; # git description: v0.007-26-g6b1e5af
+# vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: Require that our distribution has a particular command available
 # KEYWORDS: distribution installation require binary program executable
-# vim: set ts=8 sw=4 tw=78 et :
+
+our $VERSION = '0.008';
 
 use Moose;
 with
@@ -33,6 +33,7 @@ around dump_config => sub
 
     $config->{+__PACKAGE__} = {
         command => [ $self->command ],
+        blessed($self) ne __PACKAGE__ ? ( version => $VERSION ) : (),
     };
 
     return $config;
@@ -58,7 +59,7 @@ sub munge_files
     my @mfpl = grep { $_->name eq 'Makefile.PL' or $_->name eq 'Build.PL' } @{ $self->zilla->files };
     for my $mfpl (@mfpl)
     {
-        $self->log_debug('munging ' . $mfpl->name . ' in file gatherer phase');
+        $self->log_debug([ 'munging %s in file gatherer phase', $mfpl->name ]);
         $files{$mfpl->name} = $mfpl;
         $self->_munge_file($mfpl);
     }
@@ -78,7 +79,7 @@ sub setup_installer
     for my $mfpl (@mfpl)
     {
         next if exists $files{$mfpl->name};
-        $self->log_debug('munging ' . $mfpl->name . ' in setup_installer phase');
+        $self->log_debug([ 'munging %s in setup_installer phase', $mfpl->name ]);
         $self->_munge_file($mfpl);
     }
     return;
@@ -95,7 +96,7 @@ sub _munge_file
     my $pos = pos($orig_content);
 
     my $content =
-        "# inserted by " . blessed($self) . ' ' . ($self->VERSION || '<self>') . "\n"
+        '# inserted by ' . blessed($self) . ' ' . $self->VERSION . "\n"
         . "use Devel::CheckBin;\n"
         . join('', map { 'check_bin(\'' . $_ . "\');\n" } $self->command)
         . "\n";
@@ -121,7 +122,7 @@ Dist::Zilla::Plugin::CheckBin - Require that our distribution has a particular c
 
 =head1 VERSION
 
-version 0.007
+version 0.008
 
 =head1 SYNOPSIS
 
@@ -146,14 +147,6 @@ L<CPAN Testers|cpantesters.org> machine will result in a NA result.
 
 Identifies the name of the command that is searched for. Can be used more than once.
 
-=head1 SUPPORT
-
-=for stopwords irc
-
-Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-CheckBin>
-(or L<bug-Dist-Zilla-Plugin-CheckBin@rt.cpan.org|mailto:bug-Dist-Zilla-Plugin-CheckBin@rt.cpan.org>).
-I am also usually active on irc, as 'ether' at C<irc.perl.org>.
-
 =head1 SEE ALSO
 
 =over 4
@@ -172,11 +165,24 @@ L<Devel::CheckLib> and L<Dist::Zilla::Plugin::CheckLib>
 
 =back
 
+=head1 SUPPORT
+
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-CheckBin>
+(or L<bug-Dist-Zilla-Plugin-CheckBin@rt.cpan.org|mailto:bug-Dist-Zilla-Plugin-CheckBin@rt.cpan.org>).
+
+There is also a mailing list available for users of this distribution, at
+L<http://dzil.org/#mailing-list>.
+
+There is also an irc channel available for users of this distribution, at
+L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.
+
+I am also usually active on irc, as 'ether' at C<irc.perl.org>.
+
 =head1 AUTHOR
 
 Karen Etheridge <ether@cpan.org>
 
-=head1 COPYRIGHT AND LICENSE
+=head1 COPYRIGHT AND LICENCE
 
 This software is copyright (c) 2014 by Karen Etheridge.
 

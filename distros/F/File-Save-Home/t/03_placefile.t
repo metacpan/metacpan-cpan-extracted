@@ -15,7 +15,8 @@ use_ok('File::Save::Home', qw|
     conceal_target_file
     reveal_target_file
 | );
-use_ok('String::PerlIdentifier');
+use_ok ( 'String::Random', qw(random_regex) );
+*make_varname = sub { return random_regex(q([_A-Za-z][_A-Za-z0-9]{9})) };
 
 my ($homedir, @subdirs, $desired_dir_ref, $desired_dir, $target_ref, $target );
 ok($homedir = get_home_directory(), 'home directory is defined');

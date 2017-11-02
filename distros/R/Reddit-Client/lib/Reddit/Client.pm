@@ -1,6 +1,6 @@
 package Reddit::Client;
 
-our $VERSION = '1.0901'; 
+our $VERSION = '1.0965'; 
 $VERSION = eval $VERSION;
 
 use strict;
@@ -68,7 +68,7 @@ use constant USER_SAVED              => 'saved';
 
 use constant API_ME                  => 0;
 use constant API_INFO                => 1;
-use constant API_SEARCH              => 2;
+use constant API_SUB_SEARCH          => 2;
 use constant API_LOGIN               => 3;
 use constant API_SUBMIT              => 4;
 use constant API_COMMENT             => 5;
@@ -96,6 +96,9 @@ use constant API_CREATEMULTI         => 26;
 use constant API_DELETEMULTI         => 27;
 use constant API_GETMULTI            => 28;
 use constant API_EDITMULTI           => 29;
+use constant API_SUBREDDIT_INFO      => 30;
+use constant API_SEARCH              => 31;
+use constant API_MODQ                => 32;
 
 #===============================================================================
 # Parameters
@@ -111,7 +114,7 @@ our $UA               = sprintf 'Reddit::Client/%f', $VERSION;
 our @API;
 $API[API_ME            ] = ['GET',  '/api/v1/me'              ];
 $API[API_INFO          ] = ['GET',  '/api/info'               ];
-$API[API_SEARCH        ] = ['GET',  '/subreddits/search'      ];
+$API[API_SUB_SEARCH    ] = ['GET',  '/subreddits/search'      ];
 $API[API_LOGIN         ] = ['POST', '/api/login/%s'           ];
 $API[API_SUBMIT        ] = ['POST', '/api/submit'             ];
 $API[API_COMMENT       ] = ['POST', '/api/comment'            ];
@@ -139,6 +142,9 @@ $API[API_CREATEMULTI   ] = ['POST', '/api/multi/user/%s/m/%s' ];
 $API[API_GETMULTI      ] = ['GET', '/api/multi/user/%s/m/%s%s'];
 $API[API_DELETEMULTI   ] = ['DELETE','/api/multi/user/%s/m/%s'];
 $API[API_EDITMULTI     ] = ['PUT',  '/api/multi/user/%s/m/%s' ];
+$API[API_SUBREDDIT_INFO] = ['GET',  '/r/%s/about'             ];
+$API[API_SEARCH        ] = ['GET',  '/r/%s/search'            ];
+$API[API_MODQ          ] = ['GET',  '/r/%s/about/%s'          ];
 #===============================================================================
 # Package routines
 #===============================================================================
@@ -186,17 +192,19 @@ use fields (
     	'secret',
 	'username',
 	'password',
+	'request_errors',
 );
 
 sub new {
-    my ($class, %param) = @_;
-    my $self = fields::new($class);
+	my ($class, %param) = @_;
+	my $self = fields::new($class);
 
-    if (not exists $param{user_agent}) {
-        carp "Reddit::Client->new: user_agent required in future version.";
-        $param{user_agent} = $UA;
-    }
-    $self->{user_agent} = $param{user_agent};
+	if (not exists $param{user_agent}) {
+		carp "Reddit::Client->new: user_agent required in future version.";
+		$param{user_agent} = $UA;
+	}
+	$self->{user_agent} = $param{user_agent};
+	$self->{request_errors}= $param{request_errors} || 0;
 
 	if ($param{username} || $param{password} || $param{client_id} || $param{secret}) {
 		if (!$param{username} || !$param{password} || !$param{client_id} || !$param{secret}) {
@@ -211,6 +219,7 @@ sub new {
 		}
 	}
 
+	#print Dumper $self;
     return $self;
 }
 
@@ -235,8 +244,7 @@ sub request {
     my $request = Reddit::Client::Request->new(
         user_agent => $self->{user_agent},
 		   # path is sprintf'd before call, in api_json_request
-		   # the calling function passes in path %s's in 'args' param, 
-		   # an array REFERENCE
+		   # the calling function passes in path %s's in 'args' param 
         url        => sprintf('%s/%s', $BASE_URL, $path),
         method     => $method,
         query      => $query,
@@ -245,6 +253,7 @@ sub request {
         cookie     => $self->{cookie},
 	token	   => $self->{token},
 	tokentype  => $self->{tokentype},
+	request_errors=> $self->{request_errors},
     );
 
     return $request->send;
@@ -362,10 +371,9 @@ sub me {
     my $self = shift;
     DEBUG('Request user account info');
     my $result = $self->api_json_request(api => API_ME);
-    #return Reddit::Client::Account->new($self, $result->{data});
+    # Account has no data property like other things
     return Reddit::Client::Account->new($self, $result);
 }
-
 sub list_subreddits {
     	my ($self, %param) = @_;
 
@@ -470,6 +478,18 @@ sub mark_inbox_read {
 # Subreddits and listings
 #===============================================================================
 
+sub get_subreddit_info {
+	my $self	= shift;
+	my $sub		= shift || croak 'Argument 1 (subreddit name) is required.';
+	$sub = subreddit($sub);
+
+	my $result = $self->api_json_request(
+		api 	=> API_SUBREDDIT_INFO,
+		args	=> [$sub],
+	);
+	return $result->{data};
+}
+
 sub info {
     my ($self, $id) = @_;
     DEBUG('Get info for id %s', $id);
@@ -482,6 +502,36 @@ sub info {
     my $rtn = $info->{data}->{children}[0]->{data};
     $rtn->{kind} = $info->{data}->{children}[0]->{kind} if $rtn;
     return $rtn;
+}
+
+sub search {
+	my ($self, %param) = @_;
+	my $sub = $param{subreddit} || $param{sub} || croak "'subreddit' or 'sub' is required.";
+
+	my $query = $self->set_listing_defaults(%param);
+	$query->{q} = $param{q} || croak "'q' (search string) is required."; 
+
+	# things the user should be able to choose but we're hard coding
+	$query->{restrict_sr} 	= 'on';
+	$query->{include_over18}= 'on';
+	$query->{t} 		= 'all';
+	$query->{syntax} 	= 'cloudsearch';
+	$query->{show} 		= 'all';
+	$query->{type}		= 'link'; # return Link objects
+	$query->{sort}		= 'top';
+	
+	my $args = [$sub];
+
+    	my $result = $self->api_json_request(
+		api => API_SEARCH, 
+		args=> $args, 
+		data => $query,
+	);
+
+	#return $result->{data};
+    	return [
+        	map {Reddit::Client::Link->new($self, $_->{data})} @{$result->{data}{children}}
+    	       ];
 }
 
 sub get_permalink {
@@ -497,53 +547,68 @@ sub get_permalink {
 
 sub find_subreddits {
     	my ($self, %param) = @_;
-	#defined $query || croak 'Expected $query';
-	#DEBUG('Search subreddits: %s', $query);
 
-    	my $query  = {};
-	$query->{q} = $param{q} || croak "expected 'query'";
-        $query->{before} = $param{before} if $param{before};
-        $query->{after}  = $param{after}  if $param{after};
-	if (exists $param{limit}) { $query->{limit} = $param{limit} || 500; }
-	else 			  { $query->{limit} = DEFAULT_LIMIT;	    }
-
-	# sort
-	$query->{sort} = $param{sort} || 'relevance';
+	my $query 	= $self->set_listing_defaults(%param);
+	$query->{q} 	= $param{q} || croak "expected 'q'";
+	$query->{sort} 	= $param{sort} || 'relevance';
 
     	my $result = $self->api_json_request(
-		api => API_SEARCH, 
+		api => API_SUB_SEARCH, 
 		data => $query,
 	);
     	return [
-        	map {Reddit::Client::SubReddit->new($self, $_->{data})} @{$result->{data}{children}}
+        	map { Reddit::Client::SubReddit->new($self, $_->{data}) } @{$result->{data}{children}}
     	];
 }
 
+# reports spam modqueue unmoderated edited
+sub get_modlinks {
+    	my ($self, %param) = @_;
+
+	my $query = $self->set_listing_defaults(%param);
+	my $sub   = $param{sub} || $param{subreddit} || 'mod';
+	my $mode  = $param{mode} || 'modqueue';
+
+    	my $result = $self->api_json_request(
+		api  => API_MODQ, 
+		args => [$sub, $mode],
+		data => $query,
+	);
+
+	#return $result->{data};
+
+	return [
+		map {
+
+		$_->{kind} eq "t1" ? 
+			Reddit::Client::Comment->new($self, $_->{data}) :
+			Reddit::Client::Link->new($self, $_->{data})
+		} 
+
+		@{$result->{data}{children}} 
+	];
+}
 sub fetch_links {
-    my ($self, %param) = @_;
-    my $subreddit = $param{subreddit} || '';
-    my $view      = $param{view}      || VIEW_DEFAULT;
+    	my ($self, %param) = @_;
+    	my $subreddit = $param{sub} || $param{subreddit} || '';
+    	my $view      = $param{view}      || VIEW_DEFAULT;
 
-    	my $query  = {};
-        $query->{before} = $param{before} if $param{before};
-        $query->{after}  = $param{after}  if $param{after};
-	if (exists $param{limit}) { $query->{limit} = $param{limit} || 500; }
-	else 			  { $query->{limit} = DEFAULT_LIMIT;	    }
+	my $query = $self->set_listing_defaults(%param);
 
-    $subreddit = subreddit($subreddit);
+    	$subreddit = subreddit($subreddit);
 
-    my $args = [$view];
-    unshift @$args, $subreddit if $subreddit;
+    	my $args = [$view];
+    	unshift @$args, $subreddit if $subreddit;
 
-    my $result = $self->api_json_request(
-        api      => ($subreddit ? API_LINKS_FRONT : API_LINKS_OTHER),
-        args     => $args,
-        data     => $query,
-    );
+    	my $result = $self->api_json_request(
+        	api      => ($subreddit ? API_LINKS_FRONT : API_LINKS_OTHER),
+        	args     => $args,
+        	data     => $query,
+    	);
 
-    return [
-        map {Reddit::Client::Link->new($self, $_->{data})} @{$result->{data}{children}} 
-    ];
+    	return [
+        	map { Reddit::Client::Link->new($self, $_->{data}) } @{$result->{data}{children}} 
+    	];
 }
 
 sub get_links { # alias for fetch_links to make naming convention consistent
@@ -556,7 +621,7 @@ sub get_link {
 	if (	!$fullname || 
 		length($fullname) < 8 ||
 		substr($fullname, 0, 2) ne "t3")
-	{ croak "expected link fullname (i.e. t3_3ng7r5)";	}
+	{ croak "expected argument 1, 'fullname' (i.e. t3_3ng7r5)";	}
 
 	my $info = $self->info($fullname);
 
@@ -569,7 +634,7 @@ sub get_comment {
 	if (	!$fullname || 
 		length($fullname) < 8 ||
 		substr($fullname, 0, 2) ne "t1")
-	{ croak "expected comment fullname (i.e. t1_cvp5afk)"; }
+	{ croak "expected argument 1, 'fullname' (i.e. t1_3ng7r5)"; }
 
 	my $info = $self->info($fullname);
 
@@ -589,8 +654,8 @@ sub get_subreddit_comments {
 	else 			  { $query->{limit} = DEFAULT_LIMIT;	    }
 
 	$subreddit = subreddit($subreddit); # remove slashes and leading r/
-    	my $args = [$view];
-    	unshift @$args, $subreddit if $subreddit;
+    	#my $args = [$view]; # this did nothing
+    	my $args = $subreddit ? [$subreddit] : [];
 
     	my $result = $self->api_json_request(
         	api      => ($subreddit ? API_COMMENTS : API_COMMENTS_FRONT),
@@ -623,9 +688,6 @@ sub get_user {
 		data     => $query,
 	);
 
-	# data property of $result->{data}{chilren}
-	# so $result->{data}{children}[0]->{data}
-
 	return [
 		map {
 
@@ -637,7 +699,20 @@ sub get_user {
 		@{$result->{data}{children}} 
 	];
 }
-
+sub set_listing_defaults {
+    	my ($self, %param) = @_;
+	my $query = {};
+    	$query->{before} = $param{before} if $param{before};
+    	$query->{after}  = $param{after}  if $param{after};
+	$query->{only}   = $param{only}   if $param{only};
+	$query->{count}  = $param{count}  if $param{count};
+	$query->{show}	 = 'all' 	  if $param{show} or $param{show_all};
+	$query->{sr_detail} = 'true' 	  if $param{sr_detail};
+   	if (exists $param{limit}) { $query->{limit} = $param{limit} || 500; }
+	else 			  { $query->{limit} = DEFAULT_LIMIT;	    }
+	
+	return $query;
+}
 #===============================================================================
 # Delete posts or comments
 #===============================================================================

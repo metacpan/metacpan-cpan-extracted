@@ -7,6 +7,7 @@ use Mojo::UserAgent;
 use Mojo::IOLoop;
 
 use Carp;
+our @CARP_NOT = ('Webservice::Shipment'); # don't carp from AUTOLOAD
 
 has api_url => sub { Mojo::URL->new };
 has password => sub { croak 'password is required' };
@@ -66,7 +67,7 @@ sub track {
       my $data = $self->parse($id, $res);
       $self->$cb(undef, $data);
     },
-  )->catch(sub{ $self->$cb($_[1], undef) })->wait;
+  )->tap(on => error => sub{ $self->$cb($_[1], undef) })->wait;
 }
 
 sub validate {

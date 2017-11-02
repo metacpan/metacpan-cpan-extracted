@@ -1,6 +1,12 @@
+0.053		2017-10-30	T. R. Wyant
+    Recognize \px as Unicode char class. At least, when the x is C, L,
+    M, N, P, S or Z.
+
+    The 'parse' argument to new() is now deprecated.
+
 0.052		2017-09-07	T. R. Wyant
     RT 122715: Clarify Node->find_parents() documentation. Thanks to
-    Salvatore Bonaccorso for letting me know about this problem..
+    Salvatore Bonaccorso for letting me know about this problem.
 
     Further deprecate tokenizer method prior() in favor of
     prior_significant_token().

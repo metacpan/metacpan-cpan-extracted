@@ -1,4 +1,4 @@
-Lingua::EN::Inflect version 1.902
+Lingua::EN::Inflect version 1.903
 
 The exportable subroutines of Lingua::EN::Inflect provide plural
 inflections and "a"/"an" selection for English words.

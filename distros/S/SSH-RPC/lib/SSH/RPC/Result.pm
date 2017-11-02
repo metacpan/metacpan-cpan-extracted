@@ -1,5 +1,5 @@
 package SSH::RPC::Result;
-$SSH::RPC::Result::VERSION = '1.203';
+$SSH::RPC::Result::VERSION = '1.204';
 use strict;
 use Class::InsideOut qw(private id register);
 
@@ -9,7 +9,7 @@ SSH::RPC::Result - Provides methods for the response from a SSH::RPC::Client run
 
 =head1 VERSION
 
-version 1.203
+version 1.204
 
 =head1 DESCRIPTION
 

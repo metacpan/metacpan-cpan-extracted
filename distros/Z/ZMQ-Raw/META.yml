@@ -25,31 +25,31 @@ name: ZMQ-Raw
 provides:
   ZMQ::Raw:
     file: lib/ZMQ/Raw.pm
-    version: '0.10'
+    version: '0.12'
   ZMQ::Raw::Context:
     file: lib/ZMQ/Raw/Context.pm
-    version: '0.10'
+    version: '0.12'
   ZMQ::Raw::Curve:
     file: lib/ZMQ/Raw/Curve.pm
-    version: '0.10'
+    version: '0.12'
   ZMQ::Raw::Error:
     file: lib/ZMQ/Raw/Error.pm
-    version: '0.10'
+    version: '0.12'
   ZMQ::Raw::Message:
     file: lib/ZMQ/Raw/Message.pm
-    version: '0.10'
+    version: '0.12'
   ZMQ::Raw::Poller:
     file: lib/ZMQ/Raw/Poller.pm
-    version: '0.10'
+    version: '0.12'
   ZMQ::Raw::Proxy:
     file: lib/ZMQ/Raw/Proxy.pm
-    version: '0.10'
+    version: '0.12'
   ZMQ::Raw::Socket:
     file: lib/ZMQ/Raw/Socket.pm
-    version: '0.10'
+    version: '0.12'
   ZMQ::Raw::Z85:
     file: lib/ZMQ/Raw/Z85.pm
-    version: '0.10'
+    version: '0.12'
 requires:
   Carp: '0'
   XSLoader: '0'
@@ -59,7 +59,7 @@ requires:
   warnings: '0'
 resources:
   repository: git://github.com//jacquesg/p5-ZMQ-Raw.git
-version: '0.10'
+version: '0.12'
 x_Dist_Zilla:
   perl:
     version: '5.026001'
@@ -224,7 +224,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.10
+          tag: v0.12
           tag_format: v%v
           tag_message: '%N %v'
         Dist::Zilla::Role::Git::Repo:

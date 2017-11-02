@@ -23,5 +23,5 @@ resources:
   bugtracker: https://github.com/sysread/HTML-Untidy/issues
   homepage: https://github.com/sysread/HTML-Untidy
   repository: https://github.com/sysread/HTML-Untidy.git
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'YAML::Tiny version 1.70'

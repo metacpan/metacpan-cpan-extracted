@@ -8,7 +8,7 @@ use Capture::Tiny qw( capture );
 use Carp ();
 
 # ABSTRACT: Alien::Build installer code for ExtUtils::MakeMaker
-our $VERSION = '1.25'; # VERSION
+our $VERSION = '1.28'; # VERSION
 
 
 sub new
@@ -193,7 +193,7 @@ sub mm_postamble
   # append to all
   $postamble .= "pure_all :: _alien/mm/build\n\n";
   
-  $postamble .= "subdirs-test_dynamic :: alien_test\n\n";
+  $postamble .= "subdirs-test_dynamic subdirs-test_static subdirs-test :: alien_test\n\n";
   $postamble .= "alien_test :\n" .
                 "\t\$(FULLPERL) -MAlien::Build::MM=cmd -e test\n\n";
   
@@ -353,7 +353,7 @@ Alien::Build::MM - Alien::Build installer code for ExtUtils::MakeMaker
 
 =head1 VERSION
 
-version 1.25
+version 1.28
 
 =head1 SYNOPSIS
 
@@ -500,6 +500,10 @@ Petr Pisar (ppisar)
 Lance Wicks (LANCEW)
 
 Ahmad Fatoum (a3f, ATHREEF)
+
+José Joaquín Atria (JJATRIA)
+
+Duke Leto (LETO)
 
 =head1 COPYRIGHT AND LICENSE
 

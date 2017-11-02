@@ -15,15 +15,26 @@ use Sub::Util (); # for setting the prototype of the lexical accessors
 use PadWalker (); # for generating lexical accessors
 use MOP::Util ();
 
-our $VERSION   = '0.05';
+our $VERSION   = '0.06';
 our $AUTHORITY = 'cpan:STEVAN';
 
-sub init_args ( $meta, $method, %init_args ) : OverwritesMethod {
+sub init ( $meta, $method, %init_args ) : OverwritesMethod {
+
+    # XXX:
+    # Consider perhaps supporting something
+    # like the Perl 6 signature format here,
+    # which would give us a more sophisticated
+    # way to specify the constructor API
+    #
+    # The way MAIN is handled is good inspiration maybe ...
+    # http://perl6maven.com/parsing-command-line-arguments-perl6
+    #
+    # - SL
 
     my $class_name  = $meta->name;
     my $method_name = $method->name;
 
-    Carp::croak('The `init_arg` trait can only be applied to BUILDARGS')
+    Carp::confess('The `init_arg` trait can only be applied to BUILDARGS')
         if $method_name ne 'BUILDARGS';
 
     if ( %init_args ) {
@@ -47,7 +58,7 @@ sub init_args ( $meta, $method, %init_args ) : OverwritesMethod {
 
             my $arity = scalar @args;
 
-            Carp::croak('Constructor for ('.$class_name.') expected '
+            Carp::confess('Constructor for ('.$class_name.') expected '
                 . (($max_arity == $min_arity)
                     ? ($min_arity)
                     : ('between '.$min_arity.' and '.$max_arity))
@@ -62,25 +73,44 @@ sub init_args ( $meta, $method, %init_args ) : OverwritesMethod {
                 push @missing => $param unless exists $proto->{ $param };
             }
 
-            Carp::croak('Constructor for ('.$class_name.') missing (`'.(join '`, `' => @missing).'`) parameters, got (`'.(join '`, `' => sort keys $proto->%*).'`), expected (`'.(join '`, `' => @all).'`)')
+            Carp::confess('Constructor for ('.$class_name.') missing (`'.(join '`, `' => @missing).'`) parameters, got (`'.(join '`, `' => sort keys $proto->%*).'`), expected (`'.(join '`, `' => @all).'`)')
                 if @missing;
 
             my (%final, %super);
 
+            #warn "---------------------------------------";
+            #warn join ', ' => @all;
+
             # do any kind of slot assignment shuffling needed ....
             foreach my $param ( @all ) {
 
-                my $from = $param =~ s/\?$//r; #/
+                #warn "CHECKING param: $param";
+
+                my $from = $param;
+                $from =~ s/\?$//;
                 my $to   = $init_args{ $param };
+
+                #warn "PARAM: $param FROM: ($from) TO: ($to)";
 
                 if ( $to =~ /^super\((.*)\)$/ ) {
                     $super{ $1 } = delete $proto->{ $from }
                          if $proto->{ $from };
                 }
                 else {
-                    # now grab the slot by the correct name ...
-                    $final{ $to } = delete $proto->{ $from }
-                        if $proto->{ $from };
+                    if ( exists $proto->{ $from } ) {
+
+                        #use Data::Dumper;
+                        #warn "BEFORE:", Dumper $proto;
+
+                        # now grab the slot by the correct name ...
+                        $final{ $to } = delete $proto->{ $from };
+
+                        #warn "AFTER:", Dumper $proto;
+                    }
+                    #else {
+                        #use Data::Dumper;
+                        #warn "NOT FOUND ($from) :", Dumper $proto;
+                    #}
                 }
             }
 
@@ -91,29 +121,30 @@ sub init_args ( $meta, $method, %init_args ) : OverwritesMethod {
             }
 
             if ( keys $proto->%* ) {
-                Carp::croak('Constructor for ('.$class_name.') got unrecognized parameters (`'.(join '`, `' => keys $proto->%*).'`)');
-            }
 
-            # use Data::Dumper;
-            # warn Dumper +{
-            #     proto => $proto,
-            #     final => \%final,
-            #     super => \%super,
-            #     meta  => {
-            #         class     => $meta->name,
-            #         all       => \@all,
-            #         required  => \@required,
-            #         min_arity => $min_arity,
-            #         max_arity => $max_arity,
-            #     }
-            # };
+                #use Data::Dumper;
+                #warn Dumper +{
+                #    proto => $proto,
+                #    final => \%final,
+                #    super => \%super,
+                #    meta  => {
+                #        class     => $meta->name,
+                #        all       => \@all,
+                #        required  => \@required,
+                #        min_arity => $min_arity,
+                #        max_arity => $max_arity,
+                #    }
+                #};
+
+                Carp::confess('Constructor for ('.$class_name.') got unrecognized parameters (`'.(join '`, `' => keys $proto->%*).'`)');
+            }
 
             return \%final;
         });
     }
     else {
         $meta->add_method('BUILDARGS' => sub ($self, @args) {
-            Carp::croak('Constructor for ('.$class_name.') expected 0 arguments, got ('.(scalar @args).')')
+            Carp::confess('Constructor for ('.$class_name.') expected 0 arguments, got ('.(scalar @args).')')
                 if @args;
             return $self->UNIVERSAL::Object::BUILDARGS();
         });
@@ -137,12 +168,12 @@ sub ro ( $meta, $method, @args ) : OverwritesMethod {
         }
     }
 
-    Carp::croak('Unable to build `ro` accessor for slot `' . $slot_name.'` in `'.$meta->name.'` because the slot cannot be found.')
+    Carp::confess('Unable to build `ro` accessor for slot `' . $slot_name.'` in `'.$meta->name.'` because the slot cannot be found.')
         unless $meta->has_slot( $slot_name )
             || $meta->has_slot_alias( $slot_name );
 
     $meta->add_method( $method_name => sub {
-        Carp::croak("Cannot assign to `$slot_name`, it is a readonly") if scalar @_ != 1;
+        Carp::confess("Cannot assign to `$slot_name`, it is a readonly") if scalar @_ != 1;
         $_[0]->{ $slot_name };
     });
 }
@@ -159,10 +190,10 @@ sub rw ( $meta, $method, @args ) : OverwritesMethod {
         $slot_name = $method_name;
     }
 
-    Carp::croak('Unable to build `rw` accessor for slot `' . $slot_name.'` in `'.$meta->name.'` because class is immutable.')
+    Carp::confess('Unable to build `rw` accessor for slot `' . $slot_name.'` in `'.$meta->name.'` because class is immutable.')
         if ($meta->name)->isa('Moxie::Object::Immutable');
 
-    Carp::croak('Unable to build `rw` accessor for slot `' . $slot_name.'` in `'.$meta->name.'` because the slot cannot be found.')
+    Carp::confess('Unable to build `rw` accessor for slot `' . $slot_name.'` in `'.$meta->name.'` because the slot cannot be found.')
         unless $meta->has_slot( $slot_name )
             || $meta->has_slot_alias( $slot_name );
 
@@ -189,15 +220,15 @@ sub wo ( $meta, $method, @args ) : OverwritesMethod {
         }
     }
 
-    Carp::croak('Unable to build `wo` accessor for slot `' . $slot_name.'` in `'.$meta->name.'` because class is immutable.')
+    Carp::confess('Unable to build `wo` accessor for slot `' . $slot_name.'` in `'.$meta->name.'` because class is immutable.')
         if ($meta->name)->isa('Moxie::Object::Immutable');
 
-    Carp::croak('Unable to build `wo` accessor for slot `' . $slot_name.'` in `'.$meta->name.'` because the slot cannot be found.')
+    Carp::confess('Unable to build `wo` accessor for slot `' . $slot_name.'` in `'.$meta->name.'` because the slot cannot be found.')
         unless $meta->has_slot( $slot_name )
             || $meta->has_slot_alias( $slot_name );
 
     $meta->add_method( $method_name => sub {
-        Carp::croak("You must supply a value to write to `$slot_name`") if scalar(@_) < 1;
+        Carp::confess("You must supply a value to write to `$slot_name`") if scalar(@_) < 1;
         $_[0]->{ $slot_name } = $_[1];
     });
 }
@@ -219,7 +250,7 @@ sub predicate ( $meta, $method, @args ) : OverwritesMethod {
         }
     }
 
-    Carp::croak('Unable to build predicate for slot `' . $slot_name.'` in `'.$meta->name.'` because the slot cannot be found.')
+    Carp::confess('Unable to build predicate for slot `' . $slot_name.'` in `'.$meta->name.'` because the slot cannot be found.')
         unless $meta->has_slot( $slot_name )
             || $meta->has_slot_alias( $slot_name );
 
@@ -243,10 +274,10 @@ sub clearer ( $meta, $method, @args ) : OverwritesMethod {
         }
     }
 
-    Carp::croak('Unable to build `clearer` accessor for slot `' . $slot_name.'` in `'.$meta->name.'` because class is immutable.')
+    Carp::confess('Unable to build `clearer` accessor for slot `' . $slot_name.'` in `'.$meta->name.'` because class is immutable.')
         if ($meta->name)->isa('Moxie::Object::Immutable');
 
-    Carp::croak('Unable to build `clearer` accessor for slot `' . $slot_name.'` in `'.$meta->name.'` because the slot cannot be found.')
+    Carp::confess('Unable to build `clearer` accessor for slot `' . $slot_name.'` in `'.$meta->name.'` because the slot cannot be found.')
         unless $meta->has_slot( $slot_name )
             || $meta->has_slot_alias( $slot_name );
 
@@ -270,10 +301,10 @@ sub lazy ( $meta, $method, @args ) : OverwritesMethod {
         }
     }
 
-    Carp::croak('Unable to build `lazy` accessor for slot `' . $slot_name.'` in `'.$meta->name.'` because class is immutable.')
+    Carp::confess('Unable to build `lazy` accessor for slot `' . $slot_name.'` in `'.$meta->name.'` because class is immutable.')
         if ($meta->name)->isa('Moxie::Object::Immutable');
 
-    Carp::croak('Unable to build `lazy` accessor for slot `' . $slot_name.'` in `'.$meta->name.'` because the slot cannot be found.')
+    Carp::confess('Unable to build `lazy` accessor for slot `' . $slot_name.'` in `'.$meta->name.'` because the slot cannot be found.')
         unless $meta->has_slot( $slot_name )
             || $meta->has_slot_alias( $slot_name );
 
@@ -296,10 +327,10 @@ sub handles ( $meta, $method, @args ) : OverwritesMethod {
 
     my ($slot_name, $delegate) = ($args[0] =~ /^(.*)\-\>(.*)$/);
 
-    Carp::croak('Delegation spec must be in the pattern `slot->method`, not '.$args[0])
+    Carp::confess('Delegation spec must be in the pattern `slot->method`, not '.$args[0])
         unless $slot_name && $delegate;
 
-    Carp::croak('Unable to build delegation method for slot `' . $slot_name.'` in `'.$meta->name.'` because the slot cannot be found.')
+    Carp::confess('Unable to build delegation method for slot `' . $slot_name.'` in `'.$meta->name.'` because the slot cannot be found.')
         unless $meta->has_slot( $slot_name )
             || $meta->has_slot_alias( $slot_name );
 
@@ -320,7 +351,7 @@ sub private ( $meta, $method, @args ) {
         $slot_name = $method_name;
     }
 
-    Carp::croak('Unable to build private accessor for slot `' . $slot_name.'` in `'.$meta->name.'` because the slot cannot be found.')
+    Carp::confess('Unable to build private accessor for slot `' . $slot_name.'` in `'.$meta->name.'` because the slot cannot be found.')
         unless $meta->has_slot( $slot_name )
             || $meta->has_slot_alias( $slot_name );
 
@@ -329,7 +360,7 @@ sub private ( $meta, $method, @args ) {
 
     # we should not be able to find it in the symbol table ...
     if ( $meta->has_method( $method_name ) || $meta->has_method_alias( $method_name ) || $meta->requires_method( $method_name ) ) {
-        Carp::croak('Unable to install private (lexical) accessor for slot('.$slot_name.') named ('
+        Carp::confess('Unable to install private (lexical) accessor for slot('.$slot_name.') named ('
             .$method_name.') because we found a conflicting non-lexical method of that name. '
             .'Private methods must be defined before any public methods of the same name.');
     }
@@ -439,7 +470,7 @@ Moxie::Traits::Provider - built in traits
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 DESCRIPTION
 

@@ -3,7 +3,7 @@
 # it under the same terms as Perl itself.
 
 package HTML::Mason::Compiler::ToObject;
-$HTML::Mason::Compiler::ToObject::VERSION = '1.56';
+$HTML::Mason::Compiler::ToObject::VERSION = '1.58';
 use strict;
 use warnings;
 

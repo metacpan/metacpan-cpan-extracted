@@ -114,6 +114,7 @@ scripts/bump-version-number.pl
 scripts/fast-eumm.pl
 scripts/prints-to-comments.pl
 scripts/tag-release.pl
+scripts/total-build-and-test.bash
 scripts/update-HACKING-file.bash
 t/01basic.t
 t/02parse.t
@@ -164,6 +165,7 @@ t/48_memleak_rt_83744.t
 t/48_reader_undef_warning_on_empty_str_rt106830.t
 t/48_removeChild_crashes_rt_80395.t
 t/48_replaceNode_DTD_nodes_rT_80521.t
+t/48_rt123379_setNamespace.t
 t/48_rt55000.t
 t/48_rt93429_recover_2_in_html_parsing.t
 t/48importing_nodes_IDs_rt_69520.t

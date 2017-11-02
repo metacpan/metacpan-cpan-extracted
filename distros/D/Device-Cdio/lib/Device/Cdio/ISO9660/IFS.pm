@@ -1,7 +1,7 @@
 package Device::Cdio::ISO9660::IFS;
+use Device::Cdio::ISO9660;
 require 5.8.6;
 #
-#  $Id$
 #  See end for copyright and license.
 
 =pod
@@ -19,25 +19,34 @@ often used in conjunction with Device::Cdio::ISO9660.
     use Device::Cdio::ISO9660::IFS;
 
     $iso = Device::Cdio::ISO9660::IFS->new(-source=>'copying.iso');
-    $id = $iso->get_application_id();
+
+    my $id = $iso->get_application_id();
+    $id = $iso->get_preparer_id();
+    $id = $iso->get_publisher_id();
+    $id = $iso->get_system_id();
+    $id = $iso->get_volume_id();
+    $id = $iso->get_volumeset_id();
+
+    my $path = '/';
     @file_stats = $iso->readdir($path);
-    foreach my $href (@file_stats) {    
-       printf "%s [LSN %6d] %8d %s%s\n", 
+    foreach my $href (@file_stats) {
+       printf "%s [LSN %6d] %8d %s %s%s\n",
        $href->{is_dir} ? "d" : "-",
        $href->{LSN}, $href->{size},
+       $href->{tm}->{year},
        $path,
-        Device::Cdio::ISO9660::name_translate($href->{filename});
+       Device::Cdio::ISO9660::name_translate($href->{filename});
     }
 
 =head1 DESCRIPTION
 
 This is an Object-Oriented interface to the GNU CD Input and Control
 library (C<libcdio>) which is written in C. This class handles ISO
-9660 aspects of an ISO 9600 image. 
+9660 aspects of an ISO 9600 image.
 
 An ISO-9660 image is distinct from a CD in a CD-ROM which has ISO-9660
 tracks; the latter contains other CD-like information (e.g. tracks,
-information or assocated with the CD). An ISO-9660 filesystem image on
+information or associated with the CD). An ISO-9660 filesystem image on
 the other hand doesn't and is generally file in some file system,
 sometimes with the file extension ".iso"; perhaps it can be burned
 into a CD with a suitable tool, perhaps is can be "mounted" as a
@@ -107,7 +116,7 @@ use Device::Cdio::Util qw( _check_arg_count _extra_args _rearrange );
 
   new(source, iso_mask)->$iso9660_object
 
-Create a new ISO 9660 object. Source or iso_mask is optional. 
+Create a new ISO 9660 object. Source or iso_mask is optional.
 
 If source is given, open() is called using that and the optional iso_mask
 parameter; iso_mask is used only if source is specified.
@@ -120,7 +129,7 @@ sub new {
 
   my($class,@p) = @_;
 
-  my($source, $iso_mask, @args) = 
+  my($source, $iso_mask, @args) =
       _rearrange(['SOURCE', 'ISO_MASK'], @p);
 
   return undef if _extra_args(@args);
@@ -138,7 +147,7 @@ sub new {
   return $self;
 }
 
-	
+
 =pod
 
 =head2 close
@@ -162,7 +171,7 @@ sub close {
     }
 }
 
-=pod 
+=pod
 
 =head2 find_lsn
 
@@ -188,6 +197,9 @@ sub find_lsn {
 	return undef;
     }
     my @values = perliso9660::ifs_find_lsn($self->{iso9660}, $lsn);
+    # Remove the two input parameters
+    splice(@values, 0, 2) if @values > 2;
+
     return Device::Cdio::ISO9660::stat_array_to_href(@values);
 }
 
@@ -337,9 +349,9 @@ See also open_fuzzy.
 
 sub open {
     my($self,@p) = @_;
-    my($source, $iso_mask) = 
+    my($source, $iso_mask) =
 	_rearrange(['SOURCE', 'ISO_MASK'], @p);
-    
+
     $self->close() if defined($self->{iso9660});
     $iso_mask = $perliso9660::EXTENSION_NONE if !defined($iso_mask);
     if (!defined($source)) {
@@ -371,9 +383,9 @@ See also open.
 
 sub open_fuzzy {
     my($self,@p) = @_;
-    my($source, $iso_mask, $fuzz) = 
+    my($source, $iso_mask, $fuzz) =
 	_rearrange(['SOURCE', 'ISO_MASK', 'FUZZ'], @p);
-    
+
     $self->close() if defined($self->{iso9660});
     $iso_mask = $perliso9660::EXTENSION_NONE if !defined($iso_mask);
 
@@ -403,9 +415,9 @@ filesystem.
 
 sub read_fuzzy_superblock {
     my($self,@p) = @_;
-    my($iso_mask, $fuzz) = 
+    my($iso_mask, $fuzz) =
 	_rearrange(['ISO_MASK', 'FUZZ'], @p);
-    
+
     $iso_mask = $perliso9660::EXTENSION_NONE if !defined($iso_mask);
 
     if (!defined($fuzz)) {
@@ -427,39 +439,11 @@ readdir(dirname)->@iso_stat
 
 Read path (a directory) and return a list of iso9660 stat references
 
-Each item of @iso_stat is a hash reference which contains
+See L<Device::Cdio::ISO9660/stat_array_to_href> for description of each
+hash refererence in C<@stat> that is returned.
 
-=over 4
-
-=item LSN 
-
-the Logical sector number (an integer)
-
-=item size 
-
-the total size of the file in bytes
-
-=item  sec_size 
-
-the number of sectors allocated
-
-=item  filename
-
-the file name of the statbuf entry
-
-=item XA
-
-if the file has XA attributes; 0 if not
-
-=item is_dir 
-
-1 if a directory; 0 if a not;
-
-=back
-
-FIXME: If you look at iso9660.h you'll see more fields, such as for
-Rock-Ridge specific fields or XA specific fields. Eventually these
-will be added. Volunteers? 
+If you look at iso9660.h you'll see more fields, such as for
+Rock-Ridge specific fields or XA specific fields. Volunteers?
 
 =cut
 
@@ -482,8 +466,8 @@ sub readdir {
     my @result = ();
     while (@values) {
 	push @result, Device::Cdio::ISO9660::stat_array_to_href(@values);
-	splice(@values, 0, 5);
-    }	    
+	splice(@values, 0, 14);
+    }
     return @result;
 }
 
@@ -522,13 +506,13 @@ Descriptor (PVD) and perhaps a Supplemental Volume Descriptor if
 sub read_superblock {
     my($self,@p) = @_;
     my($iso_mask) = _rearrange(['ISO_MASK'], @p);
-    
+
     $iso_mask = $perliso9660::EXTENSION_NONE if !defined($iso_mask);
 
     return perliso9660::ifs_read_superblock($self->{iso9660}, $iso_mask);
 }
 
-=pod 
+=pod
 
 =head2 seek_read
 
@@ -544,8 +528,8 @@ sub seek_read {
     return undef if _extra_args(@args);
 
     $size = 1 if !defined($size);
-    
-    (my $data, $size) = perliso9660::seek_read($self->{iso9660}, $start, 
+
+    (my $data, $size) = perliso9660::seek_read($self->{iso9660}, $start,
 					       $size);
     return wantarray ? ($data, $size) : $data;
 }
@@ -561,42 +545,15 @@ Return file status for path name psz_path. C<undef> is returned on error.
 If translate is 1,  version numbers in the ISO 9660 name are dropped, i.e. ;1
 is removed and if level 1 ISO-9660 names are lowercased.
 
-Each item of @iso_stat is a hash reference which contains
-
-=over 4
-
-=item LSN 
-
-the Logical sector number (an integer)
-
-=item size 
-
-the total size of the file in bytes
-
-=item  sec_size 
-
-the number of sectors allocated
-
-=item  filename
-
-the file name of the statbuf entry
-
-=item XA
-
-if the file has XA attributes; 0 if not
-
-=item is_dir 
-
-1 if a directory; 0 if a not.
-
-=back
+See L<Device::Cdio::ISO9660/stat_array_to_href> for description of C<\%stat>
+hash reference that is returned.
 
 =cut
 
 sub stat {
     my($self, @p) = @_;
     my($path, $translate, @args) = _rearrange(['PATH', 'TRANSLATE'], @p);
-    
+
     return undef if _extra_args(@args);
     $translate = 0 if !defined($translate);
 
@@ -631,10 +588,10 @@ See also L<Device::Cdio> for module information, L<Device::Cdio::ISO9660::FS>
 and L<Device::Cdio::Device> for device objects and
 L<Device::Cdio::Track> for track objects.
 
-L<perliso9660> is the lower-level interface to C<libiso9660>, 
+L<perliso9660> is the lower-level interface to C<libiso9660>,
 the ISO 9660 library of L<http://www.gnu.org/software/libcdio>.
 
-L<http://www.gnu.org/software/libcdio/doxygen/iso9660_8h.html> is 
+L<http://www.gnu.org/software/libcdio/doxygen/iso9660_8h.html> is
 documentation via doxygen of C<libiso9660>.
 doxygen.
 
@@ -644,7 +601,7 @@ Rocky Bernstein C<< <rocky at cpan.org> >>.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2006, 2007, 2008 Rocky Bernstein <rocky@cpan.org>
+Copyright (C) 2006, 2007, 2008, 2017 Rocky Bernstein <rocky@cpan.org>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -657,6 +614,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+along with this program.  If not, see L<The GNU General Public
+License|http://www.gnu.org/licenses/#GPL>.
 
 =cut

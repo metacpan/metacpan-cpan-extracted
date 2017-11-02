@@ -18,8 +18,8 @@ limitation, you may add your own input handler to open, read and close
 particular types of locations or URI classes. Using this input callback
 handlers, you can handle your own custom URI schemes for example.
 
-The input callbacks are used whenever LibXML has to get something other than
-externally parsed entities from somewhere. They are implemented using a
+The input callbacks are used whenever XML::LibXML has to get something other
+than externally parsed entities from somewhere. They are implemented using a
 callback stack on the Perl layer in analogy to libxml2's native callback stack.
 
 The XML::LibXML::InputCallback class transparently registers the input
@@ -280,7 +280,7 @@ Petr Pajas
 
 =head1 VERSION
 
-2.0130
+2.0132
 
 =head1 COPYRIGHT
 

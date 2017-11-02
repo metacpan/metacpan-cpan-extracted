@@ -32,7 +32,6 @@ do { my $x = {
                                       'Test::Synopsis' => '0',
                                       'Test::Vars' => '0.009',
                                       'Test::Version' => '2.05',
-                                      'blib' => '1.01',
                                       'lib' => '0'
                                     }
                     },
@@ -48,10 +47,10 @@ do { my $x = {
                                       'Data::Validate::URI' => '0',
                                       'DateTime::Format::RFC3339' => '0',
                                       'Exporter' => '0',
-                                      'GeoIP2::Record::Country' => '2.003003',
+                                      'GeoIP2::Record::Country' => '2.004000',
                                       'GeoIP2::Record::Location' => '0',
                                       'GeoIP2::Role::Model::HasSubdivisions' => '0',
-                                      'GeoIP2::Role::Model::Location' => '2.003003',
+                                      'GeoIP2::Role::Model::Location' => '2.004000',
                                       'GeoIP2::Types' => '0',
                                       'HTTP::Headers' => '0',
                                       'HTTP::Request' => '0',

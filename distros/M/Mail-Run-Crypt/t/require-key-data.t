@@ -9,7 +9,7 @@ use Test::More tests => 4;
 
 use Mail::Run::Crypt;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 {
     my $mrc;
@@ -21,7 +21,7 @@ our $VERSION = '0.08';
     );
     eval { $mrc = Mail::Run::Crypt->new(%opts) } or $error = $EVAL_ERROR;
     ok( defined $error,                                'no_keyid_failed' );
-    ok( $error =~ m/^\Qkeyid required for signing/msx, 'no_keyid_errorstr' );
+    ok( $error =~ m/^\QKey ID required for signing/msx, 'no_keyid_errorstr' );
 }
 
 {
@@ -34,6 +34,6 @@ our $VERSION = '0.08';
     );
     eval { $mrc = Mail::Run::Crypt->new(%opts) } or $error = $EVAL_ERROR;
     ok( defined $error, 'no_passphrase_failed' );
-    ok( $error =~ m/^\Qpassphrase required for signing/msx,
+    ok( $error =~ m/^\QPassphrase required for signing/msx,
         'no_passphrase_errorstr' );
 }

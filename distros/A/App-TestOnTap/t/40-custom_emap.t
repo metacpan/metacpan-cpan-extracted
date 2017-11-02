@@ -11,7 +11,7 @@ use TestUtils;
 
 use Test::More tests => 9;
 
-my ($ret, $stdout, $stderr) = TestUtils::xeqsuite(['--verbose']);
+my ($ret, $stdout, $stderr) = TestUtils::xeqsuite([qw(--verbose --execmap :internal)]);
 
 is($ret, 0, "Exited with 0");
 like($stdout->[0], qr/^Files=0, Tests=0, /, "No tests recognized");

@@ -39,6 +39,7 @@ sub compare_answer($$$)
     my @answer = split /\n/, $answer;
     my ($code, $msg, $ct) = @answer[0,1,2];
     my ($header, $content) = split /\n\n/, $answer;
+    $content =~ s/( error\:) .*\z/$1 LIBXML-ERROR\n/s;
 
     my $a = join "\n", $code, $msg, $ct, '', $content;
     $a =~ s/\s*\z/\n/;
@@ -126,7 +127,7 @@ compare_answer($ans4, <<__EXPECTED, 'parsing error');
 XML syntax error
 text/plain
 
-[422] The XML cannot be parsed: :2: parser error : Premature end of data in tag bad-xml line 1
+[422] The XML cannot be parsed: error: LIBXML-ERROR
 __EXPECTED
 
 ### Not SOAP Envelope

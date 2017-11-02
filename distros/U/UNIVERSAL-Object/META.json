@@ -1,0 +1,48 @@
+{
+   "abstract" : "A useful base class",
+   "author" : [
+      "Stevan Little <stevan@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "UNIVERSAL-Object",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "perl" : "v5.6.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/stevan/p5-UNIVERSAL-Object/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/stevan/p5-UNIVERSAL-Object.git",
+         "web" : "https://github.com/stevan/p5-UNIVERSAL-Object"
+      }
+   },
+   "version" : "0.13",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+}
+

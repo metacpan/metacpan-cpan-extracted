@@ -17,12 +17,13 @@ requires undef, 2;
 mirror 'bin', 'bin';
 extract_data;
 
-my $prove = eval q{ use App::Prove; 1 };
+my $have_prove = eval q{ use App::Prove; 1 };
+my $have_yath  = eval q{ use App::Yath;  1 };
 
 foreach my $type (qw( app client ))
 {
   subtest $type => sub {
-    plan tests => 12;
+    plan tests => 14;
   
     local $CWD = tempdir( CLEANUP => 1 );
     note "% cd $CWD";
@@ -35,11 +36,18 @@ foreach my $type (qw( app client ))
     note "% cd $CWD"; 
   
     SKIP: {
-      skip 'Test requires prove', 2 unless $prove;
+      skip 'Test requires prove', 2 unless $have_prove;
       run_ok('prove', '-l')
         ->exit_is(0)
         ->note;
     }
+    
+    SKIP: {
+      skip 'Test requires yath', 2 unless $have_yath;
+      run_ok('yath')
+        ->exit_is(0)
+        ->note;
+    };
 
     run_ok($^X, 'Build.PL')
       ->exit_is(0)
@@ -70,3 +78,10 @@ use App::Prove;
 my $app = App::Prove->new;
 $app->process_args(@ARGV);
 $app->run;
+
+@@ bin/yath
+#!/usr/bin/yath
+use strict;
+use warnings;
+use App::Yath (\@ARGV, \$App::Yath::RUN);
+exit($App::Yath::RUN->());

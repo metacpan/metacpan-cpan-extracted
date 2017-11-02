@@ -4,16 +4,8 @@ author:
   - 'Nigel Horne <njh@bandsman.co.uk>'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  Geo::Coder::CA: '0'
-  Geo::Coder::Google::V3: '0.1'
-  Geo::Coder::OSM: '0'
-  Geo::Coder::XYZ: '0.06'
-  LWP::UserAgent::Throttled: '0.04'
-  Test::Carp: '0'
-  Test::LWP::UserAgent: '0'
   Test::Most: '0'
   Test::NoWarnings: '0'
-  Test::Number::Delta: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -35,5 +27,5 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Coder-List
   repository: git://github.com/nigelhorne/Geo-Coder-List.git
-version: '0.16'
+version: '0.17'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

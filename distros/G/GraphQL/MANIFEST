@@ -9,6 +9,8 @@ lib/GraphQL/Introspection.pm
 lib/GraphQL/Language/Grammar.pm
 lib/GraphQL/Language/Parser.pm
 lib/GraphQL/Language/Receiver.pm
+lib/GraphQL/Plugin/Convert.pm
+lib/GraphQL/Plugin/Convert/Test.pm
 lib/GraphQL/Role/Abstract.pm
 lib/GraphQL/Role/Composite.pm
 lib/GraphQL/Role/FieldDeprecation.pm
@@ -50,6 +52,7 @@ t/kitchen-sink.graphql
 t/language-lexer.t
 t/language-parser.t
 t/language-schema-parser.t
+t/perl.t
 t/schema-kitchen-sink.graphql
 t/type-definition.t
 t/type-enum.t

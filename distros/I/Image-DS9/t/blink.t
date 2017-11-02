@@ -6,7 +6,7 @@ use Image::DS9;
 
 BEGIN { plan( tests => 3 ) ;}
 
-require 't/common.pl';
+require './t/common.pl';
 
 
 my $ds9 = start_up();

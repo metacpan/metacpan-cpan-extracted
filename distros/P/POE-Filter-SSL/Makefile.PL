@@ -8,7 +8,7 @@ WriteMakefile(
     VERSION_FROM        => 'lib/POE/Filter/SSL.pm',
     ABSTRACT_FROM       => 'lib/POE/Filter/SSL.pm',
     PL_FILES            => {},
-    LIBS		=> '-lssl -lcrypto -ldl',
+    LIBS		=> '-ldl -lssl -lcrypto', # Strawberr perl: '-ldl ../../../c/lib/libeay32.a ../../../c/lib/libssl32.a'
     #TYPEMAPS		=> ['./typemap'],
     PREREQ_PM => {
         'Test::More' => 0,

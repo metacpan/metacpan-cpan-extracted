@@ -18,7 +18,7 @@ package Cache {
     has '_fetcher' => ( required => 1 );
     has '_data';
 
-    sub BUILDARGS : init_args( fetcher => _fetcher );
+    sub BUILDARGS : init( fetcher => _fetcher );
 
     sub data ($self) : lazy(_data) { $self->{_fetcher}->() }
 

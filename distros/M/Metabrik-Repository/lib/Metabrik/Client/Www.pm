@@ -1,5 +1,5 @@
 #
-# $Id: Www.pm,v f6ad8c136b19 2017/01/01 10:13:54 gomor $
+# $Id: Www.pm,v 15e7b76756a2 2017/10/24 09:10:27 gomor $
 #
 # client::www Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::System::Package);
 
 sub brik_properties {
    return {
-      revision => '$Revision: f6ad8c136b19 $',
+      revision => '$Revision: 15e7b76756a2 $',
       tags => [ qw(unstable browser http javascript screenshot) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -27,6 +27,9 @@ sub brik_properties {
          rtimeout => [ qw(timeout) ],
          add_headers => [ qw(http_headers_hash) ],
          do_javascript => [ qw(0|1) ],
+         do_redirects => [ qw(0|1) ],
+         src_ip => [ qw(ip_address) ],
+         max_redirects => [ qw(count) ],
          _client => [ qw(object|INTERNAL) ],
          _last => [ qw(object|INTERNAL) ],
       },
@@ -37,12 +40,15 @@ sub brik_properties {
          rtimeout => 10,
          add_headers => {},
          do_javascript => 0,
+         do_redirects => 1,
+         max_redirects => 10,
       },
       commands => {
          install => [ ], # Inherited
          create_user_agent => [ ],
          reset_user_agent => [ ],
          get => [ qw(uri|OPTIONAL username|OPTIONAL password|OPTIONAL) ],
+         cat => [ qw(uri|OPTIONAL username|OPTIONAL password|OPTIONAL) ],
          post => [ qw(content_hash uri|OPTIONAL username|OPTIONAL password|OPTIONAL) ],
          patch => [ qw(content_hash uri|OPTIONAL username|OPTIONAL password|OPTIONAL) ],
          put => [ qw(content_hash uri|OPTIONAL username|OPTIONAL password|OPTIONAL) ],
@@ -51,6 +57,8 @@ sub brik_properties {
          options => [ qw(uri|OPTIONAL username|OPTIONAL password|OPTIONAL) ],
          code => [ ],
          content => [ ],
+         get_content => [ qw(uri|OPTIONAL username|OPTIONAL password|OPTIONAL) ],
+         post_content => [ qw(content_hash uri|OPTIONAL username|OPTIONAL password|OPTIONAL) ],
          save_content => [ qw(output) ],
          headers => [ ],
          get_response_headers => [ ],
@@ -82,6 +90,7 @@ sub brik_properties {
          'Metabrik::File::Write' => [ ],
          'Metabrik::Client::Ssl' => [ ],
          'Metabrik::System::File' => [ ],
+         'Metabrik::Network::Address' => [ ],
       },
       optional_modules => {
          'WWW::Mechanize::PhantomJS' => [ ],
@@ -122,7 +131,21 @@ sub create_user_agent {
       }
    }
 
-   $ENV{PERL_NET_HTTPS_SSL_SOCKET_CLASS} = 'Net::SSL';
+   # Net::SSL doesn't support timeouts on HTTPS(?)
+   # We have to use IO::Socket::SSL which supports it.
+   #$ENV{PERL_NET_HTTPS_SSL_SOCKET_CLASS} = 'Net::SSL';
+   $ENV{PERL_NET_HTTPS_SSL_SOCKET_CLASS} = 'IO::Socket::SSL';
+
+   my %args = (
+      stack_depth => 0,  # Default is infinite, and will eat-up whole memory.
+                         # 0 means completely turn off the feature.
+      autocheck => 0,  # Do not throw on error by checking HTTP code. Let us do it.
+      timeout => $self->rtimeout,
+      ssl_opts => {
+         verify_hostname => 0,
+         SSL_ca_file => Mozilla::CA::SSL_ca_file(),
+      },
+   );
 
    my $mechanize = 'WWW::Mechanize';
    if ($self->do_javascript) {
@@ -134,15 +157,27 @@ sub create_user_agent {
          return $self->log->error("create_user_agent: module [WWW::Mechanize::PhantomJS] not found, cannot do_javascript");
       }
    }
+   if ((! $self->do_redirects) && $mechanize eq 'WWW::Mechanize::PhantomJS') {
+      $self->log->warning("create_user_agent: module [WWW::Mechanize::PhantomJS] does ".
+         "not support do_redirects, won't use it.");
+   }
+   elsif ($self->do_redirects) {
+      $args{max_redirect} = $self->max_redirects;
+   }
+   else {  # Follow redirects not wanted
+      $args{max_redirect} = 0;
+   }
 
-   my $mech = $mechanize->new(
-      autocheck => 0,  # Do not throw on error by checking HTTP code. Let us do it.
-      timeout => $self->rtimeout,
-      ssl_opts => {
-         verify_hostname => 0,
-         SSL_ca_file => Mozilla::CA::SSL_ca_file(),
-      },
-   );
+   my $src_ip = $self->src_ip;
+   if (defined($src_ip)) {
+      my $na = Metabrik::Network::Address->new_from_brik_init($self) or return;
+      if (! $na->is_ip($src_ip)) {
+         return $self->log->error("create_user_agent: src_ip [$src_ip] is invalid");
+      }
+      $args{local_address} = $src_ip;
+   }
+
+   my $mech = $mechanize->new(%args);
    if (! defined($mech)) {
       return $self->log->error("create_user_agent: unable to create WWW::Mechanize object");
    }
@@ -240,24 +275,36 @@ sub _method {
 
    $self->_last($response);
 
-   my %response = ();
-   $response{code} = $response->code;
+   my %r = ();
+   $r{code} = $response->code;
    if (! $self->ignore_content) {
       if ($self->do_javascript) {
          # decoded_content method is available in WWW::Mechanize::PhantomJS
          # but is available in HTTP::Request response otherwise.
-         $response{content} = $client->decoded_content;
+         $r{content} = $client->decoded_content;
       }
       else {
-         $response{content} = $response->decoded_content;
+         $r{content} = $response->decoded_content;
       }
    }
 
-   my $headers = $response->headers;
-   $response{headers} = { map { $_ => $headers->{$_} } keys %$headers };
-   delete $response{headers}->{'::std_case'};
+   # Error messages seen from IO::Socket::SSL module.
+   if ($r{content} =~ /^Can't connect to .+Connection timed out at /is) {
+      $self->timeout(1);
+      return $self->log->error("$method: $uri: connection timed out");
+   }
+   elsif ($r{content} =~ /^Can't connect to .+?\n\n(.+?) at /is) {
+      return $self->log->error("$method: $uri: ".lcfirst($1));
+   }
+   elsif ($r{content} =~ /^Connect failed: connect: Interrupted system call/i) {
+      return $self->log->error("$method: $uri: connection interrupted by syscall");
+   }
 
-   return \%response;
+   my $headers = $response->headers;
+   $r{headers} = { map { $_ => $headers->{$_} } keys %$headers };
+   delete $r{headers}->{'::std_case'};
+
+   return \%r;
 }
 
 sub get {
@@ -265,6 +312,14 @@ sub get {
    my ($uri, $username, $password) = @_;
 
    return $self->_method($uri, $username, $password, 'get');
+}
+
+sub cat {
+   my $self = shift;
+   my ($uri, $username, $password) = @_;
+
+   $self->_method($uri, $username, $password, 'get') or return;
+   return $self->content;
 }
 
 sub post {
@@ -342,6 +397,22 @@ sub content {
    }
 
    return $last->decoded_content;
+}
+
+sub get_content {
+   my $self = shift;
+   my @args = @_;
+
+   $self->get(@args) or return;
+   return $self->content;
+}
+
+sub post_content {
+   my $self = shift;
+   my @args = @_;
+
+   $self->post(@args) or return;
+   return $self->content;
 }
 
 sub save_content {
@@ -507,22 +578,8 @@ sub trace_redirect {
    $uri ||= $self->uri;
    $self->brik_help_run_undef_arg('trace_redirect', $uri) or return;
 
-   my %args = ();
-   if (! $self->ssl_verify) {
-      $args{ssl_opts} = { SSL_verify_mode => 'SSL_VERIFY_NONE'};
-   }
-
-   my $lwp = LWP::UserAgent->new(%args);
-   $lwp->timeout($self->rtimeout);
-   $lwp->agent('Mozilla/5.0');
-   $lwp->max_redirect(0);
-   $lwp->env_proxy;
-
-   $username ||= $self->username;
-   $password ||= $self->password;
-   if (defined($username) && defined($password)) {
-      $lwp->credentials($username, $password);
-   }
+   my $prev = $self->do_redirects;
+   $self->do_redirects(0);
 
    my @results = ();
 
@@ -533,7 +590,7 @@ sub trace_redirect {
 
       my $response;
       eval {
-         $response = $lwp->get($location);
+         $response = $self->get($location);
       };
       if ($@) {
          chomp($@);
@@ -542,7 +599,7 @@ sub trace_redirect {
 
       my $this = {
          uri => $location,
-         code => $response->code,
+         code => $self->code,
       };
       push @results, $this;
 
@@ -550,8 +607,10 @@ sub trace_redirect {
          last;
       }
 
-      $location = $this->{location} = $response->headers->{location};
+      $location = $this->{location} = $self->headers->{location};
    }
+
+   $self->do_redirects($prev);
 
    return \@results;
 }

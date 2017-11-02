@@ -1,5 +1,5 @@
 package Net::HTTP::Spore::Middleware::Format::Auto;
-$Net::HTTP::Spore::Middleware::Format::Auto::VERSION = '0.07';
+$Net::HTTP::Spore::Middleware::Format::Auto::VERSION = '0.09';
 use Moose;
 use MooseX::Types::Moose qw/HashRef Object/;
 extends 'Net::HTTP::Spore::Middleware::Format';
@@ -58,7 +58,7 @@ Net::HTTP::Spore::Middleware::Format::Auto
 
 =head1 VERSION
 
-version 0.07
+version 0.09
 
 =head1 DESCRIPTION
 

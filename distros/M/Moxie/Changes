@@ -1,6 +1,23 @@
 Revision history for Perl extension Moxie
 
+0.06 2017-10-30
+    [FEATURE CHANGES]
+    - Changed the name of BUILDARGS:init_arg to BUILDARGS:init
+      as the ARGS/args was redundant
+    - updated SYNOPSIS to be sleaker
+    - fixing a bug caught by CPAN testers
+    - switched back to Carp::confess from Carp::cluck, the
+      stack trace is vital until this module matures and
+      the error messages improve
+    - fixed a bug in the `init_args` trait that caused
+      slot => 0 to not work
+
 0.05 2017-10-21
+    [NEW FEATURE]
+    - added the `lazy(slot?)` trait, it uses the body of
+      the method it is attached to as the initializer for
+      the specified slot
+
     [FEATURE CHANGES]
     - restored the `private` trait and ceased it being
       the default behavior as a result of a `has` call

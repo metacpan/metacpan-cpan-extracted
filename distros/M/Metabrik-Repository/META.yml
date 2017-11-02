@@ -6,7 +6,7 @@ build_requires: {}
 configure_requires:
   Module::Build: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,6 +17,8 @@ provides:
     file: lib/Metabrik/Address/Generate.pm
   Metabrik::Antivirus::Clamav:
     file: lib/Metabrik/Antivirus/Clamav.pm
+  Metabrik::Api::Abuseipdb:
+    file: lib/Metabrik/Api/Abuseipdb.pm
   Metabrik::Api::Bluecoat:
     file: lib/Metabrik/Api/Bluecoat.pm
   Metabrik::Api::Cvesearch:
@@ -53,6 +55,10 @@ provides:
     file: lib/Metabrik/Client/Elasticsearch.pm
   Metabrik::Client::Elasticsearch::Query:
     file: lib/Metabrik/Client/Elasticsearch/Query.pm
+  Metabrik::Client::Imap:
+    file: lib/Metabrik/Client/Imap.pm
+  Metabrik::Client::Kafka:
+    file: lib/Metabrik/Client/Kafka.pm
   Metabrik::Client::Mongodb:
     file: lib/Metabrik/Client/Mongodb.pm
   Metabrik::Client::Mysql:
@@ -123,14 +129,14 @@ provides:
     file: lib/Metabrik/Devel/Mojo.pm
   Metabrik::Devel::Subversion:
     file: lib/Metabrik/Devel/Subversion.pm
-  Metabrik::Email::Imap:
-    file: lib/Metabrik/Email/Imap.pm
   Metabrik::Email::Mbox:
     file: lib/Metabrik/Email/Mbox.pm
   Metabrik::Email::Message:
     file: lib/Metabrik/Email/Message.pm
   Metabrik::Email::Send:
     file: lib/Metabrik/Email/Send.pm
+  Metabrik::File::Base64:
+    file: lib/Metabrik/File/Base64.pm
   Metabrik::File::Compress:
     file: lib/Metabrik/File/Compress.pm
   Metabrik::File::Csv:
@@ -143,6 +149,8 @@ provides:
     file: lib/Metabrik/File/Hash.pm
   Metabrik::File::Ini:
     file: lib/Metabrik/File/Ini.pm
+  Metabrik::File::Javascript:
+    file: lib/Metabrik/File/Javascript.pm
   Metabrik::File::Json:
     file: lib/Metabrik/File/Json.pm
   Metabrik::File::Ole:
@@ -169,8 +177,12 @@ provides:
     file: lib/Metabrik/File/Xml.pm
   Metabrik::Forensic::Dcfldd:
     file: lib/Metabrik/Forensic/Dcfldd.pm
+  Metabrik::Forensic::Pcap:
+    file: lib/Metabrik/Forensic/Pcap.pm
   Metabrik::Forensic::Scalpel:
     file: lib/Metabrik/Forensic/Scalpel.pm
+  Metabrik::Forensic::Sysmon:
+    file: lib/Metabrik/Forensic/Sysmon.pm
   Metabrik::Forensic::Volatility:
     file: lib/Metabrik/Forensic/Volatility.pm
   Metabrik::Format::Latex:
@@ -287,6 +299,8 @@ provides:
     file: lib/Metabrik/Network/Zmap.pm
   Metabrik::Password::Mirai:
     file: lib/Metabrik/Password/Mirai.pm
+  Metabrik::Password::Rockyou:
+    file: lib/Metabrik/Password/Rockyou.pm
   Metabrik::Perl::Module:
     file: lib/Metabrik/Perl/Module.pm
   Metabrik::Proxy::Http:
@@ -295,27 +309,37 @@ provides:
     file: lib/Metabrik/Proxy/Ssh2tcp.pm
   Metabrik::Remote::Msoffice:
     file: lib/Metabrik/Remote/Msoffice.pm
+  Metabrik::Remote::Sandbox:
+    file: lib/Metabrik/Remote/Sandbox.pm
   Metabrik::Remote::Ssh:
     file: lib/Metabrik/Remote/Ssh.pm
+  Metabrik::Remote::Sysmon:
+    file: lib/Metabrik/Remote/Sysmon.pm
   Metabrik::Remote::Tcpdump:
     file: lib/Metabrik/Remote/Tcpdump.pm
+  Metabrik::Remote::Windefend:
+    file: lib/Metabrik/Remote/Windefend.pm
   Metabrik::Remote::Windiff:
     file: lib/Metabrik/Remote/Windiff.pm
   Metabrik::Remote::Windows:
     file: lib/Metabrik/Remote/Windows.pm
   Metabrik::Remote::Winexe:
     file: lib/Metabrik/Remote/Winexe.pm
+  Metabrik::Remote::Winsvc:
+    file: lib/Metabrik/Remote/Winsvc.pm
   Metabrik::Remote::Wmi:
     file: lib/Metabrik/Remote/Wmi.pm
   Metabrik::Repository:
     file: lib/Metabrik/Repository.pm
-    version: '1.26'
+    version: '1.27'
   Metabrik::Server::Dns:
     file: lib/Metabrik/Server/Dns.pm
   Metabrik::Server::Elasticsearch:
     file: lib/Metabrik/Server/Elasticsearch.pm
   Metabrik::Server::Http:
     file: lib/Metabrik/Server/Http.pm
+  Metabrik::Server::Kafka:
+    file: lib/Metabrik/Server/Kafka.pm
   Metabrik::Server::Kibana:
     file: lib/Metabrik/Server/Kibana.pm
   Metabrik::Server::Logstash:
@@ -364,8 +388,12 @@ provides:
     file: lib/Metabrik/String/Hostname.pm
   Metabrik::String::Html:
     file: lib/Metabrik/String/Html.pm
+  Metabrik::String::Http:
+    file: lib/Metabrik/String/Http.pm
   Metabrik::String::Ini:
     file: lib/Metabrik/String/Ini.pm
+  Metabrik::String::Javascript:
+    file: lib/Metabrik/String/Javascript.pm
   Metabrik::String::Json:
     file: lib/Metabrik/String/Json.pm
   Metabrik::String::Parse:
@@ -426,6 +454,10 @@ provides:
     file: lib/Metabrik/System/Gphotofs.pm
   Metabrik::System::Libvirt:
     file: lib/Metabrik/System/Libvirt.pm
+  Metabrik::System::Linux::Cpuinfo:
+    file: lib/Metabrik/System/Linux/Cpuinfo.pm
+  Metabrik::System::Linux::Pps:
+    file: lib/Metabrik/System/Linux/Pps.pm
   Metabrik::System::Mount:
     file: lib/Metabrik/System/Mount.pm
   Metabrik::System::Netstat:
@@ -485,5 +517,5 @@ requires:
   perl: v5.6.1
 resources:
   license: http://opensource.org/licenses/BSD-3-Clause
-version: '1.26'
+version: '1.27'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

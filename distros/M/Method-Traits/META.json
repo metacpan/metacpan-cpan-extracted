@@ -21,12 +21,12 @@
       },
       "runtime" : {
          "requires" : {
-            "MOP" : "0.11",
+            "Carp" : "0",
+            "MOP" : "0.12",
             "Module::Runtime" : "0",
             "Scalar::Util" : "0",
-            "UNIVERSAL::Object" : "0.12",
-            "attributes" : "0",
-            "perl" : "v5.14.5"
+            "UNIVERSAL::Object" : "0.13",
+            "perl" : "v5.14.4"
          }
       },
       "test" : {
@@ -46,7 +46,7 @@
          "web" : "https://github.com/stevan/p5-Method-Traits"
       }
    },
-   "version" : "0.07",
+   "version" : "0.08",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

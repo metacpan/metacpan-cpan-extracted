@@ -22,11 +22,11 @@ configure_requires:
   Alien::Build: '0.66'
   Alien::Build::MM: '0.25'
   Alien::Build::Plugin::Build::SearchDep: '0.53'
-  Alien::PCRE2: '0.013'
+  Alien::PCRE2: '0.014'
   ExtUtils::CBuilder: '0'
   IO::Socket::SSL: '2.043'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005'
 keywords:
   - alien
   - pcre
@@ -51,5 +51,23 @@ resources:
   homepage: https://neurobin.org/projects/softwares/libs/jpcre2/
   license: http://dev.perl.org/licenses/
   repository: git://github.com/wbraswell/alien-jpcre2.git
-version: '0.008000'
+version: '0.009000'
+x_alienfile:
+  generated_by: 'Alien::Build::MM version 1.28'
+  requires:
+    share:
+      Alien::PCRE2: '0'
+      Alien::gmake: '0.11'
+      Archive::Tar: '0'
+      Config: '0'
+      Env::ShellWords: '0.01'
+      HTML::LinkExtor: '0'
+      HTTP::Tiny: '0.044'
+      IO::Socket::SSL: '1.56'
+      IO::Zlib: '0'
+      Net::SSLeay: '1.49'
+      Sort::Versions: '0'
+      URI: '0'
+      URI::Escape: '0'
+    system: {}
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

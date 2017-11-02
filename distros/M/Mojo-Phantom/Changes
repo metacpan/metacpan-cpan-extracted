@@ -1,5 +1,9 @@
 Revision history for Perl module Mojo-Phantom
 
+0.10 2017-10-28
+  - Protect against changes to Mojo::IOLoop::Delay->catch
+  - Note that upstream phantomjs is now abandoned
+
 0.09 2016-03-15
   - reinstate correct Build.PL (really, again)
 

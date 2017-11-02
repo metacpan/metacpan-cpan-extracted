@@ -17,31 +17,31 @@ name: Moxie
 provides:
   Moxie:
     file: lib/Moxie.pm
-    version: '0.05'
+    version: '0.06'
   Moxie::Enum:
     file: lib/Moxie/Enum.pm
-    version: '0.05'
+    version: '0.06'
   Moxie::Object:
     file: lib/Moxie/Object.pm
-    version: '0.05'
+    version: '0.06'
   Moxie::Object::Immutable:
     file: lib/Moxie/Object/Immutable.pm
-    version: '0.05'
+    version: '0.06'
   Moxie::Traits::Provider:
     file: lib/Moxie/Traits/Provider.pm
-    version: '0.05'
+    version: '0.06'
 requires:
   BEGIN::Lift: '0.06'
-  MOP: '0.10'
-  Method::Traits: '0.05'
+  MOP: '0.12'
+  Method::Traits: '0.08'
   Module::Runtime: '0'
   PadWalker: '0'
   Sub::Util: '0'
-  UNIVERSAL::Object: '0.12'
+  UNIVERSAL::Object: '0.13'
   experimental: '0'
   perl: v5.22.0
 resources:
   bugtracker: https://github.com/stevan/p5-Moxie/issues
   repository: https://github.com/stevan/p5-Moxie.git
-version: '0.05'
+version: '0.06'
 x_serialization_backend: 'YAML::Tiny version 1.70'

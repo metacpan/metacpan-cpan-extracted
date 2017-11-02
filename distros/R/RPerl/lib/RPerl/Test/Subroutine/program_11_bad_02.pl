@@ -4,7 +4,7 @@
 
 # [[[ PREPROCESSOR ]]]
 # <<< PARSE_ERROR: 'ERROR ECOPAPL02' >>>
-# <<< PARSE_ERROR: 'Global symbol "$autovivified" requires explicit package name (did you forget to declare "my $autovivified"?)' >>>
+# <<< PARSE_ERROR: 'Global symbol "$autovivified" requires explicit package name' >>>
 
 # [[[ HEADER ]]]
 use RPerl;
@@ -18,11 +18,13 @@ our $VERSION = 0.001_000;
 
 # [[[ SUBROUTINES ]]]
 print 'before defining quux(), have $autovivified = ', $autovivified, "\n";  # NO ERROR
-our void $quux = sub {
+sub quux {
+    { my void $RETURN_TYPE };
     $autovivified = 23;
     print 'inside          quux(), have $autovivified = ', $autovivified, "\n";       # NO ERROR
     $autovivified++;
-};
+    return;
+}
 print 'after  defining quux(), have $autovivified = ', $autovivified, "\n";  # NO ERROR
 
 # [[[ OPERATIONS ]]]
@@ -30,3 +32,4 @@ quux();
 print 'after   calling quux(), have $autovivified = ', $autovivified, "\n";  # NO ERROR
 quux();
 print 'after   calling quux(), have $autovivified = ', $autovivified, "\n";  # NO ERROR
+

@@ -1,5 +1,5 @@
 #
-# $Id: Rest.pm,v f6ad8c136b19 2017/01/01 10:13:54 gomor $
+# $Id: Rest.pm,v 5051a354bfa9 2017/10/28 08:17:02 gomor $
 #
 # client::rest Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Client::Www);
 
 sub brik_properties {
    return {
-      revision => '$Revision: f6ad8c136b19 $',
+      revision => '$Revision: 5051a354bfa9 $',
       tags => [ qw(unstable http api) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -36,6 +36,8 @@ sub brik_properties {
          options => [ qw(uri|OPTIONAL username|OPTIONAL password|OPTIONAL) ],
          code => [ ],
          content => [ qw(output_mode|OPTIONAL) ],
+         get_content => [ qw(uri|OPTIONAL username|OPTIONAL password|OPTIONAL) ],
+         post_content => [ qw(content_hash uri|OPTIONAL username|OPTIONAL password|OPTIONAL) ],
       },
       require_modules => {
          'Metabrik::String::Xml' => [ ],

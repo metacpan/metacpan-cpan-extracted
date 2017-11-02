@@ -6,7 +6,7 @@ use warnings;
 
 use parent qw(IO::Async::Notifier);
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 =head1 NAME
 
@@ -76,23 +76,6 @@ sub me {
                 %{ $_[0] },
                 trello => $self,
             )
-        }
-    )
-}
-
-sub my_tokens {
-	my ($self, %args) = @_;
-	$self->http_get(
-		uri => URI->new($self->base_uri . 'members/me/tokens')
-	)->transform(
-        done => sub {
-            use Data::Dumper;
-            warn Dumper [ @_ ];
-            return { };
-#            Net::Async::Trello::Member->new(
-#                %{ $_[0] },
-#                trello => $self,
-#            )
         }
     )
 }
@@ -443,6 +426,8 @@ sub _add_to_loop {
     );
 }
 
+sub ws { shift->{ws} }
+
 sub websocket { shift->{ws}->connection }
 
 sub oauth_request {
@@ -529,3 +514,11 @@ sub oauth_request {
 }
 
 1;
+
+=head1 AUTHOR
+
+Tom Molesworth <TEAM@cpan.org>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2014-2017. Licensed under the same terms as Perl itself.

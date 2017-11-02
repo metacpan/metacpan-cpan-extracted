@@ -20,7 +20,7 @@ package Foo {
 
     my sub _bar : private;
 
-    sub BUILDARGS : init_args( bar? => _bar );
+    sub BUILDARGS : init( bar? => _bar );
 
     sub bar ($self) { _bar }
 
@@ -39,7 +39,7 @@ package Foo::Auto {
 
     my sub _bar : private;
 
-    sub BUILDARGS : init_args( bar? => _bar );
+    sub BUILDARGS : init( bar? => _bar );
 
     sub bar       : ro(_bar);
     sub set_bar   : wo(_bar);

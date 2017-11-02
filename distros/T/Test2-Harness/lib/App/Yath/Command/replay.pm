@@ -2,7 +2,7 @@ package App::Yath::Command::replay;
 use strict;
 use warnings;
 
-our $VERSION = '0.001026';
+our $VERSION = '0.001030';
 
 use Test2::Util qw/pkg_to_file/;
 
@@ -45,7 +45,6 @@ sub handle_list_args {
 
     $settings->{log_file} = $log;
     $settings->{jobs} = { map { $_ => 1 } @jobs} if @jobs;
-    $settings->{run_id} ||= 'replay';
 
     die "You must specify a log file.\n"
         unless $log;
@@ -233,9 +232,13 @@ use Devel::Cover to calculate test coverage
 
 This is essentially the same as combining: '--no-fork', and '-MDevel::Cover=-silent,1,+ignore,^t/,+ignore,^t2/,+ignore,^xt,+ignore,^test.pl' Devel::Cover and preload/fork do not work well together.
 
-=item --default_search t
+=item --default-at-search xt
 
-ARRAY(0x2605bc8)
+Specify the default file/dir search when 'AUTHOR_TESTING' is set. Defaults to './xt'. The default AT search is only used if no files were specified at the command line
+
+=item --default-search t
+
+Specify the default file/dir search. defaults to './t', './t2', and 'test.pl'. The default search is only used if no files were specified at the command line
 
 =item --fork
 

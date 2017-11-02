@@ -1,5 +1,5 @@
 #
-# $Id: X509.pm,v f6ad8c136b19 2017/01/01 10:13:54 gomor $
+# $Id: X509.pm,v ce0abe6b7256 2017/05/23 06:22:59 gomor $
 #
 # crypto::x509 Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Shell::Command);
 
 sub brik_properties {
    return {
-      revision => '$Revision: f6ad8c136b19 $',
+      revision => '$Revision: ce0abe6b7256 $',
       tags => [ qw(unstable openssl ssl pki certificate) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -40,8 +40,10 @@ sub brik_properties {
          cert_hash => [ qw(cert_file) ],
          cert_verify => [ qw(cert_file ca_name|OPTIONAL) ],
          cert_show => [ qw(cert_file) ],
+         parse_certificate_string => [ qw(string) ],
       },
       require_modules => {
+         'Crypt::X509' => [ ],
          'Metabrik::File::Text' => [ ],
          'Metabrik::System::File' => [ ],
       },
@@ -309,6 +311,23 @@ sub cert_show {
 
    my $cmd = "openssl x509 -in $cert_file -text -noout";
    return $self->capture($cmd);
+}
+
+sub parse_certificate_string {
+   my $self = shift;
+   my ($string) = @_;
+
+   $self->brik_help_run_undef_arg('parse_certificate_string', $string) or return;
+   if (! length($string)) {
+      return $self->log->error("parse_certificate_string: empty string found");
+   }
+
+   my $decoded = Crypt::X509->new(cert => $string);
+   if ($decoded->error) {
+      return $self->log->error("parse_certificate_string: failed: ".$decoded->error);;
+   }
+
+   return $decoded;
 }
 
 1;

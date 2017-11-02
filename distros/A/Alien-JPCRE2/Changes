@@ -1,5 +1,10 @@
 Revision history for Alien::JPCRE2.
 
+0.009000 2017-10-31 Codename Vulcan
+
+    - HOLIDAY EDITION: Happy Halloween!
+    - Upgrade To JPCRE2 v10.31.01 Official
+
 0.008000 2017-07-25
 
     - Properly Require Test2::Suite & Test2::V0, Part 2 (Thanks Grinnz)

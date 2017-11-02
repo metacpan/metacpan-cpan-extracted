@@ -1,5 +1,6 @@
 package Bio::Phylo::PhyloWS::Client;
 use strict;
+use warnings;
 use base 'Bio::Phylo::PhyloWS';
 use Bio::Phylo::IO 'parse';
 use Bio::Phylo::Factory;
@@ -177,36 +178,31 @@ Gets search query result
 
     sub get_query_result {
         my $self = shift;
+        $logger->debug("going to get query result");
         if ( my %args = looks_like_hash @_ ) {
 			
 			# these fields need to be set first before get_url returns
 			# a sane response
 			$self->set_query( $args{'-query'} || throw 'BadArgs' => "Need query argument" );
+			$logger->debug("set query ".$args{'-query'});
+			
 			$self->set_section( $args{'-section'} || 'taxon' );
 			$self->set_format( 'rss1' );
 			my $rs  = $args{'-recordSchema'}  || $args{'-section'} || 'taxon';
 			my $url = $self->get_url( '-recordSchema' => $rs );
 			$url =~ s/&amp;/&/g;
+			$logger->debug("URL: $url");
 			
 			# do the request
 			my $response = $ua->($self)->get($url);
 			if ( $response->is_success ) {
+				$logger->debug("request succeeded");
 				my $content = $response->content;
+				use Data::Dumper;
+				print Dumper($response);
+				
 				$self->set_section($rs);
-				my $desc;
-				eval {
-					XML::Twig->new(
-						'TwigHandlers' => {
-							'channel' => sub {
-								$desc = $rss_handler->('create_description',$self,@_);
-							},
-							'item' => sub {
-								my $res = $rss_handler->('create_resource',$self,@_);
-								$desc->insert($res);
-							},
-						}
-					)->parse($content);
-				};
+				my $desc = $self->parse_query_result($content);
 				if ( $@ ) {
 					$logger->fatal("Error fetching from $url");
 					$logger->fatal($content);
@@ -222,6 +218,38 @@ Gets search query result
 					. $response->status_line;
 			}
         }
+    }
+
+=item parse_query_result()
+
+Parses a raw query result
+
+ Type    : Accessor
+ Title   : parse_query_result
+ Usage   : my $desc = $obj->parse_query_result($content);
+ Function: Parses a raw query result
+ Returns : Bio::Phylo::PhyloWS::Resource::Description object
+ Args    : Raw result content
+
+=cut
+    
+    sub parse_query_result {
+    	my ( $self, $content ) = @_;
+		my $desc;
+		eval {
+			XML::Twig->new(
+				'TwigHandlers' => {
+					'channel' => sub {
+						$desc = $rss_handler->('create_description',$self,@_);
+					},
+					'item' => sub {
+						my $res = $rss_handler->('create_resource',$self,@_);
+						$desc->insert($res);
+					},
+				}
+			)->parse($content);
+		};
+		return $desc;    
     }
 
 =item get_record()

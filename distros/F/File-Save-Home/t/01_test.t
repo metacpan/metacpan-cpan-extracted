@@ -10,7 +10,8 @@ use_ok('File::Save::Home', qw|
     make_subhome_directory
     restore_subhome_directory_status 
 | );
-use_ok('String::PerlIdentifier');
+use_ok ( 'String::Random', qw(random_regex) );
+*make_varname = sub { return random_regex(q([_A-Za-z][_A-Za-z0-9]{9})) };
 use_ok('Cwd');
 
 my ($cwd, $homedir, @subdirs, $desired_dir_ref, $desired_dir );

@@ -2,7 +2,7 @@ NAME
     App::tracepm - Trace dependencies of your Perl script
 
 VERSION
-    This document describes version 0.21 of App::tracepm (from Perl
+    This document describes version 0.22 of App::tracepm (from Perl
     distribution App-tracepm), released on 2017-07-29.
 
 SYNOPSIS
@@ -76,7 +76,7 @@ FUNCTIONS
         *   "prereqscanner_lite_recurse": Like "prereqscanner_lite", but
             recurses.
 
-    *   module => *str*
+    *   module => *perl::modname*
 
         --module MOD is equivalent to --script 'use MOD'.
 
@@ -118,7 +118,7 @@ FUNCTIONS
 
         When recursing, exclude XS modules.
 
-    *   script => *str*
+    *   script => *filename*
 
         Path to script file.
 

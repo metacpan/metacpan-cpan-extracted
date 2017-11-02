@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '1.005000';
+our $VERSION = '1.005001';
 
 use parent 'Data::Rx::CommonType::EasyNew';
 
@@ -49,7 +49,7 @@ WebService::MinFraud::Data::Rx::Type::Hex32 - A type to check for a 32 digit hex
 
 =head1 VERSION
 
-version 1.005000
+version 1.005001
 
 =head1 SUPPORT
 

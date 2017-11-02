@@ -7,7 +7,7 @@ WriteMakefile(
   ABSTRACT_FROM    => 'lib/App/TEWK/tt.pm',
   AUTHOR           => 'Kevin Tew',
   LICENSE          => 'freebsd',
-  MIN_PERL_VERSION => '5.22',
+  MIN_PERL_VERSION => '5.022',
   EXE_FILES        => ['script/tt'],
   PREREQ_PM        => {
     'strict'   => 0,

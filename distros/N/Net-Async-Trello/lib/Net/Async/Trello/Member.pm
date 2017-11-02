@@ -1,5 +1,5 @@
 package Net::Async::Trello::Member;
-$Net::Async::Trello::Member::VERSION = '0.001';
+$Net::Async::Trello::Member::VERSION = '0.002';
 use strict;
 use warnings;
 

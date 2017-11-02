@@ -1,0 +1,34 @@
+#/usr/bin/env perl
+
+use strict;
+use warnings;
+
+# I tried 'require'-ing modules but that did not work.
+
+use <: $module_name :>; # For the version #.
+
+use Test::More;
+
+<: $module_list_1 :>
+
+# ----------------------
+
+pass('All external modules loaded');
+
+my(@modules) = qw
+/
+<: $module_list_2 :>
+/;
+
+diag "Testing <: $module_name :> V $<: $module_name :>::VERSION";
+
+for my $module (@modules)
+{
+	no strict 'refs';
+
+	my($ver) = ${$module . '::VERSION'} || 'N/A';
+
+	diag "Using $module V $ver";
+}
+
+done_testing;

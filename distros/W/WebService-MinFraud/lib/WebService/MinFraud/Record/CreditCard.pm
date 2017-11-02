@@ -3,7 +3,7 @@ package WebService::MinFraud::Record::CreditCard;
 use Moo;
 use namespace::autoclean;
 
-our $VERSION = '1.005000';
+our $VERSION = '1.005001';
 
 use WebService::MinFraud::Record::Issuer;
 use WebService::MinFraud::Types
@@ -64,7 +64,7 @@ WebService::MinFraud::Record::CreditCard - Contains data for the credit card rec
 
 =head1 VERSION
 
-version 1.005000
+version 1.005001
 
 =head1 SYNOPSIS
 

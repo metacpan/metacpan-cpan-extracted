@@ -1,10 +1,14 @@
-#!perl 
+#!/Users/tewk/perl5/perlbrew/perls/perl-5.24.0/bin/perl 
 use Modern::Perl;
-use File::Find::Rule;
+use File::Find;
+#use File::Find::Rule;
 use Cwd;
+use Cwd qw( abs_path);
+use List::Util qw(min);
 use List::MoreUtils qw(each_array);
 use Term::ANSIColor;
 use Term::ReadKey;
+use IO::All;
 my $dir = getcwd;
 
 sub pick
@@ -13,7 +17,18 @@ sub pick
 	my @keys = '0' .. '9';
 	push( @keys,  'a' .. 'z' );
 	push( @keys,  'A' .. 'Z' );
+	#push( @keys,  (split //, '!"#%&\'()*+,-./:;<=>?@[\]^_`{|}~' ) );
 	my %hash;
+	if( $#files > 62 )
+	{
+		@keys = ();
+		for( my $i = 0; $i <= $#files; ++$i )
+		{
+			push @keys, sprintf( "%03d", $i );
+		}
+	}
+
+	@files = @files[0 .. min( $#files, $#keys ) ];
 	@hash{ @keys[ 0 .. $#files ] } = @files;
 	my @a =@keys[ 0 .. $#files ];  
 
@@ -23,19 +38,70 @@ sub pick
 		chomp( $s );
 		say colored(['bright_red'], "$first" ), $s;
 	}
-	ReadMode('cbreak');
-	my $key = ReadKey(0);
-	ReadMode('normal');
-	return $hash{ $key };
+	if( $#files > 62 )
+	{
+		my @k;
+		for( my $i = 0; $i <= 2; ++$i )
+		{
+			ReadMode('cbreak');
+			push @k, ReadKey(0);
+			ReadMode('normal');
+		}
+		say join( '', @k );
+		return $hash{ join( '', @k ) };
+	}
+	else
+	{
+		ReadMode('cbreak');
+		my $key = ReadKey(0);
+		ReadMode('normal');
+		return $hash{ $key };
+	}
 }
 #say join( " ", @keys );
-my @files = File::Find::Rule->executable()->maxdepth(1)->name( qr/^Test_[^\.]*/ )->in( "." );
-my $testsuite = pick( @files );
-my @tests = qx/.\/$testsuite --help-tests/;
-@tests = @tests[ 2 .. $#tests ];
-my $test = pick( @tests );
-my $cmd = "make -j4 $testsuite; ./$testsuite $test";
-system( $cmd );
+#my @files = File::Find::Rule->executable()->maxdepth(1)->name( qr/^Test_[^\.]*/ )->in( "." );
+my @files;
+sub kwanted
+{
+	if ( -f && -x && /^Test_/ )
+	{
+		#my $f = abs_path( "" );
+		#say $f;
+		push @files, $File::Find::name;
+	}
+}
+my $cmd;
+my $no_make_cmd;
+use File::Basename;
+my $name = basename($0);
+if( ( $name eq 'ttl' ) )
+{
+	my $file = io "$ENV{'HOME'}/.app_tewk_ttl";
+	$cmd = $file->[-1];
+	system( $cmd );
+}
+else
+{
+	find( \&kwanted , "."  );
+	my $testsuite = pick( @files );
+	system( "make -j4 $testsuite" );
+	my @tests = qx/.\/$testsuite --help-tests/;
+	@tests = @tests[ 2 .. $#tests ];
+	my $test = pick( @tests );
+	if( ( $name eq 'ttd' ) or ( ( ( $#ARGV + 1 ) > 0 ) and ( $ARGV[0] eq "-d" ) ) )
+	{
+		$no_make_cmd = "lldb -o run ./$testsuite -- $test";
+		$cmd = "make -j4 $testsuite; $no_make_cmd"; 
+	}
+	else
+	{
+		$no_make_cmd = "./$testsuite $test";
+		$cmd = "make -j4 $testsuite; $no_make_cmd"; 
+	}
+	io("$ENV{'HOME'}/.app_tewk_ttl")->touch;
+	$cmd >> io("$ENV{'HOME'}/.app_tewk_ttl");
+	system( $no_make_cmd );
+}
 say "";
 say "";
 say $cmd;

@@ -9,6 +9,107 @@ TO DO LIST
 
     2. develop web interface
 
+    3. resolve windowing ambiguity issue (see example case below)
+
+  Windowing Ambiguity Issue Example
+    CUICollector was changed in order to implement windowing. To do
+    windowing all CUIs in each phrase were placed into a tree/hash structure
+    where the sentence position (0,1,2,etc) is used as the hash key, and the
+    value is a list where each CUI can only be represented once. This
+    eliminated duplicate bigrams counts and allowed for easy windowing.
+    However, this method introduces some ambiguity that was not present in
+    the original algorithm.
+
+    The example comes from the PMID 10257468 that is part of the PMIDs from
+    1983-1985 MetaMap collection. The MetaMap entry is pasted below followed
+    by the computed tree structure from CUICollector.
+
+    10257468 ti::1:: args('MetaMap14.FML.BINARY.Linux --lexicon db -Z 2014AB
+    -Z 2014AB -qE -E /tmp/text_000N_41948
+    /tmp/text_000N.out_41948',[lexicon-db,mm_data_year-'2014AB',machine_outp
+    ut-[],indicate_citation_end-[],infile-'/tmp/text_000N_41948',outfile-'/t
+    mp/text_000N.out_41948']). aas([]). neg_list([]).
+    utterance('10257468.ti.1',"Tug of war between work and leisure for
+    health care managers.",154/61,[]). phrase('Tug of war between
+    work',[head([lexmatch(['tug of
+    war']),inputmatch(['Tug',of,war]),tag(noun),tokens([tug,of,war])]),prep(
+    [lexmatch([between]),inputmatch([between]),tag(prep),tokens([between])])
+    ,mod([lexmatch([work]),inputmatch([work]),tag(noun),tokens([work])])],15
+    4/23,[]). candidates(5,0,0,5,[]).
+    mappings([map(-687,[ev(-760,'C1319201','TUG','Timed up and go mobility
+    test',[tug],[diap],[[[1,1],[1,1],0]],yes,no,['MTH','SNOMEDCT_US'],[154/3
+    ],0,0),ev(-760,'C0043027','War','War',[war],[acty],[[[3,3],[1,1],0]],yes
+    ,no,['AOD','CHV','CSP','LCH','MSH','MTH'],[161/3],0,0),ev(-593,'C0043227
+    ','Work','Work',[work],[ocac],[[[5,5],[1,1],0]],no,no,['CHV','CSP','LCH'
+    ,'LCH_NW','LNC','MSH','MTH','NCI','SNOMEDCT_US'],[173/4],0,0)]),map(-687
+    ,[ev(-760,'C1422219','TUG','ASPSCR1
+    gene',[tug],[gngm],[[[1,1],[1,1],0]],yes,no,['HGNC','MTH','NCI','OMIM'],
+    [154/3],0,0),ev(-760,'C0043027','War','War',[war],[acty],[[[3,3],[1,1],0
+    ]],yes,no,['AOD','CHV','CSP','LCH','MSH','MTH'],[161/3],0,0),ev(-593,'C0
+    043227','Work','Work',[work],[ocac],[[[5,5],[1,1],0]],no,no,['CHV','CSP'
+    ,'LCH','LCH_NW','LNC','MSH','MTH','NCI','SNOMEDCT_US'],[173/4],0,0)]),ma
+    p(-687,[ev(-760,'C2346564','TUG','ASPSCR1 wt
+    Allele',[tug],[gngm],[[[1,1],[1,1],0]],yes,no,['MTH','NCI'],[154/3],0,0)
+    ,ev(-760,'C0043027','War','War',[war],[acty],[[[3,3],[1,1],0]],yes,no,['
+    AOD','CHV','CSP','LCH','MSH','MTH'],[161/3],0,0),ev(-593,'C0043227','Wor
+    k','Work',[work],[ocac],[[[5,5],[1,1],0]],no,no,['CHV','CSP','LCH','LCH_
+    NW','LNC','MSH','MTH','NCI','SNOMEDCT_US'],[173/4],0,0)])]).
+    phrase(and,[conj([lexmatch([and]),inputmatch([and]),tag(conj),tokens([an
+    d])])],178/3,[]). candidates(0,0,0,0,[]). mappings([]). phrase('leisure
+    for health care
+    managers.',[head([lexmatch([leisure]),inputmatch([leisure]),tag(noun),to
+    kens([leisure])]),prep([lexmatch([for]),inputmatch([for]),tag(prep),toke
+    ns([for])]),mod([lexmatch(['health care
+    managers']),inputmatch([health,care,managers]),tag(noun),tokens([health,
+    care,managers])]),punc([inputmatch(['.']),tokens([])])],182/33,[]).
+    candidates(8,2,0,6,[]).
+    mappings([map(-761,[ev(-760,'C0086542','Leisure','Leisure',[leisure],[id
+    cn],[[[1,1],[1,1],0]],yes,no,['AOD','CHV','CSP','LCH_NW','LNC','MSH','NC
+    I'],[182/7],0,0),ev(-640,'C0086388','Health Care','Health
+    Care',[health,care],[hlca],[[[3,4],[1,2],0]],no,no,['AOD','CHV','CSP','M
+    SH','NCI','NCI_NICHD','NLMSubSyn','SNMI'],[194/11],0,0),ev(-593,'C033514
+    1','MANAGERS',manager,[managers],[prog],[[[5,5],[1,1],0]],no,no,['AOD','
+    CHV','LNC','MTH','NCI','SNM','SNMI','SNOMEDCT_US'],[206/8],0,0)]),map(-7
+    61,[ev(-760,'C0086542','Leisure','Leisure',[leisure],[idcn],[[[1,1],[1,1
+    ],0]],yes,no,['AOD','CHV','CSP','LCH_NW','LNC','MSH','NCI'],[182/7],0,0)
+    ,ev(-593,'C0018684','Health','Health',[health],[idcn],[[[3,3],[1,1],0]],
+    no,no,['AOD','CHV','CSP','LCH','LCH_NW','LNC','MSH','MTH','NCI','NCI_NIC
+    HD','SNOMEDCT_US'],[194/6],0,0),ev(-640,'C0687694','care managers','Case
+    Manager',[care,managers],[prog],[[[4,4],[1,1],0],[[5,5],[2,2],0]],no,no,
+    ['CHV','LNC','MTH','NCI'],[201/13],0,0)])]). @@@@@@@
+
+    CUI tree/hash structure:
+
+    Sentence Position (hash key): 0 1 2 | 3 4 5
+
+                            CUI1: C1319201  C0043027  C0043227 | C0086542  C0086388  C0335141
+
+                            CUI2: C1422219                     |           C0018684  C0687694
+
+                            CUI3: C2346564                     |
+
+    Sentence positions 0-2 were part of one phrase, and positions 3-5 were
+    part of the second phrase in MetaMap. The ambiguity comes from sentence
+    positions 4 and 5. Originally, CUICollector would have returned the
+    following CUI Bigrams for sentence positions 4-5: C0086388-C0335141,
+    C0018684-C0687694
+
+    This is because in the original CUICollector the individual phrases
+    don't get mixed up and recombined in an all-by-all fashion. The CUI's in
+    questions are for the terms "health care managers". The different CUI
+    Bigrams reflect the difference in meaning of "health care" "managers",
+    or "health" "care managers". Thus each of these concepts has different
+    CUIs. In the windowing version of the code the CUIs are placed into the
+    shown structure and all-by-all bigrams are generated for each sentence
+    position, rather than for each phrase like before. Now we get the
+    ADDITIONAL Bigrams of: C0086388-C0687694 and C0018684-C0335141 This is
+    equivalent to "health" "managers" and "health care" "care"managers".
+
+    This behavior is now present in the Perl and Hadoop versions of
+    CUICollector. It is being left alone for now, but some thought needs to
+    be done to figure out if this is ok or if this ambiguity needs to be
+    checked for, which will probably add more complexity to CUICollector.
+
 AUTHORS
     Bridget McInnes <btmcinnes at vcu.edu>
 

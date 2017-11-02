@@ -1,8 +1,14 @@
 Revision history for perl module Lingua::JA::Moji
 
+0.47 2017-11-01
+
+* Add yurei_moji (non-existent kanji), bad_kanji (negative kanji)
+* yi now becomes kana i, not ixe in romaji2kana
+
 0.46 2017-10-24
 
 * "is_romaji" and friends disallow a leading hyphen
+* Add experimental functions "smallize_kana" and "cleanup_kana"
 
 0.45 2017-03-12
 

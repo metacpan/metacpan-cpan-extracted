@@ -1,5 +1,14 @@
 Revision history for SQL-Abstract-More
 
+1.30 29.10.2017
+  - fix typo in dependency on SQL::Abstract (require v1.84, not 1.74)
+
+1.29 28.10.2017
+  - syntax >=< for full outer joins
+  - support for joins in update() (rouzier++)
+  - support for -returning arg in update()
+  - Respect +- prefixes for update and delete and allow binds for select order by (rouzier++)
+
 1.28 05.07.2016
   - support for quoting table and column names
   - fix warning 'redundant' appeared in perl 5.22 

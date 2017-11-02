@@ -74,7 +74,7 @@ Net::SNMP::Mixin::Dot1abLldp - mixin class for the Link Layer Discovery Protocol
 
 =cut
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 =head1 SYNOPSIS
 
@@ -243,7 +243,7 @@ Returns the LLDP lldp_rem_table as a hash reference. The table is indexed by the
 
 sub get_lldp_rem_table {
   my $session = shift;
-  my $agent = $session->hostname;
+  my $agent   = $session->hostname;
 
   Carp::croak "$agent: '$prefix' not initialized,"
     unless $session->init_ok($prefix);
@@ -276,11 +276,13 @@ sub get_lldp_rem_table {
 
     # if the chassisIdSubtype has the enumeration 'macAddress(4)'
     # we normalize the MacAddress
-    $result->{$lldpRemLocalPortNum}{$lldpRemIndex}{lldpRemChassisId} =
-      normalize_mac(
-      $result->{$lldpRemLocalPortNum}{$lldpRemIndex}{lldpRemChassisId} )
-      if $result->{$lldpRemLocalPortNum}{$lldpRemIndex}
-        {lldpRemChassisIdSubtype} == 4;
+    my $chassisIdSubtype =
+      $result->{$lldpRemLocalPortNum}{$lldpRemIndex}{lldpRemChassisIdSubtype};
+
+    if ( defined $chassisIdSubtype && $chassisIdSubtype == 4 ) {
+      $result->{$lldpRemLocalPortNum}{$lldpRemIndex}{lldpRemChassisId} =
+        normalize_mac( $result->{$lldpRemLocalPortNum}{$lldpRemIndex}{lldpRemChassisId} );
+    }
 
   }
 

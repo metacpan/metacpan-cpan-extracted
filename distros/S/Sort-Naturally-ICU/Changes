@@ -1,0 +1,7 @@
+Revision history for Perl extension Sort::Naturally::ICU.
+
+0.7.7  Mon June 12 22:24:00 2017
+	- Created a fork of the Sort::Naturally::XS module
+
+0.7.8  Tue Oct 03 19:35:00 2017
+    - Synced a fork

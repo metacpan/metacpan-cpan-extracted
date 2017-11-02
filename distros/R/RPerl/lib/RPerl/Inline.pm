@@ -2,7 +2,7 @@
 package RPerl::Inline;
 use strict;
 use warnings;
-our $VERSION = 0.005_000;
+our $VERSION = 0.006_000;
 
 #use RPerl;  # ERROR: Too late to run INIT block at ...
 #use Config;
@@ -24,6 +24,10 @@ my $pcre2_lib_dir = File::Spec->catpath(q{}, $pcre2_dir, q{lib});
 #my $jpcre2_lib_dir = File::Spec->catpath(q{}, $jpcre2_dir, q{lib});  # NOT USED
 #print {*STDERR} "\n\n", q{<<< DEBUG >>> in RPerl::Inline, have $pcre2_include_dir = '}, $pcre2_include_dir, q{'}, "\n\n";
 #print {*STDERR} "\n\n", q{<<< DEBUG >>> in RPerl::Inline, have $jpcre2_include_dir = '}, $jpcre2_include_dir, q{'}, "\n\n";
+
+# NEED REMOVE HARD-CODED VALUE!  implement Alien::GSL and use Alien::GSL->dist_dir() as w/ PCRE2 in RPerl/Inline.pm
+# 'our' var below utilized from generated *.pmc files
+our $gsl_include_dir = '/usr/include/gsl';
 
 # long form
 #use Inline CPP => config => classes =>
@@ -68,7 +72,7 @@ our %ARGS = (
     filters           => 'Preprocess',
     auto_include => # DEV NOTE: include non-RPerl files using AUTO_INCLUDE so they are not parsed by the 'Preprocess' filter
     [
-        # DEV NOTE, CORRELATION #rp024: sync include files in both RPerl/Inline.pm and rperlstandalone.h
+        # DEV NOTE, CORRELATION #rp024: sync include files & other preprocessor directives in both RPerl/Inline.pm and rperlstandalone.h
         '#include <memory>',  # smart pointers for memory management
         '#include <iostream>',
         '#include <string>',
@@ -79,11 +83,15 @@ our %ARGS = (
         '#include <vector>',
         '#include <math.h>',
         '#include <unordered_map>', # DEV NOTE: unordered_map may require '-std=c++0x' in CCFLAGS above
-        '#undef do_open',         # for regex support, fix conflict between jpcre2.hpp subdep locale_facets_nonio.h & other uknown file, 'error: macro "do_open" requires 7 arguments, but only 2 given'
-        '#undef do_close',        # for regex support, fix conflict between jpcre2.hpp subdep locale_facets_nonio.h & other uknown file, 'error: macro "do_close" requires 2 arguments, but only 1 given'
-        '#include "jpcre2.hpp"',  # for regex support
+
+        # for regex support
+        # DEV NOTE, CORRELATION #rp024: sync include files & other preprocessor directives in both RPerl/Inline.pm and rperlstandalone.h
+        '#undef do_open',         # fix conflict between jpcre2.hpp subdep locale_facets_nonio.h & other uknown file, 'error: macro "do_open" requires 7 arguments, but only 2 given'
+        '#undef do_close',        # fix conflict between jpcre2.hpp subdep locale_facets_nonio.h & other uknown file, 'error: macro "do_close" requires 2 arguments, but only 1 given'
+        '#include "jpcre2.hpp"',
         # DEV NOTE, CORRELATION #rp300: must link against all bit width libs to allow automatic selection
-        'typedef jpcre2::select<char> jp;',  # for regex support, automatically selects correct character bit width based on system, 8 or 16 or 32
+        'typedef jpcre2::select<char>::Regex regex;',  # automatically selects correct character bit width based on system, 8 or 16 or 32
+        'typedef jpcre2::SIZE_T regexsize;',  # used by substitution (replace) count type
     ],
     classes => sub { join('::', split('__', shift)); }
 );

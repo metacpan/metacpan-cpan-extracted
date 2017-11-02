@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Time-Date",
    "no_index" : {
@@ -52,6 +52,6 @@
          "web" : "https://github.com/zorgnax/timedate"
       }
    },
-   "version" : "0.03",
-   "x_serialization_backend" : "JSON::PP version 2.27203"
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

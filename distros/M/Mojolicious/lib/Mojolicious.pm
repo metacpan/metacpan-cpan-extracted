@@ -58,7 +58,7 @@ has types     => sub { Mojolicious::Types->new };
 has validator => sub { Mojolicious::Validator->new };
 
 our $CODENAME = 'Doughnut';
-our $VERSION  = '7.48';
+our $VERSION  = '7.51';
 
 sub AUTOLOAD {
   my $self = shift;
@@ -772,12 +772,6 @@ have been used in the past.
 
 2.0, C<Leaf Fluttering In Wind> (U+1F343)
 
-1.4, C<Smiling Face With Sunglasses> (U+1F60E)
-
-1.3, C<Tropical Drink> (U+1F379)
-
-1.1, C<Smiling Cat Face With Heart-Shaped Eyes> (U+1F63B)
-
 1.0, C<Snowflake> (U+2744)
 
 =head1 SPONSORS
@@ -1074,6 +1068,8 @@ Steffen Ullrich
 Stephan Kulow
 
 Stephane Este-Gracias
+
+Stevan Little
 
 Steve Atkins
 

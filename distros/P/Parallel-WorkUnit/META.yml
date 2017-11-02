@@ -1,7 +1,7 @@
 ---
 abstract: 'Provide easy-to-use forking with ability to pass back data'
 author:
-  - 'J. Maslak <jmaslak@antelope.net>'
+  - 'Joelle Maslak <jmaslak@antelope.net>'
 build_requires:
   Test::Exception: '0'
   Test::More: '0'
@@ -17,12 +17,13 @@ name: Parallel-WorkUnit
 provides:
   Parallel::WorkUnit:
     file: lib/Parallel/WorkUnit.pm
-    version: '1.010'
+    version: '1.012'
 requires:
   Carp: '0'
   IO::Pipe: '0'
   IO::Select: '0'
   Moose: '0'
+  Moose::Util::TypeConstraints: '0'
   POSIX: '0'
   Storable: '0'
   Try::Tiny: '0'
@@ -34,5 +35,5 @@ requires:
 resources:
   bugtracker: https://github.com/jmaslak/Parallel-WorkUnit/issues
   repository: git://github.com/jmaslak/Parallel-WorkUnit.git
-version: '1.010'
+version: '1.012'
 x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -1,3 +1,11 @@
+2.14    2017-10-28
+
+
+- This release is based on version 2017c of the Olson database. This release
+  includes contemporary changes for Fiji, Namibia, Northern Cyprus, Sudan,
+  Tonga, and Turks & Caicos.
+
+
 2.13    2017-06-01
 
 - Really fix the indexing issue. For reals this time. I'm totally not

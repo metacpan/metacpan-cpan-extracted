@@ -1,5 +1,5 @@
 #
-# $Id: Indexer.pm,v f6ad8c136b19 2017/01/01 10:13:54 gomor $
+# $Id: Indexer.pm,v f421cd03e192 2017/08/26 14:56:55 gomor $
 #
 # server::logstash::indexer Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Server::Logstash);
 
 sub brik_properties {
    return {
-      revision => '$Revision: f6ad8c136b19 $',
+      revision => '$Revision: f421cd03e192 $',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -19,14 +19,14 @@ sub brik_properties {
          datadir => [ qw(datadir) ],
          conf_file => [ qw(file) ],
          log_file => [ qw(file) ],
-         version => [ qw(2.4.0|5.0.0) ],
+         version => [ qw(2.4.0|5.0.0|5.5.2) ],
          no_output => [ qw(0|1) ],
          redis_host => [ qw(host) ],
          es_nodes => [ qw(node_list) ],
          binary => [ qw(binary_path) ],
       },
       attributes_default => {
-         version => '5.0.0',
+         version => '5.5.2',
          no_output => 0,
          log_file => 'logstash.log',
          redis_host => '127.0.0.1',
@@ -41,6 +41,7 @@ sub brik_properties {
          stop => [ ],
          generate_conf => [ qw(conf_file|OPTIONAL redis_host|OPTIONAL) ],
          status => [ ],
+         restart => [ ],
       },
    };
 }
@@ -95,6 +96,16 @@ EOF
    $ft->write($conf, $conf_file) or return;
 
    return $conf_file;
+}
+
+sub restart {
+   my $self = shift;
+
+   $self->stop;
+
+   sleep(2);  # Wait for process to stop
+
+   return $self->start;
 }
 
 1;

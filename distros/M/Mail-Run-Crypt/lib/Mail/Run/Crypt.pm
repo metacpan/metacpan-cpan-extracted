@@ -16,7 +16,7 @@ use Mail::GnuPG;
 use MIME::Entity;
 
 # Specify package verson
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 # Default exit value
 our $DEFAULT_EXIT = 127;    ## no critic (ProhibitMagicNumbers)
@@ -30,7 +30,7 @@ sub new {
 
     # We must have a recipient
     defined $self->{mailto}
-      or croak 'mailto required';
+      or croak 'MAILTO required';
 
     # Default the instance name to the package name if it wasn't given;
     # runcrypt(1) will pass it in
@@ -43,9 +43,9 @@ sub new {
     # If signing, we need a key ID and a passphrase
     if ( $self->{sign} ) {
         defined $self->{keyid}
-          or croak 'keyid required for signing';
+          or croak 'Key ID required for signing';
         defined $self->{passphrase}
-          or croak 'passphrase required for signing';
+          or croak 'Passphrase required for signing';
     }
 
     # Return objectified self
@@ -59,7 +59,7 @@ sub run {
     # Run the command and wait for it to finish; keep its exit value for later
     my ( @out, @err );
     eval { run3 \@command, undef, \@out, \@err }
-      or carp "command failed: $EVAL_ERROR";
+      or warn "Command failed: $EVAL_ERROR\n";
     $self->{exit} = $CHILD_ERROR >> 8;
 
     # If there was output, mail it
@@ -138,7 +138,7 @@ Mail::Run::Crypt - Encrypt and mail output from command runs
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =head1 DESCRIPTION
 

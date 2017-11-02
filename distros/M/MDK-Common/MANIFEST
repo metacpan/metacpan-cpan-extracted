@@ -11,5 +11,6 @@ lib/MDK/Common/System.pm
 lib/MDK/Common/Various.pm
 lib/MDK/Common.pm
 MANIFEST
+t/01compile.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

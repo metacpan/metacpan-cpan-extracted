@@ -5,7 +5,7 @@ package WebService::BitbucketServer;
 use warnings;
 use strict;
 
-our $VERSION = '0.601'; # VERSION
+our $VERSION = '0.602'; # VERSION
 
 use HTTP::AnyUA::Util qw(www_form_urlencode);
 use HTTP::AnyUA;
@@ -304,7 +304,7 @@ WebService::BitbucketServer - Bindings for Bitbucket Server REST APIs
 
 =head1 VERSION
 
-version 0.601
+version 0.602
 
 =head1 SYNOPSIS
 

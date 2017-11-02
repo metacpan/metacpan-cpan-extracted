@@ -31,9 +31,9 @@ plan tests => scalar @modules;
 
 my %trustme = (
              'DateTime::TimeZone' => [
-                                     qr/^[A-Z_]+/,
-                                     qr/^max_span$/
-                                   ]
+                                       qr/^[A-Z_]+/,
+                                       qr/^max_span$/
+                                     ]
            );
 
 my @also_private;

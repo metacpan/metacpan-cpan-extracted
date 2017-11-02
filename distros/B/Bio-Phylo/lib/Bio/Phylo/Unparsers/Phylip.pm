@@ -1,5 +1,6 @@
 package Bio::Phylo::Unparsers::Phylip;
 use strict;
+use warnings;
 use base 'Bio::Phylo::Unparsers::Abstract';
 use Bio::Phylo::Util::Exceptions 'throw';
 use Bio::Phylo::Util::CONSTANT qw':objecttypes looks_like_object';
@@ -49,6 +50,16 @@ to the 'phylip_name' slot of set_generic. Example:
  	my $phylip_name = $seq->get_generic('phylip_name');
  }
 
+This default behavior enforces strict compliance with the phylip 
+rule for 10-character row names. It is possible to turn this off
+by passing in the optional C<-relaxed> flag with a true value, e.g.:
+
+ my $phylip_string = unparse(
+ 	-format  => 'phylip',
+ 	-phylo   => $matrix,
+ 	-relaxed => 1,
+ );
+
 The phylip module is called by the L<Bio::Phylo::IO> object, so
 look there to learn about parsing and serializing in general.
 
@@ -90,51 +101,58 @@ sub _to_string {
         my $id = $seq->get_id;
         $seq_for_id{$id} = $seq->get_char;
         my $name = $seq->get_internal_name;
-        push @ids, $id;
+        push @ids, $id;        
         
+        # relaxed phylip names may exceed 10 characters
+        if ( $self->{'RELAXED'} ) {
+        	$phylip_name_for_id{$id} = $name;
+        }        
         
-        if ( length($name) <= 10 ) {
-            
-            # pad name with spaces until 10 characters
-            my $phylip_name = $name . ( ( 10 - length($name) ) x ' ' );
-            
-            # not yet seen name, use as as
-            if ( !$seen_name{$phylip_name} ) {
-                $seen_name{$phylip_name}++;
-                $phylip_name_for_id{$id} = $phylip_name;
-            }
-            
-            # have seen name
-            else {
-                
-                # attach incrementing integer until name is new
-                my $counter = 1;
-                while ( $seen_name{$phylip_name} ) {
-                    $phylip_name =
-                      substr( $phylip_name, 0, ( 10 - length($counter) ) );
-                    $phylip_name .= $counter;
-                    $counter++;
-                }
-                $seen_name{$phylip_name}++;
-                $phylip_name_for_id{$id} = $phylip_name;
-            }
-        }
-        elsif ( length($name) > 10 ) {
-            my $phylip_name = substr( $name, 0, 10 );
-            if ( !$seen_name{$phylip_name} ) {
-                $seen_name{$phylip_name}++;
-                $phylip_name_for_id{$id} = $phylip_name;
-            }
-            else {
-                my $counter = 1;
-                while ( $seen_name{$phylip_name} ) {
-                    $phylip_name =
-                      substr( $phylip_name, 0, ( 10 - length($counter) ) );
-                    $phylip_name .= $counter;
-                    $counter++;
-                }
-                $phylip_name_for_id{$id} = $phylip_name;
-            }
+        # strict phylip names may not exceed 10 characters
+        else {
+			if ( length($name) <= 10 ) {
+			
+				# pad name with spaces until 10 characters
+				my $phylip_name = $name . ( ( 10 - length($name) ) x ' ' );
+			
+				# not yet seen name, use as as
+				if ( !$seen_name{$phylip_name} ) {
+					$seen_name{$phylip_name}++;
+					$phylip_name_for_id{$id} = $phylip_name;
+				}
+			
+				# have seen name
+				else {
+				
+					# attach incrementing integer until name is new
+					my $counter = 1;
+					while ( $seen_name{$phylip_name} ) {
+						$phylip_name =
+						  substr( $phylip_name, 0, ( 10 - length($counter) ) );
+						$phylip_name .= $counter;
+						$counter++;
+					}
+					$seen_name{$phylip_name}++;
+					$phylip_name_for_id{$id} = $phylip_name;
+				}
+			}
+			elsif ( length($name) > 10 ) {
+				my $phylip_name = substr( $name, 0, 10 );
+				if ( !$seen_name{$phylip_name} ) {
+					$seen_name{$phylip_name}++;
+					$phylip_name_for_id{$id} = $phylip_name;
+				}
+				else {
+					my $counter = 1;
+					while ( $seen_name{$phylip_name} ) {
+						$phylip_name =
+						  substr( $phylip_name, 0, ( 10 - length($counter) ) );
+						$phylip_name .= $counter;
+						$counter++;
+					}
+					$phylip_name_for_id{$id} = $phylip_name;
+				}
+			}
         }
         $seq->set_generic( 'phylip_name' => $phylip_name_for_id{$id} );
     }

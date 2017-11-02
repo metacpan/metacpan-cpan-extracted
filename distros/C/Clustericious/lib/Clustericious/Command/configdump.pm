@@ -8,7 +8,7 @@ use Clustericious::Config;
 use YAML::XS qw( Dump );
 
 # ABSTRACT: Dump a clustericious configuration
-our $VERSION = '1.26'; # VERSION
+our $VERSION = '1.27'; # VERSION
 
 
 has description => <<EOT;
@@ -60,7 +60,7 @@ Clustericious::Command::configdump - Dump a clustericious configuration
 
 =head1 VERSION
 
-version 1.26
+version 1.27
 
 =head1 SYNOPSIS
 

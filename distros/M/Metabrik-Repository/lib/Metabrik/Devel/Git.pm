@@ -1,5 +1,5 @@
 #
-# $Id: Git.pm,v f6ad8c136b19 2017/01/01 10:13:54 gomor $
+# $Id: Git.pm,v 4626597a87f0 2017/08/21 13:52:44 gomor $
 #
 # devel::git Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Shell::Command Metabrik::System::Package);
 
 sub brik_properties {
    return {
-      revision => '$Revision: f6ad8c136b19 $',
+      revision => '$Revision: 4626597a87f0 $',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -30,6 +30,7 @@ sub brik_properties {
          install => [ ], # Inherited
          clone => [ qw(repository directory|OPTIONAL) ],
          update => [ qw(repository directory|OPTIONAL) ],
+         update_or_clone => [ qw(repository directory|OPTIONAL) ],
       },
       require_binaries => {
          git => [ ],
@@ -81,6 +82,19 @@ sub update {
    $self->execute($cmd) or return;
 
    return $directory;
+}
+
+sub update_or_clone {
+   my $self = shift;
+   my ($repository, $directory) = @_;
+
+   $self->brik_help_run_undef_arg('update_or_clone', $repository) or return;
+
+   if (-d $directory) {
+      return $self->update($repository, $directory);
+   }
+
+   return $self->clone($repository, $directory);
 }
 
 1;

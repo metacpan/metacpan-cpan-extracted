@@ -25,4 +25,4 @@ requires:
   perl: '5.010001'
 resources:
   repository: https://github.com/abeltje/lc_time
-version: '0.13'
+version: '0.14'

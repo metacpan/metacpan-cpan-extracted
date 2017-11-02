@@ -1,5 +1,14 @@
 # Change Log
 
+## [1.002] - 2017-10-27
+### Added
+- Added support for TravisCI.
+
+### Fixed
+- Fix test failures due to '.' removal from @INC under Perl 5.26 when 
+  PERL_USE_UNSAFE_INC=0. (Kent Fredric, CPAN #121459)
+
+
 ## [1.001] - 2015-11-29
 ### Added
 - Added .gitignore.

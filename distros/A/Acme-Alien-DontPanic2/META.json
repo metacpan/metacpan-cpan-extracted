@@ -17,7 +17,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Alien::Build" : "1.14",
+            "Alien::Build" : "1.29",
             "Alien::Build::MB" : "0.05",
             "Module::Build" : "0.28"
          }
@@ -73,25 +73,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "1.1400",
-   "x_alienfile" : {
-      "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.24",
-      "requires" : {
-         "share" : {
-            "Archive::Tar" : "0",
-            "Config" : "0",
-            "HTML::LinkExtor" : "0",
-            "HTTP::Tiny" : "0.044",
-            "IO::Socket::SSL" : "1.56",
-            "IO::Zlib" : "0",
-            "Net::SSLeay" : "1.49",
-            "Sort::Versions" : "0",
-            "URI" : "0",
-            "URI::Escape" : "0"
-         },
-         "system" : {}
-      }
-   },
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+   "version" : "1.2900",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
 }
 

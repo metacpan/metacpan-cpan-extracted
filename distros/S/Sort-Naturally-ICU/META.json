@@ -1,0 +1,36 @@
+{
+   "abstract" : "Perl extension for human-friendly (\"natural\") sort order",
+   "author" : [
+      "Sergey Yurzin <jurzin.s@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Sort-Naturally-ICU",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "jurzin.s@gmail.com",
+         "web" : "https://github.com/CaballerosTeam/Sort-Naturally-ICU/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/CaballerosTeam/Sort-Naturally-ICU.git",
+         "web" : "https://github.com/CaballerosTeam/Sort-Naturally-ICU"
+      }
+   },
+   "version" : "v0.7.8",
+   "x_serialization_backend" : "JSON::PP version 2.94"
+}

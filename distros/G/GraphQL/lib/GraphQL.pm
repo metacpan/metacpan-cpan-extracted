@@ -10,7 +10,7 @@ GraphQL - Perl implementation of GraphQL
 
 =cut
 
-our $VERSION = '0.16';
+our $VERSION = '0.20';
 
 =begin markdown
 
@@ -132,6 +132,8 @@ To debug, set environment variable C<GRAPHQL_DEBUG> to a true value.
 None yet.
 
 =head1 SEE ALSO
+
+L<SQL::Translator::Producer::GraphQL> - produce GraphQL schemas from a L<DBIx::Class::Schema> (or in fact any SQL database)
 
 L<Sample Dancer 2 applet|https://github.com/graphql-perl/sample-dancer2>
 

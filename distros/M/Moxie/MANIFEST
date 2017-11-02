@@ -13,6 +13,7 @@ lib/Moxie/Enum.pm
 lib/Moxie/Object.pm
 lib/Moxie/Object/Immutable.pm
 lib/Moxie/Traits/Provider.pm
+t/000-samples/000-synopsis.t
 t/000-samples/001-point.t
 t/000-samples/002-bank-account.t
 t/000-samples/003-binary-tree.t

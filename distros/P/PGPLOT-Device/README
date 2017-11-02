@@ -1,0 +1,92 @@
+PGPLOT::Device
+
+It is sometimes surprisingly difficult to create an appropriate PGPLOT
+device. Coding for both interactive and hardcopy devices can lead to
+code which repeatedly has to check the device type to generate the
+correct device name. If an application outputs multiple plots, it needs
+to meld unique names (usually based upon the output format) to the
+user's choice of output device. The user should be given some
+flexibility in specifying a device or hardcopy filename output
+specification without making life difficult for the developer.
+
+This module tries to help reduce the agony. It does this by creating an
+object which will resolve to a legal PGPLOT device specification. The
+object can handle auto-incrementing of interactive window ids,
+interpolation of variables into file names, automatic generation of
+output suffices for hardcopy devices, etc.
+
+Here's the general scheme:
+
+*   The application creates the object, using the user's PGPLOT device
+    specification to initialize it.
+
+*   Before creating a new plot, the application specifies the output
+    filename it would like to have. The filename may use interpolated
+    variables. This is ignored if the device is interactive, as it is
+    meaningless in that context
+
+*   Each time that the object value is retrieved using the "next()"
+    method, the internal window id is incremented, any variables in the
+    filename are interpolated, and the result is returned.
+
+  Interactive devices
+
+Currently, the "/xs" and "/xw" devices are recognized as being
+interactive. PGPLOT allows more than one such window to be displayed;
+this is accomplished by preceding the device name with an integer id,
+e.g. "2/xs". If a program generates several independent plots, it can
+either prompt between overwriting plots in a single window, or it may
+choose to use multiple plotting windows. This module assists in the
+latter case by implementing auto-increment of the window id. The device
+specification syntax is extended to "+N/xs" where "N" is an integer
+indicating the initial window id.
+
+  Hardcopy devices
+
+Hardcopy device specifications (i.e. not "/xs" or "/xw") are specified
+as "filename/device". The filename is optional, and will automatically
+be given the extension appropriate to the output file format. If a
+filename is specified in the specification passed to the new method, it
+cannot be overridden. This allows the user to specify a single output
+file for all hardcopy plots. This works well for PostScript, which can
+handle multiple pages per file, but for the PNG device, this results in
+multiple output files with numbered suffices. It's not pretty! This
+module needs to be extended so it knows if a single output file can
+handle more than one page.
+
+Variables may be interpolated into the filenames using the "${variable}"
+syntax (curly brackets are required). Note that only simple scalars may
+be interpolated (not hash or array elements). The values may be
+formatted using sprintf by appending the format, i.e.
+"${variable:format}". Variables which are available to be interpolated
+are either those declared using our, or those passed into the class
+constructor.
+
+The internal counter which tracks the number of times the device object
+has been used is available as "${devn}".
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2017 by Smithsonian Astrophysical
+Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007

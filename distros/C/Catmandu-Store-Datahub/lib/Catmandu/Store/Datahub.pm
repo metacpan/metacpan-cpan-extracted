@@ -1,6 +1,6 @@
 package Catmandu::Store::Datahub;
 
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 
 use Catmandu::Sane;
 
@@ -109,24 +109,13 @@ L<Catmandu::LIDO> and L<Catmandu>
 
 =head1 AUTHORS
 
-Pieter De Praetere, C<< pieter at packed.be >>
-
-Matthias Vandermaesen, C<< matthias.vandermaesen at vlaamsekunstcollectie.be >>
-
-
-=head1 CONTRIBUTORS
-
-Pieter De Praetere, C<< pieter at packed.be >>
-
-Matthias Vandermaesen, C<< matthias.vandermaesen at vlaamsekunstcollectie.be >>
-
+Matthias Vandermaesen <matthias.vandermaesen@vlaamsekunstcollectie.be>
+Pieter De Praetere <pieter@packed.be>
 
 =head1 COPYRIGHT AND LICENSE
 
-This package is copyright (c) 2016 by PACKED vzw and VKC vzw.
+This software is copyright (c) 2016 by PACKED, vzw, Vlaamse Kunstcollectie, vzw.
 
-This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.
-
-=encoding utf8
+This is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License, Version 3, June 2007.
 
 =cut

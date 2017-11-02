@@ -1,5 +1,9 @@
 Revision history for Geo-Coder-CA
 
+0.06	Sat Oct 28 10:07:39 EDT 2017
+	Allow CA.pm to be run from the command line
+	Fix http://www.cpantesters.org/cpan/report/161e11f8-bb9a-11e7-a1cf-bb670eaac09d
+
 0.05	Tue Oct 24 23:00:22 EDT 2017
 	Back out 0.04 - too many false positives
 	Enable strict mode

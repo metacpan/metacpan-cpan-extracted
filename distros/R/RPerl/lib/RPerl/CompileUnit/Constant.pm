@@ -3,7 +3,7 @@ package RPerl::CompileUnit::Constant;
 use strict;
 use warnings;
 use RPerl::AfterSubclass;
-our $VERSION = 0.002_000;
+our $VERSION = 0.004_000;
 
 # [[[ OO INHERITANCE ]]]
 use parent qw(RPerl::CompileUnit);
@@ -13,13 +13,17 @@ use RPerl::CompileUnit;
 ## no critic qw(ProhibitUselessNoCritic ProhibitMagicNumbers RequireCheckedSyscalls)  # USER DEFAULT 1: allow numeric values & print operator
 ## no critic qw(RequireInterpolationOfMetachars)  # USER DEFAULT 2: allow single-quoted control characters & sigils
 
+# [[[ INCLUDES ]]]
+use perlapinames_generated;
+
 # [[[ OO PROPERTIES ]]]
 our hashref $properties = {};
 
 # [[[ SUBROUTINES & OO METHODS ]]]
 
-our string_hashref::method $ast_to_rperl__generate = sub {
-    ( my object $self, my string_hashref $modes) = @_;
+sub ast_to_rperl__generate {
+    { my string_hashref::method $RETURN_TYPE };
+    ( my object $self, my string_hashref $modes) = @ARG;
     my string_hashref $rperl_source_group = { PMC => q{} };
 
     #    RPerl::diag( 'in CompileUnit::Constant->ast_to_rperl__generate(), received $self = ' . "\n" . RPerl::Parser::rperl_ast__dump($self) . "\n" );
@@ -36,6 +40,15 @@ our string_hashref::method $ast_to_rperl__generate = sub {
     my string $type_inner_constant_equal = $type_inner_constant->{children}->[4];
     my object $subexpression             = $self->{children}->[4];
     my string $semicolon                 = $self->{children}->[5];
+
+    if ((exists $perlapinames_generated::FUNCTIONS_DOCUMENTED->{$name}) or
+        (exists $perlapinames_generated::FUNCTIONS_UNDOCUMENTED->{$name}) or
+        (exists $perlapinames_generated::VARIABLES_DOCUMENTED->{$name}) or
+        (exists $perlapinames_generated::VARIABLES_UNDOCUMENTED->{$name})) {
+        die 'ERROR ECOGEASRP42, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: Perl API name conflict, constant name ' . q{'}
+            . $name . q{'}
+            . ' is the same as a protected function or variable name in the Perl API, please choose a different name, dying' . "\n";
+    }
 
     # CREATE SYMBOL TABLE ENTRY
     if ( exists $modes->{_symbol_table}->{ $modes->{_symbol_table}->{_namespace} }->{_global}->{$name} ) {
@@ -64,20 +77,21 @@ our string_hashref::method $ast_to_rperl__generate = sub {
     RPerl::Generator::source_group_append( $rperl_source_group, $rperl_source_subgroup );
 
     $rperl_source_group->{PMC} .= $semicolon . "\n";
-
     return $rperl_source_group;
-};
+}
 
-our string_hashref::method $ast_to_cpp__generate__CPPOPS_PERLTYPES = sub {
-    ( my object $self, my string_hashref $modes) = @_;
+sub ast_to_cpp__generate__CPPOPS_PERLTYPES {
+    { my string_hashref::method $RETURN_TYPE };
+    ( my object $self, my string_hashref $modes) = @ARG;
     my string_hashref $cpp_source_group = { H => q{// <<< RP::CU::Co __DUMMY_SOURCE_CODE CPPOPS_PERLTYPES >>>} . "\n" };
 
     #...
     return $cpp_source_group;
-};
+}
 
-our string_hashref::method $ast_to_cpp__generate__CPPOPS_CPPTYPES = sub {
-    ( my object $self, my string $package_name_underscores, my string_hashref $modes ) = @_;
+sub ast_to_cpp__generate__CPPOPS_CPPTYPES {
+    { my string_hashref::method $RETURN_TYPE };
+    ( my object $self, my string $package_name_underscores, my string_hashref $modes ) = @ARG;
     my string_hashref $cpp_source_group = { H => q{} };
 
    #RPerl::diag( 'in CompileUnit::Constant->ast_to_cpp__generate__CPPOPS_CPPTYPES(), received $self = ' . "\n" . RPerl::Parser::rperl_ast__dump($self) . "\n" );
@@ -85,6 +99,15 @@ our string_hashref::method $ast_to_cpp__generate__CPPOPS_CPPTYPES = sub {
     my string $name                     = $self->{children}->[1];
     my string $type_inner_constant_type = $self->{children}->[3]->{children}->[1]->{children}->[0];
     my object $subexpression            = $self->{children}->[4];
+
+    if ((exists $perlapinames_generated::FUNCTIONS_DOCUMENTED->{$name}) or
+        (exists $perlapinames_generated::FUNCTIONS_UNDOCUMENTED->{$name}) or
+        (exists $perlapinames_generated::VARIABLES_DOCUMENTED->{$name}) or
+        (exists $perlapinames_generated::VARIABLES_UNDOCUMENTED->{$name})) {
+        die 'ERROR ECOGEASCP42, CODE GENERATOR, ABSTRACT SYNTAX TO C++: Perl API name conflict, constant name ' . q{'}
+            . $name . q{'}
+            . ' is the same as a protected function or variable name in the Perl API, please choose a different name, dying' . "\n";
+    }
 
     # CREATE SYMBOL TABLE ENTRY
     if ( exists $modes->{_symbol_table}->{ $modes->{_symbol_table}->{_namespace} }->{_global}->{$name} ) {
@@ -96,6 +119,11 @@ our string_hashref::method $ast_to_cpp__generate__CPPOPS_CPPTYPES = sub {
             . q{'} . $modes->{_symbol_table}->{_subroutine} . q{()'}
             . ', dying' . "\n";
     }
+
+    # NEED FIX: possible 'const const' conflict?!?
+    $type_inner_constant_type = RPerl::Generator::type_convert_perl_to_cpp($type_inner_constant_type, 1);  # $pointerify_classes = 1
+
+    # add converted C++ type to symtab entry
     $modes->{_symbol_table}->{ $modes->{_symbol_table}->{_namespace} }->{_global}->{$name}
         = { isa => 'RPerl::CompileUnit::Constant', type => $type_inner_constant_type };
 
@@ -120,8 +148,7 @@ our string_hashref::method $ast_to_cpp__generate__CPPOPS_CPPTYPES = sub {
         'const ' . $type_inner_constant_type . q{ } . $name . '() { return ' . $package_name_underscores . '__' . $name . '; }' . "\n";
  
 #    RPerl::diag( 'in CompileUnit::Constant->ast_to_cpp__generate__CPPOPS_CPPTYPES(), have $cpp_source_group->{_H_constants_shims}->{$package_name_underscores} = ' . "\n" . $cpp_source_group->{_H_constants_shims}->{$package_name_underscores} . "\n" );
-
     return $cpp_source_group;
-};
+}
 
 1;    # end of class

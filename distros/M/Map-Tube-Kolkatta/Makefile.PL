@@ -26,7 +26,7 @@ WriteMakefile(
         'Moo'              => '2.000000',
         'namespace::clean' => '0.24',
         'File::Share'      => '0.25',
-        'Map::Tube'        => '3.35',
+        'Map::Tube'        => '3.36',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Map-Tube-Kolkatta-*' },

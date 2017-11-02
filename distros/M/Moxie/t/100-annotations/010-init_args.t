@@ -25,7 +25,7 @@ This test
 
     has foo => sub { 'foo' };
 
-    sub BUILDARGS : init_args;
+    sub BUILDARGS : init;
 }
 
 {
@@ -36,7 +36,7 @@ This test
 
     has foo => sub { 'foo' };
 
-    sub BUILDARGS : init_args( foo => 'foo' );
+    sub BUILDARGS : init( foo => 'foo' );
 }
 
 {
@@ -48,7 +48,7 @@ This test
     has foo => sub { 'foo' };
     has bar => sub { 'bar' };
 
-    sub BUILDARGS : init_args(
+    sub BUILDARGS : init(
         bar => 'foo',
         foo => 'bar',
     );
@@ -63,7 +63,7 @@ This test
     has foo => sub { 'foo' };
     has bar => sub { 'bar' };
 
-    sub BUILDARGS : init_args(
+    sub BUILDARGS : init(
         bar  => 'bar',
         foo? => 'foo',
     );

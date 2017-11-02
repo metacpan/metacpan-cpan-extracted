@@ -1,5 +1,5 @@
 #
-# $Id: Kibana.pm,v f6ad8c136b19 2017/01/01 10:13:54 gomor $
+# $Id: Kibana.pm,v f421cd03e192 2017/08/26 14:56:55 gomor $
 #
 # server::kibana Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::System::Process);
 
 sub brik_properties {
    return {
-      revision => '$Revision: f6ad8c136b19 $',
+      revision => '$Revision: f421cd03e192 $',
       tags => [ qw(unstable elk) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -21,7 +21,7 @@ sub brik_properties {
          port => [ qw(port) ],
          conf_file => [ qw(file) ],
          log_file => [ qw(file) ],
-         version => [ qw(4.6.2|5.0.0) ],
+         version => [ qw(4.6.2|5.0.0|5.5.2) ],
          no_output => [ qw(0|1) ],
          es_nodes => [ qw(node|node_list) ],
          binary => [ qw(binary_path) ],
@@ -29,7 +29,7 @@ sub brik_properties {
       attributes_default => {
          listen => '127.0.0.1',
          port => 5601,
-         version => '5.0.0',
+         version => '5.5.2',
          no_output => 1,
          es_nodes => 'http://localhost:9200',
       },
@@ -128,9 +128,12 @@ sub install {
    my $version = $self->version;
    my $she = $self->shell;
 
-   my $url = 'https://artifacts.elastic.co/downloads/kibana/kibana-5.0.0-linux-x86_64.tar.gz';
+   my $url = 'https://artifacts.elastic.co/downloads/kibana/kibana-5.5.2-linux-x86_64.tar.gz';
    if ($version eq '4.6.2') {
       $url = 'https://download.elastic.co/kibana/kibana/kibana-4.6.2-linux-x86_64.tar.gz';
+   }
+   elsif ($version eq '5.0.0') {
+      $url = 'https://artifacts.elastic.co/downloads/kibana/kibana-5.0.0-linux-x86_64.tar.gz';
    }
 
    my $cw = Metabrik::Client::Www->new_from_brik_init($self) or return;

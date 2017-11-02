@@ -36,6 +36,7 @@ lib/Bio/Phylo/Matrices/Matrix.pm
 lib/Bio/Phylo/Matrices/MatrixRole.pm
 lib/Bio/Phylo/Matrices/TypeSafeData.pm
 lib/Bio/Phylo/Mediators/TaxaMediator.pm
+lib/Bio/Phylo/Models/Substitution/Binary.pm
 lib/Bio/Phylo/Models/Substitution/Dna.pm
 lib/Bio/Phylo/Models/Substitution/Dna/F81.pm
 lib/Bio/Phylo/Models/Substitution/Dna/GTR.pm
@@ -53,8 +54,11 @@ lib/Bio/Phylo/NeXML/Entities.pm
 lib/Bio/Phylo/NeXML/Meta.pm
 lib/Bio/Phylo/NeXML/Meta/XMLLiteral.pm
 lib/Bio/Phylo/NeXML/Writable.pm
+lib/Bio/Phylo/NeXML/XML2JSON.pm
 lib/Bio/Phylo/Parsers/Abstract.pm
 lib/Bio/Phylo/Parsers/Adjacency.pm
+lib/Bio/Phylo/Parsers/Cdao.pm
+lib/Bio/Phylo/Parsers/Dwca.pm
 lib/Bio/Phylo/Parsers/Fasta.pm
 lib/Bio/Phylo/Parsers/Fastq.pm
 lib/Bio/Phylo/Parsers/Figtree.pm
@@ -62,6 +66,7 @@ lib/Bio/Phylo/Parsers/Json.pm
 lib/Bio/Phylo/Parsers/Newick.pm
 lib/Bio/Phylo/Parsers/Nexml.pm
 lib/Bio/Phylo/Parsers/Nexus.pm
+lib/Bio/Phylo/Parsers/Nhx.pm
 lib/Bio/Phylo/Parsers/Phylip.pm
 lib/Bio/Phylo/Parsers/Phyloxml.pm
 lib/Bio/Phylo/Parsers/Table.pm
@@ -100,6 +105,7 @@ lib/Bio/Phylo/Unparsers/Abstract.pm
 lib/Bio/Phylo/Unparsers/Adjacency.pm
 lib/Bio/Phylo/Unparsers/Cdao.pm
 lib/Bio/Phylo/Unparsers/Fasta.pm
+lib/Bio/Phylo/Unparsers/Figtree.pm
 lib/Bio/Phylo/Unparsers/Hennig86.pm
 lib/Bio/Phylo/Unparsers/Html.pm
 lib/Bio/Phylo/Unparsers/Json.pm
@@ -107,6 +113,7 @@ lib/Bio/Phylo/Unparsers/Mrp.pm
 lib/Bio/Phylo/Unparsers/Newick.pm
 lib/Bio/Phylo/Unparsers/Nexml.pm
 lib/Bio/Phylo/Unparsers/Nexus.pm
+lib/Bio/Phylo/Unparsers/Nhx.pm
 lib/Bio/Phylo/Unparsers/Nwmsrdf.pm
 lib/Bio/Phylo/Unparsers/Pagel.pm
 lib/Bio/Phylo/Unparsers/Phylip.pm
@@ -119,6 +126,7 @@ lib/Bio/Phylo/Util/Dependency.pm
 lib/Bio/Phylo/Util/Exceptions.pm
 lib/Bio/Phylo/Util/IDPool.pm
 lib/Bio/Phylo/Util/Logger.pm
+lib/Bio/Phylo/Util/Math.pm
 lib/Bio/Phylo/Util/MOP.pm
 lib/Bio/Phylo/Util/OptionalInterface.pm
 lib/Bio/Phylo/Util/StackTrace.pm
@@ -176,6 +184,17 @@ t/46-noformat.t
 t/47-clone.t
 t/48-drawnoderole.t
 t/49-drawtreerole.t
+t/50-replicate-tree.t
+t/51-replicate-binary.t
+t/52-replicate-dna.t
+t/53-more-matrix.t
+t/54-rankprob.t
+t/55-modeltest.t
+t/56-figtree.t
+t/57-nhx.t
+t/58-symdiff.t
+t/59-yandell.t
+t/60-dwca.t
 t/perl-critic.t
 t/perlcriticrc
 t/pod-coverage.t

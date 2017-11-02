@@ -19,7 +19,7 @@ type QueryRoot {
   helloWorld: String
 }
 EOF
-  graphql '/graphql' => $schema, { helloWorld => 'Hello, world!' };
+  graphql '/graphql' => [ 'Test' ];
   graphql '/graphql2' => sub {
     my ($app, $body, $execute) = @_;
     # returns JSON-able Perl data

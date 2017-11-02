@@ -8,11 +8,9 @@ WriteMakefile
                    'Future' => '0.33',
                    'IO::Async::Handle' => '0.29',
                    'IO::Async::Loop' => '0.66',
-                   'IO::Async::OS' => 0,
                    'IO::Async::Protocol::Stream' => 0,
                    'IO::Async::Stream' => '0.59',
-                   'IO::Socket::SSL' => '1.968',
-                   'Test::More' => '0.88'
+                   'IO::Socket::SSL' => '1.968'
                  },
   'INSTALLDIRS' => 'site',
   'EXE_FILES' => [],

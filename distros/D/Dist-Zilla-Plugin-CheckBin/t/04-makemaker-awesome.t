@@ -1,7 +1,7 @@
 use strict;
-use warnings FATAL => 'all';
+use warnings;
 
-use Test::Requires { 'Dist::Zilla::Plugin::MakeMaker::Awesome' => '0.13' };
+use Test::Needs { 'Dist::Zilla::Plugin::MakeMaker::Awesome' => '0.13' };
 use Test::More;
 BEGIN {
     plan skip_all => 'new [MakeMaker] and old [MakeMaker::Awesome] are not compatible'

@@ -6,7 +6,7 @@ WriteMakefile(
     NAME               => 'WebService::Antigate',
     LICENSE            => 'perl',
     VERSION_FROM       => 'lib/WebService/Antigate.pm', # finds $VERSION
-    PREREQ_PM          => { 'LWP::UserAgent' => 0 }, # e.g., Module::Name => 1.1
+    PREREQ_PM          => { 'LWP::UserAgent' => 0, 'JSON::PP' => 0 }, # e.g., Module::Name => 1.1
     BUILD_REQUIRES     => { 'Test::More' => 0.88 },
     CONFIGURE_REQUIRES => { 'ExtUtils::MakeMaker' => 6.52 },
     META_MERGE         => { resources => {repository => 'https://github.com/olegwtf/p5-WebService-Antigate'} },

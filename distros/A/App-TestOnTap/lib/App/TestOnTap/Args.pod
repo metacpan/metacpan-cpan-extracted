@@ -235,10 +235,10 @@ test results etc.
 
 =item B<--execmap E<lt>mapfileE<gt>>
 
-By default, the test suite will be searched for 'executables' based on the exec map defined in the suite, or
-a built in default if none defined.
+By default, the test suite will be searched for 'executables' based on the exec map defined in the suite, but this option
+allows overriding the choices of the suite exec map.
 
-This option allows overriding the choices of the suite/internal exec map.
+The special mapfile name of C<:internal> causes use of a internally defined execmap, convenient for testing.
 
 For more on execmaps, see the L<manual regarding the 'execmap section' config setting|App::TestOnTap/"THE SUITE CONFIG">.
 

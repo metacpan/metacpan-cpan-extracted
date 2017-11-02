@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Generate IP Addresses Randomly",
-  "AUTHOR" => "J. Maslak <jmaslak\@antelope.net>",
+  "AUTHOR" => "Joelle Maslak <jmaslak\@antelope.net>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "autodie" => 0
   },
-  "VERSION" => "1.003",
+  "VERSION" => "1.004",
   "test" => {
     "TESTS" => "t/*.t"
   }

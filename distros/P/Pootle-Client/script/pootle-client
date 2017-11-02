@@ -1,0 +1,71 @@
+#!env perl
+
+package Kiva;
+
+use Modern::Perl '2015';
+use utf8;
+binmode STDOUT, ':encoding(UTF-8)';
+binmode STDERR, ':encoding(UTF-8)';
+use Carp::Always;
+
+use Getopt::Long qw(:config no_ignore_case);
+use Data::Dumper;
+
+
+my ($help, $pootleBaseurl, $apiEndpoint, $credentials, $cacheFile);
+my $verbose = 0;
+
+GetOptions(
+    'h|help'                      => \$help,
+    'v|verbose:i'                 => \$verbose,
+    'p|pootle-url:s'              => \$pootleBaseurl,
+    'a|api-endpoint:s'            => \$apiEndpoint,
+    'c|credentials:s'             => \$credentials,
+    'cacheFile:s'                 => \$cacheFile,
+);
+
+my $usage = <<USAGE;
+
+Exports/Imports .po-files from/to version control to/from Koha's translation system
+
+It is advised to test first with the "dry-run"-flag and "test"-flag.
+
+  -h --help             This friendly help!
+
+  -v --verbose          String, Log::Log4perl verbosity levels, ALL, TRACE, DEBUG, INFO, WARN, ERROR, FATAL, OFF
+
+  -p --pootle-url       String, base url to the Pootle web service, eg. https://translate.perl-community.org
+
+  -a --api-endpoint     String, which Pootle-Client endpoint to invoke?
+                        See. https://pootle.readthedocs.io/en/stable-2.5.1/api/index.html
+                        Supports only GET-requests.
+
+  -c --credentials      Login credentials to the Pootle-Client. In format username:password,
+                        eg. master:blaster
+                        or
+                        relative or absolute path to a UTF-8 encoded file containing the credentials on it's first row.
+                        It is not recommended to give credentials as commandline parameters directly.
+
+  --cacheFile           String, path to the cache file. If doesn't exists, cache file is created.
+
+EXAMPLE
+
+  pootle-client -v TRACE -p https://pootle.pot.com -a /api/v1/units/19925516/ -c credentials.txt
+
+USAGE
+
+if ($help) {
+    print $usage;
+    exit 0;
+}
+
+$ENV{POOTLE_CLIENT_VERBOSITY} = $verbose;
+
+
+
+use Pootle::Client;
+
+my $pa = Pootle::Client->new({baseUrl => $pootleBaseurl, credentials => $credentials, cacheFile => $cacheFile});
+my ($response, $payloadHash) = $pa->a->request('get', $apiEndpoint, {});
+say $response->content();
+

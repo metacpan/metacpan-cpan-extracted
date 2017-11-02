@@ -5,7 +5,7 @@ use warnings;
 use App::Yath::Util qw/read_config find_pfile/;
 use File::Spec;
 
-our $VERSION = '0.001026';
+our $VERSION = '0.001030';
 
 our $SCRIPT;
 
@@ -29,7 +29,7 @@ sub import {
     my %have = map {( $_ => 1 )} @INC;
     my @missing = grep { !$have{$_} && !$have{File::Spec->rel2abs($_)} } @{$pp_argv->{inc}};
 
-    $class->do_exec($^X, (map {('-I' => File::Spec->rel2abs($_))} @{$pp_argv->{inc}}), $SCRIPT, $cmd_name, @$argv)
+    $class->do_exec($^X, (map {('-I' => File::Spec->rel2abs($_))} @{$pp_argv->{inc}}, @INC), $SCRIPT, $cmd_name, @$argv)
         if @missing;
 
     my $cmd_class = $class->load_command($cmd_name);

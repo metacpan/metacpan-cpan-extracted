@@ -17,8 +17,8 @@ Lingua::JA::Moji - 総合日本文字変換「文字ュール」
 
 =head1 VERSION
 
-This document describes Lingua::JA::Moji version 0.46
-corresponding to git commit L<1b6d2bea0e044f6da33e62325a87070671be692c|https://github.com/benkasminbullock/Lingua-JA-Moji/commit/1b6d2bea0e044f6da33e62325a87070671be692c> made on Tue Oct 24 10:39:21 2017 +0900.
+This document describes Lingua::JA::Moji version 0.47
+corresponding to git commit L<dd0d3ba9ecbafa4492248c27b984b07d6573565b|https://github.com/benkasminbullock/Lingua-JA-Moji/commit/dd0d3ba9ecbafa4492248c27b984b07d6573565b> made on Wed Nov 1 13:04:35 2017 +0900.
 
 =head1 説明
 
@@ -1098,11 +1098,25 @@ C<InHankakuKatakana>は正規表現に使う半角カタカナにマッチしま
 
 
 
+=head2 yurei_moji 
 
 
-=head1 日本語のキリル文字表記
 
-実験的に仮名とキリル文字の変換をする。キリル文字に詳しい方の確認がありませんので、その結果をよく確認しますように。
+    use Lingua::JA::Moji 'yurei_moji';
+
+
+
+
+
+
+
+=head2 bad_kanji 
+
+
+
+    use Lingua::JA::Moji 'bad_kanji';
+
+
 
 
 
@@ -1322,7 +1336,8 @@ based on copy and paste of the Unicode 10.0 standard draft
 documents. See the directory L<F<data>|https://github.com/benkasminbullock/Lingua-JA-Moji/tree/master/data> in the github repository for the files used to
 generate this data.
 
-0.46 disallowed hyphens as the first character of a romaji string.
+0.46 disallowed hyphens as the first character of a romaji string and
+added L</smallize_kana> and L</cleanup_kana>.
 
 
 

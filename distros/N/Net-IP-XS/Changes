@@ -1,5 +1,8 @@
 Revision history for Net-IP-XS
 
+0.20    26 October 2017
+        - Fix subroutine redefinition problem (RT #122438).
+
 0.19    5 November 2016
         - Updated manifest.
 

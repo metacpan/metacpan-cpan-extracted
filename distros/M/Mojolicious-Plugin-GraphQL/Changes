@@ -1,5 +1,8 @@
 Revision history for Mojolicious::Plugin::GraphQL
 
+0.06    Wed Nov  1 04:04:22 GMT 2017
+ - use convert plugin
+
 0.05    Sun Oct 22 23:58:25 BST 2017
  - no XML-encode the JS values for GraphiQL
 

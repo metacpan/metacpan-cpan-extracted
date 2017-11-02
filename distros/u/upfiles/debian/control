@@ -1,0 +1,41 @@
+# Copyright 2009, 2010, 2011, 2012, 2013, 2014, 2016, 2017 Kevin Ryde
+
+# This file is part of Upfiles.
+
+# Upfiles is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the
+# Free Software Foundation; either version 3, or (at your option) any later
+# version.
+#
+# Upfiles is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with Upfiles.  If not, see <http://www.gnu.org/licenses/>.
+
+
+# Build-Depends could have the "maximum_tests" modules from META.yml
+# for more tests, but they're optional author tests really and would
+# just make the build tools drag in more stuff.
+#
+# libnet-sftp-foreign-perl depends on openssh-client | ssh-client
+# needed for its operation, so nothing explicit here.
+
+Source: upfiles
+Section: web
+Priority: optional
+Build-Depends: cdbs, debhelper (>= 5)
+Maintainer: Kevin Ryde <user42_kevin@yahoo.com.au>
+Standards-Version: 4.1.1
+Homepage: http://user42.tuxfamily.org/upfiles/index.html
+Bugs: mailto:user42_kevin@yahoo.com.au
+
+Package: upfiles
+Architecture: all
+Depends: perl (>= 5.10), libdbd-sqlite3-perl, libfile-homedir-perl, libintl-perl, libmath-round-perl, libmodule-load-perl | perl (>= 5.10), libregexp-common-perl, libregexp-common-other-perl, liburi-perl, ${perl:Depends}, ${misc:Depends}
+Suggests: libintl-xs-perl, libnet-sftp-foreign-perl
+Description: Upload files to an FTP server
+ Upload changed files from your local disk to an FTP, FTPS or SFTP
+ server, as a simple "push" mirroring.

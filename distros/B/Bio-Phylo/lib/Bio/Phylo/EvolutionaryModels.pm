@@ -1,5 +1,6 @@
 package Bio::Phylo::EvolutionaryModels;
 use strict;
+use warnings;
 use base 'Exporter';
 use Bio::Phylo::Forest::Tree;
 use Bio::Phylo::Forest;
@@ -10,8 +11,7 @@ use Config;    #Use to check whether multi-threading is available
 
 BEGIN {
 
-    # set the version for version checking
-    use Bio::Phylo; our $VERSION = $Bio::Phylo::VERSION;
+    use Bio::Phylo;
     our @EXPORT_OK =
       qw(&sample &constant_rate_birth &constant_rate_birth_death &clade_shifts);
 }

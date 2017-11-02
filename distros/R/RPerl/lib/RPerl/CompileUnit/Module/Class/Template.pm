@@ -1,13 +1,19 @@
 # [[[ PREPROCESSOR ]]]
 # <<< CHANGE_ME: delete unused directives >>>
-# <<< TYPE_CHECKING: OFF >>>
-# <<< TYPE_CHECKING: ON >>>
-# <<< TYPE_CHECKING: TRACE >>>
+# <<< TYPE_CHECKING: OFF or ON or TRACE >>>
+# <<< PARSE: OFF or ON >>>
 # <<< PARSE_ERROR: 'FOO' >>>
+# <<< GENERATE: OFF or ON >>>
 # <<< GENERATE_ERROR: 'FOO' >>>
+# <<< COMPILE: OFF or ON >>>
 # <<< COMPILE_ERROR: 'FOO' >>>
+# <<< EXECUTE: OFF or ON >>>
 # <<< EXECUTE_ERROR: 'FOO' >>>
 # <<< EXECUTE_SUCCESS: 'FOO' >>>
+# <<< EXECUTE_SUCCESS_INTEGER_32: 'FOO' >>>
+# <<< EXECUTE_SUCCESS_INTEGER_64: 'FOO' >>>
+# <<< EXECUTE_SUCCESS_NUMBER_32: 'FOO' >>>
+# <<< EXECUTE_SUCCESS_NUMBER_64: 'FOO' >>>
 
 # [[[ HEADER ]]]
 # <<< CHANGE_ME: replace with real class name >>>
@@ -57,14 +63,21 @@ use RPerl::CompileUnit::Module::Class;
 ## no critic qw(ProhibitBacktickOperators)  # SYSTEM SPECIAL 11: allow system command execution
 ## no critic qw(ProhibitCascadingIfElse)  # SYSTEM SPECIAL 12: allow complex conditional logic
 ## no critic qw(RequireCarping)  # SYSTEM SPECIAL 13: allow die instead of croak
-## no critic qw(ProhibitAutomaticExportation)  # SYSTEM SPECIAL 14: allow global exports from Config.pm
+## no critic qw(ProhibitAutomaticExportation)  # SYSTEM SPECIAL 14: allow global exports from Config.pm & elsewhere
+## no critic qw(ProhibitPackageVars)  # SYSTEM SPECIAL 15: allow package variables for exports tests
 
 # COMBO CRITICS
 ## no critic qw(ProhibitUselessNoCritic PodSpelling ProhibitExcessMainComplexity)  # DEVELOPER DEFAULT 1a: allow unreachable & POD-commented code; SYSTEM SPECIAL 4: allow complex code outside subroutines, must be on line 1
 
+# [[[ EXPORTS ]]]
+# <<< CHANGE_ME: delete for no exports, or replace with real names of subroutines (not methods) to be exported >>>
+use RPerl::Exporter qw(import);
+our @EXPORT    = qw(pies_are_round pi_r_squared);
+our @EXPORT_OK = qw(garply gorce);
+
 # [[[ INCLUDES ]]]
 # <<< CHANGE_ME: delete for no includes, or replace with real include package name(s) >>>
-use RPerl::Test::Foo;
+use RPerl::Test::Foo qw(ylprag ecrog);
 use RPerl::Test::Bar;
 
 # [[[ CONSTANTS ]]]
@@ -100,18 +113,22 @@ our hashref $properties = {
 # [[[ SUBROUTINES & OO METHODS ]]]
 
 # <<< CHANGE_ME: delete for no subroutines/methods, or replace with real subroutine(s)/method(s) >>>
-our void $pies_are_round = sub {
-    print 'in subroutine pies_are_round(), having PIE() = ', PIE(), "\n";
-};
+sub pies_are_round {
+    { my void $RETURN_TYPE };
+    print 'in pies_are_round(), having PIE() = ', PIE(), "\n";
+    return;
+}
 
-our number $pi_r_squared = sub {
+sub pi_r_squared {
+    { my number $RETURN_TYPE };
     ( my number $r ) = @ARG;
     my number $area = PI() * $r ** 2;
-    print 'in subroutine pi_r_squared(), have $area = PI() * $r ** 2 = ', $area, "\n";
+    print 'in pi_r_squared(), have $area = PI() * $r ** 2 = ', $area, "\n";
     return $area;
-};
+}
 
-our number_arrayref $garply = sub {
+sub garply {
+    { my number_arrayref $RETURN_TYPE };        
     ( my integer $garply_input, my number_arrayref $garply_array ) = @ARG;
     my integer $garply_input_size = scalar @{$garply_array};
     my integer $ungarply_size_typed = scalar @{my integer_arrayref $TYPED_ungarply = [4, 6, 8, 10]};
@@ -122,9 +139,10 @@ our number_arrayref $garply = sub {
         $garply_input * $garply_array->[2]
     ];
     return $garply_output;
-};
+}
 
-our string_hashref $gorce = sub {
+sub gorce {
+    { my string_hashref $RETURN_TYPE };
     ( my integer $al, my number $be, my string $ga, my string_hashref $de) = @ARG;
     return {
         alpha => integer_to_string($al),
@@ -132,30 +150,35 @@ our string_hashref $gorce = sub {
         gamma => $ga,
         delta => %{$de}
     };
-};
+}
 
-our void::method $quux = sub {
+sub quux {
+    { my void::method $RETURN_TYPE };
     ( my object $self) = @ARG;
     $self->{plugh} = $self->{plugh} * 2;
-};
+    return;
+}
 
-our integer::method $quince = sub {
+sub quince {
+    { my integer::method $RETURN_TYPE };
     my string $quince_def
         = '...Cydonia vulgaris ... Cydonia, a city in Crete ... [1913 Webster]';
     print $quince_def;
     return (length $quince_def);
 };
 
-our string_hashref::method $qorge = sub {
+sub qorge {
+    { my string_hashref::method $RETURN_TYPE };
     ( my object $self, my integer $qorge_input ) = @ARG;
     return {
         a => $self->{xyzzy} x $qorge_input,
         b => 'howdy',
         c => q{-23.42}
     };
-};
+}
 
-our RPerl::CompileUnit::Module::Class::Template_arrayref::method $qaft = sub {
+sub qaft {
+    { my RPerl::CompileUnit::Module::Class::Template_arrayref::method $RETURN_TYPE };
     ( my object $self, my integer $foo, my number $bar, my string $bat, my string_hashref $baz ) = @ARG;
     my RPerl::CompileUnit::Module::Class::Template_arrayref $retval = [];
     $retval->[0] = RPerl::CompileUnit::Module::Class::Template->new();
@@ -165,7 +188,7 @@ our RPerl::CompileUnit::Module::Class::Template_arrayref::method $qaft = sub {
     $retval->[2] = RPerl::CompileUnit::Module::Class::Template->new();
     $retval->[2]->{xyzzy} = 'moe';
     return $retval;
-};
+}
 
 1;    # end of class
 
@@ -187,6 +210,7 @@ our $VERSION = 0.001_000;
 use parent qw(RPerl::CompileUnit::Module::Class::Template);  # SHORTHAND CLASS: inherit subroutines & OO methods from parent class
 require RPerl::CompileUnit::Module::Class::Template;
 
+# NEED ANSWER: are these parent class properties automatically inherited or do we really need to explicitly inherit as shown below???
 # [[[ OO PROPERTIES ]]]
 # <<< CHANGE_ME: replace with real parent class name >>>
 our hashref $properties = $RPerl::CompileUnit::Module::Class::Template;  # SHORTHAND CLASS: no additional properties, only inherit from parent class

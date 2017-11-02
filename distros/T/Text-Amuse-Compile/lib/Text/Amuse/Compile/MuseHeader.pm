@@ -236,6 +236,12 @@ sub _build_nofinalpage {
     return !!$self->header->{nofinalpage};
 }
 
+has impressum => (is => 'lazy', isa => Bool);
+
+sub _build_impressum {
+    my $self = shift;
+    return !!$self->header->{impressum};
+}
 
 
 has topics => (is => 'lazy', isa => ArrayRef);

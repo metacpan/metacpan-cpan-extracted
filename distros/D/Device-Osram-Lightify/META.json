@@ -4,7 +4,7 @@
       "Steve Kemp <steve@steve.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.140640",
    "license" : [
       "perl_5"
    ],
@@ -52,5 +52,5 @@
          "url" : "https://github.com/skx/Device-Osram-Lightify.git"
       }
    },
-   "version" : "0.6"
+   "version" : "v0.7.1"
 }

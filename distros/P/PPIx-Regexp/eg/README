@@ -7,6 +7,11 @@ interpolated - is a script that takes as its arguments a list of files
     interpolate. If the -once option is asserted, only those expressions
     which interpolate and do not have the /o modifier are listed.
 
+preaccepts - is a script that takes as its arguments a Perl regular
+    expression and one or more Perl version numbers. For each Perl
+    version number, it displays whether that version of Perl considers
+    the regular expression to be valid.
+
 predump - is a script that takes as its argument a regular expression,
     and dumps the parse tree. Various command options are available to
     control the dump. The -help option gets you complete documentation
@@ -21,3 +26,5 @@ preslurp - is a script that makes files into PPI::Document objects, then
     dumps them. Various command options are available to control the
     dump. The -help option gets you complete documentation of the
     script.
+
+# ex: set textwidth=72 autoindent :

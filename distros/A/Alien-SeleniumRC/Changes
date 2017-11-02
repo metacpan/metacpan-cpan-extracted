@@ -1,3 +1,7 @@
+3.6 - Sun Oct 28 17:28:00 AEDT 2017
+ - Upgrade to Selenium 3.6.0
+ - Changed module version to track Selenium Server
+
 2.95 - Mon Aug 10 13:08:00 AEDT 2015
  - Update to Selenium 2.47.1
 

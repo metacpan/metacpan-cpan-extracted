@@ -1,5 +1,5 @@
 package Net::HTTP::Spore::Role::UserAgent;
-$Net::HTTP::Spore::Role::UserAgent::VERSION = '0.07';
+$Net::HTTP::Spore::Role::UserAgent::VERSION = '0.09';
 # ABSTRACT: create UserAgent
 
 use Moose::Role;
@@ -34,7 +34,7 @@ Net::HTTP::Spore::Role::UserAgent - create UserAgent
 
 =head1 VERSION
 
-version 0.07
+version 0.09
 
 =head1 AUTHORS
 

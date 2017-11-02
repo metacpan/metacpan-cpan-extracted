@@ -4,7 +4,7 @@ package WebService::BitbucketServer::WADL;
 use warnings;
 use strict;
 
-our $VERSION = '0.601'; # VERSION
+our $VERSION = '0.602'; # VERSION
 
 use WebService::BitbucketServer::Spec qw(api_info documentation_url package_name sub_name);
 
@@ -514,7 +514,7 @@ WebService::BitbucketServer::WADL - Subroutines for parsing WADL and generating 
 
 =head1 VERSION
 
-version 0.601
+version 0.602
 
 =head1 FUNCTIONS
 

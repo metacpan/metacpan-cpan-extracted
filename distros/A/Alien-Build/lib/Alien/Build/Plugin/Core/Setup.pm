@@ -7,7 +7,7 @@ use Config;
 use File::Which qw( which );
 
 # ABSTRACT: Core setup plugin
-our $VERSION = '1.25'; # VERSION
+our $VERSION = '1.28'; # VERSION
 
 
 sub init
@@ -84,7 +84,7 @@ Alien::Build::Plugin::Core::Setup - Core setup plugin
 
 =head1 VERSION
 
-version 1.25
+version 1.28
 
 =head1 SYNOPSIS
 
@@ -146,6 +146,10 @@ Petr Pisar (ppisar)
 Lance Wicks (LANCEW)
 
 Ahmad Fatoum (a3f, ATHREEF)
+
+José Joaquín Atria (JJATRIA)
+
+Duke Leto (LETO)
 
 =head1 COPYRIGHT AND LICENSE
 

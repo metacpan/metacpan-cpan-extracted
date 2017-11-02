@@ -1,5 +1,8 @@
 Revision history for Map::Tube::CLI
 
+0.33  Wed Nov 01 11:05:00 2017
+      - [RT #123467] Fixed the issue with non-ascii chars, thanks @SREZIC.
+
 0.32  Fri Oct 06 11:25:00 2017
       - Upgraded dependency on Map::Tube v3.35
 

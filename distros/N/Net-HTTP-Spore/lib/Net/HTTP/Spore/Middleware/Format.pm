@@ -1,5 +1,5 @@
 package Net::HTTP::Spore::Middleware::Format;
-$Net::HTTP::Spore::Middleware::Format::VERSION = '0.07';
+$Net::HTTP::Spore::Middleware::Format::VERSION = '0.09';
 # ABSTRACT: base class for formats middlewares
 
 use Moose;
@@ -78,7 +78,7 @@ Net::HTTP::Spore::Middleware::Format - base class for formats middlewares
 
 =head1 VERSION
 
-version 0.07
+version 0.09
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,5 @@
 # *************************************************************************
-# Copyright (c) 2014-2015, SUSE LLC
+# Copyright (c) 2014-2017, SUSE LLC
 #
 # All rights reserved.
 #
@@ -55,6 +55,7 @@ use App::Dochazka::REST::Holiday qw(
     canon_to_ymd
     get_tomorrow
     holidays_in_daterange
+    tsrange_to_dates_and_times
     ymd_to_canon
 );
 use Data::Dumper;
@@ -429,13 +430,14 @@ sub _vet_employee {
     die 'AKLDWW###%AAAAAH!' unless $ARGS{emp_obj}->eid;
     $self->{'emp_obj'} = $ARGS{emp_obj};
 
-    # check for priv and schedule changes during the tsrange
+    $log->debug( "Fillup _vet_employee(): check for priv changes during the tsrange" );
     if ( $self->{'emp_obj'}->priv_change_during_range( 
         $self->context->{'dbix_conn'}, 
         $self->tsrange->{'tsrange'},
     ) ) {
         return $CELL->status_err( 'DOCHAZKA_EMPLOYEE_PRIV_CHANGED' ); 
     }
+    $log->debug( "Fillup _vet_employee(): check for schedule changes during the tsrange" );
     if ( $self->{'emp_obj'}->schedule_change_during_range(
         $self->context->{'dbix_conn'}, 
         $self->tsrange->{'tsrange'},
@@ -563,7 +565,7 @@ Fillup object) and the employee's schedule.
 Note that the purpose of this method is to generate a set of Tempintvl
 objects that could potentially become attendance intervals. The
 C<fillup_tempintvls> method only deals with Tempintvls. It is up to the 
-C<fillup_commit> method to choose the right Tempintvls for the fillup
+C<commit> method to choose the right Tempintvls for the fillup
 operation in question and to construct and insert the corresponding
 Interval objects.
 
@@ -708,12 +710,21 @@ sub new {
 
 =head2 commit
 
-If the C<dry_run> attribute is true, merely SELECTs rows from the
-C<tempintvls> table corresponding to the vetted tsrange(s).  This SELECT
-will generate an array of C<interval> objects.
+If the C<dry_run> attribute is true, assemble and return an array of attendance
+intervals that would need to be created to reach 100% schedule fulfillment over
+the tsranges.
 
-If the C<dry_run> attribute is false, all the intervals from the SELECT are
-INSERTed into the intervals table.
+If the C<dry_run> attribute is false, iterate over all those intervals and
+INSERT them into the intervals table.
+
+Alternatively, if C<dry_run> is true and C<clobber> is true, ignore existing
+attendance intervals that might conflict and just return the scheduled intervals.
+If C<dry_run> is false, C<clobber> setting is ignored.
+
+Returns a status object containing all the fillup intervals generated, divided
+into "success" and "failure" sets, with the latter containing any intervals
+that failed to be inserted for whatever reason. If C<dry_run> is true, all the
+intervals will be in the "success" set.
 
 =cut
 
@@ -721,87 +732,188 @@ sub commit {
     my $self = shift;
     $log->debug( "Entering " . __PACKAGE__ . "::commit with dry_run " . ( $self->dry_run ? "TRUE" : "FALSE" ) );
 
-    my ( $status, @result_set, @fail_set, $count, $ok_count, $not_ok_count, @deleted_set );
+    my ( $code, $status, @result_set, @conflicting, @success_set, @failure_set );
 
-    $ok_count = 0;
-    $not_ok_count = 0;
     foreach my $t_hash ( @{ $self->tsranges } ) {
-
         my $tempintvls = fetch_tempintvls_by_tiid_and_tsrange(
             $self->context->{dbix_conn},
             $self->tiid,
             $t_hash->{tsrange},
         );
 
-        # For each tempintvl object, make a corresponding interval object
+        # Iterate over the tempintvl objects, each of which corresponds
+        # to a scheduled interval in the fillup period.
         TEMPINTVL_LOOP: foreach my $tempintvl ( @$tempintvls ) {
 
-            # if clobber is true, we have to check each interval for
-            # overlaps and delete those to avoid the trigger (note that
-            # this does not actually delete anything if dry_run is true)
-            push @deleted_set, @{ $self->_clobber_intervals( $tempintvl ) } if $self->clobber;
-
-            my $int = App::Dochazka::REST::Model::Interval->spawn(
-                          eid => $self->emp_obj->eid,
-                          aid => $self->act_obj->aid,
-                          code => $self->act_obj->code,
-                          intvl => $tempintvl->intvl,
-                          long_desc => $self->long_desc,
-                          remark => $self->remark || 'fillup',
-                          partial => 0,
-                      );
-
-            # INSERT only if not dry run
-            if ( ! $self->dry_run ) {
-                $status = $int->insert( $self->context );
-                if ( $status->not_ok ) {
-                    push @fail_set, {
-                        interval => $int,
-                        status => $status->expurgate,
-                    };
-                    $not_ok_count += 1;
-                    next TEMPINTVL_LOOP;
-                }
+            if ( $self->clobber ) {
+                push @result_set, $self->_gen_int( $tempintvl->intvl );
+                next TEMPINTVL_LOOP;
             }
 
-            push @result_set, $int;
-            $ok_count += 1;
-        }
+            # check for existing attendance intervals that conflict
+            @conflicting = ();
+            push @conflicting, @{ $self->_conflicting_intervals( $tempintvl ) };
+            $log->debug( "Conflicting intervals" . Dumper \@conflicting );
 
+            # for each conflicting interval, generate new intervals to 
+            # reach 100% fulfillment of the scheduled interval
+            my $conflicts = scalar @conflicting;
+            my $count = 0;
+            CONFLICTING_LOOP: foreach my $this ( @conflicting ) {
+                my ( $next, $newintvl );
+                if ( $count == 0 ) {
+                    # $newintvl might be from the beginning of $tempintvl to the $beginning of $this
+                    $self->_tsrange_begin_to_begin( $tempintvl, $this, \@result_set );
+                }
+                if ( $count < $conflicts - 1 ) {
+                    $next = $conflicting[$count + 1];
+                    # $newintvl might be from the end of $this to the beginning of $next
+                    $self->_tsrange_end_to_begin( $this, $next, \@result_set );
+                }
+                if ( $count == $conflicts - 1 ) {
+                    # $newintvl might be from the end of $this to the end of $tempintvl
+                    $self->_tsrange_end_to_end( $this, $tempintvl, \@result_set );
+                }
+                $count += 1;
+            }
+
+            if ( $count == 0 ) {
+                push @result_set, $self->_gen_int( $tempintvl->intvl );
+            }
+        }
     }
 
-    $count = $ok_count + $not_ok_count;
+    foreach my $int ( @result_set ) {
+        if ( $self->dry_run ) {
+            push @success_set, $int;
+        } else {
+            $status = $int->insert( $self->context );
+            if ( $status->ok ) {
+                push @success_set, $int;
+            } else {
+                push @failure_set, {
+                    interval => $int,
+                    status => $status->expurgate,
+                };
+            }
+        }
+    }
+
     my $pl = {
                 "success" => {
-                    count => $ok_count,
-                    intervals => \@result_set, 
+                    count => scalar @success_set,
+                    intervals => \@success_set,
                 },
                 "failure" => {
-                    count => $not_ok_count,
-                    intervals => \@fail_set,
+                    count => scalar @failure_set,
+                    intervals => \@failure_set,
                 },
             };
-    $pl->{"clobbered"} = {
-        count => scalar( @deleted_set ),
-        intervals => \@deleted_set
-    } if $self->clobber;
-    if ( $count ) {
+    if ( my $count = scalar @result_set ) {
+        $code = 'DISPATCH_SCHEDULED_INTERVALS_' . ( $self->dry_run ? 'IDENTIFIED' : 'CREATED' );
         return $CELL->status_ok( 
-            'DISPATCH_FILLUP_INTERVALS_CREATED', 
+            $code,
             args => [ $count ],
             payload => $pl,
             count => $count, 
         );
     }
-    return $CELL->status_ok( 'DISPATCH_FILLUP_NO_INTERVALS_CREATED', count => 0 );
+    $code = 'DISPATCH_NO_SCHEDULED_INTERVALS_' . ( $self->dry_run ? 'IDENTIFIED' : 'CREATED' );
+    return $CELL->status_ok( 'DISPATCH_NO_SCHEDULED_INTERVALS_CREATED', count => 0 );
 }
 
-# given a tempintvl object, clobbers any intervals that conflict with it,
-# logs errors and returns reference to set of deleted interval objects
-sub _clobber_intervals {
+sub _gen_int {
+    my ( $self, $intvl ) = @_;
+    return App::Dochazka::REST::Model::Interval->spawn(
+        eid => $self->emp_obj->eid,
+        aid => $self->act_obj->aid,
+        code => $self->act_obj->code,
+        intvl => $intvl,
+        long_desc => $self->long_desc,
+        remark => $self->remark || 'fillup',
+        partial => 0,
+    );
+}
+
+# Given two intervals which are assumed to be in order, construct a new
+# interval from the beginning of the first to the beginning of the second
+# and push it onto @$result_set
+sub _tsrange_begin_to_begin {
+    my ( $self, $this, $next, $result_set ) = @_;
+
+    my ( $status, $pl, $t );
+
+    $status = tsrange_to_dates_and_times( $this->intvl );
+    return unless $status->ok;
+    $pl = $status->payload;
+    my $this_begin = "\"" . $pl->{begin}->[0] . " " . $pl->{begin}->[1] . "\"";
+
+    $status = tsrange_to_dates_and_times( $next->intvl );
+    return unless $status->ok;
+    $pl = $status->payload;
+    my $next_begin = "\"" . $pl->{begin}->[0] . " " . $pl->{begin}->[1] . "\"";
+
+    $t = "[ " . $this_begin . ", " . $next_begin . " )";
+    $status = canonicalize_tsrange( $self->context->{dbix_conn}, $t );
+    return unless $status->ok;
+    push @$result_set, $self->_gen_int( $status->payload );
+}
+
+# Given two intervals which are assumed to be in order, construct a new
+# interval from the end of the first to the beginning of the second
+# and push it onto @$result_set
+sub _tsrange_end_to_begin {
+    my ( $self, $this, $next, $result_set ) = @_;
+
+    my ( $status, $pl, $t );
+
+    $status = tsrange_to_dates_and_times( $this->intvl );
+    return unless $status->ok;
+    $pl = $status->payload;
+    my $this_end   = "\"" . $pl->{end}->[0]   . " " . $pl->{end}->[1]   . "\"";
+
+    $status = tsrange_to_dates_and_times( $next->intvl );
+    return unless $status->ok;
+    $pl = $status->payload;
+    my $next_begin = "\"" . $pl->{begin}->[0] . " " . $pl->{begin}->[1] . "\"";
+
+    $t = "[ " . $this_end . ", " . $next_begin . " )";
+    $status = canonicalize_tsrange( $self->context->{dbix_conn}, $t );
+    return unless $status->ok;
+    push @$result_set, $self->_gen_int( $status->payload );
+}
+
+# Given two intervals which are assumed to be in order, construct a new
+# interval from the end of the first to the end of the second
+# and push it onto @$result_set
+sub _tsrange_end_to_end {
+    my ( $self, $this, $next, $result_set ) = @_;
+
+    my ( $status, $pl, $t );
+
+    $status = tsrange_to_dates_and_times( $this->intvl );
+    return unless $status->ok;
+    $pl = $status->payload;
+    my $this_end   = "\"" . $pl->{end}->[0]   . " " . $pl->{end}->[1]   . "\"";
+
+    $status = tsrange_to_dates_and_times( $next->intvl );
+    return unless $status->ok;
+    $pl = $status->payload;
+    my $next_end   = "\"" . $pl->{end}->[0]   . " " . $pl->{end}->[1]   . "\"";
+
+    $t = "[ " . $this_end . ", " . $next_end . " )";
+    $status = canonicalize_tsrange( $self->context->{dbix_conn}, $t );
+    return unless $status->ok;
+    push @$result_set, $self->_gen_int( $status->payload );
+}
+
+# Given a tempintvl object (which represents a single scheduled interval), find
+# and return reference to array of existing attendance intervals that conflict
+# with it.
+sub _conflicting_intervals {
     my ( $self, $tempintvl ) = @_;
 
-    my @clobbered_intervals = ();
+    my @conflicting_intervals = ();
 
     my $status = fetch_intervals_by_eid_and_tsrange_inclusive(
         $self->context->{'dbix_conn'},
@@ -810,26 +922,15 @@ sub _clobber_intervals {
     );
     if ( $status->ok and $status->code eq 'DISPATCH_RECORDS_FOUND' ) {
         foreach my $int ( @{ $status->payload } ) {
-            if ( $self->dry_run ) {
-                push @clobbered_intervals, $int;
-            } else {
-                my $saved_int = $int->clone;
-                my $status = $int->delete( $self->context );
-                if ( $status->ok ) {
-                    push @clobbered_intervals, $saved_int;
-                } else {
-                    $log->error( "Could not delete interval " . $int->intvl .
-                                 " due to " .  $status->text );
-                }
-            }
+            push @conflicting_intervals, $int;
         }
     } elsif ( $status->level eq 'NOTICE' and $status->code eq 'DISPATCH_NO_RECORDS_FOUND' ) {
-        $log->debug( "Interval " . $tempintvl->intvl . 
+        $log->debug( "Scheduled interval " . $tempintvl->intvl . 
                      " does not overlap with any existing intervals" );
     } else {
-        $log->crit( "FILLUP COMMIT: " . $status->text );
+        $log->crit( "IN FILLUP, FAILED TO FETCH CONFLICTING INTERVALS: " . $status->text );
     }
-    return \@clobbered_intervals;
+    return \@conflicting_intervals;
 }
 
 

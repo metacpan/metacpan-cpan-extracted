@@ -4,11 +4,12 @@ author:
   - 'James E Keenan (jkeenan@cpan.org)'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  String::Random: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
-license: unknown
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -19,10 +20,14 @@ no_index:
     - inc
 requires:
   Carp: '0'
+  File::Find: '0'
   File::Path: '0'
   File::Spec: '0'
   File::Temp: '0'
-  String::PerlIdentifier: '0'
   Test::Simple: '0.44'
-version: '0.10'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=File-Save-Home
+  homepage: http://thenceforward.net/perl/modules/File-Save-Home/
+  repository: https://github.com/jkeenan/file-save-home.git
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

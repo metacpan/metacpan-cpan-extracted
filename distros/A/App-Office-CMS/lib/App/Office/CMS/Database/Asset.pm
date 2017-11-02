@@ -1,16 +1,15 @@
 package App::Office::CMS::Database::Asset;
 
-use Any::Moose;
-use common::sense;
+use strict;
+use warnings;
 
 use Date::Format;
 
+use Moo;
+
 extends 'App::Office::CMS::Database::Base';
 
-# If Moose...
-#use namespace::autoclean;
-
-our $VERSION = '0.92';
+our $VERSION = '0.93';
 
 # --------------------------------------------------
 
@@ -157,10 +156,5 @@ sub update
 } # End of update.
 
 # --------------------------------------------------
-
-no Any::Moose;
-
-# If Moose...
-#__PACKAGE__ -> meta -> make_immutable;
 
 1;

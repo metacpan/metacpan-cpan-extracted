@@ -1,9 +1,15 @@
 Build.PL
-ChangeLog
-ChangeLog.0
-Changes
-configure
 COPYING
+ChangeLog
+Changes
+GNUmakefile
+MANIFEST			This list of files
+META.json
+META.yml			# Will be created by "make dist"
+Makefile.PL
+README.md
+THANKS
+configure
 data/cdda.bin
 data/cdda.cue
 data/cdda.toc
@@ -11,9 +17,11 @@ data/copying.iso
 data/isofs-m1.bin
 data/isofs-m1.cue
 examples/.gitignore
+examples/README
 examples/audio.pl
 examples/cd-read.pl
 examples/cdchange.pl
+examples/cdtext.pl
 examples/checkcd.pl
 examples/device.pl
 examples/drives.pl
@@ -22,7 +30,6 @@ examples/iso0.pl
 examples/iso1.pl
 examples/iso2.pl
 examples/iso3.pl
-examples/README
 examples/tracks.pl
 lib/Device/Cdio.pm
 lib/Device/Cdio/Device.pm
@@ -34,15 +41,11 @@ lib/Device/Cdio/Util.pm
 lib/perlcdio.pm
 lib/perliso9660.pm
 lib/perlmmc.pm
-Makefile
-Makefile.PL
-MANIFEST
-META.yml			# Will be created by "make dist"
 perlcdio_wrap.c
 perliso9660_wrap.c
 perlmmc_wrap.c
-README.md
 swig/audio.swg
+swig/cdtext.swg
 swig/device.swg
 swig/device_const.swg
 swig/disc.swg
@@ -66,8 +69,8 @@ t/07.iso1.t
 t/07.iso2.t
 t/07.iso3.t
 t/10.cdda.t
+t/10.cdtext.t
 t/10.read.t
 t/11.dev.t
-THANKS
-META.json
+t/cdtext.toc
 SIGNATURE    Added here by Module::Build

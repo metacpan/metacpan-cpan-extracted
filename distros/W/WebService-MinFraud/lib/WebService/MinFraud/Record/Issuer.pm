@@ -3,7 +3,7 @@ package WebService::MinFraud::Record::Issuer;
 use Moo;
 use namespace::autoclean;
 
-our $VERSION = '1.005000';
+our $VERSION = '1.005001';
 
 use WebService::MinFraud::Types qw( Bool BoolCoercion Str );
 
@@ -49,7 +49,7 @@ WebService::MinFraud::Record::Issuer - Contains data for the issuer of the credi
 
 =head1 VERSION
 
-version 1.005000
+version 1.005001
 
 =head1 SYNOPSIS
 

@@ -6,7 +6,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME         => 'mem',
     VERSION_FROM => 'lib/mem.pm', # finds \$VERSION
-    AUTHOR       => 'Linda Walsh (LAWALSH@cpan.org)',
+		AUTHOR       => 'LA Walsh <LAWALSH@cpan.org>',
     ABSTRACT     => "allow use of packages already in 'mem'ory",
     BUILD_REQUIRES=> { 'ExtUtils::MakeMaker' => 6.82, },
     TEST_REQUIRES=> {

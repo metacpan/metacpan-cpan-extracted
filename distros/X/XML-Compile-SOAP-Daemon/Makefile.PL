@@ -2,7 +2,7 @@ use ExtUtils::MakeMaker;
 
 use 5.008;
 
-my $version = '3.12';
+my $version = '3.13';
 
 my $devel   = exists $ENV{MARKOV_DEVEL};
 
@@ -13,7 +13,7 @@ my %prereq  =
   , XML::Compile::Tester => '0.90'
   , XML::Compile::Cache  => 0.991
 
-  , Log::Report     => 0.90
+  , Log::Report     => 1.23
   , Time::HiRes     => 0
   , Test::More      => 0.54
 
@@ -60,13 +60,12 @@ sub MY::postamble { <<'__POSTAMBLE' }
 # for DIST
 RAWDIR          = ../public_html/xml-compile-soap-daemon/raw
 DISTDIR         = ../public_html/xml-compile-soap-daemon/source
-LICENSE         = artistic
-SKIP_LINKS	= XML::LibXML
+SKIP_LINKS      = XML::LibXML
 
 # for POD
-EXTENDS		= ../XMLCompile:../XMLSOAP:../XMLTester:../XMLCache
+EXTENDSi        = ../XMLCompile:../XMLSOAP:../XMLTester:../XMLCache
 FIRST_YEAR      = 2007
 EMAIL           = perl@overmeer.net
 WEBSITE         = http://perl.overmeer.net/xml-compile/
-PODTAIL		= ../XML-shared-podtail
+PODTAIL         = ../XML-shared-podtail
 __POSTAMBLE

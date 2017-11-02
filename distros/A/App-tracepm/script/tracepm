@@ -5,7 +5,7 @@
 
 our $DATE = '2017-07-29'; # DATE
 our $DIST = 'App-tracepm'; # DIST
-our $VERSION = '0.21'; # VERSION
+our $VERSION = '0.22'; # VERSION
 
 use 5.010001;
 use strict;
@@ -33,7 +33,7 @@ tracepm - Trace dependencies of your Perl script
 
 =head1 VERSION
 
-This document describes version 0.21 of tracepm (from Perl distribution App-tracepm), released on 2017-07-29.
+This document describes version 0.22 of tracepm (from Perl distribution App-tracepm), released on 2017-07-29.
 
 =head1 SYNOPSIS
 

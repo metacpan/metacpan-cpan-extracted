@@ -2,7 +2,7 @@ package App::Yath::Command::test;
 use strict;
 use warnings;
 
-our $VERSION = '0.001026';
+our $VERSION = '0.001030';
 
 use Test2::Harness::Util::TestFile;
 use Test2::Harness::Feeder::Run;
@@ -64,8 +64,13 @@ sub handle_list_args {
         return if grep { $_->block_default_search($settings) } keys %{$settings->{plugins}};
         return unless $settings->{default_search};
 
+        my @search = @{$settings->{default_search}};
+
+        push @search => @{$settings->{default_at_search}}
+            if $ENV{AUTHOR_TESTING} || $settings->{env_vars}->{AUTHOR_TESTING};
+
         my (@dirs, @files);
-        for my $path (@{$settings->{default_search}}) {
+        for my $path (@search) {
             if (-d $path) {
                 push @dirs => $path;
                 next;
@@ -80,24 +85,6 @@ sub handle_list_args {
     }
 }
 
-sub normalize_settings {
-    my $self = shift;
-
-    $self->SUPER::normalize_settings(@_);
-
-    my $settings = $self->{+SETTINGS};
-
-    return if $settings->{default_search} && @{$settings->{default_search}};
-
-    my @default = ('./t', './t2');
-    push @default => './xt' if $ENV{AUTHOR_TESTING} || $settings->{env_vars}->{AUTHOR_TESTING};
-    push @default => 'test.pl';
-
-    $settings->{default_search} = \@default;
-
-    return;
-}
-
 sub options {
     my $self = shift;
 
@@ -109,8 +96,19 @@ sub options {
             field   => 'default_search',
             used_by => {runner => 1, jobs => 1},
             section => 'Job Options',
-            usage   => ['--default_search t'],
-            long_desc => ["Specify the default file/dir search. defaults to './t', './t2', 'test.pl', and when 'AUTHOR_TESTING' is set './xt'. The default search is only used if no files were specified at the command line"],
+            usage   => ['--default-search t'],
+            default => sub { ['./t', './t2', 'test.pl'] },
+            long_desc => "Specify the default file/dir search. defaults to './t', './t2', and 'test.pl'. The default search is only used if no files were specified at the command line",
+        },
+
+        {
+            spec    => 'default-at-search=s@',
+            field   => 'default_at_search',
+            used_by => {runner => 1, jobs => 1},
+            section => 'Job Options',
+            usage   => ['--default-at-search xt'],
+            default => sub { ['./xt'] },
+            long_desc => "Specify the default file/dir search when 'AUTHOR_TESTING' is set. Defaults to './xt'. The default AT search is only used if no files were specified at the command line",
         },
     );
 }
@@ -329,7 +327,7 @@ Do not run tests with the HARNESS-CAT-LONG header
 
 =item --no-shm
 
-Use shm for tempdir if possible (Default: on)
+Use shm for tempdir if possible (Default: off)
 
 Do not use shm.
 
@@ -503,9 +501,13 @@ use Devel::Cover to calculate test coverage
 
 This is essentially the same as combining: '--no-fork', and '-MDevel::Cover=-silent,1,+ignore,^t/,+ignore,^t2/,+ignore,^xt,+ignore,^test.pl' Devel::Cover and preload/fork do not work well together.
 
-=item --default_search t
+=item --default-at-search xt
 
-ARRAY(0x2853180)
+Specify the default file/dir search when 'AUTHOR_TESTING' is set. Defaults to './xt'. The default AT search is only used if no files were specified at the command line
+
+=item --default-search t
+
+Specify the default file/dir search. defaults to './t', './t2', and 'test.pl'. The default search is only used if no files were specified at the command line
 
 =item --fork
 

@@ -1,12 +1,10 @@
-use Test::More skip_all => 'Will be fixed.';
+use Test::More;
 use Config;
 use File::Spec::Functions qw(catdir catfile rel2abs);
 use File::Temp qw(tempdir);
 use File::Copy::Recursive 'dircopy';
 use Cwd::Guard qw(cwd_guard);
 use Capture::Tiny qw(capture);
-
-
 
 my $perl = $Config{perlpath};
 my @perl = ($perl, map { "-I" . $_ } @INC);

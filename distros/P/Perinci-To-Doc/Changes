@@ -1,3 +1,9 @@
+0.861   2017-10-26 (PERLANCAR)
+
+	- Follow specification Rinci 1.1.85 (example's result is always in
+	  enveloped form).
+
+
 0.860   2017-08-12 (PERLANCAR)
 
 	- Use description.alt.env.perl before description.

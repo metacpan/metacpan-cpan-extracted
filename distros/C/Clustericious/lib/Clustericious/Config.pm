@@ -16,7 +16,7 @@ use File::Temp ();
 use Carp ();
 
 # ABSTRACT: Configuration files for Clustericious nodes.
-our $VERSION = '1.26'; # VERSION
+our $VERSION = '1.27'; # VERSION
 
 
 our %singletons;
@@ -232,7 +232,7 @@ Clustericious::Config - Configuration files for Clustericious nodes.
 
 =head1 VERSION
 
-version 1.26
+version 1.27
 
 =head1 SYNOPSIS
 

@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "XML-Compile-SOAP-Daemon",
    "no_index" : {
@@ -32,7 +32,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Log::Report" : "0.9",
+            "Log::Report" : "1.23",
             "Test::More" : "0.54",
             "Time::HiRes" : "0",
             "XML::Compile" : "1.44",
@@ -46,5 +46,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : "3.12"
+   "version" : "3.13"
 }

@@ -1,5 +1,5 @@
 #
-# $Id: Csv.pm,v 1e1671f227f5 2017/01/05 17:29:15 gomor $
+# $Id: Csv.pm,v e12400cdb4d3 2017/09/08 12:26:37 gomor $
 #
 # file::csv Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 1e1671f227f5 $',
+      revision => '$Revision: e12400cdb4d3 $',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -29,8 +29,12 @@ sub brik_properties {
          use_quoting => [ qw(0|1) ],
          use_locking => [ qw(0|1) ],
          unbuffered => [ qw(0|1) ],
+         encoded_fields => [ qw(fields) ],
+         object_fields => [ qw(fields) ],
          _csv => [ qw(INTERNAL) ],
          _fd => [ qw(INTERNAL) ],
+         _sb => [ qw(INTERNAL) ],
+         _sc => [ qw(INTERNAL) ],
       },
       attributes_default => {
          first_line_is_header => 1,
@@ -51,11 +55,25 @@ sub brik_properties {
          read_next => [ qw(input_file|OPTIONAL) ],
       },
       require_modules => {
+         'Data::Dump' => [ ],
          'Text::CSV_XS' => [ ],
          'Metabrik::File::Read' => [ ],
          'Metabrik::File::Write' => [ ],
+         'Metabrik::String::Base64' => [ ],
+         'Metabrik::String::Compress' => [ ],
       },
    };
+}
+
+sub brik_init {
+   my $self = shift;
+
+   my $sb = Metabrik::String::Base64->new_from_brik_init($self) or return;
+   my $sc = Metabrik::String::Compress->new_from_brik_init($self) or return;
+   $self->_sb($sb);
+   $self->_sc($sc);
+
+   return $self->SUPER::brik_init;
 }
 
 sub read {
@@ -78,12 +96,33 @@ sub read {
    $fr->encoding($self->encoding);
    my $fd = $fr->open($input) or return;
 
+   # When some content is too complex to be stored as a standard CSV cell,
+   # we should encode it as base64.
+   my $sb = $self->_sb;
+   my $sc = $self->_sc;
+   my $encoded_fields = $self->encoded_fields;
+   if (defined($encoded_fields)) {
+      my $str = join(',', @$encoded_fields);
+      $encoded_fields = { map { $_ => 1 } @$encoded_fields };
+      $self->log->debug("read: will decode field(s) [$str] in encoded format");
+   }
+   my $object_fields = $self->object_fields;
+   if (defined($object_fields)) {
+      my $str = join(',', @$object_fields);
+      $object_fields = { map { $_ => 1 } @$object_fields };
+      $self->log->debug("read: will decode field(s) [$str] in object format");
+   }
+
+   my $object_re = qr/^OBJECT:(.*)$/;
+   my $base64_re = qr/^BASE64:(.*)$/;  # Keep for backward compat.
+
    my $sep = $self->separator;
    my $headers;
    my $count;
    my $first_line = 1;
    my @rows = ();
    while (my $row = $csv->getline($fd)) {
+      # The CSV file has a header, we output an array of hashes
       if ($self->first_line_is_header) {
          if ($first_line) {  # This is first line
             $headers = $row;
@@ -94,11 +133,52 @@ sub read {
          }
 
          my $h;
-         for (0..$count) {
-            $h->{$headers->[$_]} = $row->[$_];
+         # We have to decode some fields
+         if ($encoded_fields || $object_fields) {
+            for (0..$count) {
+               my $k = $headers->[$_];
+               my $v = $row->[$_];
+               next unless defined($v);
+               # Decode only if it has been asked and the value is not empty.
+               # Decode the encode format
+               if ($encoded_fields && exists($encoded_fields->{$k}) && length($v)) {
+                  my $decoded = $sb->decode($v);
+                  if (! defined($decoded)) {
+                     $self->log->error("read: decode encoded format failed, ".
+                        "skipping data with length [".length($v)."]");
+                     next;
+                  }
+                  my $gunzipped = $sc->gunzip($decoded);
+                  if (! defined($gunzipped)) {
+                     $self->log->error("read: gunzip failed, skipping ".
+                        "decoded data with length [".length($decoded)."]");
+                     next;
+                  }
+                  $v = $$gunzipped;
+               }
+               # Decode the object format
+               if ($object_fields && exists($object_fields->{$k}) && length($v)
+               &&  ($v =~ $object_re || $v =~ $base64_re)) {
+                  my $decoded = $sb->decode($1);
+                  if (! defined($decoded)) {
+                     $self->log->error("read: decode object format failed, ".
+                        "skipping data with length [".length($v)."]");
+                     next;
+                  }
+                  $v = eval($decoded);
+               }
+               $h->{$k} = $v;
+            }
+         }
+         # Or not.
+         else {
+            for (0..$count) {
+               $h->{$headers->[$_]} = $row->[$_];
+            }
          }
          push @rows, $h;
       }
+      # The CSV has no header, we output an array of arrays
       else {
          push @rows, $row;
       }
@@ -142,6 +222,23 @@ sub write {
    $fw->use_locking($self->use_locking);
    $fw->unbuffered($self->unbuffered);
 
+   # When some content is too complex to be stored as a standard CSV cell,
+   # we should encode it as base64.
+   my $sb = $self->_sb;
+   my $sc = $self->_sc;
+   my $encoded_fields = $self->encoded_fields;
+   if (defined($encoded_fields)) {
+      my $str = join(',', @$encoded_fields);
+      $encoded_fields = { map { $_ => 1 } @$encoded_fields };
+      $self->log->debug("write: will encode field(s) [$str] in encoded format");
+   }
+   my $object_fields = $self->object_fields;
+   if (defined($object_fields)) {
+      my $str = join(',', @$object_fields);
+      $object_fields = { map { $_ => 1 } @$object_fields };
+      $self->log->debug("write: will encode field(s) [$str] in object format");
+   }
+
    #
    # Set header ordering
    #
@@ -182,22 +279,78 @@ sub write {
       $written .= $data;
    }
 
+   my $separator = $self->separator;
+   my $escape = $self->escape;
+
+   local $Data::Dump::INDENT = "";    # No indentation shorten length
+   local $Data::Dump::TRY_BASE64 = 0; # Never encode in base64
+
    # Write the structure to file.
    for my $this (@$csv_struct) {
       my @fields = ();
-      for my $key (keys %$this) {
-         next if (! defined($order{$key}));  # We may have some unwanted data in this HASH
-         $fields[$order{$key}] = $this->{$key};
+      # We have to decode some fields
+      if ($encoded_fields || $object_fields) {
+         for my $key (keys %$this) {
+            # We may have some unwanted data in this HASH, we skip it.
+            next if (! defined($order{$key}));
+            my $k = $key;
+            my $v = $this->{$key};
+            next unless defined($v);
+            # Encode only if it has been asked and the value is not empty.
+            if ($encoded_fields && exists($encoded_fields->{$k}) && length($v)) {
+               # Gzip to handle UTF-like encodings, cause Base64 does not like that.
+               my $gzipped = $sc->gzip($v);
+               if (! defined($gzipped)) {
+                  $self->log->error("write: gzip failed, skipping");
+                  next;
+               }
+               $v = $sb->encode($$gzipped);
+               if (! defined($v)) {
+                  $self->log->error("write: encode in encoded format failed, skipping");
+                  next;
+               }
+            }
+            # Encode only if it has been asked and the value is not empty.
+            if ($object_fields && exists($object_fields->{$k}) && length($v)) {
+               # Encode ARRAYs and HASHes only if they are not empty.
+               # Do not encode simple strings.
+               if (ref($v) eq 'ARRAY' && @$v > 0
+               ||  ref($v) eq 'HASH' && keys %$v > 0) {
+                  $v = Data::Dump::dump($v); $v =~ s{\n}{}g;
+                  $v = 'OBJECT:'.$sb->encode($v);
+                  if (! defined($v)) {
+                     $self->log->error("write: encode in object format failed, skipping");
+                     next;
+                  }
+               }
+               # If this is a simple string, we do not encode at all.
+               elsif (ref($v) eq '' && length($v)) {
+               }
+               # And for empty objects, we set them to empty string.
+               else {
+                  $v = "";
+               }
+            }
+            $fields[$order{$key}] = $v;
+         }
+      }
+      # Or not.
+      else {
+         for my $key (keys %$this) {
+            # We may have some unwanted data in this HASH, we skip it.
+            next if (! defined($order{$key}));
+            $fields[$order{$key}] = $this->{$key};
+         }
       }
 
-      @fields = map { defined($_) ? $_ : 'undef' } @fields;
+      @fields = map { defined($_) ? $_ : '' } @fields;
       if ($self->use_quoting) {
          for (@fields) {
-            s/"/\\"/g;
+            s/"/${escape}"/g;
             $_ = '"'.$_.'"';
          }
       }
-      my $data = join($self->separator, @fields)."\n";
+      my $data = join($separator, @fields)."\n";
 
       my $r = $fw->write($data);
       if (! defined($r)) {
@@ -289,6 +442,26 @@ sub read_next {
       }
    }
 
+   # When some content is too complex to be stored as a standard CSV cell,
+   # we should encode it as base64.
+   my $sb = $self->_sb;
+   my $sc = $self->_sc;
+   my $encoded_fields = $self->encoded_fields;
+   if (defined($encoded_fields)) {
+      my $str = join(',', @$encoded_fields);
+      $encoded_fields = { map { $_ => 1 } @$encoded_fields };
+      $self->log->debug("read_next: will decode field(s) [$str] in base64");
+   }
+   my $object_fields = $self->object_fields;
+   if (defined($object_fields)) {
+      my $str = join(',', @$object_fields);
+      $object_fields = { map { $_ => 1 } @$object_fields };
+      $self->log->debug("read_next: will decode field(s) [$str] in object format");
+   }
+
+   my $object_re = qr/^OBJECT:(.*)$/;
+   my $base64_re = qr/^BASE64:(.*)$/;  # Keep for backward compat.
+
    my $row = $csv->getline($fd);
 
    # If a header is given as an Attribute, we use it to return a HASH
@@ -296,8 +469,48 @@ sub read_next {
    if (defined($header)) {
       my $h = {};
       my $i = 0;
-      for (@$header) {
-         $h->{$_} = $row->[$i++];
+      # We have to decode some fields
+      if ($encoded_fields || $object_fields) {
+         for (@$header) {
+            my $k = $_;
+            my $v = $row->[$i++];
+            next unless defined($v);
+            # Decode only if it has been asked and the value is not empty.
+            # Decode the encode format
+            if ($encoded_fields && exists($encoded_fields->{$k}) && length($v)) {
+               my $decoded = $sb->decode($v);
+               if (! defined($decoded)) {
+                  $self->log->error("read_next: decode failed, skipping data with ".
+                     "with length [".length($v)."]");
+                  next;
+               }
+               my $gunzipped = $sc->gunzip($decoded);
+               if (! defined($gunzipped)) {
+                  $self->log->error("read_next: gunzip failed, skipping ".
+                     "decoded data with length [".length($decoded)."]");
+                  next;
+               }
+               $v = $$gunzipped;
+            }
+            # Decode the object format
+            if ($object_fields && exists($object_fields->{$k}) && length($v)
+            &&  ($v =~ $object_re || $v =~ $base64_re)) {
+               my $decoded = $sb->decode($1);
+               if (! defined($decoded)) {
+                  $self->log->error("read_next: decode object format failed, ".
+                     "skipping data with length [".length($v)."]");
+                  next;
+               }
+               $v = eval($decoded);
+            }
+            $h->{$k} = $v;
+         }
+      }
+      # Or not.
+      else {
+         for (@$header) {
+            $h->{$_} = $row->[$i++];
+         }
       }
       $row = $h;
    }

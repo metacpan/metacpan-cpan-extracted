@@ -4,9 +4,9 @@
       "Rocky Bernstein <rocky@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
-      "open_source"
+      "gpl_1"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -16,7 +16,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::CBuilder" : 0
+            "ExtUtils::CBuilder" : "0"
          }
       },
       "configure" : {
@@ -28,70 +28,74 @@
          "requires" : {
             "ExtUtils::CBuilder" : "0.28",
             "ExtUtils::PkgConfig" : "1.03",
-            "Test::More" : 0,
-            "version" : 0
+            "Test::More" : "0",
+            "version" : "0"
          }
       }
    },
    "provides" : {
       "Device::Cdio" : {
          "file" : "lib/Device/Cdio.pm",
-         "version" : "v0.3.0"
+         "version" : "v0.4.0"
       },
       "Device::Cdio::Device" : {
-         "file" : "lib/Device/Cdio/Device.pm",
-         "version" : 0
+         "file" : "lib/Device/Cdio/Device.pm"
       },
       "Device::Cdio::ISO9660" : {
-         "file" : "lib/Device/Cdio/ISO9660.pm",
-         "version" : 0
+         "file" : "lib/Device/Cdio/ISO9660.pm"
       },
       "Device::Cdio::ISO9660::FS" : {
-         "file" : "lib/Device/Cdio/ISO9660/FS.pm",
-         "version" : 0
+         "file" : "lib/Device/Cdio/ISO9660/FS.pm"
       },
       "Device::Cdio::ISO9660::IFS" : {
-         "file" : "lib/Device/Cdio/ISO9660/IFS.pm",
-         "version" : 0
+         "file" : "lib/Device/Cdio/ISO9660/IFS.pm"
       },
       "Device::Cdio::Track" : {
-         "file" : "lib/Device/Cdio/Track.pm",
-         "version" : 0
+         "file" : "lib/Device/Cdio/Track.pm"
       },
       "Device::Cdio::Util" : {
-         "file" : "lib/Device/Cdio/Util.pm",
-         "version" : 0
+         "file" : "lib/Device/Cdio/Util.pm"
       },
       "perlcdio" : {
-         "file" : "lib/perlcdio.pm",
-         "version" : 0
+         "file" : "lib/perlcdio.pm"
+      },
+      "perlcdio::imaxdiv_t" : {
+         "file" : "lib/perlcdio.pm"
       },
       "perlcdioc" : {
-         "file" : "lib/perlcdio.pm",
-         "version" : 0
+         "file" : "lib/perlcdio.pm"
       },
       "perliso9660" : {
-         "file" : "lib/perliso9660.pm",
-         "version" : 0
+         "file" : "lib/perliso9660.pm"
+      },
+      "perliso9660::imaxdiv_t" : {
+         "file" : "lib/perliso9660.pm"
       },
       "perliso9660c" : {
-         "file" : "lib/perliso9660.pm",
-         "version" : 0
+         "file" : "lib/perliso9660.pm"
       },
       "perlmmc" : {
-         "file" : "lib/perlmmc.pm",
-         "version" : 0
+         "file" : "lib/perlmmc.pm"
+      },
+      "perlmmc::imaxdiv_t" : {
+         "file" : "lib/perlmmc.pm"
       },
       "perlmmcc" : {
-         "file" : "lib/perlmmc.pm",
-         "version" : 0
+         "file" : "lib/perlmmc.pm"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/rocky/Perl-Device-Cdio/issues"
+      },
       "license" : [
-         "http://opensource.org/licenses/gpl-license.php"
-      ]
+         "http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt"
+      ],
+      "repository" : {
+         "url" : "http://github.com/rocky/Perl-Device-Cdio"
+      }
    },
-   "version" : "v0.3.0"
+   "version" : "v0.4.0",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }

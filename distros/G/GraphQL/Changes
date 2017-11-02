@@ -1,5 +1,17 @@
 Revision history for GraphQL
 
+0.20	Wed Nov  1 03:59:54 GMT 2017
+ - add GraphQL::Plugin::Convert API
+
+0.19	Sun Oct 29 16:11:31 GMT 2017
+ - add DateTime as test dep, thanks @andk!
+
+0.18	Fri Oct 27 05:00:46 BST 2017
+ - make AST not have "node"
+
+0.17	Thu Oct 26 19:58:00 BST 2017
+ - fill out Schema.to_doc include default if eg type Query
+
 0.16	Sun Oct 22 07:09:44 BST 2017
  - execute take AST as well as text
  - error reporting improvements

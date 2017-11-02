@@ -10,7 +10,7 @@ BEGIN { $ENV{RPERL_WARNINGS} = 0; }
 use strict;
 use warnings;
 use RPerl::AfterSubclass;
-our $VERSION = 0.026_000;
+our $VERSION = 0.030_000;
 
 # [[[ CRITICS ]]]
 ## no critic qw(ProhibitUselessNoCritic ProhibitMagicNumbers RequireCheckedSyscalls)  # USER DEFAULT 1: allow numeric values & print operator
@@ -36,6 +36,10 @@ use constant PATH_TESTS => my string $TYPED_PATH_TESTS = $RPerl::INCLUDE_PATH . 
 use constant PATH_PRECOMPILED => my string $TYPED_PATH_PRECOMPILED = $RPerl::INCLUDE_PATH . '/RPerl';
 
 # [[[ OPERATIONS ]]]
+our $verbose_newline = q{};
+if ( $ENV{RPERL_VERBOSE} or $RPerl::VERBOSE ) {
+    $verbose_newline = "\n";
+}
 
 # DEV NOTE: if set to true, will speed up tests where no pre-compiled reference files are found
 my boolean $cpp_skip_parse_gen_if_no_ref_files = 1;
@@ -85,14 +89,30 @@ find(
         if ( ( $file =~ m/Good/ms ) or ( $file =~ m/good/ms ) ) {
 #            RPerl::diag('in 13_generate.t, find0, have good $file = ' . $file . "\n");
             $test_files->{$file} = undef;
+
+            # NEED UPDATE: remove use of $_ magic variable
+            open my filehandleref $FILE_HANDLE, '<', $_
+                or croak 'ERROR, Cannot open file ' . $file . ' for reading,' . $OS_ERROR . ', croaking';
+            while (<$FILE_HANDLE>) {
+                if (m/^\#\s*\<\<\<\s*GENERATE\s*\:\s*OFF\s*\>\>\>/xms) {
+                    delete $test_files->{$file};
+                    last;
+                }
+            }
+            close $FILE_HANDLE
+                or croak 'ERROR, Cannot close file ' . $file . ' after reading,' . $OS_ERROR . ', croaking';
         }
         elsif ( ( $file =~ m/Bad/ms ) or ( $file =~ m/bad/ms ) ) {
 #            RPerl::diag('in 13_generate.t, find0, have bad  $file = ' . $file . "\n");
 
-            # NEED FIX: remove use of $_ magic variable
+            # NEED UPDATE: remove use of $_ magic variable
             open my filehandleref $FILE_HANDLE, '<', $_
                 or croak 'ERROR ETE13GE00: Cannot open file ' . $file . ' for reading,' . $OS_ERROR . ', croaking';
             while (<$FILE_HANDLE>) {
+                if (m/^\#\s*\<\<\<\s*GENERATE\s*\:\s*OFF\s*\>\>\>/xms) {
+                    delete $test_files->{$file};
+                    last;
+                }
                 if (m/^\#\s*\<\<\<\s*GENERATE_ERROR\s*\:\s*['"](.*)['"]\s*\>\>\>/xms) {
                     push @{ $test_files->{$file}->{errors} }, $1;
                 }
@@ -158,6 +178,16 @@ find(
 );
 
 #=cut
+
+# trim unnecessary (and possibly problematic) absolute paths from input file names
+# must be done outside find() to properly utilize getcwd()
+foreach my string $test_file_key (sort keys %{$test_files}) {
+    my string $test_file_key_trimmed = RPerl::Compiler::post_processor__absolute_path_delete($test_file_key);
+    if ($test_file_key_trimmed ne $test_file_key) {
+        $test_files->{$test_file_key_trimmed} = $test_files->{$test_file_key};
+        delete $test_files->{$test_file_key};
+    }
+}
 
 my integer $number_of_test_files = scalar keys %{$test_files};
 
@@ -229,7 +259,7 @@ for my $mode_id ( 2 , 0 ) {    # CPPOPS_CPPTYPES, PERLOPS_PERLTYPES; DEV NOTE: r
         };
 
         # DEV NOTE: must recursively find & parse ((great)*grand)?parents to receive any inherited class $properties
-        my string_arrayref $parent_files = find_parents( $test_file, 1, $modes );  # second argument set to 1 for true value of $find_grandparents_recurse
+        my string_arrayref $parent_files = RPerl::Compiler::find_parents( $test_file, 1, $modes );  # second argument set to 1 for true value of $find_grandparents_recurse
 
         # generate starting with furthest ancestor & ending with parent,
         # to avoid errors due to one parent not properly receiving their own inheritance from an older grandparent, etc.
@@ -271,15 +301,13 @@ for my $mode_id ( 2 , 0 ) {    # CPPOPS_CPPTYPES, PERLOPS_PERLTYPES; DEV NOTE: r
         }
 
         # DEV NOTE: do not actually follow or compile dependencies;
-        # find RPerl system deps such as 'use rperlsse;', 'use rperlgmp;', etc.;
-        # ignore return value, here we only care about $modes->{_enable_sse}, $modes->{_enable_gmp}, etc.;
+        # find RPerl system deps such as 'use rperlsse;', 'use rperlgmp;', 'use rperlgsl;', etc.;
+        # ignore return value, here we only care about $modes->{_enable_sse}, $modes->{_enable_gmp}, $modes->{_enable_gsl}, etc.;
 #        find_dependencies( $test_file, 0, $modes );  # second argument set to 0 for false value of $find_subdependencies_recurse
 
-        $output_file_name_groups_tmp = generate_output_file_names( [$test_file], [], 1, $modes );
+        $output_file_name_groups_tmp = RPerl::Compiler::generate_output_file_names( [$test_file], [], 1, $modes );
         $output_file_name_group = $output_file_name_groups_tmp->[0];
 
-        # trim unnecessary (and possibly problematic) absolute paths from input & output file names
-        $test_file = RPerl::Compiler::post_processor__absolute_path_delete( $test_file );
         foreach my string $suffix_key (keys %{$output_file_name_group}) {
             if (defined $output_file_name_group->{$suffix_key}) {
                 $output_file_name_group->{$suffix_key} = RPerl::Compiler::post_processor__absolute_path_delete( $output_file_name_group->{$suffix_key} );
@@ -323,6 +351,7 @@ for my $mode_id ( 2 , 0 ) {    # CPPOPS_CPPTYPES, PERLOPS_PERLTYPES; DEV NOTE: r
                     if (( not -e $test_file_reference ) or ( not -f $test_file_reference ) or ( not -T $test_file_reference )) {
                         # CPP ops mode will always require some CPP output file, regardless of H or PMC output file(s), skip before reaching parse or generate below
                         if ($cpp_skip_parse_gen_if_no_ref_files) { 
+                            print $verbose_newline;
                             ok( 1, 'Program or module is missing a pre-compiled reference file, no diff check, skipped early:' . (q{ } x 2) . $test_file );
 #                            $number_of_tests_run++;
                             next TEST_FILE_LOOP;
@@ -390,6 +419,12 @@ for my $mode_id ( 2 , 0 ) {    # CPPOPS_CPPTYPES, PERLOPS_PERLTYPES; DEV NOTE: r
 #            RPerl::diag( 'in 13_generate.t, have $source_group->{H} = ' . "\n" . $source_group->{H} . "\n\n" );
 #            RPerl::diag( 'in 13_generate.t, have sort keys %{ $source_group } = ' . Dumper( [ sort keys %{$source_group} ] ) );
 
+            if ( $ops eq 'CPP' ) {
+                # CPPOPS POST-PROCESSING: set H paths in CPP files & finally create PMC file, as needed
+                $source_group->{CPP} = RPerl::Compiler::post_processor_cpp__header_unneeded( $source_group );
+                $source_group->{CPP} = RPerl::Compiler::post_processor_cpp__header_or_cpp_path( $source_group->{CPP}, $output_file_name_group->{H} );
+            }
+
             if (( $ops eq 'CPP' ) and (exists $output_file_name_group->{PMC}) and (defined $output_file_name_group->{PMC})) {
                 # generate PMC source code
                 RPerl::Compiler::post_processor_cpp__pmc_generate( $source_group, $output_file_name_group, $modes );
@@ -399,7 +434,7 @@ for my $mode_id ( 2 , 0 ) {    # CPPOPS_CPPTYPES, PERLOPS_PERLTYPES; DEV NOTE: r
 #                RPerl::diag( 'in 13_generate.t, have $test_file NOT named *Good* or *good*' . "\n" );
 
                 # skip test if dummy source code found
-                if ( not dummy_source_code_find($source_group) ) {
+                if ( not RPerl::Generator::dummy_source_code_find($source_group) ) {
                     ok( 0, 'Program or module generates with errors:' . (q{ } x 21) . $test_file );
 #                    $number_of_tests_run++;
                 }
@@ -489,7 +524,7 @@ for my $mode_id ( 2 , 0 ) {    # CPPOPS_CPPTYPES, PERLOPS_PERLTYPES; DEV NOTE: r
 #                    RPerl::diag( 'in 13_generate.t, do NOT need to perform diff check(s)' . "\n" );
 
                     # skip test if dummy source code found
-                    if ( not dummy_source_code_find($source_group) ) {
+                    if ( not RPerl::Generator::dummy_source_code_find($source_group) ) {
                         ok( 1, 'Program or module generates without errors, no diff check:' . (q{ } x 3) . $test_file );
 #                        $number_of_tests_run++;
                     }
@@ -512,11 +547,13 @@ for my $mode_id ( 2 , 0 ) {    # CPPOPS_CPPTYPES, PERLOPS_PERLTYPES; DEV NOTE: r
                 if ((exists $test_files->{$test_file}) and (defined $test_files->{$test_file}) and 
                     (exists $test_files->{$test_file}->{errors}) and (defined $test_files->{$test_file}->{errors})) {
                     foreach my $error ( @{ $test_files->{$test_file}->{errors} } ) {
+#                    RPerl::diag( 'in 13_generate.t, have possible $error = ', $error, "\n" );
                         if ( $EVAL_ERROR !~ /\Q$error\E/xms ) {
                             push @{$missing_errors}, q{Error message '} . $error . q{' expected, but not found};
                         }
                     }
                 }
+                print $verbose_newline;
                 ok( ( ( scalar @{$missing_errors} ) == 0 ), 'Program or module generates with expected error(s):' . (q{ } x 10) . $test_file );
                 if (( scalar @{$missing_errors} ) != 0) {
                     diag((join "\n", @{$missing_errors}) . "\n");

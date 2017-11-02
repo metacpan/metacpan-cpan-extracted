@@ -1,5 +1,5 @@
 #
-# $Id: Uri.pm,v f6ad8c136b19 2017/01/01 10:13:54 gomor $
+# $Id: Uri.pm,v 8e067c19c3e5 2017/02/23 07:25:08 gomor $
 #
 # string::uri Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik);
 
 sub brik_properties {
    return {
-      revision => '$Revision: f6ad8c136b19 $',
+      revision => '$Revision: 8e067c19c3e5 $',
       tags => [ qw(unstable encode decode escape) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -34,7 +34,12 @@ sub brik_properties {
          authority => [ ],
          query_form => [ ],
          userinfo => [ ],
+         is_http_scheme => [ ],
          is_https_scheme => [ ],
+         is_imap_scheme => [ ],
+         is_imaps_scheme => [ ],
+         is_pop3_scheme => [ ],
+         is_pop3s_scheme => [ ],
          encode => [ qw($data) ],
          decode => [ qw($data) ],
       },
@@ -59,7 +64,7 @@ sub parse {
       return $self->log->error("parse: invalid URI [$string]");
    }
 
-   return {
+   my $h = {
       scheme => $uri->scheme || '',
       host => $uri->host || '',
       port => $uri->port || 80,
@@ -72,20 +77,64 @@ sub parse {
       userinfo => $uri->userinfo || '',
       authority => $uri->authority || '',
    };
+
+   if ($h->{userinfo}) {
+      my ($user, $password) = $h->{userinfo} =~ m{^(.*):(.*)$};
+      $h->{user} = $user || '';
+      $h->{password} = $password || '';
+   }
+
+   return $h;
 }
 
-sub is_https_scheme {
+sub _is_scheme {
    my $self = shift;
-   my ($parsed) = @_;
+   my ($parsed, $scheme) = @_;
 
-   $self->brik_help_run_undef_arg('is_https_scheme', $parsed) or return;
-   $self->brik_help_run_invalid_arg('is_https_scheme', $parsed, 'HASH') or return;
+   $self->brik_help_run_undef_arg("is_${scheme}_scheme", $parsed) or return;
+   $self->brik_help_run_invalid_arg("is_${scheme}_scheme", $parsed, 'HASH') or return;
 
-   if (exists($parsed->{scheme}) && $parsed->{scheme} eq 'https') {
+   if (exists($parsed->{scheme}) && $parsed->{scheme} eq $scheme) {
       return 1;
    }
 
    return 0;
+}
+
+sub is_http_scheme {
+   my $self = shift;
+
+   return $self->_is_scheme(@_, 'http');
+}
+
+sub is_https_scheme {
+   my $self = shift;
+
+   return $self->_is_scheme(@_, 'https');
+}
+
+sub is_imap_scheme {
+   my $self = shift;
+
+   return $self->_is_scheme(@_, 'imap');
+}
+
+sub is_imaps_scheme {
+   my $self = shift;
+
+   return $self->_is_scheme(@_, 'imaps');
+}
+
+sub is_pop3_scheme {
+   my $self = shift;
+
+   return $self->_is_scheme(@_, 'pop3');
+}
+
+sub is_pop3s_scheme {
+   my $self = shift;
+
+   return $self->_is_scheme(@_, 'pop3s');
 }
 
 sub _this {

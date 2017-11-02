@@ -406,10 +406,22 @@ takes the same arguments as L<Mojo::IOLoop::Client/"connect">.
   my $delay = $loop->delay(sub {...});
   my $delay = $loop->delay(sub {...}, sub {...});
 
-Build L<Mojo::IOLoop::Delay> object to manage callbacks and control the flow of
-events for this event loop, which can help you avoid deep nested closures that
-often result from continuation-passing style. Callbacks will be passed along to
-L<Mojo::IOLoop::Delay/"steps">.
+Build L<Mojo::IOLoop::Delay> object to use as a promise and/or for flow-control.
+Callbacks will be passed along to L<Mojo::IOLoop::Delay/"steps">.
+
+  # Wrap continuation-passing style APIs with promises
+  my $ua = Mojo::UserAgent->new;
+  sub get {
+    my $promise = Mojo::IOLoop->delay;
+    $ua->get(@_ => sub {
+      my ($ua, $tx) = @_;
+      $promise->resolve($tx);
+    });
+    return $promise;
+  }
+  my $mojo = get('http://mojolicious.org');
+  my $cpan = get('http://metacpan.org');
+  $mojo->race($cpan)->then(sub { say shift->req->url })->wait;
 
   # Synchronize multiple non-blocking operations
   my $delay = Mojo::IOLoop->delay(sub { say 'BOOM!' });
@@ -443,21 +455,6 @@ L<Mojo::IOLoop::Delay/"steps">.
     # Third step (the end)
     sub { say 'And done after 5 seconds total.' }
   )->wait;
-
-  # Handle exceptions in all steps
-  Mojo::IOLoop->delay(
-    sub {
-      my $delay = shift;
-      die 'Intentional error';
-    },
-    sub {
-      my ($delay, @args) = @_;
-      say 'Never actually reached.';
-    }
-  )->catch(sub {
-    my ($delay, $err) = @_;
-    say "Something went wrong: $err";
-  })->wait;
 
 =head2 is_running
 

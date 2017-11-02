@@ -3,7 +3,7 @@ package GeoIP2::Model::Insights;
 use strict;
 use warnings;
 
-our $VERSION = '2.003005';
+our $VERSION = '2.004000';
 
 use Moo;
 
@@ -33,7 +33,7 @@ GeoIP2::Model::Insights - Model class for GeoIP2 Precision: Insights
 
 =head1 VERSION
 
-version 2.003005
+version 2.004000
 
 =head1 SYNOPSIS
 

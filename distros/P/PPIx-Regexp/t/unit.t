@@ -1121,6 +1121,14 @@ content ( '\\p{ Match = lo-ose }' );
 value   ( perl_version_introduced => [], '5.006001' );
 value   ( perl_version_removed => [], undef );
 
+tokenize( '/\\pL/' );
+count   ( 5 );
+choose  ( 2 );
+class   ( 'PPIx::Regexp::Token::CharClass::Simple' );
+content ( '\\pL' );
+value   ( perl_version_introduced => [], '5.006001' );
+value   ( perl_version_removed => [], undef );
+
 parse   ( 'm{)}smx' );
 value   ( failures => [], 1 );
 class   ( 'PPIx::Regexp' );

@@ -1,9 +1,43 @@
 ==================================================
-Changes from 2016-10-23 00:00:00 +0000 to present.
+Changes from 2016-10-31 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.004 at 2017-10-23 20:49:35 +0000
+version 0.007 at 2017-10-31 06:50:43 +0000
+------------------------------------------
+
+  Change: c7086531cfec09c11e6dbfcbd99f3e128b7293e1
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-10-31 07:49:58 +0000
+
+    Fix another failing test because of maintenance work 
+
+------------------------------------------
+version 0.006 at 2017-10-30 10:07:14 +0000
+------------------------------------------
+
+  Change: 77b1c771374b9e850bf09bc1b49b12a3991d6795
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-10-30 11:07:14 +0000
+
+    Fix failing test because of maintenance work
+
+    Fixes #1. 
+
+------------------------------------------
+version 0.005 at 2017-10-23 21:52:08 +0000
+------------------------------------------
+
+  Change: 8a833e8c0195e348da963af4e5b22265bbf3cf14
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-10-23 23:52:08 +0000
+
+    Require Net::HTTP::Spore 0.08, which preserves colons
+
+    This alleviates the need to override the sub at runtime. 
+
+------------------------------------------
+version 0.004 at 2017-10-23 20:48:18 +0000
 ------------------------------------------
 
   Change: 0b8f7ee48937b683e6b59d5312237475d5065b02
@@ -26,5 +60,5 @@ version 0.003 at 2017-01-15 23:27:00 +0000
     unusable. This is now fixed. 
 
 ================================================
-Plus 2 releases after 2016-10-23 00:00:00 +0000.
+Plus 2 releases after 2016-10-31 00:00:00 +0000.
 ================================================

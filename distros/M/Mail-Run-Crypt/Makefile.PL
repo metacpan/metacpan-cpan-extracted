@@ -31,7 +31,7 @@ WriteMakefile(
         'meta-spec' => { version => 2 },
         provides => {
             'Mail::Run::Crypt' => {
-                version => '0.08',
+                version => '0.09',
                 file => 'lib/Mail/Run/Crypt.pm',
             },
         },

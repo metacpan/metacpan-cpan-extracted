@@ -2,11 +2,23 @@ Revision history for HTML::Mason.
 
 ** denotes an incompatible change
 
+1.58     2017-10-29
+
+    - Redid the release because of some dzil issues. 1.57 might be a little
+      wonky.
+
+1.57     2017-10-29
+
+    [ BUG FIXES ]
+
+    - Fix test failures under 5.26.0+ due to "." no longer being in @INC. PR
+      By Kent Fredric. GH #6. Fixed RT #121443.
+
 1.56     2014-11-14
 
     [ BUG FIXES ]
 
-    - Fix a packaging issue with the last release that prevent PAUSE from
+    - Fix a packaging issue with the last release that prevented PAUSE from
       indexing some modules in the tarball.
 
 1.55     2014-11-14

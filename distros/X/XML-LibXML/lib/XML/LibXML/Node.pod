@@ -70,12 +70,12 @@ XML::LibXML::Node - Abstract Base Class of XML::LibXML Nodes
 
 =head1 DESCRIPTION
 
-XML::LibXML::Node defines functions that are common to all Node Types. A
-LibXML::Node should never be created standalone, but as an instance of a high
-level class such as LibXML::Element or LibXML::Text. The class itself should
-provide only common functionality. In XML::LibXML each node is part either of a
-document or a document-fragment. Because of this there is no node without a
-parent. This may causes confusion with "unbound" nodes.
+XML::LibXML::Node defines functions that are common to all Node Types. An
+XML::LibXML::Node should never be created standalone, but as an instance of a
+high level class such as XML::LibXML::Element or XML::LibXML::Text. The class
+itself should provide only common functionality. In XML::LibXML each node is
+part either of a document or a document-fragment. Because of this there is no
+node without a parent. This may causes confusion with "unbound" nodes.
 
 
 =head1 METHODS
@@ -763,7 +763,7 @@ Petr Pajas
 
 =head1 VERSION
 
-2.0130
+2.0132
 
 =head1 COPYRIGHT
 

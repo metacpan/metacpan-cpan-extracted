@@ -47,7 +47,7 @@ applications by forking
  use Mojolicious::Lite;
 
  plugin 'Mojolicious::Plugin::ForkCall';
- 
+
  get '/slow' => sub {
    my $c = shift;
    my @args = ...;
@@ -100,19 +100,19 @@ This module adds the following helper method to your application:
 The C<fork_call> helper takes up to 3 arguments: a required code reference to
 be run in a forked child process, an optional array reference of arguments to
 be passed to the child code, and a required code reference to be run in the
-parent as a callback. The callback is passed the controler instance and return 
+parent as a callback. The callback is passed the controler instance and return
 values of the child.
 
-The helper relies on the L<Mojolicious> core helper 
-L<Mojolicious::Plugin::DefaultHelpers/delay> and as such it will render an 
-exception (500) page if any uncaught exception occurs in the child process or 
-in the parent callback. This also means that the parent callback will not be 
+The helper relies on the L<Mojolicious> core helper
+L<Mojolicious::Plugin::DefaultHelpers/delay> and as such it will render an
+exception (500) page if any uncaught exception occurs in the child process or
+in the parent callback. This also means that the parent callback will not be
 called if the child process encounters an exception.
 
 This helper is a convenience only and is not indended for complex cases.
-If you need to configure the L<Mojo::IOLoop::ForkCall> instance or want to 
-"fork and forget" a child, you should use the class directly rather than this 
-helper. If more complicated delays are required, you should use the 
+If you need to configure the L<Mojo::IOLoop::ForkCall> instance or want to
+"fork and forget" a child, you should use the class directly rather than this
+helper. If more complicated delays are required, you should use the
 L<Mojolicious::Plugin::DefaultHelpers/delay> helper or L<Mojo::IOLoop/delay>
 method directly, along with an instance of L<Mojo::IOLoop::ForkCall>.
 

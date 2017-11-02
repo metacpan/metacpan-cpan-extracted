@@ -18,9 +18,10 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Class::InsideOut" => "1.06",
     "JSON" => "2.12",
-    "Net::OpenSSH" => "0.39"
+    "Net::OpenSSH" => "0.39",
+    "Scalar::Util" => 0
   },
-  "VERSION" => "1.203",
+  "VERSION" => "1.204",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -30,7 +31,8 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Class::InsideOut" => "1.06",
   "JSON" => "2.12",
-  "Net::OpenSSH" => "0.39"
+  "Net::OpenSSH" => "0.39",
+  "Scalar::Util" => 0
 );
 
 

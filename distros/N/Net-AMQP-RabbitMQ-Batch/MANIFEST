@@ -1,0 +1,13 @@
+.proverc
+lib/Net/AMQP/RabbitMQ/Batch.pm
+LICENSE
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+process_in_batches.pl
+README.md
+send_messages.pl
+t/01_batch.t
+verify_messages.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

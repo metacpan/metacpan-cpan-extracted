@@ -6,20 +6,19 @@ use 5.008001;
 use Env qw( @PATH );
 use File::Which 1.10 qw( which );
 use Capture::Tiny qw( capture capture_merged );
-use File::Temp ();
-use Carp qw( croak );
-use File::Basename qw( dirname );
+use File::Temp qw( tempdir );
 use File::Copy qw( move );
 use Text::ParseWords qw( shellwords );
 use Test2::API qw( context run_subtest );
 use base qw( Exporter );
 use Path::Tiny qw( path );
 use Alien::Build::Util qw( _dump );
+use Config;
 
 our @EXPORT = qw( alien_ok run_ok xs_ok ffi_ok with_subtest synthetic helper_ok interpolate_template_is );
 
 # ABSTRACT: Testing tools for Alien modules
-our $VERSION = '1.25'; # VERSION
+our $VERSION = '1.28'; # VERSION
 
 
 our @aliens;
@@ -147,26 +146,6 @@ sub _flags
     : $class->$method;
 }
 
-{
-  my $seen = 0;
-  sub _warn_cpp
-  {
-    return if $seen;
-    my $ctx = context();
-    $ctx->diag('');
-    $ctx->diag('');
-    $ctx->diag(' !!!');
-    $ctx->diag('');
-    $ctx->diag("Test::Alien xs_ok C++ is DEPRECATED and will be removed on or after 31 August 2017");
-    $ctx->diag("Please use Test::Alien::CPP instead");
-    $ctx->diag('');
-    $ctx->diag(' !!!');
-    $ctx->diag('');
-    $ctx->release;
-    $seen++;
-  }
-}
-
 sub xs_ok
 {
   my $cb;
@@ -196,10 +175,8 @@ sub xs_ok
 
   if($xs->{cpp} || $xs->{'C++'})
   {
-    _warn_cpp();
-    $xs->{pxs}->{'C++'} = 1;
-    $xs->{cbuilder_compile}->{'C++'} = 1;
-    $xs->{c_ext} = 'cpp';
+    my $ctx = context();
+    $ctx->bail("The cpp and C++ options have been removed from xs_ok");
   }
   else
   {
@@ -278,7 +255,11 @@ sub xs_ok
 
   if($ok)
   {
-    my $cb = ExtUtils::CBuilder->new;
+    my $cb = ExtUtils::CBuilder->new(
+      config => {
+        lddlflags => join(' ', grep !/^-l/, shellwords map { _flags $_, 'libs' } @aliens) . " $Config{lddlflags}",
+      },
+    );
 
     my %compile_options = (
       source               => $c_filename,
@@ -330,7 +311,7 @@ sub xs_ok
         $link_options{extra_linker_flags} = [ shellwords $link_options{extra_linker_flags} ];
       }
       
-      push @{ $link_options{extra_linker_flags} }, shellwords map { _flags $_, 'libs' } @aliens;
+      push @{ $link_options{extra_linker_flags} }, grep /^-l/, shellwords map { _flags $_, 'libs' } @aliens;
 
       my($out, $lib, $err) = capture_merged {
         my $lib = eval { 
@@ -362,9 +343,8 @@ sub xs_ok
       
       if($ok)
       {
-        require Config;
         my @modparts = split(/::/,$module);
-        my $dl_dlext = $Config::Config{dlext};
+        my $dl_dlext = $Config{dlext};
         my $modfname = $modparts[-1];
 
         my $libpath = path($dir)->child('auto', @modparts, "$modfname.$dl_dlext");
@@ -621,7 +601,7 @@ sub _tempdir {
   # makes sure /tmp or whatever isn't mounted noexec,
   # which will cause xs_ok tests to fail.
 
-  my $dir = File::Temp::tempdir(@_);
+  my $dir = tempdir(@_);
 
   if($^O ne 'MSWin32')
   {
@@ -634,7 +614,7 @@ sub _tempdir {
     system $filename, 'foo';
     if($?)
     {
-      $dir = File::Temp::tempdir( DIR => path('.')->absolute->stringify );
+      $dir = tempdir( DIR => path('.')->absolute->stringify );
     }
   }
   
@@ -655,7 +635,7 @@ Test::Alien - Testing tools for Alien modules
 
 =head1 VERSION
 
-version 1.25
+version 1.28
 
 =head1 SYNOPSIS
 
@@ -880,12 +860,6 @@ Extra The L<ExtUtils::CBuilder> arguments passed in as a hash reference.
 
 Spew copious debug information via test note.
 
-=item C++ or cpp
-
-[EXPERIMENTAL]
-
-XS should be compiled as C++.
-
 =back
 
 You can use the C<with_subtest> keyword to conditionally
@@ -1030,6 +1004,10 @@ Petr Pisar (ppisar)
 Lance Wicks (LANCEW)
 
 Ahmad Fatoum (a3f, ATHREEF)
+
+José Joaquín Atria (JJATRIA)
+
+Duke Leto (LETO)
 
 =head1 COPYRIGHT AND LICENSE
 

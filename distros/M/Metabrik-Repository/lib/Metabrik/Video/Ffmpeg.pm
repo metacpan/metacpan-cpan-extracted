@@ -1,5 +1,5 @@
 #
-# $Id: Ffmpeg.pm,v f6ad8c136b19 2017/01/01 10:13:54 gomor $
+# $Id: Ffmpeg.pm,v 246044148483 2017/03/18 14:13:18 gomor $
 #
 # video::ffmpeg Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Shell::Command Metabrik::System::Package);
 
 sub brik_properties {
    return {
-      revision => '$Revision: f6ad8c136b19 $',
+      revision => '$Revision: 246044148483 $',
       tags => [ qw(unstable audio sound record micro) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -45,7 +45,8 @@ sub record_desktop {
    $resolution ||= $self->resolution;
    $self->brik_help_run_undef_arg('record_desktop', $output) or return;
 
-   my $cmd = 'ffmpeg';
+   # Give 1 second to switch window if needed.
+   my $cmd = 'sleep 1 && ffmpeg';
    if ($self->use_micro) {
       $cmd .= " -f alsa -i pulse -f x11grab -r 25 -s $resolution -i :0.0 ".
          "-acodec pcm_s16le -vcodec libx264 -preset ultrafast -crf 0 -threads 0";

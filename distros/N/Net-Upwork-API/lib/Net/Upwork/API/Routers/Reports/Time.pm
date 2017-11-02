@@ -72,7 +72,7 @@ sub get_by_team_full {
     my $team = shift;
     my %params = @_;
 
-    return get_by_type($company, $team, "", 0, %params);
+    return $self->get_by_type($company, $team, "", 0, %params);
 }
 
 =item get_by_team_limited 
@@ -101,7 +101,7 @@ sub get_by_team_limited {
     my $team = shift;
     my %params = @_;
 
-    return get_by_type($company, $team, "", 1, %params);
+    return $self->get_by_type($company, $team, "", 1, %params);
 }
 
 =item get_by_agency
@@ -130,7 +130,7 @@ sub get_by_agency {
     my $agency = shift;
     my %params = @_;
 
-    return get_by_type($company, "", $agency, 0, %params);
+    return $self->get_by_type($company, "", $agency, 0, %params);
 }
 
 =item get_by_company
@@ -154,7 +154,7 @@ sub get_by_company {
     my $company = shift;
     my %params = @_;
 
-    return get_by_type($company, "", "", 0, %params);
+    return $self->get_by_type($company, "", "", 0, %params);
 }
 
 =item get_by_freelancer_limited

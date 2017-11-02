@@ -37,7 +37,7 @@ sub print_repositories {
 
             print "$project_key/$repo_slug:\n";
 
-            my $conditions = $api->default_reviewers->get_pull_request_conditions(
+            my $conditions = $api->default_reviewers->get_pull_request_conditions_for_repository(
                 project_key     => $project_key,
                 repository_slug => $repo_slug,
             );

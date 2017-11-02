@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Provide easy-to-use forking with ability to pass back data",
-  "AUTHOR" => "J. Maslak <jmaslak\@antelope.net>",
+  "AUTHOR" => "Joelle Maslak <jmaslak\@antelope.net>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -21,6 +21,7 @@ my %WriteMakefileArgs = (
     "IO::Pipe" => 0,
     "IO::Select" => 0,
     "Moose" => 0,
+    "Moose::Util::TypeConstraints" => 0,
     "POSIX" => 0,
     "Storable" => 0,
     "Try::Tiny" => 0,
@@ -33,7 +34,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.010",
+  "VERSION" => "1.012",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,6 +46,7 @@ my %FallbackPrereqs = (
   "IO::Pipe" => 0,
   "IO::Select" => 0,
   "Moose" => 0,
+  "Moose::Util::TypeConstraints" => 0,
   "POSIX" => 0,
   "Storable" => 0,
   "Test::Exception" => 0,

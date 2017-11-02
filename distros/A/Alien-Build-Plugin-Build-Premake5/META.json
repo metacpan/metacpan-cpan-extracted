@@ -1,0 +1,67 @@
+{
+   "abstract" : "Premake5 build plugin for Alien::Build",
+   "author" : [
+      "Jos\u00e9 Joaqu\u00edn Atria <jjatria@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Alien-Build-Plugin-Build-Premake5",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Build::Plugin" : "0",
+            "Alien::premake5" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Path::Tiny" : "0",
+            "Test2::V0" : "0",
+            "Test::Alien::Build" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Alien::Build::Plugin::Build::Premake5" : {
+         "file" : "lib/Alien/Build/Plugin/Build/Premake5.pm",
+         "version" : "0.002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "jjatria at cpan.org",
+         "web" : "https://github.com/jjatria/Alien-Build-Plugin-Build-Premake5/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/jjatria/Alien-Build-Plugin-Build-Premake5.git",
+         "web" : "https://github.com/jjatria/Alien-Build-Plugin-Build-Premake5"
+      }
+   },
+   "version" : "0.002",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
+}
+

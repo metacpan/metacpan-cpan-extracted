@@ -3,7 +3,7 @@ package RPerl::Algorithm;
 use strict;
 use warnings;
 use RPerl::AfterSubclass;
-our $VERSION = 0.010_000;
+our $VERSION = 0.011_000;
 
 # [[[ OO INHERITANCE ]]]
 use parent qw(RPerl::CompileUnit::Module::Class);    # no non-system inheritance, only inherit from base class
@@ -27,39 +27,47 @@ our hashref $properties = { foo => my string $TYPED_foo = '<<< DEFAULT, ALGORITH
 
 # [ INHERITANCE TESTING ]
 
-our void::method $inherited__Algorithm = sub {
+sub inherited__Algorithm {
+    { my void::method $RETURN_TYPE };
     ( my RPerl::Algorithm $self, my string $person ) = @ARG;
-    RPerl::diag(
-        'in PERLOPS_PERLTYPES Algorithm->inherited__Algorithm(), have ::class($self) = ' . ::class($self) . ' and $person = ' . $person . ', FNORD' . "\n" );
-};
+    RPerl::diag( 'in PERLOPS_PERLTYPES Algorithm->inherited__Algorithm(), have ::class($self) = ' . ::class($self) . ' and $person = ' . $person . ', FNORD' . "\n" );
+    return;
+}
 
-our string::method $inherited__Algorithm_foo_get = sub {
+sub inherited__Algorithm_foo_get {
+    { my string::method $RETURN_TYPE };
     ( my RPerl::Algorithm $self ) = @ARG;
     RPerl::diag( 'in PERLOPS_PERLTYPES Algorithm->inherited__Algorithm_foo_get(), have ::class($self) = ' . ::class($self) . ', FNORD' . "\n" );
     return $self->{foo};
-};
+}
 
-our void::method $inherited__Algorithm_foo_set = sub {
+sub inherited__Algorithm_foo_set {
+    { my void::method $RETURN_TYPE };
     ( my RPerl::Algorithm $self, my string $foo_new ) = @ARG;
     RPerl::diag( 'in PERLOPS_PERLTYPES Algorithm->inherited__Algorithm_foo_set(), have ::class($self) = ' . ::class($self) . ' and $foo_new = ' . $foo_new . ', FNORD' . "\n" );
     $self->{foo} = $foo_new;
-};
+    return;
+}
 
-#our void::method $inherited = sub {
+#sub inherited {
+#    { my void::method $RETURN_TYPE };
 #    ( my RPerl::Algorithm $self, my string $person ) = @ARG;
 #    RPerl::diag('in PERLOPS_PERLTYPES Algorithm->inherited(), have ::class($self) = ' . ::class($self) . ' and $person = ' . $person . ', IS' . "\n");
-#};
+#    return;
+#}
 
-our string $uninherited__Algorithm = sub {
+sub uninherited__Algorithm {
+    { my string $RETURN_TYPE };
     ( my string $person ) = @ARG;
     RPerl::diag( 'in PERLOPS_PERLTYPES Algorithm::uninherited__Algorithm(), received $person = ' . $person . ', MYSTIC' . "\n" );
     return 'Algorithm::uninherited__Algorithm() RULES! PERLOPS_PERLTYPES';
-};
+}
 
-#our string $uninherited = sub {
+#sub uninherited {
+#    { my string $RETURN_TYPE };
 #    ( my string $person ) = @ARG;
 #    RPerl::diag( 'in PERLOPS_PERLTYPES Algorithm::uninherited(), received $person = ' . $person . ', TERRITORY' . "\n" );
 #    return 'Algorithm::uninherited() ROCKS! PERLOPS_PERLTYPES';
-#};
+#}
 
 1;    # end of class

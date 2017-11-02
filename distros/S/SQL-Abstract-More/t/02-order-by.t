@@ -105,6 +105,11 @@ my @cases =
     expects_quoted => ' ORDER BY colA ASC, colB LIKE ? DESC, colC LIKE ? ASC',
     bind => [qw/test tost/],
    },
+   {
+    given => [qw(-colA +colB)],
+    expects => ' ORDER BY colA DESC, colB ASC',
+    expects_quoted => ' ORDER BY `colA` DESC, `colB` ASC',
+   },
   );
 
 

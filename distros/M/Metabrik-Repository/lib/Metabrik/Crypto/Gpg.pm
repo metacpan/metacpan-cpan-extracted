@@ -1,5 +1,5 @@
 #
-# $Id: Gpg.pm,v f6ad8c136b19 2017/01/01 10:13:54 gomor $
+# $Id: Gpg.pm,v a483f00cce99 2017/03/20 16:50:45 gomor $
 #
 # crypto::gpg Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::System::Package);
 
 sub brik_properties {
    return {
-      revision => '$Revision: f6ad8c136b19 $',
+      revision => '$Revision: a483f00cce99 $',
       tags => [ qw(unstable pgp gnupg) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -46,6 +46,7 @@ sub brik_properties {
          generate_key => [ qw(email description|OPTIONAL comment|OPTIONAL) ],
          encrypt => [ qw($data email_recipient_list) ],
          decrypt => [ qw($data) ],
+         decrypt_from_file => [ qw(file) ],
          export_keys => [ qw(key_id) ],
       },
       require_modules => {
@@ -443,6 +444,19 @@ sub decrypt {
    waitpid($pid, 0);
 
    return \@lines;
+}
+
+sub decrypt_from_file {
+   my $self = shift;
+   my ($file) = @_;
+
+   $self->brik_help_run_undef_arg('decrypt_from_file', $file) or return;
+   $self->brik_help_run_file_not_found('decrypt_from_file', $file) or return;
+
+   my $ft = Metabrik::File::Text->new_from_brik_init($self) or return;
+   my $data = $ft->read($file) or return;
+
+   return $self->decrypt($data);
 }
 
 sub export_keys {

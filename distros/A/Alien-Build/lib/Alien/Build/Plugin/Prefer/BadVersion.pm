@@ -5,8 +5,8 @@ use warnings;
 use Alien::Build::Plugin;
 use Carp ();
 
-# ABSTRACT: Filter out known bad versions
-our $VERSION = '1.25'; # VERSION
+# ABSTRACT: Plugin to filter out known bad versions
+our $VERSION = '1.28'; # VERSION
 
 
 has '+filter' => sub { Carp::croak("The filter property is required for the Prefer::BadVersion plugin") };
@@ -71,11 +71,11 @@ __END__
 
 =head1 NAME
 
-Alien::Build::Plugin::Prefer::BadVersion - Filter out known bad versions
+Alien::Build::Plugin::Prefer::BadVersion - Plugin to filter out known bad versions
 
 =head1 VERSION
 
-version 1.25
+version 1.28
 
 =head1 SYNOPSIS
 
@@ -191,6 +191,10 @@ Petr Pisar (ppisar)
 Lance Wicks (LANCEW)
 
 Ahmad Fatoum (a3f, ATHREEF)
+
+José Joaquín Atria (JJATRIA)
+
+Duke Leto (LETO)
 
 =head1 COPYRIGHT AND LICENSE
 

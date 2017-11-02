@@ -10,7 +10,7 @@ use Carp ();
 sub _path { Path::Tiny::path(@_) }
 
 # ABSTRACT: Specification for defining an external dependency for CPAN
-our $VERSION = '1.25'; # VERSION
+our $VERSION = '1.28'; # VERSION
 
 
 our @EXPORT = qw( requires on plugin probe configure share sys download fetch decode prefer extract patch patch_ffi build build_ffi gather gather_ffi meta_prop ffi log test start_url );
@@ -306,7 +306,7 @@ alienfile - Specification for defining an external dependency for CPAN
 
 =head1 VERSION
 
-version 1.25
+version 1.28
 
 =head1 SYNOPSIS
 
@@ -374,27 +374,27 @@ for those libraries.
 "any" requirement (either share or system):
 
  requires $module;
- requires $module => $verson;
+ requires $module => $version;
 
 configure time requirement:
 
  configure {
    requires $module;
-   requires $module => $verson;
+   requires $module => $version;
  };
 
 system requirement:
 
  sys {
    requires $module;
-   requires $module => $verson;
+   requires $module => $version;
  };
 
 share requirement:
 
  share {
    requires $module;
-   requires $module => $verson;
+   requires $module => $version;
  };
 
 specifies a requirement.  L<Alien::Build> takes advantage of dynamic requirements, so only
@@ -720,6 +720,10 @@ Petr Pisar (ppisar)
 Lance Wicks (LANCEW)
 
 Ahmad Fatoum (a3f, ATHREEF)
+
+José Joaquín Atria (JJATRIA)
+
+Duke Leto (LETO)
 
 =head1 COPYRIGHT AND LICENSE
 

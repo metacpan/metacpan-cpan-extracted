@@ -1,4 +1,25 @@
-Revision history for Perl extension Image::DS9.
+Revision history for Image-DS9
+
+0.188     2017-10-27 17:02:12-04:00 America/New_York
+
+  [ ENHANCEMENTS ]
+
+    * reduce sleeps between polls during wait() by using Time::HiRes and
+      a sub-second poll time.
+
+    * if auto_start is specified, a ds9 process will be created if one
+      can't be connected to.
+
+    * if kill_on_destroy is specified, the ds9 process will be terminated
+      when the Image::DS9 object is destroyed.
+
+0.187     2017-05-17 14:45:35-04:00 America/New_York
+
+  [ BUILD ]
+
+    * switch to Dist::Zilla
+    * make tests compatable with ds9 v 7.5 output
+    * make compatible with Perl 5.26's no '.' in @INC.
 
 0.186	2016-08-10T12:21:52-0400
 

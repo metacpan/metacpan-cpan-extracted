@@ -1,5 +1,10 @@
 Revision history for Task-Devel-Essentials
 
+0.006   Mon, 30 Oct 2017 12:20:51 +0100
+        upgraded versions
+        added more modules
+        fixed version of CPAN
+
 0.005   Fri, 20 Oct 2017 00:00:36 +0200
         fixed versions of modules newer in core than on CPAN
 

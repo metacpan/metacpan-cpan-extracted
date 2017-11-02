@@ -10,8 +10,6 @@ use warnings;
 our $VERSION = 0.001_000;
 
 # [[[ SUBROUTINES ]]]
-our string $empty_sub = sub {
-    return "foo\t$bar\t";
-};
+sub empty_sub { { my string $RETURN_TYPE }; return "foo\t$bar\t"; }
 
 1;    # end of package

@@ -1,3 +1,9 @@
+0.002   2017-11-01 (PERLANCAR)
+
+	- Update to new Firefox profile directory name (/\w+\.NAME-\d+/
+	  instead of just /\w+\.NAME/).
+
+
 0.001   2017-03-20 (PERLANCAR)
 
         - First release.

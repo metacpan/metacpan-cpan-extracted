@@ -1,5 +1,16 @@
 Revision history for Perl extension Smart-Args-TypeTiny
 
+0.12 2017-10-29T13:41:32Z
+
+    - stable Smart::Args::TypeTiny::Check API
+    - depend Test2::V0 instead of Test2::Suite
+
+0.11 2017-10-26T15:19:33Z
+
+    - require Type::Tiny >= 1.002001
+    - optimize checking rule parameter
+    - copy hashref to prevent change original hashref
+
 0.10 2017-10-26T04:33:54Z
 
     - isa/does can take type constraint string

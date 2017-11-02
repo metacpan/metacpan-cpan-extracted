@@ -72,6 +72,7 @@
             "Sub::Exporter" : "0",
             "Sub::Identify" : "0.05",
             "Term::Prompt" : "0",
+            "Test2::API" : "1.302015",
             "Test2::Plugin::FauxHomeDir" : "0",
             "YAML::XS" : "0",
             "autodie" : "0",
@@ -103,13 +104,13 @@
          "web" : "https://github.com/clustericious/Clustericious"
       }
    },
-   "version" : "1.26",
+   "version" : "1.27",
    "x_contributors" : [
       "Brian Duggan",
       "Graham Ollis <plicease@cpan.org>",
       "Curt Tilmes",
       "Yanick Champoux"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

@@ -61,7 +61,7 @@ foreach my $file (@ARGV) {
     set_config();
     $file =~ m/\.src\.rpm$/ and do {
         if(my ($specfile) = RPM4::installsrpm($file)) {
-            if (my $spec = RPM4::specnew($specfile, undef, undef, undef, 1, 1)) {
+            if (my $spec = RPM4::specnew($specfile, undef, undef)) {
                 specquery($spec);
                 $spec->build([qw(RMSOURCE RMSPEC)]);
             }
@@ -69,7 +69,7 @@ foreach my $file (@ARGV) {
         next;
     };
     $file =~ m/\.spec$/ and do {
-        if (my $spec = RPM4::specnew($file, undef, undef, undef, 1, 1)) {
+        if (my $spec = RPM4::specnew($file, undef, undef)) {
             specquery($spec);
         }
         next;

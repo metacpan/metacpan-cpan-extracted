@@ -25,13 +25,13 @@ no_index:
 provides:
   Dist::Zilla::Plugin::Author::SKIRMESS::InsertVersion:
     file: lib/Dist/Zilla/Plugin/Author/SKIRMESS/InsertVersion.pm
-    version: '0.030'
+    version: '0.031'
   Dist::Zilla::Plugin::Author::SKIRMESS::RepositoryBase:
     file: lib/Dist/Zilla/Plugin/Author/SKIRMESS/RepositoryBase.pm
-    version: '0.030'
+    version: '0.031'
   Dist::Zilla::PluginBundle::Author::SKIRMESS:
     file: lib/Dist/Zilla/PluginBundle/Author/SKIRMESS.pm
-    version: '0.030'
+    version: '0.031'
 requires:
   Carp: '0'
   Config::Std: '0'
@@ -50,7 +50,6 @@ requires:
   Dist::Zilla::Plugin::ConfirmRelease: '0'
   Dist::Zilla::Plugin::CopyFilesFromBuild: '0'
   Dist::Zilla::Plugin::CopyFilesFromRelease: '0'
-  Dist::Zilla::Plugin::CopyrightYearFromGit: '0'
   Dist::Zilla::Plugin::ExecDir: '0'
   Dist::Zilla::Plugin::Git::Check: '0'
   Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch: '0'
@@ -108,7 +107,7 @@ resources:
   bugtracker: https://github.com/skirmess/Dist-Zilla-PluginBundle-Author-SKIRMESS/issues
   homepage: https://github.com/skirmess/Dist-Zilla-PluginBundle-Author-SKIRMESS
   repository: https://github.com/skirmess/Dist-Zilla-PluginBundle-Author-SKIRMESS.git
-version: '0.030'
+version: '0.031'
 x_BuiltWith:
   modules:
     Carp: '1.40'
@@ -116,7 +115,7 @@ x_BuiltWith:
     Dist::Zilla: '6.010'
     Dist::Zilla::Plugin::Authority: '1.009'
     Dist::Zilla::Plugin::AutoPrereqs: '6.010'
-    Dist::Zilla::Plugin::AutoPrereqs::Perl::Critic: '0.004'
+    Dist::Zilla::Plugin::AutoPrereqs::Perl::Critic: '0.005'
     Dist::Zilla::Plugin::Bootstrap::lib: '1.001002'
     Dist::Zilla::Plugin::CPANFile: '6.010'
     Dist::Zilla::Plugin::CheckChangesHasContent: '0.010'
@@ -128,18 +127,17 @@ x_BuiltWith:
     Dist::Zilla::Plugin::ConfirmRelease: '6.010'
     Dist::Zilla::Plugin::CopyFilesFromBuild: '0.170880'
     Dist::Zilla::Plugin::CopyFilesFromRelease: '0.006'
-    Dist::Zilla::Plugin::CopyrightYearFromGit: '0.003'
     Dist::Zilla::Plugin::ExecDir: '6.010'
     Dist::Zilla::Plugin::Git::Check: '2.042'
     Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch: '0.014'
     Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts: '0.014'
     Dist::Zilla::Plugin::Git::Commit: '2.042'
     Dist::Zilla::Plugin::Git::Contributors: '0.030'
-    Dist::Zilla::Plugin::Git::FilePermissions: '0.002'
+    Dist::Zilla::Plugin::Git::FilePermissions: '0.003'
     Dist::Zilla::Plugin::Git::GatherDir: '2.042'
     Dist::Zilla::Plugin::Git::Push: '2.042'
     Dist::Zilla::Plugin::Git::Remote::Check: 0.1.2
-    Dist::Zilla::Plugin::Git::RequireUnixEOL: '0.001'
+    Dist::Zilla::Plugin::Git::RequireUnixEOL: '0.002'
     Dist::Zilla::Plugin::Git::Tag: '2.042'
     Dist::Zilla::Plugin::GithubMeta: '0.54'
     Dist::Zilla::Plugin::InstallGuide: '1.200007'
@@ -273,7 +271,7 @@ x_BuiltWith:
     Test::Kwalitee: '1.26'
     Test::MinimumVersion: '0.101082'
     Test::Mojibake: '1.3'
-    Test::More: '1.302105'
+    Test::More: '1.302106'
     Test::NoTabs: '2.00'
     Test::Perl::Critic: '1.03'
     Test::Pod: '1.51'
@@ -383,19 +381,19 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Author::SKIRMESS::RepositoryBase
       name: '@Author::SKIRMESS/Author::SKIRMESS::RepositoryBase'
-      version: '0.029'
+      version: '0.030'
     -
       class: Dist::Zilla::Plugin::Author::SKIRMESS::InsertVersion
       name: '@Author::SKIRMESS/Author::SKIRMESS::InsertVersion'
-      version: '0.029'
+      version: '0.030'
     -
       class: Dist::Zilla::Plugin::Git::FilePermissions
       name: '@Author::SKIRMESS/Git::FilePermissions'
-      version: '0.002'
+      version: '0.003'
     -
       class: Dist::Zilla::Plugin::Git::RequireUnixEOL
       name: '@Author::SKIRMESS/Git::RequireUnixEOL'
-      version: '0.001'
+      version: '0.002'
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: '@Author::SKIRMESS/NextRelease'
@@ -462,7 +460,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::AutoPrereqs::Perl::Critic
       name: '@Author::SKIRMESS/AutoPrereqs::Perl::Critic'
-      version: '0.004'
+      version: '0.005'
     -
       class: Dist::Zilla::Plugin::SetScriptShebang
       name: '@Author::SKIRMESS/SetScriptShebang'
@@ -571,10 +569,6 @@ x_Dist_Zilla:
           version: '0.006'
       name: '@Author::SKIRMESS/ReadmeAnyFromPod/ReadmeTextInBuild'
       version: '0.163250'
-    -
-      class: Dist::Zilla::Plugin::CopyrightYearFromGit
-      name: '@Author::SKIRMESS/CopyrightYearFromGit'
-      version: '0.003'
     -
       class: Dist::Zilla::Plugin::License
       name: '@Author::SKIRMESS/License'
@@ -739,7 +733,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: '0'
-          tag: '0.030'
+          tag: '0.031'
           tag_format: '%v'
           tag_message: ''
         Dist::Zilla::Role::Git::Repo:

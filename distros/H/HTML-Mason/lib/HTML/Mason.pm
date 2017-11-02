@@ -1,10 +1,8 @@
 package HTML::Mason;
-# git description: v1.55-2-g3c9481a
-
 # Copyright (c) 1998-2005 by Jonathan Swartz. All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
-$HTML::Mason::VERSION = '1.56';
+$HTML::Mason::VERSION = '1.58';
 use 5.006;
 
 use HTML::Mason::Interp;
@@ -22,9 +20,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
+=head1 NAME
+
+HTML::Mason - High-performance, dynamic web site authoring system
+
 =head1 VERSION
 
-version 1.56
+version 1.58
 
 =head1 SYNOPSIS
 
@@ -91,21 +95,16 @@ of Perl code (say, to pull records from a database). They can also
 call other components, cache results for later reuse, and perform all
 the tricks you expect from a regular Perl program.
 
-=encoding UTF-8
-
 =head1 WAIT - HAVE YOU SEEN MASON 2?
 
 Version 1 of Mason (this distribution) -- has been around since 1998, is in
 wide use, and is very stable. However it has not changed much in years and
 is no longer actively developed.
 
-Version 2 of Mason -- L<Mason> -- was released in February of 2011. It is more
-actively developed and has a much more modern architecture. If you are just
-starting out, we recommend you give Mason 2 a try.
-
-For a summary of differences between Mason 1 and 2 see
-
-    http://www.openswartz.com/2011/02/21/announcing-mason-2/
+Version 2 of Mason -- L<Mason> -- was released in February of 2011. It offers
+a new syntax as well as a number of other features. See
+L<https://metacpan.org/pod/distribution/Mason/lib/Mason/Manual/UpgradingFromMason1.pod>
+for details of the differences between the two.
 
 =head1 INSTALLATION
 
@@ -201,6 +200,16 @@ Bugs and feature requests will be tracked at RT:
     http://rt.cpan.org/NoAuth/Bugs.html?Dist=HTML-Mason
     bug-html-mason@rt.cpan.org
 
+=head1 SUPPORT
+
+Bugs may be submitted at L<http://rt.cpan.org/Public/Dist/Display.html?Name=HTML-Mason> or via email to L<bug-html-mason@rt.cpan.org|mailto:bug-html-mason@rt.cpan.org>.
+
+I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
+
+=head1 SOURCE
+
+The source code repository for HTML-Mason can be found at L<https://github.com/houseabsolute/HTML-Mason>.
+
 =head1 AUTHORS
 
 =over 4
@@ -221,7 +230,7 @@ Ken Williams <ken@mathforum.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Ævar Arnfjörð Bjarmason Alex Vandiver John Williams Kevin Falcone Patrick Kane Ricardo Signes
+=for stopwords Ævar Arnfjörð Bjarmason Alex Balhatchet Vandiver John Williams Kent Fredric Kevin Falcone Patrick Kane Ricardo Signes Shlomi Fish
 
 =over 4
 
@@ -231,11 +240,19 @@ Ken Williams <ken@mathforum.org>
 
 =item *
 
+Alex Balhatchet <kaoru@slackwise.net>
+
+=item *
+
 Alex Vandiver <alex@chmrr.net>
 
 =item *
 
 John Williams <jwilliams@cpan.org>
+
+=item *
+
+Kent Fredric <kentnl@gentoo.org>
 
 =item *
 
@@ -249,13 +266,20 @@ Patrick Kane <modus-cpan@pr.es.to>
 
 Ricardo Signes <rjbs@cpan.org>
 
+=item *
+
+Shlomi Fish <shlomif@shlomifish.org>
+
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 1998 - 2014 by Jonathan Swartz.
+This software is copyright (c) 1998 - 2017 by Jonathan Swartz.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+The full text of the license can be found in the
+F<LICENSE> file included with this distribution.
 
 =cut

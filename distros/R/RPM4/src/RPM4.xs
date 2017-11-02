@@ -246,7 +246,7 @@ static void *
             s_what = "INST_START";
             if (h) {
                 mXPUSHs(newSVpv("header", 0));
-                mXPUSHs(sv_setref_pv(newSVpvs(""), bless_header, &h));
+                mXPUSHs(sv_setref_pv(newSVpvs(""), bless_header, headerLink(h)));
 #ifdef HDRPMMEM
                 PRINTF_NEW(bless_header, &h, -1);
 #endif
@@ -1818,6 +1818,7 @@ Ts_transreset(ts)
     rpmts ts
     PPCODE:
     rpmtsEmpty(ts);
+    rpmtsSetRootDir(ts, "/");
 
 # Remaping function:
 

@@ -83,7 +83,7 @@ define ([
                     entry = selection;
                 }
             } else if (sel === 'X' || sel === 'x') {
-                stack.pop();
+                stack.pop(undefined, { "logout": true });
                 return;
             } else if (sel === '') {
                 // user hit 'enter'
@@ -119,39 +119,28 @@ define ([
         //
         // miniMenu handlers
         //
-        mmKeyListenerVetEntry = function (evt, n, eid) {
-            var input = $("input[id='" + eid + "']"),
+        mmVetEntry = function (n, entryName) {
+            var input = $("input[id='" + entryName + "']"),
                 vetted = true,
                 vettedVal,
                 vetter;
-            console.log("In writable entry " + eid);
-            vetter = currentTarget.getVetter(eid);
-            console.log("vetter", vetter);
+            console.log("In writable entry " + entryName);
+            vetter = currentTarget.getVetter(entryName);
+            // console.log("vetter", vetter);
             if (typeof vetter === 'function') {
-                console.log("Current entry ->" + eid +"<- has a vetter function!");
+                // console.log("Current entry ->" + entryName +"<- has a vetter function!");
                 vettedVal = vetter(input.val());
                 if (vettedVal) {
                     input.val(vettedVal);
                 } else {
                     vetted = false;
+                    coreLib.displayError("Bad " + entryDefs[entryName].text.toLowerCase() + " value!");
                 }
             }
-            if (vetted) {
-                if (evt.keyCode !== 9) {
-                    $("input:text")[n + 1].focus();
-                }
-            } else {
-                coreLib.displayError("Bad " + entryDefs[eid].text.toLowerCase() + " value!");
-                if (evt.keyCode === 9) {
-                    evt.preventDefault();
-                }
-                $("input:text")[n].focus();
-            }
+            return vetted;
         },
         mmKeyListener = function (evt) {
-
-            var 
-                elid = $(document.activeElement).attr("id"),
+            var elid = $(document.activeElement).attr("id"),
                 elnam = $(document.activeElement).attr("name"),
                 len = $("input:text").length,
                 n = $("input:text").index($(document.activeElement)),
@@ -173,21 +162,26 @@ define ([
                     // FIXME: iterate over writable entries and vet all the values
                     $('#submitButton').click();
                 } else {
-                    mmKeyListenerVetEntry(evt, n, elid);
+                    if (mmVetEntry(n, elid)) {
+                        $("input:text")[n + 1].focus();
+                    } else {
+                        $("input:text")[n].focus();
+                    }
                 }
             } else if (evt.keyCode === 9) {
                 // TAB key in form
-                vetter = function () { return true; };
                 if (
                         (elnam === 'entry0' && evt.shiftKey) ||
                         (elnam === 'sel' && len === 1) ||
-                        (elnam === 'sel' && !evt.shiftKey)
+                        (elnam === 'sel' && ! evt.shiftKey)
                    ) {
                     // prevent TAB keydown from navigating out of the form
                     evt.preventDefault();
-                }
-                if (! evt.shiftKey) {
-                    mmKeyListenerVetEntry(evt, n, elid);
+                } else if (! evt.shiftKey) {
+                    if (! mmVetEntry(n, elid)) {
+                        evt.preventDefault();
+                        $("input:text")[n].focus();
+                    }
                 }
             } else if (evt.keyCode === 27) {
                 var xtgt = stack.getXTarget();
@@ -230,22 +224,6 @@ define ([
                 return;
             }
 
-            if (obj !== undefined) {
-                newObj = $.extend({}, obj);
-        
-                // replace the writable properties with the values from the form
-                if (currentTarget.entriesWrite) {
-                    wlen = currentTarget.entriesWrite.length;
-                    for (i = 0; i < wlen; i += 1) {
-                        entry = currentTarget.entriesWrite[i];
-                        newObj[entry.prop] = $('#' + entry.name).val();
-                    }
-                    //console.log("Modified object based on form contents", newObj);
-                }
-            } else {
-                newObj = {};
-            }
-        
             console.log("sel === " + sel + " and len === " + len);
             if (sel >= 0 && sel <= len) {
                 //console.log("sel " + sel + " is within range");
@@ -260,7 +238,7 @@ define ([
                 if (typeof xtgt === "string") {
                     stack.unwindToTarget(xtgt);
                 } else {
-                    stack.pop();
+                    stack.pop(undefined, { 'logout': true });
                 }
                 return;
             } else {
@@ -268,8 +246,22 @@ define ([
             }
             if (item !== undefined) {
                 //console.log("Selected " + dfn + " menu item: " + item.name);
-                newObj.mm = true;
-                if (currentTarget.type === 'dform' && currentTarget.rememberState) {
+                if (obj === undefined) {
+                    newObj = {};
+                } else {
+                    newObj = $.extend({}, obj);
+                }
+                // Vet all writable entries
+                len = currentTarget.entriesWrite ? currentTarget.entriesWrite.length : 0;
+                console.log("Vetting " + len + " writable dform entries");
+                for (i = 0; i < len; i += 1) {
+                    entry = currentTarget.entriesWrite[i];
+                    if (! mmVetEntry(i, entry.name)) {
+                        return;
+                    }
+                    newObj[entry.prop] = $('#' + entry.name).val();
+                }
+                if (currentTarget.rememberState) {
                     console.log("Changing stack state to", newObj);
                     stack.setState(newObj);
                 }
@@ -539,10 +531,10 @@ define ([
                 if (typeof opts !== 'object') {
                     opts = {};
                 }
+                opts.populate = ('populate' in opts) ? opts.populate : "true";
                 opts.resultLine = ('resultLine' in opts) ? opts.resultLine : "&nbsp";
                 opts.resultLine = (opts.resultLine === null) ? "&nbsp" : opts.resultLine;
                 opts.inputId = ('inputId' in opts) ? opts.inputId : null;
-                coreLib.displayResult(opts.resultLine);
                 // determine dform "state" (i.e. starting content of form entries)
                 if (! state) {
                     state = stack.getState();
@@ -563,9 +555,10 @@ define ([
                 }
                 // call first populate function to trigger sequential,
                 // asynchronous population of all entries with "populate" property
-                if (populateArray.length > 0) {
+                if (opts.populate && populateArray.length > 0) {
                     populate.bootstrap(populateArray);
                 }
+                coreLib.displayResult(opts.resultLine);
                 // listen for user input in form
                 dformListen(dfn, state, opts.inputId);
             };
@@ -579,11 +572,16 @@ define ([
                 console.log('Entering start.dmenu with argument: ' + dmn);
                 // coreLib.clearResult();
                 stack.setFlag();
+                if (typeof opts !== 'object' || opts === null) {
+                    opts = {};
+                }
+                opts.resultLine = ('resultLine' in opts) ? opts.resultLine : "&nbsp";
+                opts.resultLine = (opts.resultLine === null) ? "&nbsp" : opts.resultLine;
                 $('#mainarea').html(dmo.source);
                 $('input[name="sel"]').val('').focus();
                 $('#' + dmn).submit(dmenuSubmitEvent(dmn));
                 $('input[name="sel"]').keydown(dmenuKeyListener(dmn));
-                coreLib.clearResult();
+                coreLib.displayResult(opts.resultLine);
             };
         }, // dmenu
 

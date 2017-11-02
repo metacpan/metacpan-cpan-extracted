@@ -1,5 +1,5 @@
 #
-# $Id: Ripe.pm,v f6ad8c136b19 2017/01/01 10:13:54 gomor $
+# $Id: Ripe.pm,v a173ffd4dd67 2017/10/23 08:23:32 gomor $
 #
 # database::ripe Brik
 #
@@ -14,7 +14,7 @@ use base qw(Metabrik);
 
 sub brik_properties {
    return {
-      revision => '$Revision: f6ad8c136b19 $',
+      revision => '$Revision: a173ffd4dd67 $',
       tags => [ qw(unstable netname country as) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -44,6 +44,7 @@ sub update {
 
    my @urls = qw(
       ftp://ftp.apnic.net/apnic/whois/apnic.db.inetnum.gz
+      ftp://ftp.apnic.net/apnic/whois/apnic.db.inet6num.gz
       ftp://ftp.ripe.net/ripe/dbase/ripe.db.gz
       ftp://ftp.afrinic.net/dbase/afrinic.db.gz
       http://ftp.apnic.net/apnic/dbase/data/jpnic.db.gz
@@ -143,7 +144,7 @@ sub next_record {
 
       push @{$record{raw}}, $line;
 
-      $self->debug && $self->log->debug("next_record: key [$key] val[$val]");
+      $self->log->debug("next_record: key [$key] val[$val]");
 
       if (! exists($record{$key})) {
          $record{$key} = $val;

@@ -4,15 +4,14 @@ author:
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Joel A Berger <joel.a.berger@gmail.com>'
 build_requires:
-  Acme::Alien::DontPanic2: '1.1400'
-  Module::Build: '0.28'
+  Acme::Alien::DontPanic2: '1.2900'
   Test2::V0: '0.000060'
   perl: '5.006'
 configure_requires:
-  Acme::Alien::DontPanic2: '1.1400'
-  Module::Build: '0.28'
+  Acme::Alien::DontPanic2: '1.2900'
+  ExtUtils::MakeMaker: '6.64'
   perl: '5.006'
-dynamic_config: 0
+dynamic_config: 1
 generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
@@ -27,5 +26,5 @@ resources:
   bugtracker: https://github.com/Perl5-Alien/Acme-Ford-Prefect2/issues
   homepage: https://metacpan.org/pod/Acme::Ford::Prefect2
   repository: git://github.com/Perl5-Alien/Acme-Ford-Prefect2.git
-version: '1.1400'
+version: '1.2901'
 x_serialization_backend: 'YAML::Tiny version 1.70'

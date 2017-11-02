@@ -3,7 +3,7 @@ package RPerl::CodeBlock::Subroutine;
 use strict;
 use warnings;
 use RPerl::AfterSubclass;
-our $VERSION = 0.012_000;
+our $VERSION = 0.021_000;
 
 ## no critic qw(ProhibitUselessNoCritic ProhibitMagicNumbers RequireCheckedSyscalls)  # USER DEFAULT 1: allow numeric values & print operator
 ## no critic qw(RequireInterpolationOfMetachars)  # USER DEFAULT 2: allow single-quoted control characters & sigils
@@ -35,41 +35,58 @@ BEGIN {
 use parent qw(RPerl::CodeBlock);
 use RPerl::CodeBlock;
 
+# [[[ INCLUDES ]]]
+use perlapinames_generated;
+
 # [[[ OO PROPERTIES ]]]
 our hashref $properties = {};
 
 # [[[ SUBROUTINES & OO METHODS ]]]
 
-our string_hashref::method $ast_to_rperl__generate = sub {
+sub ast_to_rperl__generate {
+    { my string_hashref::method $RETURN_TYPE };
     ( my object $self, my string_hashref $modes) = @ARG;
     my string_hashref $rperl_source_group = { PMC => q{} };
     my string_hashref $rperl_source_subgroup;
 
     #    RPerl::diag( 'in Subroutine->ast_to_rperl__generate(), received $self = ' . "\n" . RPerl::Parser::rperl_ast__dump($self) . "\n" );
 
-    # unwrap Subroutine_48 from SubroutineOrMethod_76, only if needed
-    if ((ref $self) eq 'SubroutineOrMethod_76') { $self = $self->{children}->[0]; }
+    # unwrap Subroutine_57 from SubroutineOrMethod_87, only if needed
+    if ((ref $self) eq 'SubroutineOrMethod_87') { $self = $self->{children}->[0]; }
 
-    if ( ( ref $self ) ne 'Subroutine_48' ) {
+    if ( ( ref $self ) ne 'Subroutine_57' ) {
         die RPerl::Parser::rperl_rule__replace(
-            'ERROR ECOGEASRP00, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: Grammar rule ' . ( ref $self ) . ' found where Subroutine_48 expected, dying' )
+            'ERROR ECOGEASRP00, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: Grammar rule ' . ( ref $self ) . ' found where Subroutine_57 expected, dying' )
             . "\n";
     }
 
-    #    RPerl::diag( 'in Subroutine->ast_to_rperl__generate(), have possibly-unwrapped $self = ' . "\n" . RPerl::Parser::rperl_ast__dump($self) . "\n" );
+#    RPerl::diag( 'in Subroutine->ast_to_rperl__generate(), have possibly-unwrapped $self = ' . "\n" . RPerl::Parser::rperl_ast__dump($self) . "\n" );
 
-    my string $our                = $self->{children}->[0];
-    my string $return_type        = $self->{children}->[1];
-    my string $name               = $self->{children}->[2];
-    my string $equal_sub          = $self->{children}->[3];
-    my object $arguments_optional = $self->{children}->[4];
-    my object $operations_star    = $self->{children}->[5];
-    my string $right_brace        = $self->{children}->[6];
-    my string $semicolon          = $self->{children}->[7];
- 
-    if ((substr $name, 1, 1) eq '_') {
+    my string $sub                     = $self->{children}->[0];
+    my string $name                    = $self->{children}->[1];
+    my string $left_brace              = $self->{children}->[2];
+    my string $return_type_left_brace  = $self->{children}->[3];
+    my string $return_type_my          = $self->{children}->[4];
+    my string $return_type             = $self->{children}->[5]->{children}->[0];
+    my string $return_type_var         = $self->{children}->[6];
+    my string $return_type_right_brace = $self->{children}->[7];
+    my string $return_type_semicolon   = $self->{children}->[8];
+    my object $arguments_optional      = $self->{children}->[9];
+    my object $operations_star         = $self->{children}->[10];
+    my string $right_brace             = $self->{children}->[11];
+
+    if ((substr $name, 0, 1) eq '_') {
         die 'ERROR ECOGEASRP08, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: subroutine name ' . ($name)
                 . ' must not start with underscore, dying' . "\n";
+    }
+
+    if ((exists $perlapinames_generated::FUNCTIONS_DOCUMENTED->{$name}) or
+        (exists $perlapinames_generated::FUNCTIONS_UNDOCUMENTED->{$name}) or
+        (exists $perlapinames_generated::VARIABLES_DOCUMENTED->{$name}) or
+        (exists $perlapinames_generated::VARIABLES_UNDOCUMENTED->{$name})) {
+        die 'ERROR ECOGEASRP44, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: Perl API name conflict, subroutine name ' . q{'}
+            . $name . q{'}
+            . ' is the same as a protected function or variable name in the Perl API, please choose a different name, dying' . "\n";
     }
 
     # CREATE SYMBOL TABLE ENTRY
@@ -79,7 +96,10 @@ our string_hashref::method $ast_to_rperl__generate = sub {
     # NEED UPGRADE, CORRELATION #rp035: allow multi-line subroutines & other code blocks, where they would be less than 160 chars if on a single line
     # DEV NOTE: no newline appended in the next line, all newlines removed from subroutine body via regex replacement after foreach loop below,
     # thus allowing for single-line subroutines as well as multi-line subroutines, at the control of Perl::Tidy
-    $rperl_source_group->{PMC} .= $our . q{ } . $return_type->{children}->[0] . q{ } . $name . q{ } . $equal_sub;
+    $rperl_source_group->{PMC} .= 
+        $sub . q{ } . $name . q{ } . $left_brace . q{ } . 
+        $return_type_left_brace . q{ } . $return_type_my . q{ } . $return_type . q{ } . $return_type_var . q{ } . 
+        $return_type_right_brace . q{ } . $return_type_semicolon;
 
     if ( exists $arguments_optional->{children}->[0] ) {
         $rperl_source_subgroup = $arguments_optional->{children}->[0]->ast_to_rperl__generate($modes);
@@ -93,40 +113,50 @@ our string_hashref::method $ast_to_rperl__generate = sub {
 
     $rperl_source_group->{PMC} =~ s/\n/\ /gxms;
 
-    $rperl_source_group->{PMC} .= $right_brace . $semicolon . "\n\n";
+    $rperl_source_group->{PMC} .= $right_brace . "\n\n";
     return $rperl_source_group;
-};
+}
 
-our string_hashref::method $ast_to_cpp__generate__CPPOPS_PERLTYPES = sub {
+sub ast_to_cpp__generate__CPPOPS_PERLTYPES {
+    { my string_hashref::method $RETURN_TYPE };
     ( my object $self, my string_hashref $modes) = @ARG;
     my string_hashref $cpp_source_group = { CPP => q{// <<< RP::CB::S __DUMMY_SOURCE_CODE CPPOPS_PERLTYPES >>>} . "\n" };
 
     #...
     return $cpp_source_group;
-};
+}
 
-our string_hashref::method $ast_to_cpp__generate_declaration__CPPOPS_CPPTYPES = sub {
+sub ast_to_cpp__generate_declaration__CPPOPS_CPPTYPES {
+    { my string_hashref::method $RETURN_TYPE };
     ( my object $self, my string_hashref $modes) = @ARG;
 #    RPerl::diag( 'in Subroutine->ast_to_cpp__generate_declaration__CPPOPS_CPPTYPES(), received $modes->{_symbol_table} = ' . "\n" . Dumper($modes->{_symbol_table}) . "\n");
  
     my string_hashref $cpp_source_group = { H => q{} };
 
-    # unwrap Subroutine_48 from SubroutineOrMethod_76, only if needed
-    if ((ref $self) eq 'SubroutineOrMethod_76') { $self = $self->{children}->[0]; }
+    # unwrap Subroutine_57 from SubroutineOrMethod_87, only if needed
+    if ((ref $self) eq 'SubroutineOrMethod_87') { $self = $self->{children}->[0]; }
 
-    my string $return_type = $self->{children}->[1]->{children}->[0];
-    my string $name        = $self->{children}->[2];
-    my object $arguments_optional = $self->{children}->[4];
+    my string $name                    = $self->{children}->[1];
+    my string $return_type             = $self->{children}->[5]->{children}->[0];
+    my object $arguments_optional      = $self->{children}->[9];
 
 #RPerl::diag( 'in Subroutine->ast_to_cpp__generate_declaration__CPPOPS_CPPTYPES(), have $arguments_optional = ' . "\n" . RPerl::Parser::rperl_ast__dump($arguments_optional) . "\n" );
 #RPerl::diag( 'in Subroutine->ast_to_cpp__generate_declaration__CPPOPS_CPPTYPES(), have $return_type = ' . "\n" . RPerl::Parser::rperl_ast__dump($return_type) . "\n" );
 
-    substr $name, 0, 1, q{};            # remove leading $ sigil
     my string_arrayref $arguments = [];
 
     if ((substr $name, 0, 1) eq '_') {
         die 'ERROR ECOGEASCP08, CODE GENERATOR, ABSTRACT SYNTAX TO C++: subroutine name ' . ($name)
                 . ' must not start with underscore, dying' . "\n";
+    }
+
+    if ((exists $perlapinames_generated::FUNCTIONS_DOCUMENTED->{$name}) or
+        (exists $perlapinames_generated::FUNCTIONS_UNDOCUMENTED->{$name}) or
+        (exists $perlapinames_generated::VARIABLES_DOCUMENTED->{$name}) or
+        (exists $perlapinames_generated::VARIABLES_UNDOCUMENTED->{$name})) {
+        die 'ERROR ECOGEASCP44, CODE GENERATOR, ABSTRACT SYNTAX TO C++: Perl API name conflict, subroutine name ' . q{'}
+            . $name . q{'}
+            . ' is the same as a protected function or variable name in the Perl API, please choose a different name, dying' . "\n";
     }
 
     # CREATE SYMBOL TABLE ENTRY
@@ -157,21 +187,30 @@ our string_hashref::method $ast_to_cpp__generate_declaration__CPPOPS_CPPTYPES = 
 
     $cpp_source_group->{H} .= ');';
     return $cpp_source_group;
-};
+}
 
-our string_hashref::method $ast_to_cpp__generate__CPPOPS_CPPTYPES = sub {
+sub ast_to_cpp__generate__CPPOPS_CPPTYPES {
+    { my string_hashref::method $RETURN_TYPE };
     ( my object $self, my string_hashref $modes) = @ARG;
     my string_hashref $cpp_source_group = { CPP => q{} };
 
-    # unwrap Subroutine_48 from SubroutineOrMethod_76, only if needed
-    if ((ref $self) eq 'SubroutineOrMethod_76') { $self = $self->{children}->[0]; }
+    # unwrap Subroutine_57 from SubroutineOrMethod_87, only if needed
+    if ((ref $self) eq 'SubroutineOrMethod_87') { $self = $self->{children}->[0]; }
 
-    my string $return_type = $self->{children}->[1]->{children}->[0];
-    my string $name        = $self->{children}->[2];
-    my object $arguments_optional = $self->{children}->[4];
-    my object $operations_star    = $self->{children}->[5];
+    my string $name                    = $self->{children}->[1];
+    my string $return_type             = $self->{children}->[5]->{children}->[0];
+    my object $arguments_optional      = $self->{children}->[9];
+    my object $operations_star         = $self->{children}->[10];
 
-    substr $name, 0, 1, q{};            # remove leading $ sigil
+    if ((exists $perlapinames_generated::FUNCTIONS_DOCUMENTED->{$name}) or
+        (exists $perlapinames_generated::FUNCTIONS_UNDOCUMENTED->{$name}) or
+        (exists $perlapinames_generated::VARIABLES_DOCUMENTED->{$name}) or
+        (exists $perlapinames_generated::VARIABLES_UNDOCUMENTED->{$name})) {
+        die 'ERROR ECOGEASCP44, CODE GENERATOR, ABSTRACT SYNTAX TO C++: Perl API name conflict, subroutine name ' . q{'}
+            . $name . q{'}
+            . ' is the same as a protected function or variable name in the Perl API, please choose a different name, dying' . "\n";
+    }
+
     my string_arrayref $arguments = [];
     my object $cpp_source_subgroup;
  
@@ -228,28 +267,26 @@ our string_hashref::method $ast_to_cpp__generate__CPPOPS_CPPTYPES = sub {
     $cpp_source_group->{CPP} = $CPP_saved;
 
     $cpp_source_group->{CPP} .= '}';
-
     return $cpp_source_group;
-};
+}
 
-our string_hashref::method $ast_to_cpp__generate_shims__CPPOPS_CPPTYPES = sub {
+sub ast_to_cpp__generate_shims__CPPOPS_CPPTYPES {
+    { my string_hashref::method $RETURN_TYPE };
     ( my object $self, my string_hashref $modes) = @ARG;
 #    RPerl::diag( 'in Subroutine->ast_to_cpp__generate_shims__CPPOPS_CPPTYPES(), received $modes->{_symbol_table} = ' . "\n" . Dumper($modes->{_symbol_table}) . "\n");
  
     my string_hashref $cpp_source_group = { CPP => q{} };
     my object $cpp_source_subgroup = undef;
 
-    # unwrap Subroutine_48 from SubroutineOrMethod_76, only if needed
-    if ((ref $self) eq 'SubroutineOrMethod_76') { $self = $self->{children}->[0]; }
+    # unwrap Subroutine_57 from SubroutineOrMethod_87, only if needed
+    if ((ref $self) eq 'SubroutineOrMethod_87') { $self = $self->{children}->[0]; }
 
-#    my string $return_type = $self->{children}->[1]->{children}->[0];  # SHIM SUBS DEPRECATED IN FAVOR OF MACROS
-    my string $name        = $self->{children}->[2];
-    my object $arguments_optional = $self->{children}->[4];
+    my string $name                    = $self->{children}->[1];
+#    my string $return_type             = $self->{children}->[5]->{children}->[0];    # SHIM SUBS DEPRECATED IN FAVOR OF MACROS
+    my object $arguments_optional      = $self->{children}->[9];
 
 #RPerl::diag( 'in Subroutine->ast_to_cpp__generate_shims__CPPOPS_CPPTYPES(), have $arguments_optional = ' . "\n" . RPerl::Parser::rperl_ast__dump($arguments_optional) . "\n" );
 #RPerl::diag( 'in Subroutine->ast_to_cpp__generate_shims__CPPOPS_CPPTYPES(), have $return_type = ' . "\n" . RPerl::Parser::rperl_ast__dump($return_type) . "\n" );
-
-    substr $name, 0, 1, q{};            # remove leading $ sigil
  
     if ((substr $name, 0, 1) eq '_') {
         die 'ERROR ECOGEASCP08, CODE GENERATOR, ABSTRACT SYNTAX TO C++: subroutine name ' . ($name)
@@ -326,8 +363,7 @@ our string_hashref::method $ast_to_cpp__generate_shims__CPPOPS_CPPTYPES = sub {
     }
 
     $cpp_source_group->{CPP} .= $typeless_arguments_joined . ') ' . $namespace_underscores . $name . '(' . $typeless_arguments_joined . ')';
-
     return $cpp_source_group;
-};
+}
 
 1;    # end of class

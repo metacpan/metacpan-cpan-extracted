@@ -1,5 +1,8 @@
 Revision history for Perl extension Mackerel-ReleaseUtils
 
+v0.2.3 2017-10-28T08:01:36Z
+    - dies when ghch exits with non-0 exit status
+
 v0.2.2 2017-09-04T06:24:54Z
     - Die when git workspace is dirty
 

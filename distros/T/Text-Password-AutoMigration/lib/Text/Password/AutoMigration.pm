@@ -1,5 +1,5 @@
 package Text::Password::AutoMigration;
-our $VERSION = "0.07";
+our $VERSION = "0.09";
 
 use Moose;
 extends 'Text::Password::SHA';
@@ -9,8 +9,6 @@ extends 'Text::Password::SHA';
 =head1 NAME
 
 Text::Password::AutoMigration - generate and verify Password with any contexts
-
-=for html <a href="https://travis-ci.org/worthmine/Text-Password-AutoMigration"><img src="https://travis-ci.org/worthmine/Text-Password-AutoMigration.svg?branch=master"></a>
 
 =head1 SYNOPSIS
 
@@ -110,8 +108,8 @@ override 'verify' => sub {
 
     if (   $data =~ /^\$6\$[!-~]{1,8}\$[!-~]{86}$/
         or $data =~ /^\$5\$[!-~]{1,8}\$[!-~]{43}$/
-        or $data =~ /^[0-9a-f]{40}$/i )
-    {
+        or $data =~ /^[0-9a-f]{40}$/i
+    ) {
         return $self->encrypt($input) if super() and $self->migrate();
         return super();
     }elsif( $self->Text::Password::MD5::verify(@_) ){
@@ -123,7 +121,7 @@ override 'verify' => sub {
 
 =head3 nonce($length)
 
-generates the strings with enough strength.
+generates the random strings with enough strength.
 
 the length defaults to 8($self->default).
 
@@ -141,6 +139,11 @@ less readable characters(0Oo1Il|!2Zz5sS$6b9qCcKkUuVvWwXx.,:;~-^'"`) are forbidde
 unless $self->readability is 0.
 
 the length defaults to 8($self->default).
+
+B<DON'T TRUST> this method.
+According to L<Password expert says he was wrong|https://www.usatoday.com/story/news/nation-now/2017/08/09/password-expert-says-he-wrong-numbers-capital-letters-and-symbols-useless/552013001/>,
+it's not a safe way. So, I will rewrite this method as soon as I find the better way.
+
  
 =cut
 
@@ -158,6 +161,9 @@ __END__
 =item L<GitHub|https://github.com/worthmine/Text-Password-AutoMigration>
 
 =item L<CPAN|http://search.cpan.org/perldoc?Text%3A%3APassword%3A%3AAutoMigration>
+
+=item L<https://shattered.io/>
+
 
 =back
 

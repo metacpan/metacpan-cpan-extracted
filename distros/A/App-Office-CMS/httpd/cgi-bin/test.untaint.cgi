@@ -1,7 +1,7 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
-use lib '/home/ron/perl5/lib/perl5/';
-use common::sense;
+use strict;
+use warnings;
 
 use CGI;
 use CGI::Untaint;

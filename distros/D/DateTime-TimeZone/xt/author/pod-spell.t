@@ -249,6 +249,7 @@ Jerusalem
 Johannesburg
 John
 Joshua
+Juba
 Jujuy
 Juneau
 KE

@@ -3,7 +3,7 @@ package GeoIP2::Record::Subdivision;
 use strict;
 use warnings;
 
-our $VERSION = '2.003005';
+our $VERSION = '2.004000';
 
 use Moo;
 
@@ -47,7 +47,7 @@ GeoIP2::Record::Subdivision - Contains data for the subdivision record associate
 
 =head1 VERSION
 
-version 2.003005
+version 2.004000
 
 =head1 SYNOPSIS
 
@@ -62,7 +62,7 @@ version 2.003005
 
   my $insights = $client->insights( ip => '24.24.24.24' );
 
-  my $subdivision_rec = $insights->subdivision();
+  my $subdivision_rec = $insights->most_specific_subdivision();
   print $subdivision_rec->name(), "\n";
 
 =head1 DESCRIPTION

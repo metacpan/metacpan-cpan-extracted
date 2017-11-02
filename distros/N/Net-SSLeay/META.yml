@@ -29,4 +29,4 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=net-ssleay
   license: http://dev.perl.org/licenses/
   repository: http://svn.debian.org/wsvn/net-ssleay
-version: '1.81'
+version: '1.82'

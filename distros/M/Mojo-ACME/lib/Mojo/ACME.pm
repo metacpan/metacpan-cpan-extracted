@@ -2,7 +2,7 @@ package Mojo::ACME;
 
 use Mojo::Base -base;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 $VERSION = eval $VERSION;
 
 use Mojo::Collection 'c';
@@ -102,11 +102,10 @@ sub get_nonce {
 
   # use result directly otherwise
   # if say the default ua has been replaced
-  if ($tx->success) {
-    my $nonce = $tx->res->headers->header('Replay-Nonce');
-    return $nonce if $nonce;
-  }
-  die "Could not get nonce\n" unless @$nonces;
+  _die_if_error($tx, 'Could not get nonce');
+  my $nonce = $tx->res->headers->header('Replay-Nonce');
+  return $nonce if $nonce;
+  die "Response did not contain a nonce\n" unless @$nonces;
 }
 
 sub generate_csr {
@@ -207,7 +206,9 @@ sub signed_request {
 sub _die_if_error {
   my ($tx, $msg, $code) = @_;
   return if $tx->success && (!$code || $code == $tx->res->code);
-  if (my $got = $tx->res->code) { $msg .= " (code $got)" }
+  my $error = $tx->error;
+  if ($error->{code}) { $msg .= " (code $error->{code})" }
+  $msg .= " $error->{message}";
   my $json = $tx->res->json || {};
   if (my $detail = $json->{detail}) { $msg .= " - $detail" }
   die "$msg\n";

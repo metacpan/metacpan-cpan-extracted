@@ -34,7 +34,8 @@
          "requires" : {
             "Class::InsideOut" : "1.06",
             "JSON" : "2.12",
-            "Net::OpenSSH" : "0.39"
+            "Net::OpenSSH" : "0.39",
+            "Scalar::Util" : "0"
          }
       }
    },
@@ -49,7 +50,7 @@
          "web" : "http://github.com/plainblack/ssh-rpc"
       }
    },
-   "version" : "1.203",
+   "version" : "1.204",
    "x_contributors" : [
       "Janos Mattyasovszky <mail@matya.hu>"
    ]

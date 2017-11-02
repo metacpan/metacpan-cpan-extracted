@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-use Test::More qw(no_plan);
+use Test::More tests => 14;
 use Config;
 
 # Tests to check if options given at initialization are failing as expecting
@@ -24,7 +24,7 @@ SKIP: {
 }
 SKIP: {
 	eval{ require Log::Funlog::Lang };
-	skip 'Log::Funlog::Lang not present' if ($@);
+	skip 'Log::Funlog::Lang not present',3 if ($@);
 	if (! $@) {
 		ok(!  eval{ use Log::Funlog; Log::Funlog->new(verbose => '1/1', fun => 101) }, 'fun => 101' );
 		ok(!  eval{ use Log::Funlog; Log::Funlog->new(verbose => '1/1', fun => 0) }, 'fun => 0' );

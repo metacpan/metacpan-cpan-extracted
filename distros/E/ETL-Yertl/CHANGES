@@ -1,5 +1,13 @@
 Changelog for ETL-Yertl
 
+0.037     2017-10-27 17:27:41-05:00 America/Chicago
+
+    [Fixed]
+
+    - Fixed test that depended on YAML.pm (which we removed as
+      a dependency). Now the test uses YAML::Tiny instead. Thanks
+      @ltriant! (Github #155)
+
 0.036     2017-10-25 23:32:12-05:00 America/Chicago
 
     [Removed]

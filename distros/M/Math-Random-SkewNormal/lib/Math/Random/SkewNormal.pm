@@ -11,21 +11,23 @@ use 5.008;
 use strict;
 use warnings;
 
-use Perl6::Export::Attrs;
 use Readonly;
 
 # }}}
 # {{{ variables
 
+our @ISA = qw(Exporter);
+our @EXPORT_OK = qw(generate_sn generate_sn_multi);
+
 my Readonly $pi = 3.14159265358979323846;
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 # }}}
 
 # {{{ generate_sn             exported
 
-sub generate_sn : Export {
+sub generate_sn {
     my $skewness = shift // 0;
     my $a = generate_n();
     my $b = generate_n();
@@ -39,7 +41,7 @@ sub generate_sn : Export {
 # }}}
 # {{{ generate_sn_multi       exported
 
-sub generate_sn_multi : Export {
+sub generate_sn_multi {
     my $delta = shift // return;
     my $omega = shift // return;
 
@@ -196,7 +198,7 @@ We use following algorithms:
 
 =item * Choleski's decomposition; for inverting matrices
 
-=item * A lemma mentioned e. g. in article from A. Azalini:
+=item * A lemma mentioned e. g. in article from A. Azzalini:
     The skew-normal distribution and related multivariate families;
     for generating Skew-Normal realizations
 

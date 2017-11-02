@@ -1,5 +1,5 @@
 #
-# $Id: Elasticsearch.pm,v 014bf41a7d83 2017/01/21 11:08:30 gomor $
+# $Id: Elasticsearch.pm,v ec1fed18b17d 2017/10/24 11:52:27 gomor $
 #
 # client::elasticsearch Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Client::Rest);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 014bf41a7d83 $',
+      revision => '$Revision: ec1fed18b17d $',
       tags => [ qw(unstable es es) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -31,6 +31,8 @@ sub brik_properties {
          try => [ qw(count) ],
          use_bulk_autoflush => [ qw(0|1) ],
          use_indexing_optimizations => [ qw(0|1) ],
+         csv_encoded_fields => [ qw(fields) ],
+         csv_object_fields => [ qw(fields) ],
          _es => [ qw(INTERNAL) ],
          _bulk => [ qw(INTERNAL) ],
          _scroll => [ qw(INTERNAL) ],
@@ -59,27 +61,34 @@ sub brik_properties {
          close_scroll => [ ],
          total_scroll => [ ],
          next_scroll => [ ],
-         index_document => [ qw(document index|OPTIONAL type|OPTIONAL id|OPTIONAL) ],
-         index_bulk => [ qw(document index|OPTIONAL type|OPTIONAL id|OPTIONAL) ],
+         index_document => [ qw(document index|OPTIONAL type|OPTIONAL hash|OPTIONAL id|OPTIONAL) ],
+         update_document => [ qw(document id index|OPTIONAL type|OPTIONAL hash|OPTIONAL) ],
+         index_bulk => [ qw(document index|OPTIONAL type|OPTIONAL hash|OPTIONAL id|OPTIONAL) ],
          bulk_flush => [ ],
-         query => [ qw($query_hash index|OPTIONAL type|OPTIONAL) ],
+         query => [ qw($query_hash index|OPTIONAL type|OPTIONAL hash|OPTIONAL) ],
          count => [ qw(index|OPTIONAL type|OPTIONAL) ],
          get_from_id => [ qw(id index|OPTIONAL type|OPTIONAL) ],
          www_search => [ qw(query index|OPTIONAL type|OPTIONAL) ],
          delete_index => [ qw(index|indices_list) ],
+         update_alias => [ qw(new_index alias) ],
          delete_document => [ qw(index type id) ],
-         show_indices => [ ],
+         delete_by_query => [ qw($query_hash index type) ],
+         show_indices => [ qw(string_filter|OPTIONAL) ],
          show_nodes => [ ],
          show_health => [ ],
          show_recovery => [ ],
          list_indices => [ ],
          get_indices => [ ],
          get_index => [ qw(index|indices_list) ],
+         list_index_types => [ qw(index) ],
+         list_index_fields => [ qw(index) ],
          list_indices_version => [ qw(index|indices_list) ],
          open_index => [ qw(index|indices_list) ],
          close_index => [ qw(index|indices_list) ],
          get_aliases => [ qw(index) ],
-         get_mappings => [ qw(index) ],
+         put_alias => [ qw(index alias) ],
+         delete_alias => [ qw(index alias) ],
+         get_mappings => [ qw(index type|OPTIONAL) ],
          create_index => [ qw(index) ],
          create_index_with_mappings => [ qw(index mappings) ],
          info => [ qw(nodes_list|OPTIONAL) ],
@@ -103,7 +112,7 @@ sub brik_properties {
          parse_error_string => [ qw(string) ],
          refresh_index => [ qw(index) ],
          export_as_csv => [ qw(index size|OPTIONAL) ],
-         import_from_csv => [ qw(input_csv index|OPTIONAL type|OPTIONAL size|OPTIONAL) ],
+         import_from_csv => [ qw(input_csv index|OPTIONAL type|OPTIONAL hash|OPTIONAL) ],
          get_stats_process => [ ],
          get_process => [ ],
          get_cluster_state => [ ],
@@ -128,12 +137,15 @@ sub brik_properties {
          enable_shard_allocation => [ ],
          flush_synced => [ ],
          create_snapshot_repository => [ qw(body repository_name|OPTIONAL) ],
-         create_shared_fs_snapshot_repository => [ qw(location repository_name|OPTIONAL) ],
+         create_shared_fs_snapshot_repository => [ qw(location
+            repository_name|OPTIONAL) ],
          get_snapshot_repositories => [ ],
          get_snapshot_status => [ ],
          delete_snapshot_repository => [ qw(repository_name) ],
-         create_snapshot => [ qw(snapshot_name|OPTIONAL repository_name|OPTIONAL body|OPTIONAL) ],
-         create_snapshot_for_indices => [ qw(indices snapshot_name|OPTIONAL repository_name|OPTIONAL) ],
+         create_snapshot => [ qw(snapshot_name|OPTIONAL repository_name|OPTIONAL 
+            body|OPTIONAL) ],
+         create_snapshot_for_indices => [ qw(indices snapshot_name|OPTIONAL
+            repository_name|OPTIONAL) ],
          is_snapshot_finished => [ ],
          get_snapshot_state => [ ],
          get_snapshot => [ qw(snapshot_name|OPTIONAL repository_name|OPTIONAL) ],
@@ -142,14 +154,11 @@ sub brik_properties {
          restore_snapshot_for_indices => [ qw(indices snapshot_name repository_name) ],
       },
       require_modules => {
-         'Metabrik::String::Base64' => [ ],
          'Metabrik::String::Json' => [ ],
          'Metabrik::File::Csv' => [ ],
          'Metabrik::File::Json' => [ ],
          'Metabrik::File::Dump' => [ ],
          'Metabrik::Format::Number' => [ ],
-         'Data::Dump' => [ ],
-         'Data::Dumper' => [ ],
          'Search::Elasticsearch' => [ ],
       },
    };
@@ -160,8 +169,8 @@ sub brik_preinit {
 
    eval("use Search::Elasticsearch;");
    if ($Search::Elasticsearch::VERSION < 5) {
-      $self->log->error("brik_preinit: please upgrade Search::Elasticsearch module with: ".
-         "run perl::module install Search::Elasticsearch");
+      $self->log->error("brik_preinit: please upgrade Search::Elasticsearch module ".
+         "with: run perl::module install Search::Elasticsearch");
    }
 
    return $self->SUPER::brik_preinit;
@@ -399,9 +408,12 @@ sub next_scroll {
    return $next;
 }
 
+#
+# Search::Elasticsearch::Client::5_0::Direct
+#
 sub index_document {
    my $self = shift;
-   my ($doc, $index, $type, $id) = @_;
+   my ($doc, $index, $type, $hash, $id) = @_;
 
    $index ||= $self->index;
    $type ||= $self->type;
@@ -421,6 +433,10 @@ sub index_document {
       $args{id} = $id;
    }
 
+   if (defined($hash)) {
+      %args = ( %args, %$hash );
+   }
+
    my $r;
    eval {
       $r = $es->index(%args);
@@ -434,11 +450,51 @@ sub index_document {
 }
 
 #
+# Search::Elasticsearch::Client::5_0::Direct
+#
+sub update_document {
+   my $self = shift;
+   my ($doc, $id, $index, $type, $hash) = @_;
+
+   $index ||= $self->index;
+   $type ||= $self->type;
+   my $es = $self->_es;
+   $self->brik_help_run_undef_arg('open', $es) or return;
+   $self->brik_help_run_undef_arg('update_document', $doc) or return;
+   $self->brik_help_run_invalid_arg('update_document', $doc, 'HASH') or return;
+   $self->brik_help_run_undef_arg('update_document', $id) or return;
+   $self->brik_help_set_undef_arg('index', $index) or return;
+   $self->brik_help_set_undef_arg('type', $type) or return;
+
+   my %args = (
+      id => $id,
+      index => $index,
+      type => $type,
+      body => { doc => $doc },
+   );
+
+   if (defined($hash)) {
+      %args = ( %args, %$hash );
+   }
+
+   my $r;
+   eval {
+      $r = $es->update(%args);
+   };
+   if ($@) {
+      chomp($@);
+      return $self->log->error("update_document: index failed for index [$index]: [$@]");
+   }
+
+   return $r;
+}
+
+#
 # Search::Elasticsearch::Client::5_0::Bulk
 #
 sub index_bulk {
    my $self = shift;
-   my ($doc, $index, $type, $id) = @_;
+   my ($doc, $index, $type, $hash, $id) = @_;
 
    my $bulk = $self->_bulk;
    $index ||= $self->index;
@@ -455,9 +511,12 @@ sub index_bulk {
       $args{id} = $id;
    }
 
+   if (defined($hash)) {
+      %args = ( %args, %$hash );
+   }
+
    my $r;
    eval {
-      #$r = $bulk->index(\%args);
       $r = $bulk->add_action(index => \%args);
    };
    if ($@) {
@@ -493,8 +552,8 @@ RETRY:
       $r = $bulk->flush;
    };
    if ($@) {
+      chomp($@);
       if (--$try == 0) {
-         chomp($@);
          my $p = $self->parse_error_string($@);
          if (defined($p) && exists($p->{class})) {
             my $class = $p->{class};
@@ -507,7 +566,9 @@ RETRY:
             return $self->log->error("bulk_flush: failed after [$try]: [$@]");
          }
       }
-      sleep 60;
+      $self->log->warning("bulk_flush: sleeping 10 seconds before retry cause error ".
+               "[$@]");
+      sleep 10;
       goto RETRY;
    }
 
@@ -587,7 +648,7 @@ sub count {
 #
 sub query {
    my $self = shift;
-   my ($query, $index, $type) = @_;
+   my ($query, $index, $type, $hash) = @_;
 
    $index ||= $self->index;
    $type ||= $self->type;
@@ -604,6 +665,10 @@ sub query {
       index => $index,
       body => $query,
    );
+
+   if (defined($hash)) {
+      %args = ( %args, %$hash );
+   }
 
    if ($type ne '*') {
       $args{type} = $type;
@@ -720,7 +785,7 @@ sub delete_index {
 #
 sub delete_document {
    my $self = shift;
-   my ($index, $type, $id) = @_;
+   my ($index, $type, $id, $hash) = @_;
 
    my $es = $self->_es;
    $self->brik_help_run_undef_arg('open', $es) or return;
@@ -733,6 +798,10 @@ sub delete_document {
       type => $type,
       id => $id,
    );
+
+   if (defined($hash)) {
+      %args = ( %args, %$hash );
+   }
 
    my $r;
    eval {
@@ -747,10 +816,50 @@ sub delete_document {
 }
 
 #
+# https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-delete-by-query.html
+#
+# Example: my $q = { query => { term => { ip => "192.168.57.19" } } }
+#
+sub delete_by_query {
+   my $self = shift;
+   my ($query, $index, $type) = @_;
+
+   my $es = $self->_es;
+   $self->brik_help_run_undef_arg('open', $es) or return;
+   $self->brik_help_run_undef_arg('delete_by_query', $query) or return;
+   $self->brik_help_run_undef_arg('delete_by_query', $index) or return;
+   $self->brik_help_run_undef_arg('delete_by_query', $type) or return;
+   $self->brik_help_run_invalid_arg('delete_by_query', $query, 'HASH') or return;
+
+   my $timeout = $self->rtimeout;
+
+   my %args = (
+      index => $index,
+      type => $type,
+      body => $query,
+   );
+
+   my $r;
+   eval {
+      $r = $es->delete_by_query(%args);
+   };
+   if ($@) {
+      chomp($@);
+      return $self->log->error("delete_by_query: failed for index [$index]: [$@]");
+   }
+
+   # This may fail, we ignore it.
+   $self->refresh_index($index);
+
+   return $r;
+}
+
+#
 # Search::Elasticsearch::Client::2_0::Direct::Cat
 #
 sub show_indices {
    my $self = shift;
+   my ($string) = @_;
 
    my $es = $self->_es;
    $self->brik_help_run_undef_arg('open', $es) or return;
@@ -768,6 +877,16 @@ sub show_indices {
 
    if (@lines == 0) {
       $self->log->warning("show_indices: nothing returned, no index?");
+   }
+
+   my @filtered = ();
+   if (defined($string)) {
+      for (@lines) {
+         if (m{$string}) {
+            push @filtered, $_;
+         }
+      }
+      @lines = @filtered;
    }
 
    return \@lines;
@@ -925,6 +1044,9 @@ sub get_indices {
    return \@indices;
 }
 
+#
+# Search::Elasticsearch::Client::5_0::Direct::Indices
+#
 sub get_index {
    my $self = shift;
    my ($index) = @_;
@@ -934,11 +1056,13 @@ sub get_index {
    $self->brik_help_run_undef_arg('get_index', $index) or return;
    $self->brik_help_run_invalid_arg('get_index', $index, 'ARRAY', 'SCALAR') or return;
 
+   my %args = (
+      index => $index,
+   );
+
    my $r;
    eval {
-      $r = $es->indices->get(
-         index => $index,
-      );
+      $r = $es->indices->get(%args);
    };
    if ($@) {
       chomp($@);
@@ -948,6 +1072,81 @@ sub get_index {
    return $r;
 }
 
+sub list_index_types {
+   my $self = shift;
+   my ($index) = @_;
+
+   my $es = $self->_es;
+   $self->brik_help_run_undef_arg('open', $es) or return;
+   $self->brik_help_run_undef_arg('list_index_types', $index) or return;
+   $self->brik_help_run_invalid_arg('list_index_types', $index, 'SCALAR') or return;
+
+   my $r = $self->get_mappings($index) or return;
+   if (keys %$r > 1) {
+      return $self->log->error("list_index_types: multiple indices found, choose one");
+   }
+
+   my @types = ();
+   for my $this_index (keys %$r) {
+      my $mappings = $r->{$this_index}{mappings};
+      push @types, keys %$mappings;
+   }
+
+   my %uniq = map { $_ => 1 } @types;
+
+   return [ sort { $a cmp $b } keys %uniq ];
+}
+
+#
+# By default, if you provide only one index and no type,
+# all types will be merged (including _default_)
+# If you specify one type (other than _default_), _default_ will be merged to it.
+#
+sub list_index_fields {
+   my $self = shift;
+   my ($index, $type) = @_;
+
+   my $es = $self->_es;
+   $self->brik_help_run_undef_arg('open', $es) or return;
+   $self->brik_help_run_undef_arg('list_index_fields', $index) or return;
+   $self->brik_help_run_invalid_arg('list_index_fields', $index, 'SCALAR') or return;
+
+   my $r;
+   if (defined($type)) {
+      $r = $self->get_mappings($index, $type) or return;
+      if (keys %$r > 1) {
+         return $self->log->error("list_index_fields: multiple indices found, ".
+            "choose one");
+      }
+      my $r2 = $self->get_mappings($index, '_default_') or return;
+      # Merge
+      for my $this_index (keys %$r2) {
+         my $default = $r2->{$this_index}{mappings}{'_default_'};
+         $r->{$this_index}{mappings}{_default_} = $default;
+      }
+   }
+   else {
+      $r = $self->get_mappings($index) or return;
+      if (keys %$r > 1) {
+         return $self->log->error("list_index_fields: multiple indices found, ".
+            "choose one");
+      }
+   }
+
+   my @fields = ();
+   for my $this_index (keys %$r) {
+      my $mappings = $r->{$this_index}{mappings};
+      for my $this_type (keys %$mappings) {
+         my $properties = $mappings->{$this_type}{properties};
+         push @fields, keys %$properties;
+      }
+   }
+
+   my %uniq = map { $_ => 1 } @fields;
+
+   return [ sort { $a cmp $b } keys %uniq ];
+}
+
 sub list_indices_version {
    my $self = shift;
    my ($index) = @_;
@@ -955,7 +1154,8 @@ sub list_indices_version {
    my $es = $self->_es;
    $self->brik_help_run_undef_arg('open', $es) or return;
    $self->brik_help_run_undef_arg('list_indices_version', $index) or return;
-   $self->brik_help_run_invalid_arg('list_indices_version', $index, 'ARRAY', 'SCALAR') or return;
+   $self->brik_help_run_invalid_arg('list_indices_version', $index, 'ARRAY', 'SCALAR')
+      or return;
 
    my $r = $self->get_index($index) or return;
 
@@ -1018,41 +1218,151 @@ sub close_index {
    return $r;
 }
 
+#
+# Search::Elasticsearch::Client::5_0::Direct::Indices
+#
 sub get_aliases {
    my $self = shift;
+   my ($index) = @_;
 
+   $index ||= $self->index;
    my $es = $self->_es;
    $self->brik_help_run_undef_arg('open', $es) or return;
 
+   my %args = (
+      index => $index,
+   );
+
    my $r;
    eval {
-      $r = $es->indices->get_aliases;
+      $r = $es->indices->get(%args);
    };
    if ($@) {
       chomp($@);
       return $self->log->error("get_aliases: get_aliases failed: [$@]");
    }
 
+   my %aliases = ();
+   for my $this (keys %$r) {
+      $aliases{$this} = $r->{$this}{aliases};
+   }
+
+   return \%aliases;
+}
+
+#
+# Search::Elasticsearch::Client::5_0::Direct::Indices
+#
+sub put_alias {
+   my $self = shift;
+   my ($index, $alias) = @_;
+
+   my $es = $self->_es;
+   $self->brik_help_run_undef_arg('open', $es) or return;
+   $self->brik_help_run_undef_arg('put_alias', $index) or return;
+   $self->brik_help_run_undef_arg('put_alias', $alias) or return;
+
+   my %args = (
+      index => $index,
+      name => $alias,
+   );
+
+   my $r;
+   eval {
+      $r = $es->indices->put_alias(%args);
+   };
+   if ($@) {
+      chomp($@);
+      return $self->log->error("put_alias: put_alias failed: [$@]");
+   }
+
    return $r;
 }
 
 #
-# https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-get-mapping.html
+# Search::Elasticsearch::Client::5_0::Direct::Indices
 #
-# GET http://192.168.0.IP:9200/INDEX/_mapping/DOCUMENT
+sub delete_alias {
+   my $self = shift;
+   my ($index, $alias) = @_;
+
+   my $es = $self->_es;
+   $self->brik_help_run_undef_arg('open', $es) or return;
+   $self->brik_help_run_undef_arg('delete_alias', $index) or return;
+   $self->brik_help_run_undef_arg('delete_alias', $alias) or return;
+
+   my %args = (
+      index => $index,
+      name => $alias,
+   );
+
+   my $r;
+   eval {
+      $r = $es->indices->delete_alias(%args);
+   };
+   if ($@) {
+      chomp($@);
+      return $self->log->error("delete_alias: delete_alias failed: [$@]");
+   }
+
+   return $r;
+}
+
+sub update_alias {
+   my $self = shift;
+   my ($new_index, $alias) = @_;
+
+   my $es = $self->_es;
+   $self->brik_help_run_undef_arg('open', $es) or return;
+   $self->brik_help_run_undef_arg('update_alias', $new_index) or return;
+   $self->brik_help_run_undef_arg('update_alias', $alias) or return;
+
+   # Search for previous index with that alias, if any.
+   my $prev_index;
+   my $aliases = $self->get_aliases or return;
+   while (my ($k, $v) = each %$aliases) {
+      for my $this (keys %$v) {
+         if ($this eq $alias) {
+            $prev_index = $k;
+            last;
+         }
+      }
+      last if $prev_index;
+   }
+
+   # Delete previous alias if it exists.
+   if (defined($prev_index)) {
+      $self->delete_alias($prev_index, $alias) or return;
+   }
+
+   return $self->put_alias($new_index, $alias);
+}
+
+#
+# Search::Elasticsearch::Client::2_0::Direct::Indices
 #
 sub get_mappings {
    my $self = shift;
-   my ($index) = @_;
+   my ($index, $type) = @_;
 
-   $index ||= $self->index;
+   my $es = $self->_es;
+   $self->brik_help_run_undef_arg('open', $es) or return;
    $self->brik_help_run_undef_arg('get_mappings', $index) or return;
+   $self->brik_help_run_invalid_arg('get_mappings', $index, 'ARRAY', 'SCALAR') or return;
 
-   my $r = $self->get_index($index) or return;
-   if ($index ne '*') {
-      if (exists($r->{$index}) && exists($r->{$index}{mappings})) {
-         return $r->{$index}{mappings};
-      }
+   my %args = (
+      index => $index,
+      type => $type,
+   );
+
+   my $r;
+   eval {
+      $r = $es->indices->get_mapping(%args);
+   };
+   if ($@) {
+      chomp($@);
+      return $self->log->error("get_mappings: get_mapping failed for index [$index]: ".
+         "[$@]");
    }
 
    return $r;
@@ -1550,7 +1860,8 @@ sub parse_error_string {
    }
 
    # Sanity check
-   if ($node =~ m{^http} && $code =~ m{^\d+$} && defined($dump) && ref($dump) eq 'HASH') {
+   if (defined($node) && $node =~ m{^http} && $code =~ m{^\d+$}
+   &&  defined($dump) && ref($dump) eq 'HASH') {
       return {
          class => $class,
          node => $node,
@@ -1635,7 +1946,6 @@ sub export_as_csv {
    }
 
    my $fd = Metabrik::File::Dump->new_from_brik_init($self) or return;
-   my $sb = Metabrik::String::Base64->new_from_brik_init($self) or return;
 
    my $fc = Metabrik::File::Csv->new_from_brik_init($self) or return;
    $fc->separator(',');
@@ -1644,12 +1954,11 @@ sub export_as_csv {
    $fc->first_line_is_header(0);
    $fc->write_header(1);
    $fc->use_quoting(1);
+   $fc->encoded_fields($self->csv_encoded_fields);
+   $fc->object_fields($self->csv_object_fields);
 
    my $total = $self->total_scroll;
    $self->log->info("export_as_csv: total [$total] for index [$index]");
-
-   local $Data::Dump::INDENT = "";    # No indentation shorten length
-   local $Data::Dump::TRY_BASE64 = 0; # Never encode in base64
 
    my $h = {};
    my %types = ();
@@ -1665,7 +1974,9 @@ sub export_as_csv {
       my $doc = $this->{_source};
       my $type = $this->{_type};
       if (! exists($types{$type})) {
-         $types{$type}{header} = [ '_id', sort { $a cmp $b } keys %$doc ];
+         my $fields = $self->list_index_fields($index, $type) or return;
+         #$types{$type}{header} = [ '_id', sort { $a cmp $b } keys %$doc ];
+         $types{$type}{header} = [ '_id', @$fields ];
          $types{$type}{output} = "$index:$type.csv";
          $done = $types{$type}{output_exported} = "$index:$type.csv.exported";
 
@@ -1682,14 +1993,7 @@ sub export_as_csv {
       $h->{_id} = $id;
 
       for my $k (keys %$doc) {
-         if (ref($doc->{$k})) {
-            my $s = Data::Dump::dump($doc->{$k});
-            $s =~ s{\n}{}g;
-            $h->{$k} = 'BASE64:'.$sb->encode($s);
-         }
-         else {
-            $h->{$k} = $doc->{$k};
-         }
+         $h->{$k} = $doc->{$k};
       }
 
       $fc->header($types{$type}{header});
@@ -1720,7 +2024,10 @@ sub export_as_csv {
 
    my $stop_time = time();
    my $duration = $stop_time - $start_time;
-   my $eps = $exported / $duration;
+   my $eps = $exported;
+   if ($duration > 0) {
+      $eps = $exported / $duration;
+   }
 
    my $result = {
       read => $read,
@@ -1744,7 +2051,7 @@ sub export_as_csv {
 #
 sub import_from_csv {
    my $self = shift;
-   my ($input_csv, $index, $type) = @_;
+   my ($input_csv, $index, $type, $hash) = @_;
 
    my $es = $self->_es;
    $self->brik_help_run_undef_arg('open', $es) or return;
@@ -1803,12 +2110,13 @@ sub import_from_csv {
       "with type [$type]");
 
    my $fd = Metabrik::File::Dump->new_from_brik_init($self) or return;
-   my $sb = Metabrik::String::Base64->new_from_brik_init($self) or return;
 
    my $fc = Metabrik::File::Csv->new_from_brik_init($self) or return;
    $fc->separator(',');
    $fc->escape('\\');
    $fc->first_line_is_header(1);
+   $fc->encoded_fields($self->csv_encoded_fields);
+   $fc->object_fields($self->csv_object_fields);
 
    my $refresh_interval;
    my $number_of_replicas;
@@ -1825,18 +2133,16 @@ sub import_from_csv {
       my $h = {};
       my $id = $this->{_id};
       delete $this->{_id};
-      for my $key (keys %$this) {
-         my $value = $this->{$key};
-         if ($value =~ m{^BASE64:(.*)$}) {  # An OBJECT is waiting to be decoded
-            my $s = $sb->decode($1);
-            $h->{$key} = eval($s);
-         }
-         else {  # Non-encoded value
-            $h->{$key} = $value;
+      for my $k (keys %$this) {
+         my $value = $this->{$k};
+         # We keep only fields when they have a value.
+         # No need to index data that is empty.
+         if (defined($value) && length($value)) {
+            $h->{$k} = $value;
          }
       }
 
-      my $r = $self->index_bulk($h, $index, $type, $id);
+      my $r = $self->index_bulk($h, $index, $type, $hash, $id);
       if (! defined($r)) {
          $self->log->error("import_from_csv: bulk processing failed for index [$index] ".
             "at read [$read], skipping chunk");
@@ -2435,7 +2741,7 @@ sub get_snapshot_status {
 }
 
 #
-# Search::Elasticsearch::Client::2_0::Direct::Snapshot
+# Search::Elasticsearch::Client::5_0::Direct::Snapshot
 #
 sub create_snapshot {
    my $self = shift;
@@ -2472,8 +2778,6 @@ sub create_snapshot_for_indices {
    my ($indices, $snapshot_name, $repository_name) = @_;
 
    $self->brik_help_run_undef_arg('create_snapshot_for_indices', $indices) or return;
-   $self->brik_help_run_invalid_arg('create_snapshot_for_indices', $indices, 'ARRAY') or return;
-   $self->brik_help_run_empty_array_arg('create_snapshot_for_indices', $indices) or return;
 
    $snapshot_name ||= 'snapshot';
    $repository_name ||= 'repository';
@@ -2614,6 +2918,8 @@ sub restore_snapshot {
    my ($snapshot_name, $repository_name, $body) = @_;
 
    my $es = $self->_es;
+   $snapshot_name ||= 'snapshot';
+   $repository_name ||= 'repository';
    $self->brik_help_run_undef_arg('open', $es) or return;
    $self->brik_help_run_undef_arg('restore_snapshot', $snapshot_name) or return;
    $self->brik_help_run_undef_arg('restore_snapshot', $repository_name) or return;
@@ -2642,12 +2948,11 @@ sub restore_snapshot_for_indices {
    my $self = shift;
    my ($indices, $snapshot_name, $repository_name) = @_;
 
+   $snapshot_name ||= 'snapshot';
+   $repository_name ||= 'repository';
    $self->brik_help_run_undef_arg('restore_snapshot_for_indices', $indices) or return;
    $self->brik_help_run_undef_arg('restore_snapshot_for_indices', $snapshot_name) or return;
    $self->brik_help_run_undef_arg('restore_snapshot_for_indices', $repository_name) or return;
-   $self->brik_help_run_invalid_arg('restore_snapshot_for_indices', $indices, 'ARRAY')
-     or return;
-   $self->brik_help_run_empty_array_arg('restore_snapshot_for_indices', $indices) or return;
 
    my $body = {
       indices => $indices,

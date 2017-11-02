@@ -3,7 +3,7 @@ use warnings;
 use 5.006; # warnings
 package Software::License;
 # ABSTRACT: packages that provide templated software licenses
-$Software::License::VERSION = '0.103012';
+$Software::License::VERSION = '0.103013';
 use Data::Section -setup => { header_re => qr/\A__([^_]+)__\Z/ };
 use Text::Template ();
 
@@ -181,6 +181,8 @@ sub _fill_in {
 #pod * L<Software::License::BSD>
 #pod * L<Software::License::CC0_1_0>
 #pod * L<Software::License::Custom>
+#pod * L<Software::License::EUPL_1_1>
+#pod * L<Software::License::EUPL_1_2>
 #pod * L<Software::License::FreeBSD>
 #pod * L<Software::License::GFDL_1_2>
 #pod * L<Software::License::GFDL_1_3>
@@ -202,6 +204,11 @@ sub _fill_in {
 #pod * L<Software::License::Sun>
 #pod * L<Software::License::Zlib>
 #pod
+#pod The L<App::Software::License> module comes with a script
+#pod L<software-license|https://metacpan.org/pod/distribution/App-Software-License/script/software-license>,
+#pod which provides a command-line interface
+#pod to Software::License.
+#pod
 #pod =cut
 
 1;
@@ -216,7 +223,7 @@ Software::License - packages that provide templated software licenses
 
 =head1 VERSION
 
-version 0.103012
+version 0.103013
 
 =head1 SYNOPSIS
 
@@ -347,6 +354,14 @@ L<Software::License::Custom>
 
 =item *
 
+L<Software::License::EUPL_1_1>
+
+=item *
+
+L<Software::License::EUPL_1_2>
+
+=item *
+
 L<Software::License::FreeBSD>
 
 =item *
@@ -427,15 +442,24 @@ L<Software::License::Zlib>
 
 =back
 
+The L<App::Software::License> module comes with a script
+L<software-license|https://metacpan.org/pod/distribution/App-Software-License/script/software-license>,
+which provides a command-line interface
+to Software::License.
+
 =head1 AUTHOR
 
 Ricardo Signes <rjbs@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Bernardo Rechea Bernhard Amann bowtie Brian Cassidy Phillips Craig Scrivner Dave Rolsky David E. Wheeler Golden Dominique Dumont Dylan William Hardison Flavio Poletti Florian Ragwitz Graham Knop Kenichi Ishigaki magnolia mikegrb Shlomi Fish Syohei YOSHIDA
+=for stopwords Alex Kapranoff Bernardo Rechea Bernhard Amann bowtie Brian Cassidy Phillips Craig Scrivner Curtis Brandt Dave Rolsky David E. Wheeler Golden Dominique Dumont Dylan William Hardison Flavio Poletti Florian Ragwitz Graham Knop Karen Etheridge Kenichi Ishigaki Leon Timmermans magnolia mikegrb Neil Bowers Olivier Mengué Shlomi Fish Syohei YOSHIDA Wesley Schwengle
 
 =over 4
+
+=item *
+
+Alex Kapranoff <kappa@yandex.ru>
 
 =item *
 
@@ -460,6 +484,10 @@ Brian Phillips <bphillips@digitalriver.com>
 =item *
 
 Craig Scrivner <scrivner@geology.cwu.edu>
+
+=item *
+
+Curtis Brandt <curtis@cpan.org>
 
 =item *
 
@@ -495,7 +523,15 @@ Graham Knop <haarg@haarg.org>
 
 =item *
 
+Karen Etheridge <ether@cpan.org>
+
+=item *
+
 Kenichi Ishigaki <ishigaki@cpan.org>
+
+=item *
+
+Leon Timmermans <fawaka@gmail.com>
 
 =item *
 
@@ -507,17 +543,29 @@ mikegrb <mgreb@linode.com>
 
 =item *
 
+Neil Bowers <neil@bowers.com>
+
+=item *
+
+Olivier Mengué <dolmen@cpan.org>
+
+=item *
+
 Shlomi Fish <shlomif@iglu.org.il>
 
 =item *
 
 Syohei YOSHIDA <syohex@gmail.com>
 
+=item *
+
+Wesley Schwengle <wesley@schwengle.net>
+
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Ricardo Signes.
+This software is copyright (c) 2017 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

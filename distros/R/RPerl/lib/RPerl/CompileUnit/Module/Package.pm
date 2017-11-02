@@ -3,7 +3,7 @@ package RPerl::CompileUnit::Module::Package;
 use strict;
 use warnings;
 use RPerl::AfterSubclass;
-our $VERSION = 0.001_100;
+our $VERSION = 0.002_000;
 
 # [[[ OO INHERITANCE ]]]
 use parent qw(RPerl::CompileUnit::Module);
@@ -22,36 +22,39 @@ our hashref $properties = {};
 
 # [[[ SUBROUTINES & OO METHODS ]]]
 
-our string_hashref::method $ast_to_rperl__generate = sub {
-    ( my object $self, my string $package_name_underscores, my string_hashref $modes ) = @_;
+sub ast_to_rperl__generate {
+    { my string_hashref::method $RETURN_TYPE };
+    ( my object $self, my string $package_name_underscores, my string_hashref $modes ) = @ARG;
     my string_hashref $rperl_source_group = {};
 
 #    RPerl::diag( 'in Package->ast_to_rperl__generate(), received $self = ' . "\n" . RPerl::Parser::rperl_ast__dump($self) . "\n" );
 
     my string $self_class = ref $self;
 
-    # unwrap Package_34 from Module_24
+    # unwrap Package_36 from Module_24
     if ( ($self_class) eq 'Module_24' ) {
         $self = $self->{children}->[0];
         $self_class = ref $self;
     }
 
-    if ( ($self_class) ne 'Package_34' ) {
+    if ( ($self_class) ne 'Package_36' ) {
         die RPerl::Parser::rperl_rule__replace(
             'ERROR ECOGEASRP00, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: Grammar rule '
                 . ($self_class)
-                . ' found where Module_24 or Package_34 expected, dying' )
+                . ' found where Module_24 or Package_36 expected, dying' )
             . "\n";
     }
 
-    # Package:   Critic* Include* Constant* Subroutine+ LITERAL_NUMBER ';' ;
-    # Package -> STAR-10 STAR-11  STAR-12   PLUS-13     LITERAL_NUMBER ';'
+    # Package:   Critic* Exports? Include* Constant* Subroutine+ LITERAL_NUMBER ';' ;
     my object $critic_star           = $self->{children}->[0];
-    my object $include_star          = $self->{children}->[1];
-    my object $constant_star         = $self->{children}->[2];
-    my object $subroutine_plus       = $self->{children}->[3];
-    my string $retval_literal_number = $self->{children}->[4];
-    my string $retval_semicolon      = $self->{children}->[5];
+    my object $exports_optional      = $self->{children}->[1];
+    my object $include_star          = $self->{children}->[2];
+    my object $constant_star         = $self->{children}->[3];
+    my object $subroutine_plus       = $self->{children}->[4];
+    my string $retval_literal_number = $self->{children}->[5];
+    my string $retval_semicolon      = $self->{children}->[6];
+
+#    RPerl::diag( 'in Package->ast_to_rperl__generate(), have $exports_optional = ' . "\n" . RPerl::Parser::rperl_ast__dump($exports_optional) . "\n" );
 
     my string_hashref $rperl_source_subgroup;
 
@@ -64,6 +67,26 @@ our string_hashref::method $ast_to_rperl__generate = sub {
         $rperl_source_subgroup = $critic->ast_to_rperl__generate($modes);
         RPerl::Generator::source_group_append( $rperl_source_group,
             $rperl_source_subgroup );
+    }
+
+    if ( exists $exports_optional->{children}->[0] ) {
+#        RPerl::diag( 'in Package->ast_to_rperl__generate(), have YES EXPORTS ' . "\n" );
+        if ( $modes->{label} eq 'ON' ) {
+            $rperl_source_group->{PMC} .= "\n" . '# [[[ EXPORTS ]]]' . "\n";
+        }
+        my object $exports = $exports_optional->{children}->[0];
+        my string $use_exporter = $exports->{children}->[0];
+        my string $export = $exports->{children}->[1];
+        my string $export_ok = $exports->{children}->[2];
+
+        $rperl_source_group->{PMC} .= $use_exporter;  # already has a newline
+        if ( exists $export->{children}->[0] ) {
+            $rperl_source_group->{PMC} .= $export->{children}->[0]->{attr} . $export->{children}->[1]->{attr} . ';' . "\n";  # DEV NOTE: does not capture semicolon in AST for some reason, must hard-code here
+        }
+        if ( exists $export_ok->{children}->[0] ) {
+            $rperl_source_group->{PMC} .= $export_ok->{children}->[0]->{attr} . $export_ok->{children}->[1]->{attr} . ';' . "\n";  # DEV NOTE: does not capture semicolon in AST for some reason, must hard-code here
+        }
+#        RPerl::diag( 'in Package->ast_to_rperl__generate(), AFTER EXPORTS, have $rperl_source_group->{PMC} = ' . "\n" . RPerl::Parser::rperl_ast__dump($rperl_source_group->{PMC}) . "\n" );
     }
 
     if ( exists $include_star->{children}->[0] ) {
@@ -113,12 +136,12 @@ our string_hashref::method $ast_to_rperl__generate = sub {
         $rperl_source_group->{PMC}
             .= $retval_literal_number . $retval_semicolon . "\n";
     }
-
     return $rperl_source_group;
-};
+}
 
-our string_hashref::method $ast_to_cpp__generate__CPPOPS_PERLTYPES = sub {
-    ( my object $self, my string $package_name_underscores, my string_hashref $modes ) = @_;
+sub ast_to_cpp__generate__CPPOPS_PERLTYPES {
+    { my string_hashref::method $RETURN_TYPE };
+    ( my object $self, my string $package_name_underscores, my string_hashref $modes ) = @ARG;
     my string_hashref $cpp_source_group = {
         CPP =>
             q{// <<< RP::CU::M::P __DUMMY_SOURCE_CODE CPPOPS_PERLTYPES >>>}
@@ -130,10 +153,11 @@ our string_hashref::method $ast_to_cpp__generate__CPPOPS_PERLTYPES = sub {
 
     #...
     return $cpp_source_group;
-};
+}
 
-our string_hashref::method $ast_to_cpp__generate__CPPOPS_CPPTYPES = sub {
-    ( my object $self, my string $package_name_underscores, my string_hashref $modes ) = @_;
+sub ast_to_cpp__generate__CPPOPS_CPPTYPES {
+    { my string_hashref::method $RETURN_TYPE };
+    ( my object $self, my string $package_name_underscores, my string_hashref $modes ) = @ARG;
     my string_hashref $cpp_source_group = {
         CPP => q{// <<< RP::CU::M::P __DUMMY_SOURCE_CODE CPPOPS_CPPTYPES >>>}
             . "\n",
@@ -144,6 +168,6 @@ our string_hashref::method $ast_to_cpp__generate__CPPOPS_CPPTYPES = sub {
 
     #...
     return $cpp_source_group;
-};
+}
 
 1;    # end of class

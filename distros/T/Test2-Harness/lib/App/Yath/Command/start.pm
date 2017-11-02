@@ -2,7 +2,7 @@ package App::Yath::Command::start;
 use strict;
 use warnings;
 
-our $VERSION = '0.001026';
+our $VERSION = '0.001030';
 
 use File::Spec();
 
@@ -32,7 +32,14 @@ sub cli_args { "" }
 
 sub description {
     return <<"    EOT";
-TODO FIX ME
+This command is used to start a persistant instance of yath. A persistant
+instance is useful because it allows you to preload modules in advance,
+reducing start time for any tests you decide to run as you work.
+
+A running instance will watch for changes to any preloaded files, and restart
+itself if anything changes. Changed files are blacklisted for subsequent
+reloads so that reloading is not a frequent occurence when editing the same
+file over and over again.
     EOT
 }
 
@@ -180,7 +187,7 @@ Do not run tests with the HARNESS-CAT-LONG header
 
 =item --no-shm
 
-Use shm for tempdir if possible (Default: on)
+Use shm for tempdir if possible (Default: off)
 
 Do not use shm.
 

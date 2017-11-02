@@ -1,5 +1,5 @@
 package Proc::tored::Machine;
-$Proc::tored::Machine::VERSION = '0.19';
+$Proc::tored::Machine::VERSION = '0.20';
 use strict;
 use warnings;
 use Moo;
@@ -168,7 +168,7 @@ Proc::tored::Machine
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 AUTHOR
 

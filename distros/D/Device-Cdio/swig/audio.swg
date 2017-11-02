@@ -1,5 +1,5 @@
 /* -*- c -*-
-  Copyright (C) 2006, 2008, 2011 Rocky Bernstein <rocky@cpan.org>
+  Copyright (C) 2006, 2008, 2011, 2017 Rocky Bernstein <rocky@cpan.org>
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -15,19 +15,56 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-/** NOTE: THIS IS THE EASILY CONVERTED SUBSET OF LIBCDIO WE CAN DO. **/
+/** NOTE: This is most of the easily-converted subset of libcdio's <cdio/audio.h>.
+    For more, feel free to dig in and add.
+**/
 
 /* See <cdio/audio.h> for more extensive documentation. */
 
 %rename cdio_audio_pause audio_pause;
-%feature("autodoc", 
+%feature("autodoc",
 "audio_pause(cdio)->status
 
 Pause playing CD through analog output.");
 driver_return_code_t cdio_audio_pause (CdIo_t *p_cdio);
 
 
-%feature("autodoc", 
+%feature("autodoc",
+"audio_play_track_index(cdio, start_track, start_index, end_track, end_index)->status
+
+Playing CD through analog output at the desired start track and index,
+to the end track and index. Tracks should be in the valid CD track range 0..99.
+
+Just as a track number is burned into the CD, so is a an index for a track.
+It gives a position within the track. Use 0 for the beginning.
+");
+driver_return_code_t audio_play_track_index (CdIo_t *p_cdio,
+					     int start_track, int start_index,
+					     int end_track, int end_index);
+%inline %{
+
+#ifndef CLAMP
+# define CLAMP(val, min_value, max_value)	\
+  ( (val < min_value ? min_value :		\
+    ((val > max_value) ? max_value : val)) )
+#endif
+
+driver_return_code_t audio_play_track_index(CdIo_t *p_cdio,
+					    int start_track, int start_index,
+					    int end_track,   int end_index)
+{
+    cdio_track_index_t track_index;
+
+    track_index.i_start_track = (uint8_t) (CLAMP(start_track, 0, 99));
+    track_index.i_start_index = (uint8_t) (CLAMP(start_index, 0, 255));
+    track_index.i_start_track = (uint8_t) (CLAMP(end_track,   0, 99));
+    track_index.i_end_track   = (uint8_t) (CLAMP(end_index,   0, 99));
+    return cdio_audio_play_track_index(p_cdio, &track_index);
+}
+%}
+
+
+%feature("autodoc",
 "auto_play_lsn(cdio, start_lsn, end_lsn)->status
 
 Playing CD through analog output at the given lsn to the ending lsn");
@@ -46,22 +83,22 @@ driver_return_code_t audio_play_lsn (CdIo_t *p_cdio, lsn_t start_lsn,
 %}
 
 %rename cdio_audio_resume audio_resume;
-%feature("autodoc", 
+%feature("autodoc",
 "audio_resume(cdio)->status
 Resume playing an audio CD.");
 driver_return_code_t cdio_audio_resume (CdIo_t *p_cdio);
 
 
 %rename cdio_audio_stop audio_stop;
-%feature("autodoc", 
+%feature("autodoc",
 "audio_stop(cdio)->status
 Stop playing an audio CD.");
 driver_return_code_t cdio_audio_stop (CdIo_t *p_cdio);
 
 %feature("autodoc",
 "return audio volume levels array");
-    
-    
+
+
 %typemap(out) uint8_t,int {
     $result = sv_newmortal();
     sv_setiv($result,(IV) $1);
@@ -104,19 +141,37 @@ uint8_t *audio_get_volume_levels (CdIo_t *p_cdio, int *rc)
 }
 %}
 
-int audio_set_volume_levels(CdIo_t *p_cdio, int vol1, int vol2, int vol3, int vol3);
+%feature("autodoc",
+"audio_set_volume_levels(cdio, channel0, channel1, channel2, channel3)->status
+
+Set volume levels for playing CD through analog output. For strereo
+CDROM devices's (which is most of them) only channel0 and channel1 are
+used. 0 is the smallest volume and 255 is the largest valume. Values
+above 255 will be pegged at 255 and values below 0 will be pegged at
+0.
+");
+int audio_set_volume_levels(CdIo_t *p_cdio,
+			    int channel_vol1, int channel_vol2,
+			    int channel_vol3, int channel_vol4);
 
 %inline %{
 
-int audio_set_volume_levels(CdIo_t *p_cdio, int vol1, int vol2, int vol3, int vol4)
+#ifndef CLAMP
+# define CLAMP(val, min_value, max_value)	\
+  ( (val < min_value ? min_value :		\
+    ((val > max_value) ? max_value : val)) )
+#endif
+
+int audio_set_volume_levels(CdIo_t *p_cdio,
+			    int channel_vol1, int channel_vol2,
+			    int channel_vol3, int channel_vol4)
 {
     static cdio_audio_volume_t audio_volume;
 
-    audio_volume.level[0] = vol1 & 255;
-    audio_volume.level[1] = vol2 & 255;
-    audio_volume.level[2] = vol3 & 255;
-    audio_volume.level[3] = vol4 & 255;
-
+    audio_volume.level[0] = CLAMP(channel_vol1, 0, 255);
+    audio_volume.level[1] = CLAMP(channel_vol2, 0, 255);
+    audio_volume.level[2] = CLAMP(channel_vol3, 0, 255);
+    audio_volume.level[3] = CLAMP(channel_vol4, 0, 255);
     return cdio_audio_set_volume(p_cdio, &audio_volume);
 }
 %}
@@ -125,6 +180,7 @@ int audio_set_volume_levels(CdIo_t *p_cdio, int vol1, int vol2, int vol3, int vo
 %apply int *OUTPUT { int *drc };
 SV * audio_get_status ( CdIo_t *p_cdio, int *drc);
 %inline %{
+extern uint8_t cdio_from_bcd8(uint8_t p);
 //static cdio_subchannel_t cdio_subchannel;
 SV * audio_get_status ( CdIo_t *p_cdio, int *drc)
 {
@@ -136,7 +192,7 @@ SV * audio_get_status ( CdIo_t *p_cdio, int *drc)
     *drc = rc;
     audio_st = newHV();
     /* unsigned int msf_seconds(msf_t *msf) or
-     * uint8_t cdio_from_bcd8(uint8_t p) 
+     *
      */
     switch(sub.audio_status) {
         case 0x00:
@@ -158,7 +214,7 @@ SV * audio_get_status ( CdIo_t *p_cdio, int *drc)
             a_s_t = "NO_STATUS";
             break;
         default:
-            a_s_t = "UNKNWON";
+            a_s_t = "UNKNOWN";
     }
     hv_store(audio_st, "format", 6,
             newSVuv(sub.format), 0);
@@ -194,4 +250,3 @@ SV * audio_get_status ( CdIo_t *p_cdio, int *drc)
     return newRV_noinc(sv_2mortal((SV*)audio_st));
 }
 %}
-

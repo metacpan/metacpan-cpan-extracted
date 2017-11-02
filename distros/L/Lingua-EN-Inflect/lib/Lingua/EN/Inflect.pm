@@ -7,7 +7,7 @@ use Env;
 require Exporter;
 @ISA = qw(Exporter);
 
-our $VERSION = '1.902';
+our $VERSION = '1.903';
 
 %EXPORT_TAGS =
 (
@@ -1831,7 +1831,7 @@ Lingua::EN::Inflect - Convert singular to plural. Select "a" or "an".
 
 =head1 VERSION
 
-This document describes version 1.902 of Lingua::EN::Inflect
+This document describes version 1.903 of Lingua::EN::Inflect
 
 =head1 SYNOPSIS
 
@@ -1975,12 +1975,12 @@ This document describes version 1.902 of Lingua::EN::Inflect
  # "NUM()" AND "ORD()" WITHIN STRINGS:
 
       print inflect("The plural of $word is PL($word)\n");
-      print inflect("I saw $cat_count PL("cat",$cat_count)\n");
-      print inflect("PL(I,$N1) PL_V(saw,$N1) PL(a,$N2) PL_N(saw,$N2)");
-      print inflect("NUM($N1,)PL(I) PL_V(saw) NUM($N2,)PL(a) PL_N(saw)");
-      print inflect("I saw NUM($cat_count) PL("cat")\nNUM()");
+      print inflect("I saw $cat_count PL(cat,$cat_count)\n");
+      print inflect("PL(I,$N1) PL_V(saw,$N1) PL(a,$N2) PL_N(saw,$N2)\n");
+      print inflect("NUM($N1,)PL(I) PL_V(saw) NUM($N2,)PL(a) PL_N(saw)\n");
+      print inflect("I saw NUM($cat_count) PL(cat)\n");
       print inflect("There PL_V(was,$errors) NO(error,$errors)\n");
-      print inflect("There NUM($errors,) PL_V(was) NO(error)\n";
+      print inflect("There NUM($errors,)PL_V(was) NO(error)\n");
       print inflect("Did you want A($thing) or AN($idea)\n");
       print inflect("It was ORD($position) from the left\n");
 
@@ -1991,13 +1991,13 @@ This document describes version 1.902 of Lingua::EN::Inflect
 
       def_verb  "will" => "shall",  # 1ST PERSON SINGULAR => PLURAL
                 "will" => "will",   # 2ND PERSON SINGULAR => PLURAL
-                "will" => "will",   # 3RD PERSON SINGULAR => PLURAL
+                "will" => "will";   # 3RD PERSON SINGULAR => PLURAL
 
-      def_adj   "hir"  => "their",  # SINGULAR => PLURAL
+      def_adj   "hir"  => "their";  # SINGULAR => PLURAL
 
-      def_a     "h"                 # "AY HALWAYS SEZ 'HAITCH'!"
+      def_a     "h";                # "AY HALWAYS SEZ 'HAITCH'!"
 
-      def_an    "horrendous.*"      # "AN HORRENDOUS AFFECTATION"
+      def_an    "horrendous.*";     # "AN HORRENDOUS AFFECTATION"
 
 
 =head1 DESCRIPTION

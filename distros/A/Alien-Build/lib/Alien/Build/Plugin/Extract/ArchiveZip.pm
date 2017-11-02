@@ -4,8 +4,8 @@ use strict;
 use warnings;
 use Alien::Build::Plugin;
 
-# ABSTRACT: Plugin to extract a tarball using Archive::Tar
-our $VERSION = '1.25'; # VERSION
+# ABSTRACT: Plugin to extract a tarball using Archive::Zip
+our $VERSION = '1.28'; # VERSION
 
 
 has '+format' => 'zip';
@@ -54,11 +54,11 @@ __END__
 
 =head1 NAME
 
-Alien::Build::Plugin::Extract::ArchiveZip - Plugin to extract a tarball using Archive::Tar
+Alien::Build::Plugin::Extract::ArchiveZip - Plugin to extract a tarball using Archive::Zip
 
 =head1 VERSION
 
-version 1.25
+version 1.28
 
 =head1 SYNOPSIS
 
@@ -146,6 +146,10 @@ Petr Pisar (ppisar)
 Lance Wicks (LANCEW)
 
 Ahmad Fatoum (a3f, ATHREEF)
+
+José Joaquín Atria (JJATRIA)
+
+Duke Leto (LETO)
 
 =head1 COPYRIGHT AND LICENSE
 

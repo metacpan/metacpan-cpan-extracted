@@ -15,7 +15,6 @@ requires "Dist::Zilla::Plugin::CheckStrictVersion" => "0";
 requires "Dist::Zilla::Plugin::ConfirmRelease" => "0";
 requires "Dist::Zilla::Plugin::CopyFilesFromBuild" => "0";
 requires "Dist::Zilla::Plugin::CopyFilesFromRelease" => "0";
-requires "Dist::Zilla::Plugin::CopyrightYearFromGit" => "0";
 requires "Dist::Zilla::Plugin::ExecDir" => "0";
 requires "Dist::Zilla::Plugin::Git::Check" => "0";
 requires "Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch" => "0";

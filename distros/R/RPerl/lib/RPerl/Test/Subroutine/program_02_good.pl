@@ -19,12 +19,12 @@ our $VERSION = 0.001_000;
 
 # [[[ SUBROUTINES ]]]
 
-our void $hello_world = sub { print 'Hello, World!',            "\n"; };
-our void $Hello_World = sub { print 'Hello, World, again!',     "\n"; };
-our void $HELLO_world = sub { print 'Hello, World, yet again!', "\n"; };
+sub hello_world_1 { { my void $RETURN_TYPE }; print 'Hello, World!',            "\n"; return; }  # this comment is a test of script/development/find_replace_old_subroutine_headers.sh
+sub hello_world_2 { { my void $RETURN_TYPE }; print 'Hello, World, again!',     "\n"; return; }
+sub hello_world_3 { { my void $RETURN_TYPE }; print 'Hello, World, yet again!', "\n"; return; }  # this comment is a test of script/development/find_replace_old_subroutine_headers.sh
 
 # [[[ OPERATIONS ]]]
 
-hello_world ();
-Hello_World  ();
-HELLO_world    ();
+hello_world_1 ();
+hello_world_2  ();
+hello_world_3    ();

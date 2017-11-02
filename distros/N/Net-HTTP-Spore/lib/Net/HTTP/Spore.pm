@@ -1,5 +1,5 @@
 package Net::HTTP::Spore;
-$Net::HTTP::Spore::VERSION = '0.07';
+$Net::HTTP::Spore::VERSION = '0.09';
 # ABSTRACT: SPORE client
 
 use Moose;
@@ -159,7 +159,7 @@ Net::HTTP::Spore - SPORE client
 
 =head1 VERSION
 
-version 0.07
+version 0.09
 
 =head1 SYNOPSIS
 

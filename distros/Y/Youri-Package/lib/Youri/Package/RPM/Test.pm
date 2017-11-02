@@ -1,4 +1,4 @@
-# $Id: Test.pm 2370 2013-01-03 19:26:49Z guillomovitch $
+# $Id: Test.pm 2419 2017-10-28 11:00:16Z guillomovitch $
 package Youri::Package::RPM::Test;
 
 =head1 NAME
@@ -247,7 +247,7 @@ sub as_formated_string {
     my ($self, $format) = @_;
     croak "Not a class method" unless ref $self;
 
-    $format =~ s/%{([^}]+)}/$self->{_tags}->{$1}/eg;
+    $format =~ s/%\{([^}]+)\}/$self->{_tags}->{$1}/eg;
     return $format;
 }
 

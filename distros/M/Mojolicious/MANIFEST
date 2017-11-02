@@ -217,6 +217,7 @@ t/mojo/request.t
 t/mojo/request_cgi.t
 t/mojo/response.t
 t/mojo/roles.t
+t/mojo/signatures.t
 t/mojo/subprocess.t
 t/mojo/template.t
 t/mojo/templates/exception.mt
@@ -292,6 +293,7 @@ t/mojolicious/longpolling_lite_app.t
 t/mojolicious/mojolicious_config_test.whatever.conf
 t/mojolicious/multipath_lite_app.t
 t/mojolicious/ojo.t
+t/mojolicious/ojo_signatures.t
 t/mojolicious/pattern.t
 t/mojolicious/pod_renderer_lite_app.t
 t/mojolicious/production_app.t
@@ -307,6 +309,7 @@ t/mojolicious/renderer.t
 t/mojolicious/restful_lite_app.t
 t/mojolicious/routes.t
 t/mojolicious/secret.txt
+t/mojolicious/signatures_lite_app.t
 t/mojolicious/single_file_test_app.conf
 t/mojolicious/static_lite_app.t
 t/mojolicious/tag_helper_lite_app.t

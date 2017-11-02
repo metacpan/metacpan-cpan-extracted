@@ -5,17 +5,17 @@ use warnings;
 use 5.010001;
 use Test2::Plugin::FauxHomeDir;
 use File::Glob qw( bsd_glob );
-use Test::Builder::Module;
 use Clustericious::Log ();
 use Carp qw( carp );
-use base qw( Test::Builder::Module Exporter );
+use base qw( Exporter );
+use Test2::API qw( context );
 use YAML::XS qw( Dump );
 
 our @EXPORT = qw( log_events log_context log_like log_unlike );
 our %EXPORT_TAGS = ( all => \@EXPORT );
 
 # ABSTRACT: Clustericious logging in tests.
-our $VERSION = '1.26'; # VERSION
+our $VERSION = '1.27'; # VERSION
 
 
 sub log_events
@@ -81,7 +81,7 @@ sub log_like ($;$)
   $message ||= "log matches pattern";
   $pattern = { message => $pattern } unless ref $pattern eq 'HASH';
   
-  my $tb = __PACKAGE__->builder;
+  my $ctx = context();
   my $ok = 0;
   
   foreach my $event (log_events)
@@ -93,19 +93,21 @@ sub log_like ($;$)
     }
   }
   
-  $tb->ok($ok, $message);
+  $ctx->ok($ok, $message);
 
   unless($ok)
   {
     
-    $tb->diag("None of the events matched the pattern:");
-    $tb->diag(
+    $ctx->diag("None of the events matched the pattern:");
+    $ctx->diag(
       Dump({
         events => [log_events],
         pattern => $pattern,
       })
     );
   }
+  
+  $ctx->release;
   
   $ok;
 }
@@ -117,7 +119,7 @@ sub log_unlike ($;$)
   $message ||= "log does not match pattern";
   $pattern = { message => $pattern } unless ref $pattern eq 'HASH';
 
-  my $tb = __PACKAGE__->builder;
+  my $ctx = context();
   my @match;
   
   foreach my $event (log_events)
@@ -128,21 +130,24 @@ sub log_unlike ($;$)
     }
   }
   
-  $tb->ok(!scalar @match, $message);
+  $ctx->ok(!scalar @match, $message);
   
   foreach my $match (@match)
   {
-    $tb->diag("This event matched, but should not have:");
-    $tb->diag(
+    $ctx->diag("This event matched, but should not have:");
+    $ctx->diag(
       Dump({
         event => $match,
         pattern => $pattern,
       })
     );
   }
+
+  $ctx->release;
   
   !scalar @match;
 }
+
 
 sub import
 {
@@ -155,8 +160,9 @@ sub import
     my $caller = caller;
     unless($caller eq 'Test::Clustericious::Cluster')
     {
-      my $tb = Test::Builder::Module->builder;
-      $tb->diag("you must use Test::Clustericious::Log before Test::Clustericious::Cluster");
+      my $ctx = context();
+      $ctx->diag("you must use Test::Clustericious::Log before Test::Clustericious::Cluster");
+      $ctx->release;
     }
     return;
   }
@@ -257,29 +263,33 @@ sub import
     @_ = ($class, ref $args->{import} ? @{ $args->{import} } : ($args->{import}));
     goto &Exporter::import;
   }
+
 }
 
-END
+sub _summary
 {
-  my $tb = Test::Builder::Module->builder;
+  my($ctx, $real, $new) = @_;
+  
   my $home = bsd_glob('~');
   
-  unless($tb->is_passing)
+  my $hub = $ctx->hub;
+  
+  if($hub->failed)
   {
     if($ENV{CLUSTERICIOUS_LOG_SPEW_OFF})
     {
-      $tb->diag("not spewing the entire log (unset CLUSTERICIOUS_LOG_SPEW_OFF to turn back on)");
+      $ctx->diag("not spewing the entire log (unset CLUSTERICIOUS_LOG_SPEW_OFF to turn back on)");
     }
     elsif(-r "$home/log/test.log")
     {
-      $tb->diag("detailed log");
+      $ctx->diag("detailed log");
       open my $fh, '<', "$home/log/test.log";
-      $tb->diag(<$fh>);
+      $ctx->diag(<$fh>);
       close $fh;
     }
     else
     {
-      $tb->diag("no detailed log");
+      $ctx->diag("no detailed log");
     }
   }
 }
@@ -330,7 +340,7 @@ Test::Clustericious::Log - Clustericious logging in tests.
 
 =head1 VERSION
 
-version 1.26
+version 1.27
 
 =head1 SYNOPSIS
 
@@ -346,7 +356,7 @@ version 1.26
 =head1 DESCRIPTION
 
 This module redirects the L<Log::Log4perl> output from a 
-L<Clustericious> application to TAP using L<Test::Builder>.  By default 
+L<Clustericious> application to TAP using L<Test2::API>.  By default 
 it sends DEBUG to WARN messages to C<note> and ERROR to FATAL to 
 C<diag>, so you should only see error and fatal messages if you run 
 C<prove -l> on your test but will see debug and warn messages if you run 

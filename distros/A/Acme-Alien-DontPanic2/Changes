@@ -1,5 +1,9 @@
 Revision history for Perl Acme-Alien-DontPanic2
 
+1.2900    2017-10-30 10:01:57 -0400
+  - Require Alien::Build 1.29 Alien::Build::MB 0.05
+  - Skip FFI tests if no DLLs available
+
 1.1400    2017-09-14 16:51:05 -0400
   - Require Alien::Build 1.14 Alien::Build::MB 0.05
   - Build FFI version of library

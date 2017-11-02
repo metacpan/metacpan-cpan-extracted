@@ -1,6 +1,17 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 use strict; use warnings;
+
+# Contributed by @SREZIC RT #123467
+BEGIN {
+    if (-t) {
+        require Encode::Locale;
+        Encode::Locale::decode_argv();
+        binmode(STDOUT, ":encoding(console_out)");
+        binmode(STDERR, ":encoding(console_out)");
+    }
+}
+
 use Map::Tube::CLI;
 
 Map::Tube::CLI->new_with_options->run;

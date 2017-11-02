@@ -1,0 +1,382 @@
+#!perl
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Any;
+
+Perinci::CmdLine::Any->new(
+    url => '/App/mysqlinfo/',
+    subcommands => {
+        'list-tables'  => {url => '/App/mysqlinfo/list_tables'},
+        'list-columns' => {url => '/App/mysqlinfo/list_columns'},
+        'dump-table'   => {url => '/App/mysqlinfo/dump_table'},
+    },
+    log => 1,
+    log_level => 'info',
+)->run;
+
+# ABSTRACT: Get/extract information from MySQL database
+# PODNAME: mysqlinfo
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+mysqlinfo - Get/extract information from MySQL database
+
+=head1 VERSION
+
+This document describes version 0.001 of mysqlinfo (from Perl distribution App-mysqlinfo), released on 2017-10-30.
+
+=head1 SYNOPSIS
+
+List tables:
+
+ % mysqlinfo list-tables mydb
+
+List columns of a table:
+
+ % mysqlinfo list-columns mydb mytable
+ % mysqlinfo list-columns -l mydb mytable   ; # show detail
+
+Dump a table into various format:
+
+ % mysqlinfo dump-table mydb mytable
+
+=head1 DESCRIPTION
+
+B<mysqlinfo> is a slightly more convenient L<dbinfo> when working with MySQL.
+
+=head1 SUBCOMMANDS
+
+=head2 B<dump-table>
+
+Dump table into various formats.
+
+=head2 B<list-columns>
+
+List columns of a table.
+
+=head2 B<list-tables>
+
+List tables in the database.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Common options
+
+=over
+
+=item B<--config-path>=I<filename>
+
+Set path to configuration file.
+
+Can be specified multiple times.
+
+=item B<--config-profile>=I<s>
+
+Set configuration profile to use.
+
+=item B<--dbname>=I<s>
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--host>=I<s>
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=item B<--no-config>
+
+Do not use any configuration file.
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=item B<--password>=I<s>, B<-p>
+
+You might want to specify this parameter in a configuration file instead of
+directly as command-line option.
+
+
+=item B<--port>=I<s>
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--subcommands>
+
+List available subcommands.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--user>=I<s>, B<-u>
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head2 Options for subcommand dump-table
+
+=over
+
+=item B<--array>
+
+Shortcut for --row-format=array.
+
+See C<--row-format>.
+
+=item B<--exclude-column>=I<s@>, B<-C>
+
+Can be specified multiple times.
+
+=item B<--exclude-columns-json>=I<s>
+
+See C<--exclude-column>.
+
+=item B<--include-column>=I<s@>, B<-c>
+
+Can be specified multiple times.
+
+=item B<--include-columns-json>=I<s>
+
+See C<--include-column>.
+
+=item B<--limit-number>=I<s>, B<-n>
+
+=item B<--limit-offset>=I<s>, B<-o>
+
+=item B<--row-format>=I<s>
+
+Default value:
+
+ "hash"
+
+Valid values:
+
+ ["array","hash"]
+
+=item B<--table>=I<s>*
+
+Table name.
+
+=item B<--where>=I<s@>, B<-w>
+
+Add WHERE clause.
+
+Can be specified multiple times.
+
+=item B<--wheres-json>=I<s>
+
+Add WHERE clause (JSON-encoded).
+
+See C<--where>.
+
+=item B<-a>
+
+Shortcut for --row-format=array.
+
+See C<--row-format>.
+
+=back
+
+=head2 Options for subcommand list-columns
+
+=over
+
+=item B<--detail>, B<-l>
+
+Show detailed information per record.
+
+=item B<--table>=I<s>*
+
+Table name.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C mysqlinfo mysqlinfo
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete mysqlinfo 'p/*/`mysqlinfo`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
+
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F<~/.config/mysqlinfo.conf>, F<~/mysqlinfo.conf>, or F</etc/mysqlinfo.conf>.
+
+All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+To put configuration for a certain subcommand only, use a section name like C<[subcommand=NAME]> or C<[SOMESECTION subcommand=NAME]>.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]> or C<[subcommand=SUBCOMMAND_NAME profile=SOMENAME]> or C<[SOMESECTION subcommand=SUBCOMMAND_NAME profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
+
+Finally, you can filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable has value equals something: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal something: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when an environment variable contains something: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+List of available configuration parameters:
+
+=head2 Common for all subcommands
+
+ dbname (see --dbname)
+ format (see --format)
+ host (see --host)
+ log_level (see --log-level)
+ naked_res (see --naked-res)
+ password (see --password)
+ port (see --port)
+ user (see --user)
+
+=head2 Configuration for subcommand dump-table
+
+ exclude_columns (see --exclude-column)
+ include_columns (see --include-column)
+ limit_number (see --limit-number)
+ limit_offset (see --limit-offset)
+ row_format (see --row-format)
+ table (see --table)
+ wheres (see --where)
+
+=head2 Configuration for subcommand list-columns
+
+ detail (see --detail)
+ table (see --table)
+
+=head2 Configuration for subcommand list-tables
+
+=head1 ENVIRONMENT
+
+=head2 MYSQLINFO_OPT => str
+
+Specify additional command-line options.
+
+=head1 FILES
+
+F<~/.config/mysqlinfo.conf>
+
+F<~/mysqlinfo.conf>
+
+F</etc/mysqlinfo.conf>
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-mysqlinfo>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-mysqlinfo>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-mysqlinfo>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<dbinfo> from L<App::dbinfo> is the more generic version of this utility.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,4 +1,4 @@
-# $Id: Makefile.PL 1501 2007-03-05 21:43:04Z guillomovitch $
+# $Id: Makefile.PL 2415 2017-10-28 10:41:36Z guillomovitch $
 use ExtUtils::MakeMaker;
 use version;
 
@@ -8,6 +8,19 @@ WriteMakefile(
     AUTHOR       => 'Youri project <youri@zarb.org>',
     PREREQ_PM    => {
         'YAML::AppConfig' => 0,
+        'Carp'            => 0,
+        'File::Spec'      => 0,
+        'Getopt::Long'    => 0,
+        'Pod::Usage'      => 0,
+        'strict'          => 0,
+        'version'         => 0,
+        'warnings'        => 0,
+    },
+    TEST_REQUIRES => {
+        'File::Temp'      => 0,
+        'Test::Exception' => 0,
+        'Test::Kwalitee'  => 0,
+        'Test::More'      => 0,
     }
 );
 

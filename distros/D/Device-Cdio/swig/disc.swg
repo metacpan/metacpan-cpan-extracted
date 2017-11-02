@@ -1,5 +1,5 @@
 /* -*- c -*-
-  Copyright (C) 2006, 2008, 2011 Rocky Bernstein <rocky@cpan.org>
+  Copyright (C) 2006, 2008, 2011, 2012 Rocky Bernstein <rocky@cpan.org>
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -92,23 +92,34 @@ get_disc_mode (CdIo_t *p_cdio)
 }
 %}
 
-
 SV * get_cdtext (CdIo_t *p_cdio, int track);
 %inline %{
 SV * get_cdtext (CdIo_t *p_cdio, int track)
 {
     HV * cdtext_hash;
-    char **cdtext; const char *str; int num; unsigned int l=0;
-    cdtext = ( char **)cdio_get_cdtext (p_cdio, (track_t) track);
+    cdtext_t *cdtext; const char *str; int num; unsigned int l=0;
+#if LIBCDIO_VERSION_NUM <= 83
+    cdtext = cdio_get_cdtext (p_cdio, (track_t) track);
+#else
+    cdtext = cdio_get_cdtext (p_cdio);
+#endif
     if(!cdtext)
         return newSV(0); //we return undef if there is no cdtext on the disk
     cdtext_hash = newHV();
     for (num=0; num<MAX_CDTEXT_FIELDS; num++) {
-        if(cdtext[num]) {
+#if LIBCDIO_VERSION_NUM <= 83
+        if(cdtext_get_const(num,cdtext)) {
+#else
+        if(cdtext_get_const(cdtext,num,track)) {
+#endif
             l++;
             str = cdtext_field2str(num);
             hv_store(cdtext_hash, str, strlen(str),
-                newSVpv(cdtext[num], 0), 0);
+#if LIBCDIO_VERSION_NUM <= 83
+                newSVpv(cdtext_get_const(num,cdtext), 0), 0);
+#else
+                newSVpv(cdtext_get_const(cdtext,num,track), 0), 0);
+#endif
         }
     }
     if(!l) {

@@ -1,0 +1,9 @@
+Revision history for Mojolicious-Services
+
+1.0.0   2017-10-30
+        改变了主类的名字，从Mojolicious::ServiceMangage改为Mojolicious::Services。
+        Mojolicoius::Plugin::Service做相应修改，支持了以Mojolicious::Services的子类的形式作为service的管理器对象。
+
+0.01    2017-10-28
+        First version, released on an unsuspecting world.
+

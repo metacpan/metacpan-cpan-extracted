@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>",
       "Joel A Berger <joel.a.berger@gmail.com>"
    ],
-   "dynamic_config" : 0,
+   "dynamic_config" : 1,
    "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
@@ -17,14 +17,13 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Acme::Alien::DontPanic2" : "1.1400",
-            "Module::Build" : "0.28"
+            "Acme::Alien::DontPanic2" : "1.2900"
          }
       },
       "configure" : {
          "requires" : {
-            "Acme::Alien::DontPanic2" : "1.1400",
-            "Module::Build" : "0.28",
+            "Acme::Alien::DontPanic2" : "1.2900",
+            "ExtUtils::MakeMaker" : "6.64",
             "perl" : "5.006"
          }
       },
@@ -71,7 +70,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "1.1400",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+   "version" : "1.2901",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: Extend Alien::Base with roles!
-our $VERSION = '1.25'; # VERSION
+our $VERSION = '1.28'; # VERSION
 
 
 1;
@@ -21,7 +21,7 @@ Alien::Role - Extend Alien::Base with roles!
 
 =head1 VERSION
 
-version 1.25
+version 1.28
 
 =head1 SYNOPSIS
 
@@ -114,6 +114,10 @@ Petr Pisar (ppisar)
 Lance Wicks (LANCEW)
 
 Ahmad Fatoum (a3f, ATHREEF)
+
+José Joaquín Atria (JJATRIA)
+
+Duke Leto (LETO)
 
 =head1 COPYRIGHT AND LICENSE
 

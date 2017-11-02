@@ -14,7 +14,7 @@ WriteMakefile(
     ABSTRACT_FROM	=> 'Attrib.pm',
     PREREQ_PM		=> {
 	'Carp'		=> 0,
-	'Class::Multi'	=> 1.02,
+	'Class::Multi'	=> 1.04,
 	'Storable'	=> 0,
     },
     dist		=> {

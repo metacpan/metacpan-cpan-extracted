@@ -1,9 +1,14 @@
-\use ExtUtils::MakeMaker;
+use strict;
+use warnings;
+
+use ExtUtils::MakeMaker;
+
+# ----------------
 
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 
-WriteMakefile
+my(%params) =
 (
 	($] ge '5.005') ?
 	(
@@ -24,35 +29,75 @@ WriteMakefile
 	PL_FILES  => {},
 	PREREQ_PM =>
 	{
-		Any::Moose                 => 0.13,
-		Brannigan                  => 0.5,
-		Capture::Tiny              => 0.08,
-		CGI                        => 3.49,
-		CGI::Application           => 4.31,
-		CGI::Application::Dispatch => 2.17,
-		CGI::Untaint               => 1.26,
-		common::sense              => 3.0,
-		Config::Tiny               => 2.12,
-		Data::Session              => 1.01,
-		Date::Format               => 2.24,
-		DBD::SQLite                => 1.29,
-		DBI                        => 1.611,
-		DBIx::Admin::CreateTable   => 2.04,
-		File::Path                 => 2.08,
-		File::Spec                 => 3.31,
-		File::Slurp                => 9999.13,
-		FindBin                    => 1.49,
-		JSON::XS                   => 2.29,
-		Log::Handler               => 0.68,
-		parent                     => 0.218,
-		Path::Class                => 0.18,
-		String::Dirify             => 1.01,
-		Test::Simple               => 0.94,
-		Test::Pod                  => 1.41,
-		Tree::DAG_Node             => 1.06,
-		Tree::DAG_Node::Persist    => 1.03,
-		Try::Tiny                  => 0.06,
-		Text::Xslate               => 0.1051,
+		'Brannigan'							=> 1.1,
+		'Capture::Tiny'						=> 0.46,
+		'CGI'								=> 3.49,
+		'CGI::Application'					=> 4.31,
+		'CGI::Application::Dispatch'		=> 2.17,
+		'CGI::Application::Dispatch::PSGI'	=> 3.12,
+		'CGI::Untaint'						=> 1.26,
+		'Config::Tiny'						=> 2.23,
+		'Data::Session'						=> 1.17,
+		'Date::Format'						=> 2.24,
+		'DBD::SQLite'						=> 1.54,
+		'DBI'								=> 1.611,
+		'DBIx::Admin::CreateTable'			=> 2.10,
+		'DBIx::Admin::TableInfo'			=> 3.03,
+		'DBIx::Simple'						=> 1.35,
+		'File::Path'						=> 2.08,
+		'File::Spec'						=> 3.31,
+		'File::Slurper'						=> 0.010,
+		'FindBin'							=> 1.51,
+		'JSON::XS'							=> 3.02,
+		'Lingua::EN::Inflect::Number'		=> 1.11,
+		'Log::Handler'						=> 0.88,
+		'Moo'								=> 2.003002,
+		'parent'							=> 0.234,
+		'Path::Class'						=> 0.37,
+		'Plack::Builder'					=> 0,
+		'strict'							=> 0,
+		'String::Dirify'					=> 1.03,
+		'Text::Xslate'						=> 3.4.0,
+		'Tree'								=> 1.10,
+		'Tree::DAG_Node'					=> 1.29,
+		'Tree::DAG_Node::Persist'			=> 1.12,
+		'Try::Tiny'							=> 0.28,
+		'Types::Standard'					=> 1.000005,
+		'warnings'							=> 0,
+	},
+	TEST_REQUIRES =>
+	{
+		'Test::More'	=> 1.001002,
+		'Test::Pod'		=> 1.48,
 	},
 	VERSION_FROM => 'lib/App/Office/CMS.pm',
 );
+
+if ( ($ExtUtils::MakeMaker::VERSION =~ /^\d\.\d\d$/) && ($ExtUtils::MakeMaker::VERSION > 6.30) )
+{
+	$params{LICENSE} = 'perl';
+}
+
+if ($ExtUtils::MakeMaker::VERSION ge '6.46')
+{
+	$params{META_MERGE} =
+	{
+		'meta-spec' =>
+		{
+			version => 2,
+		},
+		resources =>
+		{
+			bugtracker	=> 'https://rt.cpan.org/Public/Dist/Display.html?Name=App-Office-CMS',
+			license		=> 'http://dev.perl.org/licenses/',
+			repository	=>
+			{
+				type	=> 'git',
+				url		=> 'https://github.com/ronsavage/App-Office-CMS.git',
+				web		=> 'https://github.com/ronsavage/App-Office-CMS',
+			},
+		},
+	};
+}
+
+WriteMakefile(%params);

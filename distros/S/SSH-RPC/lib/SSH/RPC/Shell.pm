@@ -1,5 +1,5 @@
 package SSH::RPC::Shell;
-$SSH::RPC::Shell::VERSION = '1.203';
+$SSH::RPC::Shell::VERSION = '1.204';
 use strict;
 use JSON;
 
@@ -9,7 +9,7 @@ SSH::RPC::Shell - The shell, or server side, of an RPC call over SSH.
 
 =head1 VERSION
 
-version 1.203
+version 1.204
 
 =head1 SYNOPSIS
 

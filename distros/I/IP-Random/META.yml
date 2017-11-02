@@ -1,7 +1,7 @@
 ---
 abstract: 'Generate IP Addresses Randomly'
 author:
-  - 'J. Maslak <jmaslak@antelope.net>'
+  - 'Joelle Maslak <jmaslak@antelope.net>'
 build_requires:
   Test::Exception: '0'
   Test::More: '0'
@@ -18,7 +18,7 @@ name: IP-Random
 provides:
   IP::Random:
     file: lib/IP/Random.pm
-    version: '1.003'
+    version: '1.004'
 requires:
   Carp: '0'
   List::Util: '0'
@@ -30,5 +30,5 @@ requires:
 resources:
   bugtracker: https://github.com/jmaslak/IP-Random/issues
   repository: git://github.com/jmaslak/IP-Random.git
-version: '1.003'
+version: '1.004'
 x_serialization_backend: 'YAML::Tiny version 1.70'

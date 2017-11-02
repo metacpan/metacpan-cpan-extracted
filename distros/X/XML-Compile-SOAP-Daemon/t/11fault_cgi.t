@@ -33,6 +33,9 @@ sub compare_answer($$$)
     my ($proto, $code, $msg) = $answer =~ m/^(\S+)\s+([0-9]+)\s+([^\n]+)/; 
     my ($header, $content) = split /\n\n/, $answer;
 
+    # error not always the same for various libxml versions
+    $content =~ s/( error\:) .*\z/$1 LIBXML-ERROR\n/s;
+
     my ($ct) = $header =~ m/^Content-Type\:\s+([^;\n]+)/im;
     my $a = join "\n", $code, $msg, $ct, '', $content;
     $a =~ s/\s*\z/\n/;
@@ -109,7 +112,7 @@ compare_answer($ans4, <<__EXPECTED, 'parsing error');
 XML syntax error
 text/plain
 
-[422] The XML cannot be parsed: :2: parser error : Premature end of data in tag bad-xml line 1
+[422] The XML cannot be parsed: error: LIBXML-ERROR
 __EXPECTED
 
 ### Not SOAP Envelope

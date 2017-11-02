@@ -1,7 +1,11 @@
 package Image::DS9::Grammar;
 
+# ABSTRACT: Grammar definitions
+
 use strict;
 use warnings;
+
+our $VERSION = '0.188';
 
 use Image::DS9::PConsts;
 
@@ -12,6 +16,7 @@ use constant REGIONFORMAT => ENUM( qw( ds9 ciao saotng saoimage pros xy ) );
 #  analysis
 #  shm
 
+use namespace::clean;
 
 our %Grammar =
   (
@@ -20,21 +25,21 @@ our %Grammar =
 
    array =>
    [
-    [ 
+    [
      [],
-     { args => [ PDL ], 
+     { args => [ PDL ],
        attrs => [ new    => BOOL ],
        query => QNONE,
        bufarg => 1
      },
 
-     { args => [ SCALARREF ], 
+     { args => [ SCALARREF ],
        attrs => [ new    => BOOL,
-		  bitpix => INT,
-		  skip   => INT,
-		  -o => [ ( -a => [ xdim => INT, ydim => INT ] ),
-			  ( dim => INT ) ],
-		],
+                  bitpix => INT,
+                  skip   => INT,
+                  -o => [ ( -a => [ xdim => INT, ydim => INT ] ),
+                          ( dim => INT ) ],
+                ],
        query => QNONE,
        bufarg => 1
      }
@@ -46,7 +51,7 @@ our %Grammar =
 #------------------------------------------------------
 
    bin =>
-   [ 
+   [
     [
      ['about'],
      { args => [ FLOAT, FLOAT ] }
@@ -61,7 +66,7 @@ our %Grammar =
     # doesn't handle this elegantly, so try 3 args first.  it'll
     # always be the one to be queried, so have it return an indeterminate
     # length array (which isn't length checked yet anyway)
-    [ 
+    [
      ['cols'],
      { args => [ STRING, STRING, STRING ],
        rvals => [ ARRAY ]
@@ -131,7 +136,7 @@ our %Grammar =
 #------------------------------------------------------
 
    cmap =>
-   [ 
+   [
     [
      ['file'],
      { args => [ STRING ] }
@@ -255,12 +260,12 @@ our %Grammar =
 
     [
      [ 'close' ],
-     { query => QNONE } 
+     { query => QNONE }
     ],
 
     [
      [ 'open' ],
-     { query => QNONE } 
+     { query => QNONE }
     ],
 
 
@@ -292,12 +297,12 @@ our %Grammar =
 
     [
      [ 'close' ],
-     { query => QNONE } 
+     { query => QNONE }
     ],
 
     [
      [ 'open' ],
-     { query => QNONE } 
+     { query => QNONE }
     ],
 
 
@@ -325,28 +330,28 @@ our %Grammar =
     [
      ['survey'],
      { args => [ ENUM( qw{ poss2ukstu_red
-			   poss2ukstu_ir
-			   poss2ukstu_blue
-			   poss1_blue
-			   poss1_red
-			   all
-			   quickv
-			   phase2_gsc2
-			   phase2_gsc1
-		     }
-		     )
-	       ]
+                           poss2ukstu_ir
+                           poss2ukstu_blue
+                           poss1_blue
+                           poss1_red
+                           all
+                           quickv
+                           phase2_gsc2
+                           phase2_gsc1
+                     }
+                     )
+               ]
      }
     ],
 
     [
      [ 'close' ],
-     { query => QNONE } 
+     { query => QNONE }
     ],
 
     [
      [ 'open' ],
-     { query => QNONE } 
+     { query => QNONE }
     ],
 
    ],
@@ -355,9 +360,9 @@ our %Grammar =
 
    exit =>
    [
-    [ 
-     [], 
-     { query => QNONE } 
+    [
+     [],
+     { query => QNONE }
     ],
    ],
 
@@ -367,71 +372,71 @@ our %Grammar =
    file =>
    [
 
-    [ 
+    [
      [ENUM('fits', 'mosaic', 'mosaicimage')],
-     { args => [ STRING ], 
+     { args => [ STRING ],
        attrs => [ new => BOOL ],
        query => QNONE
      }
     ],
 
-    [ 
+    [
      ['array'],
-     { args => [ STRING ], 
+     { args => [ STRING ],
        attrs => [ new    => BOOL,
-		  bitpix => INT,
-		  skip   => INT,
-		  -o => [ [ -a => [ xdim => FLOAT, ydim => FLOAT ] ],
-			  [ dim => FLOAT ] ],
-		],
+                  bitpix => INT,
+                  skip   => INT,
+                  -o => [ [ -a => [ xdim => FLOAT, ydim => FLOAT ] ],
+                          [ dim => FLOAT ] ],
+                ],
        query => QNONE,
      }
     ],
 
-    [ 
+    [
      ['url'],
-     { args => [ STRING ], 
+     { args => [ STRING ],
        attrs => [ new => BOOL ],
        query => QNONE,
      }
     ],
 
-    [ 
+    [
      ['save'],
-     { args => [ STRING ], 
+     { args => [ STRING ],
        query => QNONE,
      }
     ],
 
-    [ 
+    [
      ['save', 'gz'],
-     { args => [ STRING ], 
+     { args => [ STRING ],
        query => QNONE,
      }
     ],
 
-    [ 
+    [
      ['save', 'resample'],
-     { args => [ STRING ], 
+     { args => [ STRING ],
        query => QNONE,
      }
     ],
 
-    [ 
+    [
      ['save', 'resample', 'gz'],
-     { args => [ STRING ], 
+     { args => [ STRING ],
        query => QNONE,
      }
     ],
 
-    [ 
+    [
      [],
-     { args => [ STRING ], 
+     { args => [ STRING ],
        attrs => [ new => BOOL,
-		  extname => STRING,
-		  filter => STRING_STRIP,
-		  bin => ARRAY(1,2),
-		],
+                  extname => STRING,
+                  filter => STRING_STRIP,
+                  bin => ARRAY(1,2),
+                ],
      }
     ],
 
@@ -446,10 +451,10 @@ our %Grammar =
      ['mosaic'],
      { args => [ SCALARREF ],
        attrs => [ new => BOOL,
-		  extname => STRING,
-		  filter => STRING_STRIP,
-		  bin => ARRAY(1,2),
-		],
+                  extname => STRING,
+                  filter => STRING_STRIP,
+                  bin => ARRAY(1,2),
+                ],
        query => QNONE,
        bufarg => 1,
        cvt => 0,
@@ -462,10 +467,10 @@ our %Grammar =
      ['mosaicimage'],
      { args => [ SCALARREF ],
        attrs => [ new => BOOL,
-		  extname => STRING,
-		  filter => STRING_STRIP,
-		  bin => ARRAY(1,2),
-		],
+                  extname => STRING,
+                  filter => STRING_STRIP,
+                  bin => ARRAY(1,2),
+                ],
        query => QNONE,
        bufarg => 1,
        cvt => 0,
@@ -523,10 +528,10 @@ our %Grammar =
      [],
      { args => [ SCALARREF ],
        attrs => [ new => BOOL,
-		  extname => STRING,
-		  filter => STRING_STRIP,
-		  bin => ARRAY(1,2),
-		],
+                  extname => STRING,
+                  filter => STRING_STRIP,
+                  bin => ARRAY(1,2),
+                ],
        query => QYES,
        bufarg => 1,
        cvt => 0,
@@ -755,12 +760,12 @@ our %Grammar =
 
     [
      [ 'close' ],
-     { query => QNONE } 
+     { query => QNONE }
     ],
 
     [
      [ 'open' ],
-     { query => QNONE } 
+     { query => QNONE }
     ],
 
     [
@@ -814,7 +819,7 @@ our %Grammar =
      { args => [ COORD_RA, COORD_DEC, COORDSYS ], query => QNONE },
      { args => [ COORD_RA, COORD_DEC, COORDSYS, SKYFORMAT ], query => QNONE },
      { args => [ COORD_RA, COORD_DEC, COORDSYS, SKYFRAME  ], query => QNONE },
-     { args => [ COORD_RA, COORD_DEC, COORDSYS, SKYFRAME, SKYFORMAT ], 
+     { args => [ COORD_RA, COORD_DEC, COORDSYS, SKYFRAME, SKYFORMAT ],
        query => QNONE },
     ],
 
@@ -824,7 +829,7 @@ our %Grammar =
      { args => [ COORD_RA, COORD_DEC, COORDSYS ], query => QNONE },
      { args => [ COORD_RA, COORD_DEC, COORDSYS, SKYFORMAT ], query => QNONE },
      { args => [ COORD_RA, COORD_DEC, COORDSYS, SKYFRAME  ], query => QNONE },
-     { args => [ COORD_RA, COORD_DEC, COORDSYS, SKYFRAME, SKYFORMAT ], 
+     { args => [ COORD_RA, COORD_DEC, COORDSYS, SKYFRAME, SKYFORMAT ],
        query => QNONE },
     ],
 
@@ -834,7 +839,7 @@ our %Grammar =
      { args => [ COORD_RA, COORD_DEC, COORDSYS ], query => QNONE },
      { args => [ COORD_RA, COORD_DEC, COORDSYS, SKYFORMAT ], query => QNONE },
      { args => [ COORD_RA, COORD_DEC, COORDSYS, SKYFRAME  ], query => QNONE },
-     { args => [ COORD_RA, COORD_DEC, COORDSYS, SKYFRAME, SKYFORMAT ], 
+     { args => [ COORD_RA, COORD_DEC, COORDSYS, SKYFRAME, SKYFORMAT ],
        query => QNONE },
     ],
 
@@ -997,7 +1002,7 @@ our %Grammar =
      { args => [ BOOL ] },
     ],
 
-    [ 
+    [
      [ENUM(qw(source background include exclude selected)) ],
      { query => QONLY }
     ],
@@ -1007,12 +1012,12 @@ our %Grammar =
      { args => [STRING] }
     ],
 
-    [ 
+    [
      ['width'],
      { args => [INT] }
     ],
 
-    [ 
+    [
      ['color'],
      { args => [ENUM(qw( black white red green blue cyan magenta yellow))] }
     ],
@@ -1020,21 +1025,21 @@ our %Grammar =
 
     [
      [],
-     { args => [STRING_NL], 
-       query => QNONE, 
+     { args => [STRING_NL],
+       query => QNONE,
        bufarg => 1,
      },
-     { query => QYES|QONLY|QATTR, 
+     { query => QYES|QONLY|QATTR,
        rvals => [ STRING ],
        attrs => [
-		 -format => REGIONFORMAT,
-		 -system => COORDSYS,
-		 -sky    => SKYFRAME,
-		 -skyformat => SKYFORMAT,
-		 -strip  => BOOL,
-		 -prop   => ENUM(qw( select edit move rotate delete fixed 
-				     include source )),
-		] 
+                 -format => REGIONFORMAT,
+                 -system => COORDSYS,
+                 -sky    => SKYFRAME,
+                 -skyformat => SKYFORMAT,
+                 -strip  => BOOL,
+                 -prop   => ENUM(qw( select edit move rotate delete fixed
+                                     include source )),
+                ]
      }
     ],
 
@@ -1215,8 +1220,8 @@ our %Grammar =
    [
     [],
     { attrs => [ now => BOOL ], query => QNONE },
-    { args => [ INT, FLOAT, FLOAT, FLOAT, FLOAT ], 
-      attrs => [ now => BOOL ], 
+    { args => [ INT, FLOAT, FLOAT, FLOAT, FLOAT ],
+      attrs => [ now => BOOL ],
       query => QNONE }
    ],
 
@@ -1237,18 +1242,18 @@ our %Grammar =
    [
     [
      [ENUM( qw( info
-		panner
-		magnifier
-		buttons
-		filename
-		object
-		minmax
-		lowhigh
-		frame
-		red
-		green
-		blue
-	     ) )],
+                panner
+                magnifier
+                buttons
+                filename
+                object
+                minmax
+                lowhigh
+                frame
+                red
+                green
+                blue
+             ) )],
      { args => [ BOOL ] },
     ],
 
@@ -1403,7 +1408,7 @@ our %Grammar =
      { query => QNONE },
     ],
 
-    [ 
+    [
      [],
      { args => [FLOAT] }
     ],
@@ -1411,6 +1416,57 @@ our %Grammar =
    ]
   );
 
+#
+# This file is part of Image-DS9
+#
+# This software is Copyright (c) 2017 by Smithsonian Astrophysical Observatory.
+#
+# This is free software, licensed under:
+#
+#   The GNU General Public License, Version 3, June 2007
+#
 
 1;
 
+__END__
+
+=pod
+
+=head1 NAME
+
+Image::DS9::Grammar - Grammar definitions
+
+=head1 VERSION
+
+version 0.188
+
+=head1 BUGS AND LIMITATIONS
+
+You can make new bug reports, and view existing ones, through the
+web interface at L<https://rt.cpan.org/Public/Dist/Display.html?Name=Image-DS9>.
+
+=head1 SEE ALSO
+
+Please see those modules/websites for more information related to this module.
+
+=over 4
+
+=item *
+
+L<Image::DS9|Image::DS9>
+
+=back
+
+=head1 AUTHOR
+
+Diab Jerius <djerius@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2017 by Smithsonian Astrophysical Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

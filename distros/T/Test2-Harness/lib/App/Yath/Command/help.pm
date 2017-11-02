@@ -4,7 +4,7 @@ use warnings;
 
 use Test2::Util qw/pkg_to_file/;
 
-our $VERSION = '0.001026';
+our $VERSION = '0.001030';
 
 use parent 'App::Yath::Command';
 use Test2::Harness::Util::HashBase;
@@ -14,6 +14,14 @@ use Test2::Harness::Util qw/open_file/;
 sub show_bench { 0 }
 
 sub summary { 'Show a this list of commands' }
+
+sub description {
+    return <<"    EOT"
+This command provides a list of commands when called with no arguments.
+When given a command name as an argument it will print the help for that
+command.
+    EOT
+}
 
 sub group { '' }
 
@@ -71,10 +79,6 @@ sub command_help {
     print $cmd_class->new->usage;
 
     return 0;
-}
-
-sub generate_pod {
-
 }
 
 1;

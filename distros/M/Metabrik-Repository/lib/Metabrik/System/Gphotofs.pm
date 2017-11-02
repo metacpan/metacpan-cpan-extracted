@@ -1,5 +1,5 @@
 #
-# $Id: Gphotofs.pm,v f6ad8c136b19 2017/01/01 10:13:54 gomor $
+# $Id: Gphotofs.pm,v e0e936960a85 2017/03/28 18:31:13 gomor $
 #
 # system::gphotofs Brik
 #
@@ -11,8 +11,8 @@ use base qw(Metabrik::Shell::Command Metabrik::System::Package);
 
 sub brik_properties {
    return {
-      revision => '$Revision: f6ad8c136b19 $',
-      tags => [ qw(unstable mtp mtpfs) ],
+      revision => '$Revision: e0e936960a85 $',
+      tags => [ qw(unstable mtp mtpfs mount umount fs filesystem) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
       attributes => {

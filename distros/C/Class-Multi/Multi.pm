@@ -35,7 +35,7 @@ use Exporter;
 # old syntax for PERL 5.004 compat
 use vars qw( $VERSION @ISA @EXPORT_OK );
 
-$VERSION	= '1.03';
+$VERSION	= '1.04';
 @ISA		= qw( Exporter );
 @EXPORT_OK	= qw( &walk &walk_width &walk_depth &other &otherpkg );
 
@@ -264,12 +264,40 @@ sub otherrun($$) {
 }
 
 
+package OTHER;
+use warnings;
+use strict;
+
+=head1 Multi-Inherited Breadth-First Chain-Up Call
+
+=head2 C<< $this->OTHER::mymethod( @myargs ); >>
+=head2 C<< $this->OTHER::MAY::mymethod( @myargs ); >>
+=head2 C<< $this->OTHER::MAY::UP::mymethod( @myargs ); >>
+=head2 C<< $this->OTHER::UP::mymethod( @myargs ); >>
+
+Syntactic sugar.
+
+Equivalent to C<< &{other( $this, 'mymethod' )}( $this, @myargs ); >>.
+
+Like C<SUPER::>, C<OTHER::> expects the requested method to exist.
+If it does not, an exception is thrown.
+
+See next section for an explanation of the flags. When OTHER
+is used without ALL, the behavior of HERE is implied.
+
+=cut
+
 =head1 Multi-Inherited Iterative Method Call
 
-=head2 C<< $this->EVERY::mymethod( @myargs ); >>
-=head2 C<< $this->EVERY::MAY::mymethod( @myargs ); >>
-=head2 C<< $this->EVERY::DOWN::mymethod( @myargs ); >>
-=head2 C<< $this->EVERY::MAY::DOWN::mymethod( @myargs ); >>
+=head2 C<< $this->OTHER::ALL::mymethod( @myargs ); >>
+=head2 C<< $this->OTHER::ALL::MAY::mymethod( @myargs ); >>
+=head2 C<< $this->OTHER::ALL::MAY::UP::mymethod( @myargs ); >>
+=head2 C<< $this->OTHER::ALL::UP::mymethod( @myargs ); >>
+
+=head2 C<< $this->OTHER::ALL::HERE::mymethod( @myargs ); >>
+=head2 C<< $this->OTHER::ALL::HERE::MAY::mymethod( @myargs ); >>
+=head2 C<< $this->OTHER::ALL::HERE::MAY::UP::mymethod( @myargs ); >>
+=head2 C<< $this->OTHER::ALL::HERE::UP::mymethod( @myargs ); >>
 
 Syntactic sugar.
 
@@ -277,21 +305,30 @@ Calls every implementation of the requested method in all of
 $this's base classes. The method must exist at least once.
 
 If you do not want an exception to be thrown if no method is
-found, call using $this->EVERY::MAY::mymethod( @myargs );
+found, use the MAY modifier.
 
-If you want the subclasses called from the top-down as normal
-inheritance does, but breadth-first, use either EVERY::DOWN
-or EVERY::MAY::DOWN.
+If you want the subclasses to be called from the base to
+the derived, rather than the normal derived-to-base order,
+use the UP modifier.
+
+If you want the subclasses to be searched starting from the
+one that made the call, rather than $this (or $this's deepest
+base class, if UP is also given), use the HERE modifier.
 
 If you do not want to provide an empty method in your base
 class to satisfy that, and don't like the ::MAY syntax, then
-you can wrap an EVERY invocation in an eval { } call. But,
+you can wrap an OTHER::ALL invocation in an eval { } call. But,
 remember to localize @_ before you do so.
 
 =cut
 
-my $EVERY_FUNC = sub {
-	my $auto = shift;
+use Carp;
+
+use vars qw( $AUTOLOAD );
+
+sub AUTOLOAD {
+	my $from = caller();
+	my $auto = $AUTOLOAD;
 	my $this = shift;
 	my @args = @_;
 
@@ -303,7 +340,9 @@ my $EVERY_FUNC = sub {
 	my $name = pop @part;
 	shift @part;
 
-	my $down = 0;
+	my $down = 1;
+	my $once = 1;
+	my $here = 1;
 	my $must = 1;
 
 	while ( my $part = shift @part ) {
@@ -312,19 +351,35 @@ my $EVERY_FUNC = sub {
 			$must = 0;
 		}
 
-		elsif ( $part eq 'DOWN' ) {
-			$down = 1;
+		elsif ( $part eq 'ALL' ) {
+			$once = 0;
+			$here = 0;
+		}
+
+		elsif ( $part eq 'HERE' ) {
+			$here = 1;
+		}
+
+		elsif ( $part eq 'UP' ) {
+			$down = 0;
 		}
 
 		else {
-			confess( "Unknown EVERY:: flag '$part'" );
+			confess( "Unknown OTHER:: flag '$part'" );
 		}
 
 	}
 
+	if ( $here and not $from ) {
+		# we must be called from code that has a package reference
+		return; # FIXME squawk about this...
+	}
+
+	my @walk = $here ? ( $from ) : ();
+
 	my @class;
 
-	walk_width { push @class, $_; 0 } $origin;
+	Class::Multi::walk_width { push @class, $_; 0 } $origin, @walk;
 
 	if ( not $down ) {
 		@class = reverse @class;
@@ -334,128 +389,79 @@ my $EVERY_FUNC = sub {
 
 	while ( my $class = shift @class ) {
 
-		no strict 'refs';
+		my $func;
 
-		if ( my $func = *{"$class\::$name"}{CODE} ) {
-			&$func( $this, @args );
-			$count++;
+		{
+			no strict 'refs';
+			$func = *{"$class\::$name"}{CODE};
 		}
+
+		next unless $func;
+
+		if ( $once ) {
+			return &$func( $this, @args );
+		} else {
+			&$func( $this, @args );
+		}
+
+		$count++;
 
 	}
 
 	if ( $must and not $count ) {
-		confess( "No method '$name' in '$origin'.\n" );
+		if ( $from ) {
+			confess( "No method '$name' after '$from' in '$origin'.\n" );
+		} else {
+			confess( "No method '$name' in '$origin'.\n" );
+		}
 	}
 
-	return $count;
+	return $once ? undef : $count;
 };
 
-package EVERY;
-use strict;
-use warnings;
-sub AUTOLOAD { &$EVERY_FUNC( $EVERY::AUTOLOAD, @_ ) }
+# flags:
+#
+# MAY:  don't throw exception if no function is found
+# ALL:  iterate over the whole inheritance tree
+# HERE: start at the caller's class rather than the object's
+# UP:   iterate base to derived rather than derived to base
+#
+# HERE is implied when ALL is absent
+#
+# must come in this order
+# ALL:HERE::MAY::UP
+#
 
-package EVERY::DOWN;
-use strict;
-use warnings;
-sub AUTOLOAD { &$EVERY_FUNC( $EVERY::DOWN::AUTOLOAD, @_ ) }
+{ # private lexicals begin
 
-package EVERY::MAY;
-use strict;
-use warnings;
-sub AUTOLOAD { &$EVERY_FUNC( $EVERY::MAY::AUTOLOAD, @_ ) }
+my $inst_other = sub {
 
-package EVERY::MAY::DOWN;
-use strict;
-use warnings;
-sub AUTOLOAD { &$EVERY_FUNC( $EVERY::MAY::DOWN::AUTOLOAD, @_ ) }
+	return unless @_;
 
+	my $auto = join( '::', 'OTHER', @_, 'AUTOLOAD' );
 
-=head1 Multi-Inherited Breadth-First Chain-Up Call
+	no strict 'refs';
 
-=head2 C<< $this->OTHER::mymethod( @myargs ); >>
-=head2 C<< $this->OTHER::MAY::mymethod( @myargs ); >>
+	*{$auto} = *{'OTHER::AUTOLOAD'}{CODE};
 
-Syntactic sugar.
-
-Equivalent to C<< &{other( $this, 'mymethod' )}( $this, @myargs ); >>.
-
-Like C<SUPER::>, C<OTHER::> expects the requested method to exist.
-If it does not, an exception is thrown.
-
-If you do not want to wrap the call in eval { }, then use OTHER::MAY.
-
-=cut
-
-package OTHER;
-
-use strict;
-use warnings;
-
-# old syntax for PERL 5.004 compat
-use vars qw( $AUTOLOAD );
-
-use Carp;
-
-sub AUTOLOAD {
-	my $this = shift;
-	my ( $origin, $caller, $name, $func );
-
-	# a valid class or instance must be supplied
-	$origin = ref( $this ) || $this or return;
-
-	# we must be called from code that has a package reference
-	$caller = caller() or return;
-
-	# strip any package name from the supplied method name
-	( $name = $AUTOLOAD ) =~ s/.*://;
-
-	{	no strict 'refs';
-
-		# can't just call other() above, would change caller package ;)
-		$func = Class::Multi::walk_width { *{"$_\::$name"}{CODE} } $origin, $caller;
-	}
-
-	# using this syntax indicates a method is -expected- to exist
-	unless ( defined( $func ) and ref( $func ) eq 'CODE' ) {
-		confess( "No method '$name' after '$caller' in '$origin'.\n" );
-	}
-
-	return &$func( $this, @_ );
-}
+};
 
 
-package OTHER::MAY;
+&$inst_other( qw( MAY ) );
+&$inst_other( qw( MAY UP ) );
+&$inst_other( qw( UP ) );
 
-use strict;
-use warnings;
+&$inst_other( qw( ALL ) );
+&$inst_other( qw( ALL MAY ) );
+&$inst_other( qw( ALL MAY UP ) );
+&$inst_other( qw( ALL UP ) );
 
-# old syntax for PERL 5.004 compat
-use vars qw( $AUTOLOAD );
+&$inst_other( qw( ALL HERE ) );
+&$inst_other( qw( ALL HERE MAY ) );
+&$inst_other( qw( ALL HERE MAY UP ) );
+&$inst_other( qw( ALL HERE UP ) );
 
-use Carp;
-
-sub AUTOLOAD {
-	my $this = shift;
-	my ( $origin, $caller, $name, $func );
-
-	# a valid class or instance must be supplied
-	$origin = ref( $this ) || $this or return;
-
-	# we must be called from code that has a package reference
-	$caller = caller() or return;
-
-	# strip any package name from the supplied method name
-	( $name = $AUTOLOAD ) =~ s/.*://;
-
-	{	no strict 'refs';
-
-		# can't just call other() above, would change caller package ;)
-		$func = Class::Multi::walk_width { *{"$_\::$name"}{CODE} } $origin, $caller;
-	}
-
-	return $func ? &$func( $this, @_ ) : undef;
-}
+} # private lexicals end
 
 
 1;

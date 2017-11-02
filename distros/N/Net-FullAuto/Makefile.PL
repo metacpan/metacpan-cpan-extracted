@@ -26,7 +26,7 @@
 ################################################################
 
 
-our $VERSION='1.0000394';
+our $VERSION='1.0000395';
 
 
 if ($ENV{'AUTOMATED_TESTING'}) {
@@ -1811,6 +1811,7 @@ if ($^O ne 'MSWin32' && $^O ne 'MSWin64') {
    &fa_install_mod('Algorithm::Diff','install','Makefile');
    &fa_install_mod('Text::Diff','install','Makefile');
    &fa_install_mod('PAR::Dist','install','Makefile');
+   &fa_install_mod('IO::Compress::Base::Common','install','Makefile');
    &fa_install_mod('Compress::Raw::Bzip2','install','Makefile');
    &fa_install_mod('Compress::Raw::Zlib','install','Makefile');
    &fa_install_mod('Compress::Zlib','install','Makefile');

@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.030';
+our $VERSION = '0.031';
 
 use Moose;
 
@@ -185,7 +185,7 @@ Dist::Zilla::Plugin::Author::SKIRMESS::RepositoryBase - Automatically create and
 
 =head1 VERSION
 
-Version 0.030
+Version 0.031
 
 =head1 SYNOPSIS
 
@@ -254,11 +254,14 @@ cache:
 install:
   - if not exist "C:\strawberry" cinst strawberryperl
   - set PATH=C:\strawberry\perl\bin;C:\strawberry\perl\site\bin;C:\strawberry\c\bin;%PATH%
-  - cd C:\projects\%APPVEYOR_PROJECT_NAME%
+  - cd %APPVEYOR_BUILD_FOLDER%
   - cpanm --quiet --installdeps --notest --skip-satisfied --with-develop .
 
 build_script:
   - perl Makefile.PL
+  - gmake
+
+test_script:
   - set AUTOMATED_TESTING=1
   - gmake test
   - prove -lr xt/author
@@ -282,6 +285,10 @@ F<perlcriticrc.local>.
 only = 1
 severity = 1
 verbose = [%p] %m at %f line %l, near '%r'\n
+
+# ----------------------------------------------------------
+# Core policies
+# ----------------------------------------------------------
 
 [BuiltinFunctions::ProhibitBooleanGrep]
 [BuiltinFunctions::ProhibitComplexMappings]
@@ -356,7 +363,7 @@ exclude_functions = print say sleep
 [Modules::ProhibitConditionalUseStatements]
 
 [Modules::ProhibitEvilModules]
-modules = Class::ISA {Found use of Class::ISA. This module is deprecated by the Perl 5 Porters.} Pod::Plainer {Found use of Pod::Plainer. This module is deprecated by the Perl 5 Porters.} Shell {Found use of Shell. This module is deprecated by the Perl 5 Porters.} Switch {Found use of Switch. This module is deprecated by the Perl 5 Porters.} Readonly {Found use of Readonly. Please use constant.pm or Const::Fast.} base {Found use of base. Please use parent instead.} File::Slurp {Found use of File::Slurp. Please use Path::Tiny instead.} common::sense {Found use of common::sense. Please use strict and warnings instead.} Class::Load {Found use of Class::Load. Please use Module::Runtime instead.} Any::Moose {Found use of Any::Moose. Please use Moo instead.} Error {Found use of Error.pm. Please use Throwable.pm instead.} Getopt::Std {Found use of Getopt::Std. Please use Getopt::Long instead.} HTML::Template {Found use of HTML::Template. Please use Template::Toolkit.} IO::Socket::INET6 {Found use of IO::Socket::INET6. Please use IO::Socket::IP.} JSON {Found use of JSON. Please use JSON::MaybeXS or Cpanel::JSON::XS.} JSON::Any {Found use of JSON::Any. Please use JSON::MaybeXS.} List::MoreUtils {Found use of List::MoreUtils. Please use List::Util or List::UtilsBy.} Mouse {Found use of Mouse. Please use Moo.} Net::IRC {Found use of Net::IRC. Please use POE::Component::IRC, Net::Async::IRC, or Mojo::IRC.} XML::Simple {Found use of XML::Simple. Please use XML::LibXML, XML::TreeBuilder, XML::Twig, or Mojo::DOM.} Sub::Infix {Found use of Sub::Infix. Please do not use it.}
+modules = Class::ISA {Found use of Class::ISA. This module is deprecated by the Perl 5 Porters.} Pod::Plainer {Found use of Pod::Plainer. This module is deprecated by the Perl 5 Porters.} Shell {Found use of Shell. This module is deprecated by the Perl 5 Porters.} Switch {Found use of Switch. This module is deprecated by the Perl 5 Porters.} Readonly {Found use of Readonly. Please use constant.pm or Const::Fast.} base {Found use of base. Please use parent instead.} File::Slurp {Found use of File::Slurp. Please use Path::Tiny instead.} common::sense {Found use of common::sense. Please use strict and warnings instead.} Class::Load {Found use of Class::Load. Please use Module::Runtime instead.} Any::Moose {Found use of Any::Moose. Please use Moo instead.} Error {Found use of Error.pm. Please use Throwable.pm instead.} Getopt::Std {Found use of Getopt::Std. Please use Getopt::Long instead.} HTML::Template {Found use of HTML::Template. Please use Template::Toolkit.} IO::Socket::INET6 {Found use of IO::Socket::INET6. Please use IO::Socket::IP.} JSON {Found use of JSON. Please use JSON::MaybeXS or Cpanel::JSON::XS.} JSON::XS {Found use of JSON::XS. Please use JSON::MaybeXS or Cpanel::JSON::XS.} JSON::Any {Found use of JSON::Any. Please use JSON::MaybeXS.} List::MoreUtils {Found use of List::MoreUtils. Please use List::Util or List::UtilsBy.} Mouse {Found use of Mouse. Please use Moo.} Net::IRC {Found use of Net::IRC. Please use POE::Component::IRC, Net::Async::IRC, or Mojo::IRC.} XML::Simple {Found use of XML::Simple. Please use XML::LibXML, XML::TreeBuilder, XML::Twig, or Mojo::DOM.} Sub::Infix {Found use of Sub::Infix. Please do not use it.}
 
 #[Modules::ProhibitExcessMainComplexity]
 [Modules::ProhibitMultiplePackages]
@@ -447,7 +454,10 @@ allow = $@ $! $/ $0
 [Variables::RequireLocalizedPunctuationVars]
 [Variables::RequireNegativeIndices]
 
-### Perl::Critic::Bangs
+# ----------------------------------------------------------
+# Perl::Critic::Bangs
+# ----------------------------------------------------------
+
 [Bangs::ProhibitBitwiseOperators]
 #[Bangs::ProhibitCommentedOutCode]
 [Bangs::ProhibitDebuggingModules]
@@ -458,7 +468,10 @@ allow = $@ $! $/ $0
 [Bangs::ProhibitUselessRegexModifiers]
 #[Bangs::ProhibitVagueNames]
 
-### Perl::Critic::Moose
+# ----------------------------------------------------------
+# Perl::Critic::Moose
+# ----------------------------------------------------------
+
 [Moose::ProhibitDESTROYMethod]
 equivalent_modules = Moo Moo::Role
 
@@ -474,7 +487,10 @@ equivalent_modules = Moo Moo::Role
 [Moose::RequireCleanNamespace]
 [Moose::RequireMakeImmutable]
 
-### Perl::Critic::Freenode
+# ----------------------------------------------------------
+# Perl::Critic::Freenode
+# ----------------------------------------------------------
+
 [Freenode::AmpersandSubCalls]
 [Freenode::ArrayAssignAref]
 [Freenode::BarewordFilehandles]
@@ -498,13 +514,22 @@ equivalent_modules = Moo Moo::Role
 [Freenode::WarningsSwitch]
 [Freenode::WhileDiamondDefaultAssignment]
 
-### Perl::Critic::Policy::HTTPCookies
+# ----------------------------------------------------------
+# Perl::Critic::Policy::HTTPCookies
+# ----------------------------------------------------------
+
 [HTTPCookies]
 
-### Perl::Critic::Itch
+# ----------------------------------------------------------
+# Perl::Critic::Itch
+# ----------------------------------------------------------
+
 #[CodeLayout::ProhibitHashBarewords]
 
-### Perl::Critic::Lax
+# ----------------------------------------------------------
+# Perl::Critic::Lax
+# ----------------------------------------------------------
+
 [Lax::ProhibitComplexMappings::LinesNotStatements]
 #[Lax::ProhibitEmptyQuotes::ExceptAsFallback]
 #[Lax::ProhibitLeadingZeros::ExceptChmod]
@@ -513,7 +538,10 @@ equivalent_modules = Moo Moo::Role
 #[Lax::RequireEndWithTrueConst]
 #[Lax::RequireExplicitPackage::ExceptForPragmata]
 
-### Perl::Critic::More
+# ----------------------------------------------------------
+# Perl::Critic::More
+# ----------------------------------------------------------
+
 #[CodeLayout::RequireASCII]
 #[Editor::RequireEmacsFileVariables]
 #[ErrorHandling::RequireUseOfExceptions]
@@ -522,39 +550,72 @@ equivalent_modules = Moo Moo::Role
 #[ValuesAndExpressions::RequireConstantOnLeftSideOfEquality]
 #[ValuesAndExpressions::RestrictLongStrings]
 
+# ----------------------------------------------------------
 # Perl::Critic::PetPeeves::JTRAMMELL
+# ----------------------------------------------------------
+
 [Variables::ProhibitUselessInitialization]
 
-### Perl::Critic::Policy::BuiltinFunctions::ProhibitDeleteOnArrays
+# ----------------------------------------------------------
+# Perl::Critic::Policy::BuiltinFunctions::ProhibitDeleteOnArrays
+# ----------------------------------------------------------
+
 [BuiltinFunctions::ProhibitDeleteOnArrays]
 
-### Perl::Critic::Policy::BuiltinFunctions::ProhibitReturnOr
+# ----------------------------------------------------------
+# Perl::Critic::Policy::BuiltinFunctions::ProhibitReturnOr
+# ----------------------------------------------------------
+
 [BuiltinFunctions::ProhibitReturnOr]
 
-### Perl::Critic::Policy::Moo::ProhibitMakeImmutable
+# ----------------------------------------------------------
+# Perl::Critic::Policy::Moo::ProhibitMakeImmutable
+# ----------------------------------------------------------
+
 [Moo::ProhibitMakeImmutable]
 
-### Perl::Critic::Policy::ValuesAndExpressions::ProhibitSingleArgArraySlice
+# ----------------------------------------------------------
+# Perl::Critic::Policy::ValuesAndExpressions::ProhibitSingleArgArraySlice
 # requires Perl 5.12
+# ----------------------------------------------------------
+
 #[ValuesAndExpressions::ProhibitSingleArgArraySlice]
 
-### Perl::Critic::Policy::Perlsecret
+# ----------------------------------------------------------
+# Perl::Critic::Policy::Perlsecret
+# ----------------------------------------------------------
+
 [Perlsecret]
 
-### Perl::Critic::Policy::TryTiny::RequireBlockTermination
+# ----------------------------------------------------------
+# Perl::Critic::Policy::TryTiny::RequireBlockTermination
+# ----------------------------------------------------------
+
 [TryTiny::RequireBlockTermination]
 
-### Perl::Critic::Policy::TryTiny::RequireUse
+# ----------------------------------------------------------
+# Perl::Critic::Policy::TryTiny::RequireUse
+# ----------------------------------------------------------
+
 [TryTiny::RequireUse]
 
-### Perl::Critic::Policy::ValuesAndExpressions::PreventSQLInjection
+# ----------------------------------------------------------
+# Perl::Critic::Policy::ValuesAndExpressions::PreventSQLInjection
+# ----------------------------------------------------------
+
 [ValuesAndExpressions::PreventSQLInjection]
 
-### Perl::Critic::Policy::Variables::ProhibitUnusedVarsStricter
+# ----------------------------------------------------------
+# Perl::Critic::Policy::Variables::ProhibitUnusedVarsStricter
+# ----------------------------------------------------------
+
 [Variables::ProhibitUnusedVarsStricter]
 allow_unused_subroutine_arguments = 1
 
-### Perl::Critic::Pulp
+# ----------------------------------------------------------
+# Perl::Critic::Pulp
+# ----------------------------------------------------------
+
 [CodeLayout::ProhibitFatCommaNewline]
 #[CodeLayout::ProhibitIfIfSameLine]
 [CodeLayout::RequireFinalSemicolon]
@@ -595,14 +656,20 @@ allow_unused_subroutine_arguments = 1
 [ValuesAndExpressions::RequireNumericVersion]
 [ValuesAndExpressions::UnexpandedSpecialLiteral]
 
-### Perl::Critic::StricterSubs
+# ----------------------------------------------------------
+# Perl::Critic::StricterSubs
+# ----------------------------------------------------------
+
 [Modules::RequireExplicitInclusion]
 #[Subroutines::ProhibitCallsToUndeclaredSubs]
 #[Subroutines::ProhibitCallsToUnexportedSubs]
 [Subroutines::ProhibitExportingUndeclaredSubs]
 [Subroutines::ProhibitQualifiedSubDeclarations]
 
-### Perl::Critic::Tics
+# ----------------------------------------------------------
+# Perl::Critic::Tics
+# ----------------------------------------------------------
+
 #[Tics::ProhibitLongLines]
 [Tics::ProhibitManyArrows]
 [Tics::ProhibitUseBase]
@@ -980,12 +1047,12 @@ L<Test::Pod::No404s|Test::Pod::No404s> author test.
 =cut
 
     $file{q{xt/author/pod-no404s.t}} = $test_header . <<'XT_AUTHOR_POD_NO404S_T';
+use Test::Pod::No404s;
+
 if ( exists $ENV{AUTOMATED_TESTING} ) {
     print "1..0 # SKIP these tests during AUTOMATED_TESTING\n";
     exit 0;
 }
-
-use Test::Pod::No404s;
 
 all_pod_files_ok();
 XT_AUTHOR_POD_NO404S_T
@@ -1002,6 +1069,11 @@ L<Test::Spelling|Test::Spelling> author test. B<stopwords> are added as stopword
         my $content = $test_header . <<'XT_AUTHOR_POD_SPELL_T';
 use Test::Spelling 0.12;
 use Pod::Wordlist;
+
+if ( exists $ENV{AUTOMATED_TESTING} ) {
+    print "1..0 # SKIP these tests during AUTOMATED_TESTING\n";
+    exit 0;
+}
 
 add_stopwords(<DATA>);
 
@@ -1115,7 +1187,7 @@ use Test::More 0.88;
 use Test::Kwalitee 'kwalitee_ok';
 
 # Module::CPANTS::Analyse does not find the LICENSE in scripts that don't end in .pl
-kwalitee_ok(qw{-has_license_in_source_file -has_abstract_in_pod});
+kwalitee_ok(qw{-has_license_in_source_file});
 
 done_testing();
 XT_RELEASE_KWALITEE_T

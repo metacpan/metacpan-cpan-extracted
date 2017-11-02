@@ -18,7 +18,7 @@ no_index:
     - t
     - inc
 requires:
-  Log::Report: 0.9
+  Log::Report: 1.23
   Test::More: 0.54
   Time::HiRes: 0
   XML::Compile: 1.44
@@ -28,4 +28,4 @@ requires:
   XML::Compile::Tester: 0.90
   XML::Compile::WSA: 0.90
   XML::Compile::WSDL11: 3.00
-version: 3.12
+version: 3.13

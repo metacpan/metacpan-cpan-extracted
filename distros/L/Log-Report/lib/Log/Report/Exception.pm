@@ -7,7 +7,7 @@ use strict;
 
 package Log::Report::Exception;
 use vars '$VERSION';
-$VERSION = '1.22';
+$VERSION = '1.23';
 
 
 use Log::Report      'log-report';
@@ -28,6 +28,7 @@ sub new($@)
     bless \%args, $class;
 }
 
+#----------------
 
 sub report_opts() {shift->{report_opts}}
 
@@ -51,6 +52,7 @@ sub message(;$)
     $self->{message} = $msg;
 }
 
+#----------------
 
 sub inClass($) { $_[0]->message->inClass($_[1]) }
 

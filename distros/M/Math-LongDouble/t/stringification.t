@@ -35,8 +35,12 @@ else {
 }
 
 $ok = 1;
+my($seen_pos, $seen_neg) = (0, 0);
 
 for($ninf, $pinf) {
+  $seen_pos++ if $_ > 0;
+  $seen_neg++ if $_ < 0;
+
   unless(LDtoNV(Math::LongDouble->new($_)) == $_) {
     warn "\n\$_: $_ ", LDtoNV(Math::LongDouble->new($_)), "\n";
     $ok = 0;
@@ -47,9 +51,9 @@ for($ninf, $pinf) {
   }
 }
 
-if($ok == 1) {print "ok 2\n"}
+if($ok == 1 && $seen_pos == 1 && $seen_neg == 1) {print "ok 2\n"}
 else {
-  warn "\n\$ok: $ok\n";
+  warn "\n\$ok: $ok\n\$seen_pos: $seen_pos\n\$seen_neg: $seen_neg\n";
   print "not ok 2\n";
 }
 

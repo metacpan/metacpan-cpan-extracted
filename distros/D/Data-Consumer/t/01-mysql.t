@@ -7,6 +7,7 @@ use DBI;
 my $debug = @ARGV ? shift : $ENV{TEST_DEBUG};
 our @fake_error;
 our @expect_fail;
+our %ignored;
 our %process_state;
 our @connect_args;
 our $table;
@@ -122,6 +123,11 @@ $consumer->consume(sub {
     my ($consumer,$id,$dbh) = @_; 
     $debug  and $consumer->debug_warn(0,"*** processing '$id'"); 
     $debug and $consumer->debug_warn(0,$id,Dumper($dbh->selectrow_arrayref("select IS_USED_LOCK(CONCAT_WS('=','$0-$table',$id))")));
+    if($ignored{$id}) {
+        $debug and $consumer->debug_warn(0,"* ignoring '$id' as requested\n");
+        $consumer->ignore();
+        return;
+    }
     sleep(1);
     $dbh->do("UPDATE `$table` SET `n` = `n` + 1 WHERE `id` = ?", undef, $id);
 

@@ -64,7 +64,7 @@ BEGIN {
 
         has _amount => ( default => sub { 0 } );
 
-        sub BUILDARGS : init_args( amount? => _amount );
+        sub BUILDARGS : init( amount? => _amount );
 
         sub amount : ro(_amount);
 

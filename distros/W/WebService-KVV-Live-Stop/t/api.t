@@ -5,7 +5,7 @@ BEGIN {
     use_ok 'WebService::KVV::Live::Stop';
 }
 
-my $stop = WebService::KVV::Live::Stop->new('Europaplatz');
+my $stop = WebService::KVV::Live::Stop->new('Karlsruhe Hbf Vorplatz');
 
 ok $stop->departures > 0;
 

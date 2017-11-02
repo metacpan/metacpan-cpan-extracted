@@ -1,5 +1,6 @@
 package Bio::Phylo::Treedrawer::Svg;
 use strict;
+use warnings;
 use base 'Bio::Phylo::Treedrawer::Abstract';
 use Bio::Phylo::Util::CONSTANT qw'looks_like_hash _PI_';
 use Bio::Phylo::Util::Exceptions 'throw';
@@ -123,6 +124,49 @@ sub _draw_triangle {
 =begin comment
 
 # required:
+# -x      => $x,
+# -y      => $y,
+# -width  => $width,
+# -height => $height,
+
+# optional:
+# -fill         => $fill,
+# -stroke       => $stroke,
+# -stroke_width => $stroke_width,
+# -api          => $api,
+
+=end comment
+
+=cut
+
+sub _draw_rectangle {
+	my $self  = shift;
+	my %args  = @_;
+	my @coord = qw(-x -y -width -height);
+	my ( $x, $y, $width, $height ) = @args{@coord};
+    my @optional = qw(-fill -stroke -stroke_width -api);
+    my $fill     = $args{'-fill'} || 'white';
+    my $stroke   = $args{'-stroke'} || 'black';
+    my $s_width  = $args{'-stroke_width'} || 1;
+    my $api      = $args{'-api'} || $self->_api;
+    delete @args{@coord};
+    delete @args{@optional};	
+	return $api->rectangle(
+		'x'      => $x,
+		'y'      => $y,
+		'width'  => $width,
+		'height' => $height,
+		'style'  => {
+			'fill'         => $fill,
+			'stroke'       => $stroke,
+			'stroke-width' => $s_width,
+		},
+	);
+}
+
+=begin comment
+
+# required:
 # -x => $x,
 # -y => $y,
 # -text => $text,
@@ -159,6 +203,9 @@ sub _draw_text {
 	}
 	if ( my $colour = $args{'-font_colour'} ) {
 		push @style, "fill: ${colour}";
+	}
+	if ( my $weight = $args{'-font_weight'} ) {
+		push @style, "font-weight: ${weight}";
 	}
 	no warnings 'uninitialized';
     return $api->tag(
@@ -246,8 +293,10 @@ sub _draw_curve {
 # -y1 => $y1,
 # -y2 => $y2,
 # -radius => $radius
-# -width => $width,
-# -color => $color
+# -width  => $width,
+# -color  => $color,
+# -large  => $large,
+# -sweep  => $sweep
 
 =end comment
 
@@ -260,6 +309,8 @@ sub _draw_arc {
     my %args = @_;
     my @keys = qw(-x1 -y1 -x2 -y2 -radius -width -color -linecap);
     my ($x1, $y1, $x2, $y2, $radius, $width, $stroke, $linecap) = @args{@keys};
+	my $large = defined $args{'-large'} ? $args{'-large'} : 0; # default 0
+	my $sweep = defined $args{'-sweep'} ? $args{'-sweep'} : 1; # default 1
 	
 	# M = "moveto", i.e. the starting coordinates
 	# A = "elliptical Arc", The size and orientation of the ellipse are
@@ -271,7 +322,9 @@ sub _draw_arc {
 	#      sweep-flag (1) contribute to the automatic calculations and
 	#      help determine how the arc is drawn
     $self->_api->path(
-        'd' => "M $x1 $y1 A $radius $radius 0 0 1 $x2 $y2",		
+		
+		# https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths#Arcs
+        'd' => "M $x1 $y1 A $radius $radius, 0, $large, $sweep, $x2 $y2",		
         'style' => {
 			'fill'           => 'none',			
 			'stroke'         => $stroke  || 'black',
@@ -360,6 +413,12 @@ sub _draw_line {
 
 sub _draw_pies {
     my $self = shift;
+    
+    # normally, the colors for the likelihood pie are generated on the fly, but if 
+    # set_pie_colors has been set in the superclass then we use those instead
+    my %c = %{ $self->_drawer->get_pie_colors };
+	%colors = %c if scalar keys %c;
+	
     $self->_tree->visit_level_order(
         sub {
             my $node = shift;
@@ -373,40 +432,41 @@ sub _draw_pies {
                 else {
                     $r = int $self->_drawer->get_tip_radius($node);
                 }
-                if ( my $pievalues = $node->get_generic('pie') ) {
-                    my @keys  = keys %{$pievalues};
-                    my $start = -90;
-                    my $total;
-                    $total += $pievalues->{$_} for @keys;
-                    my $pie = $self->_api->tag(
-                        'g',
-                        'id'        => 'pie_' . $node->get_id,
-                        'transform' => "translate($cx,$cy)",
-                    );
-                    for my $i ( 0 .. $#keys ) {
-                        next if not $pievalues->{ $keys[$i] };
-                        my $slice = $pievalues->{ $keys[$i] } / $total * 360;
-                        my $color = $colors{ $keys[$i] };
-                        if ( not $color ) {
-                            my $gray = int( ( $i / $#keys ) * 256 );
-                            $colors{ $keys[$i] } = "rgb($gray,$gray,$gray)";
-                        }
-                        my $do_arc  = 0;
-                        my $radians = $slice * $PI / 180;
-                        $do_arc++ if $slice > 180;
-                        my $radius = $r - 2;
-                        my $ry     = $radius * sin($radians);
-                        my $rx     = $radius * cos($radians);
-                        my $g =
-                          $pie->tag( 'g', 'transform' => "rotate($start)" );
-                        $g->path(
-                            'style' =>
-                              { 'fill' => "$color", 'stroke' => 'none' },
-                            'd' =>
-"M $radius,0 A $radius,$radius 0 $do_arc,1 $rx,$ry L 0,0 z"
-                        );
-                        $start += $slice;
-                    }
+                if ( $r ) {
+					if ( my $pievalues = $node->get_generic('pie') ) {
+						my @keys  = keys %{$pievalues};
+						my $start = -90;
+						my $total;
+						$total += $pievalues->{$_} for @keys;
+						my $pie = $self->_api->tag(
+							'g',
+							'id'        => 'pie_' . $node->get_id,
+							'transform' => "translate($cx,$cy)",
+						);
+						for my $i ( 0 .. $#keys ) {
+							next if not $pievalues->{ $keys[$i] };
+							my $slice = $pievalues->{ $keys[$i] } / $total * 360;
+							my $color = $colors{ $keys[$i] };
+							if ( not $color ) {
+								my $gray = int( ( $i / $#keys ) * 256 );
+								$colors{ $keys[$i] } = "rgb($gray,$gray,$gray)";
+							}
+							my $do_arc  = 0;
+							my $radians = $slice * $PI / 180;
+							$do_arc++ if $slice > 180;
+							my $radius = $r - 2;
+							my $ry     = $radius * sin($radians);
+							my $rx     = $radius * cos($radians);
+							my $g =
+							  $pie->tag( 'g', 'transform' => "rotate($start)" );
+							$g->path(
+								'style' =>
+								  { 'fill' => "$color", 'stroke' => 'none' },
+								'd' => "M $radius,0 A $radius,$radius 0 $do_arc,1 $rx,$ry L 0,0 z"
+							);
+							$start += $slice;
+						}
+					}
                 }
             }
         }

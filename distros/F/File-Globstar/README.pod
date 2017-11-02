@@ -1,0 +1,100 @@
+=head1 File-Globstar
+
+This library implements globbing with support for "**" in Perl.
+
+Two consecutive asterisks stand for all files and directories in the <br />
+current directory and all of its descendants.
+
+See
+LL<https://github.com/gflohr/File-Globstar/blob/master/lib/File/Globstar.pod>
+for more information.
+
+The library also contains
+LL<https://github.com/gflohr/File-Globstar/blob/master/lib/File/Globstar/ListMatch.pod>,
+a module that implements matching against lists of patterns in the style
+of LL<https://git-scm.com/docs/gitignore>.
+
+=head2 Installation
+
+Via CPAN:
+
+ $ perl -MCPAN -e install 'File::Globstar'
+
+From source:
+
+ $ perl Build.PL
+ Created MYMETA.yml and MYMETA.json
+ Creating new 'Build' script for 'File-Globstar' version '0.1'
+ $ ./Build
+ $ ./Build install
+
+From source with "make":
+
+ $ git clone https://github.com/gflohr/File-Globstar.git
+ $ cd File-Globstar
+ $ perl Makefile.PL
+ $ make
+ $ make install
+
+=head2 Usage
+
+ use File::Globstar qw(globstar fnmatchstar);
+ 
+ @files = globstar '**/*.css';
+ @files = globstar 'css/**/*.css';
+ @files = globstar 'scss/**';
+ 
+ print "Match!\n" if fnmatchstar '*.pl', 'hello.pl';
+ print "Case-insensitive match!\n" 
+     if fnmatchstar '*.pl', 'Makefile.PL', ignoreCase => 1;
+ 
+ $re = File::Globstar::translatestar('**/*.css');
+ 
+     use File::Globstar::ListMatch;
+ 
+ # Parse from file.
+ $matcher = File::Globstar::ListMatch('.gitignore', 
+                                      ignoreCase => 1);
+ 
+ # Parse from file handle.
+ $matcher = File::Globstar::ListMatch(STDIN, ignoreCase => 0);
+ 
+ # Parse list of patterns.  Comments and blank lines are not
+ # stripped!
+ $matcher = File::Globstar::ListMatch([
+     'src/**/*.o',
+     '.*',
+     '!.gitignore'
+ ], filename => 'exclude.txt');
+ 
+ # Parse string.
+ $patterns = <<EOF;
+ # Ignore all compiled object files.
+ src/**/*.o
+ # Ignore all hidden files.
+ '.*'
+ # But not this one.
+ '.gitignore'
+ EOF
+ $matcher = File::Globstar::ListMatch(\$pattern);
+ 
+ $filename = 'path/to/hello.o';
+ if ($matcher->match($filename)) {
+     print "Ignore '$filename'.\n";
+ }
+
+See
+LL<https://github.com/gflohr/File-Globstar/blob/master/lib/File/Globstar.pod>
+and
+LL<https://github.com/gflohr/File-Globstar/blob/master/lib/File/Globstar/ListMatch.pod>
+for more information!
+
+=head2 Bugs
+
+Please report bugs at <br />
+L<https://github.com/gflohr/File-Globstar/issues>
+
+=head2 Copyright
+
+Copyright (C) 2016-2017, Guido Flohr, L<mailto:guido.flohr@cantanea.com>, <br />
+all rights reserved.

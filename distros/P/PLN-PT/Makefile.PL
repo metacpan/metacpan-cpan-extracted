@@ -22,17 +22,18 @@ my %WriteMakefileArgs = (
     "CHI" => 0,
     "Digest::MD5" => 0,
     "Encode" => 0,
-    "JSON::MaybeXS" => 0,
+    "JSON::XS" => 0,
     "LWP::UserAgent" => 0,
     "Path::Tiny" => 0,
     "strict" => 0,
+    "utf8::all" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
     "Test::More" => 0,
     "utf8" => 0
   },
-  "VERSION" => "0.006",
+  "VERSION" => "0.008",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,12 +44,13 @@ my %FallbackPrereqs = (
   "CHI" => 0,
   "Digest::MD5" => 0,
   "Encode" => 0,
-  "JSON::MaybeXS" => 0,
+  "JSON::XS" => 0,
   "LWP::UserAgent" => 0,
   "Path::Tiny" => 0,
   "Test::More" => 0,
   "strict" => 0,
   "utf8" => 0,
+  "utf8::all" => 0,
   "warnings" => 0
 );
 

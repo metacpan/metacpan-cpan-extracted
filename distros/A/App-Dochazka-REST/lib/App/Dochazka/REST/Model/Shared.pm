@@ -169,7 +169,8 @@ sub canonicalize_tsrange {
         keys => [ $tsr ],
     );
     _replace_payload_array_with_string( $status ) if $status->ok;
-    return $status;    
+    return $CELL->status_err( 'DOCHAZKA_TSRANGE_EMPTY' ) if $status->ok and $status->payload eq "empty";
+    return $status;
 }
 
 

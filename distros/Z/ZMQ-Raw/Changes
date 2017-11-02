@@ -1,5 +1,22 @@
 Revision history for ZMQ-Raw
 
+0.12      2017-10-30 13:32:06+02:00 Africa/Johannesburg
+
+ - Revert C++ changes, they do more harm than good.
+ - Added Message methods:
+    + gets()
+ - Added Socket methods:
+    + join()
+    + leave()
+ - Added (most) DRAFT API constants
+ - Handle IV's in Socket->sendmsg()
+
+0.11      2017-10-24 17:41:12+02:00 Africa/Johannesburg (TRIAL RELEASE)
+
+ - Try and get the SunPRO compiler working Solaris
+ - Documentation improvements
+ - Update to libzmq cb266ee07
+
 0.10      2017-10-20 15:50:14+02:00 Africa/Johannesburg
 
  - Restore perl 5.8 and 5.10 compatibility

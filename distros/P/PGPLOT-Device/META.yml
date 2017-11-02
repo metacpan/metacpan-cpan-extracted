@@ -1,0 +1,47 @@
+---
+abstract: 'autogenerate PGPLOT device names'
+author:
+  - 'Diab Jerius <djerius@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PGPLOT-Device
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  PGPLOT::Device:
+    file: lib/PGPLOT/Device.pm
+    version: '0.09'
+  PGPLOT::Device::PGWin:
+    file: lib/PGPLOT/Device/PGWin.pm
+    version: '0.09'
+requires:
+  Carp: '0'
+  PDL::Graphics::PGPLOT::Window: '0'
+  PGPLOT: '0'
+  Text::Abbrev: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=PGPLOT-Device
+  repository: git://github.com/djerius/pgplot-device.git
+version: '0.09'
+x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -10,11 +10,11 @@ Task::Devel::Essentials - Bundle of modules useful for developers
 
 =head1 VERSION
 
-Version 0.005
+Version 0.006
 
 =cut
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 =head1 SYNOPSIS
 
@@ -34,6 +34,8 @@ our $VERSION = '0.005';
 =item L<Archive::Tar>
 
 =item L<Archive::Zip>
+
+=item L<Assert::Conditional>
 
 =item L<Contextual::Return>
 
@@ -56,6 +58,8 @@ our $VERSION = '0.005';
 =item L<Devel::StackTrace>
 
 =item L<Digest::SHA>
+
+=item L<Dist::Zilla>
 
 =item L<Encode>
 
@@ -113,6 +117,8 @@ our $VERSION = '0.005';
 
 =item L<Moose>
 
+=item L<Mouse>
+
 =item L<Net::FTP>
 
 =item L<Params::Check>
@@ -120,6 +126,8 @@ our $VERSION = '0.005';
 =item L<Parse::CPAN::Meta>
 
 =item L<Perl::Critic>
+
+=item L<Readonly>
 
 =item L<Regexp::Common>
 
@@ -139,11 +147,15 @@ our $VERSION = '0.005';
 
 =item L<Test::Exception>
 
+=item L<Test::Fatal>
+
 =item L<Test::Harness>
 
 =item L<Test::MockModule>
 
 =item L<Test::More>
+
+=item L<Test::NoWarnings>
 
 =item L<Test::Output>
 
@@ -157,11 +169,21 @@ our $VERSION = '0.005';
 
 =item L<Test::Reporter::Transport::Metabase>
 
+=item L<Test::Requires>
+
 =item L<Test::Signature>
+
+=item L<Test::Simple>
+
+=item L<Test::Warn>
+
+=item L<Test2::Suite>
 
 =item L<Text::Glob>
 
 =item L<Try::Tiny>
+
+=item L<Type::Tiny>
 
 =item L<YAML>
 

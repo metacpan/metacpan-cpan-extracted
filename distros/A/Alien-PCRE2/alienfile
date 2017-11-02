@@ -1,6 +1,6 @@
 use alienfile;
 
-#our $VERSION = 0.019_000;
+#our $VERSION = 0.020_000;
  
 plugin 'PkgConfig' => (
     # NEED ANSWER: which should we be using below?
@@ -12,14 +12,13 @@ plugin 'PkgConfig' => (
  
 share {
     plugin Download => (
-#        url => 'ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/',  # NEED ENABLE: official server once 10.30 is released
-        url => 'https://wbraswell.github.io/pcre2-mirror/',  # NEED DISABLE: pre-release mirror server, fixes Windows bug https://bugs.exim.org/show_bug.cgi?id=2067
+        url => 'ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/',
+#        url => 'https://wbraswell.github.io/pcre2-mirror/',  # DEV USE ONLY: pre-release mirror server
 
         filter => qr/^pcre2-.*\.tar\.gz$/,
 
 #        version => qr/([0-9\.]+)/,  # error, prefers 10.21 over 10.23
-#        version => qr/^pcre2-([0-9\.]+)/,  # NEED ENABLE: official server
-        version => qr/^pcre2-([0-9\.]+)/,  # NEED DISABLE: pre-release mirror server
+        version => qr/^pcre2-([0-9\.]+)/,
     );
     plugin Extract => 'tar.gz';
     plugin 'Build::Autoconf' => ();

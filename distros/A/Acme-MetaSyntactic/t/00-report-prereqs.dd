@@ -16,6 +16,7 @@ do { my $x = {
                                       'File::Basename' => '0',
                                       'File::Glob' => '0',
                                       'File::Spec' => '0',
+                                      'Getopt::Long' => '0',
                                       'LWP::UserAgent' => '0',
                                       'List::Util' => '0',
                                       'Test::Builder::Module' => '0',
@@ -38,7 +39,6 @@ do { my $x = {
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
                                    'Test::More' => '0',
-                                   'blib' => '1.01',
                                    'lib' => '0',
                                    'perl' => '5.006'
                                  }

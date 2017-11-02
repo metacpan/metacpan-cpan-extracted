@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = "0.16";
+our $VERSION = "0.17";
 
 1;
 
@@ -14,33 +14,9 @@ __END__
 
 App::Gre - A grep clone using Perl regexp's with better file filtering, defaults, speed, and presentation
 
-=head1 FEATURES
-
-=over
-
-=item * Uses only Perl regexp's.
-
-=item * Searches file names with regexp's as well as their contents,
-recursively starting with current directory.
-
-=item * Speed is accomplished by only searching files you want to
-search (see "gre -c").
-
-=item * Presentation is colorful and readable.
-
-=back
-
 =head1 SYNOPSIS
 
-    gre [-h] [-c]
-        [-A[<n>]] [-B[<n>]] [-C[<n>]] [-d<n>]
-        [-f=<file>] [-i] [-k] [-l] [-L] [-m] [-o] [-p=<str>]
-        [-r=<regexp>] [-R=<regexp>] [-t] [-u] [-v] [-y<n>] [-x]
-        [-[no]xbinary]
-        [-[no][x][i][r][ext]=<str>]
-        [-[no][x][i][name,path,line1][e]=<str>]
-        [-[perl,html,php,js,java,cc,...]]
-        [<regexp>] [<file>...]
+    gre [<options>] [<regexp>] [<file>...]
 
 =head1 OPTIONS
 

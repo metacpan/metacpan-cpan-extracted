@@ -3,7 +3,7 @@ use RPerl;
 package RPerl::Test::Foo;
 use strict;
 use warnings;
-our $VERSION = 0.004_000;
+our $VERSION = 0.006_000;
 
 # [[[ OO INHERITANCE ]]]
 use parent qw(RPerl::CompileUnit::Module::Class);
@@ -13,6 +13,12 @@ use RPerl::CompileUnit::Module::Class;
 ## no critic qw(ProhibitUselessNoCritic ProhibitMagicNumbers RequireCheckedSyscalls)  # USER DEFAULT 1: allow numeric values & print operator
 ## no critic qw(RequireInterpolationOfMetachars)  # USER DEFAULT 2: allow single-quoted control characters & sigils
 ## no critic qw(ProhibitConstantPragma ProhibitMagicNumbers)  # USER DEFAULT 3: allow constants
+## no critic qw(ProhibitAutomaticExportation)  # SYSTEM SPECIAL 14: allow global exports from Config.pm & elsewhere
+
+# [[[ EXPORTS ]]]
+use RPerl::Exporter qw(import);
+our @EXPORT    = qw(tnurg tluarg);
+our @EXPORT_OK = qw(ylprag ecrog quux quince qorge);
 
 # DEV NOTE: below this line copied from RPerl::CompileUnit::Module::Class::Template
 # [[[ CONSTANTS ]]]
@@ -29,7 +35,8 @@ our hashref $properties = {
 
 # [[[ SUBROUTINES & OO METHODS ]]]
 
-our void::method $quux = sub {
+sub quux {
+    { my void::method $RETURN_TYPE };
     ( my object $self) = @ARG;
     $self->{plugh} = $self->{plugh} + 2;
     $self->{plugh} = $self->{plugh} - 3;
@@ -39,25 +46,29 @@ our void::method $quux = sub {
     $self->{plugh} = -($self->{plugh});
     $self->{plugh}++;
     $self->{plugh}--;
-};
+    return;
+}
 
-our integer::method $quince = sub {
+sub quince {
+    { my integer::method $RETURN_TYPE };
     my string $quince_def
         = '...Cydonia vulgaris ... Cydonia, a city in Crete ... [1913 Webster]';
     print $quince_def;
     return (length $quince_def);
-};
+}
 
-our string_hashref::method $qorge = sub {
+sub qorge {
+    { my string_hashref::method $RETURN_TYPE };
     ( my object $self, my integer $qorge_input ) = @ARG;
     return {
         a => $self->{xyzzy} x $qorge_input,
         b => 'howdy',
         c => q{-23.42}
     };
-};
+}
 
-our RPerl::Test::Foo_arrayref::method $qaft = sub {
+sub qaft {
+    { my RPerl::Test::Foo_arrayref::method $RETURN_TYPE };
     ( my object $self, my integer $foo, my number $bar, my string $bat, my string_hashref $baz ) = @ARG;
     my RPerl::Test::Foo_arrayref $retval = [];
     $retval->[0] = RPerl::Test::Foo->new();
@@ -67,21 +78,25 @@ our RPerl::Test::Foo_arrayref::method $qaft = sub {
     $retval->[2] = RPerl::Test::Foo->new();
     $retval->[2]->{xyzzy} = 'moe';
     return $retval;
-};
+}
 
-our void $tnurg = sub {
+sub tnurg {
+    { my void $RETURN_TYPE };
     print 'PIE() = ' . PIE() . "\n";
-};
+    return;
+}
 
-our number $tluarg = sub {
+sub tluarg {
+    { my number $RETURN_TYPE };
     ( my integer $tluarg_input ) = @ARG;
     $tluarg_input++;
     $tluarg_input--;
     $tluarg_input = $tluarg_input**2;
     return $tluarg_input**PI();
-};
+}
 
-our number_arrayref $ylprag = sub {
+sub ylprag {
+    { my number_arrayref $RETURN_TYPE };
     ( my integer $ylprag_input, my number_arrayref $ylprag_array ) = @ARG;
     my integer $ylprag_input_size = scalar @{$ylprag_array};
     my integer $unylprag_size_typed = scalar @{my integer_arrayref $TYPED_unylprag = [4, 6, 8, 10]};
@@ -92,9 +107,10 @@ our number_arrayref $ylprag = sub {
         $ylprag_input * $ylprag_array->[2]
     ];
     return $ylprag_output;
-};
+}
 
-our string_hashref $ecrog = sub {
+sub ecrog {
+    { my string_hashref $RETURN_TYPE };
     ( my integer $al, my number $be, my string $ga, my string_hashref $de)
         = @ARG;
     return {
@@ -103,6 +119,6 @@ our string_hashref $ecrog = sub {
         gamma => $ga,
         delta => %{$de}
     };
-};
+}
 
 1;    # end of class

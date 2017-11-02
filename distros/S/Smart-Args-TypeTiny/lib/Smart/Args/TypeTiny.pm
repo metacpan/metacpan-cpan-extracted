@@ -1,7 +1,7 @@
 package Smart::Args::TypeTiny;
 use strict;
 use warnings;
-our $VERSION = "0.10";
+our $VERSION = "0.12";
 use Carp ();
 use PadWalker qw/var_name/;
 
@@ -36,8 +36,8 @@ sub args {
     }
 
     my $args = (@DB::args == 1 && ref $DB::args[0] eq 'HASH')
-            ?    $DB::args[0]  # must be hash
-            : +{ @DB::args };  # must be key-value list
+            ? +{ %{$DB::args[0]} } # must be hash
+            : +{ @DB::args };      # must be key-value list
     my $kv = {};
 
     # args my $var => RULE
@@ -204,7 +204,7 @@ Smart::Args::TypeTiny provides L<Smart::Args>-like argument validator using L<Ty
 =item Optional allows to pass undef to parameter
 
     sub foo {
-        args my $p => 'Int';
+        args my $p => {isa => 'Int', optional => 1};
     }
 
     foo();           # $p = undef
@@ -258,6 +258,8 @@ Type name or L<Type::Tiny>'s type constraint.
     args my $int => {isa => 'Int'};
 
 =item Mouse::Util::TypeConstraints
+
+Enable if Mouse.pm is loaded.
 
     use Mouse::Util::TypeConstraints;
 

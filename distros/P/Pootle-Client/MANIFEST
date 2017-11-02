@@ -1,0 +1,40 @@
+lib/Pootle/Agent.pm
+lib/Pootle/Cache.pm
+lib/Pootle/Client.pm
+lib/Pootle/Exception.pm
+lib/Pootle/Exception/Credentials.pm
+lib/Pootle/Exception/HTTP.pm
+lib/Pootle/Exception/HTTP/MethodNotAllowed.pm
+lib/Pootle/Exception/HTTP/NotFound.pm
+lib/Pootle/Filters.pm
+lib/Pootle/Filters/Intersection.pm
+lib/Pootle/Logger.pm
+lib/Pootle/Resource.pm
+lib/Pootle/Resource/Language.pm
+lib/Pootle/Resource/Project.pm
+lib/Pootle/Resource/Store.pm
+lib/Pootle/Resource/TranslationProject.pm
+lib/Pootle/Resource/Unit.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MYMETA.json
+MYMETA.yml
+README
+script/pootle-client
+t/01-filters.t
+t/02-simple_API_calls.t
+t/03-agent.t
+t/04-credentials.t
+t/05-cache.t
+t/10-use_case-find_language_files_from_projects.t
+t/Mock/Agent.pm
+t/Mock/Client.pm
+t/Mock/Resource.pm
+t/Mock/Resource/Languages.pm
+t/Mock/Resource/Projects.pm
+t/Mock/Resource/Stores.pm
+t/Mock/Resource/TranslationProjects.pm
+t/Mock/Resource/Units.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -4,7 +4,7 @@
 
 # [[[ PREPROCESSOR ]]]
 # <<< PARSE_ERROR: 'ERROR ECOPARP00' >>>
-# <<< PARSE_ERROR: 'Unexpected Token:  =' >>>
+# <<< PARSE_ERROR: 'Unexpected Token:  our' >>>
 
 # [[[ HEADER ]]]
 use RPerl;
@@ -19,10 +19,12 @@ our $VERSION = 0.001_000;
 # [[[ SUBROUTINES ]]]
 our integer $global_persistent = 23;
 print 'before defining quux(), have $global_persistent = ', $global_persistent, "\n";  # NO ERROR
-our void $quux = sub {
+sub quux {
+    { my void $RETURN_TYPE };
     print 'inside          quux(), have $global_persistent = ', $global_persistent, "\n";       # NO ERROR
     $global_persistent++;
-};
+    return;
+}
 print 'after  defining quux(), have $global_persistent = ', $global_persistent, "\n";  # NO ERROR
 
 # [[[ OPERATIONS ]]]
@@ -30,3 +32,4 @@ quux();
 print 'after   calling quux(), have $global_persistent = ', $global_persistent, "\n";  # NO ERROR
 quux();
 print 'after   calling quux(), have $global_persistent = ', $global_persistent, "\n";  # NO ERROR
+

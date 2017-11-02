@@ -2,7 +2,7 @@ NAME
     CUICollectorMapReduce README
 
   SYNOPSIS
-      CUICollectorMapReduce is a collection of two Java classes designed 
+      CUICollectorMapReduce is a collection of three Java classes designed 
       to parse MetaMap output files to identify CUI bigrams for use by
       the UMLS::Association package.  The Hadoop implementation improves 
       upon the Perl CUICollector.pl module through paralellization of 
@@ -10,17 +10,26 @@ NAME
       and identification of CUI bigrams that span utterances having the 
       same PubMed ID.
 
-      The two Java classes are ArticleCollector.java and CUICollector.java.
+      The three Java classes are ArticleCollector.java, ArticleSplitter.java,
+      and CUICollector.java.
       ArticleCollector parses MetaMap files in order to concatenate all 
       utterances that have the same Pubmed ID into a single record.  
       This single record is then processed by CUICollector.java when in 
       "article" mode. CUICollector.java has 2 modes: "cui" and "article".
+  
       In "cui" mode the CUICollector class parses MetaMap output 
       directly and reproduces the original output of the Perl 
       CUICollector.pl algorithm by identifying CUI bigrams in each 
       individual utterance.  In "article" mode the CUICollector requires 
       that ArticleCollector.java be run first, then it parses the output 
       of the ArticleCollector.  
+  
+      ArticleSplitter is meant to be run on MetaMap output once.  It
+      does the same record processing as ArticleCollector, except
+      instead of saving everything in one large file it saves each
+      collection of utterances in one file per pubmed ID.  These small
+      individual files can then be processed by CUICollector in article
+      mode.  
 
       The following sections provide installation instructions and give
       examples of how to use CUICollectorMapReduce.
@@ -63,33 +72,46 @@ NAME
     executable jar file under a new directory named "target".
 
   USAGE
+    To see a list of required options and their descriptions type in the
+    command without any options. For example:
+
+      >> hadoop jar <path to jar file> Hadoop.CUICollectorMapReduce.ArticleCollector
+
    ArticleCollector
     To run the ArticleCollector class on MetaMap machine readable output
     files (MMO files) use the following (>> indicates command line prompt
     and should not be typed):
 
-       >> hadoop jar <path to jar file> Hadoop.CUICollectorMapReduce.ArticleCollector <path to metamap directory OR individual file> <path and name of output directory>
+       >> hadoop jar <path to jar file> Hadoop.CUICollectorMapReduce.ArticleCollector -i <path to metamap directory OR individual file> -o <path and name of output directory>
 
     For example from within the Hadoop folder:
 
-       >> hadoop jar ./target/CUICollectorMapReduce-0.0.1-SNAPSHOT.jar Hadoop.CUICollectorMapReduce.ArticleCollector ./metamap/ articleOut
+       >> hadoop jar ./target/CUICollectorMapReduce-0.0.1-SNAPSHOT.jar Hadoop.CUICollectorMapReduce.ArticleCollector -i ./metamap/ -o articleOut
 
    CUICollector
     To run CUICollector in "cui" mode, which processes MMO files directly
     use the following:
 
-       >> hadoop jar <path to jar file> Hadoop.CUICollectorMapReduce.CUICollector <path to metamap directory OR individual file> <path and name of output directory> cui
+       >> hadoop jar <path to jar file> Hadoop.CUICollectorMapReduce.CUICollector -i <path to metamap directory OR individual file> -o <path and name of output directory> -m cui -w <window step size>
 
     For example:
 
-       >> hadoop jar ./target/CUICollectorMapReduce-0.0.1-SNAPSHOT.jar Hadoop.CUICollectorMapReduce.CUICollector ./metamap/ cuiOut cui
+       >> hadoop jar ./target/CUICollectorMapReduce-0.0.1-SNAPSHOT.jar Hadoop.CUICollectorMapReduce.CUICollector -i ./metamap/ -o cuiOut -m cui -w 2
 
     To run CUICollector in "article" mode you need to point the input to the
     ArticleCollector output and replace the "cui" with "article".
 
     For example:
 
-       >> hadoop jar ./target/CUICollectorMapReduce-0.0.1-SNAPSHOT.jar Hadoop.CUICollectorMapReduce.CUICollector ./articleOut/part-r-00000 cuiOut article
+       >> hadoop jar ./target/CUICollectorMapReduce-0.0.1-SNAPSHOT.jar Hadoop.CUICollectorMapReduce.CUICollector -i ./articleOut/part-r-00000 -o cuiOut -m article -w 2
+
+   CUICollector window step size:
+    This value must be entered. A step size of one (1) retrieves all
+    consecutive CUI bigrams. A step size of two (2) will retrieve all
+    consecutive bigrams plus all bigrams the skip 1 position. For example,
+    the CUI sequence of "CUI1 CUI2 CUI3" would return the bigrams CUI1-CUI2,
+    CUI2-CUI3 for a step size of 1, and will return the additional bigram of
+    CUI1-CUI3 with a step size of 2.
 
   OUTPUT
     CUICollectorMapReduce outputs all CUI bigrams and frequencies into a

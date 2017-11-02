@@ -1,7 +1,7 @@
 package App::tracepm::Tracer;
 
 our $DATE = '2017-07-29'; # DATE
-our $VERSION = '0.21'; # VERSION
+our $VERSION = '0.22'; # VERSION
 
 # saving CORE::GLOBAL::require doesn't work
 my $orig_require;
@@ -64,7 +64,7 @@ App::tracepm::Tracer - Trace module require to file
 
 =head1 VERSION
 
-This document describes version 0.21 of App::tracepm::Tracer (from Perl distribution App-tracepm), released on 2017-07-29.
+This document describes version 0.22 of App::tracepm::Tracer (from Perl distribution App-tracepm), released on 2017-07-29.
 
 =head1 HOMEPAGE
 

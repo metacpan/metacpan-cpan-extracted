@@ -1,0 +1,23 @@
+.ship.conf
+.travis.yml
+Changes
+cpanfile
+lib/Test/Applify.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-basic.t
+t/applify-ok-subcommand.t
+t/applify-ok.t
+t/basic-dev.t
+t/basic.t
+t/coding-error-1.pl
+t/coding-error-2.pl
+t/coding-error-3.pl
+t/file.pl
+t/file.t
+t/subclass.t
+t/syntax-error-1.pl
+t/syntax-error-2.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -13,7 +13,7 @@ use Moose::Util::TypeConstraints;
 # Distzilla
 use Archive::Zip qw();
 
-our $VERSION = '1.3';
+our $VERSION = '1.4';
 
 subtype 'PluginRole'
     => as 'Object'
@@ -136,19 +136,19 @@ File::ArchivableFormats - Be able to select archivable formats
 
 =head1 VERSION
 
-version 1.3
+version 1.4
 
 =head1 SYNOPSIS
 
-    use File::ArchivableFormat;
+    use File::ArchivableFormats;
 
-    my $archive = File::ArchivableFormat->new();
+    my $archive = File::ArchivableFormats->new();
 
     open my $fh, '<', 'path/to/file';
 
-    my $result = $archive->identify_from_fh($fh);
+    my $result_fh = $archive->identify_from_fh($fh);
 
-    my $result = $archive->identify_from_path('/path/to/file');
+    my $result_path = $archive->identify_from_path('/path/to/file');
 
 =head1 DESCRIPTION
 

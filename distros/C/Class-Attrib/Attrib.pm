@@ -29,13 +29,13 @@ use strict;
 use warnings;
 
 use Storable qw( &dclone );
-use Class::Multi 1.02;
-use Class::Multi qw( &walk &other &otherpkg );
+use Class::Multi 1.04;
+use Class::Multi qw( &walk_width &other &otherpkg );
 use Carp;
 
 use vars qw( $VERSION $AUTOLOAD %Attrib );
 
-$VERSION = "1.06";
+$VERSION = "1.08";
 
 # Abstract base class doesn't have any attributes of its own.
 %Attrib = ();
@@ -107,7 +107,7 @@ sub Attrib($;$;$) {
 		my %attribs = ();
 		my ( $Attr, $attr );
 
-		walk {
+		walk_width {
 			my $pkg = shift;
 
 			{ # scope no strict 'refs'
@@ -128,7 +128,7 @@ sub Attrib($;$;$) {
 
 	my ( $name, $value ) = @_;
 
-	my $ClassAttrib = walk {	
+	my $ClassAttrib = walk_width {	
 			my $pkg = shift;
 			my $ClassAttrib;
 
@@ -245,7 +245,7 @@ sub AUTOLOAD {
 	return if $name eq 'DESTROY';
 
 	# check to see if the requested attribute exists
-	my $class = walk {	
+	my $class = walk_width {	
 			my $pkg = shift;
 			my $ClassAttrib;
 			{ # scope no strict 'refs'

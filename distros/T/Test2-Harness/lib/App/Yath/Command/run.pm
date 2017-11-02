@@ -2,7 +2,7 @@ package App::Yath::Command::run;
 use strict;
 use warnings;
 
-our $VERSION = '0.001026';
+our $VERSION = '0.001030';
 
 use Test2::Harness::Feeder::Run;
 use Test2::Harness::Util::File::JSON;
@@ -26,7 +26,8 @@ sub cli_args { "[--] [test files/dirs] [::] [arguments to test scripts]" }
 
 sub description {
     return <<"    EOT";
-foo bar baz
+This command will run tests through an already started persistent instance. See
+the start command for details on how to launch a persistant instance.
     EOT
 }
 
@@ -269,9 +270,13 @@ use Devel::Cover to calculate test coverage
 
 This is essentially the same as combining: '--no-fork', and '-MDevel::Cover=-silent,1,+ignore,^t/,+ignore,^t2/,+ignore,^xt,+ignore,^test.pl' Devel::Cover and preload/fork do not work well together.
 
-=item --default_search t
+=item --default-at-search xt
 
-ARRAY(0x24e5468)
+Specify the default file/dir search when 'AUTHOR_TESTING' is set. Defaults to './xt'. The default AT search is only used if no files were specified at the command line
+
+=item --default-search t
+
+Specify the default file/dir search. defaults to './t', './t2', and 'test.pl'. The default search is only used if no files were specified at the command line
 
 =item --fork
 

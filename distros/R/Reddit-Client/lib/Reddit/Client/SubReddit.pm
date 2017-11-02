@@ -11,6 +11,8 @@ use fields qw/over18 header_img created_utc header_title header_size
               description display_name created url title subscribers
               public_traffic public_description subreddit_type/;
 
+use constant type => "t5";
+
 # thse functions are currently unavailable
 sub get_links {
     my ($self, %param) = @_;

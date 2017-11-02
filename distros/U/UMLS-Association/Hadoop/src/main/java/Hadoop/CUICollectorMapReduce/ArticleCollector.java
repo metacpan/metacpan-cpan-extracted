@@ -1,35 +1,22 @@
 package Hadoop.CUICollectorMapReduce;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.HashMap;
 
+import org.apache.commons.cli.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-//import org.apache.hadoop.mapred.TextInputFormat;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.ArrayWritable;
-import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
-import org.apache.hadoop.mapreduce.Reducer.Context;
-//import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
-//import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
-//import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
-
-
 
 
 /**
@@ -180,6 +167,32 @@ public class ArticleCollector {
 	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
+		
+		//Parsing commandline options before initiating Hadoop
+		Options options = new Options();
+		//old arg[0]
+		Option input = new Option("i", "input", true, "Path to directory or file to be used as input.");
+		input.setRequired(true);
+		options.addOption(input);
+		//old arg[1]
+		Option outdir = new Option("o", "outdir", true, "Path to directory where output should be saved. Directory should not already exist!");
+		outdir.setRequired(true);
+		options.addOption(outdir);
+		
+		
+		CommandLineParser parser = new GnuParser();
+		HelpFormatter formatter = new HelpFormatter();
+		CommandLine cmd;
+		
+		try{
+			cmd = parser.parse(options, args);
+		} catch(ParseException e){
+			System.out.println(e.getMessage());
+			formatter.printHelp("hadoop jar <path/to/jar/file.jar> Hadoop.CUICollectorMapReduce.ArticleCollector -i <input> -o <outdir>", options);
+			System.exit(1);
+			return;
+		}
+				
 		Configuration conf = new Configuration(true);
 		conf.set("textinputformat.record.delimiter","'EOU'.");
 		
@@ -192,9 +205,9 @@ public class ArticleCollector {
 		job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(Text.class);
 		
-		FileInputFormat.addInputPath(job, new Path(args[0]));
+		FileInputFormat.addInputPath(job, new Path(cmd.getOptionValue("input")));
 		job.setInputFormatClass(TextInputFormat.class);
-		FileOutputFormat.setOutputPath(job, new Path(args[1]));
+		FileOutputFormat.setOutputPath(job, new Path(cmd.getOptionValue("outdir")));
 		
 		System.exit(job.waitForCompletion(true) ? 0 : 1);
 	}

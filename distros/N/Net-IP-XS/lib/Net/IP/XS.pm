@@ -8,7 +8,7 @@ use 5.006;
 use Math::BigInt;
 use Tie::Simple;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 our $IP_NO_OVERLAP      = 0;
 our $IP_PARTIAL_OVERLAP = 1;
@@ -124,7 +124,6 @@ sub ip_bintoint { Math::BigInt->new(ip_bintoint_str($_[0]))        }
 sub ip_inttobin { ip_inttobin_str(Math::BigInt->new($_[0]), $_[1]) }
 
 sub binip       { $_[0]->{'binip'}     }
-sub last_bin    { $_[0]->{'last_bin'}  }
 sub version     { $_[0]->{'ipversion'} }
 sub error       { $_[0]->{'error'}     }
 sub errno       { $_[0]->{'errno'}     }

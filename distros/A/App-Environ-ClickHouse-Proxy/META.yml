@@ -26,5 +26,5 @@ requires:
   perl: '5.010001'
 resources:
   repository: https://github.com/kak-tus/App-Environ-ClickHouse-Proxy.git
-version: '0.2'
+version: '0.3'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

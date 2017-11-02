@@ -16,7 +16,7 @@ my $prereq_pm = {
         'Moo'              => 0,
         'namespace::clean' => 0,
         'File::Share'      => 0,
-        'Map::Tube'        => '3.11',
+        'Map::Tube'        => '3.32',
     }
 };
 
@@ -60,7 +60,7 @@ BBBIKE_DATADIR= $(BBBIKE_DIR)/data
 
 build-map: share/berlin-map.xml
 
-share/berlin-map.xml: $(BBBIKE_DATADIR)/ubahn $(BBBIKE_DATADIR)/sbahn $(BBBIKE_DATADIR)/ubahnhof $(BBBIKE_DATADIR)/sbahnhof inc/berlin-map-lines.inc
+share/berlin-map.xml: $(BBBIKE_DATADIR)/ubahn $(BBBIKE_DATADIR)/sbahn $(BBBIKE_DATADIR)/ubahnhof $(BBBIKE_DATADIR)/sbahnhof inc/berlin-map-lines.inc $(BBBIKE_DIR)/miscsrc/create_map_tube_xml.pl
 	mkdir -p share
 	$(BBBIKE_DIR)/miscsrc/create_map_tube_xml.pl --include-lines=inc/berlin-map-lines.inc > share/berlin-map.xml~
 	mv share/berlin-map.xml~ share/berlin-map.xml

@@ -1,16 +1,17 @@
 vim600: set textwidth=80:
  0.3   :       28/07/2005
- - Test WERE successfull: fail with an unknown language
- - Revert to 'en' when unknown language is detected
- - Interface changed
- - tests more accurate
+ * Test were unsuccessfull: fail with an unknown language
+ * Bugfix: Revert to 'en' when unknown language is detected
+ + Interface changed
+ * tests more accurate
+ * Bugfix: complain that 0.2_1 is not an integer
 
  0.2_1	:	15/05/2005
- - Test now successfull
+ * Test now successfull
 
  0.2
- - Bug under window: language was detected LIKE THIS instead of like this
+ * Bug under window: language was detected LIKE THIS instead of like this
 
  0.1
- - Creation
+ + Creation
 

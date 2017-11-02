@@ -3,6 +3,10 @@
 Unless noted otherwise, these changes where initiated and applied by
 Mark Overmeer.
 
+version 1.04: Mon 30 Oct 17:37:49 CET 2017
+
+	accidentally removed 1.03 from CPAN
+
 version 1.03: Tue 27 Jun 16:39:41 CEST 2017
 
 	Fixes:

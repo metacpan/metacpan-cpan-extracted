@@ -40,43 +40,49 @@
 
 define([
     'jquery', 
+    'app/lib',
     'ajax',
     'cf',
     'current-user',
     'html',
+    'lib',
 ], function (
     $, 
+    appLib,
     ajax,
     cf,
     currentUser,
     html,
+    coreLib,
 ) {
 
-    return function () {
+    return function (msg) {
 
-        var mainareaLogoutSplash = function () {
+        var logoutPostAJAX = function (msg) {
+                currentUser('obj', null);
+                currentUser('priv', null);
+                $('#userbox').html(appLib.fillUserBox()); // reset userbox
                 $('#mainarea').html(html.logout());
-                if (! cf('testing')) {
-                    location.reload();
-                }
+                // automated page reloads are a source of woe
+                // if (! cf('testing')) {
+                //     setTimeout(function() {
+                //         location.reload();
+                //     }, 2000);
+                // }
             },
             rest = {
                 method: 'LOGIN',
                 path: 'logout',
                 body: null
             },
-            // success callback
-            sc = function (status) {
-                var logout_text = "Logout successful"
-                console.log(logout_text, status);
-                $('#result').html(logout_text);
-                currentUser('obj', null);
-                currentUser('priv', null);
-                mainareaLogoutSplash();
+            sc = function (st) {
+                if (! msg) {
+                    msg = st.text;
+                }
+                logoutPostAJAX(msg);
             },
-            // failure callback
-            fc = function (status) {
-                console.log("Logout failed with status", status);
+            fc = function (st) {
+                logoutPostAJAX(st.text);
             };
         ajax(rest, sc, fc);
 

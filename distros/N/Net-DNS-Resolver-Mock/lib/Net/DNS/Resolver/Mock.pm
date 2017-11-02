@@ -3,7 +3,7 @@ package Net::DNS::Resolver::Mock;
 use strict;
 use warnings;
 
-our $VERSION = '1.20170814'; # VERSION
+our $VERSION = '1.20171031'; # VERSION
 
 use base 'Net::DNS::Resolver';
 

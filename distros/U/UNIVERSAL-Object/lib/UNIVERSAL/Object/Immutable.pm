@@ -10,7 +10,7 @@ use Carp ();
 
 use UNIVERSAL::Object;
 
-our $VERSION   = '0.12';
+our $VERSION   = '0.13';
 our $AUTHORITY = 'cpan:STEVAN';
 
 our @ISA; BEGIN { @ISA = ('UNIVERSAL::Object') }
@@ -35,7 +35,7 @@ sub new {
     }
     else {
         require Scalar::Util;
-        Carp::croak('Invalid BLESS args for '.Scalar::Util::blessed($self).', unsupported REPR type ('.Scalar::Util::reftype($self).')');
+        Carp::confess('Invalid BLESS args for '.Scalar::Util::blessed($self).', unsupported REPR type ('.Scalar::Util::reftype($self).')');
     }
 
     return $self;
@@ -53,7 +53,7 @@ UNIVERSAL::Object::Immutable - Another useful base class
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 SYNOPSIS
 

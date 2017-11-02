@@ -128,7 +128,7 @@ define ([
                     r += tobj.preamble + '<br><br>';
                 }
 
-                // populate maxl array
+                // populate maxl array (maximum length of each column)
                 allEntries = tobj.getEntries();
                 allEntries.map(function (e) {
                     headingsentry[e.prop] = e.text;
@@ -220,6 +220,7 @@ define ([
                 // console.log("arr has " + len + " members and the first one has text " + arr[0].text)
             } else {
                 console.log("CRITICAL ERROR: in maxLength(), arr has no members");
+                return null;
             }
             max = arr.reduce(function(prevVal, elem) {
                 if (elem.text === null || elem.text === undefined || elem.hidden === true) {
@@ -249,10 +250,10 @@ define ([
                     // console.log("Attempting to pull target " + entries[i] + " from miniMenu");
                     entry = target.pull(entries[i]);
                     if (lib.privCheck(entry.aclProfile)) {
-                        r += i + '. ' + entry.menuText + '&nbsp;&nbsp;';
+                        r += i + '.&nbsp' + entry.menuText + '&nbsp; ';
                     }
                 }
-                r += 'X. Exit/back';
+                r += 'X.&nbspExit/back';
             } else {
                 r = "To leave this page, press ENTER or click the Submit button";
             }
@@ -289,6 +290,30 @@ define ([
             }
             return obj[prop];
         }, // valueToDisplay
+
+        vetEntries = function (tgt, arr) {
+            // checks that all entries do exist
+            // if any are missing, write an error
+            // return true (OK) or false (NOT OK)
+            for (var i = 0; i < arr.length; i += 1) {
+                if (typeof arr[i] !== "object") {
+                    console.log("ERROR: target definition ->" + tgt + "<- " +
+                                "mentions non-existent entry " + i);
+                    return false;
+                }
+                if (arr[i] === null) {
+                    console.log("ERROR: target definition ->" + tgt + "<- " +
+                                " contains null entry " + i);
+                    return false;
+                }
+                if (arr[i].name === undefined) {
+                    console.log("ERROR: target definition ->" + tgt + "<- " +
+                                "is missing a \"name\" property " + i);
+                    return false;
+                }
+            }
+            return true;
+        }, // vetEntries
 
         // "Your choice" section at the bottom - shared by all target types
         yourChoice = function () {
@@ -360,6 +385,10 @@ define ([
                 // determine characters needed for padding (based on longest
                 // entry)
                 allEntries = dbo.getEntries();
+                if (! vetEntries(dbn, allEntries)) {
+                    // no point in going any further
+                    return null;
+                }
                 needed = maxLength(allEntries) + 2;
 
                 // display entries
@@ -436,6 +465,10 @@ define ([
                     );
                 }
                 // console.log("About to call maxLength() on allEntries", allEntries);
+                if (! vetEntries(dfn, allEntries)) {
+                    // no point in going any further
+                    return null;
+                }
                 needed = maxLength(allEntries) + 2;
 
                 // READ-ONLY entries first
@@ -469,17 +502,20 @@ define ([
                     r += '<br>';
                 }
         
-                // READ-WRITE entries second
+                // WRITABLE entries second
                 len = dfo.entriesWrite ? dfo.entriesWrite.length : 0;
-                console.log("Processing " + len + " read-write dform entries");
+                console.log("Processing " + len + " writable dform entries");
                 for (i = 0; i < len; i += 1) {
                     entry = dfo.entriesWrite[i];
+                    if (! entry.hasOwnProperty('size') && entry.hasOwnProperty('maxlen')) {
+                        entry.size = entry.maxlen;
+                    }
                     if (lib.privCheck(entry.aclProfileWrite)) {
                         r += lib.rightPadSpaces(entry.text.concat(':'), needed);
                         r += '<input id="' + entry.name + '" ';
                         r += 'name="entry' + i + '" ';
                         r += 'value="' + valueToDisplay(obj, entry.prop, "write") + '" ';
-                        r += 'size="' + entry.maxlen + '" ';
+                        r += 'size="' + entry.size + '" ';
                         r += 'maxlength="' + entry.maxlen + '"><br>';
                     }
                 }
@@ -574,8 +610,9 @@ define ([
         logout: function () {
             var r = '';
             r += '<br><br><br>';
-            r += 'You have been logged out of our humble application<br><br>';
-            r += 'Have a lot of fun!<br><br><br>';
+            r += 'You have logged out of this humble application<br><br>';
+            r += 'If you\'d like to log back in, just reload the page by pressing F5 or Ctrl-R<br><br>';
+            r += 'Have a lot of fun!<br><br><br><br>';
             return r;
         } // logout
 

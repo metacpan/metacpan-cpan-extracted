@@ -1,7 +1,7 @@
 use strict;
-use warnings FATAL => 'all';
+use warnings;
 
-use Test::More;
+use Test::More 0.88;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 use Test::DZil;
 use Test::Deep;
@@ -9,7 +9,7 @@ use Path::Tiny;
 use Test::Fatal;
 
 my $tzil = Builder->from_config(
-    { dist_root => 't/does-not-exist' },
+    { dist_root => 'does-not-exist' },
     {
         add_files => {
             path(qw(source dist.ini)) => simple_ini(
@@ -17,12 +17,12 @@ my $tzil = Builder->from_config(
                 [ MetaConfig => ],
                 [ 'MakeMaker' => ],
                 [ 'CheckLib' => {
-                        lib => [ qw(iconv jpeg) ],
+                        lib => [ qw(jpeg iconv) ],
                         header => 'jpeglib.h',
                         libpath => 'additional_path',
                         debug => 0,
                         LIBS => '-lfoo -lbar -Lkablammo',
-                        incpath => [ qw(inc1 inc2 inc3) ],
+                        incpath => [ qw(inc2 inc3 inc1) ],
                     },
                 ],
             ),
@@ -43,9 +43,9 @@ my $file = $build_dir->child('Makefile.PL');
 ok(-e $file, 'Makefile.PL created');
 
 my $content = $file->slurp_utf8;
-unlike($content, qr/[^\S\n]\n/m, 'no trailing whitespace in generated file');
+unlike($content, qr/[^\S\n]\n/, 'no trailing whitespace in generated file');
 
-my $version = Dist::Zilla::Plugin::CheckLib->VERSION || '<self>';
+my $version = Dist::Zilla::Plugin::CheckLib->VERSION;
 
 my $pattern = <<PATTERN;
 use strict;
@@ -97,7 +97,7 @@ cmp_deeply(
                         }),
                     },
                     name => 'CheckLib',
-                    version => ignore,
+                    version => Dist::Zilla::Plugin::CheckLib->VERSION,
                 },
             ),
         }),

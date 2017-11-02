@@ -1,5 +1,5 @@
 #
-# $Id: Latex.pm,v f6ad8c136b19 2017/01/01 10:13:54 gomor $
+# $Id: Latex.pm,v 246044148483 2017/03/18 14:13:18 gomor $
 #
 # format::latex Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Shell::Command Metabrik::System::Package Metabrik::Client:
 
 sub brik_properties {
    return {
-      revision => '$Revision: f6ad8c136b19 $',
+      revision => '$Revision: 246044148483 $',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -102,10 +102,15 @@ sub make_pdf {
    my $self = shift;
    my ($input, $style) = @_;
 
-   $style ||= $self->style;
+   my $datadir = $self->datadir;
+
+   $style ||= $datadir.'/'.$self->style;
    $self->brik_help_run_undef_arg('make_pdf', $input) or return;
    $self->brik_help_run_file_not_found('make_pdf', $input) or return;
    $self->brik_help_run_file_not_found('make_pdf', $style) or return;
+
+   my $sf = Metabrik::System::File->new_from_brik_init($self) or return;
+   $sf->copy($style, ".") or return;
 
    my $cmd = "pdflatex \"$input\"";
 

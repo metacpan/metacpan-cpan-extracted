@@ -18,22 +18,23 @@ our hashref $properties = {};
 
 # [[[ SUBROUTINES & OO METHODS ]]]
 
-our string_hashref::method $ast_to_rperl__generate = sub {
-    ( my object $self, my string_hashref $modes) = @_;
+sub ast_to_rperl__generate {
+    { my string_hashref::method $RETURN_TYPE };
+    ( my object $self, my string_hashref $modes) = @ARG;
     my string_hashref $rperl_source_group = { PMC => q{} };
 
     #    RPerl::diag( 'in Loop::ForEach->ast_to_rperl__generate(), received $self = ' . "\n" . RPerl::Parser::rperl_ast__dump($self) . "\n" );
 
     my string $self_class = ref $self;
 
-    # unwrap LoopForEach_169 from Loop_165
-    if ( $self_class eq 'Loop_165' ) {    # Loop -> LoopForEach
+    # unwrap LoopForEach_183 from Loop_179
+    if ( $self_class eq 'Loop_179' ) {    # Loop -> LoopForEach
         $self       = $self->{children}->[0];
         $self_class = ref $self;
     }
 
     # LoopForEach -> 'foreach' MY Type VARIABLE_SYMBOL LPAREN ListElements ')' CodeBlock
-    if ( $self_class eq 'LoopForEach_169' ) {
+    if ( $self_class eq 'LoopForEach_183' ) {
         my string $foreach         = $self->{children}->[0];
         my string $my              = $self->{children}->[1];
         my string $type            = $self->{children}->[2]->{children}->[0];
@@ -61,22 +62,24 @@ our string_hashref::method $ast_to_rperl__generate = sub {
     }
     else {
         die RPerl::Parser::rperl_rule__replace(
-            'ERROR ECOGEASRP00, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: Grammar rule ' . $self_class . ' found where LoopForEach_169 expected, dying' )
+            'ERROR ECOGEASRP00, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: Grammar rule ' . $self_class . ' found where LoopForEach_183 expected, dying' )
             . "\n";
     }
     return $rperl_source_group;
-};
+}
 
-our string_hashref::method $ast_to_cpp__generate__CPPOPS_PERLTYPES = sub {
-    ( my object $self, my string_hashref $modes) = @_;
+sub ast_to_cpp__generate__CPPOPS_PERLTYPES {
+    { my string_hashref::method $RETURN_TYPE };
+    ( my object $self, my string_hashref $modes) = @ARG;
     my string_hashref $cpp_source_group = { CPP => q{// <<< RP::O::S::L::FE __DUMMY_SOURCE_CODE CPPOPS_PERLTYPES >>>} . "\n" };
 
     #...
     return $cpp_source_group;
-};
+}
 
-our string_hashref::method $ast_to_cpp__generate__CPPOPS_CPPTYPES = sub {
-    ( my object $self, my string_hashref $modes) = @_;
+sub ast_to_cpp__generate__CPPOPS_CPPTYPES {
+    { my string_hashref::method $RETURN_TYPE };
+    ( my object $self, my string_hashref $modes) = @ARG;
 
     # START HERE: implement CPPOPS_CPPTYPES
     # START HERE: implement CPPOPS_CPPTYPES
@@ -86,6 +89,6 @@ our string_hashref::method $ast_to_cpp__generate__CPPOPS_CPPTYPES = sub {
 
     #...
     return $cpp_source_group;
-};
+}
 
 1;    # end of class

@@ -1,10 +1,10 @@
 {
    "abstract" : "allow use of packages already in 'mem'ory",
    "author" : [
-      "Linda Walsh (LAWALSH@cpan.org)"
+      "LA Walsh <LAWALSH@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -36,6 +36,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.4.6",
+   "version" : "v0.4.7",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

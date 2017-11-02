@@ -69,25 +69,32 @@ define ([
                 stackLength;
 
             opts = lib.objectify(opts);
+            opts['logout'] = ('logout' in opts) ? opts.logout : false;
             opts['inputId'] = ('inputId' in opts) ? opts.inputId : null;
             opts['resultLine'] = ('resultLine' in opts) ? opts.resultLine : "&nbsp";
-            opts['_start'] = ('_start' in opts) ? opts.start : true;
+            opts['_start'] = ('_start' in opts) ? opts._start : true;
             opts['_restart'] = ('_restart' in opts) ? opts._restart : false;
             opts['_start'] = opts._restart ? true : opts._start;
             console.log("stack.pop() adjusted opts", opts);
 
+            stackLength = getLength();
+
+            if (stackLength === 1) {
+                if (opts.logout) {
+                    target.pull('logout').start();
+                    return;
+                } else {
+                    console.log("Refusing to pop last remaining item off the stack");
+                    return
+                }
+            }
+
             // pop item off the stack, unless called by stack.restart()
-            if (! opts._restart ) {
+            if (opts._restart) {
+                console.log("Restarting stack top item.");
+            } else {
                 _stack.pop();
                 console.log("Stack top item popped off and discarded.");
-            } else {
-                console.log("Restarting stack top item.");
-            }
-            stackLength = getLength();
-            if (stackLength === 0) {
-                console.log("Stack empty - logging out");
-                target.pull('logout').start("Empty stack - please report bug");
-                return;
             }
             stackTarget = getTarget();
             stackState = getState();
@@ -137,6 +144,7 @@ define ([
             if (tgt.pushable) {
                 _stack.push({
                     "flag": opts.flag,
+                    "opts": opts,
                     "push": true,
                     "resultLine": opts.resultLine,
                     "state": obj,
@@ -173,6 +181,9 @@ define ([
         },
         getLength = function () {
             return _stack.length;
+        },
+        getOpts = function () {
+            return _stack[_stack.length - 1].opts;
         },
         getPush = function () {
             return _stack[_stack.length - 1].push;
@@ -256,6 +267,7 @@ define ([
             console.log("Unwinding the stack to target " + tname);
             for (i = _stack.length; i > 0; i -= 1) {
                 tgt = _stack[i - 1].target;
+                console.log("Does " + tgt.name + " equal " + tname + " ?");
                 if (tgt.name === tname) {
                    break;
                 }
@@ -264,22 +276,32 @@ define ([
             tgt.start(newObj, opts);
         },
         
-        unwindToFlag = function () {
+        unwindToFlag = function (newObj, opts) {
             console.log("Unwinding the stack to flag");
             var flag, i;
+            if (typeof opts !== 'object' || opts === null) {
+                opts = {};
+            }
+            opts['_start'] = ('_start' in opts) ? opts._start : true;
             for (i = _stack.length; i > 0; i -= 1) {
                 flag = _stack[i - 1].flag;
                 if (flag) {
                    break;
                 }
-                popWithoutStart();
+                popWithoutStart(newObj, opts);
             }
-            _stack[_stack.length - 1].target.start();
+            if (opts._start) {
+                _stack[_stack.length - 1].target.start();
+            }
         },
 
-        unwindToType = function (targetType) {
+        unwindToType = function (targetType, opts) {
             var i, tgt;
             console.log("Unwinding stack to nearest target of type " + targetType);
+            if (typeof opts !== 'object' || opts === null) {
+                opts = {};
+            }
+            opts['_start'] = ('_start' in opts) ? opts._start : true;
             for (i = _stack.length; i > 0; i -= 1) {
                 tgt = _stack[i - 1].target;
                 if (tgt.type === targetType) {
@@ -287,13 +309,17 @@ define ([
                 }
                 popWithoutStart();
             }
-            tgt.start();
+            if (opts._start) {
+                tgt.start();
+            }
         },
 
         // grep stack for a target name (exact match)
         grep = function (tname) {
             var i, retval = false;
+            console.log("Grepping stack for " + tname);
             for (i = 0; i < _stack.length; i += 1) {
+                console.log("Does " + _stack[i].target.name + " equal " + tname + " ?");
                 if (_stack[i].target.name === tname) {
                     return true;
                 }
@@ -304,6 +330,7 @@ define ([
     return {
         "getFlag": getFlag,
         "getLength": getLength,
+        "getOpts": getOpts,
         "getPush": getPush,
         "getResultLine": getResultLine,
         "getStack": getStack,

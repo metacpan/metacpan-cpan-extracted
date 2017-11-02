@@ -1,0 +1,57 @@
+{
+   "abstract" : "Mojolicious::Services 是为Mojolicious框架提供的Service管理插件。",
+   "author" : [
+      "wfso <461663376@qq.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Mojolicious-Services",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious" : "7.48",
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/wfso/Mojolicious-Services/issues"
+      },
+      "homepage" : "http://mojolicious.org",
+      "license" : [
+         "https://opensource.org/licenses/MIT"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/wfso/Mojolicious-Services.git",
+         "web" : "https://github.com/wfso/Mojolicious-Services"
+      }
+   },
+   "version" : "v1.0.0",
+   "x_serialization_backend" : "JSON::PP version 2.94"
+}

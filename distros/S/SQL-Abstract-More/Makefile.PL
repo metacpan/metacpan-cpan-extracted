@@ -19,10 +19,6 @@ resources (
    bugtracker => 'http://rt.cpan.org/NoAuth/Bugs.html?Dist=SQL-Abstract-More',
 );
 
-configure_requires (
-  'Module::Install' => 0,
-);
-
 test_requires (
   'Test::More'          => 0,
   'Test::Exception'     => 0,
@@ -33,7 +29,7 @@ test_requires (
 
 requires (
   'MRO::Compat'          => 0,
-  'SQL::Abstract'        => 1.73,
+  'SQL::Abstract'        => 1.84,
   'Params::Validate'     => 0,
   'parent'               => 0,
   'namespace::clean'     => 0,

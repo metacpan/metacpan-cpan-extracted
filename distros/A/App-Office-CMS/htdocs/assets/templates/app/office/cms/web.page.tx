@@ -47,7 +47,7 @@ YAHOO.util.Event.onDOMReady(init);
 
 <h3 class="blue_center">The Canny, Microlight and Simple CMS</h3>
 
-<div id="tabview_container">
+<div id="tabview_container"></div>
 
 </body>
 </html>

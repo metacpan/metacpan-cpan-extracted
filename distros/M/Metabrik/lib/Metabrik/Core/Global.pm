@@ -1,5 +1,5 @@
 #
-# $Id: Global.pm,v 9685bb4e1534 2017/01/01 10:20:58 gomor $
+# $Id: Global.pm,v fa356d306156 2017/11/02 09:23:32 gomor $
 #
 # core::global Brik
 #
@@ -8,14 +8,14 @@ use strict;
 use warnings;
 
 # Breaking.Feature.Fix
-our $VERSION = '1.25';
-our $FIX = '1';
+our $VERSION = '1.27';
+our $FIX = '0';
 
 use base qw(Metabrik);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 9685bb4e1534 $',
+      revision => '$Revision: fa356d306156 $',
       tags => [ qw(main core) ],
       attributes => { 
          device => [ qw(device) ],

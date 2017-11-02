@@ -1,5 +1,5 @@
 package Net::HTTP::Spore::Response;
-$Net::HTTP::Spore::Response::VERSION = '0.07';
+$Net::HTTP::Spore::Response::VERSION = '0.09';
 # ABSTRACT: Portable HTTP Response object for SPORE response
 
 use strict;
@@ -132,7 +132,7 @@ Net::HTTP::Spore::Response - Portable HTTP Response object for SPORE response
 
 =head1 VERSION
 
-version 0.07
+version 0.09
 
 =head1 SYNOPSIS
 

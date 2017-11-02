@@ -1,0 +1,61 @@
+{
+   "abstract" : "Generate IP Addresses Randomly",
+   "author" : [
+      "Joelle Maslak <jmaslak@antelope.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "IP-Random",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "List::Util" : "0",
+            "Socket" : "0",
+            "feature" : "0",
+            "perl" : "v5.20.0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "autodie" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "IP::Random" : {
+         "file" : "lib/IP/Random.pm",
+         "version" : "1.004"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jmaslak/IP-Random/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/jmaslak/IP-Random.git",
+         "web" : "https://github.com/jmaslak/IP-Random"
+      }
+   },
+   "version" : "1.004",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+}
+

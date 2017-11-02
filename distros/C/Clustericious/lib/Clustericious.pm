@@ -8,7 +8,7 @@ use File::Glob qw( bsd_glob );
 use File::Path qw( mkpath );
 
 # ABSTRACT: A framework for RESTful processing systems.
-our $VERSION = '1.26'; # VERSION
+our $VERSION = '1.27'; # VERSION
 
 
 sub _testing
@@ -114,7 +114,7 @@ Clustericious - A framework for RESTful processing systems.
 
 =head1 VERSION
 
-version 1.26
+version 1.27
 
 =head1 SYNOPSIS
 

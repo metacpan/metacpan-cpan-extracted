@@ -1,5 +1,5 @@
 package Net::Hadoop::Oozie::Role::LWP;
-$Net::Hadoop::Oozie::Role::LWP::VERSION = '0.111';
+$Net::Hadoop::Oozie::Role::LWP::VERSION = '0.112';
 use 5.010;
 use strict;
 use warnings;
@@ -97,7 +97,7 @@ Net::Hadoop::Oozie::Role::LWP
 
 =head1 VERSION
 
-version 0.111
+version 0.112
 
 =head1 SYNOPSIS
 

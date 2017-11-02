@@ -6,7 +6,7 @@ use Log::Log4perl qw(get_logger :levels);
 use Getopt::Long;
 
 # ABSTRACT: Simple Command Line Interface for Log4perl
-our $VERSION = '1.26'; # VERSION
+our $VERSION = '1.27'; # VERSION
 
 
 my %init;     # logconfig, loginit, logfile, logcategory, noinit
@@ -187,7 +187,7 @@ Clustericious::Log::CommandLine - Simple Command Line Interface for Log4perl
 
 =head1 VERSION
 
-version 1.26
+version 1.27
 
 =head1 SYNOPSIS
 

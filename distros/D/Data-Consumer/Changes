@@ -1,5 +1,8 @@
 Revision history for Data-Consumer
 
+0.17    Wed Nov 1 2017
+        Fix a bug with ignored in MySQL2, thanks to Maksym Davydov
+
 0.16    Fri Jun 24 2016
         The deprecated warning behavior of Data::Consumer::MySQL was
         a major blocker to upgrading Data::Consumer, so it has been

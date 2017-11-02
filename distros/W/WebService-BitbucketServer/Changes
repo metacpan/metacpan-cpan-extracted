@@ -1,5 +1,9 @@
 Revision history for WebService-BitbucketServer.
 
+0.602     2017-10-26 10:41:32-06:00 MST7MDT
+
+  * Fix wrong method in one of the examples
+
 0.601     2017-10-24 23:07:56-06:00 MST7MDT
 
   * Change author email

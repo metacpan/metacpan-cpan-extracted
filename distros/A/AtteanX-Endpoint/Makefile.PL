@@ -20,11 +20,11 @@ perl_version	'5.014';
 
 requires		'Attean'						=> 0.013;
 requires		'File::ShareDir'				=> 0;
-requires		'HTML::HTML5::Parser'			=> 0;
 requires		'HTML::HTML5::Writer'			=> 0;
 requires		'HTTP::Negotiate'				=> 0;
 requires		'IO::Compress::Gzip'			=> 0;
 requires		'JSON'							=> 0;
+requires		'XML::LibXML'					=> 1.70;
 requires		'List::MoreUtils'				=> 0;
 requires		'Moo'							=> 1.006000;
 requires		'MooX::Log::Any'				=> 0;

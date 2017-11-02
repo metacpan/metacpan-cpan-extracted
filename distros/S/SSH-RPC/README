@@ -1,7 +1,7 @@
 
 
 This archive contains the distribution SSH-RPC,
-version 1.203:
+version 1.204:
 
   The shell, or server side, of an RPC call over SSH.
 

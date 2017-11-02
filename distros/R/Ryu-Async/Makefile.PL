@@ -19,6 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Future" => "0.34",
     "IO::Async" => "0.71",
+    "IO::Socket::IP" => "0.37",
     "Log::Any" => "1.000",
     "Ryu" => "0.024",
     "Syntax::Keyword::Try" => 0,
@@ -41,7 +42,7 @@ my %WriteMakefileArgs = (
     "Variable::Disposition" => "0.004",
     "indirect" => 0
   },
-  "VERSION" => "0.007",
+  "VERSION" => "0.008",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -54,6 +55,7 @@ my %FallbackPrereqs = (
   "Future" => "0.34",
   "IO::Async" => "0.71",
   "IO::Handle" => 0,
+  "IO::Socket::IP" => "0.37",
   "IPC::Open3" => 0,
   "Log::Any" => "1.000",
   "Ryu" => "0.024",

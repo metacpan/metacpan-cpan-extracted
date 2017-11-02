@@ -23,6 +23,7 @@ my $test_requires = {
 	'Test::NoWarnings' => 0,
 	'Test::Number::Delta' => 0,
 	'Test::Carp' => 0,
+	'Test::LWP::UserAgent' => 0
 };
 
 if($online_tests) {

@@ -4,7 +4,7 @@
 #   carp_default.t
 #
 #   Copyright (C) 1999 Raphael Manfredi.
-#   Copyright (C) 2002-2015 Mark Rogaski, mrogaski@cpan.org;
+#   Copyright (C) 2002-2017 Mark Rogaski, mrogaski@cpan.org;
 #   all rights reserved.
 #
 #   See the README file included with the
@@ -20,4 +20,4 @@ select(ORIG_STDOUT);
 open(STDOUT, ">t/file.out") || die "can't redirect STDOUT: $!\n";
 open(STDERR, ">t/file.err") || die "can't redirect STDOUT: $!\n";
 
-do 't/carp.pl';
+do './t/carp.pl';

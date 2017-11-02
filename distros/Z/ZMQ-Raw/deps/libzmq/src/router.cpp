@@ -208,7 +208,8 @@ int zmq::router_t::xsend (msg_t *msg_)
             //  Find the pipe associated with the routing id stored in the prefix.
             //  If there's no such pipe just silently ignore the message, unless
             //  router_mandatory is set.
-            blob_t routing_id ((unsigned char*) msg_->data (), msg_->size ());
+            blob_t routing_id ((unsigned char*) msg_->data (), msg_->size (), 
+              zmq::reference_tag_t());
             outpipes_t::iterator it = outpipes.find (routing_id);
 
             if (it != outpipes.end ()) {
@@ -357,7 +358,7 @@ int zmq::router_t::xrecv (msg_t *msg_)
         prefetched = true;
         current_in = pipe;
 
-        blob_t routing_id = pipe->get_routing_id ();
+        const blob_t &routing_id = pipe->get_routing_id ();
         rc = msg_->init_size (routing_id.size ());
         errno_assert (rc == 0);
         memcpy (msg_->data (), routing_id.data (), routing_id.size ());
@@ -408,7 +409,7 @@ bool zmq::router_t::xhas_in ()
 
     zmq_assert (pipe != NULL);
 
-    blob_t routing_id = pipe->get_routing_id ();
+    const blob_t &routing_id = pipe->get_routing_id ();
     rc = prefetched_id.init_size (routing_id.size ());
     errno_assert (rc == 0);
     memcpy (prefetched_id.data (), routing_id.data (), routing_id.size ());
@@ -438,7 +439,7 @@ bool zmq::router_t::xhas_out ()
     return has_out;
 }
 
-zmq::blob_t zmq::router_t::get_credential () const
+const zmq::blob_t &zmq::router_t::get_credential () const
 {
     return fq.get_credential ();
 }
@@ -467,15 +468,15 @@ int zmq::router_t::get_peer_state (const void *routing_id_,
 bool zmq::router_t::identify_peer (pipe_t *pipe_)
 {
     msg_t msg;
-    blob_t routing_id;
     bool ok;
+    blob_t routing_id;
 
     if (connect_routing_id.length()) {
-        routing_id = blob_t ((unsigned char*) connect_routing_id.c_str (),
+        routing_id.set ((unsigned char*)connect_routing_id.c_str(),
             connect_routing_id.length());
-        connect_routing_id.clear ();
-        outpipes_t::iterator it = outpipes.find (routing_id);
-        if (it != outpipes.end ())
+        connect_routing_id.clear();
+        outpipes_t::iterator it = outpipes.find(routing_id);
+        if (it != outpipes.end())
             zmq_assert(false); //  Not allowed to duplicate an existing rid
     }
     else
@@ -483,7 +484,7 @@ bool zmq::router_t::identify_peer (pipe_t *pipe_)
         unsigned char buf [5];
         buf [0] = 0;
         put_uint32 (buf + 1, next_integral_routing_id++);
-        routing_id = blob_t (buf, sizeof buf);
+        routing_id.set (buf, sizeof buf);
     }
     else
     if (!options.raw_socket) {
@@ -498,11 +499,11 @@ bool zmq::router_t::identify_peer (pipe_t *pipe_)
             unsigned char buf [5];
             buf [0] = 0;
             put_uint32 (buf + 1, next_integral_routing_id++);
-            routing_id = blob_t (buf, sizeof buf);
+            routing_id.set (buf, sizeof buf);
             msg.close ();
         }
         else {
-            routing_id = blob_t ((unsigned char*) msg.data (), msg.size ());
+            routing_id.set ((unsigned char*) msg.data (), msg.size ());
             outpipes_t::iterator it = outpipes.find (routing_id);
             msg.close ();
 
@@ -517,14 +518,14 @@ bool zmq::router_t::identify_peer (pipe_t *pipe_)
                     unsigned char buf [5];
                     buf [0] = 0;
                     put_uint32 (buf + 1, next_integral_routing_id++);
-                    blob_t new_routing_id = blob_t (buf, sizeof buf);
+                    blob_t new_routing_id (buf, sizeof buf);
 
                     it->second.pipe->set_router_socket_routing_id (new_routing_id);
                     outpipe_t existing_outpipe =
                         {it->second.pipe, it->second.active};
 
-                    ok = outpipes.insert (outpipes_t::value_type (
-                        new_routing_id, existing_outpipe)).second;
+                    ok = outpipes.ZMQ_MAP_INSERT_OR_EMPLACE (
+                        ZMQ_MOVE(new_routing_id), existing_outpipe).second;
                     zmq_assert (ok);
 
                     //  Remove the existing routing id entry to allow the new
@@ -543,7 +544,7 @@ bool zmq::router_t::identify_peer (pipe_t *pipe_)
     pipe_->set_router_socket_routing_id (routing_id);
     //  Add the record into output pipes lookup table
     outpipe_t outpipe = {pipe_, true};
-    ok = outpipes.insert (outpipes_t::value_type (routing_id, outpipe)).second;
+    ok = outpipes.ZMQ_MAP_INSERT_OR_EMPLACE (ZMQ_MOVE(routing_id), outpipe).second;
     zmq_assert (ok);
 
     return true;

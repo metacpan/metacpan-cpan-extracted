@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 
 # [[[ PREPROCESSOR ]]]
-# <<< PARSE_ERROR: 'ERROR ECOPARP00' >>>
-# <<< PARSE_ERROR: 'Unexpected Token:  }' >>>
+# <<< PARSE_ERROR: 'ERROR ECOPAPL02' >>>
+# <<< PARSE_ERROR: 'near ")' >>>
 
 # [[[ HEADER ]]]
 use RPerl;
@@ -15,9 +15,12 @@ our $VERSION = 0.001_000;
 ## no critic qw(RequireInterpolationOfMetachars)  # USER DEFAULT 2: allow single-quoted control characters & sigils
 
 # [[[ SUBROUTINES ]]]
-our integer $foo = sub {
+sub foo {
+    { my integer $RETURN_TYPE };
     return((2))
-};
+    return;
+}
 
 # [[[ OPERATIONS ]]]
 foo();
+

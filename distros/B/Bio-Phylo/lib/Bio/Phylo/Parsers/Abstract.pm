@@ -1,5 +1,6 @@
 package Bio::Phylo::Parsers::Abstract;
 use strict;
+use warnings;
 use base 'Bio::Phylo::IO';
 use IO::Handle;
 use Bio::Phylo::Util::Exceptions 'throw';
@@ -100,9 +101,9 @@ sub _open_handle {
     }
     
     # check to see if the data source contains anything
-    if ( $handle->eof ) {
-        throw 'NoData' => "Source is empty!";
-    }
+    #if ( eof $handle ) {
+    #    throw 'NoData' => "Source is empty!";
+    #}
     return $handle;
 }
 

@@ -4,7 +4,7 @@
       ":"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v2.4.1",
+   "generated_by" : "Minilla/v3.0.13",
    "license" : [
       "perl_5"
    ],
@@ -67,7 +67,7 @@
    "provides" : {
       "Module::Build::XSUtil" : {
          "file" : "lib/Module/Build/XSUtil.pm",
-         "version" : "0.16"
+         "version" : "0.18"
       }
    },
    "release_status" : "stable",
@@ -81,11 +81,12 @@
          "web" : "https://github.com/hideo55/Module-Build-XSUtil"
       }
    },
-   "version" : "0.16",
+   "version" : "0.18",
    "x_contributors" : [
-      "tokuhirom <tokuhirom@gmail.com>",
-      "Vincent Pit <perl@profvince.com>",
+      "Shoichi Kaji <skaji@cpan.org>",
       "Syohei YOSHIDA <syohex@gmail.com>",
-      "Hideaki Ohno <hide.o.j55@gmail.com>"
+      "Vincent Pit <perl@profvince.com>",
+      "hideo55 <hide.o.j55@gmail.com>",
+      "tokuhirom <tokuhirom@gmail.com>"
    ]
 }

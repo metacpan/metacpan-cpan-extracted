@@ -1,5 +1,6 @@
 package Bio::Phylo::Matrices::TypeSafeData;
 use strict;
+use warnings;
 use base 'Bio::Phylo::Listable';
 use Bio::Phylo::Util::Exceptions 'throw';
 use Bio::Phylo::Util::CONSTANT qw'_MATRIX_ /looks_like/';
@@ -114,14 +115,10 @@ Set data type.
         $logger->info("setting type '$type'");
         my $obj = Bio::Phylo::Matrices::Datatype->new( $type, @args );
         $self->set_type_object($obj);
-        eval { looks_like_object $self, $MATRIX_CONSTANT };
-        if ( not $@ ) {
+        if ( UNIVERSAL::can($self,'_type') and $self->_type == $MATRIX_CONSTANT ) {
             for my $row ( @{ $self->get_entities } ) {
                 $row->set_type_object($obj);
             }
-        }
-        else {
-            undef($@);
         }
         return $self;
     }

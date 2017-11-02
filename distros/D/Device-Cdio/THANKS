@@ -3,7 +3,7 @@ Many thanks to Jerry G Geiger for resurrecting this project from the dead. He ad
 - audio_get_status
 - audio_get_volume
 - audio_set_volume
-- cdio_guess_cd_type 
+- cdio_guess_cd_type
 - cdio_read_pvd
 - cdio_version (version string of linked library)
 - get_cddb_discid
@@ -18,3 +18,4 @@ He also fixed Build.PL so it works again and added many corrections to
 my faulty C interface code.;
 
 Thanks to Martín Ferrari for making this available on Debian *and* for finding and fixing the bugs needed to do so.
+Thanks to Debian- and Ubuntu-aware "downstream" folks Gregor Herrmann and Adam Conrad for cluing me into what's up there.

@@ -1,0 +1,7 @@
+# This file documents the revision history for Perl extension Catalyst::Plugin::DBIC::ConsoleQueryLog.
+
+0.002 - 2017-10-30
+  - Adjust the display a bit
+
+0.001 - 2017-10-30
+  - initial release

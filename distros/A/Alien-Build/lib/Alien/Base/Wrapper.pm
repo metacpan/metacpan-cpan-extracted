@@ -16,7 +16,7 @@ use Text::ParseWords qw( shellwords );
 # distributed with Alien-Build.
 
 # ABSTRACT: Compiler and linker wrapper for Alien
-our $VERSION = '1.25'; # VERSION
+our $VERSION = '1.28'; # VERSION
 
 
 my @cflags_I;
@@ -170,7 +170,7 @@ Alien::Base::Wrapper - Compiler and linker wrapper for Alien
 
 =head1 VERSION
 
-version 1.25
+version 1.28
 
 =head1 SYNOPSIS
 
@@ -348,6 +348,10 @@ Petr Pisar (ppisar)
 Lance Wicks (LANCEW)
 
 Ahmad Fatoum (a3f, ATHREEF)
+
+José Joaquín Atria (JJATRIA)
+
+Duke Leto (LETO)
 
 =head1 COPYRIGHT AND LICENSE
 

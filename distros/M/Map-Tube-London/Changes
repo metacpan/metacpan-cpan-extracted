@@ -1,5 +1,11 @@
 Revision history for Map::Tube::London
 
+0.92  2017-10-31
+      - Fixed missing line information for some of the stations.
+      - Fixed typo in station name.
+      - Updated test script with regard to name fix.
+      - Replaced namespace:clean with namespace::autoclean.
+
 0.91  2017-10-24
       - Updated dependency on Map::Tube v3.36.
 

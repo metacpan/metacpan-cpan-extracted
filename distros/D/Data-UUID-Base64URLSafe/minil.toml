@@ -1,0 +1,6 @@
+name = "Data-UUID-Base64URLSafe"
+# badges = ["travis"]
+authority="cpan:WORTHMINE"
+
+module_maker="ModuleBuildTiny"
+

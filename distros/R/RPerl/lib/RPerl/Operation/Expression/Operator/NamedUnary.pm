@@ -37,8 +37,9 @@ our string_hashref $NAMES = {
 
 # [[[ SUBROUTINES & OO METHODS ]]]
 
-our string_hashref::method $ast_to_rperl__generate = sub {
-    ( my object $self, my string_hashref $modes) = @_;
+sub ast_to_rperl__generate {
+    { my string_hashref::method $RETURN_TYPE };
+    ( my object $self, my string_hashref $modes) = @ARG;
     my string_hashref $rperl_source_group = { PMC => q{} };
     my string_hashref $rperl_source_subgroup;
 
@@ -49,11 +50,11 @@ our string_hashref::method $ast_to_rperl__generate = sub {
     #    RPerl::diag( 'in Operator::NamedUnary->ast_to_rperl__generate(), have $self_class = ' . $self_class . "\n");
 
     my string $operator_name;
-    if ( $self_class eq 'Operation_80' ) {    # Statement -> OP01_NAMED_UNARY_SCOLON
+    if ( $self_class eq 'Operation_91' ) {    # Statement -> OP01_NAMED_UNARY_SCOLON
         $operator_name = substr $self->{children}->[0], 0, -1;
     }
-    elsif (( $self_class eq 'Operator_99' ) or    # Operator -> OP10_NAMED_UNARY SubExpression
-        ( $self_class eq 'Operator_100' )
+    elsif (( $self_class eq 'Operator_110' ) or    # Operator -> OP10_NAMED_UNARY SubExpression
+        ( $self_class eq 'Operator_111' )
         )
     {                                          # Operator -> OP10_NAMED_UNARY
             # strip trailing whitespace, caused by the need to have the grammar match some tokens with a trailing whitespace, as with 'scalar ', etc.
@@ -64,7 +65,7 @@ our string_hashref::method $ast_to_rperl__generate = sub {
     else {
         die RPerl::Parser::rperl_rule__replace( 'ERROR ECOGEASRP00, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: Grammar rule '
                 . $self_class
-                . ' found where Operation_80, Operator_99, or Operator_100 expected, dying' )
+                . ' found where Operation_91, Operator_110, or Operator_111 expected, dying' )
             . "\n";
     }
 
@@ -82,20 +83,21 @@ our string_hashref::method $ast_to_rperl__generate = sub {
 
     $rperl_source_subgroup = $operator_object->ast_to_rperl__generate( $self, $modes );
     RPerl::Generator::source_group_append( $rperl_source_group, $rperl_source_subgroup );
-
     return $rperl_source_group;
-};
+}
 
-our string_hashref::method $ast_to_cpp__generate__CPPOPS_PERLTYPES = sub {
-    ( my object $self, my string_hashref $modes) = @_;
+sub ast_to_cpp__generate__CPPOPS_PERLTYPES {
+    { my string_hashref::method $RETURN_TYPE };
+    ( my object $self, my string_hashref $modes) = @ARG;
     my string_hashref $cpp_source_group = { CPP => q{// <<< RP::O::E::O::NU __DUMMY_SOURCE_CODE CPPOPS_PERLTYPES >>>} . "\n" };
 
     #...
     return $cpp_source_group;
-};
+}
 
-our string_hashref::method $ast_to_cpp__generate__CPPOPS_CPPTYPES = sub {
-    ( my object $self, my string_hashref $modes) = @_;
+sub ast_to_cpp__generate__CPPOPS_CPPTYPES {
+    { my string_hashref::method $RETURN_TYPE };
+    ( my object $self, my string_hashref $modes) = @ARG;
     my string_hashref $cpp_source_group = { CPP => q{} };
     my string_hashref $cpp_source_subgroup;
 
@@ -103,11 +105,11 @@ our string_hashref::method $ast_to_cpp__generate__CPPOPS_CPPTYPES = sub {
 
     my string $self_class = ref $self;
     my string $operator_name;
-    if ( $self_class eq 'Operation_80' ) {    # Statement -> OP01_NAMED_UNARY_SCOLON
+    if ( $self_class eq 'Operation_91' ) {    # Statement -> OP01_NAMED_UNARY_SCOLON
         $operator_name = substr $self->{children}->[0], 0, -1;
     }
-    elsif (( $self_class eq 'Operator_99' ) or    # Operator -> OP10_NAMED_UNARY SubExpression
-        ( $self_class eq 'Operator_100' )
+    elsif (( $self_class eq 'Operator_110' ) or    # Operator -> OP10_NAMED_UNARY SubExpression
+        ( $self_class eq 'Operator_111' )
         )
     {                                          # Operator -> OP10_NAMED_UNARY
             # strip trailing whitespace, caused by the need to have the grammar match some tokens with a trailing whitespace, as with 'scalar ', etc.
@@ -117,7 +119,7 @@ our string_hashref::method $ast_to_cpp__generate__CPPOPS_CPPTYPES = sub {
     else {
         die RPerl::Parser::rperl_rule__replace( 'ERROR ECOGEASCP00, CODE GENERATOR, ABSTRACT SYNTAX TO C++: Grammar rule '
                 . $self_class
-                . ' found where Operation_80, Operator_99 or Operator_100 expected, dying' )
+                . ' found where Operation_91, Operator_110 or Operator_111 expected, dying' )
             . "\n";
     }
 
@@ -135,8 +137,7 @@ our string_hashref::method $ast_to_cpp__generate__CPPOPS_CPPTYPES = sub {
 
     $cpp_source_subgroup = $operator_object->ast_to_cpp__generate__CPPOPS_CPPTYPES( $self, $modes );
     RPerl::Generator::source_group_append( $cpp_source_group, $cpp_source_subgroup );
-
     return $cpp_source_group;
-};
+}
 
 1;    # end of class

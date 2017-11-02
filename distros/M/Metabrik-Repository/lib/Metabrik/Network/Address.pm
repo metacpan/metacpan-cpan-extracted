@@ -1,5 +1,5 @@
 #
-# $Id: Address.pm,v b8ac01b4c14b 2017/01/21 14:38:39 gomor $
+# $Id: Address.pm,v 5051a354bfa9 2017/10/28 08:17:02 gomor $
 #
 # network::address Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik);
 
 sub brik_properties {
    return {
-      revision => '$Revision: b8ac01b4c14b $',
+      revision => '$Revision: 5051a354bfa9 $',
       tags => [ qw(unstable netmask convert ascii) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -19,7 +19,7 @@ sub brik_properties {
          subnet => [ qw(subnet) ],
       },
       commands => {
-         match => [ qw(ipv4_address subnet|OPTIONAL) ],
+         match => [ qw(ip_address subnet|OPTIONAL) ],
          network_address => [ qw(subnet|OPTIONAL) ],
          broadcast_address => [ qw(subnet|OPTIONAL) ],
          netmask_address => [ qw(subnet|OPTIONAL) ],
@@ -32,16 +32,31 @@ sub brik_properties {
          ipv4_list => [ qw(subnet|OPTIONAL) ],
          ipv6_list => [ qw(subnet|OPTIONAL) ],
          count_ipv4 => [ qw(subnet|OPTIONAL) ],
+         count_ipv6 => [ qw(subnet|OPTIONAL) ],
          get_ipv4_cidr => [ qw(subnet|OPTIONAL) ],
+         get_ipv6_cidr => [ qw(subnet|OPTIONAL) ],
          is_ipv4_subnet => [ qw(subnet|OPTIONAL) ],
          merge_cidr => [ qw($cidr_list) ],
          ipv4_to_integer => [ qw(ipv4_address) ],
+         ipv6_to_integer => [ qw(ipv6_address) ],
          integer_to_ipv4 => [ qw(integer) ],
+         ipv4_reserved_subnets => [ ],
+         ipv6_reserved_subnets => [ ],
+         is_ipv4_reserved => [ qw(ipv4_address) ],
+         is_ipv6_reserved => [ qw(ipv6_address) ],
+         is_ip_reserved => [ qw(ip_address) ],
+         ipv6_to_string_preferred => [ qw(ipv6_address) ],
+         ipv4_first_address => [ qw(ipv4_address) ],
+         ipv4_last_address => [ qw(ipv4_address) ],
+         ipv6_first_address => [ qw(ipv6_address) ],
+         ipv6_last_address => [ qw(ipv6_address) ],
       },
       require_modules => {
+         'Bit::Vector' => [ ],
          'Net::Netmask' => [ ],
          'Net::IPv4Addr' => [ ],
          'Net::IPv6Addr' => [ ],
+         'IPv6::Address' => [ ],
          'NetAddr::IP' => [ ],
          'Net::CIDR' => [ ],
          'Socket' => [ ],
@@ -61,11 +76,11 @@ sub match {
    }
 
    if (Net::CIDR::cidrlookup($ip, $subnet)) {
-      $self->log->verbose("match: $ip is in the same subnet as $subnet");
+      $self->log->debug("match: $ip is in the same subnet as $subnet");
       return 1;
    }
    else {
-      $self->log->verbose("match: $ip is NOT in the same subnet as $subnet");
+      $self->log->debug("match: $ip is NOT in the same subnet as $subnet");
       return 0;
    }
 
@@ -143,7 +158,7 @@ sub is_ip {
 
    (my $local = $ip) =~ s/\/\d+$//;
 
-   if (Net::CIDR::cidrvalidate($local)) {
+   if ($self->is_ipv4($ip) || $self->is_ipv6($ip)) {
       return 1;
    }
 
@@ -313,6 +328,25 @@ sub get_ipv4_cidr {
    return $cidr;
 }
 
+sub get_ipv6_cidr {
+   my $self = shift;
+   my ($subnet) = @_;
+
+   $subnet ||= $self->subnet;
+   $self->brik_help_run_undef_arg('get_ipv6_cidr', $subnet) or return;
+
+   my ($cidr) = $subnet =~ m{/(\d+)$};
+   if (! defined($cidr)) {
+      return $self->log->error("get_ipv6_cidr: no CIDR mask found");
+   }
+
+   if ($cidr < 0 || $cidr > 128) {
+      return $self->log->error("get_ipv6_cidr: invalid CIDR mask [$cidr]");
+   }
+
+   return $cidr;
+}
+
 sub count_ipv4 {
    my $self = shift;
    my ($subnet) = @_;
@@ -327,6 +361,22 @@ sub count_ipv4 {
    my $cidr = $self->get_ipv4_cidr($subnet) or return;
 
    return 2 ** (32 - $cidr);
+}
+
+sub count_ipv6 {
+   my $self = shift;
+   my ($subnet) = @_;
+
+   $subnet ||= $self->subnet;
+   $self->brik_help_run_undef_arg('count_ipv6', $subnet) or return;
+
+   if (! $self->is_ipv6($subnet)) {
+      return $self->log->error("count_ipv6: invalid format [$subnet], not IPv6");
+   }
+
+   my $cidr = $self->get_ipv6_cidr($subnet) or return;
+
+   return 2 ** (128 - $cidr);
 }
 
 sub is_ipv4_subnet {
@@ -377,6 +427,24 @@ sub ipv4_to_integer {
    return CORE::unpack('N', Socket::inet_aton($ipv4_address));
 }
 
+sub ipv6_to_integer {
+   my $self = shift;
+   my ($ipv6_address) = @_;
+
+   $self->brik_help_run_undef_arg('ipv6_to_integer', $ipv6_address) or return;
+
+   if (! $self->is_ipv6($ipv6_address)) {
+      return $self->log->error("ipv6_to_integer: invalid IPv6 address [$ipv6_address]");
+   }
+
+   ($ipv6_address) =~ s/\/\d+$//;  # Remove /CIDR if any
+
+   my $f = IPv6::Address->new("$ipv6_address/128")->get_bitstr;
+
+   my ($b) = CORE::unpack('B128', $f);
+   return Bit::Vector->new_Bin(128, $b)->to_Dec;
+}
+
 sub integer_to_ipv4 { 
    my $self = shift;
    my ($integer) = @_;
@@ -384,6 +452,195 @@ sub integer_to_ipv4 {
    $self->brik_help_run_undef_arg('integer_to_ipv4', $integer) or return;
 
    return Socket::inet_ntoa(pack('N', $integer));
+}
+
+#
+# https://metacpan.org/source/MAXMIND/MaxMind-DB-Writer-0.202000/lib/MaxMind/DB/Writer/Tree.pm
+#
+sub ipv4_reserved_subnets {
+   my $self = shift;
+
+   return [ qw(
+      0.0.0.0/8
+      10.0.0.0/8
+      100.64.0.0/10
+      127.0.0.0/8
+      169.254.0.0/16
+      172.16.0.0/12
+      192.0.0.0/29
+      192.0.2.0/24
+      192.88.99.0/24
+      192.168.0.0/16
+      198.18.0.0/15
+      198.51.100.0/24
+      203.0.113.0/24
+      224.0.0.0/4
+      240.0.0.0/4
+   ) ];
+}
+
+sub ipv6_reserved_subnets {
+   my $self = shift;
+
+   return [ qw(
+      100::/64
+      2001:1::/32
+      2001:2::/31
+      2001:4::/30
+      2001:8::/29
+      2001:10::/28
+      2001:20::/27
+      2001:40::/26
+      2001:80::/25
+      2001:100::/24
+      2001:db8::/32
+      fc00::/7
+      fe80::/10
+      ff00::/8
+   ) ];
+}
+
+sub is_ipv4_reserved {
+   my $self = shift;
+   my ($ip) = @_;
+
+   $self->brik_help_run_undef_arg('is_ipv4_reserved', $ip) or return;
+
+   if (! $self->is_ipv4($ip)) {
+      return $self->log->error("is_ipv4_reserved: ip[$ip] is not IPv4");
+   }
+
+   my $list = $self->ipv4_reserved_subnets;
+   my $is_reserved = 0;
+   for (@$list) {
+      if ($self->match($ip, $_)) {
+         $is_reserved = 1;
+         last;
+      }
+   }
+
+   return $is_reserved;
+}
+
+sub is_ipv6_reserved {
+   my $self = shift;
+   my ($ip) = @_;
+
+   $self->brik_help_run_undef_arg('is_ipv6_reserved', $ip) or return;
+
+   if (! $self->is_ipv6($ip)) {
+      return $self->log->error("is_ipv6_reserved: ip[$ip] is not IPv6");
+   }
+
+   my $list = $self->ipv6_reserved_subnets;
+   my $is_reserved = 0;
+   for (@$list) {
+      if ($self->match($ip, $_)) {
+         $is_reserved = 1;
+         last;
+      }
+   }
+
+   return $is_reserved;
+}
+
+sub is_ip_reserved {
+   my $self = shift;
+   my ($ip) = @_;
+
+   $self->brik_help_run_undef_arg('is_ip_reserved', $ip) or return;
+
+   if (! $self->is_ip($ip)) {
+      return $self->log->error("is_ip_reserved: ip[$ip] is not IPv4 nor IPv6");
+   }
+
+   my $list;
+   if ($self->is_ipv4($ip)) {
+      $list = $self->ipv4_reserved_subnets;
+   }
+   else {
+      $list = $self->ipv6_reserved_subnets;
+   }
+
+   my $is_reserved = 0;
+   for (@$list) {
+      if ($self->match($ip, $_)) {
+         $is_reserved = 1;
+         last;
+      }
+   }
+
+   return $is_reserved;
+}
+
+sub ipv6_to_string_preferred {
+   my $self = shift;
+   my ($ip) = @_;
+
+   $self->brik_help_run_undef_arg('ipv6_to_string_preferred', $ip) or return;
+
+   if (! $self->is_ipv6($ip)) {
+      return $self->log->error("ipv6_to_string_preferred: not an IPv6 address");
+   }
+
+   my $pref;
+   eval {
+      $pref = Net::IPv6Addr::to_string_preferred($ip);
+   };
+   if ($@) {
+      return $self->log->error("ipv6_to_string_preferred: unable to convert IPv6 ".
+         "address: [$ip]");
+   }
+
+   return $pref;
+}
+
+sub ipv4_first_address {
+   my $self = shift;
+   my ($ip) = @_;
+
+   return $self->network_address($ip);
+}
+
+sub ipv4_last_address {
+   my $self = shift;
+   my ($ip) = @_;
+
+   return $self->broadcast_address($ip);
+}
+
+sub ipv6_first_address {
+   my $self = shift;
+   my ($ip) = @_;
+
+   $self->brik_help_run_undef_arg('ipv6_first_address', $ip) or return;
+
+   if (! $self->is_ipv6($ip)) {
+      return $self->log->error("ipv6_first_address: not a valid IPv6 address: [$ip]");
+   }
+
+   my $ipv6 = IPv6::Address->new($ip);
+   my $string = $ipv6->first_address->to_string;
+   $string =~ s{/\d+$}{};
+
+   return $string;
+}
+
+sub ipv6_last_address {
+   my $self = shift;
+   my ($ip) = @_;
+
+   $self->brik_help_run_undef_arg('ipv6_last_address', $ip) or return;
+
+   if (! $self->is_ipv6($ip)) {
+      return $self->log->error("ipv6_last_address: not a valid IPv6 address: [$ip]");
+   }
+
+   my $ipv6 = IPv6::Address->new($ip);
+   my $string = $ipv6->last_address->to_string;
+   $string =~ s{/\d+$}{};
+
+   return $string;
 }
 
 1;

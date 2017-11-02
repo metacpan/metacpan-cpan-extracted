@@ -4,11 +4,11 @@ use warnings;
 use Test::More;
 use Image::DS9;
 
-BEGIN { 
-	plan( tests => 9 );
+BEGIN {
+        plan( tests => 9 );
       }
 
-require 't/common.pl';
+require './t/common.pl';
 
 my $ds9 = start_up();
 clear($ds9);
@@ -41,4 +41,3 @@ ok( 3 == $ds9->frame(), "frame delete" );
 
 $ds9->frame( 'new' );
 ok( 5 == $ds9->frame(), "frame new" );
-

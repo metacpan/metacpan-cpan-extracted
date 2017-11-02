@@ -3,7 +3,7 @@ package RPerl::Operation::Statement::VariableDeclaration;
 use strict;
 use warnings;
 use RPerl::AfterSubclass;
-our $VERSION = 0.008_000;
+our $VERSION = 0.009_000;
 
 # [[[ OO INHERITANCE ]]]
 use parent qw(RPerl::Operation::Statement);
@@ -14,14 +14,16 @@ use parent qw(RPerl::Operation::Statement);
 
 # [[[ INCLUDES ]]]
 use Scalar::Util 'blessed';
+use perlapinames_generated;
 
 # [[[ OO PROPERTIES ]]]
 our hashref $properties = {};
 
 # [[[ SUBROUTINES & OO METHODS ]]]
 
-our string_hashref::method $ast_to_rperl__generate = sub {
-    ( my object $self, my string_hashref $modes) = @_;
+sub ast_to_rperl__generate {
+    { my string_hashref::method $RETURN_TYPE };
+    ( my object $self, my string_hashref $modes) = @ARG;
     my string_hashref $rperl_source_group = { PMC => q{} };
     my string_hashref $rperl_source_subgroup;
     my string $self_class = ref $self;
@@ -29,17 +31,28 @@ our string_hashref::method $ast_to_rperl__generate = sub {
     #    RPerl::diag( 'in VariableDeclaration->ast_to_rperl__generate(), received $self = ' . "\n" . RPerl::Parser::rperl_ast__dump($self) . "\n" );
     #    die 'TMP DEBUG, dying';
 
-    # unwrap VariableDeclaration_181, VariableDeclaration_182, VariableDeclaration_183, and VariableDeclaration_184 from Statement_155
-    if ( $self_class eq 'Statement_155' ) {    # Statement -> VariableDeclaration
+    # unwrap VariableDeclaration_195, VariableDeclaration_196, VariableDeclaration_197, and VariableDeclaration_198 from Statement_169
+    if ( $self_class eq 'Statement_169' ) {    # Statement -> VariableDeclaration
         $self       = $self->{children}->[0];
         $self_class = ref $self;
     }
 
-    if ( $self_class eq 'VariableDeclaration_181' ) {    # VariableDeclaration -> MY Type VARIABLE_SYMBOL ';'
+    if ( $self_class eq 'VariableDeclaration_195' ) {    # VariableDeclaration -> MY Type VARIABLE_SYMBOL ';'
         my string $my        = $self->{children}->[0];
         my string $type      = $self->{children}->[1]->{children}->[0];
         my string $symbol    = $self->{children}->[2];
         my string $semicolon = $self->{children}->[3];
+
+        my string $symbol_no_sigil = substr $symbol, 1;
+        if ((exists $perlapinames_generated::FUNCTIONS_DOCUMENTED->{$symbol_no_sigil}) or
+            (exists $perlapinames_generated::FUNCTIONS_UNDOCUMENTED->{$symbol_no_sigil}) or
+            (exists $perlapinames_generated::VARIABLES_DOCUMENTED->{$symbol_no_sigil}) or
+            (exists $perlapinames_generated::VARIABLES_UNDOCUMENTED->{$symbol_no_sigil})) {
+            die 'ERROR ECOGEASRP43, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: Perl API name conflict, variable name ' . q{'}
+                . $symbol_no_sigil . q{'}
+                . ' is the same as a protected function or variable name in the Perl API, please choose a different name, dying' . "\n";
+        }
+
         $rperl_source_group->{PMC} .= $my . q{ } . $type . q{ } . $symbol . $semicolon . "\n";
 
 #        RPerl::diag( 'in VariableDeclaration->ast_to_rperl__generate(), have $modes->{_symbol_table} = ' . "\n" . Dumper($modes->{_symbol_table}) . "\n" );
@@ -59,12 +72,22 @@ our string_hashref::method $ast_to_rperl__generate = sub {
         $modes->{_symbol_table}->{ $modes->{_symbol_table}->{_namespace} }->{ $modes->{_symbol_table}->{_subroutine} }->{$symbol}
             = { isa => 'RPerl::Operation::Expression::SubExpression::Variable', type => $type };
     }
-    elsif ( $self_class eq 'VariableDeclaration_182' ) {    # VariableDeclaration -> MY Type VARIABLE_SYMBOL OP19_VARIABLE_ASSIGN OpNamedScolonOrSubExpIn
+    elsif ( $self_class eq 'VariableDeclaration_196' ) {    # VariableDeclaration -> MY Type VARIABLE_SYMBOL OP19_VARIABLE_ASSIGN OpNamedScolonOrSubExpIn
         my string $my                                = $self->{children}->[0];
         my string $type                              = $self->{children}->[1]->{children}->[0];
         my string $symbol                            = $self->{children}->[2];
         my string $assign                            = $self->{children}->[3];
         my object $opnamed_or_subexp_or_input_scolon = $self->{children}->[4];
+
+        my string $symbol_no_sigil = substr $symbol, 1;
+        if ((exists $perlapinames_generated::FUNCTIONS_DOCUMENTED->{$symbol_no_sigil}) or
+            (exists $perlapinames_generated::FUNCTIONS_UNDOCUMENTED->{$symbol_no_sigil}) or
+            (exists $perlapinames_generated::VARIABLES_DOCUMENTED->{$symbol_no_sigil}) or
+            (exists $perlapinames_generated::VARIABLES_UNDOCUMENTED->{$symbol_no_sigil})) {
+            die 'ERROR ECOGEASRP43, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: Perl API name conflict, variable name ' . q{'}
+                . $symbol_no_sigil . q{'}
+                . ' is the same as a protected function or variable name in the Perl API, please choose a different name, dying' . "\n";
+        }
 
 #        RPerl::diag( 'in VariableDeclaration->ast_to_rperl__generate(), have $opnamed_or_subexp_or_input_scolon = ' . "\n" . RPerl::Parser::rperl_ast__dump($opnamed_or_subexp_or_input_scolon) . "\n" );
 
@@ -74,14 +97,14 @@ our string_hashref::method $ast_to_rperl__generate = sub {
 
 #        RPerl::diag( 'in VariableDeclaration->ast_to_rperl__generate(), have $opnamed_or_subexp_or_input_scolon_type = ' . "\n" . RPerl::Parser::rperl_ast__dump($opnamed_or_subexp_or_input_scolon_type) . "\n" );
 
-        if (   ( $opnamed_or_subexp_or_input_scolon_type eq 'OpNamedScolonOrSubExpIn_239' )
-            or ( $opnamed_or_subexp_or_input_scolon_type eq 'OpNamedScolonOrSubExpIn_240' ) )
+        if (   ( $opnamed_or_subexp_or_input_scolon_type eq 'OpNamedScolonOrSubExpIn_253' )
+            or ( $opnamed_or_subexp_or_input_scolon_type eq 'OpNamedScolonOrSubExpIn_254' ) )
         {
             # OpNamedScolonOrSubExpIn -> OP01_NAMED_SCOLON
             # OpNamedScolonOrSubExpIn -> OP10_NAMED_UNARY_SCOLON
             $rperl_source_group->{PMC} .= $opnamed_or_subexp_or_input_scolon->{children}->[0];
         }
-        elsif ( $opnamed_or_subexp_or_input_scolon_type eq 'OpNamedScolonOrSubExpIn_241' ) {    # OpNamedScolonOrSubExpIn -> SubExpressionOrInput ';'
+        elsif ( $opnamed_or_subexp_or_input_scolon_type eq 'OpNamedScolonOrSubExpIn_255' ) {    # OpNamedScolonOrSubExpIn -> SubExpressionOrInput ';'
 
 #            RPerl::diag( 'in VariableDeclaration->ast_to_rperl__generate(), have (ref $opnamed_or_subexp_or_input_scolon->{children}->[0]->{children}->[0]->{children}->[0]) = ' . "\n" . RPerl::Parser::rperl_ast__dump((ref $opnamed_or_subexp_or_input_scolon->{children}->[0]->{children}->[0]->{children}->[0])) . "\n" );
 
@@ -177,13 +200,13 @@ our string_hashref::method $ast_to_rperl__generate = sub {
         else {
             die RPerl::Parser::rperl_rule__replace( 'ERROR ECOGEASRP00, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: Grammar rule '
                     . $opnamed_or_subexp_or_input_scolon_type
-                    . ' found where OpNamedScolonOrSubExpIn_239, OpNamedScolonOrSubExpIn_240, or OpNamedScolonOrSubExpIn_241 expected, dying' )
+                    . ' found where OpNamedScolonOrSubExpIn_253, OpNamedScolonOrSubExpIn_254, or OpNamedScolonOrSubExpIn_255 expected, dying' )
                 . "\n";
         }
 
         $rperl_source_group->{PMC} .= "\n";
     }
-    elsif ( $self_class eq 'VariableDeclaration_183' ) { # VariableDeclaration -> MY Type VARIABLE_SYMBOL OP02_ARRAY_THINARROW SubExpression ']' OP19_VARIABLE_ASSIGN 'undef' ';'
+    elsif ( $self_class eq 'VariableDeclaration_197' ) { # VariableDeclaration -> MY Type VARIABLE_SYMBOL OP02_ARRAY_THINARROW SubExpression ']' OP19_VARIABLE_ASSIGN 'undef' ';'
         my string $my                 = $self->{children}->[0];
         my string $type               = $self->{children}->[1]->{children}->[0];
         my string $symbol             = $self->{children}->[2];
@@ -193,6 +216,16 @@ our string_hashref::method $ast_to_rperl__generate = sub {
         my string $assign             = $self->{children}->[6];
         my string $undef              = $self->{children}->[7];
         my string $semicolon          = $self->{children}->[8];
+
+        my string $symbol_no_sigil = substr $symbol, 1;
+        if ((exists $perlapinames_generated::FUNCTIONS_DOCUMENTED->{$symbol_no_sigil}) or
+            (exists $perlapinames_generated::FUNCTIONS_UNDOCUMENTED->{$symbol_no_sigil}) or
+            (exists $perlapinames_generated::VARIABLES_DOCUMENTED->{$symbol_no_sigil}) or
+            (exists $perlapinames_generated::VARIABLES_UNDOCUMENTED->{$symbol_no_sigil})) {
+            die 'ERROR ECOGEASRP43, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: Perl API name conflict, variable name ' . q{'}
+                . $symbol_no_sigil . q{'}
+                . ' is the same as a protected function or variable name in the Perl API, please choose a different name, dying' . "\n";
+        }
 
         # CREATE SYMBOL TABLE ENTRY
         if ( exists $modes->{_symbol_table}->{ $modes->{_symbol_table}->{_namespace} }->{ $modes->{_symbol_table}->{_subroutine} }->{$symbol} ) {
@@ -212,11 +245,21 @@ our string_hashref::method $ast_to_rperl__generate = sub {
         RPerl::Generator::source_group_append( $rperl_source_group, $rperl_source_subgroup );
         $rperl_source_group->{PMC} .= q{ } . $right_bracket . q{ } . $assign . q{ } . $undef . $semicolon . "\n";
     }
-    elsif ( $self_class eq 'VariableDeclaration_184' ) {    # VariableDeclaration -> MY TYPE_FHREF FHREF_SYMBOL ';'
+    elsif ( $self_class eq 'VariableDeclaration_198' ) {    # VariableDeclaration -> MY TYPE_FHREF FHREF_SYMBOL ';'
         my string $my           = $self->{children}->[0];
         my string $type_fhref   = $self->{children}->[1];
         my string $symbol_fhref = $self->{children}->[2];
         my string $semicolon    = $self->{children}->[3];
+
+        my string $symbol_no_sigil = substr $symbol_fhref, 1;
+        if ((exists $perlapinames_generated::FUNCTIONS_DOCUMENTED->{$symbol_no_sigil}) or
+            (exists $perlapinames_generated::FUNCTIONS_UNDOCUMENTED->{$symbol_no_sigil}) or
+            (exists $perlapinames_generated::VARIABLES_DOCUMENTED->{$symbol_no_sigil}) or
+            (exists $perlapinames_generated::VARIABLES_UNDOCUMENTED->{$symbol_no_sigil})) {
+            die 'ERROR ECOGEASRP43, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: Perl API name conflict, variable name ' . q{'}
+                . $symbol_no_sigil . q{'}
+                . ' is the same as a protected function or variable name in the Perl API, please choose a different name, dying' . "\n";
+        }
 
         # CREATE SYMBOL TABLE ENTRY
         if ( exists $modes->{_symbol_table}->{ $modes->{_symbol_table}->{_namespace} }->{ $modes->{_symbol_table}->{_subroutine} }->{$symbol_fhref} ) {
@@ -236,38 +279,50 @@ our string_hashref::method $ast_to_rperl__generate = sub {
     else {
         die RPerl::Parser::rperl_rule__replace( 'ERROR ECOGEASRP00, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: Grammar rule '
                 . $self_class
-                . ' found where VariableDeclaration_181, VariableDeclaration_182, VariableDeclaration_183, or VariableDeclaration_184 expected, dying' )
+                . ' found where VariableDeclaration_195, VariableDeclaration_196, VariableDeclaration_197, or VariableDeclaration_198 expected, dying' )
             . "\n";
     }
-
     return $rperl_source_group;
-};
+}
 
-our string_hashref::method $ast_to_cpp__generate__CPPOPS_PERLTYPES = sub {
-    ( my object $self, my string_hashref $modes) = @_;
+sub ast_to_cpp__generate__CPPOPS_PERLTYPES {
+    { my string_hashref::method $RETURN_TYPE };
+    ( my object $self, my string_hashref $modes) = @ARG;
     my string_hashref $cpp_source_group = { CPP => q{// <<< RP::O::S::VD __DUMMY_SOURCE_CODE CPPOPS_PERLTYPES >>>} . "\n" };
 
     #...
     return $cpp_source_group;
-};
+}
 
-our string_hashref::method $ast_to_cpp__generate__CPPOPS_CPPTYPES = sub {
-    ( my object $self, my string_hashref $modes) = @_;
+sub ast_to_cpp__generate__CPPOPS_CPPTYPES {
+    { my string_hashref::method $RETURN_TYPE };
+    ( my object $self, my string_hashref $modes) = @ARG;
     my string_hashref $cpp_source_group = { CPP => q{} };
     my string_hashref $cpp_source_subgroup;
     my string $self_class = ref $self;
 
 #    RPerl::diag( 'in VariableDeclaration->ast_to_cpp__generate__CPPOPS_CPPTYPES(), received $self = ' . "\n" . RPerl::Parser::rperl_ast__dump($self) . "\n" );
 
-    # unwrap VariableDeclaration_181, VariableDeclaration_182, VariableDeclaration_183, and VariableDeclaration_184 from Statement_155
-    if ( $self_class eq 'Statement_155' ) {    # Statement -> VariableDeclaration
+    # unwrap VariableDeclaration_195, VariableDeclaration_196, VariableDeclaration_197, and VariableDeclaration_198 from Statement_169
+    if ( $self_class eq 'Statement_169' ) {    # Statement -> VariableDeclaration
         $self       = $self->{children}->[0];
         $self_class = ref $self;
     }
 
-    if ( $self_class eq 'VariableDeclaration_181' ) {    # VariableDeclaration -> MY Type VARIABLE_SYMBOL ';'
+    if ( $self_class eq 'VariableDeclaration_195' ) {    # VariableDeclaration -> MY Type VARIABLE_SYMBOL ';'
         my string $type   = $self->{children}->[1]->{children}->[0];
         my string $symbol = $self->{children}->[2];
+
+        my string $symbol_no_sigil = substr $symbol, 1;
+        if ((exists $perlapinames_generated::FUNCTIONS_DOCUMENTED->{$symbol_no_sigil}) or
+            (exists $perlapinames_generated::FUNCTIONS_UNDOCUMENTED->{$symbol_no_sigil}) or
+            (exists $perlapinames_generated::VARIABLES_DOCUMENTED->{$symbol_no_sigil}) or
+            (exists $perlapinames_generated::VARIABLES_UNDOCUMENTED->{$symbol_no_sigil})) {
+            die 'ERROR ECOGEASCP43, CODE GENERATOR, ABSTRACT SYNTAX TO C++: Perl API name conflict, variable name ' . q{'}
+                . $symbol_no_sigil . q{'}
+                . ' is the same as a protected function or variable name in the Perl API, please choose a different name, dying' . "\n";
+        }
+
         substr $symbol, 0, 1, q{};                       # remove leading $ sigil
 
         # CREATE SYMBOL TABLE ENTRY
@@ -288,11 +343,21 @@ our string_hashref::method $ast_to_cpp__generate__CPPOPS_CPPTYPES = sub {
 
         $cpp_source_group->{CPP} .= $type . q{ } . $symbol . ';' . "\n";
     }
-    elsif ( $self_class eq 'VariableDeclaration_182' ) {    # VariableDeclaration -> MY Type VARIABLE_SYMBOL OP19_VARIABLE_ASSIGN OpNamedScolonOrSubExpIn
+    elsif ( $self_class eq 'VariableDeclaration_196' ) {    # VariableDeclaration -> MY Type VARIABLE_SYMBOL OP19_VARIABLE_ASSIGN OpNamedScolonOrSubExpIn
         my string $type                              = $self->{children}->[1]->{children}->[0];
         my string $symbol                            = $self->{children}->[2];
         my string $assign                            = $self->{children}->[3];
         my object $opnamed_or_subexp_or_input_scolon = $self->{children}->[4];
+
+        my string $symbol_no_sigil = substr $symbol, 1;
+        if ((exists $perlapinames_generated::FUNCTIONS_DOCUMENTED->{$symbol_no_sigil}) or
+            (exists $perlapinames_generated::FUNCTIONS_UNDOCUMENTED->{$symbol_no_sigil}) or
+            (exists $perlapinames_generated::VARIABLES_DOCUMENTED->{$symbol_no_sigil}) or
+            (exists $perlapinames_generated::VARIABLES_UNDOCUMENTED->{$symbol_no_sigil})) {
+            die 'ERROR ECOGEASCP43, CODE GENERATOR, ABSTRACT SYNTAX TO C++: Perl API name conflict, variable name ' . q{'}
+                . $symbol_no_sigil . q{'}
+                . ' is the same as a protected function or variable name in the Perl API, please choose a different name, dying' . "\n";
+        }
 
 #        RPerl::diag( 'in VariableDeclaration->ast_to_cpp__generate__CPPOPS_CPPTYPES(), have $opnamed_or_subexp_or_input_scolon = ' . "\n" . RPerl::Parser::rperl_ast__dump($opnamed_or_subexp_or_input_scolon) . "\n" );
 
@@ -304,14 +369,14 @@ our string_hashref::method $ast_to_cpp__generate__CPPOPS_CPPTYPES = sub {
 
 #        RPerl::diag( 'in VariableDeclaration->ast_to_cpp__generate__CPPOPS_CPPTYPES(), have $opnamed_or_subexp_or_input_scolon_type = ' . "\n" . RPerl::Parser::rperl_ast__dump($opnamed_or_subexp_or_input_scolon_type) . "\n" );
 
-        if (   ( $opnamed_or_subexp_or_input_scolon_type eq 'OpNamedScolonOrSubExpIn_239' )
-            or ( $opnamed_or_subexp_or_input_scolon_type eq 'OpNamedScolonOrSubExpIn_240' ) )
+        if (   ( $opnamed_or_subexp_or_input_scolon_type eq 'OpNamedScolonOrSubExpIn_253' )
+            or ( $opnamed_or_subexp_or_input_scolon_type eq 'OpNamedScolonOrSubExpIn_254' ) )
         {
             # OpNamedScolonOrSubExpIn -> OP01_NAMED_SCOLON
             # OpNamedScolonOrSubExpIn -> OP10_NAMED_UNARY_SCOLON
             $cpp_source_group->{CPP} .= $opnamed_or_subexp_or_input_scolon->{children}->[0];
         }
-        elsif ( $opnamed_or_subexp_or_input_scolon_type eq 'OpNamedScolonOrSubExpIn_241' ) {    # OpNamedScolonOrSubExpIn -> SubExpressionOrInput ';'
+        elsif ( $opnamed_or_subexp_or_input_scolon_type eq 'OpNamedScolonOrSubExpIn_255' ) {    # OpNamedScolonOrSubExpIn -> SubExpressionOrInput ';'
             if (    ( exists $opnamed_or_subexp_or_input_scolon->{children} )
                 and ( exists $opnamed_or_subexp_or_input_scolon->{children}->[0] )
                 and ( blessed( $opnamed_or_subexp_or_input_scolon->{children}->[0] ) )
@@ -456,17 +521,17 @@ our string_hashref::method $ast_to_cpp__generate__CPPOPS_CPPTYPES = sub {
                 # test for empty array ref as value for variable initialization, discard in C++
                 if (
                     (blessed $subexpression) and
-                    ((ref    $subexpression) eq 'SubExpressionOrInput_144') and
+                    ((ref    $subexpression) eq 'SubExpressionOrInput_158') and
                     (exists  $subexpression->{children}) and
                     (defined $subexpression->{children}) and
                     (defined $subexpression->{children}->[0]) and
                     (blessed $subexpression->{children}->[0]) and
-                    ((ref    $subexpression->{children}->[0]) eq 'SubExpression_139') and
+                    ((ref    $subexpression->{children}->[0]) eq 'SubExpression_153') and
                     (exists  $subexpression->{children}->[0]->{children}) and
                     (defined $subexpression->{children}->[0]->{children}) and
                     (defined $subexpression->{children}->[0]->{children}->[0]) and
                     (blessed $subexpression->{children}->[0]->{children}->[0]) and
-                    ((ref    $subexpression->{children}->[0]->{children}->[0]) eq 'ArrayReference_197') and
+                    ((ref    $subexpression->{children}->[0]->{children}->[0]) eq 'ArrayReference_211') and
                     (exists  $subexpression->{children}->[0]->{children}->[0]->{children}) and
                     (defined $subexpression->{children}->[0]->{children}->[0]->{children}) and
                     (defined $subexpression->{children}->[0]->{children}->[0]->{children}->[0]) and
@@ -494,17 +559,27 @@ our string_hashref::method $ast_to_cpp__generate__CPPOPS_CPPTYPES = sub {
         else {
             die RPerl::Parser::rperl_rule__replace( 'ERROR ECOGEASCP00, CODE GENERATOR, ABSTRACT SYNTAX TO C++: Grammar rule '
                     . $opnamed_or_subexp_or_input_scolon_type
-                    . ' found where OpNamedScolonOrSubExpIn_239, OpNamedScolonOrSubExpIn_240, or OpNamedScolonOrSubExpIn_241 expected, dying' )
+                    . ' found where OpNamedScolonOrSubExpIn_253, OpNamedScolonOrSubExpIn_254, or OpNamedScolonOrSubExpIn_255 expected, dying' )
                 . "\n";
         }
 
         $cpp_source_group->{CPP} .= "\n";
     }
-    elsif ( $self_class eq 'VariableDeclaration_183' ) { # VariableDeclaration -> MY Type VARIABLE_SYMBOL OP02_ARRAY_THINARROW SubExpression ']' OP19_VARIABLE_ASSIGN 'undef' ';'
+    elsif ( $self_class eq 'VariableDeclaration_197' ) { # VariableDeclaration -> MY Type VARIABLE_SYMBOL OP02_ARRAY_THINARROW SubExpression ']' OP19_VARIABLE_ASSIGN 'undef' ';'
         my string $type          = $self->{children}->[1]->{children}->[0];
         my string $symbol        = $self->{children}->[2];
         my object $subexpression = $self->{children}->[4];
         my string $semicolon     = $self->{children}->[8];
+
+        my string $symbol_no_sigil = substr $symbol, 1;
+        if ((exists $perlapinames_generated::FUNCTIONS_DOCUMENTED->{$symbol_no_sigil}) or
+            (exists $perlapinames_generated::FUNCTIONS_UNDOCUMENTED->{$symbol_no_sigil}) or
+            (exists $perlapinames_generated::VARIABLES_DOCUMENTED->{$symbol_no_sigil}) or
+            (exists $perlapinames_generated::VARIABLES_UNDOCUMENTED->{$symbol_no_sigil})) {
+            die 'ERROR ECOGEASCP43, CODE GENERATOR, ABSTRACT SYNTAX TO C++: Perl API name conflict, variable name ' . q{'}
+                . $symbol_no_sigil . q{'}
+                . ' is the same as a protected function or variable name in the Perl API, please choose a different name, dying' . "\n";
+        }
 
         substr $symbol, 0, 1, q{};                       # remove leading $ sigil
 
@@ -541,9 +616,20 @@ our string_hashref::method $ast_to_cpp__generate__CPPOPS_CPPTYPES = sub {
         RPerl::Generator::source_group_append( $cpp_source_group, $cpp_source_subgroup );
         $cpp_source_group->{CPP} .= q{)} . $semicolon . "\n";
     }
-    elsif ( $self_class eq 'VariableDeclaration_184' ) {       # VariableDeclaration -> MY TYPE_FHREF FHREF_SYMBOL ';'
+    elsif ( $self_class eq 'VariableDeclaration_198' ) {       # VariableDeclaration -> MY TYPE_FHREF FHREF_SYMBOL ';'
         my string $type_fhref   = $self->{children}->[1];
         my string $symbol_fhref = $self->{children}->[2];
+
+        my string $symbol_no_sigil = substr $symbol_fhref, 1;
+        if ((exists $perlapinames_generated::FUNCTIONS_DOCUMENTED->{$symbol_no_sigil}) or
+            (exists $perlapinames_generated::FUNCTIONS_UNDOCUMENTED->{$symbol_no_sigil}) or
+            (exists $perlapinames_generated::VARIABLES_DOCUMENTED->{$symbol_no_sigil}) or
+            (exists $perlapinames_generated::VARIABLES_UNDOCUMENTED->{$symbol_no_sigil})) {
+            die 'ERROR ECOGEASCP43, CODE GENERATOR, ABSTRACT SYNTAX TO C++: Perl API name conflict, variable name ' . q{'}
+                . $symbol_no_sigil . q{'}
+                . ' is the same as a protected function or variable name in the Perl API, please choose a different name, dying' . "\n";
+        }
+
         substr $symbol_fhref, 0, 1, q{};                       # remove leading $ sigil
 
         # CREATE SYMBOL TABLE ENTRY
@@ -569,11 +655,10 @@ our string_hashref::method $ast_to_cpp__generate__CPPOPS_CPPTYPES = sub {
     else {
         die RPerl::Parser::rperl_rule__replace( 'ERROR ECOGEASCP00, CODE GENERATOR, ABSTRACT SYNTAX TO C++: Grammar rule '
                 . $self_class
-                . ' found where VariableDeclaration_181, VariableDeclaration_182, VariableDeclaration_183, or VariableDeclaration_184 expected, dying' )
+                . ' found where VariableDeclaration_195, VariableDeclaration_196, VariableDeclaration_197, or VariableDeclaration_198 expected, dying' )
             . "\n";
     }
-
     return $cpp_source_group;
-};
+}
 
 1;    # end of class

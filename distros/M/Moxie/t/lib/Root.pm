@@ -7,7 +7,7 @@ has '_foo';
 
 my sub _foo : private;
 
-sub BUILDARGS : init_args( foo? => _foo );
+sub BUILDARGS : init( foo? => _foo );
 
 sub foo { _foo }
 

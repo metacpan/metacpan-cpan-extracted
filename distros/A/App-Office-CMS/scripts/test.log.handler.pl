@@ -1,6 +1,7 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
-use common::sense;
+use strict;
+use warnings;
 
 use Log::Handler;
 

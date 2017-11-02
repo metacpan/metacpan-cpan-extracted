@@ -1,18 +1,17 @@
 package App::Office::CMS::Database::Content;
 
-use Any::Moose;
-use common::sense;
-
-extends 'App::Office::CMS::Database::Base';
+use strict;
+use warnings;
 
 use Capture::Tiny 'capture';
 
-use File::Slurp; # For write_file().
+use File::Slurper 'write_text';
 
-# If Moose...
-#use namespace::autoclean;
+use Moo;
 
-our $VERSION = '0.92';
+extends 'App::Office::CMS::Database::Base';
+
+our $VERSION = '0.93';
 
 # --------------------------------------------------
 
@@ -42,7 +41,7 @@ sub backup
 	my($backup_file)    = ${$self -> db -> config}{backup_file};
 	my($stdout)         = $self -> capture_or_die($backup_command);
 
-	write_file($backup_file, {err_mode => 'quiet'}, $stdout) || die "Error: Can't write backup file: $!\n";
+	write_text($backup_file, $stdout) || die "Error: Can't write backup file: $!\n";
 
 	return $self -> update($page, $content) . " and backed-up";
 
@@ -184,10 +183,5 @@ sub update
 } # End of update.
 
 # --------------------------------------------------
-
-no Any::Moose;
-
-# If Moose...
-#__PACKAGE__ -> meta -> make_immutable;
 
 1;

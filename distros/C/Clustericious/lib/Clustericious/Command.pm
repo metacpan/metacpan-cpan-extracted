@@ -5,7 +5,7 @@ use warnings;
 use Mojo::Base 'Mojolicious::Command';
 
 # ABSTRACT: Command base class
-our $VERSION = '1.26'; # VERSION
+our $VERSION = '1.27'; # VERSION
 
 
 1;
@@ -22,7 +22,7 @@ Clustericious::Command - Command base class
 
 =head1 VERSION
 
-version 1.26
+version 1.27
 
 =head1 DESCRIPTION
 

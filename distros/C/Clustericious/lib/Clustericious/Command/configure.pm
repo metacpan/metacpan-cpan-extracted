@@ -7,7 +7,7 @@ use Mojo::Base 'Clustericious::Command';
 use Path::Class qw( dir );
 
 # ABSTRACT: Generate a default configuration.
-our $VERSION = '1.26'; # VERSION
+our $VERSION = '1.27'; # VERSION
 
 
 has description => <<EOT;
@@ -60,7 +60,7 @@ Clustericious::Command::configure - Generate a default configuration.
 
 =head1 VERSION
 
-version 1.26
+version 1.27
 
 =head1 SYNOPSIS
 

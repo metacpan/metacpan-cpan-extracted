@@ -7,7 +7,7 @@ use Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(bgs_call bgs_back bgs_wait bgs_break);
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use BGS ();
 

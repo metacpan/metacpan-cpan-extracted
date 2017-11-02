@@ -1,5 +1,5 @@
 #
-# $Id: Json.pm,v f6ad8c136b19 2017/01/01 10:13:54 gomor $
+# $Id: Json.pm,v 5a8528c3a0ac 2017/02/14 18:47:11 gomor $
 #
 # file::json Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::File::Text);
 
 sub brik_properties {
    return {
-      revision => '$Revision: f6ad8c136b19 $',
+      revision => '$Revision: 5a8528c3a0ac $',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -27,6 +27,7 @@ sub brik_properties {
       commands => {
          read => [ qw(input_file|OPTIONAL) ],
          write => [ qw($json_hash output_file|OPTIONAL) ],
+         is_valid => [ qw(input_file|OPTIONAL) ],
       },
       require_modules => {
          'Metabrik::File::Write' => [ ],
@@ -74,6 +75,19 @@ sub write {
    $self->SUPER::write($data, $output) or return;
 
    return $output;
+}
+
+sub is_valid {
+   my $self = shift;
+   my ($input) = @_;
+
+   $input ||= $self->input;
+   $self->brik_help_run_undef_arg('is_valid', $input) or return;
+
+   my $data = $self->SUPER::read($input) or return;
+
+   my $sj = Metabrik::String::Json->new_from_brik_init($self) or return;
+   return $sj->is_valid($data);
 }
 
 1;

@@ -1,5 +1,9 @@
 Revision history for Clustericious
 
+1.27      2017-10-26 16:22:49 -0400
+  - Add compatability with Test2::Harness / App::Yath
+  - Switch from Test::Builder to Test2::API
+
 1.26      2017-07-26 07:48:09 -0400
   - Migrate from File::ShareDir to File::ShareDir::Dist
   - Remove deprecated code (gh#43 Yanick++)

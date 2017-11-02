@@ -23,6 +23,8 @@
    SWIG to understand say that a lsn_t is an int.
 */
 
+%include "inttypes.i"
+
 #ifdef NEED_LONG
 #define LONG long
 #else 
@@ -37,7 +39,6 @@
 typedef long int my_ssize_t;
 typedef unsigned int driver_id_t;
 typedef int lsn_t;
-typedef int int16_t;
 typedef int lba_t;
 typedef unsigned int track_t;
 typedef long int driver_return_code_t;

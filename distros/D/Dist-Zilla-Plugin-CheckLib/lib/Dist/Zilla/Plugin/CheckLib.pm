@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::Plugin::CheckLib;
-# git description: v0.005-3-g4a12dcd
-$Dist::Zilla::Plugin::CheckLib::VERSION = '0.006';
-# ABSTRACT: Require that our distribution has a particular library available
+package Dist::Zilla::Plugin::CheckLib; # git description: v0.006-28-g53d21aa
+# vim: set ts=8 sts=4 sw=4 tw=115 et :
+# ABSTRACT: Require that your distribution has a particular library available
 # KEYWORDS: distribution installation require compiler library header resource
-# vim: set ts=8 sw=4 tw=78 et :
+
+our $VERSION = '0.007';
 
 use Moose;
 with
@@ -19,16 +19,13 @@ use namespace::autoclean;
 my @list_options = qw(header incpath lib libpath);
 sub mvp_multivalue_args { @list_options }
 
-foreach my $option (@list_options)
-{
-    has $option => (
-        isa => 'ArrayRef[Str]',
-        lazy => 1,
-        default => sub { [] },
-        traits => ['Array'],
-        handles => { $option => 'elements' },
-    );
-}
+has $_ => (
+    isa => 'ArrayRef[Str]',
+    lazy => 1,
+    default => sub { [] },
+    traits => ['Array'],
+    handles => { $_ => 'sort' },
+) foreach @list_options;
 
 my @string_options = qw(INC LIBS debug);
 has \@string_options => (
@@ -43,6 +40,7 @@ around dump_config => sub
     $config->{+__PACKAGE__} = {
         ( map { $_ => [ $self->$_ ] } @list_options ),
         ( map { $_ => $self->$_ } @string_options ),
+        blessed($self) ne __PACKAGE__ ? ( version => $VERSION ) : (),
     };
 
     return $config;
@@ -68,7 +66,7 @@ sub munge_files
     my @mfpl = grep { $_->name eq 'Makefile.PL' or $_->name eq 'Build.PL' } @{ $self->zilla->files };
     for my $mfpl (@mfpl)
     {
-        $self->log_debug('munging ' . $mfpl->name . ' in file gatherer phase');
+        $self->log_debug([ 'munging %s in file gatherer phase', $mfpl->name ]);
         $files{$mfpl->name} = $mfpl;
         $self->_munge_file($mfpl);
     }
@@ -88,7 +86,7 @@ sub setup_installer
     for my $mfpl (@mfpl)
     {
         next if exists $files{$mfpl->name};
-        $self->log_debug('munging ' . $mfpl->name . ' in setup_installer phase');
+        $self->log_debug([ 'munging %s in setup_installer phase', $mfpl->name ]);
         $self->_munge_file($mfpl);
     }
     return;
@@ -99,7 +97,7 @@ sub _munge_file
     my ($self, $file) = @_;
 
     my $orig_content = $file->content;
-    $self->log_fatal('could not find position in ' . $file->name . ' to modify!')
+    $self->log_fatal([ 'could not find position in %s to modify!', $file->name ])
         if not $orig_content =~ m/use strict;\nuse warnings;\n\n/g;
 
     my $pos = pos($orig_content);
@@ -121,7 +119,7 @@ sub _munge_file
 
     $file->content(
         substr($orig_content, 0, $pos)
-        . "# inserted by " . blessed($self) . ' ' . ($self->VERSION || '<self>') . "\n"
+        . "# inserted by " . blessed($self) . ' ' . $self->VERSION . "\n"
         . "use Devel::CheckLib;\n"
         . "check_lib_or_exit(\n"
         . join('',
@@ -142,11 +140,11 @@ __END__
 
 =head1 NAME
 
-Dist::Zilla::Plugin::CheckLib - Require that our distribution has a particular library available
+Dist::Zilla::Plugin::CheckLib - Require that your distribution has a particular library available
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -209,14 +207,6 @@ An additional path to search for headers. Can be used more than once.
 
 A L<ExtUtils::MakeMaker>-style space-separated list of incpaths, each preceded by C<-I>.
 
-=head1 SUPPORT
-
-=for stopwords irc
-
-Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-CheckLib>
-(or L<bug-Dist-Zilla-Plugin-CheckLib@rt.cpan.org|mailto:bug-Dist-Zilla-Plugin-CheckLib@rt.cpan.org>).
-I am also usually active on irc, as 'ether' at C<irc.perl.org>.
-
 =head1 SEE ALSO
 
 =over 4
@@ -235,11 +225,24 @@ L<Devel::CheckBin> and L<Dist::Zilla::Plugin::CheckBin>
 
 =back
 
+=head1 SUPPORT
+
+Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-CheckLib>
+(or L<bug-Dist-Zilla-Plugin-CheckLib@rt.cpan.org|mailto:bug-Dist-Zilla-Plugin-CheckLib@rt.cpan.org>).
+
+There is also a mailing list available for users of this distribution, at
+L<http://dzil.org/#mailing-list>.
+
+There is also an irc channel available for users of this distribution, at
+L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.
+
+I am also usually active on irc, as 'ether' at C<irc.perl.org>.
+
 =head1 AUTHOR
 
 Karen Etheridge <ether@cpan.org>
 
-=head1 COPYRIGHT AND LICENSE
+=head1 COPYRIGHT AND LICENCE
 
 This software is copyright (c) 2014 by Karen Etheridge.
 

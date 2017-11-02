@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 #
 # Run with:
 # starman -l 127.0.0.1:5006 --workers 1 httpd/cgi-bin/office/cms.psgi &
@@ -27,8 +27,9 @@ my($app) = CGI::Application::Dispatch -> as_psgi
 
 builder
 {
-	enable "Plack::Middleware::Static",
-	path => qr!^/(assets|favicon|yui)/!,
+	enable "ContentLength";
+	enable "Static",
+	path => qr!^/(assets|favicon|yui)!,
 	root => '/dev/shm/html';
 	$app;
 };

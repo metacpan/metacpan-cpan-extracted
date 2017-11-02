@@ -1,6 +1,6 @@
 package Test::Map::Tube;
 
-$Test::Map::Tube::VERSION   = '0.33';
+$Test::Map::Tube::VERSION   = '0.34';
 $Test::Map::Tube::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Test::Map::Tube - Interface to test Map::Tube features.
 
 =head1 VERSION
 
-Version 0.33
+Version 0.34
 
 =cut
 

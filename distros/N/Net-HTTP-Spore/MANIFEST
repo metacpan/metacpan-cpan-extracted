@@ -27,6 +27,7 @@ lib/Net/HTTP/Spore/Meta/Method/Spore.pm
 lib/Net/HTTP/Spore/Meta/Types.pm
 lib/Net/HTTP/Spore/Middleware.pm
 lib/Net/HTTP/Spore/Middleware/Auth.pm
+lib/Net/HTTP/Spore/Middleware/Auth/ApiKey.pm
 lib/Net/HTTP/Spore/Middleware/Auth/Basic.pm
 lib/Net/HTTP/Spore/Middleware/Auth/Header.pm
 lib/Net/HTTP/Spore/Middleware/Auth/OAuth.pm
@@ -34,6 +35,7 @@ lib/Net/HTTP/Spore/Middleware/DoNotTrack.pm
 lib/Net/HTTP/Spore/Middleware/Format.pm
 lib/Net/HTTP/Spore/Middleware/Format/Auto.pm
 lib/Net/HTTP/Spore/Middleware/Format/JSON.pm
+lib/Net/HTTP/Spore/Middleware/Format/Text.pm
 lib/Net/HTTP/Spore/Middleware/Format/XML.pm
 lib/Net/HTTP/Spore/Middleware/Format/YAML.pm
 lib/Net/HTTP/Spore/Middleware/LogDispatch.pm
@@ -49,9 +51,12 @@ lib/Net/HTTP/Spore/Role/Description.pm
 lib/Net/HTTP/Spore/Role/Middleware.pm
 lib/Net/HTTP/Spore/Role/Request.pm
 lib/Net/HTTP/Spore/Role/UserAgent.pm
+t/00-compile.t
 t/author-eol.t
 t/author-no-tabs.t
 t/author-pod-syntax.t
+t/author-test-version.t
+t/release-minimum-version.t
 t/specs/api.json
 t/specs/api2.json
 t/specs/content.tgz
@@ -63,6 +68,7 @@ t/spore-middleware/auth-header.t
 t/spore-middleware/auth-oauth.t
 t/spore-middleware/format-auto.t
 t/spore-middleware/format-json.t
+t/spore-middleware/format-text.t
 t/spore-middleware/format-xml.t
 t/spore-middleware/format-yaml.t
 t/spore-middleware/ns.t

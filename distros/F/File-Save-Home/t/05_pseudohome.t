@@ -12,7 +12,8 @@ use_ok('File::Save::Home', qw|
 | );
 use_ok('File::Temp', qw| tempdir |);
 use_ok('Cwd');
-use_ok('String::PerlIdentifier');
+use_ok ( 'String::Random', qw(random_regex) );
+*make_varname = sub { return random_regex(q([_A-Za-z][_A-Za-z0-9]{9})) };
 
 my ($cwd, $pseudohome, $desired_dir_ref );
 $cwd = cwd();

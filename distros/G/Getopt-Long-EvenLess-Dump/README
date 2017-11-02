@@ -1,0 +1,86 @@
+NAME
+    Getopt::Long::EvenLess::Dump - Run a Getopt::Long::EvenLess-based script
+    but only to dump the spec
+
+VERSION
+    This document describes version 0.001 of Getopt::Long::EvenLess::Dump
+    (from Perl distribution Getopt-Long-EvenLess-Dump), released on
+    2017-08-10.
+
+FUNCTIONS
+  dump_getopt_long_evenless_script
+    Usage:
+
+     dump_getopt_long_evenless_script(%args) -> [status, msg, result, meta]
+
+    Run a Getopt::Long::EvenLess-based script but only to dump the spec.
+
+    This function runs a CLI script that uses "Getopt::Long::EvenLess" but
+    monkey-patches beforehand so that "run()" will dump the object and then
+    exit. The goal is to get the object without actually running the script.
+
+    This can be used to gather information about the script and then
+    generate documentation about it or do other things (e.g.
+    "App::shcompgen" to generate a completion script for the original
+    script).
+
+    CLI script needs to use "Getopt::Long::EvenLess". This is detected
+    currently by a simple regex. If script is not detected as using
+    "Getopt::Long::EvenLess", status 412 is returned.
+
+    Will return the "Getopt::Long::EvenLess" specification.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   filename* => *str*
+
+        Path to the script.
+
+    *   libs => *array[str]*
+
+        Libraries to unshift to @INC when running script.
+
+    *   skip_detect => *bool*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+ENVIRONMENT
+  GETOPT_LONG_EVENLESS_DUMP => bool
+    Will be set to 1 when executing the script to be dumped.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Getopt-Long-EvenLess-Dump>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Getopt-Long-EvenLess-Dump>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Getopt-Long-EvenLess-
+    Dump>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

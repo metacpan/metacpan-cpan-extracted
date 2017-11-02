@@ -1,15 +1,16 @@
 package App::Office::CMS::Controller::Site;
 
 use parent 'App::Office::CMS::Controller';
-use common::sense;
+use strict;
+use warnings;
 
 use JSON::XS;
 
 use Try::Tiny;
 
-# We don't use Moose because we isa CGI::Application.
+# We don't use Moo because we isa CGI::Application.
 
-our $VERSION = '0.92';
+our $VERSION = '0.93';
 
 # -----------------------------------------------
 

@@ -38,8 +38,9 @@ our string_hashref $NAMES = {
 
 # [[[ SUBROUTINES & OO METHODS ]]]
 
-our string_hashref::method $ast_to_rperl__generate = sub {
-    ( my object $self, my string_hashref $modes) = @_;
+sub ast_to_rperl__generate {
+    { my string_hashref::method $RETURN_TYPE };
+    ( my object $self, my string_hashref $modes) = @ARG;
     my string_hashref $rperl_source_group = { PMC => q{} };
     my string_hashref $rperl_source_subgroup;
 
@@ -47,22 +48,22 @@ our string_hashref::method $ast_to_rperl__generate = sub {
 
     my string $self_class = ref $self;
     my string $operator_name;
-    if ( $self_class eq 'Operation_79' ) {    # Statement -> OP01_NAMED_SCOLON
+    if ( $self_class eq 'Operation_90' ) {    # Statement -> OP01_NAMED_SCOLON
         $operator_name = substr $self->{children}->[0], 0, -1;
     }
-    elsif (( $self_class eq 'Operator_83' )    # Operator -> OP01_NAMED SubExpression
-        or ( $self_class eq 'OperatorVoid_122' )
+    elsif (( $self_class eq 'Operator_94' )    # Operator -> OP01_NAMED SubExpression
+        or ( $self_class eq 'OperatorVoid_134' )
         )                                   # OperatorVoid -> OP01_NAMED ListElement OP21_LIST_COMMA ListElements ';'
     {
         $operator_name = $self->{children}->[0];
     }
-    elsif ( $self_class eq 'Operator_84' ) {    # Operator -> LPAREN OP01_NAMED ListElement OP21_LIST_COMMA ListElements ')'
+    elsif ( $self_class eq 'Operator_95' ) {    # Operator -> LPAREN OP01_NAMED ListElement OP21_LIST_COMMA ListElements ')'
         $operator_name = $self->{children}->[1];
     }
     else {
         die RPerl::Parser::rperl_rule__replace( 'ERROR ECOGEASRP00, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: Grammar rule '
                 . $self_class
-                . ' found where Operation_79, Operator_83, Operator_84, or OperatorVoid_122 expected, dying' )
+                . ' found where Operation_90, Operator_94, Operator_95, or OperatorVoid_134 expected, dying' )
             . "\n";
     }
  
@@ -83,43 +84,44 @@ our string_hashref::method $ast_to_rperl__generate = sub {
 
     $rperl_source_subgroup = $operator_object->ast_to_rperl__generate( $self, $modes );
     RPerl::Generator::source_group_append( $rperl_source_group, $rperl_source_subgroup );
-
     return $rperl_source_group;
-};
+}
 
-our string_hashref::method $ast_to_cpp__generate__CPPOPS_PERLTYPES = sub {
-    ( my object $self, my string_hashref $modes) = @_;
+sub ast_to_cpp__generate__CPPOPS_PERLTYPES {
+    { my string_hashref::method $RETURN_TYPE };
+    ( my object $self, my string_hashref $modes) = @ARG;
     my string_hashref $cpp_source_group = { CPP => q{// <<< RP::O::E::O::N __DUMMY_SOURCE_CODE CPPOPS_PERLTYPES >>>} . "\n" };
 
     #...
     return $cpp_source_group;
-};
+}
 
-our string_hashref::method $ast_to_cpp__generate__CPPOPS_CPPTYPES = sub {
-    ( my object $self, my string_hashref $modes) = @_;
+sub ast_to_cpp__generate__CPPOPS_CPPTYPES {
+    { my string_hashref::method $RETURN_TYPE };
+    ( my object $self, my string_hashref $modes) = @ARG;
     my string_hashref $cpp_source_group = { CPP => q{} };
     my string_hashref $cpp_source_subgroup;
 
-    #    RPerl::diag( 'in Operator::Named->ast_to_cpp__generate(), received $self = ' . "\n" . RPerl::Parser::rperl_ast__dump($self) . "\n" );
+    #    RPerl::diag( 'in Operator::Named->ast_to_cpp__generate__CPPOPS_CPPTYPES(), received $self = ' . "\n" . RPerl::Parser::rperl_ast__dump($self) . "\n" );
 
     my string $self_class = ref $self;
     my string $operator_name;
-    if ( $self_class eq 'Operation_79' ) {    # Statement -> OP01_NAMED_SCOLON
+    if ( $self_class eq 'Operation_90' ) {    # Statement -> OP01_NAMED_SCOLON
         $operator_name = substr $self->{children}->[0], 0, -1;
     }
-    elsif (( $self_class eq 'Operator_83' )    # Operator -> OP01_NAMED SubExpression
-        or ( $self_class eq 'OperatorVoid_122' )
+    elsif (( $self_class eq 'Operator_94' )    # Operator -> OP01_NAMED SubExpression
+        or ( $self_class eq 'OperatorVoid_134' )
         )                                   # OperatorVoid -> OP01_NAMED ListElement OP21_LIST_COMMA ListElements ';'
     {
         $operator_name = $self->{children}->[0];
     }
-    elsif ( $self_class eq 'Operator_84' ) {    # Operator -> LPAREN OP01_NAMED ListElement OP21_LIST_COMMA ListElements ')'
+    elsif ( $self_class eq 'Operator_95' ) {    # Operator -> LPAREN OP01_NAMED ListElement OP21_LIST_COMMA ListElements ')'
         $operator_name = $self->{children}->[1];
     }
     else {
         die RPerl::Parser::rperl_rule__replace( 'ERROR ECOGEASRP00, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: Grammar rule '
                 . $self_class
-                . ' found where Operation_79, Operator_83, Operator_84, or OperatorVoid_122 expected, dying' )
+                . ' found where Operation_90, Operator_94, Operator_95, or OperatorVoid_134 expected, dying' )
             . "\n";
     }
  
@@ -140,8 +142,7 @@ our string_hashref::method $ast_to_cpp__generate__CPPOPS_CPPTYPES = sub {
 
     $cpp_source_subgroup = $operator_object->ast_to_cpp__generate__CPPOPS_CPPTYPES( $self, $modes );
     RPerl::Generator::source_group_append( $cpp_source_group, $cpp_source_subgroup );
-
     return $cpp_source_group;
-};
+}
 
 1;    # end of class

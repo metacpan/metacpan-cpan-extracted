@@ -7,8 +7,6 @@ use strict;
 
 use PLN::PT;
 use Path::Tiny;
-binmode(STDOUT, ':utf8');
-binmode(STDIN, ':utf8');
 
 # get some args from the command line
 my $op = shift;
@@ -59,7 +57,7 @@ pln-pt - command line interface to http://api.pln.pt
 
 =head1 VERSION
 
-version 0.006
+version 0.008
 
 =head1 AUTHORS
 

@@ -1,5 +1,5 @@
 package File::ArchivableFormats::Plugin;
-our $VERSION = '1.3';
+our $VERSION = '1.4';
 use Moose::Role;
 
 # ABSTRACT: Role which implements logic for all plugins
@@ -54,7 +54,7 @@ File::ArchivableFormats::Plugin - Role which implements logic for all plugins
 
 =head1 VERSION
 
-version 1.3
+version 1.4
 
 =head1 ATTRIBUTES
 

@@ -15,17 +15,17 @@ skip = regexp(^incomplete/) or eq(README.txt)
 order = natural
 
 [DEPENDENCY All depends on init]
-match = not eq(init.pl)
-dependson = eq(init.pl)
+match = not eq(init.t)
+dependson = eq(init.t)
 
 [DEPENDENCY File handling]
 match = regexp(filehandl/.*)
-dependson = eq(basic_file_handling_setup.pl)
+dependson = eq(basic_file_handling_setup.t)
 
 [DEPENDENCY Picture processing]
 match = regexp(picproc/.*)
-dependson = eq(basic_picture_processing_setup.pl)
+dependson = eq(basic_picture_processing_setup.t)
 
 [EXECMAP]
-match10 = regexp(\.pl$)
+match10 = regexp(\.t$)
 cmd10 = perl

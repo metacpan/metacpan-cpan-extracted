@@ -13,6 +13,9 @@
 # Keith Herbert, Virginia Commonwealth University
 # herbertkb at vcu.edu
 #
+# Sam Henry, Virginia Commonwealth University
+# henryst at vcu.edu
+#
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
 # as published by the Free Software Foundation; either version 2
@@ -50,6 +53,7 @@ my $e8  = "UMLS::Association Package Error (Error Code 8).";
 my $e9  = "Index Error (Error Code 9).";
 my $e10 = "Option Error (Error Code 10).";
 my $e11 = "Unsupported Option Error (Error Code 11).";
+my $e12 = "Input parameter error (Error Code 12).";
 
 #  throws an error and exits the program
 #  input : $pkg       <- package the error originated
@@ -78,6 +82,7 @@ sub _error {
     if($errorcode eq 9)  { $errorstring = $e9;  }
     if($errorcode eq 10) { $errorstring = $e10; }
     if($errorcode eq 11) { $errorstring = $e11; }
+    if($errorcode eq 12) { $errorstring = $e12; }
 
     print STDERR "ERROR: $pkg->$function\n";
     print STDERR "$errorstring\n";

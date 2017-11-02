@@ -1,6 +1,6 @@
 # [[[ PREPROCESSOR ]]]
-# <<< PARSE_ERROR: 'ERROR ECOPARP00' >>>
-# <<< PARSE_ERROR: 'Unexpected Token:  require' >>>
+# <<< PARSE_ERROR: 'ECOPAPL03' >>>
+# <<< PARSE_ERROR: 'Subroutine empty_method redefined' >>>
 
 # [[[ HEADER ]]]
 use RPerl;
@@ -21,9 +21,7 @@ our hashref $properties
     = { empty_property => my integer $TYPED_empty_property = 2 };
 
 # [[[ SUBROUTINES & OO METHODS ]]]
-our void::method $empty_method = sub {
-    return 2;
-};
+sub empty_method { { my void::method $RETURN_TYPE }; return 2; }
 
 1;    # end of class
 

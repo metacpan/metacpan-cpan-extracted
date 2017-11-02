@@ -139,6 +139,10 @@ As above, but only the mono fonts
 
 As above, but only the sans fonts
 
+=head2 default_font_list
+
+Return an arrayref with the default font definitions
+
 =head1 INTERNALS
 
 =head2 BUILDARGS
@@ -213,7 +217,7 @@ sub BUILDARGS {
             $list = undef if $@;
         }
     }
-    $list ||= $class->_default_font_list;
+    $list ||= $class->default_font_list;
     my @out;
     foreach my $fontref (@$list) {
         my $font = { %$fontref }; # do a copy do avoid mangling the argument.
@@ -233,7 +237,7 @@ sub BUILDARGS {
     return { list => \@out };
 }
 
-sub _default_font_list {
+sub default_font_list {
     return [
             {
              name => 'CMU Serif',
@@ -265,6 +269,13 @@ sub _default_font_list {
              desc => 'TeX Gyre Bonum (Bookman)',
              type => 'serif',
             },
+            { name => 'Coelacanth',     desc => 'Coelacanth (no bolditalic)', type => 'serif' },
+            { name => 'Alegreya',       desc => 'Alegreya',       type => 'serif' },
+            { name => 'Arvo',           desc => 'Arvo',           type => 'serif' },
+            { name => 'Crimson Text',   desc => 'Crimson Text',   type => 'serif' },
+            { name => 'Lora',           desc => 'Lora',           type => 'serif' },
+            { name => 'Merriweather',   desc => 'Merriweather',   type => 'serif' },
+            { name => 'Vollkorn',       desc => 'Vollkorn',       type => 'serif' },
             {
              name => 'Antykwa Poltawskiego',
              desc => 'Antykwa Półtawskiego',
@@ -335,6 +346,14 @@ sub _default_font_list {
              desc => 'Noto Sans',
              type => 'sans',
             },
+            { name => 'Alegreya Sans',   desc => 'Alegreya Sans',   type => 'sans' },
+            { name => 'Archivo Narrow',  desc => 'Archivo Narrow',  type => 'sans' },
+            { name => 'Fira Sans',      desc => 'Fira Sans',      type => 'sans' },
+            { name => 'Karla',          desc => 'Karla',          type => 'sans' },
+            { name => 'Libre Franklin', desc => 'Libre Franklin', type => 'sans' },
+            { name => 'Poppins',        desc => 'Poppins',        type => 'sans' },
+            { name => 'Rubik',          desc => 'Rubik',          type => 'sans' },
+            { name => 'Source Sans Pro',  desc => 'Source Sans Pro',  type => 'sans' },
             {
              name => 'CMU Typewriter Text',
              desc => 'Computer Modern Typewriter Text',
@@ -350,6 +369,8 @@ sub _default_font_list {
              desc => 'TeX Gyre Cursor (Courier)',
              type => 'mono',
             },
+            { name => 'Anonymous Pro', desc => 'Anonymous Pro', type => 'mono' },
+            { name => 'Space Mono',    desc => 'Space Mono',    type => 'mono' },
            ];
 }
 

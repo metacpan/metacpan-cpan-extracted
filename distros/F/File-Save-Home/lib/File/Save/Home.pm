@@ -3,7 +3,7 @@ require 5.006_001;
 use strict;
 use warnings;
 use Exporter ();
-our $VERSION     = '0.10';
+our $VERSION     = '0.11';
 our @ISA         = qw(Exporter);
 our @EXPORT_OK   = qw(
     get_home_directory
@@ -45,7 +45,7 @@ File::Save::Home - Place file safely under user home directory
 
 =head1 VERSION
 
-This document refers to version 0.10, released February 10 2017.
+This document refers to version 0.11, released October 26 2017.
 
 =head1 SYNOPSIS
 
@@ -98,6 +98,61 @@ directory.  Among other things, if you are placing a file in such a location
 only temporarily -- say, for testing purposes -- you can temporarily hide
 any already existing file with the same name and restore it to its original
 name and timestamps when you are done.
+
+=head2 Limitations
+
+The preceding description was written in 2005.  Experience has shown that any
+claim that one can make about the B<safety> of the creation or deletion of
+directories and files underneath a user's home directory must be qualified.
+File::Save::Home is satisfactory for the use case for which it was originally
+designed, but there are other situations where it falls short.
+
+The original use case for which File::Save::Home was designed was to support
+the placement of B<personal preference files> in a user's home directory.
+Such personal preference files are often referred to as B<dot-rc files>
+because their names typically start with a C<.> character to render them
+hidden from commands like C<ls> and end in C<rc> much like C<.bashrc> or
+<.shrc>.  A developer using CPAN::Mini, for example, often makes use of
+C<.minicpanrc> to store the developer's preferred CPAN mirror.
+File::Save::Home was created specifically to support the creation of a
+C<.modulemakerrc> file by users of ExtUtils::ModuleMaker and a C<.podmultirc>
+file by users of Pod::Multi.  (ExtUtils::ModuleMaker and Pod::Multi are
+maintained by the author of File::Save::Home.)  These libraries are
+B<developer's tools>, I<i.e.,> they are intended to assist individual humans
+in software development rather than being used "in production."  As such,
+their use of dot-rc files implicitly assumes:
+
+=over 4
+
+=item *
+
+Only one user is concerned with the status of the directories and files,
+including dot-rc files, underneath the user's home directory.
+
+=item *
+
+Only one user has permissions to create, modify or remove directories and
+files underneath the user's home directory -- an assumption that is easily
+violated by a superuser such as C<root>.
+
+=item *
+
+The user is running processes to create, modify or remove directories and
+files underneath the user's home directory B<one-at-a-time>, C<i.e.,> the user
+is B<not> running such processes B<in parallel>.  Running such processes in
+parallel would raise the possibility, for example, of process trying to rename
+a dot-rc file that a second, parallel process had already deleted.
+
+=back
+
+When either the second or third assumption above is violated, we have the
+possibility of B<race conditions>
+(L<https://en.wikipedia.org/wiki/Race_condition>) and B<time of check to time
+of use (TOCTTOU) errors>
+(L<https://en.wikipedia.org/wiki/Time_of_check_to_time_of_use>).  Such
+conditions may lead to either spurious testing failures (I<e.g.,> when
+CPANtesteers run tests in parallel on libraries using File::Save::Home) or to
+security violations.
 
 =head1 USAGE
 
@@ -257,7 +312,7 @@ it is left unchanged.
 
 sub restore_subhome_directory_status {
     my $desired_dir_ref = shift;
-    my $home = $desired_dir_ref->{home};
+    my $home = $desired_dir_ref->{home} || '';
     croak "Home directory '$home' apparently lost"
         unless (-d $home);
     my $desired_dir = $desired_dir_ref->{abs};
@@ -293,7 +348,7 @@ home-equivalent directory returned by C<get_home_directory()>.
 =head3 Optional argument version
 
 Creates a randomly named temporary directory underneath the directory supplied
-as the single argument.  This version is analogous to the two-argument verion
+as the single argument.  This version is analogous to the two-argument version
 of L</"get_subhome_directory_status()"> above.  You could use it if, for
 example, you wanted to use C<File::HomeDir->my_home()> to supply a value for
 the user's home directory instead of our C<get_home_directory()>.
@@ -608,9 +663,12 @@ from monks CountZero, Tanktalus, xdg and holli, among others.
 Thanks to Rob Rothenberg for prodding me to expand the SEE ALSO section and to
 Adam Kennedy for responding to questions about File::HomeDir.
 
+Thanks to Damyan Ivanov, Xavier Guimard and Gregor Herrman of Debian Perl
+Group for patches.
+
 =head1 COPYRIGHT
 
-Copyright (c) 2005-06 James E. Keenan.  United States.  All rights reserved.
+Copyright (c) 2005-2017 James E. Keenan.  United States.  All rights reserved.
 
 This program is free software; you can redistribute
 it and/or modify it under the same terms as Perl itself.

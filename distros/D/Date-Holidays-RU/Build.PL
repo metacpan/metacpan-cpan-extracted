@@ -18,7 +18,7 @@ my %module_build_args = (
     "Alexander Nalobin <alexander\@nalobin.ru>"
   ],
   "dist_name" => "Date-Holidays-RU",
-  "dist_version" => "1.2017.0",
+  "dist_version" => "1.2018.0",
   "license" => "perl",
   "module_name" => "Date::Holidays::RU",
   "recursive_test_files" => 1,

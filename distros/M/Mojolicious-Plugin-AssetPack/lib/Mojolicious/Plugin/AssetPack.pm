@@ -6,7 +6,7 @@ use Mojolicious::Plugin::AssetPack::Asset::Null;
 use Mojolicious::Plugin::AssetPack::Store;
 use Mojolicious::Plugin::AssetPack::Util qw(diag has_ro load_module DEBUG);
 
-our $VERSION = '1.47';
+our $VERSION = '1.48';
 
 my %TAG_TEMPLATE;
 $TAG_TEMPLATE{css} = [qw(link rel stylesheet href)];
@@ -135,7 +135,6 @@ sub _pipes {
     map {
       my $class = load_module /::/ ? $_ : "Mojolicious::Plugin::AssetPack::Pipe::$_";
       diag 'Loading pipe "%s".', $class if DEBUG;
-      die qq(Unable to load "$_": $@) unless $class;
       my $pipe = $class->new(assetpack => $self);
       Scalar::Util::weaken($pipe->{assetpack});
       $pipe;
@@ -163,7 +162,6 @@ sub _process {
       local $pipe->{topic} = $topic;
       diag '%s->%s("%s")', ref $pipe, $method, $topic if DEBUG;
       $pipe->$method($assets);
-      push @{$self->{asset_paths}}, $_->path->to_string for grep { $_->path } @$assets;
     }
   }
 
@@ -254,7 +252,7 @@ Mojolicious::Plugin::AssetPack - Compress and convert css, less, sass, javascrip
 
 =head1 VERSION
 
-1.47
+1.48
 
 =head1 SYNOPSIS
 

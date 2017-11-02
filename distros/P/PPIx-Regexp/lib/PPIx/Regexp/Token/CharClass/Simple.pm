@@ -42,7 +42,7 @@ use PPIx::Regexp::Constant qw{
     MINIMUM_PERL TOKEN_LITERAL TOKEN_UNKNOWN
 };
 
-our $VERSION = '0.052';
+our $VERSION = '0.053';
 
 {
 
@@ -75,10 +75,15 @@ our $VERSION = '0.052';
 
     sub explain {
 	my ( $self ) = @_;
-	if ( $self->content() =~ m/ \A \\ ( [Pp] ) [{] ( .* ) [}] \z /smx ) {
+	if ( $self->content() =~ m/ \A \\ ( [Pp] ) ( [{] .* [}] | . ) \z /smx ) {
+	    my ( $kind, $prop ) = ( $1, $2 );
+	    if ( 1 < length $prop ) {
+		$prop =~ s/ \A [{] //smx;
+		$prop =~ s/ [}] \z //smx;
+	    }
 	    return sprintf
 		q<Match character %s Unicode or custom property '%s'>,
-		$kind_of_match{$1}, $2;
+		$kind_of_match{$kind}, $prop;
 	}
 	return $self->SUPER::explain();
     }
@@ -215,7 +220,8 @@ sub __PPIX_TOKENIZER__regexp {
     if ( my $accept = $tokenizer->find_regexp(
 	    qr{ \A \\ (?:
 		[wWsSdDvVhHXRNC] |
-		[Pp] \{ \s* \^? [\w:=\s-]+ \}
+		[Pp] \{ \s* \^? [\w:=\s-]+ \} |
+		[Pp] [CLMNPSZ]	# perluniprops for 5.26.1
 	    ) }smx
 	) ) {
 	if ( $in_class ) {

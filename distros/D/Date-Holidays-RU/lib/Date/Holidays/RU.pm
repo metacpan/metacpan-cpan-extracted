@@ -1,5 +1,5 @@
 package Date::Holidays::RU;
-$Date::Holidays::RU::VERSION = '1.2017.0';
+$Date::Holidays::RU::VERSION = '1.2018.0';
 # ABSTRACT: Determine Russian Federation official holidays and business days.
 
 
@@ -127,7 +127,8 @@ my %HOLIDAYS_SPECIAL = (
     2015 => [ qw( 0109 0309 0504 0511 ) ],
     2016 => [ qw( 0222 0307 0502 0503 0613 ) ],
     2017 => [ qw( 0224 0508 1106 ) ],
-    2018 => [ qw( 0109 0110 1105 ) ],
+    2018 => [ qw( 0309 0430 0502 0611 1105 1231 ) ],
+    2019 => [ qw( 0502 0503 0510 ) ],
 );
 
 
@@ -141,6 +142,7 @@ my %BUSINESS_DAYS_ON_WEEKENDS = (
     2011 => [ qw( 0305 ) ],
     2012 => [ qw( 0311 0428 0505 0512 0609 1229 ) ],
     2016 => [ qw( 0220 ) ],
+    2018 => [ qw( 0428 0609 1229 ) ],
 );
 
 my %SHORT_BUSINESS_DAYS = (
@@ -158,7 +160,8 @@ my %SHORT_BUSINESS_DAYS = (
     2015 => [ qw( 0430 0508 0611 1103 1231 ) ],
     2016 => [ qw( 0220 1103 ) ],
     2017 => [ qw( 0222 0307 1103 ) ],
-    2018 => [ qw( 0222 0307 0508 0611 1231 ) ],
+    2018 => [ qw( 0222 0307 0428 0508 0609 1229 ) ],
+    2019 => [ qw( 0222 0307 0430 0508 0611 1231 ) ],
 );
 
 
@@ -277,7 +280,7 @@ Date::Holidays::RU - Determine Russian Federation official holidays and business
 
 =head1 VERSION
 
-version 1.2017.0
+version 1.2018.0
 
 =head1 SYNOPSIS
 
@@ -332,7 +335,7 @@ Date::Holidays::RU
 
 =head1 VERSION
 
-version 1.2017.0
+version 1.2018.0
 
 =head1 AUTHOR
 

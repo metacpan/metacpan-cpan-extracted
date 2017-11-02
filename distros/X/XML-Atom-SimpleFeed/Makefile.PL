@@ -25,12 +25,10 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "File::Find" => 0,
-    "File::Temp" => 0,
     "Test::More" => "0.88",
     "utf8" => 0
   },
-  "VERSION" => "0.900",
+  "VERSION" => "0.902",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,8 +39,6 @@ my %FallbackPrereqs = (
   "Carp" => 0,
   "Encode" => 0,
   "ExtUtils::MakeMaker" => 0,
-  "File::Find" => 0,
-  "File::Temp" => 0,
   "POSIX" => 0,
   "Test::More" => "0.88",
   "strict" => 0,

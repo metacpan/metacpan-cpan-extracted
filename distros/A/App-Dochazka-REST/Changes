@@ -3714,3 +3714,23 @@ SPLIT OFF App::MREST into separate distribution
 0.551 2017-10-20 15:29 CEST
 - ResourceDefs: allow passerby to GET schedule/sid/:sid
 
+0.552 2017-10-23 11:53 CEST
+- ResourceDefs: fix permissions on schedule/eid/:eid/?:ts
+- Fillup: produce 100% schedule fulfillment without clobbering
+- Fillup: return just scheduled intervals if clobber is true
+- Model/Shared: make canonicalize_tsrange() fail on empty tsranges
+- fillup: get conflicting intervals list in chronological order
+
+0.553 2017-10-25 23:37 CEST
+- WISHLIST: add "GET ldap/info"
+- Dispatch: implement POST interval/scheduled
+- Shared.pm: rip out dead code
+- t/fillup.t: expand test coverage of Fillup
+- Fix {priv,schedule}_change_during_range, {priv,sched}history_at_timestamp
+
+0.554 2017-10-31 14:31 CET
+- Fillup: return different code when dry_run is set
+- tests: add 'interval/scheduled' coverage to t/dispatch/fillup.t
+- Fillup: fix success and failure messages
+- dbinit_Config: disallow modification of root supervisor field
+

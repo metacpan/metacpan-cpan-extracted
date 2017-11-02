@@ -1,5 +1,11 @@
 Revision history for Dist-Zilla-PluginBundle-Author-SKIRMESS
 
+0.031  2017-10-31 22:10:13 UTC
+
+  - Do not run xt/author/pod-spell.t if AUTOMATED_TESTING env variable is set
+  - Enabled the has_abstract_in_pod kwalitee check
+  - Removed CopyrightYearFromGit
+
 0.030  2017-10-20 20:20:56 UTC
 
   - Make it actually work on OSX with TravisCI

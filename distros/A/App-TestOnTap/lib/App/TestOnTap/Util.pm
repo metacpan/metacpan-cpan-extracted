@@ -19,6 +19,7 @@ our @EXPORT_OK =
 			slashify
 			trim
 			stringifyTime
+			ensureArray
 			expandAts
 			$IS_WINDOWS
 			$IS_PACKED
@@ -68,6 +69,30 @@ sub stringifyTime
 	}
 	
 	return strftime("%Y%m%dT%H%M%S${subsecs}Z", gmtime($tm));
+}
+
+# ensure we end up with an array or undef
+# input can be:
+#   undef
+# 	an array
+#   a space-separared string
+#   a newline-separated string
+# 
+sub ensureArray
+{
+	my $data = shift;
+	
+	if (defined($data))
+	{
+		$data =
+			(ref($data) eq 'ARRAY')
+				? $data
+				: ($data =~ m#\n#)
+					? [ split("\n", $data) ]
+					: [ split(' ', $data) ];
+	}
+
+	return $data;
 }
 
 # expand any array elements using '@xyz' as new line elements read from 'xyz'

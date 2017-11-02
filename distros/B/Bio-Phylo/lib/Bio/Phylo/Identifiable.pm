@@ -2,6 +2,9 @@ package Bio::Phylo::Identifiable;
 use Bio::Phylo::Util::IDPool;
 use Bio::Phylo::Util::Exceptions 'throw';
 
+use strict;
+use warnings;
+
 =head1 NAME
 
 Bio::Phylo::Identifiable - Objects with unique identifiers
@@ -71,6 +74,24 @@ sub get_id {
     else {
         throw 'API' => "Not a SCALAR reference";
     }
+}
+
+=item is_equal()
+
+Compares invocant's UID with argument's UID
+
+ Type    : Test
+ Title   : is_equal
+ Usage   : do_something() if $obj->is_equal($other);
+ Function: Compares objects by UID
+ Returns : BOOLEAN
+ Args    : Another object to compare with
+
+=cut
+
+sub is_equal {
+	my ($self,$other) = @_;
+	return $self->get_id == $other->get_id;
 }
 
 =back

@@ -1,14 +1,18 @@
 package Image::DS9::PConsts;
 
+# ABSTRACT: Internal Constants
+
 use strict;
 use warnings;
+
+our $VERSION = '0.188';
 
 require Exporter;
 
 our @ISA = qw( Exporter );
 
-our @EXPORT = 
-  qw( 
+our @EXPORT =
+  qw(
      %TypeCvt
 
      T_FLOAT
@@ -95,22 +99,22 @@ BEGIN {
 };
 
 
-use constant CvtSet	   => 0;
-use constant CvtGet	   => 1;
+use constant CvtSet        => 0;
+use constant CvtGet        => 1;
 
 # mustn't be 0
-use constant T_FLOAT	   =>  1;
-use constant T_INT	   =>  2;
-use constant T_BOOL	   =>  3;
+use constant T_FLOAT       =>  1;
+use constant T_INT         =>  2;
+use constant T_BOOL        =>  3;
 use constant T_COORD       =>  4;
 use constant T_WCSS        =>  5;
 use constant T_COORDSYS    =>  6;
 use constant T_SKYFRAME    =>  7;
 use constant T_SKYFORMAT   =>  8;
 use constant T_COLOR       => 10;
-use constant T_HASH	   => 11;
-use constant T_STRING	   => 12;
-use constant T_PDL	   => 13;
+use constant T_HASH        => 11;
+use constant T_STRING      => 12;
+use constant T_PDL         => 13;
 use constant T_SCALARREF   => 14;
 use constant T_WCSARRAY    => 15;
 use constant T_WCSHASH     => 16;
@@ -118,27 +122,27 @@ use constant T_EPHEMERAL   => 17;
 use constant T_SEXAGESIMAL_RA => 18;
 use constant T_SEXAGESIMAL_DEC => 19;
 use constant T_REWRITE     => 20;
-use constant T_STRING_NL   => 21;	# trailing \n added on output if necessary
+use constant T_STRING_NL   => 21;       # trailing \n added on output if necessary
 use constant T_WCS_SCALARREF => 22;
-use constant T_STRING_STRIP => 23;	# strip blanks from string on set
+use constant T_STRING_STRIP => 23;      # strip blanks from string on set
 use constant T_ANGLE_UNIT   => 24;
-use constant T_ARRAY	   => 1024;
-use constant T_OTHER	   => 8192;
+use constant T_ARRAY       => 1024;
+use constant T_OTHER       => 8192;
 
 
-use constant BOOL	   => [ T_BOOL, qr/$TRUE|$FALSE/ ];
-use constant FLOAT	   => [ T_FLOAT, $FLOAT ];
-use constant INT	   => [ T_INT, qr/[+-]?\d+/ ];
-use constant STRING	   => [ T_STRING, sub { ! ref $_[0] } ];
+use constant BOOL          => [ T_BOOL, qr/$TRUE|$FALSE/ ];
+use constant FLOAT         => [ T_FLOAT, $FLOAT ];
+use constant INT           => [ T_INT, qr/[+-]?\d+/ ];
+use constant STRING        => [ T_STRING, sub { ! ref $_[0] } ];
 use constant STRING_STRIP  => [ T_STRING_STRIP, sub { ! ref $_[0] } ];
-use constant STRING_NL	   => [ T_STRING_NL, sub { ! ref $_[0] || 'SCALAR' eq ref $_[0] } ];
-use constant HASH	   => [ T_HASH, sub { 'HASH' eq ref $_[0] } ];
-use constant SCALARREF	   => [ T_SCALARREF, sub { ! ref $_[0] || 'SCALAR' eq ref $_[0] } ];
-use constant WCS_HASH	   => [ T_WCSHASH, sub { 'HASH' eq ref $_[0] } ];
-use constant WCS_ARRAY	   => [ T_WCSARRAY, sub { 'ARRAY' eq ref $_[0] } ];
+use constant STRING_NL     => [ T_STRING_NL, sub { ! ref $_[0] || 'SCALAR' eq ref $_[0] } ];
+use constant HASH          => [ T_HASH, sub { 'HASH' eq ref $_[0] } ];
+use constant SCALARREF     => [ T_SCALARREF, sub { ! ref $_[0] || 'SCALAR' eq ref $_[0] } ];
+use constant WCS_HASH      => [ T_WCSHASH, sub { 'HASH' eq ref $_[0] } ];
+use constant WCS_ARRAY     => [ T_WCSARRAY, sub { 'ARRAY' eq ref $_[0] } ];
 use constant WCS_SCALARREF  => [ T_WCS_SCALARREF, sub { ! ref $_[0] || 'SCALAR' eq ref $_[0] } ];
 
-use constant PDL	   => [ T_PDL, sub { UNIVERSAL::isa( $_[0], 'PDL' ) } ];
+use constant PDL           => [ T_PDL, sub { UNIVERSAL::isa( $_[0], 'PDL' ) } ];
 
 use constant SEXAGESIMAL_RA   => [ T_SEXAGESIMAL_RA, $SEXAGESIMAL_RA ];
 use constant SEXAGESIMAL_DEC   => [ T_SEXAGESIMAL_DEC, $SEXAGESIMAL_DEC ];
@@ -148,24 +152,24 @@ use constant COORD_DEC     => [ T_COORD, qr/$FLOAT|$SEXAGESIMAL_DEC/ ];
 
 use constant WCSS      => [ T_WCSS, $WCSS ];
 
-use constant COORDSYS  => [ T_COORDSYS, 
-			       ENUM( qw ( physical image wcs ), $WCSS ) ];
+use constant COORDSYS  => [ T_COORDSYS,
+                               ENUM( qw ( physical image wcs ), $WCSS ) ];
 
 use constant ANGLE_UNIT => [ T_ANGLE_UNIT,
                                ENUM( qw( degrees arcmin arcsec ) ) ];
 
-use constant SKYFRAME  => [ T_SKYFRAME, 
-			       ENUM( qw ( fk4 fk5 icrs galactic ecliptic ) ) ];
+use constant SKYFRAME  => [ T_SKYFRAME,
+                               ENUM( qw ( fk4 fk5 icrs galactic ecliptic ) ) ];
 
 use constant SKYFORMAT => [ T_SKYFORMAT, ENUM( qw ( degrees sexagesimal ) ) ];
 
 use constant COLOR     => [ T_COLOR, ENUM( qw ( black white red green blue
-				     cyan magenta yellow ) ) ];
+                                     cyan magenta yellow ) ) ];
 
 # can't do a query; if the arguments aren't present, it's an error
 use constant QNONE => 0b0000;
 
-# can do query; 
+# can do query;
 use constant QYES  => 0b0001;
 
 
@@ -192,35 +196,35 @@ sub ARRAY
   # ($fixed_size)
   elsif( 1 == @_ )
   {
-    [ T_ARRAY, sub { 'ARRAY' eq ref $_[0] 
-		       && $min == @{$_[0]}
-		   } ]
+    [ T_ARRAY, sub { 'ARRAY' eq ref $_[0]
+                       && $min == @{$_[0]}
+                   } ]
   }
 
   # (0,$max)
   elsif ( 0 == $min )
   {
-    [ T_ARRAY, sub { 'ARRAY' eq ref $_[0] 
-		       && @{$_[0]} <= $max 
-		   } ]
+    [ T_ARRAY, sub { 'ARRAY' eq ref $_[0]
+                       && @{$_[0]} <= $max
+                   } ]
   }
 
 
   # ($min, -1) => lower limit only
   elsif ( -1 == $max )
   {
-    [ T_ARRAY, sub { 'ARRAY' eq ref $_[0] 
-		       && $min <= @{$_[0]}
-		   } ]
+    [ T_ARRAY, sub { 'ARRAY' eq ref $_[0]
+                       && $min <= @{$_[0]}
+                   } ]
   }
 
   # ($min,$max) lower and upper
   else
   {
-    [ T_ARRAY, sub { 'ARRAY' eq ref $_[0] 
-		       && $min <= @{$_[0]}
-		       && @{$_[0]} <= $max 
-		   } ]
+    [ T_ARRAY, sub { 'ARRAY' eq ref $_[0]
+                       && $min <= @{$_[0]}
+                       && @{$_[0]} <= $max
+                   } ]
   }
 }
 
@@ -235,86 +239,86 @@ sub REWRITE {
 # these must return references!  $_[0] is always a reference;
 # return $_[0] if no change
 our %TypeCvt = (
-	T_BOOL() => [
-		   # outgoing
-		   sub { \( ${$_[0]} =~ $TRUE ? 'yes' : 'no' ) },
-		   # incoming
-		   sub { \( ${$_[0]} =~ $TRUE ? 1 : 0 ) }
-		  ],
+        T_BOOL() => [
+                   # outgoing
+                   sub { \( ${$_[0]} =~ $TRUE ? 'yes' : 'no' ) },
+                   # incoming
+                   sub { \( ${$_[0]} =~ $TRUE ? 1 : 0 ) }
+                  ],
 
-  	T_WCSHASH() => [
-		       # outgoing
-		       sub 
-		       {
-			 my $wcs = '';
-			 while( my ($key, $val ) = each %{$_[0]} )
-			 {
-			   # remove blank lines
-			   next if $key eq '';
+        T_WCSHASH() => [
+                       # outgoing
+                       sub
+                       {
+                         my $wcs = '';
+                         while( my ($key, $val ) = each %{$_[0]} )
+                         {
+                           # remove blank lines
+                           next if $key eq '';
 
-			   # aggressively remove surrounding apostrophes
-			   $val =~ s/^'+//;
-	                   $val =~ s/'+$//;
+                           # aggressively remove surrounding apostrophes
+                           $val =~ s/^'+//;
+                           $val =~ s/'+$//;
 
-			   # remove unnecessary blanks
-			   $val =~ s/^\s+//;
-			   $val =~ s/\s+$//;
+                           # remove unnecessary blanks
+                           $val =~ s/^\s+//;
+                           $val =~ s/\s+$//;
 
-			   # surround all values with apostrophes
-			   $wcs .= uc( $key ) . ($val ne '' ? " = '$val'\n" : "\n" );
-			 }
-			 $wcs;
-		       }
+                           # surround all values with apostrophes
+                           $wcs .= uc( $key ) . ($val ne '' ? " = '$val'\n" : "\n" );
+                         }
+                         $wcs;
+                       }
 
-		      ],
+                      ],
 
-  	T_WCSARRAY() => [
-		       # outgoing
-		       sub{
-			 $_[0] = \( join( "\n", @{$_[0]}) . "\n" );
-		         ${$_[0]} =~ s/^\s+//gm;
-			 ${$_[0]} =~ s/^\s*\n//gm;
-		         $_[0];
+        T_WCSARRAY() => [
+                       # outgoing
+                       sub{
+                         $_[0] = \( join( "\n", @{$_[0]}) . "\n" );
+                         ${$_[0]} =~ s/^\s+//gm;
+                         ${$_[0]} =~ s/^\s*\n//gm;
+                         $_[0];
 
-		       },
-		       ],
+                       },
+                       ],
 
-  	T_WCS_SCALARREF() => [
-			  sub {
-			        ${$_[0]} =~ s/^\s+//gm;
-			        ${$_[0]} =~ s/^\s*\n//gm;
-				$_[0] = \( ${$_[0]} . "\n" ) 
-			         unless substr(${$_[0]},-1,1) eq '\n';
-			       $_[0];
+        T_WCS_SCALARREF() => [
+                          sub {
+                                ${$_[0]} =~ s/^\s+//gm;
+                                ${$_[0]} =~ s/^\s*\n//gm;
+                                $_[0] = \( ${$_[0]} . "\n" )
+                                 unless substr(${$_[0]},-1,1) eq '\n';
+                               $_[0];
                              }
                          ],
 
 
-  	T_ARRAY() => [
-		      # outgoing
-		      undef,
-		
-		      # incoming
-		      sub {
-			  ( my $s = ${$_[0]} ) =~ s/^\s+//;
-			  $s =~ s/\s+$//;
-			  $_[0] = [ split( / /, $s ) ];
-		          $_[0];
-			}
-		     ],
+        T_ARRAY() => [
+                      # outgoing
+                      undef,
 
-  	T_STRING_NL() => [
-			  sub {
-			    $_[0] = \( ${$_[0]} . "\n" ) 
-			         unless substr(${$_[0]},-1,1) eq '\n';
-		            $_[0];
+                      # incoming
+                      sub {
+                          ( my $s = ${$_[0]} ) =~ s/^\s+//;
+                          $s =~ s/\s+$//;
+                          $_[0] = [ split( / /, $s ) ];
+                          $_[0];
+                        }
+                     ],
+
+        T_STRING_NL() => [
+                          sub {
+                            $_[0] = \( ${$_[0]} . "\n" )
+                                 unless substr(${$_[0]},-1,1) eq '\n';
+                            $_[0];
                              }
                          ],
 
-  	T_STRING_STRIP() => [
-			  sub {
-			    ${$_[0]} =~ s/\s+//g;
-		            $_[0];
+        T_STRING_STRIP() => [
+                          sub {
+                            ${$_[0]} =~ s/\s+//g;
+                            $_[0];
                              }
                          ],
 
@@ -330,4 +334,56 @@ sub type_cvt
            ref( $_[0] ) ? $_[0] : \( $_[0] );
 }
 
+#
+# This file is part of Image-DS9
+#
+# This software is Copyright (c) 2017 by Smithsonian Astrophysical Observatory.
+#
+# This is free software, licensed under:
+#
+#   The GNU General Public License, Version 3, June 2007
+#
 1;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+Image::DS9::PConsts - Internal Constants
+
+=head1 VERSION
+
+version 0.188
+
+=head1 BUGS AND LIMITATIONS
+
+You can make new bug reports, and view existing ones, through the
+web interface at L<https://rt.cpan.org/Public/Dist/Display.html?Name=Image-DS9>.
+
+=head1 SEE ALSO
+
+Please see those modules/websites for more information related to this module.
+
+=over 4
+
+=item *
+
+L<Image::DS9|Image::DS9>
+
+=back
+
+=head1 AUTHOR
+
+Diab Jerius <djerius@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2017 by Smithsonian Astrophysical Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

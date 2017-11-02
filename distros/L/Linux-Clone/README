@@ -1,6 +1,6 @@
 NAME
-    Linux::Clone - an interface to the linux clone(2) and unshare(2)
-    syscalls
+    Linux::Clone - an interface to the linux clone, unshare, setns,
+    pivot_root and kcmp syscalls
 
 SYNOPSIS
      use Linux::Clone;
@@ -141,11 +141,24 @@ DESCRIPTION
         Calls setns(2) on the file descriptor (or file handle) $fh_or_fd. If
         $nstype is missing, then 0 is used.
 
-        At the time of this writing, $nstype can be 0,
-        "Linux::Clone::NEWIPC", "Linux::Clone::NEWNET",
-        "Linux::Clone::NEUTS", "Linux::Clone::NEWCGROUP",
-        "Linux::Clone::NEWNS", "Linux::Clone::NEWPID" or
-        "Linux::Clone::NEWUSER".
+        The argument $nstype can be 0, "Linux::Clone::NEWIPC",
+        "Linux::Clone::NEWNET", "Linux::Clone::NEUTS",
+        "Linux::Clone::NEWCGROUP", "Linux::Clone::NEWNS",
+        "Linux::Clone::NEWPID" or "Linux::Clone::NEWUSER".
+
+    Linux::Clone::pivot_root $new_root, $old_root
+        Calls pivot_root(2) - refer to its manpage for details.
+
+    Linux::Clone::kcmp $pid1, $pid2, $type[, $idx1, $idx2]
+        Calls kcmp(2) - refer to its manpage for details on operations.
+
+        The following $type constants are available if the kcmp syscall
+        number was available during compilation:
+
+        "Linux::Clone::KCMP_FILE", "Linux::Clone::KCMP_VM",
+        "Linux::Clone::KCMP_FILES", "Linux::Clone::KCMP_FS",
+        "Linux::Clone::KCMP_SIGHAND", "Linux::Clone::KCMP_IO" and
+        "Linux::Clone::KCMP_SYSVSEM".
 
 AUTHOR
      Marc Lehmann <schmorp@schmorp.de>

@@ -6,7 +6,7 @@ use Alien::Build::Plugin;
 use File::Basename ();
 
 # ABSTRACT: Plugin to extract links from HTML
-our $VERSION = '1.25'; # VERSION
+our $VERSION = '1.28'; # VERSION
 
 
 sub init
@@ -72,7 +72,7 @@ Alien::Build::Plugin::Decode::HTML - Plugin to extract links from HTML
 
 =head1 VERSION
 
-version 1.25
+version 1.28
 
 =head1 SYNOPSIS
 
@@ -138,6 +138,10 @@ Petr Pisar (ppisar)
 Lance Wicks (LANCEW)
 
 Ahmad Fatoum (a3f, ATHREEF)
+
+José Joaquín Atria (JJATRIA)
+
+Duke Leto (LETO)
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -18,13 +18,14 @@ our hashref $properties = {};
 
 # [[[ SUBROUTINES & OO METHODS ]]]
 
-our string_hashref::method $ast_to_rperl__generate = sub {
-    ( my object $self, my string_hashref $modes) = @_;
+sub ast_to_rperl__generate {
+    { my string_hashref::method $RETURN_TYPE };
+    ( my object $self, my string_hashref $modes) = @ARG;
     my string_hashref $rperl_source_group = { PMC => q{} };
 
 #    RPerl::diag( 'in Include->ast_to_rperl__generate(), received $self = ' . "\n" . RPerl::Parser::rperl_ast__dump($self) . "\n" );
 #    RPerl::diag( 'in Include->ast_to_rperl__generate(), have ::class($self) = ' . ::class($self) . "\n" );
-    if ( ref $self eq 'Include_41' ) {
+    if ( ref $self eq 'Include_50' ) {
         # Include -> USE_OR_REQUIRE WordScoped ';'
         my string $use_or_require_keyword = $self->{children}->[0];
         my string $module_name
@@ -35,7 +36,7 @@ our string_hashref::method $ast_to_rperl__generate = sub {
 
 #        RPerl::diag( 'in Include->ast_to_rperl__generate(), have $module_name = '  . $module_name . "\n" );
     }
-    elsif ( ref $self eq 'Include_42' ) {
+    elsif ( ref $self eq 'Include_51' ) {
         # Include -> USE_OR_REQUIRE WordScoped OP01_QW ';'
         my string $use_or_require_keyword = $self->{children}->[0];
         my string $module_name
@@ -52,30 +53,31 @@ our string_hashref::method $ast_to_rperl__generate = sub {
         die RPerl::Parser::rperl_rule__replace(
             'ERROR ECOGEASRP00, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: Grammar rule '
                 . ( ref $self )
-                . ' found where Include_41 or Include_42 expected, dying' )
+                . ' found where Include_50 or Include_51 expected, dying' )
             . "\n";
     }
-
     return $rperl_source_group;
-};
+}
 
-our string_hashref::method $ast_to_cpp__generate__CPPOPS_PERLTYPES = sub {
-    ( my object $self, my string_hashref $modes) = @_;
+sub ast_to_cpp__generate__CPPOPS_PERLTYPES {
+    { my string_hashref::method $RETURN_TYPE };
+    ( my object $self, my string_hashref $modes) = @ARG;
     my string_hashref $cpp_source_group
         = { CPP => q{// <<< RP::CU::I __DUMMY_SOURCE_CODE CPPOPS_PERLTYPES >>>}
             . "\n" };
 
     #...
     return $cpp_source_group;
-};
+}
 
-our string_hashref::method $ast_to_cpp__generate__CPPOPS_CPPTYPES = sub {
-    ( my object $self, my string $package_name_underscores, my string_hashref $modes) = @_;
+sub ast_to_cpp__generate__CPPOPS_CPPTYPES {
+    { my string_hashref::method $RETURN_TYPE };
+    ( my object $self, my string $package_name_underscores, my string_hashref $modes) = @ARG;
 #    RPerl::diag( 'in Include->ast_to_cpp__generate__CPPOPS_CPPTYPES(), received $self = ' . "\n" . RPerl::Parser::rperl_ast__dump($self) . "\n" );
     my string_hashref $cpp_source_group = { H => q{} };
 
     # NEED ANSWER: no difference between wholesale includes and selective includes in C++?
-    if (( ref $self eq 'Include_41' ) or ( ref $self eq 'Include_42' )) {
+    if (( ref $self eq 'Include_50' ) or ( ref $self eq 'Include_51' )) {
         # Include -> USE_OR_REQUIRE WordScoped ...
         # DEV NOTE: ignore manually included RPerl* and rperl* modules, presumably they will all be automatically included
         my string $module_name = $self->{children}->[1]->{children}->[0];
@@ -100,11 +102,12 @@ our string_hashref::method $ast_to_cpp__generate__CPPOPS_CPPTYPES = sub {
         die RPerl::Parser::rperl_rule__replace(
             'ERROR ECOGEASCP00, CODE GENERATOR, ABSTRACT SYNTAX TO C++: Grammar rule '
                 . ( ref $self )
-                . ' found where Include_41 or Include_42 expected, dying' )
+                . ' found where Include_50 or Include_51 expected, dying' )
             . "\n";
     }
     
+#    RPerl::diag( 'in Include->ast_to_cpp__generate__CPPOPS_CPPTYPES(), about to return $cpp_source_group = ' . "\n" . RPerl::Parser::rperl_ast__dump($cpp_source_group) . "\n" );
     return $cpp_source_group;
-};
+}
 
 1;    # end of class

@@ -18,8 +18,7 @@ ok (ZMQ::Raw::Socket->ZMQ_TYPE);
 ok (ZMQ::Raw::Socket->ZMQ_LINGER);
 ok (ZMQ::Raw::Socket->ZMQ_RECONNECT_IVL);
 ok (ZMQ::Raw::Socket->ZMQ_BACKLOG);
-ok (ZMQ::Raw::Socket->ZMQ_RECONNECT_IVL_MAX);
-ok (ZMQ::Raw::Socket->ZMQ_MAXMSGSIZE);
+ok (ZMQ::Raw::Socket->ZMQ_RECONNECT_IVL_MAX); ok (ZMQ::Raw::Socket->ZMQ_MAXMSGSIZE);
 ok (ZMQ::Raw::Socket->ZMQ_SNDHWM);
 ok (ZMQ::Raw::Socket->ZMQ_RCVHWM);
 ok (ZMQ::Raw::Socket->ZMQ_MULTICAST_HOPS);
@@ -90,7 +89,7 @@ isa_ok $error, 'ZMQ::Raw::Error';
 like $error -> message, qr/Context was terminated/;
 like "$error", qr/Context was terminated/;
 is $error -> file, 't/02-socket.t';
-is $error -> line, 86;
+is $error -> line, 85;
 is $error -> code, ZMQ::Raw::Error->ETERM;
 is int ($error), ZMQ::Raw::Error->ETERM;
 ok (!!$error);
@@ -199,14 +198,15 @@ $msg = ZMQ::Raw::Message->new;
 $msg->data ('world');
 push @msgs, $msg;
 
-$req->sendmsg (@msgs, 'hello', 'world');
+$req->sendmsg (@msgs, 'hello', 0, 'world');
 
 $msg2 = $rep->recvmsg();
 is $msg2->more, 1;
 is $msg2->data(), 'hello';
+ok (!defined ($msg2->gets (ZMQ::Raw::Message->ZMQ_MSG_PROPERTY_ROUTING_ID)));
 
 @msgs = $rep->recvmsg();
-is scalar (@msgs), 3;
+is scalar (@msgs), 4;
 
 $msg2 = shift @msgs;
 is $msg2->more, 1;
@@ -215,6 +215,10 @@ is $msg2->data(), 'world';
 $msg2 = shift @msgs;
 is $msg2->more, 1;
 is $msg2->data(), 'hello';
+
+$msg2 = shift @msgs;
+is $msg2->more, 1;
+is $msg2->data(), '0';
 
 $msg2 = shift @msgs;
 is $msg2->more, 0;
@@ -222,6 +226,10 @@ is $msg2->data(), 'world';
 
 $req->disconnect ('tcp://localhost:5555');
 $rep->unbind ('tcp://127.0.0.1:5555');
+
+my $dish = ZMQ::Raw::Socket->new ($ctx, ZMQ::Raw->ZMQ_DISH);
+$dish->join ('abc');
+$dish->leave ('abc');
 
 done_testing;
 

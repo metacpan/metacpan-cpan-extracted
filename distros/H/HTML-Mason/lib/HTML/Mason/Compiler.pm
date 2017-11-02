@@ -3,7 +3,7 @@
 # under the same terms as Perl itself.
 
 package HTML::Mason::Compiler;
-$HTML::Mason::Compiler::VERSION = '1.56';
+$HTML::Mason::Compiler::VERSION = '1.58';
 use strict;
 use warnings;
 use Data::Dumper;

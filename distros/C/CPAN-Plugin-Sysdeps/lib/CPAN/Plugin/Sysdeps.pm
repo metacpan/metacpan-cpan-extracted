@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps;
 use strict;
 use warnings;
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 use Hash::Util 'lock_keys';
 use List::Util 'first';

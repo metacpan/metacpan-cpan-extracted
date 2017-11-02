@@ -1,14 +1,15 @@
 package PLN::PT;
 # ABSTRACT: interface for the http://pln.pt web service
-$PLN::PT::VERSION = '0.006';
+$PLN::PT::VERSION = '0.008';
 use strict;
 use warnings;
 
-use JSON::MaybeXS ();
+use JSON::XS;
 use CHI;
 use Digest::MD5 qw/md5_base64/;
 use LWP::UserAgent;
 use Encode;
+use utf8::all;
 
 sub new {
   my ($class, $url) = @_;
@@ -34,7 +35,7 @@ sub morph_analyzer {
 
   $word =~ s/\// /g; # make it sane, if someone tries to go guessing
 
-  my $url = $self->_cat('morph', $word);
+  my $url = $self->_cat('morph_analyzer', $word);
   $url .= '?' . $self->_args($opts);
 
   return $self->_get($url, $opts);
@@ -84,12 +85,14 @@ sub _post {
 
   unless ($data) {
     my $req = HTTP::Request->new(POST => $url);
+    $req->header('Content-Type', 'text/html; charset=UTF-8');
     $req->content(Encode::encode_utf8($text));
 
     my $res = $self->{ua}->request($req);
     if ($res->is_success) {
       $data = $res->decoded_content;
       $data = $res->content unless $data;
+      $data = Encode::decode_utf8($data);
       $self->{cache}->set($key, $data);
     }
     else {
@@ -99,7 +102,7 @@ sub _post {
   }
 
   return $data if ($opts->{output} and $opts->{output} eq 'raw');
-  return JSON::MaybeXS->new(utf8 => 1)->decode($data);
+  return JSON::XS->new->decode($data);
 }
 
 sub _get {
@@ -115,6 +118,7 @@ sub _get {
     if ($res->is_success) {
       $data = $res->decoded_content;
       $data = $res->content unless $data;
+      $data = Encode::decode_utf8($data);
       $self->{cache}->set($key, $data);
     }
     else {
@@ -124,7 +128,7 @@ sub _get {
   }
 
   return $data if ($opts->{output} and $opts->{output} eq 'raw');
-  return JSON::MaybeXS->new(utf8 => 1)->decode($data);
+  return JSON::XS->new->decode($data);
 }
 
 sub _cat {
@@ -161,7 +165,7 @@ PLN::PT - interface for the http://pln.pt web service
 
 =head1 VERSION
 
-version 0.006
+version 0.008
 
 =head1 SYNOPSIS
 

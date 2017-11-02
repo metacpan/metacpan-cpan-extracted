@@ -1,5 +1,5 @@
 #
-# $Id: Json.pm,v f6ad8c136b19 2017/01/01 10:13:54 gomor $
+# $Id: Json.pm,v 5a8528c3a0ac 2017/02/14 18:47:11 gomor $
 #
 # string::json Brik
 #
@@ -11,13 +11,14 @@ use base qw(Metabrik);
 
 sub brik_properties {
    return {
-      revision => '$Revision: f6ad8c136b19 $',
+      revision => '$Revision: 5a8528c3a0ac $',
       tags => [ qw(unstable encode decode) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
       commands => {
          encode => [ qw($data_list|$data_hash) ],
          decode => [ qw($data) ],
+         is_valid => [ qw($data) ],
       },
       require_modules => {
          'JSON::XS' => [ ],
@@ -66,6 +67,24 @@ sub decode {
    }
 
    return $decoded;
+}
+
+sub is_valid {
+   my $self = shift;
+   my ($data) = @_;
+
+   $self->brik_help_run_undef_arg('is_valid', $data) or return;
+
+   $self->log->debug("is_valid: data[$data]");
+
+   eval {
+      $self->decode($data);
+   };
+   if ($@) {
+      return 0;
+   }
+
+   return 1;
 }
 
 1;

@@ -9,11 +9,11 @@ use Test::More tests => 2;
 
 use Mail::Run::Crypt;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 my $mrc;
 my $error;
 eval { $mrc = Mail::Run::Crypt->new() } or $error = $EVAL_ERROR;
 
 ok( defined $error,                     'no_mailto_failed' );
-ok( $error =~ m/^\Qmailto required/msx, 'no_mailto_errorstr' );
+ok( $error =~ m/^\QMAILTO required/msx, 'no_mailto_errorstr' );

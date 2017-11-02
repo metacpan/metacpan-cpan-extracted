@@ -43,22 +43,21 @@
       "runtime" : {
          "requires" : {
             "PadWalker" : "0",
-            "Type::Tiny" : "0"
+            "Type::Tiny" : "1.002000"
          }
       },
       "test" : {
          "requires" : {
             "Moo" : "0",
             "Mouse" : "0",
-            "Test2" : "0",
-            "Test2::Suite" : "0.000077"
+            "Test2::V0" : "0.000077"
          }
       }
    },
    "provides" : {
       "Smart::Args::TypeTiny" : {
          "file" : "lib/Smart/Args/TypeTiny.pm",
-         "version" : "0.10"
+         "version" : "0.12"
       },
       "Smart::Args::TypeTiny::Check" : {
          "file" : "lib/Smart/Args/TypeTiny/Check.pm"
@@ -75,7 +74,7 @@
          "web" : "https://github.com/akiym/Smart-Args-TypeTiny"
       }
    },
-   "version" : "0.10",
+   "version" : "0.12",
    "x_authority" : "cpan:AKIYM",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

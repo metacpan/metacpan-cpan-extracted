@@ -1,5 +1,8 @@
 Revision history for Perl extension BGS.
 
+0.08  2017-11-01
+	- bgs_break($vpid)
+
 0.07  2012-12-21
 	- waitpid, not wait
 

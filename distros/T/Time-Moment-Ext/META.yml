@@ -26,7 +26,7 @@ no_index:
 provides:
   Time::Moment::Ext:
     file: lib/Time/Moment/Ext.pm
-    version: '0.03'
+    version: '0.04'
 requires:
   Time::Moment: '0'
   Time::Piece: '0'
@@ -35,7 +35,7 @@ resources:
   bugtracker: https://github.com/dshadow/time-moment-ext/issues
   homepage: https://github.com/dshadow/time-moment-ext
   repository: git://github.com/dshadow/time-moment-ext.git
-version: '0.03'
+version: '0.04'
 x_contributors:
   - 'Konstantin Cherednichenko <konstantin_c@kntele.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

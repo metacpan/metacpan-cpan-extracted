@@ -28,15 +28,18 @@ my %WriteMakefileArgs = (
     "Moose::Util::TypeConstraints" => 0
   },
   "TEST_REQUIRES" => {
+    "File::Spec" => 0,
     "File::Spec::Functions" => 0,
     "File::Temp" => 0,
+    "IO::Handle" => 0,
+    "IPC::Open3" => 0,
     "MIME::Types" => 0,
     "Test::Deep" => 0,
     "Test::More" => 0,
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "1.3",
+  "VERSION" => "1.4",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,8 +50,11 @@ my %FallbackPrereqs = (
   "Archive::Zip" => 0,
   "File::Basename" => 0,
   "File::LibMagic" => 0,
+  "File::Spec" => 0,
   "File::Spec::Functions" => 0,
   "File::Temp" => 0,
+  "IO::Handle" => 0,
+  "IPC::Open3" => 0,
   "Image::ExifTool" => 0,
   "List::Util" => 0,
   "MIME::Types" => 0,

@@ -1,5 +1,6 @@
 package Bio::Phylo::Util::Exceptions;
 use strict;
+use warnings;
 use base 'Exporter';
 use Bio::Phylo::Util::StackTrace;
 use Scalar::Util 'blessed';
@@ -107,6 +108,7 @@ sub AUTOLOAD {
     my $self  = shift;
     my $field = $AUTOLOAD;
     $field =~ s/.*://;
+    return if $field eq 'DESTROY';
     return $self->{$field};
 }
 

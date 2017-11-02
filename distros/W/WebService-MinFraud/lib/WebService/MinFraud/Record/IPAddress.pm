@@ -3,10 +3,10 @@ package WebService::MinFraud::Record::IPAddress;
 use Moo;
 use namespace::autoclean;
 
-our $VERSION = '1.005000';
+our $VERSION = '1.005001';
 
 use B;
-use GeoIP2::Role::Model::Location 2.003003;
+use GeoIP2::Role::Model::Location 2.004000;
 use GeoIP2::Role::Model::HasSubdivisions;
 use Types::Standard qw( ArrayRef InstanceOf );
 use Sub::Quote qw( quote_sub );
@@ -70,7 +70,7 @@ WebService::MinFraud::Record::IPAddress - Contains data for the IPAddress record
 
 =head1 VERSION
 
-version 1.005000
+version 1.005001
 
 =head1 SYNOPSIS
 

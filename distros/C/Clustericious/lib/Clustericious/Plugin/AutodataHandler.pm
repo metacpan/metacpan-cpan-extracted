@@ -9,7 +9,7 @@ use PerlX::Maybe qw( maybe );
 use Path::Class qw( dir );
 
 # ABSTRACT: Handle data types automatically
-our $VERSION = '1.26'; # VERSION
+our $VERSION = '1.27'; # VERSION
 
 
 sub _default_coders
@@ -140,7 +140,7 @@ Clustericious::Plugin::AutodataHandler - Handle data types automatically
 
 =head1 VERSION
 
-version 1.26
+version 1.27
 
 =head1 SYNOPSIS
 

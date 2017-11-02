@@ -1,5 +1,6 @@
 package Bio::Phylo::Forest::DrawTreeRole;
 use strict;
+use warnings;
 use Carp;
 use Bio::Phylo::Forest::TreeRole;
 use base 'Bio::Phylo::Forest::TreeRole';
@@ -9,14 +10,14 @@ use Bio::Phylo::Util::CONSTANT 'looks_like_hash';
 
 	our $AUTOLOAD;
 	my @properties = qw(width height node_radius tip_radius node_color node_shape
-	node_image branch_color branch_shape branch_width branch_style collapsed_width
+	node_image branch_color branch_shape branch_width branch_style collapsed_clade_width
 	font_face font_size font_style margin margin_top margin_bottom margin_left 
 	margin_right padding padding_top padding_bottom padding_left padding_right
 	mode shape text_horiz_offset text_vert_offset);
 
 =head1 NAME
 
-Bio::Phylo::Forest::DrawTree - Tree with extra methods for tree drawing
+Bio::Phylo::Forest::DrawTreeRole - Tree with extra methods for tree drawing
 
 =head1 SYNOPSIS
 

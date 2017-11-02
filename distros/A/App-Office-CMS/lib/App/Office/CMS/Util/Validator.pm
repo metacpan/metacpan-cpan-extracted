@@ -1,32 +1,33 @@
 package App::Office::CMS::Util::Validator;
 
-use Any::Moose;
-use common::sense;
+use strict;
+use warnings;
 
 use Brannigan;
 
 use CGI::Untaint;
+
+use Moo;
+
+use Types::Standard qw/Any HashRef/;
 
 extends 'App::Office::CMS::Database::Base';
 
 has config =>
 (
 	is  => 'rw',
-	isa => 'HashRef',
+	isa => HashRef,
 	required => 1,
 );
 
 has query =>
 (
 	is  => 'ro',
-	isa => 'CGI',
+	isa => Any, # 'CGI'.
 	required => 1,
 );
 
-# If Moose...
-#use namespace::autoclean;
-
-our $VERSION = '0.92';
+our $VERSION = '0.93';
 
 # -----------------------------------------------
 
@@ -333,10 +334,5 @@ sub validate_site_and_design
 } # End of validate_site_and_design.
 
 # --------------------------------------------------
-
-no Any::Moose;
-
-# If Moose...
-#__PACKAGE__ -> meta -> make_immutable;
 
 1;

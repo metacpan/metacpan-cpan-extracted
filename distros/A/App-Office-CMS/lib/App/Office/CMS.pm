@@ -1,6 +1,6 @@
 package App::Office::CMS;
 
-our $VERSION = '0.92';
+our $VERSION = '0.93';
 
 # -----------------------------------------------
 
@@ -10,7 +10,7 @@ our $VERSION = '0.92';
 
 =head1 NAME
 
-L<App::Office::CMS> - The Canny, Microlight and Simple CMS
+App::Office::CMS - The Canny, Microlight and Simple CMS
 
 =head1 Synopsis
 
@@ -18,7 +18,7 @@ The scripts discussed here, I<cms.cgi> and I<cms.psgi>, are shipped with this mo
 
 A classic CGI script, I<cms.cgi>:
 
-	#!/usr/bin/perl
+	#!/usr/bin/env perl
 
 	use strict;
 	use warnings;
@@ -44,7 +44,7 @@ A classic CGI script, I<cms.cgi>:
 
 A L<Plack> script, I<cms.psgi>:
 
-	#!/usr/bin/perl
+	#!/usr/bin/env perl
 
 	use strict;
 	use warnings;
@@ -94,7 +94,7 @@ to design both the menu itself and the whole web site.
 
 =item o Microlight
 
-This means L<Any::Moose> to get L<Mouse> rather than L<Moose>.
+This means use L<Moo> rather than L<Moose>.
 
 For the same reason, L<DBIx::Simple> rather than L<DBIx::Class>.
 
@@ -511,9 +511,9 @@ This is used to validate CGI form data.
 
 See docs/cms.schema.png.
 
-The file was created with scripts/schema.sh, which uses dbigraph.pl.
+The file was created with scripts/schema.sh, which uses dbi.schema.pl.
 
-dbigraph.pl ships with L<GraphViz::DBI>. I patched it to use L<GraphViz::DBI::General>.
+That program is a version of dbigraph.pl, which ships with L<GraphViz::DBI>.
 
 =item o Does the database server have pre-requisites?
 
@@ -547,7 +547,7 @@ So, why are there 2 lines, and not something like 'pg_dump -U cms cms > /tmp/pg.
 
 Because I use L<Capture::Tiny>, which does not want you to use redirection.
 
-Lastly, the output is written using L<File::Slurp>.
+Lastly, the output is written using L<File::Slurper>.
 
 =item o What's this thing called 'context' in the menus and pages tables?
 
@@ -826,6 +826,10 @@ Considered and rejected: L<HTML::Sanitizer>, L<HTML::Scrubber>.
 
 =back
 
+=head1 Repository
+
+L<https://github.com/ronsavage/App-Office-CMS.git>
+
 =head1 Support
 
 Email the author, or log a bug on RT:
@@ -844,8 +848,8 @@ Australian copyright (c) 2010, Ron Savage.
 
 	All Programs of mine are 'OSI Certified Open Source Software';
 	you can redistribute them and/or modify them under the terms of
-	The Artistic License, a copy of which is available at:
-	http://www.opensource.org/licenses/index.html
+	The Perl License, a copy of which is available at:
+	http://dev.perl.org/licenses/
 
 =cut
 

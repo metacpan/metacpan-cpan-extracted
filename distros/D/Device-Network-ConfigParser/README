@@ -1,9 +1,9 @@
 
 
 This archive contains the distribution Device-Network-ConfigParser,
-version 0.002:
+version 0.004:
 
-  Harness for parsing network device confiugrations
+  A harness for parsing network device configuration.
 
 This software is copyright (c) 2017 by Greg Foletta.
 

@@ -1,5 +1,43 @@
 Revision history for App-TestOnTap
 
+0.040	2017-11-02
+
+	Broken MANIFEST causing missing file!
+	
+
+0.040	2017-11-02
+
+	Broken MANIFEST causing missing file!
+	
+
+0.039	2017-11-01
+
+	Broken metadata (?)
+	
+	PAUSE claims failure on indexing; try again to drop away a few things that I'd
+	rather not have show up as bona fide modules (even if they are)...
+
+0.038	2017-11-01
+
+	Bug fixes and feature changes
+	
+	NOTE: not all is backwards compatible!
+	
+	A revamp of the hidden _pp flag, now includes _info stuff to enable the listing
+	of conditions (e.g. versions of modules, config etc) for the non-packed and
+	packed copy respectively.
+	
+	--defines didn't make it into the meta file
+	
+	renamed some samples to better use .t as the preferred (perl code) test
+	extension
+	
+	Addition of a postprocess mechanism similar to preprocess
+	
+	The default/internal execmap is now not automatically used for safety reasons,
+	must be requested.
+	
+
 0.037	2017-10-16
 
 	Change in Config::Std 0.901 => 0.903 unexplicably broke a 'use Config::Std qw(read_config)' line in App::TestOnTap which consequently broke a test...

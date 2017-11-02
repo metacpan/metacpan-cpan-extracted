@@ -1,31 +1,32 @@
 package App::Office::CMS::Database::Menu;
 
-use Any::Moose;
-use common::sense;
+use strict;
+use warnings;
+
+use Moo;
 
 use Tree::DAG_Node::Persist;
+
+use Types::Standard qw/Str/;
 
 extends 'App::Office::CMS::Database::Base';
 
 has context =>
 (
- is       => 'rw',
- isa      => 'Str',
- required => 0,
+	is       => 'rw',
+	isa      => Str,
+	required => 0,
 );
 
 has table_name =>
 (
- is       => 'ro',
- isa      => 'Str',
- required => 0,
- default  => 'menus',
+	is       => 'ro',
+	isa      => Str,
+	required => 0,
+	default  => sub {return 'menus'},
 );
 
-# If Moose...
-#use namespace::autoclean;
-
-our $VERSION = '0.92';
+our $VERSION = '0.93';
 
 # --------------------------------------------------
 
@@ -225,10 +226,5 @@ sub update
 } # End of update.
 
 # --------------------------------------------------
-
-no Any::Moose;
-
-# If Moose...
-#__PACKAGE__ -> meta -> make_immutable;
 
 1;

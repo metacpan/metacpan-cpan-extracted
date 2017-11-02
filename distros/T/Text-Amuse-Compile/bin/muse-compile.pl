@@ -11,6 +11,7 @@ use File::Spec::Functions qw/catfile/;
 use Pod::Usage;
 use Text::Amuse::Compile::Utils qw/append_file/;
 use Text::Amuse::Compile::TemplateOptions;
+use Text::Amuse::Compile::Fonts;
 use Encode;
 
 binmode STDOUT, ':encoding(utf-8)';
@@ -132,6 +133,13 @@ A specification JSON file with the list of fonts. This permits you to
 use arbitrary fonts. To create one with the default list, you can use
 the command L<muse-create-font-file.pl>, generate one, then pass it to
 this script together with --extra mainfont="Font Name".
+
+If not provided, the main/sans/mono font options will be used. Please
+note that you can't build epub with embedded fonts without the
+fontspec file (because the location of the fonts is unknown) and that
+you will be bypassing any font name validation, so there is no
+guarantee that they are valid. Here the script assumes that you know
+what you are doing when setting a font name.
 
 =item --webfontsdir
 
@@ -293,6 +301,36 @@ if ($output_templates and exists $options{ttdir}) {
         mkpath($options{ttdir}) or die "Couldn't create $options{ttdir} $!";
     }
 }
+
+# at the CLI, we don't validate the font names if no fontspec is
+# passed. However, epub will not be able to embed the fonts, as their
+# location is unknown and for that you do need a fontspec file.
+
+unless ($args{fontspec}) {
+    my @list = @{Text::Amuse::Compile::Fonts->default_font_list};
+    my %map = (
+               mainfont => 'serif',
+               sansfont => 'sans',
+               monofont => 'mono',
+              );
+    foreach my $font (qw/mainfont sansfont monofont/) {
+        if (my $name = $args{extra}{$font}) {
+            my $type = $map{$font} or die;
+            unless (grep { $_->{name} eq $name && $_->{type} eq $type } @list) {
+                print "$type font $name is unknown, trying to use it anyway\n";
+                push @list, {
+                             name => $name,
+                             desc => $name,
+                             type => $type,
+                            };
+            }
+        }
+    }
+    $args{fontspec} = \@list;
+}
+
+
+
 
 my $compiler = Text::Amuse::Compile->new(%args, cleanup => $cleanup);
 

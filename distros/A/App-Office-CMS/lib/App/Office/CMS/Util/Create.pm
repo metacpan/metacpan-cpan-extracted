@@ -1,7 +1,7 @@
 package App::Office::CMS::Util::Create;
 
-use Any::Moose;
-use common::sense;
+use strict;
+use warnings;
 
 use App::Office::CMS::Database;
 use App::Office::CMS::Util::Config;
@@ -9,52 +9,53 @@ use App::Office::CMS::Util::Config;
 use DBIx::Admin::CreateTable;
 use DBIx::Admin::TableInfo;
 
-use File::Slurp; # For read_file.
+use File::Slurper 'read_lines';
 
 use FindBin;
+
+use Moo;
+
+use Types::Standard qw/Any HashRef Str/;
 
 extends 'App::Office::CMS::Database::Base';
 
 has config =>
 (
 	is  => 'rw',
-	isa => 'HashRef',
+	isa => HashRef,
 );
 
 has creator =>
 (
 	is  => 'rw',
-	isa => 'Any',
+	isa => Any,
 );
 
 has db =>
 (
 	is  => 'rw',
-	isa => 'Any',
+	isa => Any,
 );
 
 has engine =>
 (
 	is  => 'rw',
-	isa => 'Str',
+	isa => Str,
 );
 
 has time_option =>
 (
 	is  => 'rw',
-	isa => 'Str',
+	isa => Str,
 );
 
 has verbose =>
 (
 	is  => 'rw',
-	isa => 'Any',
+	isa => Any,
 );
 
-# If Moose...
-#use namespace::autoclean;
-
-our $VERSION = '0.92';
+our $VERSION = '0.93';
 
 # -----------------------------------------------
 
@@ -258,6 +259,7 @@ sub create_log_table
 	my($self)        = @_;
 	my($table_name)  = 'log';
 	my($primary_key) = $self -> creator -> generate_primary_key_sql($table_name);
+	my($type)        = $self -> creator -> db_vendor eq 'ORACLE' ? 'long' : 'text';
 	my($engine)      = $self -> engine;
 	my($time_option) = $self -> time_option;
 	my($result)      = $self -> creator -> create_table(<<SQL);
@@ -265,7 +267,7 @@ create table $table_name
 (
 id $primary_key,
 level varchar(9) not null,
-message varchar(255) not null,
+message $type not null,
 timestamp timestamp $time_option not null default current_timestamp
 ) $engine
 SQL
@@ -588,7 +590,7 @@ sub read_a_file
 {
 	my($self, $input_file_name) = @_;
 	$input_file_name = "$FindBin::Bin/../data/$input_file_name";
-	my(@line)        = read_file($input_file_name);
+	my(@line)        = read_lines($input_file_name);
 
 	chomp @line;
 
@@ -644,10 +646,5 @@ sub report_all_tables
 }	# End of report_all_tables.
 
 # -----------------------------------------------
-
-no Any::Moose;
-
-# If Moose...
-#__PACKAGE__ -> meta -> make_immutable;
 
 1;

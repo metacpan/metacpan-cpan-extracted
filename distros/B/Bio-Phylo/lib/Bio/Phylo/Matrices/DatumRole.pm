@@ -1,5 +1,6 @@
 package Bio::Phylo::Matrices::DatumRole;
 use strict;
+use warnings;
 use Bio::Phylo::Util::MOP;
 use base qw'Bio::Phylo::Matrices::TypeSafeData Bio::Phylo::Taxa::TaxonLinker';
 use Bio::Phylo::Util::OptionalInterface 'Bio::Seq';
@@ -520,7 +521,7 @@ Calculates the distance between the invocant and argument
  Returns : A number, the distance per site
  Args    : Another datum to calculate the distance to
  Comments: Assumes the sequences are aligned. Calculates
-           substitutions / total non-missing sites.
+           substitutions / total non-missing and non-gapped sites.
 =cut
 
 	sub calc_distance {

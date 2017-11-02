@@ -78,10 +78,10 @@ sub _current_route {
 }
 
 sub _delay {
-  my $c     = shift;
-  my $tx    = $c->render_later->tx;
-  my $delay = Mojo::IOLoop->delay(@_);
-  $delay->catch(sub { $c->helpers->reply->exception(pop) and undef $tx })->wait;
+  my $c  = shift;
+  my $tx = $c->render_later->tx;
+  Mojo::IOLoop->delay(@_)
+    ->catch(sub { $c->helpers->reply->exception(pop) and undef $tx })->wait;
 }
 
 sub _development {
@@ -303,18 +303,16 @@ Check or get name of current route.
 
   $c->delay(sub {...}, sub {...});
 
-Disable automatic rendering and use L<Mojo::IOLoop/"delay"> to manage callbacks
-and control the flow of events, which can help you avoid deep nested closures
-that often result from continuation-passing style. Also keeps a reference to
-L<Mojolicious::Controller/"tx"> in case the underlying connection gets closed
-early, and calls L</"reply-E<gt>exception"> if an exception gets thrown in one
-of the steps, breaking the chain.
+Disable automatic rendering and use L<Mojo::IOLoop/"delay"> for flow-control.
+Also keeps a reference to L<Mojolicious::Controller/"tx"> in case the underlying
+connection gets closed early, and calls L</"reply-E<gt>exception"> if an
+exception gets thrown in one of the steps, breaking the chain.
 
   # Longer version
   $c->render_later;
   my $tx    = $c->tx;
-  my $delay = Mojo::IOLoop->delay(sub {...}, sub {...});
-  $delay->catch(sub { $c->reply->exception(pop) and undef $tx })->wait;
+  my $delay = Mojo::IOLoop->delay(sub {...}, sub {...})
+  $delay->catch(sub { $c->helpers->reply->exception(pop) and undef $tx })->wait;
 
   # Non-blocking request
   $c->delay(

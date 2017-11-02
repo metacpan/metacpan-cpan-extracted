@@ -42,7 +42,18 @@ define ([
     coreLib,
 ) {
 
-    var //today = Object.create(Date.prototype),
+    var mflt = [null, 'January', 'February', 'March', 'April', 'May',
+                'June', 'July', 'August', 'September', 'October',
+                'November', 'December'],
+
+        mlo = { 'jan': 'January', 'feb': 'February', 'mar': 'March',
+                'apr': 'April', 'may': 'May', 'jun': 'June', 'jul': 'July',
+                'aug': 'August', 'sep': 'September', 'oct': 'October',
+                'nov': 'November', 'dec': 'December' },
+
+        mlt =  [null, 'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL',
+                'AUG', 'SEP', 'OCT', 'NOV', 'DEC'],
+
         today = new Date(),
 
         addMinutes = function (date, minutes) {
@@ -71,7 +82,7 @@ define ([
                     rts[i] = "0";
                 }
             }
-            if (!coreLib.isInteger(rts[0]) || !coreLib.isInteger(rts[1])) {
+            if (! coreLib.isInteger(rts[0]) || ! coreLib.isInteger(rts[1])) {
                 return null;
             }
             h = parseInt(rts[0], 10);
@@ -179,6 +190,22 @@ define ([
             return ftr;
         },
 
+        currentMonth = function () {
+            var cm = (new Date()).getMonth() + 1;
+            return intToMonth(m, true);
+        },
+
+        currentYear = function () {
+            return String((new Date()).getFullYear());
+        },
+
+        daysInMonth = function (year, month) {
+            if (! coreLib.isInteger(month)) {
+                month = monthToInt(month);
+            }
+            return new Date(year, month, 0).getDate();
+        },
+
         intToDay = function (d) {
             var day = null;
             // if 0 <= m <= 6, return three-letter string signifying the day
@@ -203,36 +230,18 @@ define ([
             return day;
         },
 
-        intToMonth = function (m) {
+        intToMonth = function (m, full) {
             var month = null;
             // if 1 <= m <= 12, return three-letter string signifying the month
             // otherwise, return null
             console.log("Entering intToMonth() with argument", m);
             m = parseInt(m, 10);
-            if (m === 1) {
-                month = "JAN";
-            } else if (m === 2) {
-                month = "FEB";
-            } else if (m === 3) {
-                month = "MAR";
-            } else if (m === 4) {
-                month = "APR";
-            } else if (m === 5) {
-                month = "MAY";
-            } else if (m === 6) {
-                month = "JUN";
-            } else if (m === 7) {
-                month = "JUL";
-            } else if (m === 8) {
-                month = "AUG";
-            } else if (m === 9) {
-                month = "SEP";
-            } else if (m === 10) {
-                month = "OCT";
-            } else if (m === 11) {
-                month = "NOV";
-            } else if (m === 12) {
-                month = "DEC";
+            if (m > 0 && m < 13) {
+                if (full === true) {
+                    month = mflt[m];
+                } else {
+                    month = mlt[m];
+                }
             }
             return month;
         }, // intToMonth
@@ -306,6 +315,7 @@ define ([
         monthToInt = function (month) {
             console.log("Entering monthToInt() with argument", month);
             var m = 0;
+            month = String(month).trim().toUpperCase().slice(0, 3);
             if (month === "JAN") {
                 m = 1;
             } else if (month === "FEB") {
@@ -332,41 +342,39 @@ define ([
                 m = 12;
             }
             return m;
-        }, // intToMonth
+        }, // monthToInt
 
-        strToMonth = function (buf) {
+        readableDate = function (urd) {
+            // convert "YYYY-MM-DD HH:DD:SS+TZ" string into YYYY-MMM-DD
+            var ymd = urd.substr(0, urd.indexOf(" ")).split('-'),
+                year,
+                m,
+                day,
+                month;
+            if (ymd.length !== 3) {
+                return urd;
+            }
+            year = parseInt(ymd[0], 10);
+            m =    parseInt(ymd[1], 10);
+            day =  parseInt(ymd[2], 10);
+            month = intToMonth(m);
+            return year.toString() + "-" + month + "-" + day.toString();
+        }, // readableDate
+
+        strToMonth = function (buf, full) {
             console.log("Entering strToMonth() with argument", buf);
-            var m = String(buf).toLowerCase().slice(0, 3),
-                month = null;
+            var m = String(buf).trim().toLowerCase().slice(0, 3);
             if (m.length < 3) {
                 return null;
             }
-            if (m === 'jan') {
-                month = "JAN";
-            } else if (m === 'feb') {
-                month = "FEB";
-            } else if (m === 'mar') {
-                month = "MAR";
-            } else if (m === 'apr') {
-                month = "APR";
-            } else if (m === 'may') {
-                month = "MAY";
-            } else if (m === 'jun') {
-                month = "JUN";
-            } else if (m === 'jul') {
-                month = "JUL";
-            } else if (m === 'aug') {
-                month = "AUG";
-            } else if (m === 'sep') {
-                month = "SEP";
-            } else if (m === 'oct') {
-                month = "OCT";
-            } else if (m === 'nov') {
-                month = "NOV";
-            } else if (m === 'dec') {
-                month = "DEC";
+            if (mlo.hasOwnProperty(m)) {
+                if (full === true) {
+                    return mlo[m];
+                } else {
+                    return m.toUpperCase();
+                }
             }
-            return month;
+            return null;
         }, // strToMonth
 
         timeToMinutes = function (ts) {
@@ -386,6 +394,12 @@ define ([
             return buf[0] * 60 + buf[1];
         },
 
+        tsrangeToDateAndTimeRange = function (tsr) {
+            // tsr looks like this: ["2017-10-20 08:00:00+02","2017-10-20 12:00:00+02")
+            var date = tsr.match(/\d{4}-\d{2}-\d{2}/)[0];
+            return [date, tsrangeToTimeRange(tsr)];
+        },
+
         tsrangeToTimeRange = function (tsr) {
             // tsr looks like this: ["2017-10-20 08:00:00+02","2017-10-20 12:00:00+02")
             var begin, end, h, m, s, re = /\d{2}:\d{2}:\d{2}/;
@@ -399,13 +413,109 @@ define ([
             return begin + '-' + end;
         },
 
+        vetDate = function (d) {
+            console.log("Entering vetDate() with argument", d);
+            var i,
+                td = String(d).trim(),
+                tda;
+
+            // handle offset date (e.g. "-1", "+2")
+            if (td === "0" || td.match(/^[+-]\d+$/)) {
+                return vetDateOffset(td);
+            }
+
+            tda = td.split(/-|\.|\/|\s+/);
+            console.log("Identified " + tda.length + " date components", tda);
+
+            if (tda.length === 1 && String(tda[0]).length === 0) {
+                return vetDateNothing();
+            } else if (tda.length === 1) {
+                return vetDateDD(tda);
+            } else if (tda.length === 2) {
+                if (coreLib.isInteger(tda[0]) && ! coreLib.isInteger(tda[1])) {
+                    return vetDateDDMM(tda);
+                } else {
+                    return vetDateMMDD(tda);
+                }
+            } else if (tda.length === 3) {
+                return vetDateYYYYMMDD(tda);
+            }
+            return null;
+        },
+
+        vetDateDD = function (ds) {
+            var d4 = String(ds).toLowerCase().slice(0, 4);
+            if (d4 == "toda") {
+                return vetDateOffset(0);
+            }
+            if (d4 == "yest") {
+                return vetDateOffset(-1);
+            }
+            if (d4 == "tomo") {
+                return vetDateOffset(+1);
+            }
+            return vetDateYYYYMMDD([
+                today.getFullYear(), today.getMonth() + 1, ds[0]
+            ]);
+        }, // vetDateDD
+
+        vetDateDDMM = function (ds) {
+            return vetDateYYYYMMDD([
+                today.getFullYear(), ds[1], ds[0]
+            ]);
+        }, // vetDateDDMM
+
+        vetDateMMDD = function (ds) {
+            console.log("Entering vetDateMMDD() with argument", ds);
+            var ds0 = ds[0],
+                ds1 = ds[1];
+            if (coreLib.isInteger(ds[0]) && coreLib.isInteger(ds[1])) {
+                ds0 = parseInt(ds0, 10);
+                ds1 = parseInt(ds1, 10);
+                if (ds0 > 12 && ds1 < 13) {
+                    ds0 = ds[1];
+                    ds1 = ds[0];
+                }
+            }
+            return vetDateYYYYMMDD([
+                today.getFullYear(), ds0, ds1
+            ]);
+        }, // vetDateMMDD
+
+        vetDateOffset = function (dof) {
+            console.log("Entering vetDateOffset() with argument", dof);
+            var d = new Date();
+            d.setDate(d.getDate() + parseInt(dof, 10));
+            return vetDateYYYYMMDD([
+                d.getFullYear(), d.getMonth() + 1, d.getDate()
+            ]);
+        }, //vetDateOffset
+
+        vetDateNothing = function () {
+            return vetDateYYYYMMDD([
+                today.getFullYear(), today.getMonth() + 1, today.getDate()
+            ]);
+        }, // vetDateNothing
+
+        vetDateRange = function (dr) {
+            // should support ranges of dates (using a hyphen)
+            // should support whole months (e.g. 2017 AUGUST, August 2017)
+            // if year is omitted, assume current year
+            // should trim all whitespace (leading, trailing, internal)
+            // on success, returns e.g. { "2017-02-01", "2017-02-28" }
+            // on failure, returns null
+            // TBD
+            var tdr = String(dr).trim();
+            return "VETTED";
+        },
+
         vetDateYYYYMMDD = function (ds) {
             console.log("Entering vetDateYYYYMMDD() with argument", ds);
             var y = parseInt(ds[0], 10),
                 m = ds[1],
                 d = parseInt(ds[2], 10),
                 month;
-            if (!coreLib.isInteger(y) || !coreLib.isInteger(d)) {
+            if (! coreLib.isInteger(y) || ! coreLib.isInteger(d)) {
                 console.log("Non-integer year or day-of-month");
                 return null;
             }
@@ -433,7 +543,7 @@ define ([
                     return null;
                 }
             }
-            if (!coreLib.isInteger(d) || d < 1 || d > 31) {
+            if (! coreLib.isInteger(d) || d < 1 || d > 31) {
                 console.log("Day-of-month out of range");
                 return null;
             }
@@ -444,157 +554,76 @@ define ([
                    String(d);
         }, // vetDateYYYYMMDD
 
-        vetDateMMDD = function (ds) {
-            console.log("Entering vetDateMMDD() with argument", ds);
-            var ds0 = ds[0],
-                ds1 = ds[1];
-            if (coreLib.isInteger(ds[0]) && coreLib.isInteger(ds[1])) {
-                ds0 = parseInt(ds0, 10);
-                ds1 = parseInt(ds1, 10);
-                if (ds0 > 12 && ds1 < 13) {
-                    ds0 = ds[1];
-                    ds1 = ds[0];
-                }
-            }
-            return vetDateYYYYMMDD([
-                today.getFullYear(), ds0, ds1
-            ]);
-        }, // vetDateMMDD
-
-        vetDateDDMM = function (ds) {
-            return vetDateYYYYMMDD([
-                today.getFullYear(), ds[1], ds[0]
-            ]);
-        }, // vetDateDDMM
-
-        vetDateDD = function (ds) {
-            var d4 = String(ds).toLowerCase().slice(0, 4);
-            if (d4 == "toda") {
-                return vetDateOffset(0);
-            }
-            if (d4 == "yest") {
-                return vetDateOffset(-1);
-            }
-            if (d4 == "tomo") {
-                return vetDateOffset(+1);
-            }
-            return vetDateYYYYMMDD([
-                today.getFullYear(), today.getMonth() + 1, ds[0]
-            ]);
-        }, // vetDateDD
-
-        vetDateNothing = function () {
-            return vetDateYYYYMMDD([
-                today.getFullYear(), today.getMonth() + 1, today.getDate()
-            ]);
-        }, // vetDateNothing
-
-        vetDateOffset = function (dof) {
-            console.log("Entering vetDateOffset() with argument", dof);
-            var d = new Date();
-            d.setDate(d.getDate() + parseInt(dof, 10));
-            return vetDateYYYYMMDD([
-                d.getFullYear(), d.getMonth() + 1, d.getDate()
-            ]);
-        } //vetDateOffset
-        ;
-
-    return {
-
-        addMinutes: addMinutes,
-
-        canonicalizeTime: canonicalizeTime,
-
-        canonicalizeTimeRange: canonicalizeTimeRange,
-
-        canonicalizeTimeRangeOffset: canonicalizeTimeRangeOffset,
-
-        intToDay: intToDay,
-
-        intToMonth: intToMonth,
-
-        isTimeRangeAfterTime: isTimeRangeAfterTime,
-
-        isTimeWithinTimeRange: isTimeWithinTimeRange,
-
-        minutesToTime: minutesToTime,
-
-        monthToInt: monthToInt,
-
-        // convert "YYYY-MM-DD HH:DD:SS+TZ" string into YYYY-MMM-DD
-        readableDate: function (urd) {
-            var ymd = urd.substr(0, urd.indexOf(" ")).split('-'),
-                year,
-                m,
-                day,
-                month;
-            if (ymd.length !== 3) {
-                return urd;
-            }
-            year = parseInt(ymd[0], 10);
-            m =    parseInt(ymd[1], 10);
-            day =  parseInt(ymd[2], 10);
-            month = intToMonth(m);
-            return year.toString() + "-" + month + "-" + day.toString();
-        }, // readableDate
-
-        strToMonth: strToMonth,
-
-        timeToMinutes: timeToMinutes,
-
-        tsrangeToTimeRange: tsrangeToTimeRange,
-
-        vetDateYYYYMMDD: vetDateYYYYMMDD,
-
-        vetDateOffset: vetDateOffset,
-
-        vetDateMMDD: vetDateMMDD,
-
-        vetDateDD: vetDateDD,
-
-        vetDate: function (d) {
-            console.log("Entering vetDate() with argument", d);
-            var i,
-                td = String(d).trim(),
-                tda;
-
-            // handle offset date (e.g. "-1", "+2")
-            if (td === "0" || td.match(/^[+-]\d+$/)) {
-                return vetDateOffset(td);
-            }
-
-            tda = td.split(/-|\.|\/|\s+/);
-            console.log("Identified " + tda.length + " date components", tda);
-
-            if (tda.length === 1 && String(tda[0]).length === 0) {
-                return vetDateNothing();
-            } else if (tda.length === 1) {
-                return vetDateDD(tda);
-            } else if (tda.length === 2) {
-                if (coreLib.isInteger(tda[0]) && !coreLib.isInteger(tda[1])) {
-                    return vetDateDDMM(tda);
+        vetDayList = function (tokens) {
+            // tokens is an array of integers supposed to be days of a month
+            // each array member can be:
+            // - a single day (e.g. "1", "30")
+            // - a range (e.g. "6-12")
+            var daylist = [],
+                i, j, rangeBegin, rangeEnd, t;
+            console.log("Entering vetDayList() with tokens", tokens);
+            for (i = 0; i < tokens.length; i += 1) {
+                tokens[i] = tokens[i].trim();
+                t = tokens[i];
+                // console.log("Iterating with token " + t);
+                // t is either a number or a range: if it's a number, push it 
+                // to daylist. If it's a range, push each range member.
+                if (t.indexOf('-') === -1) {
+                    if (! coreLib.isInteger(t) || t < 1 || t > 31) {
+                        console.log("Ignoring non-numeric dayspec " + t);
+                        continue;
+                    }
+                    daylist.push(t);
                 } else {
-                    return vetDateMMDD(tda);
+                    [rangeBegin, rangeEnd] = t.split('-');
+                    rangeBegin = parseInt(rangeBegin, 10);
+                    rangeEnd = parseInt(rangeEnd, 10);
+                    if (! coreLib.isInteger(rangeBegin) || ! coreLib.isInteger(rangeEnd) ||
+                        rangeBegin < 1 || rangeBegin > 31 ||
+                        rangeEnd < 1 || rangeEnd > 31 ||
+                        rangeBegin > rangeEnd) {
+                        console.log("Ignoring invalid day range ->" + t + "<-");
+                        continue;
+                    }
+                    // console.log("Encountered range from " + rangeBegin + " to " + rangeEnd);
+                    for (j = rangeBegin; j < (rangeEnd + 1); j += 1) {
+                        // console.log("Looping j == " + j);
+                        daylist.push(j);
+                        if (j > 31) {
+                            console.log("Illegal j", j);
+                            break;
+                        }
+                    }
+                    // console.log("Completed j-loop");
                 }
-            } else if (tda.length === 3) {
-                return vetDateYYYYMMDD(tda);
+                if (i > 100) {
+                    console.log("Illegal i", i);
+                    break;
+                }
+            }
+            // console.log("Completed i-loop");
+            return (coreLib.uniq(daylist)).sort(
+                function(a, b) { return a - b; }
+            );
+        },
+
+        vetMonth = function (m) {
+            var cm = (new Date()).getMonth() + 1,
+                itm = intToMonth(m, true),
+                stm = strToMonth(m, true);
+            if (m === undefined || m === null || String(m).length === 0) {
+                return intToMonth(cm, true);
+            }
+            if (itm !== null) {
+                return itm;
+            }
+            if (stm !== null) {
+                return stm;
             }
             return null;
         },
 
-        vetDateRange: function (dr) {
-            // should support ranges of dates (using a hyphen)
-            // should support whole months (e.g. 2017 AUGUST, August 2017)
-            // if year is omitted, assume current year
-            // should trim all whitespace (leading, trailing, internal)
-            // on success, returns e.g. { "2017-02-01", "2017-02-28" }
-            // on failure, returns null
-            // TBD
-            var tdr = String(dr).trim();
-            return "VETTED";
-        },
-
-        vetTimeRange: function (tr) {
+        vetTimeRange = function (tr) {
             var ctr = canonicalizeTimeRange(tr);
             if (ctr === null) {
                 return null
@@ -604,6 +633,55 @@ define ([
             return ctr;
         },
 
+        vetYear = function (y) {
+            var iy = parseInt(y, 10);
+            // console.log("Entering vetYear()", iy, typeof iy);
+            if (Number.isNaN(iy)) {
+                return currentYear();
+            }
+            if (iy < 0 || iy > 2100) {
+                return null;
+            }
+            if (iy < 1900) {
+                if (iy < 100) {
+                    return String(2000 + iy);
+                } else {
+                    return null;
+                }
+            }
+            return y;
+        }
+        ;
+
+    return {
+        addMinutes: addMinutes,
+        canonicalizeTime: canonicalizeTime,
+        canonicalizeTimeRange: canonicalizeTimeRange,
+        canonicalizeTimeRangeOffset: canonicalizeTimeRangeOffset,
+        currentMonth: currentMonth,
+        currentYear: currentYear,
+        daysInMonth: daysInMonth,
+        intToDay: intToDay,
+        intToMonth: intToMonth,
+        isTimeRangeAfterTime: isTimeRangeAfterTime,
+        isTimeWithinTimeRange: isTimeWithinTimeRange,
+        minutesToTime: minutesToTime,
+        monthToInt: monthToInt,
+        readableDate: readableDate,
+        strToMonth: strToMonth,
+        timeToMinutes: timeToMinutes,
+        tsrangeToDateAndTimeRange: tsrangeToDateAndTimeRange,
+        tsrangeToTimeRange: tsrangeToTimeRange,
+        vetDate: vetDate,
+        vetDateDD: vetDateDD,
+        vetDateMMDD: vetDateMMDD,
+        vetDateOffset: vetDateOffset,
+        vetDateRange: vetDateRange,
+        vetDateYYYYMMDD: vetDateYYYYMMDD,
+        vetDayList: vetDayList,
+        vetMonth: vetMonth,
+        vetTimeRange: vetTimeRange,
+        vetYear: vetYear,
     };
 
 });

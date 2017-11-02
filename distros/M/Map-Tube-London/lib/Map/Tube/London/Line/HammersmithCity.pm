@@ -1,6 +1,6 @@
 package Map::Tube::London::Line::HammersmithCity;
 
-$Map::Tube::London::Line::HammersmithCity::VERSION   = '0.91';
+$Map::Tube::London::Line::HammersmithCity::VERSION   = '0.92';
 $Map::Tube::London::Line::HammersmithCity::AUTHORITY = 'cpan:MANWAR';
 
 use 5.006;
@@ -12,7 +12,7 @@ Map::Tube::London::Line::HammersmithCity - London Tube Map: Hammersmith & City L
 
 =head1 VERSION
 
-Version 0.91
+Version 0.92
 
 =head1 DESCRIPTION
 

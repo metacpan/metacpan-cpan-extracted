@@ -51,59 +51,69 @@ sub get_parser {
             web { $item[1] } |
             not_config { $item[1] }
 
-        aaa: 'set aaa' { { type => $item[0], config => "yes" } }
-        arp: 'set arp' { { type => $item[0], config => "yes" } }
-        bonding: 'set bonding' { { type => $item[0], config => "yes" } }
+        aaa: 'set aaa' m{\N+} { { type => $item[0], config => "yes" } }
+        arp: 'set arp' m{\N+} { { type => $item[0], config => "yes" } }
+        bonding: 'set bonding' m{\N+} { { type => $item[0], config => "yes" } }
 
-        clienv: 'set clienv' config_lock { type => $item[0], config => { @{ $item[2] } } }
-        config_lock: 'config-lock' m{on|off} { [$item[0], $item[2]] }
+        clienv: 'set clienv' config_lock { { type => $item[0], config => { @{ $item[2] } } } }
+            config_lock: 'config-lock' m{on|off} { [$item[0], $item[2]] }
 
 
-        core_dump: 'set core-dump' { { type => $item[0], config => "yes" } }
-        dns: 'set dns' { { type => $item[0], config => "yes" } }
-        domainname: 'set domainname' { { type => $item[0], config => "yes" } }
-        format: 'set format' { { type => $item[0], config => "yes" } }
-        hostname: 'set hostname' { { type => $item[0], config => "yes" } }
-        inactivity_timeout: 'set inactivity-timeout' { { type => $item[0], config => "yes" } }
-        ipv6: 'set ipv6' { { type => $item[0], config => "yes" } }
-        ipv6_state: 'set ipv6-state' { { type => $item[0], config => "yes" } }
-        management: 'set management' { { type => $item[0], config => "yes" } }
-        max_path_splits: 'set max-path-splits'{ { type => $item[0], config => "yes" } }
-        message: 'set message' { { type => $item[0], config => "yes" } }
-        net_access: 'set net-access' { { type => $item[0], config => "yes" } }
-        ntp: 'set ntp' { { type => $item[0], config => "yes" } }
-        ospf: 'set ospf' { { type => $item[0], config => "yes" } }
-        password_controls: 'set password-controls' { { type => $item[0], config => "yes" } }
-        pbr: 'set pbr' { { type => $item[0], config => "yes" } }
-        rip: 'set rip' { { type => $item[0], config => "yes" } }
-        snmp: 'set snmp' { { type => $item[0], config => "yes" } }
-        static_route: 'set static-route' { { type => $item[0], config => "yes" } }
-        timezone: 'set timezone' { { type => $item[0], config => "yes" } }
-        tracefile: 'set tracefile' { { type => $item[0], config => "yes" } }
-        user: 'set user' { { type => $item[0], config => "yes" } }
-        vrrp: 'set vrrp' { { type => $item[0], config => "yes" } }
-        web: 'set web' { { type => $item[0], config => "yes" } }
+        core_dump: 'set core-dump' m{\N+} { { type => $item[0], config => "yes" } }
+        dns: 'set dns' m{\N+} { { type => $item[0], config => "yes" } }
+        domainname: 'set domainname' m{\N+} { { type => $item[0], config => "yes" } }
+        format: 'set format' m{\N+} { { type => $item[0], config => "yes" } }
+        hostname: 'set hostname' m{\N+} { { type => $item[0], config => "yes" } }
+        inactivity_timeout: 'set inactivity-timeout' m{\N+} { { type => $item[0], config => "yes" } }
+        ipv6: 'set ipv6' m{\N+} { { type => $item[0], config => "yes" } }
+        ipv6_state: 'set ipv6-state' m{\N+} { { type => $item[0], config => "yes" } }
+        management: 'set management' m{\N+} { { type => $item[0], config => "yes" } }
+        max_path_splits: 'set max-path-splits'm{\N+} { { type => $item[0], config => "yes" } }
+        message: 'set message' m{\N+} { { type => $item[0], config => "yes" } }
+        net_access: 'set net-access' m{\N+} { { type => $item[0], config => "yes" } }
+        ntp: 'set ntp' m{\N+} { { type => $item[0], config => "yes" } }
+        ospf: 'set ospf' m{\N+} { { type => $item[0], config => "yes" } }
+        password_controls: 'set password-controls' m{\N+} { { type => $item[0], config => "yes" } }
+        pbr: 'set pbr' m{\N+} { { type => $item[0], config => "yes" } }
+        rip: 'set rip' m{\N+} { { type => $item[0], config => "yes" } }
+        snmp: 'set snmp' m{\N+} { { type => $item[0], config => "yes" } }
+
+        static_route: 'set static-route' destination (nexthop | comment) { { type => $item[0], config => { @{ $item[2] }, @{ $item[3]->[1] } } } }
+            destination: m{((\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{2})|default)} { [$item[0], $item[1]] }
+            nexthop: 'nexthop' (nexthop_blackhole | nexthop_reject | nexthop_address | nexthop_interface) { [@{$item[2]->[1]}] }
+            nexthop_blackhole: 'blackhole' { ['nexthop_type', $item[1]] }
+            nexthop_reject: 'reject' { ['nexthop_type', $item[1]] }
+            nexthop_address: 'gateway address' ipv4 m{on|off} { [nexthop_type => 'address', nexthop => $item[2]->[1], status => $item[3]] }
+            nexthop_interface: 'gateway logical' interface_name m{on|off} { [nexthop_type => 'interface', nexthop => $item[2]->[1], status => $item[3]] }
+            comment: 'comment' m{"[\w\s]+"} { [$item[0], $item[2]] }
+
+
+
+        timezone: 'set timezone' m{\N+} { { type => $item[0], config => "yes" } }
+        tracefile: 'set tracefile' m{\N+} { { type => $item[0], config => "yes" } }
+        user: 'set user' m{\N+} { { type => $item[0], config => "yes" } }
+        vrrp: 'set vrrp' m{\N+} { { type => $item[0], config => "yes" } }
+        web: 'set web' m{\N+} { { type => $item[0], config => "yes" } }
             
 
         interface: 
             'set interface' interface_name (ipv4_address_mask | vlan | state | comment | mtu | auto_negotiation | link_speed)
             { { type => $item[0], config => { name => $item[2]->[1], %{ $item[3]->[1] } } } }
 
-        interface_name: m{\S+} 
+            ipv4_address_mask: ipv4_address ipv4_mask { $return = { @{$item[1]}, @{$item[2]}} }
+            ipv4_address: 'ipv4-address' ipv4 { [$item[0], $item[2]->[1]] }
+            ipv4_mask: 'mask-length' m{\d+} { [$item[0], $item[2]] }
 
-        ipv4_address_mask: ipv4_address ipv4_mask { $return = { @{$item[1]}, @{$item[2]}} }
-        ipv4_address: 'ipv4-address' ipv4 { [$item[0], $item[2]->[1]] }
-        ipv4_mask: 'mask-length' m{\d+} { [$item[0], $item[2]] }
-
-        vlan: 'vlan' m{\d+} { $return = { $item[0], $item[2] } }
-        state: 'state' m{\S+} { $return = { $item[0], $item[2] } }
-        comment: 'comments' m{"[\w\s]+"} { $return = { $item[0], $item[2] } }
-        mtu: 'mtu' m{\d+} { $return = { $item[0], $item[2] } }
-        auto_negotiation: 'auto-negotiation' m{\S+} { $return = { $item[0], $item[2] } }
-        link_speed: 'link-speed' m{\S+} { $return = { $item[0], $item[2] } }
+            vlan: 'vlan' m{\d+} { $return = { $item[0], $item[2] } }
+            state: 'state' m{\S+} { $return = { $item[0], $item[2] } }
+            comment: 'comments' m{"[\w\s]+"} { $return = { $item[0], $item[2] } }
+            mtu: 'mtu' m{\d+} { $return = { $item[0], $item[2] } }
+            auto_negotiation: 'auto-negotiation' m{\S+} { $return = { $item[0], $item[2] } }
+            link_speed: 'link-speed' m{\S+} { $return = { $item[0], $item[2] } }
 
         # Utility definitions
         ipv4: m{\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}} 
+        interface_name: m{\S+} 
 
         not_config: m{\N+} 
         { { type => $item[0], config => $item[1] } }
@@ -138,8 +148,8 @@ sub post_process {
     # For each 'type' of config, (e.g. interface config), the aggregator key we're using to aggregate the separate
     # config lines together into a single hash.
     my $aggregator_keys_for = {
-        interface => q{$config_entry->{config}->{name}},
-        not_config => q{undef},
+        interface       => q{$config_entry->{config}->{name}},
+        static_route    => q{$config_entry->{config}->{destination}},
     };
 
     # Go through each config entry (which was originally each line of config. If there's an aggregate key defined, 
@@ -147,8 +157,8 @@ sub post_process {
     #
     # If not, then just push it to the post processed hash.
     for my $config_entry (@{ $parsed_config }) {
-        my $aggregate_key = eval $aggregator_keys_for->{ $config_entry->{type} };
-        if (defined $aggregate_key) {
+        if (exists $aggregator_keys_for->{ $config_entry->{type} }) {
+            my $aggregate_key = eval $aggregator_keys_for->{ $config_entry->{type} };
             @{ $aggregation{ $config_entry->{type} }{ $aggregate_key } }{ keys %{ $config_entry->{config} } } = values %{ $config_entry->{config} };
         } else {
             push @{ $post_processed_config{ $config_entry->{type} } }, $config_entry->{config};
@@ -172,6 +182,7 @@ sub csv_output_driver {
     my ($fh, $filename, $parsed_config) = @_;
     my $csv_type_driver = { 
         interface       => \&_csv_interface_driver,
+        static_route    => \&_csv_static_route_driver,
         not_config      => \&_csv_not_config_driver,
     };
 
@@ -208,6 +219,23 @@ sub _csv_interface_driver {
     }
 }
 
+
+sub _csv_static_route_driver {
+    my ($fh, $static_routes_ref) = @_;
+
+    my @static_route_properties = qw{destination nexthop nexthop_type status};
+    say $fh join(',', @static_route_properties);
+
+    for my $route (@{ $static_routes_ref }) {
+        my @properties = @{ $route }{ @static_route_properties };
+
+        # Replace any undef with an empty string
+        @properties =  map { defined $_ ? $_ : '' } @properties;
+        say $fh join(',', @properties);
+    }
+}
+
+
 sub _csv_not_config_driver {
     my ($fh, $not_config) = @_;
 
@@ -242,7 +270,7 @@ Device::Network::ConfigParser::CheckPoint::Gaia - Parse CheckPoint Configuration
 
 =head1 VERSION
 
-version 0.002
+version 0.004
 
 =head1 SYNOPSIS
 

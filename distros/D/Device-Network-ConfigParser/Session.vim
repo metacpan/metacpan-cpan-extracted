@@ -69,13 +69,15 @@ if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
 endif
 set shortmess=aoO
 badd +1 lib/Device/Network/ConfigParser/CheckPoint/Gaia.pm
-badd +1 lib/Device/Network/ConfigParser.pm
-badd +0 bin/config_parser
+badd +1 t/01-checkpoint_gaia.t
+badd +1 t/00-load.t
+badd +0 t/02-cisco_asa.t
+badd +0 lib/Device/Network/ConfigParser/Cisco/ASA.pm
 argglobal
 silent! argdel *
 argadd lib/Device/Network/ConfigParser/CheckPoint/Gaia.pm
 set stal=2
-edit lib/Device/Network/ConfigParser/CheckPoint/Gaia.pm
+edit lib/Device/Network/ConfigParser/Cisco/ASA.pm
 set splitbelow splitright
 wincmd t
 set winheight=1 winwidth=1
@@ -200,19 +202,17 @@ setlocal wrapmargin=0
 normal! zo
 34
 normal! zo
-100
+37
 normal! zo
-109
+51
 normal! zo
-131
-normal! zo
-let s:l = 140 - ((41 * winheight(0) + 22) / 44)
+let s:l = 42 - ((13 * winheight(0) + 22) / 45)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-140
+42
 normal! 0
-tabedit bin/config_parser
+tabedit t/02-cisco_asa.t
 set splitbelow splitright
 wincmd t
 set winheight=1 winwidth=1
@@ -333,11 +333,11 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
-let s:l = 20 - ((19 * winheight(0) + 22) / 44)
+let s:l = 1 - ((0 * winheight(0) + 22) / 44)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-20
+1
 normal! 0
 tabnext 2
 set stal=1

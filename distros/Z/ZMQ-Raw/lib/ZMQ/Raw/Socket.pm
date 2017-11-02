@@ -1,5 +1,5 @@
 package ZMQ::Raw::Socket;
-$ZMQ::Raw::Socket::VERSION = '0.10';
+$ZMQ::Raw::Socket::VERSION = '0.12';
 use strict;
 use warnings;
 use Carp;
@@ -31,7 +31,7 @@ ZMQ::Raw::Socket - ZeroMQ Socket class
 
 =head1 VERSION
 
-version 0.10
+version 0.12
 
 =head1 DESCRIPTION
 
@@ -168,6 +168,14 @@ Returns a L<C<ZMQ::Raw::Message>> object or an array of object.
 =head2 setsockopt( $option, $value )
 
 Set a socket option.
+
+=head2 join( $group )
+
+Join a group.
+
+=head2 leave( $group )
+
+Leave a group.
 
 =head1 CONSTANTS
 

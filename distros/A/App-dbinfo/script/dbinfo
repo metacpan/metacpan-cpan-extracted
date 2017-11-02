@@ -13,6 +13,8 @@ Perinci::CmdLine::Any->new(
         'list-columns' => {url => '/App/dbinfo/list_columns'},
         'dump-table'   => {url => '/App/dbinfo/dump_table'},
     },
+    log => 1,
+    log_level => 'info',
 )->run;
 
 # ABSTRACT: Get/extract information from database
@@ -30,33 +32,24 @@ dbinfo - Get/extract information from database
 
 =head1 VERSION
 
-This document describes version 0.002 of dbinfo (from Perl distribution App-dbinfo), released on 2017-08-25.
+This document describes version 0.003 of dbinfo (from Perl distribution App-dbinfo), released on 2017-10-30.
 
 =head1 SYNOPSIS
 
-Usage:
+List tables:
 
- % dbinfo dump-table [options] [dsn] <table>
- % dbinfo list-columns [options] [dsn] <table>
- % dbinfo list-tables [options] [dsn]
+ % dbinfo list-tables mydb
 
-Examples:
+List columns of a table:
 
- % dbinfo dump-table table1
+ % dbinfo list-columns mydb mytable
+ % dbinfo list-columns -l mydb mytable   ; # show detail
 
-Only include specified columns:
+Dump a table into various format:
 
- % dbinfo dump-table table2 -c col1 -c col2
+ % dbinfo dump-table mydb mytable
 
-Exclude some columns:
-
- % dbinfo dump-table table3 -C col1 -C col2
-
-Select some rows:
-
- % dbinfo dump-table table4 -w 'name LIKE '\''John*'\' -n 10
-
- % dbinfo list-columns 'dbi:SQLite:database=/tmp/test.db' main.table1
+=head1 DESCRIPTION
 
 =head1 SUBCOMMANDS
 
@@ -90,6 +83,10 @@ Can be specified multiple times.
 
 Set configuration profile to use.
 
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
 =item B<--dsn>=I<s>
 
 DBI data source, e.g. "dbi:SQLite:dbname=/path/to/db.db".
@@ -109,6 +106,10 @@ Display help message and exit.
 =item B<--json>
 
 Set output format to json.
+
+=item B<--log-level>=I<s>
+
+Set log level.
 
 =item B<--naked-res>
 
@@ -145,11 +146,23 @@ You might want to specify this parameter in a configuration file instead of
 directly as command-line option.
 
 
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
 =item B<--subcommands>
 
 List available subcommands.
 
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
 =item B<--user>=I<s>, B<-u>
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
 
 =item B<--version>, B<-v>
 
@@ -293,6 +306,7 @@ List of available configuration parameters:
 
  dsn (see --dsn)
  format (see --format)
+ log_level (see --log-level)
  naked_res (see --naked-res)
  password (see --password)
  user (see --user)
@@ -343,6 +357,10 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
+
+=head1 SEE ALSO
+
+L<mysqlinfo> from L<App::mysqlinfo>
 
 =head1 AUTHOR
 

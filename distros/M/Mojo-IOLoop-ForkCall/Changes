@@ -1,5 +1,8 @@
 Revision history for Perl module Mojo::IOLoop::ForkCall
 
+0.18 2017-10-28
+  - Protect against changes in Mojo::IOLoop::Delay->catch
+
 0.17 2015-04-17
   - Fixed an error handling bug in the helper
 

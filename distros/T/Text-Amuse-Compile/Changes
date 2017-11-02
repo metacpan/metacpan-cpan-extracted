@@ -1,5 +1,13 @@
 Revision history for perl module Text::Amuse::Compile
 
+0.97 2017-10-26
+
+ - At the CLI, do not validate the font names (just warn)
+ - Added support for a new bunch of fonts
+ - Added boolean option impressum, to turn the #notes into an impressum
+ - Added sansfontsections option to restore komascript default layout
+   with sans fonts on section headers
+
 0.96 2017-09-30
 
  - Font importing improvement

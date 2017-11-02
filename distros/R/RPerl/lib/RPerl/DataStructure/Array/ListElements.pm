@@ -18,8 +18,9 @@ our hashref $properties = {};
 
 # [[[ SUBROUTINES & OO METHODS ]]]
 
-our integer::method $length = sub {
-    ( my object $self, my string_hashref $modes) = @_;
+sub length {
+    { my integer::method $RETURN_TYPE };
+    ( my object $self, my string_hashref $modes) = @ARG;
     my integer $length = 0;
 
     #    RPerl::diag( 'in Array::ListElements->length(), received $self = ' . "\n" . RPerl::Parser::rperl_ast__dump($self) . "\n" );
@@ -28,7 +29,7 @@ our integer::method $length = sub {
         $length++;
     }
     else {
-        return $length;
+    return $length;
     }
     my object $list_elements_star = $self->{children}->[1];
 
@@ -41,17 +42,18 @@ our integer::method $length = sub {
     }
 
     return $length;
-};
+}
 
-our string_hashref::method $ast_to_rperl__generate = sub {
-    ( my object $self, my string_hashref $modes) = @_;
+sub ast_to_rperl__generate {
+    { my string_hashref::method $RETURN_TYPE };
+    ( my object $self, my string_hashref $modes) = @ARG;
     my string_hashref $rperl_source_group = { PMC => q{} };
 
     #    RPerl::diag( 'in Array::ListElements->ast_to_rperl__generate(), received $self = ' . "\n" . RPerl::Parser::rperl_ast__dump($self) . "\n" );
 
-    if ( ( ref $self ) ne 'ListElements_190' ) {
+    if ( ( ref $self ) ne 'ListElements_204' ) {
         die RPerl::Parser::rperl_rule__replace(
-            'ERROR ECOGEASRP00, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: Grammar rule ' . ( ref $self ) . ' found where ListElements_190 expected, dying' )
+            'ERROR ECOGEASRP00, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: Grammar rule ' . ( ref $self ) . ' found where ListElements_204 expected, dying' )
             . "\n";
     }
 
@@ -82,28 +84,29 @@ our string_hashref::method $ast_to_rperl__generate = sub {
             RPerl::Generator::source_group_append( $rperl_source_group, $rperl_source_subgroup );
         }
     }
-
     return $rperl_source_group;
-};
+}
 
-our string_hashref::method $ast_to_cpp__generate__CPPOPS_PERLTYPES = sub {
-    ( my object $self, my string_hashref $modes) = @_;
+sub ast_to_cpp__generate__CPPOPS_PERLTYPES {
+    { my string_hashref::method $RETURN_TYPE };
+    ( my object $self, my string_hashref $modes) = @ARG;
     my string_hashref $cpp_source_group = { CPP => q{// <<< RP::DS::A::LEs __DUMMY_SOURCE_CODE CPPOPS_PERLTYPES >>>} . "\n" };
 
     #...
     return $cpp_source_group;
-};
+}
 
-our string_hashref::method $ast_to_cpp__generate__CPPOPS_CPPTYPES = sub {
-    ( my object $self, my string_hashref $modes) = @_;
+sub ast_to_cpp__generate__CPPOPS_CPPTYPES {
+    { my string_hashref::method $RETURN_TYPE };
+    ( my object $self, my string_hashref $modes) = @ARG;
     my string_hashref $cpp_source_group = { CPP => q{} };
 
 #    RPerl::diag( 'in Array::ListElements->ast_to_cpp__generate__CPPOPS_CPPTYPES(), received $self = ' . "\n" . RPerl::Parser::rperl_ast__dump($self) . "\n" );
 #    RPerl::diag( 'in Array::ListElements->ast_to_cpp__generate__CPPOPS_CPPTYPES(), have $modes->{_inside_print_operator} = ' . $modes->{_inside_print_operator} . "\n" );
 
-    if ( ( ref $self ) ne 'ListElements_190' ) {
+    if ( ( ref $self ) ne 'ListElements_204' ) {
         die RPerl::Parser::rperl_rule__replace(
-            'ERROR ECOGEASCP00, CODE GENERATOR, ABSTRACT SYNTAX TO C++: Grammar rule ' . ( ref $self ) . ' found where ListElements_190 expected, dying' )
+            'ERROR ECOGEASCP00, CODE GENERATOR, ABSTRACT SYNTAX TO C++: Grammar rule ' . ( ref $self ) . ' found where ListElements_204 expected, dying' )
             . "\n";
     }
 
@@ -160,8 +163,7 @@ our string_hashref::method $ast_to_cpp__generate__CPPOPS_CPPTYPES = sub {
         $modes->{_inside_list_elements} = pop @{ $modes->{_inside_list_elements_saved} };
         if ( not scalar $modes->{_inside_list_elements_saved} ) { delete $modes->{_inside_list_elements_saved}; }
     }
-
     return $cpp_source_group;
-};
+}
 
 1;    # end of class

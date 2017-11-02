@@ -1,202 +1,81 @@
-Changes on 2017-02-05 for repository at:
+Changes on 2017-11-01 for repository at:
   Fetch URL: git@github.com:abeltje/lc_time.git
   Push  URL: git@github.com:abeltje/lc_time.git
 
 Enjoy!
 
-________________________________________________________________________________
-[135fcbb] by abeltje on Sun, 5 Feb 2017 14:38:20 +0100
+0.14 2017-11-01T07:47:13+01:00 (f44c67f => abeltje)
+ - (abeltje, 5 seconds ago) Autocommit for distribution lc_time 0.14 (same)
 
-     Fix test
+0.13 2017-02-05T14:40:06+01:00 (b7dff82 => abeltje)
+ - (abeltje, 9 months ago) Autocommit for distribution lc_time 0.13 (same)
 
+ - (abeltje, 17 hours ago) FreeBSD changed theire LC_TIME (RT#123414)
+ -     Short month names in Spanish now have a '.' added at the end.
 
-M	t/10-basic.t
-________________________________________________________________________________
-[0fe0e33] by abeltje on Sun, 24 May 2015 12:37:30 +0200
+0.12 2015-05-24T12:37:30+02:00 (0fe0e33 => abeltje)
+ - (abeltje, 2 years, 5 months ago) Autocommit for distribution lc_time
+   0.12 (minor)
 
-     Autocommit for distribution lc_time 0.12 (minor)
+ - (abeltje, 9 months ago) Fix test
 
+0.11_02 2015-05-15T14:15:49+02:00 (f2a65d9 => abeltje)
+ - (abeltje, 2 years, 6 months ago) Autocommit for distribution lc_time
+   0.11_02 (test)
 
-M	Changes
-M	debian/changelog
-M	lib/lc_time.pm
-________________________________________________________________________________
-[975f785] by abeltje on Sun, 24 May 2015 12:35:40 +0200
+ - (abeltje, 2 years, 5 months ago) Tweak Makefile.PL (more META stuff)
 
-     Tweak Makefile.PL (more META stuff)
+0.11_01 2015-05-05T09:29:12+02:00 (ce9d259 => Abe Timmerman)
+ - (Abe Timmerman, 2 years, 6 months ago) Autocommit for distribution
+   lc_time 0.11_01 (test)
 
+ - (abeltje, 2 years, 6 months ago) Signal OpenBSD is not supported.
+ -     OpenBSD doesn't support LC_TIME, so no use for CPANTester to look at
+   it.
 
-M	Makefile.PL
-________________________________________________________________________________
-[f2a65d9] by abeltje on Fri, 15 May 2015 14:15:49 +0200
+0.11 2013-09-22T11:13:02+02:00 (5269f51 => abeltje)
+ - (abeltje, 4 years, 1 month ago) Autocommit for distribution lc_time 0.11
 
-     Autocommit for distribution lc_time 0.11_02 (test)
+ - (Abe Timmerman, 2 years, 6 months ago) BUGFix: perl-5.21.1 changed
+   POSIX::strftime
+ -     POSIX::strftime was changed by
+   9717af6d049902fc887c412facb2d15e785ef1a4
+ -     to decode the result (%a/%A/%b/%B) if the current locale is UTF-8.
+ -     lc_time::strftime() will still also decode for other encodings like
+ -     ISO8859-*/Big5/KOI8/CP*.
 
+0.10 2013-09-22T10:33:29+02:00 (11cbfc0 => abeltje)
+ - (abeltje, 4 years, 1 month ago) * try a version that works for both perl
+   and debian
 
-M	Changes
-M	debian/changelog
-M	lib/lc_time.pm
-________________________________________________________________________________
-[47687d9] by abeltje on Fri, 15 May 2015 14:10:57 +0200
+0.00 2013-09-08T13:40:01+02:00 (8f67d19 => abeltje)
+ - (abeltje, 4 years, 2 months ago) Initial checkin.
 
-     Signal OpenBSD is not supported.
+ - (abeltje, 4 years, 2 months ago) * Make code en tests work on linux
+   (ubuntu).
 
-        OpenBSD doesn't support LC_TIME, so no use for CPANTester to look at
-        it.
+ - (abeltje, 4 years, 2 months ago) Make the code a bit more portable...
 
+ - (abeltje, 4 years, 2 months ago) fix typo.
 
-M	Makefile.PL
-M	t/10-basic.t
-________________________________________________________________________________
-[ce9d259] by Abe Timmerman on Tue, 5 May 2015 09:29:12 +0200
+ - (abeltje, 4 years, 2 months ago) Fix typos.
 
-     Autocommit for distribution lc_time 0.11_01 (test)
+ - (abeltje, 4 years, 2 months ago) Fix MSWin32 issues.
 
+ - (abeltje, 4 years, 2 months ago) Do not try to decode() if there is no
+   encoding found.
+ -     Use the right constant for LC_TIME to check if nothing changed.
 
-M	Changes
-M	debian/changelog
-M	lib/lc_time.pm
-________________________________________________________________________________
-[3d3d7a7] by Abe Timmerman on Tue, 5 May 2015 08:35:00 +0200
+ - (abeltje, 4 years, 2 months ago) Make it more distributable:
+ -	 - Add POD
+ -	 - Add xt/ tests
+ -	 - Fix MANIFEST[.SKIP]
 
-     BUGFix: perl-5.21.1 changed POSIX::strftime
+ - (abeltje, 4 years, 2 months ago) Add the README file
 
-        POSIX::strftime was changed by
-        9717af6d049902fc887c412facb2d15e785ef1a4 to decode the result
-        (%a/%A/%b/%B) if the current locale is UTF-8. lc_time::strftime()
-        will still also decode for other encodings like 
-        ISO8859-*/Big5/KOI8/CP*.
+ - (abeltje, 4 years, 2 months ago) Fix testsuite for HP-UX.
 
+ - (abeltje, 4 years, 2 months ago) * More HP-UX test fixing
 
-M	lib/lc_time.pm
-________________________________________________________________________________
-[5269f51] by abeltje on Sun, 22 Sep 2013 11:13:02 +0200
-
-     Autocommit for distribution lc_time 0.11
-
-
-M	Changes
-M	debian/changelog
-M	lib/lc_time.pm
-________________________________________________________________________________
-[11cbfc0] by abeltje on Sun, 22 Sep 2013 10:33:29 +0200
-
-    
-        * try a version that works for both perl and debian
-
-
-M	lib/lc_time.pm
-________________________________________________________________________________
-[f38653f] by abeltje on Sat, 21 Sep 2013 10:45:31 +0200
-
-     Add the automatically generated Changes file, fix version.
-
-
-A	Changes
-M	MANIFEST
-M	lib/lc_time.pm
-________________________________________________________________________________
-[73a93a4] by abeltje on Sun, 15 Sep 2013 14:50:19 +0200
-
-    
-        * More HP-UX test fixing
-
-
-M	t/10-basic.t
-________________________________________________________________________________
-[f7658e0] by abeltje on Sun, 15 Sep 2013 14:18:44 +0200
-
-     Fix testsuite for HP-UX.
-
-
-M	t/10-basic.t
-________________________________________________________________________________
-[7ff2104] by abeltje on Sun, 15 Sep 2013 10:43:47 +0200
-
-     Add the README file
-
-
-M	MANIFEST
-A	README
-________________________________________________________________________________
-[11d1c74] by abeltje on Sat, 14 Sep 2013 18:14:12 +0200
-
-     Make it more distributable:
-         - Add POD
-         - Add xt/ tests
-         - Fix MANIFEST[.SKIP]
-
-
-M	MANIFEST
-M	MANIFEST.SKIP
-M	Makefile.PL
-M	lib/lc_time.pm
-A	xt/00-compile.t
-A	xt/10-manifest.t
-A	xt/20-pod.t
-A	xt/30-pod-coverage.t
-________________________________________________________________________________
-[9a88f5c] by abeltje on Mon, 9 Sep 2013 06:23:56 +0200
-
-     Do not try to decode() if there is no encoding found. Use the right
-        constant for LC_TIME to check if nothing changed.
-
-
-M	lib/lc_time.pm
-M	t/10-basic.t
-________________________________________________________________________________
-[1c40896] by abeltje on Mon, 9 Sep 2013 00:38:47 +0200
-
-     Fix MSWin32 issues.
-
-
-M	lib/lc_time.pm
-M	t/10-basic.t
-________________________________________________________________________________
-[c578424] by abeltje on Sun, 8 Sep 2013 23:21:53 +0200
-
-     Fix typos.
-
-
-M	lib/lc_time.pm
-________________________________________________________________________________
-[567cf71] by abeltje on Sun, 8 Sep 2013 23:20:25 +0200
-
-     fix typo.
-
-
-M	t/10-basic.t
-________________________________________________________________________________
-[04e7a9e] by abeltje on Sun, 8 Sep 2013 23:19:03 +0200
-
-     Make the code a bit more portable...
-
-
-M	lib/lc_time.pm
-M	t/10-basic.t
-________________________________________________________________________________
-[be4bb5b] by abeltje on Sun, 8 Sep 2013 17:20:35 +0200
-
-    
-        * Make code en tests work on linux (ubuntu).
-
-
-M	lib/lc_time.pm
-M	t/10-basic.t
-________________________________________________________________________________
-[8f67d19] by abeltje on Sun, 8 Sep 2013 13:40:01 +0200
-
-     Initial checkin.
-
-
-A	.gitignore
-A	MANIFEST
-A	MANIFEST.SKIP
-A	Makefile.PL
-A	debian/changelog
-A	debian/compat
-A	debian/control
-A	debian/copyright
-A	debian/rules
-A	lib/lc_time.pm
-A	t/10-basic.t
+ - (abeltje, 4 years, 1 month ago) Add the automatically generated Changes
+   file, fix version.

@@ -1,27 +1,28 @@
 {
-   "abstract" : "Perl I18n using github://nodeca/babelfish format.",
+   "abstract" : "Perl I18n using https://github.com/nodeca/babelfish format.",
    "author" : [
       "Akzhan Abdulin <akzhan@cpan.org>",
       "Igor Mironov <grif@cpan.org>",
+      "Victor Efimov <efimov@reg.ru>",
       "REG.RU LLC"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.142060",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "mit"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Locale-Babelfish",
    "no_index" : {
       "directory" : [
-         "t",
-         "xt",
+         "corpus",
          "eg",
          "examples",
-         "corpus"
+         "t",
+         "xt"
       ],
       "namespace" : [
          "t::lib"
@@ -33,17 +34,19 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.30"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "develop" : {
          "requires" : {
             "Pod::Coverage::TrustPod" : "0",
             "Test::CPAN::Meta" : "0",
-            "Test::More" : "0",
+            "Test::EOL" : "0",
+            "Test::More" : "0.88",
             "Test::NoTabs" : "0",
             "Test::Pod" : "1.41",
-            "Test::Pod::Coverage" : "1.08"
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Version" : "1"
          }
       },
       "runtime" : {
@@ -54,7 +57,9 @@
             "File::Spec" : "0",
             "List::Util" : "1.33",
             "Scalar::Util" : "0",
-            "YAML::Syck" : "0",
+            "YAML::SyckWrapper" : "0",
+            "constant" : "0",
+            "feature" : "0",
             "parent" : "0",
             "perl" : "5.010001",
             "strict" : "0",
@@ -64,17 +69,28 @@
       },
       "test" : {
          "recommends" : {
-            "CPAN::Meta" : "0",
-            "CPAN::Meta::Requirements" : "2.120900"
+            "CPAN::Meta" : "2.120900",
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::EOL" : "0",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0"
          },
          "requires" : {
+            "Data::Dumper" : "0",
+            "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
             "File::Temp" : "0",
             "FindBin" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Test::Deep" : "0",
+            "Test::Exception" : "0",
             "Test::More" : "0.98",
+            "Test::More::UTF8" : "0",
+            "Test::Spec" : "0",
+            "lib::abs" : "0",
             "strict" : "0",
             "utf8" : "0",
             "warnings" : "0"
@@ -84,43 +100,43 @@
    "provides" : {
       "Locale::Babelfish" : {
          "file" : "lib/Locale/Babelfish.pm",
-         "version" : "1.000000"
+         "version" : "2.003"
       },
       "Locale::Babelfish::Phrase::Compiler" : {
          "file" : "lib/Locale/Babelfish/Phrase/Compiler.pm",
-         "version" : "1.000000"
+         "version" : "2.003"
       },
       "Locale::Babelfish::Phrase::Literal" : {
          "file" : "lib/Locale/Babelfish/Phrase/Literal.pm",
-         "version" : "1.000000"
+         "version" : "2.003"
       },
       "Locale::Babelfish::Phrase::Node" : {
          "file" : "lib/Locale/Babelfish/Phrase/Node.pm",
-         "version" : "1.000000"
+         "version" : "2.003"
       },
       "Locale::Babelfish::Phrase::Parser" : {
          "file" : "lib/Locale/Babelfish/Phrase/Parser.pm",
-         "version" : "1.000000"
+         "version" : "2.003"
       },
       "Locale::Babelfish::Phrase::ParserBase" : {
          "file" : "lib/Locale/Babelfish/Phrase/ParserBase.pm",
-         "version" : "1.000000"
+         "version" : "2.003"
       },
       "Locale::Babelfish::Phrase::PluralForms" : {
          "file" : "lib/Locale/Babelfish/Phrase/PluralForms.pm",
-         "version" : "1.000000"
+         "version" : "2.003"
       },
       "Locale::Babelfish::Phrase::PluralFormsParser" : {
          "file" : "lib/Locale/Babelfish/Phrase/PluralFormsParser.pm",
-         "version" : "1.000000"
+         "version" : "2.003"
       },
       "Locale::Babelfish::Phrase::Pluralizer" : {
          "file" : "lib/Locale/Babelfish/Phrase/Pluralizer.pm",
-         "version" : "1.000000"
+         "version" : "2.003"
       },
       "Locale::Babelfish::Phrase::Variable" : {
          "file" : "lib/Locale/Babelfish/Phrase/Variable.pm",
-         "version" : "1.000000"
+         "version" : "2.003"
       }
    },
    "release_status" : "stable",
@@ -135,6 +151,7 @@
          "web" : "https://github.com/regru/Locale-Babelfish"
       }
    },
-   "version" : "1.000000"
+   "version" : "2.003",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
 }
 

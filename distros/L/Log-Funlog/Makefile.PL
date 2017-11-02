@@ -6,5 +6,6 @@ WriteMakefile(
 	NAME			=>	'Log::Funlog',
 	VERSION_FROM	=>	"lib/Log/Funlog.pm",
 	AUTHOR			=>	'Gabriel Guillon <korsani(removeme)@free(removeme).fr(removeagain)>',
+#	PERL			=>  '/tmp/bin/perl'
 );
 1;

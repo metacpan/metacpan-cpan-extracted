@@ -1,3 +1,6 @@
+1.24 Mon Oct 30 20:31:53 CET 2017
+ - Fix $LoadCode (PR#180, PR#181, PR#182 by @mohawk2++)
+
 1.23 Sun Feb 19 22:07:57 CET 2017
  - Fix $YAML::Numify (empty values were converted to 0)
 

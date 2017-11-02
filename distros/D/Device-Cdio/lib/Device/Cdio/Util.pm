@@ -1,9 +1,7 @@
 package Device::Cdio::Util;
 require 5.8.6;
 #
-#  $Id$
-#
-#  Copyright (C) 2006, 2008 Rocky Bernstein <rocky@cpan.org>
+#  Copyright (C) 2006, 2008, 2017 Rocky Bernstein <rocky@cpan.org>
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -16,7 +14,8 @@ require 5.8.6;
 #  GNU General Public License for more details.
 #
 #  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#  along with this program.  If not, see L<The GNU General Public
+#  License|http://www.gnu.org/licenses/#GPL>.
 
 # These are internal routines. Not all that useful for external consumption.
 
@@ -99,8 +98,8 @@ sub _rearrange {
     if (ref($param[0]) eq 'HASH') {
 	@param = %{$param[0]};
     } else {
-	return @param 
-	    unless (defined($param[0]) && substr($param[0],0,1) eq '-' 
+	return @param
+	    unless (defined($param[0]) && substr($param[0],0,1) eq '-'
 		    && $param[0] !~ m{\A-\d+});
     }
 
@@ -159,8 +158,8 @@ no public subroutines
 
 =head1 AUTHOR INFORMATION
 
-Code taken from CGI::Util.pm which reads: 
-Copyright 1995-1998, Lincoln D. Stein.  All rights reserved.  
+Code taken from CGI::Util.pm which reads:
+Copyright 1995-1998, Lincoln D. Stein.  All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

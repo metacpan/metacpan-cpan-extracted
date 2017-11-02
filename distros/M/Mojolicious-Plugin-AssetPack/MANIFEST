@@ -3,7 +3,6 @@
 .travis.yml
 Changes
 cpanfile
-examples/reloader.pl
 examples/rollup.pl
 examples/sprites.pl
 lib/Mojolicious/Plugin/AssetPack.pm
@@ -22,11 +21,10 @@ lib/Mojolicious/Plugin/AssetPack/Pipe/JavaScript.pm
 lib/Mojolicious/Plugin/AssetPack/Pipe/Jpeg.pm
 lib/Mojolicious/Plugin/AssetPack/Pipe/Less.pm
 lib/Mojolicious/Plugin/AssetPack/Pipe/Png.pm
-lib/Mojolicious/Plugin/AssetPack/Pipe/Reloader.pm
 lib/Mojolicious/Plugin/AssetPack/Pipe/require.js
 lib/Mojolicious/Plugin/AssetPack/Pipe/riot.js
 lib/Mojolicious/Plugin/AssetPack/Pipe/Riotjs.pm
-lib/Mojolicious/Plugin/AssetPack/Pipe/Rollupjs.pm
+lib/Mojolicious/Plugin/AssetPack/Pipe/RollupJs.pm
 lib/Mojolicious/Plugin/AssetPack/Pipe/Sass.pm
 lib/Mojolicious/Plugin/AssetPack/Pipe/typescript.js
 lib/Mojolicious/Plugin/AssetPack/Pipe/TypeScript.pm
@@ -89,8 +87,6 @@ t/png.t
 t/range.t
 t/recreate.t
 t/register.t
-t/reloader-process.t
-t/reloader.t
 t/riotjs-not-loaded.t
 t/riotjs.t
 t/rollup.t

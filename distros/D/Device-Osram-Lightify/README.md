@@ -13,7 +13,7 @@ your local hub, and apply operations to them.
 
 # Current Status
 
-* Introspection works such that you can dynamically retrieve all known lighgs and their state:
+* Introspection works such that you can dynamically retrieve all known lights and their state:
      * On vs. Off.
      * Brightness.
      * Temperature.

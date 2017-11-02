@@ -1,6 +1,6 @@
 package Proc::tored::Types;
 # ABSTRACT: Type constraints used by Proc::tored
-$Proc::tored::Types::VERSION = '0.19';
+$Proc::tored::Types::VERSION = '0.20';
 use strict;
 use warnings;
 use Types::Standard -types;
@@ -31,7 +31,7 @@ Proc::tored::Types - Type constraints used by Proc::tored
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 TYPES
 

@@ -7,8 +7,8 @@ use Path::Tiny ();
 use Alien::Build::Util qw( _destdir_prefix );
 use File::Copy ();
 
-# ABSTRACT: LWP plugin for fetching files
-our $VERSION = '1.25'; # VERSION
+# ABSTRACT: Plugin to gather dynamic libraries into a separate directory
+our $VERSION = '1.28'; # VERSION
 
 
 sub init
@@ -64,11 +64,11 @@ __END__
 
 =head1 NAME
 
-Alien::Build::Plugin::Gather::IsolateDynamic - LWP plugin for fetching files
+Alien::Build::Plugin::Gather::IsolateDynamic - Plugin to gather dynamic libraries into a separate directory
 
 =head1 VERSION
 
-version 1.25
+version 1.28
 
 =head1 SYNOPSIS
 
@@ -135,6 +135,10 @@ Petr Pisar (ppisar)
 Lance Wicks (LANCEW)
 
 Ahmad Fatoum (a3f, ATHREEF)
+
+José Joaquín Atria (JJATRIA)
+
+Duke Leto (LETO)
 
 =head1 COPYRIGHT AND LICENSE
 

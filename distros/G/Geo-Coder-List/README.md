@@ -10,7 +10,7 @@ Call many geocoders
 
 # VERSION
 
-Version 0.16
+Version 0.17
 
 # SYNOPSIS
 

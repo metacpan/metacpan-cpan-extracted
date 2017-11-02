@@ -5,15 +5,10 @@ SYNOPSIS
     Plans for future versions of CUICollectorMapReduce
 
 TO DO LIST
-    1. add windowing to collect distant CUI bigrams (stride of 2, 3, 4,
-    etc.)
+    1. add n-gram collection as an option
 
-    2. add n-gram collection as an option
-
-    3. write perl script to convert hadoop CUI bigram output into MySQL
-    database
-
-    4. add command line option parsing
+    2. add ability to input a list of files instead of a directory or one
+    file at a time
 
 AUTHORS
     Bridget McInnes <btmcinnes at vcu.edu>

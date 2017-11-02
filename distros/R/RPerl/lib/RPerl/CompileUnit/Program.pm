@@ -3,7 +3,7 @@ package RPerl::CompileUnit::Program;
 use strict;
 use warnings;
 use RPerl::AfterSubclass;
-our $VERSION = 0.005_000;
+our $VERSION = 0.006_000;
 
 # [[[ OO INHERITANCE ]]]
 use parent qw(RPerl::CompileUnit);
@@ -18,8 +18,9 @@ our hashref $properties = {};
 
 # [[[ SUBROUTINES & OO METHODS ]]]
 
-our string_hashref::method $ast_to_rperl__generate = sub {
-    ( my object $self, my string_hashref $modes) = @_;
+sub ast_to_rperl__generate {
+    { my string_hashref::method $RETURN_TYPE };
+    ( my object $self, my string_hashref $modes) = @ARG;
     my string_hashref $rperl_source_group = { PMC => q{} };
     my string_hashref $rperl_source_subgroup;
 
@@ -143,13 +144,13 @@ our string_hashref::method $ast_to_rperl__generate = sub {
     # Programs only generate EXE output, not PMC output
     $rperl_source_group->{EXE} = $rperl_source_group->{PMC};
     delete $rperl_source_group->{PMC};
-
     return $rperl_source_group;
-};
+}
 
 
-our string_hashref::method $ast_to_cpp__generate__CPPOPS_PERLTYPES = sub {
-    ( my object $self, my string_hashref $modes) = @_;
+sub ast_to_cpp__generate__CPPOPS_PERLTYPES {
+    { my string_hashref::method $RETURN_TYPE };
+    ( my object $self, my string_hashref $modes) = @ARG;
     my string_hashref $cpp_source_group = {
         CPP => q{// <<< RP::CU::P __DUMMY_SOURCE_CODE CPPOPS_PERLTYPES >>>} . "\n",
         H   => q{// <<< RP::CU::P __DUMMY_SOURCE_CODE CPPOPS_PERLTYPES >>>} . "\n",
@@ -159,18 +160,18 @@ our string_hashref::method $ast_to_cpp__generate__CPPOPS_PERLTYPES = sub {
 
     #...
     return $cpp_source_group;
-};
+}
 
 
-our string_hashref::method $ast_to_cpp__generate__CPPOPS_CPPTYPES = sub {
-    ( my object $self, my string_hashref $modes) = @_;
+sub ast_to_cpp__generate__CPPOPS_CPPTYPES {
+    { my string_hashref::method $RETURN_TYPE };
+    ( my object $self, my string_hashref $modes) = @ARG;
     my string_hashref $cpp_source_group = { CPP => q{} };
     my string_hashref $cpp_source_subgroup;
     my integer $cpp_source_group_CPP_line_count = 0;
 
 #    RPerl::diag( 'in Program->ast_to_cpp__generate__CPPOPS_CPPTYPES(), received $self = ' . "\n" . RPerl::Parser::rperl_ast__dump($self) . "\n" );
 #    RPerl::diag('in Program->ast_to_cpp__generate__CPPOPS_CPPTYPES(), received $modes = ' . "\n" . Dumper($modes) . "\n");
-#    die 'TMP DEBUG';
 
     my string $self_class = ref $self;
 
@@ -206,6 +207,7 @@ our string_hashref::method $ast_to_cpp__generate__CPPOPS_CPPTYPES = sub {
     my object $subroutine_star = $self->{children}->[7];
     my object $operation_plus  = $self->{children}->[8];
 
+#    RPerl::diag('in Program->ast_to_cpp__generate__CPPOPS_CPPTYPES(), have $include_star = ' . "\n" . RPerl::Parser::rperl_ast__dump($include_star) . "\n");
 #    RPerl::diag('in Program->ast_to_cpp__generate__CPPOPS_CPPTYPES(), have $subroutine_star = ' . "\n" . RPerl::Parser::rperl_ast__dump($subroutine_star) . "\n");
 
     # NEED ANSWER: should we modify the user-provided shebang as done here, or simply replace it with a hard-coded one pointing to /usr/bin?   //!/usr/bin/rperl
@@ -243,9 +245,12 @@ our string_hashref::method $ast_to_cpp__generate__CPPOPS_CPPTYPES = sub {
         }
     }
     foreach my object $include ( @{ $include_star->{children} } ) { ## no critic qw(ProhibitPostfixControls)  # SYSTEM SPECIAL 6: PERL CRITIC FILED ISSUE #639, not postfix foreach or if
-        $cpp_source_subgroup = $include->ast_to_cpp__generate__CPPOPS_CPPTYPES($modes);
+#        RPerl::diag('in Program->ast_to_cpp__generate__CPPOPS_CPPTYPES(), have $include = ' . "\n" . RPerl::Parser::rperl_ast__dump($include) . "\n");
+        $cpp_source_subgroup = $include->ast_to_cpp__generate__CPPOPS_CPPTYPES('main', $modes);
         RPerl::Generator::source_group_append( $cpp_source_group, $cpp_source_subgroup );
     }
+#    RPerl::diag('in Program->ast_to_cpp__generate__CPPOPS_CPPTYPES(), have $cpp_source_group = ' . "\n" . RPerl::Parser::rperl_ast__dump($cpp_source_group) . "\n");
+    $cpp_source_group->{CPP} .= '#include "__NEED_HEADER_PATH"' . "\n";  # DEV NOTE, CORRELATION #rp033: defer setting header include path until files are saved in Compiler
 
     if ( exists $constant_star->{children}->[0] ) {
         if ( $modes->{label} eq 'ON' ) {
@@ -314,7 +319,9 @@ our string_hashref::method $ast_to_cpp__generate__CPPOPS_CPPTYPES = sub {
 #    RPerl::diag('in Program->ast_to_cpp__generate__CPPOPS_CPPTYPES(), have $operations_line_number = ' . $operations_line_number . "\n");
 
     if ( $modes->{label} eq 'ON' ) { 
-        $cpp_source_group->{CPP} .= "\n" x (($operations_line_number - $cpp_source_group_CPP_line_count) - (2 + $num_loop_iterators));
+        my integer $newline_count = (($operations_line_number - $cpp_source_group_CPP_line_count) - (2 + $num_loop_iterators));
+        if ($newline_count < 0) { $newline_count = 0; }
+        $cpp_source_group->{CPP} .= "\n" x $newline_count;
     }
 
     $CPP_saved .= $cpp_source_group->{CPP};
@@ -334,7 +341,8 @@ Purposefully_die_from_a_compile-time_error,_due_to____PERL__TYPES_being_defined.
 #endif
 EOF
 
+#    RPerl::diag('in Program->ast_to_cpp__generate__CPPOPS_CPPTYPES(), about to return $cpp_source_group = ' . "\n" . RPerl::Parser::rperl_ast__dump($cpp_source_group) . "\n");
     return $cpp_source_group;
-};
+}
 
 1;    # end of class

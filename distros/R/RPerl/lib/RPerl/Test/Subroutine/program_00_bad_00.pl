@@ -3,8 +3,8 @@
 # Learning RPerl, Section 4.1: Subroutine Definitions
 
 # [[[ PREPROCESSOR ]]]
-# <<< PARSE_ERROR: 'ERROR ECOPARP00' >>>
-# <<< PARSE_ERROR: 'Unexpected Token:  $HELLO_WORLD' >>>
+# <<< PARSE_ERROR: 'ERROR ECOPAPC02' >>>
+# <<< PARSE_ERROR: 'Perl::Critic::Policy::NamingConventions::Capitalization' >>>
 
 # [[[ HEADER ]]]
 use RPerl;
@@ -18,12 +18,13 @@ our $VERSION = 0.001_000;
 
 # [[[ SUBROUTINES ]]]
 
-our void $HELLO_WORLD = sub { print 'Hello, World!', "\n"; };
-our void $Hello_World = sub { print 'Hello, World, again!', "\n"; };
-our void $HELLO_world = sub { print 'Hello, World, yet again!', "\n"; };
+sub HELLO_WORLD { { my void $RETURN_TYPE }; print 'Hello, World!', "\n"; return; }
+sub Hello_World { { my void $RETURN_TYPE }; print 'Hello, World, again!', "\n"; return; }
+sub HELLO_world { { my void $RETURN_TYPE }; print 'Hello, World, yet again!', "\n"; return; }
 
 # [[[ OPERATIONS ]]]
 
 HELLO_WORLD();
 Hello_World();
 HELLO_world();
+

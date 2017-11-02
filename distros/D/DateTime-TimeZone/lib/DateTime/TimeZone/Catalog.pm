@@ -11,7 +11,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.13';
+our $VERSION = '2.14';
 
 our @ALL =
 qw(
@@ -24,6 +24,7 @@ qw(
   Africa/Ceuta
   Africa/El_Aaiun
   Africa/Johannesburg
+  Africa/Juba
   Africa/Khartoum
   Africa/Lagos
   Africa/Maputo
@@ -399,6 +400,7 @@ Casablanca
 Ceuta
 El_Aaiun
 Johannesburg
+Juba
 Khartoum
 Lagos
 Maputo
@@ -1701,7 +1703,6 @@ our %LINKS =
   'Africa/Freetown' => 'Africa/Abidjan',
   'Africa/Gaborone' => 'Africa/Maputo',
   'Africa/Harare' => 'Africa/Maputo',
-  'Africa/Juba' => 'Africa/Khartoum',
   'Africa/Kampala' => 'Africa/Nairobi',
   'Africa/Kigali' => 'Africa/Maputo',
   'Africa/Kinshasa' => 'Africa/Lagos',
@@ -1801,7 +1802,6 @@ our %LINKS =
   'Brazil/West' => 'America/Manaus',
   'Canada/Atlantic' => 'America/Halifax',
   'Canada/Central' => 'America/Winnipeg',
-  'Canada/East-Saskatchewan' => 'America/Regina',
   'Canada/Eastern' => 'America/Toronto',
   'Canada/Mountain' => 'America/Edmonton',
   'Canada/Newfoundland' => 'America/St_Johns',
@@ -1896,7 +1896,7 @@ our %LINKS =
 
 ;
 
-sub OlsonVersion { '2017b' }
+sub OlsonVersion { '2017c' }
 
 
 1;
@@ -1928,6 +1928,7 @@ so that applications can easily present a list of timezones.
   Africa/Casablanca
   Africa/El_Aaiun
   Africa/Johannesburg
+  Africa/Juba
   Africa/Khartoum
   Africa/Lagos
   Africa/Maputo
@@ -3479,7 +3480,6 @@ A linked zone is an alias from one name to another.
   Africa/Freetown => Africa/Abidjan
   Africa/Gaborone => Africa/Maputo
   Africa/Harare => Africa/Maputo
-  Africa/Juba => Africa/Khartoum
   Africa/Kampala => Africa/Nairobi
   Africa/Kigali => Africa/Maputo
   Africa/Kinshasa => Africa/Lagos
@@ -3579,7 +3579,6 @@ A linked zone is an alias from one name to another.
   Brazil/West => America/Manaus
   Canada/Atlantic => America/Halifax
   Canada/Central => America/Winnipeg
-  Canada/East-Saskatchewan => America/Regina
   Canada/Eastern => America/Toronto
   Canada/Mountain => America/Edmonton
   Canada/Newfoundland => America/St_Johns

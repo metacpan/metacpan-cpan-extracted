@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps::Mapping;
 use strict;
 use warnings;
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 # shortcuts
 #  os and distros
@@ -503,6 +503,11 @@ sub mapping {
        [package => 'recode']],
       [like_fedora,
        [package => 'recode']],
+     ],
+
+     [cpanmod => 'Couchbase',
+      [os_freebsd,
+       [package => 'libcouchbase']],
      ],
 
      [cpanmod => 'Crypt::Cracklib',
@@ -1381,7 +1386,10 @@ sub mapping {
       [os_freebsd,
        [package => 'libexif']],
       [like_debian,
-       [package => 'libexif-dev']]],
+       [package => 'libexif-dev']],
+      [os_darwin,
+       [package => 'libexif']],
+     ],
 
      [cpanmod => 'Image::Libpuzzle',
       [os_freebsd,
@@ -1396,6 +1404,8 @@ sub mapping {
        [package => 'librsvg2-dev']],
       [like_fedora,
        [package => 'librsvg2-devel']],
+      [os_darwin,
+       [package => 'librsvg']],
      ],
 
      [cpanmod => 'Image::Magick',  # typically needs manual work
@@ -1611,7 +1621,9 @@ sub mapping {
 
      [cpanmod => 'LibJIT',
       [os_freebsd,
-       [package => 'libjit']],
+       [osvers => qr{^9\.},
+	[package => 'libjit']],
+       [package => []]], # does not exist in freebsd 10 and later
       # XXX what aout debian?
      ],
 
@@ -1959,6 +1971,13 @@ sub mapping {
        [package => 'libidn']],
      ],
 
+     [cpanmod => 'Net::LibLO',
+      [os_freebsd,
+       [package => 'liblo']],
+      [like_debian,
+       [package => 'liblo-dev']],
+     ],
+
      [cpanmod => 'Net::NfDump',
       [like_debian,
        [package => ['flex', 'byacc']]],
@@ -2009,7 +2028,7 @@ sub mapping {
      #],
 
      [cpanmod => 'Net::SIGTRAN::SCTP',
-      # XXX what about freebsd?
+      # no sctp on freebsd or centos
       [like_debian,
        [package => 'libsctp-dev']]],
 
@@ -2600,6 +2619,16 @@ sub mapping {
        [package => 'libxine']],
       [like_debian,
        [package => 'libxine2-dev']]],
+
+     [cpanmod => 'Vlc::Engine',
+      [os_freebsd,
+       [package => 'vlc']],
+      [like_debian,
+       [package => 'libvlc-dev']],
+      ## Does not seem to contain include files
+      #[os_darwin,
+      # [package => 'caskroom/cask/vlc']],
+     ],
 
      [cpanmod => 'WordNet::QueryData',
       [os_freebsd,

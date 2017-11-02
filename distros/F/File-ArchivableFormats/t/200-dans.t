@@ -25,7 +25,6 @@ isa_ok($af, "File::ArchivableFormats");
                 'Plain text (Non-Unicode)',
                 'Statistical data (data (.csv) + setup)',
                 'Raspter GIS (ASCII GRID)',
-                'Raspter GIS (ASCII GRID)'
             ],
         },
         mime_type => 'text/plain',

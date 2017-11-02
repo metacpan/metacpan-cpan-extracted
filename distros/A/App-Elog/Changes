@@ -1,0 +1,9 @@
+Revision history for App::Elog
+
+0.02  Tue Oct 31 18:02:15 CDT 2017
+    - Documentation update
+
+0.01  Tue Oct 31 15:18:52 CDT 2017
+    - elog, an Apache error log viewer
+    - alog, an Apache access log viewer
+

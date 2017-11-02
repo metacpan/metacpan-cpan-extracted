@@ -7,15 +7,18 @@ use File::Find;
 my %recommended = (
     'SVG'           => '0',
     'Math::Random'  => '0',
+    'Math::CDF'     => '0',
+    'XML::XML2JSON' => '0',    
     'XML::Twig'     => '0',
     'XML::LibXML'   => '0',
-    'Math::CDF'     => '0',
     'List::Util'    => '0',
     'SWF::Builder'  => '0',
-    'XML::XML2JSON' => '0',
     'PDF::API2'     => '0',
     'GD'            => '0',
     'JSON'          => '0',
+    'Archive::Zip'  => '0',
+    'RDF::Trine'    => '0',
+    'RDF::Query'    => '0',
 );
 
 check_prereq( keys %recommended );
@@ -47,6 +50,10 @@ if ( $ExtUtils::MakeMaker::VERSION ge '6.46' ) {
         },
         'recommends' => \%recommended,
     };
+}
+
+if ( $ExtUtils::MakeMaker::VERSION ge '6.48' ) {
+    $parms{MIN_PERL_VERSION} = '5.8.0';
 }
 
 WriteMakefile( %parms );

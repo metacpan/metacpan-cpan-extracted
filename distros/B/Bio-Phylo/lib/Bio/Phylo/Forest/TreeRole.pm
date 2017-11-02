@@ -1,5 +1,6 @@
 package Bio::Phylo::Forest::TreeRole;
 use strict;
+use warnings;
 use Bio::Phylo::Util::MOP;
 use base 'Bio::Phylo::Listable';
 use Bio::Phylo::Util::Exceptions 'throw';
@@ -9,7 +10,7 @@ use Bio::Phylo::Forest::Node;
 use Bio::Phylo::IO 'unparse';
 use Bio::Phylo::Factory;
 use Scalar::Util 'blessed';
-use List::Util 'sum';
+use List::Util qw'sum shuffle';
 my $LOADED_WRAPPERS = 0;
 {
     my $logger = __PACKAGE__->get_logger;
@@ -243,7 +244,8 @@ Gets node that divides tree into two distance-balanced partitions.
  Function: Gets node nearest to the middle of the longest path
  Returns : A Bio::Phylo::Forest::Node object.
  Args    : NONE
- Comments: This algorithm was ported from ETE
+ Comments: This algorithm was ported from ETE. 
+           It assumes the tree has branch lengths.
 
 =cut
 
@@ -251,7 +253,8 @@ Gets node that divides tree into two distance-balanced partitions.
         my $self     = shift;
         my $root     = $self->get_root;
         my $nA       = $self->get_tallest_tip;
-        my $nB       = $nA->get_farthest_node;
+        my $nB       = $nA->get_farthest_node(1);
+        $logger->error("no farthest node!") unless $nB; 
         my $A2B_dist = $nA->calc_path_to_root + $nB->calc_path_to_root;
         my $outgroup = $nA;
         my $middist  = $A2B_dist / 2;
@@ -634,14 +637,12 @@ Test if tree is bifurcating.
 
     sub is_binary {
         my $self = shift;
-        for ( @{ $self->get_internals } ) {
-            if ( $_->get_first_daughter->get_next_sister->get_id !=
-                $_->get_last_daughter->get_id )
-            {
-                return;
-            }
-        }
-        return 1;
+        my $return = 1;
+        $self->visit(sub{
+        	my $count = scalar(@{ shift->get_children });
+        	$return = 0 if $count != 0 && $count != 2;
+        });
+        $return;
     }
 
 =item is_ultrametric()
@@ -852,7 +853,9 @@ Tests if tree is a cladogram (i.e. no branch lengths)
 
 =item calc_branch_length_distance()
 
-Calculates the Euclidean branch length distance between two trees.
+Calculates the Euclidean branch length distance between two trees. See
+Kuhner & Felsenstein (1994). A simulation comparison of phylogeny algorithms
+under equal and unequal evolutionary rates. MBE 11(3):459-468.
 
  Type    : Calculation
  Title   : calc_branch_length_distance
@@ -905,29 +908,30 @@ Calculates the squared Euclidean branch length distance between two trees.
  Function: Calculates the squared Euclidean branch
            length distance between two trees
  Returns : SCALAR, number
- Args    : NONE
-
+ Args    : A Bio::Phylo::Forest::Tree object,           
+           Optional second argument flags that results should be normalized
 =cut
 
     sub calc_branch_length_score {
-        my ( $self, $other ) = @_;
+        my ( $self, $other, $normalize ) = @_;
         my $tuples = $self->_calc_branch_diffs($other);
         my $sum    = 0;
         for my $tuple ( @{$tuples} ) {
             my $diff = ( $tuple->[0] || 0 ) - ( $tuple->[1] || 0 );
             $sum += $diff**2;
         }
-        return $sum;
+        return $normalize ? $sum / scalar(@{$tuples}) : $sum;
     }
+
 
 =begin comment
 
-Returns an array of triples, with the first element of each triple representing
-the length of the branch subtending a particular split on the invocant, 
-the second element the length of the same branch on argument, and the third
-element a boolean to indicate whether the split was present in both trees. If a
-particular split is found on one tree but not in the other, a value of zero
-is used for the missing split.
+Returns an array ref containing array references, with the first element of 
+each nested array ref representing the length of the branch subtending a 
+particular split on the invocant (or 0), the second element the length of the 
+same branch on argument (or 0), the third element a boolean to indicate whether 
+the split was present in both trees, and the fourth element a sorted, comma-separated
+list of the MD5-hashed names of all tips subtended by that split.
 
  Type    : Calculation
  Title   : calc_branch_diffs
@@ -970,7 +974,7 @@ is used for the missing split.
                     # we only enter into this case AFTER tips
                     # have been processed, so %hash_for_node
                     # values will be assigned for all children
-                    if (@children) {
+                    if (@children and $node->get_parent) {
 
                         # these will be growing lists from
                         # tips to root
@@ -985,15 +989,16 @@ is used for the missing split.
                           $unsorted;
 
                         # coerce to a numeric type
-                        $length_for_split{$hash} = $node->get_branch_length;
+                        $length_for_split{$hash} = $node->get_branch_length || 0;
                     }
                     else {
 
-                        # this is how we ensure that every
-                        # tip name is a single, unique line.
+                        # this is how we ensure that every tip name is a 
+                        # single, unique string without unexpected characters
+                        # (especially, commas).
                         # Digest::MD5 was in CORE since 5.7
                         require Digest::MD5;
-                        $hash = Digest::MD5::md5( $node->get_name );
+                        $hash = Digest::MD5::md5( $node->get_name );                        
                     }
 
                     # store for the next recursion
@@ -1016,10 +1021,10 @@ is used for the missing split.
             my $tuple;
             if ( exists $lengths_other{$split} ) {
                 $tuple =
-                  [ $lengths_self{$split}, $lengths_other{$split} || 0, 1 ];
+                  [ $lengths_self{$split}, $lengths_other{$split} || 0, 1, $split ];
             }
             else {
-                $tuple = [ $lengths_self{$split}, 0, 0 ];
+                $tuple = [ $lengths_self{$split}, 0, 0, $split ];
             }
             push @tuples, $tuple;
         }
@@ -1027,7 +1032,7 @@ is used for the missing split.
         # then check if there are splits in $other but not in $self
         for my $split ( keys %lengths_other ) {
             if ( not exists $lengths_self{$split} ) {
-                push @tuples, [ 0, $lengths_other{$split}, 1 ];
+                push @tuples, [ 0, $lengths_other{$split}, 0, $split ];
             }
         }
         return \@tuples;
@@ -1264,7 +1269,7 @@ Calculates Colless' coefficient of tree imbalance.
                     my $ri = shift @children;
                     my $li_ndesc = $descendants{$li->get_id};
                     my $ri_ndesc = $descendants{$ri->get_id};
-                    $sumdiff += $li_ndesc - $ri_ndesc;
+                    $sumdiff += abs($li_ndesc - $ri_ndesc);
                     $descendants{$node->get_id} = $li_ndesc + $ri_ndesc;
                 }
                 
@@ -1280,7 +1285,13 @@ Calculates Colless' coefficient of tree imbalance.
                 }
             }
         );
-        return $sumdiff / ( ($n-1) * ($n-2) / 2 );
+        if ( $n < 3 ) {
+        	$logger->error("too few nodes in tree: $n<=2");
+        	return undef;
+        }
+        else {
+        	return $sumdiff / ( ($n-1) * ($n-2) / 2 );
+        }
     }
 
 =item calc_i2()
@@ -1301,8 +1312,7 @@ Calculates I2 imbalance.
         my $self = shift;
         my ( $maxic, $sum, $I2 ) = ( 0, 0 );
         if ( !$self->is_binary ) {
-            throw 'ObjectMismatch' =>
-              'I2 imbalance only possible for binary trees';
+            throw 'ObjectMismatch' => 'I2 imbalance only possible for binary trees';
         }
         my $numtips = $self->calc_number_of_terminals;
         $numtips -= 2;
@@ -1342,13 +1352,19 @@ Calculates I2 imbalance.
             next unless ( $ftips + $ltips - 2 );
             $sum += abs( $ftips - $ltips ) / abs( $ftips + $ltips - 2 );
         }
-        $I2 = $sum / $maxic;
-        return $I2;
+        if ( $maxic == 0 ) {
+        	$logger->error("too few nodes in tree: $maxic==0");
+        	return undef;
+        }
+        else {
+        	$I2 = $sum / $maxic;
+        	return $I2;
+        }
     }
 
 =item calc_gamma()
 
-Calculates the Pybus gamma statistic.
+Calculates the Pybus & Harvey (2000) gamma statistic.
 
  Type    : Calculation
  Title   : calc_gamma
@@ -1428,6 +1444,9 @@ Calculates the Pybus gamma statistic.
         $denominator->bdiv( 12 * ( $n - 2 ) );
         $denominator->bsqrt();
         $sum->bdiv( $denominator * $tl );
+        
+         # R seems to be unhappy about long numbers, so truncating
+        $sum->accuracy(10);
         return $sum;
     }
 
@@ -1467,8 +1486,13 @@ Calculates stemminess measure of Fiala and Sokal (1985).
                 $total += ( $node->get_branch_length / $desclengths );
             }
         }
-        $total /= $nnodes;
-        return $total;
+        if ( $nnodes ) {
+        	return $total /= $nnodes;
+        }
+        else {
+        	$logger->error("too few nodes in tree: n-1=$nnodes");
+        	return undef;
+        }
     }
 
 =item calc_rohlf_stemminess()
@@ -1738,7 +1762,8 @@ L<http://dx.doi.org/10.1016/0025-5564(81)90043-2>
            metric between $tree and $other_tree, 
            sensu Penny and Hendy, 1985.
  Returns : SCALAR
- Args    : A Bio::Phylo::Forest::Tree object
+ Args    : A Bio::Phylo::Forest::Tree object,
+           Optional second argument flags that results should be normalized
  Comments: Trees in comparison must span 
            the same set of terminal taxa
            or results are meaningless.
@@ -1746,14 +1771,45 @@ L<http://dx.doi.org/10.1016/0025-5564(81)90043-2>
 =cut
 
     sub calc_symdiff {
-        my ( $tree, $other_tree ) = @_;
+        my ( $tree, $other_tree, $normalize ) = @_;
         my $tuples  = $tree->_calc_branch_diffs($other_tree);
         my $symdiff = 0;
+        #use Data::Dumper;
+        #warn Dumper($tuples);
         for my $tuple ( @{$tuples} ) {
             $symdiff++ unless $tuple->[2];
         }
-        return $symdiff;
+        return $normalize ? $symdiff / scalar(@{$tuples}) : $symdiff;
     }
+
+=item calc_avtd()
+
+Calculates the average taxonomic distinctiveness. See
+Clarke KR, Warwick RM (1998) A taxonomic distinctness index and its statistical 
+properties. J Appl Ecol 35:523-525
+L<http://dx.doi.org/10.1046/j.1365-2664.1998.3540523.x>
+
+ Type    : Calculation
+ Title   : calc_avtd
+ Usage   : my $avtd = $tree->calc_avtd;
+ Function: Returns the average taxonomic distinctiveness
+ Returns : SCALAR
+ Args    : A Bio::Phylo::Forest::Tree object
+ Comments: 
+
+=cut
+
+	sub calc_avtd {
+		my $tree = shift;
+		my @tips = @{ $tree->get_terminals };
+		my $dist = 0;
+		for my $i ( 0 .. $#tips - 1 ) {
+			for my $j ( $i + 1 .. $#tips ) {
+				$dist += $tips[$i]->calc_patristic_distance($tips[$j]);
+			}
+		}
+		return $dist / scalar(@tips);
+	}
 
 =item calc_fp() 
 
@@ -1795,6 +1851,27 @@ Calculates the Fair Proportion value for each terminal.
         return $fp;
     }
 
+=item calc_fp_mean() 
+
+Calculates the mean Fair Proportion value over all terminals.
+
+ Type    : Calculation
+ Title   : calc_fp_mean
+ Usage   : my $fp = $tree->calc_fp_mean();
+ Function: Returns the mean Fair Proportion 
+           value over all terminals
+ Returns : FLOAT
+ Args    : NONE
+
+=cut
+    
+    sub calc_fp_mean {
+    	my $self = shift;
+    	my $fp = $self->calc_fp;
+    	my @fp = values %{ $fp };
+    	return sum(@fp)/scalar(@fp);
+    }
+
 =item calc_es() 
 
 Calculates the Equal Splits value for each terminal
@@ -1828,7 +1905,27 @@ Calculates the Equal Splits value for each terminal
             $es->{$name} = $esi;
         }
         return $es;
-    }
+    }  
+
+=item calc_es_mean()
+
+Calculates the mean Equal Splits value over all terminals
+
+ Type    : Calculation
+ Title   : calc_es_mean
+ Usage   : my $es = $tree->calc_es_mean();
+ Function: Returns the Equal Splits value over all terminals
+ Returns : FLOAT
+ Args    : NONE
+
+=cut
+
+	sub calc_es_mean {
+		my $self = shift;
+		my $es = $self->calc_es;
+		my @es = values %{ $es };
+		return sum(@es)/scalar(@es);
+	}
 
 =item calc_pe()
 
@@ -1850,7 +1947,27 @@ Calculates the Pendant Edge value for each terminal.
         my $pe =
           { map { $_->get_name => $_->get_branch_length } @{$terminals} };
         return $pe;
-    }
+    }    
+
+=item calc_pe_mean()
+
+Calculates the mean Pendant Edge value over all terminals
+
+ Type    : Calculation
+ Title   : calc_pe_mean
+ Usage   : my $es = $tree->calc_pe_mean();
+ Function: Returns the mean Pendant Edge value over all terminals
+ Returns : FLOAT
+ Args    : NONE
+
+=cut
+
+	sub calc_pe_mean {
+		my $self = shift;
+		my $pe = $self->calc_pe;
+		my @pe = values %{ $pe };
+		return sum(@pe)/scalar(@pe);
+	}
 
 =item calc_shapley()
 
@@ -1956,6 +2073,26 @@ Calculates the Shapley value for each terminal.
         }
         return ( @core_terminals, @child_terminals, @parent_terminals );
     }
+    
+=item calc_shapley_mean()
+
+Calculates the mean Shapley value over all terminals
+
+ Type    : Calculation
+ Title   : calc_shapley_mean
+ Usage   : my $es = $tree->calc_shapley_mean();
+ Function: Returns the mean Shapley value over all terminals
+ Returns : HASHREF
+ Args    : NONE
+
+=cut
+
+	sub calc_shapley_mean {
+		my $self = shift;
+		my $sv = $self->calc_shapley;
+		my @sv = values %{ $sv };
+		return sum(@sv)/scalar(@sv);
+	}
 
 =back
 
@@ -2231,6 +2368,50 @@ Converts node ages to branch lengths
         return $self;
     }
 
+=item rankprobbl()
+
+Generates branch lengths by calculating the rank probabilities for each node and applying
+the expected waiting times under a pure birth process to these ranks. Uses Stadler's 
+RANKPROB algorithm as described in: 
+
+B<Gernhard, T.> et al., 2006. Estimating the relative order of speciation 
+or coalescence events on a given phylogeny. I<Evolutionary Bioinformatics Online>. 
+B<2>:285. L<http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2674681/>.
+
+ Type    : Tree manipulator
+ Title   : rankprobbl
+ Usage   : $tree->rankprobbl;
+ Function: Generates pure birth branch lengths
+ Returns : The modified invocant.
+ Args    : NONE
+ Comments: Tree must be fully bifurcating
+
+=cut
+
+	sub rankprobbl {
+		my $self = shift;
+		my $root = $self->get_root;
+		my $intervals = $root->calc_terminals;
+		my @times;
+		for my $i ( 1 .. $intervals ) {
+			my $previous = $times[-1] || 0;
+			push @times, $previous + ( 1 / $i );
+		}
+		my $total = $times[-1];
+		for my $node ( @{ $self->get_internals } ) {
+			my $rankprobs = $root->calc_rankprob($node);
+			my @weighted_waiting_times;
+			for my $i ( 1 .. $#{ $rankprobs } ) {
+				push @weighted_waiting_times, $rankprobs->[$i] * $times[$i - 1];
+			}
+			my $age = $total - sum(@weighted_waiting_times);
+			$node->set_generic( 'age' => $age );
+		}
+		$self->agetobl;
+		$root->set_branch_length(1);
+		return $self;
+	}
+
 =item ultrametricize()
 
 Sets all root-to-tip path lengths equal.
@@ -2314,22 +2495,22 @@ Randomly breaks polytomies.
  Function: Randomly breaks polytomies by inserting 
            additional internal nodes.
  Returns : The modified invocant.
- Args    :
+ Args    : Optionally, when passed a true value (e.g. '1'), the newly created nodes
+           will be unnamed, otherwise they will be named 'r1', 'r2', 'r3' and so on.
  Comments:
 
 =cut
 
     sub resolve {
-        my $tree = shift;
+        my ( $tree, $anonymous ) = @_;
         for my $node ( @{ $tree->get_internals } ) {
             my @children = @{ $node->get_children };
             if ( scalar @children > 2 ) {
                 my $i = 1;
                 while ( scalar @children > 2 ) {
-                    my $newnode = Bio::Phylo::Forest::Node->new(
-                        '-branch_length' => 0.00,
-                        '-name'          => 'r' . $i++,
-                    );
+                	my %args = ( '-branch_length' => 0.00 );
+                	$args{'-name'} = 'r' . $i++ unless $anonymous;
+                    my $newnode = $fac->create_node(%args);
                     $tree->insert($newnode);
                     $newnode->set_parent($node);
                     for ( 1 .. 2 ) {
@@ -2342,6 +2523,281 @@ Randomly breaks polytomies.
             }
         }
         return $tree;
+    }
+    
+=item replicate()
+
+Simulates tree(s) whose properties resemble that of the input tree in terms of birth/death
+rate, depth, and size/depth distribution of genera. This uses the R environment for 
+statistics to get a maximum likelihood estimate of birth/death rates on the source tree
+and therefore requires the package L<Statistics::R> to be installed, and the R package
+'ape'. The idea is that this is used on a species tree that is ultrametric. To get 
+simulated genera whose sizes and root depths approximate those of the source tree, 
+annotate genus nodes in the source tree, e.g. using $tree->generize, and provide the 
+optional -genera flag of replicate() with a true value.
+
+This method uses the function C<birthdeath> from the R package C<ape>. If you use this
+method in a publication, you should therefore B<cite that package> (in addition to 
+Bio::Phylo). More information about C<ape> can be found at L<http://ape-package.ird.fr/>.
+
+ Type    : Tree manipulator
+ Title   : replicate
+ Usage   : my $forest = $tree->replicate;
+ Function: Simulates tree(s) whose properties resemble that of the invocant tree
+ Returns : Bio::Phylo::Forest
+ Args    : Optional: -trees    => number of replicates, default is 1
+           Optional: -rootedge => keep the birth/death root branch, then scale the tree(s)
+           Optional: -genera   => approximate distribution of source genus sizes and depths 
+           (do this by tagging internal nodes: $node->set_rank('genus'))
+		   Optional: -seed     => a random integer seed for generating the birth/death tree
+ Comments: Requires Statistics::R, and an R environment with 'ape' installed
+           Expects to operate on an ultrametric tree
+
+=cut    
+    
+    sub replicate {
+    	my ( $self, %args ) = @_;
+    	if ( looks_like_class('Statistics::R') and looks_like_class('Bio::Phylo::Generator') ) {
+
+    		# get birthdeath parameters
+    		$logger->info("going to estimate b/d");
+    		my $newick = $self->to_newick;
+    		my $R = Statistics::R->new;
+			if ( my $seed = $args{'-seed'} ) {
+				$R->run(qq[set.seed($seed)]);
+			}
+    		$R->run(q[library("ape")]);
+    		$R->run(qq[phylo <- read.tree(text="$newick")]);
+    		$R->run(q[bd <- birthdeath(phylo)]);
+    		$R->run(q[ratio <- as.double(bd$para[1])]);
+    		my $b_over_d = $R->get(q[ratio]);
+    		$logger->info("b/d=$b_over_d");
+    		
+    		# generate the tree
+    		$logger->info("going to simulate tree(s)");
+    		my $gen = Bio::Phylo::Generator->new;
+    		my $forest = $gen->gen_rand_birth_death(
+    			'-trees'    => $args{'-trees'} || 1,
+    			'-killrate' => $b_over_d,
+    			'-tips'     => scalar(@{ $self->get_terminals }),
+				);
+    		
+    		# invent tip labels
+    		$forest->visit(sub{
+    			my $t = shift;
+    			my $n = 0;
+    			for my $tip ( @{ $t->get_terminals } ) {
+    				my $genus = $self->_make_taxon_name;
+    				my $species = $self->_make_taxon_name;
+    				if ( $genus =~ /(..)$/ ) {
+    					my $suffix = $1;
+    					$species =~ s/..$/$suffix/;
+    					$tip->set_name( ucfirst($genus) . '_' . $species );
+    				}
+    			}
+    		});
+    		
+    		# scale the trees
+    		my $height = $self->calc_tree_height;
+    		$forest->visit(sub{shift->get_root->set_branch_length(0)}) if not $args{'-rootedge'};
+    		$forest->visit(sub{shift->scale($height)});
+    		$logger->info("tree height is $height");
+    		
+    		# create similar genera, optionally
+    		if ( $args{'-genera'} ) {
+    			$logger->info("going to approximate genera");
+    		
+    			# iterate over trees
+    			for my $replicate ( @{ $forest->get_entities } ) {
+					
+					# get distribution of source genus sizes and depths
+					$logger->info("calculating source genus sizes and depths");
+					my ( $counter, %genera ) = ( 0 );
+					$self->visit(sub{
+						my $node = shift;
+						my $rank = $node->get_rank;
+						if ( $rank ) {
+							if ( $rank eq 'genus' ) {
+								my $id     = $node->get_id;
+								my $height = $height - $node->calc_path_to_root;
+								my $size   = scalar(@{ $node->get_terminals });
+								my $name   = $node->get_name || 'Genus' . ++$counter;
+								$genera{$id} = {
+									'name'   => $name,
+									'size'   => $size,
+									'height' => $height,
+									'node'   => $node,
+								};
+							}
+						}
+					});
+					
+					# get distribution of target node sizes and depths
+					$logger->info("calculating target genus sizes and depths");					
+					my ( %node );
+					$replicate->visit(sub{
+						my $node   = shift;
+						my $id     = $node->get_id;	
+						my $height = $height - $node->calc_path_to_root;												
+						my $size   = scalar(@{ $node->get_terminals });
+						push @{ $node{$size} }, [ $node, $height, $id ];
+					});
+										
+					# keep track of which members from the genera have already been assigned
+					my %seen_labels;
+					
+					# start assigning genera, from big to small
+					for my $genus ( sort { $genera{$b}->{'size'} <=> $genera{$a}->{'size'} } keys %genera ) {
+						# get key for candidate set of nodes
+						my $name = $genera{$genus}->{'name'} || "Genus${genus}";						
+						my $size = $genera{$genus}->{'size'};
+						my @labels = shuffle map { $_->get_name } @{ $genera{$genus}->{'node'}->get_terminals };
+						
+						# avoid assigning labels more than once when genera are nested
+						@labels = grep { ! $seen_labels{$_} } @labels;
+						$seen_labels{$_}++ for @labels;
+
+						$logger->info("processing $name ($size tips)");
+						SIZE: while( not $node{$size} ) { last SIZE if --$size <= 1 }
+					
+						# get target height
+						if ( $node{$size} ) {
+							$logger->info("found candidate(s) with $size tips");						
+							my $h = $genera{$genus}->{'height'};
+							my ($node) = map { $_->[0] } 
+							            sort { abs($a->[1]-$h) <=> abs($b->[1]-$h) } 
+							                @{ $node{$size} };
+							
+							# assign genus label to node and tips, remove all descendants 
+							# (and self!) from list of candidates, as we can't nest genera
+							my $sp = 0;							
+							$node->set_name($name);
+						
+							for my $n ( $node, @{ $node->get_descendants } ) {
+								$n->set_name($labels[$sp++]) if $n->is_terminal;
+								for my $i ( 1 .. $size ) {
+									if ( my $array = $node{$i} ) {
+										my $id = $n->get_id;
+										my @filtered = grep { $id != $_->[2] } @$array;
+										@filtered ? $node{$i} = \@filtered : delete $node{$i};
+									}
+								}
+							}
+						}
+						else {
+							$logger->warn("exhausted candidate genera for $genus");
+						}
+					}
+    			}
+    		}
+    		return $forest;
+    	}
+    }
+    
+    sub _make_taxon_name {
+    	my %l = (
+    		'v' => [ qw(a e i o u) ],
+    		'c' => [ qw(qu cr ct p pr ps rs ld ph gl ch l sc v n m) ],
+    	);
+    	my @suffixes =qw(us os is as es);
+    	my $length = 1 + int rand 2;
+    	my @order = int rand 2 ? qw(v c) : qw(c v);
+    	my ($l1) = shuffle(@{$l{$order[0]}});
+    	my ($l2) = shuffle(@{$l{$order[1]}});
+		my @name = ( $l1, $l2 );
+    	for my $i ( 0 .. $length ) {
+	    	($l1) = shuffle(@{$l{$order[0]}});
+    		($l2) = shuffle(@{$l{$order[1]}});
+    		push @name, $l1, $l2;
+    	}
+    	my $name = join '', @name;
+    	$name =~ s/[aeiou]+$//;
+    	my ($suffix) = shuffle(@suffixes);
+    	return $name . $suffix;
+    }
+
+=item generize()
+
+Identifies monophyletic genera by traversing the tree, taking the first word of the tip
+names and finding the MRCA of each word. That MRCA is tagged as rank 'genus' and assigned
+the name.
+
+ Type    : Tree manipulator
+ Title   : generize
+ Usage   : $tree->generize(%args);
+ Function: Identifies monophyletic genera
+ Returns : Invocant
+ Args    : Optional: -delim => the delimiter that separates the genus name from any 
+                               following (sub)specific epithets. Default is a space ' '.
+           Optional: -monotypic => if true, also tags monotypic genera
+           Optional: -polypara  => if true, also tags poly/paraphyletic genera. Any 
+                                   putative genera nested within the largest of the 
+                                   entangled, poly/paraphyletic genera will be ignored.
+ Comments:
+
+=cut
+    
+    sub generize {
+    	my ( $self, %args ) = @_;
+    	my $delim = $args{'-delim'} || ' ';
+    	
+    	# bin by genus name
+    	my %genera;
+    	for my $tip ( @{ $self->get_terminals } ) {
+    		my $binomial = $tip->get_name;
+    		my ($genus) = split /$delim/, $binomial;
+    		$genera{$genus} = [] if not $genera{$genus};
+    		push @{ $genera{$genus} }, $tip;
+    	}
+    	
+    	# identify and tag MRCAs
+    	my %skip;
+    	for my $genus ( sort { scalar(@{$genera{$b}}) <=> scalar(@{$genera{$a}}) } keys %genera ) {
+    		next if $skip{$genus};
+    		my $tips = $genera{$genus};
+    		
+    		# genus is monotypic
+    		if ( scalar(@$tips) == 1 ) {
+    			$logger->info("$genus is monotypic");
+    			$tips->[0]->set_rank('genus') if $args{'-monotypic'};
+    		}
+    		else {
+    		
+    			# get the MRCA
+				my ( $mrca, %seen );
+				my @paths = map { @{ $_->get_ancestors } } @{ $tips };
+				$seen{$_->get_id}++ for @paths;
+				($mrca) = map { $_->[0] } 
+				         sort { $b->[1] <=> $a->[1] } 
+				          map { [ $_, $_->calc_path_to_root ] } 
+				         grep { $seen{$_->get_id} == @$tips } @paths;
+				
+				# identify mono/poly/para
+				my $clade_size = @{ $mrca->get_terminals };
+				my $tip_count  = @{ $tips };
+				if ( $clade_size == $tip_count ) {
+					$logger->info("$genus is monophyletic");
+					$mrca->set_rank('genus');
+					$mrca->set_name($genus);
+				}
+				else {
+										
+					# we could now have nested, smaller genera inside this one
+					$logger->info("$genus is non-monophyletic $clade_size != $tip_count");
+					if ( $args{'-polypara'} ) {
+						$logger->info("tagging non-monophyletic $genus anyway");
+						$mrca->set_rank('genus');
+						$mrca->set_name($genus);	
+						my @names = map { $_->get_name } @{ $mrca->get_terminals };
+						for my $name ( @names ) {
+							$name =~ s/^(.+?)${delim}.+$/$1/;
+							$skip{$name}++;
+						}			
+					}
+				}
+			}
+        }
+        return $self;
     }
 
 =item prune_tips()
@@ -2515,7 +2971,8 @@ Converts negative branch lengths to zero.
 
 =item ladderize()
 
-Sorts nodes in ascending (or descending) order of number of children.
+Sorts nodes in ascending (or descending) order of number of children. Tips are
+sorted alphabetically (ascending or descending) relative to their siblings.
 
  Type    : Tree manipulator
  Title   : ladderize
@@ -2531,25 +2988,48 @@ Sorts nodes in ascending (or descending) order of number of children.
         my %child_count;
         $self->visit_depth_first(
             '-post' => sub {
-                my $node     = shift;
-                my $id       = $node->get_id;
+                my $node = shift;
+                
+                # record the number of descendants for the focal
+                # node. because this is a post-order traversal
+                # we have already counted the children of the 
+                # children, recursively. bin nodes and tips in 
+                # separate containers.
+                my $id = $node->get_id;
                 my @children = @{ $node->get_children };
-                my $count    = 1;
+                my $count = 1;
+                my ( @tips, @nodes );
                 for my $child (@children) {
                     $count += $child_count{ $child->get_id };
+                    if ( $child->is_terminal ) {
+                    	push @tips, $child;
+                    }
+                    else {
+                    	push @nodes, $child;
+                    }
                 }
                 $child_count{$id} = $count;
+                
+                # sort the immediate children. if these are 
+                # tips we will sort alphabetically by name (so
+                # that cherries are sorted predictably), otherwise
+                # sort by descendant count
                 my @sorted;
-                if ($right) {
-                    @sorted = map { $_->[0] }
-                      sort { $b->[1] <=> $a->[1] }
-                      map { [ $_, $child_count{ $_->get_id } ] } @children;
-                }
-                else {
-                    @sorted = map { $_->[0] }
-                      sort { $a->[1] <=> $b->[1] }
-                      map { [ $_, $child_count{ $_->get_id } ] } @children;
-                }
+                
+				if ($right) {
+					@sorted = map { $_->[0] }
+					  sort { $b->[1] <=> $a->[1] }
+					  map { [ $_, $child_count{ $_->get_id } ] } @nodes;
+					push @sorted, sort { $b->get_name cmp $a->get_name } @tips;
+				}
+				else {					
+					@sorted = map { $_->[0] }
+					  sort { $a->[1] <=> $b->[1] }
+					  map { [ $_, $child_count{ $_->get_id } ] } @nodes;
+					unshift @sorted, sort { $a->get_name cmp $b->get_name } @tips;
+				}
+
+				# apply the new sort order                
                 for my $i ( 0 .. $#sorted ) {
                     $node->insert_at_index( $sorted[$i], $i );
                 }
@@ -2561,7 +3041,7 @@ Sorts nodes in ascending (or descending) order of number of children.
 =item sort_tips()
 
 Sorts nodes in (an approximation of) the provided ordering. Given an array
-reference of taxa, an array reference of name strings or a taxa object, this
+reference of taxa, an array reference of name strings, or a taxa object, this
 method attempts to order the tips in the same way. It does this by recursively
 computing the rank for all internal nodes by taking the average rank of its
 children. This results in the following orderings:
@@ -2642,6 +3122,34 @@ Raises branch lengths to argument.
         return $tree;
     }
 
+=item multiply()
+
+Multiples branch lengths by argument.
+
+ Type    : Tree manipulator
+ Title   : multiply
+ Usage   : $tree->multiply($num);
+ Function: Multiplies branch lengths by $num.
+ Returns : The modified invocant.
+ Args    : A $number in any of perl's number formats.
+
+=cut
+    
+    sub multiply {
+    	my ( $tree, $num ) = @_;
+    	if ( !looks_like_number $num ) {
+    		throw 'BadNumber' => "Number '$num' is a bad number";
+    	}
+    	$tree->visit(sub{
+    		my $node = shift;
+    		my $length = $node->get_branch_length;
+    		if ( $length ) {
+    			$node->set_branch_length( $length * $num );
+    		}
+    	});
+    	return $tree;
+    }
+
 =item log_transform()
 
 Log argument base transform branch lengths.
@@ -2700,30 +3208,58 @@ Collapses internal nodes with fewer than 2 children.
                 my $node = shift;
                 my @children = @{ $node->get_children };
                 
-                #Êthe node is interior, now need to check for each child
+                #Â the node is interior, now need to check for each child
                 # if it's interior as well
                 if ( @children ) {
+                
+                	# special case for the root with unbranched child
+                	if ( $node->is_root and 1 == @children ) {
+                		my ($child) = @children;
+						for my $gchild ( @{ $child->get_children } ) {
+					
+							# compute the new branch length for $gchild
+							my $clength = $child->get_branch_length;
+							my $glength = $gchild->get_branch_length;
+							my $length = $clength if defined $clength;
+							$length += $glength if defined $glength;
+							$gchild->set_branch_length($length) if defined $length;
+							
+							# connect grandchild to root
+							$gchild->set_parent($node);
+							$node->delete($child);
+					
+							# will delete these nodes from the tree array
+							# after the recursion
+							push @delete, $child;						
+						}              		
+                	}
+                	else {
                     
-                    # iterate over children 
-                    for my $child ( @children ) {
-                        my @grandchildren = @{ $child->get_children };
-                        
-                        # $child is an unbranched internal, so $grandchildren[0]
-                        # needs to be connected to $node
-                        if ( 1 == scalar @grandchildren ) {
-                            my $gchild = $grandchildren[0];
-                            
-                            # compute the new branch length for $gchild
-                            my $length = (  $child->get_branch_length || 0 )
-                                       + ( $gchild->get_branch_length || 0 );
-                            $gchild->set_branch_length($length);
-                            $gchild->set_parent($node);
-                            $node->delete($child);
-                            
-                            # will delete these nodes from the tree array
-                            # after the recursion
-                            push @delete, $child;						
-                        }
+						# iterate over children 
+						for my $child ( @children ) {
+							my $child_name = $child->get_name;
+							my @grandchildren = @{ $child->get_children };
+						
+							# $child is an unbranched internal, so $grandchildren[0]
+							# needs to be connected to $node
+							if ( 1 == scalar @grandchildren ) {
+								my $gchild = $grandchildren[0];
+							
+								# compute the new branch length for $gchild
+								my $clength = $child->get_branch_length;
+								my $glength = $gchild->get_branch_length;
+								my $length = $clength if defined $clength;
+								$length += $glength if defined $glength;
+								$gchild->set_branch_length($length) if defined $length;
+								
+								$gchild->set_parent($node);
+								$node->delete($child);
+							
+								# will delete these nodes from the tree array
+								# after the recursion
+								push @delete, $child;						
+							}
+						}
                     }				
                 }
             }

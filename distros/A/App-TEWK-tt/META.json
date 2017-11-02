@@ -39,7 +39,7 @@
             "Modern::Perl" : "0",
             "Term::ANSIColor" : "0",
             "Term::ReadKey" : "0",
-            "perl" : "5.22",
+            "perl" : "5.022",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -53,6 +53,6 @@
          "web" : "https://github.com/tewk/tt"
       }
    },
-   "version" : 0.01,
+   "version" : 0.03,
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

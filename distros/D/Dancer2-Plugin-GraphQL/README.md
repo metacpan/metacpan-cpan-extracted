@@ -60,7 +60,16 @@ Dancer2::Plugin::GraphQL - a plugin for adding GraphQL route handlers
 The `graphql` keyword which is exported by this plugin allow you to
 define a route handler implementing a GraphQL endpoint.
 
-Parameters, after the route pattern:
+Parameters, after the route pattern.
+The first three can be replaced with a single array-ref. If so,
+the first element is a classname-part, which will be prepended with
+"[GraphQL::Plugin::Convert](https://metacpan.org/pod/GraphQL::Plugin::Convert)::". The other values will be passed to
+that class's ["to\_graphql" in GraphQL::Plugin::Convert](https://metacpan.org/pod/GraphQL::Plugin::Convert#to_graphql) method. The returned
+hash-ref will be used to set options.
+
+E.g.
+
+    graphql '/graphql' => [ 'Test' ]; # uses GraphQL::Plugin::Convert::Test
 
 - $schema
 

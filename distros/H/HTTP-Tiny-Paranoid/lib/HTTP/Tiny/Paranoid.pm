@@ -1,5 +1,5 @@
 package HTTP::Tiny::Paranoid;
-$HTTP::Tiny::Paranoid::VERSION = '0.05';
+$HTTP::Tiny::Paranoid::VERSION = '0.07';
 use strict;
 use warnings;
 
@@ -21,7 +21,9 @@ around _open_handle => sub {
 
   my ($req, $scheme, $host, $port, $peer) = @_;
 
-  if ($peer && $peer eq $host) {
+  if ($peer) {
+    my ($ips, $error) = $dns->resolve($peer);
+    die "$peer: $error\n" if defined $error;
     $self->$next($req, $scheme, $host, $port, $peer);
   }
   else {
@@ -42,10 +44,6 @@ __END__
 =head1 NAME
 
 HTTP::Tiny::Paranoid - A safer HTTP::Tiny
-
-=head1 VERSION
-
-version 0.05
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,73 @@
+{
+   "abstract" : "Service management using a pid file and touch files",
+   "author" : [
+      "Jeff Ober <sysread@fastmail.fm>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Proc-tored",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Auto::Mata" : "0.07",
+            "Carp" : "0",
+            "Exporter" : "0",
+            "Fcntl" : "0",
+            "Guard" : "0",
+            "Moo" : "0",
+            "Moo::Role" : "0",
+            "Path::Tiny" : "0.097",
+            "Time::HiRes" : "0",
+            "Try::Tiny" : "0",
+            "Type::Tiny" : "0",
+            "Types::Standard" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "Devel::Cover" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "Path::Tiny" : "0.097",
+            "Test2::Bundle::Extended" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/sysread/Proc-tored/issues"
+      },
+      "homepage" : "https://github.com/sysread/Proc-tored",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/sysread/Proc-tored.git",
+         "web" : "https://github.com/sysread/Proc-tored"
+      }
+   },
+   "version" : "0.20",
+   "x_serialization_backend" : "JSON::XS version 3.03"
+}
+

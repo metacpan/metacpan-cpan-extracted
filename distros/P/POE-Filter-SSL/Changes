@@ -128,3 +128,14 @@ Revision history for POE-Filter-SSL
 	Allow to specify SNI
 	Allow to force tls(1.2)
 
+0.35	31.10.2017
+	Fixed cacrtmem
+	Fixed debuging
+	Fixed pod errors leaded to bad make test
+	Use own SSL_CTX_set_tmp_rsa, Net::SSLeay got CTX_set_tmp_rsa removed
+	Strawberry Perl: Compileroptions to compile, -ldl before other modules
+	Save error code on chain certificate verifying
+
+0.36	01.11.2017
+	Again pod errors
+

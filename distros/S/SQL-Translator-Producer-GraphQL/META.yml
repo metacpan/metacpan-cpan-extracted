@@ -1,0 +1,36 @@
+---
+abstract: 'GraphQL schema producer for SQL::Translator'
+author:
+  - 'Ed J <etj@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  GraphQL: '0.20'
+  GraphQL::Plugin::Convert::DBIC: '0.02'
+  SQL::Translator: '0'
+  SQL::Translator::Producer::DBIx::Class::File: '0'
+  Test::More: '0.98'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150001'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: SQL-Translator-Producer-GraphQL
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  GraphQL: '0.20'
+  GraphQL::Plugin::Convert::DBIC: '0.02'
+  SQL::Translator: '0'
+  SQL::Translator::Producer::DBIx::Class::File: '0'
+  perl: '5.014'
+resources:
+  IRC: irc://irc.perl.org/#graphql-perl
+  bugtracker: https://github.com/graphql-perl/SQL-Translator-Producer-GraphQL/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/graphql-perl/SQL-Translator-Producer-GraphQL
+version: '0.03'

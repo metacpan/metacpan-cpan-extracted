@@ -1,6 +1,6 @@
 package Proc::tored::Manager;
 # ABSTRACT: OO interface to creating a proctored service
-$Proc::tored::Manager::VERSION = '0.19';
+$Proc::tored::Manager::VERSION = '0.20';
 
 use strict;
 use warnings;
@@ -101,7 +101,7 @@ Proc::tored::Manager - OO interface to creating a proctored service
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 SYNOPSIS
 

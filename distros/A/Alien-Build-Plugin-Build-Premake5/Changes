@@ -1,0 +1,10 @@
+Revision history for Alien::Build::Plugin::Build::Premake5
+
+0.002     2017-10-31 10:51:49+00:00 Europe/London
+
+  * Fix:
+    * Correct the package name on distribution's tests
+
+0.001     2017-10-30 16:33:41+00:00 Europe/London
+
+  * Initial release

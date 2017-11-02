@@ -1,5 +1,5 @@
 #
-# $Id: Raw.pm,v f6ad8c136b19 2017/01/01 10:13:54 gomor $
+# $Id: Raw.pm,v 4f5647eb9e58 2017/03/05 12:22:13 gomor $
 #
 # file::raw Brik
 #
@@ -11,13 +11,14 @@ use base qw(Metabrik::File::Write);
 
 sub brik_properties {
    return {
-      revision => '$Revision: f6ad8c136b19 $',
+      revision => '$Revision: 4f5647eb9e58 $',
       tags => [ qw(unstable read write) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
       attributes => {
          input => [ qw(file) ],
          output => [ qw(file) ],
+         encoding => [ qw(utf8|ascii) ],  # Inherited
       },
       attributes_default => {
          encoding => 'ascii',

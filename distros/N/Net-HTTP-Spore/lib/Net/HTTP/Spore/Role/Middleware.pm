@@ -1,5 +1,5 @@
 package Net::HTTP::Spore::Role::Middleware;
-$Net::HTTP::Spore::Role::Middleware::VERSION = '0.07';
+$Net::HTTP::Spore::Role::Middleware::VERSION = '0.09';
 use Moose::Role;
 use Class::Load;
 use Scalar::Util qw/blessed/;
@@ -86,7 +86,7 @@ Net::HTTP::Spore::Role::Middleware
 
 =head1 VERSION
 
-version 0.07
+version 0.09
 
 =head1 AUTHORS
 

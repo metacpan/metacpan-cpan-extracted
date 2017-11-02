@@ -1,0 +1,29 @@
+---
+abstract: 'Business::OnlinePayment::CardConnect - CardConnect Backend for Business::OnlinePayment'
+author:
+  - 'Jason Terry <oaxlin@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Business-OnlinePayment-CardConnect
+requires:
+  Business::CreditCard: '0'
+  Business::OnlinePayment: '3'
+  Business::OnlinePayment::HTTPS: '0'
+  Carp: '0'
+  HTTP::Tiny: '0.022'
+  IO::Socket::SSL: '1.56'
+  IO::String: '0'
+  JSON: '0'
+  Log::Scrubber: '0.14'
+  Net::SSLeay: '0'
+  Test::More: '0'
+  URI::Escape: '0'
+version: '0.004'
+x_serialization_backend: 'YAML::Tiny version 1.64'

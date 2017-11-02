@@ -7,3 +7,4 @@
 - the function should return error codes. Maybe
 - Log both on stderr and file
 - Une option pour faire que qd on log un tableau, ca fasse plusieurs lignes dans les logs
+- un pattern pour afficher le thread ID

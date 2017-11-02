@@ -24,5 +24,5 @@ requires:
   Tie::Simple: '0'
 resources:
   repository: https://github.com/tomhrr/p5-Net-IP-XS
-version: '0.19'
+version: '0.20'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

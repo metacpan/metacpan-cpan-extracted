@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Software::License::AGPL_3;
-$Software::License::AGPL_3::VERSION = '0.103012';
+$Software::License::AGPL_3::VERSION = '0.103013';
 use parent 'Software::License';
 # ABSTRACT: GNU Affero General Public License, Version 3
 
@@ -23,7 +23,7 @@ Software::License::AGPL_3 - GNU Affero General Public License, Version 3
 
 =head1 VERSION
 
-version 0.103012
+version 0.103013
 
 =head1 AUTHOR
 
@@ -31,7 +31,7 @@ Ricardo Signes <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Ricardo Signes.
+This software is copyright (c) 2017 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

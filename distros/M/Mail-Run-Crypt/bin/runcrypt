@@ -10,14 +10,13 @@ use utf8;
 use 5.008_001;
 
 # Import required modules
-use Carp;
 use English '-no_match_vars';
 use File::stat;
 use Getopt::Long::Descriptive;
 use Mail::Run::Crypt;
 
 # Specify package version
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 # Name ourselves
 our $SELF = 'runcrypt';
@@ -69,14 +68,14 @@ my ( $opt, $usage ) = describe_options(
 # Print help if requested
 if ( $opt->help ) {
     print $usage->text
-      or carp 'failed stdout usage write';
+      or warn "Failed stdout usage write\n";
     exit 0;
 }
 
 # Bail if run without arguments
 if ( !@ARGV ) {
     printf {*STDERR} $usage->text
-      or carp 'failed stderr usage write';
+      or warn "Failed stderr usage write\n";
     exit 2;
 }
 
@@ -97,10 +96,10 @@ if ( defined $opt->passfile ) {
     $opts{passphrase} = do {
         local $RS = undef;
         open my $fh, '<', $fn
-          or croak "passfile $fn open failed: $ERRNO";
+          or die "Passphrase file $fn open failed: $ERRNO\n";
         my $passphrase = <$fh>;
         close $fh
-          or carp "passfile $fn close failed: $ERRNO";
+          or die "Passphrase file $fn close failed: $ERRNO\n";
         chomp $passphrase;
         $passphrase;
     };
@@ -253,10 +252,6 @@ L<https://sanctum.geek.nz/arabesque/series/gnu-linux-crypto/>
 =item *
 
 Perl v5.8.1 or newer
-
-=item *
-
-L<Carp|Carp>
 
 =item *
 

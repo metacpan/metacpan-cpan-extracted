@@ -1,5 +1,11 @@
 Revision history for Software-License
 
+0.103013  2017-10-27 17:45:23+02:00 Europe/Amsterdam
+        - guess_license_from_pod() now knows about Software::License::CC0_1_0
+        - Enable "v" as a version word
+        - Improve FreeBSD (2-Clause) phrases.
+        - Added EUPL v1.1 and v1.2
+
 0.103012  2016-04-23 14:57:59+01:00 Europe/London
         - consider license names without parentheses when scanning text for
           license (thanks, charsbar!)

@@ -1,0 +1,189 @@
+NAME
+    App::mysqlinfo - Get/extract information from MySQL database
+
+VERSION
+    This document describes version 0.001 of App::mysqlinfo (from Perl
+    distribution App-mysqlinfo), released on 2017-10-30.
+
+SYNOPSIS
+    See included script mysqlinfo.
+
+FUNCTIONS
+  dump_table
+    Usage:
+
+     dump_table(%args) -> [status, msg, result, meta]
+
+    Dump table into various formats.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   dbh => *obj*
+
+        Alternative to specifying dsn/user/password (from Perl).
+
+    *   dbname => *str*
+
+    *   exclude_columns => *array[str]*
+
+    *   host => *str*
+
+    *   include_columns => *array[str]*
+
+    *   limit_number => *nonnegint*
+
+    *   limit_offset => *nonnegint*
+
+    *   password => *str*
+
+        You might want to specify this parameter in a configuration file
+        instead of directly as command-line option.
+
+    *   port => *int*
+
+    *   row_format => *str* (default: "hash")
+
+    *   table* => *str*
+
+        Table name.
+
+    *   user => *str*
+
+    *   wheres => *array[str]*
+
+        Add WHERE clause.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (str)
+
+  list_columns
+    Usage:
+
+     list_columns(%args) -> [status, msg, result, meta]
+
+    List columns of a table.
+
+    Examples:
+
+    *   Example #1:
+
+         list_columns(dbname => "test", table => "main.table1");
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   dbh => *obj*
+
+        Alternative to specifying dsn/user/password (from Perl).
+
+    *   dbname => *str*
+
+    *   detail => *bool*
+
+        Show detailed information per record.
+
+    *   host => *str*
+
+    *   password => *str*
+
+        You might want to specify this parameter in a configuration file
+        instead of directly as command-line option.
+
+    *   port => *int*
+
+    *   table* => *str*
+
+        Table name.
+
+    *   user => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  list_tables
+    Usage:
+
+     list_tables(%args) -> [status, msg, result, meta]
+
+    List tables in the database.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   dbh => *obj*
+
+        Alternative to specifying dsn/user/password (from Perl).
+
+    *   dbname => *str*
+
+    *   host => *str*
+
+    *   password => *str*
+
+        You might want to specify this parameter in a configuration file
+        instead of directly as command-line option.
+
+    *   port => *int*
+
+    *   user => *str*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-mysqlinfo>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-mysqlinfo>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-mysqlinfo>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    DBI
+
+    App::dbinfo
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

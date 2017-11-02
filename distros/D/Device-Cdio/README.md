@@ -1,3 +1,5 @@
+[![Travis Build Status](https://travis-ci.org/rocky/Perl-Device-Cdio.svg?branch=master)](https://travis-ci.org/rocky/Perl-Device-Cdio) [![CircleCI Build Status](https://circleci.com/gh/rocky/Perl-Device-Cdio.svg?style=shield&circle-token=:circle-token)](https://circleci.com/gh/rocky/Perl-Device-Cdio)
+
 Device::Cdio - Perl bindings for libcdio (CD Input and Control library)
 ============================================================================
 
@@ -84,7 +86,7 @@ DEPENDENCIES
 COPYRIGHT AND LICENSE
 ---------------------
 
-  Copyright (C) 2006, 2008, 2011 Rocky Bernstein <rocky@cpan.org>
+  Copyright (C) 2006, 2008, 2011, 2017 Rocky Bernstein <rocky@cpan.org>
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by

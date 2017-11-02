@@ -11,7 +11,7 @@ use Clustericious::Log;
 use Clustericious::Client::Meta;
 
 # ABSTRACT: metadata about a route'
-our $VERSION = '1.26'; # VERSION
+our $VERSION = '1.27'; # VERSION
 
 
 has 'client_class';
@@ -178,7 +178,7 @@ Clustericious::Client::Meta::Route - metadata about a route'
 
 =head1 VERSION
 
-version 1.26
+version 1.27
 
 =head1 SYNOPSIS
 

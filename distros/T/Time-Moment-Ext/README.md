@@ -67,7 +67,7 @@ Return the day of month (alias to day\_of\_month)
 
 # VERSION
 
-version 0.03
+version 0.04
 
 # AUTHOR
 

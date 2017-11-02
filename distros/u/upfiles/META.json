@@ -1,0 +1,78 @@
+{
+   "abstract" : "Upload files to a remote FTP server.",
+   "author" : [
+      "Kevin Ryde <user42_kevin@yahoo.com.au>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "upfiles",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "devel",
+         "xt"
+      ]
+   },
+   "optional_features" : {
+      "sftp" : {
+         "description" : "Have sftp protocol (using ssh program).",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "Net::SFTP::Foreign" : "0"
+               }
+            }
+         }
+      }
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Math::Round" : "0.07"
+         },
+         "requires" : {
+            "DBD::SQLite" : "0",
+            "DBI" : "0",
+            "File::HomeDir" : "0",
+            "Locale::TextDomain" : "0",
+            "Math::Round" : "0",
+            "Module::Load" : "0",
+            "Regexp::Common" : "0",
+            "Regexp::Common::Emacs" : "0",
+            "URI" : "0",
+            "perl" : "5.010"
+         },
+         "suggests" : {
+            "Net::FTP" : "1.28",
+            "Net::SFTP::Foreign" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://user42.tuxfamily.org/upfiles/index.html",
+      "license" : [
+         "http://www.gnu.org/licenses/gpl.html"
+      ]
+   },
+   "version" : "12",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

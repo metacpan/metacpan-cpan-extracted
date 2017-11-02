@@ -1,5 +1,8 @@
 package Geo::Coder::Free::DB::admin1;
 
+use strict;
+use warnings;
+
 # admin1.db is from http://download.geonames.org/export/dump/admin1CodesASCII.txt
 
 use Geo::Coder::Free::DB;

@@ -1,6 +1,12 @@
 Revision history for Ryu-Async
 
-0.006     2017-09-01 21:03:27+08:00 Asia/Kuala_Lumpur
+0.007     2017-10-28 23:26:00+08:00 Asia/Kuala_Lumpur
+    Bugs fixed:
+
+    * added IO::Socket::IP to dependency list
+
+
+0.007     2017-09-01 21:03:27+08:00 Asia/Kuala_Lumpur
     New features:
 
     * Basic timeout support

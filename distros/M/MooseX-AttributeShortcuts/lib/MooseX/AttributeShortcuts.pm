@@ -9,8 +9,8 @@
 #
 package MooseX::AttributeShortcuts;
 our $AUTHORITY = 'cpan:RSRCHBOY';
-# git description: 0.034-15-g6831f38
-$MooseX::AttributeShortcuts::VERSION = '0.035';
+# git description: 0.035-1-gb1a3ab6
+$MooseX::AttributeShortcuts::VERSION = '0.036';
 
 # ABSTRACT: Shorthand for common attribute options
 
@@ -119,7 +119,7 @@ MooseX::AttributeShortcuts - Shorthand for common attribute options
 
 =head1 VERSION
 
-This document describes version 0.035 of MooseX::AttributeShortcuts - released September 22, 2017 as part of MooseX-AttributeShortcuts.
+This document describes version 0.036 of MooseX::AttributeShortcuts - released October 31, 2017 as part of MooseX-AttributeShortcuts.
 
 =head1 SYNOPSIS
 

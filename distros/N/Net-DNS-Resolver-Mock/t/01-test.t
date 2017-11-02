@@ -1,4 +1,4 @@
-#!perl -T
+#!perl
 use 5.006;
 use strict;
 use warnings FATAL => 'all';
@@ -6,7 +6,7 @@ use Test::More;
 
 use Net::DNS::Resolver::Mock;
 
-plan tests => 11;
+plan tests => 13;
 
 {
     my $Resolver = Net::DNS::Resolver::Mock->new();
@@ -48,5 +48,9 @@ plan tests => 11;
     is( ref $Reply, 'Net::DNS::Packet', 'Net::DNS::Packet object returned' );
     is( ref $Reply->{ 'answer' }->[0], 'Net::DNS::RR::A', 'New::DNS::RR::A object returned' );
     is( $Reply->{ 'answer' }->[0]->rdatastr(), '5.6.7.8', 'Correct IP Address returned' );;
+
+    $Reply = $Resolver->query( '8.6.4.2', 'PTR' );
+    is( ref $Reply->{ 'answer' }->[0], 'Net::DNS::RR::PTR', 'New::DNS::RR::PTR object returned' );
+    is( $Reply->{ 'answer' }->[0]->rdatastr(), 'reverse.example.com.', 'Correct Address returned' );;
 }
 

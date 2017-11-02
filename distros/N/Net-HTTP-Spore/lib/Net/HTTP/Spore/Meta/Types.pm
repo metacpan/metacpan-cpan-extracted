@@ -1,5 +1,5 @@
 package Net::HTTP::Spore::Meta::Types;
-$Net::HTTP::Spore::Meta::Types::VERSION = '0.07';
+$Net::HTTP::Spore::Meta::Types::VERSION = '0.09';
 # ABSTRACT: Moose type definitions for Net::HTTP::Spore
 
 use Moose::Util::TypeConstraints;
@@ -24,7 +24,7 @@ subtype JSONBoolean,
 
 coerce Boolean,
     from JSONBoolean,
-      via { return $_ == JSON::true() ? 1 : 0 },
+      via { return int($_) ? 1 : 0 },
     from Str,
       via { return $_ eq 'true' ? 1 : 0 };
 
@@ -42,7 +42,7 @@ Net::HTTP::Spore::Meta::Types - Moose type definitions for Net::HTTP::Spore
 
 =head1 VERSION
 
-version 0.07
+version 0.09
 
 =head1 AUTHORS
 

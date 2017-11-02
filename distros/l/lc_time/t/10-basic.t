@@ -65,7 +65,7 @@ my %test = (
         lang    => 'Spanish',
         lc_time => 'es_ES',
         win32   => 'Spanish_Spain',
-        expect  => qr/^marzo mar$/,
+        expect  => qr/^marzo mar\.?$/,
     },
 );
 

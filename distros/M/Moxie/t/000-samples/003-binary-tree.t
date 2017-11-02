@@ -26,29 +26,30 @@ package BinaryTree {
 
     extends 'Moxie::Object';
 
-    has _node   => ();
+    has node  => ();
+    has left  => ();
+    has right => ();
+
     has _parent => ();
-    has _left   => ();
-    has _right  => ();
 
     my sub _parent : private;
 
-    sub BUILDARGS : init_args(
+    sub BUILDARGS : init(
         node?   => _node,
         parent? => _parent,
     );
 
     sub BUILD ($self, $) { Scalar::Util::weaken( _parent ) }
 
-    sub node   : rw(_node);
+    sub node   : rw;
     sub parent : ro(_parent);
 
     sub has_parent : predicate(_parent);
-    sub has_left   : predicate(_left);
-    sub has_right  : predicate(_right);
+    sub has_left   : predicate;
+    sub has_right  : predicate;
 
-    sub left  ($self) : lazy(_left)  { $self->new( parent => $self ) }
-    sub right ($self) : lazy(_right) { $self->new( parent => $self ) }
+    sub left  ($self) : lazy { $self->new( parent => $self ) }
+    sub right ($self) : lazy { $self->new( parent => $self ) }
 }
 
 {

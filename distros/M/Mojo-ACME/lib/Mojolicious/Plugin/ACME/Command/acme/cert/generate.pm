@@ -64,7 +64,7 @@ sub run {
       #TODO poll for cert when delayed
       $cert = $acme->get_cert(@domains);
     },
-  )->catch(sub{ warn "$_[1]\n" })->wait;
+  )->tap(on => error => sub{ warn "$_[1]\n" })->wait;
 
   die "No cert was generated\n" unless $cert;
 

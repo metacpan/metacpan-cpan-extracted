@@ -1,5 +1,5 @@
 package ZMQ::Raw;
-$ZMQ::Raw::VERSION = '0.10';
+$ZMQ::Raw::VERSION = '0.12';
 use strict;
 use warnings;
 use Carp;
@@ -52,7 +52,7 @@ ZMQ::Raw - Perl bindings to the ZeroMQ library
 
 =head1 VERSION
 
-version 0.10
+version 0.12
 
 =head1 SYNOPSIS
 
@@ -106,6 +106,20 @@ Check if C<$feature> is available.
 
 =head2 ZMQ_STREAM
 
+=head2 ZMQ_SERVER
+
+=head2 ZMQ_CLIENT
+
+=head2 ZMQ_RADIO
+
+=head2 ZMQ_DISH
+
+=head2 ZMQ_GATHER
+
+=head2 ZMQ_SCATTER
+
+=head2 ZMQ_DGRAM
+
 =head2 ZMQ_DONTWAIT
 
 =head2 ZMQ_SNDMORE
@@ -129,6 +143,12 @@ Check if C<$feature> is available.
 =head2 ZMQ_THREAD_SCHED_POLICY
 
 =head2 ZMQ_MAX_MSGSZ
+
+=head2 ZMQ_MSG_T_SIZE
+
+=head2 ZMQ_THREAD_AFFINITY
+
+=head2 ZMQ_THREAD_NAME_PREFIX
 
 =head2 ZMQ_EVENT_CONNECTED
 

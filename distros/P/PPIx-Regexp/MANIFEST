@@ -1,6 +1,7 @@
 Build.PL
 Changes
 eg/interpolated
+eg/preaccepts
 eg/predump
 eg/prenav
 eg/preslurp
@@ -96,3 +97,4 @@ xt/author/perlcriticrc
 xt/author/pod.t
 xt/author/pod_coverage.t
 xt/author/pod_spelling.t
+xt/author/unicode_short_charclass.t

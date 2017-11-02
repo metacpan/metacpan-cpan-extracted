@@ -3,12 +3,11 @@ package GeoIP2::Database::Reader;
 use strict;
 use warnings;
 
-our $VERSION = '2.003005';
+our $VERSION = '2.004000';
 
 use Moo;
 
-use Data::Validate::IP 0.24
-    qw( is_ipv4 is_ipv6 is_private_ipv4 is_private_ipv6 );
+use Data::Validate::IP 0.25 qw( is_private_ip );
 use GeoIP2::Error::Generic;
 use GeoIP2::Error::IPAddressNotFound;
 use GeoIP2::Model::ASN;
@@ -77,7 +76,7 @@ sub _model_for_address {
                 . __PACKAGE__ );
     }
 
-    if ( is_private_ipv4($ip) || is_private_ipv6($ip) ) {
+    if ( is_private_ip($ip) ) {
         my ($method) = ( caller(1) )[3];
         GeoIP2::Error::Generic->throw(
                   message => "The IP address you provided ($ip) is not a "
@@ -203,7 +202,7 @@ GeoIP2::Database::Reader - Perl API for GeoIP2 databases
 
 =head1 VERSION
 
-version 2.003005
+version 2.004000
 
 =head1 SYNOPSIS
 
@@ -344,6 +343,10 @@ This method returns a L<GeoIP2::Model::Domain> object.
 =head2 $reader->isp()
 
 This method returns a L<GeoIP2::Model::ISP> object.
+
+=head2 $reader->enterprise()
+
+This method returns a L<GeoIP2::Model::Enterprise> object.
 
 =head2 $reader->anonymous_ip()
 

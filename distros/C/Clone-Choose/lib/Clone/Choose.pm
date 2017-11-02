@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp ();
 
-our $VERSION = "0.005";
+our $VERSION = "0.008";
 $VERSION = eval $VERSION;
 
 our @BACKENDS = (
@@ -37,6 +37,14 @@ sub backend
 {
     my $self     = shift;
     my @backends = @BACKENDS;
+
+    if ($ENV{CLONE_CHOOSE_PREFERRED_BACKEND})
+    {
+        my $favourite = $ENV{CLONE_CHOOSE_PREFERRED_BACKEND};
+        my %b         = @backends;
+        Carp::croak "$favourite not found" unless $b{$favourite};
+        @backends = ($favourite => $b{$favourite});
+    }
 
     while (my ($pkg, $rout) = splice @backends, 0, 2)
     {
@@ -129,6 +137,14 @@ sub get_backends
 {
     my $self     = shift;
     my %backends = @BACKENDS;
+
+    if ($ENV{CLONE_CHOOSE_PREFERRED_BACKEND})
+    {
+        my $favourite = $ENV{CLONE_CHOOSE_PREFERRED_BACKEND};
+        Carp::croak "$favourite not found" unless $backends{$favourite};
+        %backends = ($favourite => $backends{$favourite});
+    }
+
     return keys %backends;
 }
 

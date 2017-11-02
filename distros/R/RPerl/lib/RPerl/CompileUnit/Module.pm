@@ -3,7 +3,7 @@ package RPerl::CompileUnit::Module;
 use strict;
 use warnings;
 use RPerl::AfterSubclass;
-our $VERSION = 0.002_400;
+our $VERSION = 0.003_000;
 
 # [[[ OO INHERITANCE ]]]
 # <<< CHANGE_ME: leave as base class for no inheritance, or replace with real parent package name >>>
@@ -31,8 +31,9 @@ our hashref $properties = {};
 
 # [[[ SUBROUTINES & OO METHODS ]]]
 
-our string_hashref::method $ast_to_rperl__generate = sub {
-    ( my object $self, my string_hashref $modes) = @_;
+sub ast_to_rperl__generate {
+    { my string_hashref::method $RETURN_TYPE };
+    ( my object $self, my string_hashref $modes) = @ARG;
     my string_hashref $rperl_source_group = {};
 
 #    RPerl::diag('in Module->ast_to_rperl__generate(), received $self = ' . "\n" . RPerl::Parser::rperl_ast__dump($self) . "\n");
@@ -89,12 +90,12 @@ our string_hashref::method $ast_to_rperl__generate = sub {
                 . "\n";
         }
     }
-
     return $rperl_source_group;
-};
+}
 
-our string_hashref::method $ast_to_cpp__generate__CPPOPS_PERLTYPES = sub {
-    ( my object $self, my string_hashref $modes ) = @_;
+sub ast_to_cpp__generate__CPPOPS_PERLTYPES {
+    { my string_hashref::method $RETURN_TYPE };
+    ( my object $self, my string_hashref $modes ) = @ARG;
     my string_hashref $cpp_source_group = {
         CPP =>
             q{// <<< RP::CU::M __DUMMY_SOURCE_CODE CPPOPS_PERLTYPES >>>}
@@ -109,10 +110,11 @@ our string_hashref::method $ast_to_cpp__generate__CPPOPS_PERLTYPES = sub {
 
     #...
     return $cpp_source_group;
-};
+}
 
-our string_hashref::method $ast_to_cpp__generate__CPPOPS_CPPTYPES = sub {
-    ( my object $self, my string_hashref $modes ) = @_;
+sub ast_to_cpp__generate__CPPOPS_CPPTYPES {
+    { my string_hashref::method $RETURN_TYPE };
+    ( my object $self, my string_hashref $modes ) = @ARG;
     my string_hashref $cpp_source_group = { CPP => q{}, H => q{} };
 
 #    RPerl::diag('in Module->ast_to_cpp__generate__CPPOPS_CPPTYPES(), received $self = ' . "\n" . RPerl::Parser::rperl_ast__dump($self) . "\n");
@@ -150,7 +152,8 @@ our string_hashref::method $ast_to_cpp__generate__CPPOPS_CPPTYPES = sub {
         }
         elsif (((ref $header_or_module) eq 'Module_24') or ((ref $header_or_module) eq 'Module_25')) {
             if ($header_started) {
-                $cpp_source_subgroup = $header_or_module->ast_to_cpp__generate__CPPOPS_CPPTYPES($package_name_underscores, $modes);
+                # DEV NOTE, CORRELATION #rp043: no need to include RPerl.cpp multiple times in one file, need current package count for this purpose
+                $cpp_source_subgroup = $header_or_module->ast_to_cpp__generate__CPPOPS_CPPTYPES($package_name_underscores, {%{$modes}, current_package_count => $current_package_count});
                 RPerl::Generator::source_group_append($cpp_source_group, $cpp_source_subgroup);
                 RPerl::Generator::source_group_append($cpp_source_group, $cpp_source_subgroup_saved);
                 $header_started = 0;
@@ -170,9 +173,7 @@ our string_hashref::method $ast_to_cpp__generate__CPPOPS_CPPTYPES = sub {
                 . "\n";
         }
     }
-
     return $cpp_source_group;
-
-};
+}
 
 1;    # end of class

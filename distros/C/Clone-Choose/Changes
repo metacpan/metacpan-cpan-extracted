@@ -1,5 +1,16 @@
 Revision history for Clone-Choose
 
+0.008   2017-10-27
+    - Prove whether all prerequisites are available for a particular
+      backend before the test starts.
+
+0.007   2017-10-27
+    - Fix simple test to not fail if preselected backend is not found.
+
+0.006   2017-10-26
+    - Use inline test templates to ńot fail if . is not in @INC.
+    - Do more tests with the different backends.
+
 0.005	2017-10-24
     - avoid distributing Sandbox - fixes GH issue#2 reported by Slaven Rezić
 

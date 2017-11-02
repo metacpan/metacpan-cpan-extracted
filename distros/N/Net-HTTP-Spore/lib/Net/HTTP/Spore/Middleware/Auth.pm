@@ -1,5 +1,5 @@
 package Net::HTTP::Spore::Middleware::Auth;
-$Net::HTTP::Spore::Middleware::Auth::VERSION = '0.07';
+$Net::HTTP::Spore::Middleware::Auth::VERSION = '0.09';
 # ABSTRACT: base class for Authentication middlewares
 
 use Moose;
@@ -23,7 +23,7 @@ Net::HTTP::Spore::Middleware::Auth - base class for Authentication middlewares
 
 =head1 VERSION
 
-version 0.07
+version 0.09
 
 =head1 DESCRIPTION
 

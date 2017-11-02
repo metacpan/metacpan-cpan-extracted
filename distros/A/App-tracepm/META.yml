@@ -20,6 +20,8 @@ requires:
   App::FatPacker: '0'
   CHI: '0'
   Capture::Tiny: '0'
+  Data::Sah::Coerce::perl::str::str_normalize_perl_modname: '0'
+  Data::Sah::Coerce::perl::str::str_strip_trailing_slash: '0'
   Data::Sah::Compiler::perl::TH::array: '0'
   Data::Sah::Compiler::perl::TH::bool: '0'
   Data::Sah::Compiler::perl::TH::hash: '0'
@@ -34,6 +36,8 @@ requires:
   Perinci::Sub::Property::result::table: '0'
   Perl::PrereqScanner: '0'
   Perl::PrereqScanner::Lite: '0'
+  Sah::Schema::filename: '0'
+  Sah::Schema::perl::modname: '0'
   experimental: '0'
   perl: '5.010001'
   strict: '0'
@@ -43,7 +47,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-tracepm
   homepage: https://metacpan.org/release/App-tracepm
   repository: git://github.com/sharyanto/perl-App-tracepm.git
-version: '0.21'
+version: '0.22'
 x_Dist_Zilla:
   perl:
     version: '5.024000'

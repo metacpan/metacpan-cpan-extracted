@@ -1,7 +1,11 @@
 package Image::DS9::Command;
 
+# ABSTRACT: Command definitions
+
 use strict;
 use warnings;
+
+our $VERSION = '0.188';
 
 use Carp;
 
@@ -9,6 +13,7 @@ use Image::DS9::PConsts;
 use Image::DS9::Grammar;
 use Image::DS9::Parser;
 
+use namespace::clean;
 
 sub new
 {
@@ -23,15 +28,15 @@ sub new
   my $spec = $Image::DS9::Grammar::Grammar{$command};
 
 
-  my $self = bless { 
-		    command => $command,
-		    spec => $spec,
-		    opts => $opts,
-		    cvt  => 1,
-		    chomp => 1,
-		    retref => 0,
-		    attrs => {}
-		   }, $class;
+  my $self = bless {
+                    command => $command,
+                    spec => $spec,
+                    opts => $opts,
+                    cvt  => 1,
+                    chomp => 1,
+                    retref => 0,
+                    attrs => {}
+                   }, $class;
 
   $self->parse(@_);
 
@@ -42,7 +47,7 @@ sub parse
 {
   my $self = shift;
 
-  local $Carp::CarpLevel = $Carp::CarpLevel + 1; 
+  local $Carp::CarpLevel = $Carp::CarpLevel + 1;
 
   my $match = Image::DS9::Parser::parse_spec( $self->{command}, $self->{spec}, @_ );
 
@@ -62,14 +67,14 @@ sub parse
     $self->{$special} =  $self->{attrs}{$special} || 0;
     delete $self->{attrs}{$special};
   }
-  
+
   # if this command has a buffer argument, it needs to be
   # sent via the XPASet buffer argument, not as part of the
   # command string. split it off from the regular args
   if ( $self->{argl}{bufarg} && ! $self->{query} )
   {
     my $buf = pop @{$self->{args}};
-    my $valref = 
+    my $valref =
       Image::DS9::PConsts::type_cvt( CvtSet, $buf->[0], $buf->[1] );
     $self->{bufarg} = $valref;
   }
@@ -105,8 +110,8 @@ sub form_command
     {
       # cmds and args must be scalars.  they'll have been converted
       # to scalar refs by now to prevent copying of data.
-      'SCALAR' eq ref $valref or 
-	croak( __PACKAGE__, ": internal error! cmd/arg not scalar\n" );
+      'SCALAR' eq ref $valref or
+        croak( __PACKAGE__, ": internal error! cmd/arg not scalar\n" );
 
       push @command, ${Image::DS9::PConsts::type_cvt( CvtSet, $tag, $valref )};
     }
@@ -116,10 +121,10 @@ sub form_command
   {
     while( my ( $name, $val) = each %{$self->{attrs}} )
     {
-      my $valref = 
-	Image::DS9::PConsts::type_cvt( CvtSet, $val->{tag}, $val->{valref} );
+      my $valref =
+        Image::DS9::PConsts::type_cvt( CvtSet, $val->{tag}, $val->{valref} );
 
-      # dereference 
+      # dereference
       push @command, $name, $$valref;
     }
   }
@@ -135,7 +140,7 @@ sub attrs
 
   while( my ( $name, $val) = each %{$self->{attrs}} )
   {
-    my $valref = 
+    my $valref =
       Image::DS9::PConsts::type_cvt( CvtSet, $val->{tag}, $val->{valref} );
 
     # dereference scalar refs; leave the rest as is
@@ -149,8 +154,8 @@ sub cvt_get
 {
   my $self = shift;
 
-  # don't change the buffer unless asked to convert values 
-  # unless expecting more than one value or we're supposed to convert 
+  # don't change the buffer unless asked to convert values
+  # unless expecting more than one value or we're supposed to convert
   return unless @{$self->{argl}{rvals}} > 1 || $self->{cvt};
 
 
@@ -166,20 +171,21 @@ sub cvt_get
     # too many results is always an error
     if ( @input > @{$self->{argl}{rvals}} )
     {
-      croak( __PACKAGE__, 
-	    "::cvt_get: $self->{command}: expected ", 
-	    scalar @{$self->{argl}{rvals}}, 
-	    " values, got ", scalar @input );
+      croak( __PACKAGE__,
+            "::cvt_get: $self->{command}: expected ",
+            scalar @{$self->{argl}{rvals}},
+            " values, got ", scalar @input );
     }
 
     unless ( $self->{opts}{ResErrIgnore} )
     {
+      ## no critic ProhibitNoStrict
       no strict 'refs';
       my $func = $self->{opts}{ResErrWarn} ? 'carp' : 'croak';
-      &$func( __PACKAGE__, 
-	    "::cvt_get: $self->{command}: expected ", 
-	    scalar @{$self->{argl}{rvals}}, 
-	    " values, got ", scalar @input );
+      &$func( __PACKAGE__,
+            "::cvt_get: $self->{command}: expected ",
+            scalar @{$self->{argl}{rvals}},
+            " values, got ", scalar @input );
     }
 
     if ( @input < @{$self->{argl}{rvals}} )
@@ -222,4 +228,57 @@ sub bufarg  { $_[0]->{bufarg} }
 sub chomp   { $_[0]->{chomp} }
 sub retref  { $_[0]->{retref} }
 
+#
+# This file is part of Image-DS9
+#
+# This software is Copyright (c) 2017 by Smithsonian Astrophysical Observatory.
+#
+# This is free software, licensed under:
+#
+#   The GNU General Public License, Version 3, June 2007
+#
+
 1;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+Image::DS9::Command - Command definitions
+
+=head1 VERSION
+
+version 0.188
+
+=head1 BUGS AND LIMITATIONS
+
+You can make new bug reports, and view existing ones, through the
+web interface at L<https://rt.cpan.org/Public/Dist/Display.html?Name=Image-DS9>.
+
+=head1 SEE ALSO
+
+Please see those modules/websites for more information related to this module.
+
+=over 4
+
+=item *
+
+L<Image::DS9|Image::DS9>
+
+=back
+
+=head1 AUTHOR
+
+Diab Jerius <djerius@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2017 by Smithsonian Astrophysical Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

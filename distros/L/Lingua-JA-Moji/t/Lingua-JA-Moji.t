@@ -16,7 +16,8 @@ use Lingua::JA::Moji qw/romaji2kana
                         kana_to_large
 			nigori_first
 			smallize_kana
-			cleanup_kana/;
+			cleanup_kana
+			bad_kanji/;
 
 # Sanity tests
 
@@ -127,4 +128,13 @@ is_deeply (\@list, [qw/カン スウ ハツ オオ ガン ズウ バツ パツ/]
 is (smallize_kana ('シヤツター'), 'シャッター');
 is (cleanup_kana ('kaｋｉｸけコ一'), 'カキクケコー');
 
+my @bk = bad_kanji ();
+ok (@bk > 0, "got bad kanji");
+my $aku;
+for (@bk) {
+    if (/悪/) {
+	$aku = 1;
+    }
+}
+ok ($aku, "found 悪 in bad kanji list");
 done_testing ();

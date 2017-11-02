@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: pod-coverage.t 2305 2011-01-22 12:28:57Z guillomovitch $
+# $Id: pod-coverage.t 2393 2013-01-03 20:57:34Z guillomovitch $
 
 use strict;
 use warnings;
@@ -19,7 +19,7 @@ if (!RPM4->require()) {
 }
 
 if (!RPM->require()) {
-    @modules = grep { ! /RPM::RPM4/ } @modules;
+    @modules = grep { ! /RPM::RPM$/ } @modules;
 }
 
 plan tests => scalar @modules;

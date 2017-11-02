@@ -20,7 +20,7 @@ while (my ($name, $result) = each %map) {
 	}
 	
 	sysread(FH, my $buff, 20);
-	is(WebService::Antigate::_name_by_signature($buff), $result, "_name_by_signature($name) eq $result");
+	is(WebService::Antigate->_name_by_signature($buff), $result, "_name_by_signature($name) eq $result");
 	
 	close FH;
 }

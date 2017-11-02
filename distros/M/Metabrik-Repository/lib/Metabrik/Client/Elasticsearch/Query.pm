@@ -1,5 +1,5 @@
 #
-# $Id: Query.pm,v 84f8ea395fe8 2017/01/10 14:59:25 gomor $
+# $Id: Query.pm,v f421cd03e192 2017/08/26 14:56:55 gomor $
 #
 # client::elasticsearch::query Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Client::Elasticsearch);
 
 sub brik_properties {
    return {
-      revision => '$Revision: 84f8ea395fe8 $',
+      revision => '$Revision: f421cd03e192 $',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -30,13 +30,14 @@ sub brik_properties {
       commands => {
          create_client => [ ],
          reset_client => [ ],
-         query => [ qw(query index|OPTIONAL type|OPTIONAL) ],
+         query => [ qw(query index|OPTIONAL type|OPTIONAL hash|OPTIONAL) ],
          get_query_result_total => [ qw($query_result|OPTIONAL) ],
          get_query_result_hits => [ qw($query_result|OPTIONAL) ],
          get_query_result_timed_out => [ qw($query_result|OPTIONAL) ],
          get_query_result_took => [ qw($query_result|OPTIONAL) ],
          term => [ qw(kv index|OPTIONAL type|OPTIONAL) ],
          unique_term => [ qw(unique kv index|OPTIONAL type|OPTIONAL) ],
+         unique_values => [ qw(field index|OPTIONAL type|OPTIONAL) ],
          wildcard => [ qw(kv index|OPTIONAL type|OPTIONAL) ],
          range => [ qw(kv_from kv_to index|OPTIONAL type|OPTIONAL) ],
          top => [ qw(kv_count index|OPTIONAL type|OPTIONAL) ],
@@ -44,6 +45,11 @@ sub brik_properties {
          match => [ qw(kv index|OPTIONAL type|OPTIONAL) ],
          match_phrase => [ qw(kv index|OPTIONAL type|OPTIONAL) ],
          from_json_file => [ qw(json_file index|OPTIONAL type|OPTIONAL) ],
+         from_dump_file => [ qw(dump_file index|OPTIONAL type|OPTIONAL) ],
+      },
+      require_modules => {
+         'Metabrik::File::Json' => [ ],
+         'Metabrik::File::Dump' => [ ],
       },
    };
 }
@@ -146,7 +152,7 @@ sub get_query_result_took {
 
 sub query {
    my $self = shift;
-   my ($q, $index, $type) = @_;
+   my ($q, $index, $type, $hash) = @_;
 
    $index ||= '*';
    $type ||= '*';
@@ -154,7 +160,7 @@ sub query {
 
    my $ce = $self->create_client or return;
 
-   my $r = $self->SUPER::query($q, $index, $type) or return;
+   my $r = $self->SUPER::query($q, $index, $type, $hash) or return;
    if (defined($r)) {
       if (exists($r->{hits}{total})) {
          return $r;
@@ -189,6 +195,7 @@ sub term {
 
    # Optimized version on ES 5.0.0
    my $q = {
+      size => $self->size,
       query => {
          bool => {
             must => { term => { $key => $value } },
@@ -210,13 +217,14 @@ sub unique_term {
 
    $index ||= $self->index;
    $type ||= $self->type;
-   $self->brik_help_run_undef_arg('term', $unique) or return;
-   $self->brik_help_run_undef_arg('term', $kv) or return;
-   $self->brik_help_set_undef_arg('term', $index) or return;
-   $self->brik_help_set_undef_arg('term', $type) or return;
+   $self->brik_help_run_undef_arg('unique_term', $unique) or return;
+   $self->brik_help_run_undef_arg('unique_term', $kv) or return;
+   $self->brik_help_set_undef_arg('unique_term', $index) or return;
+   $self->brik_help_set_undef_arg('unique_term', $type) or return;
 
-   if ($kv !~ /^\S+?=.+$/) {
-      return $self->log->error("unique_term: kv must be in the form 'key=value'");
+   if ($kv !~ m{^.+?=.+$}) {
+      return $self->log->error("unique_term: kv [$kv] must be in the form ".
+         "'key=value'");
    }
    my ($key, $value) = split('=', $kv);
 
@@ -234,6 +242,7 @@ sub unique_term {
          1 => {
             cardinality => {
                field => $unique,
+               precision_threshold => 40000,
             },
          },
       },
@@ -248,16 +257,36 @@ sub unique_term {
 #
 # 
 #
-#sub unique_values {
-#{
-   #"size": 0,
-   #"aggs": {
-      #"1" : {
-         #"terms" : { "field" : "ip" },
-      #}
-   #}
-#}
-#} 
+sub unique_values {
+   my $self = shift;
+   my ($field, $index, $type) = @_;
+
+   $index ||= $self->index;
+   $type ||= $self->type;
+   $self->brik_help_run_undef_arg('unique_values', $field) or return;
+   $self->brik_help_set_undef_arg('unique_values', $index) or return;
+   $self->brik_help_set_undef_arg('unique_values', $type) or return;
+
+   my $size = $self->size * 10;
+
+   # Will return 10*100000=1_000_000 unique values.
+   my $q = {
+      aggs => {
+         1 => {
+            terms => {
+               field => $field,
+               include => { num_partitions => 10, partition => 0 },
+               size => $size,
+            },
+         },
+      },
+      size => 0,
+   };
+
+   $self->log->verbose("unique_values: unique [$field] index [$index] type [$type]");
+
+   return $self->query($q, $index, $type);
+}
 
 sub wildcard {
    my $self = shift;
@@ -275,6 +304,7 @@ sub wildcard {
    my ($key, $value) = split('=', $kv);
 
    my $q = {
+      size => $self->size,
       query => {
          #constant_score => {  # Does not like constant_score
             #filter => {
@@ -320,6 +350,7 @@ sub range {
    # Compatible with ES 5.0
    #
    my $q = {
+      size => $self->size,
       query => {
          bool => {
             must => [
@@ -386,6 +417,7 @@ sub match_phrase {
    $self->debug && $self->log->debug("match_phrase: key[$key] value[$value]");
 
    my $q = {
+      size => $self->size,
       query => {
          match_phrase => {
             $key => $value,
@@ -414,6 +446,7 @@ sub match {
    $self->debug && $self->log->debug("match: key[$key] value[$value]");
 
    my $q = {
+      size => $self->size,
       query => {
          match => {
             $key => $value,
@@ -448,6 +481,7 @@ sub top_match {
    my ($key_match, $value_match) = split('=', $kv_match);
 
    my $q = {
+      size => $self->size,
       query => {
          #constant_score => {   # Does not like constant_score
             #filter => {
@@ -484,7 +518,33 @@ sub from_json_file {
    my $fj = Metabrik::File::Json->new_from_brik_init($self) or return;
    my $q = $fj->read($file) or return;
 
-   return $self->query($q, $index, $type);
+   if (defined($q) && length($q)) {
+      return $self->query($q, $index, $type);
+   }
+
+   return $self->log->error("from_json_file: nothing to read from this file [$file]");
+}
+
+sub from_dump_file {
+   my $self = shift;
+   my ($file, $index, $type) = @_;
+
+   $index ||= $self->index;
+   $type ||= $self->type;
+   $self->brik_help_run_undef_arg('from_dump_file', $file) or return;
+   $self->brik_help_run_file_not_found('from_dump_file', $file) or return;
+   $self->brik_help_set_undef_arg('from_dump_file', $index) or return;
+   $self->brik_help_set_undef_arg('from_dump_file', $type) or return;
+
+   my $fd = Metabrik::File::Dump->new_from_brik_init($self) or return;
+   my $q = $fd->read($file) or return;
+
+   my $first = $q->[0];
+   if (defined($first)) {
+      return $self->query($first, $index, $type);
+   }
+
+   return $self->log->error("from_dump_file: nothing to read from this file [$file]");
 }
 
 1;

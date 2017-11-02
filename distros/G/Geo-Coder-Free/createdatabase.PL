@@ -1,5 +1,8 @@
 #!/usr/bin/env perl
 
+use strict;
+use warnings;
+
 use File::Copy;
 
 if(!-r 'lib/Geo/Coder/Free/databases/cities.sql') {

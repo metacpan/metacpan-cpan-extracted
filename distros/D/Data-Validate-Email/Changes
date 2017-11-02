@@ -1,5 +1,8 @@
 Revision history for Perl extension Data::Validate::Email.
 
+0.06  20171029
+    - Patch from Gregor Herrmann fixing POD error
+    
 0.05  20170213
 	- Allowed pluses in usernames per request from Adriano Ferreira (https://github.com/aferreira)
     

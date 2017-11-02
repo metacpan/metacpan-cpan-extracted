@@ -1,0 +1,48 @@
+Revision history for Music-Lyrics-LRC
+
+0.09    2017-11-02
+
+ - Tolerate single-digit seconds in lyric timestamps
+
+0.08    2017-11-02
+
+ - Handle blank lyric lines correctly
+ - Documentation correction
+
+0.07    2017-11-02
+
+ - Parse any resolution of fractional seconds in input, including no fractional
+   seconds at all
+ - Remove msec_to_ts() and ts_to_msec() functions, replaced with internals not
+   documented
+ - Add a verbose flag to the constructor to control the emission of warnings
+   for unparsed lines from files
+
+0.06    2017-11-02
+
+ - Correct syntax of output file: the format uses a period for the fractional
+   second separator, not a colon
+
+0.05    2017-11-02
+
+ - Documentation corrections
+ - LICENSE file
+
+0.04    2017-11-02
+
+ - Documentation corrections and fixed parameter validation.
+
+0.03    2017-11-01
+
+ - First CPAN release, with some documentation and a very simple and not yet
+   comprehensive test suite.
+
+0.02    2017-11-01
+
+ - All of the interface methods I have in mind now implemented and tested, and
+   passing some very un-rigorous testing. No proper test suite yet and
+   documentation still skeletal.
+
+0.01    2017-10-06
+
+ - Beginnings of development; load() method barely working.

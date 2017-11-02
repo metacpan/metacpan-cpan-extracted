@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.010;
 
 use ExtUtils::MakeMaker;
 
@@ -14,11 +14,13 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Net-HTTP-Spore",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Net::HTTP::Spore",
   "PREREQ_PM" => {
     "Carp" => 0,
     "Class::Load" => 0,
     "Digest::SHA" => 0,
+    "Encode" => 0,
     "HTTP::Headers" => 0,
     "HTTP::Request" => 0,
     "IO::All" => 0,
@@ -32,7 +34,7 @@ my %WriteMakefileArgs = (
     "Moose::Role" => 0,
     "Moose::Util::MetaRole" => 0,
     "Moose::Util::TypeConstraints" => 0,
-    "MooseX::Role::Parameterized" => 0,
+    "MooseX::Role::Parameterized" => "1.01",
     "MooseX::Types" => 0,
     "MooseX::Types::Moose" => 0,
     "MooseX::Types::URI" => 0,
@@ -48,13 +50,17 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "File::Spec" => 0,
     "File::Temp" => 0,
+    "IO::Handle" => 0,
+    "IPC::Open3" => 0,
     "Test::Exception" => 0,
     "Test::Moose" => 0,
     "Test::More" => 0,
-    "base" => 0
+    "base" => 0,
+    "blib" => "1.01"
   },
-  "VERSION" => "0.07",
+  "VERSION" => "0.09",
   "test" => {
     "TESTS" => "t/*.t t/spore-method/*.t t/spore-middleware/*.t t/spore-request/*.t t/spore-response/*.t t/spore-role/*.t t/spore/*.t"
   }
@@ -65,11 +71,15 @@ my %FallbackPrereqs = (
   "Carp" => 0,
   "Class::Load" => 0,
   "Digest::SHA" => 0,
+  "Encode" => 0,
+  "File::Spec" => 0,
   "File::Temp" => 0,
   "HTTP::Headers" => 0,
   "HTTP::Request" => 0,
   "IO::All" => 0,
   "IO::File" => 0,
+  "IO::Handle" => 0,
+  "IPC::Open3" => 0,
   "JSON" => 0,
   "LWP::UserAgent" => 0,
   "MIME::Base64" => 0,
@@ -79,7 +89,7 @@ my %FallbackPrereqs = (
   "Moose::Role" => 0,
   "Moose::Util::MetaRole" => 0,
   "Moose::Util::TypeConstraints" => 0,
-  "MooseX::Role::Parameterized" => 0,
+  "MooseX::Role::Parameterized" => "1.01",
   "MooseX::Types" => 0,
   "MooseX::Types::Moose" => 0,
   "MooseX::Types::URI" => 0,
@@ -94,6 +104,7 @@ my %FallbackPrereqs = (
   "XML::Simple" => 0,
   "YAML" => 0,
   "base" => 0,
+  "blib" => "1.01",
   "overload" => 0,
   "strict" => 0,
   "warnings" => 0

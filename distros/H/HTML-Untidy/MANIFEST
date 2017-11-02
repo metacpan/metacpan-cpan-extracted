@@ -2,12 +2,14 @@
 Changes
 LICENSE
 MANIFEST
+META.json
 META.yml
 Makefile.PL
 README
 cpanfile
 dist.ini
 examples/benchmarks.pl
+examples/modal.pl
 lib/HTML/Untidy.pm
 t/00-report-prereqs.dd
 t/00-report-prereqs.t

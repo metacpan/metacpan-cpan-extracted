@@ -1,5 +1,6 @@
 package Bio::Phylo::Treedrawer;
 use strict;
+use warnings;
 use Bio::Phylo::Util::Logger;
 use Bio::Phylo::Util::Exceptions 'throw';
 use Bio::Phylo::Util::CONSTANT qw'_TREE_ /looks_like/ _PI_';
@@ -22,6 +23,8 @@ my @fields = qw(
   SCALE
   FORMAT
   COLLAPSED_CLADE_WIDTH
+  CLADE_LABEL_WIDTH
+  PIE_COLORS;
 );
 
 my $PI     = _PI_;
@@ -105,6 +108,8 @@ sub new {
         'SCALE'                 => undef,
         'BRANCH_WIDTH'          => 1,
         'COLLAPSED_CLADE_WIDTH' => 6,
+        'CLADE_LABEL_WIDTH'     => 36,
+        'PIE_COLORS'            => {},
     };
     bless $self, $class;
     if (@_) {
@@ -138,13 +143,22 @@ sub _cascading_getter {
     my ( $package, $filename, $line, $subroutine ) = caller(1);
     $subroutine =~ s/.*://;
     $logger->debug($subroutine);
-    if ($invocant) {
-        if ( $invocant->can($subroutine) ) {
+    if ( $invocant ) {
+        
+        # The general idea is that there are certain properties that can potentially be
+        # set globally (i.e. in this package) or at the level of the object it applies
+        # to. For example, maybe we want to set the node radius globally here, or maybe
+        # we want to set it on the node. The idea, here, is then that we might first
+        # check to see if the values are set on $invocant, and if not, return the global
+        # value. The way this used to be done was by calling ->can(), however, because of
+        # the way in which method calls are handled by the Draw*Role classes, we can't
+        # do that.
+        #if ( $invocant->can($subroutine) ) {
             my $value = $invocant->$subroutine();
             if ( defined $value ) {
                 return $value;
             }
-        }
+        #}
     }
     $subroutine =~ s/^get_//;
     return $self->{ uc $subroutine };
@@ -398,6 +412,11 @@ sub set_tree {
     my ( $self, $tree ) = @_;
     if ( looks_like_object $tree, _TREE_ ) {
         $self->{'TREE'} = $tree->negative_to_zero;
+        my $root = $tree->get_root;
+        if ( my $length = $root->get_branch_length ) {
+            $logger->warn("Collapsing root branch length of $length");
+            $root->set_branch_length(0);
+        }
     }
     return $self;
 }
@@ -409,60 +428,107 @@ Sets time scale options.
  Type    : Mutator
  Title   : set_scale_options
  Usage   : $treedrawer->set_scale_options(
-                -width => 400,
-                -major => '10%', # major cross hatch interval
-                -minor => '2%',  # minor cross hatch interval
-                -label => 'MYA',
+                -width   => 400,
+                -major   => '10%', # major cross hatch interval
+                -minor   => '2%',  # minor cross hatch interval
+                -blocks  => '10%', # alternating blocks in light-gray
+                -label   => 'MYA',
+                -reverse => 1, # tips are 0
+                -tmpl    => '%d', # sprintf template for major cross hatch numbers
+                -font    => {
+                   -face => 'Verdana',
+                   -size => 11,
+                }
             );
  Function: Sets the options for time (distance) scale
  Returns :
- Args    : -width => (if a number, like 100, pixel 
-                      width is assumed, if a percentage, 
-                      scale width relative to longest root
-                      to tip path)
-           -major => ( ditto, value for major tick marks )
-           -minor => ( ditto, value for minor tick marks )
-           -label => ( text string displayed next to scale )
-           -units => TRUE
+ Args    :
+	-width   => 400,
+	-major   => '10%', # major cross hatch interval
+	-minor   => '2%',  # minor cross hatch interval
+	-blocks  => '10%', # alternating blocks in light-gray
+	-label   => 'MYA',
+	-reverse => 1, # tips are 0
+	-tmpl    => '%d', # sprintf template for major cross hatch numbers
+	-font    => {
+	   -face => 'Verdana',
+	   -size => 11,
+	}           
 
 =cut
 
 sub set_scale_options {
     my $self = shift;
-    if ( ( @_ && !scalar @_ % 2 ) || ( scalar @_ == 1 && ref $_[0] eq 'HASH' ) )
-    {
-        my %o;    # %options
+    if ( ( @_ && !scalar @_ % 2 ) || ( scalar @_ == 1 && ref $_[0] eq 'HASH' ) ) {
+        my %o; # %options
         if ( scalar @_ == 1 && ref $_[0] eq 'HASH' ) {
             %o = %{ $_[0] };
         }
         else {
             %o = looks_like_hash @_;
         }
-        $self->{'SCALE'}->{'-units'} = $o{'-units'};
+    
+        # copy verbatim
+        $self->{'SCALE'}->{'-label'}   = $o{'-label'};
+        $self->{'SCALE'}->{'-units'}   = $o{'-units'};
+        $self->{'SCALE'}->{'-reverse'} = $o{'-reverse'};
+        $self->{'SCALE'}->{'-font'}    = $o{'-font'};
+        $self->{'SCALE'}->{'-tmpl'}    = $o{'-tmpl'};
+        $self->{'SCALE'}->{'-blocks'}  = $o{'-blocks'};
+    
+        # set scale width, either pixels or relative to tree
         if ( looks_like_number $o{'-width'} or $o{'-width'} =~ m/^\d+%$/ ) {
             $self->{'SCALE'}->{'-width'} = $o{'-width'};
         }
         else {
             throw 'BadArgs' => "\"$o{'-width'}\" is invalid for '-width'";
         }
+    
+        # set major tick mark distances
         if ( looks_like_number $o{'-major'} or $o{'-major'} =~ m/^\d+%$/ ) {
             $self->{'SCALE'}->{'-major'} = $o{'-major'};
         }
         else {
             throw 'BadArgs' => "\"$o{'-major'}\" is invalid for '-major'";
         }
+    
+        # set minor tick mark distances
         if ( looks_like_number $o{'-minor'} or $o{'-minor'} =~ m/^\d+%$/ ) {
             $self->{'SCALE'}->{'-minor'} = $o{'-minor'};
         }
         else {
             throw 'BadArgs' => "\"$o{'-minor'}\" is invalid for '-minor'";
         }
-        $self->{'SCALE'}->{'-label'} = $o{'-label'};
     }
     else {
         throw 'OddHash' => 'Odd number of elements in hash assignment';
     }
     return $self;
+}
+
+=item set_pie_colors
+
+Sets a hash reference whose keys are (unique) names for the different segments in a
+likelihood pie chart, and whose values are color codes.
+
+ Type    : Mutator
+ Title   : set_pie_colors
+ Usage   : $treedrawer->set_pie_colors({ 'p1' => 'red', 'p2' => 'blue' });
+ Function: sets likelihood pie colors
+ Returns :
+ Args    : HASH
+
+=cut
+
+sub set_pie_colors {
+	my ( $self, $hash ) = @_;
+	if ( ref($hash) eq 'HASH' ) {
+		$self->{'PIE_COLORS'} = $hash;
+	}
+	else {
+		throw 'BadArgs' => "Not a hash reference!";
+	}
+	return $self;
 }
 
 =back
@@ -541,6 +607,30 @@ sub set_collapsed_clade_width {
         throw 'BadNumber' => "'$width' is not a valid image width";
     }
     return $self;
+}
+
+=item set_clade_label_width
+
+Sets clade label width, i.e. the spacing between nested clade annotations
+
+ Type    : Mutator
+ Title   : set_clade_label_width
+ Usage   : $treedrawer->set_clade_label_width(6);
+ Function: sets the spacing between nested clade annotations
+ Returns :
+ Args    : Positive number
+
+=cut
+
+sub set_clade_label_width {
+	my ( $self, $width ) = @_;
+	if ( looks_like_number $width && $width >= 0 ) {
+		$self->{'CLADE_LABEL_WIDTH'} = $width;
+	}
+	else {
+		throw 'BadNumber' => "'$width' is not a valid clade label width value";
+	}
+	return $self;
 }
 
 =item set_tip_radius()
@@ -777,6 +867,37 @@ Gets time scale option.
 
 sub get_scale_options { shift->{'SCALE'} }
 
+=item get_pie_colors
+
+Gets a hash reference whose keys are (unique) names for the different segments in a
+likelihood pie chart, and whose values are color codes.
+
+ Type    : Accessor
+ Title   : get_pie_colors
+ Usage   : my %h = %{ $treedrawer->get_pie_colors() };
+ Function: gets likelihood pie colors
+ Returns :
+ Args    : None
+
+=cut
+
+sub get_pie_colors { shift->{'PIE_COLORS'} }
+
+=item get_clade_label_width
+
+Gets clade label width, i.e. the spacing between nested clade annotations
+
+ Type    : Mutator
+ Title   : get_clade_label_width
+ Usage   : my $width = $treedrawer->get_clade_label_width();
+ Function: gets the spacing between nested clade annotations
+ Returns :
+ Args    : None
+
+=cut
+
+sub get_clade_label_width { shift->{'CLADE_LABEL_WIDTH'} }
+
 =back
 
 =head2 CASCADING ACCESSORS
@@ -934,8 +1055,9 @@ sub draw {
 
     # Reset the stored data in the tree
     $self->_reset_internal($root);
+    $logger->debug("going to compute coordinates");
     $self->compute_coordinates;
-
+	$logger->debug("going to render figure");
     return $self->render;
 }
 
@@ -968,6 +1090,7 @@ sub cartesian_to_polar {
 sub _compute_unrooted_coordinates {
     my $self = shift;
     my $tre  = $self->get_tree;
+    my $phy  = $self->get_mode =~ /^p/i ? $tre->is_cladogram ? 0 : 1 : 0; # phylogram?
     
     # compute unscaled rotation, depth and tip count
     my ( %unscaled_rotation, %depth );
@@ -975,7 +1098,7 @@ sub _compute_unrooted_coordinates {
     
     $tre->visit_depth_first(
         # process tips first
-        '-no_daughter' => sub {	
+        '-no_daughter' => sub {
             my $node = shift;
             my $id = $node->get_id;
             ( $unscaled_rotation{$id}, $depth{$id} ) = ( $total_tips, 0 );
@@ -985,18 +1108,29 @@ sub _compute_unrooted_coordinates {
         # then process internals
         '-post_daughter' => sub {
             my $node = shift;
-            my $id   = $node->get_id;		
+            my $id   = $node->get_id;
             
             # get deepest child and average rotation
             my @child = @{ $node->get_children };
-            my ( $unscaled_rotation, $depth ) = ( 0, 0 );		
+            my ( $unscaled_rotation, $depth ) = ( 0, 0 );
             for my $c ( @child ) {
                 my $cid = $c->get_id;
                 my $c_depth = $depth{$cid};
                 $unscaled_rotation += $unscaled_rotation{$cid};
                 $depth = $c_depth if $c_depth > $depth;
             }
-            $depth++;
+            
+            # increment depth
+            if ( $phy ) {
+                my @mapped    = map { $_->get_branch_length } @child;
+                my ($tallest) = sort { $b <=> $a } @mapped;
+                $depth += $tallest;
+            }
+            else {
+                $depth++;
+            }
+            
+            # update rotation
             $unscaled_rotation /= scalar(@child);
             
             # check to see if current depth is overal deepest
@@ -1066,15 +1200,8 @@ sub _compute_rooted_coordinates {
         
         # process this only on tips
         '-no_daughter' => sub {
-            my $node = shift;
-            if ( $node->get_collapsed ) {
-                $tip_counter += ( ( $cladew - 2 ) / 2 );
-                $node->set_y($tip_counter);
-                $tip_counter += ( ( $cladew - 2 ) / 2 ) + 1;
-            }
-            else {
-                $node->set_y( $tip_counter++ );
-            }
+            my $node = shift;            
+            $node->set_y( $tip_counter++ );
             my $x = $node->get_x;
             $tallest_tip = $x if $x > $tallest_tip;
         },

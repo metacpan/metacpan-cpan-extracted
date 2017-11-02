@@ -1,5 +1,11 @@
 Revision history for Perl extension HTTP::Server::Simple::Static
 
+0.14  Sat, 28 Oct 2017 14:53:00 +0100
+
+        - Further improvements to the path handling to fix a bug with
+          specifying the base directory using a relative path. Closes:
+          https://rt.cpan.org/Public/Bug/Display.html?id=123428
+
 0.13  Sun, 08 Oct 2017 09:38:00 +0100
 
         - Reworked file path handling to prevent attacker traversing

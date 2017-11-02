@@ -7,7 +7,7 @@ use base 'Clustericious::Command';
 use File::Which qw( which );
 
 # ABSTRACT: Clustericious command to stat Apache
-our $VERSION = '1.26'; # VERSION
+our $VERSION = '1.27'; # VERSION
 
 
 __PACKAGE__->attr(description => <<EOT);
@@ -44,7 +44,7 @@ Clustericious::Command::apache - Clustericious command to stat Apache
 
 =head1 VERSION
 
-version 1.26
+version 1.27
 
 =head1 DESCRIPTION
 

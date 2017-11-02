@@ -4,7 +4,7 @@
 #   fork.t
 #
 #   Copyright (C) 1999 Raphael Manfredi.
-#   Copyright (C) 2002-2015 Mark Rogaski, mrogaski@cpan.org;
+#   Copyright (C) 2002-2017 Mark Rogaski, mrogaski@cpan.org;
 #   all rights reserved.
 #
 #   See the README file included with the
@@ -14,7 +14,7 @@
 
 use strict;
 use Test;
-require 't/common.pl';
+require './t/common.pl';
 
 BEGIN { plan tests => 19 }
 

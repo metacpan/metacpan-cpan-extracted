@@ -91,7 +91,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "1.25",
+   "version" : "1.28",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "Diab Jerius (DJERIUS)",
@@ -114,7 +114,9 @@
       "Joel Berger (JBERGER)",
       "Petr Pisar (ppisar)",
       "Lance Wicks (LANCEW)",
-      "Ahmad Fatoum (a3f, ATHREEF)"
+      "Ahmad Fatoum (a3f, ATHREEF)",
+      "Jos\u00e9 Joaqu\u00edn Atria (JJATRIA)",
+      "Duke Leto (LETO)"
    ],
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }

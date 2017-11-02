@@ -1,5 +1,6 @@
 package Bio::Phylo;
 use strict;
+use warnings;
 use Bio::PhyloRole;
 use base 'Bio::PhyloRole';
 
@@ -13,7 +14,7 @@ use Bio::Phylo::Util::MOP;                # for traversing inheritance trees
 use Bio::Phylo::Identifiable;             # for storing unique IDs inside an instance
 
 our ( $logger, $COMPAT ) = Bio::Phylo::Util::Logger->new;
-our $VERSION = "0.58";
+use version 0.77; our $VERSION = qv("v2.0.1");
 
 # mediates one-to-many relationships between taxon and nodes,
 # taxon and sequences, taxa and forests, taxa and matrices.
@@ -654,9 +655,16 @@ Invocant destructor.
 		}
 
 		# do the cleanups
-		my @destructors = @{ $mop->get_destructors( $self ) };
-		for my $d ( @destructors ) {			
-			$d->{'code'}->( $self );
+# 		my @destructors = @{ $mop->get_destructors( $self ) };
+# 		for my $d ( @destructors ) {			
+# 			$d->{'code'}->( $self );
+# 		}
+		my @classes = @{ $mop->get_classes($self) };
+		for my $class ( @classes ) {
+			my $cleanup = "${class}::_cleanup";
+			if ( $class->can($cleanup) ) {				
+				$self->$cleanup;
+			}
 		}
 		
 		# unregister from mediator
@@ -747,6 +755,31 @@ Invocant destructor.
 				#throw 'BadArgs' => "Argument not an object";
 		}
 		return $self;
+    }
+    
+=item to_js()
+
+Serializes to simple JSON. For a conversion to NeXML/JSON, use C<to_json>.
+
+ Type    : Serializer
+ Title   : to_js
+ Usage   : my $json = $object->to_js;
+ Function: Serializes to JSON
+ Returns : A JSON string
+ Args    : None.
+ Comments: 
+
+=cut
+
+	sub to_js {JSON::to_json(shift->_json_data,{'pretty'=>1}) if looks_like_class 'JSON'}    
+    
+    sub _json_data {
+    	my $self = shift;
+    	my %data = %{ $self->get_generic };
+    	$data{'guid'}  = $self->get_guid if $self->get_guid;
+    	$data{'desc'}  = $self->get_desc if $self->get_desc;
+    	$data{'score'} = $self->get_score if $self->get_score;
+    	return \%data;
     }
 
 =back

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 # this test was generated with
-# Dist::Zilla::Plugin::Author::SKIRMESS::RepositoryBase 0.030
+# Dist::Zilla::Plugin::Author::SKIRMESS::RepositoryBase 0.031
 
 BEGIN {
     if ( !-f 'MANIFEST' ) {

@@ -1,5 +1,8 @@
 Revision history for Net-Hadoop-Oozie
 
+0.112 2017-10-31 BURAK
+    - Detect Kerberos with kerberos_enabled()
+
 0.111 2017-08-03 BOOK
       Avoid a warning when the status code is not 401
 

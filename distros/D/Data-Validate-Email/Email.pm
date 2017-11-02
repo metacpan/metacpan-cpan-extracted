@@ -25,7 +25,7 @@ use Data::Validate::Domain;
 
 %EXPORT_TAGS = ();
 
-$VERSION = '0.05';
+$VERSION = '0.06';
 
 
 # No preloads
@@ -67,13 +67,13 @@ The value to test is always the first (and often only) argument.
 
 =head1 FUNCTIONS
 
-=over 4
-
 =cut
 
 # -------------------------------------------------------------------------------
 
 =pod
+
+=over 4
 
 =item B<new> - constructor for OO usage
 

@@ -21,6 +21,7 @@
 #include "const-c-constant.inc"
 #include "const-c-error.inc"
 #include "const-c-message_options.inc"
+#include "const-c-message_properties.inc"
 #include "const-c-socket_options.inc"
 
 typedef struct
@@ -105,8 +106,9 @@ STATIC MGVTBL null_mg_vtbl =
 #endif /* MGf_LOCAL */
 };
 
-STATIC void xs_object_magic_attach_struct(pTHX_ SV *sv, void *ptr) {
-	sv_magicext(sv, NULL, PERL_MAGIC_ext, &null_mg_vtbl, ptr, 0);
+STATIC void xs_object_magic_attach_struct(pTHX_ SV *sv, void *ptr)
+{
+	sv_magicext(sv, NULL, PERL_MAGIC_ext, &null_mg_vtbl, (const char *)ptr, 0);
 }
 
 STATIC void *xs_object_magic_get_struct(pTHX_ SV *sv) {
@@ -129,14 +131,14 @@ STATIC void *xs_object_magic_get_struct(pTHX_ SV *sv) {
 #define ZMQ_SV_TO_MAGIC(SV) \
 	xs_object_magic_get_struct(aTHX_ SvRV(SV))
 
-#define ZMQ_NEW_OBJ(rv, class, sv)				\
+#define ZMQ_NEW_OBJ(rv, package, sv)				\
 	STMT_START {						\
-		(rv) = sv_setref_pv(newSV(0), class, sv);	\
+		(rv) = sv_setref_pv(newSV(0), package, sv);	\
 	} STMT_END
 
-#define ZMQ_NEW_OBJ_WITH_MAGIC(rv, class, sv, magic)		\
+#define ZMQ_NEW_OBJ_WITH_MAGIC(rv, package, sv, magic)		\
 	STMT_START {						\
-		(rv) = sv_setref_pv(newSV(0), class, sv);	\
+		(rv) = sv_setref_pv(newSV(0), package, sv);	\
 								\
 		xs_object_magic_attach_struct(			\
 			aTHX_ SvRV(rv), SvREFCNT_inc_NN(magic)	\
@@ -286,8 +288,8 @@ BOOT:
 INCLUDE: const-xs-constant.inc
 
 void
-has (class, option)
-	SV *class
+has (package, option)
+	SV *package
 	int option
 
 	PREINIT:

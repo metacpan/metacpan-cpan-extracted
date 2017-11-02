@@ -1,5 +1,5 @@
 #
-# $Id: Command.pm,v f6ad8c136b19 2017/01/01 10:13:54 gomor $
+# $Id: Command.pm,v f421cd03e192 2017/08/26 14:56:55 gomor $
 #
 # shell::command Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik);
 
 sub brik_properties {
    return {
-      revision => '$Revision: f6ad8c136b19 $',
+      revision => '$Revision: f421cd03e192 $',
       tags => [ qw(exec execute) ],
       attributes => {
          as_array => [ qw(0|1) ],
@@ -41,14 +41,16 @@ sub brik_properties {
                               # system-wide.
       },
       commands => {
-         system => [ qw(command) ],
-         sudo_system => [ qw(command) ],
-         capture => [ qw(command) ],
-         sudo_capture => [ qw(command) ],
-         system_capture => [ qw(command) ],
-         sudo_system_capture => [ qw(command) ],
-         execute => [ qw(command) ],
-         sudo_execute => [ qw(command) ],
+         system => [ qw(command args|OPTIONAL) ],
+         sudo_system => [ qw(command args|OPTIONAL) ],
+         system_in_background => [ qw(command args|OPTIONAL) ],
+         sudo_system_in_background => [ qw(command args|OPTIONAL) ],
+         capture => [ qw(command args|OPTIONAL) ],
+         sudo_capture => [ qw(command args|OPTIONAL) ],
+         system_capture => [ qw(command args|OPTIONAL) ],
+         sudo_system_capture => [ qw(command args|OPTIONAL) ],
+         execute => [ qw(command args|OPTIONAL) ],
+         sudo_execute => [ qw(command args|OPTIONAL) ],
       },
       require_binaries => {
          script => [ ],
@@ -56,6 +58,7 @@ sub brik_properties {
       require_modules => {
          'IPC::Run3' => [ ],
          'Metabrik::System::Os' => [ ],
+         'Metabrik::System::Process' => [ ],
       },
       need_packages => {
          ubuntu => [ qw(bsdutils) ],
@@ -167,6 +170,38 @@ sub sudo_system {
    $self->use_sudo($prev);
 
    return $r;
+}
+
+sub system_in_background {
+   my $self = shift;
+   my ($cmd, @args) = @_;
+
+   $self->brik_help_run_undef_arg('system_in_background', $cmd) or return;
+
+   my $sp = Metabrik::System::Process->new_from_brik_init($self) or return;
+   $sp->close_output_on_start(1);
+
+   $sp->start(sub {
+      $self->system($cmd, @args);
+   });
+
+   return 1;
+}
+
+sub sudo_system_in_background {
+   my $self = shift;
+   my ($cmd, @args) = @_;
+
+   $self->brik_help_run_undef_arg('sudo_system_in_background', $cmd) or return;
+
+   my $sp = Metabrik::System::Process->new_from_brik_init($self) or return;
+   $sp->close_output_on_start(1);
+
+   $sp->start(sub {
+      $self->sudo_system($cmd, @args);
+   });
+
+   return 1;
 }
 
 sub capture {

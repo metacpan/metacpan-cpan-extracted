@@ -25,8 +25,10 @@ no_index:
     - author
 requires:
   Archive::Zip: '1.47'
+  Config: '0'
   Config::Std: '0'
   Exporter: '0'
+  ExtUtils::Installed: '0'
   File::Basename: '0'
   File::Copy::Recursive: '0'
   File::Find: '0'
@@ -53,5 +55,5 @@ requires:
   perl: '5.010001'
 resources:
   repository: https://github.com/kenneth-olwing/App-TestOnTap.git
-version: '0.037'
+version: '0.040'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

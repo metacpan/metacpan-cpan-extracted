@@ -75,6 +75,114 @@ define ([
 
     return function () {
 
+        QUnit.test('intToMonth()', function (assert) {
+            assert.strictEqual(dt.intToMonth(0), null);
+            assert.strictEqual(dt.intToMonth(0, true), null);
+            assert.strictEqual(dt.intToMonth(-1), null);
+            assert.strictEqual(dt.intToMonth(-1, true), null);
+            assert.strictEqual(dt.intToMonth(13), null);
+            assert.strictEqual(dt.intToMonth(13, true), null);
+            assert.strictEqual(dt.intToMonth('0'), null);
+            assert.strictEqual(dt.intToMonth('0', true), null);
+            assert.strictEqual(dt.intToMonth('-1'), null);
+            assert.strictEqual(dt.intToMonth('-1', true), null);
+            assert.strictEqual(dt.intToMonth('13'), null);
+            assert.strictEqual(dt.intToMonth('13', true), null);
+            assert.strictEqual(dt.intToMonth(''), null);
+            assert.strictEqual(dt.intToMonth('', true), null);
+            assert.strictEqual(dt.intToMonth(undefined), null);
+            assert.strictEqual(dt.intToMonth(undefined, true), null);
+            assert.strictEqual(dt.intToMonth(null), null);
+            assert.strictEqual(dt.intToMonth(null, true), null);
+            assert.strictEqual(dt.intToMonth(1), 'JAN');
+            assert.strictEqual(dt.intToMonth(1, true), 'January');
+            assert.strictEqual(dt.intToMonth(2), 'FEB');
+            assert.strictEqual(dt.intToMonth(2, true), 'February');
+            assert.strictEqual(dt.intToMonth(3), 'MAR');
+            assert.strictEqual(dt.intToMonth(3, true), 'March');
+            assert.strictEqual(dt.intToMonth(4), 'APR');
+            assert.strictEqual(dt.intToMonth(4, true), 'April');
+            assert.strictEqual(dt.intToMonth(5), 'MAY');
+            assert.strictEqual(dt.intToMonth(5, true), 'May');
+            assert.strictEqual(dt.intToMonth(6), 'JUN');
+            assert.strictEqual(dt.intToMonth(6, true), 'June');
+            assert.strictEqual(dt.intToMonth(7), 'JUL');
+            assert.strictEqual(dt.intToMonth(7, true), 'July');
+            assert.strictEqual(dt.intToMonth(8), 'AUG');
+            assert.strictEqual(dt.intToMonth(8, true), 'August');
+            assert.strictEqual(dt.intToMonth(9), 'SEP');
+            assert.strictEqual(dt.intToMonth(9, true), 'September');
+            assert.strictEqual(dt.intToMonth(10), 'OCT');
+            assert.strictEqual(dt.intToMonth(10, true), 'October');
+            assert.strictEqual(dt.intToMonth(11), 'NOV');
+            assert.strictEqual(dt.intToMonth(11, true), 'November');
+            assert.strictEqual(dt.intToMonth(12), 'DEC');
+            assert.strictEqual(dt.intToMonth(12, true), 'December');
+        });
+
+        QUnit.test('strToMonth()', function (assert) {
+            assert.strictEqual(dt.strToMonth(0), null);
+            assert.strictEqual(dt.strToMonth(0, true), null);
+            assert.strictEqual(dt.strToMonth(-1), null);
+            assert.strictEqual(dt.strToMonth(-1, true), null);
+            assert.strictEqual(dt.strToMonth(13), null);
+            assert.strictEqual(dt.strToMonth(13, true), null);
+            assert.strictEqual(dt.strToMonth(''), null);
+            assert.strictEqual(dt.strToMonth('', true), null);
+            assert.strictEqual(dt.strToMonth(undefined), null);
+            assert.strictEqual(dt.strToMonth(undefined, true), null);
+            assert.strictEqual(dt.strToMonth('se'), null);
+            assert.strictEqual(dt.strToMonth('se', true), null);
+            assert.strictEqual(dt.strToMonth('janFHDCDC'), 'JAN');
+            assert.strictEqual(dt.strToMonth('janFHDCDC', true), 'January');
+            assert.strictEqual(dt.strToMonth('jan'), 'JAN');
+            assert.strictEqual(dt.strToMonth('jan', true), 'January');
+            assert.strictEqual(dt.strToMonth('feb'), 'FEB');
+            assert.strictEqual(dt.strToMonth('feb', true), 'February');
+            assert.strictEqual(dt.strToMonth('mar'), 'MAR');
+            assert.strictEqual(dt.strToMonth('mar', true), 'March');
+            assert.strictEqual(dt.strToMonth('apr'), 'APR');
+            assert.strictEqual(dt.strToMonth('apr', true), 'April');
+            assert.strictEqual(dt.strToMonth('may'), 'MAY');
+            assert.strictEqual(dt.strToMonth('may', true), 'May');
+            assert.strictEqual(dt.strToMonth('jun'), 'JUN');
+            assert.strictEqual(dt.strToMonth('jun', true), 'June');
+            assert.strictEqual(dt.strToMonth('jul'), 'JUL');
+            assert.strictEqual(dt.strToMonth('jul', true), 'July');
+            assert.strictEqual(dt.strToMonth('aug'), 'AUG');
+            assert.strictEqual(dt.strToMonth('aug', true), 'August');
+            assert.strictEqual(dt.strToMonth('sep'), 'SEP');
+            assert.strictEqual(dt.strToMonth('sep', true), 'September');
+            assert.strictEqual(dt.strToMonth('oct'), 'OCT');
+            assert.strictEqual(dt.strToMonth('oct', true), 'October');
+            assert.strictEqual(dt.strToMonth('nov'), 'NOV');
+            assert.strictEqual(dt.strToMonth('nov', true), 'November');
+            assert.strictEqual(dt.strToMonth('dec'), 'DEC');
+            assert.strictEqual(dt.strToMonth('dec', true), 'December');
+        });
+
+        QUnit.test('month vetter function', function (assert) {
+            var cm = (new Date()).getMonth() + 1,
+                cms = dt.intToMonth(cm, true);
+            assert.strictEqual(dt.vetMonth(''), cms, "Empty string -> " + cms);
+            assert.strictEqual(dt.vetMonth(undefined), cms, "undefined -> " + cms);
+            assert.strictEqual(dt.vetMonth(null), cms, "null -> " + cms);
+            assert.strictEqual(dt.vetMonth(0), null, "0 -> null");
+            assert.strictEqual(dt.vetMonth('0'), null, "0 -> null");
+            assert.strictEqual(dt.vetMonth(' 0'), null, "0 -> null");
+            assert.strictEqual(dt.vetMonth(13), null, "13 -> null");
+            assert.strictEqual(dt.vetMonth('13'), null, "13 -> null");
+            assert.strictEqual(dt.vetMonth(' 13'), null, "13 -> null");
+            assert.strictEqual(dt.vetMonth(12), 'December', "12 -> December");
+            assert.strictEqual(dt.vetMonth('12'), 'December', "12 -> December");
+            assert.strictEqual(dt.vetMonth(' 12'), 'December', "12 -> December");
+            assert.strictEqual(dt.vetMonth('dec'), 'December', "dec -> December");
+            assert.strictEqual(dt.vetMonth('decADFA'), 'December', "decADFA -> December");
+            assert.strictEqual(dt.vetMonth(' decem'), 'December', "(space)decem -> December");
+            assert.strictEqual(dt.vetMonth('December'), 'December', "December -> December");
+            assert.strictEqual(dt.vetMonth('foobar'), null, "foobar -> null");
+        });
+
         QUnit.test('date vetter function: zero components', function (assert) {
             date_valid(assert, ''); // empty string
             date_valid(assert, ' '); // space

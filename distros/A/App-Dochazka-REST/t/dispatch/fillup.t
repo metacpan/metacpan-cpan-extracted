@@ -1,22 +1,22 @@
-# ************************************************************************* 
-# Copyright (c) 2014-2015, SUSE LLC
-# 
+# *************************************************************************
+# Copyright (c) 2014-2017, SUSE LLC
+#
 # All rights reserved.
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
-# 
+#
 # 1. Redistributions of source code must retain the above copyright notice,
 # this list of conditions and the following disclaimer.
-# 
+#
 # 2. Redistributions in binary form must reproduce the above copyright
 # notice, this list of conditions and the following disclaimer in the
 # documentation and/or other materials provided with the distribution.
-# 
+#
 # 3. Neither the name of SUSE LLC nor the names of its contributors may be
 # used to endorse or promote products derived from this software without
 # specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 # AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 # IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -28,9 +28,9 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-# ************************************************************************* 
+# *************************************************************************
 #
-# test 'interval/fillup' resource
+# test 'interval/fillup' and 'interval/scheduled' resources
 #
 
 #!perl
@@ -54,7 +54,7 @@ my $app = initialize_regression_test();
 note( 'instantiate Plack::Test object' );
 my $test = Plack::Test->create( $app );
 
-my ( $note, $status );
+my ( $note, $resource, $status );
 
 #note( 'start with a clean slate' );
 #$status = delete_all_attendance_data();
@@ -114,11 +114,13 @@ note( $note = "test _extract_activity_spec method" );
 $log->info( "=== $note" );
 note( $note = "test _extract_date_list_or_tsrange method" );
 $log->info( "=== $note" );
-$status = req( $test, 400, 'active', 'POST', 'interval/fillup', <<"EOH" );
-{ "eid" : $eid_of_active }
+foreach $resource ( 'interval/fillup', 'interval/scheduled' ) {
+    $status = req( $test, 400, 'active', 'POST', $resource, <<"EOH" );
+    { "eid" : $eid_of_active }
 EOH
-is( $status->level, "ERR" );
-is( $status->code, 'DISPATCH_DATE_LIST_OR_TSRANGE' );
+    is( $status->level, "ERR" );
+    is( $status->code, 'DISPATCH_DATE_LIST_OR_TSRANGE' );
+}
 
 note( $note = "test some malformed tsranges" );
 $log->info( "=== $note" );
@@ -129,33 +131,53 @@ my @failing_tsranges = (
     'wamble wumble womble',
 );
 foreach my $tsrange ( @failing_tsranges ) {
-    $status = req( $test, 500, 'active', 'POST', 'interval/fillup', <<"EOH" );
-    { "eid" : $eid_of_active, "tsrange" : "$tsrange" }
+    foreach $resource ( 'interval/fillup', 'interval/scheduled' ) {
+        $status = req( $test, 500, 'active', 'POST', $resource, <<"EOH" );
+        { "eid" : $eid_of_active, "tsrange" : "$tsrange" }
 EOH
-    is( $status->level, "ERR" );
-    like( $status->text, qr/malformed range literal/ );
+        is( $status->level, "ERR" );
+        like( $status->text, qr/malformed range literal/ );
+    }
 }
 
 note( $note = "The testing schedule has intervals on Fri, Sat, and Sun" );
 $log->info( "=== $note" );
 note( $note = "Run fillup over a Thu-Mon tsrange" );
 $log->info( "=== $note" );
-$status = req( $test, 200, 'active', 'POST', 'interval/fillup', <<"EOH" );
-{ "eid" : $eid_of_active, "tsrange" : "[ 2014-09-04 00:00, 2014-09-08 24:00 )" }
+foreach $resource ( 'interval/fillup', 'interval/scheduled' ) {
+    $status = req( $test, 200, 'active', 'POST', $resource, <<"EOH" );
+    { "eid" : $eid_of_active, "tsrange" : "[ 2014-09-04 00:00, 2014-09-08 24:00 )" }
 EOH
-is( ref( $status->payload ), 'HASH' );
-is( $status->{'count'}, 6 );
-ok( exists( $status->payload->{'success'} ) );
-ok( exists( $status->payload->{'success'}->{'count'} ) );
-is( $status->payload->{'success'}->{'count'}, 6 );
-ok( exists( $status->payload->{'failure'} ) );
-ok( exists( $status->payload->{'failure'}->{'count'} ) );
-is( $status->payload->{'failure'}->{'count'}, 0 );
+    is( ref( $status->payload ), 'HASH' );
+    is( $status->{'count'}, 6 );
+    ok( exists( $status->payload->{'success'} ) );
+    ok( exists( $status->payload->{'success'}->{'count'} ) );
+    is( $status->payload->{'success'}->{'count'}, 6 );
+    ok( exists( $status->payload->{'failure'} ) );
+    ok( exists( $status->payload->{'failure'}->{'count'} ) );
+    is( $status->payload->{'failure'}->{'count'}, 0 );
+}
 
 note( $note = "Run fillup over a Thu-Mon tsrange where Sat, Sun are holidays" );
 $log->info( "=== $note" );
+foreach $resource ( 'interval/fillup', 'interval/scheduled' ) {
+    $status = req( $test, 200, 'active', 'POST', $resource, <<"EOH" );
+    { "eid" : $eid_of_active, "tsrange" : "[ 1960-12-22 00:00, 1960-12-26 24:00 )" }
+EOH
+    is( ref( $status->payload ), 'HASH' );
+    is( $status->{'count'}, 2 );
+    ok( exists( $status->payload->{'success'} ) );
+    ok( exists( $status->payload->{'success'}->{'count'} ) );
+    is( $status->payload->{'success'}->{'count'}, 2 );
+    ok( exists( $status->payload->{'failure'} ) );
+    ok( exists( $status->payload->{'failure'}->{'count'} ) );
+    is( $status->payload->{'failure'}->{'count'}, 0 );
+}
+
+note( $note = "Fillup with date list; intervals on 1960-12-23 will be skipped" );
+$log->info( "=== $note" );
 $status = req( $test, 200, 'active', 'POST', 'interval/fillup', <<"EOH" );
-{ "eid" : $eid_of_active, "tsrange" : "[ 1960-12-22 00:00, 1960-12-26 24:00 )" }
+{ "eid" : $eid_of_active, "date_list" : [ "1960-12-22", "1960-12-23", "1960-12-27", "1960-12-30" ] }
 EOH
 is( ref( $status->payload ), 'HASH' );
 is( $status->{'count'}, 2 );
@@ -166,29 +188,10 @@ ok( exists( $status->payload->{'failure'} ) );
 ok( exists( $status->payload->{'failure'}->{'count'} ) );
 is( $status->payload->{'failure'}->{'count'}, 0 );
 
-note( $note = "Fillup with date list; intervals on 1960-12-23 will be skipped" );
+note( $note = "Scheduled with date list" );
 $log->info( "=== $note" );
-$status = req( $test, 200, 'active', 'POST', 'interval/fillup', <<"EOH" );
+$status = req( $test, 200, 'active', 'POST', 'interval/scheduled', <<"EOH" );
 { "eid" : $eid_of_active, "date_list" : [ "1960-12-22", "1960-12-23", "1960-12-27", "1960-12-30" ] }
-EOH
-is( ref( $status->payload ), 'HASH' );
-is( $status->{'count'}, 4 );
-ok( exists( $status->payload->{'success'} ) );
-ok( exists( $status->payload->{'success'}->{'count'} ) );
-is( $status->payload->{'success'}->{'count'}, 2 );
-ok( exists( $status->payload->{'failure'} ) );
-ok( exists( $status->payload->{'failure'}->{'count'} ) );
-is( $status->payload->{'failure'}->{'count'}, 2 );
-
-note( $note = "Fillup with the same date list and clobber TRUE" );
-$log->info( "=== $note" );
-$status = req( $test, 200, 'active', 'POST', 'interval/fillup', <<"EOH" );
-{ "eid" : $eid_of_active, "date_list" : [ 
-    "1960-12-22",
-    "1960-12-23",
-    "1960-12-27",
-    "1960-12-30"
-], "clobber" : true }
 EOH
 is( ref( $status->payload ), 'HASH' );
 is( $status->{'count'}, 4 );
@@ -201,15 +204,17 @@ is( $status->payload->{'failure'}->{'count'}, 0 );
 
 note( $note = "Fillup with a date list that results in no intervals created" );
 $log->info( "=== $note" );
-$status = req( $test, 200, 'active', 'POST', 'interval/fillup', <<"EOH" );
-{ "eid" : $eid_of_active, "date_list" : [ 
-    "2016-01-05",
-    "2016-01-06"
-], "clobber" : true }
+foreach $resource ( 'interval/fillup', 'interval/scheduled' ) {
+    $status = req( $test, 200, 'active', 'POST', $resource, <<"EOH" );
+    { "eid" : $eid_of_active, "date_list" : [ 
+        "2016-01-05",
+        "2016-01-06"
+    ] }
 EOH
-is( $status->level, 'OK' );
-is( $status->code, 'DISPATCH_FILLUP_NO_INTERVALS_CREATED' );
-is( $status->{'count'}, 0 );
+    is( $status->level, 'OK' );
+    is( $status->code, 'DISPATCH_NO_SCHEDULED_INTERVALS_CREATED' );
+    is( $status->{'count'}, 0 );
+}
 
 note( 'tear down' );
 $status = delete_all_attendance_data();

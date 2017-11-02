@@ -1,5 +1,5 @@
 #
-# $Id: Twitter.pm,v f6ad8c136b19 2017/01/01 10:13:54 gomor $
+# $Id: Twitter.pm,v dfc28e2a169d 2017/03/06 20:06:58 gomor $
 #
 # client::twitter Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik);
 
 sub brik_properties {
    return {
-      revision => '$Revision: f6ad8c136b19 $',
+      revision => '$Revision: dfc28e2a169d $',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -24,6 +24,7 @@ sub brik_properties {
          follow => [ qw(username) ],
          unfollow => [ qw(username) ],
          disconnect => [ ],
+         rate_limit_status => [ ],
       },
       attributes => {
          consumer_key => [ qw(string) ],
@@ -65,10 +66,11 @@ sub connect {
 
    # Without that, we got:
    # "500 Can't connect to api.twitter.com:443 (Crypt-SSLeay can't verify hostnames)"
-   $ENV{'PERL_LWP_SSL_VERIFY_HOSTNAME'} = 0;
+   #$ENV{'PERL_LWP_SSL_VERIFY_HOSTNAME'} = 0;
 
    my $nt;
    eval {
+      local $ENV{PERL_NET_HTTPS_SSL_SOCKET_CLASS} = 'IO::Socket::SSL';
       $nt = Net::Twitter->new(
          traits => [qw/API::RESTv1_1/],
          consumer_key => $consumer_key,
@@ -98,6 +100,7 @@ sub tweet {
 
    my $r;
    eval {
+      local $ENV{PERL_NET_HTTPS_SSL_SOCKET_CLASS} = 'IO::Socket::SSL';
       $r = $nt->update($message);
    };
    if ($@) {
@@ -118,6 +121,7 @@ sub account_settings {
 
    my $r;
    eval {
+      local $ENV{PERL_NET_HTTPS_SSL_SOCKET_CLASS} = 'IO::Socket::SSL';
       $r = $nt->account_settings;
    };
    if ($@) {
@@ -145,6 +149,7 @@ sub followers {
       while ($next_cursor) {
          $self->log->info("followers: iterating on users with next_cursor [$next_cursor]");
 
+         local $ENV{PERL_NET_HTTPS_SSL_SOCKET_CLASS} = 'IO::Socket::SSL';
          $r = $nt->followers({ cursor => $next_cursor });
          last if ! defined($r);
          $next_cursor = $r->{next_cursor};
@@ -194,6 +199,7 @@ sub following {
       while ($cursor) {
          $self->log->info("following: iterating on users with cursor [$cursor]");
 
+         local $ENV{PERL_NET_HTTPS_SSL_SOCKET_CLASS} = 'IO::Socket::SSL';
          $r = $nt->friends({ cursor => $cursor });
          last if ! defined($r);
          $cursor = $r->{next_cursor};
@@ -237,6 +243,7 @@ sub follow {
 
    my $r;
    eval {
+      local $ENV{PERL_NET_HTTPS_SSL_SOCKET_CLASS} = 'IO::Socket::SSL';
       $r = $nt->follow($username);
    };
    if ($@) {
@@ -257,6 +264,7 @@ sub unfollow {
 
    my $r;
    eval {
+      local $ENV{PERL_NET_HTTPS_SSL_SOCKET_CLASS} = 'IO::Socket::SSL';
       $r = $nt->unfollow($username);
    };
    if ($@) {
@@ -276,6 +284,31 @@ sub disconnect {
    $self->net_twitter(undef);
 
    return 1;
+}
+
+#
+# https://dev.twitter.com/rest/public/rate-limits
+#
+sub rate_limit_status {
+   my $self = shift;
+
+   my $nt = $self->connect or return;
+
+   my $r;
+   eval {
+      local $ENV{PERL_NET_HTTPS_SSL_SOCKET_CLASS} = 'IO::Socket::SSL';
+      $r = $nt->rate_limit_status;
+   };
+   if ($@) {
+      chomp($@);
+      return $self->log->error("rate_limit_status: unable to call method [$@]");
+   }
+   elsif (! defined($r)) {
+      return $self->log->error("rate_limit_status: unable to call method ".
+         "[unknown error]");
+   }
+
+   return $r;
 }
 
 1;

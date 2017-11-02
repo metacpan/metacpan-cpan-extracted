@@ -1,6 +1,6 @@
 # [[[ PREPROCESSOR ]]]
 # <<< PARSE_ERROR: 'ERROR ECOPARP00' >>>
-# <<< PARSE_ERROR: 'Unexpected Token:  our' >>>
+# <<< PARSE_ERROR: 'Unexpected Token:  sub' >>>
 
 # [[[ HEADER ]]]
 use RPerl;
@@ -13,8 +13,7 @@ our $VERSION = 0.001_000;
 ## no critic qw(ProhibitUselessNoCritic ProhibitMagicNumbers RequireCheckedSyscalls
 
 # [[[ SUBROUTINES ]]]
-our void $empty_sub = sub {
-    return 2;
-};
+sub empty_sub { { my void $RETURN_TYPE }; return 2; }
 
 1;                  # end of package
+

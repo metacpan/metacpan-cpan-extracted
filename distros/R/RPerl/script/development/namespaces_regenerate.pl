@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 use rperlnamespaces;
-our $VERSION = 0.007_000;
+our $VERSION = 0.012_000;
 
 ## no critic qw(ProhibitExplicitStdin)  # USER DEFAULT 4: allow <STDIN>
 
@@ -27,7 +27,7 @@ package main;
 my $namespaces_core = rperlnamespaces::hash();
 #print 'in namespaces_regenerate.pl main::, ret from rperlnamespaces::hash(), have $namespaces_core = ', Dumper($namespaces_core), "\n";
 
-# NEED FIX: remove hard-coded list of packages
+# DEV NOTE, CORRELATION #rp050: hard-coded list of RPerl files/packages/namespaces
 # DEV NOTE, CORRELATION #rp003: some RPerl packages are missed due to BEGIN{} or INIT{} blocks, etc.
 my $namespaces_rperl_missed = { 
     # DEV NOTE, CORRELATION #rp021: remove hard-coded fake 'rperl::' namespace?
@@ -43,9 +43,11 @@ my $namespaces_rperl_missed = {
     'rperlrules::' => 1,
     'rperlsse::' => 1,
     'rperlgmp::' => 1,
+    'rperlgsl::' => 1,
+    'perlapinames_generated::' => 1,
 };
 
-# NEED FIX: remove hard-coded list of packages
+# DEV NOTE, CORRELATION #rp050: hard-coded list of RPerl files/packages/namespaces
 my $filenames_rperl = {
     # forward slash
     'RPerl/CompileUnit/Module/Class.pm' => 1,
@@ -53,6 +55,7 @@ my $filenames_rperl = {
     'RPerl/Config.pm' => 1,
     'RPerl/HelperFunctions_cpp.pm' => 1,
     'RPerl/Inline.pm' => 1,
+    'RPerl/Exporter.pm' => 1,
 
     # backslash
     'RPerl\CompileUnit\Module\Class.pm' => 1,
@@ -60,6 +63,7 @@ my $filenames_rperl = {
     'RPerl\Config.pm' => 1,
     'RPerl\HelperFunctions_cpp.pm' => 1,
     'RPerl\Inline.pm' => 1,
+    'RPerl\Exporter.pm' => 1,
 
     # no slash
     'RPerl.pm' => 1,
@@ -74,9 +78,11 @@ my $filenames_rperl = {
     'rperlrules.pm' => 1,
     'rperlsse.pm' => 1,
     'rperlgmp.pm' => 1,
+    'rperlgsl.pm' => 1,
+    'perlapinames_generated.pm' => 1,
 };
 
-# NEED FIX: remove hard-coded list of packages
+# DEV NOTE, CORRELATION #rp050: hard-coded list of RPerl files/packages/namespaces
 # NEED UPDATE: some of these should be in core
 my $namespaces_rperl_deps = {
     'Alien::'    => 1,
@@ -110,13 +116,17 @@ my $namespaces_rperl_deps = {
     'I18N::'         => 1,
     'Inline::'       => 1,
     'IPC::'          => 1,
+    'JSON::'         => 1,
     'List::'         => 1,
     'Lingua::'         => 1,
     'Locale::'       => 1,
     'Log::'          => 1,
     'MIME::'         => 1,
     'Math::'         => 1,
+    'Method::'         => 1,  # subdependency of Moo(se)
     'Module::'       => 1,
+    'Moo::'       => 1,
+    'Moose::'       => 1,
     'POSIX::'        => 1,
     'PadWalker::'    => 1,
     'Params::'       => 1,
@@ -141,6 +151,7 @@ my $namespaces_rperl_deps = {
     'Sub::'       => 1,
     'Term::'         => 1,
     'Test::'         => 1,
+    'Test2::'         => 1,
     'Text::'         => 1,
     'Tie::'          => 1,
     'Time::'         => 1,
@@ -172,6 +183,8 @@ my $namespaces_rperl_deps = {
 eval 'use RPerl::AfterSubclass';
 eval 'use rperlsse';
 eval 'use rperlgmp';
+eval 'use rperlgsl';
+eval 'use perlapinames_generated';
 
 #print 'in namespaces_regenerate.pl main::, after evals, about to call rperlnamespaces::hash()...', "\n";
 my $namespaces_rperl = rperlnamespaces::hash();

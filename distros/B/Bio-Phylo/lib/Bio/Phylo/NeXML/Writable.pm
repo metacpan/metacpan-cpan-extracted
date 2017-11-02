@@ -1,5 +1,6 @@
 package Bio::Phylo::NeXML::Writable;
 use strict;
+use warnings;
 use base 'Bio::Phylo';
 use Bio::Phylo::IO 'unparse';
 use Bio::Phylo::Factory;
@@ -18,7 +19,7 @@ use Bio::Phylo::Util::CONSTANT qw'/looks_like/ :namespaces :objecttypes';
         'xsi' => _NS_XSI_,
         'rdf' => _NS_RDF_,
         'xsd' => _NS_XSD_,
-		'map' => _NS_PHYLOMAP_,
+        'map' => _NS_PHYLOMAP_,
     );
     my @fields =
       \( my ( %tag, %id, %attributes, %identifiable, %suppress_ns, %meta, %url ) );
@@ -931,6 +932,28 @@ method indicates whether that is the case.
         return $suppress_ns{ shift->get_id };
     }
     *get_suppress_ns = \&is_ns_suppressed;
+    
+=item is_equal()
+
+Tests whether the invocant and the argument are the same. Normally this is done
+by comparing object identifiers, but if the argument is not an object but a string
+then the string is taken to be a name with which to compare, e.g. 
+$taxon->is_equal('Homo sapiens')
+
+ Type    : Test
+ Title   : is_equal
+ Usage   : if ( $obj->is_equal($other) ) { ... }
+ Function: Tests whether the invocant and the argument are the same
+ Returns : BOOLEAN
+ Args    : Object to compare with, or a string representing a
+           name to compare with the invocant's name
+
+=cut
+    
+    sub is_equal {
+    	my ($self,$other) = @_;
+    	return ref $other ? $self->SUPER::is_equal($other) : $self->get_name eq $other;
+    }
 
 =back
 
@@ -1003,10 +1026,10 @@ Serializes invocant to XML.
             throw 'BadArgs' => 'DOM factory object not provided';
         }
     }
-
+    
 =item to_json()
 
-Serializes object to JSON string
+ Serializes object to JSON string
 
  Type    : Serializer
  Title   : to_json()
@@ -1019,8 +1042,18 @@ Serializes object to JSON string
 =cut
 
     sub to_json {
-        looks_like_class('XML::XML2JSON')->new->convert( shift->to_xml );
-    }
+		looks_like_class('Bio::Phylo::NeXML::XML2JSON')->new->convert( shift->to_xml );
+    }    
+
+	sub _json_data {
+		my $self   = shift;
+		my %meta   = map { $_->get_predicate => $_->get_object } @{ $self->get_meta };
+		my %result = %{ $self->SUPER::_json_data };
+		$result{$_} = $meta{$_} for keys %meta;
+		$result{'name'} = $self->get_name if $self->get_name;
+		$result{'link'} = $self->get_link if $self->get_link;
+		return \%result;
+	}
 
 =item to_cdao()
 
@@ -1045,9 +1078,27 @@ Serializes object to CDAO RDF/XML string
 
     sub _cleanup : Destructor {
         my $self = shift;
-        my $id   = $self->get_id;
-        for my $field (@fields) {
-            delete $field->{$id};
+        
+        # this deserves an explanation. the issue is as follows: for the package
+        # bio-phylo-megatree we have node objects that are persisted in a database
+        # and accessed through an object-relational mapping provided by DBIx::Class.
+        # these node objects are created and destroyed on the fly as a set of node
+        # records (i.e. a tree) is traversed. this is the whole point of the package,
+        # because it means large trees don't ever have to be kept in memory. however,
+        # as a consequence, every time one of those ORM-backed nodes goes out of scope, 
+        # this destructor is called and all the @fields are cleaned up again. this 
+        # precludes computation and caching of node coordinates (or any other semantic 
+        # annotation) on such ORM-backed objects. the terrible, terrible fix for now is 
+        # to just assume that i) these annotations need to stay alive ii) we're not going 
+        # to have ID clashes (!!!!!), so iii) we just don't clean up after ourselves. 
+        # as a note to my future self: it would be a good idea to have a triple store-like 
+        # table to store the annotations, so they are persisted in the same way as the
+        # node objects, bypassing this malarkey.        
+        if ( not $self->isa('DBIx::Class::Core') ) {
+			my $id = $self->get_id;
+			for my $field (@fields) {
+				delete $field->{$id};
+			}
         }
     }
 

@@ -2,7 +2,8 @@
 
 # [[[ PREPROCESSOR ]]]
 # <<< PARSE_ERROR: 'ERROR ECOPAPL02' >>>
-# <<< PARSE_ERROR: 'Semicolon seems to be missing' >>>
+# <<< PARSE_ERROR: 'near ")' >>>
+# <<< PARSE_ERROR: 'sub foo "' >>>
 
 # [[[ HEADER ]]]
 use RPerl;
@@ -16,9 +17,11 @@ our $VERSION = 0.001_000;
 
 # [[[ OPERATIONS ]]]
 
-our integer $foo = sub {
+foo('howdy!', 23, 42)
+sub foo {
+    { my integer $RETURN_TYPE };
     ( my string $bar, my integer $bat, my integer $baz ) = @ARG;
     print $bar, "\n";
     return $bat + $baz;
-}
-foo('howdy!', 23, 42);
+};
+

@@ -15,7 +15,7 @@ use Locale::Babelfish::Phrase::PluralForms ();
 
 use parent qw( Class::Accessor::Fast );
 
-our $VERSION = '1.000000'; # VERSION
+our $VERSION = '2.003'; # VERSION
 
 __PACKAGE__->mk_accessors( qw( ast ) );
 
@@ -93,7 +93,7 @@ Locale::Babelfish::Phrase::Compiler - Babelfish AST Compiler
 
 =head1 VERSION
 
-version 1.000000
+version 2.003
 
 =head1 DESCRIPTION
 
@@ -141,13 +141,17 @@ Igor Mironov <grif@cpan.org>
 
 =item *
 
+Victor Efimov <efimov@reg.ru>
+
+=item *
+
 REG.RU LLC
 
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014 by Akzhan Abdulin.
+This software is Copyright (c) 2014 by REG.RU LLC.
 
 This is free software, licensed under:
 

@@ -1,5 +1,5 @@
 package Text::Password::SHA;
-our $VERSION = "0.07";
+our $VERSION = "0.09";
 
 use Moose;
 extends 'Text::Password::MD5';
@@ -81,7 +81,7 @@ override 'verify' => sub {
 
 =head3 nonce($length)
 
-generates the strings with enough strength.
+generates the random strings with enough strength.
 
 the length defaults to 8($self->default).
 

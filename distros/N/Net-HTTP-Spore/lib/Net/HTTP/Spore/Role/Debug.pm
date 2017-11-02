@@ -1,5 +1,5 @@
 package Net::HTTP::Spore::Role::Debug;
-$Net::HTTP::Spore::Role::Debug::VERSION = '0.07';
+$Net::HTTP::Spore::Role::Debug::VERSION = '0.09';
 use IO::File;
 use Moose::Role;
 
@@ -73,7 +73,7 @@ Net::HTTP::Spore::Role::Debug
 
 =head1 VERSION
 
-version 0.07
+version 0.09
 
 =head1 AUTHORS
 

@@ -1,5 +1,5 @@
 package Net::HTTP::Spore::Meta::Method::Spore;
-$Net::HTTP::Spore::Meta::Method::Spore::VERSION = '0.07';
+$Net::HTTP::Spore::Meta::Method::Spore::VERSION = '0.09';
 # ABSTRACT: declare API method
 
 use Moose::Role;
@@ -97,7 +97,7 @@ Net::HTTP::Spore::Meta::Method::Spore - declare API method
 
 =head1 VERSION
 
-version 0.07
+version 0.09
 
 =head1 SYNOPSIS
 

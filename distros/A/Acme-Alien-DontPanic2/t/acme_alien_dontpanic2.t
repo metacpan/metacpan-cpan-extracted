@@ -6,17 +6,10 @@ alien_ok 'Acme::Alien::DontPanic2';
 
 my $xs = do { local $/; <DATA> };
 
-xs_ok $xs, with_subtest {
+xs_ok { xs => $xs, verbose => 1 }, with_subtest {
   my($module) = @_;
   plan 1;
   is $module->answer, 42, 'answer is 42';
-};
-
-ffi_ok { symbols => ['answer'] }, with_subtest {
-  my($ffi) = @_;
-  my $answer = $ffi->function(answer=>[]=>'int')->call;
-  plan 1;
-  is $answer, 42;
 };
 
 run_ok('dontpanic')

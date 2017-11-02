@@ -8,7 +8,7 @@ use strict;
 
 package Log::Report;
 use vars '$VERSION';
-$VERSION = '1.22';
+$VERSION = '1.23';
 
 use base 'Exporter';
 
@@ -43,7 +43,7 @@ my $default_mode = 0;
 my @nested_tries;
 
 # we can only load these after Log::Report has compiled, because
-# the use this module themselves.
+# they use this module themselves as well.
 
 require Log::Report::Die;
 require Log::Report::Domain;
@@ -115,6 +115,14 @@ sub report($@)
     }
     elsif($message->isa('Log::Report::Message'))
     {   @_==0 or error __x"a message object is reported with more parameters";
+    }
+    else
+    {   # foreign object
+        my $text = "$message";  # hope stringification is overloaded
+		$text    =~ s/\s*$//gs;
+        @_%2 and error __x"odd length parameter list with object '{msg}'",
+             msg => $text;
+        $message = $lrm->new(_prepend => $text, @_);
     }
 
     if(my $to = $message->to)
@@ -296,8 +304,11 @@ sub try(&@)
 
     my $is_exception = blessed $err && $err->isa('Log::Report::Exception');
     if(!$is_exception && $err && !$disp->wasFatal)
-    {   ($err, my($opts, $reason, $text))
-           = Log::Report::Die::die_decode($err, on_die => $disp->die2reason);
+    {   # Decode exceptions which do not origin from Log::Report reports
+        ($err, my($opts, $reason, $text)) = blessed $err
+           ? Log::Report::Die::exception_decode($err)
+           : Log::Report::Die::die_decode($err, on_die => $disp->die2reason);
+
         $disp->log($opts, $reason, __$text);
     }
 
@@ -309,6 +320,7 @@ sub try(&@)
     wantarray ? @ret : $ret;
 }
 
+#------------
 
 sub trace(@)   {report TRACE   => @_}
 sub assert(@)  {report ASSERT  => @_}

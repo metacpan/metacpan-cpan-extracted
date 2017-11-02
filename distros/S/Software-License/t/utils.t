@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 5;
+use Test::More tests => 7;
 use Software::LicenseUtils;
 
 {
@@ -49,6 +49,25 @@ END_PM
   is_deeply(
     \@guesses,
     [ 'Software::License::Apache_2_0' ],
+    "guessed okay"
+  );
+}
+
+{
+  my $fake_pm = <<'END_PM';
+"magic true value";
+__END__
+=head1 COPYRIGHT AND LICENSE
+This software is Copyright (c) 2015.
+This program is released under the following license: GPL v3
+=cut
+END_PM
+
+  my @guesses = Software::LicenseUtils->guess_license_from_pod($fake_pm);
+
+  is_deeply(
+    \@guesses,
+    [ 'Software::License::GPL_3' ],
     "guessed okay"
   );
 }
@@ -187,6 +206,35 @@ END_JSON
   is_deeply(
     \@guesses,
     [ 'Software::License::Perl_5' ],
+    "guessed okay"
+  );
+}
+
+{
+  my $fake_pm = <<'END_PM';
+
+"magic true value";
+__END__
+
+=head1 COPYRIGHT AND LICENSE
+
+唐鳳 has dedicated the work to the Commons by waiving all of his or her rights to the work worldwide under copyright law and all related or neighboring legal rights he or she had in the work, to the extent allowable by law.
+
+Works under CC0 do not require attribution. When citing the work, you should not imply endorsement by the author.
+
+This work is published from Taiwan.
+
+L<http://creativecommons.org/publicdomain/zero/1.0>
+
+=cut
+
+END_PM
+
+  my @guesses = Software::LicenseUtils->guess_license_from_pod($fake_pm);
+
+  is_deeply(
+    \@guesses,
+    [ 'Software::License::CC0_1_0' ],
     "guessed okay"
   );
 }

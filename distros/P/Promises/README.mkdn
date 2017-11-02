@@ -4,7 +4,7 @@ Promises - An implementation of Promises in Perl
 
 # VERSION
 
-version 0.98
+version 0.99
 
 # SYNOPSIS
 

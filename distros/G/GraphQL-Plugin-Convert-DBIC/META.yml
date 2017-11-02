@@ -1,0 +1,32 @@
+---
+abstract: 'convert DBIx::Class schema to GraphQL schema'
+author:
+  - 'Ed J <etj@cpan.org>'
+build_requires:
+  DBIx::Class::Schema: '0'
+  ExtUtils::MakeMaker: '0'
+  GraphQL: '0.20'
+  Test::More: '0.98'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150001'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: GraphQL-Plugin-Convert-DBIC
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DBIx::Class::Schema: '0'
+  GraphQL: '0.20'
+  perl: '5.014'
+resources:
+  IRC: irc://irc.perl.org/#graphql-perl
+  bugtracker: https://github.com/graphql-perl/GraphQL-Plugin-Convert-DBIC/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/graphql-perl/GraphQL-Plugin-Convert-DBIC
+version: '0.02'

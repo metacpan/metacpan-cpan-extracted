@@ -14,7 +14,7 @@ Alien::Build::Manual::AlienAuthor - Alien author documentation
 
 =head1 VERSION
 
-version 1.25
+version 1.28
 
 =head1 SYNOPSIS
 
@@ -324,7 +324,7 @@ You could feed your alienfile directly into L<Alien::Build>, or
 L<Alien::Build::MM>, but it is sometimes useful to test your alienfile 
 using the C<af> command (it does not come with L<Alien::Build>, you need 
 to install L<App::af>).  By default C<af> will use the C<alienfile> in 
-the current directly (just as C<make> uses the C<Makefile> in the 
+the current directory (just as C<make> uses the C<Makefile> in the 
 current directory; just like C<make> you can use the C<-f> option to 
 specify a different L<alienfile>).
 
@@ -612,6 +612,10 @@ Petr Pisar (ppisar)
 Lance Wicks (LANCEW)
 
 Ahmad Fatoum (a3f, ATHREEF)
+
+José Joaquín Atria (JJATRIA)
+
+Duke Leto (LETO)
 
 =head1 COPYRIGHT AND LICENSE
 

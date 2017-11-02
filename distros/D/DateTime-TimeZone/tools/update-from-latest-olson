@@ -97,7 +97,10 @@ sub _compile_tzdata {
 
     my $pushed = pushd($dir);
 
-    system('make')
+    # The CFLAGS bit is necessary because of an issue introduced in 2017c with
+    # the use of snprintf. This works fine on my machine without the flag but
+    # blows up on Travis.
+    system( 'make', 'CFLAGS=-DHAVE_SNPRINTF' )
         and die "Cannot run make: $!";
 
     my $target = $dir->subdir('target');

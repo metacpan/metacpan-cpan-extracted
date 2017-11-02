@@ -1,0 +1,292 @@
+=for Pod::Coverage empty
+
+=head1 NAME
+
+File::Globstar::ListMatch - List File Names Against List Of Patterns
+
+=head1 SYNOPSIS
+
+    use File::Globstar::ListMatch;
+
+    # Parse from file.
+    $matcher = File::Globstar::ListMatch('.gitignore', 
+                                         ignoreCase => 1,
+                                         isExclude => 1);
+
+    # Parse from file handle.
+    $matcher = File::Globstar::ListMatch(STDIN, ignoreCase => 0);
+
+    # Parse list of patterns.  Comments and blank lines are not
+    # stripped!
+    $matcher = File::Globstar::ListMatch([
+        'src/**/*.o',
+        '.*',
+        '!.gitignore'
+    ], filename => 'exclude.txt');
+
+    # Parse string.
+    $patterns = <<EOF;
+    # Ignore all compiled object files.
+    src/**/*.o
+    # Ignore all hidden files.
+    '.*'
+    # But not this one.
+    '.gitignore'
+    EOF
+    $matcher = File::Globstar::ListMatch(\$pattern);
+
+    $filename = 'path/to/hello.o';
+    if ($matcher->match($filename)) {
+        print "Ignore '$filename'.\n";
+    }
+
+=head1 DESCRIPTION
+
+Files containing list of files are very common as arguments to command-line options such
+as "--ignore", "--exclude" or "--include".  A well-known example is the 
+syntax used by L<git|https://git-scm.com/> as described in
+L<https://git-scm.com/docs/gitignore>.
+
+This module implements the same functionality in Perl.
+
+While the module will normally be used for matching against filenames, no
+file system operations are done.  Only strings are compared.  The reason for
+this is that it should be possible to match names of deleted files as
+well as existing files.
+
+=head2 INPUT FILE FORMAT
+
+Unless you pass a reference to an array of patterns as input, comments and 
+blank lines are discarded.
+
+=over 4
+
+=item B<Comments>
+
+Comments are lines that start with a hash-sign.  You can escape hash-signs that 
+are part of the pattern with a backslash: "\#".
+
+=item B<Blank Lines>
+
+Blank lines are empty lines or lines consisting of whitespace only.  Whitespace
+is a sequence of US-ASCII whitespace characters:  horizontal tabs 
+(ASCII 9), line  feeds (ASCII 10), vertical tabs (ASCII 11), form feeds
+(ASCII 12), carriage returns (ASCII 13), and space (ASCII 32).  Other
+characters with the Unicode property "WSpace=Y" are not considered whitespace.
+
+=back
+
+Leading whitespace (see above) is I<not> removed!  Likewise, whitespace between
+the leading negation "!" and the pattern is not removed!  On the other hand,
+in order to ignore a file named "   " you have to backslash-escape
+the first space character ("\   ").  Otherwise, the pattern will be interpreted
+as a blank line and ignored.  This is consistent with the behavior of Git.
+
+=head2 PATTERNS
+
+Patterns undergo a little preprocessing:
+
+=over 4
+
+=item B<A leading exclamation is stripped off>
+
+But the pattern is now negated.  It produces a match for all files that do
+I<not> match the pattern.  A literal exclamation mark can be escaped with
+a backslash.
+
+=item B<A leading slash is stripped off>
+
+But the pattern must match the entire significant "path" (actually string). 
+For example "/foobar" matches for "/foobar" but not for "/sub/sub/foobar".
+
+=item B<A trailing slash is stripped off>
+
+But the pattern can only match "directories".  This is why the method
+B<match()> below has an optional second argument that lets you specify, 
+whether the string to be matched is considered a directory or not.
+
+=back 
+
+=head2 MATCHING ALGORITHM
+
+The string (normally a filename) passed to the matcher is compared
+subsequently to all patterns.  If none of the patterns match or if the last 
+match was against a negated pattern, the overall result is false.  Otherwise it
+is true.
+
+If a patterrn contains a slash ("/"), the match is done against the full
+path name, otherwise just against the basename of the file
+with a leading "directory" part stripped off.
+
+If a pattern starts with a leading slash, that slash is stripped off for
+the purpose of comparison but the string must match relative to the 
+base "directory".
+
+The semantics of a match are the same as for B<fnmatchstar()> in
+L<File::Globstar>.  But keep in mind that a leading exclamation mark (for
+negation), a leading "directory" part, a leading slash, or a trailing slash
+may be stripped off according to the rules outline above. 
+
+=head1 METHODS
+
+=over 4
+
+=item B<new INPUT[, %OPTIONS]>
+
+Creates a new B<File::Globstar::ListMatch> object.  B<INPUT> can be:
+
+=over 8
+
+=item B<FILE>
+
+B<FILE> can be a filename, an open file handle, or a reference to an open
+file handle.
+
+=item B<STRINGREF>
+
+B<STRINGREF> is a reference to a string containing the patterns.
+
+=item B<ARRAYREF>
+
+You can also pass a list of patterns as an array reference.  Leading
+exclamation marks ("!") followed by possible whitespace for negating patterns
+are stripped off, but otherwise all patterns are taken as is, even blank
+ones and patterns starting with a hash-sign ("#").
+
+=back
+
+The input source can be followed by optional named arguments passed as
+key-value pairs.  Currently recogized:
+
+=over 4
+
+=item B<ignoreCase =E<gt> 0|1|undef>
+
+Controls, whether to ignore case, when matching.  A true value will cause
+case to be ignored.  The default value is false, so that matches are done
+in a case-sensitive manner.  This is an appropriate setting for both
+case-sensitive and case-preserving file systems.
+
+=item B<filename =E<gt> FILENAME>
+
+Use B<FILENAME> in messages for I/O errors.
+
+=back
+
+=item B<match STRING[, IS_DIRECTORY]>
+
+Returns true if B<STRING> matches.  If you pass a true value for the
+optional argument B<IS_DIRECTORY>, B<STRING> is considered to be the name
+of a directory.
+
+A leading slash in B<STRING> is stripped off and is ignored.
+
+A trailing slash is also ignored but B<STRING> is then considered to
+be a directory name and B<IS_DIRECTORY> is ignored.
+
+When comparing against a pattern that contains a slash (except for a trailing
+slash), the full string is taken into account.  Otherwise, only the part
+after the last (non-trailing) slash is taken into account.
+
+Note that B<match()> assumes that you are excluding or ignoring files.  This
+I<exclude> mode implies that certain negations do not make sense and are
+ignored.  Thake this example:
+
+     /node_modules
+     !/node_modules/foobar
+
+The second line gets ignored.  In exclude mode it is assumed that you 
+recurse a directory calling B<match()> for every file you visit.  If a file
+matches it is always ignored.  And if it is a directory, it is not only
+ignored but the recursion also stops here.
+
+The exact rule is: You cannot re-include a file by negating a pattern if one
+of the file's parent directories would be excluded.  
+
+This is the  behavior of git, when evaluating ignore lists.  If you want to
+avoid that behavior, see below for B<matchInclude()>.
+
+On the other hand, the following is possible:
+
+    docs/_*
+    !docs/_posts
+
+The only "parent directory" for the negation is F<docs> and that is not
+excluded.  This is different to this example:
+
+    docs/_*
+    !docs/_posts/recent
+
+The "parent directories" are F<docs> and F<docs/_posts> and F<docs/_posts>
+matches against F<docs/_*>.  The negation is therefore invalid and ignored.
+
+=item B<matchExclude STRING[, IS_DIRECTORY]>
+
+This is an alias for B<match()>
+
+=item B<matchInclude STRING[, IS_DIRECTORY]>
+
+Does the same as B<match()> but all negations are valid.
+
+The metaphor for include mode is different from exclude mode that is
+assumed by B<match()> resp. B<matchExclude()>.  In include mode you would
+interpret all patterns as globbing patterns.  A positive, non-negated
+pattern would cause the matching files to be added to result list.  A
+negated pattern will remove the matching files from the result list.  The
+operation would happen recursively if a directory gets added or removed.
+
+We take almost the same example as for B<match()> above:
+
+    docs/_*
+    !docs/_posts/archive
+
+Imagine line 1 would produce the following list:
+
+=over 4
+
+=item * F<docs/_views/>
+
+=item * F<docs/_views/main.html>
+
+=item * F<docs/_views/head/>
+
+=item * F<docs/_views/head/meta.html>
+
+=item * F<docs/_posts/new/>
+
+=item * F<docs/_posts/new/post4321.html>
+
+=item * F<docs/_posts/archive/>
+
+=item * F<docs/_posts/archive/post1.html>
+
+=item * F<docs/_posts/archive/post2.html>
+
+Line 2 would then kickout the last three matches from the result list.
+
+=back
+
+=item B<patterns>
+
+Returns the patterns as a list of compiled regular expressions.  This is 
+useful probably only for testing.
+
+=back
+
+=head1 BUGS AND CAVEATES
+
+The module interprets backslashes only for escaping.  It does not assume any
+path separator semantics for them.  This should normally not be a problem.
+
+Git ignores all hidden files by default.  If you want the same behavior for
+B<File::Globstar::ListMatch>, put a ".*" in front of the patterns.
+
+=head1 COPYRIGHT
+
+Copyright (C) 2016-2017 Guido Flohr <guido.flohr@cantanea.com>,
+all rights reserved.
+
+=head1 SEE ALSO
+
+File::Globstar(3pm), File::Glob(3pm), glob(3), glob(7), fnmatch(3), glob(1), 
+perl(1)

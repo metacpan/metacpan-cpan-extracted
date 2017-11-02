@@ -13,7 +13,11 @@ sub bar {
 }
 
 is foo(pi => 3.14), 3.14;
-is foo({pi => 3.14}), 3.14;
+
+my $args = {pi => 3.14};
+is foo($args), 3.14;
+is $args, {pi => 3.14};
+
 is bar(3.14), 3.14;
 
 done_testing;

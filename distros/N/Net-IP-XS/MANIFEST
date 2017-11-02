@@ -60,5 +60,6 @@ t/50-rt-102155.t
 t/51-rt-102155-2.t
 t/52-rt-118605.t
 t/53-rt-118593.t
+t/54-rt-122438.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

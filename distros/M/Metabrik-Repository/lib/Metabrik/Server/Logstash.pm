@@ -1,5 +1,5 @@
 #
-# $Id: Logstash.pm,v f6ad8c136b19 2017/01/01 10:13:54 gomor $
+# $Id: Logstash.pm,v f421cd03e192 2017/08/26 14:56:55 gomor $
 #
 # server::logstash Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::System::Process);
 
 sub brik_properties {
    return {
-      revision => '$Revision: f6ad8c136b19 $',
+      revision => '$Revision: f421cd03e192 $',
       tags => [ qw(unstable elk) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -19,12 +19,12 @@ sub brik_properties {
          datadir => [ qw(datadir) ],
          conf_file => [ qw(file) ],
          log_file => [ qw(file) ],
-         version => [ qw(2.4.0|5.0.0) ],
+         version => [ qw(2.4.0|5.0.0|5.5.2) ],
          no_output => [ qw(0|1) ],
          binary => [ qw(binary_path) ],
       },
       attributes_default => {
-         version => '5.0.0',
+         version => '5.5.2',
          no_output => 0,
          log_file => 'logstash.log',
       },
@@ -169,9 +169,12 @@ sub install {
    my $version = $self->version;
    my $she = $self->shell;
 
-   my $url = 'https://artifacts.elastic.co/downloads/logstash/logstash-5.0.0.tar.gz';
+   my $url = 'https://artifacts.elastic.co/downloads/logstash/logstash-5.5.2.tar.gz';
    if ($version eq '2.4.0') {
       $url = 'https://download.elastic.co/logstash/logstash/logstash-2.4.0.tar.gz';
+   }
+   elsif ($version eq '5.0.0') {
+      $url = 'https://artifacts.elastic.co/downloads/logstash/logstash-5.0.0.tar.gz';
    }
 
    my $cw = Metabrik::Client::Www->new_from_brik_init($self) or return;

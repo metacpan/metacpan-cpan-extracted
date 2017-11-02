@@ -114,34 +114,17 @@ The resulting database will have four tables:
     
 This shows the count (n_11) for every time a particular CUI (cui_1) is immediately followed by another particular CUI (cui_2) in an utterance. 
 
-=item N_1P
-
-    cui_1   n_1p
-    
-This shows the count (n_11) for every time a particular CUI (cui_1) is followed by any CUI in an utterance. 
-
-=item N_P1
-
-    cui_2   n_p1
-    
-This shows the count (n_p1) for every time a particular CUI (cui_2) is immediately preceded by any CUI in an utterance. 
-
-=item N_PP
-
-    n_pp
-    
-This single value is the total count of all cui_1, cui_2 bigram pairs. 
-
 =back
 
 =head1 AUTHOR
 
  Keith Herbert, Virginia Commonwealth University
  Amy Olex, Virginia Commonwealth University
+ Bridget McInnes, Virginia Commonwealth University
 
 =head1 COPYRIGHT
 
-Copyright (c) 2015,
+Copyright (c) 2015-2017
 Keith Herbert, Virginia Commonwealth University
 herbertkb at vcu edu 
 
@@ -178,14 +161,10 @@ use strict;
 use warnings;
 use Time::HiRes;
 
-use Compress::Zlib;     # Read compress .gz files
 use Data::Dumper;       # Helps with debugging
 use DBI;                # Database stuff
 use Getopt::Long;       # Parse command line options
 use File::Type;         # Know when a file is compressed
-#use Graph::Directed;    # Model an utternace as a directed graph
-#use List::MoreUtils;    # these should be built-in
-
 
 use feature qw(say);
 
@@ -217,6 +196,9 @@ my $usage = $header."\n"
 ."--files       Explicit list of one or more MetaMap Baseline files\n"
 ."--file_step   How many files to read between database writes. (DEFAULT=5)\n"
 ."--plain       All input files are uncompressed.\n"
+."NGRAM OPTIONS\n"
+."--window N    Window size (DEFAULT: 1)\n"
+."--sliding         Use a sliding window\n"
 ."\nUSAGE EXAMPLES\n"
 ."Open directory ./metamap/ and write to database CUIs on localhost:\n"
 ."\tperl CUICollector.pl --database CUIs --directory metamap/\n\n"
@@ -239,7 +221,10 @@ my $port     = "3306";
 my $username;
 my $password;
 
-my $file_step = 5;  # How many files to read between writes to database.
+my $sliding; 
+my $window = 1; 
+
+my $file_step = 3;  # How many files to read between writes to database.
 my $gzipped = 1;    
 my @dirs    = ();   # Directories containing *only* MetaMap Baseline files
 my @files   = ();   # Explicit list of MetaMap Baseline files.
@@ -257,7 +242,9 @@ GetOptions( 'debug'         => \$DEBUG,
             'password=s'    => \$password,
             'file_step=i'   => \$file_step,
             'directory=s{1,}' => \@dirs,
-            'files=s{1,}'   => \@files          
+            'files=s{1,}'   => \@files, 
+	    'window=i' => \$window,
+	    'sliding' => \$sliding
 );
 
 die $usage unless $#ARGV;    
@@ -313,19 +300,16 @@ while (@files) {
     my @curr_files = splice @files, 0, $file_step;
     
     $filetime_s = Time::HiRes::gettimeofday() if $DEBUG;
-    my($bigram_ref, $n1p_ref, $np1_ref, $npp) = process_files(@curr_files);
+    my($bigram_ref) = process_files(@curr_files);
     $filetime_e = Time::HiRes::gettimeofday() if $DEBUG;
 	
     say "Entering scores into $database..." if $VERBOSE;  
 	$dbtime_s = Time::HiRes::gettimeofday() if $DEBUG;
-    update_database($dbh, $bigram_ref, $n1p_ref, $np1_ref, $npp);
+    update_database($dbh, $bigram_ref);
     $dbtime_e = Time::HiRes::gettimeofday() if $DEBUG;
 	
     if ($DEBUG) {
         print Dumper($bigram_ref);
-        print Dumper($n1p_ref);
-        print Dumper($np1_ref);
-        say $npp;
     }
 }
 
@@ -347,10 +331,11 @@ say "Finished." if $VERBOSE;
 sub open_mysql_database {
     my ($dbase, $host, $port, $user, $pass, $socket) = (@_);
     
-    # See if database exists in the specified DBMS                        
+       # See if database exists in the specified DBMS                        
     my @dbases = DBI->data_sources("mysql",
       {"host" => $host, "user" => $user, 
        password => $pass, "socket"=> $socket});
+
     my $dbase_exists = grep /DBI:mysql:$dbase/, @dbases;
 
     # Connect to the database if it exists. Otherwise create it from scratch.
@@ -360,14 +345,15 @@ sub open_mysql_database {
         $dbh =  DBI->connect("DBI:mysql:database=$dbase;host=$host;"
 			     ."mysql_socket=$socket",
 			     $user, $pass,
-			     {'RaiseError' => 1});
+			     {'RaiseError' => 1, 'AutoCommit' => 0});
     } 
     else {
+	#connect to the DB and turn AutoCommit Off (value of 1)
         $dbh = DBI->connect("DBI:mysql:host=$host", $user, $pass,
-                            {'RaiseError' => 1});
+                            {'RaiseError' => 1,'AutoCommit' => 0});
         create_database($dbh, $dbase);
     }
-    
+
     return $dbh;        # Return the handler to keep connection alive.
 }
 
@@ -379,26 +365,12 @@ sub create_database {
     $dbh->do("CREATE DATABASE $dbase");
     $dbh->do("USE $dbase");
     
-    $dbh->do("CREATE TABLE N_PP (n_pp BIGINT UNSIGNED KEY)");
-    $dbh->do("INSERT INTO N_PP (n_pp) VALUES (?)", undef, 0);
-    
-    
      $dbh->do("CREATE TABLE N_11 (   
                     cui_1   CHAR(10)    NOT NULL,
                     cui_2   CHAR(10)    NOT NULL, 
                     n_11    BIGINT      NOT NULL, 
                     PRIMARY KEY (cui_1, cui_2) )"   );
                     
-     $dbh->do("CREATE TABLE N_1P (   
-                    cui_1   CHAR(10)    NOT NULL,
-                    n_1p    BIGINT      NOT NULL, 
-                    PRIMARY KEY (cui_1) )"   );
-                    
-     $dbh->do("CREATE TABLE N_P1 (   
-                    cui_2   CHAR(10)    NOT NULL,
-                    n_p1    BIGINT      NOT NULL, 
-                    PRIMARY KEY (cui_2) )"   );        
-    
 }
 
 ###############################################################################
@@ -465,29 +437,7 @@ sub update_database {
 	            ['cui_1', 'cui_2'], [$cui_1, $cui_2] );
         }
     }
-         
-    # Add all of the CUI_1 sums to database
-    print STDERR "n1p: \n" if $DEBUG;
-    foreach my $cui_1 (keys %$n1p_ref) {
-        my $n_1p = $$n1p_ref{$cui_1};
-
-	    print STDERR "$cui_1 $n_1p \n" if $DEBUG; 
-        
-        update_row($dbh, 'N_1P', 'n_1p', $n_1p, ['cui_1'], [$cui_1] );
-          
-    }        
-        
-    # Add all of the CUI_2 sums to database
-    print STDERR "np1: \n" if $DEBUG;
-    foreach my $cui_2 (keys %$np1_ref) {
-        my $n_p1 = $$np1_ref{$cui_2};
-        say "$cui_2 $n_p1" if $DEBUG;
-        
-        update_row($dbh, 'N_P1', 'n_p1', $n_p1, ['cui_2'], [$cui_2] );        
-    }
-    
-    # Finally, update the table with the total sum of all bigrams observed.  
-    update_row($dbh, 'N_PP', 'n_pp', $npp, [], [] );
+    $dbh->commit or die $dbh->errstr;
 }
 
 ###############################################################################
@@ -498,35 +448,33 @@ sub process_files {
     my @files = @_;
     
     my %bigrams;   # cui_1 => cui_2 => sum of cui_1 preceeding cui_2
-    my %n1p;       # cui => sum of cui as cui_1
-    my %np1;       # cui => sum of cui as cui_2
-    my $npp;       # total sum of all bigram observations
-        
+            
     # Anonymous subroutine to update the bigram and marginal counts
     my $incrementor = sub {
-        my($cui_1, $cui_2, $same_phrase) = @_;
-        
-        unless (exists $$same_phrase{$cui_1}{$cui_2}) { 
-            $bigrams{$cui_1}{$cui_2}++;
-            $n1p{$cui_1}++;
-            $np1{$cui_2}++;
-            $npp++;
-        }
-        
-        $$same_phrase{$cui_1}{$cui_2} = 1;
+        my($cui_1, $cui_2) = @_;
+	$bigrams{$cui_1}{$cui_2}++;
     };
     
     for my $file (@files) {
         
         if( File::Type->mime_type($file) =~ /x-gzip/) {
-            process_gz_file($file, $incrementor);
+	    #unzip file to temp
+	    my $tempFileName = $file.'_temp';
+	    !(system "gunzip -c $file >$tempFileName -f -q") 
+		or die "error gunzipping $file\n";	  
+ 	    
+	    #process temp as normal
+            process_file($tempFileName, $incrementor);
+
+	    #remove temp file
+	    system "rm $tempFileName";
         }
         else {
             process_file($file, $incrementor);
         }
     }
     
-   return (\%bigrams, \%n1p, \%np1, $npp); 
+    return (\%bigrams); 
 }
 ###############################################################################
 sub process_file {
@@ -541,22 +489,6 @@ sub process_file {
     }
 }
 
-sub process_gz_file {
-
-    my $file = shift;           # compressed .gz file to process
-    my $incrementor = shift;    # ref to anon sub that updates bigram counts
-        
-    my $gz = gzopen("$file", "rb") or die "Cannot read gzip compressed $file\n";
-    say "Parsing gzip compressed file: $file" if $VERBOSE; 
-    
-    # Count the bigrams in each utterance until the end of the file.         
-    until ($gz->gzeof()) {
-        count_bigrams( read_gz_utterance($gz), $incrementor );
-    }
-    
-    $gz->gzclose();
-}
-
 ###############################################################################
 # take filehandle as lexical variable
 # returns ref to array of phrases for single utterance
@@ -564,47 +496,32 @@ sub read_utterance {
     my $fh = shift;
    
     my @phrases_in_utterance;
-   
-   # The following loop will iterate over all the phrases for this utterance
+
+    my $pid = "";  
+    # The following loop will iterate over all the phrases for this utterance
     while (<$fh>) {
-        
-        # Finish when we reach the End Of Utterance (EOU) marker
-        last if /^'EOU'/;
-            
-        # Skip all lines that aren't mappings for a phrase in the utterance
-        next unless /^mappings/;
-                
-        my @mappings = @{ get_mappings($_) };
+	chomp; 
 
-        push @phrases_in_utterance, \@mappings if @mappings;
+	if($_=~/utterance\(\'(.*)\.(ti|ab)\.[0-9]+/) { 
+	    my $cid = $1; 
+	    if($DEBUG == 1) { print STDERR "IDs: $cid  $pid\n"; }
+	    if($pid ne "" && $cid ne $pid)  { 
+		seek($fh, -length($_), 1); 
+		last; 
+	    }
+	    $pid = $cid; 
+	}
+	
+	# Skip all lines that aren't mappings for a phrase in the utterance
+        next unless /^mappings/;
+      	
+	my @mappings = @{ get_mappings($_) };
+	
+	push @phrases_in_utterance, \@mappings if @mappings;
+	
     }
-   
+
     return \@phrases_in_utterance;
-}
-
-###############################################################################
-# takes the gzip "filehandle" object 
-# returns ref to array of phrases for single utterance
-sub read_gz_utterance {
-    my $gz = shift;
-   
-    my @phrases;
-   
-   # The following loop will iterate over all the phrases for this utterance
-    while ($gz->gzreadline($_)) {
-        
-        # Finish when we reach the End Of Utterance (EOU) marker
-        last if /^'EOU'/;
-            
-        # Skip all lines that aren't mappings for a phrase in the utterance
-        next unless /^mappings/;
-                
-        my @mappings = @{ get_mappings($_) };
-
-        push @phrases, \@mappings if @mappings;
-    }
-   
-    return \@phrases;
 }
 
 ###############################################################################
@@ -636,34 +553,50 @@ sub count_bigrams {
         ) = @_;
         
     my @phrases = @$phrases_ref;
-    
-    # Iterate through n-1 phrases in utterance
-    for (my $i = 0; $i <= $#phrases; $i++) {
-                
-        my @phrase_1 = @{ $phrases[$i]      };  # Mappings for current phrase
-        my @phrase_2 = @{ $phrases[$i + 1]  } if $i < $#phrases;;  # Mappings for the next phrase
 
-        my %prior;  # Tracks bigrams within same phrase to avoid double counting
-        
-        # Loop through each of the mappings of the current phrase
-        foreach my $map_str_p1 ( @phrase_1 ) {
-            my @cuis = split ' ', $map_str_p1;
-            
-            # Count bigrams up to the k-1th CUI
-            for (my $k = 0; $k < $#cuis; $k++) {
-                my $cui_1 = $cuis[$k];
-                my $cui_2 = $cuis[$k+1];
-                
-                $incrementor->($cui_1, $cui_2, \%prior);
-            }
-         	if ( $i < $#phrases ) {
-            	# Count the kth CUI with the first of each of the next phrases maps
-            	foreach my $map_str_p2 ( @phrase_2 ) {
-                	(my $first_of_next_phrase) = $map_str_p2 =~ /(C\d{7})/;
-                
-               	 	$incrementor->($cuis[-1], $first_of_next_phrase, \%prior);
-            	}
+    my %tree = (); my $hid = 0; 
+    
+    for (my $i = 0; $i <= $#phrases; $i++) {
+	my @phrase = @{$phrases[$i]}; 
+	my $j = 0; my $increment = 1; 
+	foreach $j (0..$#phrase) { 
+	    my @cuis = split/\s+/, $phrase[$j]; 
+	    foreach my $k (0..$#cuis) { 
+		$tree{$hid+$k}{$cuis[$k]}++;
+		my $temp = $hid + $k; 
+		if($DEBUG == 1) { print STDERR "$cuis[$k] $temp\n"; }
+	    }
+	    $increment = $#cuis + 1; 
+	}
+	$hid += $increment; 
+    }
+
+    if(defined $sliding) { 
+	foreach my $id (sort {$a<=>$b} keys %tree) { 
+	    foreach my $cui (sort keys %{$tree{$id}}) { 
+		for my $s (1..$window) { 
+		    for my $w (1..$s) { 
+			my $k = $w+$id; 
+			foreach my $c (sort keys %{$tree{$k}}) { 
+			    $incrementor->($cui, $c);
+			    if($DEBUG == 1)  { print STDERR "ADDING $cui $c\n"; }
 			}
-        }
+		    }
+		}		    
+	    }
+	}
+    }
+    else { 
+	foreach my $id (sort {$a<=>$b} keys %tree) { 
+	    foreach my $cui (sort keys %{$tree{$id}}) { 
+		for my $w (1..$window) { 
+		    my $k = $w+$id; 
+		    foreach my $c (sort keys %{$tree{$k}}) { 
+			$incrementor->($cui, $c);
+			if($DEBUG == 1)  { print STDERR "ADDING $cui $c\n"; }
+		    }
+		}		    
+	    }
+	}	
     }
 }

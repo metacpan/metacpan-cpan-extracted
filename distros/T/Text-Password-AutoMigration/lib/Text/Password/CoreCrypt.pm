@@ -1,11 +1,18 @@
 package Text::Password::CoreCrypt;
-our $VERSION = "0.07";
+our $VERSION = "0.09";
 
 use 5.8.8;
 use Moose;
+use Moose::Util::TypeConstraints;
 
 has minimum => ( is => 'ro', isa => 'Int', default => 4 );
-has default => ( is => 'rw', isa => 'Int', default => 8 );
+
+subtype 'Default',
+    as 'Int',
+    where { $_ >=  4 },
+    message {"default must be larger than 4"};
+has default => ( is => 'rw', isa => 'Default', default => 8 );
+
 has readability => ( is => 'rw', isa => 'Bool', default => 1 );
 
 __PACKAGE__->meta->make_immutable;
@@ -81,7 +88,7 @@ sub verify {
 
 =head3 nonce($length)
 
-generates the strings with enough strength.
+generates the random strings with enough strength.
 
 the length defaults to 8($self->default).
 
@@ -123,7 +130,7 @@ sub encrypt {
     my $salt = '';
     $salt .= $seeds[ rand @seeds ] until length $salt == 2;
 
-    return $encrypt = CORE::crypt( $input, $salt )
+    return $encrypt = CORE::crypt( $input, $salt );
 }
 
 =head3 generate($length)
@@ -143,8 +150,8 @@ sub generate {
     my $min = $self->minimum();
 
     croak "unvalid length was set" unless $length =~ /^\d+$/;
-    croak ref($self) . "::generate requires list context" unless wantarray;
-    croak ref($self) . "::generate requires at least $min length" if $length < $min;
+    croak ref($self) . "::generate requires list context." unless wantarray;
+    croak ref($self) . "::generate requires at least $min length." if $length < $min;
 
     my $raw;
     do {	# redo unless it gets enough readability

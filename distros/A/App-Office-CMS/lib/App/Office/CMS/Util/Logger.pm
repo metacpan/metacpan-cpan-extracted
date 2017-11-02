@@ -1,9 +1,13 @@
 package App::Office::CMS::Util::Logger;
 
-use Any::Moose;
-use common::sense;
+use strict;
+use warnings;
 
 use Log::Handler;
+
+use Moo;
+
+use Types::Standard qw/Any Str/;
 
 # We don't use:
 # extends 'App::Office::CSM::Database::Base';
@@ -12,37 +16,34 @@ use Log::Handler;
 has creator =>
 (
 	is  => 'rw',
-	isa => 'Any',
+	isa => Any,
 );
 
 has db =>
 (
 	is  => 'rw',
-	isa => 'Any',
+	isa => Any,
 );
 
 has engine =>
 (
 	is  => 'rw',
-	isa => 'Str',
+	isa => Str,
 );
 
 has logger =>
 (
 	is  => 'rw',
-	isa => 'Any',
+	isa => Any,
 );
 
 has time_option =>
 (
 	is  => 'rw',
-	isa => 'Str',
+	isa => Str,
 );
 
-# If Moose...
-#use namespace::autoclean;
-
-our $VERSION = '0.92';
+our $VERSION = '0.93';
 
 # -----------------------------------------------
 
@@ -147,10 +148,5 @@ sub log
 } # End of log.
 
 # --------------------------------------------------
-
-no Any::Moose;
-
-# If Moose...
-#__PACKAGE__ -> meta -> make_immutable;
 
 1;

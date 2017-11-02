@@ -5,7 +5,7 @@
 # under the same terms as Perl itself.
 
 package HTML::Mason::Apache::Request;
-$HTML::Mason::Apache::Request::VERSION = '1.56';
+$HTML::Mason::Apache::Request::VERSION = '1.58';
 use strict;
 use warnings;
 

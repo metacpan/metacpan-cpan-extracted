@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 package XML::Atom::SimpleFeed;
-$XML::Atom::SimpleFeed::VERSION = '0.900';
+$XML::Atom::SimpleFeed::VERSION = '0.902';
 # ABSTRACT: No-fuss generation of Atom syndication feeds
 
 use Carp;
@@ -401,7 +401,7 @@ XML::Atom::SimpleFeed - No-fuss generation of Atom syndication feeds
 
 =head1 VERSION
 
-version 0.900
+version 0.902
 
 =head1 SYNOPSIS
 
@@ -719,6 +719,8 @@ The following datetime classes from CPAN are compatible with this interface:
 
 =item * L<Time::Object|Time::Object> (an obsolete precursor to L<Time::Piece|Time::Piece>)
 
+=item * L<Time::Date|Time::Date> (version 0.05 or newer)
+
 =back
 
 The following are not:
@@ -729,10 +731,13 @@ The following are not:
 
 This class lacks both an C<epoch> method or any way to emulate one E<ndash> as
 well as any timezone support in the first place.
+That makes it unsuitable in principle for use in Atom feeds E<ndash> unless you
+have separate information about the timezone.
 
 =item * L<Date::Handler|Date::Handler>
 
 This class has a suitable methodE<hellip> but sadly, calls it C<Epoch>.
+So it is left up to you to call C<< $dh->Epoch >> to pass such values.
 
 =back
 
@@ -809,7 +814,7 @@ Aristotle Pagaltzis <pagaltzis@gmx.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Aristotle Pagaltzis.
+This software is copyright (c) 2017 by Aristotle Pagaltzis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,5 @@
 package File::ArchivableFormats::Plugin::DANS;
-our $VERSION = '1.3';
+our $VERSION = '1.4';
 use Moose;
 
 # ABSTRACT: DANS module for archivable formats
@@ -178,6 +178,14 @@ sub _build_prefered_formats {
             allowed_extensions => ['.mif'],
             types              => ['Geographical Information (GIS) (MIF/MID)']
         },
+        'application/vnd.mid' => {
+            allowed_extensions => ['.mid'],
+            types              => ['Geographical Information (GIS) (MIF/MID)']
+        },
+        'application/x-mid' => {
+            allowed_extensions => ['.mid'],
+            types              => ['Geographical Information (GIS) (MIF/MID)']
+        },
         'application/x-sql' => {
             allowed_extensions => ['.sql'],
             types              => ['Databases (SQL)']
@@ -193,10 +201,6 @@ sub _build_prefered_formats {
         'audio/flac' => {
             allowed_extensions => ['.flac'],
             types              => ['Audio (FLAC)']
-        },
-        'audio/midi' => {
-            allowed_extensions => ['.mid'],
-            types              => ['Geographical Information (GIS) (MIF/MID)']
         },
         'audio/mpeg' => {
             allowed_extensions => ['.mp3', '.m4a'],
@@ -234,8 +238,6 @@ sub _build_prefered_formats {
             allowed_extensions => ['.tif', '.tiff'],
             types              => [
                 'Raster Images (TIFF)',
-                'Raster Images (TIFF)',
-                'Images (geo reference) (GeoTIFF)',
                 'Images (geo reference) (GeoTIFF)',
                 'Images (geo reference) (TIFF World File)'
             ]
@@ -271,7 +273,6 @@ sub _build_prefered_formats {
                 'Plain text (Non-Unicode)',
                 'Statistical data (data (.csv) + setup)',
                 'Raspter GIS (ASCII GRID)',
-                'Raspter GIS (ASCII GRID)'
             ]
         },
         'application/x-dbf' => {
@@ -323,7 +324,7 @@ File::ArchivableFormats::Plugin::DANS - DANS module for archivable formats
 
 =head1 VERSION
 
-version 1.3
+version 1.4
 
 =head1 SEE ALSO
 

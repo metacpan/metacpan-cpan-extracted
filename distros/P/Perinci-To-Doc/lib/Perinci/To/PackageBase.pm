@@ -1,7 +1,7 @@
 package Perinci::To::PackageBase;
 
-our $DATE = '2017-08-12'; # DATE
-our $VERSION = '0.860'; # VERSION
+our $DATE = '2017-10-26'; # DATE
+our $VERSION = '0.861'; # VERSION
 
 use 5.010;
 use Data::Dump::OneLine qw(dump1);
@@ -134,7 +134,7 @@ Perinci::To::PackageBase - Base class for Perinci::To::* package documentation g
 
 =head1 VERSION
 
-This document describes version 0.860 of Perinci::To::PackageBase (from Perl distribution Perinci-To-Doc), released on 2017-08-12.
+This document describes version 0.861 of Perinci::To::PackageBase (from Perl distribution Perinci-To-Doc), released on 2017-10-26.
 
 =for Pod::Coverage .+
 

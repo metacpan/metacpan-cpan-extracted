@@ -1,5 +1,5 @@
 package Net::Hadoop::Oozie;
-$Net::Hadoop::Oozie::VERSION = '0.111';
+$Net::Hadoop::Oozie::VERSION = '0.112';
 use 5.010;
 use strict;
 use warnings;
@@ -140,6 +140,27 @@ sub admin {
     }
 
     return $self->agent_request( $self->_make_full_uri( $ep ) );
+}
+
+sub kerberos_enabled {
+    # All relevant config keys:
+    #
+    # oozie.authentication.kerberos.keytab
+    # oozie.authentication.kerberos.name.rules
+    # oozie.authentication.kerberos.principal
+    # oozie.authentication.type
+    # oozie.server.authentication.type
+    # oozie.service.HadoopAccessorService.kerberos.enabled
+    # oozie.service.HadoopAccessorService.kerberos.principal
+    # oozie.service.HadoopAccessorService.keytab.file
+    #
+
+    state $krb_key = 'oozie.service.HadoopAccessorService.kerberos.enabled';
+    my $self = shift;
+    my $conf = $self->admin('configuration')
+                    || confess "Failed to collect admin/configuration";
+    my $krb_val = $conf->{ $krb_key } || return;
+    return $krb_val eq 'true';
 }
 
 sub build_version {
@@ -950,7 +971,7 @@ Net::Hadoop::Oozie
 
 =head1 VERSION
 
-version 0.111
+version 0.112
 
 =head1 SYNOPSIS
 
@@ -1181,6 +1202,10 @@ It will return false otherwise.
     else {
         warn "No such job: $id";
     }
+
+=head3 kerberos_enabled
+
+Returns true if kerberos is enabled
 
 =head3 max_node_name_len
 

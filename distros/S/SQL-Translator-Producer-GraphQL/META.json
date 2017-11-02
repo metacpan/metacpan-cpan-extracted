@@ -1,0 +1,74 @@
+{
+   "abstract" : "GraphQL schema producer for SQL::Translator",
+   "author" : [
+      "Ed J <etj@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "SQL-Translator-Producer-GraphQL",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Markdown" : "0",
+            "Test::CheckManifest" : "0.9",
+            "Test::Pod" : "1.22"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "GraphQL" : "0.20",
+            "GraphQL::Plugin::Convert::DBIC" : "0.02",
+            "SQL::Translator" : "0",
+            "SQL::Translator::Producer::DBIx::Class::File" : "0",
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "GraphQL" : "0.20",
+            "GraphQL::Plugin::Convert::DBIC" : "0.02",
+            "SQL::Translator" : "0",
+            "SQL::Translator::Producer::DBIx::Class::File" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/graphql-perl/SQL-Translator-Producer-GraphQL/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/graphql-perl/SQL-Translator-Producer-GraphQL"
+      },
+      "x_IRC" : "irc://irc.perl.org/#graphql-perl"
+   },
+   "version" : "0.03"
+}

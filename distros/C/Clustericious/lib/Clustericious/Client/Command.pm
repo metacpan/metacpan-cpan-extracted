@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: Command line type processing for clients.
-our $VERSION = '1.26'; # VERSION
+our $VERSION = '1.27'; # VERSION
 
 
 use File::Basename qw/basename/;
@@ -249,7 +249,7 @@ Clustericious::Client::Command - Command line type processing for clients.
 
 =head1 VERSION
 
-version 1.26
+version 1.27
 
 =head1 SYNOPSIS
 

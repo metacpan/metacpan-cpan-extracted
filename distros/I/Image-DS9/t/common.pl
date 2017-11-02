@@ -3,7 +3,8 @@
 use Test::Deep;
 use Test::More;
 
-use t::TestServer;
+use lib 't/lib';
+use TestServer;
 
 our $verbose = 0;
 
@@ -29,7 +30,7 @@ sub load_events
   my $ds9 = shift;
 
   $ds9->file( 'data/snooker.fits.gz', { extname => 'raytrace',
-					bin => [ 'rt_x', 'rt_y' ] } );
+                                        bin => [ 'rt_x', 'rt_y' ] } );
   $ds9->bin( factor => 0.025 );
   $ds9->zoom( 0 );
 }
@@ -52,23 +53,23 @@ sub test_stuff
 
       my $ret;
       eval {
-	$ds9->$cmd(@subcmd, @$args);
-	$ret = $ds9->$cmd(@subcmd);
+        $ds9->$cmd(@subcmd, @$args);
+        $ret = $ds9->$cmd(@subcmd);
       };
 
       diag($@, explain($ds9->res) ) && fail( "$cmd $subcmd" ) if $@;
 
       if ( ! ref($ret) && 1 == @$args )
       {
-	is( $ret, $args->[0], join( " ", $cmd, $subcmd,  @$args ) );
+        is( $ret, $args->[0], join( " ", $cmd, $subcmd,  @$args ) );
       }
       elsif ( @$ret == @$args )
       {
-	cmp_deeply( $ret, $args,  "$cmd $subcmd" );
+        cmp_deeply( $ret, $args,  "$cmd $subcmd" );
       }
       else
       {
-	fail( "$cmd $subcmd" );
+        fail( "$cmd $subcmd" );
       }
     }
   }

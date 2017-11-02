@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-use Test::More qw(no_plan);
+use Test::More tests => 28;
 
 # Test if its work
 # Should always be good as these tests are rather dumbs...
@@ -17,7 +17,8 @@ if ( -c '/dev/null' and -w '/dev/null') {
 	$file='test4log-funlog.tmp',
 	$daemon=0;
 }
-isa_ok( Log::Funlog->new(verbose => '1/1'), 'Log::Funlog','Object returned is a Log::Funlog object' );
+$f=Log::Funlog->new(verbose => '1/1');
+isa_ok( $f, 'Log::Funlog','Object returned is a Log::Funlog object' );
 *Log=Log::Funlog->new(
 	verbose => '5/5',
 	cosmetic => '*',
@@ -35,6 +36,7 @@ for ($j=1;$j<=5;$j++) {
 	$sent="Log level $j";
 	is( Log($j,$sent), $sent,$sent);
 }
+is( Log(1,'0',' plop'),'0 plop','"undef" bug');
 sub gna {
 	for ($j=1;$j<=5;$j++) {
 		$sent="Gna sub level $j";

@@ -1,5 +1,5 @@
 #
-# $Id: Virtualbox.pm,v f6ad8c136b19 2017/01/01 10:13:54 gomor $
+# $Id: Virtualbox.pm,v d7c4ded19eca 2017/05/13 11:36:37 gomor $
 #
 # system::virtualbox Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Shell::Command Metabrik::System::Package);
 
 sub brik_properties {
    return {
-      revision => '$Revision: f6ad8c136b19 $',
+      revision => '$Revision: d7c4ded19eca $',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -32,6 +32,8 @@ sub brik_properties {
          restore => [ qw(name type|OPTIONAL) ], # Alias for start
          stop => [ qw(name) ],
          save => [ qw(name) ],
+         pause => [ qw(name) ],
+         resume => [ qw(resume) ],
          snapshot_list => [ qw(name) ],
          snapshot_live => [ qw(name snapshot_name description|OPTIONAL) ],
          snapshot_delete => [ qw(name snapshot_name) ],
@@ -47,6 +49,7 @@ sub brik_properties {
          get_current_snapshot_id => [ qw(name) ],
       },
       require_modules => {
+         'Data::Dumper' => [ ],
          'Metabrik::File::Raw' => [ ],
          'Metabrik::File::Read' => [ ],
          'Metabrik::File::Readelf' => [ ],
@@ -127,6 +130,24 @@ sub save {
    return $self->command("controlvm \"$name\" savestate");
 }
 
+sub pause {
+   my $self = shift;
+   my ($name) = @_;
+
+   $self->brik_help_run_undef_arg('pause', $name) or return;
+
+   return $self->command("controlvm \"$name\" pause");
+}
+
+sub resume {
+   my $self = shift;
+   my ($name) = @_;
+
+   $self->brik_help_run_undef_arg('resume', $name) or return;
+
+   return $self->command("controlvm \"$name\" resume");
+}
+
 sub snapshot_list {
    my $self = shift;
    my ($name) = @_;
@@ -134,6 +155,15 @@ sub snapshot_list {
    $self->brik_help_run_undef_arg('snapshot_list', $name) or return;
 
    my $lines = $self->command("snapshot \"$name\" list");
+
+   if ($self->log->level > 1) {
+      print Dumper($lines)."\n";
+   }
+
+   # No snapshot: error code 256
+   if ($? != 0) {
+      return $self->log->error("snapshot_list: no snapshot found?");
+   }
 
    my @list = ();
    for my $line (@$lines) {
@@ -165,7 +195,17 @@ sub snapshot_live {
    $self->brik_help_run_undef_arg('snapshot_live', $name) or return;
    $self->brik_help_run_undef_arg('snapshot_live', $snapshot_name) or return;
 
-   return $self->command("snapshot \"$name\" take \"$snapshot_name\" --description \"$description\" --live");
+   my $lines = $self->command("snapshot \"$name\" take \"$snapshot_name\" --description \"$description\" --live");
+
+   if ($self->log->level > 1) {
+      print Dumper($lines)."\n";
+   }
+
+   if ($? != 0) {
+      return $self->log->error("snapshot_live: snapshot failed");
+   }
+
+   return $self->log->info("snapshot_live: snapshot complete");
 }
 
 sub snapshot_delete {
@@ -175,7 +215,14 @@ sub snapshot_delete {
    $self->brik_help_run_undef_arg('snapshot_delete', $name) or return;
    $self->brik_help_run_undef_arg('snapshot_delete', $snapshot_name) or return;
 
-   return $self->command("snapshot \"$name\" delete \"$snapshot_name\"");
+   my $lines = $self->command("snapshot \"$name\" delete \"$snapshot_name\"");
+
+   # code 256: This machine does not have any snapshots
+   if ($? != 0) {
+      return $self->log->error("snapshot_delete: unable to delete snapshot [$snapshot_name] for vm [$name]");
+   }
+
+   return $self->log->info("snapshot_delete: snapshot [$snapshot_name] deleted successfully for vm [$name]");
 }
 
 sub snapshot_restore {
@@ -357,7 +404,7 @@ sub is_started {
 
    my $info = $self->info($name) or return;
    my $state = $info->{state} || 'undef';
-   if ($state !~ m{powered off}) {
+   if ($state =~ m{running}) {
       return 1;
    }
 

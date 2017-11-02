@@ -13,7 +13,7 @@ Lingua-JA-Moji-[\d.]+
 \.bak
 \.old
 Makefile$
-build\.pl
+(build|deploy)\.pl
 build/.*
 makeitfile
 MYMETA\..*

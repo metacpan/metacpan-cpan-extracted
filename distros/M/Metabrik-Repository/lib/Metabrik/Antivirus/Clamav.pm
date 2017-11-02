@@ -1,5 +1,5 @@
 #
-# $Id: Clamav.pm,v f6ad8c136b19 2017/01/01 10:13:54 gomor $
+# $Id: Clamav.pm,v 4f5647eb9e58 2017/03/05 12:22:13 gomor $
 #
 # antivirus::clamav Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Shell::Command Metabrik::System::Package);
 
 sub brik_properties {
    return {
-      revision => '$Revision: f6ad8c136b19 $',
+      revision => '$Revision: 4f5647eb9e58 $',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -42,11 +42,11 @@ sub update {
 
    my $datadir = $self->datadir;
 
-   my $cmd = "freshclam --datadir=$datadir --log=$datadir/freshclam.log";
+   my $cmd = "freshclam";
 
    $self->log->verbose($cmd);
 
-   return $self->system($cmd);
+   return $self->sudo_system($cmd);
 }
 
 sub scan {

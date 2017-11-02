@@ -1,7 +1,7 @@
 use strict;
-use warnings FATAL => 'all';
+use warnings;
 
-use Test::More;
+use Test::More 0.88;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 use Test::DZil;
 use Test::Deep;
@@ -9,7 +9,7 @@ use Path::Tiny;
 use Test::Fatal;
 
 my $tzil = Builder->from_config(
-    { dist_root => 't/does-not-exist' },
+    { dist_root => 'does-not-exist' },
     {
         add_files => {
             path(qw(source dist.ini)) => simple_ini(
@@ -35,9 +35,9 @@ my $file = $build_dir->child('Makefile.PL');
 ok(-e $file, 'Makefile.PL created');
 
 my $content = $file->slurp_utf8;
-unlike($content, qr/[^\S\n]\n/m, 'no trailing whitespace in generated file');
+unlike($content, qr/[^\S\n]\n/, 'no trailing whitespace in generated file');
 
-my $version = Dist::Zilla::Plugin::CheckBin->VERSION || '<self>';
+my $version = Dist::Zilla::Plugin::CheckBin->VERSION;
 
 my $pattern = <<PATTERN;
 use strict;
@@ -77,7 +77,7 @@ cmp_deeply(
                         },
                     },
                     name => 'CheckBin',
-                    version => ignore,
+                    version => Dist::Zilla::Plugin::CheckBin->VERSION,
                 },
             ),
         })

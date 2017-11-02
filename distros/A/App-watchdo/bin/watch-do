@@ -19,7 +19,7 @@ use File::stat;
 use Path::Tiny;
 use App::watchdo;
 
-our $VERSION = version->new('0.0.6');
+our $VERSION = version->new('0.0.7');
 my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 
 my %option = (
@@ -92,6 +92,8 @@ sub run {
     my @changed = @_;
     my $cmd = join ' ', @ARGV;
 
+    warn "Files changed!\n" if $option{verbose};
+
     if ( !@ARGV ) {
         print join "\n", map { $_->path } @changed;
         print "\n";
@@ -112,7 +114,7 @@ watch-do - Run a command when watched files change
 
 =head1 VERSION
 
-This documentation refers to watch-do version 0.0.6
+This documentation refers to watch-do version 0.0.7
 
 =head1 SYNOPSIS
 
@@ -121,9 +123,9 @@ This documentation refers to watch-do version 0.0.6
 
  OPTIONS:
   cmd               Command to run when file changes
-  -w --watch[=]file File to be watched for changes
-  -g --git          Use git to find what to watch (ie monitor files that git
-                    see have changed)
+  -w --watch[=]file File or Directory to be watched for changes
+  -g --git          Use git to find what to watch (i.e. monitor git status to
+                    see files have changed and add them to the watch)
   -f --first        Execute the cmd on the first run as well as when files
                     change.
   -s --sleep[=]int  Time in seconds to sleep between checking for changes

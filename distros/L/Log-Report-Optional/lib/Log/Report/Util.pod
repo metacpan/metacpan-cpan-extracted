@@ -132,14 +132,14 @@ For instance, backslash-t is replaced by a tab character.
 
 =head1 SEE ALSO
 
-This module is part of Log-Report-Optional distribution version 1.03,
-built on June 27, 2017. Website: F<http://perl.overmeer.net/log-report/>
+This module is part of Log-Report-Optional distribution version 1.04,
+built on October 30, 2017. Website: F<http://perl.overmeer.net/log-report/>
 
 =head1 LICENSE
 
 Copyrights 2013-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
-under the Artistic license.
-See F<http://dev.perl.org/licenses/artistic.html>
+under the same terms as Perl itself.
+See F<http://dev.perl.org/licenses/>
 

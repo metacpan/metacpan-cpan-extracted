@@ -3,7 +3,7 @@ package WebService::MinFraud::Validator;
 use Moo;
 use namespace::autoclean;
 
-our $VERSION = '1.005000';
+our $VERSION = '1.005001';
 
 use Data::Delete 0.05;
 use Data::Rx;
@@ -52,7 +52,7 @@ has _rx => (
                         WebService::MinFraud::Data::Rx::Type::WebURI
                         )
                 ],
-            }
+            },
         );
     },
 );
@@ -86,7 +86,7 @@ sub _build_request_schema_definition {
                         length => { min => 1, max => 255, },
                     },
                 },
-            }
+            },
         },
         optional => {
             account => {
@@ -170,7 +170,7 @@ sub _build_request_schema_definition {
                                 'referral',         'survey',
                             ],
                         },
-                    }
+                    },
                 },
             },
             order => {
@@ -206,13 +206,15 @@ sub _build_request_schema_definition {
                                 'beanstream',
                                 'bluepay',
                                 'bluesnap',
+                                'bpoint',
                                 'braintree',
                                 'ccnow',
                                 'chase_paymentech',
+                                'checkout_com',
                                 'cielo',
                                 'collector',
-                                'compropago',
                                 'commdoo',
+                                'compropago',
                                 'concept_payments',
                                 'conekta',
                                 'cuentadigital',
@@ -223,12 +225,14 @@ sub _build_request_schema_definition {
                                 'ebs',
                                 'ecomm365',
                                 'elavon',
+                                'emerchantpay',
                                 'epay',
                                 'eprocessing_network',
                                 'eway',
                                 'exact',
                                 'first_data',
                                 'global_payments',
+                                'heartland',
                                 'hipay',
                                 'ingenico',
                                 'internetsecure',
@@ -260,6 +264,7 @@ sub _build_request_schema_definition {
                                 'payture',
                                 'payu',
                                 'payulatam',
+                                'payway',
                                 'payza',
                                 'pinpayments',
                                 'princeton_payment_solutions',
@@ -288,7 +293,7 @@ sub _build_request_schema_definition {
                                 'virtual_card_services',
                                 'vme',
                                 'vpos',
-                                'worldpay'
+                                'worldpay',
                             ],
 
                         },
@@ -312,7 +317,7 @@ sub _build_request_schema_definition {
                             type   => '//str',
                             values => [
                                 'same_day',  'overnight',
-                                'expedited', 'standard'
+                                'expedited', 'standard',
                             ],
                         },
                     },
@@ -341,8 +346,8 @@ sub _build_request_schema_definition {
                         item_id  => '//str',
                         quantity => '//int',
                         price    => '//num',
-                    }
-                }
+                    },
+                },
             },
         },
     };
@@ -381,7 +386,7 @@ WebService::MinFraud::Validator - Validation for the minFraud requests
 
 =head1 VERSION
 
-version 1.005000
+version 1.005001
 
 =head1 SYNOPSIS
 

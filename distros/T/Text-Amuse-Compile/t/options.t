@@ -210,6 +210,7 @@ is_deeply($html_options, {
                           nocoverpage => 0,
                           notoc => 0,
                           coverwidth => 1,
+                          impressum => 0,
                          }, "html escaped and interpreted ok");
 is_deeply($latex_options, {
                            prova => 'hello \emph{there} \& \textbackslash{}stuff',
@@ -220,6 +221,7 @@ is_deeply($latex_options, {
                            nofinalpage => 0,
                            nocoverpage => 0,
                            coverwidth => 1,
+                           impressum => 0,
                           }, "latex escaped and interpreted ok");
 
 is_deeply($dummy->tex_options, $latex_options);

@@ -11,10 +11,13 @@ Log::Report::Die - compatibility routines with Perl's die/croak/confess
 
 =head1 SYNOPSIS
 
+ # use internally only
+
 =head1 DESCRIPTION
 
 This module is used internally, to translate output of 'die' and Carp
-functions into L<Log::Report::Message|Log::Report::Message> objects.
+functions into L<Log::Report::Message|Log::Report::Message> objects.  Also, it tries to
+convert other kinds of exception frameworks into our message object.
 
 =head1 FUNCTIONS
 
@@ -55,12 +58,28 @@ following table is used:
 
 =back
 
+=item B<exception_decode>($exception, %options)
+
+[1.23] This function attempts to translate object of other exception frameworks
+into information to create a L<Log::Report::Exception|Log::Report::Exception>.  It returns the
+same list of parameters as L<die_decode()|Log::Report::Die/"FUNCTIONS"> does.
+
+Currently supported:
+
+=over 4
+
+=item * DBIx::Class::Exception
+
+=item * XML::LibXML::Error
+
+=back
+
 =back
 
 =head1 SEE ALSO
 
-This module is part of Log-Report distribution version 1.22,
-built on October 12, 2017. Website: F<http://perl.overmeer.net/log-report/>
+This module is part of Log-Report distribution version 1.23,
+built on November 02, 2017. Website: F<http://perl.overmeer.net/log-report/>
 
 =head1 LICENSE
 

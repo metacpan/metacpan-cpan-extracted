@@ -1,0 +1,97 @@
+{
+   "abstract" : "Build or find premake5",
+   "author" : [
+      "Jos\u00e9 Joaqu\u00edn Atria <jjatria@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Alien-premake5",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::Build" : "0.32",
+            "Alien::Build::MM" : "0.32",
+            "Capture::Tiny" : "0",
+            "ExtUtils::MakeMaker" : "6.52"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::Build" : "1.19",
+            "Alien::Build::MM" : "0.32",
+            "ExtUtils::MakeMaker" : "6.52",
+            "File::chdir" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Base" : "0",
+            "base" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0",
+            "Test::Alien" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Alien::premake5" : {
+         "file" : "lib/Alien/premake5.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "jjatria at cpan.org",
+         "web" : "https://github.com/jjatria/Alien-premake5/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/jjatria/Alien-premake5.git",
+         "web" : "https://github.com/jjatria/Alien-premake5"
+      }
+   },
+   "version" : "0.001",
+   "x_alienfile" : {
+      "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.24",
+      "requires" : {
+         "share" : {
+            "Archive::Zip" : "0",
+            "Capture::Tiny" : "0",
+            "HTML::LinkExtor" : "0",
+            "HTTP::Tiny" : "0.044",
+            "IO::Socket::SSL" : "1.56",
+            "Net::SSLeay" : "1.49",
+            "Path::Tiny" : "0",
+            "Sort::Versions" : "0",
+            "URI" : "0",
+            "URI::Escape" : "0"
+         },
+         "system" : {
+            "Capture::Tiny" : "0"
+         }
+      }
+   },
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
+}
+

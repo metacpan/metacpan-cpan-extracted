@@ -1,5 +1,5 @@
 package Net::Async::Trello::Generated::Card;
-$Net::Async::Trello::Generated::Card::VERSION = '0.001';
+$Net::Async::Trello::Generated::Card::VERSION = '0.002';
 use strict;
 use warnings;
 

@@ -25,7 +25,7 @@ Use in your Build.PL
 
 Use in custom builder module.
 
-    pakcage builder::MyBuilder;
+    package builder::MyBuilder;
     use strict;
     use warnings;
     use base 'Module::Build::XSUtil';

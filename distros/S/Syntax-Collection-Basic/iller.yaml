@@ -1,0 +1,47 @@
+---
+doctype: dist
+
+header:
+  name: Syntax-Collection-Basic
+  author:
+    - Erik Carlsson <info@code301.com>
+  license: Perl_5
+  copyright_holder: Erik Carlsson
+  copyright_year: 2017
+
+prereqs:
+  runtime:
+    requires:
+      - perl: 5.016000
+      - perl: 5.018000
+      - Syntax::Collector: 0.005
+      - Modern::Perl: 1.20140107
+      - true: 0.18
+      - Moops: 0.025
+      - MooseX::StrictConstructor
+      - Kavorka
+      - Moose: 2.00
+
+plugins:
+  - +config: Author::CSSON
+  - +plugin: Deprecated
+  - +remove_plugin: TravisYML
+  - +remove_plugin: Test::Kwalitee::Extra
+
+---
+doctype: weaver
+
+plugins:
+  - +config: Author::CSSON
+
+---
+doctype: cpanfile
+
+---
+doctype: gitignore
+
+config: Author::CSSON
+
+always:
+ - /Syntax-Collection-Basic*
+ - /Syntax-Collection-Moose*

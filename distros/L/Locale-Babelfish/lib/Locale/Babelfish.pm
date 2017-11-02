@@ -1,6 +1,8 @@
 package Locale::Babelfish;
 
-# ABSTRACT: Perl I18n using github://nodeca/babelfish format.
+# ABSTRACT: Perl I18n using https://github.com/nodeca/babelfish format.
+
+our $VERSION = '2.003'; # VERSION
 
 
 use utf8;
@@ -10,44 +12,56 @@ use warnings;
 use Carp qw/ confess /;
 use File::Find qw( find );
 use File::Spec ();
-use List::Util qw( first );
-use YAML::Syck qw( LoadFile );
 
+use YAML::SyckWrapper qw( load_yaml );
 use Locale::Babelfish::Phrase::Parser ();
 use Locale::Babelfish::Phrase::Compiler ();
 
+
 use parent qw( Class::Accessor::Fast );
 
-our $VERSION = '1.000000'; # VERSION
+use constant {
+    MTIME_INDEX => 9,
+};
 
 __PACKAGE__->mk_accessors( qw(
     dictionaries
     fallbacks
     fallback_cache
     dirs
-    _suffix
+    suffix
     default_locale
-    file_filter
+    watch
+    watchers
 ) );
 
 my $parser = Locale::Babelfish::Phrase::Parser->new();
 my $compiler = Locale::Babelfish::Phrase::Compiler->new();
 
 
-sub new {
-    my ( $class, $cfg ) = @_;
-    $cfg //= {};
-    my $self = bless {
+sub _built_config {
+    my ( $cfg ) = @_;
+    return {
         dictionaries   => {},
-        dirs           => [ "./locales" ],
         fallbacks      => {},
         fallback_cache => {},
-        _suffix        => $cfg->{suffix} // 'yaml',
+        suffix         => $cfg->{suffix} // 'yaml',
         default_locale => $cfg->{default_locale} // 'en_US',
-        %{ $cfg },
+        watch          => $cfg->{watch} || 0,
+        watchers       => {},
+        %{ $cfg // {} },
+    };
+}
+
+sub new {
+    my ( $class, $cfg ) = @_;
+
+    my $self = bless {
+        _cfg => $cfg,
+        %{ _built_config( $cfg ) },
     }, $class;
 
-    $self->load_dictionaries( $self->file_filter );
+    $self->load_dictionaries;
     $self->locale( $self->{default_locale} );
 
     return $self;
@@ -61,103 +75,40 @@ sub locale {
 }
 
 
-sub prepare_to_compile {
+sub on_watcher_change {
     my ( $self ) = @_;
-    while ( my ($locale, $dic) = each(%{ $self->{dictionaries} }) ) {
-        while ( my ($key, $value) = each(%$dic) ) {
-            if ( $self->phrase_need_compilation( $value, $key ) ) {
-                $dic->{$key} = \$value; # lazy compile
-                #$dic->{$key} = $compiler->compile( $parser->parse($value, $locale) );
-            }
+    delete $self->{keys %$self};
+    my %new_cfg = %{ _built_config( $self->{_cfg} ) };
+    while( my ( $key, $value ) = each %new_cfg ) {
+        $self->{$key} = $value;
+    }
+    $self->load_dictionaries;
+    $self->locale( $self->{default_locale} );
+}
+
+
+sub look_for_watchers {
+    my ( $self ) = @_;
+    return  unless $self->{watch};
+    my $ok = 1;
+    while ( my ( $file, $mtime ) = each %{ $self->watchers } ) {
+        my $new_mtime = (stat($file))[MTIME_INDEX];
+        if ( !defined( $mtime ) || !defined( $new_mtime ) || $new_mtime != $mtime ) {
+            $ok = 0;
+            last;
         }
     }
-    return 1;
-}
-
-
-sub detect_locale {
-    my ( $self, $locale ) = @_;
-    return $locale  if $self->dictionaries->{$locale};
-    my $alt_locale = first { $_ =~ m/\A\Q$locale\E[\-_]/i } keys %{ $self->dictionaries };
-    if ( $alt_locale && $self->dictionaries->{$alt_locale} ) {
-        # Lets locale dictionary will refer to alt locale dictinary.
-        # This speeds up all subsequent calls of t/detect/exists on this locale.
-        $self->dictionaries->{$locale} = $self->dictionaries->{$alt_locale};
-
-        $self->fallback_cache->{$locale} = $self->fallback_cache->{$alt_locale}
-            if exists $self->fallback_cache->{$alt_locale};
-
-        $self->fallbacks->{$locale} = $self->fallbacks->{$alt_locale}
-            if exists $self->fallbacks->{$alt_locale};
-
-        return $locale;
-    }
-    return $self->{default_locale}  if $self->dictionaries->{ $self->{default_locale} };
-    confess "bad locale: $locale and bad default_locale: $self->{default_locale}.";
-}
-
-
-sub load_dictionaries {
-    my ( $self, $filter ) = @_;
-
-    for my $dir ( @{$self->dirs} ) {
-        find( {
-            follow   => 1,
-            no_chdir => 1,
-            wanted   => sub {
-                my $file = File::Spec->rel2abs( $File::Find::name );
-                return  unless -f $file;
-                my ( $volume, $directories, $base ) = File::Spec->splitpath( $file );
-
-                return  if $filter && !$filter->($file);
-
-                my @tmp = split m/\./, $base;
-
-                my $cur_suffix = pop @tmp;
-                return  if $cur_suffix ne $self->_suffix;
-                my $locale = pop @tmp;
-
-                my $dictname = join('.', @tmp);
-                my $subdir = File::Spec->catpath( $volume, $directories, '' );
-                my $fdir = File::Spec->rel2abs( $dir );
-                if ( $subdir =~ m/\A\Q$fdir\E[\\\/](.+)\z/) {
-                    $dictname = "$1$dictname";
-                }
-
-                $self->_load_dictionary( $dictname, $locale, $file );
-            },
-        }, $dir );
-    }
-    $self->prepare_to_compile;
-}
-
-
-sub _load_dictionary {
-    my ( $self, $dictname, $lang, $file ) = @_;
-
-    $self->dictionaries->{$lang} //= {};
-
-    local $YAML::Syck::ImplicitUnicode = 1;
-    my $yaml = LoadFile( $file );
-
-    _flat_hash_keys( $yaml, "$dictname.", $self->dictionaries->{$lang} );
-}
-
-
-sub phrase_need_compilation {
-    my ( undef, $phrase, $key ) = @_;
-    die "L10N: $key is undef"  unless defined $phrase;
-    return 1
-        && ref($phrase) eq ''
-        && $phrase =~ m/ (?: \(\( | \#\{ | \\\\ )/x
-        ;
+    return  if $ok;
+    $self->on_watcher_change();
 }
 
 
 sub t_or_undef {
     my ( $self, $dictname_key, $params, $custom_locale ) = @_;
 
-    # disallow non-ASCII keys
+
+    confess 'No dictname_key' unless $dictname_key;
+    # запрещаем ключи не ASCII
     confess("wrong dictname_key: $dictname_key")  if $dictname_key =~ m/\P{ASCII}/;
 
     my $locale = $custom_locale ? $self->detect_locale( $custom_locale ) : $self->{locale};
@@ -174,7 +125,7 @@ sub t_or_undef {
      # fallbacks
     else {
         $self->{fallback_cache}->{$locale} //= {};
-        #  Cache can contain undef, as unexistent value.
+        # в кэше может быть undef, чтобы не пробегать локали для несуществующих ключей повторно.
         if ( exists $self->{fallback_cache}->{$locale}->{$dictname_key} ) {
             $r = $self->{fallback_cache}->{$locale}->{$dictname_key};
         }
@@ -197,9 +148,9 @@ sub t_or_undef {
 
     if ( ref( $r ) eq 'CODE' ) {
         my $flat_params = {};
-        # Convert parameters hash to flat form like "key.subkey"
+        # Переводим хэш параметров в "плоскую форму" так как в babelfish они имеют вид params.key.subkey
         if ( defined($params) ) {
-            # Scalar interpreted as { count => $scalar, value => $scalar }.
+            # переданный скаляр превращаем в хэш { count, value }.
             if ( ref($params) eq '' ) {
                 $flat_params = {
                     count => $params,
@@ -227,7 +178,7 @@ sub t {
 sub has_any_value {
     my ( $self, $dictname_key, $custom_locale ) = @_;
 
-    # disallow non-ASCII keys
+    # запрещаем ключи не ASCII
     confess("wrong dictname_key: $dictname_key")  if $dictname_key =~ m/\P{ASCII}/;
 
     my $locale = $custom_locale ? $self->detect_locale( $custom_locale ) : $self->{locale};
@@ -243,7 +194,114 @@ sub has_any_value {
         return 1  if defined $self->{dictionaries}->{$_}->{$dictname_key};
     }
 
-    return 0;
+}
+
+
+sub load_dictionaries {
+    my $self = shift;
+
+    for my $dir ( @{$self->dirs} ) {
+        my $fdir = File::Spec->rel2abs( $dir );
+        find( {
+            follow   => 1,
+            no_chdir => 1,
+            wanted   => sub {
+                my $file = File::Spec->rel2abs( $File::Find::name );
+                return unless -f $file;
+                my ( $volume, $directories, $base ) = File::Spec->splitpath( $file );
+
+                my @tmp = split m/\./, $base;
+
+                my $cur_suffix = pop @tmp;
+                return unless $cur_suffix eq $self->suffix;
+                my $lang = pop @tmp;
+
+                pop @tmp  if $tmp[-1] eq 'tt'; # словари вида formatting.tt.ru_RU.yaml - имеют имя formatting
+                if ( $tmp[-1] eq 'js') {
+                    # словари .js перекрывают одноимённые словари без суффикса
+                    # если это нежелательное поведение - словарь с суффиксом .tt перекроет одноимённый .js, и будет доступен только на сервере
+                    pop @tmp; # словари вида formatting.js.ru_RU.yaml - имеют имя formatting
+                    # и не загружаются, если есть аналогичный tt.
+                    return  if -f File::Spec->catpath( $volume, $directories, join('.', @tmp). ".tt.$lang.$cur_suffix" );
+                }
+                my $dictname = join('.', @tmp);
+                my $subdir = File::Spec->catpath( $volume, $directories, '' );
+                if ( $subdir =~ m/\A\Q$fdir\E[\\\/](.+)\z/ ) {
+                    $dictname = "$1$dictname";
+                }
+
+                $self->load_dictionary($dictname, $lang, $file);
+            },
+        }, $dir );
+    }
+    $self->prepare_to_compile;
+}
+
+
+sub load_dictionary {
+    my ( $self, $dictname, $lang, $file ) = @_;
+
+    $self->dictionaries->{$lang} //= {};
+
+    my $yaml = load_yaml( $file );
+
+    _flat_hash_keys( $yaml, "$dictname.", $self->dictionaries->{$lang} );
+
+    return  unless $self->watch;
+
+    $self->watchers->{$file} = (stat($file))[MTIME_INDEX];
+}
+
+
+sub phrase_need_compilation {
+    my ( undef, $phrase, $key ) = @_;
+    die "L10N: $key is undef"  unless defined $phrase;
+    return 1
+        && ref($phrase) eq ''
+        && $phrase =~ m/ (?: \(\( | \#\{ | \\\\ )/x
+        ;
+}
+
+
+
+sub prepare_to_compile {
+    my ( $self ) = @_;
+    while ( my ($lang, $dic) = each(%{ $self->{dictionaries} }) ) {
+        while ( my ($key, $value) = each(%$dic) ) {
+            if ( $self->phrase_need_compilation( $value, $key ) ) {
+                $dic->{$key} = \$value; # отложенная компиляция
+                #my $ast = $parser->parse($value, $lang);
+                #$dic->{$key} = $compiler->compile( $ast );
+            }
+        }
+    }
+    return 1;
+}
+
+
+sub detect_locale {
+    my ( $self, $locale ) = @_;
+    return $locale  if $self->dictionaries->{$locale};
+    my @alt_locales = grep { $_ =~ m/\A\Q$locale\E[\-_]/i } keys %{ $self->dictionaries };
+    confess "only one alternative locale allowed: ", join ',', @alt_locales
+        if @alt_locales > 1;
+
+    my $alt_locale = $alt_locales[0];
+    if ( $alt_locale && $self->dictionaries->{$alt_locale} ) {
+        # сделаем locale dictionary ссылкой на alt locale dictinary.
+        # это ускорит работу всех t с указанием языка типа "ru" вместо локали "ru_RU".
+        $self->dictionaries->{$locale} = $self->dictionaries->{$alt_locale};
+
+        $self->fallback_cache->{$locale} = $self->fallback_cache->{$alt_locale}
+            if exists $self->fallback_cache->{$alt_locale};
+
+        $self->fallbacks->{$locale} = $self->fallbacks->{$alt_locale}
+            if exists $self->fallbacks->{$alt_locale};
+
+        return $locale;
+    }
+    return $self->{default_locale}  if $self->dictionaries->{ $self->{default_locale} };
+    confess "bad locale: $locale and bad default_locale: $self->{default_locale}.";
 }
 
 
@@ -284,21 +342,29 @@ __END__
 
 =pod
 
-=encoding UTF-8
+=encoding utf-8
 
 =head1 NAME
 
-Locale::Babelfish - Perl I18n using github://nodeca/babelfish format.
+Locale::Babelfish - Perl I18n using https://github.com/nodeca/babelfish format.
 
 =head1 VERSION
 
-version 1.000000
+version 2.003
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
+
+Библиотека локализации.
+
+=head1 NAME
+
+Locale::Babelfish
+
+=head1 SYNOPSYS
 
     package Foo;
 
-    use Locale::Babelfish;
+    use Locale::Babelfish ();
 
     my $bf = Locale::Babelfish->new( { dirs => [ '/path/to/dictionaries' ] } );
     print $bf->t('dictionary.firstkey.nextkey', { foo => 'bar' } );
@@ -307,7 +373,7 @@ More sophisticated example:
 
     package Foo::Bar;
 
-    use Locale::Babelfish;
+    use Locale::Babelfish ();
 
     my $bf = Locale::Babelfish->new( {
         # configuration
@@ -333,104 +399,6 @@ More sophisticated example:
 
     # Get current locale
     print $bf->locale;
-
-=head1 DESCRIPTION
-
-Internationalisation with easy syntax
-
-Created for using same dictionaries on Perl and JavaScript.
-
-=head1 METHODS
-
-=head2 new
-
-Constructor
-
-    my $bf = Locale::Babelfish->new( {
-        dirs           => [ '/path/to/dictionaries' ], # is required
-        suffix         => 'yaml', # dictionaries extension
-        default_locale => 'ru_RU', # by default en_US
-    } );
-
-=head2 locale
-
-Gets or sets current locale.
-
-    $self->locale;
-    $self->locale( 'en_GB' );
-
-=head2 prepare_to_compile
-
-    $self->prepare_to_compile()
-
-Marks dictionary values as refscalars, is they need compilation.
-Or simply compiles them.
-
-=head2 detect_locale
-
-    $self->detect_locale( $locale );
-
-Detects locale by specified locale/language.
-
-Returns default locale unless detected.
-
-=head2 load_dictionaries
-
-Loads dictionaries recursively on specified path.
-
-    $self->load_dictionaries;
-    $self->load_dictionaries( \&filter( $file_path ) );
-
-=head2 phrase_need_compilation
-
-    $self->phrase_need_compilation( $phrase, $key )
-    $class->phrase_need_compilation( $phrase, $key )
-
-Is phrase need parsing and compilation.
-
-=head2 t_or_undef
-
-Get internationalized value for key from dictionary.
-
-    $self->t_or_undef( 'main.key.subkey' );
-    $self->t_or_undef( 'main.key.subkey' , { param1 => 1 , param2 => { next_level  => 'test' } } );
-    $self->t_or_undef( 'main.key.subkey' , { param1 => 1 }, $specific_locale );
-    $self->t_or_undef( 'main.key.subkey' , 1 );
-
-Where C<main> - is dictionary, C<key.subkey> - key at dictionary.
-
-=head2 t
-
-Get internationalized value for key from dictionary.
-
-    $self->t( 'main.key.subkey' );
-    $self->t( 'main.key.subkey' , { param1 => 1 , param2 => { next_level  => 'test' } } );
-    $self->t( 'main.key.subkey' , { param1 => 1 }, $specific_locale );
-    $self->t( 'main.key.subkey' , 1 );
-
-Where C<main> - is dictionary, C<key.subkey> - key at dictionary.
-
-Returns square bracketed key when value not found.
-
-=head2 has_any_value
-
-Check exist or not key in dictionary.
-
-    $self->has_any_value( 'main.key.subkey' );
-
-Where C<main> - is dictionary, C<key.subkey> - key at dictionary.
-
-=head2 set_fallback
-
-    $self->set_fallback( 'by_BY', 'ru_RU', 'en_US');
-    $self->set_fallback( 'by_BY', [ 'ru_RU', 'en_US' ] );
-
-Set fallbacks for given locale.
-
-When `locale` has no translation for the phrase, fallbacks[0] will be
-tried, if translation still not found, then fallbacks[1] will be tried
-and so on. If none of fallbacks have translation,
-default locale will be tried as last resort.
 
 =head1 DICTIONARIES
 
@@ -466,32 +434,123 @@ C<dictionary> is name of dictionary and C<en_US> - its locale.
     demo:
         apples: I have #{count} ((apple|apples))
 
-=head2 Encoding
+=head1 DETAILS
 
-UTF-8 (Perl internal encoding).
+Словари грузятся при создании экземпляра, сразу в плоской форме
+$self->{dictionaries}->{ru_RU}->{dictname_key}...
 
-=head2 DETAILS
+Причем все скалярные значения, при необходимости (есть спецсимволы Babelfish),
+преобразуются в ссылки на скаляры (флаг - "нужно скомпилировать").
 
-Dictionaries loaded at instance construction stage.
+Метод t_or_undef получает значение по указанному ключу.
 
-All scalar values will be saved as scalar refs if needs compilation
-(has Babelfish control sequences).
+Если это ссылка на скаляр, то парсит и компилирует строку.
 
-t_or_undef method translates specified key value.
+Результат компиляции либо ссылка на подпрограмму, лмбо просто строка.
 
-Result will be compiled when scalarref. Result of compilation is scalar or coderef.
+Если это ссылка на подпрограмму, мы просто вызываем ее с плоскими параметрами.
 
-Result will be executed when coderef.
+Если просто строка, то возвращаем её as is.
 
-Scalar/hashref/arrayref will be returned as is.
+Поддерживается обция watch.
 
-=for Pod::Coverage _load_dictionary
+=head1 METHODS
 
-=for Pod::Coverage _flat_hash_keys
+=over
 
-=head1 SEE ALSO
+=item locale
 
-L<https://github.com/nodeca/babelfish>
+Если указана локаль, устанавливет её. Если нет - возвращает.
+
+=item on_watcher_change
+
+Перечитывает все словари.
+
+=item look_for_watchers
+
+Обновляет словари оп мере необходимости, через L</on_watcher_change>.
+
+=item t_or_undef
+
+    $self->t_or_undef( 'main.key.subkey' , { paaram1 => 1 , param2 => 'test' } , 'ru' );
+
+Локализация по ключу.
+
+первой частью в ключе $key должен идти словарь, например, main.key
+параметр языка не обязательный.
+
+$params - хэш параметров
+
+=item t
+
+    $self->t( 'main.key.subkey' , { paaram1 => 1 , param2 => 'test' } , 'ru' );
+
+Локализация по ключу.
+
+первой частью в ключе $key должен идти словарь, например, main.key
+параметр языка не обязательный.
+
+$params - хэш параметров
+
+=item has_any_value
+
+    $self->has_any_value( 'main.key.subkey' );
+
+Проверяет есть ли ключ в словаре
+
+первой частью в ключе должен идти словарь, например, main.
+
+=item load_dictionaries
+
+Загружает все yaml словари с диска
+
+=item load_dictionary
+
+Загружает один yaml словарь с диска
+
+=item phrase_need_compilation
+
+    $self->phrase_need_compilation( $phrase, $key )
+    $class->phrase_need_compilation( $phrase, $key )
+
+Определяет, требуется ли компиляция фразы.
+
+Используется также при компиляции плюралов (вложенные выражения).
+
+=item prepare_to_compile
+
+    $self->prepare_to_compile()
+
+Либо маркирует как refscalar строки в словарях, требующие компиляции,
+либо просто компилирует их.
+
+=item detect_locale
+
+    $self->detect_locale( $locale );
+
+Определяем какой язык будет использован.
+приоритет $locale, далее default_locale.
+
+=item set_fallback
+
+    $self->set_fallback( 'by_BY', 'ru_RU', 'en_US');
+    $self->set_fallback( 'by_BY', [ 'ru_RU', 'en_US' ] );
+
+Для указанной локали устанавливает список локалей, на которые будет производится откат
+в случае отсутствия фразы в указанной.
+
+Например, в вышеуказанных примерах при отсутствии фразы в
+белорусской локали будет затем искаться фраза в русской локали,
+затем в англоамериканской.
+
+=item _flat_hash_keys
+
+    _flat_hash_keys( $hash, '', $result );
+
+Внутренняя, рекурсивная.
+Преобразует хэш любой вложенности в строку, где ключи хешей разделены точками.
+
+=back
 
 =head1 AUTHORS
 
@@ -507,13 +566,17 @@ Igor Mironov <grif@cpan.org>
 
 =item *
 
+Victor Efimov <efimov@reg.ru>
+
+=item *
+
 REG.RU LLC
 
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014 by Akzhan Abdulin.
+This software is Copyright (c) 2014 by REG.RU LLC.
 
 This is free software, licensed under:
 

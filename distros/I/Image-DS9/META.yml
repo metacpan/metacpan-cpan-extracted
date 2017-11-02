@@ -1,33 +1,74 @@
 ---
-abstract: 'interface to the DS9 image display and analysis program'
+abstract: 'a really awesome library'
 author:
-  - 'Diab Jerius ( djerius@cfa.harvard.edu )'
+  - 'Diab Jerius <djerius@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: '6.36'
+  Cwd: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
   Test::Deep: '0'
   Test::Fatal: '0'
-  Test::More: '0.31'
+  Test::More: '0'
+  lib: '0'
+  parent: '0'
+  perl: '5.006'
 configure_requires:
-  CPAN::Meta: '0'
-  ExtUtils::MakeMaker: '6.36'
-dynamic_config: '0'
-generated_by: 'Module::Install version 1.16, CPAN::Meta::Converter version 2.150005'
-license: unknown
+  Config: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Image-DS9
 no_index:
   directory:
+    - eg
+    - examples
     - inc
+    - share
     - t
     - xt
+provides:
+  Image::DS9:
+    file: lib/Image/DS9.pm
+    version: '0.188'
+  Image::DS9::Command:
+    file: lib/Image/DS9/Command.pm
+    version: '0.188'
+  Image::DS9::Constants:
+    file: lib/Image/DS9/Constants.pm
+    version: '0.188'
+  Image::DS9::Grammar:
+    file: lib/Image/DS9/Grammar.pm
+    version: '0.188'
+  Image::DS9::OldConstants:
+    file: lib/Image/DS9/OldConstants.pm
+    version: '0.188'
+  Image::DS9::PConsts:
+    file: lib/Image/DS9/PConsts.pm
+    version: '0.188'
+  Image::DS9::Parser:
+    file: lib/Image/DS9/Parser.pm
+    version: '0.188'
 requires:
-  IPC::XPA: '0.08'
+  Carp: '0'
+  Data::Dumper: '0'
+  Exporter: '0'
+  IPC::XPA: '0'
   Module::Runtime: '0'
+  Proc::Simple: '0'
+  Time::HiRes: '0'
+  constant: '0'
+  namespace::clean: '0'
+  strict: '0'
+  warnings: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Image-DS9
-  license: http://www.gnu.org/licenses/gpl-3.0.html
-  repository: https://github.com/djerius/image-ds9
-version: '0.186'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+  repository: git://github.com/djerius/image-ds9.git
+version: '0.188'
+x_serialization_backend: 'YAML::Tiny version 1.70'

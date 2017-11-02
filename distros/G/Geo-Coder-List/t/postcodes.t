@@ -71,7 +71,7 @@ POSTCODES: {
 		ok(defined($location));
 		ok(ref($location) eq 'HASH');
 		delta_within($location->{geometry}{location}{lat}, 51.48, 1e-2);
-		delta_within($location->{geometry}{location}{lng}, 0.09, 1e-2);
+		delta_within($location->{geometry}{location}{lng}, 0.08, 1e-2);
 		is(ref($location->{'geocoder'}), 'Geo::Coder::Postcodes', 'Verify Postcodes encoder is used');
 	}
 }

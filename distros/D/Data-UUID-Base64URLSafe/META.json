@@ -1,0 +1,81 @@
+{
+   "abstract" : "getting Data::UUID with URLSafe strings",
+   "author" : [
+      "Leon Brocard, C<< <acme@astray.com> >>,"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.13",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-UUID-Base64URLSafe",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::UUID" : "0",
+            "MIME::Base64" : "3.15",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Data::UUID::Base64URLSafe" : {
+         "file" : "lib/Data/UUID/Base64URLSafe.pm",
+         "version" : "0.35"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/worthmine/Data-UUID-Base64URLSafe/issues"
+      },
+      "homepage" : "https://github.com/worthmine/Data-UUID-Base64URLSafe",
+      "repository" : {
+         "url" : "git://github.com/worthmine/Data-UUID-Base64URLSafe.git",
+         "web" : "https://github.com/worthmine/Data-UUID-Base64URLSafe"
+      }
+   },
+   "version" : "0.35",
+   "x_authority" : "cpan:WORTHMINE",
+   "x_contributors" : [
+      "Jesse Vincent <jesse@bestpractical.com>",
+      "Leon Brocard <acme@astray.com>",
+      "Yuki Yoshida <worthmine@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.93"
+}

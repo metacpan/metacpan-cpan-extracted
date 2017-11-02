@@ -1,5 +1,12 @@
 #!/bin/bash
 
-dbigraph.pl --dsn=dbi:Pg:dbname=cms --user=cms --pass=cms --as=png > cms.schema.png
+DBI_DSN=dbi:Pg:dbname=cms
+DBI_USER=cms
+DI_PASS=cms
+export DBI_DSN
+export DBI_USER
+export DBI_PASS
 
-echo Wrote ./cms.schema.png
+dbi.schema.pl svg > docs/cms.schema.svg
+
+echo Wrote docs/cms.schema.png

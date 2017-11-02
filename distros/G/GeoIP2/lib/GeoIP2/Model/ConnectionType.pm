@@ -3,7 +3,7 @@ package GeoIP2::Model::ConnectionType;
 use strict;
 use warnings;
 
-our $VERSION = '2.003005';
+our $VERSION = '2.004000';
 
 use Moo;
 
@@ -35,7 +35,7 @@ GeoIP2::Model::ConnectionType - Model class for the GeoIP2 Connection Type datab
 
 =head1 VERSION
 
-version 2.003005
+version 2.004000
 
 =head1 SYNOPSIS
 

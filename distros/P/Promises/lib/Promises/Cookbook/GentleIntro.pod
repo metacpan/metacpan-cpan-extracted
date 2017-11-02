@@ -12,7 +12,7 @@ Promises::Cookbook::GentleIntro - All you need to know about Promises
 
 =head1 VERSION
 
-version 0.98
+version 0.99
 
 =head1 All you need to know about Promises
 

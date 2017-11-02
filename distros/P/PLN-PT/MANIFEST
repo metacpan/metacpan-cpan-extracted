@@ -10,5 +10,8 @@ dist.ini
 input.txt
 lib/PLN/PT.pm
 t/00-load.t
-t/01-simple.t
+t/01-tokenizer.t
+t/02-morph_analyzer.t
+t/03-tagger.t
+t/04-dep_parser.t
 testing.pl

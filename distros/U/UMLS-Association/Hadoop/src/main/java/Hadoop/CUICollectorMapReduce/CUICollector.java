@@ -1,15 +1,18 @@
 package Hadoop.CUICollectorMapReduce;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.HashMap;
 
+import org.apache.commons.cli.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-//import org.apache.hadoop.mapred.TextInputFormat;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
@@ -17,15 +20,10 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
-//import org.apache.hadoop.mapreduce.Mapper.Context;
-//import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
-//import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
-//import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-//import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
-//import org.hsqldb.lib.Iterator;
+
 
 /**
  * CUICollector identifies CUI bigrams from either MetaMap files or the output from ArticleCollector.
@@ -52,6 +50,7 @@ public class CUICollector {
 
 		public static final Log log = LogFactory.getLog(CUIMapper.class);
 		public static final boolean DEBUG = false;
+		public static final boolean DEBUG2 = false;
 		
 		private final static IntWritable one = new IntWritable(1);
 		private Text word = new Text();
@@ -68,6 +67,10 @@ public class CUICollector {
 		 */
 		public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
 			String thisString = value.toString();
+			
+			Configuration conf = context.getConfiguration();
+			int window = Integer.parseInt(conf.get("window"));
+			
 			/*
 			 * http://stackoverflow.com/questions/8603788/hadoop-jobconf-class-is-deprecated-need-updated-example
 			 * https://hadoopi.wordpress.com/2013/05/31/custom-recordreader-processing-string-pattern-delimited-records/
@@ -78,15 +81,11 @@ public class CUICollector {
 			Pattern p1 = Pattern.compile(phrases_pattern);
 			Matcher m_p1 = p1.matcher(thisString);
 			
-			//Create the map pattern
-			//String map_pattern = "(map\\(.*),map\\(|,map\\((.*)";
-			//Pattern m1 = Pattern.compile(map_pattern);
-			
 			//Create the CUI pattern
 			String cui_pattern = "C[0-9]{7}";
 			Pattern c1 = Pattern.compile(cui_pattern);
 			
-			List<List<String>> my_phrases = new ArrayList<List<String>>();
+			List<List<List<String>>> my_phrases = new ArrayList<List<List<String>>>();
 			//Now iterate through the utterances
 			//while we still have utterances being found
 			while(m_p1.find()){
@@ -95,27 +94,28 @@ public class CUICollector {
 				if(DEBUG){log.info("PHRASE: " + thisPhrase);}
 				String[] maps = thisPhrase.split("map\\(");
 				//create a vector to store phrases
-				List<String> my_maps = new ArrayList<String>();
+				List<List<String>> my_maps = new ArrayList<List<String>>();
 				if(DEBUG){log.info("MAPSIZE: " + maps.toString() + maps.length);}
 				//loop through all matched phrases			
 				for(int i=0; i<maps.length; i++){
 					//get phrase
 					String thisMap = maps[i];
 					if(DEBUG){log.info("THISMAP: " + thisMap);}
-					StringBuilder CUIs = new StringBuilder(64);
+					//StringBuilder CUIs = new StringBuilder(64);
+					List<String> CUIs = new ArrayList<String>();
 					//create the CUI matcher on this map
 					Matcher m_c1 = c1.matcher(thisMap);
 					while(m_c1.find()){			//only executes this if there is a match
 						String thisCUI = m_c1.group(0);
 						
-						CUIs.append(thisCUI);
-						CUIs.append(" ");
+						CUIs.add(thisCUI);
+						//CUIs.append(" ");
 						
 					}
 					//this ensures that the string CUIs is not empty.  Otherwise would add an empty string to the list.
-					if(!CUIs.toString().isEmpty()){  
-						if(DEBUG){log.info("MAP: " + CUIs + CUIs.length());}
-						my_maps.add(CUIs.toString());
+					if(!CUIs.isEmpty()){  
+						if(DEBUG){log.info("MAP: " + CUIs.toString() + CUIs.size());}
+						my_maps.add(CUIs);
 					}
 					
 				}
@@ -127,84 +127,100 @@ public class CUICollector {
 				
 			} //end find phrase
 			
-			//now we have our phrases.  I need to concatenate them, then find the CUI bigrams
+			//Now we have our phrases.  I need to concatenate them, then find the CUI bigrams
+			//Need to create a hashmap where the keys are the index position of the CUI in the sentence
+			//each entry in my_phrases will be a mapping, which can contain one or more maps to the phrase.
+			//looping through each phrase will enter in cuis at the same range of hid locations.
+			//I will need to increment the hid by the length of the current phrase array
+			
+			//Hashmap that will hold all CUIs in utterance, without duplicates.
+			//Multiple cuis will be in the same hash position
+			HashMap<Integer,ArrayList<String>> cuihash = new HashMap<Integer,ArrayList<String>>();
+			int hid = 0; //will keep track of the current hash id location
 			
 			if(!my_phrases.isEmpty()){
-				//loop over each phrase and phrase+1
+				if(DEBUG2){log.info("my_phrases size: " + my_phrases.size() + " : " + my_phrases.toString());}
+				
+				//loop over each phrase
 				for(int i = 0; i < my_phrases.size(); i++){
+					//get phrase
+					List<List<String>> this_phrase =  my_phrases.get(i);
+					if(DEBUG2){log.info("this_phrase before: " + this_phrase.toString());}
+					//get number of CUIs in the first map of this_phrase
+					//this_phrase.get(0).size();
 					
-					//Create prior hashmap to track duplicates per phrase pair
-					//So we want a new hashmap for each new phrase 1
-					HashMap<String,String> prior = new HashMap<String,String>();
-					
-					//get phrase 1
-					List<String> phrase_1 = (List<String>) my_phrases.get(i);
-					List<String> phrase_2 = null;
-					if(DEBUG){log.info("Phrase 1: " + " is: " + phrase_1.toString());}
-					//get phrase 2 if it exists
-					if(i+1 < my_phrases.size()){
-						phrase_2 = (List<String>) my_phrases.get(i+1);
-						if(DEBUG){log.info("Phrase 2: " + " is: " + phrase_2.toString());}
+					//loop through all maps in this_phrase and and add to cuihash
+					//at positions hid to local_hid
+					for(int j=0; j<this_phrase.size(); j++){
+						List<String> this_map = this_phrase.get(j);
+						//loop through CUIs in the map
+						for(int m=0; m<this_map.size(); m++){
+							int cuihash_idx = hid+m;
+							//check to see if the cuihash has anything at the current index (hid+m)
+							//if no then add the element.  If yes, then get the element and append this cui to that position.
+							if(cuihash.get(cuihash_idx)==null){
+								cuihash.put(cuihash_idx, new ArrayList<String>());
+								cuihash.get(cuihash_idx).add(this_map.get(m));
+							}
+							else{ 
+								//checks to see if cui is already in the array list.  
+								//if no then it adds it, if yes then it does nothing.
+								//this removes all duplicates automatically!
+								if(!cuihash.get(cuihash_idx).contains(this_map.get(m))){
+									cuihash.get(cuihash_idx).add(this_map.get(m));
+								}
+							}
+								
+						} //end loop through cuis
 						
-					}
+					} //end loop through maps
 					
-					//loop through all maps in phrase 1 to get CUIs
-					for(int j=0; j<phrase_1.size(); j++){
-						//populate list of CUI strings from this mapping
-						List<String> cuiList = new ArrayList<String>();
-						Matcher m_c1 = c1.matcher(phrase_1.get(j).toString());
-						while(m_c1.find()){
-							cuiList.add(m_c1.group(0));
-						}
-						//now loop through CUI list and write out bigram pairs
-						for(int h=0; h < cuiList.size()-1; h++){
-							StringBuilder bigram = new StringBuilder(15);
-							bigram.append(cuiList.get(h));  //cui1
-							bigram.append(" ");
-							bigram.append(cuiList.get(h+1)); //cui2
-							
-							//test to see if in prior
-							if(DEBUG){log.info("PRIOR: " + prior.get(bigram.toString()) );}
-							if( prior.get(bigram.toString()) == null ){
-								word.set(bigram.toString());
-								if(DEBUG){log.info("Bigram: " + bigram.toString());}
+					if(DEBUG2){log.info("HASHMAP CONDENSED MAPS: " + cuihash.toString() );}
+					
+					//finished processing all maps in this_phrase so move to the next 
+					//phrase, which increments the global hash idx.
+					if(DEBUG2){log.info("HID Before: " + hid + "map size:" + this_phrase.get(0).size());}
+					hid = hid+this_phrase.get(0).size();
+					if(DEBUG2){log.info("this_phrase_after: " + this_phrase.get(0).toString());}
+					
+				}
+			}
+			
+			//Now I supposidly have all phrases in the utterance condensed into a hashmap.
+			//Now loop through the hashmap and pull out all CUI bigrams based on a window.
+			//int window=2; //this needs to be user input
+			
+			//loop through hashmap
+			for(int h=0; h<cuihash.size(); h++){
+				//this is the first cui in the bigram
+				List<String> cui1 = cuihash.get(h);
+				//get all cui bigrams for each hashmap position
+				for(int w=1; w<=window; w++){
+					//for each window size get the second cui
+					//only loop if the second cuis index is less than the length of the hash.
+					int cui2_idx = h+w;
+					if(cui2_idx < cuihash.size()){
+						List<String> cui2 = cuihash.get(h+w);
+						if(DEBUG2){log.info("h:" + h + " w:" + w);}
+						//pair each cui in cui1 to each cui in cui2
+						for(int c_1=0; c_1<cui1.size(); c_1++){
+							for(int c_2=0; c_2<cui2.size(); c_2++){
+								StringBuilder bigram2 = new StringBuilder(15);
+								bigram2.append(cui1.get(c_1));  
+								bigram2.append("\t");
+								bigram2.append(cui2.get(c_2)); 
+								word.set(bigram2.toString());
+								if(DEBUG2){log.info("Bigram2: " + bigram2.toString());}
 								context.write(word, one);
-								prior.put(bigram.toString(), "1");
 							}
 							
 						}
-						//If there is a phrase2 add the last CUI of phrase 1 to the first CUI of phrase 2
-						if(i+1 < my_phrases.size()){
-							//loop through all phrase 2 mappings and link to this phrase 1 mapping
-							for(int k=0; k<phrase_2.size(); k++){
-								List<String> cuiList2 = new ArrayList<String>();
-								Matcher m_c2 = c1.matcher(phrase_2.get(k).toString());
-								while(m_c2.find()){
-									cuiList2.add(m_c2.group(0));
-								}
-								
-								StringBuilder bigram2 = new StringBuilder(15);
-								bigram2.append(cuiList.get(cuiList.size()-1));  //cui1 is last cui of the current phrase 1
-								bigram2.append(" ");
-								bigram2.append(cuiList2.get(0)); //cui2 is first cui of the current phrase 2
-								if( prior.get(bigram2.toString()) == null ){
-									word.set(bigram2.toString());
-									if(DEBUG){log.info("Bigram2: " + bigram2.toString());}
-									context.write(word, one);
-									prior.put(bigram2.toString(), "1");
-								} //end if prior
-								
-								
-							} //end for k in phrase 2
-						} //end in phrase 2 exists
-					} //end for each mapping in phrase 1
+					}
 					
 					
-					
-				} //for each phrase in the utterance
+				}
 				
-			} //end if we have phrases
-
+			}	
 			
 		} //end public void reduce.
 	} //end class
@@ -253,14 +269,77 @@ public class CUICollector {
 	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
+		
+		//Parsing commandline options before initiating Hadoop
+		Options options = new Options();
+		//old arg[0]
+		Option input = new Option("i", "input", true, "Path to directory or file to be used as input.");
+		input.setRequired(true);
+		options.addOption(input);
+		//old arg[1]
+		Option outdir = new Option("o", "outdir", true, "Path to directory where output should be saved. Directory should not already exist!");
+		outdir.setRequired(true);
+		options.addOption(outdir);
+		//old arg[2]
+		Option mode = new Option("m", "mode", true, "CUICollector mode. Options are cui or article");
+		mode.setRequired(true);
+		options.addOption(mode);
+		//old arg[3]
+		Option window = new Option("w", "window", true, "Bigram window size.");
+		window.setRequired(true);
+		options.addOption(window);
+		
+		Option list = new Option("l", "list", true, "OPTIONAL: List of pmids to process from input directory.");
+		list.setRequired(false);
+		options.addOption(list);
+		
+		CommandLineParser parser = new GnuParser();
+		HelpFormatter formatter = new HelpFormatter();
+		CommandLine cmd;
+		
+		try{
+			cmd = parser.parse(options, args);
+		} catch(ParseException e){
+			System.out.println(e.getMessage());
+			formatter.printHelp("hadoop jar <path/to/jar/file.jar> Hadoop.CUICollectorMapReduce.CUICollector -i <input> -o <outdir> -m <mode> -w <window> -l <pmid list>", options);
+			System.exit(1);
+			return;
+		}
+		
+		
+		//Determine if a list of pmids was provided.  If yes concatenate those with the input directory
+		//into a list of paths seperated by a comma.  Otherwise use the input path.
+		StringBuilder inputPath = new StringBuilder();
+		String inputList = cmd.getOptionValue("list");
+		String inputdir = cmd.getOptionValue("input");
+		if( inputList != null ){
+			FileInputStream fis = new FileInputStream(inputList);
+			BufferedReader br = new BufferedReader(new InputStreamReader(fis));
+			String line = null;
+			while( (line = br.readLine()) != null){
+				inputPath.append(inputdir);
+				inputPath.append(line);
+				inputPath.append(".gz,");
+			}
+			br.close();
+			inputPath.setLength(inputPath.length()-1);
+			System.out.println(inputPath.toString());
+		}
+		else{
+			inputPath.append(cmd.getOptionValue("input"));
+		}
+		
+		
+		//Start Hadoop configuration
 		Configuration conf = new Configuration(true);
 		
-		if(args[2].equals("article")){
+		if(cmd.getOptionValue("mode").equals("article")){
 			conf.set("textinputformat.record.delimiter","@@@@@@@");
 		}
 		else{
 			conf.set("textinputformat.record.delimiter","'EOU'.");
 		}
+		conf.set("window", cmd.getOptionValue("window"));
 		
 		Job job = new Job(conf);
 	
@@ -272,10 +351,12 @@ public class CUICollector {
 		job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(IntWritable.class);
 		
-		FileInputFormat.addInputPath(job, new Path(args[0]));
+		FileInputFormat.addInputPaths(job, inputPath.toString());
 		job.setInputFormatClass(TextInputFormat.class);
-		FileOutputFormat.setOutputPath(job, new Path(args[1]));
+		FileOutputFormat.setOutputPath(job, new Path(cmd.getOptionValue("outdir")));
 		
-		System.exit(job.waitForCompletion(true) ? 0 : 1);
+		System.exit(job.waitForCompletion(true) ? 0 : 1); 
+		
+		
 	}
 }

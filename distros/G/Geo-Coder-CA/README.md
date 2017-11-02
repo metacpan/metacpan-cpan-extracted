@@ -10,7 +10,7 @@ Provides a geocoding functionality using http:://geocoder.ca for both Canada and
 
 # VERSION
 
-Version 0.05
+Version 0.06
 
 # SYNOPSIS
 
@@ -57,6 +57,12 @@ You can also set your own User-Agent object:
     $location = $geocoder->reverse_geocode(latlng => '37.778907,-122.39732');
 
 Similar to geocode except it expects a latitude/longitude parameter.
+
+## run
+
+You can also run this module from the command line:
+
+    perl CA.pm 1600 Pennsylvania Avenue NW, Washington DC
 
 # AUTHOR
 

@@ -223,22 +223,37 @@ method from_ast(
 ) :ReturnType(InstanceOf[__PACKAGE__]) {
   DEBUG and _debug('Schema.from_ast', $ast);
   my @type_nodes = grep $kind2class{$_->{kind}}, @$ast;
-  my ($schema_node) = map $_->{node}, grep $_->{kind} eq 'schema', @$ast;
-  die "No schema found in AST\n" unless $schema_node;
+  my ($schema_node, $e) = grep $_->{kind} eq 'schema', @$ast;
+  die "Must provide only one schema definition.\n" if $e;
   my %name2type = %BUILTIN2TYPE;
   for (@type_nodes) {
+    die "Type '$_->{name}' was defined more than once.\n"
+      if $name2type{$_->{name}};
     require_module $kind2class{$_->{kind}};
-    $name2type{$_->{node}{name}} = $kind2class{$_->{kind}}->from_ast(\%name2type, $_->{node});
+    $name2type{$_->{name}} = $kind2class{$_->{kind}}->from_ast(\%name2type, $_);
   }
-  my @directives = map GraphQL::Directive->from_ast(\%name2type, $_->{node}),
+  if (!$schema_node) {
+    # infer one
+    $schema_node = +{
+      map { $name2type{ucfirst $_} ? ($_ => ucfirst $_) : () } @TYPE_ATTRS
+    };
+  }
+  die "Must provide schema definition with query type or a type named Query.\n"
+    unless $schema_node->{query};
+  my @directives = map GraphQL::Directive->from_ast(\%name2type, $_),
     grep $_->{kind} eq 'directive', @$ast;
-  $self->new(
+  my $schema = $self->new(
     (map {
-      $schema_node->{$_} ? ($_ => $name2type{$schema_node->{$_}}) : ()
+      $schema_node->{$_}
+        ? ($_ => $name2type{$schema_node->{$_}}
+          // die "Specified $_ type '$schema_node->{$_}' not found.\n")
+        : ()
     } @TYPE_ATTRS),
     (@directives ? (directives => [ @GraphQL::Directive::SPECIFIED_DIRECTIVES, @directives ]) : ()),
     types => [ values %name2type ],
   );
+  $schema->name2type; # walks all types, fields, args - finds undefined types
+  $schema;
 }
 
 =head2 from_doc($doc)
@@ -267,11 +282,14 @@ my %directive2builtin = map { ($_=>1) } @GraphQL::Directive::SPECIFIED_DIRECTIVE
 my %scalar2builtin = map { ($_->name=>1) } ($Int, $Float, $String, $Boolean, $ID);
 sub _build_to_doc {
   my ($self) = @_;
-  join "\n",
-    join('', map "$_\n",
-    "schema {",
+  my $schema_doc;
+  if (grep $self->$_->name ne ucfirst $_, grep $self->$_, @TYPE_ATTRS) {
+    $schema_doc = join('', map "$_\n", "schema {",
       (map "  $_: @{[$self->$_->name]}", grep $self->$_, @TYPE_ATTRS),
-    "}"),
+    "}");
+  }
+  join "\n", grep defined,
+    $schema_doc,
     (map $_->to_doc,
       sort { $a->name cmp $b->name }
       grep !$directive2builtin{$_},
@@ -316,6 +334,7 @@ fun lookup_type(
   (Map[StrNameValid, InstanceOf['GraphQL::Type']]) $name2type,
 ) :ReturnType(InstanceOf['GraphQL::Type']) {
   my $type = $typedef->{type};
+  die "Undefined type given\n" if !defined $type;
   return $name2type->{$type} // die "Unknown type '$type'.\n"
     if is_Str($type);
   my ($wrapper_type, $wrapped) = @$type;

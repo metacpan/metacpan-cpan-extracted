@@ -1,6 +1,6 @@
 =head1 NAME
 
-Linux::Clone - an interface to the linux clone(2) and unshare(2) syscalls
+Linux::Clone - an interface to the linux clone, unshare, setns, pivot_root and kcmp syscalls
 
 =head1 SYNOPSIS
 
@@ -145,9 +145,25 @@ and your libc, and exit immediately.
 Calls setns(2) on the file descriptor (or file handle) C<$fh_or_fd>. If
 C<$nstype> is missing, then C<0> is used.
 
-At the time of this writing, C<$nstype> can be C<0>, C<Linux::Clone::NEWIPC>,
+The argument C<$nstype> can be C<0>, C<Linux::Clone::NEWIPC>,
 C<Linux::Clone::NEWNET>, C<Linux::Clone::NEUTS>, C<Linux::Clone::NEWCGROUP>,
 C<Linux::Clone::NEWNS>, C<Linux::Clone::NEWPID> or C<Linux::Clone::NEWUSER>.
+
+=item Linux::Clone::pivot_root $new_root, $old_root
+
+Calls pivot_root(2) - refer to its manpage for details.
+
+=item Linux::Clone::kcmp $pid1, $pid2, $type[, $idx1, $idx2]
+
+Calls kcmp(2) - refer to its manpage for details on operations.
+
+The following C<$type> constants are available if the kcmp syscall number
+was available during compilation:
+
+C<Linux::Clone::KCMP_FILE>, C<Linux::Clone::KCMP_VM>, C<Linux::Clone::KCMP_FILES>,
+C<Linux::Clone::KCMP_FS>, C<Linux::Clone::KCMP_SIGHAND>, C<Linux::Clone::KCMP_IO> and
+C<Linux::Clone::KCMP_SYSVSEM>.
+
 
 =back
 
@@ -158,7 +174,7 @@ package Linux::Clone;
 # use common::sense;
 
 BEGIN {
-   our $VERSION = '1.0';
+   our $VERSION = '1.1';
 
    require XSLoader;
    XSLoader::load (__PACKAGE__, $VERSION);

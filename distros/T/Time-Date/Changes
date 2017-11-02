@@ -1,6 +1,12 @@
 Revision history for Time::Date
 
-0.01  Mon Sep 14 15:38:58 CDT 2015
+0.05  Wed Nov  1 11:58:55 CDT 2017
+    - Add epoch sub
+
+0.04  Wed Nov  1 11:46:38 CDT 2017
+    - Don't cache $now outside natural sub (Thanks srezic)
+
+0.02  Mon Sep 14 15:38:58 CDT 2015
     - Rename to Time::Date since TimeDate name already taken.
 
 0.01  Mon Sep 14 15:26:46 CDT 2015

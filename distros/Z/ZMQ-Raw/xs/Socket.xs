@@ -179,11 +179,13 @@ sendmsg (self, ...)
 			}
 			else
 			{
-				STRLEN size = SvCUR (item);
+				STRLEN size;
+				const char *b = SvPV (item, size);
+
 				rc = zmq_msg_init_size (&msg, size);
 				zmq_raw_check_error (rc);
 
-				Copy (SvPVX (item), zmq_msg_data (&msg), size, char);
+				Copy (b, zmq_msg_data (&msg), size, char);
 				goto SENDMSG;
 			}
 		}
@@ -467,6 +469,36 @@ monitor (self, endpoint, events)
 		sock = ZMQ_SV_TO_PTR (Socket, self);
 
 		rc = zmq_socket_monitor (sock->socket, endpoint, events);
+		zmq_raw_check_error (rc);
+
+void
+join (self, group)
+	SV *self
+	const char *group
+
+	PREINIT:
+		int rc;
+		zmq_raw_socket *sock;
+
+	CODE:
+		sock = ZMQ_SV_TO_PTR (Socket, self);
+
+		rc = zmq_join (sock->socket, group);
+		zmq_raw_check_error (rc);
+
+void
+leave (self, group)
+	SV *self
+	const char *group
+
+	PREINIT:
+		int rc;
+		zmq_raw_socket *sock;
+
+	CODE:
+		sock = ZMQ_SV_TO_PTR (Socket, self);
+
+		rc = zmq_leave (sock->socket, group);
 		zmq_raw_check_error (rc);
 
 void

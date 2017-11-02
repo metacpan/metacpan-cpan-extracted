@@ -210,7 +210,12 @@ sub import_list {
                               type => $type,
                              );
                 if (grep { !$_ } values %styles) {
-                    warn "Discarding $font, missing styles: " . Dumper(\%styles);
+                    warn "$font is missing styles: " . Dumper(\%styles) . " disabling embedding\n";
+                    push @out, {
+                                name => $font,
+                                desc => $font,
+                                type => $type,
+                               },
                 }
                 else {
                     push @out, \%styles;

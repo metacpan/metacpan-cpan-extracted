@@ -40,6 +40,7 @@
          "requires" : {
             "Future" : "0.34",
             "IO::Async" : "0.71",
+            "IO::Socket::IP" : "0.37",
             "Log::Any" : "1.000",
             "Ryu" : "0.024",
             "Syntax::Keyword::Try" : "0",
@@ -72,19 +73,19 @@
    "provides" : {
       "Ryu::Async" : {
          "file" : "lib/Ryu/Async.pm",
-         "version" : "0.007"
+         "version" : "0.008"
       },
       "Ryu::Async::Client" : {
          "file" : "lib/Ryu/Async/Client.pm",
-         "version" : "0.007"
+         "version" : "0.008"
       },
       "Ryu::Async::Packet" : {
          "file" : "lib/Ryu/Async/Packet.pm",
-         "version" : "0.007"
+         "version" : "0.008"
       },
       "Ryu::Async::Server" : {
          "file" : "lib/Ryu/Async/Server.pm",
-         "version" : "0.007"
+         "version" : "0.008"
       }
    },
    "release_status" : "stable",
@@ -98,7 +99,7 @@
          "web" : "https://github.com/team-at-cpan/Ryu-Async"
       }
    },
-   "version" : "0.007",
+   "version" : "0.008",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0237"
 }
 

@@ -4,7 +4,7 @@
       "Stevan Little <stevan@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -29,7 +29,7 @@
             "Sub::Metadata" : "0",
             "Sub::Name" : "0",
             "Symbol" : "0",
-            "UNIVERSAL::Object" : "0.12",
+            "UNIVERSAL::Object" : "0.13",
             "attributes" : "0",
             "mro" : "0",
             "perl" : "v5.10.1"
@@ -53,7 +53,7 @@
          "web" : "https://github.com/stevan/p5-MOP"
       }
    },
-   "version" : "0.11",
+   "version" : "0.12",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

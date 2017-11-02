@@ -1,11 +1,14 @@
 package App::Office::CMS::Controller::Initialize;
 
 use parent 'App::Office::CMS::Controller';
-use common::sense;
+use strict;
+use warnings;
 
 use Text::Xslate 'mark_raw';
 
-our $VERSION = '0.92';
+# We don't use Moo because we isa CGI::Application.
+
+our $VERSION = '0.93';
 
 # -----------------------------------------------
 

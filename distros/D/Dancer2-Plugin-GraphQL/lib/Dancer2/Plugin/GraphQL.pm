@@ -5,8 +5,9 @@ use warnings;
 use Dancer2::Core::Types qw(Bool);
 use Dancer2::Plugin;
 use GraphQL::Execution qw(execute);
+use Module::Runtime qw(require_module);
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 has graphiql => (
   is => 'ro',
@@ -56,6 +57,13 @@ sub _safe_serialize {
 plugin_keywords graphql => sub {
   my ($plugin, $pattern, @rest) = @_;
   my ($schema, $root_value, $field_resolver, $handler);
+  if (ref $rest[0] eq 'ARRAY') {
+    my ($class, @values) = @{ shift @rest };
+    $class = "GraphQL::Plugin::Convert::$class";
+    require_module $class;
+    my $converted = $class->to_graphql(@values);
+    unshift @rest, @{$converted}{qw(schema root_value resolver)};
+  }
   if (@rest == 4) {
     ($schema, $root_value, $field_resolver, $handler) = @rest;
   } else {
@@ -166,7 +174,16 @@ Dancer2::Plugin::GraphQL - a plugin for adding GraphQL route handlers
 The C<graphql> keyword which is exported by this plugin allow you to
 define a route handler implementing a GraphQL endpoint.
 
-Parameters, after the route pattern:
+Parameters, after the route pattern.
+The first three can be replaced with a single array-ref. If so,
+the first element is a classname-part, which will be prepended with
+"L<GraphQL::Plugin::Convert>::". The other values will be passed to
+that class's L<GraphQL::Plugin::Convert/to_graphql> method. The returned
+hash-ref will be used to set options.
+
+E.g.
+
+  graphql '/graphql' => [ 'Test' ]; # uses GraphQL::Plugin::Convert::Test
 
 =over 4
 

@@ -6,8 +6,8 @@ use Alien::Build::Plugin;
 use File::chdir;
 use Path::Tiny ();
 
-# ABSTRACT: Local file plugin for fetching files
-our $VERSION = '1.25'; # VERSION
+# ABSTRACT: Plugin for fetching a local file
+our $VERSION = '1.28'; # VERSION
 
 
 has '+url' => '';
@@ -98,11 +98,11 @@ __END__
 
 =head1 NAME
 
-Alien::Build::Plugin::Fetch::Local - Local file plugin for fetching files
+Alien::Build::Plugin::Fetch::Local - Plugin for fetching a local file
 
 =head1 VERSION
 
-version 1.25
+version 1.28
 
 =head1 SYNOPSIS
 
@@ -202,6 +202,10 @@ Petr Pisar (ppisar)
 Lance Wicks (LANCEW)
 
 Ahmad Fatoum (a3f, ATHREEF)
+
+José Joaquín Atria (JJATRIA)
+
+Duke Leto (LETO)
 
 =head1 COPYRIGHT AND LICENSE
 

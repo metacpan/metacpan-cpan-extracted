@@ -1,5 +1,5 @@
 package Net::HTTP::Spore::Middleware::LogDispatch;
-$Net::HTTP::Spore::Middleware::LogDispatch::VERSION = '0.07';
+$Net::HTTP::Spore::Middleware::LogDispatch::VERSION = '0.09';
 # ABSTRACT: Net::HTTP::Spore::Middleware::LogDispatch is a middleware that allow you to use LogDispatch.
 
 use Moose;
@@ -32,7 +32,7 @@ Net::HTTP::Spore::Middleware::LogDispatch - Net::HTTP::Spore::Middleware::LogDis
 
 =head1 VERSION
 
-version 0.07
+version 0.09
 
 =head1 SYNOPSIS
 

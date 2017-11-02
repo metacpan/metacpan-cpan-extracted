@@ -28,7 +28,38 @@ Optional command line arguements
 
 Displays the quick summary of program options.
 
-=head3 --measure
+=head3 --conceptexpansion
+
+Calculates the association score taking into account the occurrences of 
+descendants of the specified CUIs.
+
+=head3 --noorder
+
+If selected, the order in which CUIs appear will be disregarded when 
+the association score is calculated.
+
+=head3 --lta
+
+Linking Term Association - Calculates the association scores using 
+implicit or intermediate relationships between the specified CUIs,
+and the count of unique shared co-occurrences.
+
+=head3 --mwa
+
+Minimum Weight Association - Calculates the association scores using 
+implicit or intermediate relationships between the specified CUIs, 
+and the minimum co-occurrence count between shared co-occurrences.
+
+=head3 --vsa
+
+Vector Set Association - Calculates the association scores using the
+association between the sets of co-occurring terms of the original terms
+
+=head3 --precision N
+
+Displays values up to N places of decimal. (DEFAULT: 4)
+    
+=head3 --measure STRING
 
 The measure used to calculate the assocation. Default = tscore. 
 
@@ -59,30 +90,6 @@ Displays the version information.
 
 =head2 Input Options:
 
-=head3 --infile FILE
-
-A file containing pairs of concepts or terms in the following format:
-
-    term1<>term2 
-    
-    or 
-
-    cui1<>cui2
-
-    or 
-
-    cui1<>term2
-
-    or 
-
-    term1<>cui2
-
-Unless the --matrix option is chosen then it is just a list of CUIS:
-    cui1
-    cui2
-    cui3 
-    ...
-
 =head2 General Database Options:
 
 =head3 --username STRING
@@ -107,6 +114,13 @@ DEFAULT: mysql.sock
 =head3 --umlsdatabase STRING        
 
 Database contain UMLS DEFAULT: umls
+
+=head3 --matrix FILE
+
+File name containing co-occurrence data in sparse matrix format
+This is an alternative to storing in a database, but will be 
+slower for single queries, but much faster for multiple queries
+File should should be sparse format of the form CUI1\tCUI2\tvalue\\n \n\n";
 
 =head2 UMLS::Association Database Options:
 
@@ -150,6 +164,7 @@ The association between the two concepts (or terms)
 
  Bridget T. McInnes, Virginia Commonwealth University 
  Alexander D. McQuilkin, Virginia Commonwealth University
+ Sam Henry, Virginia Commonwealth University
 
 =head1 COPYRIGHT
 
@@ -176,23 +191,21 @@ this program; if not, write to:
 
 =cut
 
-###############################################################################
-
-#                               THE CODE STARTS HERE
-###############################################################################
-
-#                           ================================
-#                            COMMAND LINE OPTIONS AND USAGE
-#                           ================================
-
-
-use UMLS::Interface; 
-use UMLS::Association; 
+use UMLS::Interface;
+use UMLS::Association;
 use Getopt::Long;
 
-eval(GetOptions( "version", "help", "debug", "username=s", "password=s", "hostname=s", "umlsdatabase=s", "assocdatabase=s", "socket=s", "infile=s", "measure=s", "getdescendants", "config=s","precision=s")) or die ("Please check the above mentioned option(s).\n");
+my $DEFAULT_MEASURE = "tscore";
+
+#############################################
+#  Get Options and params
+#############################################
+eval(GetOptions( "version", "help", "debug", "username=s", "password=s", "hostname=s", "umlsdatabase=s", "assocdatabase=s", "socket=s",  "measure=s", "conceptexpansion", "noorder", "lta", "mwa", "vsa", "matrix=s", "config=s","precision=s")) or die ("Please check the above mentioned option(s).\n");
 
 
+#############################################
+#  Check help, version, minimal usage notes
+#############################################
 #  if help is defined, print out help
 if( defined $opt_help ) {
     $opt_help = 1;
@@ -210,10 +223,18 @@ if( defined $opt_version ) {
 # At least 1 term should be given on the command line.
 if(!(defined $opt_infile) && (scalar(@ARGV) < 1) ) {
     print STDERR "No term was specified on the command line\n";
-    #&minimalUsageNotes();
+    &minimalUsageNotes();
     exit;
 }
 
+#get required input
+my $cui1 = shift;
+my $cui2 = shift;
+
+
+#############################################
+#  Set Up UMLS::Interface
+#############################################
 #  set UMLS-Interface options
 my %umls_option_hash = ();
 
@@ -251,9 +272,19 @@ if(defined $opt_config){
 my $umls = UMLS::Interface->new(\%umls_option_hash); 
 die "Unable to create UMLS::Interface object.\n" if(!$umls);
 
+#############################################
+#  Set Up UMLS::Association
+#############################################
 #  set UMLS-Association option hash
 my %assoc_option_hash = ();
+$assoc_option_hash{'umls'} = $umls;
 
+if(defined $opt_measure) {
+    $assoc_option_hash{"measure"} = $opt_measure;
+}
+else {
+    $assoc_option_hash = $DEFAULT_MEASURE;
+}
 if(defined $opt_debug) {
     $assoc_option_hash{"debug"} = $opt_debug;
 }
@@ -278,92 +309,44 @@ if(defined $opt_hostname) {
 if(defined $opt_socket) {
     $assoc_option_hash{"socket"}   = $opt_socket;
 }
-if(defined $opt_getdescendants) {
-    $assoc_option_hash{"getdescendants"}   = $opt_getdescendants;
+if(defined $opt_conceptexpansion) {
+    $assoc_option_hash{"conceptexpansion"}   = $opt_conceptexpansion;
 }
 if(defined $opt_precision){
     $assoc_option_hash{"precision"} = $opt_precision;
 }
-$assoc_option_hash{"umls"} = $umls;
-
+if(defined $opt_lta){
+    $assoc_option_hash{"lta"} = $opt_lta;
+}
+if(defined $opt_mwa){
+    $assoc_option_hash{"mwa"} = $opt_mwa;
+}
+if(defined $opt_vsa) {
+    $assoc_option_hash{"vsa"} = $opt_vsa;
+}
+if(defined $opt_noorder){
+    $assoc_option_hash{"noorder"} = $opt_noorder;
+}
+if(defined $opt_matrix){
+    $assoc_option_hash{"matrix"} = $opt_matrix;
+}
 
 #  instantiate instance of UMLS-Assocation
-my $mmb = UMLS::Association->new(\%assoc_option_hash); 
-die "Unable to create UMLS::Association object.\n" if(!$mmb);
+my $association = UMLS::Association->new(\%assoc_option_hash); 
+die "Unable to create UMLS::Association object.\n" if(!$association);
 
-#  if --infile option defined calculate assocation over pairs in 
-#  the input file
-if(defined $opt_infile) { 
-    open(FILE, $opt_infile) || die "Could not open file ($opt_infile)\n";
-    while(<FILE>) { 
-	chomp;
-	my ($i1, $i2) = split/<>/;
-	calculateStat($i1, $i2); 
-    }
-}
-#  otherwise calculate the assocation over the two input terms
-else { 
-    my $input1 = shift; my $input2 = shift; 
-    calculateStat($input1, $input2); 
-}
 
-sub calculateStat { 
+#############################################
+#  Calculate Association
+#############################################
 
-    my $input1 = shift;
-    my $input2 = shift; 
-    
-    my $term1 = $input1; 
-    my $term2 = $input2; 
-    
-    my $c1 = undef;
-    if($input1=~/C[0-9]+/) {
-	push @{$c1}, $input1;
-	$term1 = $umls->getAllPreferredTerm($input1);
-    }
-    else {
-	$c1 = $umls->getConceptList($input1);
-    }
-    
-    my $c2 = undef;
-    if($input2=~/C[0-9]+/) {
-	push @{$c2}, $input2;
-	$term2 = $umls->getAllPreferredTerm($input2);
-    }
-    else {
-	$c2 = $umls->getConceptList($input2);
-    }
-    
-    my $measure = "tscore"; 
-    if(defined $opt_measure) { 
-	$measure = $opt_measure; 
-	
-	if(! ($measure=~/(ll|pmi|tmi|ps|x2|phi|leftFisher|rightFisher|twotailed|dice|jaccard|odds|tscore)/)) { 
-	    print STDER "That measure is not defined for this program\n";
-	    &showHelp();
-	    exit;
-	}
-    }
-
-    my $max = -1.000; my $mc1 = ""; my $mc2 = ""; 
-    foreach my $cui1 (@{$c1}) { 
-	foreach my $cui2 (@{$c2}) { 
-	    my $stat = $mmb->calculateStatistic($cui1, $cui2, $measure); 
-	    #my $stat2 = $mmb->calculateStatistic($cui2, $cui1, $measure); 
-	   # my $stat = $stat1 + $stat2 / 2; 
-	    if($stat > $max) { 
-		$max = $stat; $mc1 = $cui1; $mc2 = $cui2; 
-	    }
-	}
-    }
-    if($max == 0) { $max = -1; }
-    print "$max<>$term1($mc1)<>$term2($mc2)\n";
-}
+my $score = $association->calculateAssociation_termPair($cui1, $cui2, $assoc_option_hash{"measure"});
+print "$score<>$cui1<>$cui2\n";
 
 ##############################################################################
 #  function to output minimal usage notes
 ##############################################################################
 sub minimalUsageNotes {
-    
     print "Usage: umls-association.pl [OPTIONS] [TERM1 TERM2] [CUI1 CUI2]\n";
     &askHelp();
     exit;
@@ -399,20 +382,32 @@ sub showHelp() {
     print "--measure MEASURE        The measure to use to calculate the\n";
     print "                         assocation. (DEFAULT: tscore)\n\n";
 
-    print "--precision N            Displays values upto N places of decimal. (DEFAULT: 4)\n\n";
+    print "--precision N            Displays values up to N places of decimal. (DEFAULT: 4)\n\n";
 
     print "--version                Prints the version number\n\n";
     
     print "--help                   Prints this help message.\n\n";
 
-    print "--getdescendants         Calculates the association score taking into account
-                         the occurrences of descendants of the specified CUIs\n\n";
+    print "--conceptexpansion       Calculates the association score taking into account
+                                    the occurrences of descendants of the specified CUIs.\n\n";
+
+    print "--lta                    Linking Term Association - Calculates the association scores using implicit 
+                                    or intermediate relationships between the specified CUIs, and the count
+                                    of unique shared co-occurrences. \n\n";
+
+    print "--mwa                    Minimum Weight Association - Calculates the association scores using implicit 
+                                    or intermediate relationships between the specified CUIs, and the minimum
+                                    of co-occurrence count between shared co-occurrences. \n\n";
+
+    print "--vsa                    Vector Set Association - Calculates the association scores using the
+                                    association between the sets of co-occurring terms of the original terms\n\n";
+
+    print "--noorder                If selected, the order in which CUIs appear will be disregarded when the association 
+                                    score is calculated.\n\n";
 
     print "--config FILE            Configuration file\n\n";    
 
     print "\n\nInput Options: \n\n";
-
-    print "--infile FILE            File containing TERM or CUI pairs\n\n";  
 
     print "\n\nGeneral Database Options:\n\n"; 
 
@@ -425,22 +420,24 @@ sub showHelp() {
 
     print "\n\nUMLS-Interface Database Options: \n\n";
 
-    print "--umlsdatabase STRING        Database contain UMLS (DEFAULT: umls)\n\n";
+    print "--matrix FILE            File name containing co-occurrence data in sparse matrix format
+                                    This is an alternative to storing in a database, but will be 
+                                    slower for single queries, but much faster for multiple queries.
+                                    File should should be sparse format of the form CUI1\tCUI2\tvalue\\n \n\n";
+
+    print "--umlsdatabase STRING    Database contain UMLS (DEFAULT: umls)\n\n";
     
     print "\n\nUMLS-Association Database Options: \n\n";
 
     print "--assocdatabase STRING        Database containing CUI bigrams 
-                              (DEFAULT: CUI_BIGRAMS)\n\n";
-    
-    
-
+                                         (DEFAULT: CUI_BIGRAMS)\n\n";
 }
 ##############################################################################
 #  function to output the version number
 ##############################################################################
 sub showVersion {
-    print '$Id: umls-assocation.pl,v 0.01 2015/06/24 19:25:05 btmcinnes Exp $';
-    print "\nCopyright (c) 2015, Bridget McInnes\n";
+    print "current version is ".(Association->version())."\n";
+    exit;
 }
 
 ##############################################################################

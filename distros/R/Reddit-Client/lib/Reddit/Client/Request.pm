@@ -7,6 +7,7 @@ use Carp;
 use LWP::UserAgent qw//;
 use HTTP::Request  qw//;
 use URI::Encode    qw/uri_encode/;
+use URI::Escape    qw/uri_escape/; # next update, also line 122
 
 require Reddit::Client;
 
@@ -19,7 +20,8 @@ use fields (
     'cookie',
     'modhash',
     'token',
-    'tokentype'
+    'tokentype',
+	'request_errors',
 );
 
 sub new {
@@ -33,6 +35,7 @@ sub new {
     $self->{modhash}    = $param{modhash};
     $self->{token}	= $param{token};
     $self->{tokentype}	= $param{tokentype};
+	$self->{request_errors}= $param{request_errors} || 0;
 
     if (defined $self->{query}) {
         ref $self->{query} eq 'HASH' || croak 'Expected HASH ref for "query"';
@@ -99,7 +102,11 @@ sub send {
     if ($res->is_success) {
         return $res->content;
     } else {
-        croak "Request error: HTTP ".$res->status_line .", Content: $res->{_content}";
+	if ($self->{request_errors}) {
+        	croak "Request error: HTTP ".$res->status_line .", Content: $res->{_content}";
+	} else {
+		croak sprintf('Request error: HTTP %s', $res->status_line);
+	}
     }
 }
 
@@ -112,7 +119,8 @@ sub token_request {
 	my $req = HTTP::Request->new(POST => $url);
 	$req->header('content-type' => 'application/x-www-form-urlencoded');
 
-	my $postdata = "grant_type=password&username=$username&password=$password";
+	#my $postdata = "grant_type=password&username=$username&password=$password";
+	my $postdata = "grant_type=password&username=$username&password=" . uri_escape($password);
 	$req->content($postdata);
 
     	my $res = $ua->request($req);

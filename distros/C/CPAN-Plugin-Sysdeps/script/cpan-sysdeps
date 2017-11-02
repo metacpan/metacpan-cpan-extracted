@@ -9,7 +9,12 @@ use Getopt::Long;
 sub usage (;$) {
     my $msg = shift;
     if ($msg) { warn $msg, "\n" }
-    die "usage: $0 [--cpandist Dist-Name | --cpanmod Mod::Name]\n";
+    die <<EOF;
+usage: $0 [--cpandist Dist-Name | --cpanmod Mod::Name]
+          [--uninstalled|--dry-run|--run] [--debug]
+          [--os ...] [--osvers ...]
+          [--linuxdistro ...] [--linuxdistroversion ...] [--linuxdistrocodename]
+EOF
 }
 
 GetOptions(
@@ -22,7 +27,7 @@ GetOptions(
 	   'linuxdistrocodename=s' => \my $linuxdistrocodename,
 	   'uninstalled'           => \my $uninstalled,
 	   'debug'                 => \my $debug,
-	   'n|dryrun'              => \my $dryrun,
+	   'n|dryrun|dry-run'      => \my $dryrun,
 	   'run'                   => \my $run,
 	  )
     or usage;

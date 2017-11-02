@@ -1,4 +1,9 @@
 #!/usr/bin/perl
+
+# [[[ PREPROCESSOR ]]]
+# <<< EXECUTE_SUCCESS: 'have $foo = howdy hello ahoy' >>>
+# <<< EXECUTE_SUCCESS: "have $bar = $foo !~ m/owdy/gxms = ''" >>>
+
 # [[[ HEADER ]]]
 use RPerl;
 use strict;
@@ -11,14 +16,11 @@ our $VERSION = 0.001_000;
 
 # [[[ OPERATIONS ]]]
 
+# BIND, LITERAL PATTERN
+
 my string $foo  = 'howdy hello ahoy';
-my integer $bax = ( $foo =~ s/ho/HO/gms );
+my integer $bar = $foo !~ m/owdy/gxms;
 
 print 'have $foo = ', $foo, "\n";
-print 'have $bax = ', $bax, "\n";
+print q{have $bar = $foo !~ m/owdy/gxms = '}, $bar, q{'}, "\n";
 
-$foo = 'Alpha Bravo Charlie 123';
-$bax = ( $foo !~ s/ha/HAHA/gms );
-
-print 'have $foo = ', $foo, "\n";
-print 'have $bax = ', $bax, "\n";

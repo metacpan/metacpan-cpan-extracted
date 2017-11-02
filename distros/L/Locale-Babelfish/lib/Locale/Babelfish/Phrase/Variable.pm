@@ -6,7 +6,7 @@ use utf8;
 use strict;
 use warnings;
 
-our $VERSION = '1.000000'; # VERSION
+our $VERSION = '2.003'; # VERSION
 
 use parent qw( Locale::Babelfish::Phrase::Node );
 
@@ -32,7 +32,7 @@ Locale::Babelfish::Phrase::Variable - Babelfish AST Variable substitution node.
 
 =head1 VERSION
 
-version 1.000000
+version 2.003
 
 =head1 AUTHORS
 
@@ -48,13 +48,17 @@ Igor Mironov <grif@cpan.org>
 
 =item *
 
+Victor Efimov <efimov@reg.ru>
+
+=item *
+
 REG.RU LLC
 
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014 by Akzhan Abdulin.
+This software is Copyright (c) 2014 by REG.RU LLC.
 
 This is free software, licensed under:
 

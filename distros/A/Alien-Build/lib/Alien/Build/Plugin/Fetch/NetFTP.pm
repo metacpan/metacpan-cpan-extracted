@@ -7,8 +7,8 @@ use Carp ();
 use File::Temp ();
 use Path::Tiny qw( path );
 
-# ABSTRACT: Net::FTP plugin for fetching files
-our $VERSION = '1.25'; # VERSION
+# ABSTRACT: Plugin for fetching files using Net::FTP
+our $VERSION = '1.28'; # VERSION
 
 
 has '+url' => '';
@@ -154,11 +154,11 @@ __END__
 
 =head1 NAME
 
-Alien::Build::Plugin::Fetch::NetFTP - Net::FTP plugin for fetching files
+Alien::Build::Plugin::Fetch::NetFTP - Plugin for fetching files using Net::FTP
 
 =head1 VERSION
 
-version 1.25
+version 1.28
 
 =head1 SYNOPSIS
 
@@ -243,6 +243,10 @@ Petr Pisar (ppisar)
 Lance Wicks (LANCEW)
 
 Ahmad Fatoum (a3f, ATHREEF)
+
+José Joaquín Atria (JJATRIA)
+
+Duke Leto (LETO)
 
 =head1 COPYRIGHT AND LICENSE
 

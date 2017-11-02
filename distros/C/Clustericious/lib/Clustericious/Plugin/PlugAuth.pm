@@ -9,7 +9,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 use JSON::MaybeXS qw( encode_json );
 
 # ABSTRACT: Plugin for clustericious to use PlugAuth.
-our $VERSION = '1.26'; # VERSION
+our $VERSION = '1.27'; # VERSION
 
 
 has 'config_url';
@@ -166,7 +166,7 @@ Clustericious::Plugin::PlugAuth - Plugin for clustericious to use PlugAuth.
 
 =head1 VERSION
 
-version 1.26
+version 1.27
 
 =head1 SYNOPSIS
 

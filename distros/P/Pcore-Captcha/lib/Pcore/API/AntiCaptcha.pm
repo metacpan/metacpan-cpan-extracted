@@ -75,6 +75,41 @@ sub resolve ( $self, @ ) {
     return;
 }
 
+sub recaptcha_proxy ( $self, @ ) {
+    my $cb = $_[-1];
+
+    my %args = (
+        website_url   => undef,
+        website_key   => undef,
+        proxy_type    => 'socks5',
+        proxy_address => undef,
+        proxy_port    => undef,
+        user_agent    => undef,
+        cookies       => undef,
+        @_[ 1 .. $#_ - 1 ]
+    );
+
+    my $captcha = Pcore::Captcha->new( { image => \q[] } );
+
+    my $body = {
+        clientKey => $self->api_key,
+        task      => {
+            type         => 'NoCaptchaTask',
+            websiteURL   => $args{website_url},
+            websiteKey   => $args{website_key},
+            proxyType    => $args{proxy_type},
+            proxyAddress => $args{proxy_address},
+            proxyPort    => $args{proxy_port},
+            userAgent    => $args{user_agent},
+            $args{cookies} ? ( cookies => $args{cookies} ) : (),
+        },
+    };
+
+    $self->_resolve( $captcha, $body, $cb );
+
+    return;
+}
+
 sub get_balance ( $self, $cb ) {
     P->http->post(
         'https://api.anti-captcha.com/getBalance',
@@ -242,7 +277,7 @@ sub _run_resolver ($self) {
 
                             $task->[0]->set_status(200);
 
-                            $task->[0]->@{qw[result cost ip create_time end_time solve_count]} = ( $data->{solution}->{text}, $data->{cost}, $data->{ip}, $data->{createTime}, $data->{endTime}, $data->{solveCount} );
+                            $task->[0]->@{qw[result cost ip create_time end_time solve_count]} = ( $data->{solution}->{text} // $data->{solution}->{gRecaptchaResponse}, $data->{cost}, $data->{ip}, $data->{createTime}, $data->{endTime}, $data->{solveCount} );
 
                             $task->[1]->( $task->[0] );
                         }
@@ -264,6 +299,16 @@ sub _run_resolver ($self) {
 }
 
 1;
+## -----SOURCE FILTER LOG BEGIN-----
+##
+## PerlCritic profile "pcore-script" policy violations:
+## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
+## | Sev. | Lines                | Policy                                                                                                         |
+## |======+======================+================================================================================================================|
+## |    1 | 81                   | CodeLayout::RequireTrailingCommas - List declaration without trailing comma                                    |
+## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
+##
+## -----SOURCE FILTER LOG END-----
 __END__
 =pod
 

@@ -1,5 +1,6 @@
 package Bio::Phylo::Forest::Node;
 use strict;
+use warnings;
 use Bio::Phylo::Forest::DrawNodeRole;
 use base qw'Bio::Phylo::Forest::DrawNodeRole';
 use Bio::Phylo::Util::CONSTANT qw':objecttypes /looks_like/';
@@ -12,7 +13,7 @@ my ( $TYPE_CONSTANT, $CONTAINER_CONSTANT ) = ( _NODE_, _TREE_ );
 {    
 
     # @fields array necessary for object destruction
-    my @fields = \( my ( %branch_length, %parent, %tree ) );
+    my @fields = \( my ( %branch_length, %parent, %tree, %rank ) );
 
 =head1 NAME
 
@@ -108,10 +109,31 @@ Sets argument as invocant's parent.
             $parent->set_child($self);
         }
         elsif ( not $parent ) {
-            $set_raw_parent->($self);
+            $self->set_raw_parent;
         }
         return $self;
     }
+
+=item set_raw_parent()
+
+Sets argument as invocant's parent. This method does NO 
+sanity checks on the rest of the topology. Use with caution.
+
+ Type    : Mutator
+ Title   : set_raw_parent
+ Usage   : $node->set_raw_parent($parent);
+ Function: Assigns a node's parent.
+ Returns : Modified object.
+ Args    : If no argument is given, the current
+           parent is set to undefined. A valid
+           argument is Bio::Phylo::Forest::Node
+           object.
+
+=cut
+
+	sub set_raw_parent {
+		$set_raw_parent->(@_)
+	}
 
 =item set_child()
 
@@ -164,9 +186,9 @@ Sets argument as invocant's child.
             $parent_parent->prune_child($self);
 
             # step 2.
-            $set_raw_parent->( $self, $child_parent );    # XXX could be undef
+            $self->set_raw_parent( $child_parent );    # XXX could be undef
             if ($child_parent) {
-                $set_raw_child->( $child_parent, $self );
+                $child_parent->set_raw_child( $self );
             }
         }
 
@@ -174,14 +196,14 @@ Sets argument as invocant's child.
         if ($child_parent) {
             $child_parent->prune_child($child);
         }
-        $set_raw_parent->( $child, $self );
+        $child->set_raw_parent( $self );
 
         # now do the insert, first make room by shifting later siblings right
         my $children = $self->get_children;
         if ( defined $i ) {
             for ( my $j = $#{$children} ; $j >= 0 ; $j-- ) {
                 my $sibling = $children->[$j];
-                $set_raw_child->( $self, $sibling, $j + 1 );
+                $self->set_raw_child( $sibling, $j + 1 );
             }
         }
 
@@ -191,9 +213,28 @@ Sets argument as invocant's child.
         }
 
         # step 4.
-        $set_raw_child->( $self, $child, $i );
+        $self->set_raw_child( $child, $i );
         return $self;
     }
+
+=item set_raw_child()
+
+Sets argument as invocant's child. This method does NO 
+sanity checks on the rest of the topology. Use with caution.
+
+ Type    : Mutator
+ Title   : set_raw_child
+ Usage   : $node->set_raw_child($child);
+ Function: Assigns a new child to $node
+ Returns : Modified object.
+ Args    : A valid argument consists of a
+           Bio::Phylo::Forest::Node object.
+
+=cut
+
+	sub set_raw_child {
+		$set_raw_child->(@_);
+	}
     
 =item set_branch_length()
 
@@ -216,6 +257,9 @@ Sets argument as invocant's branch length.
         my $id = $self->get_id;
         if ( defined $bl && looks_like_number $bl && !ref $bl ) {
             $branch_length{$id} = $bl;
+			if ( $bl < 0 ) {
+				$self->get_logger->warn("Setting length < 0: $bl");
+			}
         }
         elsif ( defined $bl && ( !looks_like_number $bl || ref $bl ) ) {
             throw 'BadNumber' => "Branch length \"$bl\" is a bad number";
@@ -258,6 +302,27 @@ Sets what tree invocant belongs to
             $tree{$id} = undef;
         }
         return $self;
+    }
+
+=item set_rank()
+
+Sets the taxonomic rank of the node
+
+ Type    : Mutator
+ Title   : set_rank
+ Usage   : $node->set_rank('genus');
+ Function: Sets the taxonomic rank of the node
+ Returns : Invocant
+ Args    : String
+ Comments: Free-form, but highly recommended to use same rank names as in Bio::Taxon
+
+=cut
+
+    
+    sub set_rank : Clonable {
+    	my ( $self, $rank ) = @_;
+    	$rank{$self->get_id} = $rank;
+    	return $self;
     }
 
 =item get_parent()
@@ -328,6 +393,44 @@ Returns the tree invocant belongs to
         my $self = shift;
         my $id   = $self->get_id;
         return $tree{$id};
+    }
+
+=item get_rank()
+
+Gets the taxonomic rank of the node
+
+ Type    : Mutator
+ Title   : get_rank
+ Usage   : my $rank = $node->get_rank;
+ Function: Gets the taxonomic rank of the node
+ Returns : String
+ Args    : NONE
+ Comments: 
+
+=cut
+    
+    sub get_rank { $rank{shift->get_id} }
+
+=begin comment
+
+ Type    : Internal method
+ Title   : _json_data
+ Usage   : $node->_json_data;
+ Function: Populates a data structure to be serialized as JSON
+ Returns : 
+ Args    :
+
+=end comment
+
+=cut
+    
+    sub _json_data {
+    	my $self = shift;
+    	my %result = %{ $self->SUPER::_json_data };
+    	$result{'length'}   = $self->get_branch_length if defined $self->get_branch_length;
+    	$result{'rank'}     = $self->get_rank if $self->get_rank;
+    	$result{'children'} = [ map { $_->_json_data } @{ $self->get_children } ];
+    	return \%result;
     }
 
 =begin comment

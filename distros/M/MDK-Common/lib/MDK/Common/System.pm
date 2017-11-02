@@ -55,6 +55,14 @@ where each entry is [ magic_name, offset, string, offset, string, ... ].
 
 return the list of users as given by C<getpwent> (see perlfunc)
 
+=item is_real_user()
+
+checks whether or not the user is a system user or a real user
+
+=item is_real_group()
+
+checks whether or not the group is a system group or a real group
+
 =item list_home()
 
 return the list of home (eg: /home/foo, /home/pixel, ...)
@@ -65,8 +73,8 @@ return the directories where we can find dot files: homes, /root and /etc/skel
 
 =item list_users()
 
-return the list of unprivilegied users (aka those whose uid is greater
-than 500 and who are not "nobody").
+return the list of unprivilegied users (uses the is_real_user function to filter
+out system users from the full list)
 
 =item syscall_(NAME, PARA)
 
@@ -199,7 +207,7 @@ use MDK::Common::DataStructure;
 
 use Exporter;
 our @ISA = qw(Exporter);
-our @EXPORT_OK = qw(%compat_arch $printable_chars $sizeof_int $bitof_int arch distrib typeFromMagic list_passwd list_home list_skels list_users syscall_ psizeof availableMemory availableRamMB gettimeofday unix2dos whereis_binary getVarsFromSh setVarsInSh setVarsInShMode addVarsInSh addVarsInShMode setExportedVarsInSh setExportedVarsInCsh template2file template2userfile read_gnomekderc update_gnomekderc fuzzy_pidofs); #);
+our @EXPORT_OK = qw(%compat_arch $printable_chars $sizeof_int $bitof_int arch distrib typeFromMagic list_passwd is_real_user is_real_group list_home list_skels list_users syscall_ psizeof availableMemory availableRamMB gettimeofday unix2dos whereis_binary getVarsFromSh setVarsInSh setVarsInShMode addVarsInSh addVarsInShMode setExportedVarsInSh setExportedVarsInCsh template2file template2userfile read_gnomekderc update_gnomekderc fuzzy_pidofs); #);
 our %EXPORT_TAGS = (all => [ @EXPORT_OK ]);
 
 
@@ -288,8 +296,45 @@ sub list_passwd() {
     endpwent();
     @l;
 }
+sub is_real_user {
+    my ($username) = @_;
+
+    return 0 if $username eq "nobody";
+
+    # We consider real users to be those users who:
+    # Have a UID >= 1000
+    #    or
+    # Have a UID >= 500
+    #  and have a homedir that is not / or does not start with /var or /run
+    #  and have a shell that does not end in "nologin" or "false"
+
+    my (undef, undef, $uid, undef, undef, undef, undef, $homedir, $shell) = getpwnam($username);
+    ($uid >= 1000 || ($uid >= 500 && $homedir !~ m!^/($|var/|run/)! && $shell !~ /(nologin|false)$/));
+}
+sub is_real_group {
+    my ($groupname) = @_;
+
+    return 0 if $groupname eq "nogroup";
+
+    my (undef, undef, $gid, $members) = getgrnam($groupname);
+    return 0 if $gid < 500;
+    return 1 if $gid >= 1000;
+
+    # We are in the range 500-1000, so we need some heuristic.
+    # We consider ourselves a "real" group if this is the primary group of a user
+    # with the same name, or we have any member users who are "real"
+
+    my (undef, undef, undef, $ugid) = getpwnam($groupname);
+    return 1 if $ugid == $gid && is_real_user($groupname);
+
+    # OK we're not a primary group, but perhaps we have some real members?
+    foreach (split(' ', $members)) {
+        return 1 if is_real_user($_);
+    }
+    return 0;
+}
 sub list_home() {
-    MDK::Common::DataStructure::uniq(map { $_->[7] } grep { $_->[2] >= 500 } list_passwd());
+    MDK::Common::DataStructure::uniq(map { $_->[7] } grep { is_real_user($_->[0]) } list_passwd());
 }
 sub list_skels { 
     my ($prefix, $suffix) = @_;
@@ -297,7 +342,7 @@ sub list_skels {
 }
 
 sub list_users() {
-    MDK::Common::DataStructure::uniq(map { 500 <= $_->[2] && $_->[0] ne "nobody" ? $_->[0] : () } list_passwd());
+    MDK::Common::DataStructure::uniq(map { is_real_user($_->[0]) ? $_->[0] : () } list_passwd());
 }
 
 
@@ -342,7 +387,8 @@ sub expandLinkInChroot {
 sub whereis_binary {
     my ($prog, $o_prefix) = @_;
     if ($prog =~ m!/!) {
-	warn qq(don't call whereis_binary with a name containing a "/" (the culprit is: $prog)\n);
+	require MDK::Common::Various;
+	warn qq(don't call whereis_binary with a name containing a "/" (the culprit is: $prog)\n) . MDK::Common::Various::backtrace();
 	return;
     }
     foreach (split(':', $ENV{PATH})) {
@@ -413,7 +459,7 @@ sub quoteForSh {
 
 sub setVarsInShMode {
     my ($file, $mod, $l, @fields) = @_;
-    @fields = keys %$l unless @fields;
+    @fields = sort keys %$l unless @fields;
     my $string = join('',
 	map { "$_=" . quoteForSh($l->{$_}) . "\n" } grep { $l->{$_} } @fields
     );

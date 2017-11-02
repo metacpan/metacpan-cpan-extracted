@@ -1,5 +1,5 @@
 #
-# $Id: File.pm,v f6ad8c136b19 2017/01/01 10:13:54 gomor $
+# $Id: File.pm,v 05c36070ec99 2017/05/02 06:10:24 gomor $
 #
 # log::file Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Core::Log);
 
 sub brik_properties {
    return {
-      revision => '$Revision: f6ad8c136b19 $',
+      revision => '$Revision: 05c36070ec99 $',
       tags => [ qw(unstable logging) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -60,7 +60,7 @@ sub brik_init {
    open(my $fd, '>>', $output)
       or return $self->log->error("brik_init: can't open output file [$output]: $!");
 
-   $self->log->info("brik_init: now logging to file [$output]");
+   $self->log->verbose("brik_init: now logging to file [$output]");
 
    # Makes the file handle unbuffered
    my $current = select;

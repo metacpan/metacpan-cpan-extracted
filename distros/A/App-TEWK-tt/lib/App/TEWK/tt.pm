@@ -1,6 +1,6 @@
 package App::TEWK::tt;
 
-our $VERSION = 0.01;
+our $VERSION = 0.03;
 
 =head1 NAME
 

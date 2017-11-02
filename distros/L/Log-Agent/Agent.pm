@@ -3,7 +3,7 @@
 #   Agent.pm
 #
 #   Copyright (C) 1999 Raphael Manfredi.
-#   Copyright (C) 2002-2015 Mark Rogaski, mrogaski@cpan.org;
+#   Copyright (C) 2002-2017 Mark Rogaski, mrogaski@cpan.org;
 #   all rights reserved.
 #
 #   See the README file included with the
@@ -36,7 +36,7 @@ use vars qw(@ISA @EXPORT @EXPORT_OK);
 use Log::Agent::Priorities qw(:LEVELS priority_level level_from_prio);
 use Log::Agent::Formatting qw(tag_format_args);
 
-our $VERSION = '1.001';
+our $VERSION = '1.002';
 $VERSION = eval $VERSION;
 
 $Trace = NOTICE;	# Default tracing

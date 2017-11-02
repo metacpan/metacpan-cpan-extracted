@@ -17,8 +17,8 @@ Convert various types of Japanese characters into one another.
 
 =head1 VERSION
 
-This document describes Lingua::JA::Moji version 0.46
-corresponding to git commit L<1b6d2bea0e044f6da33e62325a87070671be692c|https://github.com/benkasminbullock/Lingua-JA-Moji/commit/1b6d2bea0e044f6da33e62325a87070671be692c> made on Tue Oct 24 10:39:21 2017 +0900.
+This document describes Lingua::JA::Moji version 0.47
+corresponding to git commit L<dd0d3ba9ecbafa4492248c27b984b07d6573565b|https://github.com/benkasminbullock/Lingua-JA-Moji/commit/dd0d3ba9ecbafa4492248c27b984b07d6573565b> made on Wed Nov 1 13:04:35 2017 +0900.
 
 =head1 DESCRIPTION
 
@@ -797,6 +797,8 @@ large kanas used for youon or sokuon into smaller kana. If the
 conversion succeeds, return the converted value, otherwise return the
 undefined value. This function is experimental.
 
+This was added to the module in version 0.46.
+
 
 
 
@@ -813,6 +815,8 @@ undefined value. This function is experimental.
 
 Clean up mixed kana and romaji inputs into katakana, and convert stray
 "one" kanjis into chouons. This function is experimental.
+
+This was added to the module in version 0.46.
 
 
 
@@ -1237,15 +1241,25 @@ exists, otherwise do nothing with it.
 
 
 
+=head2 yurei_moji 
 
 
-=head1 CYRILLIZATION
 
-This is an experimental cyrillization of kana based on the information
-in a Wikipedia article,
-L<http://en.wikipedia.org/wiki/Cyrillization_of_Japanese>. The module
-author does not know anything about cyrillization of kana, so any
-assistance in correcting this is very welcome.
+    use Lingua::JA::Moji 'yurei_moji';
+
+
+
+
+
+
+
+=head2 bad_kanji 
+
+
+
+    use Lingua::JA::Moji 'bad_kanji';
+
+
 
 
 
@@ -1506,7 +1520,8 @@ based on copy and paste of the Unicode 10.0 standard draft
 documents. See the directory L<F<data>|https://github.com/benkasminbullock/Lingua-JA-Moji/tree/master/data> in the github repository for the files used to
 generate this data.
 
-0.46 disallowed hyphens as the first character of a romaji string.
+0.46 disallowed hyphens as the first character of a romaji string and
+added L</smallize_kana> and L</cleanup_kana>.
 
 
 

@@ -10,7 +10,7 @@ use experimental qw[
 
 use UNIVERSAL::Object;
 
-our $VERSION   = '0.05';
+our $VERSION   = '0.06';
 our $AUTHORITY = 'cpan:STEVAN';
 
 our @ISA; BEGIN { @ISA = ('UNIVERSAL::Object') }
@@ -40,7 +40,7 @@ Moxie::Object - Yet Another Base Class
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 DESCRIPTION
 

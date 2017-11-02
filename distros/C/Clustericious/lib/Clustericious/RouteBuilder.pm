@@ -8,7 +8,7 @@ use Log::Log4perl qw( :easy );
 use Mojo::Util qw( monkey_patch );
 
 # ABSTRACT: Route builder for Clustericious applications
-our $VERSION = '1.26'; # VERSION
+our $VERSION = '1.27'; # VERSION
 
 
 my %routes;
@@ -220,7 +220,7 @@ Clustericious::RouteBuilder - Route builder for Clustericious applications
 
 =head1 VERSION
 
-version 1.26
+version 1.27
 
 =head1 SYNOPSIS
 

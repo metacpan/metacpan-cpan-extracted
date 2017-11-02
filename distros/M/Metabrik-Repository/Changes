@@ -1,5 +1,24 @@
 Revision history for Perl extension Metabrik::Repository.
 
+1.27.0 Thu  2 Nov 10:13:57 CET 2017
+   - new: string::javascript Brik
+   - new: forensic::sysmon Brik
+   - new: file::base64 Brik
+   - new: remote::sysmon Brik
+   - new: remote::winsvc Brik
+   - new: forensic::pcap Brik
+   - new: file::javascript Brik
+   - new: remote::sandbox Brik
+   - new: remote::windefend Brik
+   - new: string::http Brik
+   - new: password::rockyou Brik
+   - new: api::abuseipdb Brik
+   - new: audio::soundconverter Brik
+   - new: system::linux::pps Brik
+   - new: system::linux::cpuinfo Brik
+   - new: client::kafka Brik
+   - new: server::kafka Brik
+
 1.26.0 Sat  4 Feb 17:41:44 CET 2017
    - new: server::logstash::indexer Brik
    - new: server::logstash::oneshot Brik

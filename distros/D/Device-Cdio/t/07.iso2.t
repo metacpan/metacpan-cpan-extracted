@@ -22,17 +22,32 @@ use POSIX;
 use Test::More tests => 5;
 note 'Test ISO9660::IFS routines';
 
+# Use Canonic timezone in date testing
+$ENV{'TZ'} = 'UTC';
+
 # The test CD image
 my $CD_IMAGE_PATH="../data";
 my $cd_image_fname=File::Spec->catfile($CD_IMAGE_PATH, "isofs-m1.cue");
-my $local_filename='COPYING.;1';
+my $local_filename='COPYING';
 
 my $cd = Device::Cdio::ISO9660::FS->new(-source=>$cd_image_fname);
-  
+
 ok(defined($cd), "Open CD image $cd_image_fname") ;
 
-my $good_stat = { LSN=>26, 'filename'=>$local_filename, is_dir=>'', 
-		  sec_size=>9, size=>17992 };
+my $good_stat = { LSN=>26, 'filename'=>$local_filename, is_dir=>'',
+		  sec_size=>9, size=>17992,
+		  tm => {
+		      hour  => 12,
+		      isdst =>  0,
+		      mday  => 29,
+		      min   => 39,
+		      mon   =>  7,
+		      sec   => 53,
+		      wday  =>  1,
+		      yday  =>  209,
+		      year  => 2002,
+		    },
+                };
 
 my $stat_href = $cd->find_lsn(26);
 
@@ -44,14 +59,62 @@ is_deeply($statbuf, $good_stat, "CD 9660 file stats: stat('$local_filename)'");
 
 my @iso_stat = $cd->readdir ("/");
 
-my @good_stat = ( { LSN=>23, 'filename'=>'.', is_dir=>1, 
-		  sec_size=>1, size=>2048 },
-		  { LSN=>23, 'filename'=>'..', is_dir=>1, 
-		  sec_size=>1, size=>2048 },
-		  { LSN=>26, 'filename'=>'COPYING.;1', is_dir=>'', 
-		    sec_size=>9, size=>17992 },
-		  { LSN=>24, 'filename'=>'DOC', is_dir=>1, 
-		    sec_size=>1, size=>2048 } );
+my @good_stat = ( { LSN=>23, 'filename'=>'.', is_dir=>1,
+		  sec_size=>1, size=>2048,
+		  tm => {
+		      hour  => 11,
+		      isdst =>  0,
+		      mday  => 20,
+		      min   => 26,
+		      mon   =>  4,
+		      sec   => 46,
+		      wday  =>  0,
+		      yday  => 109,
+		      year  => 2003,
+		    },
+		  },
+		  { LSN=>23, 'filename'=>'..', is_dir=>1,
+		    sec_size=>1, size=>2048,
+		    tm => {
+		      hour  => 11,
+		      isdst =>  0,
+		      mday  => 20,
+		      min   => 26,
+		      mon   =>  4,
+		      sec   => 46,
+		      wday  =>  0,
+		      yday  => 109,
+		      year  => 2003,
+		    },
+		  },
+		  { LSN=>26, 'filename'=>'COPYING', is_dir=>'',
+		    sec_size=>9, size=>17992,
+		    tm => {
+		      hour  => 12,
+		      isdst =>  0,
+		      mday  => 29,
+		      min   => 39,
+		      mon   =>  7,
+		      sec   => 53,
+		      wday  =>  1,
+		      yday  => 209,
+		      year  => 2002,
+		    },
+		  },
+		  { LSN=>24, 'filename'=>'doc', is_dir=>1,
+		    sec_size=>1, size=>2048,
+		    tm => {
+		      hour  => 16,
+		      isdst =>  0,
+		      mday  => 20,
+		      min   => 18,
+		      mon   =>  4,
+		      sec   => 53,
+		      wday  =>  0,
+		      yday  => 109,
+		      year  => 2003,
+		    },
+		  }, );
 
 is_deeply(\@iso_stat, \@good_stat, "Read directory: readdir('/')");
 

@@ -4,7 +4,7 @@ use 5.008;
 use strict;
 use warnings;
 
-our $VERSION = '2.003005';
+our $VERSION = '2.004000';
 
 1;
 
@@ -22,7 +22,7 @@ GeoIP2 - Perl API for MaxMind's GeoIP2 web services and databases
 
 =head1 VERSION
 
-version 2.003005
+version 2.004000
 
 =head1 DESCRIPTION
 
@@ -146,7 +146,7 @@ Olaf Alders <oalders@maxmind.com>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Andy Jack E. Choroba Florian Ragwitz Graham Knop Mateu X Hunter Narsimham Chelluri
+=for stopwords Andy Jack E. Choroba Florian Ragwitz Graham Knop Mateu X Hunter Michael F. Canzoneri Narsimham Chelluri Will Storey
 
 =over 4
 
@@ -172,7 +172,15 @@ Mateu X Hunter <mhunter@maxmind.com>
 
 =item *
 
+Michael F. Canzoneri <mikecanzoneri@gmail.com>
+
+=item *
+
 Narsimham Chelluri <nchelluri@users.noreply.github.com>
+
+=item *
+
+Will Storey <will@summercat.com>
 
 =back
 

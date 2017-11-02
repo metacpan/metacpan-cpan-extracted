@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Software::License::GFDL_1_3;
-$Software::License::GFDL_1_3::VERSION = '0.103012';
+$Software::License::GFDL_1_3::VERSION = '0.103013';
 use parent 'Software::License';
 # ABSTRACT: The GNU Free Documentation License v1.3
 
@@ -22,7 +22,7 @@ Software::License::GFDL_1_3 - The GNU Free Documentation License v1.3
 
 =head1 VERSION
 
-version 0.103012
+version 0.103013
 
 =head1 AUTHOR
 
@@ -30,7 +30,7 @@ Ricardo Signes <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Ricardo Signes.
+This software is copyright (c) 2017 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -51,7 +51,7 @@ GNU Free Documentation License
 
 Version 1.3, 3 November 2008
 
-Copyright Â© 2000, 2001, 2002, 2007, 2008 Free Software Foundation, Inc.
+Copyright © 2000, 2001, 2002, 2007, 2008 Free Software Foundation, Inc.
 <http://fsf.org/>
 
 Everyone is permitted to copy and distribute verbatim copies of this license
@@ -271,7 +271,7 @@ Version's license notice. These titles must be distinct from any other section
 titles.
 
 You may add a section Entitled "Endorsements", provided it contains nothing but
-endorsements of your Modified Version by various partiesâfor example,
+endorsements of your Modified Version by various parties—for example,
 statements of peer review or that the text has been approved by an organization
 as the authoritative definition of a standard.
 
@@ -443,7 +443,7 @@ just after the title page:
     Free Documentation License".
 
 If you have Invariant Sections, Front-Cover Texts and Back-Cover Texts, replace
-the "with â¦ Texts." line with this:
+the "with … Texts." line with this:
 
     with the Invariant Sections being LIST THEIR TITLES, with the
     Front-Cover Texts being LIST, and with the Back-Cover Texts being LIST.

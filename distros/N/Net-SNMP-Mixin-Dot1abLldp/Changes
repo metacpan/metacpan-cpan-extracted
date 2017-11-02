@@ -1,4 +1,6 @@
 Revision history for Net-SNMP-Mixin-Dot1abLldp
+0.14	Fri, 27 Oct 2017 18:59:52 +0200
+	check if chassidIdSubtype is defined in get_lldp_rem_table
 
 0.13	Mon, 20 Jun 2016 18:02:09 +0200
 	new method init_ok(), check for partial initialization

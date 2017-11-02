@@ -8,7 +8,7 @@ use Carp ();
 
 use UNIVERSAL::Object::Immutable;
 
-our $VERSION   = '0.11';
+our $VERSION   = '0.12';
 our $AUTHORITY = 'cpan:STEVAN';
 
 our @ISA; BEGIN { @ISA = ('UNIVERSAL::Object::Immutable') }
@@ -91,7 +91,7 @@ MOP::Method::Attribute - The Method Attribute object
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 DESCRIPTION
 

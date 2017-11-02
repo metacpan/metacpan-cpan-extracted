@@ -764,8 +764,10 @@ sub latex {
 
 \newcommand*{\Slash}{\slash\hspace{0pt}}
 
+[% UNLESS safe_options.sansfontsections %]
 \addtokomafont{disposition}{\rmfamily}
 \addtokomafont{descriptionlabel}{\rmfamily}
+[% END %]
 % forbid widows/orphans
 \frenchspacing
 \sloppy
@@ -841,6 +843,17 @@ pdfkeywords={[% tex_metadata.keywords %]}%
   \par
 [% ELSE %]
   \end{titlepage}
+[% IF safe_options.impressum %]
+[% IF doc.header_defined.notes %]
+% impressum
+\thispagestyle{empty}
+\strut
+\vfill
+\begin{footnotesize}
+\noindent [% doc.header_as_latex.notes %]
+\end{footnotesize}
+[% END %]
+[% END %]
 \cleardoublepage
 [% END %]
 
@@ -912,8 +925,9 @@ pdfkeywords={[% tex_metadata.keywords %]}%
 
 [% IF doc.wants_postamble %]
 [% doc.header_as_latex.source     %]
-
+   [% UNLESS safe_options.impressum  %]
 [% doc.header_as_latex.notes      %]
+   [% END %]
 [% ELSE %]
 \strut
 [% END %]

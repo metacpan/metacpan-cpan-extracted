@@ -8,7 +8,7 @@ Mackerel::ReleaseUtils - release utilities for Mackerel (https://mackerel.io)
 
 # DESCRIPTION
 
-Mackerel::ReleaseUtils provise DSLs for writing release scripts.
+Mackerel::ReleaseUtils provides DSLs for writing release scripts.
 
 # LICENSE
 

@@ -1,7 +1,5 @@
-.gitignore
-Build.PL
 Changelog.ini
-CHANGES
+Changes
 data/asset_types.txt
 data/event_types.txt
 data/menu_orientations.txt
@@ -58,18 +56,23 @@ lib/App/Office/CMS/View/Content.pm
 lib/App/Office/CMS/View/Page.pm
 lib/App/Office/CMS/View/Search.pm
 lib/App/Office/CMS/View/Site.pm
+LICENSE
 Makefile.PL
 MANIFEST			This list of files
-META.yml
+MANIFEST.SKIP
 README
 scripts/create.tables.pl
 scripts/display.menu.pl
 scripts/drop.tables.pl
 scripts/new.db.sh
+scripts/pod2html.sh
 scripts/populate.tables.pl
 scripts/report.tables.pl
 scripts/schema.sh
 scripts/test.log.handler.pl
-scripts/test.text.xslate.pl
-t/pod.t
+t/00.versions.t
+t/00.versions.tx
 t/test.t
+xt/author/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

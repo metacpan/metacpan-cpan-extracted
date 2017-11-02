@@ -1,7 +1,11 @@
 package Image::DS9::Constants;
 
+# ABSTRACT:  predefined constants
+
 use strict;
 use warnings;
+
+our $VERSION = '0.188';
 
 require constant;
 require Exporter;
@@ -10,7 +14,7 @@ our @ISA = qw( Exporter );
 
 our @EXPORT;
 
-our @values = 
+our @values =
   (
    (map { 'wcs' . $_ } ('a'..'z')),
    (
@@ -196,11 +200,12 @@ sub list
 
   unshift @_, __PACKAGE__ ;
   my @list = sort &gen_list;
+  ## no critic ProhibitNoStrict
   no strict 'refs';
   my $len = 0;
   do { my $l = length($_); $len = $l if $l > $len } foreach @list;
   printf("%-${len}s => '%s'\n", $_, &$_) foreach @list;
-    
+
 }
 
 
@@ -226,15 +231,27 @@ sub gen_list
   @list;
 }
 
+#
+# This file is part of Image-DS9
+#
+# This software is Copyright (c) 2017 by Smithsonian Astrophysical Observatory.
+#
+# This is free software, licensed under:
+#
+#   The GNU General Public License, Version 3, June 2007
+#
 
 1;
 
-
-__END__
+=pod
 
 =head1 NAME
 
-  Image::DS9::Constants - predefined constants
+Image::DS9::Constants - predefined constants
+
+=head1 VERSION
+
+version 0.188
 
 =head1 SYNOPSIS
 
@@ -248,7 +265,7 @@ __END__
   use Image::DS9::Constants Prefix => 'X_';
 
   # change the prefix and import a subset
-  use Image::DS9::Constants 
+  use Image::DS9::Constants
      Prefix => 'X_', qw( X_const1 X_const2 );
 
   # list the available constants;
@@ -275,20 +292,74 @@ prefix,
   perl -MImage::DS9::Constants \
           -e 'Image::DS9::Constants::list( Prefix => "XX")'
 
+=head1 BUGS AND LIMITATIONS
 
-=head1 LICENSE
-
-This software is released under the GNU General Public License.  You
-may find a copy at 
-
-   http://www.fsf.org/copyleft/gpl.html
-
-=head1 AUTHOR
-
-Diab Jerius ( djerius@cfa.harvard.edu )
+You can make new bug reports, and view existing ones, through the
+web interface at L<https://rt.cpan.org/Public/Dist/Display.html?Name=Image-DS9>.
 
 =head1 SEE ALSO
 
-  perl(1), Image::DS9;
+Please see those modules/websites for more information related to this module.
+
+=over 4
+
+=item *
+
+L<Image::DS9|Image::DS9>
+
+=back
+
+=head1 AUTHOR
+
+Diab Jerius <djerius@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2017 by Smithsonian Astrophysical Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
 
 =cut
+
+__END__
+
+#pod =head1 SYNOPSIS
+#pod
+#pod   # import all of the constants
+#pod   use Image::DS9::Constants;
+#pod
+#pod   # import a subset
+#pod   use Image::DS9::Constants qw( _const1 _const2 );
+#pod
+#pod   # change the prefix
+#pod   use Image::DS9::Constants Prefix => 'X_';
+#pod
+#pod   # change the prefix and import a subset
+#pod   use Image::DS9::Constants
+#pod      Prefix => 'X_', qw( X_const1 X_const2 );
+#pod
+#pod   # list the available constants;
+#pod   use Image::DS9::Constants;
+#pod   Image::DS9::Constants::list;
+#pod   Image::DS9::Constants::list( Prefix => 'X_' );
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod This module provides a large number of Perl constants for option strings used
+#pod to communicate with B<DS9>.  The constants have a default prefix of C<_>,
+#pod which may be changed by the user (see L</SYNOPSIS>).  See the documentation
+#pod for the Perl B<constant> module for information on what constitutes a legal
+#pod constant name (for instance, two leading underscores are not allowed).
+#pod
+#pod To determine what the constants are, use the B<list> function:
+#pod
+#pod   perl -MImage::DS9::Constants \
+#pod           -e 'Image::DS9::Constants::list'
+#pod
+#pod This will print a listing of all of the constants.  To specify a different
+#pod prefix,
+#pod
+#pod   perl -MImage::DS9::Constants \
+#pod           -e 'Image::DS9::Constants::list( Prefix => "XX")'

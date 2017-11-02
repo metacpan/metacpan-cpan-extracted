@@ -49,7 +49,7 @@
          "requires" : {
             "Carp" : "0",
             "File::ShareDir" : "0",
-            "Net::HTTP::Spore" : "0.07",
+            "Net::HTTP::Spore" : "0.08",
             "Net::HTTP::Spore::Middleware::DefaultParams" : "0",
             "Net::HTTP::Spore::Middleware::Format::JSON" : "0",
             "perl" : "5.008",
@@ -77,7 +77,7 @@
    "provides" : {
       "WebService::KVV::Live::Stop" : {
          "file" : "lib/WebService/KVV/Live/Stop.pm",
-         "version" : "0.004"
+         "version" : "0.007"
       }
    },
    "release_status" : "stable",
@@ -92,7 +92,7 @@
          "web" : "https://github.com/athreef/WebService-KVV-Live-Stop"
       }
    },
-   "version" : "0.004",
+   "version" : "0.007",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"
@@ -334,7 +334,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.004",
+                  "tag" : "v0.007",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },

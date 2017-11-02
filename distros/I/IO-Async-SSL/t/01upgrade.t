@@ -6,8 +6,9 @@ use warnings;
 use Test::More;
 use Test::Identity;
 
-use IO::Async::Test;
+use IO::Async::Test 0.68;  # wait_for_future
 
+use Future;
 use IO::Async::OS;
 use IO::Async::Loop;
 use IO::Async::SSL;
@@ -59,7 +60,7 @@ testing_loop( $loop );
       SSL_verify_mode => 0,
    );
 
-   wait_for { $server_f->is_ready and $client_f->is_ready };
+   wait_for_future( Future->needs_all( $server_f, $client_f ) );
 
    identical( $server_f->get, $server_stream, 'server SSL_upgrade yields $server_stream' );
    identical( $client_f->get, $client_stream, 'client SSL_upgrade yields $client_stream' );
@@ -114,7 +115,7 @@ testing_loop( $loop );
    ok( defined $server_f, 'defined ->SSL_upgrade Future for server' );
    ok( defined $client_f, 'defined ->SSL_upgrade Future for client' );
 
-   wait_for { $server_f->is_ready and $client_f->is_ready };
+   wait_for_future( Future->needs_all( $server_f, $client_f ) );
 
    identical( $server_f->get, $server_sock, 'server SSL_upgrade yields $server_sock' );
    identical( $client_f->get, $client_sock, 'client SSL_upgrade yields $client_sock' );
@@ -142,6 +143,30 @@ testing_loop( $loop );
 
    ok( scalar $f->failure, '$f indicates client upgrade failure' );
    ok( $client_errored, 'on_error invoked for client upgrade failure' );
+}
+
+# An erroneous SSL_upgrade
+{
+   my ( $server_sock, $client_sock ) = IO::Async::OS->socketpair or
+      die "Cannot socketpair - $!";
+
+   $server_sock->blocking( 0 );
+   $client_sock->blocking( 0 );
+
+   my ( $server_upgraded, $client_upgraded );
+
+   my $server_f = $loop->SSL_upgrade(
+      handle => $server_sock,
+      SSL_server => 1,
+      SSL_key_file  => {},
+      SSL_cert_file => {},
+   );
+
+   wait_for { $server_f->is_ready };
+
+   # Don't be too dependent on the exact wording of the message
+   like( $server_f->failure, qr/:SSL routines:SSL_CTX_use_certificate_file:/,
+      'SSL_upgrade yields correct error on failure' );
 }
 
 {

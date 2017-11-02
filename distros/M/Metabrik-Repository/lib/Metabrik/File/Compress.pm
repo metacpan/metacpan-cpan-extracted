@@ -1,5 +1,5 @@
 #
-# $Id: Compress.pm,v f6ad8c136b19 2017/01/01 10:13:54 gomor $
+# $Id: Compress.pm,v 246044148483 2017/03/18 14:13:18 gomor $
 #
 # file::compress brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Shell::Command Metabrik::System::Package);
 
 sub brik_properties {
    return {
-      revision => '$Revision: f6ad8c136b19 $',
+      revision => '$Revision: 246044148483 $',
       tags => [ qw(unstable gzip unzip gunzip uncompress) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -29,6 +29,8 @@ sub brik_properties {
          gunzip => [ qw(input|OPTIONAL output|OPTIONAL datadir|OPTIONAL) ],
          uncompress => [ qw(input|OPTIONAL output|OPTIONAL datadir|OPTIONAL) ],
          gzip => [ qw(input) ],
+         bunzip2 => [ qw(input output|OPTIONAL datadir|OPTIONAL) ],
+         bzip2 => [ qw(input) ],
       },
       require_modules => {
          'Compress::Zlib' => [ ],
@@ -38,10 +40,12 @@ sub brik_properties {
       require_binaries => {
          unzip => [ ],
          gzip => [ ],
+         bunzip2 => [ ],
+         bzip2 => [ ],
       },
       need_packages => {
-         ubuntu => [ qw(unzip gzip) ],
-         debian => [ qw(unzip gzip) ],
+         ubuntu => [ qw(unzip gzip bzip2) ],
+         debian => [ qw(unzip gzip bzip2) ],
       },
    };
 }
@@ -141,6 +145,9 @@ sub uncompress {
    ||     $type eq 'application/java-archive') {
       return $self->unzip($input, $datadir);
    }
+   elsif ($type eq 'application/x-bzip2') {
+      return $self->bunzip2($input, $output, $datadir);
+   }
 
    return $self->log->error("uncompress: don't know how to uncompress file [$input] with MIME type [$type]");
 }
@@ -157,6 +164,48 @@ sub gzip {
    $self->execute($cmd) or return;
 
    return "$input.gz";
+}
+
+sub bzip2 {
+   my $self = shift;
+   my ($input, $output, $datadir) = @_;
+
+   $input ||= $self->input;
+   $output ||= $self->output;
+   $datadir ||= $self->datadir;
+   $self->brik_help_run_undef_arg('bzip2', $input) or return;
+
+   # If no output given, we use the input file name by adding .bz2 like bzip2 command
+   if (! defined($output)) {
+      ($output = $input) =~ s/$/.bz2/;
+   }
+
+   my $cmd = "bzip2 $input";
+
+   my $lines = $self->capture($cmd) or return;
+
+   return [ $output ];
+}
+
+sub bunzip2 {
+   my $self = shift;
+   my ($input, $output, $datadir) = @_;
+
+   $input ||= $self->input;
+   $output ||= $self->output;
+   $datadir ||= $self->datadir;
+   $self->brik_help_run_undef_arg('bunzip2', $input) or return;
+
+   # If no output given, we use the input file name by removing .bz2 like bunzip2 command
+   if (! defined($output)) {
+      ($output = $input) =~ s/.bz2$//;
+   }
+
+   my $cmd = "bunzip2 $input";
+
+   my $lines = $self->capture($cmd) or return;
+
+   return [ $output ];
 }
 
 1;

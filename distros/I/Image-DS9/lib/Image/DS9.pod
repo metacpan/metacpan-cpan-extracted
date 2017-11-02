@@ -1,8 +1,1027 @@
+# PODNAME: Image::DS9
+
+# ABSTRACT: interface to the DS9 image display and analysis program
+
+#pod =pod
+#pod
+#pod =head1 SYNOPSIS
+#pod
+#pod   use Image::DS9;
+#pod
+#pod   $dsp = new Image::DS9;
+#pod   $dsp = new Image::DS9( \%attrs );
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod This class provides access to the B<DS9> image display and analysis
+#pod program through its B<XPA> access points.
+#pod
+#pod B<DS9> is a rather flexible and feature-rich image display program.
+#pod Rather than extol its virtues, please consult the website in
+#pod L</REQUIREMENTS>.
+#pod
+#pod While one could communicate with B<DS9> solely via the B<IPC::XPA>
+#pod class, this class provides a cleaner, less error prone interface,
+#pod as it checks the passed commands and arguments for syntax and data
+#pod type.  It also cleans up returned data from B<DS9>.
+#pod
+#pod To use this class, first construct a B<Image::DS9> object, and
+#pod then apply its methods.  It is possible to both address more
+#pod than one B<DS9> with a single object, as well as having
+#pod multiple B<Image::DS9> objects communicate with their own
+#pod B<DS9> invocations.  Eventually there will be documentation
+#pod spelling out how to do this.
+#pod
+#pod
+#pod =head1 METHODS
+#pod
+#pod The methods in this class closely follow the XPA access points.  The
+#pod documentation here tries to cover the mechanics of calling the
+#pod methods. For more information on what the methods do, or how the
+#pod arguments affect things, please consult the B<DS9> documentation.
+#pod
+#pod =head2 Arguments
+#pod
+#pod Commands sent to DS9 are sent as strings.  Many of the option strings
+#pod are available as Perl constants.  See L</Constants> for more details.
+#pod
+#pod =head2 Boolean values
+#pod
+#pod Some methods take boolean values; these may be the strings C<on>, C<off>,
+#pod C<yes>, C<no>, or the integers C<1> or C<0>.
+#pod
+#pod =head2 Return Values
+#pod
+#pod Because a single B<Image::DS9> object may communicate with multiple
+#pod instances of B<DS9>, queries may return more than one value.
+#pod Because one usually communicates with a single B<DS9> instance,
+#pod if a query is made in scalar mode, the result is returned as a scalar,
+#pod i.e.:
+#pod
+#pod         $cmap = $dsp->cmap();
+#pod
+#pod In this mode, if more than one server responds, you'll get the
+#pod results for a randomly chosen server.  Some commands, in particular
+#pod some of the options to the C<fits>, will return a scalar reference
+#pod in called in scalar mode, as the returned data may be large, and it
+#pod makes no sense to have multiple copies of the data floating about.
+#pod These commands are documented below.
+#pod
+#pod If a return value is multi-valued, a query in scalar context yields a
+#pod reference to an array, not a scalar.  For instance:
+#pod
+#pod         $res = $dsp->bin( 'about' );
+#pod         ($x, $y ) = @$res;
+#pod
+#pod returns a reference to an array, while
+#pod
+#pod         $res = $dsp->bin( 'buffersize' );
+#pod
+#pod returns a scalar.  Don't attempt to do
+#pod
+#pod         ($x, $y ) = $dsp->bin( 'about' ); # ERROR DON"T DO THIS
+#pod
+#pod as it will return a full blown hash as documented next.
+#pod
+#pod When queries are made in list mode, the return values are hashes,
+#pod rather than scalars.  The hash has as keys the names of the servers,
+#pod with the values being references to hashes with the keys C<name>,
+#pod C<buf> and C<message>.  The C<message> element is present if there was
+#pod an error. The C<buf> element contains the results of a query.
+#pod
+#pod For example,
+#pod
+#pod         use Data::Dumper;
+#pod         %cmaps = $dsp->cmap;
+#pod         print Dumper \%cmaps;
+#pod
+#pod yields
+#pod
+#pod         $VAR1 = {
+#pod                  'DS9:ds9 838e2ab4:32832' =>
+#pod                   {
+#pod                     'name' => 'DS9:ds9 838e2ab4:32832',
+#pod                     'buf' => 'Grey'
+#pod                   }
+#pod                 };
+#pod
+#pod Ordinarily, the C<buf> element will be unaltered (except for the
+#pod removal of trailing newlines) from what B<DS9> outputs.  For
+#pod multi-valued return results, C<buf> is set to an array containing
+#pod the values:
+#pod
+#pod         use Data::Dumper;
+#pod         %res = $dsp->bin( 'about' );
+#pod         print Dumper \%res;
+#pod
+#pod         $VAR1 = {
+#pod                  'DS9:ds9 838e2ab4:32832' =>
+#pod                   {
+#pod                     'name' => 'DS9:ds9 838e2ab4:32832',
+#pod                     'buf' => [ 20, 30 ],
+#pod                   }
+#pod                 };
+#pod
+#pod Sending data doesn't result in a return value.
+#pod
+#pod
+#pod =head2 Error Returns
+#pod
+#pod In case of error, an exception is thrown via B<croak()>.  The B<res()>
+#pod method will return a hash, keyed off of the servers' names.  For each
+#pod server which had an error, the hash value will be a reference to a
+#pod hash containing the keys C<name> and C<message>; the latter will
+#pod contain error information.  For those commands which return data, and
+#pod for those servers which did not have an error, the C<buf> key will be
+#pod available.
+#pod
+#pod =head2 Administrative Methods
+#pod
+#pod =over 8
+#pod
+#pod =item new
+#pod
+#pod   $dsp = new Image::DS9;
+#pod   $dsp = new Image::DS9( \%attrs );
+#pod
+#pod Construct a new object.  It returns a handle to the object.  It throws
+#pod an exception (catch via B<eval>) upon error.
+#pod
+#pod The optional hash B<attrs> may contain one of the following keys:
+#pod
+#pod =over 8
+#pod
+#pod =item Server
+#pod
+#pod The title of the C<ds9> process with which to communicate.  It
+#pod defaults to C<ds9>.
+#pod
+#pod =item WaitTimeOut
+#pod
+#pod The default number of seconds that the B<wait()> method should
+#pod try to contact B<DS9> servers. It defaults to C<2> seconds.
+#pod
+#pod =item max_servers
+#pod
+#pod The maximum number of servers to which to communicate.  It defaults to
+#pod the number of C<DS9> servers running at the time the constructor is
+#pod called.
+#pod
+#pod =item min_servers
+#pod
+#pod The minimum number of servers which should respond to commands.  If
+#pod a response is not received from at least this many servers, an exception
+#pod will be thrown.  It defaults to C<1>.
+#pod
+#pod =item auto_start
+#pod
+#pod Create a B<ds9> process with the title specified by the C<Server>
+#pod attribute if one does not exist. It polls for an existing process
+#pod for the time period specified via C<WaitTimeOut> before creating
+#pod a new one.
+#pod
+#pod =item kill_on_destroy
+#pod
+#pod Terminate the B<ds9> process when the B<Image::DS9> object is
+#pod destroyed.
+#pod
+#pod =item ResErrCroak
+#pod
+#pod If true, queries sent to B<ds9> which returns fewer values than
+#pod expected will result in B<croak()>s.  This may be a problem if B<ds9>
+#pod is queried for inappropriate information. For example, it will return
+#pod an empty result if a image (i.e. not a binned event list) is displayed
+#pod in the current frame and the names of the binned columns are queried
+#pod (which of course makes no sense).  See the C<ResErrWarn> and
+#pod C<ResErrIgnore> attributes for ways of handling this.
+#pod
+#pod If too I<many> results are returned, this module will always croak.
+#pod B<ResErrCroak> is the default mode.
+#pod
+#pod =item ResErrWarn
+#pod
+#pod If true, queries sent to B<ds9> which returns fewer values than
+#pod expected will result in B<carp()>s and will be compensated for by
+#pod filling in the missing values with empty strings.
+#pod
+#pod =item ResErrIgnore
+#pod
+#pod Queries sent to B<ds9> which returns fewer values than expected are
+#pod silently compensated for by filling in the missing values with
+#pod empty strings.
+#pod
+#pod =back
+#pod
+#pod For example,
+#pod
+#pod         $dsp = new Image::DS9( { max_servers => 3 } );
+#pod
+#pod
+#pod =item nservers
+#pod
+#pod   $nservers = $dsp->nservers;
+#pod
+#pod This returns the number of servers which the object is communicating
+#pod with.
+#pod
+#pod =item res
+#pod
+#pod   %res = $dsp->res;
+#pod
+#pod In case of error, the returned results from the failing B<XPA> call
+#pod are available via this method.  It returns a hash, keyed off of the
+#pod server signature(s). See the B<IPC::XPA> documentation for more
+#pod information on what the hashes contain.
+#pod
+#pod =item wait
+#pod
+#pod   $dsp->wait();
+#pod   $dsp->wait($timeout);
+#pod
+#pod Try to contact the B<DS9> servers, and wait until at least
+#pod B<min_servers> have replied.  It will attempt this for
+#pod B<WaitTimeOut> seconds if no timeout is supplied, else
+#pod the given time.  It returns true upon success.
+#pod
+#pod =item set_attr
+#pod
+#pod   $dsp->set_attr( $attr_name => $attr_value, ... );
+#pod
+#pod Set the attribute to the given value.  The following attributes may be
+#pod set:
+#pod
+#pod   WaitTimeOut
+#pod   WaitTimeInterval
+#pod   min_servers
+#pod   kill_on_destroy
+#pod   auto_start
+#pod   verbose
+#pod
+#pod Changing other attributes will result in undefined behavior.
+#pod
+#pod =item get_attr
+#pod
+#pod   $attr_value = $dsp->get_attr( $attr_name );
+#pod
+#pod Retrieve the value of an attribute.  Valid attribute names
+#pod are those which can be passed to L</new>.
+#pod
+#pod =back
+#pod
+#pod
+#pod =head2 Control Methods
+#pod
+#pod Most methods exactly parallel the B<DS9> B<XPA> commands.  In general
+#pod each element in a command is passed as a separate argument to the
+#pod method.  For example, to change the binning factor:
+#pod
+#pod          $dsp->bin( factor => 0.2 );
+#pod
+#pod Some commands have more arguments:
+#pod
+#pod         $dsp->bin( smooth => function => 'boxcar' );
+#pod         $dsp->bin( smooth => radius => 33 );
+#pod         $dsp->bin( about => ( 3, 3 ) );
+#pod         $dsp->bin( cols => ( 'rt_x', 'rt_y' ) );
+#pod
+#pod Note the use of the C<=E<gt>> operator to force preceding barewords to be
+#pod treated as strings, and the frivolous use of extra parenthesis for
+#pod aesthetics.  Some arguments are concatenated to avoid confusion; see
+#pod the documentation for the individual methods.
+#pod
+#pod Some commands can query B<DS9> for state information as well as set it.
+#pod For example,
+#pod
+#pod         $function = $dsp->bin( smooth => function );
+#pod
+#pod B<Image::DS9> differentiates between the setting and requesting of
+#pod values by the presence or absence of the argument containing the information.
+#pod
+#pod Some commands take a hash as their last argument, which contains
+#pod attributes which are passed on to B<DS9>.
+#pod
+#pod True Boolean values may be one of the following:  C<1>, C<yes>, C<true>.
+#pod False Boolean values may be one of the following:  C<0>, C<no>,
+#pod C<false>.  Boolean values returned by a command are always translated
+#pod into either C<0> or C<1>.
+#pod
+#pod The documentation for the commands lists the options supported and
+#pod any deviations from the general approach described above.  Refer
+#pod to the B<DS9> B<XPA> documentation to determine which commands permit
+#pod queries and the allowed data types for the arguments.  B<Image::DS9>
+#pod checks that all data passed to B<DS9> is of the appropriate type.
+#pod
+#pod
+#pod The documentation which follows uses doubled square brackets to
+#pod indicate an optional argument.
+#pod
+#pod =over 8
+#pod
+#pod =item array
+#pod
+#pod   $dsp->array( $image, [[ \%attrs ]]);
+#pod
+#pod This is a interface to the B<array> access point, which displays
+#pod images.  C<$image> may be a PDL object, a scalar, or a scalar
+#pod reference.  If it is a PDL object, all required information is
+#pod extracted from it, and it is passed to B<DS9>.  Otherwise, it should
+#pod be binary data suitable for B<DS9>, and the B<attrs> hash should be
+#pod used to pass dimensional and size data to B<DS9>.  B<attrs> may
+#pod contain the following elements:
+#pod
+#pod =over 8
+#pod
+#pod =item xdim
+#pod
+#pod The X coordinate array extent.
+#pod
+#pod =item ydim
+#pod
+#pod The Y coordinate array extent.
+#pod
+#pod =item bitpix
+#pod
+#pod The number of bits per pixel.  Negative values indicate a floating point
+#pod number (similar to the B<FITS> standard).
+#pod
+#pod =back
+#pod
+#pod =item bin
+#pod
+#pod The following options are supported:
+#pod
+#pod C<about>,
+#pod C<buffersize>,
+#pod C<cols>,
+#pod C<factor>,
+#pod C<filter>,
+#pod C<function>,
+#pod C<average>,
+#pod C<sum>,
+#pod C<to fit> or C<tofit>
+#pod
+#pod =item blink
+#pod
+#pod To query the whether blink is on:
+#pod
+#pod    $is_blink_on = $dsp->blink( 'state' );
+#pod
+#pod To turn blink on:
+#pod
+#pod    $dsp->blink;
+#pod
+#pod =item cd
+#pod
+#pod   $dsp->cd( $dir );
+#pod   $dir = $dsp->cd;
+#pod
+#pod =item cmap
+#pod
+#pod The following options are supported:
+#pod
+#pod C<file>,
+#pod C<invert>,
+#pod C<value>.
+#pod
+#pod To query the current colormap,
+#pod
+#pod    $cmap = $dsp->cmap;
+#pod
+#pod =item contour
+#pod
+#pod The following options are supported:
+#pod
+#pod C<copy>,
+#pod C<paste>,
+#pod C<save>.
+#pod
+#pod To turn contouring on or off:
+#pod
+#pod    $dsp->contour( $boolean_value );
+#pod
+#pod To query the state of contouring:
+#pod
+#pod    $is_contour_on = $dsp->contour;
+#pod
+#pod =item crosshair
+#pod
+#pod   $dsp->crosshair( [[x, y, <coordinate system>, [[<sky frame>]],
+#pod                                                [[<sky format>]] ]] );
+#pod   $coords = $dsp->crosshair( [[<coordinate system>,
+#pod                         [[<sky frame>]], [[<sky format>]] ]] );
+#pod   ($x, $y ) = @$coords
+#pod
+#pod To query the position, pass no coordinates to the method.  The
+#pod return value is multi-valued.
+#pod
+#pod =item cursor
+#pod
+#pod   $dsp->cursor( $x, $y );
+#pod
+#pod Set the cursor position to the given position.
+#pod
+#pod =item dss
+#pod
+#pod The following options are supported:
+#pod
+#pod C<name>
+#pod C<coord>
+#pod C<server>
+#pod C<survey>
+#pod C<size>
+#pod
+#pod When queried, some of the options may return more than one value.  In
+#pod those cases, a query yields a reference to an array, not a scalar.
+#pod For instance:
+#pod
+#pod         $res = $dsp->dss( 'coord' );
+#pod         ($x, $y ) = @$res;
+#pod
+#pod returns a reference to an array, while
+#pod
+#pod         $res = $dsp->dss( 'server' );
+#pod
+#pod returns a scalar.  Don't attempt to do
+#pod
+#pod         ($x, $y ) = $dsp->dss( 'coord' ); # ERROR DON"T DO THIS
+#pod
+#pod As it will return a full blown hash as documented in L</Return Values>.
+#pod
+#pod =item exit
+#pod
+#pod No options, just the grand finale.
+#pod
+#pod
+#pod =item file
+#pod
+#pod return the current file name loaded for the current frame:
+#pod
+#pod   $dsp->file( $file );
+#pod
+#pod Save the frame as a file:
+#pod
+#pod   $dsp->file( 'save', [[<save options>>,]] $file );
+#pod
+#pod Display the specified C<$file>.
+#pod
+#pod   $dsp->file( [[<type>]], $file, [[\%attrs]] );
+#pod
+#pod The attributes are the possible options for the B<array> type (see
+#pod the B<DS9> docs), as well as the following options:
+#pod
+#pod =over 8
+#pod
+#pod =item C<new> I<boolean>
+#pod
+#pod create a new frame.
+#pod
+#pod =item C<bin> I<columns>.
+#pod
+#pod I<columns> should be an array ref containing the names of the columns
+#pod upon which to bin the data
+#pod
+#pod =item C<extname> I<string>
+#pod
+#pod The name of the FITS extension HDU to display.
+#pod
+#pod =item C<filter> I<string>
+#pod
+#pod A B<DS9> filter specification
+#pod
+#pod =back
+#pod
+#pod
+#pod =item fits
+#pod
+#pod Return the current frame (as a fits file) as a I<scalar ref>
+#pod
+#pod   $scalar_ref = $dsp->fits( [[<type>]], [[<type options>]], [[\%attr]] );
+#pod
+#pod Load an image from a scalar:
+#pod
+#pod   $dsp->fits( [[<type>]], [[%attrs]] );
+#pod
+#pod The available attributes are
+#pod
+#pod =over 8
+#pod
+#pod =item C<new> I<boolean>
+#pod
+#pod create a new frame.
+#pod
+#pod =item C<bin> I<columns>.
+#pod
+#pod I<columns> should be an array ref containing the names of the columns
+#pod upon which to bin the data
+#pod
+#pod =item C<extname> I<string>
+#pod
+#pod The name of the FITS extension HDU to display.
+#pod
+#pod =item C<filter> I<string>
+#pod
+#pod A B<DS9> filter specification
+#pod
+#pod =back
+#pod
+#pod
+#pod =item frame
+#pod
+#pod The following options are supported:
+#pod
+#pod C<center>,
+#pod C<clear>,
+#pod C<new>,
+#pod C<delete>,
+#pod C<reset>,
+#pod C<refresh>,
+#pod C<hide>,
+#pod C<show>,
+#pod C<move>,
+#pod C<first>,
+#pod C<next>,
+#pod C<prev>,
+#pod C<last>,
+#pod C<frameno>,
+#pod C<all>,
+#pod C<center>,
+#pod
+#pod To load a particular frame, specify the frame number as the argument:
+#pod
+#pod    $dsp->frame(3).
+#pod
+#pod The C<all> option returns an array of the frames:
+#pod
+#pod    $array_ref = $dsp->frame( 'all' );
+#pod
+#pod =item grid
+#pod
+#pod The C<load> and C<save> options are supported.
+#pod
+#pod With a boolean argument, specify the state of the coordinate grid, else
+#pod return it.
+#pod
+#pod =item height
+#pod
+#pod   $dsp->height( $height );
+#pod   $height = $dsp->height;
+#pod
+#pod =item iconify
+#pod
+#pod   $dsp->iconify($bool);
+#pod   $iconify_state = $dsp->iconify;
+#pod
+#pod With a boolean argument, specify the iconification state, else
+#pod return it.
+#pod
+#pod =item lower
+#pod
+#pod   $dsp->lower();
+#pod
+#pod Lowers the B<DS9> window in the stacking order
+#pod
+#pod =item minmax
+#pod
+#pod Supports the options
+#pod
+#pod C<mode>,
+#pod C<interval>.
+#pod
+#pod Their values may be queried by passing no arguments.
+#pod
+#pod
+#pod =item mode
+#pod
+#pod   $mode = $dsp->mode;
+#pod   $dsp->mode( $state );
+#pod
+#pod Set (or query) the first mouse button mode state.
+#pod
+#pod =item nameserver
+#pod
+#pod The following options are supported:
+#pod
+#pod C<name>,
+#pod C<server>,
+#pod C<skyformat>.
+#pod
+#pod They may be queried by specifying no argument.
+#pod
+#pod =item orient
+#pod
+#pod   $state = $dsp->orient;
+#pod   $dsp->orient( $state );
+#pod
+#pod Set (or query) the orientation of the current frame.
+#pod
+#pod =item page
+#pod
+#pod To reflect the B<XPA> command sequence, the first argument must
+#pod always be C<setup>, e.g.
+#pod
+#pod   $dsp->page( setup => orientation => 'portrait' );
+#pod
+#pod The supported options are:
+#pod
+#pod C<orientation>,
+#pod C<pagescale>,
+#pod C<pagesize>.
+#pod
+#pod They may be queried by specifying no argument.
+#pod
+#pod =item pan
+#pod
+#pod To set the pan position:
+#pod
+#pod   $dsp->pan( [[<type>,]] $x, $y,
+#pod         [[ <coordinate system> [[,<sky frame>]] [[,<sky format>]] ]] );
+#pod
+#pod where C<type> is one of C<abs> or C<to> to specify an absolute position,
+#pod or C<rel> or unspecified for a relative pan.
+#pod
+#pod To get the pan position:
+#pod
+#pod   $pan = $dsp->pan(
+#pod           [[ <coordinate system> [[,<sky frame>]] [[,<sky format>]] ]] );
+#pod
+#pod =item pixeltable
+#pod
+#pod   $dsp->pixeltable($bool);
+#pod   $state = $dsp->pixeltable;
+#pod
+#pod With a boolean argument, specify the pixeltable state, else
+#pod return it.
+#pod
+#pod =item print
+#pod
+#pod I<print only works if >B<ds9>I< uses the >C<local>I< XPA transfer protocol>.
+#pod Set the B<XPA_METHOD> environment variable to C<local> prior to
+#pod starting up B<ds9> and using this module.
+#pod
+#pod The supported options are:
+#pod
+#pod C<destination>,
+#pod C<command>,
+#pod C<filename>,
+#pod C<palette>,
+#pod C<level>,
+#pod C<interpolate>,
+#pod C<resolution>,
+#pod
+#pod To print, specify no options.  To query an option, don't specify
+#pod a value for it.
+#pod
+#pod =item quit
+#pod
+#pod Just do it.
+#pod
+#pod =item raise
+#pod
+#pod   $dsp->raise()
+#pod
+#pod Raise the B<DS9> window in the windkow stacking order.
+#pod
+#pod =item regions
+#pod
+#pod The supported options are:
+#pod
+#pod C<movefront>,
+#pod C<moveback>,
+#pod C<selectall>,
+#pod C<selectnone>,
+#pod C<deleteall>,
+#pod C<load>,
+#pod C<save>,
+#pod C<format>,
+#pod C<system>,
+#pod C<sky>,
+#pod C<skyformat>,
+#pod C<strip>,
+#pod C<shape>,
+#pod C<color>,
+#pod C<width>,
+#pod C<source>,
+#pod C<background>,
+#pod C<include>,
+#pod C<exclude>,
+#pod C<selected>.
+#pod
+#pod To query the state of options which are subject to query, don't
+#pod pass a value for the option (just the option name).
+#pod
+#pod To send B<DS9> a region, pass B<regions> a scalar or scalar ref:
+#pod
+#pod   $dsp->regions( $region );
+#pod
+#pod To query the current list of regions and receive the results using
+#pod the current attribute formats,
+#pod
+#pod   $regions = $dsp->regions();
+#pod
+#pod
+#pod Alternatively, one can request a different attribute format directly
+#pod in the query by passing a hash reference with the following available
+#pod keys: C<-format>, C<-system>, C<-sky>, C<-skyformat>, C<-strip>.
+#pod
+#pod   $regions = $dsp->regions( \%attr );
+#pod
+#pod =item rotate
+#pod
+#pod   $rotate = $dsp->rotate;         # query current angle
+#pod   $dsp->rotate( abs => $angle );  # absolute
+#pod   $dsp->rotate( to => $angle );   # absolute
+#pod   $dsp->rotate( rel => $angle );  # relative
+#pod   $dsp->rotate( $angle );         # relative
+#pod
+#pod
+#pod =item saveas
+#pod
+#pod The following options are supported:
+#pod
+#pod C<jpeg>,
+#pod C<tiff>,
+#pod C<png>,
+#pod C<ppm>.
+#pod
+#pod =item scale
+#pod
+#pod The following options are supported:
+#pod
+#pod C<datasec>,
+#pod C<limits>,
+#pod C<mode>,
+#pod C<scope>.
+#pod
+#pod To query the state of the options, don't pass a value for the option.
+#pod A query of C<limits> returns an array ref, as it is multi-valued.
+#pod
+#pod
+#pod =item single
+#pod
+#pod To query the whether single mode is set:
+#pod
+#pod    $is_single_on = $dsp->single( 'state' );
+#pod
+#pod To turn single mode on:
+#pod
+#pod    $dsp->single;
+#pod
+#pod
+#pod =item source
+#pod
+#pod Just use the source, Luke.
+#pod
+#pod =item tcl
+#pod
+#pod Nothing special here, move along.
+#pod
+#pod =item tile
+#pod
+#pod The following options are supported:
+#pod
+#pod C<mode>,
+#pod C<grid>,
+#pod C<grid> C<mode>,
+#pod C<grid> C<layout>,
+#pod C<grid> C<gap>,
+#pod C<row>,
+#pod C<column>.
+#pod
+#pod To specify grid modes, layout and gap, do this:
+#pod
+#pod   $dsp->tile( grid => mode => 'automatic' );
+#pod
+#pod To turn tiling on or off,
+#pod
+#pod   $dsp->tile( $boolean ).
+#pod
+#pod To query tiling state, either
+#pod
+#pod   $state = $dsp->tile;
+#pod   $state = $dsp->tile( 'state' ); # same as blink and single
+#pod
+#pod To query those options that support query, don't pass a value for the option.
+#pod Note that a query of the grid layout will return an arrayref.
+#pod
+#pod
+#pod =item update
+#pod
+#pod The now option is passed via a hash:
+#pod
+#pod   $dsp->update( { now => 1 } );
+#pod
+#pod =item version
+#pod
+#pod Queries and returns B<DS9>'s version.
+#pod
+#pod =item view
+#pod
+#pod Supported options are:
+#pod
+#pod C<layout>,
+#pod C<info>,
+#pod C<panner>,
+#pod C<magnifier>,
+#pod C<buttons>,
+#pod C<colorbar>,
+#pod C<graph>,
+#pod C<filename>,
+#pod C<object>,
+#pod C<minmax>,
+#pod C<lowhigh>,
+#pod C<frame>,
+#pod C<image>,
+#pod C<physical>,
+#pod C<wcs>,
+#pod C<wcsa>..C<wcsz>.
+#pod C<red>,
+#pod C<green>,
+#pod C<blue>
+#pod
+#pod =item vo
+#pod
+#pod All aboard!
+#pod
+#pod =item wcs
+#pod
+#pod The options supported are:
+#pod
+#pod C<wcs>, C<wcsa>..C<wcsz>,
+#pod C<system>,
+#pod C<sky>,
+#pod C<skyformat>,
+#pod C<align>,
+#pod C<reset>
+#pod C<replace>,
+#pod C<append>,
+#pod C<replace>,
+#pod C<append>.
+#pod
+#pod The C<replace> and C<append> options may take either the C<file>
+#pod option (followed by a filename)
+#pod
+#pod   $dsp->wcs( replace => file => $filename );
+#pod
+#pod or a scalar, scalar ref, hash ref, or array ref containing a WCS specification:
+#pod
+#pod   $dsp->wcs( replace => \%wcs ).
+#pod   $dsp->wcs( replace => \@wcs ).
+#pod   $dsp->wcs( replace => $wcs ).
+#pod   $dsp->wcs( replace => \$wcs ).
+#pod
+#pod If it is scalar, the scalar should hold the WCS record.  If it is a hash
+#pod reference, a WCS record is constructed from the keys and values.  If
+#pod it is an array reference, the record is constructed by appending a
+#pod newline to each array value and concatenating the resultant strings.
+#pod
+#pod Query the appropriate options by not passing a value for the option.
+#pod
+#pod =item web
+#pod
+#pod Set (or query) the web address in B<DS9>'s built in browser.
+#pod
+#pod =item width
+#pod
+#pod   $dsp->width( $width );
+#pod   $width = $dsp->width;
+#pod
+#pod =item zoom
+#pod
+#pod   $zoom = $dsp->zoom;          # query
+#pod   $dsp->zoom( to => $zoom );   # absolute
+#pod   $dsp->zoom( abs => $zoom );  # absolute
+#pod   $dsp->zoom( rel => $zoom );  # relative
+#pod   $dsp->zoom( $zoom );         # relative
+#pod   $dsp->zoom(0);               # zoom to fit
+#pod   $dsp->zoom('tofit');         # zoom to fit
+#pod   $dsp->zoom('to', 'fit');     # zoom to fit
+#pod
+#pod =item Set
+#pod
+#pod   $dsp->Set( $cmd, $buf )
+#pod
+#pod Send an arbitrary XPA Set command to the DS9 server.  If there was an
+#pod error sending the command to the server, or fewer than expected
+#pod servers responded, it'll B<croak()>.  Messages from the server will be
+#pod made available via the B<res()> method.  See IPC::XPA for more
+#pod information on the format of those messages.
+#pod
+#pod =item Get
+#pod
+#pod   %results = $dsp->Get( $cmd )
+#pod
+#pod Send an arbitrary XPA Get command to the DS9 Server.   If there was an
+#pod error sending the command to the server, or fewer than expected
+#pod servers responded, it'll B<croak()>.  Messages from the server will be
+#pod made available via the B<res()> method.
+#pod
+#pod Upon success, it'll return the results of the command.  If called in
+#pod scalar mode, it'll return just one result (if there is more than one
+#pod server, it returns results from an arbitrary server). In array mode,
+#pod It'll return a hash, with the hash keys being the names of the server.
+#pod The hash values are themselves references to hashes containing
+#pod the results, with a key of C<buf>.
+#pod
+#pod =back
+#pod
+#pod =head2 Constants
+#pod
+#pod Many of the options which must be passed as strings to the command
+#pod methods are available as Perl constants.  This provides a way for Perl
+#pod to verify the strings at compile time, rather than run time.  For
+#pod example,
+#pod
+#pod   $ds9->regions( 'resett' );
+#pod
+#pod will be caught at run time, while
+#pod
+#pod   $ds9->regions( _resett );
+#pod
+#pod will be caught at compile time.  There are some places where Perl
+#pod will get confused as to whether you are using a constant or a string.
+#pod For example, assume there's a constant named C<_mode>:
+#pod
+#pod   $ds9->tile( _mode => 'grid' );
+#pod
+#pod Because of the C<=E<gt>> operator, C<_mode> will be turned into the
+#pod string C<_mode>, rather than being identified as the constant B<_mode>,
+#pod which presumably will resolve into the string C<mode>.  To avoid this,
+#pod use the C<,> operator:
+#pod
+#pod   $ds9->tile( _mode, 'grid' );
+#pod
+#pod There are two ways to get to the constants:
+#pod B<Image::DS9::OldConstants> and B<Image::DS9::Constants>.  The former
+#pod is the older deprecated way, which groups the constants by command and
+#pod uses a group specific prefix to make the constants unique.  This is
+#pod confusing, as one has to remember all of the prefixes.
+#pod
+#pod The new arrangement uses a single prefix for all constants.  The
+#pod prefix defaults to C<_>, but may be specified by the user.  See
+#pod B<Image::DS9::Constants> for more info.
+#pod
+#pod =head1 Obsolete Methods, Changed Interfaces
+#pod
+#pod
+#pod These methods were available in previous versions of B<DS9>, but
+#pod are no longer supported.
+#pod
+#pod =over
+#pod
+#pod =item display
+#pod
+#pod This hid C<tile yes|no>, C<blink>, and C<single>.  Call them
+#pod directly.
+#pod
+#pod =item tile_mode
+#pod
+#pod This was really C<tile>, but without the C<tile yes|no> option.
+#pod Call C<tile> instead.
+#pod
+#pod =back
+#pod
+#pod The constants previous available from B<Image::DS9> are now available
+#pod via B<Image::DS9::OldConstants>.
+#pod
+#pod =head1 REQUIREMENTS
+#pod
+#pod B<Image::DS9> requires B<IPC::XPA> to be installed.  At present, both
+#pod B<DS9> and B<xpans> (part of the B<XPA> distribution) must be running
+#pod prior to any attempts to access B<DS9>.  B<DS9> will automatically
+#pod start B<xpans> if it is in the user's path.
+#pod
+#pod B<DS9> is available at C<http://hea-www.harvard.edu/RD/ds9/>.
+#pod
+#pod B<XPA> is available at C<http://hea-www.harvard.edu/RD/xpa/>.
+#pod
+#pod =head1 LICENSE
+#pod
+#pod This software is released under the GNU General Public License.  You
+#pod may find a copy at
+#pod
+#pod    http://www.fsf.org/copyleft/gpl.html
+#pod
+#pod =head1 AUTHOR
+#pod
+#pod Diab Jerius ( djerius@cfa.harvard.edu )
+#pod
+#pod =head1 SEE ALSO
+#pod
+#pod L<IPC::XPA>
+#pod
+#pod =cut
+
+__END__
+
 =pod
 
 =head1 NAME
 
 Image::DS9 - interface to the DS9 image display and analysis program
+
+=head1 VERSION
+
+version 0.188
 
 =head1 SYNOPSIS
 
@@ -32,7 +1051,6 @@ multiple B<Image::DS9> objects communicate with their own
 B<DS9> invocations.  Eventually there will be documentation
 spelling out how to do this.
 
-
 =head1 METHODS
 
 The methods in this class closely follow the XPA access points.  The
@@ -58,7 +1076,7 @@ Because one usually communicates with a single B<DS9> instance,
 if a query is made in scalar mode, the result is returned as a scalar,
 i.e.:
 
-	$cmap = $dsp->cmap();
+        $cmap = $dsp->cmap();
 
 In this mode, if more than one server responds, you'll get the
 results for a randomly chosen server.  Some commands, in particular
@@ -70,16 +1088,16 @@ These commands are documented below.
 If a return value is multi-valued, a query in scalar context yields a
 reference to an array, not a scalar.  For instance:
 
-	$res = $dsp->bin( 'about' );
-	($x, $y ) = @$res;
+        $res = $dsp->bin( 'about' );
+        ($x, $y ) = @$res;
 
 returns a reference to an array, while
 
-	$res = $dsp->bin( 'buffersize' );
+        $res = $dsp->bin( 'buffersize' );
 
 returns a scalar.  Don't attempt to do
 
-	($x, $y ) = $dsp->bin( 'about' ); # ERROR DON"T DO THIS
+        ($x, $y ) = $dsp->bin( 'about' ); # ERROR DON"T DO THIS
 
 as it will return a full blown hash as documented next.
 
@@ -91,39 +1109,38 @@ an error. The C<buf> element contains the results of a query.
 
 For example,
 
-	use Data::Dumper;
-	%cmaps = $dsp->cmap;
-	print Dumper \%cmaps;
+        use Data::Dumper;
+        %cmaps = $dsp->cmap;
+        print Dumper \%cmaps;
 
 yields
 
-	$VAR1 = {
-	         'DS9:ds9 838e2ab4:32832' =>
-	          {
-	            'name' => 'DS9:ds9 838e2ab4:32832',
-	            'buf' => 'Grey'
-	          }
-	        };
+        $VAR1 = {
+                 'DS9:ds9 838e2ab4:32832' =>
+                  {
+                    'name' => 'DS9:ds9 838e2ab4:32832',
+                    'buf' => 'Grey'
+                  }
+                };
 
 Ordinarily, the C<buf> element will be unaltered (except for the
 removal of trailing newlines) from what B<DS9> outputs.  For
 multi-valued return results, C<buf> is set to an array containing
 the values:
 
-	use Data::Dumper;
-	%res = $dsp->bin( 'about' );
-	print Dumper \%res;
+        use Data::Dumper;
+        %res = $dsp->bin( 'about' );
+        print Dumper \%res;
 
-	$VAR1 = {
-	         'DS9:ds9 838e2ab4:32832' =>
-	          {
-	            'name' => 'DS9:ds9 838e2ab4:32832',
-	            'buf' => [ 20, 30 ],
-	          }
-	        };
+        $VAR1 = {
+                 'DS9:ds9 838e2ab4:32832' =>
+                  {
+                    'name' => 'DS9:ds9 838e2ab4:32832',
+                    'buf' => [ 20, 30 ],
+                  }
+                };
 
 Sending data doesn't result in a return value.
-
 
 =head2 Error Returns
 
@@ -153,12 +1170,13 @@ The optional hash B<attrs> may contain one of the following keys:
 
 =item Server
 
-An alternate server to which to communicate.  It defaults to C<ds9>.
+The title of the C<ds9> process with which to communicate.  It
+defaults to C<ds9>.
 
 =item WaitTimeOut
 
 The default number of seconds that the B<wait()> method should
-try to contact B<DS9> servers.
+try to contact B<DS9> servers. It defaults to C<2> seconds.
 
 =item max_servers
 
@@ -171,6 +1189,18 @@ called.
 The minimum number of servers which should respond to commands.  If
 a response is not received from at least this many servers, an exception
 will be thrown.  It defaults to C<1>.
+
+=item auto_start
+
+Create a B<ds9> process with the title specified by the C<Server>
+attribute if one does not exist. It polls for an existing process
+for the time period specified via C<WaitTimeOut> before creating
+a new one.
+
+=item kill_on_destroy
+
+Terminate the B<ds9> process when the B<Image::DS9> object is
+destroyed.
 
 =item ResErrCroak
 
@@ -201,8 +1231,7 @@ empty strings.
 
 For example,
 
-	$dsp = new Image::DS9( { max_servers => 3 } );
-
+        $dsp = new Image::DS9( { max_servers => 3 } );
 
 =item nservers
 
@@ -228,18 +1257,32 @@ information on what the hashes contain.
 Try to contact the B<DS9> servers, and wait until at least
 B<min_servers> have replied.  It will attempt this for
 B<WaitTimeOut> seconds if no timeout is supplied, else
-the given time.  It returns true upon success.  This routine
-is useful for doing things like:
+the given time.  It returns true upon success.
 
-  $dsp = new Image::DS9;
-  unless ( $dsp->nservers )
-  {
-    system("ds9 &" );
-    $dsp->wait() or die( "unable to connect to DS9\n" );
-  }
+=item set_attr
+
+  $dsp->set_attr( $attr_name => $attr_value, ... );
+
+Set the attribute to the given value.  The following attributes may be
+set:
+
+  WaitTimeOut
+  WaitTimeInterval
+  min_servers
+  kill_on_destroy
+  auto_start
+  verbose
+
+Changing other attributes will result in undefined behavior.
+
+=item get_attr
+
+  $attr_value = $dsp->get_attr( $attr_name );
+
+Retrieve the value of an attribute.  Valid attribute names
+are those which can be passed to L</new>.
 
 =back
-
 
 =head2 Control Methods
 
@@ -247,14 +1290,14 @@ Most methods exactly parallel the B<DS9> B<XPA> commands.  In general
 each element in a command is passed as a separate argument to the
 method.  For example, to change the binning factor:
 
-	 $dsp->bin( factor => 0.2 );
+         $dsp->bin( factor => 0.2 );
 
 Some commands have more arguments:
 
-	$dsp->bin( smooth => function => 'boxcar' );
-	$dsp->bin( smooth => radius => 33 );
-	$dsp->bin( about => ( 3, 3 ) );
-	$dsp->bin( cols => ( 'rt_x', 'rt_y' ) );
+        $dsp->bin( smooth => function => 'boxcar' );
+        $dsp->bin( smooth => radius => 33 );
+        $dsp->bin( about => ( 3, 3 ) );
+        $dsp->bin( cols => ( 'rt_x', 'rt_y' ) );
 
 Note the use of the C<=E<gt>> operator to force preceding barewords to be
 treated as strings, and the frivolous use of extra parenthesis for
@@ -282,7 +1325,6 @@ any deviations from the general approach described above.  Refer
 to the B<DS9> B<XPA> documentation to determine which commands permit
 queries and the allowed data types for the arguments.  B<Image::DS9>
 checks that all data passed to B<DS9> is of the appropriate type.
-
 
 The documentation which follows uses doubled square brackets to
 indicate an optional argument.
@@ -406,23 +1448,22 @@ When queried, some of the options may return more than one value.  In
 those cases, a query yields a reference to an array, not a scalar.
 For instance:
 
-	$res = $dsp->dss( 'coord' );
-	($x, $y ) = @$res;
+        $res = $dsp->dss( 'coord' );
+        ($x, $y ) = @$res;
 
 returns a reference to an array, while
 
-	$res = $dsp->dss( 'server' );
+        $res = $dsp->dss( 'server' );
 
 returns a scalar.  Don't attempt to do
 
-	($x, $y ) = $dsp->dss( 'coord' ); # ERROR DON"T DO THIS
+        ($x, $y ) = $dsp->dss( 'coord' ); # ERROR DON"T DO THIS
 
 As it will return a full blown hash as documented in L</Return Values>.
 
 =item exit
 
 No options, just the grand finale.
-
 
 =item file
 
@@ -462,7 +1503,6 @@ A B<DS9> filter specification
 
 =back
 
-
 =item fits
 
 Return the current frame (as a fits file) as a I<scalar ref>
@@ -495,7 +1535,6 @@ The name of the FITS extension HDU to display.
 A B<DS9> filter specification
 
 =back
-
 
 =item frame
 
@@ -561,7 +1600,6 @@ C<interval>.
 
 Their values may be queried by passing no arguments.
 
-
 =item mode
 
   $mode = $dsp->mode;
@@ -571,7 +1609,7 @@ Set (or query) the first mouse button mode state.
 
 =item nameserver
 
-The following options are supported: 
+The following options are supported:
 
 C<name>,
 C<server>,
@@ -690,7 +1728,6 @@ the current attribute formats,
 
   $regions = $dsp->regions();
 
-
 Alternatively, one can request a different attribute format directly
 in the query by passing a hash reference with the following available
 keys: C<-format>, C<-system>, C<-sky>, C<-skyformat>, C<-strip>.
@@ -699,12 +1736,11 @@ keys: C<-format>, C<-system>, C<-sky>, C<-skyformat>, C<-strip>.
 
 =item rotate
 
-  $rotate = $dsp->rotate;	  # query current angle
+  $rotate = $dsp->rotate;         # query current angle
   $dsp->rotate( abs => $angle );  # absolute
   $dsp->rotate( to => $angle );   # absolute
   $dsp->rotate( rel => $angle );  # relative
   $dsp->rotate( $angle );         # relative
-
 
 =item saveas
 
@@ -727,7 +1763,6 @@ C<scope>.
 To query the state of the options, don't pass a value for the option.
 A query of C<limits> returns an array ref, as it is multi-valued.
 
-
 =item single
 
 To query the whether single mode is set:
@@ -737,7 +1772,6 @@ To query the whether single mode is set:
 To turn single mode on:
 
    $dsp->single;
-
 
 =item source
 
@@ -774,7 +1808,6 @@ To query tiling state, either
 
 To query those options that support query, don't pass a value for the option.
 Note that a query of the grid layout will return an arrayref.
-
 
 =item update
 
@@ -934,7 +1967,6 @@ B<Image::DS9::Constants> for more info.
 
 =head1 Obsolete Methods, Changed Interfaces
 
-
 These methods were available in previous versions of B<DS9>, but
 are no longer supported.
 
@@ -977,8 +2009,37 @@ may find a copy at
 
 Diab Jerius ( djerius@cfa.harvard.edu )
 
+=head1 BUGS AND LIMITATIONS
+
+You can make new bug reports, and view existing ones, through the
+web interface at L<https://rt.cpan.org/Public/Dist/Display.html?Name=Image-DS9>.
+
 =head1 SEE ALSO
 
-perl(1), IPC::XPA.
+Please see those modules/websites for more information related to this module.
+
+=over 4
+
+=item *
+
+L<Image::DS9|Image::DS9>
+
+=item *
+
+L<IPC::XPA>
+
+=back
+
+=head1 AUTHOR
+
+Diab Jerius <djerius@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2017 by Smithsonian Astrophysical Observatory.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
 
 =cut

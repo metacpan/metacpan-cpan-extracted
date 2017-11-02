@@ -4,7 +4,7 @@
 
 # [[[ PREPROCESSOR ]]]
 # <<< PARSE_ERROR: 'ERROR ECOPARP00' >>>
-# <<< PARSE_ERROR: 'Unexpected Token:  baz_variadic_dynamic' >>>
+# <<< PARSE_ERROR: 'Unexpected Token:  my' >>>
 
 # [[[ HEADER ]]]
 use RPerl;
@@ -37,3 +37,5 @@ baz_variadic_dynamic(1);
 baz_variadic_dynamic(2, 'howdy');
 baz_variadic_dynamic(3, 'howdy', 'doody');
 baz_variadic_dynamic(4, 'howdy', 'doody', 'time');
+
+

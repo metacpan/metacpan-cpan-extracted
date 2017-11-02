@@ -7,14 +7,14 @@ use 5.006;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Harness for parsing network device confiugrations",
+  "ABSTRACT" => "A harness for parsing network device configuration.",
   "AUTHOR" => "Greg Foletta <greg\@foletta.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Device-Network-ConfigParser",
   "EXE_FILES" => [
-    "bin/config_parser"
+    "bin/ncp"
   ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.006",
@@ -36,7 +36,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }

@@ -7,7 +7,7 @@ notifications:
         - akzhan.abdulin@reg.ru
 
 perl:
-    # - "5.19"
+    - "5.20"
     - "5.18"
     - "5.16"
     - "5.14"
@@ -18,20 +18,26 @@ before_install:
     - "echo 'user REGRU' > ~/.pause"
     - "git config user.email 'regru@example.com'"
     - "git config user.name 'REG.RU LLC'"
-    - "cpanm -q -n Dist::Zilla"
+    - "perlbrew --force install-cpanm"
+    - "cpanm --version"
+    - "cpanm -q -n version"
+    - "cpanm -q -n Pod::Readme"
     - "cpanm -q -n Test::CPAN::Meta"
     - "cpanm -q -n Test::Pod::Coverage"
     - "cpanm -q -n Test::Pod"
+    - "cpanm -q -n Test::EOL"
+    - "cpanm -q -n Test::NoTabs"
     - "cpanm -q -n Pod::Coverage::TrustPod"
     - "cpanm -q -n Pod::Weaver::Plugin::Encoding"
     - "cpanm -q -n Test::EOL"
     - "cpanm -q -n Test::NoTabs"
 
 install:
-    - "dzil authordeps --missing | xargs cpanm -q -n && dzil listdeps --missing | xargs cpanm -q -n"
+    - "dzil authordeps --missing | xargs cpanm -q -n"
+    - "dzil listdeps --missing | xargs cpanm -q -n"
 
 script:
-    - "dzil smoke --release --author"
+    - "dzil test --release"
 
 branches:
     only:

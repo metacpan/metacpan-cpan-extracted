@@ -30,3 +30,25 @@ NAME
 
     Removed un-needed dependencies in CuiCollector
 
+  Changes from version 0.11 to 0.13
+    added windowing to CUICollector
+
+    removed gzipped file reading, now just unzip then read as normal
+
+    counts now cross utterances
+
+  Changes from version 0.13 to 0.15
+    Association from Matrices made faster
+
+    Association of sets added
+
+    Association of datasets added
+
+    Major speed improvements for collecting results of entire datasets
+
+    Major redesign of Code stucture
+
+    Removed the ability to pass in terms, now CUIs must be used
+
+    Added a frequency association option
+

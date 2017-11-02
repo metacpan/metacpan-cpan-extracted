@@ -1,5 +1,5 @@
 package Net::HTTP::Spore::Middleware::DoNotTrack;
-$Net::HTTP::Spore::Middleware::DoNotTrack::VERSION = '0.07';
+$Net::HTTP::Spore::Middleware::DoNotTrack::VERSION = '0.09';
 # ABSTRACT: add a new header to not track
 
 use Moose;
@@ -24,7 +24,7 @@ Net::HTTP::Spore::Middleware::DoNotTrack - add a new header to not track
 
 =head1 VERSION
 
-version 0.07
+version 0.09
 
 =head1 SYNOPSIS
 

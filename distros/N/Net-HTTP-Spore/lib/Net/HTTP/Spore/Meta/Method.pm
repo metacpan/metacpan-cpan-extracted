@@ -1,5 +1,5 @@
 package Net::HTTP::Spore::Meta::Method;
-$Net::HTTP::Spore::Meta::Method::VERSION = '0.07';
+$Net::HTTP::Spore::Meta::Method::VERSION = '0.09';
 # ABSTRACT: create api method
 
 use JSON;
@@ -220,7 +220,7 @@ Net::HTTP::Spore::Meta::Method - create api method
 
 =head1 VERSION
 
-version 0.07
+version 0.09
 
 =head1 SYNOPSIS
 

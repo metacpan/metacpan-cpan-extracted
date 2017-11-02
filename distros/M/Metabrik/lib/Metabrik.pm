@@ -1,12 +1,12 @@
 #
-# $Id: Metabrik.pm,v 3592d9fef98d 2017/02/04 16:28:28 gomor $
+# $Id: Metabrik.pm,v fa356d306156 2017/11/02 09:23:32 gomor $
 #
 package Metabrik;
 use strict;
 use warnings;
 
 # Breaking.Feature.Fix
-our $VERSION = '1.26';
+our $VERSION = '1.27';
 our $FIX = '0';
 
 use base qw(Class::Gomor::Hash);
@@ -52,7 +52,7 @@ sub brik_license {
 
 sub brik_properties {
    return {
-      revision => '$Revision: 3592d9fef98d $',
+      revision => '$Revision: fa356d306156 $',
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
       tags => [ ],
@@ -1378,7 +1378,11 @@ L<help core::global>
 
 =item B<brik_preinit>
 
+=item B<brik_preinit_no_checks>
+
 =item B<brik_init>
+
+=item B<brik_init_no_checks>
 
 =item B<brik_attributes>
 

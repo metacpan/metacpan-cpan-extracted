@@ -2,7 +2,7 @@ use warnings;
 use strict;
 use Math::LongDouble qw(:all);
 
-print "1..15\n";
+print "1..16\n";
 
 my($uv, $iv, $nv, $pv, $pv_copy1, $pv_copy2);
 
@@ -129,3 +129,10 @@ else {
   print "not ok 15\n";
 }
 
+my $nan = Math::LongDouble->new();
+
+if(is_NaNLD($nan)) {print "ok 16\n"}
+else {
+  warn "\nExpected NaN\nGot $nan\n";
+  print "not ok 16\n";
+}

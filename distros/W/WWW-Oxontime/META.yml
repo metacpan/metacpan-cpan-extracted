@@ -1,0 +1,28 @@
+---
+abstract: 'live Oxford bus departures from Oxontime'
+author:
+  - 'Marius Gavrilescu <marius@ieval.ro>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::RequiresInternet: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-Oxontime
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  HTML::Tree: '0'
+  JSON::MaybeXS: '0'
+  perl: '5.014000'
+resources:
+  repository: https://git.ieval.ro/?p=www-oxontime.git
+version: '0.001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

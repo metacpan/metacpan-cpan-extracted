@@ -1,0 +1,20 @@
+lib/Sort/Naturally/ICU.pm
+src/Makefile.PL
+src/nsort.c
+src/nsort.h
+t/Sort-Naturally-ICU.t
+t/Sort-Naturally-ICU-ncmp.t
+t/Sort-Naturally-ICU-nsort.t
+t/Sort-Naturally-ICU-sorted.t
+Changes
+const-c.inc
+const-xs.inc
+Makefile.PL
+MANIFEST
+ppport.h
+README
+README.md
+typemap
+ICU.xs
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,3 +1,16 @@
+20171024
+   AFFECTS: client::elasticsearch
+
+   - client::elasticsearch index_document Command id Argument has moved to 5th position 
+     instead of the 4th. Hash is a new Argument put at the 4th position.
+   - client::elasticsearch bulk_document Command id Argument has moved to 5th position 
+     instead of the 4th. Hash is a new Argument put at the 4th position.
+
+20170223
+   AFFECTS: email::imap
+
+   - email::imap Brik renamed to client::imap
+
 20170110
    AFFECTS: client::elasticsearch
 

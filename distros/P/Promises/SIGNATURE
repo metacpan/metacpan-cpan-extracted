@@ -15,35 +15,35 @@ not run its Makefile.PL or Build.PL.
 Hash: SHA1
 
 SHA1 f4272892e90734d032dfdb7ee3611a0828d38f5f CONTRIBUTORS
-SHA1 eaff450406e95601130f8db3bfa3b418f19c6b8c Changes
+SHA1 4f90dcffe095578e6f4746f1b3b614934775276e Changes
 SHA1 2ff8bb17436915f897b6e58d3ce2a28ee657035d INSTALL
 SHA1 ce8e22e56157f3fdcca843933194db685252f2a2 LICENSE
 SHA1 899a85c4e5e0a30fdb9b318caccec3d3071adc5b MANIFEST
-SHA1 73e0837ce0c7e8b58059d65fd435108bb6c2691b META.json
-SHA1 ff61887936bbdadc2707d729174080467cec8899 META.yml
-SHA1 5d066bea18b991ea642d4b53f6a2399b870a3743 Makefile.PL
+SHA1 8eb00f1e8b027faa7ac82b50d06d4bd50aeb6768 META.json
+SHA1 f76fff5f47ff7f7d0ed91684501a6037aea7652a META.yml
+SHA1 523c8ce47ec8837ed2af82c7750d97ecd5f10850 Makefile.PL
 SHA1 4bc38d34a6eeb51674f06e9d764d30d8f64c4e2d README.md
-SHA1 ed1d6466f36dd2e78cf30313ee942ccfde5fb9df README.mkdn
+SHA1 f722d5100dd812de38817648d22b7d38d7ab27ac README.mkdn
 SHA1 98adbc2ad146d41168b58c87ccef5320fd91fae5 cpanfile
-SHA1 badb266f6f4e261f9b32fa6a2895845d805feaf9 doap.xml
+SHA1 59bf621fca6a1962a4c0b6873016989ffb524568 doap.xml
 SHA1 d05a4ade3faf1c75190c4415b67eba101d8d9f67 example/chaining-example.pl
 SHA1 49c446c6fbbaa13d3642dbed57c3fe32fe6f14f1 example/example.pl
 SHA1 3f822b32b37db136a3b2ed8ddbc24c6b7e976a18 example/mojo-promises.pl
-SHA1 e8fbce0b84758f331d0dce38bc6b48c585ca582e lib/Promises.pm
-SHA1 44671d24d836f99f5786a4dbc20d787dcb363000 lib/Promises/Cookbook/ChainingAndPipelining.pod
-SHA1 606b9cc658634d4f65bd3b6e8e8f3d041b7c26d7 lib/Promises/Cookbook/GentleIntro.pod
-SHA1 58f56b8c5ea87ffac206406a16709585f9c7e5d5 lib/Promises/Cookbook/Recursion.pod
-SHA1 2ae619bcfcdf10667d9445964571ad626e43926e lib/Promises/Cookbook/ScalaFuturesComparison.pod
-SHA1 5d40fbaa84a30787ce5213f198c0ccd6f950ab0f lib/Promises/Cookbook/SynopsisBreakdown.pod
-SHA1 e27d91a3502d4b8bcb725b0e011cdfc5f2369ab4 lib/Promises/Cookbook/TIMTOWTDI.pod
-SHA1 705c9d824d0b1aebdc8264a288b9c6dec59c10f3 lib/Promises/Deferred.pm
-SHA1 50dce6cc65371db60457098857dcd59f7e492ebe lib/Promises/Deferred/AE.pm
-SHA1 bd219def2fe5afe1f0f15f370c3e2fa7f619443a lib/Promises/Deferred/AnyEvent.pm
-SHA1 a949f68c4ffd488f377b49dec3e75a24f5779042 lib/Promises/Deferred/EV.pm
-SHA1 9dc3d60aa0040eab8bfb59f8c872e6688ed6c8ca lib/Promises/Deferred/IO/Async.pm
-SHA1 012295c07f705b0f3ff0853a44e208010d1b9076 lib/Promises/Deferred/Mojo.pm
-SHA1 8f9d7a42c925d4d51cdb46eac44abe09a7cb504e lib/Promises/Promise.pm
-SHA1 0ac3895853d2e0c172b543219067725424c5504c t/00-compile.t
+SHA1 91ca69788b7f78c5a5f387df2751bbab66cc8493 lib/Promises.pm
+SHA1 344e815483a67bcf82203cc7d10eccb8138377b5 lib/Promises/Cookbook/ChainingAndPipelining.pod
+SHA1 02090c83ad3e0e430dbe9e0f7dc57fc247a1619c lib/Promises/Cookbook/GentleIntro.pod
+SHA1 53080f06644522d38c8e72b30f3463473fee3dfd lib/Promises/Cookbook/Recursion.pod
+SHA1 f5d07cbab4057987aee852d9717698d9ba03a354 lib/Promises/Cookbook/ScalaFuturesComparison.pod
+SHA1 9c66e9958d68ea28bebf1d4551c682d5a0a1cd59 lib/Promises/Cookbook/SynopsisBreakdown.pod
+SHA1 2b3b0bec3723378f61f05e9e1303885e19d43b65 lib/Promises/Cookbook/TIMTOWTDI.pod
+SHA1 73cb7c90ae7424027c53a3bb0baf254a66733592 lib/Promises/Deferred.pm
+SHA1 ce031cc6d0afaf4cfadfaf7743eb1f9379dc0ffa lib/Promises/Deferred/AE.pm
+SHA1 5c019871e43b925ac753b945266e5df90c94b175 lib/Promises/Deferred/AnyEvent.pm
+SHA1 13ed29654ee7bc4cb93ce546de9886b9aea5d248 lib/Promises/Deferred/EV.pm
+SHA1 6d319a9f134b53d901ff46688c72fd9f04a46fd0 lib/Promises/Deferred/IO/Async.pm
+SHA1 f58a247f242c6a4ab10a1755d36037a48fa6bf37 lib/Promises/Deferred/Mojo.pm
+SHA1 f4412dabbab454e40cbf9355c241970a1ec9fb84 lib/Promises/Promise.pm
+SHA1 0a929610bbb6830b338c66b95e4365fa5ea8e881 t/00-compile.t
 SHA1 ef367b5ba506fc36df296301decd11fe0dc5f647 t/00-report-prereqs.dd
 SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
 SHA1 6a36b6a96bc5b9aa6c6e82790759bee8e3c5c51f t/000-load.t
@@ -89,7 +89,7 @@ SHA1 c242aa7b7c233b461bc62d73a976f87509fdb969 t/warnings.t
 SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
 -----BEGIN PGP SIGNATURE-----
 
-iEYEARECAAYFAlntKVAACgkQ34Hwf+GwC4xLTgCg986qu+arilo1uwkGmFL+MIlA
-FbwAnjIYbulVbp9ypxHkuyg4Zgife9rX
-=zos1
+iEYEARECAAYFAln2K8QACgkQ34Hwf+GwC4ysrwCg9e+92ZShJQLjkZhMKRjf4cjY
+NmUAn0GfaNmu4SXkC5A0+Rc1WkiqJb+Q
+=HfiN
 -----END PGP SIGNATURE-----

@@ -330,6 +330,16 @@ one.
 Do not produce the last page on the PDF with the
 author/title/notes/source/site name.
 
+=item * impressum
+
+Move the notes, which are usually in the last page at the bottom and
+centered, on the second page, raggedright, in smaller size.
+
+=item * sansfontsections
+
+Use the default komascript style where chapters and parts have sans
+font.
+
 =item * headings
 
 Generate the running headings in the document. Beware that this will
@@ -396,6 +406,8 @@ has coverwidth => (is => 'rw',
 has nocoverpage => (is => 'rw', isa => Bool, default => sub { 0 });
 has notoc       => (is => 'rw', isa => Bool, default => sub { 0 });
 has nofinalpage => (is => 'rw', isa => Bool, default => sub { 0 });
+has impressum => (is => 'rw', isa => Bool, default => sub { 0 });
+has sansfontsections => (is => 'rw', isa => Bool, default => sub { 0 });
 
 sub all_headings {
     my @headings = (
@@ -577,6 +589,7 @@ sub config_setters {
                headings
                cover coverwidth nocoverpage notoc
                nofinalpage
+               impressum sansfontsections
                opening beamertheme beamercolortheme/);
 }
 

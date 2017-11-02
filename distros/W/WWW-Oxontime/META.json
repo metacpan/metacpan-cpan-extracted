@@ -1,0 +1,54 @@
+{
+   "abstract" : "live Oxford bus departures from Oxontime",
+   "author" : [
+      "Marius Gavrilescu <marius@ieval.ro>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "WWW-Oxontime",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTML::Tree" : "0",
+            "JSON::MaybeXS" : "0",
+            "perl" : "5.014000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::RequiresInternet" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "https://git.ieval.ro/?p=www-oxontime.git"
+      }
+   },
+   "version" : "0.001",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

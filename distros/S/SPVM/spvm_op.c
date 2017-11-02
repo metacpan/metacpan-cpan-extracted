@@ -1084,27 +1084,25 @@ void SPVM_OP_build_constant_pool(SPVM_COMPILER* compiler) {
       // Push value to constant pool
       switch (constant->type->code) {
         case SPVM_TYPE_C_CODE_BYTE: {
+          int8_t value = constant->value.byte_value;
+          
+          constant->id = SPVM_CONSTANT_POOL_push_byte(compiler, constant_pool, value);
           break;
         }
         case SPVM_TYPE_C_CODE_SHORT: {
+          int16_t value = constant->value.short_value;
+          
+          constant->id = SPVM_CONSTANT_POOL_push_short(compiler, constant_pool, value);
           break;
         }
         case SPVM_TYPE_C_CODE_INT: {
-          
           int32_t value = constant->value.int_value;
-          if (value >= -32768 && value <= 32767) {
-            break;
-          }
           
-          constant->id = SPVM_CONSTANT_POOL_push_int(compiler, constant_pool, (int32_t)value);
+          constant->id = SPVM_CONSTANT_POOL_push_int(compiler, constant_pool, value);
           break;
         }
         case SPVM_TYPE_C_CODE_LONG: {
           int64_t value = constant->value.long_value;
-          
-          if (value >= -32768 && value <= 32767) {
-            break;
-          }
           
           constant->id = SPVM_CONSTANT_POOL_push_long(compiler, constant_pool, value);
           break;
@@ -1112,19 +1110,11 @@ void SPVM_OP_build_constant_pool(SPVM_COMPILER* compiler) {
         case SPVM_TYPE_C_CODE_FLOAT: {
           float value = constant->value.float_value;
           
-          if (value == 0 || value == 1 || value == 2) {
-            break;
-          }
-          
           constant->id = SPVM_CONSTANT_POOL_push_float(compiler, constant_pool, value);
           break;
         }
         case SPVM_TYPE_C_CODE_DOUBLE: {
           double value = constant->value.double_value;
-          
-          if (value == 0 || value == 1) {
-            break;
-          }
           
           constant->id = SPVM_CONSTANT_POOL_push_double(compiler, constant_pool, value);
           break;

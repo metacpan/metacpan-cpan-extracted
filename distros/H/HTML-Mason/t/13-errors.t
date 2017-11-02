@@ -417,7 +417,7 @@ EOF
                       description => 'Require a module with an error in a once block',
                       component => <<'EOF',
 <%once>
-require "t/lib/BadModule.pm";
+require "./t/lib/BadModule.pm";
 </%once>
 hi!
 EOF

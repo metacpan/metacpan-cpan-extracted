@@ -1,5 +1,5 @@
 package Net::HTTP::Spore::Role::Description;
-$Net::HTTP::Spore::Role::Description::VERSION = '0.07';
+$Net::HTTP::Spore::Role::Description::VERSION = '0.09';
 # ABSTRACT: attributes for API description
 
 use Moose::Role;
@@ -48,7 +48,7 @@ Net::HTTP::Spore::Role::Description - attributes for API description
 
 =head1 VERSION
 
-version 0.07
+version 0.09
 
 =head1 AUTHORS
 

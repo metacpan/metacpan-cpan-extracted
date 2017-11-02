@@ -6,7 +6,7 @@ use warnings;
 use Test::More tests => 6;
 use Image::DS9;
 
-require 't/common.pl';
+require './t/common.pl';
 
 my $ds9 = start_up();
 $ds9->file( 'data/m31.fits.gz' );

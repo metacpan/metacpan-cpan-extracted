@@ -1,5 +1,6 @@
 package Bio::Phylo::Parsers::Adjacency;
 use strict;
+use warnings;
 use base 'Bio::Phylo::Parsers::Abstract';
 use Bio::Phylo::Util::Exceptions 'throw';
 use Bio::Phylo::Util::CONSTANT qw'/looks_like/ :namespaces :objecttypes';
@@ -45,6 +46,9 @@ sub _parse {
 	my ( @header, %node_cols );
 	my %node_for_id;
     LINE: while (<$fh>) {
+    	unless ( scalar(keys(%node_for_id)) % 1000 ) {
+    		$log->debug("processed node " . scalar(keys(%node_for_id)));
+    	}
         chomp;
 		
 		# the first line is the header row

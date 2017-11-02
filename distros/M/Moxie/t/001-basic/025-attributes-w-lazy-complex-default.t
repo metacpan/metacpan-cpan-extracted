@@ -21,7 +21,7 @@ package Foo {
 
     my sub _bar : private;
 
-    sub BUILDARGS : init_args( bar? => _bar );
+    sub BUILDARGS : init( bar? => _bar );
 
     sub init_bar { _bar = [ 1, 2, 3 ] }
     sub bar      { _bar //= [ 5, 10, 15 ] }

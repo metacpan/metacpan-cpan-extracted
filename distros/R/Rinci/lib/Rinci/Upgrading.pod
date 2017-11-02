@@ -17,7 +17,7 @@ Rinci::Upgrading - Upgrading from previous version of specification
 
 =head1 VERSION
 
-This document describes version 1.1.84 of Rinci::Upgrading (from Perl distribution Rinci), released on 2016-12-28.
+This document describes version 1.1.85 of Rinci::Upgrading (from Perl distribution Rinci), released on 2017-10-26.
 
 =head1 DESCRIPTION
 
@@ -123,7 +123,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

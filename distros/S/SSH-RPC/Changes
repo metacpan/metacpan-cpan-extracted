@@ -1,3 +1,6 @@
+1.204 2017-10-26
+- Fix not using Scalar::Util for ref checking #2
+
 1.203 2017-09-20
 - Add option to provide extended attributes to the new Net::OpenSSH object
 - Add option to provide existing Net::OpenSSH object

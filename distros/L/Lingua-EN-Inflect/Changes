@@ -264,3 +264,9 @@ Revision history for Perl extension Lingua::EN::Inflect.
 
     - Noted the new conversion documentation in Lingua::EN::Inflexion
       (thanks Lady Aleena)
+
+
+1.903  Mon Oct 30 11:44:44 2017
+
+    - Various bugs in documentation code debugged
+      (Thanks, Kornel!)

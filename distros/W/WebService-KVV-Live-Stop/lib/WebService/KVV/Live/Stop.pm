@@ -3,12 +3,12 @@ use warnings;
 package WebService::KVV::Live::Stop;
 
 # ABSTRACT: Arrival times for Trams/Buses in the Karlsruhe metropolitan area
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use Carp;
 use utf8;
 use Net::HTTP::Spore::Middleware::Format::JSON;
-use Net::HTTP::Spore 0.07;
+use Net::HTTP::Spore 0.08;
 use Net::HTTP::Spore::Middleware::DefaultParams;
 use File::ShareDir 'dist_file';
 
@@ -129,89 +129,6 @@ sub departures {
     return @{$response->{body}->{departures}}
 }
 
-no warnings 'redefine';
-sub Net::HTTP::Spore::Request::finalize {
-    my $self = shift;
-
-    my $path_info = $self->env->{PATH_INFO};
-
-    my $form_data = $self->env->{'spore.form_data'};
-    my $headers   = $self->env->{'spore.headers'};
-    my $params    = $self->env->{'spore.params'} || [];
-
-    my $query = [];
-    my $form  = {};
-
-    for ( my $i = 0 ; $i < scalar @$params ; $i++ ) {
-        my $k = $params->[$i];
-        my $v = $params->[++$i];
-        my $modified = 0;
-
-        if ($path_info && $path_info =~ s/\:$k/$v/) {
-            $modified++;
-        }
-
-        foreach my $f_k (keys %$form_data) {
-            my $f_v = $form_data->{$f_k};
-            if ($f_v =~ s/^\:$k/$v/) {
-                $form->{$f_k} = $f_v;
-                $modified++;
-            }
-        }
-
-        foreach my $h_k (keys %$headers) {
-            my $h_v = $headers->{$h_k};
-            if ($h_v =~ s/^\:$k/$v/) {
-                $self->header($h_k => $h_v);
-                $modified++;
-            }
-        }
-
-        if ($modified == 0) {
-            if (defined $v) {
-                push @$query, $k.'='.$v;
-            }else{
-                push @$query, $k;
-            }
-        }
-    }
-
-    # XXX: we don't want colons stripped away
-    # clean remaining :name in url
-    #$path_info =~ s/:\w+//g if $path_info;
-
-    my $query_string;
-    if (scalar @$query) {
-        $query_string = join('&', @$query);
-    }
-
-    $self->env->{PATH_INFO}    = $path_info;
-    $self->env->{QUERY_STRING} = $query_string;
-
-    my $uri = $self->uri($path_info, $query_string || '');
-
-    my $request = HTTP::Request->new(
-        $self->method => $uri, $self->headers
-    );
-
-    if ( keys %$form_data ) {
-        $self->env->{'spore.form_data'} = $form;
-        my ( $content, $b ) = $self->_form_data($form);
-        $request->content($content);
-        $request->header('Content-Length' => length($content));
-        $request->header(
-            'Content-Type' => 'multipart/form-data; boundary=' . $b );
-    }
-
-    if ( my $payload = $self->content ) {
-        $request->content($payload);
-        $request->header(
-            'Content-Type' => 'application/x-www-form-urlencoded' )
-          unless $request->header('Content-Type');
-    }
-
-    return $request;
-}
 
 1;
 __END__

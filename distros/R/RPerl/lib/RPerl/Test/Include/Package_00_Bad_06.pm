@@ -13,9 +13,7 @@ our $VERSION = 0.001_000;
 use RPerl::Test::Foo;
 
 # [[[ SUBROUTINES ]]]
-our integer $empty_sub = sub {
-    return 2;
-};
+sub empty_sub { { my integer $RETURN_TYPE }; return 2; }
 
 1;                  # end of package
 

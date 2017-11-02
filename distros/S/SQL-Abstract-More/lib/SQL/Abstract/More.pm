@@ -2,7 +2,7 @@ package SQL::Abstract::More;
 use strict;
 use warnings;
 
-use SQL::Abstract 1.73;
+use SQL::Abstract 1.84;
 use parent 'SQL::Abstract';
 use MRO::Compat;
 use mro 'c3'; # implements next::method
@@ -12,7 +12,7 @@ use Params::Validate  qw/validate SCALAR SCALARREF CODEREF ARRAYREF HASHREF
 use Scalar::Util      qw/blessed reftype/;
 use Carp;
 
-our $VERSION = '1.28';
+our $VERSION = '1.30';
 
 # import the "puke" function from SQL::Abstract (kind of "die")
 BEGIN {*puke = \&SQL::Abstract::puke;}
@@ -79,8 +79,9 @@ my %limit_offset_dialects = (
 my %common_join_syntax = (
   '<=>' => '%s INNER JOIN %s ON %s',
    '=>' => '%s LEFT OUTER JOIN %s ON %s',
-  '<='  => '%s RIGHT JOIN %s ON %s',
+  '<='  => '%s RIGHT OUTER JOIN %s ON %s',
   '=='  => '%s NATURAL JOIN %s',
+  '>=<' => '%s FULL OUTER JOIN %s ON %s',
 );
 my %right_assoc_join_syntax = %common_join_syntax;
 s/JOIN %s/JOIN (%s)/ foreach values %right_assoc_join_syntax;
@@ -143,11 +144,12 @@ my %params_for_insert = (
   -returning    => {type => SCALAR|ARRAYREF|HASHREF, optional => 1},
 );
 my %params_for_update = (
-  -table        => {type => SCALAR},
+  -table        => {type => SCALAR|SCALARREF|ARRAYREF},
   -set          => {type => HASHREF},
   -where        => {type => SCALAR|ARRAYREF|HASHREF, optional => 1},
   -order_by     => {type => SCALAR|ARRAYREF|HASHREF, optional => 1},
   -limit        => {type => SCALAR,                  optional => 1},
+  -returning    => {type => SCALAR|ARRAYREF|HASHREF, optional => 1},
 );
 my %params_for_delete = (
   -from         => {type => SCALAR},
@@ -186,11 +188,9 @@ sub new {
   # check some of the params for parent -- because SQLA doesn't do it :-(
   !$params{quote_char} || exists $params{name_sep}
     or carp "when 'quote_char' is present, 'name_sep' should be present too";
-  # TODO : validate(%params)
 
   # call parent constructor
   my $self = $class->next::method(%params);
-
 
   # inject into $self
   $self->{$_} = $more_self->{$_} foreach keys %$more_self;
@@ -227,17 +227,14 @@ sub select {
   # if got positional args, this is not our job, just delegate to the parent
   return $self->next::method(@_) if !&_called_with_named_args;
 
-  # declare variables and parse arguments;
-  my ($join_info, %aliased_columns);
+  my %aliased_columns;
+
+  # parse arguments
   my %args = validate(@_, \%params_for_select);
 
   # compute join info if the datasource is a join
-  if (ref $args{-from} eq 'ARRAY' && $args{-from}[0] eq '-join') {
-    my @join_args = @{$args{-from}};
-    shift @join_args;           # drop initial '-join'
-    $join_info   = $self->join(@join_args);
-    $args{-from} = \($join_info->{sql});
-  }
+  my $join_info = $self->_compute_join_info($args{-from});
+  $args{-from}  = \($join_info->{sql}) if $join_info;
 
   # reorganize columns; initial members starting with "-" are extracted
   # into a separate list @post_select, later re-injected into the SQL
@@ -305,24 +302,9 @@ sub select {
   # add ORDER BY if needed
   if (my $order = $args{-order_by}) {
 
-    # force scalar into an arrayref
-    $order = [$order] if not ref $order;
-
-    # restructure array data
-    if (ref $order eq 'ARRAY') {
-      my @clone = @$order;      # because we will modify items 
-
-      # '-' and '+' prefixes are translated into {-desc/asc => } hashrefs
-      foreach my $item (@clone) {
-        next if !$item or ref $item;
-        $item =~ s/^-//  and $item = {-desc => $item} and next;
-        $item =~ s/^\+// and $item = {-asc  => $item};
-      }
-      $order = \@clone;
-    }
-
-    my $sql_order = $self->where(undef, $order);
+    my ($sql_order, @orderby_bind) = $self->_order_by($order);
     $sql .= $sql_order;
+    push @bind, @orderby_bind;
   }
 
   # add LIMIT/OFFSET if needed
@@ -364,19 +346,10 @@ sub insert {
     my %args = validate(@_, \%params_for_insert);
     @old_API_args = @args{qw/-into -values/};
 
-    # if present, "-returning" may be a scalar, arrayref or hashref; the latter
-    # is interpreted as .. RETURNING ... INTO ...
-    if (my $returning = $args{-returning}) {
-      if (does $returning, 'HASH') {
-        my @keys = sort keys %$returning
-          or croak "-returning => {} : the hash is empty";
-        push @old_API_args, {returning => \@keys};
-        $returning_into = [@{$returning}{@keys}];
-      }
-      else {
-        push @old_API_args, {returning => $returning};
-      }
-    }
+    # deal with -returning arg
+    ($returning_into, my $old_API_options) 
+      = $self->_compute_returning($args{-returning});
+    push @old_API_args, $old_API_options if $old_API_options;
   }
   else {
     @old_API_args = @_;
@@ -394,26 +367,71 @@ sub insert {
   return ($sql, @bind);
 }
 
+
 sub update {
   my $self = shift;
 
+  my $join_info;
   my @old_API_args;
+  my $returning_into;
   my %args;
   if (&_called_with_named_args) {
     %args = validate(@_, \%params_for_update);
+
+    # compute join info if the datasource is a join
+    $join_info = $self->_compute_join_info($args{-table});
+    $args{-table} = \($join_info->{sql}) if $join_info;
+
     @old_API_args = @args{qw/-table -set -where/};
+
+    # deal with -returning arg
+    ($returning_into, my $old_API_options) 
+      = $self->_compute_returning($args{-returning});
+    push @old_API_args, $old_API_options if $old_API_options;
   }
   else {
     @old_API_args = @_;
   }
 
-  # call clone of parent method
+  # call clone of parent method and merge with bind values from $join_info
   my ($sql, @bind) = $self->_overridden_update(@old_API_args);
+  unshift @bind, @{$join_info->{bind}} if $join_info;
 
   # maybe need to handle additional args
   $self->_handle_additional_args_for_update_delete(\%args, \$sql, \@bind);
 
+  # inject more stuff if using Oracle's "RETURNING ... INTO ..."
+  if ($returning_into) {
+    $sql .= ' INTO ' . join(", ", ("?") x @$returning_into);
+    push @bind, @$returning_into;
+  }
+
   return ($sql, @bind);
+}
+
+sub _compute_returning {
+  my ($self, $arg_returning) = @_; 
+
+  my ($returning_into, $old_API_options);
+
+  if ($arg_returning) {
+    # if present, "-returning" may be a scalar, arrayref or hashref; the latter
+    # is interpreted as .. RETURNING ... INTO ...
+
+
+    if (does $arg_returning, 'HASH') {
+      my @keys = sort keys %$arg_returning
+        or croak "-returning => {} : the hash is empty";
+
+      $old_API_options = {returning => \@keys};
+      $returning_into  = [@{$arg_returning}{@keys}];
+    }
+    else {
+      $old_API_options = {returning => $arg_returning};
+    }
+  }
+
+  return ($returning_into, $old_API_options);
 }
 
 
@@ -432,7 +450,27 @@ sub _handle_additional_args_for_update_delete {
   }
 }
 
+sub _order_by {
+  my ($self, $order) = @_;
 
+  # force scalar into an arrayref
+  $order = [$order] if not ref $order;
+
+  # restructure array data
+  if (does $order, 'ARRAY') {
+    my @clone = @$order;      # because we will modify items
+
+    # '-' and '+' prefixes are translated into {-desc/asc => } hashrefs
+    foreach my $item (@clone) {
+      next if !$item or ref $item;
+      $item =~ s/^-//  and $item = {-desc => $item} and next;
+      $item =~ s/^\+// and $item = {-asc  => $item};
+    }
+    $order = \@clone;
+  }
+
+  return $self->next::method($order);
+}
 
 sub delete {
   my $self = shift;
@@ -534,12 +572,11 @@ sub bind_params {
   $sth->isa('DBI::st') or croak "sth argument is not a DBI statement handle";
   foreach my $i (0 .. $#bind) {
     my $val = $bind[$i];
-    my $ref = ref $val || '';
-    if ($ref eq 'SCALAR') {
+    if (does $val, 'SCALAR') {
       # a scalarref is interpreted as an INOUT parameter
       $sth->bind_param_inout($i+1, $val, $INOUT_MAX_LEN);
     }
-    elsif ($ref eq 'ARRAY' and
+    elsif (does $val, 'ARRAY' and
              my ($bind_meth, @args) = $self->is_bind_value_with_type($val)) {
       # either 'bind_param' or 'bind_param_inout', with 2 or 3 args
       $sth->$bind_meth($i+1, @args);
@@ -586,6 +623,19 @@ sub is_bind_value_with_type {
 #----------------------------------------------------------------------
 # private utility methods for 'join'
 #----------------------------------------------------------------------
+
+sub _compute_join_info {
+  my ($self, $table_arg) = @_;
+
+  if (does($table_arg, 'ARRAY') && $table_arg->[0] eq '-join') {
+    my @join_args = @$table_arg;
+    shift @join_args;                # drop initial '-join'
+    return $self->join(@join_args);
+  }
+  else {
+    return;
+  }
+}
 
 sub _parse_table {
   my ($self, $table) = @_;
@@ -936,6 +986,7 @@ sub _overridden_update {
   my $table = $self->_table(shift);
   my $data  = shift || return;
   my $where = shift;
+  my $options = shift;
 
   # first build the 'SET' part of the sql statement
   my (@set, @all_bind);
@@ -997,6 +1048,12 @@ sub _overridden_update {
     my($where_sql, @where_bind) = $self->where($where);
     $sql .= $where_sql;
     push @all_bind, @where_bind;
+  }
+
+  if ($options->{returning}) {
+    my ($returning_sql, @returning_bind) = $self->_update_returning($options);
+    $sql .= $returning_sql;
+    push @all_bind, @returning_bind;
   }
 
   return wantarray ? ($sql, @all_bind) : $sql;
@@ -1509,7 +1566,7 @@ specified either by a plain string or by an array of strings.
 adds a C<HAVING> clause in the SQL statement (only makes
 sense together with a C<GROUP BY> clause).
 This is like a C<-where> clause, except that the criteria
-are applied after grouping has occured.
+are applied after grouping has occurred.
 
 
 =item C<< -order_by => \@order >>
@@ -1649,11 +1706,12 @@ present module is there for help. Example:
 
   # named parameters, handled in this class
   ($sql, @bind) = $sqla->update(
-    -table    => $table,
-    -set      => {col => $val, ...},
-    -where    => \%conditions,
-    -order_by => \@order,
-    -limit    => $limit,
+    -table     => $table,
+    -set       => {col => $val, ...},
+    -where     => \%conditions,
+    -order_by  => \@order,
+    -limit     => $limit,
+    -returning => $return_structure,
   );
 
 This works in the same spirit as the L</insert> method above.
@@ -1663,6 +1721,8 @@ they improve the readability of the client's code.
 
 Few DBMS would support parameters C<-order_by> and C<-limit>, but
 MySQL does -- see L<http://dev.mysql.com/doc/refman/5.6/en/update.html>.
+
+Optional parameter C<-returning> works like for the L</insert> method.
 
 
 =head2 delete
@@ -1775,6 +1835,7 @@ SQL JOIN clauses :
    '=>' => '%s LEFT OUTER JOIN %s ON %s',
   '<='  => '%s RIGHT JOIN %s ON %s',
   '=='  => '%s NATURAL JOIN %s',
+  '>=<' => '%s FULL OUTER JOIN %s ON %s',
 
 This operator table can be overridden through
 the C<join_syntax> parameter of the L</new> method.
@@ -1986,7 +2047,8 @@ Laurent Dami, C<< <laurent dot dami at cpan dot org> >>
 =head1 BUGS
 
 Please report any bugs or feature requests to C<bug-sql-abstract-more at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=SQL-Abstract-More>.  I will be notified, and then you'll
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=SQL-Abstract-More>. 
+I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
 
@@ -2022,7 +2084,7 @@ L<https://metacpan.org/module/SQL::Abstract::More>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2011-2016 Laurent Dami.
+Copyright 2011-2017 Laurent Dami.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

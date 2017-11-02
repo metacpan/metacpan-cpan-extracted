@@ -4,63 +4,44 @@ use strict;
 use LWP::UserAgent ();
 use Carp ();
 
-our $VERSION = '0.07';
+our $VERSION = '0.10';
 
-our $DOMAIN = 'antigate.com'; # service domain often changes because of the abuse
-our $WAIT   = 220;            # default time that recognize() or upload() can work
-our $DELAY  = 5;              # sleep time before retry while uploading or recognizing captcha
-our $FNAME  = 'captcha.jpg';  # default name of the uploaded captcha if name not specified and can't be determined
+our $DOMAIN = 'anti-captcha.com'; # service domain often changes because of the abuse
+our $WAIT   = 220;                # default time that recognize() or upload() can work
+our $DELAY  = 5;                  # sleep time before retry while uploading or recognizing captcha
+our $FNAME  = 'captcha.jpg';      # default name of the uploaded captcha if name not specified and can't be determined
 
-
-my %MESSAGES = 
-(
-    'ERROR_KEY_DOES_NOT_EXIST'       => 'wrong service key used',
-    'ERROR_WRONG_USER_KEY'           => 'wrong service key used',
-    'ERROR_NO_SLOT_AVAILABLE'        => 'all recognizers are busy, try later',
-    'ERROR_ZERO_CAPTCHA_FILESIZE'    => 'uploaded captcha size is zero',
-    'ERROR_TOO_BIG_CAPTCHA_FILESIZE' => 'uploaded captcha size is grater than 90 Kb',
-    'ERROR_WRONG_FILE_EXTENSION'     => 'wrong extension of the uploaded captcha, allowed extensions are gif, jpg, png',
-    'ERROR_IP_NOT_ALLOWED'           => 'this ip not allowed to use this account',
-    'ERROR_WRONG_ID_FORMAT'          => 'captcha id should be number',
-    'ERROR_NO_SUCH_CAPCHA_ID'        => 'no such captcha id in the database',
-    'ERROR_URL_METHOD_FORBIDDEN'     => 'this upload method is already not supported',
-    'ERROR_IMAGE_IS_NOT_PNG'         => 'captcha is not correct png file',
-    'ERROR_IMAGE_IS_NOT_JPEG'        => 'captcha is not correct jpeg file',
-    'ERROR_IMAGE_IS_NOT_GIF'         => 'captcha is not correct gif file',
-    'ERROR_ZERO_BALANCE'             => 'you have a zero balance',
-    'CAPCHA_NOT_READY'               => 'captcha is not recognized yet',
-    'OK_REPORT_RECORDED'             => 'your abuse recorded',
-    'ERROR_CAPTCHA_UNSOLVABLE'       => 'captcha can\'t be recognized',
-    'ERROR_BAD_DUPLICATES'           => 'captcha duplicates limit reached'
+my %API_VERSIONS = (
+	1 => sub { require WebService::Antigate::V1; 'WebService::Antigate::V1' },
+	2 => sub { require WebService::Antigate::V2; 'WebService::Antigate::V2' },
 );
 
-
-sub new
-{
+sub new {
     my ($class, %args) = @_;
     
     Carp::croak "Option `key' should be specified" unless defined $args{key};
     
     my $self = {};
-    $self->{key}    = $args{key};
-    $self->{wait}     = $args{wait};
-    $self->{attempts} = $args{attempts};
-    $self->{ua}     = $args{ua}     || LWP::UserAgent->new();
-    $self->{domain}   = $args{domain} || $DOMAIN;
-    $self->{delay}    = $args{delay}  || $DELAY;
+    $self->{key}         = $args{key};
+    $self->{wait}        = $args{wait};
+    $self->{attempts}    = $args{attempts};
+    $self->{ua}          = $args{ua}     || LWP::UserAgent->new();
+    $self->{domain}      = $args{domain} || $DOMAIN;
+    $self->{delay}       = $args{delay}  || $DELAY;
+	$self->{scheme}      = $args{scheme} || 'http';
+	$self->{subdomain}   = $args{subdomain};
+	$self->{api_version} = $args{api_version} || 1;
     
     $self->{wait} = $WAIT unless defined($self->{wait}) || defined($self->{attempts});
     
-    bless($self, $class);
+	Carp::croak "Unsupported `api_version' specified" unless exists $API_VERSIONS{ $self->{api_version} };
+    bless $self, $class eq __PACKAGE__ ? $API_VERSIONS{ $self->{api_version} }->() : $class;
 }
 
-
 # generate sub's for get/set object properties using closure
-foreach my $key (qw(key wait attempts ua domain delay))
-{
+foreach my $key (qw(key wait attempts ua scheme domain subdomain delay)) {
     no strict 'refs';
-    *$key = sub
-    {
+    *$key = sub {
         my $self = shift;
     
         return $self->{$key} = $_[0] if defined $_[0];
@@ -68,91 +49,22 @@ foreach my $key (qw(key wait attempts ua domain delay))
     }
 }
 
-
-sub errno
-{
+sub errno {
     return $_[0]->{errno};
 }
 
-
-sub errstr
-{
+sub errstr {
     return $_[0]->{errstr};
 }
 
-
-sub try_upload
-{
-    my ($self, %opts) = @_;
-    
-    Carp::croak "Captcha file or content should be specified and exists"
-        if (!defined($opts{file}) && !defined($opts{content})) || (defined($opts{file}) && ! -e $opts{file});
-    
-    my $file;
-    my $response = $self->{ua}->post
-        (
-            "http://$self->{domain}/in.php",
-            Content_Type => "form-data",
-            Content    =>
-            [
-                key    => $self->{key},
-                method => 'post',
-                file   =>
-                [
-                    defined($opts{file}) ?
-                        (
-                            $file = delete $opts{file},
-                            defined($opts{name}) ?
-                                delete $opts{name}
-                                :
-                                $file !~ /\..{1,5}$/ ? # filename without extension
-                                    _name_by_file_signature($file)
-                                    :
-                                    undef
-                        )
-                        :
-                        (
-                            undef,
-                            defined($opts{name}) ?
-                                delete $opts{name}
-                                :
-                                _name_by_signature($opts{content}),
-                            Content => delete $opts{content}
-                        )
-                ],
-                %opts
-            ]
-        );
-    
-    unless($response->is_success)
-    {
-        $self->{errno}  = 'HTTP_ERROR';
-        $self->{errstr} = $response->status_line;
-        return undef;
-    }
-    
-    my $captcha_id;
-    unless(($captcha_id) = $response->content =~ /OK\|(\d+)/)
-    {
-        $self->{errno}  = $response->content;
-        $self->{errstr} = $MESSAGES{ $self->{errno} };
-        return undef;
-    }
-    
-    return $self->{last_captcha_id} = $captcha_id;
-}
-
-
-sub upload
-{
+sub upload {
     my ($self, %opts) = @_;
     
     my $start = time();
     my $attempts = 0;
     my $captcha_id;
     
-    do
-    {
+    do {
         $attempts ++;
         $captcha_id = $self->try_upload(%opts);
     }
@@ -166,36 +78,7 @@ sub upload
     return $captcha_id;
 }
 
-
-sub try_recognize
-{
-    my ($self, $id) = @_;
-    
-    Carp::croak "Captcha id should be specified" unless defined $id;
-    
-    my $response = $self->{ua}->get("http://$self->{domain}/res.php?key=$self->{key}&action=get&id=$id");
-    
-    unless($response->is_success)
-    {
-        $self->{errno}  = 'HTTP_ERROR';
-        $self->{errstr} = $response->status_line;
-        return undef;
-    }
-    
-    my $captcha_text;
-    unless(($captcha_text) = $response->content =~ /OK\|(.+)/)
-    {
-        $self->{errno}  = $response->content;
-        $self->{errstr} = $MESSAGES{ $self->{errno} };
-        return undef;
-    }
-    
-    return $captcha_text;
-}
-
-
-sub recognize
-{
+sub recognize {
     my ($self, $id) = @_;
     
     my $start = time();
@@ -217,9 +100,7 @@ sub recognize
     return $captcha_text;
 }
 
-
-sub upload_and_recognize
-{
+sub upload_and_recognize {
     my ($self, %opts) = @_;
     
     my $captcha_id;
@@ -231,77 +112,23 @@ sub upload_and_recognize
     return $self->recognize($captcha_id);
 }
 
-
-sub last_captcha_id
-{
+sub last_captcha_id {
     my ($self) = @_;
     return $self->{last_captcha_id};
 }
 
-
-sub abuse
-{
-    my ($self, $id) = @_;
-    
-    Carp::croak "Captcha id should be specified" unless defined $id;
-    
-    my $response = $self->{ua}->get("http://$self->{domain}/res.php?key=$self->{key}&action=reportbad&id=$id");
-    
-    unless($response->is_success)
-    {
-        $self->{errno}  = 'HTTP_ERROR';
-        $self->{errstr} = $response->status_line;
-        return undef;
-    }
-    
-    unless($response->content eq 'OK_REPORT_RECORDED')
-    {
-        $self->{errno}  = $response->content;
-        $self->{errstr} = $MESSAGES{ $self->{errno} };
-        return undef;
-    }
-    
-    return 1;
-}
-
-
-sub balance
-{
-    my $self = shift;
-    
-    my $response = $self->{ua}->get("http://$self->{domain}/res.php?key=$self->{key}&action=getbalance");
-    
-    unless($response->is_success)
-    {
-        $self->{errno}  = 'HTTP_ERROR';
-        $self->{errstr} = $response->status_line;
-        return undef;
-    }
-    
-    if($response->content =~ /^ERROR_/)
-    {
-        $self->{errno}  = $response->content;
-        $self->{errstr} = $MESSAGES{ $self->{errno} };
-        return undef;
-    }
-    
-    return $response->content;
-}
-
-
-sub _name_by_signature
-{
-    if ($_[0] =~ /^\x47\x49\x46\x38(?:\x37|\x39)\x61/)
+sub _name_by_signature {
+    if ($_[1] =~ /^\x47\x49\x46\x38(?:\x37|\x39)\x61/)
     {
         return 'captcha.gif';
     }
 
-    if ($_[0] =~ /^\x89\x50\x4E\x47\x0D\x0A\x1A\x0A/)
+    if ($_[1] =~ /^\x89\x50\x4E\x47\x0D\x0A\x1A\x0A/)
     {
         return 'captcha.png';
     }
 
-    if ($_[0] =~ /^\xFF\xD8\xFF\xE0..\x4A\x46\x49\x46\x00/)
+    if ($_[1] =~ /^\xFF\xD8\xFF\xE0..\x4A\x46\x49\x46\x00/)
     {
         return 'captcha.jpg';
     }
@@ -309,15 +136,14 @@ sub _name_by_signature
     return $FNAME;
 }
 
-
-sub _name_by_file_signature
-{
-    open my $fh, '<:raw', $_[0] or return _name_by_signature('');
+sub _name_by_file_signature {
+    my $self = shift;
+	
+	open my $fh, '<:raw', $_[0] or return $self->_name_by_signature('');
     sysread($fh, my $buf, 20);
     close $fh;
-    return _name_by_signature($buf);
+    return $self->_name_by_signature($buf);
 }
-
 
 1;
 
@@ -325,7 +151,7 @@ __END__
 
 =head1 NAME
 
-WebService::Antigate - Recognition of captches using antigate.com service (former anti-captcha.com)
+WebService::Antigate - Recognition of captches using antigate.com service (now anti-captcha.com)
 
 =head1 SYNOPSIS
 
@@ -387,12 +213,25 @@ WebService::Antigate - Recognition of captches using antigate.com service (forme
 
  print "Recognized captcha is: ", $captcha, "\n";
 
+=item Using API v2 to recognize recaptcha
+
+  use WebService::Antigate;
+  
+  my $recognizer = WebService::Antigate->new(key => 'd41d8cd98f00b204e9800998ecf8427e', api_version => 2);
+  my $recaptcha_token = $recognizer->upload_and_recognize(
+	type       => 'NoCaptchaTaskProxyless',
+	websiteURL => "https://www.google.com/",
+	websiteKey => "6LeZhwoTAAAAAP51ukBEOocjtdKGRDei9wFxFSpm"
+  );
+  
+  warn $recaptcha_token;
+
 =back
 
 =head1 DESCRIPTION
 
-The C<WebService::Antigate>  is a class for captcha text recognition. It uses the API of antigate.com
-service. You have to register with antigate.com to obtain you private key. Thereafter you can upload
+The C<WebService::Antigate>  is a class for captcha text recognition. It uses the API of anti-captcha.com
+service (versions 1 and 2 of API supported). You have to register with anti-captcha.com to obtain you private key. Thereafter you can upload
 captcha image to this service using this class and receive captcha text already recognized. Be aware
 not to use this service for any illegal activities.
 
@@ -402,26 +241,32 @@ not to use this service for any illegal activities.
 
 =item WebService::Antigate->new( %options )
 
-This method constructs new object C<WebService::Antigate>. Key / value pairs can be passed as an argument
-to specify the initial state. The following options correspond to attribute methods described below:
+This method constructs new object of L<WebService::Antigate::V1> or L<WebService::Antigate::V2> depending on C<api_version> specified.
+Key / value pairs can be passed as an argument to specify the initial state. The following options correspond to attribute methods described below:
 
-   KEY                  DEFAULT                                           OPTIONAL
-   -----------          --------------------                              ---------------
-   key                   undef                                            NO
-   ua                    LWP::UserAgent->new                              yes
-   domain                $WebService::Antigate::DOMAIN = 'antigate.com'   yes
-   wait                  $WebService::Antigate::WAIT = 220                yes
-   attempts              undef                                            yes
-   delay                 $WebService::Antigate::DELAY = 5                 yes
+   KEY                  DEFAULT                                                OPTIONAL
+   -----------          --------------------                                 ---------------
+   key                   undef                                                 NO
+   api_version           1                                                     yes
+   ua                    LWP::UserAgent->new                                   yes
+   scheme                http                                                  yes
+   domain                $WebService::Antigate::DOMAIN = 'anti-captcha.com'    yes
+   subdomain             undef                                                 yes
+   wait                  $WebService::Antigate::WAIT = 220                     yes
+   attempts              undef                                                 yes
+   delay                 $WebService::Antigate::DELAY = 5                      yes
 
 Options description:
 
-   key      - your service private key, which can be found here: http://antigate.com/panel.php?action=api
-   ua       - LWP::UserAgent object used to upload captcha and receive the result (captcha recognition)
-   domain   - current domain of the service, can be changed in the future
-   wait     - maximum waiting time until captcha will be accepted  ( upload() ) or recognized ( recognize() ) by the service
-   delay    - delay time before next attempt of captcha uploading or recognition after previous failure
-   attempts - maximum number of attempts that we can try_upload() or try_recognize()
+   key         - your service private key
+   api_version - version of API to use: 1 or 2
+   ua          - LWP::UserAgent object used to upload captcha and receive the result (captcha recognition)
+   scheme      - http or https, default value may be different in subclasses
+   domain      - current domain of the service, can be changed in the future
+   subdomain   - current subdomain of domain of the service (with dot at the end), default value may be different in subclasses
+   wait        - maximum waiting time until captcha will be accepted  ( upload() ) or recognized ( recognize() ) by the service
+   delay       - delay time before next attempt of captcha uploading or recognition after previous failure
+   attempts    - maximum number of attempts that we can try_upload() or try_recognize()
    
 If you specify `wait' and `attempts' options at the same time, than class will try to upload/recognize until time or attempts
 will over (which first).
@@ -444,11 +289,23 @@ Example:
 
    $recognizer->ua->proxy(http => 'http://localhost:8080');
 
+=item $recognizer->scheme
+
+=item $recognizer->scheme($scheme)
+
+This method gets or sets API url scheme.
+
 =item $recognizer->domain
 
 =item $recognizer->domain($domain)
 
 This method gets or sets the domain of the service.
+
+=item $recognizer->subdomain
+
+=item $recognizer->subdomain($domain)
+
+This method gets or sets subdomain of the service (with dot at the end).
 
 =item $recognizer->wait
 
@@ -471,7 +328,7 @@ This method gets or sets maximum number of attempts. See above.
 =item $recognizer->errno
 
 This method gets an error from previous unsuccessful operation. The Error is returned as a string constant
-associated with this error type. It should be one of the:
+associated with this error type. For example:
 
   'ERROR_KEY_DOES_NOT_EXIST'
   'ERROR_WRONG_USER_KEY'
@@ -491,6 +348,8 @@ associated with this error type. It should be one of the:
   'ERROR_BAD_DUPLICATES'
   'HTTP_ERROR'
 
+For complete list of errors see API documentation
+
 =item $recognizer->errstr
 
 This method gets an error from previous unsuccessful operation. The Error is returned as a string which
@@ -498,32 +357,9 @@ describes the problem.
 
 =item $recognizer->try_upload(%options)
 
-This method tries to upload captcha image to the service. Here you can use the following settings:
-
-   KEY            DEFAULT       DESCRIPTION
-   ----------     ----------    ------------
-   file            undef        path to the file with captcha
-   content         undef        captcha content
-   name            undef        represented name of the file with captcha
-   phrase          0            1 if captcha text has 2-4 words
-   regsense        0            1 if that captcha text is case sensitive
-   numeric         0            1 if that captcha text contains only digits, 2 if captcha text has no digits
-   calc            0            1 if that digits on the captcha should be summed up
-   min_len         0            minimum length of the captcha text (0..20)
-   max_len         0            maximum length of the captcha text (0..20), 0 - no limits
-   is_russian      0            1 - russian text only, 2 - russian or english, 0 - does not matter
-   soft_id         undef        id of your application to earn money
-   header_acao     0            1 if server should return "Access-Control-Allow-Origin: *" header
-   
-You must specify either `file' option or `content'. Other options are facultative. If you want to upload captcha from variable
-(`content' option) instead from file, you must specify the name of the file with `name' option. Antigate webservice determines
-file format by extension, so it is important to specify proper extension in file name. If `file' option used and file name has
-no extension and `name' was not specified or if `content' option used and `name' was not specified, this module will try to
-specify proper name by file signature. If file has unknown signature $WebService::Antigate::FNAME will be used as file name.
-On success captcha id is returned. On failure returns undef and sets errno and errstr.
-
-This list of settings supported by the service may be outdated. But you can specify any other options supported by the service
-here without any changes of the module.
+This method tries to upload captcha image (if captcha is image related) to the service or just creates task (if not) on the service.
+For available options see speecific API version: L<WebService::Antigate::V1/"try_upload"> or L<WebService::Antigate::V2/"try_upload">.
+On success will return captcha id. On failure returns undef and sets errno and errstr.
 
 =item $recognizer->upload(%options)
 
@@ -533,8 +369,8 @@ captcha id. On failure returns undef and sets errno and errstr.
 
 =item $recognizer->try_recognize($captcha_id)
 
-This method tries to recognize captcha with id $captcha_id - value returned by method upload() or try_upload(). On
-success will return recognized captcha text. On failure returns undef and sets errno and errstr.
+This method tries to recognize captcha (get result for previously uploaded captcha) with id $captcha_id  - value returned by method
+upload() or try_upload(). On success will return recognized captcha text. On failure returns undef and sets errno and errstr.
 
 =item $recognizer->recognize($captcha_id)
 
@@ -567,21 +403,21 @@ and errstr.
 
 =head1 PACKAGE VARIABLES
 
-$WebService::Antigate::DOMAIN   = 'antigate.com'; # service domain often changes because of the abuse
+$WebService::Antigate::DOMAIN   = 'anti-captcha.com'; # service domain often changes because of the abuse
 
-$WebService::Antigate::WAIT     = 220;            # default time that recognize() or upload() can work
+$WebService::Antigate::WAIT     = 220;                # default time that recognize() or upload() can work
 
-$WebService::Antigate::DELAY    = 5;              # sleep time before retry while uploading or recognizing captcha
+$WebService::Antigate::DELAY    = 5;                  # sleep time before retry while uploading or recognizing captcha
 
-$WebService::Antigate::FNAME    = 'captcha.jpg';  # default name of the uploaded captcha if name not specified and can't be determined
+$WebService::Antigate::FNAME    = 'captcha.jpg';      # default name of the uploaded captcha if name not specified and can't be determined
 
 =head1 SEE ALSO
 
-L<LWP::UserAgent>
+L<WebService::Antigate::V1>, L<WebService::Antigate::V2>
 
 =head1 COPYRIGHT
 
-Copyright 2010-2011 Oleg G <oleg@cpan.org>.
+Oleg G <oleg@cpan.org>.
 
 This library is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

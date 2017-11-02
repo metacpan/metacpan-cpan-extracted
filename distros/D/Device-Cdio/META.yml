@@ -3,61 +3,58 @@ abstract: 'Perl bindings for CD Input and control library (libcdio)'
 author:
   - 'Rocky Bernstein <rocky@cpan.org>'
 build_requires:
-  ExtUtils::CBuilder: 0
+  ExtUtils::CBuilder: '0'
 configure_requires:
-  Module::Build: 0.38
+  Module::Build: '0.38'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112150'
-license: open_source
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150005'
+license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Device-Cdio
 provides:
   Device::Cdio:
     file: lib/Device/Cdio.pm
-    version: v0.3.0
+    version: v0.4.0
   Device::Cdio::Device:
     file: lib/Device/Cdio/Device.pm
-    version: 0
   Device::Cdio::ISO9660:
     file: lib/Device/Cdio/ISO9660.pm
-    version: 0
   Device::Cdio::ISO9660::FS:
     file: lib/Device/Cdio/ISO9660/FS.pm
-    version: 0
   Device::Cdio::ISO9660::IFS:
     file: lib/Device/Cdio/ISO9660/IFS.pm
-    version: 0
   Device::Cdio::Track:
     file: lib/Device/Cdio/Track.pm
-    version: 0
   Device::Cdio::Util:
     file: lib/Device/Cdio/Util.pm
-    version: 0
   perlcdio:
     file: lib/perlcdio.pm
-    version: 0
+  perlcdio::imaxdiv_t:
+    file: lib/perlcdio.pm
   perlcdioc:
     file: lib/perlcdio.pm
-    version: 0
   perliso9660:
     file: lib/perliso9660.pm
-    version: 0
+  perliso9660::imaxdiv_t:
+    file: lib/perliso9660.pm
   perliso9660c:
     file: lib/perliso9660.pm
-    version: 0
   perlmmc:
     file: lib/perlmmc.pm
-    version: 0
+  perlmmc::imaxdiv_t:
+    file: lib/perlmmc.pm
   perlmmcc:
     file: lib/perlmmc.pm
-    version: 0
 requires:
-  ExtUtils::CBuilder: 0.28
-  ExtUtils::PkgConfig: 1.03
-  Test::More: 0
-  version: 0
+  ExtUtils::CBuilder: '0.28'
+  ExtUtils::PkgConfig: '1.03'
+  Test::More: '0'
+  version: '0'
 resources:
-  license: http://opensource.org/licenses/gpl-license.php
-version: v0.3.0
+  bugtracker: https://github.com/rocky/Perl-Device-Cdio/issues
+  license: http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt
+  repository: http://github.com/rocky/Perl-Device-Cdio
+version: v0.4.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -88,7 +88,7 @@ define ([
         var emptyObj = { "nick": null };
         if (sw === 'obj') {
             // console.log('current-user function called with "obj"', arg);
-            if (arg) {
+            if (typeof arg === 'object' && arg) {
                 console.log('NOTICE: setting current user object to ', arg);
                 cu = arg;
                 cf('currentUser', cu);
@@ -116,7 +116,7 @@ define ([
         }
         if (sw === 'flag1') {
             // console.log('current-user function called with "flag1"');
-            if (arg || arg === 0 || arg === 'null') {
+            if (arg || arg === 0 || arg === 'null' || arg === false) {
                 console.log('NOTICE: setting current user flag1 to ' + arg);
                 flag1 = arg;
             }

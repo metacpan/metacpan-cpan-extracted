@@ -1,4 +1,9 @@
 #!/usr/bin/perl
+
+# [[[ PREPROCESSOR ]]]
+# <<< EXECUTE_SUCCESS: 'have $foo = howdy dowdy hello ahoy' >>>
+# <<< EXECUTE_SUCCESS: "have $bar = $foo =~ m/owdy/gxms = '1'" >>>
+
 # [[[ HEADER ]]]
 use RPerl;
 use strict;
@@ -11,8 +16,17 @@ our $VERSION = 0.001_000;
 
 # [[[ OPERATIONS ]]]
 
-my string $foo  = 'howdy hello ahoy';
-print 'have $foo = ', $foo, "\n";
+# BIND, LITERAL PATTERN
 
-$foo =~ s/ho/HO/gms;
-print 'have changed $foo = ', $foo, "\n";
+#use Data::Dumper;
+
+my string $foo  = 'howdy dowdy hello ahoy';
+
+my integer $bar = $foo =~ m/owdy/gxms;  # DEFAULT scalar, truth value matched
+#my string_arrayref $bar = [$foo =~ m/owdy/gxms];  # array ref, matches
+#my integer $bar = scalar @{[$foo =~ m/owdy/gxms]};  # scalar, match count
+
+print 'have $foo = ', $foo, "\n";
+print q{have $bar = $foo =~ m/owdy/gxms = '}, $bar, q{'}, "\n";
+#print q{have $bar = $foo =~ m/owdy/gxms = '}, Dumper($bar), q{'}, "\n";
+

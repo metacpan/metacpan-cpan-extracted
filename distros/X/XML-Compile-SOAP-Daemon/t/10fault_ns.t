@@ -91,12 +91,16 @@ sub compare_answer($$$)
     isa_ok($answer, 'HTTP::Response');
     UNIVERSAL::isa($answer, 'HTTP::Response') or return;
 
+	# error not always the same for various libxml versions
+	my $content = $answer->decoded_content;
+	$content =~ s/( error\:) .*\z/$1 LIBXML-ERROR\n/s;
+
     my $h = $answer->headers;
     my $a = join "\n"
      , $answer->code
      , $answer->message
      , $answer->content_type, ''
-     , $answer->decoded_content;
+     , $content;
     $a =~ s/\s*\z/\n/;
 
     is($a, $expected, $text);
@@ -153,7 +157,7 @@ compare_answer($ans4, <<__EXPECTED, 'parsing error');
 XML syntax error
 text/plain
 
-[422] The XML cannot be parsed: :1: parser error : Premature end of data in tag bad-xml line 1
+[422] The XML cannot be parsed: error: LIBXML-ERROR
 __EXPECTED
 
 ### Not SOAP Envelope

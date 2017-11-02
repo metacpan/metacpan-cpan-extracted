@@ -26,11 +26,11 @@ Data::Consumer::MySQL2 - Data::Consumer implementation for a mysql database tabl
 
 =head1 VERSION
 
-Version 0.16
+Version 0.17
 
 =cut
 
-$VERSION= '0.16';
+$VERSION= '0.17';
 
 =head1 SYNOPSIS
 
@@ -323,7 +323,10 @@ sub acquire {
         $self->debug_warn( 5, "last_id was $self->{last_id}");
         my ($id)= $dbh->selectrow_array( $self->{select_sql}, undef, $self->{last_id}, @{ $self->{select_args} || [] } );
         if ( defined $id ) {
-            next if $self->is_ignored($id);
+            if ( $self->is_ignored($id) ) {
+                $self->{last_id}= $id;
+                next;
+            }
             my ($got_id) = $dbh->selectrow_array( $self->{check_sql}, undef, $id, @{ $self->{check_args} || [] } );
             if ( not defined $got_id) {
                 $self->debug_warn(5, "race condition avoided for '$id', check_sql and select_sql did not line up!");

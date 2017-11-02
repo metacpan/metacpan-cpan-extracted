@@ -4,7 +4,7 @@
       "GomoR <gomor_at_metabrik.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4218",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "bsd"
    ],
@@ -41,23 +41,23 @@
    "provides" : {
       "Metabrik" : {
          "file" : "lib/Metabrik.pm",
-         "version" : "1.26"
+         "version" : "1.27"
       },
       "Metabrik::Core::Context" : {
          "file" : "lib/Metabrik/Core/Context.pm",
-         "version" : "1.25"
+         "version" : "1.27"
       },
       "Metabrik::Core::Global" : {
          "file" : "lib/Metabrik/Core/Global.pm",
-         "version" : "1.25"
+         "version" : "1.27"
       },
       "Metabrik::Core::Log" : {
          "file" : "lib/Metabrik/Core/Log.pm",
-         "version" : "1.25"
+         "version" : "1.27"
       },
       "Metabrik::Core::Shell" : {
          "file" : "lib/Metabrik/Core/Shell.pm",
-         "version" : "1.25"
+         "version" : "1.27"
       }
    },
    "release_status" : "stable",
@@ -66,6 +66,6 @@
          "http://opensource.org/licenses/BSD-3-Clause"
       ]
    },
-   "version" : "1.26",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "1.27",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

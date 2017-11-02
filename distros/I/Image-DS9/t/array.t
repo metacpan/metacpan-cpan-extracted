@@ -15,7 +15,7 @@ else
   plan( tests => 2 );
 }
 
-require 't/common.pl';
+require './t/common.pl';
 
 my $ds9 = start_up();
 
@@ -26,9 +26,9 @@ eval {
 };
 diag $@ if $@;
 ok( ! $@, "PDL array" );
-  
+
 my $p = $x->get_dataref;
-  
+
 my @dims = $x->dims;
 eval {
   $ds9->array($$p, { xdim => $dims[0], ydim => $dims[1], bitpix => -64 } );

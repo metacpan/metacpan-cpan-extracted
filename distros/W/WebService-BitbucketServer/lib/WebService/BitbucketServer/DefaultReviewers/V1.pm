@@ -6,7 +6,7 @@ package WebService::BitbucketServer::DefaultReviewers::V1;
 use warnings;
 use strict;
 
-our $VERSION = '0.601'; # VERSION
+our $VERSION = '0.602'; # VERSION
 
 use Moo;
 use namespace::clean;
@@ -133,7 +133,7 @@ WebService::BitbucketServer::DefaultReviewers::V1 - Bindings for a Bitbucket Ser
 
 =head1 VERSION
 
-version 0.601
+version 0.602
 
 =head1 SYNOPSIS
 

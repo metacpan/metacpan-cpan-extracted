@@ -16,13 +16,13 @@ __END__
 
 Rinci::function - Metadata for your functions/methods
 
-=head1 VERSION
-
-This document describes version 1.1.84 of Rinci::function (from Perl distribution Rinci), released on 2016-12-28.
-
 =head1 SPECIFICATION VERSION
 
  1.1
+
+=head1 VERSION
+
+This document describes version 1.1.85 of Rinci::function (from Perl distribution Rinci), released on 2017-10-26.
 
 =head1 INTRODUCTION
 
@@ -1035,9 +1035,9 @@ Required if C<src> is specified.
 
 Status from envelope. If unspecified, assumed to be 200.
 
-=item * result => DATA
+=item * result => envres
 
-Expected result.
+Expected result. This should always be in enveloped form.
 
 =item * summary => STR
 
@@ -1072,18 +1072,18 @@ Example:
  examples => [
      {
          args => {num=>10},
-         result => 0,
+         result => [200, "OK", 0],
          # summary no needed here, already clear.
      },
      {
          args => {},
-         result => 400,
+         result => [400],
          summary => 'Num argument is required',
      },
 
      {
          argv => [-5],
-         result => 1,
+         result => [200, "OK", 1],
          summary => 'Also works for negative integers',
      },
  ],
@@ -1524,7 +1524,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

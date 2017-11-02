@@ -5,7 +5,7 @@ use warnings;
 use base 'Clustericious::Client::Object';
 
 # ABSTRACT: object parameters
-our $VERSION = '1.26'; # VERSION
+our $VERSION = '1.27'; # VERSION
 
 
 sub new
@@ -30,7 +30,7 @@ Clustericious::Client::Object::Params - object parameters
 
 =head1 VERSION
 
-version 1.26
+version 1.27
 
 =head1 SYNOPSIS
 

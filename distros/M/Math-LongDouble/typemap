@@ -3,5 +3,5 @@ ldbl *		LDBL_OBJ
 
 INPUT
 LDBL_OBJ
-            $var = INT2PTR($type, SvIV(SvRV($arg)));
+            $var = INT2PTR($type, SvIVX(SvRV($arg)));
 

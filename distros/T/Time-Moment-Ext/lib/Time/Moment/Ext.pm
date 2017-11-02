@@ -1,13 +1,12 @@
 package Time::Moment::Ext;
 
-use 5.010;
 use strict;
 use warnings;
-use Time::Piece;
+use Time::Piece ();
 
 use parent 'Time::Moment';
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 my $SQL_FORMAT = '%Y-%m-%d %H:%M:%S';
 my $SQL_DATE = '%Y-%m-%d';
@@ -17,7 +16,7 @@ sub Time::Moment::strptime {
     my ($class, $str, $format) = @_;
     return unless ($str && $format);
 
-    return $class->from_object(scalar Time::Piece->strptime($str, $format));
+    return $class->from_object(scalar Time::Piece::localtime->strptime($str, $format));
 }
 
 sub Time::Moment::from_datetime {
@@ -122,7 +121,7 @@ Return the day of month (alias to day_of_month)
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 AUTHOR
 

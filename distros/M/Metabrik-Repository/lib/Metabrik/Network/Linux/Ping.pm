@@ -1,5 +1,5 @@
 #
-# $Id: Ping.pm,v f6ad8c136b19 2017/01/01 10:13:54 gomor $
+# $Id: Ping.pm,v 4626597a87f0 2017/08/21 13:52:44 gomor $
 #
 # network::linux::ping Brik
 #
@@ -11,7 +11,7 @@ use base qw(Metabrik::Shell::Command Metabrik::System::Package);
 
 sub brik_properties {
    return {
-      revision => '$Revision: f6ad8c136b19 $',
+      revision => '$Revision: 4626597a87f0 $',
       tags => [ qw(unstable) ],
       author => 'GomoR <GomoR[at]metabrik.org>',
       license => 'http://opensource.org/licenses/BSD-3-Clause',
@@ -49,7 +49,7 @@ sub is_alive {
    $timeout ||= $self->timeout;
    $self->brik_help_run_undef_arg('is_alive', $host) or return;
 
-   my $cmd = "ping -c $try -w $timeout $host > /dev/null 2>&1";
+   my $cmd = "ping -c $try -W $timeout $host > /dev/null 2>&1";
 
    my $r = $self->system($cmd) or return;
    if ($r == 1) {

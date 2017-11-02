@@ -21,7 +21,7 @@ package Point {
     my sub _x : private;
     my sub _y : private;
 
-    sub BUILDARGS : init_args(
+    sub BUILDARGS : init(
         x? => _x,
         y? => _y,
     );
@@ -52,7 +52,7 @@ package Point3D {
 
     my sub _z : private;
 
-    sub BUILDARGS : init_args(
+    sub BUILDARGS : init(
         x? => super(x),
         y? => super(y),
         z? => _z

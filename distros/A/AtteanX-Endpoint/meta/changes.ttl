@@ -28,9 +28,23 @@ my:project
 	:bug-database			<https://github.com/kasei/atteanx-endpoint/issues> ;
 	doap:download-page		<http://search.cpan.org/dist/AtteanX-Endpoint/> ;
 	doap:download-mirror	<http://kasei.us/code/files/> ;
-	:release				my:v_0-001 ;
 	.
 
+my:project :release my:v_0-002 .
+my:v_0-002
+	a					:Version ;
+	dc:issued			"2017-10-26"^^xsd:date ;
+	:revision			"0.002" ;
+	dcs:changeset [
+		dcs:versus my:v_0-001 ;
+		dcs:item
+			[ a dcs:Update ; rdfs:label "Replace use of HTML::HTML5::Parser with XML::LibXML::Parser (#4 from @kjetilk)."],
+			[ a dcs:Update ; rdfs:label "Change hashbang to use env (#2 from KjetilK)."],
+			[ a dcs:Update ; rdfs:label "Updated copyright year and added text about CodeMirror license."]
+	]
+	.
+
+my:project :release my:v_0-001 .
 my:v_0-001
 	a					:Version ;
 	dc:issued			"2016-03-25"^^xsd:date ;

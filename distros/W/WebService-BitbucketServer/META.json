@@ -96,75 +96,75 @@
    "provides" : {
       "WebService::BitbucketServer" : {
          "file" : "lib/WebService/BitbucketServer.pm",
-         "version" : "0.601"
+         "version" : "0.602"
       },
       "WebService::BitbucketServer::AccessTokens::V1" : {
          "file" : "lib/WebService/BitbucketServer/AccessTokens/V1.pm",
-         "version" : "0.601"
+         "version" : "0.602"
       },
       "WebService::BitbucketServer::Audit::V1" : {
          "file" : "lib/WebService/BitbucketServer/Audit/V1.pm",
-         "version" : "0.601"
+         "version" : "0.602"
       },
       "WebService::BitbucketServer::Branch::V1" : {
          "file" : "lib/WebService/BitbucketServer/Branch/V1.pm",
-         "version" : "0.601"
+         "version" : "0.602"
       },
       "WebService::BitbucketServer::Build::V1" : {
          "file" : "lib/WebService/BitbucketServer/Build/V1.pm",
-         "version" : "0.601"
+         "version" : "0.602"
       },
       "WebService::BitbucketServer::CommentLikes::V1" : {
          "file" : "lib/WebService/BitbucketServer/CommentLikes/V1.pm",
-         "version" : "0.601"
+         "version" : "0.602"
       },
       "WebService::BitbucketServer::Core::V1" : {
          "file" : "lib/WebService/BitbucketServer/Core/V1.pm",
-         "version" : "0.601"
+         "version" : "0.602"
       },
       "WebService::BitbucketServer::DefaultReviewers::V1" : {
          "file" : "lib/WebService/BitbucketServer/DefaultReviewers/V1.pm",
-         "version" : "0.601"
+         "version" : "0.602"
       },
       "WebService::BitbucketServer::GPG::V1" : {
          "file" : "lib/WebService/BitbucketServer/GPG/V1.pm",
-         "version" : "0.601"
+         "version" : "0.602"
       },
       "WebService::BitbucketServer::Git::V1" : {
          "file" : "lib/WebService/BitbucketServer/Git/V1.pm",
-         "version" : "0.601"
+         "version" : "0.602"
       },
       "WebService::BitbucketServer::JIRA::V1" : {
          "file" : "lib/WebService/BitbucketServer/JIRA/V1.pm",
-         "version" : "0.601"
+         "version" : "0.602"
       },
       "WebService::BitbucketServer::MirroringUpstream::V1" : {
          "file" : "lib/WebService/BitbucketServer/MirroringUpstream/V1.pm",
-         "version" : "0.601"
+         "version" : "0.602"
       },
       "WebService::BitbucketServer::RefRestriction::V2" : {
          "file" : "lib/WebService/BitbucketServer/RefRestriction/V2.pm",
-         "version" : "0.601"
+         "version" : "0.602"
       },
       "WebService::BitbucketServer::RepositoryRefSync::V1" : {
          "file" : "lib/WebService/BitbucketServer/RepositoryRefSync/V1.pm",
-         "version" : "0.601"
+         "version" : "0.602"
       },
       "WebService::BitbucketServer::Response" : {
          "file" : "lib/WebService/BitbucketServer/Response.pm",
-         "version" : "0.601"
+         "version" : "0.602"
       },
       "WebService::BitbucketServer::SSH::V1" : {
          "file" : "lib/WebService/BitbucketServer/SSH/V1.pm",
-         "version" : "0.601"
+         "version" : "0.602"
       },
       "WebService::BitbucketServer::Spec" : {
          "file" : "lib/WebService/BitbucketServer/Spec.pm",
-         "version" : "0.601"
+         "version" : "0.602"
       },
       "WebService::BitbucketServer::WADL" : {
          "file" : "lib/WebService/BitbucketServer/WADL.pm",
-         "version" : "0.601"
+         "version" : "0.602"
       }
    },
    "release_status" : "stable",
@@ -179,7 +179,7 @@
          "web" : "https://github.com/chazmcgarvey/WebService-BitbucketServer"
       }
    },
-   "version" : "0.601",
+   "version" : "0.602",
    "x_authority" : "cpan:CCM",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
 }

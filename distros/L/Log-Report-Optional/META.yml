@@ -20,4 +20,4 @@ no_index:
 requires:
   String::Print: 0.91
   Test::More: 0.86
-version: 1.03
+version: 1.04

@@ -1,7 +1,6 @@
 package Device::Cdio::Device;
 require 5.8.6;
 #
-#  $Id$
 #  See end for copyright and license.
 
 =pod
@@ -29,7 +28,7 @@ use strict;
 use Exporter;
 use perlcdio;
 use Device::Cdio::Util qw( _check_arg_count _extra_args _rearrange );
-use Device::Cdio qw(convert_drive_cap_read convert_drive_cap_write 
+use Device::Cdio qw(convert_drive_cap_read convert_drive_cap_write
 		    convert_drive_cap_misc );
 use Device::Cdio::Track;
 
@@ -37,13 +36,13 @@ $Device::Cdio::Device::VERSION   = $Device::Cdio::VERSION;
 @Device::Cdio::Device::EXPORT    = qw( new );
 @Device::Cdio::Device::EXPORT_OK = qw( close open );
 
-=pod 
+=pod
 
 =head1 METHODS
 
 =cut
 
-=pod 
+=pod
 
 =head2 new
 
@@ -53,12 +52,12 @@ Create a new Device object. Either parameter C<source>, C<driver_id>
 or C<access_mode> can be C<undef>. In fact it is probably best to not
 to give an C<access_mode> unless you know what you are doing.
 
-=cut 
+=cut
 sub new {
 
   my($class,@p) = @_;
 
-  my($source, $driver_id, $access_mode, @args) = 
+  my($source, $driver_id, $access_mode, @args) =
       _rearrange(['SOURCE', 'DRIVER_ID', 'ACCESS_MODE'], @p);
 
   return undef if _extra_args(@args);
@@ -74,7 +73,7 @@ sub new {
   return $self;
 }
 
-=pod 
+=pod
 
 =head2 audio_pause
 
@@ -96,21 +95,21 @@ sub audio_pause {
 =head2 audio_play_lsn
 
   audio_play_lsn(start_lsn, end_lsn)-> $status
-        
+
 Playing CD through analog output at the given lsn to the ending lsn
 The device status is returned.
 
-=cut 
+=cut
 
 sub audio_play_lsn {
     my($self,@p) = @_;
-    my($start_lsn, $end_lsn, @args) = 
+    my($start_lsn, $end_lsn, @args) =
 	_rearrange(['START_LSN', 'END_LSN'], @p);
     return $perlcdio::BAD_PARAMETER if _extra_args(@args);
     return perlcdio::audio_play_lsn($self->{cd}, $start_lsn, $end_lsn);
 }
 
-=pod 
+=pod
 
 =head2 audio_resume
 
@@ -214,7 +213,7 @@ If the CD object has an opened CD, return the name of the device used.
 (In fact this is the same thing as issuing C<d-E<gt>get_arg("source")>).
 
 If we haven't initialized a specific device driver, then find a
-suitable one and return the default device for that.  
+suitable one and return the default device for that.
 
 In some situations of drivers or OS's we can't find a CD device if
 there is no media in it and it is possible for this routine to return
@@ -257,7 +256,7 @@ Get disc mode - the kind of CD: CD-DA, CD-ROM mode 1, CD-MIXED, etc.
 that we've got. The notion of 'CD' is extended a little to include
 DVD's.
 
-=cut 
+=cut
 
 sub get_disc_mode {
     my($self,@p) = @_;
@@ -275,14 +274,14 @@ Get drive capabilities of device.
 In some situations of drivers or OS's we can't find a CD
 device if there is no media in it. In this situation
 capabilities will show up as empty even though there is a
-hardware CD-ROM.  
+hardware CD-ROM.
 
 =cut
 
 sub get_drive_cap {
     my($self,@p) = @_;
     return (undef, undef, undef) if !_check_arg_count($#_, 0);
-    my ($b_read_cap, $b_write_cap, $b_misc_cap) = 
+    my ($b_read_cap, $b_write_cap, $b_misc_cap) =
 	perlcdio::get_drive_cap($self->{cd});
     return (convert_drive_cap_read($b_read_cap),
 	    convert_drive_cap_write($b_write_cap),
@@ -294,9 +293,9 @@ sub get_drive_cap {
 =head2 get_drive_cap_dev
 
   get_drive_cap_dev(device=undef)->(read_cap, write_cap, misc_cap)
-       
+
 Get drive capabilities of device.
-       
+
 In some situations of drivers or OS's we can't find a CD
 device if there is no media in it. In this situation
 capabilities will show up as empty even though there is a
@@ -310,7 +309,7 @@ sub get_drive_cap_dev {
     my($device, @args) = _rearrange(['DEVICE'], @p);
     return (undef, undef, undef) if _extra_args(@args);
 
-    my ($b_read_cap, $b_write_cap, $b_misc_cap) = 
+    my ($b_read_cap, $b_write_cap, $b_misc_cap) =
 	perlcdio::get_drive_cap_dev($device);
     return (convert_drive_cap_read($b_read_cap),
 	    convert_drive_cap_write($b_write_cap),
@@ -366,7 +365,7 @@ return C<$perlcdio::DRIVER_UNKNOWN>.
 sub get_first_track {
     my($self, @p) = @_;
     return $perlcdio::BAD_PARAMETER if !_check_arg_count($#_, 0);
-    return Device::Cdio::Track->new(-device=>$self->{cd}, 
+    return Device::Cdio::Track->new(-device=>$self->{cd},
 				    -track=>perlcdio::get_first_track_num($self->{cd}));
 }
 
@@ -377,7 +376,7 @@ sub get_first_track {
   get_hwinfo()->(vendor, model, release, drc)
 
 Get the CD-ROM hardware info via a SCSI MMC INQUIRY command.
-An exception is raised if we had an error. 
+An exception is raised if we had an error.
 
 =cut
 
@@ -396,7 +395,7 @@ sub get_hwinfo {
 
 Returns the volume settings of device's 4 channels and the device return code.
 In scalar environmet only the device return code!
-See perlcdio::driver_errmsg($rc) if $rc. 
+See C<perlcdio::driver_errmsg($rc)> for return-values meanings when C<$rc != 0>.
 
 =cut
 
@@ -408,13 +407,36 @@ sub audio_get_volume {
 
 =pod
 
+=head2 audio_play_track_index
+
+    $drc = $dev->audio_play_track_index($start_track, $start_index, $end_track, $end_track);
+
+Playing CD through analog output at the desired start track and index,
+to the end track and index. Tracks should be in the valid CD track range 0..99.
+
+Just as a track number is burned into the CD, so is a an index for a track.
+
+See C<perlcdio::driver_errmsg($drc)> for return-values meanings when C<$drc != 0>.
+
+=cut
+
+sub audio_play_track_index {
+    my($self, $start_track, $start_index, $end_track, $end_index) = @_;
+    return perlcdio::audio_play_track_index($self->{cd},
+					    $start_track, $start_index,
+					    $end_track, $end_index);
+}
+
 =head2 audio_set_volume
 
-    $drc = $dev->audio_set_volume(lvl1, ...lvl4);
+    $drc = $dev->audio_set_volume($channel1_volume, $channel2_volume,
+                                  $channel3_volume, $channel4_volume);
 
-Set the volume levels of the channels 1-4. values from 0-255 are possible.
-Use -1 when the value should be kept.
-See perlcdio::driver_errmsg($drc) for return values (!= 0).
+Set the volume levels of the channels 1-4. Values from 0-255 are possible.
+Stereo CDROM devices (which is most of them) use only channels 1 and 2.
+
+Use -1 when the existing value should be kept.
+See C<perlcdio::driver_errmsg($drc)> for return-values meanings when C<$drc != 0>.
 
 =cut
 
@@ -427,18 +449,18 @@ sub audio_set_volume {
             @$vol[$i] = 255 if $p[$i] > 255;
         }
     }
-    return perlcdio::audio_set_volume_levels($self->{cd}, @$vol[0], @$vol[1], 
+    return perlcdio::audio_set_volume_levels($self->{cd}, @$vol[0], @$vol[1],
         @$vol[2], @$vol[3]);
 }
 
-=pod 
+=pod
 
 =head2 get_disk_cdtext, get_track_cdtext
 
     $hash = $dev->get_disk_cdtext;
     $hash = $dev->get_track_cdtext(track);
 
-Returns a hash reference hash->{cdtext_field}="text" 
+Returns a hash reference hash->{cdtext_field}="text"
 if found any cdtext on disk;
 
 =cut
@@ -479,7 +501,7 @@ Returns a hash reference with the audio-subchannel-mmc status values:
 
     audio_status : value
     status_text  : audio_status as text
-                (INVALID,ERROR,NO_STATUS,UNKNWON,playing,paused,completed)
+                (INVALID,ERROR,NO_STATUS,UNKNOWN,playing,paused,completed)
     track : track number
     index : index in track
     msf time values as ints minutes, seconds,frames :
@@ -519,7 +541,7 @@ sub is_tray_open {
 =head2 get_joliet_level
 
   get_joliet_level()->int
-       
+
 Return the Joliet level recognized for cdio.
 This only makes sense for something that has an ISO-9660
 filesystem.
@@ -571,7 +593,7 @@ sub get_last_track {
 =head2 get_mcn
 
 get_mcn()->str
-       
+
 Get the media catalog number (MCN) from the CD.
 
 =cut
@@ -606,14 +628,14 @@ sub get_media_changed {
 
 $hash = $dev->guess_cd_type($lsn,$track);
 
-Try to determine what kind of CD-image and/or filesystem we have at 
-track $track. First argument is the start lsn of track $track. Returns a 
+Try to determine what kind of CD-image and/or filesystem we have at
+track $track. First argument is the start lsn of track $track. Returns a
 hash reference with following keys:
 
     cdio_fs_t     (enum cdio_fs_t from libcdio) FIXME: add text
     cdio_fs_cap_t (enum cdio_fs_cap_t from libcdio) FIXME: add text
-    joliet_level  If has Joliet extensions, this is the associated level 
-                    number (i.e. 1, 2, or 3). 
+    joliet_level  If has Joliet extensions, this is the associated level
+                    number (i.e. 1, 2, or 3).
     iso_label      32 byte ISO fs label.
     isofs_size     size of ISO fs.
     UDFVerMajor    UDF fs version.
@@ -633,7 +655,7 @@ sub guess_cd_type {
 
   get_num_tracks()->int
 
-Return the number of tracks on the CD. 
+Return the number of tracks on the CD.
 C<$perlcdio::INVALID_TRACK> is raised on error.
 
 =cut
@@ -652,7 +674,7 @@ sub get_num_tracks {
 
 Set a new track object of the current disc for the given track number.
 
-=cut 
+=cut
 
 sub get_track {
     my($self,@p) = @_;
@@ -727,7 +749,7 @@ sub lseek {
 
 =head2 open
 
-  open(source=undef, driver_id=$libcdio::DRIVER_UNKNOWN, 
+  open(source=undef, driver_id=$libcdio::DRIVER_UNKNOWN,
        access_mode=undef)->$cdio_obj
 
 Sets up to read from place specified by source, driver_id and access
@@ -738,18 +760,18 @@ a new is done specifying a source or driver id.
 If C<undef> is given as the source, we'll use the default driver device.
 If C<undef> is given as the driver_id, we'll find a suitable device
 driver.  Device is opened so that subsequent operations can be
-performed. 
+performed.
 
 =cut
 
 sub open {
     my($self,@p) = @_;
-    my($source, $driver_id, $access_mode) = 
+    my($source, $driver_id, $access_mode) =
 	_rearrange(['SOURCE', 'DRIVER_ID', 'ACCESS_MODE'], @p);
-    
-    $driver_id = $perlcdio::DRIVER_UNKNOWN 
+
+    $driver_id = $perlcdio::DRIVER_UNKNOWN
 	if !defined($driver_id);
-    
+
     $self->close() if defined($self->{cd});
     $self->{cd} = perlcdio::open_cd($source, $driver_id, $access_mode);
 }
@@ -763,9 +785,9 @@ sub open {
 Reads the next size bytes.
 Similar to (if not the same as) libc's read()
 
-The number of bytes read and the data is returned. 
+The number of bytes read and the data is returned.
 
-=cut 
+=cut
 
 sub read {
 
@@ -774,7 +796,7 @@ sub read {
     (my $data, $size) = perlcdio::read_cd($self->{cd}, $size);
     return wantarray ? ($data, $size) : $data;
 }
-    
+
 =pod
 
 =head2 read_data_blocks
@@ -782,7 +804,7 @@ sub read {
   read_data_blocks(lsn, blocks=1)->($data, $size, $drc)
 
 Reads a number of data sectors (AKA blocks).
-        
+
 lsn is sector to read, blocks is the number of bytes.
 
 The size of the data will be a multiple of C<$perlcdio::ISO_BLOCKSIZE>.
@@ -791,18 +813,18 @@ The number of data, size of the data, and the return code status is
 returned in an array context. In a scalar context just the data is
 returned. C<undef> is returned as the data on error.
 
-=cut 
+=cut
 
 sub read_data_blocks {
 
     my($self,@p) = @_;
     my($lsn, $read_mode, $blocks) = _rearrange(['LSN', 'BLOCKS'], @p);
-    
+
     $blocks = 1 if !defined($blocks);
 
     my $size = $perlcdio::ISO_BLOCKSIZE * $blocks;
-    (my $data, $size, my $drc) = 
-	perlcdio::read_data_bytes($self->{cd}, $lsn, 
+    (my $data, $size, my $drc) =
+	perlcdio::read_data_bytes($self->{cd}, $lsn,
 				  $perlcdio::ISO_BLOCKSIZE,
 				  $size);
 
@@ -813,7 +835,7 @@ sub read_data_blocks {
     }
 
 }
-    
+
 =pod
 
 =head2 read_sectors
@@ -848,11 +870,11 @@ returned. undef is returned as the data on error.
 sub read_sectors {
 
     my($self,@p) = @_;
-    my($lsn, $read_mode, $blocks) = 
+    my($lsn, $read_mode, $blocks) =
 	_rearrange(['LSN', 'READ_MODE', 'BLOCKS'], @p);
-    
+
     $blocks = 1 if !defined($blocks);
-    
+
     my $size;
     my $blocksize = $Device::Cdio::read_mode2blocksize{$read_mode};
     if (defined($blocksize)) {
@@ -861,7 +883,7 @@ sub read_sectors {
 	printf "Bad read mode %s\n", $read_mode;
 	return undef;
     }
-    (my $data, $size, my $drc) = 
+    (my $data, $size, my $drc) =
 	perlcdio::read_sectors($self->{cd}, $lsn, $read_mode, $size);
 
     if ($perlcdio::DRIVER_OP_SUCCESS == $drc) {
@@ -881,7 +903,7 @@ sub read_sectors {
 Set the blocksize for subsequent reads.  The operation status code is
 returned.
 
-=cut 
+=cut
 
 sub set_blocksize {
     my($self,@p) = @_;
@@ -898,7 +920,7 @@ sub set_blocksize {
 
 The operation status code is returned.
 
-=cut 
+=cut
 
 sub set_speed {
     my($self,@p) = @_;
@@ -948,11 +970,11 @@ libcdio including the a manual and the API via doxygen.
 
 =head1 AUTHORS
 
-Rocky Bernstein C<< <rocky at cpan.org> >>.
+Rocky Bernstein
 
 =head1 COPYRIGHT
 
-Copyright (C) 2006, 2008 Rocky Bernstein <rocky@cpan.org>
+Copyright (C) 2006, 2008, 2017 Rocky Bernstein <rocky@cpan.org>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -965,6 +987,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+along with this program.  If not, see L<The GNU General Public
+License|http://www.gnu.org/licenses/#GPL>.
 
 =cut

@@ -41,6 +41,8 @@ use warnings;
 
 package Device::Osram::Lightify::Light;
 
+use Encode 'decode';
+
 #
 #  Allow our object to treated as a string.
 #
@@ -136,7 +138,7 @@ sub _decode_binary
     $self->{ 'w' } = ord( substr( $buffer, 25, 1 ) );
 
     # The name of the bulb.
-    $self->{ 'name' } = substr( $buffer, 26, 15 );
+    $self->{ 'name' } = decode 'UTF-8', substr( $buffer, 26, 15 );
     $self->{ 'name' } =~ s/\0//g;
 }
 
@@ -284,6 +286,8 @@ sub set_on
 
     # Read 8-byte header + 12-byte reply
     my $buffer = $parent->_read(20);
+
+    return $self;
 }
 
 
@@ -322,6 +326,7 @@ sub set_off
     # Read 8-byte header + 12-byte reply
     my $buffer = $parent->_read(20);
 
+    return $self;
 }
 
 
@@ -370,6 +375,8 @@ sub set_brightness
 
     # Read 8-byte header + 12-byte reply
     my $buffer = $parent->_read(20);
+
+    return $self;
 }
 
 
@@ -415,6 +422,7 @@ sub set_rgbw
     # Read 8-byte header + 12-byte reply
     my $buffer = $parent->_read(20);
 
+    return $self;
 }
 
 
@@ -468,6 +476,7 @@ sub set_temperature
     # Read 8-byte header + 12-byte reply
     my $buffer = $parent->_read(20);
 
+    return $self;
 }
 
 

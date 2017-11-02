@@ -49,6 +49,6 @@
          "web" : "https://github.com/kak-tus/App-Environ-ClickHouse-Proxy"
       }
    },
-   "version" : "0.2",
+   "version" : "0.3",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

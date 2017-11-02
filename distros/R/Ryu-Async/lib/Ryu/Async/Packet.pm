@@ -1,5 +1,5 @@
 package Ryu::Async::Packet;
-$Ryu::Async::Packet::VERSION = '0.007';
+$Ryu::Async::Packet::VERSION = '0.008';
 use strict;
 use warnings;
 

@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2010-2015 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2010-2017 -- leonerd@leonerd.org.uk
 
 package IO::Async::SSL;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 $VERSION = eval $VERSION;
 
 use Carp;
@@ -228,14 +228,16 @@ sub IO::Async::Loop::SSL_upgrade
 
    my %ssl_params = map { $_ => delete $params{$_} } grep m/^SSL_/, keys %params;
 
-   eval { $socket = IO::Socket::SSL->start_SSL( $socket, _SSL_args
-      SSL_startHandshake => 0,
+   eval {
+      $socket = IO::Socket::SSL->start_SSL( $socket, _SSL_args
+         SSL_startHandshake => 0,
 
-      # Required to make IO::Socket::SSL not ->close before we have a chance to remove it from the loop
-      SSL_error_trap => sub { },
+         # Required to make IO::Socket::SSL not ->close before we have a chance to remove it from the loop
+         SSL_error_trap => sub { },
 
-      %ssl_params,
-   ) } or do {
+         %ssl_params,
+      ) or die IO::Socket::SSL->errstr;
+   } or do {
       chomp( my $e = $@ );
       return $f->fail( $e, "ssl" );
    };

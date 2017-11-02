@@ -7,8 +7,9 @@ use utf8;
 use Test::More;
 use Test::Identity;
 
-use IO::Async::Test;
+use IO::Async::Test 0.68;  # wait_for_future
 
+use Future;
 use IO::Async::OS;
 use IO::Async::Loop;
 use IO::Async::SSL;
@@ -56,7 +57,7 @@ testing_loop( $loop );
       SSL_verify_mode => 0,
    );
 
-   wait_for { $server_f->is_ready and $client_f->is_ready };
+   wait_for_future( Future->needs_all( $server_f, $client_f ) );
 
    # Check that we can pass UTF-8 bytes unmolested
    my $bytes = encode_utf8( $message );

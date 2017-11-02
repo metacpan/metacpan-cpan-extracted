@@ -8,7 +8,7 @@
  *
  * Change data removed. See Changes
  *
- * $Id: SSLeay.xs 493 2017-03-03 09:19:46Z mikem-guest $
+ * $Id: SSLeay.xs 502 2017-10-13 02:47:21Z mikem-guest $
  * 
  * The distribution and use of this module are subject to the conditions
  * listed in LICENSE file at the root of the Net-SSLeay
@@ -786,12 +786,49 @@ int tlsext_status_cb_invoke(SSL *ssl, void *arg)
     PUTBACK;
 
     nres = call_sv(cb_func, G_SCALAR);
-    OCSP_RESPONSE_free(ocsp_response);
+    if (ocsp_response) OCSP_RESPONSE_free(ocsp_response);
 
     SPAGAIN;
 
     if (nres != 1)
 	croak("Net::SSLeay: tlsext_status_cb_invoke perl function did not return a scalar.\n");
+
+    res = POPi;
+
+    PUTBACK;
+    FREETMPS;
+    LEAVE;
+
+    return res;
+}
+
+int session_ticket_ext_cb_invoke(SSL *ssl, const unsigned char *data, int len, void *arg)
+{
+    dSP;
+    SV *cb_func, *cb_data;
+    int res,nres = -1;
+
+    cb_func = cb_data_advanced_get(arg, "session_ticket_ext_cb!!func");
+    cb_data = cb_data_advanced_get(arg, "session_ticket_ext_cb!!data");
+
+    if ( ! SvROK(cb_func) || (SvTYPE(SvRV(cb_func)) != SVt_PVCV))
+	croak ("Net::SSLeay: session_ticket_ext_cb_invoke called, but not set to point to any perl function.\n");
+
+    ENTER;
+    SAVETMPS;
+
+    PUSHMARK(SP);
+    XPUSHs(sv_2mortal(newSViv(PTR2IV(ssl))));
+    XPUSHs(sv_2mortal(newSVpvn((const char *)data, len)));
+    XPUSHs(sv_2mortal(newSVsv(cb_data)));
+    PUTBACK;
+
+    nres = call_sv(cb_func, G_SCALAR);
+
+    SPAGAIN;
+
+    if (nres != 1)
+	croak("Net::SSLeay: session_ticket_ext_cb_invoke perl function did not return a scalar.\n");
 
     res = POPi;
 
@@ -854,10 +891,12 @@ int ssleay_session_secret_cb_invoke(SSL* s, void* secret, int *secret_len,
             *cipher = sk_SSL_CIPHER_value(peer_ciphers, SvIV(pref_cipher));
 
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
-	/* Use any new master secret set by the callback function in secret */
-	STRLEN newsecretlen;
-	char* newsecretdata = SvPV(secretsv, newsecretlen);
-	memcpy(secret, newsecretdata, newsecretlen);
+	{
+	    /* Use any new master secret set by the callback function in secret */
+	    STRLEN newsecretlen;
+	    char* newsecretdata = SvPV(secretsv, newsecretlen);
+	    memcpy(secret, newsecretdata, newsecretlen);
+	}
 #endif
     }
 
@@ -870,7 +909,125 @@ int ssleay_session_secret_cb_invoke(SSL* s, void* secret, int *secret_len,
 
 #endif
 
-#if OPENSSL_VERSION_NUMBER >= 0x10001000L && !defined(OPENSSL_NO_NEXTPROTONEG)
+#if OPENSSL_VERSION_NUMBER >= 0x10000000L && !defined(OPENSSL_NO_PSK)
+#define NET_SSLEAY_CAN_PSK_CLIENT_CALLBACK
+
+unsigned int ssleay_set_psk_client_callback_invoke(SSL *ssl, const char *hint,
+                                                   char *identity, unsigned int max_identity_len,
+                                                   unsigned char *psk, unsigned int max_psk_len)
+{
+    dSP;
+    int count = -1;
+    char *identity_val, *psk_val;
+    unsigned int psk_len = 0;
+    BIGNUM *psk_bn = NULL;
+    SV * cb_func;
+    SV * hintsv;
+
+    PR1("STARTED: ssleay_set_psk_client_callback_invoke\n");
+    cb_func = cb_data_advanced_get(ssl, "ssleay_set_psk_client_callback!!func");
+
+    if(!SvOK(cb_func))
+        croak ("Net::SSLeay: ssleay_set_psk_client_callback_invoke called, but not set to point to any perl function.\n");
+
+    ENTER;
+    SAVETMPS;
+
+    PUSHMARK(SP);
+    if (hint != NULL) {
+      hintsv = sv_2mortal( newSVpv(hint, strlen(hint)));
+      XPUSHs(hintsv);
+    }
+
+    PUTBACK;
+
+    count = call_sv( cb_func, G_ARRAY );
+
+    SPAGAIN;
+
+    if (count != 2)
+        croak ("Net::SSLeay: ssleay_set_psk_client_callback_invoke perl function did not return 2 values.\n");
+
+    psk_val = POPpx;
+    identity_val = POPpx;
+
+    my_snprintf(identity, max_identity_len, "%s", identity_val);
+
+    if (BN_hex2bn(&psk_bn, psk_val) > 0) {
+        if (BN_num_bytes(psk_bn) <= max_psk_len) {
+            psk_len = BN_bn2bin(psk_bn, psk);
+        }
+        BN_free(psk_bn);
+    }
+
+    PUTBACK;
+    FREETMPS;
+    LEAVE;
+
+    return psk_len;
+}
+
+unsigned int ssleay_ctx_set_psk_client_callback_invoke(SSL *ssl, const char *hint,
+                                                       char *identity, unsigned int max_identity_len,
+                                                       unsigned char *psk, unsigned int max_psk_len)
+{
+    dSP;
+    SSL_CTX *ctx;
+    int count = -1;
+    char *identity_val, *psk_val;
+    unsigned int psk_len = 0;
+    BIGNUM *psk_bn = NULL;
+    SV * cb_func;
+    SV * hintsv;
+
+    ctx = SSL_get_SSL_CTX(ssl);
+
+    PR1("STARTED: ssleay_ctx_set_psk_client_callback_invoke\n");
+    cb_func = cb_data_advanced_get(ctx, "ssleay_ctx_set_psk_client_callback!!func");
+
+    if(!SvOK(cb_func))
+        croak ("Net::SSLeay: ssleay_ctx_set_psk_client_callback_invoke called, but not set to point to any perl function.\n");
+
+    ENTER;
+    SAVETMPS;
+
+    PUSHMARK(SP);
+    if (hint != NULL) {
+      hintsv = sv_2mortal( newSVpv(hint, strlen(hint)));
+      XPUSHs(hintsv);
+    }
+
+    PUTBACK;
+
+    count = call_sv( cb_func, G_ARRAY );
+
+    SPAGAIN;
+
+    if (count != 2)
+        croak ("Net::SSLeay: ssleay_ctx_set_psk_client_callback_invoke perl function did not return 2 values.\n");
+
+    psk_val = POPpx;
+    identity_val = POPpx;
+
+    my_snprintf(identity, max_identity_len, "%s", identity_val);
+
+    if (BN_hex2bn(&psk_bn, psk_val) > 0) {
+        if (BN_num_bytes(psk_bn) <= max_psk_len) {
+            psk_len = BN_bn2bin(psk_bn, psk);
+        }
+        BN_free(psk_bn);
+    }
+
+    PUTBACK;
+    FREETMPS;
+    LEAVE;
+
+    return psk_len;
+}
+
+#endif
+
+#if (OPENSSL_VERSION_NUMBER >= 0x10001000L && !defined(OPENSSL_NO_NEXTPROTONEG)) || (OPENSSL_VERSION_NUMBER >= 0x10002000L && !defined(OPENSSL_NO_TLSEXT))
 
 int next_proto_helper_AV2protodata(AV * list, unsigned char *out)
 {
@@ -904,6 +1061,10 @@ int next_proto_helper_protodata2AV(AV * list, const unsigned char *in, unsigned 
     }
     return 1;
 }
+
+#endif
+
+#if OPENSSL_VERSION_NUMBER >= 0x10001000L && !defined(OPENSSL_NO_NEXTPROTONEG)
 
 int next_proto_select_cb_invoke(SSL *ssl, unsigned char **out, unsigned char *outlen,
                                 const unsigned char *in, unsigned int inlen, void *arg)
@@ -1263,10 +1424,10 @@ int tlsext_ticket_key_cb_invoke(
 ){
 
     dSP;
-    int count,usable_rv_count;
+    int count,usable_rv_count,hmac_key_len = 0;
     SV *cb_func, *cb_data;
     STRLEN svlen;
-    unsigned char key[32];  /* key[0..15] aes, key[16..32] hmac */
+    unsigned char key[48];  /* key[0..15] aes, key[16..32] or key[16..48] hmac */
     unsigned char name[16];
     SSL_CTX *ctx = SSL_get_SSL_CTX(ssl);
 
@@ -1285,7 +1446,7 @@ int tlsext_ticket_key_cb_invoke(
 
     if (!enc) {
 	/* call as getkey(data,this_name) -> (key,current_name) */
-	XPUSHs(sv_2mortal(newSVpv(key_name,16)));
+	XPUSHs(sv_2mortal(newSVpv((const char *)key_name,16)));
     } else {
 	/* call as getkey(data) -> (key,current_name) */
     }
@@ -1303,9 +1464,9 @@ int tlsext_ticket_key_cb_invoke(
     if (count>0) {
 	SV *sname = POPs;
 	if (SvOK(sname)) {
-	    unsigned char *pname = SvPV(sname,svlen);
+	    unsigned char *pname = (unsigned char *)SvPV(sname,svlen);
 	    if (svlen > 16)
-		croak("name must be at at most 16 bytes, got %d",svlen);
+		croak("name must be at at most 16 bytes, got %d",(int)svlen);
 	    if (svlen == 0)
 		croak("name should not be empty");
 	    memset(name, 0, 16);
@@ -1316,10 +1477,11 @@ int tlsext_ticket_key_cb_invoke(
     if (count>1) {
 	SV *skey = POPs;
 	if (SvOK(skey)) {
-	    unsigned char *pkey = SvPV(skey,svlen);
-	    if (svlen != 32)
-		croak("key must be exactly 32 random bytes, got %d",svlen);
-	    memcpy(key,pkey,32);
+	    unsigned char *pkey = (unsigned char *)SvPV(skey,svlen);
+	    if (svlen != 32 && svlen != 48)
+		croak("key must be 32 or 48 random bytes, got %d",(int)svlen);
+	    hmac_key_len = (int)svlen - 16;
+	    memcpy(key,pkey,(int)svlen);
 	    usable_rv_count++;
 	}
     }
@@ -1339,12 +1501,12 @@ int tlsext_ticket_key_cb_invoke(
 	/* encrypt ticket information with given key */
 	RAND_bytes(iv, 16);
 	EVP_EncryptInit_ex(ectx, EVP_aes_128_cbc(), NULL, key, iv);
-	HMAC_Init_ex(hctx,key+16,16,EVP_sha256(),NULL);
+	HMAC_Init_ex(hctx,key+16,hmac_key_len,EVP_sha256(),NULL);
 	memcpy(key_name,name,16);
 	return 1;
 
     } else {
-	HMAC_Init_ex(hctx,key+16,16,EVP_sha256(),NULL);
+	HMAC_Init_ex(hctx,key+16,hmac_key_len,EVP_sha256(),NULL);
 	EVP_DecryptInit_ex(ectx, EVP_aes_128_cbc(), NULL, key, iv);
 
 	if (memcmp(name,key_name,16) == 0)
@@ -2552,6 +2714,42 @@ X509_NAME*
 X509_get_subject_name(cert)
      X509 *      cert
 
+void *
+X509_get_ex_data(cert,idx)
+     X509 *  cert
+     int     idx
+
+int
+X509_get_ex_new_index(argl,argp=NULL,new_func=NULL,dup_func=NULL,free_func=NULL)
+     long argl
+     void *  argp
+     CRYPTO_EX_new *   new_func
+     CRYPTO_EX_dup *   dup_func
+     CRYPTO_EX_free *  free_func
+
+void *
+X509_get_app_data(cert)
+     X509 *  cert
+  CODE:
+     RETVAL = X509_get_ex_data(cert,0);
+  OUTPUT:
+     RETVAL
+
+int
+X509_set_ex_data(cert,idx,data)
+     X509 *  cert
+     int     idx
+     void *  data
+
+int
+X509_set_app_data(cert,arg)
+     X509 *  cert
+     char *  arg
+  CODE:
+     RETVAL = X509_set_ex_data(cert,0,arg);
+  OUTPUT:
+     RETVAL
+
 int
 X509_set_issuer_name(X509 *x, X509_NAME *name)
 
@@ -3018,10 +3216,26 @@ X509 *
 X509_STORE_CTX_get_current_cert(x509_store_ctx)
      X509_STORE_CTX * 	x509_store_ctx
 
+int
+X509_STORE_CTX_get_ex_new_index(argl,argp=NULL,new_func=NULL,dup_func=NULL,free_func=NULL)
+     long argl
+     void *  argp
+     CRYPTO_EX_new *   new_func
+     CRYPTO_EX_dup *   dup_func
+     CRYPTO_EX_free *  free_func
+
 void *
 X509_STORE_CTX_get_ex_data(x509_store_ctx,idx)
      X509_STORE_CTX * x509_store_ctx
      int idx
+
+void *
+X509_STORE_CTX_get_app_data(x509_store_ctx)
+     X509_STORE_CTX *  x509_store_ctx
+  CODE:
+  RETVAL = X509_STORE_CTX_get_ex_data(x509_store_ctx,0);
+  OUTPUT:
+  RETVAL
 
 void
 X509_get_fingerprint(cert,type)
@@ -3351,6 +3565,15 @@ X509_STORE_CTX_set_ex_data(x509_store_ctx,idx,data)
      X509_STORE_CTX *   x509_store_ctx
      int idx
      void * data
+
+int
+X509_STORE_CTX_set_app_data(x509_store_ctx,arg)
+     X509_STORE_CTX *  x509_store_ctx
+     char *  arg
+  CODE:
+  RETVAL = X509_STORE_CTX_set_ex_data(x509_store_ctx,0,arg);
+  OUTPUT:
+  RETVAL
 
 void
 X509_STORE_CTX_set_error(x509_store_ctx,s)
@@ -4380,16 +4603,42 @@ SSL_get_ex_data(ssl,idx)
      int 	idx
 
 size_t
-SSL_get_finished(s,buf,count)
-     SSL *	s
-     void *	buf
-     size_t 	count
+SSL_get_finished(ssl,buf,count=2*EVP_MAX_MD_SIZE)
+        SSL *ssl
+        SV  *buf
+        size_t count
+    PREINIT:
+        unsigned char *finished;
+        size_t finished_len;
+    CODE:
+        Newx(finished, count, unsigned char);
+        finished_len = SSL_get_finished(ssl, finished, count);
+        if (count > finished_len)
+            count = finished_len;
+        sv_setpvn(buf, (const char *)finished, count);
+        Safefree(finished);
+        RETVAL = finished_len;
+    OUTPUT:
+        RETVAL
 
 size_t
-SSL_get_peer_finished(s,buf,count)
-     SSL *	s
-     void *	buf
-     size_t 	count
+SSL_get_peer_finished(ssl,buf,count=2*EVP_MAX_MD_SIZE)
+        SSL *ssl
+        SV  *buf
+        size_t count
+    PREINIT:
+        unsigned char *finished;
+        size_t finished_len;
+    CODE:
+        Newx(finished, count, unsigned char);
+        finished_len = SSL_get_peer_finished(ssl, finished, count);
+        if (count > finished_len)
+            count = finished_len;
+        sv_setpvn(buf, (const char *)finished, count);
+        Safefree(finished);
+        RETVAL = finished_len;
+    OUTPUT:
+        RETVAL
 
 int
 SSL_get_quiet_shutdown(ssl)
@@ -4590,7 +4839,7 @@ SSL_add_dir_cert_subjects_to_stack(stackCAs,dir)
 #endif
 
 int
-SSL_CTX_get_ex_new_index(argl,argp,new_func,dup_func,free_func)
+SSL_CTX_get_ex_new_index(argl,argp=NULL,new_func=NULL,dup_func=NULL,free_func=NULL)
      long argl
      void *  argp
      CRYPTO_EX_new *   new_func
@@ -4633,7 +4882,7 @@ SSL_set_tmp_dh_callback(ssl,dh)
      cb_ssl_int_int_ret_DH *  dh
 
 int
-SSL_get_ex_new_index(argl, argp, new_func, dup_func, free_func)
+SSL_get_ex_new_index(argl,argp=NULL,new_func=NULL,dup_func=NULL,free_func=NULL)
      long argl
      void *   argp
      CRYPTO_EX_new *  new_func
@@ -4641,7 +4890,7 @@ SSL_get_ex_new_index(argl, argp, new_func, dup_func, free_func)
      CRYPTO_EX_free * free_func
 
 int
-SSL_SESSION_get_ex_new_index(argl, argp, new_func, dup_func, free_func)
+SSL_SESSION_get_ex_new_index(argl,argp=NULL,new_func=NULL,dup_func=NULL,free_func=NULL)
      long argl
      void *   argp
      CRYPTO_EX_new *  new_func
@@ -5193,17 +5442,27 @@ SSL_get_keyblock_size(s)
      CODE:
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)
         const SSL_CIPHER *ssl_cipher;
-	int cipher, digest;
-	const EVP_CIPHER *c;
-	const EVP_MD *h;
+	int cipher = NID_undef, digest = NID_undef, mac_secret_size = 0;
+	const EVP_CIPHER *c = NULL;
+	const EVP_MD *h = NULL;
 
 	ssl_cipher = SSL_get_current_cipher(s);
-	cipher = SSL_CIPHER_get_cipher_nid(ssl_cipher);
-	digest = SSL_CIPHER_get_digest_nid(ssl_cipher);
-	c = EVP_get_cipherbynid(cipher);
-	h = EVP_get_digestbynid(digest);
-	RETVAL = 2 * (EVP_CIPHER_key_length(c) + EVP_MD_size(h) +
-		    EVP_CIPHER_iv_length(c));
+	if (ssl_cipher)
+	    cipher = SSL_CIPHER_get_cipher_nid(ssl_cipher);
+	if (cipher != NID_undef)
+	    c = EVP_get_cipherbynid(cipher);
+
+	if (ssl_cipher)
+	    digest = SSL_CIPHER_get_digest_nid(ssl_cipher);
+	if (digest != NID_undef)    /* No digest if e.g., AEAD cipher */
+	    h = EVP_get_digestbynid(digest);
+	if (h)
+	    mac_secret_size = EVP_MD_size(h);
+
+	RETVAL = -1;
+	if (c)
+	    RETVAL = 2 * (EVP_CIPHER_key_length(c) + mac_secret_size +
+		          EVP_CIPHER_iv_length(c));
 #else
      if (s == NULL ||
 	 s->enc_read_ctx == NULL ||
@@ -5228,7 +5487,8 @@ SSL_get_keyblock_size(s)
 	h = s->read_hash;
 	md_size = EVP_MD_size(h);
 #endif
-	RETVAL = (md_size > 0) ? (2 * (EVP_CIPHER_key_length(c) +
+	/* No digest if e.g., AEAD cipher */
+	RETVAL = (md_size >= 0) ? (2 * (EVP_CIPHER_key_length(c) +
 				       md_size +
 				       EVP_CIPHER_iv_length(c)))
 			       : -1;
@@ -5273,6 +5533,38 @@ SSL_set_session_secret_cb(s,callback=&PL_sv_undef,data=&PL_sv_undef)
             cb_data_advanced_put(s, "ssleay_session_secret_cb!!func", newSVsv(callback));
             cb_data_advanced_put(s, "ssleay_session_secret_cb!!data", newSVsv(data));
             SSL_set_session_secret_cb(s, (tls_session_secret_cb_fn)&ssleay_session_secret_cb_invoke, s);
+        }
+
+#endif
+
+#ifdef NET_SSLEAY_CAN_PSK_CLIENT_CALLBACK
+
+void
+SSL_set_psk_client_callback(s,callback=&PL_sv_undef)
+        SSL * s
+        SV * callback
+    CODE:
+        if (callback==NULL || !SvOK(callback)) {
+            SSL_set_psk_client_callback(s, NULL);
+            cb_data_advanced_put(s, "ssleay_set_psk_client_callback!!func", NULL);
+        }
+        else {
+            cb_data_advanced_put(s, "ssleay_set_psk_client_callback!!func", newSVsv(callback));
+            SSL_set_psk_client_callback(s, ssleay_set_psk_client_callback_invoke);
+        }
+
+void
+SSL_CTX_set_psk_client_callback(ctx,callback=&PL_sv_undef)
+        SSL_CTX * ctx
+        SV * callback
+    CODE:
+        if (callback==NULL || !SvOK(callback)) {
+            SSL_CTX_set_psk_client_callback(ctx, NULL);
+            cb_data_advanced_put(ctx, "ssleay_ctx_set_psk_client_callback!!func", NULL);
+        }
+        else {
+            cb_data_advanced_put(ctx, "ssleay_ctx_set_psk_client_callback!!func", newSVsv(callback));
+            SSL_CTX_set_psk_client_callback(ctx, ssleay_ctx_set_psk_client_callback_invoke);
         }
 
 #endif
@@ -5852,6 +6144,22 @@ P_next_proto_last_status(s)
 int
 SSL_set_tlsext_status_type(SSL *ssl,int cmd)
 
+long
+SSL_set_tlsext_status_ocsp_resp(ssl,staple)
+        SSL *  ssl
+    PREINIT:
+        char * p;
+        STRLEN staplelen;
+    INPUT:
+        char *  staple = SvPV( ST(1), staplelen);
+    CODE:
+        /* OpenSSL will free the memory */
+        New(0, p, staplelen, char);
+        memcpy(p, staple, staplelen);
+        RETVAL = SSL_ctrl(ssl,SSL_CTRL_SET_TLSEXT_STATUS_REQ_OCSP_RESP,staplelen,(void *)p);
+    OUTPUT:
+        RETVAL
+
 int
 SSL_CTX_set_tlsext_status_cb(ctx,callback,data=&PL_sv_undef)
 	SSL_CTX * ctx
@@ -5860,9 +6168,9 @@ SSL_CTX_set_tlsext_status_cb(ctx,callback,data=&PL_sv_undef)
     CODE:
 	RETVAL = 1;
 	if (callback==NULL || !SvOK(callback)) {
-	    SSL_CTX_set_tlsext_status_cb(ctx, NULL);
 	    cb_data_advanced_put(ctx, "tlsext_status_cb!!func", NULL);
 	    cb_data_advanced_put(ctx, "tlsext_status_cb!!data", NULL);
+	    SSL_CTX_set_tlsext_status_cb(ctx, NULL);
 	} else if (SvROK(callback) && (SvTYPE(SvRV(callback)) == SVt_PVCV)) {
 	    cb_data_advanced_put(ctx, "tlsext_status_cb!!func", newSVsv(callback));
 	    cb_data_advanced_put(ctx, "tlsext_status_cb!!data", newSVsv(data));
@@ -5872,6 +6180,48 @@ SSL_CTX_set_tlsext_status_cb(ctx,callback,data=&PL_sv_undef)
 	}
     OUTPUT:
 	RETVAL
+
+int
+SSL_set_session_ticket_ext_cb(ssl,callback,data=&PL_sv_undef)
+        SSL *  ssl
+        SV *  callback
+        SV *  data
+    CODE:
+        RETVAL = 1;
+        if (callback==NULL || !SvOK(callback)) {
+            cb_data_advanced_put(ssl, "session_ticket_ext_cb!!func", NULL);
+            cb_data_advanced_put(ssl, "session_ticket_ext_cb!!data", NULL);
+            SSL_set_session_ticket_ext_cb(ssl, NULL, NULL);
+        } else if (SvROK(callback) && (SvTYPE(SvRV(callback)) == SVt_PVCV)) {
+            cb_data_advanced_put(ssl, "session_ticket_ext_cb!!func", newSVsv(callback));
+            cb_data_advanced_put(ssl, "session_ticket_ext_cb!!data", newSVsv(data));
+            SSL_set_session_ticket_ext_cb(ssl, (tls_session_ticket_ext_cb_fn)&session_ticket_ext_cb_invoke, ssl);
+        } else {
+            croak("argument must be code reference");
+        }
+    OUTPUT:
+        RETVAL
+
+int
+SSL_set_session_ticket_ext(ssl,ticket)
+        SSL *ssl
+    PREINIT:
+        unsigned char * p;
+        STRLEN ticketlen;
+    INPUT:
+        unsigned char * ticket = (unsigned char *)SvPV( ST(1), ticketlen);
+    CODE:
+        RETVAL = 0;
+        if (ticketlen > 0) {
+            Newx(p, ticketlen, unsigned char);
+            if (!p)
+                croak("Net::SSLeay: set_session_ticket_ext could not allocate memory.\n");
+            memcpy(p, ticket, ticketlen);
+            RETVAL = SSL_set_session_ticket_ext(ssl, p, ticketlen);
+            Safefree(p);
+        }
+    OUTPUT:
+        RETVAL
 
 #endif
 
@@ -6059,14 +6409,14 @@ SSL_OCSP_response_verify(ssl,rsp,svreq=NULL,flags=0)
 	    }
 	    TRACE(1,"run basic verify");
 	    RETVAL = OCSP_basic_verify(bsr, NULL, store, flags);
-	    if (!RETVAL) {
+	    if (chain && !RETVAL) {
 		/* some CAs don't add a certificate to their OCSP responses and
 		 * openssl does not include the trusted CA which signed the
 		 * lowest chain certificate when looking for the signer.
 		 * So find this CA ourself and retry verification. */
 		X509 *issuer;
 		X509 *last = sk_X509_value(chain,sk_X509_num(chain)-1);
-		if ( (issuer = find_issuer(last,store,chain))) {
+		if (last && (issuer = find_issuer(last,store,chain))) {
 		    OCSP_basic_add1_cert(bsr, issuer);
 		    TRACE(1,"run OCSP_basic_verify with issuer for last chain element");
 		    RETVAL = OCSP_basic_verify(bsr, NULL, store, flags);
@@ -6327,6 +6677,5 @@ SSL_export_keying_material(ssl, outlen, label, p)
 	Safefree(out);
 
 #endif
-
 
 #define REM_EOF "/* EOF - SSLeay.xs */"

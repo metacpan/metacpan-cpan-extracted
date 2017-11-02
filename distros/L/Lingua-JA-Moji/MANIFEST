@@ -1,8 +1,8 @@
 Changes
-deploy.pl
 lib/Lingua/JA/Moji-ja.pod
 lib/Lingua/JA/Moji.pm
 lib/Lingua/JA/Moji.pod
+lib/Lingua/JA/Moji/bad-kanji.txt
 lib/Lingua/JA/Moji/bracketed2kanji.txt
 lib/Lingua/JA/Moji/circled2kanji.txt
 lib/Lingua/JA/Moji/first2hangul.txt
@@ -16,6 +16,7 @@ lib/Lingua/JA/Moji/new_kanji2old_kanji.txt
 lib/Lingua/JA/Moji/rest2hangul.txt
 lib/Lingua/JA/Moji/romaji2katakana.txt
 lib/Lingua/JA/Moji/square-katakana.txt
+lib/Lingua/JA/Moji/yurei-moji.txt
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP

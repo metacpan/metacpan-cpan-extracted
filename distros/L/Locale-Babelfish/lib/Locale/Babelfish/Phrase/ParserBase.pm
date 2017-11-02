@@ -8,7 +8,7 @@ use warnings;
 
 use parent qw( Class::Accessor::Fast );
 
-our $VERSION = '1.000000'; # VERSION
+our $VERSION = '2.003'; # VERSION
 
 __PACKAGE__->mk_accessors( qw( phrase index length prev piece escape ) );
 
@@ -80,6 +80,12 @@ sub add_to_piece {
 sub backward {
     my ( $self ) = @_;
     $self->index( $self->index - 1 );
+    if ( $self->index > 0 ) {
+        $self->prev( substr( $self->phrase, $self->index - 1, 1 ) );
+    }
+    else {
+        $self->prev( undef );
+    }
 }
 
 
@@ -109,7 +115,7 @@ Locale::Babelfish::Phrase::ParserBase - Babelfish abstract parser.
 
 =head1 VERSION
 
-version 1.000000
+version 2.003
 
 =head1 METHODS
 
@@ -193,13 +199,17 @@ Igor Mironov <grif@cpan.org>
 
 =item *
 
+Victor Efimov <efimov@reg.ru>
+
+=item *
+
 REG.RU LLC
 
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014 by Akzhan Abdulin.
+This software is Copyright (c) 2014 by REG.RU LLC.
 
 This is free software, licensed under:
 

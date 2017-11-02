@@ -3,37 +3,41 @@ abstract: 'An object-oriented Perl toolkit for analyzing and manipulating phyloi
 author:
   - 'Rutger Vos'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.8, CPAN::Meta::Converter version 2.132830'
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.143240'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Bio-Phylo
 no_index:
   directory:
     - t
     - inc
 recommends:
-  GD: 0
-  JSON: 0
-  List::Util: 0
-  Math::CDF: 0
-  Math::Random: 0
-  PDF::API2: 0
-  SVG: 0
-  SWF::Builder: 0
-  XML::LibXML: 0
-  XML::Twig: 0
-  XML::XML2JSON: 0
-requires: {}
+  Archive::Zip: '0'
+  GD: '0'
+  JSON: '0'
+  List::Util: '0'
+  Math::CDF: '0'
+  Math::Random: '0'
+  PDF::API2: '0'
+  RDF::Query: '0'
+  RDF::Trine: '0'
+  SVG: '0'
+  SWF::Builder: '0'
+  XML::LibXML: '0'
+  XML::Twig: '0'
+  XML::XML2JSON: '0'
+requires:
+  perl: '5.008000'
 resources:
   MailingList: mailto:bio-phylo@googlegroups.com
   bugtracker: https://github.com/rvosa/bio-phylo/issues
   homepage: http://biophylo.blogspot.com/
   license: http://dev.perl.org/licenses/
   repository: git://github.com/rvosa/bio-phylo.git
-version: 0.58
+version: v2.0.1

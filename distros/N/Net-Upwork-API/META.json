@@ -4,7 +4,7 @@
       "Maksym Novozhylov <mnovozhilov@upwork.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4216",
+   "generated_by" : "Module::Build version 0.4224",
    "keywords" : [
       "upwork"
    ],
@@ -38,7 +38,7 @@
    "provides" : {
       "Net::Upwork::API" : {
          "file" : "lib/Net/Upwork/API.pm",
-         "version" : "v1.2.2"
+         "version" : "v1.2.3"
       },
       "Net::Upwork::API::Client" : {
          "file" : "lib/Net/Upwork/API/Client.pm"
@@ -150,6 +150,6 @@
          "url" : "https://github.com/upwork/perl-upwork.git"
       }
    },
-   "version" : "v1.2.2",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "v1.2.3",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

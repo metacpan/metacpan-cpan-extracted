@@ -2,11 +2,11 @@ use 5.006;
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.056
+# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.057
 
 use Test::More;
 
-plan tests => 371;
+plan tests => 372;
 
 my @module_files = (
     'DateTime/TimeZone.pm',
@@ -19,6 +19,7 @@ my @module_files = (
     'DateTime/TimeZone/Africa/Ceuta.pm',
     'DateTime/TimeZone/Africa/El_Aaiun.pm',
     'DateTime/TimeZone/Africa/Johannesburg.pm',
+    'DateTime/TimeZone/Africa/Juba.pm',
     'DateTime/TimeZone/Africa/Khartoum.pm',
     'DateTime/TimeZone/Africa/Lagos.pm',
     'DateTime/TimeZone/Africa/Maputo.pm',
@@ -412,7 +413,7 @@ for my $lib (@module_files)
     is($?, 0, "$lib loaded ok");
 
     shift @_warnings if @_warnings and $_warnings[0] =~ /^Using .*\bblib/
-        and not eval { require blib; blib->VERSION('1.01') };
+        and not eval { +require blib; blib->VERSION('1.01') };
 
     if (@_warnings)
     {

@@ -12,7 +12,7 @@ my $post_diag;
 $modules{$_} = $_ for qw(
   Acme::Alien::DontPanic2
   DynaLoader
-  Module::Build
+  ExtUtils::MakeMaker
   Test2::V0
 );
 

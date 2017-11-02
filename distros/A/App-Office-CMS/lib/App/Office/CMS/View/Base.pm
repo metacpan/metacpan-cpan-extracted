@@ -1,11 +1,13 @@
 package App::Office::CMS::View::Base;
 
-use Any::Moose;
-use common::sense;
+use strict;
+use warnings;
 
 use Lingua::EN::Inflect::Number 'to_S';
 
-use Path::Class; # For file().
+use Moo;
+
+use Types::Standard qw/Any/;
 
 use Text::Xslate 'mark_raw';
 
@@ -14,37 +16,28 @@ extends 'App::Office::CMS::Database::Base';
 has config =>
 (
 	is  => 'rw',
-	isa => 'Any',
+	isa => Any,
 );
 
 has form_action =>
 (
 	is  => 'rw',
-	isa => 'Any',
+	isa => Any,
 );
 
 has session =>
 (
 	is  => 'rw',
-	isa => 'Any',
+	isa => Any,
 );
 
 has templater =>
 (
 	is  => 'rw',
-	isa => 'Text::Xslate',
+	isa => Any, # 'Text::Xslate'.
 );
 
-has tmpl_path =>
-(
-	is  => 'rw',
-	isa => 'Str',
-);
-
-# If Moose...
-#use namespace::autoclean;
-
-our $VERSION = '0.92';
+our $VERSION = '0.93';
 
 # -----------------------------------------------
 
@@ -115,10 +108,5 @@ sub log
 } # End of log.
 
 # --------------------------------------------------
-
-no Any::Moose;
-
-# If Moose...
-#__PACKAGE__ -> meta -> make_immutable;
 
 1;

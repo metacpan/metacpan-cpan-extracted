@@ -1,6 +1,6 @@
 # [[[ PREPROCESSOR ]]]
 # <<< PARSE_ERROR: 'ERROR ECOPAPL02' >>>
-# <<< PARSE_ERROR: 'Can't modify numeric gt (>) in scalar assignment' >>>
+# <<< PARSE_ERROR: 'Bareword "empty_property" not allowed while "strict subs" in use' >>>
 
 # [[[ HEADER ]]]
 use RPerl;
@@ -18,8 +18,6 @@ our hashref $properties
     = { empty_property > my integer $TYPED_empty_property = 2 };
 
 # [[[ SUBROUTINES & OO METHODS ]]]
-our void::method $empty_method = sub {
-    return 2;
-};
+sub empty_method { { my void::method $RETURN_TYPE }; return 2; }
 
 1;                  # end of class

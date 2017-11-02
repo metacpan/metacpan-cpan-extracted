@@ -182,6 +182,10 @@ $defines .= " -DLONGLONG2IV_IS_OK"
 $defines .= " -DLONG2IV_IS_OK"
   if $Config::Config{ivsize} >= $Config::Config{longsize};
 
+# Casting an extended precision inf to a __float128 may result in a nan
+$defines .= " -DNO_INF_CAST_TO_NV"
+  if ($Config{nvtype} eq '__float128' && ($Config{longdblkind} == 3 || $Config{longdblkind} == 4));
+
 $defines .= ' -DMATH_LONGDOUBLE_DEBUG'
   if "@ARGV" =~ /DEBUG/;
 

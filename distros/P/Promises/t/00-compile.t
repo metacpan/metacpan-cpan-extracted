@@ -6,16 +6,11 @@ use warnings;
 
 use Test::More;
 
-plan tests => 8 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Promises.pm',
     'Promises/Deferred.pm',
-    'Promises/Deferred/AE.pm',
-    'Promises/Deferred/AnyEvent.pm',
-    'Promises/Deferred/EV.pm',
-    'Promises/Deferred/IO/Async.pm',
-    'Promises/Deferred/Mojo.pm',
     'Promises/Promise.pm'
 );
 

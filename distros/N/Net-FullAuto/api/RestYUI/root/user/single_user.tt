@@ -1,0 +1,85 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+    <title>REST User: [% rest.fullname || rest.error %]</title>
+    <script type="text/javascript" src="/static/yui/yahoo.js"></script>
+    <script type="text/javascript" src="/static/yui/event.js"></script>
+    <script type="text/javascript" src="/static/yui/utilities.js"></script>
+    <script type="text/javascript" src="/static/yui/connection.js"></script>
+    <script type="text/javascript" src="/static/yui/dom.js"></script>
+    <script type="text/javascript" src="/static/json2.js"></script>
+</head>
+<body>
+    [%
+    SET method = 'POSTT';
+    # Editing an existing user?
+    IF rest.user_id;
+        # Set the method to PUT
+        method = 'PUT';
+    END;
+    %]
+    <form id="user_form">
+        <p>
+            <label for="user_id">User ID:</label>
+            <input id="user_id" type="text" disabled="disabled" value="[% c.req.args.0 %]"/>
+        </p><p>
+            <label for="fullname">Full Name:</label>
+            <input id="fullname" type="text" value="[% rest.fullname %]"/>
+        </p><p>
+            <label for="Description">Description:</label><br/>
+            <textarea name="description">[% rest.description %]</textarea>
+        </p><p>
+            <input type="submit" value="[% method == 'POST' ? "Create User" : "Update User" %]"/>
+        </p>
+    </form>
+    <script type="text/javascript">
+    var handleSuccess = function(o) {
+        /* Object Created, check for Loc header */
+        if ( o.status == "201" ) {
+            var loc = o.getResponseHeader["Location"];
+            if ( loc ) {
+                document.location = loc;
+                return true;
+            }
+            /* Just refresh if we did not get a location
+             */
+            alert("Object was created successfully");
+            document.location = document.location;
+        } else if ( o.status == "200" ) {
+            alert("User Update OK");        
+        }
+    };
+
+    var handleFailure = function(o) {
+        alert("Failed! :(\n" + o.responseText);
+    }
+
+    YAHOO.util.Event.addListener(window, "load", function() {
+        var callback = {
+            success: handleSuccess,
+            failure: handleFailure
+        };
+        var form = YAHOO.util.Dom.get("user_form");
+        YAHOO.util.Event.addListener(form, "submit", function(e) {
+            YAHOO.util.Event.preventDefault(e);
+            window.setTimeout(function() {
+                var uri  = '[% c.req.uri %]';
+
+                var data = {
+                    user_id:     form['user_id'].value,
+                    fullname:    form['fullname'].value,
+                    description: form['description'].value
+                };
+                YAHOO.util.Connect.setDefaultPostHeader('text/x-json');
+                var request = YAHOO.util.Connect.asyncRequest(
+                    '[% method %]',
+                    uri,
+                    callback,
+                    JSON.stringify(data)
+                );
+            }, 200);
+        });
+    });
+    </script>
+</body>
+</html>

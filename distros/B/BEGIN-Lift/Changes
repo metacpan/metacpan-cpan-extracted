@@ -1,5 +1,9 @@
 Revision history for Perl extension BEGIN::Lift
 
+0.07 2017-10-30
+    - remove the B::CompilerPhase::Hook dependency
+      and replace it with Devel::Hook
+
 0.06 2017-08-19
     - managed to upload the last one without a
       Makefile.PL, this should fix this.

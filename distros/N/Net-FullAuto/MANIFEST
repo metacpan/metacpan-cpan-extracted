@@ -59,6 +59,14 @@ api/fullautoapi
 api/memcached
 api/nginx.png
 api/zeromq.jpg
+api/RestYUI/db/adventrest.db
+api/RestYUI/root/user/single_user.tt
+api/RestYUI/root/static/json2.js
+api/RestYUI/root/static/yui/connection.js
+api/RestYUI/root/static/yui/dom.js
+api/RestYUI/root/static/yui/event.js
+api/RestYUI/root/static/yui/utilities.js
+api/RestYUI/root/static/yui/yahoo.js
 installer/GRAPHIC_LICENSE
 installer/PAR_CMD.txt
 installer/Scratched_Steel_Texture_by_AaronDesign.jpg

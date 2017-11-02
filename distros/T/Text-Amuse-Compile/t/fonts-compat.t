@@ -2,11 +2,11 @@
 use utf8;
 use strict;
 use warnings;
-use Test::More tests => 7;
+use Test::More tests => 49;
 use Text::Amuse::Compile::TemplateOptions;
 use Data::Dumper;
 
-is_deeply([ Text::Amuse::Compile::TemplateOptions->serif_fonts ],
+has_all([ Text::Amuse::Compile::TemplateOptions->serif_fonts ],
           [
                  {
                   name => 'CMU Serif',
@@ -61,7 +61,7 @@ is_deeply([ Text::Amuse::Compile::TemplateOptions->serif_fonts ],
                   desc => 'Garamond',
                  },
            ]);
-is_deeply([ Text::Amuse::Compile::TemplateOptions->mono_fonts ],
+has_all([ Text::Amuse::Compile::TemplateOptions->mono_fonts ],
           [
                  {
                   name => 'CMU Typewriter Text',
@@ -77,7 +77,7 @@ is_deeply([ Text::Amuse::Compile::TemplateOptions->mono_fonts ],
                  }
           ]);
 
-is_deeply([ Text::Amuse::Compile::TemplateOptions->sans_fonts ],
+has_all([ Text::Amuse::Compile::TemplateOptions->sans_fonts ],
           [
                  {
                   name => 'CMU Sans Serif',
@@ -109,7 +109,7 @@ is_deeply([ Text::Amuse::Compile::TemplateOptions->sans_fonts ],
                  },
            ]);
 
-is_deeply([ Text::Amuse::Compile::TemplateOptions->all_fonts ],
+has_all([ Text::Amuse::Compile::TemplateOptions->all_fonts ],
           [
                  {
                   name => 'CMU Serif',
@@ -209,3 +209,12 @@ is (Text::Amuse::Compile::TemplateOptions->default_mainfont, 'CMU Serif');
 is (Text::Amuse::Compile::TemplateOptions->default_monofont, 'CMU Typewriter Text');
 is (Text::Amuse::Compile::TemplateOptions->default_sansfont, 'CMU Sans Serif');
 
+sub has_all {
+    my ($got, $expected, $message) = @_;
+    diag $message if $message;
+    foreach my $exp (@$expected) {
+        is (scalar(grep { $_->{name} eq $exp->{name} and $_->{desc} eq $exp->{desc} } @$got),
+            1,
+            "Found $exp->{name}");
+    }
+}

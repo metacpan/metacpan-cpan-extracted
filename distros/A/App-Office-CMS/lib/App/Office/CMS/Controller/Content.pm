@@ -1,13 +1,14 @@
 package App::Office::CMS::Controller::Content;
 
 use parent 'App::Office::CMS::Controller';
-use common::sense;
+use strict;
+use warnings;
 
 use App::Office::CMS::Util::Validator;
 
 use File::Path 'make_path';
 
-use File::Slurp; # For write_file().
+use File::Slurper 'write_text';
 
 use JSON::XS;
 
@@ -17,9 +18,9 @@ use String::Dirify;
 
 use Try::Tiny;
 
-# We don't use Moose because we isa CGI::Application.
+# We don't use Moo because we isa CGI::Application.
 
-our $VERSION = '0.92';
+our $VERSION = '0.93';
 
 # -----------------------------------------------
 
@@ -309,7 +310,7 @@ sub generate_web_page
 	my($page_id) = ${$node -> attributes}{page_id};
 	my($content) = $$opt{self} -> param('db') -> content -> get_content_by_page_id($page_id);
 
-	write_file($file_name, $$opt{self} -> param('view') -> content -> generate
+	write_text($file_name, $$opt{self} -> param('view') -> content -> generate
 			   (
 				$$opt{site},
 				$$opt{design},
