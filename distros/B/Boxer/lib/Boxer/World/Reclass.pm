@@ -28,11 +28,11 @@ use namespace::clean;
 
 =head1 VERSION
 
-Version v1.1.5
+Version v1.1.7
 
 =cut
 
-our $VERSION = version->declare("v1.1.5");
+our $VERSION = version->declare("v1.1.7");
 
 =head1 DESCRIPTION
 

@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "\N{U+5348}\N{U+524d}",
-    "\N{U+5348}\N{U+5f8c}"
+    "\N{U+5348}\N{U+5f8c}",
   ],
   available_formats => {
+    Bh => "BK\N{U+6642}",
+    Bhm => "BK:mm",
+    Bhms => "BK:mm:ss",
     E => "ccc",
+    EBhm => "BK:mm (E)",
+    EBhms => "BK:mm:ss (E)",
     EEEEd => "d\N{U+65e5}EEEE",
     EHm => "H:mm (E)",
     EHms => "H:mm:ss (E)",
@@ -51,7 +56,7 @@
     yMd => "y/M/d",
     yQQQ => "y/QQQ",
     yQQQQ => "y\N{U+5e74}QQQQ",
-    "yw-count-other" => "y\N{U+5e74}\N{U+7b2c}w\N{U+9031}"
+    "yw-count-other" => "Y\N{U+5e74}\N{U+7b2c}w\N{U+9031}",
   },
   code => "ja",
   date_format_full => "y\N{U+5e74}M\N{U+6708}d\N{U+65e5}EEEE",
@@ -69,7 +74,7 @@
     "\N{U+6728}",
     "\N{U+91d1}",
     "\N{U+571f}",
-    "\N{U+65e5}"
+    "\N{U+65e5}",
   ],
   day_format_narrow => [
     "\N{U+6708}",
@@ -78,7 +83,7 @@
     "\N{U+6728}",
     "\N{U+91d1}",
     "\N{U+571f}",
-    "\N{U+65e5}"
+    "\N{U+65e5}",
   ],
   day_format_wide => [
     "\N{U+6708}\N{U+66dc}\N{U+65e5}",
@@ -87,7 +92,7 @@
     "\N{U+6728}\N{U+66dc}\N{U+65e5}",
     "\N{U+91d1}\N{U+66dc}\N{U+65e5}",
     "\N{U+571f}\N{U+66dc}\N{U+65e5}",
-    "\N{U+65e5}\N{U+66dc}\N{U+65e5}"
+    "\N{U+65e5}\N{U+66dc}\N{U+65e5}",
   ],
   day_stand_alone_abbreviated => [
     "\N{U+6708}",
@@ -96,7 +101,7 @@
     "\N{U+6728}",
     "\N{U+91d1}",
     "\N{U+571f}",
-    "\N{U+65e5}"
+    "\N{U+65e5}",
   ],
   day_stand_alone_narrow => [
     "\N{U+6708}",
@@ -105,7 +110,7 @@
     "\N{U+6728}",
     "\N{U+91d1}",
     "\N{U+571f}",
-    "\N{U+65e5}"
+    "\N{U+65e5}",
   ],
   day_stand_alone_wide => [
     "\N{U+6708}\N{U+66dc}\N{U+65e5}",
@@ -114,19 +119,19 @@
     "\N{U+6728}\N{U+66dc}\N{U+65e5}",
     "\N{U+91d1}\N{U+66dc}\N{U+65e5}",
     "\N{U+571f}\N{U+66dc}\N{U+65e5}",
-    "\N{U+65e5}\N{U+66dc}\N{U+65e5}"
+    "\N{U+65e5}\N{U+66dc}\N{U+65e5}",
   ],
   era_abbreviated => [
     "\N{U+7d00}\N{U+5143}\N{U+524d}",
-    "\N{U+897f}\N{U+66a6}"
+    "\N{U+897f}\N{U+66a6}",
   ],
   era_narrow => [
     "BC",
-    "AD"
+    "AD",
   ],
   era_wide => [
     "\N{U+7d00}\N{U+5143}\N{U+524d}",
-    "\N{U+897f}\N{U+66a6}"
+    "\N{U+897f}\N{U+66a6}",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -147,7 +152,7 @@
     "9\N{U+6708}",
     "10\N{U+6708}",
     "11\N{U+6708}",
-    "12\N{U+6708}"
+    "12\N{U+6708}",
   ],
   month_format_narrow => [
     1,
@@ -161,7 +166,7 @@
     9,
     10,
     11,
-    12
+    12,
   ],
   month_format_wide => [
     "1\N{U+6708}",
@@ -175,7 +180,7 @@
     "9\N{U+6708}",
     "10\N{U+6708}",
     "11\N{U+6708}",
-    "12\N{U+6708}"
+    "12\N{U+6708}",
   ],
   month_stand_alone_abbreviated => [
     "1\N{U+6708}",
@@ -189,7 +194,7 @@
     "9\N{U+6708}",
     "10\N{U+6708}",
     "11\N{U+6708}",
-    "12\N{U+6708}"
+    "12\N{U+6708}",
   ],
   month_stand_alone_narrow => [
     1,
@@ -203,7 +208,7 @@
     9,
     10,
     11,
-    12
+    12,
   ],
   month_stand_alone_wide => [
     "1\N{U+6708}",
@@ -217,7 +222,7 @@
     "9\N{U+6708}",
     "10\N{U+6708}",
     "11\N{U+6708}",
-    "12\N{U+6708}"
+    "12\N{U+6708}",
   ],
   name => "Japanese",
   native_language => "\N{U+65e5}\N{U+672c}\N{U+8a9e}",
@@ -229,37 +234,37 @@
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "\N{U+7b2c}1\N{U+56db}\N{U+534a}\N{U+671f}",
     "\N{U+7b2c}2\N{U+56db}\N{U+534a}\N{U+671f}",
     "\N{U+7b2c}3\N{U+56db}\N{U+534a}\N{U+671f}",
-    "\N{U+7b2c}4\N{U+56db}\N{U+534a}\N{U+671f}"
+    "\N{U+7b2c}4\N{U+56db}\N{U+534a}\N{U+671f}",
   ],
   quarter_stand_alone_abbreviated => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "\N{U+7b2c}1\N{U+56db}\N{U+534a}\N{U+671f}",
     "\N{U+7b2c}2\N{U+56db}\N{U+534a}\N{U+671f}",
     "\N{U+7b2c}3\N{U+56db}\N{U+534a}\N{U+671f}",
-    "\N{U+7b2c}4\N{U+56db}\N{U+534a}\N{U+671f}"
+    "\N{U+7b2c}4\N{U+56db}\N{U+534a}\N{U+671f}",
   ],
   script => undef,
   territory => undef,
@@ -268,5 +273,5 @@
   time_format_medium => "H:mm:ss",
   time_format_short => "H:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

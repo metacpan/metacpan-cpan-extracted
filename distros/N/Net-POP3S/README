@@ -1,4 +1,4 @@
-Net-POP3S version 0.06
+Net-POP3S version 0.10
 ======================
 
 This module implements a wrapper for Net::POP3, enabling

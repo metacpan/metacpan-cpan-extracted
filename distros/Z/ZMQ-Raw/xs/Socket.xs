@@ -99,9 +99,6 @@ send (self, buffer, flags=0)
 		sock = ZMQ_SV_TO_PTR (Socket, self);
 		rc = zmq_send (sock->socket,
 			SvPVX (buffer), SvCUR (buffer), flags);
-		if (rc < 0 && zmq_errno() == EAGAIN && (flags & ZMQ_DONTWAIT))
-			XSRETURN_UNDEF;
-
 		zmq_raw_check_error (rc);
 		XSRETURN_YES;
 
@@ -168,9 +165,6 @@ sendmsg (self, ...)
 				{
 					int error = zmq_errno();
 					zmq_msg_close (&msg);
-
-					if (error == EAGAIN && (flags & ZMQ_DONTWAIT))
-						XSRETURN_UNDEF;
 				}
 				zmq_raw_check_error (rc);
 
@@ -224,9 +218,6 @@ recv (self, flags=0)
 			{
 				int error = zmq_errno();
 				zmq_msg_close (&msg);
-
-				if (error == EAGAIN && (flags & ZMQ_DONTWAIT))
-					XSRETURN_UNDEF;
 			}
 			zmq_raw_check_error (rc);
 
@@ -287,9 +278,6 @@ recvmsg (self, flags=0)
 			{
 				int error = zmq_errno();
 				zmq_msg_close (&msg);
-
-				if (error == EAGAIN && (flags & ZMQ_DONTWAIT))
-					break;
 			}
 
 			zmq_raw_check_error (rc);

@@ -11,7 +11,7 @@ require Exporter;
 our @ISA    = qw(Exporter);
 our @EXPORT = qw(perl_tokens);
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 =encoding utf8
 
@@ -21,7 +21,7 @@ Perl::Tokenizer - A tiny Perl code tokenizer.
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =cut
 
@@ -234,7 +234,10 @@ sub perl_tokens(&$) {
                     $postfix_op    = 0;
                 }
                 else {
-                    m{\G.}gcs ? redo : exit -1;
+                    if (/\G(.)/gsc) {
+                        $callback->('unknown_char', $-[0], $+[0]);
+                        redo;
+                    }
                 }
                 redo;
             }
@@ -373,7 +376,8 @@ sub perl_tokens(&$) {
             }
             when (m~\G\}~gc) {
                 $callback->('curly_bracket_close', $-[0], $+[0]);
-                $flat = 0;
+                $flat   = 0;
+                $canpod = 1;
                 redo;
             }
             when (m~\G\[~gc) {
@@ -705,33 +709,33 @@ The standard token names that are available are:
        curly_bracket_open ...... Open curly bracket: '{'
        curly_bracket_close ..... Closed curly bracket: '}'
        substitution ............ Regex substitution: s/.../.../
-       transliteration.......... Transliteration: tr/.../.../' or y/.../.../
-       match_regex ............. A regex in matching context: m/.../
-       compiled_regex .......... A quoted 'compiled' regex: qr/.../
-       q_string ................ A single quoted string: q/.../
-       qq_string ............... A double quoted string: qq/.../
-       qw_string ............... A list of quoted strings: qw/.../
-       qx_string ............... A system command quoted string: qx/.../
-       backtick ................ A backtick system command quoted string: `...`
-       single_quoted_string .... A single quoted string, as: '...'
-       double_quoted_string .... A double quoted string, as: "..."
-       bare_word ............... An unquoted string
-       glob_readline ........... A <readline> or <shell glob>
-       v_string ................ A version string: "vX" or "X.X.X"
-       file_test ............... A file test operator (-X), such as: "-d", "-e", etc...
+       transliteration.......... Transliteration: tr/.../.../ or y/.../.../
+       match_regex ............. Regex in matching context: m/.../
+       compiled_regex .......... Quoted compiled regex: qr/.../
+       q_string ................ Single quoted string: q/.../
+       qq_string ............... Double quoted string: qq/.../
+       qw_string ............... List of quoted words: qw/.../
+       qx_string ............... System command quoted string: qx/.../
+       backtick ................ Backtick system command quoted string: `...`
+       single_quoted_string .... Single quoted string, as: '...'
+       double_quoted_string .... Double quoted string, as: "..."
+       bare_word ............... Unquoted string
+       glob_readline ........... <readline> or <shell glob>
+       v_string ................ Version string: "vX" or "X.X.X"
+       file_test ............... File test operator (-X), such as: "-d", "-e", etc...
        data .................... The content of `__DATA__` or `__END__` sections
-       keyword ................. A regular Perl keyword, such as: `if`, `else`, etc...
-       special_keyword ......... A special Perl keyword, such as: `__PACKAGE__`, `__FILE__`, etc...
-       comma ................... A comma: ','
-       fat_comma ............... A fat comma: '=>'
-       operator ................ A primitive operator, such as: '+', '||', etc...
-       assignment_operator ..... A '=' or any operator assignment: '+=', '||=', etc...
-       dereference_operator .... The arrow dereference operator: '->'
-       hex_number .............. An hexadecimal literal number: 0x...
-       binary_number ........... An binary literal number: 0b...
-       number .................. An decimal literal number, such as 42, 3.1e4, etc...
-       special_fh .............. A special file-handle name, such as 'STDIN', 'STDOUT', etc...
-       unknown_char ............ An unknown or unexpected character
+       keyword ................. Regular Perl keyword, such as: `if`, `else`, etc...
+       special_keyword ......... Special Perl keyword, such as: `__PACKAGE__`, `__FILE__`, etc...
+       comma ................... Comma: ','
+       fat_comma ............... Fat comma: '=>'
+       operator ................ Primitive operator, such as: '+', '||', etc...
+       assignment_operator ..... '=' or any assignment operator: '+=', '||=', etc...
+       dereference_operator .... Arrow dereference operator: '->'
+       hex_number .............. Hexadecimal literal number: 0x...
+       binary_number ........... Binary literal number: 0b...
+       number .................. Decimal literal number, such as 42, 3.1e4, etc...
+       special_fh .............. Special file-handle name, such as 'STDIN', 'STDOUT', etc...
+       unknown_char ............ Unknown or unexpected character
 
 =head1 EXAMPLE
 

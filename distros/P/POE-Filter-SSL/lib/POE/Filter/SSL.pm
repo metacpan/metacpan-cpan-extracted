@@ -8,11 +8,10 @@ use Carp qw(carp confess);
 use POE;
 
 use vars qw($VERSION @ISA);
-$VERSION = '0.36';
+$VERSION = '0.37';
 sub DOSENDBACK () { 1 }
 
 our $globalinfos;
-my $debug = 0;
 
 my $PATCH         = 18;
 my $HANDSHAKE     = 19;
@@ -244,10 +243,11 @@ sub CTX_add_client_CA {
 
 sub dataToBio {
    my $data = shift;
+   my $self = $globalinfos->[3] || {};
    my $bio = Net::SSLeay::BIO_new(Net::SSLeay::BIO_s_mem());
    my $sent = Net::SSLeay::BIO_write($bio, $data);
    print "Wrote ".$sent." of ".length($data)." bytes.\n"
-      if $debug;
+      if $self->{debug};
    die "Cannot write to bio!"
       if (($sent) != length($data));
    return $bio;
@@ -255,8 +255,12 @@ sub dataToBio {
 
 sub new {
    my $type = shift;
+
    my $params = {@_};
    my $self = bless({}, $type);
+
+   $globalinfos = [0, 0, [], $self];
+
    $self->{buffer} = '';
    $self->{debug} = $params->{debug} || 0;
    $self->{cacrl} = $params->{cacrl}
@@ -281,30 +285,34 @@ sub new {
       die "Error using chain: ".Net::SSLeay::ERR_error_string(Net::SSLeay::ERR_get_error())
          if ($err && ($err != 1));
    } else {
-      if ($params->{keymem}) {
-         $err = Net::SSLeay::CTX_use_PrivateKey($self->{context}, PEMdataToEVP_PKEY($self->{ssl}, $params->{keymem}));
-         print "Loaded keymem(".length($params->{keymem})." Bytes) with result ".$err."\n"
-            if $self->{debug};
-      } else {
-         $err = Net::SSLeay::CTX_use_PrivateKey_file($self->{context}, $params->{key}, &Net::SSLeay::FILETYPE_PEM);
-         print "Loaded key from file ".$params->{key}." with result ".$err."\n"
-            if $self->{debug};
+      if ($params->{keymem} || $params->{key}) {
+         if ($params->{keymem}) {
+            $err = Net::SSLeay::CTX_use_PrivateKey($self->{context}, PEMdataToEVP_PKEY($self->{ssl}, $params->{keymem}));
+            print "Loaded keymem(".length($params->{keymem})." Bytes) with result ".$err."\n"
+               if $self->{debug};
+         } else {
+            $err = Net::SSLeay::CTX_use_PrivateKey_file($self->{context}, $params->{key}, &Net::SSLeay::FILETYPE_PEM);
+            print "Loaded key from file ".$params->{key}." with result ".$err."\n"
+               if $self->{debug};
+         }
+         die "Error using keymem: ".Net::SSLeay::ERR_error_string(Net::SSLeay::ERR_get_error())
+            if ($err && ($err != 1));
       }
-      die "Error using keymem: ".Net::SSLeay::ERR_error_string(Net::SSLeay::ERR_get_error())
-         if ($err && ($err != 1));
-      if ($params->{crtmem}) {
-         my $crt = PEMdataToX509($params->{crtmem});
-         $err = Net::SSLeay::CTX_use_certificate($self->{context}, $crt);
-         print "Loaded crtmem(".length($params->{crtmem})." Bytes/".$crt.") with result ".$err."\n"
-            if $self->{debug};
-      } else {
-         # TODO:XXX:FIXME: Errorchecking!
-         $err = Net::SSLeay::CTX_use_certificate_file($self->{context}, $params->{crt}, &Net::SSLeay::FILETYPE_PEM);
-         print "Loaded crt from file ".$params->{crt}." with result ".$err."\n"
-            if $self->{debug};
+      if ($params->{crtmem} || $params->{crt}) {
+         if ($params->{crtmem}) {
+            my $crt = PEMdataToX509($params->{crtmem});
+            $err = Net::SSLeay::CTX_use_certificate($self->{context}, $crt);
+            print "Loaded crtmem(".length($params->{crtmem})." Bytes/".$crt.") with result ".$err."\n"
+               if $self->{debug};
+         } else {
+            # TODO:XXX:FIXME: Errorchecking!
+            $err = Net::SSLeay::CTX_use_certificate_file($self->{context}, $params->{crt}, &Net::SSLeay::FILETYPE_PEM);
+            print "Loaded crt from file ".$params->{crt}." with result ".$err."\n"
+               if $self->{debug};
+         }
+         die "Error using crtmem: ".Net::SSLeay::ERR_error_string(Net::SSLeay::ERR_get_error())
+            if ($err && ($err != 1));
       }
-      die "Error using crtmem: ".Net::SSLeay::ERR_error_string(Net::SSLeay::ERR_get_error())
-         if ($err && ($err != 1));
    }
 
    $err = undef;
@@ -389,10 +397,10 @@ sub new {
    $orfilter |=   &Net::SSLeay::VERIFY_FAIL_IF_NO_PEER_CERT
       if $params->{blockbadclientcert};
    # TODO:XXX:FIXME: Errorchecking!
+   #Net::SSLeay::CTX_set_verify($self->{context}, $orfilter, \&VERIFY);
    Net::SSLeay::set_verify($self->{ssl}, $orfilter, \&VERIFY);
-   Net::SSLeay::CTX_set_verify($self->{context}, $orfilter, \&VERIFY);
    print "Set verify ".($params->{blockbadclientcert} ? "FORCE" : "")." ".$orfilter."\n"
-      if $debug;
+      if $self->{debug};
    if ($params->{sni}) {
       my $err = Net::SSLeay::set_tlsext_host_name($self->{ssl}, $params->{sni});
       print "Set sni with result ".$err."\n"
@@ -400,16 +408,30 @@ sub new {
       die "Error setting sni:".Net::SSLeay::ERR_error_string(Net::SSLeay::ERR_get_error())
          if ($err && ($err != 1));
    }
-   
-   $globalinfos = [0, 0, []];
+   $self->{ignoreVerifyErrors} = $params->{ignoreVerifyErrors}
+      if ($params->{ignoreVerifyErrors} &&
+     (ref($params->{ignoreVerifyErrors}) eq "ARRAY"));
 
    $self
 }
 
 sub VERIFY {
    my ($ok, $x509_store_ctx) = @_;
-   print "VERIFY ".$ok."!\n" if $debug;
-   $globalinfos->[0] = $ok ? 1 : 2 if ($globalinfos->[0] != 2);
+   my $self = $globalinfos->[3] || {};
+   print "VERIFY ".$ok
+      if $self->{debug};
+   my $errcode = Net::SSLeay::X509_STORE_CTX_get_error($x509_store_ctx);
+   if ($self->{ignoreVerifyErrors} &&
+  (ref($self->{ignoreVerifyErrors}) eq "ARRAY") && (scalar(grep { $errcode == $_ }
+     @{$self->{ignoreVerifyErrors}}))) {
+      $ok = 1;
+      print " -> ".$ok." (Ignoring error ".$errcode.")"
+         if $self->{debug};
+   }
+   print "\n"
+      if $self->{debug};
+   $globalinfos->[0] = $ok ? 1 : 2
+      if ($globalinfos->[0] != 2);
    $globalinfos->[1]++;
    # TODO:XXX:FIXME: Chainlength check
    #X509_STORE_CTX_set_error($x509_store_ctx, X509_V_ERR_CERT_CHAIN_TOO_LONG)
@@ -421,8 +443,9 @@ sub VERIFY {
       push(@{$globalinfos->[2]},[Net::SSLeay::X509_NAME_oneline(Net::SSLeay::X509_get_subject_name($x)),
                                  Net::SSLeay::X509_NAME_oneline(Net::SSLeay::X509_get_issuer_name($x)),
                                  X509_get_serialNumber($x),
-                                 Net::SSLeay::X509_STORE_CTX_get_error($x509_store_ctx)]);
+                                 $errcode]);
    }
+   Net::SSLeay::X509_STORE_CTX_set_error($x509_store_ctx, 0);
    return 1; # $ok; # 1=accept cert, 0=reject
 }
 
@@ -433,33 +456,41 @@ sub clone {
 
 sub get_one_start {
    my ($self, $data) = @_;
-   print "GETONESTART: NETWORK -> SSL -> POE: ".hexdump(join("", @$data))."\n" if $debug;
+   print "GETONESTART: NETWORK -> SSL -> POE: ".$self->hexdump(join("", @$data))."\n"
+      if $self->{debug};
    $self->writeToSSLBIO(join("", @$data), $self->{accepted} ? 0 : 1);
    []
 }
 
 sub get_one {
    my $self = shift;
-   print "GETONE: BEGIN\n" if $debug;
+   print "GETONE: BEGIN\n"
+      if $self->{debug};
    my @return = ();
    push(@return, $self) if ($self->doSSL() || $self->{buffer});
    my $data = Net::SSLeay::read($self->{ssl});
-   push(@return, $data) if $data;
-   print "GETONE: END: ".scalar(@return)."\n" if $debug;
+   push(@return, $data)
+      if $data;
+   print "GETONE: END: ".scalar(@return)."\n"
+      if $self->{debug};
    [@return]
 }
 
 sub get {
-   print "GET: BEGIN\n" if $debug;
    my ($self, $chunks) = @_;
+   print "GET: BEGIN\n"
+      if $self->{debug};
    my @return = ();
-   #print "GET:\n" if $debug;
+   #print "GET:\n"
+   #   if $self->{debug};
    push(@return, $self) if ($self->doSSL() || $self->{buffer});
    foreach my $data (@$chunks) {
-      print "GET: NETWORK -> SSL -> POE: ".join("", @$data)."\n" if $debug;
+      print "GET: NETWORK -> SSL -> POE: ".join("", @$data)."\n"
+         if $self->{debug};
       $self->writeToSSLBIO(join("", @$data));
       my $data = Net::SSLeay::read($self->{ssl});
-      print "GET: Read ".length($data)." bytes.\n" if $debug;
+      print "GET: Read ".length($data)." bytes.\n"
+         if $self->{debug};
       push(@return, $data);
    }
    [@return]
@@ -467,7 +498,8 @@ sub get {
 
 sub put {
    my ($self, $chunks) = @_;
-   print "PUT: BEGIN\n" if $debug;
+   print "PUT: BEGIN\n"
+      if $self->{debug};
    my @return = ();
    $self->doSSL();
    if ($self->{accepted}) {
@@ -480,14 +512,17 @@ sub put {
    }
    foreach my $data (@$chunks) {
       next if (ref($data) eq "POE::Filter::SSL");
-      print "PUT: POE -> SSL -> NETWORK: ".$data."\r\n" if $debug;
+      print "PUT: POE -> SSL -> NETWORK: ".$self->hexdump($data)."\r\n"
+         if $self->{debug};
       if ($self->{accepted}) {
          $self->writeToSSL($data);
       } else {
-         push(@{$self->{sendbuf}}, $data) if ($data);
+         push(@{$self->{sendbuf}}, $data)
+            if ($data);
       }
    }
-   push(@return, $self->{buffer}) if $self->{buffer};
+   push(@return, $self->{buffer})
+      if $self->{buffer};
    $self->{buffer} = '';
    [@return]
 }
@@ -520,7 +555,8 @@ sub get_pending {
 sub doSSL {
    my $self = shift;
    my $ret = 0;
-   print "SSLing..." if $debug;
+   print "SSLing..."
+      if $self->{debug};
    unless ($self->{accepted}) {
       my $err = $self->{client} ?
          Net::SSLeay::connect($self->{ssl}) :
@@ -570,7 +606,8 @@ sub doSSL {
    while (my $data = Net::SSLeay::BIO_read($self->{wbio})) {
       $self->{buffer} .= $data;
    }
-   print $ret."\n" if $debug;
+   print $ret."\n"
+      if $self->{debug};
    return $ret;
 }
 
@@ -606,7 +643,8 @@ sub clientCertNotOnCRL {
       my $found = 0;
       my $badcrls = 0;
       my $jump = 0;
-      print("----- SSL Infos BEGIN ---------------"."\n") if $self->{debug};
+      print("----- SSL Infos BEGIN ---------------"."\n")
+         if $self->{debug};
       foreach (@{$self->{infos}->[2]}) {
          my $crlstatus = verify_serial_against_crl_file($crlfilename, $_->[2]);
          $badcrls++ if $crlstatus;
@@ -659,7 +697,7 @@ POE::Filter::SSL - The easiest and flexiblest way to SSL in POE!
 
 =head1 VERSION
 
-Version 0.36
+Version 0.37
 
 =head1 DESCRIPTION
 
@@ -1145,6 +1183,20 @@ Example:
 Let OpenSSL deny the connection if there is no client certificate.
 
 B<WARNING:> If the client is listed in the CRL file or an invalid client certifiate has been sent, the connection will be established! You have to ask I<clientCertValid()> if you have the I<crl> option set on I<new()>, otherwise to ask I<clientCertNotOnCRL()> if the certificate is listed on your CRL file!
+
+=item ignoreVerifyErrors
+
+B<WARNING:> Before using this option, you should be realy sure that you know what you are doing!
+
+Specify to ignore specific errors on verifying the certificate chain: This is for example useful to be able to fetch the time from via secure and trusted TLS connection. In this case, your time is wrong, so must ignore time errors, which are 9: X509_V_ERR_CERT_NOT_YET_VALID (certificate is not yet valid) and 10: X509_V_ERR_CERT_HAS_EXPIRED (certificate has expired).
+
+The list of errors you can ignore can be found on the documentation:
+
+L<https://wiki.openssl.org/index.php/Manual:Verify(1)>
+
+Example:
+
+  ignoreVerifyErrors => [ 9, 10, ]
 
 =back
 

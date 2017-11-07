@@ -18,7 +18,7 @@ our $object = ( Net::Whois::Object->new(@lines) )[0];
 isa_ok $object, $class;
 
 # Non-inherited methods
-can_ok $object, qw( role address phone fax_no e_mail trouble admin_c tech_c nic_hdl remarks notify mnt_by changed source);
+can_ok $object, qw( role address phone fax_no e_mail admin_c tech_c nic_hdl remarks notify mnt_by changed source);
 
 # Check if typed attributes are correct
 can_ok $object, $object->attributes('mandatory');
@@ -105,7 +105,7 @@ is( $object->changed()->[1], 'Added changed', 'changed properly added' );
 # Test 'abuse_mailbox'
 $tested{'abuse_mailbox'}++;
 $object->abuse_mailbox('foo@example.com');
-is($object->abuse_mailbox->[0], 'foo@example.com', 'abuse_mailbox');
+is($object->abuse_mailbox, 'foo@example.com', 'abuse_mailbox');
 
 # Test 'source'
 $tested{'source'}++;
@@ -115,13 +115,7 @@ is( $object->source(), 'RIPE', 'source properly set' );
 
 # Test 'e_mail'
 $tested{'e_mail'}++;
-
-# TODO
-
-# Test 'trouble'
-$tested{'trouble'}++;
-
-# TODO
+is($object->e_mail->[0], 'role@somewhere.com', 'e_mail');
 
 # Common tests
 do 't/common.pl';

@@ -11,7 +11,7 @@ use Env qw( @PKG_CONFIG_PATH );
 use Config ();
 
 # ABSTRACT: Build external dependencies for use in CPAN
-our $VERSION = '1.28'; # VERSION
+our $VERSION = '1.32'; # VERSION
 
 
 sub _path { goto \&Path::Tiny::path }
@@ -178,6 +178,33 @@ sub load
   unless(defined $self->meta->prop->{arch})
   {
     $self->meta->prop->{arch} = 1;
+  }
+  
+  unless(defined $self->meta->prop->{network})
+  {
+    $self->meta->prop->{network} = 1;
+    ## https://github.com/Perl5-Alien/Alien-Build/issues/23#issuecomment-341114414
+    #$self->meta->prop->{network} = 0 if $ENV{NO_NETWORK_TESTING};
+    $self->meta->prop->{network} = 0 if (defined $ENV{ALIEN_INSTALL_NETWORK}) && ! $ENV{ALIEN_INSTALL_NETWORK};
+  }
+  
+  unless(defined $self->meta->prop->{local_source})
+  {
+    if(! defined $self->meta->prop->{start_url})
+    {
+      $self->meta->prop->{local_source} = 0;
+    }
+    # we assume URL schemes are at least two characters, that
+    # way Windows absolute paths can be used as local start_url
+    elsif($self->meta->prop->{start_url} =~ /^([a-z]{2,}):/i)
+    {
+      my $scheme = $1;
+      $self->meta->prop->{local_source} = $scheme eq 'file';
+    }
+    else
+    {
+      $self->meta->prop->{local_source} = 1;
+    }
   }
 
   return $self;
@@ -430,9 +457,16 @@ sub probe
   {
     Carp::croak "probe hook returned something other than system or share: $type";
   }
+
+  if($type eq 'share' && (!$self->meta_prop->{network}) && (!$self->meta_prop->{local_source}))
+  {
+    $self->log("install type share requested or detected, but network fetch is turned off");
+    $self->log("see https://metacpan.org/pod/Alien::Build::Manual::FAQ#Network-fetch-is-turned-off");
+    Carp::croak "network fetch is turned off";
+  }
   
   $self->runtime_prop->{install_type} = $type;
-  
+
   $type;
 }
 
@@ -1090,7 +1124,7 @@ Alien::Build - Build external dependencies for use in CPAN
 
 =head1 VERSION
 
-version 1.28
+version 1.32
 
 =head1 SYNOPSIS
 
@@ -1246,6 +1280,12 @@ Same as C<destdir_filter> except applies to C<build_ffi> instead of C<build>.
 
 Environment variables to override during the build stage.
 
+=item local_source
+
+Set to true if source code package is available locally.  (that is not fetched
+over the internet).  This is computed by default based on the C<start_url>
+property.  Can be set by an L<alienfile> or plugin.
+
 =item platform
 
 Hash reference.  Contains information about the platform beyond just C<$^O>.
@@ -1310,6 +1350,12 @@ an "out-of-source" build.  When this property is true, instead of extracting
 to the source build root, the downloaded source will be extracted to an source
 extraction directory and the source build root will be empty.  You can use the
 C<extract> install property to get the location of the extracted source.
+
+=item network
+
+True if a network fetch is available.  This should NOT be set by an L<alienfile>
+or plugin.  This is computed based on the C<ALIEN_INSTALL_NETWORK> environment
+variables.
 
 =item start_url
 
@@ -1787,6 +1833,16 @@ Apply the given plugin with the given arguments.
 L<Alien::Build> responds to these environment variables:
 
 =over 4
+
+=item ALIEN_INSTALL_NETWORK
+
+If set to true (the default), then network fetch will be allowed.  If set to
+false, then network fetch will not be allowed.
+
+What constitutes a local vs. network fetch is determined based on the C<start_url>
+and C<local_source> meta properties.  An L<alienfile> or plugin C<could> override
+this detection (possibly inappropriately), so this variable is not a substitute
+for properly auditing of Perl modules for environments that require that.
 
 =item ALIEN_INSTALL_TYPE
 

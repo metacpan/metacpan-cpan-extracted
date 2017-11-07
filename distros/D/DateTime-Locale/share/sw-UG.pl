@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "AM",
-    "PM"
+    "PM",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "E d",
@@ -46,8 +51,8 @@
     yMd => "d/M/y",
     yQQQ => "y QQQ",
     yQQQQ => "QQQQ y",
-    "yw-count-one" => "'wiki' w 'ya' y",
-    "yw-count-other" => "'wiki' w 'ya' y"
+    "yw-count-one" => "'wiki' w 'ya' Y",
+    "yw-count-other" => "'wiki' w 'ya' Y",
   },
   code => "sw-UG",
   date_format_full => "EEEE, d MMMM y",
@@ -65,7 +70,7 @@
     "Alhamisi",
     "Ijumaa",
     "Jumamosi",
-    "Jumapili"
+    "Jumapili",
   ],
   day_format_narrow => [
     "M",
@@ -74,7 +79,7 @@
     "T",
     "F",
     "S",
-    "S"
+    "S",
   ],
   day_format_wide => [
     "Jumatatu",
@@ -83,7 +88,7 @@
     "Alhamisi",
     "Ijumaa",
     "Jumamosi",
-    "Jumapili"
+    "Jumapili",
   ],
   day_stand_alone_abbreviated => [
     "Jumatatu",
@@ -92,7 +97,7 @@
     "Alhamisi",
     "Ijumaa",
     "Jumamosi",
-    "Jumapili"
+    "Jumapili",
   ],
   day_stand_alone_narrow => [
     "M",
@@ -101,7 +106,7 @@
     "T",
     "F",
     "S",
-    "S"
+    "S",
   ],
   day_stand_alone_wide => [
     "Jumatatu",
@@ -110,19 +115,19 @@
     "Alhamisi",
     "Ijumaa",
     "Jumamosi",
-    "Jumapili"
+    "Jumapili",
   ],
   era_abbreviated => [
     "KK",
-    "BK"
+    "BK",
   ],
   era_narrow => [
     "KK",
-    "BK"
+    "BK",
   ],
   era_wide => [
     "Kabla ya Kristo",
-    "Baada ya Kristo"
+    "Baada ya Kristo",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -143,7 +148,7 @@
     "Sep",
     "Okt",
     "Nov",
-    "Des"
+    "Des",
   ],
   month_format_narrow => [
     "J",
@@ -157,7 +162,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_format_wide => [
     "Januari",
@@ -171,7 +176,7 @@
     "Septemba",
     "Oktoba",
     "Novemba",
-    "Desemba"
+    "Desemba",
   ],
   month_stand_alone_abbreviated => [
     "Jan",
@@ -185,7 +190,7 @@
     "Sep",
     "Okt",
     "Nov",
-    "Des"
+    "Des",
   ],
   month_stand_alone_narrow => [
     "J",
@@ -199,7 +204,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_stand_alone_wide => [
     "Januari",
@@ -213,7 +218,7 @@
     "Septemba",
     "Oktoba",
     "Novemba",
-    "Desemba"
+    "Desemba",
   ],
   name => "Swahili Uganda",
   native_language => "Kiswahili",
@@ -225,37 +230,37 @@
     "Robo ya 1",
     "Robo ya 2",
     "Robo ya 3",
-    "Robo ya 4"
+    "Robo ya 4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "Robo ya 1",
     "Robo ya 2",
     "Robo ya 3",
-    "Robo ya 4"
+    "Robo ya 4",
   ],
   quarter_stand_alone_abbreviated => [
     "Robo ya 1",
     "Robo ya 2",
     "Robo ya 3",
-    "Robo ya 4"
+    "Robo ya 4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "Robo ya 1",
     "Robo ya 2",
     "Robo ya 3",
-    "Robo ya 4"
+    "Robo ya 4",
   ],
   script => undef,
   territory => "Uganda",
@@ -264,5 +269,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

@@ -1,7 +1,9 @@
 package Unix::Passwd::File;
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.24'; # VERSION
+## no critic (InputOutput::RequireBriefOpen)
+
+our $DATE = '2017-11-06'; # DATE
+our $VERSION = '0.250'; # VERSION
 
 use 5.010001;
 use strict;
@@ -1936,7 +1938,7 @@ Unix::Passwd::File - Manipulate /etc/{passwd,shadow,group,gshadow} entries
 
 =head1 VERSION
 
-This document describes version 0.24 of Unix::Passwd::File (from Perl distribution Unix-Passwd-File), released on 2017-07-10.
+This document describes version 0.250 of Unix::Passwd::File (from Perl distribution Unix-Passwd-File), released on 2017-11-06.
 
 =head1 SYNOPSIS
 

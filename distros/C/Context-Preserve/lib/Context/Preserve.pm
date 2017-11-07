@@ -1,4 +1,4 @@
-package Context::Preserve; # git description: a897cd7
+package Context::Preserve; # git description: v0.02-4-g9a6a9b9
 # ABSTRACT: Run code after a subroutine call, preserving the context the subroutine would have seen if it were the last statement in the caller
 use strict;
 use warnings;
@@ -7,7 +7,7 @@ use Carp;
 use base 'Exporter';
 our @EXPORT = qw(preserve_context);
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 sub preserve_context(&@) {
     my $orig = shift;
@@ -65,7 +65,7 @@ Context::Preserve - Run code after a subroutine call, preserving the context the
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -181,23 +181,23 @@ Jonathan Rockway <jrockway@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Jonathan Rockway Karen Etheridge
+=for stopwords Karen Etheridge Jonathan Rockway
 
 =over 4
 
 =item *
 
-Jonathan Rockway <jon@jrock.us>
+Karen Etheridge <ether@cpan.org>
 
 =item *
 
-Karen Etheridge <ether@cpan.org>
+Jonathan Rockway <jon@jrock.us>
 
 =back
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2007 by Jonathan Rockway.
+This software is copyright (c) 2008 by Infinity Interactive.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,4 +1,4 @@
-Unicode/Collate version 1.19
+Unicode/Collate version 1.21
 ===============================
 
 NAME
@@ -88,7 +88,8 @@ ABOUT DUCET
 
    http://www.unicode.org/Public/UCA/
 
-   http://www.unicode.org/Public/UCA/latest/allkeys.txt (latest version)
+   http://www.unicode.org/Public/UCA/latest/allkeys.txt
+   (latest version)
 
   If DUCET is not installed, it is recommended to copy the file
   from http://www.unicode.org/Public/UCA/latest/allkeys.txt
@@ -108,13 +109,13 @@ HOW TO CHANGE DUCET (NOT WARRANTED)
 AUTHOR, COPYRIGHT AND LICENSE
 
 The Unicode::Collate module for perl was written by SADAHIRO Tomoyuki,
-<SADAHIRO@cpan.org>. This module is Copyright(C) 2001-2016,
+<SADAHIRO@cpan.org>. This module is Copyright(C) 2001-2017,
 SADAHIRO Tomoyuki. Japan. All rights reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
 The file Unicode/Collate/allkeys.txt was copied verbatim
-from http://www.unicode.org/Public/UCA/8.0.0/allkeys.txt
-For this file, Copyright (c) 2001-2015 Unicode, Inc.
+from http://www.unicode.org/Public/UCA/9.0.0/allkeys.txt
+For this file, Copyright (c) 2016 Unicode, Inc.
 For terms of use, see http://www.unicode.org/terms_of_use.html

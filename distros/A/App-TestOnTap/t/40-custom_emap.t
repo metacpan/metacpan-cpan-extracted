@@ -9,11 +9,12 @@ use App::TestOnTap::_dbgvars;
 
 use TestUtils;
 
-use Test::More tests => 9;
+use Test::More tests => 10;
 
-my ($ret, $stdout, $stderr) = TestUtils::xeqsuite([qw(--verbose --execmap :internal)]);
+my ($ret, $stdout, $stderr) = TestUtils::xeqsuite([qw(--verbose)]);
 
 is($ret, 0, "Exited with 0");
+like($stderr->[0], qr/^WARNING: No execmap found, using internal default!$/, "default execmap");
 like($stdout->[0], qr/^Files=0, Tests=0, /, "No tests recognized");
 is($stdout->[1], "Result: NOTESTS", "Nothing tested");
 

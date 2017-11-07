@@ -97,7 +97,9 @@ my $test_sub = sub {
  }
 
  my $glob = $stash->{$sub};
- return $glob ? *$glob{CODE} : undef;
+ return ref \$glob eq 'GLOB' ? *$glob{CODE}
+      : ref  $glob eq 'CODE' ?  $glob
+      :                          undef;
 };
 
 sub skip { $test_sub->('skip')->(@_) }
@@ -193,7 +195,15 @@ C<$p> is prefixed to the constants exported by this feature (defaults to C<''>).
 
 =item *
 
-Dependencies : none
+Dependencies :
+
+=over 8
+
+=item -
+
+L<File::Spec>
+
+=back
 
 =item *
 
@@ -204,6 +214,10 @@ Exports :
 =item -
 
 C<run_perl $code>
+
+=item -
+
+C<run_perl_file $file>
 
 =item -
 
@@ -241,8 +255,14 @@ sub fresh_perl_env (&) {
 sub init_run_perl {
  my $p = sanitize_prefix(shift);
 
+ # This is only required for run_perl_file(), so it is not needed for the
+ # threads feature which only calls run_perl() - don't forget to update its
+ # requirements if this ever changes.
+ require File::Spec;
+
  return (
   run_perl              => \&run_perl,
+  run_perl_file         => \&run_perl_file,
   "${p}RUN_PERL_FAILED" => sub () { 'Could not execute perl subprocess' },
  );
 }
@@ -257,6 +277,20 @@ sub run_perl {
  fresh_perl_env {
   my ($perl, @perl_args) = @_;
   system { $perl } $perl, @perl_args, '-e', $code;
+ };
+}
+
+sub run_perl_file {
+ my $file = shift;
+
+ $file = File::Spec->rel2abs($file);
+ unless (-e $file and -r _) {
+  die 'Could not run perl file';
+ }
+
+ fresh_perl_env {
+  my ($perl, @perl_args) = @_;
+  system { $perl } $perl, @perl_args, $file;
  };
 }
 
@@ -624,6 +658,7 @@ sub init_threads {
 
  if (defined $pkg and defined $threadsafe_var) {
   my $threadsafe;
+  # run_perl() doesn't actually require anything
   my $stat = run_perl("require POSIX; require $pkg; exit($threadsafe_var ? POSIX::EXIT_SUCCESS() : POSIX::EXIT_FAILURE())");
   if (defined $stat) {
    require POSIX;

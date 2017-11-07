@@ -24,6 +24,7 @@ WriteMakefile(
         },
     },
     PREREQ_PM => {
+        'B::Deparse' => 0,
         'Carp'       => 0,
         'parent'     => 0,
         'strict'     => 0,

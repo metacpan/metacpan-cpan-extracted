@@ -1,6 +1,6 @@
 package App::GitGot::Repositories;
 our $AUTHORITY = 'cpan:GENEHACK';
-$App::GitGot::Repositories::VERSION = '1.333';
+$App::GitGot::Repositories::VERSION = '1.334';
 # ABSTRACT: Object holding a collection of repositories
 use 5.014;
 
@@ -62,7 +62,7 @@ App::GitGot::Repositories - Object holding a collection of repositories
 
 =head1 VERSION
 
-version 1.333
+version 1.334
 
 =head1 ATTRIBUTES
 

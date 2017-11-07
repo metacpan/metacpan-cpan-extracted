@@ -58,7 +58,6 @@ lib/Test2/Harness/Run/Runner/ProcMan/Scheduler.pm
 lib/Test2/Harness/Run/Runner/ProcMan/Scheduler/Fair.pm
 lib/Test2/Harness/Run/Runner/ProcMan/Scheduler/Finite.pm
 lib/Test2/Harness/Util.pm
-lib/Test2/Harness/Util/Debug.pm
 lib/Test2/Harness/Util/DepTracer.pm
 lib/Test2/Harness/Util/File.pm
 lib/Test2/Harness/Util/File/JSON.pm
@@ -123,7 +122,6 @@ t/Test2/Harness/Run/Runner/ProcMan/Scheduler.t
 t/Test2/Harness/Run/Runner/ProcMan/Scheduler/Fair.t
 t/Test2/Harness/Run/Runner/ProcMan/Scheduler/Finite.t
 t/Test2/Harness/Util.t
-t/Test2/Harness/Util/Debug.t
 t/Test2/Harness/Util/DepTracer.t
 t/Test2/Harness/Util/File.t
 t/Test2/Harness/Util/File/JSON.t

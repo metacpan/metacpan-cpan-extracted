@@ -3,6 +3,7 @@ BioX::Seq
 
 [![Build Status](https://travis-ci.org/jvolkening/p5-BioX-Seq.svg?branch=master)](https://travis-ci.org/jvolkening/p5-BioX-Seq)
 [![Coverage Status](https://coveralls.io/repos/github/jvolkening/p5-BioX-Seq/badge.svg?branch=master)](https://coveralls.io/github/jvolkening/p5-BioX-Seq?branch=master)
+[![CPAN version](https://badge.fury.io/pl/BioX-Seq.svg)](https://badge.fury.io/pl/BioX-Seq)
 
 BioX::Seq is a simple sequence class that can be used to represent
 biological sequences. It was designed as a compromise between using simple

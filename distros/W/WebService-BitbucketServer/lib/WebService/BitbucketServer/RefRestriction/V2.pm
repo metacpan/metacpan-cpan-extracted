@@ -6,7 +6,7 @@ package WebService::BitbucketServer::RefRestriction::V2;
 use warnings;
 use strict;
 
-our $VERSION = '0.602'; # VERSION
+our $VERSION = '0.603'; # VERSION
 
 use Moo;
 use namespace::clean;
@@ -124,7 +124,7 @@ WebService::BitbucketServer::RefRestriction::V2 - Bindings for a Bitbucket Serve
 
 =head1 VERSION
 
-version 0.602
+version 0.603
 
 =head1 SYNOPSIS
 

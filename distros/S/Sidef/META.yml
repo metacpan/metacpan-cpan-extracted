@@ -17,9 +17,7 @@ name: Sidef
 provides:
   Sidef:
     file: lib/Sidef.pm
-    version: '3.04'
-  Sidef::Convert::Convert:
-    file: lib/Sidef/Convert/Convert.pm
+    version: '3.05'
   Sidef::Deparse::Perl:
     file: lib/Sidef/Deparse/Perl.pm
   Sidef::Deparse::Sidef:
@@ -30,6 +28,8 @@ provides:
     file: lib/Sidef/Module/Func.pm
   Sidef::Module::OO:
     file: lib/Sidef/Module/OO.pm
+  Sidef::Object::Convert:
+    file: lib/Sidef/Object/Convert.pm
   Sidef::Object::Enumerator:
     file: lib/Sidef/Object/Enumerator.pm
   Sidef::Object::Lazy:
@@ -145,7 +145,7 @@ requires:
 resources:
   bugtracker: https://github.com/trizen/sidef/issues
   homepage: https://github.com/trizen/sidef
-  license: http://opensource.org/licenses/artistic-license-2.0.php
+  license: http://www.perlfoundation.org/artistic_license_2_0
   repository: https://github.com/trizen/sidef
-version: '3.04'
+version: '3.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

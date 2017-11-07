@@ -3,7 +3,7 @@ package Specio::Constraint::Intersection;
 use strict;
 use warnings;
 
-our $VERSION = '0.40';
+our $VERSION = '0.42';
 
 use List::Util qw( all );
 use Role::Tiny::With;
@@ -133,7 +133,7 @@ Specio::Constraint::Intersection - A class for intersection constraints
 
 =head1 VERSION
 
-version 0.40
+version 0.42
 
 =head1 SYNOPSIS
 

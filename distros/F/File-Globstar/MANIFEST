@@ -3,6 +3,7 @@ Build.PL
 Changes
 LICENSE
 MANIFEST
+META.json
 META.yml
 Makefile.PL
 README.md
@@ -12,7 +13,15 @@ lib/File/Globstar.pm
 lib/File/Globstar.pod
 lib/File/Globstar/ListMatch.pm
 lib/File/Globstar/ListMatch.pod
+lib/LocaleData/bg/LC_MESSAGES/File-Globstar.mo
+lib/LocaleData/de/LC_MESSAGES/File-Globstar.mo
 perlcritic.rc
+po/File-Globstar.pot
+po/Makefile
+po/PACKAGE
+po/POTFILES
+po/bg.po
+po/de.po
 t/author-critic.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
@@ -36,5 +45,6 @@ t/listmatch-imode.t
 t/listmatch-input.t
 t/listmatch-xmode.t
 t/patterns
+t/pnmatchstar.t
 t/quotestar.t
 t/release-cpan-changes.t

@@ -5,7 +5,8 @@ commit digest emails for a given period of time.  It does this based
 on the time when the commit was pulled into the local repository,
 rather than when the commit was committed.  This means that, with
 scheduled digests, commits aren't omitted from the digest due to their
-having originally occurred at some other time.
+having originally occurred at some other time (e.g. due to delayed
+push or subsequent rebasing).
 
 ### Installation
 
@@ -82,6 +83,15 @@ false, errors will cause the process to abort immediately.  If true,
 errors will instead be printed to `stderr`, and the process will
 continue onto the next repository.
 
+Depending on what has happened to the remote repository, the updating
+of the local repository may involve a merge.  That merge will prefer
+the content from the remote repository, in the event of a conflict.
+
+If an operation against a given repository fails, then this will
+re-clone the repository and retry the operation.  If the operation
+still fails, the original repository will be restored and the
+operation will be skipped.
+
 ### Example
 
 ```
@@ -102,7 +112,7 @@ user@host:tmp$ scm-digest --conf /tmp/config.yml --get-email | sendmail user@hos
 
 ### Copyright and licence
 
-Copyright (C) 2015 Tom Harrison
+Copyright (C) 2015-2017 Tom Harrison
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

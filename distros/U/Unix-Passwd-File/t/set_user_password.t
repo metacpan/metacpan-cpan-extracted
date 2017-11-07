@@ -4,6 +4,9 @@ use 5.010;
 use strict;
 use warnings;
 use FindBin '$Bin';
+use Test::More 0.98;
+
+BEGIN { plan skip_all => "OS unsupported" if $^O eq 'MSWin32' }
 
 use Crypt::Password::Util qw(looks_like_crypt);
 use File::chdir;
@@ -11,7 +14,6 @@ use File::Copy::Recursive qw(rcopy);
 use File::Path qw(remove_tree);
 use File::Temp qw(tempdir);
 use Unix::Passwd::File qw(set_user_password get_user);
-use Test::More 0.96;
 
 my $tmpdir = tempdir(CLEANUP=>1);
 $CWD = $tmpdir;

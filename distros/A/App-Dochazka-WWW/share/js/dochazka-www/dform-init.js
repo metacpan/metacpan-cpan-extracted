@@ -58,6 +58,146 @@ define ([
 
     return function () {
 
+        target.push('createLastPlusOffset', {
+            // before doing any calculations, look up:
+            // - employee's schedule
+            // - schedule intervals on date
+            // - existing intervals on date
+            // timerange start will be:
+            // - end of last existing interval, if there are existing intervals
+            // - start of first schedule interval, if there are schedule intervals
+            // - 00:00 otherwise
+            // timerange end will be timerange start plus offset
+            'name': 'createLastPlusOffset',
+            'type': 'dform',
+            'menuText': "Last plus offset",
+            'title': "Create interval \"last plus offset\"",
+            'preamble': "You entered an offset without a start time. Deriving start " +
+                        "time from schedule and last existing interval (if any).",
+            'aclProfile': 'active',
+            'entriesRead': [
+                entries.acTaid,
+                entries.iNsid,
+                entries.iNdateHidden,
+                entries.iNactHidden,
+                entries.iNschedintvls,
+                entries.iNlastexistintvl,
+                entries.iNoffset,
+                entries.iNlastplusoffset,
+                coreLib.emptyLineEntry,
+                entries.iNtoBeCreated,
+            ],
+            'entriesWrite': [
+                entries.iNdate,
+                entries.iNtimerange,
+                entries.iNact,
+                entries.iNdesc,
+            ],
+            'rememberState': true,
+            'miniMenu': {
+                entries: ['createSingleIntSave'],
+            }
+        }); // createLastPlusOffset
+
+        target.push('createMultipleInt', {
+            'name': 'createMultipleInt',
+            'type': 'dform',
+            'menuText': 'Multiple intervals (\"Fillup\")',
+            'title': 'Create multiple intervals according to schedule',
+            'preamble': "Hints: (1) TAB or ENTER to validate and advance to next field " +
+                        "(2) enter month by name (e.g. \"June\") or number (e.g. \"6\"); " +
+                        "DEFAULT: current month " +
+                        "(3) enter days as " +
+                        "an inclusive range (e.g. \"15-18\"), as a comma-separated list (e.g. " +
+                        "\"7, 9, 28\"), or as a combination of the two (e.g. \"1, 3-5, 16-20\"); " +
+                        "DEFAULT: entire month " +
+                        "(4) Use 'Select activity' if you don't know activity code " +
+                        '(5) Description is optional',
+            'aclProfile': 'active',
+            'entriesRead': [
+                entries.iNdaterangeBegin,
+                entries.iNdaterangeEnd,
+                entries.iNyearHidden,
+            ],
+            'entriesWrite': [
+                entries.iNyear,
+                entries.iNmonth,
+                entries.iNdaylist,
+                entries.iNact,
+                entries.iNdesc,
+            ],
+            'rememberState': true,
+            'miniMenu': {
+                entries: ['selectActivityAction', 'createMultipleIntSave', 'viewIntervalsAction']
+            }
+        }); // createMultipleInt
+
+        target.push('createNextScheduled', {
+            // before doing any calculations, look up/calculate:
+            // - employee's schedule
+            // - existing intervals on date
+            // - schedule intervals on date
+            // timerange will be:
+            // - first schedule interval that does not conflict/overlap with an existing interval
+            'name': 'createNextScheduled',
+            'type': 'dform',
+            'menuText': "Next scheduled interval",
+            'title': "Create interval \"next scheduled\"",
+            'aclProfile': 'active',
+            'entriesRead': [
+                entries.acTaid,
+                entries.iNsid,
+                entries.iNdateHidden,
+                entries.iNactHidden,
+                entries.iNschedintvls,
+                entries.iNexistintvls,
+                entries.iNnextscheduled,
+                coreLib.emptyLineEntry,
+                entries.iNtoBeCreated,
+            ],
+            'entriesWrite': [
+                entries.iNdate,
+                entries.iNtimerange,
+                entries.iNact,
+                entries.iNdesc,
+            ],
+            'rememberState': true,
+            'miniMenu': {
+                entries: ['selectActivityAction', 'createSingleIntSave'],
+            }
+        }); // createNextScheduled
+
+        target.push('createSingleInt', {
+            'name': 'createSingleInt',
+            'type': 'dform',
+            'menuText': 'Single interval',
+            'title': 'Create an arbitrary interval',
+            'preamble': "Hints: (1) TAB or ENTER to validate and advance to next field " +
+                        "(2) date YYYY-MM-DD; year is optional " +
+                        "(3) time range HH:MM-HH:MM or HH:MM+HH:MM (start time plus offset) " +
+                        "or +HH:MM (last existing interval plus offset) or + (next scheduled " +
+                        "interval) (4) Use 'Select activity' if you don't know activity code " +
+                        '(5) Description is optional',
+            'aclProfile': 'active',
+            'entriesWrite': [entries.iNdate, entries.iNtimerange, entries.iNact, entries.iNdesc,],
+            'rememberState': true,
+            'miniMenu': {
+                entries: ['selectActivityAction', 'createSingleIntSave']
+            }
+        }); // createSingleInt
+
+        target.push('displaySingleInt', {
+            'name': 'displaySingleInt',
+            'type': 'dform',
+            'menuText': 'Single interval',
+            'title': 'Display a single interval',
+            'aclProfile': 'active',
+            'entriesRead': [entries.iNdaterange, entries.iNtimerange, entries.iNact, entries.iNdesc,],
+            'miniMenu': {
+                entries: []
+            }
+        }); // displaySingleInt
+
         target.push('empProfile', {
             'name': 'empProfile',
             'type': 'dform',
@@ -75,14 +215,14 @@ define ([
                 entries.ePscode, entries.ePsid, entries.ePschedEffective
             ],
             'miniMenu': {
-                entries: ['empProfileEdit', 'ldapSync']
+                entries: ['empProfileEdit', 'ldapSync', 'empProfileSetSuperSearch']
             }
         }); // empProfile
 
         target.push('empProfileEdit', {
             'name': 'empProfileEdit',
             'type': 'dform',
-            'menuText': 'Edit',
+            'menuText': 'Edit remark',
             'title': 'Employee profile edit',
             'preamble': 'Only the remark field can be modified;<br>' +
                         'All other fields are synced from LDAP',
@@ -95,19 +235,23 @@ define ([
             }
         }); // empProfileEdit
 
-        target.push('ldapLookup', {
-            'name': 'ldapLookup',
+        target.push('empProfileSetSuperConfirm', {
+            'name': 'empProfileSetSuperConfirm',
             'type': 'dform',
-            'menuText': 'Look up an LDAP employee',
-            'title': 'Look up an LDAP employee',
-            'preamble': 'Enter employee nick for exact (case insensitive) match',
-            'aclProfile': 'active',
-            'entriesWrite': [entries.ePnick],
-            'rememberState': true,
+            'menuText': 'empProfileSetSuperConfirm',
+            'title': 'Set employee supervisor - confirmation',
+            'preamble': 'Do you really want to do this?',
+            'aclProfile': 'admin',
+            'entriesRead': [
+                entries.ePsetsuperofEID,
+                entries.ePsetsupertoEID,
+                entries.ePsetsuperof,
+                entries.ePsetsuperto,
+            ],
             'miniMenu': {
-                entries: ['ldapLookupSubmit']
+                entries: ['empProfileSetSuperCommit']
             }
-        }); // ldapLookup
+        }); // empProfileEdit
 
         target.push('ldapDisplayEmployee', {
             'name': 'ldapDisplayEmployee',
@@ -122,33 +266,19 @@ define ([
             }
         }); // ldapDisplayEmployee
 
-        target.push('searchEmployee', {
-            'name': 'searchEmployee',
+        target.push('ldapLookup', {
+            'name': 'ldapLookup',
             'type': 'dform',
-            'menuText': 'Search Dochazka employees',
-            'title': 'Search Dochazka employees',
-            'preamble': 'Enter search key, % is wildcard',
-            'aclProfile': 'admin',
-            'entriesWrite': [entries.sEnick],
+            'menuText': 'Look up an LDAP employee',
+            'title': 'Look up an LDAP employee',
+            'preamble': 'Enter employee nick for exact (case insensitive) match',
+            'aclProfile': 'active',
+            'entriesWrite': [entries.ePnick],
+            'rememberState': true,
             'miniMenu': {
-                entries: ['actionEmplSearch']
+                entries: ['ldapLookupSubmit']
             }
-        }); // searchEmployee
-
-        target.push('restServerDetails', {
-            'name': 'restServerDetails',
-            'type': 'dform',
-            'menuText': 'REST server',
-            'title': 'REST server details',
-            'preamble': '<b>URI</b> used by this App::Dochazka::WWW instance to communicate ' +
-                        'with REST server;<br><b>version</b> of App::Dochazka::REST running ' +
-                        'on REST server',
-            'aclProfile': 'admin',
-            'entriesRead': [entries.rSDurl, entries.rSDversion],
-            'miniMenu': {
-                entries: []
-            }
-        }); // restServerDetails
+        }); // ldapLookup
 
         target.push('privHistoryAddRecord', {
             'name': 'privHistoryAddRecord',
@@ -180,19 +310,20 @@ define ([
             }
         }); // schedHistoryAddRecord
 
-        target.push('schedLookup', {
-            'name': 'schedLookup',
+        target.push('restServerDetails', {
+            'name': 'restServerDetails',
             'type': 'dform',
-            'menuText': 'Look up schedule by code or ID',
-            'title': 'Look up schedule by code or ID',
-            'preamble': 'Enter a schedule code or ID (must be an exact match)',
-            'aclProfile': 'passerby',
-            'entriesWrite': [entries.sScode, entries.sSid],
-            'rememberState': true,
+            'menuText': 'REST server',
+            'title': 'REST server details',
+            'preamble': '<b>URI</b> used by this App::Dochazka::WWW instance to communicate ' +
+                        'with REST server;<br><b>version</b> of App::Dochazka::REST running ' +
+                        'on REST server',
+            'aclProfile': 'admin',
+            'entriesRead': [entries.rSDurl, entries.rSDversion],
             'miniMenu': {
-                entries: ['actionSchedLookup']
+                entries: []
             }
-        }); // schedLookup
+        }); // restServerDetails
 
         target.push('schedDisplay', {
             'name': 'schedDisplay',
@@ -256,6 +387,20 @@ define ([
         schedDeleteFromBrowserObj['name'] = 'schedDeleteFromBrowser';
         target.push('schedDeleteFromBrowser', schedDeleteFromBrowserObj);
 
+        target.push('schedLookup', {
+            'name': 'schedLookup',
+            'type': 'dform',
+            'menuText': 'Look up schedule by code or ID',
+            'title': 'Look up schedule by code or ID',
+            'preamble': 'Enter a schedule code or ID (must be an exact match)',
+            'aclProfile': 'passerby',
+            'entriesWrite': [entries.sScode, entries.sSid],
+            'rememberState': true,
+            'miniMenu': {
+                entries: ['actionSchedLookup']
+            }
+        }); // schedLookup
+
         target.push('schedNewBoilerplate', {
             'name': 'schedNewBoilerplate',
             'type': 'dform',
@@ -291,91 +436,45 @@ define ([
             }
         }); // schedNewCustom
 
-        target.push('createSingleInt', {
-            'name': 'createSingleInt',
+        target.push('searchEmployee', {
+            'name': 'searchEmployee',
             'type': 'dform',
-            'menuText': 'Single interval',
-            'title': 'Create a single interval',
-            'preamble': 'Enter date like, e.g.: 2017-JAN-5, 2017-1-5, 1-5, 1 5, today, tomorrow, etc.<br>' +
-                        'Enter time range e.g.: 11:30-15:00, 11:30-15, 11:30+3:30<br>' +
-                        'For validation, use <ENTER> to move to next field<br>' +
-                        'Description is optional',
-            'aclProfile': 'active',
-            'entriesWrite': [entries.iNdate, entries.iNtimerange, entries.iNact, entries.iNdesc,],
+            'menuText': 'Search Dochazka employees',
+            'title': 'Search Dochazka employees',
+            'preamble': 'Enter search key, % is wildcard',
+            'aclProfile': 'admin',
+            'entriesWrite': [entries.sEnick],
+            'miniMenu': {
+                entries: ['actionEmplSearch']
+            }
+        }); // searchEmployee
+
+        target.push('viewIntervalsPrep', {
+            'name': 'viewIntervalsPrep',
+            'type': 'dform',
+            'menuText': 'View intervals',
+            'title': 'View intervals for date or range of dates',
+            'preamble': "Hints: (1) TAB or ENTER to validate and advance to next field " +
+                        "(2) enter month by name (e.g. \"June\") or number (e.g. \"6\"); " +
+                        "DEFAULT: current month " +
+                        "(3) enter days as a singleton (e.g. \"13\") or inclusive range (e.g. \"15-18\") " +
+                        "DEFAULT: entire month",
+            'aclProfile': 'inactive',
+            'entriesRead': [
+                entries.iNdaterangeBegin,
+                entries.iNdaterangeEnd,
+                entries.iNyearHidden,
+            ],
+            'entriesWrite': [
+                entries.iNyear,
+                entries.iNmonth,
+                entries.iNdayrange,
+            ],
             'rememberState': true,
             'miniMenu': {
-                entries: ['selectActivityAction', 'createSingleIntSave']
+                entries: ['viewIntervalsAction']
             }
-        }); // createSingleInt
-
-        target.push('createLastPlusOffset', {
-            // before doing any calculations, look up:
-            // - employee's schedule
-            // - schedule intervals on date
-            // - existing intervals on date
-            // timerange start will be:
-            // - end of last existing interval, if there are existing intervals
-            // - start of first schedule interval, if there are schedule intervals
-            // - 00:00 otherwise
-            // timerange end will be timerange start plus offset
-            'name': 'createLastPlusOffset',
-            'type': 'dform',
-            'menuText': "Last plus offset",
-            'title': "Create interval \"last plus offset\"",
-            'aclProfile': 'active',
-            'entriesRead': [
-                entries.iNdate, entries.iNoffset, entries.iNact,
-                entries.acTaid, entries.iNdesc, entries.iNsid,
-                entries.iNschedintvls, entries.iNlastexistintvl,
-                entries.iNlastplusoffset,
-            ],
-            'miniMenu': {
-                entries: ['createLastPlusOffsetSave'],
-            }
-        }); // createLastPlusOffset
-
-        target.push('createNextScheduled', {
-            // before doing any calculations, look up/calculate:
-            // - employee's schedule
-            // - existing intervals on date
-            // - schedule intervals on date
-            // timerange will be:
-            // - first schedule interval that does not conflict/overlap with an existing interval
-            'name': 'createNextScheduled',
-            'type': 'dform',
-            'menuText': "Next scheduled",
-            'title': "Create interval \"next scheduled\"",
-            'aclProfile': 'active',
-            'entriesRead': [entries.iNdate, entries.iNact, entries.iNdesc,
-                            entries.iNschedintvls, entries.iNlastexistintvl, entries.iNnextscheduled,],
-            'miniMenu': {
-                entries: ['createNextScheduledSave'],
-            }
-        }); // createNextScheduled
-
-        target.push('createMultipleInt', {
-            'name': 'createMultipleInt',
-            'type': 'dform',
-            'menuText': 'Multiple intervals',
-            'title': 'Fill up a period with intervals',
-            'aclProfile': 'active',
-            'entriesRead': [entries.iNdate, entries.iNtimerange, entries.iNact, entries.iNdesc,],
-            'miniMenu': {
-                entries: ['fillUpAction']
-            }
-        }); // createMultipleInt
-
-        target.push('displaySingleInt', {
-            'name': 'displaySingleInt',
-            'type': 'dform',
-            'menuText': 'Single interval',
-            'title': 'Display a single interval',
-            'aclProfile': 'active',
-            'entriesRead': [entries.iNdaterange, entries.iNtimerange, entries.iNact, entries.iNdesc,],
-            'miniMenu': {
-                entries: []
-            }
-        }); // displaySingleInt
+        }); // viewIntervalsPrep
 
     }; // return function ()
     

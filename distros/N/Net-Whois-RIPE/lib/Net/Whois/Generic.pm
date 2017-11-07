@@ -29,14 +29,6 @@ our %RIR = (
 
 Net::Whois::Generic - a pure-Perl implementation of a multi source Whois client.
 
-=head1 VERSION
-
-Version 2.005001
-
-=cut
-
-our $VERSION = 2.005001;
-
 =head1 SYNOPSIS
 
 Net::Whois::Generic is my first attempt to unify Whois information from different sources.
@@ -48,13 +40,10 @@ various sources (RIPE, but also AFRINIC, APNIC...)
 The current implementation is barely a proof of concept, AFRINIC and APNIC are the only other sources implemented,
 but I expect to turn it into a generic/robust implementation based on the users feedback.
 
-Usage is very similar to the Net::Whois::Object :
-
     my $c = Net::Whois::Generic->new( disconnected => 1, unfiltered => 1 );
 
     my ($org) = $c->query( 'ORG-AFNC1-AFRINIC', { type => 'organisation' } );
     # $org is a 'Net::Whois::Object::Organisation::AFRINIC' object;
-    
     
     my @o = $c->query('101.0.0.0/8');
     # @o contains various Net::Whois::Object:Inetnum::APNIC, and Net::Whois::Object::Information objects
@@ -136,7 +125,7 @@ connection to the RIPE Database service desired.
 
 {
 	my %default_options = (
-		hostname     => 'whois.ripe.net',
+		# hostname     => 'whois.ripe.net',
 		port         => '43',
 		timeout      => 5,
 		referral     => 0,
@@ -145,6 +134,7 @@ connection to the RIPE Database service desired.
 		unfiltered   => 0,
 		types        => undef,
 		disconnected => 0,
+		hostname => undef,
 	);
 
 	sub new
@@ -300,7 +290,7 @@ sub connect
 	my %connection = (
 		Proto      => 'tcp',
 		Type       => SOCK_STREAM,
-		PeerAddr   => $self->hostname,
+		PeerAddr   => $self->hostname || 'whois.ripe.net',
 		PeerPort   => $self->port,
 		Timeout    => $self->timeout,
 		Domain     => AF_INET,
@@ -481,21 +471,23 @@ sub adapt_query
 	# determine RIR unless $rir;
 	$rir = $self->_find_rir($query) unless $rir;
 
-	if ($rir eq 'ripe') {
-		$self->hostname($RIR{ripe}{SERVER});
-	}
-	elsif ($rir eq 'afrinic') {
-		$fullquery = '-V Md5.0 ' . $query;
-		$self->hostname($RIR{afrinic}{SERVER});
-	}
-	elsif ($rir eq 'arin') {
-		$self->hostname($RIR{arin}{SERVER});
-	}
-	elsif ($rir eq 'lacnic') {
-		$self->hostname($RIR{lacnic}{SERVER});
-	}
-	elsif ($rir eq 'apnic') {
-		$self->hostname($RIR{apnic}{SERVER});
+	if (!$self->hostname) {
+		if ($rir eq 'ripe') {
+			$self->hostname($RIR{ripe}{SERVER});
+		}
+		elsif ($rir eq 'afrinic') {
+			$fullquery = '-V Md5.0 ' . $query;
+			$self->hostname($RIR{afrinic}{SERVER});
+		}
+		elsif ($rir eq 'arin') {
+			$self->hostname($RIR{arin}{SERVER});
+		}
+		elsif ($rir eq 'lacnic') {
+			$self->hostname($RIR{lacnic}{SERVER});
+		}
+		elsif ($rir eq 'apnic') {
+			$self->hostname($RIR{apnic}{SERVER});
+		}
 	}
 
 	my $parameters = "";

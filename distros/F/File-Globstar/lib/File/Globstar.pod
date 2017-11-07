@@ -138,13 +138,137 @@ are currently not supported and their usage throws an exception.
 
 =back
 
+=item B<pnmatchstar PATTERN, STRING[, OPTIONS]>
+
+Returns 1 if B<STRING> matches B<PATTERN>, false otherwise.
+
+Similar to B<fnmatchstar()> but B<PATTERN> and B<STRING> are subject to some
+pre-processing and matching is eventually done "ascendingly".  B<pnmatchstar()>
+is the function underneath L<File::Globstar::ListMatch>.  You can think of it
+as a matching engine for one pattern (line) in a
+L<.gitignore|https://git-scm.com/docs/gitignore> or similar file.
+
+B<PATTERN> is either a (scalar) string that will be preprocessed and then
+compiled with B<translatestar()> or a compiled regular expression.  In the
+latter case, the compilation step is skipped.  You should pass a regular
+expression that was returned by a B<translatestar()> call with the option
+B<pathMode>.
+
+The pre-processing of B<PATTERN> goes through the steps outlined below.  The 
+intermediate results for the input B<STRING> "!/src/**/.deps/" is added in
+parentheses.
+
+=over 8
+
+=item B<*> If B<PATTERN> begins with an exclamation mark, it is discarded,
+and the B<PATTERN> is marked as negated (current "/src/**/.deps/").
+
+=item B<*> If B<PATTERN> ends with a slash, it is discarded,
+and the B<PATTERN> is marked as a "directory match" (current "/src/**/.deps").
+
+=item B<*> If B<PATTERN> begins with a slash, it is discarded,
+and the B<PATTERN> is marked as a "full path match" (current "src/**/.deps").
+
+=item B<*> If B<PATTERN> is not already marked as a "full path match", every
+remaining slash will activate "full path match" (no modification in this
+last step).
+
+=back
+
+Note that the pre-processing step is skipped, if you pass a compiled regular
+expression instead of a (scalar) string for B<PATTERN>.  And to be honest,
+B<pnmatchstar()> does not really do the pre-processing.  It is in fact done by
+B<translatestar()> when called with the option B<pathMode>.  See
+below for details.
+
+The B<STRING> argument (for example "lib/File/Globstar/") is always
+pre-processed:
+
+=over 8
+
+=item B<*> A possible trailing slash is discarded, and the B<STRING> is then
+marked as representing a "directory".  The example string would now be 
+"lib/File/Globstar" without the trailing slash.
+
+=item B<*> If full path mode is B<NOT> active (either because of a leading
+or innner slash in B<PATTERN>), a possible leading "directory portion" of
+B<STRING> is discarded.  The "directory portion" is everything until and
+including the last slash in B<STRING>.  The example string would have been
+truncated to just "Globstar" by now.
+
+=back
+
+The resulting B<STRING> is then compared to B<PATTERN>.  If it matches, and
+B<PATTERN> was not negated, 1 is returned.  Likewise, if it doesn't match and
+B<PATTERN> was negated.
+
+In "directory mode" (B<PATTERN> ended with a slash), a match also requires
+that B<STRING> is considered a directory.  It either needs a trailing slash
+or you must pass the option B<isDirectory> with a truthy value.
+
+In full path mode, the comparison continues and "ascends": The "base name" 
+of B<STRING>, that is the last slash and everything following it is discarded, 
+and B<pnmatchstar()> is called recursively, but always with the option 
+B<isDirectory> set to 1 until a match is found.  If it never matches,
+the function ultimately returns false.
+
+You can pass the following optional named arguments to B<pnmatchstar()>:
+
+=over 8
+
+=item B<ignoreCase TRUE|FALSE>
+
+Compile the regular expression with the "i" modifier so that it matches in a
+case-insensitive manner.
+
+The option is ignored, when a compiled regular expression was passed as the
+first argument instead of a scalar B<PATTERN>.
+
+=item B<isDirectory TRUE|FALSE>
+
+Mark B<STRING> as a directory, if B<TRUE>.
+
+The option is ignored, when a compiled regular expression was passed
+as the first argument instead of a scalar B<PATTERN>.  It is also ignored
+(forced to B<TRUE>), when a trailing slash was removed from B<STRING>.
+Rationale: The name of a non-directory can never contain a slash.
+
+=back
+
+The function was introduced in version 0.2.
+
 =item B<translatestar PATTERN[, OPTIONS]>
 
 Compiles B<PATTERN> into a Perl regular expression or throws an exception in
-case of failure.  This function is used internally by B<fnmatchstar()>.
+case of failure.  This function is used internally by B<fnmatchstar()> and
+B<pnmatchstar()>.
 
-B<OPTIONS> is an optional hash of named arguments.  The only
-supported option is "ignoreCase" at the moment.
+B<OPTIONS> is an optional hash of named arguments:
+
+=over 4
+
+=item B<ignoreCase TRUE|FALSE>
+
+If B<TRUE>, return a regular expression with the "i" modifier set, so that
+case is ignored, when matching.
+
+=item B<pathMode TRUE|FALSE>
+
+Remove a possible leading exclamation mark from B<PATTERN> and mark the
+regular expression in that case as negated.  If a trailing slash could
+be removed, the regular expression will be marked as a "directory match".
+If B<PATTERN> contains more slashes, the regular expression is marked as
+a "full path match".
+
+Inner slashes are preserved.  A leading slash is discarded, and only triggers
+"full path match" mode.
+
+See B<pnmatchstar()> above or the section L</"EXAMPLES"> below for more
+details.
+
+The option was intrucded in version 0.2.
+
+=back
 
 =item B<quotestar STRING[, NEGATABLE]>
 
@@ -169,7 +293,7 @@ will also be backslash-escaped.
 
 =head2 EXAMPLES
 
-First, let's look at some examples for the double asterisk pattern.
+We start with some examples for the double asterisk pattern.
 
 =over 4
 
@@ -191,6 +315,80 @@ example F<src/file.c>,  F<src/a/file.c>, F<src/b/file.c>, F<src/a/x/file.c>,
 and so on. 
 
 =back
+
+Recursively find all Perl source files in F<lib>:
+
+    @sources = globstar 'lib/**/*.p[lm]';
+
+Is F<hello.pl> in the current directory a Perl source file?
+
+    fnmatchstar '*.p[lm]', 'hello.pl';
+
+Is F<src/simple/hello.pl> a Perl source file?
+
+    fnmatchstar '*.p[lm]', 'src/simple/hello.pl';
+    require Carp;
+    Carp::croak("bug alert!");
+
+The above does not work because a star does not match a slash.  You need a different
+pattern:
+
+    fnmatchstar '**/*.p[lm]', 'src/simple/hello.pl';
+    fnmatchstar 'src/**/*.p[lm]', 'src/simple/hello.pl';
+
+Both patterns work for the example but the second pattern only matches in 
+directory 'src' and its descendants.
+
+With B<pnmatchstar()> you have more options:
+
+    pnmatchstar '*.p[lm]', 'src/simple/hello.pl';
+
+Returns 1 because F<src/simple> is discarded for matching.  Only the
+basename portion takes part in the match.
+
+    pnmatchstar '!*.p[lm]', 'src/simple/hello.pl';
+
+Returns false because the pattern is negated.
+
+    pnmatchstar 'src/', 'src/simple/hello.pl';
+
+Returns 1! F<src/simple/hello.pl> does not match.  F<src/simple> is tried 
+next but again at no avail.  F<src> ultimately matches.
+
+The following example may now be surprising:
+
+    pnmatchstar 'src/', 'src';
+
+Does not match because B<pnmatchstar()> does not consider F<src> a
+directory.  Do this instead:
+
+    pnmatchstar 'src/', 'src/';
+    pnmatchstar 'src/', 'src', isDirectory => 1;
+
+Both above examples work, because it is now clear that the string stands for
+a directory.
+
+Now for full path matching.
+
+    pnmatchstar 'lib/File', 'lib/File/Globstar/ListMatch.pm';
+
+Matches because the leading part F<lib/File> matches.  But remember that
+this does not work:
+
+    pnmatchstar 'File/Globstar, 'lib/File/Globstar/ListMatch.pm';
+    pnmatchstar 'File/Globstar/ListMatch.pm, lib/File/Globstar/ListMatch.pm';
+
+Full path mode is full path mode.  A partial match is not enough.
+
+If you use the same patterns multiple times, you can cache them:
+
+    $regex = translatestar 'src/**/*.p[lm]', pathMode => 1;
+    foreach $file (@files) {
+        print "$file matches\n" if pnmatchstar $regex, $file;
+    }
+
+You should have realized by now that B<pnmatchstar()> is hard to describe
+but easy to understand.
 
 =head2 GORY DETAILS
 

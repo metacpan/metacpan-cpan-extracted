@@ -18,6 +18,9 @@ t/12-hg.t
 t/20-digest.t
 t/21-is-usable.t
 t/22-ignore-errors.t
+t/23-changed-remote.t
+t/24-reclone.t
+t/25-restore-reclone.t
 t/lib/TestFunctions.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

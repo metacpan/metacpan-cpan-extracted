@@ -5,11 +5,14 @@ use warnings;
 
 # ABSTRACT: LDAP protocol handler used with Net::LDAP::SimpleServer
 
-our $VERSION = '0.0.19';    # VERSION
+our $VERSION = '0.0.20';    # VERSION
+
+use constant MD5_PREFIX => '{md5}';
 
 use Net::LDAP::Server;
 use base 'Net::LDAP::Server';
-use fields qw(store root_dn root_pw allow_anon);
+use fields
+  qw(store root_dn root_pw allow_anon user_passwords user_id_attr user_pw_attr user_filter);
 
 use Carp;
 use Net::LDAP::LDIF;
@@ -19,13 +22,16 @@ use Net::LDAP::FilterMatch;
 
 use Net::LDAP::Constant qw/
   LDAP_SUCCESS LDAP_INVALID_CREDENTIALS LDAP_AUTH_METHOD_NOT_SUPPORTED
-  LDAP_INVALID_SYNTAX LDAP_NO_SUCH_OBJECT/;
+  LDAP_INVALID_SYNTAX LDAP_NO_SUCH_OBJECT LDAP_INVALID_DN_SYNTAX/;
 
 use Net::LDAP::SimpleServer::LDIFStore;
 use Net::LDAP::SimpleServer::Constant;
 
 use Scalar::Util qw{reftype};
 use UNIVERSAL::isa;
+
+use Digest::MD5 qw/md5/;
+use MIME::Base64;
 
 sub _make_result {
     my $code = shift;
@@ -55,11 +61,16 @@ sub new {
       unless my $canon_dn = canonical_dn( $params->{root_dn} );
 
     my $self = $class->SUPER::new( $params->{sock} );
-    $self->{store}      = $params->{store};
-    $self->{root_dn}    = $canon_dn;
-    $self->{root_pw}    = $params->{root_pw};
-    $self->{allow_anon} = $params->{allow_anon};
+    $self->{store}          = $params->{store};
+    $self->{root_dn}        = $canon_dn;
+    $self->{root_pw}        = $params->{root_pw};
+    $self->{allow_anon}     = $params->{allow_anon};
+    $self->{user_passwords} = $params->{user_passwords};
+    $self->{user_id_attr}   = $params->{user_id_attr};
+    $self->{user_pw_attr}   = $params->{user_pw_attr};
+    $self->{user_filter}    = $params->{user_filter};
     chomp( $self->{root_pw} );
+    chomp( $self->{user_passwords} );
 
     return $self;
 }
@@ -74,37 +85,89 @@ sub unbind {
     return _make_result(LDAP_SUCCESS);
 }
 
+sub _find_user_dn {
+    my ( $self, $username ) = @_;
+
+    my $filter =
+      Net::LDAP::Filter->new( '(&'
+          . $self->{user_filter} . '('
+          . $self->{user_id_attr} . '='
+          . $username
+          . '))' );
+    return _match( $filter, $self->{store}->list() );
+}
+
+sub _encode_password {
+    my $plain = shift;
+
+    my $hashpw = encode_base64( md5($plain), '' );
+    return MD5_PREFIX . $hashpw;
+}
+
 sub bind {
     ## no critic (ProhibitBuiltinHomonyms)
     my ( $self, $request ) = @_;
 
-    my $OK = _make_result(LDAP_SUCCESS);
-
     # anonymous bind
-    if (    not $request->{name}
-        and exists $request->{authentication}->{simple}
-        and $self->{allow_anon} )
-    {
-        return $OK;
-    }
+    return _make_result(LDAP_SUCCESS)
+      if (  $self->{allow_anon}
+        and not $request->{name}
+        and exists $request->{authentication}->{simple} );
 
     # As of now, accepts only simple authentication
     return _make_result(LDAP_AUTH_METHOD_NOT_SUPPORTED)
       unless exists $request->{authentication}->{simple};
 
-    return _make_result(LDAP_INVALID_CREDENTIALS)
-      unless my $binddn = canonical_dn( $request->{name} );
+    my $bind_pw = $request->{authentication}->{simple};
+    chomp($bind_pw);
 
-    return _make_result(LDAP_INVALID_CREDENTIALS)
-      unless uc($binddn) eq uc( $self->{root_dn} );
+    my $bind_dn = canonical_dn( $request->{name} );
+    unless ($bind_dn) {
+        my $search_user_result = $self->_find_user_dn( $request->{name} );
+        my $size               = scalar( @{$search_user_result} );
 
-    my $bindpw = $request->{authentication}->{simple};
-    chomp($bindpw);
+        return _make_result( LDAP_INVALID_DN_SYNTAX, '',
+            'Cannot find user: ' . $request->{name} )
+          if $size == 0;
+        return _make_result( LDAP_INVALID_DN_SYNTAX, '',
+            'Cannot retrieve an unique user entry for id: ' . $request->{name} )
+          if $size > 1;
 
-    return _make_result(LDAP_INVALID_CREDENTIALS)
-      unless $bindpw eq $self->{root_pw};
+        $bind_dn = $search_user_result->[0];
+    }
+    elsif ( uc($bind_dn) ne uc( $self->{root_dn} ) ) {
+        my $search_dn_result =
+          $self->{store}->list_with_dn_scope( $bind_dn, SCOPE_BASEOBJ );
+        return _make_result( LDAP_INVALID_DN_SYNTAX, '',
+            'Cannot find user: ' . $request->{name} )
+          unless $search_dn_result;
 
-    return $OK;
+        $bind_dn = $search_dn_result->[0];
+    }
+
+    if ( $bind_dn->isa('Net::LDAP::Entry') ) {
+
+        # user was not a dn, but it was found
+        my $entry_pw = $bind_dn->get_value( $self->{user_pw_attr} );
+
+        my $regexp = '^' . MD5_PREFIX;
+        $entry_pw = _encode_password($entry_pw) if $entry_pw =~ /$regexp/;
+
+        return _make_result( LDAP_INVALID_CREDENTIALS, undef,
+            'entry dn: ' . $bind_dn->dn() )
+          unless $entry_pw eq $bind_pw;
+    }
+    elsif ( uc($bind_dn) eq uc( $self->{root_dn} ) ) {
+        return _make_result( LDAP_INVALID_CREDENTIALS, undef,
+            'bind dn: ' . $bind_dn )
+          unless $bind_pw eq $self->{root_pw};
+    }
+    else {
+        return _make_result( LDAP_INVALID_DN_SYNTAX, '',
+            'Cannot find user: ' . $request->{name} );
+    }
+
+    return _make_result(LDAP_SUCCESS);
 }
 
 sub _match {
@@ -112,6 +175,46 @@ sub _match {
 
     my $f = bless $filter_spec, 'Net::LDAP::Filter';
     return [ grep { $f->match($_) } @{$elems} ];
+}
+
+sub _encode_pw_attr {
+    my ( $pw_attr, $entry ) = @_;
+
+    return $entry unless grep { /person/ } $entry->get_value('objectclass');
+    return $entry unless $entry->exists($pw_attr);
+
+    my $clone  = $entry->clone();
+    my @pwlist = ();
+    my $regexp = '^' . MD5_PREFIX;
+    foreach ( $clone->get_value($pw_attr) ) {
+        next if /$regexp/;
+        push @pwlist, _encode_password($_);
+    }
+    $clone->delete($pw_attr);
+    $clone->add( $pw_attr => [@pwlist] );
+    return $clone;
+
+}
+
+sub _remove_pw_attr {
+    my ( $pw_attr, $entry ) = @_;
+
+    my $clone = $entry->clone();
+    $clone->delete($pw_attr) if $clone->exists($pw_attr);
+    return $clone;
+}
+
+sub _filter_attrs {
+    my ( $self, $list ) = @_;
+
+# TODO find a better way to keep the store read-only but not costly to return searches with filtered attributes
+    return $list if $self->{user_passwords} eq USER_PW_ALL;
+
+    return [ map { _remove_pw_attr( $self->{user_pw_attr}, $_ ) } @{$list} ]
+      if $self->{user_passwords} eq USER_PW_NONE;
+
+    return [ map { _encode_pw_attr( $self->{user_pw_attr}, $_ ) } @{$list} ]
+      if $self->{user_passwords} eq USER_PW_MD5;
 }
 
 sub search {
@@ -131,7 +234,8 @@ sub search {
         $list = $self->{store}->list();
     }
 
-    my $match = _match( $request->{filter}, $list );
+    my $match = $self->_filter_attrs( _match( $request->{filter}, $list ) );
+
     return ( _make_result(LDAP_SUCCESS), @{$match} );
 }
 
@@ -149,7 +253,7 @@ Net::LDAP::SimpleServer::ProtocolHandler - LDAP protocol handler used with Net::
 
 =head1 VERSION
 
-version 0.0.19
+version 0.0.20
 
 =head1 SYNOPSIS
 

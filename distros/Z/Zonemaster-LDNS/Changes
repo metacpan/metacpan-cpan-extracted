@@ -1,4 +1,9 @@
-Revision history for Zonemaster::LDNS
+Release history for Zonemaster component Zonemaster-LDNS
+
+1.0.1 2017-11-02
+ - Fixed
+   - Fixed licensing discrepancy (#20, #21)
+   - Explicitly avoid distributing C file generated from XS
 
 1.0.0 2017-10-06
  - Switch to Semantic Versioning.

@@ -14,7 +14,7 @@ use Data::Table::Text qw(:all);
 use File::Copy;
 use POSIX qw(strftime);                                                         # http://www.cplusplus.com/reference/ctime/strftime/
 
-our $VERSION = '20171006';
+our $VERSION = '20171007';
 
 #-------------------------------------------------------------------------------
 # Constants
@@ -418,6 +418,14 @@ sub make
      }
    }
 
+  for my $file(@{$android->src})                                                # Check source files
+   {-e $file or confess "Unable to find source file:\n$file\n";
+   }
+
+  for my $file(@{$android->libs})                                               # Check library files
+   {-e $file or confess "Unable to find library:\n$file\n";
+   }
+
   unlink $_ for $api, $apj, $apk;                                               # Remove apks
 
   if (1)                                                                        # Generate R.java
@@ -466,25 +474,25 @@ sub make
    {xxx("cp $api $apj");                                                        # Create apk
     xxx("cd $bin && zip -qv $apj classes.dex");                                 # Add dexed classes
 
-    my $z = xxx("$zipAlign -f 4 $apj $apk");
-    $android->logMessage($z);
-
     my $alg = $android->debug ? '' : "-sigalg SHA1withRSA -digestalg SHA1";
 
     my $s = xxx("echo $keyStorePwd |",                                          # Sign
-     "jarsigner $alg -keystore $keyStoreFile $apk $keyAlias");
+     "jarsigner $alg -keystore $keyStoreFile $apj $keyAlias");
 
     $s =~ /reference a valid KeyStore key entry containing a private key/s and
       confess "Invalid keystore password: $keyStorePwd ".
               "for keystore:\n$keyStoreFile\n".
               "Specify the correct password via the keyStorePwd() method\n";
 
-    $s =~ /jar signed/s or confess "Unable to sign $apk\n";
+    $s =~ /jar signed/s or confess "Unable to sign $apj\n";
     $android->logMessage($s);
 
-    my $v = xxx("jarsigner -verify $apk");
+    my $v = xxx("jarsigner -verify $apj");
     $v =~ /jar verified/s  or confess "Unable to verify $apk\n";
     $android->logMessage($v);
+
+    my $z = xxx("$zipAlign -f 4 $apj $apk");
+    $android->logMessage($z);
    }
  }
 
@@ -596,12 +604,15 @@ advertising for Android Studio.
 
 Download:
 
-  https://dl.google.com/android/repository/sdk-tools-linux-3859397.zip
+  wget https://dl.google.com/android/repository/sdk-tools-linux-3859397.zip
 
 then using the sdkmanager to get the version of the SDK that you want to use,
 for example:
 
-  sdkmanager 'platforms;android-25'  'build-tools;25.0.3
+  sdkmanager --list --verbose
+
+  sdkmanager 'platforms;android-25'  'build-tools;25.0.3' emulator \
+   'system-images;android-25;google_apis;x86_64'
 
 =head1 Synopsis
 
@@ -679,7 +690,7 @@ Name of the folder containing the build tools to be used to build the app, see L
 
 =head2 buildFolder :lvalue
 
-Name of a folder in which to build the app, The default is B<./tmp>
+Name of a folder in which to build the app, The default is B</tmp/app/>
 
 
 =head2 classes :lvalue

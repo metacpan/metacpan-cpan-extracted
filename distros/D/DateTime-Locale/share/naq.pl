@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "\N{U+01c1}goagas",
-    "\N{U+01c3}uias"
+    "\N{U+01c3}uias",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d, E",
@@ -45,7 +50,7 @@
     yMd => "y-MM-dd",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "naq",
   date_format_full => "EEEE, d MMMM y",
@@ -63,7 +68,7 @@
     "Do",
     "Fr",
     "Sat",
-    "Son"
+    "Son",
   ],
   day_format_narrow => [
     "M",
@@ -72,7 +77,7 @@
     "D",
     "F",
     "A",
-    "S"
+    "S",
   ],
   day_format_wide => [
     "Mantaxtsees",
@@ -81,7 +86,7 @@
     "Dondertaxtsees",
     "Fraitaxtsees",
     "Satertaxtsees",
-    "Sontaxtsees"
+    "Sontaxtsees",
   ],
   day_stand_alone_abbreviated => [
     "Ma",
@@ -90,7 +95,7 @@
     "Do",
     "Fr",
     "Sat",
-    "Son"
+    "Son",
   ],
   day_stand_alone_narrow => [
     "M",
@@ -99,7 +104,7 @@
     "D",
     "F",
     "A",
-    "S"
+    "S",
   ],
   day_stand_alone_wide => [
     "Mantaxtsees",
@@ -108,19 +113,19 @@
     "Dondertaxtsees",
     "Fraitaxtsees",
     "Satertaxtsees",
-    "Sontaxtsees"
+    "Sontaxtsees",
   ],
   era_abbreviated => [
     "BC",
-    "AD"
+    "AD",
   ],
   era_narrow => [
     "BC",
-    "AD"
+    "AD",
   ],
   era_wide => [
     "Xristub ai\N{U+01c3}\N{U+00e2}",
-    "Xristub khao\N{U+01c3}g\N{U+00e2}"
+    "Xristub khao\N{U+01c3}g\N{U+00e2}",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -141,7 +146,7 @@
     "Sep",
     "Oct",
     "Nov",
-    "Dec"
+    "Dec",
   ],
   month_format_narrow => [
     "J",
@@ -155,7 +160,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_format_wide => [
     "\N{U+01c3}Khanni",
@@ -169,7 +174,7 @@
     "Tara\N{U+01c0}khuum\N{U+00fb}\N{U+01c1}kh\N{U+00e2}b",
     "\N{U+01c2}N\N{U+00fb}\N{U+01c1}n\N{U+00e2}iseb",
     "\N{U+01c0}Hoo\N{U+01c2}gaeb",
-    "H\N{U+00f4}asore\N{U+01c1}kh\N{U+00e2}b"
+    "H\N{U+00f4}asore\N{U+01c1}kh\N{U+00e2}b",
   ],
   month_stand_alone_abbreviated => [
     "Jan",
@@ -183,7 +188,7 @@
     "Sep",
     "Oct",
     "Nov",
-    "Dec"
+    "Dec",
   ],
   month_stand_alone_narrow => [
     "J",
@@ -197,7 +202,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_stand_alone_wide => [
     "\N{U+01c3}Khanni",
@@ -211,7 +216,7 @@
     "Tara\N{U+01c0}khuum\N{U+00fb}\N{U+01c1}kh\N{U+00e2}b",
     "\N{U+01c2}N\N{U+00fb}\N{U+01c1}n\N{U+00e2}iseb",
     "\N{U+01c0}Hoo\N{U+01c2}gaeb",
-    "H\N{U+00f4}asore\N{U+01c1}kh\N{U+00e2}b"
+    "H\N{U+00f4}asore\N{U+01c1}kh\N{U+00e2}b",
   ],
   name => "Nama",
   native_language => "Khoekhoegowab",
@@ -223,37 +228,37 @@
     "KW1",
     "KW2",
     "KW3",
-    "KW4"
+    "KW4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "1ro kwartals",
     "2\N{U+01c1}\N{U+00ee} kwartals",
     "3\N{U+01c1}\N{U+00ee} kwartals",
-    "4\N{U+01c1}\N{U+00ee} kwartals"
+    "4\N{U+01c1}\N{U+00ee} kwartals",
   ],
   quarter_stand_alone_abbreviated => [
     "KW1",
     "KW2",
     "KW3",
-    "KW4"
+    "KW4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "1ro kwartals",
     "2\N{U+01c1}\N{U+00ee} kwartals",
     "3\N{U+01c1}\N{U+00ee} kwartals",
-    "4\N{U+01c1}\N{U+00ee} kwartals"
+    "4\N{U+01c1}\N{U+00ee} kwartals",
   ],
   script => undef,
   territory => undef,
@@ -262,5 +267,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 31
+  version => 32,
 }

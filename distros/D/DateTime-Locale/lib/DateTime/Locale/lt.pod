@@ -327,11 +327,41 @@ Lithuanian locale.
 
 =head2 Available Formats
 
+=head3 Bh (h B)
+
+   2008-02-05T18:30:30 = 6 B
+   1995-12-22T09:05:02 = 9 B
+  -0010-09-15T04:44:23 = 4 B
+
+=head3 Bhm (h:mm B)
+
+   2008-02-05T18:30:30 = 6:30 B
+   1995-12-22T09:05:02 = 9:05 B
+  -0010-09-15T04:44:23 = 4:44 B
+
+=head3 Bhms (h:mm:ss B)
+
+   2008-02-05T18:30:30 = 6:30:30 B
+   1995-12-22T09:05:02 = 9:05:02 B
+  -0010-09-15T04:44:23 = 4:44:23 B
+
 =head3 E (ccc)
 
    2008-02-05T18:30:30 = an
    1995-12-22T09:05:02 = pn
   -0010-09-15T04:44:23 = št
+
+=head3 EBhm (h:mm B, E)
+
+   2008-02-05T18:30:30 = 6:30 B, an
+   1995-12-22T09:05:02 = 9:05 B, pn
+  -0010-09-15T04:44:23 = 4:44 B, št
+
+=head3 EBhms (h:mm:ss B, E)
+
+   2008-02-05T18:30:30 = 6:30:30 B, an
+   1995-12-22T09:05:02 = 9:05:02 B, pn
+  -0010-09-15T04:44:23 = 4:44:23 B, št
 
 =head3 EHm (HH:mm, E)
 
@@ -633,25 +663,25 @@ Lithuanian locale.
    1995-12-22T09:05:02 = 1995 IV ketvirtis
   -0010-09-15T04:44:23 = -10 III ketvirtis
 
-=head3 yw-count-few (y w 'sav'.)
+=head3 yw-count-few (Y w 'sav'.)
 
    2008-02-05T18:30:30 = 2008 6 sav.
    1995-12-22T09:05:02 = 1995 51 sav.
   -0010-09-15T04:44:23 = -10 37 sav.
 
-=head3 yw-count-many (y w 'sav'.)
+=head3 yw-count-many (Y w 'sav'.)
 
    2008-02-05T18:30:30 = 2008 6 sav.
    1995-12-22T09:05:02 = 1995 51 sav.
   -0010-09-15T04:44:23 = -10 37 sav.
 
-=head3 yw-count-one (y w 'sav'.)
+=head3 yw-count-one (Y w 'sav'.)
 
    2008-02-05T18:30:30 = 2008 6 sav.
    1995-12-22T09:05:02 = 1995 51 sav.
   -0010-09-15T04:44:23 = -10 37 sav.
 
-=head3 yw-count-other (y w 'sav'.)
+=head3 yw-count-other (Y w 'sav'.)
 
    2008-02-05T18:30:30 = 2008 6 sav.
    1995-12-22T09:05:02 = 1995 51 sav.

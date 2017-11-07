@@ -1,0 +1,52 @@
+---
+abstract: 'Show documentation for a module using Pod::Weaver'
+author:
+  - 'Doug Bell <preaction@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-weavedoc
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  App::weavedoc:
+    file: lib/App/weavedoc.pm
+    version: '0.003'
+requires:
+  Encode: '0'
+  Getopt::Long: '0'
+  Module::Runtime: '0'
+  PPI: '0'
+  Path::Tiny: '0'
+  Pod::Elemental: '0'
+  Pod::Text: '0'
+  Pod::Usage: '0'
+  Pod::Weaver: '0'
+  Scalar::Util: '0'
+  Software::LicenseUtils: '0'
+  perl: '5.014'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/preaction/App-weavedoc/issues
+  homepage: https://github.com/preaction/App-weavedoc
+  repository: https://github.com/preaction/App-weavedoc.git
+version: '0.003'
+x_authority: cpan:PREACTION
+x_serialization_backend: 'YAML::Tiny version 1.69'

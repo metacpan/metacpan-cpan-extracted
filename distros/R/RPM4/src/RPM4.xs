@@ -421,7 +421,7 @@ void _newspec(rpmts ts, char * filename, SV * svanyarch, SV * svforce) {
 }
 
 /* Building a spec file */
-int _specbuild(rpmts ts, rpmSpec spec, SV * sv_buildflags) {
+int _specbuild(rpmSpec spec, SV * sv_buildflags) {
     rpmBuildFlags buildflags = sv2rpmbuildflags(sv_buildflags);
     if (buildflags == RPMBUILD_NONE) croak("No action given for build");
     BTA_t flags = calloc(1, sizeof(*flags));
@@ -471,7 +471,7 @@ int _headername_vs_dep(Header h, rpmds dep, int nopromote) {
 
 /* Hight level function */
 int rpmsign(char *passphrase, const char *rpm) {
-#ifdef RPM4_12_90
+#if defined(RPM4_12_90) | defined(PATCHED_rpmPkgSign)
     return rpmPkgSign(rpm, NULL);
 #else
     return rpmPkgSign(rpm, NULL, passphrase);
@@ -1822,7 +1822,7 @@ Ts_transreset(ts)
 
 # Remaping function:
 
-# RPM4::rpm2header(filename); # Reusing existing RPM4::Db
+# RPM4::rpm2header(filename); # Reusing existing RPM4::Transaction
 void
 Ts_rpm2header(ts, filename)
     rpmts ts
@@ -1831,14 +1831,14 @@ Ts_rpm2header(ts, filename)
     _rpm2header(ts, filename, 0);
     SPAGAIN;
 
-# RPM4::Spec::specbuild([ buildflags ]); Reusing existing RPM4::Db
+# RPM4::Spec::specbuild([ buildflags ]); Reusing existing RPM4::Transaction
 int
 Ts_specbuild(ts, spec, sv_buildflags)
     rpmts ts
     rpmSpec spec
     SV * sv_buildflags
     CODE:
-    RETVAL = _specbuild(ts, spec, sv_buildflags);
+    RETVAL = _specbuild(spec, sv_buildflags);
     OUTPUT:
     RETVAL
 
@@ -2625,10 +2625,8 @@ Spec_build(spec, sv_buildflags)
     rpmSpec spec
     SV * sv_buildflags
     PREINIT:
-    rpmts ts = rpmtsCreate();
     CODE:
-    RETVAL = _specbuild(ts, spec, sv_buildflags);
-    ts = rpmtsFree(ts);
+    RETVAL = _specbuild(spec, sv_buildflags);
     OUTPUT:
     RETVAL
 

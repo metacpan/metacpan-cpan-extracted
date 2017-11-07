@@ -18,7 +18,7 @@
 use strict;
 use warnings;
 use File::Spec;
-require 'gen-head'; # for testcount() and testhead()
+require './gen-head'; # for testcount() and testhead()
 
 my %equiv = (
     0x439 => [qw(\x{438}\x{306})],

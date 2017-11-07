@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "\N{U+0190}nkak\N{U+025b}ny\N{U+00e1}",
-    "\N{U+0190}nd\N{U+00e1}m\N{U+00e2}"
+    "\N{U+0190}nd\N{U+00e1}m\N{U+00e2}",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d, E",
@@ -45,7 +50,7 @@
     yMd => "y-MM-dd",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "mas-TZ",
   date_format_full => "EEEE, d MMMM y",
@@ -63,7 +68,7 @@
     "Alh",
     "Iju",
     "Jmo",
-    "Jpi"
+    "Jpi",
   ],
   day_format_narrow => [
     3,
@@ -72,7 +77,7 @@
     6,
     7,
     1,
-    2
+    2,
   ],
   day_format_wide => [
     "Jumat\N{U+00e1}tu",
@@ -81,7 +86,7 @@
     "Ala\N{U+00e1}misi",
     "Jum\N{U+00e1}a",
     "Jumam\N{U+00f3}si",
-    "Jumap\N{U+00ed}l\N{U+00ed}"
+    "Jumap\N{U+00ed}l\N{U+00ed}",
   ],
   day_stand_alone_abbreviated => [
     "Jtt",
@@ -90,7 +95,7 @@
     "Alh",
     "Iju",
     "Jmo",
-    "Jpi"
+    "Jpi",
   ],
   day_stand_alone_narrow => [
     3,
@@ -99,7 +104,7 @@
     6,
     7,
     1,
-    2
+    2,
   ],
   day_stand_alone_wide => [
     "Jumat\N{U+00e1}tu",
@@ -108,19 +113,19 @@
     "Ala\N{U+00e1}misi",
     "Jum\N{U+00e1}a",
     "Jumam\N{U+00f3}si",
-    "Jumap\N{U+00ed}l\N{U+00ed}"
+    "Jumap\N{U+00ed}l\N{U+00ed}",
   ],
   era_abbreviated => [
     "MY",
-    "EY"
+    "EY",
   ],
   era_narrow => [
     "MY",
-    "EY"
+    "EY",
   ],
   era_wide => [
     "Me\N{U+00ed}n\N{U+014d} Y\N{U+025b}\N{U+0301}s\N{U+0289}",
-    "E\N{U+00ed}n\N{U+014d} Y\N{U+025b}\N{U+0301}s\N{U+0289}"
+    "E\N{U+00ed}n\N{U+014d} Y\N{U+025b}\N{U+0301}s\N{U+0289}",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -141,7 +146,7 @@
     "K\N{U+00fa}s",
     "G\N{U+00ed}s",
     "Sh\N{U+0289}\N{U+0301}",
-    "Nt\N{U+0289}\N{U+0301}"
+    "Nt\N{U+0289}\N{U+0301}",
   ],
   month_format_narrow => [
     1,
@@ -155,7 +160,7 @@
     9,
     10,
     11,
-    12
+    12,
   ],
   month_format_wide => [
     "Oladal\N{U+0289}\N{U+0301}",
@@ -169,7 +174,7 @@
     "K\N{U+00fa}sh\N{U+00ee}n",
     "Olg\N{U+00ed}san",
     "P\N{U+0289}sh\N{U+0289}\N{U+0301}ka",
-    "Nt\N{U+0289}\N{U+0301}\N{U+014b}\N{U+0289}\N{U+0301}s"
+    "Nt\N{U+0289}\N{U+0301}\N{U+014b}\N{U+0289}\N{U+0301}s",
   ],
   month_stand_alone_abbreviated => [
     "Dal",
@@ -183,7 +188,7 @@
     "K\N{U+00fa}s",
     "G\N{U+00ed}s",
     "Sh\N{U+0289}\N{U+0301}",
-    "Nt\N{U+0289}\N{U+0301}"
+    "Nt\N{U+0289}\N{U+0301}",
   ],
   month_stand_alone_narrow => [
     1,
@@ -197,7 +202,7 @@
     9,
     10,
     11,
-    12
+    12,
   ],
   month_stand_alone_wide => [
     "Oladal\N{U+0289}\N{U+0301}",
@@ -211,7 +216,7 @@
     "K\N{U+00fa}sh\N{U+00ee}n",
     "Olg\N{U+00ed}san",
     "P\N{U+0289}sh\N{U+0289}\N{U+0301}ka",
-    "Nt\N{U+0289}\N{U+0301}\N{U+014b}\N{U+0289}\N{U+0301}s"
+    "Nt\N{U+0289}\N{U+0301}\N{U+014b}\N{U+0289}\N{U+0301}s",
   ],
   name => "Masai Tanzania",
   native_language => "Maa",
@@ -223,37 +228,37 @@
     "E1",
     "E2",
     "E3",
-    "E4"
+    "E4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "Erobo 1",
     "Erobo 2",
     "Erobo 3",
-    "Erobo 4"
+    "Erobo 4",
   ],
   quarter_stand_alone_abbreviated => [
     "E1",
     "E2",
     "E3",
-    "E4"
+    "E4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "Erobo 1",
     "Erobo 2",
     "Erobo 3",
-    "Erobo 4"
+    "Erobo 4",
   ],
   script => undef,
   territory => "Tanzania",
@@ -262,5 +267,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

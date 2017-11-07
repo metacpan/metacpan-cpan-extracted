@@ -1,5 +1,5 @@
 package LWP::Protocol::gopher;
-$LWP::Protocol::gopher::VERSION = '6.27';
+$LWP::Protocol::gopher::VERSION = '6.29';
 # Implementation of the gopher protocol (RFC 1436)
 #
 # This code is based on 'wwwgopher.pl,v 0.10 1994/10/17 18:12:34 shelden'

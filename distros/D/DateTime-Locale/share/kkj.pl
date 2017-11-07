@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "AM",
-    "PM"
+    "PM",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "E d",
@@ -44,7 +49,7 @@
     yMd => "dd/MM y",
     yQQQ => "y QQQ",
     yQQQQ => "y QQQQ",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "kkj",
   date_format_full => "EEEE dd MMMM y",
@@ -62,7 +67,7 @@
     "yedi",
     "va\N{U+014b}d\N{U+025b}r\N{U+025b}di",
     "m\N{U+0254}n\N{U+0254} s\N{U+0254}ndi",
-    "s\N{U+0254}ndi"
+    "s\N{U+0254}ndi",
   ],
   day_format_narrow => [
     "lu",
@@ -71,7 +76,7 @@
     "ye",
     "va",
     "ms",
-    "so"
+    "so",
   ],
   day_format_wide => [
     "lundi",
@@ -80,7 +85,7 @@
     "yedi",
     "va\N{U+014b}d\N{U+025b}r\N{U+025b}di",
     "m\N{U+0254}n\N{U+0254} s\N{U+0254}ndi",
-    "s\N{U+0254}ndi"
+    "s\N{U+0254}ndi",
   ],
   day_stand_alone_abbreviated => [
     "lundi",
@@ -89,7 +94,7 @@
     "yedi",
     "va\N{U+014b}d\N{U+025b}r\N{U+025b}di",
     "m\N{U+0254}n\N{U+0254} s\N{U+0254}ndi",
-    "s\N{U+0254}ndi"
+    "s\N{U+0254}ndi",
   ],
   day_stand_alone_narrow => [
     "lu",
@@ -98,7 +103,7 @@
     "ye",
     "va",
     "ms",
-    "so"
+    "so",
   ],
   day_stand_alone_wide => [
     "lundi",
@@ -107,19 +112,19 @@
     "yedi",
     "va\N{U+014b}d\N{U+025b}r\N{U+025b}di",
     "m\N{U+0254}n\N{U+0254} s\N{U+0254}ndi",
-    "s\N{U+0254}ndi"
+    "s\N{U+0254}ndi",
   ],
   era_abbreviated => [
     "BCE",
-    "CE"
+    "CE",
   ],
   era_narrow => [
     "BCE",
-    "CE"
+    "CE",
   ],
   era_wide => [
     "BCE",
-    "CE"
+    "CE",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -140,7 +145,7 @@
     "njapi",
     "nyukul",
     11,
-    "\N{U+0253}ul\N{U+0253}us\N{U+025b}"
+    "\N{U+0253}ul\N{U+0253}us\N{U+025b}",
   ],
   month_format_narrow => [
     1,
@@ -154,7 +159,7 @@
     9,
     10,
     11,
-    12
+    12,
   ],
   month_format_wide => [
     "pamba",
@@ -168,7 +173,7 @@
     "njapi",
     "nyukul",
     11,
-    "\N{U+0253}ul\N{U+0253}us\N{U+025b}"
+    "\N{U+0253}ul\N{U+0253}us\N{U+025b}",
   ],
   month_stand_alone_abbreviated => [
     "pamba",
@@ -182,7 +187,7 @@
     "njapi",
     "nyukul",
     11,
-    "\N{U+0253}ul\N{U+0253}us\N{U+025b}"
+    "\N{U+0253}ul\N{U+0253}us\N{U+025b}",
   ],
   month_stand_alone_narrow => [
     1,
@@ -196,7 +201,7 @@
     9,
     10,
     11,
-    12
+    12,
   ],
   month_stand_alone_wide => [
     "pamba",
@@ -210,7 +215,7 @@
     "njapi",
     "nyukul",
     11,
-    "\N{U+0253}ul\N{U+0253}us\N{U+025b}"
+    "\N{U+0253}ul\N{U+0253}us\N{U+025b}",
   ],
   name => "Kako",
   native_language => "kak\N{U+0254}",
@@ -222,37 +227,37 @@
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_stand_alone_abbreviated => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   script => undef,
   territory => undef,
@@ -261,5 +266,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

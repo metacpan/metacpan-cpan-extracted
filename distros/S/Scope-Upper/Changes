@@ -1,5 +1,10 @@
 Revision history for Scope-Upper
 
+0.30    2017-11-04 15:55 UTC
+        + Fix : [RT #123481] : Compatibility with CV-in-stash optimisation
+                Thanks Father Chrysostomos for reporting and contributing a
+                patch.
+
 0.29    2016-06-06 12:00 UTC
         + Chg : A large chunk of boilerplate XS code, which is also used in
                 other XS modules, has been factored out of the main .xs file

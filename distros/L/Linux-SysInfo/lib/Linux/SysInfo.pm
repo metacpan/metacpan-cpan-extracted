@@ -11,13 +11,13 @@ Linux::SysInfo - Perl interface to the sysinfo(2) Linux system call.
 
 =head1 VERSION
 
-Version 0.14
+Version 0.15
 
 =cut
 
 our $VERSION;
 BEGIN {
- $VERSION = '0.14';
+ $VERSION = '0.15';
 }
 
 =head1 SYNOPSIS
@@ -193,11 +193,9 @@ You can find documentation for this module with the perldoc command.
 
     perldoc Linux::SysInfo
 
-Tests code coverage report is available at L<http://www.profvince.com/perl/cover/Linux-SysInfo>.
-
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2007,2008,2009,2010,2013 Vincent Pit, all rights reserved.
+Copyright 2007,2008,2009,2010,2013,2017 Vincent Pit, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

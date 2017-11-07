@@ -17,10 +17,8 @@ sub main {
 		LICENSE       => 'perl, lgpl',
 
 		PREREQ_PM     => {
-			'Gtk3'                        => 0,
+			'Glib'                        => 0,
 		},
-		PREREQ_FATAL  => 1,
-
 		META_MERGE => {
 			resources => {
 				homepage    => 'https://github.com/potyl/perl-Gtk3-Helper',

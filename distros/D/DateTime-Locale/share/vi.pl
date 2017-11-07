@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "SA",
-    "CH"
+    "CH",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "E, 'ng\N{U+00e0}y' d",
@@ -48,7 +53,7 @@
     yMd => "d/M/y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ 'n\N{U+0103}m' y",
-    "yw-count-other" => "'tu\N{U+1ea7}n' w 'c\N{U+1ee7}a' 'n\N{U+0103}m' y"
+    "yw-count-other" => "'tu\N{U+1ea7}n' w 'c\N{U+1ee7}a' 'n\N{U+0103}m' Y",
   },
   code => "vi",
   date_format_full => "EEEE, d MMMM, y",
@@ -66,7 +71,7 @@
     "Th 5",
     "Th 6",
     "Th 7",
-    "CN"
+    "CN",
   ],
   day_format_narrow => [
     "T2",
@@ -75,7 +80,7 @@
     "T5",
     "T6",
     "T7",
-    "CN"
+    "CN",
   ],
   day_format_wide => [
     "Th\N{U+1ee9} Hai",
@@ -84,7 +89,7 @@
     "Th\N{U+1ee9} N\N{U+0103}m",
     "Th\N{U+1ee9} S\N{U+00e1}u",
     "Th\N{U+1ee9} B\N{U+1ea3}y",
-    "Ch\N{U+1ee7} Nh\N{U+1ead}t"
+    "Ch\N{U+1ee7} Nh\N{U+1ead}t",
   ],
   day_stand_alone_abbreviated => [
     "Th 2",
@@ -93,7 +98,7 @@
     "Th 5",
     "Th 6",
     "Th 7",
-    "CN"
+    "CN",
   ],
   day_stand_alone_narrow => [
     "T2",
@@ -102,7 +107,7 @@
     "T5",
     "T6",
     "T7",
-    "CN"
+    "CN",
   ],
   day_stand_alone_wide => [
     "Th\N{U+1ee9} Hai",
@@ -111,19 +116,19 @@
     "Th\N{U+1ee9} N\N{U+0103}m",
     "Th\N{U+1ee9} S\N{U+00e1}u",
     "Th\N{U+1ee9} B\N{U+1ea3}y",
-    "Ch\N{U+1ee7} Nh\N{U+1ead}t"
+    "Ch\N{U+1ee7} Nh\N{U+1ead}t",
   ],
   era_abbreviated => [
     "Tr\N{U+01b0}\N{U+1edb}c CN",
-    "sau CN"
+    "sau CN",
   ],
   era_narrow => [
     "tr. CN",
-    "sau CN"
+    "sau CN",
   ],
   era_wide => [
     "Tr\N{U+01b0}\N{U+1edb}c CN",
-    "sau CN"
+    "sau CN",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -144,7 +149,7 @@
     "thg 9",
     "thg 10",
     "thg 11",
-    "thg 12"
+    "thg 12",
   ],
   month_format_narrow => [
     1,
@@ -158,7 +163,7 @@
     9,
     10,
     11,
-    12
+    12,
   ],
   month_format_wide => [
     "th\N{U+00e1}ng 1",
@@ -172,7 +177,7 @@
     "th\N{U+00e1}ng 9",
     "th\N{U+00e1}ng 10",
     "th\N{U+00e1}ng 11",
-    "th\N{U+00e1}ng 12"
+    "th\N{U+00e1}ng 12",
   ],
   month_stand_alone_abbreviated => [
     "Thg 1",
@@ -186,7 +191,7 @@
     "Thg 9",
     "Thg 10",
     "Thg 11",
-    "Thg 12"
+    "Thg 12",
   ],
   month_stand_alone_narrow => [
     1,
@@ -200,7 +205,7 @@
     9,
     10,
     11,
-    12
+    12,
   ],
   month_stand_alone_wide => [
     "Th\N{U+00e1}ng 1",
@@ -214,7 +219,7 @@
     "Th\N{U+00e1}ng 9",
     "Th\N{U+00e1}ng 10",
     "Th\N{U+00e1}ng 11",
-    "Th\N{U+00e1}ng 12"
+    "Th\N{U+00e1}ng 12",
   ],
   name => "Vietnamese",
   native_language => "Ti\N{U+1ebf}ng Vi\N{U+1ec7}t",
@@ -226,37 +231,37 @@
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "Qu\N{U+00fd} 1",
     "Qu\N{U+00fd} 2",
     "Qu\N{U+00fd} 3",
-    "Qu\N{U+00fd} 4"
+    "Qu\N{U+00fd} 4",
   ],
   quarter_stand_alone_abbreviated => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "qu\N{U+00fd} 1",
     "qu\N{U+00fd} 2",
     "qu\N{U+00fd} 3",
-    "qu\N{U+00fd} 4"
+    "qu\N{U+00fd} 4",
   ],
   script => undef,
   territory => undef,
@@ -265,5 +270,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

@@ -4,8 +4,9 @@ use qbit;
 
 use base qw(QBit::Application);
 
-use Test::DB accessor => 'db';
+use Test::DB accessor       => 'db';
+use Test::SecondDB accessor => 'second_db';
 
-__PACKAGE__->use_config('TestAppDB.cfg');
+__PACKAGE__->config_opts(timelog_class => 'TestTimeLog');
 
 TRUE;

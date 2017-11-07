@@ -1,0 +1,6 @@
+Revision history for Perl extension Win32::Packer.
+
+0.01  Tue Jun 20 14:14:51 2017
+	- original version; created by h2xs 1.23 with options
+		-AXn Win32::Packer
+

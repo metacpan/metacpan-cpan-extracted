@@ -13,7 +13,7 @@ use Carp::Always;
 use Try::Tiny;
 use Scalar::Util qw(blessed);
 
-our $VERSION = '0.02';
+our $VERSION = '0.07';
 
 =head1 Pootle::Client
 
@@ -26,6 +26,10 @@ for more information about the API resources/data_structures this Client returns
 Eg. https://pootle.readthedocs.io/en/stable-2.5.1/api/api_project.html#get-a-project
 maps to Pootle::Resource::Project locally.
 
+=head1 REQUIRES
+
+Perl 5.20 or newer with support for subroutine signatures
+
 =head2 Caches
 
 See L<Pootle::Cache>, for how the simple caching system works to spare the Pootle-Server from abuse
@@ -36,9 +40,15 @@ See L<Pootle::Logger>, for how to change Pootle::Client chattiness
 
 =head1 Synopsis
 
-    my $papi = Pootle::Client->new({baseUrl => 'http://translate.example.com', credentials => 'username:password' || 'credentials.txt'});
+    my $papi = Pootle::Client->new({
+                  baseUrl => 'http://translate.example.com',
+                  credentials => 'username:password' || 'credentials.txt'}
+    );
     my $languages = $papi->languages();
-    my $translationProjects = $papi->searchTranslationProjects($languages, Pootle::Filters->new({fullname => qr/^Project name/}));
+    my $trnsProjs = $papi->searchTranslationProjects(
+                       $languages,
+                       Pootle::Filters->new({fullname => qr/^Project name/})
+    );
 
 
 =cut
@@ -57,6 +67,21 @@ use Pootle::Resource::Project;
 use Pootle::Logger;
 my $l = bless({}, 'Pootle::Logger'); #Lazy load package logger this way to avoid circular dependency issues with logger includes from many packages
 
+=head2 new($params)
+
+Instantiates a new Pootle::Client
+
+ $params HASHRef of parameters {
+           baseUrl => 'http://translate.pootle.url',
+           credentials => 'usename:password' ||
+                          'credentials.file.containing.credentials.txt',
+           cacheFile => 'pootle-client.cache',
+         }
+
+ @returns Pootle::Client
+
+=cut
+
 sub new($class, @params) {
   $l->debug("Initializing '$class' with parameters: ".$l->flatten(@params)) if $l->is_debug();
   my %self = validate(@params, {
@@ -72,9 +97,14 @@ sub new($class, @params) {
   return $s;
 }
 
-=head2 language
+=head1 ACCESSING THE POOTLE API
 
- @PARAM1 String, API endpoint to get the resource, eg. /api/v1/languages/124/
+This Client transparently handles authentication based on the credentials supplied.
+Use the following methods to make API requests.
+
+=item language
+
+ @PARAM1  String, API endpoint to get the resource, eg. /api/v1/languages/124/
  @RETURNS L<Pootle::Resource::Language>
 
 =cut
@@ -85,10 +115,11 @@ sub language($s, $endpoint) {
   return new Pootle::Resource::Language($contentHash);
 }
 
-=head2 languages
+=item languages
 
- @RETURNS ARRAYRef of L<Pootle::Resource::Language>, all languages in the Pootle database
- @CACHED Transiently
+ @RETURNS ARRAYRef of L<Pootle::Resource::Language>,
+                                           all languages in the Pootle database
+ @CACHED  Transiently
 
 =cut
 
@@ -108,13 +139,14 @@ sub languages($s) {
   return $objs;
 }
 
-=head2 findLanguages
+=item findLanguages
 
 Uses the API to find all languages starting with the given country code
 
- @PARAM1 L<Pootle::Filters>
- @RETURNS ARRAYRef of L<Pootle::Resource::Language>. All languages starting with the given code.
- @CACHED Persistently
+ @PARAM1  L<Pootle::Filters>
+ @RETURNS ARRAYRef of L<Pootle::Resource::Language>,
+          all languages starting with the given code.
+ @CACHED  Persistently
 
 =cut
 
@@ -131,9 +163,10 @@ sub findLanguages($s, $filters) {
   return $objects;
 }
 
-=head2 translationProject
+=item translationProject
 
- @PARAM1 String, API endpoint to get the resource, eg. /api/v1/translation-projects/124/
+ @PARAM1  String, API endpoint to get the resource,
+          eg. /api/v1/translation-projects/124/
  @RETURNS L<Pootle::Resource::TranslationProject>
 
 =cut
@@ -144,7 +177,7 @@ sub translationProject($s, $endpoint) {
   return new Pootle::Resource::TranslationProject($contentHash);
 }
 
-=head2 translationProjects
+=item translationProjects
 
  @UNIMPLEMENTED
 
@@ -153,9 +186,10 @@ This endpoint is unimplemented in the Pootle-Client. Maybe some day it becomes e
 It might be better to use searchTranslationProjects() instead, since this API call can be really invasive to the Pootle-server.
 Really depends on how many translation projects you are after.
 
- @RETURNS ARRAYRef of L<Pootle::Resource::TranslationProject>, all translation projects in the Pootle database
- @CACHED Transiently
- @THROWS L<Pootle::Exception::HTTP::MethodNotAllowed>
+ @RETURNS ARRAYRef of L<Pootle::Resource::TranslationProject>,
+          all translation projects in the Pootle database
+ @CACHED  Transiently
+ @THROWS  L<Pootle::Exception::HTTP::MethodNotAllowed>
 
 =cut
 
@@ -175,7 +209,7 @@ sub translationProjects($s) {
   return $objs;
 }
 
-=head2 findTranslationProjects
+=item findTranslationProjects
 
  @UNIMPLEMENTED
 
@@ -183,10 +217,11 @@ This endpoint is unimplemented in the Pootle-Client. Maybe some day it becomes e
 
 Uses the API to find all translation projects matching the given search expressions
 
- @PARAM1 L<Pootle::Filters>, Used to select the desired objects
- @RETURNS ARRAYRef of L<Pootle::Resource::TranslationProject>. All matched translation projects.
- @CACHED Persistently
- @THROWS L<Pootle::Exception::HTTP::MethodNotAllowed>
+ @PARAM1  L<Pootle::Filters>, Used to select the desired objects
+ @RETURNS ARRAYRef of L<Pootle::Resource::TranslationProject>.
+          All matched translation projects.
+ @CACHED  Persistently
+ @THROWS  L<Pootle::Exception::HTTP::MethodNotAllowed>
 
 =cut
 
@@ -203,16 +238,17 @@ sub findTranslationProjects($s, $filters) {
   return $objects;
 }
 
-=head2 searchTranslationProjects
+=item searchTranslationProjects
 
- @PARAM1 L<Pootle::Filters>, Filters to pick desired languages
-         or
-         ARRAYRef of L<Pootle::Resource::Language>
- @PARAM2 L<Pootle::Filters>, Filters to pick desired projects
-         or
-         ARRAYRef of L<Pootle::Resource::Project>
- @RETURNS ARRAYRef of L<Pootle::Resource::TranslationProject>, matching the given languages and projects
- @CACHED Persistently
+ @PARAM1  L<Pootle::Filters>, Filters to pick desired languages
+          or
+          ARRAYRef of L<Pootle::Resource::Language>
+ @PARAM2  L<Pootle::Filters>, Filters to pick desired projects
+          or
+          ARRAYRef of L<Pootle::Resource::Project>
+ @RETURNS ARRAYRef of L<Pootle::Resource::TranslationProject>,
+          matching the given languages and projects
+ @CACHED  Persistently
 
 =cut
 
@@ -249,9 +285,9 @@ sub searchTranslationProjects($s, $languageFilters, $projectFilters) {
   return \@translationProjects;
 }
 
-=head2 store
+=item store
 
- @PARAM1 String, API endpoint to get the resource, eg. /api/v1/stores/77/
+ @PARAM1  String, API endpoint to get the resource, eg. /api/v1/stores/77/
  @RETURNS L<Pootle::Resource::Store>
 
 =cut
@@ -262,15 +298,16 @@ sub store($s, $endpoint) {
   return new Pootle::Resource::Store($contentHash);
 }
 
-=head2 searchStores
+=item searchStores
 
- @PARAM1 L<Pootle::Filters>, Filters to pick desired languages
-         or
-         ARRAYRef of L<Pootle::Resource::Language>
- @PARAM2 L<Pootle::Filters>, Filters to pick desired projects
-         or
-         ARRAYRef of L<Pootle::Resource::Project>
- @RETURNS ARRAYRef of L<Pootle::Resource::Store>, matching the given languages and projects
+ @PARAM1  L<Pootle::Filters>, Filters to pick desired languages
+          or
+          ARRAYRef of L<Pootle::Resource::Language>
+ @PARAM2  L<Pootle::Filters>, Filters to pick desired projects
+          or
+          ARRAYRef of L<Pootle::Resource::Project>
+ @RETURNS ARRAYRef of L<Pootle::Resource::Store>,
+          matching the given languages and projects
 
 =cut
 
@@ -294,9 +331,9 @@ sub searchStores($s, $languageFilters, $projectFilters) {
   return \@stores;
 }
 
-=head2 project
+=item project
 
- @PARAM1 String, API endpoint to get the project, eg. /api/v1/projects/124/
+ @PARAM1  String, API endpoint to get the project, eg. /api/v1/projects/124/
  @RETURNS L<Pootle::Resource::Project>
 
 =cut
@@ -307,10 +344,11 @@ sub project($s, $endpoint) {
   return new Pootle::Resource::Project($contentHash);
 }
 
-=head2 projects
+=item projects
 
- @RETURNS ARRAYRef of L<Pootle::Resource::Project>, all projects in the Pootle database
- @CACHED Transiently
+ @RETURNS ARRAYRef of L<Pootle::Resource::Project>,
+          all projects in the Pootle database
+ @CACHED  Transiently
 
 =cut
 
@@ -330,13 +368,13 @@ sub projects($s) {
   return $objs;
 }
 
-=head2 findProjects
+=item findProjects
 
 Uses the API to find all projects matching the given search expressions
 
-@PARAM1 L<Pootle::Filters>, matching criteria for needed objects
-@RETURNS ARRAYRef of L<Pootle::Resource::Project>. All matched projects.
-@CACHED Persistently
+ @PARAM1  L<Pootle::Filters>, matching criteria for needed objects
+ @RETURNS ARRAYRef of L<Pootle::Resource::Project>. All matched projects.
+ @CACHED  Persistently
 
 =cut
 
@@ -353,10 +391,10 @@ sub findProjects($s, $filters) {
   return $objects;
 }
 
-=head2 unit
+=item unit
 
-@PARAM1 String, API endpoint to get the resource, eg. /api/v1/units/77/
-@RETURNS L<Pootle::Resource::Unit>
+ @PARAM1  String, API endpoint to get the resource, eg. /api/v1/units/77/
+ @RETURNS L<Pootle::Resource::Unit>
 
 =cut
 
@@ -368,11 +406,9 @@ sub unit($s, $endpoint) {
 
 
 
-#########   ###   ###
- ## HELPERS  ###   ###
-#########   ###   ###
+=head1 HELPERS
 
-=head2 flushCaches
+=item flushCaches
 
 Flushes all caches
 
@@ -382,11 +418,9 @@ sub flushCaches($s) {
   $s->c->flushCaches();
 }
 
-##########    ###   ###
- ## ACCESSORS  ###   ###
-##########    ###   ###
+=head1 ACCESSORS
 
-=head2 a
+=item a
 
  @RETURNS L<Pootle::Agent>
 
@@ -394,7 +428,7 @@ sub flushCaches($s) {
 
 sub a($s) { return $s->{agent} }
 
-=head2 c
+=item c
 
  @RETURNS L<Pootle::Cache>
 

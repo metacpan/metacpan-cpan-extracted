@@ -7,7 +7,7 @@ use File::Which ();
 use Env qw( @PATH );
 
 # ABSTRACT: MSYS plugin for Alien::Build
-our $VERSION = '1.28'; # VERSION
+our $VERSION = '1.32'; # VERSION
 
 
 has msys_version   => '0.07';
@@ -26,7 +26,7 @@ sub init
     $meta->add_requires('share' => 'Alien::MSYS' => $self->msys_version);
     
     $meta->around_hook(
-      build => sub {
+      $_ => sub {
         my $orig = shift;
         my $build = shift;
 
@@ -35,7 +35,7 @@ sub init
 
         $orig->($build, @_);
       },
-    );
+    ) for qw( build build_ffi test_share test_ffi );
   }
 
  
@@ -80,7 +80,7 @@ Alien::Build::Plugin::Build::MSYS - MSYS plugin for Alien::Build
 
 =head1 VERSION
 
-version 1.28
+version 1.32
 
 =head1 SYNOPSIS
 

@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "am",
-    "pm"
+    "pm",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E, HH:mm",
     EHms => "E, HH:mm:ss",
     Ed => "E, d",
@@ -48,7 +53,7 @@
     yMd => "dd/MM/y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ 'di' y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "kea-CV",
   date_format_full => "EEEE, d 'di' MMMM 'di' y",
@@ -66,7 +71,7 @@
     "kin",
     "ses",
     "sab",
-    "dum"
+    "dum",
   ],
   day_format_narrow => [
     "S",
@@ -75,7 +80,7 @@
     "K",
     "S",
     "S",
-    "D"
+    "D",
   ],
   day_format_wide => [
     "sigunda-fera",
@@ -84,7 +89,7 @@
     "kinta-fera",
     "sesta-fera",
     "sabadu",
-    "dumingu"
+    "dumingu",
   ],
   day_stand_alone_abbreviated => [
     "sig",
@@ -93,7 +98,7 @@
     "kin",
     "ses",
     "sab",
-    "dum"
+    "dum",
   ],
   day_stand_alone_narrow => [
     "S",
@@ -102,7 +107,7 @@
     "K",
     "S",
     "S",
-    "D"
+    "D",
   ],
   day_stand_alone_wide => [
     "sigunda-fera",
@@ -111,19 +116,19 @@
     "kinta-fera",
     "sesta-fera",
     "s\N{U+00e1}badu",
-    "dumingu"
+    "dumingu",
   ],
   era_abbreviated => [
     "AK",
-    "DK"
+    "DK",
   ],
   era_narrow => [
     "AK",
-    "DK"
+    "DK",
   ],
   era_wide => [
     "Antis di Kristu",
-    "Dispos di Kristu"
+    "Dispos di Kristu",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -144,7 +149,7 @@
     "Set",
     "Otu",
     "Nuv",
-    "Diz"
+    "Diz",
   ],
   month_format_narrow => [
     "J",
@@ -158,7 +163,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_format_wide => [
     "Janeru",
@@ -172,7 +177,7 @@
     "Setenbru",
     "Otubru",
     "Nuvenbru",
-    "Dizenbru"
+    "Dizenbru",
   ],
   month_stand_alone_abbreviated => [
     "Jan",
@@ -186,7 +191,7 @@
     "Set",
     "Otu",
     "Nuv",
-    "Diz"
+    "Diz",
   ],
   month_stand_alone_narrow => [
     "J",
@@ -200,7 +205,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_stand_alone_wide => [
     "Janeru",
@@ -214,7 +219,7 @@
     "Setenbru",
     "Otubru",
     "Nuvenbru",
-    "Dizenbru"
+    "Dizenbru",
   ],
   name => "Kabuverdianu Cape Verde",
   native_language => "kabuverdianu",
@@ -226,37 +231,37 @@
     "T1",
     "T2",
     "T3",
-    "T4"
+    "T4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "1\N{U+00ba} trimestri",
     "2\N{U+00ba} trimestri",
     "3\N{U+00ba} trimestri",
-    "4\N{U+00ba} trimestri"
+    "4\N{U+00ba} trimestri",
   ],
   quarter_stand_alone_abbreviated => [
     "T1",
     "T2",
     "T3",
-    "T4"
+    "T4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "1\N{U+00ba} trimestri",
     "2\N{U+00ba} trimestri",
     "3\N{U+00ba} trimestri",
-    "4\N{U+00ba} trimestri"
+    "4\N{U+00ba} trimestri",
   ],
   script => undef,
   territory => "Cape Verde",
@@ -265,5 +270,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

@@ -29,4 +29,4 @@ requires:
 resources:
   homepage: https://github.com/abeltje/Dancer-Plugin-RPC
   repository: git://github.com/abeltje/Dancer-Plugin-RPC.git
-version: '1.05'
+version: '1.06'

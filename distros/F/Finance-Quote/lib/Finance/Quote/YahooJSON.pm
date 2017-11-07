@@ -33,7 +33,7 @@ use HTTP::Request::Common;
 use HTML::TableExtract;
 use Time::Piece;
 
-our $VERSION = '1.38'; # VERSION
+our $VERSION = '1.43'; # VERSION
 
 my $YIND_URL_HEAD = 'http://finance.yahoo.com/webservice/v1/symbols/';
 my $YIND_URL_TAIL = '/quote?format=json';
@@ -41,6 +41,10 @@ my %suffix_to_currency = (
     NS => 'INR',
     CL => 'INR',
     BO => 'INR',
+    BR => 'EUR',
+    PA => 'EUR',
+    BC => 'EUR',
+    MC => 'EUR',
 );
 
 sub methods {
@@ -193,7 +197,7 @@ This module provides the "yahoo_json" fetch method.
 =head1 LABELS RETURNED
 
 The following labels may be returned by Finance::Quote::YahooJSON :
-name, last, isodate, volume, method, exchange.
+name, last, isodate, volume, method, exchange, currency.
 
 =head1 SEE ALSO
 

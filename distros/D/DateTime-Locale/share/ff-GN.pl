@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "subaka",
-    "kikii\N{U+0257}e"
+    "kikii\N{U+0257}e",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d, E",
@@ -48,7 +53,7 @@
     yMd => "y-MM-dd",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "ff-GN",
   date_format_full => "EEEE d MMMM y",
@@ -66,7 +71,7 @@
     "naa",
     "mwd",
     "hbi",
-    "dew"
+    "dew",
   ],
   day_format_narrow => [
     "a",
@@ -75,7 +80,7 @@
     "n",
     "m",
     "h",
-    "d"
+    "d",
   ],
   day_format_wide => [
     "aa\N{U+0253}nde",
@@ -84,7 +89,7 @@
     "naasaande",
     "mawnde",
     "hoore-biir",
-    "dewo"
+    "dewo",
   ],
   day_stand_alone_abbreviated => [
     "aa\N{U+0253}",
@@ -93,7 +98,7 @@
     "naa",
     "mwd",
     "hbi",
-    "dew"
+    "dew",
   ],
   day_stand_alone_narrow => [
     "a",
@@ -102,7 +107,7 @@
     "n",
     "m",
     "h",
-    "d"
+    "d",
   ],
   day_stand_alone_wide => [
     "aa\N{U+0253}nde",
@@ -111,19 +116,19 @@
     "naasaande",
     "mawnde",
     "hoore-biir",
-    "dewo"
+    "dewo",
   ],
   era_abbreviated => [
     "H-I",
-    "C-I"
+    "C-I",
   ],
   era_narrow => [
     "H-I",
-    "C-I"
+    "C-I",
   ],
   era_wide => [
     "Hade Iisa",
-    "Caggal Iisa"
+    "Caggal Iisa",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -144,7 +149,7 @@
     "slt",
     "yar",
     "jol",
-    "bow"
+    "bow",
   ],
   month_format_narrow => [
     "s",
@@ -158,7 +163,7 @@
     "s",
     "y",
     "j",
-    "b"
+    "b",
   ],
   month_format_wide => [
     "siilo",
@@ -172,7 +177,7 @@
     "siilto",
     "yarkomaa",
     "jolal",
-    "bowte"
+    "bowte",
   ],
   month_stand_alone_abbreviated => [
     "sii",
@@ -186,7 +191,7 @@
     "slt",
     "yar",
     "jol",
-    "bow"
+    "bow",
   ],
   month_stand_alone_narrow => [
     "s",
@@ -200,7 +205,7 @@
     "s",
     "y",
     "j",
-    "b"
+    "b",
   ],
   month_stand_alone_wide => [
     "siilo",
@@ -214,7 +219,7 @@
     "siilto",
     "yarkomaa",
     "jolal",
-    "bowte"
+    "bowte",
   ],
   name => "Fulah Guinea",
   native_language => "Pulaar",
@@ -226,37 +231,37 @@
     "T1",
     "T2",
     "T3",
-    "T4"
+    "T4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "Termes 1",
     "Termes 2",
     "Termes 3",
-    "Termes 4"
+    "Termes 4",
   ],
   quarter_stand_alone_abbreviated => [
     "T1",
     "T2",
     "T3",
-    "T4"
+    "T4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "Termes 1",
     "Termes 2",
     "Termes 3",
-    "Termes 4"
+    "Termes 4",
   ],
   script => undef,
   territory => "Guinea",
@@ -265,5 +270,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

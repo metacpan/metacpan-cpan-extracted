@@ -3,14 +3,14 @@ Build.PL
 Changes
 lib/Sidef.pm
 lib/Sidef.pod
-lib/Sidef/Convert/Convert.pm
-lib/Sidef/Convert/Convert.pod
 lib/Sidef/Deparse/Perl.pm
 lib/Sidef/Deparse/Sidef.pm
 lib/Sidef/Math/Math.pm
 lib/Sidef/Math/Math.pod
 lib/Sidef/Module/Func.pm
 lib/Sidef/Module/OO.pm
+lib/Sidef/Object/Convert.pm
+lib/Sidef/Object/Convert.pod
 lib/Sidef/Object/Enumerator.pm
 lib/Sidef/Object/Enumerator.pod
 lib/Sidef/Object/Lazy.pm
@@ -388,6 +388,7 @@ scripts/RosettaCode/holidays_related_to_easter.sf
 scripts/RosettaCode/horizontal_sundial_calculations.sf
 scripts/RosettaCode/hostname.sf
 scripts/RosettaCode/identity_matrix.sf
+scripts/RosettaCode/imaginary_base_numbers.sf
 scripts/RosettaCode/infinity.sf
 scripts/RosettaCode/inheritance_multiple.sf
 scripts/RosettaCode/inheritance_single.sf
@@ -670,6 +671,7 @@ scripts/Tests/default_var_values.sf
 scripts/Tests/draw_grid_of_squares_multi.sf
 scripts/Tests/draw_grid_of_squares_multi_2.sf
 scripts/Tests/dump_cyclic_references.sf
+scripts/Tests/dynamic_block_scoping.sf
 scripts/Tests/dynamic_constants.sf
 scripts/Tests/echo.sf
 scripts/Tests/enumerator_object.sf
@@ -687,6 +689,7 @@ scripts/Tests/first_class_functions_analogously.sf
 scripts/Tests/floyds_triangle.sf
 scripts/Tests/for_in_extended.sf
 scripts/Tests/for_in_range.sf
+scripts/Tests/for_in_with_user_objects.sf
 scripts/Tests/for_two_vars.sf
 scripts/Tests/for_var_in_array.sf
 scripts/Tests/forward_difference.sf

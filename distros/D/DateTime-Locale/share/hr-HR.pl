@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "AM",
-    "PM"
+    "PM",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "E, d.",
@@ -49,9 +54,9 @@
     yMd => "dd. MM. y.",
     yQQQ => "QQQ y.",
     yQQQQ => "QQQQ y.",
-    "yw-count-few" => "w. 'tjedan' 'u' y.",
-    "yw-count-one" => "w. 'tjedan' 'u' y.",
-    "yw-count-other" => "w. 'tjedan' 'u' y."
+    "yw-count-few" => "w. 'tjedan' 'u' Y.",
+    "yw-count-one" => "w. 'tjedan' 'u' Y.",
+    "yw-count-other" => "w. 'tjedan' 'u' Y.",
   },
   code => "hr-HR",
   date_format_full => "EEEE, d. MMMM y.",
@@ -69,7 +74,7 @@
     "\N{U+010d}et",
     "pet",
     "sub",
-    "ned"
+    "ned",
   ],
   day_format_narrow => [
     "P",
@@ -78,7 +83,7 @@
     "\N{U+010c}",
     "P",
     "S",
-    "N"
+    "N",
   ],
   day_format_wide => [
     "ponedjeljak",
@@ -87,7 +92,7 @@
     "\N{U+010d}etvrtak",
     "petak",
     "subota",
-    "nedjelja"
+    "nedjelja",
   ],
   day_stand_alone_abbreviated => [
     "pon",
@@ -96,7 +101,7 @@
     "\N{U+010d}et",
     "pet",
     "sub",
-    "ned"
+    "ned",
   ],
   day_stand_alone_narrow => [
     "p",
@@ -105,7 +110,7 @@
     "\N{U+010d}",
     "p",
     "s",
-    "n"
+    "n",
   ],
   day_stand_alone_wide => [
     "ponedjeljak",
@@ -114,19 +119,19 @@
     "\N{U+010d}etvrtak",
     "petak",
     "subota",
-    "nedjelja"
+    "nedjelja",
   ],
   era_abbreviated => [
     "pr. Kr.",
-    "po. Kr."
+    "po. Kr.",
   ],
   era_narrow => [
     "pr.n.e.",
-    "AD"
+    "AD",
   ],
   era_wide => [
     "prije Krista",
-    "poslije Krista"
+    "poslije Krista",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -147,7 +152,7 @@
     "ruj",
     "lis",
     "stu",
-    "pro"
+    "pro",
   ],
   month_format_narrow => [
     "1.",
@@ -161,7 +166,7 @@
     "9.",
     "10.",
     "11.",
-    "12."
+    "12.",
   ],
   month_format_wide => [
     "sije\N{U+010d}nja",
@@ -175,7 +180,7 @@
     "rujna",
     "listopada",
     "studenoga",
-    "prosinca"
+    "prosinca",
   ],
   month_stand_alone_abbreviated => [
     "sij",
@@ -189,7 +194,7 @@
     "ruj",
     "lis",
     "stu",
-    "pro"
+    "pro",
   ],
   month_stand_alone_narrow => [
     "1.",
@@ -203,7 +208,7 @@
     "9.",
     "10.",
     "11.",
-    "12."
+    "12.",
   ],
   month_stand_alone_wide => [
     "sije\N{U+010d}anj",
@@ -217,7 +222,7 @@
     "rujan",
     "listopad",
     "studeni",
-    "prosinac"
+    "prosinac",
   ],
   name => "Croatian Croatia",
   native_language => "hrvatski",
@@ -229,37 +234,37 @@
     "1kv",
     "2kv",
     "3kv",
-    "4kv"
+    "4kv",
   ],
   quarter_format_narrow => [
     "1.",
     "2.",
     "3.",
-    "4."
+    "4.",
   ],
   quarter_format_wide => [
     "1. kvartal",
     "2. kvartal",
     "3. kvartal",
-    "4. kvartal"
+    "4. kvartal",
   ],
   quarter_stand_alone_abbreviated => [
     "1. kv.",
     "2. kv.",
     "3. kv.",
-    "4. kv."
+    "4. kv.",
   ],
   quarter_stand_alone_narrow => [
     "1.",
     "2.",
     "3.",
-    "4."
+    "4.",
   ],
   quarter_stand_alone_wide => [
     "1. kvartal",
     "2. kvartal",
     "3. kvartal",
-    "4. kvartal"
+    "4. kvartal",
   ],
   script => undef,
   territory => "Croatia",
@@ -268,5 +273,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

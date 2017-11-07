@@ -495,6 +495,7 @@ Timor
 Tirane
 Tokelau
 Tokyo
+Tom
 Tomsk
 Tongatapu
 Toronto
@@ -541,6 +542,7 @@ Wilk
 Winamac
 Windhoek
 Winnipeg
+Wyant
 XP
 Yakutat
 Yakutsk
@@ -579,3 +581,4 @@ ribasushi
 subclasses
 timezones
 versa
+wyant

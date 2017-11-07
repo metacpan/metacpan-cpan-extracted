@@ -186,10 +186,10 @@ Chinese Hong Kong SAR China Traditional locale.
 
 =head3 Wide (format)
 
-  第1季度
-  第2季度
-  第3季度
-  第4季度
+  第1季
+  第2季
+  第3季
+  第4季
 
 =head3 Abbreviated (format)
 
@@ -208,10 +208,10 @@ Chinese Hong Kong SAR China Traditional locale.
 
 =head3 Wide (stand-alone)
 
-  第1季度
-  第2季度
-  第3季度
-  第4季度
+  第1季
+  第2季
+  第3季
+  第4季
 
 =head3 Abbreviated (stand-alone)
 
@@ -327,11 +327,41 @@ Chinese Hong Kong SAR China Traditional locale.
 
 =head2 Available Formats
 
+=head3 Bh (Bh時)
+
+   2008-02-05T18:30:30 = B6時
+   1995-12-22T09:05:02 = B9時
+  -0010-09-15T04:44:23 = B4時
+
+=head3 Bhm (Bh:mm)
+
+   2008-02-05T18:30:30 = B6:30
+   1995-12-22T09:05:02 = B9:05
+  -0010-09-15T04:44:23 = B4:44
+
+=head3 Bhms (Bh:mm:ss)
+
+   2008-02-05T18:30:30 = B6:30:30
+   1995-12-22T09:05:02 = B9:05:02
+  -0010-09-15T04:44:23 = B4:44:23
+
 =head3 E (ccc)
 
    2008-02-05T18:30:30 = 週二
    1995-12-22T09:05:02 = 週五
   -0010-09-15T04:44:23 = 週六
+
+=head3 EBhm (E Bh:mm)
+
+   2008-02-05T18:30:30 = 週二 B6:30
+   1995-12-22T09:05:02 = 週五 B9:05
+  -0010-09-15T04:44:23 = 週六 B4:44
+
+=head3 EBhms (E Bh:mm:ss)
+
+   2008-02-05T18:30:30 = 週二 B6:30:30
+   1995-12-22T09:05:02 = 週五 B9:05:02
+  -0010-09-15T04:44:23 = 週六 B4:44:23
 
 =head3 EHm (E HH:mm)
 
@@ -575,11 +605,11 @@ Chinese Hong Kong SAR China Traditional locale.
 
 =head3 yQQQQ (y年QQQQ)
 
-   2008-02-05T18:30:30 = 2008年第1季度
-   1995-12-22T09:05:02 = 1995年第4季度
-  -0010-09-15T04:44:23 = -10年第3季度
+   2008-02-05T18:30:30 = 2008年第1季
+   1995-12-22T09:05:02 = 1995年第4季
+  -0010-09-15T04:44:23 = -10年第3季
 
-=head3 yw-count-other (y年第w週)
+=head3 yw-count-other (Y年第w週)
 
    2008-02-05T18:30:30 = 2008年第6週
    1995-12-22T09:05:02 = 1995年第51週

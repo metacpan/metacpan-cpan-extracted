@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Storable qw(freeze);
 use Struct::Diff qw(diff);
-use Test::More tests => 36;
+use Test::More tests => 40;
 
 use lib "t";
 use _common qw(scmp);
@@ -172,4 +172,24 @@ $blessed2 = bless { a => 1 }, 'SomeClassName';
 $got = diff($blessed1, $blessed2);
 $exp = {N => $blessed2,O => $blessed1};
 is_deeply($got, $exp, "No deep diff for objects") || diag scmp($got, $exp);
+
+### Regexp
+my $re1 = qr/pat/msix;
+$got = diff($re1, $re1);
+$exp = {U => $re1};
+is_deeply($got, $exp, "Same regexp") || diag scmp($got, $exp);
+
+$got = diff($re1, qr/pat/ixms);
+$exp = {U => $re1};
+is_deeply($got, $exp, "Equal by data regexps") || diag scmp($got, $exp);
+
+my $re2 = qr/pat/m;
+$got = diff($re1, $re2);
+$exp = {N => $re2,O => $re1};
+is_deeply($got, $exp, "Different by mods regexps") || diag scmp($got, $exp);
+
+$re2 = qr/FOO/msix;
+$got = diff($re1, $re2);
+$exp = {N => $re2,O => $re1};
+is_deeply($got, $exp, "Different by pattern regexps") || diag scmp($got, $exp);
 

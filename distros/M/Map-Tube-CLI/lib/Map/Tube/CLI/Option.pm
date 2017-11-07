@@ -1,6 +1,6 @@
 package Map::Tube::CLI::Option;
 
-$Map::Tube::CLI::Option::VERSION   = '0.33';
+$Map::Tube::CLI::Option::VERSION   = '0.36';
 $Map::Tube::CLI::Option::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::CLI::Option - Option as Moo Role for Map::Tube::CLI.
 
 =head1 VERSION
 
-Version 0.33
+Version 0.36
 
 =cut
 
@@ -17,7 +17,7 @@ use 5.006;
 use Data::Dumper;
 
 use Moo::Role;
-use namespace::clean;
+use namespace::autoclean;
 
 use Types::Standard -all;
 use MooX::Options;

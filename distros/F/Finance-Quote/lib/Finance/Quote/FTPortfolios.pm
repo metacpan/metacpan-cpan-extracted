@@ -39,7 +39,7 @@ use LWP::UserAgent;
 use HTTP::Request::Common;
 use HTML::TableExtract;
 
-our $VERSION = '1.38'; # VERSION
+our $VERSION = '1.43'; # VERSION
 
 # URLs of where to obtain information.
 
@@ -71,7 +71,7 @@ sub ftportfolios
     @symbolhash{@symbols} = map(1,@symbols);
     #
     for (@symbols) {
-      my $te = new HTML::TableExtract( );
+      my $te = HTML::TableExtract->new();
       $trust = $_;
       $url = "$FTPORTFOLIOS_URL";
 

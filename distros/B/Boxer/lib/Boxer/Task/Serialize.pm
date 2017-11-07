@@ -16,7 +16,7 @@ use File::ShareDir qw(dist_dir);
 use Boxer::File::WithSkeleton;
 
 use Moo;
-use Types::Standard qw( Bool Str Undef InstanceOf );
+use Types::Standard qw( Bool Maybe Str Undef InstanceOf );
 use Types::Path::Tiny qw( Dir File Path );
 use Boxer::Types qw( SkelDir );
 extends 'Boxer::Task';
@@ -25,11 +25,11 @@ use namespace::clean;
 
 =head1 VERSION
 
-Version v1.1.5
+Version v1.1.7
 
 =cut
 
-our $VERSION = version->declare("v1.1.5");
+our $VERSION = version->declare("v1.1.7");
 
 has world => (
 	is       => 'ro',
@@ -39,7 +39,7 @@ has world => (
 
 has skeldir => (
 	is     => 'ro',
-	isa    => SkelDir,
+	isa    => Maybe [SkelDir],
 	coerce => 1,
 );
 

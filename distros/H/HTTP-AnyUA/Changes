@@ -1,5 +1,10 @@
 Revision history for HTTP-AnyUA.
 
+0.901     2017-11-05 22:05:57-07:00 MST7MDT
+
+  * Add middleware
+  * Fix up some documentation issues
+
 0.900     2017-03-11 18:28:59-07:00 MST7MDT
 
   * Initial release

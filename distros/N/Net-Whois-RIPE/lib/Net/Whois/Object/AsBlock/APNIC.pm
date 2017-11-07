@@ -19,7 +19,7 @@ use base qw/Net::Whois::Object/;
 # changed:        [mandatory]  [multiple]   [ ]
 # source:         [mandatory]  [single]     [ ]
 
-% This query was served by the APNIC Whois Service version 1.68.5 (WHOIS1)
+# % This query was served by the APNIC Whois Service version 1.68.5 (WHOIS1)
 
 __PACKAGE__->attributes( 'primary', ['as_block'] );
 __PACKAGE__->attributes( 'mandatory', [ 'as_block', 'admin_c', 'tech_c', 'mnt_by', 'changed', 'source' ] );

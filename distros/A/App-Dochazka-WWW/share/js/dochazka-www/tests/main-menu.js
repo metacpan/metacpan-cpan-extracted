@@ -55,7 +55,7 @@ define ([
 
     return function () {
 
-        test_desc = 'main menu appears';
+        test_desc = 'login, and immediately logout';
         QUnit.test(test_desc, function (assert) {
             console.log('***TEST*** ' + prefix + test_desc);
             var done = assert.async(2),
@@ -72,6 +72,105 @@ define ([
                 ct.loggout(assert);
                 done();
             }, 1500);
+        });
+
+        test_desc = 'masquerade as employee "active"';
+        QUnit.test(test_desc, function (assert) {
+            console.log('***TEST*** ' + prefix + test_desc);
+            var done = assert.async(5),
+                mainarea,
+                match,
+                htmlbuf,
+                sel,
+                cu;
+            login({"nam": "root", "pwd": "immutable"});
+            setTimeout(function () {
+                ct.login(assert, "root", "admin");
+                done();
+            }, 1500);
+            setTimeout(function () {
+                assert.strictEqual($('#userbox').text(), 'Employee: root ADMIN');
+                ct.mainareaForm(assert, 'mainMenu');
+                htmlbuf = $('#mainarea').html();
+                match = htmlbuf.match(/(\d+)\. Masquerade/);
+                assert.ok(match !== null, "There is a match 1");
+                if (match !== null) {
+                    assert.ok(match.length >= 1, "There is a match 2");
+                    sel = match[1];
+                }
+                assert.ok(parseInt(sel, 10) >= 0, "Masquerade selection number is sane");
+                assert.ok(true, "Main menu contains Masquerade as selection " + sel);
+                $('input[name="sel"]').val(sel);
+                $('input[name="sel"]').focus();
+                // press ENTER -> submit the form
+                $('input[name="sel"]').trigger($.Event("keydown", {keyCode: 13}));
+                ct.stack(assert, 2, 'navigating from mainMenu to searchEmployee', 'dform', 'searchEmployee');
+                mainarea = $('#mainarea').html();
+                ct.contains(assert, mainarea, "#mainarea", "Search Dochazka employees");
+                assert.ok(true, "*** REACHED searchEmployee dform");
+                done();
+            }, 2000);
+            setTimeout(function () {
+                // enter a search string
+                $('input[id="sEnick"]').val('act%');
+                assert.strictEqual($('input[id="sEnick"]').val(), 'act%', "Search string entered into form");
+                mainarea = $('#mainarea').html();
+                ct.contains(assert, mainarea, "searchEmployee miniMenu", "0.&nbsp;Search");
+                $('input[name="sel"]').val('0');
+                $('input[name="sel"]').focus();
+                $('input[name="sel"]').trigger($.Event("keydown", {keyCode: 13}));
+            }, 2500);
+            setTimeout(function () {
+                ct.stack(assert, 3, 'browsing results of successful Dochazka employee search',
+                         'dbrowser', 'masqueradeCandidatesBrowser');
+                assert.ok(true, "*** REACHED masqueradeCandidatesBrowser dform");
+                mainarea = $('#mainarea').html();
+                ct.contains(assert, mainarea, "Masquerade candidates browser", 'Masquerade candidates');
+                ct.contains(assert, mainarea, "Masquerade selection in miniMenu", "0.&nbsp;Masquerade");
+                assert.ok(true, "*** REACHED Masquerade selection in masqueradeCandidatesBrowser miniMenu");
+                match = mainarea.match(/(\d+)\.&nbsp;Masquerade/);
+                assert.ok(true, QUnit.dump.parse(match));
+                assert.ok(match !== null, "There is a match 1");
+                if (match !== null) {
+                    assert.ok(match.length >= 1, "There is a match 2");
+                    sel = match[1];
+                }
+                assert.ok(parseInt(sel, 10) >= 0, "Masquerade selection number is sane");
+                assert.ok(true, "masqueradeCandidatesBrowser miniMenu contains Masquerade as selection " + sel);
+                // select Masquerade (first time - begin)
+                $('input[name="sel"]').val(sel);
+                $('input[name="sel"]').focus();
+                // press ENTER -> submit the form
+                $('input[name="sel"]').trigger($.Event("keydown", {keyCode: 13}));
+                ct.stack(assert, 1, 'selected Masquerade in masqueradeCandidatesBrowser', 'dmenu', 'mainMenu');
+                assert.strictEqual($('#userbox').text(), '!!! Employee: active (MASQUERADE) !!!');
+                assert.ok(true, "*** REACHED masquerading as employee \"active\"");
+                done();
+            }, 3000);
+            setTimeout(function () {
+                ct.mainareaForm(assert, 'mainMenu');
+                htmlbuf = $('#mainarea').html();
+                match = htmlbuf.match(/(\d+)\. Masquerade/);
+                assert.ok(match !== null, "There is a match 1");
+                if (match !== null) {
+                    assert.ok(match.length >= 1, "There is a match 2");
+                    sel = match[1];
+                }
+                assert.ok(parseInt(sel, 10) >= 0, "Masquerade selection number is sane");
+                assert.ok(true, "Main menu contains Masquerade as selection " + sel);
+                // select Masqerade (second time - end)
+                $('input[name="sel"]').val(sel);
+                $('input[name="sel"]').focus();
+                // press ENTER -> submit the form
+                $('input[name="sel"]').trigger($.Event("keydown", {keyCode: 13}));
+                assert.strictEqual($('#userbox').text(), 'Employee: root ADMIN');
+                loggout();
+                done();
+            }, 3500);
+            setTimeout(function () {
+                ct.loggout(assert);
+                done();
+            }, 4000);
         });
 
     };

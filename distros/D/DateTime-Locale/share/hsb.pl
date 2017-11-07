@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "dopo\N{U+0142}dnja",
-    "popo\N{U+0142}dnju"
+    "popo\N{U+0142}dnju",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E, H:mm 'hod\N{U+017a}'.",
     EHms => "E, HH:mm:ss",
     Ed => "E, d.",
@@ -44,7 +49,7 @@
     yMd => "d.M.y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "hsb",
   date_format_full => "EEEE, d. MMMM y",
@@ -62,7 +67,7 @@
     "\N{U+0161}tw",
     "pja",
     "sob",
-    "nje"
+    "nje",
   ],
   day_format_narrow => [
     "p",
@@ -71,7 +76,7 @@
     "\N{U+0161}",
     "p",
     "s",
-    "n"
+    "n",
   ],
   day_format_wide => [
     "p\N{U+00f3}nd\N{U+017a}ela",
@@ -80,7 +85,7 @@
     "\N{U+0161}tw\N{U+00f3}rtk",
     "pjatk",
     "sobota",
-    "njed\N{U+017a}ela"
+    "njed\N{U+017a}ela",
   ],
   day_stand_alone_abbreviated => [
     "p\N{U+00f3}n",
@@ -89,7 +94,7 @@
     "\N{U+0161}tw",
     "pja",
     "sob",
-    "nje"
+    "nje",
   ],
   day_stand_alone_narrow => [
     "p",
@@ -98,7 +103,7 @@
     "\N{U+0161}",
     "p",
     "s",
-    "n"
+    "n",
   ],
   day_stand_alone_wide => [
     "p\N{U+00f3}nd\N{U+017a}ela",
@@ -107,19 +112,19 @@
     "\N{U+0161}tw\N{U+00f3}rtk",
     "pjatk",
     "sobota",
-    "njed\N{U+017a}ela"
+    "njed\N{U+017a}ela",
   ],
   era_abbreviated => [
     "p\N{U+0159}.Chr.n.",
-    "po Chr.n."
+    "po Chr.n.",
   ],
   era_narrow => [
     "p\N{U+0159}.Chr.n.",
-    "po Chr.n."
+    "po Chr.n.",
   ],
   era_wide => [
     "p\N{U+0159}ed Chrystowym narod\N{U+017a}enjom",
-    "po Chrystowym narod\N{U+017a}enju"
+    "po Chrystowym narod\N{U+017a}enju",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -140,7 +145,7 @@
     "sep.",
     "okt.",
     "now.",
-    "dec."
+    "dec.",
   ],
   month_format_narrow => [
     "j",
@@ -154,7 +159,7 @@
     "s",
     "o",
     "n",
-    "d"
+    "d",
   ],
   month_format_wide => [
     "januara",
@@ -168,7 +173,7 @@
     "septembra",
     "oktobra",
     "nowembra",
-    "decembra"
+    "decembra",
   ],
   month_stand_alone_abbreviated => [
     "jan",
@@ -182,7 +187,7 @@
     "sep",
     "okt",
     "now",
-    "dec"
+    "dec",
   ],
   month_stand_alone_narrow => [
     "j",
@@ -196,7 +201,7 @@
     "s",
     "o",
     "n",
-    "d"
+    "d",
   ],
   month_stand_alone_wide => [
     "januar",
@@ -210,7 +215,7 @@
     "september",
     "oktober",
     "nowember",
-    "december"
+    "december",
   ],
   name => "Upper Sorbian",
   native_language => "hornjoserb\N{U+0161}\N{U+0107}ina",
@@ -222,37 +227,37 @@
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "1. kwartal",
     "2. kwartal",
     "3. kwartal",
-    "4. kwartal"
+    "4. kwartal",
   ],
   quarter_stand_alone_abbreviated => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "1. kwartal",
     "2. kwartal",
     "3. kwartal",
-    "4. kwartal"
+    "4. kwartal",
   ],
   script => undef,
   territory => undef,
@@ -261,5 +266,5 @@
   time_format_medium => "H:mm:ss",
   time_format_short => "H:mm 'hod\N{U+017a}'.",
   variant => undef,
-  version => 31
+  version => 32,
 }

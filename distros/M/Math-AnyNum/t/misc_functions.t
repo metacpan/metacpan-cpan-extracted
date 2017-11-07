@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 282;
+plan tests => 288;
 
 use Math::AnyNum qw(:misc);
 
@@ -333,6 +333,14 @@ ok(is_odd(rat('43')));
 ok(is_odd(float('43')));
 ok(is_odd(complex('43')));
 
+ok(!is_div(int('55'), 13));
+ok(!is_div(int('55'), int('13')));
+
+ok(!is_div(123, 11));
+ok(!is_div(123, int(11)));
+
+ok(is_div(int('42'),      int('3')));
+ok(is_div(int('42'),      '2'));
 ok(is_div('42',           '2'));
 ok(is_div('4i',           '2'));
 ok(is_div(complex('12i'), '3'));

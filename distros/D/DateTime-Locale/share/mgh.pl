@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "wichishu",
-    "mchochil\N{U+2019}l"
+    "mchochil\N{U+2019}l",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "E d",
@@ -44,7 +49,7 @@
     yMd => "d/M/y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "mgh",
   date_format_full => "EEEE, d MMMM y",
@@ -62,7 +67,7 @@
     "Ara",
     "Iju",
     "Jmo",
-    "Sab"
+    "Sab",
   ],
   day_format_narrow => [
     "J",
@@ -71,7 +76,7 @@
     "A",
     "I",
     "J",
-    "S"
+    "S",
   ],
   day_format_wide => [
     "Jumatatu",
@@ -80,7 +85,7 @@
     "Arahamisi",
     "Ijumaa",
     "Jumamosi",
-    "Sabato"
+    "Sabato",
   ],
   day_stand_alone_abbreviated => [
     "Jtt",
@@ -89,7 +94,7 @@
     "Ara",
     "Iju",
     "Jmo",
-    "Sab"
+    "Sab",
   ],
   day_stand_alone_narrow => [
     "J",
@@ -98,7 +103,7 @@
     "A",
     "I",
     "J",
-    "S"
+    "S",
   ],
   day_stand_alone_wide => [
     "Jumatatu",
@@ -107,19 +112,19 @@
     "Arahamisi",
     "Ijumaa",
     "Jumamosi",
-    "Sabato"
+    "Sabato",
   ],
   era_abbreviated => [
     "HY",
-    "YY"
+    "YY",
   ],
   era_narrow => [
     "HY",
-    "YY"
+    "YY",
   ],
   era_wide => [
     "Hinapiya yesu",
-    "Yopia yesu"
+    "Yopia yesu",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -140,7 +145,7 @@
     "Tis",
     "Kum",
     "Moj",
-    "Yel"
+    "Yel",
   ],
   month_format_narrow => [
     "K",
@@ -154,7 +159,7 @@
     "T",
     "K",
     "M",
-    "Y"
+    "Y",
   ],
   month_format_wide => [
     "Mweri wo kwanza",
@@ -168,7 +173,7 @@
     "Mweri wo tisa",
     "Mweri wo kumi",
     "Mweri wo kumi na moja",
-    "Mweri wo kumi na yel\N{U+2019}li"
+    "Mweri wo kumi na yel\N{U+2019}li",
   ],
   month_stand_alone_abbreviated => [
     "Kwa",
@@ -182,7 +187,7 @@
     "Tis",
     "Kum",
     "Moj",
-    "Yel"
+    "Yel",
   ],
   month_stand_alone_narrow => [
     "K",
@@ -196,7 +201,7 @@
     "T",
     "K",
     "M",
-    "Y"
+    "Y",
   ],
   month_stand_alone_wide => [
     "Mweri wo kwanza",
@@ -210,7 +215,7 @@
     "Mweri wo tisa",
     "Mweri wo kumi",
     "Mweri wo kumi na moja",
-    "Mweri wo kumi na yel\N{U+2019}li"
+    "Mweri wo kumi na yel\N{U+2019}li",
   ],
   name => "Makhuwa-Meetto",
   native_language => "Makua",
@@ -222,37 +227,37 @@
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_stand_alone_abbreviated => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   script => undef,
   territory => undef,
@@ -261,5 +266,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

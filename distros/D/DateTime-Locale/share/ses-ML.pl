@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "Adduha",
-    "Aluula"
+    "Aluula",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d, E",
@@ -48,7 +53,7 @@
     yMd => "y-MM-dd",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "ses-ML",
   date_format_full => "EEEE d MMMM y",
@@ -66,7 +71,7 @@
     "Alm",
     "Alz",
     "Asi",
-    "Alh"
+    "Alh",
   ],
   day_format_narrow => [
     "T",
@@ -75,7 +80,7 @@
     "L",
     "L",
     "S",
-    "H"
+    "H",
   ],
   day_format_wide => [
     "Atinni",
@@ -84,7 +89,7 @@
     "Alhamiisa",
     "Alzuma",
     "Asibti",
-    "Alhadi"
+    "Alhadi",
   ],
   day_stand_alone_abbreviated => [
     "Ati",
@@ -93,7 +98,7 @@
     "Alm",
     "Alz",
     "Asi",
-    "Alh"
+    "Alh",
   ],
   day_stand_alone_narrow => [
     "T",
@@ -102,7 +107,7 @@
     "L",
     "L",
     "S",
-    "H"
+    "H",
   ],
   day_stand_alone_wide => [
     "Atinni",
@@ -111,19 +116,19 @@
     "Alhamiisa",
     "Alzuma",
     "Asibti",
-    "Alhadi"
+    "Alhadi",
   ],
   era_abbreviated => [
     "IJ",
-    "IZ"
+    "IZ",
   ],
   era_narrow => [
     "IJ",
-    "IZ"
+    "IZ",
   ],
   era_wide => [
     "Isaa jine",
-    "Isaa zamanoo"
+    "Isaa zamanoo",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -144,7 +149,7 @@
     "Sek",
     "Okt",
     "Noo",
-    "Dee"
+    "Dee",
   ],
   month_format_narrow => [
     "\N{U+017d}",
@@ -158,7 +163,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_format_wide => [
     "\N{U+017d}anwiye",
@@ -172,7 +177,7 @@
     "Sektanbur",
     "Oktoobur",
     "Noowanbur",
-    "Deesanbur"
+    "Deesanbur",
   ],
   month_stand_alone_abbreviated => [
     "\N{U+017d}an",
@@ -186,7 +191,7 @@
     "Sek",
     "Okt",
     "Noo",
-    "Dee"
+    "Dee",
   ],
   month_stand_alone_narrow => [
     "\N{U+017d}",
@@ -200,7 +205,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_stand_alone_wide => [
     "\N{U+017d}anwiye",
@@ -214,7 +219,7 @@
     "Sektanbur",
     "Oktoobur",
     "Noowanbur",
-    "Deesanbur"
+    "Deesanbur",
   ],
   name => "Koyraboro Senni Mali",
   native_language => "Koyraboro senni",
@@ -226,37 +231,37 @@
     "A1",
     "A2",
     "A3",
-    "A4"
+    "A4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "Arrubu 1",
     "Arrubu 2",
     "Arrubu 3",
-    "Arrubu 4"
+    "Arrubu 4",
   ],
   quarter_stand_alone_abbreviated => [
     "A1",
     "A2",
     "A3",
-    "A4"
+    "A4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "Arrubu 1",
     "Arrubu 2",
     "Arrubu 3",
-    "Arrubu 4"
+    "Arrubu 4",
   ],
   script => undef,
   territory => "Mali",
@@ -265,5 +270,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

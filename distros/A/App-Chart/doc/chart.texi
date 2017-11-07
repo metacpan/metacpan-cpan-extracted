@@ -803,11 +803,11 @@ downloads.  (The command is the same as an ``update'', because an update of a
 stock with no data means do an initial download.)  For example,
 
 @example
-chart --download TSCO.L RNO.PA TEL.NZ BMW.DE
+chart --download TSCO.L RNO.PA FBU.NZ BMW.DE
 @end example
 @c SYMBOL: TSCO.L
 @c SYMBOL: RNO.PA
-@c SYMBOL: TEL.NZ
+@c SYMBOL: FBU.NZ
 @c SYMBOL: BMW.DE
 
 The TreeView in the dialog has an irritating animated arrow when expanding or
@@ -5568,8 +5568,8 @@ Quotes, real-time for indexes and delayed for shares.
 @c Intraday graphs.
 @item
 Historical daily data, dividends and splits.
-@item
-Upcoming dividends.
+@c @item
+@c Upcoming dividends.
 @end itemize
 
 Yahoo does not allow commercial use, see the terms of service at
@@ -5593,18 +5593,27 @@ sites),
 
 @cindex Currencies
 @cindex Metals, spot prices
-Some currency cross-rates are available, they take a form such as
-@samp{AUDUSD=X} for the value of one Australian dollar in US dollars.  Some
-spot metals prices are available in a similar form, for example
-@samp{XAUUSD=X} for Gold in US dollars.
+Some currency cross-rates are available, they take a form like @samp{AUDUSD=X}
+for the value of one Australian dollar in US dollars.  Some spot metals prices
+are available similarly, for example @samp{XAUUSD=X} for Gold in US dollars
+(but perhaps only quotes, not historical).
 @c SYMBOL: AUDUSD=X
 @c SYMBOL: XAUUSD=X
 
 Yahoo gives some information on market closing times, but Chart doesn't make
 use of that.  A day's trading is written as daily data at 6pm (in the
-exchange's timezone).  Before that the current day is a latest quote.  The
-downloads are slightly overlapped so that if 6pm was too soon then its prices
+exchange's timezone).  Before that the current day is a latest quote.
+Downloads are slightly overlapped so that if 6pm was too soon then its prices
 are replaced on a subsequent download.
+
+Currently quotes are only the current day's open/high/low/last in the manner
+of the historical data, so without bid/offer.
+
+Currently splits are not handled properly.  Yahoo supplies historical prices
+adjusted for subsequent splits, but the intention in Chart is to have original
+prices and adjust on display if desired.  The effect in the database is to
+make a bit of a mess with new downloads having new splits and past downloads
+not.
 
 @c Dividends are re-downloaded weekly.  They seem to be a bit patchy, with not
 @c all dividends actually appearing in the data for some stocks.  The most recent

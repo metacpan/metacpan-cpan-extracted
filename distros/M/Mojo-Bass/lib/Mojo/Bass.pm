@@ -1,6 +1,6 @@
 
 package Mojo::Bass;
-$Mojo::Bass::VERSION = '0.1.1';
+$Mojo::Bass::VERSION = '0.2.0';
 # ABSTRACT: Mojo::Base + lexical "has"
 use 5.018;
 use Mojo::Base -strict;
@@ -13,16 +13,16 @@ use Sub::Inject 0.2.0 ();
 
 sub import {
   my $class = shift;
-  return unless my $flag = shift;
+  return unless my @flags = @_;
 
   # Base
-  if ($flag eq '-base') { $flag = $class }
+  if ($flags[0] eq '-base') { $flags[0] = $class }
 
   # Strict
-  elsif ($flag eq '-strict') { $flag = undef }
+  elsif ($flags[0] eq '-strict') { $flags[0] = undef }
 
   # Module
-  elsif ((my $file = $flag) && !$flag->can('new')) {
+  elsif ((my $file = $flags[0]) && !$flags[0]->can('new')) {
     $file =~ s!::|'!/!g;
     require "$file.pm";
   }
@@ -31,11 +31,18 @@ sub import {
   $_->import for qw(strict warnings utf8);
   feature->import(':5.10');
 
+  # Signatures (Perl 5.20+)
+  if (($flags[1] || '') eq '-signatures') {
+    Carp::croak 'Subroutine signatures require Perl 5.20+' if $] < 5.020;
+    feature->import('signatures');
+    warnings->unimport('experimental::signatures');
+  }
+
   # ISA
-  if ($flag) {
+  if ($flags[0]) {
     my $caller = caller;
     no strict 'refs';
-    push @{"${caller}::ISA"}, $flag;
+    push @{"${caller}::ISA"}, $flags[0];
     @_ = ($caller, has => sub { Mojo::Base::attr($caller, @_) });
     goto &{$class->can('_export_into')};
   }
@@ -116,7 +123,7 @@ Mojo::Bass - Mojo::Base + lexical "has"
 
 =head1 VERSION
 
-version 0.1.1
+version 0.2.0
 
 =head1 SYNOPSIS
 

@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "\N{U+0f66}\N{U+0f94}\N{U+0f0b}\N{U+0f51}\N{U+0fb2}\N{U+0f7c}\N{U+0f0b}",
-    "\N{U+0f55}\N{U+0fb1}\N{U+0f72}\N{U+0f0b}\N{U+0f51}\N{U+0fb2}\N{U+0f7c}\N{U+0f0b}"
+    "\N{U+0f55}\N{U+0fb1}\N{U+0f72}\N{U+0f0b}\N{U+0f51}\N{U+0fb2}\N{U+0f7c}\N{U+0f0b}",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d, E",
@@ -45,7 +50,7 @@
     yMd => "y-MM-dd",
     yQQQ => "y QQQ",
     yQQQQ => "y QQQQ",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "bo-IN",
   date_format_full => "y MMMM\N{U+0f60}\N{U+0f72}\N{U+0f0b}\N{U+0f5a}\N{U+0f7a}\N{U+0f66}\N{U+0f0b}d, EEEE",
@@ -63,7 +68,7 @@
     "\N{U+0f55}\N{U+0f74}\N{U+0f62}\N{U+0f0b}\N{U+0f56}\N{U+0f74}\N{U+0f0b}",
     "\N{U+0f54}\N{U+0f0b}\N{U+0f66}\N{U+0f44}\N{U+0f66}\N{U+0f0b}",
     "\N{U+0f66}\N{U+0fa4}\N{U+0f7a}\N{U+0f53}\N{U+0f0b}\N{U+0f54}\N{U+0f0b}",
-    "\N{U+0f49}\N{U+0f72}\N{U+0f0b}\N{U+0f58}\N{U+0f0b}"
+    "\N{U+0f49}\N{U+0f72}\N{U+0f0b}\N{U+0f58}\N{U+0f0b}",
   ],
   day_format_narrow => [
     "\N{U+0f5f}\N{U+0fb3}",
@@ -72,7 +77,7 @@
     "\N{U+0f55}\N{U+0f74}\N{U+0f62}",
     "\N{U+0f66}\N{U+0f44}\N{U+0f66}",
     "\N{U+0f66}\N{U+0fa4}\N{U+0f7a}\N{U+0f53}",
-    "\N{U+0f49}\N{U+0f72}"
+    "\N{U+0f49}\N{U+0f72}",
   ],
   day_format_wide => [
     "\N{U+0f42}\N{U+0f5f}\N{U+0f60}\N{U+0f0b}\N{U+0f5f}\N{U+0fb3}\N{U+0f0b}\N{U+0f56}\N{U+0f0b}",
@@ -81,7 +86,7 @@
     "\N{U+0f42}\N{U+0f5f}\N{U+0f60}\N{U+0f0b}\N{U+0f55}\N{U+0f74}\N{U+0f62}\N{U+0f0b}\N{U+0f56}\N{U+0f74}\N{U+0f0b}",
     "\N{U+0f42}\N{U+0f5f}\N{U+0f60}\N{U+0f0b}\N{U+0f54}\N{U+0f0b}\N{U+0f66}\N{U+0f44}\N{U+0f66}\N{U+0f0b}",
     "\N{U+0f42}\N{U+0f5f}\N{U+0f60}\N{U+0f0b}\N{U+0f66}\N{U+0fa4}\N{U+0f7a}\N{U+0f53}\N{U+0f0b}\N{U+0f54}\N{U+0f0b}",
-    "\N{U+0f42}\N{U+0f5f}\N{U+0f60}\N{U+0f0b}\N{U+0f49}\N{U+0f72}\N{U+0f0b}\N{U+0f58}\N{U+0f0b}"
+    "\N{U+0f42}\N{U+0f5f}\N{U+0f60}\N{U+0f0b}\N{U+0f49}\N{U+0f72}\N{U+0f0b}\N{U+0f58}\N{U+0f0b}",
   ],
   day_stand_alone_abbreviated => [
     "\N{U+0f5f}\N{U+0fb3}\N{U+0f0b}\N{U+0f56}\N{U+0f0b}",
@@ -90,7 +95,7 @@
     "\N{U+0f55}\N{U+0f74}\N{U+0f62}\N{U+0f0b}\N{U+0f56}\N{U+0f74}\N{U+0f0b}",
     "\N{U+0f54}\N{U+0f0b}\N{U+0f66}\N{U+0f44}\N{U+0f66}\N{U+0f0b}",
     "\N{U+0f66}\N{U+0fa4}\N{U+0f7a}\N{U+0f53}\N{U+0f0b}\N{U+0f54}\N{U+0f0b}",
-    "\N{U+0f49}\N{U+0f72}\N{U+0f0b}\N{U+0f58}\N{U+0f0b}"
+    "\N{U+0f49}\N{U+0f72}\N{U+0f0b}\N{U+0f58}\N{U+0f0b}",
   ],
   day_stand_alone_narrow => [
     "\N{U+0f5f}\N{U+0fb3}",
@@ -99,7 +104,7 @@
     "\N{U+0f55}\N{U+0f74}\N{U+0f62}",
     "\N{U+0f66}\N{U+0f44}\N{U+0f66}",
     "\N{U+0f66}\N{U+0fa4}\N{U+0f7a}\N{U+0f53}",
-    "\N{U+0f49}\N{U+0f72}"
+    "\N{U+0f49}\N{U+0f72}",
   ],
   day_stand_alone_wide => [
     "\N{U+0f42}\N{U+0f5f}\N{U+0f60}\N{U+0f0b}\N{U+0f5f}\N{U+0fb3}\N{U+0f0b}\N{U+0f56}\N{U+0f0b}",
@@ -108,19 +113,19 @@
     "\N{U+0f42}\N{U+0f5f}\N{U+0f60}\N{U+0f0b}\N{U+0f55}\N{U+0f74}\N{U+0f62}\N{U+0f0b}\N{U+0f56}\N{U+0f74}\N{U+0f0b}",
     "\N{U+0f42}\N{U+0f5f}\N{U+0f60}\N{U+0f0b}\N{U+0f54}\N{U+0f0b}\N{U+0f66}\N{U+0f44}\N{U+0f66}\N{U+0f0b}",
     "\N{U+0f42}\N{U+0f5f}\N{U+0f60}\N{U+0f0b}\N{U+0f66}\N{U+0fa4}\N{U+0f7a}\N{U+0f53}\N{U+0f0b}\N{U+0f54}\N{U+0f0b}",
-    "\N{U+0f42}\N{U+0f5f}\N{U+0f60}\N{U+0f0b}\N{U+0f49}\N{U+0f72}\N{U+0f0b}\N{U+0f58}\N{U+0f0b}"
+    "\N{U+0f42}\N{U+0f5f}\N{U+0f60}\N{U+0f0b}\N{U+0f49}\N{U+0f72}\N{U+0f0b}\N{U+0f58}\N{U+0f0b}",
   ],
   era_abbreviated => [
     "\N{U+0f66}\N{U+0fa4}\N{U+0fb1}\N{U+0f72}\N{U+0f0b}\N{U+0f63}\N{U+0f7c}\N{U+0f0b}\N{U+0f66}\N{U+0f94}\N{U+0f7c}\N{U+0f53}\N{U+0f0b}",
-    "\N{U+0f66}\N{U+0fa4}\N{U+0fb1}\N{U+0f72}\N{U+0f0b}\N{U+0f63}\N{U+0f7c}\N{U+0f0b}"
+    "\N{U+0f66}\N{U+0fa4}\N{U+0fb1}\N{U+0f72}\N{U+0f0b}\N{U+0f63}\N{U+0f7c}\N{U+0f0b}",
   ],
   era_narrow => [
     "\N{U+0f66}\N{U+0fa4}\N{U+0fb1}\N{U+0f72}\N{U+0f0b}\N{U+0f63}\N{U+0f7c}\N{U+0f0b}\N{U+0f66}\N{U+0f94}\N{U+0f7c}\N{U+0f53}\N{U+0f0b}",
-    "\N{U+0f66}\N{U+0fa4}\N{U+0fb1}\N{U+0f72}\N{U+0f0b}\N{U+0f63}\N{U+0f7c}\N{U+0f0b}"
+    "\N{U+0f66}\N{U+0fa4}\N{U+0fb1}\N{U+0f72}\N{U+0f0b}\N{U+0f63}\N{U+0f7c}\N{U+0f0b}",
   ],
   era_wide => [
     "\N{U+0f66}\N{U+0fa4}\N{U+0fb1}\N{U+0f72}\N{U+0f0b}\N{U+0f63}\N{U+0f7c}\N{U+0f0b}\N{U+0f66}\N{U+0f94}\N{U+0f7c}\N{U+0f53}\N{U+0f0b}",
-    "\N{U+0f66}\N{U+0fa4}\N{U+0fb1}\N{U+0f72}\N{U+0f0b}\N{U+0f63}\N{U+0f7c}\N{U+0f0b}"
+    "\N{U+0f66}\N{U+0fa4}\N{U+0fb1}\N{U+0f72}\N{U+0f0b}\N{U+0f63}\N{U+0f7c}\N{U+0f0b}",
   ],
   first_day_of_week => 7,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -141,7 +146,7 @@
     "\N{U+0f5f}\N{U+0fb3}\N{U+0f0b}\N{U+0f29}",
     "\N{U+0f5f}\N{U+0fb3}\N{U+0f0b}\N{U+0f21}\N{U+0f20}",
     "\N{U+0f5f}\N{U+0fb3}\N{U+0f0b}\N{U+0f21}\N{U+0f21}",
-    "\N{U+0f5f}\N{U+0fb3}\N{U+0f0b}\N{U+0f21}\N{U+0f22}"
+    "\N{U+0f5f}\N{U+0fb3}\N{U+0f0b}\N{U+0f21}\N{U+0f22}",
   ],
   month_format_narrow => [
     1,
@@ -155,7 +160,7 @@
     9,
     10,
     11,
-    12
+    12,
   ],
   month_format_wide => [
     "\N{U+0f5f}\N{U+0fb3}\N{U+0f0b}\N{U+0f56}\N{U+0f0b}\N{U+0f51}\N{U+0f44}\N{U+0f0b}\N{U+0f54}\N{U+0f7c}",
@@ -169,7 +174,7 @@
     "\N{U+0f5f}\N{U+0fb3}\N{U+0f0b}\N{U+0f56}\N{U+0f0b}\N{U+0f51}\N{U+0f42}\N{U+0f74}\N{U+0f0b}\N{U+0f54}",
     "\N{U+0f5f}\N{U+0fb3}\N{U+0f0b}\N{U+0f56}\N{U+0f0b}\N{U+0f56}\N{U+0f45}\N{U+0f74}\N{U+0f0b}\N{U+0f54}",
     "\N{U+0f5f}\N{U+0fb3}\N{U+0f0b}\N{U+0f56}\N{U+0f0b}\N{U+0f56}\N{U+0f45}\N{U+0f74}\N{U+0f0b}\N{U+0f42}\N{U+0f45}\N{U+0f72}\N{U+0f42}\N{U+0f0b}\N{U+0f54}",
-    "\N{U+0f5f}\N{U+0fb3}\N{U+0f0b}\N{U+0f56}\N{U+0f0b}\N{U+0f56}\N{U+0f45}\N{U+0f74}\N{U+0f0b}\N{U+0f42}\N{U+0f49}\N{U+0f72}\N{U+0f66}\N{U+0f0b}\N{U+0f54}"
+    "\N{U+0f5f}\N{U+0fb3}\N{U+0f0b}\N{U+0f56}\N{U+0f0b}\N{U+0f56}\N{U+0f45}\N{U+0f74}\N{U+0f0b}\N{U+0f42}\N{U+0f49}\N{U+0f72}\N{U+0f66}\N{U+0f0b}\N{U+0f54}",
   ],
   month_stand_alone_abbreviated => [
     "\N{U+0f5f}\N{U+0fb3}\N{U+0f0b}\N{U+0f21}",
@@ -183,7 +188,7 @@
     "\N{U+0f5f}\N{U+0fb3}\N{U+0f0b}\N{U+0f29}",
     "\N{U+0f5f}\N{U+0fb3}\N{U+0f0b}\N{U+0f21}\N{U+0f20}",
     "\N{U+0f5f}\N{U+0fb3}\N{U+0f0b}\N{U+0f21}\N{U+0f21}",
-    "\N{U+0f5f}\N{U+0fb3}\N{U+0f0b}\N{U+0f21}\N{U+0f22}"
+    "\N{U+0f5f}\N{U+0fb3}\N{U+0f0b}\N{U+0f21}\N{U+0f22}",
   ],
   month_stand_alone_narrow => [
     1,
@@ -197,7 +202,7 @@
     9,
     10,
     11,
-    12
+    12,
   ],
   month_stand_alone_wide => [
     "\N{U+0f5f}\N{U+0fb3}\N{U+0f0b}\N{U+0f56}\N{U+0f0b}\N{U+0f51}\N{U+0f44}\N{U+0f0b}\N{U+0f54}\N{U+0f7c}\N{U+0f0b}",
@@ -211,7 +216,7 @@
     "\N{U+0f5f}\N{U+0fb3}\N{U+0f0b}\N{U+0f56}\N{U+0f0b}\N{U+0f51}\N{U+0f42}\N{U+0f74}\N{U+0f0b}\N{U+0f54}\N{U+0f0b}",
     "\N{U+0f5f}\N{U+0fb3}\N{U+0f0b}\N{U+0f56}\N{U+0f0b}\N{U+0f56}\N{U+0f45}\N{U+0f74}\N{U+0f0b}\N{U+0f54}\N{U+0f0b}",
     "\N{U+0f5f}\N{U+0fb3}\N{U+0f0b}\N{U+0f56}\N{U+0f0b}\N{U+0f56}\N{U+0f45}\N{U+0f74}\N{U+0f0b}\N{U+0f42}\N{U+0f45}\N{U+0f72}\N{U+0f42}\N{U+0f0b}\N{U+0f54}\N{U+0f0b}",
-    "\N{U+0f5f}\N{U+0fb3}\N{U+0f0b}\N{U+0f56}\N{U+0f0b}\N{U+0f56}\N{U+0f45}\N{U+0f74}\N{U+0f0b}\N{U+0f42}\N{U+0f49}\N{U+0f72}\N{U+0f66}\N{U+0f0b}\N{U+0f54}\N{U+0f0b}"
+    "\N{U+0f5f}\N{U+0fb3}\N{U+0f0b}\N{U+0f56}\N{U+0f0b}\N{U+0f56}\N{U+0f45}\N{U+0f74}\N{U+0f0b}\N{U+0f42}\N{U+0f49}\N{U+0f72}\N{U+0f66}\N{U+0f0b}\N{U+0f54}\N{U+0f0b}",
   ],
   name => "Tibetan India",
   native_language => "\N{U+0f56}\N{U+0f7c}\N{U+0f51}\N{U+0f0b}\N{U+0f66}\N{U+0f90}\N{U+0f51}\N{U+0f0b}",
@@ -223,37 +228,37 @@
     "\N{U+0f51}\N{U+0f74}\N{U+0f66}\N{U+0f0b}\N{U+0f5a}\N{U+0f72}\N{U+0f42}\N{U+0f66}\N{U+0f0b}\N{U+0f51}\N{U+0f44}\N{U+0f0b}\N{U+0f54}\N{U+0f7c}\N{U+0f0d}",
     "\N{U+0f51}\N{U+0f74}\N{U+0f66}\N{U+0f0b}\N{U+0f5a}\N{U+0f72}\N{U+0f42}\N{U+0f66}\N{U+0f0b}\N{U+0f42}\N{U+0f49}\N{U+0f72}\N{U+0f66}\N{U+0f0b}\N{U+0f54}\N{U+0f0d}",
     "\N{U+0f51}\N{U+0f74}\N{U+0f66}\N{U+0f0b}\N{U+0f5a}\N{U+0f72}\N{U+0f42}\N{U+0f66}\N{U+0f0b}\N{U+0f42}\N{U+0f66}\N{U+0f74}\N{U+0f58}\N{U+0f0b}\N{U+0f54}\N{U+0f0d}",
-    "\N{U+0f51}\N{U+0f74}\N{U+0f66}\N{U+0f0b}\N{U+0f5a}\N{U+0f72}\N{U+0f42}\N{U+0f66}\N{U+0f0b}\N{U+0f56}\N{U+0f5e}\N{U+0f72}\N{U+0f0b}\N{U+0f54}\N{U+0f0d}"
+    "\N{U+0f51}\N{U+0f74}\N{U+0f66}\N{U+0f0b}\N{U+0f5a}\N{U+0f72}\N{U+0f42}\N{U+0f66}\N{U+0f0b}\N{U+0f56}\N{U+0f5e}\N{U+0f72}\N{U+0f0b}\N{U+0f54}\N{U+0f0d}",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "\N{U+0f51}\N{U+0f74}\N{U+0f66}\N{U+0f0b}\N{U+0f5a}\N{U+0f72}\N{U+0f42}\N{U+0f66}\N{U+0f0b}\N{U+0f51}\N{U+0f44}\N{U+0f0b}\N{U+0f54}\N{U+0f7c}\N{U+0f0d}",
     "\N{U+0f51}\N{U+0f74}\N{U+0f66}\N{U+0f0b}\N{U+0f5a}\N{U+0f72}\N{U+0f42}\N{U+0f66}\N{U+0f0b}\N{U+0f42}\N{U+0f49}\N{U+0f72}\N{U+0f66}\N{U+0f0b}\N{U+0f54}\N{U+0f0d}",
     "\N{U+0f51}\N{U+0f74}\N{U+0f66}\N{U+0f0b}\N{U+0f5a}\N{U+0f72}\N{U+0f42}\N{U+0f66}\N{U+0f0b}\N{U+0f42}\N{U+0f66}\N{U+0f74}\N{U+0f58}\N{U+0f0b}\N{U+0f54}\N{U+0f0d}",
-    "\N{U+0f51}\N{U+0f74}\N{U+0f66}\N{U+0f0b}\N{U+0f5a}\N{U+0f72}\N{U+0f42}\N{U+0f66}\N{U+0f0b}\N{U+0f56}\N{U+0f5e}\N{U+0f72}\N{U+0f0b}\N{U+0f54}\N{U+0f0d}"
+    "\N{U+0f51}\N{U+0f74}\N{U+0f66}\N{U+0f0b}\N{U+0f5a}\N{U+0f72}\N{U+0f42}\N{U+0f66}\N{U+0f0b}\N{U+0f56}\N{U+0f5e}\N{U+0f72}\N{U+0f0b}\N{U+0f54}\N{U+0f0d}",
   ],
   quarter_stand_alone_abbreviated => [
     "\N{U+0f51}\N{U+0f74}\N{U+0f66}\N{U+0f0b}\N{U+0f5a}\N{U+0f72}\N{U+0f42}\N{U+0f66}\N{U+0f0b}\N{U+0f51}\N{U+0f44}\N{U+0f0b}\N{U+0f54}\N{U+0f7c}\N{U+0f0d}",
     "\N{U+0f51}\N{U+0f74}\N{U+0f66}\N{U+0f0b}\N{U+0f5a}\N{U+0f72}\N{U+0f42}\N{U+0f66}\N{U+0f0b}\N{U+0f42}\N{U+0f49}\N{U+0f72}\N{U+0f66}\N{U+0f0b}\N{U+0f54}\N{U+0f0d}",
     "\N{U+0f51}\N{U+0f74}\N{U+0f66}\N{U+0f0b}\N{U+0f5a}\N{U+0f72}\N{U+0f42}\N{U+0f66}\N{U+0f0b}\N{U+0f42}\N{U+0f66}\N{U+0f74}\N{U+0f58}\N{U+0f0b}\N{U+0f54}\N{U+0f0d}",
-    "\N{U+0f51}\N{U+0f74}\N{U+0f66}\N{U+0f0b}\N{U+0f5a}\N{U+0f72}\N{U+0f42}\N{U+0f66}\N{U+0f0b}\N{U+0f56}\N{U+0f5e}\N{U+0f72}\N{U+0f0b}\N{U+0f54}\N{U+0f0d}"
+    "\N{U+0f51}\N{U+0f74}\N{U+0f66}\N{U+0f0b}\N{U+0f5a}\N{U+0f72}\N{U+0f42}\N{U+0f66}\N{U+0f0b}\N{U+0f56}\N{U+0f5e}\N{U+0f72}\N{U+0f0b}\N{U+0f54}\N{U+0f0d}",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "\N{U+0f51}\N{U+0f74}\N{U+0f66}\N{U+0f0b}\N{U+0f5a}\N{U+0f72}\N{U+0f42}\N{U+0f66}\N{U+0f0b}\N{U+0f51}\N{U+0f44}\N{U+0f0b}\N{U+0f54}\N{U+0f7c}\N{U+0f0d}",
     "\N{U+0f51}\N{U+0f74}\N{U+0f66}\N{U+0f0b}\N{U+0f5a}\N{U+0f72}\N{U+0f42}\N{U+0f66}\N{U+0f0b}\N{U+0f42}\N{U+0f49}\N{U+0f72}\N{U+0f66}\N{U+0f0b}\N{U+0f54}\N{U+0f0d}",
     "\N{U+0f51}\N{U+0f74}\N{U+0f66}\N{U+0f0b}\N{U+0f5a}\N{U+0f72}\N{U+0f42}\N{U+0f66}\N{U+0f0b}\N{U+0f42}\N{U+0f66}\N{U+0f74}\N{U+0f58}\N{U+0f0b}\N{U+0f54}\N{U+0f0d}",
-    "\N{U+0f51}\N{U+0f74}\N{U+0f66}\N{U+0f0b}\N{U+0f5a}\N{U+0f72}\N{U+0f42}\N{U+0f66}\N{U+0f0b}\N{U+0f56}\N{U+0f5e}\N{U+0f72}\N{U+0f0b}\N{U+0f54}\N{U+0f0d}"
+    "\N{U+0f51}\N{U+0f74}\N{U+0f66}\N{U+0f0b}\N{U+0f5a}\N{U+0f72}\N{U+0f42}\N{U+0f66}\N{U+0f0b}\N{U+0f56}\N{U+0f5e}\N{U+0f72}\N{U+0f0b}\N{U+0f54}\N{U+0f0d}",
   ],
   script => undef,
   territory => "India",
@@ -262,5 +267,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 31
+  version => 32,
 }

@@ -33,8 +33,76 @@ use Smart::Comments;
 
 
 {
+  # json v7 latest parse
+
+  my $symbol = 'NAB.AX';
+  my $filename = "$ENV{HOME}/chart/samples/yahoo/GXY-v7.json";
+  $filename = "$ENV{HOME}/chart/samples/yahoo/NOSUCH-v7.json";
+  $filename = "$ENV{HOME}/chart/samples/yahoo/GSPC-v7.json";
+  $filename = "$ENV{HOME}/chart/samples/yahoo/RMX-v7.json";
+  $filename = "$ENV{HOME}/chart/samples/yahoo/SCG-v7.json";
+  require HTTP::Response;
+  my $resp = HTTP::Response->new();
+  my $content = slurp ($filename);
+  $resp->content($content);
+  $resp->content_type('text/html; charset=utf-8');
+  my $h = App::Chart::Yahoo::latest_parse ($symbol, $resp);
+  print Dumper(\$h);
+  # App::Chart::Download::write_latest_group ($h);
+  exit 0;
+}
+{
+  # json v7 download
+
+  my $symbol;
+  $symbol = 'NAB.AX';
+  $symbol = 'FBU.AX';
+  $symbol = 'NOSUCH.AX';
+  $symbol = 'XAUUSD=X';
+  $symbol = '^AORD';
+  $symbol = '^GSPC';
+  $symbol = 'RMX.AX';
+  $symbol = 'SCG.AX';
+  my $end   = time() + 86400*2;
+  my $start = $end - 86400*10;
+
+  # # GXY.AX split 22 May 17
+  # $symbol = 'GXY.AX';
+  # require Time::Local;
+  # $start = Time::Local::timegm (0,0,0, 16, 5-1, 2017-1900);
+  # $end   = Time::Local::timegm (0,0,0, 28, 5-1, 2017-1900);
+
+  print POSIX::asctime(POSIX::gmtime($start));
+  print POSIX::asctime(POSIX::gmtime($end));
+
+  my $events;
+  $events = "div%7Csplit";
+  $events = "split";
+  $events = "div";
+  $events = "div|split";
+  $events = "history%7Cdiv%7Csplit";
+  my $url = "https://query1.finance.yahoo.com/v7/finance/chart/$symbol"
+    ."?period1=$start&period2=$end&interval=1d&events=$events";
+
+  # seem to be defaults:
+  # &includeTimestamps=true
+  # &indicators=quote
+
+  require App::Chart::UserAgent;
+  my $ua = App::Chart::UserAgent->instance;
+  my $resp = $ua->get($url);
+
+  my $content = $resp->decoded_content (raise_error => 1, charset => 'none');
+  File::Slurp::write_file('/tmp/z', {err_mode=>'carp'}, $content);
+  $content = $resp->decoded_content (raise_error => 1);
+  print $content;
+
+  exit 0;
+}
+{
+  # json v8 with flonum values rounding
+
   # https://query2.finance.yahoo.com/v8/finance/chart/IBM?formatted=true&lang=en-US&region=US&period1=1504028419&period2=1504428419&interval=1d&events=div%7Csplit&corsDomain=finance.yahoo.com
-  # json with flonum values rounding
 
   # https://forums.yahoo.net/t5/Yahoo-Finance-help/Is-Yahoo-Finance-API-broken/td-p/250503/page/14
 
@@ -86,18 +154,18 @@ use Smart::Comments;
   # GXY.AX split 22 May 17
   $symbol = 'GXY.AX';
   require Time::Local;
-  $start = Time::Local::timegm (0,0,0, 16, 7-1, 2017-1900);
-  $end   = Time::Local::timegm (0,0,0, 20, 7-1, 2017-1900);
+  $start = Time::Local::timegm (0,0,0, 16, 3-1, 2017-1900);
+  $end   = Time::Local::timegm (0,0,0, 20, 3-1, 2017-1900);
 
   print POSIX::asctime(POSIX::gmtime($start));
   print POSIX::asctime(POSIX::gmtime($end));
 
   my $events;
-  $events = "history%7Cdiv%7Csplit";
   $events = "div%7Csplit";
   $events = "split";
   $events = "div";
   $events = "history";
+  $events = "history|split";
   my $url = "https://query2.finance.yahoo.com/v8/finance/chart/$symbol?formatted=true&lang=en-US&region=US&period1=$start&period2=$end&interval=1d&events=$events&corsDomain=finance.yahoo.com";
 
   require App::Chart::UserAgent;
@@ -111,11 +179,7 @@ use Smart::Comments;
 
   exit 0;
 }
-{
-  # kill the crumb
-  App::Chart::Database->write_extra ('', 'yahoo-daily-cookies', undef);
-  exit;
-}
+
 {
   # Date,Dividends
   # 2014-05-14,1.41429
@@ -133,13 +197,21 @@ use Smart::Comments;
   # 2017-09-07,30.299999,30.379999,30.000000,30.170000,30.170000,3451099
   # 2017-09-08,30.170000,30.170000,29.830000,29.889999,29.889999,2129470
 
-  my $symbol = 'NAB.AX';
-  # $symbol = 'GXY.AX';
+  # NAB.AX Mon 6 Nov 2017 gives
+  # Date,Open,High,Low,Close,Adj Close,Volume
+  # 2017-11-01,31.889999,32.389999,31.809999,31.950001,31.950001,12516393
+  # 2017-11-02,32.000000,32.009998,31.610001,31.780001,31.780001,7329859
+  # 2017-11-05,31.830000,31.830000,31.610001,31.620001,31.620001,736485
+  # which is Thu 2 Nov and Sun 5 Nov, being 9:30am or some such in GMT
+
+  my $symbol;
   $symbol = 'NOSUCH.AX';
+  $symbol = 'NAB.AX';
+  $symbol = 'FBU.NZ';
   my $events;
   $events = 'div';
   $events = 'split';
-  $events = 'history';
+  $events = 'split|history';
 
   my $data  = App::Chart::Yahoo::daily_cookie_data($symbol);
   ### $data
@@ -150,9 +222,15 @@ use Smart::Comments;
   my $jar   = App::Chart::Yahoo::http_cookies_from_string($data->{'cookies'} // '');
   $ua->cookie_jar ($jar);
 
-  my $end   = time();
+  my $end   = time() + 86400  - 86400*90;
   my $start = $end - 86400*5;  # *365
-  my $url = "https://query1.finance.yahoo.com/v7/finance/download/$symbol?period1=$start&period2=$end&interval=1d&events=$events&crumb=$crumb";
+
+  # GXY.AX split 22 May 17
+  $symbol = 'GXY.AX';
+  $start = Time::Local::timegm (0,0,0, 10, 5-1, 2017-1900);
+  $end   = Time::Local::timegm (0,0,0, 30, 5-1, 2017-1900);
+
+  my $url = "https://query1.finance.yahoo.com/v7/finance/download/$symbol?period1=$start&period2=$end&interval=1d&region-AU&events=$events&crumb=$crumb";
   print "$url\n";
   my $resp = $ua->get($url);
   print "\n";
@@ -167,6 +245,93 @@ use Smart::Comments;
   print $content;
 
   exit 0;
+}
+
+{
+  my $symbol = 'NAB.AX';
+  $symbol = 'IBM';
+  $symbol = 'BLT.L';
+  $symbol = 'FBU.NZ';
+  my $timezone = App::Chart::TZ->for_symbol($symbol);
+
+  my $got;
+  my $offset;
+  $offset = App::Chart::Yahoo::daily_date_fixup($timezone,2017,11,5);
+  $got = App::Chart::Yahoo::daily_date_fixup($symbol,'2017-11-05');
+  ### $offset
+  ### $got
+
+  $offset = App::Chart::Yahoo::daily_date_fixup($timezone,2017,6,5);
+  $got = App::Chart::Yahoo::daily_date_fixup($symbol,'2017-06-05');
+  ### $offset
+  ### $got
+
+  print POSIX::asctime(POSIX::gmtime(1509874200));
+  print POSIX::asctime(POSIX::gmtime(1509927735));
+  print POSIX::asctime(POSIX::localtime(1509927735));
+  exit 0;
+}
+{
+  # daily_parse()
+
+  my $symbol = 'NAB.AX';
+  my $filename = "$ENV{HOME}/chart/samples/yahoo/daily.csv";
+  require HTTP::Response;
+  my $resp = HTTP::Response->new();
+  my $content = slurp ($filename);
+  $resp->content($content);
+  $resp->content_type('text/html; charset=utf-8');
+  my $h = { source          => __PACKAGE__,
+            prefer_decimals => 2,
+            date_format   => 'ymd',
+          };
+  App::Chart::Yahoo::daily_parse
+      ($symbol, $resp, $h, App::Chart::ymd_to_tdate_floor(2017,9,7));
+  print Dumper(\$h);
+  exit 0;
+
+  # (chart-quote "NAB.AX")
+  # (chart-latest "NAB.AX" 'last)
+}
+{
+  # latest_parse() for quotes
+
+  my $symbol = 'NAB.AX';
+  my $filename = "$ENV{HOME}/chart/samples/yahoo/daily.csv";
+  require HTTP::Response;
+  my $resp = HTTP::Response->new();
+  my $content = slurp ($filename);
+  $resp->content($content);
+  $resp->content_type('text/html; charset=utf-8');
+  my $h = App::Chart::Yahoo::latest_parse
+    ($symbol, $resp, App::Chart::ymd_to_tdate_floor(2017,9,1));
+  print Dumper(\$h);
+  # App::Chart::Download::write_latest_group ($h);
+  exit 0;
+
+  # (chart-quote "NAB.AX")
+  # (chart-latest "NAB.AX" 'last)
+}
+
+{
+  # 13:30
+  # -offset is 17:30
+  # +offset is  9:30
+  my $offset = -14400;
+  print POSIX::asctime(POSIX::gmtime(1504099800 + $offset));
+  print POSIX::asctime(POSIX::gmtime(1504272600 + $offset));
+
+  # 14:32
+  # +offset is 14:32
+  $offset = 36000;
+  print POSIX::asctime(POSIX::gmtime(1504845136 + $offset));
+  exit 0;
+}
+
+{
+  # kill the crumb
+  App::Chart::Database->write_extra ('', 'yahoo-daily-cookies', undef);
+  exit;
 }
 
 
@@ -362,7 +527,7 @@ use Smart::Comments;
 {
   my $timezone_gmt = App::Chart::TZ->new (tz => 'GMT');
   print $timezone_gmt->tz,"\n";
-  print App::Chart::Yahoo::mktime_in_zone (0,0,0,1,0,100, $timezone_gmt);
+  # print App::Chart::Yahoo::mktime_in_zone (0,0,0,1,0,100, $timezone_gmt);
   exit 0;
 }
 {
@@ -392,13 +557,6 @@ use Smart::Comments;
   my $content = slurp ('/nosuchfile');
   exit 0;
 }
-
-
-
-
-
-
-
 
 {
   my $zone = App::Chart::TZ->sydney;

@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "prie\N{U+0161}piet",
-    "popiet"
+    "popiet",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "h:mm B, E",
+    EBhms => "h:mm:ss B, E",
     EHm => "HH:mm, E",
     EHms => "HH:mm:ss, E",
     Ed => "d, E",
@@ -55,10 +60,10 @@
     yMd => "y-MM-dd",
     yQQQ => "y QQQ",
     yQQQQ => "y QQQQ",
-    "yw-count-few" => "y w 'sav'.",
-    "yw-count-many" => "y w 'sav'.",
-    "yw-count-one" => "y w 'sav'.",
-    "yw-count-other" => "y w 'sav'."
+    "yw-count-few" => "Y w 'sav'.",
+    "yw-count-many" => "Y w 'sav'.",
+    "yw-count-one" => "Y w 'sav'.",
+    "yw-count-other" => "Y w 'sav'.",
   },
   code => "lt",
   date_format_full => "y 'm'. MMMM d 'd'., EEEE",
@@ -76,7 +81,7 @@
     "kt",
     "pn",
     "\N{U+0161}t",
-    "sk"
+    "sk",
   ],
   day_format_narrow => [
     "P",
@@ -85,7 +90,7 @@
     "K",
     "P",
     "\N{U+0160}",
-    "S"
+    "S",
   ],
   day_format_wide => [
     "pirmadienis",
@@ -94,7 +99,7 @@
     "ketvirtadienis",
     "penktadienis",
     "\N{U+0161}e\N{U+0161}tadienis",
-    "sekmadienis"
+    "sekmadienis",
   ],
   day_stand_alone_abbreviated => [
     "pr",
@@ -103,7 +108,7 @@
     "kt",
     "pn",
     "\N{U+0161}t",
-    "sk"
+    "sk",
   ],
   day_stand_alone_narrow => [
     "P",
@@ -112,7 +117,7 @@
     "K",
     "P",
     "\N{U+0160}",
-    "S"
+    "S",
   ],
   day_stand_alone_wide => [
     "pirmadienis",
@@ -121,19 +126,19 @@
     "ketvirtadienis",
     "penktadienis",
     "\N{U+0161}e\N{U+0161}tadienis",
-    "sekmadienis"
+    "sekmadienis",
   ],
   era_abbreviated => [
     "pr. Kr.",
-    "po Kr."
+    "po Kr.",
   ],
   era_narrow => [
     "pr. Kr.",
-    "po Kr."
+    "po Kr.",
   ],
   era_wide => [
     "prie\N{U+0161} Krist\N{U+0173}",
-    "po Kristaus"
+    "po Kristaus",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -154,7 +159,7 @@
     "rugs.",
     "spal.",
     "lapkr.",
-    "gruod."
+    "gruod.",
   ],
   month_format_narrow => [
     "S",
@@ -168,7 +173,7 @@
     "R",
     "S",
     "L",
-    "G"
+    "G",
   ],
   month_format_wide => [
     "sausio",
@@ -182,7 +187,7 @@
     "rugs\N{U+0117}jo",
     "spalio",
     "lapkri\N{U+010d}io",
-    "gruod\N{U+017e}io"
+    "gruod\N{U+017e}io",
   ],
   month_stand_alone_abbreviated => [
     "saus.",
@@ -196,7 +201,7 @@
     "rugs.",
     "spal.",
     "lapkr.",
-    "gruod."
+    "gruod.",
   ],
   month_stand_alone_narrow => [
     "S",
@@ -210,7 +215,7 @@
     "R",
     "S",
     "L",
-    "G"
+    "G",
   ],
   month_stand_alone_wide => [
     "sausis",
@@ -224,7 +229,7 @@
     "rugs\N{U+0117}jis",
     "spalis",
     "lapkritis",
-    "gruodis"
+    "gruodis",
   ],
   name => "Lithuanian",
   native_language => "lietuvi\N{U+0173}",
@@ -236,37 +241,37 @@
     "I k.",
     "II k.",
     "III k.",
-    "IV k."
+    "IV k.",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "I ketvirtis",
     "II ketvirtis",
     "III ketvirtis",
-    "IV ketvirtis"
+    "IV ketvirtis",
   ],
   quarter_stand_alone_abbreviated => [
     "I ketv.",
     "II ketv.",
     "III ketv.",
-    "IV ketv."
+    "IV ketv.",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "I ketvirtis",
     "II ketvirtis",
     "III ketvirtis",
-    "IV ketvirtis"
+    "IV ketvirtis",
   ],
   script => undef,
   territory => undef,
@@ -275,5 +280,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

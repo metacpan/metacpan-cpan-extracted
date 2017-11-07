@@ -1,4 +1,4 @@
-ackage Net::Whois::Object::KeyCert::APNIC;
+package Net::Whois::Object::KeyCert::APNIC;
 
 use base qw/Net::Whois::Object/;
 

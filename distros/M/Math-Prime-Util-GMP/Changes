@@ -1,5 +1,61 @@
 Revision history for Perl module Math::Prime::Util::GMP
 
+0.48 2017-10-05
+
+    [FIXES]
+
+    - Issues with 32-bit GMP on 64-bit platforms.
+
+    - Use log instead of logl.
+
+
+0.47 2017-10-04
+
+    [ADDED]
+
+    - is_square(n)           Returns 1 if n is a perfect square
+    - is_carmichael(n)       Returns 1 if n is a Carmichael number
+    - is_fundamental(n)      Returns 1 if n is a fundamental discriminant
+    - is_totient(n)          Returns 1 if euler_phi(x) == n for some x
+    - is_polygonal(n,k)      Returns 1 if n is a k-gonal number
+    - polygonal_nth(n,k)     Returns N if n is the Nth k-gonal number
+    - logint(n,base)         Integer log: largest e s.t. b^e <= n
+    - factorialmod(n,m)      Returns n! mod m
+    - permtonum([...])       Returns rank of permutation array ref
+    - numtoperm(n,k)         Returns kth permutation of n elems
+    - hammingweight(n)       Returns bitwise population count of n
+
+    [FIXES]
+
+    - Random stream is identical on big-endian machines.  RT 122718
+
+    [PERFORMANCE]
+
+    - Use new sieve marking for prime_iterator.  Should give a very small
+      speedup to many functions.
+
+    - Remove unnecessary variable copy in AKS (is_primitive_root_uiprime).
+
+    - Slightly faster twin prime sieve by splitting BPSW test.
+
+    - Factoring is faster with new SQUFOF and native pbrent.
+
+    [OTHER]
+
+    - is_primitive_root internal func doesn't modify inputs.
+
+    - non-exported factor methods (e.g. squfof_factor, ecm_factor, etc.)
+      now always return smallest factor first.
+
+    - old native SQUFOF and GMP SQUFOF removed.
+
+    - On x86-64 use a very fast Pollard Rho Brent for 63-bit.
+
+    - On 64-bit platforms (long = 64-bit), use new SQUFOF126 which can
+      handle up to 126-bit inputs using only native math in the core.
+      This is about 10x faster than our old SQUFOF.
+
+
 0.46 2017-04-17
 
     [FIXES]

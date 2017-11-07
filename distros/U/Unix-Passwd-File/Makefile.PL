@@ -20,7 +20,7 @@ my %WriteMakefileArgs = (
     "Crypt::Password::Util" => "0.06",
     "File::Flock::Retry" => 0,
     "List::MoreUtils" => 0,
-    "List::Util" => 0,
+    "List::Util" => "1.45",
     "experimental" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -40,7 +40,7 @@ my %WriteMakefileArgs = (
     "lib" => 0,
     "vars" => 0
   },
-  "VERSION" => "0.24",
+  "VERSION" => "0.250",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -61,7 +61,7 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "List::MoreUtils" => 0,
-  "List::Util" => 0,
+  "List::Util" => "1.45",
   "Test::More" => "0.98",
   "experimental" => 0,
   "lib" => 0,

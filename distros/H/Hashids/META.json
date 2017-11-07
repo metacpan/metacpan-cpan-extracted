@@ -4,7 +4,7 @@
       "Zak B. Elep <zakame@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.12",
+   "generated_by" : "Minilla/v3.0.13",
    "license" : [
       "mit"
    ],
@@ -62,7 +62,7 @@
    "provides" : {
       "Hashids" : {
          "file" : "lib/Hashids.pm",
-         "version" : "1.000005"
+         "version" : "1.001000"
       },
       "Hashids::Util" : {
          "file" : "lib/Hashids/Util.pm"
@@ -79,7 +79,7 @@
          "web" : "https://github.com/zakame/hashids.pm"
       }
    },
-   "version" : "1.000005",
+   "version" : "1.001000",
    "x_contributors" : [
       "C. A. Church <thisdroneeatspeople@gmail.com>",
       "Troy Morehouse <troymore@nbnet.nb.ca>",

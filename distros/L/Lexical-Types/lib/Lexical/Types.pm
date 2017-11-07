@@ -11,13 +11,13 @@ Lexical::Types - Extend the semantics of typed lexicals.
 
 =head1 VERSION
 
-Version 0.15
+Version 0.16
 
 =cut
 
 our $VERSION;
 BEGIN {
- $VERSION = '0.15';
+ $VERSION = '0.16';
 }
 
 =head1 SYNOPSIS
@@ -321,7 +321,7 @@ Thanks Florian Ragwitz for suggesting the use of constants for types.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2009,2010,2011,2012,2013,2014,2015 Vincent Pit, all rights reserved.
+Copyright 2009,2010,2011,2012,2013,2014,2015,2017 Vincent Pit, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

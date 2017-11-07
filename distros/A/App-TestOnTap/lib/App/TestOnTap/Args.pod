@@ -238,7 +238,7 @@ test results etc.
 By default, the test suite will be searched for 'executables' based on the exec map defined in the suite, but this option
 allows overriding the choices of the suite exec map.
 
-The special mapfile name of C<:internal> causes use of a internally defined execmap, convenient for testing.
+If this option is not used, and there is no defined execmap in the configuration, an internal default will be used.  
 
 For more on execmaps, see the L<manual regarding the 'execmap section' config setting|App::TestOnTap/"THE SUITE CONFIG">.
 

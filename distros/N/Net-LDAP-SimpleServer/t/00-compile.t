@@ -16,7 +16,7 @@ my @module_files = (
 );
 
 my @scripts = (
-    'bin/ldapd.pl'
+    'bin/simpleldap'
 );
 
 # no fake home requested

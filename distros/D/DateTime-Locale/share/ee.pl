@@ -1,12 +1,17 @@
 {
   am_pm_abbreviated => [
     "\N{U+014b}di",
-    "\N{U+0263}etr\N{U+0254}"
+    "\N{U+0263}etr\N{U+0254}",
   ],
   available_formats => {
+    Bh => "'ga' h 'le' B 'me'",
+    Bhm => "'ga' h 'a\N{U+0256}aba\N{U+0192}o\N{U+0192}o' mm 'le' B 'me'",
+    Bhms => "h:mm:ss 'le' B 'me'",
     E => "ccc",
-    EHm => "E HH:mm",
-    EHms => "E HH:mm:ss",
+    EBhm => "'ga' h:mm 'le' E B 'me'",
+    EBhms => "'ga' h:mm:ss 'le' E B 'me'",
+    EHm => "E 'ga' HH:mm",
+    EHms => "E 'ga' HH:mm:ss",
     Ed => "E d",
     Ehm => "E a 'ga' h:mm",
     Ehms => "E a 'ga' h:mm:ss",
@@ -17,14 +22,15 @@
     H => "HH",
     Hm => "HH:mm",
     Hms => "HH:mm:ss",
-    Hmsv => "HH:mm:ss v",
-    Hmv => "HH:mm v",
+    Hmsv => "'ga' HH:mm:ss 'le' v",
+    Hmv => "'ga' HH:mm 'le' v",
     M => "L",
     MEd => "E, M/d",
     MMM => "LLL",
     MMMEd => "E, MMM d 'lia'",
     MMMMEd => "E, MMMM d 'lia'",
-    "MMMMW-count-other" => "'week' W 'of' MMMM",
+    "MMMMW-count-one" => "MMMM '\N{U+0192}e' 'k\N{U+0254}si\N{U+0256}a' W 'lia'",
+    "MMMMW-count-other" => "MMMM '\N{U+0192}e' 'k\N{U+0254}si\N{U+0256}a' W 'lia'",
     MMMMd => "MMMM d 'lia'",
     MMMd => "MMM d 'lia'",
     Md => "M/d",
@@ -32,8 +38,8 @@
     h => "a 'ga' h",
     hm => "a 'ga' h:mm",
     hms => "a 'ga' h:mm:ss",
-    hmsv => "h:mm:ss a v",
-    hmv => "h:mm a v",
+    hmsv => "a 'ga' h:mm:ss 'le' v",
+    hmv => "a 'ga' h:mm 'le' v",
     ms => "'a\N{U+0256}aba\N{U+0192}o\N{U+0192}o' mm:ss",
     y => "y",
     yM => "M/y",
@@ -45,7 +51,8 @@
     yMd => "M/d/y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-one" => "'k\N{U+0254}si\N{U+0256}a' w 'lia' 'le' '\N{U+0192}e' Y 'me'",
+    "yw-count-other" => "'k\N{U+0254}si\N{U+0256}a' w 'lia' 'le' '\N{U+0192}e' Y 'me'",
   },
   code => "ee",
   date_format_full => "EEEE, MMMM d 'lia' y",
@@ -63,7 +70,7 @@
     "yaw",
     "fi\N{U+0256}",
     "mem",
-    "k\N{U+0254}s"
+    "k\N{U+0254}s",
   ],
   day_format_narrow => [
     "d",
@@ -72,7 +79,7 @@
     "y",
     "f",
     "m",
-    "k"
+    "k",
   ],
   day_format_wide => [
     "dzo\N{U+0256}a",
@@ -81,7 +88,7 @@
     "yawo\N{U+0256}a",
     "fi\N{U+0256}a",
     "memle\N{U+0256}a",
-    "k\N{U+0254}si\N{U+0256}a"
+    "k\N{U+0254}si\N{U+0256}a",
   ],
   day_stand_alone_abbreviated => [
     "dzo",
@@ -90,7 +97,7 @@
     "yaw",
     "fi\N{U+0256}",
     "mem",
-    "k\N{U+0254}s"
+    "k\N{U+0254}s",
   ],
   day_stand_alone_narrow => [
     "d",
@@ -99,7 +106,7 @@
     "y",
     "f",
     "m",
-    "k"
+    "k",
   ],
   day_stand_alone_wide => [
     "dzo\N{U+0256}a",
@@ -108,19 +115,19 @@
     "yawo\N{U+0256}a",
     "fi\N{U+0256}a",
     "memle\N{U+0256}a",
-    "k\N{U+0254}si\N{U+0256}a"
+    "k\N{U+0254}si\N{U+0256}a",
   ],
   era_abbreviated => [
-    "hY",
-    "Y\N{U+014b}"
+    "HYV",
+    "Y\N{U+014b}",
   ],
   era_narrow => [
-    "hY",
-    "Y\N{U+014b}"
+    "HYV",
+    "Y\N{U+014b}",
   ],
   era_wide => [
-    "Hafi Yesu Va Do \N{U+014b}g\N{U+0254}",
-    "Yesu \N{U+014a}\N{U+0254}li"
+    "Hafi Yesu Va",
+    "Yesu \N{U+014b}\N{U+0254}li",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -141,7 +148,7 @@
     "any",
     "kel",
     "ade",
-    "dzm"
+    "dzm",
   ],
   month_format_narrow => [
     "d",
@@ -155,7 +162,7 @@
     "a",
     "k",
     "a",
-    "d"
+    "d",
   ],
   month_format_wide => [
     "dzove",
@@ -169,7 +176,7 @@
     "any\N{U+0254}ny\N{U+0254}",
     "kele",
     "ade\N{U+025b}mekp\N{U+0254}xe",
-    "dzome"
+    "dzome",
   ],
   month_stand_alone_abbreviated => [
     "dzv",
@@ -183,7 +190,7 @@
     "any",
     "kel",
     "ade",
-    "dzm"
+    "dzm",
   ],
   month_stand_alone_narrow => [
     "d",
@@ -197,7 +204,7 @@
     "a",
     "k",
     "a",
-    "d"
+    "d",
   ],
   month_stand_alone_wide => [
     "dzove",
@@ -211,7 +218,7 @@
     "any\N{U+0254}ny\N{U+0254}",
     "kele",
     "ade\N{U+025b}mekp\N{U+0254}xe",
-    "dzome"
+    "dzome",
   ],
   name => "Ewe",
   native_language => "E\N{U+028b}egbe",
@@ -223,37 +230,37 @@
     "k1",
     "k2",
     "k3",
-    "k4"
+    "k4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "k\N{U+0254}ta gb\N{U+00e3}t\N{U+0254}",
     "k\N{U+0254}ta evelia",
     "k\N{U+0254}ta et\N{U+0254}\N{U+0303}lia",
-    "k\N{U+0254}ta enelia"
+    "k\N{U+0254}ta enelia",
   ],
   quarter_stand_alone_abbreviated => [
     "k1",
     "k2",
     "k3",
-    "k4"
+    "k4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "k\N{U+0254}ta gb\N{U+00e3}t\N{U+0254}",
     "k\N{U+0254}ta evelia",
     "k\N{U+0254}ta et\N{U+0254}\N{U+0303}lia",
-    "k\N{U+0254}ta enelia"
+    "k\N{U+0254}ta enelia",
   ],
   script => undef,
   territory => undef,
@@ -262,5 +269,5 @@
   time_format_medium => "a 'ga' h:mm:ss",
   time_format_short => "a 'ga' h:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

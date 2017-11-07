@@ -1,15 +1,15 @@
 
 BEGIN {
   unless ($ENV{AUTHOR_TESTING}) {
-    require Test::More;
-    Test::More::plan(skip_all => 'these tests are for testing by the author');
+    print qq{1..0 # SKIP these tests are for testing by the author\n};
+    exit
   }
 }
 
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::EOL 0.18
+# this test was generated with Dist::Zilla::Plugin::Test::EOL 0.19
 
 use Test::More 0.88;
 use Test::EOL;
@@ -21,6 +21,7 @@ my @files = (
     'lib/App/GitGot/Command.pm',
     'lib/App/GitGot/Command/add.pm',
     'lib/App/GitGot/Command/chdir.pm',
+    'lib/App/GitGot/Command/checkout.pm',
     'lib/App/GitGot/Command/clone.pm',
     'lib/App/GitGot/Command/do.pm',
     'lib/App/GitGot/Command/fetch.pm',
@@ -28,6 +29,7 @@ my @files = (
     'lib/App/GitGot/Command/gc.pm',
     'lib/App/GitGot/Command/lib.pm',
     'lib/App/GitGot/Command/list.pm',
+    'lib/App/GitGot/Command/milk.pm',
     'lib/App/GitGot/Command/move.pm',
     'lib/App/GitGot/Command/mux.pm',
     'lib/App/GitGot/Command/push.pm',
@@ -61,6 +63,7 @@ my @files = (
     't/13-do.t',
     't/14-move.t',
     't/15-tags.t',
+    't/16-checkout.t',
     't/author-eol.t',
     't/author-pod-coverage.t',
     't/author-pod-syntax.t',

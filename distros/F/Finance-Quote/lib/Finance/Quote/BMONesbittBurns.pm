@@ -35,7 +35,7 @@ use LWP::UserAgent;
 use HTTP::Request::Common;
 use HTML::TableExtract;
 
-our $VERSION = '1.38'; # VERSION
+our $VERSION = '1.43'; # VERSION
 
 # URLs of where to obtain information
 my $BMO_URL = 'http://bmonesbittburns.com/QuickQuote/QuickQuote.asp?Symbol=';
@@ -62,7 +62,7 @@ sub bmonesbittburns {
 
             #print STDERR $reply->content,"\n";
 
-            $te = new HTML::TableExtract( depth => 2);
+            $te = HTML::TableExtract->new( depth => 2);
 
             # parse table
             $te->parse($reply->content);

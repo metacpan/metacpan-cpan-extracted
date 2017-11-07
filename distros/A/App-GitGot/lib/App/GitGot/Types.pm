@@ -1,6 +1,6 @@
 package App::GitGot::Types;
 our $AUTHORITY = 'cpan:GENEHACK';
-$App::GitGot::Types::VERSION = '1.333';
+$App::GitGot::Types::VERSION = '1.334';
 # ABSTRACT: GitGot type library
 use 5.014;    ## strict, unicode_strings
 use warnings;
@@ -33,7 +33,7 @@ App::GitGot::Types - GitGot type library
 
 =head1 VERSION
 
-version 1.333
+version 1.334
 
 =head1 AUTHOR
 

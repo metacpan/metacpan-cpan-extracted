@@ -11,6 +11,7 @@ my $b = Module::Build->new
     Data::Dump  =>0,
     Data::Table::Text=>'20170902',
     Digest::SHA1=>0,
+    Storable    =>0,
     Test::More  =>0,
     Test2::API  =>0,
    },

@@ -327,11 +327,41 @@ Norwegian Bokmål Svalbard & Jan Mayen locale.
 
 =head2 Available Formats
 
+=head3 Bh (h B)
+
+   2008-02-05T18:30:30 = 6 B
+   1995-12-22T09:05:02 = 9 B
+  -0010-09-15T04:44:23 = 4 B
+
+=head3 Bhm (h:mm B)
+
+   2008-02-05T18:30:30 = 6:30 B
+   1995-12-22T09:05:02 = 9:05 B
+  -0010-09-15T04:44:23 = 4:44 B
+
+=head3 Bhms (h:mm:ss B)
+
+   2008-02-05T18:30:30 = 6:30:30 B
+   1995-12-22T09:05:02 = 9:05:02 B
+  -0010-09-15T04:44:23 = 4:44:23 B
+
 =head3 E (ccc)
 
    2008-02-05T18:30:30 = tir.
    1995-12-22T09:05:02 = fre.
   -0010-09-15T04:44:23 = lør.
+
+=head3 EBhm (E h:mm B)
+
+   2008-02-05T18:30:30 = tir. 6:30 B
+   1995-12-22T09:05:02 = fre. 9:05 B
+  -0010-09-15T04:44:23 = lør. 4:44 B
+
+=head3 EBhms (E h:mm:ss B)
+
+   2008-02-05T18:30:30 = tir. 6:30:30 B
+   1995-12-22T09:05:02 = fre. 9:05:02 B
+  -0010-09-15T04:44:23 = lør. 4:44:23 B
 
 =head3 EHm (E HH:mm)
 
@@ -423,11 +453,11 @@ Norwegian Bokmål Svalbard & Jan Mayen locale.
    1995-12-22T09:05:02 = 12.
   -0010-09-15T04:44:23 = 9.
 
-=head3 MEd (E d.M)
+=head3 MEd (E d.M.)
 
-   2008-02-05T18:30:30 = tir. 5.2
-   1995-12-22T09:05:02 = fre. 22.12
-  -0010-09-15T04:44:23 = lør. 15.9
+   2008-02-05T18:30:30 = tir. 5.2.
+   1995-12-22T09:05:02 = fre. 22.12.
+  -0010-09-15T04:44:23 = lør. 15.9.
 
 =head3 MMM (LLL)
 
@@ -585,13 +615,13 @@ Norwegian Bokmål Svalbard & Jan Mayen locale.
    1995-12-22T09:05:02 = 4. kvartal 1995
   -0010-09-15T04:44:23 = 3. kvartal -10
 
-=head3 yw-count-one ('uke' w 'i' y)
+=head3 yw-count-one ('uke' w 'i' Y)
 
    2008-02-05T18:30:30 = uke 6 i 2008
    1995-12-22T09:05:02 = uke 51 i 1995
   -0010-09-15T04:44:23 = uke 37 i -10
 
-=head3 yw-count-other ('uke' w 'i' y)
+=head3 yw-count-other ('uke' w 'i' Y)
 
    2008-02-05T18:30:30 = uke 6 i 2008
    1995-12-22T09:05:02 = uke 51 i 1995

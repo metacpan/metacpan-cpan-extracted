@@ -51,14 +51,42 @@ define ([
         target.push('simpleEmployeeBrowser', {
             'name': 'simpleEmployeeBrowser',
             'type': 'dbrowser',
-            'menuText': 'Browse employee search results',
+            'menuText': 'simpleEmployeeBrowser',
             'title': 'Employee search results',
             'preamble': null,
             'aclProfile': 'admin',
             'entriesRead': [entries.ePnick, entries.ePsec_id, entries.ePfullname,
                         entries.ePemail, entries.ePremark],
             'miniMenu': {
-                entries: ['ldapSync', 'empProfileEdit', 'masqEmployee']
+                entries: ['ldapSync', 'empProfileEdit']
+            }
+        });
+
+        target.push('setSupervisorBrowser', {
+            'name': 'setSupervisorBrowser',
+            'type': 'dbrowser',
+            'menuText': 'setSupervisorBrowser',
+            'title': 'Supervisor candidates',
+            'preamble': null,
+            'aclProfile': 'admin',
+            'entriesRead': [entries.ePnick, entries.ePsec_id, entries.ePfullname,
+                        entries.ePemail, entries.ePremark],
+            'miniMenu': {
+                entries: ['empProfileSetSuperChoose']
+            }
+        });
+
+        target.push('masqueradeCandidatesBrowser', {
+            'name': 'masqueradeCandidatesBrowser',
+            'type': 'dbrowser',
+            'menuText': 'masqueradeCandidatesBrowser',
+            'title': 'Masquerade candidates',
+            'preamble': null,
+            'aclProfile': 'admin',
+            'entriesRead': [entries.ePnick, entries.ePsec_id, entries.ePfullname,
+                        entries.ePemail, entries.ePremark],
+            'miniMenu': {
+                entries: ['masqEmployee']
             }
         });
 

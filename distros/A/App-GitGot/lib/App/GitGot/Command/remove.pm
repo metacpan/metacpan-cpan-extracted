@@ -1,10 +1,10 @@
 package App::GitGot::Command::remove;
 our $AUTHORITY = 'cpan:GENEHACK';
-$App::GitGot::Command::remove::VERSION = '1.333';
+$App::GitGot::Command::remove::VERSION = '1.334';
 # ABSTRACT: remove a managed repository from your config
 use 5.014;
 
-use List::AllUtils qw/ any /;
+use List::Util qw/ any /;
 
 use App::GitGot -command;
 
@@ -67,7 +67,7 @@ App::GitGot::Command::remove - remove a managed repository from your config
 
 =head1 VERSION
 
-version 1.333
+version 1.334
 
 =head1 AUTHOR
 

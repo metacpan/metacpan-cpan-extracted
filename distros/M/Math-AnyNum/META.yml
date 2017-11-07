@@ -16,7 +16,7 @@ name: Math-AnyNum
 provides:
   Math::AnyNum:
     file: lib/Math/AnyNum.pm
-    version: '0.16'
+    version: '0.17'
 requires:
   Carp: '0'
   Math::GMPq: '0.45'
@@ -28,7 +28,7 @@ requires:
 resources:
   bugtracker: https://github.com/trizen/Math-AnyNum/issues
   homepage: https://github.com/trizen/Math-AnyNum
-  license: http://opensource.org/licenses/artistic-license-2.0.php
+  license: http://www.perlfoundation.org/artistic_license_2_0
   repository: https://github.com/trizen/Math-AnyNum
-version: '0.16'
+version: '0.17'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

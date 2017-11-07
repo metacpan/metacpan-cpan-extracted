@@ -1,0 +1,32 @@
+---
+abstract: 'Test::Class with exact and strict plan'
+author:
+  - 'Pali <pali@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Class-WithStrictPlan
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Attribute::Handlers: '0'
+  Test::Class: '0.37'
+  parent: '0'
+  perl: '5.006000'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/pali/Test-Class-WithStrictPlan/issues
+  repository: git://github.com/pali/Test-Class-WithStrictPlan.git
+version: '0.1'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "vm.",
-    "nm."
+    "nm.",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "E d",
@@ -46,8 +51,8 @@
     yMd => "y-MM-dd",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-one" => "'week' w 'van' y",
-    "yw-count-other" => "'week' w 'van' y"
+    "yw-count-one" => "'week' w 'van' Y",
+    "yw-count-other" => "'week' w 'van' Y",
   },
   code => "af",
   date_format_full => "EEEE, dd MMMM y",
@@ -65,7 +70,7 @@
     "Do.",
     "Vr.",
     "Sa.",
-    "So."
+    "So.",
   ],
   day_format_narrow => [
     "M",
@@ -74,7 +79,7 @@
     "D",
     "V",
     "S",
-    "S"
+    "S",
   ],
   day_format_wide => [
     "Maandag",
@@ -83,7 +88,7 @@
     "Donderdag",
     "Vrydag",
     "Saterdag",
-    "Sondag"
+    "Sondag",
   ],
   day_stand_alone_abbreviated => [
     "Ma.",
@@ -92,7 +97,7 @@
     "Do.",
     "Vr.",
     "Sa.",
-    "So."
+    "So.",
   ],
   day_stand_alone_narrow => [
     "M",
@@ -101,7 +106,7 @@
     "D",
     "V",
     "S",
-    "S"
+    "S",
   ],
   day_stand_alone_wide => [
     "Maandag",
@@ -110,19 +115,19 @@
     "Donderdag",
     "Vrydag",
     "Saterdag",
-    "Sondag"
+    "Sondag",
   ],
   era_abbreviated => [
     "v.C.",
-    "n.C."
+    "n.C.",
   ],
   era_narrow => [
     "v.C.",
-    "n.C."
+    "n.C.",
   ],
   era_wide => [
     "voor Christus",
-    "na Christus"
+    "na Christus",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -143,7 +148,7 @@
     "Sep.",
     "Okt.",
     "Nov.",
-    "Des."
+    "Des.",
   ],
   month_format_narrow => [
     "J",
@@ -157,7 +162,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_format_wide => [
     "Januarie",
@@ -171,7 +176,7 @@
     "September",
     "Oktober",
     "November",
-    "Desember"
+    "Desember",
   ],
   month_stand_alone_abbreviated => [
     "Jan.",
@@ -185,7 +190,7 @@
     "Sep.",
     "Okt.",
     "Nov.",
-    "Des."
+    "Des.",
   ],
   month_stand_alone_narrow => [
     "J",
@@ -199,7 +204,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_stand_alone_wide => [
     "Januarie",
@@ -213,7 +218,7 @@
     "September",
     "Oktober",
     "November",
-    "Desember"
+    "Desember",
   ],
   name => "Afrikaans",
   native_language => "Afrikaans",
@@ -225,37 +230,37 @@
     "K1",
     "K2",
     "K3",
-    "K4"
+    "K4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "1ste kwartaal",
     "2de kwartaal",
     "3de kwartaal",
-    "4de kwartaal"
+    "4de kwartaal",
   ],
   quarter_stand_alone_abbreviated => [
     "K1",
     "K2",
     "K3",
-    "K4"
+    "K4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "1ste kwartaal",
     "2de kwartaal",
     "3de kwartaal",
-    "4de kwartaal"
+    "4de kwartaal",
   ],
   script => undef,
   territory => undef,
@@ -264,5 +269,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

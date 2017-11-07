@@ -20,6 +20,7 @@ share/js/dochazka-www/caches.js
 share/js/dochazka-www/daction-init.js
 share/js/dochazka-www/daction-start.js
 share/js/dochazka-www/dbrowser-init.js
+share/js/dochazka-www/dcallback-init.js
 share/js/dochazka-www/dform-init.js
 share/js/dochazka-www/dmenu-init.js
 share/js/dochazka-www/dnotice-init.js
@@ -35,13 +36,16 @@ share/js/dochazka-www/sched-lib.js
 share/js/dochazka-www/lib.js
 share/js/dochazka-www/prototypes.js
 share/js/dochazka-www/rest-lib.js
+share/js/dochazka-www/svg-lib.js
 share/js/dochazka-www/target-init.js
 share/js/dochazka-www/test.js
 share/js/dochazka-www/tests/01-users.js
 share/js/dochazka-www/tests/dummy.js
+share/js/dochazka-www/tests/ldap.js
 share/js/dochazka-www/tests/main-empl.js
 share/js/dochazka-www/tests/main-menu.js
 share/js/dochazka-www/tests/main-sched.js
+share/js/dochazka-www/viewer.js
 t/00-load.t
 t/manifest.t
 t/pod-coverage.t

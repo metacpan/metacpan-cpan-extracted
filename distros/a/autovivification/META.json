@@ -55,6 +55,6 @@
          "url" : "http://git.profvince.com/?p=perl%2Fmodules%2Fautovivification.git"
       }
    },
-   "version" : "0.17",
+   "version" : "0.18",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

@@ -58,7 +58,7 @@ sub write_index {
         return 0;
     }
 
-    warn "Creating index at $fn_idx\n";
+    #warn "Creating index at $fn_idx\n";
     open my $idx, '>', $fn_idx or die "Error opening $fn_idx for writing: $!\n";
 
     my $fh = $self->{fh};
@@ -90,8 +90,16 @@ sub write_index {
             $ll_mismatch = 0;
         }
         elsif ($line =~ /^[A-Za-z\-]+(\r?\n?)$/) {
-            die "Base length mismatch\n" if ($bl_mismatch);
-            die "Line length mismatch\n" if ($ll_mismatch);
+            if ($bl_mismatch) {
+                close $idx;
+                unlink $fn_idx;
+                die "Base length mismatch\n";
+            }
+            if ($ll_mismatch) {
+                close $idx;
+                unlink $fn_idx;
+                die "Line length mismatch\n";
+            }
             my $ll  = length $line;
             my $bl  = $ll - length $1;
             $curr_len += $bl;
@@ -101,6 +109,8 @@ sub write_index {
             $ll_mismatch = 1 if ($ll != $curr_bytes);
         }
         elsif ($line =~ /\S/) {
+            close $idx;
+            unlink $fn_idx;
             die "Unexpected content: $line";
         }
                 

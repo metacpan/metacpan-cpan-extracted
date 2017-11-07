@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "i.b.",
-    "e.b."
+    "e.b.",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d, E",
@@ -46,9 +51,9 @@
     yMd => "y-MM-dd",
     yQQQ => "y QQQ",
     yQQQQ => "y QQQQ",
-    "yw-count-one" => "'week' w 'of' y",
-    "yw-count-other" => "'week' w 'of' y",
-    "yw-count-two" => "'week' w 'of' y"
+    "yw-count-one" => "'week' w 'of' Y",
+    "yw-count-other" => "'week' w 'of' Y",
+    "yw-count-two" => "'week' w 'of' Y",
   },
   code => "se-SE",
   date_format_full => "y MMMM d, EEEE",
@@ -66,7 +71,7 @@
     "duor",
     "bear",
     "l\N{U+00e1}v",
-    "sotn"
+    "sotn",
   ],
   day_format_narrow => [
     "V",
@@ -75,7 +80,7 @@
     "D",
     "B",
     "L",
-    "S"
+    "S",
   ],
   day_format_wide => [
     "vuoss\N{U+00e1}rga",
@@ -84,7 +89,7 @@
     "duorasdat",
     "bearjadat",
     "l\N{U+00e1}vvardat",
-    "sotnabeaivi"
+    "sotnabeaivi",
   ],
   day_stand_alone_abbreviated => [
     "vuos",
@@ -93,7 +98,7 @@
     "duor",
     "bear",
     "l\N{U+00e1}v",
-    "sotn"
+    "sotn",
   ],
   day_stand_alone_narrow => [
     "V",
@@ -102,7 +107,7 @@
     "D",
     "B",
     "L",
-    "S"
+    "S",
   ],
   day_stand_alone_wide => [
     "vuoss\N{U+00e1}rga",
@@ -111,19 +116,19 @@
     "duorasdat",
     "bearjadat",
     "l\N{U+00e1}vvardat",
-    "sotnabeaivi"
+    "sotnabeaivi",
   ],
   era_abbreviated => [
     "o.Kr.",
-    "m.Kr."
+    "m.Kr.",
   ],
   era_narrow => [
     "o.Kr.",
-    "m.Kr."
+    "m.Kr.",
   ],
   era_wide => [
     "ovdal Kristtusa",
-    "ma\N{U+014b}\N{U+014b}el Kristtusa"
+    "ma\N{U+014b}\N{U+014b}el Kristtusa",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -144,7 +149,7 @@
     "\N{U+010d}ak\N{U+010d}",
     "golg",
     "sk\N{U+00e1}b",
-    "juov"
+    "juov",
   ],
   month_format_narrow => [
     "O",
@@ -158,7 +163,7 @@
     "\N{U+010c}",
     "G",
     "S",
-    "J"
+    "J",
   ],
   month_format_wide => [
     "o\N{U+0111}\N{U+0111}ajagem\N{U+00e1}nnu",
@@ -172,7 +177,7 @@
     "\N{U+010d}ak\N{U+010d}am\N{U+00e1}nnu",
     "golggotm\N{U+00e1}nnu",
     "sk\N{U+00e1}bmam\N{U+00e1}nnu",
-    "juovlam\N{U+00e1}nnu"
+    "juovlam\N{U+00e1}nnu",
   ],
   month_stand_alone_abbreviated => [
     "o\N{U+0111}\N{U+0111}j",
@@ -186,7 +191,7 @@
     "\N{U+010d}ak\N{U+010d}",
     "golg",
     "sk\N{U+00e1}b",
-    "juov"
+    "juov",
   ],
   month_stand_alone_narrow => [
     "O",
@@ -200,7 +205,7 @@
     "\N{U+010c}",
     "G",
     "S",
-    "J"
+    "J",
   ],
   month_stand_alone_wide => [
     "o\N{U+0111}\N{U+0111}ajagem\N{U+00e1}nnu",
@@ -214,7 +219,7 @@
     "\N{U+010d}ak\N{U+010d}am\N{U+00e1}nnu",
     "golggotm\N{U+00e1}nnu",
     "sk\N{U+00e1}bmam\N{U+00e1}nnu",
-    "juovlam\N{U+00e1}nnu"
+    "juovlam\N{U+00e1}nnu",
   ],
   name => "Northern Sami Sweden",
   native_language => "davvis\N{U+00e1}megiella",
@@ -226,37 +231,37 @@
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_stand_alone_abbreviated => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   script => undef,
   territory => "Sweden",
@@ -265,5 +270,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

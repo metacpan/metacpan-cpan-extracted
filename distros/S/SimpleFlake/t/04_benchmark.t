@@ -7,7 +7,7 @@ use Benchmark;
 
 my $t0 = Benchmark->new;
 
-my $i = 100_000;
+my $i = 10_000;
 
 my $collisions = {};
 

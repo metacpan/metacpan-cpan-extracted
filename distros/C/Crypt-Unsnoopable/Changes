@@ -1,5 +1,7 @@
 Revision history for Crypt-Unsnoopable
 
+1.007   Sat Nov 4 20:41:32 2017 -0700
+        Add QR code scanning for Noodle Pi, speed up base conversions
+
 1.005   Mon Jun 19 00:36:53 2017 -0700
         First release
-

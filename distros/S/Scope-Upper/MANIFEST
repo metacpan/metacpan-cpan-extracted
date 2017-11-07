@@ -68,5 +68,6 @@ t/lib/Test/Leaner.pm
 t/lib/VPIT/TestHelpers.pm
 xsh/caps.h
 xsh/debug.h
+xsh/mem.h
 xsh/threads.h
 xsh/util.h

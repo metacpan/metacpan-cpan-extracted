@@ -47,11 +47,11 @@ autoflush STDOUT 1;
 #
 my %cbuilder_config = ExtUtils::CBuilder->new()->get_config;
 $ENV{CC} = $cbuilder_config{cc} // 'cc';
-$ENV{CFLAGS} = '';
+$ENV{CFLAGS} //= '';
 $ENV{CXX} = $cbuilder_config{cxx} // $ENV{CC};
 $ENV{CXXFLAGS} = $cbuilder_config{cxxflags} // $cbuilder_config{ccflags} // '';
 $ENV{LD} = $cbuilder_config{ld} // $ENV{CC};
-$ENV{LDFLAGS} = '';
+$ENV{LDFLAGS} //= '';
 # OTHERLDFLAGS remains local and must affect ONLY this process, not sub-processes
 my @OTHERLDFLAGS = ();
 #
@@ -94,8 +94,8 @@ if (is_os_type('Windows')) {
       # C.f. http://clang.llvm.org/compatibility.html#inline
       #      https://bugzilla.mozilla.org/show_bug.cgi?id=917526
       #
-      $ac->msg_notice("Adding -std=gnu99 to CFLAGS");
-      $ENV{CFLAGS} .= ' -std=gnu99';
+      $ac->msg_notice("Adding -std=gnu89 to CFLAGS for inline semantics");
+      $ENV{CFLAGS} .= ' -std=gnu89';
   } else {
       $ac->msg_result('no');
   }
@@ -355,7 +355,7 @@ my %WriteMakefileArgs = (
     "threads" => 0,
     "utf8" => 0
   },
-  "VERSION" => "2.0.22",
+  "VERSION" => "2.0.23",
   "test" => {
     "TESTS" => "t/*.t"
   }

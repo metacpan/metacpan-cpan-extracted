@@ -3,7 +3,7 @@ package App::TestOnTap::Util;
 use strict;
 use warnings;
 
-use POSIX qw(strftime);
+use POSIX qw(strftime getcwd);
 use File::Basename;
 use File::Spec;
 
@@ -21,6 +21,7 @@ our @EXPORT_OK =
 			stringifyTime
 			ensureArray
 			expandAts
+			runprocess
 			$IS_WINDOWS
 			$IS_PACKED
 			$FILE_SEP
@@ -196,6 +197,31 @@ sub __readLines
 	close($fh);
 	
 	return @lines;
+}
+
+sub runprocess
+{
+	my $cb = shift;
+	my $wd = shift;
+	my @argv = @_;
+	
+	my $cwd = getcwd();
+	chdir($wd) || die("Failed to change directory to '$wd': $!\n");
+
+	$_ = "$SHELL_ARG_DELIM$_$SHELL_ARG_DELIM" foreach (@argv);
+	my $cmdline = join(' ', @argv);
+	
+	open(my $fh, '-|', "$cmdline 2>&1") || die("Failed to run '$cmdline': $!\n");
+	while (my $line = <$fh>)
+	{
+		$cb->($line);
+	}
+	close($fh);
+	my $xit = $? >> 8;
+
+	chdir($cwd) || die("Failed to change directory back to '$cwd': $!\n");
+	
+	return $xit;
 }
 
 1;

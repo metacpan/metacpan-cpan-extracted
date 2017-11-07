@@ -14,18 +14,20 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Net-LDAP-SimpleServer",
   "EXE_FILES" => [
-    "bin/ldapd.pl"
+    "bin/simpleldap"
   ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Net::LDAP::SimpleServer",
   "PREREQ_PM" => {
     "Carp" => 0,
+    "Digest::MD5" => 0,
     "Exporter" => 0,
     "File::Basename" => 0,
     "File::HomeDir" => 0,
     "File::Path" => "2.08",
     "File::Spec" => 0,
+    "MIME::Base64" => 0,
     "Net::LDAP::Constant" => 0,
     "Net::LDAP::Filter" => 0,
     "Net::LDAP::FilterMatch" => 0,
@@ -55,7 +57,7 @@ my %WriteMakefileArgs = (
     "Try::Tiny" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.0.19",
+  "VERSION" => "0.0.20",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -65,6 +67,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Authen::SASL" => 0,
   "Carp" => 0,
+  "Digest::MD5" => 0,
   "Exporter" => 0,
   "File::Basename" => 0,
   "File::HomeDir" => 0,
@@ -73,6 +76,7 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IO::Pipe" => 0,
   "IPC::Open3" => 0,
+  "MIME::Base64" => 0,
   "Net::LDAP" => 0,
   "Net::LDAP::Constant" => 0,
   "Net::LDAP::Filter" => 0,

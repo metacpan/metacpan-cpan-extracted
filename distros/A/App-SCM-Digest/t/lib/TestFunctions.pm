@@ -6,11 +6,19 @@ use strict;
 use App::SCM::Digest::Utils qw(system_ad);
 
 use base qw(Exporter);
-our @EXPORT_OK = qw(initialise_git_repository initialise_git_clone);
+our @EXPORT_OK = qw(initialise_git_repository
+                    initialise_bare_git_repository
+                    initialise_git_clone);
 
 sub initialise_git_repository
 {
     system_ad("git init-db");
+    initialise_git_clone();
+}
+
+sub initialise_bare_git_repository
+{
+    system_ad("git init-db --bare");
     initialise_git_clone();
 }
 

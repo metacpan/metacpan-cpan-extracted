@@ -121,6 +121,9 @@ $req->connect ('tcp://localhost:5555');
 $req->send ('hello');
 ok (!defined ($req->recv (ZMQ::Raw->ZMQ_DONTWAIT)));
 
+$req->setsockopt (ZMQ::Raw::Socket->ZMQ_RCVTIMEO, 100);
+ok (!defined ($req->recv));
+
 my $result = $rep->recv();
 is $result, 'hello';
 
@@ -187,6 +190,20 @@ is $msgs[3], 'world';
 @msgs = ();
 
 $rep->send ('done');
+
+if ($^O ne 'MSWin32')
+{
+	my $alarm = 0;
+	local $SIG{ALRM} = sub
+	{
+		$alarm = 1;
+	};
+	alarm 1;
+	my @tmp = $rep->recv();
+	is scalar (@tmp), 0;
+	ok ($alarm);
+}
+
 $req->recv();
 
 # sendmsg/recvmsg (multi msg)

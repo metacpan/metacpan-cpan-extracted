@@ -14,7 +14,7 @@ use File::Temp;
 use File::Spec;
 use Carp;
 
-our $VERSION = '2.19';
+our $VERSION = '2.20';
 
 =pod
 
@@ -186,6 +186,7 @@ my $paper_size      = 'A3';
 my $show_grid       = 1;    
 my $show_graticule  = 1;
 my $show_towns      = 1;
+my $show_test_points = 0;
 my $show_ostn02     = 0;
 my $show_coast      = 1;
 my $call_MP         = 1;
@@ -197,6 +198,7 @@ my $options_ok = GetOptions(
     'grid!'       => \$show_grid,                                   
     'graticule!'  => \$show_graticule,                              
     'towns!'      => \$show_towns,
+    'tests!'      => \$show_test_points,
     'ostn!'       => \$show_ostn02,
     'outfile=s'   => \$pdf_filename,
     'coast!'      => \$show_coast,
@@ -369,6 +371,57 @@ if ($show_towns ) {
     print $plotter "drawoptions(withcolor .7 white);defaultscale := 1/2;\n";
     for my $t (keys %towns) {
         print $plotter sprintf "dotlabel.top(\"$t\", (%g,%g));\n", map {$_/$scale} @{$towns{$t}};     
+    }
+}
+
+if ($show_test_points ) {
+    my %points = (
+        TP01  => [   91492.146,    11318.803,  "St Mary's, Scilly" ],
+        TP02  => [  170370.718,    11572.405,  "Lizard Point Lighthouse" ],
+        TP03  => [  250359.811,    62016.569,  "Plymouth" ],
+        TP04  => [  449816.371,    75335.861,  "St Catherine's Point Lighthouse" ],
+        TP05  => [   438710.92,    114792.25,  "Former OSHQ" ],
+        TP06  => [   292184.87,   168003.465,  "Nash Point Lighthouse" ],
+        TP07  => [  639821.835,   169565.858,  "North Foreland Lighthouse" ],
+        TP08  => [  362269.991,    169978.69,  "Brislington" ],
+        TP09  => [  530624.974,   178388.464,  "Lambeth" ],
+        TP10  => [  241124.584,   220332.641,  "Carmarthen" ],
+        TP11  => [   599445.59,   225722.826,  "Colchester" ],
+        TP12  => [   389544.19,   261912.153,  "Droitwich" ],
+        TP13  => [  474335.969,   262047.755,  "Northampton" ],
+        TP14  => [  562180.547,   319784.995,  "King's Lynn" ],
+        TP15  => [  454002.834,   340834.943,  "Nottingham" ],
+        TP16  => [  357455.843,   383290.436,  "STFC, Daresbury" ],
+        TP17  => [  247958.971,   393492.909,  "Point Lynas Lighthouse, Anglesey" ],
+        TP18  => [  247959.241,   393495.583,  "Point Lynas Lighthouse, Anglesey" ],
+        TP19  => [  331534.564,   431920.794,  "Blackpool Airport" ],
+        TP20  => [  422242.186,   433818.701,  "Pudsey" ],
+        TP21  => [   227778.33,   468847.388,  "Isle of Man airport" ],
+        TP22  => [   525745.67,   470703.214,  "Flamborough Head" ],
+        TP23  => [  244780.636,   495254.887,  "Ramsey, Isle of Man" ],
+        TP24  => [  339921.145,   556034.761,  "Carlisle" ],
+        TP25  => [  424639.355,   565012.703,  "Newcastle University" ],
+        TP26  => [  256340.925,   664697.269,  "Glasgow" ],
+        TP27  => [  319188.434,   670947.534,  "Sighthill, Edinburgh" ],
+        TP28  => [  167634.202,   797067.144,  "Mallaig Lifeboat Station" ],
+        TP29  => [  397160.491,   805349.736,  "Girdle Ness Lighthouse" ],
+        TP30  => [  267056.768,   846176.972,  "Inverness" ],
+        TP31  => [    9587.909,   899448.986,  "Hirta, St Kilda" ],
+        TP32  => [   71713.132,     938516.4,  "at sea, 7km S of Flannan" ],
+        TP33  => [  151968.652,   966483.779,  "Butt of Lewis lighthouse" ],
+        TP34  => [  299721.891,   967202.992,  "Dounreay Airfield" ],
+        TP35  => [  330398.323,  1017347.016,  "Orkney Mainland" ],
+        TP36  => [  261596.778,  1025447.602,  "at sea, 1km NW of Sule Skerry" ],
+        TP37  => [  180862.461,  1029604.114,  "at sea, 3km south of Rona" ],
+        TP38  => [  421300.525,  1072147.239,  "Fair Isle" ],
+        TP39  => [  440725.073,  1107878.448,  "Sumburgh Head" ],
+        TP40  => [  395999.668,  1138728.951,  "Foula" ],
+    );
+
+    print $plotter "drawoptions(withcolor .7[blue,white]);\n";
+    for my $t (keys %points) {
+        my ($e, $n) = map { $_/$scale } $points{$t}->[0], $points{$t}->[1];
+        print $plotter "draw unitsquare shifted -(1/2,1/2) rotated 45 scaled 3 shifted ($e, $n);";
     }
 }
 

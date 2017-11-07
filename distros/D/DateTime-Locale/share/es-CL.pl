@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "a. m.",
-    "p. m."
+    "p. m.",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E, HH:mm",
     EHms => "E, HH:mm:ss",
     Ed => "E d",
@@ -57,8 +62,8 @@
     yMd => "dd-MM-y",
     yQQQ => "QQQ 'de' y",
     yQQQQ => "QQQQ 'de' y",
-    "yw-count-one" => "'semana' w 'de' y",
-    "yw-count-other" => "'semana' w 'de' y"
+    "yw-count-one" => "'semana' w 'de' Y",
+    "yw-count-other" => "'semana' w 'de' Y",
   },
   code => "es-CL",
   date_format_full => "EEEE, d 'de' MMMM 'de' y",
@@ -76,7 +81,7 @@
     "jue.",
     "vie.",
     "s\N{U+00e1}b.",
-    "dom."
+    "dom.",
   ],
   day_format_narrow => [
     "l",
@@ -85,7 +90,7 @@
     "j",
     "v",
     "s",
-    "d"
+    "d",
   ],
   day_format_wide => [
     "lunes",
@@ -94,7 +99,7 @@
     "jueves",
     "viernes",
     "s\N{U+00e1}bado",
-    "domingo"
+    "domingo",
   ],
   day_stand_alone_abbreviated => [
     "lun.",
@@ -103,7 +108,7 @@
     "jue.",
     "vie.",
     "s\N{U+00e1}b.",
-    "dom."
+    "dom.",
   ],
   day_stand_alone_narrow => [
     "L",
@@ -112,7 +117,7 @@
     "J",
     "V",
     "S",
-    "D"
+    "D",
   ],
   day_stand_alone_wide => [
     "lunes",
@@ -121,19 +126,19 @@
     "jueves",
     "viernes",
     "s\N{U+00e1}bado",
-    "domingo"
+    "domingo",
   ],
   era_abbreviated => [
     "a. C.",
-    "d. C."
+    "d. C.",
   ],
   era_narrow => [
     "a. C.",
-    "d. C."
+    "d. C.",
   ],
   era_wide => [
     "antes de Cristo",
-    "despu\N{U+00e9}s de Cristo"
+    "despu\N{U+00e9}s de Cristo",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -154,21 +159,21 @@
     "sep.",
     "oct.",
     "nov.",
-    "dic."
+    "dic.",
   ],
   month_format_narrow => [
-    "e",
-    "f",
-    "m",
-    "a",
-    "m",
-    "j",
-    "j",
-    "a",
-    "s",
-    "o",
-    "n",
-    "d"
+    "E",
+    "F",
+    "M",
+    "A",
+    "M",
+    "J",
+    "J",
+    "A",
+    "S",
+    "O",
+    "N",
+    "D",
   ],
   month_format_wide => [
     "enero",
@@ -182,7 +187,7 @@
     "septiembre",
     "octubre",
     "noviembre",
-    "diciembre"
+    "diciembre",
   ],
   month_stand_alone_abbreviated => [
     "ene.",
@@ -196,7 +201,7 @@
     "sept.",
     "oct.",
     "nov.",
-    "dic."
+    "dic.",
   ],
   month_stand_alone_narrow => [
     "E",
@@ -210,7 +215,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_stand_alone_wide => [
     "enero",
@@ -224,7 +229,7 @@
     "septiembre",
     "octubre",
     "noviembre",
-    "diciembre"
+    "diciembre",
   ],
   name => "Spanish Chile",
   native_language => "espa\N{U+00f1}ol",
@@ -236,37 +241,37 @@
     "T1",
     "T2",
     "T3",
-    "T4"
+    "T4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
-    "1.er trimestre",
+    "1.\N{U+00ba} trimestre",
     "2.\N{U+00ba} trimestre",
-    "3.er trimestre",
-    "4.\N{U+00ba} trimestre"
+    "3.\N{U+00ba} trimestre",
+    "4.\N{U+00ba} trimestre",
   ],
   quarter_stand_alone_abbreviated => [
     "T1",
     "T2",
     "T3",
-    "T4"
+    "T4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "1.\N{U+00b0} trimestre",
     "2.\N{U+00b0} trimestre",
     "3.\N{U+00b0} trimestre",
-    "4.\N{U+00ba} trimestre"
+    "4.\N{U+00ba} trimestre",
   ],
   script => undef,
   territory => "Chile",
@@ -275,5 +280,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

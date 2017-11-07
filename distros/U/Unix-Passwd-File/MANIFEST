@@ -13,6 +13,7 @@ t/add_delete_user_groups.t
 t/add_group.t
 t/add_user.t
 t/add_user_to_group.t
+t/author-critic.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
 t/data/debian/group

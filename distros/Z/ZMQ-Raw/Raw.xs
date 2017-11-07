@@ -250,21 +250,34 @@ STATIC void *zmq_sv_to_ptr (const char *type, SV *sv, const char *file, int line
 #define ZMQ_SV_TO_PTR(type, sv) \
 	zmq_sv_to_ptr(#type, sv, __FILE__, __LINE__)
 
-STATIC void S_zmq_raw_check_error (int error, const char *file, int line)
-{
-	if (error < 0)
-	{
-		zmq_raw_error *e = create_error_obj (zmq_errno(), NULL);
-		if (SvTRUE(ERRSV))
-			e->message = newSVpv (SvPVbyte_nolen (ERRSV), 0);
-		else
-			e->message = newSVpvf ("%s (errno: %d) @ (%s:%d)\n", zmq_strerror (zmq_errno()), zmq_errno(), file, line);
+#define zmq_raw_check_error(error) \
+    STMT_START {					                                              \
+		if (error < 0)                                                            \
+		{                                                                         \
+			zmq_raw_error *e;                                                     \
+                                                                                  \
+			if (zmq_errno() == EINTR || zmq_errno() == EAGAIN)                    \
+			{                                                                     \
+				int ctx = GIMME_V;                                                \
+				if (ctx == G_ARRAY)                                               \
+				{                                                                 \
+					XSRETURN_EMPTY;                                               \
+				}                                                                 \
+                                                                                  \
+				XSRETURN_UNDEF;                                                   \
+			}                                                                     \
+                                                                                  \
+			e = create_error_obj (zmq_errno(), NULL);                             \
+			if (SvTRUE(ERRSV))                                                    \
+				e->message = newSVpv (SvPVbyte_nolen (ERRSV), 0);                 \
+			else                                                                  \
+				e->message = newSVpvf ("%s (errno: %d) @ (%s:%d)\n",              \
+					zmq_strerror (zmq_errno()), zmq_errno(), __FILE__, __LINE__); \
+                                                                                  \
+			croak_error_obj (e);                                                  \
+		}                                                                         \
+    } STMT_END
 
-		croak_error_obj (e);
-	}
-}
-
-#define zmq_raw_check_error(e) S_zmq_raw_check_error(e, __FILE__, __LINE__)
 
 #define MY_CXT_KEY "ZMQ::Raw::_guts"
 typedef struct

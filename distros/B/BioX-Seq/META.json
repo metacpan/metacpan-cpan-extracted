@@ -4,7 +4,7 @@
       "Jeremy Volkening <jdv@base2bio.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.421",
+   "generated_by" : "Module::Build version 0.422",
    "license" : [
       "gpl_3"
    ],
@@ -38,7 +38,7 @@
    "provides" : {
       "BioX::Seq" : {
          "file" : "lib/BioX/Seq.pm",
-         "version" : "0.006001"
+         "version" : "0.006004"
       },
       "BioX::Seq::Fetch" : {
          "file" : "lib/BioX/Seq/Fetch.pm"
@@ -68,5 +68,5 @@
          "url" : "https://github.com/jvolkening/p5-BioX-Seq"
       }
    },
-   "version" : "0.006001"
+   "version" : "0.006004"
 }

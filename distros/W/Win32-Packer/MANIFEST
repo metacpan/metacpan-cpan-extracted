@@ -1,0 +1,21 @@
+Changes
+lib/Win32/Packer.pm
+lib/Win32/Packer/Base.pm
+lib/Win32/Packer/Helpers.pm
+lib/Win32/Packer/InstallerMaker.pm
+lib/Win32/Packer/InstallerMaker/dir.pm
+lib/Win32/Packer/InstallerMaker/dirbat.pm
+lib/Win32/Packer/InstallerMaker/do_nothing.pm
+lib/Win32/Packer/InstallerMaker/msi.pm
+lib/Win32/Packer/InstallerMaker/zip.pm
+lib/Win32/Packer/LoadPLCode.pm
+lib/Win32/Packer/WrapperCCode.pm
+Makefile.PL
+MANIFEST
+README
+scripts/pl2w32app.pl
+t/Win32-Packer.t
+win32-perl-loader/load.pl
+win32-perl-loader/win32-perl-loader.c
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

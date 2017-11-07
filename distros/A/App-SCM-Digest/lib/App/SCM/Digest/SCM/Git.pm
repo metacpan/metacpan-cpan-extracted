@@ -86,7 +86,7 @@ sub pull
 
     $self->prune();
 
-    system_ad("git pull");
+    system_ad("git pull -X theirs");
 
     return 1;
 }
@@ -146,6 +146,15 @@ sub commits_from
     my @new_commits = reverse map { chomp; $_ } `git rev-list $from..HEAD`;
 
     return \@new_commits;
+}
+
+sub has
+{
+    my ($self, $id) = @_;
+
+    my $res = system("git show -s $id >/dev/null 2>&1");
+
+    return ($res == 0);
 }
 
 sub show

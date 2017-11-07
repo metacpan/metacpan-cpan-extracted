@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "AM",
-    "PM"
+    "PM",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "E d",
@@ -44,7 +49,7 @@
     yMd => "d/M/y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "dyo-SN",
   date_format_full => "EEEE d MMMM y",
@@ -62,7 +67,7 @@
     "Ara",
     "Arj",
     "Sib",
-    "Dim"
+    "Dim",
   ],
   day_format_narrow => [
     "T",
@@ -71,7 +76,7 @@
     "A",
     "A",
     "S",
-    "D"
+    "D",
   ],
   day_format_wide => [
     "Tene\N{U+014b}",
@@ -80,7 +85,7 @@
     "Aramisay",
     "Arjuma",
     "Sibiti",
-    "Dimas"
+    "Dimas",
   ],
   day_stand_alone_abbreviated => [
     "Ten",
@@ -89,7 +94,7 @@
     "Ara",
     "Arj",
     "Sib",
-    "Dim"
+    "Dim",
   ],
   day_stand_alone_narrow => [
     "T",
@@ -98,7 +103,7 @@
     "A",
     "A",
     "S",
-    "D"
+    "D",
   ],
   day_stand_alone_wide => [
     "Tene\N{U+014b}",
@@ -107,19 +112,19 @@
     "Aramisay",
     "Arjuma",
     "Sibiti",
-    "Dimas"
+    "Dimas",
   ],
   era_abbreviated => [
     "ArY",
-    "AtY"
+    "AtY",
   ],
   era_narrow => [
     "ArY",
-    "AtY"
+    "AtY",
   ],
   era_wide => [
     "Ari\N{U+014b}uu Yeesu",
-    "Atoo\N{U+014b}e Yeesu"
+    "Atoo\N{U+014b}e Yeesu",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -140,7 +145,7 @@
     "Se",
     "Ok",
     "No",
-    "De"
+    "De",
   ],
   month_format_narrow => [
     "S",
@@ -154,7 +159,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_format_wide => [
     "Sanvie",
@@ -168,7 +173,7 @@
     "Settembar",
     "Oktobar",
     "Novembar",
-    "Disambar"
+    "Disambar",
   ],
   month_stand_alone_abbreviated => [
     "Sa",
@@ -182,7 +187,7 @@
     "Se",
     "Ok",
     "No",
-    "De"
+    "De",
   ],
   month_stand_alone_narrow => [
     "S",
@@ -196,7 +201,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_stand_alone_wide => [
     "Sanvie",
@@ -210,7 +215,7 @@
     "Settembar",
     "Oktobar",
     "Novembar",
-    "Disambar"
+    "Disambar",
   ],
   name => "Jola-Fonyi Senegal",
   native_language => "joola",
@@ -222,37 +227,37 @@
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_stand_alone_abbreviated => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   script => undef,
   territory => "Senegal",
@@ -261,5 +266,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

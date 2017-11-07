@@ -2,7 +2,7 @@ NAME
     autovivification - Lexically disable autovivification.
 
 VERSION
-    Version 0.17
+    Version 0.18
 
 SYNOPSIS
         no autovivification;
@@ -36,8 +36,8 @@ METHODS
   "unimport"
         no autovivification; # defaults to qw<fetch exists delete>
         no autovivification qw<fetch store exists delete>;
-        no autovivification 'warn';
-        no autovivification 'strict';
+        no autovivification warn   => @categories;
+        no autovivification strict => @categories;
 
     Magically called when "no autovivification @opts" is encountered.
     Enables the features given in @opts, which can be :
@@ -101,11 +101,21 @@ METHODS
 
     *   'warn'
 
-        Emits a warning when an autovivification is avoided.
+        Emits a warning when an autovivification is avoided for the
+        categories specified in @opts.
+
+        Note that "no autovivification 'warn'" currently does nothing by
+        itself, in particular it does not make the default categories warn.
+        This behaviour may change in a future version of this pragma.
 
     *   'strict'
 
-        Throws an exception when an autovivification is avoided.
+        Throws an exception when an autovivification is avoided for the
+        categories specified in @opts.
+
+        Note that "no autovivification 'strict'" currently does nothing by
+        itself, in particular it does not make the default categories die.
+        This behaviour may change in a future version of this pragma.
 
     Each call to "unimport" adds the specified features to the ones already
     in use in the current lexical scope.

@@ -1,12 +1,13 @@
 package Mojo::Log::Clearable;
 
 use Mojo::Base 'Mojo::Log';
-use Class::Method::Modifiers ();
+use Role::Tiny::With;
 
-our $VERSION = '0.003';
+our $VERSION = '1.000';
 
-sub clear_handle { delete shift->{handle} };
-Class::Method::Modifiers::before 'path' => sub { $_[0]->clear_handle if @_ > 1 };
+with 'Mojo::Log::Role::Clearable';
+
+1;
 
 =head1 NAME
 
@@ -27,40 +28,8 @@ Mojo::Log::Clearable - Mojo::Log with clearable log handle
 
 =head1 DESCRIPTION
 
-L<Mojo::Log> is a simple logger class. It holds a filehandle once it writes to
-a log, and changing L</"path"> does not open a new filehandle for logging.
-L<Mojo::Log::Clearable> subclasses L<Mojo::Log> to provide a L</"clear_handle">
-method and to automatically call it when setting L</"path"> so the logging
-handle is reopened at the new path. The L</"clear_handle"> method can also be
-used to reopen the logging handle after logrotate.
-
-=head1 EVENTS
-
-L<Mojo::Log::Clearable> inherits all events from L<Mojo::Log>.
-
-=head1 ATTRIBUTES
-
-L<Mojo::Log::Clearable> inherits all attributes from L<Mojo::Log> and
-implements the following new ones.
-
-=head2 path
-
- my $path = $log->path;
- $log     = $log->path('/var/log/mojo.log');
-
-Log file path used by L<Mojo::Log/"handle">. Reopens the handle when set.
-
-=head1 METHODS
-
-L<Mojo::Log::Clearable> inherits all methods from L<Mojo::Log> and implements
-the following new ones.
-
-=head2 clear_handle
-
- $log->clear_handle;
-
-Clears L<Mojo::Log/"handle"> attribute, it will be reopened from the L</"path">
-attribute when next accessed.
+L<Mojo::Log::Clearable> is a subclass of L<Mojo::Log> that applies the
+L<Mojo::Log::Role::Clearable> role. See that role's documentation for details.
 
 =head1 AUTHOR
 
@@ -75,8 +44,4 @@ the terms of the Artistic License version 2.0.
 
 =head1 SEE ALSO
 
-L<Mojo::Log>
-
-=cut
-
-1;
+L<Mojo::Log>, L<Mojo::Log::Role::Clearable>

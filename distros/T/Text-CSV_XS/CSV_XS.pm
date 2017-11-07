@@ -26,7 +26,7 @@ use DynaLoader ();
 use Carp;
 
 use vars   qw( $VERSION @ISA @EXPORT_OK );
-$VERSION   = "1.33";
+$VERSION   = "1.34";
 @ISA       = qw( DynaLoader Exporter );
 @EXPORT_OK = qw( csv );
 bootstrap Text::CSV_XS $VERSION;
@@ -181,7 +181,7 @@ sub new {
     exists $attr{formula_handling} and
 	$attr{formula} = delete $attr{formula_handling};
     exists $attr{formula} and
-	$attr{formula} = _supported_formula ($attr{formula});
+	$attr{formula} = _supported_formula (undef, $attr{formula});
     for (keys %attr) {
 	if (m/^[a-z]/ && exists $def_attr{$_}) {
 	    # uncoverable condition false
@@ -427,24 +427,24 @@ sub strict {
     } # always_quote
 
 sub _supported_formula {
-    my $f = shift;
+    my ($self, $f) = @_;
     defined $f or return 5;
     $f =~ m/^(?: 0 | none    )$/xi ? 0 :
     $f =~ m/^(?: 1 | die     )$/xi ? 1 :
     $f =~ m/^(?: 2 | croak   )$/xi ? 2 :
     $f =~ m/^(?: 3 | diag    )$/xi ? 3 :
     $f =~ m/^(?: 4 | empty | )$/xi ? 4 :
-    $f =~ m/^(?: 5 | undef   )$/xi ? 5 :
-    do { warn "formula-handling '$f' is not supported\n"; 3 };
+    $f =~ m/^(?: 5 | undef   )$/xi ? 5 : do {
+	$self ||= "Text::CSV_XS";
+	$self->SetDiag (1500);
+	croak "formula-handling '$f' is not supported\n";
+	};
     } # _supported_formula
-sub _formula_string {
-    [qw( none die croak diag empty undef )]->[_supported_formula (shift)];
-    } # _formula_string
 
 sub formula {
     my $self = shift;
-    @_ and $self->_set_attr_N ("formula", _supported_formula (shift));
-    _formula_string ($self->{formula});
+    @_ and $self->_set_attr_N ("formula", _supported_formula ($self, shift));
+    [qw( none die croak diag empty undef )]->[_supported_formula ($self, $self->{formula})];
     } # always_quote
 sub formula_handling {
     my $self = shift;
@@ -814,8 +814,8 @@ sub header {
 	}
 
     defined $args{detect_bom}         or $args{detect_bom}         = 1;
-    defined $args{munge_column_names} or $args{munge_column_names} = "lc";
     defined $args{set_column_names}   or $args{set_column_names}   = 1;
+    defined $args{munge_column_names} or $args{munge_column_names} = "lc";
 
     # Reset any previous leftovers
     $self->{_RECNO}		= 0;
@@ -897,7 +897,9 @@ sub header {
 
     my @hdr = @$row;
     ref $args{munge_column_names} eq "CODE" and
-	@hdr = map { $args{munge_column_names}->($_) } @hdr;
+	@hdr = map { $args{munge_column_names}->($_)       } @hdr;
+    ref $args{munge_column_names} eq "HASH" and
+	@hdr = map { $args{munge_column_names}->{$_} || $_ } @hdr;
     my %hdr = map { $_ => 1 } @hdr;
     exists $hdr{""}   and croak ($self->SetDiag (1012));
     keys %hdr == @hdr or  croak ($self->SetDiag (1013));
@@ -1168,7 +1170,7 @@ sub _csv_attr {
     ref $fltr eq "HASH" or $fltr = undef;
 
     exists $attr{formula} and
-	$attr{formula} = _supported_formula ($attr{formula});
+	$attr{formula} = _supported_formula (undef, $attr{formula});
 
     defined $attr{auto_diag}   or $attr{auto_diag}   = 1;
     defined $attr{escape_null} or $attr{escape_null} = 0;
@@ -1255,13 +1257,14 @@ sub csv {
 	return 1;
 	}
 
+    my @row1;
     if (defined $c->{hd_s} || defined $c->{hd_b} || defined $c->{hd_m} || defined $c->{hd_c}) {
 	my %harg;
 	defined $c->{hd_s} and $harg{set_set}            = $c->{hd_s};
 	defined $c->{hd_d} and $harg{detect_bom}         = $c->{hd_b};
 	defined $c->{hd_m} and $harg{munge_column_names} = $hdrs ? "none" : $c->{hd_m};
 	defined $c->{hd_c} and $harg{set_column_names}   = $hdrs ? 0      : $c->{hd_c};
-	$csv->header ($fh, \%harg);
+	@row1 = $csv->header ($fh, \%harg);
 	my @hdr = $csv->column_names;
 	@hdr and $hdrs ||= \@hdr;
 	}
@@ -1338,7 +1341,12 @@ sub csv {
 	: # aoa
 	    $frag ? $csv->fragment ($fh, $frag)
 		  : $csv->getline_all ($fh);
-    $ref or Text::CSV_XS->auto_diag;
+    if ($ref) {
+	@row1 && !$c->{hd_c} && !ref $hdrs and unshift @$ref, \@row1;
+	}
+    else {
+	Text::CSV_XS->auto_diag;
+	}
     $c->{cls} and close $fh;
     if ($ref and $c->{cbai} || $c->{cboi}) {
 	# Default is ARRAYref, but with key =>, you'll get a hashref
@@ -1447,6 +1455,8 @@ The old(er) way of using global file handles is still supported
 
 Unicode is only tested to work with perl-5.8.2 and up.
 
+See also L</BOM>.
+
 The simplest way to ensure the correct encoding is used for  in- and output
 is by either setting layers on the filehandles, or setting the L</encoding>
 argument for L</csv>.
@@ -1487,6 +1497,27 @@ For complete control over encoding, please use L<Text::CSV::Encoded>:
  $csv = Text::CSV::Encoded->new ({ encoding  => undef }); # default
  # combine () and print () accept UTF8 marked data
  # parse () and getline () return UTF8 marked data
+
+=head2 BOM
+
+BOM  (or Byte Order Mark)  handling is available only inside the L</header>
+method.   This method supports the following encodings: C<utf-8>, C<utf-1>,
+C<utf-32be>, C<utf-32le>, C<utf-16be>, C<utf-16le>, C<utf-ebcdic>, C<scsu>,
+C<bocu-1>, and C<gb-18030>. See L<Wikipedia|https://en.wikipedia.org/wiki/Byte_order_mark>.
+
+If a file has a BOM, the easiest way to deal with that is
+
+ my $aoh = csv (in => $file, detect_bom => 1);
+
+All records will be encoded based on the detected BOM.
+
+This implies a call to the  L</header>  method,  which defaults to also set
+the L</column_names>. So this is B<not> the same as
+
+ my $aoh = csv (in => $file, headers => "auto");
+
+which only reads the first record to set  L</column_names>  but ignores any
+meaning of possible present BOM.
 
 =head1 SPECIFICATION
 
@@ -2576,6 +2607,7 @@ false.
 =over 2
 
 =item sep_set
+X<sep_set>
 
  $csv->header ($fh, { sep_set => [ ";", ",", "|", "\t" ] });
 
@@ -2589,6 +2621,7 @@ Multi-byte  sequences are allowed,  both multi-character and  Unicode.  See
 L<C<sep>|/sep>.
 
 =item detect_bom
+X<detect_bom>
 
  $csv->header ($fh, { detect_bom => 1 });
 
@@ -2606,6 +2639,7 @@ If the handle was opened in a (correct) encoding,  this method will  B<not>
 alter the encoding, as it checks the leading B<bytes> of the first line.
 
 =item munge_column_names
+X<munge_column_names>
 
 This option offers the means to modify the column names into something that
 is most useful to the application.   The default is to map all column names
@@ -2615,10 +2649,23 @@ to lower case.
 
 The following values are available:
 
-  lc   - lower case
-  uc   - upper case
-  none - do not change
-  \&cb - supply a callback
+  lc     - lower case
+  uc     - upper case
+  none   - do not change
+  \%hash - supply a mapping
+  \&cb   - supply a callback
+
+Literal:
+
+ $csv->header ($fh, { munge_column_names => "none" });
+
+Hash:
+
+ $csv->header ($fh, { munge_column_names => { foo => "sombrero" });
+
+if a value does not exist, the original value is used unchanged
+
+Callback:
 
  $csv->header ($fh, { munge_column_names => sub { fc } });
  $csv->header ($fh, { munge_column_names => sub { "column_".$col++ } });
@@ -2627,6 +2674,7 @@ The following values are available:
 As this callback is called in a C<map>, you can use C<$_> directly.
 
 =item set_column_names
+X<set_column_names>
 
  $csv->header ($fh, { set_column_names => 1 });
 
@@ -2634,6 +2682,8 @@ The default is to set the instances column names using  L</column_names> if
 the method is successful,  so subsequent calls to L</getline_hr> can return
 a hash. Disable setting the header can be forced by using a false value for
 this option.
+
+As described in L</return value> above, content is lost in scalar context.
 
 =back
 
@@ -3267,6 +3317,35 @@ X<set_column_names>
 
 If  C<set_column_names> is passed,  the method L</header> is invoked on the
 opened stream with all arguments meant for L</header>.
+
+If C<set_column_names> is passed as a false value, the content of the first
+row is only preserved if the output is AoA:
+
+With an input-file like
+
+ bAr,foo
+ 1,2
+ 3,4,5
+
+This call
+
+ my $aoa = csv (in => $file, set_column_names => 0);
+
+will result in
+
+ [[ "bar", "foo"     ],
+  [ "1",   "2"       ],
+  [ "3",   "4",  "5" ]]
+
+and
+
+ my $aoa = csv (in => $file, set_column_names => 0, munge => "none");
+
+will result in
+
+ [[ "bAr", "foo"     ],
+  [ "1",   "2"       ],
+  [ "3",   "4",  "5" ]]
 
 =head2 Callbacks
 X<Callbacks>

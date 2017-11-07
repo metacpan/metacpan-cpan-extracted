@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "dop.",
-    "odp."
+    "odp.",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E H:mm",
     EHms => "E H:mm:ss",
     Ed => "E d.",
@@ -52,10 +57,10 @@
     yMd => "d. M. y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-few" => "w. 't\N{U+00fd}den' 'roku' y",
-    "yw-count-many" => "w. 't\N{U+00fd}den' 'roku' y",
-    "yw-count-one" => "w. 't\N{U+00fd}den' 'roku' y",
-    "yw-count-other" => "w. 't\N{U+00fd}den' 'roku' y"
+    "yw-count-few" => "w. 't\N{U+00fd}den' 'roku' Y",
+    "yw-count-many" => "w. 't\N{U+00fd}den' 'roku' Y",
+    "yw-count-one" => "w. 't\N{U+00fd}den' 'roku' Y",
+    "yw-count-other" => "w. 't\N{U+00fd}den' 'roku' Y",
   },
   code => "cs-CZ",
   date_format_full => "EEEE d. MMMM y",
@@ -73,7 +78,7 @@
     "\N{U+010d}t",
     "p\N{U+00e1}",
     "so",
-    "ne"
+    "ne",
   ],
   day_format_narrow => [
     "P",
@@ -82,7 +87,7 @@
     "\N{U+010c}",
     "P",
     "S",
-    "N"
+    "N",
   ],
   day_format_wide => [
     "pond\N{U+011b}l\N{U+00ed}",
@@ -91,7 +96,7 @@
     "\N{U+010d}tvrtek",
     "p\N{U+00e1}tek",
     "sobota",
-    "ned\N{U+011b}le"
+    "ned\N{U+011b}le",
   ],
   day_stand_alone_abbreviated => [
     "po",
@@ -100,7 +105,7 @@
     "\N{U+010d}t",
     "p\N{U+00e1}",
     "so",
-    "ne"
+    "ne",
   ],
   day_stand_alone_narrow => [
     "P",
@@ -109,7 +114,7 @@
     "\N{U+010c}",
     "P",
     "S",
-    "N"
+    "N",
   ],
   day_stand_alone_wide => [
     "pond\N{U+011b}l\N{U+00ed}",
@@ -118,19 +123,19 @@
     "\N{U+010d}tvrtek",
     "p\N{U+00e1}tek",
     "sobota",
-    "ned\N{U+011b}le"
+    "ned\N{U+011b}le",
   ],
   era_abbreviated => [
     "p\N{U+0159}. n. l.",
-    "n. l."
+    "n. l.",
   ],
   era_narrow => [
     "p\N{U+0159}.n.l.",
-    "n.l."
+    "n.l.",
   ],
   era_wide => [
-    "p\N{U+0159}. n. l.",
-    "n. l."
+    "p\N{U+0159}ed na\N{U+0161}\N{U+00ed}m letopo\N{U+010d}tem",
+    "na\N{U+0161}eho letopo\N{U+010d}tu",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -151,7 +156,7 @@
     "z\N{U+00e1}\N{U+0159}",
     "\N{U+0159}\N{U+00ed}j",
     "lis",
-    "pro"
+    "pro",
   ],
   month_format_narrow => [
     1,
@@ -165,7 +170,7 @@
     9,
     10,
     11,
-    12
+    12,
   ],
   month_format_wide => [
     "ledna",
@@ -179,7 +184,7 @@
     "z\N{U+00e1}\N{U+0159}\N{U+00ed}",
     "\N{U+0159}\N{U+00ed}jna",
     "listopadu",
-    "prosince"
+    "prosince",
   ],
   month_stand_alone_abbreviated => [
     "led",
@@ -193,7 +198,7 @@
     "z\N{U+00e1}\N{U+0159}",
     "\N{U+0159}\N{U+00ed}j",
     "lis",
-    "pro"
+    "pro",
   ],
   month_stand_alone_narrow => [
     1,
@@ -207,7 +212,7 @@
     9,
     10,
     11,
-    12
+    12,
   ],
   month_stand_alone_wide => [
     "leden",
@@ -221,7 +226,7 @@
     "z\N{U+00e1}\N{U+0159}\N{U+00ed}",
     "\N{U+0159}\N{U+00ed}jen",
     "listopad",
-    "prosinec"
+    "prosinec",
   ],
   name => "Czech Czechia",
   native_language => "\N{U+010d}e\N{U+0161}tina",
@@ -233,37 +238,37 @@
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "1. \N{U+010d}tvrtlet\N{U+00ed}",
     "2. \N{U+010d}tvrtlet\N{U+00ed}",
     "3. \N{U+010d}tvrtlet\N{U+00ed}",
-    "4. \N{U+010d}tvrtlet\N{U+00ed}"
+    "4. \N{U+010d}tvrtlet\N{U+00ed}",
   ],
   quarter_stand_alone_abbreviated => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "1. \N{U+010d}tvrtlet\N{U+00ed}",
     "2. \N{U+010d}tvrtlet\N{U+00ed}",
     "3. \N{U+010d}tvrtlet\N{U+00ed}",
-    "4. \N{U+010d}tvrtlet\N{U+00ed}"
+    "4. \N{U+010d}tvrtlet\N{U+00ed}",
   ],
   script => undef,
   territory => "Czechia",
@@ -272,5 +277,5 @@
   time_format_medium => "H:mm:ss",
   time_format_short => "H:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

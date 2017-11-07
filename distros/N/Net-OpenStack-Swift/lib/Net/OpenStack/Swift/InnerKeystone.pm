@@ -43,15 +43,15 @@ sub service_catalog_url_for {
     my $args = $rule->validate(@_);
 
     my $found_endpoint;
-    foreach my $service_catelog ( @{ $self->service_catalog } ) {
+    LOOP: foreach my $service_catelog ( @{ $self->service_catalog } ) {
         if ( $args->{service_type} eq $service_catelog->{type} ) {
             foreach my $endpoint ( @{ $service_catelog->{endpoints} } ) {
                 if ( exists $endpoint->{ $args->{endpoint_type} } ) {
-                    $found_endpoint = $endpoint;
-
-                    # filtering match Region
-                    if ( $args->{region} and $args->{region} ne $endpoint->{region} ) {
-                        $found_endpoint = undef;
+                    # check if the region matches or if there is no prefered region
+                    if ( !$args->{region} or $args->{region} eq $endpoint->{region} ) {
+                        $found_endpoint = $endpoint;
+                        # we found it, stop searching
+                        last LOOP;
                     }
                 }
             }

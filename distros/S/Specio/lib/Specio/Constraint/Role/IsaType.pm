@@ -3,7 +3,7 @@ package Specio::Constraint::Role::IsaType;
 use strict;
 use warnings;
 
-our $VERSION = '0.40';
+our $VERSION = '0.42';
 
 use Scalar::Util qw( blessed );
 use Specio::PartialDump qw( partial_dump );
@@ -110,7 +110,7 @@ Specio::Constraint::Role::IsaType - Provides a common implementation for Specio:
 
 =head1 VERSION
 
-version 0.40
+version 0.42
 
 =head1 DESCRIPTION
 

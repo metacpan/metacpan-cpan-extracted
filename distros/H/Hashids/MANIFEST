@@ -11,6 +11,7 @@ t/00_compile.t
 t/01_hashids.t
 t/01_util.t
 t/02_subclass.t
+t/03_collision.t
 t/lib/SubClassTest.pm
 META.yml
 MANIFEST

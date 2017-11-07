@@ -3,6 +3,7 @@ abstract: 'Perl-style syntax frontend for L<Struct::Path|Struct::Path>.'
 author:
   - 'Michael Samoglyadov <mixas@cpan.org>'
 build_requires:
+  Clone: 0
   Storable: 0
   Test::More: 0
 configure_requires:
@@ -21,11 +22,13 @@ no_index:
 requires:
   Carp: 0
   PPI: 0
+  Safe: 0
   Scalar::Util: 0
   parent: 0
-  perl: 5.008
+  perl: 5.01
+  re: 0.08
   strict: 0
   warnings: 0
 resources:
   repository: https://github.com/mr-mixas/Struct-Path-PerlStyle.pm
-version: 0.71
+version: 0.73

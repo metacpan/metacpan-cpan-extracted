@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "ki\N{U+025b}m\N{U+025b}\N{U+0301}\N{U+025b}m",
-    "kis\N{U+025b}\N{U+0301}nd\N{U+025b}"
+    "kis\N{U+025b}\N{U+0301}nd\N{U+025b}",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "E d",
@@ -44,7 +49,7 @@
     yMd => "d/M/y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "yav-CM",
   date_format_full => "EEEE d MMMM y",
@@ -62,7 +67,7 @@
     "kl",
     "fl",
     "ss",
-    "sd"
+    "sd",
   ],
   day_format_narrow => [
     "m",
@@ -71,7 +76,7 @@
     "k",
     "f",
     "s",
-    "s"
+    "s",
   ],
   day_format_wide => [
     "m\N{U+00f3}ndie",
@@ -80,7 +85,7 @@
     "k\N{U+00fa}p\N{U+00e9}limet\N{U+00fa}kpiap\N{U+025b}",
     "fel\N{U+00e9}te",
     "s\N{U+00e9}sel\N{U+00e9}",
-    "s\N{U+0254}\N{U+0301}ndi\N{U+025b}"
+    "s\N{U+0254}\N{U+0301}ndi\N{U+025b}",
   ],
   day_stand_alone_abbreviated => [
     "md",
@@ -89,7 +94,7 @@
     "kl",
     "fl",
     "ss",
-    "sd"
+    "sd",
   ],
   day_stand_alone_narrow => [
     "m",
@@ -98,7 +103,7 @@
     "k",
     "f",
     "s",
-    "s"
+    "s",
   ],
   day_stand_alone_wide => [
     "m\N{U+00f3}ndie",
@@ -107,19 +112,19 @@
     "k\N{U+00fa}p\N{U+00e9}limet\N{U+00fa}kpiap\N{U+025b}",
     "fel\N{U+00e9}te",
     "s\N{U+00e9}sel\N{U+00e9}",
-    "s\N{U+0254}\N{U+0301}ndi\N{U+025b}"
+    "s\N{U+0254}\N{U+0301}ndi\N{U+025b}",
   ],
   era_abbreviated => [
     "k.Y.",
-    "+J.C."
+    "+J.C.",
   ],
   era_narrow => [
     "k.Y.",
-    "+J.C."
+    "+J.C.",
   ],
   era_wide => [
     "katikup\N{U+00ed}en Y\N{U+00e9}suse",
-    "\N{U+00e9}k\N{U+00e9}l\N{U+00e9}mk\N{U+00fa}nup\N{U+00ed}\N{U+00e9}n n"
+    "\N{U+00e9}k\N{U+00e9}l\N{U+00e9}mk\N{U+00fa}nup\N{U+00ed}\N{U+00e9}n n",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -140,7 +145,7 @@
     "o.9",
     "o.10",
     "o.11",
-    "o.12"
+    "o.12",
   ],
   month_format_narrow => [
     1,
@@ -154,7 +159,7 @@
     9,
     10,
     11,
-    12
+    12,
   ],
   month_format_wide => [
     "pik\N{U+00ed}t\N{U+00ed}k\N{U+00ed}tie, o\N{U+00f3}l\N{U+00ed} \N{U+00fa} kut\N{U+00fa}an",
@@ -168,7 +173,7 @@
     "im\N{U+025b}\N{U+014b} i pu\N{U+0254}s",
     "im\N{U+025b}\N{U+014b} i put\N{U+00fa}k,o\N{U+00f3}li \N{U+00fa} k\N{U+00e1}t\N{U+00ed}\N{U+025b}",
     "makandik\N{U+025b}",
-    "pil\N{U+0254}nd\N{U+0254}\N{U+0301}"
+    "pil\N{U+0254}nd\N{U+0254}\N{U+0301}",
   ],
   month_stand_alone_abbreviated => [
     "o.1",
@@ -182,7 +187,7 @@
     "o.9",
     "o.10",
     "o.11",
-    "o.12"
+    "o.12",
   ],
   month_stand_alone_narrow => [
     1,
@@ -196,7 +201,7 @@
     9,
     10,
     11,
-    12
+    12,
   ],
   month_stand_alone_wide => [
     "pik\N{U+00ed}t\N{U+00ed}k\N{U+00ed}tie, o\N{U+00f3}l\N{U+00ed} \N{U+00fa} kut\N{U+00fa}an",
@@ -210,7 +215,7 @@
     "im\N{U+025b}\N{U+014b} i pu\N{U+0254}s",
     "im\N{U+025b}\N{U+014b} i put\N{U+00fa}k,o\N{U+00f3}li \N{U+00fa} k\N{U+00e1}t\N{U+00ed}\N{U+025b}",
     "makandik\N{U+025b}",
-    "pil\N{U+0254}nd\N{U+0254}\N{U+0301}"
+    "pil\N{U+0254}nd\N{U+0254}\N{U+0301}",
   ],
   name => "Yangben Cameroon",
   native_language => "nuasue",
@@ -222,37 +227,37 @@
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "nd\N{U+00e1}t\N{U+00fa}\N{U+025b} 1",
     "nd\N{U+00e1}t\N{U+00fa}\N{U+025b} 2",
     "nd\N{U+00e1}t\N{U+00fa}\N{U+025b} 3",
-    "nd\N{U+00e1}t\N{U+00fa}\N{U+025b} 4"
+    "nd\N{U+00e1}t\N{U+00fa}\N{U+025b} 4",
   ],
   quarter_stand_alone_abbreviated => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "nd\N{U+00e1}t\N{U+00fa}\N{U+025b} 1",
     "nd\N{U+00e1}t\N{U+00fa}\N{U+025b} 2",
     "nd\N{U+00e1}t\N{U+00fa}\N{U+025b} 3",
-    "nd\N{U+00e1}t\N{U+00fa}\N{U+025b} 4"
+    "nd\N{U+00e1}t\N{U+00fa}\N{U+025b} 4",
   ],
   script => undef,
   territory => "Cameroon",
@@ -261,5 +266,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

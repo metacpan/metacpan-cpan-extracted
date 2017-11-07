@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "AM",
-    "PM"
+    "PM",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "E d.",
@@ -44,7 +49,7 @@
     yMd => "y-MM-dd",
     yQQQ => "y QQQ",
     yQQQQ => "y QQQQ",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "wae",
   date_format_full => "EEEE, d. MMMM y",
@@ -62,7 +67,7 @@
     "Fr\N{U+00f3}",
     "Fri",
     "Sam",
-    "Sun"
+    "Sun",
   ],
   day_format_narrow => [
     "M",
@@ -71,7 +76,7 @@
     "F",
     "F",
     "S",
-    "S"
+    "S",
   ],
   day_format_wide => [
     "M\N{U+00e4}ntag",
@@ -80,7 +85,7 @@
     "Fr\N{U+00f3}ntag",
     "Fritag",
     "Sam\N{U+0161}tag",
-    "Sunntag"
+    "Sunntag",
   ],
   day_stand_alone_abbreviated => [
     "M\N{U+00e4}n",
@@ -89,7 +94,7 @@
     "Fr\N{U+00f3}",
     "Fri",
     "Sam",
-    "Sun"
+    "Sun",
   ],
   day_stand_alone_narrow => [
     "M",
@@ -98,7 +103,7 @@
     "F",
     "F",
     "S",
-    "S"
+    "S",
   ],
   day_stand_alone_wide => [
     "M\N{U+00e4}ntag",
@@ -107,19 +112,19 @@
     "Fr\N{U+00f3}ntag",
     "Fritag",
     "Sam\N{U+0161}tag",
-    "Sunntag"
+    "Sunntag",
   ],
   era_abbreviated => [
     "v. Chr.",
-    "n. Chr"
+    "n. Chr",
   ],
   era_narrow => [
     "v. Chr.",
-    "n. Chr"
+    "n. Chr",
   ],
   era_wide => [
     "v. Chr.",
-    "n. Chr"
+    "n. Chr",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -140,7 +145,7 @@
     "Her",
     "W\N{U+00ed}m",
     "Win",
-    "Chr"
+    "Chr",
   ],
   month_format_narrow => [
     "J",
@@ -154,7 +159,7 @@
     "H",
     "W",
     "W",
-    "C"
+    "C",
   ],
   month_format_wide => [
     "Jenner",
@@ -168,7 +173,7 @@
     "Herb\N{U+0161}tm\N{U+00e1}net",
     "W\N{U+00ed}m\N{U+00e1}net",
     "Winterm\N{U+00e1}net",
-    "Chri\N{U+0161}tm\N{U+00e1}net"
+    "Chri\N{U+0161}tm\N{U+00e1}net",
   ],
   month_stand_alone_abbreviated => [
     "Jen",
@@ -182,7 +187,7 @@
     "Her",
     "W\N{U+00ed}m",
     "Win",
-    "Chr"
+    "Chr",
   ],
   month_stand_alone_narrow => [
     "J",
@@ -196,7 +201,7 @@
     "H",
     "W",
     "W",
-    "C"
+    "C",
   ],
   month_stand_alone_wide => [
     "Jenner",
@@ -210,7 +215,7 @@
     "Herb\N{U+0161}tm\N{U+00e1}net",
     "W\N{U+00ed}m\N{U+00e1}net",
     "Winterm\N{U+00e1}net",
-    "Chri\N{U+0161}tm\N{U+00e1}net"
+    "Chri\N{U+0161}tm\N{U+00e1}net",
   ],
   name => "Walser",
   native_language => "Walser",
@@ -222,37 +227,37 @@
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "1. quartal",
     "2. quartal",
     "3. quartal",
-    "4. quartal"
+    "4. quartal",
   ],
   quarter_stand_alone_abbreviated => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "1. quartal",
     "2. quartal",
     "3. quartal",
-    "4. quartal"
+    "4. quartal",
   ],
   script => undef,
   territory => undef,
@@ -261,5 +266,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

@@ -14,7 +14,6 @@ $file = "lib/$file.pm";
 my %PREREQ_PM = (
  'Exporter'        => 0,
  'Scope::Upper'    => 0,
- 'Test::More'      => 0,
  'Variable::Magic' => '0.51',
  'base'            => 0,
 );

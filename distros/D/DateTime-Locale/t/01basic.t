@@ -231,7 +231,12 @@ sub check_root {
     test_data( $locale, %tests );
 
     my %formats = (
+        Bh                  => 'h B',
+        Bhm                 => 'h:mm B',
+        Bhms                => 'h:mm:ss B',
         E                   => 'ccc',
+        EBhm                => 'E h:mm B',
+        EBhms               => 'E h:mm:ss B',
         EHm                 => 'E HH:mm',
         EHms                => 'E HH:mm:ss',
         Ed                  => 'd, E',
@@ -271,7 +276,7 @@ sub check_root {
         yMd                 => 'y-MM-dd',
         yQQQ                => 'y QQQ',
         yQQQQ               => 'y QQQQ',
-        'yw-count-other'    => q{'week' w 'of' y},
+        'yw-count-other'    => q{'week' w 'of' Y},
     );
 
     test_formats( $locale, %formats );
@@ -315,7 +320,12 @@ sub check_en_GB {
     test_data( $locale, %tests );
 
     my %formats = (
+        Bh                  => 'h B',
+        Bhm                 => 'h.mm B',
+        Bhms                => 'h.mm.ss B',
         E                   => 'ccc',
+        EBhm                => 'E, h.mm B',
+        EBhms               => 'E, h.mm.ss B',
         EHm                 => 'E HH:mm',
         EHms                => 'E HH:mm:ss',
         Ed                  => 'E d',
@@ -357,8 +367,8 @@ sub check_en_GB {
         yMd                 => 'dd/MM/y',
         yQQQ                => 'QQQ y',
         yQQQQ               => 'QQQQ y',
-        'yw-count-one'      => q{'week' w 'of' y},
-        'yw-count-other'    => q{'week' w 'of' y},
+        'yw-count-one'      => q{'week' w 'of' Y},
+        'yw-count-other'    => q{'week' w 'of' Y},
     );
 
     test_formats( $locale, %formats );

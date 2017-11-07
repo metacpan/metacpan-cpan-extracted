@@ -57,6 +57,7 @@ sub new
 						commandlines => {},
 						fullgraph => undef,
 						prunedgraph => undef,
+						preprocess => undef,
 					},
 					$class
 				);
@@ -137,6 +138,8 @@ sub endTestRun
 			order => $self->{orderstrategy} ? $self->{orderstrategy}->getStrategyName() : undef,
 		};
 	$self->__save("$self->{root}/data/meta", $meta);
+
+	$self->__saveText("$self->{root}/data/preprocess", $self->{preprocess}) if $self->{preprocess};
 }
 
 # retain the tap handles we issue so we can 'manually' close them
@@ -320,6 +323,22 @@ sub recordPrunedGraph
 	$self->{prunedgraph} = \%prunedgraph;	
 }
 
+sub recordPreprocess
+{
+	my $self = shift;
+	my $preproc = shift;
+	
+	$self->{preprocess} = $preproc;	
+}
+
+sub recordPostprocess
+{
+	my $self = shift;
+	my $postproc = shift;
+	
+	$self->__saveText("$self->{root}/data/postprocess", $postproc);
+}
+
 sub recordCommandLine
 {
 	my $self = shift;
@@ -338,6 +357,17 @@ sub __save
 	my $file = slashify("$name.json");
 	mkpath(dirname($file));
 	write_file($file, $self->{json}->encode($data)) || die("Failed to write '$file': $!\n");
+}
+
+sub __saveText
+{
+	my $self = shift;
+	my $name = shift;
+	my $data = shift;
+	
+	my $file = slashify("$name.txt");
+	mkpath(dirname($file));
+	write_file($file, @$data) || die("Failed to write '$file': $!\n");
 }
 
 1;

@@ -105,7 +105,7 @@ SKIP: {
 
     eval { $digest->_repository_map(\&App::SCM::Digest::_update_repository) };
     ok($@, 'Died trying to update pre-initialisation');
-    like($@, qr/Unable to open repository 'test'/,
+    like($@, qr/Unable to find branch database/,
         'Got correct error message');
 
     my $email;

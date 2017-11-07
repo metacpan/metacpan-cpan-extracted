@@ -2,7 +2,7 @@ package Mojolicious::Plugin::SPNEGO;
 use Mojo::Base 'Mojolicious::Plugin';
 use Net::LDAP::SPNEGO;
 
-our $VERSION = '0.2.4';
+our $VERSION = '0.2.7';
 
 my %cCache;
 
@@ -14,15 +14,22 @@ sub register {
     $app->helper(
         ntlm_auth => sub {
             my $c = shift;
-            my $helper_cfg = ref ${_}[0] ? %{${_}[0]} : { @_ };
+            my $helper_cfg = ref ${_}[0] eq 'HASH' ? ${_}[0] : { @_ };
             my $cfg = { %$plugin_cfg, %$helper_cfg };
             my $cId = $c->tx->connection;
-            my $cCache = $cCache{$cId} //= { status => 'init' };
-            return if $cCache->{status} eq 'authenticated';
 
             my $authorization = $c->req->headers->header('Authorization') // '';
             my ($AuthBase64) = ($authorization =~ /^NTLM\s(.+)$/);
+            # $c->app->log->debug("AuthBase64: $AuthBase64") if $AuthBase64;
+
+            my $cCache = $cCache{$cId} //= {
+                status => $AuthBase64 ? 'expectType1' : 'init'
+            };
+            return 1 if $cCache->{status} eq 'authenticated';
+
             my ($status) = ($cCache->{status} =~ /^expect(Type[13])/);
+            # $c->app->log->debug("status: $status") if $status;
+
             if ($AuthBase64 and $status){
                 for ($status){
                     my $ldap = $cCache->{ldapObj} //= Net::LDAP::SPNEGO->new(
@@ -52,7 +59,8 @@ sub register {
                         }
                         $ldap->unbind;
                         delete $cCache->{ldapObj};
-                        return  $cCache->{status} eq 'authenticated';
+                        return 1 if $cCache->{status} eq 'authenticated';
+                        return $c->render( text => 'sorry auth has failed', status => 401);
                     };
                 }
             }
@@ -90,7 +98,7 @@ __END__
                 $c->session('name',$user->{displayname});
                 my $groups = $ldap->get_ad_groups($user->{samaccountname});
                 $c->session('groups',[ sort keys %$groups]);
-                return 1;
+                return 1; # 1 is you are happy with the outcome
             }
         }) or return;
     }

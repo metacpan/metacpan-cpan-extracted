@@ -1,13 +1,13 @@
 package App::GitGot::Command;
 our $AUTHORITY = 'cpan:GENEHACK';
-$App::GitGot::Command::VERSION = '1.333';
+$App::GitGot::Command::VERSION = '1.334';
 # ABSTRACT: Base class for App::GitGot commands
 use 5.014;
 
 use App::Cmd::Setup -command;
 use Cwd;
 use File::HomeDir;
-use List::AllUtils          qw/ max first /;
+use List::Util              qw/ max first /;
 use Path::Tiny;
 use Try::Tiny;
 use Types::Standard -types;
@@ -393,7 +393,7 @@ sub _git_update {
       my( $msg , $entry ) = @_;
 
       my @o = $entry->pull;
-      if ( $o[0] eq 'Already up-to-date.' ) {
+      if ( $o[0] =~ /^Already up.to.date\./ ) {
         $msg .= $self->minor_change('Up to date') unless $self->quiet;
       }
       else {
@@ -586,7 +586,7 @@ App::GitGot::Command - Base class for App::GitGot commands
 
 =head1 VERSION
 
-version 1.333
+version 1.334
 
 =head1 METHODS
 
@@ -607,7 +607,7 @@ Response defaults to 'no'.
 
 =head2 search_repos
 
-Returns a L<App::GotGot::Repositories> object containing all repos managed by
+Returns a L<App::GitGot::Repositories> object containing all repos managed by
 Got.
 
 =head2 write_config

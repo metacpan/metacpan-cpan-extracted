@@ -14,7 +14,8 @@ do { my $x = {
        'runtime' => {
                       'requires' => {
                                       'Class::Method::Modifiers' => '2.11',
-                                      'Mojolicious' => '5.77',
+                                      'Mojolicious' => '7.42',
+                                      'Role::Tiny' => '2.000002',
                                       'perl' => '5.010001'
                                     }
                     },

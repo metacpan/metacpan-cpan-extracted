@@ -1,5 +1,16 @@
 Revision history for Struct-Path-PerlStyle
 
+0.73    2017-11-05
+        tests for scientific notation or a floating-point numbers fixed
+
+0.72    2017-11-05
+        drop support for perl <= 5.008 (regexp_pattern absent in re pragma)
+        spaces as hash keys delimiters are deprecated (ambigous)
+        hash keys regexps serialization supported
+        hash keys regex parsing fixed and improved
+        parsing/serialization escape sequences in hash keys fixed
+        sane errors for undefs as array indexes on path serialization
+
 0.71    2017-10-15
         ranges composer in ps_serialize() optimized a bit
         $_ mangling in ps_parse() fixed

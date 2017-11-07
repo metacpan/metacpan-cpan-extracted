@@ -5,7 +5,7 @@ package WebService::BitbucketServer;
 use warnings;
 use strict;
 
-our $VERSION = '0.602'; # VERSION
+our $VERSION = '0.603'; # VERSION
 
 use HTTP::AnyUA::Util qw(www_form_urlencode);
 use HTTP::AnyUA;
@@ -304,7 +304,7 @@ WebService::BitbucketServer - Bindings for Bitbucket Server REST APIs
 
 =head1 VERSION
 
-version 0.602
+version 0.603
 
 =head1 SYNOPSIS
 
@@ -384,6 +384,14 @@ Get the L<JSON> (or compatible) object used for encoding and decoding documents.
 Get whether or not a warning will be issued when an insecure action takes place (such as sending
 credentials unencrypted). Defaults to false (i.e. will issue warning).
 
+=head1 METHODS
+
+=head2 new
+
+    $api = WebService::BitbucketServer->new(base_url => $base_url, %other_attributes);
+
+Create a new API context object. Provide L</ATTRIBUTES> to customize.
+
 =head2 core
 
 Get the L<WebService::BitbucketServer::Core::V1> api.
@@ -426,7 +434,7 @@ Get the L<WebService::BitbucketServer::GPG::V1> api.
 
 =head2 jira
 
-Get the L<WebService::BitbucketServer::Jira::V1> api.
+Get the L<WebService::BitbucketServer::JIRA::V1> api.
 
 =head2 ssh
 
@@ -440,14 +448,6 @@ Get the L<WebService::BitbucketServer::MirroringUpstream::V1> api.
 
 Get the L<WebService::BitbucketServer::RepositoryRefSync::V1> api.
 
-=head1 METHODS
-
-=head2 new
-
-    $api = WebService::BitbucketServer->new(base_url => $base_url, %other_attributes);
-
-Create a new API context object. Provide L</ATTRIBUTES> to customize.
-
 =head2 url
 
     $url = $api->url;
@@ -458,7 +458,8 @@ Get the URL of the APIs (a combination of L</base_url> and L</path>).
 
     $response = $api->call(method => $method, url => $url, %options);
 
-Make a request to an API and get a L<response|WebService::BitbucketServer::Response>.
+Make a request to an API and get a L<response|WebService::BitbucketServer::Response> (or L<Future>
+if the user agent is non-blocking).
 
 =over 4
 
@@ -507,6 +508,12 @@ feature.
 =head1 AUTHOR
 
 Charles McGarvey <chazmcgarvey@brokenzipper.com>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Camspi
+
+Camspi <amarus18@hotmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 

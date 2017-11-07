@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "sn.",
-    "gn."
+    "gn.",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d, E",
@@ -46,7 +51,7 @@
     yMd => "y-MM-dd",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "so",
   date_format_full => "EEEE, MMMM dd, y",
@@ -64,7 +69,7 @@
     "Kha",
     "Jim",
     "Sab",
-    "Axd"
+    "Axd",
   ],
   day_format_narrow => [
     "I",
@@ -73,7 +78,7 @@
     "Kh",
     "J",
     "S",
-    "A"
+    "A",
   ],
   day_format_wide => [
     "Isniin",
@@ -82,7 +87,7 @@
     "Khamiis",
     "Jimco",
     "Sabti",
-    "Axad"
+    "Axad",
   ],
   day_stand_alone_abbreviated => [
     "Isn",
@@ -91,7 +96,7 @@
     "Kha",
     "Jim",
     "Sab",
-    "Axd"
+    "Axd",
   ],
   day_stand_alone_narrow => [
     "I",
@@ -100,7 +105,7 @@
     "Kh",
     "J",
     "S",
-    "A"
+    "A",
   ],
   day_stand_alone_wide => [
     "Isniin",
@@ -109,19 +114,19 @@
     "Khamiis",
     "Jimco",
     "Sabti",
-    "Axad"
+    "Axad",
   ],
   era_abbreviated => [
     "CK",
-    "CD"
+    "CD",
   ],
   era_narrow => [
     "CK",
-    "CD"
+    "CD",
   ],
   era_wide => [
     "CK",
-    "CD"
+    "CD",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -142,7 +147,7 @@
     "Sag",
     "Tob",
     "KIT",
-    "LIT"
+    "LIT",
   ],
   month_format_narrow => [
     "K",
@@ -156,7 +161,7 @@
     "S",
     "T",
     "K",
-    "L"
+    "L",
   ],
   month_format_wide => [
     "Bisha Koobaad",
@@ -170,7 +175,7 @@
     "Bisha Sagaalaad",
     "Bisha Tobnaad",
     "Bisha Kow iyo Tobnaad",
-    "Bisha Laba iyo Tobnaad"
+    "Bisha Laba iyo Tobnaad",
   ],
   month_stand_alone_abbreviated => [
     "Kob",
@@ -184,7 +189,7 @@
     "Sag",
     "Tob",
     "KIT",
-    "LIT"
+    "LIT",
   ],
   month_stand_alone_narrow => [
     1,
@@ -198,7 +203,7 @@
     9,
     10,
     11,
-    12
+    12,
   ],
   month_stand_alone_wide => [
     "Bisha Koobaad",
@@ -212,7 +217,7 @@
     "Bisha Sagaalaad",
     "Bisha Tobnaad",
     "Bisha Kow iyo Tobnaad",
-    "Bisha Laba iyo Tobnaad"
+    "Bisha Laba iyo Tobnaad",
   ],
   name => "Somali",
   native_language => "Soomaali",
@@ -224,37 +229,37 @@
     "R1",
     "R2",
     "R3",
-    "R4"
+    "R4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "Rubaca 1aad",
     "Rubaca 2aad",
     "Rubaca 3aad",
-    "Rubaca 4aad"
+    "Rubaca 4aad",
   ],
   quarter_stand_alone_abbreviated => [
     "R1",
     "R2",
     "R3",
-    "R4"
+    "R4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "Rubaca 1aad",
     "Rubaca 2aad",
     "Rubaca 3aad",
-    "Rubaca 4aad"
+    "Rubaca 4aad",
   ],
   script => undef,
   territory => undef,
@@ -263,5 +268,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 31
+  version => 32,
 }

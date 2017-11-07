@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "ip.",
-    "ep."
+    "ep.",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E H.mm",
     EHms => "E H.mm.ss",
     Ed => "E d.",
@@ -46,9 +51,9 @@
     yMd => "d.M.y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-one" => "'okko' w, y",
-    "yw-count-other" => "'okko' w, y",
-    "yw-count-two" => "'okko' w, y"
+    "yw-count-one" => "'okko' w, Y",
+    "yw-count-other" => "'okko' w, Y",
+    "yw-count-two" => "'okko' w, Y",
   },
   code => "smn-FI",
   date_format_full => "cccc, MMMM d. y",
@@ -66,7 +71,7 @@
     "tuo",
     "v\N{U+00e1}s",
     "l\N{U+00e1}v",
-    "pas"
+    "pas",
   ],
   day_format_narrow => [
     "V",
@@ -75,7 +80,7 @@
     "T",
     "V",
     "L",
-    "p"
+    "p",
   ],
   day_format_wide => [
     "vuossaarg\N{U+00e2}",
@@ -84,7 +89,7 @@
     "tuor\N{U+00e2}stuv",
     "v\N{U+00e1}stuppeeivi",
     "l\N{U+00e1}vurduv",
-    "pasepeeivi"
+    "pasepeeivi",
   ],
   day_stand_alone_abbreviated => [
     "vuo",
@@ -93,7 +98,7 @@
     "tuo",
     "v\N{U+00e1}s",
     "l\N{U+00e1}v",
-    "pas"
+    "pas",
   ],
   day_stand_alone_narrow => [
     "M",
@@ -102,7 +107,7 @@
     "T",
     "F",
     "S",
-    "S"
+    "S",
   ],
   day_stand_alone_wide => [
     "vuossarg\N{U+00e2}",
@@ -111,19 +116,19 @@
     "tuor\N{U+00e2}st\N{U+00e2}h",
     "v\N{U+00e1}stuppeivi",
     "l\N{U+00e1}vurd\N{U+00e2}h",
-    "pasepeivi"
+    "pasepeivi",
   ],
   era_abbreviated => [
     "oKr.",
-    "mKr."
+    "mKr.",
   ],
   era_narrow => [
     "oKr.",
-    "mKr."
+    "mKr.",
   ],
   era_wide => [
     "Ovdil Kristus \N{U+0161}odd\N{U+00e2}m",
-    "ma\N{U+014b}a Kristus \N{U+0161}odd\N{U+00e2}m"
+    "ma\N{U+014b}a Kristus \N{U+0161}odd\N{U+00e2}m",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -144,7 +149,7 @@
     "\N{U+010d}oh\N{U+010d}\N{U+00e2}",
     "roovv\N{U+00e2}d",
     "skamm\N{U+00e2}",
-    "juovl\N{U+00e2}"
+    "juovl\N{U+00e2}",
   ],
   month_format_narrow => [
     "U",
@@ -158,7 +163,7 @@
     "\N{U+010c}",
     "R",
     "S",
-    "J"
+    "J",
   ],
   month_format_wide => [
     "u\N{U+0111}\N{U+0111}\N{U+00e2}ivem\N{U+00e1}\N{U+00e1}nu",
@@ -172,7 +177,7 @@
     "\N{U+010d}oh\N{U+010d}\N{U+00e2}m\N{U+00e1}\N{U+00e1}nu",
     "roovv\N{U+00e2}dm\N{U+00e1}\N{U+00e1}nu",
     "skamm\N{U+00e2}m\N{U+00e1}\N{U+00e1}nu",
-    "juovl\N{U+00e2}m\N{U+00e1}\N{U+00e1}nu"
+    "juovl\N{U+00e2}m\N{U+00e1}\N{U+00e1}nu",
   ],
   month_stand_alone_abbreviated => [
     "u\N{U+0111}iv",
@@ -186,7 +191,7 @@
     "\N{U+010d}oh\N{U+010d}\N{U+00e2}",
     "roovv\N{U+00e2}d",
     "skamm\N{U+00e2}",
-    "juovl\N{U+00e2}"
+    "juovl\N{U+00e2}",
   ],
   month_stand_alone_narrow => [
     "U",
@@ -200,7 +205,7 @@
     "\N{U+010c}",
     "R",
     "S",
-    "J"
+    "J",
   ],
   month_stand_alone_wide => [
     "u\N{U+0111}\N{U+0111}\N{U+00e2}ivem\N{U+00e1}\N{U+00e1}nu",
@@ -214,7 +219,7 @@
     "\N{U+010d}oh\N{U+010d}\N{U+00e2}m\N{U+00e1}\N{U+00e1}nu",
     "roovv\N{U+00e2}dm\N{U+00e1}\N{U+00e1}nu",
     "skamm\N{U+00e2}m\N{U+00e1}\N{U+00e1}nu",
-    "juovl\N{U+00e2}m\N{U+00e1}\N{U+00e1}nu"
+    "juovl\N{U+00e2}m\N{U+00e1}\N{U+00e1}nu",
   ],
   name => "Inari Sami Finland",
   native_language => "anar\N{U+00e2}\N{U+0161}kiel\N{U+00e2}",
@@ -226,37 +231,37 @@
     "1. ni\N{U+00e4}lj.",
     "2. ni\N{U+00e4}lj.",
     "3. ni\N{U+00e4}lj.",
-    "4. ni\N{U+00e4}lj."
+    "4. ni\N{U+00e4}lj.",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "1. ni\N{U+00e4}lj\N{U+00e1}d\N{U+00e2}s",
     "2. ni\N{U+00e4}lj\N{U+00e1}d\N{U+00e2}s",
     "3. ni\N{U+00e4}lj\N{U+00e1}d\N{U+00e2}s",
-    "4. ni\N{U+00e4}lj\N{U+00e1}d\N{U+00e2}s"
+    "4. ni\N{U+00e4}lj\N{U+00e1}d\N{U+00e2}s",
   ],
   quarter_stand_alone_abbreviated => [
     "1. ni\N{U+00e4}lj.",
     "2. ni\N{U+00e4}lj.",
     "3. ni\N{U+00e4}lj.",
-    "4. ni\N{U+00e4}lj."
+    "4. ni\N{U+00e4}lj.",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "1. ni\N{U+00e4}lj\N{U+00e1}d\N{U+00e2}s",
     "2. ni\N{U+00e4}lj\N{U+00e1}d\N{U+00e2}s",
     "3. ni\N{U+00e4}lj\N{U+00e1}d\N{U+00e2}s",
-    "4. ni\N{U+00e4}lj\N{U+00e1}d\N{U+00e2}s"
+    "4. ni\N{U+00e4}lj\N{U+00e1}d\N{U+00e2}s",
   ],
   script => undef,
   territory => "Finland",
@@ -265,5 +270,5 @@
   time_format_medium => "H.mm.ss",
   time_format_short => "H.mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

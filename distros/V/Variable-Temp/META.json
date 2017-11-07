@@ -4,13 +4,13 @@
       "Vincent Pit <perl@profvince.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Variable-Temp",
    "no_index" : {
@@ -40,7 +40,6 @@
          "requires" : {
             "Exporter" : "0",
             "Scope::Upper" : "0",
-            "Test::More" : "0",
             "Variable::Magic" : "0.51",
             "base" : "0",
             "perl" : "5.006"
@@ -60,5 +59,6 @@
          "url" : "http://git.profvince.com/?p=perl%2Fmodules%2FVariable-Temp.git"
       }
    },
-   "version" : "0.03"
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "AM",
-    "PM"
+    "PM",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d, E",
@@ -45,7 +50,7 @@
     yMd => "y-MM-dd",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "vai-Vaii-LR",
   date_format_full => "EEEE, d MMMM y",
@@ -63,7 +68,7 @@
     "\N{U+a549}\N{U+a524}\N{U+a546}\N{U+a562}",
     "\N{U+a549}\N{U+a524}\N{U+a540}\N{U+a56e}",
     "\N{U+a53b}\N{U+a52c}\N{U+a533}",
-    "\N{U+a55e}\N{U+a54c}\N{U+a535}"
+    "\N{U+a55e}\N{U+a54c}\N{U+a535}",
   ],
   day_format_narrow => [
     "M",
@@ -72,7 +77,7 @@
     "T",
     "F",
     "S",
-    "S"
+    "S",
   ],
   day_format_wide => [
     "\N{U+a5f3}\N{U+a5e1}\N{U+a609}",
@@ -81,7 +86,7 @@
     "\N{U+a549}\N{U+a524}\N{U+a546}\N{U+a562}",
     "\N{U+a549}\N{U+a524}\N{U+a540}\N{U+a56e}",
     "\N{U+a53b}\N{U+a52c}\N{U+a533}",
-    "\N{U+a55e}\N{U+a54c}\N{U+a535}"
+    "\N{U+a55e}\N{U+a54c}\N{U+a535}",
   ],
   day_stand_alone_abbreviated => [
     "\N{U+a5f3}\N{U+a5e1}\N{U+a609}",
@@ -90,7 +95,7 @@
     "\N{U+a549}\N{U+a524}\N{U+a546}\N{U+a562}",
     "\N{U+a549}\N{U+a524}\N{U+a540}\N{U+a56e}",
     "\N{U+a53b}\N{U+a52c}\N{U+a533}",
-    "\N{U+a55e}\N{U+a54c}\N{U+a535}"
+    "\N{U+a55e}\N{U+a54c}\N{U+a535}",
   ],
   day_stand_alone_narrow => [
     "M",
@@ -99,7 +104,7 @@
     "T",
     "F",
     "S",
-    "S"
+    "S",
   ],
   day_stand_alone_wide => [
     "\N{U+a5f3}\N{U+a5e1}\N{U+a609}",
@@ -108,19 +113,19 @@
     "\N{U+a549}\N{U+a524}\N{U+a546}\N{U+a562}",
     "\N{U+a549}\N{U+a524}\N{U+a540}\N{U+a56e}",
     "\N{U+a53b}\N{U+a52c}\N{U+a533}",
-    "\N{U+a55e}\N{U+a54c}\N{U+a535}"
+    "\N{U+a55e}\N{U+a54c}\N{U+a535}",
   ],
   era_abbreviated => [
     "BCE",
-    "CE"
+    "CE",
   ],
   era_narrow => [
     "BCE",
-    "CE"
+    "CE",
   ],
   era_wide => [
     "BCE",
-    "CE"
+    "CE",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -130,18 +135,18 @@
   glibc_time_format => "%H:%M:%S",
   language => "Vai",
   month_format_abbreviated => [
-    "\N{U+a5a8}\N{U+a56a}\N{U+a583} \N{U+a51e}\N{U+a56e}",
-    "\N{U+a552}\N{U+a561}\N{U+a59d}\N{U+a595}",
+    "\N{U+a5a8}\N{U+a56a}\N{U+a583}",
+    "\N{U+a552}\N{U+a561}",
     "\N{U+a57e}\N{U+a5ba}",
     "\N{U+a5a2}\N{U+a595}",
     "\N{U+a591}\N{U+a571}",
-    6,
-    7,
+    "\N{U+a5b1}\N{U+a60b}",
+    "\N{U+a5b1}\N{U+a55e}",
     "\N{U+a5db}\N{U+a515}",
     "\N{U+a562}\N{U+a54c}",
     "\N{U+a56d}\N{U+a583}",
-    "\N{U+a51e}\N{U+a60b}\N{U+a554}\N{U+a57f} \N{U+a578}\N{U+a583}\N{U+a5cf}",
-    "\N{U+a5a8}\N{U+a56a}\N{U+a571} \N{U+a5cf}\N{U+a56e}"
+    "\N{U+a51e}\N{U+a60b}",
+    "\N{U+a5a8}\N{U+a56a}\N{U+a571}",
   ],
   month_format_narrow => [
     1,
@@ -155,7 +160,7 @@
     9,
     10,
     11,
-    12
+    12,
   ],
   month_format_wide => [
     "\N{U+a5a8}\N{U+a56a}\N{U+a583} \N{U+a51e}\N{U+a56e}",
@@ -163,27 +168,27 @@
     "\N{U+a57e}\N{U+a5ba}",
     "\N{U+a5a2}\N{U+a595}",
     "\N{U+a591}\N{U+a571}",
-    6,
-    7,
+    "\N{U+a5b1}\N{U+a60b}",
+    "\N{U+a5b1}\N{U+a55e}\N{U+a524}",
     "\N{U+a5db}\N{U+a515}",
     "\N{U+a562}\N{U+a54c}",
     "\N{U+a56d}\N{U+a583}",
     "\N{U+a51e}\N{U+a60b}\N{U+a554}\N{U+a57f} \N{U+a578}\N{U+a583}\N{U+a5cf}",
-    "\N{U+a5a8}\N{U+a56a}\N{U+a571} \N{U+a5cf}\N{U+a56e}"
+    "\N{U+a5a8}\N{U+a56a}\N{U+a571} \N{U+a5cf}\N{U+a56e}",
   ],
   month_stand_alone_abbreviated => [
-    "\N{U+a5a8}\N{U+a56a}\N{U+a583} \N{U+a51e}\N{U+a56e}",
-    "\N{U+a552}\N{U+a561}\N{U+a59d}\N{U+a595}",
+    "\N{U+a5a8}\N{U+a56a}\N{U+a583}",
+    "\N{U+a552}\N{U+a561}",
     "\N{U+a57e}\N{U+a5ba}",
     "\N{U+a5a2}\N{U+a595}",
     "\N{U+a591}\N{U+a571}",
-    6,
-    7,
+    "\N{U+a5b1}\N{U+a60b}",
+    "\N{U+a5b1}\N{U+a55e}",
     "\N{U+a5db}\N{U+a515}",
     "\N{U+a562}\N{U+a54c}",
     "\N{U+a56d}\N{U+a583}",
-    "\N{U+a51e}\N{U+a60b}\N{U+a554}\N{U+a57f} \N{U+a578}\N{U+a583}\N{U+a5cf}",
-    "\N{U+a5a8}\N{U+a56a}\N{U+a571} \N{U+a5cf}\N{U+a56e}"
+    "\N{U+a51e}\N{U+a60b}",
+    "\N{U+a5a8}\N{U+a56a}\N{U+a571}",
   ],
   month_stand_alone_narrow => [
     1,
@@ -197,7 +202,7 @@
     9,
     10,
     11,
-    12
+    12,
   ],
   month_stand_alone_wide => [
     "\N{U+a5a8}\N{U+a56a}\N{U+a583} \N{U+a51e}\N{U+a56e}",
@@ -205,13 +210,13 @@
     "\N{U+a57e}\N{U+a5ba}",
     "\N{U+a5a2}\N{U+a595}",
     "\N{U+a591}\N{U+a571}",
-    6,
-    7,
+    "\N{U+a5b1}\N{U+a60b}",
+    "\N{U+a5b1}\N{U+a55e}\N{U+a524}",
     "\N{U+a5db}\N{U+a515}",
     "\N{U+a562}\N{U+a54c}",
     "\N{U+a56d}\N{U+a583}",
     "\N{U+a51e}\N{U+a60b}\N{U+a554}\N{U+a57f} \N{U+a578}\N{U+a583}\N{U+a5cf}",
-    "\N{U+a5a8}\N{U+a56a}\N{U+a571} \N{U+a5cf}\N{U+a56e}"
+    "\N{U+a5a8}\N{U+a56a}\N{U+a571} \N{U+a5cf}\N{U+a56e}",
   ],
   name => "Vai Liberia Vai",
   native_language => "\N{U+a559}\N{U+a524}",
@@ -223,37 +228,37 @@
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_stand_alone_abbreviated => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   script => "Vai",
   territory => "Liberia",
@@ -262,5 +267,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 31
+  version => 32,
 }

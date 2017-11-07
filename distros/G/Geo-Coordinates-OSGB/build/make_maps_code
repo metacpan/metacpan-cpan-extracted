@@ -47,13 +47,13 @@ Apply the new version number v.vv to the newly created module.
 
 =head1 AUTHOR 
 
-Toby Thurston -- 30 Jul 2017
+Toby Thurston -- 30 Oct 2017
 
 =cut
 
 my $want_diff   = 0;
 my $want_update = 0;
-my $new_version = '2.19';
+my $new_version = '2.20';
 my $module_name = 'Maps.pm';
 my $lib_module_name = File::Spec->catfile(qw(lib Geo Coordinates OSGB), $module_name);
 

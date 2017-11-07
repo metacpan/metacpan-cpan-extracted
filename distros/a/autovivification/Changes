@@ -1,5 +1,14 @@
 Revision history for autovivification
 
+0.18    2017-11-04 15:30 UTC
+        + Fix : [RT #123411] : Compatibility with CV-in-stash optimisation
+                Thanks Father Chrysostomos for reporting and contributing a
+                patch.
+        + Fix : [RT #122956] : strict/warn flags seem to simply do nothing
+                The documentation has been amended to clarify how these two
+                options are supposed to be used.
+                Thanks Christian Walde for reporting.
+
 0.17    2017-07-31 17:15 UTC
         + Chg : A large chunk of boilerplate XS code, which is also used in
                 other XS modules, has been factored out of the main .xs file

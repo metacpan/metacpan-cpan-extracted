@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "AM",
-    "PM"
+    "PM",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "E d",
@@ -46,8 +51,8 @@
     yMd => "dd/MM/y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-one" => "'week' w 'of' y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-one" => "'week' w 'of' Y",
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "en-GM",
   date_format_full => "EEEE, d MMMM y",
@@ -65,7 +70,7 @@
     "Thu",
     "Fri",
     "Sat",
-    "Sun"
+    "Sun",
   ],
   day_format_narrow => [
     "M",
@@ -74,7 +79,7 @@
     "T",
     "F",
     "S",
-    "S"
+    "S",
   ],
   day_format_wide => [
     "Monday",
@@ -83,7 +88,7 @@
     "Thursday",
     "Friday",
     "Saturday",
-    "Sunday"
+    "Sunday",
   ],
   day_stand_alone_abbreviated => [
     "Mon",
@@ -92,7 +97,7 @@
     "Thu",
     "Fri",
     "Sat",
-    "Sun"
+    "Sun",
   ],
   day_stand_alone_narrow => [
     "M",
@@ -101,7 +106,7 @@
     "T",
     "F",
     "S",
-    "S"
+    "S",
   ],
   day_stand_alone_wide => [
     "Monday",
@@ -110,19 +115,19 @@
     "Thursday",
     "Friday",
     "Saturday",
-    "Sunday"
+    "Sunday",
   ],
   era_abbreviated => [
     "BC",
-    "AD"
+    "AD",
   ],
   era_narrow => [
     "B",
-    "A"
+    "A",
   ],
   era_wide => [
     "Before Christ",
-    "Anno Domini"
+    "Anno Domini",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -143,7 +148,7 @@
     "Sep",
     "Oct",
     "Nov",
-    "Dec"
+    "Dec",
   ],
   month_format_narrow => [
     "J",
@@ -157,7 +162,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_format_wide => [
     "January",
@@ -171,7 +176,7 @@
     "September",
     "October",
     "November",
-    "December"
+    "December",
   ],
   month_stand_alone_abbreviated => [
     "Jan",
@@ -185,7 +190,7 @@
     "Sep",
     "Oct",
     "Nov",
-    "Dec"
+    "Dec",
   ],
   month_stand_alone_narrow => [
     "J",
@@ -199,7 +204,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_stand_alone_wide => [
     "January",
@@ -213,7 +218,7 @@
     "September",
     "October",
     "November",
-    "December"
+    "December",
   ],
   name => "English Gambia",
   native_language => "English",
@@ -225,37 +230,37 @@
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "1st quarter",
     "2nd quarter",
     "3rd quarter",
-    "4th quarter"
+    "4th quarter",
   ],
   quarter_stand_alone_abbreviated => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "1st quarter",
     "2nd quarter",
     "3rd quarter",
-    "4th quarter"
+    "4th quarter",
   ],
   script => undef,
   territory => "Gambia",
@@ -264,5 +269,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 31
+  version => 32,
 }

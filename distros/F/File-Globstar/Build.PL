@@ -19,7 +19,7 @@ my %module_build_args = (
     "Guido Flohr <guido.flohr\@cantanea.com>"
   ],
   "dist_name" => "File-Globstar",
-  "dist_version" => "0.1",
+  "dist_version" => "0.2",
   "license" => "artistic_2",
   "module_name" => "File::Globstar",
   "recursive_test_files" => 1,
@@ -29,7 +29,7 @@ my %module_build_args = (
     "File::Glob" => 0,
     "IO::Handle" => 0,
     "Locale::TextDomain" => 0,
-    "Scalar::Util" => 0,
+    "Scalar::Util" => "1.21",
     "base" => 0,
     "constant" => 0,
     "strict" => 0,

@@ -1,5 +1,8 @@
 Revision history for Text-NumericData
 
+2.003003
+	- Make tests more robust by introducing proper numerical error range.
+
 2.003002
 	- Re-release with correct metadata (build system misuse).
 

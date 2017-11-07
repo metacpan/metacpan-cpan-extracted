@@ -1,6 +1,10 @@
 #ifndef XSH_CAPS_H
 #define XSH_CAPS_H 1
 
+#ifdef __cplusplus
+# error C++ compilers are not supported
+#endif
+
 #define XSH_HAS_PERL(R, V, S) (PERL_REVISION > (R) || (PERL_REVISION == (R) && (PERL_VERSION > (V) || (PERL_VERSION == (V) && (PERL_SUBVERSION >= (S))))))
 
 #define XSH_HAS_PERL_BRANCH(R, V, S) (PERL_REVISION == (R) && PERL_VERSION == (V) && PERL_SUBVERSION >= (S))

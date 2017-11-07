@@ -260,7 +260,7 @@ Italian Vatican City locale.
 
 =head3 Medium
 
-   2008-02-05T18:30:30 = 05 feb 2008
+   2008-02-05T18:30:30 = 5 feb 2008
    1995-12-22T09:05:02 = 22 dic 1995
   -0010-09-15T04:44:23 = 15 set -10
 
@@ -314,7 +314,7 @@ Italian Vatican City locale.
 
 =head3 Medium
 
-   2008-02-05T18:30:30 = 05 feb 2008, 18:30:30
+   2008-02-05T18:30:30 = 5 feb 2008, 18:30:30
    1995-12-22T09:05:02 = 22 dic 1995, 09:05:02
   -0010-09-15T04:44:23 = 15 set -10, 04:44:23
 
@@ -327,11 +327,41 @@ Italian Vatican City locale.
 
 =head2 Available Formats
 
+=head3 Bh (h B)
+
+   2008-02-05T18:30:30 = 6 B
+   1995-12-22T09:05:02 = 9 B
+  -0010-09-15T04:44:23 = 4 B
+
+=head3 Bhm (h:mm B)
+
+   2008-02-05T18:30:30 = 6:30 B
+   1995-12-22T09:05:02 = 9:05 B
+  -0010-09-15T04:44:23 = 4:44 B
+
+=head3 Bhms (h:mm:ss B)
+
+   2008-02-05T18:30:30 = 6:30:30 B
+   1995-12-22T09:05:02 = 9:05:02 B
+  -0010-09-15T04:44:23 = 4:44:23 B
+
 =head3 E (ccc)
 
    2008-02-05T18:30:30 = mar
    1995-12-22T09:05:02 = ven
   -0010-09-15T04:44:23 = sab
+
+=head3 EBhm (E h:mm B)
+
+   2008-02-05T18:30:30 = mar 6:30 B
+   1995-12-22T09:05:02 = ven 9:05 B
+  -0010-09-15T04:44:23 = sab 4:44 B
+
+=head3 EBhms (E h:mm:ss B)
+
+   2008-02-05T18:30:30 = mar 6:30:30 B
+   1995-12-22T09:05:02 = ven 9:05:02 B
+  -0010-09-15T04:44:23 = sab 4:44:23 B
 
 =head3 EHm (E HH:mm)
 
@@ -573,13 +603,13 @@ Italian Vatican City locale.
    1995-12-22T09:05:02 = 4º trimestre 1995
   -0010-09-15T04:44:23 = 3º trimestre -10
 
-=head3 yw-count-one ('settimana' w 'del' y)
+=head3 yw-count-one ('settimana' w 'del' Y)
 
    2008-02-05T18:30:30 = settimana 6 del 2008
    1995-12-22T09:05:02 = settimana 51 del 1995
   -0010-09-15T04:44:23 = settimana 37 del -10
 
-=head3 yw-count-other ('settimana' w 'del' y)
+=head3 yw-count-other ('settimana' w 'del' Y)
 
    2008-02-05T18:30:30 = settimana 6 del 2008
    1995-12-22T09:05:02 = settimana 51 del 1995

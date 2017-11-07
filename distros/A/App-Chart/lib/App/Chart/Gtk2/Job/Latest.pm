@@ -60,10 +60,10 @@ sub start_for_view {
   if ($symlist) {
     my $l = $symlist->symbol_listref;
     my @l = List::MoreUtils::after {$_ eq $symbol} @$l;
-    push @$symbol_list, shift @l;
-    push @$extra_list, splice @l,0,9;
+    # push @$symbol_list, shift @l;
+    push @$extra_list, splice @l,0,3;      # next 4 symbols as extras
     @l = List::MoreUtils::before {$_ eq $symbol} @$l;
-    if (@l) { push @$extra_list, $l[-1]; }
+    if (@l) { push @$extra_list, $l[-1]; } # prev 1 symbol as extra
   }
   $class->start ($symbol_list, $extra_list);
 }

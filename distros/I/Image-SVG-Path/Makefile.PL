@@ -22,6 +22,7 @@ WriteMakefile (
 	x_contributors => [
 	    'Alessandro Ranellucci <aar@cpan.org>',
 	    'Colin Kuskie <colink@cpan.org>',
+	    'Alexander Gorlov',
 	],
     },
     MIN_PERL_VERSION => '5.006001',

@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "AM",
-    "PM"
+    "PM",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d, E",
@@ -50,7 +55,7 @@
     yMd => "y-MM-dd",
     yQQQ => "y QQQ",
     yQQQQ => "y QQQQ",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "seh-MZ",
   date_format_full => "EEEE, d 'de' MMMM 'de' y",
@@ -68,7 +73,7 @@
     "Nai",
     "Sha",
     "Sab",
-    "Dim"
+    "Dim",
   ],
   day_format_narrow => [
     "P",
@@ -77,7 +82,7 @@
     "N",
     "S",
     "S",
-    "D"
+    "D",
   ],
   day_format_wide => [
     "Chiposi",
@@ -86,7 +91,7 @@
     "Chinai",
     "Chishanu",
     "Sabudu",
-    "Dimingu"
+    "Dimingu",
   ],
   day_stand_alone_abbreviated => [
     "Pos",
@@ -95,7 +100,7 @@
     "Nai",
     "Sha",
     "Sab",
-    "Dim"
+    "Dim",
   ],
   day_stand_alone_narrow => [
     "P",
@@ -104,7 +109,7 @@
     "N",
     "S",
     "S",
-    "D"
+    "D",
   ],
   day_stand_alone_wide => [
     "Chiposi",
@@ -113,19 +118,19 @@
     "Chinai",
     "Chishanu",
     "Sabudu",
-    "Dimingu"
+    "Dimingu",
   ],
   era_abbreviated => [
     "AC",
-    "AD"
+    "AD",
   ],
   era_narrow => [
     "AC",
-    "AD"
+    "AD",
   ],
   era_wide => [
     "Antes de Cristo",
-    "Anno Domini"
+    "Anno Domini",
   ],
   first_day_of_week => 7,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -146,7 +151,7 @@
     "Set",
     "Otu",
     "Nov",
-    "Dec"
+    "Dec",
   ],
   month_format_narrow => [
     "J",
@@ -160,7 +165,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_format_wide => [
     "Janeiro",
@@ -174,7 +179,7 @@
     "Setembro",
     "Otubro",
     "Novembro",
-    "Decembro"
+    "Decembro",
   ],
   month_stand_alone_abbreviated => [
     "Jan",
@@ -188,7 +193,7 @@
     "Set",
     "Otu",
     "Nov",
-    "Dec"
+    "Dec",
   ],
   month_stand_alone_narrow => [
     "J",
@@ -202,7 +207,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_stand_alone_wide => [
     "Janeiro",
@@ -216,7 +221,7 @@
     "Setembro",
     "Otubro",
     "Novembro",
-    "Decembro"
+    "Decembro",
   ],
   name => "Sena Mozambique",
   native_language => "sena",
@@ -228,37 +233,37 @@
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_stand_alone_abbreviated => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   script => undef,
   territory => "Mozambique",
@@ -267,5 +272,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

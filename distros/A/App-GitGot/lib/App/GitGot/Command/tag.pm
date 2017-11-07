@@ -1,6 +1,6 @@
 package App::GitGot::Command::tag;
 our $AUTHORITY = 'cpan:GENEHACK';
-$App::GitGot::Command::tag::VERSION = '1.333';
+$App::GitGot::Command::tag::VERSION = '1.334';
 # ABSTRACT: list/add/remove tags for the current repository
 use 5.014;
 
@@ -85,7 +85,7 @@ App::GitGot::Command::tag - list/add/remove tags for the current repository
 
 =head1 VERSION
 
-version 1.333
+version 1.334
 
 =head1 SYNOPSIS
 

@@ -10,7 +10,7 @@ Base class for DB tables.
 =cut
 
 package QBit::Application::Model::DB::Table;
-$QBit::Application::Model::DB::Table::VERSION = '0.022';
+$QBit::Application::Model::DB::Table::VERSION = '0.023';
 use qbit;
 
 use base qw(QBit::Application::Model::DB::Class);

@@ -9,8 +9,8 @@ use LWP::UserAgent;
 use HTTP::Request::Common;
 use HTML::TableExtract;
 
-our $VERSION = '1.38'; # VERSION
-$MORNINGSTAR_SE_FUNDS_URL = 'http://morningstar.se/funds/overview.asp?cid=';
+our $VERSION = '1.43'; # VERSION
+$MORNINGSTAR_SE_FUNDS_URL = 'http://morningstar.se/Funds/Quicktake/Overview.aspx?perfid=';
 
 sub methods { return (morningstar => \&morningstar); }
 
@@ -41,33 +41,28 @@ sub morningstar {
 	  return wantarray ? %funds : \%funds;
     }
 
-    $te = new HTML::TableExtract();
-    $te->parse($reply->content);
+    $te = HTML::TableExtract->new();
+    $te->parse($reply->decoded_content);
     #print "Tables: " . $te->tables_report() . "\n";
-    my $counter = 0;
-    my $dateset = 0;
     for my $table ($te->tables()) {
-	  for my $row ($table->rows()) {
-        if (defined(@$row[0])) {
-		  if ('Senaste NAV' eq substr(@$row[0],0,11)) {
-            @value_currency = split(/ /, $$row[2]);
-            $funds{$name, 'method'}   = 'morningstar_funds';
-            $funds{$name, 'price'}    = $value_currency[0];
-            $funds{$name, 'currency'} = $value_currency[1];
-            $funds{$name, 'success'}  = 1;
-            $funds{$name, 'symbol'}  = $name;
-            $funds{$name, 'source'}   = 'Finance::Quote::Morningstar';
-            $funds{$name, 'name'}   = $name;
-            $funds{$name, 'p_change'} = "";  # p_change is not retrieved (yet?)
-		  }
-		  if ($counter == 7 && $dateset == 0) {
-            my $date = substr($$row[1],0,10);
-            $quoter->store_date(\%funds, $name, {isodate => $date});
-            $dateset = 1;
-		  }
+        for my $row ($table->rows()) {
+            if (defined(@$row[0])) {
+                if ('Senaste NAV' eq substr(@$row[0],0,11)) {
+                    my $date = $$row[2];
+                    @value_currency = split(' ', $$row[1]);
+                    $funds{$name, 'method'}   = 'morningstar_funds';
+                    $value_currency[0] =~ s/,/\./;
+                    $funds{$name, 'price'}    = $value_currency[0];
+                    $funds{$name, 'currency'} = $value_currency[1];
+                    $funds{$name, 'success'}  = 1;
+                    $funds{$name, 'symbol'}  = $name;
+                    $quoter->store_date(\%funds, $name, {isodate => $date});
+                    $funds{$name, 'source'}   = 'Finance::Quote::Morningstar';
+                    $funds{$name, 'name'}   = $name;
+                    $funds{$name, 'p_change'} = "";  # p_change is not retrieved (yet?)
+                }
+            }
         }
-	  }
-	  $counter++;
     }
 
     # Check for undefined symbols

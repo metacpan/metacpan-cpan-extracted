@@ -1,5 +1,5 @@
 package QBit::Application::Model::DBManager::_Utils::Fields;
-$QBit::Application::Model::DBManager::_Utils::Fields::VERSION = '0.017';
+$QBit::Application::Model::DBManager::_Utils::Fields::VERSION = '0.018';
 use qbit;
 
 use base qw(QBit::Class);
@@ -13,6 +13,7 @@ sub new {
 
     $opt = [grep {$fields->{$_}{'default'}} keys(%$fields)] unless defined($opt);
     $opt = [$opt] if ref($opt) ne 'ARRAY';
+    $opt = [keys(%$fields)] if ($opt->[0] // '') eq '*';
 
     my @unknown_fields = ();
     foreach my $field (@$opt) {
@@ -118,7 +119,7 @@ sub process_data {
     if (@{$self->{__PROC_FIELDS__}} || @need_delete) {
         foreach my $rec (@$data) {
             foreach my $p (@{$self->{__PROC_FIELDS__}}) {
-                $rec->{$p->{'name'}} = $p->{'process'}($self, $rec);
+                $rec->{$p->{'name'}} = $p->{'process'}->($self, $rec);
             }
 
             delete($rec->{$_}) foreach @need_delete;

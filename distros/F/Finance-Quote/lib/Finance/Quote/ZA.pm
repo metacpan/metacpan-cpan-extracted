@@ -28,7 +28,7 @@ use LWP::UserAgent;
 use HTTP::Request::Common;
 use HTML::TableExtract;
 
-our $VERSION = '1.38'; # VERSION
+our $VERSION = '1.43'; # VERSION
 
 my $SHARENET_MAINURL = ("http://www.sharenet.co.za/");
 my $SHARENET_URL     = ( $SHARENET_MAINURL . "jse/" );
@@ -68,7 +68,7 @@ sub sharenet {
             next;
         }
 
-        $te = new HTML::TableExtract();
+        $te = HTML::TableExtract->new();
         $te->parse( $response->content );
 
         # print "[debug]: (parsed HTML)",$te, "\n";

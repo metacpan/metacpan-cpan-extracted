@@ -11,13 +11,13 @@ Variable::Temp - Temporarily change the value of a variable.
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
 our $VERSION;
 BEGIN {
- $VERSION = '0.03';
+ $VERSION = '0.04';
 }
 
 =head1 SYNOPSIS
@@ -201,7 +201,7 @@ You can find documentation for this module with the perldoc command.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2015 Vincent Pit, all rights reserved.
+Copyright 2015,2017 Vincent Pit, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

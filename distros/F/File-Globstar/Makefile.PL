@@ -25,7 +25,7 @@ my %WriteMakefileArgs = (
     "File::Glob" => 0,
     "IO::Handle" => 0,
     "Locale::TextDomain" => 0,
-    "Scalar::Util" => 0,
+    "Scalar::Util" => "1.21",
     "base" => 0,
     "constant" => 0,
     "strict" => 0,
@@ -38,7 +38,7 @@ my %WriteMakefileArgs = (
     "Git" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.1",
+  "VERSION" => "0.2",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -56,7 +56,7 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "Locale::TextDomain" => 0,
   "Module::Build" => "0.28",
-  "Scalar::Util" => 0,
+  "Scalar::Util" => "1.21",
   "Test::More" => 0,
   "base" => 0,
   "constant" => 0,

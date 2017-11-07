@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "AM",
-    "PM"
+    "PM",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d, E",
@@ -44,7 +49,7 @@
     yMd => "y-MM-dd",
     yQQQ => "y QQQ",
     yQQQQ => "y QQQQ",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "lkt",
   date_format_full => "y MMMM d, EEEE",
@@ -62,7 +67,7 @@
     "A\N{U+014b}p\N{U+00e9}tutopa",
     "A\N{U+014b}p\N{U+00e9}tuzapta\N{U+014b}",
     "Ow\N{U+00e1}\N{U+014b}gyu\N{U+017e}a\N{U+017e}api",
-    "A\N{U+014b}p\N{U+00e9}tuwak\N{U+021f}a\N{U+014b}"
+    "A\N{U+014b}p\N{U+00e9}tuwak\N{U+021f}a\N{U+014b}",
   ],
   day_format_narrow => [
     "W",
@@ -71,7 +76,7 @@
     "T",
     "Z",
     "O",
-    "A"
+    "A",
   ],
   day_format_wide => [
     "A\N{U+014b}p\N{U+00e9}tuwa\N{U+014b}\N{U+017e}i",
@@ -80,7 +85,7 @@
     "A\N{U+014b}p\N{U+00e9}tutopa",
     "A\N{U+014b}p\N{U+00e9}tuzapta\N{U+014b}",
     "Ow\N{U+00e1}\N{U+014b}gyu\N{U+017e}a\N{U+017e}api",
-    "A\N{U+014b}p\N{U+00e9}tuwak\N{U+021f}a\N{U+014b}"
+    "A\N{U+014b}p\N{U+00e9}tuwak\N{U+021f}a\N{U+014b}",
   ],
   day_stand_alone_abbreviated => [
     "A\N{U+014b}p\N{U+00e9}tuwa\N{U+014b}\N{U+017e}i",
@@ -89,7 +94,7 @@
     "A\N{U+014b}p\N{U+00e9}tutopa",
     "A\N{U+014b}p\N{U+00e9}tuzapta\N{U+014b}",
     "Ow\N{U+00e1}\N{U+014b}gyu\N{U+017e}a\N{U+017e}api",
-    "A\N{U+014b}p\N{U+00e9}tuwak\N{U+021f}a\N{U+014b}"
+    "A\N{U+014b}p\N{U+00e9}tuwak\N{U+021f}a\N{U+014b}",
   ],
   day_stand_alone_narrow => [
     "M",
@@ -98,7 +103,7 @@
     "T",
     "F",
     "S",
-    "S"
+    "S",
   ],
   day_stand_alone_wide => [
     "A\N{U+014b}p\N{U+00e9}tuwa\N{U+014b}\N{U+017e}i",
@@ -107,19 +112,19 @@
     "A\N{U+014b}p\N{U+00e9}tutopa",
     "A\N{U+014b}p\N{U+00e9}tuzapta\N{U+014b}",
     "Ow\N{U+00e1}\N{U+014b}gyu\N{U+017e}a\N{U+017e}api",
-    "A\N{U+014b}p\N{U+00e9}tuwak\N{U+021f}a\N{U+014b}"
+    "A\N{U+014b}p\N{U+00e9}tuwak\N{U+021f}a\N{U+014b}",
   ],
   era_abbreviated => [
     "BCE",
-    "CE"
+    "CE",
   ],
   era_narrow => [
     "BCE",
-    "CE"
+    "CE",
   ],
   era_wide => [
     "BCE",
-    "CE"
+    "CE",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -140,7 +145,7 @@
     "\N{U+010c}ha\N{U+014b}w\N{U+00e1}pe\N{U+01e7}i W\N{U+00ed}",
     "\N{U+010c}ha\N{U+014b}w\N{U+00e1}pe-kasn\N{U+00e1} W\N{U+00ed}",
     "Wan\N{U+00ed}yetu W\N{U+00ed}",
-    "T\N{U+021f}ah\N{U+00e9}kap\N{U+0161}u\N{U+014b} W\N{U+00ed}"
+    "T\N{U+021f}ah\N{U+00e9}kap\N{U+0161}u\N{U+014b} W\N{U+00ed}",
   ],
   month_format_narrow => [
     1,
@@ -154,7 +159,7 @@
     9,
     10,
     11,
-    12
+    12,
   ],
   month_format_wide => [
     "Wi\N{U+00f3}the\N{U+021f}ika W\N{U+00ed}",
@@ -168,7 +173,7 @@
     "\N{U+010c}ha\N{U+014b}w\N{U+00e1}pe\N{U+01e7}i W\N{U+00ed}",
     "\N{U+010c}ha\N{U+014b}w\N{U+00e1}pe-kasn\N{U+00e1} W\N{U+00ed}",
     "Wan\N{U+00ed}yetu W\N{U+00ed}",
-    "T\N{U+021f}ah\N{U+00e9}kap\N{U+0161}u\N{U+014b} W\N{U+00ed}"
+    "T\N{U+021f}ah\N{U+00e9}kap\N{U+0161}u\N{U+014b} W\N{U+00ed}",
   ],
   month_stand_alone_abbreviated => [
     "Wi\N{U+00f3}the\N{U+021f}ika W\N{U+00ed}",
@@ -182,7 +187,7 @@
     "\N{U+010c}ha\N{U+014b}w\N{U+00e1}pe\N{U+01e7}i W\N{U+00ed}",
     "\N{U+010c}ha\N{U+014b}w\N{U+00e1}pe-kasn\N{U+00e1} W\N{U+00ed}",
     "Wan\N{U+00ed}yetu W\N{U+00ed}",
-    "T\N{U+021f}ah\N{U+00e9}kap\N{U+0161}u\N{U+014b} W\N{U+00ed}"
+    "T\N{U+021f}ah\N{U+00e9}kap\N{U+0161}u\N{U+014b} W\N{U+00ed}",
   ],
   month_stand_alone_narrow => [
     1,
@@ -196,7 +201,7 @@
     9,
     10,
     11,
-    12
+    12,
   ],
   month_stand_alone_wide => [
     "Wi\N{U+00f3}the\N{U+021f}ika W\N{U+00ed}",
@@ -210,7 +215,7 @@
     "\N{U+010c}ha\N{U+014b}w\N{U+00e1}pe\N{U+01e7}i W\N{U+00ed}",
     "\N{U+010c}ha\N{U+014b}w\N{U+00e1}pe-kasn\N{U+00e1} W\N{U+00ed}",
     "Wan\N{U+00ed}yetu W\N{U+00ed}",
-    "T\N{U+021f}ah\N{U+00e9}kap\N{U+0161}u\N{U+014b} W\N{U+00ed}"
+    "T\N{U+021f}ah\N{U+00e9}kap\N{U+0161}u\N{U+014b} W\N{U+00ed}",
   ],
   name => "Lakota",
   native_language => "Lak\N{U+021f}\N{U+00f3}l\N{U+02bc}iyapi",
@@ -222,37 +227,37 @@
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_stand_alone_abbreviated => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   script => undef,
   territory => undef,
@@ -261,5 +266,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

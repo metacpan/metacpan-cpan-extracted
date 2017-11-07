@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "AM",
-    "PM"
+    "PM",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d, E",
@@ -44,7 +49,7 @@
     yMd => "y-MM-dd",
     yQQQ => "y QQQ",
     yQQQQ => "y QQQQ",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "rw-RW",
   date_format_full => "y MMMM d, EEEE",
@@ -62,7 +67,7 @@
     "kan.",
     "gnu.",
     "gnd.",
-    "cyu."
+    "cyu.",
   ],
   day_format_narrow => [
     "M",
@@ -71,7 +76,7 @@
     "T",
     "F",
     "S",
-    "S"
+    "S",
   ],
   day_format_wide => [
     "Kuwa mbere",
@@ -80,7 +85,7 @@
     "Kuwa kane",
     "Kuwa gatanu",
     "Kuwa gatandatu",
-    "Ku cyumweru"
+    "Ku cyumweru",
   ],
   day_stand_alone_abbreviated => [
     "mbe.",
@@ -89,7 +94,7 @@
     "kan.",
     "gnu.",
     "gnd.",
-    "cyu."
+    "cyu.",
   ],
   day_stand_alone_narrow => [
     "M",
@@ -98,7 +103,7 @@
     "T",
     "F",
     "S",
-    "S"
+    "S",
   ],
   day_stand_alone_wide => [
     "Kuwa mbere",
@@ -107,19 +112,19 @@
     "Kuwa kane",
     "Kuwa gatanu",
     "Kuwa gatandatu",
-    "Ku cyumweru"
+    "Ku cyumweru",
   ],
   era_abbreviated => [
     "BCE",
-    "CE"
+    "CE",
   ],
   era_narrow => [
     "BCE",
-    "CE"
+    "CE",
   ],
   era_wide => [
     "BCE",
-    "CE"
+    "CE",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -140,7 +145,7 @@
     "nze.",
     "ukw.",
     "ugu.",
-    "uku."
+    "uku.",
   ],
   month_format_narrow => [
     1,
@@ -154,7 +159,7 @@
     9,
     10,
     11,
-    12
+    12,
   ],
   month_format_wide => [
     "Mutarama",
@@ -168,7 +173,7 @@
     "Nzeli",
     "Ukwakira",
     "Ugushyingo",
-    "Ukuboza"
+    "Ukuboza",
   ],
   month_stand_alone_abbreviated => [
     "mut.",
@@ -182,7 +187,7 @@
     "nze.",
     "ukw.",
     "ugu.",
-    "uku."
+    "uku.",
   ],
   month_stand_alone_narrow => [
     1,
@@ -196,7 +201,7 @@
     9,
     10,
     11,
-    12
+    12,
   ],
   month_stand_alone_wide => [
     "Mutarama",
@@ -210,49 +215,49 @@
     "Nzeli",
     "Ukwakira",
     "Ugushyingo",
-    "Ukuboza"
+    "Ukuboza",
   ],
   name => "Kinyarwanda Rwanda",
   native_language => "Kinyarwanda",
-  native_name => "Kinyarwanda Rwanda",
+  native_name => "Kinyarwanda U Rwanda",
   native_script => undef,
-  native_territory => "Rwanda",
+  native_territory => "U Rwanda",
   native_variant => undef,
   quarter_format_abbreviated => [
     "I1",
     "I2",
     "I3",
-    "I4"
+    "I4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "igihembwe cya mbere",
     "igihembwe cya kabiri",
     "igihembwe cya gatatu",
-    "igihembwe cya kane"
+    "igihembwe cya kane",
   ],
   quarter_stand_alone_abbreviated => [
     "I1",
     "I2",
     "I3",
-    "I4"
+    "I4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "igihembwe cya mbere",
     "igihembwe cya kabiri",
     "igihembwe cya gatatu",
-    "igihembwe cya kane"
+    "igihembwe cya kane",
   ],
   script => undef,
   territory => "Rwanda",
@@ -261,5 +266,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

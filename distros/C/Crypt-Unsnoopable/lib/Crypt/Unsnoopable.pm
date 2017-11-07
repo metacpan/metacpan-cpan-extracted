@@ -3,7 +3,7 @@
 # Crypt::Unsnoopable - Completely unsnoopable messaging
 # Copyright (c) 2017 Ashish Gulhati <crypt-unsnoopable at hash.neo.tc>
 #
-# $Id: lib/Crypt/Unsnoopable.pm v1.006 Tue Jun 20 15:40:10 PDT 2017 $
+# $Id: lib/Crypt/Unsnoopable.pm v1.007 Sat Nov  4 20:41:32 PDT 2017 $
 
 package Crypt::Unsnoopable;
 
@@ -12,11 +12,14 @@ use strict;
 use Bytes::Random::Secure;
 use Persistence::Object::Simple;
 use Compress::Zlib;
-use Math::BaseCnv qw(dec heX);
+use Math::Prime::Util qw(fromdigits todigitstring);
 
-use vars qw( $VERSION $AUTOLOAD );
+use vars qw( $VERSION $AUTOLOAD @ISA @EXPORT_OK );
 
-our ( $VERSION ) = '$Revision: 1.006 $' =~ /\s+([\d\.]+)/;
+@ISA = qw(Exporter);
+@EXPORT_OK = qw(dec heX);
+
+our ( $VERSION ) = '$Revision: 1.007 $' =~ /\s+([\d\.]+)/;
 
 sub new {
   my ($class, %arg) = @_;
@@ -106,6 +109,14 @@ sub _diag {
   print STDERR @_ if $self->debug;
 }
 
+sub dec {
+  fromdigits(shift, 16);
+}
+
+sub heX {
+  todigitstring(shift, 16)
+}
+
 1; # End of Crypt::Unsnoopable
 
 __END__
@@ -116,8 +127,8 @@ Crypt::Unsnoopable - Completely unsnoopable messaging
 
 =head1 VERSION
 
- $Revision: 1.006 $
- $Date: Tue Jun 20 15:40:10 PDT 2017 $
+ $Revision: 1.007 $
+ $Date: Sat Nov  4 20:41:32 PDT 2017 $
 
 =head1 SYNOPSIS
 

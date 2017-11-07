@@ -6,7 +6,7 @@ use Time::Piece ();
 
 use parent 'Time::Moment';
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 my $SQL_FORMAT = '%Y-%m-%d %H:%M:%S';
 my $SQL_DATE = '%Y-%m-%d';
@@ -121,7 +121,7 @@ Return the day of month (alias to day_of_month)
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 AUTHOR
 

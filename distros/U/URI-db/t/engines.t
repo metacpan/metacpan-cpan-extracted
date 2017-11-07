@@ -15,6 +15,7 @@ for my $spec (
     [ pg         => 5432,  'pg'        ],
     [ pgxc       => 5432,  'pg'        ],
     [ postgresxc => 5432,  'pg'        ],
+    [ redshift   => 5432,  'pg'        ],
     [ mysql      => 3306,  'mysql'     ],
     [ mariadb    => 3306,  'mysql'     ],
     [ maria      => 3306,  'mysql'     ],
@@ -46,6 +47,7 @@ for my $spec (
     [ derby      => 1527,  'derby'     ],
     [ vertica    => 5433,  'vertica'   ],
     [ ldapdb     => undef, 'ldapdb'    ],
+    [ exasol     => 8563,  'exasol'    ],
 ) {
     my ($engine, $port, $canon) = @{ $spec };
     my $prefix = "db:$engine";

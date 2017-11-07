@@ -55,7 +55,7 @@ Albanian Kosovo locale.
   M
   E
   P
-  S
+  Sh
   D
 
 
@@ -86,7 +86,7 @@ Albanian Kosovo locale.
   M
   E
   P
-  S
+  Sh
   D
 
 =head2 Months
@@ -114,8 +114,8 @@ Albanian Kosovo locale.
   pri
   maj
   qer
-  kor
-  gsh
+  korr
+  gush
   sht
   tet
   nën
@@ -124,17 +124,17 @@ Albanian Kosovo locale.
 =head3 Narrow (format)
 
   j
-  s
+  sh
   m
   p
   m
   q
   k
   g
-  s
+  sh
   t
   n
-  d
+  dh
 
 
 =head3 Wide (stand-alone)
@@ -160,8 +160,8 @@ Albanian Kosovo locale.
   Pri
   Maj
   Qer
-  Kor
-  Gsh
+  Korr
+  Gush
   Sht
   Tet
   Nën
@@ -170,17 +170,17 @@ Albanian Kosovo locale.
 =head3 Narrow (stand-alone)
 
   J
-  S
+  Sh
   M
   P
   M
   Q
   K
   G
-  S
+  Sh
   T
   N
-  D
+  Dh
 
 =head2 Quarters
 
@@ -327,11 +327,41 @@ Albanian Kosovo locale.
 
 =head2 Available Formats
 
+=head3 Bh (h B)
+
+   2008-02-05T18:30:30 = 6 B
+   1995-12-22T09:05:02 = 9 B
+  -0010-09-15T04:44:23 = 4 B
+
+=head3 Bhm (h:mm B)
+
+   2008-02-05T18:30:30 = 6:30 B
+   1995-12-22T09:05:02 = 9:05 B
+  -0010-09-15T04:44:23 = 4:44 B
+
+=head3 Bhms (h:mm:ss B)
+
+   2008-02-05T18:30:30 = 6:30:30 B
+   1995-12-22T09:05:02 = 9:05:02 B
+  -0010-09-15T04:44:23 = 4:44:23 B
+
 =head3 E (ccc)
 
    2008-02-05T18:30:30 = Mar
    1995-12-22T09:05:02 = Pre
   -0010-09-15T04:44:23 = Sht
+
+=head3 EBhm (E h:mm B)
+
+   2008-02-05T18:30:30 = Mar 6:30 B
+   1995-12-22T09:05:02 = Pre 9:05 B
+  -0010-09-15T04:44:23 = Sht 4:44 B
+
+=head3 EBhms (E h:mm:ss B)
+
+   2008-02-05T18:30:30 = Mar 6:30:30 B
+   1995-12-22T09:05:02 = Pre 9:05:02 B
+  -0010-09-15T04:44:23 = Sht 4:44:23 B
 
 =head3 EHm (E, HH:mm)
 
@@ -585,13 +615,13 @@ Albanian Kosovo locale.
    1995-12-22T09:05:02 = tremujori i katërt, 1995
   -0010-09-15T04:44:23 = tremujori i tretë, -10
 
-=head3 yw-count-one ('java' w 'e' y)
+=head3 yw-count-one ('java' w 'e' Y)
 
    2008-02-05T18:30:30 = java 6 e 2008
    1995-12-22T09:05:02 = java 51 e 1995
   -0010-09-15T04:44:23 = java 37 e -10
 
-=head3 yw-count-other ('java' w 'e' y)
+=head3 yw-count-other ('java' w 'e' Y)
 
    2008-02-05T18:30:30 = java 6 e 2008
    1995-12-22T09:05:02 = java 51 e 1995

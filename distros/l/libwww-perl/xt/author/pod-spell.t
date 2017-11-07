@@ -13,6 +13,7 @@ __DATA__
 Aas
 Accomazzi
 Adam
+Akiyama
 Alders
 Alex
 Alexandre
@@ -131,6 +132,7 @@ Liam
 Lindley
 Lipcon
 Lotterer
+Lundin
 Lutz
 MacEachern
 Macdonald
@@ -171,6 +173,7 @@ Onken
 Oosten
 Oschwald
 Panchenko
+Patrik
 Peter
 Peters
 Pettit
@@ -189,12 +192,14 @@ Rezic
 Robert
 RobotUA
 Rolf
+Romanov
 Roszatycki
 Sarathy
 Schilli
 Schinder
 Schwern
 Sean
+Sergey
 Shirazi
 Simple
 Sjogren
@@ -214,6 +219,7 @@ Stosberg
 Subbarao
 TCP
 Takanori
+Takumi
 Theodore
 Thoennes
 Thompson
@@ -255,6 +261,7 @@ Zielinski
 Zoest
 adamk
 afPuUsSedvhx
+akiym
 amir
 amire80
 andreas
@@ -322,6 +329,7 @@ olaf
 ondrej
 onken
 oschwald
+patrik
 peterm
 phrstbrn
 piotr
@@ -335,6 +343,7 @@ shaohua
 shildreth
 slaven
 sprout
+sromanov
 talby
 tech
 tim

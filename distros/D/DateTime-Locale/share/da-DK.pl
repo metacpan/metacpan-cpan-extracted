@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "AM",
-    "PM"
+    "PM",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h.mm B",
+    Bhms => "h.mm.ss B",
     E => "ccc",
+    EBhm => "E h.mm B",
+    EBhms => "E h.mm.ss B",
     EHm => "E HH.mm",
     EHms => "E HH.mm.ss",
     Ed => "E 'den' d.",
@@ -48,8 +53,8 @@
     yMd => "d/M/y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-one" => "'uge' w 'i' y",
-    "yw-count-other" => "'uge' w 'i' y"
+    "yw-count-one" => "'uge' w 'i' Y",
+    "yw-count-other" => "'uge' w 'i' Y",
   },
   code => "da-DK",
   date_format_full => "EEEE 'den' d. MMMM y",
@@ -67,7 +72,7 @@
     "tor.",
     "fre.",
     "l\N{U+00f8}r.",
-    "s\N{U+00f8}n."
+    "s\N{U+00f8}n.",
   ],
   day_format_narrow => [
     "M",
@@ -76,7 +81,7 @@
     "T",
     "F",
     "L",
-    "S"
+    "S",
   ],
   day_format_wide => [
     "mandag",
@@ -85,7 +90,7 @@
     "torsdag",
     "fredag",
     "l\N{U+00f8}rdag",
-    "s\N{U+00f8}ndag"
+    "s\N{U+00f8}ndag",
   ],
   day_stand_alone_abbreviated => [
     "man",
@@ -94,7 +99,7 @@
     "tor",
     "fre",
     "l\N{U+00f8}r",
-    "s\N{U+00f8}n"
+    "s\N{U+00f8}n",
   ],
   day_stand_alone_narrow => [
     "M",
@@ -103,7 +108,7 @@
     "T",
     "F",
     "L",
-    "S"
+    "S",
   ],
   day_stand_alone_wide => [
     "mandag",
@@ -112,19 +117,19 @@
     "torsdag",
     "fredag",
     "l\N{U+00f8}rdag",
-    "s\N{U+00f8}ndag"
+    "s\N{U+00f8}ndag",
   ],
   era_abbreviated => [
     "f.Kr.",
-    "e.Kr."
+    "e.Kr.",
   ],
   era_narrow => [
     "fKr",
-    "eKr"
+    "eKr",
   ],
   era_wide => [
     "f.Kr.",
-    "e.Kr."
+    "e.Kr.",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -145,7 +150,7 @@
     "sep.",
     "okt.",
     "nov.",
-    "dec."
+    "dec.",
   ],
   month_format_narrow => [
     "J",
@@ -159,7 +164,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_format_wide => [
     "januar",
@@ -173,7 +178,7 @@
     "september",
     "oktober",
     "november",
-    "december"
+    "december",
   ],
   month_stand_alone_abbreviated => [
     "jan.",
@@ -187,7 +192,7 @@
     "sep.",
     "okt.",
     "nov.",
-    "dec."
+    "dec.",
   ],
   month_stand_alone_narrow => [
     "J",
@@ -201,7 +206,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_stand_alone_wide => [
     "januar",
@@ -215,7 +220,7 @@
     "september",
     "oktober",
     "november",
-    "december"
+    "december",
   ],
   name => "Danish Denmark",
   native_language => "dansk",
@@ -227,37 +232,37 @@
     "1. kvt.",
     "2. kvt.",
     "3. kvt.",
-    "4. kvt."
+    "4. kvt.",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "1. kvartal",
     "2. kvartal",
     "3. kvartal",
-    "4. kvartal"
+    "4. kvartal",
   ],
   quarter_stand_alone_abbreviated => [
     "1. kvt.",
     "2. kvt.",
     "3. kvt.",
-    "4. kvt."
+    "4. kvt.",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "1. kvartal",
     "2. kvartal",
     "3. kvartal",
-    "4. kvartal"
+    "4. kvartal",
   ],
   script => undef,
   territory => "Denmark",
@@ -266,5 +271,5 @@
   time_format_medium => "HH.mm.ss",
   time_format_short => "HH.mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

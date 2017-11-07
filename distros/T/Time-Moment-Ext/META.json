@@ -43,7 +43,7 @@
       "runtime" : {
          "requires" : {
             "Time::Moment" : "0",
-            "Time::Piece" : "0",
+            "Time::Piece" : "1.20",
             "perl" : "5.010"
          }
       },
@@ -56,7 +56,7 @@
    "provides" : {
       "Time::Moment::Ext" : {
          "file" : "lib/Time/Moment/Ext.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -70,7 +70,7 @@
          "web" : "https://github.com/dshadow/time-moment-ext"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_contributors" : [
       "Konstantin Cherednichenko <konstantin_c@kntele.com>"
    ],

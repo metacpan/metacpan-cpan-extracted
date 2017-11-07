@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "A.M.",
-    "P.M."
+    "P.M.",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d, E",
@@ -45,7 +50,7 @@
     yMd => "y-MM-dd",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "ig",
   date_format_full => "EEEE, d MMMM y",
@@ -63,7 +68,7 @@
     "T\N{U+1ecd}\N{U+1ecd}",
     "Fra\N{U+1ecb}",
     "Sat",
-    "\N{U+1ee4}ka"
+    "\N{U+1ee4}ka",
   ],
   day_format_narrow => [
     "M",
@@ -72,7 +77,7 @@
     "T",
     "F",
     "S",
-    "S"
+    "S",
   ],
   day_format_wide => [
     "M\N{U+1ecd}nde",
@@ -81,7 +86,7 @@
     "T\N{U+1ecd}\N{U+1ecd}zdee",
     "Fra\N{U+1ecb}dee",
     "Sat\N{U+1ecd}dee",
-    "Mb\N{U+1ecd}s\N{U+1ecb} \N{U+1ee4}ka"
+    "Mb\N{U+1ecd}s\N{U+1ecb} \N{U+1ee4}ka",
   ],
   day_stand_alone_abbreviated => [
     "M\N{U+1ecd}n",
@@ -90,7 +95,7 @@
     "T\N{U+1ecd}\N{U+1ecd}",
     "Fra\N{U+1ecb}",
     "Sat",
-    "\N{U+1ee4}ka"
+    "\N{U+1ee4}ka",
   ],
   day_stand_alone_narrow => [
     "M",
@@ -99,7 +104,7 @@
     "T",
     "F",
     "S",
-    "S"
+    "S",
   ],
   day_stand_alone_wide => [
     "M\N{U+1ecd}nde",
@@ -108,19 +113,19 @@
     "T\N{U+1ecd}\N{U+1ecd}zdee",
     "Fra\N{U+1ecb}dee",
     "Sat\N{U+1ecd}dee",
-    "Mb\N{U+1ecd}s\N{U+1ecb} \N{U+1ee4}ka"
+    "Mb\N{U+1ecd}s\N{U+1ecb} \N{U+1ee4}ka",
   ],
   era_abbreviated => [
     "T.K.",
-    "A.K."
+    "A.K.",
   ],
   era_narrow => [
     "T.K.",
-    "A.K."
+    "A.K.",
   ],
   era_wide => [
     "Tupu Kristi",
-    "Af\N{U+1ecd} Kristi"
+    "Af\N{U+1ecd} Kristi",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -141,7 +146,7 @@
     "Sep",
     "\N{U+1ecc}kt",
     "Nov",
-    "Dis"
+    "Dis",
   ],
   month_format_narrow => [
     1,
@@ -155,7 +160,7 @@
     9,
     10,
     11,
-    12
+    12,
   ],
   month_format_wide => [
     "Jen\N{U+1ee5}war\N{U+1ecb}",
@@ -169,7 +174,7 @@
     "Septemba",
     "\N{U+1ecc}ktoba",
     "Novemba",
-    "Disemba"
+    "Disemba",
   ],
   month_stand_alone_abbreviated => [
     "Jen",
@@ -183,7 +188,7 @@
     "Sep",
     "\N{U+1ecc}kt",
     "Nov",
-    "Dis"
+    "Dis",
   ],
   month_stand_alone_narrow => [
     1,
@@ -197,7 +202,7 @@
     9,
     10,
     11,
-    12
+    12,
   ],
   month_stand_alone_wide => [
     "Jen\N{U+1ee5}war\N{U+1ecb}",
@@ -211,7 +216,7 @@
     "Septemba",
     "\N{U+1ecc}ktoba",
     "Novemba",
-    "Disemba"
+    "Disemba",
   ],
   name => "Igbo",
   native_language => "Igbo",
@@ -223,37 +228,37 @@
     "\N{U+1ecc}1",
     "\N{U+1ecc}2",
     "\N{U+1ecc}3",
-    "\N{U+1ecc}4"
+    "\N{U+1ecc}4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "\N{U+1ecc}kara 1",
     "\N{U+1ecc}kara 2",
     "\N{U+1ecc}kara 3",
-    "\N{U+1ecc}kara 4"
+    "\N{U+1ecc}kara 4",
   ],
   quarter_stand_alone_abbreviated => [
     "\N{U+1ecc}1",
     "\N{U+1ecc}2",
     "\N{U+1ecc}3",
-    "\N{U+1ecc}4"
+    "\N{U+1ecc}4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "\N{U+1ecc}kara 1",
     "\N{U+1ecc}kara 2",
     "\N{U+1ecc}kara 3",
-    "\N{U+1ecc}kara 4"
+    "\N{U+1ecc}kara 4",
   ],
   script => undef,
   territory => undef,
@@ -262,5 +267,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

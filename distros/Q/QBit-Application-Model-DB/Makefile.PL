@@ -21,6 +21,7 @@ my %WriteMakefileArgs = (
     "QBit::Application::Model" => 0,
     "QBit::Class" => 0,
     "Sys::Hostname" => 0,
+    "Sys::SigAction" => 0,
     "base" => 0,
     "qbit" => 0,
     "strict" => 0
@@ -32,7 +33,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "lib::abs" => 0
   },
-  "VERSION" => "0.022",
+  "VERSION" => "0.023",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,6 +48,7 @@ my %FallbackPrereqs = (
   "QBit::Application::Model" => 0,
   "QBit::Class" => 0,
   "Sys::Hostname" => 0,
+  "Sys::SigAction" => 0,
   "Test::Differences" => 0,
   "Test::More" => 0,
   "base" => 0,

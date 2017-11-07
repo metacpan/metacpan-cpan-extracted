@@ -1,7 +1,10 @@
 Revision history for Context-Preserve
 
+0.03      2017-11-03 19:55:47Z
+        - fix copyright in metadata and pod (thanks dam)
+
 0.02      2017-05-11 13:28:50Z
         - convert packaging to Dist::Zilla, resolving RT#120824
 
-0.01      2007-01-15
+0.01      2008-01-15
         - initial release

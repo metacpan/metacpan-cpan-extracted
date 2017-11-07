@@ -38,7 +38,7 @@ Encodes bundle to packet. Pack several OSC messages/bundles to a bundle.
 
 =head2 parse($data)
 
-Parses OSC packet data. Returns OSC message/bundle. 
+Parses OSC packet data. Returns OSC message/bundle.
 OSC-message is a blessed arrayref B<[$path, $type, @args]> with corresponding methods B<path>, B<type>, B<args>.
 OSC-bundle is a blessed arrayref B<[$time, @packets]> with corresponding methods B<time>, B<packets>
 
@@ -71,15 +71,16 @@ If B<$unix_time> is undef then (0,1) is returned which means immediate execution
 
 =head2 tag2time($ntp_time, $fraction_of_sec)
 
-Reverse of previous. 
+Reverse of previous.
 
 =head2 to_stream($data)
 
 Packs raw OSC data for (tcp) streaming.
 
-=head2 from_steam($buf)
+=head2 from_stream($buf)
 
 Returns list of raw OSC data packets in B<$buf> from stream buffer and residue of B<$buf>.
+If $buf is incomplete - returns only B<$buf>.
 
 =head1 EXAMPLES
 
@@ -94,13 +95,13 @@ make packet
 
 via UDP
 
-    my $udp = IO::Socket::INET->new( PeerAddr => 'localhost', PeerPort => '57120', Proto => 'udp', Type => SOCK_DGRAM) || die $!;
+    my $udp = IO::Socket::INET->new( PeerAddr => 'localhost', PeerPort => $port, Proto => 'udp', Type => SOCK_DGRAM) || die $!;
     $udp->send($data);
 
 via TCP
 
-    my $tcp = IO::Socket::INET->new( PeerAddr => 'localhost', PeerPort => '57120', Proto => 'tcp', Type => SOCK_STREAM) || die $!;
-    $tcp->send($osc->to_stream($data));
+    my $tcp = IO::Socket::INET->new( PeerAddr => 'localhost', PeerPort => $port, Proto => 'tcp', Type => SOCK_STREAM) || die $!;
+    $tcp->syswrite($osc->to_stream($data));
 
 =head2 Receiving
 
@@ -112,9 +113,15 @@ UDP
 
 TCP
 
-    $in = IO::Socket::INET->new( qw(LocalAddr localhost LocalPort), $port, qw(Proto tcp Type), SOCK_STREAM, qw(Listen 1 Reuse 1) ) || die $!;
-    $in->accept->recv(my $packet, $in->sockopt(SO_RCVBUF));
-    my $p = $osc->parse(($osc->from_stream($packet))[0]);
+    my $in = IO::Socket::INET->new( qw(LocalAddr localhost LocalPort), $port, qw(Proto tcp Type), SOCK_STREAM, qw(Listen 1 Reuse 1) ) || die $!;
+    while (my $sock = $in->accept) {
+        my $tail;
+        while ($sock->sysread(my $buf, $in->sockopt(SO_RCVBUF))) {
+            my @packets = $p->from_stream(length($tail) ? $tail.$buf : $buf);
+            $tail = pop @packets;
+            $osc->parse($_) for @packets;
+        }
+    }
 
 =head2 Dispatching
 
@@ -151,7 +158,7 @@ TCP
 
 encode
 
-    cmpthese -1, { 
+    cmpthese -1, {
         'Net::LibLO::Message' => sub { Net::LibLO::Message->new(qw(isf 3 laaaa 3.0)) },
         'Protocol::OSC' => sub { $protocol->message(qw(/echo isf 3 laaaa 3.0)) },
         'Net::OpenSoundControl' => sub { Net::OpenSoundControl::encode([qw(/echo i 3 s laaaa f 3.0)]) }
@@ -166,7 +173,7 @@ encode
 
 decode
 
-    cmpthese -1, { 
+    cmpthese -1, {
         'Protocol::OSC' => sub { $protocol->parse($data) },
         'Net::OpenSoundControl' => sub { Net::OpenSoundControl::decode($data) }
     };
@@ -174,7 +181,7 @@ decode
                             Rate Net::OpenSoundControl         Protocol::OSC
     Net::OpenSoundControl 1630/s                    --                  -65%
     Protocol::OSC         4654/s                  186%                    --
-    
+
 =head2 NB
 
 No validation checks performed
@@ -184,30 +191,30 @@ No validation checks performed
 =over
 
 =item * GitHub
- 
+
 L<http://github.com/vividsnow/Protocol-OSC>
- 
+
 =item * Search MetaCPAN
- 
+
 L<https://metacpan.org/module/Protocol::OSC>
- 
+
 =back
- 
+
 =head1 AUTHOR
- 
+
 Yegor Korablev <egor@cpan.org>
- 
+
 =head1 LICENSE
- 
+
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =head1 TODO
 
 more docs, examples and tests.. as usual )
- 
+
 =head1 SEE ALSO
- 
+
 L<Net::LibLO>, L<Net::OpenSoundControl>, L<AnyEvent::Handle::UDP>
 
 =cut

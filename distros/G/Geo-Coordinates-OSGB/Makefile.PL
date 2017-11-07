@@ -1,14 +1,32 @@
+use strict;
+use warnings;
+
 use ExtUtils::MakeMaker;
-# See lib/ExtUtils/MakeMaker.pm for details of how to influence
-# the contents of the Makefile that is written.
-WriteMakefile(
-  NAME             => 'Geo::Coordinates::OSGB',
-  AUTHOR           => 'Toby Thurston',
-  VERSION_FROM     => 'lib/Geo/Coordinates/OSGB.pm',
-  ABSTRACT_FROM    => 'lib/Geo/Coordinates/OSGB.pm',
-  MIN_PERL_VERSION => '5.008',
-  dist             => {TARFLAGS => '-cvf'},
+
+use File::ShareDir::Install;
+install_share dist => "share";
+
+my %WriteMakefileArgs = (
+  "ABSTRACT" => "Convert coordinates between Lat/Lon and the British National Grid",
+  "AUTHOR" => "Toby Thurston <toby\@cpan.org>",
+  "CONFIGURE_REQUIRES" => {
+    "ExtUtils::MakeMaker"     => 0,
+    "File::ShareDir::Install" => "0.06"
+  },
+  "DISTNAME"  => "Geo-Coordinates-OSGB",
+  "LICENSE"   => "gpl",
+  "NAME"      => "Geo::Coordinates::OSGB",
+  "PREREQ_PM" => { 'File::Share' => "0.25" },
+  "VERSION"   => "2.20",
+  "test"      => { "TESTS" => "t/*.t" }
 );
 
+delete $WriteMakefileArgs{CONFIGURE_REQUIRES} unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
 
+WriteMakefile(%WriteMakefileArgs);
 
+{
+package
+MY;
+use File::ShareDir::Install qw(postamble);
+}

@@ -2,9 +2,9 @@ package Net::Whois::Object::Information;
 
 use base qw/Net::Whois::Object/;
 
-__PACKAGE__->attributes( 'mandatory', ['comment'] );
-__PACKAGE__->attributes( 'optional', [] );
-__PACKAGE__->attributes( 'multiple',  ['comment'] );
+__PACKAGE__->attributes( 'mandatory',   ['comment'] );
+__PACKAGE__->attributes( 'optional',    [] );
+__PACKAGE__->attributes( 'multiple',    ['comment'] );
 
 =head1 NAME
 

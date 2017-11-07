@@ -22,7 +22,7 @@ our @SVG_REGEX = qw/
 our @FUNCTIONS = qw/extract_path_info reverse_path create_path_string/;
 our @EXPORT_OK = (@FUNCTIONS, @SVG_REGEX);
 our %EXPORT_TAGS = (all => \@FUNCTIONS, regex => \@SVG_REGEX);
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use Carp;
 
@@ -157,16 +157,6 @@ my $comma_wsp = qr/$wsp+|$wsp*,$wsp*/;#|(?<=[0-9])(?=-)/;
 # this only splits on '-' or '+' when not preceeded by 'e'.  This
 # regular expression is not following the SVG grammar, it is going our
 # own way.
-
-my $split_re = qr/
-		     (?:
-			 $comma_wsp
-		     |
-			 (?<!$e)(?=-)
-		     |
-			 (?<!$e)(?:\+)
-		     )
-		 /x;
 
 # Regular expressions to match numbers
 
@@ -370,57 +360,34 @@ sub extract_path_info
         print "$me: I am trying to split up '$path'.\n";
     }
     my @path_info;
-    my $has_moveto = ($path =~ /^$wsp*([Mm])$wsp*($numbers_re)(.*)$/s);
-    if (! $has_moveto) {
+    my @path = split /([cslqtahvzm])/i, $path;
+    if ( $path[0] !~ /^$wsp*$/ || $path[1] !~ /[Mm]/ ) {
         croak "No moveto at start of path '$path'";
     }
-    my ($moveto_type, $move_to, $curves) = ($1, $2, $3);
-    if ($verbose) {
-        print "$me: The initial moveto looks like '$moveto_type' '$move_to'.\n";
-    }
-    # Deal with the initial "move to" command.
-    my $position = position_type ($moveto_type);
-    my @coords = split $split_re, $move_to;
-    if (@coords < 2) {
-	croak "$me: Not enough numerical values for the initial M command in '$path'";
-    }
-    push @path_info, {
-        type => 'moveto',
-	name => 'moveto',
-        position => $position,
-        point => [@coords[0, 1]],
-        svg_key => $moveto_type,
-    };
-    # Deal with any implicit line-to's remaining.
-    if (@coords > 2) {
-	# Check the number of coordinates is valid.
-	if (@coords % 2 != 0) {
-	    croak "$me: Odd number of values for an implicit L command " .
-	    scalar (@coords) . " in '$path'";
-	}
-	if ($verbose) {
-	    print "$me: dealing with extra stuff in ", join (', ', @coords),
-	    ".\n";
-	}
-	# Add the remaining numbers as line-to elements, deleting the
-	# first two.
-	push @path_info, build_lineto ($position, splice (@coords, 2));
-    }
-    # Deal with the rest of the path.
+    shift @path;
+    my $path_pos=0;
     my @curves;
-    while ($curves =~ /\G(([cslqtahvzm])$wsp*($numbers_re))/gi) {
-	my $original = $1;
-	my $command = $2;
-	my $values = $3;
+    while ( $path_pos < scalar @path ) {
+        my $command = $path[$path_pos];
+        my $values = $path[$path_pos+1];
+	if (! defined $values) {
+	    $values = '';
+	}
+        my $original = "${command}${values}";
 	if ($original !~ /$moveto|$drawto_command/x) {
 	    warn "Cannot parse '$original' using moveto/drawto_command regex";
 	}
+        $values=~s/^$wsp*//;
         push @curves, [$command, $values, $original];
+        $path_pos+=2;
     }
     for my $curve_data (@curves) {
         my ($command, $values) = @$curve_data;
 #	print "$curve\n";
         my @numbers = ($values =~ /($number)/g);
+	# Remove leading plus signs to keep the same behaviour as
+	# before.
+	@numbers = map {s/^\+//; $_} @numbers;
 #	print "@numbers\n";
         if ($verbose) {
             printf "$me: Extracted %d numbers: %s\n", scalar (@numbers),

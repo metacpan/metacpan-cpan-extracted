@@ -248,15 +248,15 @@ Basque Spain locale.
 
 =head3 Full
 
-   2008-02-05T18:30:30 = 2008(e)ko otsaila 5, asteartea
-   1995-12-22T09:05:02 = 1995(e)ko abendua 22, ostirala
-  -0010-09-15T04:44:23 = -10(e)ko iraila 15, larunbata
+   2008-02-05T18:30:30 = 2008(e)ko otsailaren 5(a), asteartea
+   1995-12-22T09:05:02 = 1995(e)ko abenduaren 22(a), ostirala
+  -0010-09-15T04:44:23 = -10(e)ko irailaren 15(a), larunbata
 
 =head3 Long
 
-   2008-02-05T18:30:30 = 2008(e)ko otsaila 5
-   1995-12-22T09:05:02 = 1995(e)ko abendua 22
-  -0010-09-15T04:44:23 = -10(e)ko iraila 15
+   2008-02-05T18:30:30 = 2008(e)ko otsailaren 5(a)
+   1995-12-22T09:05:02 = 1995(e)ko abenduaren 22(a)
+  -0010-09-15T04:44:23 = -10(e)ko irailaren 15(a)
 
 =head3 Medium
 
@@ -302,15 +302,15 @@ Basque Spain locale.
 
 =head3 Full
 
-   2008-02-05T18:30:30 = 2008(e)ko otsaila 5, asteartea 18:30:30 (UTC)
-   1995-12-22T09:05:02 = 1995(e)ko abendua 22, ostirala 09:05:02 (UTC)
-  -0010-09-15T04:44:23 = -10(e)ko iraila 15, larunbata 04:44:23 (UTC)
+   2008-02-05T18:30:30 = 2008(e)ko otsailaren 5(a), asteartea 18:30:30 (UTC)
+   1995-12-22T09:05:02 = 1995(e)ko abenduaren 22(a), ostirala 09:05:02 (UTC)
+  -0010-09-15T04:44:23 = -10(e)ko irailaren 15(a), larunbata 04:44:23 (UTC)
 
 =head3 Long
 
-   2008-02-05T18:30:30 = 2008(e)ko otsaila 5 18:30:30 (UTC)
-   1995-12-22T09:05:02 = 1995(e)ko abendua 22 09:05:02 (UTC)
-  -0010-09-15T04:44:23 = -10(e)ko iraila 15 04:44:23 (UTC)
+   2008-02-05T18:30:30 = 2008(e)ko otsailaren 5(a) 18:30:30 (UTC)
+   1995-12-22T09:05:02 = 1995(e)ko abenduaren 22(a) 09:05:02 (UTC)
+  -0010-09-15T04:44:23 = -10(e)ko irailaren 15(a) 04:44:23 (UTC)
 
 =head3 Medium
 
@@ -327,11 +327,41 @@ Basque Spain locale.
 
 =head2 Available Formats
 
+=head3 Bh (B h)
+
+   2008-02-05T18:30:30 = B 6
+   1995-12-22T09:05:02 = B 9
+  -0010-09-15T04:44:23 = B 4
+
+=head3 Bhm (B h:mm)
+
+   2008-02-05T18:30:30 = B 6:30
+   1995-12-22T09:05:02 = B 9:05
+  -0010-09-15T04:44:23 = B 4:44
+
+=head3 Bhms (B h:mm:ss)
+
+   2008-02-05T18:30:30 = B 6:30:30
+   1995-12-22T09:05:02 = B 9:05:02
+  -0010-09-15T04:44:23 = B 4:44:23
+
 =head3 E (ccc)
 
    2008-02-05T18:30:30 = ar.
    1995-12-22T09:05:02 = or.
   -0010-09-15T04:44:23 = lr.
+
+=head3 EBhm (E B h:mm)
+
+   2008-02-05T18:30:30 = ar. B 6:30
+   1995-12-22T09:05:02 = or. B 9:05
+  -0010-09-15T04:44:23 = lr. B 4:44
+
+=head3 EBhms (E B h:mm:ss)
+
+   2008-02-05T18:30:30 = ar. B 6:30:30
+   1995-12-22T09:05:02 = or. B 9:05:02
+  -0010-09-15T04:44:23 = lr. B 4:44:23
 
 =head3 EHm (E HH:mm)
 
@@ -441,17 +471,17 @@ Basque Spain locale.
    1995-12-22T09:05:02 = abe. 22, or.
   -0010-09-15T04:44:23 = ira. 15, lr.
 
-=head3 MMMMW-count-one (MMM W 'astea')
+=head3 MMMMW-count-one (MMM W. 'astea')
 
-   2008-02-05T18:30:30 = ots. 1 astea
-   1995-12-22T09:05:02 = abe. 3 astea
-  -0010-09-15T04:44:23 = ira. 2 astea
+   2008-02-05T18:30:30 = ots. 1. astea
+   1995-12-22T09:05:02 = abe. 3. astea
+  -0010-09-15T04:44:23 = ira. 2. astea
 
-=head3 MMMMW-count-other (MMM'ren' 'astea' W)
+=head3 MMMMW-count-other (MMM W. 'astea')
 
-   2008-02-05T18:30:30 = ots.ren astea 1
-   1995-12-22T09:05:02 = abe.ren astea 3
-  -0010-09-15T04:44:23 = ira.ren astea 2
+   2008-02-05T18:30:30 = ots. 1. astea
+   1995-12-22T09:05:02 = abe. 3. astea
+  -0010-09-15T04:44:23 = ira. 2. astea
 
 =head3 MMMMd (MMMM d)
 
@@ -549,17 +579,17 @@ Basque Spain locale.
    1995-12-22T09:05:02 = 1995(e)ko abendua
   -0010-09-15T04:44:23 = -10(e)ko iraila
 
-=head3 yMMMMEd (y('e')'ko' MMMM d, E)
+=head3 yMMMMEd (y('e')'ko' MMMM'k' d, E)
 
-   2008-02-05T18:30:30 = 2008(e)ko otsaila 5, ar.
-   1995-12-22T09:05:02 = 1995(e)ko abendua 22, or.
-  -0010-09-15T04:44:23 = -10(e)ko iraila 15, lr.
+   2008-02-05T18:30:30 = 2008(e)ko otsailak 5, ar.
+   1995-12-22T09:05:02 = 1995(e)ko abenduak 22, or.
+  -0010-09-15T04:44:23 = -10(e)ko irailak 15, lr.
 
-=head3 yMMMMd (y('e')'ko' MMMM d)
+=head3 yMMMMd (y('e')'ko' MMMM'ren' d)
 
-   2008-02-05T18:30:30 = 2008(e)ko otsaila 5
-   1995-12-22T09:05:02 = 1995(e)ko abendua 22
-  -0010-09-15T04:44:23 = -10(e)ko iraila 15
+   2008-02-05T18:30:30 = 2008(e)ko otsailaren 5
+   1995-12-22T09:05:02 = 1995(e)ko abenduaren 22
+  -0010-09-15T04:44:23 = -10(e)ko irailaren 15
 
 =head3 yMMMd (y MMM d)
 
@@ -585,17 +615,17 @@ Basque Spain locale.
    1995-12-22T09:05:02 = 1995(e)ko 4. hiruhilekoa
   -0010-09-15T04:44:23 = -10(e)ko 3. hiruhilekoa
 
-=head3 yw-count-one (y 'urteko' w 'astea')
+=head3 yw-count-one (Y. 'urteko' w. 'astea')
 
-   2008-02-05T18:30:30 = 2008 urteko 6 astea
-   1995-12-22T09:05:02 = 1995 urteko 51 astea
-  -0010-09-15T04:44:23 = -10 urteko 37 astea
+   2008-02-05T18:30:30 = 2008. urteko 6. astea
+   1995-12-22T09:05:02 = 1995. urteko 51. astea
+  -0010-09-15T04:44:23 = -10. urteko 37. astea
 
-=head3 yw-count-other (w/y 'astea')
+=head3 yw-count-other (Y. 'urteko' w. 'astea')
 
-   2008-02-05T18:30:30 = 6/2008 astea
-   1995-12-22T09:05:02 = 51/1995 astea
-  -0010-09-15T04:44:23 = 37/-10 astea
+   2008-02-05T18:30:30 = 2008. urteko 6. astea
+   1995-12-22T09:05:02 = 1995. urteko 51. astea
+  -0010-09-15T04:44:23 = -10. urteko 37. astea
 
 
 =head2 Miscellaneous

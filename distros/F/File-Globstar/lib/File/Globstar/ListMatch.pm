@@ -7,20 +7,20 @@
 # This next lines is here to make Dist::Zilla happy.
 # ABSTRACT: Perl Globstar (double asterisk globbing) and utils
 
-package File::Globstar::ListMatch;
+package File::Globstar::ListMatch 0.2;
 
 use strict;
 
 use Locale::TextDomain qw(File-Globstar);
-use Scalar::Util qw(reftype);
+use Scalar::Util 1.21 qw(reftype);
 use IO::Handle;
 
-use File::Globstar qw(translatestar);
+use File::Globstar qw(translatestar pnmatchstar);
 
-use constant RE_NONE => 0x0;
-use constant RE_NEGATED => 0x1;
-use constant RE_FULL_MATCH => 0x2;
-use constant RE_DIRECTORY => 0x4;
+use constant RE_NONE => File::Globstar::RE_NONE();
+use constant RE_NEGATED => File::Globstar::RE_NEGATED();
+use constant RE_FULL_MATCH => File::Globstar::RE_FULL_MATCH;
+use constant RE_DIRECTORY => File::Globstar::RE_DIRECTORY;
 
 sub new {
     my ($class, $input, %options) = @_;
@@ -49,52 +49,32 @@ sub new {
 }
 
 sub __match {
-    my ($self, $imode, $full_path, $full_is_directory) = @_;
-
-    $full_is_directory = 1 if $full_path =~ s{/$}{};
-    $full_path =~ s{^/}{};
-
-    my @parts = split '/', $full_path;
-    my @paths = shift @parts;
-    foreach my $part (@parts) {
-        push @paths, "$paths[-1]/$part";
-    }
+    my ($self, $imode, $path, $is_directory) = @_;
 
     my $match;
-    for (my $i = 0; $i <= $#paths; ++$i) {
-        my $path = $paths[$i];
-        my $is_directory = $full_is_directory || $i != $#paths;
-        undef $match unless $imode;
-
-        my $basename = $path;
-        $basename =~ s{.*/}{};
-
-        foreach my $pattern ($self->patterns) {
-            my $type = ref $pattern;
-            if ($type & RE_NEGATED) {
-                next if !$match;
-            } else {
-                next if $match;
-            }
-
-            my $string = $type & RE_FULL_MATCH ? $path : $basename;
-            next if $string !~ $$pattern;
-
-            if ($type & RE_DIRECTORY) {
-                next if !$is_directory;
-            }
-
-            if ($type & RE_NEGATED) {
-                $match = 0;
-            } else {
-                $match = 1;
-            }
+    foreach my $pattern ($self->patterns) {
+        my $type = ref $pattern;
+        my $negated;
+        if ($type & RE_NEGATED) {
+            next if !$match;
+            $negated = 1;
+        } else {
+            next if $match;
         }
 
-        return $self if $match && !$imode;
+        $match = pnmatchstar $pattern, $path, isDirectory => $is_directory;
     }
 
-    return $self if $match && $imode;
+    return 1 if $match;
+
+    # Check that none of its parent directories has been ignored.
+    if (!$imode) {
+        $path =~ s{/$}{};
+
+        while ($path =~ s{/[^/]*$}{} && length $path) {
+            return 1 if $self->__match(undef, $path, 1);
+        }
+    }
 
     return;
 }
@@ -127,31 +107,16 @@ sub _readArray {
 
     my $ignore_case = $self->{__ignore_case};
     foreach my $line (@$lines) {
-        my $blessing = RE_NONE;
-        $blessing |= RE_NEGATED if $line =~ s/^!//;
-        $blessing |= RE_DIRECTORY if $line =~ s{/$}{};
-        $blessing |= RE_FULL_MATCH if $line =~ m{/};
-        $line =~ s{^/}{};
-
-        # This causes a warning in git.  We simply ignore it.
-        next if !length $line;
-
-        $line = '' if $@;
-        
         my $transpiled = eval { translatestar $line, 
-                                ignoreCase => $ignore_case };
-        if ($@) {
-            $transpiled = quotemeta $line;
-            if ($ignore_case) {
-                push @patterns, \qr/^$transpiled$/i;
-            } else {
-                push @patterns, \qr/^$transpiled$/;
-            }
-        } else {
-            push @patterns, \$transpiled;
-        }
+                                ignoreCase => $ignore_case,
+                                pathMode => 1 };
 
-        bless $patterns[-1], $blessing;
+        # Why a slash? When matching, we discard a trailing slash from the
+        # string to match.  The regex '/$' can therefore never match.  And the
+        # leading caret is there in order to save Perl at least reading the
+        # string to the end.
+        $transpiled = qr{^/$} if $@;
+        push @patterns, $transpiled;
     }
 
     return $self;

@@ -42,6 +42,14 @@ CONSTRUCTORS
     Returns a new Future that will become ready after the specified delay.
     Uses "singleton" in Mojo::IOLoop if no loop is specified.
 
+ new_timeout
+
+     my $future = Future::Mojo->new_timeout($seconds);
+     my $future = Future::Mojo->new_timeout($loop, $seconds);
+
+    Returns a new Future that will fail after the specified delay. Uses
+    "singleton" in Mojo::IOLoop if no loop is specified.
+
 METHODS
 
     Future::Mojo inherits all methods from Future and implements the

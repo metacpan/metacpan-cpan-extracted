@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "e paradites",
-    "e pasdites"
+    "e pasdites",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E, HH:mm",
     EHms => "E, HH:mm:ss",
     Ed => "E, d",
@@ -47,8 +52,8 @@
     yMd => "d.M.y",
     yQQQ => "QQQ, y",
     yQQQQ => "QQQQ, y",
-    "yw-count-one" => "'java' w 'e' y",
-    "yw-count-other" => "'java' w 'e' y"
+    "yw-count-one" => "'java' w 'e' Y",
+    "yw-count-other" => "'java' w 'e' Y",
   },
   code => "sq-AL",
   date_format_full => "EEEE, d MMMM y",
@@ -66,7 +71,7 @@
     "Enj",
     "Pre",
     "Sht",
-    "Die"
+    "Die",
   ],
   day_format_narrow => [
     "H",
@@ -74,8 +79,8 @@
     "M",
     "E",
     "P",
-    "S",
-    "D"
+    "Sh",
+    "D",
   ],
   day_format_wide => [
     "e h\N{U+00eb}n\N{U+00eb}",
@@ -84,7 +89,7 @@
     "e enjte",
     "e premte",
     "e shtun\N{U+00eb}",
-    "e diel"
+    "e diel",
   ],
   day_stand_alone_abbreviated => [
     "H\N{U+00eb}n",
@@ -93,7 +98,7 @@
     "Enj",
     "Pre",
     "Sht",
-    "Die"
+    "Die",
   ],
   day_stand_alone_narrow => [
     "H",
@@ -101,8 +106,8 @@
     "M",
     "E",
     "P",
-    "S",
-    "D"
+    "Sh",
+    "D",
   ],
   day_stand_alone_wide => [
     "E h\N{U+00eb}n\N{U+00eb}",
@@ -111,19 +116,19 @@
     "E enjte",
     "E premte",
     "E shtun\N{U+00eb}",
-    "E diel"
+    "E diel",
   ],
   era_abbreviated => [
     "p.K.",
-    "mb.K."
+    "mb.K.",
   ],
   era_narrow => [
     "p.K.",
-    "mb.K."
+    "mb.K.",
   ],
   era_wide => [
     "para Krishtit",
-    "mbas Krishtit"
+    "mbas Krishtit",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -139,26 +144,26 @@
     "pri",
     "maj",
     "qer",
-    "kor",
-    "gsh",
+    "korr",
+    "gush",
     "sht",
     "tet",
     "n\N{U+00eb}n",
-    "dhj"
+    "dhj",
   ],
   month_format_narrow => [
     "j",
-    "s",
+    "sh",
     "m",
     "p",
     "m",
     "q",
     "k",
     "g",
-    "s",
+    "sh",
     "t",
     "n",
-    "d"
+    "dh",
   ],
   month_format_wide => [
     "janar",
@@ -172,7 +177,7 @@
     "shtator",
     "tetor",
     "n\N{U+00eb}ntor",
-    "dhjetor"
+    "dhjetor",
   ],
   month_stand_alone_abbreviated => [
     "Jan",
@@ -181,26 +186,26 @@
     "Pri",
     "Maj",
     "Qer",
-    "Kor",
-    "Gsh",
+    "Korr",
+    "Gush",
     "Sht",
     "Tet",
     "N\N{U+00eb}n",
-    "Dhj"
+    "Dhj",
   ],
   month_stand_alone_narrow => [
     "J",
-    "S",
+    "Sh",
     "M",
     "P",
     "M",
     "Q",
     "K",
     "G",
-    "S",
+    "Sh",
     "T",
     "N",
-    "D"
+    "Dh",
   ],
   month_stand_alone_wide => [
     "Janar",
@@ -214,7 +219,7 @@
     "Shtator",
     "Tetor",
     "N\N{U+00eb}ntor",
-    "Dhjetor"
+    "Dhjetor",
   ],
   name => "Albanian Albania",
   native_language => "shqip",
@@ -226,37 +231,37 @@
     "tremujori I",
     "tremujori II",
     "tremujori III",
-    "tremujori IV"
+    "tremujori IV",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "tremujori i par\N{U+00eb}",
     "tremujori i dyt\N{U+00eb}",
     "tremujori i tret\N{U+00eb}",
-    "tremujori i kat\N{U+00eb}rt"
+    "tremujori i kat\N{U+00eb}rt",
   ],
   quarter_stand_alone_abbreviated => [
     "Tremujori I",
     "Tremujori II",
     "Tremujori III",
-    "Tremujori IV"
+    "Tremujori IV",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "Tremujori i 1-r\N{U+00eb}",
     "Tremujori i 2-t\N{U+00eb}",
     "Tremujori i 3-t\N{U+00eb}",
-    "Tremujori i 4-t"
+    "Tremujori i 4-t",
   ],
   script => undef,
   territory => "Albania",
@@ -265,5 +270,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 31
+  version => 32,
 }

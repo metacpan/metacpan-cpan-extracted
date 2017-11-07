@@ -12,7 +12,7 @@ use MooX::Types::MooseLike::Base qw(HashRef Str);
 use Set::Scalar;
 use namespace::autoclean;
 
-our $VERSION = '2.004';
+our $VERSION = '2.014';
 
 has category => (
     is      => 'rw',
@@ -204,9 +204,40 @@ sub merge_extract {
     my $message_keys = Set::Scalar->new( keys %{$message_ref} );
     my $extract_message_ref  = $extract_lexicon_ref->{$extract_lexicon_key};
     my $extract_message_keys = Set::Scalar->new( keys %{$extract_message_ref} );
-    my @new_message_keys = $arg_ref->{skip_new_messages}
-        ? ()
-        : $extract_message_keys->difference($message_keys)->elements;
+    my $skip_new_messages = $arg_ref->{skip_new_messages};
+    my @new_message_keys
+        = ref $skip_new_messages ne 'HASH'
+        # simple
+        ? (
+            $skip_new_messages
+            # bool parameter true
+            ? ()
+            : $extract_message_keys->difference($message_keys)->elements
+        )
+        # extended
+        : ! $skip_new_messages->{on}
+        # hash parameter false
+        ? $extract_message_keys->difference($message_keys)->elements
+        : do {
+            my $to_regex = sub {
+                my $any = shift;
+                my @parts
+                    = map { ref $_ eq 'Regex' ? $_ : qr{\Q$_\E}xmsi }
+                    grep { defined && length }
+                    ref $any eq 'ARRAY' ? @{$any} : $any;
+                return @parts
+                    ? do {
+                        my $joined = join ' | ', @parts;
+                        qr{ $joined }xms;
+                    }
+                    : qr{ (?!) }xms;
+            };
+            my $regex     = $to_regex->( $skip_new_messages->{no_skip_for} );
+            my $not_regex = $to_regex->( $skip_new_messages->{but_skip_for} );
+
+            grep { $_ =~ $regex && $_ !~ $not_regex }
+            $extract_message_keys->difference($message_keys)->elements;
+        };
     my @changed_message_keys = $extract_message_keys->intersection($message_keys)->elements;
 
     # merge header
@@ -260,7 +291,7 @@ $HeadURL: svn+ssh://steffenw@svn.code.sf.net/p/perl-gettext-oo/code/extract/trun
 
 =head1 VERSION
 
-2.004
+2.014
 
 =head1 DESCRIPTION
 
@@ -344,7 +375,15 @@ But in can be different.
         domain            => 'my extract domain',
         # extract language is i-default
         # skip region if region file is only the difference, e.g. to language de
-        skip_new_messages => $process->langauge eq 'de-at',
+        skip_new_messages => $process->language eq 'de-at',
+        # or extended
+        skip_new_messages => {
+            on           => $process->language eq 'de-at'
+            no_skip_for  => # arrayref or scalar with string or regex
+                            [ '.domain.de', '+49', qr{ ... }xmsi ) ],
+            but_skip_for => # same like before but filter out false positive
+                            'Fax: ',
+        },
     });
 
 =head2 write back all PO files
@@ -449,12 +488,19 @@ So all new and changed data will be merged to any language.
 For sublanguages/regions it is possible to skip.
 
     $process->merge_extract({
-        lexicon_ref      => $extract->lexicon_ref,
+        lexicon_ref         => $extract->lexicon_ref,
         # all following optional
-        category          => 'category during extraction',
-        domain            => 'domain during extraction',
-        project           => 'project during extraction',
-        skip_new_messages => $boolean,
+        category            => 'category during extraction',
+        domain              => 'domain during extraction',
+        project             => 'project during extraction',
+        # simple
+        skip_new_messages   => $boolean,
+        # or extended
+        skip_new_messages   => {
+            on           => $boolean,
+            no_skip_     => $arrayref_or_scalar_with_string_or_regex,
+            but_skip_for => $arrayref_or_scalar_with_string_or_regex,
+        },
     });
 
 =head1 EXAMPLE
@@ -508,7 +554,7 @@ Steffen Winkler
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2014 - 2015,
+Copyright (c) 2014 - 2017,
 Steffen Winkler
 C<< <steffenw at cpan.org> >>.
 All rights reserved.

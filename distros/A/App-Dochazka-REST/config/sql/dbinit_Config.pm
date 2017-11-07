@@ -171,7 +171,7 @@ $body$
     q/CREATE OR REPLACE FUNCTION eid_immutable() RETURNS trigger AS $IMM$
       BEGIN
           IF OLD.eid <> NEW.eid THEN
-              RAISE EXCEPTION 'employees.eid field is immutable'; 
+              RAISE EXCEPTION 'employees.eid field is immutable';
           END IF;
           RETURN NEW;
       END;
@@ -183,6 +183,24 @@ $body$
       FOR EACH ROW EXECUTE PROCEDURE eid_immutable()/,
 
     q/COMMENT ON TRIGGER no_eid_update ON employees IS 'trigger for eid_immutable()'/,
+
+    q/CREATE OR REPLACE FUNCTION employee_supervise_self() RETURNS trigger AS $IMM$
+      BEGIN
+          IF NEW.eid = NEW.supervisor THEN
+              RAISE EXCEPTION 'employees cannot be their own supervisor';
+          END IF;
+          RETURN NEW;
+      END;
+    $IMM$ LANGUAGE plpgsql/,
+
+    q/COMMENT ON FUNCTION employee_supervise_self()
+      IS 'trigger function to prevent employees from supervising themselves'/,
+
+    q/CREATE TRIGGER no_employee_supervise_self BEFORE INSERT OR UPDATE ON employees
+        FOR EACH ROW EXECUTE PROCEDURE employee_supervise_self()/,
+
+    q/COMMENT ON TRIGGER no_employee_supervise_self ON employees
+      IS 'Make it impossible for an employee to supervise her- or himself'/,
 
     # the 'schedintvls' table
 

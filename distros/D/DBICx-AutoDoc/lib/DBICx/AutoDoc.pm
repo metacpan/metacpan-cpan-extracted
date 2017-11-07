@@ -1,7 +1,7 @@
 package DBICx::AutoDoc;
 use strict;
 use warnings;
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 use base qw( Class::Accessor::Grouped );
 use Carp qw( croak );
 use Template;
@@ -208,7 +208,7 @@ sub get_relationships_for {
         if ( $type eq 'many_to_many' ) {
             @{ $rel }{qw( link_rel_name foreign_rel_name attributes )} = @parts;
         } else {
-            @{ $rel }{qw( foreign_class condition attributes )} = @parts;
+            @{ $rel }{qw( foreign_class cond attributes )} = @parts;
         }
     }
 
@@ -230,6 +230,10 @@ sub get_relationships_for {
                 $rel->{ $x.'moniker' } = $rel->{ $x.'class' }->source_name;
             }
         }
+        # Can't handle the comples conds returned by code refs yet
+        # $rel->{ 'cond' } = ($rel->{ 'cond' }->({ self_alias => 'self', foreign_alias => 'foreign' }))[0]
+        delete( $rel->{ 'cond' } )
+            if ref( $rel->{ 'cond' } ) eq 'CODE';
     }
 
     return values %relationships;
@@ -259,7 +263,7 @@ sub relationship_map {
                 $map->{ 'self' } = $source->{ 'moniker' };
                 $map->{ 'foreign' } = $snames->{ $rel->{ 'foreign_class' } };
 
-                my %cond = %{ $rel->{ 'cond' } };
+                my %cond = %{ $rel->{ 'cond' } || {} };
             
                 my @cond = ();
                 while ( my ( $l, $r ) = each %cond ) {

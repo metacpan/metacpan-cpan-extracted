@@ -1,5 +1,6 @@
 package Device::Network::ConfigParser::CheckPoint::Gaia;
 # ABSTRACT: Parse CheckPoint Configuration
+our $VERSION = '0.005'; # VERSION
 
 use 5.006;
 use strict;
@@ -13,70 +14,48 @@ use Exporter qw{import};
 
 our @EXPORT_OK = qw{get_parser get_output_drivers parse_config post_process};
 
+=head1 NAME
+
+Device::Network::ConfigParser::CheckPoint::Gaia - parse CheckPoint Gaia configuration.
+
+=head1 VERSION
+
+version 0.005
+
+=head1 SYNOPSIS
+
+This module is intended to be used in conjunction with L<Device::Network::ConfigParser>, however there's nothing stopping it being used on its own.
+
+The module provides subroutines to parse & post-process CheckPoint Gaia configuration, and output the structured data in a number of formats.
+
+=head1 SUBROUTINES
+
+=head2 get_parser
+
+For more information on the subroutine, see L<Device::Network::ConfigParser/"get_parser">.
+
+This module currently parses the following sections of Gaia config:
+
+=over 4
+
+=item * Static routes
+
+=item * Interface configuration
+
+=back
+
+Any other lines within the file are classified as 'unrecognised'.
+
+=cut
 
 sub get_parser {
     return new Parse::RecDescent(q{
         <autoaction: { [@item] }>
         startrule: config_line(s) { $item[1] }
         config_line:
-            aaa { $item[1] } |
-            arp { $item[1] } |
-            bonding { $item[1] } |
-            clienv { $item[1] } |
-            core_dump { $item[1] } |
-            dns { $item[1] } |
-            domainname { $item[1] } |
-            format { $item[1] } |
-            hostname { $item[1] } |
-            inactivity_timeout { $item[1] } |
             interface { $item[1] } |
-            ipv6 { $item[1] } |
-            ipv6_state { $item[1] } |
-            management { $item[1] } |
-            management { $item[1] } |
-            max_path_splits { $item[1] } |
-            message { $item[1] } |
-            net_access { $item[1] } |
-            ntp { $item[1] } |
-            ospf { $item[1] } |
-            password_controls { $item[1] } |
-            pbr { $item[1] } |
-            rip { $item[1] } |
-            snmp { $item[1] } |
             static_route { $item[1] } |
-            timezone { $item[1] } |
-            tracefile { $item[1] } |
-            user { $item[1] } |
-            vrrp { $item[1] } |
-            web { $item[1] } |
-            not_config { $item[1] }
-
-        aaa: 'set aaa' m{\N+} { { type => $item[0], config => "yes" } }
-        arp: 'set arp' m{\N+} { { type => $item[0], config => "yes" } }
-        bonding: 'set bonding' m{\N+} { { type => $item[0], config => "yes" } }
-
-        clienv: 'set clienv' config_lock { { type => $item[0], config => { @{ $item[2] } } } }
-            config_lock: 'config-lock' m{on|off} { [$item[0], $item[2]] }
-
-
-        core_dump: 'set core-dump' m{\N+} { { type => $item[0], config => "yes" } }
-        dns: 'set dns' m{\N+} { { type => $item[0], config => "yes" } }
-        domainname: 'set domainname' m{\N+} { { type => $item[0], config => "yes" } }
-        format: 'set format' m{\N+} { { type => $item[0], config => "yes" } }
-        hostname: 'set hostname' m{\N+} { { type => $item[0], config => "yes" } }
-        inactivity_timeout: 'set inactivity-timeout' m{\N+} { { type => $item[0], config => "yes" } }
-        ipv6: 'set ipv6' m{\N+} { { type => $item[0], config => "yes" } }
-        ipv6_state: 'set ipv6-state' m{\N+} { { type => $item[0], config => "yes" } }
-        management: 'set management' m{\N+} { { type => $item[0], config => "yes" } }
-        max_path_splits: 'set max-path-splits'm{\N+} { { type => $item[0], config => "yes" } }
-        message: 'set message' m{\N+} { { type => $item[0], config => "yes" } }
-        net_access: 'set net-access' m{\N+} { { type => $item[0], config => "yes" } }
-        ntp: 'set ntp' m{\N+} { { type => $item[0], config => "yes" } }
-        ospf: 'set ospf' m{\N+} { { type => $item[0], config => "yes" } }
-        password_controls: 'set password-controls' m{\N+} { { type => $item[0], config => "yes" } }
-        pbr: 'set pbr' m{\N+} { { type => $item[0], config => "yes" } }
-        rip: 'set rip' m{\N+} { { type => $item[0], config => "yes" } }
-        snmp: 'set snmp' m{\N+} { { type => $item[0], config => "yes" } }
+            unrecognised { $item[1] }
 
         static_route: 'set static-route' destination (nexthop | comment) { { type => $item[0], config => { @{ $item[2] }, @{ $item[3]->[1] } } } }
             destination: m{((\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{2})|default)} { [$item[0], $item[1]] }
@@ -86,15 +65,6 @@ sub get_parser {
             nexthop_address: 'gateway address' ipv4 m{on|off} { [nexthop_type => 'address', nexthop => $item[2]->[1], status => $item[3]] }
             nexthop_interface: 'gateway logical' interface_name m{on|off} { [nexthop_type => 'interface', nexthop => $item[2]->[1], status => $item[3]] }
             comment: 'comment' m{"[\w\s]+"} { [$item[0], $item[2]] }
-
-
-
-        timezone: 'set timezone' m{\N+} { { type => $item[0], config => "yes" } }
-        tracefile: 'set tracefile' m{\N+} { { type => $item[0], config => "yes" } }
-        user: 'set user' m{\N+} { { type => $item[0], config => "yes" } }
-        vrrp: 'set vrrp' m{\N+} { { type => $item[0], config => "yes" } }
-        web: 'set web' m{\N+} { { type => $item[0], config => "yes" } }
-            
 
         interface: 
             'set interface' interface_name (ipv4_address_mask | vlan | state | comment | mtu | auto_negotiation | link_speed)
@@ -115,12 +85,17 @@ sub get_parser {
         ipv4: m{\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}} 
         interface_name: m{\S+} 
 
-        not_config: m{\N+} 
+        unrecognised: m{\N+} 
         { { type => $item[0], config => $item[1] } }
         });
 }
 
 
+=head2 parse_config
+
+For more information on the subroutine, see L<Device::Network::ConfigParser/"parse_config">.
+
+=cut
 
 sub parse_config {
     my ($parser, $config_contents) = @_;
@@ -132,13 +107,13 @@ sub parse_config {
 
 
 
-sub get_output_drivers {
-    return { 
-        csv => \&csv_output_driver,
-        json => \&json_output_driver,
-    };
-}
+=head2 post_process
 
+For more information on the subroutine, see L<Device::Network::ConfigParser/"post_process">.
+
+The C<post_process()> subroutine consolidates configuration spread out over multiple lines.
+
+=cut
 
 sub post_process {
     my ($parsed_config) = @_;
@@ -176,7 +151,30 @@ sub post_process {
     return \%post_processed_config;
 }
 
+=head2 get_output_drivers
 
+For more information on the subroutine, see L<Device::Network::ConfigParser/"get_output_drivers">.
+
+Currently supported output drivers are:
+
+=over 4
+
+=item * csv - writes the parsed configuration out in CSV format.
+
+=item * json - writes the parsed configuration out as JSON.
+
+=back
+
+sub get_output_drivers {
+    return { 
+        csv => \&csv_output_driver,
+        json => \&json_output_driver,
+    };
+}
+
+=head2 csv_output_driver
+
+=cut
 
 sub csv_output_driver {
     my ($fh, $filename, $parsed_config) = @_;
@@ -248,55 +246,15 @@ sub _csv_not_config_driver {
 
 
 
+=head2 json_output_driver
+
+=cut
 
 sub json_output_driver {
     my ($fh, $filename, $parsed_config) = @_;
 
     print encode_json($parsed_config);
 }
-
-
-1; # End of Device::CheckPoint::ConfigParse
-
-__END__
-
-=pod
-
-=encoding UTF-8
-
-=head1 NAME
-
-Device::Network::ConfigParser::CheckPoint::Gaia - Parse CheckPoint Configuration
-
-=head1 VERSION
-
-version 0.004
-
-=head1 SYNOPSIS
-
-=head1 NAME
-
-Device::Network::ConfigParser::CheckPoint::Gaia
-
-=head1 VERSION
-
-# VERSION
-
-=head1 SUBROUTINES
-
-=head2 get_parser
-
-=head2 parse_config
-
-=head2 get_output_drivers
-
-Returns a hash of the output driver subs keyed on the --output command line argument
-
-=head2 post_process
-
-=head2 csv_output_driver
-
-=head2 json_output_driver
 
 =head1 AUTHOR
 
@@ -308,11 +266,15 @@ Please report any bugs or feature requests to C<bug-device-checkpoint-configpars
 the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Device-CheckPoint-ConfigParse>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
+
+
+
 =head1 SUPPORT
 
 You can find documentation for this module with the perldoc command.
 
     perldoc Device::CheckPoint::ConfigParse
+
 
 You can also look for information at:
 
@@ -336,7 +298,9 @@ L<http://search.cpan.org/dist/Device-CheckPoint-ConfigParse/>
 
 =back
 
+
 =head1 ACKNOWLEDGEMENTS
+
 
 =head1 LICENSE AND COPYRIGHT
 
@@ -378,15 +342,7 @@ CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
 CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
 EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=head1 AUTHOR
-
-Greg Foletta <greg@foletta.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2017 by Greg Foletta.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut
+
+1; # End of Device::CheckPoint::ConfigParse

@@ -7,7 +7,7 @@ use Carp qw( croak );
 use Exporter 'import';
 use overload ();
 
-our $VERSION = '0.40';
+our $VERSION = '0.42';
 
 use Scalar::Util qw( blessed );
 
@@ -89,7 +89,10 @@ sub is_class_loaded {
     return 1 if exists $stash->{VERSION};
 
     foreach my $globref ( values %{$stash} ) {
-        return 1 if *{$globref}{CODE};
+        return 1
+            if ref \$globref eq 'GLOB'
+            ? *{$globref}{CODE}
+            : ref $globref;    # const or sub ref
     }
 
     return 0;
@@ -111,7 +114,7 @@ Specio::Helpers - Helper subs for the Specio distro
 
 =head1 VERSION
 
-version 0.40
+version 0.42
 
 =head1 DESCRIPTION
 

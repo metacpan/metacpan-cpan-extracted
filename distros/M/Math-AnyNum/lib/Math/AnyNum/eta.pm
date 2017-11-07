@@ -10,11 +10,11 @@ our ($ROUND, $PREC);
 sub __eta__ {
     my ($x) = @_;    # $x is always a Math::MPFR object
 
-    my $r = Math::MPFR::Rmpfr_init2($PREC);
+    my $r        = Math::MPFR::Rmpfr_init2($PREC);
+    my $x_is_int = Math::MPFR::Rmpfr_integer_p($x);
 
     # Special case for eta(1) = log(2)
-    if (    Math::MPFR::Rmpfr_integer_p($x)
-        and Math::MPFR::Rmpfr_cmp_ui($x, 1) == 0) {
+    if ($x_is_int and Math::MPFR::Rmpfr_cmp_ui($x, 1) == 0) {
         Math::MPFR::Rmpfr_const_log2($r, $ROUND);
         return $r;
     }
@@ -25,8 +25,7 @@ sub __eta__ {
     Math::MPFR::Rmpfr_ui_pow($r, 2, $r, $ROUND);
     Math::MPFR::Rmpfr_ui_sub($r, 1, $r, $ROUND);
 
-    if (    Math::MPFR::Rmpfr_integer_p($x)
-        and Math::MPFR::Rmpfr_fits_ulong_p($x, $ROUND)) {
+    if ($x_is_int and Math::MPFR::Rmpfr_fits_ulong_p($x, $ROUND)) {
         Math::MPFR::Rmpfr_zeta_ui($t, Math::MPFR::Rmpfr_get_ui($x, $ROUND), $ROUND);
     }
     else {

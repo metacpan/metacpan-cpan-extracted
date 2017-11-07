@@ -16,7 +16,7 @@ use Text::ParseWords qw( shellwords );
 # distributed with Alien-Build.
 
 # ABSTRACT: Compiler and linker wrapper for Alien
-our $VERSION = '1.28'; # VERSION
+our $VERSION = '1.32'; # VERSION
 
 
 my @cflags_I;
@@ -39,6 +39,36 @@ sub _reset
 }
 
 
+sub _myexec
+{
+  my @command = @_;
+  if($^O eq 'MSWin32')
+  {
+    # To handle weird quoting on MSWin32
+    # this logic needs to be improved.
+    my $command = "@command";
+    $command =~ s{"}{\\"}g;
+    system $command;
+
+    if($? == -1 )
+    {
+      die "failed to execute: $!\n";
+    }
+    elsif($? & 127)
+    {
+      die "child died with signal @{[ $? & 128 ]}";
+    }
+    else
+    {
+      exit($? >> 8);
+    }
+  }
+  else
+  {
+    exec @command;
+  }
+}
+
 sub cc
 {
   my @command = (
@@ -48,7 +78,7 @@ sub cc
     @ARGV,
   );
   print "@command\n" unless $ENV{ALIEN_BASE_WRAPPER_QUIET};
-  exec @command;
+  _myexec @command;
 }
 
 
@@ -62,7 +92,7 @@ sub ld
     @ldflags_l,
   );
   print "@command\n" unless $ENV{ALIEN_BASE_WRAPPER_QUIET};
-  exec @command;
+  _myexec @command;
 }
 
 
@@ -129,7 +159,8 @@ sub import
   push @mm, CCFLAGS   => _join(@cflags_other2) . " $Config{ccflags}" if @cflags_other2;
   push @mm, DEFINE    => _join(@cflags_define)                       if @cflags_define;
 
-  push @mm, LIBS      => [@ldflags_l];
+  # TODO: handle spaces in -L paths
+  push @mm, LIBS      => ["@ldflags_L @ldflags_l"];
   my @ldflags = (@ldflags_L, @ldflags_other);
   push @mm, LDDLFLAGS => _join(@ldflags) . " $Config{lddlflags}"     if @ldflags;
   push @mm, LDFLAGS   => _join(@ldflags) . " $Config{ldflags}"       if @ldflags;
@@ -170,7 +201,7 @@ Alien::Base::Wrapper - Compiler and linker wrapper for Alien
 
 =head1 VERSION
 
-version 1.28
+version 1.32
 
 =head1 SYNOPSIS
 

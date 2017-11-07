@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "Z.MU.",
-    "Z.MW."
+    "Z.MW.",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "E d",
@@ -44,7 +49,7 @@
     yMd => "d/M/y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "rn-BI",
   date_format_full => "EEEE d MMMM y",
@@ -62,7 +67,7 @@
     "kan.",
     "gnu.",
     "gnd.",
-    "cu."
+    "cu.",
   ],
   day_format_narrow => [
     "M",
@@ -71,7 +76,7 @@
     "T",
     "F",
     "S",
-    "S"
+    "S",
   ],
   day_format_wide => [
     "Ku wa mbere",
@@ -80,7 +85,7 @@
     "Ku wa kane",
     "Ku wa gatanu",
     "Ku wa gatandatu",
-    "Ku w\N{U+2019}indwi"
+    "Ku w\N{U+2019}indwi",
   ],
   day_stand_alone_abbreviated => [
     "mbe.",
@@ -89,7 +94,7 @@
     "kan.",
     "gnu.",
     "gnd.",
-    "cu."
+    "cu.",
   ],
   day_stand_alone_narrow => [
     "M",
@@ -98,7 +103,7 @@
     "T",
     "F",
     "S",
-    "S"
+    "S",
   ],
   day_stand_alone_wide => [
     "Ku wa mbere",
@@ -107,19 +112,19 @@
     "Ku wa kane",
     "Ku wa gatanu",
     "Ku wa gatandatu",
-    "Ku w\N{U+2019}indwi"
+    "Ku w\N{U+2019}indwi",
   ],
   era_abbreviated => [
     "Mb.Y.",
-    "Ny.Y"
+    "Ny.Y",
   ],
   era_narrow => [
     "Mb.Y.",
-    "Ny.Y"
+    "Ny.Y",
   ],
   era_wide => [
     "Mbere ya Yezu",
-    "Nyuma ya Yezu"
+    "Nyuma ya Yezu",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -140,7 +145,7 @@
     "Nze.",
     "Ukw.",
     "Ugu.",
-    "Uku."
+    "Uku.",
   ],
   month_format_narrow => [
     1,
@@ -154,7 +159,7 @@
     9,
     10,
     11,
-    12
+    12,
   ],
   month_format_wide => [
     "Nzero",
@@ -168,7 +173,7 @@
     "Nyakanga",
     "Gitugutu",
     "Munyonyo",
-    "Kigarama"
+    "Kigarama",
   ],
   month_stand_alone_abbreviated => [
     "Mut.",
@@ -182,7 +187,7 @@
     "Nze.",
     "Ukw.",
     "Ugu.",
-    "Uku."
+    "Uku.",
   ],
   month_stand_alone_narrow => [
     1,
@@ -196,7 +201,7 @@
     9,
     10,
     11,
-    12
+    12,
   ],
   month_stand_alone_wide => [
     "Nzero",
@@ -210,7 +215,7 @@
     "Nyakanga",
     "Gitugutu",
     "Munyonyo",
-    "Kigarama"
+    "Kigarama",
   ],
   name => "Rundi Burundi",
   native_language => "Ikirundi",
@@ -222,37 +227,37 @@
     "I1",
     "I2",
     "I3",
-    "I4"
+    "I4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "Igice ca mbere c\N{U+2019}umwaka",
     "Igice ca kabiri c\N{U+2019}umwaka",
     "Igice ca gatatu c\N{U+2019}umwaka",
-    "Igice ca kane c\N{U+2019}umwaka"
+    "Igice ca kane c\N{U+2019}umwaka",
   ],
   quarter_stand_alone_abbreviated => [
     "I1",
     "I2",
     "I3",
-    "I4"
+    "I4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "Igice ca mbere c\N{U+2019}umwaka",
     "Igice ca kabiri c\N{U+2019}umwaka",
     "Igice ca gatatu c\N{U+2019}umwaka",
-    "Igice ca kane c\N{U+2019}umwaka"
+    "Igice ca kane c\N{U+2019}umwaka",
   ],
   script => undef,
   territory => "Burundi",
@@ -261,5 +266,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

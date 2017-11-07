@@ -1,28 +1,20 @@
 #!/usr/bin/env perl
 
 # PODNAME: ncp
+our $VERSION = '0.005'; # VERSION
 
 use strict;
 use warnings;
 use Pod::Usage;
 use Device::Network::ConfigParser qw{app};
 
-
-app(@ARGV);
-
-__END__
-
-=pod
-
-=encoding UTF-8
-
 =head1 NAME
 
-ncp
+ncp - parse network device configurations.
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -38,13 +30,10 @@ version 0.004
 
 -o, --output=STRING     file to write to, defaults to STDOUT.
 
+
 Type 'man ncp' for more information.
 
 =back
-
-=head1 NAME
-
-ncp - parse network device configurations.
 
 =head1 OPTIONS
 
@@ -99,15 +88,6 @@ A list of configuration files to parse. If no configuration files are listed it 
     # to three separate output files
     ncp --vendor Cisco --type ASA --format csv --output %in_file%.csv fw1.conf fw2.conf fw3.conf
 
-=head1 AUTHOR
-
-Greg Foletta <greg@foletta.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2017 by Greg Foletta.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
 =cut
+
+app(@ARGV);

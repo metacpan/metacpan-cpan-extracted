@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "yb",
-    "yh"
+    "yh",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E, HH:mm",
     EHms => "E, HH:mm:ss",
     Ed => "d, E",
@@ -23,12 +28,12 @@
     MEd => "E, d/M",
     MMM => "LLL",
     MMMEd => "E, d MMM",
-    "MMMMW-count-few" => "'wythnos' W 'o' MMM",
-    "MMMMW-count-many" => "'wythnos' W 'o' MMM",
-    "MMMMW-count-one" => "'wythnos' W 'o' MMM",
-    "MMMMW-count-other" => "'wythnos' W 'o' MMM",
-    "MMMMW-count-two" => "'wythnos' W 'o' MMM",
-    "MMMMW-count-zero" => "'wythnos' W 'o' MMM",
+    "MMMMW-count-few" => "'wythnos' W 'o' MMMM",
+    "MMMMW-count-many" => "'wythnos' W 'o' MMMM",
+    "MMMMW-count-one" => "'wythnos' W 'o' MMMM",
+    "MMMMW-count-other" => "'wythnos' W 'o' MMMM",
+    "MMMMW-count-two" => "'wythnos' W 'o' MMMM",
+    "MMMMW-count-zero" => "'wythnos' W 'o' MMMM",
     MMMMd => "MMMM d",
     MMMd => "d MMM",
     Md => "d/M",
@@ -50,12 +55,12 @@
     yQ => "Q y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-few" => "'wythnos' w 'of' y",
-    "yw-count-many" => "'wythnos' w 'of' y",
-    "yw-count-one" => "'wythnos' w 'of' y",
-    "yw-count-other" => "'wythnos' w 'of' y",
-    "yw-count-two" => "'wythnos' w 'of' y",
-    "yw-count-zero" => "'wythnos' w 'of' y"
+    "yw-count-few" => "'wythnos' w 'o' Y",
+    "yw-count-many" => "'wythnos' w 'o' Y",
+    "yw-count-one" => "'wythnos' w 'o' Y",
+    "yw-count-other" => "'wythnos' w 'o' Y",
+    "yw-count-two" => "'wythnos' w 'o' Y",
+    "yw-count-zero" => "'wythnos' w 'o' Y",
   },
   code => "cy-GB",
   date_format_full => "EEEE, d MMMM y",
@@ -73,7 +78,7 @@
     "Iau",
     "Gwen",
     "Sad",
-    "Sul"
+    "Sul",
   ],
   day_format_narrow => [
     "Ll",
@@ -82,7 +87,7 @@
     "I",
     "G",
     "S",
-    "S"
+    "S",
   ],
   day_format_wide => [
     "Dydd Llun",
@@ -91,7 +96,7 @@
     "Dydd Iau",
     "Dydd Gwener",
     "Dydd Sadwrn",
-    "Dydd Sul"
+    "Dydd Sul",
   ],
   day_stand_alone_abbreviated => [
     "Llun",
@@ -100,7 +105,7 @@
     "Iau",
     "Gwe",
     "Sad",
-    "Sul"
+    "Sul",
   ],
   day_stand_alone_narrow => [
     "Ll",
@@ -109,7 +114,7 @@
     "I",
     "G",
     "S",
-    "S"
+    "S",
   ],
   day_stand_alone_wide => [
     "Dydd Llun",
@@ -118,19 +123,19 @@
     "Dydd Iau",
     "Dydd Gwener",
     "Dydd Sadwrn",
-    "Dydd Sul"
+    "Dydd Sul",
   ],
   era_abbreviated => [
     "CC",
-    "OC"
+    "OC",
   ],
   era_narrow => [
     "C",
-    "O"
+    "O",
   ],
   era_wide => [
     "Cyn Crist",
-    "Oed Crist"
+    "Oed Crist",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %e %b %H:%M:%S %Z %Y",
@@ -151,7 +156,7 @@
     "Medi",
     "Hyd",
     "Tach",
-    "Rhag"
+    "Rhag",
   ],
   month_format_narrow => [
     "I",
@@ -165,7 +170,7 @@
     "M",
     "H",
     "T",
-    "Rh"
+    "Rh",
   ],
   month_format_wide => [
     "Ionawr",
@@ -179,7 +184,7 @@
     "Medi",
     "Hydref",
     "Tachwedd",
-    "Rhagfyr"
+    "Rhagfyr",
   ],
   month_stand_alone_abbreviated => [
     "Ion",
@@ -193,7 +198,7 @@
     "Medi",
     "Hyd",
     "Tach",
-    "Rhag"
+    "Rhag",
   ],
   month_stand_alone_narrow => [
     "I",
@@ -207,7 +212,7 @@
     "M",
     "H",
     "T",
-    "Rh"
+    "Rh",
   ],
   month_stand_alone_wide => [
     "Ionawr",
@@ -221,7 +226,7 @@
     "Medi",
     "Hydref",
     "Tachwedd",
-    "Rhagfyr"
+    "Rhagfyr",
   ],
   name => "Welsh United Kingdom",
   native_language => "Cymraeg",
@@ -233,37 +238,37 @@
     "Ch1",
     "Ch2",
     "Ch3",
-    "Ch4"
+    "Ch4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "chwarter 1af",
     "2il chwarter",
     "3ydd chwarter",
-    "4ydd chwarter"
+    "4ydd chwarter",
   ],
   quarter_stand_alone_abbreviated => [
     "Ch1",
     "Ch2",
     "Ch3",
-    "Ch4"
+    "Ch4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "chwarter 1af",
     "2il chwarter",
     "3ydd chwarter",
-    "4ydd chwarter"
+    "4ydd chwarter",
   ],
   script => undef,
   territory => "United Kingdom",
@@ -272,5 +277,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

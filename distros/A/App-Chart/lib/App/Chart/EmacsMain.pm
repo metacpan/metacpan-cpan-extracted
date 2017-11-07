@@ -301,8 +301,16 @@ sub latest_line {
   $add->(1, ' ');
   $add->(7, $latest->short_datetime);
   $add->(1, ' ');
-  my $note = $latest->{'note'} // '';
+
+  my @notes;
+  if ($latest->{'halt'}) { push @notes, __('halt'); }
+  if ($latest->{'limit_up'}) { push @notes, __('limit up'); }
+  if ($latest->{'limit_down'}) { push @notes, __('limit down'); }
+  if (my $note = $latest->{'note'}) { push @notes, $note; }
+  if (my $error = $latest->{'error'}) { push @notes, $error; }
+  my $note = join (', ', @notes);
   $add->(length($note), $note);
+
   return $ret;
 }
 

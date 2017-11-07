@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "Ma",
-    "Mo"
+    "Mo",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d, E",
@@ -45,7 +50,7 @@
     yMd => "y-MM-dd",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "guz",
   date_format_full => "EEEE, d MMMM y",
@@ -63,7 +68,7 @@
     "Ars",
     "Icm",
     "Est",
-    "Cpr"
+    "Cpr",
   ],
   day_format_narrow => [
     "C",
@@ -72,7 +77,7 @@
     "A",
     "I",
     "E",
-    "C"
+    "C",
   ],
   day_format_wide => [
     "Chumatato",
@@ -81,7 +86,7 @@
     "Aramisi",
     "Ichuma",
     "Esabato",
-    "Chumapiri"
+    "Chumapiri",
   ],
   day_stand_alone_abbreviated => [
     "Ctt",
@@ -90,7 +95,7 @@
     "Ars",
     "Icm",
     "Est",
-    "Cpr"
+    "Cpr",
   ],
   day_stand_alone_narrow => [
     "C",
@@ -99,7 +104,7 @@
     "A",
     "I",
     "E",
-    "C"
+    "C",
   ],
   day_stand_alone_wide => [
     "Chumatato",
@@ -108,19 +113,19 @@
     "Aramisi",
     "Ichuma",
     "Esabato",
-    "Chumapiri"
+    "Chumapiri",
   ],
   era_abbreviated => [
     "YA",
-    "YK"
+    "YK",
   ],
   era_narrow => [
     "YA",
-    "YK"
+    "YK",
   ],
   era_wide => [
     "Yeso ataiborwa",
-    "Yeso kaiboirwe"
+    "Yeso kaiboirwe",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -141,7 +146,7 @@
     "Sep",
     "Okt",
     "Nob",
-    "Dis"
+    "Dis",
   ],
   month_format_narrow => [
     "C",
@@ -155,7 +160,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_format_wide => [
     "Chanuari",
@@ -169,7 +174,7 @@
     "Septemba",
     "Okitoba",
     "Nobemba",
-    "Disemba"
+    "Disemba",
   ],
   month_stand_alone_abbreviated => [
     "Can",
@@ -183,7 +188,7 @@
     "Sep",
     "Okt",
     "Nob",
-    "Dis"
+    "Dis",
   ],
   month_stand_alone_narrow => [
     "C",
@@ -197,7 +202,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_stand_alone_wide => [
     "Chanuari",
@@ -211,7 +216,7 @@
     "Septemba",
     "Okitoba",
     "Nobemba",
-    "Disemba"
+    "Disemba",
   ],
   name => "Gusii",
   native_language => "Ekegusii",
@@ -223,37 +228,37 @@
     "E1",
     "E2",
     "E3",
-    "E4"
+    "E4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "Erobo entang\N{U+2019}ani",
     "Erobo yakabere",
     "Erobo yagatato",
-    "Erobo yakane"
+    "Erobo yakane",
   ],
   quarter_stand_alone_abbreviated => [
     "E1",
     "E2",
     "E3",
-    "E4"
+    "E4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "Erobo entang\N{U+2019}ani",
     "Erobo yakabere",
     "Erobo yagatato",
-    "Erobo yakane"
+    "Erobo yakane",
   ],
   script => undef,
   territory => undef,
@@ -262,5 +267,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

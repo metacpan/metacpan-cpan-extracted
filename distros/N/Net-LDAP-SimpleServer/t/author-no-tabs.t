@@ -15,7 +15,7 @@ use Test::More 0.88;
 use Test::NoTabs;
 
 my @files = (
-    'bin/ldapd.pl',
+    'bin/simpleldap',
     'lib/Net/LDAP/SimpleServer.pm',
     'lib/Net/LDAP/SimpleServer/Constant.pm',
     'lib/Net/LDAP/SimpleServer/LDIFStore.pm',
@@ -27,7 +27,9 @@ my @files = (
     't/20-handler.t',
     't/30-param.t',
     't/40-bind.t',
+    't/41-bind-user.t',
     't/50-search.t',
+    't/51-search-pw_attr.t',
     't/lib/Helper.pm'
 );
 

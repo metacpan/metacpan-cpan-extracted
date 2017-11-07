@@ -65,7 +65,7 @@
    "provides" : {
       "WebService::Slack::WebApi" : {
          "file" : "lib/WebService/Slack/WebApi.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "WebService::Slack::WebApi::Api" : {
          "file" : "lib/WebService/Slack/WebApi/Api.pm"
@@ -142,9 +142,10 @@
          "web" : "https://github.com/mihyaeru21/p5-WebService-Slack-WebApi"
       }
    },
-   "version" : "0.10",
+   "version" : "0.11",
    "x_contributors" : [
       "Askar Timirgazin <anotheroneackap@gmail.com>",
+      "Ivan Wills <Ivan.Wills2@optus.com.au>",
       "Sterling Hanenkamp <sterling@hanenkamp.com>",
       "Steven Arnott <steven.arnott@grantstreet.com>",
       "Yanick Champoux <yanick@babyl.dyndns.org>",

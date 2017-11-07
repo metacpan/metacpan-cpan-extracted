@@ -327,11 +327,41 @@ Turkish locale.
 
 =head2 Available Formats
 
+=head3 Bh (B h)
+
+   2008-02-05T18:30:30 = B 6
+   1995-12-22T09:05:02 = B 9
+  -0010-09-15T04:44:23 = B 4
+
+=head3 Bhm (B h:mm)
+
+   2008-02-05T18:30:30 = B 6:30
+   1995-12-22T09:05:02 = B 9:05
+  -0010-09-15T04:44:23 = B 4:44
+
+=head3 Bhms (B h:mm:ss)
+
+   2008-02-05T18:30:30 = B 6:30:30
+   1995-12-22T09:05:02 = B 9:05:02
+  -0010-09-15T04:44:23 = B 4:44:23
+
 =head3 E (ccc)
 
    2008-02-05T18:30:30 = Sal
    1995-12-22T09:05:02 = Cum
   -0010-09-15T04:44:23 = Cmt
+
+=head3 EBhm (E B h:mm)
+
+   2008-02-05T18:30:30 = Sal B 6:30
+   1995-12-22T09:05:02 = Cum B 9:05
+  -0010-09-15T04:44:23 = Cmt B 4:44
+
+=head3 EBhms (E B h:mm:ss)
+
+   2008-02-05T18:30:30 = Sal B 6:30:30
+   1995-12-22T09:05:02 = Cum B 9:05:02
+  -0010-09-15T04:44:23 = Cmt B 4:44:23
 
 =head3 EHm (E HH:mm)
 
@@ -591,13 +621,13 @@ Turkish locale.
    1995-12-22T09:05:02 = 1995 4. çeyrek
   -0010-09-15T04:44:23 = -10 3. çeyrek
 
-=head3 yw-count-one (y 'yılının' w. 'haftası')
+=head3 yw-count-one (Y 'yılının' w. 'haftası')
 
    2008-02-05T18:30:30 = 2008 yılının 6. haftası
    1995-12-22T09:05:02 = 1995 yılının 51. haftası
   -0010-09-15T04:44:23 = -10 yılının 37. haftası
 
-=head3 yw-count-other (y 'yılının' w. 'haftası')
+=head3 yw-count-other (Y 'yılının' w. 'haftası')
 
    2008-02-05T18:30:30 = 2008 yılının 6. haftası
    1995-12-22T09:05:02 = 1995 yılının 51. haftası

@@ -327,11 +327,41 @@ Welsh locale.
 
 =head2 Available Formats
 
+=head3 Bh (h B)
+
+   2008-02-05T18:30:30 = 6 B
+   1995-12-22T09:05:02 = 9 B
+  -0010-09-15T04:44:23 = 4 B
+
+=head3 Bhm (h:mm B)
+
+   2008-02-05T18:30:30 = 6:30 B
+   1995-12-22T09:05:02 = 9:05 B
+  -0010-09-15T04:44:23 = 4:44 B
+
+=head3 Bhms (h:mm:ss B)
+
+   2008-02-05T18:30:30 = 6:30:30 B
+   1995-12-22T09:05:02 = 9:05:02 B
+  -0010-09-15T04:44:23 = 4:44:23 B
+
 =head3 E (ccc)
 
    2008-02-05T18:30:30 = Maw
    1995-12-22T09:05:02 = Gwe
   -0010-09-15T04:44:23 = Sad
+
+=head3 EBhm (E h:mm B)
+
+   2008-02-05T18:30:30 = Maw 6:30 B
+   1995-12-22T09:05:02 = Gwen 9:05 B
+  -0010-09-15T04:44:23 = Sad 4:44 B
+
+=head3 EBhms (E h:mm:ss B)
+
+   2008-02-05T18:30:30 = Maw 6:30:30 B
+   1995-12-22T09:05:02 = Gwen 9:05:02 B
+  -0010-09-15T04:44:23 = Sad 4:44:23 B
 
 =head3 EHm (E, HH:mm)
 
@@ -441,40 +471,40 @@ Welsh locale.
    1995-12-22T09:05:02 = Gwen, 22 Rhag
   -0010-09-15T04:44:23 = Sad, 15 Medi
 
-=head3 MMMMW-count-few ('wythnos' W 'o' MMM)
+=head3 MMMMW-count-few ('wythnos' W 'o' MMMM)
 
-   2008-02-05T18:30:30 = wythnos 1 o Chwef
-   1995-12-22T09:05:02 = wythnos 3 o Rhag
+   2008-02-05T18:30:30 = wythnos 1 o Chwefror
+   1995-12-22T09:05:02 = wythnos 3 o Rhagfyr
   -0010-09-15T04:44:23 = wythnos 2 o Medi
 
-=head3 MMMMW-count-many ('wythnos' W 'o' MMM)
+=head3 MMMMW-count-many ('wythnos' W 'o' MMMM)
 
-   2008-02-05T18:30:30 = wythnos 1 o Chwef
-   1995-12-22T09:05:02 = wythnos 3 o Rhag
+   2008-02-05T18:30:30 = wythnos 1 o Chwefror
+   1995-12-22T09:05:02 = wythnos 3 o Rhagfyr
   -0010-09-15T04:44:23 = wythnos 2 o Medi
 
-=head3 MMMMW-count-one ('wythnos' W 'o' MMM)
+=head3 MMMMW-count-one ('wythnos' W 'o' MMMM)
 
-   2008-02-05T18:30:30 = wythnos 1 o Chwef
-   1995-12-22T09:05:02 = wythnos 3 o Rhag
+   2008-02-05T18:30:30 = wythnos 1 o Chwefror
+   1995-12-22T09:05:02 = wythnos 3 o Rhagfyr
   -0010-09-15T04:44:23 = wythnos 2 o Medi
 
-=head3 MMMMW-count-other ('wythnos' W 'o' MMM)
+=head3 MMMMW-count-other ('wythnos' W 'o' MMMM)
 
-   2008-02-05T18:30:30 = wythnos 1 o Chwef
-   1995-12-22T09:05:02 = wythnos 3 o Rhag
+   2008-02-05T18:30:30 = wythnos 1 o Chwefror
+   1995-12-22T09:05:02 = wythnos 3 o Rhagfyr
   -0010-09-15T04:44:23 = wythnos 2 o Medi
 
-=head3 MMMMW-count-two ('wythnos' W 'o' MMM)
+=head3 MMMMW-count-two ('wythnos' W 'o' MMMM)
 
-   2008-02-05T18:30:30 = wythnos 1 o Chwef
-   1995-12-22T09:05:02 = wythnos 3 o Rhag
+   2008-02-05T18:30:30 = wythnos 1 o Chwefror
+   1995-12-22T09:05:02 = wythnos 3 o Rhagfyr
   -0010-09-15T04:44:23 = wythnos 2 o Medi
 
-=head3 MMMMW-count-zero ('wythnos' W 'o' MMM)
+=head3 MMMMW-count-zero ('wythnos' W 'o' MMMM)
 
-   2008-02-05T18:30:30 = wythnos 1 o Chwef
-   1995-12-22T09:05:02 = wythnos 3 o Rhag
+   2008-02-05T18:30:30 = wythnos 1 o Chwefror
+   1995-12-22T09:05:02 = wythnos 3 o Rhagfyr
   -0010-09-15T04:44:23 = wythnos 2 o Medi
 
 =head3 MMMMd (MMMM d)
@@ -603,41 +633,41 @@ Welsh locale.
    1995-12-22T09:05:02 = 4ydd chwarter 1995
   -0010-09-15T04:44:23 = 3ydd chwarter -10
 
-=head3 yw-count-few ('wythnos' w 'of' y)
+=head3 yw-count-few ('wythnos' w 'o' Y)
 
-   2008-02-05T18:30:30 = wythnos 6 of 2008
-   1995-12-22T09:05:02 = wythnos 51 of 1995
-  -0010-09-15T04:44:23 = wythnos 37 of -10
+   2008-02-05T18:30:30 = wythnos 6 o 2008
+   1995-12-22T09:05:02 = wythnos 51 o 1995
+  -0010-09-15T04:44:23 = wythnos 37 o -10
 
-=head3 yw-count-many ('wythnos' w 'of' y)
+=head3 yw-count-many ('wythnos' w 'o' Y)
 
-   2008-02-05T18:30:30 = wythnos 6 of 2008
-   1995-12-22T09:05:02 = wythnos 51 of 1995
-  -0010-09-15T04:44:23 = wythnos 37 of -10
+   2008-02-05T18:30:30 = wythnos 6 o 2008
+   1995-12-22T09:05:02 = wythnos 51 o 1995
+  -0010-09-15T04:44:23 = wythnos 37 o -10
 
-=head3 yw-count-one ('wythnos' w 'of' y)
+=head3 yw-count-one ('wythnos' w 'o' Y)
 
-   2008-02-05T18:30:30 = wythnos 6 of 2008
-   1995-12-22T09:05:02 = wythnos 51 of 1995
-  -0010-09-15T04:44:23 = wythnos 37 of -10
+   2008-02-05T18:30:30 = wythnos 6 o 2008
+   1995-12-22T09:05:02 = wythnos 51 o 1995
+  -0010-09-15T04:44:23 = wythnos 37 o -10
 
-=head3 yw-count-other ('wythnos' w 'of' y)
+=head3 yw-count-other ('wythnos' w 'o' Y)
 
-   2008-02-05T18:30:30 = wythnos 6 of 2008
-   1995-12-22T09:05:02 = wythnos 51 of 1995
-  -0010-09-15T04:44:23 = wythnos 37 of -10
+   2008-02-05T18:30:30 = wythnos 6 o 2008
+   1995-12-22T09:05:02 = wythnos 51 o 1995
+  -0010-09-15T04:44:23 = wythnos 37 o -10
 
-=head3 yw-count-two ('wythnos' w 'of' y)
+=head3 yw-count-two ('wythnos' w 'o' Y)
 
-   2008-02-05T18:30:30 = wythnos 6 of 2008
-   1995-12-22T09:05:02 = wythnos 51 of 1995
-  -0010-09-15T04:44:23 = wythnos 37 of -10
+   2008-02-05T18:30:30 = wythnos 6 o 2008
+   1995-12-22T09:05:02 = wythnos 51 o 1995
+  -0010-09-15T04:44:23 = wythnos 37 o -10
 
-=head3 yw-count-zero ('wythnos' w 'of' y)
+=head3 yw-count-zero ('wythnos' w 'o' Y)
 
-   2008-02-05T18:30:30 = wythnos 6 of 2008
-   1995-12-22T09:05:02 = wythnos 51 of 1995
-  -0010-09-15T04:44:23 = wythnos 37 of -10
+   2008-02-05T18:30:30 = wythnos 6 o 2008
+   1995-12-22T09:05:02 = wythnos 51 o 1995
+  -0010-09-15T04:44:23 = wythnos 37 o -10
 
 
 =head2 Miscellaneous

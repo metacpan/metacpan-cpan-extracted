@@ -2,7 +2,7 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More tests => 36;
+use Test::More tests => 38;
 
 use Struct::Path qw(spath);
 
@@ -10,7 +10,7 @@ use Storable qw(freeze);
 $Storable::canonical = 1;
 
 use lib "t";
-use _common qw($s_array $s_mixed);
+use _common qw($s_array $s_mixed t_dump);
 
 my (@r, $frozen_s);
 
@@ -23,23 +23,23 @@ like($@, qr/^Reference expected for structure/);
 
 # path must be a list
 eval { spath($s_mixed, undef) };
-like($@, qr/^Path must be arrayref/);
+like($@, qr/^Arrayref expected for path/);
 
 # garbage in the path
 eval { spath($s_mixed, [ 'a' ]) };
-like($@, qr/^Unsupported thing in the path \(step #0\)/);
+like($@, qr/^Unsupported thing in the path, step #0/);
 
 # garbage in hash definitioni 1
 eval { spath($s_mixed, [ {garbage => ['a']} ]) };
-like($@, qr/^Unsupported HASH definition \(step #0\)/); # must be error
+like($@, qr/^Unsupported HASH definition, step #0/); # must be error
 
 # garbage in hash definition 2
 eval { spath($s_mixed, [ {keys => 'a'} ]) };
-like($@, qr/^Unsupported HASH keys definition \(step #0\)/); # must be error
+like($@, qr/^Unsupported HASH keys definition, step #0/); # must be error
 
 # garbage in hash definition 3
 eval { spath($s_mixed, [ {regs => 'a'} ]) };
-like($@, qr/^Unsupported HASH regs definition \(step #0\)/); # must be error
+like($@, qr/^Unsupported HASH regs definition, step #0/); # must be error
 
 # wrong step type, strict
 eval { spath($s_mixed, [ [0] ], strict => 1) };
@@ -59,7 +59,7 @@ ok($@); # must be error
 
 # out of range, but strict opt used
 eval { spath($s_mixed, [ {keys => ['a']},[-3] ], strict => 1) };
-like($@, qr/^\[-3\] doesn't exists \(step #1\) at/);
+like($@, qr/^\[-3\] doesn't exist, step #1/);
 
 # hash key doesn't exists
 eval { spath($s_mixed, [ {keys => ['notexists']} ]) };
@@ -67,7 +67,7 @@ ok(!$@); # must be no error
 
 # hash key doesn't exists, but strict opt used
 eval { spath($s_mixed, [ {keys => ['notexists']} ], strict => 1) };
-ok($@); # must be error
+like($@, qr/^\{notexists\} doesn't exist, step #0/);
 
 # path doesn't exists
 @r = spath($s_mixed, [ [],{keys => ['c']} ]);
@@ -257,6 +257,30 @@ is_deeply(
     [\[],\0],
     "code refs in the path (grep defined)"
 );
+
+do {
+    local $_ = 'must remain unchanged';
+
+    my $data = [
+        { k => 'one', v => 1 },
+        { k => 'two', v => 2, s => { k => 1 } },
+        { k => 'two', v => 2, s => { k => 2 } },
+    ];
+
+    my $dfltvar = sub {
+        $_->{k} eq 'two' and
+            exists $_->{s} and $_->{s}->{k} < 2
+    };
+
+    @r = spath($data, [ [],$dfltvar,{keys => ['k','s']} ]);
+    is_deeply(
+        \@r,
+        [\'two',\{k => 1}],
+        '$_ usage'
+    ) || diag t_dump \@r;
+
+    is($_, 'must remain unchanged', 'Default var ($_) locality check');
+};
 
 # original structure must remain unchanged
 ok($frozen_s eq freeze($s_mixed));

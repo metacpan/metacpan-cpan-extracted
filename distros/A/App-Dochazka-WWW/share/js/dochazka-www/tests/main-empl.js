@@ -76,11 +76,11 @@ define ([
                 ct.mainMenuToMainEmpl(assert);
                 loggout();
                 done();
-            }, 1500);
+            }, 2000);
             setTimeout(function () {
                 ct.loggout(assert);
                 done();
-            }, 2000);
+            }, 2500);
         });
 
         test_desc = 'employee profile - passerby';
@@ -90,8 +90,6 @@ define ([
             console.log("***TEST*** " + prefix + test_desc);
             login({"nam": "demo", "pwd": "demo"});
             setTimeout(function() {
-                var htmlbuf,
-                    result;
                 ct.login(assert, "demo", "passerby");
                 done();
             }, 1500);
@@ -128,172 +126,6 @@ define ([
             }, 3000);
         });
 
-        test_desc = 'LDAP lookup - success';
-        QUnit.test(test_desc, function (assert) {
-            console.log('***TEST*** ' + prefix + test_desc);
-            var done = assert.async(4);
-            login({"nam": "root", "pwd": "immutable"});
-            setTimeout(function () {
-                ct.login(assert, "root", "admin");
-                ct.mainMenuToMainEmpl(assert);
-                ct.mainEmplToLdapLookup(assert);
-                ct.submitLdapLookup(assert, 'ncutler');
-                done();
-            }, 1000);
-            setTimeout(function () {
-                var ldapDochazka;
-                ct.stack(
-                    assert,
-                    4,
-                    'Displaying LDAP employee after successful LDAP lookup',
-                    'dform',
-                    'ldapDisplayEmployee',
-                );
-                ct.mainareaForm(assert, 'ldapDisplayEmployee');
-                assert.strictEqual(
-                    $('#ePfullname').text(),
-                    "Nathan Cutler",
-                    "Successful LDAP lookup displayed full name Nathan Cutler",
-                );
-                assert.strictEqual(
-                    $('#ePnick').text(),
-                    "ncutler",
-                    "Successful LDAP lookup displayed nick ncutler",
-                );
-                ldapDochazka = $('#LDAPdochazka').text();
-                assert.ok(ldapDochazka, "ncutler is in Dochazka already? " + ldapDochazka);
-                assert.ok(
-                    ldapDochazka === "YES" || ldapDochazka === "NO",
-                    "Answer to whether ncutler is in Dochazka (" + ldapDochazka + ") makes sense",
-                );
-                assert.ok(true, "*** REACHED Employee LDAP lookup success");
-                ct.contains(
-                    assert,
-                    $('#mainarea').html(),
-                    "#mainarea html",
-                    "0. LDAP sync",
-                );
-                assert.ok(true, "*** REACHED miniMenu contains 0. LDAP sync");
-                // choose '0' for ldapSync
-                $('input[name="sel"]').val('0');
-                $('input[name="sel"]').focus();
-                start.mmKeyListener($.Event("keydown", {keyCode: 13}));
-                assert.ok(true, "*** REACHED pressed 0 for LDAP sync");
-                done();
-            }, 3000);
-            setTimeout(function () {
-                var ldapDochazka = $('#LDAPdochazka').text();
-                ct.stack(
-                    assert,
-                    4,
-                    'Displaying LDAP employee after successful LDAP lookup',
-                    'dform',
-                    'ldapDisplayEmployee',
-                );
-                ct.mainareaForm(assert, 'ldapDisplayEmployee');
-                assert.ok(ldapDochazka, "ncutler is in Dochazka already? " + ldapDochazka);
-                assert.ok(
-                    ldapDochazka === "YES",
-                    "ncutler is now in Dochazka, no question about it",
-                );
-                $('input[name="sel"]').val('x');
-                $('input[name="sel"]').focus();
-                start.mmKeyListener($.Event("keydown", {keyCode: 13}));
-                ct.stack(
-                    assert,
-                    3,
-                    'After selecting X in ldapDisplayEmployee',
-                    'dform',
-                    'ldapLookup',
-                );
-                assert.ok(true, "*** REACHED ldapLookup dform via X from ldapDisplayEmployee");
-                assert.strictEqual(
-                    coreLib.focusedItem().name,
-                    'sel',
-                    'Focus is on selection field',
-                );
-                $('input[name="sel"]').val('x');
-                $('input[name="sel"]').focus();
-                start.mmKeyListener($.Event("keydown", {keyCode: 13}));
-                ct.stack(
-                    assert,
-                    2,
-                    'After selecting X in ldapLookup',
-                    'dmenu',
-                    'mainEmpl'
-                );
-                assert.ok(true, "*** REACHED mainEmpl dmenu via X from ldapLookup");
-                loggout();
-                done();
-            }, 4500);
-            setTimeout(function () {
-                ct.loggout(assert);
-                done();
-            }, 5500);
-        });
-
-        test_desc = 'LDAP lookup - failure';
-        QUnit.test(test_desc, function (assert) {
-            console.log('***TEST*** ' + prefix + test_desc);
-            var done = assert.async(4);
-            login({"nam": "root", "pwd": "immutable"});
-            setTimeout(function () {
-                ct.login(assert, "root", "admin");
-                ct.mainMenuToMainEmpl(assert);
-                ct.mainEmplToLdapLookup(assert);
-                ct.submitLdapLookup(assert, 'NONEXISTENTfoobarbazblatFISHBEAR');
-                done();
-            }, 1000);
-            setTimeout(function () {
-                ct.stack(
-                    assert,
-                    3,
-                    'failed LDAP lookup',
-                    'dform',
-                    'ldapLookup',
-                );
-                ct.contains(
-                    assert,
-                    $("#result").html(),
-                    "#result html",
-                    "Employee not found in LDAP",
-                );
-                assert.strictEqual(
-                    coreLib.focusedItem().name,
-                    'entry0',
-                    'Focus is on data entry field',
-                );
-                ct.submitLdapLookup(assert, 'NONEXISTENTpseudoDataEntered');
-                done();
-            }, 3000);
-            setTimeout(function () {
-                ct.stack(
-                    assert,
-                    3,
-                    'failed LDAP lookup',
-                    'dform',
-                    'ldapLookup',
-                );
-                ct.contains(
-                    assert,
-                    $("#result").html(),
-                    "#result html",
-                    "Employee not found in LDAP",
-                );
-                assert.strictEqual(
-                    coreLib.focusedItem().name,
-                    'entry0',
-                    'Focus is on data entry field',
-                );
-                loggout();
-                done();
-            }, 4000);
-            setTimeout(function () {
-                ct.loggout(assert);
-                done();
-            }, 5000);
-        });
-
         test_desc = 'Search Dochazka employees - success no wildcard';
         // searches for an exact match - the resulting dbrowser will
         // contain only one object
@@ -306,12 +138,12 @@ define ([
                 ct.mainMenuToMainEmpl(assert);
                 ct.mainEmplToSearchEmployee(assert);
                 // enter search term into form
-                $('#searchEmployee input[name="entry0"]').val('ncutler');
+                $('#searchEmployee input[name="entry0"]').val('inactive');
                 // choose '0' to start search
                 $('input[name="sel"]').val('0');
                 $('input[name="sel"]').focus();
                 start.mmKeyListener($.Event("keydown", {keyCode: 13}));
-                assert.ok(true, "*** REACHED pressed 0 to initiate search for Dochazka employee ncutler");
+                assert.ok(true, "*** REACHED pressed 0 to initiate search for Dochazka employee inactive");
                 done();
             }, 1000);
             setTimeout(function () {
@@ -332,35 +164,35 @@ define ([
                 ct.mainareaForm(assert, "simpleEmployeeBrowser");
                 assert.strictEqual(
                     $('#ePfullname').text(),
-                    "Nathan Cutler",
-                    "Dochazka employee search succeeded - full name Nathan Cutler displayed",
+                    "inactive user",
+                    "Dochazka employee search succeeded - full name \"inactive user\" displayed",
                 );
                 assert.strictEqual(
                     $('#ePnick').text(),
-                    "ncutler",
-                    "Dochazka employee search succeeded - nick ncutler displayed",
+                    "inactive",
+                    "Dochazka employee search succeeded - nick inactive displayed",
                 );
                 ct.contains(
                     assert,
                     $('#mainarea').html(),
                     "#mainarea html",
-                    "0. LDAP sync",
+                    "0.&nbsp;LDAP sync",
                 );
                 assert.ok(true, "*** REACHED miniMenu contains 0. LDAP sync");
-                // choose '0' for ldapSync
-                $('input[name="sel"]').val('0');
-                $('input[name="sel"]').focus();
-                start.mmKeyListener($.Event("keydown", {keyCode: 13}));
-                assert.ok(true, "*** REACHED pressed 0 for LDAP sync");
+                // // choose '0' for ldapSync
+                // $('input[name="sel"]').val('0');
+                // $('input[name="sel"]').focus();
+                // start.mmKeyListener($.Event("keydown", {keyCode: 13}));
+                // assert.ok(true, "*** REACHED pressed 0 for LDAP sync");
                 done();
             }, 2500);
             setTimeout(function () {
-                ct.contains(
-                    assert,
-                    $('#result').html(),
-                    "#result html",
-                    "Employee profile updated from LDAP",
-                );
+                // ct.contains(
+                //     assert,
+                //     $('#result').html(),
+                //     "#result html",
+                //     "Employee profile updated from LDAP",
+                // );
                 ct.stack(
                     assert,
                     4,

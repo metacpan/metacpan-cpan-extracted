@@ -15,7 +15,7 @@ use Data::Dumper qw/Dumper/;
 use English qw/ -no_match_vars /;
 use base qw/App::TemplateCMD::Command/;
 
-our $VERSION     = version->new('0.6.7');
+our $VERSION     = version->new('0.6.8');
 our @EXPORT_OK   = qw//;
 our %EXPORT_TAGS = ();
 
@@ -76,7 +76,7 @@ App::TemplateCMD::Command::Describe - Command to describe a template (variables 
 
 =head1 VERSION
 
-This documentation refers to App::TemplateCMD::Command::Describe version 0.6.7.
+This documentation refers to App::TemplateCMD::Command::Describe version 0.6.8.
 
 =head1 SYNOPSIS
 

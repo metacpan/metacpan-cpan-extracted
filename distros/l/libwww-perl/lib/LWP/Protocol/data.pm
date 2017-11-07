@@ -1,5 +1,5 @@
 package LWP::Protocol::data;
-$LWP::Protocol::data::VERSION = '6.27';
+$LWP::Protocol::data::VERSION = '6.29';
 # Implements access to data:-URLs as specified in RFC 2397
 
 use strict;

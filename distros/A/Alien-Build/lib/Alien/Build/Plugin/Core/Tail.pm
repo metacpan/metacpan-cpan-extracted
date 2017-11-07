@@ -5,7 +5,7 @@ use warnings;
 use Alien::Build::Plugin;
 
 # ABSTRACT: Core tail setup plugin
-our $VERSION = '1.28'; # VERSION
+our $VERSION = '1.32'; # VERSION
 
 
 sub init
@@ -32,7 +32,7 @@ Alien::Build::Plugin::Core::Tail - Core tail setup plugin
 
 =head1 VERSION
 
-version 1.28
+version 1.32
 
 =head1 SYNOPSIS
 

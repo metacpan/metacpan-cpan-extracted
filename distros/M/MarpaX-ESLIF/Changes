@@ -1,6 +1,18 @@
 Changelog for MarpaX-ESLIF
 
-2.0.22 2017-10-30T03:45:29
+2.0.23 2017-11-04T07:19:19
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Back to -std=gnu89 on CFLAGS only and clang only [ci skip]
+ - src/marpaESLIF.c: In _marpaESLIFRecognizer_flush_charconv(), utf8s may
+   be used uninitialized in the err: section, detected by clang [ci skip]
+ - src/bootstrap_actions.c: some variables may be used uninitialized in the
+   err: section, detected by clang [ci skip]
+ - src/marpaESLIF.c: terminalp may be used uninitialized in the err:
+   section, detected by clang [ci skip]
+ - In Perls dist.ini, take CFLAGS and LDFLAGS from current environment,
+   eventually [ci skip]
+
+2.0.22 2017-10-30T03:45:29Z
  [Jean-Damien Durand <jeandamiendurand@free.fr>]
  - Revert "Version 2.0.23 [ci skip]"
  - Version 2.0.23 [ci skip]

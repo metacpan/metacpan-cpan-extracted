@@ -28,13 +28,6 @@
 # define XSH_ASSERT(C)
 #endif
 
-#undef VOID2
-#ifdef __cplusplus
-# define VOID2(T, P) static_cast<T>(P)
-#else
-# define VOID2(T, P) (P)
-#endif
-
 #ifndef STMT_START
 # define STMT_START do
 #endif
@@ -65,19 +58,6 @@
 #endif
 #define xsh_dup(S, P)     sv_dup((S), (P))
 #define xsh_dup_inc(S, P) SvREFCNT_inc(xsh_dup((S), (P)))
-
-/* Context for PerlMemShared_*() functions */
-#ifdef PERL_IMPLICIT_SYS
-# define pPMS  pTHX
-# define pPMS_ pTHX_
-# define aPMS  aTHX
-# define aPMS_ aTHX_
-#else
-# define pPMS  void
-# define pPMS_
-# define aPMS
-# define aPMS_
-#endif
 
 #ifdef USE_ITHREADS
 # define XSH_LOCK(M)   MUTEX_LOCK(M)

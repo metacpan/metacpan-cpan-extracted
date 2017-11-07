@@ -1,29 +1,34 @@
 {
   am_pm_abbreviated => [
     "a.m.",
-    "p.m."
+    "p.m.",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
-    EHm => "ccc, HH:mm",
-    EHms => "ccc, HH:mm:ss",
-    Ed => "d 'de' E",
+    EBhm => "E, h:mm B",
+    EBhms => "E, h:mm:ss B",
+    EHm => "E, HH:mm",
+    EHms => "E, HH:mm:ss",
+    Ed => "E d",
     Ehm => "E, h:mm a",
     Ehms => "E, h:mm:ss a",
     Gy => "y G",
     GyMMM => "MMM 'de' y G",
-    GyMMMEd => "E, d 'de' MMM 'de' y G",
+    GyMMMEd => "E, d/MM/y G",
     GyMMMd => "d 'de' MMMM 'de' y G",
     H => "HH",
     Hm => "HH:mm",
     Hms => "HH:mm:ss",
-    Hmsv => "HH:mm:ss (v)",
-    Hmv => "HH:mm (v)",
+    Hmsv => "HH:mm:ss v",
+    Hmv => "HH:mm v",
     M => "L",
     MEd => "E, d/M",
     MMM => "LLL",
-    MMMEd => "ccc, d 'de' MMM",
-    MMMMEd => "ccc, d 'de' MMMM",
+    MMMEd => "E, d 'de' MMM",
+    MMMMEd => "E, d 'de' MMMM",
     "MMMMW-count-one" => "W.'\N{U+00aa}' 'semana' 'de' MMMM",
     "MMMMW-count-other" => "W.'\N{U+00aa}' 'semana' 'de' MMMM",
     MMMMd => "d 'de' MMMM",
@@ -39,22 +44,22 @@
     ms => "mm:ss",
     y => "y",
     yM => "M/y",
-    yMEd => "ccc, d/M/y",
+    yMEd => "E, d/M/y",
     yMM => "MM/y",
-    yMMM => "LLL 'de' y",
-    yMMMEd => "ccc, d 'de' MMM 'de' y",
-    yMMMM => "LLLL 'de' y",
-    yMMMd => "d 'de' MMM 'de' y",
+    yMMM => "MMM 'de' y",
+    yMMMEd => "EEE, d/MM/y",
+    yMMMM => "MMMM 'de' y",
+    yMMMd => "d/MM/y",
     yMd => "d/M/y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ 'de' y",
-    "yw-count-one" => "w.'\N{U+00aa}' 'semana' 'de' y",
-    "yw-count-other" => "w.'\N{U+00aa}' 'semana' 'de' y"
+    "yw-count-one" => "w.'\N{U+00aa}' 'semana' 'de' Y",
+    "yw-count-other" => "w.'\N{U+00aa}' 'semana' 'de' Y",
   },
   code => "gl",
   date_format_full => "EEEE, d 'de' MMMM 'de' y",
   date_format_long => "d 'de' MMMM 'de' y",
-  date_format_medium => "d 'de' MMM 'de' y",
+  date_format_medium => "dd/MM/y",
   date_format_short => "dd/MM/yy",
   datetime_format_full => "{0} 'do' {1}",
   datetime_format_long => "{0} 'do' {1}",
@@ -67,7 +72,7 @@
     "xov.",
     "ven.",
     "s\N{U+00e1}b.",
-    "dom."
+    "dom.",
   ],
   day_format_narrow => [
     "l.",
@@ -76,7 +81,7 @@
     "x.",
     "v.",
     "s.",
-    "d."
+    "d.",
   ],
   day_format_wide => [
     "luns",
@@ -85,7 +90,7 @@
     "xoves",
     "venres",
     "s\N{U+00e1}bado",
-    "domingo"
+    "domingo",
   ],
   day_stand_alone_abbreviated => [
     "Luns",
@@ -94,7 +99,7 @@
     "Xov.",
     "Ven.",
     "S\N{U+00e1}b.",
-    "Dom."
+    "Dom.",
   ],
   day_stand_alone_narrow => [
     "L",
@@ -103,7 +108,7 @@
     "X",
     "V",
     "S",
-    "D"
+    "D",
   ],
   day_stand_alone_wide => [
     "Luns",
@@ -112,19 +117,19 @@
     "Xoves",
     "Venres",
     "S\N{U+00e1}bado",
-    "Domingo"
+    "Domingo",
   ],
   era_abbreviated => [
     "a.C.",
-    "d.C."
+    "d.C.",
   ],
   era_narrow => [
     "a.C.",
-    "d.C."
+    "d.C.",
   ],
   era_wide => [
     "antes de Cristo",
-    "despois de Cristo"
+    "despois de Cristo",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -145,7 +150,7 @@
     "set.",
     "out.",
     "nov.",
-    "dec."
+    "dec.",
   ],
   month_format_narrow => [
     "x.",
@@ -159,7 +164,7 @@
     "s.",
     "o.",
     "n.",
-    "d."
+    "d.",
   ],
   month_format_wide => [
     "xaneiro",
@@ -173,7 +178,7 @@
     "setembro",
     "outubro",
     "novembro",
-    "decembro"
+    "decembro",
   ],
   month_stand_alone_abbreviated => [
     "Xan.",
@@ -187,7 +192,7 @@
     "Set.",
     "Out.",
     "Nov.",
-    "Dec."
+    "Dec.",
   ],
   month_stand_alone_narrow => [
     "X",
@@ -201,7 +206,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_stand_alone_wide => [
     "Xaneiro",
@@ -215,7 +220,7 @@
     "Setembro",
     "Outubro",
     "Novembro",
-    "Decembro"
+    "Decembro",
   ],
   name => "Galician",
   native_language => "galego",
@@ -227,37 +232,37 @@
     "T1",
     "T2",
     "T3",
-    "T4"
+    "T4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "1.\N{U+00ba} trimestre",
     "2.\N{U+00ba} trimestre",
     "3.\N{U+00ba} trimestre",
-    "4.\N{U+00ba} trimestre"
+    "4.\N{U+00ba} trimestre",
   ],
   quarter_stand_alone_abbreviated => [
     "T1",
     "T2",
     "T3",
-    "T4"
+    "T4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "1.\N{U+00ba} trimestre",
     "2.\N{U+00ba} trimestre",
     "3.\N{U+00ba} trimestre",
-    "4.\N{U+00ba} trimestre"
+    "4.\N{U+00ba} trimestre",
   ],
   script => undef,
   territory => undef,
@@ -266,5 +271,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

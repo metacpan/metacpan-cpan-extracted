@@ -38,8 +38,11 @@ sub __readCfgFile
 	my $userExecMapFile = shift;
 	
 	my $cfg;
-	if (-e $configFilePath && !$App::TestOnTap::_dbgvars::IGNORE_CONFIG_FILE)
+	
+	if (!$App::TestOnTap::_dbgvars::IGNORE_CONFIG_FILE)
 	{
+		die("Missing configuration '$configFilePath'\n") unless -e $configFilePath;
+		
 		read_config($configFilePath, $cfg);
 		
 		# this looks weird, I know - see https://rt.cpan.org/Public/Bug/Display.html?id=56862
@@ -52,13 +55,7 @@ sub __readCfgFile
 		my $dummy = *Config::Std::Hash::DEMOLISH;
 		$dummy = *Config::Std::Hash::DEMOLISH;
 	}
-	else
-	{
-		my $id = create_uuid_as_string();
-		warn("WARNING: No configuration file found, using blank with generated id '$id'!\n");
-		$cfg->{''}->{id} = $id; 
-	}
-
+	
 	# pick the necessities from the blank section
 	#
 	my $blankSection = $cfg->{''} || {};
@@ -66,6 +63,12 @@ sub __readCfgFile
 	# a valid uuid is required
 	#
 	my $id = $blankSection->{id} || '';
+	if (!$id)
+	{
+		$id = create_uuid_as_string();
+		warn("WARNING: No id found, using generated '$id'!\n");
+		$blankSection->{id} = $id; 
+	}
 	die("Invalid/missing suite id: '$id'") unless $id =~ /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
 	$self->{id} = $id;
 	

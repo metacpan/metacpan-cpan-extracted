@@ -13,3 +13,5 @@ givenName: Alexei
 manager: CN=John Doe,DC=SnakeOil,DC=com
 name: Alexei Znamensky
 sn: Znamensky
+uid: russoz
+userPassword: potatoes

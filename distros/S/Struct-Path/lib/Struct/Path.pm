@@ -3,8 +3,9 @@ package Struct::Path;
 use 5.006;
 use strict;
 use warnings FATAL => 'all';
-use parent qw(Exporter);
-use Carp qw(croak);
+use parent 'Exporter';
+
+use Carp 'croak';
 
 our @EXPORT_OK = qw(
     is_implicit_step
@@ -27,11 +28,11 @@ Struct::Path - Path for nested structures where path is also a structure
 
 =head1 VERSION
 
-Version 0.72
+Version 0.73
 
 =cut
 
-our $VERSION = '0.72';
+our $VERSION = '0.73';
 
 =head1 SYNOPSIS
 
@@ -49,7 +50,7 @@ our $VERSION = '0.72';
         undef
     ];
 
-    @list = slist($s);                              # list paths and their values
+    @list = slist($s);                              # list paths and values
     # @list == (
     #     [[0]], \0,
     #     [[1]], \1,
@@ -61,13 +62,13 @@ our $VERSION = '0.72';
     @r = spath($s, [ [3,0,1] ]);                    # get refs to values
     # @r == (\undef, \0, \1)
 
-    @r = spath($s, [ [2],{keys => ['2a']},{} ]);    # same, another example
+    @r = spath($s, [ [2],{keys => ['2a']},{} ]);    # another example
     # @r == (\'2aav', \'2abv')
 
-    @r = spath($s, [ [2],{},{regs => [qr/^2a/]} ]); # or using regular expressions
+    @r = spath($s, [ [2],{},{regs => [qr/^2a/]} ]); # using regular expressions
     # @r == (\'2aav', \'2abv')
 
-    ${$r[0]} =~ s/2a/blah-blah-/;                   # replace
+    ${$r[0]} =~ s/2a/blah-blah-/;                   # replace value
     # $s->[2]{2a}{2aa} eq "blah-blah-av"
 
     @d = spath_delta([[0],[4],[2]], [[0],[1],[3]]); # get steps delta
@@ -75,14 +76,15 @@ our $VERSION = '0.72';
 
 =head1 DESCRIPTION
 
-Struct::Path provides functions to access/match/expand/list nested data structures.
+Struct::Path provides functions to access/match/expand/list nested data
+structures.
 
-Why existed *Path* modules (L</"SEE ALSO">) is not enough? This module has no
-conflicts for paths like '/a/0/c', where C<0> may be an ARRAY index or a key for
-HASH (depends on passed structure). In some cases this is important, for example,
-when one need to define exact path in structure, but unable to validate it's
-schema or when structure itself doesn't yet exists (see L</spath/Options/expand>
-for example).
+Why L<existed Path modules|/"SEE ALSO"> is not enough? This module has no
+conflicts for paths like '/a/0/c', where C<0> may be an array index or a key
+for hash (depends on passed structure). In some cases this is important, for
+example, when one need to define exact path in structure, but unable to
+validate it's schema or when structure itself doesn't yet exist (see
+L</spath/Options/expand> for example).
 
 =head1 EXPORT
 
@@ -92,28 +94,32 @@ Nothing is exported by default.
 
 Path is a list of 'steps', each represents nested level in structure.
 
-Arrayref as a step stands for ARRAY in structure and must contain desired indexes
-or be empty (means "all items"). Sequence for indexes is important and defines
-result sequence.
+Arrayref as a step stands for ARRAY in the structure and must contain desired
+indexes or be empty (means "all items"). Sequence for indexes is important
+and defines result sequence.
 
-Hashref represents HASH in the structure and may contain keys C<keys>, C<regs> or be
-empty. C<keys> may contain list of desired keys, C<regs> must contain list of regular
-expressions. Empty hash or empty list for C<keys> means all keys. Sequence in C<keys>
-and C<regs> lists defines result sequence. C<keys> have higher priority than C<regs>.
+Hashref represent HASH in the structure and may contain keys C<keys>, C<regs>
+or be empty. C<keys> may contain list of desired keys, C<regs> must contain
+list of regular expressions. Empty hash or empty list for C<keys> means all
+keys. Sequence in C<keys> and C<regs> lists defines result sequence. C<keys>
+have higher priority than C<regs>.
+
+Coderef step is a hook - subroutine which may filter and/or modify
+structure. Path as first argument and a stack (arrayref) of refs to traversed
+subsstructures as second passed to it when executed, $_ set to current
+substructure. Some true (match) value or false (doesn't match) value expected
+as output.
 
 Sample:
 
     $spath = [
-        [1,7],              # first spep
-        {regs => qr/foo/}   # second step
+        [1,7],                      # first spep
+        {regs => qr/foo/}           # second step
+        sub { exists $_->{bar} }    # third step
     ];
 
-Since v0.50 hooks (coderefs) as steps supported. Path as first argument and stack
-of references (arrayref) as second passed to it when executed. Some true (match)
-value or false (doesn't match) value expected as output.
-
-See L<Struct::Path::PerlStyle> if you're looking for human friendly path definition
-method.
+See L<Struct::Path::PerlStyle> if you're looking for human friendly path
+definition method.
 
 =head1 SUBROUTINES
 
@@ -121,7 +127,8 @@ method.
 
     $implicit = is_implicit_step($step);
 
-Returns true value if step contains hooks or specified all items or regexp match.
+Returns true value if step contains hooks or specified 'all' items or regexp
+match.
 
 =cut
 
@@ -206,7 +213,7 @@ Dereference result items.
 
 =item expand C<< <"append"|true|false> >>
 
-Expand structure if specified in path items doesn't exists. All newly created
+Expand structure if specified in path items doesn't exist. All newly created
 items initialized by C<undef>. Arrays will be growed smoothly if C<append> as
 value used (experimental).
 
@@ -232,7 +239,7 @@ sub spath($$;@) {
     my ($struct, $spath, %opts) = @_;
 
     croak "Reference expected for structure" unless (ref $struct);
-    croak "Path must be arrayref" unless (ref $spath eq 'ARRAY');
+    croak "Arrayref expected for path" unless (ref $spath eq 'ARRAY');
     croak "Unable to remove passed thing entirely (empty path passed)"
         if ($opts{delete} and not @{$spath});
 
@@ -258,7 +265,7 @@ sub spath($$;@) {
                         $opts{expand} or
                         @{${$refs->[-1]}} > ($_ >= 0 ? $_ : abs($_ + 1))
                     ) {
-                        croak "[$_] doesn't exists (step #$sc)" if ($opts{strict});
+                        croak "[$_] doesn't exist, step #$sc" if ($opts{strict});
                         next;
                     }
                     $_ = @{${$refs->[-1]}} if ($opts{expand} and
@@ -279,17 +286,17 @@ sub spath($$;@) {
                 }
 
                 @types = grep { exists $step->{$_} } qw(keys regs);
-                croak "Unsupported HASH definition (step #$sc)" if (@types != keys %{$step});
+                croak "Unsupported HASH definition, step #$sc" if (@types != keys %{$step});
                 undef $items;
 
                 for my $t (@types) {
-                    croak "Unsupported HASH $t definition (step #$sc)"
+                    croak "Unsupported HASH $t definition, step #$sc"
                         unless (ref $step->{$t} eq 'ARRAY');
 
                     if ($t eq 'keys') {
                         for (@{$step->{keys}}) {
                             unless ($opts{expand} or exists ${$refs->[-1]}->{$_}) {
-                                croak "{$_} doesn't exists (step #$sc)" if $opts{strict};
+                                croak "{$_} doesn't exist, step #$sc" if $opts{strict};
                                 next;
                             }
                             push @{$items}, $_;
@@ -306,9 +313,10 @@ sub spath($$;@) {
                     delete ${$refs->[-1]}->{$_} if ($opts{delete} and $sc == $#{$spath});
                 }
             } elsif (ref $step eq 'CODE') {
+                local $_ = ${$refs->[-1]};
                 $step->($path, $refs) and push @next, $path, $refs;
             } else {
-                croak "Unsupported thing in the path (step #$sc)";
+                croak "Unsupported thing in the path, step #$sc";
             }
         }
 
@@ -347,6 +355,8 @@ sub spath_delta($$) {
     return @{$scnd} unless (defined $frst);
     croak "First path may be undef or an arrayref" unless (ref $frst eq 'ARRAY');
 
+    require B::Deparse;
+    my $deparse = B::Deparse->new();
     my $i = 0;
 
     MAIN:
@@ -361,8 +371,13 @@ sub spath_delta($$) {
             for my $j (0 .. $#{$frst->[$i]->{keys}}) {
                 last MAIN unless ($frst->[$i]->{keys}->[$j] eq $scnd->[$i]->{keys}->[$j]);
             }
+        } elsif (ref $frst->[$i] eq 'CODE') {
+            last unless (
+                $deparse->coderef2text($frst->[$i]) eq
+                $deparse->coderef2text($scnd->[$i])
+            );
         } else {
-            croak "Unsupported thing in the path (step #$i)";
+            croak "Unsupported thing in the path, step #$i";
         }
         $i++;
     }
@@ -384,9 +399,9 @@ Michael Samoglyadov, C<< <mixas at cpan.org> >>
 
 Please report any bugs or feature requests to C<bug-struct-path at rt.cpan.org>,
 or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Struct-Path>. I will be notified,
-and then you'll automatically be notified of progress on your bug as I make
-changes.
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Struct-Path>. I will be
+notified, and then you'll automatically be notified of progress on your bug
+as I make changes.
 
 =head1 SUPPORT
 

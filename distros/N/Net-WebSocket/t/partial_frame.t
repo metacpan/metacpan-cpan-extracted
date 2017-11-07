@@ -10,6 +10,7 @@ BEGIN {
 use Test::More;
 use Test::Deep;
 
+use IO::Handle;     #for pre-5.14
 use IO::Select ();
 
 use IO::Framed::Read ();

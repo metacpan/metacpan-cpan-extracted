@@ -8,7 +8,7 @@ use Data::Validator;
 use Net::OpenStack::Swift::Util qw/uri_escape uri_unescape debugf/;
 use Net::OpenStack::Swift::InnerKeystone;
 use namespace::clean -except => 'meta';
-our $VERSION = "0.12";
+our $VERSION = "0.13";
 
 
 subtype 'Path' => as 'Path::Tiny';
@@ -20,6 +20,7 @@ has auth_url     => (is => 'rw', required => 1, default => sub { $ENV{OS_AUTH_UR
 has user         => (is => 'rw', required => 1, default => sub { $ENV{OS_USERNAME}    || '' });
 has password     => (is => 'rw', required => 1, default => sub { $ENV{OS_PASSWORD}    || '' });
 has tenant_name  => (is => 'rw', required => 1, default => sub { $ENV{OS_TENANT_NAME} || '' });
+has region       => (is => 'rw', required => 1, default => sub { $ENV{OS_REGION_NAME} || '' });
 has storage_url  => (is => 'rw');
 has token        => (is => 'rw');
 has agent_options => (is => 'rw', isa => 'HashRef', default => sub{+{ timeout => 10 }});
@@ -63,7 +64,7 @@ sub auth_keystone {
     );
     $ksclient->agent($self->agent);
     my $auth_token = $ksclient->auth();
-    my $endpoint = $ksclient->service_catalog_url_for(service_type=>'object-store', endpoint_type=>'publicURL');
+    my $endpoint = $ksclient->service_catalog_url_for(service_type=>'object-store', endpoint_type=>'publicURL', region=>$self->region);
     croak "Not found endpoint type 'object-store'" unless $endpoint;
     $self->token($auth_token);
     $self->storage_url($endpoint);
@@ -594,7 +595,8 @@ Net::OpenStack::Swift - Perl Bindings for the OpenStack Object Storage API, know
         user           => 'userid',
         password       => 'password',
         tenant_name    => 'project_id',
-        # auth_version => '2.0', # by default
+        # region         => 'REGION', # prefered region
+        # auth_version => '2.0',      # by default
         # agent_options => +{
         #    timeout    => 10,
         #    user_agent => "Furl::HTTP",

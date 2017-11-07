@@ -327,11 +327,41 @@ Irish Ireland locale.
 
 =head2 Available Formats
 
+=head3 Bh (h B)
+
+   2008-02-05T18:30:30 = 6 B
+   1995-12-22T09:05:02 = 9 B
+  -0010-09-15T04:44:23 = 4 B
+
+=head3 Bhm (h:mm B)
+
+   2008-02-05T18:30:30 = 6:30 B
+   1995-12-22T09:05:02 = 9:05 B
+  -0010-09-15T04:44:23 = 4:44 B
+
+=head3 Bhms (h:mm:ss B)
+
+   2008-02-05T18:30:30 = 6:30:30 B
+   1995-12-22T09:05:02 = 9:05:02 B
+  -0010-09-15T04:44:23 = 4:44:23 B
+
 =head3 E (ccc)
 
    2008-02-05T18:30:30 = Máirt
    1995-12-22T09:05:02 = Aoine
   -0010-09-15T04:44:23 = Sath
+
+=head3 EBhm (E h:mm B)
+
+   2008-02-05T18:30:30 = Máirt 6:30 B
+   1995-12-22T09:05:02 = Aoine 9:05 B
+  -0010-09-15T04:44:23 = Sath 4:44 B
+
+=head3 EBhms (E h:mm:ss B)
+
+   2008-02-05T18:30:30 = Máirt 6:30:30 B
+   1995-12-22T09:05:02 = Aoine 9:05:02 B
+  -0010-09-15T04:44:23 = Sath 4:44:23 B
 
 =head3 EHm (E HH:mm)
 
@@ -353,15 +383,15 @@ Irish Ireland locale.
 
 =head3 Ehm (E h:mm a)
 
-   2008-02-05T18:30:30 = Máirt 6:30 p.m.
-   1995-12-22T09:05:02 = Aoine 9:05 a.m.
-  -0010-09-15T04:44:23 = Sath 4:44 a.m.
+   2008-02-05T18:30:30 = Máirt 6:30 i.n.
+   1995-12-22T09:05:02 = Aoine 9:05 r.n.
+  -0010-09-15T04:44:23 = Sath 4:44 r.n.
 
 =head3 Ehms (E h:mm:ss a)
 
-   2008-02-05T18:30:30 = Máirt 6:30:30 p.m.
-   1995-12-22T09:05:02 = Aoine 9:05:02 a.m.
-  -0010-09-15T04:44:23 = Sath 4:44:23 a.m.
+   2008-02-05T18:30:30 = Máirt 6:30:30 i.n.
+   1995-12-22T09:05:02 = Aoine 9:05:02 r.n.
+  -0010-09-15T04:44:23 = Sath 4:44:23 r.n.
 
 =head3 Gy (y G)
 
@@ -497,33 +527,33 @@ Irish Ireland locale.
 
 =head3 h (h a)
 
-   2008-02-05T18:30:30 = 6 p.m.
-   1995-12-22T09:05:02 = 9 a.m.
-  -0010-09-15T04:44:23 = 4 a.m.
+   2008-02-05T18:30:30 = 6 i.n.
+   1995-12-22T09:05:02 = 9 r.n.
+  -0010-09-15T04:44:23 = 4 r.n.
 
 =head3 hm (h:mm a)
 
-   2008-02-05T18:30:30 = 6:30 p.m.
-   1995-12-22T09:05:02 = 9:05 a.m.
-  -0010-09-15T04:44:23 = 4:44 a.m.
+   2008-02-05T18:30:30 = 6:30 i.n.
+   1995-12-22T09:05:02 = 9:05 r.n.
+  -0010-09-15T04:44:23 = 4:44 r.n.
 
 =head3 hms (h:mm:ss a)
 
-   2008-02-05T18:30:30 = 6:30:30 p.m.
-   1995-12-22T09:05:02 = 9:05:02 a.m.
-  -0010-09-15T04:44:23 = 4:44:23 a.m.
+   2008-02-05T18:30:30 = 6:30:30 i.n.
+   1995-12-22T09:05:02 = 9:05:02 r.n.
+  -0010-09-15T04:44:23 = 4:44:23 r.n.
 
 =head3 hmsv (h:mm:ss a v)
 
-   2008-02-05T18:30:30 = 6:30:30 p.m. UTC
-   1995-12-22T09:05:02 = 9:05:02 a.m. UTC
-  -0010-09-15T04:44:23 = 4:44:23 a.m. UTC
+   2008-02-05T18:30:30 = 6:30:30 i.n. UTC
+   1995-12-22T09:05:02 = 9:05:02 r.n. UTC
+  -0010-09-15T04:44:23 = 4:44:23 r.n. UTC
 
 =head3 hmv (h:mm a v)
 
-   2008-02-05T18:30:30 = 6:30 p.m. UTC
-   1995-12-22T09:05:02 = 9:05 a.m. UTC
-  -0010-09-15T04:44:23 = 4:44 a.m. UTC
+   2008-02-05T18:30:30 = 6:30 i.n. UTC
+   1995-12-22T09:05:02 = 9:05 r.n. UTC
+  -0010-09-15T04:44:23 = 4:44 r.n. UTC
 
 =head3 ms (mm:ss)
 
@@ -591,31 +621,31 @@ Irish Ireland locale.
    1995-12-22T09:05:02 = 4ú ráithe 1995
   -0010-09-15T04:44:23 = 3ú ráithe -10
 
-=head3 yw-count-few ('seachtain' 'a' w 'i' y)
+=head3 yw-count-few ('seachtain' 'a' w 'i' Y)
 
    2008-02-05T18:30:30 = seachtain a 6 i 2008
    1995-12-22T09:05:02 = seachtain a 51 i 1995
   -0010-09-15T04:44:23 = seachtain a 37 i -10
 
-=head3 yw-count-many ('seachtain' 'a' w 'i' y)
+=head3 yw-count-many ('seachtain' 'a' w 'i' Y)
 
    2008-02-05T18:30:30 = seachtain a 6 i 2008
    1995-12-22T09:05:02 = seachtain a 51 i 1995
   -0010-09-15T04:44:23 = seachtain a 37 i -10
 
-=head3 yw-count-one ('seachtain' 'a' w 'i' y)
+=head3 yw-count-one ('seachtain' 'a' w 'i' Y)
 
    2008-02-05T18:30:30 = seachtain a 6 i 2008
    1995-12-22T09:05:02 = seachtain a 51 i 1995
   -0010-09-15T04:44:23 = seachtain a 37 i -10
 
-=head3 yw-count-other ('seachtain' 'a' w 'i' y)
+=head3 yw-count-other ('seachtain' 'a' w 'i' Y)
 
    2008-02-05T18:30:30 = seachtain a 6 i 2008
    1995-12-22T09:05:02 = seachtain a 51 i 1995
   -0010-09-15T04:44:23 = seachtain a 37 i -10
 
-=head3 yw-count-two ('seachtain' 'a' w 'i' y)
+=head3 yw-count-two ('seachtain' 'a' w 'i' Y)
 
    2008-02-05T18:30:30 = seachtain a 6 i 2008
    1995-12-22T09:05:02 = seachtain a 51 i 1995

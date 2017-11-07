@@ -23,7 +23,7 @@ name: Mojo-Bass
 provides:
   Mojo::Bass:
     file: lib/Mojo/Bass.pm
-    version: v0.1.1
+    version: v0.2.0
 requires:
   Mojo::Base: '0'
   Sub::Inject: v0.2.0
@@ -33,5 +33,5 @@ resources:
   bugtracker: https://github.com/aferreira/cpan-Mojo-Bass/issues
   homepage: https://github.com/aferreira/cpan-Mojo-Bass
   repository: https://github.com/aferreira/cpan-Mojo-Bass.git
-version: 0.1.1
+version: 0.2.0
 x_serialization_backend: 'YAML::Tiny version 1.70'

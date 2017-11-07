@@ -25,14 +25,16 @@ sub __bernfrac__ {
         goto &_zero;
     }
 
-    my $round = Math::MPFR::MPFR_RNDN();
+    state $round = Math::MPFR::MPFR_RNDN();
+    state $tau   = 6.28318530717958647692528676655900576839433879875;
 
-    my $tau   = 6.28318530717958647692528676655900576839433879875;
-    my $log2B = (CORE::log(4 * $tau * $n) / 2 + $n * (CORE::log($n) - CORE::log($tau) - 1)) / CORE::log(2);
+    my $log2B = (CORE::log(4 * $tau * $n) / 2 + $n * (CORE::log($n / $tau) - 1)) / CORE::log(2);
 
-    my $prec = CORE::int($n + $log2B) + ($n <= 90 ? 18 : 0);
+    my $prec = CORE::int($n + $log2B) +
+          ($n <= 90 ? (3, 3, 4, 4, 6, 6, 6, 6, 7, 7, 7, 8, 8, 9, 10, 12, 9, 7, 6, 0, 0, 0,
+                       0, 0, 0, 0, 0, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4)[($n>>1)-1] : 0);
 
-    my $d = Math::GMPz::Rmpz_init();
+    state $d = Math::GMPz::Rmpz_init_nobless();
     Math::GMPz::Rmpz_fac_ui($d, $n);                      # d = n!
 
     my $K = Math::MPFR::Rmpfr_init2($prec);
@@ -41,43 +43,51 @@ sub __bernfrac__ {
     Math::MPFR::Rmpfr_mul_z($K, $K, $d, $round);          # K = K*d
     Math::MPFR::Rmpfr_div_2ui($K, $K, $n - 1, $round);    # K = K / 2^(n-1)
 
-    Math::GMPz::Rmpz_set_ui($d, 1);                       # d = 1
+    # `d` is the denominator of bernoulli(n)
+    Math::GMPz::Rmpz_set_ui($d, 2);                       # d = 2
 
-    my @primes;
+    my @primes = (2);
 
-    {  # Sieve the primes <= n+1
+    { # Sieve the primes <= n+1
+      # Sieve of Eratosthenes + Dana Jacobsen's optimizations
+        my $N = $n + 1;
+
         my @composite;
-        foreach my $i (2 .. CORE::sqrt($n) + 1) {
-            for (my $j = $i**2 ; $j <= $n + 1 ; $j += $i) {
-                $composite[$j] = 1;
+        my $bound = CORE::int(CORE::sqrt($N));
+
+        for (my $i = 3 ; $i <= $bound ; $i += 2) {
+            if (!exists($composite[$i])) {
+                for (my $j = $i * $i ; $j <= $N ; $j += 2 * $i) {
+                    undef $composite[$j];
+                }
             }
         }
 
-        foreach my $p (2 .. $n + 1) {
-            if (!$composite[$p]) {
+        foreach my $k (1 .. ($N - 1) >> 1) {
+            if (!exists($composite[2 * $k + 1])) {
 
-                if ($n % ($p - 1) == 0) {
-                    Math::GMPz::Rmpz_mul_ui($d, $d, $p);    # d = d*p   iff (p-1)|n
+                push(@primes, 2 * $k + 1);
+
+                if ($n % (2 * $k) == 0) {    # d = d*p   iff (p-1)|n
+                    Math::GMPz::Rmpz_mul_ui($d, $d, 2 * $k + 1);
                 }
-
-                push @primes, $p;
             }
         }
     }
 
     state $N = Math::MPFR::Rmpfr_init2_nobless(64);
-    Math::MPFR::Rmpfr_mul_z($N, $K, $d, $round);            # N = K*d
-    Math::MPFR::Rmpfr_root($N, $N, $n - 1, $round);         # N = N^(1/(n-1))
-    Math::MPFR::Rmpfr_ceil($N, $N);                         # N = ceil(N)
+    Math::MPFR::Rmpfr_mul_z($N, $K, $d, $round);         # N = K*d
+    Math::MPFR::Rmpfr_root($N, $N, $n - 1, $round);      # N = N^(1/(n-1))
+    Math::MPFR::Rmpfr_ceil($N, $N);                      # N = ceil(N)
 
-    my $bound = Math::MPFR::Rmpfr_get_ui($N, $round);       # bound = int(N)
+    my $bound = Math::MPFR::Rmpfr_get_ui($N, $round);    # bound = int(N)
 
-    my $z = Math::MPFR::Rmpfr_init2($prec);                 # zeta(n)
-    my $u = Math::GMPz::Rmpz_init();                        # p^n
+    my $z = Math::MPFR::Rmpfr_init2($prec);              # zeta(n)
+    my $u = Math::GMPz::Rmpz_init();                     # p^n
 
-    Math::MPFR::Rmpfr_set_ui($z, 1, $round);                # z = 1
+    Math::MPFR::Rmpfr_set_ui($z, 1, $round);             # z = 1
 
-    for (my $i = 0 ; $primes[$i] <= $bound ; ++$i) {        # primes <= bound
+    for (my $i = 0 ; $primes[$i] <= $bound ; ++$i) {     # primes <= bound
         Math::GMPz::Rmpz_ui_pow_ui($u, $primes[$i], $n);    # u = p^n
         Math::MPFR::Rmpfr_mul_z($z, $z, $u, $round);        # z = z*u
         Math::GMPz::Rmpz_sub_ui($u, $u, 1);                 # u = u-1

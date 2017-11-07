@@ -5,7 +5,7 @@ package HTTP::AnyUA::Backend::HTTP::Tiny;
 use warnings;
 use strict;
 
-our $VERSION = '0.900'; # VERSION
+our $VERSION = '0.901'; # VERSION
 
 use parent 'HTTP::AnyUA::Backend';
 
@@ -30,7 +30,7 @@ HTTP::AnyUA::Backend::HTTP::Tiny - A unified programming interface for HTTP::Tin
 
 =head1 VERSION
 
-version 0.900
+version 0.901
 
 =head1 DESCRIPTION
 

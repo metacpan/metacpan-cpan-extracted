@@ -255,9 +255,12 @@ sub find_type_name {
   if ($callback_list->size == 1) {
     my $callback = $callback_list->pop;
     my ($in, $retval, $out) = $self->find_parameters_and_return_value ($callback);
+    unshift @$out, $retval if defined $retval;
     my $in_list = join ', ', map { $self->find_type_name ($_) } @$in;
-    my $out_list = join ', ', map { $self->find_type_name ($_) } ($retval, @$out);
-    return "callback (in: $in_list; out: $out_list)";
+    my $out_list = join ', ', map { $self->find_type_name ($_) } @$out;
+    my $in_text = $in_list ne '' ? "in: $in_list" : '';
+    my $out_text = $out_list ne '' ? "; out: $out_list" : '';
+    return "callback ($in_text$out_text)";
   }
 
   # bare types

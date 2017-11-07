@@ -10,11 +10,12 @@ use namespace::autoclean;
 
 use DateTime::Locale::Util qw( parse_locale_code );
 use JSON::MaybeXS qw( decode_json );
+use Specio::Declare;
+use Specio::Library::Builtins;
+use Specio::Library::Perl;
+use Specio::Library::Path::Tiny;
 
 use Moose;
-use MooseX::Types::Moose qw( HashRef Int Maybe Str );
-use MooseX::Types::Path::Class qw( Dir File );
-use MooseX::Types::Perl qw( LaxVersionStr );
 
 ## no critic (TestingAndDebugging::ProhibitNoWarnings)
 no warnings qw( experimental::postderef experimental::signatures );
@@ -22,97 +23,97 @@ no warnings qw( experimental::postderef experimental::signatures );
 
 has code => (
     is       => 'ro',
-    isa      => Str,
+    isa      => t('Str'),
     required => 1,
 );
 
 has _source_data_root => (
     is       => 'ro',
-    isa      => Dir,
+    isa      => t('Dir'),
     required => 1,
     init_arg => 'source_data_root',
 );
 
 has _parent_code => (
     is      => 'ro',
-    isa     => Str,
+    isa     => t('Str'),
     lazy    => 1,
     builder => '_build_parent_code',
 );
 
 has _parent_locale => (
     is      => 'ro',
-    isa     => Maybe ['ModuleGenerator::Locale'],
+    isa     => t( 'Maybe', of => object_isa_type('ModuleGenerator::Locale') ),
     lazy    => 1,
     builder => '_build_parent_locale',
 );
 
 has _json_file => (
     is      => 'ro',
-    isa     => File,
+    isa     => t('File'),
     lazy    => 1,
     builder => '_build_json_file',
 );
 
 has _glibc_file => (
     is      => 'ro',
-    isa     => File,
+    isa     => t('Path'),
     lazy    => 1,
     builder => '_build_glibc_file',
 );
-
+use Devel::Confess;
 has _glibc_data => (
     is      => 'ro',
-    isa     => HashRef,
+    isa     => t('HashRef'),
     lazy    => 1,
     builder => '_build_glibc_data',
 );
 
 has _parsed_code => (
     is      => 'ro',
-    isa     => HashRef [ Maybe [Str] ],
+    isa     => t( 'HashRef', of => t( 'Maybe', of => t('Str') ) ),
     lazy    => 1,
     builder => '_build_parsed_code',
 );
 
 has language_code => (
     is      => 'ro',
-    isa     => Str,
+    isa     => t('Str'),
     lazy    => 1,
     default => sub ($self) { $self->_parsed_code->{language} },
 );
 
 has script_code => (
-    is      => 'ro',
-    isa     => Maybe [Str],
-    lazy    => 1,
+    is   => 'ro',
+    isa  => t( 'Maybe', of => t('Str') ),
+    lazy => 1,
     default => sub ($self) { $self->_parsed_code->{script} },
 );
 
 has territory_code => (
-    is      => 'ro',
-    isa     => Maybe [Str],
-    lazy    => 1,
+    is   => 'ro',
+    isa  => t( 'Maybe', of => t('Str') ),
+    lazy => 1,
     default => sub ($self) { $self->_parsed_code->{territory} },
 );
 
 has variant_code => (
-    is      => 'ro',
-    isa     => Maybe [Str],
-    lazy    => 1,
+    is   => 'ro',
+    isa  => t( 'Maybe', of => t('Str') ),
+    lazy => 1,
     default => sub ($self) { $self->_parsed_code->{variant} },
 );
 
 has en_name => (
     is      => 'ro',
-    isa     => Str,
+    isa     => t('Str'),
     lazy    => 1,
     builder => '_build_en_name',
 );
 
 has native_name => (
     is      => 'ro',
-    isa     => Str,
+    isa     => t('Str'),
     lazy    => 1,
     builder => '_build_native_name',
 );
@@ -122,7 +123,7 @@ for my $lang (qw( en native )) {
         my $attr = q{_} . $lang . q{_} . $part;
         has $attr => (
             is      => 'ro',
-            isa     => Maybe [Str],
+            isa     => t( 'Maybe', of => t('Str') ),
             lazy    => 1,
             builder => '_build' . $attr,
         );
@@ -131,28 +132,28 @@ for my $lang (qw( en native )) {
 
 has _cldr_json_data => (
     is      => 'ro',
-    isa     => HashRef,
+    isa     => t('HashRef'),
     lazy    => 1,
     builder => '_build_cldr_json_data',
 );
 
 has _first_day_of_week => (
     is      => 'ro',
-    isa     => Int,
+    isa     => t('Int'),
     lazy    => 1,
     builder => '_build_first_day_of_week',
 );
 
 has version => (
     is      => 'ro',
-    isa     => LaxVersionStr,
+    isa     => t('LaxVersion'),
     lazy    => 1,
     builder => '_build_version',
 );
 
 has data_hash => (
     is      => 'ro',
-    isa     => HashRef,
+    isa     => t('HashRef'),
     lazy    => 1,
     builder => '_build_data_hash',
 );
@@ -250,7 +251,7 @@ sub _build_glibc_data ($self) {
         return $parent->_glibc_data;
     }
 
-    my $raw = $self->_glibc_file->slurp;
+    my $raw = $self->_glibc_file->slurp_raw;
 
     return {
         glibc_datetime_format =>
@@ -278,7 +279,7 @@ sub _build_glibc_file ($self) {
     # This ensures some sort of sanish fallback
     $glibc_code = 'POSIX' if $self->code eq 'root';
 
-    return $self->_source_data_root->file( 'glibc-locales', $glibc_code );
+    return $self->_source_data_root->child( 'glibc-locales', $glibc_code );
 }
 
 sub _extract_glibc_value ( $self, $key, $raw ) {
@@ -297,13 +298,13 @@ sub _build_version ($self) {
 }
 
 sub _build_json_file ($self) {
-    my $code_file = $self->_source_data_root->file(
+    my $code_file = $self->_source_data_root->child(
         qw( cldr-dates-full main ),
         $self->code, 'ca-gregorian.json'
     );
     return $code_file if -f $code_file;
 
-    my $parent_file = $self->_source_data_root->file(
+    my $parent_file = $self->_source_data_root->child(
         qw( cldr-dates-full main ),
         $self->_parent_code,
         'ca-gregorian.json'
@@ -346,7 +347,7 @@ sub _explicit_parents ($self) {
     return $explicit_parents if $explicit_parents;
 
     my $json = $self->_json_from(
-        $self->_source_data_root->file(
+        $self->_source_data_root->child(
             qw( cldr-core supplemental parentLocales.json ))
     );
 
@@ -379,7 +380,7 @@ sub _first_day_of_week_index ($self) {
     return $first_day_of_week_index if $first_day_of_week_index;
 
     my $json = $self->_json_from(
-        $self->_source_data_root->file(
+        $self->_source_data_root->child(
             qw( cldr-core supplemental weekData.json ))
     );
 
@@ -434,7 +435,7 @@ sub _en_variants_data ($self) {
 
 sub _populate_en_lookup ( $self, $type ) {
     my $json = $self->_json_from(
-        $self->_source_data_root->file(
+        $self->_source_data_root->child(
             qw( cldr-localenames-full main en ), $type . '.json'
         )
     );
@@ -471,7 +472,7 @@ sub _native_lookup ( $self, $type ) {
     my $file;
     my $locale = $self;
     while ($locale) {
-        $file = $self->_source_data_root->file(
+        $file = $self->_source_data_root->child(
             qw( cldr-localenames-full main  ),
             $locale->code, $type . '.json'
         );
@@ -486,7 +487,7 @@ sub _native_lookup ( $self, $type ) {
 }
 
 sub _json_from ( $self, $file ) {
-    return decode_json( $file->slurp( iomode => '<:raw' ) );
+    return decode_json( $file->slurp_raw );
 }
 
 __PACKAGE__->meta->make_immutable;

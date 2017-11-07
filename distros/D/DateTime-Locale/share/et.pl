@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "AM",
-    "PM"
+    "PM",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "E, d",
@@ -47,8 +52,8 @@
     yMd => "d.M.y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-one" => "y (w. 'n\N{U+00e4}dal')",
-    "yw-count-other" => "y (w. 'n\N{U+00e4}dal')"
+    "yw-count-one" => "w. 'n\N{U+00e4}dal' (Y)",
+    "yw-count-other" => "w. 'n\N{U+00e4}dal' (Y)",
   },
   code => "et",
   date_format_full => "EEEE, d. MMMM y",
@@ -66,7 +71,7 @@
     "N",
     "R",
     "L",
-    "P"
+    "P",
   ],
   day_format_narrow => [
     "E",
@@ -75,7 +80,7 @@
     "N",
     "R",
     "L",
-    "P"
+    "P",
   ],
   day_format_wide => [
     "esmasp\N{U+00e4}ev",
@@ -84,7 +89,7 @@
     "neljap\N{U+00e4}ev",
     "reede",
     "laup\N{U+00e4}ev",
-    "p\N{U+00fc}hap\N{U+00e4}ev"
+    "p\N{U+00fc}hap\N{U+00e4}ev",
   ],
   day_stand_alone_abbreviated => [
     "E",
@@ -93,7 +98,7 @@
     "N",
     "R",
     "L",
-    "P"
+    "P",
   ],
   day_stand_alone_narrow => [
     "E",
@@ -102,7 +107,7 @@
     "N",
     "R",
     "L",
-    "P"
+    "P",
   ],
   day_stand_alone_wide => [
     "esmasp\N{U+00e4}ev",
@@ -111,19 +116,19 @@
     "neljap\N{U+00e4}ev",
     "reede",
     "laup\N{U+00e4}ev",
-    "p\N{U+00fc}hap\N{U+00e4}ev"
+    "p\N{U+00fc}hap\N{U+00e4}ev",
   ],
   era_abbreviated => [
     "eKr",
-    "pKr"
+    "pKr",
   ],
   era_narrow => [
     "eKr",
-    "pKr"
+    "pKr",
   ],
   era_wide => [
     "enne Kristust",
-    "p\N{U+00e4}rast Kristust"
+    "p\N{U+00e4}rast Kristust",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -144,7 +149,7 @@
     "sept",
     "okt",
     "nov",
-    "dets"
+    "dets",
   ],
   month_format_narrow => [
     "J",
@@ -158,7 +163,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_format_wide => [
     "jaanuar",
@@ -172,7 +177,7 @@
     "september",
     "oktoober",
     "november",
-    "detsember"
+    "detsember",
   ],
   month_stand_alone_abbreviated => [
     "jaan",
@@ -186,7 +191,7 @@
     "sept",
     "okt",
     "nov",
-    "dets"
+    "dets",
   ],
   month_stand_alone_narrow => [
     "J",
@@ -200,7 +205,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_stand_alone_wide => [
     "jaanuar",
@@ -214,7 +219,7 @@
     "september",
     "oktoober",
     "november",
-    "detsember"
+    "detsember",
   ],
   name => "Estonian",
   native_language => "eesti",
@@ -226,37 +231,37 @@
     "K1",
     "K2",
     "K3",
-    "K4"
+    "K4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "1. kvartal",
     "2. kvartal",
     "3. kvartal",
-    "4. kvartal"
+    "4. kvartal",
   ],
   quarter_stand_alone_abbreviated => [
     "K1",
     "K2",
     "K3",
-    "K4"
+    "K4",
   ],
   quarter_stand_alone_narrow => [
     "1.",
     "2.",
     "3.",
-    "4."
+    "4.",
   ],
   quarter_stand_alone_wide => [
     "1. kvartal",
     "2. kvartal",
     "3. kvartal",
-    "4. kvartal"
+    "4. kvartal",
   ],
   script => undef,
   territory => undef,
@@ -265,5 +270,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

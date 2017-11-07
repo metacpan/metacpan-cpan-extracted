@@ -1,3 +1,7 @@
+3.003 2017-11-05
+
+    * fix test file contents to work with utf-8
+
 3.002 2017-08-22
 
     * add doc for $skip variable

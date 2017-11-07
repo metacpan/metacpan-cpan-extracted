@@ -30,7 +30,7 @@ use LWP::UserAgent;
 use HTTP::Request::Common;
 use HTML::TableExtract;
 
-our $VERSION = '1.38'; # VERSION
+our $VERSION = '1.43'; # VERSION
 
 my $ASEGR_URL = 'http://www.ase.gr/content/en/MarketData/Stocks/Prices/Share_SearchResults.asp?';
 
@@ -62,7 +62,7 @@ sub asegr {
 		if ($reply->is_success)
 		{
 
-			$te= new HTML::TableExtract( headers =>
+			$te= HTML::TableExtract->new( headers =>
 			[("Date","Price","\%Change","Volume","Max","Min","Value","Trades","Open")]);
 
 			$te->parse($reply->content);

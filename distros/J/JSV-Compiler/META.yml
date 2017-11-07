@@ -1,0 +1,38 @@
+---
+abstract: unknown
+author:
+  - 'Anton Petrusevich'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::Most: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: JSV-Compiler
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Data::Dumper: '0'
+  JSON: '0'
+  JSON::Pointer: '0'
+  List::Util: '0'
+  Path::Tiny: '0'
+  Regexp::Common: '0'
+  Regexp::Common::Email::Address: '0'
+  Regexp::Common::URI: '0'
+  Regexp::Common::time: '0'
+  Storable: '0'
+  YAML::XS: '0'
+  perl: '5.008000'
+resources:
+  bugtracker: https://github.com/jef-sure/jsv-compilator/issues
+  repository: https://github.com/jef-sure/jsv-compilator.git
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

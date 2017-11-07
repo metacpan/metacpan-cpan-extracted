@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "v.M.",
-    "n.M."
+    "n.M.",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "E 'd\N{U+00e4}' d.",
@@ -44,7 +49,7 @@
     yMd => "y-MM-dd",
     yQQQ => "QQQy",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "ksh-DE",
   date_format_full => "EEEE, 'd\N{U+00e4}' d. MMMM y",
@@ -62,7 +67,7 @@
     "Du.",
     "Fr.",
     "Sa.",
-    "Su."
+    "Su.",
   ],
   day_format_narrow => [
     "M",
@@ -71,7 +76,7 @@
     "D",
     "F",
     "S",
-    "S"
+    "S",
   ],
   day_format_wide => [
     "Mohndaach",
@@ -80,7 +85,7 @@
     "Dunnersdaach",
     "Friidaach",
     "Samsdaach",
-    "Sunndaach"
+    "Sunndaach",
   ],
   day_stand_alone_abbreviated => [
     "Mo.",
@@ -89,7 +94,7 @@
     "Du.",
     "Fr.",
     "Sa.",
-    "Su."
+    "Su.",
   ],
   day_stand_alone_narrow => [
     "M",
@@ -98,7 +103,7 @@
     "D",
     "F",
     "S",
-    "S"
+    "S",
   ],
   day_stand_alone_wide => [
     "Mohndaach",
@@ -107,19 +112,19 @@
     "Dunnersdaach",
     "Friidaach",
     "Samsdaach",
-    "Sunndaach"
+    "Sunndaach",
   ],
   era_abbreviated => [
     "v. Chr.",
-    "n. Chr."
+    "n. Chr.",
   ],
   era_narrow => [
     "vC",
-    "nC"
+    "nC",
   ],
   era_wide => [
     "v\N{U+00fc}r Krestos",
-    "noh Krestos"
+    "noh Krestos",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -140,7 +145,7 @@
     "S\N{U+00e4}p",
     "Okt",
     "Nov",
-    "Dez"
+    "Dez",
   ],
   month_format_narrow => [
     "J",
@@ -154,7 +159,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_format_wide => [
     "Jannewa",
@@ -168,7 +173,7 @@
     "Sept\N{U+00e4}mber",
     "Oktohber",
     "Nov\N{U+00e4}mber",
-    "Dez\N{U+00e4}mber"
+    "Dez\N{U+00e4}mber",
   ],
   month_stand_alone_abbreviated => [
     "Jan.",
@@ -182,7 +187,7 @@
     "S\N{U+00e4}p.",
     "Okt.",
     "Nov.",
-    "Dez."
+    "Dez.",
   ],
   month_stand_alone_narrow => [
     "J",
@@ -196,7 +201,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_stand_alone_wide => [
     "Jannewa",
@@ -210,7 +215,7 @@
     "Sept\N{U+00e4}mber",
     "Oktohber",
     "Nov\N{U+00e4}mber",
-    "Dez\N{U+00e4}mber"
+    "Dez\N{U+00e4}mber",
   ],
   name => "Colognian Germany",
   native_language => "K\N{U+00f6}lsch",
@@ -222,37 +227,37 @@
     "1.Q.",
     "2.Q.",
     "3.Q.",
-    "4.Q."
+    "4.Q.",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "1. Quattahl",
     "2. Quattahl",
     "3. Quattahl",
-    "4. Quattahl"
+    "4. Quattahl",
   ],
   quarter_stand_alone_abbreviated => [
     "1.Q.",
     "2.Q.",
     "3.Q.",
-    "4.Q."
+    "4.Q.",
   ],
   quarter_stand_alone_narrow => [
     "1Q",
     "2Q",
     "3Q",
-    "4Q"
+    "4Q",
   ],
   quarter_stand_alone_wide => [
     "1. Quattahl",
     "2. Quattahl",
     "3. Quattahl",
-    "4. Quattahl"
+    "4. Quattahl",
   ],
   script => undef,
   territory => "Germany",
@@ -261,5 +266,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

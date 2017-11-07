@@ -18,7 +18,7 @@ our $object = ( Net::Whois::Object->new(@lines) )[0];
 isa_ok $object, $class;
 
 # Non-inherited methods
-can_ok $object, qw( route6 descr country origin org holes member_of inject aggr_mtd
+can_ok $object, qw( route6 descr origin org holes member_of inject aggr_mtd
     aggr_bndry export_comps components remarks notify mnt_lower mnt_routes mnt_by
     changed source);
 
@@ -37,12 +37,6 @@ $tested{'descr'}++;
 is_deeply( $object->descr(), ['route object for 192.168.1.0/24'], 'descr properly parsed' );
 $object->descr('Added descr');
 is( $object->descr()->[1], 'Added descr', 'descr properly added' );
-
-# Test 'country'
-$tested{'country'}++;
-is( $object->country(), 'FR', 'country properly parsed' );
-$object->country('GB');
-is( $object->country(), 'GB', 'country properly set' );
 
 # Test 'origin'
 $tested{'origin'}++;
@@ -162,7 +156,6 @@ ok( !$@, "Can evaluate t/common.pl ($@)" );
 __DATA__
 route6:         2001:0DB8::/32
 descr:          route object for 192.168.1.0/24
-country:        FR
 origin:         AS1234
 org:            ORG-MISC01-RIPE
 holes:          192.168.1.23

@@ -10,7 +10,7 @@ configure_requires:
   Locale::Msgfmt: 0.15
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.16'
+generated_by: 'Module::Install version 1.18'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,7 +29,7 @@ requires:
   Hash::Merge: 0
   IO::Socket::INET6: 2.69
   List::MoreUtils: 0
-  Locale::TextDomain: 0
+  Locale::TextDomain: 1.23
   MIME::Base64: 0
   Mail::RFC822::Address: 0
   Module::Find: 0.1
@@ -43,4 +43,4 @@ resources:
   bugtracker: https://github.com/dotse/zonemaster-engine/issues
   license: http://opensource.org/licenses/bsd-license.php
   repository: https://github.com/dotse/zonemaster-engine
-version: '2.000000'
+version: '2.000001'

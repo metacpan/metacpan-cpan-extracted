@@ -1,5 +1,8 @@
 Revision history for Acme-Ford-Prefect2
 
+1.2902    2017-11-02 10:15:43 -0400
+  - Additional diagnostics
+
 1.2901    2017-11-02 02:02:06 -0400
   - Fix configure time prereqs bug (GH#1)
 

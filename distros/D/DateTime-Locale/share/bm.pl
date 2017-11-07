@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "AM",
-    "PM"
+    "PM",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d, E",
@@ -48,7 +53,7 @@
     yMd => "d/M/y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "bm",
   date_format_full => "EEEE d MMMM y",
@@ -66,7 +71,7 @@
     "ala",
     "jum",
     "sib",
-    "kar"
+    "kar",
   ],
   day_format_narrow => [
     "N",
@@ -75,7 +80,7 @@
     "A",
     "J",
     "S",
-    "K"
+    "K",
   ],
   day_format_wide => [
     "nt\N{U+025b}n\N{U+025b}",
@@ -84,7 +89,7 @@
     "alamisa",
     "juma",
     "sibiri",
-    "kari"
+    "kari",
   ],
   day_stand_alone_abbreviated => [
     "nt\N{U+025b}",
@@ -93,7 +98,7 @@
     "ala",
     "jum",
     "sib",
-    "kar"
+    "kar",
   ],
   day_stand_alone_narrow => [
     "N",
@@ -102,7 +107,7 @@
     "A",
     "J",
     "S",
-    "K"
+    "K",
   ],
   day_stand_alone_wide => [
     "nt\N{U+025b}n\N{U+025b}",
@@ -111,19 +116,19 @@
     "alamisa",
     "juma",
     "sibiri",
-    "kari"
+    "kari",
   ],
   era_abbreviated => [
     "J.-C. \N{U+0272}\N{U+025b}",
-    "ni J.-C."
+    "ni J.-C.",
   ],
   era_narrow => [
     "J.-C. \N{U+0272}\N{U+025b}",
-    "ni J.-C."
+    "ni J.-C.",
   ],
   era_wide => [
     "jezu krisiti \N{U+0272}\N{U+025b}",
-    "jezu krisiti mink\N{U+025b}"
+    "jezu krisiti mink\N{U+025b}",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -144,7 +149,7 @@
     "s\N{U+025b}t",
     "\N{U+0254}ku",
     "now",
-    "des"
+    "des",
   ],
   month_format_narrow => [
     "Z",
@@ -158,7 +163,7 @@
     "S",
     "\N{U+0186}",
     "N",
-    "D"
+    "D",
   ],
   month_format_wide => [
     "zanwuye",
@@ -172,7 +177,7 @@
     "s\N{U+025b}tanburu",
     "\N{U+0254}kut\N{U+0254}buru",
     "nowanburu",
-    "desanburu"
+    "desanburu",
   ],
   month_stand_alone_abbreviated => [
     "zan",
@@ -186,7 +191,7 @@
     "s\N{U+025b}t",
     "\N{U+0254}ku",
     "now",
-    "des"
+    "des",
   ],
   month_stand_alone_narrow => [
     "Z",
@@ -200,7 +205,7 @@
     "S",
     "\N{U+0186}",
     "N",
-    "D"
+    "D",
   ],
   month_stand_alone_wide => [
     "zanwuye",
@@ -214,7 +219,7 @@
     "s\N{U+025b}tanburu",
     "\N{U+0254}kut\N{U+0254}buru",
     "nowanburu",
-    "desanburu"
+    "desanburu",
   ],
   name => "Bambara",
   native_language => "bamanakan",
@@ -226,37 +231,37 @@
     "KS1",
     "KS2",
     "KS3",
-    "KS4"
+    "KS4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "kalo saba f\N{U+0254}l\N{U+0254}",
     "kalo saba filanan",
     "kalo saba sabanan",
-    "kalo saba naaninan"
+    "kalo saba naaninan",
   ],
   quarter_stand_alone_abbreviated => [
     "KS1",
     "KS2",
     "KS3",
-    "KS4"
+    "KS4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "kalo saba f\N{U+0254}l\N{U+0254}",
     "kalo saba filanan",
     "kalo saba sabanan",
-    "kalo saba naaninan"
+    "kalo saba naaninan",
   ],
   script => undef,
   territory => undef,
@@ -265,5 +270,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

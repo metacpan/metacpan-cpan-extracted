@@ -4,19 +4,19 @@ author:
   - 'Calle Dybedahl <calle@init.se>'
   - 'Mattias P <mattias.paivarinta@iis.se>'
 build_requires:
-  Devel::CheckLib: 0.4
+  Devel::CheckLib: '0.4'
   Devel::PPPort: 3.19
   ExtUtils::MakeMaker: 6.59
   JSON::PP: 0
   Test::Fatal: 0
 configure_requires:
-  Devel::CheckLib: 0.4
+  Devel::CheckLib: '0.4'
   Devel::PPPort: 3.19
   ExtUtils::MakeMaker: 6.59
   ExtUtils::ParseXS: 3.18
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.06'
+generated_by: 'Module::Install version 1.18'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,4 +32,4 @@ requires:
   perl: 5.14.0
 resources:
   license: http://opensource.org/licenses/bsd-license.php
-version: 1.0.0
+version: 1.0.1

@@ -4,14 +4,14 @@ package Test::Class::Moose::Report;
 
 use 5.10.0;
 
-our $VERSION = '0.87';
+our $VERSION = '0.88';
 
 use Carp;
 use Moose;
 use namespace::autoclean;
 with 'Test::Class::Moose::Role::HasTimeReport';
 
-use List::Util qw( first sum );
+use List::Util qw( first sum0 );
 
 has 'is_parallel' => (
     is      => 'ro',
@@ -45,10 +45,10 @@ sub num_test_methods {
 
 sub num_tests_run {
     my $self = shift;
-    return sum map { $_->num_tests_run }
-      grep         { !$_->is_skipped }
-      map          { $_->all_test_methods }
-      map          { $_->all_test_instances } $self->all_test_classes;
+    return sum0 map { $_->num_tests_run }
+      grep          { !$_->is_skipped }
+      map           { $_->all_test_methods }
+      map           { $_->all_test_instances } $self->all_test_classes;
 }
 
 sub all_test_classes {
@@ -144,7 +144,7 @@ Test::Class::Moose::Report - Test information for Test::Class::Moose
 
 =head1 VERSION
 
-version 0.87
+version 0.88
 
 =head1 SYNOPSIS
 

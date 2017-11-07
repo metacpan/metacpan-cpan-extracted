@@ -21,7 +21,7 @@ name: App-MFILE-WWW
 provides:
   App::MFILE::WWW:
     file: lib/App/MFILE/WWW.pm
-    version: 0.170
+    version: 0.171
   App::MFILE::WWW::Dispatch:
     file: lib/App/MFILE/WWW/Dispatch.pm
     version: 0
@@ -48,4 +48,4 @@ requires:
   perl: 5.012
 resources:
   license: http://opensource.org/licenses/BSD-3-Clause
-version: 0.170
+version: 0.171

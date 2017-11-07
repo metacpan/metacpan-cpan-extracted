@@ -7,7 +7,7 @@ their TAP output and optionally save the aggregated results for later processing
 
 =head1 VERSION
 
-Version 0.040
+Version 0.044
 
 =head1 SYNOPSIS
 
@@ -139,7 +139,9 @@ However, the test suite should preferably as soon as possible be given a config 
 =head2 THE SUITE CONFIG
 
 A test suite is configured by putting the file F<config.testontap> in the root of the suite. It is
-technically optional, as the only required part (test id) will be generated for each run.
+technically optional, as some important parts can be generated/use defaults, but it must exist, even
+if it is empty. If it is completely empty, the generated form will be printed for easy inclusion.
+
 However, while this can be useful just to try things out, it makes it impossible to use any persisted
 results properly, and obviously will make some functionality unavailable, so it quickly becomes desirable
 to put one in.
@@ -152,8 +154,8 @@ described in L<Grep::Query>. Notable here is that queries operate on paths insid
 are defined as simply the relative path of the file from the root of the suite, and always using '/' as a path
 delimiter on all platforms. Directories will be suffixed with a '/'.
 
-Generally, this file should at a minimum always contain a line of "id = <UUID>". In fact, if no config file is
-present, a warning will be displayed to the effect that a newly generated id will be used for each run. See below.  
+Generally, this file should at a minimum always contain a line of "id = <UUID>" and an execmap.
+In fact, if either isn't present, a warning will be displayed.  
 
 Empty lines are ignored, and comments can be made by starting the line with '#'. Unknown keys/sections
 will generate warnings but will otherwise be ignored. 
@@ -164,14 +166,14 @@ The following keys/sections are valid:
 
 =item B<id>
 
-This is required and must be set to an UUID.
+This must be set to an UUID.
 
 It will be used to mark results with and thus can be used to distinguish persisted results from different
 suites. Hence, you should obviously not reuse an id already used for another suite! It is however expected
 that something processing such results are aware that a suite most likely will change during its lifetime.
 
-Unless you have any other tool to generate an UUID with, a tip is to run the suite once without a config file and
-then cut and paste the generated id.
+Unless you have any other tool to generate an UUID with, a tip is to run the suite once with an empty
+config file and then cut and paste the generated id.
 
 Example:
 
@@ -277,9 +279,9 @@ If not given, the default commandline setting applies (C<none>).
 
 =item B<[EXECMAP]> (section)
 
-This section is optional, but recommended. It details how to decide which files are tests and how they should be executed. 
-Note that there is also possible to pass a file with this section manually using the '--execmap' option, in order
-to override or complement any defined execmap. For safety, no execmap is defined by default.
+This section is technically optional, but recommended. It details how to decide which files are tests and how
+they should be executed. Note that there is also possible to pass a file with this section manually using the
+'--execmap' option, in order to override or complement any defined execmap.
 
 The section should contain matched pairs of key/values named C<matchI<n>> and C<cmdI<n>>, where the C<match> part defines
 a L<Grep::Query> expression to match to test names, and the C<cmd> part defines the command line to use for matching tests.
@@ -306,20 +308,29 @@ If no "EXECMAP" section is present, an internal one can be used by specifying a 
 C<--execmap :internal> which uses an execmap equivalent to this (for this release, may change):
 
   [EXECMAP]
+  # Perl, including common test extension
   match1 = regexp[\.(t|pl)$]
   cmd1 = perl
+  # Python
   match2 = regexp[\.py$]
   cmd2 = python
+  # Java (jar files with main entry point)
   match3 = regexp[\.jar$]
   cmd3 = java
        = -jar
+  # Groovy with common extensions
   match4 = regexp[\.(groovy|gsh|gvy|gy)$]
   cmd4 = groovy
   # only on windows
+    # Batch files
     match5 = regexp[\.(bat|cmd)$]
     cmd5 = cmd.exe
          = /c
+    # AutoIt scripts (https://www.autoitscript.com/site/autoit/)
+    match6 = regexp(\.au3)
+    cmd6 = autoit3
   # only on unix/linux
+    # Shell scripts
     match5 = regexp[\.sh$]
     cmd5 = /bin/sh
 
@@ -504,6 +515,8 @@ The test suite result tree in /tmp will look like this:
   -- meta.json
   -- summary.json
   -- testinfo.json
+  -- preprocess.txt
+  -- postprocess.txt
   -- private/
   -- -- ioperf.xml
   -- result/
@@ -717,6 +730,14 @@ Tests having TODO's.
 Tests with TODO's that unexpectedly passed.
 
 =back
+
+=item * preprocess.txt
+
+The text printed by a preprocess command, if any.
+
+=item * postprocess.txt
+
+The text printed by a postprocess command, if any.
 
 =item * private/
 

@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "icheheavo",
-    "ichamthi"
+    "ichamthi",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d, E",
@@ -45,7 +50,7 @@
     yMd => "d/M/y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "asa-TZ",
   date_format_full => "EEEE, d MMMM y",
@@ -63,7 +68,7 @@
     "Alh",
     "Ijm",
     "Jmo",
-    "Jpi"
+    "Jpi",
   ],
   day_format_narrow => [
     "J",
@@ -72,7 +77,7 @@
     "A",
     "I",
     "J",
-    "J"
+    "J",
   ],
   day_format_wide => [
     "Jumatatu",
@@ -81,7 +86,7 @@
     "Alhamisi",
     "Ijumaa",
     "Jumamosi",
-    "Jumapili"
+    "Jumapili",
   ],
   day_stand_alone_abbreviated => [
     "Jtt",
@@ -90,7 +95,7 @@
     "Alh",
     "Ijm",
     "Jmo",
-    "Jpi"
+    "Jpi",
   ],
   day_stand_alone_narrow => [
     "J",
@@ -99,7 +104,7 @@
     "A",
     "I",
     "J",
-    "J"
+    "J",
   ],
   day_stand_alone_wide => [
     "Jumatatu",
@@ -108,19 +113,19 @@
     "Alhamisi",
     "Ijumaa",
     "Jumamosi",
-    "Jumapili"
+    "Jumapili",
   ],
   era_abbreviated => [
     "KM",
-    "BM"
+    "BM",
   ],
   era_narrow => [
     "KM",
-    "BM"
+    "BM",
   ],
   era_wide => [
     "Kabla yakwe Yethu",
-    "Baada yakwe Yethu"
+    "Baada yakwe Yethu",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -141,7 +146,7 @@
     "Sep",
     "Okt",
     "Nov",
-    "Dec"
+    "Dec",
   ],
   month_format_narrow => [
     "J",
@@ -155,7 +160,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_format_wide => [
     "Januari",
@@ -169,7 +174,7 @@
     "Septemba",
     "Oktoba",
     "Novemba",
-    "Desemba"
+    "Desemba",
   ],
   month_stand_alone_abbreviated => [
     "Jan",
@@ -183,7 +188,7 @@
     "Sep",
     "Okt",
     "Nov",
-    "Dec"
+    "Dec",
   ],
   month_stand_alone_narrow => [
     "J",
@@ -197,7 +202,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_stand_alone_wide => [
     "Januari",
@@ -211,7 +216,7 @@
     "Septemba",
     "Oktoba",
     "Novemba",
-    "Desemba"
+    "Desemba",
   ],
   name => "Asu Tanzania",
   native_language => "Kipare",
@@ -223,37 +228,37 @@
     "R1",
     "R2",
     "R3",
-    "R4"
+    "R4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "Robo 1",
     "Robo 2",
     "Robo 3",
-    "Robo 4"
+    "Robo 4",
   ],
   quarter_stand_alone_abbreviated => [
     "R1",
     "R2",
     "R3",
-    "R4"
+    "R4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "Robo 1",
     "Robo 2",
     "Robo 3",
-    "Robo 4"
+    "Robo 4",
   ],
   script => undef,
   territory => "Tanzania",
@@ -262,5 +267,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

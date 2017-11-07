@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 1.28
+    version 1.32
 
 SYNOPSIS
 
@@ -159,6 +159,12 @@ PROPERTIES
 
       Environment variables to override during the build stage.
 
+    local_source
+
+      Set to true if source code package is available locally. (that is not
+      fetched over the internet). This is computed by default based on the
+      start_url property. Can be set by an alienfile or plugin.
+
     platform
 
       Hash reference. Contains information about the platform beyond just
@@ -214,6 +220,12 @@ PROPERTIES
       will be extracted to an source extraction directory and the source
       build root will be empty. You can use the extract install property to
       get the location of the extracted source.
+
+    network
+
+      True if a network fetch is available. This should NOT be set by an
+      alienfile or plugin. This is computed based on the
+      ALIEN_INSTALL_NETWORK environment variables.
 
     start_url
 
@@ -658,6 +670,17 @@ META METHODS
 ENVIRONMENT
 
     Alien::Build responds to these environment variables:
+
+    ALIEN_INSTALL_NETWORK
+
+      If set to true (the default), then network fetch will be allowed. If
+      set to false, then network fetch will not be allowed.
+
+      What constitutes a local vs. network fetch is determined based on the
+      start_url and local_source meta properties. An alienfile or plugin
+      could override this detection (possibly inappropriately), so this
+      variable is not a substitute for properly auditing of Perl modules
+      for environments that require that.
 
     ALIEN_INSTALL_TYPE
 

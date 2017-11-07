@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "Tesiran",
-    "Teipa"
+    "Teipa",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d, E",
@@ -45,7 +50,7 @@
     yMd => "y-MM-dd",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "saq",
   date_format_full => "EEEE, d MMMM y",
@@ -63,7 +68,7 @@
     "Ile",
     "Sap",
     "Kwe",
-    "Are"
+    "Are",
   ],
   day_format_narrow => [
     "K",
@@ -72,7 +77,7 @@
     "I",
     "S",
     "K",
-    "A"
+    "A",
   ],
   day_format_wide => [
     "Mderot ee kuni",
@@ -81,7 +86,7 @@
     "Mderot ee ile",
     "Mderot ee sapa",
     "Mderot ee kwe",
-    "Mderot ee are"
+    "Mderot ee are",
   ],
   day_stand_alone_abbreviated => [
     "Kun",
@@ -90,7 +95,7 @@
     "Ile",
     "Sap",
     "Kwe",
-    "Are"
+    "Are",
   ],
   day_stand_alone_narrow => [
     "K",
@@ -99,7 +104,7 @@
     "I",
     "S",
     "K",
-    "A"
+    "A",
   ],
   day_stand_alone_wide => [
     "Mderot ee kuni",
@@ -108,19 +113,19 @@
     "Mderot ee ile",
     "Mderot ee sapa",
     "Mderot ee kwe",
-    "Mderot ee are"
+    "Mderot ee are",
   ],
   era_abbreviated => [
     "KK",
-    "BK"
+    "BK",
   ],
   era_narrow => [
     "KK",
-    "BK"
+    "BK",
   ],
   era_wide => [
     "Kabla ya Christo",
-    "Baada ya Christo"
+    "Baada ya Christo",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -141,7 +146,7 @@
     "Saa",
     "Tom",
     "Tob",
-    "Tow"
+    "Tow",
   ],
   month_format_narrow => [
     "O",
@@ -155,7 +160,7 @@
     "S",
     "T",
     "T",
-    "T"
+    "T",
   ],
   month_format_wide => [
     "Lapa le obo",
@@ -169,7 +174,7 @@
     "Lapa le saal",
     "Lapa le tomon",
     "Lapa le tomon obo",
-    "Lapa le tomon waare"
+    "Lapa le tomon waare",
   ],
   month_stand_alone_abbreviated => [
     "Obo",
@@ -183,7 +188,7 @@
     "Saa",
     "Tom",
     "Tob",
-    "Tow"
+    "Tow",
   ],
   month_stand_alone_narrow => [
     "O",
@@ -197,7 +202,7 @@
     "S",
     "T",
     "T",
-    "T"
+    "T",
   ],
   month_stand_alone_wide => [
     "Lapa le obo",
@@ -211,7 +216,7 @@
     "Lapa le saal",
     "Lapa le tomon",
     "Lapa le tomon obo",
-    "Lapa le tomon waare"
+    "Lapa le tomon waare",
   ],
   name => "Samburu",
   native_language => "Kisampur",
@@ -223,37 +228,37 @@
     "R1",
     "R2",
     "R3",
-    "R4"
+    "R4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "Robo 1",
     "Robo 2",
     "Robo 3",
-    "Robo 4"
+    "Robo 4",
   ],
   quarter_stand_alone_abbreviated => [
     "R1",
     "R2",
     "R3",
-    "R4"
+    "R4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "Robo 1",
     "Robo 2",
     "Robo 3",
-    "Robo 4"
+    "Robo 4",
   ],
   script => undef,
   territory => undef,
@@ -262,5 +267,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

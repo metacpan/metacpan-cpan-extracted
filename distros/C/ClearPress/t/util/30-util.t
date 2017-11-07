@@ -15,6 +15,8 @@ eval {
 
 use_ok('ClearPress::util');
 
+delete $ENV{dev};
+
 {
   my $util = ClearPress::util->new();
   isa_ok($util, 'ClearPress::util');

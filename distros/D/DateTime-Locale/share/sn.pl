@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "AM",
-    "PM"
+    "PM",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d, E",
@@ -46,8 +51,8 @@
     yMd => "y-MM-dd",
     yQQQ => "y QQQ",
     yQQQQ => "y QQQQ",
-    "yw-count-one" => "'week' w 'of' y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-one" => "'week' w 'of' Y",
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "sn",
   date_format_full => "y MMMM d, EEEE",
@@ -65,7 +70,7 @@
     "Chn",
     "Chs",
     "Mug",
-    "Svo"
+    "Svo",
   ],
   day_format_narrow => [
     "M",
@@ -74,7 +79,7 @@
     "C",
     "C",
     "M",
-    "S"
+    "S",
   ],
   day_format_wide => [
     "Muvhuro",
@@ -83,7 +88,7 @@
     "China",
     "Chishanu",
     "Mugovera",
-    "Svondo"
+    "Svondo",
   ],
   day_stand_alone_abbreviated => [
     "Muv",
@@ -92,7 +97,7 @@
     "Chn",
     "Chs",
     "Mug",
-    "Svo"
+    "Svo",
   ],
   day_stand_alone_narrow => [
     "M",
@@ -101,7 +106,7 @@
     "C",
     "C",
     "M",
-    "S"
+    "S",
   ],
   day_stand_alone_wide => [
     "Muvhuro",
@@ -110,19 +115,19 @@
     "China",
     "Chishanu",
     "Mugovera",
-    "Svondo"
+    "Svondo",
   ],
   era_abbreviated => [
     "BC",
-    "AD"
+    "AD",
   ],
   era_narrow => [
     "BC",
-    "AD"
+    "AD",
   ],
   era_wide => [
     "Kristo asati auya",
-    "mugore ramambo vedu"
+    "mugore ramambo vedu",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -143,7 +148,7 @@
     "Gun",
     "Gum",
     "Mbu",
-    "Zvi"
+    "Zvi",
   ],
   month_format_narrow => [
     "N",
@@ -157,7 +162,7 @@
     "G",
     "G",
     "M",
-    "Z"
+    "Z",
   ],
   month_format_wide => [
     "Ndira",
@@ -171,7 +176,7 @@
     "Gunyana",
     "Gumiguru",
     "Mbudzi",
-    "Zvita"
+    "Zvita",
   ],
   month_stand_alone_abbreviated => [
     "Ndi",
@@ -185,7 +190,7 @@
     "Gun",
     "Gum",
     "Mbu",
-    "Zvi"
+    "Zvi",
   ],
   month_stand_alone_narrow => [
     "N",
@@ -199,7 +204,7 @@
     "G",
     "G",
     "M",
-    "Z"
+    "Z",
   ],
   month_stand_alone_wide => [
     "Ndira",
@@ -213,7 +218,7 @@
     "Gunyana",
     "Gumiguru",
     "Mbudzi",
-    "Zvita"
+    "Zvita",
   ],
   name => "Shona",
   native_language => "chiShona",
@@ -225,37 +230,37 @@
     "K1",
     "K2",
     "K3",
-    "K4"
+    "K4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "Kota 1",
     "Kota 2",
     "Kota 3",
-    "Kota 4"
+    "Kota 4",
   ],
   quarter_stand_alone_abbreviated => [
     "K1",
     "K2",
     "K3",
-    "K4"
+    "K4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "Kota 1",
     "Kota 2",
     "Kota 3",
-    "Kota 4"
+    "Kota 4",
   ],
   script => undef,
   territory => undef,
@@ -264,5 +269,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

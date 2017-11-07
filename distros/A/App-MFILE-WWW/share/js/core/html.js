@@ -430,6 +430,25 @@ define ([
             };
         }, // dbrowser
 
+        dcallback: function (dcn) {
+            // console.log("Entering html.dcallback with argument " + dcn);
+            // dcn is dcallback name
+            // dco is dcallback object
+            var dco = target.pull(dcn),
+                r = '';
+
+            r += '<br><div id="dcallback"></div><br>';
+
+            r += '<form id="' + dcn + '">';
+            // miniMenu at the bottom
+            r += miniMenu(dco.miniMenu);
+            // your choice section
+            r += yourChoice();
+            r += '</form>';
+
+            return r;
+        }, // dcallback
+
         dform: function (dfn) {
             // dfn is dform name
             // dfo is dform object
@@ -543,7 +562,6 @@ define ([
                 r = '',
                 len = dmo.entries.length,
                 i,
-                back = target.pull(dmo.back),
                 entry;
         
             r += '<form id="' + dmn + '"><br><b>' + dmo.title + '</b><br><br>';

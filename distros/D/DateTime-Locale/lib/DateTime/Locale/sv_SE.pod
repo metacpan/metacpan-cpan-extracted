@@ -327,11 +327,41 @@ Swedish Sweden locale.
 
 =head2 Available Formats
 
+=head3 Bh (h B)
+
+   2008-02-05T18:30:30 = 6 B
+   1995-12-22T09:05:02 = 9 B
+  -0010-09-15T04:44:23 = 4 B
+
+=head3 Bhm (h:mm B)
+
+   2008-02-05T18:30:30 = 6:30 B
+   1995-12-22T09:05:02 = 9:05 B
+  -0010-09-15T04:44:23 = 4:44 B
+
+=head3 Bhms (h:mm:ss B)
+
+   2008-02-05T18:30:30 = 6:30:30 B
+   1995-12-22T09:05:02 = 9:05:02 B
+  -0010-09-15T04:44:23 = 4:44:23 B
+
 =head3 E (ccc)
 
    2008-02-05T18:30:30 = tis
    1995-12-22T09:05:02 = fre
   -0010-09-15T04:44:23 = lör
+
+=head3 EBhm (E h:mm B)
+
+   2008-02-05T18:30:30 = tis 6:30 B
+   1995-12-22T09:05:02 = fre 9:05 B
+  -0010-09-15T04:44:23 = lör 4:44 B
+
+=head3 EBhms (E h:mm:ss B)
+
+   2008-02-05T18:30:30 = tis 6:30:30 B
+   1995-12-22T09:05:02 = fre 9:05:02 B
+  -0010-09-15T04:44:23 = lör 4:44:23 B
 
 =head3 EHm (E HH:mm)
 
@@ -597,13 +627,13 @@ Swedish Sweden locale.
    1995-12-22T09:05:02 = 4:e kvartalet 1995
   -0010-09-15T04:44:23 = 3:e kvartalet -10
 
-=head3 yw-count-one ('vecka' w, y)
+=head3 yw-count-one ('vecka' w, Y)
 
    2008-02-05T18:30:30 = vecka 6, 2008
    1995-12-22T09:05:02 = vecka 51, 1995
   -0010-09-15T04:44:23 = vecka 37, -10
 
-=head3 yw-count-other ('vecka' w, y)
+=head3 yw-count-other ('vecka' w, Y)
 
    2008-02-05T18:30:30 = vecka 6, 2008
    1995-12-22T09:05:02 = vecka 51, 1995

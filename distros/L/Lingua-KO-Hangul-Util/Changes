@@ -1,5 +1,8 @@
 Revision history for Perl extension Lingua::KO::Hangul::Util.
 
+0.28  Fri Nov  3 11:19:13 2017
+    - xsub: [rt.cpan.org #121737] Fails install when no '.' in @INC
+
 0.27  Sun Sep  1 13:11:14 2013
     - mkheader: close FH.
     - test.t: remove a test with charnames.

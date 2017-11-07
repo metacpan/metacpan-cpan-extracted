@@ -1,5 +1,7 @@
 package Minion::Backend::mysql;
 
+use 5.010;
+
 use Mojo::Base 'Minion::Backend';
 
 use Mojo::IOLoop;
@@ -9,7 +11,7 @@ use Sys::Hostname 'hostname';
 
 has 'mysql';
 
-our $VERSION = '0.08';
+our $VERSION = '0.10';
 
 sub dequeue {
   my ($self, $id, $wait, $options) = @_;
@@ -332,16 +334,16 @@ sub receive {
 #pod =head1 SYNOPSIS
 #pod
 #pod   use Mojolicious::Lite;
-#pod   
+#pod
 #pod   plugin Minion => {mysql => 'mysql://user@127.0.0.1/minion_jobs'};
-#pod   
+#pod
 #pod   # Slow task
 #pod   app->minion->add_task(poke_mojo => sub {
 #pod     my $job = shift;
 #pod     $job->app->ua->get('mojolicio.us');
 #pod     $job->app->log->debug('We have poked mojolicio.us for a visitor');
 #pod   });
-#pod   
+#pod
 #pod   # Perform job in a background worker process
 #pod   get '/' => sub {
 #pod     my $c = shift;
@@ -355,7 +357,7 @@ sub receive {
 #pod
 #pod L<Minion::Backend::mysql> is a backend for L<Minion> based on L<Mojo::mysql>. All
 #pod necessary tables will be created automatically with a set of migrations named
-#pod C<minion>. This backend has been tested on v5.5 of MySQL.
+#pod C<minion>. This backend requires at least v5.6.5 of MySQL.
 #pod
 #pod =head1 ATTRIBUTES
 #pod
@@ -735,21 +737,21 @@ Minion::Backend::mysql
 
 =head1 VERSION
 
-version 0.08
+version 0.10
 
 =head1 SYNOPSIS
 
   use Mojolicious::Lite;
-  
+
   plugin Minion => {mysql => 'mysql://user@127.0.0.1/minion_jobs'};
-  
+
   # Slow task
   app->minion->add_task(poke_mojo => sub {
     my $job = shift;
     $job->app->ua->get('mojolicio.us');
     $job->app->log->debug('We have poked mojolicio.us for a visitor');
   });
-  
+
   # Perform job in a background worker process
   get '/' => sub {
     my $c = shift;
@@ -763,7 +765,7 @@ version 0.08
 
 L<Minion::Backend::mysql> is a backend for L<Minion> based on L<Mojo::mysql>. All
 necessary tables will be created automatically with a set of migrations named
-C<minion>. This backend has been tested on v5.5 of MySQL.
+C<minion>. This backend requires at least v5.6.5 of MySQL.
 
 =head1 NAME
 
@@ -1151,7 +1153,7 @@ Doug Bell <preaction@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alexander Nalobin Olaf Alders Zoffix Znet
+=for stopwords Alexander Nalobin Olaf Alders Paul Cochrane Zoffix Znet
 
 =over 4
 
@@ -1162,6 +1164,10 @@ Alexander Nalobin <nalobin@reg.ru>
 =item *
 
 Olaf Alders <olaf@wundersolutions.com>
+
+=item *
+
+Paul Cochrane <paul@liekut.de>
 
 =item *
 

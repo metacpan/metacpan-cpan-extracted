@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "I bik\N{U+025b}\N{U+0302}gl\N{U+00e0}",
-    "I \N{U+0253}ugaj\N{U+0254}p"
+    "I \N{U+0253}ugaj\N{U+0254}p",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "E d",
@@ -44,7 +49,7 @@
     yMd => "d/M/y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "bas-CM",
   date_format_full => "EEEE d MMMM y",
@@ -62,7 +67,7 @@
     "mb\N{U+0254}",
     "k\N{U+0254}\N{U+0254}",
     "jon",
-    "n\N{U+0254}y"
+    "n\N{U+0254}y",
   ],
   day_format_narrow => [
     "n",
@@ -71,7 +76,7 @@
     "m",
     "k",
     "j",
-    "n"
+    "n",
   ],
   day_format_wide => [
     "\N{U+014b}gw\N{U+00e0} nja\N{U+014b}gumba",
@@ -80,7 +85,7 @@
     "\N{U+014b}gw\N{U+00e0} mb\N{U+0254}k",
     "\N{U+014b}gw\N{U+00e0} k\N{U+0254}\N{U+0254}",
     "\N{U+014b}gw\N{U+00e0} j\N{U+00f4}n",
-    "\N{U+014b}gw\N{U+00e0} n\N{U+0254}\N{U+0302}y"
+    "\N{U+014b}gw\N{U+00e0} n\N{U+0254}\N{U+0302}y",
   ],
   day_stand_alone_abbreviated => [
     "nja",
@@ -89,7 +94,7 @@
     "mb\N{U+0254}",
     "k\N{U+0254}\N{U+0254}",
     "jon",
-    "n\N{U+0254}y"
+    "n\N{U+0254}y",
   ],
   day_stand_alone_narrow => [
     "n",
@@ -98,7 +103,7 @@
     "m",
     "k",
     "j",
-    "n"
+    "n",
   ],
   day_stand_alone_wide => [
     "\N{U+014b}gw\N{U+00e0} nja\N{U+014b}gumba",
@@ -107,19 +112,19 @@
     "\N{U+014b}gw\N{U+00e0} mb\N{U+0254}k",
     "\N{U+014b}gw\N{U+00e0} k\N{U+0254}\N{U+0254}",
     "\N{U+014b}gw\N{U+00e0} j\N{U+00f4}n",
-    "\N{U+014b}gw\N{U+00e0} n\N{U+0254}\N{U+0302}y"
+    "\N{U+014b}gw\N{U+00e0} n\N{U+0254}\N{U+0302}y",
   ],
   era_abbreviated => [
     "b.Y.K",
-    "m.Y.K"
+    "m.Y.K",
   ],
   era_narrow => [
     "b.Y.K",
-    "m.Y.K"
+    "m.Y.K",
   ],
   era_wide => [
     "bis\N{U+016b} bi Yes\N{U+00f9} Kr\N{U+01d0}st\N{U+00f2}",
-    "i mb\N{U+016b}s Yes\N{U+00f9} Kr\N{U+01d0}st\N{U+00f2}"
+    "i mb\N{U+016b}s Yes\N{U+00f9} Kr\N{U+01d0}st\N{U+00f2}",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -140,7 +145,7 @@
     "dip",
     "bio",
     "may",
-    "li\N{U+0253}"
+    "li\N{U+0253}",
   ],
   month_format_narrow => [
     "k",
@@ -154,7 +159,7 @@
     "d",
     "b",
     "m",
-    "l"
+    "l",
   ],
   month_format_wide => [
     "K\N{U+0254}nd\N{U+0254}\N{U+014b}",
@@ -168,7 +173,7 @@
     "D\N{U+00ec}p\N{U+0254}\N{U+0300}s",
     "B\N{U+00ec}\N{U+00f2}\N{U+00f4}m",
     "M\N{U+00e0}y\N{U+025b}s\N{U+00e8}p",
-    "L\N{U+00ec}buy li \N{U+0144}y\N{U+00e8}e"
+    "L\N{U+00ec}buy li \N{U+0144}y\N{U+00e8}e",
   ],
   month_stand_alone_abbreviated => [
     "k\N{U+0254}n",
@@ -182,7 +187,7 @@
     "dip",
     "bio",
     "may",
-    "li\N{U+0253}"
+    "li\N{U+0253}",
   ],
   month_stand_alone_narrow => [
     "k",
@@ -196,7 +201,7 @@
     "d",
     "b",
     "m",
-    "l"
+    "l",
   ],
   month_stand_alone_wide => [
     "K\N{U+0254}nd\N{U+0254}\N{U+014b}",
@@ -210,7 +215,7 @@
     "D\N{U+00ec}p\N{U+0254}\N{U+0300}s",
     "B\N{U+00ec}\N{U+00f2}\N{U+00f4}m",
     "M\N{U+00e0}y\N{U+025b}s\N{U+00e8}p",
-    "L\N{U+00ec}buy li \N{U+0144}y\N{U+00e8}e"
+    "L\N{U+00ec}buy li \N{U+0144}y\N{U+00e8}e",
   ],
   name => "Basaa Cameroon",
   native_language => "\N{U+0181}\N{U+00e0}s\N{U+00e0}a",
@@ -222,37 +227,37 @@
     "K1s3",
     "K2s3",
     "K3s3",
-    "K4s3"
+    "K4s3",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "K\N{U+00e8}k bisu i so\N{U+014b} ia\N{U+00e2}",
     "K\N{U+00e8}k i \N{U+0144}yonos bi\N{U+0253}a\N{U+00e0} i so\N{U+014b} ia\N{U+00e2}",
     "K\N{U+00e8}k i \N{U+0144}yonos bia\N{U+00e2} i so\N{U+014b} ia\N{U+00e2}",
-    "K\N{U+00e8}k i \N{U+0144}yonos bin\N{U+00e2} i so\N{U+014b} ia\N{U+00e2}"
+    "K\N{U+00e8}k i \N{U+0144}yonos bin\N{U+00e2} i so\N{U+014b} ia\N{U+00e2}",
   ],
   quarter_stand_alone_abbreviated => [
     "K1s3",
     "K2s3",
     "K3s3",
-    "K4s3"
+    "K4s3",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "K\N{U+00e8}k bisu i so\N{U+014b} ia\N{U+00e2}",
     "K\N{U+00e8}k i \N{U+0144}yonos bi\N{U+0253}a\N{U+00e0} i so\N{U+014b} ia\N{U+00e2}",
     "K\N{U+00e8}k i \N{U+0144}yonos bia\N{U+00e2} i so\N{U+014b} ia\N{U+00e2}",
-    "K\N{U+00e8}k i \N{U+0144}yonos bin\N{U+00e2} i so\N{U+014b} ia\N{U+00e2}"
+    "K\N{U+00e8}k i \N{U+0144}yonos bin\N{U+00e2} i so\N{U+014b} ia\N{U+00e2}",
   ],
   script => undef,
   territory => "Cameroon",
@@ -261,5 +266,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

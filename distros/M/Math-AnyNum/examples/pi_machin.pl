@@ -55,8 +55,8 @@ for (my $x = 5 ; $x < 5000 ; $x += 4) {
 
     if ($p2 % 20 == 1) {
         my $g = gcd($ds, $ns);
-        $ds /= $g;
-        $ns /= $g;
+        $ds = idiv($ds, $g);
+        $ns = idiv($ns, $g);
     }
 }
 

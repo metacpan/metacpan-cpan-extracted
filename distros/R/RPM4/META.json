@@ -6,7 +6,7 @@
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "gpl_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -27,7 +27,10 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::Depends" : "0",
+            "ExtUtils::MakeMaker" : "6.64",
+            "ExtUtils::PkgConfig" : "0",
+            "Getopt::Long" : "0"
          }
       },
       "runtime" : {
@@ -37,11 +40,19 @@
             "DynaLoader" : "0",
             "Exporter" : "0",
             "File::Temp" : "0",
-            "MDV::Packdrakeng" : "0"
+            "MDV::Packdrakeng" : "0",
+            "perl" : "5.008001"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.37",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://git.mageia.org/software/rpm/perl-RPM4/",
+         "web" : "http://gitweb.mageia.org/software/rpm/perl-RPM4/"
+      }
+   },
+   "version" : "0.38",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

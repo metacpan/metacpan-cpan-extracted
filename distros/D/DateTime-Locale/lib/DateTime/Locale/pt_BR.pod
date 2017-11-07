@@ -327,11 +327,41 @@ Portuguese Brazil locale.
 
 =head2 Available Formats
 
+=head3 Bh (h B)
+
+   2008-02-05T18:30:30 = 6 B
+   1995-12-22T09:05:02 = 9 B
+  -0010-09-15T04:44:23 = 4 B
+
+=head3 Bhm (h:mm B)
+
+   2008-02-05T18:30:30 = 6:30 B
+   1995-12-22T09:05:02 = 9:05 B
+  -0010-09-15T04:44:23 = 4:44 B
+
+=head3 Bhms (h:mm:ss B)
+
+   2008-02-05T18:30:30 = 6:30:30 B
+   1995-12-22T09:05:02 = 9:05:02 B
+  -0010-09-15T04:44:23 = 4:44:23 B
+
 =head3 E (ccc)
 
    2008-02-05T18:30:30 = ter
    1995-12-22T09:05:02 = sex
   -0010-09-15T04:44:23 = sáb
+
+=head3 EBhm (E h:mm B)
+
+   2008-02-05T18:30:30 = ter 6:30 B
+   1995-12-22T09:05:02 = sex 9:05 B
+  -0010-09-15T04:44:23 = sáb 4:44 B
+
+=head3 EBhms (E h:mm:ss B)
+
+   2008-02-05T18:30:30 = ter 6:30:30 B
+   1995-12-22T09:05:02 = sex 9:05:02 B
+  -0010-09-15T04:44:23 = sáb 4:44:23 B
 
 =head3 EHm (E, HH:mm)
 
@@ -447,11 +477,11 @@ Portuguese Brazil locale.
    1995-12-22T09:05:02 = sex, 22 de dezembro
   -0010-09-15T04:44:23 = sáb, 15 de setembro
 
-=head3 MMMMW-count-one (W'ª' 'semana' 'de' MMM)
+=head3 MMMMW-count-one (W'ª' 'semana' 'de' MMMM)
 
-   2008-02-05T18:30:30 = 1ª semana de fev
-   1995-12-22T09:05:02 = 3ª semana de dez
-  -0010-09-15T04:44:23 = 2ª semana de set
+   2008-02-05T18:30:30 = 1ª semana de fevereiro
+   1995-12-22T09:05:02 = 3ª semana de dezembro
+  -0010-09-15T04:44:23 = 2ª semana de setembro
 
 =head3 MMMMW-count-other (W'ª' 'semana' 'de' MMMM)
 
@@ -603,13 +633,13 @@ Portuguese Brazil locale.
    1995-12-22T09:05:02 = 4º trimestre de 1995
   -0010-09-15T04:44:23 = 3º trimestre de -10
 
-=head3 yw-count-one (w'ª' 'semana' 'de' y)
+=head3 yw-count-one (w'ª' 'semana' 'de' Y)
 
    2008-02-05T18:30:30 = 6ª semana de 2008
    1995-12-22T09:05:02 = 51ª semana de 1995
   -0010-09-15T04:44:23 = 37ª semana de -10
 
-=head3 yw-count-other (w'ª' 'semana' 'de' y)
+=head3 yw-count-other (w'ª' 'semana' 'de' Y)
 
    2008-02-05T18:30:30 = 6ª semana de 2008
    1995-12-22T09:05:02 = 51ª semana de 1995

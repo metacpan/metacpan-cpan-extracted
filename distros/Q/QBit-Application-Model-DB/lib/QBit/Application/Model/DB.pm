@@ -1,10 +1,10 @@
 
 =head1 Name
- 
+
 QBit::Application::Model::DB - base class for DB.
- 
+
 =head1 Description
- 
+
 Base class for working with databases.
 
 =head1 GitHub
@@ -14,7 +14,7 @@ https://github.com/QBitFramework/QBit-Application-Model-DB
 =head1 Install
 
 =over
- 
+
 =item *
 
 cpanm QBit::Application::Model::DB
@@ -24,19 +24,21 @@ cpanm QBit::Application::Model::DB
 apt-get install libqbit-application-model-db-perl (http://perlhub.ru/)
 
 =back
- 
+
 =cut
 
 package QBit::Application::Model::DB;
-$QBit::Application::Model::DB::VERSION = '0.022';
+$QBit::Application::Model::DB::VERSION = '0.023';
 use qbit;
 
 use base qw(QBit::Application::Model);
 
 use Exception::DB;
 use Exception::DB::DuplicateEntry;
+use Exception::DB::TimeOut;
 
 use DBI;
+use Sys::SigAction;
 
 =head1 Debug
 
@@ -47,51 +49,70 @@ use DBI;
 our $DEBUG = FALSE;
 
 =head1 Abstract methods
- 
+
 =over
- 
+
 =item *
- 
+
 B<query>
 
 =item *
- 
+
+B<get_query_id>
+
+=item *
+
 B<filter>
 
 =item *
- 
+
 B<_get_table_object>
 
 =item *
- 
+
 B<_create_sql_db>
 
 =item *
- 
+
 B<_connect>
 
 =item *
- 
+
 B<_is_connection_error>
- 
+
 =back
- 
+
 =cut
 
-__PACKAGE__->abstract_methods(qw(query filter _get_table_object _create_sql_db _connect _is_connection_error));
+__PACKAGE__->abstract_methods(
+    qw(query filter get_query_id _get_table_object _create_sql_db _connect _is_connection_error));
+
+=head1 Accessors
+
+=over
+
+=item *
+
+B<select_timeout> - timeout for select statement
+
+=back
+
+=cut
+
+__PACKAGE__->mk_accessors(qw(select_timeout));
 
 =head1 Package methods
- 
+
 =head2 meta
- 
+
 B<Arguments:>
- 
+
 =over
- 
+
 =item
- 
+
 B<%meta> - meta information about database
- 
+
 =back
 
 B<Example:>
@@ -101,7 +122,7 @@ B<Example:>
   use qbit;
 
   use base qw(QBit::Application::Model::DB);
-  
+
   my $meta = {
       tables => {
           users => {
@@ -113,7 +134,7 @@ B<Example:>
               primary_key => [qw(id)],
               indexes     => [{fields => [qw(login)], unique => 1},],
           },
-       
+
           fio => {
               fields => [
                   {name => 'user_id'},
@@ -127,7 +148,7 @@ B<Example:>
   };
 
   __PACKAGE__->meta($meta);
-  
+
 in Appplication.pm
 
   use Test::DB accessor => 'db';
@@ -147,13 +168,13 @@ sub meta {
 }
 
 =head2 get_all_meta
- 
+
 B<Arguments:>
 
 =over
- 
+
 =item
- 
+
 B<$package> - package object or name (optional)
 
 =back
@@ -191,11 +212,11 @@ sub get_all_meta {
 }
 
 =head2 init
- 
+
 B<No arguments.>
- 
+
 Method called from L</new> before return object.
- 
+
 =cut
 
 sub init {
@@ -223,13 +244,14 @@ sub init {
         $self->{'__TABLE_TREE_LEVEL__'}{$_} = $self->_table_tree_level(\%tables, $_, 0) foreach keys(%tables);
         $self->{'__TABLES__'} = {};
 
+        my $class = ref($self);
+
         foreach my $table_name ($self->_sorted_tables(keys(%tables))) {
             throw gettext('Cannot create table object, "%s" is reserved', $table_name)
               if $self->can($table_name);
             {
                 no strict 'refs';
-                my $db_self = $self;
-                *{__PACKAGE__ . "::$table_name"} = sub {
+                *{"$class::$table_name"} = sub {
                     my ($self) = @_;
 
                     $self->{'__TABLES__'}{$table_name} = $tables{$table_name}->{'class'}->new(
@@ -315,13 +337,13 @@ sub dbh {
 }
 
 =head2 quote
- 
+
 B<Arguments:>
 
 =over
- 
+
 =item
- 
+
 B<$name> - string
 
 =back
@@ -357,13 +379,13 @@ sub quote {
 }
 
 =head2 quote_identifier
- 
+
 B<Arguments:>
 
 =over
- 
+
 =item
- 
+
 B<$name> - string
 
 =back
@@ -399,7 +421,7 @@ sub quote_identifier {
 }
 
 =head2 begin
- 
+
 B<No arguments.>
 
 start a new transaction or create new savepoint
@@ -421,7 +443,7 @@ sub begin {
 }
 
 =head2 commit
- 
+
 B<No arguments.>
 
 commits the current transaction or release savepoint
@@ -441,7 +463,7 @@ sub commit {
 }
 
 =head2 rollback
- 
+
 B<No arguments.>
 
 rolls back the current transaction or savepoint
@@ -462,13 +484,13 @@ sub rollback {
 }
 
 =head2 transaction
- 
+
 B<Arguments:>
 
 =over
- 
+
 =item
- 
+
 B<$sub> - reference to sub
 
 =back
@@ -504,6 +526,42 @@ sub transaction {
     $self->commit();
 }
 
+=head2 kill_query
+
+B<Arguments:>
+
+=over
+
+=item
+
+B<$query_id> - number (ID query)
+
+=back
+
+B<Return values:>
+
+=over
+
+=item
+
+B<$res> - Returns the number of rows affected or undef on error.
+
+A return value of -1 means the number of rows is not known, not applicable, or not available.
+
+=back
+
+B<Example:>
+
+  my $res = $app->db->kill_query(35); #SQL: KILL QUERY 35;
+
+=cut
+
+sub kill_query {
+    my ($self, $query_id) = @_;
+
+    $self->_do("KILL QUERY $query_id");
+}
+
 sub _get_list_tables {
     my ($self, @tables) = @_;
 
@@ -521,13 +579,13 @@ sub _get_list_tables {
 }
 
 =head2 create_sql
- 
+
 B<Arguments:>
 
 =over
- 
+
 =item
- 
+
 B<@tables> - table names (optional)
 
 =back
@@ -561,13 +619,13 @@ sub create_sql {
 }
 
 =head2 init_db
- 
+
 B<Arguments:>
 
 =over
- 
+
 =item
- 
+
 B<@tables> - table names (optional)
 
 =back
@@ -587,7 +645,7 @@ sub init_db {
 }
 
 =head2 finish
- 
+
 B<No arguments.>
 
 Check that transaction closed
@@ -640,6 +698,22 @@ sub _get_all {
         sub {
             my ($self, $sql, @params) = @_;
 
+            my $TimeOut = Sys::SigAction::set_sig_handler(
+                'ALRM',
+                sub {
+                    my $q_id = $self->get_query_id();
+
+                    #for reconnect
+                    $self->set_dbh();
+
+                    $self->kill_query($q_id);
+
+                    throw Exception::DB::TimeOut gettext("Timeout for sql:\n%s", $self->_log_sql($sql, \@params));
+                }
+            );
+
+            alarm($self->select_timeout // 0);
+
             my $err_code;
             $self->timelog->start(gettext('DBH prepare'));
             my $sth = $self->dbh->prepare($sql)
@@ -669,6 +743,8 @@ sub _get_all {
               && throw Exception::DB $sth->errstr() . " ($err_code)\n" . $self->_log_sql($sql, \@params),
               errorcode => $err_code;
             $self->timelog->finish();
+
+            alarm(0);
 
             return $data;
         },
@@ -761,19 +837,19 @@ sub _sub_with_connected_dbh {
 TRUE;
 
 =head1 Internal packages
- 
+
 =over
- 
+
 =item B<L<QBit::Application::Model::DB::Class>> - base class for DB modules;
- 
+
 =item B<L<QBit::Application::Model::DB::Field>> - base class for DB fields;
- 
+
 =item B<L<QBit::Application::Model::DB::Filter>> - base class for DB filters;
- 
+
 =item B<L<QBit::Application::Model::DB::Query>> - base class for DB queries;
- 
+
 =item B<L<QBit::Application::Model::DB::Table>> - base class for DB tables;
- 
+
 =item B<L<QBit::Application::Model::DB::VirtualTable>> - base class for DB virtual tables;
- 
+
 =back

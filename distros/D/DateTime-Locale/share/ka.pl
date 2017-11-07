@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "AM",
-    "PM"
+    "PM",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E, HH:mm",
     EHms => "E, HH:mm:ss",
     Ed => "d E",
@@ -45,8 +50,8 @@
     yMd => "d.M.y",
     yQQQ => "QQQ, y",
     yQQQQ => "QQQQ, y",
-    "yw-count-one" => "\N{U+10d9}\N{U+10d5}\N{U+10d8}\N{U+10e0}\N{U+10d0} w, y",
-    "yw-count-other" => "\N{U+10d9}\N{U+10d5}\N{U+10d8}\N{U+10e0}\N{U+10d0} w, y"
+    "yw-count-one" => "\N{U+10d9}\N{U+10d5}\N{U+10d8}\N{U+10e0}\N{U+10d0} w, Y",
+    "yw-count-other" => "\N{U+10d9}\N{U+10d5}\N{U+10d8}\N{U+10e0}\N{U+10d0} w, Y",
   },
   code => "ka",
   date_format_full => "EEEE, dd MMMM, y",
@@ -64,7 +69,7 @@
     "\N{U+10ee}\N{U+10e3}\N{U+10d7}",
     "\N{U+10de}\N{U+10d0}\N{U+10e0}",
     "\N{U+10e8}\N{U+10d0}\N{U+10d1}",
-    "\N{U+10d9}\N{U+10d5}\N{U+10d8}"
+    "\N{U+10d9}\N{U+10d5}\N{U+10d8}",
   ],
   day_format_narrow => [
     "\N{U+10dd}",
@@ -73,7 +78,7 @@
     "\N{U+10ee}",
     "\N{U+10de}",
     "\N{U+10e8}",
-    "\N{U+10d9}"
+    "\N{U+10d9}",
   ],
   day_format_wide => [
     "\N{U+10dd}\N{U+10e0}\N{U+10e8}\N{U+10d0}\N{U+10d1}\N{U+10d0}\N{U+10d7}\N{U+10d8}",
@@ -82,7 +87,7 @@
     "\N{U+10ee}\N{U+10e3}\N{U+10d7}\N{U+10e8}\N{U+10d0}\N{U+10d1}\N{U+10d0}\N{U+10d7}\N{U+10d8}",
     "\N{U+10de}\N{U+10d0}\N{U+10e0}\N{U+10d0}\N{U+10e1}\N{U+10d9}\N{U+10d4}\N{U+10d5}\N{U+10d8}",
     "\N{U+10e8}\N{U+10d0}\N{U+10d1}\N{U+10d0}\N{U+10d7}\N{U+10d8}",
-    "\N{U+10d9}\N{U+10d5}\N{U+10d8}\N{U+10e0}\N{U+10d0}"
+    "\N{U+10d9}\N{U+10d5}\N{U+10d8}\N{U+10e0}\N{U+10d0}",
   ],
   day_stand_alone_abbreviated => [
     "\N{U+10dd}\N{U+10e0}\N{U+10e8}",
@@ -91,7 +96,7 @@
     "\N{U+10ee}\N{U+10e3}\N{U+10d7}",
     "\N{U+10de}\N{U+10d0}\N{U+10e0}",
     "\N{U+10e8}\N{U+10d0}\N{U+10d1}",
-    "\N{U+10d9}\N{U+10d5}\N{U+10d8}"
+    "\N{U+10d9}\N{U+10d5}\N{U+10d8}",
   ],
   day_stand_alone_narrow => [
     "\N{U+10dd}",
@@ -100,7 +105,7 @@
     "\N{U+10ee}",
     "\N{U+10de}",
     "\N{U+10e8}",
-    "\N{U+10d9}"
+    "\N{U+10d9}",
   ],
   day_stand_alone_wide => [
     "\N{U+10dd}\N{U+10e0}\N{U+10e8}\N{U+10d0}\N{U+10d1}\N{U+10d0}\N{U+10d7}\N{U+10d8}",
@@ -109,19 +114,19 @@
     "\N{U+10ee}\N{U+10e3}\N{U+10d7}\N{U+10e8}\N{U+10d0}\N{U+10d1}\N{U+10d0}\N{U+10d7}\N{U+10d8}",
     "\N{U+10de}\N{U+10d0}\N{U+10e0}\N{U+10d0}\N{U+10e1}\N{U+10d9}\N{U+10d4}\N{U+10d5}\N{U+10d8}",
     "\N{U+10e8}\N{U+10d0}\N{U+10d1}\N{U+10d0}\N{U+10d7}\N{U+10d8}",
-    "\N{U+10d9}\N{U+10d5}\N{U+10d8}\N{U+10e0}\N{U+10d0}"
+    "\N{U+10d9}\N{U+10d5}\N{U+10d8}\N{U+10e0}\N{U+10d0}",
   ],
   era_abbreviated => [
     "\N{U+10eb}\N{U+10d5}. \N{U+10ec}.",
-    "\N{U+10d0}\N{U+10ee}. \N{U+10ec}."
+    "\N{U+10d0}\N{U+10ee}. \N{U+10ec}.",
   ],
   era_narrow => [
     "\N{U+10eb}\N{U+10d5}. \N{U+10ec}.",
-    "\N{U+10d0}\N{U+10ee}. \N{U+10ec}."
+    "\N{U+10d0}\N{U+10ee}. \N{U+10ec}.",
   ],
   era_wide => [
     "\N{U+10eb}\N{U+10d5}\N{U+10d4}\N{U+10da}\N{U+10d8} \N{U+10ec}\N{U+10d4}\N{U+10da}\N{U+10d7}\N{U+10d0}\N{U+10e6}\N{U+10e0}\N{U+10d8}\N{U+10ea}\N{U+10ee}\N{U+10d5}\N{U+10d8}\N{U+10d7}",
-    "\N{U+10d0}\N{U+10ee}\N{U+10d0}\N{U+10da}\N{U+10d8} \N{U+10ec}\N{U+10d4}\N{U+10da}\N{U+10d7}\N{U+10d0}\N{U+10e6}\N{U+10e0}\N{U+10d8}\N{U+10ea}\N{U+10ee}\N{U+10d5}\N{U+10d8}\N{U+10d7}"
+    "\N{U+10d0}\N{U+10ee}\N{U+10d0}\N{U+10da}\N{U+10d8} \N{U+10ec}\N{U+10d4}\N{U+10da}\N{U+10d7}\N{U+10d0}\N{U+10e6}\N{U+10e0}\N{U+10d8}\N{U+10ea}\N{U+10ee}\N{U+10d5}\N{U+10d8}\N{U+10d7}",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -142,7 +147,7 @@
     "\N{U+10e1}\N{U+10d4}\N{U+10e5}",
     "\N{U+10dd}\N{U+10e5}\N{U+10e2}",
     "\N{U+10dc}\N{U+10dd}\N{U+10d4}",
-    "\N{U+10d3}\N{U+10d4}\N{U+10d9}"
+    "\N{U+10d3}\N{U+10d4}\N{U+10d9}",
   ],
   month_format_narrow => [
     "\N{U+10d8}",
@@ -156,7 +161,7 @@
     "\N{U+10e1}",
     "\N{U+10dd}",
     "\N{U+10dc}",
-    "\N{U+10d3}"
+    "\N{U+10d3}",
   ],
   month_format_wide => [
     "\N{U+10d8}\N{U+10d0}\N{U+10dc}\N{U+10d5}\N{U+10d0}\N{U+10e0}\N{U+10d8}",
@@ -170,7 +175,7 @@
     "\N{U+10e1}\N{U+10d4}\N{U+10e5}\N{U+10e2}\N{U+10d4}\N{U+10db}\N{U+10d1}\N{U+10d4}\N{U+10e0}\N{U+10d8}",
     "\N{U+10dd}\N{U+10e5}\N{U+10e2}\N{U+10dd}\N{U+10db}\N{U+10d1}\N{U+10d4}\N{U+10e0}\N{U+10d8}",
     "\N{U+10dc}\N{U+10dd}\N{U+10d4}\N{U+10db}\N{U+10d1}\N{U+10d4}\N{U+10e0}\N{U+10d8}",
-    "\N{U+10d3}\N{U+10d4}\N{U+10d9}\N{U+10d4}\N{U+10db}\N{U+10d1}\N{U+10d4}\N{U+10e0}\N{U+10d8}"
+    "\N{U+10d3}\N{U+10d4}\N{U+10d9}\N{U+10d4}\N{U+10db}\N{U+10d1}\N{U+10d4}\N{U+10e0}\N{U+10d8}",
   ],
   month_stand_alone_abbreviated => [
     "\N{U+10d8}\N{U+10d0}\N{U+10dc}",
@@ -184,7 +189,7 @@
     "\N{U+10e1}\N{U+10d4}\N{U+10e5}",
     "\N{U+10dd}\N{U+10e5}\N{U+10e2}",
     "\N{U+10dc}\N{U+10dd}\N{U+10d4}",
-    "\N{U+10d3}\N{U+10d4}\N{U+10d9}"
+    "\N{U+10d3}\N{U+10d4}\N{U+10d9}",
   ],
   month_stand_alone_narrow => [
     "\N{U+10d8}",
@@ -198,7 +203,7 @@
     "\N{U+10e1}",
     "\N{U+10dd}",
     "\N{U+10dc}",
-    "\N{U+10d3}"
+    "\N{U+10d3}",
   ],
   month_stand_alone_wide => [
     "\N{U+10d8}\N{U+10d0}\N{U+10dc}\N{U+10d5}\N{U+10d0}\N{U+10e0}\N{U+10d8}",
@@ -212,7 +217,7 @@
     "\N{U+10e1}\N{U+10d4}\N{U+10e5}\N{U+10e2}\N{U+10d4}\N{U+10db}\N{U+10d1}\N{U+10d4}\N{U+10e0}\N{U+10d8}",
     "\N{U+10dd}\N{U+10e5}\N{U+10e2}\N{U+10dd}\N{U+10db}\N{U+10d1}\N{U+10d4}\N{U+10e0}\N{U+10d8}",
     "\N{U+10dc}\N{U+10dd}\N{U+10d4}\N{U+10db}\N{U+10d1}\N{U+10d4}\N{U+10e0}\N{U+10d8}",
-    "\N{U+10d3}\N{U+10d4}\N{U+10d9}\N{U+10d4}\N{U+10db}\N{U+10d1}\N{U+10d4}\N{U+10e0}\N{U+10d8}"
+    "\N{U+10d3}\N{U+10d4}\N{U+10d9}\N{U+10d4}\N{U+10db}\N{U+10d1}\N{U+10d4}\N{U+10e0}\N{U+10d8}",
   ],
   name => "Georgian",
   native_language => "\N{U+10e5}\N{U+10d0}\N{U+10e0}\N{U+10d7}\N{U+10e3}\N{U+10da}\N{U+10d8}",
@@ -224,37 +229,37 @@
     "I \N{U+10d9}\N{U+10d5}.",
     "II \N{U+10d9}\N{U+10d5}.",
     "III \N{U+10d9}\N{U+10d5}.",
-    "IV \N{U+10d9}\N{U+10d5}."
+    "IV \N{U+10d9}\N{U+10d5}.",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "I \N{U+10d9}\N{U+10d5}\N{U+10d0}\N{U+10e0}\N{U+10e2}\N{U+10d0}\N{U+10da}\N{U+10d8}",
     "II \N{U+10d9}\N{U+10d5}\N{U+10d0}\N{U+10e0}\N{U+10e2}\N{U+10d0}\N{U+10da}\N{U+10d8}",
     "III \N{U+10d9}\N{U+10d5}\N{U+10d0}\N{U+10e0}\N{U+10e2}\N{U+10d0}\N{U+10da}\N{U+10d8}",
-    "IV \N{U+10d9}\N{U+10d5}\N{U+10d0}\N{U+10e0}\N{U+10e2}\N{U+10d0}\N{U+10da}\N{U+10d8}"
+    "IV \N{U+10d9}\N{U+10d5}\N{U+10d0}\N{U+10e0}\N{U+10e2}\N{U+10d0}\N{U+10da}\N{U+10d8}",
   ],
   quarter_stand_alone_abbreviated => [
     "I \N{U+10d9}\N{U+10d5}.",
     "II \N{U+10d9}\N{U+10d5}.",
     "III \N{U+10d9}\N{U+10d5}.",
-    "IV \N{U+10d9}\N{U+10d5}."
+    "IV \N{U+10d9}\N{U+10d5}.",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "I \N{U+10d9}\N{U+10d5}\N{U+10d0}\N{U+10e0}\N{U+10e2}\N{U+10d0}\N{U+10da}\N{U+10d8}",
     "II \N{U+10d9}\N{U+10d5}\N{U+10d0}\N{U+10e0}\N{U+10e2}\N{U+10d0}\N{U+10da}\N{U+10d8}",
     "III \N{U+10d9}\N{U+10d5}\N{U+10d0}\N{U+10e0}\N{U+10e2}\N{U+10d0}\N{U+10da}\N{U+10d8}",
-    "IV \N{U+10d9}\N{U+10d5}\N{U+10d0}\N{U+10e0}\N{U+10e2}\N{U+10d0}\N{U+10da}\N{U+10d8}"
+    "IV \N{U+10d9}\N{U+10d5}\N{U+10d0}\N{U+10e0}\N{U+10e2}\N{U+10d0}\N{U+10da}\N{U+10d8}",
   ],
   script => undef,
   territory => undef,
@@ -263,5 +268,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

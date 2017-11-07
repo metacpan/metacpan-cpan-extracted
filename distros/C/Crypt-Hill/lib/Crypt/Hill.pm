@@ -1,6 +1,6 @@
 package Crypt::Hill;
 
-$Crypt::Hill::VERSION   = '0.10';
+$Crypt::Hill::VERSION   = '0.11';
 $Crypt::Hill::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Crypt::Hill - Interface to the Hill cipher (2x2).
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 
@@ -25,7 +25,7 @@ use Crypt::Hill::Utils qw(
 );
 
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 
 my $CHARSETS   = ['A'..'Z'];
 my $KEY_LENGTH = 4;

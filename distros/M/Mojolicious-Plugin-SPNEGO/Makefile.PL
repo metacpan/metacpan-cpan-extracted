@@ -17,8 +17,8 @@ WriteMakefile(
     'Net::LDAP::SPNEGO' => '0.1.4',
     'Mojolicious' => '7.01',
   },
-  TEST_REQUIRES => {
-  },
+  # TEST_REQUIRES => {
+  # },
   BUILD_REQUIRES => {
     'Pod::Markdown::Github' => '0.01',
     'CPAN::Uploader' => 0,
@@ -46,7 +46,7 @@ sub MY::postamble {
 all:: README.md README
 
 README.md: $self->{VERSION_FROM}
-	\$(PERL) -I$tpd/lib/perl5 -MPod::Markdown::Github -e 'binmode(STDOUT, ":utf8");Pod::Markdown::Github->new->filter(q{$self->{VERSION_FROM}})' > README.md
+	\$(PERL) -I$tpd/lib/perl5 -MPod::Markdown::Github -e "binmode(STDOUT, q(:utf8));Pod::Markdown::Github->new->filter(q($self->{VERSION_FROM}))" > README.md
 
 README: README.md
 	cp README.md README

@@ -114,9 +114,12 @@ cast %Hlagh::, $wiz;
  eval q{ Hlagh->shoot() };
 
  is $@, '', 'stash: valid method call ran fine';
- is_deeply \%mg, {
-  fetch => [ qw<shoot> ],
- }, 'stash: valid method call';
+ my %expected = ( fetch => [ qw<shoot> ] );
+ # Typeglob reification may cause a store in 5.28+
+ if ("$]" >= 5.027 && %mg == 2) {
+  $expected{store} = $expected{fetch};
+ }
+ is_deeply \%mg, \%expected, 'stash: valid method call';
 }
 
 {

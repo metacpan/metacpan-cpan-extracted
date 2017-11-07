@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "a. m.",
-    "p. m."
+    "p. m.",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E H:mm",
     EHms => "E H:mm:ss",
     Ed => "E d",
@@ -18,10 +23,10 @@
     GyMMMMd => "d MMMM 'de' y G",
     GyMMMd => "d MMM 'de' y G",
     H => "H",
-    Hm => "HH:mm",
-    Hms => "HH:mm:ss",
-    Hmsv => "HH:mm:ss v",
-    Hmv => "HH:mm v",
+    Hm => "H:mm",
+    Hms => "H:mm:ss",
+    Hmsv => "H:mm:ss v",
+    Hmv => "H:mm v",
     M => "L",
     MEd => "E d/M",
     MMM => "LLL",
@@ -47,12 +52,12 @@
     yMMMM => "LLLL 'de' y",
     yMMMMEd => "E, d MMMM 'de' y",
     yMMMMd => "d MMMM 'de' y",
-    yMMMd => "d LLL y",
+    yMMMd => "d MMM 'de' y",
     yMd => "d/M/y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-one" => "'setmana' w 'de' y",
-    "yw-count-other" => "'setmana' w 'de' y"
+    "yw-count-one" => "'setmana' w 'de' Y",
+    "yw-count-other" => "'setmana' w 'de' Y",
   },
   code => "ca",
   date_format_full => "EEEE, d MMMM 'de' y",
@@ -70,7 +75,7 @@
     "dj.",
     "dv.",
     "ds.",
-    "dg."
+    "dg.",
   ],
   day_format_narrow => [
     "dl",
@@ -79,7 +84,7 @@
     "dj",
     "dv",
     "ds",
-    "dg"
+    "dg",
   ],
   day_format_wide => [
     "dilluns",
@@ -88,7 +93,7 @@
     "dijous",
     "divendres",
     "dissabte",
-    "diumenge"
+    "diumenge",
   ],
   day_stand_alone_abbreviated => [
     "dl.",
@@ -97,7 +102,7 @@
     "dj.",
     "dv.",
     "ds.",
-    "dg."
+    "dg.",
   ],
   day_stand_alone_narrow => [
     "dl",
@@ -106,7 +111,7 @@
     "dj",
     "dv",
     "ds",
-    "dg"
+    "dg",
   ],
   day_stand_alone_wide => [
     "dilluns",
@@ -115,19 +120,19 @@
     "dijous",
     "divendres",
     "dissabte",
-    "diumenge"
+    "diumenge",
   ],
   era_abbreviated => [
     "aC",
-    "dC"
+    "dC",
   ],
   era_narrow => [
     "aC",
-    "dC"
+    "dC",
   ],
   era_wide => [
     "abans de Crist",
-    "despr\N{U+00e9}s de Crist"
+    "despr\N{U+00e9}s de Crist",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -148,7 +153,7 @@
     "de set.",
     "d\N{U+2019}oct.",
     "de nov.",
-    "de des."
+    "de des.",
   ],
   month_format_narrow => [
     "GN",
@@ -162,7 +167,7 @@
     "ST",
     "OC",
     "NV",
-    "DS"
+    "DS",
   ],
   month_format_wide => [
     "de gener",
@@ -176,7 +181,7 @@
     "de setembre",
     "d\N{U+2019}octubre",
     "de novembre",
-    "de desembre"
+    "de desembre",
   ],
   month_stand_alone_abbreviated => [
     "gen.",
@@ -190,7 +195,7 @@
     "set.",
     "oct.",
     "nov.",
-    "des."
+    "des.",
   ],
   month_stand_alone_narrow => [
     "GN",
@@ -204,7 +209,7 @@
     "ST",
     "OC",
     "NV",
-    "DS"
+    "DS",
   ],
   month_stand_alone_wide => [
     "gener",
@@ -218,7 +223,7 @@
     "setembre",
     "octubre",
     "novembre",
-    "desembre"
+    "desembre",
   ],
   name => "Catalan",
   native_language => "catal\N{U+00e0}",
@@ -230,37 +235,37 @@
     "1T",
     "2T",
     "3T",
-    "4T"
+    "4T",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "1r trimestre",
     "2n trimestre",
     "3r trimestre",
-    "4t trimestre"
+    "4t trimestre",
   ],
   quarter_stand_alone_abbreviated => [
     "1T",
     "2T",
     "3T",
-    "4T"
+    "4T",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "1r trimestre",
     "2n trimestre",
     "3r trimestre",
-    "4t trimestre"
+    "4t trimestre",
   ],
   script => undef,
   territory => undef,
@@ -269,5 +274,5 @@
   time_format_medium => "H:mm:ss",
   time_format_short => "H:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

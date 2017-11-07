@@ -4,7 +4,7 @@
       "Vincent Pit <perl@profvince.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.140640",
    "license" : [
       "perl_5"
    ],
@@ -56,5 +56,5 @@
          "url" : "http://git.profvince.com/?p=perl%2Fmodules%2FLinux-SysInfo.git"
       }
    },
-   "version" : "0.14"
+   "version" : "0.15"
 }

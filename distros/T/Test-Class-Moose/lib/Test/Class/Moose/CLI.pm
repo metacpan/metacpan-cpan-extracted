@@ -4,7 +4,7 @@ package Test::Class::Moose::CLI;
 
 use 5.10.0;
 
-our $VERSION = '0.87';
+our $VERSION = '0.88';
 
 use Moose 2.0000;
 use Carp;
@@ -28,7 +28,7 @@ Test::Class::Moose::CLI - Use this in your tcm.t script for a drop-in runner too
 
 =head1 VERSION
 
-version 0.87
+version 0.88
 
 =head1 SYNOPSIS
 

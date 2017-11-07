@@ -5,10 +5,13 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::Depends: '0'
+  ExtUtils::MakeMaker: '6.64'
+  ExtUtils::PkgConfig: '0'
+  Getopt::Long: '0'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
-license: unknown
+license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -24,5 +27,8 @@ requires:
   Exporter: '0'
   File::Temp: '0'
   MDV::Packdrakeng: '0'
-version: '0.37'
+  perl: '5.008001'
+resources:
+  repository: git://git.mageia.org/software/rpm/perl-RPM4/
+version: '0.38'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

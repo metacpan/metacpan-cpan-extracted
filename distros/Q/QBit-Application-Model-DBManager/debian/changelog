@@ -1,3 +1,9 @@
+libqbit-application-model-dbmanager-perl (0.018) raring; urgency=low
+
+  * use '*' as all fields
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sat, 04 Nov 2017 21:21:08 +0300
+
 libqbit-application-model-dbmanager-perl (0.017) raring; urgency=low
 
   * all_locales and process fields in new

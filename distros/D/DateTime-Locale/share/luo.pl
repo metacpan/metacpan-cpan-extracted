@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "OD",
-    "OT"
+    "OT",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d, E",
@@ -45,7 +50,7 @@
     yMd => "y-MM-dd",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "luo",
   date_format_full => "EEEE, d MMMM y",
@@ -63,7 +68,7 @@
     "TAN",
     "TAB",
     "NGS",
-    "JMP"
+    "JMP",
   ],
   day_format_narrow => [
     "W",
@@ -72,7 +77,7 @@
     "T",
     "T",
     "N",
-    "J"
+    "J",
   ],
   day_format_wide => [
     "Wuok Tich",
@@ -81,7 +86,7 @@
     "Tich Ang\N{U+2019}wen",
     "Tich Abich",
     "Ngeso",
-    "Jumapil"
+    "Jumapil",
   ],
   day_stand_alone_abbreviated => [
     "WUT",
@@ -90,7 +95,7 @@
     "TAN",
     "TAB",
     "NGS",
-    "JMP"
+    "JMP",
   ],
   day_stand_alone_narrow => [
     "W",
@@ -99,7 +104,7 @@
     "T",
     "T",
     "N",
-    "J"
+    "J",
   ],
   day_stand_alone_wide => [
     "Wuok Tich",
@@ -108,19 +113,19 @@
     "Tich Ang\N{U+2019}wen",
     "Tich Abich",
     "Ngeso",
-    "Jumapil"
+    "Jumapil",
   ],
   era_abbreviated => [
     "BC",
-    "AD"
+    "AD",
   ],
   era_narrow => [
     "BC",
-    "AD"
+    "AD",
   ],
   era_wide => [
     "Kapok Kristo obiro",
-    "Ka Kristo osebiro"
+    "Ka Kristo osebiro",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -141,7 +146,7 @@
     "DOC",
     "DAP",
     "DGI",
-    "DAG"
+    "DAG",
   ],
   month_format_narrow => [
     "C",
@@ -155,7 +160,7 @@
     "C",
     "P",
     "C",
-    "P"
+    "P",
   ],
   month_format_wide => [
     "Dwe mar Achiel",
@@ -169,7 +174,7 @@
     "Dwe mar Ochiko",
     "Dwe mar Apar",
     "Dwe mar gi achiel",
-    "Dwe mar Apar gi ariyo"
+    "Dwe mar Apar gi ariyo",
   ],
   month_stand_alone_abbreviated => [
     "DAC",
@@ -183,7 +188,7 @@
     "DOC",
     "DAP",
     "DGI",
-    "DAG"
+    "DAG",
   ],
   month_stand_alone_narrow => [
     "C",
@@ -197,7 +202,7 @@
     "C",
     "P",
     "C",
-    "P"
+    "P",
   ],
   month_stand_alone_wide => [
     "Dwe mar Achiel",
@@ -211,7 +216,7 @@
     "Dwe mar Ochiko",
     "Dwe mar Apar",
     "Dwe mar gi achiel",
-    "Dwe mar Apar gi ariyo"
+    "Dwe mar Apar gi ariyo",
   ],
   name => "Luo",
   native_language => "Dholuo",
@@ -223,37 +228,37 @@
     "NMN1",
     "NMN2",
     "NMN3",
-    "NMN4"
+    "NMN4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "nus mar nus 1",
     "nus mar nus 2",
     "nus mar nus 3",
-    "nus mar nus 4"
+    "nus mar nus 4",
   ],
   quarter_stand_alone_abbreviated => [
     "NMN1",
     "NMN2",
     "NMN3",
-    "NMN4"
+    "NMN4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "nus mar nus 1",
     "nus mar nus 2",
     "nus mar nus 3",
-    "nus mar nus 4"
+    "nus mar nus 4",
   ],
   script => undef,
   territory => undef,
@@ -262,5 +267,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

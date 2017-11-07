@@ -1,14 +1,20 @@
 package Struct::Path::PerlStyle;
 
-use 5.006;
+use 5.010;
 use strict;
 use warnings FATAL => 'all';
-use parent qw(Exporter);
-use Carp qw(croak);
-use PPI;
-use Scalar::Util qw(looks_like_number);
+use parent 'Exporter';
 
-our @EXPORT_OK = qw(ps_parse ps_serialize);
+use Carp 'croak';
+use PPI;
+use Safe;
+use Scalar::Util 'looks_like_number';
+use re qw(is_regexp regexp_pattern);
+
+our @EXPORT_OK = qw(
+    ps_parse
+    ps_serialize
+);
 
 =encoding utf8
 
@@ -26,11 +32,11 @@ Struct::Path::PerlStyle - Perl-style syntax frontend for L<Struct::Path|Struct::
 
 =head1 VERSION
 
-Version 0.71
+Version 0.73
 
 =cut
 
-our $VERSION = '0.71';
+our $VERSION = '0.73';
 
 =head1 SYNOPSIS
 
@@ -50,7 +56,6 @@ Examples:
     '{a}{b}'              # points to b's value
     '{a}{}'               # all values from a's subhash; same for arrays (using empty square brackets)
     '{a}{b,c}'            # b's and c's values
-    '{a}{b c}'            # same, space also is a delimiter
     '{a}{"space inside"}' # key must be quoted unless it is a simple word (single quotes supported as well)
     '{a}{"multi\nline"}'  # same for special characters (if double quoted)
     '{a}{"π"}'            # keys containing non ASCII characters also must be quoted*
@@ -109,95 +114,128 @@ our $HOOKS = {
 
 $HOOKS->{'<<'} = $HOOKS->{back}; # backward compatibility ('<<' is deprecated)
 
+my %ESCP = (
+    '\\' => '\\\\', # single => double
+    '"'  => '\"',
+    "\a" => '\a',
+    "\b" => '\b',
+    "\t" => '\t',
+    "\n" => '\n',
+    "\f" => '\f',
+    "\r" => '\r',
+    "\e" => '\e',
+);
+my $ESCP = join('', sort keys %ESCP);
+
+my %INTP = map { $ESCP{$_} => $_ } keys %ESCP; # swap keys <-> values
+my $INTP = join('|', map { "\Q$_\E" } sort keys %INTP);
+
+my $RSAFE = Safe->new;
+$RSAFE->permit_only(
+    'const',
+    'lineseq',
+    'qr',
+    'leaveeval',
+    'rv2gv',
+    'padany',
+);
+
 sub ps_parse($;$);
 sub ps_parse($;$) {
     my ($path, $opts) = @_;
+
     croak "Undefined path passed" unless (defined $path);
     my $doc = PPI::Document->new(ref $path ? $path : \$path);
     croak "Failed to parse passed path '$path'" unless (defined $doc);
     my @out;
 
-    for my $step ($doc->elements) {
-        croak "Unsupported thing '$step' in the path, step #" . @out
-            unless ($step->can('elements'));
-        for my $item ($step->elements) {
-            $item->prune('PPI::Token::Whitespace') if $item->can('prune');
+    for my $step (map { $_->can('elements') ? $_->elements : $_ } $doc->elements) {
+        $step->prune('PPI::Token::Whitespace') if $step->can('prune');
 
-            if ($item->isa('PPI::Structure') and $item->start->content eq '{' and $item->finish) {
-                push @out, {};
-                for my $t (map { $_->elements } $item->children) {
-                    my $tmp;
-                    if ($t->isa('PPI::Token::Word') or $t->isa('PPI::Token::Number')) {
-                        $tmp->{keys} = $t->content;
-                    } elsif ($t->isa('PPI::Token::Operator') and $t->content eq ',') {
-                        next;
-                    } elsif ($t->isa('PPI::Token::Quote::Single')) {
-                        $tmp->{keys} = $t->literal;
-                    } elsif ($t->isa('PPI::Token::Quote::Double')) {
-                        $tmp->{keys} = $t->string;
-                        $tmp->{keys} =~ s/\\"/"/g;
-                    } elsif ($t->isa('PPI::Token::Regexp::Match')) {
-                        $tmp->{regs} = substr(substr($t->content, 1), 0, -1); # get rid of slashes
-                        $tmp->{regs} = qr($tmp->{regs});
-                    } else {
-                        croak "Unsupported thing '$t' for hash key, step #$#out";
+        if ($step->isa('PPI::Structure') and $step->start eq '{' and $step->finish) {
+            push @out, {};
+            for my $t (map { $_->elements } $step->children) {
+                my $tmp;
+                if ($t->isa('PPI::Token::Word') or $t->isa('PPI::Token::Number')) {
+                    $tmp->{keys} = $t->content;
+                } elsif ($t->isa('PPI::Token::Operator') and $t eq ',') {
+                    next;
+                } elsif ($t->isa('PPI::Token::Quote::Single')) {
+                    $tmp->{keys} = $t->literal;
+                } elsif ($t->isa('PPI::Token::Quote::Double')) {
+                    $tmp->{keys} = $t->string;
+                    $tmp->{keys} =~ s/($INTP)/$INTP{$1}/gs; # interpolate
+                } elsif (
+                    $t->isa('PPI::Token::Regexp::Match') or
+                    $t->isa('PPI::Token::QuoteLike::Regexp')
+                ) {
+                    $tmp->{regs} = $RSAFE->reval(
+                        'qr/' . $t->get_match_string . '/' .
+                        join('', keys %{$t->get_modifiers}), 1
+                    );
+                    if ($@) {
+                        (my $err = $@) =~ s/ at \(eval \d+\) .+//s;
+                        croak "Step #$#out: failed to evaluate regexp: $err";
                     }
-                    map { push @{$out[-1]->{$_}}, delete $tmp->{$_} } keys %{$tmp};
+                } else {
+                    croak "Unsupported thing '$t' for hash key, step #$#out";
                 }
-            } elsif ($item->isa('PPI::Structure') and $item->start->content eq '[' and $item->finish) {
-                push @out, [];
-                my $is_range;
-                for my $t (map { $_->elements } $item->children) {
-                    if ($t->isa('PPI::Token::Number')) {
-                        croak "Incorrect array index '$t', step #$#out"
-                            unless ($t->content == int($t->content));
-                        if ($is_range) {
-                            my $start = pop(@{$out[-1]});
-                            croak "Range start undefided, step #$#out"
-                                unless (defined $start);
-                            push @{$out[-1]},
-                                ($start < $t->content ? $start..$t->content : reverse $t->content..$start);
-                            $is_range = undef;
-                        } else {
-                            push @{$out[-1]}, int($t->content);
-                        }
-                    } elsif ($t->isa('PPI::Token::Operator') and $t->content eq ',') {
-                        $is_range = undef;
-                    } elsif ($t->isa('PPI::Token::Operator') and $t->content eq '..') {
-                        $is_range = $t;
-                    } else {
-                        croak "Unsupported thing '$t' for array index, step #$#out";
-                    }
-                }
-                croak "Unfinished range secified, step #$#out" if ($is_range);
-            } elsif ($item->isa('PPI::Structure') and $item->start->content eq '(' and $item->finish) {
-                my ($hook, @args) = map { $_->elements } $item->children;
-                my $neg;
-                if ($hook->content eq 'not' or $hook->content eq '!') {
-                    $neg = $hook->content;
-                    $hook = shift @args;
-                }
-                croak "Unsupported thing '$hook' as hook, step #" . @out
-                    unless ($hook->isa('PPI::Token::Operator') or $hook->isa('PPI::Token::Word'));
-                croak "Unsupported hook '$hook', step #" . @out unless (exists $HOOKS->{$hook->content});
-                @args = map {
-                    if ($_->isa('PPI::Token::Quote::Single') or $_->isa('PPI::Token::Number')) {
-                        $_->literal;
-                    } elsif ($_->isa('PPI::Token::Quote::Double')) {
-                        $_->string;
-                    } else {
-                        croak "Unsupported thing '$_' as hook argument, step #" . @out;
-                    }
-                } @args;
-                $hook = $HOOKS->{$hook->content}->(@args); # closure with saved args
-                push @out, ($neg ? sub { not $hook->(@_) } : $hook);
-            } elsif ($item->isa('PPI::Token::Symbol') and $item->raw_type eq '$') {
-                my $name = substr($item->content, 1); # cut off sigil
-                croak "Unknown alias '$name'" unless (exists $opts->{aliases}->{$name});
-                push @out, @{ps_parse($opts->{aliases}->{$name}, $opts)};
-            } else {
-                croak "Unsupported thing '$item' in the path, step #" . @out;
+                map { push @{$out[-1]->{$_}}, delete $tmp->{$_} } keys %{$tmp};
             }
+        } elsif ($step->isa('PPI::Structure') and $step->start eq '[' and $step->finish) {
+            push @out, [];
+            my $range;
+            for my $t (map { $_->elements } $step->children) {
+                if ($t->isa('PPI::Token::Number')) {
+                    croak "Incorrect array index '$t', step #$#out"
+                        unless ($t->content == int($t));
+                    if ($range) {
+                        my $start = pop(@{$out[-1]});
+                        croak "Range start absent, step #$#out"
+                            unless (defined $start);
+                        push @{$out[-1]},
+                            ($start < $t->content ? $start .. $t : reverse $t .. $start);
+                        $range = undef;
+                    } else {
+                        push @{$out[-1]}, int($t);
+                    }
+                } elsif ($t->isa('PPI::Token::Operator') and $t eq ',') {
+                    $range = undef;
+                } elsif ($t->isa('PPI::Token::Operator') and $t eq '..') {
+                    $range = $t;
+                } else {
+                    croak "Unsupported thing '$t' for array index, step #$#out";
+                }
+            }
+            croak "Unfinished range secified, step #$#out" if ($range);
+        } elsif ($step->isa('PPI::Structure') and $step->start eq '(' and $step->finish) {
+            my ($hook, @args) = map { $_->elements } $step->children;
+            my $neg;
+            if ($hook eq 'not' or $hook eq '!') {
+                $neg = $hook;
+                $hook = shift @args;
+            }
+            croak "Unsupported thing '$hook' as hook, step #" . @out
+                unless ($hook->isa('PPI::Token::Operator') or $hook->isa('PPI::Token::Word'));
+            croak "Unsupported hook '$hook', step #" . @out
+                unless (exists $HOOKS->{$hook});
+            @args = map {
+                if ($_->isa('PPI::Token::Quote::Single') or $_->isa('PPI::Token::Number')) {
+                    $_->literal;
+                } elsif ($_->isa('PPI::Token::Quote::Double')) {
+                    $_->string;
+                } else {
+                    croak "Unsupported thing '$_' as hook argument, step #" . @out;
+                }
+            } @args;
+            $hook = $HOOKS->{$hook}->(@args); # closure with saved args
+            push @out, ($neg ? sub { not $hook->(@_) } : $hook);
+        } elsif ($step->isa('PPI::Token::Symbol') and $step->raw_type eq '$') {
+            my $name = substr($step, 1); # cut off sigil
+            croak "Unknown alias '$name'" unless (exists $opts->{aliases}->{$name});
+            push @out, @{ps_parse($opts->{aliases}->{$name}, $opts)};
+        } else {
+            croak "Unsupported thing '$step' in the path, step #" . @out;
         }
     }
 
@@ -212,60 +250,74 @@ Serialize L<Struct::Path|Struct::Path> path to perl-style string
 
 =cut
 
-my %esc = (
-    '"'  => '\"',
-    "\a" => '\a',
-    "\b" => '\b',
-    "\t" => '\t',
-    "\n" => '\n',
-    "\f" => '\f',
-    "\r" => '\r',
-    "\e" => '\e',
-);
-my $esc = join('', keys %esc);
-
 sub ps_serialize($) {
     my $path = shift;
-    croak "Path must be an arrayref" unless (ref $path eq 'ARRAY');
 
+    croak "Arrayref expected for path" unless (ref $path eq 'ARRAY');
     my $out = '';
     my $sc = 0; # step counter
 
     for my $step (@{$path}) {
+        my @items;
+
         if (ref $step eq 'ARRAY') {
-            my @ranges;
             for my $i (@{$step}) {
-                croak "Incorrect array index '$i', step #$sc"
+                croak "Incorrect array index '" . ($i // 'undef') . "', step #$sc"
                     unless (looks_like_number($i) and int($i) == $i);
-                if (@ranges and (
-                    $ranges[-1][0] < $i and $ranges[-1][-1] == $i - 1 or   # ascending
-                    $ranges[-1][0] > $i and $ranges[-1][-1] == $i + 1      # descending
+                if (@items and (
+                    $items[-1][0] < $i and $items[-1][-1] == $i - 1 or   # ascending
+                    $items[-1][0] > $i and $items[-1][-1] == $i + 1      # descending
                 )) {
-                    $ranges[-1][1] = $i; # update range
+                    $items[-1][1] = $i; # update range
                 } else {
-                    push @ranges, [$i]; # new range
+                    push @items, [$i]; # new range
                 }
             }
-            $out .= "[" . join(",", map { $_->[0] == $_->[-1] ? $_->[0] : "$_->[0]..$_->[-1]" } @{ranges}) . "]";
+            $out .= "[" . join(",", map { $_->[0] == $_->[-1] ? $_->[0] : "$_->[0]..$_->[-1]" } @{items}) . "]";
         } elsif (ref $step eq 'HASH') {
-            my @items;
-            if (keys %{$step} == 1 and exists $step->{keys} and ref $step->{keys} eq 'ARRAY' or not keys %{$step}) {
+            my $types = [ grep { exists $step->{$_} } qw(keys regs) ];
+            if (keys %{$step} != @{$types}) {
+                $types = { map { $_, 1 } @{$types} };
+                my @errs = grep { !exists $types->{$_} } sort keys %{$step};
+                croak "Unsupported hash definition (" .
+                    join(',', @errs) . "), step #$sc"
+            }
+
+            if (exists $step->{keys}) {
+                croak "Unsupported hash keys definition, step #$sc"
+                    unless (ref $step->{keys} eq 'ARRAY');
+
                 for my $k (@{$step->{keys}}) {
-                    if (not defined $k) {
-                        croak "Unsupported hash key type 'undef', step #$sc";
-                    } elsif (ref $k) {
-                        croak "Unsupported hash key type '" . (ref $k) . "', step #$sc";
-                    } elsif (looks_like_number($k) or $k =~ /^[0-9a-zA-Z_]+$/) {
+                    croak "Unsupported hash key type 'undef', step #$sc"
+                        unless (defined $k);
+                    croak "Unsupported hash key type '@{[ref $k]}', step #$sc"
+                        if (ref $k);
+
+                    push @items, $k;
+
+                    unless (looks_like_number($k) or $k =~ /^[0-9a-zA-Z_]+$/) {
                         # \w doesn't fit -- PPI can't parse unquoted utf8 hash keys
                         # https://github.com/adamkennedy/PPI/issues/168#issuecomment-180506979
-                        push @items, $k;
-                    } else {
-                        push @items, map { $_ =~ s/([\\$esc])/$esc{$1}/g; qq("$_"); } $k; # escape and quote
+                        $items[-1] =~ s/([\Q$ESCP\E])/$ESCP{$1}/gs;    # escape
+                        $items[-1] = qq("$items[-1]");                 # quote
                     }
                 }
-            } else {
-                croak "Unsupported hash definition, step #$sc";
             }
+
+            if (exists $step->{regs}) {
+                croak "Unsupported hash regs definition, step #$sc"
+                    unless (ref $step->{regs} eq 'ARRAY');
+
+                for my $r (@{$step->{regs}}) {
+                    croak "Regexp expected for regs item, step #$sc"
+                        unless (is_regexp($r));
+
+                    my ($patt, $mods) = regexp_pattern($r);
+                    $patt =~ s|/|\\/|g;
+                    push @items, "/$patt/$mods";
+                }
+            }
+
             $out .= "{" . join(",", @items) . "}";
         } else {
             croak "Unsupported thing in the path, step #$sc";
@@ -282,9 +334,11 @@ Michael Samoglyadov, C<< <mixas at cpan.org> >>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-struct-path-native at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Struct-Path-PerlStyle>. I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
+Please report any bugs or feature requests to
+C<bug-struct-path-perlstyle at rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Struct-Path-PerlStyle>. I
+will be notified, and then you'll automatically be notified of progress on
+your bug as I make changes.
 
 =head1 SUPPORT
 

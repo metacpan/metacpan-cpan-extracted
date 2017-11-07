@@ -41,7 +41,7 @@ sub string ($) {
     return $ret;
 }
 
-# usage: -e "require 'dumpstr'; test_element(1);"
+# usage: -e "require './dumpstr'; test_element(1);"
 sub test_element (;$) {
     my $verbose = shift;
     my %hash = map +($_ => "{$_}"), 'a'..'z', 'A'..'Z';
@@ -58,7 +58,7 @@ sub test_element (;$) {
     print $err ? "not ok\n$err" : "all ok\n";
 }
 
-# usage: -e "require 'dumpstr'; test_dumpstr();"
+# usage: -e "require './dumpstr'; test_dumpstr();"
 sub test_dumpstr () {
     my $a = "a\x{301}";
     my $b = pack 'U', 0xFF;

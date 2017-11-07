@@ -1,6 +1,6 @@
 package App::GitGot::Repo::Git;
 our $AUTHORITY = 'cpan:GENEHACK';
-$App::GitGot::Repo::Git::VERSION = '1.333';
+$App::GitGot::Repo::Git::VERSION = '1.334';
 # ABSTRACT: Git repo objects
 use 5.014;
 
@@ -21,6 +21,7 @@ has '_wrapper' => (
   is         => 'lazy' ,
   isa        => GitWrapper ,
   handles    => [ qw/
+                      checkout
                       cherry
                       clone
                       config
@@ -45,6 +46,7 @@ sub _build__wrapper {
                              remote symbolic_ref / ) {
       $mock->mock( $method => sub { return( '1' )});
     }
+    $mock->mock( 'checkout' => sub { } );
     $mock->mock( 'status' => sub { package
                                      MyFake; sub get { return () }; return bless {} , 'MyFake' } );
     $mock->mock( 'config' => sub { 0 });
@@ -110,7 +112,7 @@ App::GitGot::Repo::Git - Git repo objects
 
 =head1 VERSION
 
-version 1.333
+version 1.334
 
 =head1 METHODS
 

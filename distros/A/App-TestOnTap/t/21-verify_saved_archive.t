@@ -10,17 +10,18 @@ use TestUtils;
 use File::Temp qw(tempdir);
 use Archive::Zip qw(:ERROR_CODES);
 
-use Test::More tests => 10;
+use Test::More tests => 11;
 
 my $suitename = TestUtils::suitename_from_script();
 
 my $tmpdir = tempdir(CLEANUP => 1);
 ok(-d $tmpdir, "Created tmpdir $tmpdir");
 
-my ($ret, $stdout, $stderr) = TestUtils::xeqsuite(['--verbose', '--execmap', ':internal', '--archive', '--savedirectory', $tmpdir]);
+my ($ret, $stdout, $stderr) = TestUtils::xeqsuite(['--verbose', '--archive', '--savedirectory', $tmpdir]);
 
 is($ret, 0, "Exited with 0");
-like($stderr->[0], qr/^WARNING: No configuration file found, using blank with generated id '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}'!$/, "Generated id");
+like($stderr->[0], qr/^WARNING: No id found, using generated '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}'!$/, "Generated id");
+like($stderr->[1], qr/^WARNING: No execmap found, using internal default!$/, "default execmap");
 like($stdout->[14], qr/^Files=1, Tests=10, /, "Only one file with 10 tests found");
 is($stdout->[15], "Result: PASS", "Passed");
 like($stdout->[16], qr(^Result saved to '\Q$tmpdir\E[\\/]\Q$suitename\E\.\d{8}T\d{6}Z\.[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\.zip'$), "Saved to archive");

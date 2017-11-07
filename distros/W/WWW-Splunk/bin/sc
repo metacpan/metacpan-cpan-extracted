@@ -33,7 +33,7 @@ use Pod::Usage;
 use strict;
 use warnings;
 
-our $VERSION = '2.06';
+our $VERSION = '2.07';
 
 # Subcommand dispatch
 
@@ -208,11 +208,11 @@ sub search
 
 =over
 
-=item B<sc --host splunk.example.net --login user --password s1kr3t2 --since '2 days ago' --until yesterday search 'network AND error | head 10'>
+=item B<sc --host splunk.example.net --login user --password s1kr3t2 search --since '2 days ago' --until yesterday 'network AND error | head 10'>
 
 Perform a simple search query limited by given time frame.
 
-=item B<sc --since 'rt-30' search 'source=/var/log/httpd/access_log |stats count by http_status_code'>
+=item B<sc search --since 'rt-30' 'source=/var/log/httpd/access_log |stats count by http_status_code'>
 
 Perform a simple real-time search.
 

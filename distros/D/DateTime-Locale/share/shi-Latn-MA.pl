@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "tifawt",
-    "tadgg\N{U+02b7}at"
+    "tadgg\N{U+02b7}at",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d, E",
@@ -47,7 +52,7 @@
     yMd => "y-MM-dd",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "shi-Latn-MA",
   date_format_full => "EEEE d MMMM y",
@@ -65,7 +70,7 @@
     "akw",
     "asim",
     "asi\N{U+1e0d}",
-    "asa"
+    "asa",
   ],
   day_format_narrow => [
     "M",
@@ -74,7 +79,7 @@
     "T",
     "F",
     "S",
-    "S"
+    "S",
   ],
   day_format_wide => [
     "aynas",
@@ -83,7 +88,7 @@
     "akwas",
     "asimwas",
     "asi\N{U+1e0d}yas",
-    "asamas"
+    "asamas",
   ],
   day_stand_alone_abbreviated => [
     "ayn",
@@ -92,7 +97,7 @@
     "akw",
     "asim",
     "asi\N{U+1e0d}",
-    "asa"
+    "asa",
   ],
   day_stand_alone_narrow => [
     "M",
@@ -101,7 +106,7 @@
     "T",
     "F",
     "S",
-    "S"
+    "S",
   ],
   day_stand_alone_wide => [
     "aynas",
@@ -110,19 +115,19 @@
     "akwas",
     "asimwas",
     "asi\N{U+1e0d}yas",
-    "asamas"
+    "asamas",
   ],
   era_abbreviated => [
     "da\N{U+025b}",
-    "df\N{U+025b}"
+    "df\N{U+025b}",
   ],
   era_narrow => [
     "da\N{U+025b}",
-    "df\N{U+025b}"
+    "df\N{U+025b}",
   ],
   era_wide => [
     "dat n \N{U+025b}isa",
-    "dffir n \N{U+025b}isa"
+    "dffir n \N{U+025b}isa",
   ],
   first_day_of_week => 6,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -143,7 +148,7 @@
     "cut",
     "ktu",
     "nuw",
-    "duj"
+    "duj",
   ],
   month_format_narrow => [
     "i",
@@ -157,7 +162,7 @@
     "c",
     "k",
     "n",
-    "d"
+    "d",
   ],
   month_format_wide => [
     "innayr",
@@ -171,7 +176,7 @@
     "cutanbir",
     "ktubr",
     "nuwanbir",
-    "dujanbir"
+    "dujanbir",
   ],
   month_stand_alone_abbreviated => [
     "inn",
@@ -185,7 +190,7 @@
     "cut",
     "ktu",
     "nuw",
-    "duj"
+    "duj",
   ],
   month_stand_alone_narrow => [
     "i",
@@ -199,7 +204,7 @@
     "c",
     "k",
     "n",
-    "d"
+    "d",
   ],
   month_stand_alone_wide => [
     "innayr",
@@ -213,7 +218,7 @@
     "cutanbir",
     "ktubr",
     "nuwanbir",
-    "dujanbir"
+    "dujanbir",
   ],
   name => "Tachelhit Morocco Latin",
   native_language => "Tashel\N{U+1e25}iyt",
@@ -225,37 +230,37 @@
     "ak 1",
     "ak 2",
     "ak 3",
-    "ak 4"
+    "ak 4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "ak\N{U+1e5b}a\N{U+1e0d}yur 1",
     "ak\N{U+1e5b}a\N{U+1e0d}yur 2",
     "ak\N{U+1e5b}a\N{U+1e0d}yur 3",
-    "ak\N{U+1e5b}a\N{U+1e0d}yur 4"
+    "ak\N{U+1e5b}a\N{U+1e0d}yur 4",
   ],
   quarter_stand_alone_abbreviated => [
     "ak 1",
     "ak 2",
     "ak 3",
-    "ak 4"
+    "ak 4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "ak\N{U+1e5b}a\N{U+1e0d}yur 1",
     "ak\N{U+1e5b}a\N{U+1e0d}yur 2",
     "ak\N{U+1e5b}a\N{U+1e0d}yur 3",
-    "ak\N{U+1e5b}a\N{U+1e0d}yur 4"
+    "ak\N{U+1e5b}a\N{U+1e0d}yur 4",
   ],
   script => "Latin",
   territory => "Morocco",
@@ -264,5 +269,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

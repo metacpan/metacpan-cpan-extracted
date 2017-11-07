@@ -1,0 +1,10 @@
+Revision history for Text::Continuation::Parser
+
+0.2       2017-11-06 23:52:34Z
+
+    * Make sure we can run on older perl versions like 5.10
+      (CPANTESTERS)
+
+0.1       2017-11-05 16:38:56Z
+
+    * First release to CPAN

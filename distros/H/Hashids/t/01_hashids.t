@@ -39,7 +39,7 @@ subtest 'basics' => sub {
         throws_ok {
             Hashids->new( minHashLength => $minHashLength );
         }
-        qr/not a number/, 'invalid minHashLength';
+        qr/must be a positive number/, 'invalid minHashLength';
     };
 
     subtest 'alphabet' => sub {
@@ -84,19 +84,22 @@ subtest 'basics' => sub {
 };
 
 subtest 'simple encode/decode' => sub {
-    plan tests => 6;
+    plan tests => 8;
 
     my $hashids = Hashids->new( salt => $salt );
 
     is( $hashids->encode(),               '', 'no encode' );
     is( $hashids->encode('up the wazoo'), '', 'bad encode' );
 
+    is( $hashids->encode(undef), '',    'undef encode' );
+    is( $hashids->decode(),      undef, 'no decode' );
+
     my $plaintext = 123;
     my $encoded   = 'YDx';
     is( $hashids->encode($plaintext), $encoded,   'encode 1' );
     is( $hashids->decode($encoded),   $plaintext, 'decode 1' );
 
-    $plaintext = 123456;
+    $plaintext = 123_456;
     $encoded   = '4DLz6';
     is( $hashids->encode($plaintext), $encoded,   'encode 2' );
     is( $hashids->decode($encoded),   $plaintext, 'decode 2' );

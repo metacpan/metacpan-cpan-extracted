@@ -24,7 +24,7 @@ use MIME::Base64 qw(encode_base64);
 use JSON;
 use Readonly;
 
-our $VERSION = q[477.1.2];
+our $VERSION = q[477.1.4];
 
 our $DEBUG_OUTPUT        = 0;
 our $DEBUG_L10N          = 0;
@@ -266,7 +266,7 @@ sub method_name {
 }
 
 sub streamed_aspects {
-  return [qw(options)];
+  return [];
 }
 
 sub streamed {
@@ -319,7 +319,7 @@ sub render {
   }
 
   if($self->can($method)) {
-    if($aspect eq 'options' ||
+    if($action eq 'options' ||
        $aspect =~ /_(?:jpg|png|gif|svg|svgz)/smx) {
       return $self->$method();
     }
@@ -553,7 +553,10 @@ sub edit {
 }
 
 sub options {
-  return 1;
+  #########
+  # streamed response
+  #
+  return q[];
 }
 
 sub list {
@@ -668,6 +671,9 @@ sub decor {
   my $self = shift;
   my $aspect = $self->aspect || q[];
 
+  if($self->action eq 'options') {
+    return 0;
+  }
   for my $ending (qw(rss atom ajax xml
                      json js _png _jpg _svg _svgz
                      _txt _csv _xls)) {

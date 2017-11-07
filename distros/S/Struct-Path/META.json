@@ -33,6 +33,7 @@
       },
       "runtime" : {
          "requires" : {
+            "B::Deparse" : "0",
             "Carp" : "0",
             "parent" : "0",
             "perl" : "5.006",
@@ -47,5 +48,5 @@
          "url" : "https://github.com/mr-mixas/Struct-Path.pm"
       }
    },
-   "version" : "0.72"
+   "version" : "0.73"
 }

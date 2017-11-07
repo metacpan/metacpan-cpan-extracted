@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "vorm.",
-    "nam."
+    "nam.",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "E d.",
@@ -50,7 +55,7 @@
     yMd => "y-MM-dd",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "gsw-CH",
   date_format_full => "EEEE, d. MMMM y",
@@ -68,7 +73,7 @@
     "Du.",
     "Fr.",
     "Sa.",
-    "Su."
+    "Su.",
   ],
   day_format_narrow => [
     "M",
@@ -77,7 +82,7 @@
     "D",
     "F",
     "S",
-    "S"
+    "S",
   ],
   day_format_wide => [
     "M\N{U+00e4}\N{U+00e4}ntig",
@@ -86,7 +91,7 @@
     "Dunschtig",
     "Friitig",
     "Samschtig",
-    "Sunntig"
+    "Sunntig",
   ],
   day_stand_alone_abbreviated => [
     "M\N{U+00e4}.",
@@ -95,7 +100,7 @@
     "Du.",
     "Fr.",
     "Sa.",
-    "Su."
+    "Su.",
   ],
   day_stand_alone_narrow => [
     "M",
@@ -104,7 +109,7 @@
     "D",
     "F",
     "S",
-    "S"
+    "S",
   ],
   day_stand_alone_wide => [
     "M\N{U+00e4}\N{U+00e4}ntig",
@@ -113,19 +118,19 @@
     "Dunschtig",
     "Friitig",
     "Samschtig",
-    "Sunntig"
+    "Sunntig",
   ],
   era_abbreviated => [
     "v. Chr.",
-    "n. Chr."
+    "n. Chr.",
   ],
   era_narrow => [
     "v. Chr.",
-    "n. Chr."
+    "n. Chr.",
   ],
   era_wide => [
     "v. Chr.",
-    "n. Chr."
+    "n. Chr.",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -146,7 +151,7 @@
     "Sep",
     "Okt",
     "Nov",
-    "Dez"
+    "Dez",
   ],
   month_format_narrow => [
     "J",
@@ -160,7 +165,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_format_wide => [
     "Januar",
@@ -174,7 +179,7 @@
     "Sept\N{U+00e4}mber",
     "Oktoober",
     "Nov\N{U+00e4}mber",
-    "Dez\N{U+00e4}mber"
+    "Dez\N{U+00e4}mber",
   ],
   month_stand_alone_abbreviated => [
     "Jan",
@@ -188,7 +193,7 @@
     "Sep",
     "Okt",
     "Nov",
-    "Dez"
+    "Dez",
   ],
   month_stand_alone_narrow => [
     "J",
@@ -202,7 +207,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_stand_alone_wide => [
     "Januar",
@@ -216,7 +221,7 @@
     "Sept\N{U+00e4}mber",
     "Oktoober",
     "Nov\N{U+00e4}mber",
-    "Dez\N{U+00e4}mber"
+    "Dez\N{U+00e4}mber",
   ],
   name => "Swiss German Switzerland",
   native_language => "Schwiizert\N{U+00fc}\N{U+00fc}tsch",
@@ -228,37 +233,37 @@
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "1. Quartal",
     "2. Quartal",
     "3. Quartal",
-    "4. Quartal"
+    "4. Quartal",
   ],
   quarter_stand_alone_abbreviated => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "1. Quartal",
     "2. Quartal",
     "3. Quartal",
-    "4. Quartal"
+    "4. Quartal",
   ],
   script => undef,
   territory => "Switzerland",
@@ -267,5 +272,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "RW",
-    "T\N{U+014a}"
+    "T\N{U+014a}",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "E d",
@@ -44,7 +49,7 @@
     yMd => "d/M/y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "nus-SS",
   date_format_full => "EEEE d MMMM y",
@@ -62,7 +67,7 @@
     "\N{U+014a}uaan",
     "Dhieec",
     "B\N{U+00e4}k\N{U+025b}l",
-    "C\N{U+00e4}\N{U+014b}"
+    "C\N{U+00e4}\N{U+014b}",
   ],
   day_format_narrow => [
     "J",
@@ -71,7 +76,7 @@
     "\N{U+014a}",
     "D",
     "B",
-    "C"
+    "C",
   ],
   day_format_wide => [
     "Jiec la\N{U+0331}t",
@@ -80,7 +85,7 @@
     "\N{U+014a}uaan l\N{U+00e4}tni",
     "Dhieec l\N{U+00e4}tni",
     "B\N{U+00e4}k\N{U+025b}l l\N{U+00e4}tni",
-    "C\N{U+00e4}\N{U+014b} ku\N{U+0254}th"
+    "C\N{U+00e4}\N{U+014b} ku\N{U+0254}th",
   ],
   day_stand_alone_abbreviated => [
     "Jiec",
@@ -89,7 +94,7 @@
     "\N{U+014a}uaan",
     "Dhieec",
     "B\N{U+00e4}k\N{U+025b}l",
-    "C\N{U+00e4}\N{U+014b}"
+    "C\N{U+00e4}\N{U+014b}",
   ],
   day_stand_alone_narrow => [
     "J",
@@ -98,7 +103,7 @@
     "\N{U+014a}",
     "D",
     "B",
-    "C"
+    "C",
   ],
   day_stand_alone_wide => [
     "Jiec la\N{U+0331}t",
@@ -107,19 +112,19 @@
     "\N{U+014a}uaan l\N{U+00e4}tni",
     "Dhieec l\N{U+00e4}tni",
     "B\N{U+00e4}k\N{U+025b}l l\N{U+00e4}tni",
-    "C\N{U+00e4}\N{U+014b} ku\N{U+0254}th"
+    "C\N{U+00e4}\N{U+014b} ku\N{U+0254}th",
   ],
   era_abbreviated => [
     "AY",
-    "\N{U+0190}Y"
+    "\N{U+0190}Y",
   ],
   era_narrow => [
     "AY",
-    "\N{U+0190}Y"
+    "\N{U+0190}Y",
   ],
   era_wide => [
     "A ka\N{U+0331}n Yecu ni dap",
-    "\N{U+0190} ca Yecu dap"
+    "\N{U+0190} ca Yecu dap",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -140,7 +145,7 @@
     "T\N{U+025b}\N{U+025b}",
     "Laa",
     "Kur",
-    "Tid"
+    "Tid",
   ],
   month_format_narrow => [
     "T",
@@ -154,7 +159,7 @@
     "T",
     "L",
     "K",
-    "T"
+    "T",
   ],
   month_format_wide => [
     "Tiop thar p\N{U+025b}t",
@@ -168,7 +173,7 @@
     "T\N{U+025b}\N{U+025b}r",
     "Laath",
     "Kur",
-    "Tio\N{U+0331}p in di\N{U+0331}i\N{U+0331}t"
+    "Tio\N{U+0331}p in di\N{U+0331}i\N{U+0331}t",
   ],
   month_stand_alone_abbreviated => [
     "Tiop",
@@ -182,7 +187,7 @@
     "T\N{U+025b}\N{U+025b}",
     "Laa",
     "Kur",
-    "Tid"
+    "Tid",
   ],
   month_stand_alone_narrow => [
     "T",
@@ -196,7 +201,7 @@
     "T",
     "L",
     "K",
-    "T"
+    "T",
   ],
   month_stand_alone_wide => [
     "Tiop thar p\N{U+025b}t",
@@ -210,7 +215,7 @@
     "T\N{U+025b}\N{U+025b}r",
     "Laath",
     "Kur",
-    "Tio\N{U+0331}p in di\N{U+0331}i\N{U+0331}t"
+    "Tio\N{U+0331}p in di\N{U+0331}i\N{U+0331}t",
   ],
   name => "Nuer South Sudan",
   native_language => "Thok Nath",
@@ -222,37 +227,37 @@
     "P1",
     "P2",
     "P3",
-    "P4"
+    "P4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "P\N{U+00e4}th di\N{U+0254}k tin nhiam",
     "P\N{U+00e4}th di\N{U+0254}k tin guur\N{U+025b}",
     "P\N{U+00e4}th di\N{U+0254}k tin w\N{U+00e4} k\N{U+0254}\N{U+0254}ri\N{U+025b}n",
-    "P\N{U+00e4}th di\N{U+0254}k tin ji\N{U+0254}akdi\N{U+025b}n"
+    "P\N{U+00e4}th di\N{U+0254}k tin ji\N{U+0254}akdi\N{U+025b}n",
   ],
   quarter_stand_alone_abbreviated => [
     "P1",
     "P2",
     "P3",
-    "P4"
+    "P4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "P\N{U+00e4}th di\N{U+0254}k tin nhiam",
     "P\N{U+00e4}th di\N{U+0254}k tin guur\N{U+025b}",
     "P\N{U+00e4}th di\N{U+0254}k tin w\N{U+00e4} k\N{U+0254}\N{U+0254}ri\N{U+025b}n",
-    "P\N{U+00e4}th di\N{U+0254}k tin ji\N{U+0254}akdi\N{U+025b}n"
+    "P\N{U+00e4}th di\N{U+0254}k tin ji\N{U+0254}akdi\N{U+025b}n",
   ],
   script => undef,
   territory => "South Sudan",
@@ -261,5 +266,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 31
+  version => 32,
 }

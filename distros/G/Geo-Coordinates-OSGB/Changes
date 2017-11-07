@@ -1,5 +1,17 @@
 Revision history for Perl extension Geo::Coordinates::OSGB
 
+2.20 November 2017
+
+    - Replaced OSTN02 data set with OSTN15, the new OSGB standard
+
+    - Moved OSTN data to external files
+
+    - Removed function to inspect OSTN data shifts
+
+    - Updated pod in OSGB.pm and OSGB/Background.pod
+
+    - Drop support for Perl 5.08 - if you must have 5.08 see the note in OSGB.pm
+
 2.19 July 2017
 
     - Go faster stripes on main conversion routines
@@ -145,6 +157,17 @@ Revision history for Perl extension Geo::Coordinates::OSGB
       -- general purpose "parse_grid" for all parsing
     
     - New module Geo::Coordinates::OSGB::Maps provides outlines, bounding boxes, and titles for OSGB maps
+
+    - The functions `shift_ll_into_WGS84` and `shift_ll_from_WGS84` are no longer provided (or needed).
+ 
+    - The functions formerly provided by OSTN02.pm are integrated into OSGB.pm, so the subroutines 
+      `OSGB36_to_ETRS89` and `ETRS89_to_OSGB36` are no longer provided (or needed).
+
+    - The functions to parse and format grid references are moved to OSGB/Grid.pm.
+
+    - The functions to parse and format lat/lon are removed, because they are better provided by other modules.
+
+    For more details, see the section on "Upgrading" in Background.pod
 
 
 2.09 October 2015

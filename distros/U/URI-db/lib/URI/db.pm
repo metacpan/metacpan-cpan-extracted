@@ -13,7 +13,7 @@ use strict;
 use 5.008001;
 use base 'URI::Nested';
 use URI::_db;
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 sub prefix       { 'db' }
 sub nested_class { 'URI::_db' }
@@ -267,7 +267,7 @@ if one is known. Returns C<undef> if no driver is known.
 
 =head3 C<dbi_dsn>
 
-  DBI->connect( $uri->dbi_dsn, $uri->user, $uri->pass );
+  DBI->connect( $uri->dbi_dsn, $uri->user, $uri->password );
 
 Returns a L<DBI> DSN appropriate for use in a call to C<< DBI->connect >>. The
 attributes will usually be pulled from the URI host name, port, and database
@@ -321,11 +321,11 @@ C<canonical_engine> if it is not already the canonical engine.
 =head1 Support
 
 This module is stored in an open
-L<GitHub repository|http://github.com/theory/uri-db/>. Feel free to fork and
+L<GitHub repository|https://github.com/theory/uri-db/>. Feel free to fork and
 contribute!
 
 Please file bug reports via
-L<GitHub Issues|http://github.com/theory/uri-db/issues/> or by sending mail to
+L<GitHub Issues|https://github.com/theory/uri-db/issues/> or by sending mail to
 L<bug-URI-db@rt.cpan.org|mailto:bug-URI-db@rt.cpan.org>.
 
 =head1 Author
@@ -334,7 +334,7 @@ David E. Wheeler <david@justatheory.com>
 
 =head1 Copyright and License
 
-Copyright (c) 2013 David E. Wheeler. Some Rights Reserved.
+Copyright (c) 2013-2016 David E. Wheeler. Some Rights Reserved.
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

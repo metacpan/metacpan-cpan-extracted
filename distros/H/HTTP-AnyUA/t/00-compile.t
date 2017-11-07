@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 10 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 13 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'HTTP/AnyUA.pm',
@@ -18,6 +18,9 @@ my @module_files = (
     'HTTP/AnyUA/Backend/LWP/UserAgent.pm',
     'HTTP/AnyUA/Backend/Mojo/UserAgent.pm',
     'HTTP/AnyUA/Backend/Net/Curl/Easy.pm',
+    'HTTP/AnyUA/Middleware.pm',
+    'HTTP/AnyUA/Middleware/ContentLength.pm',
+    'HTTP/AnyUA/Middleware/Runtime.pm',
     'HTTP/AnyUA/Util.pm'
 );
 

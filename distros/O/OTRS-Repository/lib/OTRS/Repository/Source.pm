@@ -1,5 +1,7 @@
 package OTRS::Repository::Source;
 
+use v5.10;
+
 # ABSTRACT: Parser for a single otrs.xml file
 
 use strict;
@@ -7,14 +9,15 @@ use warnings;
 
 use Moo;
 use HTTP::Tiny;
+use HTTP::Tiny::FileProtocol;
 use XML::LibXML;
 use Regexp::Common qw(URI);
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
-our $ALLOWED_SCHEME = 'HTTP';
+our $ALLOWED_SCHEME = [ 'HTTP', 'file' ];
 
-has url      => ( is => 'ro', required => 1, isa     => sub { die "No valid URI" unless $_[0] =~ m{\A$RE{URI}{$ALLOWED_SCHEME}\z} } );
+has url      => ( is => 'ro', required => 1, isa     => \&_check_uri );
 has content  => ( is => 'ro', lazy     => 1, builder => \&_get_content );
 has tree     => ( is => 'ro', lazy     => 1, builder => \&_build_tree );
 has error    => ( is => 'rwp' );
@@ -64,6 +67,27 @@ sub list {
     }
 
     return @packages;
+}
+
+sub _check_uri {
+    my @allowed_schemes = ref $ALLOWED_SCHEME ? @{ $ALLOWED_SCHEME } : $ALLOWED_SCHEME;
+
+    my $matches;
+
+    SCHEME:
+    for my $scheme ( @allowed_schemes ) {
+        my $regex = ( lc $scheme eq 'http' ) ?
+            $RE{URI}{HTTP}{-scheme => qr/https?/} :
+            $RE{URI}{$scheme};
+
+        if ( $_[0] =~ m{\A$regex\z} ) {
+            $matches++;
+            last SCHEME;
+        }
+    }
+
+    die "No valid URI" unless $matches;
+    return 1;
 }
 
 sub _parse {
@@ -170,13 +194,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 OTRS::Repository::Source - Parser for a single otrs.xml file
 
 =head1 VERSION
 
-version 0.05
+version 0.07
 
 =head1 AUTHOR
 
@@ -184,7 +210,7 @@ Renee Baecker <github@renee-baecker.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013 by Renee Baecker.
+This software is Copyright (c) 2017 by Renee Baecker.
 
 This is free software, licensed under:
 

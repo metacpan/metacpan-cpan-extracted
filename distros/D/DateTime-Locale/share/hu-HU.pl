@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "de.",
-    "du."
+    "du.",
   ],
   available_formats => {
+    Bh => "B h",
+    Bhm => "B h:mm",
+    Bhms => "B h:mm:ss",
     E => "ccc",
+    EBhm => "E B h:mm",
+    EBhms => "E B h:mm:ss",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d., E",
@@ -32,8 +37,8 @@
     h => "a h",
     hm => "a h:mm",
     hms => "a h:mm:ss",
-    hmsv => "h:mm:ss a v",
-    hmv => "h:mm a v",
+    hmsv => "a h:mm:ss v",
+    hmv => "a h:mm v",
     mmss => "mm:ss",
     ms => "mm:ss",
     y => "y.",
@@ -46,8 +51,8 @@
     yMd => "y. MM. dd.",
     yQQQ => "y. QQQ",
     yQQQQ => "y. QQQQ",
-    "yw-count-one" => "y w. 'hete'",
-    "yw-count-other" => "y w. 'hete'"
+    "yw-count-one" => "Y w. 'hete'",
+    "yw-count-other" => "Y w. 'hete'",
   },
   code => "hu-HU",
   date_format_full => "y. MMMM d., EEEE",
@@ -65,7 +70,7 @@
     "Cs",
     "P",
     "Szo",
-    "V"
+    "V",
   ],
   day_format_narrow => [
     "H",
@@ -74,7 +79,7 @@
     "Cs",
     "P",
     "Sz",
-    "V"
+    "V",
   ],
   day_format_wide => [
     "h\N{U+00e9}tf\N{U+0151}",
@@ -83,7 +88,7 @@
     "cs\N{U+00fc}t\N{U+00f6}rt\N{U+00f6}k",
     "p\N{U+00e9}ntek",
     "szombat",
-    "vas\N{U+00e1}rnap"
+    "vas\N{U+00e1}rnap",
   ],
   day_stand_alone_abbreviated => [
     "H",
@@ -92,7 +97,7 @@
     "Cs",
     "P",
     "Szo",
-    "V"
+    "V",
   ],
   day_stand_alone_narrow => [
     "H",
@@ -101,7 +106,7 @@
     "Cs",
     "P",
     "Sz",
-    "V"
+    "V",
   ],
   day_stand_alone_wide => [
     "h\N{U+00e9}tf\N{U+0151}",
@@ -110,19 +115,19 @@
     "cs\N{U+00fc}t\N{U+00f6}rt\N{U+00f6}k",
     "p\N{U+00e9}ntek",
     "szombat",
-    "vas\N{U+00e1}rnap"
+    "vas\N{U+00e1}rnap",
   ],
   era_abbreviated => [
     "i. e.",
-    "i. sz."
+    "i. sz.",
   ],
   era_narrow => [
     "ie.",
-    "isz."
+    "isz.",
   ],
   era_wide => [
-    "id\N{U+0151}sz\N{U+00e1}m\N{U+00ed}t\N{U+00e1}sunk el\N{U+0151}tt",
-    "id\N{U+0151}sz\N{U+00e1}m\N{U+00ed}t\N{U+00e1}sunk szerint"
+    "Krisztus el\N{U+0151}tt",
+    "id\N{U+0151}sz\N{U+00e1}m\N{U+00ed}t\N{U+00e1}sunk szerint",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%Y. %b. %e., %A, %H.%M.%S %Z",
@@ -143,7 +148,7 @@
     "szept.",
     "okt.",
     "nov.",
-    "dec."
+    "dec.",
   ],
   month_format_narrow => [
     "J",
@@ -157,7 +162,7 @@
     "Sz",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_format_wide => [
     "janu\N{U+00e1}r",
@@ -171,7 +176,7 @@
     "szeptember",
     "okt\N{U+00f3}ber",
     "november",
-    "december"
+    "december",
   ],
   month_stand_alone_abbreviated => [
     "jan.",
@@ -185,7 +190,7 @@
     "szept.",
     "okt.",
     "nov.",
-    "dec."
+    "dec.",
   ],
   month_stand_alone_narrow => [
     "J",
@@ -199,7 +204,7 @@
     "Sz",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_stand_alone_wide => [
     "janu\N{U+00e1}r",
@@ -213,7 +218,7 @@
     "szeptember",
     "okt\N{U+00f3}ber",
     "november",
-    "december"
+    "december",
   ],
   name => "Hungarian Hungary",
   native_language => "magyar",
@@ -222,40 +227,40 @@
   native_territory => "Magyarorsz\N{U+00e1}g",
   native_variant => undef,
   quarter_format_abbreviated => [
-    "N1",
-    "N2",
-    "N3",
-    "N4"
+    "I. n.\N{U+00e9}v",
+    "II. n.\N{U+00e9}v",
+    "III. n.\N{U+00e9}v",
+    "IV. n.\N{U+00e9}v",
   ],
   quarter_format_narrow => [
-    "1.",
-    "2.",
-    "3.",
-    "4."
+    "I.",
+    "II.",
+    "III.",
+    "IV.",
   ],
   quarter_format_wide => [
     "I. negyed\N{U+00e9}v",
     "II. negyed\N{U+00e9}v",
     "III. negyed\N{U+00e9}v",
-    "IV. negyed\N{U+00e9}v"
+    "IV. negyed\N{U+00e9}v",
   ],
   quarter_stand_alone_abbreviated => [
-    "N1",
-    "N2",
-    "N3",
-    "N4"
+    "1. n.\N{U+00e9}v",
+    "2. n.\N{U+00e9}v",
+    "3. n.\N{U+00e9}v",
+    "4. n.\N{U+00e9}v",
   ],
   quarter_stand_alone_narrow => [
     "1.",
     "2.",
     "3.",
-    "4."
+    "4.",
   ],
   quarter_stand_alone_wide => [
     "1. negyed\N{U+00e9}v",
     "2. negyed\N{U+00e9}v",
     "3. negyed\N{U+00e9}v",
-    "4. negyed\N{U+00e9}v"
+    "4. negyed\N{U+00e9}v",
   ],
   script => undef,
   territory => "Hungary",
@@ -264,5 +269,5 @@
   time_format_medium => "H:mm:ss",
   time_format_short => "H:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

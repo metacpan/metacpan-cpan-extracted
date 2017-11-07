@@ -18,7 +18,7 @@ $log->fatal('I ♥ Mojolicious');
 $log->debug('Does not work');
 my $content;
 {
-  open my $slurper, '<:raw', $path;
+  open my $slurper, '<:raw', $path or die "Failed to open '$path' for reading: $!";
   local $/;
   $content = decode 'UTF-8', scalar readline $slurper;
 }

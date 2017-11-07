@@ -1,6 +1,6 @@
 package App::GitGot::Command::gc;
 our $AUTHORITY = 'cpan:GENEHACK';
-$App::GitGot::Command::gc::VERSION = '1.333';
+$App::GitGot::Command::gc::VERSION = '1.334';
 # ABSTRACT: Run the 'gc' command to garbage collect in git repos
 use 5.014;
 
@@ -51,7 +51,7 @@ App::GitGot::Command::gc - Run the 'gc' command to garbage collect in git repos
 
 =head1 VERSION
 
-version 1.333
+version 1.334
 
 =head1 AUTHOR
 

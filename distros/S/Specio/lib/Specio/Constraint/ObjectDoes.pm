@@ -3,7 +3,7 @@ package Specio::Constraint::ObjectDoes;
 use strict;
 use warnings;
 
-our $VERSION = '0.40';
+our $VERSION = '0.42';
 
 use B ();
 use Role::Tiny::With;
@@ -54,7 +54,7 @@ Specio::Constraint::ObjectDoes - A class for constraints which require an object
 
 =head1 VERSION
 
-version 0.40
+version 0.42
 
 =head1 SYNOPSIS
 

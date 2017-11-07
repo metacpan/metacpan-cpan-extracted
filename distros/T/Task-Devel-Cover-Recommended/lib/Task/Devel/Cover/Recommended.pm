@@ -9,11 +9,11 @@ Task::Devel::Cover::Recommended - Install Devel::Cover and its recommended depen
 
 =head1 VERSION
 
-Version v1.200.0
+Version v1.290.0
 
 =cut
 
-our $VERSION = 'v1.200.0';
+our $VERSION = 'v1.290.0';
 
 =head1 SYNOPSIS
 
@@ -23,7 +23,7 @@ our $VERSION = 'v1.200.0';
 
 =head1 DESCRIPTION
 
-This task module lets you easily install L<Devel::Cover> 1.20 and all its recommended dependencies.
+This task module lets you easily install L<Devel::Cover> 1.29 and all its recommended dependencies.
 
 =head1 DEPENDENCIES
 
@@ -57,11 +57,15 @@ L<Test::More>
 
 =item *
 
-L<Devel::Cover> 1.20
+L<Devel::Cover> 1.29
 
 =item *
 
 C<perl> 5.008002
+
+=item *
+
+L<B::Debug>
 
 =item *
 
@@ -81,7 +85,15 @@ L<Digest::MD5>
 
 =item *
 
-L<JSON::PP>
+L<HTML::Entities> 3.69
+
+=item *
+
+L<HTML::Parser>
+
+=item *
+
+L<JSON::MaybeXS> 1.003003
 
 =item *
 
@@ -104,6 +116,14 @@ L<Pod::Coverage> 0.06
 =item *
 
 L<Pod::Coverage::CountParents>
+
+=item *
+
+L<Sereal::Decoder>
+
+=item *
+
+L<Sereal::Encoder>
 
 =item *
 
@@ -143,7 +163,7 @@ You can find documentation for this module with the perldoc command.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2012,2013,2014,2015 Vincent Pit, all rights reserved.
+Copyright 2012,2013,2014,2015,2016,2017 Vincent Pit, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

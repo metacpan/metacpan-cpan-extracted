@@ -32,10 +32,7 @@ package Sidef::Types::Number::Number {
     };
 #>>>
 
-    use parent qw(
-      Sidef::Object::Object
-      Sidef::Convert::Convert
-      );
+    use parent qw(Sidef::Object::Object);
 
     use overload
       q{bool} => sub { (@_) = (${$_[0]}); goto &__boolify__ },
@@ -320,7 +317,7 @@ package Sidef::Types::Number::Number {
         $s =~ tr/_//d;
 
         # Performance improvement for Perl integers
-        if (CORE::int($s) eq $s and $s >= LONG_MIN and $s <= ULONG_MAX) {
+        if (CORE::int($s) eq $s and $s > LONG_MIN and $s < ULONG_MAX) {
             return (
                     $s < 0
                     ? Math::GMPz::Rmpz_init_set_si($s)
@@ -577,65 +574,110 @@ package Sidef::Types::Number::Number {
     }
 
     #
-    ## Any to unsigned integer
+    ## Anything to an unsigned native integer
     #
     sub _any2ui {
         my ($x) = @_;
+        goto(ref($x) =~ tr/:/_/rs);
 
-        if (ref($x) eq 'Math::GMPz') {
-            my $d = CORE::int(Math::GMPz::Rmpz_get_d($x));
-            ($d < 0 or $d > ULONG_MAX) && return;
-            return $d;
-        }
+      Math_GMPz: {
 
-        if (ref($x) eq 'Math::GMPq') {
-            my $d = CORE::int(Math::GMPq::Rmpq_get_d($x));
-            ($d < 0 or $d > ULONG_MAX) && return;
-            return $d;
-        }
-
-        if (ref($x) eq 'Math::MPFR') {
-            if (Math::MPFR::Rmpfr_number_p($x)) {
-                my $d = CORE::int(Math::MPFR::Rmpfr_get_d($x, $ROUND));
-                ($d < 0 or $d > ULONG_MAX) && return;
-                return $d;
+            if (Math::GMPz::Rmpz_fits_ulong_p($x)) {
+                goto &Math::GMPz::Rmpz_get_ui;
             }
+
             return;
         }
 
-        (@_) = _any2mpfr($x);
-        goto &_any2ui;
+      Math_GMPq: {
+
+            if (Math::GMPq::Rmpq_integer_p($x)) {
+                @_ = ($x = _mpq2mpz($x));
+                goto Math_GMPz;
+            }
+
+            my $d = CORE::int(Math::GMPq::Rmpq_get_d($x));
+            return (($d < 0 or $d > ULONG_MAX) ? undef : $d);
+        }
+
+      Math_MPFR: {
+
+            if (Math::MPFR::Rmpfr_integer_p($x) and Math::MPFR::Rmpfr_fits_ulong_p($x, $ROUND)) {
+                push @_, $ROUND;
+                goto &Math::MPFR::Rmpfr_get_ui;
+            }
+
+            if (Math::MPFR::Rmpfr_number_p($x)) {
+                my $d = CORE::int(Math::MPFR::Rmpfr_get_d($x, $ROUND));
+                return (($d < 0 or $d > ULONG_MAX) ? undef : $d);
+            }
+
+            return;
+        }
+
+      Math_MPC: {
+            @_ = ($x = _any2mpfr($x));
+            goto Math_MPFR;
+        }
     }
 
     #
-    ## Any to signed integer
+    ## Anything to a signed native integer
     #
     sub _any2si {
         my ($x) = @_;
+        goto(ref($x) =~ tr/:/_/rs);
 
-        if (ref($x) eq 'Math::GMPz') {
-            my $d = CORE::int(Math::GMPz::Rmpz_get_d($x));
-            ($d < LONG_MIN or $d > ULONG_MAX) && return;
-            return $d;
-        }
+      Math_GMPz: {
 
-        if (ref($x) eq 'Math::GMPq') {
-            my $d = CORE::int(Math::GMPq::Rmpq_get_d($x));
-            ($d < LONG_MIN or $d > ULONG_MAX) && return;
-            return $d;
-        }
-
-        if (ref($x) eq 'Math::MPFR') {
-            if (Math::MPFR::Rmpfr_number_p($x)) {
-                my $d = CORE::int(Math::MPFR::Rmpfr_get_d($x, $ROUND));
-                ($d < LONG_MIN or $d > ULONG_MAX) && return;
-                return $d;
+            if (Math::GMPz::Rmpz_fits_slong_p($x)) {
+                goto &Math::GMPz::Rmpz_get_si;
             }
+
+            if (Math::GMPz::Rmpz_fits_ulong_p($x)) {
+                goto &Math::GMPz::Rmpz_get_ui;
+            }
+
             return;
         }
 
-        (@_) = _any2mpfr($x);
-        goto &_any2si;
+      Math_GMPq: {
+
+            if (Math::GMPq::Rmpq_integer_p($x)) {
+                @_ = ($x = _mpq2mpz($x));
+                goto Math_GMPz;
+            }
+
+            my $d = CORE::int(Math::GMPq::Rmpq_get_d($x));
+            return (($d < LONG_MIN or $d > ULONG_MAX) ? undef : $d);
+        }
+
+      Math_MPFR: {
+
+            if (Math::MPFR::Rmpfr_integer_p($x)) {
+                if (Math::MPFR::Rmpfr_fits_slong_p($x, $ROUND)) {
+                    push @_, $ROUND;
+                    goto &Math::MPFR::Rmpfr_get_si;
+                }
+
+                if (Math::MPFR::Rmpfr_fits_ulong_p($x, $ROUND)) {
+                    push @_, $ROUND;
+                    goto &Math::MPFR::Rmpfr_get_ui;
+                }
+            }
+
+            if (Math::MPFR::Rmpfr_number_p($x)) {
+                my $d = CORE::int(Math::MPFR::Rmpfr_get_d($x, $ROUND));
+                return (($d < LONG_MIN or $d > ULONG_MAX) ? undef : $d);
+            }
+
+            return;
+        }
+
+      Math_MPC: {
+            @_ = ($x = _any2mpfr($x));
+            goto Math_MPFR;
+        }
     }
 
     sub _big2istr {
@@ -684,21 +726,49 @@ package Sidef::Types::Number::Number {
         goto(ref($x) =~ tr/:/_/rs);
 
       Math_MPFR: {
-            return Math::MPFR::Rmpfr_get_d($x, $ROUND);
+            push @_, $ROUND;
+
+            if (Math::MPFR::Rmpfr_integer_p($x)) {
+                if (Math::MPFR::Rmpfr_fits_slong_p($x, $ROUND)) {
+                    goto &Math::MPFR::Rmpfr_get_si;
+                }
+
+                if (Math::MPFR::Rmpfr_fits_ulong_p($x, $ROUND)) {
+                    goto &Math::MPFR::Rmpfr_get_ui;
+                }
+            }
+
+            goto &Math::MPFR::Rmpfr_get_d;
         }
 
       Math_GMPq: {
+
+            if (Math::GMPq::Rmpq_integer_p($x)) {
+                @_ = ($x = _mpq2mpz($x));
+                goto Math_GMPz;
+            }
+
             goto &Math::GMPq::Rmpq_get_d;
         }
 
       Math_GMPz: {
+
+            if (Math::GMPz::Rmpz_fits_slong_p($x)) {
+                goto &Math::GMPz::Rmpz_get_si;
+            }
+
+            if (Math::GMPz::Rmpz_fits_ulong_p($x)) {
+                goto &Math::GMPz::Rmpz_get_ui;
+            }
+
             goto &Math::GMPz::Rmpz_get_d;
         }
 
       Math_MPC: {
             my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
             Math::MPC::RMPC_RE($r, $x);
-            return Math::MPFR::Rmpfr_get_d($r, $ROUND);
+            @_ = ($x = $r);
+            goto Math_MPFR;
         }
     }
 
@@ -1369,8 +1439,8 @@ package Sidef::Types::Number::Number {
 
       Math_GMPz__Math_MPFR: {
             my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-            Math::MPFR::Rmpfr_set_z($r, $x, $ROUND);
-            Math::MPFR::Rmpfr_sub($r, $r, $y, $ROUND);
+            Math::MPFR::Rmpfr_sub_z($r, $y, $x, $ROUND);
+            Math::MPFR::Rmpfr_neg($r, $r, $ROUND);
             return $r;
         }
 
@@ -1810,8 +1880,8 @@ package Sidef::Types::Number::Number {
         goto(ref($x) =~ tr/:/_/rs);
 
       Math_GMPz: {
-            my $r = Math::GMPz::Rmpz_init_set($x);
-            Math::GMPz::Rmpz_neg($r, $r);
+            my $r = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_neg($r, $x);
             return bless \$r;
         }
 
@@ -1842,8 +1912,8 @@ package Sidef::Types::Number::Number {
 
       Math_GMPz: {
             Math::GMPz::Rmpz_sgn($x) >= 0 and return $_[0];
-            my $r = Math::GMPz::Rmpz_init_set($x);
-            Math::GMPz::Rmpz_abs($r, $r);
+            my $r = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_abs($r, $x);
             return bless \$r;
         }
 
@@ -2453,10 +2523,10 @@ package Sidef::Types::Number::Number {
         my ($x, $y) = @_;
 
         # ilog(x, y <= 1) = NaN
-        Math::GMPz::Rmpz_cmp_ui($y, 1) <= 0 and goto &_nan;
+        Math::GMPz::Rmpz_cmp_ui($y, 1) <= 0 and return;
 
         # ilog(x <= 0, y) = NaN
-        Math::GMPz::Rmpz_sgn($x) <= 0 and goto &_nan;
+        Math::GMPz::Rmpz_sgn($x) <= 0 and return;
 
         # Return faster for y <= 62
         if (Math::GMPz::Rmpz_cmp_ui($y, 62) <= 0) {
@@ -2464,15 +2534,14 @@ package Sidef::Types::Number::Number {
             $y = Math::GMPz::Rmpz_get_ui($y);
 
             my $t = Math::GMPz::Rmpz_init();
-            my $e = (Math::GMPz::Rmpz_sizeinbase($x, $y) || goto &_nan) - 1;
+            my $e = (Math::GMPz::Rmpz_sizeinbase($x, $y) || return) - 1;
 
             if ($e > 0) {
                 Math::GMPz::Rmpz_ui_pow_ui($t, $y, $e);
                 Math::GMPz::Rmpz_cmp($t, $x) > 0 and --$e;
             }
 
-            Math::GMPz::Rmpz_set_ui($t, $e);
-            return $t;
+            return $e;
         }
 
         my $e = 0;
@@ -2501,8 +2570,7 @@ package Sidef::Types::Number::Number {
             ++$e;
         }
 
-        Math::GMPz::Rmpz_set_ui($t, $e);
-        $t;
+        return $e;
     }
 
     sub ilog {
@@ -2510,7 +2578,7 @@ package Sidef::Types::Number::Number {
 
         if (defined($y)) {
             _valid(\$y);
-            bless \__ilog__((_any2mpz($$x) // goto &nan), (_any2mpz($$y) // goto &nan));
+            __PACKAGE__->_set_uint(__ilog__((_any2mpz($$x) // goto &nan), (_any2mpz($$y) // goto &nan)) // goto &nan);
         }
         else {
             bless \(_any2mpz(__log__(_any2mpfr_mpc($$x))) // goto &nan);
@@ -2520,13 +2588,13 @@ package Sidef::Types::Number::Number {
     sub ilog2 {
         my ($x) = @_;
         state $two = Math::GMPz::Rmpz_init_set_ui(2);
-        bless \__ilog__((_any2mpz($$x) // goto &nan), $two);
+        __PACKAGE__->_set_uint(__ilog__((_any2mpz($$x) // goto &nan), $two) // goto &nan);
     }
 
     sub ilog10 {
         my ($x) = @_;
         state $ten = Math::GMPz::Rmpz_init_set_ui(10);
-        bless \__ilog__((_any2mpz($$x) // goto &nan), $ten);
+        __PACKAGE__->_set_uint(__ilog__((_any2mpz($$x) // goto &nan), $ten) // goto &nan);
     }
 
     sub __lgrt__ {
@@ -3663,11 +3731,11 @@ package Sidef::Types::Number::Number {
 
         $x = _any2mpfr($$x);
 
-        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        my $x_is_int = Math::MPFR::Rmpfr_integer_p($x);
+        my $r        = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
 
         # Special case for eta(1) = log(2)
-        if (    Math::MPFR::Rmpfr_integer_p($x)
-            and Math::MPFR::Rmpfr_cmp_ui($x, 1) == 0) {
+        if ($x_is_int and Math::MPFR::Rmpfr_cmp_ui($x, 1) == 0) {
             Math::MPFR::Rmpfr_const_log2($r, $ROUND);
             return bless \$r;
         }
@@ -3678,7 +3746,13 @@ package Sidef::Types::Number::Number {
         Math::MPFR::Rmpfr_ui_pow($r, 2, $r, $ROUND);
         Math::MPFR::Rmpfr_ui_sub($r, 1, $r, $ROUND);
 
-        Math::MPFR::Rmpfr_zeta($t, $x, $ROUND);
+        if ($x_is_int and Math::MPFR::Rmpfr_fits_ulong_p($x, $ROUND)) {
+            Math::MPFR::Rmpfr_zeta_ui($t, Math::MPFR::Rmpfr_get_ui($x, $ROUND), $ROUND);
+        }
+        else {
+            Math::MPFR::Rmpfr_zeta($t, $x, $ROUND);
+        }
+
         Math::MPFR::Rmpfr_mul($r, $r, $t, $ROUND);
 
         bless \$r;
@@ -4588,7 +4662,19 @@ package Sidef::Types::Number::Number {
     sub is_div {
         my ($x, $y) = @_;
         _valid(\$y);
-        __eq__(__mod__($$x, $$y), 0)
+
+        $x = $$x;
+        $y = $$y;
+
+        if (ref($x) eq 'Math::GMPz' and ref($y) eq 'Math::GMPz') {
+            return (
+                      (Math::GMPz::Rmpz_divisible_p($x, $y) && Math::GMPz::Rmpz_sgn($y))
+                    ? (Sidef::Types::Bool::Bool::TRUE)
+                    : (Sidef::Types::Bool::Bool::FALSE)
+                   );
+        }
+
+        __eq__(__mod__($x, $y), 0)
           ? (Sidef::Types::Bool::Bool::TRUE)
           : (Sidef::Types::Bool::Bool::FALSE);
     }
@@ -4596,7 +4682,19 @@ package Sidef::Types::Number::Number {
     sub divides {
         my ($x, $y) = @_;
         _valid(\$y);
-        __eq__(__mod__($$y, $$x), 0)
+
+        $x = $$x;
+        $y = $$y;
+
+        if (ref($x) eq 'Math::GMPz' and ref($y) eq 'Math::GMPz') {
+            return (
+                      (Math::GMPz::Rmpz_divisible_p($y, $x) && Math::GMPz::Rmpz_sgn($x))
+                    ? (Sidef::Types::Bool::Bool::TRUE)
+                    : (Sidef::Types::Bool::Bool::FALSE)
+                   );
+        }
+
+        __eq__(__mod__($y, $x), 0)
           ? (Sidef::Types::Bool::Bool::TRUE)
           : (Sidef::Types::Bool::Bool::FALSE);
     }
@@ -5087,8 +5185,8 @@ package Sidef::Types::Number::Number {
         goto(ref($x) =~ tr/:/_/rs);
 
       Math_GMPz: {
-            my $r = Math::GMPz::Rmpz_init_set($x);
-            Math::GMPz::Rmpz_add_ui($r, $r, 1);
+            my $r = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_add_ui($r, $x, 1);
             return $r;
         }
 
@@ -5122,8 +5220,8 @@ package Sidef::Types::Number::Number {
         goto(ref($x) =~ tr/:/_/rs);
 
       Math_GMPz: {
-            my $r = Math::GMPz::Rmpz_init_set($x);
-            Math::GMPz::Rmpz_sub_ui($r, $r, 1);
+            my $r = Math::GMPz::Rmpz_init();
+            Math::GMPz::Rmpz_sub_ui($r, $x, 1);
             return $r;
         }
 
@@ -5412,6 +5510,13 @@ package Sidef::Types::Number::Number {
         bless \$r;
     }
 
+    sub sqrtmod {
+        my ($x, $y) = @_;
+        _valid(\$y);
+        my $n = Math::Prime::Util::GMP::sqrtmod(_big2istr($x) // (goto &nan), _big2uistr($y) // (goto &nan)) // goto &nan;
+        $n < ULONG_MAX ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str('int', $n);
+    }
+
     sub modpow {
         my ($x, $y, $z) = @_;
 
@@ -5532,6 +5637,14 @@ package Sidef::Types::Number::Number {
     }
 
     *fac = \&factorial;
+
+    sub factorialmod {
+        my ($n, $m) = @_;
+        _valid(\$m);
+        my $r = Math::Prime::Util::GMP::factorialmod(_big2uistr($n) // (goto &nan), _big2uistr($m) // (goto &nan))
+          // goto &nan;
+        $r < ULONG_MAX ? __PACKAGE__->_set_uint($r) : __PACKAGE__->_set_str('int', $r);
+    }
 
     sub double_factorial {
         my ($x) = @_;
@@ -5778,7 +5891,7 @@ package Sidef::Types::Number::Number {
             else {
 #<<<
                 Math::GMPz::Rmpz_set_str($u, $bd, 10);                       # u = bd
-                Math::GMPz::Rmpz_mul(   $numerator,   $numerator,   $u);     # numerator   = numerator * u
+                Math::GMPz::Rmpz_mul(   $numerator,   $numerator,   $u);     # numerator   = numerator   * u
                 Math::GMPz::Rmpz_addmul($numerator,   $denominator, $t);     # numerator  += denominator * t
                 Math::GMPz::Rmpz_mul(   $denominator, $denominator, $u);     # denominator = denominator * u
 #>>>
@@ -5843,7 +5956,7 @@ package Sidef::Types::Number::Number {
             Math::Prime::Util::GMP::prime_count(_big2istr($x) // (goto &nan), _big2istr($y) // (goto &nan));
           }
           : Math::Prime::Util::GMP::prime_count(2, _big2istr($x) // (goto &nan));
-        $n <= ULONG_MAX ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str('int', $n);
+        $n < ULONG_MAX ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str('int', $n);
     }
 
     sub square_free_count {
@@ -5857,7 +5970,7 @@ package Sidef::Types::Number::Number {
         (my $n = __numify__($$from)) <= 0 && return ZERO;
 
         # Optimization for native integers
-        if ($n <= ULONG_MAX) {
+        if ($n < ULONG_MAX) {
 
             $n = CORE::int($n);
             my $s = CORE::int(CORE::sqrt($n));
@@ -6152,7 +6265,7 @@ package Sidef::Types::Number::Number {
                 if ($count >= $n) {
                     my $p = $primes[$n - $prev_count - 1];
                     return (
-                            $p <= ULONG_MAX
+                            $p < ULONG_MAX
                             ? __PACKAGE__->_set_uint($p)
                             : __PACKAGE__->_set_str('int', $p)
                            );
@@ -6251,6 +6364,16 @@ package Sidef::Types::Number::Number {
         bless \$r;
     }
 
+    sub gcdext {
+        my ($x, $y) = @_;
+
+        _valid(\$y);
+
+        my ($u, $v, $d) = Math::Prime::Util::GMP::gcdext(_big2istr($x) // 0, _big2istr($y) // 0);
+
+        map { ($_ > LONG_MIN and $_ < ULONG_MAX) ? __PACKAGE__->_set_int($_) : __PACKAGE__->_set_str('int', $_) } ($u, $v, $d);
+    }
+
     sub lcm {
         my ($x, $y) = @_;
 
@@ -6308,7 +6431,7 @@ package Sidef::Types::Number::Number {
 
         my $t = Math::GMPz::Rmpz_init();
         foreach my $f (keys %factors) {
-            if ($f <= ULONG_MAX) {
+            if ($f < ULONG_MAX) {
                 Math::GMPz::Rmpz_divisible_ui_p($r, $f)
                   ? Math::GMPz::Rmpz_set_ui($t, $f)
                   : next;
@@ -6406,12 +6529,7 @@ package Sidef::Types::Number::Number {
         _valid(\$y) if defined($y);
 
         Sidef::Types::Array::Array->new(
-            [
-             map {
-                 $_ <= ULONG_MAX
-                   ? __PACKAGE__->_set_uint($_)
-                   : __PACKAGE__->_set_str('int', $_)
-               }
+            [map { $_ < ULONG_MAX ? __PACKAGE__->_set_uint($_) : __PACKAGE__->_set_str('int', $_) }
 
                defined($y)
              ? Math::Prime::Util::GMP::sieve_primes((_big2uistr($x) // 0), (_big2uistr($y) // 0), 0)
@@ -6422,41 +6540,36 @@ package Sidef::Types::Number::Number {
 
     sub prev_prime {
         my $p = Math::Prime::Util::GMP::prev_prime(&_big2uistr // goto &nan) || goto &nan;
-        $p <= ULONG_MAX ? __PACKAGE__->_set_uint($p) : __PACKAGE__->_set_str('int', $p);
+        $p < ULONG_MAX ? __PACKAGE__->_set_uint($p) : __PACKAGE__->_set_str('int', $p);
     }
 
     sub next_prime {
         my $p = Math::Prime::Util::GMP::next_prime(&_big2uistr // goto &nan) || goto &nan;
-        $p <= ULONG_MAX ? __PACKAGE__->_set_uint($p) : __PACKAGE__->_set_str('int', $p);
+        $p < ULONG_MAX ? __PACKAGE__->_set_uint($p) : __PACKAGE__->_set_str('int', $p);
     }
 
     sub znorder {
         my ($x, $y) = @_;
         _valid(\$y);
         my $z = Math::Prime::Util::GMP::znorder(_big2uistr($x) // (goto &nan), _big2uistr($y) // (goto &nan)) // goto &nan;
-        $z <= ULONG_MAX ? __PACKAGE__->_set_uint($z) : __PACKAGE__->_set_str('int', $z);
+        $z < ULONG_MAX ? __PACKAGE__->_set_uint($z) : __PACKAGE__->_set_str('int', $z);
     }
 
     sub znprimroot {
         my $z = Math::Prime::Util::GMP::znprimroot(&_big2uistr // (goto &nan)) // goto &nan;
-        $z <= ULONG_MAX ? __PACKAGE__->_set_uint($z) : __PACKAGE__->_set_str('int', $z);
+        $z < ULONG_MAX ? __PACKAGE__->_set_uint($z) : __PACKAGE__->_set_str('int', $z);
     }
 
     sub rad {
         my %f;
         @f{Math::Prime::Util::GMP::factor(&_big2uistr // goto &nan)} = ();
         my $r = Math::Prime::Util::GMP::vecprod(CORE::keys %f);
-        $r <= ULONG_MAX ? __PACKAGE__->_set_uint($r) : __PACKAGE__->_set_str('int', $r);
+        $r < ULONG_MAX ? __PACKAGE__->_set_uint($r) : __PACKAGE__->_set_str('int', $r);
     }
 
     sub factor {
         Sidef::Types::Array::Array->new(
-            [
-             map {
-                 $_ <= ULONG_MAX
-                   ? __PACKAGE__->_set_uint($_)
-                   : __PACKAGE__->_set_str('int', $_)
-               }
+            [map { $_ < ULONG_MAX ? __PACKAGE__->_set_uint($_) : __PACKAGE__->_set_str('int', $_) }
 
                Math::Prime::Util::GMP::factor(&_big2uistr || return Sidef::Types::Array::Array->new())
             ]
@@ -6477,7 +6590,7 @@ package Sidef::Types::Number::Number {
               Sidef::Types::Array::Array->new(
                                               [
                                                (
-                                                $factor <= ULONG_MAX
+                                                $factor < ULONG_MAX
                                                 ? __PACKAGE__->_set_uint($factor)
                                                 : __PACKAGE__->_set_str('int', $factor)
                                                ),
@@ -6495,25 +6608,21 @@ package Sidef::Types::Number::Number {
         my $n = &_big2uistr || return Sidef::Types::Array::Array->new();
 
         Sidef::Types::Array::Array->new(
-            [
-             map {
-                 $_ <= ULONG_MAX
-                   ? __PACKAGE__->_set_uint($_)
-                   : __PACKAGE__->_set_str('int', $_)
-               } Math::Prime::Util::GMP::divisors($n)
-            ]
-        );
+                                        [map { $_ < ULONG_MAX ? __PACKAGE__->_set_uint($_) : __PACKAGE__->_set_str('int', $_) }
+                                           Math::Prime::Util::GMP::divisors($n)
+                                        ]
+                                       );
     }
 
     sub exp_mangoldt {
         my $n = Math::Prime::Util::GMP::exp_mangoldt(&_big2uistr || return ONE);
         $n eq '1' and return ONE;
-        $n <= ULONG_MAX ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str('int', $n);
+        $n < ULONG_MAX ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str('int', $n);
     }
 
     sub totient {
         my $n = Math::Prime::Util::GMP::totient(&_big2uistr // goto &nan);
-        $n <= ULONG_MAX ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str('int', $n);
+        $n < ULONG_MAX ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str('int', $n);
     }
 
     *euler_phi     = \&totient;
@@ -6523,12 +6632,12 @@ package Sidef::Types::Number::Number {
         my ($x, $y) = @_;
         _valid(\$y);
         my $n = Math::Prime::Util::GMP::jordan_totient(_big2istr($x) // (goto &nan), _big2istr($y) // (goto &nan));
-        $n <= ULONG_MAX ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str('int', $n);
+        $n < ULONG_MAX ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str('int', $n);
     }
 
     sub carmichael_lambda {
         my $n = Math::Prime::Util::GMP::carmichael_lambda(&_big2uistr // goto &nan);
-        $n <= ULONG_MAX ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str('int', $n);
+        $n < ULONG_MAX ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str('int', $n);
     }
 
     sub liouville {
@@ -6549,7 +6658,7 @@ package Sidef::Types::Number::Number {
         my $str = &_big2uistr // goto &nan;
         $str eq '0' && return ZERO;
         my $n = Math::Prime::Util::GMP::sigma($str, 0);
-        $n <= ULONG_MAX ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str('int', $n);
+        $n < ULONG_MAX ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str('int', $n);
     }
 
     sub sigma {
@@ -6562,12 +6671,12 @@ package Sidef::Types::Number::Number {
           }
           : Math::Prime::Util::GMP::sigma(&_big2uistr // (goto &nan), 1);
 
-        $n <= ULONG_MAX ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str('int', $n);
+        $n < ULONG_MAX ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str('int', $n);
     }
 
     sub partitions {
         my $n = Math::Prime::Util::GMP::partitions(&_big2uistr // goto &nan);
-        $n <= ULONG_MAX ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str('int', $n);
+        $n < ULONG_MAX ? __PACKAGE__->_set_uint($n) : __PACKAGE__->_set_str('int', $n);
     }
 
     sub is_primitive_root {
@@ -6585,6 +6694,30 @@ package Sidef::Types::Number::Number {
         my ($x) = @_;
         __is_int__($$x)
           && Math::Prime::Util::GMP::moebius(_big2uistr($x) // return Sidef::Types::Bool::Bool::FALSE)
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    sub is_totient {
+        my ($x) = @_;
+        __is_int__($$x)
+          && Math::Prime::Util::GMP::is_totient(_big2uistr($x) // return Sidef::Types::Bool::Bool::FALSE)
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    sub is_carmichael {
+        my ($x) = @_;
+        __is_int__($$x)
+          && Math::Prime::Util::GMP::is_carmichael(_big2uistr($x) // return Sidef::Types::Bool::Bool::FALSE)
+          ? Sidef::Types::Bool::Bool::TRUE
+          : Sidef::Types::Bool::Bool::FALSE;
+    }
+
+    sub is_fundamental {
+        my ($x) = @_;
+        __is_int__($$x)
+          && Math::Prime::Util::GMP::is_fundamental(_big2uistr($x) // return Sidef::Types::Bool::Bool::FALSE)
           ? Sidef::Types::Bool::Bool::TRUE
           : Sidef::Types::Bool::Bool::FALSE;
     }
@@ -6723,54 +6856,50 @@ package Sidef::Types::Number::Number {
         __PACKAGE__->_set_uint(Math::Prime::Util::GMP::is_power(&_big2istr // return ONE) || return ONE);
     }
 
-    sub next_pow2 {
-        my ($x) = @_;
-
-        my $r = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-
-        Math::MPFR::Rmpfr_log2($r, _any2mpfr($$x), $round_z);
-        Math::MPFR::Rmpfr_ceil($r, $r);
-
-        my $z = Math::GMPz::Rmpz_init_set_ui(1);
-        my $ui = Math::MPFR::Rmpfr_get_ui($r, $ROUND);
-        Math::GMPz::Rmpz_mul_2exp($z, $z, $ui);
-        bless \$z;
-    }
-
-    *next_power2 = \&next_pow2;
-
     sub next_pow {
         my ($x, $y) = @_;
 
         _valid(\$y);
 
-        my $f1 = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
-        my $f2 = Math::MPFR::Rmpfr_init2(CORE::int($PREC));
+        $x = _any2mpz($$x) // goto &nan;
+        $y = _any2mpz($$y) // goto &nan;
 
-        Math::MPFR::Rmpfr_log($f1, _any2mpfr($$x), $round_z);
-        Math::MPFR::Rmpfr_log($f2, _any2mpfr($$y), $round_z);
+        Math::GMPz::Rmpz_sgn($x) <= 0 and return ONE;
 
-        Math::MPFR::Rmpfr_div($f1, $f1, $f2, $ROUND);
-        Math::MPFR::Rmpfr_ceil($f1, $f1);
+        my $log = 1 + (__ilog__($x, $y) // goto &nan);
 
         my $r = Math::GMPz::Rmpz_init();
-        my $ui = Math::MPFR::Rmpfr_get_ui($f1, $ROUND);
-        Math::GMPz::Rmpz_pow_ui($r, (_any2mpz($$y) // goto &nan), $ui);
+
+        Math::GMPz::Rmpz_fits_ulong_p($y)
+          ? Math::GMPz::Rmpz_ui_pow_ui($r, Math::GMPz::Rmpz_get_ui($y), $log)
+          : Math::GMPz::Rmpz_pow_ui($r, $y, $log);
+
         bless \$r;
     }
 
     *next_power = \&next_pow;
 
+    sub next_pow2 {
+        my ($x) = @_;
+
+        state $two = bless \Math::GMPz::Rmpz_init_set_ui(2);
+
+        @_ = ($x, $two);
+        goto &next_pow;
+    }
+
+    *next_power2 = \&next_pow2;
+
     #
     ## Is a polygonal number?
     #
 
-    # $n is a Math::GMPz object
-    # $k is a Math::GMPz object
-    # $second is a boolean
-
     sub __is_polygonal__ {
         my ($n, $k, $second) = @_;
+
+        # $n is a Math::GMPz object
+        # $k is a Math::GMPz object
+        # $second is a boolean
 
         Math::GMPz::Rmpz_sgn($n) || return 1;
 
@@ -6837,12 +6966,12 @@ package Sidef::Types::Number::Number {
     ## Integer polygonal root
     #
 
-    # $n is a Math::GMPz object
-    # $k is a Math::GMPz object
-    # $second is a boolean
-
     sub __ipolygonal_root__ {
         my ($n, $k, $second) = @_;
+
+        # $n is a Math::GMPz object
+        # $k is a Math::GMPz object
+        # $second is a boolean
 
         # polygonal_root(n, k)
         #   = ((k - 4) ± sqrt(8 * (k - 2) * n + (k - 4)^2)) / (2 * (k - 2))
@@ -6925,11 +7054,10 @@ package Sidef::Types::Number::Number {
 
         Math::GMPz::Rmpz_mul($r, $n, $k);    # r = n*k
         Math::GMPz::Rmpz_sub($r, $r, $k);    # r = r-k
-        Math::GMPz::Rmpz_sub($r, $r, $n);    # r = r-n
-        Math::GMPz::Rmpz_sub($r, $r, $n);    # r = r-n
-        Math::GMPz::Rmpz_add_ui($r, $r, 4);  # r = r+4
-        Math::GMPz::Rmpz_mul($r, $r, $n);    # r = r*n
-        Math::GMPz::Rmpz_div_2exp($r, $r, 1);    # r = r/2
+        Math::GMPz::Rmpz_submul_ui($r, $n, 2);    # r = r-2*n
+        Math::GMPz::Rmpz_add_ui($r, $r, 4);       # r = r+4
+        Math::GMPz::Rmpz_mul($r, $r, $n);         # r = r*n
+        Math::GMPz::Rmpz_div_2exp($r, $r, 1);     # r = r/2
 
         bless \$r;
     }
@@ -7087,14 +7215,14 @@ package Sidef::Types::Number::Number {
 
         my $r = $$x;
         while (1) {
-            my $ref = ref($r);
-            ref($r) eq 'Math::GMPz' && return $x;    # is an integer
 
             if (ref($r) eq 'Math::GMPq') {
                 my $z = Math::GMPz::Rmpz_init();
                 Math::GMPq::Rmpq_get_num($z, $r);
                 return bless \$z;
             }
+
+            ref($r) eq 'Math::GMPz' and return $x;    # is an integer
 
             $r = _any2mpq($r) // (goto &nan);
         }
@@ -7107,14 +7235,14 @@ package Sidef::Types::Number::Number {
 
         my $r = $$x;
         while (1) {
-            my $ref = ref($r);
-            ref($r) eq 'Math::GMPz' && return ONE;    # is an integer
 
             if (ref($r) eq 'Math::GMPq') {
                 my $z = Math::GMPz::Rmpz_init();
                 Math::GMPq::Rmpq_get_den($z, $r);
                 return bless \$z;
             }
+
+            ref($r) eq 'Math::GMPz' and return ONE;    # is an integer
 
             $r = _any2mpq($r) // (goto &nan);
         }

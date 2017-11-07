@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "a. m.",
-    "p. m."
+    "p. m.",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E H:mm",
     EHms => "E H:mm:ss",
     Ed => "E d",
@@ -46,7 +51,7 @@
     ms => "mm:ss",
     y => "y",
     yM => "M/y",
-    yMEd => "E d/M/y",
+    yMEd => "E, d/M/y",
     yMM => "MM/y",
     yMMM => "MMMM 'de' y",
     yMMMEd => "EEE, d 'de' MMMM 'de' y",
@@ -57,13 +62,13 @@
     yMd => "d/M/y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ 'de' y",
-    "yw-count-one" => "'semana' w 'de' y",
-    "yw-count-other" => "'semana' w 'de' y"
+    "yw-count-one" => "'semana' w 'de' Y",
+    "yw-count-other" => "'semana' w 'de' Y",
   },
   code => "es-MX",
   date_format_full => "EEEE, d 'de' MMMM 'de' y",
   date_format_long => "d 'de' MMMM 'de' y",
-  date_format_medium => "dd/MM/y",
+  date_format_medium => "d MMM y",
   date_format_short => "dd/MM/yy",
   datetime_format_full => "{1}, {0}",
   datetime_format_long => "{1}, {0}",
@@ -76,7 +81,7 @@
     "jue.",
     "vie.",
     "s\N{U+00e1}b.",
-    "dom."
+    "dom.",
   ],
   day_format_narrow => [
     "L",
@@ -85,7 +90,7 @@
     "J",
     "V",
     "S",
-    "D"
+    "D",
   ],
   day_format_wide => [
     "lunes",
@@ -94,7 +99,7 @@
     "jueves",
     "viernes",
     "s\N{U+00e1}bado",
-    "domingo"
+    "domingo",
   ],
   day_stand_alone_abbreviated => [
     "lun.",
@@ -103,7 +108,7 @@
     "jue.",
     "vie.",
     "s\N{U+00e1}b.",
-    "dom."
+    "dom.",
   ],
   day_stand_alone_narrow => [
     "L",
@@ -112,7 +117,7 @@
     "J",
     "V",
     "S",
-    "D"
+    "D",
   ],
   day_stand_alone_wide => [
     "lunes",
@@ -121,19 +126,19 @@
     "jueves",
     "viernes",
     "s\N{U+00e1}bado",
-    "domingo"
+    "domingo",
   ],
   era_abbreviated => [
     "a. C.",
-    "d. C."
+    "d. C.",
   ],
   era_narrow => [
     "a. C.",
-    "d. C."
+    "d. C.",
   ],
   era_wide => [
     "antes de Cristo",
-    "despu\N{U+00e9}s de Cristo"
+    "despu\N{U+00e9}s de Cristo",
   ],
   first_day_of_week => 7,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -154,21 +159,21 @@
     "sep",
     "oct",
     "nov",
-    "dic"
+    "dic",
   ],
   month_format_narrow => [
-    "e",
-    "f",
-    "m",
-    "a",
-    "m",
-    "j",
-    "j",
-    "a",
-    "s",
-    "o",
-    "n",
-    "d"
+    "E",
+    "F",
+    "M",
+    "A",
+    "M",
+    "J",
+    "J",
+    "A",
+    "S",
+    "O",
+    "N",
+    "D",
   ],
   month_format_wide => [
     "enero",
@@ -182,7 +187,7 @@
     "septiembre",
     "octubre",
     "noviembre",
-    "diciembre"
+    "diciembre",
   ],
   month_stand_alone_abbreviated => [
     "ene.",
@@ -196,7 +201,7 @@
     "sep.",
     "oct.",
     "nov.",
-    "dic."
+    "dic.",
   ],
   month_stand_alone_narrow => [
     "E",
@@ -210,7 +215,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_stand_alone_wide => [
     "enero",
@@ -224,7 +229,7 @@
     "septiembre",
     "octubre",
     "noviembre",
-    "diciembre"
+    "diciembre",
   ],
   name => "Spanish Mexico",
   native_language => "espa\N{U+00f1}ol",
@@ -236,44 +241,44 @@
     "1er. trim.",
     "2\N{U+00ba}. trim.",
     "3er. trim.",
-    "4\N{U+00ba} trim."
+    "4\N{U+00ba} trim.",
   ],
   quarter_format_narrow => [
     "1T",
     "2T",
     "3T",
-    "4T"
+    "4T",
   ],
   quarter_format_wide => [
-    "1er. trimestre",
+    "1.er trimestre",
     "2\N{U+00ba}. trimestre",
-    "3er. trimestre",
-    "4o. trimestre"
+    "3.er trimestre",
+    "4o. trimestre",
   ],
   quarter_stand_alone_abbreviated => [
     "1er. trim.",
     "2\N{U+00ba}. trim.",
     "3er. trim.",
-    "4\N{U+00ba} trim."
+    "4\N{U+00ba} trim.",
   ],
   quarter_stand_alone_narrow => [
     "1T",
     "2T",
     "3T",
-    "4T"
+    "4T",
   ],
   quarter_stand_alone_wide => [
-    "1er. trimestre",
+    "1.er trimestre",
     "2\N{U+00ba}. trimestre",
-    "3er. trimestre",
-    "4\N{U+00ba} trimestre"
+    "3.er trimestre",
+    "4\N{U+00ba} trimestre",
   ],
   script => undef,
   territory => "Mexico",
-  time_format_full => "HH:mm:ss zzzz",
-  time_format_long => "HH:mm:ss z",
-  time_format_medium => "HH:mm:ss",
-  time_format_short => "HH:mm",
+  time_format_full => "H:mm:ss zzzz",
+  time_format_long => "H:mm:ss z",
+  time_format_medium => "H:mm:ss",
+  time_format_short => "H:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

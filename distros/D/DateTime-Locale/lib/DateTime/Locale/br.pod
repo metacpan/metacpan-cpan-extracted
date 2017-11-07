@@ -327,11 +327,41 @@ Breton locale.
 
 =head2 Available Formats
 
+=head3 Bh (h B)
+
+   2008-02-05T18:30:30 = 6 B
+   1995-12-22T09:05:02 = 9 B
+  -0010-09-15T04:44:23 = 4 B
+
+=head3 Bhm (h:mm B)
+
+   2008-02-05T18:30:30 = 6:30 B
+   1995-12-22T09:05:02 = 9:05 B
+  -0010-09-15T04:44:23 = 4:44 B
+
+=head3 Bhms (h:mm:ss B)
+
+   2008-02-05T18:30:30 = 6:30:30 B
+   1995-12-22T09:05:02 = 9:05:02 B
+  -0010-09-15T04:44:23 = 4:44:23 B
+
 =head3 E (ccc)
 
    2008-02-05T18:30:30 = Meu.
    1995-12-22T09:05:02 = Gwe.
   -0010-09-15T04:44:23 = Sad.
+
+=head3 EBhm (E h:mm B)
+
+   2008-02-05T18:30:30 = Meu. 6:30 B
+   1995-12-22T09:05:02 = Gwe. 9:05 B
+  -0010-09-15T04:44:23 = Sad. 4:44 B
+
+=head3 EBhms (E h:mm:ss B)
+
+   2008-02-05T18:30:30 = Meu. 6:30:30 B
+   1995-12-22T09:05:02 = Gwe. 9:05:02 B
+  -0010-09-15T04:44:23 = Sad. 4:44:23 B
 
 =head3 EHm (E HH:mm)
 
@@ -591,31 +621,31 @@ Breton locale.
    1995-12-22T09:05:02 = 4e trimiziad 1995
   -0010-09-15T04:44:23 = 3e trimiziad -10
 
-=head3 yw-count-few ('week' w 'of' y)
+=head3 yw-count-few ('week' w 'of' Y)
 
    2008-02-05T18:30:30 = week 6 of 2008
    1995-12-22T09:05:02 = week 51 of 1995
   -0010-09-15T04:44:23 = week 37 of -10
 
-=head3 yw-count-many ('week' w 'of' y)
+=head3 yw-count-many ('week' w 'of' Y)
 
    2008-02-05T18:30:30 = week 6 of 2008
    1995-12-22T09:05:02 = week 51 of 1995
   -0010-09-15T04:44:23 = week 37 of -10
 
-=head3 yw-count-one ('week' w 'of' y)
+=head3 yw-count-one ('week' w 'of' Y)
 
    2008-02-05T18:30:30 = week 6 of 2008
    1995-12-22T09:05:02 = week 51 of 1995
   -0010-09-15T04:44:23 = week 37 of -10
 
-=head3 yw-count-other ('week' w 'of' y)
+=head3 yw-count-other ('week' w 'of' Y)
 
    2008-02-05T18:30:30 = week 6 of 2008
    1995-12-22T09:05:02 = week 51 of 1995
   -0010-09-15T04:44:23 = week 37 of -10
 
-=head3 yw-count-two ('week' w 'of' y)
+=head3 yw-count-two ('week' w 'of' Y)
 
    2008-02-05T18:30:30 = week 6 of 2008
    1995-12-22T09:05:02 = week 51 of 1995

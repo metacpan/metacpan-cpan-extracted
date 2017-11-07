@@ -1,5 +1,10 @@
 Revision history for Struct-Path
 
+0.73    2017-11-03
+        hooks supported in spath_delta()
+        hooks: set $_ to substructure pointed by current step
+        spelling corrected, cosmetics
+
 0.72    2017-10-15
         spath(): sane errors for out of range negative array indexes
         croak if empty path and delete opt passed to spath()

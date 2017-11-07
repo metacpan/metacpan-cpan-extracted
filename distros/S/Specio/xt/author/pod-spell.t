@@ -96,6 +96,7 @@ Yuval
 autarch
 boolification
 coercions
+cpansprout
 de
 distro
 drolsky

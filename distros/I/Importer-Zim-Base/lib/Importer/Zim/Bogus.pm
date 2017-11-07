@@ -1,6 +1,6 @@
 
 package Importer::Zim::Bogus;
-$Importer::Zim::Bogus::VERSION = '0.9.0';
+$Importer::Zim::Bogus::VERSION = '0.10.0';
 # ABSTRACT: Bogus Importer::Zim backend
 
 use 5.010001;
@@ -83,7 +83,7 @@ Importer::Zim::Bogus - Bogus Importer::Zim backend
 
 =head1 VERSION
 
-version 0.9.0
+version 0.10.0
 
 =head1 SYNOPSIS
 

@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.602
+    version 0.603
 
 SYNOPSIS
 
@@ -86,6 +86,14 @@ ATTRIBUTES
     takes place (such as sending credentials unencrypted). Defaults to
     false (i.e. will issue warning).
 
+METHODS
+
+ new
+
+        $api = WebService::BitbucketServer->new(base_url => $base_url, %other_attributes);
+
+    Create a new API context object. Provide "ATTRIBUTES" to customize.
+
  core
 
     Get the WebService::BitbucketServer::Core::V1 api.
@@ -128,7 +136,7 @@ ATTRIBUTES
 
  jira
 
-    Get the WebService::BitbucketServer::Jira::V1 api.
+    Get the WebService::BitbucketServer::JIRA::V1 api.
 
  ssh
 
@@ -142,14 +150,6 @@ ATTRIBUTES
 
     Get the WebService::BitbucketServer::RepositoryRefSync::V1 api.
 
-METHODS
-
- new
-
-        $api = WebService::BitbucketServer->new(base_url => $base_url, %other_attributes);
-
-    Create a new API context object. Provide "ATTRIBUTES" to customize.
-
  url
 
         $url = $api->url;
@@ -160,7 +160,8 @@ METHODS
 
         $response = $api->call(method => $method, url => $url, %options);
 
-    Make a request to an API and get a response.
+    Make a request to an API and get a response (or Future if the user
+    agent is non-blocking).
 
       * url - the endpoint URL, relative to "url"
 
@@ -198,6 +199,10 @@ BUGS
 AUTHOR
 
     Charles McGarvey <chazmcgarvey@brokenzipper.com>
+
+CONTRIBUTOR
+
+    Camspi <amarus18@hotmail.com>
 
 COPYRIGHT AND LICENSE
 

@@ -1,5 +1,5 @@
 package Gtk3;
-$Gtk3::VERSION = '0.032';
+$Gtk3::VERSION = '0.033';
 =encoding utf8
 
 =head1 NAME
@@ -2345,7 +2345,7 @@ sub _rest_to_ref {
 }
 
 package Gtk3::Gdk::EventMask;
-$Gtk3::Gdk::EventMask::VERSION = '0.032';
+$Gtk3::Gdk::EventMask::VERSION = '0.033';
 use overload
   '==' => \&eq,
   '>=' => \&ge;

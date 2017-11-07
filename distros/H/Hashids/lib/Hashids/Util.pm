@@ -7,7 +7,7 @@ our ( @EXPORT_OK, %EXPORT_TAGS );
 
 BEGIN {
     use Exporter 'import';
-    @EXPORT_OK = qw(consistent_shuffle to_alphabet from_alphabet bignum);
+    @EXPORT_OK = qw(consistent_shuffle to_alphabet from_alphabet any bignum);
     %EXPORT_TAGS = ( all => \@EXPORT_OK );
 }
 
@@ -19,11 +19,11 @@ use namespace::clean -except => [qw(import)];
 sub consistent_shuffle {
     my ( $alphabet, $salt ) = @_;
 
-    return wantarray ? [''] : '' unless $alphabet;
+    return ('') unless $alphabet;
 
     my @alphabet
         = ref $alphabet eq 'ARRAY' ? @$alphabet : split // => $alphabet;
-    return wantarray ? @alphabet : join '', @alphabet unless $salt;
+    return @alphabet unless $salt;
     my @salt = ref $salt eq 'ARRAY' ? @$salt : split //, $salt;
 
     for ( my ( $i, $v, $p ) = ( $#alphabet, 0, 0 ); $i > 0; $i--, $v++ ) {
@@ -33,7 +33,7 @@ sub consistent_shuffle {
         @alphabet[ $j, $i ] = @alphabet[ $i, $j ];
     }
 
-    wantarray ? @alphabet : join '', @alphabet;
+    @alphabet;
 }
 
 sub to_alphabet {
@@ -64,6 +64,14 @@ sub from_alphabet {
     "$num";
 }
 
+sub any (&@) {                 ## no critic (ProhibitSubroutinePrototypes)
+    my $f = shift;
+    for (@_) {
+        return 1 if $f->();
+    }
+    0;
+}
+
 sub bignum {
     my $n = Math::BigInt->bzero();
     $n->round_mode('zero');
@@ -75,14 +83,16 @@ __END__
 
 =encoding utf-8
 
+=for stopwords arrayrefs bignum
+
 =head1 NAME
 
 Hashids::Util - Shuffling and conversion functions for Hashids
 
 =head1 SYNOPSIS
 
-    use Hashids::Util 
-        qw( consistent_shuffle to_alphabet from_alphabet bignum );
+    use Hashids::Util
+        qw( consistent_shuffle to_alphabet from_alphabet any bignum );
 
 =head1 DESCRIPTION
 
@@ -98,7 +108,7 @@ C<Hashids::Util> does not export any functions by default.
 
 =head2 consistent_shuffle
 
-    my $shuffled_alphabet = consistent_shuffle( $alphabet, $salt );
+    my @shuffled_alphabet = consistent_shuffle( $alphabet, $salt );
 
 Given an alphabet and salt, produce a shuffled alphabet.  Both alphabet
 and salt can be either strings or arrayrefs of characters.
@@ -116,6 +126,15 @@ may be a string or an arrayref of characters.
 
 Produce a number from the given hash string and alphabet.  The given
 alphabet may be a string or arrayref of characters.
+
+=head2 any
+
+    print "At least one non-negative value"
+    any { $_ >= 0 } @list_of_numbers;
+
+Returns a true value if any item in the given list meets the given
+criterion.  Returns false otherwise.  Adapted from
+L<List::MoreUtils::PP>.
 
 =head2 bignum
 

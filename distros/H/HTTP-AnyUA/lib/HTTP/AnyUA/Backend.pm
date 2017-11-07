@@ -5,7 +5,7 @@ package HTTP::AnyUA::Backend;
 use warnings;
 use strict;
 
-our $VERSION = '0.900'; # VERSION
+our $VERSION = '0.901'; # VERSION
 
 
 
@@ -40,7 +40,7 @@ HTTP::AnyUA::Backend - A base class for HTTP::AnyUA backends
 
 =head1 VERSION
 
-version 0.900
+version 0.901
 
 =head1 SYNOPSIS
 
@@ -64,7 +64,9 @@ version 0.900
         return $resp;
     }
 
-    ### Non-blocking user agents return responses as Future objects:
+    ### Non-blocking user agents are expected to return Future objects:
+
+    use Future;
 
     sub response_is_future { 1 }
 
@@ -141,11 +143,11 @@ This must be overridden by implementations.
 
 =item *
 
-L<HTTP::AnyUA/REQUEST>  - Explanation of the request arguments
+L<HTTP::AnyUA/The Request>  - Explanation of the request arguments
 
 =item *
 
-L<HTTP::AnyUA/RESPONSE> - Explanation of the response
+L<HTTP::AnyUA/The Response> - Explanation of the response
 
 =back
 

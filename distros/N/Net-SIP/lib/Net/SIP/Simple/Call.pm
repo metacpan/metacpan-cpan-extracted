@@ -55,7 +55,7 @@ use fields qw( call_cleanup rtp_cleanup ctx param );
 #       between packets managed in Net::SIP::Simple::RTP, default is PCMU/8000,
 #       e.g [ 0,160,160/8000 ]
 #       a name can be added in which case an rtpmap and ptme entry will be created in the
-#       SDP, e.g. [ 97,240,0.03,'iLBC/8000' ]
+#       SDP, e.g. [ 97,50,0.03,'iLBC/8000' ]
 ###########################################################################
 
 use Net::SIP::Util qw(:all);
@@ -667,26 +667,35 @@ sub _setup_local_rtp_socks {
 
 	# if no raddr yet just assume one
 	my @media;
+	my $rp = $param->{rtp_param};
 	if ( my $sdp_peer = $param->{sdp_peer} ) {
 	    foreach my $m ( $sdp_peer->get_media ) {
 		if ( $m->{proto} ne 'RTP/AVP' ) {
 		    $self->error( "only RTP/AVP supported" );
 		    return;
 		}
+		my @a;
 		if ( $m->{media} eq 'audio' ) {
-		    # enforce PCMU/8000 for now
-		    $m = { %$m, fmt => '0' }
+		    # enforce the payload type based on rtp_param
+		    $m = { %$m, fmt => $rp->[0] };
+		    push @a, (
+			"rtpmap:$rp->[0] $rp->[3]",
+			"ptime:".$rp->[2]*1000
+		    ) if $rp->[3];
+		    push @a, (
+			"rtpmap:101 telephone-event/8000",
+			"fmtp:101 0-16"
+		    );
 		}
 		push @media, {
 		    media => $m->{media},
 		    proto => $m->{proto},
 		    range => $m->{range},
 		    fmt   => [ $m->{fmt},101 ],
-		    a     => [ "rtpmap:101 telephone-event/8000", "fmtp:101 0-16" ],
+		    a     => \@a,
 		};
 	    }
 	} else {
-	    my $rp = $param->{rtp_param};
 	    my @a;
 	    push @a,( "rtpmap:$rp->[0] $rp->[3]" , "ptime:".$rp->[2]*1000) if $rp->[3];
 	    my $te = $rp->[3] && $rp->[0] == 101 ? 102: 101;

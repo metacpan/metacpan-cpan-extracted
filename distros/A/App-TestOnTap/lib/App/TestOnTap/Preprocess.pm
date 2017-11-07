@@ -1,6 +1,6 @@
 package App::TestOnTap::Preprocess;
 
-use App::TestOnTap::Util qw($SHELL_ARG_DELIM);
+use App::TestOnTap::Util qw(runprocess);
 
 use POSIX;
 
@@ -42,17 +42,20 @@ sub __execPreprocess
 	my $self = shift;
 	my $cmd = shift;
 	my $args = shift;
-	
-	my $cwd = getcwd();
-	my $suiteRoot = $args->getSuiteRoot(); 
-	chdir($suiteRoot) || die("Failed to change directory to '$suiteRoot': $!\n");
-	my @cmdcp = (@$cmd, @{$self->getArgv()});
-	$_ = "$SHELL_ARG_DELIM$_$SHELL_ARG_DELIM" foreach (@cmdcp);
-	my $cmdString = join(' ', @cmdcp);
-	my @preproc = qx($cmdString);
-	my $xit = $? >> 8;
-	chdir($cwd) || die("Failed to change directory back to '$cwd': $!\n");
-	die("Error $xit when running preprocess command: @preproc\n") if $xit;
+
+	my @preproc;	
+	my $xit = runprocess
+				(
+					sub { push(@preproc, $_[0])},
+					$args->getSuiteRoot(),
+					(
+						@$cmd,
+						@{$self->getArgv()}
+					)
+				);
+	die("ERROR: exit code '$xit' when running preprocess command\n") if $xit;
+
+	$args->getWorkDirManager()->recordPreprocess([ @preproc ]);
 
 	my %types =
 		(
@@ -65,7 +68,8 @@ sub __execPreprocess
 						$self->__parseArgvLines(@_)
 					}
 		);
-	chomp(@preproc);	
+
+	chomp(@preproc);
 	while (my $line = shift(@preproc))
 	{
 		if ($line =~ /^\s*#\s*BEGIN\s+([^\s]+)\s*$/ && exists($types{$1}))
@@ -76,7 +80,7 @@ sub __execPreprocess
 		{
 			warn("WARNING: Unexpected line during preprocessing: '$line'\n");
 		}
-	}	
+	}
 }
 
 sub __parseEnvLines

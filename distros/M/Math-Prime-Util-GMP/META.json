@@ -4,7 +4,7 @@
       "Dana A Jacobsen <dana@acm.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
    "license" : [
       "perl_5"
    ],
@@ -20,40 +20,16 @@
       ]
    },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
-      "configure" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
       "runtime" : {
          "recommends" : {
-            "Math::Prime::Util" : "0.62"
-         },
-         "requires" : {
-            "Carp" : "0",
-            "Exporter" : "5.57",
-            "Fcntl" : "0",
-            "XSLoader" : "0.01",
-            "base" : "0",
-            "perl" : "5.006002"
-         }
-      },
-      "test" : {
-         "requires" : {
-            "Math::BigInt" : "1.88",
-            "Test::More" : "0.45"
+            "Math::Prime::Util" : "0.68"
          }
       }
    },
    "provides" : {
       "Math::Prime::Util::GMP" : {
          "file" : "lib/Math/Prime/Util/GMP.pm",
-         "version" : "0.46"
+         "version" : "0.48"
       }
    },
    "release_status" : "stable",
@@ -66,6 +42,5 @@
          "url" : "https://github.com/danaj/Math-Prime-Util-GMP"
       }
    },
-   "version" : "0.46",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "0.48"
 }

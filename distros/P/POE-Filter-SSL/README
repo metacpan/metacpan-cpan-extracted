@@ -2,7 +2,7 @@ NAME
     POE::Filter::SSL - The easiest and flexiblest way to SSL in POE!
 
 VERSION
-    Version 0.36
+    Version 0.37
 
 DESCRIPTION
     This module allows one to secure connections of *POE::Wheel::ReadWrite*
@@ -473,6 +473,26 @@ FUNCTIONS
           *crl* option set on *new()*, otherwise to ask
           *clientCertNotOnCRL()* if the certificate is listed on your CRL
           file!
+
+        ignoreVerifyErrors
+          WARNING: Before using this option, you should be realy sure that
+          you know what you are doing!
+
+          Specify to ignore specific errors on verifying the certificate
+          chain: This is for example useful to be able to fetch the time
+          from via secure and trusted TLS connection. In this case, your
+          time is wrong, so must ignore time errors, which are 9:
+          X509_V_ERR_CERT_NOT_YET_VALID (certificate is not yet valid) and
+          10: X509_V_ERR_CERT_HAS_EXPIRED (certificate has expired).
+
+          The list of errors you can ignore can be found on the
+          documentation:
+
+          <https://wiki.openssl.org/index.php/Manual:Verify(1)>
+
+          Example:
+
+            ignoreVerifyErrors => [ 9, 10, ]
 
     handshakeDone(options)
         Returns *true* if the handshake is done and all data for handshake

@@ -80,7 +80,10 @@ use App::Dochazka::REST::Model::Shared qw(
 );
 use App::Dochazka::REST::ResourceDefs;
 use App::Dochazka::REST::Shared qw( :ALL );  # all the shared_* functions
-use App::Dochazka::REST::Holiday qw( holidays_in_daterange );
+use App::Dochazka::REST::Holiday qw(
+    holidays_and_weekends
+    holidays_in_daterange
+);
 use Data::Dumper;
 use File::Path qw( mkpath rmtree );
 use Module::Runtime qw( use_module );
@@ -403,8 +406,9 @@ sub handler_holiday_tsrange {
     }
 
     # second pass
-    return $CELL->status_ok( 'DOCHAZKA_HOLIDAYS_IN_TSRANGE', payload =>
-        holidays_in_daterange( %{ $self->context->{'stashed_daterange'} } )
+    return $CELL->status_ok( 'DOCHAZKA_HOLIDAYS_AND_WEEKENDS_IN_TSRANGE',
+        tsrange => $self->context->{'mapping'}->{'tsrange'},
+        payload => holidays_and_weekends( %{ $self->context->{'stashed_daterange'} } )
     );
 }
 
@@ -2731,21 +2735,23 @@ sub _handler_interval_fillup_scheduled {
     my $method = $context->{'method'};
     my $path = $context->{'path'};
     my $entity = $context->{'request_entity'};
-    my ( $clobber, $dry_run );
+    my ( $act, $clobber, $dry_run, $emp );
 
     # first pass
     return 1 if $self->_first_pass_always_exists( $pass ); 
 
     # second pass
-    $log->debug( "handler_fillup(): Commencing pass #2, mode is $mode, entity is " .  Dumper( $entity ) );
+    $log->debug( "_handler_interval_fillup_scheduled(): Commencing pass #2, mode is $mode, entity is " .  Dumper( $entity ) );
 
     # extract employee from request entity
-    my $emp = $self->_extract_employee_spec( $entity );
+    $emp = $self->_extract_employee_spec( $entity );
     return $fail unless ref( $emp ) eq 'App::Dochazka::REST::Model::Employee';
 
-    # extract activity from request entity
-    my $act = $self->_extract_activity_spec( $entity );
-    return $fail unless ref( $act ) eq 'App::Dochazka::REST::Model::Activity';
+    if ($mode eq 'Fillup') {
+        # extract activity from request entity
+        $act = $self->_extract_activity_spec( $entity );
+        return $fail unless ref( $act ) eq 'App::Dochazka::REST::Model::Activity';
+    }
 
     # either tsrange or date_list, but not both
     my $tsdl = $self->_extract_date_list_or_tsrange( $entity );
@@ -2768,12 +2774,14 @@ sub _handler_interval_fillup_scheduled {
     my $fillup = App::Dochazka::REST::Fillup->new( 
         context => $context,
         emp_obj => $emp,
-        aid => $act->aid,
         clobber => $clobber,
         %$dry_run,
         %$tsdl,
         %$entity,
     );
+    if ($mode eq 'Fillup') {
+        $fillup->act_obj( $act );
+    }
     if ( ! defined( $fillup ) or ref( $fillup ) ne 'App::Dochazka::REST::Fillup' ) {
         $self->mrest_declare_status( 
             code => 500, 

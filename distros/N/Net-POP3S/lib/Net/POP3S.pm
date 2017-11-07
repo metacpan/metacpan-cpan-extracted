@@ -8,7 +8,7 @@ package Net::POP3S;
 
 use vars qw ( $VERSION @ISA );
 
-$VERSION = '0.09';
+$VERSION = '0.10';
 
 use strict;
 use base qw ( Net::POP3 );
@@ -41,10 +41,6 @@ sub new {
   }
   my $ssl = delete $arg{doSSL};
   if ($ssl =~ /ssl/i) {
-      $arg{SSL} = 1;
-  }
-  if (defined($arg{SSL}) && $arg{SSL} > 0) {
-      $ssl = 'ssl';
       $arg{Port} ||= 995;
   }
 
@@ -79,25 +75,14 @@ sub new {
   ${*$obj}{'net_pop3_host'} = $host;
 
   $obj->autoflush(1);
+
   $obj->debug(exists $arg{Debug} ? $arg{Debug} : undef);
 
-# common in SSL
-  my %ssl_args;
-  if ($ssl || defined($arg{SSL}) ) {
-    eval {
-      require IO::Socket::SSL;
-    } or do {
-      $obj->set_status(500, ["Need working IO::Socket::SSL"]);
-      $obj->close;
-      return undef;
-    };
-    %ssl_args = map { +"$_" => $arg{$_} } grep {/^SSL/} keys %arg;
-    $IO::Socket::SSL::DEBUG = (exists $arg{Debug} ? $arg{Debug} : undef); 
-  }
+  ${*$obj}{'net_pop3_arg'} = \%arg;
 
 # OverSSL
   if (defined($ssl) && $ssl =~ /ssl/i) {
-    $obj->ssl_start(\%ssl_args)
+    $obj->ssl_start()
       or do {
 	 $obj->set_status(500, ["Cannot start SSL"]);
 	 $obj->close;
@@ -111,7 +96,6 @@ sub new {
   }
 
   ${*$obj}{'net_pop3_banner'} = $obj->message;
-  ${*$obj}{'net_pop3_arg'} = \%arg;
 
 # STARTTLS
   if (defined($ssl) && $ssl =~ /starttls|stls/i ) {
@@ -124,11 +108,26 @@ sub new {
 }
 
 sub ssl_start {
-    my ($self, $args) = @_;
+    my $self = shift;
     my $type = ref($self);
+    my %arg = %{ ${*$self}{'net_pop3_arg'} };
+    my %ssl_args = map { +"$_" => $arg{$_} } grep {/^SSL/} keys %arg;
+
+    eval {
+	require IO::Socket::SSL;
+    } or do {
+	$self->set_status(500, ["Need working IO::Socket::SSL"]);
+	$self->close;
+	return undef;
+    };
+
+    my $ssl_debug = (exists $arg{Debug} ? $arg{Debug} : undef);
+    $ssl_debug = (exists $arg{Debug_SSL} ? $arg{Debug_SSL} : $ssl_debug);
+
+    local $IO::Socket::SSL::DEBUG = $ssl_debug;    
 
     (unshift @ISA, 'IO::Socket::SSL'
-     and IO::Socket::SSL->start_SSL($self, %$args)
+     and IO::Socket::SSL->start_SSL($self, %ssl_args, @_)
      and $self->isa('IO::Socket::SSL')
      and bless $self, $type     # re-bless 'cause IO::Socket::SSL blesses himself.
     ) or return undef;
@@ -136,13 +135,11 @@ sub ssl_start {
 
 sub starttls {
     my $self = shift;
-    my %arg = %{ ${*$self}{'net_pop3_arg'} };
-    my %ssl_args = map { +"$_" => $arg{$_} } grep {/^SSL/} keys %arg;
     my $capa;
     ($capa = $self->capa
      and exists $capa->{STLS}
      and $self->_STLS()
-     and $self->ssl_start(\%ssl_args, @_)
+     and $self->ssl_start(@_)
     ) or do {
 	$self->set_status(500, ["Cannot start SSL session"]);
 	$self->close();
@@ -235,8 +232,6 @@ A few options added to Net::POP3(2.X).
 B<doSSL> { C<ssl> | C<starttls> | undef } - to specify SSL connection type.
 C<ssl> makes connection wrapped with SSL, C<starttls> uses POP3 command C<STLS>.
 
-B<SSL> { 0 | 1 } - C<1> means the same as B<doSSL> to C<ssl>, C<0> is just initialize
-SSL libraries internally for using C<starttls> later.
 
 =back
 
@@ -256,9 +251,7 @@ method of authentication, like 'CRAM-MD5', 'LOGIN', ... etc. the default is 'CRA
 
 =item starttls ( SSLARGS )
 
-Upgrade existing plain connection to SSL. If you use this, you must create instance like,
-
-    $smtp = Net::POP3S->new($host, SSL => 0, ...);
+Upgrade existing plain connection to SSL.
 
 
 =back

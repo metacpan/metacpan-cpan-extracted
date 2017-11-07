@@ -34,7 +34,7 @@ use LWP::UserAgent;
 use HTTP::Request::Common;
 use HTML::TableExtract;
 
-our $VERSION = '1.38'; # VERSION
+our $VERSION = '1.43'; # VERSION
 $AIAHK_URL = 'http://www.aia.com.hk/daily/fund_mst_rightb.asp?cat=BR_AC';
 
 
@@ -69,7 +69,7 @@ sub aiahk {
     # Now parse the data table contained in the result.  This is the
     # inner of two tables.  There are no headers on this table as they
     # are part of the iframe containing this page.
-    $te= new HTML::TableExtract(depth => 1);
+    $te = HTML::TableExtract->new(depth => 1);
     $te->parse($reply->content);
 
     unless ($te->tables) {

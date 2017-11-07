@@ -10,7 +10,7 @@ use strict;
 use warnings;
 
 use vars qw($VERSION);
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Wx qw( :image );
 use File::Basename;

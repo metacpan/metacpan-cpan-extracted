@@ -1,0 +1,6 @@
+Revision history for Perl extension XML::FromPerl.
+
+0.01  Mon Jul 17 15:55:48 2017
+	- original version; created by h2xs 1.23 with options
+		-AXn XML::FromPerl
+

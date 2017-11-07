@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright 2007, 2009, 2010, 2011, 2016 Kevin Ryde
+# Copyright 2007, 2009, 2010, 2011, 2016, 2017 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -249,7 +249,7 @@ set format y "%.1f"
 unset key
 set style fill solid 1.0
 set boxwidth 0.6 relative
-plot "$datafilename" with boxes
+plot "$datafilename" with boxes lc "red"
 HERE
 
     system("gnuplot $plotfilename 2>&1 >$basename.png") == 0 or die;

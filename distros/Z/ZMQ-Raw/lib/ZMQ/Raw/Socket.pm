@@ -1,5 +1,5 @@
 package ZMQ::Raw::Socket;
-$ZMQ::Raw::Socket::VERSION = '0.12';
+$ZMQ::Raw::Socket::VERSION = '0.14';
 use strict;
 use warnings;
 use Carp;
@@ -31,7 +31,7 @@ ZMQ::Raw::Socket - ZeroMQ Socket class
 
 =head1 VERSION
 
-version 0.12
+version 0.14
 
 =head1 DESCRIPTION
 
@@ -117,18 +117,6 @@ discarded.
 Queue a message created from C<$buffer>. C<$flags> defaults to C<0> but may
 be a combination of:
 
-=head2 close( )
-
-Close the socket. Any outstanding messages physically received from the network
-but not yet received by the application will be discarded.
-
-=head2 monitor( $endpoint, $events)
-
-Track socket events. Each call to this method creates a C<ZMQ_PAIR> socket and
-binds that to the specified inproc C<$endpoint>. In order to collect socket
-events, you must create your own C<ZMQ_PAIR> socket and connect it to the
-C<$endpoint>.
-
 =over 4
 
 =item * C<ZMQ::Raw-E<gt>ZMQ_DONTWAIT>
@@ -143,6 +131,22 @@ follow.
 
 =back
 
+This method may return C<undef> (or an empty list if called in list context) if
+the system call was interrupt or if the operation cannot be completed
+immediately, after which it may be reattempted.
+
+=head2 close( )
+
+Close the socket. Any outstanding messages physically received from the network
+but not yet received by the application will be discarded.
+
+=head2 monitor( $endpoint, $events)
+
+Track socket events. Each call to this method creates a C<ZMQ_PAIR> socket and
+binds that to the specified inproc C<$endpoint>. In order to collect socket
+events, you must create your own C<ZMQ_PAIR> socket and connect it to the
+C<$endpoint>.
+
 =head2 sendmsg( @msgs, $flags = 0)
 
 Queue C<@msgs> to be sent. Each message in C<@msgs> that is a L<C<ZMQ::Raw::Message>>
@@ -150,6 +154,10 @@ is still valid after this call, that is, they may be reused. Each item in C<@msg
 may either be a L<C<ZMQ::Raw::Message>> object or a "normal" perl scalar. The
 C<$flags> parameter is only available if all items in C<@msgs> are L<C<ZMQ::Raw::Message>>
 objects. See the SYNOPSIS for usage examples.
+
+This method may return C<undef> (or an empty list if called in list context) if
+the system call was interrupt or if the operation cannot be completed
+immediately, after which it may be reattempted.
 
 =head2 recv( $flags = 0)
 
@@ -160,10 +168,18 @@ method will return C<undef> immediately. If called in list context, this method
 will return each part of the message as a scalar item. In scalar context, each
 part of the message will be concatenated into a single scalar item.
 
+This method may return C<undef> (or an empty list if called in list context) if
+the system call was interrupt or if the operation cannot be completed
+immediately, after which it may be reattempted.
+
 =head2 recvmsg( $flags = 0)
 
 Receive a message part or multiple messages parts if called in list context.
 Returns a L<C<ZMQ::Raw::Message>> object or an array of object.
+
+This method may return C<undef> (or an empty list if called in list context) if
+the system call was interrupt or if the operation cannot be completed
+immediately, after which it may be reattempted.
 
 =head2 setsockopt( $option, $value )
 

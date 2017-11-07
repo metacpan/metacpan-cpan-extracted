@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "n tufat",
-    "n tmeddit"
+    "n tmeddit",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d, E",
@@ -48,7 +53,7 @@
     yMd => "y-MM-dd",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "kab",
   date_format_full => "EEEE d MMMM y",
@@ -66,7 +71,7 @@
     "Sam",
     "S\N{U+1e0d}is",
     "Say",
-    "Yan"
+    "Yan",
   ],
   day_format_narrow => [
     "S",
@@ -75,7 +80,7 @@
     "S",
     "S",
     "S",
-    "Y"
+    "Y",
   ],
   day_format_wide => [
     "Sanass",
@@ -84,7 +89,7 @@
     "Samass",
     "S\N{U+1e0d}isass",
     "Sayass",
-    "Yanass"
+    "Yanass",
   ],
   day_stand_alone_abbreviated => [
     "San",
@@ -93,7 +98,7 @@
     "Sam",
     "S\N{U+1e0d}is",
     "Say",
-    "Yan"
+    "Yan",
   ],
   day_stand_alone_narrow => [
     "S",
@@ -102,7 +107,7 @@
     "S",
     "S",
     "S",
-    "Y"
+    "Y",
   ],
   day_stand_alone_wide => [
     "Sanass",
@@ -111,19 +116,19 @@
     "Samass",
     "S\N{U+1e0d}isass",
     "Sayass",
-    "Yanass"
+    "Yanass",
   ],
   era_abbreviated => [
     "snd. T.\N{U+0190}",
-    "sld. T.\N{U+0190}"
+    "sld. T.\N{U+0190}",
   ],
   era_narrow => [
     "snd. T.\N{U+0190}",
-    "sld. T.\N{U+0190}"
+    "sld. T.\N{U+0190}",
   ],
   era_wide => [
     "send talalit n \N{U+0190}isa",
-    "seld talalit n \N{U+0190}isa"
+    "seld talalit n \N{U+0190}isa",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -144,7 +149,7 @@
     "Cte",
     "Tub",
     "Nun",
-    "Du\N{U+01e7}"
+    "Du\N{U+01e7}",
   ],
   month_format_narrow => [
     "Y",
@@ -158,7 +163,7 @@
     "C",
     "T",
     "N",
-    "D"
+    "D",
   ],
   month_format_wide => [
     "Yennayer",
@@ -172,7 +177,7 @@
     "Ctembe\N{U+1e5b}",
     "Tube\N{U+1e5b}",
     "Nunembe\N{U+1e5b}",
-    "Du\N{U+01e7}embe\N{U+1e5b}"
+    "Du\N{U+01e7}embe\N{U+1e5b}",
   ],
   month_stand_alone_abbreviated => [
     "Yen",
@@ -186,7 +191,7 @@
     "Cte",
     "Tub",
     "Nun",
-    "Du\N{U+01e7}"
+    "Du\N{U+01e7}",
   ],
   month_stand_alone_narrow => [
     "Y",
@@ -200,7 +205,7 @@
     "C",
     "T",
     "N",
-    "D"
+    "D",
   ],
   month_stand_alone_wide => [
     "Yennayer",
@@ -214,7 +219,7 @@
     "Ctembe\N{U+1e5b}",
     "Tube\N{U+1e5b}",
     "Nunembe\N{U+1e5b}",
-    "Du\N{U+01e7}embe\N{U+1e5b}"
+    "Du\N{U+01e7}embe\N{U+1e5b}",
   ],
   name => "Kabyle",
   native_language => "Taqbaylit",
@@ -226,37 +231,37 @@
     "K\N{U+1e0d}g1",
     "K\N{U+1e0d}g2",
     "K\N{U+1e0d}g3",
-    "K\N{U+1e0d}g4"
+    "K\N{U+1e0d}g4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "akra\N{U+1e0d}aggur amenzu",
     "akra\N{U+1e0d}aggur wis-sin",
     "akra\N{U+1e0d}aggur wis-kra\N{U+1e0d}",
-    "akra\N{U+1e0d}aggur wis-ku\N{U+1e93}"
+    "akra\N{U+1e0d}aggur wis-ku\N{U+1e93}",
   ],
   quarter_stand_alone_abbreviated => [
     "K\N{U+1e0d}g1",
     "K\N{U+1e0d}g2",
     "K\N{U+1e0d}g3",
-    "K\N{U+1e0d}g4"
+    "K\N{U+1e0d}g4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "akra\N{U+1e0d}aggur amenzu",
     "akra\N{U+1e0d}aggur wis-sin",
     "akra\N{U+1e0d}aggur wis-kra\N{U+1e0d}",
-    "akra\N{U+1e0d}aggur wis-ku\N{U+1e93}"
+    "akra\N{U+1e0d}aggur wis-ku\N{U+1e93}",
   ],
   script => undef,
   territory => undef,
@@ -265,5 +270,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 31
+  version => 32,
 }

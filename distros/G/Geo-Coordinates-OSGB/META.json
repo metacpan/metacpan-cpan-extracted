@@ -1,12 +1,12 @@
 {
    "abstract" : "Convert coordinates between Lat/Lon and the British National Grid",
    "author" : [
-      "Toby Thurston"
+      "Toby Thurston <toby@cpan.org>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "open_source"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -27,16 +27,17 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0.06"
          }
       },
       "runtime" : {
          "requires" : {
-            "perl" : "5.008"
+            "File::Share" : "0.25"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "2.19",
+   "version" : "2.20",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

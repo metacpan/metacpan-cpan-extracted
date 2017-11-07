@@ -6,7 +6,7 @@
    "dynamic_config" : 0,
    "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -34,10 +34,18 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp::Always" : "0.13",
+            "Exception::Class" : "1.40",
             "File::Temp" : "0.2304",
-            "JSON::XS" : "3.04",
-            "LWP::UserAgent" : "6.27",
-            "perl" : "v5.22.1"
+            "JSON::XS" : "3.01",
+            "LWP::UserAgent" : "6.15",
+            "Log::Log4perl" : "1.49",
+            "MIME::Base64" : "3.15",
+            "Params::Validate" : "1.22",
+            "Test::Exception" : "0.38",
+            "Test::MockModule" : "0.11",
+            "Try::Tiny" : "0.24",
+            "perl" : "5.020000"
          }
       }
    },
@@ -53,6 +61,6 @@
          "web" : "https://github.com/KohaSuomi/Pootle-Client/"
       }
    },
-   "version" : "0.02",
+   "version" : "0.07",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

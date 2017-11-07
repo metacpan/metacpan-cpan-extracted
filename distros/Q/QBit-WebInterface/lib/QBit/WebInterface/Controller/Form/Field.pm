@@ -1,5 +1,5 @@
 package QBit::WebInterface::Controller::Form::Field;
-$QBit::WebInterface::Controller::Form::Field::VERSION = '0.029';
+$QBit::WebInterface::Controller::Form::Field::VERSION = '0.030';
 use qbit;
 
 use base qw(QBit::Class);

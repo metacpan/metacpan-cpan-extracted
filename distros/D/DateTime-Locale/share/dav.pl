@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "Luma lwa K",
-    "luma lwa p"
+    "luma lwa p",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d, E",
@@ -45,7 +50,7 @@
     yMd => "d/M/y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "dav",
   date_format_full => "EEEE, d MMMM y",
@@ -63,7 +68,7 @@
     "Kan",
     "Kas",
     "Ngu",
-    "Jum"
+    "Jum",
   ],
   day_format_narrow => [
     "J",
@@ -72,7 +77,7 @@
     "K",
     "K",
     "N",
-    "J"
+    "J",
   ],
   day_format_wide => [
     "Kuramuka jimweri",
@@ -81,7 +86,7 @@
     "Kuramuka kana",
     "Kuramuka kasanu",
     "Kifula nguwo",
-    "Ituku ja jumwa"
+    "Ituku ja jumwa",
   ],
   day_stand_alone_abbreviated => [
     "Jim",
@@ -90,7 +95,7 @@
     "Kan",
     "Kas",
     "Ngu",
-    "Jum"
+    "Jum",
   ],
   day_stand_alone_narrow => [
     "J",
@@ -99,7 +104,7 @@
     "K",
     "K",
     "N",
-    "J"
+    "J",
   ],
   day_stand_alone_wide => [
     "Kuramuka jimweri",
@@ -108,19 +113,19 @@
     "Kuramuka kana",
     "Kuramuka kasanu",
     "Kifula nguwo",
-    "Ituku ja jumwa"
+    "Ituku ja jumwa",
   ],
   era_abbreviated => [
     "KK",
-    "BK"
+    "BK",
   ],
   era_narrow => [
     "KK",
-    "BK"
+    "BK",
   ],
   era_wide => [
     "Kabla ya Kristo",
-    "Baada ya Kristo"
+    "Baada ya Kristo",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -141,7 +146,7 @@
     "Ike",
     "Iku",
     "Imw",
-    "Iwi"
+    "Iwi",
   ],
   month_format_narrow => [
     "I",
@@ -155,7 +160,7 @@
     "I",
     "I",
     "I",
-    "I"
+    "I",
   ],
   month_format_wide => [
     "Mori ghwa imbiri",
@@ -169,7 +174,7 @@
     "Mori ghwa ikenda",
     "Mori ghwa ikumi",
     "Mori ghwa ikumi na imweri",
-    "Mori ghwa ikumi na iwi"
+    "Mori ghwa ikumi na iwi",
   ],
   month_stand_alone_abbreviated => [
     "Imb",
@@ -183,7 +188,7 @@
     "Ike",
     "Iku",
     "Imw",
-    "Iwi"
+    "Iwi",
   ],
   month_stand_alone_narrow => [
     "I",
@@ -197,7 +202,7 @@
     "I",
     "I",
     "I",
-    "I"
+    "I",
   ],
   month_stand_alone_wide => [
     "Mori ghwa imbiri",
@@ -211,7 +216,7 @@
     "Mori ghwa ikenda",
     "Mori ghwa ikumi",
     "Mori ghwa ikumi na imweri",
-    "Mori ghwa ikumi na iwi"
+    "Mori ghwa ikumi na iwi",
   ],
   name => "Taita",
   native_language => "Kitaita",
@@ -223,37 +228,37 @@
     "K1",
     "K2",
     "K3",
-    "K4"
+    "K4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "Kimu cha imbiri",
     "Kimu cha kawi",
     "Kimu cha kadadu",
-    "Kimu cha kana"
+    "Kimu cha kana",
   ],
   quarter_stand_alone_abbreviated => [
     "K1",
     "K2",
     "K3",
-    "K4"
+    "K4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "Kimu cha imbiri",
     "Kimu cha kawi",
     "Kimu cha kadadu",
-    "Kimu cha kana"
+    "Kimu cha kana",
   ],
   script => undef,
   territory => undef,
@@ -262,5 +267,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

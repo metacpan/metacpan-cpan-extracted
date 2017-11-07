@@ -73,7 +73,7 @@
             "constant" : "0",
             "goto::file" : "0.005",
             "parent" : "0",
-            "perl" : "5.008001"
+            "perl" : "5.008009"
          },
          "suggests" : {
             "Cpanel::JSON::XS" : "0",
@@ -92,7 +92,7 @@
          "url" : "http://github.com/Test-More/Test2-Harness/"
       }
    },
-   "version" : "0.001030",
+   "version" : "0.001031",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
 }
 

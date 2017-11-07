@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "AM",
-    "PM"
+    "PM",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "E d",
@@ -44,7 +49,7 @@
     yMd => "M/d/y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "vai-Latn",
   date_format_full => "EEEE, d MMMM y",
@@ -62,7 +67,7 @@
     "aimisa",
     "aijima",
     "si\N{U+0253}iti",
-    "lahadi"
+    "lahadi",
   ],
   day_format_narrow => [
     "M",
@@ -71,7 +76,7 @@
     "T",
     "F",
     "S",
-    "S"
+    "S",
   ],
   day_format_wide => [
     "t\N{U+025b}\N{U+025b}n\N{U+025b}\N{U+025b}",
@@ -80,7 +85,7 @@
     "aimisa",
     "aijima",
     "si\N{U+0253}iti",
-    "lahadi"
+    "lahadi",
   ],
   day_stand_alone_abbreviated => [
     "t\N{U+025b}\N{U+025b}n\N{U+025b}\N{U+025b}",
@@ -89,7 +94,7 @@
     "aimisa",
     "aijima",
     "si\N{U+0253}iti",
-    "lahadi"
+    "lahadi",
   ],
   day_stand_alone_narrow => [
     "M",
@@ -98,7 +103,7 @@
     "T",
     "F",
     "S",
-    "S"
+    "S",
   ],
   day_stand_alone_wide => [
     "t\N{U+025b}\N{U+025b}n\N{U+025b}\N{U+025b}",
@@ -107,19 +112,19 @@
     "aimisa",
     "aijima",
     "si\N{U+0253}iti",
-    "lahadi"
+    "lahadi",
   ],
   era_abbreviated => [
     "BCE",
-    "CE"
+    "CE",
   ],
   era_narrow => [
     "BCE",
-    "CE"
+    "CE",
   ],
   era_wide => [
     "BCE",
-    "CE"
+    "CE",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -140,7 +145,7 @@
     "saah",
     "galo",
     "kenpkato \N{U+0253}olol\N{U+0254}",
-    "luukao l\N{U+0254}ma"
+    "luukao l\N{U+0254}ma",
   ],
   month_format_narrow => [
     1,
@@ -154,7 +159,7 @@
     9,
     10,
     11,
-    12
+    12,
   ],
   month_format_wide => [
     "luukao kem\N{U+00e3}",
@@ -168,7 +173,7 @@
     "saah",
     "galo",
     "kenpkato \N{U+0253}olol\N{U+0254}",
-    "luukao l\N{U+0254}ma"
+    "luukao l\N{U+0254}ma",
   ],
   month_stand_alone_abbreviated => [
     "luukao kem\N{U+00e3}",
@@ -182,7 +187,7 @@
     "saah",
     "galo",
     "kenpkato \N{U+0253}olol\N{U+0254}",
-    "luukao l\N{U+0254}ma"
+    "luukao l\N{U+0254}ma",
   ],
   month_stand_alone_narrow => [
     1,
@@ -196,7 +201,7 @@
     9,
     10,
     11,
-    12
+    12,
   ],
   month_stand_alone_wide => [
     "luukao kem\N{U+00e3}",
@@ -210,7 +215,7 @@
     "saah",
     "galo",
     "kenpkato \N{U+0253}olol\N{U+0254}",
-    "luukao l\N{U+0254}ma"
+    "luukao l\N{U+0254}ma",
   ],
   name => "Vai Latin",
   native_language => "Vai",
@@ -222,37 +227,37 @@
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_stand_alone_abbreviated => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   script => "Latin",
   territory => undef,
@@ -261,5 +266,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 31
+  version => 32,
 }

@@ -6,6 +6,7 @@ WriteMakefile
   'NAME' => 'Data::RecordStore',
   'VERSION_FROM' => 'lib/Data/RecordStore.pm',
   'PREREQ_PM' => {
+                   'File::Path' => '2.06_05',
                    'JSON' => 0,
                    'Module::Build' => 0,
                    'Test::More' => 0

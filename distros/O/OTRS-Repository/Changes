@@ -1,6 +1,14 @@
 Change history for OTRS::Repository
 ===================================
 
+0.07 2017-11-05
+
+  + fix dist (updated dist.ini)
+
+0.06 2017-11-05
+
+  + Allow file:// protocol for repositories
+
 0.05 2014-01-21
 
   + fix test failures on Win32

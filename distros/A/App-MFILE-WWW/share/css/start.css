@@ -38,6 +38,10 @@ p {
    background: #ccc;
 }
 
+.boxtopbot {
+   background: #ccc;
+}
+
 input, textarea {
    font-family:    "Courier New",
 		Courier,

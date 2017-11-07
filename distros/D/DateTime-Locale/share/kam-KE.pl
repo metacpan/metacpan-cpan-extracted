@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "\N{U+0128}yakwakya",
-    "\N{U+0128}yaw\N{U+0129}oo"
+    "\N{U+0128}yaw\N{U+0129}oo",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d, E",
@@ -45,7 +50,7 @@
     yMd => "y-MM-dd",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "kam-KE",
   date_format_full => "EEEE, d MMMM y",
@@ -63,7 +68,7 @@
     "Wkn",
     "Wtn",
     "Wth",
-    "Wky"
+    "Wky",
   ],
   day_format_narrow => [
     "W",
@@ -72,7 +77,7 @@
     "A",
     "A",
     "A",
-    "Y"
+    "Y",
   ],
   day_format_wide => [
     "Wa kwamb\N{U+0129}l\N{U+0129}lya",
@@ -81,7 +86,7 @@
     "Wa kana",
     "Wa katano",
     "Wa thanthat\N{U+0169}",
-    "Wa kyumwa"
+    "Wa kyumwa",
   ],
   day_stand_alone_abbreviated => [
     "Wkw",
@@ -90,7 +95,7 @@
     "Wkn",
     "Wtn",
     "Wth",
-    "Wky"
+    "Wky",
   ],
   day_stand_alone_narrow => [
     "W",
@@ -99,7 +104,7 @@
     "A",
     "A",
     "A",
-    "Y"
+    "Y",
   ],
   day_stand_alone_wide => [
     "Wa kwamb\N{U+0129}l\N{U+0129}lya",
@@ -108,19 +113,19 @@
     "Wa kana",
     "Wa katano",
     "Wa thanthat\N{U+0169}",
-    "Wa kyumwa"
+    "Wa kyumwa",
   ],
   era_abbreviated => [
     "MY",
-    "IY"
+    "IY",
   ],
   era_narrow => [
     "MY",
-    "IY"
+    "IY",
   ],
   era_wide => [
     "Mbee wa Yes\N{U+0169}",
-    "\N{U+0128}tina wa Yes\N{U+0169}"
+    "\N{U+0128}tina wa Yes\N{U+0169}",
   ],
   first_day_of_week => 7,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -141,7 +146,7 @@
     "Knd",
     "\N{U+0128}ku",
     "\N{U+0128}km",
-    "\N{U+0128}kl"
+    "\N{U+0128}kl",
   ],
   month_format_narrow => [
     "M",
@@ -155,7 +160,7 @@
     "K",
     "\N{U+0128}",
     "\N{U+0128}",
-    "\N{U+0128}"
+    "\N{U+0128}",
   ],
   month_format_wide => [
     "Mwai wa mbee",
@@ -169,7 +174,7 @@
     "Mwai wa kenda",
     "Mwai wa \N{U+0129}kumi",
     "Mwai wa \N{U+0129}kumi na \N{U+0129}mwe",
-    "Mwai wa \N{U+0129}kumi na il\N{U+0129}"
+    "Mwai wa \N{U+0129}kumi na il\N{U+0129}",
   ],
   month_stand_alone_abbreviated => [
     "Mbe",
@@ -183,7 +188,7 @@
     "Knd",
     "\N{U+0128}ku",
     "\N{U+0128}km",
-    "\N{U+0128}kl"
+    "\N{U+0128}kl",
   ],
   month_stand_alone_narrow => [
     "M",
@@ -197,7 +202,7 @@
     "K",
     "\N{U+0128}",
     "\N{U+0128}",
-    "\N{U+0128}"
+    "\N{U+0128}",
   ],
   month_stand_alone_wide => [
     "Mwai wa mbee",
@@ -211,7 +216,7 @@
     "Mwai wa kenda",
     "Mwai wa \N{U+0129}kumi",
     "Mwai wa \N{U+0129}kumi na \N{U+0129}mwe",
-    "Mwai wa \N{U+0129}kumi na il\N{U+0129}"
+    "Mwai wa \N{U+0129}kumi na il\N{U+0129}",
   ],
   name => "Kamba Kenya",
   native_language => "Kikamba",
@@ -223,37 +228,37 @@
     "L1",
     "L2",
     "L3",
-    "L4"
+    "L4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "Lovo ya mbee",
     "Lovo ya kel\N{U+0129}",
     "Lovo ya katat\N{U+0169}",
-    "Lovo ya kana"
+    "Lovo ya kana",
   ],
   quarter_stand_alone_abbreviated => [
     "L1",
     "L2",
     "L3",
-    "L4"
+    "L4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "Lovo ya mbee",
     "Lovo ya kel\N{U+0129}",
     "Lovo ya katat\N{U+0169}",
-    "Lovo ya kana"
+    "Lovo ya kana",
   ],
   script => undef,
   territory => "Kenya",
@@ -262,5 +267,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

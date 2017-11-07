@@ -30,13 +30,13 @@ Bosnian Bosnia & Herzegovina Cyrillic locale.
 
 =head3 Wide (format)
 
-  понедељак
+  понедјељак
   уторак
   сриједа
   четвртак
   петак
   субота
-  недеља
+  недјеља
 
 =head3 Abbreviated (format)
 
@@ -61,13 +61,13 @@ Bosnian Bosnia & Herzegovina Cyrillic locale.
 
 =head3 Wide (stand-alone)
 
-  понедељак
+  понедјељак
   уторак
   сриједа
   четвртак
   петак
   субота
-  недеља
+  недјеља
 
 =head3 Abbreviated (stand-alone)
 
@@ -100,7 +100,7 @@ Bosnian Bosnia & Herzegovina Cyrillic locale.
   мај
   јуни
   јули
-  август
+  аугуст
   септембар
   октобар
   новембар
@@ -115,7 +115,7 @@ Bosnian Bosnia & Herzegovina Cyrillic locale.
   мај
   јун
   јул
-  авг
+  ауг
   сеп
   окт
   нов
@@ -146,7 +146,7 @@ Bosnian Bosnia & Herzegovina Cyrillic locale.
   мај
   јуни
   јули
-  август
+  аугуст
   септембар
   октобар
   новембар
@@ -161,7 +161,7 @@ Bosnian Bosnia & Herzegovina Cyrillic locale.
   мај
   јун
   јул
-  авг
+  ауг
   сеп
   окт
   нов
@@ -231,8 +231,8 @@ Bosnian Bosnia & Herzegovina Cyrillic locale.
 
 =head3 Wide (format)
 
-  Пре нове ере
-  Нове ере
+  прије нове ере
+  нове ере
 
 =head3 Abbreviated (format)
 
@@ -327,11 +327,41 @@ Bosnian Bosnia & Herzegovina Cyrillic locale.
 
 =head2 Available Formats
 
+=head3 Bh (h B)
+
+   2008-02-05T18:30:30 = 6 B
+   1995-12-22T09:05:02 = 9 B
+  -0010-09-15T04:44:23 = 4 B
+
+=head3 Bhm (h:mm B)
+
+   2008-02-05T18:30:30 = 6:30 B
+   1995-12-22T09:05:02 = 9:05 B
+  -0010-09-15T04:44:23 = 4:44 B
+
+=head3 Bhms (h:mm:ss B)
+
+   2008-02-05T18:30:30 = 6:30:30 B
+   1995-12-22T09:05:02 = 9:05:02 B
+  -0010-09-15T04:44:23 = 4:44:23 B
+
 =head3 E (ccc)
 
    2008-02-05T18:30:30 = уто
    1995-12-22T09:05:02 = пет
   -0010-09-15T04:44:23 = суб
+
+=head3 EBhm (E h:mm B)
+
+   2008-02-05T18:30:30 = уто 6:30 B
+   1995-12-22T09:05:02 = пет 9:05 B
+  -0010-09-15T04:44:23 = суб 4:44 B
+
+=head3 EBhms (E h:mm:ss B)
+
+   2008-02-05T18:30:30 = уто 6:30:30 B
+   1995-12-22T09:05:02 = пет 9:05:02 B
+  -0010-09-15T04:44:23 = суб 4:44:23 B
 
 =head3 EHm (E HH:mm)
 
@@ -567,7 +597,7 @@ Bosnian Bosnia & Herzegovina Cyrillic locale.
    1995-12-22T09:05:02 = 1995 Четврто тромесечје
   -0010-09-15T04:44:23 = -10 Треће тромесечје
 
-=head3 yw-count-other ('week' w 'of' y)
+=head3 yw-count-other ('week' w 'of' Y)
 
    2008-02-05T18:30:30 = week 6 of 2008
    1995-12-22T09:05:02 = week 51 of 1995
@@ -582,7 +612,7 @@ Yes
 
 =head3 Local first day of the week
 
-1 (понедељак)
+1 (понедјељак)
 
 =head1 SUPPORT
 

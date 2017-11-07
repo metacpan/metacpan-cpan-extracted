@@ -1,5 +1,5 @@
 package Dist::Zilla::Plugin::Test::Map::Tube;
-$Dist::Zilla::Plugin::Test::Map::Tube::VERSION = '0.21';
+$Dist::Zilla::Plugin::Test::Map::Tube::VERSION = '0.22';
 $Dist::Zilla::Plugin::Test::Map::Tube::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -8,7 +8,7 @@ Dist::Zilla::Plugin::Test::Map::Tube - Provides release test for Test::Map::Tube
 
 =head1 VERSION
 
-version 0.21
+version 0.22
 
 =cut
 
@@ -47,7 +47,7 @@ The routes file should be structured as below:
 
 =cut
 
-our $MIN_VER = '0.33';
+our $MIN_VER = '0.34';
 has 'routes' => (is => 'ro', required => 0);
 
 sub register_prereqs {

@@ -1,8 +1,9 @@
 #!/usr/bin/env perl
 
 use Test::More;
+use Test::NoWarnings;
 
-plan tests => 3;
+plan tests => 1 + 4;
 
 use Net::WebSocket::Message ();
 use Net::WebSocket::PMCE::deflate ();
@@ -51,10 +52,18 @@ TODO: {
 }
 
 #This is here because the former is broken.
+#This used to compare the common length of $frames[0] and $frames2[0],
+#but not all Perl versions seem to compress those the same way.
 is(
-    sprintf( '%v.02x', substr( $frames[0]->get_payload(), 0, length $frames2[0]->get_payload() ) ),
-    sprintf( '%v.02x', $frames2[0]->get_payload() ),
+    sprintf( '%v.02x', substr( $frames[0]->get_payload(), 0, 4 ) ),
+    sprintf( '%v.02x', substr( $frames2[0]->get_payload(), 0, 4 ) ),
     'first message starts the same as the second (i.e., context is reset)',
 ) or do {
     diag( sprintf "%v.02x\n", $_ ) for map { $_->get_payload() } @frames, @frames2;
 };
+
+is(
+    $deflate->decompress( $msg2->get_payload() ),
+    $deflate->decompress( $msg->get_payload() ),
+    'the two messages decompress to the same value',
+);

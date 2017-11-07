@@ -1,42 +1,47 @@
 {
   am_pm_abbreviated => [
     "a.m.",
-    "p.m."
+    "p.m.",
   ],
   available_formats => {
+    Bh => "h 'h' B",
+    Bhm => "h 'h' mm B",
+    Bhms => "h 'h' mm 'min' ss 's' B",
     E => "E",
+    EBhm => "E h 'h' mm B",
+    EBhms => "E h 'h' mm 'min' ss 's' B",
     EHm => "E HH 'h' mm",
-    EHms => "E HH:mm:ss",
+    EHms => "E HH 'h' mm 'min' ss 's'",
     Ed => "E d",
-    Ehm => "E h:mm a",
-    Ehms => "E h:mm:ss a",
+    Ehm => "E h 'h' mm a",
+    Ehms => "E h 'h' mm 'min' ss 's' a",
     Gy => "y G",
     GyMMM => "MMM y G",
     GyMMMEd => "E d MMM y G",
     GyMMMd => "d MMM y G",
     H => "HH 'h'",
     Hm => "HH 'h' mm",
-    Hms => "HH:mm:ss",
-    Hmsv => "HH:mm:ss v",
+    Hms => "HH 'h' mm 'min' ss 's'",
+    Hmsv => "HH 'h' mm 'min' ss 's' v",
     Hmv => "HH 'h' mm v",
     M => "L",
     MEd => "E M-d",
     MMM => "LLL",
     MMMEd => "E d MMM",
-    "MMMMW-count-one" => "'semaine' W 'de' MMM",
-    "MMMMW-count-other" => "'semaine' W 'de' MMM",
+    "MMMMW-count-one" => "'semaine' W (MMMM)",
+    "MMMMW-count-other" => "'semaine' W (MMMM)",
     MMMMd => "d MMMM",
     MMMd => "d MMM",
     MMd => "MM-d",
     MMdd => "MM-dd",
     Md => "M-d",
     d => "d",
-    h => "h a",
-    hm => "h:mm a",
-    hms => "h:mm:ss a",
-    hmsv => "h:mm:ss a v",
-    hmv => "h:mm a v",
-    ms => "mm:ss",
+    h => "h 'h' a",
+    hm => "h 'h' mm a",
+    hms => "h 'h' mm 'min' ss 's' a",
+    hmsv => "h 'h' mm 'min' ss 's' a v",
+    hmv => "h 'h' mm a v",
+    ms => "mm 'min' ss 's'",
     y => "y",
     yM => "y-MM",
     yMEd => "E y-MM-dd",
@@ -48,8 +53,8 @@
     yMd => "y-MM-dd",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-one" => "'semaine' w 'de' y",
-    "yw-count-other" => "'semaine' w 'de' y"
+    "yw-count-one" => "'semaine' w 'de' Y",
+    "yw-count-other" => "'semaine' w 'de' Y",
   },
   code => "fr-CA",
   date_format_full => "EEEE d MMMM y",
@@ -67,7 +72,7 @@
     "jeu.",
     "ven.",
     "sam.",
-    "dim."
+    "dim.",
   ],
   day_format_narrow => [
     "L",
@@ -76,7 +81,7 @@
     "J",
     "V",
     "S",
-    "D"
+    "D",
   ],
   day_format_wide => [
     "lundi",
@@ -85,7 +90,7 @@
     "jeudi",
     "vendredi",
     "samedi",
-    "dimanche"
+    "dimanche",
   ],
   day_stand_alone_abbreviated => [
     "lun.",
@@ -94,7 +99,7 @@
     "jeu.",
     "ven.",
     "sam.",
-    "dim."
+    "dim.",
   ],
   day_stand_alone_narrow => [
     "L",
@@ -103,7 +108,7 @@
     "J",
     "V",
     "S",
-    "D"
+    "D",
   ],
   day_stand_alone_wide => [
     "lundi",
@@ -112,19 +117,19 @@
     "jeudi",
     "vendredi",
     "samedi",
-    "dimanche"
+    "dimanche",
   ],
   era_abbreviated => [
     "av. J.-C.",
-    "ap. J.-C."
+    "ap. J.-C.",
   ],
   era_narrow => [
     "av. J.-C.",
-    "ap. J.-C."
+    "ap. J.-C.",
   ],
   era_wide => [
     "avant J\N{U+00e9}sus-Christ",
-    "apr\N{U+00e8}s J\N{U+00e9}sus-Christ"
+    "apr\N{U+00e8}s J\N{U+00e9}sus-Christ",
   ],
   first_day_of_week => 7,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -145,7 +150,7 @@
     "sept.",
     "oct.",
     "nov.",
-    "d\N{U+00e9}c."
+    "d\N{U+00e9}c.",
   ],
   month_format_narrow => [
     "J",
@@ -159,7 +164,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_format_wide => [
     "janvier",
@@ -173,7 +178,7 @@
     "septembre",
     "octobre",
     "novembre",
-    "d\N{U+00e9}cembre"
+    "d\N{U+00e9}cembre",
   ],
   month_stand_alone_abbreviated => [
     "janv.",
@@ -187,7 +192,7 @@
     "sept.",
     "oct.",
     "nov.",
-    "d\N{U+00e9}c."
+    "d\N{U+00e9}c.",
   ],
   month_stand_alone_narrow => [
     "J",
@@ -201,7 +206,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_stand_alone_wide => [
     "janvier",
@@ -215,7 +220,7 @@
     "septembre",
     "octobre",
     "novembre",
-    "d\N{U+00e9}cembre"
+    "d\N{U+00e9}cembre",
   ],
   name => "French Canada",
   native_language => "fran\N{U+00e7}ais",
@@ -227,44 +232,44 @@
     "T1",
     "T2",
     "T3",
-    "T4"
+    "T4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "1er trimestre",
     "2e trimestre",
     "3e trimestre",
-    "4e trimestre"
+    "4e trimestre",
   ],
   quarter_stand_alone_abbreviated => [
     "T1",
     "T2",
     "T3",
-    "T4"
+    "T4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "1er trimestre",
     "2e trimestre",
     "3e trimestre",
-    "4e trimestre"
+    "4e trimestre",
   ],
   script => undef,
   territory => "Canada",
-  time_format_full => "HH:mm:ss zzzz",
-  time_format_long => "HH:mm:ss z",
-  time_format_medium => "HH:mm:ss",
+  time_format_full => "HH 'h' mm 'min' ss 's' zzzz",
+  time_format_long => "HH 'h' mm 'min' ss 's' z",
+  time_format_medium => "HH 'h' mm 'min' ss 's'",
   time_format_short => "HH 'h' mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

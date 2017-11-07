@@ -550,7 +550,7 @@ static inline marpaESLIF_terminal_t *_marpaESLIF_terminal_newp(marpaESLIF_t *mar
   marpaESLIF_string_t              *content2descp         = NULL;
   char                             *generatedasciis       = NULL;
   short                             memcmpb               = 0;
-  marpaESLIF_terminal_t            *terminalp;
+  marpaESLIF_terminal_t            *terminalp             = NULL;
   marpaWrapperGrammarSymbolOption_t marpaWrapperGrammarSymbolOption;
   marpaESLIF_uint32_t               pcre2Optioni = PCRE2_ANCHORED;
   int                               pcre2Errornumberi;
@@ -10516,7 +10516,7 @@ static inline short _marpaESLIFRecognizer_flush_charconv(marpaESLIFRecognizer_t 
 {
   static const char *funcs       = "_marpaESLIFRecognizer_flush_charconv";
   marpaESLIF_t      *marpaESLIFp = marpaESLIFRecognizerp->marpaESLIFp;
-  char              *utf8s;
+  char              *utf8s       = NULL;
   size_t             utf8l;
   short              rcb;
 

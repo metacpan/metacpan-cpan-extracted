@@ -1,7 +1,13 @@
+libqbit-webinterface-perl (0.030) raring; urgency=low
+
+  * fix json
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Fri, 03 Nov 2017 23:30:37 +0300
+
 libqbit-webinterface-perl (0.029) raring; urgency=low
-
+ 
   * fix dumper
-
+ 
  -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 23 Apr 2017 17:02:29 +0300
 
 libqbit-webinterface-perl (0.028) raring; urgency=low

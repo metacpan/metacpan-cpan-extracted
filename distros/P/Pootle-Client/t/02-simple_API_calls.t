@@ -6,6 +6,8 @@ use Modern::Perl '2015';
 use utf8;
 binmode STDOUT, ':encoding(UTF-8)';
 binmode STDERR, ':encoding(UTF-8)';
+use FindBin;
+use lib "$FindBin::Bin/../";
 use feature 'signatures'; no warnings "experimental::signatures";
 use Carp::Always;
 use Try::Tiny;
@@ -13,6 +15,7 @@ use Scalar::Util qw(blessed);
 use Data::Dumper;
 
 use Test::More;
+use Test::Exception;
 use Test::MockModule;
 
 use Pootle::Resource::Language;
@@ -190,26 +193,22 @@ sub translationProjects {
   });
   _runSimpleTests('translationProjects', 6, 'translationProject', '/api/v1/translation-projects/989/', $expectedObject);
 
-=head2 SKIPPED WHEN USING MOCKED API
+=for comment SKIPPED WHEN USING MOCKED API
 ##Instead of spamming the _runSimpleTests(), we need to use exception handling here to catch an unsupported endpoint
 ##But only if using a live Pootle-Client to test
 
   my ($objs, $obj);
   eval {
 
-  try {
-    $objs = $papi->translationProjects();
-    ok(0, "THIS SHOULD CRASH! GET /api/v1/translation-projects is unimplemeted");
-  } catch {
-    ok(blessed $_ && $_->isa('Pootle::Exception::HTTP::MethodNotAllowed'),
-       "GET /api/v1/translation-projects is unimplemeted");
-  };
+  throws_ok(sub { $objs = $papi->translationProjects(); },
+            'Pootle::Exception::HTTP::MethodNotAllowed',
+    "GET /api/v1/translation-projects is unimplemeted");
 
   ok($obj = $papi->translationProject('/api/v1/translation-projects/989/'),
-     "When a object is fetched");
+    "When a object is fetched");
 
   is_deeply($obj, $expectedObject,
-     "Then the objects is as expected");
+    "Then the objects is as expected");
 
   };
   if ($@) {

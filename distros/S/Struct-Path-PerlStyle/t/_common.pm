@@ -1,0 +1,43 @@
+package _common;
+
+# common parts for Struct::Path::PerlStyle tests
+
+use parent 'Exporter';
+
+use Clone qw(clone);
+use Data::Dumper qw();
+use Struct::Path::PerlStyle qw(ps_parse ps_serialize);
+use Test::More;
+
+our @EXPORT_OK = qw(
+    roundtrip
+    t_dump
+);
+
+sub roundtrip {
+    my ($struct, $string, $comment) = @_;
+
+    my $orig_string = $string;
+    my $orig_struct = clone($struct);
+
+    my $serialized = ps_serialize($struct);
+    my $parsed = ps_parse($serialized);
+
+    subtest $comment => sub {
+        plan tests => 4;
+        local $Test::Builder::Level = $Test::Builder::Level + 6;
+
+        is_deeply($struct, $parsed, "$comment: parsing");
+        is($string, $serialized, "$comment: serialization");
+
+        is_deeply($orig_struct, $struct, "$comment: input struct changed");
+        is($orig_string, $string, "$comment: input string changed");
+    }
+}
+
+# return neat one-line string of perl serialized structure
+sub t_dump {
+    return Data::Dumper->new([shift])->Terse(1)->Sortkeys(1)->Quotekeys(0)->Indent(0)->Deepcopy(1)->Dump();
+}
+
+1;

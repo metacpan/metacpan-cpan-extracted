@@ -1,21 +1,25 @@
 Revision history for Perl extension DBICx::AutoDoc.
 
+0.09
+    - Don't die on coderef relationship conditions
+    - Convert from Module::Install to ExtUtils::MakeMaker
+
 0.08
     - Handle literal SQL and explicit undef default values RT#65155
     - Use File::ShareDir to get default template path RT#64697
 
 0.07
-    - Added another patch from Dagfinn Ilmari Mannsåkerin to correctly
+    - Added another patch from Dagfinn Ilmari Mannsåker to correctly
       show multidimentional column sizes.  I should have looked all the
       way through the queue before releasing...  RT#44843
 
 0.06
-    - Added a patch from Dagfinn Ilmari Mannsåkerin to show ENUM values.
+    - Added a patch from Dagfinn Ilmari Mannsåker to show ENUM values.
       RT#44847
 
 0.05
     - Fixed a bug where comments on columns were not rendered correctly.
-      Reported, and patch supplied, by Dagfinn Ilmari Mannsåkerin RT#44844
+      Reported, and patch supplied, by Dagfinn Ilmari Mannsåker RT#44844
 
 0.04
     - Added Tie::IxHash to the list of requirements.  Reported by

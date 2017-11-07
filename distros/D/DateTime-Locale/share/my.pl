@@ -1,56 +1,61 @@
 {
   am_pm_abbreviated => [
     "\N{U+1014}\N{U+1036}\N{U+1014}\N{U+1000}\N{U+103a}",
-    "\N{U+100a}\N{U+1014}\N{U+1031}"
+    "\N{U+100a}\N{U+1014}\N{U+1031}",
   ],
   available_formats => {
+    Bh => "B h",
+    Bhm => "B h:mm",
+    Bhms => "B h:mm:ss",
     E => "ccc\N{U+1014}\N{U+1031}\N{U+1037}",
-    EHm => "HH:mm E\N{U+1014}\N{U+1031}\N{U+1037}",
-    EHms => "HH:mm:ss E\N{U+1014}\N{U+1031}\N{U+1037}",
+    EBhm => "E B h:mm",
+    EBhms => "E B h:mm:ss",
+    EHm => "E HH:mm",
+    EHms => "E HH:mm:ss",
     Ed => "d \N{U+101b}\N{U+1000}\N{U+103a} E\N{U+1014}\N{U+1031}\N{U+1037}",
-    Ehm => "E\N{U+1014}\N{U+1031}\N{U+1037} a h:mm",
-    Ehms => "E\N{U+1014}\N{U+1031}\N{U+1037} a h:mm:ss",
+    Ehm => "E B h:mm",
+    Ehms => "E B h:mm:ss",
     Gy => "G y",
     GyMMM => "G y MMM",
-    GyMMMEd => "G y MMM d \N{U+101b}\N{U+1000}\N{U+103a} E\N{U+1014}\N{U+1031}\N{U+1037}",
-    GyMMMd => "G y MMM d \N{U+101b}\N{U+1000}\N{U+103a}",
+    GyMMMEd => "G y\N{U+104a} MMM d\N{U+104a} E",
+    GyMMMd => "G y\N{U+104a} MMM d",
     H => "HH",
     Hm => "HH:mm",
     Hms => "HH:mm:ss",
     Hmsv => "v HH:mm:ss",
     Hmv => "v HH:mm",
     M => "L",
-    MEd => "d/M E\N{U+1014}\N{U+1031}\N{U+1037}",
+    MEd => "d/M\N{U+104a} E",
     MMM => "LLL",
-    MMMEd => "MMM d \N{U+101b}\N{U+1000}\N{U+103a} E\N{U+1014}\N{U+1031}\N{U+1037}",
+    MMMEd => "MMM d\N{U+104a} E",
     MMMMEd => "MMMM d \N{U+101b}\N{U+1000}\N{U+103a} E\N{U+1014}\N{U+1031}\N{U+1037}",
     "MMMMW-count-other" => "MMM \N{U+101c} W \N{U+1015}\N{U+1010}\N{U+103a}\N{U+1019}\N{U+103c}\N{U+1031}\N{U+102c}\N{U+1000}\N{U+103a}",
     MMMMd => "MMMM d",
     MMMd => "d MMM",
     Md => "d/M",
     d => "d",
-    h => "a h \N{U+1014}\N{U+102c}\N{U+101b}\N{U+102e}",
-    hm => "a h:mm",
-    hms => "a h:mm:ss",
+    h => "B h",
+    hm => "B h:mm",
+    hms => "B h:mm:ss",
     hmsv => "v a h:mm:ss",
     hmv => "v a h:mm",
     ms => "mm:ss",
     y => "y",
     yM => "M/y",
-    yMEd => "d-M-y E\N{U+1014}\N{U+1031}\N{U+1037}",
+    yMEd => "d/M/y\N{U+104a} E",
     yMMM => "MMM y",
-    yMMMEd => "d MMM y E\N{U+1014}\N{U+1031}\N{U+1037}",
-    yMMMM => "MMMM y",
-    yMMMd => "d MMM y",
+    yMMMEd => "y\N{U+104a} MMM d\N{U+104a} E",
+    yMMMM => "y MMMM",
+    yMMMd => "y\N{U+104a} MMM d",
     yMd => "dd-MM-y",
     yQQQ => "y QQQ",
     yQQQQ => "y QQQQ",
-    "yw-count-other" => "y \N{U+1001}\N{U+102f} w \N{U+1015}\N{U+1010}\N{U+103a}\N{U+1019}\N{U+103c}\N{U+1031}\N{U+102c}\N{U+1000}\N{U+103a}"
+    "yw-count-other" => "Y \N{U+1001}\N{U+102f} w \N{U+1015}\N{U+1010}\N{U+103a}\N{U+1019}\N{U+103c}\N{U+1031}\N{U+102c}\N{U+1000}\N{U+103a}",
   },
   code => "my",
-  date_format_full => "EEEE d MMMM y",
-  date_format_long => "d MMMM y",
-  date_format_medium => "d MMM y",
+  date_format_full => "y\N{U+104a} MMMM d\N{U+104a} EEEE",
+  date_format_long => "y\N{U+104a} d MMMM",
+  date_format_medium => "y\N{U+104a} MMM d",
   date_format_short => "dd-MM-yy",
   datetime_format_full => "{1} {0}",
   datetime_format_long => "{1} {0}",
@@ -63,7 +68,7 @@
     "\N{U+1000}\N{U+103c}\N{U+102c}\N{U+101e}\N{U+1015}\N{U+1010}\N{U+1031}\N{U+1038}",
     "\N{U+101e}\N{U+1031}\N{U+102c}\N{U+1000}\N{U+103c}\N{U+102c}",
     "\N{U+1005}\N{U+1014}\N{U+1031}",
-    "\N{U+1010}\N{U+1014}\N{U+1004}\N{U+103a}\N{U+1039}\N{U+1002}\N{U+1014}\N{U+103d}\N{U+1031}"
+    "\N{U+1010}\N{U+1014}\N{U+1004}\N{U+103a}\N{U+1039}\N{U+1002}\N{U+1014}\N{U+103d}\N{U+1031}",
   ],
   day_format_narrow => [
     "\N{U+1010}",
@@ -72,7 +77,7 @@
     "\N{U+1000}",
     "\N{U+101e}",
     "\N{U+1005}",
-    "\N{U+1010}"
+    "\N{U+1010}",
   ],
   day_format_wide => [
     "\N{U+1010}\N{U+1014}\N{U+1004}\N{U+103a}\N{U+1039}\N{U+101c}\N{U+102c}",
@@ -81,7 +86,7 @@
     "\N{U+1000}\N{U+103c}\N{U+102c}\N{U+101e}\N{U+1015}\N{U+1010}\N{U+1031}\N{U+1038}",
     "\N{U+101e}\N{U+1031}\N{U+102c}\N{U+1000}\N{U+103c}\N{U+102c}",
     "\N{U+1005}\N{U+1014}\N{U+1031}",
-    "\N{U+1010}\N{U+1014}\N{U+1004}\N{U+103a}\N{U+1039}\N{U+1002}\N{U+1014}\N{U+103d}\N{U+1031}"
+    "\N{U+1010}\N{U+1014}\N{U+1004}\N{U+103a}\N{U+1039}\N{U+1002}\N{U+1014}\N{U+103d}\N{U+1031}",
   ],
   day_stand_alone_abbreviated => [
     "\N{U+1010}\N{U+1014}\N{U+1004}\N{U+103a}\N{U+1039}\N{U+101c}\N{U+102c}",
@@ -90,7 +95,7 @@
     "\N{U+1000}\N{U+103c}\N{U+102c}\N{U+101e}\N{U+1015}\N{U+1010}\N{U+1031}\N{U+1038}",
     "\N{U+101e}\N{U+1031}\N{U+102c}\N{U+1000}\N{U+103c}\N{U+102c}",
     "\N{U+1005}\N{U+1014}\N{U+1031}",
-    "\N{U+1010}\N{U+1014}\N{U+1004}\N{U+103a}\N{U+1039}\N{U+1002}\N{U+1014}\N{U+103d}\N{U+1031}"
+    "\N{U+1010}\N{U+1014}\N{U+1004}\N{U+103a}\N{U+1039}\N{U+1002}\N{U+1014}\N{U+103d}\N{U+1031}",
   ],
   day_stand_alone_narrow => [
     "\N{U+1010}",
@@ -99,7 +104,7 @@
     "\N{U+1000}",
     "\N{U+101e}",
     "\N{U+1005}",
-    "\N{U+1010}"
+    "\N{U+1010}",
   ],
   day_stand_alone_wide => [
     "\N{U+1010}\N{U+1014}\N{U+1004}\N{U+103a}\N{U+1039}\N{U+101c}\N{U+102c}",
@@ -108,19 +113,19 @@
     "\N{U+1000}\N{U+103c}\N{U+102c}\N{U+101e}\N{U+1015}\N{U+1010}\N{U+1031}\N{U+1038}",
     "\N{U+101e}\N{U+1031}\N{U+102c}\N{U+1000}\N{U+103c}\N{U+102c}",
     "\N{U+1005}\N{U+1014}\N{U+1031}",
-    "\N{U+1010}\N{U+1014}\N{U+1004}\N{U+103a}\N{U+1039}\N{U+1002}\N{U+1014}\N{U+103d}\N{U+1031}"
+    "\N{U+1010}\N{U+1014}\N{U+1004}\N{U+103a}\N{U+1039}\N{U+1002}\N{U+1014}\N{U+103d}\N{U+1031}",
   ],
   era_abbreviated => [
     "\N{U+1018}\N{U+102e}\N{U+1005}\N{U+102e}",
-    "\N{U+1021}\N{U+1031}\N{U+1012}\N{U+102e}"
+    "\N{U+1021}\N{U+1031}\N{U+1012}\N{U+102e}",
   ],
   era_narrow => [
     "\N{U+1018}\N{U+102e}\N{U+1005}\N{U+102e}",
-    "\N{U+1021}\N{U+1031}\N{U+1012}\N{U+102e}"
+    "\N{U+1021}\N{U+1031}\N{U+1012}\N{U+102e}",
   ],
   era_wide => [
     "\N{U+1001}\N{U+101b}\N{U+1005}\N{U+103a}\N{U+1010}\N{U+1031}\N{U+102c}\N{U+103a} \N{U+1019}\N{U+1015}\N{U+1031}\N{U+102b}\N{U+103a}\N{U+1019}\N{U+102e}\N{U+1014}\N{U+103e}\N{U+1005}\N{U+103a}",
-    "\N{U+1001}\N{U+101b}\N{U+1005}\N{U+103a}\N{U+1014}\N{U+103e}\N{U+1005}\N{U+103a}"
+    "\N{U+1001}\N{U+101b}\N{U+1005}\N{U+103a}\N{U+1014}\N{U+103e}\N{U+1005}\N{U+103a}",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -141,7 +146,7 @@
     "\N{U+1005}\N{U+1000}\N{U+103a}",
     "\N{U+1021}\N{U+1031}\N{U+102c}\N{U+1000}\N{U+103a}",
     "\N{U+1014}\N{U+102d}\N{U+102f}",
-    "\N{U+1012}\N{U+102e}"
+    "\N{U+1012}\N{U+102e}",
   ],
   month_format_narrow => [
     "\N{U+1007}",
@@ -155,7 +160,7 @@
     "\N{U+1005}",
     "\N{U+1021}",
     "\N{U+1014}",
-    "\N{U+1012}"
+    "\N{U+1012}",
   ],
   month_format_wide => [
     "\N{U+1007}\N{U+1014}\N{U+103a}\N{U+1014}\N{U+101d}\N{U+102b}\N{U+101b}\N{U+102e}",
@@ -169,7 +174,7 @@
     "\N{U+1005}\N{U+1000}\N{U+103a}\N{U+1010}\N{U+1004}\N{U+103a}\N{U+1018}\N{U+102c}",
     "\N{U+1021}\N{U+1031}\N{U+102c}\N{U+1000}\N{U+103a}\N{U+1010}\N{U+102d}\N{U+102f}\N{U+1018}\N{U+102c}",
     "\N{U+1014}\N{U+102d}\N{U+102f}\N{U+101d}\N{U+1004}\N{U+103a}\N{U+1018}\N{U+102c}",
-    "\N{U+1012}\N{U+102e}\N{U+1007}\N{U+1004}\N{U+103a}\N{U+1018}\N{U+102c}"
+    "\N{U+1012}\N{U+102e}\N{U+1007}\N{U+1004}\N{U+103a}\N{U+1018}\N{U+102c}",
   ],
   month_stand_alone_abbreviated => [
     "\N{U+1007}\N{U+1014}\N{U+103a}",
@@ -183,7 +188,7 @@
     "\N{U+1005}\N{U+1000}\N{U+103a}",
     "\N{U+1021}\N{U+1031}\N{U+102c}\N{U+1000}\N{U+103a}",
     "\N{U+1014}\N{U+102d}\N{U+102f}",
-    "\N{U+1012}\N{U+102e}"
+    "\N{U+1012}\N{U+102e}",
   ],
   month_stand_alone_narrow => [
     "\N{U+1007}",
@@ -197,7 +202,7 @@
     "\N{U+1005}",
     "\N{U+1021}",
     "\N{U+1014}",
-    "\N{U+1012}"
+    "\N{U+1012}",
   ],
   month_stand_alone_wide => [
     "\N{U+1007}\N{U+1014}\N{U+103a}\N{U+1014}\N{U+101d}\N{U+102b}\N{U+101b}\N{U+102e}",
@@ -211,7 +216,7 @@
     "\N{U+1005}\N{U+1000}\N{U+103a}\N{U+1010}\N{U+1004}\N{U+103a}\N{U+1018}\N{U+102c}",
     "\N{U+1021}\N{U+1031}\N{U+102c}\N{U+1000}\N{U+103a}\N{U+1010}\N{U+102d}\N{U+102f}\N{U+1018}\N{U+102c}",
     "\N{U+1014}\N{U+102d}\N{U+102f}\N{U+101d}\N{U+1004}\N{U+103a}\N{U+1018}\N{U+102c}",
-    "\N{U+1012}\N{U+102e}\N{U+1007}\N{U+1004}\N{U+103a}\N{U+1018}\N{U+102c}"
+    "\N{U+1012}\N{U+102e}\N{U+1007}\N{U+1004}\N{U+103a}\N{U+1018}\N{U+102c}",
   ],
   name => "Burmese",
   native_language => "\N{U+1019}\N{U+103c}\N{U+1014}\N{U+103a}\N{U+1019}\N{U+102c}",
@@ -223,44 +228,44 @@
     "\N{U+1015}\N{U+1011}\N{U+1019} \N{U+101e}\N{U+102f}\N{U+1036}\N{U+1038}\N{U+101c}\N{U+1015}\N{U+1010}\N{U+103a}",
     "\N{U+1012}\N{U+102f}\N{U+1010}\N{U+102d}\N{U+101a} \N{U+101e}\N{U+102f}\N{U+1036}\N{U+1038}\N{U+101c}\N{U+1015}\N{U+1010}\N{U+103a}",
     "\N{U+1010}\N{U+1010}\N{U+102d}\N{U+101a} \N{U+101e}\N{U+102f}\N{U+1036}\N{U+1038}\N{U+101c}\N{U+1015}\N{U+1010}\N{U+103a}",
-    "\N{U+1005}\N{U+1010}\N{U+102f}\N{U+1010}\N{U+1039}\N{U+1011} \N{U+101e}\N{U+102f}\N{U+1036}\N{U+1038}\N{U+101c}\N{U+1015}\N{U+1010}\N{U+103a}"
+    "\N{U+1005}\N{U+1010}\N{U+102f}\N{U+1010}\N{U+1039}\N{U+1011} \N{U+101e}\N{U+102f}\N{U+1036}\N{U+1038}\N{U+101c}\N{U+1015}\N{U+1010}\N{U+103a}",
   ],
   quarter_format_narrow => [
     "\N{U+1015}",
     "\N{U+1012}\N{U+102f}",
     "\N{U+1010}",
-    "\N{U+1005}"
+    "\N{U+1005}",
   ],
   quarter_format_wide => [
     "\N{U+1015}\N{U+1011}\N{U+1019} \N{U+101e}\N{U+102f}\N{U+1036}\N{U+1038}\N{U+101c}\N{U+1015}\N{U+1010}\N{U+103a}",
     "\N{U+1012}\N{U+102f}\N{U+1010}\N{U+102d}\N{U+101a} \N{U+101e}\N{U+102f}\N{U+1036}\N{U+1038}\N{U+101c}\N{U+1015}\N{U+1010}\N{U+103a}",
     "\N{U+1010}\N{U+1010}\N{U+102d}\N{U+101a} \N{U+101e}\N{U+102f}\N{U+1036}\N{U+1038}\N{U+101c}\N{U+1015}\N{U+1010}\N{U+103a}",
-    "\N{U+1005}\N{U+1010}\N{U+102f}\N{U+1010}\N{U+1039}\N{U+1011} \N{U+101e}\N{U+102f}\N{U+1036}\N{U+1038}\N{U+101c}\N{U+1015}\N{U+1010}\N{U+103a}"
+    "\N{U+1005}\N{U+1010}\N{U+102f}\N{U+1010}\N{U+1039}\N{U+1011} \N{U+101e}\N{U+102f}\N{U+1036}\N{U+1038}\N{U+101c}\N{U+1015}\N{U+1010}\N{U+103a}",
   ],
   quarter_stand_alone_abbreviated => [
     "\N{U+1015}\N{U+1011}\N{U+1019} \N{U+101e}\N{U+102f}\N{U+1036}\N{U+1038}\N{U+101c}\N{U+1015}\N{U+1010}\N{U+103a}",
     "\N{U+1012}\N{U+102f}\N{U+1010}\N{U+102d}\N{U+101a} \N{U+101e}\N{U+102f}\N{U+1036}\N{U+1038}\N{U+101c}\N{U+1015}\N{U+1010}\N{U+103a}",
     "\N{U+1010}\N{U+1010}\N{U+102d}\N{U+101a} \N{U+101e}\N{U+102f}\N{U+1036}\N{U+1038}\N{U+101c}\N{U+1015}\N{U+1010}\N{U+103a}",
-    "\N{U+1005}\N{U+1010}\N{U+102f}\N{U+1010}\N{U+1039}\N{U+1011} \N{U+101e}\N{U+102f}\N{U+1036}\N{U+1038}\N{U+101c}\N{U+1015}\N{U+1010}\N{U+103a}"
+    "\N{U+1005}\N{U+1010}\N{U+102f}\N{U+1010}\N{U+1039}\N{U+1011} \N{U+101e}\N{U+102f}\N{U+1036}\N{U+1038}\N{U+101c}\N{U+1015}\N{U+1010}\N{U+103a}",
   ],
   quarter_stand_alone_narrow => [
     "\N{U+1015}",
     "\N{U+1012}\N{U+102f}",
     "\N{U+1010}",
-    "\N{U+1005}"
+    "\N{U+1005}",
   ],
   quarter_stand_alone_wide => [
     "\N{U+1015}\N{U+1011}\N{U+1019} \N{U+101e}\N{U+102f}\N{U+1036}\N{U+1038}\N{U+101c}\N{U+1015}\N{U+1010}\N{U+103a}",
     "\N{U+1012}\N{U+102f}\N{U+1010}\N{U+102d}\N{U+101a} \N{U+101e}\N{U+102f}\N{U+1036}\N{U+1038}\N{U+101c}\N{U+1015}\N{U+1010}\N{U+103a}",
     "\N{U+1010}\N{U+1010}\N{U+102d}\N{U+101a} \N{U+101e}\N{U+102f}\N{U+1036}\N{U+1038}\N{U+101c}\N{U+1015}\N{U+1010}\N{U+103a}",
-    "\N{U+1005}\N{U+1010}\N{U+102f}\N{U+1010}\N{U+1039}\N{U+1011} \N{U+101e}\N{U+102f}\N{U+1036}\N{U+1038}\N{U+101c}\N{U+1015}\N{U+1010}\N{U+103a}"
+    "\N{U+1005}\N{U+1010}\N{U+102f}\N{U+1010}\N{U+1039}\N{U+1011} \N{U+101e}\N{U+102f}\N{U+1036}\N{U+1038}\N{U+101c}\N{U+1015}\N{U+1010}\N{U+103a}",
   ],
   script => undef,
   territory => undef,
   time_format_full => "zzzz HH:mm:ss",
   time_format_long => "z HH:mm:ss",
-  time_format_medium => "HH:mm:ss",
-  time_format_short => "HH:mm",
+  time_format_medium => "B HH:mm:ss",
+  time_format_short => "B H:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

@@ -255,6 +255,9 @@ sub show_info {
             $stats->{maxtime} = $a->{reqtime};
         }
         update_stats($stats, $a);
+        if ($opts{last} && $opts{last} == $count) {
+            last;
+        }
     }
     $stats->{count} = $count;
     close $fh;

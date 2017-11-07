@@ -7,8 +7,7 @@ use base qw(TAP::Harness);
 
 use App::TestOnTap::Scheduler;
 use App::TestOnTap::Dispenser;
-use App::TestOnTap::Util qw(slashify $IS_PACKED);
-use App::TestOnTap::Postprocess;
+use App::TestOnTap::Util qw(slashify runprocess $IS_PACKED);
 
 use TAP::Formatter::Console;
 use TAP::Formatter::File;
@@ -47,7 +46,8 @@ sub runtests
 {
 	my $self = shift;
 	
-	my $sr = $self->{testontap}->{args}->getSuiteRoot();
+	my $args = $self->{testontap}->{args}; 
+	my $sr = $args->getSuiteRoot();
 	
 	my @pairs;
 	push(@pairs, [ slashify("$sr/$_"), $_ ]) foreach ($self->{testontap}->{pez}->getAllTests());
@@ -103,12 +103,34 @@ sub runtests
 			}	
 		}
 		
-
 		# run postprocessing
 		#
-		my $postprocess = App::TestOnTap::Postprocess->new($self->{testontap}->{args}->getConfig()->getPostprocessCmd(), $self->{testontap}->{args}, $self->{testontap}->{args}->getPreprocess()->getArgv());
+		my $postcmd = $self->{testontap}->{args}->getConfig()->getPostprocessCmd();
+		if ($postcmd)
+		{
+			my @postproc;
+			my $xit = runprocess
+						(
+							sub
+								{
+									push(@postproc, $_[0]);
+									print STDERR $_[0]
+								},
+							$sr,
+							(
+								@$postcmd,
+								@{$self->{testontap}->{args}->getPreprocess()->getArgv()}
+							)
+						);
+			if ($xit)
+			{
+				$failed++;
+				warn("WARNING: exit code '$xit' when running postprocess command\n");
+			}
+			$failed++ if $xit;
 
-		$failed++ if $postprocess->getExitCode();
+			$args->getWorkDirManager()->recordPostprocess([ @postproc ]);
+		}
 		
 		# drop the special workaround envvar...
 		#

@@ -12,8 +12,8 @@ use Algorithm::Diff qw(sdiff);
 our @EXPORT_OK = qw(
     diff
     list_diff
-    split_diff
     patch
+    split_diff
     valid_diff
 );
 
@@ -21,13 +21,21 @@ our @EXPORT_OK = qw(
 
 Struct::Diff - Recursive diff for nested perl structures
 
+=begin html
+
+<a href="https://travis-ci.org/mr-mixas/Struct-Diff.pm"><img src="https://travis-ci.org/mr-mixas/Struct-Diff.pm.svg?branch=master" alt="Travis CI"></a>
+<a href='https://coveralls.io/github/mr-mixas/Struct-Diff.pm?branch=master'><img src='https://coveralls.io/repos/github/mr-mixas/Struct-Diff.pm/badge.svg?branch=master' alt='Coverage Status'/></a>
+<a href="https://badge.fury.io/pl/Struct-Diff"><img src="https://badge.fury.io/pl/Struct-Diff.svg" alt="CPAN version"></a>
+
+=end html
+
 =head1 VERSION
 
-Version 0.90
+Version 0.91
 
 =cut
 
-our $VERSION = '0.90';
+our $VERSION = '0.91';
 
 =head1 SYNOPSIS
 
@@ -191,6 +199,13 @@ sub diff($$;@) {
 
         $d = $alt # return 'D' version of diff
             if (keys %{$d} > 1 or ($sd) = values %{$d} and keys %{$sd} != @keys);
+    } elsif (ref $a eq 'Regexp' and $a != $b) {
+        if ($a eq $b) {
+            $d->{U} = $a unless ($opts{noU});
+        } else {
+            $d->{O} = $a unless ($opts{noO});
+            $d->{N} = $b unless ($opts{noN});
+        }
     } elsif (ref $a ? $a == $b || freeze($a) eq freeze($b) : freeze(\$a) eq freeze(\$b)) {
         $d->{U} = $a unless ($opts{noU});
     } else {
@@ -265,7 +280,7 @@ sub list_diff($;@) {
 
 =head2 split_diff
 
-Divide diff to pseudo original structures
+Divide diff to pseudo original structures.
 
     $structs = split_diff(diff($a, $b));
     # $structs->{a}: items originated from $a
@@ -308,7 +323,7 @@ sub split_diff($) {
 
 =head2 patch
 
-Apply diff
+Apply diff.
 
     patch($a, $diff);
 

@@ -2,7 +2,7 @@ use 5.008007;
 package DBIx::Custom;
 use Object::Simple -base;
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 
 use Carp 'croak';
 use DBI;
@@ -551,11 +551,12 @@ sub new {
   if (@_ > 0 && !ref $_[0] && $_[0] =~ /:/) {
     my $dsn = shift;
     my $user = shift;
-    my $paddword = shift;
-    my $dbi_option = shift;
+    my $password = shift;
+    my $dbi_option = shift || {};
     my $attrs = shift || {};
     $attrs->{dsn} = $dsn;
     $attrs->{user} = $user;
+    $attrs->{password} = $password;
     $attrs->{option} = $dbi_option;
     $self = $self->SUPER::new($attrs);
   }

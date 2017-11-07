@@ -17,7 +17,8 @@ my $builder = Module::Build->new(
     release_status     => 'stable',
     test_files         => [ 't/recordstore.t', ],
     requires => {
-        'perl'                  => 'v5.9.4',
+        'perl'       => 'v5.9.4',
+        'File::Path' => '2.06_05',
     },
     );
 

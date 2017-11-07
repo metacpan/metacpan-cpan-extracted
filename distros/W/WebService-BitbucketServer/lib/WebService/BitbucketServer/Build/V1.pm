@@ -6,7 +6,7 @@ package WebService::BitbucketServer::Build::V1;
 use warnings;
 use strict;
 
-our $VERSION = '0.602'; # VERSION
+our $VERSION = '0.603'; # VERSION
 
 use Moo;
 use namespace::clean;
@@ -88,7 +88,7 @@ WebService::BitbucketServer::Build::V1 - Bindings for a Bitbucket Server REST AP
 
 =head1 VERSION
 
-version 0.602
+version 0.603
 
 =head1 SYNOPSIS
 

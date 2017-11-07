@@ -283,11 +283,11 @@ sub cud {
             $log->err( '$_ undefined in catch' );
             $errmsg = '<NONE>';
         }
-        if ( not $site->MREST_DEBUG_MODE ) {
+        if ( ! $site->DOCHAZKA_SQL_TRACE ) {
             $errmsg =~ s/^DBD::Pg::st execute failed: //;
             $errmsg =~ s#at /usr/lib/perl5/.* line .*\.$##;
         }
-        if ( not defined( $status ) ) {
+        if ( ! defined( $status ) ) {
             $status = $CELL->status_err( 'DOCHAZKA_DBI_ERR', 
                 args => [ $errmsg ],
                 DBI_return_value => $rv,

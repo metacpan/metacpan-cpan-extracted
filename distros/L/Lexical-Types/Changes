@@ -1,5 +1,8 @@
 Revision history for Lexical-Types
 
+0.16    2017-11-04 17:15 UTC
+        + Fix : Test failures on perl 5.27.5 and above.
+
 0.15    2015-12-21 15:30 UTC
         + Chg : The new environment variable to enable thread tests on older
                 perls is PERL_FORCE_TEST_THREADS. Note that this variable

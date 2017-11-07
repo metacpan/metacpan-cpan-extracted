@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "Dinda",
-    "Dilolo"
+    "Dilolo",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "E d",
@@ -44,7 +49,7 @@
     yMd => "d/M/y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "lu-CD",
   date_format_full => "EEEE d MMMM y",
@@ -62,7 +67,7 @@
     "Njw",
     "Ngv",
     "Lub",
-    "Lum"
+    "Lum",
   ],
   day_format_narrow => [
     "N",
@@ -71,7 +76,7 @@
     "N",
     "N",
     "L",
-    "L"
+    "L",
   ],
   day_format_wide => [
     "Nkodya",
@@ -80,7 +85,7 @@
     "Nj\N{U+00f2}wa",
     "Ng\N{U+00f2}vya",
     "Lubingu",
-    "Lumingu"
+    "Lumingu",
   ],
   day_stand_alone_abbreviated => [
     "Nko",
@@ -89,7 +94,7 @@
     "Njw",
     "Ngv",
     "Lub",
-    "Lum"
+    "Lum",
   ],
   day_stand_alone_narrow => [
     "N",
@@ -98,7 +103,7 @@
     "N",
     "N",
     "L",
-    "L"
+    "L",
   ],
   day_stand_alone_wide => [
     "Nkodya",
@@ -107,19 +112,19 @@
     "Nj\N{U+00f2}wa",
     "Ng\N{U+00f2}vya",
     "Lubingu",
-    "Lumingu"
+    "Lumingu",
   ],
   era_abbreviated => [
     "kmp. Y.K.",
-    "kny. Y. K."
+    "kny. Y. K.",
   ],
   era_narrow => [
     "kmp. Y.K.",
-    "kny. Y. K."
+    "kny. Y. K.",
   ],
   era_wide => [
     "Kumpala kwa Yezu Kli",
-    "Kunyima kwa Yezu Kli"
+    "Kunyima kwa Yezu Kli",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -140,7 +145,7 @@
     "Lut",
     "Lun",
     "Kas",
-    "Cis"
+    "Cis",
   ],
   month_format_narrow => [
     "C",
@@ -154,7 +159,7 @@
     "L",
     "L",
     "K",
-    "C"
+    "C",
   ],
   month_format_wide => [
     "Ciongo",
@@ -168,7 +173,7 @@
     "Lutongolo",
     "Lung\N{U+00f9}di",
     "Kasw\N{U+00e8}k\N{U+00e8}s\N{U+00e8}",
-    "Cisw\N{U+00e0}"
+    "Cisw\N{U+00e0}",
   ],
   month_stand_alone_abbreviated => [
     "Cio",
@@ -182,7 +187,7 @@
     "Lut",
     "Lun",
     "Kas",
-    "Cis"
+    "Cis",
   ],
   month_stand_alone_narrow => [
     "C",
@@ -196,7 +201,7 @@
     "L",
     "L",
     "K",
-    "C"
+    "C",
   ],
   month_stand_alone_wide => [
     "Ciongo",
@@ -210,7 +215,7 @@
     "Lutongolo",
     "Lung\N{U+00f9}di",
     "Kasw\N{U+00e8}k\N{U+00e8}s\N{U+00e8}",
-    "Cisw\N{U+00e0}"
+    "Cisw\N{U+00e0}",
   ],
   name => "Luba-Katanga Congo - Kinshasa",
   native_language => "Tshiluba",
@@ -222,37 +227,37 @@
     "M1",
     "M2",
     "M3",
-    "M4"
+    "M4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "Mueji 1",
     "Mueji 2",
     "Mueji 3",
-    "Mueji 4"
+    "Mueji 4",
   ],
   quarter_stand_alone_abbreviated => [
     "M1",
     "M2",
     "M3",
-    "M4"
+    "M4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "Mueji 1",
     "Mueji 2",
     "Mueji 3",
-    "Mueji 4"
+    "Mueji 4",
   ],
   script => undef,
   territory => "Congo - Kinshasa",
@@ -261,5 +266,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

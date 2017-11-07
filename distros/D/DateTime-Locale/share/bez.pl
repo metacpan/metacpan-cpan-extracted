@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "pamilau",
-    "pamunyi"
+    "pamunyi",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d, E",
@@ -45,7 +50,7 @@
     yMd => "d/M/y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "bez",
   date_format_full => "EEEE, d MMMM y",
@@ -63,7 +68,7 @@
     "Hit",
     "Hih",
     "Lem",
-    "Mul"
+    "Mul",
   ],
   day_format_narrow => [
     "J",
@@ -72,7 +77,7 @@
     "H",
     "W",
     "J",
-    "M"
+    "M",
   ],
   day_format_wide => [
     "pa shahuviluha",
@@ -81,7 +86,7 @@
     "pa hitayi",
     "pa hihanu",
     "pa shahulembela",
-    "pa mulungu"
+    "pa mulungu",
   ],
   day_stand_alone_abbreviated => [
     "Vil",
@@ -90,7 +95,7 @@
     "Hit",
     "Hih",
     "Lem",
-    "Mul"
+    "Mul",
   ],
   day_stand_alone_narrow => [
     "J",
@@ -99,7 +104,7 @@
     "H",
     "W",
     "J",
-    "M"
+    "M",
   ],
   day_stand_alone_wide => [
     "pa shahuviluha",
@@ -108,19 +113,19 @@
     "pa hitayi",
     "pa hihanu",
     "pa shahulembela",
-    "pa mulungu"
+    "pa mulungu",
   ],
   era_abbreviated => [
     "KM",
-    "BM"
+    "BM",
   ],
   era_narrow => [
     "KM",
-    "BM"
+    "BM",
   ],
   era_wide => [
     "Kabla ya Mtwaa",
-    "Baada ya Mtwaa"
+    "Baada ya Mtwaa",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -141,7 +146,7 @@
     "Tis",
     "Kum",
     "Kmj",
-    "Kmb"
+    "Kmb",
   ],
   month_format_narrow => [
     "H",
@@ -155,7 +160,7 @@
     "T",
     "K",
     "K",
-    "K"
+    "K",
   ],
   month_format_wide => [
     "pa mwedzi gwa hutala",
@@ -169,7 +174,7 @@
     "pa mwedzi gwa tisa",
     "pa mwedzi gwa kumi",
     "pa mwedzi gwa kumi na moja",
-    "pa mwedzi gwa kumi na mbili"
+    "pa mwedzi gwa kumi na mbili",
   ],
   month_stand_alone_abbreviated => [
     "Hut",
@@ -183,7 +188,7 @@
     "Tis",
     "Kum",
     "Kmj",
-    "Kmb"
+    "Kmb",
   ],
   month_stand_alone_narrow => [
     "H",
@@ -197,7 +202,7 @@
     "T",
     "K",
     "K",
-    "K"
+    "K",
   ],
   month_stand_alone_wide => [
     "pa mwedzi gwa hutala",
@@ -211,7 +216,7 @@
     "pa mwedzi gwa tisa",
     "pa mwedzi gwa kumi",
     "pa mwedzi gwa kumi na moja",
-    "pa mwedzi gwa kumi na mbili"
+    "pa mwedzi gwa kumi na mbili",
   ],
   name => "Bena",
   native_language => "Hibena",
@@ -223,37 +228,37 @@
     "L1",
     "L2",
     "L3",
-    "L4"
+    "L4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "Lobo 1",
     "Lobo 2",
     "Lobo 3",
-    "Lobo 4"
+    "Lobo 4",
   ],
   quarter_stand_alone_abbreviated => [
     "L1",
     "L2",
     "L3",
-    "L4"
+    "L4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "Lobo 1",
     "Lobo 2",
     "Lobo 3",
-    "Lobo 4"
+    "Lobo 4",
   ],
   script => undef,
   territory => undef,
@@ -262,5 +267,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

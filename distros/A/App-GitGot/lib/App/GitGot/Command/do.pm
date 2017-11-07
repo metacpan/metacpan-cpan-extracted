@@ -1,6 +1,6 @@
 package App::GitGot::Command::do;
 our $AUTHORITY = 'cpan:GENEHACK';
-$App::GitGot::Command::do::VERSION = '1.333';
+$App::GitGot::Command::do::VERSION = '1.334';
 # ABSTRACT: run command in many repositories
 use 5.014;
 
@@ -65,7 +65,7 @@ App::GitGot::Command::do - run command in many repositories
 
 =head1 VERSION
 
-version 1.333
+version 1.334
 
 =head1 AUTHOR
 

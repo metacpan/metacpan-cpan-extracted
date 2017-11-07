@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "\N{U+0db4}\N{U+0dd9}.\N{U+0dc0}.",
-    "\N{U+0db4}.\N{U+0dc0}."
+    "\N{U+0db4}.\N{U+0dc0}.",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH.mm",
     EHms => "E HH.mm.ss",
     Ed => "d E",
@@ -45,8 +50,8 @@
     yMd => "y-M-d",
     yQQQ => "y QQQ",
     yQQQQ => "y QQQQ",
-    "yw-count-one" => "y \N{U+0dc3}\N{U+0dad}\N{U+0dd2}\N{U+0dba} w",
-    "yw-count-other" => "y \N{U+0dc3}\N{U+0dad}\N{U+0dd2}\N{U+0dba} w"
+    "yw-count-one" => "Y \N{U+0dc3}\N{U+0dad}\N{U+0dd2}\N{U+0dba} w",
+    "yw-count-other" => "Y \N{U+0dc3}\N{U+0dad}\N{U+0dd2}\N{U+0dba} w",
   },
   code => "si",
   date_format_full => "y MMMM d, EEEE",
@@ -64,7 +69,7 @@
     "\N{U+0db6}\N{U+0dca}\N{U+200d}\N{U+0dbb}\N{U+0dc4}\N{U+0dc3}\N{U+0dca}",
     "\N{U+0dc3}\N{U+0dd2}\N{U+0d9a}\N{U+0dd4}",
     "\N{U+0dc3}\N{U+0dd9}\N{U+0db1}",
-    "\N{U+0d89}\N{U+0dbb}\N{U+0dd2}\N{U+0daf}\N{U+0dcf}"
+    "\N{U+0d89}\N{U+0dbb}\N{U+0dd2}\N{U+0daf}\N{U+0dcf}",
   ],
   day_format_narrow => [
     "\N{U+0dc3}",
@@ -73,7 +78,7 @@
     "\N{U+0db6}\N{U+0dca}\N{U+200d}\N{U+0dbb}",
     "\N{U+0dc3}\N{U+0dd2}",
     "\N{U+0dc3}\N{U+0dd9}",
-    "\N{U+0d89}"
+    "\N{U+0d89}",
   ],
   day_format_wide => [
     "\N{U+0dc3}\N{U+0db3}\N{U+0dd4}\N{U+0daf}\N{U+0dcf}",
@@ -82,7 +87,7 @@
     "\N{U+0db6}\N{U+0dca}\N{U+200d}\N{U+0dbb}\N{U+0dc4}\N{U+0dc3}\N{U+0dca}\N{U+0db4}\N{U+0dad}\N{U+0dd2}\N{U+0db1}\N{U+0dca}\N{U+0daf}\N{U+0dcf}",
     "\N{U+0dc3}\N{U+0dd2}\N{U+0d9a}\N{U+0dd4}\N{U+0dbb}\N{U+0dcf}\N{U+0daf}\N{U+0dcf}",
     "\N{U+0dc3}\N{U+0dd9}\N{U+0db1}\N{U+0dc3}\N{U+0dd4}\N{U+0dbb}\N{U+0dcf}\N{U+0daf}\N{U+0dcf}",
-    "\N{U+0d89}\N{U+0dbb}\N{U+0dd2}\N{U+0daf}\N{U+0dcf}"
+    "\N{U+0d89}\N{U+0dbb}\N{U+0dd2}\N{U+0daf}\N{U+0dcf}",
   ],
   day_stand_alone_abbreviated => [
     "\N{U+0dc3}\N{U+0db3}\N{U+0dd4}\N{U+0daf}\N{U+0dcf}",
@@ -91,7 +96,7 @@
     "\N{U+0db6}\N{U+0dca}\N{U+200d}\N{U+0dbb}\N{U+0dc4}\N{U+0dc3}\N{U+0dca}",
     "\N{U+0dc3}\N{U+0dd2}\N{U+0d9a}\N{U+0dd4}",
     "\N{U+0dc3}\N{U+0dd9}\N{U+0db1}",
-    "\N{U+0d89}\N{U+0dbb}\N{U+0dd2}\N{U+0daf}\N{U+0dcf}"
+    "\N{U+0d89}\N{U+0dbb}\N{U+0dd2}\N{U+0daf}\N{U+0dcf}",
   ],
   day_stand_alone_narrow => [
     "\N{U+0dc3}",
@@ -100,7 +105,7 @@
     "\N{U+0db6}\N{U+0dca}\N{U+200d}\N{U+0dbb}",
     "\N{U+0dc3}\N{U+0dd2}",
     "\N{U+0dc3}\N{U+0dd9}",
-    "\N{U+0d89}"
+    "\N{U+0d89}",
   ],
   day_stand_alone_wide => [
     "\N{U+0dc3}\N{U+0db3}\N{U+0dd4}\N{U+0daf}\N{U+0dcf}",
@@ -109,19 +114,19 @@
     "\N{U+0db6}\N{U+0dca}\N{U+200d}\N{U+0dbb}\N{U+0dc4}\N{U+0dc3}\N{U+0dca}\N{U+0db4}\N{U+0dad}\N{U+0dd2}\N{U+0db1}\N{U+0dca}\N{U+0daf}\N{U+0dcf}",
     "\N{U+0dc3}\N{U+0dd2}\N{U+0d9a}\N{U+0dd4}\N{U+0dbb}\N{U+0dcf}\N{U+0daf}\N{U+0dcf}",
     "\N{U+0dc3}\N{U+0dd9}\N{U+0db1}\N{U+0dc3}\N{U+0dd4}\N{U+0dbb}\N{U+0dcf}\N{U+0daf}\N{U+0dcf}",
-    "\N{U+0d89}\N{U+0dbb}\N{U+0dd2}\N{U+0daf}\N{U+0dcf}"
+    "\N{U+0d89}\N{U+0dbb}\N{U+0dd2}\N{U+0daf}\N{U+0dcf}",
   ],
   era_abbreviated => [
     "\N{U+0d9a}\N{U+0dca}\N{U+200d}\N{U+0dbb}\N{U+0dd2}.\N{U+0db4}\N{U+0dd6}.",
-    "\N{U+0d9a}\N{U+0dca}\N{U+200d}\N{U+0dbb}\N{U+0dd2}.\N{U+0dc0}."
+    "\N{U+0d9a}\N{U+0dca}\N{U+200d}\N{U+0dbb}\N{U+0dd2}.\N{U+0dc0}.",
   ],
   era_narrow => [
     "\N{U+0d9a}\N{U+0dca}\N{U+200d}\N{U+0dbb}\N{U+0dd2}.\N{U+0db4}\N{U+0dd6}.",
-    "\N{U+0d9a}\N{U+0dca}\N{U+200d}\N{U+0dbb}\N{U+0dd2}.\N{U+0dc0}."
+    "\N{U+0d9a}\N{U+0dca}\N{U+200d}\N{U+0dbb}\N{U+0dd2}.\N{U+0dc0}.",
   ],
   era_wide => [
     "\N{U+0d9a}\N{U+0dca}\N{U+200d}\N{U+0dbb}\N{U+0dd2}\N{U+0dc3}\N{U+0dca}\N{U+0dad}\N{U+0dd4} \N{U+0db4}\N{U+0dd6}\N{U+0dbb}\N{U+0dca}\N{U+0dc0}",
-    "\N{U+0d9a}\N{U+0dca}\N{U+200d}\N{U+0dbb}\N{U+0dd2}\N{U+0dc3}\N{U+0dca}\N{U+0dad}\N{U+0dd4} \N{U+0dc0}\N{U+0dbb}\N{U+0dca}\N{U+0dc2}"
+    "\N{U+0d9a}\N{U+0dca}\N{U+200d}\N{U+0dbb}\N{U+0dd2}\N{U+0dc3}\N{U+0dca}\N{U+0dad}\N{U+0dd4} \N{U+0dc0}\N{U+0dbb}\N{U+0dca}\N{U+0dc2}",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -142,7 +147,7 @@
     "\N{U+0dc3}\N{U+0dd0}\N{U+0db4}\N{U+0dca}",
     "\N{U+0d94}\N{U+0d9a}\N{U+0dca}",
     "\N{U+0db1}\N{U+0ddc}\N{U+0dc0}\N{U+0dd0}",
-    "\N{U+0daf}\N{U+0dd9}\N{U+0dc3}\N{U+0dd0}"
+    "\N{U+0daf}\N{U+0dd9}\N{U+0dc3}\N{U+0dd0}",
   ],
   month_format_narrow => [
     "\N{U+0da2}",
@@ -156,7 +161,7 @@
     "\N{U+0dc3}\N{U+0dd0}",
     "\N{U+0d94}",
     "\N{U+0db1}\N{U+0dd9}",
-    "\N{U+0daf}\N{U+0dd9}"
+    "\N{U+0daf}\N{U+0dd9}",
   ],
   month_format_wide => [
     "\N{U+0da2}\N{U+0db1}\N{U+0dc0}\N{U+0dcf}\N{U+0dbb}\N{U+0dd2}",
@@ -170,7 +175,7 @@
     "\N{U+0dc3}\N{U+0dd0}\N{U+0db4}\N{U+0dca}\N{U+0dad}\N{U+0dd0}\N{U+0db8}\N{U+0dca}\N{U+0db6}\N{U+0dbb}\N{U+0dca}",
     "\N{U+0d94}\N{U+0d9a}\N{U+0dca}\N{U+0dad}\N{U+0ddd}\N{U+0db6}\N{U+0dbb}\N{U+0dca}",
     "\N{U+0db1}\N{U+0ddc}\N{U+0dc0}\N{U+0dd0}\N{U+0db8}\N{U+0dca}\N{U+0db6}\N{U+0dbb}\N{U+0dca}",
-    "\N{U+0daf}\N{U+0dd9}\N{U+0dc3}\N{U+0dd0}\N{U+0db8}\N{U+0dca}\N{U+0db6}\N{U+0dbb}\N{U+0dca}"
+    "\N{U+0daf}\N{U+0dd9}\N{U+0dc3}\N{U+0dd0}\N{U+0db8}\N{U+0dca}\N{U+0db6}\N{U+0dbb}\N{U+0dca}",
   ],
   month_stand_alone_abbreviated => [
     "\N{U+0da2}\N{U+0db1}",
@@ -184,7 +189,7 @@
     "\N{U+0dc3}\N{U+0dd0}\N{U+0db4}\N{U+0dca}",
     "\N{U+0d94}\N{U+0d9a}\N{U+0dca}",
     "\N{U+0db1}\N{U+0ddc}\N{U+0dc0}\N{U+0dd0}",
-    "\N{U+0daf}\N{U+0dd9}\N{U+0dc3}\N{U+0dd0}"
+    "\N{U+0daf}\N{U+0dd9}\N{U+0dc3}\N{U+0dd0}",
   ],
   month_stand_alone_narrow => [
     "\N{U+0da2}",
@@ -198,7 +203,7 @@
     "\N{U+0dc3}\N{U+0dd0}",
     "\N{U+0d94}",
     "\N{U+0db1}\N{U+0dd9}",
-    "\N{U+0daf}\N{U+0dd9}"
+    "\N{U+0daf}\N{U+0dd9}",
   ],
   month_stand_alone_wide => [
     "\N{U+0da2}\N{U+0db1}\N{U+0dc0}\N{U+0dcf}\N{U+0dbb}\N{U+0dd2}",
@@ -212,7 +217,7 @@
     "\N{U+0dc3}\N{U+0dd0}\N{U+0db4}\N{U+0dca}\N{U+0dad}\N{U+0dd0}\N{U+0db8}\N{U+0dca}\N{U+0db6}\N{U+0dbb}\N{U+0dca}",
     "\N{U+0d94}\N{U+0d9a}\N{U+0dca}\N{U+0dad}\N{U+0ddd}\N{U+0db6}\N{U+0dbb}\N{U+0dca}",
     "\N{U+0db1}\N{U+0ddc}\N{U+0dc0}\N{U+0dd0}\N{U+0db8}\N{U+0dca}\N{U+0db6}\N{U+0dbb}\N{U+0dca}",
-    "\N{U+0daf}\N{U+0dd9}\N{U+0dc3}\N{U+0dd0}\N{U+0db8}\N{U+0dca}\N{U+0db6}\N{U+0dbb}\N{U+0dca}"
+    "\N{U+0daf}\N{U+0dd9}\N{U+0dc3}\N{U+0dd0}\N{U+0db8}\N{U+0dca}\N{U+0db6}\N{U+0dbb}\N{U+0dca}",
   ],
   name => "Sinhala",
   native_language => "\N{U+0dc3}\N{U+0dd2}\N{U+0d82}\N{U+0dc4}\N{U+0dbd}",
@@ -224,37 +229,37 @@
     "\N{U+0d9a}\N{U+0dcf}\N{U+0dbb}\N{U+0dca}:1",
     "\N{U+0d9a}\N{U+0dcf}\N{U+0dbb}\N{U+0dca}:2",
     "\N{U+0d9a}\N{U+0dcf}\N{U+0dbb}\N{U+0dca}:3",
-    "\N{U+0d9a}\N{U+0dcf}\N{U+0dbb}\N{U+0dca}:4"
+    "\N{U+0d9a}\N{U+0dcf}\N{U+0dbb}\N{U+0dca}:4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "1 \N{U+0dc0}\N{U+0db1} \N{U+0d9a}\N{U+0dcf}\N{U+0dbb}\N{U+0dca}\N{U+0dad}\N{U+0dd4}\N{U+0dc0}",
     "2 \N{U+0dc0}\N{U+0db1} \N{U+0d9a}\N{U+0dcf}\N{U+0dbb}\N{U+0dca}\N{U+0dad}\N{U+0dd4}\N{U+0dc0}",
     "3 \N{U+0dc0}\N{U+0db1} \N{U+0d9a}\N{U+0dcf}\N{U+0dbb}\N{U+0dca}\N{U+0dad}\N{U+0dd4}\N{U+0dc0}",
-    "4 \N{U+0dc0}\N{U+0db1} \N{U+0d9a}\N{U+0dcf}\N{U+0dbb}\N{U+0dca}\N{U+0dad}\N{U+0dd4}\N{U+0dc0}"
+    "4 \N{U+0dc0}\N{U+0db1} \N{U+0d9a}\N{U+0dcf}\N{U+0dbb}\N{U+0dca}\N{U+0dad}\N{U+0dd4}\N{U+0dc0}",
   ],
   quarter_stand_alone_abbreviated => [
     "\N{U+0d9a}\N{U+0dcf}\N{U+0dbb}\N{U+0dca}:1",
     "\N{U+0d9a}\N{U+0dcf}\N{U+0dbb}\N{U+0dca}:2",
     "\N{U+0d9a}\N{U+0dcf}\N{U+0dbb}\N{U+0dca}:3",
-    "\N{U+0d9a}\N{U+0dcf}\N{U+0dbb}\N{U+0dca}:4"
+    "\N{U+0d9a}\N{U+0dcf}\N{U+0dbb}\N{U+0dca}:4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "1 \N{U+0dc0}\N{U+0db1} \N{U+0d9a}\N{U+0dcf}\N{U+0dbb}\N{U+0dca}\N{U+0dad}\N{U+0dd4}\N{U+0dc0}",
     "2 \N{U+0dc0}\N{U+0db1} \N{U+0d9a}\N{U+0dcf}\N{U+0dbb}\N{U+0dca}\N{U+0dad}\N{U+0dd4}\N{U+0dc0}",
     "3 \N{U+0dc0}\N{U+0db1} \N{U+0d9a}\N{U+0dcf}\N{U+0dbb}\N{U+0dca}\N{U+0dad}\N{U+0dd4}\N{U+0dc0}",
-    "4 \N{U+0dc0}\N{U+0db1} \N{U+0d9a}\N{U+0dcf}\N{U+0dbb}\N{U+0dca}\N{U+0dad}\N{U+0dd4}\N{U+0dc0}"
+    "4 \N{U+0dc0}\N{U+0db1} \N{U+0d9a}\N{U+0dcf}\N{U+0dbb}\N{U+0dca}\N{U+0dad}\N{U+0dd4}\N{U+0dc0}",
   ],
   script => undef,
   territory => undef,
@@ -263,5 +268,5 @@
   time_format_medium => "HH.mm.ss",
   time_format_short => "HH.mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

@@ -66,7 +66,7 @@ sub valid_protocol_or_die {
     my ($self, $protocol) = @_;
 
     if ($protocol ne Net::WebSocket::Constants::REQUIRED_REQUEST_PROTOCOL()) {
-        die Net::WebSocket::X->new('BadRequestProtocol', $protocol);
+        die Net::WebSocket::X->create('BadRequestProtocol', $protocol);
     }
 
     return;
@@ -86,7 +86,7 @@ sub valid_method_or_die {
     my ($self, $method) = @_;
 
     if ($method ne Net::WebSocket::Constants::REQUIRED_HTTP_METHOD()) {
-        die Net::WebSocket::X->new('BadHTTPMethod', $method);
+        die Net::WebSocket::X->create('BadHTTPMethod', $method);
     }
 
     return;
@@ -99,7 +99,7 @@ sub _consume_peer_header {
 
     if ($name eq 'sec-websocket-version') {
         if ( $value ne Net::WebSocket::Constants::PROTOCOL_VERSION() ) {
-            die Net::WebSocket::X->new('BadHeader', 'Sec-WebSocket-Version', $value, 'Unsupported protocol version; must be ' . Net::WebSocket::Constants::PROTOCOL_VERSION());
+            die Net::WebSocket::X->create('UnsupportedProtocolVersion', $value);
         }
 
         $self->{'_version_ok'} = 1;

@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "AM",
-    "PM"
+    "PM",
   ],
   available_formats => {
+    Bh => "B h",
+    Bhm => "B h:mm",
+    Bhms => "B h:mm:ss",
     E => "ccc",
+    EBhm => "E B h:mm",
+    EBhms => "E B h:mm:ss",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d E",
@@ -25,7 +30,7 @@
     MMMEd => "d MMM, E",
     "MMMMW-count-one" => "MMM, W 'h\N{U+0259}ft\N{U+0259}'",
     "MMMMW-count-other" => "MMM, W 'h\N{U+0259}ft\N{U+0259}'",
-    MMMMd => "MMMM d",
+    MMMMd => "d MMMM",
     MMMd => "d MMM",
     Md => "dd.MM",
     d => "d",
@@ -45,8 +50,8 @@
     yMd => "dd.MM.y",
     yQQQ => "y QQQ",
     yQQQQ => "y QQQQ",
-    "yw-count-one" => "y, w 'h\N{U+0259}ft\N{U+0259}'",
-    "yw-count-other" => "y, w 'h\N{U+0259}ft\N{U+0259}'"
+    "yw-count-one" => "Y, w 'h\N{U+0259}ft\N{U+0259}'",
+    "yw-count-other" => "Y, w 'h\N{U+0259}ft\N{U+0259}'",
   },
   code => "az",
   date_format_full => "d MMMM y, EEEE",
@@ -64,7 +69,7 @@
     "C.A.",
     "C.",
     "\N{U+015e}.",
-    "B."
+    "B.",
   ],
   day_format_narrow => [
     1,
@@ -73,7 +78,7 @@
     4,
     5,
     6,
-    7
+    7,
   ],
   day_format_wide => [
     "bazar ert\N{U+0259}si",
@@ -82,7 +87,7 @@
     "c\N{U+00fc}m\N{U+0259} ax\N{U+015f}am\N{U+0131}",
     "c\N{U+00fc}m\N{U+0259}",
     "\N{U+015f}\N{U+0259}nb\N{U+0259}",
-    "bazar"
+    "bazar",
   ],
   day_stand_alone_abbreviated => [
     "B.E.",
@@ -91,7 +96,7 @@
     "C.A.",
     "C.",
     "\N{U+015e}.",
-    "B."
+    "B.",
   ],
   day_stand_alone_narrow => [
     1,
@@ -100,7 +105,7 @@
     4,
     5,
     6,
-    7
+    7,
   ],
   day_stand_alone_wide => [
     "bazar ert\N{U+0259}si",
@@ -109,19 +114,19 @@
     "c\N{U+00fc}m\N{U+0259} ax\N{U+015f}am\N{U+0131}",
     "c\N{U+00fc}m\N{U+0259}",
     "\N{U+015f}\N{U+0259}nb\N{U+0259}",
-    "bazar"
+    "bazar",
   ],
   era_abbreviated => [
     "e.\N{U+0259}.",
-    "y.e."
+    "y.e.",
   ],
   era_narrow => [
     "e.\N{U+0259}.",
-    "y.e."
+    "y.e.",
   ],
   era_wide => [
     "eram\N{U+0131}zdan \N{U+0259}vv\N{U+0259}l",
-    "yeni era"
+    "yeni era",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -142,7 +147,7 @@
     "sen",
     "okt",
     "noy",
-    "dek"
+    "dek",
   ],
   month_format_narrow => [
     1,
@@ -156,7 +161,7 @@
     9,
     10,
     11,
-    12
+    12,
   ],
   month_format_wide => [
     "yanvar",
@@ -170,7 +175,7 @@
     "sentyabr",
     "oktyabr",
     "noyabr",
-    "dekabr"
+    "dekabr",
   ],
   month_stand_alone_abbreviated => [
     "yan",
@@ -184,7 +189,7 @@
     "sen",
     "okt",
     "noy",
-    "dek"
+    "dek",
   ],
   month_stand_alone_narrow => [
     1,
@@ -198,7 +203,7 @@
     9,
     10,
     11,
-    12
+    12,
   ],
   month_stand_alone_wide => [
     "Yanvar",
@@ -212,7 +217,7 @@
     "Sentyabr",
     "Oktyabr",
     "Noyabr",
-    "Dekabr"
+    "Dekabr",
   ],
   name => "Azerbaijani",
   native_language => "az\N{U+0259}rbaycan",
@@ -224,37 +229,37 @@
     "1-ci kv.",
     "2-ci kv.",
     "3-c\N{U+00fc} kv.",
-    "4-c\N{U+00fc} kv."
+    "4-c\N{U+00fc} kv.",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "1-ci kvartal",
     "2-ci kvartal",
     "3-c\N{U+00fc} kvartal",
-    "4-c\N{U+00fc} kvartal"
+    "4-c\N{U+00fc} kvartal",
   ],
   quarter_stand_alone_abbreviated => [
     "1-ci kv.",
     "2-ci kv.",
     "3-c\N{U+00fc} kv.",
-    "4-c\N{U+00fc} kv."
+    "4-c\N{U+00fc} kv.",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "1-ci kvartal",
     "2-ci kvartal",
     "3-c\N{U+00fc} kvartal",
-    "4-c\N{U+00fc} kvartal"
+    "4-c\N{U+00fc} kvartal",
   ],
   script => undef,
   territory => undef,
@@ -263,5 +268,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

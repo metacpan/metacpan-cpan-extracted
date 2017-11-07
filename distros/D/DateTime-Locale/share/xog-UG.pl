@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "Munkyo",
-    "Eigulo"
+    "Eigulo",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d, E",
@@ -45,7 +50,7 @@
     yMd => "y-MM-dd",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "xog-UG",
   date_format_full => "EEEE, d MMMM y",
@@ -63,7 +68,7 @@
     "Kuna",
     "Kuta",
     "Muka",
-    "Sabi"
+    "Sabi",
   ],
   day_format_narrow => [
     "B",
@@ -72,7 +77,7 @@
     "K",
     "K",
     "M",
-    "S"
+    "S",
   ],
   day_format_wide => [
     "Balaza",
@@ -81,7 +86,7 @@
     "Olokuna",
     "Olokutaanu",
     "Olomukaaga",
-    "Sabiiti"
+    "Sabiiti",
   ],
   day_stand_alone_abbreviated => [
     "Bala",
@@ -90,7 +95,7 @@
     "Kuna",
     "Kuta",
     "Muka",
-    "Sabi"
+    "Sabi",
   ],
   day_stand_alone_narrow => [
     "B",
@@ -99,7 +104,7 @@
     "K",
     "K",
     "M",
-    "S"
+    "S",
   ],
   day_stand_alone_wide => [
     "Balaza",
@@ -108,19 +113,19 @@
     "Olokuna",
     "Olokutaanu",
     "Olomukaaga",
-    "Sabiiti"
+    "Sabiiti",
   ],
   era_abbreviated => [
     "AZ",
-    "AF"
+    "AF",
   ],
   era_narrow => [
     "AZ",
-    "AF"
+    "AF",
   ],
   era_wide => [
     "Kulisto nga azilawo",
-    "Kulisto nga affile"
+    "Kulisto nga affile",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -141,7 +146,7 @@
     "Seb",
     "Oki",
     "Nov",
-    "Des"
+    "Des",
   ],
   month_format_narrow => [
     "J",
@@ -155,7 +160,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_format_wide => [
     "Janwaliyo",
@@ -169,7 +174,7 @@
     "Sebuttemba",
     "Okitobba",
     "Novemba",
-    "Desemba"
+    "Desemba",
   ],
   month_stand_alone_abbreviated => [
     "Jan",
@@ -183,7 +188,7 @@
     "Seb",
     "Oki",
     "Nov",
-    "Des"
+    "Des",
   ],
   month_stand_alone_narrow => [
     "J",
@@ -197,7 +202,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_stand_alone_wide => [
     "Janwaliyo",
@@ -211,7 +216,7 @@
     "Sebuttemba",
     "Okitobba",
     "Novemba",
-    "Desemba"
+    "Desemba",
   ],
   name => "Soga Uganda",
   native_language => "Olusoga",
@@ -223,37 +228,37 @@
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "Ebisera ebyomwaka ebisoka",
     "Ebisera ebyomwaka ebyokubiri",
     "Ebisera ebyomwaka ebyokusatu",
-    "Ebisera ebyomwaka ebyokuna"
+    "Ebisera ebyomwaka ebyokuna",
   ],
   quarter_stand_alone_abbreviated => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "Ebisera ebyomwaka ebisoka",
     "Ebisera ebyomwaka ebyokubiri",
     "Ebisera ebyomwaka ebyokusatu",
-    "Ebisera ebyomwaka ebyokuna"
+    "Ebisera ebyomwaka ebyokuna",
   ],
   script => undef,
   territory => "Uganda",
@@ -262,5 +267,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

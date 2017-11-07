@@ -13,7 +13,7 @@
 package Finance::Quote::ZA_UnitTrusts;
 require 5.004;
 
-our $VERSION = '1.38'; # VERSION
+our $VERSION = '1.43'; # VERSION
 
 use strict;
 
@@ -61,7 +61,7 @@ sub za_unittrusts {
             next;
         }
 
-        $te = new HTML::TableExtract();
+        $te = HTML::TableExtract->new();
 
         $te->parse( $response->content );
 

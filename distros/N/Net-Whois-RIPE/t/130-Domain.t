@@ -18,8 +18,8 @@ our $object = ( Net::Whois::Object->new(@lines) )[0];
 isa_ok $object, $class;
 
 # Non-inherited methods
-can_ok $object, qw( domain descr org admin_c tech_c zone_c nserver ds_rdata sub_dom dom_net
-    remarks notify mnt_by mnt_lower refer changed source);
+can_ok $object, qw( domain descr org admin_c tech_c zone_c nserver ds_rdata 
+    remarks notify mnt_by changed source);
 
 # Check if typed attributes are correct
 can_ok $object, $object->attributes('mandatory');
@@ -73,18 +73,6 @@ is_deeply( $object->ds_rdata(), ['64431 5 1 278BF194C29A812B33935BB2517E17D14862
 $object->ds_rdata('Added ds_rdata');
 is( $object->ds_rdata()->[1], 'Added ds_rdata', 'ds_rdata properly added' );
 
-# Test 'sub_dom'
-$tested{'sub_dom'}++;
-is_deeply( $object->sub_dom(), [ 'SUBDOM1', 'SUBDOM2', 'PRIVATE.SUBDOM2' ], 'sub_dom properly parsed' );
-$object->sub_dom('Added sub_dom');
-is( $object->sub_dom()->[3], 'Added sub_dom', 'sub_dom properly added' );
-
-# Test 'dom_net'
-$tested{'dom_net'}++;
-is_deeply( $object->dom_net(), ['10.0.0.1'], 'dom_net properly parsed' );
-$object->dom_net('Added dom_net');
-is( $object->dom_net()->[1], 'Added dom_net', 'dom_net properly added' );
-
 # Test 'remarks'
 $tested{'remarks'}++;
 is_deeply( $object->remarks(), ['Nothing to say'], 'remarks properly parsed' );
@@ -102,18 +90,6 @@ $tested{'notify'}++;
 is_deeply( $object->notify(), ['watcher@somewhere.net'], 'notify properly parsed' );
 $object->notify('Added notify');
 is( $object->notify()->[1], 'Added notify', 'notify properly added' );
-
-# Test 'mnt_lower'
-$tested{'mnt_lower'}++;
-is_deeply( $object->mnt_lower(), ['DOM-LMAINT'], 'mnt_lower properly parsed' );
-$object->mnt_lower('Added mnt_lower');
-is( $object->mnt_lower()->[1], 'Added mnt_lower', 'mnt_lower properly added' );
-
-# Test 'refer'
-$tested{'refer'}++;
-is( $object->refer(), 'CLIENTADDRESS whois.server.dom.com 43', 'refer properly parsed' );
-$object->refer('CLIENTADDRESS whois.server.dom.com 45');
-is( $object->refer(), 'CLIENTADDRESS whois.server.dom.com 45', 'refer properly set' );
 
 # Test 'changed'
 $tested{'changed'}++;
@@ -141,15 +117,9 @@ tech-c:     CPNY-TECH01
 zone-c:     CPNY-ZONE
 nserver:    NS1.SUPERDOMAIN.COM
 nserver:    NS2.SUPERDOMAIN.COM
-sub-dom:    SUBDOM1
-sub-dom:    SUBDOM2
-sub-dom:    PRIVATE.SUBDOM2
-dom-net:    10.0.0.1
 remarks:    Nothing to say
 notify:     watcher@somewhere.net
 mnt-by:     DOM-MAINT
-mnt-lower:  DOM-LMAINT
-refer:      CLIENTADDRESS whois.server.dom.com 43
 ds-rdata:   64431 5 1 278BF194C29A812B33935BB2517E17D1486210FA
 changed:    someoneelese@somewere.net 20090429
 source:     RIPE # Filtered

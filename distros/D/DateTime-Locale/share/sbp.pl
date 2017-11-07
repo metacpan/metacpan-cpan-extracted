@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "Lwamilawu",
-    "Pashamihe"
+    "Pashamihe",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "E d",
@@ -44,7 +49,7 @@
     yMd => "M/d/y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "sbp",
   date_format_full => "EEEE, d MMMM y",
@@ -62,7 +67,7 @@
     "Alh",
     "Iju",
     "Jmo",
-    "Mul"
+    "Mul",
   ],
   day_format_narrow => [
     "J",
@@ -71,7 +76,7 @@
     "A",
     "I",
     "J",
-    "M"
+    "M",
   ],
   day_format_wide => [
     "Jumatatu",
@@ -80,7 +85,7 @@
     "Alahamisi",
     "Ijumaa",
     "Jumamosi",
-    "Mulungu"
+    "Mulungu",
   ],
   day_stand_alone_abbreviated => [
     "Jtt",
@@ -89,7 +94,7 @@
     "Alh",
     "Iju",
     "Jmo",
-    "Mul"
+    "Mul",
   ],
   day_stand_alone_narrow => [
     "J",
@@ -98,7 +103,7 @@
     "A",
     "I",
     "J",
-    "M"
+    "M",
   ],
   day_stand_alone_wide => [
     "Jumatatu",
@@ -107,19 +112,19 @@
     "Alahamisi",
     "Ijumaa",
     "Jumamosi",
-    "Mulungu"
+    "Mulungu",
   ],
   era_abbreviated => [
     "AK",
-    "PK"
+    "PK",
   ],
   era_narrow => [
     "AK",
-    "PK"
+    "PK",
   ],
   era_wide => [
     "Ashanali uKilisito",
-    "Pamwandi ya Kilisto"
+    "Pamwandi ya Kilisto",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -140,7 +145,7 @@
     "Mye",
     "Mok",
     "Mus",
-    "Muh"
+    "Muh",
   ],
   month_format_narrow => [
     1,
@@ -154,7 +159,7 @@
     9,
     10,
     11,
-    12
+    12,
   ],
   month_format_wide => [
     "Mupalangulwa",
@@ -168,7 +173,7 @@
     "Munyense",
     "Mokhu",
     "Musongandembwe",
-    "Muhaano"
+    "Muhaano",
   ],
   month_stand_alone_abbreviated => [
     "Mup",
@@ -182,7 +187,7 @@
     "Mye",
     "Mok",
     "Mus",
-    "Muh"
+    "Muh",
   ],
   month_stand_alone_narrow => [
     1,
@@ -196,7 +201,7 @@
     9,
     10,
     11,
-    12
+    12,
   ],
   month_stand_alone_wide => [
     "Mupalangulwa",
@@ -210,7 +215,7 @@
     "Munyense",
     "Mokhu",
     "Musongandembwe",
-    "Muhaano"
+    "Muhaano",
   ],
   name => "Sangu",
   native_language => "Ishisangu",
@@ -222,37 +227,37 @@
     "L1",
     "L2",
     "L3",
-    "L4"
+    "L4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "Lobo 1",
     "Lobo 2",
     "Lobo 3",
-    "Lobo 4"
+    "Lobo 4",
   ],
   quarter_stand_alone_abbreviated => [
     "L1",
     "L2",
     "L3",
-    "L4"
+    "L4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "Lobo 1",
     "Lobo 2",
     "Lobo 3",
-    "Lobo 4"
+    "Lobo 4",
   ],
   script => undef,
   territory => undef,
@@ -261,5 +266,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

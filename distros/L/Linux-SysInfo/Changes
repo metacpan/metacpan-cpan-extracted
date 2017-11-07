@@ -1,5 +1,8 @@
 Revision history for Linux-SysInfo
 
+0.15    2017-11-04 17:30 UTC
+        + Fix : Test failures on perl 5.27.5 and above.
+
 0.14    2013-09-01 15:20 UTC
         This is a maintenance release. The code contains no functional change.
         Satisfied users of version 0.13 can skip this update.

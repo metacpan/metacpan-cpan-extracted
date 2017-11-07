@@ -26,6 +26,7 @@ my $output = WriteMakefile(
         'Getopt::Long'               => 0,
         'Email::MIME'                => 0,
         'File::ReadBackwards'        => 0,
+        'File::Path'                 => 0,
         'File::Temp'                 => 0,
         'List::Util'                 => 0,
         'Pod::Usage'                 => 0,

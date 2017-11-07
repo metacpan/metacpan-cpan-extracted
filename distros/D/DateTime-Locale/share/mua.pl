@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "comme",
-    "lilli"
+    "lilli",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "E d",
@@ -44,7 +49,7 @@
     yMd => "d/M/y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "mua",
   date_format_full => "EEEE d MMMM y",
@@ -62,7 +67,7 @@
     "Cka",
     "Cga",
     "Cze",
-    "Cya"
+    "Cya",
   ],
   day_format_narrow => [
     "L",
@@ -71,7 +76,7 @@
     "A",
     "G",
     "E",
-    "Y"
+    "Y",
   ],
   day_format_wide => [
     "Comlaa\N{U+0257}ii",
@@ -80,7 +85,7 @@
     "Comkald\N{U+01dd}\N{U+0253}lii",
     "Comgaisuu",
     "Comzye\N{U+0253}suu",
-    "Com\N{U+2019}yakke"
+    "Com\N{U+2019}yakke",
   ],
   day_stand_alone_abbreviated => [
     "Cla",
@@ -89,7 +94,7 @@
     "Cka",
     "Cga",
     "Cze",
-    "Cya"
+    "Cya",
   ],
   day_stand_alone_narrow => [
     "L",
@@ -98,7 +103,7 @@
     "A",
     "G",
     "E",
-    "Y"
+    "Y",
   ],
   day_stand_alone_wide => [
     "Comlaa\N{U+0257}ii",
@@ -107,19 +112,19 @@
     "Comkald\N{U+01dd}\N{U+0253}lii",
     "Comgaisuu",
     "Comzye\N{U+0253}suu",
-    "Com\N{U+2019}yakke"
+    "Com\N{U+2019}yakke",
   ],
   era_abbreviated => [
     "KK",
-    "PK"
+    "PK",
   ],
   era_narrow => [
     "KK",
-    "PK"
+    "PK",
   ],
   era_wide => [
     "K\N{U+01dd}Pel Kristu",
-    "Pel Kristu"
+    "Pel Kristu",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -140,7 +145,7 @@
     "FDE",
     "FMU",
     "FGW",
-    "FYU"
+    "FYU",
   ],
   month_format_narrow => [
     "O",
@@ -154,7 +159,7 @@
     "E",
     "U",
     "W",
-    "Y"
+    "Y",
   ],
   month_format_wide => [
     "F\N{U+0129}i Loo",
@@ -168,7 +173,7 @@
     "F\N{U+0129}i D\N{U+01dd}\N{U+0253}lii",
     "F\N{U+0129}i Munda\N{U+014b}",
     "F\N{U+0129}i Gwahlle",
-    "F\N{U+0129}i Yuru"
+    "F\N{U+0129}i Yuru",
   ],
   month_stand_alone_abbreviated => [
     "FLO",
@@ -182,7 +187,7 @@
     "FDE",
     "FMU",
     "FGW",
-    "FYU"
+    "FYU",
   ],
   month_stand_alone_narrow => [
     "O",
@@ -196,7 +201,7 @@
     "E",
     "U",
     "W",
-    "Y"
+    "Y",
   ],
   month_stand_alone_wide => [
     "F\N{U+0129}i Loo",
@@ -210,7 +215,7 @@
     "F\N{U+0129}i D\N{U+01dd}\N{U+0253}lii",
     "F\N{U+0129}i Munda\N{U+014b}",
     "F\N{U+0129}i Gwahlle",
-    "F\N{U+0129}i Yuru"
+    "F\N{U+0129}i Yuru",
   ],
   name => "Mundang",
   native_language => "MUNDA\N{U+014a}",
@@ -222,37 +227,37 @@
     "F1",
     "F2",
     "F3",
-    "F4"
+    "F4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "Tai f\N{U+0129}i sai ma t\N{U+01dd}n kee zah",
     "Tai f\N{U+0129}i sai zah l\N{U+01dd}n gwa ma kee",
     "Tai f\N{U+0129}i sai zah l\N{U+01dd}n sai ma kee",
-    "Tai f\N{U+0129}i sai ma coo kee zah \N{U+2018}na"
+    "Tai f\N{U+0129}i sai ma coo kee zah \N{U+2018}na",
   ],
   quarter_stand_alone_abbreviated => [
     "F1",
     "F2",
     "F3",
-    "F4"
+    "F4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "Tai f\N{U+0129}i sai ma t\N{U+01dd}n kee zah",
     "Tai f\N{U+0129}i sai zah l\N{U+01dd}n gwa ma kee",
     "Tai f\N{U+0129}i sai zah l\N{U+01dd}n sai ma kee",
-    "Tai f\N{U+0129}i sai ma coo kee zah \N{U+2018}na"
+    "Tai f\N{U+0129}i sai ma coo kee zah \N{U+2018}na",
   ],
   script => undef,
   territory => undef,
@@ -261,5 +266,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

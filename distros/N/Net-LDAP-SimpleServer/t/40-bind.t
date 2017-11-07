@@ -45,7 +45,7 @@ test_requests(
         $mesg = $ldap->bind( uc($ROOT_DN), password => $ROOT_PW );
         ok( !$mesg->code,
                 'should be able to bind with authentication in upper case('
-              . $mesg->error_desc
+              . explain $mesg
               . ')' );
 
         $mesg = $ldap->unbind;

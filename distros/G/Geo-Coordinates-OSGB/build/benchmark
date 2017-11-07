@@ -1,0 +1,37 @@
+#! /usr/bin/env perl
+# Toby Thurston -- 27 Jun 2017
+# Bench mark the conversion routines
+
+use strict;
+use warnings;
+
+use Geo::Coordinates::OSGB   qw/grid_to_ll grid_to_ll_helmert ll_to_grid ll_to_grid_helmert/;
+use Benchmark qw/timethese/;
+use Config;
+
+our $VERSION = '2.20';
+
+my $times = timethese( -4, {
+    ll_to_grid         => 'll_to_grid(52 + rand 3, 0 - rand 3)',
+    ll_to_grid_helmert => 'll_to_grid_helmert(52 + rand 3, 0 - rand 3)',
+    grid_to_ll         => 'grid_to_ll(400000 + rand 100000, 300000 + rand 100000)',
+    grid_to_ll_helmert => 'grid_to_ll_helmert(400000 + rand 100000, 300000 + rand 100000)',
+} );
+
+sub make_line {
+    my ($results, $name) = @_;
+    my $timed = ${$results}{$name}[1];
+    my $count = ${$results}{$name}[5];
+    my $rate = $count/$timed;
+    my $mspc = 1000*$timed/$count;
+    return sprintf '%-42s %9.0f %9.4f', $name,  $rate,  $mspc;
+}
+
+print "Conversion benchmark Geo::Coordinates::OSGB v$Geo::Coordinates::OSGB::VERSION\n";
+print "$Config{osname} on $Config{archname} running Perl: $Config{version}\n";
+print "\n";
+print make_line($times, 'll_to_grid'), "\n";
+print make_line($times, 'll_to_grid_helmert'), "\n";
+print "\n";
+print make_line($times, 'grid_to_ll'), "\n";
+print make_line($times, 'grid_to_ll_helmert'), "\n";

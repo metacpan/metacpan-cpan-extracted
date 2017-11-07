@@ -39,6 +39,7 @@ lib/Net/FullAuto/ISets/Amazon/KaliLinux_is.pm
 lib/Net/FullAuto/ISets/Amazon/OpenLDAP_is.pm
 lib/Net/FullAuto/ISets/Amazon/Hadoop_is.pm
 lib/Net/FullAuto/ISets/Amazon/Liferay_is.pm
+lib/Net/FullAuto/ISets/Local/WordPress_is.pm
 lib/Net/FullAuto/ISets/Local/FullAutoAPI_is.pm
 lib/Net/FullAuto/FA_Core.pm
 LICENSE

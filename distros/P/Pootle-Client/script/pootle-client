@@ -43,7 +43,8 @@ It is advised to test first with the "dry-run"-flag and "test"-flag.
   -c --credentials      Login credentials to the Pootle-Client. In format username:password,
                         eg. master:blaster
                         or
-                        relative or absolute path to a UTF-8 encoded file containing the credentials on it's first row.
+                        relative or absolute path to a UTF-8 encoded file containing the credentials.
+                        Credentials are found from the file using this regexp /^(.+):(.+)$/
                         It is not recommended to give credentials as commandline parameters directly.
 
   --cacheFile           String, path to the cache file. If doesn't exists, cache file is created.

@@ -5,7 +5,7 @@ use strict;
 use warnings FATAL => 'all';
 use Test::More;
 
-plan tests => 12;
+plan tests => 14;
 
 use App::SCM::Digest::SCM::Hg;
 use App::SCM::Digest::Utils qw(system_ad system_ad_op);
@@ -15,7 +15,7 @@ use File::Temp qw(tempdir);
 SKIP: {
     my $hg = eval { App::SCM::Digest::SCM::Hg->new(); };
     if ($@) {
-        skip 'Mercurial not available', 12;
+        skip 'Mercurial not available', 14;
     }
 
     eval { $hg->clone('invalid', 'invalid') };
@@ -77,6 +77,9 @@ SKIP: {
     @branches = sort { $a->[0] cmp $b->[0] } @{$hg2->branches()};
     is($commits[0], $branches[0]->[1],
         'The found commit has the correct ID');
+
+    ok($hg2->has($commits[0]), 'Has a commit');
+    ok((not $hg2->has('invalid')), 'Does not have a commit');
 
     my $info = join '', @{$hg2->show($commits[0])};
     like($info, qr/out3/,

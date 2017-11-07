@@ -17,7 +17,7 @@ use LWP::UserAgent;
 use HTTP::Request::Common;
 use HTML::TableExtract;
 
-our $VERSION = '1.38'; # VERSION
+our $VERSION = '1.43'; # VERSION
 my $FINANCECANADA_MAINURL = ("http://finance.canada.com/");
 my $FINANCECANADA_URL = "http://stockgroup.canada.com/sn_overview.asp?symbol=T.";
 
@@ -64,7 +64,7 @@ sub financecanada {
 
 	# Parse the page looking for the table containing the full
 	# name of the stock
-        my $te = new HTML::TableExtract( depth => 2, count => 0);
+        my $te = HTML::TableExtract->new( depth => 2, count => 0);
         $te->parse($response->content);
 
 	# debug
@@ -87,7 +87,7 @@ sub financecanada {
 
 	# Parse the page looking for the table containing the quote
 	# details
-        $te = new HTML::TableExtract(headers => [qw(Quote)],
+        $te = HTML::TableExtract->new(headers => [qw(Quote)],
 				     slice_columns => 0);
         $te->parse($response->content);
 

@@ -6,7 +6,7 @@ use warnings;
 
 require Exporter;
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 our $PACKAGE = __PACKAGE__;
 
 our @EXPORT = qw(

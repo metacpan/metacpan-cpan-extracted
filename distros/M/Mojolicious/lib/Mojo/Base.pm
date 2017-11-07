@@ -9,6 +9,9 @@ use feature ();
 use Carp         ();
 use Scalar::Util ();
 
+# Defer to runtime so Mojo::Util can use "-strict"
+require Mojo::Util;
+
 # Only Perl 5.14+ requires it on demand
 use IO::Handle ();
 
@@ -16,20 +19,8 @@ use IO::Handle ();
 use constant ROLES =>
   !!(eval { require Role::Tiny; Role::Tiny->VERSION('2.000001'); 1 });
 
-# Supported on Perl 5.22+
-my $NAME
-  = eval { require Sub::Util; Sub::Util->can('set_subname') } || sub { $_[1] };
-
 # Protect subclasses using AUTOLOAD
 sub DESTROY { }
-
-# Declared here to avoid circular require problems in Mojo::Util
-sub _monkey_patch {
-  my ($class, %patch) = @_;
-  no strict 'refs';
-  no warnings 'redefine';
-  *{"${class}::$_"} = $NAME->("${class}::$_", $patch{$_}) for keys %patch;
-}
 
 sub attr {
   my ($self, $attrs, $value) = @_;
@@ -43,31 +34,33 @@ sub attr {
 
     # Very performance-sensitive code with lots of micro-optimizations
     if (ref $value) {
-      _monkey_patch $class, $attr, sub {
+      my $sub = sub {
         return
           exists $_[0]{$attr} ? $_[0]{$attr} : ($_[0]{$attr} = $value->($_[0]))
           if @_ == 1;
         $_[0]{$attr} = $_[1];
         $_[0];
       };
+      Mojo::Util::monkey_patch($class, $attr, $sub);
     }
     elsif (defined $value) {
-      _monkey_patch $class, $attr, sub {
+      my $sub = sub {
         return exists $_[0]{$attr} ? $_[0]{$attr} : ($_[0]{$attr} = $value)
           if @_ == 1;
         $_[0]{$attr} = $_[1];
         $_[0];
       };
+      Mojo::Util::monkey_patch($class, $attr, $sub);
     }
     else {
-      _monkey_patch $class, $attr,
-        sub { return $_[0]{$attr} if @_ == 1; $_[0]{$attr} = $_[1]; $_[0] };
+      Mojo::Util::monkey_patch($class, $attr,
+        sub { return $_[0]{$attr} if @_ == 1; $_[0]{$attr} = $_[1]; $_[0] });
     }
   }
 }
 
 sub import {
-  my $class = shift;
+  my ($class, $caller) = (shift, caller);
   return unless my @flags = @_;
 
   # Base
@@ -76,18 +69,23 @@ sub import {
   # Strict
   elsif ($flags[0] eq '-strict') { $flags[0] = undef }
 
+  # Role
+  elsif ($flags[0] eq '-role') {
+    Carp::croak 'Role::Tiny 2.000001+ is required for roles' unless ROLES;
+    eval "package $caller; use Role::Tiny; 1" or die $@;
+  }
+
   # Module
   elsif ((my $file = $flags[0]) && !$flags[0]->can('new')) {
     $file =~ s!::|'!/!g;
     require "$file.pm";
   }
 
-  # ISA
+  # "has" and possibly ISA
   if ($flags[0]) {
-    my $caller = caller;
     no strict 'refs';
-    push @{"${caller}::ISA"}, $flags[0];
-    _monkey_patch $caller, 'has', sub { attr($caller, @_) };
+    push @{"${caller}::ISA"}, $flags[0] unless $flags[0] eq '-role';
+    Mojo::Util::monkey_patch($caller, 'has', sub { attr($caller, @_) });
   }
 
   # Mojo modules are strict!
@@ -98,8 +96,7 @@ sub import {
   if (($flags[1] || '') eq '-signatures') {
     Carp::croak 'Subroutine signatures require Perl 5.20+' if $] < 5.020;
     require experimental;
-    @_ = ('warnings', 'signatures');
-    goto &experimental::import;
+    experimental->import('signatures');
   }
 }
 
@@ -167,8 +164,10 @@ interfaces.
   use Mojo::Base -strict;
   use Mojo::Base -base;
   use Mojo::Base 'SomeBaseClass';
+  use Mojo::Base -role;
 
-All three forms save a lot of typing.
+All four forms save a lot of typing. Note that role support depends on
+L<Role::Tiny> (2.000001+).
 
   # use Mojo::Base -strict;
   use strict;
@@ -196,6 +195,15 @@ All three forms save a lot of typing.
   push @ISA, 'SomeBaseClass';
   sub has { Mojo::Base::attr(__PACKAGE__, @_) }
 
+  # use Mojo::Base -role;
+  use strict;
+  use warnings;
+  use utf8;
+  use feature ':5.10';
+  use IO::Handle ();
+  use Role::Tiny;
+  sub has { Mojo::Base::attr(__PACKAGE__, @_) }
+
 On Perl 5.20+ you can also append a C<-signatures> flag to all three forms and
 enable support for L<subroutine signatures|perlsub/"Signatures">.
 
@@ -203,6 +211,7 @@ enable support for L<subroutine signatures|perlsub/"Signatures">.
   use Mojo::Base -strict, -signatures;
   use Mojo::Base -base, -signatures;
   use Mojo::Base 'SomeBaseClass', -signatures;
+  use Mojo::Base -role, -signatures;
 
 This will also disable experimental warnings on versions of Perl where this
 feature was still experimental.

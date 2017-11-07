@@ -6,6 +6,8 @@ use Modern::Perl '2015';
 use utf8;
 binmode STDOUT, ':encoding(UTF-8)';
 binmode STDERR, ':encoding(UTF-8)';
+use FindBin;
+use lib "$FindBin::Bin/../";
 use feature 'signatures'; no warnings "experimental::signatures";
 use Carp::Always;
 use Try::Tiny;
@@ -13,6 +15,7 @@ use Scalar::Util qw(blessed);
 use Data::Dumper;
 
 use Test::More;
+use Test::Exception;
 use Test::MockModule;
 
 use t::Mock::Client;
@@ -27,13 +30,10 @@ sub nowhere {
   ok($papi = t::Mock::Client::new('http://www.example.com', 'user:pass'),
     "Given a Pootle::Client connection to nowhere");
 
-  try {
-    $papi->store('/api/v1/stores/7578/');
-    ok(0, "THIS SHOULD CRASH with 404 Not Found!");
-  } catch {
-    ok(blessed $_ && $_->isa('Pootle::Exception::HTTP::NotFound'),
-       "Then nothing was found from nowhere");
-  };
+  throws_ok(sub {
+      $papi->store('/api/v1/stores/7578/');
+    }, 'Pootle::Exception::HTTP::NotFound',
+    "Then nothing was found from nowhere");
 
   };
   if ($@) {

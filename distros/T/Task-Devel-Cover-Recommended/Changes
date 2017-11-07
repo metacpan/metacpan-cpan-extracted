@@ -1,5 +1,8 @@
 Revision history for Task-Devel-Cover-Recommended
 
+1.290.0 2017-11-04 16:45 UTC
+        + Upd : Update to Devel::Cover 1.29.
+
 1.200.0 2015-07-31 18:00 UTC
         + Upd : Update to Devel::Cover 1.20.
 

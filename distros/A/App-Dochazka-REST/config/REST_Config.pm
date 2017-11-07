@@ -220,6 +220,10 @@ set( 'DOCHAZKA_INTERVAL_FILLUP_LIMIT', 365 );
 #     upper limit for number of date_list entries
 set( 'DOCHAZKA_INTERVAL_FILLUP_MAX_DATELIST_ENTRIES', 35 );
 
+# DOCHAZKA_SQL_TRACE
+#     include extra debugging info in SQL error messages
+set( 'DOCHAZKA_SQL_TRACE', 0 );
+
 # -----------------------------------
 # DO NOT EDIT ANYTHING BELOW THIS LINE
 # -----------------------------------

@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "AM",
-    "PM"
+    "PM",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "E d.",
@@ -53,8 +58,8 @@
     yMd => "y-MM-dd",
     yQQQ => "y QQQ",
     yQQQQ => "y QQQQ",
-    "yw-count-one" => "'week' w 'of' y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-one" => "'week' w 'of' Y",
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "rm",
   date_format_full => "EEEE, 'ils' d 'da' MMMM y",
@@ -72,7 +77,7 @@
     "gie",
     "ve",
     "so",
-    "du"
+    "du",
   ],
   day_format_narrow => [
     "G",
@@ -81,7 +86,7 @@
     "G",
     "V",
     "S",
-    "D"
+    "D",
   ],
   day_format_wide => [
     "glindesdi",
@@ -90,7 +95,7 @@
     "gievgia",
     "venderdi",
     "sonda",
-    "dumengia"
+    "dumengia",
   ],
   day_stand_alone_abbreviated => [
     "gli",
@@ -99,7 +104,7 @@
     "gie",
     "ve",
     "so",
-    "du"
+    "du",
   ],
   day_stand_alone_narrow => [
     "G",
@@ -108,7 +113,7 @@
     "G",
     "V",
     "S",
-    "D"
+    "D",
   ],
   day_stand_alone_wide => [
     "glindesdi",
@@ -117,19 +122,19 @@
     "gievgia",
     "venderdi",
     "sonda",
-    "dumengia"
+    "dumengia",
   ],
   era_abbreviated => [
     "av. Cr.",
-    "s. Cr."
+    "s. Cr.",
   ],
   era_narrow => [
     "av. Cr.",
-    "s. Cr."
+    "s. Cr.",
   ],
   era_wide => [
     "avant Cristus",
-    "suenter Cristus"
+    "suenter Cristus",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -150,7 +155,7 @@
     "sett.",
     "oct.",
     "nov.",
-    "dec."
+    "dec.",
   ],
   month_format_narrow => [
     "S",
@@ -164,7 +169,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_format_wide => [
     "schaner",
@@ -178,7 +183,7 @@
     "settember",
     "october",
     "november",
-    "december"
+    "december",
   ],
   month_stand_alone_abbreviated => [
     "schan.",
@@ -192,7 +197,7 @@
     "sett.",
     "oct.",
     "nov.",
-    "dec."
+    "dec.",
   ],
   month_stand_alone_narrow => [
     "S",
@@ -206,7 +211,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_stand_alone_wide => [
     "schaner",
@@ -220,7 +225,7 @@
     "settember",
     "october",
     "november",
-    "december"
+    "december",
   ],
   name => "Romansh",
   native_language => "rumantsch",
@@ -232,37 +237,37 @@
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "1. quartal",
     "2. quartal",
     "3. quartal",
-    "4. quartal"
+    "4. quartal",
   ],
   quarter_stand_alone_abbreviated => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "1. quartal",
     "2. quartal",
     "3. quartal",
-    "4. quartal"
+    "4. quartal",
   ],
   script => undef,
   territory => undef,
@@ -271,5 +276,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

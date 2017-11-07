@@ -11,8 +11,11 @@ ok(! defined(RPM4::setverbosity("DEBUG")), "Set verbosity works");
 my $marker =  0;
 ok(!defined(RPM4::setlogcallback(sub { my %m = @_; $marker = 1; print "$m{priority}: $m{msg}\n" })),
     "Setting log callback function works");
-ok(!defined(RPM4::rpmlog("ERR", "This is a rpm debug message")), "rpmlog function works");
-ok($marker == 1, "rpmlogcallback has been called");
+ SKIP: {
+     skip 'segfault in rpm-4.1[12]', 2 if `rpm --version` =~ /4\.1[12]\./;
+     ok(!defined(RPM4::rpmlog("ERR", "This is a rpm debug message")), "rpmlog function works");
+     ok($marker == 1, "rpmlogcallback has been called");
+};
 }
 ok(! defined(RPM4::setlogcallback(undef)), "remove callback function");
 ok(RPM4::setlogfile("logfile"), "set a log file");

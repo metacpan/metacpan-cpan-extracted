@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "AM",
-    "PM"
+    "PM",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "E d",
@@ -45,13 +50,13 @@
     yMd => "d/M/y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-one" => "'settimana' w 'del' y",
-    "yw-count-other" => "'settimana' w 'del' y"
+    "yw-count-one" => "'settimana' w 'del' Y",
+    "yw-count-other" => "'settimana' w 'del' Y",
   },
   code => "it",
   date_format_full => "EEEE d MMMM y",
   date_format_long => "d MMMM y",
-  date_format_medium => "dd MMM y",
+  date_format_medium => "d MMM y",
   date_format_short => "dd/MM/yy",
   datetime_format_full => "{1} {0}",
   datetime_format_long => "{1} {0}",
@@ -64,7 +69,7 @@
     "gio",
     "ven",
     "sab",
-    "dom"
+    "dom",
   ],
   day_format_narrow => [
     "L",
@@ -73,7 +78,7 @@
     "G",
     "V",
     "S",
-    "D"
+    "D",
   ],
   day_format_wide => [
     "luned\N{U+00ec}",
@@ -82,7 +87,7 @@
     "gioved\N{U+00ec}",
     "venerd\N{U+00ec}",
     "sabato",
-    "domenica"
+    "domenica",
   ],
   day_stand_alone_abbreviated => [
     "lun",
@@ -91,7 +96,7 @@
     "gio",
     "ven",
     "sab",
-    "dom"
+    "dom",
   ],
   day_stand_alone_narrow => [
     "L",
@@ -100,7 +105,7 @@
     "G",
     "V",
     "S",
-    "D"
+    "D",
   ],
   day_stand_alone_wide => [
     "luned\N{U+00ec}",
@@ -109,19 +114,19 @@
     "gioved\N{U+00ec}",
     "venerd\N{U+00ec}",
     "sabato",
-    "domenica"
+    "domenica",
   ],
   era_abbreviated => [
     "a.C.",
-    "d.C."
+    "d.C.",
   ],
   era_narrow => [
     "aC",
-    "dC"
+    "dC",
   ],
   era_wide => [
     "avanti Cristo",
-    "dopo Cristo"
+    "dopo Cristo",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -142,7 +147,7 @@
     "set",
     "ott",
     "nov",
-    "dic"
+    "dic",
   ],
   month_format_narrow => [
     "G",
@@ -156,7 +161,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_format_wide => [
     "gennaio",
@@ -170,7 +175,7 @@
     "settembre",
     "ottobre",
     "novembre",
-    "dicembre"
+    "dicembre",
   ],
   month_stand_alone_abbreviated => [
     "gen",
@@ -184,7 +189,7 @@
     "set",
     "ott",
     "nov",
-    "dic"
+    "dic",
   ],
   month_stand_alone_narrow => [
     "G",
@@ -198,7 +203,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_stand_alone_wide => [
     "gennaio",
@@ -212,7 +217,7 @@
     "settembre",
     "ottobre",
     "novembre",
-    "dicembre"
+    "dicembre",
   ],
   name => "Italian",
   native_language => "italiano",
@@ -224,37 +229,37 @@
     "T1",
     "T2",
     "T3",
-    "T4"
+    "T4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "1\N{U+00ba} trimestre",
     "2\N{U+00ba} trimestre",
     "3\N{U+00ba} trimestre",
-    "4\N{U+00ba} trimestre"
+    "4\N{U+00ba} trimestre",
   ],
   quarter_stand_alone_abbreviated => [
     "T1",
     "T2",
     "T3",
-    "T4"
+    "T4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "1\N{U+00ba} trimestre",
     "2\N{U+00ba} trimestre",
     "3\N{U+00ba} trimestre",
-    "4\N{U+00ba} trimestre"
+    "4\N{U+00ba} trimestre",
   ],
   script => undef,
   territory => undef,
@@ -263,5 +268,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

@@ -11,7 +11,7 @@ use warnings;
 
 use lib qw(../lib);
 #use Math::AnyNum qw(:overload);       # can be uncommented
-use Math::AnyNum qw(factorial next_prime ceil float is_div);
+use Math::AnyNum qw(factorial next_prime ceil float);
 
 sub bernoulli_from_primes {
     my ($n) = @_;
@@ -30,7 +30,7 @@ sub bernoulli_from_primes {
     my $d = 1;
 
     for (my $p = 2 ; $p <= $n + 1 ; $p = next_prime($p)) {
-        if (is_div($n, $p - 1)) {
+        if ($n % ($p - 1) == 0) {
             $d *= $p;
         }
     }

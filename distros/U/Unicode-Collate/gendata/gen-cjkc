@@ -13,8 +13,8 @@ use strict;
 use warnings;
 use File::Spec;
 
-require 'gen-head'; # for testcount(), testhead() and testnew()
-require 'dumpstr';  # for string()
+require './gen-head'; # for testcount(), testhead() and testnew()
+require './dumpstr';  # for string()
 
 my @obj = qw($objDefault $objB $objG $objJ $objK $objP $objS $objZ);
 my $ok = 1 + @obj;

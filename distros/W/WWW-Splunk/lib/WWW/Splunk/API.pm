@@ -21,34 +21,32 @@ package WWW::Splunk::API;
 
 use LWP::UserAgent;
 use HTTP::Request::Common;
-use Text::CSV;
 use WWW::Splunk::XMLParser;
 use Carp;
 
 use strict;
 use warnings;
 
-our $VERSION = '2.06';
+our $VERSION = '2.08';
 our $prefix = '/services';
 
 =head2 B<new> (F<params>)
 
 A constructor.
 
-  my $splunk = new WWW::Splunk::API ({
-          host    => $host,
-          port    => $port,
-          login   => $login,
+  my $splunk = WWW::Splunk::API->new({
+          host => $host,
+          port => $port,
+          login => $login,
           password => $password,
           unsafe_ssl => 0,
           verbose => 0,
   });
 
 =cut
-sub new
-{
-	my $class = shift;
-	my $self = shift;
+
+sub new {
+	my ($class, $self) = @_;
 
 	$self->{port} ||= 8089;
 	$self->{host} ||= 'localhost';
@@ -69,69 +67,74 @@ sub new
 		$self->{agent}->agent ("$class/$VERSION ");
 	}
 
-	bless $self, $class;
+	return bless $self, $class;
 }
 
 =head2 B<delete> (F<parameters>)
 
-Wrapper around HTTP::Request::Common::DELETE ().
+Wrapper around HTTP::Request::Common::DELETE().
 
 =cut
-sub delete
-{
-	my $self = shift;
+
+sub delete {
+	my ($self, @args) = @_;
+
 	print "DELETE" if $self->{verbose};
-	$self->request (\&DELETE, @_);
+	$self->request (\&DELETE, @args);
 }
 
 =head2 B<post> (F<parameters>)
 
-Wrapper around HTTP::Request::Common::POST ().
+Wrapper around HTTP::Request::Common::POST().
 
 =cut
-sub post
-{
-	my $self = shift;
+
+sub post {
+	my ($self, @args) = @_;
+
 	print "POST" if $self->{verbose};
-	$self->request (\&POST, @_);
+	$self->request (\&POST, @args);
 }
 
 =head2 B<get> (F<parameters>)
 
-Wrapper around HTTP::Request::Common::GET ().
+Wrapper around HTTP::Request::Common::GET().
 
 =cut
-sub get
-{
-	my $self = shift;
+
+sub get {
+	my ($self, @args) = @_;
+
 	print "GET" if $self->{verbose};
-	$self->request (\&GET, @_);
+	$self->request (\&GET, @args);
 }
 
 =head2 B<head> (F<parameters>)
 
-Wrapper around HTTP::Request::Common::HEAD ().
+Wrapper around HTTP::Request::Common::HEAD().
 Not used anywhere in splunk API
 
 =cut
-sub head
-{
-	my $self = shift;
+
+sub head {
+	my ($self, @args) = @_;
+
 	print "HEAD" if $self->{verbose};
-	$self->request (\&HEAD, @_);
+	$self->request (\&HEAD, @args);
 }
 
 =head2 B<put> (F<parameters>)
 
-Wrapper around HTTP::Request::Common::PUT ().
+Wrapper around HTTP::Request::Common::PUT().
 Not used anywhere in splunk API
 
 =cut
-sub put
-{
-	my $self = shift;
+
+sub put {
+	my ($self, @args) = @_;
+
 	print "PUT" if $self->{verbose};
-	$self->request (\&PUT, @_);
+	$self->request (\&PUT, @args);
 }
 
 =head2 B<request> (F<method>, F<location>, [F<data>], [F<callback>])
@@ -149,12 +152,9 @@ Call-back function can be specified for a single special case, where a XML strea
 of <results> elements is expected.
 
 =cut
+
 sub request {
-	my $self = shift;
-	my $method = shift;
-	my $location = shift;
-	my $data = shift;
-	my $callback = shift;
+	my ($self, $method, $location, $data, $callback) = @_;
 
 	my $url = $self->{url}.$prefix.$location;
 	if ($self->{verbose}) {

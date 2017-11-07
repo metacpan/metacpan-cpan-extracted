@@ -4,17 +4,24 @@
 # unsnoopable.pl - Completely unsnoopable messaging
 # Copyright (c) 2017 Ashish Gulhati <crypt-unsnoopable at hash.neo.tc>
 #
-# $Id: bin/unsnoopable.pl v1.006 Tue Jun 20 15:40:10 PDT 2017 $
+# $Id: bin/unsnoopable.pl v1.007 Sat Nov  4 20:41:32 PDT 2017 $
 
 use warnings;
 
 use Wx qw (:everything);
 use Wx::Event qw (EVT_BUTTON);
-use Crypt::Unsnoopable;
+use Crypt::Unsnoopable qw(dec heX);
 use GD::Barcode::QRcode;
 use File::HomeDir;
-use Math::BaseCnv qw(dec heX);
 
+my $NOODLEPI;
+if ($ARGV[0] and $ARGV[0] eq '--noodlepi') {
+  my $uname = `uname -a`; my $cpu;
+  if ($uname =~ /armv6l GNU\/Linux/) {
+    $cpu = `grep Hardware /proc/cpuinfo`;
+  }
+  $NOODLEPI = 1 if $cpu =~ /BCM2708/;
+}
 my $UNSNOOPABLE = $ENV{UNSNOOPABLEDIR} || File::HomeDir->my_home . '/.unsnoopable';
 
 unless (-d $UNSNOOPABLE) {
@@ -44,14 +51,26 @@ $action{Generate} = sub {   # Generate new OTP
 };
 
 $action{Import} = sub {     # Import OTP
-  my $dialog = Wx::TextEntryDialog->new( $frame, "Paste pad below", "Import One-Time Pad");
-  return if($dialog->ShowModal == wxID_CANCEL);
-  my $pad = $dialog->GetValue();
+  my ($dialog, $pad);
+  if ($NOODLEPI) {
+    system ('v4l2-ctl --overlay=1');
+    open (ZBAR, "zbarcam --nodisplay --prescale=640x480 /dev/video0 |");
+    $pad = <ZBAR>; chomp $pad; $pad =~ s/^QR-Code://;
+    system ('killall -9 zbarcam');
+    close ZBAR;
+    system ('v4l2-ctl --overlay=0');
+    print "$pad\n";
+  }
+  else {
+    $dialog = Wx::TextEntryDialog->new( $frame, "Paste pad below", "Import One-Time Pad");
+    return if($dialog->ShowModal == wxID_CANCEL);
+    $pad = $dialog->GetValue();
+  }
   return if $pad =~ /\D/;
   $dialog = Wx::TextEntryDialog->new( $frame, "Enter a name for this pad:", "Import One-Time Pad");
   return if $dialog->ShowModal == wxID_CANCEL;
   my $name = $dialog->GetValue(); return unless $name =~ /^[\w\d\s]+$/; return if exists $pads->{$name};
-  return unless my $pad = $u->add($pad, $name);
+  return unless $pad = $u->add($pad, $name);
   $pads = $u->otps; my $len = length($pads->{$name}->{pad})/2;
   $padsel->Insert("$name ($len)", 0);
   show();
@@ -79,9 +98,22 @@ $action{Send} = sub {       # Send a message
 };
 
 $action{Receive} = sub {    # Receive a message
-  my $dialog = Wx::TextEntryDialog->new( $frame, "Enter message:", "Receive message");
-  return if $dialog->ShowModal == wxID_CANCEL;
-  my $msg = $dialog->GetValue(); return unless $msg;
+  my ($dialog, $msg);
+  if ($NOODLEPI) {
+    system ('v4l2-ctl --overlay=1');
+    open (ZBAR, "zbarcam --nodisplay --prescale=640x480 /dev/video0 |");
+    $msg = <ZBAR>; chomp $msg; $msg =~ s/^QR-Code://;
+    system ('killall -9 zbarcam');
+    close ZBAR;
+    system ('v4l2-ctl --overlay=0');
+    print "$msg\n";
+  }
+  else {
+    $dialog = Wx::TextEntryDialog->new( $frame, "Enter message:", "Receive message");
+    return if $dialog->ShowModal == wxID_CANCEL;
+    $msg = $dialog->GetValue();
+  }
+  return unless $msg;
   return unless my ($decrypted, $pad, $oldlen) = $u->decrypt($msg);
   my $padlen = length($pad->{pad})/2;
   my $pad_name = pack('H*',$pad->{name});
@@ -445,8 +477,8 @@ unsnoopable.pl - Completely unsnoopable messaging
 
 =head1 VERSION
 
- $Revision: 1.006 $
- $Date: Tue Jun 20 15:40:10 PDT 2017 $
+ $Revision: 1.007 $
+ $Date: Sat Nov  4 20:41:32 PDT 2017 $
 
 =head1 SYNOPSIS
 

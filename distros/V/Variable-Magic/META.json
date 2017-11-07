@@ -4,13 +4,13 @@
       "Vincent Pit <perl@profvince.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Variable-Magic",
    "no_index" : {
@@ -66,6 +66,6 @@
          "url" : "http://git.profvince.com/?p=perl%2Fmodules%2FVariable-Magic.git"
       }
    },
-   "version" : "0.61",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "0.62",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

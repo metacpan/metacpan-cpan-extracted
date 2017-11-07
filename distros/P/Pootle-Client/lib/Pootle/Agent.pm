@@ -125,18 +125,27 @@ sub _httpResponseToLoggableHeader($s, $response) {
 
 sub _loadCredentials($s) {
   my $c = $s->credentials();
+  my $credentialsConfirmed;
   my $file;
   if (-e $c) { #This is a file
     $file = $c;
     $l->info("Loading credentials from file '$c'");
     my @rows = File::Slurp::read_file( $c => { binmode => ':encoding(UTF-8)' } );
-    $c = $rows[0];
+    foreach my $row (@rows) {
+      if ($row =~ /^(.+):(.+)$/) {
+        $credentialsConfirmed = "$1:$2";
+      }
+      last;
+    }
+  }
+  else {
+    $credentialsConfirmed = $c;
   }
 
-  unless ($c =~ /^(.+):(.+)$/) {
-    Pootle::Exception::Credentials->throw(error => "_loadCredentials():> Given credentials ".($file ? "from file '$file' " : "")."are malformed. Credentials must look like username:password");
+  unless ($credentialsConfirmed && $credentialsConfirmed =~ /^(.+):(.+)$/) {
+    Pootle::Exception::Credentials->throw(error => "_loadCredentials():> Given credentials ".($file ? "from file '$file' " : "")."are malformed. Credentials must look like username:password, or point to a file with properly formatted credentials.");
   }
-  return $c;
+  return $credentialsConfirmed;
 }
 
 ##########    ###   ###

@@ -199,6 +199,16 @@ define ([
             return String((new Date()).getFullYear());
         },
 
+        dateToDay = function (dateStr) {
+            // date assumed to be in YYYY-MM-DD format, all numeric
+            var y, m, d, dateObj, dow, day;
+            [y, m, d] = dateStr.split('-');
+            m -= 1;
+            dateObj = new Date(y, m, d);
+            dow = dateObj.getDay();
+            return intToDay(dow);
+        },
+
         daysInMonth = function (year, month) {
             if (! coreLib.isInteger(month)) {
                 month = monthToInt(month);
@@ -660,6 +670,7 @@ define ([
         canonicalizeTimeRangeOffset: canonicalizeTimeRangeOffset,
         currentMonth: currentMonth,
         currentYear: currentYear,
+        dateToDay: dateToDay,
         daysInMonth: daysInMonth,
         intToDay: intToDay,
         intToMonth: intToMonth,

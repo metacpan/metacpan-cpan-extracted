@@ -7,7 +7,7 @@ use Module::Load ();
 use Carp ();
 
 # ABSTRACT: Download negotiation plugin
-our $VERSION = '1.28'; # VERSION
+our $VERSION = '1.32'; # VERSION
 
 
 has '+url' => undef;
@@ -28,6 +28,9 @@ has 'scheme'  => undef;
 
 
 has 'bootstrap_ssl' => 0;
+
+
+has 'prefer' => 1;
 
 
 sub pick
@@ -118,10 +121,25 @@ sub init
   if($self->version)
   {
     $meta->apply_plugin($_) for @decoders;
-    $meta->apply_plugin('Prefer::SortVersions', 
-      (defined $self->filter ? (filter => $self->filter) : ()),
-      version => $self->version,
-    );
+    
+    if(defined $self->prefer && ref($self->prefer) eq 'CODE')
+    {
+      $meta->add_requires('share' => 'Alien::Build::Plugin::Download::Negotiate' => '1.30');
+      $meta->register_hook(
+        prefer => $self->prefer,
+      );
+    }
+    elsif($self->prefer)
+    {
+      $meta->apply_plugin('Prefer::SortVersions', 
+        (defined $self->filter ? (filter => $self->filter) : ()),
+        version => $self->version,
+      );
+    }
+    else
+    {
+      $meta->add_requires('share' => 'Alien::Build::Plugin::Download::Negotiate' => '1.30');
+    }
   }
 }
 
@@ -139,7 +157,7 @@ Alien::Build::Plugin::Download::Negotiate - Download negotiation plugin
 
 =head1 VERSION
 
-version 1.28
+version 1.32
 
 =head1 SYNOPSIS
 
@@ -205,6 +223,26 @@ OpenSSL to be alienized and be a useful optional dependency for L<Net::SSLeay>.
 
 The implementation may improve over time, but as of this writing, this option relies on you
 having a working C<curl> or C<wget> with SSL support in your C<PATH>.
+
+=head2 prefer
+
+How to sort candidates for selection.  This should be one of three types of values:
+
+=over 4
+
+=item code reference
+
+This will be used as the prefer hook.
+
+=item true value
+
+Use L<Alien::Build::Plugin::Prefer::SortVersions>.
+
+=item false value
+
+Don't set any preference at all.  A hook must be installed, or another prefer plugin specified.
+
+=back
 
 =head1 METHODS
 

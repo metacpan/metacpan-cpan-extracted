@@ -1,5 +1,5 @@
 package LWP::Protocol::http;
-$LWP::Protocol::http::VERSION = '6.27';
+$LWP::Protocol::http::VERSION = '6.29';
 use strict;
 
 require HTTP::Response;
@@ -42,6 +42,8 @@ sub _new_socket
 	    $@ =~ /\b(Crypt-SSLeay can't verify hostnames)\b/
 	) {
 	    $status .= " ($1)";
+	} elsif ($@) {
+	    $status .= " ($@)";
 	}
 	die "$status\n\n$@";
     }

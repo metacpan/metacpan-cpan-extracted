@@ -58,11 +58,11 @@ App::MFILE::WWW - Web UI development toolkit with prototype demo app
 
 =head1 VERSION
 
-Version 0.170
+Version 0.171
 
 =cut
 
-our $VERSION = '0.170';
+our $VERSION = '0.171';
 our @EXPORT_OK = ( '$VERSION' );
 
 
@@ -283,6 +283,16 @@ The C<dbrowser> primitive is like C<dform>, except that it displays a set
 of data objects and enables the user to "browse" the dataset using arrow keys.
 Like C<dform>, the primitive includes "miniMenu" functionality through which
 the user can potentially trigger actions that take the current object as input.
+
+
+=head2 dcallback
+
+The C<dcallback> primitive is useful for cases when none of the other primitives
+are appropriate for displaying a given type of object, and no interactivity is
+needed beyond that provided by miniMenu. The C<dcallback> primitive writes the
+target title and miniMenu to the screen, along with a "dcallback" div in
+between, which it populates by calling the callback function. Since the callback
+function part of the target definition, it can be app-specific.
 
 
 =head2 dform

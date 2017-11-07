@@ -2,7 +2,7 @@ package Test2::Formatter::Test2;
 use strict;
 use warnings;
 
-our $VERSION = '0.001030';
+our $VERSION = '0.001031';
 
 use Scalar::Util qw/blessed/;
 use List::Util qw/shuffle first/;
@@ -10,6 +10,7 @@ use Test2::Util::Term qw/term_size/;
 use Test2::Harness::Util::Term qw/USE_ANSI_COLOR/;
 use Test2::Util qw/IS_WIN32 clone_io/;
 use Time::HiRes;
+use IO::Handle;
 
 use File::Spec();
 

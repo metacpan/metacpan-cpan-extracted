@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "makeo",
-    "nyiaghuo"
+    "nyiaghuo",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d, E",
@@ -45,7 +50,7 @@
     yMd => "y-MM-dd",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "ksb",
   date_format_full => "EEEE, d MMMM y",
@@ -63,7 +68,7 @@
     "Alh",
     "Iju",
     "Jmo",
-    "Jpi"
+    "Jpi",
   ],
   day_format_narrow => [
     3,
@@ -72,7 +77,7 @@
     "A",
     "I",
     1,
-    2
+    2,
   ],
   day_format_wide => [
     "Jumaatatu",
@@ -81,7 +86,7 @@
     "Alhamisi",
     "Ijumaa",
     "Jumaamosi",
-    "Jumaapii"
+    "Jumaapii",
   ],
   day_stand_alone_abbreviated => [
     "Jtt",
@@ -90,7 +95,7 @@
     "Alh",
     "Iju",
     "Jmo",
-    "Jpi"
+    "Jpi",
   ],
   day_stand_alone_narrow => [
     3,
@@ -99,7 +104,7 @@
     "A",
     "I",
     1,
-    2
+    2,
   ],
   day_stand_alone_wide => [
     "Jumaatatu",
@@ -108,19 +113,19 @@
     "Alhamisi",
     "Ijumaa",
     "Jumaamosi",
-    "Jumaapii"
+    "Jumaapii",
   ],
   era_abbreviated => [
     "KK",
-    "BK"
+    "BK",
   ],
   era_narrow => [
     "KK",
-    "BK"
+    "BK",
   ],
   era_wide => [
     "Kabla ya Klisto",
-    "Baada ya Klisto"
+    "Baada ya Klisto",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -141,7 +146,7 @@
     "Sep",
     "Okt",
     "Nov",
-    "Des"
+    "Des",
   ],
   month_format_narrow => [
     "J",
@@ -155,7 +160,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_format_wide => [
     "Januali",
@@ -169,7 +174,7 @@
     "Septemba",
     "Oktoba",
     "Novemba",
-    "Desemba"
+    "Desemba",
   ],
   month_stand_alone_abbreviated => [
     "Jan",
@@ -183,7 +188,7 @@
     "Sep",
     "Okt",
     "Nov",
-    "Des"
+    "Des",
   ],
   month_stand_alone_narrow => [
     "J",
@@ -197,7 +202,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_stand_alone_wide => [
     "Januali",
@@ -211,7 +216,7 @@
     "Septemba",
     "Oktoba",
     "Novemba",
-    "Desemba"
+    "Desemba",
   ],
   name => "Shambala",
   native_language => "Kishambaa",
@@ -223,37 +228,37 @@
     "L1",
     "L2",
     "L3",
-    "L4"
+    "L4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "Lobo ya bosi",
     "Lobo ya mbii",
     "Lobo ya nnd\N{U+2019}atu",
-    "Lobo ya nne"
+    "Lobo ya nne",
   ],
   quarter_stand_alone_abbreviated => [
     "L1",
     "L2",
     "L3",
-    "L4"
+    "L4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "Lobo ya bosi",
     "Lobo ya mbii",
     "Lobo ya nnd\N{U+2019}atu",
-    "Lobo ya nne"
+    "Lobo ya nne",
   ],
   script => undef,
   territory => undef,
@@ -262,5 +267,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

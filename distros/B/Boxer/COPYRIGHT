@@ -220,15 +220,6 @@ Files: README
 Copyright: Copyright Â© 2013-2016 Jonas Smedegaard.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: Changes
- META.json
- META.yml
- bin/boxer
- doap.ttl
- t/world.t
-Copyright: Copyright 2017 Jonas Smedegaard.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: t/00_compile.t
  t/00_compile_scripts.t
  t/01_app_help.t
@@ -238,22 +229,31 @@ Files: t/00_compile.t
 Copyright: Copyright 2016 Jonas Smedegaard.
 License: GPL-1.0+ or Artistic-1.0
 
+Files: Changes
+ META.json
+ META.yml
+ bin/boxer
+ doap.ttl
+ t/world.t
+Copyright: Copyright 2017 Jonas Smedegaard.
+License: GPL-1.0+ or Artistic-1.0
+
 Files: COPYRIGHT
  CREDITS
  SIGNATURE
 Copyright: None
 License: public-domain
 
-Files: Makefile.PL
-Copyright: Copyright 2013 Toby Inkster.
+Files: dist.ini
+Copyright: Copyright 2014 Jonas Smedegaard.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: lib/Boxer/Part/Reclass.pm
 Copyright: Copyright Â© 2016 Jonas Smedegaard.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: dist.ini
-Copyright: Copyright 2014 Jonas Smedegaard.
+Files: Makefile.PL
+Copyright: Copyright 2013 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0

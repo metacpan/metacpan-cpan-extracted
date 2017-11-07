@@ -18,7 +18,7 @@ our $object = ( Net::Whois::Object->new(@lines) )[0];
 isa_ok $object, $class;
 
 # Non-inherited methods
-can_ok $object, qw( route descr country origin cross_mnt cross_nfy holes member_of inject aggr_mtd
+can_ok $object, qw( route descr origin holes member_of inject aggr_mtd
     aggr_bndry export_comps components remarks notify mnt_lower mnt_routes mnt_by
     changed source);
 
@@ -38,12 +38,6 @@ is_deeply( $object->descr(), ['route object for 192.168.1.0/24'], 'descr properl
 $object->descr('Added descr');
 is( $object->descr()->[1], 'Added descr', 'descr properly added' );
 
-# Test 'country'
-$tested{'country'}++;
-is( $object->country(), 'FR', 'country properly parsed' );
-$object->country('GB');
-is( $object->country(), 'GB', 'country properly set' );
-
 # Test 'origin'
 $tested{'origin'}++;
 is( $object->origin(), 'AS1234', 'origin properly parsed' );
@@ -61,18 +55,6 @@ $tested{'ping_hdl'}++;
 is_deeply( $object->ping_hdl(), ['PING-EXAMPLECOM'], 'ping_hdl properly parsed' );
 $object->ping_hdl('PING2-EXAMPLECOM');
 is( $object->ping_hdl()->[1], 'PING2-EXAMPLECOM', 'ping_hdl properly added' );
-
-# Test 'cross_mnt'
-$tested{'cross_mnt'}++;
-is_deeply( $object->cross_mnt(), ['CROSS-MAINT01'], 'cross_mnt properly parsed' );
-$object->cross_mnt('CROSS-MAINT02');
-is( $object->cross_mnt()->[1], 'CROSS-MAINT02', 'cross_mnt properly added' );
-
-# Test 'cross_nfy'
-$tested{'cross_nfy'}++;
-is_deeply( $object->cross_nfy(), ['watcher2@somewhere.com'], 'cross_nfy properly parsed' );
-$object->cross_nfy('watcher@somewhere.com');
-is( $object->cross_nfy()->[1], 'watcher@somewhere.com', 'cross_ntfy properly added' );
 
 # Test 'holes'
 $tested{'holes'}++;
@@ -172,10 +154,7 @@ ok( !$@, "Can evaluate t/common.pl ($@)" );
 __DATA__
 route:          192.168.1.0/24
 descr:          route object for 192.168.1.0/24
-country:        FR
 origin:         AS1234
-cross-mnt:      CROSS-MAINT01
-cross-nfy:      watcher2@somewhere.com
 holes:          192.168.1.23
 org:            ORG-MISC01-RIPE
 member_of:      RTES-SET01

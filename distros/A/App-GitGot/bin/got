@@ -21,7 +21,7 @@ got - A tool to make it easier to manage multiple code repositories using differ
 
 =head1 VERSION
 
-version 1.333
+version 1.334
 
 =head1 SYNOPSIS
 
@@ -234,6 +234,10 @@ Currently git is the only supported VCS.
 =item Rolando Pereira
 
 =item Tina Müller <tinita@cpan.org>
+
+=item Karen Etheridge
+
+=item Lucy Wyman
 
 =back
 

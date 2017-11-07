@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "mba\N{U+a78c}mba\N{U+a78c}",
-    "\N{U+014b}ka mb\N{U+0254}\N{U+0301}t nji"
+    "\N{U+014b}ka mb\N{U+0254}\N{U+0301}t nji",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "E d",
@@ -44,7 +49,7 @@
     yMd => "M.d.y",
     yQQQ => "y QQQ",
     yQQQQ => "y QQQQ",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "jgo",
   date_format_full => "EEEE, y MMMM dd",
@@ -62,7 +67,7 @@
     "T\N{U+0254}\N{U+0301}s\N{U+025b}d\N{U+025b}",
     "F\N{U+025b}l\N{U+00e2}y\N{U+025b}d\N{U+025b}",
     "S\N{U+00e1}sid\N{U+025b}",
-    "S\N{U+0254}\N{U+0301}ndi"
+    "S\N{U+0254}\N{U+0301}ndi",
   ],
   day_format_narrow => [
     "M\N{U+0254}\N{U+0301}",
@@ -71,7 +76,7 @@
     "T\N{U+0254}\N{U+0301}",
     "F\N{U+025b}",
     "S\N{U+00e1}",
-    "S\N{U+0254}\N{U+0301}"
+    "S\N{U+0254}\N{U+0301}",
   ],
   day_format_wide => [
     "M\N{U+0254}\N{U+0301}ndi",
@@ -80,7 +85,7 @@
     "T\N{U+0254}\N{U+0301}s\N{U+025b}d\N{U+025b}",
     "F\N{U+025b}l\N{U+00e2}y\N{U+025b}d\N{U+025b}",
     "S\N{U+00e1}sid\N{U+025b}",
-    "S\N{U+0254}\N{U+0301}ndi"
+    "S\N{U+0254}\N{U+0301}ndi",
   ],
   day_stand_alone_abbreviated => [
     "M\N{U+0254}\N{U+0301}ndi",
@@ -89,7 +94,7 @@
     "T\N{U+0254}\N{U+0301}s\N{U+025b}d\N{U+025b}",
     "F\N{U+025b}l\N{U+00e2}y\N{U+025b}d\N{U+025b}",
     "S\N{U+00e1}sid\N{U+025b}",
-    "S\N{U+0254}\N{U+0301}ndi"
+    "S\N{U+0254}\N{U+0301}ndi",
   ],
   day_stand_alone_narrow => [
     "M\N{U+0254}\N{U+0301}",
@@ -98,7 +103,7 @@
     "T\N{U+0254}\N{U+0301}",
     "F\N{U+025b}",
     "S\N{U+00e1}",
-    "S\N{U+0254}\N{U+0301}"
+    "S\N{U+0254}\N{U+0301}",
   ],
   day_stand_alone_wide => [
     "M\N{U+0254}\N{U+0301}ndi",
@@ -107,19 +112,19 @@
     "T\N{U+0254}\N{U+0301}s\N{U+025b}d\N{U+025b}",
     "F\N{U+025b}l\N{U+00e2}y\N{U+025b}d\N{U+025b}",
     "S\N{U+00e1}sid\N{U+025b}",
-    "S\N{U+0254}\N{U+0301}ndi"
+    "S\N{U+0254}\N{U+0301}ndi",
   ],
   era_abbreviated => [
     "BCE",
-    "CE"
+    "CE",
   ],
   era_narrow => [
     "BCE",
-    "CE"
+    "CE",
   ],
   era_wide => [
     "ts\N{U+025b}tts\N{U+025b}t m\N{U+025b}\N{U+014b}gu\N{U+a78c} mi \N{U+025b}\N{U+0301} l\N{U+025b}\N{U+025b}n\N{U+025b} K\N{U+025b}l\N{U+00ed}s\N{U+025b}t\N{U+0254} g\N{U+0254} \N{U+0144}\N{U+0254}\N{U+0301}",
-    "ts\N{U+025b}tts\N{U+025b}t m\N{U+025b}\N{U+014b}gu\N{U+a78c} mi \N{U+025b}\N{U+0301} f\N{U+00fa}n\N{U+025b} K\N{U+025b}l\N{U+00ed}s\N{U+025b}t\N{U+0254} t\N{U+0254}\N{U+0301} m\N{U+0254}\N{U+0301}"
+    "ts\N{U+025b}tts\N{U+025b}t m\N{U+025b}\N{U+014b}gu\N{U+a78c} mi \N{U+025b}\N{U+0301} f\N{U+00fa}n\N{U+025b} K\N{U+025b}l\N{U+00ed}s\N{U+025b}t\N{U+0254} t\N{U+0254}\N{U+0301} m\N{U+0254}\N{U+0301}",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -140,7 +145,7 @@
     "P\N{U+025b}sa\N{U+014b} P\N{U+025b}\N{U+0301}n\N{U+025b}\N{U+0301}pf\N{U+00fa}\N{U+a78b}\N{U+00fa}",
     "P\N{U+025b}sa\N{U+014b} N\N{U+025b}g\N{U+025b}\N{U+0301}m",
     "P\N{U+025b}sa\N{U+014b} Nts\N{U+0254}\N{U+030c}pm\N{U+0254}\N{U+0301}",
-    "P\N{U+025b}sa\N{U+014b} Nts\N{U+0254}\N{U+030c}pp\N{U+00e1}"
+    "P\N{U+025b}sa\N{U+014b} Nts\N{U+0254}\N{U+030c}pp\N{U+00e1}",
   ],
   month_format_narrow => [
     1,
@@ -154,7 +159,7 @@
     9,
     10,
     11,
-    12
+    12,
   ],
   month_format_wide => [
     "Ndu\N{U+014b}mbi Sa\N{U+014b}",
@@ -168,7 +173,7 @@
     "P\N{U+025b}sa\N{U+014b} P\N{U+025b}\N{U+0301}n\N{U+025b}\N{U+0301}pf\N{U+00fa}\N{U+a78b}\N{U+00fa}",
     "P\N{U+025b}sa\N{U+014b} N\N{U+025b}g\N{U+025b}\N{U+0301}m",
     "P\N{U+025b}sa\N{U+014b} Nts\N{U+0254}\N{U+030c}pm\N{U+0254}\N{U+0301}",
-    "P\N{U+025b}sa\N{U+014b} Nts\N{U+0254}\N{U+030c}pp\N{U+00e1}"
+    "P\N{U+025b}sa\N{U+014b} Nts\N{U+0254}\N{U+030c}pp\N{U+00e1}",
   ],
   month_stand_alone_abbreviated => [
     "Ndu\N{U+014b}mbi Sa\N{U+014b}",
@@ -182,7 +187,7 @@
     "P\N{U+025b}sa\N{U+014b} P\N{U+025b}\N{U+0301}n\N{U+025b}\N{U+0301}pf\N{U+00fa}\N{U+a78b}\N{U+00fa}",
     "P\N{U+025b}sa\N{U+014b} N\N{U+025b}g\N{U+025b}\N{U+0301}m",
     "P\N{U+025b}sa\N{U+014b} Nts\N{U+0254}\N{U+030c}pm\N{U+0254}\N{U+0301}",
-    "P\N{U+025b}sa\N{U+014b} Nts\N{U+0254}\N{U+030c}pp\N{U+00e1}"
+    "P\N{U+025b}sa\N{U+014b} Nts\N{U+0254}\N{U+030c}pp\N{U+00e1}",
   ],
   month_stand_alone_narrow => [
     1,
@@ -196,7 +201,7 @@
     9,
     10,
     11,
-    12
+    12,
   ],
   month_stand_alone_wide => [
     "Ndu\N{U+014b}mbi Sa\N{U+014b}",
@@ -210,7 +215,7 @@
     "P\N{U+025b}sa\N{U+014b} P\N{U+025b}\N{U+0301}n\N{U+025b}\N{U+0301}pf\N{U+00fa}\N{U+a78b}\N{U+00fa}",
     "P\N{U+025b}sa\N{U+014b} N\N{U+025b}g\N{U+025b}\N{U+0301}m",
     "P\N{U+025b}sa\N{U+014b} Nts\N{U+0254}\N{U+030c}pm\N{U+0254}\N{U+0301}",
-    "P\N{U+025b}sa\N{U+014b} Nts\N{U+0254}\N{U+030c}pp\N{U+00e1}"
+    "P\N{U+025b}sa\N{U+014b} Nts\N{U+0254}\N{U+030c}pp\N{U+00e1}",
   ],
   name => "Ngomba",
   native_language => "Nda\N{U+a78c}a",
@@ -222,37 +227,37 @@
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_stand_alone_abbreviated => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   script => undef,
   territory => undef,
@@ -261,5 +266,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

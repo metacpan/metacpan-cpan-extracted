@@ -1,5 +1,5 @@
 package ZMQ::Raw;
-$ZMQ::Raw::VERSION = '0.12';
+$ZMQ::Raw::VERSION = '0.14';
 use strict;
 use warnings;
 use Carp;
@@ -52,7 +52,7 @@ ZMQ::Raw - Perl bindings to the ZeroMQ library
 
 =head1 VERSION
 
-version 0.12
+version 0.14
 
 =head1 SYNOPSIS
 

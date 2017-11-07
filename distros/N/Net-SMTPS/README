@@ -1,4 +1,4 @@
-Net-SMTPS version 0.05
+Net-SMTPS version 0.09
 ======================
 
    This module implements a wrapper for Net::SMTP, enabling

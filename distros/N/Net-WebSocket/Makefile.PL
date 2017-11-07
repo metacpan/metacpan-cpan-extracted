@@ -22,7 +22,7 @@ WriteMakefile1(
     LICENSE      => 'perl',
 
     #Bleh. Hopefully can add support for older versions.
-    MIN_PERL_VERSION => 5.014000,
+    MIN_PERL_VERSION => 5.010000,
 
     PREREQ_PM    => {
         'autodie'                  => 0,
@@ -45,7 +45,7 @@ WriteMakefile1(
         'Time::HiRes' => 0,
         'File::Temp' => 0,
         'File::Slurp' => 0,
-        'IO::Framed' => 0,
+        'IO::Framed' => 0.03,
         'IO::Select' => 0,
         ( $^O eq 'MSWin32' ? ('Win32::Socketpair' => 0.02) : () ),
     },

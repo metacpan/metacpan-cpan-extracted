@@ -8,7 +8,8 @@ do { my $x = {
                       'requires' => {
                                       'Minion' => '7',
                                       'Mojo::mysql' => '1.04',
-                                      'Mojolicious' => '0'
+                                      'Mojolicious' => '0',
+                                      'perl' => '5.010'
                                     }
                     },
        'test' => {
@@ -21,7 +22,8 @@ do { my $x = {
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
                                    'Test::More' => '0',
-                                   'Test::mysqld' => '0'
+                                   'Test::mysqld' => '0',
+                                   'Time::HiRes' => '0'
                                  }
                  }
      };

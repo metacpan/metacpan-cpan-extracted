@@ -1,19 +1,24 @@
 {
   am_pm_abbreviated => [
     "PG",
-    "PTG"
+    "PTG",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d E",
     Ehm => "E h:mm a",
     Ehms => "E h:mm:ss a",
-    Gy => "G y",
-    GyMMM => "G y MMM",
-    GyMMMEd => "G y MMM d, E",
-    GyMMMd => "G y MMM d",
+    Gy => "y G",
+    GyMMM => "MMM y G",
+    GyMMMEd => "E, d MMM y G",
+    GyMMMd => "d MMM y G",
     H => "HH",
     Hm => "HH:mm",
     Hms => "HH:mm:ss",
@@ -40,12 +45,12 @@
     yMEd => "E, d/M/y",
     yMMM => "MMM y",
     yMMMEd => "E, d MMM y",
-    yMMMM => "y MMMM",
+    yMMMM => "MMMM y",
     yMMMd => "d MMM y",
     yMd => "d/M/y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "ms",
   date_format_full => "EEEE, d MMMM y",
@@ -54,8 +59,8 @@
   date_format_short => "d/MM/yy",
   datetime_format_full => "{1} {0}",
   datetime_format_long => "{1} {0}",
-  datetime_format_medium => "{1} {0}",
-  datetime_format_short => "{1} {0}",
+  datetime_format_medium => "{1}, {0}",
+  datetime_format_short => "{1}, {0}",
   day_format_abbreviated => [
     "Isn",
     "Sel",
@@ -63,7 +68,7 @@
     "Kha",
     "Jum",
     "Sab",
-    "Ahd"
+    "Ahd",
   ],
   day_format_narrow => [
     "I",
@@ -72,7 +77,7 @@
     "K",
     "J",
     "S",
-    "A"
+    "A",
   ],
   day_format_wide => [
     "Isnin",
@@ -81,7 +86,7 @@
     "Khamis",
     "Jumaat",
     "Sabtu",
-    "Ahad"
+    "Ahad",
   ],
   day_stand_alone_abbreviated => [
     "Isn",
@@ -90,7 +95,7 @@
     "Kha",
     "Jum",
     "Sab",
-    "Ahd"
+    "Ahd",
   ],
   day_stand_alone_narrow => [
     "I",
@@ -99,7 +104,7 @@
     "K",
     "J",
     "S",
-    "A"
+    "A",
   ],
   day_stand_alone_wide => [
     "Isnin",
@@ -108,19 +113,19 @@
     "Khamis",
     "Jumaat",
     "Sabtu",
-    "Ahad"
+    "Ahad",
   ],
   era_abbreviated => [
     "S.M.",
-    "TM"
+    "TM",
   ],
   era_narrow => [
     "S.M.",
-    "TM"
+    "TM",
   ],
   era_wide => [
     "S.M.",
-    "TM"
+    "TM",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -141,7 +146,7 @@
     "Sep",
     "Okt",
     "Nov",
-    "Dis"
+    "Dis",
   ],
   month_format_narrow => [
     "J",
@@ -155,7 +160,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_format_wide => [
     "Januari",
@@ -169,7 +174,7 @@
     "September",
     "Oktober",
     "November",
-    "Disember"
+    "Disember",
   ],
   month_stand_alone_abbreviated => [
     "Jan",
@@ -183,7 +188,7 @@
     "Sep",
     "Okt",
     "Nov",
-    "Dis"
+    "Dis",
   ],
   month_stand_alone_narrow => [
     "J",
@@ -197,7 +202,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_stand_alone_wide => [
     "Januari",
@@ -211,11 +216,11 @@
     "September",
     "Oktober",
     "November",
-    "Disember"
+    "Disember",
   ],
   name => "Malay",
-  native_language => "Bahasa Melayu",
-  native_name => "Bahasa Melayu",
+  native_language => "Melayu",
+  native_name => "Melayu",
   native_script => undef,
   native_territory => undef,
   native_variant => undef,
@@ -223,37 +228,37 @@
     "S1",
     "S2",
     "S3",
-    "S4"
+    "S4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "Suku pertama",
     "Suku Ke-2",
     "Suku Ke-3",
-    "Suku Ke-4"
+    "Suku Ke-4",
   ],
   quarter_stand_alone_abbreviated => [
     "S1",
     "S2",
     "S3",
-    "S4"
+    "S4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "Suku pertama",
     "Suku Ke-2",
     "Suku Ke-3",
-    "Suku Ke-4"
+    "Suku Ke-4",
   ],
   script => undef,
   territory => undef,
@@ -262,5 +267,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 31
+  version => 32,
 }

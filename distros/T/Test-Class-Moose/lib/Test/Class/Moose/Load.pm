@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.87';
+our $VERSION = '0.88';
 
 use File::Find;
 use File::Spec;
@@ -89,7 +89,7 @@ Test::Class::Moose::Load - Load L<Test::Class::Moose> classes automatically.
 
 =head1 VERSION
 
-version 0.87
+version 0.88
 
 =head1 SYNOPSIS
 

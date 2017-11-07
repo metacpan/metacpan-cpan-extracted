@@ -1,6 +1,29 @@
 Revision History for Net-LDAP-SimpleServer
 ==========================================
 
+v0.0.20 2017-11-04
+------------------
+
+commit 38fe4fdeb509ce81cc1b1ef738c3341a5ab03520
+Author: Alexei Znamensky <russoz@gmail.com>
+
+    handling user bind and passwords
+
+commit 394496b5e0810fbd5992067f632335795c5149fa
+Author: Alexei Znamensky <russoz@gmail.com>
+
+    added README.MD file for repo
+
+commit 29d08ac2c633fd0256aa938486f621ff7b271e66
+Author: Alexei Znamensky <russoz@gmail.com>
+
+    binding with simple, plain text passwords, working
+
+commit d50a187e676ebf82ef18a7353568b7d709f544b1
+Author: Alexei Znamensky <russoz@gmail.com>
+
+    renamed ldapd.pl to simpleldap
+
 v0.0.19 2017-10-22
 ------------------
 

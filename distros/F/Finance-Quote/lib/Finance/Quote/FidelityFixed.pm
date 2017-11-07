@@ -18,7 +18,7 @@ use LWP::UserAgent;
 use HTTP::Request::Common;
 use HTML::TableExtract;
 
-our $VERSION = '1.38'; # VERSION
+our $VERSION = '1.43'; # VERSION
 
 # e.g., http://fixedincome.fidelity.com/fi/FIIndividualBondsSearch?cusip=912810QT8
 # This URL should really be "https://fixedincome.fidelity.com/", but that host name
@@ -67,7 +67,7 @@ sub fidelityfixed {
             next;
         }
 
-        $te = new HTML::TableExtract();
+        $te = HTML::TableExtract->new();
         $te->parse($response->content);
         #print "[debug]: (parsed HTML)",$te, "\n";
 

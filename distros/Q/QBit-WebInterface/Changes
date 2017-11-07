@@ -1,10 +1,48 @@
 ==================================================
-Changes from 2016-04-23 00:00:00 +0000 to present.
+Changes from 2016-11-03 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.029 at 2017-04-23 14:02:28 +0000
+version 0.030 at 2017-11-03 20:30:37 +0000
 ------------------------------------------
+
+  Change: adf8a4b877eaa20a7b8c8cb4b39e951567ec66cc
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2017-11-03 23:29:45 +0000
+
+    Merge pull request #26 from Madskill/fix_json
+
+    Fix json 
+
+  Change: 0b6c07ffe19d858a696d29f38cf7d2c72604f2e2
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-11-03 23:28:12 +0000
+
+    Merge remote-tracking branch 'upstream/master' into fix_json 
+
+  Change: 343142f40c493d86c0688fe8ab12d2c1278ff1fc
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-11-03 23:27:27 +0000
+
+    fix json 
+
+------------------------------------------
+version 0.029 at 2017-04-23 14:18:38 +0000
+------------------------------------------
+
+  Change: 2e22abc209f39d05ac666a47c49dded9283588e7
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-04-23 17:18:38 +0000
+
+    Version 0.029
+
+    fix debian/changelog 
+
+  Change: 44fcf93dda63b76e592177a2381937dc9274be9d
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-04-23 17:12:48 +0000
+
+    Version 0.029 
 
   Change: 6dec34f48eddef5e98fbc81e88457775d5dd3e5d
   Author: Igor <igor-sverdlov@mail.ru>
@@ -44,108 +82,6 @@ version 0.028 at 2016-12-20 04:54:15 +0000
 
     exceptions 
 
-------------------------------------------
-version 0.027 at 2016-10-09 20:14:27 +0000
-------------------------------------------
-
-  Change: 5fcb8f55d979be86b57737cf662fa37024dc3a90
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-10-09 23:14:27 +0000
-
-    Version 0.027 
-
-  Change: ed7067c681eb356a0cfbefeabfd80ab8f05aba29
-  Author: Igor <igor-sverdlov@mail.ru>
-  Date : 2016-10-10 00:12:39 +0000
-
-    Merge pull request #23 from Madskill/test_time_log
-
-    added TestTimeLog 
-
-  Change: 19f381061bd1578eef11ce3d55488701668c2a8d
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-10-09 23:10:36 +0000
-
-    added TestTimeLog 
-
-------------------------------------------
-version 0.026 at 2016-10-08 19:39:18 +0000
-------------------------------------------
-
-  Change: 39f3990932327680382bea2a105ae5a06d511038
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-10-08 22:39:18 +0000
-
-    Version 0.026 
-
-  Change: 9467a05427c37e0fb1bcc004d0b7e20672bb44e8
-  Author: Igor <igor-sverdlov@mail.ru>
-  Date : 2016-10-08 23:37:17 +0000
-
-    Merge pull request #22 from Madskill/move_t_lib
-
-    t_lib -> lib 
-
-  Change: bd66490aeb78e6cc690809c5e71f3c6cd2f1d1d2
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-10-08 22:35:02 +0000
-
-    t_lib -> lib 
-
-------------------------------------------
-version 0.025 at 2016-09-04 20:41:05 +0000
-------------------------------------------
-
-  Change: e4457600d0ec884df7b5edcfb0f1e065813e0435
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-09-04 23:41:05 +0000
-
-    Version 0.025 
-
-  Change: 57b56cb8ab354080cd907b5049b82ad6df9cc7ba
-  Author: Igor <igor-sverdlov@mail.ru>
-  Date : 2016-09-05 00:39:30 +0000
-
-    Merge pull request #21 from Madskill/upload_to_cpan
-
-    upload to cpan 
-
-  Change: 98c4ee29e114de0e5c73f3116f95c505ed2ac2e6
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-09-04 23:38:06 +0000
-
-    upload to cpan 
-
-------------------------------------------
-version 0.024 at 2016-07-03 15:31:30 +0000
-------------------------------------------
-
-  Change: 91993bb2b178fb9ef2063b753d39b7472b884be4
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-07-03 18:31:30 +0000
-
-    Version 0.024 
-
-  Change: aa6b59f988751455d047f26c8c2f70d94d956dd8
-  Author: Sergei Svistunov <sergei-svistunov@yandex.ru>
-  Date : 2016-06-27 23:48:59 +0000
-
-    Merge pull request #20 from Madskill/fix_exception
-
-    fix exception 
-
-  Change: 57abf1f39f4b7586636e9b37036f32986636ac4b
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-06-27 22:13:02 +0000
-
-    shift -> $_[0] 
-
-  Change: 62eb9f7548230891376006e5dd9eee71c89dacaf
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-06-20 00:03:32 +0000
-
-    fix exception 
-
 =================================================
-Plus 23 releases after 2016-04-23 00:00:00 +0000.
+Plus 27 releases after 2016-11-03 00:00:00 +0000.
 =================================================

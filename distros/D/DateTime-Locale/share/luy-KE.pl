@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "a.m.",
-    "p.m."
+    "p.m.",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d, E",
@@ -45,7 +50,7 @@
     yMd => "y-MM-dd",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "luy-KE",
   date_format_full => "EEEE, d MMMM y",
@@ -63,7 +68,7 @@
     "Al",
     "Ij",
     "J1",
-    "J2"
+    "J2",
   ],
   day_format_narrow => [
     "M",
@@ -72,7 +77,7 @@
     "T",
     "F",
     "S",
-    "S"
+    "S",
   ],
   day_format_wide => [
     "Jumatatu",
@@ -81,7 +86,7 @@
     "Murwa wa Kanne",
     "Murwa wa Katano",
     "Jumamosi",
-    "Jumapiri"
+    "Jumapiri",
   ],
   day_stand_alone_abbreviated => [
     "J3",
@@ -90,7 +95,7 @@
     "Al",
     "Ij",
     "J1",
-    "J2"
+    "J2",
   ],
   day_stand_alone_narrow => [
     "M",
@@ -99,7 +104,7 @@
     "T",
     "F",
     "S",
-    "S"
+    "S",
   ],
   day_stand_alone_wide => [
     "Jumatatu",
@@ -108,19 +113,19 @@
     "Murwa wa Kanne",
     "Murwa wa Katano",
     "Jumamosi",
-    "Jumapiri"
+    "Jumapiri",
   ],
   era_abbreviated => [
     "BC",
-    "AD"
+    "AD",
   ],
   era_narrow => [
     "BC",
-    "AD"
+    "AD",
   ],
   era_wide => [
     "Imberi ya Kuuza Kwa",
-    "Muhiga Kuvita Kuuza"
+    "Muhiga Kuvita Kuuza",
   ],
   first_day_of_week => 7,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -141,7 +146,7 @@
     "Sep",
     "Okt",
     "Nov",
-    "Des"
+    "Des",
   ],
   month_format_narrow => [
     "J",
@@ -155,7 +160,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_format_wide => [
     "Januari",
@@ -169,7 +174,7 @@
     "Septemba",
     "Oktoba",
     "Novemba",
-    "Desemba"
+    "Desemba",
   ],
   month_stand_alone_abbreviated => [
     "Jan",
@@ -183,7 +188,7 @@
     "Sep",
     "Okt",
     "Nov",
-    "Des"
+    "Des",
   ],
   month_stand_alone_narrow => [
     "J",
@@ -197,7 +202,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_stand_alone_wide => [
     "Januari",
@@ -211,7 +216,7 @@
     "Septemba",
     "Oktoba",
     "Novemba",
-    "Desemba"
+    "Desemba",
   ],
   name => "Luyia Kenya",
   native_language => "Luluhia",
@@ -223,37 +228,37 @@
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "Robo ya Kala",
     "Robo ya Kaviri",
     "Robo ya Kavaga",
-    "Robo ya Kanne"
+    "Robo ya Kanne",
   ],
   quarter_stand_alone_abbreviated => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "Robo ya Kala",
     "Robo ya Kaviri",
     "Robo ya Kavaga",
-    "Robo ya Kanne"
+    "Robo ya Kanne",
   ],
   script => undef,
   territory => "Kenya",
@@ -262,5 +267,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

@@ -127,7 +127,7 @@ my %tests = (
             '4foo',
         ]
     },
-    LaxVersion => {
+    LaxVersionStr => {
         accept => [
             qw(
                 v1.2.3.4
@@ -150,7 +150,7 @@ my %tests = (
                 ),
         ],
     },
-    StrictVersion => {
+    StrictVersionStr => {
         accept => [
             qw(
                 v1.2.3.4

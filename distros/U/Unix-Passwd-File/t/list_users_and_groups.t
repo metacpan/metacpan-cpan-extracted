@@ -4,11 +4,13 @@ use 5.010;
 use strict;
 use warnings;
 use FindBin '$Bin';
+use Test::More 0.98;
+
+BEGIN { plan skip_all => "OS unsupported" if $^O eq 'MSWin32' }
 
 use File::chdir;
 use File::Copy::Recursive qw(rcopy);
 use File::Temp qw(tempdir);
-use Test::More 0.96;
 use Unix::Passwd::File qw(list_users_and_groups);
 
 my $tmpdir = tempdir(CLEANUP=>1);

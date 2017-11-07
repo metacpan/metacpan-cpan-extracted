@@ -16,7 +16,7 @@ use fields qw/session name id/;
 sub new {
     my ($class, $reddit, $source_data) = @_;
     my $self = fields::new($class);
-    $self->{session} = $reddit;
+    $self->{session} = $reddit; # could this be called something more sensible
     $self->load_from_source_data($source_data) if $source_data;
     return $self;
 }

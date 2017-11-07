@@ -85,3 +85,10 @@ Revision history for Perl module Net::WebSocket
 
 - Major revamp of handshake logic: Net::WebSocket can now handle
 the entire handshake.
+
+0.051 Tue Oct 24 2017
+- No code changed; documentation updated.
+
+0.052 Sat Nov 4 2017
+- Perl 5.12 and 5.10 are now supported.
+- Fix exception creation boo-boos, added tests.

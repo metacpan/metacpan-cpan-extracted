@@ -20,6 +20,7 @@ my %WriteMakefileArgs = (
   },
   "CONFIGURE_REQUIRES" => {
     "Acme::Alien::DontPanic2" => "1.2900",
+    "Alien::Base::Wrapper" => "1.29",
     "ExtUtils::MakeMaker" => "6.64"
   },
   "DISTNAME" => "Acme-Ford-Prefect2",
@@ -33,9 +34,11 @@ my %WriteMakefileArgs = (
     "DynaLoader" => 0
   },
   "TEST_REQUIRES" => {
+    "Alien::Base::Wrapper" => "1.29",
+    "Data::Dumper" => 0,
     "Test2::V0" => "0.000060"
   },
-  "VERSION" => "1.2901",
+  "VERSION" => "1.2902",
   "test" => {
     "TESTS" => "t/*.t"
   }

@@ -5,7 +5,7 @@ package WebService::BitbucketServer::Response;
 use warnings;
 use strict;
 
-our $VERSION = '0.602'; # VERSION
+our $VERSION = '0.603'; # VERSION
 
 use Clone qw(clone);
 use Types::Standard qw(HashRef Object);
@@ -159,7 +159,7 @@ WebService::BitbucketServer::Response - A response object for Bitbucket Server R
 
 =head1 VERSION
 
-version 0.602
+version 0.603
 
 =head1 SYNOPSIS
 
@@ -238,6 +238,18 @@ using L</data>, L</page_data>, etc. before this.
 
 Get the L<JSON> (or compatible) object used for encoding and decoding documents.
 
+=head1 METHODS
+
+=head2 new
+
+    $response = WebService::BitbucketServer::Response->new(
+        context         => $webservice_bitbucketserver_obj,
+        request_args    => $data,
+        raw             => $response,
+    );
+
+Create a new response.
+
 =head2 is_success
 
 Get whether or not the response is a success.
@@ -251,22 +263,6 @@ Get the HTTP status code.
 Get the error message or structure if this response represents an error (i.e. L</is_success> is
 false), or undef if this response is not an error.
 
-=head2 is_paged
-
-Get whether or not the response is a page of values.
-
-=head1 METHODS
-
-=head2 new
-
-    $response = WebService::BitbucketServer::Response->new(
-        context         => $webservice_bitbucketserver_obj,
-        request_args    => $data,
-        raw             => $response,
-    );
-
-Create a new response.
-
 =head2 data
 
 =head2 info
@@ -277,6 +273,10 @@ Create a new response.
 
 Get the decoded response content. If this is a paged response (see L</is_paged>), this will be an
 arrayref of values.
+
+=head2 is_paged
+
+Get whether or not the response is a page of values.
 
 =head2 page_info
 
@@ -315,7 +315,8 @@ start
     $next_response = $response->next;
 
 Get the next page of results or undef if no more results. As with
-L<WebService::BitbucketServer/call>, the returned response may be a hashref or a L<Future>.
+L<WebService::BitbucketServer/call>, the returned response may be
+a L<WebService::BitbucketServer::Response> or a L<Future>.
 
 =head2 wrap
 

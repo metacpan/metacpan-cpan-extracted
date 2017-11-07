@@ -1,7 +1,7 @@
 
 
 This archive contains the distribution Mojo-Bass,
-version 0.1.1:
+version 0.2.0:
 
   Mojo::Base + lexical "has"
 

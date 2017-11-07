@@ -40,6 +40,8 @@ my @tests = (
     ['foo[[.a.]bar', 'foo.bar', 1, 'collating class #2'],
     ['foo[[.a.]bar', 'foo.bar', 1, 'collating class #2'],
     ['foo[ab\\xy]bar', 'foo\\bar', 1, 'backslash inside range'],
+    ['', 'foobar', 0, 'empty matches a string'],
+    ['', '', 1, 'empty string does not match an empty pattern'],
 );
 
 foreach my $test (@tests) {

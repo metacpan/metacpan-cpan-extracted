@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "kang\N{U+2019}ama",
-    "kingoto"
+    "kingoto",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d, E",
@@ -45,7 +50,7 @@
     yMd => "y-MM-dd",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "rof",
   date_format_full => "EEEE, d MMMM y",
@@ -63,7 +68,7 @@
     "Alh",
     "Iju",
     "Ijm",
-    "Ijp"
+    "Ijp",
   ],
   day_format_narrow => [
     3,
@@ -72,7 +77,7 @@
     6,
     7,
     1,
-    2
+    2,
   ],
   day_format_wide => [
     "Ijumatatu",
@@ -81,7 +86,7 @@
     "Alhamisi",
     "Ijumaa",
     "Ijumamosi",
-    "Ijumapili"
+    "Ijumapili",
   ],
   day_stand_alone_abbreviated => [
     "Ijt",
@@ -90,7 +95,7 @@
     "Alh",
     "Iju",
     "Ijm",
-    "Ijp"
+    "Ijp",
   ],
   day_stand_alone_narrow => [
     3,
@@ -99,7 +104,7 @@
     6,
     7,
     1,
-    2
+    2,
   ],
   day_stand_alone_wide => [
     "Ijumatatu",
@@ -108,19 +113,19 @@
     "Alhamisi",
     "Ijumaa",
     "Ijumamosi",
-    "Ijumapili"
+    "Ijumapili",
   ],
   era_abbreviated => [
     "KM",
-    "BM"
+    "BM",
   ],
   era_narrow => [
     "KM",
-    "BM"
+    "BM",
   ],
   era_wide => [
     "Kabla ya Mayesu",
-    "Baada ya Mayesu"
+    "Baada ya Mayesu",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -141,7 +146,7 @@
     "M9",
     "M10",
     "M11",
-    "M12"
+    "M12",
   ],
   month_format_narrow => [
     "K",
@@ -155,7 +160,7 @@
     "T",
     "I",
     "I",
-    "I"
+    "I",
   ],
   month_format_wide => [
     "Mweri wa kwanza",
@@ -169,7 +174,7 @@
     "Mweri wa tisa",
     "Mweri wa ikumi",
     "Mweri wa ikumi na moja",
-    "Mweri wa ikumi na mbili"
+    "Mweri wa ikumi na mbili",
   ],
   month_stand_alone_abbreviated => [
     "M1",
@@ -183,7 +188,7 @@
     "M9",
     "M10",
     "M11",
-    "M12"
+    "M12",
   ],
   month_stand_alone_narrow => [
     "K",
@@ -197,7 +202,7 @@
     "T",
     "I",
     "I",
-    "I"
+    "I",
   ],
   month_stand_alone_wide => [
     "Mweri wa kwanza",
@@ -211,7 +216,7 @@
     "Mweri wa tisa",
     "Mweri wa ikumi",
     "Mweri wa ikumi na moja",
-    "Mweri wa ikumi na mbili"
+    "Mweri wa ikumi na mbili",
   ],
   name => "Rombo",
   native_language => "Kihorombo",
@@ -223,37 +228,37 @@
     "R1",
     "R2",
     "R3",
-    "R4"
+    "R4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "Robo ya kwanza",
     "Robo ya kaili",
     "Robo ya katatu",
-    "Robo ya kaana"
+    "Robo ya kaana",
   ],
   quarter_stand_alone_abbreviated => [
     "R1",
     "R2",
     "R3",
-    "R4"
+    "R4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "Robo ya kwanza",
     "Robo ya kaili",
     "Robo ya katatu",
-    "Robo ya kaana"
+    "Robo ya kaana",
   ],
   script => undef,
   territory => undef,
@@ -262,5 +267,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

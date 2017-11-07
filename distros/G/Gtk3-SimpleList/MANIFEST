@@ -3,6 +3,7 @@ Makefile.PL
 MANIFEST
 MANIFEST.SKIP
 README
+t/01compile.t
 COPYING
 Changes
 META.yml                                 Module YAML meta-data (added by MakeMaker)

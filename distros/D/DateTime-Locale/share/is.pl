@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "f.h.",
-    "e.h."
+    "e.h.",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E, HH:mm",
     EHms => "E, HH:mm:ss",
     Ed => "E d.",
@@ -17,8 +22,8 @@
     H => "HH",
     Hm => "HH:mm",
     Hms => "HH:mm:ss",
-    Hmsv => "HH:mm:ss v",
-    Hmv => "HH:mm v",
+    Hmsv => "v \N{U+2013} HH:mm:ss",
+    Hmv => "v \N{U+2013} HH:mm",
     M => "L",
     MEd => "E, d.M.",
     MMM => "LLL",
@@ -46,8 +51,8 @@
     yMd => "d.M.y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-one" => "'viku' w 'af' y",
-    "yw-count-other" => "'viku' w 'af' y"
+    "yw-count-one" => "'viku' w 'af' Y",
+    "yw-count-other" => "'viku' w 'af' Y",
   },
   code => "is",
   date_format_full => "EEEE, d. MMMM y",
@@ -65,7 +70,7 @@
     "fim.",
     "f\N{U+00f6}s.",
     "lau.",
-    "sun."
+    "sun.",
   ],
   day_format_narrow => [
     "M",
@@ -74,7 +79,7 @@
     "F",
     "F",
     "L",
-    "S"
+    "S",
   ],
   day_format_wide => [
     "m\N{U+00e1}nudagur",
@@ -83,7 +88,7 @@
     "fimmtudagur",
     "f\N{U+00f6}studagur",
     "laugardagur",
-    "sunnudagur"
+    "sunnudagur",
   ],
   day_stand_alone_abbreviated => [
     "m\N{U+00e1}n.",
@@ -92,7 +97,7 @@
     "fim.",
     "f\N{U+00f6}s.",
     "lau.",
-    "sun."
+    "sun.",
   ],
   day_stand_alone_narrow => [
     "M",
@@ -101,7 +106,7 @@
     "F",
     "F",
     "L",
-    "S"
+    "S",
   ],
   day_stand_alone_wide => [
     "m\N{U+00e1}nudagur",
@@ -110,19 +115,19 @@
     "fimmtudagur",
     "f\N{U+00f6}studagur",
     "laugardagur",
-    "sunnudagur"
+    "sunnudagur",
   ],
   era_abbreviated => [
     "f.Kr.",
-    "e.Kr."
+    "e.Kr.",
   ],
   era_narrow => [
     "f.k.",
-    "e.k."
+    "e.k.",
   ],
   era_wide => [
     "fyrir Krist",
-    "eftir Krist"
+    "eftir Krist",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -143,7 +148,7 @@
     "sep.",
     "okt.",
     "n\N{U+00f3}v.",
-    "des."
+    "des.",
   ],
   month_format_narrow => [
     "J",
@@ -157,7 +162,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_format_wide => [
     "jan\N{U+00fa}ar",
@@ -171,7 +176,7 @@
     "september",
     "okt\N{U+00f3}ber",
     "n\N{U+00f3}vember",
-    "desember"
+    "desember",
   ],
   month_stand_alone_abbreviated => [
     "jan.",
@@ -185,7 +190,7 @@
     "sep.",
     "okt.",
     "n\N{U+00f3}v.",
-    "des."
+    "des.",
   ],
   month_stand_alone_narrow => [
     "J",
@@ -199,7 +204,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_stand_alone_wide => [
     "jan\N{U+00fa}ar",
@@ -213,7 +218,7 @@
     "september",
     "okt\N{U+00f3}ber",
     "n\N{U+00f3}vember",
-    "desember"
+    "desember",
   ],
   name => "Icelandic",
   native_language => "\N{U+00ed}slenska",
@@ -225,37 +230,37 @@
     "F1",
     "F2",
     "F3",
-    "F4"
+    "F4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "1. fj\N{U+00f3}r\N{U+00f0}ungur",
     "2. fj\N{U+00f3}r\N{U+00f0}ungur",
     "3. fj\N{U+00f3}r\N{U+00f0}ungur",
-    "4. fj\N{U+00f3}r\N{U+00f0}ungur"
+    "4. fj\N{U+00f3}r\N{U+00f0}ungur",
   ],
   quarter_stand_alone_abbreviated => [
     "F1",
     "F2",
     "F3",
-    "F4"
+    "F4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "1. fj\N{U+00f3}r\N{U+00f0}ungur",
     "2. fj\N{U+00f3}r\N{U+00f0}ungur",
     "3. fj\N{U+00f3}r\N{U+00f0}ungur",
-    "4. fj\N{U+00f3}r\N{U+00f0}ungur"
+    "4. fj\N{U+00f3}r\N{U+00f0}ungur",
   ],
   script => undef,
   territory => undef,
@@ -264,5 +269,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

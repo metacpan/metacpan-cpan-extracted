@@ -1,0 +1,11 @@
+0.03    2017-11-06 22:30:00 Europe/Madrid
+        - Add Changes file
+        - Improve documentation
+
+0.02    2017-11-06 21:30:00 Europe/Madrid
+        - Fix run & cleanup methods
+        - New verbose messages
+        - Support for CSV target
+
+0.01    2017-11-05 21:30:00 Europe/Madrid
+        - Initial revision to CPAN

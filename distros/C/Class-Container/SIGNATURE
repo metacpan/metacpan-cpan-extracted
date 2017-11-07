@@ -1,12 +1,12 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.38.
+signed via the Module::Signature module, version 0.73.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
 
     % cpansign -v
 
-It would check each file's integrity, as well as the signature's
+It will check each file's integrity, as well as the signature's
 validity.  If "==> Signature verified OK! <==" is not displayed,
 the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
@@ -14,21 +14,25 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 3b225b4d443775932c127fe00d5dddca58820aa6 Build.PL
-SHA1 8cd28fa1763a93ffc196226642df8c584a2adc70 Changes
-SHA1 1b386906514c738a00fcd4b1b7ba74ac1925c227 INSTALL
-SHA1 6e250a09fdb471a3dcd7b9f267d4585dc2e5de18 MANIFEST
-SHA1 976fabe5ba08d4f96ec5d764a30e3f37d46f4019 META.yml
-SHA1 48dcc0a806041eaf9d020b5305d0c4bb32898f51 Makefile.PL
-SHA1 336c070360a737f094645d80d4c82d5fd02ae973 README
-SHA1 4286abb1ee51dcfa9868ccb754ec63b4ff684ad2 lib/Class/Container.pm
-SHA1 39edf6c1802d4be568c18968ea5389965a0a6ff1 t/01-basic.t
-SHA1 8154cdf85123d748ae210fa86a58e5484cb79275 t/02-decorator.t
+SHA1 a1ba286c01e42e90f41ad222897698b1a4a4f2ac Build.PL
+SHA1 59e86d738663b3ee65ef269e1174de943b0d8d92 Changes
+SHA1 c787d88b3935853f48f6204a1d7ef463694702f5 INSTALL
+SHA1 87d1d7d8be19f13b0ee779177fa03fcca3e2b628 LICENSE
+SHA1 a35434bea6cb6de976b09fa2bacc05ecd9e6a3a7 MANIFEST
+SHA1 dd611cdd49745ae9a2fc09034014b69b48f05046 META.yml
+SHA1 cbcd8951f75b2f97add6578140cfcca486af081a Makefile.PL
+SHA1 34c04c1651dbc6a26fa785bec8b08390b5acdfc2 README
+SHA1 feac03c41fd721eda9d2865be041f66d59fecb8a cpanfile
+SHA1 b5f4a8e152959e7d391fa2508620adfddb98c21e dist.ini
+SHA1 cf40f42c3313085bf17db0b4e4f3ad071f03a705 lib/Class/Container.pm
+SHA1 a7f3e0732c4a3d45affd6a4f5e95a11c15674789 t/01-basic.t
+SHA1 64e7e9420276e05e85f05b1b17b85d55a630a7a9 t/02-decorator.t
+SHA1 fa45d6e6ab1cd421349dea4ef527bfd5cdc8a09e t/author-critic.t
 SHA1 56e282a6a8379f3a3a42d5f78cd1682ab1cfc68b t/classes.pl
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.2 (Darwin)
+Comment: GPGTools - http://gpgtools.org
 
-iD8DBQFB9GYigrvMBLfvlHYRAry6AJ0R722RV5sESZlMjvcID/M6ms/7HwCdGHfI
-DhsUAU9sOA7srQVl1uZMJ90=
-=oCuW
+iF0EARECAB0WIQSty9sFtA6yoqVVVGKCu8wEt++UdgUCWfv2ogAKCRCCu8wEt++U
+dtZDAKCm0N97e/ebIvg7dmDcE+kO6l+fJwCfYbC+xwjbS7NzKBJOmq7nLJwi1eA=
+=zO1B
 -----END PGP SIGNATURE-----

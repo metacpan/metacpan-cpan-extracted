@@ -1,5 +1,5 @@
 package QBit::Application::Model::DB::mysql;
-$QBit::Application::Model::DB::mysql::VERSION = '0.014';
+$QBit::Application::Model::DB::mysql::VERSION = '0.015';
 use qbit;
 
 use base qw(QBit::Application::Model::DB);
@@ -18,6 +18,10 @@ sub query {
     my ($self) = @_;
 
     return QBit::Application::Model::DB::mysql::Query->new(db => $self);
+}
+
+sub get_query_id {
+    return $_[0]->dbh->{"mysql_thread_id"};
 }
 
 sub transaction {
@@ -174,6 +178,26 @@ B<$filter> - object (QBit::Application::Model::DB::Filter)
 B<Example:>
 
   my $filter = $app->db->filter([id => '=' => \23]);
+
+=head2 get_query_id
+
+B<No arguments.>
+
+Returns a current query ID or undef
+
+B<Return values:>
+
+=over
+
+=item
+
+B<$query_id> - number
+
+=back
+
+B<Example:>
+
+  my $query_id = $app->db->get_query_id();
 
 =head2 query
 

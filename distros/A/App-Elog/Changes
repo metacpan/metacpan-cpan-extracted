@@ -1,5 +1,8 @@
 Revision history for App::Elog
 
+0.03  Thu Nov  2 17:26:09 CDT 2017
+    - Allow a limit to the -i command
+
 0.02  Tue Oct 31 18:02:15 CDT 2017
     - Documentation update
 

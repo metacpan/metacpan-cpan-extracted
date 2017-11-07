@@ -199,6 +199,7 @@
             "HTTP::Message" : "5.814",
             "HTTP::Request" : "0",
             "IO::String" : "1.07",
+            "JSON" : "0",
             "LWP" : "5.814",
             "LWP::UserAgent" : "0",
             "Lisp::Printer" : "0",
@@ -224,11 +225,11 @@
             "Software::License::GPL_3" : "0.001",
             "Spreadsheet::ParseExcel" : "0",
             "Spreadsheet::ParseExcel::Utility" : "0",
-            "Text::CSV_XS" : "0",
             "Text::Glob" : "0",
             "Tie::Cache" : "0",
             "Tie::IxHash" : "0",
             "Tie::TZ" : "1",
+            "Time::HiRes" : "0",
             "Time::TZ" : "6",
             "URI::Escape" : "0",
             "URI::file" : "0",
@@ -258,6 +259,6 @@
          "http://www.gnu.org/licenses/gpl.html"
       ]
    },
-   "version" : "263",
+   "version" : "264",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

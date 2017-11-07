@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "TO",
-    "TK"
+    "TK",
   ],
   available_formats => {
+    Bh => "B h",
+    Bhm => "B h:mm",
+    Bhms => "B h:mm:ss",
     E => "ccc",
+    EBhm => "E, B h:mm",
+    EBhms => "E, B h:mm:ss",
     EHm => "E, HH:mm",
     EHms => "E, HH:mm:ss",
     Ed => "d, E",
@@ -36,7 +41,7 @@
     hmv => "h:mm a (v)",
     ms => "mm:ss",
     y => "y",
-    yM => "MM/y",
+    yM => "MM.y",
     yMEd => "E, dd/MM/y",
     yMMM => "MMM, y",
     yMMMEd => "E, d-MMM, y",
@@ -45,8 +50,8 @@
     yMd => "dd/MM/y",
     yQQQ => "y, QQQ",
     yQQQQ => "y, QQQQ",
-    "yw-count-one" => "y, w-'hafta'",
-    "yw-count-other" => "y, w-'hafta'"
+    "yw-count-one" => "Y, w-'hafta'",
+    "yw-count-other" => "Y, w-'hafta'",
   },
   code => "uz",
   date_format_full => "EEEE, d-MMMM, y",
@@ -64,7 +69,7 @@
     "Pay",
     "Jum",
     "Shan",
-    "Yak"
+    "Yak",
   ],
   day_format_narrow => [
     "D",
@@ -73,7 +78,7 @@
     "P",
     "J",
     "S",
-    "Y"
+    "Y",
   ],
   day_format_wide => [
     "dushanba",
@@ -82,7 +87,7 @@
     "payshanba",
     "juma",
     "shanba",
-    "yakshanba"
+    "yakshanba",
   ],
   day_stand_alone_abbreviated => [
     "Dush",
@@ -91,7 +96,7 @@
     "Pay",
     "Jum",
     "Shan",
-    "Yak"
+    "Yak",
   ],
   day_stand_alone_narrow => [
     "D",
@@ -100,7 +105,7 @@
     "P",
     "J",
     "S",
-    "Y"
+    "Y",
   ],
   day_stand_alone_wide => [
     "dushanba",
@@ -109,19 +114,19 @@
     "payshanba",
     "juma",
     "shanba",
-    "yakshanba"
+    "yakshanba",
   ],
   era_abbreviated => [
     "m.a.",
-    "milodiy"
+    "milodiy",
   ],
   era_narrow => [
     "m.a.",
-    "milodiy"
+    "milodiy",
   ],
   era_wide => [
     "miloddan avvalgi",
-    "milodiy"
+    "milodiy",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -142,7 +147,7 @@
     "sen",
     "okt",
     "noy",
-    "dek"
+    "dek",
   ],
   month_format_narrow => [
     "Y",
@@ -156,7 +161,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_format_wide => [
     "yanvar",
@@ -170,7 +175,7 @@
     "sentabr",
     "oktabr",
     "noyabr",
-    "dekabr"
+    "dekabr",
   ],
   month_stand_alone_abbreviated => [
     "Yan",
@@ -184,7 +189,7 @@
     "Sen",
     "Okt",
     "Noy",
-    "Dek"
+    "Dek",
   ],
   month_stand_alone_narrow => [
     "Y",
@@ -198,7 +203,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_stand_alone_wide => [
     "Yanvar",
@@ -212,7 +217,7 @@
     "Sentabr",
     "Oktabr",
     "Noyabr",
-    "Dekabr"
+    "Dekabr",
   ],
   name => "Uzbek",
   native_language => "o\N{U+2018}zbek",
@@ -224,37 +229,37 @@
     "1-ch",
     "2-ch",
     "3-ch",
-    "4-ch"
+    "4-ch",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "1-chorak",
     "2-chorak",
     "3-chorak",
-    "4-chorak"
+    "4-chorak",
   ],
   quarter_stand_alone_abbreviated => [
     "1-ch",
     "2-ch",
     "3-ch",
-    "4-ch"
+    "4-ch",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "1-chorak",
     "2-chorak",
     "3-chorak",
-    "4-chorak"
+    "4-chorak",
   ],
   script => undef,
   territory => undef,
@@ -263,5 +268,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

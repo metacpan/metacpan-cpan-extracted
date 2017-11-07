@@ -193,10 +193,10 @@ Bosnian locale.
 
 =head3 Abbreviated (format)
 
-  K1
-  K2
-  K3
-  K4
+  KV1
+  KV2
+  KV3
+  KV4
 
 =head3 Narrow (format)
 
@@ -215,10 +215,10 @@ Bosnian locale.
 
 =head3 Abbreviated (stand-alone)
 
-  K1
-  K2
-  K3
-  K4
+  KV1
+  KV2
+  KV3
+  KV4
 
 =head3 Narrow (stand-alone)
 
@@ -260,9 +260,9 @@ Bosnian locale.
 
 =head3 Medium
 
-   2008-02-05T18:30:30 = 5. feb. 2008.
-   1995-12-22T09:05:02 = 22. dec. 1995.
-  -0010-09-15T04:44:23 = 15. sep. -10.
+   2008-02-05T18:30:30 = 5. feb 2008.
+   1995-12-22T09:05:02 = 22. dec 1995.
+  -0010-09-15T04:44:23 = 15. sep -10.
 
 =head3 Short
 
@@ -314,9 +314,9 @@ Bosnian locale.
 
 =head3 Medium
 
-   2008-02-05T18:30:30 = 5. feb. 2008. 18:30:30
-   1995-12-22T09:05:02 = 22. dec. 1995. 09:05:02
-  -0010-09-15T04:44:23 = 15. sep. -10. 04:44:23
+   2008-02-05T18:30:30 = 5. feb 2008. 18:30:30
+   1995-12-22T09:05:02 = 22. dec 1995. 09:05:02
+  -0010-09-15T04:44:23 = 15. sep -10. 04:44:23
 
 =head3 Short
 
@@ -327,11 +327,41 @@ Bosnian locale.
 
 =head2 Available Formats
 
+=head3 Bh (h B)
+
+   2008-02-05T18:30:30 = 6 B
+   1995-12-22T09:05:02 = 9 B
+  -0010-09-15T04:44:23 = 4 B
+
+=head3 Bhm (h:mm B)
+
+   2008-02-05T18:30:30 = 6:30 B
+   1995-12-22T09:05:02 = 9:05 B
+  -0010-09-15T04:44:23 = 4:44 B
+
+=head3 Bhms (h:mm:ss B)
+
+   2008-02-05T18:30:30 = 6:30:30 B
+   1995-12-22T09:05:02 = 9:05:02 B
+  -0010-09-15T04:44:23 = 4:44:23 B
+
 =head3 E (ccc)
 
    2008-02-05T18:30:30 = uto
    1995-12-22T09:05:02 = pet
   -0010-09-15T04:44:23 = sub
+
+=head3 EBhm (E h:mm B)
+
+   2008-02-05T18:30:30 = uto 6:30 B
+   1995-12-22T09:05:02 = pet 9:05 B
+  -0010-09-15T04:44:23 = sub 4:44 B
+
+=head3 EBhms (E h:mm:ss B)
+
+   2008-02-05T18:30:30 = uto 6:30:30 B
+   1995-12-22T09:05:02 = pet 9:05:02 B
+  -0010-09-15T04:44:23 = sub 4:44:23 B
 
 =head3 EHm (E HH:mm)
 
@@ -585,31 +615,31 @@ Bosnian locale.
    1995-12-22T09:05:02 = 22.12.1995.
   -0010-09-15T04:44:23 = 15.9.-10.
 
-=head3 yQQQ (QQQ y)
+=head3 yQQQ (QQQ y.)
 
-   2008-02-05T18:30:30 = K1 2008
-   1995-12-22T09:05:02 = K4 1995
-  -0010-09-15T04:44:23 = K3 -10
+   2008-02-05T18:30:30 = KV1 2008.
+   1995-12-22T09:05:02 = KV4 1995.
+  -0010-09-15T04:44:23 = KV3 -10.
 
-=head3 yQQQQ (QQQQ y)
+=head3 yQQQQ (QQQQ y.)
 
-   2008-02-05T18:30:30 = Prvi kvartal 2008
-   1995-12-22T09:05:02 = Četvrti kvartal 1995
-  -0010-09-15T04:44:23 = Treći kvartal -10
+   2008-02-05T18:30:30 = Prvi kvartal 2008.
+   1995-12-22T09:05:02 = Četvrti kvartal 1995.
+  -0010-09-15T04:44:23 = Treći kvartal -10.
 
-=head3 yw-count-few (w. 'sedmica' 'u' y.)
-
-   2008-02-05T18:30:30 = 6. sedmica u 2008.
-   1995-12-22T09:05:02 = 51. sedmica u 1995.
-  -0010-09-15T04:44:23 = 37. sedmica u -10.
-
-=head3 yw-count-one (w. 'sedmica' 'u' y.)
+=head3 yw-count-few (w. 'sedmica' 'u' Y.)
 
    2008-02-05T18:30:30 = 6. sedmica u 2008.
    1995-12-22T09:05:02 = 51. sedmica u 1995.
   -0010-09-15T04:44:23 = 37. sedmica u -10.
 
-=head3 yw-count-other (w. 'sedmica' 'u' y.)
+=head3 yw-count-one (w. 'sedmica' 'u' Y.)
+
+   2008-02-05T18:30:30 = 6. sedmica u 2008.
+   1995-12-22T09:05:02 = 51. sedmica u 1995.
+  -0010-09-15T04:44:23 = 37. sedmica u -10.
+
+=head3 yw-count-other (w. 'sedmica' 'u' Y.)
 
    2008-02-05T18:30:30 = 6. sedmica u 2008.
    1995-12-22T09:05:02 = 51. sedmica u 1995.

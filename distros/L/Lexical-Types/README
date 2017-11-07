@@ -2,7 +2,7 @@ NAME
     Lexical::Types - Extend the semantics of typed lexicals.
 
 VERSION
-    Version 0.15
+    Version 0.16
 
 SYNOPSIS
         { package Str; }
@@ -254,8 +254,8 @@ ACKNOWLEDGEMENTS
     Thanks Florian Ragwitz for suggesting the use of constants for types.
 
 COPYRIGHT & LICENSE
-    Copyright 2009,2010,2011,2012,2013,2014,2015 Vincent Pit, all rights
-    reserved.
+    Copyright 2009,2010,2011,2012,2013,2014,2015,2017 Vincent Pit, all
+    rights reserved.
 
     This program is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.

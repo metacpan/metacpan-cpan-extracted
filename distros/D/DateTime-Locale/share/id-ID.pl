@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "AM",
-    "PM"
+    "PM",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h.mm B",
+    Bhms => "h.mm.ss B",
     E => "ccc",
+    EBhm => "E h.mm B",
+    EBhms => "E h.mm.ss B",
     EHm => "E HH.mm",
     EHms => "E HH.mm.ss",
     Ed => "E, d",
@@ -45,7 +50,7 @@
     yMd => "d/M/y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'minggu' 'ke'-w y"
+    "yw-count-other" => "'minggu' 'ke'-w Y",
   },
   code => "id-ID",
   date_format_full => "EEEE, dd MMMM y",
@@ -63,7 +68,7 @@
     "Kam",
     "Jum",
     "Sab",
-    "Min"
+    "Min",
   ],
   day_format_narrow => [
     "S",
@@ -72,7 +77,7 @@
     "K",
     "J",
     "S",
-    "M"
+    "M",
   ],
   day_format_wide => [
     "Senin",
@@ -81,7 +86,7 @@
     "Kamis",
     "Jumat",
     "Sabtu",
-    "Minggu"
+    "Minggu",
   ],
   day_stand_alone_abbreviated => [
     "Sen",
@@ -90,7 +95,7 @@
     "Kam",
     "Jum",
     "Sab",
-    "Min"
+    "Min",
   ],
   day_stand_alone_narrow => [
     "S",
@@ -99,7 +104,7 @@
     "K",
     "J",
     "S",
-    "M"
+    "M",
   ],
   day_stand_alone_wide => [
     "Senin",
@@ -108,19 +113,19 @@
     "Kamis",
     "Jumat",
     "Sabtu",
-    "Minggu"
+    "Minggu",
   ],
   era_abbreviated => [
     "SM",
-    "M"
+    "M",
   ],
   era_narrow => [
     "SM",
-    "M"
+    "M",
   ],
   era_wide => [
     "Sebelum Masehi",
-    "Masehi"
+    "Masehi",
   ],
   first_day_of_week => 7,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -141,7 +146,7 @@
     "Sep",
     "Okt",
     "Nov",
-    "Des"
+    "Des",
   ],
   month_format_narrow => [
     "J",
@@ -155,7 +160,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_format_wide => [
     "Januari",
@@ -169,7 +174,7 @@
     "September",
     "Oktober",
     "November",
-    "Desember"
+    "Desember",
   ],
   month_stand_alone_abbreviated => [
     "Jan",
@@ -183,7 +188,7 @@
     "Sep",
     "Okt",
     "Nov",
-    "Des"
+    "Des",
   ],
   month_stand_alone_narrow => [
     "J",
@@ -197,7 +202,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_stand_alone_wide => [
     "Januari",
@@ -211,7 +216,7 @@
     "September",
     "Oktober",
     "November",
-    "Desember"
+    "Desember",
   ],
   name => "Indonesian Indonesia",
   native_language => "Indonesia",
@@ -223,37 +228,37 @@
     "K1",
     "K2",
     "K3",
-    "K4"
+    "K4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "Kuartal ke-1",
     "Kuartal ke-2",
     "Kuartal ke-3",
-    "Kuartal ke-4"
+    "Kuartal ke-4",
   ],
   quarter_stand_alone_abbreviated => [
     "K1",
     "K2",
     "K3",
-    "K4"
+    "K4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "Kuartal ke-1",
     "Kuartal ke-2",
     "Kuartal ke-3",
-    "Kuartal ke-4"
+    "Kuartal ke-4",
   ],
   script => undef,
   territory => "Indonesia",
@@ -262,5 +267,5 @@
   time_format_medium => "HH.mm.ss",
   time_format_short => "HH.mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

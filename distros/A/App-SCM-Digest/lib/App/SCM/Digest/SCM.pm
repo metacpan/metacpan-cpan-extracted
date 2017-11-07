@@ -43,6 +43,11 @@ sub commits_from
     die "Not implemented.";
 }
 
+sub has
+{
+    die "Not implemented.";
+}
+
 sub show
 {
     die "Not implemented.";
@@ -120,6 +125,12 @@ arrayref containing all commits on that branch that were received
 after the given commit.  The arrayref is in order from least to most
 recent, i.e. the last element of the arrayref contains the most recent
 commit.
+
+=item B<has>
+
+Takes a commit ID as its single argument.  Returns a boolean
+indicating whether the commit is present in the history for the
+current branch.
 
 =item B<show>
 

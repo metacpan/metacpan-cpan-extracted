@@ -1100,3 +1100,9 @@ Revision history for App::MFILE::WWW
 - js: core/stack: make unwindTo{Flag,Target} handle opts and respect _start
 - js: core/start: make dmenu process opts and respect resultLine
 
+0.171 2017-11-02 20:14 CET
+- js: core: implement dcallback widget
+- js: core/start: support htmlCallback and populateCallback props in dcallback
+- js: core/datetime: implement dateToDay()
+- start.css: make boxtopbot have the same background color as mainarea
+

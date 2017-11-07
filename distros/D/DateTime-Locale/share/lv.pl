@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "priek\N{U+0161}p.",
-    "p\N{U+0113}cp."
+    "p\N{U+0113}cp.",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E, h:mm B",
+    EBhms => "E, h:mm:ss B",
     EHm => "E, HH:mm",
     EHms => "E, HH:mm:ss",
     Ed => "E, d.",
@@ -48,9 +53,9 @@
     yMd => "y.MM.d.",
     yQQQ => "y. 'g'. QQQ",
     yQQQQ => "y. 'g'. QQQQ",
-    "yw-count-one" => "y. 'g'. w. 'ned\N{U+0113}\N{U+013c}a'",
-    "yw-count-other" => "y. 'g'. w. 'ned\N{U+0113}\N{U+013c}a'",
-    "yw-count-zero" => "y. 'g'. w. 'ned\N{U+0113}\N{U+013c}a'"
+    "yw-count-one" => "Y. 'g'. w. 'ned\N{U+0113}\N{U+013c}a'",
+    "yw-count-other" => "Y. 'g'. w. 'ned\N{U+0113}\N{U+013c}a'",
+    "yw-count-zero" => "Y. 'g'. w. 'ned\N{U+0113}\N{U+013c}a'",
   },
   code => "lv",
   date_format_full => "EEEE, y. 'gada' d. MMMM",
@@ -68,7 +73,7 @@
     "ceturtd.",
     "piektd.",
     "sestd.",
-    "sv\N{U+0113}td."
+    "sv\N{U+0113}td.",
   ],
   day_format_narrow => [
     "P",
@@ -77,7 +82,7 @@
     "C",
     "P",
     "S",
-    "S"
+    "S",
   ],
   day_format_wide => [
     "pirmdiena",
@@ -86,7 +91,7 @@
     "ceturtdiena",
     "piektdiena",
     "sestdiena",
-    "sv\N{U+0113}tdiena"
+    "sv\N{U+0113}tdiena",
   ],
   day_stand_alone_abbreviated => [
     "Pirmd.",
@@ -95,7 +100,7 @@
     "Ceturtd.",
     "Piektd.",
     "Sestd.",
-    "Sv\N{U+0113}td."
+    "Sv\N{U+0113}td.",
   ],
   day_stand_alone_narrow => [
     "P",
@@ -104,7 +109,7 @@
     "C",
     "P",
     "S",
-    "S"
+    "S",
   ],
   day_stand_alone_wide => [
     "Pirmdiena",
@@ -113,19 +118,19 @@
     "Ceturtdiena",
     "Piektdiena",
     "Sestdiena",
-    "Sv\N{U+0113}tdiena"
+    "Sv\N{U+0113}tdiena",
   ],
   era_abbreviated => [
     "p.m.\N{U+0113}.",
-    "m.\N{U+0113}."
+    "m.\N{U+0113}.",
   ],
   era_narrow => [
     "p.m.\N{U+0113}.",
-    "m.\N{U+0113}."
+    "m.\N{U+0113}.",
   ],
   era_wide => [
     "pirms m\N{U+016b}su \N{U+0113}ras",
-    "m\N{U+016b}su \N{U+0113}r\N{U+0101}"
+    "m\N{U+016b}su \N{U+0113}r\N{U+0101}",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -146,7 +151,7 @@
     "sept.",
     "okt.",
     "nov.",
-    "dec."
+    "dec.",
   ],
   month_format_narrow => [
     "J",
@@ -160,7 +165,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_format_wide => [
     "janv\N{U+0101}ris",
@@ -174,7 +179,7 @@
     "septembris",
     "oktobris",
     "novembris",
-    "decembris"
+    "decembris",
   ],
   month_stand_alone_abbreviated => [
     "janv.",
@@ -188,7 +193,7 @@
     "sept.",
     "okt.",
     "nov.",
-    "dec."
+    "dec.",
   ],
   month_stand_alone_narrow => [
     "J",
@@ -202,7 +207,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_stand_alone_wide => [
     "janv\N{U+0101}ris",
@@ -216,7 +221,7 @@
     "septembris",
     "oktobris",
     "novembris",
-    "decembris"
+    "decembris",
   ],
   name => "Latvian",
   native_language => "latvie\N{U+0161}u",
@@ -228,37 +233,37 @@
     "1.\N{U+00a0}cet.",
     "2.\N{U+00a0}cet.",
     "3.\N{U+00a0}cet.",
-    "4.\N{U+00a0}cet."
+    "4.\N{U+00a0}cet.",
   ],
   quarter_format_narrow => [
     "1.",
     "2.",
     "3.",
-    "4."
+    "4.",
   ],
   quarter_format_wide => [
     "1. ceturksnis",
     "2. ceturksnis",
     "3. ceturksnis",
-    "4. ceturksnis"
+    "4. ceturksnis",
   ],
   quarter_stand_alone_abbreviated => [
     "1.\N{U+00a0}cet.",
     "2.\N{U+00a0}cet.",
     "3.\N{U+00a0}cet.",
-    "4.\N{U+00a0}cet."
+    "4.\N{U+00a0}cet.",
   ],
   quarter_stand_alone_narrow => [
     "1.",
     "2.",
     "3.",
-    "4."
+    "4.",
   ],
   quarter_stand_alone_wide => [
     "1. ceturksnis",
     "2. ceturksnis",
     "3. ceturksnis",
-    "4. ceturksnis"
+    "4. ceturksnis",
   ],
   script => undef,
   territory => undef,
@@ -267,5 +272,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

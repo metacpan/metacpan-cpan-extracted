@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "KI",
-    "UT"
+    "UT",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d, E",
@@ -45,7 +50,7 @@
     yMd => "d/M/y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "ebu-KE",
   date_format_full => "EEEE, d MMMM y",
@@ -63,7 +68,7 @@
     "Arm",
     "Maa",
     "NMM",
-    "Kma"
+    "Kma",
   ],
   day_format_narrow => [
     "N",
@@ -72,7 +77,7 @@
     "A",
     "M",
     "N",
-    "K"
+    "K",
   ],
   day_format_wide => [
     "Njumatatu",
@@ -81,7 +86,7 @@
     "Aramithi",
     "Njumaa",
     "NJumamothii",
-    "Kiumia"
+    "Kiumia",
   ],
   day_stand_alone_abbreviated => [
     "Tat",
@@ -90,7 +95,7 @@
     "Arm",
     "Maa",
     "NMM",
-    "Kma"
+    "Kma",
   ],
   day_stand_alone_narrow => [
     "N",
@@ -99,7 +104,7 @@
     "A",
     "M",
     "N",
-    "K"
+    "K",
   ],
   day_stand_alone_wide => [
     "Njumatatu",
@@ -108,19 +113,19 @@
     "Aramithi",
     "Njumaa",
     "NJumamothii",
-    "Kiumia"
+    "Kiumia",
   ],
   era_abbreviated => [
     "MK",
-    "TK"
+    "TK",
   ],
   era_narrow => [
     "MK",
-    "TK"
+    "TK",
   ],
   era_wide => [
     "Mbere ya Kristo",
-    "Thutha wa Kristo"
+    "Thutha wa Kristo",
   ],
   first_day_of_week => 7,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -141,7 +146,7 @@
     "Ken",
     "Iku",
     "Imw",
-    "Igi"
+    "Igi",
   ],
   month_format_narrow => [
     "M",
@@ -155,7 +160,7 @@
     "K",
     "I",
     "I",
-    "I"
+    "I",
   ],
   month_format_wide => [
     "Mweri wa mbere",
@@ -169,7 +174,7 @@
     "Mweri wa kenda",
     "Mweri wa ik\N{U+0169}mi",
     "Mweri wa ik\N{U+0169}mi na \N{U+0169}mwe",
-    "Mweri wa ik\N{U+0169}mi na Ka\N{U+0129}r\N{U+0129}"
+    "Mweri wa ik\N{U+0169}mi na Ka\N{U+0129}r\N{U+0129}",
   ],
   month_stand_alone_abbreviated => [
     "Mbe",
@@ -183,7 +188,7 @@
     "Ken",
     "Iku",
     "Imw",
-    "Igi"
+    "Igi",
   ],
   month_stand_alone_narrow => [
     "M",
@@ -197,7 +202,7 @@
     "K",
     "I",
     "I",
-    "I"
+    "I",
   ],
   month_stand_alone_wide => [
     "Mweri wa mbere",
@@ -211,7 +216,7 @@
     "Mweri wa kenda",
     "Mweri wa ik\N{U+0169}mi",
     "Mweri wa ik\N{U+0169}mi na \N{U+0169}mwe",
-    "Mweri wa ik\N{U+0169}mi na Ka\N{U+0129}r\N{U+0129}"
+    "Mweri wa ik\N{U+0169}mi na Ka\N{U+0129}r\N{U+0129}",
   ],
   name => "Embu Kenya",
   native_language => "K\N{U+0129}embu",
@@ -223,37 +228,37 @@
     "K1",
     "K2",
     "K3",
-    "K4"
+    "K4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "Kuota ya mbere",
     "Kuota ya Ka\N{U+0129}r\N{U+0129}",
     "Kuota ya kathatu",
-    "Kuota ya kana"
+    "Kuota ya kana",
   ],
   quarter_stand_alone_abbreviated => [
     "K1",
     "K2",
     "K3",
-    "K4"
+    "K4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "Kuota ya mbere",
     "Kuota ya Ka\N{U+0129}r\N{U+0129}",
     "Kuota ya kathatu",
-    "Kuota ya kana"
+    "Kuota ya kana",
   ],
   script => undef,
   territory => "Kenya",
@@ -262,5 +267,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "ap.",
-    "ip."
+    "ip.",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h.mm B",
+    Bhms => "h.mm.ss B",
     E => "ccc",
+    EBhm => "E h.mm B",
+    EBhms => "E h.mm.ss B",
     EHm => "E H.mm",
     EHms => "E H.mm.ss",
     Ed => "E d.",
@@ -47,8 +52,8 @@
     yMd => "d.M.y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-one" => "'vuoden' y 'viikko' w",
-    "yw-count-other" => "'vuoden' y 'viikko' w"
+    "yw-count-one" => "'vuoden' Y 'viikko' w",
+    "yw-count-other" => "'vuoden' Y 'viikko' w",
   },
   code => "fi",
   date_format_full => "cccc d. MMMM y",
@@ -66,7 +71,7 @@
     "to",
     "pe",
     "la",
-    "su"
+    "su",
   ],
   day_format_narrow => [
     "M",
@@ -75,7 +80,7 @@
     "T",
     "P",
     "L",
-    "S"
+    "S",
   ],
   day_format_wide => [
     "maanantaina",
@@ -84,7 +89,7 @@
     "torstaina",
     "perjantaina",
     "lauantaina",
-    "sunnuntaina"
+    "sunnuntaina",
   ],
   day_stand_alone_abbreviated => [
     "ma",
@@ -93,7 +98,7 @@
     "to",
     "pe",
     "la",
-    "su"
+    "su",
   ],
   day_stand_alone_narrow => [
     "M",
@@ -102,7 +107,7 @@
     "T",
     "P",
     "L",
-    "S"
+    "S",
   ],
   day_stand_alone_wide => [
     "maanantai",
@@ -111,19 +116,19 @@
     "torstai",
     "perjantai",
     "lauantai",
-    "sunnuntai"
+    "sunnuntai",
   ],
   era_abbreviated => [
     "eKr.",
-    "jKr."
+    "jKr.",
   ],
   era_narrow => [
     "eKr",
-    "jKr"
+    "jKr",
   ],
   era_wide => [
     "ennen Kristuksen syntym\N{U+00e4}\N{U+00e4}",
-    "j\N{U+00e4}lkeen Kristuksen syntym\N{U+00e4}n"
+    "j\N{U+00e4}lkeen Kristuksen syntym\N{U+00e4}n",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -144,7 +149,7 @@
     "syysk.",
     "lokak.",
     "marrask.",
-    "jouluk."
+    "jouluk.",
   ],
   month_format_narrow => [
     "T",
@@ -158,7 +163,7 @@
     "S",
     "L",
     "M",
-    "J"
+    "J",
   ],
   month_format_wide => [
     "tammikuuta",
@@ -172,7 +177,7 @@
     "syyskuuta",
     "lokakuuta",
     "marraskuuta",
-    "joulukuuta"
+    "joulukuuta",
   ],
   month_stand_alone_abbreviated => [
     "tammi",
@@ -186,7 +191,7 @@
     "syys",
     "loka",
     "marras",
-    "joulu"
+    "joulu",
   ],
   month_stand_alone_narrow => [
     "T",
@@ -200,7 +205,7 @@
     "S",
     "L",
     "M",
-    "J"
+    "J",
   ],
   month_stand_alone_wide => [
     "tammikuu",
@@ -214,7 +219,7 @@
     "syyskuu",
     "lokakuu",
     "marraskuu",
-    "joulukuu"
+    "joulukuu",
   ],
   name => "Finnish",
   native_language => "suomi",
@@ -226,37 +231,37 @@
     "1. nelj.",
     "2. nelj.",
     "3. nelj.",
-    "4. nelj."
+    "4. nelj.",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "1. nelj\N{U+00e4}nnes",
     "2. nelj\N{U+00e4}nnes",
     "3. nelj\N{U+00e4}nnes",
-    "4. nelj\N{U+00e4}nnes"
+    "4. nelj\N{U+00e4}nnes",
   ],
   quarter_stand_alone_abbreviated => [
     "1. nelj.",
     "2. nelj.",
     "3. nelj.",
-    "4. nelj."
+    "4. nelj.",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "1. nelj\N{U+00e4}nnes",
     "2. nelj\N{U+00e4}nnes",
     "3. nelj\N{U+00e4}nnes",
-    "4. nelj\N{U+00e4}nnes"
+    "4. nelj\N{U+00e4}nnes",
   ],
   script => undef,
   territory => undef,
@@ -265,5 +270,5 @@
   time_format_medium => "H.mm.ss",
   time_format_short => "H.mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

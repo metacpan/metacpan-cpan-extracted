@@ -29,3 +29,6 @@ Revision history for Perl extension Net::SMTPS.
 0.08  Wed Sep 13 07:00:00 2017
 	- move starttls code from constructor and enabling starttls() as a method.
 
+0.09  Sun Nov 05 22:00:00 2017
+	- fix on Ticket #123360; Debug option also sets $IO::Socket::SSL::DEBUG.
+

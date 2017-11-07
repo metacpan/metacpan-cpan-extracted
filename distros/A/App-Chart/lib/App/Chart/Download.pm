@@ -754,7 +754,7 @@ sub write_latest_group {
            my $low     = $data->{'low'};
            my $last    = $data->{'last'} || $data->{'close'};
            my $change  = $data->{'change'};
-           my $prev    = crunch_price ($data->{'prev'},   $prefer_decimals);
+           my $prev    = crunch_price ($data->{'prev'}, $prefer_decimals);
            my $volume  = $data->{'volume'};
 
            if (! defined $last) {
@@ -871,7 +871,7 @@ sub crunch_h {
     @$aref = grep {
       defined $_
         # && App::Chart::Database->symbol_exists($_->{'symbol'})
-      } @$aref;
+    } @$aref;
   }
 
   my $suffix = $h->{'suffix'};
@@ -928,7 +928,7 @@ sub crunch_h {
       my $symbol = $data->{'symbol'};
       my $front_symbol
         = App::Chart::symbol_commodity($symbol)
-          . App::Chart::symbol_suffix($symbol);
+        . App::Chart::symbol_suffix($symbol);
       if (! $front{$front_symbol}
           || $data->{'month'} gt $front{$front_symbol}->{'month'}) {
         $front{$front_symbol} = $data;
@@ -1059,7 +1059,6 @@ sub crunch_price {
   if (str_is_zero ($str)) { return undef; }
   return $str;
 }
-
 sub crunch_change {
   my ($str, $prefer_decimals) = @_;
   $str = crunch_number ($str) // return undef;

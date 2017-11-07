@@ -34,7 +34,7 @@ use HTTP::Request::Common qw(POST);
 use HTML::TableExtract;
 use CGI;
 
-our $VERSION = '1.38'; # VERSION
+our $VERSION = '1.43'; # VERSION
 
 my $CSE_URL = "http://www.cse.lk/trade_summary_report.do?reportType=CSV";
 
@@ -60,10 +60,10 @@ sub cse {
   $url = $CSE_URL;    		# base url
 
   # Create a user agent object and HTTP headers
-  my $ua  = new LWP::UserAgent(agent => 'Mozilla/4.0 (compatible; MSIE 5.5; Windows 98)');
+  my $ua = LWP::UserAgent->new(agent => 'Mozilla/4.0 (compatible; MSIE 5.5; Windows 98)');
 
   # Compose POST request
-  my $request = new HTTP::Request("GET", $url);
+  my $request = HTTP::Request->new("GET", $url);
 
   $reply = $ua->request( $request );
 

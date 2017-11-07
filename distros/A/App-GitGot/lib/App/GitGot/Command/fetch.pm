@@ -1,6 +1,6 @@
 package App::GitGot::Command::fetch;
 our $AUTHORITY = 'cpan:GENEHACK';
-$App::GitGot::Command::fetch::VERSION = '1.333';
+$App::GitGot::Command::fetch::VERSION = '1.334';
 # ABSTRACT: fetch remotes for managed repositories
 use 5.014;
 
@@ -32,7 +32,7 @@ App::GitGot::Command::fetch - fetch remotes for managed repositories
 
 =head1 VERSION
 
-version 1.333
+version 1.334
 
 =head1 AUTHOR
 

@@ -1,9 +1,9 @@
 package Exception::DBManager::Grammar;
-$Exception::DBManager::Grammar::VERSION = '0.017';
+$Exception::DBManager::Grammar::VERSION = '0.018';
 use base qw(Exception);
 
 package QBit::Application::Model::DBManager;
-$QBit::Application::Model::DBManager::VERSION = '0.017';
+$QBit::Application::Model::DBManager::VERSION = '0.018';
 use qbit;
 
 use base qw(QBit::Application::Model);

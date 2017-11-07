@@ -7,15 +7,17 @@
 
 package GitHub::Crud;
 use v5.16;
-our $VERSION = '20170903';
+our $VERSION = '20171103';
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess);
 use Data::Dump qw(dump);
-use Data::Table::Text qw(dateTimeStamp decodeBase64 decodeJson encodeBase64 filePath genLValueScalarMethods readFile temporaryFile writeFile xxx);
+use Data::Table::Text qw(appendFile dateTimeStamp decodeBase64 decodeJson encodeBase64 encodeJson filePath genLValueScalarMethods readFile temporaryFile writeFile xxx);
 use Digest::SHA1 qw(sha1_hex);
+use Storable qw(store retrieve);
 
 my $url         = "https://api.github.com/repos";                               # Github api url
+my $accessFile  = q(/etc/GitHubCrudPersonalAccessToken);                        # Standard location for personal access token file
 my $credentials = 'personalAccessToken.data';                                   # This file is not shipped with the distribution as it contains user specific data
 my $develop     = -e $credentials;                                              # Set to true if developing
 
@@ -26,16 +28,19 @@ my ($pat, $testUserid, $testRepository, $testUrl, $testSecret) = sub            
 
 #1 Attributes                                                                   # Create a L<new()|/new> object and then set these attributes to specify your request to GitHub
 
+genLValueScalarMethods(qw(body));                                               # The body of an issue
 genLValueScalarMethods(qw(branch));                                             # Branch name (you should create this branch first) or omit it for the default branch which is usually 'master'
 genLValueScalarMethods(qw(failed));                                             # Defined if the last request to Github failed else B<undef>.
 genLValueScalarMethods(qw(fileList));                                           # Reference to an array of files produced by L<list|/list>
 genLValueScalarMethods(qw(gitFile));                                            # File name on GitHub - this name can contain '/'
 genLValueScalarMethods(qw(gitFolder));                                          # Folder name on GitHub - this name can contain '/'
+genLValueScalarMethods(qw(logFile));                                            # The name of a local file  to w hwich to write error messages if any errors occur.
 genLValueScalarMethods(qw(personalAccessToken));                                # A personal access token with scope "public_repo" as generated on page: https://github.com/settings/tokens
 genLValueScalarMethods(qw(readData));                                           # Data produced by L<read|/read>
 genLValueScalarMethods(qw(repository));                                         # The name of your repository - you should create this repository first
 genLValueScalarMethods(qw(response));                                           # A reference to GitHub's response to the latest request
-genLValueScalarMethods(qw(secret));                                             # The secret for a web hook
+genLValueScalarMethods(qw(secret));                                             # The secret for a web hook - this is created by the creator of the web hook and remembered by GitHuib
+genLValueScalarMethods(qw(title));                                              # The title of an issue
 genLValueScalarMethods(qw(url));                                                # The url for a web hook
 genLValueScalarMethods(qw(userid));                                             # Your userid on GitHub
 genLValueScalarMethods(qw(writeData));                                          # Data to be written by L<write|/write>
@@ -81,7 +86,8 @@ sub GitHub::Crud::Response::new($$)                                             
      }
 
     if (keys %can and $develop)                                                 # List of new methods required
-     {say STDERR "qw($_)," for(sort keys %can);
+     {say STDERR "Add the following fields to package GitHub::Crud::Response";
+      say STDERR "qw($_)," for(sort keys %can);
      }
 
     if (@data)                                                                  # Save any data
@@ -117,6 +123,7 @@ qw(Date),
 qw(ETag),
 qw(Expires),
 qw(Last_Modified),
+qw(Location),
 qw(Server),
 qw(Source_Age),
 qw(Status),
@@ -216,12 +223,23 @@ sub refOrBranch($$)
   ''
  }
 
+#-------------------------------------------------------------------------------
+# Log an error message
+#-------------------------------------------------------------------------------
+
+sub lll($$)
+ {my ($gitHub, $op) = @_;
+  return unless $gitHub->failed;                                                # No error so no need to write a message
+  return unless my $log = $gitHub->logFile;                                     # Cannot log unless the caller supplied a log file
+  appendFile($log, "GitHub::Crud::$op failed:\n".dump($gitHub));
+ }
+
 #1 Methods available
 
 sub new                                                                         # Create a new GitHub object.
  {my $curl = qx(curl -V);                                                       # Check Curl
   if ($curl =~ /command not found/)
-   {confess "Command 𝗰𝘂𝗿𝗹 not found"
+   {confess "Command curl not found"
    }
   return bless {}
  }
@@ -240,6 +258,7 @@ sub list($)                                                                     
 
   my ($status) = split / /, $r->Status;                                         # Check response code
   $gitHub->failed = $status != 200;
+  lll($gitHub, q(list));
 
   if ($gitHub->failed)                                                          # No file list supplied
    {$gitHub->fileList = [];
@@ -276,6 +295,7 @@ sub read($)                                                                     
 
   my ($status) = split / /, $r->Status;                                         # Check response code
   $gitHub->failed = $status != 200;
+  lll($gitHub, q(read));
 
   if ($gitHub->failed)                                                          # No file list supplied
    {$gitHub->readData = undef;
@@ -321,6 +341,7 @@ sub write($$)                                                                   
   my ($status) = split / /, $R->Status;                                         # Check response code
   my $success = $status == 200 ? 'updated' : $status == 201 ? 'created' : undef;# Updated, created
   $gitHub->failed = $success ? undef : 1;
+  lll($gitHub, q(write));
   $success                                                                      # Return true on success
  }
 
@@ -355,6 +376,7 @@ sub delete($)                                                                   
   my ($status) = split / /, $r->Status;                                         # Check response code
   my $success = $status == 200;
   $gitHub->failed = $success ? undef : 1;
+  lll($gitHub, q(delete));
   $success ? 1 : undef                                                          # Return true on success
  }
 
@@ -368,7 +390,7 @@ if (0 and !caller)
   say STDERR "Delete:\n", dump($d);
  }
 
-sub listWebHooks($)                                                             # List web hooks..\mRequired: L<userid|/userid>, L<repository|/repository>, L<patKey|/patKey>. \mIf the list operation is successful, L<failed|/failed> is set to false otherwise it is set to true.\mReturns true if the list  operation was successful else false.
+sub listWebHooks($)                                                             # List web hooks.\mRequired: L<userid|/userid>, L<repository|/repository>, L<patKey|/patKey>. \mIf the list operation is successful, L<failed|/failed> is set to false otherwise it is set to true.\mReturns true if the list  operation was successful else false.
  {my ($gitHub) = @_;                                                            # GitHub object
   my $pat  = $gitHub->patKey(1);
   my $user = $gitHub->userid;     $user or confess "userid required";
@@ -381,7 +403,8 @@ sub listWebHooks($)                                                             
   my ($status) = split / /, $r->Status;                                         # Check response code
   my $success = $status == 200;
   $gitHub->failed = $success ? undef : 1;
-  $success ? 1 : undef                                                          # Return true on success
+  lll($gitHub, q(listWebHooks));
+  $success ? $gitHub->response->data : undef                                    # Return reference to array of web hooks on success. If there are no web hooks set then the referenced array will be empty.
  }
 
 if (0 and !caller)
@@ -389,10 +412,12 @@ if (0 and !caller)
   $g->userid     = $testUserid;
   $g->repository = $testRepository;
   $g->personalAccessToken = $pat;
-  $g->listWebHooks;
+  if (my $h = $g->listWebHooks)
+   {say STDERR "Webhooks ", dump($h);
+   }
  }
 
-sub createPushWebHook($)                                                        # Create a web hook..\mRequired: L<userid|/userid>, L<repository|/repository>, L<url|/url>, L<patKey|/patKey>.\mOptional: L<secret|/secret>.\mIf the create operation is successful, L<failed|/failed> is set to false otherwise it is set to true.\mReturns true if the web hook was created successfully else false.
+sub createPushWebHook($)                                                        # Create a web hook.\mRequired: L<userid|/userid>, L<repository|/repository>, L<url|/url>, L<patKey|/patKey>.\mOptional: L<secret|/secret>.\mIf the create operation is successful, L<failed|/failed> is set to false otherwise it is set to true.\mReturns true if the web hook was created successfully else false.
  {my ($gitHub) = @_;                                                            # GitHub object
   my $pat    = $gitHub->patKey(1);
   my $user   = $gitHub->userid;     $user   or confess "userid required";
@@ -416,6 +441,7 @@ END
   my $success = $status == 201;
   unlink $tmpFile;                                                              # Cleanup
   $gitHub->failed = $success ? undef : 1;
+  lll($gitHub, q(createPushWebHooks));
   $success ? 1 : undef                                                          # Return true on success
  }
 
@@ -430,11 +456,64 @@ if (0 and !caller)
   say STDERR "Create web hook:\n", dump($d);
  }
 
+sub createIssue($)                                                              # Create an issue.\mRequired: L<userid|/userid>, L<repository|/repository>, L<body|/body>, L<title|/title>.\mIf the operation is successful, L<failed|/failed> is set to false otherwise it is set to true.\mReturns true if the issue was created successfully else false.
+ {my ($gitHub) = @_;                                                            # GitHub object
+  my $pat    = $gitHub->patKey(1);
+  my $user   = $gitHub->userid;     $user   or confess "userid required";
+  my $repo   = $gitHub->repository; $repo   or confess "repository required";
+  my $body   = $gitHub->body;       $body   or confess "body required";
+  my $title  = $gitHub->title;      $title  or confess "title required";
+  my $bran   = $gitHub->refOrBranch(0);
+
+  my $json   = encodeJson({body=>$body,  title=>$title});                       # Issue in json
+  writeFile(my $tmpFile = temporaryFile(), $json);                              # Write issue definition
+  my $d = q( -d @).$tmpFile;
+  my $u = filePath($url, $user, $repo, qw(issues));
+  my $s = "curl -si -X POST $pat $u $d";                                        # Create url
+  my $r = GitHub::Crud::Response::new($gitHub, $s);
+  my ($status) = split / /, $r->Status;                                         # Check response code
+  my $success = $status == 201;
+  unlink $tmpFile;                                                              # Cleanup
+  $gitHub->failed = $success ? undef : 1;
+  lll($gitHub, q(createIssue));
+  $success ? 1 : undef                                                          # Return true on success
+ }
+
+if (0 and !caller)
+ {my $g = GitHub::Crud::new();
+  $g->userid     = $testUserid;
+  $g->repository = $testRepository;
+  $g->title      = "Hello";
+  $g->body       = "Hello World";
+  $g->personalAccessToken = $pat;
+  my $d = $g->createIssue;
+  say STDERR "Create issue: ", dump($d);
+  exit;
+ }
+
+sub savePersonalAccessToken($;$)                                                # Save the personal access token in a file.
+ {my ($gitHub, $file) = @_;                                                     # GitHub object, optional access file - default is /etc/GitHubCrudPersonalAccessToken
+  $file //= $accessFile;                                                        # Default location
+  store {pat=>$gitHub->personalAccessToken}, $file;                             # Store personal access token
+  -e $file or confess "Unable to store personal access token in file:\n$file";  # Complain if store fails
+ }
+
+sub loadPersonalAccessToken($;$)                                                # Load a personal access token from a file.
+ {my ($gitHub, $file) = @_;                                                     # GitHub object, optional access file - default is /etc/GitHubCrudPersonalAccessToken
+  $file //= $accessFile;                                                        # Default location
+  -e $file or                                                                   # Check file exists
+    confess "File containing personal access token does not exist:\n$file";
+  my $p = retrieve $file;
+  my $a = $p->{pat} or                                                          # Check file format
+    confess "File does not contain a personal access token:\n$file";
+  $gitHub->personalAccessToken = $a;                                            # Retrieve token
+ }
+
 #-------------------------------------------------------------------------------
 # Tests
 #-------------------------------------------------------------------------------
 
-if (1 and !caller)
+if (0 and !caller)
  {my $g = GitHub::Crud::new();
   $g->userid     = $testUserid;
   $g->repository = $testRepository;
@@ -509,6 +588,11 @@ module.  For an alphabetic listing of all methods by name see L<Index|/Index>.
 
 Create a L<new()|/new> object and then set these attributes to specify your request to GitHub
 
+=head2 body :lvalue
+
+The body of an issue
+
+
 =head2 branch :lvalue
 
 Branch name (you should create this branch first) or omit it for the default branch which is usually 'master'
@@ -534,6 +618,11 @@ File name on GitHub - this name can contain '/'
 Folder name on GitHub - this name can contain '/'
 
 
+=head2 logFile :lvalue
+
+The name of a local file  to w hwich to write error messages if any errors occur.
+
+
 =head2 personalAccessToken :lvalue
 
 A personal access token with scope "public_repo" as generated on page: https://github.com/settings/tokens
@@ -556,7 +645,12 @@ A reference to GitHub's response to the latest request
 
 =head2 secret :lvalue
 
-The secret for a web hook
+The secret for a web hook - this is created by the creator of the web hook and remembered by GitHuib
+
+
+=head2 title :lvalue
+
+The title of an issue
 
 
 =head2 url :lvalue
@@ -644,7 +738,7 @@ Returns true if the delete was successful else false.
 
 =head2 listWebHooks($)
 
-List web hooks..
+List web hooks.
 
 Required: L<userid|/userid>, L<repository|/repository>, L<patKey|/patKey>.
 
@@ -656,7 +750,7 @@ Returns true if the list  operation was successful else false.
 
 =head2 createPushWebHook($)
 
-Create a web hook..
+Create a web hook.
 
 Required: L<userid|/userid>, L<repository|/repository>, L<url|/url>, L<patKey|/patKey>.
 
@@ -668,49 +762,87 @@ Returns true if the web hook was created successfully else false.
 
   1  $gitHub  GitHub object
 
+=head2 createIssue($)
+
+Create an issue.
+
+Required: L<userid|/userid>, L<repository|/repository>, L<body|/body>, L<title|/title>.
+
+If the operation is successful, L<failed|/failed> is set to false otherwise it is set to true.
+
+Returns true if the issue was created successfully else false.
+
+  1  $gitHub  GitHub object
+
+=head2 savePersonalAccessToken($$)
+
+Save the personal access token in a file.
+
+  1  $gitHub  GitHub object
+  2  $file    File
+
+=head2 loadPersonalAccessToken($$)
+
+Load a personal access token from a file.
+
+  1  $gitHub  GitHub object
+  2  $file    File
+
 
 =head1 Index
 
 
-1 L<branch|/branch>
+1 L<body|/body>
 
-2 L<createPushWebHook|/createPushWebHook>
+2 L<branch|/branch>
 
-3 L<delete|/delete>
+3 L<createIssue|/createIssue>
 
-4 L<failed|/failed>
+4 L<createPushWebHook|/createPushWebHook>
 
-5 L<fileList|/fileList>
+5 L<delete|/delete>
 
-6 L<gitFile|/gitFile>
+6 L<failed|/failed>
 
-7 L<gitFolder|/gitFolder>
+7 L<fileList|/fileList>
 
-8 L<list|/list>
+8 L<gitFile|/gitFile>
 
-9 L<listWebHooks|/listWebHooks>
+9 L<gitFolder|/gitFolder>
 
-10 L<new|/new>
+10 L<list|/list>
 
-11 L<personalAccessToken|/personalAccessToken>
+11 L<listWebHooks|/listWebHooks>
 
-12 L<read|/read>
+12 L<loadPersonalAccessToken|/loadPersonalAccessToken>
 
-13 L<readData|/readData>
+13 L<logFile|/logFile>
 
-14 L<repository|/repository>
+14 L<new|/new>
 
-15 L<response|/response>
+15 L<personalAccessToken|/personalAccessToken>
 
-16 L<secret|/secret>
+16 L<read|/read>
 
-17 L<url|/url>
+17 L<readData|/readData>
 
-18 L<userid|/userid>
+18 L<repository|/repository>
 
-19 L<write|/write>
+19 L<response|/response>
 
-20 L<writeData|/writeData>
+20 L<savePersonalAccessToken|/savePersonalAccessToken>
+
+21 L<secret|/secret>
+
+22 L<title|/title>
+
+23 L<url|/url>
+
+24 L<userid|/userid>
+
+25 L<write|/write>
+
+26 L<writeData|/writeData>
 
 =head1 Installation
 
@@ -739,8 +871,6 @@ under the same terms as Perl itself.
 
 =cut
 
-
-
 # Tests and documentation
 
 sub test
@@ -760,4 +890,13 @@ test unless caller;
 __DATA__
 use Test::More tests => 1;
 
-ok 1;
+if (1)
+ {my $pat = 123;
+  my $g = GitHub::Crud::new();
+     $g->personalAccessToken = $pat;
+  my $file = "zzz.data";
+  $g->savePersonalAccessToken($file);
+  $g->personalAccessToken = undef;
+  $g->loadPersonalAccessToken($file);
+  ok $pat eq $g->personalAccessToken, "Save/load of personal access token";
+ }

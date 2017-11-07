@@ -1,5 +1,5 @@
 package QBit::WebInterface::Controller::Template::Provider;
-$QBit::WebInterface::Controller::Template::Provider::VERSION = '0.029';
+$QBit::WebInterface::Controller::Template::Provider::VERSION = '0.030';
 use qbit;
 
 use base qw(Template::Provider);

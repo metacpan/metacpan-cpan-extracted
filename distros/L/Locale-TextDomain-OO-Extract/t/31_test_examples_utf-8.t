@@ -1296,6 +1296,58 @@ msgstr "Jänner"
 
 EOT
     },
+    {
+        test   => '22_process_extended_skip',
+        path   => 'example',
+        script => '-I../lib 22_process_extended_skip_utf-8.pl',
+        result => <<'EOT',
+de/LC_MESSAGES/example1.po (clean)
+
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+
+# comment 2
+# comment 1
+#: files_to_extract_for_process/gettext_loc.pl:14
+msgid "January"
+msgstr "Januar"
+
+#. thing => 'text'
+#: files_to_extract_for_process/gettext_loc.pl:15
+msgid "This is a new {thing}."
+msgstr ""
+
+de-at/LC_MESSAGES/example1.po (clean)
+
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+
+# comment 2
+# comment 1
+#: files_to_extract_for_process/gettext_loc.pl:14
+msgid "January"
+msgstr "Jänner"
+
+EOT
+    },
 );
 
 plan tests => 1 + @data;

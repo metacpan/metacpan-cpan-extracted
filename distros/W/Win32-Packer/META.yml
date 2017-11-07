@@ -1,0 +1,31 @@
+---
+abstract: 'Pack your Perl applications for Windows'
+author:
+  - 'Salvador FandiÃ±o <sfandino@yahoo.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Win32-Packer
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Archive::Zip: '0'
+  Log::Any: '0'
+  Module::ScanDeps: '0'
+  Moo: '0'
+  Path::Tiny: '0'
+  Win32: '0'
+  Win32::Ldd: '0'
+  XML::FromPerl: '0'
+  namespace::autoclean: '0'
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

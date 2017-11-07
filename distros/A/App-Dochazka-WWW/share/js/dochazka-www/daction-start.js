@@ -95,6 +95,9 @@ define ([
         "empProfileEditSave": empLib.empProfileEditSave,
         "actionEmplSearch": empLib.actionEmplSearch,
         "masqEmployee": appCaches.masqEmployee,
+        "empProfileSetSuperChoose": empLib.empProfileSetSuperChoose,
+        "empProfileSetSuperCommit": empLib.empProfileSetSuperCommit,
+        "empProfileSetSuperSearch": empLib.empProfileSetSuperSearch,
 
         // Employee LDAP actions
         "ldapLookupSubmit": ldapLib.ldapLookupSubmit,
@@ -122,9 +125,10 @@ define ([
         "schedReallyDelete": schedLib.schedReallyDelete,
 
         // create interval actions
-        "createLastIntervalPlusOffsetSave": intLib.createLastIntervalPlusOffsetSave,
+        "createMultipleIntSave": intLib.createMultipleIntSave,
         "createNextScheduledIntervalSave": intLib.createNextScheduledIntervalSave,
         "createSingleIntSave": intLib.createSingleIntSave,
+        "viewIntervalsAction": intLib.viewIntervalsAction,
         
         // activity select actions
         "selectActivityAction": appCaches.selectActivityAction,
@@ -140,12 +144,12 @@ define ([
         },
 
         // logout action
-        "logout": function () {
+        "logout": function (msg) {
             console.log("Reached logout action");
             if (currentUser('flag1')) {
                 appCaches.endTheMasquerade();
             }
-            loggout();
+            loggout(msg);
         } // logout
 
     }; // var act

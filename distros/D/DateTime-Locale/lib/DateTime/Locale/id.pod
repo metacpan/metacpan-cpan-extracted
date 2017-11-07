@@ -327,11 +327,41 @@ Indonesian locale.
 
 =head2 Available Formats
 
+=head3 Bh (h B)
+
+   2008-02-05T18:30:30 = 6 B
+   1995-12-22T09:05:02 = 9 B
+  -0010-09-15T04:44:23 = 4 B
+
+=head3 Bhm (h.mm B)
+
+   2008-02-05T18:30:30 = 6.30 B
+   1995-12-22T09:05:02 = 9.05 B
+  -0010-09-15T04:44:23 = 4.44 B
+
+=head3 Bhms (h.mm.ss B)
+
+   2008-02-05T18:30:30 = 6.30.30 B
+   1995-12-22T09:05:02 = 9.05.02 B
+  -0010-09-15T04:44:23 = 4.44.23 B
+
 =head3 E (ccc)
 
    2008-02-05T18:30:30 = Sel
    1995-12-22T09:05:02 = Jum
   -0010-09-15T04:44:23 = Sab
+
+=head3 EBhm (E h.mm B)
+
+   2008-02-05T18:30:30 = Sel 6.30 B
+   1995-12-22T09:05:02 = Jum 9.05 B
+  -0010-09-15T04:44:23 = Sab 4.44 B
+
+=head3 EBhms (E h.mm.ss B)
+
+   2008-02-05T18:30:30 = Sel 6.30.30 B
+   1995-12-22T09:05:02 = Jum 9.05.02 B
+  -0010-09-15T04:44:23 = Sab 4.44.23 B
 
 =head3 EHm (E HH.mm)
 
@@ -573,7 +603,7 @@ Indonesian locale.
    1995-12-22T09:05:02 = Kuartal ke-4 1995
   -0010-09-15T04:44:23 = Kuartal ke-3 -10
 
-=head3 yw-count-other ('minggu' 'ke'-w y)
+=head3 yw-count-other ('minggu' 'ke'-w Y)
 
    2008-02-05T18:30:30 = minggu ke-6 2008
    1995-12-22T09:05:02 = minggu ke-51 1995

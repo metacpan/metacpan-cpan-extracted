@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "AM",
-    "PM"
+    "PM",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "E d",
@@ -45,8 +50,8 @@
     yMd => "d/M/y",
     yQQQ => "y QQQ",
     yQQQQ => "y QQQQ",
-    "yw-count-one" => "'week' w 'of' y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-one" => "'week' w 'of' Y",
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "haw",
   date_format_full => "EEEE, d MMMM y",
@@ -64,7 +69,7 @@
     "P4",
     "P5",
     "P6",
-    "LP"
+    "LP",
   ],
   day_format_narrow => [
     "M",
@@ -73,7 +78,7 @@
     "T",
     "F",
     "S",
-    "S"
+    "S",
   ],
   day_format_wide => [
     "Po\N{U+02bb}akahi",
@@ -82,7 +87,7 @@
     "Po\N{U+02bb}ah\N{U+0101}",
     "Po\N{U+02bb}alima",
     "Po\N{U+02bb}aono",
-    "L\N{U+0101}pule"
+    "L\N{U+0101}pule",
   ],
   day_stand_alone_abbreviated => [
     "P1",
@@ -91,7 +96,7 @@
     "P4",
     "P5",
     "P6",
-    "LP"
+    "LP",
   ],
   day_stand_alone_narrow => [
     "M",
@@ -100,7 +105,7 @@
     "T",
     "F",
     "S",
-    "S"
+    "S",
   ],
   day_stand_alone_wide => [
     "Po\N{U+02bb}akahi",
@@ -109,19 +114,19 @@
     "Po\N{U+02bb}ah\N{U+0101}",
     "Po\N{U+02bb}alima",
     "Po\N{U+02bb}aono",
-    "L\N{U+0101}pule"
+    "L\N{U+0101}pule",
   ],
   era_abbreviated => [
     "BCE",
-    "CE"
+    "CE",
   ],
   era_narrow => [
     "BCE",
-    "CE"
+    "CE",
   ],
   era_wide => [
     "BCE",
-    "CE"
+    "CE",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -142,7 +147,7 @@
     "Kep.",
     "\N{U+02bb}Ok.",
     "Now.",
-    "Kek."
+    "Kek.",
   ],
   month_format_narrow => [
     1,
@@ -156,7 +161,7 @@
     9,
     10,
     11,
-    12
+    12,
   ],
   month_format_wide => [
     "Ianuali",
@@ -170,7 +175,7 @@
     "Kepakemapa",
     "\N{U+02bb}Okakopa",
     "Nowemapa",
-    "Kekemapa"
+    "Kekemapa",
   ],
   month_stand_alone_abbreviated => [
     "Ian.",
@@ -184,7 +189,7 @@
     "Kep.",
     "\N{U+02bb}Ok.",
     "Now.",
-    "Kek."
+    "Kek.",
   ],
   month_stand_alone_narrow => [
     1,
@@ -198,7 +203,7 @@
     9,
     10,
     11,
-    12
+    12,
   ],
   month_stand_alone_wide => [
     "Ianuali",
@@ -212,7 +217,7 @@
     "Kepakemapa",
     "\N{U+02bb}Okakopa",
     "Nowemapa",
-    "Kekemapa"
+    "Kekemapa",
   ],
   name => "Hawaiian",
   native_language => "\N{U+02bb}\N{U+014c}lelo Hawai\N{U+02bb}i",
@@ -224,37 +229,37 @@
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_stand_alone_abbreviated => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   script => undef,
   territory => undef,
@@ -263,5 +268,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 31
+  version => 32,
 }

@@ -1,6 +1,6 @@
 package App::GitGot::Command::list;
 our $AUTHORITY = 'cpan:GENEHACK';
-$App::GitGot::Command::list::VERSION = '1.333';
+$App::GitGot::Command::list::VERSION = '1.334';
 # ABSTRACT: list managed repositories
 use 5.014;
 
@@ -71,7 +71,7 @@ App::GitGot::Command::list - list managed repositories
 
 =head1 VERSION
 
-version 1.333
+version 1.334
 
 =head1 AUTHOR
 

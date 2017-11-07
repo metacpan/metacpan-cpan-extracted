@@ -1,21 +1,29 @@
---- #YAML:1.0
-name: Class-Container
-version: 0.12
+---
+abstract: 'Glues object frameworks together transparently'
 author:
-  - |-
-    Originally by Ken Williams <ken@mathforum.org> and Dave Rolsky
-    <autarch@urth.org> for the HTML::Mason project.  Important feedback
-    contributed by Jonathan Swartz <swartz@pobox.com>.  Extended by Ken
-    Williams for the AI::Categorizer project.
-abstract: Glues object frameworks together transparently
+  - 'Ken Williams <kwilliams@cpan.org>'
+build_requires:
+  File::Spec: 0
+  Module::Build: 0.3601
+  Test: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.150001'
 license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Class-Container
 requires:
+  B::Deparse: 0
   Carp: 0
-  Params::Validate: 0.23
-recommends:
+  Params::Validate: 0
   Scalar::Util: 0
-provides:
-  Class::Container:
-    file: lib/Class/Container.pm
-    version: 0.12
-generated_by: Module::Build version 0.26
+  strict: 0
+  vars: 0
+resources:
+  bugtracker: http://github.com/kenahoo/Class-Container/issues
+  repository: git://github.com/kenahoo/Class-Container.git
+version: 0.13

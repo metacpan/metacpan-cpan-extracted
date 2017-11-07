@@ -32,7 +32,7 @@ use Glib;
 # uncomment this to run the ### lines
 #use Smart::Comments;
 
-our $VERSION = 263;
+our $VERSION = 264;
 
 use Locale::Messages 1.16; # version 1.16 for turn_utf_8_on()
 BEGIN {
@@ -317,7 +317,7 @@ sub collapse_whitespace {
 sub decimal_sub {
   my ($x, $y) = @_;
   # would prefer an actual decimal-arithmetic subtract here
-  my $decimals = max (count_decimals ($x), count_decimals ($y));
+  my $decimals = max (count_decimals($x), count_decimals($y));
   return sprintf ('%.*f', $decimals, $x - $y);
 }
 

@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "uluchelo",
-    "akasuba"
+    "akasuba",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d, E",
@@ -45,7 +50,7 @@
     yMd => "d/M/y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "bem",
   date_format_full => "EEEE, d MMMM y",
@@ -63,7 +68,7 @@
     "Palichine",
     "Palichisano",
     "Pachibelushi",
-    "Pa Mulungu"
+    "Pa Mulungu",
   ],
   day_format_narrow => [
     "M",
@@ -72,7 +77,7 @@
     "T",
     "F",
     "S",
-    "S"
+    "S",
   ],
   day_format_wide => [
     "Palichimo",
@@ -81,7 +86,7 @@
     "Palichine",
     "Palichisano",
     "Pachibelushi",
-    "Pa Mulungu"
+    "Pa Mulungu",
   ],
   day_stand_alone_abbreviated => [
     "Palichimo",
@@ -90,7 +95,7 @@
     "Palichine",
     "Palichisano",
     "Pachibelushi",
-    "Pa Mulungu"
+    "Pa Mulungu",
   ],
   day_stand_alone_narrow => [
     "M",
@@ -99,7 +104,7 @@
     "T",
     "F",
     "S",
-    "S"
+    "S",
   ],
   day_stand_alone_wide => [
     "Palichimo",
@@ -108,19 +113,19 @@
     "Palichine",
     "Palichisano",
     "Pachibelushi",
-    "Pa Mulungu"
+    "Pa Mulungu",
   ],
   era_abbreviated => [
     "BC",
-    "AD"
+    "AD",
   ],
   era_narrow => [
     "BC",
-    "AD"
+    "AD",
   ],
   era_wide => [
     "Before Yesu",
-    "After Yesu"
+    "After Yesu",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -141,7 +146,7 @@
     "Sep",
     "Okt",
     "Nov",
-    "Dis"
+    "Dis",
   ],
   month_format_narrow => [
     "J",
@@ -155,7 +160,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_format_wide => [
     "Januari",
@@ -169,7 +174,7 @@
     "Septemba",
     "Oktoba",
     "Novemba",
-    "Disemba"
+    "Disemba",
   ],
   month_stand_alone_abbreviated => [
     "Jan",
@@ -183,7 +188,7 @@
     "Sep",
     "Okt",
     "Nov",
-    "Dis"
+    "Dis",
   ],
   month_stand_alone_narrow => [
     "J",
@@ -197,7 +202,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_stand_alone_wide => [
     "Januari",
@@ -211,7 +216,7 @@
     "Septemba",
     "Oktoba",
     "Novemba",
-    "Disemba"
+    "Disemba",
   ],
   name => "Bemba",
   native_language => "Ichibemba",
@@ -223,37 +228,37 @@
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_stand_alone_abbreviated => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   script => undef,
   territory => undef,
@@ -262,5 +267,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 31
+  version => 32,
 }

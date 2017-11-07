@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "\N{U+1295}\N{U+1309}\N{U+1206} \N{U+1230}\N{U+12d3}\N{U+1270}",
-    "\N{U+12f5}\N{U+1215}\N{U+122d} \N{U+1230}\N{U+12d3}\N{U+1275}"
+    "\N{U+12f5}\N{U+1215}\N{U+122d} \N{U+1230}\N{U+12d3}\N{U+1275}",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d, E",
@@ -48,8 +53,8 @@
     yMd => "y-MM-dd",
     yQQQ => "QQQ y",
     yQQQQ => "y QQQQ",
-    "yw-count-one" => "\N{U+1218}\N{U+1260}\N{U+120d} w \N{U+1230}\N{U+1219}\N{U+1295} \N{U+1293}\N{U+12ed} y",
-    "yw-count-other" => "\N{U+1218}\N{U+1260}\N{U+120d} w \N{U+1230}\N{U+1219}\N{U+1295} \N{U+1293}\N{U+12ed} y"
+    "yw-count-one" => "\N{U+1218}\N{U+1260}\N{U+120d} w \N{U+1230}\N{U+1219}\N{U+1295} \N{U+1293}\N{U+12ed} Y",
+    "yw-count-other" => "\N{U+1218}\N{U+1260}\N{U+120d} w \N{U+1230}\N{U+1219}\N{U+1295} \N{U+1293}\N{U+12ed} Y",
   },
   code => "ti-ET",
   date_format_full => "EEEE\N{U+1363} dd MMMM \N{U+1218}\N{U+12d3}\N{U+120d}\N{U+1272} y G",
@@ -67,7 +72,7 @@
     "\N{U+1213}\N{U+1219}",
     "\N{U+12d3}\N{U+122d}",
     "\N{U+1240}\N{U+12f3}",
-    "\N{U+1230}\N{U+1295}"
+    "\N{U+1230}\N{U+1295}",
   ],
   day_format_narrow => [
     "\N{U+1230}",
@@ -76,7 +81,7 @@
     "\N{U+1213}",
     "\N{U+12d3}",
     "\N{U+1240}",
-    "\N{U+1230}"
+    "\N{U+1230}",
   ],
   day_format_wide => [
     "\N{U+1230}\N{U+1291}\N{U+12ed}",
@@ -85,7 +90,7 @@
     "\N{U+1283}\N{U+1219}\N{U+1235}",
     "\N{U+12d3}\N{U+122d}\N{U+1262}",
     "\N{U+1240}\N{U+12f3}\N{U+121d}",
-    "\N{U+1230}\N{U+1295}\N{U+1260}\N{U+1275}"
+    "\N{U+1230}\N{U+1295}\N{U+1260}\N{U+1275}",
   ],
   day_stand_alone_abbreviated => [
     "\N{U+1230}\N{U+1291}",
@@ -94,7 +99,7 @@
     "\N{U+1213}\N{U+1219}",
     "\N{U+12d3}\N{U+122d}",
     "\N{U+1240}\N{U+12f3}",
-    "\N{U+1230}\N{U+1295}"
+    "\N{U+1230}\N{U+1295}",
   ],
   day_stand_alone_narrow => [
     "\N{U+1230}",
@@ -103,7 +108,7 @@
     "\N{U+1213}",
     "\N{U+12d3}",
     "\N{U+1240}",
-    "\N{U+1230}"
+    "\N{U+1230}",
   ],
   day_stand_alone_wide => [
     "\N{U+1230}\N{U+1291}\N{U+12ed}",
@@ -112,19 +117,19 @@
     "\N{U+1213}\N{U+1219}\N{U+1235}",
     "\N{U+12d3}\N{U+122d}\N{U+1262}",
     "\N{U+1240}\N{U+12f3}\N{U+121d}",
-    "\N{U+1230}\N{U+1295}\N{U+1260}\N{U+1275}"
+    "\N{U+1230}\N{U+1295}\N{U+1260}\N{U+1275}",
   ],
   era_abbreviated => [
     "\N{U+12d3}/\N{U+12d3}",
-    "\N{U+12d3}/\N{U+121d}"
+    "\N{U+12d3}/\N{U+121d}",
   ],
   era_narrow => [
     "\N{U+12d3}/\N{U+12d3}",
-    "\N{U+12d3}/\N{U+121d}"
+    "\N{U+12d3}/\N{U+121d}",
   ],
   era_wide => [
     "\N{U+12d3}/\N{U+12d3}",
-    "\N{U+12d3}\N{U+1218}\N{U+1270} \N{U+121d}\N{U+1205}\N{U+1228}\N{U+1275}"
+    "\N{U+12d3}\N{U+1218}\N{U+1270} \N{U+121d}\N{U+1205}\N{U+1228}\N{U+1275}",
   ],
   first_day_of_week => 7,
   glibc_date_1_format => "%A\N{U+1363} %B %e \N{U+1218}\N{U+12d3}\N{U+120d}\N{U+1272} %r %Z %Y \N{U+12d3}/\N{U+121d}",
@@ -145,7 +150,7 @@
     "\N{U+1218}\N{U+1235}",
     "\N{U+1325}\N{U+1245}",
     "\N{U+1215}\N{U+12f3}",
-    "\N{U+1273}\N{U+1215}"
+    "\N{U+1273}\N{U+1215}",
   ],
   month_format_narrow => [
     "\N{U+1325}",
@@ -159,7 +164,7 @@
     "\N{U+1218}",
     "\N{U+1325}",
     "\N{U+1215}",
-    "\N{U+1273}"
+    "\N{U+1273}",
   ],
   month_format_wide => [
     "\N{U+1325}\N{U+122a}",
@@ -173,7 +178,7 @@
     "\N{U+1218}\N{U+1235}\N{U+12a8}\N{U+1228}\N{U+121d}",
     "\N{U+1325}\N{U+1245}\N{U+121d}\N{U+1272}",
     "\N{U+1215}\N{U+12f3}\N{U+122d}",
-    "\N{U+1273}\N{U+1215}\N{U+1233}\N{U+1235}"
+    "\N{U+1273}\N{U+1215}\N{U+1233}\N{U+1235}",
   ],
   month_stand_alone_abbreviated => [
     "\N{U+1325}\N{U+122a}",
@@ -187,7 +192,7 @@
     "\N{U+1218}\N{U+1235}",
     "\N{U+1325}\N{U+1245}",
     "\N{U+1215}\N{U+12f3}",
-    "\N{U+1273}\N{U+1215}"
+    "\N{U+1273}\N{U+1215}",
   ],
   month_stand_alone_narrow => [
     "\N{U+1325}",
@@ -201,7 +206,7 @@
     "\N{U+1218}",
     "\N{U+1325}",
     "\N{U+1215}",
-    "\N{U+1273}"
+    "\N{U+1273}",
   ],
   month_stand_alone_wide => [
     "\N{U+1325}\N{U+122a}",
@@ -215,49 +220,49 @@
     "\N{U+1218}\N{U+1235}\N{U+12a8}\N{U+1228}\N{U+121d}",
     "\N{U+1325}\N{U+1245}\N{U+121d}\N{U+1272}",
     "\N{U+1215}\N{U+12f3}\N{U+122d}",
-    "\N{U+1273}\N{U+1215}\N{U+1233}\N{U+1235}"
+    "\N{U+1273}\N{U+1215}\N{U+1233}\N{U+1235}",
   ],
   name => "Tigrinya Ethiopia",
   native_language => "\N{U+1275}\N{U+130d}\N{U+122d}\N{U+129b}",
-  native_name => "\N{U+1275}\N{U+130d}\N{U+122d}\N{U+129b} ET",
+  native_name => "\N{U+1275}\N{U+130d}\N{U+122d}\N{U+129b} \N{U+12a2}\N{U+1275}\N{U+12ee}\N{U+1335}\N{U+12eb}",
   native_script => undef,
-  native_territory => "ET",
+  native_territory => "\N{U+12a2}\N{U+1275}\N{U+12ee}\N{U+1335}\N{U+12eb}",
   native_variant => undef,
   quarter_format_abbreviated => [
     "\N{U+122d}1",
     "\N{U+122d}2",
     "\N{U+122d}3",
-    "\N{U+122d}4"
+    "\N{U+122d}4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "\N{U+1240}\N{U+12f3}\N{U+121b}\N{U+12ed} \N{U+122d}\N{U+1265}\N{U+12d2}",
     "\N{U+12ab}\N{U+120d}\N{U+12a3}\N{U+12ed} \N{U+122d}\N{U+1265}\N{U+12d2}",
     "\N{U+1233}\N{U+120d}\N{U+1233}\N{U+12ed} \N{U+122d}\N{U+1265}\N{U+12d2}",
-    "\N{U+122b}\N{U+1265}\N{U+12d3}\N{U+12ed} \N{U+122d}\N{U+1265}\N{U+12d2}"
+    "\N{U+122b}\N{U+1265}\N{U+12d3}\N{U+12ed} \N{U+122d}\N{U+1265}\N{U+12d2}",
   ],
   quarter_stand_alone_abbreviated => [
     "\N{U+122d}1",
     "\N{U+122d}2",
     "\N{U+122d}3",
-    "\N{U+122d}4"
+    "\N{U+122d}4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "\N{U+1240}\N{U+12f3}\N{U+121b}\N{U+12ed} \N{U+122d}\N{U+1265}\N{U+12d2}",
     "\N{U+12ab}\N{U+120d}\N{U+12a3}\N{U+12ed} \N{U+122d}\N{U+1265}\N{U+12d2}",
     "\N{U+1233}\N{U+120d}\N{U+1233}\N{U+12ed} \N{U+122d}\N{U+1265}\N{U+12d2}",
-    "\N{U+122b}\N{U+1265}\N{U+12d3}\N{U+12ed} \N{U+122d}\N{U+1265}\N{U+12d2}"
+    "\N{U+122b}\N{U+1265}\N{U+12d3}\N{U+12ed} \N{U+122d}\N{U+1265}\N{U+12d2}",
   ],
   script => undef,
   territory => "Ethiopia",
@@ -266,5 +271,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 31
+  version => 32,
 }

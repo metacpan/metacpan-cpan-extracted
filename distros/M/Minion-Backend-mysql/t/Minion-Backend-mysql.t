@@ -16,6 +16,14 @@ my $mysqld = Test::mysqld->new(
   }
 ) or plan skip_all => $Test::mysqld::errstr;
 
+chomp( my $mysqld_version_info = qx{$mysqld->{mysqld} --version} );
+diag "Running tests with MySQL/MariaDB server version: ";
+diag $mysqld_version_info;
+
+my $dbh = DBI->connect($mysqld->dsn(dbname => 'test'));
+my $mysqld_version = $dbh->{mysql_serverversion};
+$mysqld_version >= 50605 or plan skip_all => 'Require at least MySQL 5.6.5';
+
 # Clean up before start
 require Mojo::mysql;
 my $mysql = Mojo::mysql->new( dsn => $mysqld->dsn( dbname => 'test' ));
@@ -90,7 +98,7 @@ my $finished = $minion->backend->mysql->db->query(
 )->hash->{finished};
 $minion->backend->mysql->db->query(
   'update minion_jobs set finished = FROM_UNIXTIME(?) where id = ?',
-  $finished - ($minion->remove_after + 1), $id2);
+  $finished - ($minion->remove_after + 3601), $id2);
 $finished = $minion->backend->mysql->db->query(
   'select UNIX_TIMESTAMP(finished) as finished
    from minion_jobs
@@ -98,7 +106,7 @@ $finished = $minion->backend->mysql->db->query(
 )->hash->{finished};
 $minion->backend->mysql->db->query(
   'update minion_jobs set finished = FROM_UNIXTIME(?) where id = ?',
-  $finished - ($minion->remove_after + 1), $id3);
+  $finished - ($minion->remove_after + 3601), $id3);
 $worker->unregister;
 $minion->repair;
 ok $minion->job($id), 'job has not been cleaned up';

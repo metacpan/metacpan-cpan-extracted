@@ -165,11 +165,11 @@ sub _create_header_lines {
 
     my $path = $self->{'uri_path'};
 
-    if (!length $path) {
+    if (!defined $path || !length $path) {
         $path = '/';
     }
 
-    if (length $self->{'uri_query'}) {
+    if (defined $self->{'uri_query'} && length $self->{'uri_query'}) {
         $path .= "?$self->{'uri_query'}";
     }
 

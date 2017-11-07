@@ -24,6 +24,7 @@ use Date::Calc;
 use Date::Parse;
 use List::Util qw (min max);
 use POSIX ();
+use Time::Local;
 use URI::Escape;
 use Locale::TextDomain ('App-Chart');
 
@@ -314,192 +315,386 @@ sub quote_parse_div_date {
 # wget -S -O /dev/stdout 'http://download.finance.yahoo.com/d/quotes.csv?f=snc4b3b2d1t1oml1c1vqdx&e=.csv&s=GM'
 #
 
-use constant DEFAULT_DOWNLOAD_HOST => 'download.finance.yahoo.com';
-
 App::Chart::LatestHandler->new
   (pred => $latest_pred,
    proc => \&latest_download,
-   max_symbols => MAX_QUOTES);
+   max_symbols => 1);  # downloads go 1 at a time
 
 sub latest_download {
   my ($symbol_list) = @_;
 
-  App::Chart::Download::status
-      (__x('Yahoo quotes {symbol_range}',
-           symbol_range =>
-           App::Chart::Download::symbol_range_string ($symbol_list)));
+  foreach my $symbol (@$symbol_list) {
+    my $tdate = daily_available_tdate ($symbol);
+    App::Chart::Download::status(__('Yahoo quote'), $symbol);
 
-  my $host = App::Chart::Database->preference_get
-    ('yahoo-quote-host', DEFAULT_DOWNLOAD_HOST);
-  my $url = "http://$host/d/quotes.csv?f=snc4b3b2d1t1oml1c1vqdx&e=.csv&s="
-    . join (',', map { URI::Escape::uri_escape($_) } @$symbol_list);
+    my $lo_timet = tdate_to_unix($tdate - 4);
+    my $hi_timet = tdate_to_unix($tdate + 2);
 
-  my $resp = App::Chart::Download->get ($url);
-  App::Chart::Download::write_latest_group (latest_parse ($resp));
+    my $events = 'history';
+    my $url = "https://query1.finance.yahoo.com/v7/finance/chart/"
+      . URI::Escape::uri_escape($symbol)
+      ."?period1=$lo_timet&period2=$hi_timet&interval=1d&events=$events";
+
+    # unknown symbol is 404 with json error details
+    #
+    my $resp = App::Chart::Download->get ($url, allow_404 => 1,);
+    App::Chart::Download::write_latest_group
+        (latest_parse($symbol,$resp,$tdate));
+  }
 }
 
 sub latest_parse {
-  my ($resp) = @_;
+  my ($symbol, $resp, $tdate) = @_;
+
   my $content = $resp->decoded_content (raise_error => 1);
-  ### Yahoo quotes: $content
+  require JSON;
+  my $json = JSON::from_json($content);
 
-  my @data = ();
-  my $h = { source => __PACKAGE__,
-            resp   => $resp,
+  my %record = (symbol => $symbol,
+               );
+  my $h = { source      => __PACKAGE__,
+            resp        => $resp,
             prefer_decimals => 2,
-            date_format => 'mdy',  # eg. '6/26/2015'
-            data   => \@data };
-
-  require Text::CSV_XS;
-  my $csv = Text::CSV_XS->new;
-  foreach my $line (App::Chart::Download::split_lines ($content)) {
-    $csv->parse($line);
-    ### csv fields: $csv->fields()
-    my ($symbol, $name, $currency, $bid, $offer, $last_date, $last_time,
-        $open, $range, $last, $change, $volume,
-        $div_date, $div_amount, $exchange)
-      = $csv->fields();
-    if (! defined $symbol) {
-      # blank line maybe
-      print "Yahoo quotes blank line maybe:\n---\n$content\n---\n";
-      next;
-    }
-
-    # for unknown stocks the name is a repeat of the symbol, which is pretty
-    # useless
-    if ($name eq $symbol) { $name = undef; }
-
-    my ($low, $high) = split /-/, $range;
-    my $quote_delay_minutes = symbol_quote_delay ($symbol);
-
-    # have seen wildly garbage date for unknown symbols, like
-    # GC.CMX","GC.CMX","MRA",N/A,N/A,"8/352/19019","4:58am",N/A,"N/A - N/A",0.00,N/A,N/A,"N/A",N/A,"N/A
-    # depending what else in the same request ...
-    #
-
-    # In the past date/times were in New York timezone, for shares anywhere
-    # in the world.  The Chart database is in the timezone of the exchange.
-    # As of June 2015 believe Yahoo is now also the exchange timezone so no
-    # transformation.
-    #
-    # my $symbol_timezone = App::Chart::TZ->for_symbol ($symbol);
-    # ($last_date, $last_time)
-    #   = quote_parse_datetime ($last_date, $last_time,
-    #                           App::Chart::TZ->newyork,
-    #                           $symbol_timezone);
-
-    # dividend is "0.00" for various unknowns or estimates, eg. from ASX
-    # trusts
-    if (App::Chart::Download::str_is_zero ($div_amount)) {
-      $div_amount = __('unknown');
-    }
-
-    # dividend shown only if it's today
-    # don't show if no last_date, just in case have a div_date but no
-    # last_date for some reason
-    $div_date = quote_parse_div_date ($div_date);
-    if (! ($div_date && $last_date && $div_date eq $last_date)) {
-      $div_amount = undef;
-    }
-
-    push @data, { symbol      => $symbol,
-                  name        => $name,
-                  exchange    => $exchange,
-                  currency    => $currency,
-
-                  quote_delay_minutes => $quote_delay_minutes,
-                  bid         => $bid,
-                  offer       => $offer,
-
-                  last_date   => $last_date,
-                  last_time   => $last_time,
-                  open        => $open,
-                  high        => $high,
-                  low         => $low,
-                  last        => $last,
-                  change      => $change,
-                  volume      => $volume,
-                  dividend    => $div_amount,
-                };
+            date_format => 'ymd',
+            data        => [ \%record ],
+          };
+  if (defined (my $error = $json->{'chart'}->{'error'}->{'code'})) {
+    $record{'error'} = $error;
   }
 
-  ### $h
+  if (my $result = $json->{'chart'}->{'result'}->[0]) {
+    my $meta = $result->{'meta'}
+      // die "Yahoo JSON oops, no meta";
+    $record{'currency'} = $meta->{'currency'},
+      $record{'exchange'} = $meta->{'exchangeName'},
+
+      my $symbol_timezone = App::Chart::TZ->for_symbol ($symbol);
+    my $timestamps = $result->{'timestamp'}
+      // die "Yahoo JSON oops, no timestamp";
+
+    if (@$timestamps) {
+
+      # timestamps are time of last trade, as can be seen by looking at
+      # something with low enough volume, eg. RMX.AX
+      #
+      if (defined (my $timet = $timestamps->[-1])) {
+        ($record{'last_date'}, $record{'last_time'})
+          = $symbol_timezone->iso_date_time($timet);
+      }
+
+      if (my $indicators = $result->{'indicators'}->{'quote'}->[0]) {
+        foreach my $key ('open','high','low') {
+          if (my $aref = $indicators->{$key}) {
+            $record{$key} = crunch_trailing_nines($aref->[$#$timestamps]);
+          }
+        }
+        if (my $aref = $indicators->{'volume'}) {
+          $record{'volume'} = $aref->[$#$timestamps];
+        }
+        if (my $aref = $indicators->{'close'}) {
+          my $last = $record{'last'}
+            = crunch_trailing_nines($aref->[$#$timestamps]);
+
+          # "change" from second last timestamp, if there is one.
+          # As of Nov 17, XAUUSD=X only ever gives a single latest quote
+          # from v7, no previous day to compare.
+          #
+          if (defined $last
+              && scalar(@$timestamps) >= 2
+              && defined(my $prev = $aref->[$#$timestamps - 1])) {
+            $record{'change'}
+              = App::Chart::decimal_sub($last, crunch_trailing_nines($prev));
+          }
+        }
+      }
+    }
+
+    if (defined $record{'last_date'}
+        && (my $splits = $result->{'events'}->{'splits'})) {
+      while (my ($timet, $href) = each %$splits) {
+        my $split_date = $symbol_timezone->iso_date($timet);
+        if ($split_date eq $record{'last_date'}) {
+          __x('Split {ratio}', ratio => $href->{'splitRatio'})
+        }
+      }
+    }
+  }
   return $h;
 }
 
-sub mktime_in_zone {
-  my ($sec, $min, $hour, $mday, $mon, $year, $zone) = @_;
-  my $timet;
+# sub latest_download {
+#   my ($symbol_list) = @_;
+#   App::Chart::Download::status (__('Yahoo quotes'));
+# 
+#   # App::Chart::Download::verbose_message ("Yahoo crumb $crumb cookies\n"
+#   #                                        . $jar->as_string);
+# 
+#   my $crumb_errors = 0;
+#  SYMBOL: foreach my $symbol (@$symbol_list) {
+#     my $tdate = daily_available_tdate ($symbol);
+# 
+#     App::Chart::Download::status(__('Yahoo quote'), $symbol);
+# 
+#     my $lo_timet = tdate_to_unix($tdate - 4);
+#     my $hi_timet = tdate_to_unix($tdate + 2);
+# 
+#     my $data  = daily_cookie_data($symbol);
+#     if (! defined $data) {
+#       print "Yahoo $symbol does not exist\n";
+#       next SYMBOL;
+#     }
+#     my $crumb = URI::Escape::uri_escape($data->{'crumb'});
+#     my $jar = http_cookies_from_string($data->{'cookies'} // '');
+# 
+#     my $events = 'history';
+#     my $url = "http://query1.finance.yahoo.com/v7/finance/download/"
+#       . URI::Escape::uri_escape($symbol)
+#       . "?period1=$lo_timet&period2=$hi_timet&interval=1d&events=$events&crumb=$crumb";
+# 
+#     my $resp = App::Chart::Download->get ($url,
+#                                           allow_401 => 1,
+#                                           allow_404 => 1,
+#                                           cookie_jar => $jar,
+#                                          );
+#     if ($resp->code == 401) {
+#       if (++$crumb_errors >= 2) { die "Yahoo: crumb authorization failed"; }
+#       App::Chart::Database->write_extra ('', 'yahoo-daily-cookies', undef);
+#       redo SYMBOL;
+#     }
+#     if ($resp->code == 404) {
+#       print "Yahoo $symbol does not exist\n";
+#       next SYMBOL;
+#     }
+# 
+#     App::Chart::Download::write_latest_group
+#         (latest_parse($symbol,$resp,$tdate));
+#   }
+# }
+# 
+# sub latest_parse {
+#   my ($symbol, $resp, $tdate) = @_;
+# 
+#   my $h = { source      => __PACKAGE__,
+#             resp        => $resp,
+#             prefer_decimals => 2,
+#             date_format => 'ymd' };
+#   daily_parse($symbol,$resp,$h);
+# 
+#   my $data = $h->{'data'};
+#   @$data = sort {$a->{'date'} cmp $b->{'date'}} @$data;
+# 
+#   my $this = (@$data ? $data->[-1] : {});
+#   $this->{'symbol'} = $symbol;
+#   $this->{'last_date'} = delete $this->{'date'};
+#   my $last = $this->{'last'} = delete $this->{'close'};
+#   if (defined $last && @$data >= 2) {
+#     my $prev = $data->[-2]->{'close'};
+#     if (defined $prev) {
+#       $this->{'change'} = decimal_subtract($last, $prev);
+#     }
+#   }
+#   @$data = ($this);
+#   return $h;
+# }
 
-  { local $Tie::TZ::TZ = $zone->tz;
-    $timet = POSIX::mktime ($sec, $min, $hour,
-                            $mday, $mon, $year, 0,0,0);
-    my ($Xsec,$Xmin,$Xhour,$Xmday,$Xmon,$Xyear,$wday,$yday,$isdst)
-      = localtime ($timet);
-    return POSIX::mktime ($sec, $min, $hour,
-                          $mday, $mon, $year, $wday,$yday,$isdst);
-  }
+# Return the difference $x - $y, done as a "decimal" subtract, so retaining
+# as many decimal places there are on $x and $y.
+# It's done with some sprint %f fakery, not actual decimal arithmetic, but
+# that's close enough for 4 decimal place currencies.
+sub decimal_subtract {
+  my ($x, $y) = @_;
+  my $decimals = max (App::Chart::count_decimals($x),
+                      App::Chart::count_decimals($y));
+  return sprintf ('%.*f', $decimals, $x - $y);
 }
 
-# $date is dmy like 7/15/2007, in GMT
-# $time is h:mp like 10:05am, in $server_zone
+
+# use constant DEFAULT_DOWNLOAD_HOST => 'download.finance.yahoo.com';
+# 
+# App::Chart::LatestHandler->new
+#   (pred => $latest_pred,
+#    proc => \&latest_download,
+#    max_symbols => MAX_QUOTES);
+# 
+# sub latest_download {
+#   my ($symbol_list) = @_;
+# 
+#   App::Chart::Download::status
+#       (__x('Yahoo quotes {symbol_range}',
+#            symbol_range =>
+#            App::Chart::Download::symbol_range_string ($symbol_list)));
+# 
+#   my $host = App::Chart::Database->preference_get
+#     ('yahoo-quote-host', DEFAULT_DOWNLOAD_HOST);
+#   my $url = "http://$host/d/quotes.csv?f=snc4b3b2d1t1oml1c1vqdx&e=.csv&s="
+#     . join (',', map { URI::Escape::uri_escape($_) } @$symbol_list);
+# 
+#   my $resp = App::Chart::Download->get ($url);
+#   App::Chart::Download::write_latest_group (latest_parse ($resp));
+# }
 #
-# return ($date, $time) iso strings like ('2008-06-11', '10:55:00') in
-# $want_zone
-#
-sub quote_parse_datetime {
-  my ($date, $time, $server_zone, $want_zone) = @_;
-  if (DEBUG) { print "quote_parse_datetime $date, $time\n"; }
-  if ($date eq 'N/A' || $time eq 'N/A') { return (undef, undef); }
-
-  my ($sec,$min,$hour,$mday,$mon,$year)
-    = Date::Parse::strptime($date . ' ' . $time);
-  $sec //= 0; # undef if not present
-  if (DEBUG) { print "  parse $sec,$min,$hour,$mday,$mon,$year\n"; }
-
-  my $timet = mktime_in_zone ($sec, $min, $hour,
-                              $mday, $mon, $year, $server_zone);
-  if (DEBUG) {
-    print "  timet     Serv ",do { local $Tie::TZ::TZ = $server_zone->tz;
-                                   POSIX::ctime($timet) };
-    print "  timet     GMT  ",do { local $Tie::TZ::TZ = 'GMT';
-                                   POSIX::ctime($timet) };
-  }
-
-  my ($gmt_sec,$gmt_min,$gmt_hour,$gmt_mday,$gmt_mon,$gmt_year,$gmt_wday,$gmt_yday,$gmt_isdst) = gmtime ($timet);
-
-  if ($gmt_mday != $mday) {
-    if (DEBUG) { print "  mday $mday/$mon cf gmt_mday $gmt_mday/$gmt_mon, at $timet\n"; }
-    if (cmp_modulo ($gmt_mday, $mday, 31) < 0) {
-      $mday++;
-    } else {
-      $mday--;
-    }
-    $timet = mktime_in_zone ($sec, $min, $hour,
-                             $mday, $mon, $year, $server_zone);
-    if (DEBUG) { print "  switch to $mday        giving $timet = $timet\n"; }
-    if (DEBUG) {
-      print "  timet     GMT  ",do { local $Tie::TZ::TZ = 'GMT';
-                                     POSIX::ctime($timet) };
-      print "  timet     Targ ",do { local $Tie::TZ::TZ = $want_zone->tz;
-                                     POSIX::ctime($timet) };
-    }
-  }
-  return $want_zone->iso_date_time ($timet);
-}
-
-sub cmp_modulo {
-  my ($x, $y, $modulus) = @_;
-  my $half = int ($modulus / 2);
-  return (($x - $y + $half) % $modulus) <=> $half;
-}
-
-sub decode_hms {
-  my ($str) = @_;
-  my ($hour, $minute, $second) = split /:/, $str;
-  if (! defined $second) { $second = 0; }
-  return ($hour, $minute, $second);
-}
+# sub latest_parse {
+#   my ($resp) = @_;
+#   my $content = $resp->decoded_content (raise_error => 1);
+#   ### Yahoo quotes: $content
+# 
+#   my @data = ();
+#   my $h = { source => __PACKAGE__,
+#             resp   => $resp,
+#             prefer_decimals => 2,
+#             date_format => 'mdy',  # eg. '6/26/2015'
+#             data   => \@data };
+# 
+#   require Text::CSV_XS;
+#   my $csv = Text::CSV_XS->new;
+#   foreach my $line (App::Chart::Download::split_lines ($content)) {
+#     $csv->parse($line);
+#     ### csv fields: $csv->fields()
+#     my ($symbol, $name, $currency, $bid, $offer, $last_date, $last_time,
+#         $open, $range, $last, $change, $volume,
+#         $div_date, $div_amount, $exchange)
+#       = $csv->fields();
+#     if (! defined $symbol) {
+#       # blank line maybe
+#       print "Yahoo quotes blank line maybe:\n---\n$content\n---\n";
+#       next;
+#     }
+# 
+#     # for unknown stocks the name is a repeat of the symbol, which is pretty
+#     # useless
+#     if ($name eq $symbol) { $name = undef; }
+# 
+#     my ($low, $high) = split /-/, $range;
+#     my $quote_delay_minutes = symbol_quote_delay ($symbol);
+# 
+#     # have seen wildly garbage date for unknown symbols, like
+#     # GC.CMX","GC.CMX","MRA",N/A,N/A,"8/352/19019","4:58am",N/A,"N/A - N/A",0.00,N/A,N/A,"N/A",N/A,"N/A
+#     # depending what else in the same request ...
+#     #
+# 
+#     # In the past date/times were in New York timezone, for shares anywhere
+#     # in the world.  The Chart database is in the timezone of the exchange.
+#     # As of June 2015 believe Yahoo is now also the exchange timezone so no
+#     # transformation.
+#     #
+#     # my $symbol_timezone = App::Chart::TZ->for_symbol ($symbol);
+#     # ($last_date, $last_time)
+#     #   = quote_parse_datetime ($last_date, $last_time,
+#     #                           App::Chart::TZ->newyork,
+#     #                           $symbol_timezone);
+# 
+#     # dividend is "0.00" for various unknowns or estimates, eg. from ASX
+#     # trusts
+#     if (App::Chart::Download::str_is_zero ($div_amount)) {
+#       $div_amount = __('unknown');
+#     }
+# 
+#     # dividend shown only if it's today
+#     # don't show if no last_date, just in case have a div_date but no
+#     # last_date for some reason
+#     $div_date = quote_parse_div_date ($div_date);
+#     if (! ($div_date && $last_date && $div_date eq $last_date)) {
+#       $div_amount = undef;
+#     }
+# 
+#     push @data, { symbol      => $symbol,
+#                   name        => $name,
+#                   exchange    => $exchange,
+#                   currency    => $currency,
+# 
+#                   quote_delay_minutes => $quote_delay_minutes,
+#                   bid         => $bid,
+#                   offer       => $offer,
+# 
+#                   last_date   => $last_date,
+#                   last_time   => $last_time,
+#                   open        => $open,
+#                   high        => $high,
+#                   low         => $low,
+#                   last        => $last,
+#                   change      => $change,
+#                   volume      => $volume,
+#                   dividend    => $div_amount,
+#                 };
+#   }
+# 
+#   ### $h
+#   return $h;
+# }
+# 
+# sub mktime_in_zone {
+#   my ($sec, $min, $hour, $mday, $mon, $year, $zone) = @_;
+#   my $timet;
+# 
+#   { local $Tie::TZ::TZ = $zone->tz;
+#     $timet = POSIX::mktime ($sec, $min, $hour,
+#                             $mday, $mon, $year, 0,0,0);
+#     my ($Xsec,$Xmin,$Xhour,$Xmday,$Xmon,$Xyear,$wday,$yday,$isdst)
+#       = localtime ($timet);
+#     return POSIX::mktime ($sec, $min, $hour,
+#                           $mday, $mon, $year, $wday,$yday,$isdst);
+#   }
+# }
+# 
+# # $date is dmy like 7/15/2007, in GMT
+# # $time is h:mp like 10:05am, in $server_zone
+# #
+# # return ($date, $time) iso strings like ('2008-06-11', '10:55:00') in
+# # $want_zone
+# #
+# sub quote_parse_datetime {
+#   my ($date, $time, $server_zone, $want_zone) = @_;
+#   if (DEBUG) { print "quote_parse_datetime $date, $time\n"; }
+#   if ($date eq 'N/A' || $time eq 'N/A') { return (undef, undef); }
+# 
+#   my ($sec,$min,$hour,$mday,$mon,$year)
+#     = Date::Parse::strptime($date . ' ' . $time);
+#   $sec //= 0; # undef if not present
+#   if (DEBUG) { print "  parse $sec,$min,$hour,$mday,$mon,$year\n"; }
+# 
+#   my $timet = mktime_in_zone ($sec, $min, $hour,
+#                               $mday, $mon, $year, $server_zone);
+#   if (DEBUG) {
+#     print "  timet     Serv ",do { local $Tie::TZ::TZ = $server_zone->tz;
+#                                    POSIX::ctime($timet) };
+#     print "  timet     GMT  ",do { local $Tie::TZ::TZ = 'GMT';
+#                                    POSIX::ctime($timet) };
+#   }
+# 
+#   my ($gmt_sec,$gmt_min,$gmt_hour,$gmt_mday,$gmt_mon,$gmt_year,$gmt_wday,$gmt_yday,$gmt_isdst) = gmtime ($timet);
+# 
+#   if ($gmt_mday != $mday) {
+#     if (DEBUG) { print "  mday $mday/$mon cf gmt_mday $gmt_mday/$gmt_mon, at $timet\n"; }
+#     if (cmp_modulo ($gmt_mday, $mday, 31) < 0) {
+#       $mday++;
+#     } else {
+#       $mday--;
+#     }
+#     $timet = mktime_in_zone ($sec, $min, $hour,
+#                              $mday, $mon, $year, $server_zone);
+#     if (DEBUG) { print "  switch to $mday        giving $timet = $timet\n"; }
+#     if (DEBUG) {
+#       print "  timet     GMT  ",do { local $Tie::TZ::TZ = 'GMT';
+#                                      POSIX::ctime($timet) };
+#       print "  timet     Targ ",do { local $Tie::TZ::TZ = $want_zone->tz;
+#                                      POSIX::ctime($timet) };
+#     }
+#   }
+#   return $want_zone->iso_date_time ($timet);
+# }
+# 
+# sub cmp_modulo {
+#   my ($x, $y, $modulus) = @_;
+#   my $half = int ($modulus / 2);
+#   return (($x - $y + $half) % $modulus) <=> $half;
+# }
+# 
+# sub decode_hms {
+#   my ($str) = @_;
+#   my ($hour, $minute, $second) = split /:/, $str;
+#   if (! defined $second) { $second = 0; }
+#   return ($hour, $minute, $second);
+# }
 
 
 #-----------------------------------------------------------------------------
@@ -531,7 +726,7 @@ sub decode_hms {
 #     2017-09-07,30.299999,30.379999,30.000000,30.170000,30.170000,3451099
 #
 # The "9999s" are some dodgy rounding off to what should be usually at most
-# 3 decimal places.
+# 3 (maybe 4?) decimal places.
 #
 # Response is 404 if no such symbol, 401 unauthorized if no cookie or crumb.
 #
@@ -556,7 +751,7 @@ sub decode_hms {
 # mantissa.  log(14255000)/log(2) = 23.76 bits
 #
 # All prices look like they are split-adjusted, which is ok if that's what
-# you ant and are downloading a full data set, but bad for incremental since
+# you want and are downloading a full data set, but bad for incremental since
 # you don't know when a change is applied.
 #
 
@@ -603,7 +798,7 @@ sub daily_download {
 
     my $data  = daily_cookie_data($symbol);
     if (! defined $data) {
-      print "Yahoo $symbol does not exist";
+      print "Yahoo $symbol does not exist\n";
       next SYMBOL;
     }
     my $crumb = URI::Escape::uri_escape($data->{'crumb'});
@@ -632,7 +827,7 @@ sub daily_download {
         redo SYMBOL;
       }
       if ($resp->code == 404) {
-        print "Yahoo $symbol does not exist";
+        print "Yahoo $symbol does not exist\n";
         next SYMBOL;
       }
       $parse->($symbol,$resp,$h, $hi_tdate);
@@ -646,7 +841,8 @@ sub daily_parse {
   my ($symbol, $resp, $h, $hi_tdate) = @_;
   my @data = ();
   $h->{'data'} = \@data;
-  my $hi_tdate_iso = App::Chart::tdate_to_iso($hi_tdate);
+  my $hi_tdate_iso;
+  if (defined $hi_tdate){ $hi_tdate_iso = App::Chart::tdate_to_iso($hi_tdate); }
 
   my $body = $resp->decoded_content (raise_error => 1);
   my @line_list = App::Chart::Download::split_lines($body);
@@ -660,10 +856,11 @@ sub daily_parse {
     my ($date, $open, $high, $low, $close, $adj_volume, $volume)
       = split (/,/, $line);
 
-    $date = daily_date_to_iso ($date);
-    if ($date gt $hi_tdate_iso) {
+    $date = daily_date_fixup ($symbol, $date);
+    if (defined $hi_tdate_iso && $date gt $hi_tdate_iso) {
       # Sep 2017: There's a daily data record during the trading day, but
       # want to write the database only at the end of trading.
+      ### skip date after hi_tdate ...
       next;
     }
 
@@ -751,7 +948,7 @@ sub daily_parse_div {
     my ($date, $amount) = split (/,/, $line);
 
     push @dividends, { symbol  => $symbol,
-                       ex_date => daily_date_to_iso ($date),
+                       ex_date => daily_date_fixup ($symbol, $date),
                        amount  => $amount };
   }
   return $h;
@@ -779,7 +976,7 @@ sub daily_parse_split {
     my ($old, $new) = split m{/}, $ratio;
 
     push @splits, { symbol  => $symbol,
-                    date    => daily_date_to_iso ($date),
+                    date    => daily_date_fixup ($symbol, $date),
                     new     => $new,
                     old     => $old };
   }
@@ -791,22 +988,59 @@ sub daily_parse_split {
 sub crunch_trailing_nines {
   my ($str) = @_;
   if (defined $str) {
-    if ($str =~ /(.*)\.(...9+)$/) {
-      return decimal_add_low($str,1);
+    $str =~ s/(\....(99|00)).*/$1/;    # trailing garbage
+
+    if ($str =~ /(.*)\.(....9+)$/) {
+      $str = decimal_add_low($str,1);
+    } elsif ($str =~ /(.*)\.(....*01)$/) {
+      $str = decimal_add_low($str,-1);
     }
-    if ($str =~ /(.*)\.(....*01)$/) {
-      return decimal_add_low($str,-1);
+
+    if ($str =~ /(.*)\./) {
+      my $ilen = length($1);
+      my $decimals = ($ilen >= 4 ? 2
+                      : $ilen == 3 ? 3
+                      : 4);
+      $str = round_decimals($str,$decimals);
     }
+    $str = pad_decimals($str, 2);
   }
   return $str;
 }
 sub decimal_add_low {
   my ($str, $add) = @_;
+  ### decimal_add_low(): "$str  $add"
   $str =~ /(.*)\.(.+)$/ or return $str+$add;
   my $pre  = $1;
   my $post = $2;
+  ### $pre
+  ### $post
   $str = $pre * 10**length($post) + $post + $add;
+  if (length($post) >= length($str)) { $str = '0'.$str; }
   substr($str, -length($post),0, '.');
+  return $str;
+}
+sub round_decimals {
+  my ($str, $decimals) = @_;
+  if (defined $str && $str =~ /(.*\.[0-9]{$decimals})([0-9])/) {
+    $str = $1;
+    if ($2 >= 5) { $str = decimal_add_low($str, 1); }
+  } 
+  return $str;
+}
+sub pad_decimals {
+  my ($str, $decimals) = @_;
+  ### pad_decimals(): "$str  $decimals"
+  my $got;
+  if ($str =~ /\.(.*)/) {
+    $got = length($1);
+  } else {
+    $got = 0;
+    $str .= '.';
+  }
+  if ((my $add = $decimals - $got) > 0) {
+    $str .= '0' x $add;
+  }
   return $str;
 }
 
@@ -859,17 +1093,34 @@ sub daily_cookie_parse {
            cookies => $cookies_str };
 }
 
-# return tdate for a date STR from historical data
-#     "2005-03-07"   AGK.AX seen in jan07, maybe transient
-#     "20-Aug-02"    past format
+# $str is an ISO date string like 2017-11-05
+# It is date GMT of 9:30am in the timezone of $symbol.
+# Return the date in the symbol timezone.
 #
-sub daily_date_to_iso {
-  my ($str) = @_;
-  if ($str =~ /[A-Za-z]/) {
-    return App::Chart::Download::Decode_Date_EU_to_iso ($str); # dmy
-  } else {
-    return $str;
+sub daily_date_fixup {
+  my ($symbol, $str) = @_;
+  ### daily_date_fixup: "$symbol  $str"
+  my ($year, $month, $day) = App::Chart::iso_to_ymd ($str);
+
+  my $timezone = App::Chart::TZ->for_symbol($symbol);
+  if (timezone_gmtoffset_at_ymd($timezone, $year, $month, $day+1)
+      <= - (10*60+20)*60) {
+    my $adate = App::Chart::ymd_to_adate ($year, $month, $day);
+    $str = App::Chart::adate_to_iso ($adate+1);
+    my $today = $timezone->iso_date();
+    if ($str gt $today) {
+      $str = $today;
+    }
   }
+  return $str;
+}
+
+sub timezone_gmtoffset_at_ymd {
+  my ($timezone, $year, $month, $day) = @_;
+  my $timet = $timezone->call(\&POSIX::mktime,
+                              0, 0, 0, $day, $month-1, $year-1900);
+  my ($sec,$min,$hour,$gmt_day) = gmtime($timet);
+  return $sec + 60*$min + 3600*$hour + 86400*($gmt_day - $day);
 }
 
 # Return seconds since 00:00:00, 1 Jan 1970 GMT.
@@ -901,68 +1152,68 @@ sub http_cookies_from_string {
 #
 # Eg. http://download.finance.yahoo.com/d?f=snxc4qr1d&s=TLS.AX
 
-App::Chart::DownloadHandler->new
-  (name         => __('Yahoo info'),
-   key          => 'Yahoo-info',
-   pred         => $download_pred,
-   proc         => \&info_download,
-   recheck_days => 7,
-   max_symbols  => MAX_QUOTES);
-
-sub info_download {
-  my ($symbol_list) = @_;
-
-  App::Chart::Download::status
-      (__x('Yahoo info {symbolrange}',
-           symbolrange =>
-           App::Chart::Download::symbol_range_string ($symbol_list)));
-
-  my $url = 'http://download.finance.yahoo.com/d?f=snxc4qr1d&s='
-    . join (',', map { URI::Escape::uri_escape($_) } @$symbol_list);
-  my $resp = App::Chart::Download->get ($url);
-  my $h = info_parse($resp);
-  $h->{'recheck_list'} = $symbol_list;
-  App::Chart::Download::write_daily_group ($h);
-}
-
-sub info_parse {
-  my ($resp) = @_;
-
-  my $content = $resp->decoded_content (raise_error => 1);
-  if (DEBUG >= 2) { print "Yahoo info:\n$content\n"; }
-
-  my @info;
-  my @dividends;
-  my $h = { source    => __PACKAGE__,
-            info      => \@info,
-            dividends => \@dividends };
-
-  require Text::CSV_XS;
-  my $csv = Text::CSV_XS->new;
-
-  foreach my $line (App::Chart::Download::split_lines ($content)) {
-    $csv->parse($line);
-    my ($symbol, $name, $exchange, $currency, $ex_date, $pay_date, $amount)
-      = $csv->fields();
-
-    $ex_date  = quote_parse_div_date ($ex_date);
-    $pay_date = quote_parse_div_date ($pay_date);
-
-    push @info, { symbol => $symbol,
-                  name   => $name,
-                  currency => $currency,
-                  exchange => $exchange };
-    # circa 2015 the "d" dividend amount field is "N/A" when after the
-    # dividend payment (with "r1" pay date "N/A" too)
-    if ($ex_date && $amount ne 'N/A' && $amount != 0) {
-      push @dividends, { symbol   => $symbol,
-                         ex_date  => $ex_date,
-                         pay_date => $pay_date,
-                         amount   => $amount };
-    }
-  }
-  return $h;
-}
+# App::Chart::DownloadHandler->new
+#   (name         => __('Yahoo info'),
+#    key          => 'Yahoo-info',
+#    pred         => $download_pred,
+#    proc         => \&info_download,
+#    recheck_days => 7,
+#    max_symbols  => MAX_QUOTES);
+# 
+# sub info_download {
+#   my ($symbol_list) = @_;
+# 
+#   App::Chart::Download::status
+#       (__x('Yahoo info {symbolrange}',
+#            symbolrange =>
+#            App::Chart::Download::symbol_range_string ($symbol_list)));
+# 
+#   my $url = 'http://download.finance.yahoo.com/d?f=snxc4qr1d&s='
+#     . join (',', map { URI::Escape::uri_escape($_) } @$symbol_list);
+#   my $resp = App::Chart::Download->get ($url);
+#   my $h = info_parse($resp);
+#   $h->{'recheck_list'} = $symbol_list;
+#   App::Chart::Download::write_daily_group ($h);
+# }
+# 
+# sub info_parse {
+#   my ($resp) = @_;
+# 
+#   my $content = $resp->decoded_content (raise_error => 1);
+#   if (DEBUG >= 2) { print "Yahoo info:\n$content\n"; }
+# 
+#   my @info;
+#   my @dividends;
+#   my $h = { source    => __PACKAGE__,
+#             info      => \@info,
+#             dividends => \@dividends };
+# 
+#   require Text::CSV_XS;
+#   my $csv = Text::CSV_XS->new;
+# 
+#   foreach my $line (App::Chart::Download::split_lines ($content)) {
+#     $csv->parse($line);
+#     my ($symbol, $name, $exchange, $currency, $ex_date, $pay_date, $amount)
+#       = $csv->fields();
+# 
+#     $ex_date  = quote_parse_div_date ($ex_date);
+#     $pay_date = quote_parse_div_date ($pay_date);
+# 
+#     push @info, { symbol => $symbol,
+#                   name   => $name,
+#                   currency => $currency,
+#                   exchange => $exchange };
+#     # circa 2015 the "d" dividend amount field is "N/A" when after the
+#     # dividend payment (with "r1" pay date "N/A" too)
+#     if ($ex_date && $amount ne 'N/A' && $amount != 0) {
+#       push @dividends, { symbol   => $symbol,
+#                          ex_date  => $ex_date,
+#                          pay_date => $pay_date,
+#                          amount   => $amount };
+#     }
+#   }
+#   return $h;
+# }
 
 
 #------------------------------------------------------------------------------

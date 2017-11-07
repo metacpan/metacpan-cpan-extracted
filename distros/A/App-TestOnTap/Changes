@@ -1,5 +1,30 @@
 Revision history for App-TestOnTap
 
+0.044	2017-11-06
+
+	Clean up warn message
+
+0.043	2017-11-06
+
+	Failure in automated smoke tests
+	
+	But without verbosity, hard to figure out - simplified
+
+0.042	2017-11-05
+
+	Changes to how config works
+	
+	Revamp config handling to be required to exist, but allowed to be empty and defaults will kick in
+	Add execmap support for AutoIt
+	Make sure preproc/postproc output is put in saved results
+	Attempt to hide _Args pod
+	
+
+0.041	2017-11-02
+
+	Missing dependencies (PAR; PAR::Packer)
+	
+
 0.040	2017-11-02
 
 	Broken MANIFEST causing missing file!

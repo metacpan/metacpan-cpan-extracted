@@ -5,7 +5,7 @@ package HTTP::AnyUA::Backend::Furl;
 use warnings;
 use strict;
 
-our $VERSION = '0.900'; # VERSION
+our $VERSION = '0.901'; # VERSION
 
 use parent 'HTTP::AnyUA::Backend';
 
@@ -66,7 +66,7 @@ HTTP::AnyUA::Backend::Furl - A unified programming interface for Furl
 
 =head1 VERSION
 
-version 0.900
+version 0.901
 
 =head1 DESCRIPTION
 
@@ -79,10 +79,7 @@ interface provided by L<HTTP::AnyUA>.
 
 =item *
 
-L<Furl> doesn't keep a list of requests and responses along a redirect chain. As such, the C<url>
-
-field in the response is always the same as the URL of the original request, and the C<redirects>
-field is never used.
+L<Furl> doesn't keep a list of requests and responses along a redirect chain. As such, the C<url> field in the response is always the same as the URL of the original request, and the C<redirects> field is never used.
 
 =back
 

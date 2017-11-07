@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 #use Test::More "no_plan";
- use Test::More tests => 51;
+ use Test::More tests => 52;
 
 BEGIN {
     use_ok "Text::CSV_XS", ("csv");
@@ -80,6 +80,13 @@ is_deeply (csv (in => $tfn, headers => sub { lcfirst uc $_[0] }),
 	    [ { fOO => 1, bAR => 2,     bAZ => 3 },
 	      { fOO => 2, bAR => "a b", bAZ => "" }],
 	    "AOH with mangled headers");
+
+SKIP: {
+    $] < 5.008001 and skip "No BOM support in $]", 1;
+    is_deeply (csv (in => $tfn, munge => { bar => "boo" }),
+	[{ baz =>  3, boo => 2,     foo => 1 },
+	 { baz => "", boo => "a b", foo => 2 }], "Munge with hash");
+    }
 
 open  FH, ">>", $tfn or die "$tfn: $!";
 print FH <<"EOD";
@@ -175,8 +182,6 @@ SKIP: {
     is_deeply ($hr->{8}, {qw( bar 13 baz 18 foo 8 quz B ziq 2 )},
 	"on_in with key works");
     }
-
-#is_deeply (csv (in => $tfn, 
 
 open  FH, ">", $tfn or die "$tfn: $!";
 print FH <<"EOD";

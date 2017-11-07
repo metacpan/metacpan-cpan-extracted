@@ -17,41 +17,9 @@ SYNOPSIS
 
 DESCRIPTION
 
-    Mojo::Log is a simple logger class. It holds a filehandle once it
-    writes to a log, and changing "path" does not open a new filehandle for
-    logging. Mojo::Log::Clearable subclasses Mojo::Log to provide a
-    "clear_handle" method and to automatically call it when setting "path"
-    so the logging handle is reopened at the new path. The "clear_handle"
-    method can also be used to reopen the logging handle after logrotate.
-
-EVENTS
-
-    Mojo::Log::Clearable inherits all events from Mojo::Log.
-
-ATTRIBUTES
-
-    Mojo::Log::Clearable inherits all attributes from Mojo::Log and
-    implements the following new ones.
-
- path
-
-     my $path = $log->path;
-     $log     = $log->path('/var/log/mojo.log');
-
-    Log file path used by "handle" in Mojo::Log. Reopens the handle when
-    set.
-
-METHODS
-
-    Mojo::Log::Clearable inherits all methods from Mojo::Log and implements
-    the following new ones.
-
- clear_handle
-
-     $log->clear_handle;
-
-    Clears "handle" in Mojo::Log attribute, it will be reopened from the
-    "path" attribute when next accessed.
+    Mojo::Log::Clearable is a subclass of Mojo::Log that applies the
+    Mojo::Log::Role::Clearable role. See that role's documentation for
+    details.
 
 AUTHOR
 
@@ -66,5 +34,5 @@ COPYRIGHT AND LICENSE
 
 SEE ALSO
 
-    Mojo::Log
+    Mojo::Log, Mojo::Log::Role::Clearable
 

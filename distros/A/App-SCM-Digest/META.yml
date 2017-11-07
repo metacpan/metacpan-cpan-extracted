@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,6 +21,7 @@ requires:
   DateTime: '0'
   DateTime::Format::Strptime: '0'
   Email::MIME: '0'
+  File::Path: '0'
   File::ReadBackwards: '0'
   File::Temp: '0'
   Getopt::Long: '0'
@@ -33,5 +34,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/tomhrr/p5-App-SCM-Digest
-version: '0.11'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+version: '0.13'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

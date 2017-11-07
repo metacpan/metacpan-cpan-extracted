@@ -10,10 +10,10 @@
 #
 use strict;
 use warnings;
-require 'gen-head'; # for testcount() and testhead()
+require './gen-head'; # for testcount() and testhead()
 
 use Unicode::Normalize;
-require 'dumpstr'; # for string() and unidump()
+require './dumpstr'; # for string() and unidump()
 
 my $textf = 'ja.txt';
 my $text0 = "#katakana\n";

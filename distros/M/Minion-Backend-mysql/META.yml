@@ -10,10 +10,11 @@ build_requires:
   IPC::Open3: '0'
   Test::More: '0'
   Test::mysqld: '0'
+  Time::HiRes: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,20 +31,22 @@ no_index:
 provides:
   Minion::Backend::mysql:
     file: lib/Minion/Backend/mysql.pm
-    version: '0.08'
+    version: '0.10'
 requires:
   Minion: '7'
   Mojo::mysql: '1.04'
   Mojolicious: '0'
+  perl: '5.010'
 resources:
   IRC: irc://irc.perl.org/#mojo
   bugtracker: https://github.com/preaction/Minion-Backend-mysql/issues
   homepage: https://github.com/preaction/Minion-Backend-mysql
   repository: https://github.com/preaction/Minion-Backend-mysql.git
-version: '0.08'
+version: '0.10'
 x_authority: cpan:PREACTION
 x_contributors:
   - 'Alexander Nalobin <nalobin@reg.ru>'
   - 'Olaf Alders <olaf@wundersolutions.com>'
+  - 'Paul Cochrane <paul@liekut.de>'
   - 'Zoffix Znet <cpan@zoffix.com>'
 x_serialization_backend: 'YAML::Tiny version 1.69'

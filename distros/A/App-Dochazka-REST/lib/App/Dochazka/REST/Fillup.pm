@@ -819,7 +819,7 @@ sub commit {
         );
     }
     $code = 'DISPATCH_NO_SCHEDULED_INTERVALS_' . ( $self->dry_run ? 'IDENTIFIED' : 'CREATED' );
-    return $CELL->status_ok( 'DISPATCH_NO_SCHEDULED_INTERVALS_CREATED', count => 0 );
+    return $CELL->status_ok( $code, count => 0 );
 }
 
 sub _gen_int {

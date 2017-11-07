@@ -1,12 +1,12 @@
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::CheckBreaks 0.017
+# this test was generated with Dist::Zilla::Plugin::Test::CheckBreaks 0.019
 
-use Test::More tests => 1;
+use Test::More tests => 2;
 
 SKIP: {
-    eval 'require DateTime::Locale::Conflicts; DateTime::Locale::Conflicts->check_conflicts';
+    eval { +require DateTime::Locale::Conflicts; DateTime::Locale::Conflicts->check_conflicts };
     skip('no DateTime::Locale::Conflicts module found', 1) if not $INC{'DateTime/Locale/Conflicts.pm'};
 
     diag $@ if $@;
@@ -32,3 +32,5 @@ if (my @breaks = grep { defined $result->{$_} } keys %$result)
     diag "$result->{$_}" for sort @breaks;
     diag "\n", 'You should now update these modules!';
 }
+
+pass 'checked x_breaks data';

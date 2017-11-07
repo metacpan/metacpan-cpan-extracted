@@ -7,7 +7,7 @@ use Path::Tiny qw( path );
 use Config;
 
 # ABSTRACT: Private utility functions for Alien::Build
-our $VERSION = '1.28'; # VERSION
+our $VERSION = '1.32'; # VERSION
 
 
 our @EXPORT_OK = qw( _mirror _dump _destdir_prefix _perl_config );
@@ -128,7 +128,7 @@ Alien::Build::Util - Private utility functions for Alien::Build
 
 =head1 VERSION
 
-version 1.28
+version 1.32
 
 =head1 DESCRIPTION
 

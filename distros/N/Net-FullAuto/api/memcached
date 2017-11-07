@@ -13,7 +13,7 @@
 . /etc/init.d/functions
 
 PORT=11211
-USER=ec2-user
+USER=@USER@
 MAXCONN=1024
 CACHESIZE=128
 OPTIONS=""

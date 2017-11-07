@@ -275,21 +275,21 @@ French Canada locale.
 
 =head3 Full
 
-   2008-02-05T18:30:30 = 18:30:30 UTC
-   1995-12-22T09:05:02 = 09:05:02 UTC
-  -0010-09-15T04:44:23 = 04:44:23 UTC
+   2008-02-05T18:30:30 = 18 h 30 min 30 s UTC
+   1995-12-22T09:05:02 = 09 h 05 min 02 s UTC
+  -0010-09-15T04:44:23 = 04 h 44 min 23 s UTC
 
 =head3 Long
 
-   2008-02-05T18:30:30 = 18:30:30 UTC
-   1995-12-22T09:05:02 = 09:05:02 UTC
-  -0010-09-15T04:44:23 = 04:44:23 UTC
+   2008-02-05T18:30:30 = 18 h 30 min 30 s UTC
+   1995-12-22T09:05:02 = 09 h 05 min 02 s UTC
+  -0010-09-15T04:44:23 = 04 h 44 min 23 s UTC
 
 =head3 Medium
 
-   2008-02-05T18:30:30 = 18:30:30
-   1995-12-22T09:05:02 = 09:05:02
-  -0010-09-15T04:44:23 = 04:44:23
+   2008-02-05T18:30:30 = 18 h 30 min 30 s
+   1995-12-22T09:05:02 = 09 h 05 min 02 s
+  -0010-09-15T04:44:23 = 04 h 44 min 23 s
 
 =head3 Short
 
@@ -302,21 +302,21 @@ French Canada locale.
 
 =head3 Full
 
-   2008-02-05T18:30:30 = mardi 5 février 2008 à 18:30:30 UTC
-   1995-12-22T09:05:02 = vendredi 22 décembre 1995 à 09:05:02 UTC
-  -0010-09-15T04:44:23 = samedi 15 septembre -10 à 04:44:23 UTC
+   2008-02-05T18:30:30 = mardi 5 février 2008 à 18 h 30 min 30 s UTC
+   1995-12-22T09:05:02 = vendredi 22 décembre 1995 à 09 h 05 min 02 s UTC
+  -0010-09-15T04:44:23 = samedi 15 septembre -10 à 04 h 44 min 23 s UTC
 
 =head3 Long
 
-   2008-02-05T18:30:30 = 5 février 2008 à 18:30:30 UTC
-   1995-12-22T09:05:02 = 22 décembre 1995 à 09:05:02 UTC
-  -0010-09-15T04:44:23 = 15 septembre -10 à 04:44:23 UTC
+   2008-02-05T18:30:30 = 5 février 2008 à 18 h 30 min 30 s UTC
+   1995-12-22T09:05:02 = 22 décembre 1995 à 09 h 05 min 02 s UTC
+  -0010-09-15T04:44:23 = 15 septembre -10 à 04 h 44 min 23 s UTC
 
 =head3 Medium
 
-   2008-02-05T18:30:30 = 5 févr. 2008 18:30:30
-   1995-12-22T09:05:02 = 22 déc. 1995 09:05:02
-  -0010-09-15T04:44:23 = 15 sept. -10 04:44:23
+   2008-02-05T18:30:30 = 5 févr. 2008 18 h 30 min 30 s
+   1995-12-22T09:05:02 = 22 déc. 1995 09 h 05 min 02 s
+  -0010-09-15T04:44:23 = 15 sept. -10 04 h 44 min 23 s
 
 =head3 Short
 
@@ -327,11 +327,41 @@ French Canada locale.
 
 =head2 Available Formats
 
+=head3 Bh (h 'h' B)
+
+   2008-02-05T18:30:30 = 6 h B
+   1995-12-22T09:05:02 = 9 h B
+  -0010-09-15T04:44:23 = 4 h B
+
+=head3 Bhm (h 'h' mm B)
+
+   2008-02-05T18:30:30 = 6 h 30 B
+   1995-12-22T09:05:02 = 9 h 05 B
+  -0010-09-15T04:44:23 = 4 h 44 B
+
+=head3 Bhms (h 'h' mm 'min' ss 's' B)
+
+   2008-02-05T18:30:30 = 6 h 30 min 30 s B
+   1995-12-22T09:05:02 = 9 h 05 min 02 s B
+  -0010-09-15T04:44:23 = 4 h 44 min 23 s B
+
 =head3 E (E)
 
    2008-02-05T18:30:30 = mar.
    1995-12-22T09:05:02 = ven.
   -0010-09-15T04:44:23 = sam.
+
+=head3 EBhm (E h 'h' mm B)
+
+   2008-02-05T18:30:30 = mar. 6 h 30 B
+   1995-12-22T09:05:02 = ven. 9 h 05 B
+  -0010-09-15T04:44:23 = sam. 4 h 44 B
+
+=head3 EBhms (E h 'h' mm 'min' ss 's' B)
+
+   2008-02-05T18:30:30 = mar. 6 h 30 min 30 s B
+   1995-12-22T09:05:02 = ven. 9 h 05 min 02 s B
+  -0010-09-15T04:44:23 = sam. 4 h 44 min 23 s B
 
 =head3 EHm (E HH 'h' mm)
 
@@ -339,11 +369,11 @@ French Canada locale.
    1995-12-22T09:05:02 = ven. 09 h 05
   -0010-09-15T04:44:23 = sam. 04 h 44
 
-=head3 EHms (E HH:mm:ss)
+=head3 EHms (E HH 'h' mm 'min' ss 's')
 
-   2008-02-05T18:30:30 = mar. 18:30:30
-   1995-12-22T09:05:02 = ven. 09:05:02
-  -0010-09-15T04:44:23 = sam. 04:44:23
+   2008-02-05T18:30:30 = mar. 18 h 30 min 30 s
+   1995-12-22T09:05:02 = ven. 09 h 05 min 02 s
+  -0010-09-15T04:44:23 = sam. 04 h 44 min 23 s
 
 =head3 Ed (E d)
 
@@ -351,17 +381,17 @@ French Canada locale.
    1995-12-22T09:05:02 = ven. 22
   -0010-09-15T04:44:23 = sam. 15
 
-=head3 Ehm (E h:mm a)
+=head3 Ehm (E h 'h' mm a)
 
-   2008-02-05T18:30:30 = mar. 6:30 p.m.
-   1995-12-22T09:05:02 = ven. 9:05 a.m.
-  -0010-09-15T04:44:23 = sam. 4:44 a.m.
+   2008-02-05T18:30:30 = mar. 6 h 30 p.m.
+   1995-12-22T09:05:02 = ven. 9 h 05 a.m.
+  -0010-09-15T04:44:23 = sam. 4 h 44 a.m.
 
-=head3 Ehms (E h:mm:ss a)
+=head3 Ehms (E h 'h' mm 'min' ss 's' a)
 
-   2008-02-05T18:30:30 = mar. 6:30:30 p.m.
-   1995-12-22T09:05:02 = ven. 9:05:02 a.m.
-  -0010-09-15T04:44:23 = sam. 4:44:23 a.m.
+   2008-02-05T18:30:30 = mar. 6 h 30 min 30 s p.m.
+   1995-12-22T09:05:02 = ven. 9 h 05 min 02 s a.m.
+  -0010-09-15T04:44:23 = sam. 4 h 44 min 23 s a.m.
 
 =head3 Gy (y G)
 
@@ -399,17 +429,17 @@ French Canada locale.
    1995-12-22T09:05:02 = 09 h 05
   -0010-09-15T04:44:23 = 04 h 44
 
-=head3 Hms (HH:mm:ss)
+=head3 Hms (HH 'h' mm 'min' ss 's')
 
-   2008-02-05T18:30:30 = 18:30:30
-   1995-12-22T09:05:02 = 09:05:02
-  -0010-09-15T04:44:23 = 04:44:23
+   2008-02-05T18:30:30 = 18 h 30 min 30 s
+   1995-12-22T09:05:02 = 09 h 05 min 02 s
+  -0010-09-15T04:44:23 = 04 h 44 min 23 s
 
-=head3 Hmsv (HH:mm:ss v)
+=head3 Hmsv (HH 'h' mm 'min' ss 's' v)
 
-   2008-02-05T18:30:30 = 18:30:30 UTC
-   1995-12-22T09:05:02 = 09:05:02 UTC
-  -0010-09-15T04:44:23 = 04:44:23 UTC
+   2008-02-05T18:30:30 = 18 h 30 min 30 s UTC
+   1995-12-22T09:05:02 = 09 h 05 min 02 s UTC
+  -0010-09-15T04:44:23 = 04 h 44 min 23 s UTC
 
 =head3 Hmv (HH 'h' mm v)
 
@@ -441,17 +471,17 @@ French Canada locale.
    1995-12-22T09:05:02 = ven. 22 déc.
   -0010-09-15T04:44:23 = sam. 15 sept.
 
-=head3 MMMMW-count-one ('semaine' W 'de' MMM)
+=head3 MMMMW-count-one ('semaine' W (MMMM))
 
-   2008-02-05T18:30:30 = semaine 1 de févr.
-   1995-12-22T09:05:02 = semaine 3 de déc.
-  -0010-09-15T04:44:23 = semaine 2 de sept.
+   2008-02-05T18:30:30 = semaine 1 (février)
+   1995-12-22T09:05:02 = semaine 3 (décembre)
+  -0010-09-15T04:44:23 = semaine 2 (septembre)
 
-=head3 MMMMW-count-other ('semaine' W 'de' MMM)
+=head3 MMMMW-count-other ('semaine' W (MMMM))
 
-   2008-02-05T18:30:30 = semaine 1 de févr.
-   1995-12-22T09:05:02 = semaine 3 de déc.
-  -0010-09-15T04:44:23 = semaine 2 de sept.
+   2008-02-05T18:30:30 = semaine 1 (février)
+   1995-12-22T09:05:02 = semaine 3 (décembre)
+  -0010-09-15T04:44:23 = semaine 2 (septembre)
 
 =head3 MMMMd (d MMMM)
 
@@ -489,41 +519,41 @@ French Canada locale.
    1995-12-22T09:05:02 = 22
   -0010-09-15T04:44:23 = 15
 
-=head3 h (h a)
+=head3 h (h 'h' a)
 
-   2008-02-05T18:30:30 = 6 p.m.
-   1995-12-22T09:05:02 = 9 a.m.
-  -0010-09-15T04:44:23 = 4 a.m.
+   2008-02-05T18:30:30 = 6 h p.m.
+   1995-12-22T09:05:02 = 9 h a.m.
+  -0010-09-15T04:44:23 = 4 h a.m.
 
-=head3 hm (h:mm a)
+=head3 hm (h 'h' mm a)
 
-   2008-02-05T18:30:30 = 6:30 p.m.
-   1995-12-22T09:05:02 = 9:05 a.m.
-  -0010-09-15T04:44:23 = 4:44 a.m.
+   2008-02-05T18:30:30 = 6 h 30 p.m.
+   1995-12-22T09:05:02 = 9 h 05 a.m.
+  -0010-09-15T04:44:23 = 4 h 44 a.m.
 
-=head3 hms (h:mm:ss a)
+=head3 hms (h 'h' mm 'min' ss 's' a)
 
-   2008-02-05T18:30:30 = 6:30:30 p.m.
-   1995-12-22T09:05:02 = 9:05:02 a.m.
-  -0010-09-15T04:44:23 = 4:44:23 a.m.
+   2008-02-05T18:30:30 = 6 h 30 min 30 s p.m.
+   1995-12-22T09:05:02 = 9 h 05 min 02 s a.m.
+  -0010-09-15T04:44:23 = 4 h 44 min 23 s a.m.
 
-=head3 hmsv (h:mm:ss a v)
+=head3 hmsv (h 'h' mm 'min' ss 's' a v)
 
-   2008-02-05T18:30:30 = 6:30:30 p.m. UTC
-   1995-12-22T09:05:02 = 9:05:02 a.m. UTC
-  -0010-09-15T04:44:23 = 4:44:23 a.m. UTC
+   2008-02-05T18:30:30 = 6 h 30 min 30 s p.m. UTC
+   1995-12-22T09:05:02 = 9 h 05 min 02 s a.m. UTC
+  -0010-09-15T04:44:23 = 4 h 44 min 23 s a.m. UTC
 
-=head3 hmv (h:mm a v)
+=head3 hmv (h 'h' mm a v)
 
-   2008-02-05T18:30:30 = 6:30 p.m. UTC
-   1995-12-22T09:05:02 = 9:05 a.m. UTC
-  -0010-09-15T04:44:23 = 4:44 a.m. UTC
+   2008-02-05T18:30:30 = 6 h 30 p.m. UTC
+   1995-12-22T09:05:02 = 9 h 05 a.m. UTC
+  -0010-09-15T04:44:23 = 4 h 44 a.m. UTC
 
-=head3 ms (mm:ss)
+=head3 ms (mm 'min' ss 's')
 
-   2008-02-05T18:30:30 = 30:30
-   1995-12-22T09:05:02 = 05:02
-  -0010-09-15T04:44:23 = 44:23
+   2008-02-05T18:30:30 = 30 min 30 s
+   1995-12-22T09:05:02 = 05 min 02 s
+  -0010-09-15T04:44:23 = 44 min 23 s
 
 =head3 y (y)
 
@@ -591,13 +621,13 @@ French Canada locale.
    1995-12-22T09:05:02 = 4e trimestre 1995
   -0010-09-15T04:44:23 = 3e trimestre -10
 
-=head3 yw-count-one ('semaine' w 'de' y)
+=head3 yw-count-one ('semaine' w 'de' Y)
 
    2008-02-05T18:30:30 = semaine 6 de 2008
    1995-12-22T09:05:02 = semaine 51 de 1995
   -0010-09-15T04:44:23 = semaine 37 de -10
 
-=head3 yw-count-other ('semaine' w 'de' y)
+=head3 yw-count-other ('semaine' w 'de' Y)
 
    2008-02-05T18:30:30 = semaine 6 de 2008
    1995-12-22T09:05:02 = semaine 51 de 1995

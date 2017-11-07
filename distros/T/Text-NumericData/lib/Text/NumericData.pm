@@ -6,7 +6,7 @@ use Storable qw(dclone);
 
 # major.minor.bugfix, the latter two with 3 digits each
 # It's not pretty, but I gave up on 1.2.3 style.
-our $VERSION = '2.003002';
+our $VERSION = '2.003003';
 our $version = $VERSION;
 $VERSION = eval $VERSION;
 

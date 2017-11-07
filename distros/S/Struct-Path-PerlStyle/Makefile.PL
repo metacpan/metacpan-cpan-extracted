@@ -1,4 +1,4 @@
-use 5.006;
+use 5.010;
 use strict;
 use warnings FATAL => 'all';
 use ExtUtils::MakeMaker;
@@ -10,12 +10,13 @@ WriteMakefile(
     ABSTRACT_FROM    => 'lib/Struct/Path/PerlStyle.pm',
     LICENSE          => 'Perl_5',
     PL_FILES         => {},
-    MIN_PERL_VERSION => 5.008,
+    MIN_PERL_VERSION => 5.010,
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => 0,
     },
     BUILD_REQUIRES => {
-        'Storable'     => 0,
+        'Clone'        => 0,
+        'Storable'     => 0, # rm ?
         'Test::More'   => 0,
     },
     META_MERGE => {
@@ -26,8 +27,10 @@ WriteMakefile(
     PREREQ_PM => {
         'Carp'         => 0,
         'PPI'          => 0,
+        'Safe'         => 0,
         'Scalar::Util' => 0,
         'parent'       => 0,
+        're'           => 0.08, # it seems eralier versions has no is_regexp() and regexp_pattern()
         'strict'       => 0,
         'warnings'     => 0
     },

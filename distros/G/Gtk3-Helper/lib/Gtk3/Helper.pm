@@ -4,7 +4,7 @@
 
 package Gtk3::Helper;
 
-our $VERSION = '0.02';
+our $VERSION = '0.06';
 
 use Carp;
 use strict;

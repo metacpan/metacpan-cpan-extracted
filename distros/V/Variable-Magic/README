@@ -2,7 +2,7 @@ NAME
     Variable::Magic - Associate user-defined magic to variables from Perl.
 
 VERSION
-    Version 0.61
+    Version 0.62
 
 SYNOPSIS
         use Variable::Magic qw<wizard cast VMG_OP_INFO_NAME>;

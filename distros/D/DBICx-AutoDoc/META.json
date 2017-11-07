@@ -1,0 +1,70 @@
+{
+   "abstract" : "Generate automatic documentation of DBIx::Class::Schema objects",
+   "author" : [
+      "Jason Kohles <email@jasonkohles.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "DBICx-AutoDoc",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "examples",
+         "templates",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.42",
+            "File::ShareDir::Install" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::Accessor::Grouped" : "0",
+            "DBIx::Class" : "0",
+            "Data::Dump" : "0",
+            "File::ShareDir" : "1.00",
+            "File::Temp" : "0",
+            "FindBin" : "0",
+            "Getopt::Long" : "0",
+            "Pod::Usage" : "0",
+            "Template" : "0",
+            "Tie::IxHash" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/ilmari/dbicx-autodoc"
+      }
+   },
+   "version" : "0.09",
+   "x_serialization_backend" : "JSON::PP version 2.94"
+}

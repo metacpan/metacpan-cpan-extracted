@@ -4,7 +4,7 @@ package Test::Class::Moose::Report::Time;
 
 use 5.10.0;
 
-our $VERSION = '0.87';
+our $VERSION = '0.88';
 
 use Moose;
 use Benchmark qw(timestr :hireswallclock);
@@ -57,7 +57,7 @@ Test::Class::Moose::Report::Time - Reporting object for timing
 
 =head1 VERSION
 
-version 0.87
+version 0.88
 
 =head1 DESCRIPTION
 

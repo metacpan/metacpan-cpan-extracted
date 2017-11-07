@@ -9,6 +9,8 @@ my @defcon = ("--config=testdata/default.conf");
 
 my $app = Text::NumericData::App::txdmean->new();
 
+# The result should be exact. It is a sum of integers yielding
+# 4, then being divided by 4.
 ok( txdtest([@defcon, '--lineend=UNIX', 2], 'test1.dat', 'test-txdmean1.dat'), 'factor 2');
 
 sub txdtest

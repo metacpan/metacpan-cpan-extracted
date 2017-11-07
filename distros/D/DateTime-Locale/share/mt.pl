@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "AM",
-    "PM"
+    "PM",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d, E",
@@ -44,7 +49,7 @@
     yMd => "y-MM-dd",
     yQQQ => "QQQ - y",
     yQQQQ => "QQQQ - y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "mt",
   date_format_full => "EEEE, d 'ta'\N{U+2019} MMMM y",
@@ -62,7 +67,7 @@
     "\N{U+0126}am",
     "\N{U+0120}im",
     "Sib",
-    "\N{U+0126}ad"
+    "\N{U+0126}ad",
   ],
   day_format_narrow => [
     "T",
@@ -71,7 +76,7 @@
     "\N{U+0126}m",
     "\N{U+0120}m",
     "Sb",
-    "\N{U+0126}d"
+    "\N{U+0126}d",
   ],
   day_format_wide => [
     "It-Tnejn",
@@ -80,7 +85,7 @@
     "Il-\N{U+0126}amis",
     "Il-\N{U+0120}img\N{U+0127}a",
     "Is-Sibt",
-    "Il-\N{U+0126}add"
+    "Il-\N{U+0126}add",
   ],
   day_stand_alone_abbreviated => [
     "Tne",
@@ -89,7 +94,7 @@
     "\N{U+0126}am",
     "\N{U+0120}im",
     "Sib",
-    "\N{U+0126}ad"
+    "\N{U+0126}ad",
   ],
   day_stand_alone_narrow => [
     "Tn",
@@ -98,7 +103,7 @@
     "\N{U+0126}m",
     "\N{U+0120}m",
     "Sb",
-    "\N{U+0126}d"
+    "\N{U+0126}d",
   ],
   day_stand_alone_wide => [
     "It-Tnejn",
@@ -107,19 +112,19 @@
     "Il-\N{U+0126}amis",
     "Il-\N{U+0120}img\N{U+0127}a",
     "Is-Sibt",
-    "Il-\N{U+0126}add"
+    "Il-\N{U+0126}add",
   ],
   era_abbreviated => [
     "QK",
-    "WK"
+    "WK",
   ],
   era_narrow => [
     "QK",
-    "WK"
+    "WK",
   ],
   era_wide => [
     "Qabel Kristu",
-    "Wara Kristu"
+    "Wara Kristu",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -140,7 +145,7 @@
     "Set",
     "Ott",
     "Nov",
-    "Di\N{U+010b}"
+    "Di\N{U+010b}",
   ],
   month_format_narrow => [
     "J",
@@ -154,7 +159,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_format_wide => [
     "Jannar",
@@ -168,7 +173,7 @@
     "Settembru",
     "Ottubru",
     "Novembru",
-    "Di\N{U+010b}embru"
+    "Di\N{U+010b}embru",
   ],
   month_stand_alone_abbreviated => [
     "Jan",
@@ -182,7 +187,7 @@
     "Set",
     "Ott",
     "Nov",
-    "Di\N{U+010b}"
+    "Di\N{U+010b}",
   ],
   month_stand_alone_narrow => [
     "Jn",
@@ -196,7 +201,7 @@
     "St",
     "Ob",
     "Nv",
-    "D\N{U+010b}"
+    "D\N{U+010b}",
   ],
   month_stand_alone_wide => [
     "Jannar",
@@ -210,7 +215,7 @@
     "Settembru",
     "Ottubru",
     "Novembru",
-    "Di\N{U+010b}embru"
+    "Di\N{U+010b}embru",
   ],
   name => "Maltese",
   native_language => "Malti",
@@ -222,37 +227,37 @@
     "K1",
     "K2",
     "K3",
-    "K4"
+    "K4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "1el kwart",
     "2ni kwart",
     "3et kwart",
-    "4ba\N{U+2019} kwart"
+    "4ba\N{U+2019} kwart",
   ],
   quarter_stand_alone_abbreviated => [
     "K1",
     "K2",
     "K3",
-    "K4"
+    "K4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "1el kwart",
     "2ni kwart",
     "3et kwart",
-    "4ba\N{U+2019} kwart"
+    "4ba\N{U+2019} kwart",
   ],
   script => undef,
   territory => undef,
@@ -261,5 +266,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

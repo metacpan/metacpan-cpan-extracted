@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "krn",
-    "koosk"
+    "koosk",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d, E",
@@ -45,7 +50,7 @@
     yMd => "y-MM-dd",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "kln-KE",
   date_format_full => "EEEE, d MMMM y",
@@ -63,7 +68,7 @@
     "Koa",
     "Kom",
     "Kol",
-    "Kts"
+    "Kts",
   ],
   day_format_narrow => [
     "T",
@@ -72,7 +77,7 @@
     "A",
     "M",
     "L",
-    "T"
+    "T",
   ],
   day_format_wide => [
     "Kotaai",
@@ -81,7 +86,7 @@
     "Koang\N{U+2019}wan",
     "Komuut",
     "Kolo",
-    "Kotisap"
+    "Kotisap",
   ],
   day_stand_alone_abbreviated => [
     "Kot",
@@ -90,7 +95,7 @@
     "Koa",
     "Kom",
     "Kol",
-    "Kts"
+    "Kts",
   ],
   day_stand_alone_narrow => [
     "T",
@@ -99,7 +104,7 @@
     "A",
     "M",
     "L",
-    "T"
+    "T",
   ],
   day_stand_alone_wide => [
     "Kotaai",
@@ -108,19 +113,19 @@
     "Koang\N{U+2019}wan",
     "Komuut",
     "Kolo",
-    "Kotisap"
+    "Kotisap",
   ],
   era_abbreviated => [
     "AM",
-    "KO"
+    "KO",
   ],
   era_narrow => [
     "AM",
-    "KO"
+    "KO",
   ],
   era_wide => [
     "Amait kesich Jesu",
-    "Kokakesich Jesu"
+    "Kokakesich Jesu",
   ],
   first_day_of_week => 7,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -141,7 +146,7 @@
     "Bur",
     "Epe",
     "Kpt",
-    "Kpa"
+    "Kpa",
   ],
   month_format_narrow => [
     "M",
@@ -155,7 +160,7 @@
     "B",
     "E",
     "K",
-    "K"
+    "K",
   ],
   month_format_wide => [
     "Mulgul",
@@ -169,7 +174,7 @@
     "Bureet",
     "Epeeso",
     "Kipsuunde ne taai",
-    "Kipsuunde nebo aeng\N{U+2019}"
+    "Kipsuunde nebo aeng\N{U+2019}",
   ],
   month_stand_alone_abbreviated => [
     "Mul",
@@ -183,7 +188,7 @@
     "Bur",
     "Epe",
     "Kpt",
-    "Kpa"
+    "Kpa",
   ],
   month_stand_alone_narrow => [
     "M",
@@ -197,7 +202,7 @@
     "B",
     "E",
     "K",
-    "K"
+    "K",
   ],
   month_stand_alone_wide => [
     "Mulgul",
@@ -211,7 +216,7 @@
     "Bureet",
     "Epeeso",
     "Kipsuunde ne taai",
-    "Kipsuunde nebo aeng\N{U+2019}"
+    "Kipsuunde nebo aeng\N{U+2019}",
   ],
   name => "Kalenjin Kenya",
   native_language => "Kalenjin",
@@ -223,37 +228,37 @@
     "R1",
     "R2",
     "R3",
-    "R4"
+    "R4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "Robo netai",
     "Robo nebo aeng\N{U+2019}",
     "Robo nebo somok",
-    "Robo nebo ang\N{U+2019}wan"
+    "Robo nebo ang\N{U+2019}wan",
   ],
   quarter_stand_alone_abbreviated => [
     "R1",
     "R2",
     "R3",
-    "R4"
+    "R4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "Robo netai",
     "Robo nebo aeng\N{U+2019}",
     "Robo nebo somok",
-    "Robo nebo ang\N{U+2019}wan"
+    "Robo nebo ang\N{U+2019}wan",
   ],
   script => undef,
   territory => "Kenya",
@@ -262,5 +267,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

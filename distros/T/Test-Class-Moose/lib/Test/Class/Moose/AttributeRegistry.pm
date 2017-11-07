@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.87';
+our $VERSION = '0.88';
 
 use Carp;
 use Class::MOP;
@@ -199,7 +199,7 @@ Test::Class::Moose::AttributeRegistry - Global registry of tags by class and met
 
 =head1 VERSION
 
-version 0.87
+version 0.88
 
 =head1 SYNOPSIS
 

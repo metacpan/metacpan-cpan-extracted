@@ -29,7 +29,7 @@ requires:
   Crypt::Password::Util: '0.06'
   File::Flock::Retry: '0'
   List::MoreUtils: '0'
-  List::Util: '0'
+  List::Util: '1.45'
   experimental: '0'
   perl: '5.010001'
   strict: '0'
@@ -38,7 +38,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Unix-Passwd-File
   homepage: https://metacpan.org/release/Unix-Passwd-File
   repository: git://github.com/perlancar/perl-Unix-Passwd-File.git
-version: '0.24'
+version: '0.250'
 x_Dist_Zilla:
   perl:
     version: '5.026000'
@@ -114,7 +114,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.58'
+      version: '0.590'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -328,6 +328,10 @@ x_Dist_Zilla:
       name: '@Author::PERLANCAR/Test::Compile'
       version: '2.056'
     -
+      class: Dist::Zilla::Plugin::Test::Perl::Critic
+      name: '@Author::PERLANCAR/Test::Perl::Critic'
+      version: '3.001'
+    -
       class: Dist::Zilla::Plugin::Test::Rinci
       name: '@Author::PERLANCAR/Test::Rinci'
       version: '0.03'
@@ -346,11 +350,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Acme::CPANLists::Blacklist
       name: '@Author::PERLANCAR/Acme::CPANLists::Blacklist'
-      version: '0.03'
+      version: '0.04'
     -
       class: Dist::Zilla::Plugin::Prereqs::EnsureVersion
       name: '@Author::PERLANCAR/Prereqs::EnsureVersion'
-      version: '0.03'
+      version: '0.04'
     -
       class: Dist::Zilla::Plugin::Prereqs::CheckCircular
       name: '@Author::PERLANCAR/Prereqs::CheckCircular'
@@ -383,6 +387,10 @@ x_Dist_Zilla:
           type: x_spec
       name: DevelopX_spec
       version: '6.009'
+    -
+      class: Dist::Zilla::Plugin::Acme::CPANLists::Whitelist
+      name: Acme::CPANLists::Whitelist
+      version: '0.04'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'

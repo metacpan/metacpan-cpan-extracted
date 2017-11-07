@@ -1,5 +1,8 @@
 Revision history for Struct-Diff
 
+0.91    2017-11-04
+        regexps comparison support added to diff()
+
 0.90    2017-08-09
         valid_diff() appeared
         coderefs and blessed are now distinguishable for diff() by content

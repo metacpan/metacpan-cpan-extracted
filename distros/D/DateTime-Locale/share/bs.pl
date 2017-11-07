@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "prijepodne",
-    "popodne"
+    "popodne",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "E, d.",
@@ -47,16 +52,16 @@
     yMMMM => "LLLL y.",
     yMMMd => "d. MMM y.",
     yMd => "d.M.y.",
-    yQQQ => "QQQ y",
-    yQQQQ => "QQQQ y",
-    "yw-count-few" => "w. 'sedmica' 'u' y.",
-    "yw-count-one" => "w. 'sedmica' 'u' y.",
-    "yw-count-other" => "w. 'sedmica' 'u' y."
+    yQQQ => "QQQ y.",
+    yQQQQ => "QQQQ y.",
+    "yw-count-few" => "w. 'sedmica' 'u' Y.",
+    "yw-count-one" => "w. 'sedmica' 'u' Y.",
+    "yw-count-other" => "w. 'sedmica' 'u' Y.",
   },
   code => "bs",
   date_format_full => "EEEE, d. MMMM y.",
   date_format_long => "d. MMMM y.",
-  date_format_medium => "d. MMM. y.",
+  date_format_medium => "d. MMM y.",
   date_format_short => "d.M.yy.",
   datetime_format_full => "{1} 'u' {0}",
   datetime_format_long => "{1} 'u' {0}",
@@ -69,7 +74,7 @@
     "\N{U+010d}et",
     "pet",
     "sub",
-    "ned"
+    "ned",
   ],
   day_format_narrow => [
     "P",
@@ -78,7 +83,7 @@
     "\N{U+010c}",
     "P",
     "S",
-    "N"
+    "N",
   ],
   day_format_wide => [
     "ponedjeljak",
@@ -87,7 +92,7 @@
     "\N{U+010d}etvrtak",
     "petak",
     "subota",
-    "nedjelja"
+    "nedjelja",
   ],
   day_stand_alone_abbreviated => [
     "pon",
@@ -96,7 +101,7 @@
     "\N{U+010d}et",
     "pet",
     "sub",
-    "ned"
+    "ned",
   ],
   day_stand_alone_narrow => [
     "p",
@@ -105,7 +110,7 @@
     "\N{U+010d}",
     "p",
     "s",
-    "n"
+    "n",
   ],
   day_stand_alone_wide => [
     "ponedjeljak",
@@ -114,19 +119,19 @@
     "\N{U+010d}etvrtak",
     "petak",
     "subota",
-    "nedjelja"
+    "nedjelja",
   ],
   era_abbreviated => [
     "p. n. e.",
-    "n. e."
+    "n. e.",
   ],
   era_narrow => [
     "p. n. e.",
-    "n. e."
+    "n. e.",
   ],
   era_wide => [
     "prije nove ere",
-    "nove ere"
+    "nove ere",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -147,7 +152,7 @@
     "sep",
     "okt",
     "nov",
-    "dec"
+    "dec",
   ],
   month_format_narrow => [
     "j",
@@ -161,7 +166,7 @@
     "s",
     "o",
     "n",
-    "d"
+    "d",
   ],
   month_format_wide => [
     "januar",
@@ -175,7 +180,7 @@
     "septembar",
     "oktobar",
     "novembar",
-    "decembar"
+    "decembar",
   ],
   month_stand_alone_abbreviated => [
     "jan",
@@ -189,7 +194,7 @@
     "sep",
     "okt",
     "nov",
-    "dec"
+    "dec",
   ],
   month_stand_alone_narrow => [
     "j",
@@ -203,7 +208,7 @@
     "s",
     "o",
     "n",
-    "d"
+    "d",
   ],
   month_stand_alone_wide => [
     "januar",
@@ -217,7 +222,7 @@
     "septembar",
     "oktobar",
     "novembar",
-    "decembar"
+    "decembar",
   ],
   name => "Bosnian",
   native_language => "bosanski",
@@ -226,40 +231,40 @@
   native_territory => undef,
   native_variant => undef,
   quarter_format_abbreviated => [
-    "K1",
-    "K2",
-    "K3",
-    "K4"
+    "KV1",
+    "KV2",
+    "KV3",
+    "KV4",
   ],
   quarter_format_narrow => [
     "1.",
     "2.",
     "3.",
-    "4."
+    "4.",
   ],
   quarter_format_wide => [
     "Prvi kvartal",
     "Drugi kvartal",
     "Tre\N{U+0107}i kvartal",
-    "\N{U+010c}etvrti kvartal"
+    "\N{U+010c}etvrti kvartal",
   ],
   quarter_stand_alone_abbreviated => [
-    "K1",
-    "K2",
-    "K3",
-    "K4"
+    "KV1",
+    "KV2",
+    "KV3",
+    "KV4",
   ],
   quarter_stand_alone_narrow => [
     "1.",
     "2.",
     "3.",
-    "4."
+    "4.",
   ],
   quarter_stand_alone_wide => [
     "Prvi kvartal",
     "Drugi kvartal",
     "Tre\N{U+0107}i kvartal",
-    "\N{U+010c}etvrti kvartal"
+    "\N{U+010c}etvrti kvartal",
   ],
   script => undef,
   territory => undef,
@@ -268,5 +273,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

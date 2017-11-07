@@ -248,9 +248,9 @@ Slovak locale.
 
 =head3 Full
 
-   2008-02-05T18:30:30 = utorok, 5. februára 2008
-   1995-12-22T09:05:02 = piatok, 22. decembra 1995
-  -0010-09-15T04:44:23 = sobota, 15. septembra -10
+   2008-02-05T18:30:30 = utorok 5. februára 2008
+   1995-12-22T09:05:02 = piatok 22. decembra 1995
+  -0010-09-15T04:44:23 = sobota 15. septembra -10
 
 =head3 Long
 
@@ -302,9 +302,9 @@ Slovak locale.
 
 =head3 Full
 
-   2008-02-05T18:30:30 = utorok, 5. februára 2008, 18:30:30 UTC
-   1995-12-22T09:05:02 = piatok, 22. decembra 1995, 9:05:02 UTC
-  -0010-09-15T04:44:23 = sobota, 15. septembra -10, 4:44:23 UTC
+   2008-02-05T18:30:30 = utorok 5. februára 2008, 18:30:30 UTC
+   1995-12-22T09:05:02 = piatok 22. decembra 1995, 9:05:02 UTC
+  -0010-09-15T04:44:23 = sobota 15. septembra -10, 4:44:23 UTC
 
 =head3 Long
 
@@ -327,11 +327,41 @@ Slovak locale.
 
 =head2 Available Formats
 
+=head3 Bh (h B)
+
+   2008-02-05T18:30:30 = 6 B
+   1995-12-22T09:05:02 = 9 B
+  -0010-09-15T04:44:23 = 4 B
+
+=head3 Bhm (h:mm B)
+
+   2008-02-05T18:30:30 = 6:30 B
+   1995-12-22T09:05:02 = 9:05 B
+  -0010-09-15T04:44:23 = 4:44 B
+
+=head3 Bhms (h:mm:ss B)
+
+   2008-02-05T18:30:30 = 6:30:30 B
+   1995-12-22T09:05:02 = 9:05:02 B
+  -0010-09-15T04:44:23 = 4:44:23 B
+
 =head3 E (ccc)
 
    2008-02-05T18:30:30 = ut
    1995-12-22T09:05:02 = pi
   -0010-09-15T04:44:23 = so
+
+=head3 EBhm (E h:mm B)
+
+   2008-02-05T18:30:30 = ut 6:30 B
+   1995-12-22T09:05:02 = pi 9:05 B
+  -0010-09-15T04:44:23 = so 4:44 B
+
+=head3 EBhms (E h:mm:ss B)
+
+   2008-02-05T18:30:30 = ut 6:30:30 B
+   1995-12-22T09:05:02 = pi 9:05:02 B
+  -0010-09-15T04:44:23 = so 4:44:23 B
 
 =head3 EHm (E HH:mm)
 
@@ -375,11 +405,11 @@ Slovak locale.
    1995-12-22T09:05:02 = december 1995 po Kr.
   -0010-09-15T04:44:23 = september -10 pred Kr.
 
-=head3 GyMMMEd (E, d. M. y G)
+=head3 GyMMMEd (E d. M. y G)
 
-   2008-02-05T18:30:30 = ut, 5. 2. 2008 po Kr.
-   1995-12-22T09:05:02 = pi, 22. 12. 1995 po Kr.
-  -0010-09-15T04:44:23 = so, 15. 9. -10 pred Kr.
+   2008-02-05T18:30:30 = ut 5. 2. 2008 po Kr.
+   1995-12-22T09:05:02 = pi 22. 12. 1995 po Kr.
+  -0010-09-15T04:44:23 = so 15. 9. -10 pred Kr.
 
 =head3 GyMMMMd (d. M. y G)
 
@@ -609,25 +639,25 @@ Slovak locale.
    1995-12-22T09:05:02 = 4. štvrťrok 1995
   -0010-09-15T04:44:23 = 3. štvrťrok -10
 
-=head3 yw-count-few (w. 'týždeň' 'v' 'roku' y)
+=head3 yw-count-few (w. 'týždeň' 'v' 'roku' Y)
 
    2008-02-05T18:30:30 = 6. týždeň v roku 2008
    1995-12-22T09:05:02 = 51. týždeň v roku 1995
   -0010-09-15T04:44:23 = 37. týždeň v roku -10
 
-=head3 yw-count-many (w. 'týždeň' 'v' 'roku' y)
+=head3 yw-count-many (w. 'týždeň' 'v' 'roku' Y)
 
    2008-02-05T18:30:30 = 6. týždeň v roku 2008
    1995-12-22T09:05:02 = 51. týždeň v roku 1995
   -0010-09-15T04:44:23 = 37. týždeň v roku -10
 
-=head3 yw-count-one (w. 'týždeň' 'v' 'roku' y)
+=head3 yw-count-one (w. 'týždeň' 'v' 'roku' Y)
 
    2008-02-05T18:30:30 = 6. týždeň v roku 2008
    1995-12-22T09:05:02 = 51. týždeň v roku 1995
   -0010-09-15T04:44:23 = 37. týždeň v roku -10
 
-=head3 yw-count-other (w. 'týždeň' 'v' 'roku' y)
+=head3 yw-count-other (w. 'týždeň' 'v' 'roku' Y)
 
    2008-02-05T18:30:30 = 6. týždeň v roku 2008
    1995-12-22T09:05:02 = 51. týždeň v roku 1995

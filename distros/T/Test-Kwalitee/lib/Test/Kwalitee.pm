@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Test::Kwalitee; # git description: v1.25-7-g7ffcea4
+package Test::Kwalitee; # git description: v1.26-10-gb95ec58
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: Test the Kwalitee of a distribution before you release it
 # KEYWORDS: testing tests kwalitee CPANTS quality lint errors critic
 
-our $VERSION = '1.26';
+our $VERSION = '1.27';
 
 use Cwd ();
 use Test::Builder 0.88;
@@ -137,7 +137,7 @@ Test::Kwalitee - Test the Kwalitee of a distribution before you release it
 
 =head1 VERSION
 
-version 1.26
+version 1.27
 
 =head1 SYNOPSIS
 

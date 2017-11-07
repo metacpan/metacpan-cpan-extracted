@@ -9,7 +9,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.56'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.143240'
-license: unknown
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -25,4 +25,4 @@ requires:
   perl: '5.010001'
 resources:
   repository: https://github.com/abeltje/lc_time
-version: '0.14'
+version: '0.15'

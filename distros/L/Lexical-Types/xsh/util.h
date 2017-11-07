@@ -13,7 +13,12 @@
 # if XSH_HAS_PERL(5, 8, 9) || XSH_HAS_PERL(5, 9, 3)
 #  define XSH_ASSERT(C) assert(C)
 # else
-#  define XSH_ASSERT(C) PERL_DEB( \
+#  ifdef PERL_DEB
+#   define XSH_DEB(X) PERL_DEB(X)
+#  else
+#   define XSH_DEB(X) (X)
+#  endif
+#  define XSH_ASSERT(C) XSH_DEB( \
    ((C) ? ((void) 0)           \
         : (Perl_croak_nocontext("Assertion %s failed: file \"" __FILE__  \
                                  "\", line %d", STRINGIFY(C), __LINE__), \

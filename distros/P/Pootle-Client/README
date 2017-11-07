@@ -4,6 +4,8 @@ Pootle::Client
 Client for conveniently accessing the Pootle API v1
 
 Currently supports only GET-requests
+and
+Perl 5.20 or newer with support for feature 'signatures'
 
 INSTALLATION
 

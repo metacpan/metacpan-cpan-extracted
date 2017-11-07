@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "DBIx-Custom",
    "no_index" : {
@@ -48,6 +48,6 @@
          "web" : "https://github.com/yuki-kimoto/DBIx-Custom"
       }
    },
-   "version" : "0.40",
-   "x_serialization_backend" : "JSON::PP version 2.27203"
+   "version" : "0.41",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

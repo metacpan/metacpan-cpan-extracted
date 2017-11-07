@@ -36,6 +36,7 @@ for my $a ( $object->attributes('multiple') ) {
 
 for my $a ( $object->attributes('all') ) {
     # Check that each attribute is set either to 'single' or 'multiple'
+    ok ($a =~ /^[a-z0-9\_]+$/,  "$a is properly named");
     ok ($object->attribute_is($a, 'single') or $object->attribute_is($a, 'multiple'), "$a is either single or multiple");
     ok ($object->attribute_is($a, 'single') != $object->attribute_is($a, 'multiple'), "$a can't be both single".$object->attribute_is($a,'single')." and multi".$object->attribute_is($a,'multiple'));
 }

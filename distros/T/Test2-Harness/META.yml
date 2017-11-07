@@ -59,9 +59,9 @@ requires:
   constant: '0'
   goto::file: '0.005'
   parent: '0'
-  perl: '5.008001'
+  perl: '5.008009'
 resources:
   bugtracker: http://github.com/Test-More/Test2-Harness/issues
   repository: http://github.com/Test-More/Test2-Harness/
-version: '0.001030'
+version: '0.001031'
 x_serialization_backend: 'YAML::Tiny version 1.70'

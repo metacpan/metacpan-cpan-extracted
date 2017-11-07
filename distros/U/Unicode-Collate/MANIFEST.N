@@ -24,6 +24,7 @@ Collate/Locale/cy.pl		Unicode::Collate::Locale
 Collate/Locale/da.pl		Unicode::Collate::Locale
 Collate/Locale/de_at_ph.pl	Unicode::Collate::Locale
 Collate/Locale/de_phone.pl	Unicode::Collate::Locale
+Collate/Locale/dsb.pl		Unicode::Collate::Locale
 Collate/Locale/ee.pl		Unicode::Collate::Locale
 Collate/Locale/eo.pl		Unicode::Collate::Locale
 Collate/Locale/es.pl		Unicode::Collate::Locale
@@ -51,6 +52,7 @@ Collate/Locale/kl.pl		Unicode::Collate::Locale
 Collate/Locale/kn.pl		Unicode::Collate::Locale
 Collate/Locale/ko.pl		Unicode::Collate::Locale
 Collate/Locale/kok.pl		Unicode::Collate::Locale
+Collate/Locale/lkt.pl		Unicode::Collate::Locale
 Collate/Locale/ln.pl		Unicode::Collate::Locale
 Collate/Locale/lt.pl		Unicode::Collate::Locale
 Collate/Locale/lv.pl		Unicode::Collate::Locale
@@ -108,6 +110,7 @@ data/cy.txt		# preparating Unicode::Collate::Locale
 data/da.txt		# preparating Unicode::Collate::Locale
 data/de_at_ph.txt	# preparating Unicode::Collate::Locale
 data/de_phone.txt	# preparating Unicode::Collate::Locale
+data/dsb.txt		# preparating Unicode::Collate::Locale
 data/ee.txt		# preparating Unicode::Collate::Locale
 data/eo.txt		# preparating Unicode::Collate::Locale
 data/es.txt		# preparating Unicode::Collate::Locale
@@ -135,6 +138,7 @@ data/kl.txt		# preparating Unicode::Collate::Locale
 data/kn.txt		# preparating Unicode::Collate::Locale
 data/ko.txt		# preparating Unicode::Collate::Locale
 data/kok.txt		# preparating Unicode::Collate::Locale
+data/lkt.txt		# preparating Unicode::Collate::Locale
 data/ln.txt		# preparating Unicode::Collate::Locale
 data/lt.txt		# preparating Unicode::Collate::Locale
 data/lv.txt		# preparating Unicode::Collate::Locale
@@ -241,6 +245,7 @@ t/loc_da.t	test Unicode::Collate::Locale
 t/loc_de.t	test Unicode::Collate::Locale
 t/loc_deat.t	test Unicode::Collate::Locale
 t/loc_deph.t	test Unicode::Collate::Locale
+t/loc_dsb.t	test Unicode::Collate::Locale
 t/loc_ee.t	test Unicode::Collate::Locale
 t/loc_eo.t	test Unicode::Collate::Locale
 t/loc_es.t	test Unicode::Collate::Locale
@@ -271,6 +276,7 @@ t/loc_kl.t	test Unicode::Collate::Locale
 t/loc_kn.t	test Unicode::Collate::Locale
 t/loc_ko.t	test Unicode::Collate::Locale
 t/loc_kok.t	test Unicode::Collate::Locale
+t/loc_lkt.t	test Unicode::Collate::Locale
 t/loc_ln.t	test Unicode::Collate::Locale
 t/loc_lt.t	test Unicode::Collate::Locale
 t/loc_lv.t	test Unicode::Collate::Locale
@@ -329,6 +335,7 @@ t/overcjk1.t
 t/override.t
 t/rearrang.t
 t/rewrite.t	test using DUCET
+t/tangut.t
 t/test.t
 t/trailwt.t
 t/variable.t

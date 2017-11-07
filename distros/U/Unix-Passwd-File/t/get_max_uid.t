@@ -4,8 +4,10 @@ use 5.010;
 use strict;
 use warnings;
 use FindBin '$Bin';
+use Test::More 0.98;
 
-use Test::More 0.96;
+BEGIN { plan skip_all => "OS unsupported" if $^O eq 'MSWin32' }
+
 use Unix::Passwd::File qw(get_max_uid);
 
 subtest "default" => sub {

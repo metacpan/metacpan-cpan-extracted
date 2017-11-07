@@ -7,7 +7,7 @@ use Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(bgs_call bgs_back bgs_wait bgs_break);
 
-our $VERSION = '0.08';
+our $VERSION = '0.10';
 
 use BGS ();
 
@@ -85,6 +85,8 @@ BGS::Limit - Background execution of subroutines in child processes with limit o
 If $limit == 0, child processes are not used.
 
 =head1 ATTENTION
+
+Deprecated! Use BGS with $BGS::limit.
 
 Do not use $_ in bgs_call.
 

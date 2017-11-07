@@ -10,17 +10,53 @@ Image::SVG::Path - read the "d" attribute of an SVG path
 
     
     use Image::SVG::Path 'extract_path_info';
-    my $path_d_attribute = "M9.6,20.25c0.61,0.37,3.91,0.45,4.52,0.34c2.86-0.5,14.5-2.09,21.37-2.64c0.94-0.07,2.67-0.26,3.45,0.04";
+    use Data::Dumper;
+    my $path_d_attribute = "M9.6,20.25c0.61,0.37,3.91,0.45,4.52,0.34";
     my @path_info = extract_path_info ($path_d_attribute);
+    print Dumper (\@path_info);
 
 
+produces output
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Image-SVG-Path-0.31/examples/synopsis.pl> in the distribution.)
+    $VAR1 = [
+              {
+                'point' => [
+                             '9.6',
+                             '20.25'
+                           ],
+                'name' => 'moveto',
+                'svg_key' => 'M',
+                'position' => 'absolute',
+                'type' => 'moveto'
+              },
+              {
+                'control2' => [
+                                '3.91',
+                                '0.45'
+                              ],
+                'svg_key' => 'c',
+                'name' => 'curveto',
+                'position' => 'relative',
+                'control1' => [
+                                '0.61',
+                                '0.37'
+                              ],
+                'end' => [
+                           '4.52',
+                           '0.34'
+                         ],
+                'type' => 'cubic-bezier'
+              }
+            ];
+
+
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Image-SVG-Path-0.32/examples/synopsis.pl> in the distribution.)
+
 
 =head1 VERSION
 
-This documents version 0.31 of Image::SVG::Path corresponding to git
-commit e7a4db2cb10fae2fde7d358a92d09280f393dd48 released on Sun Oct 8 14:35:36 2017 +0900.
+This documents version 0.32 of Image-SVG-Path
+corresponding to L<git commit 8e97c75cb08b77f120dd312fe43b99842f041e2e|https://github.com/benkasminbullock/Image-SVG-Path/commit/8e97c75cb08b77f120dd312fe43b99842f041e2e> released on Tue Nov 7 13:27:40 2017 +0900.
 
 =head1 DESCRIPTION
 
@@ -66,7 +102,7 @@ produces output
     MOVE TO 148 214.
 
 
-(This example is included as L<F<xml-parser.pl>|https://fastapi.metacpan.org/source/BKB/Image-SVG-Path-0.31/examples/xml-parser.pl> in the distribution.)
+(This example is included as L<F<xml-parser.pl>|https://fastapi.metacpan.org/source/BKB/Image-SVG-Path-0.32/examples/xml-parser.pl> in the distribution.)
 
 
 SVG means "scalable vector graphics" and it is a standard of the W3
@@ -156,7 +192,7 @@ produces output
        type -> closepath
 
 
-(This example is included as L<F<extract-path-info.pl>|https://fastapi.metacpan.org/source/BKB/Image-SVG-Path-0.31/examples/extract-path-info.pl> in the distribution.)
+(This example is included as L<F<extract-path-info.pl>|https://fastapi.metacpan.org/source/BKB/Image-SVG-Path-0.32/examples/extract-path-info.pl> in the distribution.)
 
 
 The return value is a list of hash references. Each hash reference has
@@ -240,7 +276,7 @@ produces output
     M15.160000,91.180000 C16.400000,91.690000 17.650000,91.410000 18.390000,90.150000 C21.260000,85.250000 24.140000,79.250000 26.750000,73.000000 
 
 
-(This example is included as L<F<test-reverse.pl>|https://fastapi.metacpan.org/source/BKB/Image-SVG-Path-0.31/examples/test-reverse.pl> in the distribution.)
+(This example is included as L<F<test-reverse.pl>|https://fastapi.metacpan.org/source/BKB/Image-SVG-Path-0.32/examples/test-reverse.pl> in the distribution.)
 
 
 =head2 create_path_string
@@ -541,35 +577,6 @@ with quadratic bezier curves. See also L</HISTORY>.
 This is L<bug 19|https://github.com/benkasminbullock/Image-SVG-Path/issues/19> on the issue tracker.
 
 
-=item Some inputs cause blowups
-
-Some relatively simple inputs blow up the L</$svg_path> regex, causing
-errors of the form I<Complex regular subexpression recursion limit
-(32766) exceeded>. See the file F<t/export-regex.t> for an example
-(commented out).
-
-Because of this, as of version 0.29, C<$svg_path> is no longer used to
-check the path inputs of L</extract_path_info>.
-
-I am not sure whether this issue is inherent in the SVG grammar or
-whether it is caused by some kind of regex error. I (Ben Bullock)
-believe that the regular expression L</$svg_path> exactly follows the
-SVG grammar, does not contain any duplicates, and that the problems
-arise because the grammar itself is inherently difficult to parse.
-This is because of the many ambiguous ways that numbers can be put
-into a list. For example 123-456,1e-78+9 has to be parsed into four
-numbers. The SVG standard insists on this for the sake of saving a few
-bytes of whitespace or commas, which, considering that these condensed
-paths are embedded within the excruciatingly verbose XML format, seems
-a false economy.
-
-But I might be wrong about that, so if you can find an error in my
-regular expression, let me know.
-
-
-This is L<bug 21|https://github.com/benkasminbullock/Image-SVG-Path/issues/21> on the issue tracker.
-
-
 =item reverse_path only works for cubic bezier curves
 
 See L</reverse_path>.
@@ -608,7 +615,13 @@ correspond to the SVG standard can also be exported.
 =item $svg_path
 
 Match a complete path consisting of multiple move-to and drawing
-commands. See also L</Some inputs cause blowups>.
+commands. Some relatively simple inputs blow up the C<$svg_path>
+regex, causing errors of the form I<Complex regular subexpression
+recursion limit (32766) exceeded>. See the file F<t/export-regex.t>
+for an example (commented out).
+
+This was withdrawn from use in parsing the paths in version 0.29 of
+the module.
 
 =item $drawto_command
 
@@ -765,6 +778,7 @@ for version 0.20, number paths for version 0.21, implicit line-tos for
 version 0.22, implicit arc commands for version 0.23, multiple
 closepaths for version 0.24, and handling plus signs in numbers in
 0.25.
+
 
 
 =head1 AUTHOR

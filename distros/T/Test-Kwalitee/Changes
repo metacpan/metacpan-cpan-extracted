@@ -1,5 +1,8 @@
 Revision history for Test-Kwalitee
 
+1.27      2017-11-05 18:45:40Z
+    - make taint test TODO when version.pm is not current (see RT#118087)
+
 1.26      2017-05-11 12:04:49Z
     - bump Test::More prereq for (fully) working subtests
     - properly detect the xt/ caller condition when running kwalitee_ok

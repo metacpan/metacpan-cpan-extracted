@@ -25,5 +25,5 @@ requires:
   Test::More: '0'
 resources:
   repository: https://github.com/yuki-kimoto/DBIx-Custom.git
-version: '0.40'
+version: '0.41'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

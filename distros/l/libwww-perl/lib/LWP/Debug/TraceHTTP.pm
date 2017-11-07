@@ -1,5 +1,5 @@
 package LWP::Debug::TraceHTTP;
-$LWP::Debug::TraceHTTP::VERSION = '6.27';
+$LWP::Debug::TraceHTTP::VERSION = '6.29';
 # Just call:
 #
 #   require LWP::Debug::TraceHTTP;

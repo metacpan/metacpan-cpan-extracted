@@ -7,17 +7,11 @@ BEGIN { use_ok('Wx::Perl::IconDepot') };
 
 use Wx;
 use Module::Load::Conditional qw( can_load );
-use Data::Dumper; 
 
-my $no_svg_support = 0;
-my $tests = 205;
+my $num_of_tests = 205;
 unless (can_load(modules => {'Image::LibRSVG' => '0.07'})) { 
-	$no_svg_support = 1 ;
-	$tests = 133;
+	$num_of_tests = 133;
 }
-
-print "No SVG support: $no_svg_support\n";
-
 
 my @iconpath = ('t/Themes');
 my @theme = qw( png_1 png_2 svg_1 );
@@ -251,9 +245,7 @@ my @tests = (
 
 # More tests for loading bitmapped icons
 my @names = $depot->AvailableIcons('png_1');
-# print Dumper \@names;
 my @sizes = $depot->AvailableSizes('png_1');
-# print Dumper \@sizes;
 &CreateImageTests(\@names, \@sizes, {
 	validate => 'image',
 });
@@ -285,23 +277,12 @@ for (@tests) {
 	}
 	my @result = &$method($depot, @$args);
 	if ($validate eq 'list') {
-		if (&ListCompare($expected, \@result)) {
-			ok(1, $name)
-		} else {
-			ok(0, $name);
-			&PrintListResult($expected, \@result);
-		}
+		ok(&ListCompare($expected, \@result), $name);
 	} elsif ($validate eq 'image') {
 		my $img = $result[0];
 		my $outcome = 0;
 		if ((defined $img) and ($img->IsOk)) { $outcome = 1 }
-		if ($expected eq $outcome) {
-			ok(1, $name);
-		} else {
-			ok(1, $name);
-			print "Expected: $expected\n";
-			print "     Got: $outcome\n";
-		}
+		is ($outcome, $expected, $name);
 		if (defined $checksize) {
 			SKIP: {
 				skip 'Previous test returned no image.', 1 unless $outcome;
@@ -313,7 +294,7 @@ for (@tests) {
 	}
 }
 
-done_testing($tests);
+done_testing($num_of_tests);
 
 sub CreateImageTests {
 	my ($nms, $szs, $empty) = @_;

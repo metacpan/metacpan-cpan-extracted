@@ -51,6 +51,7 @@ my @files = (
     't/load.t',
     't/loadlib/helpers/Fail.pm',
     't/loadlib/tests/LoadTests/Success.pm',
+    't/no_tests_run.t',
     't/non_randomize_classes.t',
     't/parallel.t',
     't/parallellib/TestsFor/Alpha.pm',

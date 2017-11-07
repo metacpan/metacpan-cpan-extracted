@@ -1,10 +1,10 @@
 package HTTP::AnyUA::Util;
-# ABSTRACT: Utility subroutines for HTTP::AnyUA backends
+# ABSTRACT: Utility subroutines for HTTP::AnyUA backends and middleware
 
 use warnings;
 use strict;
 
-our $VERSION = '0.900'; # VERSION
+our $VERSION = '0.901'; # VERSION
 
 use Exporter qw(import);
 
@@ -13,6 +13,7 @@ our @EXPORT_OK = qw(
     http_headers_to_native
     native_to_http_request
     coderef_content_to_string
+    normalize_headers
     internal_exception
     http_date
     parse_http_date
@@ -76,6 +77,21 @@ sub http_headers_to_native {
     }
 
     return $native;
+}
+
+
+sub normalize_headers {
+    my $headers_in = shift;
+
+    my $headers = {};
+
+    if (defined $headers_in) {
+        while (my ($key, $value) = each %{$headers_in || {}}) {
+            $headers->{lc($key)} = $value;
+        }
+    }
+
+    return $headers;
 }
 
 
@@ -223,11 +239,11 @@ __END__
 
 =head1 NAME
 
-HTTP::AnyUA::Util - Utility subroutines for HTTP::AnyUA backends
+HTTP::AnyUA::Util - Utility subroutines for HTTP::AnyUA backends and middleware
 
 =head1 VERSION
 
-version 0.900
+version 0.901
 
 =head1 FUNCTIONS
 
@@ -251,6 +267,12 @@ Convert a "native" request tuple to an L<HTTP::Request> object.
     $headers = http_headers_to_native($http_headers);
 
 Convert an L<HTTP::Headers> object to a "native" hashref.
+
+=head2 normalize_headers
+
+    $normalized_headers = normalize_headers(\%headers);
+
+Normalize headers. Currently lowercases header keys.
 
 =head2 internal_exception
 

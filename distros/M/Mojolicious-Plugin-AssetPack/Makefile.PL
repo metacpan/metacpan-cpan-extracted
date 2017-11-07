@@ -2,16 +2,16 @@
 use ExtUtils::MakeMaker;
 WriteMakefile(
   NAME => 'Mojolicious::Plugin::AssetPack',
-  AUTHOR => 'Jan Henning Thorsen <jhthorsen@cpan.org>',
+  AUTHOR => 'Marcus Ramberg <marcus.ramberg@gmail.com>',
   LICENSE => 'artistic_2',
   ABSTRACT_FROM => 'lib/Mojolicious/Plugin/AssetPack.pm',
   VERSION_FROM => 'lib/Mojolicious/Plugin/AssetPack.pm',
-  EXE_FILES => [qw()],
+  EXE_FILES => [qw(  )],
   META_MERGE => {
     resources => {
       bugtracker => 'https://github.com/jhthorsen/mojolicious-plugin-assetpack/issues',
       homepage => 'https://github.com/jhthorsen/mojolicious-plugin-assetpack',
-      repository => 'https://github.com/jhthorsen/mojolicious-plugin-assetpack.git',
+      repository => 'https://github.com/marcus/mojolicious-plugin-assetpack',
     },
   },
   BUILD_REQUIRES => {

@@ -45,10 +45,11 @@
          "url" : "https://github.com/benkasminbullock/Image-SVG-Path"
       }
    },
-   "version" : "0.31",
+   "version" : "0.32",
    "x_contributors" : [
       "Alessandro Ranellucci <aar@cpan.org>",
-      "Colin Kuskie <colink@cpan.org>"
+      "Colin Kuskie <colink@cpan.org>",
+      "Alexander Gorlov"
    ],
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

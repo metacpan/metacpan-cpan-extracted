@@ -17,7 +17,7 @@ name: Text-NumericData
 provides:
   Text::NumericData:
     file: lib/Text/NumericData.pm
-    version: '2.003002'
+    version: '2.003003'
   Text::NumericData::App:
     file: lib/Text/NumericData/App.pm
     version: '1'
@@ -95,5 +95,5 @@ requires:
   perl: '5.006'
 resources:
   license: http://dev.perl.org/licenses/
-version: '2.003002'
+version: '2.003003'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

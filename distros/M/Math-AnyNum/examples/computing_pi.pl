@@ -14,7 +14,7 @@ my $digits = int($ARGV[0] // 0) || 60;
 
 {
     say "Newton iteration, using Taylor series of sine and cosine.";
-    local $Math::AnyNum::PREC = 4 * $digits;
+    local $Math::AnyNum::PREC = log(10)/log(2) * $digits;
     my $b = Math::AnyNum->new(0);
     my $x = $b + 0.5;
     my %x;
@@ -36,7 +36,7 @@ my $digits = int($ARGV[0] // 0) || 60;
 
 {
     say "Using Taylor series of arctangent.";
-    local $Math::AnyNum::PREC = 4 * $digits;
+    local $Math::AnyNum::PREC = log(10)/log(2) * $digits;
     my $b = Math::AnyNum->new(0);
     my $x = 2 - sqrt($b + 3);
     my $f = -$x * $x;

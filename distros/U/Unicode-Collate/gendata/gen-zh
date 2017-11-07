@@ -8,10 +8,10 @@
 #
 use strict;
 use warnings;
-require 'gen-head'; # for testcount() and testhead()
+require './gen-head'; # for testcount() and testhead()
 
 use Unicode::Normalize;
-require 'dumpstr'; # for element() and string()
+require './dumpstr'; # for element() and string()
 
 my @low = qw( 61 65 EA 69 6D 6E 6F 75 FC ); # lower base letters
 my @upp = qw( 41 45 CA 49 4D 4E 4F 55 DC ); # upper base letters

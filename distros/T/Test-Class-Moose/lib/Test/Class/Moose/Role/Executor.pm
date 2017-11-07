@@ -4,7 +4,7 @@ package Test::Class::Moose::Role::Executor;
 
 use 5.10.0;
 
-our $VERSION = '0.87';
+our $VERSION = '0.88';
 
 use Moose::Role 2.0000;
 use Carp;
@@ -500,9 +500,7 @@ sub test_classes {
     my $self = shift;
 
     if ( my $classes = $self->test_configuration->test_classes ) {
-        if (@$classes) {    # ignore it if the array is empty
-            return @$classes;
-        }
+        return @{$classes} if @{$classes};
     }
 
     my %metaclasses = Class::MOP::get_all_metaclasses();
@@ -532,7 +530,7 @@ Test::Class::Moose::Role::Executor - Common code for Runner classes
 
 =head1 VERSION
 
-version 0.87
+version 0.88
 
 =for Pod::Coverage runtests test_classes
 

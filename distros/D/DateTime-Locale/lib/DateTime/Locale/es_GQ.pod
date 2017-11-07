@@ -327,11 +327,41 @@ Spanish Equatorial Guinea locale.
 
 =head2 Available Formats
 
+=head3 Bh (h B)
+
+   2008-02-05T18:30:30 = 6 B
+   1995-12-22T09:05:02 = 9 B
+  -0010-09-15T04:44:23 = 4 B
+
+=head3 Bhm (h:mm B)
+
+   2008-02-05T18:30:30 = 6:30 B
+   1995-12-22T09:05:02 = 9:05 B
+  -0010-09-15T04:44:23 = 4:44 B
+
+=head3 Bhms (h:mm:ss B)
+
+   2008-02-05T18:30:30 = 6:30:30 B
+   1995-12-22T09:05:02 = 9:05:02 B
+  -0010-09-15T04:44:23 = 4:44:23 B
+
 =head3 E (ccc)
 
    2008-02-05T18:30:30 = mar.
    1995-12-22T09:05:02 = vie.
   -0010-09-15T04:44:23 = sáb.
+
+=head3 EBhm (E h:mm B)
+
+   2008-02-05T18:30:30 = mar. 6:30 B
+   1995-12-22T09:05:02 = vie. 9:05 B
+  -0010-09-15T04:44:23 = sáb. 4:44 B
+
+=head3 EBhms (E h:mm:ss B)
+
+   2008-02-05T18:30:30 = mar. 6:30:30 B
+   1995-12-22T09:05:02 = vie. 9:05:02 B
+  -0010-09-15T04:44:23 = sáb. 4:44:23 B
 
 =head3 EHm (E, H:mm)
 
@@ -639,13 +669,13 @@ Spanish Equatorial Guinea locale.
    1995-12-22T09:05:02 = 4.º trimestre de 1995
   -0010-09-15T04:44:23 = 3.er trimestre de -10
 
-=head3 yw-count-one ('semana' w 'de' y)
+=head3 yw-count-one ('semana' w 'de' Y)
 
    2008-02-05T18:30:30 = semana 6 de 2008
    1995-12-22T09:05:02 = semana 51 de 1995
   -0010-09-15T04:44:23 = semana 37 de -10
 
-=head3 yw-count-other ('semana' w 'de' y)
+=head3 yw-count-other ('semana' w 'de' Y)
 
    2008-02-05T18:30:30 = semana 6 de 2008
    1995-12-22T09:05:02 = semana 51 de 1995

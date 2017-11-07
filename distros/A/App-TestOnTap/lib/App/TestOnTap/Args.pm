@@ -102,7 +102,7 @@ sub __parseArgv
 			'_info_modules',
 		);
 
-	my $_argsPodName = 'App/TestOnTap/_Args.pod';
+	my $_argsPodName = 'App/TestOnTap/_Args._pod';
 	my $_argsPodInput = Pod::Simple::Search->find($_argsPodName);
 	my $argsPodName = 'App/TestOnTap/Args.pod';
 	my $argsPodInput = Pod::Simple::Search->find($argsPodName);
@@ -130,6 +130,7 @@ sub __parseArgv
 
 	# help with the hidden flags...
 	#
+
 	pod2usage(-input => $_argsPodInput, -exitval => 0, -verbose => 2, -noperldoc => 1) if $rawOpts{_help};
 
 	# for the special selection of using --_pp* or '--_info*', turn over to packinfo

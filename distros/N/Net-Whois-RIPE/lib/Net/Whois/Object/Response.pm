@@ -2,10 +2,10 @@ package Net::Whois::Object::Response;
 
 use base qw/Net::Whois::Object/;
 
-__PACKAGE__->attributes( 'mandatory', ['response'] );
-__PACKAGE__->attributes( 'optional', ['comment'] );
-__PACKAGE__->attributes( 'single',    ['response'] );
-__PACKAGE__->attributes( 'multiple',  ['comment'] );
+__PACKAGE__->attributes( 'mandatory',   [ 'response' ] );
+__PACKAGE__->attributes( 'optional',    [ 'comment' ] );
+__PACKAGE__->attributes( 'single',      [ 'response' ] );
+__PACKAGE__->attributes( 'multiple',    [ 'comment' ] );
 
 
 =head1 NAME

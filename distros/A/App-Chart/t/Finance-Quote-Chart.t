@@ -36,7 +36,7 @@ diag "Finance::Quote version ",Finance::Quote->VERSION;
 #------------------------------------------------------------------------------
 # VERSION
 
-my $want_version = 263;
+my $want_version = 264;
 is ($Finance::Quote::Chart::VERSION, $want_version, 'VERSION variable');
 is (Finance::Quote::Chart->VERSION,  $want_version, 'VERSION class method');
 { ok (eval { Finance::Quote::Chart->VERSION($want_version); 1 },

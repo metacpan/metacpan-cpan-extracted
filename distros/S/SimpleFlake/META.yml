@@ -1,13 +1,13 @@
 ---
 abstract: 'A perl implemantation of SimpleFlake. Inspired by https://github.com/SawdustSoftware/simpleflake'
 author:
-  - =over
+  - '=over 1'
 build_requires:
   Test::More: '0.98'
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v2.4.1, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Minilla/v3.0.13, CPAN::Meta::Converter version 2.150005'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   SimpleFlake:
     file: lib/SimpleFlake.pm
-    version: '0.06'
+    version: '0.11'
 requires:
   Bytes::Random::Secure: '0'
   Math::BigInt: '0'
@@ -34,7 +34,12 @@ requires:
   Math::Random::ISAAC: '0'
   Time::HiRes: '0'
   perl: '5.008001'
-version: '0.06'
+resources:
+  bugtracker: https://github.com/itnode/SimpleFlake/issues
+  homepage: https://github.com/itnode/SimpleFlake
+  repository: git://github.com/itnode/SimpleFlake.git
+version: '0.11'
 x_contributors:
   - 'Jens Gassmann <jens.gassmann@atomix.de>'
   - 'Patrick Kilter <pas.freelance@googlemail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

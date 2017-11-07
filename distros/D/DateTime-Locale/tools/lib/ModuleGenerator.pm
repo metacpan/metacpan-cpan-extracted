@@ -12,18 +12,20 @@ use autodie;
 use Data::Dumper::Concise qw( Dumper );
 use JSON::MaybeXS qw( decode_json );
 use List::AllUtils qw( max uniq );
-use ModuleGenerator::Locale;
 use Locale::Codes::Language
     qw( language_code2code LOCALE_LANG_ALPHA_2 LOCALE_LANG_ALPHA_3 );
+use ModuleGenerator::Locale;
 use Parse::PMFile;
-use Path::Class qw( file );
-use Path::Class::Rule;
+use Path::Iterator::Rule;
+use Path::Tiny qw( path );
 use Scalar::Util qw( reftype );
+use Specio::Declare;
+use Specio::Library::Builtins;
+use Specio::Library::Path::Tiny;
+use Specio::Subs qw( Specio::Library::Builtins );
 use Text::Template;
 
 use Moose;
-use MooseX::Types::Moose qw( ArrayRef Bool Num Str );
-use MooseX::Types::Path::Class qw( Dir File );
 
 ## no critic (TestingAndDebugging::ProhibitNoWarnings)
 no warnings qw( experimental::postderef experimental::signatures );
@@ -36,10 +38,10 @@ our $VERSION = '0.10';
 has _only_locales => (
     traits   => ['Array'],
     is       => 'ro',
-    isa      => ArrayRef [Str],
+    isa      => t( 'ArrayRef', of => t('Str') ),
     init_arg => 'locales',
-    default  => sub { [] },
-    handles  => {
+    default => sub { [] },
+    handles => {
         _has_only_locales => 'count',
     },
     documentation => 'If specified, only these locales will be built.',
@@ -47,36 +49,36 @@ has _only_locales => (
 
 has _autogen_warning => (
     is      => 'ro',
-    isa     => Str,
+    isa     => t('Str'),
     lazy    => 1,
     builder => '_build_autogen_warning',
 );
 
 has _generator_script => (
     is      => 'ro',
-    isa     => File,
+    isa     => t('File'),
     lazy    => 1,
     builder => '_build_generator_script',
 );
 
 has _source_data_root => (
     is      => 'ro',
-    isa     => Dir,
+    isa     => t('Dir'),
     lazy    => 1,
     builder => '_build_source_data_root',
 );
 
 has _locale_codes => (
     is      => 'ro',
-    isa     => ArrayRef [Str],
+    isa     => t( 'ArrayRef', of => t('Str') ),
     lazy    => 1,
     builder => '_build_locale_codes',
 );
 
 has _locales => (
-    is      => 'ro',
-    isa     => ArrayRef ['ModuleGenerator::Locale'],
-    lazy    => 1,
+    is   => 'ro',
+    isa  => t( 'ArrayRef', of => object_isa_type('ModuleGenerator::Locale') ),
+    lazy => 1,
     builder => '_build_locales',
 );
 
@@ -91,9 +93,10 @@ sub run ($self) {
 }
 
 sub _clean_old_data ($self) {
-    my $pir  = Path::Class::Rule->new;
+    my $pir  = Path::Iterator::Rule->new;
     my $iter = $pir->file->name(qr/\.pod$/)->iter('lib');
     while ( my $path = $iter->() ) {
+        $path = path($path);
         ## no critic (InputOutput::RequireCheckedSyscalls)
         say 'Removing ', $path->basename;
         $path->remove;
@@ -125,7 +128,7 @@ sub _write_data_files ($self) {
 
     for my $code ( sort keys %raw_locales ) {
         my $dumped = $self->_dump_with_unicode( $raw_locales{$code} );
-        my $file = file( 'share', $code . '.pl' );
+        my $file = path( 'share', $code . '.pl' );
         ## no critic (InputOutput::RequireCheckedSyscalls)
         say "Generating $file";
         $file->spew($dumped);
@@ -146,11 +149,11 @@ sub _write_data_pm ($self) {
         $raw_locales{ $locale->code }         = $locale->data_hash;
     }
 
-    my $data_pm_file = file(qw( lib DateTime Locale Data.pm ));
+    my $data_pm_file = path(qw( lib DateTime Locale Data.pm ));
     ## no critic (InputOutput::RequireCheckedSyscalls)
     say "Generating $data_pm_file";
     ## use critic
-    my $data_pm = $data_pm_file->slurp( iomode => '<:encoding(UTF-8)' );
+    my $data_pm = $data_pm_file->slurp_utf8;
 
     $self->_insert_autogen_warning( \$data_pm );
 
@@ -175,7 +178,7 @@ sub _write_data_pm ($self) {
 
     $self->_insert_var_in_code( 'LocaleData', \%preload, 0, \$data_pm );
 
-    $data_pm_file->spew( iomode => '>:encoding(UTF-8)', $data_pm );
+    $data_pm_file->spew_utf8($data_pm);
 
     return %raw_locales;
 }
@@ -204,11 +207,11 @@ sub _iso_639_aliases ($self) {
 }
 
 sub _write_catalog_pm ($self) {
-    my $catalog_pm_file = file(qw( lib DateTime Locale Catalog.pm ));
+    my $catalog_pm_file = path(qw( lib DateTime Locale Catalog.pm ));
     ## no critic (InputOutput::RequireCheckedSyscalls)
     say "Generating $catalog_pm_file";
     ## use critic
-    my $catalog_pm = $catalog_pm_file->slurp( iomode => '<:encoding(UTF-8)' );
+    my $catalog_pm = $catalog_pm_file->slurp_utf8;
 
     my $max_code = max map { length $_->code } $self->_locales->@*;
     $max_code += 3;
@@ -239,7 +242,7 @@ sub _write_catalog_pm ($self) {
     $catalog_pm =~ s/(^=for :locales\n\n).+^(?==)/$1$locale_list/ms
         or die 'locale list subst failed';
 
-    $catalog_pm_file->spew( iomode => '>:encoding(UTF-8)', $catalog_pm );
+    $catalog_pm_file->spew_utf8($catalog_pm);
 }
 
 sub _insert_var_in_code ( $self, $name, $value, $public, $code ) {
@@ -319,7 +322,7 @@ EOF
 sub _write_pod_files ($self) {
     my $template = Text::Template->new(
         TYPE   => 'FILE',
-        SOURCE => file(qw( tools templates locale.pod ))->stringify,
+        SOURCE => path(qw( tools templates locale.pod ))->stringify,
     ) or die $Text::Template::ERROR;
 
     use lib 'lib';
@@ -362,7 +365,7 @@ sub _write_pod_files ($self) {
         my $underscore = $code =~ s/-/_/gr;
 
         my $pod_file
-            = file( qw( lib DateTime Locale ), $underscore . '.pod' );
+            = path( qw( lib DateTime Locale ), $underscore . '.pod' );
         ## no critic (InputOutput::RequireCheckedSyscalls)
         say "Generating $pod_file";
         ## use critic
@@ -382,18 +385,18 @@ sub _write_pod_files ($self) {
             },
         ) or die $Text::Template::ERROR;
 
-        $pod_file->spew( iomode => '>:encoding(UTF-8)', $filled );
+        $pod_file->spew_utf8($filled);
     }
 
     return;
 }
 
 sub _build_generator_script {
-    return file($0);
+    return path($0);
 }
 
 sub _build_source_data_root ($self) {
-    return $self->_generator_script->parent->parent->subdir('source-data');
+    return $self->_generator_script->parent->parent->child('source-data');
 }
 
 sub _build_locale_codes ($self) {
@@ -402,14 +405,15 @@ sub _build_locale_codes ($self) {
     return [ uniq( 'en-US', @{ $self->_only_locales } ) ]
         if $self->_has_only_locales;
 
-    my $avail
-        = decode_json(
-        $self->_source_data_root->file(qw( cldr-core availableLocales.json ))
-            ->slurp( iomode => '<:raw' ) );
+    my $avail = decode_json(
+        $self->_source_data_root->child(
+            qw( cldr-core availableLocales.json ))->slurp_raw
+    );
+
     my $default
         = decode_json(
-        $self->_source_data_root->file(qw( cldr-core defaultContent.json ))
-            ->slurp( iomode => '<:raw' ) );
+        $self->_source_data_root->child(qw( cldr-core defaultContent.json ))
+            ->slurp_raw );
 
     return [
         $avail->{availableLocales}{full}->@*,

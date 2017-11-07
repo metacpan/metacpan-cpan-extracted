@@ -22,8 +22,9 @@ requires:
 resources:
   bugtracker: https://github.com/benkasminbullock/Image-SVG-Path/issues
   repository: https://github.com/benkasminbullock/Image-SVG-Path
-version: '0.31'
+version: '0.32'
 x_contributors:
   - 'Alessandro Ranellucci <aar@cpan.org>'
   - 'Colin Kuskie <colink@cpan.org>'
+  - 'Alexander Gorlov'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

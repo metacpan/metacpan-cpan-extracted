@@ -7,7 +7,7 @@ use overload
     q{""}    => 'as_string',
     fallback => 1;
 
-our $VERSION = '0.40';
+our $VERSION = '0.42';
 
 use Devel::StackTrace;
 use Scalar::Util qw( blessed );
@@ -67,7 +67,7 @@ __PACKAGE__->_ooify;
 
 1;
 
-# ABSTRACT: A Throwable::Error subclass for type constraint failures
+# ABSTRACT: An exception class for type constraint failures
 
 __END__
 
@@ -77,11 +77,11 @@ __END__
 
 =head1 NAME
 
-Specio::Exception - A Throwable::Error subclass for type constraint failures
+Specio::Exception - An exception class for type constraint failures
 
 =head1 VERSION
 
-version 0.40
+version 0.42
 
 =head1 SYNOPSIS
 

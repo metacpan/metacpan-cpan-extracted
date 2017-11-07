@@ -1,16 +1,24 @@
-Changes on 2017-11-01 for repository at:
+Changes on 2017-11-06 for repository at:
   Fetch URL: git@github.com:abeltje/lc_time.git
   Push  URL: git@github.com:abeltje/lc_time.git
 
 Enjoy!
 
-0.14 2017-11-01T07:47:13+01:00 (f44c67f => abeltje)
- - (abeltje, 5 seconds ago) Autocommit for distribution lc_time 0.14 (same)
+0.15 2017-11-06T18:28:15+01:00 (3d2f6c6 => abeltje)
+ - (abeltje, 5 seconds ago) Autocommit for distribution lc_time 0.15 (same)
+
+0.14 2017-11-01T07:47:13+01:00 (9075eb2 => abeltje)
+ - (abeltje, 5 days ago) Autocommit for distribution lc_time 0.14 (same)
+
+ - (Mohammad S Anwar, 5 days ago) - Added license meta name as suggested by
+   CPANTS.
+
+ - (abeltje, 2 minutes ago) Merge branch 'manwar-add-license-meta-name'
 
 0.13 2017-02-05T14:40:06+01:00 (b7dff82 => abeltje)
  - (abeltje, 9 months ago) Autocommit for distribution lc_time 0.13 (same)
 
- - (abeltje, 17 hours ago) FreeBSD changed theire LC_TIME (RT#123414)
+ - (abeltje, 6 days ago) FreeBSD changed theire LC_TIME (RT#123414)
  -     Short month names in Spanish now have a '.' added at the end.
 
 0.12 2015-05-24T12:37:30+02:00 (0fe0e33 => abeltje)
@@ -34,7 +42,8 @@ Enjoy!
    it.
 
 0.11 2013-09-22T11:13:02+02:00 (5269f51 => abeltje)
- - (abeltje, 4 years, 1 month ago) Autocommit for distribution lc_time 0.11
+ - (abeltje, 4 years, 2 months ago) Autocommit for distribution lc_time
+   0.11
 
  - (Abe Timmerman, 2 years, 6 months ago) BUGFix: perl-5.21.1 changed
    POSIX::strftime
@@ -45,8 +54,8 @@ Enjoy!
  -     ISO8859-*/Big5/KOI8/CP*.
 
 0.10 2013-09-22T10:33:29+02:00 (11cbfc0 => abeltje)
- - (abeltje, 4 years, 1 month ago) * try a version that works for both perl
-   and debian
+ - (abeltje, 4 years, 2 months ago) * try a version that works for both
+   perl and debian
 
 0.00 2013-09-08T13:40:01+02:00 (8f67d19 => abeltje)
  - (abeltje, 4 years, 2 months ago) Initial checkin.
@@ -77,5 +86,5 @@ Enjoy!
 
  - (abeltje, 4 years, 2 months ago) * More HP-UX test fixing
 
- - (abeltje, 4 years, 1 month ago) Add the automatically generated Changes
+ - (abeltje, 4 years, 2 months ago) Add the automatically generated Changes
    file, fix version.

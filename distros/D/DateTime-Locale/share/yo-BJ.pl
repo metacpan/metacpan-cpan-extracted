@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "\N{U+00c0}\N{U+00e1}r\N{U+0254}\N{U+0300}",
-    "\N{U+0186}\N{U+0300}s\N{U+00e1}n"
+    "\N{U+0186}\N{U+0300}s\N{U+00e1}n",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d, E",
@@ -45,7 +50,7 @@
     yMd => "y-MM-dd",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "yo-BJ",
   date_format_full => "EEEE, d MMMM y",
@@ -63,7 +68,7 @@
     "\N{U+0186}j\N{U+0254}\N{U+0301}b\N{U+0254}",
     "\N{U+0190}t\N{U+00ec}",
     "\N{U+00c0}b\N{U+00e1}m\N{U+025b}\N{U+0301}ta",
-    "\N{U+00c0}\N{U+00ec}k\N{U+00fa}"
+    "\N{U+00c0}\N{U+00ec}k\N{U+00fa}",
   ],
   day_format_narrow => [
     "M",
@@ -72,7 +77,7 @@
     "T",
     "F",
     "S",
-    "S"
+    "S",
   ],
   day_format_wide => [
     "\N{U+0186}j\N{U+0254}\N{U+0301} Aj\N{U+00e9}",
@@ -81,7 +86,7 @@
     "\N{U+0186}j\N{U+0254}\N{U+0301}b\N{U+0254}",
     "\N{U+0186}j\N{U+0254}\N{U+0301} \N{U+0190}t\N{U+00ec}",
     "\N{U+0186}j\N{U+0254}\N{U+0301} \N{U+00c0}b\N{U+00e1}m\N{U+025b}\N{U+0301}ta",
-    "\N{U+0186}j\N{U+0254}\N{U+0301} \N{U+00c0}\N{U+00ec}k\N{U+00fa}"
+    "\N{U+0186}j\N{U+0254}\N{U+0301} \N{U+00c0}\N{U+00ec}k\N{U+00fa}",
   ],
   day_stand_alone_abbreviated => [
     "Aj\N{U+00e9}",
@@ -90,7 +95,7 @@
     "\N{U+0186}j\N{U+0254}\N{U+0301}b\N{U+0254}",
     "\N{U+0190}t\N{U+00ec}",
     "\N{U+00c0}b\N{U+00e1}m\N{U+025b}\N{U+0301}ta",
-    "\N{U+00c0}\N{U+00ec}k\N{U+00fa}"
+    "\N{U+00c0}\N{U+00ec}k\N{U+00fa}",
   ],
   day_stand_alone_narrow => [
     "M",
@@ -99,7 +104,7 @@
     "T",
     "F",
     "S",
-    "S"
+    "S",
   ],
   day_stand_alone_wide => [
     "\N{U+0186}j\N{U+0254}\N{U+0301} Aj\N{U+00e9}",
@@ -108,19 +113,19 @@
     "\N{U+0186}j\N{U+0254}\N{U+0301}b\N{U+0254}",
     "\N{U+0186}j\N{U+0254}\N{U+0301} \N{U+0190}t\N{U+00ec}",
     "\N{U+0186}j\N{U+0254}\N{U+0301} \N{U+00c0}b\N{U+00e1}m\N{U+025b}\N{U+0301}ta",
-    "\N{U+0186}j\N{U+0254}\N{U+0301} \N{U+00c0}\N{U+00ec}k\N{U+00fa}"
+    "\N{U+0186}j\N{U+0254}\N{U+0301} \N{U+00c0}\N{U+00ec}k\N{U+00fa}",
   ],
   era_abbreviated => [
     "BCE",
-    "LK"
+    "LK",
   ],
   era_narrow => [
     "BCE",
-    "LK"
+    "LK",
   ],
   era_wide => [
     "Saju Kristi",
-    "Lehin Kristi"
+    "Lehin Kristi",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -141,7 +146,7 @@
     "Owewe",
     "\N{U+0186}\N{U+0300}w\N{U+00e0}r\N{U+00e0}",
     "B\N{U+00e9}l\N{U+00fa}",
-    "\N{U+0186}\N{U+0300}p\N{U+025b}\N{U+0300}"
+    "\N{U+0186}\N{U+0300}p\N{U+025b}\N{U+0300}",
   ],
   month_format_narrow => [
     1,
@@ -155,7 +160,7 @@
     9,
     10,
     11,
-    12
+    12,
   ],
   month_format_wide => [
     "Osh\N{U+00f9} Sh\N{U+025b}\N{U+0301}r\N{U+025b}\N{U+0301}",
@@ -169,7 +174,7 @@
     "Osh\N{U+00f9} Owewe",
     "Osh\N{U+00f9} \N{U+0186}\N{U+0300}w\N{U+00e0}r\N{U+00e0}",
     "Osh\N{U+00f9} B\N{U+00e9}l\N{U+00fa}",
-    "Osh\N{U+00f9} \N{U+0186}\N{U+0300}p\N{U+025b}\N{U+0300}"
+    "Osh\N{U+00f9} \N{U+0186}\N{U+0300}p\N{U+025b}\N{U+0300}",
   ],
   month_stand_alone_abbreviated => [
     "Sh\N{U+025b}\N{U+0301}r\N{U+025b}\N{U+0301}",
@@ -183,7 +188,7 @@
     "Owewe",
     "\N{U+0186}\N{U+0300}w\N{U+00e0}r\N{U+00e0}",
     "B\N{U+00e9}l\N{U+00fa}",
-    "\N{U+0186}\N{U+0300}p\N{U+025b}\N{U+0300}"
+    "\N{U+0186}\N{U+0300}p\N{U+025b}\N{U+0300}",
   ],
   month_stand_alone_narrow => [
     1,
@@ -197,7 +202,7 @@
     9,
     10,
     11,
-    12
+    12,
   ],
   month_stand_alone_wide => [
     "Osh\N{U+00f9} Sh\N{U+025b}\N{U+0301}r\N{U+025b}\N{U+0301}",
@@ -211,7 +216,7 @@
     "Osh\N{U+00f9} Owewe",
     "Osh\N{U+00f9} \N{U+0186}\N{U+0300}w\N{U+00e0}r\N{U+00e0}",
     "Osh\N{U+00f9} B\N{U+00e9}l\N{U+00fa}",
-    "Osh\N{U+00f9} \N{U+0186}\N{U+0300}p\N{U+025b}\N{U+0300}"
+    "Osh\N{U+00f9} \N{U+0186}\N{U+0300}p\N{U+025b}\N{U+0300}",
   ],
   name => "Yoruba Benin",
   native_language => "\N{U+00c8}d\N{U+00e8} Yor\N{U+00f9}b\N{U+00e1}",
@@ -223,37 +228,37 @@
     "K1",
     "K2",
     "K3",
-    "K4"
+    "K4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "K\N{U+0254}\N{U+0301}t\N{U+00e0} K\N{U+00ed}nn\N{U+00ed}",
     "K\N{U+0254}\N{U+0301}t\N{U+00e0} Kej\N{U+00ec}",
     "K\N{U+0254}\N{U+0301}\N{U+00e0} Keta",
-    "K\N{U+0254}\N{U+0301}t\N{U+00e0} K\N{U+025b}rin"
+    "K\N{U+0254}\N{U+0301}t\N{U+00e0} K\N{U+025b}rin",
   ],
   quarter_stand_alone_abbreviated => [
     "K1",
     "K2",
     "K3",
-    "K4"
+    "K4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "K\N{U+0254}\N{U+0301}t\N{U+00e0} K\N{U+00ed}nn\N{U+00ed}",
     "K\N{U+0254}\N{U+0301}t\N{U+00e0} Kej\N{U+00ec}",
     "K\N{U+0254}\N{U+0301}\N{U+00e0} Keta",
-    "K\N{U+0254}\N{U+0301}t\N{U+00e0} K\N{U+025b}rin"
+    "K\N{U+0254}\N{U+0301}t\N{U+00e0} K\N{U+025b}rin",
   ],
   script => undef,
   territory => "Benin",
@@ -262,5 +267,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

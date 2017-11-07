@@ -1,5 +1,5 @@
 package QBit::WebInterface::Request;
-$QBit::WebInterface::Request::VERSION = '0.029';
+$QBit::WebInterface::Request::VERSION = '0.030';
 use qbit;
 
 use base qw(QBit::Class);
@@ -117,6 +117,8 @@ sub _parse_params {
                     push(@pairs, [$header{'name'}, \$content]);
                 }
             }
+        } elsif ($self->http_header('content-type') =~ /application\/json/) {
+            push(@pairs, ['', $buffer]);
         } else {
             push(@pairs, map {[split('=', $_, 2)]} split('&', $buffer));
         }

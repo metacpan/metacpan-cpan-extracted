@@ -8,7 +8,7 @@ my $builder = Module::Build->new(
     dist_author       => 'Ivan Wills <ivan.wills@gmail.com>',
     dist_version_from => 'lib/App/TemplateCMD.pm',
     requires          => {
-        'perl'               => 5.008,
+        'perl'               => 5.010,
         'version'            => 0,
         'File::ShareDir'     => '1.03',
         'Template'           => '2.14',
@@ -26,7 +26,7 @@ my $builder = Module::Build->new(
     },
     build_requires => {
         'Test::More'     => '0.88',
-        'Test::Warnings' => 0,
+        'Test::Warnings' => '0.026',
     },
     share_dir => {
         dist => [

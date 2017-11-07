@@ -4,7 +4,7 @@ use warnings;
 
 # functions for gen-* scripts : testcount(), testhead() and testnew().
 
-require 'dumpstr';  # for string()
+require './dumpstr';  # for string()
 
 sub testcount ($$;$) {
     my $r_ok = shift; # reference to the counter

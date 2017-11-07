@@ -5,7 +5,7 @@ use strict;
 use warnings FATAL => 'all';
 use Test::More;
 
-plan tests => 20;
+plan tests => 22;
 
 use App::SCM::Digest::SCM;
 
@@ -18,6 +18,7 @@ use App::SCM::Digest::SCM;
                      branch
                      checkout
                      commits_from
+                     has
                      show
                      show_all);
 

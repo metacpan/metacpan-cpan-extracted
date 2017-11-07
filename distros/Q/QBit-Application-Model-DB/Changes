@@ -1,10 +1,34 @@
 ==================================================
-Changes from 2016-09-30 00:00:00 +0000 to present.
+Changes from 2016-11-05 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.022 at 2017-09-30 17:47:03 +0000
+version 0.023 at 2017-11-05 00:22:39 +0000
 ------------------------------------------
+
+  Change: 17a60bfbd024b8dd737f4a6cfeddc012e90e6522
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2017-11-05 03:21:48 +0000
+
+    Merge pull request #25 from Madskill/select_timeout
+
+    added select_timeout 
+
+  Change: cac133a928da349e652bc4bdcebc343b9a4f0335
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-11-05 03:18:14 +0000
+
+    added select_timeout 
+
+------------------------------------------
+version 0.022 at 2017-09-30 17:47:20 +0000
+------------------------------------------
+
+  Change: ba89aa792795eb93b1397639065187c3d2983108
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-09-30 20:47:20 +0000
+
+    Version 0.022 
 
   Change: 6cc3801666dcc87e3c4e35dfa4a9ddeeda20b068
   Author: Igor <igor-sverdlov@mail.ru>
@@ -267,84 +291,6 @@ version 0.013 at 2016-12-01 23:33:04 +0000
 
     deleted connect if transaction 
 
-------------------------------------------
-version 0.012 at 2016-10-09 12:09:28 +0000
-------------------------------------------
-
-  Change: 6fc5d082e717a99817f95fe48d73c2fcd189e24f
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-10-09 15:09:28 +0000
-
-    Version 0.012 
-
-  Change: 2c330c7192a9346963254cbe35acc76285cff7c1
-  Author: Igor <igor-sverdlov@mail.ru>
-  Date : 2016-10-09 16:07:52 +0000
-
-    Merge pull request #14 from Madskill/fix_test
-
-    Fix test 
-
-  Change: f8c91ed9b89914c03135e607a3c69f0d47cf814c
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-10-09 15:05:31 +0000
-
-    use TestTimeLog 
-
-  Change: cd14b8396e14401edf00e2427c61325e19e581de
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-10-09 14:56:38 +0000
-
-    added TestTimeLog 
-
-------------------------------------------
-version 0.011 at 2016-10-09 08:53:52 +0000
-------------------------------------------
-
-  Change: 3bcaac11c3dd018f194564d62aa748c0d9966441
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-10-09 11:53:52 +0000
-
-    Version 0.011 
-
-  Change: 2a4698f36f9e83fab1b13002623c6eb08df1c7f8
-  Author: Igor <igor-sverdlov@mail.ru>
-  Date : 2016-10-09 12:52:26 +0000
-
-    Merge pull request #13 from Madskill/fix_dependency
-
-    added DBD::Mock to depends 
-
-  Change: c8d38e9088198a4169d9b095df811ff58162541b
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-10-09 11:45:48 +0000
-
-    added DBD::Mock to depends 
-
-------------------------------------------
-version 0.010 at 2016-10-08 19:58:21 +0000
-------------------------------------------
-
-  Change: 44a47f7f621f10e7fe702d2b5b298939e441b558
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-10-08 22:58:21 +0000
-
-    Version 0.010 
-
-  Change: 622ac9d8ccc88e277119510a23eb2ab20468f2c1
-  Author: Igor <igor-sverdlov@mail.ru>
-  Date : 2016-10-08 23:56:07 +0000
-
-    Merge pull request #12 from Madskill/move_t_lib
-
-    t_lib -> t/lib 
-
-  Change: 3101350fdb2972577c158cebb620f20ece57cc40
-  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
-  Date : 2016-10-08 22:54:34 +0000
-
-    t_lib -> t/lib 
-
-================================================
-Plus 9 releases after 2016-09-30 00:00:00 +0000.
-================================================
+=================================================
+Plus 12 releases after 2016-11-05 00:00:00 +0000.
+=================================================

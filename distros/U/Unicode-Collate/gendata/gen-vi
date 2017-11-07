@@ -8,10 +8,10 @@
 #
 use strict;
 use warnings;
-require 'gen-head'; # for testcount() and testhead()
+require './gen-head'; # for testcount() and testhead()
 
 use Unicode::Normalize;
-require 'dumpstr'; # for element(), string() and unidump()
+require './dumpstr'; # for element(), string() and unidump()
 
 my @base = qw( 61 41 103 102 E2 C2 65 45 EA CA 69 49 6F 4F
 	       F4 D4 1A1 1A0 75 55 1B0 1AF 79 59 );

@@ -1,0 +1,37 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'Module::Build::Tiny' => '0.034'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Pod::Coverage::TrustPod' => '0',
+                                      'Test::Pod' => '1.41',
+                                      'Test::Pod::Coverage' => '1.08'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Carp' => '0',
+                                      'Future' => '0.33',
+                                      'Mojolicious' => '5.0',
+                                      'Scalar::Util' => '0',
+                                      'parent' => '0',
+                                      'perl' => '5.010001'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'File::Spec' => '0',
+                                   'Module::Metadata' => '0',
+                                   'Test::Identity' => '0',
+                                   'Test::More' => '0.88'
+                                 }
+                 }
+     };
+  $x;
+ }

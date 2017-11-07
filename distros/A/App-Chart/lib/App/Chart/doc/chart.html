@@ -1,6 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<!-- This manual describes how to install and use Chart, version 262.
+<!-- This manual describes how to install and use Chart, version 264.
 
 Copyright 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2016, 2017 Kevin Ryde
 
@@ -8,16 +8,16 @@ Chart is free software; you can redistribute it and/or modify it under the
 terms of the GNU General Public License as published by the Free Software
 Foundation; either version 3, or (at your option) any later version
 (Copying). -->
-<!-- Created by GNU Texinfo 6.4.90, http://www.gnu.org/software/texinfo/ -->
+<!-- Created by GNU Texinfo 6.5, http://www.gnu.org/software/texinfo/ -->
 <head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <title>Chart Manual</title>
 
-<meta name="description" content="How to install and use the Chart program, version 262.">
+<meta name="description" content="How to install and use the Chart program, version 264.">
 <meta name="keywords" content="Chart Manual">
 <meta name="resource-type" content="document">
 <meta name="distribution" content="global">
 <meta name="Generator" content="makeinfo">
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <link href="#Top" rel="start" title="Top">
 <link href="#Concept-Index" rel="index" title="Concept Index">
 <link href="dir.html#Top" rel="up" title="(dir)">
@@ -83,7 +83,7 @@ Next: <a href="#Introduction" accesskey="n" rel="next">Introduction</a>, Previou
 <h1 class="top">Chart</h1>
 
 
-<p>This manual describes how to install and use Chart, version 262.
+<p>This manual describes how to install and use Chart, version 264.
 </p>
 <p>Copyright 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015, 2016, 2017 Kevin Ryde
 </p>
@@ -697,7 +697,7 @@ downloads.  (The command is the same as an &ldquo;update&rdquo;, because an upda
 stock with no data means do an initial download.)  For example,
 </p>
 <div class="example">
-<pre class="example">chart --download TSCO.L RNO.PA TEL.NZ BMW.DE
+<pre class="example">chart --download TSCO.L RNO.PA FBU.NZ BMW.DE
 </pre></div>
 
 <p>The TreeView in the dialog has an irritating animated arrow when expanding or
@@ -5125,7 +5125,6 @@ Previous: <a href="#Thrift-Savings-Plan" accesskey="p" rel="prev">Thrift Savings
 <ul>
 <li> Quotes, real-time for indexes and delayed for shares.
 </li><li> Historical daily data, dividends and splits.
-</li><li> Upcoming dividends.
 </li></ul>
 
 <p>Yahoo does not allow commercial use, see the terms of service at
@@ -5147,16 +5146,25 @@ sites),
 
 <a name="index-Currencies"></a>
 <a name="index-Metals_002c-spot-prices"></a>
-<p>Some currency cross-rates are available, they take a form such as
-&lsquo;<samp>AUDUSD=X</samp>&rsquo; for the value of one Australian dollar in US dollars.  Some
-spot metals prices are available in a similar form, for example
-&lsquo;<samp>XAUUSD=X</samp>&rsquo; for Gold in US dollars.
+<p>Some currency cross-rates are available, they take a form like &lsquo;<samp>AUDUSD=X</samp>&rsquo;
+for the value of one Australian dollar in US dollars.  Some spot metals prices
+are available similarly, for example &lsquo;<samp>XAUUSD=X</samp>&rsquo; for Gold in US dollars
+(but perhaps only quotes, not historical).
 </p>
 <p>Yahoo gives some information on market closing times, but Chart doesn&rsquo;t make
 use of that.  A day&rsquo;s trading is written as daily data at 6pm (in the
-exchange&rsquo;s timezone).  Before that the current day is a latest quote.  The
-downloads are slightly overlapped so that if 6pm was too soon then its prices
+exchange&rsquo;s timezone).  Before that the current day is a latest quote.
+Downloads are slightly overlapped so that if 6pm was too soon then its prices
 are replaced on a subsequent download.
+</p>
+<p>Currently quotes are only the current day&rsquo;s open/high/low/last in the manner
+of the historical data, so without bid/offer.
+</p>
+<p>Currently splits are not handled properly.  Yahoo supplies historical prices
+adjusted for subsequent splits, but the intention in Chart is to have original
+prices and adjust on display if desired.  The effect in the database is to
+make a bit of a mess with new downloads having new splits and past downloads
+not.
 </p>
 
 <table class="menu" border="0" cellspacing="0">

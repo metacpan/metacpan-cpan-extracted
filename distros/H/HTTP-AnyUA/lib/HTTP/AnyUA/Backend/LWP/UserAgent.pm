@@ -5,7 +5,7 @@ package HTTP::AnyUA::Backend::LWP::UserAgent;
 use warnings;
 use strict;
 
-our $VERSION = '0.900'; # VERSION
+our $VERSION = '0.901'; # VERSION
 
 use parent 'HTTP::AnyUA::Backend';
 
@@ -75,7 +75,7 @@ HTTP::AnyUA::Backend::LWP::UserAgent - A unified programming interface for LWP::
 
 =head1 VERSION
 
-version 0.900
+version 0.901
 
 =head1 DESCRIPTION
 

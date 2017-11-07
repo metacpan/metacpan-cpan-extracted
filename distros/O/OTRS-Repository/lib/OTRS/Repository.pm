@@ -12,15 +12,15 @@ use Regexp::Common qw(URI);
 
 use OTRS::Repository::Source;
 
-our $VERSION = 0.05;
+our $VERSION = 0.07;
 
-our $ALLOWED_SCHEME = 'HTTP';
+our $ALLOWED_SCHEME = [ 'HTTP', 'file' ];
 
 has sources => ( is => 'ro', required => 1, isa => sub {
     die "no valid URIs" unless 
         ref $_[0] eq 'ARRAY' 
         and
-        all { $_ =~ m{\A$RE{URI}{$ALLOWED_SCHEME}\z} } @{ $_[0] }
+        all { _check_uri( $_ ) } @{ $_[0] }
 });
 
 has _objects => ( is => 'ro', isa => sub {
@@ -68,11 +68,34 @@ sub BUILDARGS {
     return \%param;
 }
 
+sub _check_uri {
+    my @allowed_schemes = ref $ALLOWED_SCHEME ? @{ $ALLOWED_SCHEME } : $ALLOWED_SCHEME;
+
+    my $matches;
+
+    SCHEME:
+    for my $scheme ( @allowed_schemes ) {
+        my $regex = ( lc $scheme eq 'http' ) ?
+            $RE{URI}{HTTP}{-scheme => qr/https?/} :
+            $RE{URI}{$scheme};
+
+        if ( $_[0] =~ m{\A$regex\z} ) {
+            $matches++;
+            last SCHEME;
+        }
+    }
+
+    die "No valid URI" unless $matches;
+    return 1;
+}
+
 1;
 
 __END__
 
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -80,7 +103,7 @@ OTRS::Repository - parse OTRS repositories' otrs.xml files to search for add ons
 
 =head1 VERSION
 
-version 0.05
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -140,7 +163,7 @@ Renee Baecker <github@renee-baecker.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013 by Renee Baecker.
+This software is Copyright (c) 2017 by Renee Baecker.
 
 This is free software, licensed under:
 

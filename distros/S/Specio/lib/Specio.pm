@@ -5,7 +5,7 @@ use warnings;
 
 use 5.008;
 
-our $VERSION = '0.40';
+our $VERSION = '0.42';
 
 1;
 
@@ -23,7 +23,7 @@ Specio - Type constraints and coercions for Perl
 
 =head1 VERSION
 
-version 0.40
+version 0.42
 
 =head1 SYNOPSIS
 
@@ -443,9 +443,13 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Graham Knop Karen Etheridge
+=for stopwords cpansprout Graham Knop Karen Etheridge
 
 =over 4
+
+=item *
+
+cpansprout <cpansprout@gmail.com>
 
 =item *
 

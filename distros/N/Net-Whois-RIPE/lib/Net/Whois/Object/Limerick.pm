@@ -15,11 +15,12 @@ use base qw/Net::Whois::Object/;
 # mnt-by:        [mandatory]  [multiple]   [inverse key]
 # changed:       [mandatory]  [multiple]   [ ]
 # source:        [mandatory]  [single]     [ ]
-__PACKAGE__->attributes( 'primary', ['limerick'] );
-__PACKAGE__->attributes( 'mandatory', [ 'limerick', 'text', 'admin_c', 'author', 'mnt_by', 'changed', 'source' ] );
-__PACKAGE__->attributes( 'optional', [ 'descr', 'remarks', 'notify' ] );
-__PACKAGE__->attributes( 'single', [ 'limerick', 'source' ] );
-__PACKAGE__->attributes( 'multiple', [ 'text', 'admin_c', 'author', 'mnt_by', 'changed', 'descr', 'remarks', 'notify' ] );
+
+__PACKAGE__->attributes( 'primary',     [ 'limerick' ] );
+__PACKAGE__->attributes( 'mandatory',   [ 'limerick', 'text', 'admin_c', 'author', 'mnt_by', 'changed', 'source' ] );
+__PACKAGE__->attributes( 'optional',    [ 'descr', 'remarks', 'notify' ] );
+__PACKAGE__->attributes( 'single',      [ 'limerick', 'source' ] );
+__PACKAGE__->attributes( 'multiple',    [ 'text', 'admin_c', 'author', 'mnt_by', 'changed', 'descr', 'remarks', 'notify' ] );
 
 =head1 NAME
 

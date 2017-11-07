@@ -11,6 +11,7 @@ use Test::More;
 use File::Globstar::ListMatch;
 
 sub unref;
+sub compile_re;
 sub get_blessings;
 
 my ($matcher, $input, @patterns);
@@ -18,9 +19,9 @@ my ($matcher, $input, @patterns);
 $input = [qw (Tom Dick Harry)];
 $matcher = File::Globstar::ListMatch->new($input);
 is_deeply [unref $matcher->patterns], [
-    qr{^Tom$},
-    qr{^Dick$},
-    qr{^Harry$},
+    compile_re('^Tom$'),
+    compile_re('^Dick$'),
+    compile_re('^Harry$'),
 ], 'array input';
 
 $input = <<EOF;
@@ -29,8 +30,8 @@ BarBaz
 EOF
 $matcher = File::Globstar::ListMatch->new(\$input);
 is_deeply [unref $matcher->patterns], [
-    qr{^FooBar$},
-    qr{^BarBaz$}
+    compile_re('^FooBar$'),
+    compile_re('^BarBaz$'),
 ], 'string input';
 
 $input = <<EOF;
@@ -42,8 +43,8 @@ BarBaz
 EOF
 $matcher = File::Globstar::ListMatch->new(\$input);
 is_deeply [unref $matcher->patterns], [
-    qr{^FooBar$},
-    qr{^BarBaz$}
+    compile_re('^FooBar$'),
+    compile_re('^BarBaz$'),
 ], 'discard comments';
 
 my $space = ' ';
@@ -58,8 +59,8 @@ $whitespace$whitespace
 EOF
 $matcher = File::Globstar::ListMatch->new(\$input);
 is_deeply [unref $matcher->patterns], [
-    qr{^FooBar$},
-    qr{^BarBaz$}
+    compile_re('^FooBar$'),
+    compile_re('^BarBaz$')
 ], 'discard empty lines';
 
 $input = <<EOF;
@@ -68,8 +69,8 @@ foo\\\\bar
 EOF
 $matcher = File::Globstar::ListMatch->new(\$input);
 is_deeply [unref $matcher->patterns], [
-    qr{^foobar$},
-    qr{^foo\\bar$}
+    compile_re('^foobar$'),
+    compile_re('^foo\\\\bar$')
 ], 'backslash escape regular characters';
 
 $input = <<EOF;
@@ -81,36 +82,36 @@ escaped space again\\\\\\\\\\$space$whitespace
 EOF
 $matcher = File::Globstar::ListMatch->new(\$input);
 is_deeply [unref $matcher->patterns], [
-    qr{^trailing\ space$},
-    qr{^escaped\ space\ $},
-    qr{^not\ escaped\ space\\$},
-    qr{^escaped\ space\ again\\\\\ $},
-    qr{^\ $},
+    compile_re('^trailing\ space$'),
+    compile_re('^escaped\ space\ $'),
+    compile_re('^not\ escaped\ space\\\\$'),
+    compile_re('^escaped\ space\ again\\\\\\\\\ $'),
+    compile_re('^\ $'),
 ], 'trailing whitespace';
 
 open HANDLE, '<', 't/patterns' 
     or die "Cannot open 't/patterns' for reading: $!";
 $matcher = File::Globstar::ListMatch->new(*HANDLE, filename => 't/patterns');
 is_deeply [unref $matcher->patterns], [
-    qr{^foo$},
-    qr{^bar$},
-    qr{^baz$},
+    compile_re('^foo$'),
+    compile_re('^bar$'),
+    compile_re('^baz$'),
 ], 'read from GLOB';
 
 open my $fh, '<', 't/patterns' 
     or die "Cannot open 't/patterns' for reading: $!";
 $matcher = File::Globstar::ListMatch->new($fh, filename => 't/patterns');
 is_deeply [unref $matcher->patterns], [
-    qr{^foo$},
-    qr{^bar$},
-    qr{^baz$},
+    compile_re('^foo$'),
+    compile_re('^bar$'),
+    compile_re('^baz$'),
 ], 'read from GLOB';
 
 $matcher = File::Globstar::ListMatch->new('t/patterns');
 is_deeply [unref $matcher->patterns], [
-    qr{^foo$},
-    qr{^bar$},
-    qr{^baz$},
+    compile_re('^foo$'),
+    compile_re('^bar$'),
+    compile_re('^baz$'),
 ], 'read from GLOB';
 
 $input = <<EOF;
@@ -128,13 +129,13 @@ use constant RE_NEGATED => 0x1;
 use constant RE_FULL_MATCH => 0x2;
 use constant RE_DIRECTORY => 0x4;
 is_deeply [unref $matcher->patterns], [
-    qr{^regular$},
-    qr{^negated$},
-    qr{^full\-match$},
-    qr{^negated\-full\-match$},
-    qr{^directory$},
-    qr{^negated\-directory$},
-    qr{^negated\/full\-match\-directory$},
+    compile_re('^regular$'),
+    compile_re('^negated$'),
+    compile_re('^full\-match$'),
+    compile_re('^negated\-full\-match$'),
+    compile_re('^directory$'),
+    compile_re('^negated\-directory$'),
+    compile_re('^negated\/full\-match\-directory$'),
 ], 'strip-off';
 is_deeply [get_blessings $matcher->patterns], [
     RE_NONE,
@@ -151,7 +152,15 @@ done_testing;
 sub unref {
     my (@patterns) = @_;
 
-    return map { $$_ } @patterns;
+    return map { "$$_" } @patterns;
+}
+
+sub compile_re {
+    my ($regex) = @_;
+
+    my $ref = qr{$regex};
+
+    return "$$ref";
 }
 
 sub get_blessings {

@@ -1,6 +1,6 @@
 package App::GitGot;
 our $AUTHORITY = 'cpan:GENEHACK';
-$App::GitGot::VERSION = '1.333';
+$App::GitGot::VERSION = '1.334';
 # ABSTRACT: A tool to make it easier to manage multiple git repositories.
 use 5.014;
 use warnings;
@@ -22,7 +22,7 @@ App::GitGot - A tool to make it easier to manage multiple git repositories.
 
 =head1 VERSION
 
-version 1.333
+version 1.334
 
 =head1 SYNOPSIS
 

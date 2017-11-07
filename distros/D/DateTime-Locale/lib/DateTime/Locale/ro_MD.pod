@@ -327,11 +327,41 @@ Romanian Moldova locale.
 
 =head2 Available Formats
 
+=head3 Bh (h B)
+
+   2008-02-05T18:30:30 = 6 B
+   1995-12-22T09:05:02 = 9 B
+  -0010-09-15T04:44:23 = 4 B
+
+=head3 Bhm (h:mm B)
+
+   2008-02-05T18:30:30 = 6:30 B
+   1995-12-22T09:05:02 = 9:05 B
+  -0010-09-15T04:44:23 = 4:44 B
+
+=head3 Bhms (h:mm:ss B)
+
+   2008-02-05T18:30:30 = 6:30:30 B
+   1995-12-22T09:05:02 = 9:05:02 B
+  -0010-09-15T04:44:23 = 4:44:23 B
+
 =head3 E (ccc)
 
    2008-02-05T18:30:30 = Mar
    1995-12-22T09:05:02 = Vin
   -0010-09-15T04:44:23 = Sâm
+
+=head3 EBhm (E h:mm B)
+
+   2008-02-05T18:30:30 = Mar 6:30 B
+   1995-12-22T09:05:02 = Vin 9:05 B
+  -0010-09-15T04:44:23 = Sâm 4:44 B
+
+=head3 EBhms (E h:mm:ss B)
+
+   2008-02-05T18:30:30 = Mar 6:30:30 B
+   1995-12-22T09:05:02 = Vin 9:05:02 B
+  -0010-09-15T04:44:23 = Sâm 4:44:23 B
 
 =head3 EHm (E HH:mm)
 
@@ -597,19 +627,19 @@ Romanian Moldova locale.
    1995-12-22T09:05:02 = trimestrul 4 1995
   -0010-09-15T04:44:23 = trimestrul 3 -10
 
-=head3 yw-count-few ('săptămâna' w 'din' y)
+=head3 yw-count-few ('săptămâna' w 'din' Y)
 
    2008-02-05T18:30:30 = săptămâna 6 din 2008
    1995-12-22T09:05:02 = săptămâna 51 din 1995
   -0010-09-15T04:44:23 = săptămâna 37 din -10
 
-=head3 yw-count-one ('săptămâna' w 'din' y)
+=head3 yw-count-one ('săptămâna' w 'din' Y)
 
    2008-02-05T18:30:30 = săptămâna 6 din 2008
    1995-12-22T09:05:02 = săptămâna 51 din 1995
   -0010-09-15T04:44:23 = săptămâna 37 din -10
 
-=head3 yw-count-other ('săptămâna' w 'din' y)
+=head3 yw-count-other ('săptămâna' w 'din' Y)
 
    2008-02-05T18:30:30 = săptămâna 6 din 2008
    1995-12-22T09:05:02 = săptămâna 51 din 1995

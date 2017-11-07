@@ -41,7 +41,7 @@ use vars qw/$COMINVEST_URL /;
 use LWP::UserAgent;
 use HTTP::Request::Common;
 
-our $VERSION = '1.38'; # VERSION
+our $VERSION = '1.43'; # VERSION
 
 $COMINVEST_URL = ('http://www.cominvest.de/_applications/fonds_application/FondsInfos/FondsInfos_PreiseAktuell_CSVFile.asp?b2b=0&noindex=1&noindex=1&lang=49');
 

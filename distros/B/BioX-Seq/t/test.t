@@ -14,7 +14,7 @@ use BioX::Seq::Utils qw/rev_com is_nucleic all_orfs build_ORF_regex/;
 chdir $FindBin::Bin;
 
 my $test_fa       = 'test_data/test.fa';
-my $test_fq       = 'test_data/test.fq';
+my $test_fq       = 'test_data/test.fq.bz2';
 my $test_gz       = 'test_data/test2.fa.gz';
 my $test_fai      = 'test_data/test2.fa.gz.fai';
 my $test_fai_cmp  = 'test_data/test2.fa.gz.fai.cmp';
@@ -63,7 +63,8 @@ ok ($fa eq ">test_seq testing it\nTTTG\nAAAC\nTT\n", "as FASTA");
 # FASTA testing
 #----------------------------------------------------------------------------#
 
-my $parser = BioX::Seq::Stream->new($test_fa);
+open my $in, '<', $test_fa;
+my $parser = BioX::Seq::Stream->new($in);
 
 ok ($parser->isa('BioX::Seq::Stream::FASTA'), "returned BioX::Seq::Stream::FASTA object");
 
@@ -86,13 +87,30 @@ ok ($seq->seq eq 'WWFWWFWWFWWFWWFWWFWWFWWFWWF', "invalid translate");
 my $invalid = $seq->translate();
 ok (! defined $invalid, "invalid translate undef");
 
+close $in;
 
 #----------------------------------------------------------------------------#
-# FASTQ testing
+# gzip testing
 #----------------------------------------------------------------------------#
 
-open my $in, '<', $test_fq;
-$parser = BioX::Seq::Stream->new($in);
+$parser = BioX::Seq::Stream->new($test_gz);
+
+ok ($parser->isa('BioX::Seq::Stream::FASTA'), "returned BioX::Seq::Stream::FASTA object");
+
+$seq = $parser->next_seq;
+ok ($seq->isa('BioX::Seq'), "returned BioX::Seq object");
+
+ok ($seq->id eq 'Test1|someseq', "read seq ID");
+ok ($seq->seq eq 'AATGCAAGTACGTAAGACTTATAGCAGTAGGATGGAATGATAGCCATAG', "read seq ");
+ok ($seq->desc eq 'This is a test of the emergency broadcast system', "read desc");
+ok (! defined $seq->qual, "undefined qual");
+
+
+#----------------------------------------------------------------------------#
+# FASTQ / bzip2 testing
+#----------------------------------------------------------------------------#
+
+$parser = BioX::Seq::Stream->new($test_fq);
 
 ok ($parser->isa('BioX::Seq::Stream::FASTQ'), "returned BioX::Seq::Stream::FASTQ object");
 
@@ -134,11 +152,8 @@ ok( $seq->id eq 'seq_03', "read 2bit id" );
 # Fetch testing
 #----------------------------------------------------------------------------#
 
-$parser = BioX::Seq::Fetch->new($test_gz);
+$parser = BioX::Seq::Fetch->new($test_gz, with_description => 0);
 ok(! compare($test_fai, $test_fai_cmp), "Compare indices" );
-
-$seq = $parser->fetch_seq('Test1|someseq', 28 => 33);
-ok( $seq->seq eq 'TAGGAT', "fetch seq match 1" );
 
 $seq = $parser->fetch_seq('Prot1', 1 => 1);
 ok( $seq->seq eq 'W', "fetch seq match 2" );
@@ -146,11 +161,25 @@ ok( $seq->seq eq 'W', "fetch seq match 2" );
 $seq = $parser->fetch_seq('Test3/yetanother');
 ok( $seq->seq eq 'GTTAGAGCCAGGAACGAGAACGA', "fetch seq match 3" );
 
+$seq = $parser->fetch_seq('Test1|someseq', 28 => 33);
+ok( $seq->seq eq 'TAGGAT', "fetch seq match 1" );
+
+# should not have description
+$seq = $parser->fetch_seq('Test1|another');
+ok( ! defined $seq->desc );
+
+
 my @ids = $parser->ids;
 ok( scalar(@ids) == 4, "ID count" );
 ok( $ids[1] eq 'Test1|another', "ID comparison" );
 my $l = $parser->length($ids[2]);
 ok( $parser->length($ids[2]) == 23, "length comparison" );
+
+# now try to get descriptions
+$parser = BioX::Seq::Fetch->new($test_gz, with_description => 1);
+$seq = $parser->fetch_seq('Test1|another');
+ok( $seq->desc eq 'This is a second test' );
+
 
 #----------------------------------------------------------------------------#
 # Fetch utils

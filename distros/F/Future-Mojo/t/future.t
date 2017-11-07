@@ -52,6 +52,15 @@ my $loop = Mojo::IOLoop->new;
 	is_deeply [$future->get], [], '$future->get returns empty list on new_timer';
 }
 
+# new_timeout
+{
+	my $future = Future::Mojo->new_timeout($loop, 0.1);
+	
+	$future->await;
+	ok $future->is_ready, '$future is ready from new_timeout';
+	is_deeply [$future->failure], ['Timeout'], '$future failed after new_timeout';
+}
+
 # timer cancellation
 {
 	my $called;

@@ -1,10 +1,10 @@
 {
    "abstract" : "A perl implemantation of SimpleFlake. Inspired by https://github.com/SawdustSoftware/simpleflake",
    "author" : [
-      "=over"
+      "=over 1"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v2.4.1",
+   "generated_by" : "Minilla/v3.0.13",
    "license" : [
       "artistic_2"
    ],
@@ -59,13 +59,24 @@
    "provides" : {
       "SimpleFlake" : {
          "file" : "lib/SimpleFlake.pm",
-         "version" : "0.06"
+         "version" : "0.11"
       }
    },
    "release_status" : "stable",
-   "version" : "0.06",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/itnode/SimpleFlake/issues"
+      },
+      "homepage" : "https://github.com/itnode/SimpleFlake",
+      "repository" : {
+         "url" : "git://github.com/itnode/SimpleFlake.git",
+         "web" : "https://github.com/itnode/SimpleFlake"
+      }
+   },
+   "version" : "0.11",
    "x_contributors" : [
       "Jens Gassmann <jens.gassmann@atomix.de>",
       "Patrick Kilter <pas.freelance@googlemail.com>"
-   ]
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }

@@ -1,0 +1,32 @@
+---
+abstract: "Poor man's YAML"
+author:
+  - 'Adriano Ferreira <ferreira@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Module::Build: '0.28'
+  Test::More: '0.96'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: YAML-Hobo
+provides:
+  YAML::Hobo:
+    file: lib/YAML/Hobo.pm
+    version: v0.1.0
+requires:
+  YAML::Tiny: '1.70'
+resources:
+  bugtracker: https://github.com/aferreira/cpan-YAML-Hobo/issues
+  homepage: https://github.com/aferreira/cpan-YAML-Hobo
+  repository: https://github.com/aferreira/cpan-YAML-Hobo.git
+version: 0.1.0
+x_serialization_backend: 'YAML::Tiny version 1.70'

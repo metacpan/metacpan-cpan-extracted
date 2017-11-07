@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "\N{U+05dc}\N{U+05e4}\N{U+05e0}\N{U+05d4}\N{U+05f4}\N{U+05e6}",
-    "\N{U+05d0}\N{U+05d7}\N{U+05d4}\N{U+05f4}\N{U+05e6}"
+    "\N{U+05d0}\N{U+05d7}\N{U+05d4}\N{U+05f4}\N{U+05e6}",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E H:mm",
     EHms => "E H:mm:ss",
     Ed => "E \N{U+05d4}-d",
@@ -48,10 +53,10 @@
     yMd => "d.M.y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-many" => "\N{U+05e9}\N{U+05d1}\N{U+05d5}\N{U+05e2} w \N{U+05d1}\N{U+05e9}\N{U+05e0}\N{U+05ea} y",
-    "yw-count-one" => "\N{U+05e9}\N{U+05d1}\N{U+05d5}\N{U+05e2} w \N{U+05d1}\N{U+05e9}\N{U+05e0}\N{U+05ea} y",
-    "yw-count-other" => "\N{U+05e9}\N{U+05d1}\N{U+05d5}\N{U+05e2} w \N{U+05d1}\N{U+05e9}\N{U+05e0}\N{U+05ea} y",
-    "yw-count-two" => "\N{U+05e9}\N{U+05d1}\N{U+05d5}\N{U+05e2} w \N{U+05d1}\N{U+05e9}\N{U+05e0}\N{U+05ea} y"
+    "yw-count-many" => "\N{U+05e9}\N{U+05d1}\N{U+05d5}\N{U+05e2} w \N{U+05d1}\N{U+05e9}\N{U+05e0}\N{U+05ea} Y",
+    "yw-count-one" => "\N{U+05e9}\N{U+05d1}\N{U+05d5}\N{U+05e2} w \N{U+05d1}\N{U+05e9}\N{U+05e0}\N{U+05ea} Y",
+    "yw-count-other" => "\N{U+05e9}\N{U+05d1}\N{U+05d5}\N{U+05e2} w \N{U+05d1}\N{U+05e9}\N{U+05e0}\N{U+05ea} Y",
+    "yw-count-two" => "\N{U+05e9}\N{U+05d1}\N{U+05d5}\N{U+05e2} w \N{U+05d1}\N{U+05e9}\N{U+05e0}\N{U+05ea} Y",
   },
   code => "he",
   date_format_full => "EEEE, d \N{U+05d1}MMMM y",
@@ -69,7 +74,7 @@
     "\N{U+05d9}\N{U+05d5}\N{U+05dd} \N{U+05d4}\N{U+05f3}",
     "\N{U+05d9}\N{U+05d5}\N{U+05dd} \N{U+05d5}\N{U+05f3}",
     "\N{U+05e9}\N{U+05d1}\N{U+05ea}",
-    "\N{U+05d9}\N{U+05d5}\N{U+05dd} \N{U+05d0}\N{U+05f3}"
+    "\N{U+05d9}\N{U+05d5}\N{U+05dd} \N{U+05d0}\N{U+05f3}",
   ],
   day_format_narrow => [
     "\N{U+05d1}\N{U+05f3}",
@@ -78,7 +83,7 @@
     "\N{U+05d4}\N{U+05f3}",
     "\N{U+05d5}\N{U+05f3}",
     "\N{U+05e9}\N{U+05f3}",
-    "\N{U+05d0}\N{U+05f3}"
+    "\N{U+05d0}\N{U+05f3}",
   ],
   day_format_wide => [
     "\N{U+05d9}\N{U+05d5}\N{U+05dd} \N{U+05e9}\N{U+05e0}\N{U+05d9}",
@@ -87,7 +92,7 @@
     "\N{U+05d9}\N{U+05d5}\N{U+05dd} \N{U+05d7}\N{U+05de}\N{U+05d9}\N{U+05e9}\N{U+05d9}",
     "\N{U+05d9}\N{U+05d5}\N{U+05dd} \N{U+05e9}\N{U+05d9}\N{U+05e9}\N{U+05d9}",
     "\N{U+05d9}\N{U+05d5}\N{U+05dd} \N{U+05e9}\N{U+05d1}\N{U+05ea}",
-    "\N{U+05d9}\N{U+05d5}\N{U+05dd} \N{U+05e8}\N{U+05d0}\N{U+05e9}\N{U+05d5}\N{U+05df}"
+    "\N{U+05d9}\N{U+05d5}\N{U+05dd} \N{U+05e8}\N{U+05d0}\N{U+05e9}\N{U+05d5}\N{U+05df}",
   ],
   day_stand_alone_abbreviated => [
     "\N{U+05d9}\N{U+05d5}\N{U+05dd} \N{U+05d1}\N{U+05f3}",
@@ -96,7 +101,7 @@
     "\N{U+05d9}\N{U+05d5}\N{U+05dd} \N{U+05d4}\N{U+05f3}",
     "\N{U+05d9}\N{U+05d5}\N{U+05dd} \N{U+05d5}\N{U+05f3}",
     "\N{U+05e9}\N{U+05d1}\N{U+05ea}",
-    "\N{U+05d9}\N{U+05d5}\N{U+05dd} \N{U+05d0}\N{U+05f3}"
+    "\N{U+05d9}\N{U+05d5}\N{U+05dd} \N{U+05d0}\N{U+05f3}",
   ],
   day_stand_alone_narrow => [
     "\N{U+05d1}\N{U+05f3}",
@@ -105,7 +110,7 @@
     "\N{U+05d4}\N{U+05f3}",
     "\N{U+05d5}\N{U+05f3}",
     "\N{U+05e9}\N{U+05f3}",
-    "\N{U+05d0}\N{U+05f3}"
+    "\N{U+05d0}\N{U+05f3}",
   ],
   day_stand_alone_wide => [
     "\N{U+05d9}\N{U+05d5}\N{U+05dd} \N{U+05e9}\N{U+05e0}\N{U+05d9}",
@@ -114,19 +119,19 @@
     "\N{U+05d9}\N{U+05d5}\N{U+05dd} \N{U+05d7}\N{U+05de}\N{U+05d9}\N{U+05e9}\N{U+05d9}",
     "\N{U+05d9}\N{U+05d5}\N{U+05dd} \N{U+05e9}\N{U+05d9}\N{U+05e9}\N{U+05d9}",
     "\N{U+05d9}\N{U+05d5}\N{U+05dd} \N{U+05e9}\N{U+05d1}\N{U+05ea}",
-    "\N{U+05d9}\N{U+05d5}\N{U+05dd} \N{U+05e8}\N{U+05d0}\N{U+05e9}\N{U+05d5}\N{U+05df}"
+    "\N{U+05d9}\N{U+05d5}\N{U+05dd} \N{U+05e8}\N{U+05d0}\N{U+05e9}\N{U+05d5}\N{U+05df}",
   ],
   era_abbreviated => [
     "\N{U+05dc}\N{U+05e4}\N{U+05e0}\N{U+05d4}\N{U+05f4}\N{U+05e1}",
-    "\N{U+05dc}\N{U+05e1}\N{U+05e4}\N{U+05d9}\N{U+05e8}\N{U+05d4}"
+    "\N{U+05dc}\N{U+05e1}\N{U+05e4}\N{U+05d9}\N{U+05e8}\N{U+05d4}",
   ],
   era_narrow => [
     "\N{U+05dc}\N{U+05e4}\N{U+05e0}\N{U+05d4}\N{U+05f4}\N{U+05e1}",
-    "\N{U+05dc}\N{U+05e1}\N{U+05e4}\N{U+05d9}\N{U+05e8}\N{U+05d4}"
+    "\N{U+05dc}\N{U+05e1}\N{U+05e4}\N{U+05d9}\N{U+05e8}\N{U+05d4}",
   ],
   era_wide => [
     "\N{U+05dc}\N{U+05e4}\N{U+05e0}\N{U+05d9} \N{U+05d4}\N{U+05e1}\N{U+05e4}\N{U+05d9}\N{U+05e8}\N{U+05d4}",
-    "\N{U+05dc}\N{U+05e1}\N{U+05e4}\N{U+05d9}\N{U+05e8}\N{U+05d4}"
+    "\N{U+05dc}\N{U+05e1}\N{U+05e4}\N{U+05d9}\N{U+05e8}\N{U+05d4}",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -147,7 +152,7 @@
     "\N{U+05e1}\N{U+05e4}\N{U+05d8}\N{U+05f3}",
     "\N{U+05d0}\N{U+05d5}\N{U+05e7}\N{U+05f3}",
     "\N{U+05e0}\N{U+05d5}\N{U+05d1}\N{U+05f3}",
-    "\N{U+05d3}\N{U+05e6}\N{U+05de}\N{U+05f3}"
+    "\N{U+05d3}\N{U+05e6}\N{U+05de}\N{U+05f3}",
   ],
   month_format_narrow => [
     1,
@@ -161,7 +166,7 @@
     9,
     10,
     11,
-    12
+    12,
   ],
   month_format_wide => [
     "\N{U+05d9}\N{U+05e0}\N{U+05d5}\N{U+05d0}\N{U+05e8}",
@@ -175,7 +180,7 @@
     "\N{U+05e1}\N{U+05e4}\N{U+05d8}\N{U+05de}\N{U+05d1}\N{U+05e8}",
     "\N{U+05d0}\N{U+05d5}\N{U+05e7}\N{U+05d8}\N{U+05d5}\N{U+05d1}\N{U+05e8}",
     "\N{U+05e0}\N{U+05d5}\N{U+05d1}\N{U+05de}\N{U+05d1}\N{U+05e8}",
-    "\N{U+05d3}\N{U+05e6}\N{U+05de}\N{U+05d1}\N{U+05e8}"
+    "\N{U+05d3}\N{U+05e6}\N{U+05de}\N{U+05d1}\N{U+05e8}",
   ],
   month_stand_alone_abbreviated => [
     "\N{U+05d9}\N{U+05e0}\N{U+05d5}\N{U+05f3}",
@@ -189,7 +194,7 @@
     "\N{U+05e1}\N{U+05e4}\N{U+05d8}\N{U+05f3}",
     "\N{U+05d0}\N{U+05d5}\N{U+05e7}\N{U+05f3}",
     "\N{U+05e0}\N{U+05d5}\N{U+05d1}\N{U+05f3}",
-    "\N{U+05d3}\N{U+05e6}\N{U+05de}\N{U+05f3}"
+    "\N{U+05d3}\N{U+05e6}\N{U+05de}\N{U+05f3}",
   ],
   month_stand_alone_narrow => [
     1,
@@ -203,7 +208,7 @@
     9,
     10,
     11,
-    12
+    12,
   ],
   month_stand_alone_wide => [
     "\N{U+05d9}\N{U+05e0}\N{U+05d5}\N{U+05d0}\N{U+05e8}",
@@ -217,7 +222,7 @@
     "\N{U+05e1}\N{U+05e4}\N{U+05d8}\N{U+05de}\N{U+05d1}\N{U+05e8}",
     "\N{U+05d0}\N{U+05d5}\N{U+05e7}\N{U+05d8}\N{U+05d5}\N{U+05d1}\N{U+05e8}",
     "\N{U+05e0}\N{U+05d5}\N{U+05d1}\N{U+05de}\N{U+05d1}\N{U+05e8}",
-    "\N{U+05d3}\N{U+05e6}\N{U+05de}\N{U+05d1}\N{U+05e8}"
+    "\N{U+05d3}\N{U+05e6}\N{U+05de}\N{U+05d1}\N{U+05e8}",
   ],
   name => "Hebrew",
   native_language => "\N{U+05e2}\N{U+05d1}\N{U+05e8}\N{U+05d9}\N{U+05ea}",
@@ -229,37 +234,37 @@
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "\N{U+05e8}\N{U+05d1}\N{U+05e2}\N{U+05d5}\N{U+05df} 1",
     "\N{U+05e8}\N{U+05d1}\N{U+05e2}\N{U+05d5}\N{U+05df} 2",
     "\N{U+05e8}\N{U+05d1}\N{U+05e2}\N{U+05d5}\N{U+05df} 3",
-    "\N{U+05e8}\N{U+05d1}\N{U+05e2}\N{U+05d5}\N{U+05df} 4"
+    "\N{U+05e8}\N{U+05d1}\N{U+05e2}\N{U+05d5}\N{U+05df} 4",
   ],
   quarter_stand_alone_abbreviated => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "\N{U+05e8}\N{U+05d1}\N{U+05e2}\N{U+05d5}\N{U+05df} 1",
     "\N{U+05e8}\N{U+05d1}\N{U+05e2}\N{U+05d5}\N{U+05df} 2",
     "\N{U+05e8}\N{U+05d1}\N{U+05e2}\N{U+05d5}\N{U+05df} 3",
-    "\N{U+05e8}\N{U+05d1}\N{U+05e2}\N{U+05d5}\N{U+05df} 4"
+    "\N{U+05e8}\N{U+05d1}\N{U+05e2}\N{U+05d5}\N{U+05df} 4",
   ],
   script => undef,
   territory => undef,
@@ -268,5 +273,5 @@
   time_format_medium => "H:mm:ss",
   time_format_short => "H:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

@@ -327,11 +327,41 @@ Finnish locale.
 
 =head2 Available Formats
 
+=head3 Bh (h B)
+
+   2008-02-05T18:30:30 = 6 B
+   1995-12-22T09:05:02 = 9 B
+  -0010-09-15T04:44:23 = 4 B
+
+=head3 Bhm (h.mm B)
+
+   2008-02-05T18:30:30 = 6.30 B
+   1995-12-22T09:05:02 = 9.05 B
+  -0010-09-15T04:44:23 = 4.44 B
+
+=head3 Bhms (h.mm.ss B)
+
+   2008-02-05T18:30:30 = 6.30.30 B
+   1995-12-22T09:05:02 = 9.05.02 B
+  -0010-09-15T04:44:23 = 4.44.23 B
+
 =head3 E (ccc)
 
    2008-02-05T18:30:30 = ti
    1995-12-22T09:05:02 = pe
   -0010-09-15T04:44:23 = la
+
+=head3 EBhm (E h.mm B)
+
+   2008-02-05T18:30:30 = ti 6.30 B
+   1995-12-22T09:05:02 = pe 9.05 B
+  -0010-09-15T04:44:23 = la 4.44 B
+
+=head3 EBhms (E h.mm.ss B)
+
+   2008-02-05T18:30:30 = ti 6.30.30 B
+   1995-12-22T09:05:02 = pe 9.05.02 B
+  -0010-09-15T04:44:23 = la 4.44.23 B
 
 =head3 EHm (E H.mm)
 
@@ -585,13 +615,13 @@ Finnish locale.
    1995-12-22T09:05:02 = 4. neljännes 1995
   -0010-09-15T04:44:23 = 3. neljännes -10
 
-=head3 yw-count-one ('vuoden' y 'viikko' w)
+=head3 yw-count-one ('vuoden' Y 'viikko' w)
 
    2008-02-05T18:30:30 = vuoden 2008 viikko 6
    1995-12-22T09:05:02 = vuoden 1995 viikko 51
   -0010-09-15T04:44:23 = vuoden -10 viikko 37
 
-=head3 yw-count-other ('vuoden' y 'viikko' w)
+=head3 yw-count-other ('vuoden' Y 'viikko' w)
 
    2008-02-05T18:30:30 = vuoden 2008 viikko 6
    1995-12-22T09:05:02 = vuoden 1995 viikko 51

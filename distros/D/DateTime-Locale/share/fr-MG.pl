@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "AM",
-    "PM"
+    "PM",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "E",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "E d",
@@ -23,8 +28,8 @@
     MEd => "E dd/MM",
     MMM => "LLL",
     MMMEd => "E d MMM",
-    "MMMMW-count-one" => "'semaine' W 'de' MMM",
-    "MMMMW-count-other" => "'semaine' W 'de' MMM",
+    "MMMMW-count-one" => "'semaine' W (MMMM)",
+    "MMMMW-count-other" => "'semaine' W (MMMM)",
     MMMMd => "d MMMM",
     MMMd => "d MMM",
     Md => "dd/MM",
@@ -45,8 +50,8 @@
     yMd => "dd/MM/y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-one" => "'semaine' w 'de' y",
-    "yw-count-other" => "'semaine' w 'de' y"
+    "yw-count-one" => "'semaine' w 'de' Y",
+    "yw-count-other" => "'semaine' w 'de' Y",
   },
   code => "fr-MG",
   date_format_full => "EEEE d MMMM y",
@@ -64,7 +69,7 @@
     "jeu.",
     "ven.",
     "sam.",
-    "dim."
+    "dim.",
   ],
   day_format_narrow => [
     "L",
@@ -73,7 +78,7 @@
     "J",
     "V",
     "S",
-    "D"
+    "D",
   ],
   day_format_wide => [
     "lundi",
@@ -82,7 +87,7 @@
     "jeudi",
     "vendredi",
     "samedi",
-    "dimanche"
+    "dimanche",
   ],
   day_stand_alone_abbreviated => [
     "lun.",
@@ -91,7 +96,7 @@
     "jeu.",
     "ven.",
     "sam.",
-    "dim."
+    "dim.",
   ],
   day_stand_alone_narrow => [
     "L",
@@ -100,7 +105,7 @@
     "J",
     "V",
     "S",
-    "D"
+    "D",
   ],
   day_stand_alone_wide => [
     "lundi",
@@ -109,19 +114,19 @@
     "jeudi",
     "vendredi",
     "samedi",
-    "dimanche"
+    "dimanche",
   ],
   era_abbreviated => [
     "av. J.-C.",
-    "ap. J.-C."
+    "ap. J.-C.",
   ],
   era_narrow => [
     "av. J.-C.",
-    "ap. J.-C."
+    "ap. J.-C.",
   ],
   era_wide => [
     "avant J\N{U+00e9}sus-Christ",
-    "apr\N{U+00e8}s J\N{U+00e9}sus-Christ"
+    "apr\N{U+00e8}s J\N{U+00e9}sus-Christ",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -142,7 +147,7 @@
     "sept.",
     "oct.",
     "nov.",
-    "d\N{U+00e9}c."
+    "d\N{U+00e9}c.",
   ],
   month_format_narrow => [
     "J",
@@ -156,7 +161,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_format_wide => [
     "janvier",
@@ -170,7 +175,7 @@
     "septembre",
     "octobre",
     "novembre",
-    "d\N{U+00e9}cembre"
+    "d\N{U+00e9}cembre",
   ],
   month_stand_alone_abbreviated => [
     "janv.",
@@ -184,7 +189,7 @@
     "sept.",
     "oct.",
     "nov.",
-    "d\N{U+00e9}c."
+    "d\N{U+00e9}c.",
   ],
   month_stand_alone_narrow => [
     "J",
@@ -198,7 +203,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_stand_alone_wide => [
     "janvier",
@@ -212,7 +217,7 @@
     "septembre",
     "octobre",
     "novembre",
-    "d\N{U+00e9}cembre"
+    "d\N{U+00e9}cembre",
   ],
   name => "French Madagascar",
   native_language => "fran\N{U+00e7}ais",
@@ -224,37 +229,37 @@
     "T1",
     "T2",
     "T3",
-    "T4"
+    "T4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "1er trimestre",
     "2e trimestre",
     "3e trimestre",
-    "4e trimestre"
+    "4e trimestre",
   ],
   quarter_stand_alone_abbreviated => [
     "T1",
     "T2",
     "T3",
-    "T4"
+    "T4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "1er trimestre",
     "2e trimestre",
     "3e trimestre",
-    "4e trimestre"
+    "4e trimestre",
   ],
   script => undef,
   territory => "Madagascar",
@@ -263,5 +268,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

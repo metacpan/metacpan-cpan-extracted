@@ -20,33 +20,30 @@ sub new
 	my $execmapCfg;
 	if ($fn)
 	{
-		if ($fn eq ':internal')
+		# read in the file in Config::Std style
+		#
+		read_config($fn, my %cfg);
+	
+		# this looks weird, I know - see https://rt.cpan.org/Public/Bug/Display.html?id=56862
+		#
+		# I seem to hit the problem with "Warning: Name "Config::Std::Hash::DEMOLISH" used only once..."
+		# when running a Par::Packer binary but not when as a 'normal' script.
+		#
+		# The below incantation seem to get rid of that, at least for now. Let's see if it reappears... 
+		#
+		my $dummy = *Config::Std::Hash::DEMOLISH;
+		$dummy = *Config::Std::Hash::DEMOLISH;
+			
+		$execmapCfg = $cfg{EXECMAP};
+		die("Missing EXECMAP section in '$fn'\n") unless $execmapCfg;
+	}
+	else
+	{
+		if (!$delegate)
 		{
+			warn("WARNING: No execmap found, using internal default!\n");
 			$execmapCfg = __defaultCfg();
 		}
-		else
-		{
-			# read in the file in Config::Std style
-			#
-			read_config($fn, my %cfg);
-		
-			# this looks weird, I know - see https://rt.cpan.org/Public/Bug/Display.html?id=56862
-			#
-			# I seem to hit the problem with "Warning: Name "Config::Std::Hash::DEMOLISH" used only once..."
-			# when running a Par::Packer binary but not when as a 'normal' script.
-			#
-			# The below incantation seem to get rid of that, at least for now. Let's see if it reappears... 
-			#
-			my $dummy = *Config::Std::Hash::DEMOLISH;
-			$dummy = *Config::Std::Hash::DEMOLISH;
-			
-			$execmapCfg = $cfg{EXECMAP};
-			die("Missing EXECMAP section in '$fn'\n") unless $execmapCfg;
-		}
-	}
-	elsif (!$delegate)
-	{
-		die("No EXECMAP found - configure one or use '--execmap :internal' for default\n");
 	}
 
 	my $self = bless( {}, $class);
@@ -166,6 +163,18 @@ sub __defaultCfg
 						'cmd5' => '/bin/sh',
 					),
 
+			# For using AutoIt scripts (https://www.autoitscript.com/site/autoit/)
+			# (Windows only)
+			#
+			$IS_WINDOWS
+				?
+					(
+						'match6' => 'regexp[\.au3$]',
+						'cmd6' => 'autoit3',
+					)
+				:
+					(),
+			
 			#######
 			# add other conveniences here - ensure numbering is as desired
 			#

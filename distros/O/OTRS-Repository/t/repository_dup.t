@@ -10,21 +10,7 @@ use File::Basename;
 
 use OTRS::Repository;
 
-$OTRS::Repository::ALLOWED_SCHEME = 'file';
-$OTRS::Repository::Source::ALLOWED_SCHEME = 'file';
-
-{
-    no warnings 'redefine';
-    sub HTTP::Tiny::get {
-        my ($obj, $url) = @_;
-
-        $url =~ s{file://}{};
-        my $content = do { local (@ARGV, $/) = $url; <> };
-        return { success => 1, content => $content };
-    }
-}
-
-my $base_url = File::Spec->abs2rel(
+my $base_url = File::Spec->rel2abs(
   File::Spec->catdir( dirname( __FILE__ ), 'data' ),
 );
 
@@ -32,7 +18,9 @@ if ( $^O =~ m{win32}i ) {
     $base_url =~ s{\\}{/}g;
 }
 
-my $xml_file = File::Spec::Unix->catfile( $base_url, 'otrs.xml' );
+my $xml_file = File::Spec->rel2abs(
+    File::Spec::Unix->catfile( $base_url, 'otrs.xml' )
+);
 
 $base_url = 'file://' . $base_url;
 

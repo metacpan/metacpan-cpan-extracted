@@ -30,23 +30,23 @@ Northern Sami Finland locale.
 
 =head3 Wide (format)
 
-  vuossárgga
-  maŋŋebárgga
-  gaskavahku
-  duorastaga
-  bearjadaga
-  lávvardaga
+  mánnodat
+  disdat
+  gaskavahkku
+  duorastat
+  bearjadat
+  lávvordat
   sotnabeaivi
 
 =head3 Abbreviated (format)
 
-  vuos
-  maŋ
-  gask
-  duor
-  bear
-  láv
-  sotn
+  má
+  di
+  ga
+  du
+  be
+  lá
+  so
 
 =head3 Narrow (format)
 
@@ -61,23 +61,23 @@ Northern Sami Finland locale.
 
 =head3 Wide (stand-alone)
 
-  vuossárga
-  maŋŋebárga
+  mánnodat
+  disdat
   gaskavahkku
-  duorasdat
+  duorastat
   bearjadat
-  lávvardat
+  lávvordat
   sotnabeaivi
 
 =head3 Abbreviated (stand-alone)
 
-  vuos
-  maŋ
-  gask
-  duor
-  bear
-  láv
-  sotn
+  má
+  di
+  ga
+  du
+  be
+  lá
+  so
 
 =head3 Narrow (stand-alone)
 
@@ -111,7 +111,7 @@ Northern Sami Finland locale.
   ođđj
   guov
   njuk
-  cuo
+  cuoŋ
   mies
   geas
   suoi
@@ -157,7 +157,7 @@ Northern Sami Finland locale.
   ođđj
   guov
   njuk
-  cuo
+  cuoŋ
   mies
   geas
   suoi
@@ -186,17 +186,17 @@ Northern Sami Finland locale.
 
 =head3 Wide (format)
 
-  Q1
-  Q2
-  Q3
-  Q4
+  1. njealjádas
+  2. njealjádas
+  3. njealjádas
+  4. njealjádas
 
 =head3 Abbreviated (format)
 
-  Q1
-  Q2
-  Q3
-  Q4
+  1Q
+  2Q
+  3Q
+  4Q
 
 =head3 Narrow (format)
 
@@ -208,17 +208,17 @@ Northern Sami Finland locale.
 
 =head3 Wide (stand-alone)
 
-  Q1
-  Q2
-  Q3
-  Q4
+  1. njealjádas
+  2. njealjádas
+  3. njealjádas
+  4. njealjádas
 
 =head3 Abbreviated (stand-alone)
 
   Q1
-  Q2
-  Q3
-  Q4
+  2Q
+  3Q
+  4Q
 
 =head3 Narrow (stand-alone)
 
@@ -231,44 +231,44 @@ Northern Sami Finland locale.
 
 =head3 Wide (format)
 
-  ovdal Kristtusa
-  maŋŋel Kristtusa
+  ovdal Kristusa
+  maŋŋel Kristusa
 
 =head3 Abbreviated (format)
 
-  o.Kr.
-  m.Kr.
+  oKr.
+  mKr.
 
 =head3 Narrow (format)
 
-  o.Kr.
-  m.Kr.
+  oKr.
+  mKr.
 
 =head2 Date Formats
 
 =head3 Full
 
-   2008-02-05T18:30:30 = 2008 guovvamánnu 5, maŋŋebárgga
-   1995-12-22T09:05:02 = 1995 juovlamánnu 22, bearjadaga
-  -0010-09-15T04:44:23 = -10 čakčamánnu 15, lávvardaga
+   2008-02-05T18:30:30 = disdat 5 guovvamánnu 2008
+   1995-12-22T09:05:02 = bearjadat 22 juovlamánnu 1995
+  -0010-09-15T04:44:23 = lávvordat 15 čakčamánnu -10
 
 =head3 Long
 
-   2008-02-05T18:30:30 = 2008 guovvamánnu 5
-   1995-12-22T09:05:02 = 1995 juovlamánnu 22
-  -0010-09-15T04:44:23 = -10 čakčamánnu 15
+   2008-02-05T18:30:30 = 5 guovvamánnu 2008
+   1995-12-22T09:05:02 = 22 juovlamánnu 1995
+  -0010-09-15T04:44:23 = 15 čakčamánnu -10
 
 =head3 Medium
 
-   2008-02-05T18:30:30 = 2008 guov 5
-   1995-12-22T09:05:02 = 1995 juov 22
-  -0010-09-15T04:44:23 = -10 čakč 15
+   2008-02-05T18:30:30 = 5 guov 2008
+   1995-12-22T09:05:02 = 22 juov 1995
+  -0010-09-15T04:44:23 = 15 čakč -10
 
 =head3 Short
 
-   2008-02-05T18:30:30 = 2008-02-05
-   1995-12-22T09:05:02 = 1995-12-22
-  -0010-09-15T04:44:23 = -10-09-15
+   2008-02-05T18:30:30 = 05.02.2008
+   1995-12-22T09:05:02 = 22.12.1995
+  -0010-09-15T04:44:23 = 15.09.-10
 
 
 =head2 Time Formats
@@ -302,90 +302,120 @@ Northern Sami Finland locale.
 
 =head3 Full
 
-   2008-02-05T18:30:30 = 2008 guovvamánnu 5, maŋŋebárgga 18:30:30 UTC
-   1995-12-22T09:05:02 = 1995 juovlamánnu 22, bearjadaga 09:05:02 UTC
-  -0010-09-15T04:44:23 = -10 čakčamánnu 15, lávvardaga 04:44:23 UTC
+   2008-02-05T18:30:30 = disdat 5 guovvamánnu 2008 18:30:30 UTC
+   1995-12-22T09:05:02 = bearjadat 22 juovlamánnu 1995 09:05:02 UTC
+  -0010-09-15T04:44:23 = lávvordat 15 čakčamánnu -10 04:44:23 UTC
 
 =head3 Long
 
-   2008-02-05T18:30:30 = 2008 guovvamánnu 5 18:30:30 UTC
-   1995-12-22T09:05:02 = 1995 juovlamánnu 22 09:05:02 UTC
-  -0010-09-15T04:44:23 = -10 čakčamánnu 15 04:44:23 UTC
+   2008-02-05T18:30:30 = 5 guovvamánnu 2008 18:30:30 UTC
+   1995-12-22T09:05:02 = 22 juovlamánnu 1995 09:05:02 UTC
+  -0010-09-15T04:44:23 = 15 čakčamánnu -10 04:44:23 UTC
 
 =head3 Medium
 
-   2008-02-05T18:30:30 = 2008 guov 5 18:30:30
-   1995-12-22T09:05:02 = 1995 juov 22 09:05:02
-  -0010-09-15T04:44:23 = -10 čakč 15 04:44:23
+   2008-02-05T18:30:30 = 5 guov 2008 18:30:30
+   1995-12-22T09:05:02 = 22 juov 1995 09:05:02
+  -0010-09-15T04:44:23 = 15 čakč -10 04:44:23
 
 =head3 Short
 
-   2008-02-05T18:30:30 = 2008-02-05 18:30
-   1995-12-22T09:05:02 = 1995-12-22 09:05
-  -0010-09-15T04:44:23 = -10-09-15 04:44
+   2008-02-05T18:30:30 = 05.02.2008 18:30
+   1995-12-22T09:05:02 = 22.12.1995 09:05
+  -0010-09-15T04:44:23 = 15.09.-10 04:44
 
 
 =head2 Available Formats
 
+=head3 Bh (h B)
+
+   2008-02-05T18:30:30 = 6 B
+   1995-12-22T09:05:02 = 9 B
+  -0010-09-15T04:44:23 = 4 B
+
+=head3 Bhm (h:mm B)
+
+   2008-02-05T18:30:30 = 6:30 B
+   1995-12-22T09:05:02 = 9:05 B
+  -0010-09-15T04:44:23 = 4:44 B
+
+=head3 Bhms (h:mm:ss B)
+
+   2008-02-05T18:30:30 = 6:30:30 B
+   1995-12-22T09:05:02 = 9:05:02 B
+  -0010-09-15T04:44:23 = 4:44:23 B
+
 =head3 E (ccc)
 
-   2008-02-05T18:30:30 = maŋ
-   1995-12-22T09:05:02 = bear
-  -0010-09-15T04:44:23 = láv
+   2008-02-05T18:30:30 = di
+   1995-12-22T09:05:02 = be
+  -0010-09-15T04:44:23 = lá
+
+=head3 EBhm (E h:mm B)
+
+   2008-02-05T18:30:30 = di 6:30 B
+   1995-12-22T09:05:02 = be 9:05 B
+  -0010-09-15T04:44:23 = lá 4:44 B
+
+=head3 EBhms (E h:mm:ss B)
+
+   2008-02-05T18:30:30 = di 6:30:30 B
+   1995-12-22T09:05:02 = be 9:05:02 B
+  -0010-09-15T04:44:23 = lá 4:44:23 B
 
 =head3 EHm (E HH:mm)
 
-   2008-02-05T18:30:30 = maŋ 18:30
-   1995-12-22T09:05:02 = bear 09:05
-  -0010-09-15T04:44:23 = láv 04:44
+   2008-02-05T18:30:30 = di 18:30
+   1995-12-22T09:05:02 = be 09:05
+  -0010-09-15T04:44:23 = lá 04:44
 
 =head3 EHms (E HH:mm:ss)
 
-   2008-02-05T18:30:30 = maŋ 18:30:30
-   1995-12-22T09:05:02 = bear 09:05:02
-  -0010-09-15T04:44:23 = láv 04:44:23
+   2008-02-05T18:30:30 = di 18:30:30
+   1995-12-22T09:05:02 = be 09:05:02
+  -0010-09-15T04:44:23 = lá 04:44:23
 
-=head3 Ed (d, E)
+=head3 Ed (d E)
 
-   2008-02-05T18:30:30 = 5, maŋ
-   1995-12-22T09:05:02 = 22, bear
-  -0010-09-15T04:44:23 = 15, láv
+   2008-02-05T18:30:30 = 5 di
+   1995-12-22T09:05:02 = 22 be
+  -0010-09-15T04:44:23 = 15 lá
 
 =head3 Ehm (E h:mm a)
 
-   2008-02-05T18:30:30 = maŋ 6:30 e.b.
-   1995-12-22T09:05:02 = bear 9:05 i.b.
-  -0010-09-15T04:44:23 = láv 4:44 i.b.
+   2008-02-05T18:30:30 = di 6:30 eb
+   1995-12-22T09:05:02 = be 9:05 ib
+  -0010-09-15T04:44:23 = lá 4:44 ib
 
 =head3 Ehms (E h:mm:ss a)
 
-   2008-02-05T18:30:30 = maŋ 6:30:30 e.b.
-   1995-12-22T09:05:02 = bear 9:05:02 i.b.
-  -0010-09-15T04:44:23 = láv 4:44:23 i.b.
+   2008-02-05T18:30:30 = di 6:30:30 eb
+   1995-12-22T09:05:02 = be 9:05:02 ib
+  -0010-09-15T04:44:23 = lá 4:44:23 ib
 
-=head3 Gy (G y)
+=head3 Gy (y G)
 
-   2008-02-05T18:30:30 = m.Kr. 2008
-   1995-12-22T09:05:02 = m.Kr. 1995
-  -0010-09-15T04:44:23 = o.Kr. -10
+   2008-02-05T18:30:30 = 2008 mKr.
+   1995-12-22T09:05:02 = 1995 mKr.
+  -0010-09-15T04:44:23 = -10 oKr.
 
-=head3 GyMMM (G y MMM)
+=head3 GyMMM (MMM y G)
 
-   2008-02-05T18:30:30 = m.Kr. 2008 guov
-   1995-12-22T09:05:02 = m.Kr. 1995 juov
-  -0010-09-15T04:44:23 = o.Kr. -10 čakč
+   2008-02-05T18:30:30 = guov 2008 mKr.
+   1995-12-22T09:05:02 = juov 1995 mKr.
+  -0010-09-15T04:44:23 = čakč -10 oKr.
 
-=head3 GyMMMEd (G y MMM d, E)
+=head3 GyMMMEd (E d MMM y G)
 
-   2008-02-05T18:30:30 = m.Kr. 2008 guov 5, maŋ
-   1995-12-22T09:05:02 = m.Kr. 1995 juov 22, bear
-  -0010-09-15T04:44:23 = o.Kr. -10 čakč 15, láv
+   2008-02-05T18:30:30 = di 5 guov 2008 mKr.
+   1995-12-22T09:05:02 = be 22 juov 1995 mKr.
+  -0010-09-15T04:44:23 = lá 15 čakč -10 oKr.
 
-=head3 GyMMMd (G y MMM d)
+=head3 GyMMMd (d MMM y G)
 
-   2008-02-05T18:30:30 = m.Kr. 2008 guov 5
-   1995-12-22T09:05:02 = m.Kr. 1995 juov 22
-  -0010-09-15T04:44:23 = o.Kr. -10 čakč 15
+   2008-02-05T18:30:30 = 5 guov 2008 mKr.
+   1995-12-22T09:05:02 = 22 juov 1995 mKr.
+  -0010-09-15T04:44:23 = 15 čakč -10 oKr.
 
 =head3 H (HH)
 
@@ -423,11 +453,11 @@ Northern Sami Finland locale.
    1995-12-22T09:05:02 = 12
   -0010-09-15T04:44:23 = 9
 
-=head3 MEd (MM-dd, E)
+=head3 MEd (E d.M)
 
-   2008-02-05T18:30:30 = 02-05, maŋ
-   1995-12-22T09:05:02 = 12-22, bear
-  -0010-09-15T04:44:23 = 09-15, láv
+   2008-02-05T18:30:30 = di 5.2
+   1995-12-22T09:05:02 = be 22.12
+  -0010-09-15T04:44:23 = lá 15.9
 
 =head3 MMM (LLL)
 
@@ -435,47 +465,47 @@ Northern Sami Finland locale.
    1995-12-22T09:05:02 = juov
   -0010-09-15T04:44:23 = čakč
 
-=head3 MMMEd (MMM d, E)
+=head3 MMMEd (E d MMM)
 
-   2008-02-05T18:30:30 = guov 5, maŋ
-   1995-12-22T09:05:02 = juov 22, bear
-  -0010-09-15T04:44:23 = čakč 15, láv
+   2008-02-05T18:30:30 = di 5 guov
+   1995-12-22T09:05:02 = be 22 juov
+  -0010-09-15T04:44:23 = lá 15 čakč
 
-=head3 MMMMW-count-one ('week' W 'of' MMM)
+=head3 MMMMW-count-one (MMMM:a 'vahkku' W)
 
-   2008-02-05T18:30:30 = week 1 of guov
-   1995-12-22T09:05:02 = week 3 of juov
-  -0010-09-15T04:44:23 = week 2 of čakč
+   2008-02-05T18:30:30 = guovvamánnu:eb vahkku 1
+   1995-12-22T09:05:02 = juovlamánnu:ib vahkku 3
+  -0010-09-15T04:44:23 = čakčamánnu:ib vahkku 2
 
-=head3 MMMMW-count-other ('week' W 'of' MMM)
+=head3 MMMMW-count-other (MMM:a 'vahkku' W)
 
-   2008-02-05T18:30:30 = week 1 of guov
-   1995-12-22T09:05:02 = week 3 of juov
-  -0010-09-15T04:44:23 = week 2 of čakč
+   2008-02-05T18:30:30 = guov:eb vahkku 1
+   1995-12-22T09:05:02 = juov:ib vahkku 3
+  -0010-09-15T04:44:23 = čakč:ib vahkku 2
 
-=head3 MMMMW-count-two ('week' W 'of' MMM)
+=head3 MMMMW-count-two (MMMM:a 'vahkku' W)
 
-   2008-02-05T18:30:30 = week 1 of guov
-   1995-12-22T09:05:02 = week 3 of juov
-  -0010-09-15T04:44:23 = week 2 of čakč
+   2008-02-05T18:30:30 = guovvamánnu:eb vahkku 1
+   1995-12-22T09:05:02 = juovlamánnu:ib vahkku 3
+  -0010-09-15T04:44:23 = čakčamánnu:ib vahkku 2
 
-=head3 MMMMd (MMMM d)
+=head3 MMMMd (d MMMM)
 
-   2008-02-05T18:30:30 = guovvamánnu 5
-   1995-12-22T09:05:02 = juovlamánnu 22
-  -0010-09-15T04:44:23 = čakčamánnu 15
+   2008-02-05T18:30:30 = 5 guovvamánnu
+   1995-12-22T09:05:02 = 22 juovlamánnu
+  -0010-09-15T04:44:23 = 15 čakčamánnu
 
-=head3 MMMd (MMM d)
+=head3 MMMd (d MMM)
 
-   2008-02-05T18:30:30 = guov 5
-   1995-12-22T09:05:02 = juov 22
-  -0010-09-15T04:44:23 = čakč 15
+   2008-02-05T18:30:30 = 5 guov
+   1995-12-22T09:05:02 = 22 juov
+  -0010-09-15T04:44:23 = 15 čakč
 
-=head3 Md (MM-dd)
+=head3 Md (d/M)
 
-   2008-02-05T18:30:30 = 02-05
-   1995-12-22T09:05:02 = 12-22
-  -0010-09-15T04:44:23 = 09-15
+   2008-02-05T18:30:30 = 5/2
+   1995-12-22T09:05:02 = 22/12
+  -0010-09-15T04:44:23 = 15/9
 
 =head3 d (d)
 
@@ -485,33 +515,33 @@ Northern Sami Finland locale.
 
 =head3 h (h a)
 
-   2008-02-05T18:30:30 = 6 e.b.
-   1995-12-22T09:05:02 = 9 i.b.
-  -0010-09-15T04:44:23 = 4 i.b.
+   2008-02-05T18:30:30 = 6 eb
+   1995-12-22T09:05:02 = 9 ib
+  -0010-09-15T04:44:23 = 4 ib
 
 =head3 hm (h:mm a)
 
-   2008-02-05T18:30:30 = 6:30 e.b.
-   1995-12-22T09:05:02 = 9:05 i.b.
-  -0010-09-15T04:44:23 = 4:44 i.b.
+   2008-02-05T18:30:30 = 6:30 eb
+   1995-12-22T09:05:02 = 9:05 ib
+  -0010-09-15T04:44:23 = 4:44 ib
 
 =head3 hms (h:mm:ss a)
 
-   2008-02-05T18:30:30 = 6:30:30 e.b.
-   1995-12-22T09:05:02 = 9:05:02 i.b.
-  -0010-09-15T04:44:23 = 4:44:23 i.b.
+   2008-02-05T18:30:30 = 6:30:30 eb
+   1995-12-22T09:05:02 = 9:05:02 ib
+  -0010-09-15T04:44:23 = 4:44:23 ib
 
 =head3 hmsv (h:mm:ss a v)
 
-   2008-02-05T18:30:30 = 6:30:30 e.b. UTC
-   1995-12-22T09:05:02 = 9:05:02 i.b. UTC
-  -0010-09-15T04:44:23 = 4:44:23 i.b. UTC
+   2008-02-05T18:30:30 = 6:30:30 eb UTC
+   1995-12-22T09:05:02 = 9:05:02 ib UTC
+  -0010-09-15T04:44:23 = 4:44:23 ib UTC
 
 =head3 hmv (h:mm a v)
 
-   2008-02-05T18:30:30 = 6:30 e.b. UTC
-   1995-12-22T09:05:02 = 9:05 i.b. UTC
-  -0010-09-15T04:44:23 = 4:44 i.b. UTC
+   2008-02-05T18:30:30 = 6:30 eb UTC
+   1995-12-22T09:05:02 = 9:05 ib UTC
+  -0010-09-15T04:44:23 = 4:44 ib UTC
 
 =head3 ms (mm:ss)
 
@@ -525,73 +555,73 @@ Northern Sami Finland locale.
    1995-12-22T09:05:02 = 1995
   -0010-09-15T04:44:23 = -10
 
-=head3 yM (y-MM)
+=head3 yM (MM.y)
 
-   2008-02-05T18:30:30 = 2008-02
-   1995-12-22T09:05:02 = 1995-12
-  -0010-09-15T04:44:23 = -10-09
+   2008-02-05T18:30:30 = 02.2008
+   1995-12-22T09:05:02 = 12.1995
+  -0010-09-15T04:44:23 = 09.-10
 
-=head3 yMEd (y-MM-dd, E)
+=head3 yMEd (E dd.MM.y)
 
-   2008-02-05T18:30:30 = 2008-02-05, maŋ
-   1995-12-22T09:05:02 = 1995-12-22, bear
-  -0010-09-15T04:44:23 = -10-09-15, láv
+   2008-02-05T18:30:30 = di 05.02.2008
+   1995-12-22T09:05:02 = be 22.12.1995
+  -0010-09-15T04:44:23 = lá 15.09.-10
 
-=head3 yMMM (y MMM)
+=head3 yMMM (MMM y)
 
-   2008-02-05T18:30:30 = 2008 guov
-   1995-12-22T09:05:02 = 1995 juov
-  -0010-09-15T04:44:23 = -10 čakč
+   2008-02-05T18:30:30 = guov 2008
+   1995-12-22T09:05:02 = juov 1995
+  -0010-09-15T04:44:23 = čakč -10
 
-=head3 yMMMEd (y MMM d, E)
+=head3 yMMMEd (E d MMM y)
 
-   2008-02-05T18:30:30 = 2008 guov 5, maŋ
-   1995-12-22T09:05:02 = 1995 juov 22, bear
-  -0010-09-15T04:44:23 = -10 čakč 15, láv
+   2008-02-05T18:30:30 = di 5 guov 2008
+   1995-12-22T09:05:02 = be 22 juov 1995
+  -0010-09-15T04:44:23 = lá 15 čakč -10
 
-=head3 yMMMM (y MMMM)
+=head3 yMMMM (MMMM y)
 
-   2008-02-05T18:30:30 = 2008 guovvamánnu
-   1995-12-22T09:05:02 = 1995 juovlamánnu
-  -0010-09-15T04:44:23 = -10 čakčamánnu
+   2008-02-05T18:30:30 = guovvamánnu 2008
+   1995-12-22T09:05:02 = juovlamánnu 1995
+  -0010-09-15T04:44:23 = čakčamánnu -10
 
-=head3 yMMMd (y MMM d)
+=head3 yMMMd (d MMM y)
 
-   2008-02-05T18:30:30 = 2008 guov 5
-   1995-12-22T09:05:02 = 1995 juov 22
-  -0010-09-15T04:44:23 = -10 čakč 15
+   2008-02-05T18:30:30 = 5 guov 2008
+   1995-12-22T09:05:02 = 22 juov 1995
+  -0010-09-15T04:44:23 = 15 čakč -10
 
-=head3 yMd (y-MM-dd)
+=head3 yMd (dd.MM.y)
 
-   2008-02-05T18:30:30 = 2008-02-05
-   1995-12-22T09:05:02 = 1995-12-22
-  -0010-09-15T04:44:23 = -10-09-15
+   2008-02-05T18:30:30 = 05.02.2008
+   1995-12-22T09:05:02 = 22.12.1995
+  -0010-09-15T04:44:23 = 15.09.-10
 
-=head3 yQQQ (y QQQ)
+=head3 yQQQ (QQQ y)
 
-   2008-02-05T18:30:30 = 2008 Q1
-   1995-12-22T09:05:02 = 1995 Q4
-  -0010-09-15T04:44:23 = -10 Q3
+   2008-02-05T18:30:30 = 1Q 2008
+   1995-12-22T09:05:02 = 4Q 1995
+  -0010-09-15T04:44:23 = 3Q -10
 
-=head3 yQQQQ (y QQQQ)
+=head3 yQQQQ (QQQQ y)
 
-   2008-02-05T18:30:30 = 2008 Q1
-   1995-12-22T09:05:02 = 1995 Q4
-  -0010-09-15T04:44:23 = -10 Q3
+   2008-02-05T18:30:30 = 1. njealjádas 2008
+   1995-12-22T09:05:02 = 4. njealjádas 1995
+  -0010-09-15T04:44:23 = 3. njealjádas -10
 
-=head3 yw-count-one ('week' w 'of' y)
-
-   2008-02-05T18:30:30 = week 6 of 2008
-   1995-12-22T09:05:02 = week 51 of 1995
-  -0010-09-15T04:44:23 = week 37 of -10
-
-=head3 yw-count-other ('week' w 'of' y)
+=head3 yw-count-one ('week' w 'of' Y)
 
    2008-02-05T18:30:30 = week 6 of 2008
    1995-12-22T09:05:02 = week 51 of 1995
   -0010-09-15T04:44:23 = week 37 of -10
 
-=head3 yw-count-two ('week' w 'of' y)
+=head3 yw-count-other ('week' w 'of' Y)
+
+   2008-02-05T18:30:30 = week 6 of 2008
+   1995-12-22T09:05:02 = week 51 of 1995
+  -0010-09-15T04:44:23 = week 37 of -10
+
+=head3 yw-count-two ('week' w 'of' Y)
 
    2008-02-05T18:30:30 = week 6 of 2008
    1995-12-22T09:05:02 = week 51 of 1995
@@ -606,7 +636,7 @@ Yes
 
 =head3 Local first day of the week
 
-1 (vuossárga)
+1 (mánnodat)
 
 =head1 SUPPORT
 

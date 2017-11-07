@@ -2,10 +2,7 @@ package Sidef::Types::Glob::File {
 
     use 5.014;
 
-    use parent qw(
-      Sidef::Convert::Convert
-      Sidef::Types::String::String
-      );
+    use parent qw(Sidef::Types::String::String);
 
     use Sidef::Types::Number::Number;
 
@@ -396,7 +393,7 @@ package Sidef::Types::Glob::File {
         $mode = defined($mode) ? "$mode" : 'utf8';
 
         open(my $fh, "<:$mode", "$self") || do {
-            warn "[WARNING] Can't open file `$self' for writing: $!";
+            warn "[WARNING] Can't open file `$self' for reading: $!";
             return undef;
         };
 

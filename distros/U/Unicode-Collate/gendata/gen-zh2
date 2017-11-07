@@ -29,8 +29,8 @@ use strict;
 use warnings;
 use File::Spec;
 
-require 'gen-head'; # for testcount(), testhead(), testnew() and testprim()
-require 'dumpstr';  # for string()
+require './gen-head'; # for testcount(), testhead(), testnew() and testprim()
+require './dumpstr';  # for string()
 chomp(my @cjkdata = <DATA>); # compatibility decomposable characters
 
 my $pkg  = 'Unicode::Collate::CJK';

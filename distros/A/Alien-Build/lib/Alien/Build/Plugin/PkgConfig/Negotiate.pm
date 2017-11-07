@@ -3,14 +3,14 @@ package Alien::Build::Plugin::PkgConfig::Negotiate;
 use strict;
 use warnings;
 use Alien::Build::Plugin;
-use Alien::Build::Plugin::PkgConfig::CommandLine;
-use Alien::Build::Plugin::PkgConfig::LibPkgConf;
 use Alien::Build::Plugin::PkgConfig::PP;
+use Alien::Build::Plugin::PkgConfig::LibPkgConf;
+use Alien::Build::Plugin::PkgConfig::CommandLine;
 use Alien::Build::Util qw( _perl_config );
 use Carp ();
 
 # ABSTRACT: Package configuration negotiation plugin
-our $VERSION = '1.28'; # VERSION
+our $VERSION = '1.32'; # VERSION
 
 
 has '+pkg_name' => sub {
@@ -51,7 +51,7 @@ sub pick
     # fallback on installing PkgConfig.pm as a prereq if nothing else is avail).
     # we therefore expect at least one of these to work, if not, then the configuration
     # of the system has shifted from underneath us.
-    Carp::croak("Could not find an appropriate pkg-config implementation, please install PkgConfig.pm, PkgConfig::LibPkgConf, pkg-config or pkgconf");
+    Carp::croak("Could not find an appropriate pkg-config or pkgconf implementation, please install PkgConfig.pm, PkgConfig::LibPkgConf, pkg-config or pkgconf");
   }
 }
 
@@ -91,7 +91,7 @@ Alien::Build::Plugin::PkgConfig::Negotiate - Package configuration negotiation p
 
 =head1 VERSION
 
-version 1.28
+version 1.32
 
 =head1 SYNOPSIS
 

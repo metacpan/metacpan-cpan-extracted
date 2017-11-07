@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "AM",
-    "PM"
+    "PM",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d, E",
@@ -44,7 +49,7 @@
     yMd => "y-MM-dd",
     yQQQ => "y QQQ",
     yQQQQ => "y QQQQ",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "mgo-CM",
   date_format_full => "EEEE, y MMMM dd",
@@ -62,7 +67,7 @@
     "Aneg 5",
     "Aneg 6",
     "Aneg 7",
-    "Aneg 1"
+    "Aneg 1",
   ],
   day_format_narrow => [
     "A2",
@@ -71,7 +76,7 @@
     "A5",
     "A6",
     "A7",
-    "A1"
+    "A1",
   ],
   day_format_wide => [
     "Aneg 2",
@@ -80,7 +85,7 @@
     "Aneg 5",
     "Aneg 6",
     "Aneg 7",
-    "Aneg 1"
+    "Aneg 1",
   ],
   day_stand_alone_abbreviated => [
     "Aneg 2",
@@ -89,7 +94,7 @@
     "Aneg 5",
     "Aneg 6",
     "Aneg 7",
-    "Aneg 1"
+    "Aneg 1",
   ],
   day_stand_alone_narrow => [
     "A2",
@@ -98,7 +103,7 @@
     "A5",
     "A6",
     "A7",
-    "A1"
+    "A1",
   ],
   day_stand_alone_wide => [
     "Aneg 2",
@@ -107,19 +112,19 @@
     "Aneg 5",
     "Aneg 6",
     "Aneg 7",
-    "Aneg 1"
+    "Aneg 1",
   ],
   era_abbreviated => [
     "BCE",
-    "CE"
+    "CE",
   ],
   era_narrow => [
     "BCE",
-    "CE"
+    "CE",
   ],
   era_wide => [
     "BCE",
-    "CE"
+    "CE",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -140,7 +145,7 @@
     "im\N{U+0259}g kud",
     "im\N{U+0259}g t\N{U+00e8}si\N{U+02bc}e",
     "im\N{U+0259}g z\N{U+00f2}",
-    "im\N{U+0259}g krizmed"
+    "im\N{U+0259}g krizmed",
   ],
   month_format_narrow => [
     "M1",
@@ -154,7 +159,7 @@
     "K9",
     10,
     11,
-    12
+    12,
   ],
   month_format_wide => [
     "im\N{U+0259}g mbegtug",
@@ -168,7 +173,7 @@
     "im\N{U+0259}g kud",
     "im\N{U+0259}g t\N{U+00e8}si\N{U+02bc}e",
     "im\N{U+0259}g z\N{U+00f2}",
-    "im\N{U+0259}g krizmed"
+    "im\N{U+0259}g krizmed",
   ],
   month_stand_alone_abbreviated => [
     "mbegtug",
@@ -182,7 +187,7 @@
     "im\N{U+0259}g kud",
     "im\N{U+0259}g t\N{U+00e8}si\N{U+02bc}e",
     "im\N{U+0259}g z\N{U+00f2}",
-    "im\N{U+0259}g krizmed"
+    "im\N{U+0259}g krizmed",
   ],
   month_stand_alone_narrow => [
     "M1",
@@ -196,7 +201,7 @@
     "K9",
     10,
     11,
-    12
+    12,
   ],
   month_stand_alone_wide => [
     "im\N{U+0259}g mbegtug",
@@ -210,7 +215,7 @@
     "im\N{U+0259}g kud",
     "im\N{U+0259}g t\N{U+00e8}si\N{U+02bc}e",
     "im\N{U+0259}g z\N{U+00f2}",
-    "im\N{U+0259}g krizmed"
+    "im\N{U+0259}g krizmed",
   ],
   name => "Meta\N{U+02bc} Cameroon",
   native_language => "meta\N{U+02bc}",
@@ -222,37 +227,37 @@
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_stand_alone_abbreviated => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   script => undef,
   territory => "Cameroon",
@@ -261,5 +266,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

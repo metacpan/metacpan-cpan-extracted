@@ -6,8 +6,23 @@ This is the explanation which file shows what.
 11_extract_perl.pl
     This example shows, how to extract data of from Perl applications.
 
+11_extract_perl_filter_only_babelfish.pl
+    Same like before but babelfish writing.
+
 12_extract_tt.pl
     This example shows, how to extract data from tt templates.
 
 13_extract_js.pl
     This example shows, how to extract data from JavaScript files.
+
+14_extract_html.pl
+    This example shows, how to extract data from HTML files used with HTML::Zoom.
+
+15_extract_yaml.pl
+    This example shows, how to extract data from YAML files used for HTML forms.
+
+21_process_utf-8.pl
+    This example shows how to work with internationalization data.
+
+22_process_extended_skip_utf-8.pl
+    Same like before but shows how to handle region data with by customized skip.

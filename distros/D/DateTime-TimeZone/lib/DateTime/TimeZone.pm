@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.14';
+our $VERSION = '2.15';
 
 use DateTime::TimeZone::Catalog;
 use DateTime::TimeZone::Floating;
@@ -602,7 +602,7 @@ DateTime::TimeZone - Time zone object base class and factory
 
 =head1 VERSION
 
-version 2.14
+version 2.15
 
 =head1 SYNOPSIS
 
@@ -921,7 +921,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alexey Molchanov Alfie John Bron Gondwana Daisuke Maki David Pinkowitz Iain Truskett Jakub Wilk Joshua Hoblitt Karen Etheridge karupanerura Olaf Alders Peter Rabbitson
+=for stopwords Alexey Molchanov Alfie John Bron Gondwana Daisuke Maki David Pinkowitz Iain Truskett Jakub Wilk Joshua Hoblitt Karen Etheridge karupanerura Olaf Alders Peter Rabbitson Tom Wyant
 
 =over 4
 
@@ -972,6 +972,10 @@ Olaf Alders <olaf@wundersolutions.com>
 =item *
 
 Peter Rabbitson <ribasushi@cpan.org>
+
+=item *
+
+Tom Wyant <wyant@cpan.org>
 
 =back
 

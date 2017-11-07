@@ -1,19 +1,19 @@
 package Hashids;
 
-our $VERSION = "1.000005";
-
 use Carp 'croak';
 use POSIX 'ceil';
 use Hashids::Util ':all';
 use Moo;
 use namespace::clean;
 
+our $VERSION = "1.001000";
+
 has salt => ( is => 'ro', default => '' );
 
 has minHashLength => (
     is  => 'ro',
     isa => sub {
-        croak "$_[0] is not a number!" unless $_[0] =~ /^\d+$/;
+        croak "$_[0] must be a positive number" unless $_[0] =~ /^\d+$/;
     },
     default => 0
 );
@@ -21,13 +21,12 @@ has minHashLength => (
 has alphabet => (
     is  => 'rwp',
     isa => sub {
-        croak "$_[0] must not have spaces"
-            if $_[0] =~ /\s/;
-        croak "$_[0] must contain at least 16 characters"
-            if length $_[0] < 16;
+        local $_ = shift;
+        croak "$_ must not have spaces" if /\s/;
+        croak "$_ must contain at least 16 characters" if 16 > length;
         my %u;
-        croak "$_[0] must contain unique characters"
-            if grep { $u{$_}++ } split // => $_[0];
+        croak "$_ must contain unique characters"
+            if any { $u{$_}++ } split //;
     },
     default => sub { join '' => 'a' .. 'z', 'A' .. 'Z', 1 .. 9, 0 }
 );
@@ -45,15 +44,18 @@ has seps => (
 
 has guards => ( is => 'rwp', init_arg => undef, default => sub { [] } );
 
-sub BUILDARGS {
-    my ( $class, @args ) = @_;
+around BUILDARGS => sub {
+    my ( $orig, $class, @args ) = @_;
     unshift @args, 'salt' if @args % 2 == 1;
 
-    +{@args};
-}
+    $class->$orig(@args);
+};
 
 sub BUILD {
     my $self = shift;
+
+    croak "salt must be shorter than or of equal length to alphabet"
+        if length $self->salt > length $self->alphabet;
 
     my @alphabet = split // => $self->alphabet;
     my ( @seps, @guards );
@@ -64,7 +66,7 @@ sub BUILD {
     # seps should contain only chars present in alphabet;
     # alphabet should not contain seps
     for my $sep ( @{ $self->seps } ) {
-        push @seps, $sep if grep {/$sep/} @alphabet;
+        push @seps, $sep if any {/$sep/} @alphabet;
         @alphabet = grep { !/$sep/ } @alphabet;
     }
 
@@ -76,9 +78,6 @@ sub BUILD {
         if ( $sepsLength > @seps ) {
             push @seps => splice @alphabet, 0, $sepsLength - @seps;
         }
-        # else {
-        #     splice @seps, 0, $sepsLength;
-        # }
     }
 
     @alphabet = consistent_shuffle( \@alphabet, $self->salt );
@@ -129,7 +128,7 @@ sub encode {
     my ( $self, @num ) = @_;
 
     return '' unless @num;
-    map { return '' unless /^\d+$/ } @num;
+    map { return '' unless defined and /^\d+$/ } @num;
 
     my $num = [ map { bignum($_) } @num ];
 
@@ -155,7 +154,7 @@ sub encode {
 
         if ( $i + 1 < @$num ) {
             $n %= ord($last) + $i;
-            my $sepsIndex = $n % @{$self->seps};
+            my $sepsIndex = $n % @{ $self->seps };
             push @res, $self->seps->[$sepsIndex];
         }
     }
@@ -201,7 +200,7 @@ sub decode {
     my $orig = $hash;
 
     my $guard = join '|', map {quotemeta} @{ $self->guards };
-    my @hash = grep { !/^$/ } split /$guard/ => $hash;
+    my @hash = grep { $_ ne '' } split /$guard/ => $hash;
     my $i = ( @hash == 3 || @hash == 2 ) ? 1 : 0;
 
     return unless defined( $hash = $hash[$i] );
@@ -209,7 +208,7 @@ sub decode {
     $hash = substr $hash, 1;
 
     my $sep = join '|', @{ $self->seps };
-    @hash = grep { !/^$/ } split /$sep/ => $hash;
+    @hash = grep { $_ ne '' } split /$sep/ => $hash;
 
     my @alphabet = @{ $self->chars };
     for my $part (@hash) {
@@ -229,6 +228,8 @@ sub decode {
 __END__
 
 =encoding utf-8
+
+=for stopwords minHashLength
 
 =head1 NAME
 
@@ -286,7 +287,9 @@ Make a new Hashids object.  This constructor accepts a few options:
 
 =item  salt
 
-Salt string, this should be unique per Hashids object.
+Salt string, this should be unique per Hashids object.  Must be either
+as long or shorter than the alphabet length, as a longer salt string
+than the alphabet introduces false collisions.
 
 =item  alphabet
 

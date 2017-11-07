@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "AM",
-    "PM"
+    "PM",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "E d.",
@@ -12,7 +17,7 @@
     Ehms => "E h:mm:ss a",
     Gy => "y G",
     GyMMM => "LLLL y G",
-    GyMMMEd => "E, d. M. y G",
+    GyMMMEd => "E d. M. y G",
     GyMMMMd => "d. M. y G",
     GyMMMd => "d. M. y G",
     H => "H",
@@ -51,13 +56,13 @@
     yMd => "d. M. y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-few" => "w. 't\N{U+00fd}\N{U+017e}de\N{U+0148}' 'v' 'roku' y",
-    "yw-count-many" => "w. 't\N{U+00fd}\N{U+017e}de\N{U+0148}' 'v' 'roku' y",
-    "yw-count-one" => "w. 't\N{U+00fd}\N{U+017e}de\N{U+0148}' 'v' 'roku' y",
-    "yw-count-other" => "w. 't\N{U+00fd}\N{U+017e}de\N{U+0148}' 'v' 'roku' y"
+    "yw-count-few" => "w. 't\N{U+00fd}\N{U+017e}de\N{U+0148}' 'v' 'roku' Y",
+    "yw-count-many" => "w. 't\N{U+00fd}\N{U+017e}de\N{U+0148}' 'v' 'roku' Y",
+    "yw-count-one" => "w. 't\N{U+00fd}\N{U+017e}de\N{U+0148}' 'v' 'roku' Y",
+    "yw-count-other" => "w. 't\N{U+00fd}\N{U+017e}de\N{U+0148}' 'v' 'roku' Y",
   },
   code => "sk",
-  date_format_full => "EEEE, d. MMMM y",
+  date_format_full => "EEEE d. MMMM y",
   date_format_long => "d. MMMM y",
   date_format_medium => "d. M. y",
   date_format_short => "d. M. y",
@@ -72,7 +77,7 @@
     "\N{U+0161}t",
     "pi",
     "so",
-    "ne"
+    "ne",
   ],
   day_format_narrow => [
     "p",
@@ -81,7 +86,7 @@
     "\N{U+0161}",
     "p",
     "s",
-    "n"
+    "n",
   ],
   day_format_wide => [
     "pondelok",
@@ -90,7 +95,7 @@
     "\N{U+0161}tvrtok",
     "piatok",
     "sobota",
-    "nede\N{U+013e}a"
+    "nede\N{U+013e}a",
   ],
   day_stand_alone_abbreviated => [
     "po",
@@ -99,7 +104,7 @@
     "\N{U+0161}t",
     "pi",
     "so",
-    "ne"
+    "ne",
   ],
   day_stand_alone_narrow => [
     "p",
@@ -108,7 +113,7 @@
     "\N{U+0161}",
     "p",
     "s",
-    "n"
+    "n",
   ],
   day_stand_alone_wide => [
     "pondelok",
@@ -117,19 +122,19 @@
     "\N{U+0161}tvrtok",
     "piatok",
     "sobota",
-    "nede\N{U+013e}a"
+    "nede\N{U+013e}a",
   ],
   era_abbreviated => [
     "pred Kr.",
-    "po Kr."
+    "po Kr.",
   ],
   era_narrow => [
     "pred Kr.",
-    "po Kr."
+    "po Kr.",
   ],
   era_wide => [
     "pred Kristom",
-    "po Kristovi"
+    "po Kristovi",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -150,7 +155,7 @@
     "sep",
     "okt",
     "nov",
-    "dec"
+    "dec",
   ],
   month_format_narrow => [
     "j",
@@ -164,7 +169,7 @@
     "s",
     "o",
     "n",
-    "d"
+    "d",
   ],
   month_format_wide => [
     "janu\N{U+00e1}ra",
@@ -178,7 +183,7 @@
     "septembra",
     "okt\N{U+00f3}bra",
     "novembra",
-    "decembra"
+    "decembra",
   ],
   month_stand_alone_abbreviated => [
     "jan",
@@ -192,7 +197,7 @@
     "sep",
     "okt",
     "nov",
-    "dec"
+    "dec",
   ],
   month_stand_alone_narrow => [
     "j",
@@ -206,7 +211,7 @@
     "s",
     "o",
     "n",
-    "d"
+    "d",
   ],
   month_stand_alone_wide => [
     "janu\N{U+00e1}r",
@@ -220,7 +225,7 @@
     "september",
     "okt\N{U+00f3}ber",
     "november",
-    "december"
+    "december",
   ],
   name => "Slovak",
   native_language => "sloven\N{U+010d}ina",
@@ -232,37 +237,37 @@
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "1. \N{U+0161}tvr\N{U+0165}rok",
     "2. \N{U+0161}tvr\N{U+0165}rok",
     "3. \N{U+0161}tvr\N{U+0165}rok",
-    "4. \N{U+0161}tvr\N{U+0165}rok"
+    "4. \N{U+0161}tvr\N{U+0165}rok",
   ],
   quarter_stand_alone_abbreviated => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "1. \N{U+0161}tvr\N{U+0165}rok",
     "2. \N{U+0161}tvr\N{U+0165}rok",
     "3. \N{U+0161}tvr\N{U+0165}rok",
-    "4. \N{U+0161}tvr\N{U+0165}rok"
+    "4. \N{U+0161}tvr\N{U+0165}rok",
   ],
   script => undef,
   territory => undef,
@@ -271,5 +276,5 @@
   time_format_medium => "H:mm:ss",
   time_format_short => "H:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

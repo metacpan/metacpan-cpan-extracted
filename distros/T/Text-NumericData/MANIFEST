@@ -122,4 +122,5 @@ t/testdata/testderiv2_in.txd
 t/testdata/testderiv2_out.txd
 t/testdata/testderiv_in.dat
 t/testdata/testderiv_out.dat
+t/txdtestutil.pm
 TODO

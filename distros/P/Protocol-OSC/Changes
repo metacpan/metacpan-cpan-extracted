@@ -1,3 +1,7 @@
+0.08
+
+    fix RT#123504 POD
+
 0.07
 
     fix RT#110666 Protocol::OSC drops trailing zeros from OSC packets (Kataoka Haruka)

@@ -1,0 +1,20 @@
+requires "B::Deparse" => "0";
+requires "Carp" => "0";
+requires "Params::Validate" => "0";
+requires "Scalar::Util" => "0";
+requires "strict" => "0";
+requires "vars" => "0";
+
+on 'build' => sub {
+  requires "Module::Build" => "0.3601";
+};
+
+on 'test' => sub {
+  requires "File::Spec" => "0";
+  requires "Test" => "0";
+};
+
+on 'configure' => sub {
+  requires "ExtUtils::MakeMaker" => "6.30";
+  requires "Module::Build" => "0.3601";
+};

@@ -97,7 +97,9 @@ my $test_sub = sub {
  }
 
  my $glob = $stash->{$sub};
- return $glob ? *$glob{CODE} : undef;
+ return ref \$glob eq 'GLOB' ? *$glob{CODE}
+      : ref  $glob eq 'CODE' ?  $glob
+      :                          undef;
 };
 
 sub skip { $test_sub->('skip')->(@_) }

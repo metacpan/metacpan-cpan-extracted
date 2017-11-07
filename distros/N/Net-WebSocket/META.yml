@@ -6,7 +6,7 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   File::Slurp: '0'
   File::Temp: '0'
-  IO::Framed: '0'
+  IO::Framed: '0.03'
   IO::Select: '0'
   Test::Deep: '0'
   Test::Exception: '0'
@@ -37,8 +37,8 @@ requires:
   autodie: '0'
   overload: '0'
   parent: '0'
-  perl: '5.014'
+  perl: '5.01'
 resources:
   repository: git://github.com/FGasper/p5-Net-WebSocket.git
-version: '0.051'
+version: '0.052'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

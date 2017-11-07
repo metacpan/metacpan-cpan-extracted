@@ -1,6 +1,7 @@
 package Reddit::Client;
 
-our $VERSION = '1.0965'; 
+our $VERSION = '1.0972';  
+
 $VERSION = eval $VERSION;
 
 use strict;
@@ -99,6 +100,7 @@ use constant API_EDITMULTI           => 29;
 use constant API_SUBREDDIT_INFO      => 30;
 use constant API_SEARCH              => 31;
 use constant API_MODQ                => 32;
+use constant API_EDIT                => 33;
 
 #===============================================================================
 # Parameters
@@ -106,9 +108,9 @@ use constant API_MODQ                => 32;
 
 our $DEBUG            = 0;
 our $BASE_URL         = 'https://oauth.reddit.com';
-use constant BASE_URL => 'https://oauth.reddit.com';
+use constant BASE_URL =>'https://oauth.reddit.com';
 our $LINK_URL         = 'https://www.reddit.com';
-use constant LINK_URL => 'https://www.reddit.com';
+use constant LINK_URL =>'https://www.reddit.com';
 our $UA               = sprintf 'Reddit::Client/%f', $VERSION;
 
 our @API;
@@ -145,6 +147,7 @@ $API[API_EDITMULTI     ] = ['PUT',  '/api/multi/user/%s/m/%s' ];
 $API[API_SUBREDDIT_INFO] = ['GET',  '/r/%s/about'             ];
 $API[API_SEARCH        ] = ['GET',  '/r/%s/search'            ];
 $API[API_MODQ          ] = ['GET',  '/r/%s/about/%s'          ];
+$API[API_EDIT          ] = ['POST', '/api/editusertext'       ];
 #===============================================================================
 # Package routines
 #===============================================================================
@@ -492,7 +495,6 @@ sub get_subreddit_info {
 
 sub info {
     my ($self, $id) = @_;
-    DEBUG('Get info for id %s', $id);
     defined $id || croak 'Expected $id';
     my $query->{id} = $id;
     
@@ -537,6 +539,7 @@ sub search {
 sub get_permalink {
 	# This still makes an extra request. Why?
 	my ($self, $commentid, $post_fullname) = @_;
+	return "wtf in Client";
 
 	if (substr ($commentid, 0, 3) eq "t1_") { $commentid = substr $commentid, 3; } 
 	if (substr ($post_fullname, 0, 3) ne "t3_") { $post_fullname = "t3_" . $post_fullname; } 
@@ -618,11 +621,9 @@ sub get_links { # alias for fetch_links to make naming convention consistent
 
 sub get_link {
     	my ($self, $fullname) = @_;
-	if (	!$fullname || 
-		length($fullname) < 8 ||
-		substr($fullname, 0, 2) ne "t3")
-	{ croak "expected argument 1, 'fullname' (i.e. t3_3ng7r5)";	}
+	croak "expected argument 1: id or fullname" unless $fullname;
 
+	$fullname = "t3_$fullname" if $self->get_type($fullname) ne "t3";
 	my $info = $self->info($fullname);
 
 	return $info if !$info;
@@ -631,11 +632,9 @@ sub get_link {
 
 sub get_comment {
     	my ($self, $fullname) = @_;
-	if (	!$fullname || 
-		length($fullname) < 8 ||
-		substr($fullname, 0, 2) ne "t1")
-	{ croak "expected argument 1, 'fullname' (i.e. t1_3ng7r5)"; }
+	croak "expected argument 1: id or fullname" unless $fullname;
 
+	$fullname = "t1_$fullname" if $self->get_type($fullname) ne "t1";
 	my $info = $self->info($fullname);
 
 	return $info if !$info;
@@ -714,19 +713,37 @@ sub set_listing_defaults {
 	return $query;
 }
 #===============================================================================
-# Delete posts or comments
+# Change posts or comments
 #===============================================================================
 
+sub edit {
+    	my ($self, $name, $text) = @_;
+    	my $type = substr $name, 0, 2;
+    	croak 'Argument 1 ($fullname) must be a post or comment.' if $type ne 't1' && $type ne 't3';
+	croak 'Argument 2 (text) is required. Empty strings are allowed.' unless defined $text;
+
+	my $data = {
+		thing_id	=> $name,
+		text		=> $text
+	};
+
+	my $result = $self->api_json_request(
+		api	=> API_EDIT,
+		data	=> $data,
+	);
+	return $result;
+}
+
 sub delete {
-    my ($self, $name) = @_;
-    croak 'Expected $fullname' if !$name;
-    my $type = substr $name, 0, 2;
-    croak '$fullname must be a post or comment' if $type ne 't1' && $type ne 't3';
+    	my ($self, $name) = @_;
+    	croak 'Expected $fullname' if !$name;
+    	my $type = substr $name, 0, 2;
+    	croak '$fullname must be a post or comment' if $type ne 't1' && $type ne 't3';
 
-    DEBUG('Delete post/comment %s', $name);
+    	DEBUG('Delete post/comment %s', $name);
 
-    my $result = $self->api_json_request(api => API_DEL, data => { id => $name });
-    return 1;
+    	my $result = $self->api_json_request(api => API_DEL, data => { id => $name });
+    	return 1;
 }
 
 #===============================================================================
@@ -1109,6 +1126,10 @@ sub iscomment {
 	my ($self, $name) = @_;
     	my $type = substr $name, 0, 2;
 	return $type eq 't1';
+}
+sub get_type {
+	my ($self, $name) = @_;
+    	return lc substr $name, 0, 2;
 }
 
 1;

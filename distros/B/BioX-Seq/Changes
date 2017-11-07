@@ -1,18 +1,25 @@
 Revision history for BioX-Seq
 
-0.006   2017-04-21
-        Major documentation updates
-        Fixed bug in build_ORF_regex() causing problems after multiple calls
-            with different arguments
-        Increased coverage of testing suite
-        Increased coverage of POD
+0.006004 2017-11-05
+         Fixed memory leak caused by unnecessary binmode() and repeated
+             BioX::Seq::Stream::new()
 
-0.005   2017-04-20
-        Auto-indexing of FASTA files for BioX::Seq::Fetch
+0.006003 2017-07-04
+         Remove index file if failure during write
 
-0.004   2016-11-18
-        Fixed handling of cross-platform line endings
+0.006    2017-04-21
+         Major documentation updates
+         Fixed bug in build_ORF_regex() causing problems after multiple calls
+             with different arguments
+         Increased coverage of testing suite
+         Increased coverage of POD
 
-0.001   2016-03-31
-        Initial release
+0.005    2017-04-20
+         Auto-indexing of FASTA files for BioX::Seq::Fetch
+
+0.004    2016-11-18
+         Fixed handling of cross-platform line endings
+
+0.001    2016-03-31
+         Initial release
 

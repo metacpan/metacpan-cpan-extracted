@@ -40,10 +40,12 @@ sub new {
             open $fh, '<', $fn or die "Error opening $fn for reading\n";
 
             #read first four bytes as raw
-            my $old_layers = join '', map {":$_"} PerlIO::get_layers($fh);
-            binmode($fh);
+            #this causes a memory leak as opened filehandles are not properly
+            #closed again. Should work without setting binary mode anyway.
+            #my $old_layers = join '', map {":$_"} PerlIO::get_layers($fh);
+            #binmode($fh);
             read( $fh, my $magic, 4 );
-            binmode($fh, $old_layers); 
+            #binmode($fh, $old_layers); 
 
             #check for compression and open stream if found
             if (substr($magic,0,3) eq MAGIC_GZIP) {

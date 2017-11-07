@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "nt\N{U+0254}\N{U+0301}ng\N{U+0254}\N{U+0301}",
-    "mp\N{U+00f3}kwa"
+    "mp\N{U+00f3}kwa",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "E d",
@@ -44,7 +49,7 @@
     yMd => "d/M/y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "ln-CD",
   date_format_full => "EEEE d MMMM y",
@@ -62,7 +67,7 @@
     "min",
     "mtn",
     "mps",
-    "eye"
+    "eye",
   ],
   day_format_narrow => [
     "y",
@@ -71,7 +76,7 @@
     "m",
     "m",
     "p",
-    "e"
+    "e",
   ],
   day_format_wide => [
     "mok\N{U+0254}l\N{U+0254} mwa yambo",
@@ -80,7 +85,7 @@
     "mok\N{U+0254}l\N{U+0254} ya m\N{U+00ed}n\N{U+00e9}i",
     "mok\N{U+0254}l\N{U+0254} ya m\N{U+00ed}t\N{U+00e1}no",
     "mp\N{U+0254}\N{U+0301}s\N{U+0254}",
-    "eyenga"
+    "eyenga",
   ],
   day_stand_alone_abbreviated => [
     "ybo",
@@ -89,7 +94,7 @@
     "min",
     "mtn",
     "mps",
-    "eye"
+    "eye",
   ],
   day_stand_alone_narrow => [
     "y",
@@ -98,7 +103,7 @@
     "m",
     "m",
     "p",
-    "e"
+    "e",
   ],
   day_stand_alone_wide => [
     "mok\N{U+0254}l\N{U+0254} mwa yambo",
@@ -107,19 +112,19 @@
     "mok\N{U+0254}l\N{U+0254} ya m\N{U+00ed}n\N{U+00e9}i",
     "mok\N{U+0254}l\N{U+0254} ya m\N{U+00ed}t\N{U+00e1}no",
     "mp\N{U+0254}\N{U+0301}s\N{U+0254}",
-    "eyenga"
+    "eyenga",
   ],
   era_abbreviated => [
     "lib\N{U+00f3}so ya",
-    "nsima ya Y"
+    "nsima ya Y",
   ],
   era_narrow => [
     "lib\N{U+00f3}so ya",
-    "nsima ya Y"
+    "nsima ya Y",
   ],
   era_wide => [
     "Yambo ya Y\N{U+00e9}zu Kr\N{U+00ed}s",
-    "Nsima ya Y\N{U+00e9}zu Kr\N{U+00ed}s"
+    "Nsima ya Y\N{U+00e9}zu Kr\N{U+00ed}s",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -140,7 +145,7 @@
     "stb",
     "\N{U+0254}tb",
     "nvb",
-    "dsb"
+    "dsb",
   ],
   month_format_narrow => [
     "y",
@@ -154,7 +159,7 @@
     "s",
     "\N{U+0254}",
     "n",
-    "d"
+    "d",
   ],
   month_format_wide => [
     "s\N{U+00e1}nz\N{U+00e1} ya yambo",
@@ -168,7 +173,7 @@
     "s\N{U+00e1}nz\N{U+00e1} ya libwa",
     "s\N{U+00e1}nz\N{U+00e1} ya z\N{U+00f3}mi",
     "s\N{U+00e1}nz\N{U+00e1} ya z\N{U+00f3}mi na m\N{U+0254}\N{U+030c}k\N{U+0254}\N{U+0301}",
-    "s\N{U+00e1}nz\N{U+00e1} ya z\N{U+00f3}mi na m\N{U+00ed}bal\N{U+00e9}"
+    "s\N{U+00e1}nz\N{U+00e1} ya z\N{U+00f3}mi na m\N{U+00ed}bal\N{U+00e9}",
   ],
   month_stand_alone_abbreviated => [
     "yan",
@@ -182,7 +187,7 @@
     "stb",
     "\N{U+0254}tb",
     "nvb",
-    "dsb"
+    "dsb",
   ],
   month_stand_alone_narrow => [
     "y",
@@ -196,7 +201,7 @@
     "s",
     "\N{U+0254}",
     "n",
-    "d"
+    "d",
   ],
   month_stand_alone_wide => [
     "s\N{U+00e1}nz\N{U+00e1} ya yambo",
@@ -210,7 +215,7 @@
     "s\N{U+00e1}nz\N{U+00e1} ya libwa",
     "s\N{U+00e1}nz\N{U+00e1} ya z\N{U+00f3}mi",
     "s\N{U+00e1}nz\N{U+00e1} ya z\N{U+00f3}mi na m\N{U+0254}\N{U+030c}k\N{U+0254}\N{U+0301}",
-    "s\N{U+00e1}nz\N{U+00e1} ya z\N{U+00f3}mi na m\N{U+00ed}bal\N{U+00e9}"
+    "s\N{U+00e1}nz\N{U+00e1} ya z\N{U+00f3}mi na m\N{U+00ed}bal\N{U+00e9}",
   ],
   name => "Lingala Congo - Kinshasa",
   native_language => "ling\N{U+00e1}la",
@@ -222,37 +227,37 @@
     "SM1",
     "SM2",
     "SM3",
-    "SM4"
+    "SM4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "s\N{U+00e1}nz\N{U+00e1} m\N{U+00ed}s\N{U+00e1}to ya yambo",
     "s\N{U+00e1}nz\N{U+00e1} m\N{U+00ed}s\N{U+00e1}to ya m\N{U+00ed}bal\N{U+00e9}",
     "s\N{U+00e1}nz\N{U+00e1} m\N{U+00ed}s\N{U+00e1}to ya m\N{U+00ed}s\N{U+00e1}to",
-    "s\N{U+00e1}nz\N{U+00e1} m\N{U+00ed}s\N{U+00e1}to ya m\N{U+00ed}nei"
+    "s\N{U+00e1}nz\N{U+00e1} m\N{U+00ed}s\N{U+00e1}to ya m\N{U+00ed}nei",
   ],
   quarter_stand_alone_abbreviated => [
     "SM1",
     "SM2",
     "SM3",
-    "SM4"
+    "SM4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "s\N{U+00e1}nz\N{U+00e1} m\N{U+00ed}s\N{U+00e1}to ya yambo",
     "s\N{U+00e1}nz\N{U+00e1} m\N{U+00ed}s\N{U+00e1}to ya m\N{U+00ed}bal\N{U+00e9}",
     "s\N{U+00e1}nz\N{U+00e1} m\N{U+00ed}s\N{U+00e1}to ya m\N{U+00ed}s\N{U+00e1}to",
-    "s\N{U+00e1}nz\N{U+00e1} m\N{U+00ed}s\N{U+00e1}to ya m\N{U+00ed}nei"
+    "s\N{U+00e1}nz\N{U+00e1} m\N{U+00ed}s\N{U+00e1}to ya m\N{U+00ed}nei",
   ],
   script => undef,
   territory => "Congo - Kinshasa",
@@ -261,5 +266,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

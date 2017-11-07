@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "a.g",
-    "a.k"
+    "a.k",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d E",
@@ -44,7 +49,7 @@
     yMd => "d/M/y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "agq",
   date_format_full => "EEEE d MMMM y",
@@ -62,7 +67,7 @@
     "ume",
     "gh\N{U+0268}",
     "dzk",
-    "nts"
+    "nts",
   ],
   day_format_narrow => [
     "k",
@@ -71,7 +76,7 @@
     "u",
     "g",
     "d",
-    "n"
+    "n",
   ],
   day_format_wide => [
     "tsu\N{U+0294}ukp\N{U+00e0}",
@@ -80,7 +85,7 @@
     "tsu\N{U+0294}um\N{U+00e8}",
     "tsu\N{U+0294}ugh\N{U+0268}\N{U+0302}m",
     "tsu\N{U+0294}ndz\N{U+0268}k\N{U+0254}\N{U+0294}\N{U+0254}",
-    "tsu\N{U+0294}nts\N{U+0268}"
+    "tsu\N{U+0294}nts\N{U+0268}",
   ],
   day_stand_alone_abbreviated => [
     "kpa",
@@ -89,7 +94,7 @@
     "ume",
     "gh\N{U+0268}",
     "dzk",
-    "nts"
+    "nts",
   ],
   day_stand_alone_narrow => [
     "k",
@@ -98,7 +103,7 @@
     "u",
     "g",
     "d",
-    "n"
+    "n",
   ],
   day_stand_alone_wide => [
     "tsu\N{U+0294}ukp\N{U+00e0}",
@@ -107,19 +112,19 @@
     "tsu\N{U+0294}um\N{U+00e8}",
     "tsu\N{U+0294}ugh\N{U+0268}\N{U+0302}m",
     "tsu\N{U+0294}ndz\N{U+0268}k\N{U+0254}\N{U+0294}\N{U+0254}",
-    "tsu\N{U+0294}nts\N{U+0268}"
+    "tsu\N{U+0294}nts\N{U+0268}",
   ],
   era_abbreviated => [
     "SK",
-    "BK"
+    "BK",
   ],
   era_narrow => [
     "SK",
-    "BK"
+    "BK",
   ],
   era_wide => [
     "S\N{U+011b}e K\N{U+0268}\N{U+0300}lesto",
-    "B\N{U+01ce}a K\N{U+0268}\N{U+0300}lesto"
+    "B\N{U+01ce}a K\N{U+0268}\N{U+0300}lesto",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -140,7 +145,7 @@
     "dzu",
     "l\N{U+0254}m",
     "kaa",
-    "fwo"
+    "fwo",
   ],
   month_format_narrow => [
     "n",
@@ -154,7 +159,7 @@
     "d",
     "l",
     "c",
-    "f"
+    "f",
   ],
   month_format_wide => [
     "ndz\N{U+0254}\N{U+0300}\N{U+014b}\N{U+0254}\N{U+0300}n\N{U+00f9}m",
@@ -168,7 +173,7 @@
     "ndz\N{U+0254}\N{U+0300}\N{U+014b}\N{U+0254}\N{U+0300}t\N{U+0197}\N{U+0300}f\N{U+0289}\N{U+0300}gh\N{U+00e0}dzugh\N{U+00f9}",
     "ndz\N{U+0254}\N{U+0300}\N{U+014b}\N{U+0254}\N{U+0300}gh\N{U+01d4}uwel\N{U+0254}\N{U+0300}m",
     "ndz\N{U+0254}\N{U+0300}\N{U+014b}\N{U+0254}\N{U+0300}chwa\N{U+0294}\N{U+00e0}kaa wo",
-    "ndz\N{U+0254}\N{U+0300}\N{U+014b}\N{U+00e8}fw\N{U+00f2}o"
+    "ndz\N{U+0254}\N{U+0300}\N{U+014b}\N{U+00e8}fw\N{U+00f2}o",
   ],
   month_stand_alone_abbreviated => [
     "n\N{U+00f9}m",
@@ -182,7 +187,7 @@
     "dzu",
     "l\N{U+0254}m",
     "kaa",
-    "fwo"
+    "fwo",
   ],
   month_stand_alone_narrow => [
     "n",
@@ -196,7 +201,7 @@
     "d",
     "l",
     "c",
-    "f"
+    "f",
   ],
   month_stand_alone_wide => [
     "ndz\N{U+0254}\N{U+0300}\N{U+014b}\N{U+0254}\N{U+0300}n\N{U+00f9}m",
@@ -210,7 +215,7 @@
     "ndz\N{U+0254}\N{U+0300}\N{U+014b}\N{U+0254}\N{U+0300}t\N{U+0197}\N{U+0300}f\N{U+0289}\N{U+0300}gh\N{U+00e0}dzugh\N{U+00f9}",
     "ndz\N{U+0254}\N{U+0300}\N{U+014b}\N{U+0254}\N{U+0300}gh\N{U+01d4}uwel\N{U+0254}\N{U+0300}m",
     "ndz\N{U+0254}\N{U+0300}\N{U+014b}\N{U+0254}\N{U+0300}chwa\N{U+0294}\N{U+00e0}kaa wo",
-    "ndz\N{U+0254}\N{U+0300}\N{U+014b}\N{U+00e8}fw\N{U+00f2}o"
+    "ndz\N{U+0254}\N{U+0300}\N{U+014b}\N{U+00e8}fw\N{U+00f2}o",
   ],
   name => "Aghem",
   native_language => "Aghem",
@@ -222,37 +227,37 @@
     "k\N{U+0268}b\N{U+00e2} k\N{U+0268} 1",
     "ugb\N{U+00e2} u 2",
     "ugb\N{U+00e2} u 3",
-    "ugb\N{U+00e2} u 4"
+    "ugb\N{U+00e2} u 4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "k\N{U+0268}b\N{U+00e2} k\N{U+0268} 1",
     "ugb\N{U+00e2} u 2",
     "ugb\N{U+00e2} u 3",
-    "ugb\N{U+00e2} u 4"
+    "ugb\N{U+00e2} u 4",
   ],
   quarter_stand_alone_abbreviated => [
     "k\N{U+0268}b\N{U+00e2} k\N{U+0268} 1",
     "ugb\N{U+00e2} u 2",
     "ugb\N{U+00e2} u 3",
-    "ugb\N{U+00e2} u 4"
+    "ugb\N{U+00e2} u 4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "k\N{U+0268}b\N{U+00e2} k\N{U+0268} 1",
     "ugb\N{U+00e2} u 2",
     "ugb\N{U+00e2} u 3",
-    "ugb\N{U+00e2} u 4"
+    "ugb\N{U+00e2} u 4",
   ],
   script => undef,
   territory => undef,
@@ -261,5 +266,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

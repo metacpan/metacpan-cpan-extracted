@@ -14,7 +14,7 @@ WriteMakefile(
 				     },
 	      PREREQ_PM => {
 			    'Bytes::Random::Secure' => 0,
-			    'Math::BaseCnv' => 0,
+			    'Math::Prime::Util' => 0,
 			    'Compress::Zlib' => 0,
 			    'Persistence::Object::Simple' => 0,
 			    'File::HomeDir' => 0,

@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "Kiroko",
-    "Hwa\N{U+0129}-in\N{U+0129}"
+    "Hwa\N{U+0129}-in\N{U+0129}",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d, E",
@@ -45,7 +50,7 @@
     yMd => "y-MM-dd",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "ki",
   date_format_full => "EEEE, d MMMM y",
@@ -63,7 +68,7 @@
     "ART",
     "NMA",
     "NMM",
-    "KMA"
+    "KMA",
   ],
   day_format_narrow => [
     "N",
@@ -72,7 +77,7 @@
     "A",
     "N",
     "N",
-    "K"
+    "K",
   ],
   day_format_wide => [
     "Njumatat\N{U+0169}",
@@ -81,7 +86,7 @@
     "Aramithi",
     "Njumaa",
     "Njumamothi",
-    "Kiumia"
+    "Kiumia",
   ],
   day_stand_alone_abbreviated => [
     "NTT",
@@ -90,7 +95,7 @@
     "ART",
     "NMA",
     "NMM",
-    "KMA"
+    "KMA",
   ],
   day_stand_alone_narrow => [
     "N",
@@ -99,7 +104,7 @@
     "A",
     "N",
     "N",
-    "K"
+    "K",
   ],
   day_stand_alone_wide => [
     "Njumatat\N{U+0169}",
@@ -108,19 +113,19 @@
     "Aramithi",
     "Njumaa",
     "Njumamothi",
-    "Kiumia"
+    "Kiumia",
   ],
   era_abbreviated => [
     "MK",
-    "TK"
+    "TK",
   ],
   era_narrow => [
     "MK",
-    "TK"
+    "TK",
   ],
   era_wide => [
     "Mbere ya Kristo",
-    "Thutha wa Kristo"
+    "Thutha wa Kristo",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -141,7 +146,7 @@
     "WKD",
     "WIK",
     "WMW",
-    "DIT"
+    "DIT",
   ],
   month_format_narrow => [
     "J",
@@ -155,7 +160,7 @@
     "K",
     "I",
     "I",
-    "D"
+    "D",
   ],
   month_format_wide => [
     "Njenuar\N{U+0129}",
@@ -169,7 +174,7 @@
     "Mwere wa kenda",
     "Mwere wa ik\N{U+0169}mi",
     "Mwere wa ik\N{U+0169}mi na \N{U+0169}mwe",
-    "Ndithemba"
+    "Ndithemba",
   ],
   month_stand_alone_abbreviated => [
     "JEN",
@@ -183,7 +188,7 @@
     "WKD",
     "WIK",
     "WMW",
-    "DIT"
+    "DIT",
   ],
   month_stand_alone_narrow => [
     "J",
@@ -197,7 +202,7 @@
     "K",
     "I",
     "I",
-    "D"
+    "D",
   ],
   month_stand_alone_wide => [
     "Njenuar\N{U+0129}",
@@ -211,7 +216,7 @@
     "Mwere wa kenda",
     "Mwere wa ik\N{U+0169}mi",
     "Mwere wa ik\N{U+0169}mi na \N{U+0169}mwe",
-    "Ndithemba"
+    "Ndithemba",
   ],
   name => "Kikuyu",
   native_language => "Gikuyu",
@@ -223,37 +228,37 @@
     "R1",
     "R2",
     "R3",
-    "R4"
+    "R4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "Robo ya mbere",
     "Robo ya ker\N{U+0129}",
     "Robo ya gatat\N{U+0169}",
-    "Robo ya kana"
+    "Robo ya kana",
   ],
   quarter_stand_alone_abbreviated => [
     "R1",
     "R2",
     "R3",
-    "R4"
+    "R4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "Robo ya mbere",
     "Robo ya ker\N{U+0129}",
     "Robo ya gatat\N{U+0169}",
-    "Robo ya kana"
+    "Robo ya kana",
   ],
   script => undef,
   territory => undef,
@@ -262,5 +267,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

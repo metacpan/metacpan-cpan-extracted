@@ -14,7 +14,7 @@ use DBI;
 use English qw(-no_match_vars);
 use Carp;
 
-our $VERSION = q[477.1.2];
+our $VERSION = q[477.1.4];
 
 sub new {
   my ($class, $ref) = @_;

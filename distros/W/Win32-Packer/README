@@ -1,0 +1,34 @@
+Win32-Packer
+============
+
+Pack Perl applications for Windows as MSI or ZIP archives.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+     Win32::Ldd
+     XML::FromPerl
+     Log::Any
+     Path::Tiny
+     Module::ScanDeps
+     Moo
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2017 by Salvador Fandiño
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.24.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

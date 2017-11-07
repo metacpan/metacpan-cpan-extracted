@@ -85,75 +85,75 @@
    "provides" : {
       "ClearPress" : {
          "file" : "lib/ClearPress.pm",
-         "version" : "v477.1.2"
+         "version" : "v477.1.4"
       },
       "ClearPress::Localize" : {
          "file" : "lib/ClearPress/Localize.pm",
-         "version" : "v477.1.2"
+         "version" : "v477.1.4"
       },
       "ClearPress::authdecor" : {
          "file" : "lib/ClearPress/authdecor.pm",
-         "version" : "v477.1.2"
+         "version" : "v477.1.4"
       },
       "ClearPress::authenticator" : {
          "file" : "lib/ClearPress/authenticator.pm",
-         "version" : "v477.1.2"
+         "version" : "v477.1.4"
       },
       "ClearPress::authenticator::db" : {
          "file" : "lib/ClearPress/authenticator/db.pm",
-         "version" : "v477.1.2"
+         "version" : "v477.1.4"
       },
       "ClearPress::authenticator::ldap" : {
          "file" : "lib/ClearPress/authenticator/ldap.pm",
-         "version" : "v477.1.2"
+         "version" : "v477.1.4"
       },
       "ClearPress::authenticator::passwd" : {
          "file" : "lib/ClearPress/authenticator/passwd.pm",
-         "version" : "v477.1.2"
+         "version" : "v477.1.4"
       },
       "ClearPress::authenticator::session" : {
          "file" : "lib/ClearPress/authenticator/session.pm",
-         "version" : "v477.1.2"
+         "version" : "v477.1.4"
       },
       "ClearPress::controller" : {
          "file" : "lib/ClearPress/controller.pm",
-         "version" : "v477.1.2"
+         "version" : "v477.1.4"
       },
       "ClearPress::decorator" : {
          "file" : "lib/ClearPress/decorator.pm",
-         "version" : "v477.1.2"
+         "version" : "v477.1.4"
       },
       "ClearPress::driver" : {
          "file" : "lib/ClearPress/driver.pm",
-         "version" : "v477.1.2"
+         "version" : "v477.1.4"
       },
       "ClearPress::driver::Pg" : {
          "file" : "lib/ClearPress/driver/Pg.pm",
-         "version" : "v477.1.2"
+         "version" : "v477.1.4"
       },
       "ClearPress::driver::SQLite" : {
          "file" : "lib/ClearPress/driver/SQLite.pm",
-         "version" : "v477.1.2"
+         "version" : "v477.1.4"
       },
       "ClearPress::driver::mysql" : {
          "file" : "lib/ClearPress/driver/mysql.pm",
-         "version" : "v477.1.2"
+         "version" : "v477.1.4"
       },
       "ClearPress::model" : {
          "file" : "lib/ClearPress/model.pm",
-         "version" : "v477.1.2"
+         "version" : "v477.1.4"
       },
       "ClearPress::util" : {
          "file" : "lib/ClearPress/util.pm",
-         "version" : "v477.1.2"
+         "version" : "v477.1.4"
       },
       "ClearPress::view" : {
          "file" : "lib/ClearPress/view.pm",
-         "version" : "v477.1.2"
+         "version" : "v477.1.4"
       },
       "ClearPress::view::error" : {
          "file" : "lib/ClearPress/view/error.pm",
-         "version" : "v477.1.2"
+         "version" : "v477.1.4"
       }
    },
    "release_status" : "stable",
@@ -165,6 +165,6 @@
          "url" : "http://github.com/rmp/libclearpress-perl"
       }
    },
-   "version" : "v477.1.2",
+   "version" : "v477.1.4",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

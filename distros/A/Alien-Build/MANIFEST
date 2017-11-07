@@ -111,6 +111,7 @@ example/user/xs-mm/Example.xs
 example/user/xs-mm/Makefile.PL
 example/user/xs-mm/lib/LZMA/Example.pm
 example/user/xs-mm/t/lzma_example.t
+example/wrapper.pl
 example/xz-manual.alienfile
 example/xz.alienfile
 lib/Alien/Base.pm

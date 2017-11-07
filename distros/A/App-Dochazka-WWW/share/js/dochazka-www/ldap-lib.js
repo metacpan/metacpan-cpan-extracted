@@ -132,9 +132,9 @@ define ([
         },
 
         ldapSync = function (ldapEmp) {
-            if (! ldapEmp) {
-                stack.getState();
-            }
+            // if (! ldapEmp) {
+            //     stack.getState();
+            // }
             console.log("Entered ldapSync with object", ldapEmp);
             if (! ldapEmp.nick) {
                 return;
@@ -166,7 +166,7 @@ define ([
                         start.dbrowserListen("Employee profile updated from LDAP");
                     } else if (stackTarget === 'empProfile') {
                         stack.restart(
-                            ldapEmployeeObject,
+                            $.extend(ldapEmp, ldapEmployeeObject),
                             {"resultLine": "Employee profile updated from LDAP"},
                         );
                     }

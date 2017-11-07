@@ -37,24 +37,15 @@ close $fh;
 
 open my $rdr, '<', $file;
 
-my $parse = Net::WebSocket::Parser->new( IO::Framed::Read->new($rdr) );
+my $parse = Net::WebSocket::Parser->new(
+    IO::Framed::Read->new($rdr)->allow_empty_read()
+);
 
 my $received = q<>;
 
-eval {
-    while ( my $msg = $parse->get_next_frame() ) {
-        $received .= $msg->get_payload();
-    }
-
-    1;
+while ( my $msg = $parse->get_next_frame() ) {
+    $received .= $msg->get_payload();
 }
-or do {
-    my $err = $@;
-    if (!$@->isa('IO::Framed::X::EmptyRead')) {
-        local $@ = $_;
-        die;
-    }
-};
 
 is(
     $received,

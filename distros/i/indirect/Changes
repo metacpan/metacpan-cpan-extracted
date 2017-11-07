@@ -1,5 +1,10 @@
 Revision history for indirect
 
+0.38    2017-11-04 15:40 UTC
+        + Fix : [RT #123374] : Compatibility with CV-in-stash optimisation
+                Thanks Father Chrysostomos for reporting and contributing a
+                patch.
+
 0.37    2016-07-12 16:40 UTC
         + Chg : A large chunk of boilerplate XS code, which is also used in
                 other XS modules, has been factored out of the main .xs file

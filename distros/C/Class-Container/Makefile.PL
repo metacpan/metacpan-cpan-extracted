@@ -1,37 +1,69 @@
 
-use ExtUtils::MakeMaker;
+use strict;
+use warnings;
 
-unless (eval "use Scalar::Util; 1") {
-  warn("You seem not to have the Scalar::Util module installed.\n" .
-       "Its installation is recommended (but not required) for Class::Container - see the README.\n");
-  sleep 4;
+
+
+use ExtUtils::MakeMaker 6.30;
+
+
+
+my %WriteMakefileArgs = (
+  "ABSTRACT" => "Glues object frameworks together transparently",
+  "AUTHOR" => "Ken Williams <kwilliams\@cpan.org>",
+  "BUILD_REQUIRES" => {
+    "Module::Build" => "0.3601"
+  },
+  "CONFIGURE_REQUIRES" => {
+    "ExtUtils::MakeMaker" => "6.30",
+    "Module::Build" => "0.3601"
+  },
+  "DISTNAME" => "Class-Container",
+  "EXE_FILES" => [],
+  "LICENSE" => "perl",
+  "NAME" => "Class::Container",
+  "PREREQ_PM" => {
+    "B::Deparse" => 0,
+    "Carp" => 0,
+    "Params::Validate" => 0,
+    "Scalar::Util" => 0,
+    "strict" => 0,
+    "vars" => 0
+  },
+  "TEST_REQUIRES" => {
+    "File::Spec" => 0,
+    "Test" => 0
+  },
+  "VERSION" => "0.13",
+  "test" => {
+    "TESTS" => "t/*.t"
+  }
+);
+
+
+my %FallbackPrereqs = (
+  "B::Deparse" => 0,
+  "Carp" => 0,
+  "File::Spec" => 0,
+  "Module::Build" => "0.3601",
+  "Params::Validate" => 0,
+  "Scalar::Util" => 0,
+  "Test" => 0,
+  "strict" => 0,
+  "vars" => 0
+);
+
+
+unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {
+  delete $WriteMakefileArgs{TEST_REQUIRES};
+  delete $WriteMakefileArgs{BUILD_REQUIRES};
+  $WriteMakefileArgs{PREREQ_PM} = \%FallbackPrereqs;
 }
 
-my $module = 'Class::Container';
-my ($file, $dir);
-($file = "lib/$module.pm") =~ s{::}{/}g;
-($dir  = $module) =~ s/::/-/g;
+delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
+  unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
 
-WriteMakefile
-  (
-   'NAME'       => $module,
-   'VERSION_FROM' => $file, # finds $VERSION
-   'dist' => { COMPRESS=>"gzip",
-               SUFFIX=>"gz",
-               PREOP=>('rm -f README; '.
-                       "pod2text -80 < $file > README; ".
-                       "cp -f README $dir-\$(VERSION); "
-                      ),
-             },
-   'PREREQ_PM' => {
-		   Params::Validate => '0.23',
-		  },
-   'PL_FILES' => {},
-   ($] >= 5.005 ?    ## Add these new keywords supported since 5.005
-    (ABSTRACT_FROM => $file, # retrieve abstract from module
-     AUTHOR     => 'Ken Williams <ken@mathforum.org>') : 
-    ()
-   ),
-   NO_META => 1,
-  );
+WriteMakefile(%WriteMakefileArgs);
+
+
 

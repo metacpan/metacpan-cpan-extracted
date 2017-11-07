@@ -8,19 +8,19 @@ WWW::Splunk - Client library for Splunk log search engine
 
   use WWW::Splunk;
 
-  my $splunk = new WWW::Splunk ({
-          host    => $host,
-          port    => $port,
-          login   => $login,
+  my $splunk = WWW::Splunk->new({
+          host => $host,
+          port => $port,
+          login => $login,
           password => $password,
           unsafe_ssl => 1,
           verbose => 0,
   });
 
-  my $sid = $splunk->start_search ('selinux avc');
-  $splunk->poll_search ($sid);
-  until ($splunk->results_read ($sid)) {
-    print scalar $splunk->search_results ($sid);
+  my $sid = $splunk->start_search('selinux avc');
+  $splunk->poll_search($sid);
+  until ($splunk->results_read($sid)) {
+          print scalar $splunk->search_results($sid);
   }
   print " results found\n";
 
@@ -36,7 +36,7 @@ package WWW::Splunk;
 use strict;
 use warnings;
 
-our $VERSION = '2.06';
+our $VERSION = '2.08';
 
 use WWW::Splunk::API;
 use Carp;
@@ -49,12 +49,11 @@ use base qw/WWW::Splunk::API/;
 Initiate a search, return a SID (Search ID) string.
 
 =cut
-sub start_search
-{
-	my $self = shift;
-	my $string = shift;
-	my $since = shift;
-	my $until = shift;
+
+sub start_search {
+	my ($self, $string, $since, $until) = @_;
+
+	delete $self->{last_read};
 
 	# Format dates
 	($since, $until) = map { defined $_ ? scalar UnixDate (ParseDate ($_) || $_, '%O') || $_ : undef }
@@ -69,7 +68,8 @@ sub start_search
 	die 'Unexpected response format '
 		unless $response and ref $response eq 'XML::LibXML::Document';
 	my $sid = $response->findvalue ('/response/sid');
-	croak "Bad response" unless defined $sid;
+	croak 'Bad response' unless defined $sid;
+
 	return $sid;
 }
 
@@ -81,14 +81,13 @@ Finishes only if connection terminates (potentially never), returning number of
 results consumed.
 
 =cut
-sub rt_search
-{
-	my $self = shift;
-	my $string = shift;
-	my $callback = shift;
-	my $since = shift || 'rt';
-	my $until = shift || 'rt';
-	my $counter = 0;
+
+sub rt_search {
+	my ($self, $string, $callback, $since, $until, $counter) = @_;
+
+	$since ||= 'rt';
+	$until ||= 'rt';
+	$counter ||= 0;
 
 	$self->post ('/search/jobs/export', {
 		search => "search $string",
@@ -108,14 +107,12 @@ sub rt_search
 Return true if the search is finished.
 
 =cut
-sub search_done
-{
-	my $self = shift;
-	my $sid = shift;
+
+sub search_done {
+	my ($self, $sid) = @_;
 
 	my $search = $self->get ('/search/jobs/'.$sid);
-#use Data::Dumper;
-#warn Dumper $search->toStringC14N;
+
 	return $search->{isDone};
 }
 
@@ -124,12 +121,13 @@ sub search_done
 Wait for a search to finish.
 
 =cut
-sub poll_search
-{
-	my $self = shift;
-	my $sid = shift;
 
-	until ($self->search_done ($sid)) { sleep 1; }
+sub poll_search {
+	my ($self, $sid) = @_;
+
+	until ($self->search_done ($sid)) {
+		sleep 1;
+	}
 }
 
 =head2 B<search_results> (F<sid>)
@@ -142,10 +140,9 @@ with single L<WWW::Splunk> instance. Otherwise,
 L<WWW::Splunk> is perfectly thread-safe.
 
 =cut
-sub search_results
-{
-	my $self = shift;
-	my $sid = shift;
+
+sub search_results {
+	my ($self, $sid) = @_;
 
 	my $done = $self->search_done ($sid);
 	my @results = $self->get ('/search/jobs/'.$sid.'/results?count=1024&offset='.
@@ -162,10 +159,9 @@ Return true if search is finished and all there are no
 more results to read (everything was fetched with L<search_results>).
 
 =cut
-sub results_read
-{
-	my $self = shift;
-	my $sid = shift;
+
+sub results_read {
+	my ($self, $sid) = @_;
 
 	return undef if not defined $self->{last_read};
 	return $self->{last_read} eq 0;

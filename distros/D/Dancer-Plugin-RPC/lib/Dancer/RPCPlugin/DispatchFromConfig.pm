@@ -7,13 +7,15 @@ our @EXPORT = qw/dispatch_table_from_config/;
 use Dancer qw/error warning info debug/;
 
 use Dancer::RPCPlugin::DispatchItem;
+use Dancer::RPCPlugin::PluginNames;
 use Types::Standard qw/ Int Str StrMatch Any /;
 use Params::ValidationCompiler 'validation_for';
 
 sub dispatch_table_from_config {
+    my $pn_re = Dancer::RPCPlugin::PluginNames->new->regex;
     my %args = validation_for(
         params => {
-            plugin   => { type => StrMatch[ qr/^(xmlrpc|jsonrpc|restrpc)$/ ] },
+            plugin   => { type => StrMatch[ qr/^$pn_re$/ ] },
             config   => { type  => Any },
             endpoint => { type  => Str, optional => 0 },
         }
@@ -24,7 +26,7 @@ sub dispatch_table_from_config {
 
     my $dispatch;
     for my $pkg (@pkgs) {
-        eval "require $pkg";
+        eval "require $pkg" if $pkg ne 'main';
         error("Loading $pkg: $@") if $@;
 
         my @rpc_methods = keys %{ $config->{$pkg} };

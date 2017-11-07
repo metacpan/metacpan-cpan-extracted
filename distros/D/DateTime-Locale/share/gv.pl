@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "a.m.",
-    "p.m."
+    "p.m.",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d, E",
@@ -44,7 +49,7 @@
     yMd => "y-MM-dd",
     yQQQ => "y QQQ",
     yQQQQ => "y QQQQ",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "gv",
   date_format_full => "y MMMM d, EEEE",
@@ -62,7 +67,7 @@
     "Jerd",
     "Jeh",
     "Jes",
-    "Jed"
+    "Jed",
   ],
   day_format_narrow => [
     "M",
@@ -71,7 +76,7 @@
     "T",
     "F",
     "S",
-    "S"
+    "S",
   ],
   day_format_wide => [
     "Jelhein",
@@ -80,7 +85,7 @@
     "Jerdein",
     "Jeheiney",
     "Jesarn",
-    "Jedoonee"
+    "Jedoonee",
   ],
   day_stand_alone_abbreviated => [
     "Jel",
@@ -89,7 +94,7 @@
     "Jerd",
     "Jeh",
     "Jes",
-    "Jed"
+    "Jed",
   ],
   day_stand_alone_narrow => [
     "M",
@@ -98,7 +103,7 @@
     "T",
     "F",
     "S",
-    "S"
+    "S",
   ],
   day_stand_alone_wide => [
     "Jelhein",
@@ -107,19 +112,19 @@
     "Jerdein",
     "Jeheiney",
     "Jesarn",
-    "Jedoonee"
+    "Jedoonee",
   ],
   era_abbreviated => [
     "RC",
-    "AD"
+    "AD",
   ],
   era_narrow => [
     "RC",
-    "AD"
+    "AD",
   ],
   era_wide => [
     "RC",
-    "AD"
+    "AD",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -140,7 +145,7 @@
     "M-fouyir",
     "J-fouyir",
     "M-Houney",
-    "M-Nollick"
+    "M-Nollick",
   ],
   month_format_narrow => [
     1,
@@ -154,7 +159,7 @@
     9,
     10,
     11,
-    12
+    12,
   ],
   month_format_wide => [
     "Jerrey-geuree",
@@ -168,7 +173,7 @@
     "Mean-fouyir",
     "Jerrey-fouyir",
     "Mee Houney",
-    "Mee ny Nollick"
+    "Mee ny Nollick",
   ],
   month_stand_alone_abbreviated => [
     "J-guer",
@@ -182,7 +187,7 @@
     "M-fouyir",
     "J-fouyir",
     "M-Houney",
-    "M-Nollick"
+    "M-Nollick",
   ],
   month_stand_alone_narrow => [
     1,
@@ -196,7 +201,7 @@
     9,
     10,
     11,
-    12
+    12,
   ],
   month_stand_alone_wide => [
     "Jerrey-geuree",
@@ -210,7 +215,7 @@
     "Mean-fouyir",
     "Jerrey-fouyir",
     "Mee Houney",
-    "Mee ny Nollick"
+    "Mee ny Nollick",
   ],
   name => "Manx",
   native_language => "Gaelg",
@@ -222,37 +227,37 @@
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_stand_alone_abbreviated => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   script => undef,
   territory => undef,
@@ -261,5 +266,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

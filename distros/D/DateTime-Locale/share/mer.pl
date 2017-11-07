@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "R\N{U+0168}",
-    "\N{U+0168}G"
+    "\N{U+0168}G",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d, E",
@@ -45,7 +50,7 @@
     yMd => "y-MM-dd",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "mer",
   date_format_full => "EEEE, d MMMM y",
@@ -63,7 +68,7 @@
     "WEN",
     "WTN",
     "JUM",
-    "KIU"
+    "KIU",
   ],
   day_format_narrow => [
     "M",
@@ -72,7 +77,7 @@
     "W",
     "W",
     "J",
-    "K"
+    "K",
   ],
   day_format_wide => [
     "Muramuko",
@@ -81,7 +86,7 @@
     "Wena",
     "Wetano",
     "Jumamosi",
-    "Kiumia"
+    "Kiumia",
   ],
   day_stand_alone_abbreviated => [
     "MRA",
@@ -90,7 +95,7 @@
     "WEN",
     "WTN",
     "JUM",
-    "KIU"
+    "KIU",
   ],
   day_stand_alone_narrow => [
     "M",
@@ -99,7 +104,7 @@
     "W",
     "W",
     "J",
-    "K"
+    "K",
   ],
   day_stand_alone_wide => [
     "Muramuko",
@@ -108,19 +113,19 @@
     "Wena",
     "Wetano",
     "Jumamosi",
-    "Kiumia"
+    "Kiumia",
   ],
   era_abbreviated => [
     "MK",
-    "NK"
+    "NK",
   ],
   era_narrow => [
     "MK",
-    "NK"
+    "NK",
   ],
   era_wide => [
     "Mbere ya Krist\N{U+0169}",
-    "Nyuma ya Krist\N{U+0169}"
+    "Nyuma ya Krist\N{U+0169}",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -141,7 +146,7 @@
     "SPT",
     "OKT",
     "NOV",
-    "DEC"
+    "DEC",
   ],
   month_format_narrow => [
     "J",
@@ -155,7 +160,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_format_wide => [
     "Januar\N{U+0129}",
@@ -169,7 +174,7 @@
     "Septemba",
     "Okt\N{U+0169}ba",
     "Novemba",
-    "Dicemba"
+    "Dicemba",
   ],
   month_stand_alone_abbreviated => [
     "JAN",
@@ -183,7 +188,7 @@
     "SPT",
     "OKT",
     "NOV",
-    "DEC"
+    "DEC",
   ],
   month_stand_alone_narrow => [
     "J",
@@ -197,7 +202,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_stand_alone_wide => [
     "Januar\N{U+0129}",
@@ -211,7 +216,7 @@
     "Septemba",
     "Okt\N{U+0169}ba",
     "Novemba",
-    "Dicemba"
+    "Dicemba",
   ],
   name => "Meru",
   native_language => "K\N{U+0129}m\N{U+0129}r\N{U+0169}",
@@ -223,37 +228,37 @@
     "\N{U+0128}mwe k\N{U+0129}r\N{U+0129} inya",
     "Ij\N{U+0129}r\N{U+0129} k\N{U+0129}r\N{U+0129} inya",
     "Ithat\N{U+0169} k\N{U+0129}r\N{U+0129} inya",
-    "Inya k\N{U+0129}r\N{U+0129} inya"
+    "Inya k\N{U+0129}r\N{U+0129} inya",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "\N{U+0128}mwe k\N{U+0129}r\N{U+0129} inya",
     "Ij\N{U+0129}r\N{U+0129} k\N{U+0129}r\N{U+0129} inya",
     "Ithat\N{U+0169} k\N{U+0129}r\N{U+0129} inya",
-    "Inya k\N{U+0129}r\N{U+0129} inya"
+    "Inya k\N{U+0129}r\N{U+0129} inya",
   ],
   quarter_stand_alone_abbreviated => [
     "\N{U+0128}mwe k\N{U+0129}r\N{U+0129} inya",
     "Ij\N{U+0129}r\N{U+0129} k\N{U+0129}r\N{U+0129} inya",
     "Ithat\N{U+0169} k\N{U+0129}r\N{U+0129} inya",
-    "Inya k\N{U+0129}r\N{U+0129} inya"
+    "Inya k\N{U+0129}r\N{U+0129} inya",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "\N{U+0128}mwe k\N{U+0129}r\N{U+0129} inya",
     "Ij\N{U+0129}r\N{U+0129} k\N{U+0129}r\N{U+0129} inya",
     "Ithat\N{U+0169} k\N{U+0129}r\N{U+0129} inya",
-    "Inya k\N{U+0129}r\N{U+0129} inya"
+    "Inya k\N{U+0129}r\N{U+0129} inya",
   ],
   script => undef,
   territory => undef,
@@ -262,5 +267,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

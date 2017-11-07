@@ -15,6 +15,7 @@ Aghem
 Ahad
 Akan
 Alatsinainy
+Altine
 Aneg
 Anwar
 Asiḍyas
@@ -44,6 +45,9 @@ Base
 Belarusian
 Bemba
 Bena
+Bh
+Bhm
+Bhms
 Blin
 Bodo
 Bokmål
@@ -55,6 +59,7 @@ CX
 Caicos
 Catalog
 Ceuta
+Chakma
 Chiga
 Chiini
 Chiposi
@@ -83,12 +88,15 @@ Dimingu
 Divehi
 Domhnaigh
 Duala
+Duşenbe
 Dwowda
 Dydd
 Dzo
 Dzongkha
 Dzu
 Dé
+EBhm
+EBhms
 EEE
 EEEE
 EEEEd
@@ -254,6 +262,8 @@ MMMEEEEd
 MMMEEEd
 MMMEd
 MMMM
+MMMM'k
+MMMM'ren
 MMMMEEEEd
 MMMMEEEd
 MMMMEd
@@ -392,6 +402,7 @@ Swati
 São
 T'Q
 TG
+TJ
 TT
 TW
 TZ
@@ -545,6 +556,9 @@ ca_FR
 ca_IT
 ccc
 cccc
+ccp
+ccp_BD
+ccp_IN
 ce
 ce_RU
 cgg
@@ -854,6 +868,7 @@ haw
 haw_US
 he
 he_IL
+hepde
 hete
 hh
 hi
@@ -953,6 +968,7 @@ lag
 lag_TZ
 lb
 lb_LU
+le
 lg
 lg_UG
 lia
@@ -1039,6 +1055,7 @@ my_MM
 mzn
 mzn_IR
 mánadagur
+mánnodat
 mánudagur
 måanta
 måndag
@@ -1164,6 +1181,8 @@ saq_KE
 sav
 sbp
 sbp_TZ
+sd
+sd_PK
 se
 se_FI
 se_NO
@@ -1246,7 +1265,9 @@ teden
 teo
 teo_KE
 teo_UG
+tg
 tgKingal
+tg_TJ
 th
 th_TH
 tháng
@@ -1263,6 +1284,8 @@ tr_CY
 tr_TR
 trimestrul
 tsu
+tt
+tt_RU
 tuần
 twq
 twq_NE
@@ -1291,6 +1314,7 @@ uz_Cyrl
 uz_Cyrl_UZ
 uz_Latn
 uz_Latn_UZ
+vahkku
 vai
 vai_Latn
 vai_Latn_LR
@@ -1316,6 +1340,8 @@ wae
 wae_CH
 watapa
 wike
+wo
+wo_SN
 wythnos
 xog
 xog_UG
@@ -1349,7 +1375,10 @@ yo
 yo_BJ
 yo_NG
 yue
-yue_HK
+yue_Hans
+yue_Hans_CN
+yue_Hant
+yue_Hant_HK
 yw
 yy
 yyM

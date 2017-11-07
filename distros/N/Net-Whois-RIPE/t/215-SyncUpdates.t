@@ -4,8 +4,6 @@ use Test::More;
 use Net::Whois::RIPE;
 use Net::Whois::Object;
 
-use Data::Dumper;
-
 our $LWP;
 
 BEGIN {

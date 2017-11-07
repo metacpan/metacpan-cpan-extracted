@@ -9,7 +9,7 @@
 #
 package Config::Model::Tester;
 # ABSTRACT: Test framework for Config::Model
-$Config::Model::Tester::VERSION = '3.002';
+$Config::Model::Tester::VERSION = '3.003';
 use warnings;
 use strict;
 use locale;
@@ -350,7 +350,7 @@ sub check_file_content {
             my $t = $fc->{$f} ;
             my @tests = ref $t eq 'ARRAY' ? @$t : ($t) ;
             foreach my $subtest (@tests) {
-                file_contents_eq_or_diff $wr_dir->child($f)->stringify,  $subtest,
+                file_contents_eq_or_diff $wr_dir->child($f)->stringify,  $subtest, { encoding => 'UTF-8' },
                     "check that $f contains $subtest";
             }
         }
@@ -361,7 +361,7 @@ sub check_file_content {
             my $t = $fc->{$f} ;
             my @tests = ref $t eq 'ARRAY' ? @$t : ($t) ;
             foreach my $subtest (@tests) {
-                file_contents_like $wr_dir->child($f)->stringify,  $subtest,
+                file_contents_like $wr_dir->child($f)->stringify,  $subtest, { encoding => 'UTF-8' },
                     "check that $f matches regexp $subtest";
             }
         }
@@ -372,7 +372,7 @@ sub check_file_content {
             my $t = $fc->{$f} ;
             my @tests = ref $t eq 'ARRAY' ? @$t : ($t) ;
             foreach my $subtest (@tests) {
-                file_contents_unlike $wr_dir->child($f)->stringify,  $subtest,
+                file_contents_unlike $wr_dir->child($f)->stringify,  $subtest, { encoding => 'UTF-8' },
                     "check that $f does not match regexp $subtest";
             }
         }
@@ -488,8 +488,12 @@ sub run_model_test {
         my @options;
         push @options, backend_arg => $t->{backend_arg} if $t->{backend_arg};
 
+        # eventually, we may end up with several instances of Dpkg
+        # model in the same process. So we can't play with chdir
         my $inst = $model->instance(
             root_class_name => $model_to_test,
+            # need to keed root_dir to handle config files like
+            # /etc/foo.ini (absolute path, like in /etc/)
             root_dir        => $wr_dir->stringify,
             instance_name   => $inst_name,
             application     => $app_to_test,
@@ -627,7 +631,7 @@ Config::Model::Tester - Test framework for Config::Model
 
 =head1 VERSION
 
-version 3.002
+version 3.003
 
 =head1 SYNOPSIS
 

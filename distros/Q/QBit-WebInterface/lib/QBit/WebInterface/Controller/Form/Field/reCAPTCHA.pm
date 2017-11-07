@@ -1,5 +1,5 @@
 package QBit::WebInterface::Controller::Form::Field::reCAPTCHA;
-$QBit::WebInterface::Controller::Form::Field::reCAPTCHA::VERSION = '0.029';
+$QBit::WebInterface::Controller::Form::Field::reCAPTCHA::VERSION = '0.030';
 use qbit;
 
 use base qw(QBit::WebInterface::Controller::Form::Field);

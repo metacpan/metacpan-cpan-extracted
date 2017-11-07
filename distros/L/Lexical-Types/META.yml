@@ -6,6 +6,7 @@ build_requires:
   Carp: '0'
   Config: '0'
   ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
   Test::More: '0'
   XSLoader: '0'
   constant: '0'
@@ -14,7 +15,7 @@ configure_requires:
   Config: '0'
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -33,5 +34,5 @@ resources:
   homepage: http://search.cpan.org/dist/Lexical-Types/
   license: http://dev.perl.org/licenses/
   repository: http://git.profvince.com/?p=perl%2Fmodules%2FLexical-Types.git
-version: '0.15'
+version: '0.16'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

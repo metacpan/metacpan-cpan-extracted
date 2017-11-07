@@ -20,11 +20,11 @@ use namespace::autoclean;
 
 use File::ShareDir qw( dist_file );
 
-our $VERSION = '1.16';
+our $VERSION = '1.17';
 
 #<<<
 ### :start CLDRVersion:
-our $CLDRVersion = 31;
+our $CLDRVersion = 32;
 ### :end CLDRVersion:
 #>>>
 
@@ -113,6 +113,9 @@ our %Codes = (
   "ca-ES-VALENCIA" => 1,
   "ca-FR" => 1,
   "ca-IT" => 1,
+  ccp => 1,
+  "ccp-BD" => 1,
+  "ccp-IN" => 1,
   ce => 1,
   "ce-RU" => 1,
   cgg => 1,
@@ -620,6 +623,8 @@ our %Codes = (
   "saq-KE" => 1,
   sbp => 1,
   "sbp-TZ" => 1,
+  sd => 1,
+  "sd-PK" => 1,
   se => 1,
   "se-FI" => 1,
   "se-NO" => 1,
@@ -684,6 +689,8 @@ our %Codes = (
   teo => 1,
   "teo-KE" => 1,
   "teo-UG" => 1,
+  tg => 1,
+  "tg-TJ" => 1,
   th => 1,
   "th-TH" => 1,
   ti => 1,
@@ -696,6 +703,8 @@ our %Codes = (
   tr => 1,
   "tr-CY" => 1,
   "tr-TR" => 1,
+  tt => 1,
+  "tt-RU" => 1,
   twq => 1,
   "twq-NE" => 1,
   tzm => 1,
@@ -727,6 +736,8 @@ our %Codes = (
   "vun-TZ" => 1,
   wae => 1,
   "wae-CH" => 1,
+  wo => 1,
+  "wo-SN" => 1,
   xog => 1,
   "xog-UG" => 1,
   yav => 1,
@@ -737,7 +748,10 @@ our %Codes = (
   "yo-BJ" => 1,
   "yo-NG" => 1,
   yue => 1,
-  "yue-HK" => 1,
+  "yue-Hans" => 1,
+  "yue-Hans-CN" => 1,
+  "yue-Hant" => 1,
+  "yue-Hant-HK" => 1,
   zgh => 1,
   "zgh-MA" => 1,
   zh => 1,
@@ -751,7 +765,7 @@ our %Codes = (
   "zh-Hant-MO" => 1,
   "zh-Hant-TW" => 1,
   zu => 1,
-  "zu-ZA" => 1
+  "zu-ZA" => 1,
 );
 ### :end Codes:
 #>>>
@@ -845,7 +859,10 @@ our %Names = (
   Burmese => "my",
   "Burmese Myanmar (Burma)" => "my-MM",
   Cantonese => "yue",
-  "Cantonese Hong Kong SAR China" => "yue-HK",
+  "Cantonese China Simplified" => "yue-Hans-CN",
+  "Cantonese Hong Kong SAR China Traditional" => "yue-Hant-HK",
+  "Cantonese Simplified" => "yue-Hans",
+  "Cantonese Traditional" => "yue-Hant",
   Catalan => "ca",
   "Catalan Andorra" => "ca-AD",
   "Catalan France" => "ca-FR",
@@ -857,6 +874,9 @@ our %Names = (
   "Central Kurdish" => "ckb",
   "Central Kurdish Iran" => "ckb-IR",
   "Central Kurdish Iraq" => "ckb-IQ",
+  Chakma => "ccp",
+  "Chakma Bangladesh" => "ccp-BD",
+  "Chakma India" => "ccp-IN",
   Chechen => "ce",
   "Chechen Russia" => "ce-RU",
   Cherokee => "chr",
@@ -1345,6 +1365,8 @@ our %Names = (
   "Shona Zimbabwe" => "sn-ZW",
   "Sichuan Yi" => "ii",
   "Sichuan Yi China" => "ii-CN",
+  Sindhi => "sd",
+  "Sindhi Pakistan" => "sd-PK",
   Sinhala => "si",
   "Sinhala Sri Lanka" => "si-LK",
   Slovak => "sk",
@@ -1409,6 +1431,8 @@ our %Names = (
   "Tachelhit Tifinagh" => "shi-Tfng",
   Taita => "dav",
   "Taita Kenya" => "dav-KE",
+  Tajik => "tg",
+  "Tajik Tajikistan" => "tg-TJ",
   Tamil => "ta",
   "Tamil India" => "ta-IN",
   "Tamil Malaysia" => "ta-MY",
@@ -1416,6 +1440,8 @@ our %Names = (
   "Tamil Sri Lanka" => "ta-LK",
   Tasawaq => "twq",
   "Tasawaq Niger" => "twq-NE",
+  Tatar => "tt",
+  "Tatar Russia" => "tt-RU",
   Telugu => "te",
   "Telugu India" => "te-IN",
   Teso => "teo",
@@ -1469,6 +1495,8 @@ our %Names = (
   "Welsh United Kingdom" => "cy-GB",
   "Western Frisian" => "fy",
   "Western Frisian Netherlands" => "fy-NL",
+  Wolof => "wo",
+  "Wolof Senegal" => "wo-SN",
   Yangben => "yav",
   "Yangben Cameroon" => "yav-CM",
   Yiddish => "yi",
@@ -1479,7 +1507,7 @@ our %Names = (
   Zarma => "dje",
   "Zarma Niger" => "dje-NE",
   Zulu => "zu",
-  "Zulu South Africa" => "zu-ZA"
+  "Zulu South Africa" => "zu-ZA",
 );
 ### :end Names:
 #>>>
@@ -1495,10 +1523,6 @@ our %NativeNames = (
   "Aghem K\N{U+00e0}m\N{U+00e0}l\N{U+00fb}\N{U+014b}" => "agq-CM",
   Akan => "ak",
   "Akan Gaana" => "ak-GH",
-  "Bahasa Melayu" => "ms",
-  "Bahasa Melayu Brunei" => "ms-BN",
-  "Bahasa Melayu Malaysia" => "ms-MY",
-  "Bahasa Melayu Singapura" => "ms-SG",
   Chimakonde => "kde",
   "Chimakonde Tanzania" => "kde-TZ",
   Cymraeg => "cy",
@@ -1627,6 +1651,8 @@ our %NativeNames = (
   "E\N{U+028b}egbe Togo nutome" => "ee-TG",
   Filipino => "fil",
   "Filipino Pilipinas" => "fil-PH",
+  Frysk => "fy",
+  "Frysk Nederl\N{U+00e2}n" => "fy-NL",
   Gaeilge => "ga",
   "Gaeilge \N{U+00c9}ire" => "ga-IE",
   Gaelg => "gv",
@@ -1644,7 +1670,7 @@ our %NativeNames = (
   Ichibemba => "bem",
   "Ichibemba Zambia" => "bem-ZM",
   Igbo => "ig",
-  "Igbo Nigeria" => "ig-NG",
+  "Igbo Na\N{U+1ecb}j\N{U+1ecb}r\N{U+1ecb}a" => "ig-NG",
   Ikirundi => "rn",
   "Ikirundi Uburundi" => "rn-BI",
   Indonesia => "id",
@@ -1662,7 +1688,7 @@ our %NativeNames = (
   Kimachame => "jmc",
   "Kimachame Tanzania" => "jmc-TZ",
   Kinyarwanda => "rw",
-  "Kinyarwanda Rwanda" => "rw-RW",
+  "Kinyarwanda U Rwanda" => "rw-RW",
   Kipare => "asa",
   "Kipare Tadhania" => "asa-TZ",
   Kiruwa => "rwk",
@@ -1714,6 +1740,10 @@ our %NativeNames = (
   "Malagasy Madagasikara" => "mg-MG",
   Malti => "mt",
   "Malti Malta" => "mt-MT",
+  Melayu => "ms",
+  "Melayu Brunei" => "ms-BN",
+  "Melayu Malaysia" => "ms-MY",
+  "Melayu Singapura" => "ms-SG",
   NL => "nds-NL",
   "Nda\N{U+a78c}a" => "jgo",
   "Nda\N{U+a78c}a Kam\N{U+025b}l\N{U+00fb}n" => "jgo-CM",
@@ -1770,6 +1800,8 @@ our %NativeNames = (
   "Ti\N{U+1ebf}ng Vi\N{U+1ec7}t Vi\N{U+1ec7}t Nam" => "vi-VN",
   Tshiluba => "lu",
   "Tshiluba Ditunga wa Kongu" => "lu-CD",
+  "T\N{U+00fc}rkmen dili" => "tk",
+  "T\N{U+00fc}rkmen dili T\N{U+00fc}rkmenistan" => "tk-TM",
   "T\N{U+00fc}rk\N{U+00e7}e" => "tr",
   "T\N{U+00fc}rk\N{U+00e7}e K\N{U+0131}br\N{U+0131}s" => "tr-CY",
   "T\N{U+00fc}rk\N{U+00e7}e T\N{U+00fc}rkiye" => "tr-TR",
@@ -1777,8 +1809,8 @@ our %NativeNames = (
   "Vai Latn" => "vai-Latn",
   Walser => "wae",
   "Walser Schwiz" => "wae-CH",
-  "West-Frysk" => "fy",
-  "West-Frysk Nederl\N{U+00e2}n" => "fy-NL",
+  Wolof => "wo",
+  "Wolof Senegaal" => "wo-SN",
   Zarmaciine => "dje",
   "Zarmaciine Ni\N{U+017e}er" => "dje-NE",
   "anar\N{U+00e2}\N{U+0161}kiel\N{U+00e2}" => "smn",
@@ -1915,7 +1947,7 @@ our %NativeNames = (
   isiNdebele => "nd",
   "isiNdebele Zimbabwe" => "nd-ZW",
   isiZulu => "zu",
-  "isiZulu i-South Africa" => "zu-ZA",
+  "isiZulu iNingizimu Afrika" => "zu-ZA",
   italiano => "it",
   "italiano Citt\N{U+00e0} del Vaticano" => "it-VA",
   "italiano Italia" => "it-IT",
@@ -2006,10 +2038,9 @@ our %NativeNames = (
   "svenska Finland" => "sv-FI",
   "svenska Sverige" => "sv-SE",
   "svenska \N{U+00c5}land" => "sv-AX",
-  tk => "tk",
-  "tk TM" => "tk-TM",
   vo => "vo",
   "vo 001" => "vo-001",
+  yue => "yue",
   "\N{U+00c8}d\N{U+00e8} Yor\N{U+00f9}b\N{U+00e1}" => "yo",
   "\N{U+00c8}d\N{U+00e8} Yor\N{U+00f9}b\N{U+00e1} Or\N{U+00ed}l\N{U+025b}\N{U+0301}\N{U+00e8}de B\N{U+025b}\N{U+0300}n\N{U+025b}\N{U+0300}" => "yo-BJ",
   "\N{U+00c8}d\N{U+00e8} Yor\N{U+00f9}b\N{U+00e1} Or\N{U+00ed}l\N{U+1eb9}\N{U+0301}\N{U+00e8}de N\N{U+00e0}\N{U+00ec}j\N{U+00ed}r\N{U+00ed}\N{U+00e0}" => "yo-NG",
@@ -2028,8 +2059,8 @@ our %NativeNames = (
   "\N{U+0430}\N{U+0437}\N{U+04d9}\N{U+0440}\N{U+0431}\N{U+0430}\N{U+0458}\N{U+04b9}\N{U+0430}\N{U+043d} \N{U+041a}\N{U+0438}\N{U+0440}\N{U+0438}\N{U+043b}" => "az-Cyrl",
   "\N{U+0431}\N{U+0435}\N{U+043b}\N{U+0430}\N{U+0440}\N{U+0443}\N{U+0441}\N{U+043a}\N{U+0430}\N{U+044f}" => "be",
   "\N{U+0431}\N{U+0435}\N{U+043b}\N{U+0430}\N{U+0440}\N{U+0443}\N{U+0441}\N{U+043a}\N{U+0430}\N{U+044f} \N{U+0411}\N{U+0435}\N{U+043b}\N{U+0430}\N{U+0440}\N{U+0443}\N{U+0441}\N{U+044c}" => "be-BY",
-  "\N{U+0431}\N{U+043e}\N{U+0441}\N{U+0430}\N{U+043d}\N{U+0441}\N{U+043a}\N{U+0438} \N{U+040b}\N{U+0438}\N{U+0440}\N{U+0438}\N{U+043b}\N{U+0438}\N{U+0446}\N{U+0430}" => "bs-Cyrl",
-  "\N{U+0431}\N{U+043e}\N{U+0441}\N{U+0430}\N{U+043d}\N{U+0441}\N{U+043a}\N{U+0438} \N{U+0411}\N{U+043e}\N{U+0441}\N{U+043d}\N{U+0430} \N{U+0438} \N{U+0425}\N{U+0435}\N{U+0440}\N{U+0446}\N{U+0435}\N{U+0433}\N{U+043e}\N{U+0432}\N{U+0438}\N{U+043d}\N{U+0430} \N{U+040b}\N{U+0438}\N{U+0440}\N{U+0438}\N{U+043b}\N{U+0438}\N{U+0446}\N{U+0430}" => "bs-Cyrl-BA",
+  "\N{U+0431}\N{U+043e}\N{U+0441}\N{U+0430}\N{U+043d}\N{U+0441}\N{U+043a}\N{U+0438} \N{U+0411}\N{U+043e}\N{U+0441}\N{U+043d}\N{U+0430} \N{U+0438} \N{U+0425}\N{U+0435}\N{U+0440}\N{U+0446}\N{U+0435}\N{U+0433}\N{U+043e}\N{U+0432}\N{U+0438}\N{U+043d}\N{U+0430} \N{U+045b}\N{U+0438}\N{U+0440}\N{U+0438}\N{U+043b}\N{U+0438}\N{U+0446}\N{U+0430}" => "bs-Cyrl-BA",
+  "\N{U+0431}\N{U+043e}\N{U+0441}\N{U+0430}\N{U+043d}\N{U+0441}\N{U+043a}\N{U+0438} \N{U+045b}\N{U+0438}\N{U+0440}\N{U+0438}\N{U+043b}\N{U+0438}\N{U+0446}\N{U+0430}" => "bs-Cyrl",
   "\N{U+0431}\N{U+044a}\N{U+043b}\N{U+0433}\N{U+0430}\N{U+0440}\N{U+0441}\N{U+043a}\N{U+0438}" => "bg",
   "\N{U+0431}\N{U+044a}\N{U+043b}\N{U+0433}\N{U+0430}\N{U+0440}\N{U+0441}\N{U+043a}\N{U+0438} \N{U+0411}\N{U+044a}\N{U+043b}\N{U+0433}\N{U+0430}\N{U+0440}\N{U+0438}\N{U+044f}" => "bg-BG",
   "\N{U+0438}\N{U+0440}\N{U+043e}\N{U+043d}" => "os",
@@ -2058,6 +2089,10 @@ our %NativeNames = (
   "\N{U+0441}\N{U+0440}\N{U+043f}\N{U+0441}\N{U+043a}\N{U+0438} \N{U+0421}\N{U+0440}\N{U+0431}\N{U+0438}\N{U+0458}\N{U+0430} \N{U+045b}\N{U+0438}\N{U+0440}\N{U+0438}\N{U+043b}\N{U+0438}\N{U+0446}\N{U+0430}" => "sr-Cyrl-RS",
   "\N{U+0441}\N{U+0440}\N{U+043f}\N{U+0441}\N{U+043a}\N{U+0438} \N{U+0426}\N{U+0440}\N{U+043d}\N{U+0430} \N{U+0413}\N{U+043e}\N{U+0440}\N{U+0430} \N{U+045b}\N{U+0438}\N{U+0440}\N{U+0438}\N{U+043b}\N{U+0438}\N{U+0446}\N{U+0430}" => "sr-Cyrl-ME",
   "\N{U+0441}\N{U+0440}\N{U+043f}\N{U+0441}\N{U+043a}\N{U+0438} \N{U+045b}\N{U+0438}\N{U+0440}\N{U+0438}\N{U+043b}\N{U+0438}\N{U+0446}\N{U+0430}" => "sr-Cyrl",
+  "\N{U+0442}\N{U+0430}\N{U+0442}\N{U+0430}\N{U+0440}" => "tt",
+  "\N{U+0442}\N{U+0430}\N{U+0442}\N{U+0430}\N{U+0440} \N{U+0420}\N{U+043e}\N{U+0441}\N{U+0441}\N{U+0438}\N{U+044f}" => "tt-RU",
+  "\N{U+0442}\N{U+043e}\N{U+04b7}\N{U+0438}\N{U+043a}\N{U+04e3}" => "tg",
+  "\N{U+0442}\N{U+043e}\N{U+04b7}\N{U+0438}\N{U+043a}\N{U+04e3} \N{U+0422}\N{U+043e}\N{U+04b7}\N{U+0438}\N{U+043a}\N{U+0438}\N{U+0441}\N{U+0442}\N{U+043e}\N{U+043d}" => "tg-TJ",
   "\N{U+0443}\N{U+043a}\N{U+0440}\N{U+0430}\N{U+0457}\N{U+043d}\N{U+0441}\N{U+044c}\N{U+043a}\N{U+0430}" => "uk",
   "\N{U+0443}\N{U+043a}\N{U+0440}\N{U+0430}\N{U+0457}\N{U+043d}\N{U+0441}\N{U+044c}\N{U+043a}\N{U+0430} \N{U+0423}\N{U+043a}\N{U+0440}\N{U+0430}\N{U+0457}\N{U+043d}\N{U+0430}" => "uk-UA",
   "\N{U+045e}\N{U+0437}\N{U+0431}\N{U+0435}\N{U+043a}\N{U+0447}\N{U+0430} \N{U+040e}\N{U+0437}\N{U+0431}\N{U+0435}\N{U+043a}\N{U+0438}\N{U+0441}\N{U+0442}\N{U+043e}\N{U+043d} \N{U+041a}\N{U+0438}\N{U+0440}\N{U+0438}\N{U+043b}" => "uz-Cyrl-UZ",
@@ -2106,6 +2141,8 @@ our %NativeNames = (
   "\N{U+0627}\N{U+0644}\N{U+0639}\N{U+0631}\N{U+0628}\N{U+064a}\N{U+0629} \N{U+0645}\N{U+0648}\N{U+0631}\N{U+064a}\N{U+062a}\N{U+0627}\N{U+0646}\N{U+064a}\N{U+0627}" => "ar-MR",
   "\N{U+0627}\N{U+0648}\N{U+0632}\N{U+0628}\N{U+06cc}\N{U+06a9} \N{U+0627}\N{U+0641}\N{U+063a}\N{U+0627}\N{U+0646}\N{U+0633}\N{U+062a}\N{U+0627}\N{U+0646} \N{U+0639}\N{U+0631}\N{U+0628}\N{U+06cc}" => "uz-Arab-AF",
   "\N{U+0627}\N{U+0648}\N{U+0632}\N{U+0628}\N{U+06cc}\N{U+06a9} \N{U+0639}\N{U+0631}\N{U+0628}\N{U+06cc}" => "uz-Arab",
+  "\N{U+0633}\N{U+0646}\N{U+068c}\N{U+064a}" => "sd",
+  "\N{U+0633}\N{U+0646}\N{U+068c}\N{U+064a} \N{U+067e}\N{U+0627}\N{U+06aa}\N{U+0633}\N{U+062a}\N{U+0627}\N{U+0646}" => "sd-PK",
   "\N{U+0641}\N{U+0627}\N{U+0631}\N{U+0633}\N{U+06cc}" => "fa",
   "\N{U+0641}\N{U+0627}\N{U+0631}\N{U+0633}\N{U+06cc} \N{U+0627}\N{U+0641}\N{U+063a}\N{U+0627}\N{U+0646}\N{U+0633}\N{U+062a}\N{U+0627}\N{U+0646}" => "fa-AF",
   "\N{U+0641}\N{U+0627}\N{U+0631}\N{U+0633}\N{U+06cc} \N{U+0627}\N{U+06cc}\N{U+0631}\N{U+0627}\N{U+0646}" => "fa-IR",
@@ -2135,7 +2172,7 @@ our %NativeNames = (
   "\N{U+0939}\N{U+093f}\N{U+0928}\N{U+094d}\N{U+0926}\N{U+0940}" => "hi",
   "\N{U+0939}\N{U+093f}\N{U+0928}\N{U+094d}\N{U+0926}\N{U+0940} \N{U+092d}\N{U+093e}\N{U+0930}\N{U+0924}" => "hi-IN",
   "\N{U+0985}\N{U+09b8}\N{U+09ae}\N{U+09c0}\N{U+09af}\N{U+09bc}\N{U+09be}" => "as",
-  "\N{U+0985}\N{U+09b8}\N{U+09ae}\N{U+09c0}\N{U+09af}\N{U+09bc}\N{U+09be} \N{U+09ad}\N{U+09be}\N{U+09f0}\N{U+09a4}" => "as-IN",
+  "\N{U+0985}\N{U+09b8}\N{U+09ae}\N{U+09c0}\N{U+09af}\N{U+09bc}\N{U+09be} \N{U+09ad}\N{U+09be}\N{U+09b0}\N{U+09a4}" => "as-IN",
   "\N{U+09ac}\N{U+09be}\N{U+0982}\N{U+09b2}\N{U+09be}" => "bn",
   "\N{U+09ac}\N{U+09be}\N{U+0982}\N{U+09b2}\N{U+09be} \N{U+09ac}\N{U+09be}\N{U+0982}\N{U+09b2}\N{U+09be}\N{U+09a6}\N{U+09c7}\N{U+09b6}" => "bn-BD",
   "\N{U+09ac}\N{U+09be}\N{U+0982}\N{U+09b2}\N{U+09be} \N{U+09ad}\N{U+09be}\N{U+09b0}\N{U+09a4}" => "bn-IN",
@@ -2152,7 +2189,7 @@ our %NativeNames = (
   "\N{U+0ba4}\N{U+0bae}\N{U+0bbf}\N{U+0bb4}\N{U+0bcd} \N{U+0b9a}\N{U+0bbf}\N{U+0b99}\N{U+0bcd}\N{U+0b95}\N{U+0baa}\N{U+0bcd}\N{U+0baa}\N{U+0bc2}\N{U+0bb0}\N{U+0bcd}" => "ta-SG",
   "\N{U+0ba4}\N{U+0bae}\N{U+0bbf}\N{U+0bb4}\N{U+0bcd} \N{U+0bae}\N{U+0bb2}\N{U+0bc7}\N{U+0b9a}\N{U+0bbf}\N{U+0baf}\N{U+0bbe}" => "ta-MY",
   "\N{U+0c24}\N{U+0c46}\N{U+0c32}\N{U+0c41}\N{U+0c17}\N{U+0c41}" => "te",
-  "\N{U+0c24}\N{U+0c46}\N{U+0c32}\N{U+0c41}\N{U+0c17}\N{U+0c41} \N{U+0c2d}\N{U+0c3e}\N{U+0c30}\N{U+0c24} \N{U+0c26}\N{U+0c47}\N{U+0c36}\N{U+0c02}" => "te-IN",
+  "\N{U+0c24}\N{U+0c46}\N{U+0c32}\N{U+0c41}\N{U+0c17}\N{U+0c41} \N{U+0c2d}\N{U+0c3e}\N{U+0c30}\N{U+0c24}\N{U+0c26}\N{U+0c47}\N{U+0c36}\N{U+0c02}" => "te-IN",
   "\N{U+0c95}\N{U+0ca8}\N{U+0ccd}\N{U+0ca8}\N{U+0ca1}" => "kn",
   "\N{U+0c95}\N{U+0ca8}\N{U+0ccd}\N{U+0ca8}\N{U+0ca1} \N{U+0cad}\N{U+0cbe}\N{U+0cb0}\N{U+0ca4}" => "kn-IN",
   "\N{U+0d2e}\N{U+0d32}\N{U+0d2f}\N{U+0d3e}\N{U+0d33}\N{U+0d02}" => "ml",
@@ -2173,8 +2210,8 @@ our %NativeNames = (
   "\N{U+10e5}\N{U+10d0}\N{U+10e0}\N{U+10d7}\N{U+10e3}\N{U+10da}\N{U+10d8}" => "ka",
   "\N{U+10e5}\N{U+10d0}\N{U+10e0}\N{U+10d7}\N{U+10e3}\N{U+10da}\N{U+10d8} \N{U+10e1}\N{U+10d0}\N{U+10e5}\N{U+10d0}\N{U+10e0}\N{U+10d7}\N{U+10d5}\N{U+10d4}\N{U+10da}\N{U+10dd}" => "ka-GE",
   "\N{U+1275}\N{U+130d}\N{U+122d}\N{U+129b}" => "ti",
-  "\N{U+1275}\N{U+130d}\N{U+122d}\N{U+129b} ER" => "ti-ER",
-  "\N{U+1275}\N{U+130d}\N{U+122d}\N{U+129b} ET" => "ti-ET",
+  "\N{U+1275}\N{U+130d}\N{U+122d}\N{U+129b} \N{U+12a2}\N{U+1275}\N{U+12ee}\N{U+1335}\N{U+12eb}" => "ti-ET",
+  "\N{U+1275}\N{U+130d}\N{U+122d}\N{U+129b} \N{U+12a4}\N{U+122d}\N{U+1275}\N{U+122b}" => "ti-ER",
   "\N{U+12a0}\N{U+121b}\N{U+122d}\N{U+129b}" => "am",
   "\N{U+12a0}\N{U+121b}\N{U+122d}\N{U+129b} \N{U+12a2}\N{U+1275}\N{U+12ee}\N{U+1335}\N{U+12eb}" => "am-ET",
   "\N{U+13e3}\N{U+13b3}\N{U+13a9}" => "chr",
@@ -2198,8 +2235,10 @@ our %NativeNames = (
   "\N{U+4e2d}\N{U+6587} \N{U+7e41}\N{U+9ad4}" => "zh-Hant",
   "\N{U+65e5}\N{U+672c}\N{U+8a9e}" => "ja",
   "\N{U+65e5}\N{U+672c}\N{U+8a9e} \N{U+65e5}\N{U+672c}" => "ja-JP",
-  "\N{U+7cb5}\N{U+8a9e}" => "yue",
-  "\N{U+7cb5}\N{U+8a9e} \N{U+4e2d}\N{U+83ef}\N{U+4eba}\N{U+6c11}\N{U+5171}\N{U+548c}\N{U+570b}\N{U+9999}\N{U+6e2f}\N{U+7279}\N{U+5225}\N{U+884c}\N{U+653f}\N{U+5340}" => "yue-HK",
+  "\N{U+7ca4}\N{U+8bed} \N{U+4e2d}\N{U+534e}\N{U+4eba}\N{U+6c11}\N{U+5171}\N{U+548c}\N{U+56fd} \N{U+7b80}\N{U+4f53}" => "yue-Hans-CN",
+  "\N{U+7ca4}\N{U+8bed} \N{U+7b80}\N{U+4f53}" => "yue-Hans",
+  "\N{U+7cb5}\N{U+8a9e} \N{U+4e2d}\N{U+83ef}\N{U+4eba}\N{U+6c11}\N{U+5171}\N{U+548c}\N{U+570b}\N{U+9999}\N{U+6e2f}\N{U+7279}\N{U+5225}\N{U+884c}\N{U+653f}\N{U+5340} \N{U+7e41}\N{U+9ad4}" => "yue-Hant-HK",
+  "\N{U+7cb5}\N{U+8a9e} \N{U+7e41}\N{U+9ad4}" => "yue-Hant",
   "\N{U+a188}\N{U+a320}\N{U+a259}" => "ii",
   "\N{U+a188}\N{U+a320}\N{U+a259} \N{U+a34f}\N{U+a1e9}" => "ii-CN",
   "\N{U+a559}\N{U+a524}" => "vai",
@@ -2207,7 +2246,10 @@ our %NativeNames = (
   "\N{U+a559}\N{U+a524} \N{U+a55e}\N{U+a524}\N{U+a52b}\N{U+a569} Vaii" => "vai-Vaii-LR",
   "\N{U+d55c}\N{U+ad6d}\N{U+c5b4}" => "ko",
   "\N{U+d55c}\N{U+ad6d}\N{U+c5b4} \N{U+b300}\N{U+d55c}\N{U+bbfc}\N{U+ad6d}" => "ko-KR",
-  "\N{U+d55c}\N{U+ad6d}\N{U+c5b4} \N{U+c870}\N{U+c120}\N{U+bbfc}\N{U+c8fc}\N{U+c8fc}\N{U+c758}\N{U+c778}\N{U+bbfc}\N{U+acf5}\N{U+d654}\N{U+ad6d}" => "ko-KP"
+  "\N{U+d55c}\N{U+ad6d}\N{U+c5b4} \N{U+c870}\N{U+c120}\N{U+bbfc}\N{U+c8fc}\N{U+c8fc}\N{U+c758}\N{U+c778}\N{U+bbfc}\N{U+acf5}\N{U+d654}\N{U+ad6d}" => "ko-KP",
+  "\N{U+1110c}\N{U+1110b}\N{U+11134}\N{U+1111f}\N{U+11133}\N{U+11126}" => "ccp",
+  "\N{U+1110c}\N{U+1110b}\N{U+11134}\N{U+1111f}\N{U+11133}\N{U+11126} \N{U+1111d}\N{U+11101}\N{U+11123}\N{U+11118}\N{U+1112c}\N{U+1110c}\N{U+11134}" => "ccp-BD",
+  "\N{U+1110c}\N{U+1110b}\N{U+11134}\N{U+1111f}\N{U+11133}\N{U+11126} \N{U+1111e}\N{U+11122}\N{U+11127}\N{U+11116}\N{U+11134}" => "ccp-IN",
 );
 ### :end NativeNames:
 #>>>
@@ -2671,6 +2713,8 @@ our %ISO639Aliases = (
   "sme-SE" => "se-SE",
   sna => "sn",
   "sna-ZW" => "sn-ZW",
+  snd => "sd",
+  "snd-PK" => "sd-PK",
   som => "so",
   "som-DJ" => "so-DJ",
   "som-ET" => "so-ET",
@@ -2730,8 +2774,12 @@ our %ISO639Aliases = (
   "tam-LK" => "ta-LK",
   "tam-MY" => "ta-MY",
   "tam-SG" => "ta-SG",
+  tat => "tt",
+  "tat-RU" => "tt-RU",
   tel => "te",
   "tel-IN" => "te-IN",
+  tgk => "tg",
+  "tgk-TJ" => "tg-TJ",
   tha => "th",
   "tha-TH" => "th-TH",
   tib => "bo",
@@ -2767,13 +2815,15 @@ our %ISO639Aliases = (
   "vol-001" => "vo-001",
   wel => "cy",
   "wel-GB" => "cy-GB",
+  wol => "wo",
+  "wol-SN" => "wo-SN",
   yid => "yi",
   "yid-001" => "yi-001",
   yor => "yo",
   "yor-BJ" => "yo-BJ",
   "yor-NG" => "yo-NG",
   zul => "zu",
-  "zul-ZA" => "zu-ZA"
+  "zul-ZA" => "zu-ZA",
 );
 ### :end ISO639Aliases:
 #>>>
@@ -2784,10 +2834,15 @@ my %LocaleData = (
   ar => {
     am_pm_abbreviated => [
       "\N{U+0635}",
-      "\N{U+0645}"
+      "\N{U+0645}",
     ],
     available_formats => {
+      Bh => "h B",
+      Bhm => "h:mm B",
+      Bhms => "h:mm:ss B",
       E => "ccc",
+      EBhm => "E h:mm B",
+      EBhms => "E h:mm:ss B",
       EHm => "E HH:mm",
       EHms => "E HH:mm:ss",
       Ed => "E\N{U+060c} d",
@@ -2795,8 +2850,8 @@ my %LocaleData = (
       Ehms => "E h:mm:ss a",
       Gy => "y G",
       GyMMM => "MMM y G",
-      GyMMMEd => "E\N{U+060c} d MMM\N{U+060c} y G",
-      GyMMMd => "d MMM\N{U+060c} y G",
+      GyMMMEd => "E\N{U+060c} d MMM y G",
+      GyMMMd => "d MMM y G",
       H => "HH",
       Hm => "HH:mm",
       Hms => "HH:mm:ss",
@@ -2829,22 +2884,22 @@ my %LocaleData = (
       yMEd => "E\N{U+060c} d/\N{U+200f}M/\N{U+200f}y",
       yMM => "MM\N{U+200f}/y",
       yMMM => "MMM y",
-      yMMMEd => "E\N{U+060c} d MMM\N{U+060c} y",
+      yMMMEd => "E\N{U+060c} d MMM y",
       yMMMM => "MMMM y",
-      yMMMd => "d MMM\N{U+060c} y",
+      yMMMd => "d MMM y",
       yMd => "d\N{U+200f}/M\N{U+200f}/y",
       yQQQ => "QQQ y",
       yQQQQ => "QQQQ y",
-      "yw-count-few" => "\N{U+0627}\N{U+0644}\N{U+0623}\N{U+0633}\N{U+0628}\N{U+0648}\N{U+0639} w \N{U+0645}\N{U+0646} \N{U+0633}\N{U+0646}\N{U+0629} y",
-      "yw-count-many" => "\N{U+0627}\N{U+0644}\N{U+0623}\N{U+0633}\N{U+0628}\N{U+0648}\N{U+0639} w \N{U+0645}\N{U+0646} \N{U+0633}\N{U+0646}\N{U+0629} y",
-      "yw-count-one" => "\N{U+0627}\N{U+0644}\N{U+0623}\N{U+0633}\N{U+0628}\N{U+0648}\N{U+0639} w \N{U+0645}\N{U+0646} \N{U+0633}\N{U+0646}\N{U+0629} y",
-      "yw-count-other" => "\N{U+0627}\N{U+0644}\N{U+0623}\N{U+0633}\N{U+0628}\N{U+0648}\N{U+0639} w \N{U+0645}\N{U+0646} \N{U+0633}\N{U+0646}\N{U+0629} y",
-      "yw-count-two" => "\N{U+0627}\N{U+0644}\N{U+0623}\N{U+0633}\N{U+0628}\N{U+0648}\N{U+0639} w \N{U+0645}\N{U+0646} \N{U+0633}\N{U+0646}\N{U+0629} y",
-      "yw-count-zero" => "\N{U+0627}\N{U+0644}\N{U+0623}\N{U+0633}\N{U+0628}\N{U+0648}\N{U+0639} w \N{U+0645}\N{U+0646} \N{U+0633}\N{U+0646}\N{U+0629} y"
+      "yw-count-few" => "\N{U+0627}\N{U+0644}\N{U+0623}\N{U+0633}\N{U+0628}\N{U+0648}\N{U+0639} w \N{U+0645}\N{U+0646} \N{U+0633}\N{U+0646}\N{U+0629} Y",
+      "yw-count-many" => "\N{U+0627}\N{U+0644}\N{U+0623}\N{U+0633}\N{U+0628}\N{U+0648}\N{U+0639} w \N{U+0645}\N{U+0646} \N{U+0633}\N{U+0646}\N{U+0629} Y",
+      "yw-count-one" => "\N{U+0627}\N{U+0644}\N{U+0623}\N{U+0633}\N{U+0628}\N{U+0648}\N{U+0639} w \N{U+0645}\N{U+0646} \N{U+0633}\N{U+0646}\N{U+0629} Y",
+      "yw-count-other" => "\N{U+0627}\N{U+0644}\N{U+0623}\N{U+0633}\N{U+0628}\N{U+0648}\N{U+0639} w \N{U+0645}\N{U+0646} \N{U+0633}\N{U+0646}\N{U+0629} Y",
+      "yw-count-two" => "\N{U+0627}\N{U+0644}\N{U+0623}\N{U+0633}\N{U+0628}\N{U+0648}\N{U+0639} w \N{U+0645}\N{U+0646} \N{U+0633}\N{U+0646}\N{U+0629} Y",
+      "yw-count-zero" => "\N{U+0627}\N{U+0644}\N{U+0623}\N{U+0633}\N{U+0628}\N{U+0648}\N{U+0639} w \N{U+0645}\N{U+0646} \N{U+0633}\N{U+0646}\N{U+0629} Y",
     },
     code => "ar",
-    date_format_full => "EEEE\N{U+060c} d MMMM\N{U+060c} y",
-    date_format_long => "d MMMM\N{U+060c} y",
+    date_format_full => "EEEE\N{U+060c} d MMMM y",
+    date_format_long => "d MMMM y",
     date_format_medium => "dd\N{U+200f}/MM\N{U+200f}/y",
     date_format_short => "d\N{U+200f}/M\N{U+200f}/y",
     datetime_format_full => "{1} {0}",
@@ -2858,7 +2913,7 @@ my %LocaleData = (
       "\N{U+0627}\N{U+0644}\N{U+062e}\N{U+0645}\N{U+064a}\N{U+0633}",
       "\N{U+0627}\N{U+0644}\N{U+062c}\N{U+0645}\N{U+0639}\N{U+0629}",
       "\N{U+0627}\N{U+0644}\N{U+0633}\N{U+0628}\N{U+062a}",
-      "\N{U+0627}\N{U+0644}\N{U+0623}\N{U+062d}\N{U+062f}"
+      "\N{U+0627}\N{U+0644}\N{U+0623}\N{U+062d}\N{U+062f}",
     ],
     day_format_narrow => [
       "\N{U+0646}",
@@ -2867,7 +2922,7 @@ my %LocaleData = (
       "\N{U+062e}",
       "\N{U+062c}",
       "\N{U+0633}",
-      "\N{U+062d}"
+      "\N{U+062d}",
     ],
     day_format_wide => [
       "\N{U+0627}\N{U+0644}\N{U+0627}\N{U+062b}\N{U+0646}\N{U+064a}\N{U+0646}",
@@ -2876,7 +2931,7 @@ my %LocaleData = (
       "\N{U+0627}\N{U+0644}\N{U+062e}\N{U+0645}\N{U+064a}\N{U+0633}",
       "\N{U+0627}\N{U+0644}\N{U+062c}\N{U+0645}\N{U+0639}\N{U+0629}",
       "\N{U+0627}\N{U+0644}\N{U+0633}\N{U+0628}\N{U+062a}",
-      "\N{U+0627}\N{U+0644}\N{U+0623}\N{U+062d}\N{U+062f}"
+      "\N{U+0627}\N{U+0644}\N{U+0623}\N{U+062d}\N{U+062f}",
     ],
     day_stand_alone_abbreviated => [
       "\N{U+0627}\N{U+0644}\N{U+0627}\N{U+062b}\N{U+0646}\N{U+064a}\N{U+0646}",
@@ -2885,7 +2940,7 @@ my %LocaleData = (
       "\N{U+0627}\N{U+0644}\N{U+062e}\N{U+0645}\N{U+064a}\N{U+0633}",
       "\N{U+0627}\N{U+0644}\N{U+062c}\N{U+0645}\N{U+0639}\N{U+0629}",
       "\N{U+0627}\N{U+0644}\N{U+0633}\N{U+0628}\N{U+062a}",
-      "\N{U+0627}\N{U+0644}\N{U+0623}\N{U+062d}\N{U+062f}"
+      "\N{U+0627}\N{U+0644}\N{U+0623}\N{U+062d}\N{U+062f}",
     ],
     day_stand_alone_narrow => [
       "\N{U+0646}",
@@ -2894,7 +2949,7 @@ my %LocaleData = (
       "\N{U+062e}",
       "\N{U+062c}",
       "\N{U+0633}",
-      "\N{U+062d}"
+      "\N{U+062d}",
     ],
     day_stand_alone_wide => [
       "\N{U+0627}\N{U+0644}\N{U+0627}\N{U+062b}\N{U+0646}\N{U+064a}\N{U+0646}",
@@ -2903,19 +2958,19 @@ my %LocaleData = (
       "\N{U+0627}\N{U+0644}\N{U+062e}\N{U+0645}\N{U+064a}\N{U+0633}",
       "\N{U+0627}\N{U+0644}\N{U+062c}\N{U+0645}\N{U+0639}\N{U+0629}",
       "\N{U+0627}\N{U+0644}\N{U+0633}\N{U+0628}\N{U+062a}",
-      "\N{U+0627}\N{U+0644}\N{U+0623}\N{U+062d}\N{U+062f}"
+      "\N{U+0627}\N{U+0644}\N{U+0623}\N{U+062d}\N{U+062f}",
     ],
     era_abbreviated => [
       "\N{U+0642}.\N{U+0645}",
-      "\N{U+0645}"
+      "\N{U+0645}",
     ],
     era_narrow => [
       "\N{U+0642}.\N{U+0645}",
-      "\N{U+0645}"
+      "\N{U+0645}",
     ],
     era_wide => [
       "\N{U+0642}\N{U+0628}\N{U+0644} \N{U+0627}\N{U+0644}\N{U+0645}\N{U+064a}\N{U+0644}\N{U+0627}\N{U+062f}",
-      "\N{U+0645}\N{U+064a}\N{U+0644}\N{U+0627}\N{U+062f}\N{U+064a}"
+      "\N{U+0645}\N{U+064a}\N{U+0644}\N{U+0627}\N{U+062f}\N{U+064a}",
     ],
     first_day_of_week => 1,
     glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -2936,7 +2991,7 @@ my %LocaleData = (
       "\N{U+0633}\N{U+0628}\N{U+062a}\N{U+0645}\N{U+0628}\N{U+0631}",
       "\N{U+0623}\N{U+0643}\N{U+062a}\N{U+0648}\N{U+0628}\N{U+0631}",
       "\N{U+0646}\N{U+0648}\N{U+0641}\N{U+0645}\N{U+0628}\N{U+0631}",
-      "\N{U+062f}\N{U+064a}\N{U+0633}\N{U+0645}\N{U+0628}\N{U+0631}"
+      "\N{U+062f}\N{U+064a}\N{U+0633}\N{U+0645}\N{U+0628}\N{U+0631}",
     ],
     month_format_narrow => [
       "\N{U+064a}",
@@ -2950,7 +3005,7 @@ my %LocaleData = (
       "\N{U+0633}",
       "\N{U+0643}",
       "\N{U+0628}",
-      "\N{U+062f}"
+      "\N{U+062f}",
     ],
     month_format_wide => [
       "\N{U+064a}\N{U+0646}\N{U+0627}\N{U+064a}\N{U+0631}",
@@ -2964,7 +3019,7 @@ my %LocaleData = (
       "\N{U+0633}\N{U+0628}\N{U+062a}\N{U+0645}\N{U+0628}\N{U+0631}",
       "\N{U+0623}\N{U+0643}\N{U+062a}\N{U+0648}\N{U+0628}\N{U+0631}",
       "\N{U+0646}\N{U+0648}\N{U+0641}\N{U+0645}\N{U+0628}\N{U+0631}",
-      "\N{U+062f}\N{U+064a}\N{U+0633}\N{U+0645}\N{U+0628}\N{U+0631}"
+      "\N{U+062f}\N{U+064a}\N{U+0633}\N{U+0645}\N{U+0628}\N{U+0631}",
     ],
     month_stand_alone_abbreviated => [
       "\N{U+064a}\N{U+0646}\N{U+0627}\N{U+064a}\N{U+0631}",
@@ -2978,7 +3033,7 @@ my %LocaleData = (
       "\N{U+0633}\N{U+0628}\N{U+062a}\N{U+0645}\N{U+0628}\N{U+0631}",
       "\N{U+0623}\N{U+0643}\N{U+062a}\N{U+0648}\N{U+0628}\N{U+0631}",
       "\N{U+0646}\N{U+0648}\N{U+0641}\N{U+0645}\N{U+0628}\N{U+0631}",
-      "\N{U+062f}\N{U+064a}\N{U+0633}\N{U+0645}\N{U+0628}\N{U+0631}"
+      "\N{U+062f}\N{U+064a}\N{U+0633}\N{U+0645}\N{U+0628}\N{U+0631}",
     ],
     month_stand_alone_narrow => [
       "\N{U+064a}",
@@ -2992,7 +3047,7 @@ my %LocaleData = (
       "\N{U+0633}",
       "\N{U+0643}",
       "\N{U+0628}",
-      "\N{U+062f}"
+      "\N{U+062f}",
     ],
     month_stand_alone_wide => [
       "\N{U+064a}\N{U+0646}\N{U+0627}\N{U+064a}\N{U+0631}",
@@ -3006,7 +3061,7 @@ my %LocaleData = (
       "\N{U+0633}\N{U+0628}\N{U+062a}\N{U+0645}\N{U+0628}\N{U+0631}",
       "\N{U+0623}\N{U+0643}\N{U+062a}\N{U+0648}\N{U+0628}\N{U+0631}",
       "\N{U+0646}\N{U+0648}\N{U+0641}\N{U+0645}\N{U+0628}\N{U+0631}",
-      "\N{U+062f}\N{U+064a}\N{U+0633}\N{U+0645}\N{U+0628}\N{U+0631}"
+      "\N{U+062f}\N{U+064a}\N{U+0633}\N{U+0645}\N{U+0628}\N{U+0631}",
     ],
     name => "Arabic",
     native_language => "\N{U+0627}\N{U+0644}\N{U+0639}\N{U+0631}\N{U+0628}\N{U+064a}\N{U+0629}",
@@ -3018,37 +3073,37 @@ my %LocaleData = (
       "\N{U+0627}\N{U+0644}\N{U+0631}\N{U+0628}\N{U+0639} \N{U+0627}\N{U+0644}\N{U+0623}\N{U+0648}\N{U+0644}",
       "\N{U+0627}\N{U+0644}\N{U+0631}\N{U+0628}\N{U+0639} \N{U+0627}\N{U+0644}\N{U+062b}\N{U+0627}\N{U+0646}\N{U+064a}",
       "\N{U+0627}\N{U+0644}\N{U+0631}\N{U+0628}\N{U+0639} \N{U+0627}\N{U+0644}\N{U+062b}\N{U+0627}\N{U+0644}\N{U+062b}",
-      "\N{U+0627}\N{U+0644}\N{U+0631}\N{U+0628}\N{U+0639} \N{U+0627}\N{U+0644}\N{U+0631}\N{U+0627}\N{U+0628}\N{U+0639}"
+      "\N{U+0627}\N{U+0644}\N{U+0631}\N{U+0628}\N{U+0639} \N{U+0627}\N{U+0644}\N{U+0631}\N{U+0627}\N{U+0628}\N{U+0639}",
     ],
     quarter_format_narrow => [
       "\N{U+0661}",
       "\N{U+0662}",
       "\N{U+0663}",
-      "\N{U+0664}"
+      "\N{U+0664}",
     ],
     quarter_format_wide => [
       "\N{U+0627}\N{U+0644}\N{U+0631}\N{U+0628}\N{U+0639} \N{U+0627}\N{U+0644}\N{U+0623}\N{U+0648}\N{U+0644}",
       "\N{U+0627}\N{U+0644}\N{U+0631}\N{U+0628}\N{U+0639} \N{U+0627}\N{U+0644}\N{U+062b}\N{U+0627}\N{U+0646}\N{U+064a}",
       "\N{U+0627}\N{U+0644}\N{U+0631}\N{U+0628}\N{U+0639} \N{U+0627}\N{U+0644}\N{U+062b}\N{U+0627}\N{U+0644}\N{U+062b}",
-      "\N{U+0627}\N{U+0644}\N{U+0631}\N{U+0628}\N{U+0639} \N{U+0627}\N{U+0644}\N{U+0631}\N{U+0627}\N{U+0628}\N{U+0639}"
+      "\N{U+0627}\N{U+0644}\N{U+0631}\N{U+0628}\N{U+0639} \N{U+0627}\N{U+0644}\N{U+0631}\N{U+0627}\N{U+0628}\N{U+0639}",
     ],
     quarter_stand_alone_abbreviated => [
       "\N{U+0627}\N{U+0644}\N{U+0631}\N{U+0628}\N{U+0639} \N{U+0627}\N{U+0644}\N{U+0623}\N{U+0648}\N{U+0644}",
       "\N{U+0627}\N{U+0644}\N{U+0631}\N{U+0628}\N{U+0639} \N{U+0627}\N{U+0644}\N{U+062b}\N{U+0627}\N{U+0646}\N{U+064a}",
       "\N{U+0627}\N{U+0644}\N{U+0631}\N{U+0628}\N{U+0639} \N{U+0627}\N{U+0644}\N{U+062b}\N{U+0627}\N{U+0644}\N{U+062b}",
-      "\N{U+0627}\N{U+0644}\N{U+0631}\N{U+0628}\N{U+0639} \N{U+0627}\N{U+0644}\N{U+0631}\N{U+0627}\N{U+0628}\N{U+0639}"
+      "\N{U+0627}\N{U+0644}\N{U+0631}\N{U+0628}\N{U+0639} \N{U+0627}\N{U+0644}\N{U+0631}\N{U+0627}\N{U+0628}\N{U+0639}",
     ],
     quarter_stand_alone_narrow => [
       "\N{U+0661}",
       "\N{U+0662}",
       "\N{U+0663}",
-      "\N{U+0664}"
+      "\N{U+0664}",
     ],
     quarter_stand_alone_wide => [
       "\N{U+0627}\N{U+0644}\N{U+0631}\N{U+0628}\N{U+0639} \N{U+0627}\N{U+0644}\N{U+0623}\N{U+0648}\N{U+0644}",
       "\N{U+0627}\N{U+0644}\N{U+0631}\N{U+0628}\N{U+0639} \N{U+0627}\N{U+0644}\N{U+062b}\N{U+0627}\N{U+0646}\N{U+064a}",
       "\N{U+0627}\N{U+0644}\N{U+0631}\N{U+0628}\N{U+0639} \N{U+0627}\N{U+0644}\N{U+062b}\N{U+0627}\N{U+0644}\N{U+062b}",
-      "\N{U+0627}\N{U+0644}\N{U+0631}\N{U+0628}\N{U+0639} \N{U+0627}\N{U+0644}\N{U+0631}\N{U+0627}\N{U+0628}\N{U+0639}"
+      "\N{U+0627}\N{U+0644}\N{U+0631}\N{U+0628}\N{U+0639} \N{U+0627}\N{U+0644}\N{U+0631}\N{U+0627}\N{U+0628}\N{U+0639}",
     ],
     script => undef,
     territory => undef,
@@ -3057,15 +3112,20 @@ my %LocaleData = (
     time_format_medium => "h:mm:ss a",
     time_format_short => "h:mm a",
     variant => undef,
-    version => 31
+    version => 32,
   },
   en => {
     am_pm_abbreviated => [
       "AM",
-      "PM"
+      "PM",
     ],
     available_formats => {
+      Bh => "h B",
+      Bhm => "h:mm B",
+      Bhms => "h:mm:ss B",
       E => "ccc",
+      EBhm => "E h:mm B",
+      EBhms => "E h:mm:ss B",
       EHm => "E HH:mm",
       EHms => "E HH:mm:ss",
       Ed => "d E",
@@ -3106,8 +3166,8 @@ my %LocaleData = (
       yMd => "M/d/y",
       yQQQ => "QQQ y",
       yQQQQ => "QQQQ y",
-      "yw-count-one" => "'week' w 'of' y",
-      "yw-count-other" => "'week' w 'of' y"
+      "yw-count-one" => "'week' w 'of' Y",
+      "yw-count-other" => "'week' w 'of' Y",
     },
     code => "en",
     date_format_full => "EEEE, MMMM d, y",
@@ -3125,7 +3185,7 @@ my %LocaleData = (
       "Thu",
       "Fri",
       "Sat",
-      "Sun"
+      "Sun",
     ],
     day_format_narrow => [
       "M",
@@ -3134,7 +3194,7 @@ my %LocaleData = (
       "T",
       "F",
       "S",
-      "S"
+      "S",
     ],
     day_format_wide => [
       "Monday",
@@ -3143,7 +3203,7 @@ my %LocaleData = (
       "Thursday",
       "Friday",
       "Saturday",
-      "Sunday"
+      "Sunday",
     ],
     day_stand_alone_abbreviated => [
       "Mon",
@@ -3152,7 +3212,7 @@ my %LocaleData = (
       "Thu",
       "Fri",
       "Sat",
-      "Sun"
+      "Sun",
     ],
     day_stand_alone_narrow => [
       "M",
@@ -3161,7 +3221,7 @@ my %LocaleData = (
       "T",
       "F",
       "S",
-      "S"
+      "S",
     ],
     day_stand_alone_wide => [
       "Monday",
@@ -3170,19 +3230,19 @@ my %LocaleData = (
       "Thursday",
       "Friday",
       "Saturday",
-      "Sunday"
+      "Sunday",
     ],
     era_abbreviated => [
       "BC",
-      "AD"
+      "AD",
     ],
     era_narrow => [
       "B",
-      "A"
+      "A",
     ],
     era_wide => [
       "Before Christ",
-      "Anno Domini"
+      "Anno Domini",
     ],
     first_day_of_week => 1,
     glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -3203,7 +3263,7 @@ my %LocaleData = (
       "Sep",
       "Oct",
       "Nov",
-      "Dec"
+      "Dec",
     ],
     month_format_narrow => [
       "J",
@@ -3217,7 +3277,7 @@ my %LocaleData = (
       "S",
       "O",
       "N",
-      "D"
+      "D",
     ],
     month_format_wide => [
       "January",
@@ -3231,7 +3291,7 @@ my %LocaleData = (
       "September",
       "October",
       "November",
-      "December"
+      "December",
     ],
     month_stand_alone_abbreviated => [
       "Jan",
@@ -3245,7 +3305,7 @@ my %LocaleData = (
       "Sep",
       "Oct",
       "Nov",
-      "Dec"
+      "Dec",
     ],
     month_stand_alone_narrow => [
       "J",
@@ -3259,7 +3319,7 @@ my %LocaleData = (
       "S",
       "O",
       "N",
-      "D"
+      "D",
     ],
     month_stand_alone_wide => [
       "January",
@@ -3273,7 +3333,7 @@ my %LocaleData = (
       "September",
       "October",
       "November",
-      "December"
+      "December",
     ],
     name => "English",
     native_language => "English",
@@ -3285,37 +3345,37 @@ my %LocaleData = (
       "Q1",
       "Q2",
       "Q3",
-      "Q4"
+      "Q4",
     ],
     quarter_format_narrow => [
       1,
       2,
       3,
-      4
+      4,
     ],
     quarter_format_wide => [
       "1st quarter",
       "2nd quarter",
       "3rd quarter",
-      "4th quarter"
+      "4th quarter",
     ],
     quarter_stand_alone_abbreviated => [
       "Q1",
       "Q2",
       "Q3",
-      "Q4"
+      "Q4",
     ],
     quarter_stand_alone_narrow => [
       1,
       2,
       3,
-      4
+      4,
     ],
     quarter_stand_alone_wide => [
       "1st quarter",
       "2nd quarter",
       "3rd quarter",
-      "4th quarter"
+      "4th quarter",
     ],
     script => undef,
     territory => undef,
@@ -3324,15 +3384,20 @@ my %LocaleData = (
     time_format_medium => "h:mm:ss a",
     time_format_short => "h:mm a",
     variant => undef,
-    version => 31
+    version => 32,
   },
   "en-CA" => {
     am_pm_abbreviated => [
-      "AM",
-      "PM"
+      "a.m.",
+      "p.m.",
     ],
     available_formats => {
+      Bh => "h B",
+      Bhm => "h:mm B",
+      Bhms => "h:mm:ss B",
       E => "ccc",
+      EBhm => "E h:mm B",
+      EBhms => "E h:mm:ss B",
       EHm => "E HH:mm",
       EHms => "E HH:mm:ss",
       Ed => "E d",
@@ -3380,8 +3445,8 @@ my %LocaleData = (
       "yMd-alt-variant" => "d/M/y",
       yQQQ => "QQQ y",
       yQQQQ => "QQQQ y",
-      "yw-count-one" => "'week' w 'of' y",
-      "yw-count-other" => "'week' w 'of' y"
+      "yw-count-one" => "'week' w 'of' Y",
+      "yw-count-other" => "'week' w 'of' Y",
     },
     code => "en-CA",
     date_format_full => "EEEE, MMMM d, y",
@@ -3393,13 +3458,13 @@ my %LocaleData = (
     datetime_format_medium => "{1}, {0}",
     datetime_format_short => "{1}, {0}",
     day_format_abbreviated => [
-      "Mon",
-      "Tue",
-      "Wed",
-      "Thu",
-      "Fri",
-      "Sat",
-      "Sun"
+      "Mon.",
+      "Tue.",
+      "Wed.",
+      "Thu.",
+      "Fri.",
+      "Sat.",
+      "Sun.",
     ],
     day_format_narrow => [
       "M",
@@ -3408,7 +3473,7 @@ my %LocaleData = (
       "T",
       "F",
       "S",
-      "S"
+      "S",
     ],
     day_format_wide => [
       "Monday",
@@ -3417,16 +3482,16 @@ my %LocaleData = (
       "Thursday",
       "Friday",
       "Saturday",
-      "Sunday"
+      "Sunday",
     ],
     day_stand_alone_abbreviated => [
-      "Mon",
-      "Tue",
-      "Wed",
-      "Thu",
-      "Fri",
-      "Sat",
-      "Sun"
+      "Mon.",
+      "Tue.",
+      "Wed.",
+      "Thu.",
+      "Fri.",
+      "Sat.",
+      "Sun.",
     ],
     day_stand_alone_narrow => [
       "M",
@@ -3435,7 +3500,7 @@ my %LocaleData = (
       "T",
       "F",
       "S",
-      "S"
+      "S",
     ],
     day_stand_alone_wide => [
       "Monday",
@@ -3444,19 +3509,19 @@ my %LocaleData = (
       "Thursday",
       "Friday",
       "Saturday",
-      "Sunday"
+      "Sunday",
     ],
     era_abbreviated => [
       "BC",
-      "AD"
+      "AD",
     ],
     era_narrow => [
       "B",
-      "A"
+      "A",
     ],
     era_wide => [
       "Before Christ",
-      "Anno Domini"
+      "Anno Domini",
     ],
     first_day_of_week => 7,
     glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -3466,18 +3531,18 @@ my %LocaleData = (
     glibc_time_format => "%r",
     language => "English",
     month_format_abbreviated => [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
+      "Jan.",
+      "Feb.",
+      "Mar.",
+      "Apr.",
       "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec"
+      "Jun.",
+      "Jul.",
+      "Aug.",
+      "Sep.",
+      "Oct.",
+      "Nov.",
+      "Dec.",
     ],
     month_format_narrow => [
       "J",
@@ -3491,7 +3556,7 @@ my %LocaleData = (
       "S",
       "O",
       "N",
-      "D"
+      "D",
     ],
     month_format_wide => [
       "January",
@@ -3505,7 +3570,7 @@ my %LocaleData = (
       "September",
       "October",
       "November",
-      "December"
+      "December",
     ],
     month_stand_alone_abbreviated => [
       "Jan",
@@ -3519,7 +3584,7 @@ my %LocaleData = (
       "Sep",
       "Oct",
       "Nov",
-      "Dec"
+      "Dec",
     ],
     month_stand_alone_narrow => [
       "J",
@@ -3533,7 +3598,7 @@ my %LocaleData = (
       "S",
       "O",
       "N",
-      "D"
+      "D",
     ],
     month_stand_alone_wide => [
       "January",
@@ -3547,7 +3612,7 @@ my %LocaleData = (
       "September",
       "October",
       "November",
-      "December"
+      "December",
     ],
     name => "English Canada",
     native_language => "English",
@@ -3559,37 +3624,37 @@ my %LocaleData = (
       "Q1",
       "Q2",
       "Q3",
-      "Q4"
+      "Q4",
     ],
     quarter_format_narrow => [
       1,
       2,
       3,
-      4
+      4,
     ],
     quarter_format_wide => [
       "1st quarter",
       "2nd quarter",
       "3rd quarter",
-      "4th quarter"
+      "4th quarter",
     ],
     quarter_stand_alone_abbreviated => [
       "Q1",
       "Q2",
       "Q3",
-      "Q4"
+      "Q4",
     ],
     quarter_stand_alone_narrow => [
       1,
       2,
       3,
-      4
+      4,
     ],
     quarter_stand_alone_wide => [
       "1st quarter",
       "2nd quarter",
       "3rd quarter",
-      "4th quarter"
+      "4th quarter",
     ],
     script => undef,
     territory => "Canada",
@@ -3598,15 +3663,20 @@ my %LocaleData = (
     time_format_medium => "h:mm:ss a",
     time_format_short => "h:mm a",
     variant => undef,
-    version => 31
+    version => 32,
   },
   "en-US" => {
     am_pm_abbreviated => [
       "AM",
-      "PM"
+      "PM",
     ],
     available_formats => {
+      Bh => "h B",
+      Bhm => "h:mm B",
+      Bhms => "h:mm:ss B",
       E => "ccc",
+      EBhm => "E h:mm B",
+      EBhms => "E h:mm:ss B",
       EHm => "E HH:mm",
       EHms => "E HH:mm:ss",
       Ed => "d E",
@@ -3647,8 +3717,8 @@ my %LocaleData = (
       yMd => "M/d/y",
       yQQQ => "QQQ y",
       yQQQQ => "QQQQ y",
-      "yw-count-one" => "'week' w 'of' y",
-      "yw-count-other" => "'week' w 'of' y"
+      "yw-count-one" => "'week' w 'of' Y",
+      "yw-count-other" => "'week' w 'of' Y",
     },
     code => "en-US",
     date_format_full => "EEEE, MMMM d, y",
@@ -3666,7 +3736,7 @@ my %LocaleData = (
       "Thu",
       "Fri",
       "Sat",
-      "Sun"
+      "Sun",
     ],
     day_format_narrow => [
       "M",
@@ -3675,7 +3745,7 @@ my %LocaleData = (
       "T",
       "F",
       "S",
-      "S"
+      "S",
     ],
     day_format_wide => [
       "Monday",
@@ -3684,7 +3754,7 @@ my %LocaleData = (
       "Thursday",
       "Friday",
       "Saturday",
-      "Sunday"
+      "Sunday",
     ],
     day_stand_alone_abbreviated => [
       "Mon",
@@ -3693,7 +3763,7 @@ my %LocaleData = (
       "Thu",
       "Fri",
       "Sat",
-      "Sun"
+      "Sun",
     ],
     day_stand_alone_narrow => [
       "M",
@@ -3702,7 +3772,7 @@ my %LocaleData = (
       "T",
       "F",
       "S",
-      "S"
+      "S",
     ],
     day_stand_alone_wide => [
       "Monday",
@@ -3711,19 +3781,19 @@ my %LocaleData = (
       "Thursday",
       "Friday",
       "Saturday",
-      "Sunday"
+      "Sunday",
     ],
     era_abbreviated => [
       "BC",
-      "AD"
+      "AD",
     ],
     era_narrow => [
       "B",
-      "A"
+      "A",
     ],
     era_wide => [
       "Before Christ",
-      "Anno Domini"
+      "Anno Domini",
     ],
     first_day_of_week => 7,
     glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -3744,7 +3814,7 @@ my %LocaleData = (
       "Sep",
       "Oct",
       "Nov",
-      "Dec"
+      "Dec",
     ],
     month_format_narrow => [
       "J",
@@ -3758,7 +3828,7 @@ my %LocaleData = (
       "S",
       "O",
       "N",
-      "D"
+      "D",
     ],
     month_format_wide => [
       "January",
@@ -3772,7 +3842,7 @@ my %LocaleData = (
       "September",
       "October",
       "November",
-      "December"
+      "December",
     ],
     month_stand_alone_abbreviated => [
       "Jan",
@@ -3786,7 +3856,7 @@ my %LocaleData = (
       "Sep",
       "Oct",
       "Nov",
-      "Dec"
+      "Dec",
     ],
     month_stand_alone_narrow => [
       "J",
@@ -3800,7 +3870,7 @@ my %LocaleData = (
       "S",
       "O",
       "N",
-      "D"
+      "D",
     ],
     month_stand_alone_wide => [
       "January",
@@ -3814,7 +3884,7 @@ my %LocaleData = (
       "September",
       "October",
       "November",
-      "December"
+      "December",
     ],
     name => "English United States",
     native_language => "English",
@@ -3826,37 +3896,37 @@ my %LocaleData = (
       "Q1",
       "Q2",
       "Q3",
-      "Q4"
+      "Q4",
     ],
     quarter_format_narrow => [
       1,
       2,
       3,
-      4
+      4,
     ],
     quarter_format_wide => [
       "1st quarter",
       "2nd quarter",
       "3rd quarter",
-      "4th quarter"
+      "4th quarter",
     ],
     quarter_stand_alone_abbreviated => [
       "Q1",
       "Q2",
       "Q3",
-      "Q4"
+      "Q4",
     ],
     quarter_stand_alone_narrow => [
       1,
       2,
       3,
-      4
+      4,
     ],
     quarter_stand_alone_wide => [
       "1st quarter",
       "2nd quarter",
       "3rd quarter",
-      "4th quarter"
+      "4th quarter",
     ],
     script => undef,
     territory => "United States",
@@ -3865,15 +3935,20 @@ my %LocaleData = (
     time_format_medium => "h:mm:ss a",
     time_format_short => "h:mm a",
     variant => undef,
-    version => 31
+    version => 32,
   },
   es => {
     am_pm_abbreviated => [
       "a. m.",
-      "p. m."
+      "p. m.",
     ],
     available_formats => {
+      Bh => "h B",
+      Bhm => "h:mm B",
+      Bhms => "h:mm:ss B",
       E => "ccc",
+      EBhm => "E h:mm B",
+      EBhms => "E h:mm:ss B",
       EHm => "E, H:mm",
       EHms => "E, H:mm:ss",
       Ed => "E d",
@@ -3925,8 +4000,8 @@ my %LocaleData = (
       yMd => "d/M/y",
       yQQQ => "QQQ y",
       yQQQQ => "QQQQ 'de' y",
-      "yw-count-one" => "'semana' w 'de' y",
-      "yw-count-other" => "'semana' w 'de' y"
+      "yw-count-one" => "'semana' w 'de' Y",
+      "yw-count-other" => "'semana' w 'de' Y",
     },
     code => "es",
     date_format_full => "EEEE, d 'de' MMMM 'de' y",
@@ -3944,7 +4019,7 @@ my %LocaleData = (
       "jue.",
       "vie.",
       "s\N{U+00e1}b.",
-      "dom."
+      "dom.",
     ],
     day_format_narrow => [
       "L",
@@ -3953,7 +4028,7 @@ my %LocaleData = (
       "J",
       "V",
       "S",
-      "D"
+      "D",
     ],
     day_format_wide => [
       "lunes",
@@ -3962,7 +4037,7 @@ my %LocaleData = (
       "jueves",
       "viernes",
       "s\N{U+00e1}bado",
-      "domingo"
+      "domingo",
     ],
     day_stand_alone_abbreviated => [
       "lun.",
@@ -3971,7 +4046,7 @@ my %LocaleData = (
       "jue.",
       "vie.",
       "s\N{U+00e1}b.",
-      "dom."
+      "dom.",
     ],
     day_stand_alone_narrow => [
       "L",
@@ -3980,7 +4055,7 @@ my %LocaleData = (
       "J",
       "V",
       "S",
-      "D"
+      "D",
     ],
     day_stand_alone_wide => [
       "lunes",
@@ -3989,19 +4064,19 @@ my %LocaleData = (
       "jueves",
       "viernes",
       "s\N{U+00e1}bado",
-      "domingo"
+      "domingo",
     ],
     era_abbreviated => [
       "a. C.",
-      "d. C."
+      "d. C.",
     ],
     era_narrow => [
       "a. C.",
-      "d. C."
+      "d. C.",
     ],
     era_wide => [
       "antes de Cristo",
-      "despu\N{U+00e9}s de Cristo"
+      "despu\N{U+00e9}s de Cristo",
     ],
     first_day_of_week => 1,
     glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -4022,7 +4097,7 @@ my %LocaleData = (
       "sept.",
       "oct.",
       "nov.",
-      "dic."
+      "dic.",
     ],
     month_format_narrow => [
       "E",
@@ -4036,7 +4111,7 @@ my %LocaleData = (
       "S",
       "O",
       "N",
-      "D"
+      "D",
     ],
     month_format_wide => [
       "enero",
@@ -4050,7 +4125,7 @@ my %LocaleData = (
       "septiembre",
       "octubre",
       "noviembre",
-      "diciembre"
+      "diciembre",
     ],
     month_stand_alone_abbreviated => [
       "ene.",
@@ -4064,7 +4139,7 @@ my %LocaleData = (
       "sept.",
       "oct.",
       "nov.",
-      "dic."
+      "dic.",
     ],
     month_stand_alone_narrow => [
       "E",
@@ -4078,7 +4153,7 @@ my %LocaleData = (
       "S",
       "O",
       "N",
-      "D"
+      "D",
     ],
     month_stand_alone_wide => [
       "enero",
@@ -4092,7 +4167,7 @@ my %LocaleData = (
       "septiembre",
       "octubre",
       "noviembre",
-      "diciembre"
+      "diciembre",
     ],
     name => "Spanish",
     native_language => "espa\N{U+00f1}ol",
@@ -4104,37 +4179,37 @@ my %LocaleData = (
       "T1",
       "T2",
       "T3",
-      "T4"
+      "T4",
     ],
     quarter_format_narrow => [
       1,
       2,
       3,
-      4
+      4,
     ],
     quarter_format_wide => [
       "1.er trimestre",
       "2.\N{U+00ba} trimestre",
       "3.er trimestre",
-      "4.\N{U+00ba} trimestre"
+      "4.\N{U+00ba} trimestre",
     ],
     quarter_stand_alone_abbreviated => [
       "T1",
       "T2",
       "T3",
-      "T4"
+      "T4",
     ],
     quarter_stand_alone_narrow => [
       1,
       2,
       3,
-      4
+      4,
     ],
     quarter_stand_alone_wide => [
       "1.er trimestre",
       "2.\N{U+00ba} trimestre",
       "3.er trimestre",
-      "4.\N{U+00ba} trimestre"
+      "4.\N{U+00ba} trimestre",
     ],
     script => undef,
     territory => undef,
@@ -4143,15 +4218,20 @@ my %LocaleData = (
     time_format_medium => "H:mm:ss",
     time_format_short => "H:mm",
     variant => undef,
-    version => 31
+    version => 32,
   },
   "fr-FR" => {
     am_pm_abbreviated => [
       "AM",
-      "PM"
+      "PM",
     ],
     available_formats => {
+      Bh => "h B",
+      Bhm => "h:mm B",
+      Bhms => "h:mm:ss B",
       E => "E",
+      EBhm => "E h:mm B",
+      EBhms => "E h:mm:ss B",
       EHm => "E HH:mm",
       EHms => "E HH:mm:ss",
       Ed => "E d",
@@ -4170,8 +4250,8 @@ my %LocaleData = (
       MEd => "E dd/MM",
       MMM => "LLL",
       MMMEd => "E d MMM",
-      "MMMMW-count-one" => "'semaine' W 'de' MMM",
-      "MMMMW-count-other" => "'semaine' W 'de' MMM",
+      "MMMMW-count-one" => "'semaine' W (MMMM)",
+      "MMMMW-count-other" => "'semaine' W (MMMM)",
       MMMMd => "d MMMM",
       MMMd => "d MMM",
       Md => "dd/MM",
@@ -4192,8 +4272,8 @@ my %LocaleData = (
       yMd => "dd/MM/y",
       yQQQ => "QQQ y",
       yQQQQ => "QQQQ y",
-      "yw-count-one" => "'semaine' w 'de' y",
-      "yw-count-other" => "'semaine' w 'de' y"
+      "yw-count-one" => "'semaine' w 'de' Y",
+      "yw-count-other" => "'semaine' w 'de' Y",
     },
     code => "fr-FR",
     date_format_full => "EEEE d MMMM y",
@@ -4211,7 +4291,7 @@ my %LocaleData = (
       "jeu.",
       "ven.",
       "sam.",
-      "dim."
+      "dim.",
     ],
     day_format_narrow => [
       "L",
@@ -4220,7 +4300,7 @@ my %LocaleData = (
       "J",
       "V",
       "S",
-      "D"
+      "D",
     ],
     day_format_wide => [
       "lundi",
@@ -4229,7 +4309,7 @@ my %LocaleData = (
       "jeudi",
       "vendredi",
       "samedi",
-      "dimanche"
+      "dimanche",
     ],
     day_stand_alone_abbreviated => [
       "lun.",
@@ -4238,7 +4318,7 @@ my %LocaleData = (
       "jeu.",
       "ven.",
       "sam.",
-      "dim."
+      "dim.",
     ],
     day_stand_alone_narrow => [
       "L",
@@ -4247,7 +4327,7 @@ my %LocaleData = (
       "J",
       "V",
       "S",
-      "D"
+      "D",
     ],
     day_stand_alone_wide => [
       "lundi",
@@ -4256,19 +4336,19 @@ my %LocaleData = (
       "jeudi",
       "vendredi",
       "samedi",
-      "dimanche"
+      "dimanche",
     ],
     era_abbreviated => [
       "av. J.-C.",
-      "ap. J.-C."
+      "ap. J.-C.",
     ],
     era_narrow => [
       "av. J.-C.",
-      "ap. J.-C."
+      "ap. J.-C.",
     ],
     era_wide => [
       "avant J\N{U+00e9}sus-Christ",
-      "apr\N{U+00e8}s J\N{U+00e9}sus-Christ"
+      "apr\N{U+00e8}s J\N{U+00e9}sus-Christ",
     ],
     first_day_of_week => 1,
     glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -4289,7 +4369,7 @@ my %LocaleData = (
       "sept.",
       "oct.",
       "nov.",
-      "d\N{U+00e9}c."
+      "d\N{U+00e9}c.",
     ],
     month_format_narrow => [
       "J",
@@ -4303,7 +4383,7 @@ my %LocaleData = (
       "S",
       "O",
       "N",
-      "D"
+      "D",
     ],
     month_format_wide => [
       "janvier",
@@ -4317,7 +4397,7 @@ my %LocaleData = (
       "septembre",
       "octobre",
       "novembre",
-      "d\N{U+00e9}cembre"
+      "d\N{U+00e9}cembre",
     ],
     month_stand_alone_abbreviated => [
       "janv.",
@@ -4331,7 +4411,7 @@ my %LocaleData = (
       "sept.",
       "oct.",
       "nov.",
-      "d\N{U+00e9}c."
+      "d\N{U+00e9}c.",
     ],
     month_stand_alone_narrow => [
       "J",
@@ -4345,7 +4425,7 @@ my %LocaleData = (
       "S",
       "O",
       "N",
-      "D"
+      "D",
     ],
     month_stand_alone_wide => [
       "janvier",
@@ -4359,7 +4439,7 @@ my %LocaleData = (
       "septembre",
       "octobre",
       "novembre",
-      "d\N{U+00e9}cembre"
+      "d\N{U+00e9}cembre",
     ],
     name => "French France",
     native_language => "fran\N{U+00e7}ais",
@@ -4371,37 +4451,37 @@ my %LocaleData = (
       "T1",
       "T2",
       "T3",
-      "T4"
+      "T4",
     ],
     quarter_format_narrow => [
       1,
       2,
       3,
-      4
+      4,
     ],
     quarter_format_wide => [
       "1er trimestre",
       "2e trimestre",
       "3e trimestre",
-      "4e trimestre"
+      "4e trimestre",
     ],
     quarter_stand_alone_abbreviated => [
       "T1",
       "T2",
       "T3",
-      "T4"
+      "T4",
     ],
     quarter_stand_alone_narrow => [
       1,
       2,
       3,
-      4
+      4,
     ],
     quarter_stand_alone_wide => [
       "1er trimestre",
       "2e trimestre",
       "3e trimestre",
-      "4e trimestre"
+      "4e trimestre",
     ],
     script => undef,
     territory => "France",
@@ -4410,15 +4490,20 @@ my %LocaleData = (
     time_format_medium => "HH:mm:ss",
     time_format_short => "HH:mm",
     variant => undef,
-    version => 31
+    version => 32,
   },
   hi => {
     am_pm_abbreviated => [
       "\N{U+092a}\N{U+0942}\N{U+0930}\N{U+094d}\N{U+0935}\N{U+093e}\N{U+0939}\N{U+094d}\N{U+0928}",
-      "\N{U+0905}\N{U+092a}\N{U+0930}\N{U+093e}\N{U+0939}\N{U+094d}\N{U+0928}"
+      "\N{U+0905}\N{U+092a}\N{U+0930}\N{U+093e}\N{U+0939}\N{U+094d}\N{U+0928}",
     ],
     available_formats => {
+      Bh => "B h",
+      Bhm => "B h:mm",
+      Bhms => "B h:mm:ss",
       E => "ccc",
+      EBhm => "E B h:mm",
+      EBhms => "E B h:mm:ss",
       EHm => "E HH:mm",
       EHms => "E HH:mm:ss",
       Ed => "E d",
@@ -4463,13 +4548,13 @@ my %LocaleData = (
       yMd => "d/M/y",
       yQQQ => "QQQ y",
       yQQQQ => "QQQQ y",
-      "yw-count-one" => "y \N{U+0915}\N{U+093e} \N{U+0938}\N{U+092a}\N{U+094d}\N{U+0924}\N{U+093e}\N{U+0939} w",
-      "yw-count-other" => "y \N{U+0915}\N{U+093e} \N{U+0938}\N{U+092a}\N{U+094d}\N{U+0924}\N{U+093e}\N{U+0939} w"
+      "yw-count-one" => "Y \N{U+0915}\N{U+093e} \N{U+0938}\N{U+092a}\N{U+094d}\N{U+0924}\N{U+093e}\N{U+0939} w",
+      "yw-count-other" => "Y \N{U+0915}\N{U+093e} \N{U+0938}\N{U+092a}\N{U+094d}\N{U+0924}\N{U+093e}\N{U+0939} w",
     },
     code => "hi",
     date_format_full => "EEEE, d MMMM y",
     date_format_long => "d MMMM y",
-    date_format_medium => "dd/MM/y",
+    date_format_medium => "d MMM y",
     date_format_short => "d/M/yy",
     datetime_format_full => "{1} \N{U+0915}\N{U+094b} {0}",
     datetime_format_long => "{1} \N{U+0915}\N{U+094b} {0}",
@@ -4482,7 +4567,7 @@ my %LocaleData = (
       "\N{U+0917}\N{U+0941}\N{U+0930}\N{U+0941}",
       "\N{U+0936}\N{U+0941}\N{U+0915}\N{U+094d}\N{U+0930}",
       "\N{U+0936}\N{U+0928}\N{U+093f}",
-      "\N{U+0930}\N{U+0935}\N{U+093f}"
+      "\N{U+0930}\N{U+0935}\N{U+093f}",
     ],
     day_format_narrow => [
       "\N{U+0938}\N{U+094b}",
@@ -4491,7 +4576,7 @@ my %LocaleData = (
       "\N{U+0917}\N{U+0941}",
       "\N{U+0936}\N{U+0941}",
       "\N{U+0936}",
-      "\N{U+0930}"
+      "\N{U+0930}",
     ],
     day_format_wide => [
       "\N{U+0938}\N{U+094b}\N{U+092e}\N{U+0935}\N{U+093e}\N{U+0930}",
@@ -4500,7 +4585,7 @@ my %LocaleData = (
       "\N{U+0917}\N{U+0941}\N{U+0930}\N{U+0941}\N{U+0935}\N{U+093e}\N{U+0930}",
       "\N{U+0936}\N{U+0941}\N{U+0915}\N{U+094d}\N{U+0930}\N{U+0935}\N{U+093e}\N{U+0930}",
       "\N{U+0936}\N{U+0928}\N{U+093f}\N{U+0935}\N{U+093e}\N{U+0930}",
-      "\N{U+0930}\N{U+0935}\N{U+093f}\N{U+0935}\N{U+093e}\N{U+0930}"
+      "\N{U+0930}\N{U+0935}\N{U+093f}\N{U+0935}\N{U+093e}\N{U+0930}",
     ],
     day_stand_alone_abbreviated => [
       "\N{U+0938}\N{U+094b}\N{U+092e}",
@@ -4509,7 +4594,7 @@ my %LocaleData = (
       "\N{U+0917}\N{U+0941}\N{U+0930}\N{U+0941}",
       "\N{U+0936}\N{U+0941}\N{U+0915}\N{U+094d}\N{U+0930}",
       "\N{U+0936}\N{U+0928}\N{U+093f}",
-      "\N{U+0930}\N{U+0935}\N{U+093f}"
+      "\N{U+0930}\N{U+0935}\N{U+093f}",
     ],
     day_stand_alone_narrow => [
       "\N{U+0938}\N{U+094b}",
@@ -4518,7 +4603,7 @@ my %LocaleData = (
       "\N{U+0917}\N{U+0941}",
       "\N{U+0936}\N{U+0941}",
       "\N{U+0936}",
-      "\N{U+0930}"
+      "\N{U+0930}",
     ],
     day_stand_alone_wide => [
       "\N{U+0938}\N{U+094b}\N{U+092e}\N{U+0935}\N{U+093e}\N{U+0930}",
@@ -4527,19 +4612,19 @@ my %LocaleData = (
       "\N{U+0917}\N{U+0941}\N{U+0930}\N{U+0941}\N{U+0935}\N{U+093e}\N{U+0930}",
       "\N{U+0936}\N{U+0941}\N{U+0915}\N{U+094d}\N{U+0930}\N{U+0935}\N{U+093e}\N{U+0930}",
       "\N{U+0936}\N{U+0928}\N{U+093f}\N{U+0935}\N{U+093e}\N{U+0930}",
-      "\N{U+0930}\N{U+0935}\N{U+093f}\N{U+0935}\N{U+093e}\N{U+0930}"
+      "\N{U+0930}\N{U+0935}\N{U+093f}\N{U+0935}\N{U+093e}\N{U+0930}",
     ],
     era_abbreviated => [
       "\N{U+0908}\N{U+0938}\N{U+093e}-\N{U+092a}\N{U+0942}\N{U+0930}\N{U+094d}\N{U+0935}",
-      "\N{U+0908}\N{U+0938}\N{U+094d}\N{U+0935}\N{U+0940}"
+      "\N{U+0908}\N{U+0938}\N{U+094d}\N{U+0935}\N{U+0940}",
     ],
     era_narrow => [
       "\N{U+0908}\N{U+0938}\N{U+093e}-\N{U+092a}\N{U+0942}\N{U+0930}\N{U+094d}\N{U+0935}",
-      "\N{U+0908}\N{U+0938}\N{U+094d}\N{U+0935}\N{U+0940}"
+      "\N{U+0908}\N{U+0938}\N{U+094d}\N{U+0935}\N{U+0940}",
     ],
     era_wide => [
       "\N{U+0908}\N{U+0938}\N{U+093e}-\N{U+092a}\N{U+0942}\N{U+0930}\N{U+094d}\N{U+0935}",
-      "\N{U+0908}\N{U+0938}\N{U+0935}\N{U+0940} \N{U+0938}\N{U+0928}"
+      "\N{U+0908}\N{U+0938}\N{U+0935}\N{U+0940} \N{U+0938}\N{U+0928}",
     ],
     first_day_of_week => 1,
     glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -4560,7 +4645,7 @@ my %LocaleData = (
       "\N{U+0938}\N{U+093f}\N{U+0924}\N{U+0970}",
       "\N{U+0905}\N{U+0915}\N{U+094d}\N{U+0924}\N{U+0942}\N{U+0970}",
       "\N{U+0928}\N{U+0935}\N{U+0970}",
-      "\N{U+0926}\N{U+093f}\N{U+0938}\N{U+0970}"
+      "\N{U+0926}\N{U+093f}\N{U+0938}\N{U+0970}",
     ],
     month_format_narrow => [
       "\N{U+091c}",
@@ -4574,7 +4659,7 @@ my %LocaleData = (
       "\N{U+0938}\N{U+093f}",
       "\N{U+0905}",
       "\N{U+0928}",
-      "\N{U+0926}\N{U+093f}"
+      "\N{U+0926}\N{U+093f}",
     ],
     month_format_wide => [
       "\N{U+091c}\N{U+0928}\N{U+0935}\N{U+0930}\N{U+0940}",
@@ -4588,7 +4673,7 @@ my %LocaleData = (
       "\N{U+0938}\N{U+093f}\N{U+0924}\N{U+0902}\N{U+092c}\N{U+0930}",
       "\N{U+0905}\N{U+0915}\N{U+094d}\N{U+0924}\N{U+0942}\N{U+092c}\N{U+0930}",
       "\N{U+0928}\N{U+0935}\N{U+0902}\N{U+092c}\N{U+0930}",
-      "\N{U+0926}\N{U+093f}\N{U+0938}\N{U+0902}\N{U+092c}\N{U+0930}"
+      "\N{U+0926}\N{U+093f}\N{U+0938}\N{U+0902}\N{U+092c}\N{U+0930}",
     ],
     month_stand_alone_abbreviated => [
       "\N{U+091c}\N{U+0928}\N{U+0970}",
@@ -4602,7 +4687,7 @@ my %LocaleData = (
       "\N{U+0938}\N{U+093f}\N{U+0924}\N{U+0970}",
       "\N{U+0905}\N{U+0915}\N{U+094d}\N{U+0924}\N{U+0942}\N{U+0970}",
       "\N{U+0928}\N{U+0935}\N{U+0970}",
-      "\N{U+0926}\N{U+093f}\N{U+0938}\N{U+0970}"
+      "\N{U+0926}\N{U+093f}\N{U+0938}\N{U+0970}",
     ],
     month_stand_alone_narrow => [
       "\N{U+091c}",
@@ -4616,7 +4701,7 @@ my %LocaleData = (
       "\N{U+0938}\N{U+093f}",
       "\N{U+0905}",
       "\N{U+0928}",
-      "\N{U+0926}\N{U+093f}"
+      "\N{U+0926}\N{U+093f}",
     ],
     month_stand_alone_wide => [
       "\N{U+091c}\N{U+0928}\N{U+0935}\N{U+0930}\N{U+0940}",
@@ -4630,7 +4715,7 @@ my %LocaleData = (
       "\N{U+0938}\N{U+093f}\N{U+0924}\N{U+0902}\N{U+092c}\N{U+0930}",
       "\N{U+0905}\N{U+0915}\N{U+094d}\N{U+0924}\N{U+0942}\N{U+092c}\N{U+0930}",
       "\N{U+0928}\N{U+0935}\N{U+0902}\N{U+092c}\N{U+0930}",
-      "\N{U+0926}\N{U+093f}\N{U+0938}\N{U+0902}\N{U+092c}\N{U+0930}"
+      "\N{U+0926}\N{U+093f}\N{U+0938}\N{U+0902}\N{U+092c}\N{U+0930}",
     ],
     name => "Hindi",
     native_language => "\N{U+0939}\N{U+093f}\N{U+0928}\N{U+094d}\N{U+0926}\N{U+0940}",
@@ -4642,37 +4727,37 @@ my %LocaleData = (
       "\N{U+0924}\N{U+093f}1",
       "\N{U+0924}\N{U+093f}2",
       "\N{U+0924}\N{U+093f}3",
-      "\N{U+0924}\N{U+093f}4"
+      "\N{U+0924}\N{U+093f}4",
     ],
     quarter_format_narrow => [
       1,
       2,
       3,
-      4
+      4,
     ],
     quarter_format_wide => [
       "\N{U+092a}\N{U+0939}\N{U+0932}\N{U+0940} \N{U+0924}\N{U+093f}\N{U+092e}\N{U+093e}\N{U+0939}\N{U+0940}",
       "\N{U+0926}\N{U+0942}\N{U+0938}\N{U+0930}\N{U+0940} \N{U+0924}\N{U+093f}\N{U+092e}\N{U+093e}\N{U+0939}\N{U+0940}",
       "\N{U+0924}\N{U+0940}\N{U+0938}\N{U+0930}\N{U+0940} \N{U+0924}\N{U+093f}\N{U+092e}\N{U+093e}\N{U+0939}\N{U+0940}",
-      "\N{U+091a}\N{U+094c}\N{U+0925}\N{U+0940} \N{U+0924}\N{U+093f}\N{U+092e}\N{U+093e}\N{U+0939}\N{U+0940}"
+      "\N{U+091a}\N{U+094c}\N{U+0925}\N{U+0940} \N{U+0924}\N{U+093f}\N{U+092e}\N{U+093e}\N{U+0939}\N{U+0940}",
     ],
     quarter_stand_alone_abbreviated => [
       "\N{U+0924}\N{U+093f}1",
       "\N{U+0924}\N{U+093f}2",
       "\N{U+0924}\N{U+093f}3",
-      "\N{U+0924}\N{U+093f}4"
+      "\N{U+0924}\N{U+093f}4",
     ],
     quarter_stand_alone_narrow => [
       1,
       2,
       3,
-      4
+      4,
     ],
     quarter_stand_alone_wide => [
       "\N{U+092a}\N{U+0939}\N{U+0932}\N{U+0940} \N{U+0924}\N{U+093f}\N{U+092e}\N{U+093e}\N{U+0939}\N{U+0940}",
       "\N{U+0926}\N{U+0942}\N{U+0938}\N{U+0930}\N{U+0940} \N{U+0924}\N{U+093f}\N{U+092e}\N{U+093e}\N{U+0939}\N{U+0940}",
       "\N{U+0924}\N{U+0940}\N{U+0938}\N{U+0930}\N{U+0940} \N{U+0924}\N{U+093f}\N{U+092e}\N{U+093e}\N{U+0939}\N{U+0940}",
-      "\N{U+091a}\N{U+094c}\N{U+0925}\N{U+0940} \N{U+0924}\N{U+093f}\N{U+092e}\N{U+093e}\N{U+0939}\N{U+0940}"
+      "\N{U+091a}\N{U+094c}\N{U+0925}\N{U+0940} \N{U+0924}\N{U+093f}\N{U+092e}\N{U+093e}\N{U+0939}\N{U+0940}",
     ],
     script => undef,
     territory => undef,
@@ -4681,15 +4766,20 @@ my %LocaleData = (
     time_format_medium => "h:mm:ss a",
     time_format_short => "h:mm a",
     variant => undef,
-    version => 31
+    version => 32,
   },
   "ja-JP" => {
     am_pm_abbreviated => [
       "\N{U+5348}\N{U+524d}",
-      "\N{U+5348}\N{U+5f8c}"
+      "\N{U+5348}\N{U+5f8c}",
     ],
     available_formats => {
+      Bh => "BK\N{U+6642}",
+      Bhm => "BK:mm",
+      Bhms => "BK:mm:ss",
       E => "ccc",
+      EBhm => "BK:mm (E)",
+      EBhms => "BK:mm:ss (E)",
       EEEEd => "d\N{U+65e5}EEEE",
       EHm => "H:mm (E)",
       EHms => "H:mm:ss (E)",
@@ -4736,7 +4826,7 @@ my %LocaleData = (
       yMd => "y/M/d",
       yQQQ => "y/QQQ",
       yQQQQ => "y\N{U+5e74}QQQQ",
-      "yw-count-other" => "y\N{U+5e74}\N{U+7b2c}w\N{U+9031}"
+      "yw-count-other" => "Y\N{U+5e74}\N{U+7b2c}w\N{U+9031}",
     },
     code => "ja-JP",
     date_format_full => "y\N{U+5e74}M\N{U+6708}d\N{U+65e5}EEEE",
@@ -4754,7 +4844,7 @@ my %LocaleData = (
       "\N{U+6728}",
       "\N{U+91d1}",
       "\N{U+571f}",
-      "\N{U+65e5}"
+      "\N{U+65e5}",
     ],
     day_format_narrow => [
       "\N{U+6708}",
@@ -4763,7 +4853,7 @@ my %LocaleData = (
       "\N{U+6728}",
       "\N{U+91d1}",
       "\N{U+571f}",
-      "\N{U+65e5}"
+      "\N{U+65e5}",
     ],
     day_format_wide => [
       "\N{U+6708}\N{U+66dc}\N{U+65e5}",
@@ -4772,7 +4862,7 @@ my %LocaleData = (
       "\N{U+6728}\N{U+66dc}\N{U+65e5}",
       "\N{U+91d1}\N{U+66dc}\N{U+65e5}",
       "\N{U+571f}\N{U+66dc}\N{U+65e5}",
-      "\N{U+65e5}\N{U+66dc}\N{U+65e5}"
+      "\N{U+65e5}\N{U+66dc}\N{U+65e5}",
     ],
     day_stand_alone_abbreviated => [
       "\N{U+6708}",
@@ -4781,7 +4871,7 @@ my %LocaleData = (
       "\N{U+6728}",
       "\N{U+91d1}",
       "\N{U+571f}",
-      "\N{U+65e5}"
+      "\N{U+65e5}",
     ],
     day_stand_alone_narrow => [
       "\N{U+6708}",
@@ -4790,7 +4880,7 @@ my %LocaleData = (
       "\N{U+6728}",
       "\N{U+91d1}",
       "\N{U+571f}",
-      "\N{U+65e5}"
+      "\N{U+65e5}",
     ],
     day_stand_alone_wide => [
       "\N{U+6708}\N{U+66dc}\N{U+65e5}",
@@ -4799,19 +4889,19 @@ my %LocaleData = (
       "\N{U+6728}\N{U+66dc}\N{U+65e5}",
       "\N{U+91d1}\N{U+66dc}\N{U+65e5}",
       "\N{U+571f}\N{U+66dc}\N{U+65e5}",
-      "\N{U+65e5}\N{U+66dc}\N{U+65e5}"
+      "\N{U+65e5}\N{U+66dc}\N{U+65e5}",
     ],
     era_abbreviated => [
       "\N{U+7d00}\N{U+5143}\N{U+524d}",
-      "\N{U+897f}\N{U+66a6}"
+      "\N{U+897f}\N{U+66a6}",
     ],
     era_narrow => [
       "BC",
-      "AD"
+      "AD",
     ],
     era_wide => [
       "\N{U+7d00}\N{U+5143}\N{U+524d}",
-      "\N{U+897f}\N{U+66a6}"
+      "\N{U+897f}\N{U+66a6}",
     ],
     first_day_of_week => 7,
     glibc_date_1_format => "%Y\N{U+5e74} %b %e\N{U+65e5} %A %H:%M:%S %Z",
@@ -4832,7 +4922,7 @@ my %LocaleData = (
       "9\N{U+6708}",
       "10\N{U+6708}",
       "11\N{U+6708}",
-      "12\N{U+6708}"
+      "12\N{U+6708}",
     ],
     month_format_narrow => [
       1,
@@ -4846,7 +4936,7 @@ my %LocaleData = (
       9,
       10,
       11,
-      12
+      12,
     ],
     month_format_wide => [
       "1\N{U+6708}",
@@ -4860,7 +4950,7 @@ my %LocaleData = (
       "9\N{U+6708}",
       "10\N{U+6708}",
       "11\N{U+6708}",
-      "12\N{U+6708}"
+      "12\N{U+6708}",
     ],
     month_stand_alone_abbreviated => [
       "1\N{U+6708}",
@@ -4874,7 +4964,7 @@ my %LocaleData = (
       "9\N{U+6708}",
       "10\N{U+6708}",
       "11\N{U+6708}",
-      "12\N{U+6708}"
+      "12\N{U+6708}",
     ],
     month_stand_alone_narrow => [
       1,
@@ -4888,7 +4978,7 @@ my %LocaleData = (
       9,
       10,
       11,
-      12
+      12,
     ],
     month_stand_alone_wide => [
       "1\N{U+6708}",
@@ -4902,7 +4992,7 @@ my %LocaleData = (
       "9\N{U+6708}",
       "10\N{U+6708}",
       "11\N{U+6708}",
-      "12\N{U+6708}"
+      "12\N{U+6708}",
     ],
     name => "Japanese Japan",
     native_language => "\N{U+65e5}\N{U+672c}\N{U+8a9e}",
@@ -4914,37 +5004,37 @@ my %LocaleData = (
       "Q1",
       "Q2",
       "Q3",
-      "Q4"
+      "Q4",
     ],
     quarter_format_narrow => [
       1,
       2,
       3,
-      4
+      4,
     ],
     quarter_format_wide => [
       "\N{U+7b2c}1\N{U+56db}\N{U+534a}\N{U+671f}",
       "\N{U+7b2c}2\N{U+56db}\N{U+534a}\N{U+671f}",
       "\N{U+7b2c}3\N{U+56db}\N{U+534a}\N{U+671f}",
-      "\N{U+7b2c}4\N{U+56db}\N{U+534a}\N{U+671f}"
+      "\N{U+7b2c}4\N{U+56db}\N{U+534a}\N{U+671f}",
     ],
     quarter_stand_alone_abbreviated => [
       "Q1",
       "Q2",
       "Q3",
-      "Q4"
+      "Q4",
     ],
     quarter_stand_alone_narrow => [
       1,
       2,
       3,
-      4
+      4,
     ],
     quarter_stand_alone_wide => [
       "\N{U+7b2c}1\N{U+56db}\N{U+534a}\N{U+671f}",
       "\N{U+7b2c}2\N{U+56db}\N{U+534a}\N{U+671f}",
       "\N{U+7b2c}3\N{U+56db}\N{U+534a}\N{U+671f}",
-      "\N{U+7b2c}4\N{U+56db}\N{U+534a}\N{U+671f}"
+      "\N{U+7b2c}4\N{U+56db}\N{U+534a}\N{U+671f}",
     ],
     script => undef,
     territory => "Japan",
@@ -4953,15 +5043,20 @@ my %LocaleData = (
     time_format_medium => "H:mm:ss",
     time_format_short => "H:mm",
     variant => undef,
-    version => 31
+    version => 32,
   },
   "pt-BR" => {
     am_pm_abbreviated => [
       "AM",
-      "PM"
+      "PM",
     ],
     available_formats => {
+      Bh => "h B",
+      Bhm => "h:mm B",
+      Bhms => "h:mm:ss B",
       E => "ccc",
+      EBhm => "E h:mm B",
+      EBhms => "E h:mm:ss B",
       EHm => "E, HH:mm",
       EHms => "E, HH:mm:ss",
       Ed => "E, d",
@@ -4981,7 +5076,7 @@ my %LocaleData = (
       MMM => "LLL",
       MMMEd => "E, d 'de' MMM",
       MMMMEd => "E, d 'de' MMMM",
-      "MMMMW-count-one" => "W'\N{U+00aa}' 'semana' 'de' MMM",
+      "MMMMW-count-one" => "W'\N{U+00aa}' 'semana' 'de' MMMM",
       "MMMMW-count-other" => "W'\N{U+00aa}' 'semana' 'de' MMMM",
       MMMMd => "d 'de' MMMM",
       MMMd => "d 'de' MMM",
@@ -5007,8 +5102,8 @@ my %LocaleData = (
       yMd => "dd/MM/y",
       yQQQ => "QQQ 'de' y",
       yQQQQ => "QQQQ 'de' y",
-      "yw-count-one" => "w'\N{U+00aa}' 'semana' 'de' y",
-      "yw-count-other" => "w'\N{U+00aa}' 'semana' 'de' y"
+      "yw-count-one" => "w'\N{U+00aa}' 'semana' 'de' Y",
+      "yw-count-other" => "w'\N{U+00aa}' 'semana' 'de' Y",
     },
     code => "pt-BR",
     date_format_full => "EEEE, d 'de' MMMM 'de' y",
@@ -5026,7 +5121,7 @@ my %LocaleData = (
       "qui",
       "sex",
       "s\N{U+00e1}b",
-      "dom"
+      "dom",
     ],
     day_format_narrow => [
       "S",
@@ -5035,7 +5130,7 @@ my %LocaleData = (
       "Q",
       "S",
       "S",
-      "D"
+      "D",
     ],
     day_format_wide => [
       "segunda-feira",
@@ -5044,7 +5139,7 @@ my %LocaleData = (
       "quinta-feira",
       "sexta-feira",
       "s\N{U+00e1}bado",
-      "domingo"
+      "domingo",
     ],
     day_stand_alone_abbreviated => [
       "seg",
@@ -5053,7 +5148,7 @@ my %LocaleData = (
       "qui",
       "sex",
       "s\N{U+00e1}b",
-      "dom"
+      "dom",
     ],
     day_stand_alone_narrow => [
       "S",
@@ -5062,7 +5157,7 @@ my %LocaleData = (
       "Q",
       "S",
       "S",
-      "D"
+      "D",
     ],
     day_stand_alone_wide => [
       "segunda-feira",
@@ -5071,19 +5166,19 @@ my %LocaleData = (
       "quinta-feira",
       "sexta-feira",
       "s\N{U+00e1}bado",
-      "domingo"
+      "domingo",
     ],
     era_abbreviated => [
       "a.C.",
-      "d.C."
+      "d.C.",
     ],
     era_narrow => [
       "a.C.",
-      "d.C."
+      "d.C.",
     ],
     era_wide => [
       "antes de Cristo",
-      "depois de Cristo"
+      "depois de Cristo",
     ],
     first_day_of_week => 7,
     glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -5104,7 +5199,7 @@ my %LocaleData = (
       "set",
       "out",
       "nov",
-      "dez"
+      "dez",
     ],
     month_format_narrow => [
       "J",
@@ -5118,7 +5213,7 @@ my %LocaleData = (
       "S",
       "O",
       "N",
-      "D"
+      "D",
     ],
     month_format_wide => [
       "janeiro",
@@ -5132,7 +5227,7 @@ my %LocaleData = (
       "setembro",
       "outubro",
       "novembro",
-      "dezembro"
+      "dezembro",
     ],
     month_stand_alone_abbreviated => [
       "jan",
@@ -5146,7 +5241,7 @@ my %LocaleData = (
       "set",
       "out",
       "nov",
-      "dez"
+      "dez",
     ],
     month_stand_alone_narrow => [
       "J",
@@ -5160,7 +5255,7 @@ my %LocaleData = (
       "S",
       "O",
       "N",
-      "D"
+      "D",
     ],
     month_stand_alone_wide => [
       "janeiro",
@@ -5174,7 +5269,7 @@ my %LocaleData = (
       "setembro",
       "outubro",
       "novembro",
-      "dezembro"
+      "dezembro",
     ],
     name => "Portuguese Brazil",
     native_language => "portugu\N{U+00ea}s",
@@ -5186,37 +5281,37 @@ my %LocaleData = (
       "T1",
       "T2",
       "T3",
-      "T4"
+      "T4",
     ],
     quarter_format_narrow => [
       1,
       2,
       3,
-      4
+      4,
     ],
     quarter_format_wide => [
       "1\N{U+00ba} trimestre",
       "2\N{U+00ba} trimestre",
       "3\N{U+00ba} trimestre",
-      "4\N{U+00ba} trimestre"
+      "4\N{U+00ba} trimestre",
     ],
     quarter_stand_alone_abbreviated => [
       "T1",
       "T2",
       "T3",
-      "T4"
+      "T4",
     ],
     quarter_stand_alone_narrow => [
       1,
       2,
       3,
-      4
+      4,
     ],
     quarter_stand_alone_wide => [
       "1\N{U+00ba} trimestre",
       "2\N{U+00ba} trimestre",
       "3\N{U+00ba} trimestre",
-      "4\N{U+00ba} trimestre"
+      "4\N{U+00ba} trimestre",
     ],
     script => undef,
     territory => "Brazil",
@@ -5225,15 +5320,20 @@ my %LocaleData = (
     time_format_medium => "HH:mm:ss",
     time_format_short => "HH:mm",
     variant => undef,
-    version => 31
+    version => 32,
   },
   "zh-Hans-CN" => {
     am_pm_abbreviated => [
       "\N{U+4e0a}\N{U+5348}",
-      "\N{U+4e0b}\N{U+5348}"
+      "\N{U+4e0b}\N{U+5348}",
     ],
     available_formats => {
+      Bh => "Bh\N{U+65f6}",
+      Bhm => "Bh:mm",
+      Bhms => "Bh:mm:ss",
       E => "ccc",
+      EBhm => "EBh:mm",
+      EBhms => "EBh:mm:ss",
       EHm => "EHH:mm",
       EHms => "EHH:mm:ss",
       Ed => "d\N{U+65e5}E",
@@ -5275,7 +5375,7 @@ my %LocaleData = (
       yMd => "y/M/d",
       yQQQ => "y\N{U+5e74}\N{U+7b2c}Q\N{U+5b63}\N{U+5ea6}",
       yQQQQ => "y\N{U+5e74}\N{U+7b2c}Q\N{U+5b63}\N{U+5ea6}",
-      "yw-count-other" => "y\N{U+5e74}\N{U+7b2c}w\N{U+5468}"
+      "yw-count-other" => "Y\N{U+5e74}\N{U+7b2c}w\N{U+5468}",
     },
     code => "zh-Hans-CN",
     date_format_full => "y\N{U+5e74}M\N{U+6708}d\N{U+65e5}EEEE",
@@ -5293,7 +5393,7 @@ my %LocaleData = (
       "\N{U+5468}\N{U+56db}",
       "\N{U+5468}\N{U+4e94}",
       "\N{U+5468}\N{U+516d}",
-      "\N{U+5468}\N{U+65e5}"
+      "\N{U+5468}\N{U+65e5}",
     ],
     day_format_narrow => [
       "\N{U+4e00}",
@@ -5302,7 +5402,7 @@ my %LocaleData = (
       "\N{U+56db}",
       "\N{U+4e94}",
       "\N{U+516d}",
-      "\N{U+65e5}"
+      "\N{U+65e5}",
     ],
     day_format_wide => [
       "\N{U+661f}\N{U+671f}\N{U+4e00}",
@@ -5311,7 +5411,7 @@ my %LocaleData = (
       "\N{U+661f}\N{U+671f}\N{U+56db}",
       "\N{U+661f}\N{U+671f}\N{U+4e94}",
       "\N{U+661f}\N{U+671f}\N{U+516d}",
-      "\N{U+661f}\N{U+671f}\N{U+65e5}"
+      "\N{U+661f}\N{U+671f}\N{U+65e5}",
     ],
     day_stand_alone_abbreviated => [
       "\N{U+5468}\N{U+4e00}",
@@ -5320,7 +5420,7 @@ my %LocaleData = (
       "\N{U+5468}\N{U+56db}",
       "\N{U+5468}\N{U+4e94}",
       "\N{U+5468}\N{U+516d}",
-      "\N{U+5468}\N{U+65e5}"
+      "\N{U+5468}\N{U+65e5}",
     ],
     day_stand_alone_narrow => [
       "\N{U+4e00}",
@@ -5329,7 +5429,7 @@ my %LocaleData = (
       "\N{U+56db}",
       "\N{U+4e94}",
       "\N{U+516d}",
-      "\N{U+65e5}"
+      "\N{U+65e5}",
     ],
     day_stand_alone_wide => [
       "\N{U+661f}\N{U+671f}\N{U+4e00}",
@@ -5338,19 +5438,19 @@ my %LocaleData = (
       "\N{U+661f}\N{U+671f}\N{U+56db}",
       "\N{U+661f}\N{U+671f}\N{U+4e94}",
       "\N{U+661f}\N{U+671f}\N{U+516d}",
-      "\N{U+661f}\N{U+671f}\N{U+65e5}"
+      "\N{U+661f}\N{U+671f}\N{U+65e5}",
     ],
     era_abbreviated => [
       "\N{U+516c}\N{U+5143}\N{U+524d}",
-      "\N{U+516c}\N{U+5143}"
+      "\N{U+516c}\N{U+5143}",
     ],
     era_narrow => [
       "\N{U+516c}\N{U+5143}\N{U+524d}",
-      "\N{U+516c}\N{U+5143}"
+      "\N{U+516c}\N{U+5143}",
     ],
     era_wide => [
       "\N{U+516c}\N{U+5143}\N{U+524d}",
-      "\N{U+516c}\N{U+5143}"
+      "\N{U+516c}\N{U+5143}",
     ],
     first_day_of_week => 7,
     glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -5371,7 +5471,7 @@ my %LocaleData = (
       "9\N{U+6708}",
       "10\N{U+6708}",
       "11\N{U+6708}",
-      "12\N{U+6708}"
+      "12\N{U+6708}",
     ],
     month_format_narrow => [
       1,
@@ -5385,7 +5485,7 @@ my %LocaleData = (
       9,
       10,
       11,
-      12
+      12,
     ],
     month_format_wide => [
       "\N{U+4e00}\N{U+6708}",
@@ -5399,7 +5499,7 @@ my %LocaleData = (
       "\N{U+4e5d}\N{U+6708}",
       "\N{U+5341}\N{U+6708}",
       "\N{U+5341}\N{U+4e00}\N{U+6708}",
-      "\N{U+5341}\N{U+4e8c}\N{U+6708}"
+      "\N{U+5341}\N{U+4e8c}\N{U+6708}",
     ],
     month_stand_alone_abbreviated => [
       "1\N{U+6708}",
@@ -5413,7 +5513,7 @@ my %LocaleData = (
       "9\N{U+6708}",
       "10\N{U+6708}",
       "11\N{U+6708}",
-      "12\N{U+6708}"
+      "12\N{U+6708}",
     ],
     month_stand_alone_narrow => [
       1,
@@ -5427,7 +5527,7 @@ my %LocaleData = (
       9,
       10,
       11,
-      12
+      12,
     ],
     month_stand_alone_wide => [
       "\N{U+4e00}\N{U+6708}",
@@ -5441,7 +5541,7 @@ my %LocaleData = (
       "\N{U+4e5d}\N{U+6708}",
       "\N{U+5341}\N{U+6708}",
       "\N{U+5341}\N{U+4e00}\N{U+6708}",
-      "\N{U+5341}\N{U+4e8c}\N{U+6708}"
+      "\N{U+5341}\N{U+4e8c}\N{U+6708}",
     ],
     name => "Chinese China Simplified",
     native_language => "\N{U+4e2d}\N{U+6587}",
@@ -5453,37 +5553,37 @@ my %LocaleData = (
       "1\N{U+5b63}\N{U+5ea6}",
       "2\N{U+5b63}\N{U+5ea6}",
       "3\N{U+5b63}\N{U+5ea6}",
-      "4\N{U+5b63}\N{U+5ea6}"
+      "4\N{U+5b63}\N{U+5ea6}",
     ],
     quarter_format_narrow => [
       1,
       2,
       3,
-      4
+      4,
     ],
     quarter_format_wide => [
       "\N{U+7b2c}\N{U+4e00}\N{U+5b63}\N{U+5ea6}",
       "\N{U+7b2c}\N{U+4e8c}\N{U+5b63}\N{U+5ea6}",
       "\N{U+7b2c}\N{U+4e09}\N{U+5b63}\N{U+5ea6}",
-      "\N{U+7b2c}\N{U+56db}\N{U+5b63}\N{U+5ea6}"
+      "\N{U+7b2c}\N{U+56db}\N{U+5b63}\N{U+5ea6}",
     ],
     quarter_stand_alone_abbreviated => [
       "1\N{U+5b63}\N{U+5ea6}",
       "2\N{U+5b63}\N{U+5ea6}",
       "3\N{U+5b63}\N{U+5ea6}",
-      "4\N{U+5b63}\N{U+5ea6}"
+      "4\N{U+5b63}\N{U+5ea6}",
     ],
     quarter_stand_alone_narrow => [
       1,
       2,
       3,
-      4
+      4,
     ],
     quarter_stand_alone_wide => [
       "\N{U+7b2c}\N{U+4e00}\N{U+5b63}\N{U+5ea6}",
       "\N{U+7b2c}\N{U+4e8c}\N{U+5b63}\N{U+5ea6}",
       "\N{U+7b2c}\N{U+4e09}\N{U+5b63}\N{U+5ea6}",
-      "\N{U+7b2c}\N{U+56db}\N{U+5b63}\N{U+5ea6}"
+      "\N{U+7b2c}\N{U+56db}\N{U+5b63}\N{U+5ea6}",
     ],
     script => "Simplified",
     territory => "China",
@@ -5492,15 +5592,20 @@ my %LocaleData = (
     time_format_medium => "ah:mm:ss",
     time_format_short => "ah:mm",
     variant => undef,
-    version => 31
+    version => 32,
   },
   "zh-Hant-TW" => {
     am_pm_abbreviated => [
       "\N{U+4e0a}\N{U+5348}",
-      "\N{U+4e0b}\N{U+5348}"
+      "\N{U+4e0b}\N{U+5348}",
     ],
     available_formats => {
+      Bh => "Bh\N{U+6642}",
+      Bhm => "Bh:mm",
+      Bhms => "Bh:mm:ss",
       E => "ccc",
+      EBhm => "E Bh:mm",
+      EBhms => "E Bh:mm:ss",
       EHm => "E HH:mm",
       EHms => "E HH:mm:ss",
       Ed => "d E",
@@ -5542,7 +5647,7 @@ my %LocaleData = (
       yMd => "y/M/d",
       yQQQ => "y\N{U+5e74}QQQ",
       yQQQQ => "y\N{U+5e74}QQQQ",
-      "yw-count-other" => "y\N{U+5e74}\N{U+7684}\N{U+7b2c}w\N{U+9031}"
+      "yw-count-other" => "Y\N{U+5e74}\N{U+7684}\N{U+7b2c}w\N{U+9031}",
     },
     code => "zh-Hant-TW",
     date_format_full => "y\N{U+5e74}M\N{U+6708}d\N{U+65e5} EEEE",
@@ -5560,7 +5665,7 @@ my %LocaleData = (
       "\N{U+9031}\N{U+56db}",
       "\N{U+9031}\N{U+4e94}",
       "\N{U+9031}\N{U+516d}",
-      "\N{U+9031}\N{U+65e5}"
+      "\N{U+9031}\N{U+65e5}",
     ],
     day_format_narrow => [
       "\N{U+4e00}",
@@ -5569,7 +5674,7 @@ my %LocaleData = (
       "\N{U+56db}",
       "\N{U+4e94}",
       "\N{U+516d}",
-      "\N{U+65e5}"
+      "\N{U+65e5}",
     ],
     day_format_wide => [
       "\N{U+661f}\N{U+671f}\N{U+4e00}",
@@ -5578,7 +5683,7 @@ my %LocaleData = (
       "\N{U+661f}\N{U+671f}\N{U+56db}",
       "\N{U+661f}\N{U+671f}\N{U+4e94}",
       "\N{U+661f}\N{U+671f}\N{U+516d}",
-      "\N{U+661f}\N{U+671f}\N{U+65e5}"
+      "\N{U+661f}\N{U+671f}\N{U+65e5}",
     ],
     day_stand_alone_abbreviated => [
       "\N{U+9031}\N{U+4e00}",
@@ -5587,7 +5692,7 @@ my %LocaleData = (
       "\N{U+9031}\N{U+56db}",
       "\N{U+9031}\N{U+4e94}",
       "\N{U+9031}\N{U+516d}",
-      "\N{U+9031}\N{U+65e5}"
+      "\N{U+9031}\N{U+65e5}",
     ],
     day_stand_alone_narrow => [
       "\N{U+4e00}",
@@ -5596,7 +5701,7 @@ my %LocaleData = (
       "\N{U+56db}",
       "\N{U+4e94}",
       "\N{U+516d}",
-      "\N{U+65e5}"
+      "\N{U+65e5}",
     ],
     day_stand_alone_wide => [
       "\N{U+661f}\N{U+671f}\N{U+4e00}",
@@ -5605,19 +5710,19 @@ my %LocaleData = (
       "\N{U+661f}\N{U+671f}\N{U+56db}",
       "\N{U+661f}\N{U+671f}\N{U+4e94}",
       "\N{U+661f}\N{U+671f}\N{U+516d}",
-      "\N{U+661f}\N{U+671f}\N{U+65e5}"
+      "\N{U+661f}\N{U+671f}\N{U+65e5}",
     ],
     era_abbreviated => [
       "\N{U+897f}\N{U+5143}\N{U+524d}",
-      "\N{U+897f}\N{U+5143}"
+      "\N{U+897f}\N{U+5143}",
     ],
     era_narrow => [
       "\N{U+897f}\N{U+5143}\N{U+524d}",
-      "\N{U+897f}\N{U+5143}"
+      "\N{U+897f}\N{U+5143}",
     ],
     era_wide => [
       "\N{U+897f}\N{U+5143}\N{U+524d}",
-      "\N{U+897f}\N{U+5143}"
+      "\N{U+897f}\N{U+5143}",
     ],
     first_day_of_week => 7,
     glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -5638,7 +5743,7 @@ my %LocaleData = (
       "9\N{U+6708}",
       "10\N{U+6708}",
       "11\N{U+6708}",
-      "12\N{U+6708}"
+      "12\N{U+6708}",
     ],
     month_format_narrow => [
       1,
@@ -5652,7 +5757,7 @@ my %LocaleData = (
       9,
       10,
       11,
-      12
+      12,
     ],
     month_format_wide => [
       "1\N{U+6708}",
@@ -5666,7 +5771,7 @@ my %LocaleData = (
       "9\N{U+6708}",
       "10\N{U+6708}",
       "11\N{U+6708}",
-      "12\N{U+6708}"
+      "12\N{U+6708}",
     ],
     month_stand_alone_abbreviated => [
       "1\N{U+6708}",
@@ -5680,7 +5785,7 @@ my %LocaleData = (
       "9\N{U+6708}",
       "10\N{U+6708}",
       "11\N{U+6708}",
-      "12\N{U+6708}"
+      "12\N{U+6708}",
     ],
     month_stand_alone_narrow => [
       1,
@@ -5694,7 +5799,7 @@ my %LocaleData = (
       9,
       10,
       11,
-      12
+      12,
     ],
     month_stand_alone_wide => [
       "1\N{U+6708}",
@@ -5708,7 +5813,7 @@ my %LocaleData = (
       "9\N{U+6708}",
       "10\N{U+6708}",
       "11\N{U+6708}",
-      "12\N{U+6708}"
+      "12\N{U+6708}",
     ],
     name => "Chinese Taiwan Traditional",
     native_language => "\N{U+4e2d}\N{U+6587}",
@@ -5717,40 +5822,40 @@ my %LocaleData = (
     native_territory => "\N{U+53f0}\N{U+7063}",
     native_variant => undef,
     quarter_format_abbreviated => [
-      "1\N{U+5b63}",
-      "2\N{U+5b63}",
-      "3\N{U+5b63}",
-      "4\N{U+5b63}"
+      "\N{U+7b2c}1\N{U+5b63}",
+      "\N{U+7b2c}2\N{U+5b63}",
+      "\N{U+7b2c}3\N{U+5b63}",
+      "\N{U+7b2c}4\N{U+5b63}",
     ],
     quarter_format_narrow => [
       1,
       2,
       3,
-      4
+      4,
     ],
     quarter_format_wide => [
       "\N{U+7b2c}1\N{U+5b63}",
       "\N{U+7b2c}2\N{U+5b63}",
       "\N{U+7b2c}3\N{U+5b63}",
-      "\N{U+7b2c}4\N{U+5b63}"
+      "\N{U+7b2c}4\N{U+5b63}",
     ],
     quarter_stand_alone_abbreviated => [
-      "1\N{U+5b63}",
-      "2\N{U+5b63}",
-      "3\N{U+5b63}",
-      "4\N{U+5b63}"
+      "\N{U+7b2c}1\N{U+5b63}",
+      "\N{U+7b2c}2\N{U+5b63}",
+      "\N{U+7b2c}3\N{U+5b63}",
+      "\N{U+7b2c}4\N{U+5b63}",
     ],
     quarter_stand_alone_narrow => [
       1,
       2,
       3,
-      4
+      4,
     ],
     quarter_stand_alone_wide => [
       "\N{U+7b2c}1\N{U+5b63}",
       "\N{U+7b2c}2\N{U+5b63}",
       "\N{U+7b2c}3\N{U+5b63}",
-      "\N{U+7b2c}4\N{U+5b63}"
+      "\N{U+7b2c}4\N{U+5b63}",
     ],
     script => "Traditional",
     territory => "Taiwan",
@@ -5759,8 +5864,8 @@ my %LocaleData = (
     time_format_medium => "ah:mm:ss",
     time_format_short => "ah:mm",
     variant => undef,
-    version => 31
-  }
+    version => 32,
+  },
 );
 ### :end LocaleData:
 #>>>
@@ -5797,7 +5902,7 @@ DateTime::Locale::Data - Locale data generated from CLDR
 
 =head1 VERSION
 
-version 1.16
+version 1.17
 
 =head1 DESCRIPTION
 

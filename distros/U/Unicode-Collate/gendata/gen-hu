@@ -8,7 +8,7 @@
 #
 use strict;
 use warnings;
-require 'gen-head'; # for testcount() and testhead()
+require './gen-head'; # for testcount() and testhead()
 
 my @a = qw( cs dz dzs gy ly ny sz ty zs );
 

@@ -1,40 +1,45 @@
 {
   am_pm_abbreviated => [
     "a. m.",
-    "p. m."
+    "p. m.",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
-    EHm => "E, HH:mm",
-    EHms => "E, HH:mm:ss",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
+    EHm => "E HH:mm",
+    EHms => "E HH:mm:ss",
     Ed => "E d",
-    Ehm => "E, h:mm a",
-    Ehms => "E, h:mm:ss a",
+    Ehm => "E h:mm a",
+    Ehms => "E h:mm:ss a",
     Gy => "y G",
     GyMMM => "MMM y G",
     GyMMMEd => "E, d MMM y G",
     GyMMMM => "MMMM 'de' y G",
     GyMMMMEd => "E, d 'de' MMMM 'de' y G",
     GyMMMMd => "d 'de' MMMM 'de' y G",
-    GyMMMd => "d 'de' MMM 'de' y G",
+    GyMMMd => "d MMM y G",
     H => "HH",
     Hm => "HH:mm",
     Hms => "HH:mm:ss",
-    Hmsv => "H:mm:ss v",
-    Hmsvvvv => "H:mm:ss (vvvv)",
-    Hmv => "H:mm v",
+    Hmsv => "HH:mm:ss v",
+    Hmsvvvv => "HH:mm:ss (vvvv)",
+    Hmv => "HH:mm v",
     M => "L",
     MEd => "E, d/M",
     MMM => "LLL",
-    MMMEd => "E, d MMM",
+    MMMEd => "E, d 'de' MMM",
     MMMMEd => "E, d 'de' MMMM",
     "MMMMW-count-one" => "'semana' W 'de' MMM",
     "MMMMW-count-other" => "'semana' W 'de' MMM",
     MMMMd => "d 'de' MMMM",
     MMMd => "d MMM",
     MMMdd => "dd-MMM",
-    MMd => "d/M",
-    MMdd => "d/M",
+    MMd => "d/MM",
+    MMdd => "dd/MM",
     Md => "d/M",
     d => "d",
     h => "h a",
@@ -46,19 +51,19 @@
     ms => "mm:ss",
     y => "y",
     yM => "M/y",
-    yMEd => "E d/M/y",
-    yMM => "M/y",
+    yMEd => "E, d/M/y",
+    yMM => "MM/y",
     yMMM => "MMMM 'de' y",
-    yMMMEd => "E, d 'de' MMM 'de' y",
+    yMMMEd => "EEE, d 'de' MMMM 'de' y",
     yMMMM => "MMMM 'de' y",
     yMMMMEd => "EEE, d 'de' MMMM 'de' y",
     yMMMMd => "d 'de' MMMM 'de' y",
     yMMMd => "d 'de' MMMM 'de' y",
     yMd => "d/M/y",
-    yQQQ => "QQQ 'de' y",
+    yQQQ => "QQQ y",
     yQQQQ => "QQQQ 'de' y",
-    "yw-count-one" => "'semana' w 'de' y",
-    "yw-count-other" => "'semana' w 'de' y"
+    "yw-count-one" => "'semana' w 'de' Y",
+    "yw-count-other" => "'semana' w 'de' Y",
   },
   code => "es-US",
   date_format_full => "EEEE, d 'de' MMMM 'de' y",
@@ -76,16 +81,16 @@
     "jue.",
     "vie.",
     "s\N{U+00e1}b.",
-    "dom."
+    "dom.",
   ],
   day_format_narrow => [
-    "l",
-    "m",
-    "m",
-    "j",
-    "v",
-    "s",
-    "d"
+    "L",
+    "M",
+    "M",
+    "J",
+    "V",
+    "S",
+    "D",
   ],
   day_format_wide => [
     "lunes",
@@ -94,7 +99,7 @@
     "jueves",
     "viernes",
     "s\N{U+00e1}bado",
-    "domingo"
+    "domingo",
   ],
   day_stand_alone_abbreviated => [
     "lun.",
@@ -103,7 +108,7 @@
     "jue.",
     "vie.",
     "s\N{U+00e1}b.",
-    "dom."
+    "dom.",
   ],
   day_stand_alone_narrow => [
     "L",
@@ -112,7 +117,7 @@
     "J",
     "V",
     "S",
-    "D"
+    "D",
   ],
   day_stand_alone_wide => [
     "lunes",
@@ -121,19 +126,19 @@
     "jueves",
     "viernes",
     "s\N{U+00e1}bado",
-    "domingo"
+    "domingo",
   ],
   era_abbreviated => [
     "a. C.",
-    "d. C."
+    "d. C.",
   ],
   era_narrow => [
     "a. C.",
-    "d. C."
+    "d. C.",
   ],
   era_wide => [
     "antes de Cristo",
-    "despu\N{U+00e9}s de Cristo"
+    "despu\N{U+00e9}s de Cristo",
   ],
   first_day_of_week => 7,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -154,21 +159,21 @@
     "sep.",
     "oct.",
     "nov.",
-    "dic."
+    "dic.",
   ],
   month_format_narrow => [
-    "e",
-    "f",
-    "m",
-    "a",
-    "m",
-    "j",
-    "j",
-    "a",
-    "s",
-    "o",
-    "n",
-    "d"
+    "E",
+    "F",
+    "M",
+    "A",
+    "M",
+    "J",
+    "J",
+    "A",
+    "S",
+    "O",
+    "N",
+    "D",
   ],
   month_format_wide => [
     "enero",
@@ -182,7 +187,7 @@
     "septiembre",
     "octubre",
     "noviembre",
-    "diciembre"
+    "diciembre",
   ],
   month_stand_alone_abbreviated => [
     "ene.",
@@ -196,7 +201,7 @@
     "sep.",
     "oct.",
     "nov.",
-    "dic."
+    "dic.",
   ],
   month_stand_alone_narrow => [
     "E",
@@ -210,7 +215,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_stand_alone_wide => [
     "enero",
@@ -224,7 +229,7 @@
     "septiembre",
     "octubre",
     "noviembre",
-    "diciembre"
+    "diciembre",
   ],
   name => "Spanish United States",
   native_language => "espa\N{U+00f1}ol",
@@ -236,37 +241,37 @@
     "T1",
     "T2",
     "T3",
-    "T4"
+    "T4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
-    "1.er trimestre",
+    "1.\N{U+00ba} trimestre",
     "2.\N{U+00ba} trimestre",
-    "3.er trimestre",
-    "4.\N{U+00ba} trimestre"
+    "3.\N{U+00ba} trimestre",
+    "4.\N{U+00ba} trimestre",
   ],
   quarter_stand_alone_abbreviated => [
     "T1",
     "T2",
     "T3",
-    "T4"
+    "T4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
-    "1.er trimestre",
+    "1.\N{U+00ba} trimestre",
     "2.\N{U+00ba} trimestre",
-    "3.er trimestre",
-    "4.\N{U+00ba} trimestre"
+    "3.\N{U+00ba} trimestre",
+    "4.\N{U+00ba} trimestre",
   ],
   script => undef,
   territory => "United States",
@@ -275,5 +280,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 31
+  version => 32,
 }

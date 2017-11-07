@@ -65,7 +65,21 @@ use Dancer::RPCPlugin::DispatchMethodList;
                 '/customer' => [qw/get_user update_user remove_user/],
             },
         },
-        "list_methods()"
+        "->list_methods()"
+    );
+
+    $all = list_methods();
+    is_deeply(
+        $all,
+        {
+            jsonrpc => {
+                '/customer' => [qw/get_user update_user remove_user/],
+            },
+            xmlrpc => {
+                '/customer' => [qw/get_user update_user remove_user/],
+            },
+        },
+        "list_methods() backward compatible"
     );
 }
 

@@ -8,7 +8,10 @@ use strictures 2;
 use Test::More;
 use Test::Exception;
 use Test::File::Contents;
+use File::Which;
 use Path::Tiny;
+
+plan skip_all => 'reclass executable required' unless which('reclass');
 
 use_ok('Boxer::Part::Reclass');
 use_ok('Boxer::World::Reclass');

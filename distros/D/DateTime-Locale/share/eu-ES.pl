@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "AM",
-    "PM"
+    "PM",
   ],
   available_formats => {
+    Bh => "B h",
+    Bhm => "B h:mm",
+    Bhms => "B h:mm:ss",
     E => "ccc",
+    EBhm => "E B h:mm",
+    EBhms => "E B h:mm:ss",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d, E",
@@ -23,8 +28,8 @@
     MEd => "M/d, E",
     MMM => "LLL",
     MMMEd => "MMM d, E",
-    "MMMMW-count-one" => "MMM W 'astea'",
-    "MMMMW-count-other" => "MMM'ren' 'astea' W",
+    "MMMMW-count-one" => "MMM W. 'astea'",
+    "MMMMW-count-other" => "MMM W. 'astea'",
     MMMMd => "MMMM d",
     MMMd => "MMM d",
     Md => "M/d",
@@ -41,18 +46,18 @@
     yMMM => "y MMM",
     yMMMEd => "y MMM d, E",
     yMMMM => "y('e')'ko' MMMM",
-    yMMMMEd => "y('e')'ko' MMMM d, E",
-    yMMMMd => "y('e')'ko' MMMM d",
+    yMMMMEd => "y('e')'ko' MMMM'k' d, E",
+    yMMMMd => "y('e')'ko' MMMM'ren' d",
     yMMMd => "y MMM d",
     yMd => "y/M/d",
     yQQQ => "y('e')'ko' QQQ",
     yQQQQ => "y('e')'ko' QQQQ",
-    "yw-count-one" => "y 'urteko' w 'astea'",
-    "yw-count-other" => "w/y 'astea'"
+    "yw-count-one" => "Y. 'urteko' w. 'astea'",
+    "yw-count-other" => "Y. 'urteko' w. 'astea'",
   },
   code => "eu-ES",
-  date_format_full => "y('e')'ko' MMMM d, EEEE",
-  date_format_long => "y('e')'ko' MMMM d",
+  date_format_full => "y('e')'ko' MMMM'ren' d('a'), EEEE",
+  date_format_long => "y('e')'ko' MMMM'ren' d('a')",
   date_format_medium => "y MMM d",
   date_format_short => "yy/M/d",
   datetime_format_full => "{1} {0}",
@@ -66,7 +71,7 @@
     "og.",
     "or.",
     "lr.",
-    "ig."
+    "ig.",
   ],
   day_format_narrow => [
     "A",
@@ -75,7 +80,7 @@
     "O",
     "O",
     "L",
-    "I"
+    "I",
   ],
   day_format_wide => [
     "astelehena",
@@ -84,7 +89,7 @@
     "osteguna",
     "ostirala",
     "larunbata",
-    "igandea"
+    "igandea",
   ],
   day_stand_alone_abbreviated => [
     "al.",
@@ -93,7 +98,7 @@
     "og.",
     "or.",
     "lr.",
-    "ig."
+    "ig.",
   ],
   day_stand_alone_narrow => [
     "A",
@@ -102,7 +107,7 @@
     "O",
     "O",
     "L",
-    "I"
+    "I",
   ],
   day_stand_alone_wide => [
     "Astelehena",
@@ -111,19 +116,19 @@
     "Osteguna",
     "Ostirala",
     "Larunbata",
-    "Igandea"
+    "Igandea",
   ],
   era_abbreviated => [
     "K.a.",
-    "K.o."
+    "K.o.",
   ],
   era_narrow => [
     "K.a.",
-    "K.o."
+    "K.o.",
   ],
   era_wide => [
     "K.a.",
-    "Kristo ondoren"
+    "Kristo ondoren",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -144,7 +149,7 @@
     "ira.",
     "urr.",
     "aza.",
-    "abe."
+    "abe.",
   ],
   month_format_narrow => [
     "U",
@@ -158,7 +163,7 @@
     "I",
     "U",
     "A",
-    "A"
+    "A",
   ],
   month_format_wide => [
     "urtarrila",
@@ -172,7 +177,7 @@
     "iraila",
     "urria",
     "azaroa",
-    "abendua"
+    "abendua",
   ],
   month_stand_alone_abbreviated => [
     "urt.",
@@ -186,7 +191,7 @@
     "ira.",
     "urr.",
     "aza.",
-    "abe."
+    "abe.",
   ],
   month_stand_alone_narrow => [
     "U",
@@ -200,7 +205,7 @@
     "I",
     "U",
     "A",
-    "A"
+    "A",
   ],
   month_stand_alone_wide => [
     "urtarrila",
@@ -214,7 +219,7 @@
     "Iraila",
     "Urria",
     "Azaroa",
-    "Abendua"
+    "Abendua",
   ],
   name => "Basque Spain",
   native_language => "euskara",
@@ -226,37 +231,37 @@
     "1Hh",
     "2Hh",
     "3Hh",
-    "4Hh"
+    "4Hh",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "1. hiruhilekoa",
     "2. hiruhilekoa",
     "3. hiruhilekoa",
-    "4. hiruhilekoa"
+    "4. hiruhilekoa",
   ],
   quarter_stand_alone_abbreviated => [
     "1Hh",
     "2Hh",
     "3Hh",
-    "4Hh"
+    "4Hh",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "1. hiruhilekoa",
     "2. hiruhilekoa",
     "3. hiruhilekoa",
-    "4. hiruhilekoa"
+    "4. hiruhilekoa",
   ],
   script => undef,
   territory => "Spain",
@@ -265,5 +270,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

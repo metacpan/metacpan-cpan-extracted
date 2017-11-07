@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "Zdat azal",
-    "\N{U+1e0c}effir aza"
+    "\N{U+1e0c}effir aza",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d, E",
@@ -45,7 +50,7 @@
     yMd => "y-MM-dd",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "tzm",
   date_format_full => "EEEE, d MMMM y",
@@ -63,7 +68,7 @@
     "Akw",
     "Asm",
     "As\N{U+1e0d}",
-    "Asa"
+    "Asa",
   ],
   day_format_narrow => [
     "A",
@@ -72,7 +77,7 @@
     "A",
     "A",
     "A",
-    "A"
+    "A",
   ],
   day_format_wide => [
     "Aynas",
@@ -81,7 +86,7 @@
     "Akwas",
     "Asimwas",
     "Asi\N{U+1e0d}yas",
-    "Asamas"
+    "Asamas",
   ],
   day_stand_alone_abbreviated => [
     "Ayn",
@@ -90,7 +95,7 @@
     "Akw",
     "Asm",
     "As\N{U+1e0d}",
-    "Asa"
+    "Asa",
   ],
   day_stand_alone_narrow => [
     "A",
@@ -99,7 +104,7 @@
     "A",
     "A",
     "A",
-    "A"
+    "A",
   ],
   day_stand_alone_wide => [
     "Aynas",
@@ -108,19 +113,19 @@
     "Akwas",
     "Asimwas",
     "Asi\N{U+1e0d}yas",
-    "Asamas"
+    "Asamas",
   ],
   era_abbreviated => [
     "Z\N{U+0190}",
-    "\N{U+1e0c}\N{U+0190}"
+    "\N{U+1e0c}\N{U+0190}",
   ],
   era_narrow => [
     "Z\N{U+0190}",
-    "\N{U+1e0c}\N{U+0190}"
+    "\N{U+1e0c}\N{U+0190}",
   ],
   era_wide => [
     "Zdat \N{U+0190}isa (TA\N{U+0194})",
-    "\N{U+1e0c}effir \N{U+0190}isa (TA\N{U+0194})"
+    "\N{U+1e0c}effir \N{U+0190}isa (TA\N{U+0194})",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -141,7 +146,7 @@
     "Cut",
     "K\N{U+1e6d}u",
     "Nwa",
-    "Duj"
+    "Duj",
   ],
   month_format_narrow => [
     "Y",
@@ -155,7 +160,7 @@
     "C",
     "K",
     "N",
-    "D"
+    "D",
   ],
   month_format_wide => [
     "Yennayer",
@@ -169,7 +174,7 @@
     "Cutanbir",
     "K\N{U+1e6d}uber",
     "Nwanbir",
-    "Dujanbir"
+    "Dujanbir",
   ],
   month_stand_alone_abbreviated => [
     "Yen",
@@ -183,7 +188,7 @@
     "Cut",
     "K\N{U+1e6d}u",
     "Nwa",
-    "Duj"
+    "Duj",
   ],
   month_stand_alone_narrow => [
     "Y",
@@ -197,7 +202,7 @@
     "C",
     "K",
     "N",
-    "D"
+    "D",
   ],
   month_stand_alone_wide => [
     "Yennayer",
@@ -211,7 +216,7 @@
     "Cutanbir",
     "K\N{U+1e6d}uber",
     "Nwanbir",
-    "Dujanbir"
+    "Dujanbir",
   ],
   name => "Central Atlas Tamazight",
   native_language => "Tamazi\N{U+0263}t n la\N{U+1e6d}la\N{U+1e63}",
@@ -223,37 +228,37 @@
     "IA1",
     "IA2",
     "IA3",
-    "IA4"
+    "IA4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "Imir adamsan 1",
     "Imir adamsan 2",
     "Imir adamsan 3",
-    "Imir adamsan 4"
+    "Imir adamsan 4",
   ],
   quarter_stand_alone_abbreviated => [
     "IA1",
     "IA2",
     "IA3",
-    "IA4"
+    "IA4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "Imir adamsan 1",
     "Imir adamsan 2",
     "Imir adamsan 3",
-    "Imir adamsan 4"
+    "Imir adamsan 4",
   ],
   script => undef,
   territory => undef,
@@ -262,5 +267,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

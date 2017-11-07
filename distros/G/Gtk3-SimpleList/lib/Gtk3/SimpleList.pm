@@ -11,7 +11,7 @@ use Gtk3;
 
 our @ISA = 'Gtk3::TreeView';
 
-our $VERSION = '0.15';
+our $VERSION = '0.17';
 
 our %column_types = (
   'hidden' => {type=>'Glib::String',                                        attr=>'hidden'},

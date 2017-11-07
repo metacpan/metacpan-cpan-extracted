@@ -39,7 +39,7 @@ use LWP::UserAgent;
 use HTTP::Request::Common;
 use HTML::TableExtract;
 
-our $VERSION = '1.38'; # VERSION
+our $VERSION = '1.43'; # VERSION
 
 # URLs of where to obtain information
 
@@ -98,7 +98,7 @@ sub tsp {
 	$ua = $quoter->user_agent;
 	$reply = $ua->request(GET $TSP_URL);
 	return unless ($reply->is_success);
-	$te = new HTML::TableExtract( headers =>
+	$te = HTML::TableExtract->new( headers =>
 		["Date", values %TSP_FUND_COLUMNS] );
 
 	$te->parse($reply->content);

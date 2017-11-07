@@ -7,25 +7,10 @@ examples/ExampleDB-1-inheritance.dot
 examples/ExampleDB-1-inheritance.html
 examples/ExampleDB-1-inheritance.png
 examples/ExampleDB-1.html
-inc/Module/AutoInstall.pm
-inc/Module/Install.pm
-inc/Module/Install/AutoInstall.pm
-inc/Module/Install/Base.pm
-inc/Module/Install/Can.pm
-inc/Module/Install/ExtraTests.pm
-inc/Module/Install/Fetch.pm
-inc/Module/Install/Include.pm
-inc/Module/Install/Makefile.pm
-inc/Module/Install/Metadata.pm
-inc/Module/Install/Scripts.pm
-inc/Module/Install/Share.pm
-inc/Module/Install/Win32.pm
-inc/Module/Install/WriteAll.pm
 lib/DBICx/AutoDoc.pm
 lib/DBICx/AutoDoc/Magic.pm
 Makefile.PL
 MANIFEST			This list of files
-META.yml
 README
 t/01app.t
 t/lib/ExampleDB.pm
@@ -57,3 +42,5 @@ templates/unique_constraints_table.tt2
 update-examples
 xt/author/pod-coverage.t
 xt/author/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

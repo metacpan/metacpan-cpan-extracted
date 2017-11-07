@@ -34,13 +34,14 @@
 //
 // A 'target' is an object representing a user-interface element. Targets
 // can currently be one of the following types:
-// - dmenu
-// - dform
 // - daction
 // - dbrowser
+// - dcallback
+// - dform
+// - dmenu
 // - dnotice
-// - dtable
 // - drowselect
+// - dtable
 //
 // Each target must have a unique name. The object exported by this module
 // provides methods for storing and retrieving targets.

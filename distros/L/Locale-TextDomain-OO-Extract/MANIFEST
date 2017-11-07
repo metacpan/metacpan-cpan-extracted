@@ -18,6 +18,7 @@ example/13_extract_js.pl
 example/14_extract_html.pl
 example/15_extract_yaml.pl
 example/21_process_utf-8.pl
+example/22_process_extended_skip_utf-8.pl
 example/files_to_extract/babelfish_loc.pl
 example/files_to_extract/babelfish_loc.tt
 example/files_to_extract/babelfish_loc.yml
@@ -65,6 +66,7 @@ t/13_extract_js.t
 t/14_extract_html.t
 t/15_extract_yaml.t
 t/21_process_utf-8.t
+t/22_process_extended_skip_utf-8.t
 t/31_test_examples_utf-8.t
 t/chars.t
 t/files_to_extract/babelfish_loc.pl

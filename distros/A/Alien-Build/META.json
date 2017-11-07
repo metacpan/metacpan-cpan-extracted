@@ -91,7 +91,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "1.28",
+   "version" : "1.32",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "Diab Jerius (DJERIUS)",
@@ -118,6 +118,6 @@
       "Jos\u00e9 Joaqu\u00edn Atria (JJATRIA)",
       "Duke Leto (LETO)"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

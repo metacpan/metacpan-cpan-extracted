@@ -228,6 +228,57 @@ subtest(
                 );
             }
         );
+
+        subtest(
+            'get all fields with "*"' => sub {
+                my $tmp_rights = $app->add_tmp_rights('view_secret');
+
+                $TestQuery::DATA = [
+                    {
+                        id        => 1,
+                        parent_id => 2,
+                        caption   => 'caption 1 en',
+                        secret    => 's3cret1',
+                        fix_db    => 10,
+                    },
+                    {
+                        id        => 2,
+                        parent_id => 1,
+                        caption   => 'caption 2 en',
+                        secret    => 's3cret2',
+                        fix_db    => 20,
+                    },
+                ];
+
+                cmp_deeply(
+                    $app->test_model->get_all(fields => ['*']),
+                    [
+                        {
+                            id          => 1,
+                            parent_id   => 2,
+                            caption     => 'caption 1 en',
+                            view_id     => "id: 1, parent_id: 2",
+                            parent      => 'PARENT 2',
+                            reverse     => '1terc3s',
+                            fix_db      => 100,
+                            secret      => 's3cret1',
+                            view_secret => 's3cret1',
+                        },
+                        {
+                            id          => 2,
+                            parent_id   => 1,
+                            caption     => 'caption 2 en',
+                            view_id     => "id: 2, parent_id: 1",
+                            parent      => 'PARENT 1',
+                            reverse     => '2terc3s',
+                            fix_db      => 200,
+                            secret      => 's3cret2',
+                            view_secret => 's3cret2',
+                        },
+                    ]
+                );
+            }
+        );
     }
 );
 

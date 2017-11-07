@@ -22,6 +22,12 @@ test_all_dependents(
         filter => sub {
 
             # Fails tests for reasons unrelated to DateTime-Locale
+            return 0 if $_[0] eq 'CatalystX-I18N';
+
+            # Seems to hang when running under this harness for some reason
+            return 0 if $_[0] eq 'HTML-FormFu';
+
+            # Fails tests for reasons unrelated to DateTime-Locale
             return 0 if $_[0] =~ /Jifty/;
 
             # Is having issues with installing its Pg schema

@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "AN",
-    "EW"
+    "EW",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d, E",
@@ -45,7 +50,7 @@
     yMd => "y/M/d",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "ak-GH",
   date_format_full => "EEEE, y MMMM dd",
@@ -63,7 +68,7 @@
     "Yaw",
     "Fia",
     "Mem",
-    "Kwe"
+    "Kwe",
   ],
   day_format_narrow => [
     "D",
@@ -72,7 +77,7 @@
     "Y",
     "F",
     "M",
-    "K"
+    "K",
   ],
   day_format_wide => [
     "Dwowda",
@@ -81,7 +86,7 @@
     "Yawda",
     "Fida",
     "Memeneda",
-    "Kwesida"
+    "Kwesida",
   ],
   day_stand_alone_abbreviated => [
     "Dwo",
@@ -90,7 +95,7 @@
     "Yaw",
     "Fia",
     "Mem",
-    "Kwe"
+    "Kwe",
   ],
   day_stand_alone_narrow => [
     "D",
@@ -99,7 +104,7 @@
     "Y",
     "F",
     "M",
-    "K"
+    "K",
   ],
   day_stand_alone_wide => [
     "Dwowda",
@@ -108,19 +113,19 @@
     "Yawda",
     "Fida",
     "Memeneda",
-    "Kwesida"
+    "Kwesida",
   ],
   era_abbreviated => [
     "AK",
-    "KE"
+    "KE",
   ],
   era_narrow => [
     "AK",
-    "KE"
+    "KE",
   ],
   era_wide => [
     "Ansa Kristo",
-    "Kristo Ekyiri"
+    "Kristo Ekyiri",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -141,7 +146,7 @@
     "F-\N{U+0190}",
     "\N{U+0186}-A",
     "\N{U+0186}-O",
-    "M-\N{U+0186}"
+    "M-\N{U+0186}",
   ],
   month_format_narrow => [
     1,
@@ -155,7 +160,7 @@
     9,
     10,
     11,
-    12
+    12,
   ],
   month_format_wide => [
     "Sanda-\N{U+0186}p\N{U+025b}p\N{U+0254}n",
@@ -169,7 +174,7 @@
     "Fankwa-\N{U+0190}b\N{U+0254}",
     "\N{U+0186}b\N{U+025b}s\N{U+025b}-Ahinime",
     "\N{U+0186}ber\N{U+025b}f\N{U+025b}w-Obubuo",
-    "Mumu-\N{U+0186}p\N{U+025b}nimba"
+    "Mumu-\N{U+0186}p\N{U+025b}nimba",
   ],
   month_stand_alone_abbreviated => [
     "S-\N{U+0186}",
@@ -183,7 +188,7 @@
     "F-\N{U+0190}",
     "\N{U+0186}-A",
     "\N{U+0186}-O",
-    "M-\N{U+0186}"
+    "M-\N{U+0186}",
   ],
   month_stand_alone_narrow => [
     1,
@@ -197,7 +202,7 @@
     9,
     10,
     11,
-    12
+    12,
   ],
   month_stand_alone_wide => [
     "Sanda-\N{U+0186}p\N{U+025b}p\N{U+0254}n",
@@ -211,7 +216,7 @@
     "Fankwa-\N{U+0190}b\N{U+0254}",
     "\N{U+0186}b\N{U+025b}s\N{U+025b}-Ahinime",
     "\N{U+0186}ber\N{U+025b}f\N{U+025b}w-Obubuo",
-    "Mumu-\N{U+0186}p\N{U+025b}nimba"
+    "Mumu-\N{U+0186}p\N{U+025b}nimba",
   ],
   name => "Akan Ghana",
   native_language => "Akan",
@@ -223,37 +228,37 @@
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_stand_alone_abbreviated => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   script => undef,
   territory => "Ghana",
@@ -262,5 +267,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 31
+  version => 32,
 }

@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "a.",
-    "p."
+    "p.",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d E",
@@ -46,7 +51,7 @@
     yMd => "y-MM-dd",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "fur",
   date_format_full => "EEEE d 'di' MMMM 'dal' y",
@@ -64,7 +69,7 @@
     "joi",
     "vin",
     "sab",
-    "dom"
+    "dom",
   ],
   day_format_narrow => [
     "L",
@@ -73,7 +78,7 @@
     "J",
     "V",
     "S",
-    "D"
+    "D",
   ],
   day_format_wide => [
     "lunis",
@@ -82,7 +87,7 @@
     "joibe",
     "vinars",
     "sabide",
-    "domenie"
+    "domenie",
   ],
   day_stand_alone_abbreviated => [
     "lun",
@@ -91,7 +96,7 @@
     "joi",
     "vin",
     "sab",
-    "dom"
+    "dom",
   ],
   day_stand_alone_narrow => [
     "L",
@@ -100,7 +105,7 @@
     "J",
     "V",
     "S",
-    "D"
+    "D",
   ],
   day_stand_alone_wide => [
     "lunis",
@@ -109,19 +114,19 @@
     "joibe",
     "vinars",
     "sabide",
-    "domenie"
+    "domenie",
   ],
   era_abbreviated => [
     "pdC",
-    "ddC"
+    "ddC",
   ],
   era_narrow => [
     "pdC",
-    "ddC"
+    "ddC",
   ],
   era_wide => [
     "pdC",
-    "ddC"
+    "ddC",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -142,7 +147,7 @@
     "Set",
     "Otu",
     "Nov",
-    "Dic"
+    "Dic",
   ],
   month_format_narrow => [
     "Z",
@@ -156,7 +161,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_format_wide => [
     "Zen\N{U+00e2}r",
@@ -170,7 +175,7 @@
     "Setembar",
     "Otubar",
     "Novembar",
-    "Dicembar"
+    "Dicembar",
   ],
   month_stand_alone_abbreviated => [
     "Zen",
@@ -184,7 +189,7 @@
     "Set",
     "Otu",
     "Nov",
-    "Dic"
+    "Dic",
   ],
   month_stand_alone_narrow => [
     "Z",
@@ -198,7 +203,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_stand_alone_wide => [
     "Zen\N{U+00e2}r",
@@ -212,7 +217,7 @@
     "Setembar",
     "Otubar",
     "Novembar",
-    "Dicembar"
+    "Dicembar",
   ],
   name => "Friulian",
   native_language => "furlan",
@@ -224,37 +229,37 @@
     "T1",
     "T2",
     "T3",
-    "T4"
+    "T4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "Prin trimestri",
     "Secont trimestri",
     "Tier\N{U+00e7} trimestri",
-    "Cuart trimestri"
+    "Cuart trimestri",
   ],
   quarter_stand_alone_abbreviated => [
     "T1",
     "T2",
     "T3",
-    "T4"
+    "T4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "Prin trimestri",
     "Secont trimestri",
     "Tier\N{U+00e7} trimestri",
-    "Cuart trimestri"
+    "Cuart trimestri",
   ],
   script => undef,
   territory => undef,
@@ -263,5 +268,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

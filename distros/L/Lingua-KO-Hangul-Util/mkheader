@@ -4,7 +4,7 @@
 # used for building XSUB of Lingua::KO::Hangul::Util
 #
 # Usage:
-#    <do 'mkheader'> in perl, or <perl mkheader> in command line
+#    <do './mkheader'> in perl, or <perl mkheader> in command line
 #
 # Input: nothing
 # Output: "lkhutmp.h"

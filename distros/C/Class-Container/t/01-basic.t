@@ -12,7 +12,7 @@ use Test;
 use Class::Container;
 use Params::Validate qw(:types);
 use File::Spec;
-require File::Spec->catfile('t', 'classes.pl');
+require File::Spec->rel2abs(File::Spec->catfile('t', 'classes.pl'));
 
 my $HAVE_WEAKEN = 0 + exists $INC{'Scalar/Util.pm'};
 

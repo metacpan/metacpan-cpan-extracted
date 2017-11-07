@@ -5,7 +5,7 @@ use Carp qw/croak confess carp/;
 
 BEGIN {
   $Math::Prime::Util::GMP::AUTHORITY = 'cpan:DANAJ';
-  $Math::Prime::Util::GMP::VERSION = '0.46';
+  $Math::Prime::Util::GMP::VERSION = '0.48';
 }
 
 # parent is cleaner, and in the Perl 5.10.1 / 5.12.0 core, but not earlier.
@@ -65,11 +65,11 @@ our @EXPORT_OK = qw(
                      prime_count
                      primorial
                      pn_primorial
-                     factorial
+                     factorial factorialmod
                      consecutive_integer_lcm
                      partitions bernfrac bernreal harmfrac harmreal stirling
                      zeta riemannr lambertw
-                     gcd lcm kronecker valuation binomial gcdext
+                     gcd lcm kronecker valuation binomial gcdext hammingweight
                      invmod sqrtmod addmod mulmod divmod powmod
                      vecsum vecprod
                      exp_mangoldt
@@ -77,9 +77,11 @@ our @EXPORT_OK = qw(
                      totient
                      jordan_totient
                      carmichael_lambda
-                     sqrtint rootint
-                     is_power is_prime_power is_semiprime
+                     sqrtint rootint logint
+                     is_power is_prime_power is_semiprime is_square
+                     is_carmichael is_fundamental is_totient
                      is_primitive_root
+                     is_polygonal polygonal_nth
                      znorder
                      znprimroot
                      ramanujan_tau
@@ -92,6 +94,7 @@ our @EXPORT_OK = qw(
                      random_shawe_taylor_prime_with_cert
                      seed_csprng is_csprng_well_seeded
                      irand irand64 drand urandomb urandomm urandomr random_bytes
+                     permtonum numtoperm
                    );
                    # Should add:
                    # nth_prime
@@ -186,7 +189,7 @@ __END__
 
 =encoding utf8
 
-=for stopwords Möbius Deléglise Bézout gcdext vecsum vecprod moebius totient liouville znorder znprimroot bernfrac bernreal harmfrac harmreal stirling zeta riemannr lambertw lucasu lucasv OpenPFGW gmpy2 nonresidue chinese tuplets sqrtmod addmod mulmod powmod divmod superset sqrtint rootint todigits urandomb urandomr
+=for stopwords Möbius Deléglise Bézout s-gonal gcdext vecsum vecprod moebius totient liouville znorder znprimroot bernfrac bernreal harmfrac harmreal stirling zeta riemannr lambertw lucasu lucasv OpenPFGW gmpy2 nonresidue chinese tuplets sqrtmod addmod mulmod powmod divmod superset sqrtint rootint logint todigits urandomb urandomr
 
 =head1 NAME
 
@@ -195,7 +198,7 @@ Math::Prime::Util::GMP - Utilities related to prime numbers and factoring, using
 
 =head1 VERSION
 
-Version 0.46
+Version 0.48
 
 
 =head1 SYNOPSIS
@@ -1066,6 +1069,12 @@ defined as the product of the integers 1 to C<n> with the special case
 of C<factorial(0) = 1>.  This corresponds to Pari's C<factorial(n)>
 and Mathematica's C<Factorial[n]> functions.
 
+=head2 factorialmod
+
+Given two positive integer arguments C<n> and C<m>, returns C<n! mod m>.
+This is much faster than computing the large C<factorial(n)> followed
+by a mod operation.
+
 =head2 gcd
 
 Given a list of integers, returns the greatest common divisor.  This is
@@ -1249,6 +1258,38 @@ A semiprime is the product of exactly two primes.
 The boolean result is the same as C<scalar(factor(n)) == 2>, but this
 function performs shortcuts that can greatly speed up the operation.
 
+=head2 is_carmichael
+
+Given a positive integer C<n>, returns 1 if C<n> is a Carmichael number,
+0 otherwise.
+These are composites that satisfy C<b^(n-1) ≡ 1 mod n> for all
+C<1 E<lt> b E<lt> n> relatively prime to C<n>.
+Alternately Korselt's theorem says these are composites such that C<n> is
+square-free and C<p-1> divides C<n-1> for all prime divisors C<p> of C<n>.
+
+Inputs greater than 50 digits use a probabilistic test to avoid fully
+factoring the input.
+
+=head2 is_fundamental
+
+Given a positive integer C<n>, returns 1 if C<n> is a fundamental
+discriminant, 0 otherwise.
+
+=head2 is_totient
+
+Given an integer C<n>, returns 1 if there exists an integer C<x> where
+C<euler_phi(x) == n>.
+
+=head2 is_polygonal
+
+Given integers C<x> and C<s>, return 1 if x is an s-gonal number, 0 otherwise.
+C<s> must be greater than 2.
+
+=head2 polygonal_nth
+
+Given integers C<x> and C<s>, return N if C<x> is the C<N-th> s-gonal number,
+0 otherwise.
+
 
 =head2 sigma
 
@@ -1284,6 +1325,13 @@ by C<k>.  This is a very limited version of the algebraic valuation meaning,
 just applied to integers.
 This corresponds to Pari's C<valuation> function.
 C<0> is returned if C<n> or C<k> is one of the values C<-1>, C<0>, or C<1>.
+
+=head2 hammingweight
+
+Given an integer C<n>, returns the binary Hamming weight of C<abs(n)>.  This
+is also called the population count, and is the number of 1s in the binary
+representation.  This corresponds to Pari's C<hammingweight> function for
+C<t_INT> arguments.
 
 =head2 moebius
 
@@ -1383,6 +1431,24 @@ but not practical for producing the partition I<number> for values
 over 100 or so.
 
 
+=head2 numtoperm
+
+  @p = numtoperm(10,654321);  # @p=(1,8,2,7,6,5,3,4,9,0)
+
+Given a non-negative integer C<n> and integer C<k>, return the
+rank C<k> lexicographic permutation of C<n> elements.
+C<k> will be interpreted as mod C<n!>.
+
+=head2 permtonum
+
+  $k = permtonum([1,8,2,7,6,5,3,4,9,0]);  # $k = 654321
+
+Given an array reference containing integers from C<0> to C<n>,
+returns the lexicographic permutation rank of the set.  This is
+the inverse of the L</numtoperm> function.  All integers up to
+C<n> must be present.  The result will be between C<0> and C<n!-1>.
+
+
 =head2 Pi
 
 Takes a positive integer argument C<n> and returns the constant Pi with that
@@ -1463,6 +1529,13 @@ and 0 otherwise.  For example, if C<k=2> then this detects perfect squares.
 This corresponds to Pari/GP's C<ispower> function, with the limitations of
 only integer arguments and no third argument may be given to return the root.
 
+=head2 is_square
+
+Given a positive integer C<n>, returns 1 if C<n> is a perfect square,
+0 otherwise.  This is identical to C<is_power(n,2)>.
+
+This corresponds to Pari/GP's C<issquare> function.
+
 =head2 is_prime_power
 
 Given an integer input C<n>, returns C<k> if C<n = p^k> for some prime p,
@@ -1483,6 +1556,12 @@ of C<n>.
 
 This corresponds to Pari/GP's C<sqrtnint> function.
 
+=head2 logint
+
+Given C<n> and C<b>, returns the integer base-C<b> logarithm of C<n>.
+This is the largest integer C<e> such that C<b^e E<lt>= n>.
+
+This corresponds to Pari/GP's C<logint> function.
 
 =head2 factor
 
@@ -1811,7 +1890,7 @@ Returns a random 32-bit integer using the CSPRNG.
 Performance is similar to
 L<Math::Random::MTwist/rand> and L<Math::Random::Xorshift>.
 It is somewhat faster than casting system C<rand> to a 32-bit int.
-It is noticibly faster than
+It is noticeably faster than
 L<Math::Random::ISAAC>,
 L<Math::Random::ISAAC::XS>,
 L<Math::Random::MT>,
@@ -1871,7 +1950,7 @@ random data from the CSPRNG.  Performance for getting 256 byte strings:
 
 Each of the CSPRNG modules should be high quality.  There are no known
 flaws in any of ISAAC, AES CTR, ChaCha20, or Fortuna.  The industry
-seems to be standardizing onChaCha20 (e.g. BSD, Linux, TLS).
+seems to be standardizing on ChaCha20 (e.g. BSD, Linux, TLS).
 
 
 =head1 SEE ALSO

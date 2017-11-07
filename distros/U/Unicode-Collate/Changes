@@ -1,5 +1,18 @@
 Revision history for Perl module Unicode::Collate.
 
+1.21  Sat Nov  4 10:49:19 2017
+    - mklocale: [rt.cpan.org #121664] . removed from @INC (take 2)
+    - DUCET is updated (for Unicode 9.0.0) as Collate/allkeys.txt.
+      * Please notice that allkeys.txt will be overwritten if you have had
+        other allkeys.txt already.
+    - The default UCA_Version is 34.
+    - added tangut.t in t.
+    - Locale/*.pl and CJK/Korean.pm are updated.
+
+1.20  Fri Nov  3 11:50:21 2017
+    - XS: [rt.cpan.org #121664] . removed from @INC
+    - U::C::Locale newly supports locales: dsb, lkt.
+
 1.19  Sat Dec  3 09:32:31 2016
     - U::C::Locale newly supports locales: he, vo.
     - locales updated to CLDR 24: az, haw.

@@ -1,4 +1,15 @@
-Revision history for Perl extension Class::Framework.
+Revision history for Perl extension Class::Container:
+
+0.13  Thu Nov  2 23:53:03 CDT 2017
+
+ - Fix tests failing on Perl 5.26 w/o '.' in @INC [Kent Fredric]
+
+ - A bit of Perl::Critic compliance
+
+ - Convert to Dist::Zilla
+
+ - Convert to git
+
 
 0.12  Sun Jan 23 21:02:35 CST 2005
 

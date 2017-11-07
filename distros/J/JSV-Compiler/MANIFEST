@@ -1,0 +1,14 @@
+lib/JSV/Compiler.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/01_basic.t
+t/02_object-pattern.t
+t/03_object-oneof.t
+t/04_syn-test.t
+t/05_allof.t
+t/06_anyof.t
+t/07_oneof.t
+t/08_not.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,5 +1,5 @@
 package Exception::DB::NoFieldsAvailable;
-$Exception::DB::NoFieldsAvailable::VERSION = '0.022';
+$Exception::DB::NoFieldsAvailable::VERSION = '0.023';
 use base qw(Exception::DB);
 
 =head1 Name
@@ -13,7 +13,7 @@ Base class for DB queries.
 =cut
 
 package QBit::Application::Model::DB::Query;
-$QBit::Application::Model::DB::Query::VERSION = '0.022';
+$QBit::Application::Model::DB::Query::VERSION = '0.023';
 use qbit;
 
 use base qw(QBit::Application::Model::DB::Class);
@@ -674,7 +674,7 @@ sub get_sql_with_data {
     }
 
     unless (%all_fields) {
-        throw Exception::DB::NoFieldsAvailable;
+        throw Exception::DB::NoFieldsAvailable gettext('No fields available');
     }
 
     $sql .= "\n$offset    " . CORE::join(",\n$offset    ", map {@{$all_fields{$_}}} sort keys(%all_fields));

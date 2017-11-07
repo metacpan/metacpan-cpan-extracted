@@ -1,4 +1,22 @@
 
+7.55  2017-11-06
+  - Added -role flag to Mojo::Base. (jberger)
+  - Improved tablify function in Mojo::Util to work with non-rectangular arrays.
+    (CandyAngel, jabberwok)
+  - Improved Windows compatibility of Mojo::Server::Daemon.
+
+7.54  2017-11-05
+  - Fixed a bug in Mojo::Promise where promise chains could not recover from
+    rejections.
+
+7.53  2017-11-04
+  - Added module Mojo::Promise.
+  - Improved Mojo::IOLoop::Delay to be a subclass of Mojo::Promise.
+
+7.52  2017-11-02
+  - Added delete_p, get_p, head_p, options_p, patch_p, post_p, put_p and start_p
+    methods to Mojo::UserAgent.
+
 7.51  2017-10-31
   - Added -signatures flag to Mojo::Base and Mojolicious::Lite.
   - Added support for new HTTP status code.

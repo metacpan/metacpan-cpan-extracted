@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "AM",
-    "PM"
+    "PM",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d, E",
@@ -45,7 +50,7 @@
     yMd => "y-MM-dd",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "nd-ZW",
   date_format_full => "EEEE, d MMMM y",
@@ -63,7 +68,7 @@
     "Sin",
     "Sih",
     "Mgq",
-    "Son"
+    "Son",
   ],
   day_format_narrow => [
     "M",
@@ -72,7 +77,7 @@
     "S",
     "S",
     "M",
-    "S"
+    "S",
   ],
   day_format_wide => [
     "Mvulo",
@@ -81,7 +86,7 @@
     "Sine",
     "Sihlanu",
     "Mgqibelo",
-    "Sonto"
+    "Sonto",
   ],
   day_stand_alone_abbreviated => [
     "Mvu",
@@ -90,7 +95,7 @@
     "Sin",
     "Sih",
     "Mgq",
-    "Son"
+    "Son",
   ],
   day_stand_alone_narrow => [
     "M",
@@ -99,7 +104,7 @@
     "S",
     "S",
     "M",
-    "S"
+    "S",
   ],
   day_stand_alone_wide => [
     "Mvulo",
@@ -108,19 +113,19 @@
     "Sine",
     "Sihlanu",
     "Mgqibelo",
-    "Sonto"
+    "Sonto",
   ],
   era_abbreviated => [
     "BC",
-    "AD"
+    "AD",
   ],
   era_narrow => [
     "BC",
-    "AD"
+    "AD",
   ],
   era_wide => [
     "UKristo angakabuyi",
-    "Ukristo ebuyile"
+    "Ukristo ebuyile",
   ],
   first_day_of_week => 7,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -141,7 +146,7 @@
     "Mpan",
     "Mfu",
     "Lwe",
-    "Mpal"
+    "Mpal",
   ],
   month_format_narrow => [
     "Z",
@@ -155,7 +160,7 @@
     "M",
     "M",
     "L",
-    "M"
+    "M",
   ],
   month_format_wide => [
     "Zibandlela",
@@ -169,7 +174,7 @@
     "Mpandula",
     "Mfumfu",
     "Lwezi",
-    "Mpalakazi"
+    "Mpalakazi",
   ],
   month_stand_alone_abbreviated => [
     "Zib",
@@ -183,7 +188,7 @@
     "Mpan",
     "Mfu",
     "Lwe",
-    "Mpal"
+    "Mpal",
   ],
   month_stand_alone_narrow => [
     "Z",
@@ -197,7 +202,7 @@
     "M",
     "M",
     "L",
-    "M"
+    "M",
   ],
   month_stand_alone_wide => [
     "Zibandlela",
@@ -211,7 +216,7 @@
     "Mpandula",
     "Mfumfu",
     "Lwezi",
-    "Mpalakazi"
+    "Mpalakazi",
   ],
   name => "North Ndebele Zimbabwe",
   native_language => "isiNdebele",
@@ -223,37 +228,37 @@
     "K1",
     "K2",
     "K3",
-    "K4"
+    "K4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "Kota 1",
     "Kota 2",
     "Kota 3",
-    "Kota 4"
+    "Kota 4",
   ],
   quarter_stand_alone_abbreviated => [
     "K1",
     "K2",
     "K3",
-    "K4"
+    "K4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "Kota 1",
     "Kota 2",
     "Kota 3",
-    "Kota 4"
+    "Kota 4",
   ],
   script => undef,
   territory => "Zimbabwe",
@@ -262,5 +267,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

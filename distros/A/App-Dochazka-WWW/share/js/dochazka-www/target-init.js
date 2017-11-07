@@ -41,6 +41,7 @@ define ([
     'app/caches',
     'app/emp-lib',
     'app/daction-init',
+    'app/dcallback-init',
     'app/dform-init',
     'app/dmenu-init',
     'app/dbrowser-init',
@@ -55,6 +56,7 @@ define ([
     appCaches,
     empLib,
     dactionInitRoundOne,
+    dcallbackInitRoundOne,
     dformInitRoundOne,
     dmenuInitRoundOne,
     dbrowserInitRoundOne,
@@ -71,6 +73,7 @@ define ([
         // round one - set up the targets
         console.log("dochazka-www/target-init.js: round one");
         dactionInitRoundOne();
+        dcallbackInitRoundOne();
         dformInitRoundOne();
         dmenuInitRoundOne();
         dbrowserInitRoundOne();
@@ -83,6 +86,7 @@ define ([
         console.log("dochazka-www/target-init.js: round two");
         initRoundTwo('dform');
         initRoundTwo('dmenu');
+        initRoundTwo('dcallback');
         initRoundTwo('dbrowser');
         initRoundTwo('dnotice');
         initRoundTwo('dtable');

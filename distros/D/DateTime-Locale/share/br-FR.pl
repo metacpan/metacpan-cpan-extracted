@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "A.M.",
-    "G.M."
+    "G.M.",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "E d",
@@ -48,11 +53,11 @@
     yMd => "dd/MM/y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-few" => "'week' w 'of' y",
-    "yw-count-many" => "'week' w 'of' y",
-    "yw-count-one" => "'week' w 'of' y",
-    "yw-count-other" => "'week' w 'of' y",
-    "yw-count-two" => "'week' w 'of' y"
+    "yw-count-few" => "'week' w 'of' Y",
+    "yw-count-many" => "'week' w 'of' Y",
+    "yw-count-one" => "'week' w 'of' Y",
+    "yw-count-other" => "'week' w 'of' Y",
+    "yw-count-two" => "'week' w 'of' Y",
   },
   code => "br-FR",
   date_format_full => "y MMMM d, EEEE",
@@ -70,7 +75,7 @@
     "Yaou",
     "Gwe.",
     "Sad.",
-    "Sul"
+    "Sul",
   ],
   day_format_narrow => [
     "L",
@@ -79,7 +84,7 @@
     "Y",
     "G",
     "Sa",
-    "Su"
+    "Su",
   ],
   day_format_wide => [
     "Lun",
@@ -88,7 +93,7 @@
     "Yaou",
     "Gwener",
     "Sadorn",
-    "Sul"
+    "Sul",
   ],
   day_stand_alone_abbreviated => [
     "Lun",
@@ -97,7 +102,7 @@
     "Yaou",
     "Gwe.",
     "Sad.",
-    "Sul"
+    "Sul",
   ],
   day_stand_alone_narrow => [
     "L",
@@ -106,7 +111,7 @@
     "Y",
     "G",
     "Sa",
-    "Su"
+    "Su",
   ],
   day_stand_alone_wide => [
     "Lun",
@@ -115,19 +120,19 @@
     "Yaou",
     "Gwener",
     "Sadorn",
-    "Sul"
+    "Sul",
   ],
   era_abbreviated => [
     "a-raok J.K.",
-    "goude J.K."
+    "goude J.K.",
   ],
   era_narrow => [
     "a-raok J.K.",
-    "goude J.K."
+    "goude J.K.",
   ],
   era_wide => [
     "a-raok Jezuz-Krist",
-    "goude Jezuz-Krist"
+    "goude Jezuz-Krist",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -148,7 +153,7 @@
     "Gwen.",
     "Here",
     "Du",
-    "Kzu."
+    "Kzu.",
   ],
   month_format_narrow => [
     "01",
@@ -162,7 +167,7 @@
     "09",
     10,
     11,
-    12
+    12,
   ],
   month_format_wide => [
     "Genver",
@@ -176,7 +181,7 @@
     "Gwengolo",
     "Here",
     "Du",
-    "Kerzu"
+    "Kerzu",
   ],
   month_stand_alone_abbreviated => [
     "Gen.",
@@ -190,7 +195,7 @@
     "Gwen.",
     "Here",
     "Du",
-    "Ker."
+    "Ker.",
   ],
   month_stand_alone_narrow => [
     "01",
@@ -204,7 +209,7 @@
     "09",
     10,
     11,
-    12
+    12,
   ],
   month_stand_alone_wide => [
     "Genver",
@@ -218,7 +223,7 @@
     "Gwengolo",
     "Here",
     "Du",
-    "Kerzu"
+    "Kerzu",
   ],
   name => "Breton France",
   native_language => "brezhoneg",
@@ -230,37 +235,37 @@
     "1a\N{U+00f1} trim.",
     "2l trim.",
     "3e trim.",
-    "4e trim."
+    "4e trim.",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "1a\N{U+00f1} trimiziad",
     "2l trimiziad",
     "3e trimiziad",
-    "4e trimiziad"
+    "4e trimiziad",
   ],
   quarter_stand_alone_abbreviated => [
     "1a\N{U+00f1} trim.",
     "2l trim.",
     "3e trim.",
-    "4e trim."
+    "4e trim.",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "1a\N{U+00f1} trimiziad",
     "2l trimiziad",
     "3e trimiziad",
-    "4e trimiziad"
+    "4e trimiziad",
   ],
   script => undef,
   territory => "France",
@@ -269,5 +274,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

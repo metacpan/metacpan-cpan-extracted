@@ -193,17 +193,17 @@ Hungarian Hungary locale.
 
 =head3 Abbreviated (format)
 
-  N1
-  N2
-  N3
-  N4
+  I. n.év
+  II. n.év
+  III. n.év
+  IV. n.év
 
 =head3 Narrow (format)
 
-  1.
-  2.
-  3.
-  4.
+  I.
+  II.
+  III.
+  IV.
 
 
 =head3 Wide (stand-alone)
@@ -215,10 +215,10 @@ Hungarian Hungary locale.
 
 =head3 Abbreviated (stand-alone)
 
-  N1
-  N2
-  N3
-  N4
+  1. n.év
+  2. n.év
+  3. n.év
+  4. n.év
 
 =head3 Narrow (stand-alone)
 
@@ -231,7 +231,7 @@ Hungarian Hungary locale.
 
 =head3 Wide (format)
 
-  időszámításunk előtt
+  Krisztus előtt
   időszámításunk szerint
 
 =head3 Abbreviated (format)
@@ -327,11 +327,41 @@ Hungarian Hungary locale.
 
 =head2 Available Formats
 
+=head3 Bh (B h)
+
+   2008-02-05T18:30:30 = B 6
+   1995-12-22T09:05:02 = B 9
+  -0010-09-15T04:44:23 = B 4
+
+=head3 Bhm (B h:mm)
+
+   2008-02-05T18:30:30 = B 6:30
+   1995-12-22T09:05:02 = B 9:05
+  -0010-09-15T04:44:23 = B 4:44
+
+=head3 Bhms (B h:mm:ss)
+
+   2008-02-05T18:30:30 = B 6:30:30
+   1995-12-22T09:05:02 = B 9:05:02
+  -0010-09-15T04:44:23 = B 4:44:23
+
 =head3 E (ccc)
 
    2008-02-05T18:30:30 = K
    1995-12-22T09:05:02 = P
   -0010-09-15T04:44:23 = Szo
+
+=head3 EBhm (E B h:mm)
+
+   2008-02-05T18:30:30 = K B 6:30
+   1995-12-22T09:05:02 = P B 9:05
+  -0010-09-15T04:44:23 = Szo B 4:44
+
+=head3 EBhms (E B h:mm:ss)
+
+   2008-02-05T18:30:30 = K B 6:30:30
+   1995-12-22T09:05:02 = P B 9:05:02
+  -0010-09-15T04:44:23 = Szo B 4:44:23
 
 =head3 EHm (E HH:mm)
 
@@ -495,17 +525,17 @@ Hungarian Hungary locale.
    1995-12-22T09:05:02 = de. 9:05:02
   -0010-09-15T04:44:23 = de. 4:44:23
 
-=head3 hmsv (h:mm:ss a v)
+=head3 hmsv (a h:mm:ss v)
 
-   2008-02-05T18:30:30 = 6:30:30 du. UTC
-   1995-12-22T09:05:02 = 9:05:02 de. UTC
-  -0010-09-15T04:44:23 = 4:44:23 de. UTC
+   2008-02-05T18:30:30 = du. 6:30:30 UTC
+   1995-12-22T09:05:02 = de. 9:05:02 UTC
+  -0010-09-15T04:44:23 = de. 4:44:23 UTC
 
-=head3 hmv (h:mm a v)
+=head3 hmv (a h:mm v)
 
-   2008-02-05T18:30:30 = 6:30 du. UTC
-   1995-12-22T09:05:02 = 9:05 de. UTC
-  -0010-09-15T04:44:23 = 4:44 de. UTC
+   2008-02-05T18:30:30 = du. 6:30 UTC
+   1995-12-22T09:05:02 = de. 9:05 UTC
+  -0010-09-15T04:44:23 = de. 4:44 UTC
 
 =head3 mmss (mm:ss)
 
@@ -569,9 +599,9 @@ Hungarian Hungary locale.
 
 =head3 yQQQ (y. QQQ)
 
-   2008-02-05T18:30:30 = 2008. N1
-   1995-12-22T09:05:02 = 1995. N4
-  -0010-09-15T04:44:23 = -10. N3
+   2008-02-05T18:30:30 = 2008. I. n.év
+   1995-12-22T09:05:02 = 1995. IV. n.év
+  -0010-09-15T04:44:23 = -10. III. n.év
 
 =head3 yQQQQ (y. QQQQ)
 
@@ -579,13 +609,13 @@ Hungarian Hungary locale.
    1995-12-22T09:05:02 = 1995. IV. negyedév
   -0010-09-15T04:44:23 = -10. III. negyedév
 
-=head3 yw-count-one (y w. 'hete')
+=head3 yw-count-one (Y w. 'hete')
 
    2008-02-05T18:30:30 = 2008 6. hete
    1995-12-22T09:05:02 = 1995 51. hete
   -0010-09-15T04:44:23 = -10 37. hete
 
-=head3 yw-count-other (y w. 'hete')
+=head3 yw-count-other (Y w. 'hete')
 
    2008-02-05T18:30:30 = 2008 6. hete
    1995-12-22T09:05:02 = 1995 51. hete

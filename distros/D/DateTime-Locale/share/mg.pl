@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "AM",
-    "PM"
+    "PM",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d, E",
@@ -49,8 +54,8 @@
     yMd => "y-MM-dd",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-one" => "'week' w 'of' y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-one" => "'week' w 'of' Y",
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "mg",
   date_format_full => "EEEE d MMMM y",
@@ -68,7 +73,7 @@
     "Alak",
     "Zom",
     "Asab",
-    "Alah"
+    "Alah",
   ],
   day_format_narrow => [
     "A",
@@ -77,7 +82,7 @@
     "A",
     "Z",
     "A",
-    "A"
+    "A",
   ],
   day_format_wide => [
     "Alatsinainy",
@@ -86,7 +91,7 @@
     "Alakamisy",
     "Zoma",
     "Asabotsy",
-    "Alahady"
+    "Alahady",
   ],
   day_stand_alone_abbreviated => [
     "Alats",
@@ -95,7 +100,7 @@
     "Alak",
     "Zom",
     "Asab",
-    "Alah"
+    "Alah",
   ],
   day_stand_alone_narrow => [
     "A",
@@ -104,7 +109,7 @@
     "A",
     "Z",
     "A",
-    "A"
+    "A",
   ],
   day_stand_alone_wide => [
     "Alatsinainy",
@@ -113,19 +118,19 @@
     "Alakamisy",
     "Zoma",
     "Asabotsy",
-    "Alahady"
+    "Alahady",
   ],
   era_abbreviated => [
     "BC",
-    "AD"
+    "AD",
   ],
   era_narrow => [
     "BC",
-    "AD"
+    "AD",
   ],
   era_wide => [
     "Alohan\N{U+2019}i JK",
-    "Aorian\N{U+2019}i JK"
+    "Aorian\N{U+2019}i JK",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -146,7 +151,7 @@
     "Sep",
     "Okt",
     "Nov",
-    "Des"
+    "Des",
   ],
   month_format_narrow => [
     "J",
@@ -160,7 +165,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_format_wide => [
     "Janoary",
@@ -174,7 +179,7 @@
     "Septambra",
     "Oktobra",
     "Novambra",
-    "Desambra"
+    "Desambra",
   ],
   month_stand_alone_abbreviated => [
     "Jan",
@@ -188,7 +193,7 @@
     "Sep",
     "Okt",
     "Nov",
-    "Des"
+    "Des",
   ],
   month_stand_alone_narrow => [
     "J",
@@ -202,7 +207,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_stand_alone_wide => [
     "Janoary",
@@ -216,7 +221,7 @@
     "Septambra",
     "Oktobra",
     "Novambra",
-    "Desambra"
+    "Desambra",
   ],
   name => "Malagasy",
   native_language => "Malagasy",
@@ -228,37 +233,37 @@
     "T1",
     "T2",
     "T3",
-    "T4"
+    "T4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "Telovolana voalohany",
     "Telovolana faharoa",
     "Telovolana fahatelo",
-    "Telovolana fahefatra"
+    "Telovolana fahefatra",
   ],
   quarter_stand_alone_abbreviated => [
     "T1",
     "T2",
     "T3",
-    "T4"
+    "T4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "Telovolana voalohany",
     "Telovolana faharoa",
     "Telovolana fahatelo",
-    "Telovolana fahefatra"
+    "Telovolana fahefatra",
   ],
   script => undef,
   territory => undef,
@@ -267,5 +272,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

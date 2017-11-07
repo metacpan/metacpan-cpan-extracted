@@ -1,3 +1,9 @@
+Overview of changes in Glib::Object::Introspection 0.044
+========================================================
+
+* perli11ndoc: properly handle callback fields without return value
+∗ interface -> SV: correctly marshal class struct args of functions
+
 Overview of changes in Glib::Object::Introspection 0.043
 ========================================================
 

@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "Muhi",
-    "Chilo"
+    "Chilo",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d, E",
@@ -45,7 +50,7 @@
     yMd => "y-MM-dd",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "kde",
   date_format_full => "EEEE, d MMMM y",
@@ -63,7 +68,7 @@
     "Ll6",
     "Ll7",
     "Ll1",
-    "Ll2"
+    "Ll2",
   ],
   day_format_narrow => [
     3,
@@ -72,7 +77,7 @@
     6,
     7,
     1,
-    2
+    2,
   ],
   day_format_wide => [
     "Liduva lyatatu",
@@ -81,7 +86,7 @@
     "Liduva lyannyano na linji",
     "Liduva lyannyano na mavili",
     "Liduva litandi",
-    "Liduva lyapili"
+    "Liduva lyapili",
   ],
   day_stand_alone_abbreviated => [
     "Ll3",
@@ -90,7 +95,7 @@
     "Ll6",
     "Ll7",
     "Ll1",
-    "Ll2"
+    "Ll2",
   ],
   day_stand_alone_narrow => [
     3,
@@ -99,7 +104,7 @@
     6,
     7,
     1,
-    2
+    2,
   ],
   day_stand_alone_wide => [
     "Liduva lyatatu",
@@ -108,19 +113,19 @@
     "Liduva lyannyano na linji",
     "Liduva lyannyano na mavili",
     "Liduva litandi",
-    "Liduva lyapili"
+    "Liduva lyapili",
   ],
   era_abbreviated => [
     "AY",
-    "NY"
+    "NY",
   ],
   era_narrow => [
     "AY",
-    "NY"
+    "NY",
   ],
   era_wide => [
     "Akanapawa Yesu",
-    "Nankuida Yesu"
+    "Nankuida Yesu",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -141,7 +146,7 @@
     "Sep",
     "Okt",
     "Nov",
-    "Des"
+    "Des",
   ],
   month_format_narrow => [
     "J",
@@ -155,7 +160,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_format_wide => [
     "Mwedi Ntandi",
@@ -169,7 +174,7 @@
     "Mwedi wa Nnyano na Nchechi",
     "Mwedi wa Nnyano na Nnyano",
     "Mwedi wa Nnyano na Nnyano na U",
-    "Mwedi wa Nnyano na Nnyano na M"
+    "Mwedi wa Nnyano na Nnyano na M",
   ],
   month_stand_alone_abbreviated => [
     "Jan",
@@ -183,7 +188,7 @@
     "Sep",
     "Okt",
     "Nov",
-    "Des"
+    "Des",
   ],
   month_stand_alone_narrow => [
     "J",
@@ -197,7 +202,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_stand_alone_wide => [
     "Mwedi Ntandi",
@@ -211,7 +216,7 @@
     "Mwedi wa Nnyano na Nchechi",
     "Mwedi wa Nnyano na Nnyano",
     "Mwedi wa Nnyano na Nnyano na U",
-    "Mwedi wa Nnyano na Nnyano na M"
+    "Mwedi wa Nnyano na Nnyano na M",
   ],
   name => "Makonde",
   native_language => "Chimakonde",
@@ -223,37 +228,37 @@
     "L1",
     "L2",
     "L3",
-    "L4"
+    "L4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "Lobo 1",
     "Lobo 2",
     "Lobo 3",
-    "Lobo 4"
+    "Lobo 4",
   ],
   quarter_stand_alone_abbreviated => [
     "L1",
     "L2",
     "L3",
-    "L4"
+    "L4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "Lobo 1",
     "Lobo 2",
     "Lobo 3",
-    "Lobo 4"
+    "Lobo 4",
   ],
   script => undef,
   territory => undef,
@@ -262,5 +267,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

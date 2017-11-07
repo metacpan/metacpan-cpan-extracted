@@ -63,7 +63,7 @@ EXTRTACT: {
             lexicon_ref       => $extract->lexicon_ref,
             category          => $category,
             domain            => $domain,
-            # project not used here
+            # simple writing means: project not used here
             skip_new_messages => $language eq 'de-at',
         });
     }
@@ -114,7 +114,7 @@ my @content
     "de-at/LC_MESSAGES/example1.po (clean)\n\n",
     $content[1];
 
-# $Id: 21_process_utf-8.pl 685 2017-08-23 05:42:23Z steffenw $
+# $Id: 21_process_utf-8.pl 709 2017-11-03 10:40:26Z steffenw $
 
 __END__
 

@@ -39,7 +39,7 @@
             "Compress::Zlib" : "0",
             "File::HomeDir" : "0",
             "GD::Barcode::QRcode" : "0",
-            "Math::BaseCnv" : "0",
+            "Math::Prime::Util" : "0",
             "Persistence::Object::Simple" : "0"
          }
       },
@@ -50,6 +50,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.006",
+   "version" : "1.007",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

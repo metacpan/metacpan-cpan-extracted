@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "Taparachu",
-    "Ebongi"
+    "Ebongi",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d, E",
@@ -45,7 +50,7 @@
     yMd => "y-MM-dd",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "teo-UG",
   date_format_full => "EEEE, d MMMM y",
@@ -63,7 +68,7 @@
     "Ung",
     "Kan",
     "Sab",
-    "Jum"
+    "Jum",
   ],
   day_format_narrow => [
     "B",
@@ -72,7 +77,7 @@
     "U",
     "K",
     "S",
-    "J"
+    "J",
   ],
   day_format_wide => [
     "Nakaebarasa",
@@ -81,7 +86,7 @@
     "Nakaung\N{U+2019}on",
     "Nakakany",
     "Nakasabiti",
-    "Nakaejuma"
+    "Nakaejuma",
   ],
   day_stand_alone_abbreviated => [
     "Bar",
@@ -90,7 +95,7 @@
     "Ung",
     "Kan",
     "Sab",
-    "Jum"
+    "Jum",
   ],
   day_stand_alone_narrow => [
     "B",
@@ -99,7 +104,7 @@
     "U",
     "K",
     "S",
-    "J"
+    "J",
   ],
   day_stand_alone_wide => [
     "Nakaebarasa",
@@ -108,19 +113,19 @@
     "Nakaung\N{U+2019}on",
     "Nakakany",
     "Nakasabiti",
-    "Nakaejuma"
+    "Nakaejuma",
   ],
   era_abbreviated => [
     "KK",
-    "BK"
+    "BK",
   ],
   era_narrow => [
     "KK",
-    "BK"
+    "BK",
   ],
   era_wide => [
     "Kabla ya Christo",
-    "Baada ya Christo"
+    "Baada ya Christo",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -141,7 +146,7 @@
     "Sok",
     "Tib",
     "Lab",
-    "Poo"
+    "Poo",
   ],
   month_format_narrow => [
     "R",
@@ -155,7 +160,7 @@
     "S",
     "T",
     "L",
-    "P"
+    "P",
   ],
   month_format_wide => [
     "Orara",
@@ -169,7 +174,7 @@
     "Osokosokoma",
     "Otibar",
     "Olabor",
-    "Opoo"
+    "Opoo",
   ],
   month_stand_alone_abbreviated => [
     "Rar",
@@ -183,7 +188,7 @@
     "Sok",
     "Tib",
     "Lab",
-    "Poo"
+    "Poo",
   ],
   month_stand_alone_narrow => [
     "R",
@@ -197,7 +202,7 @@
     "S",
     "T",
     "L",
-    "P"
+    "P",
   ],
   month_stand_alone_wide => [
     "Orara",
@@ -211,7 +216,7 @@
     "Osokosokoma",
     "Otibar",
     "Olabor",
-    "Opoo"
+    "Opoo",
   ],
   name => "Teso Uganda",
   native_language => "Kiteso",
@@ -223,37 +228,37 @@
     "K1",
     "K2",
     "K3",
-    "K4"
+    "K4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "Akwota abe",
     "Akwota Aane",
     "Akwota auni",
-    "Akwota Aung\N{U+2019}on"
+    "Akwota Aung\N{U+2019}on",
   ],
   quarter_stand_alone_abbreviated => [
     "K1",
     "K2",
     "K3",
-    "K4"
+    "K4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "Akwota abe",
     "Akwota Aane",
     "Akwota auni",
-    "Akwota Aung\N{U+2019}on"
+    "Akwota Aung\N{U+2019}on",
   ],
   script => undef,
   territory => "Uganda",
@@ -262,5 +267,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

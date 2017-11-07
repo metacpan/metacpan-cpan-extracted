@@ -1,5 +1,6 @@
 package Device::Network::ConfigParser::Cisco::ASA;
 # ABSTRACT: Parse Cisco ASA Configuration
+our $VERSION = '0.005'; # VERSION
 
 use 5.006;
 use strict;
@@ -13,6 +14,49 @@ use Exporter qw{import};
 
 our @EXPORT_OK = qw{get_parser get_output_drivers parse_config post_process};
 
+=head1 NAME
+
+Device::Network::ConfigParser::Cisco::ASA - parse Cisco ASA configuration.
+
+=head1 VERSION
+
+version 0.005
+
+=head1 SYNOPSIS
+
+This module is intended to be used in conjunction with L<Device::Network::ConfigParser>, however there's nothing stopping it being used on its own.
+
+The module provides subroutines to parse & post-process Cisco ASA configuration, and output the structured data in a number of formats.
+
+=head1 SUBROUTINES
+
+=head2 get_parser
+
+For more information on the subroutine, see L<Device::Network::ConfigParser/"get_parser">.
+
+This module currently recognised the following parts of Cisco ASA configuration:
+
+=over 4
+
+=item * Hostname and domain name
+
+=item * Name aliases
+
+=item * Routes
+
+=item * Access lists
+
+=item * NATs
+
+=item * Objects
+
+=item * Object groups
+
+Any other lines within the file are classified as 'unrecognised'.
+
+=back
+
+=cut
 
 sub get_parser {
     return new Parse::RecDescent(q{
@@ -27,7 +71,7 @@ sub get_parser {
             nat { $item[1] } |
             object { $item[1] } |
             object_group { $item[1] } |
-            not_config { $item[1] }
+            unrecognised { $item[1] }
 
             hostname: 'hostname' m{\w+} { { type => $item{__RULE__}, config => $item{__PATTERN1__} } }
             domain_name: 'domain-name' m{\S+} { 
@@ -174,12 +218,17 @@ sub get_parser {
 
         alias_or_ipv4: name_alias { $item[1] } | ipv4 { $item[1] }
 
-        not_config: m{\N+}i { 
+        unrecognised: m{\N+} { 
             { type => $item[0], config => $item[1] } 
         }
     });
 }
 
+=head2 parse_config
+
+For more information on the subroutine, see L<Device::Network::ConfigParser/"parse_config">.
+
+=cut
 
 sub parse_config {
     my ($parser, $config_contents) = @_;
@@ -192,7 +241,36 @@ sub parse_config {
     return $parse_tree;
 }
 
+=head2 post_process
 
+For more information on the subroutine, see L<Device::Network::ConfigParser/"post_process">.
+
+This module does not post-process the data structure.
+
+
+=cut
+
+sub post_process {
+    my ($parsed_config) = @_;
+
+    return $parsed_config;
+}
+
+=head2 get_output_drivers
+
+For more information on the subroutine, see L<Device::Network::ConfigParser/"get_output_drivers">.
+
+This module supports the following output drivers:
+
+=over 4
+
+=item * csv - writes the parsed configuration out in CSV format.
+
+=item * json - writes the parsed configuration out as JSON.
+
+=back
+
+=cut
 
 sub get_output_drivers {
     return { 
@@ -202,13 +280,9 @@ sub get_output_drivers {
 }
 
 
-sub post_process {
-    my ($parsed_config) = @_;
+=head2 csv_output_driver
 
-    return $parsed_config;
-}
-
-
+=cut
 
 sub csv_output_driver {
     my ($fh, $filename, $parsed_config) = @_;
@@ -280,55 +354,15 @@ sub _csv_not_config_driver {
 
 
 
+=head2 json_output_driver
+
+=cut
 
 sub json_output_driver {
     my ($fh, $filename, $parsed_config) = @_;
 
     print encode_json($parsed_config);
 }
-
-
-1; # End of Device::CheckPoint::ConfigParse
-
-__END__
-
-=pod
-
-=encoding UTF-8
-
-=head1 NAME
-
-Device::Network::ConfigParser::Cisco::ASA - Parse Cisco ASA Configuration
-
-=head1 VERSION
-
-version 0.004
-
-=head1 SYNOPSIS
-
-=head1 NAME
-
-Device::Network::ConfigParser::Cisco::ASA
-
-=head1 VERSION
-
-# VERSION
-
-=head1 SUBROUTINES
-
-=head2 get_parser
-
-=head2 parse_config
-
-=head2 get_output_drivers
-
-Returns a hash of the output driver subs keyed on the --output command line argument
-
-=head2 post_process
-
-=head2 csv_output_driver
-
-=head2 json_output_driver
 
 =head1 AUTHOR
 
@@ -340,11 +374,15 @@ Please report any bugs or feature requests to C<bug-device-checkpoint-configpars
 the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Device-CheckPoint-ConfigParse>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
+
+
+
 =head1 SUPPORT
 
 You can find documentation for this module with the perldoc command.
 
     perldoc Device::CheckPoint::ConfigParse
+
 
 You can also look for information at:
 
@@ -368,7 +406,9 @@ L<http://search.cpan.org/dist/Device-CheckPoint-ConfigParse/>
 
 =back
 
+
 =head1 ACKNOWLEDGEMENTS
+
 
 =head1 LICENSE AND COPYRIGHT
 
@@ -410,15 +450,7 @@ CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
 CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
 EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-=head1 AUTHOR
-
-Greg Foletta <greg@foletta.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2017 by Greg Foletta.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut
+
+1; # End of Device::CheckPoint::ConfigParse

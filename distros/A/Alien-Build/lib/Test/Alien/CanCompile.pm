@@ -5,7 +5,7 @@ use warnings;
 use base 'Test2::Require';
 
 # ABSTRACT: Skip a test file unless a C compiler is available
-our $VERSION = '1.28'; # VERSION
+our $VERSION = '1.32'; # VERSION
 
 
 sub skip
@@ -28,7 +28,7 @@ Test::Alien::CanCompile - Skip a test file unless a C compiler is available
 
 =head1 VERSION
 
-version 1.28
+version 1.32
 
 =head1 SYNOPSIS
 

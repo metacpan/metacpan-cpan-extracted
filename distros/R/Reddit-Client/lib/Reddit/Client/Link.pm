@@ -17,11 +17,18 @@ use fields qw/link_flair_text media url link_flair_css_class num_reports
 use constant type => "t3";
 
 sub reply {
-    my ($self, $text) = @_;
+    	my ($self, $text) = @_;
 	$text || croak "need comment text";	
 	my $cmtid = $self->{session}->submit_comment(parent_id=>$self->{name}, text=>$text);
 	return "t1_".$cmtid if $cmtid;
 	return $cmtid;
+}
+sub edit {
+    	my ($self, $text) = @_;
+	croak 'This is not a self post' unless $self->{is_self};
+	my $post = $self->{session}->edit($self->{name}, $text);
+	$self->{selftext} = $text if $post;
+	return $post;
 }
 sub comments {
     my $self = shift;
@@ -36,6 +43,17 @@ sub hide {
 sub unhide {
     my $self = shift;
     $self->{session}->unhide($self->{name});
+}
+
+sub get_permalink {
+	my $self = shift;
+	return "https://www.reddit.com$self->{permalink}";
+}
+
+sub wtf {
+	my $self = shift;
+	return "etf";
+
 }
 
 1;

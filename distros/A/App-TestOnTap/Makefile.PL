@@ -89,6 +89,8 @@ WriteMakefile(
 			'List::Util'						=>	0,		# Core 5.24
 			'LWP::Simple'						=>	0,		# initial dev used: 6.17
 			'Net::Domain'						=>	0,		# initial dev used: 3.07
+			'PAR'								=>	0,
+			'PAR::Packer'						=>	0,
 			'POSIX'								=>	0,		# initial dev used: 1.38_03
 			'Pod::Simple::Search'				=>	0,		# initial dev used: 3.35 
 			'Pod::Usage'						=>	0,		# initial dev used: 1.67

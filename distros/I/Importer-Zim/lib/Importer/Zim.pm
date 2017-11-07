@@ -1,6 +1,6 @@
 
 package Importer::Zim;
-$Importer::Zim::VERSION = '0.6.0';
+$Importer::Zim::VERSION = '0.7.0';
 # ABSTRACT: Import functions à la Invader Zim
 
 use 5.010001;
@@ -18,7 +18,8 @@ my %MIN_VERSION = do {
     my %v = (
         '+Lexical'    => '0.8.0',
         '+EndOfScope' => '0.2.0',
-        '+Unit'       => '0.3.0'
+        '+Unit'       => '0.3.0',
+        '+Bogus'      => '0.9.0',
     );
     /^\+/ and $v{ backend_class($_) } = $v{$_} for keys %v;
     %v;
@@ -34,7 +35,7 @@ sub backend_class {
 sub backend {
     my @how = split ',',
       ( ( ref $_[2] eq 'HASH' ? $_[2]->{-how} : undef )
-        // '+Lexical,+EndOfScope,+Unit' );
+        // '+Lexical,+EndOfScope,+Unit,+Bogus' );
     for my $how (@how) {
         my $backend = backend_class($how);
         my @version
@@ -155,7 +156,7 @@ Importer::Zim - Import functions à la Invader Zim
 
 =head1 VERSION
 
-version 0.6.0
+version 0.7.0
 
 =head1 SYNOPSIS
 

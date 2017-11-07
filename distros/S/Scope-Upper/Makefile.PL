@@ -6,6 +6,28 @@ use ExtUtils::MakeMaker;
 
 use Config;
 
+if ($Config{d_cplusplus}) {
+ print STDERR <<'FAILPLUSPLUS';
+Configuration aborted: C++ compilers are not supported
+
+    Your perl has been built with a C++ compiler, which is then handed to
+    XS extensions as if it were a proper C compiler. This extension is
+    written in C, and naturally only supports C compilers, so it cannot be
+    built with your perl.
+
+    Note that building perl with a C++ compiler is only supposed to be done
+    by core developers in order to check that the perl headers can be
+    included from C++ code. Its use in the wild is not supported by the
+    perl5 porters. If your vendor has built its perl binary with a C++
+    compiler, please consider reporting this issue to them.
+
+    This text will be displayed 10 seconds, and then the configuration
+    script will exit.
+FAILPLUSPLUS
+ sleep 10;
+ exit 0;
+}
+
 my $pl   = $Config{perl_patchlevel};
 my $desc = $Config{git_describe};
 for ($pl, $desc) {

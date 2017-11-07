@@ -65,6 +65,8 @@ my @include = qw(
   Sub::Name
   YAML
   autodie
+  CPAN::Meta::Requirements
+  version
 );
 
 my @exclude = qw(

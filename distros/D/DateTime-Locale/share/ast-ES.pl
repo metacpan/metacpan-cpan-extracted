@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "AM",
-    "PM"
+    "PM",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "E d",
@@ -45,8 +50,8 @@
     yMd => "d/M/y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ 'de' y",
-    "yw-count-one" => "'selmana' w 'de' y",
-    "yw-count-other" => "'selmana' w 'de' y"
+    "yw-count-one" => "'selmana' w 'de' Y",
+    "yw-count-other" => "'selmana' w 'de' Y",
   },
   code => "ast-ES",
   date_format_full => "EEEE, d MMMM 'de' y",
@@ -64,7 +69,7 @@
     "xue",
     "vie",
     "s\N{U+00e1}b",
-    "dom"
+    "dom",
   ],
   day_format_narrow => [
     "L",
@@ -73,7 +78,7 @@
     "X",
     "V",
     "S",
-    "D"
+    "D",
   ],
   day_format_wide => [
     "llunes",
@@ -82,7 +87,7 @@
     "xueves",
     "vienres",
     "s\N{U+00e1}badu",
-    "domingu"
+    "domingu",
   ],
   day_stand_alone_abbreviated => [
     "llu",
@@ -91,7 +96,7 @@
     "xue",
     "vie",
     "s\N{U+00e1}b",
-    "dom"
+    "dom",
   ],
   day_stand_alone_narrow => [
     "L",
@@ -100,7 +105,7 @@
     "X",
     "V",
     "S",
-    "D"
+    "D",
   ],
   day_stand_alone_wide => [
     "llunes",
@@ -109,19 +114,19 @@
     "xueves",
     "vienres",
     "s\N{U+00e1}badu",
-    "domingu"
+    "domingu",
   ],
   era_abbreviated => [
     "e.C.",
-    "d.C."
+    "d.C.",
   ],
   era_narrow => [
     "e.C.",
-    "d.C."
+    "d.C.",
   ],
   era_wide => [
     "enantes de Cristu",
-    "despu\N{U+00e9}s de Cristu"
+    "despu\N{U+00e9}s de Cristu",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -142,7 +147,7 @@
     "set",
     "och",
     "pay",
-    "avi"
+    "avi",
   ],
   month_format_narrow => [
     "X",
@@ -156,7 +161,7 @@
     "S",
     "O",
     "P",
-    "A"
+    "A",
   ],
   month_format_wide => [
     "de xineru",
@@ -170,7 +175,7 @@
     "de setiembre",
     "d\N{U+2019}ochobre",
     "de payares",
-    "d\N{U+2019}avientu"
+    "d\N{U+2019}avientu",
   ],
   month_stand_alone_abbreviated => [
     "Xin",
@@ -184,7 +189,7 @@
     "Set",
     "Och",
     "Pay",
-    "Avi"
+    "Avi",
   ],
   month_stand_alone_narrow => [
     "X",
@@ -198,7 +203,7 @@
     "S",
     "O",
     "P",
-    "A"
+    "A",
   ],
   month_stand_alone_wide => [
     "xineru",
@@ -212,7 +217,7 @@
     "setiembre",
     "ochobre",
     "payares",
-    "avientu"
+    "avientu",
   ],
   name => "Asturian Spain",
   native_language => "asturianu",
@@ -224,37 +229,37 @@
     "1T",
     "2T",
     "3T",
-    "4T"
+    "4T",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "1er trimestre",
     "2u trimestre",
     "3er trimestre",
-    "4u trimestre"
+    "4u trimestre",
   ],
   quarter_stand_alone_abbreviated => [
     "1T",
     "2T",
     "3T",
-    "4T"
+    "4T",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "1er trimestre",
     "2u trimestre",
     "3er trimestre",
-    "4u trimestre"
+    "4u trimestre",
   ],
   script => undef,
   territory => "Spain",
@@ -263,5 +268,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

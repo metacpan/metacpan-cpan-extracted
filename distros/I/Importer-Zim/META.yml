@@ -20,10 +20,10 @@ name: Importer-Zim
 provides:
   Importer::Zim:
     file: lib/Importer/Zim.pm
-    version: v0.6.0
+    version: v0.7.0
   zim:
     file: lib/zim.pm
-    version: v0.6.0
+    version: v0.7.0
 requires:
   Importer::Zim::Utils: v0.8.0
   Module::Runtime: '0'
@@ -33,5 +33,5 @@ resources:
   bugtracker: https://github.com/aferreira/cpan-Importer-Zim/issues
   homepage: https://github.com/aferreira/cpan-Importer-Zim
   repository: https://github.com/aferreira/cpan-Importer-Zim.git
-version: 0.6.0
+version: 0.7.0
 x_serialization_backend: 'YAML::Tiny version 1.70'

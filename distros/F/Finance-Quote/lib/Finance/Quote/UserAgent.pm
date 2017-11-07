@@ -31,7 +31,7 @@ use HTTP::Headers;
 
 use vars qw/@ISA /;
 
-our $VERSION = '1.38'; # VERSION
+our $VERSION = '1.43'; # VERSION
 @ISA = qw/LWP::UserAgent/;
 
 # A very simple extension.  When we generate a LWP::UserAgent object,

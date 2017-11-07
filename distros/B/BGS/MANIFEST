@@ -2,9 +2,11 @@ Changes
 Makefile.PL
 MANIFEST
 README
+BGS.pm
+BGS/Future.pm
+BGS/Limit.pm
 t/1_bgs.t
 t/2_limit.t
-BGS.pm
-BGS/Limit.pm
-META.yml                                 Module meta-data (added by MakeMaker)
+t/3_future.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

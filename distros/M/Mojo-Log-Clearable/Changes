@@ -1,3 +1,9 @@
+1.000     2017-11-06 21:27:23 EST
+  - Add Mojo::Log::Role::Clearable, and move the implementation to there.
+  - Mojo::Log::Clearable is now a simple Mojo::Log subclass that has the new
+    role applied.
+  - Require Mojolicious 7.42 for with_roles support.
+
 0.003     2017-04-26 22:23:40 EDT
   - Switch installer to Module::Build::Tiny
   - Fix tests to avoid removed Mojo::Util::slurp function

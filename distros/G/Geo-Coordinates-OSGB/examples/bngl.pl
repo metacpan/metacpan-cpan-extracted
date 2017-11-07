@@ -1,6 +1,6 @@
 #! /usr/bin/perl -w
 
-# Toby Thurston -- 30 Jul 2017 
+# Toby Thurston -- 15 Aug 2017 
 
 use strict;
 use warnings;
@@ -8,24 +8,25 @@ use warnings;
 use Geo::Coordinates::OSGB qw/grid_to_ll ll_to_grid/;
 use Geo::Coordinates::OSGB::Grid qw/random_grid parse_grid format_grid_landranger/;
 use Browser::Open qw(open_browser);
+use IO::Interactive qw(is_interactive interactive);
 
 use Scalar::Util qw(looks_like_number);
 use Getopt::Long;
 use Pod::Usage;
 
-our $VERSION = '2.19';
+our $VERSION = '2.20';
 
 =pod
 
 =head1 NAME
 
-gbguessr.pl -- compare a random spot in the UK on Streetmap and Googlemaps
+bngl.pl -- convert coordinates, and compare (possibly random) spots in the UK on Streetmap and Googlemaps
 
 This programme shows off some features of L<Geo::Coordinates::OSGB>.
 
 =head1 SYNOPSIS
 
-  perl bngl.pl [--filter] [--streetmap] [--googlemap] [--osgb] [ lat lon | grid reference ] 
+  perl bngl.pl [--streetmap] [--googlemap] [--osgb] [ lat lon | grid reference ] 
 
 =head1 ARGUMENTS and OPTIONS
 
@@ -43,12 +44,10 @@ you will get back a lat/lon pair, and vice versa.
 
 If you supply no argument, then a random grid reference is supplied.
 
+You can also pipe the argument from another program, and pipe the output to something else.
+If you connect the output to a pipe you will get just the coordinates, without the fancy message.
+
 =over 4 
-
-=item --filter 
-
-Just send the converted coordinates to STDOUT instead of dressing them up in a message.
-This suppresses the "--streetmap" and/or "--googlemap" options.
 
 =item --streetmap
 
@@ -89,11 +88,11 @@ level of zoom, and makes it roughly 1:50,000 corresponding to the Streetmap disp
 
 =head1 DEPENDENCIES
 
-You may need to install L<Browser::Open>.
+You may need to install L<Browser::Open> and L<IO::Interactive>.
 
 =head1 AUTHOR
 
-Toby Thurston -- 30 Jul 2017
+Toby Thurston -- 30 Oct 2017 
 
 toby@cpan.org
 
@@ -137,7 +136,6 @@ sub clean_args {
 
 my $show_streetmap = 0;
 my $show_googlemap = 0;
-my $want_filter = 0;
 my $use_osgb = 0;
 
 Getopt::Long::Configure("pass_through");
@@ -148,7 +146,6 @@ my $options_ok = GetOptions(
     'usage'      => sub { pod2usage(-verbose => 0, -exitstatus => 0) },
     'help'       => sub { pod2usage(-verbose => 1, -exitstatus => 0) },
     'man'        => sub { pod2usage(-verbose => 2, -exitstatus => 0) },
-    'filter!'    => \$want_filter,
     'streetmap'  => \$show_streetmap,
     'googlemap'  => \$show_googlemap,
     'osgb'       => \$use_osgb,
@@ -159,29 +156,31 @@ my ($e, $n, $lat, $lon, @out);
 
 my $model = $use_osgb ? 'OSGB36' : 'WGS84';
 
-if (!@ARGV) {
-    ($e, $n) = random_grid();
-    @out = ($lat, $lon) = grid_to_ll($e, $n, {shape => $model});
-}
-else {
-    @ARGV = clean_args(@ARGV);
-    if ( scalar @ARGV == 2 && looks_like_number($ARGV[0]) 
-                           && looks_like_number($ARGV[1]) 
-                           && $ARGV[0] < 72 
-                           && $ARGV[1] < 72 ) {
-        ($lat, $lon) = @ARGV;    
-        @out = ($e, $n) = ll_to_grid($lat, $lon, {shape => $model});
+my @input;
+
+if ( is_interactive(*STDIN) ) {
+    if (@ARGV) {
+        @input = clean_args(@ARGV);
     }
     else {
-        ($e, $n) = parse_grid("@ARGV");
-        @out = ($lat, $lon) = grid_to_ll($e, $n, {shape => $model});
-    } 
+        @input = random_grid();
+    }
+}
+else {
+    @input = clean_args(<STDIN>);
 }
 
-if ($want_filter) {
-    print "@out\n";
-    exit;
+if ( scalar @input == 2 && looks_like_number($input[0]) 
+                       && looks_like_number($input[1]) 
+                       && $input[0] < 72 
+                       && $input[1] < 72 ) {
+    ($lat, $lon) = @input;    
+    @out = ($e, $n) = ll_to_grid($lat, $lon, {shape => $model});
 }
+else {
+    ($e, $n) = parse_grid("@input");
+    @out = ($lat, $lon) = grid_to_ll($e, $n, {shape => $model});
+} 
 
 if ($show_googlemap) {
     open_browser(format_ll_googlemaps($lat,$lon));
@@ -190,9 +189,14 @@ if ($show_streetmap) {
     open_browser(format_grid_streetmap($e, $n));
 }
 
-printf "Your input: %s, model: $model\n", @ARGV ? "@ARGV" : "(random)";
-printf "Gridref: %s %s == %s\n", $e, $n, scalar format_grid_landranger($e, $n);
-print format_ll_nicely($lat, $lon), "\n";
+if ( is_interactive(*STDOUT) ) {
+    printf "Your input: %s, model: $model\n", @ARGV ? "@ARGV" : "(random)";
+    printf "Gridref: %s %s == %s\n", $e, $n, scalar format_grid_landranger($e, $n);
+    print format_ll_nicely($lat, $lon), "\n";
+}
+else {
+    print "@out\n";
+}
 
 
 

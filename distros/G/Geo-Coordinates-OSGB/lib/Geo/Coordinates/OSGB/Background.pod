@@ -6,7 +6,7 @@ Geo::Coordinates::OSGB::Background - Background and extended description
 
 =head1 VERSION
 
-2.19
+2.20
 
 =head1 DESCRIPTION
 
@@ -68,8 +68,8 @@ now you need to do this:
 The old C<OSTN02.pm> module has been removed.  The data and the
 functions it provided are now integrated into C<OSGB.pm>.  The 
 old C<OSGB36_to_ETRS89> and C<ETRS89_to_OSGB36> functions are
-now built into C<ll_to_grid> and C<grid_to_ll>; the OSTN02 data 
-is used automatically when needed.
+now built into C<ll_to_grid> and C<grid_to_ll>; the OSTN data 
+is now used automatically when needed.
 
 =item * 
 
@@ -185,7 +185,7 @@ most of Western Europe.  This is not used by these modules.
 =item WGS84
 
 As part of the development of the GPS network by the American military
-in the 1980s a new world-wide ellipsoid called was defined.  This fits most
+in the 1980s a new world-wide ellipsoid called WGS84 was defined.  This fits most
 populated regions of the world reasonably well. (Technically the ellipsoid is
 called GRS80, and WGS84 refers to the whole World Geodetic System that is based on it, plus 
 some very nerdy modifications, but for the purposes of this module it's just a label).
@@ -212,7 +212,7 @@ In these modules the shape used for the projection of latitude and
 longitude onto the grid is WGS84 unless you specifically set it to use
 OSGB36. 
 
-=head2 The British National Grid and OSTN02
+=head2 The British National Grid and OSTN02 / OSTN15
 
 A Mercator grid projection like the British National Grid is defined by
 the five parameters defined as constants at the top of the module.
@@ -343,20 +343,22 @@ OSGB36.  At a scale of 1:50,000, 124 meters is 2.48 mm, and at 1:25,000
 it is 4.96 mm, so the difference is readily visible if you compare new 
 and old editions of the same map sheet.
 
-The transformation from WGS84 to OSGB36 is called OSTN02 and consists of
-a large data set that defines a three dimensional shift for each square
-kilometre of the country.  To get from WGS84 latitude and longitude to
-the grid, you project from the WGS84 ellipsoid to a pseudo-grid and then
-look up the relevant shifts from OSTN02 and adjust the easting and
-northing accordingly to get coordinates in the OSGB grid.  Going the
-other way is slightly more complicated as you have to use an iterative
-approach to find the latitude and longitude that would give you your
-grid coordinates.
+The transformation from WGS84 to OSGB36 published in 2002 was called OSTN02 and
+consisted of a large data set that defined a three dimensional shift for each
+square kilometre of the country.  This dataset was revised (apparently to give
+a better fit) in 2015 and the revised dataset is called OSTN15.
+
+To get from WGS84 latitude and longitude to the grid, you project from the
+WGS84 ellipsoid to a pseudo-grid and then look up the relevant shifts from
+OSTN15 and adjust the easting and northing accordingly to get coordinates in
+the OSGB grid.  Going the other way is slightly more complicated as you have to
+use an iterative approach to find the latitude and longitude that would give
+you your grid coordinates.
 
 It is also possible to use a three-dimensional shift and rotation called
 a Helmert transformation to get an approximate conversion.  This
 approach is used automatically by these modules for locations that are
-undefined in OSTN02, and, if you want to, you can explicitly use it
+undefined in OSTN15, and, if you want to, you can explicitly use it
 anywhere in the UK by using the C<grid_to_ll_helmert> and
 C<ll_to_grid_helmert> routines.
 
@@ -366,7 +368,7 @@ whatever similar name is used on your unit.  Most units display the
 coordinates as two groups of five digits and a grid square identifier.
 The units are metres within the grid square.  However you should note
 that your consumer GPS unit will B<not> have a copy of the whole of
-OSTN02 in it.  To show you an OSGB grid reference, your GPS will be
+OSTN15 in it.  To show you an OSGB grid reference, your GPS will be
 using either a Helmert transformation, or an even more approximate
 Molodenksy transformation to translate from the WGS84 coordinates it is
 getting from the satellites.
@@ -376,12 +378,14 @@ of the British Isles, nor even the whole of the UK, in particular it
 covers neither the Channel Islands nor Northern Ireland.  The coverage
 that is included is essentially the same as the coverage provided by the
 OSGB "Landranger" 1:50000 series maps.  The coverage of the OSTN02 data
-set is slightly smaller, as the OS do not define the model for any
-points more than about 2km off shore.
+set was slightly smaller, as the OS did not originally define the model for any
+points more than about 2km off shore.  The main difference in OSTN15 is that
+coverage is extended to the whole rectangle from grid point (0,0) to (700000,1250000),
+although the accuracy far off shore should not be relied on more than about +/- 5m.
 
-=head2 Implementation of OSTN02
+=head2 Implementation of OSTN shift data
 
-The OSTN02 is the definitive transformation from WGS84 coordinates to
+The OSTN15 is the definitive transformation from WGS84 coordinates to
 the British National Grid.  It is published as a large text file giving
 a set of corrections for each square kilometre of the country.  The OS
 also publish an algorithm to use it which is described on their website.
@@ -393,43 +397,38 @@ corrections needed for your spot in the square.  Adding these exact
 corrections gives you an (easting, northing) pair in the British grid.
 
 The distributed data also includes a vertical height correction as part
-of the OSGM02 geoid module, but this is not used in this module, so it
-is omitted from the table of data in order to save space.  
+of the OSGM15 geoid module, but this is not used in this module, so it
+is omitted from the module in order to save space.  
 
 The table of data supplied by the Ordnance Survey contains 876951 rows with
-entries for each km intersection between (0,0) and (700000, 1250000).  However,
-567472 of these entries refer to places that are more than 10 km away from the
-British mainland (either in the sea or in Eire) and these are set to zero,
-indicating that OSTN02 is not defined at these places.  In order to save more
-space, these are omitted from the beginning and end of each row in the data as
-stored in my implementation. The last 21 rows (north of Shetland) are all
-zeroes, so these are omitted as well.
+entries for each km intersection between (0,0) and (700000, 1250000).  In
+OSTN02, 567472 of these entries referred to square kms that are more than 10 km
+away from the British mainland (either in the sea or in Eire) and these were
+set to zero, indicating that OSTN02 is not defined at these places.  In order
+to save more space, these were omitted from the beginning and end of each row
+in the data as stored in my original implementation. The last 21 rows (north of
+Shetland) were all zeroes, so these were omitted as well.
 
-My implementation of the OSTN02 data is included in the C<OSGB.pm> module after
-the C<__DATA__> line, and is read using the magic C<< <DATA> >> file handle.
+My implementation of the OSTN02 data was included in the C<OSGB.pm> module after
+the C<__DATA__> line, and was read using the magic C<< <DATA> >> file handle.
 In tests this proved to be the fastest way to load all that data, by a long
 way. 
 
-There are 1229 rows of data, and each row contains up to 701 pairs of shift
+There were 1229 rows of data, and each row contained up to 701 pairs of shift
 data encoded as pairs of integers representing the shift in mm.  Leading and
-trailing zeros are omitted, and the number of leading zeros omitted is stored
-in the first three characters of each row.  The integer pairs are all coded in
-a home-grown version of base32 using the character set 
-C<< 0123456789:;<=>?@ABDEFGHIJKLMNO >>.  This allows integers up to 32767 to be
-stored in three bytes of printable ASCII.  It would (obviously) be possible to
-compress the data more by storing them as binary integers but I need them to be
-printable ASCII so that they can be stored inside C<OSGB.pm>.  Decoding them is
-very slightly slower than decoding hex strings, but using 3 bytes integer
-instead of 4 reduces the memory and loading time by 25%.
+trailing zeros were omitted, and the number of leading zeros omitted was stored
+in the first three characters of each row.  The integer pairs were all coded in
+a home-grown version of base32 using the character set C<<
+0123456789:;<=>?@ABDEFGHIJKLMNO >>.  This allowed integers up to 32767 to be
+stored in three bytes of printable ASCII.  that could be stored inside
+C<OSGB.pm>.  Decoding them was very slightly slower than decoding hex strings,
+but using 3 bytes integer instead of 4 reduced the memory and loading time by
+25%.
 
-Earlier versions of the module had the data in a hash, but this was much
-too slow to load.  Later versions stored keys with the data and use a
-binary search to find the right data, but the current method with no
-keys requires less space and runs much faster.
-
-The C<build> directory includes a script called C<pack_ostn_data> which creates
-the 1229 rows of data in the correct form from the C<OSTN02_OSGM02_GB.txt> file
-which is available from the Ordnance Survey.
+When the OSGB revised OSTN02 to OSTN15, they filled in all the zeros, so 
+this complicated approach was no longer justified.  In version 2.20 and above
+of this module, the shift data sets are included in the module's `share` directory 
+and loaded at run time.  This turns out to be faster and simpler.
 
 =head2 Accuracy, uncertainty, and speed
 
@@ -496,41 +495,41 @@ the fifth decimal place of a degree of longitude represents about
 
 =head3 How accurate are the conversions?
 
-The OS supply test data with OSTN02 that comes from various fixed
+The OS supply test data with OSTN15 that comes from various fixed
 stations around the country and that form part of the definition of the
-transformation.  If you look in the test file C<06osdata.t> you can see
+transformation.  If you look in the test files C<06-osgb-*.t> you can see
 how it is used for testing these modules.
 
 In all cases translating from the WGS84 coordinates to the national grid
+and vice versa
 is accurate to the millimetre, so these modules are at least as accurate
 as the OSGB software that produced the test data.
 
+The main difference between the OSTN02 transformation and OSTN15 
+is that the model fits the whole grid area better.  With OSTN02 the 
+conversions were (very slightly) less accurate for places west of 7W.
 Translating from the given grid coordinates to WGS84 latitude and
-longitude coordinates is very slightly less accurate, but in all of
-England, Wales, Scotland and the Isle of Man this software produces
-WGS84 lat/lon coordinates from the given grid references that are within
-1 mm of the OSGB data, except for points beyond 7W, as noted below.
-
-I have also run extensive `round trip' testing by generating random grid
+longitude coordinates was accurate to 1mm for all of 
+England, Wales, Scotland and the Isle of Man, but 
+`round trip' testing (by generating random grid
 references, converting them to WGS84 latitude and longitude and then converting
-them back to grid easting and northing.  In all places between 6W and 2E (the
-whole of the UK mainland, plus Orkney and Shetland) the round trip error is
-less than 1 mm.  This is the design point of the OS formulae.  So far so good.
-However, beyond of 6W (that is in the Scilly Isles and the Hebrides), the round
-trip error creeps up slowly as you go further west;  the furthest west you can
-go on the OS grid is St Kilda (at about 8.57W) and here the round trip error is
-about 4 mm. As far as I can tell, this is just a limitation of the OS formulae
-as designed in 2001 when OSTN02 was published. 
+them back to grid easting and northing), showed 
+that beyond of 6W (that is in the Scilly Isles and the Hebrides), the
+error creeps up to about 4mm if you go as far as St Kilda (at about 8.57W).
+The new OSTN15 numbers are all very slightly different, so that converting any given latitude 
+and longitude in WGS84 gives a grid reference that may be a few mm different.  But OSTN15
+no longer shows greater round trip errors in the far west. The accuracy of round trip conversions 
+is less than 1mm for all of the OSGB test points in both directions.
 
-Outside the area covered by OSTN02, this module uses the small Helmert
+Outside the rectangle covered by OSTN15, this module uses the small Helmert
 transformation recommended by the OS.  The OS state that, with the parameters
 they provide, this transformation will be accurate up to about +/-5 metres, in
 the vicinity of the British Isles.  
 
-You can also use this transformation within the OSTN02 polygon by calling the
+You can also use this transformation within the OSTN15 rectangle by calling the
 C<grid_to_ll_helmert> and C<ll_to_grid_helmert> routines.  If you compare the
 output from these routines to the output from the more accurate routines that
-use OSTN02 you will find that the differences are between about -3.6 metres and
+use OSTN15 you will find that the differences are between about -3.6 metres and
 +5.1 metres depending on where you are in the country.  In the South East both
 easting and northing are underestimated, in northern Scotland they tend to be
 overestimated.
@@ -539,24 +538,27 @@ overestimated.
 
 In general the answer to this question is "probably faster than you need", but if
 you have read this far you might be interested in the results of my benchmarking.  
-The slowest part of these routines used to be the loading of the OSTN02 data set but I have 
+The slowest part of these routines used to be the loading of the OSTN15 data set but I have 
 put considerable effort into making this faster since about version 2.08 of this module, so that
-now the accurate routines the use the OSTN02 data are pretty much the same as the approximate 
-routines.  
+now the accurate routines the use the OSTN15 data are pretty much the same as the approximate 
+routines (C<ll_to_grid> is slightly faster, C<grid_to_ll> is slightly slower).
 
-The tests are probably rather generous to my code because of the caching effect.
-In order to speed up the OSTN02 data lookups, the routines keep a cache of the data 
-fetched, so that if you convert a sequence of coordinates in the same square km, the second
-and subsequent lookups will get the data from a local hash instead of having to read the 
-table.  The benchmark test (using the standard Benchmark.pm approach) consists of getting
-Perl to run as many conversions as possible 
-for about 5 CPU seconds, and as a result the cache hit ratio is probably rather exaggerated.
-Nevertheless this might still be reasonably representative if you are converting, say, the steps 
-in a GPX track, where successive steps are highly likely to be the same square km as the one before.
+The tests used to be a bit generous to my code because of the caching
+effect.  In order to speed up the OSTN data lookups, the routines used to keep a
+cache of the data fetched, so that if you convert a sequence of coordinates in
+the same square km, the second and subsequent lookups will get the data from a
+local hash instead of having to read the table.  The benchmark test (using the
+standard Benchmark.pm approach) consists of getting Perl to run as many
+conversions as possible for about 5 CPU seconds, and as a result the cache hit
+ratio was probably rather exaggerated.  Nevertheless this might still be
+reasonably representative if you are converting, say, the steps in a GPX track,
+where successive steps are highly likely to be the same square km as the one
+before.  Moreover, since converting to OSTN15, I have removed the cache look ups
+so I'm no longer getting any such boost.
 
-Last year (2016) with version 2.16 of this module, a typical bench mark run on my development
-machine (a Mac Mini server from 2011) using the Apple-supplied Perl 5.16
-gave:
+Last year (2016) with version 2.16 of this module, a typical bench mark run on
+my development machine (a Mac Mini server from 2011) using the Apple-supplied
+Perl 5.16 gave:
 
     Subroutine          calls per sec  ms per call 
     ----------------------------------------------
@@ -578,7 +580,7 @@ with macOS Sierra, I got slightly better numbers with V2.16
     grid_to_ll_helmert          54371        0.018
 
 But after a bit more work to simplify the way that the cache is implemented 
-I get this on the same MBP with the current version of my code:
+I get this on the same MBP with the version 2.19:
 
     Subroutine          calls per sec  ms per call
     ----------------------------------------------
@@ -588,21 +590,31 @@ I get this on the same MBP with the current version of my code:
     grid_to_ll                  29114       0.0343
     grid_to_ll_helmert          53969       0.0185
 
-In my opinion, this justifies my decision to make the accurate OSTN02
-conversion the default.  The approximate Helmert-based routine is no quicker
-for ll to grid conversions.  
+Now, on the same MBP, but with the new OSTN15 data set and the simpler data look up I get:
+
+    Subroutine          calls per sec  ms per call
+    ----------------------------------------------
+    ll_to_grid                  70730       0.0141
+    ll_to_grid_helmert          63308       0.0158
+    
+    grid_to_ll                  32238       0.0310
+    grid_to_ll_helmert          55286       0.0181
+
+In my opinion, this justifies my decision to make the accurate OSTN conversion
+the default.  The approximate Helmert-based routine is no quicker for ll to
+grid conversions.  
 
 It is always going to be slightly slower converting from grid to ll, due to the
-iterative nature of the algorithm that is built into OSTN02.  So the approximate 
-routine is likely to remain a fair bit faster.  Having said that
+iterative nature of the algorithm that is built into OSTN15.  So the
+approximate routine is likely to remain slightly faster.  Having said that
 none of the routines is really slow, since even C<grid_to_ll> averages under 60
-microseconds per call on the older machine. 
-`Your mileage may vary', of course.
+microseconds per call on the older machine.  `Your mileage may vary', of
+course.
 
 The routines have been tested with various versions of Perl, including recent
 versions with the C<uselongdouble> option enabled.  Using a locally compiled
 version of Perl 5.22 with ordinary doubles, I saw a small improvement on the
-Helmert routines, but the OSTN02 routines are about the same.  On the same
+Helmert routines, but the default routines are about the same.  On the same
 system, long doubles slowed everything down by about 10%, and made no
 difference to the round trip precision of the routines. Since the formulae were
 specifically designed for ordinary double precision arithmetic, Perl's default

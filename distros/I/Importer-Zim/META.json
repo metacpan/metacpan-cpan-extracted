@@ -39,7 +39,9 @@
             "warnings" : "0"
          },
          "suggests" : {
-            "Importer::Zim::Lexical" : "v0.6.0"
+            "Importer::Zim::EndOfScope" : "v0.2.0",
+            "Importer::Zim::Lexical" : "v0.8.0",
+            "Importer::Zim::Unit" : "v0.3.0"
          }
       },
       "test" : {
@@ -57,11 +59,11 @@
    "provides" : {
       "Importer::Zim" : {
          "file" : "lib/Importer/Zim.pm",
-         "version" : "v0.6.0"
+         "version" : "v0.7.0"
       },
       "zim" : {
          "file" : "lib/zim.pm",
-         "version" : "v0.6.0"
+         "version" : "v0.7.0"
       }
    },
    "release_status" : "stable",
@@ -76,7 +78,7 @@
          "web" : "https://github.com/aferreira/cpan-Importer-Zim"
       }
    },
-   "version" : "0.6.0",
+   "version" : "0.7.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0228"
 }
 

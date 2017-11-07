@@ -19,7 +19,6 @@ var obj = Block.new(...);
 Inherits methods from:
 
 	* Sidef::Object::Object
-	* Sidef::Convert::Convert
 
 =head1 METHODS
 
@@ -61,6 +60,14 @@ I<Obj> B<E<gt>E<gt>> I<Obj> -> I<Obj>
 Return the
 
 Aliases: I<map>
+
+=cut
+
+=head2 cache
+
+Block.cache() -> I<Obj>
+
+Return the
 
 =cut
 
@@ -155,6 +162,14 @@ Block.thr() -> I<Obj>
 Return the
 
 Aliases: I<thread>
+
+=cut
+
+=head2 uncache
+
+Block.uncache() -> I<Obj>
+
+Return the
 
 =cut
 

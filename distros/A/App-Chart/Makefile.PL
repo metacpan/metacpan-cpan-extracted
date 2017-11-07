@@ -54,6 +54,10 @@ my %PREREQ_PM
     # builtin in perl 5.10, but also separately on CPAN, maybe
     'File::Spec' => 0,
 
+    # FIXME: actually only for LME which is a bit broken, though also used
+    # in Manual.t tests
+    'File::Slurp' => 0,
+
     # builtin since perl 5.6 which is what Gtk2 needs anyway, but it's also
     # published separately (and newer) on CPAN; probably any version ok
     'File::Temp' => 0,
@@ -129,11 +133,10 @@ my %PREREQ_PM
     'HTML::TableExtract' => 0,
     'HTML::TreeBuilder' => 0,   # only for LME plastics hack actually
 
-    'POSIX::Wide' => 0,
+    'JSON' => 0,
 
     # anything Archive::Zip is happy with is enough, 1.07 looks likely
     'IO::String' => '1.07',
-
 
     # Perl-Lisp dist, only for the Emacs interface actually
     # think at least 0.04 to read nil as undef
@@ -174,9 +177,6 @@ my %PREREQ_PM
     # as the monetary thousands sep
     'Number::Format' => '1.60',
 
-    # FIXME: actually only for LME which is a bit broken
-    'File::Slurp' => 0,
-
     'PerlIO::via::EscStatus' => 2,  # version 2 fixing erase on close
     # parts of EscStatus used explicitly
     'PerlIO::via::EscStatus::Parser' => 0,
@@ -184,6 +184,7 @@ my %PREREQ_PM
     'PerlIO::via::EscStatus::ShowNone' => 0,
 
     'Proc::SyncExec' => 0,
+    'POSIX::Wide' => 0,
     'Regexp::Common' => 0,
     'Regexp::Tr' => 0, # only for ATH.pm, but small, so get it always
 
@@ -206,13 +207,15 @@ my %PREREQ_PM
 
     # builtin in perl 5.10 (and 5.8 up), but also separate on cpan;
     # think any version ok
-    # 'Time::HiRes' => 0,
+    'Time::HiRes' => 0,
 
     # not used at the moment
     # builtin in perl 5.10 anyway
     # 'Time::Piece' => 0,
 
-    'Text::CSV_XS' => 0,
+    # was for Yahoo, no longer used
+    # 'Text::CSV_XS' => 0,
+
     'Text::Glob' => 0,
 
     # brought in by 'LWP' anyway, but used directly too, so name them here

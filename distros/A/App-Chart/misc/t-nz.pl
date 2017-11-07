@@ -32,7 +32,7 @@ use Smart::Comments;
   # old jul 09
   # my $content = slurp ("$ENV{'HOME'}/chart/samples/nzx/Dividends.html");
   # new sep 17
-  my $content = slurp ("$ENV{HOME}/chart/samples/nzx/NZSX.html");
+  my $content = slurp ("$ENV{HOME}/chart/samples/nzx/dividends-nov17.html");
 
   my $resp = HTTP::Response->new (200, 'OK',
                                   ['Content-Type' => 'text/html; charset=utf-8'],
@@ -45,8 +45,9 @@ use Smart::Comments;
   # ### resp: $resp->as_string
 
   my $h = App::Chart::Suffix::NZ::dividends_parse ($resp);
-  # print Dumper ($h);
-  #  App::Chart::Download::write_daily_group ($h);
+  # App::Chart::Download::crunch_h($h);
+  print Dumper ($h);
+   App::Chart::Download::write_daily_group ($h);
   exit 0;
 }
 

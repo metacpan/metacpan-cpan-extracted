@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "man\N{U+00e1}",
-    "kug\N{U+00fa}"
+    "kug\N{U+00fa}",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "E d",
@@ -44,7 +49,7 @@
     yMd => "d/M/y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "nmg-CM",
   date_format_full => "EEEE d MMMM y",
@@ -62,7 +67,7 @@
     "smn",
     "mbs",
     "sas",
-    "s\N{U+0254}\N{U+0301}n"
+    "s\N{U+0254}\N{U+0301}n",
   ],
   day_format_narrow => [
     "m",
@@ -71,7 +76,7 @@
     "s",
     "m",
     "s",
-    "s"
+    "s",
   ],
   day_format_wide => [
     "m\N{U+0254}\N{U+0301}nd\N{U+0254}",
@@ -80,7 +85,7 @@
     "s\N{U+0254}\N{U+0301}nd\N{U+0254} maf\N{U+00fa} m\N{U+00e1}na",
     "mab\N{U+00e1}g\N{U+00e1} m\N{U+00e1} sukul",
     "s\N{U+00e1}sadi",
-    "s\N{U+0254}\N{U+0301}nd\N{U+0254}"
+    "s\N{U+0254}\N{U+0301}nd\N{U+0254}",
   ],
   day_stand_alone_abbreviated => [
     "m\N{U+0254}\N{U+0301}n",
@@ -89,7 +94,7 @@
     "smn",
     "mbs",
     "sas",
-    "s\N{U+0254}\N{U+0301}n"
+    "s\N{U+0254}\N{U+0301}n",
   ],
   day_stand_alone_narrow => [
     "m",
@@ -98,7 +103,7 @@
     "s",
     "m",
     "s",
-    "s"
+    "s",
   ],
   day_stand_alone_wide => [
     "m\N{U+0254}\N{U+0301}nd\N{U+0254}",
@@ -107,19 +112,19 @@
     "s\N{U+0254}\N{U+0301}nd\N{U+0254} maf\N{U+00fa} m\N{U+00e1}na",
     "mab\N{U+00e1}g\N{U+00e1} m\N{U+00e1} sukul",
     "s\N{U+00e1}sadi",
-    "s\N{U+0254}\N{U+0301}nd\N{U+0254}"
+    "s\N{U+0254}\N{U+0301}nd\N{U+0254}",
   ],
   era_abbreviated => [
     "BL",
-    "PB"
+    "PB",
   ],
   era_narrow => [
     "BL",
-    "PB"
+    "PB",
   ],
   era_wide => [
     "B\N{U+00f3} Lahl\N{U+025b}\N{U+0304}",
-    "Pfi\N{U+025b} Bur\N{U+012b}"
+    "Pfi\N{U+025b} Bur\N{U+012b}",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -140,7 +145,7 @@
     "ng9",
     "ng10",
     "ng11",
-    "kris"
+    "kris",
   ],
   month_format_narrow => [
     1,
@@ -154,7 +159,7 @@
     9,
     10,
     11,
-    12
+    12,
   ],
   month_format_wide => [
     "ngw\N{U+025b}n mat\N{U+00e1}hra",
@@ -168,7 +173,7 @@
     "ngw\N{U+025b}n r\N{U+025b}bvu\N{U+00e2}",
     "ngw\N{U+025b}n wum",
     "ngw\N{U+025b}n wum nav\N{U+01d4}r",
-    "kr\N{U+00ed}simin"
+    "kr\N{U+00ed}simin",
   ],
   month_stand_alone_abbreviated => [
     "ng1",
@@ -182,7 +187,7 @@
     "ng9",
     "ng10",
     "ng11",
-    "kris"
+    "kris",
   ],
   month_stand_alone_narrow => [
     1,
@@ -196,7 +201,7 @@
     9,
     10,
     11,
-    12
+    12,
   ],
   month_stand_alone_wide => [
     "ngw\N{U+025b}n mat\N{U+00e1}hra",
@@ -210,7 +215,7 @@
     "ngw\N{U+025b}n r\N{U+025b}bvu\N{U+00e2}",
     "ngw\N{U+025b}n wum",
     "ngw\N{U+025b}n wum nav\N{U+01d4}r",
-    "kr\N{U+00ed}simin"
+    "kr\N{U+00ed}simin",
   ],
   name => "Kwasio Cameroon",
   native_language => "nmg",
@@ -222,37 +227,37 @@
     "T1",
     "T2",
     "T3",
-    "T4"
+    "T4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "Tind\N{U+025b} nv\N{U+00fa}r",
     "Tind\N{U+025b} \N{U+0144}mba",
     "Tind\N{U+025b} \N{U+0144}lal",
-    "Tind\N{U+025b} \N{U+0144}na"
+    "Tind\N{U+025b} \N{U+0144}na",
   ],
   quarter_stand_alone_abbreviated => [
     "T1",
     "T2",
     "T3",
-    "T4"
+    "T4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "Tind\N{U+025b} nv\N{U+00fa}r",
     "Tind\N{U+025b} \N{U+0144}mba",
     "Tind\N{U+025b} \N{U+0144}lal",
-    "Tind\N{U+025b} \N{U+0144}na"
+    "Tind\N{U+025b} \N{U+0144}na",
   ],
   script => undef,
   territory => "Cameroon",
@@ -261,5 +266,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

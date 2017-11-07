@@ -327,11 +327,41 @@ Inari Sami Finland locale.
 
 =head2 Available Formats
 
+=head3 Bh (h B)
+
+   2008-02-05T18:30:30 = 6 B
+   1995-12-22T09:05:02 = 9 B
+  -0010-09-15T04:44:23 = 4 B
+
+=head3 Bhm (h:mm B)
+
+   2008-02-05T18:30:30 = 6:30 B
+   1995-12-22T09:05:02 = 9:05 B
+  -0010-09-15T04:44:23 = 4:44 B
+
+=head3 Bhms (h:mm:ss B)
+
+   2008-02-05T18:30:30 = 6:30:30 B
+   1995-12-22T09:05:02 = 9:05:02 B
+  -0010-09-15T04:44:23 = 4:44:23 B
+
 =head3 E (ccc)
 
    2008-02-05T18:30:30 = maj
    1995-12-22T09:05:02 = vás
   -0010-09-15T04:44:23 = láv
+
+=head3 EBhm (E h:mm B)
+
+   2008-02-05T18:30:30 = maj 6:30 B
+   1995-12-22T09:05:02 = vás 9:05 B
+  -0010-09-15T04:44:23 = láv 4:44 B
+
+=head3 EBhms (E h:mm:ss B)
+
+   2008-02-05T18:30:30 = maj 6:30:30 B
+   1995-12-22T09:05:02 = vás 9:05:02 B
+  -0010-09-15T04:44:23 = láv 4:44:23 B
 
 =head3 EHm (E H.mm)
 
@@ -579,19 +609,19 @@ Inari Sami Finland locale.
    1995-12-22T09:05:02 = 4. niäljádâs 1995
   -0010-09-15T04:44:23 = 3. niäljádâs -10
 
-=head3 yw-count-one ('okko' w, y)
+=head3 yw-count-one ('okko' w, Y)
 
    2008-02-05T18:30:30 = okko 6, 2008
    1995-12-22T09:05:02 = okko 51, 1995
   -0010-09-15T04:44:23 = okko 37, -10
 
-=head3 yw-count-other ('okko' w, y)
+=head3 yw-count-other ('okko' w, Y)
 
    2008-02-05T18:30:30 = okko 6, 2008
    1995-12-22T09:05:02 = okko 51, 1995
   -0010-09-15T04:44:23 = okko 37, -10
 
-=head3 yw-count-two ('okko' w, y)
+=head3 yw-count-two ('okko' w, Y)
 
    2008-02-05T18:30:30 = okko 6, 2008
    1995-12-22T09:05:02 = okko 51, 1995

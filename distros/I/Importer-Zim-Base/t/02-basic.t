@@ -43,6 +43,13 @@ use Importer::Zim::Base;
 }
 {
     my @exports = Importer::Zim::Base->_prepare_args(
+        'M1' => 'f4' => { -strict => 0 } );
+    my @expected = ( { export => 'f4', code => \&M1::f4 }, );
+    is_deeply( \@exports, \@expected,
+        "Importing non-exportable symbols with -strict => 0" )
+}
+{
+    my @exports = Importer::Zim::Base->_prepare_args(
         'M1' => { -strict => 0 } => 'f4' );
     my @expected = ( { export => 'f4', code => \&M1::f4 }, );
     is_deeply( \@exports, \@expected,

@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "pre podne",
-    "po podne"
+    "po podne",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "hh:mm B",
+    Bhms => "hh:mm:ss B",
     E => "E",
+    EBhm => "E hh:mm B",
+    EBhms => "E hh:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "E d.",
@@ -51,9 +56,9 @@
     yMd => "d.M.y.",
     yQQQ => "QQQ y.",
     yQQQQ => "QQQQ y.",
-    "yw-count-few" => "w. 'sedmica' 'u' y.",
-    "yw-count-one" => "w. 'sedmica' 'u' y.",
-    "yw-count-other" => "w. 'sedmica' 'u' y."
+    "yw-count-few" => "w. 'sedmica' 'u' Y.",
+    "yw-count-one" => "w. 'sedmica' 'u' Y.",
+    "yw-count-other" => "w. 'sedmica' 'u' Y.",
   },
   code => "sr-Latn",
   date_format_full => "EEEE, dd. MMMM y.",
@@ -71,7 +76,7 @@
     "\N{U+010d}et",
     "pet",
     "sub",
-    "ned"
+    "ned",
   ],
   day_format_narrow => [
     "p",
@@ -80,7 +85,7 @@
     "\N{U+010d}",
     "p",
     "s",
-    "n"
+    "n",
   ],
   day_format_wide => [
     "ponedeljak",
@@ -89,7 +94,7 @@
     "\N{U+010d}etvrtak",
     "petak",
     "subota",
-    "nedelja"
+    "nedelja",
   ],
   day_stand_alone_abbreviated => [
     "pon",
@@ -98,7 +103,7 @@
     "\N{U+010d}et",
     "pet",
     "sub",
-    "ned"
+    "ned",
   ],
   day_stand_alone_narrow => [
     "p",
@@ -107,7 +112,7 @@
     "\N{U+010d}",
     "p",
     "s",
-    "n"
+    "n",
   ],
   day_stand_alone_wide => [
     "ponedeljak",
@@ -116,19 +121,19 @@
     "\N{U+010d}etvrtak",
     "petak",
     "subota",
-    "nedelja"
+    "nedelja",
   ],
   era_abbreviated => [
     "p. n. e.",
-    "n. e."
+    "n. e.",
   ],
   era_narrow => [
     "p.n.e.",
-    "n.e."
+    "n.e.",
   ],
   era_wide => [
     "pre nove ere",
-    "nove ere"
+    "nove ere",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -149,7 +154,7 @@
     "sep",
     "okt",
     "nov",
-    "dec"
+    "dec",
   ],
   month_format_narrow => [
     "j",
@@ -163,7 +168,7 @@
     "s",
     "o",
     "n",
-    "d"
+    "d",
   ],
   month_format_wide => [
     "januar",
@@ -177,7 +182,7 @@
     "septembar",
     "oktobar",
     "novembar",
-    "decembar"
+    "decembar",
   ],
   month_stand_alone_abbreviated => [
     "jan",
@@ -191,7 +196,7 @@
     "sep",
     "okt",
     "nov",
-    "dec"
+    "dec",
   ],
   month_stand_alone_narrow => [
     "j",
@@ -205,7 +210,7 @@
     "s",
     "o",
     "n",
-    "d"
+    "d",
   ],
   month_stand_alone_wide => [
     "januar",
@@ -219,7 +224,7 @@
     "septembar",
     "oktobar",
     "novembar",
-    "decembar"
+    "decembar",
   ],
   name => "Serbian Latin",
   native_language => "srpski",
@@ -231,37 +236,37 @@
     "K1",
     "K2",
     "K3",
-    "K4"
+    "K4",
   ],
   quarter_format_narrow => [
     "1.",
     "2.",
     "3.",
-    "4."
+    "4.",
   ],
   quarter_format_wide => [
     "prvi kvartal",
     "drugi kvartal",
     "tre\N{U+0107}i kvartal",
-    "\N{U+010d}etvrti kvartal"
+    "\N{U+010d}etvrti kvartal",
   ],
   quarter_stand_alone_abbreviated => [
     "K1",
     "K2",
     "K3",
-    "K4"
+    "K4",
   ],
   quarter_stand_alone_narrow => [
     "1.",
     "2.",
     "3.",
-    "4."
+    "4.",
   ],
   quarter_stand_alone_wide => [
     "prvi kvartal",
     "drugi kvartal",
     "tre\N{U+0107}i kvartal",
-    "\N{U+010d}etvrti kvartal"
+    "\N{U+010d}etvrti kvartal",
   ],
   script => "Latin",
   territory => undef,
@@ -270,5 +275,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

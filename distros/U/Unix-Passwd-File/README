@@ -3,8 +3,8 @@ NAME
     entries
 
 VERSION
-    This document describes version 0.24 of Unix::Passwd::File (from Perl
-    distribution Unix-Passwd-File), released on 2017-07-10.
+    This document describes version 0.250 of Unix::Passwd::File (from Perl
+    distribution Unix-Passwd-File), released on 2017-11-06.
 
 SYNOPSIS
      use Unix::Passwd::File;

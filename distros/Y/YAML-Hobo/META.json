@@ -1,0 +1,74 @@
+{
+   "abstract" : "Poor man's YAML",
+   "author" : [
+      "Adriano Ferreira <ferreira@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "YAML-Hobo",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::Pod" : "1.41",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "YAML::Tiny" : "1.70"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "Test::More" : "0.96",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "YAML::Hobo" : {
+         "file" : "lib/YAML/Hobo.pm",
+         "version" : "v0.1.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/aferreira/cpan-YAML-Hobo/issues"
+      },
+      "homepage" : "https://github.com/aferreira/cpan-YAML-Hobo",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/aferreira/cpan-YAML-Hobo.git",
+         "web" : "https://github.com/aferreira/cpan-YAML-Hobo"
+      }
+   },
+   "version" : "0.1.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0228"
+}
+

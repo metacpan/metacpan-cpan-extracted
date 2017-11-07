@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "AM",
-    "PM"
+    "PM",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d, E",
@@ -45,8 +50,8 @@
     yMd => "d-M-y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-one" => "'wike' w 'fan' y",
-    "yw-count-other" => "'wike' w 'fan' y"
+    "yw-count-one" => "'wike' w 'fan' Y",
+    "yw-count-other" => "'wike' w 'fan' Y",
   },
   code => "fy",
   date_format_full => "EEEE d MMMM y",
@@ -64,7 +69,7 @@
     "to",
     "fr",
     "so",
-    "si"
+    "si",
   ],
   day_format_narrow => [
     "M",
@@ -73,7 +78,7 @@
     "T",
     "F",
     "S",
-    "S"
+    "S",
   ],
   day_format_wide => [
     "moandei",
@@ -82,7 +87,7 @@
     "tongersdei",
     "freed",
     "sneon",
-    "snein"
+    "snein",
   ],
   day_stand_alone_abbreviated => [
     "mo",
@@ -91,7 +96,7 @@
     "to",
     "fr",
     "so",
-    "si"
+    "si",
   ],
   day_stand_alone_narrow => [
     "M",
@@ -100,7 +105,7 @@
     "T",
     "F",
     "S",
-    "S"
+    "S",
   ],
   day_stand_alone_wide => [
     "moandei",
@@ -109,19 +114,19 @@
     "tongersdei",
     "freed",
     "sneon",
-    "snein"
+    "snein",
   ],
   era_abbreviated => [
     "f.Kr.",
-    "n.Kr."
+    "n.Kr.",
   ],
   era_narrow => [
     "f.K.",
-    "n.K."
+    "n.K.",
   ],
   era_wide => [
     "Foar Kristus",
-    "nei Kristus"
+    "nei Kristus",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -142,7 +147,7 @@
     "Sep",
     "Okt",
     "Nov",
-    "Des"
+    "Des",
   ],
   month_format_narrow => [
     "J",
@@ -156,7 +161,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_format_wide => [
     "Jannewaris",
@@ -170,7 +175,7 @@
     "Septimber",
     "Oktober",
     "Novimber",
-    "Desimber"
+    "Desimber",
   ],
   month_stand_alone_abbreviated => [
     "Jan",
@@ -184,7 +189,7 @@
     "Sep",
     "Okt",
     "Nov",
-    "Des"
+    "Des",
   ],
   month_stand_alone_narrow => [
     "J",
@@ -198,7 +203,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_stand_alone_wide => [
     "Jannewaris",
@@ -212,11 +217,11 @@
     "Septimber",
     "Oktober",
     "Novimber",
-    "Desimber"
+    "Desimber",
   ],
   name => "Western Frisian",
-  native_language => "West-Frysk",
-  native_name => "West-Frysk",
+  native_language => "Frysk",
+  native_name => "Frysk",
   native_script => undef,
   native_territory => undef,
   native_variant => undef,
@@ -224,37 +229,37 @@
     "K1",
     "K2",
     "K3",
-    "K4"
+    "K4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "1e fearnsjier",
     "2e fearnsjier",
     "3e fearnsjier",
-    "4e fearnsjier"
+    "4e fearnsjier",
   ],
   quarter_stand_alone_abbreviated => [
     "K1",
     "K2",
     "K3",
-    "K4"
+    "K4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "1e fearnsjier",
     "2e fearnsjier",
     "3e fearnsjier",
-    "4e fearnsjier"
+    "4e fearnsjier",
   ],
   script => undef,
   territory => undef,
@@ -263,5 +268,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

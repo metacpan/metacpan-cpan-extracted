@@ -34,6 +34,7 @@ do { my $x = {
                                       'MIME::Base64' => '0',
                                       'Module::Loader' => '0',
                                       'Scalar::Util' => '0',
+                                      'Time::HiRes' => '0',
                                       'Time::Local' => '0',
                                       'bytes' => '0',
                                       'parent' => '0',

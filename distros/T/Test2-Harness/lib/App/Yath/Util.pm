@@ -2,7 +2,7 @@ package App::Yath::Util;
 use strict;
 use warnings;
 
-our $VERSION = '0.001030';
+our $VERSION = '0.001031';
 
 use File::Spec;
 
@@ -41,7 +41,8 @@ sub find_in_updir {
     my %seen;
     while(1) {
         $path = File::Spec->catdir('..', $path);
-        my $check = realpath(File::Spec->rel2abs($path));
+        my $check = eval { realpath(File::Spec->rel2abs($path)) };
+        next unless $check;
         last if $seen{$check}++;
         return $check if -f $check;
     }

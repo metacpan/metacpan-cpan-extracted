@@ -3734,3 +3734,13 @@ SPLIT OFF App::MREST into separate distribution
 - Fillup: fix success and failure messages
 - dbinit_Config: disallow modification of root supervisor field
 
+0.555 2017-11-02 20:23 CET
+- Model/Shared: introduce DOCHAZKA_SQL_TRACE to control SQL debugging info
+- sql: add trigger preventing employees from supervising themselves
+- Resource "POST interval/scheduled" no longer requires AID
+- ResourceDefs: adjust POD of "interval/scheduled"
+
+0.556 2017-11-02 23:20 CET
+- Fillup: fix status code when no intervals created/identified
+- Dispatch: fix regression in POST interval/fillup
+

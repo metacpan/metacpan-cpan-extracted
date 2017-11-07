@@ -4,7 +4,7 @@
 # used by Unicode::Collate::Locale.
 #
 # Usage:
-#    <do 'mklocale'> in perl, or <perl mklocale> in command line
+#    <do './mklocale'> in perl, or <perl mklocale> in command line
 #
 # Input files:
 #    data/*.txt
@@ -96,7 +96,7 @@ use Carp;
 use File::Spec;
 
 my $Use4th; # Use 4th level (Unicode 6.2.0 or before)
-my $DEFAULT_LOCALE_VERSION = '1.19'; # should be same as $VERSION of Collate.pm
+my $DEFAULT_LOCALE_VERSION = '1.21'; # should be same as $VERSION of Collate.pm
 
 BEGIN {
     unless ("A" eq pack('U', 0x41)) {
@@ -546,7 +546,7 @@ for my $txt (@txts) {
 	    s/\s*\z/.pm/;
 	    my $f = File::Spec->catfile($CUR_DIR, split /::/, $_);
 	    $f = 'Korean.pm' if /::Korean\.pm/; # using the newer one
-	    require $f;
+	    require "./$f"; # File::Spec->catfile($CUR_DIR, $f) seems not work.
 	    next;
 	}
 	if (/^(alternate)\s+(\S+)/) {

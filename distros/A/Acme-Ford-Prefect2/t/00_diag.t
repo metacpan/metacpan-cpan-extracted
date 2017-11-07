@@ -11,12 +11,18 @@ my $post_diag;
 
 $modules{$_} = $_ for qw(
   Acme::Alien::DontPanic2
+  Alien::Base::Wrapper
+  Data::Dumper
   DynaLoader
   ExtUtils::MakeMaker
   Test2::V0
 );
 
-
+$post_diag = sub {
+  use Alien::Base::Wrapper 1.29 qw( Acme::Alien::DontPanic2 !export );
+  use Data::Dumper qw( Dumper );
+  diag Dumper( { Alien::Base::Wrapper->mm_args } );
+};
 
 my @modules = sort keys %modules;
 

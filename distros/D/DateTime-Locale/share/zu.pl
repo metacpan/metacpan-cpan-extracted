@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "AM",
-    "PM"
+    "PM",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d E",
@@ -24,7 +29,7 @@
     MMM => "LLL",
     MMMEd => "E, MMM d",
     "MMMMW-count-one" => "'week' W 'of' MMM",
-    "MMMMW-count-other" => "'week' W 'of' MMM",
+    "MMMMW-count-other" => "'week' W 'of' MMMM",
     MMMMd => "MMMM d",
     MMMd => "MMM d",
     Md => "MM-dd",
@@ -45,8 +50,8 @@
     yMd => "y-MM-dd",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-one" => "'week' w 'of' y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-one" => "'week' w 'of' Y",
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "zu",
   date_format_full => "EEEE, MMMM d, y",
@@ -64,7 +69,7 @@
     "Sin",
     "Hla",
     "Mgq",
-    "Son"
+    "Son",
   ],
   day_format_narrow => [
     "M",
@@ -73,7 +78,7 @@
     "S",
     "H",
     "M",
-    "S"
+    "S",
   ],
   day_format_wide => [
     "UMsombuluko",
@@ -82,7 +87,7 @@
     "ULwesine",
     "ULwesihlanu",
     "UMgqibelo",
-    "ISonto"
+    "ISonto",
   ],
   day_stand_alone_abbreviated => [
     "Mso",
@@ -91,7 +96,7 @@
     "Sin",
     "Hla",
     "Mgq",
-    "Son"
+    "Son",
   ],
   day_stand_alone_narrow => [
     "M",
@@ -100,7 +105,7 @@
     "S",
     "H",
     "M",
-    "S"
+    "S",
   ],
   day_stand_alone_wide => [
     "UMsombuluko",
@@ -109,19 +114,19 @@
     "ULwesine",
     "ULwesihlanu",
     "UMgqibelo",
-    "ISonto"
+    "ISonto",
   ],
   era_abbreviated => [
     "BC",
-    "AD"
+    "AD",
   ],
   era_narrow => [
     "BC",
-    "AD"
+    "AD",
   ],
   era_wide => [
     "BC",
-    "AD"
+    "AD",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -142,7 +147,7 @@
     "Sep",
     "Okt",
     "Nov",
-    "Dis"
+    "Dis",
   ],
   month_format_narrow => [
     "J",
@@ -156,10 +161,10 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_format_wide => [
-    "UMasingana",
+    "Januwari",
     "Februwari",
     "Mashi",
     "Ephreli",
@@ -170,7 +175,7 @@
     "Septhemba",
     "Okthoba",
     "Novemba",
-    "Disemba"
+    "Disemba",
   ],
   month_stand_alone_abbreviated => [
     "Jan",
@@ -184,7 +189,7 @@
     "Sep",
     "Okt",
     "Nov",
-    "Dis"
+    "Dis",
   ],
   month_stand_alone_narrow => [
     "J",
@@ -198,7 +203,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_stand_alone_wide => [
     "Januwari",
@@ -212,7 +217,7 @@
     "Septhemba",
     "Okthoba",
     "Novemba",
-    "Disemba"
+    "Disemba",
   ],
   name => "Zulu",
   native_language => "isiZulu",
@@ -224,37 +229,37 @@
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "ikota yesi-1",
     "ikota yesi-2",
     "ikota yesi-3",
-    "ikota yesi-4"
+    "ikota yesi-4",
   ],
   quarter_stand_alone_abbreviated => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "ikota yesi-1",
     "ikota yesi-2",
     "ikota yesi-3",
-    "ikota yesi-4"
+    "ikota yesi-4",
   ],
   script => undef,
   territory => undef,
@@ -263,5 +268,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

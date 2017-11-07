@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "a.m.",
-    "p.m."
+    "p.m.",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d, E",
@@ -44,7 +49,7 @@
     yMd => "y-MM-dd",
     yQQQ => "y QQQ",
     yQQQQ => "y QQQQ",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "kw-GB",
   date_format_full => "y MMMM d, EEEE",
@@ -62,7 +67,7 @@
     "Yow",
     "Gwe",
     "Sad",
-    "Sul"
+    "Sul",
   ],
   day_format_narrow => [
     "M",
@@ -71,7 +76,7 @@
     "T",
     "F",
     "S",
-    "S"
+    "S",
   ],
   day_format_wide => [
     "dy Lun",
@@ -80,7 +85,7 @@
     "dy Yow",
     "dy Gwener",
     "dy Sadorn",
-    "dy Sul"
+    "dy Sul",
   ],
   day_stand_alone_abbreviated => [
     "Lun",
@@ -89,7 +94,7 @@
     "Yow",
     "Gwe",
     "Sad",
-    "Sul"
+    "Sul",
   ],
   day_stand_alone_narrow => [
     "M",
@@ -98,7 +103,7 @@
     "T",
     "F",
     "S",
-    "S"
+    "S",
   ],
   day_stand_alone_wide => [
     "dy Lun",
@@ -107,19 +112,19 @@
     "dy Yow",
     "dy Gwener",
     "dy Sadorn",
-    "dy Sul"
+    "dy Sul",
   ],
   era_abbreviated => [
     "RC",
-    "AD"
+    "AD",
   ],
   era_narrow => [
     "RC",
-    "AD"
+    "AD",
   ],
   era_wide => [
     "RC",
-    "AD"
+    "AD",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -140,7 +145,7 @@
     "Gwn",
     "Hed",
     "Du",
-    "Kev"
+    "Kev",
   ],
   month_format_narrow => [
     1,
@@ -154,7 +159,7 @@
     9,
     10,
     11,
-    12
+    12,
   ],
   month_format_wide => [
     "mis Genver",
@@ -168,7 +173,7 @@
     "mis Gwynngala",
     "mis Hedra",
     "mis Du",
-    "mis Kevardhu"
+    "mis Kevardhu",
   ],
   month_stand_alone_abbreviated => [
     "Gen",
@@ -182,7 +187,7 @@
     "Gwn",
     "Hed",
     "Du",
-    "Kev"
+    "Kev",
   ],
   month_stand_alone_narrow => [
     1,
@@ -196,7 +201,7 @@
     9,
     10,
     11,
-    12
+    12,
   ],
   month_stand_alone_wide => [
     "mis Genver",
@@ -210,7 +215,7 @@
     "mis Gwynngala",
     "mis Hedra",
     "mis Du",
-    "mis Kevardhu"
+    "mis Kevardhu",
   ],
   name => "Cornish United Kingdom",
   native_language => "kernewek",
@@ -222,37 +227,37 @@
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_stand_alone_abbreviated => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   script => undef,
   territory => "United Kingdom",
@@ -261,5 +266,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

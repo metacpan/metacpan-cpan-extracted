@@ -60,6 +60,7 @@ lib/Net/WebSocket/X/BadArg.pm
 lib/Net/WebSocket/X/BadHTTPMethod.pm
 lib/Net/WebSocket/X/BadHTTPStatus.pm
 lib/Net/WebSocket/X/BadHeader.pm
+lib/Net/WebSocket/X/BadRequestProtocol.pm
 lib/Net/WebSocket/X/BadToken.pm
 lib/Net/WebSocket/X/Base.pm
 lib/Net/WebSocket/X/ControlPayloadTooLong.pm
@@ -71,9 +72,12 @@ lib/Net/WebSocket/X/ReceivedClose.pm
 lib/Net/WebSocket/X/UnfinishedStream.pm
 lib/Net/WebSocket/X/UnknownExtension.pm
 lib/Net/WebSocket/X/UnknownSubprotocol.pm
+lib/Net/WebSocket/X/UnsupportedProtocolVersion.pm
 t/Net-WebSocket-HTTP.t
+t/constants.t
 t/create_frame.t
 t/handshake.t
+t/handshake_case_insensitivity.t
 t/handshake_extension.t
 t/handshake_subprotocols.t
 t/parse_message.t

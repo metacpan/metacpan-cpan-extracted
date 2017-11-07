@@ -37,7 +37,7 @@ diag "GT::DB version ",GT::DB->VERSION;
 #------------------------------------------------------------------------------
 # VERSION
 
-my $want_version = 263;
+my $want_version = 264;
 is ($GT::DB::Chart::VERSION, $want_version, 'VERSION variable');
 is (GT::DB::Chart->VERSION,  $want_version, 'VERSION class method');
 { ok (eval { GT::DB::Chart->VERSION($want_version); 1 },

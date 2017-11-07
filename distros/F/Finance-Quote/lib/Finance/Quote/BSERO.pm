@@ -30,7 +30,7 @@ use LWP::UserAgent;
 use HTTP::Request::Common;
 use HTML::TableExtract;
 
-our $VERSION = '1.38'; # VERSION
+our $VERSION = '1.43'; # VERSION
 
 my $BSERO_URL = 'http://www.bvb.ro/mobile/m_SecurityDetails.aspx?';
 
@@ -63,7 +63,7 @@ sub bsero {
       if ($reply->is_success)
         {
 
-          $te = new HTML::TableExtract();
+          $te = HTML::TableExtract->new();
 
           $te->parse($reply->content);
 

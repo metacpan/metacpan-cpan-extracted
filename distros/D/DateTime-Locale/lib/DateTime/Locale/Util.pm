@@ -6,7 +6,7 @@ use namespace::autoclean 0.19 -except => ['import'];
 
 use Exporter qw( import );
 
-our $VERSION = '1.16';
+our $VERSION = '1.17';
 
 our @EXPORT_OK = 'parse_locale_code';
 
@@ -66,7 +66,7 @@ DateTime::Locale::Util - Utility code for DateTime::Locale
 
 =head1 VERSION
 
-version 1.16
+version 1.17
 
 =head1 DESCRIPTION
 

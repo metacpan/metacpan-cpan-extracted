@@ -1,3 +1,9 @@
+libqbit-application-model-db-mysql-perl (0.015) raring; urgency=low
+
+  * added get_query_id
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 05 Nov 2017 03:27:52 +0300
+
 libqbit-application-model-db-mysql-perl (0.014) raring; urgency=low
 
   * use query in add

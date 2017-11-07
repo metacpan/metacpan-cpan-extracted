@@ -1,3 +1,6 @@
+0.2.5 2017-11-02
+  - fix argument parsing
+
 0.2.4 2016-08-22
   - make it work on old perls too
 

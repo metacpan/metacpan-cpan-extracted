@@ -5,6 +5,7 @@ use 5.10.0;
 
 use Test::More;
 use Test::Exception;
+use lib '.';
 use t::Util qw/ slack set_mock_response /;
 
 subtest 'test' => sub {

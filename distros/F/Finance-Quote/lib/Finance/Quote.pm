@@ -57,7 +57,7 @@ $YAHOO_CURRENCY_URL = "http://finance.yahoo.com/d/quotes.csv?e=.csv&f=l1&s=";
                 currency_lookup/;
 @EXPORT_TAGS = ( all => [@EXPORT_OK]);
 
-our $VERSION = '1.38'; # VERSION
+our $VERSION = '1.43'; # VERSION
 
 $USE_EXPERIMENTAL_UA = 0;
 
@@ -173,15 +173,16 @@ sub new {
   if (!@reqmodules or $reqmodules[0] eq "-defaults") {
     shift(@reqmodules) if (@reqmodules);
     # Default modules
-    @modules = qw/AEX AIAHK ASEGR ASX BMONesbittBurns BSERO Bourso
-            Cdnfundlibrary Citywire CSE Currencies Deka DWS FTPortfolios Fidelity FidelityFixed
-            FinanceCanada Fool FTfunds HU GoldMoney HEX IndiaMutual LeRevenu
-            ManInvestments Morningstar MorningstarJP MStaruk NZX Platinum
-            SEB SIXfunds SIXshares StockHouseCanada TSP TSX Tdefunds
-            Tdwaterhouse Tiaacref TNetuk Troweprice Trustnet Union USFedBonds
-            VWD ZA Cominvest Finanzpartner YahooJSON Yahoo::Asia
-            Yahoo::Australia Yahoo::Brasil Yahoo::Europe Yahoo::NZ
-            Yahoo::USA YahooYQL ZA_UnitTrusts/; }
+    @modules = qw/AEX AIAHK AlphaVantage ASEGR ASX BMONesbittBurns
+            BSERO Bourso Cdnfundlibrary Citywire CSE Currencies Deka
+            DWS FTPortfolios Fidelity FidelityFixed FinanceCanada Fool
+            FTfunds HU GoldMoney HEX IndiaMutual LeRevenu
+            ManInvestments Morningstar MorningstarJP MStaruk NZX
+            Platinum SEB SIXfunds SIXshares StockHouseCanada TSP TSX
+            Tdefunds Tdwaterhouse Tiaacref TNetuk Troweprice Trustnet
+            Union USFedBonds VWD ZA Cominvest Finanzpartner YahooJSON
+            Yahoo::Asia Yahoo::Australia Yahoo::Brasil Yahoo::Europe
+            Yahoo::NZ Yahoo::USA YahooYQL ZA_UnitTrusts/; }
 
   $this->_load_modules(@modules,@reqmodules);
 
@@ -727,7 +728,6 @@ sub store_date
       ($year, $month, $day) = ($piecesref->{isodate} =~ m/(\d+)\W+(\w+)\W+(\d+)/);
       $year += 2000 if $year < 100;
       $year_specified = 1;
-      $inforef->{$symbol, "a"} = sprintf ("Defaults: Year %d, Month %s, Day %d\n", $year, $month, $day);
 #      printf ("ISO Date %s: Year %d, Month %s, Day %d\n", $piecesref->{isodate}, $year, $month, $day);
     }
 

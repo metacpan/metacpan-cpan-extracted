@@ -50,13 +50,35 @@ define ([
     appLib,
     ajax,
     currentUser,
-    datetime,
+    dt,
     coreLib,
     populate,
     stack,
 ) {
 
     var
+        colorList = [
+            "#e6194b",
+            "#3cb44b",
+            "#ffe119",
+            "#0082c8",
+            "#f58231",
+            "#911eb4",
+            "#46f0f0",
+            "#f032e6",
+            "#d2f53c",
+            "#fabebe",
+            "#008080",
+            "#e6beff",
+            "#aa6e28",
+            "#fffac8",
+            "#800000",
+            "#aaffc3",
+            "#808000",
+            "#ffd8b1",
+            "#000080",
+        ],
+
         backgroundColorStashed = null,
         currentEmployeeStashed = null,
         currentEmplPrivStashed = null,
@@ -79,7 +101,7 @@ define ([
             currentUser('obj', currentEmployeeStashed);
             currentEmployeeStashed = null;
             $('#userbox').html(appLib.fillUserBox()); // reset userbox
-            $('#mainarea').css("background-color", backgroundColorStashed);
+            $('body').css("background-color", backgroundColorStashed);
             coreLib.displayResult('Masquerade is finished');
             $('input[name="sel"]').val('');
         },
@@ -137,6 +159,10 @@ define ([
             return null;
         },
 
+        fullDayTsrange = function (date) {
+            return "[ \"" + date + " 00:00\", \"" + date + " 24:00\" )";
+        },
+
         masqEmployee = function (obj) {
             console.log("Entering masqEmployee() with object", obj);
             // if obj is empty, dA was selected from menu
@@ -156,7 +182,7 @@ define ([
                 }
                 // let the masquerade begin
                 currentEmployeeStashed = $.extend({}, cu);
-                backgroundColorStashed = $('#mainarea').css("background-color");
+                backgroundColorStashed = $('body').css("background-color");
                 currentUser('obj', obj);
                 currentUser('flag1', 1); // turn on masquerade flag
                 populate.bootstrap([
@@ -164,19 +190,19 @@ define ([
                     populateScheduleBySID,
                 ]);
                 $('#userbox').html(appLib.fillUserBox()); // reset userbox
-                $('#mainarea').css("background-color", "red");
+                $('body').css("background-color", "#669933");
                 stack.unwindToType('dmenu'); // return to most recent dmenu
                 return;
             }
         
             // let the admin pick which user to masquerade as
             stack.push('searchEmployee', {}, {
-                "xtarget": "mainEmpl"
+                "masquerade": true,
             });
         },
 
         populateActivityCache = function (populateArray) {
-            var rest, sc, fc, populateContinue;
+            var ao, rest, sc, fc, populateContinue;
             console.log("Entering populateActivityCache()");
             populateContinue = populate.shift(populateArray);
             if (activityCache.length === 0) {
@@ -187,9 +213,11 @@ define ([
                 sc = function (st) {
                     var i;
                     for (i = 0; i < st.payload.length; i += 1) {
-                        activityCache.push(st.payload[i]);
-                        activityByAID[st.payload[i].aid] = st.payload[i];
-                        activityByCode[st.payload[i].code] = st.payload[i];
+                        ao = st.payload[i];
+                        ao.color = colorList[i];
+                        activityCache.push(ao);
+                        activityByAID[st.payload[i].aid] = ao;
+                        activityByCode[st.payload[i].code] = ao;
                     }
                     coreLib.displayResult(i + 1 + " activity objects loaded into cache");
                     populateContinue();
@@ -214,6 +242,38 @@ define ([
             aid = getActivityByCode(code).aid;
             $('#acTaid').html(String(aid));
             populateContinue(populateArray);
+        },
+
+        populateExistingIntervals = function (populateArray) {
+            var cu = currentUser('obj'),
+                eid = cu.eid,
+                date, lia, tsr,
+                rest, sc, fc, populateContinue;
+            date = $("#iNdate").text();
+            console.log("Entering populateExistingIntervals() with date " + date);
+            populateContinue = populate.shift(populateArray);
+            tsr = fullDayTsrange(date);
+            rest = {
+                "method": "GET",
+                "path": "interval/eid/" + eid + "/" + tsr,
+            };
+            sc = function (st) {
+                if (st.code === "DISPATCH_RECORDS_FOUND") {
+                    // payload is an array of interval objects
+                    appLib.displayIntervals(st.payload, $('#iNexistintvls'));
+                }
+                populateContinue(populateArray);
+            };
+            fc = function (st) {
+                if (st.code === "DISPATCH_NOTHING_IN_TSRANGE") {
+                    // form field is pre-populated with "(none)"
+                    coreLib.clearResult();
+                } else {
+                    coreLib.displayError(st.payload.message);
+                }
+                populateContinue(populateArray);
+            };
+            ajax(rest, sc, fc);
         },
 
         populateFullEmployeeProfileCache = function (populateArray) {
@@ -265,12 +325,12 @@ define ([
         populateLastExisting = function (populateArray) {
             var cu = currentUser('obj'),
                 eid = cu.eid,
-                date, tsr,
+                date, lia, tsr,
                 rest, sc, fc, populateContinue;
             date = $("#iNdate").text();
             console.log("Entering populateLastExisting() with date " + date);
             populateContinue = populate.shift(populateArray);
-            tsr = "[ \"" + date + " 00:00\", \"" + date + " 24:00\" )";
+            tsr = fullDayTsrange(date);
             rest = {
                 "method": "GET",
                 "path": "interval/eid/" + eid + "/" + tsr,
@@ -278,12 +338,9 @@ define ([
             sc = function (st) {
                 if (st.code === "DISPATCH_RECORDS_FOUND") {
                     // payload is an array of interval objects
-                    appLib.displayIntervals(
-                        st.payload,
-                        $('#iNlastexistintvl')
-                    );
+                    lia = [st.payload[st.payload.length - 1]];
+                    appLib.displayIntervals(lia, $('#iNlastexistintvl'));
                 }
-                coreLib.clearResult();
                 populateContinue(populateArray);
             };
             fc = function (st) {
@@ -299,42 +356,193 @@ define ([
         },
 
         populateLastPlusOffset = function (populateArray) {
+            var beginTime,
+                date = $('#iNdate').text(),
+                eolei,
+                endTime,
+                i,
+                lastExistIntvl = $('#iNlastexistintvl').text().trim().replace(/\s/g, ''),
+                offset = $('#iNoffset').text(),
+                schedAfter,
+                schedIntvls = $('#iNschedintvls').text().trim().replace(/\s/g, '').split(';'),
+                withinSchedIntvl,
+                rest, sc, fc, populateContinue;
+            console.log("Entering populateLastPlusOffset()");
+            console.log("Date", date);
+            console.log("Offset", offset);
+            if (schedIntvls.length === 1 && schedIntvls[0] === "(none)") {
+                schedIntvls = null;
+            }
+            console.log("Schedule intervals", schedIntvls);
+            if (lastExistIntvl === "(none)") {
+                lastExistIntvl = null;
+            }
+            console.log("Last existing interval", lastExistIntvl);
+            populateContinue = populate.shift(populateArray);
+            // no schedule intervals, no last existing interval
+            if (! schedIntvls && ! lastExistIntvl) {
+                [beginTime, endTime] = dt.canonicalizeTimeRangeOffset("00:00" + String(offset));
+                populateLastPlusOffsetFormFields(beginTime + '-' + endTime);
+                populateContinue(populateArray);
+                return null;
+            }
+            if (! schedIntvls && lastExistIntvl) {
+                [beginTime, endTime] = lastExistIntvl.split('-');
+                [beginTime, endTime] = dt.canonicalizeTimeRangeOffset(endTime + String(offset));
+                populateLastPlusOffsetFormFields(beginTime + '-' + endTime);
+                populateContinue(populateArray);
+                return null;
+            }
+            if (schedIntvls && ! lastExistIntvl) {
+                [beginTime, endTime] = schedIntvls[0].split('-');
+                [beginTime, endTime] = dt.canonicalizeTimeRangeOffset(beginTime + String(offset));
+                populateLastPlusOffsetFormFields(beginTime + '-' + endTime);
+                populateContinue(populateArray);
+                return null;
+            }
+            // Names/meanings of variables
+            //
+            // "eolei": end of last existing interval
+            [beginTime, endTime] = lastExistIntvl.split('-');
+            eolei = endTime;
+            console.log("eolei is " + eolei);
+            //
+            // "withinSchedIntvl": eolei falls within a schedule interval (boolean)
+            // Example: eolei is 8:00, schedIntvl is 8:00-12:00 -> true
+            // Example: eolei is 12:00, schedIntvl is 8:00-12:00 -> false
+            // Example: eolei is 11:55, schedIntvl is 8:00-12:00 -> true
+            // (Calculate withSchedIntvl by comparing eolei with each schedIntvl in turn.
+            // If computation is true for any of them, then the result is true)
+            for (i = 0; i < schedIntvls.length; i += 1) {
+                withinSchedIntvl = dt.isTimeWithinTimeRange(eolei, schedIntvls[i]);
+                if (withinSchedIntvl) {
+                    [beginTime, endTime] = dt.canonicalizeTimeRangeOffset(eolei + String(offset));
+                    populateLastPlusOffsetFormFields(beginTime + '-' + endTime);
+                    populateContinue(populateArray);
+                    return null;
+                }
+            }
+            console.log("eolei does not fall within any of the schedule intervals");
+            //
+            // "schedAfter": first schedule interval that lies fully after eolei 
+            schedAfter = null;
+            for (i = 0; i < schedIntvls.length; i += 1) {
+                if (dt.isTimeRangeAfterTime(schedIntvls[i], eolei)) {
+                    schedAfter = schedIntvls[i];
+                    break;
+                }
+            }
+            // if schedAfter, add offset to beginning of schedAfter
+            // else, add offset to eolei
+            if (schedAfter) {
+                console.log("There is a schedule interval after eolei");
+                [beginTime, endTime] = schedAfter.split('-');
+                [beginTime, endTime] = dt.canonicalizeTimeRangeOffset(beginTime + String(offset));
+            } else {
+                console.log("There is no schedule interval after eolei");
+                [beginTime, endTime] = dt.canonicalizeTimeRangeOffset(eolei + String(offset));
+            }
+            populateLastPlusOffsetFormFields(beginTime + '-' + endTime);
+            populateContinue(populateArray);
         },
 
-        populateSchedIntvlsForDate = function (populateArray) {
+        populateLastPlusOffsetFormFields = function (buf) {
+            var formField = $('#iNlastplusoffset'),
+                formInput = $('input[id="iNtimerange"');
+            formField.html(String(buf));
+            formInput.val(String(buf));
+        },
+
+        populateNextScheduled = function (populateArray) {
             var cu = currentUser('obj'),
-                eid = cu.eid,
-                sid, date, tsr, rest, sc, fc, populateContinue;
+                schedIntvls = $('#iNschedintvls').text(),
+                m, sid, date, rest, sc, fc, populateContinue;
             date = $("#iNdate").text();
-            console.log("Entering populateSchedIntvlsForDate() with date " + date);
-            console.log(populateArray);
+            console.log("Entering populateNextScheduled() with date " + date);
+            if (date === "(none)") {
+                date = null;
+            }
+            // Though #iNsid is hidden, the following will display its value
+            // console.log("SID", document.getElementById("iNsid").textContent);
             populateContinue = populate.shift(populateArray);
             sid = parseInt($("#iNsid").text(), 10);
             if (coreLib.isInteger(sid) && sid > 0) {
-                console.log("Active schedule of EID " + eid + " for " + date + " has SID " + sid);
+                console.log("Active schedule of EID " + cu.eid + " for " + date + " has SID " + sid);
             } else {
-                console.log("EID " + eid + " has no active schedule for " + date);
+                m = "User " + cu.nick + " has no active schedule for " + date;
+                console.log(m);
+                coreLib.displayError(m);
                 populateContinue(populateArray);
                 return null;
             }
             // there is an active schedule: determine the schedule intervals
-            tsr = "[ \"" + date + " 00:00\", \"" + date + " 24:00\" )";
+            // while avoiding existing intervals
+            if (schedIntvls === "(none)") {
+                schedIntvls = null;
+            }
             rest = {
                 "method": "POST",
                 "path": "interval/fillup",
                 "body": {
-                    'clobber': '1',
-                    'tsrange': tsr,
+                    'clobber': '0',
+                    'tsrange': fullDayTsrange(date),
                     'dry_run': '1',
-                    'eid': String(eid),
+                    'eid': String(cu.eid),
                 },
             };
             sc = function (st) {
-                if (st.code === "DISPATCH_FILLUP_INTERVALS_CREATED") {
-                    appLib.displayIntervals(
-                        st.payload.success.intervals,
-                        $('#iNschedintvls')
+                if (st.code === "DISPATCH_SCHEDULED_INTERVALS_IDENTIFIED") {
+                    appLib.displayIntervals([st.payload.success.intervals[0]], $('#iNnextscheduled'));
+                    $('input[id="iNtimerange"]').val(
+                        dt.tsrangeToTimeRange(st.payload.success.intervals[0].intvl)
                     );
+                } else {
+                    if (date) {
+                        m = "No unfulfilled scheduled intervals for " + date;
+                    } else {
+                        m = "No date given";
+                    }
+                    console.log("ERROR: " + m);
+                    coreLib.displayError(m);
+                }
+                populateContinue(populateArray);
+            };
+            fc = function (st) {
+                coreLib.displayError(st.payload.message);
+                populateContinue(populateArray);
+            };
+            ajax(rest, sc, fc);
+        },
+
+        populateSchedIntvlsForDate = function (populateArray) {
+            var cu = currentUser('obj'),
+                sid, date, tsr, rest, sc, fc, populateContinue;
+            date = $("#iNdate").text();
+            console.log("Entering populateSchedIntvlsForDate() with date " + date);
+            // Though #iNsid is hidden, the following will display its value
+            // console.log("SID", document.getElementById("iNsid").textContent);
+            populateContinue = populate.shift(populateArray);
+            sid = parseInt($("#iNsid").text(), 10);
+            if (coreLib.isInteger(sid) && sid > 0) {
+                console.log("Active schedule of EID " + cu.eid + " for " + date + " has SID " + sid);
+            } else {
+                console.log("EID " + cu.eid + " has no active schedule for " + date);
+                populateContinue(populateArray);
+                return null;
+            }
+            // there is an active schedule: determine the schedule intervals
+            tsr = fullDayTsrange(date);
+            rest = {
+                "method": "POST",
+                "path": "interval/scheduled",
+                "body": {
+                    'tsrange': tsr,
+                    'eid': String(cu.eid),
+                },
+            };
+            sc = function (st) {
+                if (st.code === "DISPATCH_SCHEDULED_INTERVALS_IDENTIFIED") {
+                    appLib.displayIntervals(st.payload.success.intervals, $('#iNschedintvls'));
                 }
                 populateContinue(populateArray);
             };
@@ -450,6 +658,13 @@ define ([
             }
         },
 
+        populateYear = function (populateArray) {
+            var populateContinue;
+            console.log("Entering populateYear()");
+            $('input[id="iNyear"]').val(dt.currentYear());
+            populate.shift(populateArray);
+        },
+
         selectActivityAction = function (obj) {
             if (activityCache.length > 0) {
                 stack.push('selectActivity', {
@@ -459,10 +674,12 @@ define ([
             } else {
                 coreLib.displayError("CRITICAL ERROR: activity cache is empty");
             }
-        };
+        }
+        ;
 
     return {
         activityCache: activityCache,
+        endTheMasquerade: endTheMasquerade,
         getActivityByAID: getActivityByAID,
         getActivityByCode: getActivityByCode,
         getProfileByEID: getProfileByEID,
@@ -472,13 +689,16 @@ define ([
         masqEmployee: masqEmployee,
         populateActivityCache: populateActivityCache,
         populateAIDfromCode: populateAIDfromCode,
+        populateExistingIntervals: populateExistingIntervals,
         populateFullEmployeeProfileCache: populateFullEmployeeProfileCache,
         populateLastExisting: populateLastExisting,
         populateLastPlusOffset: populateLastPlusOffset,
+        populateNextScheduled: populateNextScheduled,
         populateSchedIntvlsForDate: populateSchedIntvlsForDate,
         populateScheduleBySID: populateScheduleBySID,
         populateSIDByDate: populateSIDByDate,
         populateSupervisorNick: populateSupervisorNick,
+        populateYear: populateYear,
         profileCacheLength: function () {
             return profileCache.length
         },
@@ -486,6 +706,9 @@ define ([
             return scheduleCache.length
         },
         selectActivityAction: selectActivityAction,
+        setProfileByEID: function (eid, obj) {
+            profileByEID[parseInt(eid, 10)] = obj;
+        },
     };
 
 });

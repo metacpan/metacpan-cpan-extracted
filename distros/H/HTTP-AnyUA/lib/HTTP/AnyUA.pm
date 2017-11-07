@@ -6,7 +6,7 @@ use 5.010;
 use warnings;
 use strict;
 
-our $VERSION = '0.900'; # VERSION
+our $VERSION = '0.901'; # VERSION
 
 use HTTP::AnyUA::Util;
 use Module::Loader;
@@ -14,11 +14,13 @@ use Scalar::Util;
 
 
 our $BACKEND_NAMESPACE;
+our $MIDDLEWARE_NAMESPACE;
 our @BACKENDS;
 our %REGISTERED_BACKENDS;
 
 BEGIN {
-    $BACKEND_NAMESPACE = __PACKAGE__ . '::Backend';
+    $BACKEND_NAMESPACE      = __PACKAGE__ . '::Backend';
+    $MIDDLEWARE_NAMESPACE   = __PACKAGE__ . '::Middleware';
 }
 
 
@@ -128,10 +130,7 @@ sub post_form {
     (@_ == 3 || @_ == 4 && ref $args eq 'HASH')
         or _usage(q{$any_ua->post_form($url, $formdata, \%options)});
 
-    my $headers = {};
-    while (my ($key, $value) = each %{$args->{headers} || {}}) {
-        $headers->{lc $key} = $value;
-    }
+    my $headers = HTTP::AnyUA::Util::normalize_headers($args->{headers});
     delete $args->{headers};
 
     return $self->request(POST => $url, {
@@ -151,13 +150,7 @@ sub mirror {
     @_ == 3 || (@_ == 4 && ref $args eq 'HASH')
         or _usage(q{$any_ua->mirror($url, $filepath, \%options)});
 
-    if (exists $args->{headers}) {
-        my $headers = {};
-        while (my ($key, $value) = each %{$args->{headers} || {}}) {
-            $headers->{lc($key)} = $value;
-        }
-        $args->{headers} = $headers;
-    }
+    $args->{headers} = HTTP::AnyUA::Util::normalize_headers($args->{headers});
 
     if (-e $file and my $mtime = (stat($file))[9]) {
         $args->{headers}{'if-modified-since'} ||= HTTP::AnyUA::Util::http_date($mtime);
@@ -210,6 +203,22 @@ sub mirror {
     else {
         return $finish->($resp);
     }
+}
+
+
+sub apply_middleware {
+    my $self    = shift;
+    my $class   = shift;
+
+    if (!ref $class) {
+        $class = "${MIDDLEWARE_NAMESPACE}::${class}" unless $class =~ s/^\+//;
+        $self->_module_loader->load($class);
+    }
+
+    $self->{backend} = $class->wrap($self->backend, @_);
+    $self->_check_response_is_future($self->response_is_future);
+
+    return $self;
 }
 
 
@@ -321,7 +330,7 @@ HTTP::AnyUA - An HTTP user agent programming interface unification layer
 
 =head1 VERSION
 
-version 0.900
+version 0.901
 
 =head1 SYNOPSIS
 
@@ -471,6 +480,27 @@ actually throwing the exceptions. The reason for this is that exceptions as resp
 deal with for non-blocking HTTP clients, and the fact that this method throws exceptions in
 L<HTTP::Tiny> seems like an inconsistency in its interface.
 
+=head2 apply_middleware
+
+    $any_ua->apply_middleware($middleware_package);
+    $any_ua->apply_middleware($middleware_package, %args);
+    $any_ua->apply_middleware($middleware_obj);
+
+Wrap the backend with some new middleware. Middleware packages are relative to the
+C<HTTP::AnyUA::Middleware::> namespace unless prefixed with a C<+>.
+
+This effectively replaces the L</backend> with a new object that wraps the previous backend.
+
+This can be used multiple times to add multiple layers of middleware, and order matters. The last
+middleware applied is the first one to see the request and last one to get the response. For
+example, if you apply middleware that does logging and middleware that does caching (and
+short-circuits on a cache hit), applying your logging middleware I<first> will cause only cache
+misses to be logged whereas applying your cache middleware first will allow all requests to be
+logged.
+
+See L<HTTP::AnyUA::Middleware> for more information about what middleware is and how to write your
+own middleware.
+
 =head2 register_backend
 
     HTTP::AnyUA->register_backend($user_agent_package => $backend_package);
@@ -482,6 +512,154 @@ relative to the C<HTTP::AnyUA::Backend::> namespace unless prefixed with a C<+>.
 
 If you only need to set a backend as a one-off thing, you could also pass an instantiated backend to
 L</new>.
+
+=head1 SPECIFICATION
+
+This section specifies a standard set of data structures that can be used to make a request and get
+a response from a user agent. This is the specification HTTP::AnyUA uses for its programming
+interface. It is heavily based on L<HTTP::Tiny>'s interface, and parts of this specification were
+adapted or copied verbatim from that module's documentation. The intent is for this specification to
+be written such that L<HTTP::Tiny> is already a compliant implementor of the specification (at least
+as of the specification's publication date).
+
+=head2 The Request
+
+A request is a tuple of the form C<(Method, URL)> or C<(Method, URL, Options)>.
+
+=head3 Method
+
+Method B<MUST> be a string representing the HTTP verb. This is commonly C<"GET">, C<"POST">,
+C<"HEAD">, C<"DELETE">, etc.
+
+=head3 URL
+
+URL B<MUST> be a string representing the remote resource to be acted upon. The URL B<MUST> have
+unsafe characters escaped and international domain names encoded before being passed to the user
+agent. A user agent B<MUST> generate a C<"Host"> header based on the URL in accordance with RFC
+2616; a user agent B<MAY> throw an error if a C<"Host"> header is given with the L</headers>.
+
+=head3 Options
+
+Options, if present, B<MUST> be a hash reference containing zero or more of the following keys with
+appropriate values. A user agent B<MAY> support more options than are specified here.
+
+=head4 headers
+
+The value for the C<headers> key B<MUST> be a hash reference containing zero or more HTTP header
+names (as keys) and header values. The value for a header B<MUST> be either a string containing the
+header value OR an array reference where each item is a string. If the value for a header is an
+array reference, the user agent B<MUST> output the header multiple times with each value in the
+array.
+
+User agents B<MAY> may add headers, but B<SHOULD NOT> replace user-specified headers unless
+otherwise documented.
+
+=head4 content
+
+The value for the C<content> key B<MUST> be a string OR a code reference. If the value is a string,
+its contents will be included with the request as the body. If the value is a code reference, the
+referenced code will be called iteratively to produce the body of the request, and the code B<MUST>
+return an empty string or undef value to indicate the end of the request body. If the value is
+a code reference, a user agent B<SHOULD> use chunked transfer encoding if it supports it, otherwise
+a user agent B<MAY> completely drain the code of content before sending the request.
+
+=head4 data_callback
+
+The value for the C<data_callback> key B<MUST> be a code reference that will be called zero or more
+times, once for each "chunk" of response body received. A user agent B<MAY> send the entire response
+body in one call. The referenced code B<MUST> be given two arguments; the first is a string
+containing a chunk of the response body, the second is an in-progress L<response|/The Response>.
+
+=head2 The Response
+
+A response B<MUST> be a hash reference containg some required keys and values. A response B<MAY>
+contain some optional keys and values.
+
+=head3 success
+
+A response B<MUST> include a C<success> key, the value of which is a boolean indicating whether or
+not the request is to be considered a success (true is a success). Unless otherwise documented,
+a successful result means that the operation returned a 2XX status code.
+
+=head3 url
+
+A response B<MUST> include a C<url> key, the value of which is the URL that provided the response.
+This is the URL used in the request unless there were redirections, in which case it is the last URL
+queried in a redirection chain.
+
+=head3 status
+
+A response B<MUST> include a C<status> key, the value of which is the HTTP status code of the
+response. If an internal exception occurs (e.g. connection error), then the status code B<MUST> be
+C<599>.
+
+=head3 reason
+
+A response B<MUST> include a C<reason> key, the value of which is the response phrase returned by
+the server OR "Internal Exception" if an internal exception occurred.
+
+=head3 content
+
+A response B<MAY> include a C<content> key, the value of which is the response body returned by the
+server OR the text of the exception if an internal exception occurred. This field B<MUST> be missing
+or empty if the server provided no response OR if the body was already provided via
+L</data_callback>.
+
+=head3 headers
+
+A response B<SHOULD> include a C<headers> key, the value of which is a hash reference containing
+zero or more HTTP header names (as keys) and header values. Keys B<MUST> be lowercased. The value
+for a header B<MUST> be either a string containing the header value OR an array reference where each
+item is the value of one of the repeated headers.
+
+=head3 redirects
+
+A response B<MAY> include a C<redirects> key, the value of which is an array reference of one or
+more responses from redirections that occurred to fulfill the current request, in chronological
+order.
+
+=head1 FREQUENTLY ASKED QUESTIONS
+
+=head2 How do I set up proxying, SSL, cookies, timeout, etc.?
+
+HTTP::AnyUA provides a common interface for I<using> HTTP clients, not for instantiating or
+configuring them. Proxying, SSL, and other custom settings can be configured directly through the
+underlying HTTP client; see the documentation for your particular user agent to learn how to
+configure these things.
+
+L<AnyEvent::HTTP> is a bit of a special case because there is no instantiated object representing
+the client. For this particular user agent, you can configure the backend to pass a default set of
+options whenever it calls C<http_request>. See L<HTTP::AnyUA::Backend::AnyEvent::HTTP/options>:
+
+    $any_ua->backend->options({recurse => 5, timeout => 15});
+
+If you are a module writer, you should probably receive a user agent from your end user and leave
+this type of configuration up to them.
+
+=head2 Why use HTTP::AnyUA instead of some other HTTP client?
+
+Maybe you shouldn't. If you're an end user writing a script or application, you can just pick the
+HTTP client that suits you best and use it. For example, if you're writing a L<Mojolicious> app,
+you're not going wrong by using L<Mojo::UserAgent>; it's loaded with features and is well-integrated
+with that particular environment.
+
+As an end user, you I<could> wrap the HTTP client you pick in an HTTP::AnyUA object, but the only
+reason to do this is if you prefer using the L<HTTP::Tiny> interface.
+
+The real benefit of HTTP::AnyUA (or something like it) is if module writers use it to allow end
+users of their modules to be able to plug in whatever HTTP client they want. For example, a module
+that implements an API wrapper that has a hard dependency on L<LWP::UserAgent> or even L<HTTP::Tiny>
+is essentially useless for non-blocking applications. If the same hypothetical module had been
+written using HTTP::AnyUA then it would be useful in any scenario.
+
+=head2 Why use the HTTP::Tiny interface?
+
+The L<HTTP::Tiny> interface is simple but provides all the essential functionality needed for
+a capable HTTP client and little more. That makes it easy to provide an implementation for, and it
+also makes it straightforward for module authors to use.
+
+Marrying the L<HTTP::Tiny> interface with L<Future> gives us these benefits for both blocking and
+non-blocking modules and applications.
 
 =head1 SUPPORTED USER AGENTS
 
@@ -578,154 +756,6 @@ doesn't matter for users who choose non-blocking HTTP clients because they will 
 objects either way, but users who know they are using a blocking HTTP client may appreciate not
 having to deal with L<Future> objects at all.
 
-=head1 FREQUENTLY ASKED QUESTIONS
-
-=head2 How do I set up proxying, SSL, cookies, timeout, etc.?
-
-HTTP::AnyUA provides a common interface for I<using> HTTP clients, not for instantiating or
-configuring them. Proxying, SSL, and other custom settings can be configured directly through the
-underlying HTTP client; see the documentation for your particular user agent to learn how to
-configure these things.
-
-L<AnyEvent::HTTP> is a bit of a special case because there is no instantiated object representing
-the client. For this particular user agent, you can configure the backend to pass a default set of
-options whenever it calls C<http_request>. See L<HTTP::AnyUA::Backend::AnyEvent::HTTP/options>:
-
-    $any_ua->backend->options({recurse => 5, timeout => 15});
-
-If you are a module writer, you should probably receive a user agent from your end user and leave
-this type of configuration up to them.
-
-=head2 Why use HTTP::AnyUA instead of some other HTTP client?
-
-Maybe you shouldn't. If you're an end user writing a script or application, you can just pick the
-HTTP client that suits you best and use it. For example, if you're writing a L<Mojolicious> app,
-you're not going wrong by using L<Mojo::UserAgent>; it's loaded with features and is well-integrated
-with that particular environment.
-
-As an end user, you I<could> wrap the HTTP client you pick in an HTTP::AnyUA object, but the only
-reason to do this is if you prefer using the L<HTTP::Tiny> interface.
-
-The real benefit of HTTP::AnyUA (or something like it) is if module writers use it to allow end
-users of their modules to be able to plug in whatever HTTP client they want. For example, a module
-that implements an API wrapper that has a hard dependency on L<LWP::UserAgent> or even L<HTTP::Tiny>
-is essentially useless for non-blocking applications. If the same hypothetical module had been
-written using HTTP::AnyUA then it would be useful in any scenario.
-
-=head2 Why use the HTTP::Tiny interface?
-
-The L<HTTP::Tiny> interface is simple but provides all the essential functionality needed for
-a capable HTTP client and little more. That makes it easy to provide an implementation for, and it
-also makes it straightforward for module authors to use.
-
-Marrying the L<HTTP::Tiny> interface with L<Future> gives us these benefits for both blocking and
-non-blocking modules and applications.
-
-=head1 SPECIFICATION
-
-This section specifies a standard set of data structures that can be used to make a request and get
-a response from a user agent. This is the specification HTTP::AnyUA uses for its programming
-interface. It is heavily based on L<HTTP::Tiny>'s interface, and parts of this specification were
-adapted or copied verbatim from that module's documentation. The intent is for this specification to
-be written such that L<HTTP::Tiny> is already a compliant implementor of the specification (at least
-as of the specification's publication date).
-
-=head2 The Request
-
-A request is a tuple of the form C<(Method, URL)> or C<(Method, URL, Options)>.
-
-=head3 Method
-
-Method B<MUST> be a string representing the HTTP verb. This is commonly C<"GET">, C<"POST">,
-C<"HEAD">, C<"DELETE">, etc.
-
-=head3 URL
-
-URL B<MUST> be a string representing the remote resource to be acted upon. The URL B<MUST> have
-unsafe characters escaped and international domain names encoded before being passed to the user
-agent. A user agent B<MUST> generated a C<"Host"> header based on the URL in accordance with RFC
-2616; a user agent B<MAY> throw an error if a C<"Host"> header is given with the L</headers>.
-
-=head3 Options
-
-Options, if present, B<MUST> be a hash reference containing zero or more of the following keys with
-appropriate values. A user agent B<MAY> support more options than are specified here.
-
-=head4 headers
-
-The value for the C<headers> key B<MUST> be a hash reference containing zero or more HTTP header
-names (as keys) and header values. The value for a header B<MUST> be either a string containing the
-header value OR an array reference where each item is a string. If the value for a header is an
-array reference, the user agent B<MUST> output the header multiple times with each value in the
-array.
-
-User agents B<MAY> may add headers, but B<SHOULD NOT> replace user-specified headers unless
-otherwise documented.
-
-=head4 content
-
-The value for the C<content> key B<MUST> be a string OR a code reference. If the value is a string,
-its contents will be included with the request as the body. If the value is a code reference, the
-referenced code will be called iteratively to produce the body of the request, and the code B<MUST>
-return an empty string or undef value to indicate the end of the request body. If the value is
-a code reference, a user agent B<SHOULD> use chunked transfer encoding if it supports it, otherwise
-a user agent B<MAY> completely drain the code of content before sending the request.
-
-=head4 data_callback
-
-The value for the C<data_callback> key B<MUST> be a code reference that will be called zero or more
-times, once for each "chunk" of response body received. A user agent B<MAY> send the entire response
-body in one call. The referenced code B<MUST> be given two arguments; the first is a string
-containing a chunk of the response body, the second is an in-progress L<response|/The Response>.
-
-=head2 The Response
-
-A response B<MUST> be a hash reference containg some required keys and values. A response B<MAY>
-contain some optional keys and values.
-
-=head3 success
-
-A response B<MUST> include a C<success> key, the value of which is a boolean indicating whether or
-not the request is to be considered a success (true is a success). Unless otherwise documented,
-a successful result means that the operation returned a 2XX status code.
-
-=head3 url
-
-A response B<MUST> include a C<url> key, the value of which is the URL that provided the response.
-This is the URL used in the request unless there were redirections, in which case it is the last URL
-queried in a rediretion chain.
-
-=head3 status
-
-A response B<MUST> include a C<status> key, the value of which is the HTTP status code of the
-response. If an internal exception occurs (e.g. connection error), then the status code B<MUST> be
-C<599>.
-
-=head3 reason
-
-A response B<MUST> include a C<reason> key, the value of which is the response phrase returned by
-the server OR "Internal Exception" if an internal exception occurred.
-
-=head3 content
-
-A response B<MAY> include a C<content> key, the value of which is the response body returned by the
-server OR the text of the exception if an internal exception occurred. This field B<MUST> be missing
-or empty if the server provided no response OR if the body was already provided via
-L</data_callback>.
-
-=head3 headers
-
-A response B<SHOULD> include a C<headers> key, the value of which is a hash reference containing
-zero or more HTTP header names (as keys) and header values. Keys B<MUST> be lowercased. The value
-for a header B<MUST> be either a string containing the header value OR an array reference where each
-item is the value of one of the repeated headers.
-
-=head3 redirects
-
-A response B<MAY> include a C<redirects> key, the value of which is an array reference of one or
-more responses from redirections that occurred to fulfill the current request, in chronological
-order.
-
 =head1 ENVIRONMENT
 
 =over 4
@@ -742,7 +772,7 @@ Not all HTTP clients implement the same features or in the same ways. While the 
 is to hide those differences, you may notice some (hopefully) I<insignificant> differences when
 plugging in different clients. For example, L<LWP::UserAgent> sets some headers on the response such
 as C<client-date> and C<client-peer> that won't appear when using other clients. Little differences
-like these probably aren't big deal. Other differences may be a bigger deal, depending on what's
+like these probably aren't a big deal. Other differences may be a bigger deal, depending on what's
 important to you. For example, some clients (like L<HTTP::Tiny>) may do chunked transfer encoding in
 situations where other clients won't (probably because they don't support it). It's not a goal of
 this project to eliminate I<all> of the differences, but if you come across a difference that is

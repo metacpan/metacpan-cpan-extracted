@@ -75,7 +75,7 @@ use HTTP::Request::Common;
 use HTML::TreeBuilder
     ;    # Boursorama doesn't put data in table elements anymore but uses <div>
 
-our $VERSION = '1.38'; # VERSION
+our $VERSION = '1.43'; # VERSION
 
 my $Bourso_URL = 'http://www.boursorama.com/recherche/index.phtml';
 
@@ -128,7 +128,7 @@ sub bourso {
             my $tree = HTML::TreeBuilder->new_from_content( $reply->content );
 
             # retrieve SYMBOL
-            my @symbolline = $tree->look_down( 'class', 'fv-isin ellipsis' );
+            my @symbolline = $tree->look_down( 'class', 'seoinline fv-isin ellipsis' );
 
             unless (@symbolline) {
                 $info{ $stocks, "success" }  = 0;

@@ -18,8 +18,8 @@ our $object = ( Net::Whois::Object->new(@lines) )[0];
 isa_ok $object, $class;
 
 # Non-inherited methods
-can_ok $object, qw( mntner descr country admin_c tech_c upd_to mnt_nfy auth
-    auth_override remarks notify abuse_mailbox mnt_by referral_by changed source);
+can_ok $object, qw( mntner descr admin_c tech_c upd_to mnt_nfy auth
+    remarks notify abuse_mailbox mnt_by referral_by changed source);
 
 # Check if typed attributes are correct
 can_ok $object, $object->attributes('mandatory');
@@ -41,12 +41,6 @@ $tested{'remarks'}++;
 is_deeply( $object->remarks(), ['Remark1'], 'remarks properly parsed' );
 $object->remarks('Added remark');
 is( $object->remarks()->[1], 'Added remark', 'remarks properly added' );
-
-# Test 'country'
-$tested{'country'}++;
-is( $object->country(), 'FR', 'country properly parsed' );
-$object->country('ZH');
-is( $object->country(), 'ZH', 'country properly set' );
 
 # Test 'admin_c'
 $tested{'admin_c'}++;
@@ -114,11 +108,6 @@ is( $object->source(), 'RIPE', 'source properly parsed' );
 $object->source('APNIC');
 is( $object->source(), 'APNIC', 'source properly set' );
 
-# Test 'auth_override'
-$tested{'auth_override'}++;
-
-# TODO
-
 # Test 'org'
 $tested{'org'}++;
 
@@ -133,7 +122,6 @@ __DATA__
 mntner:         MAINT01-EXAMPLECOM
 remarks:        Remark1
 descr:          Maintainer for Example company
-country:        FR
 admin-c:        FR123-AP
 tech-c:         FR123-AP
 upd-to:         abc@somewhere.com

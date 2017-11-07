@@ -139,3 +139,8 @@ Revision history for POE-Filter-SSL
 0.36	01.11.2017
 	Again pod errors
 
+0.37	05.11.2017
+	ignoreVerifyError: Allows to connect trusted without specify error testing (e.g. time)
+	debugging improved
+	Only import key/crt if key/crt is passed
+

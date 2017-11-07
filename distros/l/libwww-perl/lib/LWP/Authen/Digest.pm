@@ -1,5 +1,5 @@
 package LWP::Authen::Digest;
-$LWP::Authen::Digest::VERSION = '6.27';
+$LWP::Authen::Digest::VERSION = '6.29';
 use strict;
 use base 'LWP::Authen::Basic';
 

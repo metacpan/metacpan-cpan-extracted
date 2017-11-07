@@ -33,58 +33,58 @@ no_index:
 provides:
   WebService::BitbucketServer:
     file: lib/WebService/BitbucketServer.pm
-    version: '0.602'
+    version: '0.603'
   WebService::BitbucketServer::AccessTokens::V1:
     file: lib/WebService/BitbucketServer/AccessTokens/V1.pm
-    version: '0.602'
+    version: '0.603'
   WebService::BitbucketServer::Audit::V1:
     file: lib/WebService/BitbucketServer/Audit/V1.pm
-    version: '0.602'
+    version: '0.603'
   WebService::BitbucketServer::Branch::V1:
     file: lib/WebService/BitbucketServer/Branch/V1.pm
-    version: '0.602'
+    version: '0.603'
   WebService::BitbucketServer::Build::V1:
     file: lib/WebService/BitbucketServer/Build/V1.pm
-    version: '0.602'
+    version: '0.603'
   WebService::BitbucketServer::CommentLikes::V1:
     file: lib/WebService/BitbucketServer/CommentLikes/V1.pm
-    version: '0.602'
+    version: '0.603'
   WebService::BitbucketServer::Core::V1:
     file: lib/WebService/BitbucketServer/Core/V1.pm
-    version: '0.602'
+    version: '0.603'
   WebService::BitbucketServer::DefaultReviewers::V1:
     file: lib/WebService/BitbucketServer/DefaultReviewers/V1.pm
-    version: '0.602'
+    version: '0.603'
   WebService::BitbucketServer::GPG::V1:
     file: lib/WebService/BitbucketServer/GPG/V1.pm
-    version: '0.602'
+    version: '0.603'
   WebService::BitbucketServer::Git::V1:
     file: lib/WebService/BitbucketServer/Git/V1.pm
-    version: '0.602'
+    version: '0.603'
   WebService::BitbucketServer::JIRA::V1:
     file: lib/WebService/BitbucketServer/JIRA/V1.pm
-    version: '0.602'
+    version: '0.603'
   WebService::BitbucketServer::MirroringUpstream::V1:
     file: lib/WebService/BitbucketServer/MirroringUpstream/V1.pm
-    version: '0.602'
+    version: '0.603'
   WebService::BitbucketServer::RefRestriction::V2:
     file: lib/WebService/BitbucketServer/RefRestriction/V2.pm
-    version: '0.602'
+    version: '0.603'
   WebService::BitbucketServer::RepositoryRefSync::V1:
     file: lib/WebService/BitbucketServer/RepositoryRefSync/V1.pm
-    version: '0.602'
+    version: '0.603'
   WebService::BitbucketServer::Response:
     file: lib/WebService/BitbucketServer/Response.pm
-    version: '0.602'
+    version: '0.603'
   WebService::BitbucketServer::SSH::V1:
     file: lib/WebService/BitbucketServer/SSH/V1.pm
-    version: '0.602'
+    version: '0.603'
   WebService::BitbucketServer::Spec:
     file: lib/WebService/BitbucketServer/Spec.pm
-    version: '0.602'
+    version: '0.603'
   WebService::BitbucketServer::WADL:
     file: lib/WebService/BitbucketServer/WADL.pm
-    version: '0.602'
+    version: '0.603'
 requires:
   Carp: '0'
   Clone: '0'
@@ -104,6 +104,8 @@ resources:
   bugtracker: https://github.com/chazmcgarvey/WebService-BitbucketServer/issues
   homepage: https://github.com/chazmcgarvey/WebService-BitbucketServer
   repository: https://github.com/chazmcgarvey/WebService-BitbucketServer.git
-version: '0.602'
+version: '0.603'
 x_authority: cpan:CCM
+x_contributors:
+  - 'Camspi <amarus18@hotmail.com>'
 x_serialization_backend: 'YAML::Tiny version 1.70'

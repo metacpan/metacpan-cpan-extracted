@@ -1,3 +1,6 @@
+0.004     2017-11-03 12:20:54 EDT
+  - Added new_timeout constructor for a future that fails after a delay
+
 0.003     2015-11-28 15:34:30 EST
   - $loop parameter to constructors is now optional
 

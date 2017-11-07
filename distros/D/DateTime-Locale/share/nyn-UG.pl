@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "AM",
-    "PM"
+    "PM",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d, E",
@@ -45,7 +50,7 @@
     yMd => "y-MM-dd",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "nyn-UG",
   date_format_full => "EEEE, d MMMM y",
@@ -63,7 +68,7 @@
     "OKN",
     "OKT",
     "OMK",
-    "SAN"
+    "SAN",
   ],
   day_format_narrow => [
     "K",
@@ -72,7 +77,7 @@
     "N",
     "T",
     "M",
-    "S"
+    "S",
   ],
   day_format_wide => [
     "Orwokubanza",
@@ -81,7 +86,7 @@
     "Orwakana",
     "Orwakataano",
     "Orwamukaaga",
-    "Sande"
+    "Sande",
   ],
   day_stand_alone_abbreviated => [
     "ORK",
@@ -90,7 +95,7 @@
     "OKN",
     "OKT",
     "OMK",
-    "SAN"
+    "SAN",
   ],
   day_stand_alone_narrow => [
     "K",
@@ -99,7 +104,7 @@
     "N",
     "T",
     "M",
-    "S"
+    "S",
   ],
   day_stand_alone_wide => [
     "Orwokubanza",
@@ -108,19 +113,19 @@
     "Orwakana",
     "Orwakataano",
     "Orwamukaaga",
-    "Sande"
+    "Sande",
   ],
   era_abbreviated => [
     "BC",
-    "AD"
+    "AD",
   ],
   era_narrow => [
     "BC",
-    "AD"
+    "AD",
   ],
   era_wide => [
     "Kurisito Atakaijire",
-    "Kurisito Yaijire"
+    "Kurisito Yaijire",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -141,7 +146,7 @@
     "KMW",
     "KKM",
     "KNK",
-    "KNB"
+    "KNB",
   ],
   month_format_narrow => [
     "J",
@@ -155,7 +160,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_format_wide => [
     "Okwokubanza",
@@ -169,7 +174,7 @@
     "Okwamwenda",
     "Okwaikumi",
     "Okwaikumi na kumwe",
-    "Okwaikumi na ibiri"
+    "Okwaikumi na ibiri",
   ],
   month_stand_alone_abbreviated => [
     "KBZ",
@@ -183,7 +188,7 @@
     "KMW",
     "KKM",
     "KNK",
-    "KNB"
+    "KNB",
   ],
   month_stand_alone_narrow => [
     "J",
@@ -197,7 +202,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_stand_alone_wide => [
     "Okwokubanza",
@@ -211,7 +216,7 @@
     "Okwamwenda",
     "Okwaikumi",
     "Okwaikumi na kumwe",
-    "Okwaikumi na ibiri"
+    "Okwaikumi na ibiri",
   ],
   name => "Nyankole Uganda",
   native_language => "Runyankore",
@@ -223,37 +228,37 @@
     "K1",
     "K2",
     "K3",
-    "K4"
+    "K4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "KWOTA 1",
     "KWOTA 2",
     "KWOTA 3",
-    "KWOTA 4"
+    "KWOTA 4",
   ],
   quarter_stand_alone_abbreviated => [
     "K1",
     "K2",
     "K3",
-    "K4"
+    "K4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "KWOTA 1",
     "KWOTA 2",
     "KWOTA 3",
-    "KWOTA 4"
+    "KWOTA 4",
   ],
   script => undef,
   territory => "Uganda",
@@ -262,5 +267,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

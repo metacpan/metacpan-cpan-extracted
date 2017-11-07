@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "m",
-    "f"
+    "f",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "E, d",
@@ -49,10 +54,10 @@
     yMd => "M/d/y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-few" => "'seachdain' w 'dhe' y",
-    "yw-count-one" => "'seachdain' w 'dhe' y",
-    "yw-count-other" => "'seachdain' w 'dhe' y",
-    "yw-count-two" => "'seachdain' w 'dhe' y"
+    "yw-count-few" => "'seachdain' w 'dhe' Y",
+    "yw-count-one" => "'seachdain' w 'dhe' Y",
+    "yw-count-other" => "'seachdain' w 'dhe' Y",
+    "yw-count-two" => "'seachdain' w 'dhe' Y",
   },
   code => "gd-GB",
   date_format_full => "EEEE, d'mh' MMMM y",
@@ -70,7 +75,7 @@
     "Dia",
     "Dih",
     "DiS",
-    "DiD"
+    "DiD",
   ],
   day_format_narrow => [
     "L",
@@ -79,7 +84,7 @@
     "A",
     "H",
     "S",
-    "D"
+    "D",
   ],
   day_format_wide => [
     "DiLuain",
@@ -88,7 +93,7 @@
     "DiarDaoin",
     "DihAoine",
     "DiSathairne",
-    "DiD\N{U+00f2}mhnaich"
+    "DiD\N{U+00f2}mhnaich",
   ],
   day_stand_alone_abbreviated => [
     "DiL",
@@ -97,7 +102,7 @@
     "Dia",
     "Dih",
     "DiS",
-    "DiD"
+    "DiD",
   ],
   day_stand_alone_narrow => [
     "L",
@@ -106,7 +111,7 @@
     "A",
     "H",
     "S",
-    "D"
+    "D",
   ],
   day_stand_alone_wide => [
     "DiLuain",
@@ -115,19 +120,19 @@
     "DiarDaoin",
     "DihAoine",
     "DiSathairne",
-    "DiD\N{U+00f2}mhnaich"
+    "DiD\N{U+00f2}mhnaich",
   ],
   era_abbreviated => [
     "RC",
-    "AD"
+    "AD",
   ],
   era_narrow => [
     "R",
-    "A"
+    "A",
   ],
   era_wide => [
     "Ro Chr\N{U+00ec}osta",
-    "An d\N{U+00e8}idh Chr\N{U+00ec}osta"
+    "An d\N{U+00e8}idh Chr\N{U+00ec}osta",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -148,7 +153,7 @@
     "Sult",
     "D\N{U+00e0}mh",
     "Samh",
-    "D\N{U+00f9}bh"
+    "D\N{U+00f9}bh",
   ],
   month_format_narrow => [
     "F",
@@ -162,7 +167,7 @@
     "S",
     "D",
     "S",
-    "D"
+    "D",
   ],
   month_format_wide => [
     "dhen Fhaoilleach",
@@ -176,7 +181,7 @@
     "dhen t-Sultain",
     "dhen D\N{U+00e0}mhair",
     "dhen t-Samhain",
-    "dhen D\N{U+00f9}bhlachd"
+    "dhen D\N{U+00f9}bhlachd",
   ],
   month_stand_alone_abbreviated => [
     "Faoi",
@@ -190,7 +195,7 @@
     "Sult",
     "D\N{U+00e0}mh",
     "Samh",
-    "D\N{U+00f9}bh"
+    "D\N{U+00f9}bh",
   ],
   month_stand_alone_narrow => [
     "F",
@@ -204,7 +209,7 @@
     "S",
     "D",
     "S",
-    "D"
+    "D",
   ],
   month_stand_alone_wide => [
     "Am Faoilleach",
@@ -218,7 +223,7 @@
     "An t-Sultain",
     "An D\N{U+00e0}mhair",
     "An t-Samhain",
-    "An D\N{U+00f9}bhlachd"
+    "An D\N{U+00f9}bhlachd",
   ],
   name => "Scottish Gaelic United Kingdom",
   native_language => "G\N{U+00e0}idhlig",
@@ -230,37 +235,37 @@
     "C1",
     "C2",
     "C3",
-    "C4"
+    "C4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "1d chairteal",
     "2na cairteal",
     "3s cairteal",
-    "4mh cairteal"
+    "4mh cairteal",
   ],
   quarter_stand_alone_abbreviated => [
     "C1",
     "C2",
     "C3",
-    "C4"
+    "C4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "1d chairteal",
     "2na cairteal",
     "3s cairteal",
-    "4mh cairteal"
+    "4mh cairteal",
   ],
   script => undef,
   territory => "United Kingdom",
@@ -269,5 +274,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

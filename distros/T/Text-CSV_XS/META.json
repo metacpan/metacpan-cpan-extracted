@@ -1,30 +1,42 @@
 {
-   "meta-spec" : {
-      "version" : 2,
-      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec"
+   "provides" : {
+      "Text::CSV_XS" : {
+         "file" : "CSV_XS.pm",
+         "version" : "1.34"
+      }
    },
-   "version" : "1.33",
-   "name" : "Text-CSV_XS",
+   "resources" : {
+      "x_IRC" : "irc://irc.perl.org/#csv",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Tux/Text-CSV_XS",
+         "web" : "https://github.com/Tux/Text-CSV_XS"
+      },
+      "homepage" : "https://metacpan.org/pod/Text::CSV_XS"
+   },
    "prereqs" : {
+      "test" : {
+         "requires" : {
+            "Tie::Scalar" : "0",
+            "Test::More" : "0"
+         }
+      },
       "runtime" : {
          "recommends" : {
             "Encode" : "2.93"
          },
          "requires" : {
-            "perl" : "5.006001",
             "IO::Handle" : "0",
-            "DynaLoader" : "0"
+            "DynaLoader" : "0",
+            "perl" : "5.006001"
          }
       },
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
-         }
-      },
-      "test" : {
-         "requires" : {
-            "Test::More" : "0",
-            "Tie::Scalar" : "0"
          }
       },
       "build" : {
@@ -33,32 +45,20 @@
          }
       }
    },
+   "version" : "1.34",
+   "abstract" : "Comma-Separated Values manipulation routines",
+   "name" : "Text-CSV_XS",
    "generated_by" : "Author",
-   "dynamic_config" : 1,
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "release_status" : "stable",
    "author" : [
       "H.Merijn Brand <h.m.brand@xs4all.nl>"
    ],
-   "release_status" : "stable",
-   "provides" : {
-      "Text::CSV_XS" : {
-         "version" : "1.33",
-         "file" : "CSV_XS.pm"
-      }
-   },
    "license" : [
       "perl_5"
    ],
-   "abstract" : "Comma-Separated Values manipulation routines",
-   "resources" : {
-      "homepage" : "https://metacpan.org/pod/Text::CSV_XS",
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ],
-      "x_IRC" : "irc://irc.perl.org/#csv",
-      "repository" : {
-         "type" : "git",
-         "web" : "https://github.com/Tux/Text-CSV_XS",
-         "url" : "https://github.com/Tux/Text-CSV_XS"
-      }
-   }
+   "dynamic_config" : 1
 }

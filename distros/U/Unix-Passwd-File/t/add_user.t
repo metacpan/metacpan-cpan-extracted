@@ -4,6 +4,9 @@ use 5.010;
 use strict;
 use warnings;
 use FindBin '$Bin';
+use Test::More 0.98;
+
+BEGIN { plan skip_all => "OS unsupported" if $^O eq 'MSWin32' }
 
 use Crypt::Password::Util qw(looks_like_crypt);
 use File::chdir;
@@ -12,7 +15,6 @@ use File::Path qw(remove_tree);
 use File::Slurper qw(read_text);
 use File::Temp qw(tempdir);
 use Unix::Passwd::File qw(add_user get_user get_group);
-use Test::More 0.98;
 
 my @files = qw(passwd shadow group gshadow);
 

@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "AM",
-    "PM"
+    "PM",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d E",
@@ -47,8 +52,8 @@
     yMd => "M/d/y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-one" => "'ika'-w 'linggo' 'ng' y",
-    "yw-count-other" => "'linggo' w 'ng' y"
+    "yw-count-one" => "'ika'-w 'linggo' 'ng' Y",
+    "yw-count-other" => "'linggo' w 'ng' Y",
   },
   code => "fil",
   date_format_full => "EEEE, MMMM d, y",
@@ -66,7 +71,7 @@
     "Huw",
     "Biy",
     "Sab",
-    "Lin"
+    "Lin",
   ],
   day_format_narrow => [
     "Lun",
@@ -75,7 +80,7 @@
     "Huw",
     "Biy",
     "Sab",
-    "Lin"
+    "Lin",
   ],
   day_format_wide => [
     "Lunes",
@@ -84,7 +89,7 @@
     "Huwebes",
     "Biyernes",
     "Sabado",
-    "Linggo"
+    "Linggo",
   ],
   day_stand_alone_abbreviated => [
     "Lun",
@@ -93,7 +98,7 @@
     "Huw",
     "Biy",
     "Sab",
-    "Lin"
+    "Lin",
   ],
   day_stand_alone_narrow => [
     "Lun",
@@ -102,7 +107,7 @@
     "Huw",
     "Biy",
     "Sab",
-    "Lin"
+    "Lin",
   ],
   day_stand_alone_wide => [
     "Lunes",
@@ -111,19 +116,19 @@
     "Huwebes",
     "Biyernes",
     "Sabado",
-    "Linggo"
+    "Linggo",
   ],
   era_abbreviated => [
     "BC",
-    "AD"
+    "AD",
   ],
   era_narrow => [
     "BC",
-    "AD"
+    "AD",
   ],
   era_wide => [
-    "BC",
-    "AD"
+    "Before Christ",
+    "Anno Domini",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -144,7 +149,7 @@
     "Set",
     "Okt",
     "Nob",
-    "Dis"
+    "Dis",
   ],
   month_format_narrow => [
     "Ene",
@@ -158,7 +163,7 @@
     "Set",
     "Okt",
     "Nob",
-    "Dis"
+    "Dis",
   ],
   month_format_wide => [
     "Enero",
@@ -172,7 +177,7 @@
     "Setyembre",
     "Oktubre",
     "Nobyembre",
-    "Disyembre"
+    "Disyembre",
   ],
   month_stand_alone_abbreviated => [
     "Ene",
@@ -186,7 +191,7 @@
     "Set",
     "Okt",
     "Nob",
-    "Dis"
+    "Dis",
   ],
   month_stand_alone_narrow => [
     "E",
@@ -200,7 +205,7 @@
     "Set",
     "Okt",
     "Nob",
-    "Dis"
+    "Dis",
   ],
   month_stand_alone_wide => [
     "Enero",
@@ -214,7 +219,7 @@
     "Setyembre",
     "Oktubre",
     "Nobyembre",
-    "Disyembre"
+    "Disyembre",
   ],
   name => "Filipino",
   native_language => "Filipino",
@@ -226,37 +231,37 @@
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "ika-1 quarter",
     "ika-2 quarter",
     "ika-3 quarter",
-    "ika-4 na quarter"
+    "ika-4 na quarter",
   ],
   quarter_stand_alone_abbreviated => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "ika-1 quarter",
     "ika-2 quarter",
     "ika-3 quarter",
-    "ika-4 na quarter"
+    "ika-4 na quarter",
   ],
   script => undef,
   territory => undef,
@@ -265,5 +270,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 31
+  version => 32,
 }

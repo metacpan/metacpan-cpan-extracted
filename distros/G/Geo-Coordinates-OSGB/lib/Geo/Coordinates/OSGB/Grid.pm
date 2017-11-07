@@ -1,15 +1,14 @@
 package Geo::Coordinates::OSGB::Grid;
 
 use Geo::Coordinates::OSGB::Maps qw{%maps %name_for_map_series};
-use Geo::Coordinates::OSGB qw{get_ostn02_shift_pair};
 
 use base qw(Exporter);
 use strict;
 use warnings;
 use Carp;
-use 5.008; # At least Perl 5.08 please, be sure to change POD below if you update
+use 5.010; # At least Perl 5.10 please, be sure to change POD below if you update
 
-our $VERSION = '2.19';
+our $VERSION = '2.20';
 
 our %EXPORT_TAGS = (all => [qw(
         parse_grid
@@ -42,7 +41,7 @@ use constant MAX_GRID_SIZE => MINOR_GRID_SQ_SIZE * length GRID_SQ_LETTERS;
 # A simple approach would pick 0 < E < 700000 and 0 < N < 1250000 but that way
 # many GRs produced would be in the sea, so pick a random map, and then find a
 # random GR within its bbox and finally check that the resulting pair is
-# inside the OSTN02 boundary and actually on some map.
+# and actually on the map.
 
 sub random_grid {
     my @preferred_sheets = @_;
@@ -59,7 +58,6 @@ sub random_grid {
     else {
         @sheets = keys %maps;
     }
-    my $margin = 5000;
     my ($map, $lle, $lln, $ure, $urn);
     my ($easting, $northing);
     while (1) {
@@ -68,13 +66,8 @@ sub random_grid {
         ($ure, $urn) = @{$map->{bbox}->[1]};
         $easting  = sprintf '%.3f', $lle + rand ($ure-$lle);
         $northing = sprintf '%.3f', $lln + rand ($urn-$lln);
-        # check we are well inside OSTN02 and actually on the chosen map
-        last if get_ostn02_shift_pair($easting, $northing)
-             && get_ostn02_shift_pair($easting, $northing+$margin)
-             && get_ostn02_shift_pair($easting, $northing-$margin)
-             && get_ostn02_shift_pair($easting+$margin, $northing)
-             && get_ostn02_shift_pair($easting-$margin, $northing)
-             && 0 != _winding_number($easting, $northing, $map->{polygon});
+        # check we are actually on the chosen map
+        last if _winding_number($easting, $northing, $map->{polygon});
     }
     return ($easting, $northing);
 }
@@ -337,7 +330,7 @@ Geo::Coordinates::OSGB::Grid - Format and parse British National Grid references
 
 =head1 VERSION
 
-2.19
+2.20
 
 =head1 SYNOPSIS
 
@@ -480,8 +473,8 @@ context depending on how many map numbers are in the list of sheets.
 
 =head2 C<parse_grid>
 
-The C<parse_grid> routine extracts a (easting, northing) pair from a
-string, or a list of arguments, representing a grid reference.  The pair
+The C<parse_grid> routine extracts an (easting, northing) pair from a
+string or a list of arguments representing a grid reference.  The pair
 returned are in units of metres from the false origin of the grid, so
 that you can pass them to C<format_grid> or C<grid_to_ll>.
 
@@ -599,11 +592,10 @@ synonym for C<parse_grid>.
 
 =head2 C<random_grid([sheet1, sheet2, ...])>
 
-Takes an optional list of map sheet identifiers, and returns a random
-easting and northing for some place covered by one of the maps.  There's
-no guarantee that the point will not be in the sea, but it will be
-within the bounding box of one of the maps and it should be within one
-of the areas covered by the OSTN02 data set.
+Takes an optional list of map sheet identifiers, and returns a random easting
+and northing for some place covered by one of the maps.  There's no guarantee
+that the point will not be in the sea, but it will be within the bounding box
+of one of the maps.
 
 =over 4
 
@@ -753,11 +745,11 @@ about it.
 
 There is no configuration required either of these modules or your
 environment.  It should work on any recent version of Perl better than
-5.8, on any platform.
+5.10, on any platform.
 
 =head1 DEPENDENCIES
 
-Perl 5.08 or better.
+Perl 5.10 or better.
 
 =head1 INCOMPATIBILITIES
 

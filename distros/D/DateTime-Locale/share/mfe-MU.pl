@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "AM",
-    "PM"
+    "PM",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d, E",
@@ -48,7 +53,7 @@
     yMd => "y-MM-dd",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "mfe-MU",
   date_format_full => "EEEE d MMMM y",
@@ -66,7 +71,7 @@
     "ze",
     "van",
     "sam",
-    "dim"
+    "dim",
   ],
   day_format_narrow => [
     "l",
@@ -75,7 +80,7 @@
     "z",
     "v",
     "s",
-    "d"
+    "d",
   ],
   day_format_wide => [
     "lindi",
@@ -84,7 +89,7 @@
     "zedi",
     "vandredi",
     "samdi",
-    "dimans"
+    "dimans",
   ],
   day_stand_alone_abbreviated => [
     "lin",
@@ -93,7 +98,7 @@
     "ze",
     "van",
     "sam",
-    "dim"
+    "dim",
   ],
   day_stand_alone_narrow => [
     "l",
@@ -102,7 +107,7 @@
     "z",
     "v",
     "s",
-    "d"
+    "d",
   ],
   day_stand_alone_wide => [
     "lindi",
@@ -111,19 +116,19 @@
     "zedi",
     "vandredi",
     "samdi",
-    "dimans"
+    "dimans",
   ],
   era_abbreviated => [
     "av. Z-K",
-    "ap. Z-K"
+    "ap. Z-K",
   ],
   era_narrow => [
     "av. Z-K",
-    "ap. Z-K"
+    "ap. Z-K",
   ],
   era_wide => [
     "avan Zezi-Krist",
-    "apre Zezi-Krist"
+    "apre Zezi-Krist",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -144,7 +149,7 @@
     "sep",
     "okt",
     "nov",
-    "des"
+    "des",
   ],
   month_format_narrow => [
     "z",
@@ -158,7 +163,7 @@
     "s",
     "o",
     "n",
-    "d"
+    "d",
   ],
   month_format_wide => [
     "zanvie",
@@ -172,7 +177,7 @@
     "septam",
     "oktob",
     "novam",
-    "desam"
+    "desam",
   ],
   month_stand_alone_abbreviated => [
     "zan",
@@ -186,7 +191,7 @@
     "sep",
     "okt",
     "nov",
-    "des"
+    "des",
   ],
   month_stand_alone_narrow => [
     "z",
@@ -200,7 +205,7 @@
     "s",
     "o",
     "n",
-    "d"
+    "d",
   ],
   month_stand_alone_wide => [
     "zanvie",
@@ -214,7 +219,7 @@
     "septam",
     "oktob",
     "novam",
-    "desam"
+    "desam",
   ],
   name => "Morisyen Mauritius",
   native_language => "kreol morisien",
@@ -226,37 +231,37 @@
     "T1",
     "T2",
     "T3",
-    "T4"
+    "T4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "1e trimes",
     "2em trimes",
     "3em trimes",
-    "4em trimes"
+    "4em trimes",
   ],
   quarter_stand_alone_abbreviated => [
     "T1",
     "T2",
     "T3",
-    "T4"
+    "T4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "1e trimes",
     "2em trimes",
     "3em trimes",
-    "4em trimes"
+    "4em trimes",
   ],
   script => undef,
   territory => "Mauritius",
@@ -265,5 +270,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

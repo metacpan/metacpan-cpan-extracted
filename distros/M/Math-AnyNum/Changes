@@ -1,5 +1,12 @@
 Revision history for Math-AnyNum
 
+0.17    2017-11-04
+
+        - Optimized `is_div(n, k)` when `n` and `k` are integers.
+        - Optimized `kronecker(n, k)` when `k` is a native integer.
+        - Improvements in `__bernfrac__(n)`, using a more optimized sieve for prime numbers.
+        - Minor simplifications inside `faulhaber_sum(n)`.
+
 0.16    2017-10-17
 
         - Fixed the numification of signed and unsigned integers close to the native integer limits.

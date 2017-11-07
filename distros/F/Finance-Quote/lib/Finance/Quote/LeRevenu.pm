@@ -41,7 +41,7 @@ use LWP::UserAgent;
 use HTTP::Request::Common;
 use HTML::TableExtract;
 
-our $VERSION = '1.38'; # VERSION
+our $VERSION = '1.43'; # VERSION
 
 my $LR_URL = 'http://bourse.lerevenu.com/recherchenom.hts';
 
@@ -72,7 +72,7 @@ sub lerevenu {
 		{
 			# print STDERR $reply->content,"\n";
 
-			$te= new HTML::TableExtract( );
+			$te = HTML::TableExtract->new();
 
 			$te->parse($reply->content);
 

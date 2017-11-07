@@ -5,7 +5,7 @@ package HTTP::AnyUA::Backend::Mojo::UserAgent;
 use warnings;
 use strict;
 
-our $VERSION = '0.900'; # VERSION
+our $VERSION = '0.901'; # VERSION
 
 use parent 'HTTP::AnyUA::Backend';
 
@@ -126,7 +126,7 @@ sub _munge_response {
     }
 
     my $err = $tx->error;
-    if ($err and !$err->{code}) {
+    if ($err && !$err->{code}) {
         return HTTP::AnyUA::Util::internal_exception($err->{message}, $resp);
     }
 
@@ -150,7 +150,7 @@ HTTP::AnyUA::Backend::Mojo::UserAgent - A unified programming interface for Mojo
 
 =head1 VERSION
 
-version 0.900
+version 0.901
 
 =head1 DESCRIPTION
 

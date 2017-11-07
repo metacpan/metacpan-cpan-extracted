@@ -42,7 +42,7 @@ use LWP::Simple;
 use strict;
 use warnings;
 
-our $VERSION = '1.38'; # VERSION
+our $VERSION = '1.43'; # VERSION
 
 sub methods {
 	return(dwsfunds => \&dwsfunds);

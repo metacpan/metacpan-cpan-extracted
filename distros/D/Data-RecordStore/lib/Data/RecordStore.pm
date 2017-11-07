@@ -56,7 +56,7 @@ use Data::Dumper;
 
 use vars qw($VERSION);
 
-$VERSION = '2.01';
+$VERSION = '2.03';
 
 =head1 METHODS
 
@@ -180,7 +180,8 @@ sub stow {
 
     $id //= $self->{OBJ_INDEX}->next_id;
 
-
+    die "ID must be a positive integer" if $id < 1;
+    
     my $save_size = do { use bytes; length( $data ); };
 
     # tack on the size of the id (a long or 8 bytes) to the byte count
@@ -219,6 +220,7 @@ sub stow {
 
     my $index_in_store = $store->next_id;
 
+    $self->ensure_entry_count( $id );
     $self->{OBJ_INDEX}->put_record( $id, [ $store_id, $index_in_store ] );
 
     $store->put_record( $index_in_store, [ $id, $data ] );
@@ -238,6 +240,10 @@ sub delete {
     1;
 } #delete
 
+#
+# Removes a record from the store. If there was a record at the end of the store
+# then move that record to the vacated space, reducing the file size by one record.
+#
 sub _swapout {
     my( $self, $store, $store_id, $vacated_store_idx ) = @_;
 
@@ -246,7 +252,8 @@ sub _swapout {
 
     if( $vacated_store_idx < $last_idx ) {
 
-        sysseek $fh, $store->{RECORD_SIZE} * ($last_idx-1), SEEK_SET or die "Could not seek ($store->{RECORD_SIZE} * ($last_idx-1)) : $@ $!";
+        sysseek $fh, $store->{RECORD_SIZE} * ($last_idx-1), SEEK_SET 
+            or die "Could not seek ($store->{RECORD_SIZE} * ($last_idx-1)) : $@ $!";
         my $srv = sysread $fh, my $data, $store->{RECORD_SIZE};
         defined( $srv ) or die "Could not read : $@ $!";
         sysseek( $fh, $store->{RECORD_SIZE} * ( $vacated_store_idx - 1 ), SEEK_SET ) && ( my $swv = syswrite( $fh, $data ) );
@@ -258,10 +265,6 @@ sub _swapout {
         my( $moving_id ) = unpack( $store->{TMPL}, $data );
 
         $self->{OBJ_INDEX}->put_record( $moving_id, [ $store_id, $vacated_store_idx ] );
-
-        #
-        # truncate the object file
-        #
     }
 
     #
@@ -300,7 +303,8 @@ sub empty_recycler {
 
 =cut
 sub recycle {
-    shift->{RECYC_STORE}->push( [shift] );
+    my( $self, $id ) = @_;
+    $self->delete( $id ) && $self->{RECYC_STORE}->push( [$id] );
 } #empty_recycler
 
 
@@ -609,12 +613,7 @@ sub get_record {
 
     my $fh = $self->_filehandle;
 
-# how about an ensure_entry_count right here?
-    # also a has_record
-    if( $idx < 1 ) {
-        die "get record must be a positive integer";
-    }
-
+    die "get record must be a positive integer" if $idx < 1;
 
     sysseek $fh, $self->{RECORD_SIZE} * ($idx-1), SEEK_SET or die "Could not seek ($self->{RECORD_SIZE} * ($idx-1)) : $@ $!";
 
@@ -750,6 +749,6 @@ __END__
        under the same terms as Perl itself.
 
 =head1 VERSION
-       Version 2.01  (Sep 14, 2017))
+       Version 2.03  (Nov 5, 2017))
 
 =cut

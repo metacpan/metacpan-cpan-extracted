@@ -1,0 +1,168 @@
+#!/usr/bin/env perl
+#Copyright (c) 2017, Zane C. Bowers-Hadley
+#All rights reserved.
+#
+#Redistribution and use in source and binary forms, with or without modification,
+#are permitted provided that the following conditions are met:
+#
+#   * Redistributions of source code must retain the above copyright notice,
+#    this list of conditions and the following disclaimer.
+#   * Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#
+#THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+#ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+#WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+#IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+#INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+#BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+#DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+#LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+#OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+#THE POSSIBILITY OF SUCH DAMAGE.
+
+use strict;
+use warnings;
+use Getopt::Std;
+use Proc::ProcessTable::Colorizer;
+
+$Getopt::Std::STANDARD_HELP_VERSION = 1;
+
+#print help
+sub main::HELP_MESSAGE {
+	print "\n".
+		"-z    Show zombies procs.\n".
+		"-s    Show swapped out procs.\n".
+		"-p <regex>   Search procs using the matching regex.\n".
+		"-u <users>   A string search for users.\n".
+		"-t <time search>   A numeric search for CPU time".
+		"-c <pctcpu search>   A numeric search for CPU usage percent\n".
+		"-m <pctmem search>   A numeric search for memory usage percent\n".
+		"-w <wait channels>   A string search for wait channels.\n".
+		"\n".
+		"\n".
+		"String Search:\n".
+		"This is a comma seperated list of strings to search for.\n".
+		"Any items starting with ! will be inverted.\n".
+		"\n".
+		"foo     Checks if it matches foo.\n".
+		"!foo    Checks if it does not match foo.\n".
+		"foo,bar Checks if it matches foo or bar.\n".
+		"\n".
+		"\n".
+		"Numeric Search:\n".
+		"This is a comma seperated list of values to search for.\n".
+		"Each item must start with a equality. <, <=, >=, > are all recognized.\n"
+}
+
+sub main::VERSION_MESSAGE {
+	print "cps v. 0.0.0\n";
+}
+
+#gets the options
+my %opts=();
+getopts('p:u:zw:st:c:m:', \%opts);
+
+
+use Proc::ProcessTable::Colorizer;
+my $cps = Proc::ProcessTable::Colorizer->new;
+$cps->procSearchSet( $opts{p} );
+$cps->zombieSearchSet( $opts{z} );
+$cps->swappedOutSearchSet( $opts{s} );
+if ( defined( $opts{u} ) ){
+	$cps->userSearchSetString( $opts{u} );
+}
+if ( defined( $opts{w} ) ){
+	$cps->waitSearchSetString( $opts{w} );
+}
+if ( defined( $opts{t} ) ){
+	$cps->timeSearchSetString( $opts{t} );
+	if ($cps->error){
+		exit $cps->error;
+	}
+}
+if ( defined( $opts{c} ) ){
+	$cps->pctcpuSearchSetString( $opts{c} );
+	if ($cps->error){
+		exit $cps->error;
+	}
+}
+if ( defined( $opts{m} ) ){
+	$cps->pctcpuSearchSetString( $opts{m} );
+	if ($cps->error){
+		exit $cps->error;
+	}
+}
+
+
+print $cps->colorize;
+
+=head1 NAME
+
+cps - A colorized version of ps with various extra useful options.
+
+=head1 SYNOPSIS
+
+cps [B<-z>] [B<-s>] [B<-p> <regex>] [B<-u> <users>] [B<-t> <time>] [B<-m> <pctmem>] [B<-c> <pctcpu>]  [B<-w> <wait channels>]
+
+=head1 USAGE
+
+By default this prints out all processes, minus the idle process.
+
+This may be changed via setting various switches to limit the procs shown. If more than one is specified,
+only the processes matching all of them are shown.
+
+=head1 SWITCHES
+
+=head2 B<-z>
+
+Only show zombie processes.
+
+=head2 B<-s>
+
+Show only swapped out processes.
+
+=head2 B<-p> <regex>
+
+The command line of the processes is matched against the provided regex.
+
+=head2 B<-u> <users>
+
+A string search for users.
+
+=head2 B<-t> <time>
+
+A numeric search based on the total amount of CPU seconds used by the processes.
+
+=head2 B<-m> <pctmem>
+
+A numeric search based on the percent of memory processes are using.
+
+=head2 B<-c> <pctcpu>
+
+A numeric search based on the percent of CPU usage a process is using.
+
+=head2 B<-w> <wait channels>
+
+A string search based on the wait channel a processes are using.
+
+=head1 STRING SEARCHES
+
+This is a comma seperated list of strings to search for.
+
+Any items starting with ! will be inverted.
+
+    foo      Checks if it matches foo.
+    !foo     Checks if it does not match foo.
+    foo,bar  Checks if it matches foo or bar.
+
+=head1 NUMERIC SEARCHES
+
+This is a comma seperated list of values to search for.
+
+Each item must start with a equality.
+
+<, <=, >=, > are all recognized.
+
+=cut

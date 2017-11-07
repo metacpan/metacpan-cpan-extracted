@@ -51,6 +51,7 @@ sub pmver {
 
 eval { $v .= pmver('Authen::SASL','any version') };
 eval { $v .= pmver('Carp','any version') };
+eval { $v .= pmver('Digest::MD5','any version') };
 eval { $v .= pmver('Exporter','any version') };
 eval { $v .= pmver('ExtUtils::MakeMaker','any version') };
 eval { $v .= pmver('File::Basename','any version') };
@@ -60,6 +61,7 @@ eval { $v .= pmver('File::Spec','any version') };
 eval { $v .= pmver('IO::Handle','any version') };
 eval { $v .= pmver('IO::Pipe','any version') };
 eval { $v .= pmver('IPC::Open3','any version') };
+eval { $v .= pmver('MIME::Base64','any version') };
 eval { $v .= pmver('Net::LDAP','any version') };
 eval { $v .= pmver('Net::LDAP::Constant','any version') };
 eval { $v .= pmver('Net::LDAP::Filter','any version') };

@@ -21,20 +21,25 @@ my $BUILD_PREREQS = {
 };
 
 my $RUN_PREREQS = {
+ 'B::Debug'                    => '0',
  'Browser::Open'               => '0',
  'Capture::Tiny'               => '0',
  'Class::XSAccessor'           => '0',
  'Digest::MD5'                 => '0',
- 'JSON::PP'                    => '0',
+ 'HTML::Entities'              => '3.69',
+ 'HTML::Parser'                => '0',
+ 'JSON::MaybeXS'               => '1.003003',
  'Moo'                         => '0',
  'PPI::HTML'                   => '1.07',
  'Parallel::Iterator'          => '0',
  'Pod::Coverage'               => '0.06',
  'Pod::Coverage::CountParents' => '0',
+ 'Sereal::Decoder'             => '0',
+ 'Sereal::Encoder'             => '0',
  'Storable'                    => '0',
  'Template'                    => '2.00',
  'namespace::clean'            => '0',
- 'Devel::Cover'                => '1.20',
+ 'Devel::Cover'                => '1.29',
 };
 
 my %META = (

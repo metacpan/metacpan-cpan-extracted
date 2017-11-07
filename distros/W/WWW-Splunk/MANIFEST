@@ -1,6 +1,6 @@
 bin/sc
 Build.PL
-ChangeLog
+Changes
 lib/WWW/Splunk.pm
 lib/WWW/Splunk/API.pm
 lib/WWW/Splunk/XMLParser.pm
@@ -9,6 +9,16 @@ MANIFEST
 META.json
 META.yml
 README
-t/pod.t
-t/XMLParser.t
-SIGNATURE    Added here by Module::Build
+t/WWW-Splunk-API/01-use.t
+t/WWW-Splunk-API/02-version.t
+t/WWW-Splunk-XMLParser/01-use.t
+t/WWW-Splunk-XMLParser/02-version.t
+t/WWW-Splunk-XMLParser/03-parse.t
+t/WWW-Splunk/01-use.t
+t/WWW-Splunk/02-version.t
+xt/WWW-Splunk-API/01-pod_coverage.t
+xt/WWW-Splunk-API/02-pod.t
+xt/WWW-Splunk-XMLParser/01-pod_coverage.t
+xt/WWW-Splunk-XMLParser/02-pod.t
+xt/WWW-Splunk/01-pod_coverage.t
+xt/WWW-Splunk/02-pod.t

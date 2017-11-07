@@ -18,7 +18,7 @@ our $object = ( Net::Whois::Object->new(@lines) )[0];
 isa_ok $object, $class;
 
 # Non-inherited methods
-can_ok $object, qw( poem descr form text admin_c author remarks notify mnt_by
+can_ok $object, qw( poem descr form text author remarks notify mnt_by
     changed source);
 
 # Check if typed attributes are correct
@@ -55,17 +55,11 @@ is_deeply( $object->author(), ['GEEK-01'], 'author properly parsed' );
 $object->author('GEEK-02');
 is( $object->author()->[1], 'GEEK-02', 'author properly added' );
 
-# Test 'admin_c'
-$tested{'admin_c'}++;
-is_deeply( $object->admin_c(), ['CPNY-ADM'], 'admin_c properly parsed' );
-$object->admin_c('CPNY-ADM2');
-is( $object->admin_c()->[1], 'CPNY-ADM2', 'admin_c properly added' );
-
 # Test 'mnt_by'
 $tested{'mnt_by'}++;
-is_deeply( $object->mnt_by(), ['CPNY-MNT'], 'mnt_by properly parsed' );
-$object->mnt_by('CPNY-MNT2');
-is( $object->mnt_by()->[1], 'CPNY-MNT2', 'mnt_by properly added' );
+is( $object->mnt_by(), 'CPNY-MNT', 'mnt_by properly parsed' );
+$object->mnt_by('CPNY-MNT3');
+is( $object->mnt_by, 'CPNY-MNT3', 'mnt_by properly added' );
 
 # Test 'notify'
 $tested{'notify'}++;
@@ -107,7 +101,6 @@ text:           line 3 is boring
 text:           I'd stick with coding
 text:           
 author:         GEEK-01
-admin-c:        CPNY-ADM
 mnt-by:         CPNY-MNT
 notify:         CPNY-MNT
 changed:        arhuman@gmail.com 20110214

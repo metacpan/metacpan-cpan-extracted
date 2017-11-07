@@ -1,5 +1,13 @@
 Revision history for App-TemplateCMD
 
+0.6.8   2017-11-05
+        Updating for release of version 0.6.8
+        Adding default restart on exit (Ivan Wills)
+        Adding default edits (Ivan Wills)
+        Fixed storing wrong version (Ivan Wills)
+        Updating Test dependencies for better windows experience (Ivan Wills)
+        Stopping supporting Perl 5.8 (Ivan Wills)
+
 0.6.7   2017-04-23
         Updating for release of version 0.6.7
         Update date (Ivan Wills)

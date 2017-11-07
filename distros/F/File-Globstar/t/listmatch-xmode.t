@@ -128,6 +128,7 @@ SKIP: {
 /
 EOF
     $matcher = File::Globstar::ListMatch->new(\$input);
+    # Leading slashes are invalid.  The pattern can never match.
     ok !$matcher->match('/'), 'slash';
     ok !$matcher->match('/top-level'), 'top-level';
 }

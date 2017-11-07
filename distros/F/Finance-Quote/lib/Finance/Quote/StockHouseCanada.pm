@@ -38,7 +38,7 @@ use LWP::UserAgent;
 use HTTP::Request::Common;
 use HTML::TableExtract;
 
-our $VERSION = '1.38'; # VERSION
+our $VERSION = '1.43'; # VERSION
 
 $STOCKHOUSE_LOOKUP_URL="http://www.stockhouse.com/mutualFunds/index.asp?asp=1&lang=&item=searchresult&country=CAN&by=symbol&searchtext=";
 $STOCKHOUSE_URL="http://www.stockhouse.com/MutualFunds/index.asp?item=snapshot&page=1&Lang=EN&fundkey=%s&source=Fundata&Symbol=%s&FundName=&CompanyName=&asp=1";
@@ -115,7 +115,7 @@ sub stockhouse_fund  {
 		######################################################
 		# debug
 
-		#my $tetest= new HTML::TableExtract( headers => [qw(NAVPS CURRENCY)] );
+		#my $tetest= HTML::TableExtract->new( headers => [qw(NAVPS CURRENCY)] );
 		#$tetest->parse($reply->content);
 		#foreach my $tstest ($tetest->table_states) {
 		#    print "\n***\n*** Table (", join(',', $tstest->coords), "):\n***\n";
@@ -141,7 +141,7 @@ sub stockhouse_fund  {
 		$fundquote {$mutual, "name"} = $name;
 
 		# Find NAV and Currency via table header
-		my $te= new HTML::TableExtract( headers => [qw(NAVPS CURRENCY)] );
+		my $te = HTML::TableExtract->new( headers => [qw(NAVPS CURRENCY)] );
 		$te->parse($reply->content);
 
 		# There should only be one hit

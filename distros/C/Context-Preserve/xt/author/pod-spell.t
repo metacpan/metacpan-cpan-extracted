@@ -12,6 +12,8 @@ all_pod_files_spelling_ok( qw( examples lib script t xt ) );
 __DATA__
 Context
 Etheridge
+Infinity
+Interactive
 Jonathan
 Karen
 Preserve

@@ -1,5 +1,21 @@
 Revision history for Alien-Build
 
+1.32      2017-11-03 13:15:35 -0400
+  - Add ALIEN_INSTALL_NETWORK environment variable.  Set to false if you don't
+    want to allow network fetch.
+
+1.31_01   2017-10-31 16:50:52 -0400
+  - Fix testing prereq bug introduced in 1.30_01.
+
+1.30_01   2017-10-31 14:24:15 -0400
+  - Add prefer property to Download::Negotiate plugin
+
+1.29_01   2017-10-30 09:54:22 -0400
+  - Fix bug in Alien::Base::Wrapper where -l flags were being ignored by EUMM
+  - MSYS plugin works with ffi build
+  - Windows specific fixes for Alien::Base::Wrapper
+  - Removed optional dependency on Test::Exec
+
 1.28      2017-10-29 19:39:19 -0400
   - Production release identical to 1.27_01
 

@@ -42,11 +42,13 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
+            "Digest::MD5" : "0",
             "Exporter" : "0",
             "File::Basename" : "0",
             "File::HomeDir" : "0",
             "File::Path" : "2.08",
             "File::Spec" : "0",
+            "MIME::Base64" : "0",
             "Net::LDAP::Constant" : "0",
             "Net::LDAP::Filter" : "0",
             "Net::LDAP::FilterMatch" : "0",
@@ -91,7 +93,7 @@
          "web" : "https://github.com/russoz/Net-LDAP-SimpleServer"
       }
    },
-   "version" : "0.0.19",
+   "version" : "0.0.20",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

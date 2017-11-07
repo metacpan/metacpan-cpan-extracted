@@ -1344,6 +1344,60 @@ void binomial(mpz_t r, UV n, UV k)
   Safefree(mprimes);
 }
 
+void factorialmod(mpz_t r, UV N, mpz_t m)
+{
+  mpz_t t;
+  UV i, D = N;
+
+  if (mpz_cmp_ui(m,N) <= 0 || mpz_cmp_ui(m,1) <= 0) {
+    mpz_set_ui(r,0);
+    return;
+  }
+
+  mpz_init(t);
+  mpz_tdiv_q_2exp(t, m, 1);
+  if (mpz_cmp_ui(t, N) < 0 && _GMP_is_prime(m))
+    D = mpz_get_ui(m) - N - 1;
+
+  if (D < 2 && N > D) {
+    if (D == 0) mpz_sub_ui(r, m, 1);
+    else        mpz_set_ui(r, 1);
+    mpz_clear(t);
+    return;
+  }
+
+  if (D == N && D > 5000000) {   /* TODO: tune this threshold */
+    mpz_t *factors;
+    int j, nfactors, *exponents, reszero;
+    nfactors = factor(m, &factors, &exponents);
+    /* Find max factor */
+    mpz_set_ui(t, 0);
+    for (j = 0; j < nfactors; j++) {
+      if (exponents[j] > 1)
+        mpz_pow_ui(factors[j], factors[j], exponents[j]);
+      if (mpz_cmp(factors[j], t) > 0)
+        mpz_set(t, factors[j]);
+    }
+    reszero = (mpz_cmp_ui(t, N) <= 0);
+    clear_factors(nfactors, &factors, &exponents);
+    if (reszero) { mpz_clear(t); mpz_set_ui(r,0); return; }
+  }
+
+  mpz_set_ui(t,1);
+  for (i = 2; i <= D && mpz_sgn(t); i++) {
+    mpz_mul_ui(t, t, i);
+    if ((i & 15) == 0) mpz_mod(t, t, m);
+  }
+  mpz_mod(r, t, m);
+
+  if (D != N && mpz_sgn(r)) {
+    if (!(D&1)) mpz_sub(r, m, r);
+    mpz_invert(r, r, m);
+  }
+
+  mpz_clear(t);
+}
+
 void partitions(mpz_t npart, UV n)
 {
   mpz_t psum, *part;
@@ -1472,6 +1526,185 @@ void exp_mangoldt(mpz_t res, mpz_t n)
     mpz_set_ui(res, 1);
 }
 
+int is_carmichael(mpz_t n)
+{
+  mpz_t nm1, t, *factors;
+  int i, res, nfactors, *exponents;
+
+  /* small or even */
+  if (mpz_cmp_ui(n,561) < 0 || mpz_even_p(n))  return 0;
+
+  /* divisible by small square */
+  for (i = 1; i < 9; i++)
+    if (mpz_divisible_ui_p(n, sprimes[i] * sprimes[i]))
+      return 0;
+
+  mpz_init(nm1);
+  mpz_sub_ui(nm1, n, 1);
+
+  /* Korselt's criterion for small divisors */
+  for (i = 2; i < 20; i++)
+    if (mpz_divisible_ui_p(n, sprimes[i]) && !mpz_divisible_ui_p(nm1, sprimes[i]-1))
+      { mpz_clear(nm1); return 0; }
+
+  mpz_init_set_ui(t, 2);
+  mpz_powm(t, t, nm1, n);
+  if (mpz_cmp_ui(t, 1) != 0) {   /* if 2^(n-1) mod n != 1, fail */
+    mpz_clear(t);  mpz_clear(nm1);
+    return 0;
+  }
+
+  /* If large enough, use probable test */
+  if (mpz_sizeinbase(n,10) > 50) {
+    res = !_GMP_is_prime(n);  /* It must be a composite */
+    for (i = 20; res && i <= 100; i++) {
+      UV p = sprimes[i];
+      UV gcd = mpz_gcd_ui(NULL, n, p);
+      if (gcd == 1) {
+        /* For each non prime factor it passes a Fermat test */
+        if (mpz_set_ui(t,p), mpz_powm(t,t,nm1,n), mpz_cmp_ui(t, 1) != 0)
+          res = 0;
+      } else {
+        /* For each prime factor it meets Korselt criterion */
+        if (gcd != p || !mpz_divisible_ui_p(nm1, p-1))
+          res = 0;
+      }
+    }
+    mpz_clear(t);  mpz_clear(nm1);
+    return res;
+  }
+
+  nfactors = factor(n, &factors, &exponents);
+  res = (nfactors > 2);                       /* must have 3+ factors */
+  for (i = 0; res && i < nfactors; i++) {     /* must be square free  */
+    if (exponents[i] > 1)
+      res = 0;
+  }
+  for (i = 0; res && i < nfactors; i++) {     /* p-1 | n-1 for all p */
+    mpz_sub_ui(t, factors[i], 1);
+    if (!mpz_divisible_p(nm1, t))
+      res = 0;
+  }
+  clear_factors(nfactors, &factors, &exponents);
+  mpz_clear(t);  mpz_clear(nm1);
+  return res;
+}
+
+int is_fundamental(mpz_t n)
+{
+  int r, neg = (mpz_sgn(n) < 0), ret = 0;
+  if (neg) mpz_neg(n,n);
+
+  r = mpz_fdiv_ui(n,16);
+  if (r != 0) {
+    int r4 = r & 3;
+    if (!neg && r4 == 1 && moebius(n) != 0) ret = 1;
+    if ( neg && r4 == 3 && moebius(n) != 0) ret = 1;
+    if (r4 == 0 && ((!neg && r != 4) || (neg && r != 12))) {
+      mpz_t t;
+      mpz_init(t);
+      mpz_tdiv_q_2exp(t, n, 2);
+      if (moebius(t) != 0)
+        ret = 1;
+      mpz_clear(t);
+    }
+  }
+  if (neg) mpz_neg(n,n);
+  return ret;
+}
+
+int _totpred(mpz_t n, mpz_t maxd)
+{
+    int i, res, ndivisors;
+    mpz_t N, r, d, p, *D;
+
+    if (mpz_odd_p(n)) return 0;
+    if (mpz_cmp_ui(n,2) == 0) return 1;
+
+    mpz_init(N);  mpz_init(p);
+    mpz_tdiv_q_2exp(N, n, 1);
+    res = 0;
+    mpz_add_ui(p, n, 1);
+    if (mpz_cmp(N, maxd) < 0 && _GMP_is_prime(p)) {
+      res = 1;
+    } else {
+      mpz_init(d);  mpz_init(r);
+      D = divisor_list(&ndivisors, N);
+      for (i = 0; res == 0 && i < ndivisors && mpz_cmp(D[i],maxd) < 0; i++) {
+        mpz_set(d, D[i]);
+        mpz_mul_2exp(p,d,1);  mpz_add_ui(p,p,1);
+        if (!_GMP_is_prime(p))
+          continue;
+        mpz_divexact(r, N, d);
+        while (1) {
+          if (mpz_cmp(r, p) == 0 || _totpred(r, d)) {
+            res = 1;
+            break;
+          }
+          if (!mpz_divisible_p(r, p))
+            break;
+          mpz_divexact(r, r, p);
+        }
+      }
+      mpz_clear(r);  mpz_clear(d);
+      for (i = 0; i < ndivisors; i++)
+        mpz_clear(D[i]);
+      Safefree(D);
+    }
+    mpz_clear(p);  mpz_clear(N);
+    return res;
+}
+
+int is_totient(mpz_t n)
+{
+  if (mpz_sgn(n) == 0 || mpz_odd_p(n))
+    return !mpz_cmp_ui(n,1) ? 1 : 0;
+  return _totpred(n, n);
+}
+
+void polygonal_nth(mpz_t r, mpz_t n, UV k)
+{
+  mpz_t D, t;
+  UV R;
+
+  if (k < 3 || mpz_sgn(n) < 0) { mpz_set_ui(r,0); return; }
+  if (mpz_cmp_ui(n,1) <= 0)    { mpz_set_ui(r,1); return; }
+
+  if (k == 4) {
+    if (mpz_perfect_square_p(n)) mpz_sqrt(r, n);
+    else                         mpz_set_ui(r, 0);
+    return;
+  }
+
+  mpz_init(D);
+  if (k == 3) {
+    mpz_mul_2exp(D, n, 3);
+    mpz_add_ui(D, D, 1);
+  } else if (k == 5) {
+    mpz_mul_ui(D, n, (8*k-16));
+    mpz_add_ui(D, D, 1);
+  } else {
+    mpz_mul_ui(D, n, (8*k-16));
+    mpz_init_set_ui(t, k-4);
+    mpz_mul(t, t, t);
+    mpz_add(D, D, t);
+    mpz_clear(t);
+  }
+  if (mpz_perfect_square_p(D)) {
+    mpz_sqrt(D, D);
+    if (k == 3)  mpz_sub_ui(D, D, 1);
+    else         mpz_add_ui(D, D, k-4);
+    R = 2*k-4;
+    if (mpz_divisible_ui_p(D, R)) {
+      mpz_divexact_ui(r, D, R);
+      mpz_clear(D);
+      return;
+    }
+  }
+  mpz_clear(D);
+  mpz_set_ui(r, 0);
+}
+
 
 static void word_tile(uint32_t* source, uint32_t from, uint32_t to) {
   while (from < to) {
@@ -1559,7 +1792,7 @@ uint32_t* partial_sieve(mpz_t start, UV length, UV maxprime)
       UV lastp, pos;
       mpz_t mp, rem;
       mpz_init(rem);
-      mpz_init_set_ui(mp, p >> 32);
+      mpz_init_set_ui(mp, (p >> 16) >> 16);
       mpz_mul_2exp(mp, mp, 32);
       mpz_add_ui(mp, mp, p & 0xFFFFFFFFUL);
       for (lastp = p;  p <= maxprime;  lastp=p, p=prime_iterator_next(&iter)) {
@@ -1593,6 +1826,18 @@ char* pidigits(UV n) {
     return out;
 
 #if 0
+  /* If we want to compare with MPFR.  Add -lmpfr in Makefile. */
+  #include <mpfr.h>
+  mpfr_t pi;
+  mpfr_exp_t exp;
+  mpfr_init2(pi,  (n * 3.322) + 40  );
+  mpfr_const_pi(pi, MPFR_RNDN);
+  mpfr_free_cache();
+  char* mpi = mpfr_get_str(NULL, &exp, 10, n, pi, MPFR_RNDN);
+  strncpy(out+1, mpi, n);
+  mpfr_free_str(mpi);
+  out[1] = '.';
+#elif 0
   /* Spigot method.
    * ~40x slower than the Machin formulas, 2x slower than spigot in plain C */
   {
@@ -1986,13 +2231,12 @@ UV* sieve_twin_primes(mpz_t low, mpz_t high, UV twin, UV *rn) {
   comp = partial_sieve(low, length + twin, k);
   for (i = starti; i <= length; i += skipi) {
     if (!TSTAVAL(comp, i) && !TSTAVAL(comp, i+twin)) {
-      mpz_add_ui(t, low, i);
-      if (_GMP_BPSW(t)) {
-        mpz_add_ui(t, t, twin);
-        if (_GMP_BPSW(t)) {
-          PUSH_VLIST(retlist, i);
-        }
-      }
+      /* Add to list if both t,t+2 pass MR and if both pass ES Lucas */
+      if ( (mpz_add_ui(t,low,i),  miller_rabin_ui(t,2)) &&
+           (mpz_add_ui(t,t,twin), miller_rabin_ui(t,2)) &&
+           (mpz_add_ui(t,low,i),  _GMP_is_lucas_pseudoprime(t,2)) &&
+           (mpz_add_ui(t,t,twin), _GMP_is_lucas_pseudoprime(t,2)) )
+        PUSH_VLIST(retlist, i);
     }
   }
   Safefree(comp);

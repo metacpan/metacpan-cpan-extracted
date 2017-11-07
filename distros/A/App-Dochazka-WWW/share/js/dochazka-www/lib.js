@@ -112,7 +112,8 @@ define ([
                 r += ' (MASQUERADE)';
             } else {
                 if (cupriv === 'admin') {
-                    r += '&nbsp;ADMIN';
+                    r += ' ADMIN'; // used to be '&nbsp;ADMIN' but this caused
+                                   // unnecessary trouble with tests
                 }
             }
 

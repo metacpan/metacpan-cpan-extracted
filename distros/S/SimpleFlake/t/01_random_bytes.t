@@ -3,7 +3,7 @@ use Test::More 0.98;
 
 use SimpleFlake;
 
-my $random = SimpleFlake->get_random_bits(3);
+my $random = SimpleFlake->get_random_bits(8);
 
 ok( $random, "Random Bytes generated: $random" );
 

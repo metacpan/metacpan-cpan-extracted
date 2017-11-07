@@ -16,6 +16,10 @@ You should have received a copy of the GNU General Public License
 along with Chart.  If not, see <http://www.gnu.org/licenses/>.
 
 
+Version 264, November 2017
+    - Yahoo quotes site changes
+    - NZX dividends fixes and site changes
+
 Version 263, September 2017
     - fix Ticker tests for when empty database
 

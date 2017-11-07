@@ -4,13 +4,13 @@
       "Vincent Pit <perl@profvince.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Task-Devel-Cover-Recommended",
    "no_index" : {
@@ -33,17 +33,22 @@
       },
       "runtime" : {
          "requires" : {
+            "B::Debug" : "0",
             "Browser::Open" : "0",
             "Capture::Tiny" : "0",
             "Class::XSAccessor" : "0",
-            "Devel::Cover" : "1.20",
+            "Devel::Cover" : "1.29",
             "Digest::MD5" : "0",
-            "JSON::PP" : "0",
+            "HTML::Entities" : "3.69",
+            "HTML::Parser" : "0",
+            "JSON::MaybeXS" : "1.003003",
             "Moo" : "0",
             "PPI::HTML" : "1.07",
             "Parallel::Iterator" : "0",
             "Pod::Coverage" : "0.06",
             "Pod::Coverage::CountParents" : "0",
+            "Sereal::Decoder" : "0",
+            "Sereal::Encoder" : "0",
             "Storable" : "0",
             "Template" : "2.00",
             "namespace::clean" : "0",
@@ -64,6 +69,6 @@
          "url" : "http://git.profvince.com/?p=perl%2Fmodules%2FTask-Devel-Cover-Recommended.git"
       }
    },
-   "version" : "v1.200.0",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "v1.290.0",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

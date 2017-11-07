@@ -1,5 +1,5 @@
 package QBit::WebInterface;
-$QBit::WebInterface::VERSION = '0.029';
+$QBit::WebInterface::VERSION = '0.030';
 use POSIX qw(strftime setlocale LC_TIME);
 
 use qbit;

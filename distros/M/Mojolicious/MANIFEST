@@ -49,6 +49,7 @@ lib/Mojo/Message/Request.pm
 lib/Mojo/Message/Response.pm
 lib/Mojo/Parameters.pm
 lib/Mojo/Path.pm
+lib/Mojo/Promise.pm
 lib/Mojo/Reactor.pm
 lib/Mojo/Reactor/EV.pm
 lib/Mojo/Reactor/Poll.pm
@@ -208,6 +209,7 @@ t/mojo/morbo.t
 t/mojo/parameters.t
 t/mojo/path.t
 t/mojo/prefork.t
+t/mojo/promise.t
 t/mojo/proxy.t
 t/mojo/psgi.t
 t/mojo/reactor_detect.t

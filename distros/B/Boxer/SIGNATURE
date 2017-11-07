@@ -12,22 +12,22 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA256
+Hash: SHA512
 
-SHA1 b80914f670c13ed969c34bda31b282dfafba4d33 COPYRIGHT
+SHA1 7b9c867f682991d714b2fefd03e7d89d3e43d36a COPYRIGHT
 SHA1 6c20c21af1aee1cc223733f8ad611d6e78ef790b CREDITS
-SHA1 ac159bf79e001f0bc73d3c2b7c5da8453908a4a2 Changes
+SHA1 969f48a25cb5f16b34c2bfe5375242e871e3b3bf Changes
 SHA1 b199daf5b34dc2f8f1a17edf821af560e72d7c54 INSTALL
 SHA1 669fff2c2aa740c31d6546341aa7627c248454c6 LICENSE
 SHA1 32f71780808987c77911be49c06b626328d71cf3 MANIFEST
-SHA1 fb99d5fa3fd21d24fde965a0ac246eed1957b384 META.json
-SHA1 728f9b97960baab884f1a4e47264d463dbd7a860 META.yml
-SHA1 21cd40660db5642207454363401630026641696f Makefile.PL
-SHA1 81d5e803a8aeb5e8ab2b52bf96b166222d01b5c5 README
-SHA1 28172458c570fec482572f4ebc19bb0609cdf24a TODO
-SHA1 d8a7ee1564a3da8af9726fe0c5ad6751a88bd0c1 bin/boxer
+SHA1 aa2a588ee089b6d4c42ca077dd19d82af922094d META.json
+SHA1 35f3a52bb8104dc293af9a8a932b01c0da3cfb4c META.yml
+SHA1 d7e65dda8c0a00d7d8fe8ca8132a0329c16b25ba Makefile.PL
+SHA1 175334c9838fb4acdf4b388945d77886e446aedc README
+SHA1 718a2edfad84285e6b3ae8c676bd7aa5b93268c7 TODO
+SHA1 7b83eea519f65357760b51e036981cebd3c8088f bin/boxer
 SHA1 c59760e54130231bcd42e193e41df8420a5d8bd9 dist.ini
-SHA1 5d95c8259e1182dfbf76b72125c8e6877f109e39 doap.ttl
+SHA1 470b4decbee40c0d711b7cb0587a1b4c842bca1d doap.ttl
 SHA1 f2f5df67593d316760b27e089157ab26ca1cc4e1 doc/boxer.svg
 SHA1 919d3b2bb4100a6a9731e85c91f70f957e42364d examples/README
 SHA1 bde3ca64437336189476c015b54fa4a627ada4f7 examples/classes/Admin/apt/auto/all.yml
@@ -216,24 +216,24 @@ SHA1 20c2af37df6d3a9ec0c44362949d1228f8d039f7 examples/classes/x11/lightdm/gtk.y
 SHA1 36575b4e55acc82830eaa1f53ef74130629b184f examples/classes/x11/lightdm/init.yml
 SHA1 b0e8e08c5b9e7726efa134a1ef081ff492f4c3ab examples/nodes/lxp5.yml
 SHA1 45e744814af30ccc792ce8042815f39f57da1804 examples/nodes/parl-greens.yml
-SHA1 1d325aa029e68f148c685e32c4e815fab1a570fa lib/Boxer.pm
-SHA1 ec795fc0ddfa11c9901730341ce25047776a9ea4 lib/Boxer/CLI.pm
-SHA1 37f74e0c677c19dcfb1103e0a6598d4472b45637 lib/Boxer/CLI/Command.pm
-SHA1 4b092c09221ba6dc42cfd739ce4255477385ec67 lib/Boxer/CLI/Command/About.pm
-SHA1 bc86a5e1e0aad8cc5486715e087522b3c9f13771 lib/Boxer/CLI/Command/Aliases.pm
-SHA1 7979cce9e19d87a37d05c4bc975f23d9f4c54233 lib/Boxer/CLI/Command/Commands.pm
-SHA1 f16887b80e5d5c458ec80a051b3237250d79ab40 lib/Boxer/CLI/Command/Compose.pm
-SHA1 339853ee61db3f69d624739e6e3f55b2b8e53fb6 lib/Boxer/File/WithSkeleton.pm
-SHA1 7c48970ece7de7688387699a9ce86e53df4ea10c lib/Boxer/Part.pm
-SHA1 f3ac8e2ac2dbd41265828aeb8caf904a738ff544 lib/Boxer/Part/Reclass.pm
-SHA1 3631567c6aad87000434fea993b58ff7f7fcc149 lib/Boxer/Role/Interact.pm
-SHA1 be19af8f3deea6237b71cab96cbb9192d76cdf4f lib/Boxer/Task.pm
-SHA1 3a3f877943d8a4a1f6a3f57b96cb81224e821b47 lib/Boxer/Task/Classify.pm
-SHA1 e004f119e7cd20d042489a4e5789cd88ebc784e2 lib/Boxer/Task/Serialize.pm
-SHA1 05ccf46cd931835e347a519a229be8b3bd760fa1 lib/Boxer/Types.pm
-SHA1 4d60d62b45b9bf369a3df83598c50c18fa1ae249 lib/Boxer/World.pm
-SHA1 87678b47ed7e691d09697ccf61de95d29bfa141c lib/Boxer/World/Flat.pm
-SHA1 ed6395ea5551296641dfbc0c56daa019a6ea6181 lib/Boxer/World/Reclass.pm
+SHA1 85201fd7fdf52d6356eac9f2a0a3fafe394c13b2 lib/Boxer.pm
+SHA1 b975c410e1f647d23ab5168d5ce4eb7fa2a47ca6 lib/Boxer/CLI.pm
+SHA1 a34b771cd4eaa017d88314fd7c411153ac90048d lib/Boxer/CLI/Command.pm
+SHA1 8bfc21311e1cff9f6ab6d4dae52b57a9c3aa70b1 lib/Boxer/CLI/Command/About.pm
+SHA1 7974a17b747bd6cdb4a1a2744ab0c399d9cb8ceb lib/Boxer/CLI/Command/Aliases.pm
+SHA1 6c10f4f80f23c33d4a9c0e00f2d8f7b4b128d61d lib/Boxer/CLI/Command/Commands.pm
+SHA1 5518e755e7bec8aab62b9640a488678c890aebd2 lib/Boxer/CLI/Command/Compose.pm
+SHA1 f821fd83794efbde4a7ab756d2b32a1ec74ab903 lib/Boxer/File/WithSkeleton.pm
+SHA1 a213fe4752a457a41fc68bc91dc53fa924717cfc lib/Boxer/Part.pm
+SHA1 6d3483cc3f501e66a073e67cd2eefac4e7a8c5a0 lib/Boxer/Part/Reclass.pm
+SHA1 6975c109cecd250fb4d506546d9ad31ff2b62d3b lib/Boxer/Role/Interact.pm
+SHA1 fa282e9f0de81e6fa04be758ac1b3a47a4240ed2 lib/Boxer/Task.pm
+SHA1 327650d5865487248d0211753404ac0587ad9599 lib/Boxer/Task/Classify.pm
+SHA1 26985bcc07e378cbee94760e90d8ecb9319de356 lib/Boxer/Task/Serialize.pm
+SHA1 b4978767d3b1236a309c30b625923879525b8056 lib/Boxer/Types.pm
+SHA1 6a1e853f340cdb3e81868455325fa732f1c5332e lib/Boxer/World.pm
+SHA1 a82cc2f4a7f6effe744ccf96085c700d0d87aef8 lib/Boxer/World/Flat.pm
+SHA1 e5d71f0aa10ad22bc3c22c3e5060767c71445095 lib/Boxer/World/Reclass.pm
 SHA1 16ab646487dcc69478b20f7f11becb9f30bc01ee share/skel/preseed.cfg.in
 SHA1 888a9b47c3e1cdbc23d932d2ec0ef4bb0e671572 share/skel/script.sh.in
 SHA1 8653c7bc24881ffb021b65bf7c9c9dca6a71e1a5 t/00_compile.t
@@ -242,4 +242,20 @@ SHA1 d34157688eed8a82c1612c22ac98c6c0ee4f0286 t/01_app_help.t
 SHA1 8fb30d12fcc4a35ee8bd781c3ed99d90a951cd3a t/fixme.t
 SHA1 28287c40831d5126046988c88cd07e5da6f3f6d6 t/minimumversion.t
 SHA1 a7dcc176ca5bedb047f328b71bc7638ad6f330b5 t/pod.t
-SHA1 e42a74d35077f86e571fb4a7a81d7e7b3f53ebac t/world.t
+SHA1 0975601a515a4413e644f83b7bde12be352197e7 t/world.t
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEn+Ppw2aRpp/1PMaELHwxRsGgASEFAloAN+kACgkQLHwxRsGg
+ASHdxA//SO/gEH60z4TDJ+n0CBDeR06f/EdpMYCmgGImdUTPRbZGjyJf8B2qSRqD
+yWWgZYKM0hRA5sq/9KoKA41597sHNV7Yed3LKDPtF5qwz5jzHjE2JrgnsJ44E4nz
+W+GM+/yGBklDuAUXrnazPgTRRYb+qiv1XNbLSoawULxRQI7iM32jXfDulvueKjVu
+50GhnrN7Doa6r+bCrYnX0STWftEfTPKtCPr5bJfqvt4ZDPGi6oSY0xmbzPoKkW62
+rtnl4fLsFHHRYwTKDzmBHaFJTJsn0cVeh54jzr6RAI0ma6Hy7A82Rnm7Ice2V7WR
+ADKJbcP1A0zMYGI6vt7cgiyNjbgtT9zrV+e094Qiq4ynAOKlf3U20UuER7up8hg/
+omGs1PciAjIGbp00RdyqMMsVl2USwj9OKcxU3MAzNZ3nu5Cx9fVpC5F05Qyb9Qct
+Tric+ttk2maWqRUX4dLqLB3do81InkLMcWDLgwZN71oWmBXAHupMerAP4rKtir0u
+7wzftrn24zFWCx5456bNUvANmfc5lhqxLvNwXHKBCDuWX/HpmydeeYCr62nzWVxc
+BGNjQr2gSF3+MYXwl14gE8AANLAzHaE0vmTlU/M4VVMjPkOwKZDUalXPvs5SSY/P
+nyPugf7g1ijCOnwUl2ymLZ5BEKxY3tqMaSY9iXTMbzY9c4xLZ9g=
+=3o1D
+-----END PGP SIGNATURE-----

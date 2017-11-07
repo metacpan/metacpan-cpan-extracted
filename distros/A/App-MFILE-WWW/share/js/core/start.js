@@ -211,8 +211,8 @@ define ([
                 entries = currentTarget.miniMenu.entries;
 
             // if miniMenu has zero or one entries, 'Back' is the only option
-            console.log("entries", entries);
-            if (entries === null || entries === undefined || entries.length === 0) {
+            // console.log("entries", entries);
+            if (! coreLib.isArray(entries) || entries.length === 0) {
                 console.log("Setting sel to 'X' by default because miniMenu has no entries");
                 sel = 'X';
                 len = 0;
@@ -224,9 +224,9 @@ define ([
                 return;
             }
 
-            console.log("sel === " + sel + " and len === " + len);
+            // console.log("sel === " + sel + " and len === " + len);
             if (sel >= 0 && sel <= len) {
-                //console.log("sel " + sel + " is within range");
+                // console.log("sel " + sel + " is within range");
                 // we can only select the item if we have sufficient priv level
                 selection = target.pull(currentTarget.miniMenu.entries[sel]);
                 if (coreLib.privCheck(selection.aclProfile)) {
@@ -274,7 +274,6 @@ define ([
         //
         dformListen = function (dfn, obj, focusId) {
             console.log("Listening in form " + dfn);
-            currentTarget = target.pull(dfn);
             $('#' + dfn).submit(suppressSubmitEvent);
             $('input[name="sel"]').val('');
             if (focusId) {
@@ -350,7 +349,6 @@ define ([
                 pos = coreLib.dbrowserState.pos;
             
             console.log("Listening in browser " + dbo.name);
-            currentTarget = dbo;
             console.log("Browser set is", set, "cursor position is " + pos);
             $('#mainarea').html(dbo.source(set, pos));
             if (resultLine) {
@@ -391,7 +389,6 @@ define ([
         },
         dtableListen = function (dto) {
             console.log("Listening in table " + dto.name);
-            currentTarget = dto;
             $('#' + dto.name).submit(suppressSubmitEvent);
             $('input[name="sel"]').val('').focus();
             $('#submitButton').on("click", function (event) {
@@ -476,7 +473,6 @@ define ([
             var drso = coreLib.drowselectState.obj,
                 set = coreLib.drowselectState.set,
                 pos = coreLib.drowselectState.pos;
-            currentTarget = drso;
             $('#result').text("Displaying rowselect with " + coreLib.genObjStr(set.length));
             $('#mainarea').html(drso.source(set));
             coreLib.reverseVideo(pos, true);
@@ -494,36 +490,70 @@ define ([
     return {
 
         dbrowser: function (dbn) {
-            if (dbn) {
-                // when called with dbn (dbrowser name) argument, we assume
-                // that we are being called from the second stage of dbrowser
-                // initialization (i.e., one-time event) -- generate and
-                // return the start function for this dbrowser
-                return function (state, opts) {
-                    console.log('Starting new ' + dbn + ' dbrowser with state', state);
-                    if (! state) {
-                        state = stack.getState();
-                    }
-                    console.log('dbrowser state', state);
-                    // (re)initialize dbrowser state
-                    if (coreLib.dbrowserStateOverride) {
-                        coreLib.dbrowserStateOverride = false;
-                    } else {
-                        coreLib.dbrowserState.obj = target.pull(dbn);
-                        coreLib.dbrowserState.set = state.set;
-                        coreLib.dbrowserState.pos = state.pos;
-                    }
-                    // start browsing
-                    dbrowserListen(stack.getResultLine());
-                };
-            }
+            var dbo = target.pull(dbn);
+            return function (state, opts) {
+                currentTarget = dbo;
+                console.log('Starting new ' + dbn + ' dbrowser with state', state);
+                if (! state) {
+                    state = stack.getState();
+                }
+                console.log('dbrowser state', state);
+                // (re)initialize dbrowser state
+                if (coreLib.dbrowserStateOverride) {
+                    coreLib.dbrowserStateOverride = false;
+                } else {
+                    coreLib.dbrowserState.obj = target.pull(dbn);
+                    coreLib.dbrowserState.set = state.set;
+                    coreLib.dbrowserState.pos = state.pos;
+                }
+                // start browsing
+                dbrowserListen(stack.getResultLine());
+            };
         }, // dbrowser
 
         dbrowserListen: dbrowserListen,
 
+        dcallback: function (dcn) {
+            // dcn is dcallback name
+            // dco is dcallback object
+            var dco = target.pull(dcn);
+            return function (obj, opts) {
+                currentTarget = dco;
+                console.log('Starting dcallback ' + dcn + ' with object', opts);
+                // coreLib.clearResult();
+                if (typeof opts !== 'object' || opts === null) {
+                    opts = {};
+                }
+                opts.resultLine = ('resultLine' in opts) ? opts.resultLine : "&nbsp";
+                opts.resultLine = (opts.resultLine === null) ? "&nbsp" : opts.resultLine;
+                if (! obj) {
+                    obj = stack.getState();
+                }
+                $('#mainarea').html(dco.source);
+                if (dco.hasOwnProperty('callback')) {
+                    $('#dcallback').html(dco.callback(obj, dco.title, dco.preamble));
+                }
+                if (dco.hasOwnProperty('htmlCallback')) {
+                    $('#dcallback').html(dco.htmlCallback(obj, dco.title, dco.preamble));
+                }
+                if (dco.hasOwnProperty('populateCallback')) {
+                    dco.populateCallback(obj);
+                }
+                $('input[name="sel"]').val('').focus();
+                $('#submitButton').on("click", function (event) {
+                    event.preventDefault;
+                    console.log("Submitting form " + dcn);
+                    mmSubmit(obj);
+                });
+                $('#' + dcn).on("keydown", mmKeyListener);
+                coreLib.displayResult(opts.resultLine);
+            };
+        }, // dcallback
+
         dform: function (dfn) {
             var dfo = target.pull(dfn);
             return function (state, opts) {
+                currentTarget = dfo;
                 console.log('Entering start method of target ' + dfn);
                 var entry,
                     i,
@@ -569,6 +599,7 @@ define ([
             // dmo is dmenu object
             var dmo = target.pull(dmn);
             return function (state, opts) {
+                currentTarget = dmo;
                 console.log('Entering start.dmenu with argument: ' + dmn);
                 // coreLib.clearResult();
                 stack.setFlag();
@@ -589,6 +620,7 @@ define ([
             var dno = target.pull(dnn);
             return function (state, opts) {
                 // state is a string to be displayed on the screen
+                currentTarget = dno;
                 console.log("Entering start.dnotice with argument: " + dnn);
                 if (! state) {
                     state = stack.getState();
@@ -609,6 +641,7 @@ define ([
                 // initialization (i.e., one-time event) -- generate and
                 // return the start function for this drowselect
                 return function (state, opts) {
+                    currentTarget = drso;
                     coreLib.clearResult();
                     console.log('Starting new ' + drsn + ' drowselect');
                     if (! state) {
@@ -635,6 +668,7 @@ define ([
             var dto = target.pull(dtn);
             return function (state, opts) {
                 // state is a array of objects to be displayed as a table
+                currentTarget = dto;
                 coreLib.clearResult();
                 console.log('Starting new ' + dtn + ' dtable');
                 if (! state) {

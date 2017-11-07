@@ -1,13 +1,18 @@
 {
   am_pm_abbreviated => [
     "AM",
-    "PM"
+    "PM",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
-    Ed => "d E",
+    Ed => "E d",
     Ehm => "E h:mm a",
     Ehms => "E h:mm:ss a",
     Gy => "y G",
@@ -46,7 +51,7 @@
     yMd => "d/M/y",
     yQQQ => "y QQQ",
     yQQQQ => "y QQQQ",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "to-TO",
   date_format_full => "EEEE d MMMM y",
@@ -64,7 +69,7 @@
     "Tu\N{U+02bb}a",
     "Fal",
     "Tok",
-    "S\N{U+0101}p"
+    "S\N{U+0101}p",
   ],
   day_format_narrow => [
     "M",
@@ -73,7 +78,7 @@
     "T",
     "F",
     "T",
-    "S"
+    "S",
   ],
   day_format_wide => [
     "M\N{U+014d}nite",
@@ -82,7 +87,7 @@
     "Tu\N{U+02bb}apulelulu",
     "Falaite",
     "Tokonaki",
-    "S\N{U+0101}pate"
+    "S\N{U+0101}pate",
   ],
   day_stand_alone_abbreviated => [
     "M\N{U+014d}n",
@@ -91,7 +96,7 @@
     "Tu\N{U+02bb}a",
     "Fal",
     "Tok",
-    "S\N{U+0101}p"
+    "S\N{U+0101}p",
   ],
   day_stand_alone_narrow => [
     "M",
@@ -100,7 +105,7 @@
     "T",
     "F",
     "T",
-    "S"
+    "S",
   ],
   day_stand_alone_wide => [
     "M\N{U+014d}nite",
@@ -109,19 +114,19 @@
     "Tu\N{U+02bb}apulelulu",
     "Falaite",
     "Tokonaki",
-    "S\N{U+0101}pate"
+    "S\N{U+0101}pate",
   ],
   era_abbreviated => [
     "KM",
-    "TS"
+    "TS",
   ],
   era_narrow => [
     "KM",
-    "TS"
+    "TS",
   ],
   era_wide => [
     "ki mu\N{U+02bb}a",
-    "ta\N{U+02bb}u \N{U+02bb}o S\N{U+012b}s\N{U+016b}"
+    "ta\N{U+02bb}u \N{U+02bb}o S\N{U+012b}s\N{U+016b}",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -142,7 +147,7 @@
     "Sep",
     "\N{U+02bb}Oka",
     "N\N{U+014d}v",
-    "T\N{U+012b}s"
+    "T\N{U+012b}s",
   ],
   month_format_narrow => [
     "S",
@@ -156,7 +161,7 @@
     "S",
     "O",
     "N",
-    "T"
+    "T",
   ],
   month_format_wide => [
     "S\N{U+0101}nuali",
@@ -170,7 +175,7 @@
     "Sepitema",
     "\N{U+02bb}Okatopa",
     "N\N{U+014d}vema",
-    "T\N{U+012b}sema"
+    "T\N{U+012b}sema",
   ],
   month_stand_alone_abbreviated => [
     "S\N{U+0101}n",
@@ -184,7 +189,7 @@
     "Sep",
     "\N{U+02bb}Oka",
     "N\N{U+014d}v",
-    "T\N{U+012b}s"
+    "T\N{U+012b}s",
   ],
   month_stand_alone_narrow => [
     "S",
@@ -198,7 +203,7 @@
     "S",
     "O",
     "N",
-    "T"
+    "T",
   ],
   month_stand_alone_wide => [
     "S\N{U+0101}nuali",
@@ -212,7 +217,7 @@
     "Sepitema",
     "\N{U+02bb}Okatopa",
     "N\N{U+014d}vema",
-    "T\N{U+012b}sema"
+    "T\N{U+012b}sema",
   ],
   name => "Tongan Tonga",
   native_language => "lea fakatonga",
@@ -224,37 +229,37 @@
     "K1",
     "K2",
     "K3",
-    "K4"
+    "K4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "kuata \N{U+02bb}uluaki",
     "kuata ua",
     "kuata tolu",
-    "kuata f\N{U+0101}"
+    "kuata f\N{U+0101}",
   ],
   quarter_stand_alone_abbreviated => [
     "K1",
     "K2",
     "K3",
-    "K4"
+    "K4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "kuata 1",
     "kuata 2",
     "kuata 3",
-    "kuata 4"
+    "kuata 4",
   ],
   script => undef,
   territory => "Tonga",
@@ -263,5 +268,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 31
+  version => 32,
 }

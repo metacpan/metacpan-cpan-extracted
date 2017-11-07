@@ -11,8 +11,10 @@ use DateTime;
 use DateTime::Format::Strptime;
 use Getopt::Long;
 use Email::MIME;
+use File::Copy;
+use File::Path;
 use File::ReadBackwards;
-use File::Temp;
+use File::Temp qw(tempdir);
 use List::Util qw(first);
 use POSIX qw();
 
@@ -24,7 +26,7 @@ use constant EMAIL_ATTRIBUTES => (
     encoding     => 'quoted-printable',
 );
 
-our $VERSION = '0.11';
+our $VERSION = '0.13';
 
 sub new
 {
@@ -134,12 +136,17 @@ sub _update_repository
             File::ReadBackwards->new($branch_db_path)
                 or die "Unable to load branch database ".
                         "($branch_db_path).";
-        my $last = $branch_db_file->readline() || '';
-        chomp $last;
-        my (undef, $commit) = split /\./, $last;
-        if (not $commit) {
-            die "Unable to find commit ID in database.";
-        }
+
+        my ($last, $commit);
+        do {
+            $last = $branch_db_file->readline() || '';
+            chomp $last;
+            (undef, $commit) = split /\./, $last;
+            if (not $commit) {
+                die "Unable to find commit ID in database.";
+            }
+        } while (not $impl->has($commit));
+
         my @new_commits = @{$impl->commits_from($branch_name, $commit)};
         my $time = _strftime(time());
         open my $fh, '>>', $branch_db_path;
@@ -163,15 +170,53 @@ sub _repository_map
         @{$config}{qw(repository_path db_path repositories)};
 
     for my $repository (@{$repositories}) {
-        if ($config->{'ignore_errors'}) {
+        eval {
+            $method->($repo_path, $db_path, $repository);
+        };
+        if (my $error = $@) {
+            chdir $repo_path;
+            my ($name, $impl) = _load_repository($repository);
+            my $backup_dir = tempdir(CLEANUP => 1);
+            my $backup_path = $backup_dir.'/temporary';
+            my $do_backup = (-e $name);
+            if ($do_backup) {
+                my $res = move($name, $backup_path);
+                if (not $res) {
+                    warn "Unable to backup repository for re-clone: $!";
+                }
+            }
             eval {
+                $impl->clone($repository->{'url'}, $name);
                 $method->($repo_path, $db_path, $repository);
             };
-            if (my $error = $@) {
-                warn $error;
+            if (my $sub_error = $@) {
+                if ($do_backup) {
+                    my $rm_error;
+                    rmtree($name, { error => \$rm_error });
+                    if ($rm_error and @{$rm_error}) {
+                        my $info =
+                            join ', ',
+                            map { join ':', %{$_} }
+                                @{$rm_error};
+                        warn "Unable to restore repository: ".$info;
+                    } else {
+                        my $res = move($backup_path, $name);
+                        if (not $res) {
+                            warn "Unable to restore repository on ".
+                                 "failed rerun: $!";
+                        }
+                    }
+                }
+                my $error_msg = "Re-clone or nested operation failed: ".
+                                "$sub_error (original error was $error)";
+                if ($config->{'ignore_errors'}) {
+                    warn $error_msg;
+                } else {
+                    die $error_msg;
+                }
+            } else {
+                warn "Re-cloned '$name' due to error: $error";
             }
-        } else {
-            $method->($repo_path, $db_path, $repository);
         }
     }
 }
@@ -311,12 +356,18 @@ sub get_email
                 my ($time, $id) = @{$commit};
                 $time = $self->_utc_to_tz($time);
                 $time =~ s/T/ /;
-                print $output_ft "Pulled at: $time\n".
-                                 (join '', @{$impl->show($id)}).
-                                 "\n";
+                if ($impl->has($id)) {
+                    print $output_ft "Pulled at: $time\n".
+                                     (join '', @{$impl->show($id)}).
+                                     "\n";
 
-                my $content = join '', @{$impl->show_all($id)};
-                push @commit_data, [$name, $branch_name, $id, $content];
+                    my $content = join '', @{$impl->show_all($id)};
+                    push @commit_data, [$name, $branch_name, $id, $content];
+                } else {
+                    print $output_ft "Pulled at: $time\n".
+                                     "commit $id\n".
+                                     "(no longer present in repository)\n\n";
+                }
             }
             print $output_ft "\n";
         }

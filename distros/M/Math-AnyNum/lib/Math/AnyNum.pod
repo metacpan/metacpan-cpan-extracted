@@ -6,11 +6,11 @@ Math::AnyNum - Arbitrary size precision for integers, rationals, floating-points
 
 =head1 VERSION
 
-Version 0.16
+Version 0.17
 
 =head1 SYNOPSIS
 
-Math::AnyNum provides a transparent and easy-to-use interface to L<Math::GMPq>, L<Math::GMPz>, L<Math::MPFR> and L<Math::MPC>.
+Math::AnyNum provides a transparent and easy-to-use interface to L<Math::GMPz>, L<Math::GMPq>, L<Math::MPFR> and L<Math::MPC>.
 
     use 5.014;
     use Math::AnyNum qw(:overload factorial);
@@ -142,9 +142,7 @@ The syntax for disabling the C<:overload> behavior in the current scope, is:
     no Math::AnyNum;        # :overload will be disabled in the current scope
 
 In addition to the exportable functions, Math::AnyNum also provides a list with
-useful mathematical constants that can be exported.
-
-This constants are:
+useful mathematical constants that can be exported, such as:
 
     i           # imaginary unit             sqrt(-1)
     e           # e mathematical constant    2.718281828459...
@@ -190,7 +188,7 @@ we get the following results:
 As shown above, integers and rational numbers do not obey this precision, because they can grow and
 shrink dynamically, without a specific limit.
 
-A rational number never losses accuracy in rational operations, therefore if we say:
+Furthermore, a rational number never losses precision and accuracy in rational operations, therefore if we say:
 
     my $x = 1/3;
     say $x*3;                                     #=> 1
@@ -537,7 +535,7 @@ Example:
 =head2 pow
 
     x ** y                                        #=> Any
-    pos(x, y)                                     #=> Any
+    pow(x, y)                                     #=> Any
 
 Raises C<x> to power C<y> and returns the result.
 
@@ -1021,7 +1019,7 @@ The n-th Fibonacci number. Returns NaN when C<n> is negative.
 
     factorial(n)                                  #=> Int | NaN
 
-Factorial of C<n>. Returns NaN when C<n> is negative. (C<1*2*3*...*n>)
+Factorial of C<n> (denoted as C<n!>). Returns NaN when C<n> is negative. (C<1*2*3*...*n>)
 
 =head2 dfactorial
 

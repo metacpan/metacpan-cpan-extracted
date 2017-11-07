@@ -36,9 +36,13 @@
                 [% SET fm = foreign_moniker %]
                 <td><a href="#[% fm %]">[% fm %]</a></td>
                 <td>
-                    [% FOR key IN cond.keys %]
-                        [% key %] =&gt; [% cond.$key %]
-                        [% UNLESS loop.last %], [% END %]
+                    [% IF cond %]
+                        [% FOR key IN cond.keys %]
+                            [% key %] =&gt; [% cond.$key %]
+                            [% UNLESS loop.last %], [% END %]
+                        [% END %]
+                    [% ELSE %]
+                        <em>complex</em>
                     [% END %]
                 </td>
             [% END %]

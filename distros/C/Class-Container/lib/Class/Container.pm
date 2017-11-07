@@ -1,7 +1,8 @@
+use strict;
 package Class::Container;
-
-$VERSION = '0.12';
-$VERSION = eval $VERSION if $VERSION =~ /_/;
+{
+  $Class::Container::VERSION = '0.13';
+}
 
 my $HAVE_WEAKEN;
 BEGIN {
@@ -14,7 +15,6 @@ BEGIN {
   *weaken = sub {} unless defined &weaken;
 }
 
-use strict;
 use Carp;
 
 # The create_contained_objects() method lets one object
@@ -224,7 +224,7 @@ sub contained_objects
 
 sub _decorator_AUTOLOAD {
   my $self = shift;
-  no strict 'vars';
+  use vars qw($AUTOLOAD);
   my ($method) = $AUTOLOAD =~ /([^:]+)$/;
   return if $method eq 'DESTROY';
   die qq{Can't locate object method "$method" via package $self} unless ref($self);
@@ -239,7 +239,7 @@ sub _decorator_CAN {
   return $self->SUPER::can($method) if $self->SUPER::can($method);
   if (ref $self) {
     return $self->{_decorates}->can($method) if $self->{_decorates};
-    return undef;
+    return;
   } else {
     return $DECORATEES{$self}->can($method);
   }
@@ -248,7 +248,7 @@ sub _decorator_CAN {
 sub decorates {
   my ($class, $super) = @_;
   
-  no strict 'refs';
+  no strict 'refs';  ## no critic
   $super ||= ${$class . '::ISA'}[0];
   
   # Pass through unknown method invocations
@@ -421,8 +421,8 @@ sub _load_module {
     
     unless ( eval { $module->can('new') } )
     {
-	no strict 'refs';
-	eval "use $module";
+	no strict 'refs';   ## no critic
+	eval "use $module"; ## no critic
 	croak $@ if $@;
     }
 }
@@ -480,7 +480,7 @@ sub _iterate_ISA {
 
   my %out;
   
-  no strict 'refs';
+  no strict 'refs';  ## no critic
   foreach my $superclass (@{ "${class}::ISA" }) {
     next unless $superclass->isa(__PACKAGE__);
     my $superparams = $superclass->_iterate_ISA($look_in, $cache_in, $add);
@@ -510,6 +510,10 @@ __END__
 =head1 NAME
 
 Class::Container - Glues object frameworks together transparently
+
+=head1 VERSION
+
+version 0.13
 
 =head1 SYNOPSIS
 

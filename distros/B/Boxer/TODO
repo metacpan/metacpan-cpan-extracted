@@ -50,3 +50,5 @@ Later releases...
   * Implement PXE target - i.e. DHCP+TFTP services serving preseed file.
     + <https://wiki.fogproject.org/wiki/index.php?title=IPXE>.
     + <https://wiki.fogproject.org/wiki/index.php?title=FOG_on_a_MAC>
+  * Improve testsuite
+    + Test implicit --skeldir (by setting ENV variable instead)

@@ -327,11 +327,41 @@ Portuguese Macau SAR China locale.
 
 =head2 Available Formats
 
+=head3 Bh (h B)
+
+   2008-02-05T18:30:30 = 6 B
+   1995-12-22T09:05:02 = 9 B
+  -0010-09-15T04:44:23 = 4 B
+
+=head3 Bhm (h:mm B)
+
+   2008-02-05T18:30:30 = 6:30 B
+   1995-12-22T09:05:02 = 9:05 B
+  -0010-09-15T04:44:23 = 4:44 B
+
+=head3 Bhms (h:mm:ss B)
+
+   2008-02-05T18:30:30 = 6:30:30 B
+   1995-12-22T09:05:02 = 9:05:02 B
+  -0010-09-15T04:44:23 = 4:44:23 B
+
 =head3 E (ccc)
 
    2008-02-05T18:30:30 = terça
    1995-12-22T09:05:02 = sexta
   -0010-09-15T04:44:23 = sábado
+
+=head3 EBhm (E h:mm B)
+
+   2008-02-05T18:30:30 = terça 6:30 B
+   1995-12-22T09:05:02 = sexta 9:05 B
+  -0010-09-15T04:44:23 = sábado 4:44 B
+
+=head3 EBhms (E h:mm:ss B)
+
+   2008-02-05T18:30:30 = terça 6:30:30 B
+   1995-12-22T09:05:02 = sexta 9:05:02 B
+  -0010-09-15T04:44:23 = sábado 4:44:23 B
 
 =head3 EHm (E, HH:mm)
 
@@ -609,13 +639,13 @@ Portuguese Macau SAR China locale.
    1995-12-22T09:05:02 = 4.º trimestre de 1995
   -0010-09-15T04:44:23 = 3.º trimestre de -10
 
-=head3 yw-count-one (w.'ª' 'semana' 'de' y)
+=head3 yw-count-one (w.'ª' 'semana' 'de' Y)
 
    2008-02-05T18:30:30 = 6.ª semana de 2008
    1995-12-22T09:05:02 = 51.ª semana de 1995
   -0010-09-15T04:44:23 = 37.ª semana de -10
 
-=head3 yw-count-other (w.'ª' 'semana' 'de' y)
+=head3 yw-count-other (w.'ª' 'semana' 'de' Y)
 
    2008-02-05T18:30:30 = 6.ª semana de 2008
    1995-12-22T09:05:02 = 51.ª semana de 1995

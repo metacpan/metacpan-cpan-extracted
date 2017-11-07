@@ -1,0 +1,12 @@
+line one\
+continues in two without spaces in onecontinues
+baz
+\
+this line starts \
+with 'this line starts with' \
+    and ends with ''s: \
+    ''\
+s
+0\
+foo\
+''

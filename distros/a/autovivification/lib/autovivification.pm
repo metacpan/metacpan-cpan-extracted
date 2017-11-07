@@ -11,13 +11,13 @@ autovivification - Lexically disable autovivification.
 
 =head1 VERSION
 
-Version 0.17
+Version 0.18
 
 =cut
 
 our $VERSION;
 BEGIN {
- $VERSION = '0.17';
+ $VERSION = '0.18';
 }
 
 =head1 SYNOPSIS
@@ -57,8 +57,8 @@ BEGIN {
 
     no autovivification; # defaults to qw<fetch exists delete>
     no autovivification qw<fetch store exists delete>;
-    no autovivification 'warn';
-    no autovivification 'strict';
+    no autovivification warn   => @categories;
+    no autovivification strict => @categories;
 
 Magically called when C<no autovivification @opts> is encountered.
 Enables the features given in C<@opts>, which can be :
@@ -125,13 +125,19 @@ In the example, this would require C<$arrayref> (resp. C<$hashref>) to already b
 
 C<'warn'>
 
-Emits a warning when an autovivification is avoided.
+Emits a warning when an autovivification is avoided for the categories specified in C<@opts>.
+
+Note that C<no autovivification 'warn'> currently does nothing by itself, in particular it does not make the default categories warn.
+This behaviour may change in a future version of this pragma.
 
 =item *
 
 C<'strict'>
 
-Throws an exception when an autovivification is avoided.
+Throws an exception when an autovivification is avoided for the categories specified in C<@opts>.
+
+Note that C<no autovivification 'strict'> currently does nothing by itself, in particular it does not make the default categories die.
+This behaviour may change in a future version of this pragma.
 
 =back
 

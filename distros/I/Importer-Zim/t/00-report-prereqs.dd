@@ -24,7 +24,9 @@ do { my $x = {
                                       'warnings' => '0'
                                     },
                       'suggests' => {
-                                    'Importer::Zim::Lexical' => 'v0.6.0'
+                                    'Importer::Zim::EndOfScope' => 'v0.2.0',
+                                    'Importer::Zim::Lexical' => 'v0.8.0',
+                                    'Importer::Zim::Unit' => 'v0.3.0'
                                   }
                     },
        'test' => {

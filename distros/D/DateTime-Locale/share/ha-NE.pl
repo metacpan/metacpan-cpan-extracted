@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "AM",
-    "PM"
+    "PM",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "E, d",
@@ -45,7 +50,7 @@
     yMd => "y-MM-dd",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "ha-NE",
   date_format_full => "EEEE, d MMMM, y",
@@ -63,7 +68,7 @@
     "Alh",
     "Jum",
     "Asa",
-    "Lah"
+    "Lah",
   ],
   day_format_narrow => [
     "L",
@@ -72,7 +77,7 @@
     "A",
     "J",
     "A",
-    "L"
+    "L",
   ],
   day_format_wide => [
     "Litinin",
@@ -81,7 +86,7 @@
     "Alhamis",
     "Jumma\N{U+02bc}a",
     "Asabar",
-    "Lahadi"
+    "Lahadi",
   ],
   day_stand_alone_abbreviated => [
     "Lit",
@@ -90,7 +95,7 @@
     "Alh",
     "Jum",
     "Asa",
-    "Lah"
+    "Lah",
   ],
   day_stand_alone_narrow => [
     "L",
@@ -99,7 +104,7 @@
     "A",
     "J",
     "A",
-    "L"
+    "L",
   ],
   day_stand_alone_wide => [
     "Litinin",
@@ -108,19 +113,19 @@
     "Alhamis",
     "Jumma\N{U+02bc}a",
     "Asabar",
-    "Lahadi"
+    "Lahadi",
   ],
   era_abbreviated => [
     "KHAI",
-    "BHAI"
+    "BHAI",
   ],
   era_narrow => [
     "KHAI",
-    "BHAI"
+    "BHAI",
   ],
   era_wide => [
     "Kafin haihuwar annab",
-    "Bayan haihuwar annab"
+    "Bayan haihuwar annab",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -141,7 +146,7 @@
     "Sat",
     "Okt",
     "Nuw",
-    "Dis"
+    "Dis",
   ],
   month_format_narrow => [
     "J",
@@ -155,7 +160,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_format_wide => [
     "Janairu",
@@ -169,7 +174,7 @@
     "Satumba",
     "Oktoba",
     "Nuwamba",
-    "Disamba"
+    "Disamba",
   ],
   month_stand_alone_abbreviated => [
     "Jan",
@@ -183,7 +188,7 @@
     "Sat",
     "Okt",
     "Nuw",
-    "Dis"
+    "Dis",
   ],
   month_stand_alone_narrow => [
     "J",
@@ -197,7 +202,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_stand_alone_wide => [
     "Janairu",
@@ -211,7 +216,7 @@
     "Satumba",
     "Oktoba",
     "Nuwamba",
-    "Disamba"
+    "Disamba",
   ],
   name => "Hausa Niger",
   native_language => "Hausa",
@@ -223,37 +228,37 @@
     "K1",
     "K2",
     "K3",
-    "K4"
+    "K4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "Kwata na \N{U+0257}aya",
     "Kwata na biyu",
     "Kwata na uku",
-    "Kwata na hu\N{U+0257}u"
+    "Kwata na hu\N{U+0257}u",
   ],
   quarter_stand_alone_abbreviated => [
     "K1",
     "K2",
     "K3",
-    "K4"
+    "K4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "Kwata na \N{U+0257}aya",
     "Kwata na biyu",
     "Kwata na uku",
-    "Kwata na hu\N{U+0257}u"
+    "Kwata na hu\N{U+0257}u",
   ],
   script => undef,
   territory => "Niger",
@@ -262,5 +267,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

@@ -28,6 +28,7 @@
       },
       "runtime" : {
          "requires" : {
+            "File::Path" : "2.06_05",
             "perl" : "v5.9.4"
          }
       }
@@ -35,7 +36,7 @@
    "provides" : {
       "Data::RecordStore" : {
          "file" : "lib/Data/RecordStore.pm",
-         "version" : "2.01"
+         "version" : "2.03"
       },
       "Data::RecordStore::FixedStore" : {
          "file" : "lib/Data/RecordStore.pm"
@@ -47,6 +48,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "2.01",
+   "version" : "2.03",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

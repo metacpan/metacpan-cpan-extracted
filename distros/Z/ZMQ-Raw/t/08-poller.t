@@ -62,6 +62,20 @@ is $events, 0;
 
 is 1, $poller->wait (1000);
 $req->recv();
+
+if ($^O ne 'MSWin32')
+{
+	my $alarm = 0;
+	local $SIG{ALRM} = sub
+	{
+		$alarm = 1;
+	};
+
+	alarm 1;
+	ok (!$poller->wait (-1));
+	ok ($alarm);
+}
+
 is 0, $poller->wait (1000);
 
 $poller = ZMQ::Raw::Poller->new;

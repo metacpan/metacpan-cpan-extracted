@@ -1,5 +1,8 @@
 Revision history for Perl extension Net-OpenStack-Swift
 
+0.13 2017-11-06T06:40:55Z
+    - Add option to set the region #25
+
 0.12 2017-08-17T01:43:11Z
     - swift.pl supports v1.0
 

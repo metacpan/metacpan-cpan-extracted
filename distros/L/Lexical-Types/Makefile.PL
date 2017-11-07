@@ -87,6 +87,7 @@ my %PREREQ_PM = (
 my %BUILD_REQUIRES = (
  'Config'              => 0,
  'ExtUtils::MakeMaker' => 0,
+ 'File::Spec'          => 0,
  'Test::More'          => 0,
  'constant'            => 0,
  'lib'                 => 0,

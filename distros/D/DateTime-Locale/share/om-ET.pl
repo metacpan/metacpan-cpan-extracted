@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "WD",
-    "WB"
+    "WB",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d, E",
@@ -48,8 +53,8 @@
     yMd => "y-MM-dd",
     yQQQ => "QQQ y",
     yQQQQ => "y QQQQ",
-    "yw-count-one" => "'week' w 'of' y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-one" => "'week' w 'of' Y",
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "om-ET",
   date_format_full => "EEEE, MMMM d, y",
@@ -67,7 +72,7 @@
     "Kam",
     "Jim",
     "San",
-    "Dil"
+    "Dil",
   ],
   day_format_narrow => [
     "M",
@@ -76,7 +81,7 @@
     "T",
     "F",
     "S",
-    "S"
+    "S",
   ],
   day_format_wide => [
     "Wiixata",
@@ -85,7 +90,7 @@
     "Kamiisa",
     "Jimaata",
     "Sanbata",
-    "Dilbata"
+    "Dilbata",
   ],
   day_stand_alone_abbreviated => [
     "Wix",
@@ -94,7 +99,7 @@
     "Kam",
     "Jim",
     "San",
-    "Dil"
+    "Dil",
   ],
   day_stand_alone_narrow => [
     "M",
@@ -103,7 +108,7 @@
     "T",
     "F",
     "S",
-    "S"
+    "S",
   ],
   day_stand_alone_wide => [
     "Wiixata",
@@ -112,19 +117,19 @@
     "Kamiisa",
     "Jimaata",
     "Sanbata",
-    "Dilbata"
+    "Dilbata",
   ],
   era_abbreviated => [
     "BCE",
-    "CE"
+    "CE",
   ],
   era_narrow => [
     "BCE",
-    "CE"
+    "CE",
   ],
   era_wide => [
     "Dheengadda Jeesu",
-    "CE"
+    "CE",
   ],
   first_day_of_week => 7,
   glibc_date_1_format => "%A, %B %e, %r %Z %Y",
@@ -145,7 +150,7 @@
     "Ful",
     "Onk",
     "Sad",
-    "Mud"
+    "Mud",
   ],
   month_format_narrow => [
     "J",
@@ -159,7 +164,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_format_wide => [
     "Amajjii",
@@ -173,7 +178,7 @@
     "Fuulbana",
     "Onkololeessa",
     "Sadaasa",
-    "Muddee"
+    "Muddee",
   ],
   month_stand_alone_abbreviated => [
     "Ama",
@@ -187,7 +192,7 @@
     "Ful",
     "Onk",
     "Sad",
-    "Mud"
+    "Mud",
   ],
   month_stand_alone_narrow => [
     "J",
@@ -201,7 +206,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_stand_alone_wide => [
     "Amajjii",
@@ -215,7 +220,7 @@
     "Fuulbana",
     "Onkololeessa",
     "Sadaasa",
-    "Muddee"
+    "Muddee",
   ],
   name => "Oromo Ethiopia",
   native_language => "Oromoo",
@@ -227,37 +232,37 @@
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "Kurmaana 1",
     "Kurmaana 2",
     "Kurmaana 3",
-    "Kurmaana 4"
+    "Kurmaana 4",
   ],
   quarter_stand_alone_abbreviated => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "Kurmaana 1",
     "Kurmaana 2",
     "Kurmaana 3",
-    "Kurmaana 4"
+    "Kurmaana 4",
   ],
   script => undef,
   territory => "Ethiopia",
@@ -266,5 +271,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 31
+  version => 32,
 }

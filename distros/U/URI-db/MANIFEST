@@ -10,6 +10,7 @@ lib/URI/cubrid.pm
 lib/URI/db.pm
 lib/URI/db2.pm
 lib/URI/derby.pm
+lib/URI/exasol.pm
 lib/URI/firebird.pm
 lib/URI/hive.pm
 lib/URI/impala.pm
@@ -34,6 +35,7 @@ lib/URI/pgxc.pm
 lib/URI/postgres.pm
 lib/URI/postgresql.pm
 lib/URI/postgresxc.pm
+lib/URI/redshift.pm
 lib/URI/sqlite.pm
 lib/URI/sqlite3.pm
 lib/URI/sqlserver.pm
@@ -42,10 +44,10 @@ lib/URI/teradata.pm
 lib/URI/unify.pm
 lib/URI/vertica.pm
 MANIFEST			This list of files
-META.json
-META.yml
 README
 README.md
 t/db.t
 t/dbi.t
 t/engines.t
+META.yml
+META.json

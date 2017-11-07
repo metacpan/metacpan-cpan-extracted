@@ -1,5 +1,15 @@
 Revision history for App-SCM-Digest
 
+0.13    5 November 2017
+        - Fix wrong skip test counts.
+
+0.12    2 November 2017
+        - Re-clone the repository if an attempted operation fails,
+          and restore the original repository if the re-clone or
+          retried operation doesn't succeed.
+        - Prefer the remote repository when merging conflicts.
+        - Handle missing commits better.
+
 0.11    13 February 2016
         - Catch 'init-db' errors in tests.
         - Set user.name and user.email for Git repository clones in

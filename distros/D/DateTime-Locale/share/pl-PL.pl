@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "AM",
-    "PM"
+    "PM",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E, HH:mm",
     EHms => "E, HH:mm:ss",
     Ed => "E, d",
@@ -53,10 +58,10 @@
     yMd => "d.MM.y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-few" => "y, 'tydz'. w",
-    "yw-count-many" => "y, 'tydz'. w",
-    "yw-count-one" => "y, 'tydz'. w",
-    "yw-count-other" => "y, 'tydz'. w"
+    "yw-count-few" => "Y, 'tydz'. w",
+    "yw-count-many" => "Y, 'tydz'. w",
+    "yw-count-one" => "Y, 'tydz'. w",
+    "yw-count-other" => "Y, 'tydz'. w",
   },
   code => "pl-PL",
   date_format_full => "EEEE, d MMMM y",
@@ -74,7 +79,7 @@
     "czw.",
     "pt.",
     "sob.",
-    "niedz."
+    "niedz.",
   ],
   day_format_narrow => [
     "p",
@@ -83,7 +88,7 @@
     "c",
     "p",
     "s",
-    "n"
+    "n",
   ],
   day_format_wide => [
     "poniedzia\N{U+0142}ek",
@@ -92,7 +97,7 @@
     "czwartek",
     "pi\N{U+0105}tek",
     "sobota",
-    "niedziela"
+    "niedziela",
   ],
   day_stand_alone_abbreviated => [
     "pon.",
@@ -101,7 +106,7 @@
     "czw.",
     "pt.",
     "sob.",
-    "niedz."
+    "niedz.",
   ],
   day_stand_alone_narrow => [
     "P",
@@ -110,7 +115,7 @@
     "C",
     "P",
     "S",
-    "N"
+    "N",
   ],
   day_stand_alone_wide => [
     "poniedzia\N{U+0142}ek",
@@ -119,19 +124,19 @@
     "czwartek",
     "pi\N{U+0105}tek",
     "sobota",
-    "niedziela"
+    "niedziela",
   ],
   era_abbreviated => [
     "p.n.e.",
-    "n.e."
+    "n.e.",
   ],
   era_narrow => [
     "p.n.e.",
-    "n.e."
+    "n.e.",
   ],
   era_wide => [
     "przed nasz\N{U+0105} er\N{U+0105}",
-    "naszej ery"
+    "naszej ery",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a, %-d %b %Y, %T %Z",
@@ -152,7 +157,7 @@
     "wrz",
     "pa\N{U+017a}",
     "lis",
-    "gru"
+    "gru",
   ],
   month_format_narrow => [
     "s",
@@ -166,7 +171,7 @@
     "w",
     "p",
     "l",
-    "g"
+    "g",
   ],
   month_format_wide => [
     "stycznia",
@@ -180,7 +185,7 @@
     "wrze\N{U+015b}nia",
     "pa\N{U+017a}dziernika",
     "listopada",
-    "grudnia"
+    "grudnia",
   ],
   month_stand_alone_abbreviated => [
     "sty",
@@ -194,7 +199,7 @@
     "wrz",
     "pa\N{U+017a}",
     "lis",
-    "gru"
+    "gru",
   ],
   month_stand_alone_narrow => [
     "S",
@@ -208,7 +213,7 @@
     "W",
     "P",
     "L",
-    "G"
+    "G",
   ],
   month_stand_alone_wide => [
     "stycze\N{U+0144}",
@@ -222,7 +227,7 @@
     "wrzesie\N{U+0144}",
     "pa\N{U+017a}dziernik",
     "listopad",
-    "grudzie\N{U+0144}"
+    "grudzie\N{U+0144}",
   ],
   name => "Polish Poland",
   native_language => "polski",
@@ -234,37 +239,37 @@
     "I kw.",
     "II kw.",
     "III kw.",
-    "IV kw."
+    "IV kw.",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "I kwarta\N{U+0142}",
     "II kwarta\N{U+0142}",
     "III kwarta\N{U+0142}",
-    "IV kwarta\N{U+0142}"
+    "IV kwarta\N{U+0142}",
   ],
   quarter_stand_alone_abbreviated => [
     "I kw.",
     "II kw.",
     "III kw.",
-    "IV kw."
+    "IV kw.",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "I kwarta\N{U+0142}",
     "II kwarta\N{U+0142}",
     "III kwarta\N{U+0142}",
-    "IV kwarta\N{U+0142}"
+    "IV kwarta\N{U+0142}",
   ],
   script => undef,
   territory => "Poland",
@@ -273,5 +278,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

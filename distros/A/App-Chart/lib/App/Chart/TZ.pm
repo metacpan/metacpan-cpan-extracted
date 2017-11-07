@@ -1,6 +1,6 @@
 # Timezone objects.
 
-# Copyright 2007, 2008, 2009, 2010 Kevin Ryde
+# Copyright 2007, 2008, 2009, 2010, 2017 Kevin Ryde
 
 # This file is part of Chart.
 #
@@ -34,13 +34,13 @@ use base 'Time::TZ';
 #------------------------------------------------------------------------------
 # maybe for Time::TZ ...
 
-sub tm_localtime {
-  my ($self, $timet) = @_;
-  require Time::localtime;
-  if (! defined $timet) { $timet = time(); }
-  local $Tie::TZ::TZ = $self->tz;
-  return Time::localtime ($timet);
-}
+# sub tm_localtime {
+#   my ($self, $timet) = @_;
+#   require Time::localtime;
+#   if (! defined $timet) { $timet = time(); }
+#   local $Tie::TZ::TZ = $self->tz;
+#   return Time::Local::localtime ($timet);
+# }
 
 # rolling century means they're not the reverse of localtime :-(.
 #
@@ -95,8 +95,8 @@ sub ymd {
 }
 
 sub iso_date {
-  my ($self) = @_;
-  return sprintf '%04d-%02d-%02d', $self->ymd;
+  my ($self, $timet) = @_;
+  return sprintf '%04d-%02d-%02d', $self->ymd($timet);
 }
 sub iso_datetimezone {
   my ($self, $timet) = @_;
@@ -142,7 +142,6 @@ sub iso_date_time {
 # "2007-12-31".
 # 
 #     my $str = $tz->iso_date;
-
 
 
 #------------------------------------------------------------------------------

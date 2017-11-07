@@ -30,11 +30,11 @@ VSGDR::TestScriptGen - Unit test script support package for SSDT unit tests, Ded
 
 =head1 VERSION
 
-Version 0.16
+Version 0.17
 
 =cut
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 
 sub databaseName {
@@ -86,7 +86,8 @@ SELECT  case when ROUTINE_TYPE = 'PROCEDURE' then cast([PARAMETER_NAME] + ' = ' 
              when ROUTINE_TYPE = 'FUNCTION'  then cast([PARAMETER_NAME] as VARCHAR(MAX)) 
         end  as PARAMTER
 --      cast([PARAMETER_NAME] + ' = ' + [PARAMETER_NAME] + case when PARAMETER_MODE = 'IN' then '' else  ' OUTPUT' + CHAR(10) end as VARCHAR(MAX)) as PARAMTER
-,		cast([PARAMETER_NAME] + '  ' + case when USER_DEFINED_TYPE_CATALOG is not null then USER_DEFINED_TYPE_SCHEMA + '.' + USER_DEFINED_TYPE_NAME when P.DATA_TYPE in ('ntext','text') then 'varchar' when P.DATA_TYPE in ('image') then 'varbinary' else P.DATA_TYPE end +coalesce('('+case when P.CHARACTER_MAXIMUM_LENGTH = -1 or P.CHARACTER_MAXIMUM_LENGTH > 8000 then 'max' else cast(P.CHARACTER_MAXIMUM_LENGTH as varchar) end+')','') + CHAR(10) as VARCHAR(MAX)) as DECLARATION
+,		cast([PARAMETER_NAME] + '  ' + case when P.DATA_TYPE in ('table type') then user_defined_type_schema +'.'+ user_defined_type_name when P.DATA_TYPE in ('ntext','text') then 'varchar' when P.DATA_TYPE in ('image') then 'varbinary' else P.DATA_TYPE end +
+              case when P.DATA_TYPE not in ('xml') then coalesce('('+case when P.CHARACTER_MAXIMUM_LENGTH = -1 or P.CHARACTER_MAXIMUM_LENGTH > 8000 then 'max' else cast(P.CHARACTER_MAXIMUM_LENGTH as varchar) end +')','') ELSE '' END + CHAR(10) as VARCHAR(MAX)) as DECLARATION
 ,       R.[SPECIFIC_CATALOG]
 ,       R.[SPECIFIC_SCHEMA]
 ,       R.[SPECIFIC_NAME]
@@ -104,7 +105,8 @@ select  cast(PARAMTER + +char(10)+CHAR(9)+CHAR(9)+CHAR(9)+char(9)+CHAR(9)+CHAR(9
                                      when ROUTINE_TYPE = 'FUNCTION'  then cast(N.[PARAMETER_NAME] as VARCHAR(MAX)) 
                                 end as VARCHAR(MAX)) as PARAMTER                            
 --N.[PARAMETER_NAME] + ' = ' + N.[PARAMETER_NAME] + case when N.PARAMETER_MODE = 'IN' then '' else  ' OUTPUT' + CHAR(10) end as varchar(max))
-,		cast(DECLARATION + CHAR(9)+',' + CHAR(9)+CHAR(9) + [PARAMETER_NAME] + '  ' + case when N.DATA_TYPE in ('ntext','text') then 'varchar' when N.DATA_TYPE in ('image') then 'varbinary' else N.DATA_TYPE end +coalesce('('+case when N.CHARACTER_MAXIMUM_LENGTH = -1 or N.CHARACTER_MAXIMUM_LENGTH > 8000 then 'max' else cast(N.CHARACTER_MAXIMUM_LENGTH as varchar) end +')','') + CHAR(10) as VARCHAR(MAX))
+,		cast(DECLARATION + CHAR(9)+',' + CHAR(9)+CHAR(9) + [PARAMETER_NAME] + '  ' + case when n.DATA_TYPE in ('table type') then user_defined_type_schema +'.'+ user_defined_type_name when N.DATA_TYPE in ('ntext','text') then 'varchar' when N.DATA_TYPE in ('image') then 'varbinary' else N.DATA_TYPE end +
+              case when N.DATA_TYPE not in ('xml') then coalesce('('+case when N.CHARACTER_MAXIMUM_LENGTH = -1 or N.CHARACTER_MAXIMUM_LENGTH > 8000 then 'max' else cast(N.CHARACTER_MAXIMUM_LENGTH as varchar) end +')','') ELSE '' END + CHAR(10) as VARCHAR(MAX))
 ,       N.[SPECIFIC_CATALOG]
 ,       N.[SPECIFIC_SCHEMA]
 ,       N.[SPECIFIC_NAME]

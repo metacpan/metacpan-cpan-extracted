@@ -129,6 +129,30 @@ define ([
             'start': dactionStart('masqEmployee'),
             'pushable': false
         });
+        target.push('empProfileSetSuperChoose', {
+            'name': 'empProfileSetSuperChoose',
+            'type': 'daction',
+            'menuText': 'Set supervisor',
+            'aclProfile': 'admin',
+            'start': dactionStart('empProfileSetSuperChoose'),
+            'pushable': false
+        });
+        target.push('empProfileSetSuperCommit', {
+            'name': 'empProfileSetSuperCommit',
+            'type': 'daction',
+            'menuText': 'Yes, I really do',
+            'aclProfile': 'admin',
+            'start': dactionStart('empProfileSetSuperCommit'),
+            'pushable': false
+        });
+        target.push('empProfileSetSuperSearch', {
+            'name': 'empProfileSetSuperSearch',
+            'type': 'daction',
+            'menuText': 'Set supervisor',
+            'aclProfile': 'admin',
+            'start': dactionStart('empProfileSetSuperSearch'),
+            'pushable': false
+        });
 
         // Privhistory actions
         target.push('actionPrivHistory', { // read-only
@@ -342,20 +366,12 @@ define ([
         });
 
         // Interval actions - create
-        target.push('createLastPlusOffsetSave', {
-            'name': 'createLastPlusOffsetSave',
+        target.push('createMultipleIntSave', {
+            'name': 'createMultipleIntSave',
             'type': 'daction',
             'menuText': 'Save',
             'aclProfile': 'active',
-            'start': dactionStart('createLastPlusOffsetSave'),
-            'pushable': false
-        });
-        target.push('createNextScheduledSave', {
-            'name': 'createNextScheduledSave',
-            'type': 'daction',
-            'menuText': 'Save',
-            'aclProfile': 'active',
-            'start': dactionStart('createNextScheduledSave'),
+            'start': dactionStart('createMultipleIntSave'),
             'pushable': false
         });
         target.push('createSingleIntSave', {
@@ -364,6 +380,14 @@ define ([
             'menuText': 'Save',
             'aclProfile': 'active',
             'start': dactionStart('createSingleIntSave'),
+            'pushable': false
+        });
+        target.push('viewIntervalsAction', {
+            'name': 'viewIntervalsAction',
+            'type': 'daction',
+            'menuText': 'View',
+            'aclProfile': 'active',
+            'start': dactionStart('viewIntervalsAction'),
             'pushable': false
         });
 
@@ -395,13 +419,6 @@ define ([
             'pushable': false
         });
 
-        // Run unit tests
-        target.push('unitTests', {
-            'name': 'unitTests',
-            'menuText': 'Run unit tests',
-            'aclProfile': 'passerby'
-        }),
-        
         // return to (saved) browser state 
         target.push('returnToBrowser', {
             'name': 'returnToBrowser',

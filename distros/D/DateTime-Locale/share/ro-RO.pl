@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "a.m.",
-    "p.m."
+    "p.m.",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "E d",
@@ -49,9 +54,9 @@
     yMd => "dd.MM.y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-few" => "'s\N{U+0103}pt\N{U+0103}m\N{U+00e2}na' w 'din' y",
-    "yw-count-one" => "'s\N{U+0103}pt\N{U+0103}m\N{U+00e2}na' w 'din' y",
-    "yw-count-other" => "'s\N{U+0103}pt\N{U+0103}m\N{U+00e2}na' w 'din' y"
+    "yw-count-few" => "'s\N{U+0103}pt\N{U+0103}m\N{U+00e2}na' w 'din' Y",
+    "yw-count-one" => "'s\N{U+0103}pt\N{U+0103}m\N{U+00e2}na' w 'din' Y",
+    "yw-count-other" => "'s\N{U+0103}pt\N{U+0103}m\N{U+00e2}na' w 'din' Y",
   },
   code => "ro-RO",
   date_format_full => "EEEE, d MMMM y",
@@ -69,7 +74,7 @@
     "joi",
     "vin.",
     "s\N{U+00e2}m.",
-    "dum."
+    "dum.",
   ],
   day_format_narrow => [
     "L",
@@ -78,7 +83,7 @@
     "J",
     "V",
     "S",
-    "D"
+    "D",
   ],
   day_format_wide => [
     "luni",
@@ -87,7 +92,7 @@
     "joi",
     "vineri",
     "s\N{U+00e2}mb\N{U+0103}t\N{U+0103}",
-    "duminic\N{U+0103}"
+    "duminic\N{U+0103}",
   ],
   day_stand_alone_abbreviated => [
     "lun.",
@@ -96,7 +101,7 @@
     "joi",
     "vin.",
     "s\N{U+00e2}m.",
-    "dum."
+    "dum.",
   ],
   day_stand_alone_narrow => [
     "L",
@@ -105,7 +110,7 @@
     "J",
     "V",
     "S",
-    "D"
+    "D",
   ],
   day_stand_alone_wide => [
     "luni",
@@ -114,19 +119,19 @@
     "joi",
     "vineri",
     "s\N{U+00e2}mb\N{U+0103}t\N{U+0103}",
-    "duminic\N{U+0103}"
+    "duminic\N{U+0103}",
   ],
   era_abbreviated => [
     "\N{U+00ee}.Hr.",
-    "d.Hr."
+    "d.Hr.",
   ],
   era_narrow => [
     "\N{U+00ee}.Hr.",
-    "d.Hr."
+    "d.Hr.",
   ],
   era_wide => [
     "\N{U+00ee}nainte de Hristos",
-    "dup\N{U+0103} Hristos"
+    "dup\N{U+0103} Hristos",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%A %-e %B %Y, %H:%M:%S %z",
@@ -147,7 +152,7 @@
     "sept.",
     "oct.",
     "nov.",
-    "dec."
+    "dec.",
   ],
   month_format_narrow => [
     "I",
@@ -161,7 +166,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_format_wide => [
     "ianuarie",
@@ -175,7 +180,7 @@
     "septembrie",
     "octombrie",
     "noiembrie",
-    "decembrie"
+    "decembrie",
   ],
   month_stand_alone_abbreviated => [
     "ian.",
@@ -189,7 +194,7 @@
     "sept.",
     "oct.",
     "nov.",
-    "dec."
+    "dec.",
   ],
   month_stand_alone_narrow => [
     "I",
@@ -203,7 +208,7 @@
     "S",
     "O",
     "N",
-    "D"
+    "D",
   ],
   month_stand_alone_wide => [
     "ianuarie",
@@ -217,7 +222,7 @@
     "septembrie",
     "octombrie",
     "noiembrie",
-    "decembrie"
+    "decembrie",
   ],
   name => "Romanian Romania",
   native_language => "rom\N{U+00e2}n\N{U+0103}",
@@ -229,37 +234,37 @@
     "trim. I",
     "trim. II",
     "trim. III",
-    "trim. IV"
+    "trim. IV",
   ],
   quarter_format_narrow => [
     "I",
     "II",
     "III",
-    "IV"
+    "IV",
   ],
   quarter_format_wide => [
     "trimestrul I",
     "trimestrul al II-lea",
     "trimestrul al III-lea",
-    "trimestrul al IV-lea"
+    "trimestrul al IV-lea",
   ],
   quarter_stand_alone_abbreviated => [
     "trim. I",
     "trim. II",
     "trim. III",
-    "trim. IV"
+    "trim. IV",
   ],
   quarter_stand_alone_narrow => [
     "I",
     "II",
     "III",
-    "IV"
+    "IV",
   ],
   quarter_stand_alone_wide => [
     "trimestrul I",
     "trimestrul al II-lea",
     "trimestrul al III-lea",
-    "trimestrul al IV-lea"
+    "trimestrul al IV-lea",
   ],
   script => undef,
   territory => "Romania",
@@ -268,5 +273,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

@@ -367,3 +367,43 @@ Revision history for App-Dochazka-WWW
 - js: caches: implement populateLastExisting
 - js: refactor to use populate.bootstrap() and populate.shift()
 
+0.157 2017-10-23 01:52 CEST
+- js: finish Create interval "last plus offset" dialog
+- build/ops: require App::MFILE::WWW 0.166 for hidden entries feature
+- js: implement "Create next scheduled interval" feature
+- build/ops: designed to work with App::Dochazka::REST 0.552
+
+0.158 2017-10-27 23:11 CEST
+- js: improve "Create next scheduled interval" dialog
+- js: tests: disable tests that require LDAP
+- WISHLIST: proper skipping of LDAP tests
+- js: allow user to modify to-be-created interval
+- daction-start: send logout message to core
+
+0.159 2017-10-29 14:40 CET
+- js: "Create multiple intervals": add pre-populated year entry
+- js: caches: use datetime.currentYear() function from core
+- js: int-lib: implement vetDayList()
+- build/ops: require App::MFILE::WWW 0.168 for entry "size" attribute
+- js: implement createMultipleIntSave()
+- Initial implementation of "Create multiple intervals according to schedule"
+  feature
+
+0.160 2017-10-30 08:42 CET
+- build/ops: require App::MFILE::WWW 0.169 for bug fix
+- js: caches: use "interval/scheduled" resource instead of "interval/fillup"
+- js: First sketch of "View intervals" functionality
+
+0.161 2017-10-31 12:33 CET
+- js: Make "View intervals" dform take single day or day range only
+- js: dmenu-init: move Masqeruade to main menu
+- js: tests/main-menu: add "Masquerade as a different employee" test case
+- js: ldap: stop ldapSync from partially clobbering employee profile
+- js: implement "Set supervisor" feature
+- build/ops: require App::MFILE:WWW 0.170 for unwindToTarget opts handling
+
+0.162 2017-11-02 20:21 CET
+- js: move "Set supervisor" functionality to employee profile
+- js: Implement "Multi-day interval viewer" feature
+- build/ops: require App::MFILE::WWW 0.171 for dcallback widget
+

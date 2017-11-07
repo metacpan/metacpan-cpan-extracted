@@ -1,34 +1,8 @@
 /* -*- mode: c; indent-tabs-mode: t; c-basic-offset: 8; -*- */
 
-void _store_enum (GIEnumInfo * info, gint value, GIArgument * arg);
-gint _retrieve_enum (GIEnumInfo * info, GIArgument * arg);
-
-static gpointer
-instance_sv_to_class_struct_pointer (SV *sv, GPerlI11nInvocationInfo *iinfo)
-{
-	gpointer pointer = NULL;
-	GType class_type = 0;
-	dwarn ("  -> gtype struct?\n");
-	if (gperl_sv_is_ref (sv)) { /* instance? */
-		const char *package = sv_reftype (SvRV (sv), TRUE);
-		class_type = gperl_type_from_package (package);
-	} else { /* package? */
-		class_type = gperl_type_from_package (SvPV_nolen (sv));
-	}
-	dwarn ("     class_type = %s (%lu), is_classed = %d\n",
-	       g_type_name (class_type), class_type, G_TYPE_IS_CLASSED (class_type));
-	if (G_TYPE_IS_CLASSED (class_type)) {
-		pointer = g_type_class_peek (class_type);
-		if (!pointer) {
-			/* If peek() produced NULL, the class has not been
-			 * instantiated yet and needs to be created. */
-			pointer = g_type_class_ref (class_type);
-			free_after_call (iinfo, (GFunc) g_type_class_unref, pointer);
-		}
-		dwarn ("     type class = %p\n", pointer);
-	}
-	return pointer;
-}
+static gpointer _sv_to_class_struct_pointer (SV *sv, GPerlI11nInvocationInfo *iinfo);
+static void _store_enum (GIEnumInfo * info, gint value, GIArgument * arg);
+static gint _retrieve_enum (GIEnumInfo * info, GIArgument * arg);
 
 static gpointer
 instance_sv_to_pointer (GICallableInfo *info, SV *sv, GPerlI11nInvocationInfo *iinfo)
@@ -58,7 +32,7 @@ instance_sv_to_pointer (GICallableInfo *info, SV *sv, GPerlI11nInvocationInfo *i
 		GType type = get_gtype ((GIRegisteredTypeInfo *) container);
 		if (!type || type == G_TYPE_NONE) {
 			if (g_struct_info_is_gtype_struct (container)) {
-				pointer = instance_sv_to_class_struct_pointer (sv, iinfo);
+				pointer = _sv_to_class_struct_pointer (sv, iinfo);
 			}
 			if (!pointer) {
 				dwarn ("  -> untyped record\n");
@@ -200,29 +174,33 @@ sv_to_interface (GIArgInfo * arg_info,
 			&& !g_type_info_is_pointer (type_info);
 		GType type = get_gtype ((GIRegisteredTypeInfo *) interface);
 		if (!type || type == G_TYPE_NONE) {
-			const gchar *namespace, *name, *package;
-			GType parent_type;
 			dwarn ("  -> untyped record\n");
 			g_assert (!need_value_semantics);
-			/* Find out whether this untyped record is a member of
-			 * a boxed union before using raw hash-to-struct
-			 * conversion. */
-			name = g_base_info_get_name (interface);
-			namespace = g_base_info_get_namespace (interface);
-			package = get_package_for_basename (namespace);
-			parent_type = package ? find_union_member_gtype (package, name) : 0;
-			if (parent_type && parent_type != G_TYPE_NONE) {
-				arg->v_pointer = gperl_get_boxed_check (
-				                   sv, parent_type);
-				if (GI_TRANSFER_EVERYTHING == transfer)
-					arg->v_pointer =
-						g_boxed_copy (parent_type,
-						              arg->v_pointer);
+			if (g_struct_info_is_gtype_struct (interface)) {
+				arg->v_pointer = _sv_to_class_struct_pointer (sv, invocation_info);
 			} else {
-				arg->v_pointer = sv_to_struct (transfer,
-				                               interface,
-				                               info_type,
-				                               sv);
+				const gchar *namespace, *name, *package;
+				GType parent_type;
+				/* Find out whether this untyped record is a member of
+				 * a boxed union before using raw hash-to-struct
+				 * conversion. */
+				name = g_base_info_get_name (interface);
+				namespace = g_base_info_get_namespace (interface);
+				package = get_package_for_basename (namespace);
+				parent_type = package ? find_union_member_gtype (package, name) : 0;
+				if (parent_type && parent_type != G_TYPE_NONE) {
+					arg->v_pointer = gperl_get_boxed_check (
+					                   sv, parent_type);
+					if (GI_TRANSFER_EVERYTHING == transfer)
+						arg->v_pointer =
+							g_boxed_copy (parent_type,
+							              arg->v_pointer);
+				} else {
+					arg->v_pointer = sv_to_struct (transfer,
+					                               interface,
+					                               info_type,
+					                               sv);
+				}
 			}
 		}
 
@@ -461,6 +439,35 @@ interface_to_sv (GITypeInfo* info, GIArgument *arg, gboolean own, GPerlI11nInvoc
 	g_base_info_unref ((GIBaseInfo *) interface);
 
 	return sv;
+}
+
+/* ------------------------------------------------------------------------- */
+
+static gpointer
+_sv_to_class_struct_pointer (SV *sv, GPerlI11nInvocationInfo *iinfo)
+{
+	gpointer pointer = NULL;
+	GType class_type = 0;
+	dwarn ("  -> gtype struct?\n");
+	if (gperl_sv_is_ref (sv)) { /* instance? */
+		const char *package = sv_reftype (SvRV (sv), TRUE);
+		class_type = gperl_type_from_package (package);
+	} else { /* package? */
+		class_type = gperl_type_from_package (SvPV_nolen (sv));
+	}
+	dwarn ("     class_type = %s (%lu), is_classed = %d\n",
+	       g_type_name (class_type), class_type, G_TYPE_IS_CLASSED (class_type));
+	if (G_TYPE_IS_CLASSED (class_type)) {
+		pointer = g_type_class_peek (class_type);
+		if (!pointer) {
+			/* If peek() produced NULL, the class has not been
+			 * instantiated yet and needs to be created. */
+			pointer = g_type_class_ref (class_type);
+			free_after_call (iinfo, (GFunc) g_type_class_unref, pointer);
+		}
+		dwarn ("     type class = %p\n", pointer);
+	}
+	return pointer;
 }
 
 /* ------------------------------------------------------------------------- */

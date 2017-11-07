@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "ND",
-    "LK"
+    "LK",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d, E",
@@ -47,7 +52,7 @@
     yMd => "y-MM-dd",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "sg-CF",
   date_format_full => "EEEE d MMMM y",
@@ -65,7 +70,7 @@
     "Bk5",
     "L\N{U+00e2}p",
     "L\N{U+00e2}y",
-    "Bk1"
+    "Bk1",
   ],
   day_format_narrow => [
     "S",
@@ -74,7 +79,7 @@
     "K",
     "P",
     "Y",
-    "K"
+    "K",
   ],
   day_format_wide => [
     "B\N{U+00ef}kua-\N{U+00fb}se",
@@ -83,7 +88,7 @@
     "B\N{U+00ef}kua-ok\N{U+00fc}",
     "L\N{U+00e2}p\N{U+00f4}s\N{U+00f6}",
     "L\N{U+00e2}yenga",
-    "Bikua-\N{U+00f4}ko"
+    "Bikua-\N{U+00f4}ko",
   ],
   day_stand_alone_abbreviated => [
     "Bk2",
@@ -92,7 +97,7 @@
     "Bk5",
     "L\N{U+00e2}p",
     "L\N{U+00e2}y",
-    "Bk1"
+    "Bk1",
   ],
   day_stand_alone_narrow => [
     "S",
@@ -101,7 +106,7 @@
     "K",
     "P",
     "Y",
-    "K"
+    "K",
   ],
   day_stand_alone_wide => [
     "B\N{U+00ef}kua-\N{U+00fb}se",
@@ -110,19 +115,19 @@
     "B\N{U+00ef}kua-ok\N{U+00fc}",
     "L\N{U+00e2}p\N{U+00f4}s\N{U+00f6}",
     "L\N{U+00e2}yenga",
-    "Bikua-\N{U+00f4}ko"
+    "Bikua-\N{U+00f4}ko",
   ],
   era_abbreviated => [
     "KnK",
-    "NpK"
+    "NpK",
   ],
   era_narrow => [
     "KnK",
-    "NpK"
+    "NpK",
   ],
   era_wide => [
     "K\N{U+00f4}zo na Kr\N{U+00ee}stu",
-    "Na pek\N{U+00f4} t\N{U+00ee} Kr\N{U+00ee}stu"
+    "Na pek\N{U+00f4} t\N{U+00ee} Kr\N{U+00ee}stu",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -143,7 +148,7 @@
     "Mvu",
     "Ngb",
     "Nab",
-    "Kak"
+    "Kak",
   ],
   month_format_narrow => [
     "N",
@@ -157,7 +162,7 @@
     "M",
     "N",
     "N",
-    "K"
+    "K",
   ],
   month_format_wide => [
     "Nyenye",
@@ -171,7 +176,7 @@
     "Mvuka",
     "Ngberere",
     "Nab\N{U+00e4}nd\N{U+00fc}ru",
-    "Kakauka"
+    "Kakauka",
   ],
   month_stand_alone_abbreviated => [
     "Nye",
@@ -185,7 +190,7 @@
     "Mvu",
     "Ngb",
     "Nab",
-    "Kak"
+    "Kak",
   ],
   month_stand_alone_narrow => [
     "N",
@@ -199,7 +204,7 @@
     "M",
     "N",
     "N",
-    "K"
+    "K",
   ],
   month_stand_alone_wide => [
     "Nyenye",
@@ -213,7 +218,7 @@
     "Mvuka",
     "Ngberere",
     "Nab\N{U+00e4}nd\N{U+00fc}ru",
-    "Kakauka"
+    "Kakauka",
   ],
   name => "Sango Central African Republic",
   native_language => "S\N{U+00e4}ng\N{U+00f6}",
@@ -225,37 +230,37 @@
     "F4\N{U+2013}1",
     "F4\N{U+2013}2",
     "F4\N{U+2013}3",
-    "F4\N{U+2013}4"
+    "F4\N{U+2013}4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "F\N{U+00e2}ngbis\N{U+00ef}\N{U+00f6} \N{U+00f4}ko",
     "F\N{U+00e2}ngbis\N{U+00ef}\N{U+00f6} \N{U+00fb}se",
     "F\N{U+00e2}ngbis\N{U+00ef}\N{U+00f6} ot\N{U+00e2}",
-    "F\N{U+00e2}ngbis\N{U+00ef}\N{U+00f6} us\N{U+00ef}\N{U+00f6}"
+    "F\N{U+00e2}ngbis\N{U+00ef}\N{U+00f6} us\N{U+00ef}\N{U+00f6}",
   ],
   quarter_stand_alone_abbreviated => [
     "F4\N{U+2013}1",
     "F4\N{U+2013}2",
     "F4\N{U+2013}3",
-    "F4\N{U+2013}4"
+    "F4\N{U+2013}4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "F\N{U+00e2}ngbis\N{U+00ef}\N{U+00f6} \N{U+00f4}ko",
     "F\N{U+00e2}ngbis\N{U+00ef}\N{U+00f6} \N{U+00fb}se",
     "F\N{U+00e2}ngbis\N{U+00ef}\N{U+00f6} ot\N{U+00e2}",
-    "F\N{U+00e2}ngbis\N{U+00ef}\N{U+00f6} us\N{U+00ef}\N{U+00f6}"
+    "F\N{U+00e2}ngbis\N{U+00ef}\N{U+00f6} us\N{U+00ef}\N{U+00f6}",
   ],
   script => undef,
   territory => "Central African Republic",
@@ -264,5 +269,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

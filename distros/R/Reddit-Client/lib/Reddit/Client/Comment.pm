@@ -31,17 +31,28 @@ sub replies {
 }
 
 sub reply {
-    my ($self, $text) = @_;
+    	my ($self, $text) = @_;
 	$text || croak "need comment text";	
 	my $cmtid = $self->{session}->submit_comment(parent_id=>$self->{name}, text=>$text);
 	return "t1_".$cmtid if $cmtid;
 	return $cmtid;
-    #return $self->SUPER::submit_comment(@_);
 }
 
+sub edit {
+    	my ($self, $text) = @_;
+	my $cmtid = $self->{session}->edit($self->{name}, $text);
+	$self->{body} = $text if $cmtid;
+	return $cmtid;
+}
+sub delete {
+    	my $self = shift;
+	my $cmtid = $self->{session}->delete($self->{name});
+	#return "t1_".$cmtid if $cmtid;
+	return $cmtid;
+}
 sub get_permalink {
 	my $self = shift;
-	my $parentid = substr $self->{parent_id}, 3;
+	my $parentid = substr $self->{link_id}, 3;
 
 	return sprintf "%s/r/$self->{subreddit}/comments/%s//%s", $self->{session}->LINK_URL, $parentid, $self->{id};
 }

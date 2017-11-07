@@ -1,5 +1,5 @@
 package QBit::Application::Model::DBManager::Filter::multistate;
-$QBit::Application::Model::DBManager::Filter::multistate::VERSION = '0.017';
+$QBit::Application::Model::DBManager::Filter::multistate::VERSION = '0.018';
 use qbit;
 
 use base qw(QBit::Application::Model::DBManager::Filter);

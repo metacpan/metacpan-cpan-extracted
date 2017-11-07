@@ -19,16 +19,16 @@ WriteMakefile(
         'Test::More' => 0,
     },
     PREREQ_PM => {
-        'Moo'              => '2.000000',
-        'namespace::clean' => '0.24',
+        'Moo'                  => '2.000000',
+        'namespace::autoclean' => '0.28',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Crypt-Hill-*' },
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides    => {
-            'Crypt::Hill'        => { file => 'lib/Crypt/Hill.pm',       version => '0.10' },
-            'Crypt::Hill::Utils' => { file => 'lib/Crypt/Hill/Utils.pm', version => '0.10' },
+            'Crypt::Hill'        => { file => 'lib/Crypt/Hill.pm',       version => '0.11' },
+            'Crypt::Hill::Utils' => { file => 'lib/Crypt/Hill/Utils.pm', version => '0.11' },
         },
         resources => {
             repository => {

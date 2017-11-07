@@ -6,6 +6,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <gmp.h>
+#include <math.h>
 
 #include "ptypes.h"
 
@@ -21,7 +22,29 @@ void set_verbose_level(int level) { _verbose = level; }
 
 static gmp_randstate_t _randstate;
 gmp_randstate_t* get_randstate(void) { return &_randstate; }
+
+#if __LITTLE_ENDIAN__ || (defined(BYTEORDER) && (BYTEORDER == 0x1234 || BYTEORDER == 0x12345678))
+#define LESWAP(mem, val)
+#else
+#if !defined(__x86_64__)
+#undef U8TO32_LE
+#undef U32TO8_LE
+#endif
+#ifndef U32TO8_LE
+#define U32TO8_LE(p, v) \
+  do { \
+    uint32_t _v = v; \
+    (p)[0] = (((_v)      ) & 0xFFU); \
+    (p)[1] = (((_v) >>  8) & 0xFFU); \
+    (p)[2] = (((_v) >> 16) & 0xFFU); \
+    (p)[3] = (((_v) >> 24) & 0xFFU); \
+  } while (0)
+#endif
+#define LESWAP(mem, val) U32TO8_LE(mem,val)
+#endif
+
 void init_randstate(unsigned long seed) {
+  unsigned char seedstr[8] = {0};
 #if (__GNU_MP_VERSION > 4) || (__GNU_MP_VERSION == 4 && __GNU_MP_VERSION_MINOR >= 2)
   /* MT was added in GMP 4.2 released in 2006. */
   gmp_randinit_mt(_randstate);
@@ -29,7 +52,18 @@ void init_randstate(unsigned long seed) {
   gmp_randinit_default(_randstate);
 #endif
   gmp_randseed_ui(_randstate, seed);
-  isaac_init( sizeof(unsigned long), (const unsigned char*)(&seed) );
+
+#if BITS_PER_WORD == 64
+  if (seed > UVCONST(4294967295)) {
+    LESWAP(seedstr, seed);
+    LESWAP(seedstr + 4, (seed >> 16) >> 16);
+    isaac_init(8, seedstr);
+  } else
+#endif
+  {
+    LESWAP(seedstr, seed);
+    isaac_init(4, seedstr);
+  }
 }
 void clear_randstate(void) {  gmp_randclear(_randstate);  }
 
@@ -112,9 +146,9 @@ void mpz_isaac_urandomm(mpz_t rop, mpz_t n)
   }
 }
 
-int is_primitive_root(mpz_t a, mpz_t n, int nprime)
+int is_primitive_root(mpz_t ina, mpz_t n, int nprime)
 {
-  mpz_t s, sreduced, t, *factors;
+  mpz_t a, s, sreduced, t, *factors;
   int ret, i, nfactors, *exponents;
 
   if (mpz_sgn(n) == 0)
@@ -124,12 +158,14 @@ int is_primitive_root(mpz_t a, mpz_t n, int nprime)
   if (mpz_cmp_ui(n,1) == 0)
     return 1;
 
-  mpz_mod(a,a,n);
-
+  mpz_init(a);
+  mpz_mod(a,ina,n);
   mpz_init(s);
   mpz_gcd(s, a, n);
+
   if (mpz_cmp_ui(s,1) != 0) {
     mpz_clear(s);
+    mpz_clear(a);
     return 0;
   }
   if (nprime) {
@@ -196,7 +232,8 @@ int is_primitive_root(mpz_t a, mpz_t n, int nprime)
   clear_factors(nfactors, &factors, &exponents);
 
 DONE_IPR:
-  mpz_clear(s);  mpz_clear(sreduced);  mpz_clear(t);
+  mpz_clear(sreduced);  mpz_clear(t);
+  mpz_clear(s);  mpz_clear(a);
   return ret;
 }
 
@@ -658,6 +695,71 @@ void mpz_product(mpz_t* A, UV a, UV b) {
     mpz_product(A, c, b);
     mpz_mul(A[a], A[a], A[c]);
   }
+}
+
+UV logint(mpz_t n, UV base) {
+  double logn, logbn, coreps;
+  UV res, nbits, logn_red;
+
+  if (mpz_cmp_ui(n,0) <= 0 || base <= 1)
+    croak("mpz_logint: bad input\n");
+
+  /* If base is a small power of 2, then this is exact */
+  if (base <= 62 && (base & (base-1)) == 0)
+    return mpz_sizeinbase(n, base)-1;
+
+#if 0  /* example using mpf_log for high precision.  Slow. */
+  {
+    mpf_t fr, fn;
+    mpf_init(fr); mpf_init(fn);
+    mpf_set_z(fn, n);
+    mpf_log(fr, fn);
+    logn = mpf_get_d(fr);
+    mpf_clear(fn); mpf_clear(fr);
+    coreps = 1e-8;
+  }
+#endif
+
+  /* Step 1, get an approximation of log(n) */
+  nbits = mpz_sizeinbase(n,2);
+  if (nbits < 768) {
+    logn = log(mpz_get_d(n));
+    coreps = 1e-8;
+  } else {
+    long double logn_adj = 45426.093625176575797967724311883L;/* log(2^65536) */
+    mpz_t nr;
+
+    for ( mpz_init_set(nr,n),  logn_red = 65536,  logn = 0;
+          logn_red >= 128;
+          logn_red /= 2,  logn_adj /= 2) {
+      while (nbits >= 512+logn_red) {
+        mpz_tdiv_q_2exp(nr, nr, logn_red);
+        nbits -= logn_red;
+        logn += logn_adj;
+      }
+    }
+    logn += log(mpz_get_d(nr));
+    mpz_clear(nr);
+    coreps = 1e-4;
+  }
+  /* Step 2, approximate log_base(n) */
+  logbn = logn / log(base);
+  res = (UV) logbn;
+
+  /* Step 3, ensure exact if logbn might be rounded wrong */
+  if (res != (UV)(logbn+coreps) || res != (UV)(logbn-coreps)) {
+    mpz_t be;
+    mpz_init(be);
+    /* Decrease until <= n */
+    while (mpz_ui_pow_ui(be, base, res),mpz_cmp(be,n) > 0)
+      res--;
+    /* Increase until n+1 > n */
+    while (mpz_ui_pow_ui(be, base, res+1),mpz_cmp(be,n) <= 0)
+      res++;
+    mpz_clear(be);
+  }
+  /* res is largest res such that base^res <= n */
+  return res;
 }
 
 /******************************************************************************/

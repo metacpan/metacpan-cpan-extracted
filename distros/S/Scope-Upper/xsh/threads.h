@@ -3,6 +3,7 @@
 
 #include "caps.h" /* XSH_HAS_PERL(), XSH_THREADSAFE */
 #include "util.h" /* XSH_PACKAGE, dNOOP, NOOP */
+#include "mem.h"  /* XSH_SHARED_*() */
 
 #ifndef XSH_THREADS_COMPILE_TIME_PROTECTION
 # define XSH_THREADS_COMPILE_TIME_PROTECTION 0
@@ -307,7 +308,7 @@ static int xsh_teardown_late_arg_free(pTHX_ SV *sv, MAGIC *mg) {
   tok->cb(aTHX_ tok->ud);
  XSH_LOADED_UNLOCK;
 
- PerlMemShared_free(tok);
+ XSH_SHARED_FREE(tok, 1, xsh_teardown_late_token);
 
  return 0;
 }
@@ -338,7 +339,7 @@ static void xsh_teardown_late_register(pTHX_ xsh_teardown_late_cb cb, void *ud){
  } else {
   xsh_teardown_late_token *tok;
 
-  tok     = PerlMemShared_malloc(sizeof *tok);
+  XSH_SHARED_ALLOC(tok, 1, xsh_teardown_late_token);
   tok->cb = cb;
   tok->ud = ud;
 

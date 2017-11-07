@@ -18,7 +18,7 @@ my %module_build_args = (
     "Adriano Ferreira <ferreira\@cpan.org>"
   ],
   "dist_name" => "Mojo-Bass",
-  "dist_version" => "0.1.1",
+  "dist_version" => "0.2.0",
   "license" => "artistic_2",
   "module_name" => "Mojo::Bass",
   "recursive_test_files" => 1,

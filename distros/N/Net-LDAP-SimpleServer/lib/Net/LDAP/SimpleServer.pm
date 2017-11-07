@@ -5,7 +5,7 @@ use warnings;
 
 # ABSTRACT: Minimal-configuration, read-only LDAP server
 
-our $VERSION = '0.0.19';    # VERSION
+our $VERSION = '0.0.20';    # VERSION
 
 use 5.008;
 use Carp;
@@ -34,14 +34,16 @@ use File::Path 2.08 qw{make_path};
 use Scalar::Util qw{reftype};
 use Net::LDAP::SimpleServer::LDIFStore;
 use Net::LDAP::SimpleServer::ProtocolHandler;
+use Net::LDAP::SimpleServer::Constant;
 
 my $BASEDIR             = File::Spec->catfile( home(),   '.ldapsimple' );
 my $DEFAULT_CONFIG_FILE = File::Spec->catfile( $BASEDIR, 'server.conf' );
 my $DEFAULT_DATA_FILE   = File::Spec->catfile( $BASEDIR, 'server.ldif' );
 my $DEFAULT_LOG_FILE    = File::Spec->catfile( $BASEDIR, 'server.log' );
 
-my @LDAP_PRIVATE_OPTIONS = ( 'store', 'input', 'output' );
-my @LDAP_PUBLIC_OPTIONS = ( 'data_file', 'root_dn', 'root_pw', 'allow_anon' );
+my @LDAP_PRIVATE_OPTIONS = qw/store input output/;
+my @LDAP_PUBLIC_OPTIONS =
+  qw/data_file root_dn root_pw allow_anon user_passwords user_id_attr user_pw_attr user_filter/;
 
 make_path($BASEDIR);
 
@@ -73,9 +75,13 @@ sub default_values {
     $v->{syslog_ident} =
       'Net::LDAP::SimpleServer [' . $Net::LDAP::SimpleServer::VERSION . ']';
 
-    $v->{allow_anon} = 1;
-    $v->{root_dn}    = 'cn=root';
-    $v->{data_file}  = $DEFAULT_DATA_FILE if -r $DEFAULT_DATA_FILE;
+    $v->{allow_anon}     = 1;
+    $v->{root_dn}        = 'cn=root';
+    $v->{data_file}      = $DEFAULT_DATA_FILE if -r $DEFAULT_DATA_FILE;
+    $v->{user_passwords} = USER_PW_NONE;
+    $v->{user_filter}    = '(objectClass=person)';
+    $v->{user_id_attr}   = 'uid';
+    $v->{user_pw_attr}   = 'userPassword';
 
     #use Data::Dumper; print STDERR Dumper($v);
     return $v;
@@ -134,7 +140,7 @@ Net::LDAP::SimpleServer - Minimal-configuration, read-only LDAP server
 
 =head1 VERSION
 
-version 0.0.19
+version 0.0.20
 
 =head1 SYNOPSIS
 

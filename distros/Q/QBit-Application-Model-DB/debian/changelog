@@ -1,3 +1,9 @@
+libqbit-application-model-db-perl (0.023) raring; urgency=low
+
+  * added select_timeout
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 05 Nov 2017 03:22:40 +0300
+
 libqbit-application-model-db-perl (0.022) raring; urgency=low
 
   * move _after_group_by

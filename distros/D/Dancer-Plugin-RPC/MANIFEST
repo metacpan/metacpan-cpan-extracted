@@ -21,6 +21,7 @@ lib/Dancer/RPCPlugin/DispatchItem.pm
 lib/Dancer/RPCPlugin/DispatchMethodList.pm
 lib/Dancer/RPCPlugin/ErrorResponse.pm
 lib/Dancer/RPCPlugin/FlattenData.pm
+lib/Dancer/RPCPlugin/PluginNames.pm
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
@@ -30,6 +31,7 @@ t/020-callbackresult.t
 t/030-dispatchmethodlist.t
 t/040-flatten-data.t
 t/050-error-response.t
+t/060-plugin-names.t
 t/100-xmlrpc.t
 t/150-jsonrpc.t
 t/175-restrpc.t

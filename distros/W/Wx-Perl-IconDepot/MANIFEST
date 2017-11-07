@@ -6,7 +6,6 @@ LICENSE
 Makefile.PL
 MANIFEST
 README.md
-scratch/svg_exp
 t/Themes/PNG1/actions/22/document-new.png
 t/Themes/PNG1/actions/22/document-save.png
 t/Themes/PNG1/actions/32/edit-cut.png

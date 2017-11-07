@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "AM",
-    "PM"
+    "PM",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d, E",
@@ -44,7 +49,7 @@
     yMd => "y-MM-dd",
     yQQQ => "y QQQ",
     yQQQQ => "y QQQQ",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "kl",
   date_format_full => "y MMMM d, EEEE",
@@ -62,7 +67,7 @@
     "sis",
     "tal",
     "arf",
-    "sab"
+    "sab",
   ],
   day_format_narrow => [
     "M",
@@ -71,7 +76,7 @@
     "T",
     "F",
     "S",
-    "S"
+    "S",
   ],
   day_format_wide => [
     "ataasinngorneq",
@@ -80,7 +85,7 @@
     "sisamanngorneq",
     "tallimanngorneq",
     "arfininngorneq",
-    "sabaat"
+    "sabaat",
   ],
   day_stand_alone_abbreviated => [
     "ata",
@@ -89,7 +94,7 @@
     "sis",
     "tal",
     "arf",
-    "sab"
+    "sab",
   ],
   day_stand_alone_narrow => [
     "M",
@@ -98,7 +103,7 @@
     "T",
     "F",
     "S",
-    "S"
+    "S",
   ],
   day_stand_alone_wide => [
     "ataasinngorneq",
@@ -107,19 +112,19 @@
     "sisamanngorneq",
     "tallimanngorneq",
     "arfininngorneq",
-    "sabaat"
+    "sabaat",
   ],
   era_abbreviated => [
     "BCE",
-    "CE"
+    "CE",
   ],
   era_narrow => [
     "BCE",
-    "CE"
+    "CE",
   ],
   era_wide => [
     "BCE",
-    "CE"
+    "CE",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -140,7 +145,7 @@
     "sep",
     "okt",
     "nov",
-    "dec"
+    "dec",
   ],
   month_format_narrow => [
     1,
@@ -154,7 +159,7 @@
     9,
     10,
     11,
-    12
+    12,
   ],
   month_format_wide => [
     "januari",
@@ -168,7 +173,7 @@
     "septemberi",
     "oktoberi",
     "novemberi",
-    "decemberi"
+    "decemberi",
   ],
   month_stand_alone_abbreviated => [
     "jan",
@@ -182,7 +187,7 @@
     "sep",
     "okt",
     "nov",
-    "dec"
+    "dec",
   ],
   month_stand_alone_narrow => [
     1,
@@ -196,7 +201,7 @@
     9,
     10,
     11,
-    12
+    12,
   ],
   month_stand_alone_wide => [
     "januari",
@@ -210,7 +215,7 @@
     "septemberi",
     "oktoberi",
     "novemberi",
-    "decemberi"
+    "decemberi",
   ],
   name => "Kalaallisut",
   native_language => "kalaallisut",
@@ -222,44 +227,44 @@
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_stand_alone_abbreviated => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   script => undef,
   territory => undef,
-  time_format_full => "HH:mm:ss zzzz",
-  time_format_long => "HH:mm:ss z",
-  time_format_medium => "HH:mm:ss",
-  time_format_short => "HH:mm",
+  time_format_full => "HH.mm.ss zzzz",
+  time_format_long => "HH.mm.ss z",
+  time_format_medium => "HH.mm.ss",
+  time_format_short => "HH.mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

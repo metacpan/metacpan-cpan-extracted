@@ -74,6 +74,5 @@ on 'develop' => sub {
   requires "Test::Vars" => "0.009";
   requires "Test::Version" => "2.05";
   requires "Test::Without::Module" => "0";
-  requires "blib" => "1.01";
   requires "namespace::autoclean" => "0";
 };

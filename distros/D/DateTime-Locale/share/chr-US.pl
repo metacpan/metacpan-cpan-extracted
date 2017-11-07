@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "\N{U+13cc}\N{U+13be}\N{U+13b4}",
-    "\N{U+13d2}\N{U+13af}\N{U+13f1}\N{U+13a2}\N{U+13d7}\N{U+13e2}"
+    "\N{U+13d2}\N{U+13af}\N{U+13f1}\N{U+13a2}\N{U+13d7}\N{U+13e2}",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d E",
@@ -23,7 +28,8 @@
     MEd => "E, M/d",
     MMM => "LLL",
     MMMEd => "E, MMM d",
-    "MMMMW-count-other" => "'week' W 'of' MMMM",
+    "MMMMW-count-one" => "\N{U+2019}\N{U+13d2}\N{U+13be}\N{U+13d9}\N{U+13d3}\N{U+13c6}\N{U+13cd}\N{U+13d7}\N{U+2019} W \N{U+2019}\N{U+13be}\N{U+13bf}\N{U+2019} MMMM",
+    "MMMMW-count-other" => "\N{U+2019}\N{U+13d2}\N{U+13be}\N{U+13d9}\N{U+13d3}\N{U+13c6}\N{U+13cd}\N{U+13d7}\N{U+2019} W \N{U+2019}\N{U+13be}\N{U+13bf}\N{U+2019} MMM",
     MMMMd => "MMMM d",
     MMMd => "MMM d",
     Md => "M/d",
@@ -44,7 +50,8 @@
     yMd => "M/d/y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-one" => "\N{U+2019}\N{U+13d2}\N{U+13be}\N{U+13d9}\N{U+13d3}\N{U+13c6}\N{U+13cd}\N{U+13d7}\N{U+2019} w \N{U+2019}\N{U+13be}\N{U+13bf}\N{U+2019} Y",
+    "yw-count-other" => "\N{U+2019}\N{U+13d2}\N{U+13be}\N{U+13d9}\N{U+13d3}\N{U+13c6}\N{U+13cd}\N{U+13d7}\N{U+2019} w \N{U+2019}\N{U+13be}\N{U+13bf}\N{U+2019} Y",
   },
   code => "chr-US",
   date_format_full => "EEEE, MMMM d, y",
@@ -62,7 +69,7 @@
     "\N{U+13c5}\N{U+13a9}\N{U+13c1}",
     "\N{U+13e7}\N{U+13be}\N{U+13a9}",
     "\N{U+13c8}\N{U+13d5}\N{U+13be}",
-    "\N{U+13c6}\N{U+13cd}\N{U+13ac}"
+    "\N{U+13c6}\N{U+13cd}\N{U+13ac}",
   ],
   day_format_narrow => [
     "\N{U+13c9}",
@@ -71,7 +78,7 @@
     "\N{U+13c5}",
     "\N{U+13e7}",
     "\N{U+13a4}",
-    "\N{U+13c6}"
+    "\N{U+13c6}",
   ],
   day_format_wide => [
     "\N{U+13a4}\N{U+13be}\N{U+13d9}\N{U+13d3}\N{U+13c9}\N{U+13c5}\N{U+13af}",
@@ -80,7 +87,7 @@
     "\N{U+13c5}\N{U+13a9}\N{U+13c1}\N{U+13a2}\N{U+13a6}",
     "\N{U+13e7}\N{U+13be}\N{U+13a9}\N{U+13b6}\N{U+13cd}\N{U+13d7}",
     "\N{U+13a4}\N{U+13be}\N{U+13d9}\N{U+13d3}\N{U+13c8}\N{U+13d5}\N{U+13be}",
-    "\N{U+13a4}\N{U+13be}\N{U+13d9}\N{U+13d3}\N{U+13c6}\N{U+13cd}\N{U+13ac}"
+    "\N{U+13a4}\N{U+13be}\N{U+13d9}\N{U+13d3}\N{U+13c6}\N{U+13cd}\N{U+13ac}",
   ],
   day_stand_alone_abbreviated => [
     "\N{U+13c9}\N{U+13c5}\N{U+13af}",
@@ -89,7 +96,7 @@
     "\N{U+13c5}\N{U+13a9}\N{U+13c1}",
     "\N{U+13e7}\N{U+13be}\N{U+13a9}",
     "\N{U+13c8}\N{U+13d5}\N{U+13be}",
-    "\N{U+13c6}\N{U+13cd}\N{U+13ac}"
+    "\N{U+13c6}\N{U+13cd}\N{U+13ac}",
   ],
   day_stand_alone_narrow => [
     "\N{U+13c9}",
@@ -98,7 +105,7 @@
     "\N{U+13c5}",
     "\N{U+13e7}",
     "\N{U+13a4}",
-    "\N{U+13c6}"
+    "\N{U+13c6}",
   ],
   day_stand_alone_wide => [
     "\N{U+13a4}\N{U+13be}\N{U+13d9}\N{U+13d3}\N{U+13c9}\N{U+13c5}\N{U+13af}",
@@ -107,19 +114,19 @@
     "\N{U+13c5}\N{U+13a9}\N{U+13c1}\N{U+13a2}\N{U+13a6}",
     "\N{U+13e7}\N{U+13be}\N{U+13a9}\N{U+13b6}\N{U+13cd}\N{U+13d7}",
     "\N{U+13a4}\N{U+13be}\N{U+13d9}\N{U+13d3}\N{U+13c8}\N{U+13d5}\N{U+13be}",
-    "\N{U+13a4}\N{U+13be}\N{U+13d9}\N{U+13d3}\N{U+13c6}\N{U+13cd}\N{U+13ac}"
+    "\N{U+13a4}\N{U+13be}\N{U+13d9}\N{U+13d3}\N{U+13c6}\N{U+13cd}\N{U+13ac}",
   ],
   era_abbreviated => [
     "BC",
-    "AD"
+    "AD",
   ],
   era_narrow => [
     "BC",
-    "AD"
+    "AD",
   ],
   era_wide => [
     "\N{U+13e7}\N{U+13d3}\N{U+13b7}\N{U+13b8} \N{U+13a4}\N{U+13b7}\N{U+13af}\N{U+13cd}\N{U+13d7} \N{U+13a6}\N{U+13b6}\N{U+13c1}\N{U+13db}",
-    "\N{U+13a0}\N{U+13c3} \N{U+13d9}\N{U+13bb}\N{U+13c2}"
+    "\N{U+13a0}\N{U+13c3} \N{U+13d9}\N{U+13bb}\N{U+13c2}",
   ],
   first_day_of_week => 7,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -140,7 +147,7 @@
     "\N{U+13da}\N{U+13b5}",
     "\N{U+13da}\N{U+13c2}",
     "\N{U+13c5}\N{U+13d3}",
-    "\N{U+13a5}\N{U+13cd}"
+    "\N{U+13a5}\N{U+13cd}",
   ],
   month_format_narrow => [
     "\N{U+13a4}",
@@ -154,7 +161,7 @@
     "\N{U+13da}",
     "\N{U+13da}",
     "\N{U+13c5}",
-    "\N{U+13a5}"
+    "\N{U+13a5}",
   ],
   month_format_wide => [
     "\N{U+13a4}\N{U+13c3}\N{U+13b8}\N{U+13d4}\N{U+13c5}",
@@ -168,7 +175,7 @@
     "\N{U+13da}\N{U+13b5}\N{U+13cd}\N{U+13d7}",
     "\N{U+13da}\N{U+13c2}\N{U+13c5}\N{U+13d7}",
     "\N{U+13c5}\N{U+13d3}\N{U+13d5}\N{U+13c6}",
-    "\N{U+13a5}\N{U+13cd}\N{U+13a9}\N{U+13f1}"
+    "\N{U+13a5}\N{U+13cd}\N{U+13a9}\N{U+13f1}",
   ],
   month_stand_alone_abbreviated => [
     "\N{U+13a4}\N{U+13c3}",
@@ -182,7 +189,7 @@
     "\N{U+13da}\N{U+13b5}",
     "\N{U+13da}\N{U+13c2}",
     "\N{U+13c5}\N{U+13d3}",
-    "\N{U+13a5}\N{U+13cd}"
+    "\N{U+13a5}\N{U+13cd}",
   ],
   month_stand_alone_narrow => [
     "\N{U+13a4}",
@@ -196,7 +203,7 @@
     "\N{U+13da}",
     "\N{U+13da}",
     "\N{U+13c5}",
-    "\N{U+13a5}"
+    "\N{U+13a5}",
   ],
   month_stand_alone_wide => [
     "\N{U+13a4}\N{U+13c3}\N{U+13b8}\N{U+13d4}\N{U+13c5}",
@@ -210,7 +217,7 @@
     "\N{U+13da}\N{U+13b5}\N{U+13cd}\N{U+13d7}",
     "\N{U+13da}\N{U+13c2}\N{U+13c5}\N{U+13d7}",
     "\N{U+13c5}\N{U+13d3}\N{U+13d5}\N{U+13c6}",
-    "\N{U+13a5}\N{U+13cd}\N{U+13a9}\N{U+13f1}"
+    "\N{U+13a5}\N{U+13cd}\N{U+13a9}\N{U+13f1}",
   ],
   name => "Cherokee United States",
   native_language => "\N{U+13e3}\N{U+13b3}\N{U+13a9}",
@@ -222,37 +229,37 @@
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "1st \N{U+13a9}\N{U+13c4}\N{U+13d9}\N{U+13d7}",
     "2nd \N{U+13a9}\N{U+13c4}\N{U+13d9}\N{U+13d7}",
     "3rd \N{U+13a9}\N{U+13c4}\N{U+13d9}\N{U+13d7}",
-    "4th \N{U+13a9}\N{U+13c4}\N{U+13d9}\N{U+13d7}"
+    "4th \N{U+13a9}\N{U+13c4}\N{U+13d9}\N{U+13d7}",
   ],
   quarter_stand_alone_abbreviated => [
     "Q1",
     "Q2",
     "Q3",
-    "Q4"
+    "Q4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "1st \N{U+13a9}\N{U+13c4}\N{U+13d9}\N{U+13d7}",
     "2nd \N{U+13a9}\N{U+13c4}\N{U+13d9}\N{U+13d7}",
     "3rd \N{U+13a9}\N{U+13c4}\N{U+13d9}\N{U+13d7}",
-    "4th \N{U+13a9}\N{U+13c4}\N{U+13d9}\N{U+13d7}"
+    "4th \N{U+13a9}\N{U+13c4}\N{U+13d9}\N{U+13d7}",
   ],
   script => undef,
   territory => "United States",
@@ -261,5 +268,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 31
+  version => 32,
 }

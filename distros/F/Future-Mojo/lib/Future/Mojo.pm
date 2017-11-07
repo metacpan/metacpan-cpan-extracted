@@ -8,7 +8,7 @@ use Mojo::IOLoop;
 
 use parent 'Future';
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 sub new {
 	my $proto = shift;
@@ -23,10 +23,29 @@ sub new_timer {
 	my $proto = shift;
 	my $self = (blessed $_[0] and $_[0]->isa('Mojo::IOLoop'))
 		? $proto->new(shift) : $proto->new;
-	my ($after) = @_;
+	
+	$self->_set_timer(1, @_);
+	
+	return $self;
+}
+
+sub new_timeout {
+	my $proto = shift;
+	my $self = (blessed $_[0] and $_[0]->isa('Mojo::IOLoop'))
+		? $proto->new(shift) : $proto->new;
+	
+	$self->_set_timer(0, @_);
+	
+	return $self;
+}
+
+sub _set_timer {
+	my ($self, $succeed, $after) = @_;
 	
 	weaken(my $weakself = $self);
-	my $id = $self->loop->timer($after => sub { $weakself->done if $weakself });
+	my $cb = $succeed ? sub { $weakself->done if $weakself }
+		: sub { $weakself->fail('Timeout') if $weakself };
+	my $id = $self->loop->timer($after => $cb);
 	
 	$self->on_cancel(sub { shift->loop->remove($id) });
 	
@@ -103,6 +122,14 @@ Returns a new Future. Uses L<Mojo::IOLoop/"singleton"> if no loop is specified.
  my $future = Future::Mojo->new_timer($loop, $seconds);
 
 Returns a new Future that will become ready after the specified delay. Uses
+L<Mojo::IOLoop/"singleton"> if no loop is specified.
+
+=head2 new_timeout
+
+ my $future = Future::Mojo->new_timeout($seconds);
+ my $future = Future::Mojo->new_timeout($loop, $seconds);
+
+Returns a new Future that will fail after the specified delay. Uses
 L<Mojo::IOLoop/"singleton"> if no loop is specified.
 
 =head1 METHODS

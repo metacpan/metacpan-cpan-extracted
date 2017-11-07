@@ -1,5 +1,5 @@
 package ZMQ::Raw::Message;
-$ZMQ::Raw::Message::VERSION = '0.12';
+$ZMQ::Raw::Message::VERSION = '0.14';
 use strict;
 use warnings;
 use Carp;
@@ -38,7 +38,7 @@ ZMQ::Raw::Message - ZeroMQ Message class
 
 =head1 VERSION
 
-version 0.12
+version 0.14
 
 =head1 DESCRIPTION
 

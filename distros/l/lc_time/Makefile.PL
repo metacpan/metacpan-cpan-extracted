@@ -10,6 +10,7 @@ WriteMakefile(
     ABSTRACT_FROM => 'lib/lc_time.pm',
     NAME          => 'lc_time',
     VERSION_FROM  => 'lib/lc_time.pm',
+    LICENSE       => 'perl',
 
     PREREQ_PM => {
         'Encode' => 0,

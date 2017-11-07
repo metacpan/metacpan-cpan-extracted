@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
-    "a.m.",
-    "p.m."
+    "r.n.",
+    "i.n.",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "E d",
@@ -48,11 +53,11 @@
     yMd => "dd/MM/y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-few" => "'seachtain' 'a' w 'i' y",
-    "yw-count-many" => "'seachtain' 'a' w 'i' y",
-    "yw-count-one" => "'seachtain' 'a' w 'i' y",
-    "yw-count-other" => "'seachtain' 'a' w 'i' y",
-    "yw-count-two" => "'seachtain' 'a' w 'i' y"
+    "yw-count-few" => "'seachtain' 'a' w 'i' Y",
+    "yw-count-many" => "'seachtain' 'a' w 'i' Y",
+    "yw-count-one" => "'seachtain' 'a' w 'i' Y",
+    "yw-count-other" => "'seachtain' 'a' w 'i' Y",
+    "yw-count-two" => "'seachtain' 'a' w 'i' Y",
   },
   code => "ga-IE",
   date_format_full => "EEEE d MMMM y",
@@ -70,7 +75,7 @@
     "D\N{U+00e9}ar",
     "Aoine",
     "Sath",
-    "Domh"
+    "Domh",
   ],
   day_format_narrow => [
     "L",
@@ -79,7 +84,7 @@
     "D",
     "A",
     "S",
-    "D"
+    "D",
   ],
   day_format_wide => [
     "D\N{U+00e9} Luain",
@@ -88,7 +93,7 @@
     "D\N{U+00e9}ardaoin",
     "D\N{U+00e9} hAoine",
     "D\N{U+00e9} Sathairn",
-    "D\N{U+00e9} Domhnaigh"
+    "D\N{U+00e9} Domhnaigh",
   ],
   day_stand_alone_abbreviated => [
     "Luan",
@@ -97,7 +102,7 @@
     "D\N{U+00e9}ar",
     "Aoine",
     "Sath",
-    "Domh"
+    "Domh",
   ],
   day_stand_alone_narrow => [
     "L",
@@ -106,7 +111,7 @@
     "D",
     "A",
     "S",
-    "D"
+    "D",
   ],
   day_stand_alone_wide => [
     "D\N{U+00e9} Luain",
@@ -115,19 +120,19 @@
     "D\N{U+00e9}ardaoin",
     "D\N{U+00e9} hAoine",
     "D\N{U+00e9} Sathairn",
-    "D\N{U+00e9} Domhnaigh"
+    "D\N{U+00e9} Domhnaigh",
   ],
   era_abbreviated => [
     "RC",
-    "AD"
+    "AD",
   ],
   era_narrow => [
     "RC",
-    "AD"
+    "AD",
   ],
   era_wide => [
     "Roimh Chr\N{U+00ed}ost",
-    "Anno Domini"
+    "Anno Domini",
   ],
   first_day_of_week => 7,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -148,7 +153,7 @@
     "MF\N{U+00f3}mh",
     "DF\N{U+00f3}mh",
     "Samh",
-    "Noll"
+    "Noll",
   ],
   month_format_narrow => [
     "E",
@@ -162,7 +167,7 @@
     "M",
     "D",
     "S",
-    "N"
+    "N",
   ],
   month_format_wide => [
     "Ean\N{U+00e1}ir",
@@ -176,7 +181,7 @@
     "Me\N{U+00e1}n F\N{U+00f3}mhair",
     "Deireadh F\N{U+00f3}mhair",
     "Samhain",
-    "Nollaig"
+    "Nollaig",
   ],
   month_stand_alone_abbreviated => [
     "Ean",
@@ -190,7 +195,7 @@
     "MF\N{U+00f3}mh",
     "DF\N{U+00f3}mh",
     "Samh",
-    "Noll"
+    "Noll",
   ],
   month_stand_alone_narrow => [
     "E",
@@ -204,7 +209,7 @@
     "M",
     "D",
     "S",
-    "N"
+    "N",
   ],
   month_stand_alone_wide => [
     "Ean\N{U+00e1}ir",
@@ -218,7 +223,7 @@
     "Me\N{U+00e1}n F\N{U+00f3}mhair",
     "Deireadh F\N{U+00f3}mhair",
     "Samhain",
-    "Nollaig"
+    "Nollaig",
   ],
   name => "Irish Ireland",
   native_language => "Gaeilge",
@@ -230,37 +235,37 @@
     "R1",
     "R2",
     "R3",
-    "R4"
+    "R4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "1\N{U+00fa} r\N{U+00e1}ithe",
     "2\N{U+00fa} r\N{U+00e1}ithe",
     "3\N{U+00fa} r\N{U+00e1}ithe",
-    "4\N{U+00fa} r\N{U+00e1}ithe"
+    "4\N{U+00fa} r\N{U+00e1}ithe",
   ],
   quarter_stand_alone_abbreviated => [
     "R1",
     "R2",
     "R3",
-    "R4"
+    "R4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "1\N{U+00fa} r\N{U+00e1}ithe",
     "2\N{U+00fa} r\N{U+00e1}ithe",
     "3\N{U+00fa} r\N{U+00e1}ithe",
-    "4\N{U+00fa} r\N{U+00e1}ithe"
+    "4\N{U+00fa} r\N{U+00e1}ithe",
   ],
   script => undef,
   territory => "Ireland",
@@ -269,5 +274,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

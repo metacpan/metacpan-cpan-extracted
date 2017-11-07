@@ -7,19 +7,34 @@
 # This next lines is here to make Dist::Zilla happy.
 # ABSTRACT: Perl Globstar (double asterisk globbing) and utils
 
-package File::Globstar;
+package File::Globstar 0.2;
 
 use strict;
 
+use Locale::TextDomain qw(File-Globstar);
 use File::Glob qw(bsd_glob);
-use Scalar::Util qw(reftype);
+use Scalar::Util 1.21 qw(reftype);
 use File::Find;
 
 use base 'Exporter';
 use vars qw(@EXPORT_OK);
-@EXPORT_OK = qw(globstar fnmatchstar translatestar quotestar);
+@EXPORT_OK = qw(globstar fnmatchstar translatestar quotestar pnmatchstar);
+
+use constant RE_NONE => 0x0;
+use constant RE_NEGATED => 0x1;
+use constant RE_FULL_MATCH => 0x2;
+use constant RE_DIRECTORY => 0x4;
+
+# Remember what Scalar::Util::reftype() returns for a compiled regular
+# expression.  It should normally be 'REGEXP' but with Perl 5.10 (or
+# maybe older) this seems to be an empty string.  In this case, the
+# check in pnmatchstar() whether it received a compiled regex will be
+# rather weak ...
+my $test_re = qr/./;
+my $regex_type = reftype $test_re;
 
 sub _globstar;
+sub pnmatchstar;
 
 sub empty($) {
     my ($what) = @_;
@@ -216,6 +231,21 @@ sub _transpile_range($) {
 sub translatestar {
     my ($pattern, %options) = @_;
 
+    die __x("invalid pattern '{pattern}'\n", pattern => $pattern)
+        if $pattern =~ m{^/+$};
+
+    my $blessing = RE_NONE;
+
+    if ($options{pathMode}) {
+        $blessing |= RE_NEGATED if $pattern =~ s/^!//;
+        $blessing |= RE_DIRECTORY if $pattern =~ s{/$}{};
+        $blessing |= RE_FULL_MATCH if $pattern =~ m{/};
+        $pattern =~ s{^/}{};
+    }
+
+    # xgettext doesn't parse Perl code in regexes.
+    my $invalid_msg = __"invalid use of double asterisk";
+
     $pattern =~ s
                 {
                     (.*?)               # Anything, followed by ...
@@ -266,33 +296,69 @@ sub translatestar {
                         $translated .= _transpile_range $2;
                     } elsif (length $2) {
                         if ($2 =~ /\*\*/) {
-                            die "invalid use of double asterisk";
+                            die $invalid_msg;
                         }
                         die "should not happen: $2"; 
                     }
                     $translated;
                 }gsex;
 
-    return $options{ignoreCase} ? qr/^$pattern$/i : qr/^$pattern$/;
+    my $re = $options{ignoreCase} ? qr/^$pattern$/i : qr/^$pattern$/;
+
+    bless $re, $blessing;
 }
 
 sub fnmatchstar {
     my ($pattern, $string, %options) = @_;
 
     my $transpiled = eval { translatestar $pattern, %options };
-    if ($@) {
-        if ($options{ignoreCase}) {
-            lc $pattern eq lc $string or return;
-        } else {
-            $pattern eq $string or return;
-        }
-
-        return 1;
-    }
+    return if $@;
 
     $string =~ $transpiled or return;
 
     return 1;
+}
+
+sub pnmatchstar {
+    my ($pattern, $string, %options) = @_;
+
+    $options{isDirectory} = 1 if $string =~ s{/$}{};
+
+    my $full_path = $string;
+
+    # Check whether the regular expression is compiled.  
+    # (ref $pattern) may be false here because it can be 0.
+    my $reftype = reftype $pattern;
+    unless (defined $reftype && $regex_type eq $reftype) {
+        $pattern = eval { translatestar $pattern, %options, pathMode => 1 };
+        return if $@;
+    }
+
+    my $flags = ref $pattern;
+    $string =~ s{.*/}{} unless $flags & RE_FULL_MATCH;
+
+    my $match = $string =~ $pattern;
+    if ($flags & RE_DIRECTORY) {
+        undef $match if !$options{isDirectory};        
+    }
+
+    my $negated = $flags & RE_NEGATED;
+
+    if ($match) {
+        if ($negated) {
+            return;
+       } else {
+            return 1;
+        }
+    }
+
+    if ($full_path =~ s{/[^/]*$}{}) {
+        return pnmatchstar $pattern, $full_path, %options, isDirectory => 1;
+    }
+
+    return 1 if $negated;
+    
+    return;
 }
 
 1;

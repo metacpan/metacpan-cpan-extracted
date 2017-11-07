@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "\N{U+00d6}\N{U+00d6}",
-    "\N{U+00d6}S"
+    "\N{U+00d6}S",
   ],
   available_formats => {
+    Bh => "B h",
+    Bhm => "B h:mm",
+    Bhms => "B h:mm:ss",
     E => "ccc",
+    EBhm => "E B h:mm",
+    EBhms => "E B h:mm:ss",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d E",
@@ -48,8 +53,8 @@
     yMd => "dd.MM.y",
     yQQQ => "y QQQ",
     yQQQQ => "y QQQQ",
-    "yw-count-one" => "y 'y\N{U+0131}l\N{U+0131}n\N{U+0131}n' w. 'haftas\N{U+0131}'",
-    "yw-count-other" => "y 'y\N{U+0131}l\N{U+0131}n\N{U+0131}n' w. 'haftas\N{U+0131}'"
+    "yw-count-one" => "Y 'y\N{U+0131}l\N{U+0131}n\N{U+0131}n' w. 'haftas\N{U+0131}'",
+    "yw-count-other" => "Y 'y\N{U+0131}l\N{U+0131}n\N{U+0131}n' w. 'haftas\N{U+0131}'",
   },
   code => "tr",
   date_format_full => "d MMMM y EEEE",
@@ -67,7 +72,7 @@
     "Per",
     "Cum",
     "Cmt",
-    "Paz"
+    "Paz",
   ],
   day_format_narrow => [
     "P",
@@ -76,7 +81,7 @@
     "P",
     "C",
     "C",
-    "P"
+    "P",
   ],
   day_format_wide => [
     "Pazartesi",
@@ -85,7 +90,7 @@
     "Per\N{U+015f}embe",
     "Cuma",
     "Cumartesi",
-    "Pazar"
+    "Pazar",
   ],
   day_stand_alone_abbreviated => [
     "Pzt",
@@ -94,7 +99,7 @@
     "Per",
     "Cum",
     "Cmt",
-    "Paz"
+    "Paz",
   ],
   day_stand_alone_narrow => [
     "P",
@@ -103,7 +108,7 @@
     "P",
     "C",
     "C",
-    "P"
+    "P",
   ],
   day_stand_alone_wide => [
     "Pazartesi",
@@ -112,19 +117,19 @@
     "Per\N{U+015f}embe",
     "Cuma",
     "Cumartesi",
-    "Pazar"
+    "Pazar",
   ],
   era_abbreviated => [
     "M\N{U+00d6}",
-    "MS"
+    "MS",
   ],
   era_narrow => [
     "M\N{U+00d6}",
-    "MS"
+    "MS",
   ],
   era_wide => [
     "Milattan \N{U+00d6}nce",
-    "Milattan Sonra"
+    "Milattan Sonra",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -145,7 +150,7 @@
     "Eyl",
     "Eki",
     "Kas",
-    "Ara"
+    "Ara",
   ],
   month_format_narrow => [
     "O",
@@ -159,7 +164,7 @@
     "E",
     "E",
     "K",
-    "A"
+    "A",
   ],
   month_format_wide => [
     "Ocak",
@@ -173,7 +178,7 @@
     "Eyl\N{U+00fc}l",
     "Ekim",
     "Kas\N{U+0131}m",
-    "Aral\N{U+0131}k"
+    "Aral\N{U+0131}k",
   ],
   month_stand_alone_abbreviated => [
     "Oca",
@@ -187,7 +192,7 @@
     "Eyl",
     "Eki",
     "Kas",
-    "Ara"
+    "Ara",
   ],
   month_stand_alone_narrow => [
     "O",
@@ -201,7 +206,7 @@
     "E",
     "E",
     "K",
-    "A"
+    "A",
   ],
   month_stand_alone_wide => [
     "Ocak",
@@ -215,7 +220,7 @@
     "Eyl\N{U+00fc}l",
     "Ekim",
     "Kas\N{U+0131}m",
-    "Aral\N{U+0131}k"
+    "Aral\N{U+0131}k",
   ],
   name => "Turkish",
   native_language => "T\N{U+00fc}rk\N{U+00e7}e",
@@ -227,37 +232,37 @@
     "\N{U+00c7}1",
     "\N{U+00c7}2",
     "\N{U+00c7}3",
-    "\N{U+00c7}4"
+    "\N{U+00c7}4",
   ],
   quarter_format_narrow => [
     "1.",
     "2.",
     "3.",
-    "4."
+    "4.",
   ],
   quarter_format_wide => [
     "1. \N{U+00e7}eyrek",
     "2. \N{U+00e7}eyrek",
     "3. \N{U+00e7}eyrek",
-    "4. \N{U+00e7}eyrek"
+    "4. \N{U+00e7}eyrek",
   ],
   quarter_stand_alone_abbreviated => [
     "\N{U+00c7}1",
     "\N{U+00c7}2",
     "\N{U+00c7}3",
-    "\N{U+00c7}4"
+    "\N{U+00c7}4",
   ],
   quarter_stand_alone_narrow => [
     "1.",
     "2.",
     "3.",
-    "4."
+    "4.",
   ],
   quarter_stand_alone_wide => [
     "1. \N{U+00e7}eyrek",
     "2. \N{U+00e7}eyrek",
     "3. \N{U+00e7}eyrek",
-    "4. \N{U+00e7}eyrek"
+    "4. \N{U+00e7}eyrek",
   ],
   script => undef,
   territory => undef,
@@ -266,5 +271,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

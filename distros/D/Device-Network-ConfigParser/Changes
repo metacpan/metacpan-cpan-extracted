@@ -18,4 +18,6 @@ Revision history for Device-CheckPoint-ConfigParse
         * Added CheckPoint::Expert Module
         * Cisco::ASA now has partial parsing of objects and object groups.
 
+0.005   2017-11-02
+        * Documentation Updates
         

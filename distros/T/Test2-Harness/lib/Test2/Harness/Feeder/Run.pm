@@ -2,14 +2,12 @@ package Test2::Harness::Feeder::Run;
 use strict;
 use warnings;
 
-our $VERSION = '0.001030';
+our $VERSION = '0.001031';
 
 use Carp qw/croak/;
 use Time::HiRes qw/time/;
 use Scalar::Util qw/blessed/;
 use List::Util qw/first/;
-
-use Test2::Harness::Util::Debug qw/DEBUG/;
 
 use Test2::Harness::Feeder::Job;
 use Test2::Harness::Run::Dir;
@@ -157,33 +155,19 @@ sub poll {
 sub complete {
     my $self = shift;
 
-    DEBUG "Checking For Complete";
-
     if (my $job_ids = $self->{+JOB_IDS}) {
-        DEBUG "Checking job list";
         return 1 unless first { !$self->{+SEEN_JOBS}->{$_} } keys %$job_ids;
-        DEBUG "More jobs to see";
         return 0;
     }
 
-    DEBUG "Checking runner";
     my $runner = $self->{+RUNNER} or return 1;
     my $exit = $runner->exit;
 
-    DEBUG "Checking runner exit (" . (defined $exit ? $exit : 'undef' ) . ")";
     # If runner exited with an error we need to be complete
     return 1 if $exit;
-
-    DEBUG "Checking runner active " . scalar(@{$self->{+_ACTIVE}});
     return 0 if @{$self->{+_ACTIVE}};
-
-    DEBUG "Checking DIR completeness";
     return 1 if $self->{+DIR}->complete();
-
-    DEBUG "Checking if runner exited";
     return 1 if $runner->exited;
-
-    DEBUG "Not Complete";
     return 0;
 }
 

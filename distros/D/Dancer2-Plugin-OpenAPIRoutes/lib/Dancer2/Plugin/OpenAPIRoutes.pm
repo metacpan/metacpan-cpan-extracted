@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: A Dancer2 plugin for creating routes from a Swagger2 spec
-our $VERSION = '0.01';    # VERSION
+our $VERSION = '0.02';    # VERSION
 use File::Spec;
 use Dancer2::Plugin;
 use Module::Load;
@@ -23,22 +23,27 @@ sub _build_path_map {
     my $schema = $_[0];
     my $paths  = $schema->{paths};
     #<<<
-    my @paths  = map {
+    my @paths = 
+      map {
         my $p  = $_;
         my $ps = $_;
         $p =~ s!/\{[^{}]+\}!!g;
-        my @m = grep {!/^x-/} keys %{$paths->{$_}};
-        ($p, [map {+{method => $_, pspec => $ps}} @m])
-    }
-    sort {    ## no critic (BuiltinFunctions::RequireSimpleSortBlock)
+        (
+            $p,
+            [
+                map { +{ method => $_, pspec => $ps } }
+                  grep { !/^x-/ }
+                  keys %{ $paths->{$_} }
+            ]
+          )
+      }
+      sort {    ## no critic (BuiltinFunctions::RequireSimpleSortBlock)
         my @a = split m{/}, $a;
         my @b = split m{/}, $b;
         @b <=> @a;
-    }
-    grep {
-        !/^x-/ && 'HASH' eq ref $paths->{$_}
-    }
-    keys %{$paths};
+      }
+      grep { !/^x-/ && 'HASH' eq ref $paths->{$_} }
+      keys %{$paths};
     #>>>
     my %paths;
     ## no critic (ControlStructures::ProhibitCStyleForLoops)
@@ -78,7 +83,7 @@ sub _build_path_map {
     return \%paths;
 }
 
-my %http_methods_func_map = (
+my %http_methods_func_map_orig = (
     get     => 'fetch',
     post    => 'create',
     patch   => 'update',
@@ -88,6 +93,8 @@ my %http_methods_func_map = (
     head    => 'check'
 );
 
+my %http_methods_func_map;
+
 sub _path_to_fqfn {
     my ($config, $schema, $path_spec, $method) = @_;
     my $paths = $schema->{paths};
@@ -95,13 +102,22 @@ sub _path_to_fqfn {
     my $func = $paths->{$path_spec}{$method}{'x-path-map'}{func};
     my @pwsr = split m{/}, $paths->{$path_spec}{$method}{'x-path-map'}{module_path};
     $module_name = join "::", map {_path2mod $_ } @pwsr;
+    if ($http_methods_func_map{"$method:$path_spec"}) {
+        my ($mf, $mm) = split /:/, $http_methods_func_map{"$method:$path_spec"}, 2;
+        $func        = $mf if $mf;
+        $module_name = $mm if $mm;
+    }
     if ($module_name eq '') {
         $module_name = $config->{default_module} || $config->{appname};
     } else {
         $module_name = $config->{namespace} . $module_name;
     }
-    $func = $http_methods_func_map{$func} if $http_methods_func_map{$func};
-    return ($module_name, $func);
+    my $rfunc = $http_methods_func_map{$func} ? $http_methods_func_map{$func} : $func;
+    if ($rfunc eq 'create' && $func eq 'post' && $path_spec =~ m{/\{[^/{}]*\}$}) {
+        $rfunc = 'update';
+    }
+    $rfunc =~ s/\W+/_/g;
+    return ($module_name, $rfunc);
 }
 
 sub load_schema {
@@ -187,7 +203,7 @@ sub _make_handler_params {
         }
         $param_eval .= $req_code if $required;
     }
-    $param_eval .= "if(\@errors) { \$dsl->status('bad_request'); \$res = { errors => \\\@errors }; }\n";
+    $param_eval .= "if(\@errors) { \$dsl->status('unprocessable_entity'); \$res = { errors => \\\@errors }; }\n";
     if ($mpath =~ /\(\?</) {
         $mpath = "\\Q$mpath\\E";
         $mpath =~ s/\\Q(.*?)\\E/quotemeta($1)/eg;
@@ -212,8 +228,9 @@ sub _path_compare {
 }
 
 register OpenAPIRoutes => sub {
-    my ($dsl, $debug) = @_;
-    my $app = $dsl->app;
+    my ($dsl, $debug, $custom_map) = @_;
+    my $json = JSON->new->utf8->allow_blessed->convert_blessed;
+    my $app  = $dsl->app;
     local $SIG{__DIE__} = sub {Carp::confess(@_)};
     my $config = plugin_setting;
     $config->{app}     = $app;
@@ -221,7 +238,12 @@ register OpenAPIRoutes => sub {
     my $schema = load_schema($config);
     my $paths  = $schema->{paths};
     _build_path_map($schema);
+    %http_methods_func_map = %http_methods_func_map_orig;
 
+    if ($custom_map && 'HASH' eq ref $custom_map) {
+        my @cmk = keys %$custom_map;
+        @http_methods_func_map{@cmk} = @{$custom_map}{@cmk};
+    }
     for my $path_spec (sort _path_compare keys %$paths) {
         next if $path_spec =~ /^x-/;
         my $path = $path_spec;
@@ -229,9 +251,6 @@ register OpenAPIRoutes => sub {
         for my $method (sort keys %{$paths->{$path_spec}}) {
             next if $method =~ /^x-/;
             my ($module_name, $module_func) = _path_to_fqfn($config, $schema, $path_spec, $method);
-            if ($module_func eq 'create' && $path =~ m{/:[^:/]+$}) {
-                $module_func = 'update';    # EXCEPTION RULE!!!
-            }
             my @parameters;
             if ($paths->{$path_spec}{$method}{parameters}) {
                 @parameters = @{$paths->{$path_spec}{$method}{parameters}};
@@ -265,22 +284,31 @@ register OpenAPIRoutes => sub {
                     \$dsl->content_type("application/json");
                     if (not defined \$res) {
                         \$res = { error => \$\@ };
-                        \$res->{error} =~ s/ at .*? line \\d+\.\n?//;
+                        \$res->{error} =~ s/ at .*? line \\d+\.\\n?//;
                         \$dsl->status('bad_request');
                     } else {
                         \$dsl->status(\$status) if \$status;
                     }
-                    return JSON::encode_json \$res;
+                    return \$json->encode(\$res);
                 } else {
                     die \$\@ if \$\@ and not defined \$res; 
                     \$dsl->status(\$status) if \$status;
+                    if(!\$status && \$res && ref(\$res) && "\$res" =~ /^(HASH|ARRAY|SCALAR|CODE)\\(/ ) {
+                        \$dsl->status('not_acceptable');
+                        return; 
+                    }
                     return \$res;
                 }
             }
 EOS
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
             my $prolog_code = eval $prolog_code_src;
-            my $route       = Dancer2::Core::Route->new(
+            if ($@) {
+                my $error = $@;
+                $dsl->error("$method $mpath ($error): $prolog_code_src");
+                croak "Route $method $mpath cant be compiled: $error";
+            }
+            my $route = Dancer2::Core::Route->new(
                 method => $method,
                 regexp => $mpath,
                 code   => $prolog_code,
@@ -289,7 +317,7 @@ EOS
             if ($app->route_exists($route)) {
                 croak "Route $method $mpath is already exists";
             }
-            $debug && $dsl->debug("$dancer_method $mpath -> $module_func in module $module_name\n");
+            $debug && $dsl->debug("$dancer_method $path_spec -> $module_func in $module_name\n");
             my $success_load = eval {load $module_name; 1};
             croak "Can't load module $module_name for path $path_spec: $@"
                 if not $success_load or $@;
@@ -304,7 +332,9 @@ EOS
 register_plugin;
 
 1;
+
 __END__
+
 =encoding utf8
 
 =head1 NAME
@@ -374,7 +404,8 @@ Module name to put root's routes.
 
 =back
 
-You have to call C<OpenAPIRoutes()> in your main application module.
+You have to call C<OpenAPIRoutes([$debug_flag, $custom_map])> 
+in your main application module.
 Optionally you can pass true value as first argument to see how it 
 maps routes to Modules and functions.
 
@@ -527,6 +558,28 @@ specific functions directly from route handler using callback:
     );
   }
 
+=head2 CUSTOM MAPPING
+
+When you need some customization to your routes mapping, you
+can do it passing hash reference as second parameter to 
+C<OpenAPIRoutes([$debug, $castom_map])>. You can change mapping
+for HTTP method for all paths or only for specific ones like this:
+
+  OpenAPIRoutes(1, {"get:/store/order/{orderId}" => "remove"});
+
+(Very naughty joke): Instead of calling "fetch" for this specific
+path it will call "remove". The whole schema:
+
+  OpenAPIRoutes(1, {"$method[:$path]" => "[$function]:[$full::module::name]"});
+
+like this:
+
+  OpenAPIRoutes(1, {
+      "put"               => "update",
+      "post:/store/order" => "create_order",
+      "post:/store/image" => "upload_image",
+      # and so on ...
+  });
 
 =head1 AUTHOR
  

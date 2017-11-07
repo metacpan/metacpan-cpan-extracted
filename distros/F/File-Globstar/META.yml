@@ -25,7 +25,7 @@ requires:
   File::Glob: '0'
   IO::Handle: '0'
   Locale::TextDomain: '0'
-  Scalar::Util: '0'
+  Scalar::Util: '1.21'
   base: '0'
   constant: '0'
   strict: '0'
@@ -34,5 +34,5 @@ resources:
   bugtracker: https://github.com/gflohr/File-Globstar/issues
   homepage: http://www.guido-flohr.net/globstar-for-perl/
   repository: git://github.com/gflohr/File-Globstar.git
-version: '0.1'
+version: '0.2'
 x_serialization_backend: 'YAML::Tiny version 1.70'

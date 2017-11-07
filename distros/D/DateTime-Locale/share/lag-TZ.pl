@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "TOO",
-    "MUU"
+    "MUU",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "d, E",
@@ -45,7 +50,7 @@
     yMd => "y-MM-dd",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' y"
+    "yw-count-other" => "'week' w 'of' Y",
   },
   code => "lag-TZ",
   date_format_full => "EEEE, d MMMM y",
@@ -63,7 +68,7 @@
     "Alh",
     "Ijm",
     "M\N{U+00f3}osi",
-    "P\N{U+00ed}ili"
+    "P\N{U+00ed}ili",
   ],
   day_format_narrow => [
     "T",
@@ -72,7 +77,7 @@
     "A",
     "I",
     "M",
-    "P"
+    "P",
   ],
   day_format_wide => [
     "Jumat\N{U+00e1}tu",
@@ -81,7 +86,7 @@
     "Alam\N{U+00ed}isi",
     "Ijum\N{U+00e1}a",
     "Jumam\N{U+00f3}osi",
-    "Jumap\N{U+00ed}iri"
+    "Jumap\N{U+00ed}iri",
   ],
   day_stand_alone_abbreviated => [
     "T\N{U+00e1}atu",
@@ -90,7 +95,7 @@
     "Alh",
     "Ijm",
     "M\N{U+00f3}osi",
-    "P\N{U+00ed}ili"
+    "P\N{U+00ed}ili",
   ],
   day_stand_alone_narrow => [
     "T",
@@ -99,7 +104,7 @@
     "A",
     "I",
     "M",
-    "P"
+    "P",
   ],
   day_stand_alone_wide => [
     "Jumat\N{U+00e1}tu",
@@ -108,19 +113,19 @@
     "Alam\N{U+00ed}isi",
     "Ijum\N{U+00e1}a",
     "Jumam\N{U+00f3}osi",
-    "Jumap\N{U+00ed}iri"
+    "Jumap\N{U+00ed}iri",
   ],
   era_abbreviated => [
     "KSA",
-    "KA"
+    "KA",
   ],
   era_narrow => [
     "KSA",
-    "KA"
+    "KA",
   ],
   era_wide => [
     "K\N{U+0268}r\N{U+0268}sit\N{U+0289} s\N{U+0268} anavyaal",
-    "K\N{U+0268}r\N{U+0268}sit\N{U+0289} akavyaalwe"
+    "K\N{U+0268}r\N{U+0268}sit\N{U+0289} akavyaalwe",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -141,7 +146,7 @@
     "Saat\N{U+0289}",
     "Inyi",
     "Saano",
-    "Sasat\N{U+0289}"
+    "Sasat\N{U+0289}",
   ],
   month_format_narrow => [
     "F",
@@ -155,7 +160,7 @@
     "S",
     "I",
     "S",
-    "S"
+    "S",
   ],
   month_format_wide => [
     "K\N{U+0289}f\N{U+00fa}ngat\N{U+0268}",
@@ -169,7 +174,7 @@
     "K\N{U+0289}saat\N{U+0289}",
     "Kwiinyi",
     "K\N{U+0289}saano",
-    "K\N{U+0289}sasat\N{U+0289}"
+    "K\N{U+0289}sasat\N{U+0289}",
   ],
   month_stand_alone_abbreviated => [
     "F\N{U+00fa}ngat\N{U+0268}",
@@ -183,7 +188,7 @@
     "Saat\N{U+0289}",
     "Inyi",
     "Saano",
-    "Sasat\N{U+0289}"
+    "Sasat\N{U+0289}",
   ],
   month_stand_alone_narrow => [
     "F",
@@ -197,7 +202,7 @@
     "S",
     "I",
     "S",
-    "S"
+    "S",
   ],
   month_stand_alone_wide => [
     "K\N{U+0289}f\N{U+00fa}ngat\N{U+0268}",
@@ -211,7 +216,7 @@
     "K\N{U+0289}saat\N{U+0289}",
     "Kwiinyi",
     "K\N{U+0289}saano",
-    "K\N{U+0289}sasat\N{U+0289}"
+    "K\N{U+0289}sasat\N{U+0289}",
   ],
   name => "Langi Tanzania",
   native_language => "K\N{U+0268}laangi",
@@ -223,37 +228,37 @@
     "Ncho 1",
     "Ncho 2",
     "Ncho 3",
-    "Ncho 4"
+    "Ncho 4",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "Ncholo ya 1",
     "Ncholo ya 2",
     "Ncholo ya 3",
-    "Ncholo ya 4"
+    "Ncholo ya 4",
   ],
   quarter_stand_alone_abbreviated => [
     "Ncho 1",
     "Ncho 2",
     "Ncho 3",
-    "Ncho 4"
+    "Ncho 4",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "Ncholo ya 1",
     "Ncholo ya 2",
     "Ncholo ya 3",
-    "Ncholo ya 4"
+    "Ncholo ya 4",
   ],
   script => undef,
   territory => "Tanzania",
@@ -262,5 +267,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }

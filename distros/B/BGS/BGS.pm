@@ -7,115 +7,169 @@ use Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(bgs_call bgs_back bgs_wait bgs_break);
 
-our $VERSION = '0.08';
+our $VERSION = '0.11';
 
 use IO::Select;
+use Scalar::Util qw(refaddr);
 use Storable qw(freeze thaw);
 use POSIX ":sys_wait_h";
 
+
+our $limit = 0; 
 
 $SIG{CHLD} = "IGNORE";
 
 my $sel = IO::Select->new();
 
-my %callbacks = (); 
-my %fh2vpid   = (); 
-my %vpid2fh   = (); 
-my %vpid2pid  = (); 
+my %fh2data   = (); 
+my %vpid2data = (); 
+
+my @to_call = (); 
 
 
-sub bgs_call(&$) {
-	my ($sub, $callback) = @_;
+sub _call {
+	my ($data) = @_;
+
+	my $sub = delete $$data{sub};
 
 	pipe my $from_kid_fh, my $to_parent_fh or die "pipe: $!";
 
 	my $kid_pid = fork;
 	defined $kid_pid or die "Can't fork: $!";
-	my $vpid = $kid_pid;
 
 	if ($kid_pid) {
 		$sel->add($from_kid_fh);
-		$callbacks{$from_kid_fh} = $callback;
-		$fh2vpid{$from_kid_fh} = $vpid;
-		$vpid2fh{$vpid} = $from_kid_fh;
-		$vpid2pid{$vpid} = $kid_pid;
+
+		my $vpid = $$data{vpid};
+
+		$$data{fh}  = $from_kid_fh;
+		$$data{pid} = $kid_pid;
+
+		$fh2data{$from_kid_fh} = $data;
+		$vpid2data{$vpid}      = $data;
+
 	} else {
 		binmode $to_parent_fh;
 		print $to_parent_fh freeze \ scalar $sub->();
 		close $to_parent_fh;
 		exit;
 	}
-	return $vpid;
+
+}
+
+
+sub _bgs_call {
+	my ($sub, $callback) = @_;
+
+	my $data = { sub => $sub };
+	my $vpid = $$data{vpid} = refaddr $data;
+
+	$$data{callback} = $callback if $callback;
+
+	if ($limit > 0 and keys %fh2data >= $limit) {
+		push @to_call, $data;
+	} else {
+		_call($data);
+	}
+
+	return $data;
+}
+
+sub bgs_call(&$) {
+	my ($sub, $callback) = @_;
+
+	my $data = _bgs_call($sub, $callback);
+
+	return $$data{vpid};
 }
 
 sub bgs_back(&) { shift }
 
 
-sub bgs_wait() {
+sub bgs_wait(;$) {
+	my ($waited) = @_;
+
 	local $SIG{PIPE} = "IGNORE";
-	my %from_kid;       
 	my $buf;            
 	my $blksize = 1024; 
- 	while ($sel->count()) {
- 		foreach my $fh ($sel->can_read()) {
- 			my $len = sysread $fh, $buf, $blksize;
- 			if ($len) {
- 				push @{$from_kid{$fh}}, $buf;
- 			} elsif (defined $len) { 
+	while ($sel->count()) {
+		foreach my $fh ($sel->can_read()) {
+			my $data = $fh2data{$fh};
+			my $len = sysread $fh, $buf, $blksize;
+			if ($len) {
+				push @{$$data{from_kid}}, $buf; 
+			} elsif (defined $len) { 
 				$sel->remove($fh); 
 				close $fh or warn "Kid is existed: $?";
 
-				if (exists $from_kid{$fh}) {
-	 				my $r = join "", @{$from_kid{$fh}};
- 					delete $from_kid{$fh};
-					$callbacks{$fh}->(${thaw $r});
+				delete $$data{fh};
+				delete $$data{pid};
+				my $callback = delete $$data{callback};
+				
+				if (exists $$data{from_kid}) {
+					my $r = join "", @{$$data{from_kid}};
+					delete $$data{from_kid};
+					if ($callback) {
+						$callback->(${thaw $r});
+					} else {
+						$$data{result} = ${thaw $r};
+					}
 				} else {
-					$callbacks{$fh}->();
+					if ($callback) {
+						$callback->();
+					} else {
+						$$data{result} = undef;
+					}
 				}
 
-				my $vpid = $fh2vpid{$fh};
- 				delete $callbacks{$fh};
-				delete $fh2vpid{$fh};
-				if ($vpid) {
-					delete $vpid2fh{$vpid};
-					delete $vpid2pid{$vpid};
+				my $vpid = $$data{vpid};
+				delete $fh2data{$fh};
+				delete $vpid2data{$vpid};
+
+				if (my $call = shift @to_call) {
+					_call($call);
 				}
 
- 			} else {
- 				die "Can't read '$fh': $!";
- 			}
- 		}
- 	}
+				if ($waited and $waited == $vpid) {
+					return;
+				}
+
+			} else {
+				die "Can't read '$fh': $!";
+			}
+		}
+	}
 }
 
 
-sub _clean_by_vpid {
-	my ($vpid) = @_;
-	my $fh = $vpid2fh{$vpid} or return;
-
+sub _clean {
+	my ($data) = @_;
+	my $vpid = $$data{vpid};
+	delete $vpid2data{$vpid};
+	my $fh = $$data{fh} or return;
 	$sel->remove($fh);
 	close $fh;
-
-	delete $callbacks{$fh};
-	delete $fh2vpid{$fh};
-	delete $vpid2fh{$vpid};
-	delete $vpid2pid{$vpid};
+	delete $fh2data{$fh};
 }
 
 
 sub bgs_break(;$) {
 	my ($vpid) = @_;
 	if (defined $vpid) {
-		if (my $pid = $vpid2pid{$vpid}) {
+		my $data = $vpid2data{$vpid};
+		defined $data or return;
+		if (my $pid = $$data{pid}) {
 			kill 15, $pid;
 			1 while waitpid($pid, WNOHANG) > 0;
-			_clean_by_vpid($vpid);
 		}
+		_clean($data);
+		 @to_call = grep { $$_{vpid} ne $vpid } @to_call;
 	} else {
 		local $SIG{TERM} = "IGNORE";
 		kill 15, -$$;
 		1 while waitpid(-1, WNOHANG) > 0;
-		_clean_by_vpid($_) foreach keys %vpid2fh;
+		_clean($_) foreach values %vpid2data;
+		@to_call = ();
 	}
 }
 
@@ -133,6 +187,7 @@ BGS - Background execution of subroutines in child processes.
 =head1 SYNOPSIS
 
   use BGS;
+  # $BGS::limit = 0;
 
   my @foo;
 
@@ -182,11 +237,17 @@ as an argument.
 Call of bgs_wait() reduces to child processes answers wait and
 callback subroutines execution.
 
+Call bgs_wait($vpid) to wait specific process.
+
 =head2 bgs_break
 
 kill all or specific child processes.
 
-Call bgs_break($vpid) to kill one process.
+Call bgs_break($vpid) to kill specific process.
+
+=head2 $BGS::limit
+
+Set $BGS::limit to limit child processes count. Default is 0 (unlimited).
 
 =head1 AUTHOR
 

@@ -1,5 +1,5 @@
 package LWP::Debug;    # legacy
-$LWP::Debug::VERSION = '6.27';
+$LWP::Debug::VERSION = '6.29';
 require Exporter;
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(level trace debug conns);

@@ -1,10 +1,15 @@
 {
   am_pm_abbreviated => [
     "dop.",
-    "pop."
+    "pop.",
   ],
   available_formats => {
+    Bh => "h B",
+    Bhm => "h:mm B",
+    Bhms => "h:mm:ss B",
     E => "ccc",
+    EBhm => "E h:mm B",
+    EBhms => "E h:mm:ss B",
     EHm => "E HH:mm",
     EHms => "E HH:mm:ss",
     Ed => "E, d.",
@@ -48,10 +53,10 @@
     yMd => "d. M. y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-few" => "w. 'teden' 'v' y",
-    "yw-count-one" => "w. 'teden' 'v' y",
-    "yw-count-other" => "w. 'teden' 'v' y",
-    "yw-count-two" => "w. 'teden' 'v' y"
+    "yw-count-few" => "w. 'teden' 'v' Y",
+    "yw-count-one" => "w. 'teden' 'v' Y",
+    "yw-count-other" => "w. 'teden' 'v' Y",
+    "yw-count-two" => "w. 'teden' 'v' Y",
   },
   code => "sl-SI",
   date_format_full => "EEEE, dd. MMMM y",
@@ -69,7 +74,7 @@
     "\N{U+010d}et.",
     "pet.",
     "sob.",
-    "ned."
+    "ned.",
   ],
   day_format_narrow => [
     "p",
@@ -78,7 +83,7 @@
     "\N{U+010d}",
     "p",
     "s",
-    "n"
+    "n",
   ],
   day_format_wide => [
     "ponedeljek",
@@ -87,7 +92,7 @@
     "\N{U+010d}etrtek",
     "petek",
     "sobota",
-    "nedelja"
+    "nedelja",
   ],
   day_stand_alone_abbreviated => [
     "pon.",
@@ -96,7 +101,7 @@
     "\N{U+010d}et.",
     "pet.",
     "sob.",
-    "ned."
+    "ned.",
   ],
   day_stand_alone_narrow => [
     "p",
@@ -105,7 +110,7 @@
     "\N{U+010d}",
     "p",
     "s",
-    "n"
+    "n",
   ],
   day_stand_alone_wide => [
     "ponedeljek",
@@ -114,19 +119,19 @@
     "\N{U+010d}etrtek",
     "petek",
     "sobota",
-    "nedelja"
+    "nedelja",
   ],
   era_abbreviated => [
     "pr. Kr.",
-    "po Kr."
+    "po Kr.",
   ],
   era_narrow => [
     "pr. Kr.",
-    "po Kr."
+    "po Kr.",
   ],
   era_wide => [
     "pred Kristusom",
-    "po Kristusu"
+    "po Kristusu",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -147,7 +152,7 @@
     "sep.",
     "okt.",
     "nov.",
-    "dec."
+    "dec.",
   ],
   month_format_narrow => [
     "j",
@@ -161,7 +166,7 @@
     "s",
     "o",
     "n",
-    "d"
+    "d",
   ],
   month_format_wide => [
     "januar",
@@ -175,7 +180,7 @@
     "september",
     "oktober",
     "november",
-    "december"
+    "december",
   ],
   month_stand_alone_abbreviated => [
     "jan.",
@@ -189,7 +194,7 @@
     "sep.",
     "okt.",
     "nov.",
-    "dec."
+    "dec.",
   ],
   month_stand_alone_narrow => [
     "j",
@@ -203,7 +208,7 @@
     "s",
     "o",
     "n",
-    "d"
+    "d",
   ],
   month_stand_alone_wide => [
     "januar",
@@ -217,7 +222,7 @@
     "september",
     "oktober",
     "november",
-    "december"
+    "december",
   ],
   name => "Slovenian Slovenia",
   native_language => "sloven\N{U+0161}\N{U+010d}ina",
@@ -229,37 +234,37 @@
     "1. \N{U+010d}et.",
     "2. \N{U+010d}et.",
     "3. \N{U+010d}et.",
-    "4. \N{U+010d}et."
+    "4. \N{U+010d}et.",
   ],
   quarter_format_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_format_wide => [
     "1. \N{U+010d}etrtletje",
     "2. \N{U+010d}etrtletje",
     "3. \N{U+010d}etrtletje",
-    "4. \N{U+010d}etrtletje"
+    "4. \N{U+010d}etrtletje",
   ],
   quarter_stand_alone_abbreviated => [
     "1. \N{U+010d}et.",
     "2. \N{U+010d}et.",
     "3. \N{U+010d}et.",
-    "4. \N{U+010d}et."
+    "4. \N{U+010d}et.",
   ],
   quarter_stand_alone_narrow => [
     1,
     2,
     3,
-    4
+    4,
   ],
   quarter_stand_alone_wide => [
     "1. \N{U+010d}etrtletje",
     "2. \N{U+010d}etrtletje",
     "3. \N{U+010d}etrtletje",
-    "4. \N{U+010d}etrtletje"
+    "4. \N{U+010d}etrtletje",
   ],
   script => undef,
   territory => "Slovenia",
@@ -268,5 +273,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 31
+  version => 32,
 }
