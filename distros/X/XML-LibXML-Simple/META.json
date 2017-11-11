@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "XML-LibXML-Simple",
    "no_index" : {
@@ -32,7 +32,6 @@
       },
       "runtime" : {
          "requires" : {
-            "File::Slurp::Tiny" : "0",
             "Scalar::Util" : "0",
             "Test::More" : "0.54",
             "XML::LibXML" : "1.64"
@@ -40,5 +39,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.97"
+   "version" : "0.98"
 }

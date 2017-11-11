@@ -29,6 +29,7 @@ my @files = (
     'lib/WebService/HashiCorp/Vault/Secret/SSH.pm',
     'lib/WebService/HashiCorp/Vault/Sys.pm',
     't/000-load.t',
+    't/001-vault.t',
     't/author-critic.t',
     't/author-eol.t',
     't/author-pod-coverage.t',

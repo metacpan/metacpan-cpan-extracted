@@ -174,7 +174,7 @@ package Linux::Clone;
 # use common::sense;
 
 BEGIN {
-   our $VERSION = '1.1';
+   our $VERSION = '1.2';
 
    require XSLoader;
    XSLoader::load (__PACKAGE__, $VERSION);

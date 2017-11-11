@@ -1,4 +1,4 @@
-# $Id: Text.pm,v 1.73 2017/08/06 21:19:09 pfeiffer Exp $
+# $Id: Text.pm,v 1.75 2017/11/08 22:08:14 pfeiffer Exp $
 
 =head1 NAME
 
@@ -21,7 +21,7 @@ BEGIN {
   # Keep it here, as this is the common to all mpp* utilities.
   our $BASEVERSION = 2.1;
 #@@setVERSION
-  our $VERSION = '2.0.99.1';
+  our $VERSION = '2.0.99.2';
 
 #
 # Not installed, so grep all our sources for the checkin date.  Make a
@@ -753,7 +753,7 @@ For details look";
 our @common_opts =
  ([qr/[h?]/, 'help', undef, undef, \&help],
 
-  [qw(V version), undef, undef, sub { $0 =~ s!.*/!!; my $typ = $VERSION =~ /[-:]/ ? 'cvs-version' : $VERSION !~ /\.9([89])\./ ? 'version' : $1 == 8 ? 'snapshot' : 'release-candidate'; print <<EOS; exit 0 }]);
+  [qw(V version), undef, undef, sub { $0 =~ s!.*/!!; my $typ = $VERSION =~ /[-:]/ ? 'cvs-version' : $VERSION !~ /\.9([89])\./ ? 'version' : $1 == 8 ? 'snapshot' : "$BASEVERSION release-candidate"; print <<EOS; exit 0 }]);
 $0 $typ $VERSION
 Makepp may be copied only under the terms of either the Artistic License or
 the GNU General Public License, either version 2, or (at your option) any

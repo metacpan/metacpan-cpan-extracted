@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,37 +12,38 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: SHA512
 
-SHA1 dc60c5dad626e82f0444fd529cec1c41ac227c68 Changes
+SHA1 2243dd1ee78bb63bb1f5bf9e0b4c3a791d451a21 Changes
 SHA1 882221895a73bad18eb9f16a0ce523a968a932c1 LICENSE.artistic_2
-SHA1 507a10efa92555ddddfbe72be27964d9e3eef80f LICENSE.bsd
-SHA1 79a4bb0fbd4166166e5835d8364acea2e757b28e MANIFEST
-SHA1 8925631ad4afff070a59e7280ef475b886f5c3fa META.yml
-SHA1 bb591a12d755255410e0821f32901bd07aebd187 Makefile.PL
-SHA1 68c1c1da318cbff7f436f83e8c53871b6dcc5701 Moscow.pm
-SHA1 fa38fff12a15eb345013137a1cabd38717fe4546 README
+SHA1 c2a761283151cfab0e2f28a22cbbb24cbde838fc LICENSE.bsd
+SHA1 2fbd67a616605c5f3651ce21907803781819b90b MANIFEST
+SHA1 00b304e675bd2b0e3ea4485f6e24449d4d1a8c0e META.yml
+SHA1 a209c569ed2bf765b1b7881ceba442d422c6f57d Makefile.PL
+SHA1 07866ed311d2d8a9a9daec6fe42a3cc9edb2d634 Moscow.pm
+SHA1 d01ea8e703c7ef861f22b971cbf9ad58b34d2a4a README
 SHA1 52d1ab081adcb0b66c5a76a584c4369e74d46b1a examples/ex1.pl
 SHA1 c3e81c878f34dae900b2c5f7dd678b2abbf87ecb examples/ex2.pl
 SHA1 709e87f737fca9f8bde19b6d4a7fb627d2cef68d examples/ex3.pl
 SHA1 f56c4971de971f5674c8661e6cb2aebaefc28b03 examples/ex4.pl
+SHA1 ceab13db6777578f37055e33221a29f2c3103db9 examples/ex5.pl
 SHA1 f2e212e5b43b3c933e8100407364185c03d803de images/ex3.png
-SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 fb87e7e7964647af0e7f6422bc7943754935dca7 inc/Module/Install.pm
 SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
 SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
-SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
-SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
-SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
-SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
-SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
-SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
-SHA1 42de62df31eaf796d8bfd49a11fdc9cff1b50b74 inc/Module/Install/Share.pm
-SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
-SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
-SHA1 e71ce65ecfaf8c036d4af2d8ddc163404531f356 share/moscow-map.xml
+SHA1 06ca84c52f555dfd7cf8bb7c941c975e25adfc9d inc/Module/Install/Base.pm
+SHA1 3eeb29878c8a435182b492e22315166a0229a373 inc/Module/Install/Can.pm
+SHA1 3bb596078a0413cc568ff3a834d9fc54dbddd54b inc/Module/Install/Fetch.pm
+SHA1 5885b5a7af6c3d54cbeb1274a896a565e5cbdb9a inc/Module/Install/Makefile.pm
+SHA1 9247628a32ad889e815a356fb39b2bc94ff3cc3a inc/Module/Install/Metadata.pm
+SHA1 8d19f4485276b987b7838d4ec01909f8055a4724 inc/Module/Install/ReadmeFromPod.pm
+SHA1 47c4d01e2a0df08bf3be46fcc132783f5228d238 inc/Module/Install/Share.pm
+SHA1 b0b3ad3cfea40b508eb61e0e5c8ea477f81f3eb1 inc/Module/Install/Win32.pm
+SHA1 b162866505fb2a1141efa422cfdc864394cb4444 inc/Module/Install/WriteAll.pm
+SHA1 a26b92c64ddfba96dbf9d0989f9d7e6e17c4a9b7 share/moscow-map.xml
 SHA1 cb17b5179f60da093c816564dd7e985fbe0e8306 t/Map-Tube-Moscow/01-use.t
-SHA1 6f153ce28db2d789c4106a766d0a505146fef82a t/Map-Tube-Moscow/02-version.t
-SHA1 03ac1fa2231fb15243546fb1c9d50d391823e46a t/Map-Tube-Moscow/03-map.t
+SHA1 9f9695511a6bb56c4f4a4c4dc4ab5a0099f1383f t/Map-Tube-Moscow/02-version.t
+SHA1 e6f7c89bd288deea3454874d8f4b0dc41c1ed57c t/Map-Tube-Moscow/03-map.t
 SHA1 9900f06f5d033f26bc851adc5aea5d9e80d15013 t/Map-Tube-Moscow/04-get_node_by_id.t
 SHA1 f5dcead799e449adfb3cc8f9fe5cffc8dcfd0888 t/Map-Tube-Moscow/05-get_node_by_name.t
 SHA1 26c9aaef0b6d579a4d5f9c8fc1e9348ccec6ec56 t/Map-Tube-Moscow/06-get_shortest_route.t
@@ -51,13 +52,13 @@ SHA1 51e155826b6643eac6291dd6064476c222ced3af t/Map-Tube-Moscow/08-xml.t
 SHA1 4809d61312a6291814bfad04cdff80c94f4332e0 xt/Map-Tube-Moscow/01-pod_coverage.t
 SHA1 03b792aea98eb9155834148db3049ea619d8ef24 xt/Map-Tube-Moscow/02-pod.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQEcBAEBAgAGBQJWIMy3AAoJEJe+XXKaIuTlssYIAKWrLU5x456ZZThIFYyXkmOc
-R6B/Wbrf2Sqf2WU20W6q4iZVWBZvLH8PATEfX4kitOEcV4LX1WmJ0WhIidaxQfWl
-+1RJPF96gXfn6GaTbTpXBq6nwhEN8c3Nv5reQzIqH92WEy2dv9s5lU3AT+6Mo/Pc
-amo2/UsFVB+W9xON2gsFpPVUoKZcV6YUxSnRLxgNpmCVzxudDHrvt/v37/OpFzYs
-uVQplRKKkvU0WA6MjOiG1TyUFthrsc/cd/80pbeosI31WBhfmt0ktEyhTzUqs0N1
-2C3IEDleHydKHa29ge9azsEuxjthu+K+FWmqFPKkC+HyLMEY1vvl7jlk1+DOtEM=
-=aTaG
+iQEzBAEBCgAdFiEEAxWqUSy7qDLVZJQKKyiOZjWerHYFAloC8tgACgkQKyiOZjWe
+rHbY9Af+Kj6BRbic6BJcHAAYfCWbZwMHt8u8WCOc7j4hY0p54NrS46iwI/y+hhcA
+5VcGEFgsU6VXpPX6h7/iZXUjHS+/CDQ4ssUTn2IJFLAUPzUgMFq/Jr0jJ8dm4ClR
+PgdU3K8hIdMMNKZ29m7SuF5VCpKeHmx1GdBJ/AC0Ra97zsqN8/MLyknYiZoD2Ern
+48/AtvwG4nLOS7QgPxDhQgKpgmmw03zw4e6l2U6vSSVYPi6qLZ9pBw3N/c0QxB/i
+21cSY3EVu2cXkf2aOVZ2UuMhiQmKALgGFkAzfOSbjgsngJwtRdM6EMBHRO/CCfAD
+sZis5nwToF7FxZcK7I99Zncm8pQafg==
+=HODT
 -----END PGP SIGNATURE-----

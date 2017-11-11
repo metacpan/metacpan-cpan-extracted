@@ -323,7 +323,6 @@ This allows you to fetch information for the specified database resource under y
 
 Required:
 
-	website_id
 	database_id
 
 Optional:
@@ -437,6 +436,218 @@ sub disable_database {
 	return $self->_do_method('edit_database', $real_params);
 }
 
+=head2 create_website_backup
+
+Will initiate an on-demand backup for a Website.
+
+Required:
+
+    website_id - Id of the Website to create a backup for.
+
+Optional:
+
+    None
+
+=cut
+
+sub create_website_backup {
+
+    my ($self, $params) = @_;
+    return $self->_do_method('create_website_backup', $params);
+}
+
+=head2 restore_website_backup
+
+Will initiate a full restore for a Website.
+
+Required:
+
+    website_id - Id of the Website to perform restore on.
+    commit_id  - The commit to restore the website from.
+
+Optional:
+
+    None
+
+=cut
+
+sub restore_website_backup {
+
+    my ($self, $params) = @_;
+    return $self->_do_method('restore_website_backup', $params)
+}
+
+=head2 selective_restore_website_backup
+
+Will initiate a restore of the specified files and directories for a Website.
+
+Required:
+
+    website_id - Id of the Website to perform the restore on.
+    commit_id  - The commit to restore files from.
+    paths      - A list of paths to restore.
+
+Optional:
+
+    None
+
+=cut
+
+sub selective_restore_website_backup {
+
+    my ($self, $params) = @_;
+    return $self->_do_method('selective_restore_website_backup', $params)
+}
+
+=head2 archive_website_backup
+
+Will initiate the production of a zip file which contains the entire contents of the selected backup. Upon completion a perishable link will be provided to the customer so that they can retrieve the zip file. The links expire after 1 week.
+
+Required:
+
+    website_id - Id of the Website to download the file for.
+    commit_id  - The commit to create the zip file from.
+
+Optional:
+
+    None
+
+=cut
+
+sub archive_website_backup {
+
+    my ($self, $params) = @_;
+    return $self->_do_method('download_website_backup', $params);
+}
+
+=head2 archive_website_selective_backup
+
+Will initiate the production of a zip file which contains the the specified files and directories. Upon completion a perishable link will be provided to the customer so that they can retrieve the zip file. The links expire after 1 week.
+
+Required:
+
+    website_id - Id of the Website to download the file for.
+    commit_id  - The commit to create the zip file from.
+    paths      - A list of paths to include in the archive.
+
+Optional:
+
+    None
+
+=cut
+
+sub archive_website_selective_backup {
+
+    my ($self, $params) = @_;
+    return $self->_do_method('download_selective_website_backup', $params);
+}
+
+=head2 list_website_backups
+
+List all of the backups for a Website.
+
+Required:
+
+    website_id - Id of the Website to list the backups for.
+
+Optional:
+
+    None
+
+=cut
+
+sub list_website_backups {
+
+    my ($self, $params) = @_;
+    return $self->_do_method('list_website_backups', $params);
+}
+
+=head2 browse_website_backup
+
+Response includes files, directories and their associated metadata as an array of entries.
+Requests can be scoped to an optional C<path> parameter.
+
+Required:
+
+    website_id - Id of the Website to brose the backup of.
+    commit_id  - The commit to brwose the contents of.
+
+Optional:
+
+    path - scopes the results to this path within the backup.
+
+=cut
+
+sub browse_website_backup {
+
+    my ($self, $params) = @_;
+    return $self->_do_method('browse_website_backup', $params);
+}
+
+=head2 create_database_backup
+
+Will initiate an on-demand backup for a Database.
+
+Required:
+
+    website_id  - Id of the Website associated with the database to create a backup for.
+    database_id - Id of the Database to create a backup for.
+
+Optional:
+
+    None
+
+=cut
+
+sub create_database_backup {
+
+    my ($self, $params) = @_;
+    return $self->_do_method('create_database_backup', $params);
+}
+
+=head2 restore_database_backup
+
+Will initiate a full restore for a Database.
+
+Required:
+
+    website_id  - Id of the Website associated with the database to restore.
+    database_id - Id of the Database to restore a backup for.
+    commit_id   - The commit to restore the database from.
+
+Optional:
+
+    None
+
+=cut
+
+sub restore_database_backup {
+
+    my ($self, $params) = @_;
+    return $self->_do_method('restore_database_backup', $params);
+}
+
+=head2 list_database_backups
+
+List all the bacukps for a Database.
+
+Required:
+
+    website_id  - Id of the Website associated with the requested database.
+    database_id - Id of the Database to list the backups for.
+
+Optional:
+
+    None
+
+=cut
+
+sub list_database_backups {
+
+    my ($self, $params) = @_;
+    return $self->_do_method('list_database_backups', $params);
+}
+
 =head2 generate_login_link
 
 This creates a login URL that can be used to access the Codeguard Dashboard for your User account.
@@ -501,17 +712,27 @@ sub _create_request {
 
 	my ($self, $action, $params) = @_;
 	my $action_map = {
-		'create_website'     => 'POST',
-		'list_websites'      => 'GET',
-		'edit_website'       => 'PUT',
-		'delete_website'     => 'DELETE',
-		'list_website_rules' => 'GET',
-		'set_website_rules'  => 'POST',
-		'create_database'    => 'POST',
-		'list_databases'     => 'GET',
-		'show_database'      => 'GET',
-		'edit_database'      => 'PUT',
-		'delete_database'    => 'DELETE',
+        'create_website'                    => 'POST',
+        'list_websites'                     => 'GET',
+        'edit_website'                      => 'PUT',
+        'delete_website'                    => 'DELETE',
+        'list_website_rules'                => 'GET',
+        'set_website_rules'                 => 'POST',
+        'create_database'                   => 'POST',
+        'list_databases'                    => 'GET',
+        'show_database'                     => 'GET',
+        'edit_database'                     => 'PUT',
+        'delete_database'                   => 'DELETE',
+        'create_website_backup'             => 'POST',
+        'restore_website_backup'            => 'POST',
+        'selective_restore_website_backup'  => 'POST',
+        'download_website_backup'           => 'GET',
+        'download_selective_website_backup' => 'POST',
+        'list_website_backups'              => 'GET',
+        'browse_website_backup'             => 'GET',
+        'create_database_backup'            => 'POST',
+        'restore_database_backup'           => 'POST',
+        'list_database_backups'             => 'GET',
 	};
 	my $request = HTTP::Request->new( $action_map->{$action} );
 	$request->header('Content-Type' => 'application/json' );
@@ -524,21 +745,39 @@ sub _set_uri {
 
 	my ($self, $action, $request, $params) = @_;
 	my $base_url = $self->get_api_url();
+
+    my $website_id  = delete $params->{website_id}  || '';
+    my $database_id = delete $params->{database_id} || '';
+    my $commit_id   = delete $params->{commit_id}   || '';
+
 	my $uri_map  = {
-		'create_website'     => '/websites',
-		'list_websites'      => '/websites',
-		'edit_website'       => '/websites/'.($params->{website_id} || ''),
-		'delete_website'     => '/websites/'.($params->{website_id} || ''),
-		'list_website_rules' => '/websites/'.($params->{website_id} || '').'/rules',
-		'set_website_rules'  => '/websites/'.($params->{website_id} || '').'/rules',
-		'create_database'    => '/database_backups',
-		'list_databases'     => '/database_backups',
-		'show_database'      => '/websites/'.($params->{website_id} || '').'/database_backups/'.($params->{database_id} || ''),
-		'edit_database'      => '/database_backups/'.($params->{database_id} || ''),
-		'delete_database'    => '/database_backups/'.($params->{database_id} || ''),
+        'create_website'                    => '/websites',
+        'list_websites'                     => '/websites',
+        'edit_website'                      => "/websites/$website_id",
+        'delete_website'                    => "/websites/$website_id",
+        'list_website_rules'                => "/websites/$website_id/rules",
+        'set_website_rules'                 => "/websites/$website_id/rules",
+        'create_database'                   => '/database_backups',
+        'list_databases'                    => '/database_backups',
+        'show_database'                     => "/database_backups/$database_id",
+        'edit_database'                     => "/database_backups/$database_id",
+        'delete_database'                   => "/database_backups/$database_id",
+        'create_website_backup'             => "/websites/$website_id/request_backup",
+        'restore_website_backup'            => "/websites/$website_id/commits/$commit_id/initiate_restore",
+        'selective_restore_website_backup'  => "/websites/$website_id/commits/$commit_id/restore_selected",
+        'download_website_backup'           => "/websites/$website_id/commits/$commit_id/download",
+        'download_selective_website_backup' => "/websites/$website_id/commits/$commit_id/download_selected",
+        'list_website_backups'              => "/websites/$website_id/commits",
+        'browse_website_backup'             => "/websites/$website_id/commits/$commit_id/browse",
+        'create_database_backup'            => "/websites/$website_id/database_backups/$database_id/request_backup",
+        'restore_database_backup'           => "/websites/$website_id/database_backups/$database_id/commits/$commit_id/initiate_restore",
+        'list_database_backups'             => "/websites/$website_id/database_backups/$database_id/commits",
 	};
 
-	my $oauth_req = Net::OAuth->request('protected resource')->new(
+    my $method = ($request) ? $request->method : 'GET';
+    my $oauth_params = {
+        # Include our parameters in the query if our method is GET
+        ($method eq 'GET' ? (extra_params => $params) : ()),
 		'consumer_key'     => $self->{api_key},
 		'consumer_secret'  => $self->{api_secret},
 		'token'            => $self->{access_token},
@@ -546,9 +785,11 @@ sub _set_uri {
 		'signature_method' => 'HMAC-SHA1',
 		'timestamp'        => time(),
 		'nonce'            => _oauth_nonce(),
-		'request_method'   => ($request) ? $request->method() : 'GET',
+		'request_method'   => $method,
 		'request_url'      => $base_url.$uri_map->{$action},
-	);
+    };
+
+	my $oauth_req = Net::OAuth->request('protected resource')->new(%$oauth_params);
 	$oauth_req->sign;
 	return ($request) ? $request->uri($oauth_req->to_url) : $oauth_req->to_url;
 }
@@ -557,15 +798,24 @@ sub _fetch_required_params {
 
 	my ($self, $action, $params) = @_;
 	my $required_keys_map = {
-		create_website     => { map { ($_ => 1) } qw(url hostname account provider) },
-		list_websites      => { },
-		list_website_rules => { map { ($_ => 1) } qw(website_id) },
-		set_website_rules  => { map { ($_ => 1) } qw(website_id exclude_rules) },
-		create_database    => { map { ($_ => 1) } qw(server_address account password port database_name) },
-		list_databases     => { },
-		#show_database      => { map { ($_ => 1) } qw(website_id database_id) },
-        show_database      => { map { ($_ => 1) } qw(database_id) }, # Added in v0.03.
-		edit_database      => { map { ($_ => 1) } qw(database_id) },
+        create_website                    => { map { ($_ => 1) } qw(url hostname account provider) },
+        list_websites                     => { },
+        list_website_rules                => { map { ($_ => 1) } qw(website_id) },
+        set_website_rules                 => { map { ($_ => 1) } qw(website_id exclude_rules) },
+        create_database                   => { map { ($_ => 1) } qw(server_address account password port database_name) },
+        list_databases                    => { },
+        show_database                     => { map { ($_ => 1) } qw(database_id) }, # Added in v0.03.
+        edit_database                     => { map { ($_ => 1) } qw(database_id) },
+        create_website_backup             => { map { ($_ => 1) } qw(website_id) },
+        restore_website_backup            => { map { ($_ => 1) } qw(website_id commit_id) },
+        selective_restore_website_backup  => { map { ($_ => 1) } qw(website_id commit_id paths) },
+        download_website_backup           => { map { ($_ => 1) } qw(website_id commit_id) },
+        download_selective_website_backup => { map { ($_ => 1) } qw(website_id commit_id paths) },
+        list_website_backups              => { map { ($_ => 1) } qw(website_id) },
+        browse_website_backup             => { map { ($_ => 1) } qw(website_id commit_id) },
+        create_database_backup            => { map { ($_ => 1) } qw(website_id database_id) },
+        restore_database_backup           => { map { ($_ => 1) } qw(website_id database_id commit_id) },
+        list_database_backups             => { map { ($_ => 1) } qw(website_id database_id) },
 	};
 
 	# The 'edit_website', and 'delete_website' calls have the same set of required params as the 'list_website_rules' call
@@ -599,11 +849,12 @@ sub _fetch_optional_params {
 
 	my ($self, $action) = @_;
 	my $optional_keys_map = {
-		create_website  => { map { ($_ => 1) } qw(port dir_path) },
-		create_database => { map { ($_ => 1) } qw(website_id authentication_mode) },
-		edit_website    => { map { ($_ => 1) } qw(url monitor_frequency account password key dir_path hostname disabled) },
-        show_database   => { map { ($_ => 1) } qw(website_id) }, # Added in v0.03. 
-		edit_database   => { map { ($_ => 1) } qw(server_address account password port database_name authentication_mode server_account server_password website_id disabled) },
+        create_website        => { map { ($_ => 1) } qw(port dir_path) },
+        create_database       => { map { ($_ => 1) } qw(website_id authentication_mode) },
+        edit_website          => { map { ($_ => 1) } qw(url monitor_frequency account password key dir_path hostname disabled) },
+        show_database         => { map { ($_ => 1) } qw(website_id) }, # Added in v0.03.
+        edit_database         => { map { ($_ => 1) } qw(server_address account password port database_name authentication_mode server_account server_password website_id disabled) },
+        browse_website_backup => { map { ($_ => 1) } qw (path) },
 	};
 	return $optional_keys_map->{$action};
 }

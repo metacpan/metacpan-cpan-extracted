@@ -102,7 +102,7 @@
          "web" : "https://github.com/russoz/Dist-Zilla-PluginBundle-Author-RUSSOZ"
       }
    },
-   "version" : "0.024",
+   "version" : "0.026",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

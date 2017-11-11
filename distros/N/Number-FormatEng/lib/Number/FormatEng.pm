@@ -11,7 +11,7 @@ our @ISA         = qw(Exporter);
 our @EXPORT_OK   = qw(format_eng format_pref unformat_pref use_e_zero no_e_zero);
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 my %prefix = (
     '-8' => 'y',    '8' => 'Y',
@@ -80,14 +80,7 @@ sub format_num {
 
     my $e    = floor( log($num) / log(1000) );
     my $mult = 1000**$e;
-    $num = sprintf '%.6f', ($num / $mult);
-
-    # If there are only zeroes after the decimal,
-    # delete the decimal and all zeroes
-    $num =~ s/\.0+$//;
-
-    # Delete trailing zeroes after the decimal
-    $num =~ s/(\d+\.\d+?)0+/$1/;
+    $num = 0 + sprintf '%.6f', ($num / $mult);
 
     if ($prefix_mode) {
         return $sign . $num . $prefix{$e};
@@ -144,7 +137,7 @@ Number::FormatEng - Format a number using engineering notation
 
 =head1 VERSION
 
-This document refers to Number::FormatEng version 0.02.
+This document refers to Number::FormatEng version 0.03.
 
 =head1 SYNOPSIS
 

@@ -5,25 +5,25 @@
       "Aleksandr Babenko <babenko@reg.ru>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.132661",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "WebService-CEPH",
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Module::Build" : "0.3601"
+            "Module::Build" : "0.28"
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.30",
-            "Module::Build" : "0.3601"
+            "ExtUtils::MakeMaker" : "0",
+            "Module::Build" : "0.28"
          }
       },
       "develop" : {
@@ -31,11 +31,13 @@
             "Pod::Coverage::TrustPod" : "0",
             "Test::CPAN::Changes" : "0.19",
             "Test::CPAN::Meta" : "0",
-            "Test::Kwalitee" : "1.12",
-            "Test::More" : "0",
+            "Test::EOL" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::More" : "0.88",
             "Test::NoTabs" : "0",
             "Test::Pod" : "1.41",
-            "Test::Pod::Coverage" : "1.08"
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Version" : "1"
          }
       },
       "runtime" : {
@@ -48,6 +50,7 @@
             "File::Slurp" : "0",
             "HTTP::Status" : "0",
             "Net::Amazon::S3" : "0.80",
+            "Time::Local" : "0",
             "parent" : "0",
             "perl" : "5.014000",
             "strict" : "0",
@@ -70,21 +73,22 @@
    "provides" : {
       "WebService::CEPH" : {
          "file" : "lib/WebService/CEPH.pm",
-         "version" : "0.014"
+         "version" : "0.015"
       },
       "WebService::CEPH::FileShadow" : {
          "file" : "lib/WebService/CEPH/FileShadow.pm",
-         "version" : "0.014"
+         "version" : "0.015"
       },
       "WebService::CEPH::NetAmazonS3" : {
          "file" : "lib/WebService/CEPH/NetAmazonS3.pm",
-         "version" : "0.014"
+         "version" : "0.015"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "homepage" : "https://metacpan.org/release/WebService-CEPH"
    },
-   "version" : "0.014"
+   "version" : "0.015",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
 }
 

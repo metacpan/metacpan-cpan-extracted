@@ -22,7 +22,7 @@ use HTTP::Request::Common;
 use HTML::TableExtract;
 use HTML::Parser;
 
-our $VERSION = '1.43'; # VERSION
+our $VERSION = '1.45'; # VERSION
 my $TREASURY_MAINURL = ("http://www.treasurydirect.gov/");
 my $TREASURY_URL = ($TREASURY_MAINURL."indiv/tools/");
 

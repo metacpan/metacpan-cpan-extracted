@@ -6,7 +6,7 @@ use namespace::autoclean;
 
 use re 'eval';
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 use List::AllUtils qw( uniq );
 use Markdent::Event::AutoLink;
@@ -27,7 +27,7 @@ use Markdent::Event::StartLink;
 use Markdent::Event::StartStrong;
 use Markdent::Event::Text;
 use Markdent::Regexes qw( $HTMLComment );
-use Markdent::Types qw( Str ArrayRef HashRef RegexpRef EventObject );
+use Markdent::Types;
 
 use Moose;
 use MooseX::SemiAffordanceAccessor;
@@ -36,9 +36,9 @@ use MooseX::StrictConstructor;
 with 'Markdent::Role::SpanParser';
 
 has __pending_events => (
-    traits   => ['Array'],
-    is       => 'rw',
-    isa      => ArrayRef [EventObject],
+    traits => ['Array'],
+    is     => 'rw',
+    isa    => t( 'ArrayRef', of => t('EventObject') ),
     default  => sub { [] },
     init_arg => undef,
     handles  => {
@@ -51,7 +51,7 @@ has __pending_events => (
 has _span_text_buffer => (
     traits   => ['String'],
     is       => 'ro',
-    isa      => Str,
+    isa      => t('Str'),
     default  => q{},
     init_arg => undef,
     handles  => {
@@ -62,9 +62,9 @@ has _span_text_buffer => (
 );
 
 has _links_by_id => (
-    traits   => ['Hash'],
-    is       => 'ro',
-    isa      => HashRef [ArrayRef],
+    traits => ['Hash'],
+    is     => 'ro',
+    isa    => t( 'HashRef', of => t('ArrayRef') ),
     default  => sub { {} },
     init_arg => undef,
     handles  => {
@@ -75,7 +75,7 @@ has _links_by_id => (
 
 has _emphasis_start_delimiter_re => (
     is       => 'ro',
-    isa      => RegexpRef,
+    isa      => t('RegexpRef'),
     lazy     => 1,
     builder  => '_build_emphasis_start_delimiter_re',
     init_arg => undef,
@@ -83,7 +83,7 @@ has _emphasis_start_delimiter_re => (
 
 has _escape_re => (
     is       => 'ro',
-    isa      => RegexpRef,
+    isa      => t('RegexpRef'),
     lazy     => 1,
     builder  => '_build_escape_re',
     init_arg => undef,
@@ -91,7 +91,7 @@ has _escape_re => (
 
 has _line_break_re => (
     is       => 'ro',
-    isa      => RegexpRef,
+    isa      => t('RegexpRef'),
     lazy     => 1,
     builder  => '_build_line_break_re',
     init_arg => undef,
@@ -99,7 +99,7 @@ has _line_break_re => (
 
 has _escapable_chars => (
     is      => 'ro',
-    isa     => ArrayRef [Str],
+    isa     => t( 'ArrayRef', of => t('Str') ),
     lazy    => 1,
     builder => '_build_escapable_chars',
 );
@@ -219,7 +219,8 @@ PARSE:
 sub _possible_span_matches {
     my $self = shift;
 
-    if ( my $event = $self->_open_start_event_for_span('code') ) {
+    my %open = $self->_open_start_events_for_span( 'code', 'link' );
+    if ( my $event = $open{code} ) {
         return [ 'code_end', $event->delimiter() ];
     }
 
@@ -229,7 +230,7 @@ sub _possible_span_matches {
 
     push @look_for, 'code_start';
 
-    unless ( $self->_open_start_event_for_span('link') ) {
+    unless ( $open{link} ) {
         push @look_for, qw( auto_link link image );
     }
 
@@ -241,18 +242,17 @@ sub _possible_span_matches {
 sub _look_for_strong_and_emphasis {
     my $self = shift;
 
-    my %start;
-    $start{strong}   = $self->_open_start_event_for_span('strong');
-    $start{emphasis} = $self->_open_start_event_for_span('emphasis');
+    my %open = $self->_open_start_events_for_span( 'strong', 'emphasis' );
 
     # If we are in both, we need to try to end the most recent one first.
-    if ( $start{strong} && $start{emphasis} ) {
+    if ( $open{strong} && $open{emphasis} ) {
         my $last_saw;
         for my $event ( $self->_pending_events() ) {
-            if ( $event->event_name() eq 'start_strong' ) {
+            my $event_name = $event->event_name;
+            if ( $event_name eq 'start_strong' ) {
                 $last_saw = 'strong';
             }
-            elsif ( $event->event_name() eq 'start_emphasis' ) {
+            elsif ( $event_name eq 'start_emphasis' ) {
                 $last_saw = 'emphasis';
             }
         }
@@ -262,17 +262,17 @@ sub _look_for_strong_and_emphasis {
             ? qw( strong emphasis )
             : qw( emphasis strong );
 
-        return map { [ $_ . '_end', $start{$_}->delimiter() ] } @order;
+        return map { [ $_ . '_end', $open{$_}->delimiter() ] } @order;
     }
-    elsif ( $start{emphasis} ) {
+    elsif ( $open{emphasis} ) {
         return (
             'strong_start',
-            [ 'emphasis_end', $start{emphasis}->delimiter() ]
+            [ 'emphasis_end', $open{emphasis}->delimiter() ]
         );
     }
-    elsif ( $start{strong} ) {
+    elsif ( $open{strong} ) {
         return (
-            [ 'strong_end', $start{strong}->delimiter() ],
+            [ 'strong_end', $open{strong}->delimiter() ],
             'emphasis_start'
         );
     }
@@ -282,20 +282,22 @@ sub _look_for_strong_and_emphasis {
     return ( 'strong_start', 'emphasis_start' );
 }
 
-sub _open_start_event_for_span {
-    my $self = shift;
-    my $type = shift;
+sub _open_start_events_for_span {
+    my $self         = shift;
+    my %wanted_start = map { 'start_' . $_ => $_ } @_;
+    my %wanted_end   = map { 'end_' . $_ => $_ } @_;
 
-    my $in;
+    my %open;
     for my $event ( $self->_pending_events() ) {
-        $in = $event
-            if $event->event_name eq 'start_' . $type;
+        my $event_name = $event->event_name;
+        $open{ $wanted_start{$event_name} } = $event
+            if $wanted_start{$event_name};
 
-        undef $in
-            if $event->event_name eq 'end_' . $type;
+        delete $open{ $wanted_end{$event_name} }
+            if $wanted_end{$event_name};
     }
 
-    return $in;
+    return %open;
 }
 
 sub _build_emphasis_start_delimiter_re {
@@ -975,13 +977,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Markdent::Parser::SpanParser - Span parser for standard Markdown
 
 =head1 VERSION
 
-version 0.26
+version 0.27
 
 =head1 DESCRIPTION
 
@@ -1015,15 +1019,26 @@ L<Markdent::Role::AnyParser>, and L<Markdent::Role::DebugPrinter> roles.
 
 See L<Markdent> for bug reporting details.
 
+Bugs may be submitted at L<http://rt.cpan.org/Public/Dist/Display.html?Name=Markdent> or via email to L<bug-markdent@rt.cpan.org|mailto:bug-markdent@rt.cpan.org>.
+
+I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
+
+=head1 SOURCE
+
+The source code repository for Markdent can be found at L<https://github.com/houseabsolute/Markdent>.
+
 =head1 AUTHOR
 
 Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Dave Rolsky.
+This software is copyright (c) 2017 by Dave Rolsky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+The full text of the license can be found in the
+F<LICENSE> file included with this distribution.
 
 =cut

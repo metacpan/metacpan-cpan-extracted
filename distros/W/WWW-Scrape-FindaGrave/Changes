@@ -1,4 +1,7 @@
-Revision history for WWW::Scaper::FindaGrave
+Revision history for WWW::Scape::FindaGrave
+
+0.05	Tue Nov  7 15:00:00 EST 2017
+	Use the legacy website, the new one doesn't scrape well and doesn't have RESTful
 
 0.04	Mon 19 Jun 20:26:20 EDT 2017
 	Try to fix http://www.cpantesters.org/cpan/report/66aabd38-5457-11e7-8c7b-c7f2659b2034

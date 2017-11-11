@@ -1,5 +1,12 @@
 Revision history for RT-Extension-ConditionalCustomFields
 
+0.06 2017-11-09
+ - Upgrade Module::Install and cie
+ - Add patch for RT 4.4.2 (no need anymore to add callback for Group Modify)
+ - Rename patch 4.4 to 4.4.1
+ - Fixed license meta name.
+ - Fixed abstract in pod as suggested by CPANTS.
+
 0.05 2017-03-31
  - Fix reload of Config, avoid duplicating plugins
 

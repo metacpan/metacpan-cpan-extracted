@@ -1,0 +1,9 @@
+Revision history for Device-Chip-AnalogConverters
+
+0.02    2017-11-07 21:52:03
+        [CHANGES]
+         * Added 'constfield' for packing constant-value fields
+         * Support pack/unpack format of packed binary bytestrings
+
+0.01    2014-09-26
+        First version, released on an unsuspecting world.

@@ -1,4 +1,4 @@
-package Dist::Zilla::MintingProfile::Author::Plicease 2.23 {
+package Dist::Zilla::MintingProfile::Author::Plicease 2.24 {
 
   use 5.014;
   use Moose;
@@ -17,10 +17,13 @@ package Dist::Zilla::MintingProfile::Author::Plicease 2.23 {
   
     # use a dist share instead of a class share
   
-    my $profile_dir = Path::Tiny->new( File::ShareDir::Dist::dist_share( 'Dist-Zilla-Plugin-Author-Plicease' ) )
-      ->child( "profiles/$profile_name" );
+    my $dir1 = Path::Tiny->new( File::ShareDir::Dist::dist_share( 'Dist-Zilla-Plugin-Author-Plicease' ) );
+    
+    my $dir2 = defined $profile_name
+      ? $dir1->child("profiles/$profile_name")
+      : $dir1->child("profiles");
   
-    return $profile_dir if -d $profile_dir;
+    return $dir2 if -d $dir2;
   
     Carp::confess "Can't find profile $profile_name via $self";
   }
@@ -42,7 +45,7 @@ Dist::Zilla::MintingProfile::Author::Plicease - Minting profile for Plicease
 
 =head1 VERSION
 
-version 2.23
+version 2.24
 
 =head1 SYNOPSIS
 

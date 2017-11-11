@@ -2,7 +2,7 @@
 
 makepp_functions -- Functions in makepp
 
-=for vc $Id: makepp_functions.pod,v 1.52 2016/09/06 19:59:45 pfeiffer Exp $
+=for vc $Id: makepp_functions.pod,v 1.54 2017/11/08 22:08:04 pfeiffer Exp $
 
 =head1 DESCRIPTION
 
@@ -103,7 +103,7 @@ makepp|makepp_extending> for more details.
 
 =item and I<condition1[,condition2[,condition3...]]>
 
-The and function provides a “short-circuiting” AND operation. Each argument is
+The and function provides a "short-circuiting" AND operation. Each argument is
 expanded, in order. If an argument expands to an empty string the processing
 stops and the result of the expansion is the empty string. If all arguments
 expand to a non-empty string then the result of the expansion is the expansion
@@ -130,7 +130,7 @@ blank.
 
 =item or I<condition1[,condition2[,condition3...]]>
 
-The or function provides a “short-circuiting” OR operation. Each argument is
+The or function provides a "short-circuiting" OR operation. Each argument is
 expanded, in order. If an argument expands to a non-empty string the
 processing stops and the result of the expansion is that string. If, after all
 arguments are expanded, all of them are false (empty), then the result of the
@@ -689,8 +689,9 @@ And now for a more complex example to show what is possible:
     DCWORDS := $(call mymap,downcase,$(UCWORDS))
 
 Now C<$(DCWORDS)> contains S<C<all these words are upcase>>.  By the way: it
-makes no difference, whether we access the arguments via B<C<$1>>, B<C<${1}>>
-or B<C<$(1)>> within a macro.
+makes no difference, whether we access the single-digit arguments via
+B<C<$1>>, B<C<${1}>> or B<C<$(1)>> or multi-digit B<C<${10}>> or B<C<$(10)>>
+within a macro.
 
 You can directly use the variable as though it were a function, if there is no
 function of that name.  This is internally converted to C<call>, so these are
@@ -699,6 +700,15 @@ equivalent:
     discussion = The $0 turned into $1 $2.
     direct = $(discussion an,argument)
     called = $(call discussion,an,argument)
+
+Normally the arguments will be unset, when called as a normal variable. But if
+it is nested in the body of another macro, then the arguments of the outer
+macro will be seen. to prevent this, append a space to pass 1, or for clarity
+2 empty arguments, turning it into a macro invocation:
+
+    inner = [$1]
+    outer = wrap $(inner) here, but not $(inner ) here, or $(inner ,) here
+    $(outer foobar) # -> wrap [foobar] here, but not [] here, or [] here
 
 It might seem debatable whether C<$[call]> should also expand the macro's
 C<$[]> expressions, or whether a function should always do the same thing, no

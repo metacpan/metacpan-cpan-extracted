@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Role-Tiny",
    "no_index" : {
@@ -60,6 +60,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#moose"
    },
-   "version" : "2.000005",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "2.000006",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

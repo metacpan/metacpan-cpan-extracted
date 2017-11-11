@@ -41,7 +41,7 @@ use strict;
 ##==============================================================================
 ## Globals & Constants
 
-our $VERSION = "0.12.008";
+our $VERSION = "0.12.010";
 our @ISA = qw(DiaColloDB::Client);
 
 ## $PGOOD_DEFAULT
@@ -1802,7 +1802,7 @@ sub parseQuery {
 	##-- compat: value: array --> CQTokSet @{VAL1,...,VALN}
 	$aq = DDC::Any::CQTokSet->new($attr, '', $areq);
       }
-      elsif (UNIVERSAL::isa($areq,'RegExp') || (!$opts{ddcmode} && $areq && $areq =~ m{^${regre}$})) {
+      elsif (UNIVERSAL::isa($areq,'RegExp') || (($opts{ddcmode}||0)<1 && $areq && $areq =~ m{^${regre}$})) {
 	##-- compat: value: regex --> CQTokRegex /REGEX/
 	my $re = regex($areq)."";
 	$re =~ s{\G(.*?\(\?\^[^adlu:]*)[adlu]*}{$1}g; ##-- trim perl-5.14 character-set modifiers: they break KWIC-links, since DDC (PCRE) doesn't support them!

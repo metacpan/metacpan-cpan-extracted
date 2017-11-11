@@ -10,7 +10,7 @@ plan tests => 1;
 
 use File::Temp;
 
-use IO::Framed::Read ();
+use IO::Framed ();
 
 use Net::WebSocket::Parser ();
 use Net::WebSocket::Streamer::Client ();
@@ -38,7 +38,7 @@ close $fh;
 open my $rdr, '<', $file;
 
 my $parse = Net::WebSocket::Parser->new(
-    IO::Framed::Read->new($rdr)->allow_empty_read()
+    IO::Framed->new($rdr)->allow_empty_read()
 );
 
 my $received = q<>;

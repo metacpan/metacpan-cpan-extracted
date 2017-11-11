@@ -1,5 +1,5 @@
-=== README for XML-Compile-SOAP12 version 3.04
-=   Generated on Wed Dec  9 12:12:38 2015 by OODoc 2.02
+=== README for XML-Compile-SOAP12 version 3.05
+=   Generated on Wed Nov  8 10:21:54 2017 by OODoc 2.02
 
 There are various ways to install this module:
 
@@ -9,16 +9,16 @@ There are various ways to install this module:
  (2) if you use Windows, have a look at http://ppm.activestate.com/
 
  (3) if you have downloaded this module manually (as root/administrator)
-       gzip -d XML-Compile-SOAP12-3.04.tar.gz
-       tar -xf XML-Compile-SOAP12-3.04.tar
-       cd XML-Compile-SOAP12-3.04
+       gzip -d XML-Compile-SOAP12-3.05.tar.gz
+       tar -xf XML-Compile-SOAP12-3.05.tar
+       cd XML-Compile-SOAP12-3.05
        perl Makefile.PL
        make          # optional
        make test     # optional
        make install
 
 For usage, see the included manual-pages or
-    http://search.cpan.org/dist/XML-Compile-SOAP12-3.04/
+    http://search.cpan.org/dist/XML-Compile-SOAP12-3.05/
 
 Please report problems to
     http://rt.cpan.org/Dist/Display.html?Queue=XML-Compile-SOAP12

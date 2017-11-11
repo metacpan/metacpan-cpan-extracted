@@ -5,6 +5,7 @@ use warnings;
 use Test::More 0.90;
 use Test::DZil;
 use IPC::Cmd 'can_run';
+use Path::Tiny;
 
 plan skip_all => 'msgfmt not found' unless can_run 'msgfmt';
 
@@ -23,7 +24,7 @@ sub tzil {
     );
 }
 
-ok my $tzil = tzil(), 'Create tzil';;
+ok my $tzil = tzil(), 'Create tzil';
 
 ok $tzil->build, 'Build it';
 my @messages = grep { /^\Q[LocaleTextDomain]/ } @{ $tzil->log_messages };
@@ -65,9 +66,9 @@ ok $tzil->build, 'Build again';
 is $messages[0], '[LocaleTextDomain] Compiling language files in po',
     'Compiling message should have been emitted again';
 
-ok -e $tzil->tempdir->file("build/lib/LocaleData/fr/LC_MESSAGES/org.imperia.simplecal.bo"),
+ok -e path($tzil->tempdir)->child("build/lib/LocaleData/fr/LC_MESSAGES/org.imperia.simplecal.bo"),
     'Should have fr .bo file';
-ok !-e $tzil->tempdir->file("build/lib/LocaleData/de/LC_MESSAGES/org.imperia.simplecal.bo"),
+ok !-e path($tzil->tempdir)->child("build/lib/LocaleData/de/LC_MESSAGES/org.imperia.simplecal.bo"),
     'Should not have de .bo file';
 
 $i = 0;

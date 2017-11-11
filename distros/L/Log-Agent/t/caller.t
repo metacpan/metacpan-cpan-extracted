@@ -14,7 +14,7 @@
 
 print "1..10\n";
 
-require 't/code.pl';
+require './t/code.pl';
 sub ok;
 
 use Log::Agent;

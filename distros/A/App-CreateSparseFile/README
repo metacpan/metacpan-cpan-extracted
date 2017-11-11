@@ -1,4 +1,95 @@
-SYNOPSIS
+NAME
+    App::CreateSparseFile - Create sparse file
 
+VERSION
+    This document describes version 0.080 of App::CreateSparseFile (from
+    Perl distribution App-CreateSparseFile), released on 2017-11-10.
+
+SYNOPSIS
     See create-sparse-file.
+
+FUNCTIONS
+  create_sparse_file
+    Usage:
+
+     create_sparse_file(%args) -> [status, msg, result, meta]
+
+    Create sparse file.
+
+    Examples:
+
+    *   Create a sparse file called file.bin with size of 30GB:
+
+         create_sparse_file( name => "file.bin", size => "30G");
+
+    Sparse file is a file with a predefined size (sometimes large) but does
+    not yet allocate all its (blank) data on disk. Sparse file is a feature
+    of filesystem.
+
+    I usually create sparse file when I want to create a large disk image
+    but do not want to preallocate its data yet. Creating a sparse file
+    should be virtually instantaneous.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   interactive => *bool* (default: 1)
+
+        Whether or not the program should be interactive.
+
+        If set to false then will not prompt interactively and usually will
+        proceed (unless for dangerous stuffs, in which case will bail
+        immediately.
+
+    *   name* => *str*
+
+    *   overwrite => *bool* (default: 0)
+
+        Whether to overwrite existing file.
+
+        If se to true then will overwrite existing file without warning. The
+        default is to prompt, or bail (if not interactive).
+
+    *   size* => *str*
+
+        Size (e.g. 10K, 22.5M).
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-CreateSparseFile>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-CreateSparseFile>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-CreateSparseFile>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    fallocate.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2015, 2014 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

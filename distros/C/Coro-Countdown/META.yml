@@ -1,0 +1,29 @@
+---
+abstract: 'a counter that signals when it reaches 0'
+author:
+  - 'Jeff Ober <sysread@fastmail.fm>'
+build_requires:
+  Devel::Cover: '1.29'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test2: '1.302106'
+  Test2::Bundle::Extended: '0.000083'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Coro-Countdown
+requires:
+  Coro: '6.514'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/sysread/Coro-Countdown/issues
+  homepage: https://github.com/sysread/Coro-Countdown
+  repository: https://github.com/sysread/Coro-Countdown.git
+version: '0.02'
+x_serialization_backend: 'YAML::Tiny version 1.70'

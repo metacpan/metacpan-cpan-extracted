@@ -181,57 +181,66 @@ sub _html_validates_ok {
     my $got_html    = shift;
     my $is_fragment = shift;
 
-    unless ( $ENV{RELEASE_TESTING} ) {
-    SKIP: {
-            skip
-                'HTML validation tests with W3C service are only done for release testing',
-                1;
-        }
-        return;
+SKIP: {
+        skip(
+            'The WebService::Validator::HTML::W3C module is completely broken.'
+                . ' See https://rt.cpan.org/Ticket/Display.html?id=122930 for some details.',
+            1
+        );
     }
-
-    unless ( WebService::Validator::HTML::W3C->can('new') ) {
-    SKIP: {
-            skip
-                'HTML validation tests require WebService::Validator::HTML::W3C',
-                1;
-        }
-        return;
-    }
-
-    if ($is_fragment) {
-        $got_html = <<"EOF";
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Test</title>
-</head>
-<body>
-$got_html
-</body>
-</html>
-EOF
-    }
-
-    my $v = WebService::Validator::HTML::W3C->new(
-        detailed => 1,
-    );
-
-    $v->validate_markup($got_html);
-
-    is( $v->num_errors(), 0, 'no errors from W3C validator' )
-        and return;
-
-    diag($got_html);
-    diag(
-        sprintf(
-            "line %s\tcol %s\terror: %s",
-            $_->line(), $_->col(), $_->msg()
-        )
-    ) for @{ $v->errors() || [] };
-
     return;
+
+    #     unless ( $ENV{RELEASE_TESTING} ) {
+    #     SKIP: {
+    #             skip
+    #                 'HTML validation tests with W3C service are only done for release testing',
+    #                 1;
+    #         }
+    #         return;
+    #     }
+
+    #     unless ( WebService::Validator::HTML::W3C->can('new') ) {
+    #     SKIP: {
+    #             skip
+    #                 'HTML validation tests require WebService::Validator::HTML::W3C',
+    #                 1;
+    #         }
+    #         return;
+    #     }
+
+    #     if ($is_fragment) {
+    #         $got_html = <<"EOF";
+    # <!DOCTYPE html>
+    # <html lang="en">
+    # <head>
+    # <meta charset="UTF-8">
+    # <title>Test</title>
+    # </head>
+    # <body>
+    # $got_html
+    # </body>
+    # </html>
+    # EOF
+    #     }
+
+    #     my $v = WebService::Validator::HTML::W3C->new(
+    #         detailed => 1,
+    #     );
+
+    #     $v->validate_markup($got_html);
+
+    #     is( $v->num_errors(), 0, 'no errors from W3C validator' )
+    #         and return;
+
+    #     diag($got_html);
+    #     diag(
+    #         sprintf(
+    #             "line %s\tcol %s\terror: %s",
+    #             $_->line(), $_->col(), $_->msg()
+    #         )
+    #     ) for @{ $v->errors() || [] };
+
+    #     return;
 }
 
 sub _can_test_html {

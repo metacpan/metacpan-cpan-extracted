@@ -1,0 +1,43 @@
+{
+    "ConfigCascade::Test::BottleBox": {
+        "material": "Material from BottleBox",
+        "bottle": {
+            "glass_type": 2,
+            "label": {
+                "manufacturer": "manufacturer from BottleBox",
+                "logo": {
+                    "company_name": "company_name from BottleBox",
+                    "slogan": "slogan from BottleBox"
+                }
+            }
+        }
+    },
+
+    "ConfigCascade::Test::Bottle": {
+        "label": {
+            "logo": {
+                "company_name": "company_name from Bottle",
+                "slogan": "slogan from Bottle"
+            }
+        }
+    },
+
+    "ConfigCascade::Test::Label": {
+        "manufacturer": "manufacturer from Label",
+        "logo": {
+            "company_name": "company_name from Label",
+            "slogan": "slogan from Label"
+        }
+    },
+
+
+    "ConfigCascade::Test::Logo": {
+
+        "company_name": "company_name from Logo",
+        "slogan": "slogan from Logo",
+        "colors": { 
+            "colors from Logo key": "colors from Logo value"
+        }
+    }
+}
+

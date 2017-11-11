@@ -1,0 +1,7 @@
+Revision history for Perl module Win32::Shortkeys
+
+0.01 Tue Oct  3 10:45:25 2017
+    - original version; created by ExtUtils::ModuleMaker 0.56
+0.02 Package MySubs -> Win32::Shortkeys::MySubs
+
+

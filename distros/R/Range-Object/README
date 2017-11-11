@@ -1,4 +1,4 @@
-Range::Object version 0.93
+Range::Object version 0.94
 ==========================
 
 This suite of modules implements unified API for manipulating ranges of
@@ -47,7 +47,7 @@ This module requires these other modules and libraries:
 
 COPYRIGHT AND LICENSE
 
-Copyright (C) 2011 by Alexander Tokarev.
+Copyright (C) 2011-2017 by Alex Tokarev.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.6.0 or,

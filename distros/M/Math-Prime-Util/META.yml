@@ -22,43 +22,40 @@ no_index:
 provides:
   Math::Prime::Util:
     file: lib/Math/Prime/Util.pm
-    version: '0.68'
+    version: '0.69'
   Math::Prime::Util::ChaCha:
     file: lib/Math/Prime/Util/ChaCha.pm
-    version: '0.68'
+    version: '0.69'
   Math::Prime::Util::Entropy:
     file: lib/Math/Prime/Util/Entropy.pm
-    version: '0.68'
-  Math::Prime::Util::ISAAC:
-    file: lib/Math/Prime/Util/ISAAC.pm
-    version: '0.68'
+    version: '0.69'
   Math::Prime::Util::MemFree:
     file: lib/Math/Prime/Util/MemFree.pm
-    version: '0.68'
+    version: '0.69'
   Math::Prime::Util::PP:
     file: lib/Math/Prime/Util/PP.pm
-    version: '0.68'
+    version: '0.69'
   Math::Prime::Util::PrimeArray:
     file: lib/Math/Prime/Util/PrimeArray.pm
-    version: '0.68'
+    version: '0.69'
   Math::Prime::Util::PrimeIterator:
     file: lib/Math/Prime/Util/PrimeIterator.pm
-    version: '0.68'
+    version: '0.69'
   ntheory:
     file: lib/ntheory.pm
-    version: '0.68'
+    version: '0.69'
 recommends:
   Digest::SHA: '5.87'
   Math::BigInt::GMP: '0'
   Math::MPFR: '2.03'
-  Math::Prime::Util::GMP: '0.46'
+  Math::Prime::Util::GMP: '0.48'
 requires:
   Carp: '0'
   Config: '0'
   Exporter: '5.57'
   Math::BigFloat: '1.59'
   Math::BigInt: '1.88'
-  Math::Prime::Util::GMP: '0.44'
+  Math::Prime::Util::GMP: '0.48'
   Tie::Array: '0'
   XSLoader: '0.01'
   base: '0'
@@ -68,5 +65,5 @@ resources:
   homepage: https://github.com/danaj/Math-Prime-Util
   license: http://dev.perl.org/licenses/
   repository: https://github.com/danaj/Math-Prime-Util
-version: '0.68'
+version: '0.69'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

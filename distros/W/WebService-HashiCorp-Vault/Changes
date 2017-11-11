@@ -1,5 +1,14 @@
 WebService::HashiCorp::Vault - perl API for HashiCorp's Vault
 
+0.004 2017-11-08
+ - Back out changes to path, accepting the change was a mistake
+ - Correctly pass base_url through to secrets when created, see GH#1
+
+0.003 2017-11-08
+ - Allow path to be given to Generic backend secrets
+ - Typo in pod
+ - Thanks to nxadm via GH pr #1
+
 0.002 2017-04-28
  - Add cubbyhole secret
 

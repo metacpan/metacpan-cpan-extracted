@@ -2,7 +2,7 @@
 
 makepp_signatures -- How makepp knows when files have changed
 
-=for vc $Id: makepp_signatures.pod,v 1.26 2015/07/13 20:54:05 pfeiffer Exp $
+=for vc $Id: makepp_signatures.pod,v 1.27 2017/08/11 22:09:32 pfeiffer Exp $
 
 =head1 DESCRIPTION
 

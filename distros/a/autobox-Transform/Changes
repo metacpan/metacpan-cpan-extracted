@@ -1,5 +1,17 @@
 # Revision history for Perl module autobox::Transform
 
+1.031 2017-11-09T00:48:09Z
+
+  * Improved POD documentation
+
+
+1.030 2017-11-08T23:42:36Z
+
+  * Document simple case for group_by $value_sub
+
+  * New @array methods ->group, ->group_count, ->group_array
+
+
 1.029 2016-10-24T22:09:19Z
 
   * @array->to_hash, and %hash->to_array

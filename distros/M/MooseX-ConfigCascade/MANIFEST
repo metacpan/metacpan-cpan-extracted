@@ -1,0 +1,31 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/00_file.t
+t/01_conf.t
+t/02_error.t
+t/03_cascade.t
+t/04_moose.t
+t/05_parser.t
+t/data/arbitrary.conf
+t/data/bottle.json
+t/data/widget.json
+t/data/widget.yml
+t/lib/ConfigCascade/Test/Book.pm
+t/lib/ConfigCascade/Test/BottleBox.pm
+t/lib/ConfigCascade/Test/Bottle.pm
+t/lib/ConfigCascade/Test/BottleTop.pm
+t/lib/ConfigCascade/Test/Data.pm
+t/lib/ConfigCascade/Test/HasBUILD.pm
+t/lib/ConfigCascade/Test/HasRole.pm
+t/lib/ConfigCascade/Test/Label.pm
+t/lib/ConfigCascade/Test/Logo.pm
+t/lib/ConfigCascade/Test/Novel.pm
+t/lib/ConfigCascade/Test/Role.pm
+t/lib/ConfigCascade/Test/RO_Widget.pm
+t/lib/ConfigCascade/Test/RW_Widget.pm
+lib/MooseX/ConfigCascade.pm
+lib/MooseX/ConfigCascade/Util.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

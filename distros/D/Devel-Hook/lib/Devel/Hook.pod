@@ -59,9 +59,9 @@ of the array and last if they are at the end.
 Notice that the FIFO or LIFO nature of blocks
 according to their textual order of appearance
 at Perl source does not matter here.
-For example, BEGIN, UNITCHECK and INIT are
+For example, BEGIN and INIT are
 FIFO (first-in, first-out) blocks while
-CHECK and END are LIFO (last-in, first-out).
+CHECK, UNITCHECK and END are LIFO (last-in, first-out).
 But the Perl interpreter and the user of this
 module inserts blocks at the start of arrays
 if they should execute earlier and at the end
@@ -191,6 +191,8 @@ L<perlmod/"BEGIN, UNITCHECK, CHECK, INIT and END">
 
 L<Manip::END>
 
+L<B::CompilerPhase::Hook>
+
 
 =head1 BUGS
 
@@ -239,7 +241,7 @@ Adriano R. Ferreira, E<lt>ferreira@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2014 by Adriano R. Ferreira
+Copyright (C) 2008-2017 by Adriano R. Ferreira
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

@@ -23,25 +23,61 @@ Catmandu::Store::VIAF - Retrieve items from VIAF
 
 =head1 SYNOPSIS
 
-This module contains a L<store|Catmandu::Store::VIAF> to lookup a I<viaf_id> in L<VIAF|https://www.viaf.org>.
+    # From the command line
+    $ catmandu export VIAF --id 102333412 to YAML
+    ---
+    dcterms:identifier: '102333412'
+    guid: http://viaf.org/viaf/102333412
+    schema:birthDate: 1775-12-16
+    schema:deathDate: 1817-07-18
+    schema:description: English novelist
+    skos:prefLabel: Jane Austen
+    ...
 
-  lookup_in_store(authortName, VIAF, lang:'nl-NL', fallback_lang:'en-US')
+    # From a Catmandu Fix
+    lookup_in_store(
+        objectName,    # objectName is a field containing the VIAF identifier
+        VIAF
+    )
+
+    # From Perl code
+    use Catmandu;
+
+    my $store = Catmandu->store('VIAF')->bag;
+
+    my $item = $store->get('102333412');
+
+    print $item->{'skos:prefLabel'} , "\n";  # Jane Austen
 
 =head1 DESCRIPTION
 
-  lookup_in_store(
-    authorName,
-    AAT,
-    lang: 'nl-NL',
-    fallback_lang: 'en-US'
-  )
+A Catmandu::Store::VIAF is a Perl package that can query the <VIAF|http://viaf.org/>
+authority file.
+
+This store supports only one method C<get> to retrieve an AAT record by its identifier
+
+=head1 CONFIGURATION
+
+=head2 lang
 
 The C<lang> parameter is optional and defaults to I<nl-NL>. It sets
 the language of the returned I<prefLabel>. If no I<prefLabel> for the
 I<viaf_id> in provided I<lang> exists, the I<prefLabel> for the
 I<fallback_lang> is used.
 
-The store takes the C<dc:identifier> of a I<Person> from VIAF and returns the following data:
+=head2 fallback_lang
+
+Optional. Default I<en-US>.
+
+=head1 METHODS
+
+=head2 new(%configuration)
+
+Create a new Catmandu::Store::VIAF
+
+=head2 get($id)
+
+Retrieve a VIAF record given an identifier. Returns a record like:
 
   {
     'dcterms:identifier' => 'The identifier',
@@ -52,22 +88,17 @@ The store takes the C<dc:identifier> of a I<Person> from VIAF and returns the fo
     'skos:prefLabel'     => 'prefLabel, in lang or fallback_lang'
   }
 
-=head2 PARAMETERS
+=head2 add()
 
-=head3 Optional parameters
+Not supported
 
-=over
+=head2 delete()
 
-=item C<lang>
+Not supported
 
-Language of the returned C<skos:prefLabel>. Falls back to
-C<fallback_lang> if none was found. Use L<IETF language tags|https://en.wikipedia.org/wiki/IETF_language_tag>.
+=head2 each()
 
-=item C<fallback_lang>
-
-Fallback language.
-
-=back
+Not supported
 
 =head1 AUTHOR
 

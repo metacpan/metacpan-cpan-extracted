@@ -21,13 +21,13 @@ name: Importer-Zim-Base
 provides:
   Importer::Zim::Base:
     file: lib/Importer/Zim/Base.pm
-    version: v0.10.0
+    version: v0.12.0
   Importer::Zim::Bogus:
     file: lib/Importer/Zim/Bogus.pm
-    version: v0.10.0
+    version: v0.12.0
   Importer::Zim::Utils:
     file: lib/Importer/Zim/Utils.pm
-    version: v0.10.0
+    version: v0.12.0
 requires:
   Carp: '0'
   Module::Runtime: '0'
@@ -37,5 +37,5 @@ resources:
   bugtracker: https://github.com/aferreira/cpan-Importer-Zim-Base/issues
   homepage: https://github.com/aferreira/cpan-Importer-Zim-Base
   repository: https://github.com/aferreira/cpan-Importer-Zim-Base.git
-version: 0.10.0
+version: 0.12.0
 x_serialization_backend: 'YAML::Tiny version 1.70'

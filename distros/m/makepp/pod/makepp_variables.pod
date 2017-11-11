@@ -2,7 +2,7 @@
 
 makepp_variables -- How to use variables in makepp
 
-=for vc $Id: makepp_variables.pod,v 1.56 2015/07/13 20:54:05 pfeiffer Exp $
+=for vc $Id: makepp_variables.pod,v 1.58 2017/11/08 22:07:58 pfeiffer Exp $
 
 =head1 DESCRIPTION
 
@@ -10,7 +10,7 @@ makepp_variables -- How to use variables in makepp
 
 B<?:>E<nbsp>L<$*|/stem>,
   L<$+|/sorted_dependencies>,
-  L<$/|/__>,
+  L<$E<sol>|/__>,
   L<$E<lt>|/dependency>,
   L<$?|/changed_dependencies>,
   L<$@|/output>,
@@ -755,7 +755,7 @@ that makepp supports.  For example,
 See the documentation on L<the foreach clause in
 rules|makepp_rules/Foreach rules> for more details and examples.
 
-=item $/ X<slashconst>
+=item $E<sol>
 
 This is essentially a constant, either C</>, or on native Windows C<\>.  You
 need it, if you want to start a program portably, e.g. one you built in the

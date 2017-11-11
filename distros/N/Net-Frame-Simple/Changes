@@ -1,5 +1,12 @@
 Revision history for Perl extension Net::Frame::Simple.
 
+1.09 Thu  9 Nov 18:07:44 CET 2017
+   - feature: $NoUnableToUnpackWarnings global variable to disable printing a message 
+              when unpack() doesn't know how to unpack the next layer, and 
+              $NoModuleNotFoundWarnings does the same when not able to load a module 
+              for a next layer. See SYNOPSIS for usage.
+              See original request on CPAN RT#123570.
+
 1.08 Sun  7 May 14:23:24 CEST 2017
    - bugfix: correctly computeLengths() when encapsulating IP within IP
    - update: copyright notice

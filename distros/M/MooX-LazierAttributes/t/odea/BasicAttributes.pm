@@ -7,7 +7,7 @@ attributes (
     one      => [ 10 ],    
     two      => [ ro, [qw/one two three/] ],    
     three    => [ 'ro', { one => 'two' } ],    
-    four     => [ 'ro', 'a default value' ],
+	four     => [ 'ro', 'a default value' ],
     five     => [ 'ro', bless {}, 'Thing' ],
     six      => [ 'ro', 0 ],
     seven    => [ 'ro', undef ],

@@ -20,6 +20,7 @@ $modules{$_} = $_ for qw(
   IPC::System::Simple
   Moose
   Path::Tiny
+  Perl::Tidy
   Sub::Exporter::ForMethods
   Test2::V0
   autodie

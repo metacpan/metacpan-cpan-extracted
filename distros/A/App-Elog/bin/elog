@@ -1,4 +1,5 @@
 #!/usr/bin/perl
+
 use strict;
 use warnings;
 use Cwd ();
@@ -89,10 +90,12 @@ sub show_graph {
         }
     }
     $count = 0;
+    my $entryp;
     for my $entry (@entries) {
         $count++;
         $entry->{count} = $count;
-        show_graph_entry($entry, $max);
+        show_graph_entry($entry, $entryp, $max);
+        $entryp = $entry;
     }
 }
 
@@ -102,13 +105,13 @@ sub add_error_to_graph {
     my $entry = $entries->[-1];
     if (!$entry) {
         $entry = {};
-        $entry->{start} = graph_start($e->{date});
+        $entry->{start} = $e->{date};
         push @$entries, $entry;
     }
-    elsif ($e->{date} < $entry->{start}) {
+    if ($e->{date} < $entry->{start}) {
         while (1) {
             my $entry2 = {};
-            $entry2->{start} = $entry->{start} - $opts{period};
+            $entry2->{start} = $entry->{start} - $opts{interval};
             $entry = $entry2;
             push @$entries, $entry;
             if ($e->{date} >= $entry->{start}) {
@@ -120,7 +123,7 @@ sub add_error_to_graph {
 }
 
 sub show_graph_entry {
-    my ($entry, $max) = @_;
+    my ($entry, $entryp, $max) = @_;
     my ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst) = localtime($entry->{start});
     $mon += 1;
     my $hour2;
@@ -133,18 +136,31 @@ sub show_graph_entry {
     else {
         $hour2 = $hour;
     }
-    if ($opts{interval} eq "daily") {
+    my $offset = 16;
+    $entry->{monday} = "$mon/$mday";
+    if ($opts{interval} >= 24 * 60 * 60) {
         printf "%-5s: ", "$mon/$mday";
     }
-    elsif ($hour == 0 || $entry->{count} == 1) {
-        printf "%-5s %2d: ", "$mon/$mday", $hour2;
+    elsif ($opts{interval} >= 60 * 60) {
+        if (!$entryp || $entryp->{monday} ne $entry->{monday}) {
+            printf "%-5s %2d: ", "$mon/$mday", $hour2;
+        }
+        else {
+            printf "      %2d: ", $hour2;
+        }
     }
     else {
-        printf "      %2d: ", $hour2;
+        $offset += 3;
+        if (!$entryp || $entryp->{monday} ne $entry->{monday}) {
+            printf "%-5s %2d:%02d: ", "$mon/$mday", $hour2, $min;
+        }
+        else {
+            printf "      %2d:%02d: ", $hour2, $min;
+        }
     }
     my $bar = "";
     if ($entry->{total}) {
-        my $size = int(($entry->{total} / $max) * ($columns - 16));
+        my $size = int(($entry->{total} / $max) * ($columns - $offset));
         $bar = "#" x $size;
         if ($size) {
             $bar .= " ";
@@ -152,16 +168,6 @@ sub show_graph_entry {
         $bar .= $entry->{total};
     }
     print "$bar\n";
-}
-
-sub graph_start {
-    my ($date) = @_;
-    my ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst) = localtime($date);
-    if ($opts{interval} eq "daily") {
-        $hour = 0;
-    }
-    my $start = POSIX::mktime(0, 0, $hour, $mday, $mon, $year, -1, -1, -1);
-    return $start;
 }
 
 sub myglob {
@@ -550,7 +556,7 @@ sub show_log_info {
         }
     }
     my $name = $log->{name};
-    my $line = sprintf "%s %-33s %-15s %s", $selected, $name, "$size$rinfo", $updated;
+    my $line = sprintf "%s %-33s %-16s %s", $selected, $name, "$size$rinfo", $updated;
     print "$line\n";
 }
 
@@ -588,7 +594,7 @@ sub show_log_info_verbose {
     my $docroot2 = "";
     if ($log->{vhost} && $log->{vhost}{docroot}) {
         $docroot = $log->{vhost}{docroot};
-        $docroot2 = Cwd::abs_path($docroot);
+        $docroot2 = $log->{vhost}{docroot2};
     }
     print "$selected$log->{name}\n";
     print "    file $log->{file}\n";
@@ -634,11 +640,9 @@ sub select_log {
         return;
     }
     select_log_by_cwd();
-    if (!$selected_log && $opts{default}) {
-        select_log_by_name($opts{default});
-    }
     if (!$selected_log && @logs) {
-        $selected_log = $logs[0];
+        my @logs2 = sort bybegcmp @logs;
+        $selected_log = $logs2[0];
         $selected_log->{selected} = 1;
         return;
     }
@@ -700,6 +704,27 @@ sub get_logs {
     if (-e "/usr/local/apache/logs/error_log") {
         add_log("/usr/local/apache/logs/error_log");
     }
+    for my $log (@logs) {
+        my $docroot = "";
+        if ($log->{vhost} && $log->{vhost}{docroot2}) {
+            $docroot = $log->{vhost}{docroot2};
+        }
+        $log->{begcmp} = begcmp($ENV{PWD}, $docroot);
+    }
+    @logs = sort byname @logs;
+}
+
+sub begcmp {
+    my ($a, $b) = @_;
+    my $count = 0;
+    my $min = length($a) < length($b) ? length($a) : length($b);
+    my $i = 0;
+    for ($i = 0; $i < $min; $i++) {
+        if (substr($a, $i, 1) ne substr($b, $i, 1)) {
+            return $i;
+        }
+    }
+    return $i;
 }
 
 sub get_logs_from_apache_conf {
@@ -708,7 +733,7 @@ sub get_logs_from_apache_conf {
     my $host = {};
     my $vhost = $host;
     my %vhosts;
-    for my $file (@files) {
+    for my $file (sort @files) {
         chomp $file;
         next if $file =~ /\bavailable\b/;
         open my $fh, $file or next;
@@ -735,6 +760,7 @@ sub get_logs_from_apache_conf {
             }
             elsif ($line =~ /^\s*DocumentRoot\s+(.+)/ims) {
                 $vhost->{docroot} = unquote($1);
+                $vhost->{docroot2} = Cwd::abs_path($vhost->{docroot});
             }
             elsif ($line =~ /^\s*ServerRoot\s+(\S+)/ims) {
                 $vhost->{servroot} = unquote($1);
@@ -751,7 +777,7 @@ sub get_logs_from_apache_conf {
         close $fh;
     }
     my %logs;
-    for my $log (sort byfile @logs_all) {
+    for my $log (@logs_all) {
         if ($log && $log->{vhost}) {
             if ($log->{vhost}{invalid}) {
                 next;
@@ -774,7 +800,11 @@ sub env_replace {
     $log->{file} =~ s/\$\{(\w+)\}/$ENV{$1}/ge;
 }
 
-sub byfile {
+sub bybegcmp {
+    return $b->{begcmp} <=> $a->{begcmp} || $a->{name} cmp $b->{name};
+}
+
+sub byname {
     return $a->{name} cmp $b->{name};
 }
 
@@ -830,22 +860,20 @@ sub get_opts {
         elsif ($arg =~ /^-a(\d*)$/) {
             $opts{last} = $1;
         }
-        elsif ($arg =~ /^-d(=(.*))?$/) {
-            $opts{default} = $1 ? $2 : shift(@ARGV);
-        }
         elsif ($arg =~ /^-f$/) {
             $opts{action} = "tailf";
         }
-        elsif ($arg =~ /^-g([dh]?)$/) {
+        elsif ($arg =~ /^-g(\d+|[dh]|)$/) {
             $opts{action} = "graph";
             my $interval = $1 || "";
             if ($interval eq "d") {
-                $opts{interval} = "daily";
-                $opts{period} = 24 * 60 * 60;
+                $opts{interval} = 24 * 60 * 60;
+            }
+            elsif ($interval eq "h" || !$interval) {
+                $opts{interval} = 60 * 60;
             }
             else {
-                $opts{interval} = "hourly";
-                $opts{period} = 60 * 60;
+                $opts{interval} = $interval;
             }
         }
         elsif ($arg =~ /^(--?help|-h|-\?)$/) {
@@ -885,7 +913,6 @@ sub usage {
 Usage: elog [<options>] [<name>]
 
 -a[<n>]    show last n errors on own line, info preceeding
--d=<file>  default log when one isn't found for cwd
 -f         tail -f the log
 -g         graph errors at hourly intervals
 -gd        graph errors at daily intervals
@@ -919,7 +946,6 @@ elog - An Apache error log viewer
 =head1 OPTIONS
 
     -a[<n>]    show last n errors on own line, info preceeding
-    -d=<file>  default log when one isn't found for cwd
     -f         tail -f the log
     -g         graph errors at hourly intervals
     -gd        graph errors at daily intervals
@@ -979,11 +1005,9 @@ with extra info such as date and ip address on a line beforehand.
 When multiple lines of the error log relate to the same error, they
 are grouped.
 
-The -g option will show a graph of the number of errors in an hourly
-interval.
+The -g option will show a graph of the number of errors in hourly intervals.
 
-The -gd option will show a graph of the number of errors in a daily
-interval.
+The -gd option will show a graph of the number of errors in daily intervals.
 
 =head1 METACPAN
 

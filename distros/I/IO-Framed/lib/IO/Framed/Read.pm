@@ -28,6 +28,12 @@ sub get_read_fh { return $_[0]->{'_in_fh'} }
 #----------------------------------------------------------------------
 # IO subclass interface
 
+sub allow_empty_read {
+    my ($self) = @_;
+    $self->{'_ALLOW_EMPTY_READ'} = 1;
+    return $self;
+}
+
 my $buf_len;
 
 #We assume here that whatever read may be incomplete at first
@@ -60,6 +66,9 @@ sub read {
                 if ( !$!{'EAGAIN'} && !$!{'EWOULDBLOCK'}) {
                     die IO::Framed::X->create( 'ReadError', $! );
                 }
+            }
+            elsif ($self->{'_ALLOW_EMPTY_READ'}) {
+                return q<>;
             }
             else {
                 die IO::Framed::X->create('EmptyRead');

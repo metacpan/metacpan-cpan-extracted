@@ -8,7 +8,7 @@
 //                                               
 // Design and Implementation by Bjoern Lemke               
 //                                                         
-// (C)opyright 2007-2013 by Bjoern Lemke                        
+// (C)opyright 2007-2017 by Bjoern Lemke                        
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -23,8 +23,7 @@
 
 #include "CegoXS.h"
 
-#define NETMSG_BUFLEN 8192
-#define NETMSG_SIZEBUFLEN 10 
+#define NETMSG_MAXSENDLEN 8192
 
 DBISTATE_DECLARE;
 
@@ -63,7 +62,8 @@ cego_db_login(SV *dbh, imp_dbh_t *imp_dbh, char *dbname, char *user, char *pass)
 
     Chain serverName( imp_dbh->hostname );
     int portNo = imp_dbh->port;
-
+    int maxsendlen = imp_dbh->maxsendlen == 0 ? NETMSG_MAXSENDLEN : imp_dbh->maxsendlen;
+    
     imp_dbh->activeTransaction = FALSE;
     imp_dbh->activeQuery = FALSE;
     imp_dbh->in_tran = FALSE;
@@ -92,7 +92,7 @@ cego_db_login(SV *dbh, imp_dbh_t *imp_dbh, char *dbname, char *user, char *pass)
     
     try
     {
-	imp_dbh->cgnet->connect(serverName, portNo, tableSet, dbUser, dbPWD);
+	imp_dbh->cgnet->connect(serverName, portNo, tableSet, dbUser, dbPWD, maxsendlen);
     }
     catch ( Exception e )
     {
@@ -746,6 +746,11 @@ cego_db_STORE_attrib (SV *dbh, imp_dbh_t *imp_dbh, SV *keysv, SV *valuesv)
     if (strncmp(key, "port", 4) == 0) 
     {
         imp_dbh->port = atoi(val);
+	return TRUE;
+    }        
+    if (strncmp(key, "maxsendlen", 10) == 0) 
+    {
+        imp_dbh->maxsendlen = atoi(val);
 	return TRUE;
     }        
     return FALSE;

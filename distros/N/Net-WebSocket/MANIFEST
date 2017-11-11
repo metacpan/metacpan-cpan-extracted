@@ -4,6 +4,7 @@ Changes
 LICENSE
 MANIFEST
 Makefile.PL
+README.pod
 demo/123_server.pl
 demo/echo_server.pl
 demo/lib/NWDemo.pm

@@ -4,6 +4,8 @@ author:
   - 'Olli-Antti Kivilahti <olli-antti.kivilahti@jns.fi>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Test::Exception: '0.38'
+  Test::MockModule: '0.11'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -27,14 +29,13 @@ requires:
   LWP::UserAgent: '6.15'
   Log::Log4perl: '1.49'
   MIME::Base64: '3.15'
+  Modern::Perl: '1.20161005'
   Params::Validate: '1.22'
-  Test::Exception: '0.38'
-  Test::MockModule: '0.11'
   Try::Tiny: '0.24'
   perl: '5.020000'
 resources:
   bugtracker: https://github.com/KohaSuomi/Pootle-Client/issues
   homepage: https://github.com/KohaSuomi/Pootle-Client/
   repository: https://github.com/KohaSuomi/Pootle-Client.git
-version: '0.07'
+version: '0.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

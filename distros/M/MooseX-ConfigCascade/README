@@ -1,0 +1,40 @@
+MooseX-ConfigCascade version 0.02
+=================================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Moose
+    MooseX::ClassAttribute
+    Carp
+    Module::Runtime
+    Moose::Role
+    YAML
+    JSON
+
+The following modules are also required for testing:
+
+    Test::More
+    File::Spec
+    Cwd
+    Try::Tiny
+    Carp
+
+COPYRIGHT AND LICENCE
+
+
+Copyright (C) 2017 by Tom Gracey
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

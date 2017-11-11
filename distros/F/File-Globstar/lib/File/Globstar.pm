@@ -7,8 +7,8 @@
 # This next lines is here to make Dist::Zilla happy.
 # ABSTRACT: Perl Globstar (double asterisk globbing) and utils
 
-package File::Globstar 0.2;
-
+package File::Globstar;
+$File::Globstar::VERSION = '0.3';
 use strict;
 
 use Locale::TextDomain qw(File-Globstar);

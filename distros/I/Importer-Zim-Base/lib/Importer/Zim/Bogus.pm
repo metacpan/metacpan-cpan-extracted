@@ -1,28 +1,33 @@
 
 package Importer::Zim::Bogus;
-$Importer::Zim::Bogus::VERSION = '0.10.0';
+$Importer::Zim::Bogus::VERSION = '0.12.0';
 # ABSTRACT: Bogus Importer::Zim backend
 
 use 5.010001;
 
-use Importer::Zim::Base;
-BEGIN { our @ISA = qw(Importer::Zim::Base); }
-
 use Importer::Zim::Utils qw(DEBUG carp);
 
 sub import {
-    my $class = shift;
+    require Importer::Zim::Base;
+    goto &Importer::Zim::Base::import_into;
+}
+
+sub export_to {
+    my $t = shift;
+    @_ = %{ $_[0] } if @_ == 1 && ref $_[0] eq 'HASH';
+    @_ = map { $_ & 1 ? $_[$_] : "${t}::$_[$_]" } 0 .. $#_;
+    goto &_export_to;
+}
+
+sub _export_to {
+    my %imports = @_;
 
     carp
       qq{WARNING! Using bogus Importer::Zim backend (you may need to install a proper backend)};
 
-    carp "$class->import(@_)" if DEBUG;
-    my @exports = $class->_prepare_args(@_);
-
-    my $caller = caller;
     no strict 'refs';
-    for (@exports) {
-        *{"${caller}::$_->{export}"} = $_->{code};
+    for ( keys %imports ) {
+        *$_ = $imports{$_};
     }
 }
 
@@ -83,7 +88,7 @@ Importer::Zim::Bogus - Bogus Importer::Zim backend
 
 =head1 VERSION
 
-version 0.10.0
+version 0.12.0
 
 =head1 SYNOPSIS
 

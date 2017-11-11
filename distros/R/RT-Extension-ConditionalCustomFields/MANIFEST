@@ -1,7 +1,6 @@
 Changes
 html/Callbacks/RT-Extension-ConditionalCustomFields/Admin/CustomFields/Modify.html/BeforeEnabled
 html/Callbacks/RT-Extension-ConditionalCustomFields/Admin/CustomFields/Modify.html/Massage
-html/Callbacks/RT-Extension-ConditionalCustomFields/Admin/Groups/Modify.html/AfterCustomFieldValue
 html/Callbacks/RT-Extension-ConditionalCustomFields/Admin/Queues/Modify.html/AfterCustomFieldValue
 html/Callbacks/RT-Extension-ConditionalCustomFields/Articles/Article/Elements/EditCustomFields/AfterCustomFieldValue
 html/Callbacks/RT-Extension-ConditionalCustomFields/Elements/EditCustomFields/AfterCustomFieldValue
@@ -33,7 +32,8 @@ Makefile.PL
 MANIFEST			This list of files
 META.yml
 patches/4.2-add-callbacksto-extend-customfields-capabilities.patch
-patches/4.4-add-callbacks-to-extend-customfields-capabilities.patch
+patches/4.4.1-add-callbacks-to-extend-customfields-capabilities.patch
+patches/4.4.2-add-callbacks-to-extend-customfields-capabilities.patch
 README
 README.md
 xt/00-load.t

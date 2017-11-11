@@ -43,8 +43,8 @@ in WSDL1.1 style.
   endpoints    XML::Compile::SOAP::Operation  []
   fault_def                                   <undef>
   input_def                                   <undef>
-  kin          XML::Compile::SOAP::Operation  <required>
-  nam          XML::Compile::SOAP::Operation  <required>
+  kind         XML::Compile::SOAP::Operation  <required>
+  name         XML::Compile::SOAP::Operation  <required>
   output_def                                  <undef>
   schemas      XML::Compile::SOAP::Operation  <required>
   server_type  XML::Compile::SOAP::Operation  undef
@@ -61,9 +61,9 @@ in WSDL1.1 style.
 
 =item input_def => HASH
 
-=item kin => d
+=item kind => 'one-way'|...
 
-=item nam => e
+=item name => STRING
 
 =item output_def => HASH
 
@@ -267,26 +267,8 @@ Inherited, see L<XML::Compile::SOAP::Operation/"Helpers">
 
 =head1 SEE ALSO
 
-This module is part of XML-Compile-SOAP12 distribution version 3.04,
-built on December 09, 2015. Website: F<http://perl.overmeer.net/xml-compile/>
-
-Other distributions in this suite:
-L<XML::Compile>,
-L<XML::Compile::SOAP>,
-L<XML::Compile::WSDL11>,
-L<XML::Compile::SOAP12>,
-L<XML::Compile::SOAP::Daemon>,
-L<XML::Compile::SOAP::WSA>,
-L<XML::Compile::C14N>,
-L<XML::Compile::WSS>,
-L<XML::Compile::WSS::Signature>,
-L<XML::Compile::Tester>,
-L<XML::Compile::Cache>,
-L<XML::Compile::Dumper>,
-L<XML::Compile::RPC>,
-L<XML::Rewrite>
-and
-L<XML::LibXML::Simple>.
+This module is part of XML-Compile-SOAP12 distribution version 3.05,
+built on November 08, 2017. Website: F<http://perl.overmeer.net/xml-compile/>
 
 Please post questions or ideas to the mailinglist at
 F<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/xml-compile> .
@@ -295,9 +277,9 @@ on C<irc.perl.org>.
 
 =head1 LICENSE
 
-Copyrights 2009-2015 by [Mark Overmeer]. For other contributors see ChangeLog.
+Copyrights 2009-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-See F<http://www.perl.com/perl/misc/Artistic.html>
+See F<http://dev.perl.org/licenses/>
 

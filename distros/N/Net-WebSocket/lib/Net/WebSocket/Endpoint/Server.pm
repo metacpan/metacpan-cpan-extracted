@@ -72,7 +72,7 @@ Instantiate the class. Nothing is actually done here. Options are:
 =item * C<parser> (required) - An instance of L<Net::WebSocket::Parser>.
 
 =item * C<out> (required) - The endpoint’s output object. An
-instance of L<IO::Framed::Write> or a compatible class.
+instance of L<IO::Framed> or a compatible class.
 
 =item * C<max_pings> (optional) - The maximum # of pings to send before
 we send a C<close> frame (which ends the session).

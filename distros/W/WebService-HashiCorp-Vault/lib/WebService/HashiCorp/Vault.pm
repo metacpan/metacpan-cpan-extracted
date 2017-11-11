@@ -9,7 +9,7 @@
 package WebService::HashiCorp::Vault;
 
 use Moo;
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 extends 'WebService::HashiCorp::Vault::Base';
 use namespace::clean;
@@ -48,8 +48,10 @@ use WebService::HashiCorp::Vault::Sys;
 sub secret {
     my $self = shift;
     my %args = @_;
-    $args{token}   = $self->token();
-    $args{version} = $self->version();
+    $args{token}    = $self->token();
+    $args{version}  = $self->version();
+    $args{base_url} = $self->base_url();
+
     $args{backend} ||= 'generic';
     die sprintf( "Unknown backend type: %s\n", $args{backend} )
         unless $backendmap{ lc($args{backend}) };
@@ -64,9 +66,11 @@ sub secret {
 sub sys {
     my $self = shift;
     my %args = @_;
-    $args{mount} ||= 'sys';
-    $args{token} = $self->token();
-    $args{version} = $self->version();
+    $args{mount}    ||= 'sys';
+    $args{token}    = $self->token();
+    $args{version}  = $self->version();
+    $args{base_url} = $self->base_url();
+
     return WebService::HashiCorp::Vault::Sys->new( %args );
 }
 
@@ -85,7 +89,7 @@ WebService::HashiCorp::Vault - Perl API for HashiCorp's Vault
 
 =head1 VERSION
 
-version 0.002
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -94,8 +98,7 @@ version 0.002
  my $vault = WebService::HashiCorp::Vault->new(
      token    => 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
      base_url => 'http://127.0.0.1:8200', # optional, default shown
-     verson   => 'v1', # optional, for future use if api changes
-
+     version  => 'v1', # optional, for future use if api changes
  );
 
  my $secret = $vault->secret();
@@ -122,8 +125,9 @@ Unfortunatly the "official" API's for other languages aren't much to go on. They
 =head2 secret
 
  my $secret = $vault->secret(
-     mount   => 'secret', # optional if mounted non-default
+     mount   => 'secret',  # optional if mounted non-default
      backend => 'Generic', # or MySQL, or SSH, or whatever
+     %other_args,          # other, backend specific arguments
  );
 
 B<Parameters>
@@ -159,6 +163,10 @@ Here are the currently supported options:
 =item L<SSH|WebService::HashiCorp::Vault::Secret::SSH>
 
 =back
+
+=item other arguments
+
+See the documentation for the backend in question. Everything will pass through to the backend's constructor.
 
 =back
 

@@ -238,8 +238,8 @@ sub DDC::Any::CQTokSetInfl::__dcvs_compile {
   my ($cq,$vq,%opts) = @_;
   $vq->logwarn("ignoring non-trivial expansion chain in ", ref($cq), " expression (", $cq->toString, ")")
     if (@{$cq->getExpanders//[]});
-  return DDC::Any::Object::__dcvs_compile($vq,@_) if (ref($cq) !~ /^DDC::\w+::CQTokSetInfl$/);
-  return $cq->DDC::Any::CQTokSet::__dcvs_compile($vq,@_);
+  return DDC::Any::Object::__dcvs_compile(@_) if (ref($cq) !~ /^DDC::\w+::CQTokSetInfl$/);
+  return $cq->DDC::Any::CQTokSet::__dcvs_compile($vq,%opts);
 }
 
 
@@ -248,7 +248,7 @@ sub DDC::Any::CQTokSetInfl::__dcvs_compile {
 ##  + should set $vq->{ti}
 sub DDC::Any::CQTokRegex::__dcvs_compile {
   my ($cq,$vq,%opts) = @_;
-  return DDC::Any::Object::__dcvs_compile($vq,@_) if (ref($cq) !~ /^DDC::Any::CQTokRegex$/);
+  return DDC::Any::Object::__dcvs_compile(@_) if (ref($cq) !~ /^DDC::\w+::CQTokRegex$/);
   return $cq->__dcvs_compile_re($vq,$cq->getValue,%opts);
 }
 
@@ -257,7 +257,7 @@ sub DDC::Any::CQTokRegex::__dcvs_compile {
 ##  + should set $vq->{ti}
 sub DDC::Any::CQTokPrefix::__dcvs_compile {
   my ($cq,$vq,%opts) = @_;
-  return DDC::Any::Object::__dcvs_compile($vq,@_) if (ref($cq) !~ /^DDC::Any::CQTokPrefix$/);
+  return DDC::Any::Object::__dcvs_compile(@_) if (ref($cq) !~ /^DDC::\w+::CQTokPrefix$/);
   return $cq->__dcvs_compile_re($vq,('^'.quotemeta($cq->getValue)),%opts);
 }
 
@@ -266,7 +266,7 @@ sub DDC::Any::CQTokPrefix::__dcvs_compile {
 ##  + should set $vq->{ti}
 sub DDC::Any::CQTokSuffix::__dcvs_compile {
   my ($cq,$vq,%opts) = @_;
-  return DDC::Any::Object::__dcvs_compile($vq,@_) if (ref($cq) !~ /^DDC::\w+::CQTokSuffix$/);
+  return DDC::Any::Object::__dcvs_compile(@_) if (ref($cq) !~ /^DDC::\w+::CQTokSuffix$/);
   return $cq->__dcvs_compile_re($vq,(quotemeta($cq->getValue).'$'),%opts);
 }
 
@@ -275,7 +275,7 @@ sub DDC::Any::CQTokSuffix::__dcvs_compile {
 ##  + should set $vq->{ti}
 sub DDC::Any::CQTokInfix::__dcvs_compile {
   my ($cq,$vq,%opts) = @_;
-  return DDC::Any::Object::__dcvs_compile($vq,@_) if (ref($cq) !~ /^DDC::\w+::CQTokInfix$/);
+  return DDC::Any::Object::__dcvs_compile(@_) if (ref($cq) !~ /^DDC::\w+::CQTokInfix$/);
   return $cq->__dcvs_compile_re($vq,quotemeta($cq->getValue),%opts);
 }
 
@@ -284,7 +284,7 @@ sub DDC::Any::CQTokInfix::__dcvs_compile {
 ##  + should set $vq->{ti}
 sub DDC::Any::CQTokPrefixSet::__dcvs_compile {
   my ($cq,$vq,%opts) = @_;
-  return DDC::Any::Object::__dcvs_compile($vq,@_) if (ref($cq) !~ /^DDC::\w+::CQTokPrefixSet$/);
+  return DDC::Any::Object::__dcvs_compile(@_) if (ref($cq) !~ /^DDC::\w+::CQTokPrefixSet$/);
   return $cq->__dcvs_compile_re($vq, ('^(?:'.join('|', map {quotemeta($_)} @{$cq->getValues}).')'), %opts);
 }
 
@@ -293,7 +293,7 @@ sub DDC::Any::CQTokPrefixSet::__dcvs_compile {
 ##  + should set $vq->{ti}
 sub DDC::Any::CQTokSuffixSet::__dcvs_compile {
   my ($cq,$vq,%opts) = @_;
-  return DDC::Any::Object::__dcvs_compile($vq,@_) if (ref($cq) !~ /^DDC::\w+::CQTokSuffixSet$/);
+  return DDC::Any::Object::__dcvs_compile(@_) if (ref($cq) !~ /^DDC::\w+::CQTokSuffixSet$/);
   return $cq->__dcvs_compile_re($vq, ('(?:'.join('|', map {quotemeta($_)} @{$cq->getValues}).')$'), %opts);
 }
 
@@ -302,7 +302,7 @@ sub DDC::Any::CQTokSuffixSet::__dcvs_compile {
 ##  + should set $vq->{ti}
 sub DDC::Any::CQTokInfixSet::__dcvs_compile {
   my ($cq,$vq,%opts) = @_;
-  return DDC::Any::Object::__dcvs_compile($vq,@_) if (ref($cq) !~ /^DDC::\w+::CQTokInfixSet$/);
+  return DDC::Any::Object::__dcvs_compile(@_) if (ref($cq) !~ /^DDC::\w+::CQTokInfixSet$/);
   return $cq->__dcvs_compile_re($vq, ('(?:'.join('|', map {quotemeta($_)} @{$cq->getValues}).')'), %opts);
 }
 
@@ -311,7 +311,7 @@ sub DDC::Any::CQTokInfixSet::__dcvs_compile {
 ##  + should set $vq->{ti}
 sub DDC::Any::CQTokLemma::__dcvs_compile {
   my ($cq,$vq,%opts) = @_;
-  return DDC::Any::Object::__dcvs_compile($vq,@_) if (ref($cq) !~ /^DDC::\w+::CQTokLemma$/);
+  return DDC::Any::Object::__dcvs_compile(@_) if (ref($cq) !~ /^DDC::\w+::CQTokLemma$/);
   return DDC::Any::CQTokExact::__dcvs_compile(@_);
 }
 
@@ -352,7 +352,7 @@ sub DDC::Any::CQBinOp::__dcvs_compile_dtrs {
 ##  + should set $vq->{ti} (term-intersection only)
 sub DDC::Any::CQWith::__dcvs_compile {
   my ($cq,$vq,%opts) = @_;
-  return DDC::Any::Object::__dcvs_compile($vq,@_) if (ref($cq) !~ /^DDC::\w+::CQWith$/);
+  return DDC::Any::Object::__dcvs_compile(@_) if (ref($cq) !~ /^DDC::\w+::CQWith$/);
   my ($vq1,$vq2) = $cq->__dcvs_compile_dtrs($vq,%opts);
   $vq->{ti} = DiaColloDB::Utils::_intersect_p($vq1->{ti},$vq2->{ti});
   return DDC::Any::CQToken::__dcvs_compile_neg($cq,$vq,%opts);
@@ -363,7 +363,7 @@ sub DDC::Any::CQWith::__dcvs_compile {
 ##  + should set $vq->{ti} (term-difference only)
 sub DDC::Any::CQWithout::__dcvs_compile {
   my ($cq,$vq,%opts) = @_;
-  return DDC::Any::Object::__dcvs_compile($vq,@_) if (ref($cq) !~ /^DDC::\w+::CQWithout$/);
+  return DDC::Any::Object::__dcvs_compile(@_) if (ref($cq) !~ /^DDC::\w+::CQWithout$/);
   my ($vq1,$vq2) = $cq->__dcvs_compile_dtrs($vq,%opts);
   $vq->{ti} = DiaColloDB::Utils::_setdiff_p($vq1->{ti},$vq2->{ti},$opts{tdf}->nTerms);
   return DDC::Any::CQToken::__dcvs_compile_neg($cq,$vq,%opts);
@@ -376,7 +376,7 @@ sub DDC::Any::CQWithout::__dcvs_compile {
 ##    - requires generalizing Query.pm to allow explicit frequencies (full tdm?) -- LATER!
 sub DDC::Any::CQAnd::__dcvs_compile {
   my ($cq,$vq,%opts) = @_;
-  return DDC::Any::Object::__dcvs_compile($vq,@_) if (ref($cq) !~ /^DDC::\w+::CQAnd$/);
+  return DDC::Any::Object::__dcvs_compile(@_) if (ref($cq) !~ /^DDC::\w+::CQAnd$/);
   my ($vq1,$vq2) = $cq->__dcvs_compile_dtrs($vq,%opts);
   $vq->{ti} = DiaColloDB::Utils::_union_p($vq1->{ti}, $vq2->{ti});
   $vq->{ci} = DiaColloDB::Utils::_intersect_p($opts{tdf}->catSubset($vq1->{ti}, $vq1->{ci}),
@@ -389,7 +389,7 @@ sub DDC::Any::CQAnd::__dcvs_compile {
 ##  + should set $vq->{ti}, $vq->{ci} (cat-union, term-union)
 sub DDC::Any::CQOr::__dcvs_compile {
   my ($cq,$vq,%opts) = @_;
-  return DDC::Any::Object::__dcvs_compile($vq,@_) if (ref($cq) !~ /^DDC::\w+::CQOr$/);
+  return DDC::Any::Object::__dcvs_compile(@_) if (ref($cq) !~ /^DDC::\w+::CQOr$/);
   my ($vq1,$vq2) = $cq->__dcvs_compile_dtrs($vq,%opts);
   $vq->{ti} = DiaColloDB::Utils::_union_p($vq1->{ti}, $vq2->{ti});
   $vq->{ci} = DiaColloDB::Utils::_union_p($vq1->{ci}, $vq2->{ci});

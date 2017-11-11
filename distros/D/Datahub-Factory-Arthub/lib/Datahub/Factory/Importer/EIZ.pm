@@ -2,7 +2,7 @@ package Datahub::Factory::Importer::EIZ;
 
 use Datahub::Factory::Sane;
 
-our $VERSION = '0.92';
+our $VERSION = '0.93';
 
 use Catmandu::Importer::OAI;
 use Moo;
@@ -25,13 +25,7 @@ has password               => (is => 'ro');
 has pids_path              => (is => 'ro', required => 1);
 has aat_path               => (is => 'ro', required => 1);
 has creators_path          => (is => 'ro', required => 1);
-# has pid_module             => (is => 'ro', default => 'rcf');
-# has pid_username           => (is => 'ro');
-# has pid_password           => (is => 'ro');
-# has pid_lwp_realm          => (is => 'ro');
-# has pid_lwp_base_url       => (is => 'ro');
-# has pid_rcf_container_name => (is => 'ro');
-
+has generate_vocabularies  => (is => 'ro', default => 1);
 
 sub _build_importer {
     my $self = shift;
@@ -57,8 +51,15 @@ sub _build_importer {
 
 sub prepare {
     my $self = shift;
-    $self->logger->info('Creating "pids" temporary table.');
-    $self->__pids();
+
+    if ($self->generate_vocabularies) {
+        $self->__generate_vocabularies();
+    }
+}
+
+sub __generate_vocabularies {
+    my $self = shift;
+
     $self->logger->info('Creating "creators" temporary table.');
     $self->__creators();
     $self->logger->info('Creating "aat" temporary table.');
@@ -68,46 +69,16 @@ sub prepare {
 sub __pids {
     my $self = shift;
     $self->temporary_table($self->pids_path);
-    # my $pid = Datahub::Factory->module('PID')->new(
-    #     pid_module             => $self->pid_module,
-    #     pid_username           => $self->pid_username,
-    #     pid_password           => $self->pid_password,
-    #     pid_rcf_container_name => $self->pid_rcf_container_name,
-    #     pid_rcf_object         => '/tmp/PIDS_MSK_UTF8.csv',
-    #     pid_lwp_url            => uri_join($self->pid_lwp_base_url, 'PIDS_MSK_UTF8.csv'),
-    #     pid_lwp_realm          => $self->pid_lwp_realm,
-    # );
-    # $pid->temporary_table($pid->path);
 }
 
 sub __creators {
     my $self = shift;
     $self->temporary_table($self->creators_path);
-    # my $pid = Datahub::Factory->module('PID')->new(
-    #     pid_module             => $self->pid_module,
-    #     pid_username           => $self->pid_username,
-    #     pid_password           => $self->pid_password,
-    #     pid_rcf_container_name => $self->pid_rcf_container_name,
-    #     pid_rcf_object         => '/tmp/CREATORS_MSK_UTF8.csv',
-    #     pid_lwp_url            => uri_join($self->pid_lwp_base_url, 'CREATORS_MSK_UTF8.csv'),
-    #     pid_lwp_realm          => $self->pid_lwp_realm,
-    # );
-    # $pid->temporary_table($pid->path);
 }
 
 sub __aat {
     my $self = shift;
     $self->temporary_table($self->aat_path);
-    # my $pid = Datahub::Factory->module('PID')->new(
-    #     pid_module             => $self->pid_module,
-    #     pid_username           => $self->pid_username,
-    #     pid_password           => $self->pid_password,
-    #     pid_rcf_container_name => $self->pid_rcf_container_name,
-    #     pid_rcf_object         => '/tmp/AAT_UTF8.csv',
-    #     pid_lwp_url            => uri_join($self->pid_lwp_base_url, 'AAT_UTF8.csv'),
-    #     pid_lwp_realm          => $self->pid_lwp_realm,
-    # );
-    # $pid->temporary_table($pid->path, 'record - object_name');
 }
 
 sub temporary_table {
@@ -134,7 +105,6 @@ sub temporary_table {
                 $item->{'_id'} = $item->{$id_column};
             }
             my $bag = $store->bag();
-            # first $bag->get($item->{'_id'})
             $bag->add($item);
         });
 }
@@ -242,41 +212,27 @@ Optionally, a I<must_be_younger_than> date.
 
 =item C<username>
 
+Optional HTAccess username.
+
 =item C<password>
 
-=back
+Optional HTAccess password.
 
-=head2 PID options
+=item C<pids_path>
 
-=over
+Path to a CSV file containing PIDS list.
 
-=item C<pid_module>
+=item C<aat_path>
 
-Choose the PID module you want to use. Set to I<rcf> to use Rackspace Cloud Files, or to
-I<lwp> to use a public web site.
+Path to a CSV file containing AAT terms vocabulary.
 
-=item C<pid_username>
+=item C<creators_path>
 
-Provide your Rackspace Cloud Files username. If you selected I<lwp>, provide an optional
-username (for HTTP Basic Authentication).
+Path to a CSV file containing Creator terms vocabulary.
 
-=item C<pid_password>
+=item C<generate_vocabularies>
 
-Provide your Rackspace Cloud Files api key. For I<lwp>, an optional password.
-
-=item C<pid_rcf_container_name>
-
-Provide the container name that holds the PID CSV's for I<rcf>.
-
-=item C<pid_lwp_realm>
-
-For I<lwp>, provide (optionally) the HTTP Basic Authentication Realm.
-
-=item C<pid_lwp_base_url>
-
-For I<lwp>, provide the URL where the CSV's are stored. This URL is used in addition
-to the name of the CSV file to create the URL where the file can be fetched from (i.e
-C<my $url = $pid_lwp_base_url + $csv_file_name>).
+Generate temporary SQLite db containing vocabularies from CSV file (1 or 0, defaults to 1)
 
 =back
 

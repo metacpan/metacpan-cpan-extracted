@@ -520,8 +520,8 @@ of the package.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.002,
-built on September 04, 2017.
+This module is part of Mail-Message distribution version 3.003,
+built on November 08, 2017.
 
 Do not forget to read
 L<Mail::Box-Overview>,

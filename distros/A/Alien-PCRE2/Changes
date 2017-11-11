@@ -1,5 +1,10 @@
 Revision history for Alien::PCRE2.
 
+0.015000 2017-11-07
+
+	- Fix "Sorry, you may not have multiple connections.",
+		Replace Official Server With GitHub Mirror Server
+
 0.014000 2017-10-31 Codename Ovomorph
 
     - HOLIDAY EDITION: Happy Halloween!

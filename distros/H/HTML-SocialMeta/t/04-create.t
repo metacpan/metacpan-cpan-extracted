@@ -4,7 +4,6 @@ use warnings;
 use Test::More;
   
 use_ok( 'HTML::SocialMeta' );
-
 # Build Some Test Data Which Is Valid
 my $meta_tags = HTML::SocialMeta->new(
     card_type => 'summary',
@@ -192,6 +191,24 @@ my $test_featured_twitter = '<meta name="twitter:card" content="summary_large_im
 <meta name="twitter:image:alt" content="A picture of some stuff."/>';
 
 is($create_twitter_featured, $test_featured_twitter);
+
+# Make sure that we can make a tags object with no optional tags defined
+my $only_required_meta_tags = HTML::SocialMeta->new(
+    card_type => 'summary',
+    site => '@example_twitter',
+    site_name => 'Example Site, anything',
+    title => 'You can have any title you wish here',
+    description => 'Description goes here may have to do a little validation',
+    image => 'www.urltoimage.com/blah.jpg',
+    player => 'www.somevideourl.com/url/url',
+    url	 => 'www.someurl.com',
+    player_width => '500',
+    player_height => '500',
+    fb_app_id	=> '1232342342354',
+);
+
+my $only_required_tags = $only_required_meta_tags->create;
+like ( $only_required_tags, qr{<meta name="twitter:image:alt" content=""/>});
 
 done_testing();
 

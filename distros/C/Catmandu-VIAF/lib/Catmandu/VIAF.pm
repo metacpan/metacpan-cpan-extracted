@@ -2,7 +2,7 @@ package Catmandu::VIAF;
 
 use strict;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 1;
 __END__
@@ -13,79 +13,54 @@ __END__
 
 =for html <a href="https://travis-ci.org/thedatahub/Catmandu-VIAF"><img src="https://travis-ci.org/thedatahub/Catmandu-VIAF.svg?branch=master"></a>
 
-Catmandu::VIAF - Retrieve items from VIAF
+Catmandu::VIAF - Retrieve items from the VIAF authority file
 
 =head1 SYNOPSIS
 
-This module contains a L<store|Catmandu::Store::VIAF> to lookup a I<viaf_id> in L<VIAF|https://www.viaf.org>, 
-a L<fix|Catmandu::Fix::viaf_match> to match a name to a I<mainHeadingEl> and a
-L<fix|Catmandu::Fix::viaf_search> to search for a name in VIAF.
+    # From the command line
+    $ catmandu export VIAF --id 102333412 to YAML
+    ---
+    dcterms:identifier: '102333412'
+    guid: http://viaf.org/viaf/102333412
+    schema:birthDate: 1775-12-16
+    schema:deathDate: 1817-07-18
+    schema:description: English novelist
+    skos:prefLabel: Jane Austen
+    ...
 
-  lookup_in_store(authortName, VIAF, lang:'nl-NL', fallback_lang:'en-US')
+    # From a Catmandu Fix
+    lookup_in_store(authortName, VIAF, lang:'nl-NL', fallback_lang:'en-US')
 
-  viaf_match(authorName, -lang:'nl-NL', -fallback_lang:'en-US')
+    # Perform a direct match between a name and a mainHeadingEl from VIAF
+    viaf_match(authorName, -lang:'nl-NL', -fallback_lang:'en-US')
 
-  viaf_search(authorName, -lang:'nl-NL', -fallback_lang:'en-US')
+    # Perform a search for a name in VIAF
+    viaf_search(authorName, -lang:'nl-NL', -fallback_lang:'en-US')
 
-=head1 DESCRIPTION
+=head1 MODULES
 
-=head2 L<Catmandu::Store::VIAF>
+=over
 
-  lookup_in_store(
-    authorName,
-    AAT,
-    lang: 'nl-NL',
-    fallback_lang: 'en-US'
-  )
+=item * L<Catmandu::Store::VIAF>
 
-The C<lang> parameter is optional and defaults to I<nl-NL>. It sets
-the language of the returned I<prefLabel>. If no I<prefLabel> for the
-I<viaf_id> in provided I<lang> exists, the I<prefLabel> for the
-I<fallback_lang> is used.
+=item * L<Catmandu::Fix::viaf_match>
 
-The store takes the C<dc:identifier> of a I<Person> from VIAF and returns the following data:
+=item * L<Catmandu::Fix::viaf_search>
 
-  {
-    'dcterms:identifier' => 'The identifier',
-    'guid'               => 'The VIAF URL',
-    'schema:birthDate'   => 'Birth date, if provided',
-    'schema:deathDate'   => 'Death date, if provided',
-    'schema:description' => 'Description, if provided',
-    'skos:prefLabel'     => 'prefLabel, in lang or fallback_lang'
-  }
+=item * L<Catmandu::VIAF::API>
 
-=head2 L<Catmandu::Fix::viaf_match>
+=back
 
-  viaf_match(
-    path,
-    -lang: 'nl-NL',
-    -fallback_lang: 'nl-NL'
-  )
+=head1 AUTHORS
 
-A fix that performs a match between a name and a I<mainHeadingEl> of VIAF I<Person>.
+Matthias Vandermaesen <matthias.vandermaesen@vlaamsekunstcollectie.be>
+Pieter De Praetere <pieter@packed.be>
 
-=head2 L<Catmandu::Fix::viaf_search>
+=head1 COPYRIGHT AND LICENSE
 
-  viaf_search(
-    path,
-    -lang: 'nl-NL',
-    -fallback_lang: 'nl-NL'
-  )
+This software is copyright (c) 2017 by PACKED, vzw, Vlaamse Kunstcollectie, vzw.
 
-A fix that performs a search for a name in VIAF.
-
-=head1 AUTHOR
-
-Pieter De Praetere E<lt>pieter at packed.be E<gt>
-
-=head1 COPYRIGHT
-
-Copyright 2017- PACKED vzw
-
-=head1 LICENSE
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License, Version 3, June 2007.
 
 =head1 SEE ALSO
 

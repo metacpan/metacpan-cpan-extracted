@@ -5,7 +5,7 @@ use warnings;
 use Test::More 0.90;
 use Test::DZil;
 use IPC::Cmd 'can_run';
-use Path::Class;
+use Path::Tiny;
 use Test::File;
 use Test::File::Contents;
 use Dist::Zilla::App::Tester;
@@ -60,7 +60,7 @@ ok((grep {
 ok((grep { /ja[.]po/} @{ $result->log_messages }),
    'File name should have been emitted from msginit');
 
-my $po = file $result->tempdir, qw(source po ja.po);
+my $po = path $result->tempdir, qw(source po ja.po);
 file_exists_ok $po, 'po/ja.po should now exist';
 file_contents_like $po, qr/Language: ja/,
     'Language name "ja" should be present';
@@ -80,7 +80,7 @@ like $result->error, qr/po.fr[.]po already exists/,
     'Should get error trying to create existing language';
 
 # Now specify a bunch of options.
-my $pot = file qw(po org.imperia.simplecal.pot);
+my $pot = path qw(po org.imperia.simplecal.pot);
 ok $result = test_dzil('t/dist', [
     'msg-init',
     '--encoding'         => 'Latin-1',
@@ -98,7 +98,7 @@ ok(!(grep {
 ok((grep { /pt_BR[.]po/} @{ $result->log_messages }),
    'pt_BR name should have been emitted from msginit');
 
-$po = file $result->tempdir, qw(source po pt_BR.po);
+$po = path $result->tempdir, qw(source po pt_BR.po);
 file_exists_ok $po, 'po/pt_BR.po should now exist';
 file_contents_like $po, qr/Language: pt_BR/,
     'Language name "pt_BR" should be present';

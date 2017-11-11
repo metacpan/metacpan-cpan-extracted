@@ -54,7 +54,7 @@ This is the current built-in configuration file, showing all settings.
   
       // User defined chords.
       // "base" defaults to 1.
-      // "easy" defaults to 0.
+      // "easy" is ignored.
       // Use 0 for an empty string, and -1 for a muted string.
       "chords" : [
         //  {
@@ -145,6 +145,10 @@ This is the current built-in configuration file, showing all settings.
   	// "chordscolumn" : 400,
   	"chordscolumn" :  0,
   
+  	// Alternative placement for chord diagrams.
+  	// Value is the column position.
+  	"diagramscolumn" :  0,
+  
 	// A {titles: left} may conflict with customized formats.
 	// Set to non-zero to ignore the directive.
 	"titles-directive-ignore" : false,
@@ -208,6 +212,7 @@ This is the current built-in configuration file, showing all settings.
   	// Fonts can be specified by name (for the corefonts)
   	// or a filename (for TrueType/OpenType fonts).
   	// Relative filenames are looked up in the fontdir.
+	// "fontdir" : [ "/usr/share/fonts/liberation", "/home/me/fonts" ],
   	"fontdir" : null,
   
   	// Fonts for chords and comments can have a background
@@ -264,20 +269,4 @@ This is the current built-in configuration file, showing all settings.
       },
   }
   // End of config.
-
-=begin later
-
-my $cloner;
-
-sub clone($) {
-    my $self = shift;
-
-    unless ( $cloner ) {
-	eval { require Clone; $cloner = \&Clone::clone }
-	  or
-	eval { require Clone::PP; $cloner = \&Clone::PP::clone }
-    }
-    my $h = $cloner->($self);
-    bless( $h, ref($self) );
-}
 

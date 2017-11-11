@@ -1,3 +1,32 @@
+2017-11-08  trobador  <occitan@esperanto.org>
+
+Version 2.1rc2 makepp-2.1rc2.tgz, technically 2.0.99.2 on sourceforge & CPAN.
+
+	* Mpp/Text.pm:
+	* makepp.spec:
+	* META.yml: New version
+
+	* Mpp/Subs.pm (f_shell): A busy system can have more than 3 interrupts. (Thanks to R. Rüdenauer)
+
+	* pod/makepp_functions.pod:
+	* pod/html/html.pl: Nice quoting everywhere
+
+	* pod/html/makepp.less:
+	* pod/html/makepp.css: Nicer pre.
+
+2017-08-18  trobador  <occitan@esperanto.org>
+
+	* pod/html/makepp.less:
+	* pod/html/html.pl: Fix bottom gray border with modern css.
+
+2017-08-15  trobador  <occitan@esperanto.org>
+
+	* Mpp/Makefile.pm: Better diagnostic.
+
+	* pod/makepp_functions.pod: Explain implicit call better.
+
+	* pod/html/html.pl: Take version from Mpp::Text
+
 2017-08-11  trobador  <occitan@esperanto.org>
 
 Version 2.1rc1 makepp-2.1rc1.tgz, technically 2.0.99.1 on sourceforge & CPAN.
@@ -1996,7 +2025,7 @@ Snapshot makepp-1.50-cvs-070728.tgz, version 1.50-07281-07203-07172 on CPAN.
 	this could mean that makepp uses a different name as it discovers
 	a shorter one.  For another, if the build dir name was shorter
 	than the repository name, when the repository file changed makepp
-	would recreate the link as a cycle onto itself.	
+	would recreate the link as a cycle onto itself.
 	This was documented as giving varying automounted directories a
 	consistent name -- if there is a need for such a feature, it
 	should be made reliable through explicit aliasing.

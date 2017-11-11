@@ -36,5 +36,5 @@ requires:
   warnings: '0'
 resources:
   repository: git://github.com/mauke/Function-Parameters
-version: '2.001001'
+version: '2.001002'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

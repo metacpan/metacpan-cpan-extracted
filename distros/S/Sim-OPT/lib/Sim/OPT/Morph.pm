@@ -59,7 +59,7 @@ decreasearray deg2rad_ rad2deg_ purifyarray replace_nth rotate2dabs rotate2d rot
 gatherseparators supercleanarray modish $max_processes
 ); # our @EXPORT = qw( );
 
-$VERSION = '0.63.29'; # our $VERSION = '';
+$VERSION = '0.63.35'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Morph is a morphing program for performing parametric variations on model descriptions for simulation programs.';
 
 ################################################# MORPH          
@@ -1734,7 +1734,6 @@ sub translate_vertices
 	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $translate_vertices_ref, $countvar, $fileconfig , $mypath, $file, $countmorphing, $launchline ) = @_;
 	
 	my @applytype = @$applytype_ref;
-	#my $zone_letter = $applytype[$countop][3];
 	my @translate_vertices = @$translate_vertices_ref; 
 	say "Translating vertices for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 	my @v;
@@ -1755,41 +1754,41 @@ sub translate_vertices
 	my $countlines = 0;
 	my $countvert = 0;
 
-	my %verts = ( a => 1, b => 2, c => 3, d => 4, e => 5, f => 6, g => 7, h => 8, i => 9, j => 10, k => 11, l => 12, 
-	m => 13, n => 14, o => 15, p => 16, 
+	my %verts = ( "a" => 1, "b" => 2, "c" => 3, "d" => 4, "e" => 5, "f" => 6, "g" => 7, "h" => 8, "i" => 9, "j" => 10, "k" => 11, "l" => 12, 
+	"m" => 13, "n" => 14, "o" => 15, "p" => 16, 
 	"0\nq" => 17, "0\nr" => 18, "0\ns" => 19, "0\nt" => 20, "0\nu" => 21, "0\nv" => 22, "0\nw" => 23, "0\nx" => 24, "0\ny" => 25, "0\nz" => 26, 
 	"0\na" => 27, "0\nb" => 28, "0\nc" => 29, "0\nd" => 30, "0\ne" => 31, 
-	"0\n0\ncf" => 32, "0\n0\ncg" => 33, "0\n0\nch" => 34, "0\n0\nci" => 35, "0\n0\ncj" => 36, "0\n0\nck" => 37, "0\n0\ncl" => 38, 
-	"0\n0\ncm" => 39, "0\n0\ncn" => 40, "0\n0\nco" => 41, "0\n0\ncp" => 42, "0\n0\ncq" => 43, "0\n0\ncr" => 44, "0\n0\ncs" => 45, 
-	"0\n0\nct" => 46, 
-	"0\n0\nc0\ncu" => 47, "0\n0\nc0\ncv" => 48, "0\n0\nc0\ncw" => 49, "0\n0\nc0\ncx" => 50, "0\n0\nc0\ncy" => 51, "0\n0\nc0\ncz" => 52, 
-	"0\n0\nc0\nca" => 53, "0\n0\nc0\ncb" => 54, "0\n0\nc0\ncc" => 55, "0\n0\nc0\ncd" => 56, "0\n0\nc0\nce" => 57, "0\n0\nc0\ncf" => 58, 
-	"0\n0\nc0\ncg" => 59, "0\n0\nc0\nch" => 60, "0\n0\nc0\nci" => 61, 
-	"0\n0\nc0\nc0\ncj" => 62, "0\n0\nc0\nc0\nck" => 63, "0\n0\nc0\nc0\ncl" => 64, "0\n0\nc0\nc0\ncm" => 65, "0\n0\nc0\nc0\ncn" => 66, 
-	"0\n0\nc0\nc0\nco" => 67, "0\n0\nc0\nc0\ncp" => 68, "0\n0\nc0\nc0\ncq" => 69, "0\n0\nc0\nc0\ncr" => 70, "0\n0\nc0\nc0\ncs" => 71, 
-	"0\n0\nc0\nc0\nct" => 72, "0\n0\nc0\nc0\ncu" => 73, "0\n0\nc0\nc0\ncv" => 74, "0\n0\nc0\nc0\ncw" => 75, "0\n0\nc0\nc0\ncx" => 76, 
-	"0\n0\nc0\nc0\nc0\ncy" => 77, "0\n0\nc0\nc0\nc0\ncz" => 78, "0\n0\nc0\nc0\nc0\nca" => 79, "0\n0\nc0\nc0\nc0\ncb" => 80, 
-	"0\n0\nc0\nc0\nc0\ncc" => 81, "0\n0\nc0\nc0\nc0\ncd" => 82, "0\n0\nc0\nc0\nc0\nce" => 83, "0\n0\nc0\nc0\nc0\ncf" => 84, 
-	"0\n0\nc0\nc0\nc0\ncg" => 85, "0\n0\nc0\nc0\nc0\nch" => 86, "0\n0\nc0\nc0\nc0\nci" => 87, "0\n0\nc0\nc0\nc0\ncj" => 88, 
-	"0\n0\nc0\nc0\nc0\nck" => 89, "0\n0\nc0\nc0\nc0\ncl" => 90, "0\n0\nc0\nc0\nc0\ncm" => 91, 
-	"0\n0\nc0\nc0\nc0\nc0\ncn" => 92, "0\n0\nc0\nc0\nc0\nc0\nco" => 93, "0\n0\nc0\nc0\nc0\nc0\ncp" => 94, "0\n0\nc0\nc0\nc0\nc0\ncq" => 95, 
-	"0\n0\nc0\nc0\nc0\nc0\ncr" => 96, "0\n0\nc0\nc0\nc0\nc0\ncs" => 97, "0\n0\nc0\nc0\nc0\nc0\nct" => 98, "0\n0\nc0\nc0\nc0\nc0\ncu" => 99, 
-	"0\n0\nc0\nc0\nc0\nc0\ncv" => 100, "0\n0\nc0\nc0\nc0\nc0\ncw" => 101, "0\n0\nc0\nc0\nc0\nc0\ncx" => 102, "0\n0\nc0\nc0\nc0\nc0\ncy" => 103, 
-	"0\n0\nc0\nc0\nc0\nc0\ncz" => 104 );
+	"0\n0\nb\nf" => 32, "0\n0\nb\ng" => 33, "0\n0\nb\nh" => 34, "0\n0\nb\ni" => 35, "0\n0\nb\nj" => 36, "0\n0\nb\nk" => 37, "0\n0\nb\nl" => 38, 
+	"0\n0\nb\nm" => 39, "0\n0\nb\nn" => 40, "0\n0\nb\no" => 41, "0\n0\nb\np" => 42, "0\n0\nb\nq" => 43, "0\n0\nb\nr" => 44, "0\n0\nb\ns" => 45, 
+	"0\n0\nb\nt" => 46, 
+	"0\n0\nb\n0\nb\nu" => 47, "0\n0\nb\n0\nb\nv" => 48, "0\n0\nb\n0\nb\nw" => 49, "0\n0\nb\n0\nc\nx" => 50, "0\n0\nb\n0\nb\ny" => 51, "0\n0\nc0\nc\nz" => 52, 
+	"0\n0\nb\n0\nb\na" => 53, "0\n0\nb\n0\nb\nb" => 54, "0\n0\nb\n0\nb\nc" => 55, "0\n0\nb\n0\nb\nd" => 56, "0\n0\nb\n0\nb\ne" => 57, "0\n0\nc0\nc\nf" => 58, 
+	"0\n0\nb\n0\nb\ng" => 59, "0\n0\nb\n0\nb\nh" => 60, "0\n0\nb\n0\nb\ni" => 61, 
+	"0\n0\nb\n0\nb\n0\nb\nj" => 62, "0\n0\nb\n0\nb\n0\nb\nk" => 63, "0\n0\nb\n0\nb\n0\nb\nl" => 64, "0\n0\nb\n0\nb0\nb\nm" => 65, "0\n0\nc0\nb\n0\nb\nn" => 66, 
+	"0\n0\nb\n0\nb\n0\nb\no" => 67, "0\n0\nb\n0\nb\n0\nb\np" => 68, "0\n0\nb\n0\nb\n0\nb\nq" => 69, "0\n0\nb\n0\nb\n0\nb\nr" => 70, "0\n0\nb\n0\nb\n0\nb\ns" => 71, 
+	"0\n0\nb\n0\nb\n0\nb\nt" => 72, "0\n0\nb\n0\nb\n0\nb\nu" => 73, "0\n0\nb\n0\nc0\nb\nv" => 74, "0\n0\nb\n0\nb\n0\nb\nw" => 75, "0\n0\nb\n0\nb\n0\nb\nx" => 76, 
+	"0\n0\nb\n0\nb\n0\nb\n0\nb\ny" => 77, "0\n0\nb\n0\nb\n0\nb\n0\nb\nz" => 78, "0\n0\nb\n0\nb\n0\nb\n0\nb\na" => 79, "0\n0\nb\n0\nb\n0\nb\n0\nb\nb" => 80, 
+	"0\n0\nb\n0\nb\n0\nb\n0\nb\nc" => 81, "0\n0\nb\n0\nb\n0\nb\n0\nb\nd" => 82, "0\n0\nb\n0\nb\n0\nb\n0\nb\ne" => 83, "0\n0\nb\n0\nb\n0\nb\n0\nb\nf" => 84, 
+	"0\n0\nb\n0\nb\n0\nb\n0\nb\ng" => 85, "0\n0\nb\n0\nb\n0\nb\n0\nb\n\nh" => 86, "0\n0\nb\n0\nb\n0\nb\n0\nb\ni" => 87, "0\n0\nb\n0\nb\n0\nb\n0\nb\nj" => 88, 
+	"0\n0\nb\n0\nb\n0\nb\n0\nb\nk" => 89, "0\n0\nb\n0\nb\n0\nb\n0\nb\nl" => 90, "0\n0\nb\n0\nb\n0\nb\n0\nb\nm" => 91, 
+	"0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nn" => 92, "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\no" => 93, "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\np" => 94, "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nq" => 95, 
+	"0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nr" => 96, "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\ns" => 97, "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nt" => 98, "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nu" => 99, 
+	"0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nv" => 100, "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nw" => 101, "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nx" => 102, "0\n0\nc0\nc0\nc0\nc0\nc\ny" => 103, 
+	"0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nz" => 104 );
 
 	foreach my $vert ( @verts_to_transl )
-	{
+		{
 		foreach my $line ( @lines )
 		{
 			$line =~ s/^\s+//; 
 			my @rowelts = split(/\s+|,/, $line);
 			if   ($rowelts[0] eq "*vertex" ) 
 			{
+				
 				if ( $rowelts[5] eq $verts{$vert} ) 
 				{
 					push (@v, [ $rowelts[1], $rowelts[2], $rowelts[3], $vert ] );
 				}
-				$countvert++;
 			}
 		}
 	}
@@ -1802,7 +1801,7 @@ sub translate_vertices
 	{
 		( $x_swing, $y_swing, $z_swing, $x_base, $y_base, $z_base );
 		my $vertex_letter = $verts{ $verts_to_transl[ $countvertex ] }; 
-		my @basevs = @{ $v[ $countvertex ] }; 
+		my @basevs = @{ $v[ $countvertex ] }; say $tee "\@basevs: " . dump( @basevs );
 		my ( $x_base, $y_base, $z_base, $vertexletter ) = ( $basevs[0], $basevs[1], $basevs[2], $basevs[3] ); 
 		
 		my @base_coordinates = @{ $base_coordinates_ref }; 
@@ -2338,7 +2337,7 @@ sub change_thickness
 {
 	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $thickness_change, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline ) = @_;
 	my @applytype = @$applytype_ref; 
-	
+
 	say "Changing thicknesses in construction layer for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
 	my @entries_to_change = @{ $$thickness_change[$countop][0] }; #say $tee "\@entries_to_change: " . dump( @entries_to_change ) ; 
@@ -2351,21 +2350,21 @@ sub change_thickness
 	if ( $stepsvar > 1 )
 	{
 		foreach $entry_to_change ( @entries_to_change )
-		{   #say $tee "\$entry_to_change: " . dump( $entry_to_change ) ; 
+		{   say $tee "\$entry_to_change: " . dump( $entry_to_change ) ; say $tee "\$countstep: " . dump( $countstep ) ; say $tee "\$stepsvar: " . dump( $stepsvar ) ;  
 			@strata_to_change = @{ $groups_of_strata_to_change[$thiscount] }; #say $tee "\@strata_to_change: " . dump( @strata_to_change ) ; 
 			$countstrata = 0;
 			foreach $stratum_to_change ( @strata_to_change )
-			{   #say $tee "\$stratum_to_change: " . dump( $stratum_to_change ) ; 
-				my @min_max_values = @{ $groups_of_couples_of_min_max_values[$thiscount][$countstrata] }; #say $tee "\@min_max_values: " . dump( @min_max_values ) ; 
-				my $min   = $min_max_values[0]; #say $tee "\$min: " . dump( $min ) ;  
-				my $max   = $min_max_values[1]; #say $tee "\$max: " . dump( $max ) ; 
-				my $swing = $max - $min; #say $tee "\$swing: " . dump( $swing ) ; 
-				my $pace  = ( $swing / ( $stepsvar - 1 ) ); #say $tee "\$pace: " . dump( $pace ) ; 
-				my $thickness = $min + ( $pace * ( $countstep - 1 ) ); #say $tee "\$thickness: " . dump( $thickness ) ; 
+			{   say $tee "\$stratum_to_change: " . dump( $stratum_to_change ) ; 
+				my @min_max_values = @{ $groups_of_couples_of_min_max_values[$thiscount][$countstrata] }; say $tee "\@min_max_values: " . dump( @min_max_values ) ; 
+				my $min   = $min_max_values[0]; say $tee "\$min: " . dump( $min ) ;  
+				my $max   = $min_max_values[1]; say $tee "\$max: " . dump( $max ) ; 
+				my $swing = $max - $min; say $tee "\$swing: " . dump( $swing ) ; 
+				my $pace  = ( $swing / ( $stepsvar - 1 ) ); say $tee "\$pace: " . dump( $pace ) ; 
+				my $thickness = $min + ( $pace * ( $countstep - 1 ) ); say $tee "\$thickness: " . dump( $thickness ) ; 
 				my $layers = ( i => 1, j => 2, k => 3, l => 4, m => 5, n => 6, o => 7, p => 8, q => 9, r => 10, s => 11, t => 12, u => 13, v => 14, w => 15 );
 
 
-                my $printthis = "prj $launchline<<YYY		
+                my $printthis = "prj $launchline<<YYY
 b
 e
 a
@@ -2375,6 +2374,7 @@ n
 $thickness
 -
 >
+a
 y
 -
 -
@@ -2880,7 +2880,7 @@ m
 c
 f
 *
-a
+b
 a
 -
 -
@@ -3710,34 +3710,35 @@ sub apply_constraints
 
 	my %verts = ( 1 => "a", 2 => "b", 3 => "c", 4 => "d", 5 => "e", 6 => "f", 7 => "g", 
 	8 => "h", 9 => "i", 10 => "j", 11 => "k", 12 => "l", 
-	13 => "m", 14 => "n", 15 => "o", 16 => "p", 17 => "q", 18 => "r", 19 => "s", 
-	20 => "t", 		21 => "u", 22 => "v", 23 => "w", 24 => "x", 25 => "0\ny", 
+	13 => "m", 14 => "n", 15 => "o", 16 => "p", 17 => "0\nq", 18 => "0\nr", 19 => "0\ns", 
+	20 => "0\nt", 		21 => "0\nu", 22 => "0\nv", 23 => "0\nw", 24 => "0\nx", 25 => "0\ny", 
 	26 => "0\nz", 27 => "0\na", 28 => "0\nb", 29 => "0\nc", 30 => "0\nd", 31 => "0\ne", 
-	32 => "0\nf", 33 => "0\ng", 34 => "0\nh", 35 => "0\ni", 36 => "0\nj", 
-	37 => "0\nk", 38 => "0\nl", 39 => "0\nm", 40 => "0\nn", 41 => "0\no", 
-	42 => "0\np", 43 => "0\nq", 44 => "0\nr", 45 => "0\ns", 46 => "0\nt", 
+	32 => "0\n0\nb\nf", 33 => "0\n0\nb\ng", 34 => "0\n0\nb\nh", 35 => "0\n0\nb\ni", 36 => "0\n0\nb\nj", 
+	37 => "0\n0\nb\nk", 38 => "0\n0\nb\nl", 39 => "0\n0\nb\nm", 40 => "0\n0\nb\nn", 41 => "0\n0\nb\no", 
+	42 => "0\n0\nb\np", 43 => "0\n0\nb\nq", 44 => "0\n0\nb\nr", 45 => "0\n0\nb\ns", 46 => "0\n0\nb\nt", 
 	47 => "0\nu", 48 => "0\n0\ncv", 49 => "0\n0\ncw", 50 => "0\n0\ncx", 
-	51 => "0\n0\ncy", 52 => "0\n0\ncz", 
-	53 => "0\n0\nca", 54 => "0\n0\ncb", 55 => "0\n0\ncc", 56 => "0\n0\ncd", 
+	51 => "0\n0\nb\n0\nb\ny", 52 => "0\n0\nb\n0\nb\nz", 
+	53 => "0\n0\nb\n0\nb\na", 54 => "0\n0\nb\n0\nb\nb", 55 => "0\n0\nb\n0\nb\nc", 56 => "0\n0\nb\n0\nb\nd", 
 	57 => "0\n0\nce", 58 => "0\n0\ncf", 
-	59 => "0\n0\ncg", 60 => "0\n0\nch", 61 => "0\n0\nci", 
-	62 => "0\n0\nc0\ncj", 63 => 63, 64 => "0\n0\nc0\ncl", 
-	65 => "0\n0\nc0\ncm", 66 => "0\n0\nc0\ncn", 
-	67 => "0\n0\nc0\nco", 68 => "0\n0\nc0\ncp", 69 => "0\n0\nc0\ncq", 
-	70 => "0\n0\nc0\ncr", 71 => "0\n0\nc0\ncs", 
-	72 => "0\n0\nc0\nct", 73 => "0\n0\nc0\ncu", 74 => "0\n0\nc0\ncv", 
-	75 => "0\n0\nc0\ncw", 76 => "0\n0\nc0\ncx", 
-	77 => "0\n0\nc0\nc0\ncy", 78 => "0\n0\nc0\nc0\ncz", 79 => "0\n0\nc0\nc0\nca", 
-	80 => "0\n0\nc0\nc0\ncb", 81 => "0\n0\nc0\nc0\ncc", 82 => "0\n0\nc0\nc0\ncd", 
-	83 => "0\n0\nc0\nc0\nce", 84 => "0\n0\nc0\nc0\ncf", 85 => "0\n0\nc0\nc0\ncg", 
-	86 => "0\n0\nc0\nc0\nch", 87 => "0\n0\nc0\nc0\nci", 88 => "0\n0\nc0\nc0\ncj", 
-	89 => "0\n0\nc0\nc0\nck", 90 => "0\n0\nc0\nc0\ncl", 91 => "0\n0\nc0\nc0\ncm", 
-	92 => "0\n0\nc0\nc0\nc0\ncn", 93 => "0\n0\nc0\nc0\nc0\nco", 
-	94 => "0\n0\nc0\nc0\nc0\ncp", 95 => "0\n0\nc0\nc0\nc0\ncq", 
-	96 => "0\n0\nc0\nc0\nc0\ncr", 97 => "0\n0\nc0\nc0\nc0\ncs", 
-	98 => "0\n0\nc0\nc0\nc0\nct", 99 => "0\n0\nc0\nc0\nc0\ncu", 
-	100 => "0\n0\nc0\nc0\nc0\ncv", 101 => "0\n0\nc0\nc0\nc0\ncw", 
-	102 => "0\n0\nc0\nc0\nc0\ncx", 103 => "0\n0\nc0\nc0\nc0\ncy", );
+	59 => "0\n0\nb\n0\nb\ng", 60 => "0\n0\nb\n0\nb\nh", 61 => "0\n0\nb\n0\nb\ni", 
+	62 => "0\n0\nb\n0\nb\n0\nb\nj", 63 => 63, 64 => "0\n0\nb\n0\nb\n0\nb\nl", 
+	65 => "0\n0\nb\n0\nb\n0\nb\nm", 66 => "0\n0\nb\n0\nb\n0\nb\nn", 
+	67 => "0\n0\nb\n0\nb\n0\nb\no", 68 => "0\n0\nb\n0\nb\n0\nb\np", 69 => "0\n0\nb\n0\nb\n0\nb\nq", 
+	70 => "0\n0\nb\n0\nb\n0\nb\nr", 71 => "0\n0\nb\n0\nb\n0\nb\ns", 
+	72 => "0\n0\nb\n0\nb\n0\nb\nt", 73 => "0\n0\nb\n0\nb\n0\nb\nu", 74 => "0\n0\nb\n0\nb\n0\nb\nv", 
+	75 => "0\n0\nb\n0\nb\n0\nb\nw", 76 => "0\n0\nb\n0\nb\n0\nb\nx", 
+	77 => "0\n0\nb\n0\nb\n0\nb\n0\nb\ny", 78 => "0\n0\nb\n0\nb\n0\nb\n0\nb\nz", 79 => "0\n0\nb\n0\nb\n0\nb\n0\nb\na", 
+	80 => "0\n0\nb\n0\nb\n0\nb\n0\nb\nb", 81 => "0\n0\nb\n0\nb\n0\nb\n0\nb\nc", 82 => "0\n0\nb\n0\nb\n0\nb\n0\nb\nd", 
+	83 => "0\n0\nb\n0\nb\n0\nb\n0\nb\ne", 84 => "0\n0\nb\n0\nb\n0\nb\n0\nb\nf", 85 => "0\n0\nb\n0\nb\n0\nb\n0\nb\ng", 
+	86 => "0\n0\nb\n0\nb\n0\nb\n0\nb\nh", 87 => "0\n0\nb\n0\nb\n0\nb\n0\nb\ni", 88 => "0\n0\nb\n0\nb\n0\nb\n0\nb\nj", 
+	89 => "0\n0\nb\n0\nb\n0\nb\n0\nb\nk", 90 => "0\n0\nb\n0\nb\n0\nb\n0\nb\nl", 91 => "0\n0\nb\n0\nb\n0\nb\n0\nb\nm", 
+	92 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nn", 93 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\no", 
+	94 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\np", 95 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nq", 
+	96 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nr", 97 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\ns", 
+	98 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nt", 99 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nu", 
+	100 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nv", 101 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nw", 
+	102 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nx", 103 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\ny", );
+
 
 	my %zones = ( 1 => "a", 2 => "b", 3 => "c", 4 => "d", 5 => "e", 6 => "f", 7 => "g", 
 		8 => "h", 9 => "i", 10 => "j", 11 => "k", 12 => "l", 
@@ -3996,7 +3997,7 @@ sub apply_constraints
     {   
         if ( $output =~ /^ver/ )
         {
-        	$output =~ /ver{(.+)}{(.+)}/; #say $tee "DING. \$output : " . dump( $output );
+        	$output =~ /^ver{(\d+)}{(\d+)}/; #say $tee "DING. \$output : " . dump( $output );
         	my $zone_number = $1; #say $tee "\$zone_number : " . dump( $zone_number );
         	my $zone_letter = $zones{$zone_number}; #say $tee "\$zone_letter : " . dump( $zone_letter );
         	my $vnum = $2; #say $tee "\$vnum : " . dump( $vnum );

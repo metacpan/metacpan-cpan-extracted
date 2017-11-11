@@ -1,25 +1,34 @@
 
 package Importer::Zim;
-$Importer::Zim::VERSION = '0.7.0';
+$Importer::Zim::VERSION = '0.8.0';
 # ABSTRACT: Import functions à la Invader Zim
 
 use 5.010001;
 use warnings;
+
 use Module::Runtime ();
 
 use Importer::Zim::Utils 0.8.0 qw(DEBUG carp croak);
 
-sub import {
+sub import {    # Load +Base if import() is called
+    require Importer::Zim::Base;
+    Importer::Zim::Base->VERSION('0.12.0');
+    no warnings 'redefine';
+    *import = \&_import;
+    goto &_import;
+}
+
+sub _import {
     unshift @_, shift->backend(@_);
-    goto &{ $_[0]->can('import') };
+    goto &Importer::Zim::Base::import_into;
 }
 
 my %MIN_VERSION = do {
     my %v = (
-        '+Lexical'    => '0.8.0',
-        '+EndOfScope' => '0.2.0',
-        '+Unit'       => '0.3.0',
-        '+Bogus'      => '0.9.0',
+        '+Lexical'    => '0.10.0',
+        '+EndOfScope' => '0.4.0',
+        '+Unit'       => '0.5.0',
+        '+Bogus'      => '0.12.0',
     );
     /^\+/ and $v{ backend_class($_) } = $v{$_} for keys %v;
     %v;
@@ -47,6 +56,10 @@ sub backend {
     croak qq{Can't load any backend};
 }
 
+sub export_to {
+    goto &{ __PACKAGE__->backend->can('export_to') };
+}
+
 sub _trace_backend {
     my ( $mod, $backend, $version ) = @_;
     my $rv = $version ? " $version+" : '';
@@ -57,6 +70,8 @@ sub _trace_backend {
     my $v = $mod->VERSION // 'NA';
     carp qq{Loaded "$backend"$rv ($v) backend};
 }
+
+no Importer::Zim::Utils qw(DEBUG carp);
 
 1;
 
@@ -125,6 +140,13 @@ sub _trace_backend {
 #pod     Importer::Zim->import($class => @imports);
 #pod     Importer::Zim->import($class => \%opts => @imports);
 #pod
+#pod =head1 FUNCTIONS
+#pod
+#pod =head2 export_to
+#pod
+#pod     Importer::Zim::export_to($target, %imports);
+#pod     Importer::Zim::export_to($target, \%imports);
+#pod
 #pod =head1 DEBUGGING
 #pod
 #pod You can set the C<IMPORTER_ZIM_DEBUG> environment variable
@@ -136,7 +158,7 @@ sub _trace_backend {
 #pod
 #pod L<zim>
 #pod
-#pod L<Import::Zim::Cookbook>
+#pod L<Importer::Zim::Cookbook>
 #pod
 #pod L<Importer> and L<Lexical::Importer>
 #pod
@@ -156,7 +178,7 @@ Importer::Zim - Import functions à la Invader Zim
 
 =head1 VERSION
 
-version 0.7.0
+version 0.8.0
 
 =head1 SYNOPSIS
 
@@ -221,6 +243,13 @@ Read also L<Importer::Zim::Cookbook/WHICH BACKEND?>.
     Importer::Zim->import($class => @imports);
     Importer::Zim->import($class => \%opts => @imports);
 
+=head1 FUNCTIONS
+
+=head2 export_to
+
+    Importer::Zim::export_to($target, %imports);
+    Importer::Zim::export_to($target, \%imports);
+
 =head1 DEBUGGING
 
 You can set the C<IMPORTER_ZIM_DEBUG> environment variable
@@ -232,7 +261,7 @@ for get some diagnostics information printed to C<STDERR>.
 
 L<zim>
 
-L<Import::Zim::Cookbook>
+L<Importer::Zim::Cookbook>
 
 L<Importer> and L<Lexical::Importer>
 

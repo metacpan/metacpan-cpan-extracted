@@ -5,7 +5,7 @@ use Carp qw/carp croak confess/;
 
 BEGIN {
   $Math::Prime::Util::PP::AUTHORITY = 'cpan:DANAJ';
-  $Math::Prime::Util::PP::VERSION = '0.68';
+  $Math::Prime::Util::PP::VERSION = '0.69';
 }
 
 BEGIN {
@@ -664,7 +664,7 @@ sub sieve_prime_cluster {
   }
 
   # Walk the range in primorial chunks, doing primality tests.
-  my $nprim = 0;
+  my($nummr, $numlucas) = (0,0);
   while ($lo <= $hi) {
 
     my @racc = @acc;
@@ -683,17 +683,34 @@ sub sieve_prime_cluster {
     }
 
     # Do final primality tests.
-    for my $c (@cl) {
-      last unless scalar(@racc);
-      my $loc = $lo + $c;
-      $nprim += scalar(@racc);
-      @racc = grep { Math::Prime::Util::is_prime($loc+$_) } @racc;
+    if ($lo < 1e13) {
+      for my $r (@racc) {
+        my($good, $p) = (1, $lo + $r);
+        for my $c (@cl) {
+          $nummr++;
+          if (!Math::Prime::Util::is_prime($p+$c)) { $good = 0; last; }
+        }
+        push @p, $p if $good;
+      }
+    } else {
+      for my $r (@racc) {
+        my($good, $p) = (1, $lo + $r);
+        for my $c (@cl) {
+          $nummr++;
+          if (!Math::Prime::Util::is_strong_pseudoprime($p+$c,2)) { $good = 0; last; }
+        }
+        next unless $good;
+        for my $c (@cl) {
+          $numlucas++;
+          if (!Math::Prime::Util::is_extra_strong_lucas_pseudoprime($p+$c)) { $good = 0; last; }
+        }
+        push @p, $p if $good;
+      }
     }
 
-    push @p, map { $lo + $_ } @racc;
     $lo += $pr;
   }
-  print "cluster sieve ran $nprim primality tests\n" if $_verbose;
+  print "cluster sieve ran $nummr MR and $numlucas Lucas tests\n" if $_verbose;
   @p;
 }
 
@@ -870,12 +887,12 @@ sub jordan_totient {
 sub euler_phi {
   return euler_phi_range(@_) if scalar @_ > 1;
   my($n) = @_;
+  return 0 if defined $n && $n < 0;
 
   return Math::Prime::Util::_reftyped($_[0],Math::Prime::Util::GMP::totient($n))
     if $Math::Prime::Util::_GMPfunc{"totient"};
 
   _validate_positive_integer($n);
-  return 0 if $n < 0;
   return $n if $n <= 1;
 
   my $totient = $n - $n + 1;
@@ -915,31 +932,41 @@ sub euler_phi {
 }
 
 sub euler_phi_range {
-  my($n, $nend) = @_;
-  return () if $nend < $n;
-  return euler_phi($n) if $n == $nend;
+  my($lo, $hi) = @_;
+  _validate_integer($lo);
+  _validate_integer($hi);
+
   my @totients;
-  if ($nend > 2**30) {
-    while ($n < $nend) {
-      push @totients, euler_phi($n++);
+  while ($lo < 0 && $lo <= $hi) {
+    push @totients, 0;
+    $lo++;
+  }
+  return @totients if $hi < $lo;
+
+  if ($hi > 2**30 || $hi-$lo < 100) {
+    while ($lo <= $hi) {
+      push @totients, euler_phi($lo++);
     }
   } else {
-    @totients = (0 .. $nend);
-    foreach my $i (2 .. $nend) {
-      next unless $totients[$i] == $i;
-      $totients[$i] = $i-1;
-      foreach my $j (2 .. int($nend / $i)) {
-        $totients[$i*$j] -= $totients[$i*$j]/$i;
+    my @tot = (0 .. $hi);
+    foreach my $i (2 .. $hi) {
+      next unless $tot[$i] == $i;
+      $tot[$i] = $i-1;
+      foreach my $j (2 .. int($hi / $i)) {
+        $tot[$i*$j] -= $tot[$i*$j]/$i;
       }
     }
-    splice(@totients, 0, $n) if $n > 0;
+    splice(@tot, 0, $lo) if $lo > 0;
+    push @totients, @tot;
   }
-  return @totients;
+  @totients;
 }
 
 sub moebius {
   return moebius_range(@_) if scalar @_ > 1;
   my($n) = @_;
+  $n = -$n if defined $n && $n < 0;
+  _validate_num($n) || _validate_positive_integer($n);
   return ($n == 1) ? 1 : 0  if $n <= 1;
   return 0 if ($n >= 49) && (!($n % 4) || !($n % 9) || !($n % 25) || !($n%49) );
   my @factors = Math::Prime::Util::factor($n);
@@ -977,11 +1004,46 @@ sub is_semiprime {
   return (scalar(Math::Prime::Util::factor($n)) == 2) ? 1 : 0;
 }
 
+sub _totpred {
+  my($n, $maxd) = @_;
+  return 0 if (ref($n) ? $n->is_odd() : ($n & 1));
+  $n >>= 1;
+  return 1 if $n == 1 || ($n < $maxd && Math::Prime::Util::is_prime(2*$n+1));
+  for my $d (Math::Prime::Util::divisors($n)) {
+    last if $d >= $maxd;
+    my $p = ($d < (~0 >> 1))  ?  ($d<<1)+1  :  Math::Prime::Util::vecprod(2,$d)+1;
+    next unless Math::Prime::Util::is_prime($p);
+    my $r = int($n / $d);
+    while (1) {
+      return 1 if $r == $p || _totpred($r, $d);
+      last if $r % $p;
+      $r = int($r / $p);
+    }
+  }
+  0;
+}
+sub is_totient {
+  my($n) = @_;
+  _validate_positive_integer($n);
+  return 1 if $n == 1;
+  return 0 if $n <= 0;
+  return _totpred($n,$n);
+}
+
 
 sub moebius_range {
   my($lo, $hi) = @_;
+  _validate_integer($lo);
+  _validate_integer($hi);
   return () if $hi < $lo;
   return moebius($lo) if $lo == $hi;
+  if ($lo < 0) {
+    if ($hi < 0) {
+      return reverse(moebius_range(-$hi,-$lo));
+    } else {
+      return (reverse(moebius_range(1,-$lo)), moebius_range(0,$hi));
+    }
+  }
   if ($hi > 2**32) {
     my @mu;
     while ($lo <= $hi) {
@@ -1094,29 +1156,24 @@ sub is_carmichael {
   # return !is_prime($n) && ($n % carmichael_lambda($n)) == 1;
 
   return 0 if $n < 561 || ($n % 2) == 0;
-  return 0 if (!($n % 4) || !($n % 9) || !($n % 25) || !($n%49) || !($n%121));
+  return 0 if (!($n % 9) || !($n % 25) || !($n%49) || !($n%121));
 
+  # Check Korselt's criterion for small divisors
   my $fn = $n;
-  if ($n > 100_000_000) {   # After 100M, this saves time on average
-    # Pre-tests which are faster than factoring.
-    return 0 if Math::Prime::Util::powmod(2, $n-1, $n) != 1;
-    return 0 if Math::Prime::Util::is_prime($n);
-    for my $a (3,5,7,11,13,17,19,23,29,31,37) {
-      my $gcd = Math::Prime::Util::gcd($a, $fn);
-      if ($gcd == 1) {
-        return 0 if Math::Prime::Util::powmod($a, $n-1, $n) != 1;
-      } else {
-        return 0 if $gcd != $a;              # Not square free
-        return 0 if (($n-1) % ($a-1)) != 0;  # factor doesn't divide
-        $fn /= $a;
-      }
+  for my $a (5,7,11,13,17,19,23,29,31,37,41,43) {
+    if (($fn % $a) == 0) {
+      return 0 if (($n-1) % ($a-1)) != 0;   # Korselt
+      $fn /= $a;
+      return 0 unless $fn % $a;             # not square free
     }
   }
-  #return 1;
-  # Based on pre-tests, it's reasonably likely $n is a Carmichael number.
+  return 0 if Math::Prime::Util::powmod(2, $n-1, $n) != 1;
+
+  # After pre-tests, it's reasonably likely $n is a Carmichael number or prime
 
   # Use probabilistic test if too large to reasonably factor.
   if (length($fn) > 50) {
+    return 0 if Math::Prime::Util::is_prime($n);
     for my $t (13 .. 150) {
       my $a = $_primes_small[$t];
       my $gcd = Math::Prime::Util::gcd($a, $fn);
@@ -2834,6 +2891,15 @@ sub is_polygonal {
   croak("is_polygonal: k must be >= 3") if $k < 3;
   return 0 if $n <= 0;
   if ($n == 1) { $$refp = 1 if defined $refp; return 1; }
+
+  if ($Math::Prime::Util::_GMPfunc{"polygonal_nth"}) {
+    my $nth = Math::Prime::Util::GMP::polygonal_nth($n, $k);
+    return 0 unless $nth;
+    $nth = Math::Prime::Util::_reftyped($_[0], $nth);
+    $$refp = $nth if defined $refp;
+    return 1;
+  }
+
   my($D,$R);
   if ($k == 4) {
     return 0 unless _is_perfect_square($n);
@@ -2862,6 +2928,8 @@ sub is_polygonal {
 
 sub valuation {
   my($n, $k) = @_;
+  $n = -$n if defined $n && $n < 0;
+  _validate_num($n) || _validate_positive_integer($n);
   return 0 if $n < 2 || $k < 2;
   my $v = 0;
   if ($k == 2) { # Accelerate power of 2
@@ -2994,6 +3062,17 @@ sub rootint {
 sub logint {
   my ($n, $b, $refp) = @_;
   croak("logint third argument not a scalar reference") if defined($refp) && !ref($refp);
+
+  if ($Math::Prime::Util::_GMPfunc{"logint"}) {
+    my $e = Math::Prime::Util::GMP::logint($n, $b);
+    if (defined $refp) {
+      my $r = Math::Prime::Util::GMP::powmod($b, $e, $n);
+      $r = $n if $r == 0;
+      $$refp = Math::Prime::Util::_reftyped($_[0], $r);
+    }
+    return Math::Prime::Util::_reftyped($_[0], $e);
+  }
+
   croak "logint: n must be > 0" unless $n > 0;
   croak "logint: missing base" unless defined $b;
   if ($b == 10) {
@@ -3069,27 +3148,31 @@ sub stirling {
   }
   return Math::Prime::Util::_reftyped($_[0], Math::Prime::Util::GMP::stirling($n,$m,$type))
     if $Math::Prime::Util::_GMPfunc{"stirling"};
-  my $s = BZERO->copy;
+  # Go through vecsum with quoted negatives to make sure we don't overflow.
+  my $s;
   if ($type == 3) {
     $s = Math::Prime::Util::vecprod( Math::Prime::Util::binomial($n,$m), Math::Prime::Util::binomial($n-1,$m-1), Math::Prime::Util::factorial($n-$m) );
   } elsif ($type == 2) {
+    my @terms;
     for my $j (1 .. $m) {
       my $t = Math::Prime::Util::vecprod(
                 Math::BigInt->new($j) ** $n,
                 Math::Prime::Util::binomial($m,$j)
               );
-      $s = (($m-$j) & 1)  ?  $s - $t  :  $s + $t;
+      push @terms, (($m-$j) & 1)  ?  "-$t"  :  $t;
     }
-    $s /= factorial($m);
+    $s = Math::Prime::Util::vecsum(@terms) / factorial($m);
   } else {
+    my @terms;
     for my $k (1 .. $n-$m) {
       my $t = Math::Prime::Util::vecprod(
         Math::Prime::Util::binomial($k + $n - 1, $k + $n - $m),
         Math::Prime::Util::binomial(2 * $n - $m, $n - $k - $m),
         Math::Prime::Util::stirling($k - $m + $n, $k, 2),
       );
-      $s = ($k & 1)  ?  $s - $t  :  $s + $t;
+      push @terms, ($k & 1)  ?  "-$t"  :  $t;
     }
+    $s = Math::Prime::Util::vecsum(@terms);
   }
   $s;
 }
@@ -3511,6 +3594,8 @@ sub factorialmod {
 
   return Math::Prime::Util::GMP::factorialmod($n,$m)
     if $Math::Prime::Util::_GMPfunc{"factorialmod"};
+
+  return 0 if $n >= $m || $m == 1;
 
   if ($n > 10) {
     my($s,$t,$e) = (1);
@@ -6352,11 +6437,11 @@ sub _multiset_permutations {
 sub numtoperm {
   my($n,$k) = @_;
   _validate_positive_integer($n);
-  _validate_positive_integer($k);
+  _validate_integer($k);
   return () if $n == 0;
   return (0) if $n == 1;
   my $f = factorial($n-1);
-  $k %= vecprod($f,$n) if int($k/$f) >= $n;
+  $k %= vecprod($f,$n) if $k < 0 || int($k/$f) >= $n;
   my @S = map { $_ } 0 .. $n-1;
   my @V;
   while ($n-- > 0) {
@@ -6695,7 +6780,7 @@ Math::Prime::Util::PP - Pure Perl version of Math::Prime::Util
 
 =head1 VERSION
 
-Version 0.68
+Version 0.69
 
 
 =head1 SYNOPSIS

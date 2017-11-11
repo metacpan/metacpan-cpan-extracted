@@ -1,12 +1,16 @@
 Revision history for Perl extension File-Globstar.
 
-0.2  2017-11-05 
+0.3  2017-11-08 
+    - do not use "package" with version (breaks older Perls)
+    - run author tests on Travis CI
 
+0.2  2017-11-05
     - new function pnmatchstar()
     - minor bug fixes for edge cases
     - German translation
     - Bulgarian translation
+    - Auto generate META.json using dzil plugin [MetaJSON]
+      (https://github.com/gflohr/File-Globstar/pull/1)
 
 0.1 2017-10-31
-
     - Initial release

@@ -5,22 +5,20 @@ package Dist::Zilla::Role::PotWriter;
 use Moose::Role;
 use strict;
 use warnings;
-use File::Path qw(make_path);
 use IPC::Run3;
 use namespace::autoclean;
 
-our $VERSION = '0.90';
+our $VERSION = '0.91';
 
 sub files_to_scan {
-    my $self = shift;
-    my $dzil = $self->zilla;
+    my $self   = shift;
+    my $plugin = shift;
+    my $dzil   = $self->zilla;
     $dzil->chrome->logger->mute;
     $_->gather_files for grep {
         ! $_->isa('Dist::Zilla::Plugin::LocaleTextDomain')
     } @{ $dzil->plugins_with(-FileGatherer) };
     $dzil->chrome->logger->unmute;
-    my $plugin = $dzil->plugin_named('LocaleTextDomain')
-        or $dzil->log_fatal('LocaleTextDomain plugin not found in dist.ini!');
     return map { $_->name() } @{ $plugin->found_files() };
 }
 
@@ -32,11 +30,14 @@ sub write_pot {
     my $verb = -e $pot ? 'update' : 'create';
 
     # Make sure the directory exists.
-    make_path $pot->parent->stringify unless -d $pot->parent;
+    $pot->parent->mkpath unless -d $pot->parent;
+
+    my $plugin = $dzil->plugin_named('LocaleTextDomain')
+        or $dzil->log_fatal('LocaleTextDomain plugin not found in dist.ini!');
 
     # Need to do this before calling other methods, as they need the
     # files loaded to find various information.
-    my @files = $self->files_to_scan;
+    my @files = $self->files_to_scan($plugin);
 
     my $email = $p{bugs_email} || do {
         if (my $author = $dzil->authors->[0]) {
@@ -46,8 +47,10 @@ sub write_pot {
         }
     } || '';
 
-    my $log = sub { $dzil->log(@_) };
-    run3 [
+    my $xgettext_args = $plugin->xgettext_args;
+    my $override_args = $plugin->override_args;
+
+    my @cmd = (
         $p{xgettext} || 'xgettext' . ($^O eq 'MSWin32' ? '.exe' : ''),
         '--from-code=' . ($p{encoding} || 'UTF-8'),
         '--add-comments=TRANSLATORS:',
@@ -55,6 +58,10 @@ sub write_pot {
         '--package-version=' . ($p{version} || $dzil->version || 'VERSION'),
         '--copyright-holder=' . ($p{copyright_holder} || $dzil->copyright_holder),
         ($email ? '--msgid-bugs-address=' . $email : ()),
+        '--output=' . $pot,
+    );
+    my @default_keywords = (
+        '--language=perl',
         '--keyword',
         '--keyword=\'$__\'}',
         '--keyword=__',
@@ -70,11 +77,36 @@ sub write_pot {
         '--keyword=N__p:1c,2',
         '--keyword=N__np:1c,2,3',
         '--keyword=%__',
-        '--language=perl',
-        '--output=' . $pot,
+    );
+
+    my $log = sub { $dzil->log(@_) };
+    run3 [
+        @cmd,
+        $override_args ? () : @default_keywords,
+        @$xgettext_args,
         @files,
     ], undef, $log, $log;
     $dzil->log_fatal("Cannot $verb $pot") if $?;
+
+    my $join_existing = $plugin->join_existing;
+
+    my $expand_arg = sub {
+        my $arg = shift;
+        if (my ($finder) = $arg =~ /^\%\{(.+)\}f$/) {
+            my $files = $dzil->find_files($finder);
+            return map { $_->name() } @$files;
+        }
+        return $arg;
+    };
+
+    for my $join (@$join_existing) {
+        my @args = map { $expand_arg->($_) } @$join;
+        run3 [
+            @cmd,
+            '--join-existing', @args,
+        ], undef, $log, $log;
+        $dzil->log_fatal("Cannot join existing $pot") if $?;
+    }
 }
 
 requires 'zilla';
@@ -117,7 +149,7 @@ language translation file. The supported parameters are:
 
 =item C<to>
 
-L<Path::Class::File> object representing the file to write to. Required.
+L<Path::Tiny> object representing the file to write to. Required.
 
 =item C<scan_files>
 
@@ -161,9 +193,13 @@ L<Email::Address>.
 
 David E. Wheeler <david@justatheory.com>
 
+=head1 Contributor
+
+Charles McGarvey <ccm@cpan.org>
+
 =head1 Copyright and License
 
-This software is copyright (c) 2012-2013 by David E. Wheeler.
+This software is copyright (c) 2012-2017 by David E. Wheeler.
 
 This is free software; you can redistribute it and/or modify it under the same
 terms as the Perl 5 programming language system itself.

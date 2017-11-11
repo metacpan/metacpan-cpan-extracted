@@ -1,0 +1,18 @@
+MANIFEST
+README
+LICENSE
+INSTALL
+Todo
+Changes
+Makefile.PL
+pm_to_blib
+lib/Win32/Shortkeys.pm
+lib/Win32/Shortkeys/Ripper.pm
+lib/Win32/Shortkeys/Manager.pm
+t/001_load.t
+example/example.pl
+example/kbhook.properties
+example/shortkeys_utf8.xml
+example/ripper.properties
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

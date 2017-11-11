@@ -20,7 +20,7 @@ package Finance::Quote::AlphaVantage;
 
 require 5.005;
 
-our $VERSION = '1.43'; # VERSION
+our $VERSION = '1.45'; # VERSION
 
 use strict;
 use JSON qw( decode_json );
@@ -30,7 +30,71 @@ my $ALPHAVANTAGE_URL =
     'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&outputsize=compact&datatype=json';
 my $ALPHAVANTAGE_API_KEY = $ENV{'ALPHAVANTAGE_API_KEY'};
 
-my %currencies_by_suffix = ( '.BR' => 'EUR', '.DE' => 'EUR', '.L' => 'GBP', );
+my %currencies_by_suffix = (
+
+                        # Country		City/Exchange Name
+    '.US'  => "USD",    # USA		AMEX, Nasdaq, NYSE
+    '.A'   => "USD",    # USA		American Stock Exchange (ASE)
+    '.B'   => "USD",    # USA		Boston Stock Exchange (BOS)
+    '.N'   => "USD",    # USA		Nasdaq Stock Exchange (NAS)
+    '.O'   => "USD",    # USA		NYSE Stock Exchange (NYS)
+    '.OB'  => "USD",    # USA		OTC Bulletin Board
+    '.PK'  => "USD",    # USA		Pink Sheets
+    '.X'   => "USD",    # USA		US Options
+    '.BA'  => "ARS",    # Argentina	Buenos Aires
+    '.VI'  => "EUR",    # Austria		Vienna
+    '.AX'  => "AUD",    # Australia
+    '.SA'  => "BRL",    # Brazil		Sao Paolo
+    '.BR'  => "EUR",    # Belgium		Brussels
+    '.TO'  => "CAD",    # Canada		Toronto
+    '.V'   => "CAD",    # 		Toronto Venture
+    '.SN'  => "CLP",    # Chile		Santiago
+    '.SS'  => "CNY",    # China		Shanghai
+    '.SZ'  => "CNY",    # 		Shenzhen
+    '.CO'  => "DKK",    # Denmark		Copenhagen
+    '.PA'  => "EUR",    # France		Paris
+    '.BE'  => "EUR",    # Germany		Berlin
+    '.BM'  => "EUR",    # 		Bremen
+    '.D'   => "EUR",    # 		Dusseldorf
+    '.F'   => "EUR",    # 		Frankfurt
+    '.H'   => "EUR",    # 		Hamburg
+    '.HA'  => "EUR",    # 		Hanover
+    '.MU'  => "EUR",    # 		Munich
+    '.SG'  => "EUR",    # 		Stuttgart
+    '.DE'  => "EUR",    # 		XETRA
+    '.HK'  => "HKD",    # Hong Kong
+    '.BO'  => "INR",    # India		Bombay
+    '.CL'  => "INR",    # 		Calcutta
+    '.NS'  => "INR",    # 		National Stock Exchange
+    '.JK'  => "IDR",    # Indonesia	Jakarta
+    '.I'   => "EUR",    # Ireland		Dublin
+    '.TA'  => "ILS",    # Israel		Tel Aviv
+    '.MI'  => "EUR",    # Italy		Milan
+    '.KS'  => "KRW",    # Korea		Stock Exchange
+    '.KQ'  => "KRW",    # 		KOSDAQ
+    '.KL'  => "MYR",    # Malaysia	Kuala Lampur
+    '.MX'  => "MXP",    # Mexico
+    '.NZ'  => "NZD",    # New Zealand
+    '.AS'  => "EUR",    # Netherlands	Amsterdam
+    '.OL'  => "NOK",    # Norway		Oslo
+    '.LM'  => "PEN",    # Peru		Lima
+    '.IN'  => "EUR",    # Portugal	Lisbon
+    '.SI'  => "SGD",    # Singapore
+    '.BC'  => "EUR",    # Spain		Barcelona
+    '.BI'  => "EUR",    # 		Bilbao
+    '.MF'  => "EUR",    # 		Madrid Fixed Income
+    '.MC'  => "EUR",    # 		Madrid SE CATS
+    '.MA'  => "EUR",    # 		Madrid
+    '.VA'  => "EUR",    # 		Valence
+    '.ST'  => "SEK",    # Sweden		Stockholm
+    '.S'   => "CHF",    # Switzerland	Zurich
+    '.TW'  => "TWD",    # Taiwan		Taiwan Stock Exchange
+    '.TWO' => "TWD",    # 		OTC
+    '.BK'  => "THB",    # Thialand	Thailand Stock Exchange
+    '.TH'  => "THB",    # 		??? From Asia.pm, (in Thai Baht)
+    '.L'   => "GBP",    # United Kingdom	London
+);
+
 
 sub methods {
     return ( alphavantage => \&alphavantage, );
@@ -46,6 +110,7 @@ sub alphavantage {
     my $quoter = shift;
 
     my @stocks = @_;
+    my $quantity = @stocks;
     my ( %info, $reply, $url );
     my $ua = $quoter->user_agent();
 
@@ -123,14 +188,32 @@ sub alphavantage {
         $info{ $stock, 'volume' }  = $ts{'5. volume'};
         $info{ $stock, 'method' }  = 'alphavantage';
         $quoter->store_date( \%info, $stock, { isodate => $isodate } );
+
         # deduce currency
-        if ($stock =~ /(\..*)/) {
-                my $suffix = $1;
-                $info{ $stock, 'currency' } = $currencies_by_suffix{$suffix}
-                    if ( $currencies_by_suffix{$suffix} );
-            } else {
-                $info{ $stock, 'currency' } = 'USD';
+        if ( $stock =~ /(\..*)/ ) {
+            my $suffix = $1;
+            if ( $currencies_by_suffix{$suffix} ) {
+                $info{ $stock, 'currency' } = $currencies_by_suffix{$suffix};
+
+                # divide GBP quotes by 100
+                if ( ($info{ $stock, 'currency' } eq 'GBP') || ($info{$stock,'currency'} eq 'GBX') ) {
+                    foreach my $field ( $quoter->default_currency_fields ) {
+                        next unless ( $info{ $stock, $field } );
+                        $info{ $stock, $field } =
+                            $quoter->scale_field( $info{ $stock, $field },
+                                                  0.01 );
+                    }
+                }
             }
+        }
+        else {
+            $info{ $stock, 'currency' } = 'USD';
+        }
+
+        $info{ $stock, "currency_set_by_fq" } = 1;
+
+        $quantity--;
+        select(undef, undef, undef, .7) if ($quantity);
     }
 
     return wantarray() ? %info : \%info;

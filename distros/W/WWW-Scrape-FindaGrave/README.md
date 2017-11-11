@@ -9,7 +9,7 @@ Scrape the Find a Grave website
 
 # VERSION
 
-Version 0.04
+Version 0.05
 
 # SYNOPSIS
 
@@ -45,7 +45,7 @@ There are three optional arguments: middlename, ua and mech.  Mech is a pointer
 to an object such as [WWW::Mechanize](https://metacpan.org/pod/WWW::Mechanize).  If not given it will be created.
 
 ua is a pointer to an object that understands get and env\_proxy messages, such
-as [LWP::UserAgent](https://metacpan.org/pod/LWP::UserAgent).
+as [LWP::UserAgent::Throttled](https://metacpan.org/pod/LWP::UserAgent::Throttled).
 
 ## get\_next\_entry
 
@@ -66,7 +66,7 @@ automatically be notified of progress on your bug as I make changes.
 # SEE ALSO
 
 [https://github.com/nigelhorne/gedgrave](https://github.com/nigelhorne/gedgrave)
-[http://www.findagrave.com](http://www.findagrave.com)
+[https://old.findagrave.com](https://old.findagrave.com)
 
 # SUPPORT
 

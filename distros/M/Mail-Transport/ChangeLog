@@ -1,6 +1,12 @@
 
 ===== ChangeLog of Mail::Transport version 3.*
 
+version 3.001: Wed  8 Nov 13:06:18 CET 2017
+
+	Fixes:
+	- link to Perl licenses.
+	  rt.cpan.org#120319 [Jitka Plesnikova]
+
 version 3.000: Thu  2 Feb 15:41:59 CET 2017
 
 	Changes:

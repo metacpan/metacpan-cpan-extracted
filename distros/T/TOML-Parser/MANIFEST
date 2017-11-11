@@ -48,5 +48,7 @@ t/toml/single_quote.toml
 t/toml/string_zero.toml
 t/toml/table.toml
 wercker.yml
+xt/toml/too_large.toml
+xt/too_large.t
 META.yml
 MANIFEST

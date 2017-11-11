@@ -1,4 +1,4 @@
-package Dist::Zilla::PluginBundle::Author::Plicease 2.23 {
+package Dist::Zilla::PluginBundle::Author::Plicease 2.24 {
 
   use 5.014;
   use Moose;
@@ -31,7 +31,7 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.23 {
 
   my %plugin_versions = qw(
     Alien                0.023
-    Author::Plicease.*   2.23
+    Author::Plicease.*   2.24
     OurPkgVersion        0.12
     MinimumPerl          1.006
     InstallGuide         1.200006
@@ -336,7 +336,7 @@ Dist::Zilla::PluginBundle::Author::Plicease - Dist::Zilla plugin bundle used by 
 
 =head1 VERSION
 
-version 2.23
+version 2.24
 
 =head1 SYNOPSIS
 

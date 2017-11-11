@@ -1,4 +1,4 @@
-Dist/Zilla/LocaleTextDomain version 0.90
+Dist/Zilla/LocaleTextDomain version 0.91
 ========================================
 
 Dist::Zilla::LocaleTextDomain provides tools to scan your Perl libraries for
@@ -28,7 +28,7 @@ Or, if you don't have Module::Build installed, type the following:
 Dependencies
 ------------
 
-This module requires the the [gettext](http://www.gnu.org/software/gettext/)
+This module requires the [gettext](http://www.gnu.org/software/gettext/)
 utilities. It also requires the following non-core modules:
 
 * Dist::Zilla
@@ -44,8 +44,8 @@ utilities. It also requires the following non-core modules:
 * Moose
 * Moose::Role:
 * Moose::Util::TypeConstraints
-* MooseX::Types::Path::Class
-* Path::Class
+* MooseX::Types::Path::Tiny
+* Path::Tiny
 * namespace::autoclean
 
 Copyright and License

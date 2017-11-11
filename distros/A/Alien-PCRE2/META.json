@@ -34,10 +34,14 @@
             "Alien::gmake" : "0.11",
             "Archive::Tar" : "0",
             "Config" : "0",
+            "HTML::LinkExtor" : "0",
+            "HTTP::Tiny" : "0.044",
+            "IO::Socket::SSL" : "1.56",
             "IO::Zlib" : "0",
-            "Net::FTP" : "0",
+            "Net::SSLeay" : "1.49",
             "Sort::Versions" : "0",
-            "URI" : "0"
+            "URI" : "0",
+            "URI::Escape" : "0"
          }
       },
       "configure" : {
@@ -72,7 +76,7 @@
       "x_mailinglist" : "https://lists.exim.org/lurker/list/pcre-dev.html",
       "x_wiki" : "https://en.wikipedia.org/wiki/Perl_Compatible_Regular_Expressions"
    },
-   "version" : "0.014000",
+   "version" : "0.015000",
    "x_alienfile" : {
       "generated_by" : "Alien::Build::MM version 1.28",
       "requires" : {
@@ -80,10 +84,14 @@
             "Alien::gmake" : "0.11",
             "Archive::Tar" : "0",
             "Config" : "0",
+            "HTML::LinkExtor" : "0",
+            "HTTP::Tiny" : "0.044",
+            "IO::Socket::SSL" : "1.56",
             "IO::Zlib" : "0",
-            "Net::FTP" : "0",
+            "Net::SSLeay" : "1.49",
             "Sort::Versions" : "0",
-            "URI" : "0"
+            "URI" : "0",
+            "URI::Escape" : "0"
          },
          "system" : {}
       }

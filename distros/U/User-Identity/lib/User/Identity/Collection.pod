@@ -81,7 +81,7 @@ example:
  foreach my $loc (@$location) ...
  print $location->[0];
 
-=item overload: B<stringification>
+=item overload: B<stringification >
 
 Returns the name of the collection and a sorted list of defined items.
 
@@ -101,7 +101,7 @@ Extends L<"Constructors" in User::Identity::Item|User::Identity::Item/"Construct
  
 =over 4
 
-=item User::Identity::Collection-E<gt>B<new>( [NAME], OPTIONS )
+=item User::Identity::Collection-E<gt>B<new>( [$name], %options )
 
  -Option     --Defined in          --Default
   description  User::Identity::Item  undef
@@ -148,7 +148,7 @@ Inherited, see L<User::Identity::Item/"Attributes">
 
 Returns the type of the items collected.
 
-=item $obj-E<gt>B<name>( [NEWNAME] )
+=item $obj-E<gt>B<name>( [$newname] )
 
 Inherited, see L<User::Identity::Item/"Attributes">
 
@@ -165,23 +165,23 @@ Extends L<"Collections" in User::Identity::Item|User::Identity::Item/"Collection
  
 =over 4
 
-=item $obj-E<gt>B<add>(COLLECTION, ROLE)
+=item $obj-E<gt>B<add>($collection, $role)
 
 Inherited, see L<User::Identity::Item/"Collections">
 
-=item $obj-E<gt>B<addCollection>(OBJECT | ([TYPE], OPTIONS))
+=item $obj-E<gt>B<addCollection>( $object | <[$type], %options> )
 
 Inherited, see L<User::Identity::Item/"Collections">
 
-=item $obj-E<gt>B<collection>(NAME)
+=item $obj-E<gt>B<collection>($name)
 
 Inherited, see L<User::Identity::Item/"Collections">
 
-=item $obj-E<gt>B<parent>( [PARENT] )
+=item $obj-E<gt>B<parent>( [$parent] )
 
 Inherited, see L<User::Identity::Item/"Collections">
 
-=item $obj-E<gt>B<removeCollection>(OBJECT|NAME)
+=item $obj-E<gt>B<removeCollection>($object|$name)
 
 Inherited, see L<User::Identity::Item/"Collections">
 
@@ -201,11 +201,11 @@ Inherited, see L<User::Identity::Item/"Collections">
 
 =over 4
 
-=item $obj-E<gt>B<addRole>(ROLE| ([NAME],OPTIONS) | ARRAY)
+=item $obj-E<gt>B<addRole>($role| <[$name],%options> | ARRAY)
 
-Adds a new role to this collection.  ROLE is an object of the right type
+Adds a new role to this collection.  $role is an object of the right type
 (depends on the extension of this module which type that is) or a list
-of OPTIONS which are used to create such role.  The options can also be
+of %options which are used to create such role.  The options can also be
 passed as reference to an ARRAY.  The added role is returned.
 
 example: 
@@ -224,11 +224,11 @@ Easier
  $ui->add(location => 'home', address => 'street 32' );
  $ui->add(location => [ 'home', address => 'street 32' ] );
 
-=item $obj-E<gt>B<removeRole>(ROLE|NAME)
+=item $obj-E<gt>B<removeRole>($role|$name)
 
 The deleted role is returned (if it existed).
 
-=item $obj-E<gt>B<renameRole>( <ROLE|OLDNAME>, NEWNAME )
+=item $obj-E<gt>B<renameRole>( <$role|$oldname>, $newname )
 
 Give the role a different name, and move it in the collection.
 
@@ -244,9 +244,9 @@ Extends L<"Searching" in User::Identity::Item|User::Identity::Item/"Searching">.
  
 =over 4
 
-=item $obj-E<gt>B<find>(NAME|CODE|undef)
+=item $obj-E<gt>B<find>($name|CODE|undef)
 
-Find the object with the specified NAME in this collection.  With C<undef>,
+Find the object with the specified $name in this collection.  With C<undef>,
 a randomly selected role is returned.
 
 When a code reference is specified, all collected roles are scanned one
@@ -322,13 +322,13 @@ cannot add objects of a different $type.
 
 =head1 SEE ALSO
 
-This module is part of User-Identity distribution version 0.97,
-built on February 02, 2017.
+This module is part of User-Identity distribution version 0.98,
+built on November 08, 2017.
 
 Do not forget to read
-L</Mail::Box-Overview>,
-L</Mail::Box-Cookbook>, and
-L</Mail::Box-Index>.
+L<Mail::Box-Overview>,
+L<Mail::Box-Cookbook>, and
+L<Mail::Box-Index>.
 Examples are included in the Mail-Box distribution, directories 'examples'
 and 'scripts'.
 
@@ -336,23 +336,23 @@ Browseable manuals, papers, and other released material van be found
 at  Website: F<http://perl.overmeer.net/userid/>
 
 The central modules (in separate distributions) in the MailBox suite are:
-L</Mail::Message>,
-L</Mail::Box>,
-L</Mail::Box::IMAP4>,
-L</Mail::Box::POP3>,
-L</Mail::Box::Parser::C>,
-L</Mail::Box::Dbx> (unpublished),
-L</Mail::Transport>,
-L</Object::Realize::Later>, and
-L</User::Identity>.
+L<Mail::Message>,
+L<Mail::Box>,
+L<Mail::Box::IMAP4>,
+L<Mail::Box::POP3>,
+L<Mail::Box::Parser::C>,
+L<Mail::Box::Dbx> (unpublished),
+L<Mail::Transport>,
+L<Object::Realize::Later>, and
+L<User::Identity>.
 
 Please post questions or ideas to the author F<markov@cpan.org>.
 
 =head1 LICENSE
 
-Copyrights 2003-2017 by [Mark Overmeer <perl@overmeer.net>]. For other contributors see Changes.
+Copyrights 2003-2017 by [Mark Overmeer <markov@cpan.org>]. For other contributors see Changes.
 
 This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-See F<http://www.perl.com/perl/misc/Artistic.html>
+under the Artistic license.
+See F<http://dev.perl.org/licenses/artistic.html>
 

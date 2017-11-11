@@ -116,6 +116,7 @@ struct imp_dbh_st {
     CegoDbHandler *db; */
     char hostname[MAXHOSTNAMELEN];
     int port;
+    int maxsendlen;
     char logfile[MAXLOGFILE];
     char logmode[MAXLOGMODE];
     char protocol[MAXPROTSTRING];

@@ -1,10 +1,12 @@
 {
    "abstract" : "Perl interface to interact with the Codeguard API",
    "author" : [
-      "Rishwanth Yeddula <ryeddula@cpan.org>"
+      "Rishwanth Yeddula <ryeddula@cpan.org>",
+      "David Oswald <davido@cpan.org>",
+      "James Jacobson <shames@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -23,6 +25,7 @@
       "build" : {
          "requires" : {
             "JSON" : "0",
+            "Test::MockModule" : "0",
             "Test::More" : "0",
             "parent" : "0"
          }
@@ -39,7 +42,7 @@
             "LWP::UserAgent" : "0",
             "Net::OAuth" : "0",
             "parent" : "0",
-            "perl" : "5.006"
+            "perl" : "5.008009"
          }
       }
    },
@@ -47,9 +50,10 @@
    "resources" : {
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/ryeddula/www-codeguard.git",
-         "web" : "https://github.com/ryeddula/www-codeguard"
+         "url" : "https://github.com/daoswald/www-codeguard.git",
+         "web" : "https://github.com/daoswald/www-codeguard"
       }
    },
-   "version" : "0.03"
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

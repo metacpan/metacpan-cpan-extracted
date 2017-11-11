@@ -4,7 +4,7 @@
       "GomoR <gomor_at_cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4218",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "artistic_1"
    ],
@@ -30,7 +30,7 @@
    "provides" : {
       "Net::Frame::Simple" : {
          "file" : "lib/Net/Frame/Simple.pm",
-         "version" : "1.08"
+         "version" : "1.09"
       }
    },
    "release_status" : "stable",
@@ -39,6 +39,6 @@
          "http://www.perlfoundation.org/artistic_license_1_0"
       ]
    },
-   "version" : "1.08",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "1.09",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

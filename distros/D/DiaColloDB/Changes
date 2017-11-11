@@ -2,6 +2,15 @@
 ##
 ## Change log for perl distribution DiaColloDB
 
+v0.12.010 Fri, 10 Nov 2017 10:31:29 +0100 moocow
+	* fixed native query syntax regex parsing with ddcmode=-1 (fallback)
+
+v0.12.009 Thu, 09 Nov 2017 12:40:16 +0100 moocow
+	* fixed DDC::Any::Object::__dcvs_compile() fallback calls in Relation/TDF/Query.pm
+	  - bogus parameter conventions were resulting in error messages
+	    'Can't locate object method "toString" via package "DiaColloDB::Relation::TDF::Query"'
+	    and 'no index term(s) matched user query' for simple WITH (&=) queries
+
 v0.12.008 Thu, 22 Jun 2017 11:02:11 +0200 moocow
 	* trim perl-5.14 character set modifiers from qr()-stringified regexes
 	  - including these breaks KWIC links, since DDC (PCRE) doesn't seem to support them

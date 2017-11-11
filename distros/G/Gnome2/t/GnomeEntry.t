@@ -11,7 +11,9 @@ use Test::More tests => TESTS;
 
 SKIP: {
   our $application;
-  do "t/TestBoilerplate";
+  do "./t/TestBoilerplate";
+  die $@ if $@;
+  die $! if $!;
 
   #############################################################################
 

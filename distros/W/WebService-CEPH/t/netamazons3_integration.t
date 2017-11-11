@@ -58,9 +58,18 @@ sub test_case {
 
 test_case "list_multipart_uploads" => sub {
     my ($msg, $ceph) = @_;
-    $ceph->list_multipart_uploads();
-    ok 1, "$msg"
 
+    no warnings 'redefine';
+    local *WebService::CEPH::NetAmazonS3::_time = sub { 1289422113 + 5000 };
+    my $uploads = $ceph->list_multipart_uploads();
+    cmp_deeply $uploads, [{
+        upload_id => 'XMgbGlrZSBlbHZpbmcncyBub3QgaGF2aW5nIG11Y2ggbHVjaw',
+        initiated => '2010-11-10T20:48:33.000Z',
+        key => 'my-divisor',
+        initiated_epoch => 1289422113,
+        initiated_age_seconds => 5000,
+    }];
+    ok 1, "$msg";
 } => sub {
     my ($msg, $connect, $request) = @_;
     die unless $request->url eq '/testbucket?uploads';

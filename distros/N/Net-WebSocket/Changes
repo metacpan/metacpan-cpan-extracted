@@ -92,3 +92,7 @@ the entire handshake.
 0.052 Sat Nov 4 2017
 - Perl 5.12 and 5.10 are now supported.
 - Fix exception creation boo-boos, added tests.
+
+0.053 Thu Nov 9 2017
+- Update tests and docs for up-to-date IO::Framed syntax
+- Add README.pod

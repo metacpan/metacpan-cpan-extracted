@@ -21,7 +21,7 @@ WriteMakefile(
     PREREQ_PM => {
         'Moo' => '1.001001',
     	'List::MoreUtils' => '0.33',
-       	'MooX::LazierAttributes' => '1.03',
+       	'MooX::LazierAttributes' => '1.06',
        	'MooX::ValidateSubs' => '1.012001',
         'Type::Tiny' => '1.002000',
 		'Coerce::Types::Standard' => '0.000004',

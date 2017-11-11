@@ -1,10 +1,10 @@
-# Copyrights 2003-2017 by [Mark Overmeer <perl@overmeer.net>].
+# Copyrights 2003-2017 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see Changes.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
 package User::Identity::Item;
 use vars '$VERSION';
-$VERSION = '0.97';
+$VERSION = '0.98';
 
 
 use strict;
@@ -163,11 +163,10 @@ sub find($$)
 {   my $all        = shift->{UI_col};
     my $collname   = shift;
     my $collection
-     = ref $collname && $collname->isa('User::Identity::Collect') ? $collname
+     = ref $collname && $collname->isa('User::Identity::Collection') ? $collname
      : ($all->{$collname} || $all->{$collname.'s'});
 
-    return () unless defined $collection;
-    $collection->find(shift);
+    defined $collection ? $collection->find(shift) : ();
 }
 
 1;

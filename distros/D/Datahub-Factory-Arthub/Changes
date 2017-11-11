@@ -1,5 +1,11 @@
 Revision history for Datahub-Factory-VKC
 
+0.93  2017-11-08 13:17:10 CET
+
+    - Added: added generate_temp_tables and generate_vocabularies plugin options.
+    - Changed: remove stale PID module.
+    - Changed: added AAT & Creators SQLite generation to KMSKA module.
+
 0.92  2017-09-06 10:59:08 CEST
 
     - Changed: updated documentation and licensing

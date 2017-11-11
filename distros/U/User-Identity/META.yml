@@ -1,7 +1,7 @@
 ---
 abstract: 'Collect information about a user'
 author:
-  - 'Mark Overmeer <perl@overmeer.net>'
+  - 'Mark Overmeer <markov@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: 0
 configure_requires:
@@ -18,4 +18,4 @@ no_index:
     - t
     - inc
 requires: {}
-version: 0.97
+version: 0.98

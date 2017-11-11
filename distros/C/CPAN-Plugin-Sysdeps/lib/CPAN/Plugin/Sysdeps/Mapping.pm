@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps::Mapping;
 use strict;
 use warnings;
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 
 # shortcuts
 #  os and distros
@@ -995,7 +995,7 @@ sub mapping {
 
      [cpanmod => 'Geo::Proj4',
       [os_freebsd,
-       [package => ['libproj4', 'proj']]],
+       [package => 'proj']],
       [like_debian,
        [package => ['libproj-dev', 'proj-bin']]],
       [like_fedora,
@@ -2291,6 +2291,17 @@ sub mapping {
        [package => 'librpm-dev']], # but tests fail
       [like_fedora,
        [package => 'rpm-devel']],
+     ],
+
+     [cpanmod => ['RPM4', 'URPM'],
+      [os_freebsd,
+       [package => 'rpm4']],
+      [like_debian,
+       [package => 'rpm']],
+      [like_fedora,
+       [package => 'rpm']],
+      [os_darwin,
+       [package => 'rpm']],
      ],
 
      [cpanmod => 'RRD::Tweak',

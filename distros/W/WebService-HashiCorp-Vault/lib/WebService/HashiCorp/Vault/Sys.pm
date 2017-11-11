@@ -9,7 +9,7 @@
 package WebService::HashiCorp::Vault::Sys;
 
 use Moo;
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.004'; # VERSION
 use namespace::clean;
 
 extends 'WebService::HashiCorp::Vault::Base';
@@ -164,7 +164,7 @@ WebService::HashiCorp::Vault::Sys - Perl API for HashiCorp's Vault (System)
 
 =head1 VERSION
 
-version 0.002
+version 0.004
 
 =head1 SYNOPSIS
 

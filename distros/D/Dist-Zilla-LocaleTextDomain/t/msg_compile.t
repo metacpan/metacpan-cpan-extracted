@@ -5,7 +5,7 @@ use warnings;
 use Test::More 0.90;
 use Test::DZil;
 use IPC::Cmd 'can_run';
-use Path::Class;
+use Path::Tiny;
 use Test::File;
 use Test::File::Contents;
 use Dist::Zilla::App::Tester;
@@ -38,7 +38,7 @@ my $i = 0;
 for my $lang (qw(de fr)) {
     like $result->log_messages->[$i++], qr/(?:po.$lang[.]po: )?19/m,
         "$lang.po message should have been logged";
-    my $mo = file $result->tempdir,
+    my $mo = path $result->tempdir,
         qw(source LocaleData), $lang, qw(LC_MESSAGES DZT-Sample.mo);
     my $t = $result->tempdir;
     file_exists_ok $mo, "$lang .mo file should now exist";
@@ -47,19 +47,19 @@ for my $lang (qw(de fr)) {
 }
 
 # Try creating just one language.
-my $de = file qw(po de.po);
-my $fr = file qw(po fr.po);
+my $de = path qw(po de.po);
+my $fr = path qw(po fr.po);
 $result = test_dzil('t/dist', [qw(msg-compile), $fr]);
 is $result->exit_code, 0, '"msg-compile fr" should have exited 0';
 is @{ $result->log_messages }, 1, 'Should have only one log message';
 like $result->log_messages->[0], qr/(?:po.fr[.]po: )?19/m,
     '... And it should be for the french file';
-my $mo = file $result->tempdir,
+my $mo = path $result->tempdir,
     qw(source LocaleData fr LC_MESSAGES DZT-Sample.mo);
 file_exists_ok $mo, "fr .mo file should exist";
 file_contents_like $mo, qr/^Language: fr$/m,
     "f r.mo should have language content";
-$mo = file $result->tempdir,
+$mo = path $result->tempdir,
     qw(source LocaleData de LC_MESSAGES DZT-Sample.mo);
 file_not_exists_ok $mo, 'de .mo file should not exist';
 
@@ -71,7 +71,7 @@ $i = 0;
 for my $lang (qw(de fr)) {
     like $result->log_messages->[$i++], qr/(?:po.$lang[.]po: )?19/m,
         "$lang.po message should have been logged";
-    my $mo = file $result->tempdir,
+    my $mo = path $result->tempdir,
         qw(source foo LocaleData), $lang, qw(LC_MESSAGES DZT-Sample.mo);
     my $t = $result->tempdir;
     file_exists_ok $mo, "$lang .mo file should now exist";

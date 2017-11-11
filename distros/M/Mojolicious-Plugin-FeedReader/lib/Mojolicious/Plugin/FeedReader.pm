@@ -1,7 +1,7 @@
 package Mojolicious::Plugin::FeedReader;
 use Mojo::Base 'Mojolicious::Plugin';
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 use Mojo::Util qw(decode trim);
 use Mojo::File;
 use Mojo::DOM;
@@ -22,6 +22,8 @@ our @feed_types = (
 );
 our %is_feed = map { $_ => 1 } @feed_types;
 
+our $default_charset = 'UTF-8';
+
 sub register {
   my ($self, $app) = @_;
   foreach my $method (
@@ -33,7 +35,7 @@ sub register {
 }
 
 sub make_dom {
-  my ($xml) = @_;
+  my ($xml, $charset) = @_;
   my $rss;
   if (!ref $xml) {    # assume file
     $rss = Mojo::File->new($xml)->slurp;
@@ -51,14 +53,15 @@ sub make_dom {
   else {
     die "don't know how to make a Mojo::DOM from object $xml";
   }
-  #my $rss_str = decode 'UTF-8', $rss;
-  my $rss_str = $rss;
-  die "Failed to read asset $xml (as UTF-8): $!" unless ($rss_str);
+  $charset = ($charset) ? $charset : $default_charset ;
+  my $rss_str = decode($charset, $rss);
+  die "Failed to read asset $xml (as $charset): $!" unless ($rss_str);
   return Mojo::DOM->new->parse($rss_str);
 }
 
 sub parse_rss {
   my ($c, $xml, $cb) = @_;
+  my $charset = undef;
   if (blessed $xml && $xml->isa('Mojo::URL')) {
     # this is the only case where we might go non-blocking:
     if ($cb && ref $cb eq 'CODE') {
@@ -70,7 +73,8 @@ sub parse_rss {
           my $feed;
           if ($tx->success) {
             my $body = $tx->res->body;
-            my $dom = make_dom(\$body);
+            $charset = $tx->res->content->charset;
+            my $dom = make_dom(\$body, $charset);
             eval { $feed = parse_rss_dom($dom); };
           }
           $c->$cb($feed);
@@ -81,6 +85,7 @@ sub parse_rss {
       my $tx = $c->ua->get($xml);
       if ($tx->success) {
         my $body = $tx->res->body;
+        $charset = $tx->res->content->charset;
         $xml = \$body;
       }
       else {
@@ -88,7 +93,7 @@ sub parse_rss {
       }
     }
   }
-  my $dom = make_dom($xml);
+  my $dom = make_dom($xml, $charset);
   return ($dom) ? parse_rss_dom($dom) : 1;
 }
 
@@ -330,7 +335,7 @@ sub _find_feed_links {
 
 sub parse_opml {
   my ($self, $opml_file) = @_;
-  my $opml_str = decode 'UTF-8',
+  my $opml_str = decode $default_charset,
     (ref $opml_file) ? $opml_file->slurp : Mojo::File->new($opml_file)->slurp;
   my $d = Mojo::DOM->new->parse($opml_str);
   my (%subscriptions, %categories);

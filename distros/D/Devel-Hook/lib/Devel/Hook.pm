@@ -5,7 +5,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.006';
+our $VERSION = '0.010';
 
 require XSLoader;
 XSLoader::load( 'Devel::Hook', $Devel::Hook::VERSION );
@@ -86,7 +86,8 @@ sub _has_support_for {
 sub _check {
     my $BLOCK = shift;
     if ( grep { !UNIVERSAL::isa($_, "CODE") } @_ ) {
-        die "$BLOCK blocks must be CODE references";
+        require Carp;
+        Carp::croak "$BLOCK blocks must be CODE references";
     }
 }
 

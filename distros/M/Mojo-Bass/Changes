@@ -1,11 +1,20 @@
 
 Release history for Mojo-Bass
 
-0.2.0     2017-11-03 14:27:39-07:00 America/Los_Angeles
+0.4.0     2017-11-07 16:44:26-08:00 America/Los_Angeles
 
-    - Added -signatures flat to Mojo::Bass
+    - Deprecate Mojo::Bass in favor of Jojo::Base
 
-v0.1.1     2017-10-01 12:31:00-07:00 America/Los_Angeles
+v0.3     2017-11-06 18:40:25-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Export "with" when using "-base"
+    - Added -role flag to Mojo::Bass
+
+v0.2     2017-11-03 14:27:39-07:00 America/Los_Angeles
+
+    - Added -signatures flag to Mojo::Bass
+
+v0.1.1   2017-10-01 12:31:00-07:00 America/Los_Angeles
 
     - Fix packaging issue
 

@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE shortkey SYSTEM "dtd/shk.dtd">
+<shortkey>
+<data k= 'a' use.ctrl_v= '1'>
+Decousser, Jean-Winoc; Department of Virology, Bacteriology - Infection Control, Parasitology - Mycology, Assistance Publique - Hôpitaux de Paris, University Hospital, Crétail, France - IAME, UMR 1137, INSERM, Paris, France
+Poirel, Laurent; Emerging Antibiotic Resistance Unit, Medical and Molecular Microbiology, Department of Medicine, University of Fribourg, Switzerland - French INSERM European Unit, University of Fribourg (LEA-IAME), Fribourg, Switzerland - National Reference Center for Emerging Antibiotic Resistance (Switzerland); fUniversity of Lausanne and University hospital Center, Lausanne, Switzerland
+Nordmann, Patrice; Emerging Antibiotic Resistance Unit, Medical and Molecular Microbiology, Department of Medicine, University of Fribourg, Switzerland - French INSERM European Unit, University of Fribourg (LEA-IAME), Fribourg, Switzerland - National Reference Center for Emerging Antibiotic Resistance (Switzerland); fUniversity of Lausanne and University hospital Center, Lausanne, Switzerland - 
+</data>
+<data k= 't'>
+
+</data>
+<data k= 'j'>
+</data>
+<data k= 'd'>
+</data>
+<data k= 'y'></data>
+<data k= 'v'>
+</data>
+<data k= 'n'>
+</data>
+<data k= 'p'>
+</data>
+<data k= 'd'>
+</data>
+<data k= 's'>
+</data>
+<data k= 'k'>
+</data>
+<!-- ne mettre que la fin du doi -->
+<data k= 'qu'>
+</data><data k= 'qa'></data>
+<!-- U:\docs\zotero_data\styles -->
+<!---->
+<!---->
+<!---->
+<data k='t'>Recent advances in biochemical and molecular diagnostics for the rapid detection of antibiotic-resistant Enterobacteriaceae: a focus on ß-lactam resistance</data><data k='j'>Expert Review of Molecular Diagnostics éàèâô</data><data k='d'>2017-04-03</data><data k='v'>17</data><data k='n'>4</data><data k='p'>327–350</data><data k='qu'>10.1080/14737159.2017.1289087</data><data k='y'>2017</data><data k='qa'>Decousser, J.-W., Poirel, L. and Nordmann, P.</data>
+
+<!---->
+<!---->
+<!---->
+<!--aussi pour le chemin du fichier-->
+<data k= 'l'>Physique</data>
+<!--pdf: mettre le nom du fichier uniquement -->
+<data k= 'wa'>
+</data>
+<!--supplementary material: mettre le nom du fichier uniquement -->
+<data k= 'wb'>
+</data>
+<!-- Dataset appeler avec <r -->
+<data k= 'wc'>
+</data>
+<data k= 'm'>
+##francois.rappaz@unifr.ch#t01#w01
+</data><data k= 'z'>
+<dataref id= 'j'></dataref>#t01<dataref id= 'y'></dataref>#t01<dataref id= 'v'></dataref>#t01<dataref id= 'n'></dataref>#t01<dataref id= 'p'></dataref>
+</data>
+<data k= 'u'>
+Published version; http://dx.doi.org/<dataref id= 'qu'></dataref>
+</data>
+<data k= 'x'>#c01s#h01</data><data k= 'hj'><dataref id= 'j'></dataref> <dataref id= 'v'></dataref>(<dataref id= 'n'></dataref>): <dataref id= 'p'></dataref>, <dataref id= 'y'></dataref></data>
+<data k= 'hj'>Published in "<dataref id= 'j'></dataref> <dataref id= 'v'></dataref>(<dataref id= 'n'></dataref>): <dataref id= 'p'></dataref>, <dataref id= 'y'></dataref>"#e01which should be cited to refer to this work.</data>
+<data k= 'hg'>Published in "<dataref id= 'j'></dataref> doi: <dataref id= 'qu'></dataref>,  <dataref id= 'y'></dataref>"#e01which should be cited to refer to this work.</data>
+<data k= 'f'>pdf#t02#e02U:\docs\OA\articles\<dataref id= 'l'></dataref>\<dataref id= 'wa'></dataref>#t02#e01</data>
+<data k= 'r'>Dataset#t01<dataref id= 'wc'></dataref></data>
+<data k= 'o'>Supplementary material#t02#e02U:\docs\OA\articles\<dataref id= 'l'></dataref>\<dataref id= 'wb'></dataref>#t02#e01</data>
+<data k= 'qw'><dataref id= 'qa'></dataref>#e01<dataref id= 't'></dataref>#e01http://doc.rero.ch/search.py?p=990__a:#c01v</data>
+</shortkey>

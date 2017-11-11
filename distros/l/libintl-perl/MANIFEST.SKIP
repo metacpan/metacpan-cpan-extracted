@@ -32,3 +32,4 @@ MYMETA\.json$
 MYMETA\.yml$
 .*\.mo$
 .*\.gmo$
+^\.travis\.yml$

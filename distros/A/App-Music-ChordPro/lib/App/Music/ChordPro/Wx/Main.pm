@@ -36,6 +36,7 @@ sub init {
     $prefctl ||=
       {
        cfgpreset => "Default",
+       skipstdcfg => 1,
        configfile => "",
        pdfviewer => "",
       };
@@ -81,6 +82,28 @@ sub init {
 }
 
 ################ Internal methods ################
+
+my @stylelist;
+sub stylelist {
+    return \@stylelist if @stylelist;
+    my $cfglib = ::findlib("config");
+    @stylelist = ( [ _T("Default") ] );
+    if ( -d $cfglib ) {
+	opendir( my $dh, $cfglib );
+	foreach ( sort readdir($dh) ) {
+	    next unless /^(.*)\.json$/;
+	    my $base = $1;
+	    next if $base eq "chordpro"; # default
+	    my $t = ucfirst(lc($1));
+	    $t =~ s/_/ /g;
+	    $t =~ s/^Style /Style: /;
+	    $t =~ s/ (.)/" ".uc($1)/eg;
+	    push( @stylelist, [ _T($t), "$cfglib/$base.json" ] );
+	}
+    }
+    push( @stylelist, [ _T("Custom") ] );
+    return \@stylelist;
+}
 
 sub opendialog {
     my ($self) = @_;
@@ -165,7 +188,8 @@ sub preview {
 
     # Setup configuration.
     use App::Music::ChordPro::Config;
-    $options->{nouserconfig} = 1;
+    $options->{nouserconfig} =
+      $options->{nolegacyconfig} = $self->{prefs_skipstdcfg};
     if ( $self->{_cfgpresetfile} ) {
 	$options->{noconfig} = 0;
 	$options->{config} = $self->{_cfgpresetfile};
@@ -294,6 +318,21 @@ sub GetPreferences {
     my $conf = Wx::ConfigBase::Get;
     for ( keys( %$prefctl ) ) {
 	$self->{"prefs_$_"} = $conf->Read( "preferences/$_", $prefctl->{$_} );
+    }
+
+    # Find config setting.
+    if ( exists $self->{prefs_cfgpreset}
+	 && $self->{prefs_cfgpreset} ne _T("Default") ) {
+	if ( $self->{prefs_cfgpreset} eq _T("Custom") ) {
+	    $self->{_cfgpresetfile} = $self->{prefs_configfile};
+	}
+	else {
+	    for ( @{ $self->stylelist } ) {
+		next unless $_->[0] eq $self->{prefs_cfgpreset};
+		$self->{_cfgpresetfile} = $_->[1];
+		last;
+	    }
+	}
     }
 }
 
@@ -444,27 +483,30 @@ sub OnAbout {
 	$ai->SetName("ChordPro Preview Editor");
 	$ai->SetVersion( $dd->($App::Music::ChordPro::VERSION) );
 	$ai->SetCopyright("Copyright $year Johan Vromans <jvromans\@squirrel.nl>");
-	$ai->AddDeveloper("Johan Vromans <jvromans\@squirrel.nl>");
-	$ai->AddDeveloper("Editor core " . $dd->($VERSION));
+	$ai->AddDeveloper("Johan Vromans <jvromans\@squirrel.nl>\n");
+	$ai->AddDeveloper("ChordPro version " .
+			  $dd->($App::Music::ChordPro::VERSION));
+	$ai->AddDeveloper("GUI wrapper " . $dd->($VERSION) . " " .
+			  "designed with wxGlade\n");
 	$ai->AddDeveloper("Perl version " . $dd->(sprintf("%vd",$^V)));
 	$ai->AddDeveloper("wxWidgets version " . $dd->(Wx::wxVERSION));
 	$ai->AddDeveloper(App::Packager::Packager() . " version " . App::Packager::Version())
 	  if $App::Packager::PACKAGED;
-	$ai->AddDeveloper("GUI design with wxGlade");
 	$ai->AddDeveloper("Some icons by www.flaticon.com");
-	$ai->SetWebSite("http://www.chordpro.org");
+	$ai->SetWebSite("https://www.chordpro.org");
 	Wx::AboutBox($ai);
     }
     else {
 	my $md = Wx::MessageDialog->new
-	  ($self, "ChordPro Preview Editor version " . $dd->($VERSION) . "\n".
+	  ($self, "ChordPro Preview Editor version " . $dd->($App::Music::ChordPro::VERSION) . "\n".
 	   "Copyright $year Johan Vromans <jvromans\@squirrel.nl>\n".
 	   "\n".
-	   "GUI design with wxGlade, http://wxglade.sourceforge.net\n\n".
-	   "ChordPro version " . $dd->($App::Music::ChordPro::VERSION) . "\n".
+	   "GUI wrapper " . $dd->($VERSION) . " ".
+	   "designed with wxGlade\n\n".
 	   "Perl version " . $dd->(sprintf("%vd",$^V))."\n".
 	   "wxPerl version " . $dd->($Wx::VERSION)."\n".
-	   "wxWidgets version " . $dd->(Wx::wxVERSION)."\n".
+	   "wxWidgets version " . $dd->(Wx::wxVERSION)."\n\n".
+	   "https://www.chordpro.org\n".
 	   ( $App::Packager::PACKAGED
 	     ? App::Packager::Packager() . " version " . App::Packager::Version()."\n"
 	     : "" ),

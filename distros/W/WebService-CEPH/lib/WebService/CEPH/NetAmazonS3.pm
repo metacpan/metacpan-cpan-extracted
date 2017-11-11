@@ -24,14 +24,20 @@
 
 package WebService::CEPH::NetAmazonS3;
 
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 use strict;
 use warnings;
 use Carp;
+use Time::Local;
 use Net::Amazon::S3;
 use HTTP::Status;
 use Digest::MD5 qw/md5_hex/;
+
+
+sub _time { # for mocking in tests
+    time()
+}
 
 =head2 new
 
@@ -87,7 +93,7 @@ sub _request_object {
     $self->{client}->bucket(name => $self->{bucket});
 }
 
-=head2 get_buckets_ist
+=head2 get_buckets_list
 
 Returns buckets list
 
@@ -146,6 +152,8 @@ sub upload_single_request {
             key       => 'Upload key',
             upload_id => 'Upload ID',
             initiated => 'Init date',
+            initiated_epoch => то же, что initiated но в формате epoch time
+            initiated_age_seconds => это просто time() - initiated_epoch т.е. возраст upload
         },
         ...
     ]
@@ -166,11 +174,21 @@ sub list_multipart_uploads {
     my $xpc = $self->{client}->_send_request_xpc($http_request);
 
     my @uploads;
+    my $t0 = _time();
     foreach my $node ( $xpc->findnodes(".//s3:Upload") ) {
+
+        my $initiated = $xpc->findvalue( ".//s3:Initiated", $node );
+
+        my ($y, $m, $d, $hour, $min, $sec) = $initiated =~ /^(\d{4})\-(\d{2})\-(\d{2})T(\d{2}):(\d{2}):(\d{2})/
+            or confess "Bad date $initiated";
+        my $initiated_epoch = timegm($sec, $min, $hour, $d, $m - 1, $y); # interpret time as GMT+00 time and convert to epoch
+
         push @uploads, {
             key       => $xpc->findvalue( ".//s3:Key", $node ),
             upload_id => $xpc->findvalue( ".//s3:UploadId", $node ),
-            initiated => $xpc->findvalue( ".//s3:Initiated", $node ),
+            initiated => $initiated,
+            initiated_epoch => $initiated_epoch,
+            initiated_age_seconds => $t0 - $initiated_epoch,
         };
 
     }

@@ -5,10 +5,10 @@ use vars qw($VERSION @EXPORT_OK);
 use Exporter;
 use base qw(Exporter);
 
-$VERSION = '1.807';
+$VERSION = '1.808';
 
 @EXPORT_OK = qw(
-  FORMAT_UNDEF FORMAT_ASN1 FORMAT_TEXT FORMAT_PEM FORMAT_NETSCAPE
+  FORMAT_UNDEF FORMAT_ASN1 FORMAT_TEXT FORMAT_PEM
   FORMAT_PKCS12 FORMAT_SMIME FORMAT_ENGINE FORMAT_IISSGC OPENSSL_VERSION_NUMBER
 );
 
@@ -111,9 +111,10 @@ Crypt::OpenSSL::X509 - Perl extension to OpenSSL's X509 API.
 
   print $x509->pubkey() . "\n";
   print $x509->subject() . "\n";
-  print $x509->issuer() . "\n";
-  print $x509->email() . "\n";
   print $x509->hash() . "\n";
+  print $x509->email() . "\n";
+  print $x509->issuer() . "\n";
+  print $x509->issuer_hash() . "\n";
   print $x509->notBefore() . "\n";
   print $x509->notAfter() . "\n";
   print $x509->modulus() . "\n";
@@ -161,7 +162,7 @@ None by default.
 
 On request:
 
-	FORMAT_UNDEF FORMAT_ASN1 FORMAT_TEXT FORMAT_PEM FORMAT_NETSCAPE
+	FORMAT_UNDEF FORMAT_ASN1 FORMAT_TEXT FORMAT_PEM
 	FORMAT_PKCS12 FORMAT_SMIME FORMAT_ENGINE FORMAT_IISSGC
 
 
@@ -195,11 +196,19 @@ Subject name as a string.
 
 Issuer name as a string.
 
+=item issuer_hash
+
+Issuer name hash as a string.
+
 =item serial
 
 Serial number as a string.
 
 =item hash
+
+Alias for subject_hash
+
+=item subject_hash
 
 Subject name hash as a string.
 
@@ -249,7 +258,7 @@ Return Boolean value if subject and issuer name are the same.
 
 =item as_string ( [ FORMAT ] )
 
-Return the certificate as a string in the specified format. C<FORMAT> can be one of C<FORMAT_PEM> (the default), C<FORMAT_ASN1>, or C<FORMAT_NETSCAPE>.
+Return the certificate as a string in the specified format. C<FORMAT> can be one of C<FORMAT_PEM> (the default) or C<FORMAT_ASN1>.
 
 =item modulus ( )
 
@@ -320,9 +329,11 @@ Methods for handling ObjectID objects are given below.
 
 =item value ( )
 
-Return the value or data of the extension.
-FIXME: the value is returned as a string but may represent
-a complex object.
+Return the value of the extension as an asn1parse(1) style hex dump.
+
+=item as_string ( )
+
+Return a human-readable version of the extension as formatted by X509V3_EXT_print. Note that this will return an empty string for OIDs with unknown ASN.1 encodings.
 
 =back
 
@@ -419,7 +430,7 @@ Daniel Kahn Gillmor E<lt>dkg@fifthhorseman.netE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2004-2016 by Dan Sully
+Copyright 2004-2017 by Dan Sully
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

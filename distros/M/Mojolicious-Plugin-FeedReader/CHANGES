@@ -1,5 +1,9 @@
 Revision history for perl module Mojolicious::Plugin::FeedReader
 
+0.10 2017-11-08
+
+   - decode text before using Mojo::DOM (Uses either UTF-8 or charset from HTTP response)
+
 0.09 2017-08-28
 
    - Replace use of removed Mojo::Util function slurp() with Mojo::File

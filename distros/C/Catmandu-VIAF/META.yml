@@ -1,16 +1,17 @@
 ---
-abstract: 'Retrieve items from VIAF'
+abstract: 'Retrieve items from the VIAF authority file'
 author:
-  - 'Pieter De Praetere <pieter at packed.be >'
+  - 'Matthias Vandermaesen <matthias.vandermaesen@vlaamsekunstcollectie.be>'
 build_requires:
   Catmandu: '1.0304'
   LWP::Protocol::https: '0'
+  Module::Build: '0.28'
   Test::More: '0.96'
 configure_requires:
-  Module::Build::Tiny: '0.034'
+  Module::Build: '0.28'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
-license: perl
+generated_by: 'Dist::Milla version v1.0.18, Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -36,8 +37,10 @@ resources:
   bugtracker: https://github.com/thedatahub/Catmandu-VIAF/issues
   homepage: https://github.com/thedatahub/Catmandu-VIAF
   repository: https://github.com/thedatahub/Catmandu-VIAF.git
-version: '0.04'
+version: '0.05'
 x_contributors:
+  - 'Matthias Vandermaesen <matthias@colada.be>'
+  - 'Patrick Hochstenbach <patrick.hochstenbach@ugent.be>'
   - 'Pieter De Praetere <pieter.de.praetere@helptux.be>'
   - 'Pieter De Praetere <pieter@packed.be>'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+x_serialization_backend: 'YAML::Tiny version 1.70'

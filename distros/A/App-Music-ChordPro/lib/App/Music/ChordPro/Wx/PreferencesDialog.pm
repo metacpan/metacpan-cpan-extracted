@@ -28,32 +28,27 @@ sub __set_properties {
       if $self->GetParent->{prefs_configfile};
     $self->{t_pdfviewer}->SetValue($self->GetParent->{prefs_pdfviewer})
       if $self->GetParent->{prefs_pdfviewer};
+    $self->{cb_skipstdcfg}->SetValue($self->GetParent->{prefs_skipstdcfg});
 
     my $cfglib = ::findlib("config");
     my $ctl = $self->{ch_config};
     $ctl->Clear;
-    $ctl->Append("Default");
-    my $n = 1;
-    if ( -d $cfglib ) {
-	opendir( my $dh, $cfglib );
-	foreach ( sort readdir($dh) ) {
-	    next unless /^(.*)\.json$/;
-	    my $base = $1;
-	    next if $base eq "chordpro"; # default
-	    my $t = ucfirst(lc($1));
-	    $t =~ s/_/ /g;
-	    $t =~ s/^Style /Style: /;
-	    $t =~ s/ (.)/" ".uc($1)/eg;
-	    $ctl->Append($t);
-	    $ctl->SetClientData( $n, "$cfglib/$base.json" );
-	    $n++;
-	}
+    my $n = 0;
+    for ( @{ $self->GetParent->stylelist } ) {
+	$ctl->Append($_->[0]);
+	$ctl->SetClientData( $n, $_->[1]) if $_->[1];
+	$n++;
     }
-    $ctl->Append("Custom");
     $n = 0;
     if ( $self->GetParent->{prefs_cfgpreset} ) {
 	$n = $ctl->FindString($self->GetParent->{prefs_cfgpreset});
-	$n = 0 if $n == wxNOT_FOUND;
+	if ( $n == wxNOT_FOUND ) {
+	    $n = 0;
+	}
+	else {
+	    $self->GetParent->{_cfgpresetfile} =
+	      $self->{ch_config}->GetClientData($n);
+	}
     }
     $ctl->SetSelection($n);
     $self->_enablecustom($n);
@@ -153,11 +148,18 @@ sub OnAccept {
     $xp += 12 if $xp < 0;
     $xp = $xp - 12 if $self->{rb_xpose_flat }->GetValue;
     $self->GetParent->{prefs_xpose} = $xp;
+    $self->GetParent->{prefs_skipstdcfg} =
+      $self->{cb_skipstdcfg}->IsChecked ? 1 : 0;
 
     $event->Skip;
 }
 
 sub OnCancel {
+    my ( $self, $event ) = @_;
+    $event->Skip;
+}
+
+sub OnSkipStdCfg {
     my ( $self, $event ) = @_;
     $event->Skip;
 }

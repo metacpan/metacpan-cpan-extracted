@@ -13,68 +13,70 @@ use ExtUtils::MakeMaker;
 use File::ShareDir::Install;
 
 $File::ShareDir::Install::INCLUDE_DOTFILES = 1;
-$File::ShareDir::Install::INCLUDE_DOTDIRS = 1;
+$File::ShareDir::Install::INCLUDE_DOTDIRS  = 1;
 install_share dist => "share";
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Dist::Zilla plugins used by Plicease",
-  "AUTHOR" => "Graham Ollis <plicease\@cpan.org>",
+  "ABSTRACT"           => "Dist::Zilla plugins used by Plicease",
+  "AUTHOR"             => "Graham Ollis <plicease\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
-    "ExtUtils::MakeMaker" => 0,
+    "ExtUtils::MakeMaker"     => 0,
     "File::ShareDir::Install" => "0.06"
   },
-  "DISTNAME" => "Dist-Zilla-Plugin-Author-Plicease",
-  "LICENSE" => "perl",
+  "DISTNAME"         => "Dist-Zilla-Plugin-Author-Plicease",
+  "LICENSE"          => "perl",
   "MIN_PERL_VERSION" => "5.014",
-  "NAME" => "Dist::Zilla::Plugin::Author::Plicease",
-  "PM" => {
-    "lib/Dist/Zilla/MintingProfile/Author/Plicease.pm" => "\$(INST_LIB)/Dist/Zilla/MintingProfile/Author/Plicease.pm",
-    "lib/Dist/Zilla/Plugin/Author/Plicease.pm" => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease.pm",
-    "lib/Dist/Zilla/Plugin/Author/Plicease/DevShare.pm" => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease/DevShare.pm",
-    "lib/Dist/Zilla/Plugin/Author/Plicease/Init2.pm" => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease/Init2.pm",
-    "lib/Dist/Zilla/Plugin/Author/Plicease/MakeMaker.pm" => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease/MakeMaker.pm",
+  "NAME"             => "Dist::Zilla::Plugin::Author::Plicease",
+  "PM"               => {
+    "lib/Dist/Zilla/MintingProfile/Author/Plicease.pm"         => "\$(INST_LIB)/Dist/Zilla/MintingProfile/Author/Plicease.pm",
+    "lib/Dist/Zilla/Plugin/Author/Plicease.pm"                 => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease.pm",
+    "lib/Dist/Zilla/Plugin/Author/Plicease/DevShare.pm"        => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease/DevShare.pm",
+    "lib/Dist/Zilla/Plugin/Author/Plicease/Init2.pm"           => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease/Init2.pm",
+    "lib/Dist/Zilla/Plugin/Author/Plicease/MakeMaker.pm"       => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease/MakeMaker.pm",
     "lib/Dist/Zilla/Plugin/Author/Plicease/MarkDownCleanup.pm" => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease/MarkDownCleanup.pm",
-    "lib/Dist/Zilla/Plugin/Author/Plicease/SpecialPrereqs.pm" => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease/SpecialPrereqs.pm",
-    "lib/Dist/Zilla/Plugin/Author/Plicease/Tests.pm" => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease/Tests.pm",
-    "lib/Dist/Zilla/Plugin/Author/Plicease/Thanks.pm" => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease/Thanks.pm",
-    "lib/Dist/Zilla/Plugin/Author/Plicease/TravisInstall.pm" => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease/TravisInstall.pm",
-    "lib/Dist/Zilla/Plugin/Author/Plicease/Upload.pm" => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease/Upload.pm"
+    "lib/Dist/Zilla/Plugin/Author/Plicease/SpecialPrereqs.pm"  => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease/SpecialPrereqs.pm",
+    "lib/Dist/Zilla/Plugin/Author/Plicease/Tests.pm"           => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease/Tests.pm",
+    "lib/Dist/Zilla/Plugin/Author/Plicease/Thanks.pm"          => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease/Thanks.pm",
+    "lib/Dist/Zilla/Plugin/Author/Plicease/TravisInstall.pm"   => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease/TravisInstall.pm",
+    "lib/Dist/Zilla/Plugin/Author/Plicease/Upload.pm"          => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease/Upload.pm"
   },
   "PREREQ_PM" => {
-    "Data::Section" => 0,
-    "Dist::Zilla" => "6.00",
-    "File::Path" => 0,
-    "File::ShareDir::Dist" => 0,
-    "File::chdir" => 0,
-    "IPC::System::Simple" => "1.25",
-    "Moose" => 0,
-    "Path::Tiny" => 0,
+    "Data::Section"             => 0,
+    "Dist::Zilla"               => "6.00",
+    "File::Path"                => 0,
+    "File::ShareDir::Dist"      => 0,
+    "File::chdir"               => 0,
+    "IPC::System::Simple"       => "1.25",
+    "Moose"                     => 0,
+    "Path::Tiny"                => 0,
+    "Perl::Tidy"                => 0,
     "Sub::Exporter::ForMethods" => 0,
-    "autodie" => 0,
-    "namespace::autoclean" => 0
+    "autodie"                   => 0,
+    "namespace::autoclean"      => 0
   },
   "TEST_REQUIRES" => {
     "Test2::V0" => "0.000060"
   },
-  "VERSION" => "2.23",
-  "test" => {
+  "VERSION" => "2.24",
+  "test"    => {
     "TESTS" => "t/*.t"
-  }
+    }
 );
 
 my %FallbackPrereqs = (
-  "Data::Section" => 0,
-  "Dist::Zilla" => "6.00",
-  "File::Path" => 0,
-  "File::ShareDir::Dist" => 0,
-  "File::chdir" => 0,
-  "IPC::System::Simple" => "1.25",
-  "Moose" => 0,
-  "Path::Tiny" => 0,
+  "Data::Section"             => 0,
+  "Dist::Zilla"               => "6.00",
+  "File::Path"                => 0,
+  "File::ShareDir::Dist"      => 0,
+  "File::chdir"               => 0,
+  "IPC::System::Simple"       => "1.25",
+  "Moose"                     => 0,
+  "Path::Tiny"                => 0,
+  "Perl::Tidy"                => 0,
   "Sub::Exporter::ForMethods" => 0,
-  "Test2::V0" => "0.000060",
-  "autodie" => 0,
-  "namespace::autoclean" => 0
+  "Test2::V0"                 => "0.000060",
+  "autodie"                   => 0,
+  "namespace::autoclean"      => 0
 );
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {
@@ -89,7 +91,7 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
 WriteMakefile(%WriteMakefileArgs);
 
 {
-package
-MY;
-use File::ShareDir::Install qw(postamble);
+  package
+    MY;
+  use File::ShareDir::Install qw(postamble);
 }

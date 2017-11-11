@@ -1,5 +1,11 @@
 Revision history for Perl extension Geo::Proj4.
 
+version 1.07: Wed  8 Nov 10:57:23 CET 2017
+
+	Fixes:
+	- z-coordinates in transform
+	  rt.cpan.org#121300 [Peter Daen]
+
 version 1.06: Thu 23 Feb 10:24:01 CET 2017
 
 	Fixes:

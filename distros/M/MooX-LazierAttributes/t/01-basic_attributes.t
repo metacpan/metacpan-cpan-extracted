@@ -52,5 +52,4 @@ is_deeply($extends->twelve, 'ahhhhhhhhhhhhh', 'arrayref of names - twelve');
 is_deeply($extends->thirteen, 'ahhhhhhhhhhhhh', 'arrayref of names - thirteen');
 is($extends->fourteen, 40000, 'okay 100');
 is_deeply($basics->fifthteen, { correct => 'way' }, 'okay the correct way');
-
 done_testing();

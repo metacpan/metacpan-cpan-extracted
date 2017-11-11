@@ -4,7 +4,7 @@ require 5.010;
 
 use IO::Handle;
 
-my $VERSION = '3.000';
+my $VERSION = '3.001';
 
 my %prereq =
  ( Carp           => 0
@@ -66,7 +66,7 @@ EXTENDS			= ../MailMessage:../MailPOP:../MailIMAP
 
 # for POD
 FIRST_YEAR      = 2001
-EMAIL           = perl@overmeer.net
+EMAIL           = markov@cpan.org
 WEBSITE         = http://perl.overmeer.net/mailbox/
 PODTAIL         = ../MailBox-shared-podtail
 

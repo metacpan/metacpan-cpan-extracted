@@ -13,9 +13,11 @@ t/05-HashesToArrays.t
 t/06-html.t
 t/07-uri.t
 t/08-json.t
+t/09-strSR.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
+test.pl
 xt/boilerplate.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

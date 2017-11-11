@@ -34,14 +34,11 @@ for my $type (qw(google_reader sputnik rssowl)) {
   is($invalid, 0, 'all feeds are valid');
   my $feedcount = scalar grep { defined $_->{xmlUrl} } @feeds;
   is($feedcount, 294, 'all feeds defined');
-  ok(defined $feeds[0]{text}, "text defined");
-  ok(defined $feeds[293]{text}, "text defined");
-  unless ($type eq 'rssowl') { # rssowl export doesn't include htmlUrl
-    ok(defined $feeds[0]{htmlUrl}, "htmlUrl defined");
-    ok(defined $feeds[293]{htmlUrl}, "htmlUrl defined");
-  }
   my ($frew) = grep { $_->{xmlUrl} =~ /Foolish/ } @feeds;
   note( $frew->{xmlUrl} , " is sub I will test" );
+  is($frew->{text}, 'A Foolish Manifesto', 'item text');
+  is($frew->{title}, 'A Foolish Manifesto', 'item title') unless ($type eq 'rssowl');
+  is($frew->{htmlUrl}, 'http://blog.afoolishmanifesto.com', 'htmlUrl') unless ($type eq 'rssowl');
   my @cats = sort @{$frew->{categories}};
   is($cats[0], 'perl', $frew->{xmlUrl} . ' is in category perl');
   is(scalar @cats, 1, $frew->{xmlUrl} . ' is in one category');

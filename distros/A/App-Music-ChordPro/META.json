@@ -43,33 +43,43 @@
          "requires" : {
             "App::Packager" : "1.42",
             "Font::TTF" : "1.04",
+            "JSON::PP" : "2.27203",
             "PDF::API2" : "2.02",
+            "Text::Balanced" : "v2.0.0",
             "perl" : "5.01"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0"
+            "JSON::PP" : "2.27203",
+            "Test::More" : "0",
+            "Text::Balanced" : "v2.0.0"
          }
       }
    },
    "provides" : {
       "App::Music::ChordPro" : {
          "file" : "lib/App/Music/ChordPro.pm",
-         "version" : "v0.860.1"
+         "version" : "v0.910.1"
       },
       "chordpro" : {
          "file" : "script/chordpro",
-         "version" : "v0.860.1"
+         "version" : "v0.910.1"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/sciurius/chordpro/issues"
+      },
       "homepage" : "http://www.chordpro.org",
       "license" : [
          "http://dev.perl.org/licenses/"
-      ]
+      ],
+      "repository" : {
+         "url" : "https://github.com/sciurius/chordpro"
+      }
    },
-   "version" : "v0.860.1",
+   "version" : "v0.910.1",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

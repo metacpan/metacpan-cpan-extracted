@@ -1,17 +1,17 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014-2017 -- leonerd@leonerd.org.uk
 
 package Data::Bitfield;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Exporter 'import';
-our @EXPORT_OK = qw( bitfield boolfield intfield enumfield );
+our @EXPORT_OK = qw( bitfield boolfield intfield enumfield constfield );
 
 use Carp;
 
@@ -34,11 +34,11 @@ devices, or similar purposes.
 Creates two new functions in the calling package whose names are derived from
 the string C<$name> passed here. These functions will be symmetric opposites,
 which convert between a key/value list of field values, and their packed
-binary integer representation.
+integer or binary byte-string representation.
 
- $binary_value = pack_$name( %field_values )
+ $packed_value = pack_$name( %field_values )
 
- %field_values = unpack_$name( $binary_value )
+ %field_values = unpack_$name( $packed_value )
 
 These two functions will work to a set of field names that match those field
 definitions given to the C<bitfield> function that declared them.
@@ -55,6 +55,19 @@ Recognised options are:
 
 =over 4
 
+=item format => "bytes-LE" | "bytes-BE" | "integer"
+
+Defines the format that the C<pack_NAME> function will return and the
+C<unpack_NAME> function will expect to receive as input. The two C<bytes-*>
+formats describe a packed binary string in either little- or big-endian
+direction, and C<integer> describes an integer numerical value.
+
+Note that currently the C<bytes-*> formats are limited to values 32bits wide
+or smaller.
+
+Optional; will default to C<integer> if not supplied. This default may change
+in a later version - make sure to always specify it for now.
+
 =item unrecognised_ok => BOOL
 
 If true, the C<pack_> function will not complain about unrecognised field
@@ -70,6 +83,8 @@ sub bitfield
    bitfield_into_caller( $pkg, @_ );
 }
 
+my %VALID_FORMATS = map { $_ => 1 } qw( bytes-LE bytes-BE integer );
+
 sub bitfield_into_caller
 {
    my $pkg = shift;
@@ -77,14 +92,34 @@ sub bitfield_into_caller
    my ( $name, @args ) = @_;
 
    my $unrecognised_ok = !!$options{unrecognised_ok};
+   my $format = $options{format} // "integer";
+   $VALID_FORMATS{$format} or
+      croak "Invalid 'format' value $format";
 
    my $used_bits = 0;
+
+   my $constmask = 0;
+   my $constval = 0;
 
    my %fieldmask;
    my %fieldshift;
    my %fieldencoder;
    my %fielddecoder;
-   while( my $name = shift @args ) {
+   while( @args ) {
+      my $name = shift @args;
+      if( !defined $name ) {
+         my ( $mask, $value ) = @{ shift @args };
+
+         croak "Constfield collides with other defined bits"
+            if $used_bits & $mask;
+
+         $constmask |= $mask;
+         $constval |= $value;
+         $used_bits |= $mask;
+
+         next;
+      }
+
       ( my $mask, $fieldshift{$name}, $fieldencoder{$name}, $fielddecoder{$name} ) =
          @{ shift @args };
 
@@ -97,11 +132,12 @@ sub bitfield_into_caller
       $used_bits |= $mask;
    }
 
-   my %subs;
+   my $nbits = 0;
+   $nbits += 8 while( 1 << $nbits < $used_bits );
 
-   $subs{"pack_$name"} = sub {
+   my $packsub = sub {
       my %args = @_;
-      my $ret = 0;
+      my $ret = $constval;
       foreach ( keys %args ) {
          my $mask = $fieldmask{$_};
          next if !$mask and $unrecognised_ok;
@@ -124,8 +160,9 @@ sub bitfield_into_caller
       return $ret;
    };
 
-   $subs{"unpack_$name"} = sub {
+   my $unpacksub = sub {
       my ( $val ) = @_;
+      # TODO: check constmask
       my @ret;
       foreach ( keys %fieldmask ) {
          my $v = $val & $fieldmask{$_};
@@ -141,6 +178,53 @@ sub bitfield_into_caller
       }
       return @ret;
    };
+
+   if( $format ne "integer" ) {
+      my $orig_packsub   = $packsub;
+      my $orig_unpacksub = $unpacksub;
+
+      my $big_endian = ( $format eq "bytes-BE" );
+      my $pointy = $big_endian ? ">" : "<";
+
+      if( $nbits <= 8 ) {
+         $packsub   = sub { pack "C", $orig_packsub->( @_ ) };
+         $unpacksub = sub { $orig_unpacksub->( unpack "C", $_[0] ) };
+      }
+      elsif( $nbits <= 16 ) {
+         $packsub   = sub { pack "S$pointy", $orig_packsub->( @_ ) };
+         $unpacksub = sub { $orig_unpacksub->( unpack "S$pointy", $_[0] ) };
+      }
+      elsif( $nbits <= 24 ) {
+         if( $big_endian ) {
+            $packsub = sub {
+               substr( pack( "L>", $orig_packsub->( @_ ) ), 1, 3 )
+            };
+            $unpacksub = sub {
+               $orig_unpacksub->( unpack "L>", "\0$_[0]" )
+            };
+         }
+         else {
+            $packsub = sub {
+               substr( pack( "L<", $orig_packsub->( @_ ) ), 0, 3 )
+            };
+            $unpacksub = sub {
+               $orig_unpacksub->( unpack "L<", "$_[0]\0" )
+            };
+         }
+      }
+      elsif( $nbits <= 32 ) {
+         $packsub   = sub { pack "L$pointy", $orig_packsub->( @_ ) };
+         $unpacksub = sub { $orig_unpacksub->( unpack "L$pointy", $_[0] ) };
+      }
+      else {
+         croak "Cannot currently handle bytewise packing of $nbits wide values";
+      }
+   }
+
+   my %subs;
+
+   $subs{"pack_$name"}   = $packsub;
+   $subs{"unpack_$name"} = $unpacksub;
 
    no strict 'refs';
    *{"${pkg}::$_"} = $subs{$_} for keys %subs;
@@ -214,6 +298,29 @@ sub enumfield
    };
 
    return $def;
+}
+
+=head2 constfield
+
+ constfield( $bitnum, $width, $value )
+
+Declares a field some number of bits wide that stores a constant value. This
+value will be packed automatically.
+
+Unlike other field definitions, this field is not named. It returns a
+2-element list directly for use in the C<bitfield> list.
+
+=cut
+
+sub constfield
+{
+   my ( $bitnum, $width, $value ) = @_;
+
+   $value >= 0 and $value < ( 1 << $width ) or
+      croak "Invalid value for constfield of width $width";
+
+   my $mask = ( 1 << $width ) - 1;
+   return undef, [ $mask << $bitnum, $value << $bitnum ];
 }
 
 =head1 TODO

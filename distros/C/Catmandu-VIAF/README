@@ -1,79 +1,51 @@
 NAME
 
-    Catmandu::VIAF - Retrieve items from VIAF
+    Catmandu::VIAF - Retrieve items from the VIAF authority file
 
 SYNOPSIS
 
-    This module contains a store to lookup a viaf_id in VIAF
-    <https://www.viaf.org>, a fix to match a name to a mainHeadingEl and a
-    fix to search for a name in VIAF.
-
-      lookup_in_store(authortName, VIAF, lang:'nl-NL', fallback_lang:'en-US')
+        # From the command line
+        $ catmandu export VIAF --id 102333412 to YAML
+        ---
+        dcterms:identifier: '102333412'
+        guid: http://viaf.org/viaf/102333412
+        schema:birthDate: 1775-12-16
+        schema:deathDate: 1817-07-18
+        schema:description: English novelist
+        skos:prefLabel: Jane Austen
+        ...
     
-      viaf_match(authorName, -lang:'nl-NL', -fallback_lang:'en-US')
+        # From a Catmandu Fix
+        lookup_in_store(authortName, VIAF, lang:'nl-NL', fallback_lang:'en-US')
     
-      viaf_search(authorName, -lang:'nl-NL', -fallback_lang:'en-US')
+        # Perform a direct match between a name and a mainHeadingEl from VIAF
+        viaf_match(authorName, -lang:'nl-NL', -fallback_lang:'en-US')
+    
+        # Perform a search for a name in VIAF
+        viaf_search(authorName, -lang:'nl-NL', -fallback_lang:'en-US')
 
-DESCRIPTION
+MODULES
 
- Catmandu::Store::VIAF
+      * Catmandu::Store::VIAF
 
-      lookup_in_store(
-        authorName,
-        AAT,
-        lang: 'nl-NL',
-        fallback_lang: 'en-US'
-      )
+      * Catmandu::Fix::viaf_match
 
-    The lang parameter is optional and defaults to nl-NL. It sets the
-    language of the returned prefLabel. If no prefLabel for the viaf_id in
-    provided lang exists, the prefLabel for the fallback_lang is used.
+      * Catmandu::Fix::viaf_search
 
-    The store takes the dc:identifier of a Person from VIAF and returns the
-    following data:
+      * Catmandu::VIAF::API
 
-      {
-        'dcterms:identifier' => 'The identifier',
-        'guid'               => 'The VIAF URL',
-        'schema:birthDate'   => 'Birth date, if provided',
-        'schema:deathDate'   => 'Death date, if provided',
-        'schema:description' => 'Description, if provided',
-        'skos:prefLabel'     => 'prefLabel, in lang or fallback_lang'
-      }
+AUTHORS
 
- Catmandu::Fix::viaf_match
+    Matthias Vandermaesen <matthias.vandermaesen@vlaamsekunstcollectie.be>
+    Pieter De Praetere <pieter@packed.be>
 
-      viaf_match(
-        path,
-        -lang: 'nl-NL',
-        -fallback_lang: 'nl-NL'
-      )
+COPYRIGHT AND LICENSE
 
-    A fix that performs a match between a name and a mainHeadingEl of VIAF
-    Person.
+    This software is copyright (c) 2017 by PACKED, vzw, Vlaamse
+    Kunstcollectie, vzw.
 
- Catmandu::Fix::viaf_search
-
-      viaf_search(
-        path,
-        -lang: 'nl-NL',
-        -fallback_lang: 'nl-NL'
-      )
-
-    A fix that performs a search for a name in VIAF.
-
-AUTHOR
-
-    Pieter De Praetere <pieter at packed.be >
-
-COPYRIGHT
-
-    Copyright 2017- PACKED vzw
-
-LICENSE
-
-    This library is free software; you can redistribute it and/or modify it
-    under the same terms as Perl itself.
+    This is free software; you can redistribute it and/or modify it under
+    the terms of the GNU General Public License, Version 3, June 2007.
 
 SEE ALSO
 

@@ -1,12 +1,11 @@
 COPYING		        	GNU General Public License
-ChangeLog			Detailed list of changes
 FAQ				Frequently asked questions
 MANIFEST			This list of files
 MANIFEST.SKIP                   Files to suppress in MANIFEST
 Makefile.PL			Makefile generator
 MyInstall.pm			Workaround file
 NEWS				Latest Changes
-ReleaseNotes			Same as NEWS
+Changes			        Same as NEWS
 README				See README.md
 README-oldversions		Where are old versions of this module?
 README.md                       Read it
@@ -394,6 +393,6 @@ tests/po/additional.xy.po
 tests/po/additional.xy_XY.po
 tests/po/existing.xy.po
 tests/po/existing.xy_XY.po
-META.yml                                Module meta-data (added by MakeMaker)
 SIGNATURE                               Checksums and signature
+META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

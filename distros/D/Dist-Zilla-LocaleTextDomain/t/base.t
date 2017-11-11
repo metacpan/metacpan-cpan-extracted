@@ -6,7 +6,7 @@ use Test::More tests => 14;
 
 require_ok 'Dist::Zilla::Plugin::LocaleTextDomain';
 is_deeply [Dist::Zilla::Plugin::LocaleTextDomain->mvp_multivalue_args],
-    [qw(language finder)], 'Should have mvp_multivalue_args';
+    [qw(join_existing language finder)], 'Should have mvp_multivalue_args';
 
 for my $cmd (qw(msg_init msg_scan msg_merge msg_compile)) {
     my $module = "Dist::Zilla::App::Command::$cmd";

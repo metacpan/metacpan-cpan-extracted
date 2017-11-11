@@ -1,6 +1,22 @@
 Revision History for Dist-Zilla-PluginBundle-Author-RUSSOZ
 ==========================================================
 
+v0.026 2017-11-11
+-----------------
+
+commit 2a0fe052e4a4361dda9b63013d43e5140e3a5e37
+Author: Alexei Znamensky <russoz@gmail.com>
+
+    rolledback unused github_issues parameter and replaced ReportVersions::Tiny with Test::ReportPrereqs
+
+v0.025 2017-11-09
+-----------------
+
+commit 643d000bd5d3829474e14d0b5281682ac1e5bf88
+Author: Alexei Znamensky <russoz@gmail.com>
+
+    new features
+
 v0.024 2017-10-09
 -----------------
 

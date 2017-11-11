@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Geo-Proj4",
    "no_index" : {
@@ -35,5 +35,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.06"
+   "version" : "1.07"
 }

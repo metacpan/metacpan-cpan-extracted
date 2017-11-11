@@ -63,7 +63,7 @@ arrayref, use that format.
 *** DONE filter_by
 *** DONE filter_each
 ** DONE Document filter_each, etc
-** array->as_hash, hash->as_array
+** DONE array->as_hash, hash->as_array
 ** TODO map_each_by
 ** TODO map_each_value_by - replace the hashref/object value with the result of map_by
 ** TODO group
@@ -324,14 +324,14 @@ For objects, call $_->$accessor(@args) to set the value.
 ***** return hash with same keys + $new_key = return value
 **** map_by ?
 ** grep family
-*** grep -> hash
-**** [#A] grep_each($subref = true)
+*** filter -> hash
+**** [#A] filter_each($subref = true)
 ***** ($key, $value), $_ is value
-**** [#B] grep_each_defined
+**** [#B] filter_each_defined
 ***** value is defined
-**** grep_each_by($accessor, $args?, $subref = true)
+**** filter_each_by($accessor, $args?, $subref = true)
 ***** ($key, $value, $accessor_value), $_ is accessor value
-**** grep_each_by_defined
+**** filter_each_by_defined
 ***** accessor value is defined
 * DOCS
 ** Operate on an array of scalars

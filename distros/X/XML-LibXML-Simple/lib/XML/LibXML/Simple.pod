@@ -30,6 +30,11 @@ This module is a blunt rewrite of XML::Simple (by Grant McLean) to
 use the XML::LibXML parser for XML structures, where the original
 uses plain Perl or SAX parsers.
 
+B<Be warned:> this module thinks to be smart.  You may very well shoot
+yourself in the foot with this DWIMmery.  Read the whole manual page
+at least once before you start using it.  If your XML is described in
+a schema or WSDL, then use XML::Compile for maintainable code.
+
 =head1 METHODS
 
 =head2 Constructors
@@ -156,7 +161,7 @@ In alphabetic order:
 
 =item ContentKey => 'keyname' I<# seldom used>
 
-When text content is parsed to a hash value, this option let's you specify a
+When text content is parsed to a hash value, this option lets you specify a
 name for the hash key to override the default 'content'.  So for example:
 
   XMLin('<opt one="1">Two</opt>', ContentKey => 'text')
@@ -770,9 +775,9 @@ from the L<XML::Simple> module, written by
 Grant McLean E<lt>grantm@cpan.orgE<gt>
 
 Copyrights of the perl code and the related documentation by
-2008-2016 by [Mark Overmeer]. For other contributors see ChangeLog.
+2008-2017 by [Mark Overmeer]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-See F<http://www.perl.com/perl/misc/Artistic.html>
+See F<http://dev.perl.org/licenses/>
 

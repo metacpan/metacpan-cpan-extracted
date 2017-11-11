@@ -1,6 +1,6 @@
 
 package Importer::Zim::Base;
-$Importer::Zim::Base::VERSION = '0.10.0';
+$Importer::Zim::Base::VERSION = '0.12.0';
 # ABSTRACT: Base module for Importer::Zim backends
 
 use 5.010001;
@@ -8,6 +8,30 @@ use 5.010001;
 use Module::Runtime ();
 
 use Importer::Zim::Utils qw(DEBUG carp croak);
+
+sub import_into {
+    my $class = shift;
+
+    carp "$class->import(@_)" if DEBUG;
+    my @exports = _prepare_args( $class, @_ );
+
+    if ( $class eq 'Importer::Zim::Lexical' ) {    # +Lexical backend
+
+        # require Sub::Inject;
+        @_ = map { @{$_}{qw(export code)} } @exports;
+        goto &Sub::Inject::sub_inject;
+    }
+
+    my $caller = caller;
+    return $class->can('_export_to')->(            #
+        map { ; "${caller}::$_->{export}" => $_->{code} } @exports
+    );
+
+    ## Non-optimized code
+    #my $caller = caller;
+    #@_ = $caller, map { @{$_}{qw(export code)} } @exports;
+    #goto &{ $class->can('export_to') };
+}
 
 sub _prepare_args {
     my $class   = shift;
@@ -163,7 +187,7 @@ Importer::Zim::Base - Base module for Importer::Zim backends
 
 =head1 VERSION
 
-version 0.10.0
+version 0.12.0
 
 =head1 DESCRIPTION
 

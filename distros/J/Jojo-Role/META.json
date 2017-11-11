@@ -1,0 +1,76 @@
+{
+   "abstract" : "Role::Tiny + lexical \"with\"",
+   "author" : [
+      "Adriano Ferreira <ferreira@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Jojo-Role",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Role::Tiny" : "2.000005",
+            "Sub::Inject" : "v0.3.0",
+            "experimental" : "0",
+            "perl" : "5.018"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "provides" : {
+      "Jojo::Role" : {
+         "file" : "lib/Jojo/Role.pm",
+         "version" : "v0.4.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/aferreira/cpan-Jojo-Role/issues"
+      },
+      "homepage" : "https://github.com/aferreira/cpan-Jojo-Role",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/aferreira/cpan-Jojo-Role.git",
+         "web" : "https://github.com/aferreira/cpan-Jojo-Role"
+      }
+   },
+   "version" : "0.4.0",
+   "x_contributors" : [
+      "Adriano Ferreira <a.r.ferreira@gmail.com>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0228"
+}
+

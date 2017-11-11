@@ -4,7 +4,7 @@
       "Adriano Ferreira <ferreira@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -46,8 +46,9 @@
    "release_status" : "stable",
    "resources" : {
       "repository" : {
-         "url" : "http://github.com/aferreira/cpan-WWW-CPAN"
+         "url" : "http://github.com/aferreira/cpan-Devel-Hook"
       }
    },
-   "version" : "0.006"
+   "version" : "0.010",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

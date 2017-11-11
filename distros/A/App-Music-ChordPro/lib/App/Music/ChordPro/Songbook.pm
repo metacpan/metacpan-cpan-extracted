@@ -6,6 +6,7 @@ use strict;
 use warnings;
 
 use App::Music::ChordPro::Chords;
+use App::Music::ChordPro::Output::Common;
 
 use Encode qw(decode encode);
 use Carp;
@@ -22,7 +23,7 @@ my $grid_arg;
 my $grid_cells;
 
 # Local transposition.
-my $xpose;
+my $xpose = 0;
 
 # Chord type for this song, used to detect mixing types.
 my $chordtype;
@@ -30,27 +31,93 @@ my $chordtype;
 # Used chords, in order of appearance.
 my @used_chords;
 
+# Chorus lines, if any.
+my @chorus;
+
 # Keep track of unknown chords, to avoid dup warnings.
 my %warned_chords;
 
-my $re_meta;
+my $re_meta;			# for metadata
+
+# Normally, transposition and subtitutions are handled by the parser.
+my $no_transpose;		# NYI
+my $no_substitute;
 
 my $diag;			# for diagnostics
 
 sub parsefile {
     my ( $self, $filename, $options ) = @_;
 
-    my $fh;
+    my $data;			# slurped file data
+    my $encoded;		# already encoded
+
+    # Gather data from the input.
     if ( ref($filename) ) {
-	my $data = encode("UTF-8", $$filename);
+	$data = $$filename;
 	$filename = "__STRING__";
-	open($fh, '<', \$data)
-	  or croak("$filename: $!\n");
+	$encoded++;
+    }
+    elsif ( $filename eq '-' ) {
+	$filename = "__STDIN__";
+	$data = do { local $/; <STDIN> };
     }
     else {
-	open($fh, '<', $filename)
+	open( my $fh, '<', $filename)
 	  or croak("$filename: $!\n");
+	$data = do { local $/; <$fh> };
     }
+
+    if ( $encoded ) {
+	# Nothing to do, already dealt with.
+    }
+
+    # Detect Byte Order Mark.
+    elsif ( $data =~ /^\xEF\xBB\xBF/ ) {
+	warn("Input is UTF-8 (BOM)\n") if $options->{debug};
+	$data = decode( "UTF-8", substr($data, 3) );
+    }
+    elsif ( $data =~ /^\xFE\xFF/ ) {
+	warn("Input is UTF-16BE (BOM)\n") if $options->{debug};
+	$data = decode( "UTF-16BE", substr($data, 2) );
+    }
+    elsif ( $data =~ /^\xFF\xFE\x00\x00/ ) {
+	warn("Input is UTF-32LE (BOM)\n") if $options->{debug};
+	$data = decode( "UTF-32LE", substr($data, 4) );
+    }
+    elsif ( $data =~ /^\xFF\xFE/ ) {
+	warn("Input is UTF-16LE (BOM)\n") if $options->{debug};
+	$data = decode( "UTF-16LE", substr($data, 2) );
+    }
+    elsif ( $data =~ /^\x00\x00\xFE\xFF/ ) {
+	warn("Input is UTF-32BE (BOM)\n") if $options->{debug};
+	$data = decode( "UTF-32BE", substr($data, 4) );
+    }
+
+    # No BOM, did user specify an encoding?
+    elsif ( $options->{encoding} ) {
+	warn("Input is ", $options->{encoding}, " (--encoding)\n")
+	  if $options->{debug};
+	$data = decode( $options->{encoding}, $data, 1 );
+    }
+
+    # Try UTF8, fallback to ISO-8895.1.
+    else {
+	my $d = eval { decode( "UTF-8", $data, 1 ) };
+	if ( $@ ) {
+	    warn("Input is ISO-8859.1 (assumed)\n") if $options->{debug};
+	    $data = decode( "iso-8859-1", $data );
+	}
+	else {
+	    warn("Input is UTF-8 (detected)\n") if $options->{debug};
+	    $data = $d;
+	}
+    }
+
+    # Split in lines;
+    my @lines = split( /\r\n|\n|\r/, $data );
+
+    $no_transpose = $options->{'no-transpose'};
+    $no_substitute = $options->{'no-substitute'};
 
     push( @{ $self->{songs} }, App::Music::ChordPro::Song->new )
       if exists($self->{songs}->[-1]->{body});
@@ -76,27 +143,18 @@ sub parsefile {
 	undef $re_meta;
     }
 
-    while ( <$fh> ) {
-	s/[\r\n]+$//;
-	$diag->{line} = $.;
-
-	my $line;
-	if ( $options->{encoding} ) {
-	    $line = decode( $options->{encoding}, $_, 1 );
-	}
-	else {
-	    eval { $line = decode( "UTF-8", $_, 1 ) };
-	    $line = decode( "iso-8859-1", $_ ) if $@;
-	}
-	$diag->{orig} = $_ = $line;
+    my $linecnt;
+    while ( @lines ) {
+	$diag->{line} = ++$linecnt;
+	$diag->{orig} = $_ = shift(@lines);
 
 	if ( /^#/ ) {
 	    # Collect pre-title stuff separately.
 	    if ( exists $self->{songs}->[-1]->{title} ) {
-		$self->add( type => "ignore", text => $line );
+		$self->add( type => "ignore", text => $_ );
 	    }
 	    else {
-		push( @{ $self->{songs}->[-1]->{preamble} }, $line );
+		push( @{ $self->{songs}->[-1]->{preamble} }, $_ );
 	    }
 	    next;
 	}
@@ -130,7 +188,7 @@ sub parsefile {
 	}
 	else {
 	    # Collect pre-title stuff separately.
-	    push( @{ $self->{songs}->[-1]->{preamble} }, $line );
+	    push( @{ $self->{songs}->[-1]->{preamble} }, $_ );
 	}
     }
     do_warn("Unterminated context in song: $in_context")
@@ -174,9 +232,7 @@ sub parsefile {
     }
 
     # Global transposition.
-    if ( $options->{transpose} ) {
-	$self->{songs}->[-1]->transpose( $options->{transpose} );
-    }
+    $self->{songs}->[-1]->transpose( $options->{transpose} );
 
     # $self->{songs}->[-1]->structurize;
 
@@ -188,6 +244,8 @@ sub add {
     push( @{$self->{songs}->[-1]->{body}},
 	  { context => $in_context,
 	    @_ } );
+    push( @chorus, { context => $in_context, @_ } )
+      if $in_context eq "chorus";
 }
 
 sub chord {
@@ -270,6 +328,9 @@ sub decompose {
 
 sub cdecompose {
     my ( $self, $line ) = @_;
+    $line = App::Music::ChordPro::Output::Common::fmt_subst( $self->{songs}->[-1],
+						     $line )
+      unless $no_substitute;
     my %res = $self->decompose($line);
     return ( text => $line ) unless $res{chords};
     return %res;
@@ -303,7 +364,7 @@ sub decompose_grid {
     }
 
     my @tokens = split( ' ', $line );
-    my $nbt;			# non-bar tokens
+    my $nbt = 0;		# non-bar tokens
     foreach ( @tokens ) {
 	if ( $_ eq "|:" || $_ eq "{" ) {
 	    $_ = { symbol => $_, class => "bar" };
@@ -391,6 +452,7 @@ sub directive {
 	    do_warn("Garbage in start_of_$1: $arg (ignored)\n")
 	      if $arg;
 	}
+	@chorus = () if $in_context eq "chorus";
 	return;
     }
     if ( $dir =~ /^end_of_(\w+)$/ ) {
@@ -404,7 +466,12 @@ sub directive {
 	    do_warn("{chorus} encountered while in $in_context context -- ignored\n");
 	    return;
 	}
-	$self->add( type => "rechorus" );
+	$self->add( type => "rechorus",
+		    @chorus
+		    ? ( "chorus" => App::Music::ChordPro::Config::clone(\@chorus),
+			"transpose" => $xpose )
+		    : (),
+		  );
 	return;
     }
 
@@ -546,6 +613,8 @@ sub directive {
     return;
 }
 
+my %propstack;
+
 sub global_directive {
     my ($self, $d, $legacy ) = @_;
     my ( $dir, $arg ) = dir_split($d);
@@ -581,16 +650,52 @@ sub global_directive {
 	return 1;
     }
 
-    # Private hack: transpose at parse time.
-    # Usefulness is a bit limited since it doesn't apply to {chorus}.
-    if ( $d =~ /^\+transpose[: ]+([-+]?\d+)\s*$/ ) {
+    if ( $d =~ /^transpose[: ]+([-+]?\d+)\s*$/ ) {
 	return if $legacy;
-	$xpose = $1;
+	$propstack{transpose} //= [];
+	push( @{ $propstack{transpose} }, $xpose );
+	my %a = ( type => "control",
+		  name => "transpose",
+		  previous => $xpose,
+		);
+	my $m = $self->{songs}->[-1]->{meta};
+	if ( $m->{key} ) {
+	    $m->{key_actual} =
+	      [ App::Music::ChordPro::Chords::transpose( $m->{key}->[-1],
+							 $xpose+$1 ) ];
+	    $m->{key_from} =
+	      [ App::Music::ChordPro::Chords::transpose( $m->{key}->[-1],
+							 $xpose ) ];
+	}
+	$xpose += $1;
+	$self->add( %a, value => $xpose ) if $no_transpose;
 	return 1;
     }
-    if ( $dir =~ /^\+transpose\s*$/ ) {
+    if ( $dir =~ /^transpose\s*$/ ) {
 	return if $legacy;
-	$xpose = 0;
+	$propstack{transpose} //= [];
+	my %a = ( type => "control",
+		  name => "transpose",
+		  previous => $xpose,
+		);
+	my $m = $self->{songs}->[-1]->{meta};
+	if ( $m->{key} ) {
+	    $m->{key_from} =
+	      [ App::Music::ChordPro::Chords::transpose( $m->{key}->[-1],
+							 $xpose ) ];
+	}
+	if ( @{ $propstack{transpose} } ) {
+	    $xpose = pop( @{ $propstack{transpose} } );
+	}
+	else {
+	    $xpose = 0;
+	}
+	if ( $m->{key} ) {
+	    $m->{key_actual} =
+	      [ App::Music::ChordPro::Chords::transpose( $m->{key}->[-1],
+							 $xpose ) ];
+	}
+	$self->add( %a, value => $xpose ) if $no_transpose;
 	return 1;
     }
 
@@ -622,11 +727,25 @@ sub global_directive {
 	  && ! ( $item =~ /^(text|chord|tab)$/ && $prop =~ /^(font|size)$/ );
 
 	$prop = "color" if $prop eq "colour";
+	my $name = "$item-$prop";
+	$propstack{$name} //= [];
 
 	if ( $value eq "" ) {
-	    $self->add( type => "control",
-			name => "$item-$prop",
-			value => undef );
+	    # Pop current value from stack.
+	    if ( @{ $propstack{$name} } ) {
+		pop( @{ $propstack{$name} } );
+	    }
+	    # Use new current value, if any.
+	    if ( @{ $propstack{$name} } ) {
+		$value = $propstack{$name}->[-1]
+	    }
+	    else {
+		# do_warn("No saved value for property $item$prop\n" );
+		$value = undef;
+	    }
+	    $self->add( type  => "control",
+			name  => $name,
+			value => $value );
 	    return 1;
 	}
 
@@ -644,9 +763,11 @@ sub global_directive {
 	    }
 	    $value = $v;
 	}
-	$self->add( type => "control",
-		    name => "$item-$prop",
-		    value => $prop eq 'font' ? $value : lc($value) );
+	$value = $prop eq 'font' ? $value : lc($value);
+	$self->add( type  => "control",
+		    name  => $name,
+		    value => $value );
+	push( @{ $propstack{$name} }, $value );
 	return 1;
     }
 
@@ -737,7 +858,31 @@ sub global_directive {
 	    return 1;
 	}
 
-	if ( $res->{frets} || $res->{base} || $res->{fingers} ) {
+	if ( $show) {
+	    my $ci;
+	    if ( $res->{frets} || $res->{base} || $res->{fingers} ) {
+		$ci = { name => $res->{name},
+			base => $res->{base} ? $res->{base} : 0,
+			strings => $res->{frets},
+			$res->{fingers} ? ( fingers => $res->{fingers} ) : (),
+		      };
+	    }
+	    else {
+		$ci = $res->{name};
+	    }
+	    # Combine consecutive entries.
+	    if ( $self->{songs}->[-1]->{body}->[-1]->{type} eq "diagrams" ) {
+		push( @{ $self->{songs}->[-1]->{body}->[-1]->{chords} },
+		      $ci );
+	    }
+	    else {
+		$self->add( type => "diagrams",
+			    show => "user",
+			    origin => "chord",
+			    chords => [ $ci ] );
+	    }
+	}
+	elsif ( $res->{frets} || $res->{base} || $res->{fingers} ) {
 	    $res->{base} ||= 1;
 	    push( @{$cur->{define}}, $res );
 	    if ( $res->{frets} ) {
@@ -760,19 +905,6 @@ sub global_directive {
 	    }
 	}
 
-	if ( $show) {
-	    # Combine consecutive entries.
-	    if ( $self->{songs}->[-1]->{body}->[-1]->{type} eq "diagrams" ) {
-		push( @{ $self->{songs}->[-1]->{body}->[-1]->{chords} },
-		      $res->{name} );
-	    }
-	    else {
-		$self->add( type => "diagrams",
-			    show => "user",
-			    origin => "chord",
-			    chords => [ $res->{name} ] );
-	    }
-	}
 	return 1;
     }
 
@@ -828,59 +960,84 @@ sub new {
 
 sub transpose {
     my ( $self, $xpose ) = @_;
-    return unless $xpose;
 
     # Transpose meta data (key).
-    if ( exists $self->{meta}->{key} ) {
+    if ( exists $self->{meta} && exists $self->{meta}->{key} ) {
 	foreach ( @{ $self->{meta}->{key} } ) {
 	    $_ = $self->xpchord( $_, $xpose );
 	}
     }
 
     # Transpose body contents.
-    foreach my $item ( @{ $self->{body} } ) {
-	if ( $item->{type} eq "songline" ) {
-	    foreach ( @{ $item->{chords} } ) {
+    if ( exists $self->{body} ) {
+	foreach my $item ( @{ $self->{body} } ) {
+	    $self->_transpose( $item, $xpose );
+	}
+    }
+}
+
+sub _transpose {
+    my ( $self, $item, $xpose ) = @_;
+    $xpose //= 0;
+
+    if ( $item->{type} eq "rechorus" ) {
+	return unless $item->{chorus};
+	for ( @{ $item->{chorus} } ) {
+	    $self->_transpose( $_, $xpose + $item->{transpose} );
+	}
+	return;
+    }
+    return unless $xpose;
+
+    if ( $item->{type} eq "songline" ) {
+	# Prevent chords to be autovivified.
+	# The ChordPro backend relies on it.
+	return unless exists $item->{chords};
+
+	foreach ( @{ $item->{chords} } ) {
+	    $_ = $self->xpchord( $_, $xpose );
+	}
+	return;
+    }
+
+    if ( $item->{type} =~ /^comment/ ) {
+	return unless $item->{chords};
+	foreach ( @{ $item->{chords} } ) {
+	    $_ = $self->xpchord( $_, $xpose );
+	}
+	return;
+    }
+
+    if ( $item->{type} eq "gridline" ) {
+	foreach ( @{ $item->{tokens} } ) {
+	    return unless $_->{class} eq "chord";
+	    $_->{chord} = $self->xpchord( $_->{chord}, $xpose );
+	}
+	if ( $item->{margin} && exists $item->{margin}->{chords} ) {
+	    foreach ( @{ $item->{margin}->{chords} } ) {
 		$_ = $self->xpchord( $_, $xpose );
 	    }
-	    next;
 	}
-	if ( $item->{type} =~ /^comment/ ) {
-	    next unless $item->{chords};
-	    foreach ( @{ $item->{chords} } ) {
+	if ( $item->{comment} && exists $item->{comment}->{chords} ) {
+	    foreach ( @{ $item->{comment}->{chords} } ) {
 		$_ = $self->xpchord( $_, $xpose );
 	    }
-	    next;
 	}
-	if ( $item->{type} eq "gridline" ) {
-	    foreach ( @{ $item->{tokens} } ) {
-		next unless $_->{class} eq "chord";
-		$_->{chord} = $self->xpchord( $_->{chord}, $xpose );
-	    }
-	    if ( $item->{margin} && exists $item->{margin}->{chords} ) {
-		foreach ( @{ $item->{margin}->{chords} } ) {
-		    $_ = $self->xpchord( $_, $xpose );
-		}
-	    }
-	    if ( $item->{comment} && exists $item->{comment}->{chords} ) {
-		foreach ( @{ $item->{comment}->{chords} } ) {
-		    $_ = $self->xpchord( $_, $xpose );
-		}
-	    }
-	    next;
+	return;
+    }
+
+    if ( $item->{type} eq "diagrams" ) {
+	foreach ( @{ $item->{chords} } ) {
+	    $_ = $self->xpchord( $_, $xpose );
 	}
-	if ( $item->{type} eq "diagrams" ) {
-	    foreach ( @{ $item->{chords} } ) {
-		$_ = $self->xpchord( $_, $xpose );
-	    }
-	    next;
-	}
+	return;
     }
 }
 
 sub xpchord {
     my ( $self, $c, $xpose ) = @_;
     return $c unless length($c) && $xpose;
+    return $c if ref $c;
     my $parens = $c =~ s/^\((.*)\)$/$1/;
     my $xc = App::Music::ChordPro::Chords::transpose( $c, $xpose );
     $xc ||= $c;

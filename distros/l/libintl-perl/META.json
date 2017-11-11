@@ -43,13 +43,13 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=libintl-perl"
+         "web" : "https://github.com/gflohr/libintl-perl/issues"
       },
-      "homepage" : "http://git.guido-flohr.net/projects/libintl-perl/",
+      "homepage" : "http://www.guido-flohr.net/en/projects/",
       "repository" : {
-         "url" : "git://git.guido-flohr.net/perl/libintl-perl.git"
+         "url" : "https://github.com/gflohr/libintl-perl.git"
       }
    },
-   "version" : "1.28",
+   "version" : "1.29",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

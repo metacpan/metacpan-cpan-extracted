@@ -42,6 +42,10 @@ Inherited, see L<User::Identity::Collection/"OVERLOADED">
 
 Returns the L<string()|Mail::Message::Field::AddrGroup/"METHODS"> value.
 
+=item overload: B<stringification >
+
+Inherited, see L<User::Identity::Collection/"OVERLOADED">
+
 =back
 
 =head1 METHODS
@@ -71,7 +75,7 @@ Coerce an $object into a L<Mail::Message::Field::AddrGroup|Mail::Message::Field:
 you can only coerce L<User::Identity::Collection::Emails|User::Identity::Collection::Emails> (which is
 the base class for this one) into this one.
 
-=item Mail::Message::Field::AddrGroup-E<gt>B<new>( [NAME], OPTIONS )
+=item Mail::Message::Field::AddrGroup-E<gt>B<new>( [$name], %options )
 
 Inherited, see L<User::Identity::Collection::Emails/"Constructors">
 
@@ -91,7 +95,7 @@ Inherited, see L<User::Identity::Item/"Attributes">
 
 Inherited, see L<User::Identity::Collection/"Attributes">
 
-=item $obj-E<gt>B<name>( [NEWNAME] )
+=item $obj-E<gt>B<name>( [$newname] )
 
 Inherited, see L<User::Identity::Item/"Attributes">
 
@@ -107,23 +111,23 @@ Extends L<"Collections" in User::Identity::Collection::Emails|User::Identity::Co
  
 =over 4
 
-=item $obj-E<gt>B<add>(COLLECTION, ROLE)
+=item $obj-E<gt>B<add>($collection, $role)
 
 Inherited, see L<User::Identity::Item/"Collections">
 
-=item $obj-E<gt>B<addCollection>(OBJECT | ([TYPE], OPTIONS))
+=item $obj-E<gt>B<addCollection>( $object | <[$type], %options> )
 
 Inherited, see L<User::Identity::Item/"Collections">
 
-=item $obj-E<gt>B<collection>(NAME)
+=item $obj-E<gt>B<collection>($name)
 
 Inherited, see L<User::Identity::Item/"Collections">
 
-=item $obj-E<gt>B<parent>( [PARENT] )
+=item $obj-E<gt>B<parent>( [$parent] )
 
 Inherited, see L<User::Identity::Item/"Collections">
 
-=item $obj-E<gt>B<removeCollection>(OBJECT|NAME)
+=item $obj-E<gt>B<removeCollection>($object|$name)
 
 Inherited, see L<User::Identity::Item/"Collections">
 
@@ -145,15 +149,15 @@ Extends L<"Maintaining roles" in User::Identity::Collection::Emails|User::Identi
  
 =over 4
 
-=item $obj-E<gt>B<addRole>(ROLE| ([NAME],OPTIONS) | ARRAY)
+=item $obj-E<gt>B<addRole>($role| <[$name],%options> | ARRAY)
 
 Inherited, see L<User::Identity::Collection/"Maintaining roles">
 
-=item $obj-E<gt>B<removeRole>(ROLE|NAME)
+=item $obj-E<gt>B<removeRole>($role|$name)
 
 Inherited, see L<User::Identity::Collection/"Maintaining roles">
 
-=item $obj-E<gt>B<renameRole>( <ROLE|OLDNAME>, NEWNAME )
+=item $obj-E<gt>B<renameRole>( <$role|$oldname>, $newname )
 
 Inherited, see L<User::Identity::Collection/"Maintaining roles">
 
@@ -169,7 +173,7 @@ Extends L<"Searching" in User::Identity::Collection::Emails|User::Identity::Coll
  
 =over 4
 
-=item $obj-E<gt>B<find>(NAME|CODE|undef)
+=item $obj-E<gt>B<find>($name|CODE|undef)
 
 Inherited, see L<User::Identity::Collection/"Searching">
 
@@ -266,8 +270,8 @@ cannot add objects of a different $type.
 
 =head1 SEE ALSO
 
-This module is part of Mail-Message distribution version 3.002,
-built on September 04, 2017.
+This module is part of Mail-Message distribution version 3.003,
+built on November 08, 2017.
 
 Do not forget to read
 L<Mail::Box-Overview>,

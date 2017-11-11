@@ -8,7 +8,7 @@ chop $line;
 my ($host, $port,$tableset,$user,$pwd) = split(/:/,$line );
 close(DEF);
 
-my $dbh = DBI->connect("dbi:Cego:tableset=$tableset;hostname=$host;port=$port;protocol=serial;logfile=cegoDBD.log;logmode=debug", "$user", "$pwd");
+my $dbh = DBI->connect("dbi:Cego:tableset=$tableset;hostname=$host;port=$port;protocol=serial;logfile=cegoDBD.log;logmode=debug;maxsendlen=1024", "$user", "$pwd");
 ok($dbh);
 
 $dbh->{AutoCommit} = 1;

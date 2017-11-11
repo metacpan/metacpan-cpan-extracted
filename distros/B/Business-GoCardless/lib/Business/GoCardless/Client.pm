@@ -367,7 +367,7 @@ sub _api_request {
         if ( $self->api_version > 1 ) {
             $req->content_type( 'application/json' );
             my $json;
-            $json = JSON->new->canonical->encode( $params ) if $params;
+            $json = JSON->new->utf8->canonical->encode( $params ) if $params;
             $req->content( $json ) if $json;
             say STDERR "GOCARDLESS -> $json" if $ENV{GOCARDLESS_DEBUG} && $json;
         } else {

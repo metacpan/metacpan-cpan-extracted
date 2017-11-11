@@ -1,7 +1,16 @@
 
 Release history for Importer-Zim-EndOfScope
 
-0.2.0     2017-09-29 11:32:18-07:00 America/Los_Angeles
+0.4.0     2017-11-09 11:38:45-08:00 America/Los_Angeles
+
+    - Lift dependency on Importer::Zim::Base to runtime
+    - Depend on Importer::Zim::Base 0.12.0+
+
+v0.3     2017-11-08 16:38:40-08:00 America/Los_Angeles
+
+    - export_to() function
+
+v0.2     2017-09-29 11:32:18-07:00 America/Los_Angeles
 
     - Produce DEBUG message with carp()
     - Apply indentation to DEBUG messages

@@ -31,7 +31,7 @@ fs_shadow_path - путь к файловой системе, указывает
 
 package WebService::CEPH::FileShadow;
 
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 use strict;
 use warnings;

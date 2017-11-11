@@ -4,13 +4,13 @@ use warnings;
 no warnings qw(redefine);
 package RT::Extension::ConditionalCustomFields;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =encoding utf8
 
 =head1 NAME
 
-RT-Extension-ConditionalCustomFields - CF conditionned by the value of another CF
+RT::Extension::ConditionalCustomFields - CF conditionned by the value of another CF
 
 =head1 DESCRIPTION
 

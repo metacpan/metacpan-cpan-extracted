@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: Pod::Weaver configuration the way RUSSOZ does it
-our $VERSION = '0.024';    # VERSION
+our $VERSION = '0.026';    # VERSION
 
 use Pod::Weaver::Config::Assembler;
 
@@ -81,8 +81,9 @@ sub mvp_bundle_config {
             '@Author::RUSSOZ/postlude', _exp('Region'),
             { region_name => 'postlude' }
         ],
-        [ '@Author::RUSSOZ/Authors', _exp('Authors'), {} ],
-        [ '@Author::RUSSOZ/Legal',   _exp('Legal'),   {} ],
+        [ '@Author::RUSSOZ/Authors',      _exp('Authors'),      {} ],
+        [ '@Author::RUSSOZ/Contributors', _exp('Contributors'), {} ],
+        [ '@Author::RUSSOZ/Legal',        _exp('Legal'),        {} ],
         [
             '@Author::RUSSOZ/BugsAndLimitations', _exp('BugsAndLimitations'), {}
         ],
@@ -114,7 +115,7 @@ Pod::Weaver::PluginBundle::Author::RUSSOZ - Pod::Weaver configuration the way RU
 
 =head1 VERSION
 
-version 0.024
+version 0.026
 
 =head1 NAME
 
@@ -122,7 +123,7 @@ Pod::Weaver::PluginBundle::Author::RUSSOZ - Pod::Weaver configuration the way RU
 
 =head1 VERSION
 
-version 0.024
+version 0.026
 
 =head1 TASK CONTENTS
 

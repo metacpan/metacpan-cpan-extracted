@@ -13,28 +13,24 @@ my %module_build_args = (
   "configure_requires" => {
     "Module::Build" => "0.28"
   },
-  "dist_abstract" => "Mojo::Base + lexical \"has\"",
+  "dist_abstract" => "DEPRECATED! Mojo::Base + lexical \"has\"",
   "dist_author" => [
     "Adriano Ferreira <ferreira\@cpan.org>"
   ],
   "dist_name" => "Mojo-Bass",
-  "dist_version" => "0.2.0",
+  "dist_version" => "0.4.0",
   "license" => "artistic_2",
   "module_name" => "Mojo::Bass",
   "recursive_test_files" => 1,
   "requires" => {
-    "Mojo::Base" => 0,
-    "Sub::Inject" => "v0.2.0",
-    "perl" => "5.018",
-    "strict" => 0
+    "Jojo::Base" => 0
   },
   "test_requires" => {
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
-    "FindBin" => 0,
     "Test::More" => "0.96",
-    "base" => 0,
-    "lib" => 0,
+    "perl" => "5.018",
+    "strict" => 0,
     "warnings" => 0
   }
 );
@@ -43,11 +39,10 @@ my %module_build_args = (
 my %fallback_build_requires = (
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
-  "FindBin" => 0,
   "Module::Build" => "0.28",
   "Test::More" => "0.96",
-  "base" => 0,
-  "lib" => 0,
+  "perl" => "5.018",
+  "strict" => 0,
   "warnings" => 0
 );
 

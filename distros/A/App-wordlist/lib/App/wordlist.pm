@@ -1,13 +1,34 @@
 package App::wordlist;
 
-our $DATE = '2016-09-25'; # DATE
-our $VERSION = '0.25'; # VERSION
+our $DATE = '2017-11-08'; # DATE
+our $VERSION = '0.261'; # VERSION
 
 use 5.010001;
 use strict;
 use warnings;
 
+use List::Util qw(shuffle);
+
 our %SPEC;
+
+our %arg_wordlists = (
+    wordlists => {
+        'x.name.is_plural' => 1,
+        schema => ['array*' => of => 'str*'],
+        summary => 'Select one or more wordlist modules',
+        cmdline_aliases => {w=>{}},
+        element_completion => sub {
+            require Complete::Util;
+
+            my %args = @_;
+            Complete::Util::complete_array_elem(
+                word  => $args{word},
+                array => [map {$_->{name}} @{ _list_installed() }],
+                ci    => 1,
+            );
+        },
+    },
+);
 
 sub _list_installed {
     require Module::List;
@@ -77,22 +98,18 @@ $SPEC{wordlist} = {
         max_len => {
             schema  => 'int*',
         },
-        wordlists => {
-            'x.name.is_plural' => 1,
-            schema => ['array*' => of => 'str*'],
-            summary => 'Select one or more wordlist modules',
-            cmdline_aliases => {w=>{}},
-            element_completion => sub {
-                require Complete::Util;
-
-                my %args = @_;
-                Complete::Util::complete_array_elem(
-                    word  => $args{word},
-                    array => [map {$_->{name}} @{ _list_installed() }],
-                    ci    => 1,
-                );
-            },
+        num => {
+            summary => 'Return (at most) this number of words (0 = unlimited)',
+            schema  => ['int*', min=>0, max=>9999],
+            default => 0,
+            cmdline_aliases => {n=>{}},
         },
+        random => {
+            summary => 'Pick random words (must set --num to positive number)',
+            schema  => 'bool*',
+            cmdline_aliases => {r=>{}},
+        },
+        %arg_wordlists,
         or => {
             summary => 'Match any word in query instead of the default "all"',
             schema  => 'bool',
@@ -246,6 +263,11 @@ sub wordlist {
     my $or = $args{or};
     my $arg = $args{arg} // [];
     my $detail = $args{detail};
+    my $num = $args{num} // 0;
+    my $random = $args{random};
+
+    return [412, "Must set --num to positive number when --random"]
+        if $random && !$num;
 
     if ($action eq 'grep') {
         # convert /.../ in arg to regex
@@ -274,6 +296,25 @@ sub wordlist {
                 push @$wordlists, $rec->{name};
             }
         }
+        $wordlists = [shuffle @$wordlists] if $random;
+
+        my $n = 0;
+
+        my $code_add_word = sub {
+            my ($wl, $word) = @_;
+            if ($random) {
+                if (@res < $num) {
+                    splice @res, rand(@res+1), 0,
+                        $detail ? [$wl, $word] : $word;
+                } else {
+                    rand($n) < @res and splice @res, rand(@res), 1,
+                        $detail ? [$wl, $word] : $word;
+                }
+            } else {
+                push @res, $detail ? [$wl, $word] : $word;
+            }
+        };
+
         for my $wl (@$wordlists) {
             my $mod = "WordList::$wl";
             (my $modpm = $mod . ".pm") =~ s!::!/!g;
@@ -283,6 +324,7 @@ sub wordlist {
                 sub {
                     my $word = shift;
 
+                    return if !$random && $num > 0 && $n >= $num;
                     return if defined($args{len}) &&
                         length($word) != $args{len};
                     return if defined($args{min_len}) &&
@@ -298,7 +340,8 @@ sub wordlist {
                         if ($or) {
                             # succeed early when --or
                             if ($match) {
-                                push @res, $detail ? [$wl, $word] : $word;
+                                $n++;
+                                $code_add_word->($wl, $word);
                                 return;
                             }
                         } else {
@@ -309,7 +352,8 @@ sub wordlist {
                         }
                     }
                     if (!$or || !@$arg) {
-                        push @res, $detail ? [$wl, $word] : $word;
+                        $n++;
+                        $code_add_word->($wl, $word);
                     }
                 }
             );
@@ -347,7 +391,7 @@ sub wordlist {
                 );
                 return $res if $res->[0] != 200;
                 return [200, "OK",
-                        [map {s/\AWordList:://; $_}
+                        [map {my $w = $_; $w =~ s/\AWordList:://; $w }
                              grep {/WordList::/} sort @{$res->[2]}]];
             } elsif ($method eq 'metacpan') {
                 unless (eval { require MetaCPAN::Client; 1 }) {
@@ -367,7 +411,7 @@ sub wordlist {
                     push @res, $mod unless grep {$mod eq $_} @res;
                 }
                 warn "Empty result from MetaCPAN\n" unless @res;
-                return [200, "OK", [sort @res]];
+                return [200, "OK", [$random ? shuffle(@res) : sort(@res)]];
             }
         }
         return [412, "Can't find a way to list CPAN mirrors"];
@@ -394,7 +438,7 @@ App::wordlist - Grep words from WordList::*
 
 =head1 VERSION
 
-This document describes version 0.25 of App::wordlist (from Perl distribution App-wordlist), released on 2016-09-25.
+This document describes version 0.261 of App::wordlist (from Perl distribution App-wordlist), released on 2017-11-08.
 
 =head1 SYNOPSIS
 
@@ -403,7 +447,11 @@ See the included script L<wordlist>.
 =head1 FUNCTIONS
 
 
-=head2 wordlist(%args) -> [status, msg, result, meta]
+=head2 wordlist
+
+Usage:
+
+ wordlist(%args) -> [status, msg, result, meta]
 
 Grep words from WordList::*.
 
@@ -488,9 +536,17 @@ Use local CPAN mirror first when available (for -L).
 
 =item * B<min_len> => I<int>
 
+=item * B<num> => I<int> (default: 0)
+
+Return (at most) this number of words (0 = unlimited).
+
 =item * B<or> => I<bool>
 
 Match any word in query instead of the default "all".
+
+=item * B<random> => I<bool>
+
+Pick random words (must set --num to positive number).
 
 =item * B<types> => I<array[str]>
 
@@ -550,7 +606,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2017, 2016, 2015, 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

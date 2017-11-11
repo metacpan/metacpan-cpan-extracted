@@ -1,9 +1,9 @@
 
 
 This archive contains the distribution Mojo-Bass,
-version 0.2.0:
+version 0.4.0:
 
-  Mojo::Base + lexical "has"
+  DEPRECATED! Mojo::Base + lexical "has"
 
 This software is Copyright (c) 2017 by Adriano Ferreira.
 

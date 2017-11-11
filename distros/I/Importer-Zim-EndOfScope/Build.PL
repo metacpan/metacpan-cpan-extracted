@@ -18,13 +18,13 @@ my %module_build_args = (
     "Adriano Ferreira <ferreira\@cpan.org>"
   ],
   "dist_name" => "Importer-Zim-EndOfScope",
-  "dist_version" => "0.2.0",
+  "dist_version" => "0.4.0",
   "license" => "perl",
   "module_name" => "Importer::Zim::EndOfScope",
   "recursive_test_files" => 1,
   "requires" => {
     "B::Hooks::EndOfScope" => 0,
-    "Importer::Zim::Base" => "v0.8.0",
+    "Importer::Zim::Base" => "v0.12.0",
     "Importer::Zim::Utils" => "v0.8.0",
     "Sub::Replace" => 0,
     "perl" => "5.010001"

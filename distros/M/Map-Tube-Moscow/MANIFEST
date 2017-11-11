@@ -3,6 +3,7 @@ examples/ex1.pl
 examples/ex2.pl
 examples/ex3.pl
 examples/ex4.pl
+examples/ex5.pl
 images/ex3.png
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm

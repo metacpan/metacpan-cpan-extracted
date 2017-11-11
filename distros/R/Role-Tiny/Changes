@@ -1,5 +1,9 @@
 Revision history for Role-Tiny
 
+2.000006 - 2017-11-08
+  - account for code references stored directly in stash (for perl 5.28)
+  - work around hint leakage when loading modules in perl 5.8 and 5.10.1
+
 2.000005 - 2016-11-01
   - revert change to MRO::Compat usage
 

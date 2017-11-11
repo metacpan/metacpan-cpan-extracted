@@ -54,10 +54,9 @@ my $handler = Markdent::Handler::MinimalTree->new();
     is(
         exception {
             my $parser = Markdent::Parser->new(
-                dialects => 'Theory',
-                block_parser_class =>
-                    'Markdent::Parser::BlockParser',
-                handler => $handler,
+                dialects           => 'Theory',
+                block_parser_class => 'Markdent::Parser::BlockParser',
+                handler            => $handler,
             );
         },
         undef,

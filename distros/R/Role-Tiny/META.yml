@@ -25,5 +25,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Role-Tiny
   license: http://dev.perl.org/licenses/
   repository: git://github.com/moose/Role-Tiny.git
-version: '2.000005'
+version: '2.000006'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

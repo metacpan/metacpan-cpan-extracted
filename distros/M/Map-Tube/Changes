@@ -1,5 +1,9 @@
 Revision history for Map::Tube
 
+3.37  2017-11-07T15:35:00+00:00
+      - Updated method get_stations() to return all map stations
+        if no line name is passed.
+
 3.36  2017-10-18T13:40:00+00:00
       - Added support for partial station index.
 

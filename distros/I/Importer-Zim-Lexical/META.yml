@@ -21,15 +21,14 @@ name: Importer-Zim-Lexical
 provides:
   Importer::Zim::Lexical:
     file: lib/Importer/Zim/Lexical.pm
-    version: v0.8.0
+    version: v0.10.0
 requires:
-  Importer::Zim::Base: v0.8.0
-  Importer::Zim::Utils: v0.8.0
+  Importer::Zim::Base: v0.12.0
   Sub::Inject: v0.2.0
   perl: '5.018'
 resources:
   bugtracker: https://github.com/aferreira/cpan-Importer-Zim-Lexical/issues
   homepage: https://github.com/aferreira/cpan-Importer-Zim-Lexical
   repository: https://github.com/aferreira/cpan-Importer-Zim-Lexical.git
-version: 0.8.0
+version: 0.10.0
 x_serialization_backend: 'YAML::Tiny version 1.70'

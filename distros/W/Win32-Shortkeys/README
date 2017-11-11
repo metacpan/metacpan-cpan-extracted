@@ -1,0 +1,160 @@
+NAME
+
+    Win32::Shortkeys - A shortkeys perl script for windows
+
+VERSION
+
+    0.02
+
+INSTALLATION
+
+    To install Win32::Shortkeys, cd to the directory that contains this
+    file and type the following:
+
+       perl Makefile.PL
+       make
+       make test
+       make install
+
+    On windows use nmake or dmake instead of make.
+
+    To install this module into a specific directory, do: perl Makefile.PL
+    PREFIX=/name/of/the/directory ...the rest is the same...
+
+    Please also read the perlmodinstall man page, if available.
+
+DEPENDENCIES
+
+            Win32::Clipboard        0.58
+            Win32::Shortkeys::Kbh   0.01
+            Config::YAML::Tiny
+            Test::Simple    0.44
+            Encode  2.84
+            XML::Parser     2.44
+            Time::HiRes     1.9733
+            Carp    1.4
+
+DESCRIPTION
+
+    Since the synopsis above is short, the main things to describe are in
+    the file pass to Win32::Shortkeys-new($file)>.
+
+ Properties file
+
+    It must follow the Config::YAML::Tiny syntax. Mine looks like
+
+        file_path: shortkeys_utf8.xml
+        file_encoding: UTF8
+        use_ctrl_v: 1
+        load_key: VK_HOME
+        quit_key: VK_F12
+        usleep_delay: 400_000
+        vkcode_map: 
+            t: VK_TAB
+            e: VK_RETURN
+            d: VK_DOWN
+            l: VK_LEFT
+            r: VK_RIGHT
+            x: VK_BACK
+            s: VK_SHIFT
+            c: VK_CONTROL
+            a: VK_MENU
+            w: VK_SPACE
+            h: VK_HOM
+
+    The key given in the load_key property is used to reload the
+    shorkeys.xml file (without exiting the script). The key given in the
+    quit_key property is used to terminate the script.
+
+ The xml file
+
+    It's name is given by the file_path property. It's xml syntax is:
+
+        <?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE shortkey SYSTEM "dtd/shk.dtd">
+        <shortkey>
+        <data k='t'>Recent advances in biochemical and molecular diagnostics for the rapid detection of antibiotic-resistant Enterobacteriaceae: a focus
+         </data>
+        <data k='j'>Expert Review of Molecular Diagnostics
+        </data>
+        ....
+    
+        </shortkey>
+
+    The values of the k attribute are a-z string composed of lower case
+    character(s) (a string can have two or more characters). I call those
+    strings shortkeys and when press on the keyboard after they < key with
+    the script running, the key pressed are replaced by the content of the
+    corresponding data element.
+
+    For example, with the cursor in an opened notepad file, hitting the two
+    keys <j when the script is running will replace this two characters
+    with the value of the corresponding <data> element: Expert Review of
+    Molecular Diagnostics.
+
+    The shortkeys.xml file should be utf-8 encoded, even if the encoding
+    can be defined in the properties.
+
+    With the key <, the script enter a "search mode" for a shortkey
+    sequence. This key is hard coded and can't be changed (unless you edit
+    the code).
+
+    The text from the shortkeys file is sent to the keyboard using the
+    send_input API function. With using the use.ctrl_v='1' attribute in a
+    data element, the text will be place in the clipboard and paste (with
+    sending the keys ctlr + v) at the cursor position.
+
+        <data k= 'a' use.ctrl_v= '1'>
+         This text will be copied and paste. 
+         And the new line will be preserved.
+        </data>
+
+    In the xml file, data elements can be combine using a dataref element.
+
+        <data k='qu'>10.1080/14737159.2017.1289087</data>
+        <data k= 'u'>
+            Published version; http://dx.doi.org/<dataref id= 'qu'></dataref>
+        </data>
+
+    When hitting <u, the text that will be subtitued will be Published
+    version; http://dx.doi.org/10.1080/14737159.2017.1289087
+
+ Commands syntax in shortkey.xml
+
+      * a command keystroke start with # (to diplay # as a character, it
+      has to be enter has ##), next you have to give
+
+      * the command itself, set by a character (only one character) listed
+      in the map defined with the property vkcode_map
+
+      * how much you want to repeat that command, on two position, with a
+      padding 0 if necessary (01)
+
+      * the next characters are treated as text (unless a new command
+      keystroke is defined with #)
+
+      * The shift, control and alt keys are released
+
+	* after a non-command key has been given. For example ctr+shift+a
+	(written as #c01#s01a) will send the following event: key press for
+	the keys control and shift, key press and released for the a key,
+	key release for shift and control
+
+	* at the end of a command keystroke, if the keys have not been
+	released. For example a sequence of shit+tab, shift+tab, shift+tab
+	(#s01#t01#t01#t01) will release the shift key at the end. On the
+	contrary #s01#t01#t01#t01abc will call three back tab and will
+	write Abc.
+
+AUTHOR
+
+    François Rappaz <rappazf@gmail.com>
+
+COPYRIGHT
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

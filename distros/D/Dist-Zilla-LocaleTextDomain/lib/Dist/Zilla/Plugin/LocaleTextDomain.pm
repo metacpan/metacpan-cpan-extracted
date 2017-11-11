@@ -4,10 +4,10 @@ package Dist::Zilla::Plugin::LocaleTextDomain;
 use strict;
 use warnings;
 use Moose;
-use Path::Class;
+use Path::Tiny;
 use IPC::Cmd qw(can_run);
 use IPC::Run3;
-use MooseX::Types::Path::Class;
+use MooseX::Types::Path::Tiny qw(Path);
 use Moose::Util::TypeConstraints;
 use Dist::Zilla::File::FromCode;
 use File::Path 2.07 qw(make_path remove_tree);
@@ -19,12 +19,24 @@ with 'Dist::Zilla::Role::FileFinderUser' => {
     default_finders  => [ ':InstallModules', ':ExecFiles' ],
 };
 
-our $VERSION = '0.90';
+our $VERSION = '0.91';
 
 use IPC::Cmd qw(can_run);
 BEGIN {
     subtype 'App', as 'Str', where { !!can_run $_ },  message {
         qq{Cannot find "$_": Are the GNU gettext utilities installed?};
+    };
+
+    subtype 'ShellWords', as 'ArrayRef[Str]';
+    coerce  'ShellWords', from 'Str', via {
+        require Text::ParseWords;
+        [Text::ParseWords::shellwords($_)];
+    };
+
+    subtype 'ArrayRefOfShellWords', as 'ArrayRef[ShellWords]';
+    coerce  'ArrayRefOfShellWords', from 'ArrayRef[Str]', via {
+        require Text::ParseWords;
+        [map { [Text::ParseWords::shellwords($_)] } @$_];
     };
 }
 
@@ -37,25 +49,22 @@ has textdomain => (
 
 has lang_dir => (
     is      => 'ro',
-    isa     => 'Path::Class::Dir',
+    isa     => Path,
     coerce  => 1,
-    default => sub { dir 'po' },
+    default => sub { path 'po' },
 );
 
 has share_dir => (
     is      => 'ro',
-    isa     => 'Path::Class::Dir',
+    isa     => Path,
     coerce  => 1,
-    default => sub { dir 'share' },
+    default => sub { path 'share' },
 );
 
 has _tmp_dir => (
     is      => 'ro',
-    isa     => 'Path::Class::Dir',
-    default => sub {
-        require File::Temp;
-        dir File::Temp::tempdir(CLEANUP => 1);
-    },
+    isa     => Path,
+    default => sub { Path::Tiny->tempdir },
 );
 
 has msgfmt => (
@@ -76,6 +85,26 @@ has bin_file_suffix => (
     default => 'mo',
 );
 
+has xgettext_args => (
+    is      => 'ro',
+    isa     => 'ShellWords',
+    coerce  => 1,
+    default => sub { [] },
+);
+
+has override_args => (
+    is      => 'ro',
+    isa     => 'Bool',
+    default => 0,
+);
+
+has join_existing => (
+    is      => 'ro',
+    isa     => 'ArrayRefOfShellWords',
+    coerce  => 1,
+    default => sub { [] },
+);
+
 has language => (
     is      => 'ro',
     isa     => 'ArrayRef[Str]',
@@ -94,7 +123,7 @@ has language => (
     },
 );
 
-sub mvp_multivalue_args { return qw(language) }
+sub mvp_multivalue_args { return qw(join_existing language) }
 
 sub gather_files {
     my ($self, $arg) = @_;
@@ -123,17 +152,17 @@ sub gather_files {
     }
 
     $self->log("Compiling language files in $lang_dir");
-    make_path $tmp_dir->stringify;
+    $tmp_dir->mkpath;
     my @encoding_params = Dist::Zilla::File::FromCode->VERSION >= 5.0 ? (
         encoding         => 'bytes',
         code_return_type => 'bytes',
     ) : ();
 
     for my $lang (@{ $self->language }) {
-        my $file = $lang_dir->file("$lang.$lang_ext");
-        my $dest = file $shr_dir, 'LocaleData', $lang, 'LC_MESSAGES',
-            "$txt_dom.$bin_ext";
-        my $temp = $tmp_dir->file("$lang.$bin_ext");
+        my $file = $lang_dir->child("$lang.$lang_ext");
+        my $dest = $shr_dir->child('LocaleData', $lang, 'LC_MESSAGES',
+            "$txt_dom.$bin_ext");
+        my $temp = $tmp_dir->child("$lang.$bin_ext");
         my $log = sub { $self->log(@_) };
         $self->add_file(
             Dist::Zilla::File::FromCode->new({
@@ -142,7 +171,7 @@ sub gather_files {
                 code => sub {
                     run3 [@cmd, $temp, $file], undef, $log, $log;
                     $dzil->log_fatal("Cannot compile $file") if $?;
-                    scalar $temp->slurp(iomode => '<:raw');
+                    scalar $temp->slurp_raw;
                 },
             })
         );
@@ -288,13 +317,60 @@ L<C<FileFinder>|Dist::Zilla::Role::FileFinder> plugin. For example:
 This configuration will extract strings from files that match C<*.pl> and all
 files in a share directory.
 
+=head3 C<xgettext_args>
+
+Extra arguments to be passed to the extractor program. This is an advanced
+feature that exists for cases where special customization is needed, such as
+when different keywords are used to mark strings.
+
+=head3 C<override_args>
+
+By default, arguments are passed to the extractor that set the language to
+"perl" as well as set keywords that tell L<xgettext> how strings are marked
+(which includes the keywords specified by L<Locale::TextDomain>). If for some
+reason you don't want that (presumably because you're going to use the
+C<xgettext_args> attribute to configure your own language and keywords), then
+you can set this attribute to true.
+
+=head3 C<join_existing>
+
+If you have strings in files other than Perl files, you can cause the
+extractor to be invoked multiple times against different sets of files with
+different arguments. The strings from all of these other file sets will be
+joined into your C<po> files.
+
+For example, imagine you have a GTK+ app. You have strings in your Perl
+modules, as usual, but perhaps you also have strings in your Glade files that
+you want to be translatable. You could write something like this into your
+F<dist.ini>:
+
+  [FileFinder::ByName / GladeFiles]
+  file = *.ui
+
+  [LocaleTextDomain]
+  join_existing = --language=glade %{GladeFiles}f
+
+The value of the C<join_existing> attribute is the argument list that will be
+passed to an additional invocation of L<xgettext>. The C<%{GladeFiles}f>
+syntax allows you to use a finder to search for files to be passed to the
+extractor, but you could also "hard code" one or more files as well.
+
+This attribute is repeatable. If your project also had a JavaScript file with
+strings, you could just add another line to your C<LocaleTextDomain> section:
+
+  join_existing = -L javascript share/media/app.js
+
 =head1 Author
 
 David E. Wheeler <david@justatheory.com>
 
+=head1 Contributor
+
+Charles McGarvey <ccm@cpan.org>
+
 =head1 Copyright and License
 
-This software is copyright (c) 2012-2013 by David E. Wheeler.
+This software is copyright (c) 2012-2017 by David E. Wheeler.
 
 This is free software; you can redistribute it and/or modify it under the same
 terms as the Perl 5 programming language system itself.

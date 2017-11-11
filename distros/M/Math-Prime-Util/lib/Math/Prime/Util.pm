@@ -5,7 +5,7 @@ use Carp qw/croak confess carp/;
 
 BEGIN {
   $Math::Prime::Util::AUTHORITY = 'cpan:DANAJ';
-  $Math::Prime::Util::VERSION = '0.68';
+  $Math::Prime::Util::VERSION = '0.69';
 }
 
 # parent is cleaner, and in the Perl 5.10.1 / 5.12.0 core, but not earlier.
@@ -28,7 +28,7 @@ our @EXPORT_OK =
       is_aks_prime is_bpsw_prime is_ramanujan_prime is_mersenne_prime
       is_power is_prime_power is_pillai is_semiprime is_square is_polygonal
       is_square_free is_primitive_root is_carmichael is_quasi_carmichael
-      is_fundamental
+      is_fundamental is_totient
       sqrtint rootint logint
       miller_rabin_random
       lucas_sequence lucasu lucasv
@@ -964,7 +964,7 @@ Math::Prime::Util - Utilities related to prime numbers, including fast sieves an
 
 =head1 VERSION
 
-Version 0.68
+Version 0.69
 
 
 =head1 SYNOPSIS
@@ -1168,7 +1168,7 @@ If you are using bigints, here are some performance suggestions:
 =item *
 
 Install L<Math::Prime::Util::GMP>, as that will vastly increase the speed
-of many of the functions.  This does require the L<GMP|gttp://gmplib.org>
+of many of the functions.  This does require the L<GMP|http://gmplib.org>
 library be installed on your system, but this increasingly comes
 pre-installed or easily available using the OS vendor package installation tool.
 
@@ -2923,6 +2923,16 @@ L<OEIS series A003657|http://oeis.org/A003657> (negative).
 
 This corresponds to Pari's C<isfundamental> function.
 
+=head2 is_totient
+
+Given an integer C<n>, returns 1 if there exists an integer C<x> where
+C<euler_phi(x) == n>.
+
+This corresponds to Pari's C<istotient> function, though without the
+optional second argument to return an C<x>.  L<Math::NumSeq::Totient>
+also has a similar function.
+
+
 =head2 is_pillai
 
 Given a positive integer C<n>, if there exists a C<v> where C<v! % n == n-1>
@@ -3006,10 +3016,12 @@ theoretically used to create a faster solution.
 Returns φ(n), the Euler totient function (also called Euler's phi or phi
 function) for an integer value.  This is an arithmetic function which counts
 the number of positive integers less than or equal to C<n> that are relatively
-prime to C<n>.  Given the definition used, C<euler_phi> will return 0 for all
+prime to C<n>.
+
+Given the definition used, C<euler_phi> will return 0 for all
 C<n E<lt> 1>.  This follows the logic used by SAGE.  Mathematica and Pari
 return C<euler_phi(-n)> for C<n E<lt> 0>.  Mathematica returns 0 for C<n = 0>,
-Pari pre-2.6.2 raises and exception, and Pari 2.6.2 and newer returns 2.
+Pari pre-2.6.2 raises an exception, and Pari 2.6.2 and newer returns 2.
 
 If called with two arguments, they define a range C<low> to C<high>, and the
 function returns a list with the totient of every n from low to high
@@ -3406,11 +3418,11 @@ is a good simple approximation to the nth prime.
 
   @p = numtoperm(10,654321);  # @p=(1,8,2,7,6,5,3,4,9,0)
 
-Given two non-negative integers C<n> and C<k>, return the
+Given a non-negative integer C<n> and integer C<k>, return the
 rank C<k> lexicographic permutation of C<n> elements.
+C<k> will be interpreted as mod C<n!>.
 
 This will match iteration number C<k> (zero based) of L</forperm>.
-C<k> can be assumed to be mod C<n!>.
 
 This corresponds to Pari's C<numtoperm(n,k)> function, though Pari
 uses an implementation specific ordering rather than lexicographic.

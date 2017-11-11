@@ -10,7 +10,9 @@ use Test::More tests => TESTS;
 ###############################################################################
 
 SKIP: {
-  do "t/TestBoilerplate";
+  do "./t/TestBoilerplate";
+  die $@ if $@;
+  die $! if $!;
 
   skip("GnomePasswordDialog and GnomeAuthenticationManager didn't appear until 2.4.0", TESTS)
     unless (Gnome2 -> CHECK_VERSION(2, 4, 0));

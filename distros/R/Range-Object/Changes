@@ -1,5 +1,9 @@
 Revision history for Perl module Range::Object.
 
+0.94  Tue Nov  7 17:37:28 2017
+
+    Fixed broken links in main pod, thanks to ABRAXXA for spotting.
+
 0.93  Mon Nov 21 18:47:03 2011
 
     Moved all Range::Object-descended packages to Range::Object::*

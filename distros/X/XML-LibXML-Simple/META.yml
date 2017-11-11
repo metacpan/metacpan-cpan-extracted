@@ -18,8 +18,7 @@ no_index:
     - t
     - inc
 requires:
-  File::Slurp::Tiny: 0
   Scalar::Util: 0
   Test::More: 0.54
   XML::LibXML: 1.64
-version: 0.97
+version: 0.98

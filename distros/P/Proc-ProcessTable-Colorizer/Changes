@@ -1,5 +1,9 @@
 Revision history for Proc-ProcessTable-Colorizer
 
+0.2.0	 2017-11-08/02:00
+		 -Fix numeric search string checking involving numbers with decimal points.
+		 -Move self ignore check to the end so it works properly.
+
 0.1.0	 2017-11-07/01:00
 		 -Only initilize BSD::Process once per process.
 		 -Use require for BSD::Process instead of use. #123531/SREZIC

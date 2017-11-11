@@ -237,6 +237,32 @@ OTHER MODULES
     catching. If the language is to provide such a facility, it should be
     more universally applicable as a stand-alone independent ability.
 
+KNOWN BUGS
+
+ Thread-safety at load time cannot be assured before perl 5.16
+
+    On perl versions 5.16 and above this module is thread-safe.
+
+    On perl version 5.14 this module is thread-safe provided that it is
+    used before any additional threads are created.
+
+    However, when using 5.14 there is a race condition if this module is
+    loaded late in the program startup, after additional threads have been
+    created. This leads to the potential for it to be started up multiple
+    times concurrently, which creates data races when modifying internal
+    structures and likely leads to a segmentation fault, either during load
+    or soon after when more code is compiled.
+
+    As a workaround, for any such program that creates multiple threads,
+    loads additional code (such as dynamically-discovered plugins), and has
+    to run on 5.14, it should make sure to
+
+       use Syntax::Keyword::Try;
+
+    early on in startup, before it spins out any additional threads.
+
+    (See also https://rt.cpan.org/Public/Bug/Display.html?id=123547)
+
 ACKNOWLEDGEMENTS
 
     With thanks to Zefram, ilmari and others from irc.perl.org/#p5p for

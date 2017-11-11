@@ -44,7 +44,7 @@ query_string_authentication_host_replace - протокол-хост на кот
 
 package WebService::CEPH;
 
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 use strict;
 use warnings;
@@ -428,7 +428,7 @@ sub query_string_authentication_uri {
     $uri;
 }
 
-=head2 get_buckets_ist
+=head2 get_buckets_list
 
 Returns buckets list
 

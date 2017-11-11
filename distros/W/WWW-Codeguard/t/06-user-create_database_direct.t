@@ -3,6 +3,7 @@ use Test::More;
 use FindBin;
 use lib "$FindBin::Bin/lib";
 use CommonSubs;
+use Test::MockModule;
 
 my $config = CommonSubs::read_config();
 if (not $config) {
@@ -126,6 +127,77 @@ subtest 'Show created database' => sub {
 	}
 };
 
+subtest 'Exercise database backup endpoints' => sub {
+    # We aren't able to do a full test of the endpoints with these due to the
+    # database resource not being 'activated' quickly enough (see the 'activated' field returned as part of `list_databases`).
+    # So instead, we're only testing our own code out to the point of making the call to codeguard.
+
+    my $num_subtests = 4;
+    plan => $num_subtests;
+    SKIP: {
+        skip 'Requires database_id', $num_subtests
+            if ! $created_database_id;
+
+        my $mock = Test::MockModule->new('LWP::UserAgent');
+        $mock->mock(request =>
+            sub {
+                use HTTP::Response;
+                return HTTP::Response->new(200, 'OK', undef, '{"message":"200"}');
+            }
+        );
+
+        note "create_database_backup";
+        my $resp = $user_api->create_database_backup({
+            website_id  => $created_database_website_id,
+            database_id => $created_database_id,
+        });
+        is ( $resp->{'message'}, 200, 'create_database_backup call is fully functional' );
+
+        note "restore_database_backup";
+        my $fake_commit_id = '2f902b20d0593051d16acd7b29b5fae28c75fa7d';
+        $resp = $user_api->restore_database_backup({
+            website_id  => $created_database_website_id,
+            database_id => $created_database_id,
+            commit_id   => $fake_commit_id,
+        });
+        is ( $resp->{'message'}, 200, 'restore_database_backup  call is fully functional' );
+
+        $mock->mock(request =>
+            sub {
+                use HTTP::Response;
+                return HTTP::Response->new(200, 'OK', undef, '
+                    [
+                        {
+                            "commit_id" : "87f3b9f036c71aebc49abff30f415e763dead8c2",
+                            "additions" : 0,
+                            "modifications" : 2,
+                            "deletions" : 0,
+                            "new_content" : true,
+                            "event_time" : "2014-02-27T12:06:09-05:00"
+                        },
+                        {
+                            "commit_id" : null,
+                            "additions" : 0,
+                            "modifications" : 0,
+                            "deletions" : 0,
+                            "new_content" : false,
+                            "event_time" : "2014-02-24T12:56:00-05:00"
+                        }
+                    ]
+                ');
+            }
+        );
+
+        note "list_database_backups";
+        $resp = $user_api->list_database_backups({
+            website_id  => $created_database_website_id,
+            database_id => $created_database_id,
+        });
+        is ( ref($resp), 'ARRAY', 'list_database_backups returned an ARRAY' );
+        is ( scalar(@$resp), 2, 'list_database_backups returned ARRAY contains two backups' );
+    }
+};
+
 subtest 'Disable created database resource' => sub {
 	if (not $created_database_id) {
 		pass 'Disable created database resource skipped';
@@ -199,4 +271,4 @@ subtest 'Delete created database resource' => sub {
 	ok ( $resp->{message} eq '200', 'delete_website call was successful' );
 };
 
-done_testing;
+done_testing();

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 use File::Slurp qw( read_file );
 
@@ -12,7 +12,7 @@ use File::Slurp qw( read_file );
 use Getopt::Long::Descriptive;
 use Markdent::Simple::Document;
 use Markdent::Simple::Fragment;
-use Markdent::Types qw( ArrayRef Bool ExistingFile Str );
+use Markdent::Types;
 use MooseX::Getopt::OptionTypeMap;
 
 use Moose;
@@ -20,12 +20,12 @@ use Moose;
 with 'MooseX::Getopt::Dashes';
 
 MooseX::Getopt::OptionTypeMap->add_option_type_to_map(
-    ExistingFile() => '=s',
+    t('ExistingFile') => '=s',
 );
 
 has file => (
     is        => 'ro',
-    isa       => ExistingFile,
+    isa       => => t('ExistingFile'),
     predicate => 'has_file',
     documentation =>
         'A Markdown file to parse and turn into HTML. Conflicts with --text.',
@@ -33,7 +33,7 @@ has file => (
 
 has text => (
     is        => 'ro',
-    isa       => Str,
+    isa       => => t('Str'),
     predicate => 'has_text',
     documentation =>
         'Markdown text to parse and turn into HTML. Conflicts with --file.',
@@ -41,28 +41,28 @@ has text => (
 
 has title => (
     is            => 'ro',
-    isa           => Str,
+    isa           => => t('Str'),
     predicate     => '_has_title',
     documentation => 'The title for the created document. Optional.',
 );
 
 has charset => (
     is            => 'ro',
-    isa           => Str,
+    isa           => => t('Str'),
     predicate     => '_has_charset',
     documentation => 'The charset for the created document. Optional.',
 );
 
 has language => (
     is            => 'ro',
-    isa           => Str,
+    isa           => => t('Str'),
     predicate     => '_has_language',
     documentation => 'The language for the created document. Optional.',
 );
 
 has dialects => (
-    is            => 'ro',
-    isa           => ArrayRef [Str],
+    is  => 'ro',
+    isa => => t( 'ArrayRef', of => t('Str') ),
     default       => sub { [] },
     documentation => 'One oe more dialects to use when parsing.',
 );
@@ -87,8 +87,7 @@ sub run {
         ? read_file( $self->file() )
         : $self->text();
 
-    my ( $class, %p )
-        = $self->_has_title()
+    my ( $class, %p ) = $self->_has_title()
         ? (
         'Markdent::Simple::Document',
         title => $self->title(),

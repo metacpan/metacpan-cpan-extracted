@@ -5,7 +5,7 @@ use warnings;
 use Test::More 0.90;
 use Test::DZil;
 use IPC::Cmd 'can_run';
-use Path::Class;
+use Path::Tiny;
 use Test::File;
 use Test::File::Contents;
 use Dist::Zilla::App::Tester;
@@ -52,10 +52,10 @@ ok got_msg(qr/extracting gettext strings/),
     'Should have logged the POT file creation';
 
 for my $lang (qw(de fr)) {
-    my $po = file 'po', "$lang.po";
+    my $po = path 'po', "$lang.po";
     ok got_msg(qr/Merging gettext strings into $po/),
         "Should have message for merging $lang.po";
-    my $path = file $result->tempdir, qw(source po), "$lang.po";
+    my $path = path $result->tempdir, qw(source po), "$lang.po";
     file_exists_ok $path, "$po should exist";
     file_not_exists_ok "$path~", "$po~ should not exist";
     file_contents_like $path,
@@ -65,8 +65,8 @@ for my $lang (qw(de fr)) {
 }
 
 # Try specifying a file.
-my $de = file qw(po de.po);
-my $fr = file qw(po fr.po);
+my $de = path qw(po de.po);
+my $fr = path qw(po fr.po);
 ok $result = test_dzil('t/dist', [qw(msg-merge), $de, '--backup']),
     'Call msg-merge with de.po arg';
 is $result->exit_code, 0, 'Should have exited 0' or diag @{ $result->log_messages };
@@ -74,7 +74,7 @@ ok got_msg(qr/extracting gettext strings/),
     'Should have logged the POT file creation';
 
 # Make sure the German was merged.
-my $path = file $result->tempdir, 'source', $de;
+my $path = path $result->tempdir, 'source', $de;
 ok got_msg(qr/Merging gettext strings into $de/),
     "Should have message for merging $de";
 file_exists_ok $path, "$de should exist";
@@ -85,7 +85,7 @@ file_contents_like $path,
     qr/^\Q#~ msgid "May"\E$/m, qq{$de should have "May" msgid commented out};
 
 # The French should not have been merged.
-$path = file $result->tempdir, 'source', $fr;
+$path = path $result->tempdir, 'source', $fr;
 ok !got_msg(qr/Merging gettext strings into $fr/),
     "Should not have message for merging $fr";
 file_exists_ok $path, "$fr should exist";
@@ -96,11 +96,11 @@ file_contents_like $path,
     qr/^\Qmsgid "May"\E$/m, qq{$fr should have uncommented "May" msgid};
 
 # Now specify a bunch of options.
-my $pot = file qw(po org.imperia.simplecal.pot);
+my $pot = path qw(po org.imperia.simplecal.pot);
 ok $result = test_dzil('t/dist', [
     'msg-merge',
     '--encoding'         => 'Latin-1',
-    '--pot-file'         => file(qw(po org.imperia.simplecal.pot)),
+    '--pot-file'         => path(qw(po org.imperia.simplecal.pot)),
     '--copyright-holder' => 'Homer Simpson',
     '--bugs-email'       => 'foo@bar.com',
     '--backup',
@@ -111,10 +111,10 @@ ok !got_msg(qr/extracting gettext strings/),
     'Should not have logged the POT file creation';
 
 for my $lang (qw(de fr)) {
-    my $po = file 'po', "$lang.po";
+    my $po = path 'po', "$lang.po";
     ok got_msg(qr/Merging gettext strings into $po/),
         "Should have message for merging $lang.po";
-    my $path = file $result->tempdir, qw(source po), "$lang.po";
+    my $path = path $result->tempdir, qw(source po), "$lang.po";
     file_exists_ok $path, "$po should exist";
     file_not_exists_ok "$path~", "$po~ should not exist (no changes)";
     file_contents_unlike $path,
@@ -123,7 +123,7 @@ for my $lang (qw(de fr)) {
         qr/^\Qmsgid "May"\E$/m, qq{$po should have "May" msgid};
 }
 
-my $nonpot = file(qw(po nonexistent.top));
+my $nonpot = path(qw(po nonexistent.top));
 # Now try a non-existent POT file.
 ok $result = test_dzil('t/dist', [
     'msg-merge',

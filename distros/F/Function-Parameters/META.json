@@ -35,6 +35,8 @@
       },
       "develop" : {
          "requires" : {
+            "Pod::Markdown" : "3.005",
+            "Pod::Text" : "4.09",
             "Test::Pod" : "1.22"
          }
       },
@@ -67,6 +69,6 @@
          "web" : "https://github.com/mauke/Function-Parameters"
       }
    },
-   "version" : "2.001001",
+   "version" : "2.001002",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

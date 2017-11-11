@@ -14,11 +14,11 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 c98540e3e125396a2df7de7e783df8d773ce8baa ChangeLog
+SHA1 0620aca766479d5b076c2029bf7f8810de6e7cfe ChangeLog
 SHA1 62647027745e394450492878f8d8730548d83fa2 LICENSE
 SHA1 eabdadc5b565952e6168f5a650fb32bc25e0c716 MANIFEST
-SHA1 71c49eaaf1b5e00f14665f170c3290db6cce3b5b META.yml
-SHA1 2bc9fc79c5ca6f3e8cb7c97d36460c43631640cc Makefile.PL
+SHA1 448bc279b553cff9b25c2fee0dd9044a48e65193 META.yml
+SHA1 1e4711d8fb83e8d2100c88feb242a7ec896ba4ef Makefile.PL
 SHA1 d78ed6f21f203e2054419369d111efa325a97d1b README
 SHA1 ecb089134bba590f02aa974be5a6e86d72cdb0dc UNINSTALL_CYGWIN
 SHA1 0da04817f80ed6c542780dffe674926c1bf7b3de api/Docker_is.py
@@ -111,7 +111,7 @@ SHA1 acb1a0daeae8b6c0cfd3ce4ee899204052d40855 installer/runputty.ahk
 SHA1 2887d192d7c656080bab522cf64354975b77a915 installer/runputty.exe
 SHA1 784955e0e44b132341668db4efa407569dd71189 installer/standup.gif
 SHA1 6c3adc63eb0e790491af15178fabb88f9508bf50 lbbroker_zmqv4.pl
-SHA1 3e1db3d535b265d53d2f84bc2d6c684ce9cca034 lib/Net/FullAuto.pm
+SHA1 04ade136d79a8a8701b1283525e992d1eaf18a26 lib/Net/FullAuto.pm
 SHA1 a73fa03896208dc550b292954f51722d7b139c24 lib/Net/FullAuto/Cloud/fa_amazon.pm
 SHA1 71928e8ed46e6c63d2effda32c2ceba413ab3976 lib/Net/FullAuto/Cloud/fa_azure.pm
 SHA1 2d1d4af82b485a801bd146f5c079418f4bd56dd2 lib/Net/FullAuto/Cloud/fa_google.pm
@@ -137,16 +137,16 @@ SHA1 a4d5e6f009042ecde8701230f3b31d1a66236279 lib/Net/FullAuto/ISets/Amazon/Kali
 SHA1 ddb48cea930f376830b4b3c5a80f29826e231bad lib/Net/FullAuto/ISets/Amazon/Liferay_is.pm
 SHA1 4708044b661f8aa812d1d9dc2d61496509ba72d8 lib/Net/FullAuto/ISets/Amazon/OpenLDAP_is.pm
 SHA1 9e2dd950d026a00e5242695306b7a82ed6fb7f9e lib/Net/FullAuto/ISets/Local/FullAutoAPI_is.pm
-SHA1 7d657298539f7ea73e1583b5169ed498d2d8c744 lib/Net/FullAuto/ISets/Local/WordPress_is.pm
+SHA1 14fb99da320c30521013284f78c7abceda44d9c1 lib/Net/FullAuto/ISets/Local/WordPress_is.pm
 SHA1 7f2e13f5f6a798d52ea897d24d07b49af4039341 t/0-signature.t
 SHA1 6fac6b17647d05b71441ac3783ceec38b9b71fa6 t/test.t
 -----BEGIN PGP SIGNATURE-----
 
-iQEcBAEBAgAGBQJaAPWfAAoJEBa/9Pad787EXFEH/RGBGwxfIFDxrgc3af2+GHbi
-bKM6XaEyYFqu0HFDufDpu0CWG9CO9QQtpPwnzBZSgnCMOh0gT0oORp+GJeN7byXg
-NbovFfKUBZ6G4rfmc3gafuHAtP6DMEZdEPDfxCRjPqWK5bXWkAkTeEcism5iOL9h
-c/eyuU65ApecQNYt5WPhZs2Wy/Hv79v6ocTH7klG3M8URiubhPGTqxmcQJhdnBzc
-oXcOvg8YjxC/ER1TWngLR0Qs0DGC/dVdrcAjoBXsBdoIQs/sMQbuUjNWfn70MX3R
-bDSPGNPS0KKWrJUUJH5Mk+PgV4dg5dxl1d7z1PXNvRQGuKFLVUfJW/ZF39rYrmY=
-=6Unr
+iQEcBAEBAgAGBQJaBO+4AAoJEBa/9Pad787ETpMH/1jK9zt9j7q+RlGPpdxcvKCI
+LRXKg22pZafZ7LfyQlo1YX/NFrhH0hv1sbRlwpoZTLM3dfLBpxfuxCc/LUtn5Xp/
+n0KWghBA4VHtBidawVKeJcbL6BjlixGCNivufoG5XorkxumHQ4SsNwdSkM3b2Vzt
+Ur0DHz3MFECXCD++IB1VgBmX0Fcq7QGh7PGVOWoeGmUC1wklwYPjdtYPpwviHChl
+vhaXXCnxlGClgpZP3jxDcHHkMGaltpzu7bHe21riDkxZTTelUlLAp+9WtY5B4Vpl
+K0EuukL+uSbMg4sPIpJu4NSlcoDCz6hy7JysU7zIxn13p3fRPzvbKWJsOzYSLhI=
+=PEsB
 -----END PGP SIGNATURE-----

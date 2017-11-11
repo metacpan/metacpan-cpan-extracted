@@ -1,7 +1,7 @@
 package Business::Tax::ID::PPH21;
 
-our $DATE = '2017-05-24'; # DATE
-our $VERSION = '0.04'; # VERSION
+our $DATE = '2017-11-09'; # DATE
+our $VERSION = '0.05'; # VERSION
 
 use 5.010001;
 use strict;
@@ -51,6 +51,7 @@ our %arg_pph21_op = (
         summary => 'Amount of PPh 21 op paid',
         schema => ['float*', min=>0],
         req => 1,
+        pos => 1,
     },
 );
 
@@ -359,7 +360,7 @@ Business::Tax::ID::PPH21 - Routines to help calculate Indonesian income tax arti
 
 =head1 VERSION
 
-This document describes version 0.04 of Business::Tax::ID::PPH21 (from Perl distribution Business-Tax-ID-PPH21), released on 2017-05-24.
+This document describes version 0.05 of Business::Tax::ID::PPH21 (from Perl distribution Business-Tax-ID-PPH21), released on 2017-11-09.
 
 =head1 SYNOPSIS
 

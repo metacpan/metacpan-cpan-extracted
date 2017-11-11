@@ -999,16 +999,16 @@ int is_semiprime(UV n) {
       return !!is_prob_prime(n/p);
   }
   /* 9.8% of random inputs left */
-  if (is_prob_prime(n)) return 0;
+  if (is_def_prime(n)) return 0;
   if (p > n3) return 1;
   /* 4-8% of random inputs left */
   /* n is a composite and larger than p^3 */
-  if (   pbrent_factor(n, factors, 70000, 1) == 2
+  if (   pbrent_factor(n, factors, 90000, 1) == 2
          /* The only things we normally see by now are 16+ digit semiprimes */
       || pminus1_factor(n, factors, 4000, 4000) == 2
          /* 0.09% of random 64-bit inputs left */
       || pbrent_factor(n, factors, 180000, 7) == 2 )
-    return (is_prob_prime(factors[0]) && is_prob_prime(factors[1]));
+    return (is_def_prime(factors[0]) && is_def_prime(factors[1]));
   /* 0.002% of random 64-bit inputs left */
   {
     UV facs[MPU_MAX_FACTORS+1];
@@ -1034,6 +1034,34 @@ int is_fundamental(UV n, int neg) {
     }
   }
   return 0;
+}
+
+static int _totpred(UV n, UV maxd) {
+  UV i, ndivisors, *divs;
+  int res;
+
+  if (n & 1) return 0;
+  n >>= 1;
+  if (n == 1) return 1;
+  if (n < maxd && is_prime(2*n+1)) return 1;
+
+  divs = _divisor_list(n, &ndivisors);
+  for (i = 0, res = 0; i < ndivisors && divs[i] < maxd && res == 0; i++) {
+    UV r, d = divs[i], p = 2*d+1;
+    if (!is_prime(p)) continue;
+    r = n/d;
+    while (1) {
+      if (r == p || _totpred(r, d)) { res = 1; break; }
+      if (r % p) break;
+      r /= p;
+    }
+  }
+  Safefree(divs);
+  return res;
+}
+
+int is_totient(UV n) {
+  return (n == 0 || (n & 1))  ?  (n==1)  :  _totpred(n,n);
 }
 
 UV pillai_v(UV n) {
@@ -1146,16 +1174,8 @@ int is_primitive_root(UV a, UV n, int nprime) {
   /* Quick check for small factors before full factor */
   if ((s % 2) == 0 && powmod(a, s/2, n) == 1) return 0;
 
-#if !USE_MONTMATH
-  if ((s % 3) == 0 && powmod(a, s/3, n) == 1) return 0;
-  if ((s % 5) == 0 && powmod(a, s/5, n) == 1) return 0;
-  /* Complete factor and check each one not found above. */
-  nfacs = factor_exp(s, fac, 0);
-  for (i = 0; i < nfacs; i++) {
-    if (fac[i] > 5 && powmod(a, s/fac[i], n) == 1) return 0;
-  }
-#else
-  {
+#if USE_MONTMATH
+  if (n & 1) {
     const uint64_t npi = mont_inverse(n),  mont1 = mont_get1(n);
     a = mont_geta(a, n);
     if ((s % 3) == 0 && mont_powmod(a, s/3, n) == mont1) return 0;
@@ -1164,8 +1184,17 @@ int is_primitive_root(UV a, UV n, int nprime) {
     for (i = 0; i < nfacs; i++) {
       if (fac[i] > 5 && mont_powmod(a, s/fac[i], n) == mont1) return 0;
     }
-  }
+  } else
 #endif
+  {
+    if ((s % 3) == 0 && powmod(a, s/3, n) == 1) return 0;
+    if ((s % 5) == 0 && powmod(a, s/5, n) == 1) return 0;
+    /* Complete factor and check each one not found above. */
+    nfacs = factor_exp(s, fac, 0);
+    for (i = 0; i < nfacs; i++) {
+      if (fac[i] > 5 && powmod(a, s/fac[i], n) == 1) return 0;
+    }
+  }
   return 1;
 }
 
@@ -1232,9 +1261,14 @@ UV factorialmod(UV n, UV m) {  /*  n! mod m */
     return (d == 0) ? m-1 : 1;   /* Wilson's Theorem: n = m-1 and n = m-2 */
 
   if (d == n && d > 5000000) {   /* Check for composite m that leads to 0 */
-    UV facs[MPU_MAX_FACTORS];
-    int nfacs = factor(m, facs);
-    if (n >= facs[nfacs-1]) return 0;
+    UV fac[MPU_MAX_FACTORS+1], exp[MPU_MAX_FACTORS+1];
+    int j, k, nfacs = factor_exp(m, fac, exp);
+    for (j = 0; j < nfacs; j++) {
+      UV t = fac[j];
+      for (k = 1; (UV)k < exp[j]; k++)
+        t *= fac[j];
+      if (n >= t) return 0;
+    }
   }
 
 #if USE_MONTMATH
@@ -2158,10 +2192,21 @@ long double lambertw(long double x) {
   return w;
 }
 
+#if HAVE_STD_U64
+  #define U64T uint64_t
+#else
+  #define U64T UV
+#endif
+
+/* Spigot from Arndt, Haenel, Winter, and Flammenkamp. */
+/* Modified for larger digits and rounding by Dana Jacobsen */
 char* pidigits(int digits)
 {
   char* out;
-  IV *a, b, c, d, e, f, g, i,  d4, d3, d2, d1;
+  uint32_t *a, b, c, d, e, g, i, d4, d3, d2, d1;
+  uint32_t const f = 10000;
+  U64T d64;  /* 64-bit intermediate for 2*2*10000*b > 2^32 (~30k digits) */
+
   if (digits <= 0) return 0;
   if (digits <= DBL_DIG && digits <= 18) {
     Newz(0, out, 19, char);
@@ -2169,23 +2214,33 @@ char* pidigits(int digits)
     return out;
   }
   digits++;   /* For rounding */
-  b = d = e = g = i = 0;  f = 10000;
   c = 14*(digits/4 + 2);
-  New(0, a, c, IV);
   New(0, out, digits+5+1, char);
   *out++ = '3';  /* We'll turn "31415..." into "3.1415..." */
-  for (b = 0; b < c; b++)  a[b] = 20000000;
+  New(0, a, c, uint32_t);
+  for (b = 0; b < c; b++)  a[b] = 2000;
 
-  while ((b = c -= 14) > 0 && i < digits) {
+  d = i = 0;
+  while ((b = c -= 14) > 0 && i < (uint32_t)digits) {
     d = e = d % f;
+    if (b > 107000) {  /* Use 64-bit intermediate while necessary. */
+      for (d64 = d; --b > 107000; ) {
+        g = (b << 1) - 1;
+        d64 = d64 * b  +  f * (U64T)a[b];
+        a[b] = d64 % g;
+        d64 /= g;
+      }
+      d = d64;
+      b++;
+    }
     while (--b > 0) {
-      d = d * b + a[b];
       g = (b << 1) - 1;
-      a[b] = (d % g) * f;
+      d = d * b  +  f * a[b];
+      a[b] = d % g;
       d /= g;
     }
     /* sprintf(out+i, "%04d", e+d/f);   i += 4; */
-    d4 = e+d/f;
+    d4 = e + d/f;
     if (d4 > 9999) {
       d4 -= 10000;
       out[i-1]++;

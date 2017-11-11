@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 use Digest::SHA1 qw( sha1_hex );
 use Encode qw( encode );
@@ -27,7 +27,7 @@ use Markdent::Event::HTMLBlock;
 use Markdent::Event::HTMLCommentBlock;
 use Markdent::Event::Preformatted;
 use Markdent::Regexes qw( :block $HTMLComment );
-use Markdent::Types qw( Str Int Bool ArrayRef HashRef );
+use Markdent::Types;
 
 use Moose;
 use MooseX::SemiAffordanceAccessor;
@@ -36,9 +36,9 @@ use MooseX::StrictConstructor;
 with 'Markdent::Role::BlockParser';
 
 has __html_blocks => (
-    traits   => ['Hash'],
-    is       => 'ro',
-    isa      => HashRef [Str],
+    traits => ['Hash'],
+    is     => 'ro',
+    isa    => t( 'HashRef', of => t('Str') ),
     default  => sub { {} },
     init_arg => undef,
     handles  => {
@@ -50,7 +50,7 @@ has __html_blocks => (
 has _list_level => (
     traits   => ['Counter'],
     is       => 'rw',
-    isa      => Int,
+    isa      => t('Int'),
     default  => 0,
     init_arg => undef,
     handles  => {
@@ -62,7 +62,7 @@ has _list_level => (
 has _list_item_is_paragraph => (
     traits   => ['Bool'],
     is       => 'ro',
-    isa      => Bool,
+    isa      => t('Bool'),
     default  => 0,
     init_arg => undef,
     handles  => {
@@ -801,13 +801,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Markdent::Parser::BlockParser - Block parser for standard Markdown
 
 =head1 VERSION
 
-version 0.26
+version 0.27
 
 =head1 DESCRIPTION
 
@@ -837,15 +839,26 @@ L<Markdent::Role::AnyParser>, and L<Markdent::Role::DebugPrinter> roles.
 
 See L<Markdent> for bug reporting details.
 
+Bugs may be submitted at L<http://rt.cpan.org/Public/Dist/Display.html?Name=Markdent> or via email to L<bug-markdent@rt.cpan.org|mailto:bug-markdent@rt.cpan.org>.
+
+I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
+
+=head1 SOURCE
+
+The source code repository for Markdent can be found at L<https://github.com/houseabsolute/Markdent>.
+
 =head1 AUTHOR
 
 Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Dave Rolsky.
+This software is copyright (c) 2017 by Dave Rolsky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+The full text of the license can be found in the
+F<LICENSE> file included with this distribution.
 
 =cut

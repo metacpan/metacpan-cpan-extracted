@@ -12,6 +12,9 @@ with 'Catmandu::Bag';
 
 sub generator {
     my $self = shift;
+    Catmandu::NotImplemented->throw(
+        message => 'Iterating over items in this store not supported.'
+    );
 }
 
 sub get {
@@ -53,4 +56,5 @@ sub delete_all {
 }
 
 1;
+
 __END__

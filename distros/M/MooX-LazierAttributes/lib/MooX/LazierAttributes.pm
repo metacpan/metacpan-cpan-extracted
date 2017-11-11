@@ -2,10 +2,10 @@ package MooX::LazierAttributes;
 
 use strict;
 use warnings;
-use Scalar::Util qw/reftype blessed/;
+use Scalar::Util qw/reftype refaddr blessed/;
 use MooX::ReturnModifiers qw/return_modifiers/;
 
-our $VERSION = '1.03';
+our $VERSION = '1.06';
 
 use constant ro => 'ro';
 use constant is_ro => ( is => ro );
@@ -21,6 +21,15 @@ use constant req => ( required => 1 );
 use constant coe => ( coerce => 1 );
 use constant lzy_hash => ( lazy => 1, default => sub { {} });
 use constant lzy_array => ( lazy => 1, default => sub { [] });
+use constant lzy_str => (lazy => 1, default => sub { "" });
+use constant dhash => (default => sub { {} });
+use constant darray => (default => sub { [] });
+use constant dstr => (default => sub { "" });
+
+our %opts;
+BEGIN {
+    %opts => (limit => 5, skip => '');
+}
 
 sub import {
     my ($package, @export) = @_;
@@ -31,16 +40,25 @@ sub import {
         my @attr = @_;
         while (@attr) {
             my @names = ref $attr[0] eq 'ARRAY' ? @{ shift @attr } : shift @attr;
-            my @spec = @{ shift @attr };
+            my @spec = @{ shift(@attr) };
             
-            push @spec, delete $spec[2]->{default}; 
+            my $eye = scalar @spec - 1;    
+            (grep { ref $spec[$_] eq 'Type::Tiny'} (0 .. $eye)) 
+                ? push @spec, delete $spec[$eye]->{default}
+                : ( ref $spec[$eye] eq 'HASH' && exists $spec[$eye]->{default} ) && splice @spec, ($eye == 0 ? 0 : 1), 0, delete $spec[$eye]->{default};
+            
             for (@names) {
                 unshift @spec, 'set' if $_ =~ m/^\+/ and ( !$spec[0] || $spec[0] ne 'set' );
-                unshift @spec, ro unless ref \$spec[0] eq 'SCALAR' and $spec[0] =~ m/^ro|rw|set$/;
+                unshift @spec, ro unless ref \$spec[0] eq 'SCALAR' and $spec[0] =~ m/^ro|rw|set$/;    
                 $modifiers{has}->( $_, construct_attribute(@spec) );
             }
         }
     };
+
+    if (ref $export[0]) {
+        my $o = shift @export;
+        exists $o->{$_} and $opts{$_} = $o->{$_} for (qw/limit skip/); 
+    }
 
     { 
         no strict 'refs'; 
@@ -56,32 +74,36 @@ sub construct_attribute {
     my @spec = @_;
     my %attr = ();
     $attr{is} = $spec[0] unless $spec[0] eq 'set';
-   
+
     if ( ref $spec[1] eq 'Type::Tiny' ) { 
         $attr{isa} = $spec[1];
         $spec[1] = pop @spec;
     } 
-    
+
     $attr{default} = ref $spec[1] eq 'CODE' ? $spec[1] : sub { _clone( $spec[1] ) }
         if defined $spec[1];
 
     $attr{$_} = $spec[2]->{$_} foreach keys %{ $spec[2] };
+
     return %attr;
 }
 
 sub _clone {
-    my ($to_clone) = @_;
+    my ($to_clone, $recur) = @_;
     my $blessed = blessed $to_clone;
-    my $clone   = _deep_clone($to_clone);
+    $blessed =~ m/^$opts{skip}$/ and return $to_clone if $opts{skip};
+    my $clone   = _deep_clone($to_clone, $recur);
     return $blessed ? bless $clone, $blessed : $clone;
 }
 
 sub _deep_clone {
-    my ($to_clone) = @_;
+    my ($to_clone, $recur) = @_;
     my $rt = reftype($to_clone) || reftype(\$to_clone);
     $rt eq 'SCALAR' and return $to_clone;
-    $rt eq 'HASH'   and return { map +( $_ => _clone( $to_clone->{$_} ) ), keys %$to_clone };
-    $rt eq 'ARRAY'  and return [ map _clone($_), @$to_clone ];
+    my $addr = refaddr $to_clone;
+    $recur->{$addr}++ && $recur->{$addr} > $opts{limit} and return $to_clone;
+    $rt eq 'HASH'   and return { map +( $_ => _clone( $to_clone->{$_}, $recur ) ), keys %$to_clone };
+    $rt eq 'ARRAY'  and return [ map _clone($_, $recur), @$to_clone ];
     return $to_clone;
 }
 
@@ -95,7 +117,7 @@ MooX::LazierAttributes - Lazier Attributes.
 
 =head1 VERSION
 
-Version 1.03
+Version 1.06
 
 =cut
 
@@ -314,6 +336,22 @@ undef
 =head3 lzy_array
 
 ( lazy => 1, default => sub { [] } )
+
+=head3 lzy_str
+
+( lazy => 1, default => sub { '' } )
+
+=head3 dhash
+
+( default => sub { {} } )
+
+=head3 darray
+
+( default => sub { [] } )
+
+=head3 dstr
+
+( default => sub { '' } )
 
 =head1 Acknowledgements
 

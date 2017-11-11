@@ -19,7 +19,7 @@ my %module_build_args = (
     "Dean Hamstead <dean\@bytefoundry.com.au>"
   ],
   "dist_name" => "WebService-HashiCorp-Vault",
-  "dist_version" => "0.002",
+  "dist_version" => "0.004",
   "license" => "perl",
   "module_name" => "WebService::HashiCorp::Vault",
   "recursive_test_files" => 1,

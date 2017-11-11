@@ -1,15 +1,161 @@
-SYNOPSIS
+NAME
+    App::wordlist - Grep words from WordList::*
 
+VERSION
+    This document describes version 0.261 of App::wordlist (from Perl
+    distribution App-wordlist), released on 2017-11-08.
+
+SYNOPSIS
     See the included script wordlist.
 
-ENVIRONMENT
+FUNCTIONS
+  wordlist
+    Usage:
 
- DEBUG => bool
+     wordlist(%args) -> [status, msg, result, meta]
+
+    Grep words from WordList::*.
+
+    Examples:
+
+    *   By default print all words from all wordlists:
+
+         wordlist();
+
+    *   Print all words matching /foo/ and /bar/:
+
+         wordlist( arg => ["foo", "bar"]);
+
+    *   Print all words matching /foo/ or /bar/:
+
+         wordlist( arg => ["foo", "bar"], or => 1);
+
+    *   Print wordlist name for each matching words:
+
+         wordlist( arg => ["foo"], detail => 1);
+
+    *   Select a specific wordlist (multiple -w allowed):
+
+         wordlist( arg => ["foo"], wordlists => ["ID::KBBI"]);
+
+    *   Select phrase wordlists (multiple -t allowed):
+
+         wordlist( arg => ["foo"], types => ["Phrase"]);
+
+    *   Select French wordlists (multiple --lang allowed):
+
+         wordlist( arg => ["foo"], langs => ["FR"]);
+
+    *   Filter by regex:
+
+         wordlist( arg => ["/fof[aeiou]/"]);
+
+    *   List installed wordlist modules:
+
+         wordlist( action => "list_installed");
+
+    *   List wordlist modules available on CPAN:
+
+         wordlist( action => "list_cpan");
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   action => *str* (default: "grep")
+
+    *   arg => *array[str]*
+
+    *   detail => *bool*
+
+        Display more information when listing modules/result.
+
+        When listing installed modules ("-l"), this means also returning a
+        wordlist's type and language.
+
+        When returning grep result, this means also returning wordlist name.
+
+    *   ignore_case => *bool* (default: 1)
+
+    *   langs => *array[str]*
+
+        Only include wordlists of certain language(s).
+
+    *   lcpan => *bool*
+
+        Use local CPAN mirror first when available (for -L).
+
+    *   len => *int*
+
+    *   max_len => *int*
+
+    *   min_len => *int*
+
+    *   num => *int* (default: 0)
+
+        Return (at most) this number of words (0 = unlimited).
+
+    *   or => *bool*
+
+        Match any word in query instead of the default "all".
+
+    *   random => *bool*
+
+        Pick random words (must set --num to positive number).
+
+    *   types => *array[str]*
+
+        Only include wordlists of certain type(s).
+
+        By convention, language information is encoded in the wordlist's
+        name. For example, English wordlists have names matching "EN::*" or
+        "Word::EN::*" or "Char::EN::*" or "Phrase::EN::*".
+
+    *   wordlists => *array[str]*
+
+        Select one or more wordlist modules.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (result) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+ENVIRONMENT
+  DEBUG => bool
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-wordlist>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-wordlist>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-wordlist>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     App::GamesWordlist (games-wordlist) which greps from
-    Games::Word::Wordlist::* instead.
+    "Games::Word::Wordlist::*" instead.
 
-    WordList and WordList::* modules.
+    WordList and "WordList::*" modules.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017, 2016, 2015, 2014 by
+    perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

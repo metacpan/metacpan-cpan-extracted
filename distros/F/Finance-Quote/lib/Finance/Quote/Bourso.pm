@@ -75,7 +75,7 @@ use HTTP::Request::Common;
 use HTML::TreeBuilder
     ;    # Boursorama doesn't put data in table elements anymore but uses <div>
 
-our $VERSION = '1.43'; # VERSION
+our $VERSION = '1.45'; # VERSION
 
 my $Bourso_URL = 'http://www.boursorama.com/recherche/index.phtml';
 

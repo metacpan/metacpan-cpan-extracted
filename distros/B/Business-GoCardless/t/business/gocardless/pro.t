@@ -2,6 +2,7 @@
 
 use strict;
 use warnings;
+use utf8;
 
 use Test::Most;
 use Test::Deep;
@@ -414,8 +415,8 @@ sub _user_json {
 "id": "CU123",
     "created_at": "2014-05-08T17:01:06.000Z",
     "email": "user\@example.com",
-    "given_name": "Frank",
-    "family_name": "Osborne",
+    "given_name": "Frañk",
+    "family_name": "Osbörne",
     "address_line1": "27 Acer Road",
     "address_line2": "Apt 2",
     "address_line3": null,
@@ -450,8 +451,8 @@ sub _user_obj {
   'created_at' => '2014-05-08T17:01:06.000Z',
   'email' => 'user@example.com',
   'endpoint' => '/customers/%s',
-  'family_name' => 'Osborne',
-  'given_name' => 'Frank',
+  'family_name' => 'Osbörne',
+  'given_name' => 'Frañk',
   'id' => 'CU123',
   'language' => 'en',
   'metadata' => {
@@ -489,7 +490,7 @@ sub _subscription_json_internal {
     "amount": 2500,
     "currency": "GBP",
     "status": "$status",
-    "name": "Monthly Magazine",
+    "name": "Monthly Magaziné",
     "start_date": "2014-11-03",
     "end_date": null,
     "interval": 1,
@@ -549,7 +550,7 @@ return bless( {
     'order_no' => 'ABCD1234'
   },
   'month' => undef,
-  'name' => 'Monthly Magazine',
+  'name' => 'Monthly Magaziné',
   'payment_reference' => undef,
   'start_date' => '2014-11-03',
   'status' => $status,
@@ -615,7 +616,7 @@ bless( {
     'user_agent' => ignore(),
   }, 'Business::GoCardless::Client' ),
   'created_at' => '2014-10-22T13:10:06.000Z',
-  'description' => 'Wine boxes',
+  'description' => 'Winé boxes',
   'endpoint' => '/redirect_flows/%s',
   'id' => 'RE123',
   'links' => {
@@ -675,8 +676,8 @@ sub _pre_auth_json {
   "created_at": "2014-08-20T21:41:25Z",
   "expires_at": "2016-08-20T21:41:25Z",
   "id": "1234ABCD",
-  "name": "Computer support invoices",
-  "description": "GoCardless magazine",
+  "name": "Computer support invoicés",
+  "description": "GoCardless magaziné",
   "max_amount": "750.00",
   "setup_fee": "10.00",
   "remaining_amount": "750.00",
@@ -742,7 +743,7 @@ sub _merchant_json {
     return qq!{
   "id":"06Z06JWQW1",
   "name":"Company Ltd",
-  "description":"We do stuff.",
+  "description":"Wé do stuff.",
   "created_at":"2014-01-22T10:27:42Z",
   "first_name":"Lee",
   "last_name":"Johnson",
@@ -774,7 +775,7 @@ sub _merchant_obj {
             'balance' => '0.0',
             'client' => ignore(),
             'created_at'           => '2014-01-22T10:27:42Z',
-            'description'          => 'We do stuff.',
+            'description'          => 'Wé do stuff.',
             'email'                => 'lee@foo.com',
             'endpoint'             => '/merchants/%s',
             'eur_balance'          => '0.0',
@@ -829,7 +830,7 @@ return qq!
     "created_at": "2014-05-08T17:01:06.000Z",
     "charge_date": "2014-05-15",
     "amount": $amount,
-    "description": null,
+    "description": "Stuff and Thiñgs",
     "currency": "GBP",
     "status": "$status",
     "reference": "WINEBOX001",
@@ -858,7 +859,7 @@ sub _payment_obj {
         "charge_date"     => "2014-05-15",
         "amount"          => 44.0,
         "amount_refunded" => 0,
-        "description"     => undef,
+        "description"     => "Stuff and Thiñgs",
         "currency"        => "GBP",
         "status"          => $status,
         "reference"       => "WINEBOX001",
@@ -900,7 +901,7 @@ sub _redirect_flow_json {
     return qq!{
           "redirect_flows": {
             "id": "RE123",
-            "description": "Wine boxes",
+            "description": "Winé boxes",
             "session_token": "SESS_wSs0uGYMISxzqOBq",
             "scheme": null,
             "success_redirect_url": "https://example.com/pay/confirm",

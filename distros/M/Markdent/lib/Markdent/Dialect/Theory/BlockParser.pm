@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 use List::AllUtils qw( insert_after_string sum );
 use Markdent::Event::StartTable;
@@ -18,7 +18,7 @@ use Markdent::Event::EndTableRow;
 use Markdent::Event::StartTableCell;
 use Markdent::Event::EndTableCell;
 use Markdent::Regexes qw( $HorizontalWS $EmptyLine $BlockStart $BlockEnd );
-use Markdent::Types qw( Bool );
+use Markdent::Types;
 
 use Moose::Role;
 
@@ -27,7 +27,7 @@ with 'Markdent::Role::Dialect::BlockParser';
 has _in_table => (
     traits   => ['Bool'],
     is       => 'ro',
-    isa      => Bool,
+    isa      => t('Bool'),
     default  => 0,
     init_arg => undef,
     handles  => {
@@ -459,13 +459,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Markdent::Dialect::Theory::BlockParser - Block parser for Theory's proposed Markdown extensions
 
 =head1 VERSION
 
-version 0.26
+version 0.27
 
 =head1 DESCRIPTION
 
@@ -488,15 +490,26 @@ This role does the L<Markdent::Role::Dialect::BlockParser> role.
 
 See L<Markdent> for bug reporting details.
 
+Bugs may be submitted at L<http://rt.cpan.org/Public/Dist/Display.html?Name=Markdent> or via email to L<bug-markdent@rt.cpan.org|mailto:bug-markdent@rt.cpan.org>.
+
+I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
+
+=head1 SOURCE
+
+The source code repository for Markdent can be found at L<https://github.com/houseabsolute/Markdent>.
+
 =head1 AUTHOR
 
 Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Dave Rolsky.
+This software is copyright (c) 2017 by Dave Rolsky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+The full text of the license can be found in the
+F<LICENSE> file included with this distribution.
 
 =cut

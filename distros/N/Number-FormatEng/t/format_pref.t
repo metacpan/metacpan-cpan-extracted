@@ -1,7 +1,7 @@
 
 use warnings;
 use strict;
-use Test::More tests => 47;
+use Test::More tests => 48;
 
 # Check if module loads ok
 BEGIN { use_ok('Number::FormatEng', qw(format_pref)) }
@@ -14,6 +14,7 @@ is(format_pref(10_000   )        , '10k');
 is(format_pref(7777     )        , '7.777k');
 is(format_pref(-0.04567 )        , '-45.67m');
 is(format_pref(456789   )        , '456.789k');
+is(format_pref(2308     )        , '2.308k', 'Bug: RT 123532');
 
 # examples from pod
 is(format_pref(1234     )        , '1.234k');

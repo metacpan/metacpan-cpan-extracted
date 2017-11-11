@@ -5,19 +5,24 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     NAME             => 'WWW::Codeguard',
-    AUTHOR           => q{Rishwanth Yeddula <ryeddula@cpan.org>},
+    AUTHOR           => [
+        'Rishwanth Yeddula <ryeddula@cpan.org>',
+        'David Oswald <davido@cpan.org>',
+        'James Jacobson <shames@cpan.org>'
+    ],
     VERSION_FROM     => 'lib/WWW/Codeguard.pm',
     ABSTRACT_FROM    => 'lib/WWW/Codeguard.pm',
     LICENSE          => 'Artistic_2_0',
     PL_FILES         => {},
-    MIN_PERL_VERSION => 5.006,
+    MIN_PERL_VERSION => 5.008009,
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => 0,
     },
     BUILD_REQUIRES => {
-        'Test::More' => 0,
-        'JSON'       => 0,
-        'parent'     => 0, # this is core as of 5.10.1, so specifing this for 5.8 installs
+        'Test::More'       => 0,
+        'Test::MockModule' => 0,
+        'JSON'             => 0,
+        'parent'           => 0, # this is core as of 5.10.1, so specifing this for 5.8 installs
     },
     PREREQ_PM => {
         'LWP::UserAgent' => 0,
@@ -31,8 +36,8 @@ WriteMakefile(
         resources => {
             repository => {
                 type => 'git',
-                url  => 'https://github.com/ryeddula/www-codeguard.git',
-                web  => 'https://github.com/ryeddula/www-codeguard',
+                url  => 'https://github.com/daoswald/www-codeguard.git',
+                web  => 'https://github.com/daoswald/www-codeguard',
             },
         },
     },

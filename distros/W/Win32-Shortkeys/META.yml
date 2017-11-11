@@ -1,0 +1,30 @@
+---
+abstract: 'Shortkeys for windows'
+author:
+  - 'FranE<ccedil>ois Rappaz (rappazf@gmail.com)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.16, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Win32-Shortkeys
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '1.4'
+  Config::YAML::Tiny: v1.42.0
+  Encode: '2.84'
+  Test::Simple: '0.44'
+  Time::HiRes: '1.9733'
+  Win32::Clipboard: '0.58'
+  Win32::Shortkeys::Kbh: '0.01'
+  XML::Parser: '2.44'
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

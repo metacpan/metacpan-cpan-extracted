@@ -1,0 +1,117 @@
+#!perl
+
+our $DATE = '2017-11-10'; # DATE
+our $VERSION = '0.003'; # VERSION
+
+use strict;
+use warnings;
+use App::FTPThis;
+
+die "ftp_this: Please run me as root because I need to do chroot()\n" if $>;
+App::FTPThis->new->run;
+
+# ABSTRACT: Export the current directory over anonymous FTP
+# PODNAME: ftp_this
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+ftp_this - Export the current directory over anonymous FTP
+
+=head1 VERSION
+
+This document describes version 0.003 of ftp_this (from Perl distribution App-FTPThis), released on 2017-11-10.
+
+=head1 SYNOPSIS
+
+ ## Export the current directory over anonymous FTP
+ $ ftp_this
+
+ ## Export the `dir_name` directory over FTP, specify port
+ $ ftp_this dir_name --port 8121
+
+ ## Show documentation about our options
+ $ ftp_this --help
+
+ ## Show the entire man page
+ $ ftp_this --man
+
+=head1 DESCRIPTION
+
+B<SECURITY WARNING: USE THIS SCRIPT FOR TESTING ONLY AND NOT PRODUCTION.>
+
+This script exports the current directory over anonymous FTP. It chroots to the
+directory and switches to the directory owner user (or C<nobody> if directory
+owner is root, to avoid running the FTP daemon as root).
+
+=head1 ARGUMENTS
+
+The script accepts a single optional argument: the path of the directory to
+export.
+
+=head1 OPTIONS
+
+The following options are available:
+
+=over 4
+
+=item --port PORT
+
+Start the FTP server on a specific C<PORT>. Default is 8021.
+
+=item --help
+
+Print information about the script usage and its options.
+
+=item --man
+
+Print the entire man page for the command.
+
+=back
+
+=head1 TODO
+
+Support systems that do not have chroot().
+
+Support running as normal user (without doing chroot()).
+
+Support non-anonymous (read-write mode).
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-FTPThis>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-ftpthis>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-FTPThis>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+Other scripts in the same spirit: L<http_this> (from L<App::HTTPThis>),
+L<https_this> (from L<App::HTTPThis>), L<cgi_this> (from L<App::CGIThis>).
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

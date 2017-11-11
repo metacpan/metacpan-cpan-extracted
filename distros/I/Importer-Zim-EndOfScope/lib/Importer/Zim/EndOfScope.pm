@@ -1,30 +1,30 @@
 
 package Importer::Zim::EndOfScope;
-$Importer::Zim::EndOfScope::VERSION = '0.2.0';
+$Importer::Zim::EndOfScope::VERSION = '0.4.0';
 # ABSTRACT: Import functions with compilation block scope
 
 use 5.010001;
 
-BEGIN {
-    require Importer::Zim::Base;
-    Importer::Zim::Base->VERSION('0.8.0');
-    our @ISA = qw(Importer::Zim::Base);
-}
-
 use B::Hooks::EndOfScope ();
 use Sub::Replace         ();
 
-use Importer::Zim::Utils 0.8.0 qw(DEBUG carp);
+use Importer::Zim::Utils 0.8.0 qw(DEBUG );
 
 sub import {
-    my $class = shift;
+    require Importer::Zim::Base;
+    Importer::Zim::Base->VERSION('0.12.0');
+    goto &Importer::Zim::Base::import_into;
+}
 
-    carp "$class->import(@_)" if DEBUG;
-    my @exports = $class->_prepare_args(@_);
+sub export_to {
+    my $t = shift;
+    @_ = %{ $_[0] } if @_ == 1 && ref $_[0] eq 'HASH';
+    @_ = map { $_ & 1 ? $_[$_] : "${t}::$_[$_]" } 0 .. $#_;
+    goto &_export_to;
+}
 
-    my $caller = caller;
-    my $old    = Sub::Replace::sub_replace(
-        map { ; "${caller}::$_->{export}" => $_->{code} } @exports );
+sub _export_to {
+    my $old = Sub::Replace::sub_replace(@_);
 
     # Clean it up after a scope finished compilation
     B::Hooks::EndOfScope::on_scope_end(
@@ -36,7 +36,7 @@ sub import {
     ) if %$old;
 }
 
-no Importer::Zim::Utils qw(DEBUG carp);
+no Importer::Zim::Utils qw(DEBUG );
 
 1;
 
@@ -138,7 +138,7 @@ Importer::Zim::EndOfScope - Import functions with compilation block scope
 
 =head1 VERSION
 
-version 0.2.0
+version 0.4.0
 
 =head1 SYNOPSIS
 

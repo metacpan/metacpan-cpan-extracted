@@ -8,7 +8,7 @@ Net::WebSocket::Parser - Parse WebSocket from a filehandle
 
 =head1 SYNOPSIS
 
-    my $iof = IO::Framed::Read->new($fh);
+    my $iof = IO::Framed->new($fh);
 
     my $parse = Net::WebSocket::Parser->new($iof);
 

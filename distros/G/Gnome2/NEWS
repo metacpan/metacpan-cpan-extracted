@@ -1,3 +1,14 @@
+Overview of changes in Gnome2 1.047
+===================================
+
+* RT#121440 - Fix test failures when '.' missing from @INC path
+
+Overview of changes in Gnome2 1.046
+===================================
+
+* RT#104191; Don't use localtime() in POD output; patch submitted by intrigeri
+  for the Debian Reproducable Builds project
+
 Overview of changes in Gnome2 1.045
 ===================================
 

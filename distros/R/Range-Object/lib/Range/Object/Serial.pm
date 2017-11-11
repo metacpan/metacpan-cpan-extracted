@@ -175,13 +175,9 @@ supported, i.e. while '1-10' is valid range, '10-1' is not.
 There are no known bugs in this module. Please report problems to author,
 patches are welcome.
 
-=head1 AUTHOR
-
-Alexander Tokarev E<lt>tokarev@cpan.orgE<gt>.
-
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2011 Alexander Tokarev.
+Copyright (c) 2011-2017 Alex Tokarev E<lt>tokarev@cpan.orgE<gt>.
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself. See L<perlartistic>.

@@ -158,8 +158,7 @@ EOF
                 [
                     {
                         type => 'text',
-                        text =>
-                            "A list item with a blockquote:\n",
+                        text => "A list item with a blockquote:\n",
                     },
                 ],
                 { type => 'blockquote' },
@@ -214,13 +213,11 @@ EOF
                 [
                     {
                         type => 'text',
-                        text =>
-                            "A list item with a pre block:\n",
+                        text => "A list item with a pre block:\n",
                     },
                 ], {
                     type => 'preformatted',
-                    text =>
-                        "This is a pre block\ninside a list item.\n",
+                    text => "This is a pre block\ninside a list item.\n",
                 },
             ], {
                 type   => 'list_item',

@@ -19,11 +19,11 @@ Proc::ProcessTable::Colorizer - Like ps, but with colored columns and enhnaced f
 
 =head1 VERSION
 
-Version 0.1.0
+Version 0.2.0
 
 =cut
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.2.0';
 
 
 =head1 SYNOPSIS
@@ -346,25 +346,6 @@ sub colorize{
 				}
 			}
 
-			#checks to see if it should ignore its self
-			my $self_ignore=$self->{self_ignore};
-			if (
-				#if it is set to 1
-				( $self_ignore == 1 ) &&
-				( $proc->{pid} == $$ )
-				){
-				$required_hits++;
-			}elsif(
-				#if it is set to 2... we only care if we are doing a search...
-				#meaning required hits are greater than zero
-				( $required_hits > 0 ) &&
-				( $self_ignore == 2 ) &&
-				( $proc->{pid} == $$ )
-				){
-				#increment this so it will always be off by one for this proc, meaning it is ignored
-				$required_hits++;
-			}
-
 			#check to see if it needs to search for users
 			my $user_search_array=$self->userSearchGet;
 			if ( defined( $user_search_array->[0] ) ){
@@ -666,6 +647,25 @@ sub colorize{
 					){
 					$hits++;
 				}
+			}
+
+			#checks to see if it should ignore its self
+			my $self_ignore=$self->{self_ignore};
+			if (
+				#if it is set to 1
+				( $self_ignore == 1 ) &&
+				( $proc->{pid} == $$ )
+				){
+				$required_hits++;
+			}elsif(
+				#if it is set to 2... we only care if we are doing a search...
+				#meaning required hits are greater than zero
+				( $required_hits > 0 ) &&
+				( $self_ignore == 2 ) &&
+				( $proc->{pid} == $$ )
+				){
+				#increment this so it will always be off by one for this proc, meaning it is ignored
+				$required_hits++;
 			}
 			
 			if ( $required_hits == $hits ){
@@ -980,9 +980,17 @@ sub pctcpuSearchSetString{
 		foreach my $item ( @pctcpu_search_array ){
 			if (
 				( $item !~ /^\>[0123456789]*$/ ) &&
-				( $item !~ /^\>=[0123456789]*$/ ) &&
+				( $item !~ /^\>[0123456789]*\.[0123456789]*$/ ) &&
+				( $item !~ /^\>\.[0123456789]*$/ ) &&
+				( $item !~ /^\>\=[0123456789]*$/ ) &&
+				( $item !~ /^\>\=[0123456789]*\.[0123456789]*$/ ) &&
+				( $item !~ /^\>\=\.[0123456789]*$/ ) &&
 				( $item !~ /^\<[0123456789]*$/ ) &&
-				( $item !~ /^\<=[0123456789]*$/ )
+				( $item !~ /^\<[0123456789]*\.[0123456789]*$/ ) &&
+				( $item !~ /^\<\.[0123456789]*$/ ) &&
+				( $item !~ /^\<\=[0123456789]*$/ ) &&
+				( $item !~ /^\<\=[0123456789]*\.[0123456789]*$/ ) &&
+				( $item !~ /^\<\=\.[0123456789]*$/ )
 				){
 				$self->{error}=2;
 				$self->{errorString}='"'.$item.'"" is not a valid value for use in a PCT CPU search';
@@ -1051,9 +1059,17 @@ sub pctmemSearchSetString{
 		foreach my $item ( @pctmem_search_array ){
 			if (
 				( $item !~ /^\>[0123456789]*$/ ) &&
-				( $item !~ /^\>=[0123456789]*$/ ) &&
+				( $item !~ /^\>[0123456789]*\.[0123456789]*$/ ) &&
+				( $item !~ /^\>\.[0123456789]*$/ ) &&
+				( $item !~ /^\>\=[0123456789]*$/ ) &&
+				( $item !~ /^\>\=[0123456789]*\.[0123456789]*$/ ) &&
+				( $item !~ /^\>\=\.[0123456789]*$/ ) &&
 				( $item !~ /^\<[0123456789]*$/ ) &&
-				( $item !~ /^\<=[0123456789]*$/ )
+				( $item !~ /^\<[0123456789]*\.[0123456789]*$/ ) &&
+				( $item !~ /^\<\.[0123456789]*$/ ) &&
+				( $item !~ /^\<=[0123456789]*$/ ) &&
+				( $item !~ /^\<\=[0123456789]*\.[0123456789]*$/ ) &&
+				( $item !~ /^\<\=\.[0123456789]*$/ )
 				){
 				$self->{error}=3;
 				$self->{errorString}='"'.$item.'"" is not a valid value for use in a PCT MEM search';
@@ -1322,9 +1338,17 @@ sub timeSearchSetString{
 		foreach my $item ( @time_search_array ){
 			if (
 				( $item !~ /^\>[0123456789]*$/ ) &&
+				( $item !~ /^\>[0123456789]*\.[0123456789]*$/ ) &&
+				( $item !~ /^\>\.[0123456789]*$/ ) &&
 				( $item !~ /^\>=[0123456789]*$/ ) &&
+				( $item !~ /^\>\=[0123456789]*\.[0123456789]*$/ ) &&
+				( $item !~ /^\>\=\.[0123456789]*$/ ) &&
 				( $item !~ /^\<[0123456789]*$/ ) &&
-				( $item !~ /^\<=[0123456789]*$/ )
+				( $item !~ /^\<[0123456789]*\.[0123456789]*$/ ) &&
+				( $item !~ /^\<\.[0123456789]*$/ ) &&
+				( $item !~ /^\<=[0123456789]*$/ ) &&
+				( $item !~ /^\<\=[0123456789]*\.[0123456789]*$/ ) &&
+				( $item !~ /^\<\=\.[0123456789]*$/ )
 				){
 				$self->{error}=1;
 				$self->{errorString}='"'.$item.'"" is not a valid value for use in a time search';

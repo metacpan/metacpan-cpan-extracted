@@ -4,13 +4,11 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
-use MooseX::Params::Validate qw( validated_list validated_hash );
-use Markdent::Types qw(
-    HeaderLevel Str Bool HashRef
-    TableCellAlignment PosInt
-);
+use Markdent::Types;
+use Params::ValidationCompiler qw( validation_for );
+use Specio::Declare;
 use Tree::Simple;
 
 use Moose;
@@ -18,9 +16,10 @@ use MooseX::SemiAffordanceAccessor;
 
 with 'Markdent::Role::EventsAsMethods';
 
+my $tree_simple_type = object_isa_type('Tree::Simple');
 has tree => (
     is      => 'ro',
-    isa     => 'Tree::Simple',
+    isa     => $tree_simple_type,
     default => sub {
         Tree::Simple->new( { type => 'document' }, Tree::Simple->ROOT() );
     },
@@ -29,7 +28,7 @@ has tree => (
 
 has _current_node => (
     is       => 'rw',
-    isa      => 'Maybe[Tree::Simple]',
+    isa      => t( 'Maybe', of => $tree_simple_type ),
     init_arg => undef,
 );
 
@@ -45,17 +44,22 @@ sub end_document {
     $self->_set_current_node(undef);
 }
 
-sub start_header {
-    my $self = shift;
-    my ($level) = validated_list(
-        \@_,
-        level => { isa => HeaderLevel },
+{
+    my $validator = validation_for(
+        params        => [ level => { type => t('HeaderLevel') } ],
+        named_to_list => 1,
     );
 
-    my $header = Tree::Simple->new( { type => 'header', level => $level } );
-    $self->_current_node()->addChild($header);
+    sub start_header {
+        my $self = shift;
+        my ($level) = $validator->(@_);
 
-    $self->_set_current_node($header);
+        my $header
+            = Tree::Simple->new( { type => 'header', level => $level } );
+        $self->_current_node()->addChild($header);
+
+        $self->_set_current_node($header);
+    }
 }
 
 sub end_header {
@@ -109,18 +113,22 @@ sub end_ordered_list {
     $self->_set_current_up_one_level();
 }
 
-sub start_list_item {
-    my $self = shift;
-    my %p    = validated_hash(
-        \@_,
-        bullet => { isa => Str },
+{
+    my $validator = validation_for(
+        params        => [ bullet => { type => t('Str') } ],
+        named_to_list => 1,
     );
 
-    my $list_item
-        = Tree::Simple->new( { type => 'list_item', bullet => $p{bullet} } );
-    $self->_current_node()->addChild($list_item);
+    sub start_list_item {
+        my $self = shift;
+        my ($bullet) = $validator->(@_);
 
-    $self->_set_current_node($list_item);
+        my $list_item
+            = Tree::Simple->new( { type => 'list_item', bullet => $bullet } );
+        $self->_current_node()->addChild($list_item);
+
+        $self->_set_current_node($list_item);
+    }
 }
 
 sub end_list_item {
@@ -129,32 +137,48 @@ sub end_list_item {
     $self->_set_current_up_one_level();
 }
 
-sub preformatted {
-    my $self = shift;
-    my ($text) = validated_list( \@_, text => { isa => Str }, );
+{
+    my $validator = validation_for(
+        params        => [ text => { type => t('Str') } ],
+        named_to_list => 1,
+    );
 
-    my $pre_node
-        = Tree::Simple->new( { type => 'preformatted', text => $text } );
-    $self->_current_node()->addChild($pre_node);
+    sub preformatted {
+        my $self = shift;
+        my ($text) = $validator->(@_);
+
+        my $pre_node
+            = Tree::Simple->new( { type => 'preformatted', text => $text } );
+        $self->_current_node()->addChild($pre_node);
+    }
 }
 
-sub code_block {
-    my $self = shift;
-    my ( $code, $language ) = validated_list(
-        \@_,
-        code     => { isa => Str },
-        language => { isa => Str, optional => 1 },
+{
+    my $validator = validation_for(
+        params => [
+            code     => { type => t('Str') },
+            language => {
+                type     => t('Str'),
+                optional => 1,
+            },
+        ],
+        named_to_list => 1,
     );
 
-    my $code_block_node = Tree::Simple->new(
-        {
-            type     => 'code_block',
-            code     => $code,
-            language => $language,
-        }
-    );
+    sub code_block {
+        my $self = shift;
+        my ( $code, $language ) = $validator->(@_);
 
-    $self->_current_node()->addChild($code_block_node);
+        my $code_block_node = Tree::Simple->new(
+            {
+                type     => 'code_block',
+                code     => $code,
+                language => $language,
+            }
+        );
+
+        $self->_current_node()->addChild($code_block_node);
+    }
 }
 
 sub start_paragraph {
@@ -172,17 +196,25 @@ sub end_paragraph {
     $self->_set_current_up_one_level();
 }
 
-sub start_table {
-    my $self = shift;
-    my %p    = validated_hash(
-        \@_,
-        caption => { isa => Str, optional => 1 },
+{
+    my $validator = validation_for(
+        params => {
+            caption => {
+                type     => t('Str'),
+                optional => 1,
+            },
+        },
     );
 
-    my $para = Tree::Simple->new( { type => 'table', %p } );
-    $self->_current_node()->addChild($para);
+    sub start_table {
+        my $self = shift;
+        my %p    = $validator->(@_);
 
-    $self->_set_current_node($para);
+        my $para = Tree::Simple->new( { type => 'table', %p } );
+        $self->_current_node()->addChild($para);
+
+        $self->_set_current_node($para);
+    }
 }
 
 sub end_table {
@@ -236,19 +268,27 @@ sub end_table_row {
     $self->_set_current_up_one_level();
 }
 
-sub start_table_cell {
-    my $self = shift;
-    my %p    = validated_hash(
-        \@_,
-        alignment      => { isa => TableCellAlignment, optional => 1 },
-        colspan        => { isa => PosInt },
-        is_header_cell => { isa => Bool },
+{
+    my $validator = validation_for(
+        params => {
+            alignment => {
+                type     => t('TableCellAlignment'),
+                optional => 1,
+            },
+            colspan        => { type => t('PositiveInt') },
+            is_header_cell => { type => t('Bool') },
+        },
     );
 
-    my $para = Tree::Simple->new( { type => 'table_cell', %p } );
-    $self->_current_node()->addChild($para);
+    sub start_table_cell {
+        my $self = shift;
+        my %p    = $validator->(@_);
 
-    $self->_set_current_node($para);
+        my $para = Tree::Simple->new( { type => 'table_cell', %p } );
+        $self->_current_node()->addChild($para);
+
+        $self->_set_current_node($para);
+    }
 }
 
 sub end_table_cell {
@@ -293,30 +333,49 @@ sub end_code {
     $self->_set_current_up_one_level();
 }
 
-sub auto_link {
-    my $self = shift;
-    my %p    = validated_hash(
-        \@_,
-        uri => { isa => Str, optional => 1 },
+{
+    my $validator = validation_for(
+        params => {
+            uri => {
+                type     => t('Str'),
+                optional => 1,
+            },
+        },
     );
 
-    my $link_node = Tree::Simple->new( { type => 'auto_link', %p } );
-    $self->_current_node()->addChild($link_node);
+    sub auto_link {
+        my $self = shift;
+        my %p    = $validator->(@_);
+
+        my $link_node = Tree::Simple->new( { type => 'auto_link', %p } );
+        $self->_current_node()->addChild($link_node);
+    }
 }
 
-sub start_link {
-    my $self = shift;
-    my %p    = validated_hash(
-        \@_,
-        uri            => { isa => Str },
-        title          => { isa => Str, optional => 1 },
-        id             => { isa => Str, optional => 1 },
-        is_implicit_id => { isa => Bool },
+{
+    my $validator = validation_for(
+        params => {
+            uri   => { type => t('Str') },
+            title => {
+                type     => t('Str'),
+                optional => 1,
+            },
+            id => {
+                type     => t('Str'),
+                optional => 1,
+            },
+            is_implicit_id => { type => t('Bool') },
+        },
     );
 
-    delete @p{ grep { !defined $p{$_} } keys %p };
+    sub start_link {
+        my $self = shift;
+        my %p    = $validator->(@_);
 
-    $self->_start_markup_node( 'link', %p );
+        delete @p{ grep { !defined $p{$_} } keys %p };
+
+        $self->_start_markup_node( 'link', %p );
+    }
 }
 
 sub end_link {
@@ -333,33 +392,49 @@ sub line_break {
     $self->_current_node()->addChild($break_node);
 }
 
-sub text {
-    my $self = shift;
-    my ($text) = validated_list( \@_, text => { isa => Str }, );
+{
+    my $validator = validation_for(
+        params => [
+            text => { type => t('Str') },
+        ],
+        named_to_list => 1,
+    );
 
-    my $text_node = Tree::Simple->new( { type => 'text', text => $text } );
-    $self->_current_node()->addChild($text_node);
+    sub text {
+        my $self = shift;
+        my ($text) = $validator->(@_);
+
+        my $text_node
+            = Tree::Simple->new( { type => 'text', text => $text } );
+        $self->_current_node()->addChild($text_node);
+    }
 }
 
-sub start_html_tag {
-    my $self = shift;
-    my ( $tag, $attributes ) = validated_list(
-        \@_,
-        tag        => { isa => Str },
-        attributes => { isa => HashRef },
+{
+    my $validator = validation_for(
+        params => [
+            tag        => { type => t('Str') },
+            attributes => { type => t('HashRef') },
+        ],
+        named_to_list => 1,
     );
 
-    my $tag_node = Tree::Simple->new(
-        {
-            type       => 'start_html_tag',
-            tag        => $tag,
-            attributes => $attributes,
-        }
-    );
+    sub start_html_tag {
+        my $self = shift;
+        my ( $tag, $attributes ) = $validator->(@_);
 
-    $self->_current_node()->addChild($tag_node);
+        my $tag_node = Tree::Simple->new(
+            {
+                type       => 'start_html_tag',
+                tag        => $tag,
+                attributes => $attributes,
+            }
+        );
 
-    $self->_set_current_node($tag_node);
+        $self->_current_node()->addChild($tag_node);
+
+        $self->_set_current_node($tag_node);
+    }
 }
 
 sub end_html_tag {
@@ -368,75 +443,131 @@ sub end_html_tag {
     $self->_set_current_up_one_level();
 }
 
-sub html_comment_block {
-    my $self = shift;
-
-    my ($text) = validated_list( \@_, text => { isa => Str }, );
-
-    my $html_node = Tree::Simple->new(
-        { type => 'html_comment_block', text => $text } );
-    $self->_current_node()->addChild($html_node);
-}
-
-sub html_comment {
-    my $self = shift;
-    my ($text) = validated_list( \@_, text => { isa => Str }, );
-
-    my $html_node
-        = Tree::Simple->new( { type => 'html_comment', text => $text } );
-    $self->_current_node()->addChild($html_node);
-}
-
-sub html_tag {
-    my $self = shift;
-    my ( $tag, $attributes ) = validated_list(
-        \@_,
-        tag        => { isa => Str },
-        attributes => { isa => HashRef },
+{
+    my $validator = validation_for(
+        params => [
+            text => { type => t('Str') },
+        ],
+        named_to_list => 1,
     );
 
-    my $tag_node = Tree::Simple->new(
-        {
-            type       => 'html_tag',
-            tag        => $tag,
-            attributes => $attributes,
-        }
+    sub html_comment_block {
+        my $self = shift;
+        my ($text) = $validator->(@_);
+
+        my $html_node = Tree::Simple->new(
+            { type => 'html_comment_block', text => $text } );
+        $self->_current_node()->addChild($html_node);
+    }
+}
+
+{
+    my $validator = validation_for(
+        params => [
+            text => { type => t('Str') },
+        ],
+        named_to_list => 1,
     );
 
-    $self->_current_node()->addChild($tag_node);
+    sub html_comment {
+        my $self = shift;
+        my ($text) = $validator->(@_);
+
+        my $html_node
+            = Tree::Simple->new( { type => 'html_comment', text => $text } );
+        $self->_current_node()->addChild($html_node);
+    }
 }
 
-sub html_entity {
-    my $self = shift;
-    my ($entity) = validated_list( \@_, entity => { isa => Str }, );
-
-    my $html_node
-        = Tree::Simple->new( { type => 'html_entity', entity => $entity } );
-    $self->_current_node()->addChild($html_node);
-}
-
-sub html_block {
-    my $self = shift;
-    my ($html) = validated_list( \@_, html => { isa => Str }, );
-
-    my $html_node
-        = Tree::Simple->new( { type => 'html_block', html => $html } );
-    $self->_current_node()->addChild($html_node);
-}
-
-sub image {
-    my $self = shift;
-    my %p    = validated_hash(
-        \@_,
-        alt_text       => { isa => Str },
-        uri            => { isa => Str },
-        title          => { isa => Str, optional => 1 },
-        id             => { isa => Str, optional => 1 },
-        is_implicit_id => { isa => Bool, optional => 1 },
+{
+    my $validator = validation_for(
+        params => [
+            tag        => { type => t('Str') },
+            attributes => { type => t('HashRef') },
+        ],
+        named_to_list => 1,
     );
 
-    my $image_node = Tree::Simple->new( { type => 'image', %p } );
-    $self->_current_node()->addChild($image_node);
+    sub html_tag {
+        my $self = shift;
+        my ( $tag, $attributes ) = $validator->(@_);
+
+        my $tag_node = Tree::Simple->new(
+            {
+                type       => 'html_tag',
+                tag        => $tag,
+                attributes => $attributes,
+            }
+        );
+
+        $self->_current_node()->addChild($tag_node);
+    }
+}
+
+{
+    my $validator = validation_for(
+        params => [
+            entity => { type => t('Str') },
+        ],
+        named_to_list => 1,
+    );
+
+    sub html_entity {
+        my $self = shift;
+        my ($entity) = $validator->(@_);
+
+        my $html_node
+            = Tree::Simple->new(
+            { type => 'html_entity', entity => $entity } );
+        $self->_current_node()->addChild($html_node);
+    }
+}
+
+{
+    my $validator = validation_for(
+        params => [
+            html => { type => t('Str') },
+        ],
+        named_to_list => 1,
+    );
+
+    sub html_block {
+        my $self = shift;
+        my ($html) = $validator->(@_);
+
+        my $html_node
+            = Tree::Simple->new( { type => 'html_block', html => $html } );
+        $self->_current_node()->addChild($html_node);
+    }
+}
+
+{
+    my $validator = validation_for(
+        params => {
+            alt_text => { type => t('Str') },
+            uri      => { type => t('Str') },
+            title    => {
+                type     => t('Str'),
+                optional => 1,
+            },
+            id => {
+                type     => t('Str'),
+                optional => 1,
+            },
+            is_implicit_id => {
+                type     => t('Bool'),
+                optional => 1,
+            },
+        },
+    );
+
+    sub image {
+        my $self = shift;
+        my %p    = $validator->(@_);
+
+        my $image_node = Tree::Simple->new( { type => 'image', %p } );
+        $self->_current_node()->addChild($image_node);
+    }
 }
 
 sub horizontal_rule {
@@ -472,13 +603,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Markdent::Handler::MinimalTree - A Markdent handler which builds a tree
 
 =head1 VERSION
 
-version 0.26
+version 0.27
 
 =head1 DESCRIPTION
 
@@ -508,15 +641,26 @@ L<Markdent::Role::Handler> roles.
 
 See L<Markdent> for bug reporting details.
 
+Bugs may be submitted at L<http://rt.cpan.org/Public/Dist/Display.html?Name=Markdent> or via email to L<bug-markdent@rt.cpan.org|mailto:bug-markdent@rt.cpan.org>.
+
+I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
+
+=head1 SOURCE
+
+The source code repository for Markdent can be found at L<https://github.com/houseabsolute/Markdent>.
+
 =head1 AUTHOR
 
 Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Dave Rolsky.
+This software is copyright (c) 2017 by Dave Rolsky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+The full text of the license can be found in the
+F<LICENSE> file included with this distribution.
 
 =cut

@@ -1,10 +1,10 @@
-# Copyrights 1999,2001-2016 by [Mark Overmeer].
+# Copyrights 1999,2001-2017 by [Mark Overmeer].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
 package MojoX::MIME::Types;
 use vars '$VERSION';
-$VERSION = '2.13';
+$VERSION = '2.14';
 
 use Mojo::Base -base;
 
@@ -38,7 +38,7 @@ sub types(;$)
 sub detect($$;$)
 {   my ($self, $accept, $prio) = @_;
     my $mt  = $self->mimeTypes;
-    my @ext = map $mt->type($_)->extensions,
+    my @ext = map $_->extensions, grep defined, map $mt->type($_),
         grep !/\*/, $mt->httpAccept($accept);
     \@ext;
 }

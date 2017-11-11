@@ -5,13 +5,12 @@ package Dist::Zilla::App::Command::msg_compile;
 use Dist::Zilla::App -command;
 use strict;
 use warnings;
-use Path::Class;
+use Path::Tiny qw(path cwd);
 use Dist::Zilla::Plugin::LocaleTextDomain;
 use IPC::Run3;
-use File::Path 2.07 qw(make_path);
 use namespace::autoclean;
 
-our $VERSION = '0.90';
+our $VERSION = '0.91';
 
 sub command_names { qw(msg-compile) }
 
@@ -37,7 +36,7 @@ sub validate_args {
     }
 
     if ( my $dir = $opt->{dest_dir} ) {
-        $opt->{dest_dir} = dir $dir;
+        $opt->{dest_dir} = path $dir;
     }
 }
 
@@ -55,7 +54,7 @@ sub execute {
         or $self->zilla->log_fatal('LocaleTextDomain plugin not found in dist.ini!');
 
     my $lang_dir = $plugin->lang_dir;
-    my $dest_dir = $opt->{dest_dir} || dir;
+    my $dest_dir = $opt->{dest_dir} || cwd;
     my $lang_ext = $plugin->lang_file_suffix;
     my $bin_ext  = $plugin->bin_file_suffix;
     my $txt_dom  = $plugin->textdomain;
@@ -72,14 +71,14 @@ sub execute {
     my @pos = @{ $args } ? @{ $args } : $self->_po_files( $plugin );
     $plugin->log_fatal("No language catalog files found") unless @pos;
 
-    make_path $dest_dir->stringify;
+    $dest_dir->mkpath;
 
     for my $file (@pos) {
-        $file = file $file;
+        $file = path $file;
         ( my $lang = $file->basename ) =~ s{[.][^.]*$}{};
-        my $dest = file $dest_dir, 'LocaleData', $lang, 'LC_MESSAGES',
-            "$txt_dom.$bin_ext";
-        make_path $dest->dir->stringify;
+        my $dest = $dest_dir->child('LocaleData', $lang, 'LC_MESSAGES',
+            "$txt_dom.$bin_ext");
+        $dest->parent->mkpath;
         run3 [@cmd, $dest, $file], undef, $log, $log;
         $plugin->log_fatal("Cannot compile $file") if $?;
     }
@@ -138,9 +137,13 @@ path.
 
 David E. Wheeler <david@justatheory.com>
 
+=head1 Contributor
+
+Charles McGarvey <ccm@cpan.org>
+
 =head1 Copyright and License
 
-This software is copyright (c) 2012-2013 by David E. Wheeler.
+This software is copyright (c) 2012-2017 by David E. Wheeler.
 
 This is free software; you can redistribute it and/or modify it under the same
 terms as the Perl 5 programming language system itself.

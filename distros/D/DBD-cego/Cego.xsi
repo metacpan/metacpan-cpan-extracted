@@ -8,6 +8,27 @@
 
 #include "Driver_xst.h"
 
+# Historically dbd_db_do4, dbd_st_execute, and dbd_st_rows returned an 'int' type.
+# That's only 32 bits (31+sign) so isn't sufficient for very large row counts
+# So now instead of defining those macros, drivers can define dbd_db_do4_iv,
+# dbd_st_execute_iv, and dbd_st_rows_iv to be the names of functions that
+# return an 'IV' type. They could also set DBIc_ROW_COUNT(imp_sth).
+#
+# To save a mess of #ifdef's we arrange for dbd_st_execute (etc) to work
+# as dbd_st_execute_iv if that's defined
+#
+#if defined(dbd_st_execute_iv)
+#undef dbd_st_execute
+#define dbd_st_execute dbd_st_execute_iv
+#endif
+#if defined(dbd_st_rows_iv)
+#undef dbd_st_rows
+#define dbd_st_rows dbd_st_rows_iv
+#endif
+#if defined(dbd_db_do4_iv)
+#undef dbd_db_do4
+#define dbd_db_do4 dbd_db_do4_iv
+#endif
 
 MODULE = DBD::Cego  PACKAGE = DBD::Cego
 
@@ -122,7 +143,7 @@ selectall_arrayref(...)
                 (DBD_ATTRIB_TRUE(attr,"Slice",5,tmp_svp) || DBD_ATTRIB_TRUE(attr,"Columns",7,tmp_svp))
         ) {
             /* fallback to perl implementation */
-            SV *tmp =dbixst_bounce_method("DBD::Cego::db::SUPER::selectall_arrayref", items);
+            SV *tmp =dbixst_bounce_method((char*)"DBD::Cego::db::SUPER::selectall_arrayref", items);
             SPAGAIN;
             ST(0) = tmp;
             XSRETURN(1);
@@ -137,7 +158,7 @@ selectall_arrayref(...)
             sth = mg->mg_obj;
     }
     else {
-        sth = dbixst_bounce_method("prepare", 3);
+        sth = dbixst_bounce_method((char*)"prepare", 3);
         SPAGAIN; SP -= items; /* because stack might have been realloc'd */
         if (!SvROK(sth))
             XSRETURN_UNDEF;
@@ -182,7 +203,7 @@ selectrow_arrayref(...)
     }
     else {
         /* --- prepare --- */
-        sth = dbixst_bounce_method("prepare", 3);
+        sth = dbixst_bounce_method((char*)"prepare", 3);
         SPAGAIN; SP -= items; /* because stack might have been realloc'd */
         if (!SvROK(sth)) {
             if (is_selectrow_array) { XSRETURN_EMPTY; } else { XSRETURN_UNDEF; }
@@ -240,7 +261,7 @@ do(dbh, statement, params = Nullsv)
     {
     D_imp_dbh(dbh);
     IV retval;
-    retval = dbd_db_do4(dbh, imp_dbh, statement, params);
+    retval = dbd_db_do4(dbh, imp_dbh, statement, params); /* might be dbd_db_do4_iv via macro */
     /* remember that dbd_db_do4 must return <= -2 for error     */
     if (retval == 0)            /* ok with no rows affected     */
         XST_mPV(0, "0E0");      /* (true but zero)              */
@@ -582,16 +603,15 @@ execute(sth, ...)
     SV *        sth
     CODE:
     D_imp_sth(sth);
-    int retval;
+    IV retval;
     if (items > 1) {    /* need to bind params */
         if (!dbdxst_bind_params(sth, imp_sth, items, ax) ) {
             XSRETURN_UNDEF;
         }
     }
     /* XXX this code is duplicated in selectrow_arrayref above  */
-    if (DBIc_ROW_COUNT(imp_sth) > 0) /* reset for re-execute */
-        DBIc_ROW_COUNT(imp_sth) = 0;
-    retval = dbd_st_execute(sth, imp_sth);
+    DBIc_ROW_COUNT(imp_sth) = 0;
+    retval = dbd_st_execute(sth, imp_sth); /* might be dbd_st_execute_iv via macro */
     /* remember that dbd_st_execute must return <= -2 for error */
     if (retval == 0)            /* ok with no rows affected     */
         XST_mPV(0, "0E0");      /* (true but zero)              */
@@ -658,7 +678,7 @@ fetchall_arrayref(sth, slice=&PL_sv_undef, batch_row_count=&PL_sv_undef)
     SV *        batch_row_count
     CODE:
     if (SvOK(slice)) {  /* fallback to perl implementation */
-        SV *tmp = dbixst_bounce_method("DBD::Cego::st::SUPER::fetchall_arrayref", 3);
+        SV *tmp = dbixst_bounce_method((char*)"DBD::Cego::st::SUPER::fetchall_arrayref", 3);
         SPAGAIN;
         ST(0) = tmp;
     }

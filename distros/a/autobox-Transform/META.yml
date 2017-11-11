@@ -29,7 +29,7 @@ no_index:
 provides:
   autobox::Transform:
     file: lib/autobox/Transform.pm
-    version: '1.029'
+    version: '1.031'
 requires:
   Carp: '0'
   List::MoreUtils: '0'
@@ -42,7 +42,7 @@ resources:
   bugtracker: https://github.com/jplindstrom/p5-autobox-Transform/issues
   homepage: https://github.com/jplindstrom/p5-autobox-Transform
   repository: git://github.com/jplindstrom/p5-autobox-Transform.git
-version: '1.029'
+version: '1.031'
 x_authority: cpan:JOHANL
 x_contributors:
   - 'Johan Lindstrom <johan.lindstrom@broadbean.com>'

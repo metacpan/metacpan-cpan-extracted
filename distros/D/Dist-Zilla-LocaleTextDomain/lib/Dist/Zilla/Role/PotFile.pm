@@ -5,13 +5,13 @@ package Dist::Zilla::Role::PotFile;
 use Moose::Role;
 use strict;
 use warnings;
-use Path::Class;
+use Path::Tiny;
 use namespace::autoclean;
 
 with 'Dist::Zilla::Role::PotWriter';
 requires 'zilla';
 
-our $VERSION = '0.90';
+our $VERSION = '0.91';
 
 sub pot_file {
     my ( $self, %p ) = @_;
@@ -26,13 +26,13 @@ sub pot_file {
     my $plugin = $self->zilla->plugin_named('LocaleTextDomain')
         or $dzil->log_fatal('LocaleTextDomain plugin not found in dist.ini!');
 
-    $pot = file $plugin->lang_dir, $dzil->name . '.pot';
+    $pot = $plugin->lang_dir->child($dzil->name . '.pot');
     return $pot if -e $pot;
 
     # Create a temporary template file.
     require File::Temp;
     my $tmp = $self->{tmp} = File::Temp->new(SUFFIX => '.pot', OPEN => 0);
-    $pot = file $tmp->filename;
+    $pot = path $tmp->filename;
     $self->log('extracting gettext strings');
     $self->write_pot(
         to               => $pot,
@@ -137,9 +137,13 @@ L<Email::Address>.
 
 David E. Wheeler <david@justatheory.com>
 
+=head1 Contributor
+
+Charles McGarvey <ccm@cpan.org>
+
 =head1 Copyright and License
 
-This software is copyright (c) 2012-2013 by David E. Wheeler.
+This software is copyright (c) 2012-2017 by David E. Wheeler.
 
 This is free software; you can redistribute it and/or modify it under the same
 terms as the Perl 5 programming language system itself.

@@ -61,5 +61,5 @@ resources:
   bugtracker: https://rt.cpan.org/Dist/Display.html?Name=Finance-Quote
   homepage: http://finance-quote.sourceforge.net/
   repository: git://github.com/finance-quote/finance-quote
-version: '1.43'
+version: '1.45'
 x_serialization_backend: 'YAML::Tiny version 1.70'

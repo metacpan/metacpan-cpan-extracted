@@ -1,0 +1,22 @@
+NAME
+    Task::FooThis - Export your directory over various channels
+
+VERSION
+    version 0.002
+
+TASK CONTENTS
+  Included modules
+   App::HTTPThis
+   App::HTTPSThis
+   App::DAVThis
+   App::FTPThis
+   App::CGIThis
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

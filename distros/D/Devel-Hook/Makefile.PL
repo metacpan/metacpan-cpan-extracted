@@ -24,7 +24,7 @@ WriteMakefile(
   ( $EUMM_VERSION >= 6.4501 ? (
         'META_MERGE' => {
             resources => {
-                repository => 'http://github.com/aferreira/cpan-WWW-CPAN',
+                repository => 'http://github.com/aferreira/cpan-Devel-Hook',
             },
             recommends => {
                 'Test::Pod'           => 1.18,

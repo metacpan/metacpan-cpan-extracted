@@ -42,3 +42,11 @@ Revision history for Perl module IO::Framed
 0.021 Sun Apr 9 2017
     - Again tweak the tests for MSWin: drop new_from_fd() since it hangs.
       (thank you to CHORNY for pointing out the problem!)
+
+0.03 Tue Jul 24 2017
+    - Deprecate the ReadWrite class; reassign that functionality to
+      the IO::Framed namespace.
+    - allow_empty_read() to make read() not throw EmptyRead on an empty read.
+
+0.031 Thu Nov 9 2017
+    - Fix up some documentation. No code changes.

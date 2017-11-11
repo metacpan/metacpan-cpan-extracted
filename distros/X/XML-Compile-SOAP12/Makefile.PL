@@ -2,7 +2,7 @@ use ExtUtils::MakeMaker;
 
 use 5.010;
 
-my $version = '3.04';
+my $version = '3.05';
 
 WriteMakefile
  ( NAME	 	=> 'XML::Compile::SOAP12'
@@ -28,17 +28,16 @@ WriteMakefile
 ### used by oodist during production of distribution
 sub MY::postamble { <<'__POSTAMBLE' }
 
-EXTENDS		= ../XMLCompile:../XMLSOAP:../XMLDaemon:../XMLTester
+EXTENDS         = ../XMLCompile:../XMLSOAP:../XMLDaemon:../XMLTester
 
 # for DIST
 RAWDIR          = ../public_html/xml-compile-soap12/raw
 DISTDIR         = ../public_html/xml-compile-soap12/source
-LICENSE         = artistic
-SKIP_LINKS	= XML::LibXML
+SKIP_LINKS      = XML::LibXML
 
 # for POD
 FIRST_YEAR      = 2009
-EMAIL           = perl@overmeer.net
+EMAIL           = markov@cpan.org
 WEBSITE         = http://perl.overmeer.net/xml-compile/
-PODTAIL		= ../XML-shared-podtail
+PODTAIL         = ../XML-shared-podtail
 __POSTAMBLE

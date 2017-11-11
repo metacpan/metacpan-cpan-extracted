@@ -109,6 +109,8 @@ t/216-SyncUpdates-Signed.t
 t/300-AFRINIC.t
 t/305-APNIC.t
 t/boilerplate.t
+t/bug-hostname-constructor.t
+t/bug-disconnect.t
 t/common.pl
 t/pod-coverage.t
 t/pod.t

@@ -1,0 +1,36 @@
+NAME
+
+    Win32::Shortkeys - A shortkeys perl script for windows
+
+VERSION
+
+    0.01
+
+INSTALLATION
+
+    To install Win32::Shortkeys, cd to the directory that contains this
+    file and type the following:
+
+       perl Makefile.PL
+       make
+       make test
+       make install
+
+    On windows use nmake or dmake instead of make.
+
+    To install this module into a specific directory, do: perl Makefile.PL
+    PREFIX=/name/of/the/directory ...the rest is the same...
+
+    Please also read the perlmodinstall man page, if available.
+
+DEPENDENCIES
+
+            Win32::Clipboard        0.58
+            Win32::Shortkeys::Kbh   0.01
+            Config::YAML::Tiny
+            Test::Simple    0.44
+            Encode  2.84
+            XML::Parser     2.44
+            Time::HiRes     1.9733
+            Carp    1.4
+

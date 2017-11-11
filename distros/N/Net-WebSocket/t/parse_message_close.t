@@ -10,7 +10,7 @@ plan tests => 3;
 
 use File::Temp;
 
-use IO::Framed::Read ();
+use IO::Framed ();
 
 use Net::WebSocket::Parser;
 
@@ -79,7 +79,7 @@ syswrite( $in_fh, $_->[0] ) for @tests;
 close $in_fh;
 
 open my $bfh, '<', $in_path;
-my $io = IO::Framed::Read->new($bfh);
+my $io = IO::Framed->new($bfh);
 my $parser = Net::WebSocket::Parser->new( $io );
 
 for my $t (@tests) {

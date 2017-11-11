@@ -1,0 +1,62 @@
+{
+   "abstract" : "a counter that signals when it reaches 0",
+   "author" : [
+      "Jeff Ober <sysread@fastmail.fm>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Coro-Countdown",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Coro" : "6.514",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "Devel::Cover" : "1.29",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "Test2" : "1.302106",
+            "Test2::Bundle::Extended" : "0.000083",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/sysread/Coro-Countdown/issues"
+      },
+      "homepage" : "https://github.com/sysread/Coro-Countdown",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/sysread/Coro-Countdown.git",
+         "web" : "https://github.com/sysread/Coro-Countdown"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::XS version 3.03"
+}
+

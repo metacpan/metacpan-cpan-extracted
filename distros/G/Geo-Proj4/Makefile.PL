@@ -3,7 +3,7 @@ use ExtUtils::MakeMaker;
 require 5.006;
 
 # increased per release
-my $relversion = '1.06';
+my $relversion = '1.07';
 
 my $libversion = '4.4.9';
 

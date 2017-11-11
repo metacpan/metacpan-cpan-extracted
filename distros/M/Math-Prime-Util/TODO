@@ -121,11 +121,9 @@
 - compare wheel_t with primes separated and possibly cached.
 
 - urandomm with bigints could be faster.
-  14.7s  my $f=factorial(144); urandomm($f) for 1..5e5;
-  10.7s  use Math::GMP qw/:constant/; my $f=factorial(144); urandomm($f) for 1..5e5;
+   8.2s  my $f=factorial(144); urandomm($f) for 1..5e5;
+   5.3s  use Math::GMP qw/:constant/; my $f=factorial(144); urandomm($f) for 1..5e5;
    1.8s  my $f=Math::Prime::Util::GMP::factorial(144); Math::Prime::Util::GMP::urandomm($f) for 1..5e5;
-
-- Move ISAAC to per-thread context model.
 
 - Destroy csprng context on thread destruction.
 
@@ -133,7 +131,12 @@
 
 - add back formultiperm optimization if we can get around lastfor issue.
 
-- istotient from Pari/GP.  We could be more ambitious and consider returning
-  the count and/or full list of totients.
-
 - make a uint128_t version of montmath.  Needs to handle 64-bit.
+
+- sieve_range does trial division
+
+- csrand and srand should be calling a util function to seed GMP csprng
+
+- prime_count_approx should give a proper integer result when given a
+  bigint input.  Currently it calls RiemannR which since bignum isn't on,
+  calls the XS RiemannR.  That starts truncating excessively past 10^23 ish.

@@ -1,5 +1,13 @@
 # Change Log
 
+## [1.003] - 2017-11-10
+### Added
+- Added a license file.
+
+### Fixed
+- Fixed remaining relative paths in unit tests. (Florian Schlichting,
+  CPAN #123578)
+
 ## [1.002] - 2017-10-27
 ### Added
 - Added support for TravisCI.
@@ -200,6 +208,8 @@
 ## 0.100
 Initial revision.
 
+[1.003]: https://github.com/mrogaski/Log-Agent/compare/v1.002...v1.003
+[1.002]: https://github.com/mrogaski/Log-Agent/compare/v1.001...v1.002
 [1.001]: https://github.com/mrogaski/Log-Agent/compare/v1.000...v1.001
 [1.000]: https://github.com/mrogaski/Log-Agent/compare/v0.308...v1.000
 [0.308]: https://github.com/mrogaski/Log-Agent/compare/rel_0_3_7...v0.308

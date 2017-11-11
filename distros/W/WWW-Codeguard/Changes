@@ -8,3 +8,8 @@ Revision history for WWW-Codeguard
         Added separate 'edit resource' calls in WWW::Codeguard::User
 0.03    Jul 31, 2015
         Moved show_database param website_id from required to optional.
+0.04    Nov 6, 2017
+        Added support for new Codeguard endpoints that allow for interacting with backups.
+        Added support for passing parameters through GET requests.
+0.05    Nov 7, 2017
+        Version bump

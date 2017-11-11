@@ -8,7 +8,7 @@ package Syntax::Keyword::Try;
 use strict;
 use warnings;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 use Carp;
 
@@ -293,6 +293,32 @@ sub import_into
 
    croak "Unrecognised import symbols @{[ keys %syms ]}" if keys %syms;
 }
+
+=head1 KNOWN BUGS
+
+=head2 Thread-safety at load time cannot be assured before perl 5.16
+
+On F<perl> versions 5.16 and above this module is thread-safe.
+
+On F<perl> version 5.14 this module is thread-safe provided that it is
+C<use>d before any additional threads are created.
+
+However, when using 5.14 there is a race condition if this module is loaded
+late in the program startup, after additional threads have been created. This
+leads to the potential for it to be started up multiple times concurrently,
+which creates data races when modifying internal structures and likely leads
+to a segmentation fault, either during load or soon after when more code is
+compiled.
+
+As a workaround, for any such program that creates multiple threads, loads
+additional code (such as dynamically-discovered plugins), and has to run on
+5.14, it should make sure to
+
+   use Syntax::Keyword::Try;
+
+early on in startup, before it spins out any additional threads.
+
+(See also L<https://rt.cpan.org/Public/Bug/Display.html?id=123547>)
 
 =head1 ACKNOWLEDGEMENTS
 

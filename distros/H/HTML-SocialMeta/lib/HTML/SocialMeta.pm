@@ -9,12 +9,12 @@ use MooX::LazierAttributes qw/lzy bld coe/;
 use MooX::ValidateSubs;
 use Coerce::Types::Standard qw/HTML Str Object StrToArray/;
 
-our $VERSION = '0.730004';
+our $VERSION = '0.740001';
 
 our %encode;
 BEGIN {
-        %encode = ( q{&} => q{&amp;}, q{"} => q{&quot;}, q{'} => q{&apos;}, q{<} => q{&lt;}, q{>} => q{&gt;} );
-        $encode{regex} = join "|", keys %encode;
+    %encode = ( q{&} => q{&amp;}, q{"} => q{&quot;}, q{'} => q{&apos;}, q{<} => q{&lt;}, q{>} => q{&gt;} );
+    $encode{regex} = join "|", keys %encode;
 }
 
 attributes(
@@ -44,6 +44,11 @@ sub required_fields {
 }
 
 sub _build_twitter {
+    my %args =  map {  defined $_[0]->$_ ? ( $_ => $_[0]->$_ ) : () }
+              qw/card_type site title description image image_alt url creator
+              operatingSystem app_country app_name app_id app_url
+              player player_width player_height/;
+    
     HTML::SocialMeta::Twitter->new(
         (
             map { defined $_[0]->$_ ? ( $_ => $_[0]->$_ ) : () }
@@ -84,7 +89,7 @@ HTML::SocialMeta - Module to generate Social Media Meta Tags,
 
 =head1 VERSION
 
-Version 0.730004
+Version 0.740001
 
 =head1 SYNOPSIS
 
@@ -95,15 +100,15 @@ Version 0.730004
         site_name => '',
         title => '',
         description => '',
-        image	=> '',
+        image    => '',
         fb_app_id => '',
-	    url  => '',  # optional
+        url  => '',
         ... => '',
         ... => '',
     );
 
-    # returns meta tags for all providers	
-    # additional options 'featured_image',  'app', 'player'   
+    # returns meta tags for all providers
+    # additional options 'featured_image',  'app', 'player'
     my $meta_tags = $social->create('summary');
 
     # returns meta tags specificly for a single provider
@@ -155,11 +160,11 @@ It generates all the required META data for the following Providers:
 
 This module currently allows you to generate the following meta cards:
 
-    $social->create()  $twitter->create_       $opengraph->create_  	
-    summary            summary                 thumbnail         	
-    featured_image     summary_large_image     article            	 
-    player             player                  video              	
-    app                app                     product             	                 
+    $social->create()  $twitter->create_       $opengraph->create_      
+    summary            summary                 thumbnail             
+    featured_image     summary_large_image     article                 
+    player             player                  video                  
+    app                app                     product                                  
 
 =head1 SUBROUTINES/METHODS
 
@@ -199,7 +204,7 @@ OPTIONAL - A text description of the image, for use by vision-impaired users
 
 =item url
 
-OPTIONAL OPENGRAPH - allows you to specify an alternative url link you want the reader to be redirected
+Required for OpenGraph. Allows you to specify an alternative url link you want the reader to be redirected
 
 =item player
 
@@ -253,7 +258,7 @@ It is designed to give the reader a preview of the content before clicking throu
     *-----------------------------------*
 
 Returns an instance for the summary card:
-	
+    
     $meta->create('summary');
     # call meta provider specifically
     $card->twitter->create_summary;
@@ -288,7 +293,7 @@ It is designed to give the reader a rich photo experience, clicking on the image
 
 Returns an instance for the featured image card:
 
-    $card->create('featured_image');	
+    $card->create('featured_image');    
     # call meta provider specifically
     $card->twitter->create_featured_image;
     $card->opengraph->create_article;
@@ -314,8 +319,8 @@ Optional Fields:
 The Player Card allows you to share Video clips and audio stream.
 
     ,-----------------------------------,
-    | Title                             |	
-    | link   				|
+    | Title                             |    
+    | link                              |
     | *-------------------------------* |
     | |                               | |
     | |                               | |
@@ -367,7 +372,7 @@ The App Card is a great way to represent mobile applications on Social Media Pla
 
 Return an instance for the provider specific app card:
 
-    $card->create('app);	
+    $card->create('app);    
     # call meta provider specifically
     $card->twitter->create_app;
     $card->opengraph->create_product;
@@ -392,7 +397,7 @@ Create the Meta Tags - this returns the meta information for all the providers:
     * Twitter
     * OpenGraph
     * Google
-	
+    
 You just need to specify the card type on create
 
     #'summary', 'featured_image', 'app', 'player'

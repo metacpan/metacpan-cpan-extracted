@@ -18,4 +18,5 @@ t/05_interval.t
 t/06_digitstring.t
 t/pod.t
 t/tests.pl
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

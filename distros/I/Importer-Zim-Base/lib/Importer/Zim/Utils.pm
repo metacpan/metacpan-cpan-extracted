@@ -1,6 +1,6 @@
 
 package Importer::Zim::Utils;
-$Importer::Zim::Utils::VERSION = '0.10.0';
+$Importer::Zim::Utils::VERSION = '0.12.0';
 # ABSTRACT: Utilities for Importer::Zim backends
 
 use 5.010001;
@@ -104,7 +104,7 @@ Importer::Zim::Utils - Utilities for Importer::Zim backends
 
 =head1 VERSION
 
-version 0.10.0
+version 0.12.0
 
 =head1 SYNOPSIS
 

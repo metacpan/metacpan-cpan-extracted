@@ -7,6 +7,11 @@
 #include "perl.h"
 #include "XSUB.h"
 
+#ifndef OP_CHECK_MUTEX_LOCK /* < 5.15.8 */
+#define OP_CHECK_MUTEX_LOCK ((void)0)
+#define OP_CHECK_MUTEX_UNLOCK ((void)0)
+#endif
+
 /* Before perl 5.22 these were not visible */
 
 #ifndef cv_clone
@@ -458,11 +463,21 @@ static int my_keyword_plugin(pTHX_ char *kw, STRLEN kwlen, OP **op)
 MODULE = Syntax::Keyword::Try    PACKAGE = Syntax::Keyword::Try
 
 BOOT:
-  next_keyword_plugin = PL_keyword_plugin;
-  PL_keyword_plugin = &my_keyword_plugin;
+  /* BOOT can potentially race with other threads (RT123547) */
 
-  XopENTRY_set(&xop_pushfinally, xop_name, "pushfinally");
-  XopENTRY_set(&xop_pushfinally, xop_desc,
-    "arrange for a CV to be invoked at scope exit");
-  XopENTRY_set(&xop_pushfinally, xop_class, OA_SVOP);
-  Perl_custom_op_register(aTHX_ &pp_pushfinally, &xop_pushfinally);
+  /* Perl doesn't really provide us a nice mutex for doing this so this is the
+   * best we can find. See also
+   *   https://rt.perl.org/Public/Bug/Display.html?id=132413
+   */
+  OP_CHECK_MUTEX_LOCK;
+  if(!next_keyword_plugin) {
+    next_keyword_plugin = PL_keyword_plugin;
+    PL_keyword_plugin = &my_keyword_plugin;
+
+    XopENTRY_set(&xop_pushfinally, xop_name, "pushfinally");
+    XopENTRY_set(&xop_pushfinally, xop_desc,
+      "arrange for a CV to be invoked at scope exit");
+    XopENTRY_set(&xop_pushfinally, xop_class, OA_SVOP);
+    Perl_custom_op_register(aTHX_ &pp_pushfinally, &xop_pushfinally);
+  }
+  OP_CHECK_MUTEX_UNLOCK;

@@ -1,6 +1,6 @@
 package Net::WebSocket;
 
-our $VERSION = '0.052';
+our $VERSION = '0.053';
 
 =encoding utf-8
 
@@ -30,10 +30,10 @@ Net::WebSocket - WebSocket in Perl
 
     #See below about IO::Framed
     my $parser = Net::WebSocket::Parser->new(
-        IO::Framed::Read->new($inet),
+        IO::Framed->new($inet),
     );
 
-    my $iof_w = IO::Framed::Write->new($inet);
+    my $iof_w = IO::Framed->new($inet);
 
     my $ept = Net::WebSocket::Endpoint::Client->new(
         parser => $parser,

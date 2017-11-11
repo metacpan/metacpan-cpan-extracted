@@ -18,13 +18,12 @@ my %module_build_args = (
     "Adriano Ferreira <ferreira\@cpan.org>"
   ],
   "dist_name" => "Importer-Zim-Lexical",
-  "dist_version" => "0.8.0",
+  "dist_version" => "0.10.0",
   "license" => "perl",
   "module_name" => "Importer::Zim::Lexical",
   "recursive_test_files" => 1,
   "requires" => {
-    "Importer::Zim::Base" => "v0.8.0",
-    "Importer::Zim::Utils" => "v0.8.0",
+    "Importer::Zim::Base" => "v0.12.0",
     "Sub::Inject" => "v0.2.0",
     "perl" => "5.018"
   },

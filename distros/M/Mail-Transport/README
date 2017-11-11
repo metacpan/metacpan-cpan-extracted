@@ -1,5 +1,5 @@
-=== README for Mail-Transport version 3.000
-=   Generated on Thu Feb  2 15:40:56 2017 by OODoc 2.02
+=== README for Mail-Transport version 3.001
+=   Generated on Wed Nov  8 13:06:25 2017 by OODoc 2.02
 
 There are various ways to install this module:
 
@@ -9,16 +9,16 @@ There are various ways to install this module:
  (2) if you use Windows, have a look at http://ppm.activestate.com/
 
  (3) if you have downloaded this module manually (as root/administrator)
-       gzip -d Mail-Transport-3.000.tar.gz
-       tar -xf Mail-Transport-3.000.tar
-       cd Mail-Transport-3.000
+       gzip -d Mail-Transport-3.001.tar.gz
+       tar -xf Mail-Transport-3.001.tar
+       cd Mail-Transport-3.001
        perl Makefile.PL
        make          # optional
        make test     # optional
        make install
 
 For usage, see the included manual-pages or
-    http://search.cpan.org/dist/Mail-Transport-3.000/
+    http://search.cpan.org/dist/Mail-Transport-3.001/
 
 Please report problems to
     http://rt.cpan.org/Dist/Display.html?Queue=Mail-Transport

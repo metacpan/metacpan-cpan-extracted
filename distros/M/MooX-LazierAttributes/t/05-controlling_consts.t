@@ -15,12 +15,24 @@ BEGIN {
 
     package Test::Control;
     use Moo;
-    use MooX::LazierAttributes qw/ro/;
-    attributes( foo => [ ro, {} ], );
+    use MooX::LazierAttributes { limit => 10 }, qw/ro dstr dhash darray lzy_str/;
+    attributes( 
+		foo => [ ro, {} ], 
+		lzs => [ {lzy_str} ],
+		ds => [ ro, {dstr} ],
+		dh => [ ro, {dhash} ],
+		da => [ ro, {darray} ]
+	);
 }
 
 my $o1 = Test::Control->new( foo => { a => 'b' } );
+use Data::Dumper;
+
 is_deeply($o1->foo, { a => 'b' }, "foo is deeply { a => 'b' }");
+is($o1->ds, '');
+is($o1->lzs, '');
+is_deeply($o1->dh, {});
+is_deeply($o1->da, []);
 
 eval '
 {

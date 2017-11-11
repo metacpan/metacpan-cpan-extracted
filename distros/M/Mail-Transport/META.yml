@@ -25,4 +25,4 @@ requires:
   List::Util: 0
   Mail::Reporter: 3
   Net::SMTP: 0
-version: 3.000
+version: 3.001

@@ -6,9 +6,10 @@ use Dist::Zilla::App -command;
 use strict;
 use warnings;
 use Moose;
+use Path::Tiny;
 use namespace::autoclean;
 
-our $VERSION = '0.90';
+our $VERSION = '0.91';
 
 with 'Dist::Zilla::Role::PotWriter';
 
@@ -49,11 +50,10 @@ sub validate_args {
 sub execute {
     my ( $self, $opt ) = @_;
 
-    require Path::Class;
     my $dzil     = $self->zilla;
     my $plugin   = $self->zilla->plugin_named('LocaleTextDomain')
         or $dzil->log_fatal('LocaleTextDomain plugin not found in dist.ini!');
-    my $pot_file = Path::Class::file($opt->{pot_file} || (
+    my $pot_file = path($opt->{pot_file} || (
         $plugin->lang_dir, $self->zilla->name . '.pot'
     ));
 
@@ -125,9 +125,13 @@ email address of the first distribution author, if available.
 
 David E. Wheeler <david@justatheory.com>
 
+=head1 Contributor
+
+Charles McGarvey <ccm@cpan.org>
+
 =head1 Copyright and License
 
-This software is copyright (c) 2012-2013 by David E. Wheeler.
+This software is copyright (c) 2012-2017 by David E. Wheeler.
 
 This is free software; you can redistribute it and/or modify it under the same
 terms as the Perl 5 programming language system itself.

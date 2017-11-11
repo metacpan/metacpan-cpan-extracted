@@ -7,10 +7,14 @@ build_requires:
   Alien::gmake: '0.11'
   Archive::Tar: '0'
   Config: '0'
+  HTML::LinkExtor: '0'
+  HTTP::Tiny: '0.044'
+  IO::Socket::SSL: '1.56'
   IO::Zlib: '0'
-  Net::FTP: '0'
+  Net::SSLeay: '1.49'
   Sort::Versions: '0'
   URI: '0'
+  URI::Escape: '0'
 configure_requires:
   Alien::Build: '0.66'
   Alien::Build::MM: '0.25'
@@ -43,7 +47,7 @@ resources:
   homepage: http://www.pcre.org
   license: http://dev.perl.org/licenses/
   repository: git://github.com/wbraswell/alien-pcre2.git
-version: '0.014000'
+version: '0.015000'
 x_alienfile:
   generated_by: 'Alien::Build::MM version 1.28'
   requires:
@@ -51,9 +55,13 @@ x_alienfile:
       Alien::gmake: '0.11'
       Archive::Tar: '0'
       Config: '0'
+      HTML::LinkExtor: '0'
+      HTTP::Tiny: '0.044'
+      IO::Socket::SSL: '1.56'
       IO::Zlib: '0'
-      Net::FTP: '0'
+      Net::SSLeay: '1.49'
       Sort::Versions: '0'
       URI: '0'
+      URI::Escape: '0'
     system: {}
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

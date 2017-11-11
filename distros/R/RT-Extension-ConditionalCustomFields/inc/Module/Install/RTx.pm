@@ -8,7 +8,7 @@ no warnings 'once';
 
 use Module::Install::Base;
 use base 'Module::Install::Base';
-our $VERSION = '0.37';
+our $VERSION = '0.39';
 
 use FindBin;
 use File::Glob     ();
@@ -49,14 +49,12 @@ sub RTx {
     $ENV{RTHOME} =~ s{/RT\.pm$}{} if defined $ENV{RTHOME};
     $ENV{RTHOME} =~ s{/lib/?$}{}  if defined $ENV{RTHOME};
     my @try = $ENV{RTHOME} ? ($ENV{RTHOME}, "$ENV{RTHOME}/lib") : ();
-    my $prefix = $ENV{PREFIX};
-    push @INC, "$prefix/lib";
     while (1) {
         my @look = @INC;
         unshift @look, grep {defined and -d $_} @try;
         push @look, grep {defined and -d $_}
             map { ( "$_/rt4/lib", "$_/lib/rt4", "$_/lib" ) } @prefixes;
-        last if eval {local @INC = @look; require RT; $RT::LocalPluginPath = '$(DESTDIR)'."$prefix/plugins"; $RT::LocalLibPath};
+        last if eval {local @INC = @look; require RT; $RT::LocalLibPath};
 
         warn
             "Cannot find the location of RT.pm that defines \$RT::LocalPath in: @look\n";
@@ -100,7 +98,7 @@ sub RTx {
     my %index = map { $_ => 1 } @INDEX_DIRS;
     $self->no_index( directory => $_ ) foreach grep !$index{$_}, @DIRS;
 
-    my $args = join ', ', map "q($_)", map { ($_, '$(DESTDIR)' . $path{$_}) }
+    my $args = join ', ', map "q($_)", map { ($_, "\$(DESTDIR)$path{$_}") }
         sort keys %path;
 
     printf "%-10s => %s\n", $_, $path{$_} for sort keys %path;
@@ -115,11 +113,29 @@ lexicons ::
 .
     }
 
+    my $remove_files;
+    if( $extra_args->{'remove_files'} ){
+        $self->include('Module::Install::RTx::Remove');
+        our @remove_files;
+        eval { require "etc/upgrade/remove_files" }
+          or print "No remove file located, no files to remove\n";
+        $remove_files = join ",", map {"q(\$(DESTDIR)$plugin_path/$name/$_)"} @remove_files;
+    }
+
     $self->include('Module::Install::RTx::Runtime') if $self->admin;
     $self->include_deps( 'YAML::Tiny', 0 ) if $self->admin;
     my $postamble = << ".";
 install ::
 \t\$(NOECHO) \$(PERL) -Ilib -I"$local_lib_path" -I"$lib_path" -Iinc -MModule::Install::RTx::Runtime -e"RTxPlugin()"
+.
+
+    if( $remove_files ){
+        $postamble .= << ".";
+\t\$(NOECHO) \$(PERL) -MModule::Install::RTx::Remove -e \"RTxRemove([$remove_files])\"
+.
+    }
+
+    $postamble .= << ".";
 \t\$(NOECHO) \$(PERL) -MExtUtils::Install -e \"install({$args})\"
 .
 
@@ -281,4 +297,4 @@ sub _load_rt_handle {
 
 __END__
 
-#line 430
+#line 468

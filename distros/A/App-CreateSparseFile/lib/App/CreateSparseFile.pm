@@ -1,7 +1,7 @@
 package App::CreateSparseFile;
 
-our $DATE = '2017-03-21'; # DATE
-our $VERSION = '0.07'; # VERSION
+our $DATE = '2017-11-10'; # DATE
+our $VERSION = '0.080'; # VERSION
 
 use 5.010001;
 use strict;
@@ -68,6 +68,9 @@ _
             test => 0,
             'x.doc.show_result' => 0, # to avoid having PWP:Rinci execute our function to get result
         },
+    ],
+    links => [
+        {url => 'prog:fallocate'},
     ],
 };
 sub create_sparse_file {
@@ -136,7 +139,7 @@ App::CreateSparseFile - Create sparse file
 
 =head1 VERSION
 
-This document describes version 0.07 of App::CreateSparseFile (from Perl distribution App-CreateSparseFile), released on 2017-03-21.
+This document describes version 0.080 of App::CreateSparseFile (from Perl distribution App-CreateSparseFile), released on 2017-11-10.
 
 =head1 SYNOPSIS
 
@@ -224,6 +227,11 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
+
+=head1 SEE ALSO
+
+
+L<fallocate>.
 
 =head1 AUTHOR
 

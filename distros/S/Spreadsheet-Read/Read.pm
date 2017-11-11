@@ -36,7 +36,7 @@ use 5.8.1;
 use strict;
 use warnings;
 
-our $VERSION = "0.74";
+our $VERSION = "0.75";
 sub  Version { $VERSION }
 
 use Carp;
@@ -328,9 +328,9 @@ sub _clipsheets {
 	while ($ss->{maxcol} and not
 		grep { defined && m/\S/ } @{$ss->{cell}[$ss->{maxcol}]}
 		) {
-	    (my $col = cr2cell ($ss->{maxcol}, 1)) =~ s/1$//;
-	    my $recol = qr{^$col(?=[0-9]+)$};
-	    delete $ss->{$_} for grep m/$recol/, keys %{$ss};
+	    if ($opt->{cells}) {
+		delete $ss->{cr2cell ($ss->{maxcol}, $_)} for 1..$ss->{maxrow};
+		}
 	    $ss->{maxcol}--;
 	    }
 	$ss->{maxcol} or $ss->{maxrow} = 0;
@@ -341,8 +341,9 @@ sub _clipsheets {
 		map  { $ss->{cell}[$_][$ss->{maxrow}] }
 		1 .. $ss->{maxcol}
 		)) {
-	    my $rerow = qr{^[A-Z]+$ss->{maxrow}$};
-	    delete $ss->{$_} for grep m/$rerow/, keys %{$ss};
+	    if ($opt->{cells}) {
+		delete $ss->{cr2cell ($_, $ss->{maxrow})} for 1..$ss->{maxcol};
+		}
 	    $ss->{maxrow}--;
 	    }
 	$ss->{maxrow} or $ss->{maxcol} = 0;
@@ -398,7 +399,8 @@ sub ReadData {
     my $_parser = _parser ($opt{parser});
 
     my $io_ref = ref ($txt) =~ m/GLOB|IO/ ? $txt : undef;
-    my $io_fil = $io_ref ? 0 : do { no warnings "newline"; -f $txt };
+    my $io_fil = $io_ref ? 0 : $txt =~ m/\0/ ? 0
+			     : do { no warnings "newline"; -f $txt };
     my $io_txt = $io_ref || $io_fil ? 0 : 1;
 
     $io_fil && ! -s $txt  and return;

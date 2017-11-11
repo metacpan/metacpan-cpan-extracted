@@ -1,10 +1,10 @@
 #
-# $Id: Simple.pm,v f95f896d91d6 2017/05/07 12:57:38 gomor $
+# $Id: Simple.pm,v 8db613a28727 2017/11/09 17:23:40 gomor $
 #
 package Net::Frame::Simple;
 use warnings; use strict;
 
-our $VERSION = '1.08';
+our $VERSION = '1.09';
 
 use Class::Gomor::Array;
 use Exporter;
@@ -12,6 +12,8 @@ our @ISA = qw(Class::Gomor::Array Exporter);
 our @EXPORT_OK = qw(
    $NoComputeLengths
    $NoComputeChecksums
+   $NoUnableToUnpackWarnings
+   $NoModuleNotFoundWarnings
 );
 our @AS = qw(
    raw
@@ -43,6 +45,8 @@ use Net::Frame::Layer::TCP;
 
 our $NoComputeLengths   = 0;
 our $NoComputeChecksums = 0;
+our $NoUnableToUnpackWarnings = 0;
+our $NoModuleNotFoundWarnings = 0;
 
 sub _gettimeofday {
    my ($sec, $usec) = gettimeofday();
@@ -84,7 +88,7 @@ sub unpack {
 
    my $encapsulate = $self->[$__firstLayer];
 
-   if ($encapsulate eq NF_LAYER_UNKNOWN) {
+   if (! $NoUnableToUnpackWarnings && $encapsulate eq NF_LAYER_UNKNOWN) {
       print("Unable to unpack frame from this layer type.\n");
       return undef;
    }
@@ -103,9 +107,11 @@ sub unpack {
       my $layer = 'Net::Frame::Layer::'.$encapsulate;
       eval "require $layer";
       if ($@) {
-         print("*** $layer module not found.\n".
-               "*** Either install it (if avail), or implement it.\n".
-               "*** You can also send the pcap file to perl\@gomor.org.\n");
+         if (! $NoModuleNotFoundWarnings) {
+            print("*** $layer module not found.\n".
+                  "*** Either install it (if avail), or implement it.\n".
+                  "*** You can also send the pcap file to perl\@gomor.org.\n");
+         }
          if ($prevLayer) {
             $prevLayer->nextLayer(NF_LAYER_NOT_AVAILABLE);
          }
@@ -123,7 +129,7 @@ sub unpack {
 
       last unless $encapsulate;
 
-      if ($encapsulate eq NF_LAYER_UNKNOWN) {
+      if (! $NoUnableToUnpackWarnings && $encapsulate eq NF_LAYER_UNKNOWN) {
          print("Unable to unpack next layer, not yet implemented in layer: ".
                "$n:@{[$l->layer]}\n");
          last;
@@ -397,9 +403,12 @@ Net::Frame::Simple - frame crafting made easy
    my $target = '192.168.0.1';
    my $port   = 22;
 
-   use Net::Frame::Simple;
+   use Net::Frame::Simple qw($NoUnableToUnpackWarnings $NoModuleNotFoundWarnings);
    use Net::Frame::Layer::IPv4;
    use Net::Frame::Layer::TCP;
+
+   $NoUnableToUnpackWarnings = 1;
+   $NoModuleNotFoundWarnings = 1;
 
    my $ip4 = Net::Frame::Layer::IPv4->new(
       src => $src,
@@ -500,11 +509,11 @@ When B<Net::Frame::Dump> B<next> method is called, and there is a frame waiting,
 
 =item B<computeLengths>
 
-This one hides the manual hassle of calling B<computeLengths> method for each layers. It takes no parameter, it will know internally what to do.
+This one hides the manual hassle of calling B<computeLengths> method for each layers. It takes no parameter, it will know internally what to do. You may set the global variable $NoComputeLengths to 1 to avoid computing lengths.
 
 =item B<computeChecksums>
 
-Same as above, but for checksums. you MUST call the previous one before this one.
+Same as above, but for checksums. you MUST call the previous one before this one. You may set the global variable $NoComputeChecksums to 1 to avoid computing checksums.
 
 =item B<pack>
 
@@ -512,7 +521,7 @@ Will pack all layers to to B<raw> attribute, ready to be sent to the network.
 
 =item B<unpack>
 
-Will unpack a raw string from the B<raw> attribute into respective layers.
+Will unpack a raw string from the B<raw> attribute into respective layers. By default, a warning will be displayed if unable to unpack the next layer. You may disable this message by setting the global variable $NoUnableToUnpackWarnings to 1. Furthermore, unpack() will try to load a module and print a warnings in case it is not able to load it. You may disable this message by setting the global variable $NoModuleNotFoundWarnings to 1.
 
 =item B<getKey>
 

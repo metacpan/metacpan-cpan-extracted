@@ -1,6 +1,6 @@
 package Map::Tube;
 
-$Map::Tube::VERSION   = '3.36';
+$Map::Tube::VERSION   = '3.37';
 $Map::Tube::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube - Lightweight Routing Framework.
 
 =head1 VERSION
 
-Version 3.36
+Version 3.37
 
 =cut
 
@@ -375,36 +375,41 @@ sub get_lines {
 =head2 get_stations($line_name)
 
 Returns ref to a list of objects of type L<Map::Tube::Node> for the C<$line_name>.
+If C<$line_name> is missing, it would return all stations in the map.
 
 =cut
 
 sub get_stations {
     my ($self, $line_name) = @_;
 
-    my @caller = caller(0);
-    @caller    = caller(2) if $caller[3] eq '(eval)';
-
-    Map::Tube::Exception::MissingLineName->throw({
-        method      => __PACKAGE__."::get_stations",
-        message     => "ERROR: Missing Line Name.",
-        filename    => $caller[1],
-        line_number => $caller[2] })
-        unless (defined $line_name);
-
-    my $line = $self->_get_line_object_by_name($line_name);
-    Map::Tube::Exception::InvalidLineName->throw({
-        method      => __PACKAGE__."::get_stations",
-        message     => "ERROR: Invalid Line Name [$line_name].",
-        filename    => $caller[1],
-        line_number => $caller[2] })
-        unless defined $line;
-
+    my $lines    = [];
     my $stations = [];
     my $seen     = {};
-    foreach (@{$line->{stations}}) {
-        unless (exists $seen->{$_->id}) {
-            push @$stations, $self->get_node_by_id($_->id);
-            $seen->{$_->id} = 1;
+
+    if (defined $line_name) {
+        my @caller = caller(0);
+        @caller    = caller(2) if $caller[3] eq '(eval)';
+
+        my $line = $self->_get_line_object_by_name($line_name);
+        Map::Tube::Exception::InvalidLineName->throw({
+            method      => __PACKAGE__."::get_stations",
+            message     => "ERROR: Invalid Line Name [$line_name].",
+            filename    => $caller[1],
+            line_number => $caller[2] })
+            unless defined $line;
+
+        $lines = [ $self->_get_line_object_by_name($line_name) ];
+    }
+    else {
+        $lines = $self->get_lines;
+    }
+
+    foreach my $line (@$lines) {
+        foreach my $station (@{$line->{stations}}) {
+            unless (exists $seen->{$station->id}) {
+                push @$stations, $self->get_node_by_id($station->id);
+                $seen->{$station->id} = 1;
+            }
         }
     }
 

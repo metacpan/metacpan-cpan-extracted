@@ -1,5 +1,40 @@
 Revision history for Perl module Math::Prime::Util
 
+0.69 2017-11-08
+
+    [ADDED]
+
+    - is_totient(n)                   true if euler_phi(x) == n for some x
+
+    [FUNCTIONALITY AND PERFORMANCE]
+
+    - is_square_free uses abs(n), like Pari and moebius.
+
+    - is_primitive_root could be wrong with even n on some platforms.
+
+    - euler_phi and moebius with negative range inputs weren't consistent.
+
+    - factorialmod given a large n and m where m was a composite with
+      large square factors was incorrect.  Fixed.
+
+    - numtoperm will accept negative k values (k is always mod n!)
+
+    - Split XS mapping of many primality tests.  Makes more sense and
+      improves performance for some calls.
+
+    - Split final test in PP cluster sieve.
+
+    - Support some new Math::Prime::Util::GMP functions from 0.47.
+
+    - C spigot Pi is 30-60% faster on x86_64 by using 32-bit types.
+
+    - Reworked some factoring code.
+
+    - Remove ISAAC (Perl and C) since we use ChaCha.
+
+    - Each thread allocs a new const array again instead of sharing.
+
+
 0.68 2017-10-19
 
     [API Changes]

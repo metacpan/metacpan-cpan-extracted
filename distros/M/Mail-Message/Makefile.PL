@@ -4,7 +4,7 @@ require 5.010;
 
 use IO::Handle;
 
-my $VERSION = '3.002';
+my $VERSION = '3.003';
 
 my @optional =
 ( 
@@ -166,7 +166,7 @@ EXTENDS			= ../UserIdentity:../MimeTypes:../ORL:../MailTools2:../MailBoxC:../Mai
 
 # for POD
 FIRST_YEAR      = 2001
-EMAIL           = perl@overmeer.net
+EMAIL           = markov@cpan.org
 WEBSITE         = http://perl.overmeer.net/mailbox/
 PODTAIL         = ../MailBox-shared-podtail
 

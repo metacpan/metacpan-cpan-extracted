@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: configure Dist::Zilla like RUSSOZ
-our $VERSION = '0.024';    # VERSION
+our $VERSION = '0.026';    # VERSION
 
 use Moose 0.99;
 use namespace::autoclean 0.09;
@@ -165,7 +165,7 @@ sub configure {
         $self->add_plugins('TaskWeaver');
     }
     else {
-        $self->add_plugins( 'ReportVersions::Tiny',
+        $self->add_plugins( 'Test::ReportPrereqs',
             [ 'PodWeaver' => { config_plugin => '@Author::RUSSOZ' }, ],
         );
 
@@ -179,6 +179,8 @@ sub configure {
     $self->add_plugins('Signature')   if $self->signature;
     $self->add_plugins('ReportPhase') if $self->report;
     $self->add_bundle('Git')          if $self->git;
+
+    $self->add_plugins('Git::Contributors');
 
     $self->add_plugins('ExtraTests');
 
@@ -202,7 +204,7 @@ Dist::Zilla::PluginBundle::Author::RUSSOZ - configure Dist::Zilla like RUSSOZ
 
 =head1 VERSION
 
-version 0.024
+version 0.026
 
 =head1 SYNOPSIS
 
@@ -261,7 +263,7 @@ Dist::Zilla::PluginBundle::Author::RUSSOZ - configure Dist::Zilla like RUSSOZ
 
 =head1 VERSION
 
-version 0.024
+version 0.026
 
 =head1 TASK CONTENTS
 

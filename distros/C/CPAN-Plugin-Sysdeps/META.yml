@@ -21,4 +21,4 @@ requires:
   perl: 5.006
 resources:
   repository: git://github.com/eserte/cpan-plugin-sysdeps.git
-version: 0.40
+version: 0.41

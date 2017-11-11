@@ -51,8 +51,8 @@ WriteMakefile(
     'MYEXTLIB'    => $opt->{'prefix'} . "/lib/libcego.$so* " 
 	      . $opt->{'prefix'} . "/lib/liblfcxml.$so* " 
 	      . $opt->{'prefix'} . "/lib/liblfcbase.$so",
-    "CC" => "c++",
-    "LD" => "c++",
+    "CC" => "clang++",
+    "LD" => "clang++",
     "XSPROTOARG" => "-noprototypes",
     'OPTIMIZE'      => '-O3 -DNDEBUG=1',
     'XSOPT'             => '-C++',

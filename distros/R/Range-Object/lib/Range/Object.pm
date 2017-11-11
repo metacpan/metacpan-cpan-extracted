@@ -22,7 +22,7 @@ use List::Util qw( first );
 # This is for compatibility with older Perls
 use vars qw( $VERSION );
 
-$VERSION = '0.93';
+$VERSION = '0.94';
 
 ### PUBLIC CLASS METHOD (CONSTRUCTOR) ###
 #
@@ -485,9 +485,10 @@ Range::Object - Basic facilities for manipulating different kinds of object rang
 
 =head1 SYNOPSIS
 
-This module is not to be used directly. See L<Range::Serial>,
-L<Range::Strings>, L<Range::Extension>, L<Range::DigitString>,
-L<Range::Date> and L<Range::Interval>.
+This module is not to be used directly. See L<Range::Object::Serial>,
+L<Range::Object::String>, L<Range::Object::Extension>,
+L<Range::Object::DigitString>, L<Range::Object::Date>, and
+L<Range::Object::Interval>.
 
 =head1 DESCRIPTION
 
@@ -644,13 +645,9 @@ or equal to ending value.
 There are no known bugs in this module. Please report problems to author,
 patches are welcome.
 
-=head1 AUTHOR
-
-Alexander Tokarev E<lt>tokarev@cpan.orgE<gt>.
-
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2011 by Alexander Tokarev.
+Copyright (c) 2011-2017 by Alex Tokarev E<lt>tokarev@cpan.orgE<gt>.
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself. See L<perlartistic>.

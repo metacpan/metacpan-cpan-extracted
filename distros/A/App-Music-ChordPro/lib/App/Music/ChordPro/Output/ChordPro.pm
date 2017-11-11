@@ -7,11 +7,24 @@ use warnings;
 
 use App::Music::ChordPro::Output::Common;
 
+my $re_meta;
+
 sub generate_songbook {
     my ($self, $sb, $options) = @_;
 
     # Skip empty songbooks.
     return [] unless eval { $sb->{songs}->[0]->{body} };
+
+    # Build regex for the known metadata items.
+    if ( $::config->{metadata}->{keys} ) {
+	$re_meta = '^(' .
+	  join( '|', map { quotemeta } @{$::config->{metadata}->{keys}} )
+	    . ')$';
+	$re_meta = qr/$re_meta/;
+    }
+    else {
+	undef $re_meta;
+    }
 
     my @book;
 
@@ -54,7 +67,7 @@ sub generate_song {
     if ( $s->{meta} ) {
 	foreach my $k ( sort keys %{ $s->{meta} } ) {
 	    next if $k =~ /^(?:title|subtitle)$/;
-	    if ( $variant eq 'msp' ) {
+	    if ( $variant eq 'msp' || $k =~ $re_meta ) {
 		push( @s, map { +"{$k: $_}" } @{ $s->{meta}->{$k} } );
 	    }
 	    else {
@@ -74,14 +87,28 @@ sub generate_song {
     # Move a trailing list of chords to the beginning, so the chords
     # are defined when the song is parsed.
     if ( @{ $s->{body} } && $s->{body}->[-1]->{type} eq "diagrams"
-	 && $s->{body}->[-1]->{origin} ne "__CLI__"
+    	 && $s->{body}->[-1]->{origin} ne "__CLI__"
        ) {
-	unshift( @{ $s->{body} }, pop( @{ $s->{body} } ) );
+    	unshift( @{ $s->{body} }, pop( @{ $s->{body} } ) );
+    }
+
+    if ( $s->{define} ) {
+	foreach my $info ( @{ $s->{define} } ) {
+	    my $t = "{define: " . $info->{name};
+	    $t .= " base-fret " . $info->{base};
+	    $t .= " frets " .
+	      join(" ", map { $_ < 0 ? "N" : $_ } @{$info->{frets}})
+		if $info->{frets};
+	    $t .= " fingers " .
+	      join(" ", map { $_ < 0 ? "N" : $_ } @{$info->{fingers}})
+		if $info->{fingers};
+	    push(@s, $t);
+	}
+	push(@s, "") if $tidy;
     }
 
     my $ctx = "";
     my $dumphdr = 1;
-    my @chorus;			# for chorus recall
 
     my @elts = @{$s->{body}};
     while ( @elts ) {
@@ -106,11 +133,7 @@ sub generate_song {
 		else {
 		    push(@s, "{start_of_$ctx}");
 		}
-		@chorus = ( $elt ) if $ctx eq "chorus";
 	    }
-	}
-	elsif ( $elt->{context} eq "chorus" ) {
-	    push( @chorus, $elt );
 	}
 
 	if ( $elt->{type} eq "empty" ) {
@@ -186,7 +209,7 @@ sub generate_song {
 		push( @s, "{chorus}" );
 	    }
 	    else {
-		unshift( @elts, @chorus );
+		unshift( @elts, @{ $elt->{chorus} } );
 	    }
 	    next;
 	}
@@ -222,7 +245,6 @@ sub generate_song {
 	    }
 	    push(@s, "") if $tidy;
 	    push(@s, "{$type: $text}");
-	    push(@chorus, "{$type: $text}") if $elt->{context} eq "chorus";
 	    push(@s, "") if $tidy;
 	    next;
 	}
@@ -257,6 +279,8 @@ sub generate_song {
 	    }
 	    elsif ( $elt->{name} eq "gridparams" ) {
 		@gridparams = @{ $elt->{value} };
+	    }
+	    elsif ( $elt->{name} eq "transpose" ) {
 	    }
 	    next;
 	}

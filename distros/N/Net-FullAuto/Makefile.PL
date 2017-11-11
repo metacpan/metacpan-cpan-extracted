@@ -26,7 +26,7 @@
 ################################################################
 
 
-our $VERSION='1.0000396';
+our $VERSION='1.0000397';
 
 
 if ($ENV{'AUTOMATED_TESTING'}) {
@@ -2077,6 +2077,7 @@ END
    &fa_install_module('Module::Pluggable','install','Makefile');
    &fa_install_module('Email::Abstract','install','Makefile');
    &fa_install_module('Email::Sender','install','Makefile');
+   &fa_install_module('URI::Escape::XS','install','Makefile');
    &fa_install_module('Data::Password::Check','install','Makefile');
    &fa_install_module('Crypt::GeneratePassword','install','Makefile');
 

@@ -1,0 +1,92 @@
+---
+"ConfigCascade::Test::RW_Widget": 
+
+    str_no_default: str_no_default from yaml value
+    str_has_default: str_has_default from yaml value
+    str_has_builder: str_has_builder from yaml value
+    str_lazy: str_lazy from yaml value
+
+
+    hash_no_default: 
+        hash_no_default from yaml key: hash_no_default from yaml value
+    hash_has_default: 
+        hash_has_default from yaml key: hash_has_default from yaml value
+    hash_has_builder: 
+        hash_has_builder from yaml key: hash_has_builder from yaml value
+    hash_lazy: 
+        hash_lazy from yaml key: hash_lazy from yaml value
+
+
+    array_no_default: 
+        - array_no_default from yaml value
+    array_has_default: 
+        - array_has_default from yaml value
+    array_has_builder: 
+        - array_has_builder from yaml value
+    array_lazy: 
+        - array_lazy from yaml value
+
+
+    bool_no_default: 1
+    bool_has_default: 1
+    bool_has_builder: 1
+    bool_lazy: 1
+
+
+    num_no_default: 1.2
+    num_has_default: 2.4
+    num_has_builder: 3.6
+    num_lazy: 4.8
+
+
+    int_no_default: 2
+    int_has_default: 4
+    int_has_builder: 6
+    int_lazy: 8
+
+
+"ConfigCascade::Test::RO_Widget":
+
+    str_no_default: str_no_default from yaml value
+    str_has_default: str_has_default from yaml value
+    str_has_builder: str_has_builder from yaml value
+    str_lazy: str_lazy from yaml value
+
+
+    hash_no_default: 
+        hash_no_default from yaml key: hash_no_default from yaml value
+    hash_has_default: 
+        hash_has_default from yaml key: hash_has_default from yaml value
+    hash_has_builder: 
+        hash_has_builder from yaml key: hash_has_builder from yaml value
+    hash_lazy: 
+        hash_lazy from yaml key: hash_lazy from yaml value
+
+
+    array_no_default: 
+        - array_no_default from yaml value
+    array_has_default: 
+        - array_has_default from yaml value
+    array_has_builder: 
+        - array_has_builder from yaml value
+    array_lazy: 
+        - array_lazy from yaml value
+
+
+    bool_no_default: 1
+    bool_has_default: 1
+    bool_has_builder: 1
+    bool_lazy: 1
+
+
+    num_no_default: 1.2
+    num_has_default: 2.4
+    num_has_builder: 3.6
+    num_lazy: 4.8
+
+
+    int_no_default: 2
+    int_has_default: 4
+    int_has_builder: 6
+    int_lazy: 8
+

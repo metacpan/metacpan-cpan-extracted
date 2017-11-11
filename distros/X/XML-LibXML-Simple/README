@@ -1,5 +1,5 @@
-=== README for XML-LibXML-Simple version 0.97
-=   Generated on Tue Apr 12 15:12:26 2016 by OODoc 2.02
+=== README for XML-LibXML-Simple version 0.98
+=   Generated on Wed Nov  8 10:39:34 2017 by OODoc 2.02
 
 There are various ways to install this module:
 
@@ -9,16 +9,16 @@ There are various ways to install this module:
  (2) if you use Windows, have a look at http://ppm.activestate.com/
 
  (3) if you have downloaded this module manually (as root/administrator)
-       gzip -d XML-LibXML-Simple-0.97.tar.gz
-       tar -xf XML-LibXML-Simple-0.97.tar
-       cd XML-LibXML-Simple-0.97
+       gzip -d XML-LibXML-Simple-0.98.tar.gz
+       tar -xf XML-LibXML-Simple-0.98.tar
+       cd XML-LibXML-Simple-0.98
        perl Makefile.PL
        make          # optional
        make test     # optional
        make install
 
 For usage, see the included manual-pages or
-    http://search.cpan.org/dist/XML-LibXML-Simple-0.97/
+    http://search.cpan.org/dist/XML-LibXML-Simple-0.98/
 
 Please report problems to
     http://rt.cpan.org/Dist/Display.html?Queue=XML-LibXML-Simple

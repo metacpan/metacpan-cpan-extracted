@@ -2,14 +2,15 @@
 # define V_MAJ	0
 # define V_MIN	85
 # define V_AUX	0
+# define BuildNum	27
 # define PUBLISHER "ChordPro.ORG"
 # define SRC	"C:\Users\Johan\Documents\ChordPro"
 # define DEST	"C:\Users\Johan\Documents\ChordPro"
 
 ; Increment the build number by one.
-#define BuildNum Int(ReadIni(SourcePath	+ "BuildInfo.ini","Info","Build","0"))
-#expr BuildNum = BuildNum + 1
-#expr WriteIni(SourcePath + "BuildInfo.ini","Info","Build", BuildNum)
+;#define BuildNum Int(ReadIni(SourcePath	+ "BuildInfo.ini","Info","Build","0"))
+;#expr BuildNum = BuildNum + 1
+;#expr WriteIni(SourcePath + "BuildInfo.ini","Info","Build", BuildNum)
 
 [Setup]
 AppID={{F8D1018C-AAE3-45E6-9447-5997F512F932}
@@ -20,7 +21,7 @@ AppPublisher={#PUBLISHER}
 DefaultDirName={pf}\{#PUBLISHER}\{#APP}
 DefaultGroupName=\{#PUBLISHER}\{#APP}
 OutputDir={#DEST}
-OutputBaseFilename={#APP}-{#V_MAJ}-{#V_MIN}-{#V_AUX}-{#BuildNum}-x64
+OutputBaseFilename={#APP}-GUI-installer-{#V_MAJ}-{#V_MIN}-{#V_AUX}-{#BuildNum}-msw-x64
 Compression=lzma/Max
 SolidCompression=true
 AppCopyright=Copyright (C) 2017 {#PUBLISHER}

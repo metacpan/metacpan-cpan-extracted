@@ -11,7 +11,7 @@ use lib '/Users/Felipe/code/p5-IO-SigGuard/lib';
 use IO::Socket::INET ();
 use IO::Select ();
 
-use IO::Framed::ReadWrite ();
+use IO::Framed ();
 
 use HTTP::Headers::Util ();
 
@@ -64,7 +64,7 @@ while ( my $sock = $server->accept() ) {
 
     NWDemo::set_signal_handlers_for_server($sock);
 
-    my $framed_obj = IO::Framed::ReadWrite->new($sock);
+    my $framed_obj = IO::Framed->new($sock);
     $framed_obj->enable_write_queue();
 
     my $parser = Net::WebSocket::Parser->new($framed_obj);

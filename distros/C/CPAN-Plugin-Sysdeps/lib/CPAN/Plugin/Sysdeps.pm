@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps;
 use strict;
 use warnings;
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 
 use Hash::Util 'lock_keys';
 use List::Util 'first';
@@ -651,7 +651,7 @@ distributions:
 
 =back
 
-Additionally, L<sudo(1)> is prepended before the installer programm if
+Additionally, L<sudo(8)> is prepended before the installer programm if
 the current user is not a privileged one, and the installer requires
 elevated privileges.
 
@@ -860,7 +860,7 @@ also L</Conflicting packages>). In F<CPAN/MyConfig.pm>:
   'plugin_list' => [q[CPAN::Plugin::Sysdeps=batch]],
 
 Installation of system packages requires root priviliges. Therefore
-the installer is run using L<sudo(1)> if the executing user is not
+the installer is run using L<sudo(8)> if the executing user is not
 root. To avoid the need to enter a password either make sure that
 running the installer program (C<apt-get> or so) is made password-less
 in the F<sudoers> file, or run a wrapper like

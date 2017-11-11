@@ -23,7 +23,7 @@ requires:
 resources:
   homepage: https://github.com/ByteFoundryAU/perl-WebService-HashiCorp-Vault
   repository: https://github.com/ByteFoundryAU/perl-WebService-HashiCorp-Vault.git
-version: '0.002'
+version: '0.004'
 x_author_pledge:
   version: 1
 x_serialization_backend: 'YAML::Tiny version 1.69'

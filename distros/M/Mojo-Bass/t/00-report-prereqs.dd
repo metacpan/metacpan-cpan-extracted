@@ -13,15 +13,13 @@ do { my $x = {
                       'requires' => {
                                       'Test::More' => '0',
                                       'Test::Pod' => '1.41',
+                                      'strict' => '0',
                                       'warnings' => '0'
                                     }
                     },
        'runtime' => {
                       'requires' => {
-                                      'Mojo::Base' => '0',
-                                      'Sub::Inject' => 'v0.2.0',
-                                      'perl' => '5.018',
-                                      'strict' => '0'
+                                      'Jojo::Base' => '0'
                                     }
                     },
        'test' => {
@@ -31,10 +29,9 @@ do { my $x = {
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
-                                   'FindBin' => '0',
                                    'Test::More' => '0.96',
-                                   'base' => '0',
-                                   'lib' => '0',
+                                   'perl' => '5.018',
+                                   'strict' => '0',
                                    'warnings' => '0'
                                  }
                  }

@@ -2,7 +2,7 @@
 
 makepp_builtins -- Builtin commands in makepp
 
-=for vc $Id: makepp_builtins.pod,v 1.56 2014/07/08 22:37:36 pfeiffer Exp $
+=for vc $Id: makepp_builtins.pod,v 1.57 2017/08/17 22:32:28 pfeiffer Exp $
 
 =head1 DESCRIPTION
 
@@ -798,7 +798,7 @@ not suited to files with lots of C<$>-signs, like Makefiles or scripts.
 L<Conditional statements|makepp_statements/Conditionals>, as well as the
 statements C<include>/C<_include> (which here neither build the file nor
 search upwards), C<perl>/C<makeperl>/C<perl_begin> or C<sub>/C<makesub>, or
-any statements you define within the file, are processed.  Empty and comment
+any statements you define within the file, are processed. Empty and comment
 lines are eliminated.
 
 But, instead of learning build rules, it will output all remaining lines after
@@ -833,6 +833,13 @@ might give:
 
     Empty expression prevents \
     backslash continuation from being recognized.
+
+B<Note:> Due to a limitation with the way builtins read from a file, other
+such builtins, e.g. C<$(&cat myfile)>, can't alas be nested in C<&preprocess>.
+If you run this as a body of a rule, due to the way Unix forks, a copy of the
+scheduler is available, so you could call C<$(&prebuild myfile)> – this can be
+dangerous, because the main scheduler won't know and might try the same thing
+in parallel, possibly leading to a clobbered file.
 
 L</Standard options>: C<-A, --args-file, --arguments-file=filename, -f, --force, -o,
 --output=filename, -O, --outfail, -S, --synclines, -v, --verbose>

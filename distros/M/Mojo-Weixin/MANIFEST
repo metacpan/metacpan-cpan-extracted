@@ -35,6 +35,7 @@ lib/Mojo/Weixin/Message/Base.pm
 lib/Mojo/Weixin/Message/Handle.pm
 lib/Mojo/Weixin/Message/Queue.pm
 lib/Mojo/Weixin/Message/Remote/_get_media.pm
+lib/Mojo/Weixin/Message/Remote/_revoke_message.pm
 lib/Mojo/Weixin/Message/Remote/_send_media_message.pm
 lib/Mojo/Weixin/Message/Remote/_send_text_message.pm
 lib/Mojo/Weixin/Message/Remote/_upload_media.pm
@@ -84,6 +85,7 @@ lib/Mojo/Weixin/Run.pm
 lib/Mojo/Weixin/Server.pm
 lib/Mojo/Weixin/User.pm
 lib/Mojo/Weixin/Util.pm
+LICENSE
 Makefile.PL
 MANIFEST			This list of files
 Plugin.md

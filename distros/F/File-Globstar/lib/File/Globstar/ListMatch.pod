@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-File::Globstar::ListMatch - List File Names Against List Of Patterns
+File::Globstar::ListMatch - Match File Names Against List Of Patterns
 
 =head1 SYNOPSIS
 

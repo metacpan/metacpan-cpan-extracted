@@ -13,11 +13,11 @@ WWW::Codeguard - Perl interface to interact with the Codeguard API
 
 =head1 VERSION
 
-Version 0.03
+Version 0.05
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 =head1 SYNOPSIS
 
@@ -264,6 +264,16 @@ sub _error {
 =head1 AUTHOR
 
 Rishwanth Yeddula, C<< <ryeddula at cpan.org> >>
+
+=head2 COMAINTAINERS
+
+=over 4
+
+=item David Oswald, C<< <davido@cpan.org> >>
+
+=item James Jacobson, C<< <shames@cpan.org> >>
+
+=back
 
 =head1 BUGS
 

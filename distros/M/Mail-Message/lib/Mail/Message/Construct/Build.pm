@@ -2,13 +2,13 @@
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
-
-use strict;
-
 package Mail::Message;
 use vars '$VERSION';
-$VERSION = '3.002';
+$VERSION = '3.003';
 
+
+use strict;
+use warnings;
 
 use Mail::Message::Head::Complete  ();
 use Mail::Message::Body::Lines     ();
@@ -17,8 +17,6 @@ use Mail::Message::Body::Nested    ();
 use Mail::Message::Field           ();
 
 use Mail::Address  ();
-
-use Scalar::Util   qw(reftype);
 
 
 sub build(@)
@@ -62,10 +60,10 @@ sub build(@)
         {   @data = Mail::Message::Body->new(data => $value) }
         elsif($key eq 'file' || $key eq 'files')
         {   @data = map Mail::Message::Body->new(file => $_)
-              , reftype $value eq 'ARRAY' ? @$value : $value;
+              , ref $value eq 'ARRAY' ? @$value : $value;
         }
         elsif($key eq 'attach')
-        {   foreach my $c (reftype $value eq 'ARRAY' ? @$value : $value)
+        {   foreach my $c (ref $value eq 'ARRAY' ? @$value : $value)
             {   defined $c or next;
                 push @data, ref $c && $c->isa('Mail::Message')
 		          ? Mail::Message::Body::Nested->new(nested => $c)

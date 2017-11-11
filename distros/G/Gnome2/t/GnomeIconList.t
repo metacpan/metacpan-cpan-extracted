@@ -11,7 +11,9 @@ use Test::More skip_all => "Seems to be broken", tests => TESTS;
 
 SKIP: {
   our $application;
-  do "t/TestBoilerplate";
+  do "./t/TestBoilerplate";
+  die $@ if $@;
+  die $! if $!;
 
   #############################################################################
 

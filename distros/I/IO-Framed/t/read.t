@@ -3,10 +3,14 @@ use warnings;
 
 use Test::More;
 
-plan tests => 7;
+plan tests => 9;
 
 use Socket;
 use IO::File ();    #so blocking() will work
+
+BEGIN {
+    unshift @INC, '../lib';
+}
 
 use IO::Framed::Read ();
 
@@ -42,6 +46,9 @@ close $w;
 
 eval { $rdr->read(2) };
 isa_ok( $@, 'IO::Framed::X::EmptyRead', 'error from read() on empty' ) or diag ( ref($@) ? "\$\@ type is ".ref($@) : "\$\@ is '$@'" );
+
+is( $rdr->allow_empty_read(), $rdr, 'allow_empty_read() returns the instance' );
+is( $rdr->read(2), q<>, 'allow_empty_read() works as expected' );
 
 close $r;
 

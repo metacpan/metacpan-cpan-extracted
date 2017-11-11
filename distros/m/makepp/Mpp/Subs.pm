@@ -1,4 +1,4 @@
-# $Id: Subs.pm,v 1.213 2016/09/06 19:59:07 pfeiffer Exp $
+# $Id: Subs.pm,v 1.214 2017/11/08 22:07:53 pfeiffer Exp $
 
 =head1 NAME
 
@@ -35,6 +35,7 @@ which ones are official.
 package Mpp::Subs;
 
 use strict qw(vars subs);
+use POSIX qw(:errno_h);
 
 use Mpp::Text qw(find_unquoted split_on_whitespace unquote unquote_split_on_whitespace format_exec_args);
 use Mpp::File;
@@ -1088,8 +1089,9 @@ sub f_relative_to {
 
 sub f_shell {
   my $str = &arg;
+  Mpp::print_profile( $str ) if $Mpp::profile;
   my( undef, $mkfile, $mkfile_line ) = @_; # Name the arguments.
-  Mpp::log SHELL => $str, $mkfile_line
+  Mpp::log SHELL => $str, ($mkfile_line ||= 'somewhere')
     if $Mpp::log_level;
 
   local %ENV;			# Pass all exports to the subshell.
@@ -1123,30 +1125,29 @@ sub f_shell {
 # (finally) seems to work.  I'm still not 100% clear on why some of the
 # other ones didn't.
 #
-    pipe my $pin, my $pout or die $_[2] || 'somewhere', ": can't make pipe--$!\n";
+    pipe my $pin, my $pout or die "$mkfile_line: can't make pipe--$!\n";
     my $proc_handle = new Mpp::Event::Process sub { # Wait for process to finish.
       #
       # This is the child process.  Redirect our standard output to the pipe.
       #
       close $pin;		# Don't read from the handle any more.
       close STDOUT;
-      open STDOUT,'>&', $pout or die $_[2] || 'somewhere', ": can't redirect stdout--$!\n";
+      open STDOUT,'>&', $pout or die "$mkfile_line: can't redirect stdout--$!\n";
       exec format_exec_args $str;
-      die $_[2] || 'somewhere', ": exec $str failed--$!\n";
+      die "$mkfile_line: exec $str failed--$!\n";
     }, ERROR => sub {
       warn "$mkfile_line: shell command `$str' returned `$_[0]'\n";
     };
 
     close $pout;		# In parent, get rid of the output handle.
-    my $n_errors_remaining = 3;
-    for (;;) {
-      my $n_chars = sysread $pin, my( $blk ), 8192; # Try to read.
-      unless( defined $n_chars ) { # An error on the read?
-	--$n_errors_remaining > 0 and next; # Probably "Interrupted system call".
-	die $_[2] || 'somewhere', ": read error--$!\n";
+    for(;;) {
+      if( my $n_chars = sysread $pin, my( $blk ), 8192 ) { # Try to read.
+	$shell_output .= $blk;
+      } elsif( defined $n_chars ) { # i.e. == 0
+	last;
+      } elsif( $! != EINTR && $! != EAGAIN ) {
+	die "$mkfile_line: read error--$!\n";
       }
-      last if $n_chars == 0;	# No characters read--other process closed pipe.
-      $shell_output .= $blk;
     }
     wait_for $proc_handle; 	# Should not really be necessary.
     close $pin;
@@ -1154,6 +1155,7 @@ sub f_shell {
   $shell_output =~ s/\r?\n/ /g	# Get rid of newlines.
     unless $Mpp::Makefile::s_define;
   $shell_output =~ s/\s+$//s;	# Strip out trailing whitespace.
+  Mpp::print_profile_end( $str ) if $Mpp::profile;
   $shell_output;
 }
 

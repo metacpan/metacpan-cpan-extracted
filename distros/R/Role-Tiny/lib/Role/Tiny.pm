@@ -6,8 +6,8 @@ sub _getstash { \%{"$_[0]::"} }
 use strict;
 use warnings;
 
-our $VERSION = '2.000005';
-$VERSION = eval $VERSION;
+our $VERSION = '2.000006';
+$VERSION =~ tr/_//d;
 
 our %INFO;
 our %APPLIED_TO;
@@ -19,6 +19,9 @@ our @ON_ROLE_CREATE;
 
 BEGIN {
   *_WORK_AROUND_BROKEN_MODULE_STATE = "$]" < 5.009 ? sub(){1} : sub(){0};
+  *_WORK_AROUND_HINT_LEAKAGE
+    = "$]" < 5.011 && !("$]" >= 5.009004 && "$]" < 5.010001)
+      ? sub(){1} : sub(){0};
   *_MRO_MODULE = "$]" < 5.010 ? sub(){"MRO/Compat.pm"} : sub(){"mro.pm"};
 }
 
@@ -34,15 +37,19 @@ sub Role::Tiny::__GUARD__::DESTROY {
 }
 
 sub _load_module {
-  (my $proto = $_[0]) =~ s/::/\//g;
-  $proto .= '.pm';
-  return 1 if $INC{$proto};
+  my ($module) = @_;
+  (my $file = "$module.pm") =~ s{::}{/}g;
+  return 1
+    if $INC{$file};
+
   # can't just ->can('can') because a sub-package Foo::Bar::Baz
   # creates a 'Baz::' key in Foo::Bar's symbol table
-  return 1 if grep !/::$/, keys %{_getstash($_[0])||{}};
+  return 1
+    if grep !/::\z/, keys %{_getstash($module)};
   my $guard = _WORK_AROUND_BROKEN_MODULE_STATE
-    && bless([ $proto ], 'Role::Tiny::__GUARD__');
-  require $proto;
+    && bless([ $file ], 'Role::Tiny::__GUARD__');
+  local %^H if _WORK_AROUND_HINT_LEAKAGE;
+  require $file;
   pop @$guard if _WORK_AROUND_BROKEN_MODULE_STATE;
   return 1;
 }
@@ -61,7 +68,7 @@ sub import {
   # in the symbol table and store their refaddrs (no need to forcibly
   # inflate constant subs into real subs) with a map to the coderefs in
   # case of copying or re-use
-  my @not_methods = (map { *$_{CODE}||() } grep !ref($_), values %$stash);
+  my @not_methods = map +(ref $_ eq 'CODE' ? $_ : ref $_ ? () : *$_{CODE}||()), values %$stash;
   @{$INFO{$target}{not_methods}={}}{@not_methods} = @not_methods;
   # a role does itself
   $APPLIED_TO{$target} = { $target => undef };
@@ -349,7 +356,7 @@ sub _concrete_methods_of {
       no strict 'refs';
       my $code = exists &{"${role}::$_"} ? \&{"${role}::$_"} : undef;
       ( ! $code or exists $not_methods->{$code} ) ? () : ($_ => $code)
-    } grep !ref($stash->{$_}), keys %$stash
+    } grep +(!ref($stash->{$_}) || ref($stash->{$_}) eq 'CODE'), keys %$stash
   };
 }
 

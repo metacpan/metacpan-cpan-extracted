@@ -87,6 +87,16 @@ sub get_write_queue_count {
     return 0 + @{ $self->{'_write_queue'} };
 }
 
+sub forget_write_queue {
+    my ($self) = @_;
+
+    my $count = @{ $self->{'_write_queue'} };
+
+    @{ $self->{'_write_queue'} } = ();
+
+    return $count;
+}
+
 #----------------------------------------------------------------------
 
 sub _write_now_then_callback {

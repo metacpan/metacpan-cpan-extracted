@@ -8,7 +8,9 @@ build_requires:
   File::Temp: '0'
   Git: '0'
   Module::Build: '0.28'
+  Pod::Coverage::TrustPod: '0'
   Test::More: '0'
+  Test::Perl::Critic: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   Module::Build: '0.28'
@@ -34,5 +36,5 @@ resources:
   bugtracker: https://github.com/gflohr/File-Globstar/issues
   homepage: http://www.guido-flohr.net/globstar-for-perl/
   repository: git://github.com/gflohr/File-Globstar.git
-version: '0.2'
+version: '0.3'
 x_serialization_backend: 'YAML::Tiny version 1.70'

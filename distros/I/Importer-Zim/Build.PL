@@ -18,11 +18,12 @@ my %module_build_args = (
     "Adriano Ferreira <ferreira\@cpan.org>"
   ],
   "dist_name" => "Importer-Zim",
-  "dist_version" => "0.7.0",
+  "dist_version" => "0.8.0",
   "license" => "perl",
   "module_name" => "Importer::Zim",
   "recursive_test_files" => 1,
   "requires" => {
+    "Importer::Zim::Base" => "v0.12.0",
     "Importer::Zim::Utils" => "v0.8.0",
     "Module::Runtime" => 0,
     "perl" => "5.010001",

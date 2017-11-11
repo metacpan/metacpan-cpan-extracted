@@ -1,11 +1,19 @@
+0.27   2017-11-09
+
+- Replaced MooseX::Params::Validate and MooseX::Types with
+  Params::ValidationCompiler and Specio. There are also some other internals
+  changes to improve performance in this release. Prompted by fREW
+  Schmidt. GitHub #9.
+
+
 0.26   2015-05-31
 
 - Fixes for Unicode characters when generating HTML. The Markdent::Simple::*
   classes now make sure that the scalar it returns containing HTML contains
   characters, not bytes. The Markdent::Handler::HTMLStream::* classes no
   longer entitize non-ASCII characters. Only control characters and HTML
-  reserved character (< > & ") are encoded as HTML entities. The problems with
-  Unicode handling were reported by Polina Shubha. GitHub PR #8.
+  reserved characters (< > & ") are encoded as HTML entities. The problems
+  with Unicode handling were reported by Polina Shubha. GitHub PR #8.
 
 - HTML blocks containing Unicode characters could cause the parser to die or
   warn. Reported by Polina Shubha. GitHub PR #8.
@@ -15,7 +23,7 @@
   issue #7.
 
 - The parsing of HTML entities was too greedy, so that something like
-  "&lt;word&gt;" would be parsed a sigle eneity, "lt;word&gt", which is
+  "&lt;word&gt;" would be parsed a single entity, "lt;word&gt", which is
   clearly wrong. Fixed by Polina Shubina. GitHub PR #3.
 
 - Accept Pandoc (1.12.3)-generated GitHub-format Markdown document style for

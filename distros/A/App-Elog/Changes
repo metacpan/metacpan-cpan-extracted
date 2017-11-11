@@ -1,5 +1,19 @@
 Revision history for App::Elog
 
+0.07  Tue Nov  7 18:00:47 CST 2017
+    - Documentation update
+    - Remove -d option
+    - Allow limits on access log statistics
+
+0.06  Tue Nov  7 13:01:30 CST 2017
+    - Choose log whose docroot matches CWD the most
+
+0.05  Fri Nov  3 13:13:25 CDT 2017
+    - Better graph labels
+
+0.04  Fri Nov  3 12:22:29 CDT 2017
+    - Arbitrary intervals on graphs
+
 0.03  Thu Nov  2 17:26:09 CDT 2017
     - Allow a limit to the -i command
 

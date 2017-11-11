@@ -3,85 +3,92 @@ package Markdent::Types::Internal;
 use strict;
 use warnings;
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 use IO::Handle;
 
-use MooseX::Types 0.20 -declare => [
-    qw(
-        BlockParserClass
-        BlockParserDialectRole
-        EventObject
-        ExistingFile
-        HandlerObject
-        HeaderLevel
-        NonEmptyArrayRef
-        OutputStream
-        PosInt
-        SpanParserClass
-        SpanParserDialectRole
-        TableCellAlignment
-        )
-];
+use Specio::Declare;
+use Specio::Library::Builtins;
 
-use MooseX::Types::Moose qw(
-    ArrayRef
-    ClassName
-    FileHandle
-    Int
-    Item
-    Object
-    Str
+use parent 'Specio::Exporter';
+
+declare(
+    'HeaderLevel',
+    parent => t('Int'),
+    inline => sub {"$_[1] >= 1 && $_[1] <= 6"},
+    message_generator =>
+        sub {"Header level must be a number from 1-6 (not $_)"},
 );
 
-#<<<
-subtype HeaderLevel,
-    as Int,
-    where { $_ >= 1 && $_ <= 6 },
-    message { "Header level must be a number from 1-6 (not $_)" };
+object_does_type(
+    'BlockParserDialectRole',
+    role => 'Markdent::Role::Dialect::BlockParser',
+);
 
-role_type BlockParserDialectRole, { role => 'Markdent::Role::Dialect::BlockParser' };
-
-subtype BlockParserClass,
-    as ClassName,
-    where { $_->can('does') && $_->does('Markdent::Role::BlockParser') };
-
-role_type SpanParserDialectRole, { role => 'Markdent::Role::Dialect::SpanParser' };
-
-subtype SpanParserClass,
-    as ClassName,
-    where { $_->can('does') && $_->does('Markdent::Role::SpanParser') };
-
-subtype EventObject,
-    as Object,
-    where { $_->can('does') && $_->does('Markdent::Role::Event') };
-
-subtype ExistingFile,
-    as Str,
-    where { -f $_ };
-
-subtype HandlerObject,
-    as Object,
-    where { $_->can('does') && $_->does('Markdent::Role::Handler') };
-
-subtype NonEmptyArrayRef,
-    as ArrayRef,
-    where { @{$_} >= 1 };
-
-subtype OutputStream,
-    as Item,
-    where {
-        FileHandle()->check($_)
-            || ( Object()->check($_) && $_->can('print') );
+declare(
+    'BlockParserClass',
+    parent => t('ClassName'),
+    inline => sub {
+        "$_[1]->can('does') && $_[1]->does('Markdent::Role::BlockParser')";
     },
-    message { 'The output stream must be a Perl file handle or an object with a print method' };
+);
 
-enum TableCellAlignment, [qw( left right center )];
+object_does_type(
+    'SpanParserDialectRole',
+    role => 'Markdent::Role::Dialect::SpanParser',
+);
 
-subtype PosInt,
-    as Int,
-    where { $_ >= 1 },
-    message { "The number provided ($_) is not a positive integer" };
-#>>>
+declare(
+    'SpanParserClass',
+    parent => t('ClassName'),
+    inline => sub {
+        "$_[1]->can('does') && $_[1]->does('Markdent::Role::SpanParser')";
+    },
+);
+
+declare(
+    'EventObject',
+    parent => t('Object'),
+    inline =>
+        sub {"$_[1]->can('does') && $_[1]->does('Markdent::Role::Event')"},
+);
+
+declare(
+    'ExistingFile',
+    parent => t('Str'),
+    inline => sub {"-f $_[1]"},
+);
+
+declare(
+    'HandlerObject',
+    parent => t('Object'),
+    inline =>
+        sub {"$_[1]->can('does') && $_[1]->does('Markdent::Role::Handler')"},
+);
+
+declare(
+    'NonEmptyArrayRef',
+    parent => t('ArrayRef'),
+    inline => sub {"@{$_[1]} >= 1"},
+);
+
+declare(
+    'OutputStream',
+    parent => t('Item'),
+    inline => sub {
+        sprintf(
+            <<'EOF', t('FileHandle')->inline_check( $_[1] ), t('Object')->inline_check( $_[1] ), $_[1] );
+( %s || %s ) && %s->can('print')
+EOF
+    },
+    message_generator => sub {
+        'The output stream must be a Perl file handle or an object with a print method';
+    },
+);
+
+enum(
+    'TableCellAlignment',
+    values => [qw( left right center )],
+);
 
 1;

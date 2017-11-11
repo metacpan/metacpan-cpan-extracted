@@ -10,6 +10,7 @@ notes/notes.org
 t/00_compile.t
 t/filter.t
 t/filter_by.t
+t/group.t
 t/group_by.t
 t/hash-filter_each.t
 t/hash-map_each.t

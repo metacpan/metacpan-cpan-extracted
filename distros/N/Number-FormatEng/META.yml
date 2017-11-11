@@ -1,6 +1,6 @@
 --- #YAML:1.0
-name:               Number::FormatEng
-version:            0.02
+name:               Number-FormatEng
+version:            0.03
 abstract:           Format a number using engineering notation
 author:
     - Gene Sullivan <gsullivan@cpan.org>

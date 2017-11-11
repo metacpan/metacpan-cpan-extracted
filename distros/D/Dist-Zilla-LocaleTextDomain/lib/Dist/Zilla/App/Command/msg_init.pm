@@ -5,14 +5,13 @@ package Dist::Zilla::App::Command::msg_init;
 use Dist::Zilla::App -command;
 use strict;
 use warnings;
-use Path::Class;
 use Dist::Zilla::Plugin::LocaleTextDomain;
 use Moose;
 use IPC::Run3;
 use File::Find::Rule;
 use namespace::autoclean;
 
-our $VERSION = '0.90';
+our $VERSION = '0.91';
 
 with 'Dist::Zilla::Role::PotFile';
 
@@ -99,7 +98,7 @@ sub execute {
     for my $lang (@{ $args }) {
         # Strip off encoding.
         (my $name = $lang) =~ s/[.].+$//;
-        my $dest = $lang_dir->file( $name . $lang_ext );
+        my $dest = $lang_dir->child( $name . $lang_ext );
         $plugin->log_fatal("$dest already exists") if -e $dest;
         run3 (
             [@cmd,  "--locale=$lang", '--output-file=' . $dest],
@@ -179,9 +178,13 @@ generate a temporary template file.
 
 David E. Wheeler <david@justatheory.com>
 
+=head1 Contributor
+
+Charles McGarvey <ccm@cpan.org>
+
 =head1 Copyright and License
 
-This software is copyright (c) 2012-2013 by David E. Wheeler.
+This software is copyright (c) 2012-2017 by David E. Wheeler.
 
 This is free software; you can redistribute it and/or modify it under the same
 terms as the Perl 5 programming language system itself.

@@ -1,0 +1,35 @@
+---
+abstract: 'Role::Tiny + lexical "with"'
+author:
+  - 'Adriano Ferreira <ferreira@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Module::Build: '0.28'
+  Test::More: '0.96'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Jojo-Role
+provides:
+  Jojo::Role:
+    file: lib/Jojo/Role.pm
+    version: v0.4.0
+requires:
+  Role::Tiny: '2.000005'
+  Sub::Inject: v0.3.0
+  experimental: '0'
+  perl: '5.018'
+resources:
+  bugtracker: https://github.com/aferreira/cpan-Jojo-Role/issues
+  homepage: https://github.com/aferreira/cpan-Jojo-Role
+  repository: https://github.com/aferreira/cpan-Jojo-Role.git
+version: 0.4.0
+x_contributors:
+  - 'Adriano Ferreira <a.r.ferreira@gmail.com>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

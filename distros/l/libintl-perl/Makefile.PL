@@ -226,9 +226,9 @@ WriteMakefile (
     META_MERGE		    => {
         recommends => { 'File::ShareDir' => 0 },
         resources  => {
-            homepage   => 'http://git.guido-flohr.net/projects/libintl-perl/',
-            bugtracker => 'http://rt.cpan.org/Public/Dist/Display.html?Name=libintl-perl',
-            repository => 'git://git.guido-flohr.net/perl/libintl-perl.git',
+            homepage   => 'http://www.guido-flohr.net/en/projects/',
+            bugtracker => 'https://github.com/gflohr/libintl-perl/issues',
+            repository => 'https://github.com/gflohr/libintl-perl.git',
         },
     },
     PL_FILES                => {},
@@ -245,14 +245,14 @@ sub MY::postamble {
         return '' if ! -e '.git';
 
         '
-all :: Credits ReleaseNotes README
+all :: Credits Changes README
 
 # Make search.cpan.org happy but still follow GNU standards:
 # # (Thanks to Graham Barr for the hint)
 Credits: THANKS
 	cat THANKS >$@
 
-ReleaseNotes: NEWS
+Changes: NEWS
 	cat NEWS >$@
 
 README: README.md

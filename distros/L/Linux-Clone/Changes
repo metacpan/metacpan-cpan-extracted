@@ -1,5 +1,11 @@
 Revision history for Perl extension Linux::Clone
 
+1.2  Tue Nov  7 19:15:11 CET 2017
+	- the CLONE constants wrongly acuqired a CLONE_ prefix, remove
+          it again (reported by Ryan Voots).
+	- use __has_include to check for existance of linux/kcmp.h, if the
+          compiler defines it in case there is a kernel/libc mismatch.
+
 1.1  Thu Nov  2 08:30:45 CET 2017
 	- added pivot_root.
         - added kcmp.

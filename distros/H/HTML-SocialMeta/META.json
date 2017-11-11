@@ -36,7 +36,7 @@
             "Coerce::Types::Standard" : "0.000004",
             "List::MoreUtils" : "0.33",
             "Moo" : "1.001001",
-            "MooX::LazierAttributes" : "1.03",
+            "MooX::LazierAttributes" : "1.06",
             "MooX::ValidateSubs" : "1.012001",
             "Type::Tiny" : "1.002000",
             "perl" : "5.006"
@@ -51,7 +51,7 @@
          "web" : "https://github.com/ThisUsedToBeAnEmail/HTML-SocialMeta"
       }
    },
-   "version" : "0.730004",
+   "version" : "0.740001",
    "x_contributors" : [
       "Robert Haliday <robh@cpan.org>",
       "Jason McIntosh (JMAC) <jmac@jmac.org>"

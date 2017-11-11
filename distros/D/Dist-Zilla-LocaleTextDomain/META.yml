@@ -4,7 +4,6 @@ author:
   - 'David E. Wheeler <david@justatheory.com>'
 build_requires:
   App::Cmd::Tester::CaptureExternal: '0'
-  Dist::Zilla::App::Tester: '0'
   Module::Build: '0.35'
   Test::DZil: '0'
   Test::File: '0'
@@ -14,7 +13,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   Module::Build: '0.35'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -39,12 +38,14 @@ requires:
   Moose: '0'
   Moose::Role: '0'
   Moose::Util::TypeConstraints: '0'
-  MooseX::Types::Path::Class: '0'
-  Path::Class: '0'
+  MooseX::Types::Path::Tiny: '0'
+  Path::Tiny: '0'
+  Text::ParseWords: '0'
   namespace::autoclean: '0'
   perl: v5.8.5
   strict: '0'
   warnings: '0'
 resources:
   repository: https://github.com/theory/dist-zilla-localetextdomain.git
-version: '0.90'
+version: '0.91'
+x_serialization_backend: 'YAML::Tiny version 1.70'

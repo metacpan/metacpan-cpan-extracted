@@ -1,0 +1,49 @@
+const wchar_t * T_WCHAR
+byte    T_U_CHAR
+INPUT
+T_WCHAR
+  //  $var = ($type)SvPV_nolen($arg)
+    {
+    Newz(0, $var, SvLEN($arg), wchar_t);
+    U8* src = (U8*) SvPV_nolen($arg);
+     wchar_t* dst = (wchar_t*) $var;
+     if (SvUTF8($arg)) {
+         STRLEN len;
+         while (*src) {
+            *dst++ = utf8_to_uvuni((U8*) src, &len);
+            //*dst++ = uvchr_to_urf8()
+            src += len;
+        }
+     } else {
+        while (*src) {
+            *dst++ = (wchar_t) *src++;
+        }
+
+    }
+    *dst = 0;
+    SAVEFREEPV($var);
+    }
+T_U_CHAR
+	$var = (unsigned char)SvUV($arg)
+
+OUTPUT
+T_WCHAR
+    //sv_setpv((SV*)$arg, $var);
+    {
+        wchar_t* src = (wchar_t*) $var;
+        U8* dst;
+        U8* d;
+        Newz(0, dst, 3 * wcslen(src), U8);
+        d = dst;
+        while (*src) {
+            d = uvuni_to_utf8(d, *src++);
+         }
+         *d = 0;
+
+        sv_setpv((SV*)$arg, (char*) dst);
+        sv_utf8_decode($arg);
+
+        Safefree(dst);
+    }
+T_U_CHAR
+	sv_setuv($arg, (UV)$var);

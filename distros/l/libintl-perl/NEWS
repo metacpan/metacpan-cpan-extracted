@@ -1,3 +1,11 @@
+Version 1.29 - 09 Aug 2017
+
+* Important: Fixed a bug that caused Locale::gettext_pp and 
+  Locale::gettext_dumb to not load .mo files with a revision
+  number of 0.1 not to be loaded 
+  (see https://github.com/gflohr/libintl-perl/issues/1)
+* New bug tracker address is https://github.com/gflohr/libintl-perl/issues
+
 Version 1.28 - 31 Aug 2017 
 
 * New class methods options(), keywords(), and flags() for

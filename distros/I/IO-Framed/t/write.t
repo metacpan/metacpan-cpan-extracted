@@ -75,7 +75,7 @@ is(
 
 is(
     $nbw->get_write_queue_count(),
-    2,
+    $wrote_1 ? 1 : 2,
     'get_write_queue_count() - when the queue is actually not empty',
 );
 

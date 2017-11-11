@@ -1,6 +1,6 @@
 use alienfile;
 
-#our $VERSION = 0.020_000;
+#our $VERSION = 0.021_000;
  
 plugin 'PkgConfig' => (
     # NEED ANSWER: which should we be using below?
@@ -12,8 +12,8 @@ plugin 'PkgConfig' => (
  
 share {
     plugin Download => (
-        url => 'ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/',
-#        url => 'https://wbraswell.github.io/pcre2-mirror/',  # DEV USE ONLY: pre-release mirror server
+#        url => 'ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/',  # ERROR: "Sorry, you may not have multiple connections."
+        url => 'https://wbraswell.github.io/pcre2-mirror/',  # GitHub mirror server
 
         filter => qr/^pcre2-.*\.tar\.gz$/,
 

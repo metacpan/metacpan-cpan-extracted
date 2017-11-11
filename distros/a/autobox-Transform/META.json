@@ -63,7 +63,7 @@
    "provides" : {
       "autobox::Transform" : {
          "file" : "lib/autobox/Transform.pm",
-         "version" : "1.029"
+         "version" : "1.031"
       }
    },
    "release_status" : "stable",
@@ -77,7 +77,7 @@
          "web" : "https://github.com/jplindstrom/p5-autobox-Transform"
       }
    },
-   "version" : "1.029",
+   "version" : "1.031",
    "x_authority" : "cpan:JOHANL",
    "x_contributors" : [
       "Johan Lindstrom <johan.lindstrom@broadbean.com>",

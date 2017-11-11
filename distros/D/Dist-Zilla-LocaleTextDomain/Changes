@@ -1,5 +1,15 @@
 Revision history for Perl extension Dist-Zilla-LocaleTextDomain
 
+0.91
+     - Switched to Path::Tiny. IMPORTANT: This is potentially a backwards
+       compatibility break for third-party plugin code that relies on certain
+       plugin attributes following the Class::Path API.
+     - Removed deprecation warnings in test related to Dist::Zilla 6.0
+       having switched from Class::Path to Path::Tiny.
+     - Added new attributes: xgettext_args, override_args, and join_existing.
+       These attributes allow greater customization over extraction.
+     - Added newer perls to Travis CI. Thanks to viviparous for the patch!
+
 0.90  2014-09-22T21:48:12Z
      - Updated docs to reflect proper ShareDir support in Locale::TextDomain
        v1.21 and higher.

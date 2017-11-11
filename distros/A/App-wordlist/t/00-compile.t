@@ -13,8 +13,8 @@ my @module_files = (
 );
 
 my @scripts = (
-    'bin/_wordlist',
-    'bin/wordlist'
+    'script/_wordlist',
+    'script/wordlist'
 );
 
 # no fake home requested

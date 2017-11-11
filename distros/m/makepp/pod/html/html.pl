@@ -2,7 +2,7 @@
 #
 # This script does the pod to html generation with some heavy massageing.
 #
-# $Id: html.pl,v 1.18 2015/08/09 16:24:51 pfeiffer Exp $
+# $Id: html.pl,v 1.21 2017/11/08 22:08:04 pfeiffer Exp $
 #
 
 #use Pod::Html ();		# Stole module to have consistent id-attributes.
@@ -2024,8 +2024,11 @@ BEGIN {
     };
 }
 
+use Mpp::Text;
+
 our @extra_files = <html/makepp.css html/makepp.js html/*.png>;
 
+our $sf_makepp = 'https://sourceforge.net/projects/makepp/';
 our $webroot ||= 'http://makepp.sourceforge.net/';
 our $docroot ||= '';
 our $docindex ||= 'index.html';
@@ -2115,24 +2118,28 @@ sub init {
     $prev = $_;
   }
 
+  my $snap = ($Mpp::Text::VERSION =~ /\.98\./) ? 'snapshots/' : '';
   @tabmeta =			# title, alt, href, img-src-base
    (['Makepp Homepage', 'Home', $webroot, 'home'],
     ['Frequently Asked Questions', 'FAQ', "${docroot}makepp_faq.html", 'faq'],
     [('Documentation') x 2, "${docroot}$docindex", 'doc'],
     [('Gallery') x 2, "${webroot}gallery/", 'gallery'],
 
-    [('Download') x 2, 'http://sourceforge.net/projects/makepp/files/2.1/snapshots/', 'download'],
-    ['Makepp on SourceForge', 'SourceForge', 'https://sourceforge.net/projects/makepp/', 'sourceforge'],
+    [('Download') x 2, "${sf_makepp}files/$Mpp::Text::BASEVERSION/$snap", 'download'],
+    ['Makepp on SourceForge', 'SourceForge', $sf_makepp, 'sourceforge'],
     ['Makepp on CPAN', 'CPAN', 'http://search.cpan.org/dist/makepp/', 'cpan']);
 }
 &init;
 
 
-our $sitesearch = '/2.1';
+our $sitesearch = "/$Mpp::Text::BASEVERSION";
 sub frame($$$) {
   my( $file, $tab ) = @_;
   my( $head, $body ) = split "\f", $_[2];
   die unless $body;
+
+  $body =~ s((<(?:(tt|code|pre|script|style).+?</\2|[^>]+)>)|&quot;(.+?)&quot;| -- ) {
+    $1 or $3 ? "&ldquo;$3&rdquo;" : " \x{2014} " }eg;
 
   my $tabs = '';
   for my $meta ( @tabmeta ) {
@@ -2200,7 +2207,7 @@ sub frame($$$) {
   </li>$nav
 </ul>
 </nav>
-<main>$body</main><div id='_clear'/></body></html>" ) {
+<main>$body</main></body></html>" ) {
     if( !$ret ) {		# compact html
       ($ret = $piece) =~ s/>\s+</></g;
     } else {

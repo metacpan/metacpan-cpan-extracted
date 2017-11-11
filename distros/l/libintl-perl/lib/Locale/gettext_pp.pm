@@ -627,7 +627,8 @@ sub __load_catalog
     	$hash_size, $hash_off) = 
     		unpack (($unpack x 6), substr $raw, 4, 24);
     
-    return unless $revision == 0; # Invalid revision number.
+    my $major = $revision >> 16;
+    return if $major != 0; # Invalid revision number.
     
     $domain->{revision} = $revision;
     $domain->{num_strings} = $num_strings;

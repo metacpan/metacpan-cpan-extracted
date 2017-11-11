@@ -1,6 +1,6 @@
 # NAME
 
-RT-Extension-ConditionalCustomFields - CF conditionned by the value of another CF
+RT::Extension::ConditionalCustomFields - CF conditionned by the value of another CF
 
 # DESCRIPTION
 

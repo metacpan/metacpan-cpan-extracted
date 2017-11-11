@@ -1,8 +1,10 @@
-package Dist::Zilla::Plugin::Author::Plicease::MakeMaker 2.23 {
+package Dist::Zilla::Plugin::Author::Plicease::MakeMaker 2.24 {
 
   use 5.014;
   use Moose;
   use namespace::autoclean;
+  use Perl::Tidy ();
+  use Dist::Zilla::Plugin::Author::Plicease ();
   use List::Util qw( first );
 
   # ABSTRACT: munge the AUTHOR section
@@ -31,8 +33,23 @@ package Dist::Zilla::Plugin::Author::Plicease::MakeMaker 2.23 {
     
     my $file = first { $_->name eq 'Makefile.PL' } @{ $self->zilla->files };
     my $mod  = first { $_->name eq 'inc/mymm.pl' } @{ $self->zilla->files };
-    
-    my @content = split /\n/, $file->content;
+
+    $DB::single = 1;
+    my @content = do {
+      my $in  = $file->content;
+      my $out = '';
+      my $err = '';
+      local @ARGV = ();
+      my $error = Perl::Tidy::perltidy(
+        source      => \$in,
+        destination => \$out,
+        stderr      => \$err,
+        perltidyrc  => Dist::Zilla::Plugin::Author::Plicease->dist_dir->child('perltidyrc')->stringify,
+      );
+      $self->log("perltidy: $_") for split /\n/, $err;
+      $self->log_fatal("perltidy failed!") if $error;
+      split /\n/, $out;
+    };
 
     # pet-peve1: remove blank lines between use
     {
@@ -61,7 +78,7 @@ package Dist::Zilla::Plugin::Author::Plicease::MakeMaker 2.23 {
         }
       }
     }
-    
+
     # pet-peve2: squeeze multiple blank lines
     {
       my @new;
@@ -86,7 +103,7 @@ package Dist::Zilla::Plugin::Author::Plicease::MakeMaker 2.23 {
       }
       @content = @new;
     }
-    
+
     if($mod)
     {
       my $last = pop @content;
@@ -95,7 +112,11 @@ package Dist::Zilla::Plugin::Author::Plicease::MakeMaker 2.23 {
         my @new;
         while(defined $content[0] && $content[0] !~ /\%FallbackPrereqs/)
         {
-          push @new, shift @content;
+          my $line = shift @content;
+        
+          $line =~ s/use ExtUtils::MakeMaker;/use ExtUtils::MakeMaker 6.64;/;
+        
+          push @new, $line;
         }
         
         if((eval $mod->content) && mymm->can('myWriteMakefile'))
@@ -110,9 +131,9 @@ package Dist::Zilla::Plugin::Author::Plicease::MakeMaker 2.23 {
         $self->log_fatal("unable to find WriteMakefile in Makefile.PL");
       }
     }
-    
+
     $file->content(join "\n", @content);
-    
+
     return;
   };
 
@@ -162,7 +183,7 @@ Dist::Zilla::Plugin::Author::Plicease::MakeMaker - munge the AUTHOR section
 
 =head1 VERSION
 
-version 2.23
+version 2.24
 
 =head1 SYNOPSIS
 

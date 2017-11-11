@@ -18,16 +18,17 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
+                                      'Importer::Zim::Base' => 'v0.12.0',
                                       'Importer::Zim::Utils' => 'v0.8.0',
                                       'Module::Runtime' => '0',
                                       'perl' => '5.010001',
                                       'warnings' => '0'
                                     },
                       'suggests' => {
-                                    'Importer::Zim::EndOfScope' => 'v0.2.0',
-                                    'Importer::Zim::Lexical' => 'v0.8.0',
-                                    'Importer::Zim::Unit' => 'v0.3.0'
-                                  }
+                                      'Importer::Zim::EndOfScope' => 'v0.2.0',
+                                      'Importer::Zim::Lexical' => 'v0.8.0',
+                                      'Importer::Zim::Unit' => 'v0.3.0'
+                                    }
                     },
        'test' => {
                    'recommends' => {

@@ -11,7 +11,9 @@ use Test::More tests => TESTS;
 
 SKIP: {
   our $application;
-  do "t/TestBoilerplate";
+  do "./t/TestBoilerplate";
+  die $@ if $@;
+  die $! if $!;
 
   skip("GnomeThumbnail is new in 2.0.6", 4)
     unless (Gnome2 -> CHECK_VERSION(2, 0, 6));

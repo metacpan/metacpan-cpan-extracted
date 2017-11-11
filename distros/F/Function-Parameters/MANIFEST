@@ -21,7 +21,6 @@ Makefile_PL_settings.plx
 MANIFEST
 MANIFEST.SKIP
 Parameters.xs
-README
 t/00-load.t
 t/01-compiles.t
 t/02-compiles.t
@@ -144,6 +143,7 @@ t/strict_3.fail
 t/strict_4.fail
 t/strict_5.fail
 t/threads.t
+t/threads2.t
 t/types_auto.t
 t/types_caller.t
 t/types_custom.t
@@ -162,3 +162,4 @@ t/unicode2.t
 xt/pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
+README                                   generated from Function::Parameters POD (added by maint/eumm-fixup.pl)

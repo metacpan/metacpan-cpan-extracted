@@ -1,6 +1,9 @@
 Revision history for Perl module Number::FormatEng
 
 
+0.03  Nov 7 2017
+      - Fixed RT bug #123532: Remove trailing zeroes after decimal (Bill Haller)
+
 0.02  Jul 30 2015
       - attempt to fix failing CPANTesters on 5.23.1/solaris
 

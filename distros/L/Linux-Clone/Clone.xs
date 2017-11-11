@@ -11,8 +11,14 @@
 #include <unistd.h>
 #include <sys/syscall.h>
 
+#ifdef __has_include
+  #if !__has_include("linux/kcmp.h") // use "" as GCC wrongly expands macros
+    #undef SYS_kcmp
+  #endif
+#endif
+
 #ifdef SYS_kcmp
-  #include <linux/kcmp.h>
+  #include "linux/kcmp.h"
   #define kcmp(pid1,pid2,type,idx1,idx2) \
     syscall (SYS_kcmp, (pid_t)pid1, (pid_t)pid2, \
              (int)type, (unsigned long)idx1, (unsigned long)idx2)
@@ -70,72 +76,73 @@ BOOT:
     const char *name;
     IV iv;
   } *civ, const_iv[] = {
-#   define const_iv(name) { # name, (IV)name },
+#   define const_iv(name)       { # name, (IV)name },
+#   define const_iv_clone(name) { # name, (IV) CLONE_ ## name },
 #   ifdef CLONE_FILES
-      const_iv (CLONE_FILES)
+      const_iv_clone (FILES)
 #   endif
 #   ifdef CLONE_FS
-      const_iv (CLONE_FS)
+      const_iv_clone (FS)
 #   endif
 #   ifdef CLONE_NEWNS
-      const_iv (CLONE_NEWNS)
+      const_iv_clone (NEWNS)
 #   endif
 #   ifdef CLONE_VM
-      const_iv (CLONE_VM)
+      const_iv_clone (VM)
 #   endif
 #   ifdef CLONE_THREAD
-      const_iv (CLONE_THREAD)
+      const_iv_clone (THREAD)
 #   endif
 #   ifdef CLONE_SIGHAND
-      const_iv (CLONE_SIGHAND)
+      const_iv_clone (SIGHAND)
 #   endif
 #   ifdef CLONE_SYSVSEM
-      const_iv (CLONE_SYSVSEM)
+      const_iv_clone (SYSVSEM)
 #   endif
 #   ifdef CLONE_NEWUTS
-      const_iv (CLONE_NEWUTS)
+      const_iv_clone (NEWUTS)
 #   endif
 #   ifdef CLONE_NEWIPC
-      const_iv (CLONE_NEWIPC)
+      const_iv_clone (NEWIPC)
 #   endif
 #   ifdef CLONE_NEWNET
-      const_iv (CLONE_NEWNET)
+      const_iv_clone (NEWNET)
 #   endif
 #   ifdef CLONE_PTRACE
-      const_iv (CLONE_PTRACE)
+      const_iv_clone (PTRACE)
 #   endif
 #   ifdef CLONE_VFORK
-      const_iv (CLONE_VFORK)
+      const_iv_clone (VFORK)
 #   endif
 #   ifdef CLONE_SETTLS
-      const_iv (CLONE_SETTLS)
+      const_iv_clone (SETTLS)
 #   endif
 #   ifdef CLONE_PARENT_SETTID
-      const_iv (CLONE_PARENT_SETTID)
+      const_iv_clone (PARENT_SETTID)
 #   endif
 #   ifdef CLONE_CHILD_CLEARTID
-      const_iv (CLONE_CHILD_CLEARTID)
+      const_iv_clone (CHILD_CLEARTID)
 #   endif
 #   ifdef CLONE_DETACHED
-      const_iv (CLONE_DETACHED)
+      const_iv_clone (DETACHED)
 #   endif
 #   ifdef CLONE_UNTRACED
-      const_iv (CLONE_UNTRACED)
+      const_iv_clone (UNTRACED)
 #   endif
 #   ifdef CLONE_CHILD_SETTID
-      const_iv (CLONE_CHILD_SETTID)
+      const_iv_clone (CHILD_SETTID)
 #   endif
 #   ifdef CLONE_NEWUSER
-      const_iv (CLONE_NEWUSER)
+      const_iv_clone (NEWUSER)
 #   endif
 #   ifdef CLONE_NEWPID
-      const_iv (CLONE_NEWPID)
+      const_iv_clone (NEWPID)
 #   endif
 #   ifdef CLONE_IO
-      const_iv (CLONE_IO)
+      const_iv_clone (IO)
 #   endif
 #   ifdef CLONE_NEWCGROUP
-      const_iv (CLONE_NEWCGROUP)
+      const_iv_clone (NEWCGROUP)
 #   endif
 #   ifdef SYS_kcmp
       const_iv (KCMP_FILE)

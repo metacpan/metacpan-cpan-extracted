@@ -30,6 +30,8 @@ WriteMakefile
 		    'App::Packager' => 1.420,
 		    'PDF::API2'   => 2.020,
 		    'Font::TTF'   => 1.04,
+		    'JSON::PP'	  => 2.27203,
+		    'Text::Balanced' => 2.0.0
 		   },
 
  CONFIGURE_REQUIRES => {
@@ -41,6 +43,8 @@ WriteMakefile
 
  TEST_REQUIRES  => {
 		    'Test::More'  => 0,
+		    'JSON::PP'	  => 2.27203,
+		    'Text::Balanced' => 2.0.0
 		   },
 
  META_MERGE => {
@@ -48,11 +52,8 @@ WriteMakefile
      resources => {
 	 license    => "http://dev.perl.org/licenses/",
 	 homepage   => "http://www.chordpro.org",
-	 repository => {
-	     web  => "https://github.com/sciurius/chordpro",
-	     url  => "git://github.com/sciurius/chordpro.git",
-	     type => "git",
-	 },
+	 repository => "https://github.com/sciurius/chordpro",
+	 bugtracker => "https://github.com/sciurius/chordpro/issues",
      },
      provides => {
 	 chordpro => { file => "script/chordpro",

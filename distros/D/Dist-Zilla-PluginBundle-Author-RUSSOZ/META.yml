@@ -60,5 +60,5 @@ requires:
 resources:
   homepage: https://github.com/russoz/Dist-Zilla-PluginBundle-Author-RUSSOZ
   repository: https://github.com/russoz/Dist-Zilla-PluginBundle-Author-RUSSOZ.git
-version: '0.024'
+version: '0.026'
 x_serialization_backend: 'YAML::Tiny version 1.70'

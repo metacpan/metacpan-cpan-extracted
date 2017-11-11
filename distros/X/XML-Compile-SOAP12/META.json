@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "XML-Compile-SOAP12",
    "no_index" : {
@@ -45,5 +45,5 @@
       }
    },
    "release_status" : "stable",
-   "version" : "3.04"
+   "version" : "3.05"
 }

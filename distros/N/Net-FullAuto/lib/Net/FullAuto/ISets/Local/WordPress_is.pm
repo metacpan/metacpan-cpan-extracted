@@ -38,9 +38,16 @@ require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw($select_wordpress_setup);
 
+my $url='get-wisdom.com';
+my $tit='Get-Wisdom.com';
+my $adu='Administrator';
+my $ade='Brian.Kelly@get-wisdom.com';
+my $avail_port='';
+
 use Net::FullAuto::Cloud::fa_amazon;
 use Net::FullAuto::FA_Core qw[$localhost];
 use File::HomeDir;
+use URI::Escape::XS qw/uri_escape/;
 my $home_dir=File::HomeDir->my_home;
 $home_dir||=$ENV{'HOME'}||'';
 $home_dir.='/';
@@ -54,9 +61,12 @@ my $configure_wordpress=sub {
    my $service_and_cert_password=$_[1]||'';
    my ($stdout,$stderr)=('','');
    my $handle=$localhost;my $connect_error='';
-   $handle->cwd('~');
-   my $userhome=$handle->cmd('pwd');
    my $sudo=($^O eq 'cygwin')?'':'sudo ';
+   $handle->cwd('~');
+   my $ip=$handle->cmd($sudo.
+         "ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*'");
+   $ip=~s/^.*?(\d+.\d+.\d+.\d+).*$/$1/s;
+   my $userhome=$handle->cmd('pwd');
    ($stdout,$stderr)=$handle->cmd("${sudo}perl -e \'use CPAN;".
       "CPAN::HandleConfig-\>load;print \$CPAN::Config-\>{build_dir}\'");
    $builddir=$stdout;
@@ -621,7 +631,6 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
        "sed -i \'s/%NL%/\'\"`echo \\\\\\n`/g\" ".
        "/usr/local/nginx/nginx.conf");
-   my $avail_port='';
    foreach my $port (443,444,445,443) {
       $avail_port=
       `true &>/dev/null </dev/tcp/127.0.0.1/$port && echo open || echo closed`;
@@ -630,6 +639,12 @@ END
       chomp($status);
       last if $status eq 'closed';
    }
+   $ad='client_max_body_size 10M;';
+   ($stdout,$stderr)=$handle->cmd($sudo.
+       "sed -i \'/octet-stream/i$ad\' /usr/local/nginx/nginx.conf");
+   my $ngx='/usr/local/nginx/nginx.conf';
+   $handle->cmd_raw(
+       "sed -i 's/\\(^client_max_body_size 10M;$\\\)/    \\1/' $ngx");
    ($stdout,$stderr)=$handle->cmd($sudo.
        "sed -i \'s/^        listen       80/        listen       ".
        "\*:$avail_port ssl default_server/\' /usr/local/nginx/nginx.conf");
@@ -721,6 +736,9 @@ END
             next;
          }
       }
+      ($stdout,$stderr)=$handle->cwd("~/WordPress/deps")
+      #($stdout,$stderr)=$handle->cmd($sudo.
+      #   "git clone https://github.com/letsencrypt/letsencrypt",'__display__');
    }
 }
    # https://shaunfreeman.name/compiling-php-7-on-centos/
@@ -743,6 +761,7 @@ END
             \  \ /\  \ / / _ \| '__/ _` | |_) | '__/ _ \/ __/ __|
              \  /  \  / | (_) | | | (_| |  __/| | |  __/\__ \__ \
               \/    \/   \___/|_|  \__,_|_|   |_|  \___||___/___/
+
 
 
          (WordPress is **NOT** a sponsor of the FullAuto© Project.)
@@ -856,59 +875,118 @@ END
    }
    $do=0;
    if ($do==1) {
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'mkdir -v /usr/local/php7','__display__');
-   ($stdout,$stderr)=$handle->cwd('~/WordPress/deps');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'git clone https://github.com/php/php-src.git','__display__');
-   ($stdout,$stderr)=$handle->cwd('php-src');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'git checkout PHP-7.0.2','__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      './buildconf --force','__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      './configure --prefix=/usr/local/php7 '.
-      '--with-config-file-path=/usr/local/php7/etc '.
-      '--with-config-file-scan-dir=/usr/local/php7/etc/conf.d '.
-      '--enable-bcmath '.
-      '--with-bz2 '.
-      '--with-curl '.
-      '--enable-filter '.
-      '--enable-fpm '.
-      '--with-gd '.
-      '--enable-gd-native-ttf '.
-      '--with-freetype-dir '.
-      '--with-jpeg-dir '.
-      '--with-png-dir '.
-      '--enable-intl '.
-      '--enable-mbstring '.
-      '--with-mcrypt '.
-      '--enable-mysqlnd '.
-      '--with-mysql-sock=/var/lib/mysql/mysql.sock '.
-      '--with-mysqli=mysqlnd '.
-      '--with-pdo-mysql=mysqlnd '.
-      '--with-pdo-sqlite '.
-      '--disable-phpdbg '.
-      '--disable-phpdbg-webhelper '.
-      '--enable-opcache '.
-      '--with-openssl '.
-      '--enable-simplexml '.
-      '--with-sqlite3 '.
-      '--enable-xmlreader '.
-      '--enable-xmlwriter '.
-      '--enable-zip '.
-      '--with-zlib','__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.'make -j2','__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.'make install','__display__'); 
-
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'mkdir -v /usr/local/php7','__display__');
+      ($stdout,$stderr)=$handle->cwd('~/WordPress/deps');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'git clone https://github.com/php/php-src.git','__display__');
+      ($stdout,$stderr)=$handle->cwd('php-src');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         'git checkout PHP-7.0.2','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         './buildconf --force','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         './configure --prefix=/usr/local/php7 '.
+         '--with-config-file-path=/usr/local/php7/etc '.
+         '--with-config-file-scan-dir=/usr/local/php7/etc/conf.d '.
+         '--enable-bcmath '.
+         '--with-bz2 '.
+         '--with-curl '.
+         '--enable-filter '.
+         '--enable-fpm '.
+         '--with-gd '.
+         '--enable-gd-native-ttf '.
+         '--with-freetype-dir '.
+         '--with-jpeg-dir '.
+         '--with-png-dir '.
+         '--enable-intl '.
+         '--enable-mbstring '.
+         '--with-mcrypt '.
+         '--enable-mysqlnd '.
+         '--with-mysql-sock=/var/lib/mysql/mysql.sock '.
+         '--with-mysqli=mysqlnd '.
+         '--with-pdo-mysql=mysqlnd '.
+         '--with-pdo-sqlite '.
+         '--disable-phpdbg '.
+         '--disable-phpdbg-webhelper '.
+         '--enable-opcache '.
+         '--with-openssl '.
+         '--enable-simplexml '.
+         '--with-sqlite3 '.
+         '--enable-xmlreader '.
+         '--enable-xmlwriter '.
+         '--enable-zip '.
+         '--with-zlib','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.'make -j2','__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.'make install','__display__'); 
+   }
    ($stdout,$stderr)=$handle->cmd($sudo.
       'cp -v /opt/cpanel/ea-php70/root/etc/php-fpm.d/www.conf.default '.
       '/opt/cpanel/ea-php70/root/etc/php-fpm.d/www.conf','__display__');
-   }
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "/etc/init.d/ea-php70-php-fpm start",'__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "wget --random-wait --progress=dot ".
+      "https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/".
+      'wp-cli.phar','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "chmod -v +x wp-cli.phar",'__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "mv -v wp-cli.phar /usr/local/bin/wp",'__display__');
    ($stdout,$stderr)=$handle->cwd('~');
    ($stdout,$stderr)=$handle->cmd($sudo.
       "chmod -Rv 777 WordPress",'__display__');
+   $ade=uri_escape($ade);
+   $service_and_cert_password=uri_escape($service_and_cert_password);
+   $tit=uri_escape($tit);
+   $adu=uri_escape($adu); 
+   $url=uri_escape($url);
+   my $cmd="sudo wget -d -qO- --random-wait --wait=3 ".
+       "--no-check-certificate --post-data='weblog_title=".
+       $tit."&user_name=".$adu."&admin_password=".
+       $service_and_cert_password."&pass1-text=".
+       $service_and_cert_password."&admin_password2=".
+       $service_and_cert_password."&admin_email=".$ade.
+       "&Submit=Install+WordPress&language=' https://".
+       $ip.":".$avail_port."/wp-admin/install.php?step=2";
+   ($stdout,$stderr)=$handle->cmd($cmd);
+$do=1;
+if ($do) {
+   my @wp_plugins = qw(
 
+         all-in-one-wp-migration
+         better-recent-comments
+         contact-form-7
+         maxbuttons
+         meks-easy-ads-widget
+         meks-flexible-shortcodes
+         meks-simple-flickr-widget
+         meks-smart-author-widget
+         meks-smart-social-widget
+         meks-themeforest-smart-widget
+         read-more-without-refresh
+         text-hover
+         jetpack
+         read-more-without-refresh
+         text-hover
+         woocommerce
+         woocommerce-gateway-paypal-powered-by-braintree
+         woocommerce-services
+         woocommerce-gateway-stripe
+         wp-to-twitter
+         wordpress-seo
+
+   );
+   ($stdout,$stderr)=$handle->cwd("WordPress/wordpress");
+   foreach my $plugin (@wp_plugins) {
+      ($stdout,$stderr)=$handle->cmd(
+         "/usr/local/bin/wp plugin install $plugin --allow-root --activate",
+         '__display__');
+   }
+   ($stdout,$stderr)=$handle->cmd(
+      "/usr/local/bin/wp plugin install ultimate-member --allow-root",
+      '__display__');
+}
    #($stdout,$stderr)=$handle->cmd($sudo.
    #   "sudo rsync -avP ~/wordpress/ /var/www/html/",'__display__');
    #($stdout,$stderr)=$handle->cmd($sudo.
@@ -1069,6 +1147,8 @@ END
          die if -1<index $word,'*';
          die if -1<index $word,'$';
          die if -1<index $word,'+';
+         die if -1<index $word,'&';
+         die if -1<index $word,'/';
          return $word;
       };
       alarm 0;

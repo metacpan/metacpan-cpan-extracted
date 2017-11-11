@@ -1,5 +1,9 @@
 Revision history for net-whois-ripe
 
+2.006002    2017-11-7
+        -  Fix a weird bug in Net::Whois::Generif::disconnect() occuring with older Perl versions (reproduced on 5.12)
+           Thanks to all the CPAN testers for their reports!!!
+
 2.006001    2017-11-2
         -  Fix bug when hostname was used in constructor
         -  Dirty workaround to handle RADB until a complete handling is written

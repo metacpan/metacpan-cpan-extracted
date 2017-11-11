@@ -7,7 +7,7 @@ use Test::More tests => 30;
 BEGIN { use_ok('Number::FormatEng', qw(format_eng)) }
 
 # Check module version number
-BEGIN { use_ok('Number::FormatEng', '0.02') }
+BEGIN { use_ok('Number::FormatEng', '0.03') }
 
 is(format_eng(99)           , '99');
 is(format_eng(99999)        , '99.999e3');

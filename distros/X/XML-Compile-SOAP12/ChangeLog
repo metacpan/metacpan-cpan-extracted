@@ -4,6 +4,12 @@
 explain differences in WSDL
 http://schemas.xmlsoap.org/wsdl/soap12/soap12WSDL.html
 
+version 3.05: Wed  8 Nov 10:21:12 CET 2017
+
+	Fixes:
+	- server does not send error correctly.
+	  rt.cpan.org#116445 [Mohamad Hallal]
+
 version 3.04: Wed  9 Dec 12:12:20 CET 2015
 
 	Fixes:

@@ -13,7 +13,7 @@ use Math::Prime::Util qw/ prime_get_config
 
 BEGIN {
   $Math::Prime::Util::RandomPrimes::AUTHORITY = 'cpan:DANAJ';
-  $Math::Prime::Util::RandomPrimes::VERSION = '0.68';
+  $Math::Prime::Util::RandomPrimes::VERSION = '0.69';
 }
 
 BEGIN {
@@ -380,11 +380,19 @@ sub random_prime {
   my($low,$high) = @_;
   return if $high < 2 || $low > $high;
 
-  # Tighten the range to the nearest prime.
-  $low = ($low <= 2)  ?  2  :  next_prime($low-1);
-  $high = ($high == ~0) ? prev_prime($high) : prev_prime($high + 1);
-  return $low if ($low == $high) && is_prob_prime($low);
-  return if $low >= $high;
+  if ($high-$low > 1000000000) {
+    # Range is large, just make them odd if needed.
+    $low = 2 if $low < 2;
+    $low++ if $low > 2 && ($low % 2) == 0;
+    $high-- if ($high % 2) == 0;
+  } else {
+    # Tighten the range to the nearest prime.
+    $low = ($low <= 2)  ?  2  :  next_prime($low-1);
+    $high = ($high == ~0) ? prev_prime($high) : prev_prime($high + 1);
+    return $low if ($low == $high) && is_prob_prime($low);
+    return if $low >= $high;
+    # At this point low and high are both primes, and low < high.
+  }
 
   # At this point low and high are both primes, and low < high.
   return $_random_prime->($low, $high);
@@ -916,7 +924,7 @@ Math::Prime::Util::RandomPrimes - Generate random primes
 
 =head1 VERSION
 
-Version 0.68
+Version 0.69
 
 
 =head1 SYNOPSIS

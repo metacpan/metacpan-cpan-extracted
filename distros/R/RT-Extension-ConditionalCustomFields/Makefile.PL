@@ -2,7 +2,7 @@ use inc::Module::Install;
 use utf8;
 
 RTx 'RT-Extension-ConditionalCustomFields';
-license 'gplv3';
+license 'gpl_3';
 repository 'https://github.com/gibus/RT-Extension-ConditionalCustomFields';
 
 requires_rt('4.2.0');

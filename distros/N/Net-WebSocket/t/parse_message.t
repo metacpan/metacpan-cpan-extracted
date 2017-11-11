@@ -13,7 +13,7 @@ use Test::Deep;
 use File::Slurp;
 use File::Temp;
 
-use IO::Framed::ReadWrite::Blocking ();
+use IO::Framed ();
 
 plan tests => 6;
 
@@ -62,7 +62,7 @@ my @tests = (
         sub {
             open my $read_out_fh, '<', $out_path;
 
-            my $io = IO::Framed::ReadWrite::Blocking->new($read_out_fh);
+            my $io = IO::Framed->new($read_out_fh);
             my $out_parser = Net::WebSocket::Parser->new( $io );
 
             cmp_deeply(
@@ -111,7 +111,7 @@ my @tests = (
 
             open my $read_out_fh, '<', $out_path;
 
-            my $io = IO::Framed::ReadWrite::Blocking->new($read_out_fh);
+            my $io = IO::Framed->new($read_out_fh);
             my $out_parser = Net::WebSocket::Parser->new( $io );
 
             my $resp = $out_parser->get_next_frame();
@@ -144,7 +144,7 @@ open my $out_fh, '>>', $out_path;
 
 $out_fh->blocking(1);
 
-my $io = IO::Framed::ReadWrite::Blocking->new( $full_read_fh, $out_fh );
+my $io = IO::Framed->new( $full_read_fh, $out_fh );
 
 my $parser = Net::WebSocket::Parser->new( $io );
 

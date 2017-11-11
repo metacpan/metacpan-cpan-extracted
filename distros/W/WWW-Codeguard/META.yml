@@ -2,14 +2,17 @@
 abstract: 'Perl interface to interact with the Codeguard API'
 author:
   - 'Rishwanth Yeddula <ryeddula@cpan.org>'
+  - 'David Oswald <davido@cpan.org>'
+  - 'James Jacobson <shames@cpan.org>'
 build_requires:
   JSON: '0'
+  Test::MockModule: '0'
   Test::More: '0'
   parent: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,7 +28,8 @@ requires:
   LWP::UserAgent: '0'
   Net::OAuth: '0'
   parent: '0'
-  perl: '5.006'
+  perl: '5.008009'
 resources:
-  repository: https://github.com/ryeddula/www-codeguard.git
-version: '0.03'
+  repository: https://github.com/daoswald/www-codeguard.git
+version: '0.05'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

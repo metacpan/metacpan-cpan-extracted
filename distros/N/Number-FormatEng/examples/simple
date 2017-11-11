@@ -11,7 +11,7 @@ use strict;
 
 use Number::FormatEng qw(format_eng format_pref);
 
-my @numbers = qw(1234 0.00057 -1e14 0.00 1 9876e64 123456789012345678);
+my @numbers = qw(1234 0.00057 -1e14 0.00 1 9876e64 123456789012345678 2308);
 
 for (@numbers) {
     printf "%20s  -->  %-20s\n", $_, format_eng($_);

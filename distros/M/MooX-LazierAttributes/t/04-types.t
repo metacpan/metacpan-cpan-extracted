@@ -17,7 +17,6 @@ my $basics = t::odea::BasicTypes->new;
 
 ok($basics->thing('okay'));
 is($basics->thing, 'okay');
-
 eval { $basics->thing({ ohhh => 'noooo' }) };
 my $error = $@;
 my $expected_error = 'Reference {"ohhh" => "noooo"} did not pass type constraint "Str" (in $self->{"thing"})';
@@ -35,5 +34,4 @@ is_deeply($basics->okay, { three => 'four' }, "okay was set");
 is_deeply($basics->another, { }, "lazy hash");
 
 isa_ok($basics->object, 'Thing');
-
 done_testing();

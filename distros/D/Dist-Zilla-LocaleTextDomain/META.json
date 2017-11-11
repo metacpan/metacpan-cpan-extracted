@@ -4,13 +4,13 @@
       "David E. Wheeler <david@justatheory.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Dist-Zilla-LocaleTextDomain",
    "prereqs" : {
@@ -23,6 +23,11 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
             "Module::Build" : "0.35"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0"
          }
       },
       "runtime" : {
@@ -45,8 +50,9 @@
             "Moose" : "0",
             "Moose::Role" : "0",
             "Moose::Util::TypeConstraints" : "0",
-            "MooseX::Types::Path::Class" : "0",
-            "Path::Class" : "0",
+            "MooseX::Types::Path::Tiny" : "0",
+            "Path::Tiny" : "0",
+            "Text::ParseWords" : "0",
             "namespace::autoclean" : "0",
             "perl" : "v5.8.5",
             "strict" : "0",
@@ -56,7 +62,6 @@
       "test" : {
          "requires" : {
             "App::Cmd::Tester::CaptureExternal" : "0",
-            "Dist::Zilla::App::Tester" : "0",
             "Test::DZil" : "0",
             "Test::File" : "0",
             "Test::File::Contents" : "0",
@@ -72,6 +77,7 @@
          "web" : "https://github.com/theory/dist-zilla-localetextdomain"
       }
    },
-   "version" : "0.90"
+   "version" : "0.91",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
 }
 

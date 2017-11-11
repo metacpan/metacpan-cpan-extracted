@@ -1,6 +1,16 @@
 
 === version history for XML::LibXML::Simple
 
+version 0.98: Wed  8 Nov 10:38:35 CET 2017
+
+	Improvements:
+	- warn about the dwimmery of the code
+	  rt.cpan.org#114021 [David Schmidt, Slaven Rezic]
+	- typo
+	  rt.cpan.org#114211 [Gregor Herrmann, Debian]
+	- remove dependency on File::Slurp::Tiny, never used it
+	  rt.cpan.org#123537 [Dan Book]
+
 version 0.97: Tue 12 Apr 15:12:21 CEST 2016
 
 	Fixes:

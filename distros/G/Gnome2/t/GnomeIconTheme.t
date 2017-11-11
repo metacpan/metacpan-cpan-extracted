@@ -13,7 +13,9 @@ Gnome2::VFS -> init();
 
 SKIP: {
   our $application;
-  do "t/TestBoilerplate";
+  do "./t/TestBoilerplate";
+  die $@ if $@;
+  die $! if $!;
 
   skip("GnomeIconTheme is new in 2.0.6", TESTS)
     unless (Gnome2 -> CHECK_VERSION(2, 0, 6));

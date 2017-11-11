@@ -1,4 +1,14 @@
-Revision history for App-wordlist
+0.261   2017-11-08 (PERLANCAR)
+
+	- No functional changes.
+
+	- Make %arg_wordlists accessible from other packages.
+
+
+0.260   2017-11-07 (PERLANCAR)
+
+	- Add options --num (-n) & --random (-r).
+
 
 0.25    2016-09-26 (PERLANCAR)
 
@@ -84,7 +94,7 @@ Revision history for App-wordlist
 	- Don't show results in POD (no need, very large).
 
 
-0.13    2016-01-07 (PERLANCAR) (unreleased)
+0.13    2016-01-07 (PERLANCAR)
 
         - First (WordList::*-based) release. The older versions are based on
           Games::Word::Wordlist::* and is now moved to App-GamesWordlist

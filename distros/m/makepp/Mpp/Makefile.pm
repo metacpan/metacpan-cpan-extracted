@@ -1,4 +1,4 @@
-# $Id: Makefile.pm,v 1.184 2016/09/28 20:36:49 pfeiffer Exp $
+# $Id: Makefile.pm,v 1.185 2017/08/15 21:42:55 pfeiffer Exp $
 package Mpp::Makefile;
 
 use Mpp::Glob qw(wildcard_do);
@@ -116,7 +116,7 @@ sub expand_text {
 	my $oldpos = pos;	# Remember where the expression starts.
 	my $len = &Mpp::Text::skip_over_make_expression; # Find the end of it.
 	defined $len or
-	  die "$makefile_line: unterminated reference $_\n";
+	  die "$makefile_line: unterminated make expression $_\n";
 	my $newpos = pos;	# For some obscure reason, the following
 				# messes up pos($_).
 	$ret_str .= expand_expression($self, substr( $_, $oldpos + $len, $newpos - $oldpos - 2*$len ), $makefile_line);
@@ -167,7 +167,7 @@ sub expand_text {
 	my $oldpos = pos;	# Remember where the expression starts.
 	my $len = &Mpp::Text::skip_over_make_expression; # Find the end of it.
 	defined $len or
-	  die "$makefile_line: unterminated reference $_\n";
+	  die "$makefile_line: unterminated make expression $_\n";
 	my $newpos = pos;	# For some obscure reason, the following
 				# messes up pos($_).
 	my $space = substr( $_, $oldpos + $len, 1 ) =~ /\s/;

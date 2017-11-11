@@ -52,14 +52,15 @@
             "Alien::Build" : "0.66",
             "Alien::Build::MM" : "0.25",
             "Alien::Build::Plugin::Build::SearchDep" : "0.53",
-            "Alien::PCRE2" : "0.014",
+            "Alien::PCRE2" : "0.015",
             "ExtUtils::CBuilder" : "0",
             "IO::Socket::SSL" : "2.043"
          }
       },
       "runtime" : {
          "requires" : {
-            "Alien::Build" : "0.25"
+            "Alien::Build" : "0.25",
+            "Alien::PCRE2" : "0.015"
          }
       },
       "test" : {
@@ -84,7 +85,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.009000",
+   "version" : "0.012000",
    "x_alienfile" : {
       "generated_by" : "Alien::Build::MM version 1.28",
       "requires" : {

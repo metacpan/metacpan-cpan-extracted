@@ -29,6 +29,9 @@ my %delta :shared=(); # change in amplitude for peak detection, for each fastq
 my $scriptDir=dirname $0;
 my $dbhLock :shared;  # Use this as a lock so that only one thread writes to the db at a time
 local $0=basename $0;
+if($0 eq 'mashtree.pl'){
+  logmsg "WARNING: the executable mashtree.pl is deprecated. Please switch to the mashtree executable (without the .pl).";
+}
 
 exit main();
 
@@ -95,7 +98,6 @@ sub main{
 
   my $phylip = mashDistance($sketches,\@reads,$$settings{tempdir},$settings);
 
-  logmsg "Creating a NJ tree with BioPerl";
   my $treeObj = createTreeFromPhylip($phylip,$$settings{tempdir},$settings);
 
   print $treeObj->as_text('newick');
@@ -239,6 +241,7 @@ sub mashSketch{
       logmsg "WARNING: ".basename($fastq)." was already mashed.";
     } elsif(-s $fastq < 1){
       logmsg "WARNING: $fastq is a zero byte file. Skipping.";
+      next;
     } else {
       logmsg "Sketching $fastq";
       system("mash sketch -p $$settings{cpus_per_mash} -k $$settings{kmerlength} -s $$settings{'sketch-size'} $sketchXopts -o $outPrefix $fastq  1>&2");
@@ -290,9 +293,10 @@ sub mashDistance{
     $thr[$_]=threads->new(\&mashDist,$outdir,$threadArr[$_],$mshListFilename,$mashtreeDbFilename,$settings);
   }
 
-  logmsg "Joining $$settings{numthreads} threads";
   for(@thr){
+    logmsg "Waiting to join thread TID".$_->tid;
     my $distfiles=$_->join;
+    logmsg "Joined TID".$_->tid;
   }
 
   my $phylip = "$outdir/distances.phylip";

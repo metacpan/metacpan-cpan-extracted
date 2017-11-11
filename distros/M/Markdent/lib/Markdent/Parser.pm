@@ -4,15 +4,15 @@ use strict;
 use warnings;
 use namespace::autoclean 0.09;
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 use Markdent::Parser::BlockParser;
 use Markdent::Parser::SpanParser;
-use Markdent::Types
-    qw( ArrayRef HashRef BlockParserClass BlockParserDialectRole SpanParserClass SpanParserDialectRole Str );
+use Markdent::Types;
 use Module::Runtime qw( require_module );
 use Moose::Meta::Class;
-use MooseX::Params::Validate qw( validated_list );
+use Params::ValidationCompiler qw( validation_for );
+use Specio::Declare;
 use Try::Tiny;
 
 use Moose 0.92;
@@ -23,14 +23,14 @@ with 'Markdent::Role::AnyParser';
 
 has _block_parser_class => (
     is       => 'rw',
-    isa      => BlockParserClass,
+    isa      => t('BlockParserClass'),
     init_arg => 'block_parser_class',
     default  => 'Markdent::Parser::BlockParser',
 );
 
 has _block_parser => (
     is       => 'rw',
-    does     => 'Markdent::Role::BlockParser',
+    does     => object_does_type('Markdent::Role::BlockParser'),
     lazy     => 1,
     init_arg => undef,
     builder  => '_build_block_parser',
@@ -38,20 +38,20 @@ has _block_parser => (
 
 has _block_parser_args => (
     is       => 'rw',
-    does     => HashRef,
+    isa      => t('HashRef'),
     init_arg => undef,
 );
 
 has _span_parser_class => (
     is       => 'rw',
-    isa      => SpanParserClass,
+    isa      => t('SpanParserClass'),
     init_arg => 'span_parser_class',
     default  => 'Markdent::Parser::SpanParser',
 );
 
 has _span_parser => (
     is       => 'ro',
-    does     => 'Markdent::Role::SpanParser',
+    does     => object_does_type('Markdent::Role::SpanParser'),
     lazy     => 1,
     init_arg => undef,
     builder  => '_build_span_parser',
@@ -59,7 +59,7 @@ has _span_parser => (
 
 has _span_parser_args => (
     is       => 'rw',
-    does     => HashRef,
+    isa      => t('HashRef'),
     init_arg => undef,
 );
 
@@ -196,22 +196,26 @@ sub _build_span_parser {
     return $self->_span_parser_class()->new( $self->_span_parser_args() );
 }
 
-sub parse {
-    my $self = shift;
-    my ($text) = validated_list(
-        \@_,
-        markdown => { isa => Str },
+{
+    my $validator = validation_for(
+        params        => [ markdown => { type => t('Str') } ],
+        named_to_list => 1,
     );
 
-    $self->_clean_text( \$text );
+    sub parse {
+        my $self = shift;
+        my ($text) = $validator->(@_);
 
-    $self->_send_event('StartDocument');
+        $self->_clean_text( \$text );
 
-    $self->_block_parser()->parse_document( \$text );
+        $self->_send_event('StartDocument');
 
-    $self->_send_event('EndDocument');
+        $self->_block_parser()->parse_document( \$text );
 
-    return;
+        $self->_send_event('EndDocument');
+
+        return;
+    }
 }
 
 sub _clean_text {
@@ -235,13 +239,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Markdent::Parser - A markdown parser
 
 =head1 VERSION
 
-version 0.26
+version 0.27
 
 =head1 SYNOPSIS
 
@@ -319,15 +325,26 @@ L<Markdent::Role::Handler> roles.
 
 See L<Markdent> for bug reporting details.
 
+Bugs may be submitted at L<http://rt.cpan.org/Public/Dist/Display.html?Name=Markdent> or via email to L<bug-markdent@rt.cpan.org|mailto:bug-markdent@rt.cpan.org>.
+
+I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
+
+=head1 SOURCE
+
+The source code repository for Markdent can be found at L<https://github.com/houseabsolute/Markdent>.
+
 =head1 AUTHOR
 
 Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Dave Rolsky.
+This software is copyright (c) 2017 by Dave Rolsky.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+The full text of the license can be found in the
+F<LICENSE> file included with this distribution.
 
 =cut

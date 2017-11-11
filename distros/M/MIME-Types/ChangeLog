@@ -6,6 +6,12 @@ Mark Overmeer.
 TODO:
  . Add source http://www.ltsw.se/knbase/internet/mime.htp ?
 
+version 2.14: Wed  8 Nov 17:45:22 CET 2017
+
+	Fixes:
+	- MojoX should not die on missing types.
+	  rt.cpan.org#123298 [Dmitry Latin]
+
 version 2.13: Mon  7 Mar 15:48:28 CET 2016
 
 	Fixes:

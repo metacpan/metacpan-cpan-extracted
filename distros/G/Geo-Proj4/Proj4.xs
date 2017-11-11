@@ -166,7 +166,7 @@ transform_proj4(proj_from, proj_to, points, degrees)
 
 	    x[p] = SvNV(*av_fetch(point, 0, 0));
 	    y[p] = SvNV(*av_fetch(point, 1, 0));
-	    z[p] = av_len(point) < 3 ? 0.0 : SvNV(*av_fetch(point, 1, 0));
+	    z[p] = av_len(point) < 2 ? NAN : SvNV(*av_fetch(point, 2, 0));
 	    /* fprintf(stderr, "point=%f %f %f\n", x[p], y[p], z[p]); */
 
 	    if(degrees && pj_is_latlong(proj_from))
@@ -192,8 +192,8 @@ transform_proj4(proj_from, proj_to, points, degrees)
 	        av_push(res, newSVnv(x[p]));
 	        av_push(res, newSVnv(y[p]));
 
-	        if(z[p]!=0.0) av_push(res, newSVnv(z[p]));
-		av_push(retlist, newRV((SV *)res));
+	        if(!isnan(z[p])) av_push(res, newSVnv(z[p]));
+	        av_push(retlist, newRV((SV *)res));
 	    }
 
 	    XPUSHs(newRV_noinc((SV *)retlist));

@@ -1,8 +1,8 @@
-use 5.006;
+use 5.010;
 
 use ExtUtils::MakeMaker;
 
-my $version = '0.97';
+my $version = '0.98';
 
 #
 # The following is needed, because User::Identity does gracefully handle
@@ -32,7 +32,7 @@ WriteMakefile
   , VERSION    => $version
   , PREREQ_PM  => \%prereq
   , ABSTRACT   => 'Collect information about a user'
-  , AUTHOR     => 'Mark Overmeer <perl@overmeer.net>'
+  , AUTHOR     => 'Mark Overmeer <markov@cpan.org>'
   , LICENSE    => 'perl'
   );
 
@@ -46,7 +46,7 @@ LICENSE         = artistic
 
 # for POD
 FIRST_YEAR      = 2003
-EMAIL           = perl@overmeer.net
+EMAIL           = markov@cpan.org
 WEBSITE         = http://perl.overmeer.net/userid/
 PODTAIL         = ../MailBox-shared-podtail
 

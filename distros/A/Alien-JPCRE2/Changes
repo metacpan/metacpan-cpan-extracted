@@ -1,5 +1,21 @@
 Revision history for Alien::JPCRE2.
 
+0.012000 2017-11-09
+
+    - Fix Bug, Windows dmake Builds, Remove Extraneous 'gmake' Config In Makefile.PL
+	- Upgrade To JPCRE2 v10.31.02 Official
+
+0.011000 2017-11-08
+
+	- Fix Bug, BSD & MacOSX, Remove Extraneous 'typename' Keywords,
+		Upgrade To JPCRE2 v10.31.03-DEV Unofficial
+
+0.010000 2017-11-08
+
+	- Fix Bug, BSD & MacOSX, Change 'std::setlocale' To 'setlocale',
+		Upgrade To JPCRE2 v10.31.02-DEV Unofficial
+	- Require Alien::PCRE2 v0.014
+
 0.009000 2017-10-31 Codename Vulcan
 
     - HOLIDAY EDITION: Happy Halloween!
