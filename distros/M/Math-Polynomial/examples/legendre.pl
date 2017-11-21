@@ -17,11 +17,14 @@
 use strict;
 use warnings;
 use Math::Polynomial 1.000;
-use Math::BigNum;
+use Math::AnyNum;
 
 my $max_degree = 5;
 
-sub fmt_num { $_[0]->as_rat }
+sub fmt_num {
+    my ($n, $d) = $_[0]->nude;
+    return 1 == $d? "$n": "$n/$d";
+}
 
 # adjust some printing options
 Math::Polynomial->string_config({
@@ -33,7 +36,7 @@ Math::Polynomial->string_config({
 
 # create p[0] = 1 and p[1] = x
 # using arbitrary precision rational coefficients
-my $one = Math::BigNum->new('1');
+my $one = Math::AnyNum->new('1');
 my $p0  = Math::Polynomial->new($one);
 my $p1  = $p0 << 1;
 my @p   = ($p0, $p1);

@@ -4,7 +4,7 @@
 #                                                                                    #
 #    Author: Clint Cuffy                                                             #
 #    Date:    06/16/2016                                                             #
-#    Revised: 09/04/2017                                                             #
+#    Revised: 11/06/2017                                                             #
 #    UMLS Similarity Word2Vec Executable Interface Module                            #
 #                                                                                    #
 ######################################################################################
@@ -1321,7 +1321,7 @@ sub IsVectorDataInMemory
 {
     my ( $self ) = @_;
 
-    my $numberOfWordsInMemory = keys %{ $self->GetVocabularyHash() };
+    my $numberOfWordsInMemory = scalar keys %{ $self->GetVocabularyHash() };
     return 1 if $numberOfWordsInMemory > 0;
 
     return 0;
@@ -2055,6 +2055,7 @@ sub RemoveWordFromWordVectorString
     # Check(s)
     return undef if !defined( $dataStr );
 
+    # shift @tempAry Also Works As Well
     my @tempAry = split( ' ', $dataStr, 2 );
     $dataStr = $tempAry[1];
 

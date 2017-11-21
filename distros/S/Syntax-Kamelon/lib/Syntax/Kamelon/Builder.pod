@@ -1,0 +1,211 @@
+=head1 NAME
+
+Syntax::Kamelon::Builder - Builds a lexer from an xml file
+
+=head1 SYNOPSIS
+
+ use Syntax::Kamelon::Builder;
+ my $lexer = Syntax::Kamelon::Builder->new(%options);
+
+=head1 DESCRIPTION
+
+This module inherits B<Syntax::Kamelon::XMLData>. 
+
+The constructor does not return an object but a data structure called a lexer. 
+Below more details of what it looks like. You will never have the opportunity to
+call any of it's methods. It creates a lexer and says bye bye. If fact you never
+have to create an instance of it. Kamelon does that for you.
+
+=head1 OPTIONS
+
+The constructor is called with a paired list or hash of options as parameters. You must use
+the following options.
+
+=over 4
+
+=item B<engine> => $ref 
+
+A reference to the main Kamelon object.
+
+=item B<xmlfile> => $filename
+
+Full path and file name of the xml file to load.
+
+=back
+
+=head1 STRUCTURE OF A LEXER
+
+=over 4
+
+=item B<Global overview>
+
+ my $lexer = {
+	basecontext => 'first',
+   contexts => {
+	  first => {
+	  },
+	  second => {
+	  }
+   },
+   deliminators => ".|(|)|:|!|+|,|-|<|=|>|%|&|*|/|;|?|[|]|^|{|||}|~|\\",
+   lists => {
+		mycolors => {
+			red => 1,
+			yellow => 1,
+		},
+   }
+   syntax => 'Name',
+ };
+
+Notice that lists are in fact hashes. This is for faster
+lookup. After all we only need to know if an entry exists or not.
+
+=item B<The contexts in detail>
+
+ my $context = {
+  attribute => $something,
+  callbacks => [ #the rules in action
+    [\&testMethod, @options, $contextshifter, $attribute, @resultparsers],
+    [\&testMethod2, @options2, $contextshifter2, $attribute2, @resultparsers2],
+    #etcetera
+  ],
+  debug => [
+	 [$reftohash, #all the data that was previously in the items key of the context hash.
+	 ],
+	 [],
+    #etcetera
+ ],
+  dynamic => 0, #or 1
+  emptycontext => \&contextshifter,
+  endcontext => \&contextshifter,
+  fallthroughcontext => undef, #or also a context shifter
+  info => {
+    #All of the data from the context hash except the items key (the rules)
+  }
+};
+
+=item B<Context shifters>
+
+=item B<Result parsers>
+
+=back
+
+=head1 SYSTEM METHODS
+
+=over 4
+
+=item B<AttributeGet>(I<$attribute>);
+
+Returns the style tag belonging to $attribute in the Attributes hash.
+If it cannot find it it will log a warning and return the style tag
+belonging to the current context.
+
+=item B<AttributeGetF>(I<$attribute>);
+
+Uses B<AttributeGet> to obtain the styel tag. Returns the format information belonging 
+to the style tag. 
+
+=item B<ContextExists>(I<$contextname>);
+
+Returns true if the context exists in the contexts hash.
+
+=item B<CurContext>(I<$contextname>);
+
+Sets and returns the current context.
+
+=item B<CurContextIsDynamic>
+
+Returns true if the current context is dynamic.
+
+=item B<CurRule>I(<$rulenumber>);
+
+Sets and returns the current rule within the current context.
+
+=item B<Deliminators>I(<$rulenumber>);
+
+Sets and returns the composed deliminators string. It is composed
+of the general deliminators, the B<WaekDeliminator> and the B<AdditionalDeliminator>.
+
+=item B<Engine>
+
+Returns a reference to the main Kamelon object.
+
+=item B<LogWarning>($message);
+
+And exacter Warning mechanism than Kamelon has.
+
+=item B<RuleGetArgs>(I<$reftorule>, I<@optionstoretrieve>));
+
+Returns a list of the values belonging to I<@optionstoretrieve>.
+
+=item B<RuleGetChar>(I<$char>);
+
+Generally a char data type consists of one character. However, an escaped character
+has two. This methods returns the escaped character also as the real character. so
+a newline for a \n etc.
+
+=item B<Setup>
+
+The initiater of the building process.
+
+=item B<SetupContext>(I<$lexer>, I<$contextname>, I<$reftodata>);
+
+Sets up context and stores it in $lexer.
+
+=item B<SetupContextRules>(I<$lexer>, I<$contextname>, I<$reftodata>);
+
+Sets up the rules for $contextname.
+
+=item B<SetupContextShifter>(I<$lexer>, I<$contextname>);
+
+Creates an anonymous sub that does a context shift when executed.
+
+=item B<SetupRuleXXXXX>(I<$reftorule>);
+
+All these methods set up specific rules inside a context.
+
+=item B<SetupRuleAnyChar>
+
+=item B<SetupRuleDefault>
+
+=item B<SetupRuleDetectChar>
+
+=item B<SetupRuleDetect2Chars>
+
+=item B<SetupRuleKeyword>
+
+=item B<SetupRuleLineContinue>
+
+=item B<SetupRuleRangeDetect>
+
+=item B<SetupRuleRegMinimal>
+
+=item B<SetupRuleRegExpr>
+
+=item B<SetupRuleStringDetect>
+
+=item B<SyntaxExists>
+
+Checks if a syntax is available before creating a context shifter 
+that uses it.
+
+=back
+
+=head1 AUTHOR AND COPYRIGHT
+
+This module is written and maintained by:
+
+Hans Jeuken < hansjeuken at xs4all dot nl>
+
+Copyright (c) 2017 by Hans Jeuken, all rights reserved.
+
+Published under the GPLV3 license
+
+=head1 SEE ALSO
+
+B<Syntax::Kamelon>, B<Syntax::Kamelon::Debugger>, B<Syntax::Kamelon::Diagnostics>,
+B<Syntax::Kamelon::Indexer>, B<Syntax::Kamelon::XMLData>, B<Syntax::Kamelon::Format::Base>,
+B<Syntax::Kamelon::Format::ANSI>, B<Syntax::Kamelon::Format:HTML4>
+
+=cut
+

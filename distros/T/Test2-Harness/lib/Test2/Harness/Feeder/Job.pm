@@ -2,7 +2,7 @@ package Test2::Harness::Feeder::Job;
 use strict;
 use warnings;
 
-our $VERSION = '0.001031';
+our $VERSION = '0.001034';
 
 use Carp qw/croak carp/;
 use Scalar::Util qw/blessed/;
@@ -72,10 +72,11 @@ sub set_complete {
 
     $self->{+_COMPLETE} = 1;
 
-    remove_tree($self->{+DIR}->job_root, {safe => 1, keep_root => 1})
-        unless $self->{+KEEP_DIR};
-
+    my $job_root = $self->{+DIR}->job_root;
     delete $self->{+DIR};
+
+    remove_tree($job_root, {safe => 1, keep_root => 1})
+        unless $self->{+KEEP_DIR};
 
     return $self->{+_COMPLETE};
 }

@@ -9,7 +9,7 @@
 #
 package MooseX::AttributeShortcuts::Trait::Attribute::HasAnonBuilder;
 our $AUTHORITY = 'cpan:RSRCHBOY';
-$MooseX::AttributeShortcuts::Trait::Attribute::HasAnonBuilder::VERSION = '0.036';
+$MooseX::AttributeShortcuts::Trait::Attribute::HasAnonBuilder::VERSION = '0.037';
 # ABSTRACT: Attributes, etc, common to both the role-attribute and attribute traits
 
 use Moose::Role;
@@ -79,7 +79,7 @@ MooseX::AttributeShortcuts::Trait::Attribute::HasAnonBuilder - Attributes, etc, 
 
 =head1 VERSION
 
-This document describes version 0.036 of MooseX::AttributeShortcuts::Trait::Attribute::HasAnonBuilder - released October 31, 2017 as part of MooseX-AttributeShortcuts.
+This document describes version 0.037 of MooseX::AttributeShortcuts::Trait::Attribute::HasAnonBuilder - released November 20, 2017 as part of MooseX-AttributeShortcuts.
 
 =head1 DESCRIPTION
 

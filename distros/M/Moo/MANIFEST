@@ -81,6 +81,7 @@ t/no-moo.t
 t/non-moo-extends-c3.t
 t/non-moo-extends.t
 t/not-both.t
+t/not-methods.t
 t/overloaded-coderefs.t
 t/overridden-core-funcs.t
 t/perl-56-like.t

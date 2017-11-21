@@ -1,56 +1,56 @@
-Artistic
-Changes
-Configure
-Copying
-INSTALL
-LICENCE
-MANIFEST
-MANIFEST.SKIP
-Makefile.PL
-README
-demos/ftp
-demos/nntp
-demos/nntp.mirror
-demos/pop3
-demos/smtp.self
-demos/time
-lib/Net/Cmd.pm
-lib/Net/Config.pm
-lib/Net/Domain.pm                        DNS Domain name lookup
-lib/Net/FTP.pm                           File Transfer Protocol Client
-lib/Net/FTP/A.pm
-lib/Net/FTP/E.pm
-lib/Net/FTP/I.pm
-lib/Net/FTP/L.pm
-lib/Net/FTP/dataconn.pm
-lib/Net/NNTP.pm                          Network News Transfer Protocol
-lib/Net/Netrc.pm                         .netrc lookup routines
-lib/Net/POP3.pm                          Post Office Protocol
-lib/Net/SMTP.pm                          Simple Mail Transfer Protocol Client
-lib/Net/Time.pm                          time & nettime protocols
-lib/Net/libnetFAQ.pod
-t/changes.t
-t/config.t
-t/critic.t
-t/datasend.t
-t/external/ftp-ssl.t
-t/external/pop3-ssl.t
-t/external/smtp-ssl.t
-t/ftp.t
-t/hostname.t
-t/libnet_t.pl
-t/netrc.t
-t/nntp.t
-t/nntp_ipv6.t
-t/nntp_ssl.t
-t/pod.t
-t/pod_coverage.t
-t/require.t
-t/smtp.t
-t/smtp_ipv6.t
-t/smtp_ssl.t
-t/pop3_ipv6.t
-t/pop3_ssl.t
-t/time.t
+Artistic                                 The "Artistic License"
+Changes                                  Differences from previous version
+Configure                                Configuration script
+Copying                                  The GNU General Public License
+demos/ftp                                Demo script for Net::FTP
+demos/nntp                               Demo script for Net::NNTP
+demos/nntp.mirror                        Demo script for Net::NNTP
+demos/pop3                               Demo script for Net::POP3
+demos/smtp.self                          Demo script for Net::SMTP
+demos/time                               Demo script for Net::Time
+INSTALL                                  Detailed installation instructions
+lib/Net/Cmd.pm                           Net::Cmd Perl module
+lib/Net/Config.pm                        Net::Config Perl module
+lib/Net/Domain.pm                        Net::Domain Perl module
+lib/Net/FTP.pm                           Net::FTP Perl module
+lib/Net/FTP/A.pm                         Net::FTP::A Perl module
+lib/Net/FTP/dataconn.pm                  Net::FTP::dataconn Perl module
+lib/Net/FTP/E.pm                         Net::FTP::E Perl module
+lib/Net/FTP/I.pm                         Net::FTP::I Perl module
+lib/Net/FTP/L.pm                         Net::FTP::L Perl module
+lib/Net/libnetFAQ.pod                    Frequently Asked Questions
+lib/Net/Netrc.pm                         Net::Netrc Perl module
+lib/Net/NNTP.pm                          Net::NNTP Perl module
+lib/Net/POP3.pm                          Net::POP3 Perl module
+lib/Net/SMTP.pm                          Net::SMTP Perl module
+lib/Net/Time.pm                          Net::Time Perl module
+LICENCE                                  The Licence
+Makefile.PL                              Makefile writer
+MANIFEST                                 This list of files
+MANIFEST.SKIP                            Manifest skip specs
+README                                   The Instructions
+t/changes.t                              See if Changes file format is OK
+t/config.t                               Test script
+t/critic.t                               See if coding style is OK
+t/datasend.t                             Test script
+t/external/ftp-ssl.t                     Test script
+t/external/pop3-ssl.t                    Test script
+t/external/smtp-ssl.t                    Test script
+t/ftp.t                                  Test script
+t/hostname.t                             Test script
+t/libnet_t.pl                            Test script
+t/netrc.t                                Test script
+t/nntp.t                                 Test script
+t/nntp_ipv6.t                            Test script
+t/nntp_ssl.t                             Test script
+t/pod.t                                  See if POD is OK
+t/pod_coverage.t                         See if POD coverage is OK
+t/pop3_ipv6.t                            Test script
+t/pop3_ssl.t                             Test script
+t/require.t                              Test script
+t/smtp.t                                 Test script
+t/smtp_ipv6.t                            Test script
+t/smtp_ssl.t                             Test script
+t/time.t                                 Test script
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,39 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Syntax::Kamelon;
+use Data::Dumper;
+
+my $noindex = 0;
+my $section;
+my $syntax;
+my $xmldir;
+
+while (@ARGV) {
+	my $o = shift @ARGV;
+	if ($o eq '-xmlfolder') {
+		$xmldir = shift @ARGV;
+	} elsif ($o eq '-section') {
+		$section = shift @ARGV
+	} elsif ($o eq '-syntax') {
+		$syntax = shift @ARGV
+	} else {
+		die "available options: -xmlfolder, -section, -syntax";
+	}
+}
+
+my @o = (noindex => $noindex);
+if (defined $xmldir) {
+	unless (-e $xmldir) { die "$xmldir folder does not exist" }
+	unless (-d $xmldir) { die "$xmldir is not a folder" }
+	push @o, 'xmlfolder', $xmldir;
+}
+unless (defined $syntax) { die "you must specify the -syntax option" }
+
+my $highlighter = Syntax::Kamelon->new(@o);
+
+my $hl = $highlighter->GetHighlighter($syntax);
+print Dumper $hl;
+
+

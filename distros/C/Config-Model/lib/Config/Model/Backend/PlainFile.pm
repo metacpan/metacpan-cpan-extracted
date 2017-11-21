@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::PlainFile;
-$Config::Model::Backend::PlainFile::VERSION = '2.113';
+$Config::Model::Backend::PlainFile::VERSION = '2.114';
 use 5.10.1;
 use Carp;
 use Mouse;
@@ -53,7 +53,8 @@ sub read {
     $logger->trace( "called on node ", $node->name );
 
     # read data from leaf element from the node
-    foreach my $elt ( $node->get_element_name() ) {
+    # do not trigger warp when getting element names
+    foreach my $elt ( $node->get_element_names(all => 1) ) {
         my $obj = $args{object}->fetch_element( name => $elt );
 
         my $dir = path($args{root} . $dir);
@@ -89,6 +90,10 @@ sub read_leaf {
 
     my $v = $file->slurp_utf8;
     chomp($v) unless $obj->value_type eq 'string';
+    if ($logger->is_trace) {
+        (my $str = $v) =~ s/\n.*/[...]/s;
+        $logger->trace("storing leaf value '$str' from $file ");
+    }
     $obj->store( value => $v, check => $check );
 }
 
@@ -98,6 +103,7 @@ sub read_list {
     return unless $file->exists;
 
     my @v = $file->lines_utf8({ chomp => 1});
+    $logger->trace("storing list value @v from $file ");
 
     $obj->store_set(@v);
 }
@@ -210,7 +216,7 @@ Config::Model::Backend::PlainFile - Read and write config as plain file
 
 =head1 VERSION
 
-version 2.113
+version 2.114
 
 =head1 SYNOPSIS
 

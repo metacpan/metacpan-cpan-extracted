@@ -7,7 +7,7 @@
 
 package Data::Table::Text;
 use v5.8.0;
-our $VERSION = '20171105';
+our $VERSION = '20171117';
 use warnings FATAL => qw(all);
 use strict;
 use Carp;
@@ -36,6 +36,8 @@ sub timeStamp                                                                   
  {strftime('%H:%M:%S', localtime)
  }
 
+#1 Command execution                                                            # Various ways of processing commands
+
 sub xxx(@)                                                                      # Execute a command checking and logging the results: the command to execute is specified as one or more strings with optionally the last string being a regular expression that is used to confirm that the command executed successfully and thus that it is safe to suppress the command output as uninteresting.
  {my (@cmd) = @_;                                                               # Command to execute followed by an optional regular expression to test the results
   @cmd or confess "No command\n";                                               # Check that there is a command to execute
@@ -50,6 +52,49 @@ sub xxx(@)                                                                      
   say STDERR $r if $r and !$check;                                              # Print non blank error message
   confess $r if $r and $check and $r !~ m/$success/;                            # Error check if an error checking regular expression has been supplied
   $r
+ }
+
+sub XXX($)                                                                      # Execute a block of shell commands line by line after removing comments
+ {my ($cmd) = @_;                                                               # Commands to execute separated by new lines
+  for(split /\n/, $cmd)                                                         # Split commands on new lines
+   {s(#.*\Z)()gs;                                                               # Remove comments
+    next if !$_ or m(\A\s*\Z);                                                  # Skip blank lines
+    say   STDERR $_;                                                            # Say command
+    print STDERR for qx($_);                                                    # Execute command
+    say STDERR '';
+   }
+ }
+
+sub zzz($$)                                                                     # Execute lines of commands as one long command string separated by added &&'s and then check that the execution results match the specified regular expression, confess()ing to the error if they do not.
+ {my ($cmd, $success) = @_;                                                     # Commands to execute - one per line with no trailing &&, regular expression to check the results
+  $cmd     or confess "No command\n";                                           # Check that there is a command to execute
+  $success or confess "No error checking regular expression\n";                 # Check that there is a success check
+  my @c;                                                                        # Commands
+  for(split /\n/, $cmd)                                                         # Split commands on new lines
+   {s(#.*\Z)()gs;                                                               # Remove comments
+    next if !$_ or m(\A\s*\Z);                                                  # Skip blank lines
+    push @c, $_;                                                                # Save command
+   }
+  my $c = join ' && ', @c;                                                      # Command string to execute
+  my $r = qx($c 2>&1);                                                          # Execute command
+  $r =~ s/\s+\Z//s;                                                             # Remove trailing white space from response
+  confess "$cmd\n$r\n" if $r !~ m/$success/;                                    # Error check if an error checking regular expression has been supplied
+  $r
+ }
+
+sub parseCommandLineArguments(&@)                                               # Classify the specified array of words into positional parameters and keyword parameters, then call the specified sub with a reference to an array of positional parameters followed by a reference to a hash of keywords and their values and return the value returned by the sub
+ {my ($sub, @args) = @_;                                                        # Sub to call, list of arguments to parse
+  my %h;
+  my @a;
+  for(@args)
+   {if (m/\A-+(\S+?)(=(.+))?\Z/)
+     {$h{$1} = $3;
+     }
+    else
+     {push @a, $_;
+     }
+   }
+  $sub->([@a], {%h})
  }
 
 #1 Files and paths                                                              # Operations on files and paths
@@ -379,6 +424,10 @@ sub writeBinaryFile($$)                                                         
   -e $file or confess "Failed to write in binary to file:\n$file\n";
  }
 
+sub binModeAllUtf8                                                              # Set STDOUT and STDERR to accept utf8 without complaint
+ {binmode $_, ":utf8" for *STDOUT, *STDERR;
+ }
+
 #1 Images                                                                       # Image operations
 
 sub imageSize($)                                                                # Return (width, height) of an image obtained via imagemagick.
@@ -453,6 +502,17 @@ sub decodeBase64($)                                                             
   decode_base64($string)
  }
 
+sub convertUnicodeToXml($)                                                      # Convert a string with unicode points that are not directly representable in ascii into string that replaces these points with their representation on Xml making the string usable in Xml documents
+ {my ($s) = @_;                                                                 # String to convert
+  my $t = '';
+  for(split //, $s)                                                             # Each letter in the source
+   {my $n = ord($_);
+    my $c = $n > 127 ? "&#$n;" : $_;                                            # Use xml representation beyond u+127
+    $t .= $c;
+   }
+  $t                                                                            # Return resulting string
+ }
+
 #1 Numbers                                                                      # Numeric operations
 
 sub powerOfTwo($)                                                               #X Test whether a number is a power of two, return the power if it is else B<undef>
@@ -472,6 +532,23 @@ sub containingPowerOfTwo($)                                                     
   undef
  }
 
+
+#1 Sets                                                                         # Set operations
+
+sub setIntersectionOfTwoArraysOfWords($$)                                       # Intersection of two arrays of words
+ {my ($a, $b) = @_;                                                             # Reference to first array of words, reference to second array of words
+  my @a = @$a >  @$b ? @$a : @$b;
+  my @b = @$a <= @$b ? @$a : @$b;
+  my %a  = map {$_=>1} @a;
+  my %b  = map {$_=>1} @b;
+  grep {$a{$_}} sort keys %b
+ }
+
+sub setUnionOfTwoArraysOfWords($$)                                              # Union of two arrays of words
+ {my ($a, $b) = @_;                                                             # Reference to first array of words, reference to second array of words
+  my %a = map {$_=>1} @$a, @$b;
+  sort keys %a
+ }
 
 #1 Arrays                                                                       # Array operations
 
@@ -965,8 +1042,8 @@ END
         $parmNames =~ s/\A\s*\{my\s*\(//r =~ s/\)\s*=\s*\@_;//r;
 
       @parameters == length($signature) or                                      # Check signature length
-        confess "Signature $signature for method: $name".
-                " has wrong number of parameters\n";
+        confess "Wrong number of parameter descriptions for method: ".
+          "$name($signature)";
 
       my @parmDescriptions = map {ucfirst()} split /,\s*/, $parmDescriptions;   # Parameter descriptions with first letter uppercased
 
@@ -1220,9 +1297,10 @@ use vars qw(@ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 @EXPORT       = qw(formatTable);
 @EXPORT_OK    = qw(
 addCertificate appendFile
+binModeAllUtf8
 checkFile checkFilePath checkFilePathExt checkFilePathDir
 checkKeys clearFolder contains containingPowerOfTwo
-containingFolder convertImageToJpx currentDirectory currentDirectoryAbove
+containingFolder convertImageToJpx convertUnicodeToXml currentDirectory currentDirectoryAbove
 dateStamp dateTimeStamp decodeJson decodeBase64
 encodeJson encodeBase64
 fileList fileModTime fileOutOfDate
@@ -1237,14 +1315,16 @@ loadArrayArrayFromLines loadArrayFromLines
 loadHashArrayFromLines loadHashFromLines
 makePath matchPath max min
 nws
-pad parseFileName powerOfTwo printFullFileName
+pad parseFileName parseCommandLineArguments powerOfTwo printFullFileName
 quoteFile
 readBinaryFile readFile removeFilePrefix
 saveToS3 searchDirectoryTreesForMatchingFiles
+setIntersectionOfTwoArraysOfWords setUnionOfTwoArraysOfWords
 temporaryDirectory temporaryFile temporaryFolder timeStamp trim
 updateDocumentation updatePerlModuleDocumentation userId
 writeBinaryFile writeFile
-xxx);
+xxx XXX
+zzz);
 %EXPORT_TAGS  = (all=>[@EXPORT, @EXPORT_OK]);
 
 # podDocumentation
@@ -1345,11 +1425,35 @@ Year-monthName-day
 hours:minute:seconds
 
 
+=head1 Command execution
+
+Various ways of processing commands
+
 =head2 xxx(@)
 
 Execute a command checking and logging the results: the command to execute is specified as one or more strings with optionally the last string being a regular expression that is used to confirm that the command executed successfully and thus that it is safe to suppress the command output as uninteresting.
 
   1  @cmd  Command to execute followed by an optional regular expression to test the results
+
+=head2 XXX($)
+
+Execute a block of shell commands line by line after removing comments
+
+  1  $cmd  Commands to execute separated by new lines
+
+=head2 zzz($$)
+
+Execute lines of commands as one long command string separated by added &&'s and then check that the execution results match the specified regular expression, confess()ing to the error if they do not.
+
+  1  $cmd      Commands to execute - one per line with no trailing &&
+  2  $success  Regular expression to check the results
+
+=head2 parseCommandLineArguments(&@)
+
+Classify the specified array of words into positional parameters and keyword parameters, then call the specified sub with a reference to an array of positional parameters followed by a reference to a hash of keywords and their values and return the value returned by the sub
+
+  1  $sub   Sub to call
+  2  @args  List of arguments to parse
 
 =head1 Files and paths
 
@@ -1586,6 +1690,11 @@ Write a non unicode string to a file in after creating a path to the file if nec
   1  $file    File to write to
   2  $string  Non unicode string to write
 
+=head3 binModeAllUtf8()
+
+Set STDOUT and STDERR to accept utf8 without complaint
+
+
 =head1 Images
 
 Image operations
@@ -1631,6 +1740,12 @@ Encode a string in base 64.
 Decode a string in base 64.
 
   1  $string  String to decode
+
+=head2 convertUnicodeToXml($)
+
+Convert a string with unicode points that are not directly representable in ascii into string that replaces these points with their representation on Xml making the string usable in Xml documents
+
+  1  $s  String to convert
 
 =head1 Numbers
 
@@ -1983,165 +2098,175 @@ Extract a line of a test.
 
 2 L<appendFile|/appendFile>
 
-3 L<checkFile|/checkFile>
+3 L<binModeAllUtf8|/binModeAllUtf8>
 
-4 L<checkFilePath|/checkFilePath>
+4 L<checkFile|/checkFile>
 
-5 L<checkFilePathDir|/checkFilePathDir>
+5 L<checkFilePath|/checkFilePath>
 
-6 L<checkFilePathExt|/checkFilePathExt>
+6 L<checkFilePathDir|/checkFilePathDir>
 
-7 L<checkKeys|/checkKeys>
+7 L<checkFilePathExt|/checkFilePathExt>
 
-8 L<clearFolder|/clearFolder>
+8 L<checkKeys|/checkKeys>
 
-9 L<containingFolder|/containingFolder>
+9 L<clearFolder|/clearFolder>
 
-10 L<containingPowerOfTwo|/containingPowerOfTwo>
+10 L<containingFolder|/containingFolder>
 
-11 L<containingPowerOfTwoX|/containingPowerOfTwo>
+11 L<containingPowerOfTwo|/containingPowerOfTwo>
 
-12 L<contains|/contains>
+12 L<containingPowerOfTwoX|/containingPowerOfTwo>
 
-13 L<convertImageToJpx|/convertImageToJpx>
+13 L<contains|/contains>
 
-14 L<currentDirectory|/currentDirectory>
+14 L<convertImageToJpx|/convertImageToJpx>
 
-15 L<currentDirectoryAbove|/currentDirectoryAbove>
+15 L<convertUnicodeToXml|/convertUnicodeToXml>
 
-16 L<dateStamp|/dateStamp>
+16 L<currentDirectory|/currentDirectory>
 
-17 L<dateTimeStamp|/dateTimeStamp>
+17 L<currentDirectoryAbove|/currentDirectoryAbove>
 
-18 L<decodeBase64|/decodeBase64>
+18 L<dateStamp|/dateStamp>
 
-19 L<decodeJson|/decodeJson>
+19 L<dateTimeStamp|/dateTimeStamp>
 
-20 L<denormalizeFolderName|/denormalizeFolderName>
+20 L<decodeBase64|/decodeBase64>
 
-21 L<encodeBase64|/encodeBase64>
+21 L<decodeJson|/decodeJson>
 
-22 L<encodeJson|/encodeJson>
+22 L<denormalizeFolderName|/denormalizeFolderName>
 
-23 L<extractTest|/extractTest>
+23 L<encodeBase64|/encodeBase64>
 
-24 L<fileList|/fileList>
+24 L<encodeJson|/encodeJson>
 
-25 L<fileModTime|/fileModTime>
+25 L<extractTest|/extractTest>
 
-26 L<fileOutOfDate|/fileOutOfDate>
+26 L<fileList|/fileList>
 
-27 L<filePath|/filePath>
+27 L<fileModTime|/fileModTime>
 
-28 L<filePathDir|/filePathDir>
+28 L<fileOutOfDate|/fileOutOfDate>
 
-29 L<filePathExt|/filePathExt>
+29 L<filePath|/filePath>
 
-30 L<fileSize|/fileSize>
+30 L<filePathDir|/filePathDir>
 
-31 L<findDirs|/findDirs>
+31 L<filePathExt|/filePathExt>
 
-32 L<findFiles|/findFiles>
+32 L<fileSize|/fileSize>
 
-33 L<formatTable|/formatTable>
+33 L<findDirs|/findDirs>
 
-34 L<formatTableA|/formatTableA>
+34 L<findFiles|/findFiles>
 
-35 L<formatTableAA|/formatTableAA>
+35 L<formatTable|/formatTable>
 
-36 L<formatTableAH|/formatTableAH>
+36 L<formatTableA|/formatTableA>
 
-37 L<formatTableBasic|/formatTableBasic>
+37 L<formatTableAA|/formatTableAA>
 
-38 L<formatTableH|/formatTableH>
+38 L<formatTableAH|/formatTableAH>
 
-39 L<formatTableHA|/formatTableHA>
+39 L<formatTableBasic|/formatTableBasic>
 
-40 L<formatTableHH|/formatTableHH>
+40 L<formatTableH|/formatTableH>
 
-41 L<fullFileName|/fullFileName>
+41 L<formatTableHA|/formatTableHA>
 
-42 L<genLValueArrayMethods|/genLValueArrayMethods>
+42 L<formatTableHH|/formatTableHH>
 
-43 L<genLValueHashMethods|/genLValueHashMethods>
+43 L<fullFileName|/fullFileName>
 
-44 L<genLValueScalarMethods|/genLValueScalarMethods>
+44 L<genLValueArrayMethods|/genLValueArrayMethods>
 
-45 L<genLValueScalarMethodsWithDefaultValues|/genLValueScalarMethodsWithDefaultValues>
+45 L<genLValueHashMethods|/genLValueHashMethods>
 
-46 L<imageSize|/imageSize>
+46 L<genLValueScalarMethods|/genLValueScalarMethods>
 
-47 L<indentString|/indentString>
+47 L<genLValueScalarMethodsWithDefaultValues|/genLValueScalarMethodsWithDefaultValues>
 
-48 L<isBlank|/isBlank>
+48 L<imageSize|/imageSize>
 
-49 L<javaPackage|/javaPackage>
+49 L<indentString|/indentString>
 
-50 L<javaPackageAsFileName|/javaPackageAsFileName>
+50 L<isBlank|/isBlank>
 
-51 L<keyCount|/keyCount>
+51 L<javaPackage|/javaPackage>
 
-52 L<loadArrayArrayFromLines|/loadArrayArrayFromLines>
+52 L<javaPackageAsFileName|/javaPackageAsFileName>
 
-53 L<loadArrayFromLines|/loadArrayFromLines>
+53 L<keyCount|/keyCount>
 
-54 L<loadHashArrayFromLines|/loadHashArrayFromLines>
+54 L<loadArrayArrayFromLines|/loadArrayArrayFromLines>
 
-55 L<loadHashFromLines|/loadHashFromLines>
+55 L<loadArrayFromLines|/loadArrayFromLines>
 
-56 L<makePath|/makePath>
+56 L<loadHashArrayFromLines|/loadHashArrayFromLines>
 
-57 L<matchPath|/matchPath>
+57 L<loadHashFromLines|/loadHashFromLines>
 
-58 L<max|/max>
+58 L<makePath|/makePath>
 
-59 L<min|/min>
+59 L<matchPath|/matchPath>
 
-60 L<nws|/nws>
+60 L<max|/max>
 
-61 L<pad|/pad>
+61 L<min|/min>
 
-62 L<parseFileName|/parseFileName>
+62 L<nws|/nws>
 
-63 L<perlPackage|/perlPackage>
+63 L<pad|/pad>
 
-64 L<powerOfTwo|/powerOfTwo>
+64 L<parseCommandLineArguments|/parseCommandLineArguments>
 
-65 L<powerOfTwoX|/powerOfTwo>
+65 L<parseFileName|/parseFileName>
 
-66 L<printFullFileName|/printFullFileName>
+66 L<perlPackage|/perlPackage>
 
-67 L<quoteFile|/quoteFile>
+67 L<powerOfTwo|/powerOfTwo>
 
-68 L<readBinaryFile|/readBinaryFile>
+68 L<powerOfTwoX|/powerOfTwo>
 
-69 L<readFile|/readFile>
+69 L<printFullFileName|/printFullFileName>
 
-70 L<removeFilePrefix|/removeFilePrefix>
+70 L<quoteFile|/quoteFile>
 
-71 L<renormalizeFolderName|/renormalizeFolderName>
+71 L<readBinaryFile|/readBinaryFile>
 
-72 L<searchDirectoryTreesForMatchingFiles|/searchDirectoryTreesForMatchingFiles>
+72 L<readFile|/readFile>
 
-73 L<temporaryDirectory|/temporaryDirectory>
+73 L<removeFilePrefix|/removeFilePrefix>
 
-74 L<temporaryFile|/temporaryFile>
+74 L<renormalizeFolderName|/renormalizeFolderName>
 
-75 L<temporaryFolder|/temporaryFolder>
+75 L<searchDirectoryTreesForMatchingFiles|/searchDirectoryTreesForMatchingFiles>
 
-76 L<timeStamp|/timeStamp>
+76 L<temporaryDirectory|/temporaryDirectory>
 
-77 L<trim|/trim>
+77 L<temporaryFile|/temporaryFile>
 
-78 L<updateDocumentation|/updateDocumentation>
+78 L<temporaryFolder|/temporaryFolder>
 
-79 L<userId|/userId>
+79 L<timeStamp|/timeStamp>
 
-80 L<writeBinaryFile|/writeBinaryFile>
+80 L<trim|/trim>
 
-81 L<writeFile|/writeFile>
+81 L<updateDocumentation|/updateDocumentation>
 
-82 L<xxx|/xxx>
+82 L<userId|/userId>
+
+83 L<writeBinaryFile|/writeBinaryFile>
+
+84 L<writeFile|/writeFile>
+
+85 L<xxx|/xxx>
+
+86 L<XXX|/XXX>
+
+87 L<zzz|/zzz>
 
 =head1 Installation
 
@@ -2208,7 +2333,7 @@ test unless caller;
 1;
 # podDocumentation
 __DATA__
-use Test::More tests => 114;
+use Test::More tests => 120;
 
 #Test::More->builder->output("/dev/null");
 
@@ -2536,7 +2661,7 @@ is_deeply [0, 1, 5], [contains(qr(a+), qw(a baa c d e aa b c d e))];
 
 is_deeply [qw(a b)], [&removeFilePrefix(qw(a/ a/a a/b))];
 
-if (1)                                                                          # fileOutOfDate
+if (0)                                                                          # fileOutOfDate
  {my @Files = qw(a b c);
   my @files = (@Files, qw(d));
   writeFile($_, $_), sleep 1 for @Files;
@@ -2569,3 +2694,38 @@ if (1)                                                                          
   is_deeply [@C], [],      'ccc';
   unlink for @Files;
  }
+else
+ { SKIP:
+   {skip "Takes too much time", 11;
+   }
+ }
+
+ok convertUnicodeToXml('setenta e três') eq "setenta e tr&#234;s";
+
+ok zzz(<<END, qr(aaa\s*bbb)s);
+echo aaa
+echo bbb
+END
+
+if (1)
+ {eval {zzz(<<END, qr(SUCCESS)s)};
+echo aaa
+echo bbb
+END
+  ok $@ =~ m(Data::Table::Text::zzz)s;
+ }
+
+if (1)
+ {my $r = parseCommandLineArguments {[@_]}
+   (qw( aaa bbb -c --dd --eee=EEEE -f=F), q(--gg=g g), q(--hh=h h));
+  is_deeply $r,
+    [["aaa", "bbb"],
+     {c=>undef, dd=>undef, eee=>"EEEE", f=>"F", gg=>"g g", hh=>"h h"},
+    ];
+ }
+
+is_deeply [qw(a b c)],
+  [setIntersectionOfTwoArraysOfWords([qw(e f g a b c )], [qw(a A b B c C)])];
+
+is_deeply [qw(a b c)],
+  [setUnionOfTwoArraysOfWords([qw(a b c )], [qw(a b)])];

@@ -1,0 +1,32 @@
+---
+abstract: 'Declare subtests using subroutine attributes'
+author:
+  - 'Ben Marcotte <bmarcotte NOSPAM cpan.org>'
+build_requires:
+  English: '0'
+  Test::More: '0.99'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Subtest-Attribute
+provides:
+  Test::Subtest::Attribute:
+    file: lib/Test/Subtest/Attribute.pm
+    version: '0.03'
+requires:
+  Attribute::Handlers: '0'
+  Test::Builder: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/bmarcotte/Test-Subtest-Attribute/issues
+  homepage: https://github.com/bmarcotte/Test-Subtest-Attribute
+  repository: https://github.com/bmarcotte/Test-Subtest-Attribute.git
+version: '0.03'
+x_serialization_backend: 'YAML::Tiny version 1.70'

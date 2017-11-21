@@ -34,7 +34,7 @@ no_index:
 provides:
   App::Dochazka::REST:
     file: lib/App/Dochazka/REST.pm
-    version: 0.556
+    version: 0.557
   App::Dochazka::REST::ACL:
     file: lib/App/Dochazka/REST/ACL.pm
     version: 0
@@ -141,4 +141,4 @@ resources:
   bugtracker: https://github.com/smithfarm/dochazka-rest/issues
   license: http://opensource.org/licenses/BSD-3-Clause
   repository: https://github.com/smithfarm/dochazka-rest
-version: 0.556
+version: 0.557

@@ -1,7 +1,5 @@
 # -*- cperl -*-
 
-use warnings;
-
 use ExtUtils::testlib;
 use Test::More;
 use Test::Exception;
@@ -12,30 +10,13 @@ use Config::Model;
 use Config::Model::AnyId;
 use Log::Log4perl qw(:easy :levels);
 
+use lib -d 't' ? 't/lib' : 'lib';
+use MyTestLib qw/init_test/;
+
 use strict;
+use warnings;
 
-my $arg = shift || '';
-
-my $log = 0;
-
-my $trace = $arg =~ /t/ ? 1 : 0;
-$log = 1 if $arg =~ /l/;
-
-my $home = $ENV{HOME} || "";
-my $log4perl_user_conf_file = "$home/.log4config-model";
-
-if ( $log and -e $log4perl_user_conf_file ) {
-    Log::Log4perl::init($log4perl_user_conf_file);
-}
-else {
-    Log::Log4perl->easy_init( $log ? $WARN : $ERROR );
-}
-
-my $model = Config::Model->new();
-
-Config::Model::Exception::Any->Trace(1) if $arg =~ /e/;
-
-ok( 1, "compiled" );
+my ($model, $trace) = init_test(shift);
 
 my @element = (
 
@@ -123,6 +104,7 @@ $model->create_config_class(
 
 $model->create_config_class(
     name    => "Slave",
+    gist => '{X} and {Y}',
     element => [
         [qw/X Y Z/] => {
             type       => 'leaf',
@@ -153,10 +135,11 @@ my $b = $root->fetch_element('bounded_list');
 ok( $b, "bounded list created" );
 is( $inst->needs_save, 0, "verify instance needs_save status after element creation" );
 
+# each line triggers 2 changes: element creation and value storage
 is( $b->fetch_with_id(1)->store('foo'), 1, "stored in 1" );
 is( $b->fetch_with_id(0)->store('baz'), 1, "stored in 0" );
 is( $b->fetch_with_id(2)->store('bar'), 1, "stored in 2" );
-is( $inst->needs_save, 3, "verify instance needs_save status after storing into element" );
+is( $inst->needs_save, 6, "verify instance needs_save status after storing into element" );
 print join( "\n", $inst->list_changes("\n") ), "\n" if $trace;
 
 throws_ok { $b->fetch_with_id(124)->store('baz'); } qr/Index 124 > max_index limit 123/,
@@ -200,6 +183,8 @@ is( $b->fetch_with_id(7)->annotation,
 my @all = $b->fetch_all_values;
 eq_or_diff( \@all, [qw/baz bar toto titi toto titi toto2/], "check fetch_all_values" );
 
+is( $b->fetch, 'baz,bar,toto,titi,toto,titi,toto2', "check fetch" );
+
 my $lac = $root->fetch_element('list_with_auto_created_id');
 eq_or_diff( [ $lac->fetch_all_indexes ], [ 0 .. 3 ], "check list_with_auto_created_id" );
 
@@ -242,6 +227,7 @@ $inst->clear_changes;
 is( $ol->fetch_with_id(3)->fetch_element('Z')->fetch, undef, "check after move idx 3 in 4" );
 is( $ol->fetch_with_id(4)->fetch_element('Z')->fetch, 'Cv',  "check after move idx 3 in 4" );
 map { is( $ol->fetch_with_id($_)->index_value, $_, "Check moved index value $_" ); } ( 0 .. 4 );
+$inst->clear_changes;
 
 $ol->swap( 0, 2 );
 is( $inst->needs_save, 1, "verify instance needs_save status after move" );
@@ -261,6 +247,13 @@ is( $ol->fetch_with_id(0)->fetch_element('X')->fetch, undef, "check before move"
 $ol->remove(0);
 print $root->dump_tree( ) if $trace;
 is( $ol->fetch_with_id(0)->fetch_element('X')->fetch, 'Bv', "check after move" );
+
+# test node gist in an array display
+my $olgist = $ol->fetch_with_id(5);
+$olgist->fetch_element('X')->store('Av');
+$olgist->fetch_element('Y')->store('Bv');
+
+is($olgist->fetch_gist,'Av and Bv', "check get_display_key");
 
 # test store
 my @test = (

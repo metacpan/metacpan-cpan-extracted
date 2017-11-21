@@ -1,5 +1,5 @@
 package Search::Elasticsearch::Transport;
-$Search::Elasticsearch::Transport::VERSION = '5.02';
+$Search::Elasticsearch::Transport::VERSION = '6.00';
 use Moo;
 
 use URI();
@@ -72,7 +72,7 @@ Search::Elasticsearch::Transport - Provides interface between the client class a
 
 =head1 VERSION
 
-version 5.02
+version 6.00
 
 =head1 DESCRIPTION
 
@@ -91,7 +91,7 @@ L<Search::Elasticsearch::Role::Is_Sync>.
         send_get_body_as => 'POST'
     );
 
-Certain endpoints like L<Search::Elasticsearch::Client::5_0::Direct/search()>
+Certain endpoints like L<Search::Elasticsearch::Client::6_0::Direct/search()>
 default to using a C<GET> method, even when they include a request body.
 Some proxy servers do not support C<GET> requests with a body.  To work
 around this, the C<send_get_body_as>  parameter accepts the following:

@@ -1,0 +1,40 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use YAML::XS;
+use File::Temp;
+use Digest::MD5;
+
+local $/ = undef;
+
+my %param = %{ YAML::XS::Load( <> ) };
+
+my $idie = sub { print shift; exit 1; };
+my $unlink = sub { unlink shift; print shift;exit 1 };
+
+for my $conf ( ref $param{argv}[0] ? @{ $param{argv} } : $param{argv} )
+{
+    my $path = delete $conf->{path};
+    my ( $fh, $temp ) = File::Temp::tempfile();
+
+    &$idie( 'param error' ) unless defined $conf->{md5}
+        && $path && $fh && length $conf->{file};
+
+    &$idie( "get $conf->{chown} uid fail" ) if $conf->{chown} && ! ( my @pw = getpwnam $conf->{chown} );
+
+    print $fh $conf->{file};
+    seek $fh, 0, 0;
+    my $md5 = Digest::MD5->new()->addfile( $fh )->hexdigest;
+    close $fh;
+
+    &$unlink( $temp, 'md5 nomatch' ) if $md5 ne $conf->{md5};
+    &$unlink( $temp, 'chmod fail' ) if $conf->{chmod}
+        && ! chmod oct $conf->{chmod}, $temp;
+    &$unlink( $temp, 'chown fail' ) if @pw && ! chown @pw[2,3], $temp;
+
+    &$unlink( $temp, 'rename fail' ) unless rename $temp, $path;
+}
+
+print "ok\n";
+exit 0;

@@ -8,8 +8,8 @@ build_requires:
   File::Find: '0'
   File::Path: '0'
   Scalar::Util: '0'
-  Sereal::Decoder: '3.015'
-  Sereal::Encoder: '3.015'
+  Sereal::Decoder: '4.004'
+  Sereal::Encoder: '4.004'
   Test::Deep: '0'
   Test::Differences: '0'
   Test::Exception: '0.38'
@@ -33,4 +33,4 @@ requires:
 resources:
   bugtracker: https://github.com/Sereal/Sereal/issues
   repository: git://github.com/Sereal/Sereal.git
-version: '4.003'
+version: '4.004'

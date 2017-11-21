@@ -8,6 +8,7 @@ use MYDan;
 
 use File::Basename;
 use MYDan::Util::OptConf;
+use MYDan::Util::XTar;
 
 =head1 SYNOPSIS
 
@@ -23,6 +24,8 @@ use MYDan::Util::OptConf;
      release
 
 =cut
+
+$MYDan::Util::OptConf::THIS = 'util';
 
 my $option = MYDan::Util::OptConf->load();
 my %o = $option->get( qw( pack=s release=s ) )->dump();
@@ -53,7 +56,7 @@ unless( $o{pack} || $o{release} )
 my $version = $o{release} || $o{pack};
 system( "rsync -av --delete $mydan/etc/agent/auth/*.pub $mydan/etc/agent/auth.tmp/ && \
 rsync -av --delete $mydan/dan/bootstrap/exec/ $mydan/dan/bootstrap/exec.tmp/ && \
-tar -zcvf $tmp/$version $mydan/perl $mydan/dan $mydan/etc/agent/auth.tmp/*.pub $mydan/etc/agent/proxy $mydan/etc/node/cache/current --exclude=$mydan/dan/bootstrap/exec/* " ) 
+tar -zcvf $tmp/$version $mydan/perl $mydan/dan $mydan/etc/agent/auth.tmp/*.pub $mydan/etc/agent/proxy $mydan/etc/node/cache/current $mydan/etc/util --exclude=$mydan/dan/bootstrap/exec/* " ) 
     unless -f "$tmp/$version";
 
 if( $o{release} )
@@ -64,6 +67,13 @@ if( $o{release} )
     my $to = "$rel/$os.$arch";
     system( "mkdir -p '$to'" ) unless -e $to;
     system "cp '$tmp/$version' '$to/mydan.$version.tar.gz'";
-    system "ln -fsn 'mydan.$version.tar.gz' '$to/mydan.latest.tar.gz'";
+    map{ 
+       MYDan::Util::XTar->new( 
+           script => "$o{conf}/release/$_.sh",
+           package => "$to/mydan.$version.tar.gz", 
+           output => "$to/mydan.$version.$_"
+       )->xtar(); 
+    }qw( client agent );
+    map{ system "ln -fsn 'mydan.$version.$_' '$to/mydan.latest.$_'" }qw( tar.gz client agent );
 }
 

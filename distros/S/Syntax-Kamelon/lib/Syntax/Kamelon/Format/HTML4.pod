@@ -1,0 +1,240 @@
+=head1 NAME
+
+Syntax::Kamelon::Format::HTML4 - Formatting module for HTML output
+
+=head1 SYNOPSIS
+
+ my $kam = Syntax::Kamelon->new(
+    syntax => 'Perl',
+    formatter => ['HTML4',
+       title => "Testing Plain/Theme DarkGray",
+    ],
+ );
+
+=head1 DESCRIPTION
+
+This module provides a basic formatting interface to creat HTML documents. It 
+inherits B<Syntax::Kamelon::Format::Base> and all of its options and methods.
+
+It is set up to quickly put up a formatting interface in a simple manner.
+Even if you call this formatter without any options it will produce readable
+output.
+
+If you intend to use Kamelon on your webserver you may be better of spending
+some time in writing your own templates. If you want to quickly produce some
+nicely formatted HTML then you use this module.
+
+=head1 OPTIONS
+
+The constructor is called with a paired list of options as parameters. You can use
+the following options.
+
+=over 4
+
+=item B<foldmarkers> => boolean
+
+If set then the output produces clickable foldmarkers. By default 0.
+If set and the option B<foldingdepth> is not specified then B<foldingdepth
+is set to 99.
+
+=item B<footer> => various
+
+Specify the footer template for the HTML output. If not used, it will use its
+internal footer template.
+
+=item B<header> => various
+
+Specify the header template for the HTML output. If not used, it will use its
+internal header template.
+
+=item B<inlinecss> => boolean
+
+Specifies if css should be internal in the HTML output or if an external
+stylesheet should be used.
+
+=item B<javascript> => various
+
+Specify the javascript template for the HTML output. If not used, it will use its
+internal javascript template.
+
+=item B<layoutcss> filename
+
+Specifies the css to be used for the layout and sizes in the HTML file. If not specified
+it will use the file "layout.css" it finds in the theme folder.
+
+=item B<lineoffset> integer
+
+Specifies the starting line number of the output. By default 1.
+
+=item B<plainpanel> ref to hash
+
+Specifies the data the module is using to create a plain panel. The hash looks like:
+
+ {
+    begin => "begin template",
+    end => "end template",
+ }
+
+By default it uses some internally defined templates for the plain panel.
+
+=item B<scrolled> boolean
+
+Specifies if a plain panel (0) or scrolled panel (1) should be used for the output.
+By default it is 0.
+
+=item B<scrolledpanel> ref to hash
+
+Specifies the data the module is using to create a scrolled panel. The hash looks like:
+
+ {
+    begin => "begin template",
+    end => "end template",
+ }
+
+By default it uses some internally defined templates for the scrolled panel.
+
+=item B<sections> boolean
+
+If set it uses the top level fold information to divide the output in sections.
+By default 0.
+
+=item B<theme> name
+
+Sets a prefedefined theme. Available themes are: Black, DarkGray, Gray, LightGray
+and White. By default DarkGray. If you specify the B<themecss> option, this option
+is ignored.
+
+=item B<themecss> integer
+
+Specifies the css to be used for coloring the output. If not specified
+it will use the file "DarkGray.css" it finds in the theme folder. Which
+is equal to setting the B<theme> option to DarkGray.
+
+=item B<themefolder> integer
+
+Points to the folder where it finds all the CSS files. By default it is
+set to Syntax/Kamelon/Format/HTML4 in @INC.
+
+=item B<title> string
+
+Specifies the title that your output will display in a browser. By default
+'Kamelon ouput'.
+
+=back
+
+=head1 PUBLIC METHODS
+
+=over 4
+
+=item B<FoldMarkers>
+
+Accessor. Corresponds with the B<foldmarkers> option.
+
+=item B<Format>
+
+Overwritten method. Usually called through B<Kamelon>. It composes the HTML framework and
+formats the parsed text into it.
+
+=item B<Footer>
+
+Accessor. Corresponds with the B<footer> option.
+
+=item B<GetData>
+
+Overwritten method of B<Syntax::Kamelon::Format::Base>. Use this method if you want to use your own instance of Template Tooolkit instead of B<TT>'s internal one. It returns
+a data structure that looks like this:
+
+ {
+    folds => { #the keys of this hash are line numbers
+	    4 => {
+          end => $endline,
+		    depth => $folddepth,
+		    line => $text,
+		    region => $regionname,
+	    },
+	    ...
+    },
+    content => [
+       [{ text => $snippet, tag => $tagname}, ...], #this is one line
+       ...
+    ],
+    foldmarkers => 0, # or ofcourse 1
+    header => "the processed header including javascript and css, this is no longer a template",
+    footer => "the processed footer, this is no longer a template",
+    panel => "The data of which a panel on which the hightlighted code is displayed. this is still a template",
+    sections => 0, # or ofcourse 1
+ }
+
+=item B<Header>
+
+Accessor. Corresponds with the B<header> option.
+
+=item B<InlineCSS>
+
+Accessor. Corresponds with the B<inlinecss> option.
+
+=item B<Javascript>
+
+Accessor. Corresponds with the B<javascript> option.
+
+=item B<LayoutCSS>
+
+Accessor. Corresponds with the B<layoutcss> option.
+
+=item B<PlainPanel>
+
+Accessor. Corresponds with the B<plainpanel> option.
+
+=item B<Scrolled>
+
+Accessor. Corresponds with the B<footer> option.
+
+=item B<ScrolledPanel>
+
+Accessor. Corresponds with the B<scrolledpanel> option.
+
+=item B<Sections>
+
+Accessor. Corresponds with the B<sections> option.
+
+=item B<ThemeCSS>
+
+Accessor. Corresponds with the B<themecss> option.
+
+=item B<ThemeFolder>
+
+Accessor. Corresponds with the B<themefolder> option.
+
+=item B<Title>
+
+Accessor. Corresponds with the B<title> option.
+
+=back
+
+=head1 PIVATE METHODS
+
+=over 4
+
+=item B<LoadFile>
+
+Loads a plain text file and returns it in a scalar.
+
+=back
+
+=head1 AUTHOR AND COPYRIGHT
+
+This module is written and maintained by:
+
+Hans Jeuken < hansjeuken at xs4all dot nl>
+
+Copyright (c) 2017 by Hans Jeuken, all rights reserved.
+
+Published under the GPLV3 license
+
+=head1 SEE ALSO
+
+B<Syntax::Kamelon>, B<Syntax::Kamelon::Builder>, B<Syntax::Kamelon::Debugger>, B<Syntax::Kamelon::Diagnostics>, B<Syntax::Kamelon::Indexer>, 
+B<Syntax::Kamelon::XMLData>, B<Syntax::Kamelon::Format::Base> B<Syntax::Kamelon::Format::ANSI>
+
+=cut
+

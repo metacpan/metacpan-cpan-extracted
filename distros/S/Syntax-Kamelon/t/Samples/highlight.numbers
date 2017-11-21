@@ -1,0 +1,31 @@
+Testing numbers
+
+<Float attribute="Match" context="#stay" />
+<Float>
+3.42
+<Float>
+
+<HlCChar attribute="Match" context="#stay" />
+<HlCChar>
+'c'
+<HlCChar>
+
+<HlCHex attribute="Match" context="#stay" />
+<HlCHex>
+0xff
+<HlCHex>
+
+<HlCOct attribute="Match" context="#stay" />
+<HlCOct>
+033
+<HlCOct>
+
+<HlCStringChar attribute="Match" context="#stay" />
+<HlCStringChar>
+\t
+<HlCStringChar>
+
+<Int attribute="Match" context="#stay" />
+<Int>
+947
+<Int>

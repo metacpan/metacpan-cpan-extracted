@@ -439,7 +439,7 @@ note "test boolean where values are translated to true/false";
     is( $bwwa->fetch, 'false', "boolean_with_write_as returns 'false'" );
     is( $inst->needs_save, 1, "check needs_save after writing 'boolean_with_write_as'" );
 
-    my @changes = "boolean_with_write_as: '<undef>' -> 'false'";
+    my @changes = "boolean_with_write_as has new value: 'false'";
     eq_or_diff([$inst->list_changes],\@changes,
                "check change message after writing 'boolean_with_write_as'");
 
@@ -784,7 +784,7 @@ note "test replace_follow";
     is( $inst->needs_save, 0,     "check needs_save after simple fetch" );
 
     $root->load('replacement_hash:foo=repfoo replacement_hash:bar=repbar');
-    is( $inst->needs_save, 2, "check needs_save after load" );
+    is( $inst->needs_save, 4, "check needs_save after load" );
     $inst->clear_changes;
 
     is( $wrf->fetch,       'repfoo', "check replacement_hash with foo (after replacement)" );

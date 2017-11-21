@@ -201,3 +201,9 @@ os          => 'Windows XP',
 parser      => 'msie',
 version     => '6.000',
 version_raw => '6.0',
+
+[AGENT]
+
+# WTF?
+
+#TODO: Mozilla/4.0 (compatible; MSIE 6.0; GomezAgent 2.0; Windows NT)

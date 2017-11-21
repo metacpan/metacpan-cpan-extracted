@@ -1,5 +1,5 @@
 package Moose::Exception::CanReblessOnlyIntoASuperclass;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -10,4 +10,5 @@ sub _build_message {
     "You may rebless only into a superclass of (".blessed( $self->instance )."), of which (". $self->class_name .") isn't."
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Value;
-$Config::Model::Value::VERSION = '2.113';
+$Config::Model::Value::VERSION = '2.114';
 use 5.10.1;
 
 use Mouse;
@@ -1271,8 +1271,7 @@ sub _store {
 
     my $old_value = $self->_fetch_no_check;
 
-    # FIXME: storing wrong value does not make sense
-    # we let store the value even if wrong when check is disabled
+    # let's store wrong value when check is disable (gh #15)
     if ( $ok or $check eq 'no' ) {
         $self->instance->cancel_error( $self->location );
         $self->_store_value( $value, $notify_change );
@@ -1854,7 +1853,7 @@ Config::Model::Value - Strongly typed configuration value
 
 =head1 VERSION
 
-version 2.113
+version 2.114
 
 =head1 SYNOPSIS
 

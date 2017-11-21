@@ -131,8 +131,8 @@ define ([
             assert.strictEqual(dt.strToMonth('', true), null);
             assert.strictEqual(dt.strToMonth(undefined), null);
             assert.strictEqual(dt.strToMonth(undefined, true), null);
-            assert.strictEqual(dt.strToMonth('se'), null);
-            assert.strictEqual(dt.strToMonth('se', true), null);
+            assert.strictEqual(dt.strToMonth('se'), 'SEP');
+            assert.strictEqual(dt.strToMonth('se', true), 'September');
             assert.strictEqual(dt.strToMonth('janFHDCDC'), 'JAN');
             assert.strictEqual(dt.strToMonth('janFHDCDC', true), 'January');
             assert.strictEqual(dt.strToMonth('jan'), 'JAN');

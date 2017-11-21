@@ -3,6 +3,7 @@ use warnings;
 use Test::More;
 
 my $pkg;
+
 BEGIN {
     $pkg = 'Catmandu::Importer::DBI';
     use_ok $pkg;

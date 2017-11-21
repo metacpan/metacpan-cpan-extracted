@@ -20,4 +20,4 @@ no_index:
 requires:
   Carp: '0'
   Tie::IxHash: '0'
-version: '3223'
+version: '3224'

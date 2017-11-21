@@ -1,0 +1,8 @@
+Revision history for Pod::Github
+
+0.03    13 Nov 2017
+        Added EXE_FILES to Makefile.PL; update README
+
+0.01    12 Nov 2017
+        Initial release.
+

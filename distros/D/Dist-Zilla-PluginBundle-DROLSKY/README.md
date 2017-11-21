@@ -4,7 +4,7 @@ Dist::Zilla::PluginBundle::DROLSKY - DROLSKY's plugin bundle
 
 # VERSION
 
-version 0.85
+version 0.88
 
 # SYNOPSIS
 
@@ -21,6 +21,8 @@ version 0.85
     exclude_files = ...
     ; Default is DROLSKY
     authority = DROLSKY
+    ; Used to do things like add the PPPort plugin - determined automatically but can be overridden
+    has_xs = ...
     ; Passed to AutoPrereqs - can be repeated
     prereqs_skip = ...
     ; Passed to Test::Pod::Coverage::Configurable if set

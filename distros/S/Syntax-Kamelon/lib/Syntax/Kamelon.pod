@@ -1,0 +1,509 @@
+=head1 NAME
+
+Syntax::Kamelon - A versatile and fully programmable textual content parser that is extremely well suited for syntax highlighting and code folding 
+
+=head1 SYNOPSIS
+
+ use Syntax::Kamelon;
+ 
+ my $textfilter = "[%~ text FILTER html FILTER replace('\\040', '&nbsp;') FILTER replace('\\t', '&nbsp;&nbsp;&nbsp;') ~%]";
+ my $hl = new Syntax::Kamelon(
+    xmlfolder => $xmldir,
+    noindex => 1,
+    formatter => ['Base',
+       textfilter => \$textfilter,
+       format_table => \%formtab,
+       newline => "</br>\n",
+       tagend => '</font>',
+    ],
+ );
+ while (my $in = <IFILE>) {
+   $hl->Parse($in);
+ }
+ print $hl->Format;
+
+=head1 DESCRIPTION
+
+Kamelon is based on the syntax highlighting and code folding algorithms used in the Kate texteditor
+of the KDE desktop. It replaces and supercedes Syntax::Highlight::Engine::Kate.
+
+B<This is a rewrite> and not backwards compatible with Syntax::Highlight::Engine::Kate.
+
+Instead of using plugin modules it loads Kate's syntax
+highlight definition xml files directly. That makes development and testing a lot easier. It
+also opens up a new field of applications like creating your own highlight definitions to 
+neatly format your reports. Tons of bugs have been removed. Testing has been redesigned. 
+It runs about four times faster than version 0.10 and is up to spec with the latest Kate 
+highlight definitions.
+
+=head1 OPTIONS
+
+Kamelons' constructor is called with a paired list of options as parameters. You can use
+the following options.
+
+=over 4
+
+=item B<commands> => ref to hash
+
+Specify commands to execute upon a specific match. Example:
+
+ mycommand => sub { my $match = shift; return '' }
+
+You can specify the command in the rules of your own syntax xml file.
+Kamelon will give the matched text to your sub as parameter and will parse whatever
+your sub returns. Make it always return at least an empty string.
+
+=item B<formatter> => ['Name', @options],
+
+A formatter can be any object that inherits B<Syntax::Kamelon::Format::Base> and 
+lives in B<Syntax::Kamelon::Format::Name>. By default 'Base' without options is loaded.
+This is convenient if you only use B<ParseRaw>.
+
+See also B<Syntax::Kamelon::Format::Base>.
+
+=item B<indexfile> => filename
+
+Specifies the filename where Kamelon stores information about available syntax definitions.
+
+By default it points to 'indexrc' in the B<xmlfolder>. If the file does not exist Kamelon will 
+load all xml files in the B<xmlfolder> and attempt to create the indexfile.
+
+Once the indexfile has been created it becomes static. If you add a syntax definition 
+XML file to the B<xmlfolder> it will no longer be recognized. Delete the indexfile and reload
+Kamelon to fix that. 
+
+See also B<Syntax::Kamelon::Indexer>
+
+=item B<logcall> => ref to sub
+
+By default Kamelon writes all errors to STERR. 
+
+=item B<noindex> => boolean
+
+By default 0. If you set this option Kamelon will ignore the existence of an indexfile
+and manually build the index, without saving it. But it gives
+you the liberty of adding and removing syntax highlight definition files.
+
+This option comes with a considerable startup penalty.
+
+See also B<Syntax::Kamelon::Indexer>
+
+=item B<syntax> => string
+
+Specify the syntax definition you want to use. If you do not specify this option
+Kamelon will start in blank mode. It the B<Highlight> and B<HighlightAndFormat> methods
+will allow text to pass without any highlighting being done.
+
+=item B<verbose> => boolean
+
+By default 0. If you set it Kamelon will happily complain about all integrity errors
+it finds in syntax xml files. Otherwise it will only complain and crunch about the ones
+it cannot overcome.
+
+=item B<xmlfolder> => folder
+
+This is the place where Kamelon looks for syntax highlight definition XML files. By
+default it searches @INC for 'Syntax/Kamelon/XML'. Here you find the
+XML files used in the Kate text editor. They are specially crafted for this module.
+
+See also B<Syntax::Kamelon::Indexer>
+
+=back
+
+=head1 PUBLIC METHODS
+
+=over 4
+
+=item B<AvailableAttributes>
+
+Returns a list of all available attribute tags. Can also be called before initializing Kamelon.
+
+=item B<AvailableSyntaxes>
+
+Returns a list of all available syntax definitions.
+
+=item B<ClearLexers>
+
+Empties the pool of loaded lexers. Every called lexer will be loaded from scratch.
+
+=item B<Column>
+
+Returns the column position in the line that is currently highlighted.
+
+=item B<FirstNonSpace>(I<$string>);
+
+Returns true if the current line did not contain a non-spatial character so far and the first 
+character in B<$string> is a non spatial character.
+
+=item B<Format>
+
+Calls the B<Format> method of the currently loaded formatter and returns the result.
+
+=item B<Formatter>
+
+Returns a reference to the formatter object.
+
+=item B<GetIndexer>
+
+Returns the Indexer object.
+
+=item B<GetLexer>(I<$syntax>);
+
+Returns the lexer data structure from the pool of loaded lexers. If it is
+not found it will create and return it.
+
+=item B<IsDeliminator>(I<$char>);
+
+Returns true if I<$char> is a deliminator.
+
+=item B<LastcharBoundary>
+
+Returns true if the last character that was parsed was a word boundary.
+
+=item B<LastcharDeliminator>
+
+Returns true if the last character that was parsed was a deliminator.
+
+=item B<LastChar>
+
+Returns the last character that was parsed.
+
+=item B<LineNumber>
+
+Returns the line number of the next line that is to be parsed.
+
+=item B<LineStart>
+
+Returns true if the parser is at the beginning of a line.
+
+=item B<LogCallGet>;
+
+Returns a reference to the anonymous sub that handles Warnings. See also the B<locall> option.
+
+=item B<LogCallSet>(I<$anonsub>);
+
+Sets the anonymous sub that handles Warnings. See also the B<locall> option.
+
+=item B<LogWarning>(I<$message>);
+
+Send a message to the warning mechanism of Kamelon.
+
+=item B<Parse>(I<$text>);
+
+Parses I<$text> and returns a formatted text.
+
+=item B<ParseRaw>(I<$text>);
+
+Parses I<$text> and returns a paired list of text fragments and the format information from the formatters B<FormatTable>.
+
+=item B<Reset>
+
+Clears all buffers and resets Kamelon to beginning state.
+
+=item B<StateCompare>(I<$state>);
+
+Returns true if the current stack is equal to a previously saved $state. $state contains a reference to a list.
+
+=item B<StateGet>
+
+Returns a copy of the stack in an array.
+
+=item B<StateSet>(I<@state>);
+
+Set the state to a previously saved state.
+
+=item B<SuggestSyntax>(I<$filename>);
+
+Tries to come up with a suitable lexer for $filename. It matches the
+extension of the file against the extension database held by the Indexer.
+Returns undef if nothing is found.
+
+=item B<Syntax>(I<$syntax>);
+
+Switches to the lexer in $syntax and performs a reset.
+
+=back
+
+=head1 PRIVATE METHODS
+
+=over 4
+
+=item B<Captured>(I<\@captured>)
+
+Stores a list of items captured by the RegExpr rule in the stack
+with the current context. Used with dynamic rules.
+
+=item B<CapturedGet>(I<$number>)
+
+Returns the captured item indexed by number that is stored in the
+stack with the parent context. Used with dynamic rules.
+
+=item B<CapturedParseC>(I<$string>)
+
+B<$string> should only be one character long and numeric. B<capturedParseC> will return the 
+Nth captured element of the parent context.
+
+Used with dynamic rules.
+
+=item B<CapturedParseR>(I<$string>)
+
+All occurences of \[1-9] will be replaced by the 
+corresponding captured elements of the parent context.
+
+Used with dynamic rules.
+
+=item B<CommandExecute>(I<$cmdname>, I<$matchedtext>);
+
+Calls the sub connected to $cmdname with $matchedtext as parameter.
+Returns whatever the sub returns.
+
+=item B<IncludeRules>(I<$text>, I<$callbacklist>, I<$debuginfo>, I<$inclattr>);
+
+Called when an IncludeRules instruction is encountered in a lexer context.
+
+=item B<IncludeSyntax>(I<$text>, I<$syntax>, I<$context>);
+
+Same as IncludeRules, only the Rules refer to another syntax.
+
+=item B<IncludeSyntaxIA>(I<$text>, I<$syntax>, I<$context>, I<$attr>);
+
+Same as IncludeSyntax but now with the includeAttribute flag set.
+
+=item B<InitFormatter>(I<$reftolist>);
+
+Tries to load a formatter module that lives in I<Syntax::Kamelon::Format::PluginName>.
+The PluginName is the first item in the list. The other items are its options
+
+These formatters do not yet work.
+
+Initializes the formatter module. These modules are not yet ready for deployment.
+
+=item B<LineEndContext>(I<$shifter>);
+
+Makes sure the context shift is done properly when a LineEndContext is specified.
+
+=item B<ParseContext>(I<$text>, I<$callbacklist>, I<$debuginfo>);
+
+The internal combustion engine of Kamelon. It parses $$text through all callbacks
+in $callbacklist. If a match is found it parses the result and stops. Returns true if 
+a match was made.
+
+=item B<ParseLine>(I<$text>);
+
+Called by B<Parse>. It is given one line (including the newline) as a parameter.
+
+=item B<ParseResultXXXX>
+
+These methods are called by the resultparsers. These are anonymous subs within the rules
+of the lexer. Sometimes multiple resultparsers are embedded in a rule.
+
+=item B<ParseResult>(I<$text>, I<$match>, I<$contextswitcher>, I<$attr>);
+
+=item B<ParseResultCommand>(I<$text>, I<$match>, I<$contextswitcher>, I<$attr>, I<@resultparsers>, I<$command>);
+
+=item B<ParseResultLookAhead>(I<$text>, I<$match>, I<$contextswitcher>);
+
+=item B<ParseResultOverStrike>(I<$text>, I<$match>, I<$contextswitcher>, I<$attr>, I<@resultparsers>, I<$command>);
+
+=item B<ParseResultRegion>(I<$text>, I<$match>, I<$contextswitcher>, I<$attr>, I<$beginregion>, I<$endregion>);
+
+Not yet functional. Should be called when a match indicates a region (code folding) event.
+
+=item B<ParseResultReplace>(I<$text>, I<$match>, I<$contextswitcher>, I<$attr>, I<@resultparsers>, I<$string>);
+
+=item B<SnippetForce>
+
+Forces the current text snippet into the output cue together with its attribute. Clears the snippet.
+
+=item B<SnippetParse>(I<$match>, I<$attribute>);
+
+Tries to collect a snippet of text, as long as possible under the same attribute. If I<$attribute> differs
+form the current attribute, the snippet and current attribute are parsed to the output. The snippet is emptied
+and the current attribute changed.
+
+=item B<StackPush>($lexer, $context);
+
+Pushes $lexer and $context to the stack. Also adds the collected dynamic captures. This $lexer now
+becomes the acting lexer.
+
+Stack items are stored in the stack as [$lexer, $context, \@captures].
+
+=item B<StackPull>
+
+Pulls the last lexer and context that was pushed from the stack and returns it.
+
+=item B<StackTop>
+
+Returns a reference to the top item on the stack.
+
+=item B<testXXXXXX>
+
+These are the methods called by the rules in the lexers. They return true if a match
+was found and take care that the result gets parsed. I<$text> stands for a reference to
+the line that is currently parsed.
+
+=item B<testAnyChar>(I<$text>, I<$string>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
+
+Case sensitive.
+
+=item B<testAnyCharI>(I<$text>, I<$string>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
+
+Case insensitive.
+
+=item B<testCommonColumn>(I<$text>, I<$column>, I<$nexttestmethod>, I<@options>);
+
+=item B<testCommonFirstNonSpace>(I<$text>, I<$nexttestmethod>, I<@options>);
+
+=item B<testCommonLastCharBB>(I<$text>, I<$nexttestmethod>, I<@options>);
+
+=item B<testCommonLastCharBb>(I<$text>, I<$nexttestmethod>, I<@options>);
+
+=item B<testCommonLineStart>(I<$text>, I<$nexttestmethod>, I<@options>);
+
+=item B<testDetectChar>(I<$text>, I<$char>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
+
+Case sensitive.
+
+=item B<testDetectCharD>(I<$text>, I<$char>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
+
+Dynamic.
+
+=item B<testDetectCharDI>(I<$text>, I<$char>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
+
+Dynamic and case insensitive.
+
+=item B<testDetectCharI>(I<$text>, I<$char>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
+
+Case insensitive.
+
+=item B<testDetect2Chars>(I<$text>, I<$char1>, I<$char2>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
+
+Case sensitive.
+
+=item B<testDetect2CharsD>(I<$text>, I<$char1>, I<$char2>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
+
+Dynamic.
+
+=item B<testDetect2CharsDI>(I<$text>, I<$char1>, I<$char2>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
+
+Dynamic and case insensitive.
+
+=item B<testDetect2CharsI>(I<$text>, I<$char1>, I<$char2>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
+
+Case insensitive.
+
+=item B<testDetectIdentifier>(I<$text>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
+
+=item B<testDetectSpaces>(I<$text>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
+
+=item B<testFloat>(I<$text>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
+
+=item B<testHlCChar>(I<$text>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
+
+=item B<testHlCHex>(I<$text>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
+
+=item B<testHlCOct>(I<$text>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
+
+=item B<testHlCStringChar>(I<$text>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
+
+=item B<testInt>(I<$text>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
+
+=item B<testKeyword>(I<$text>, I<$list>, I<$deliminators>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
+
+Case sensitive.
+
+=item B<testKeywordI>(I<$text>, I<$list>, I<$deliminators>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
+
+Case insensitive.
+
+=item B<testLineContinue>(I<$text>, I<$char>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
+
+=item B<testRangeDetect>(I<$text>, I<$char1>, I<$char2>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
+
+Case sensitive.
+
+=item B<testRangeDetectI>(I<$text>, I<$char1>, I<$char2>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
+
+Case insensitive.
+
+=item B<testRegExpr>(I<$text>, I<$reg>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
+
+Case sensitive.
+
+=item B<testRegExprD>(I<$text>, I<$regstring>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
+
+Dynamic.
+
+=item B<testRegExprDI>(I<$text>, I<$regstring>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
+
+Dynamic and case insensitive.
+
+=item B<testRegExprI>(I<$text>, I<$reg>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
+
+Case insensitive.
+
+=item B<testStringDetect>(I<$text>, I<$string>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
+
+Case sensitive.
+
+=item B<testStringDetectD>(I<$text>, I<$string>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
+
+Dynamic.
+
+=item B<testStringDetectDI>(I<$text>, I<$string>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
+
+Dynamic and case insensitive.
+
+=item B<testStringDetectI>(I<$text>, I<$string>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
+
+Case insensitive.
+
+=item B<testWordDetect>(I<$text>, I<$string>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
+
+Case sensitive.
+
+=item B<testWordDetectD>(I<$text>, I<$string>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
+
+Dynamic.
+
+=item B<testWordDetectDI>(I<$text>, I<$string>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
+
+Dynamic and case insensitive.
+
+=item B<testWordDetectI>(I<$text>, I<$string>, I<$contextswitcher>, I<$attribute>, I<$beginregion>,  I<$endregion>,  I<@resultparsers>);
+
+Case insensitive.
+
+=item B<UseAttribStackPush>
+
+=item B<UseAttribStackPull>
+
+=item B<UseAttribStackTop>
+
+Used with IncludeRules instructions. The UseAttribStack facilitates the use of the attribute of the calling
+rule/context to make usse of it's attribute instead of the native attribute of the included context.
+
+=back
+
+=head1 ACKNOWLEDGEMENTS
+
+All the people who wrote Kate and the syntax highlight xml files.
+
+=head1 AUTHOR AND COPYRIGHT
+
+This module is written and maintained by:
+
+Hans Jeuken < hansjeuken at xs4all dot nl>
+
+Copyright (c) 2017 by Hans Jeuken, all rights reserved.
+
+Published under the GPLV3 license
+
+=head1 SEE ALSO
+
+B<Syntax::Kamelon::Builder>, B<Syntax::Kamelon::Debugger>, B<Syntax::Kamelon::Diagnostics>,
+B<Syntax::Kamelon::Indexer>, B<Syntax::Kamelon::XMLData>, B<Syntax::Kamelon::Format::Base>, 
+B<Syntax::Kamelon::Format::ANSI>, B<Syntax::Kamelon::Format::HTML4>.
+
+=cut
+

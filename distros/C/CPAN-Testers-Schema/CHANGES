@@ -1,5 +1,17 @@
 Changelog for CPAN-Testers-Schema
 
+0.020     2017-11-18 20:44:13-06:00 America/Chicago
+
+    [Changed]
+
+    - Added some additional logging to some resultset methods to try to
+      track down some problems.
+
+    [Fixed]
+
+    - Fixed issue deserializing JSON from MySQL with illegal ASCII
+      control characters inside.
+
 0.019     2017-08-18 12:16:21-05:00 America/Chicago
 
     [Fixed]

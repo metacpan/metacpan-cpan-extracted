@@ -42,8 +42,8 @@ package Todo {
 
     extends 'Moxie::Object';
 
-    has '_description';
-    has '_is_done';
+    has _description => ();
+    has _is_done     => ();
 
     sub description : ro(_description) JSONParameter;
     sub is_done     : ro(_is_done)     JSONParameter;
@@ -53,7 +53,7 @@ package Todo {
 
 package TodoService {
     use Moxie
-        traits => [ 'Service::Traits::Provider' ];
+        traits => [ 'Service::Traits::Provider', ':experimental' ];
 
     extends 'Moxie::Object';
 

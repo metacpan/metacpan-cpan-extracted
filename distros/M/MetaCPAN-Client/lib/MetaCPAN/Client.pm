@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package MetaCPAN::Client;
 # ABSTRACT: A comprehensive, DWIM-featured client to the MetaCPAN API
-$MetaCPAN::Client::VERSION = '2.018000';
+$MetaCPAN::Client::VERSION = '2.021000';
 use Moo;
 use Carp;
 use Ref::Util qw< is_arrayref is_hashref >;
@@ -29,7 +29,7 @@ has request => (
 );
 
 my @supported_searches = qw<
-    author distribution favorite module rating release mirror file permission
+    author distribution favorite module rating release mirror file permission package
 >;
 
 sub BUILDARGS {
@@ -174,9 +174,10 @@ sub all {
     my $type   = shift;
     my $params = shift;
 
-    grep { $type eq $_ } qw/ authors distributions modules releases
-                             favorites ratings mirrors files /
-        or croak "all: unsupported type";
+    # This endpoint used to support only pluralized types (mostly) and convert
+    # to singular types before redispatching.  Now it accepts both plural and
+    # unplural forms directly and relies on the underlying methods it
+    # dispatches to to check types (using the global supported types array).
     $type =~ s/s$//;
 
     $params and !is_hashref($params)
@@ -214,6 +215,24 @@ sub autocomplete {
     return [
         map { $_->{fields} } @{ $res->{hits}{hits} }
     ];
+}
+
+sub autocomplete_suggest {
+    my $self = shift;
+    my $q    = shift;
+
+    my $res;
+
+    eval {
+        $res = $self->fetch( '/search/autocomplete/suggest?q=' . uri_escape_utf8($q) );
+        1;
+
+    } or do {
+        warn $@;
+        return [];
+    };
+
+    return $res->{suggestions};
 }
 
 ###
@@ -394,7 +413,7 @@ MetaCPAN::Client - A comprehensive, DWIM-featured client to the MetaCPAN API
 
 =head1 VERSION
 
-version 2.018000
+version 2.021000
 
 =head1 SYNOPSIS
 
@@ -561,6 +580,14 @@ Call the search/autocomplete endpoint with a query string.
 
 Returns an array reference.
 
+=head2 autocomplete_suggest
+
+    my $ac = $mcpan->autocomplete_suggest('Moo');
+
+Call the search/autocomplete/suggest endpoint with a query string.
+
+Returns an array reference.
+
 =head2 recent
 
     my $recent = $mcpan->recent(10);
@@ -673,6 +700,15 @@ This will affect query performance and memory usage, but you will still
 get an iterator back to fetch one object at a time.
 
     my $module = $mcpan->all('releases', { scroller_size => 500 });
+
+=head3 sort
+
+Pass a raw Elasticsearch sort specification for the query.
+
+    my $some_releases = $mcpan->all('releases', { sort => [{ date => { order => 'desc' } }] })
+
+Note: this param and is a bit too specific to Elasticsearch.  Just like
+L</es_filter>, only use this if you know what you're dealing with.
 
 =head1 SEARCH SPEC
 

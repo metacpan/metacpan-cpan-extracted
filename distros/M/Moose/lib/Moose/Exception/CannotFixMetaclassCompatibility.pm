@@ -1,5 +1,5 @@
 package Moose::Exception::CannotFixMetaclassCompatibility;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -22,4 +22,5 @@ sub _build_message {
     "Can't fix metaclass incompatibility for $class_name because it is not pristine.";
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

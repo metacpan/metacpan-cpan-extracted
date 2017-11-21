@@ -1,5 +1,5 @@
 package Search::Elasticsearch::Cxn::LWP;
-$Search::Elasticsearch::Cxn::LWP::VERSION = '5.02';
+$Search::Elasticsearch::Cxn::LWP::VERSION = '6.00';
 use Moo;
 with 'Search::Elasticsearch::Role::Cxn', 'Search::Elasticsearch::Role::Is_Sync';
 
@@ -97,7 +97,7 @@ Search::Elasticsearch::Cxn::LWP - A Cxn implementation which uses LWP
 
 =head1 VERSION
 
-version 5.02
+version 6.00
 
 =head1 DESCRIPTION
 

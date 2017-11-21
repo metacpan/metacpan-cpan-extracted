@@ -10,13 +10,15 @@ Session.vim
 bin/ncp
 dist.ini
 lib/Device/Network/ConfigParser.pm
-lib/Device/Network/ConfigParser/CheckPoint/Expert.pm
 lib/Device/Network/ConfigParser/CheckPoint/Gaia.pm
 lib/Device/Network/ConfigParser/Cisco/ASA.pm
+lib/Device/Network/ConfigParser/Linux/NetUtils.pm
+lib/Device/Network/ConfigParser/Linux/iproute2.pm
 t/00-load.t
 t/01-checkpoint_gaia.t
 t/02-cisco_asa.t
-t/03-checkpoint_expert.t
+t/03-linux_netutils.t
+t/04-linux_iproute2.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
 t/release-kwalitee.t

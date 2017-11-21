@@ -11,8 +11,30 @@ use strict;
 use Carp;
 use Data::Table::Text qw(:all);
 use Data::Dump qw(dump);
+use utf8;
 
-our $VERSION = '2017.444';
+our $VERSION = '20171111';
+
+#-------------------------------------------------------------------------------
+# Select speakers
+#-------------------------------------------------------------------------------
+
+sub select(@)                                                                   # Select speakers by fields
+ {my (%selection) = @_;                                                         # Selection fields: name=>"regular expression" where the field of that name must match the regular expression regardless of case
+  my @s;
+  for my $speaker(&speakers)
+   {my $m = 1;
+    for my $field(keys %selection)
+     {last unless $m;
+      my $r = $selection{$field};
+      my $v = $speaker->{$field};
+      confess "No such field: $field" unless $v;
+      $m = $v =~ m/$r/i;                                                        # Case insensitive
+     }
+    push @s, $speaker if $m;                                                    # Exclude potential speaker unless they match all valid fields
+   }
+  sort {$a->name cmp $b->name} @s
+ }
 
 #-------------------------------------------------------------------------------
 # Load speakers
@@ -54,28 +76,6 @@ END
  }
 
 sub speakers {map {speaker($_)} @{&speakerDetails}}                             # Speakers
-
-#-------------------------------------------------------------------------------
-# Select speakers
-#-------------------------------------------------------------------------------
-
-sub select(@)                                                                   ## Select speakers by fields
- {my (%selection) = @_;                                                         # Selection fields: name=>"regular expression" where the field of that name must match the regular expression regardless of case
-  my @s;
-  for my $speaker(speakers)
-   {my $m = 1;
-    for my $field(keys %selection)
-     {last unless $m;
-      my $r = $selection{$field};
-      my $v = $speaker->{$field};
-      confess "No such field: $field" unless $v;
-      $m = $v =~ m/$r/i;                                                        # Case insensitive
-     }
-    push @s, $speaker if $m;                                                    # Exclude potential speaker unless they match all valid fields
-   }
-  sort {$a->name cmp $b->name} @s
- }
-
 #-------------------------------------------------------------------------------
 # Renew speaker details, but only when AWS changes the list of speakers
 #-------------------------------------------------------------------------------
@@ -537,7 +537,7 @@ with case or code qr()i;
             Welsh-English
 
 The returned speaker definitions have the following B<METHOD>s which will yield
-one of th specified b<VALUES> for each speaker definition:
+one of the specified b<VALUES> for each speaker definition:
 
  METHOD     VALUES
 
@@ -589,7 +589,7 @@ under the same terms as Perl itself.
 =cut
 
 __DATA__
-use Test::More tests=>11;
+use Test::More tests=>12;
 
 ok join(" ", Aws::Polly::Select::written)  eq join(" ", qw(cy da de en es fr is it ja nb nl pl pt ro ru sv tr));
 ok join(" ", Aws::Polly::Select::code)     eq join(" ", qw(cy-GB da-DK de-DE en-AU en-GB en-GB-WLS en-IN en-US es-ES es-US fr-CA fr-FR is-IS it-IT ja-JP nb-NO nl-NL pl-PL pt-BR pt-PT ro-RO ru-RU sv-SE tr-TR));
@@ -602,3 +602,5 @@ ok join(" ", map{$_->name} &Aws::Polly::Select::select(qw(code en-GB)))         
 ok join(" ", map{$_->name} &Aws::Polly::Select::select(qw(country gb gender female)))                eq join(' ', qw(Amy Emma Gwyneth));
 ok qw(Penelope) eq  join " ", map {$_->name} Aws::Polly::Select::select qw(country us gender female speaking Spanish);
 ok qw(Penelope) eq  join " ", map {$_->name} Aws::Polly::Select::select country=>qr(us), gender=>qr(female), speaking=>qr(Spanish);
+
+ok convertUnicodeToXml('setenta e três') eq "setenta e tr&#234;s";

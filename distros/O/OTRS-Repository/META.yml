@@ -26,5 +26,5 @@ resources:
   bugtracker: http://github.com/reneeb/OTRS-Repository/issues
   homepage: http://github.com/reneeb/OTRS-Repository
   repository: http://github.com/reneeb/OTRS-Repository.git
-version: '0.07'
+version: '0.09'
 x_serialization_backend: 'YAML::Tiny version 1.69'

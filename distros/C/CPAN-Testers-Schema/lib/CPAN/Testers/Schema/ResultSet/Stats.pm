@@ -1,6 +1,6 @@
 use utf8;
 package CPAN::Testers::Schema::ResultSet::Stats;
-our $VERSION = '0.019';
+our $VERSION = '0.020';
 # ABSTRACT: Query the raw test reports
 
 #pod =head1 SYNOPSIS
@@ -41,6 +41,7 @@ sub insert_test_report ( $self, $report ) {
     my $schema = $self->result_source->schema;
 
     my $guid = $report->id;
+    $LOG->infof( 'Updating stats row (report %s)', $guid );
     my $data = $report->report;
     my $created = $report->created;
 
@@ -50,8 +51,18 @@ sub insert_test_report ( $self, $report ) {
         version => $data->{distribution}{version},
     })->all;
 
-    die $LOG->warn("No upload match for GUID $guid") unless @uploads;
-    $LOG->warn("Multiple upload matches for GUID $guid") if @uploads > 1;
+    if ( !@uploads ) {
+        die $LOG->error(
+            sprintf 'No upload matches for dist %s version %s (report %s)',
+            $data->{distribution}->@{qw( name version )}, $guid,
+        );
+    }
+    elsif ( @uploads > 1 ) {
+        $LOG->warnf(
+            'Multiple upload matches for dist %s version %s (report %s)',
+            $data->{distribution}->@{qw( name version )}, $guid,
+        );
+    }
     my $uploadid = $uploads[0]->uploadid;
 
     my $stat = {
@@ -85,7 +96,7 @@ CPAN::Testers::Schema::ResultSet::Stats - Query the raw test reports
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 SYNOPSIS
 

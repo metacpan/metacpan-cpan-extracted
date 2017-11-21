@@ -1,5 +1,8 @@
 Changelog for Catmandu-PICA
 
+0.24  2017-11-18 15:55:56 CET
+ - fix test for new XML writer
+
 0.23  2017-07-14 10:29:48 CEST
  - requires Catmandu::SRU 0.41
 0.22  2017-07-13 14:10:25 CEST

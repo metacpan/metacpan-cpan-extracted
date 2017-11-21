@@ -1,5 +1,5 @@
 package Moose::Exception::WrapTakesACodeRefToBless;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -22,4 +22,5 @@ sub _build_message {
     "You must supply a CODE reference to bless, not (" . ( $self->code ? $self->code : 'undef' ) . ")";
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

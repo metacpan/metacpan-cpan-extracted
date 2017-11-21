@@ -18,7 +18,7 @@ require Tangence::Type;
 use Struct::Dumb;
 struct Instance => [qw( value callbacks cursors )];
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 sub build_accessor
 {

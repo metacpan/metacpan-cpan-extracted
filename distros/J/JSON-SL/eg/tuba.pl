@@ -30,6 +30,7 @@ $JSON ||= <<'EOJ';
     "c" : { "d" : "e" },
     "f" : [ "g", "h", "i", "j" ],
     "a number" : 0.4444444444,
+    "a negative number" : -44,
     "a (false) boolean": false,
     "another (true) boolean" : true,
     "a null value" : null,

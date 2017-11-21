@@ -25,11 +25,16 @@ my @tests = (
 		params => {seed => sub { die if ++$state > 2; $$ }, fork_safe => 1},
 		desc => 'does not keep reseeding',
 	},
+	{
+		params => {seed => sub { $$ }, cache => 1024, fork_safe => 1},
+		desc => 'empties cache on fork when fork safe',
+	},
 );
 foreach my $test (@tests) {
 	subtest $test->{desc} => sub {
 		my %kids;
 		my $obj = Crypt::DRBG::HMAC->new(%{$test->{params}});
+		$obj->generate(10);
 		foreach my $kid (1..2) {
 			pipe my $rfh, my $wfh;
 			my $pid = fork;

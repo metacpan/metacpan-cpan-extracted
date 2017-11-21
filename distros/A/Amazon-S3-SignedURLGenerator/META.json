@@ -1,0 +1,67 @@
+{
+   "abstract" : "Amazon S3 Signed URL Generator",
+   "author" : [
+      "Fayland Lam <fayland@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.18, Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Amazon-S3-SignedURLGenerator",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.18",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Digest::HMAC_SHA1" : "0",
+            "MIME::Base64" : "0",
+            "URI::Escape" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/fayland/perl-Amazon-S3-SignedURLGenerator/issues"
+      },
+      "homepage" : "https://github.com/fayland/perl-Amazon-S3-SignedURLGenerator",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/fayland/perl-Amazon-S3-SignedURLGenerator.git",
+         "web" : "https://github.com/fayland/perl-Amazon-S3-SignedURLGenerator"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.023"
+}
+

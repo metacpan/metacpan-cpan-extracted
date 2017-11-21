@@ -703,7 +703,7 @@ sub team_nicks {
     my ( $conn ) = validate_pos( @_,
         { isa => 'DBIx::Connector' },
     );
-    $log->debug( "Entering " . __PACKAGE__ . "::team_nicks for supervisor " . ( $self->nick || 'undefined' ) );
+    $log->debug( "Entering " . __PACKAGE__ . "::team_nicks for employee " . ( $self->nick || 'undefined' ) );
 
     # no EID, no team
     return $CELL->status_ok( 'TEAM', payload => [] ) unless $self->eid;
@@ -725,6 +725,39 @@ sub team_nicks {
 }
 
 
+=head2 has_reports
+
+Given a L<DBIx::Connector> object, return a status object that, if successful,
+will contain in the payload an integer indicating how many "reports" the
+employee has - i.e. how many employees, if any, there are whose supervisor is
+the employee corresponding to C<$self>.
+
+=cut
+
+sub has_reports {
+    my $self = shift;
+    my ( $conn ) = validate_pos( @_,
+        { isa => 'DBIx::Connector' },
+    );
+    $log->debug( "Entering " . __PACKAGE__ . "::has_reports for employee " . ( $self->nick || 'undefined' ) );
+    my $reports;
+
+    # no EID, no team
+    return $CELL->status_ok( 'TEAM', payload => [] ) unless $self->eid;
+
+    my $status = select_single(
+        'conn' => $conn,
+        'sql' => $site->SQL_EMPLOYEE_HAS_REPORTS,
+        'keys' => [ $self->eid ],
+    );
+    return $status unless $status->ok;
+    ( $reports ) = @{ $status->payload };
+    return $CELL->status_ok(
+        'DISPATCH_EMPLOYEE_HAS_REPORTS_EID',
+        args => [ $self->eid ],
+        payload => $reports,
+    );
+}
 
 
 =head1 FUNCTIONS

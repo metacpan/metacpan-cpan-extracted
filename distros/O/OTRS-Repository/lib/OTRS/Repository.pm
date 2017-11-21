@@ -12,7 +12,7 @@ use Regexp::Common qw(URI);
 
 use OTRS::Repository::Source;
 
-our $VERSION = 0.07;
+our $VERSION = 0.09;
 
 our $ALLOWED_SCHEME = [ 'HTTP', 'file' ];
 
@@ -46,9 +46,15 @@ sub list {
     my ($self, %params) = @_;
 
     my %found_packages;
+    my @detailed_list;
     for my $source ( @{ $self->_objects || [] } ) {
         my @found = $source->list( %params );
         @found_packages{@found} = (1) x @found;
+        push @detailed_list, @found;
+    }
+
+    if ( $params{details} ) {
+        return sort { $a->{name} cmp $b->{name} || $a->{version} cmp $b->{version} }@detailed_list;
     }
 
     return sort keys %found_packages;
@@ -103,7 +109,7 @@ OTRS::Repository - parse OTRS repositories' otrs.xml files to search for add ons
 
 =head1 VERSION
 
-version 0.07
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -156,6 +162,27 @@ Find a specific version
     otrs    => '3.3',
     version => '1.4.8',
   );
+
+=head2 list
+
+List all addons found in the repositories
+
+  my @addons = $repo->list;
+  say $_ for @addons;
+
+You can also define the OTRS version
+
+  my @addons = $repo->list( otrs => '5.0.x' );
+  say $_ for @addons;
+
+Both snippets print a simple list of addon names. If you want to
+to create a list with more information, you can use
+
+  my @addons = $repo->list(
+      otrs    => '5.0.x',
+      details => 1,
+  );
+  say sprintf "%s (%s) on %s\n", $_->{name}, $_->{version}, $_->{url} for @addons;
 
 =head1 AUTHOR
 

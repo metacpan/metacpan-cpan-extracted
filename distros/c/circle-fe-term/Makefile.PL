@@ -14,7 +14,7 @@ WriteMakefile
                    'Tangence::ObjectProxy' => '0.20_001',
                    'Text::Balanced' => 0,
                    'Tickit' => '0.55',
-                   'Tickit::Async' => 0,
+                   'Tickit::Async' => '0.21',
                    'Tickit::Event' => '0.58',
                    'Tickit::Style' => '0.40',
                    'Tickit::Term' => '0.27',

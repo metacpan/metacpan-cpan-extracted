@@ -5,8 +5,6 @@ use FindBin qw($Bin);
 
 use lib "$Bin/lib";
 
-use App::TestOnTap::_dbgvars;
-
 use TestUtils;
 
 use Test::More tests => 14;
@@ -21,8 +19,7 @@ like($stdout->[8], qr/^t1\.pl /, "t1 last");
 like($stdout->[13], qr/^Files=3, Tests=3, /, "Three tests found");
 is($stdout->[14], "Result: PASS", "Passed");
 
-$App::TestOnTap::_dbgvars::IGNORE_DEPENDENCIES = 1;
-($ret, $stdout, $stderr) = TestUtils::xeqsuite([qw(--verbose --order natural)]);
+($ret, $stdout, $stderr) = TestUtils::xeqsuite([qw(--verbose --order natural --_ignore_dependencies)]);
 
 is($ret, 0, "Exited with 0");
 like($stderr->[0], qr/^WARNING: No execmap found, using internal default!$/, "default execmap");

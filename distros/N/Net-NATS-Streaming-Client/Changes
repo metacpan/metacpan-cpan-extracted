@@ -1,0 +1,11 @@
+Revision history for Perl extension Net::NATS::Streaming::Client
+
+0.03  Mon Nov 13 09:49:26 PST 2017
+        - bugfixes
+
+0.02  Sun Nov 12 11:33:06 PST 2017
+        - bugfixes, slight api redesign
+
+0.01  Fri Nov 10 15:34:21 PST 2017
+        - initial release.
+

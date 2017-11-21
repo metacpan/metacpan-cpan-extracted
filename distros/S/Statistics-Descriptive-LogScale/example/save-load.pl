@@ -63,7 +63,7 @@ Options may include:
     Options are the same as in printf %f, i.e. %[-][+][0][n].[n]
     X may be:
     m - min   M - max   a - average   d - standard deviation   n - count
-    s - skeweness   k - kurtosis
+    S - skeweness   K - kurtosis
     p(n) - nth percentile   q(n) - nth quartile
     P(n) - probability of value being less than n
     e(n) - nth central momEnt   E(n) - nth standardized momEnt
@@ -76,7 +76,7 @@ sub default_format {
 	return <<"SUMMARY"
 count : %15.0n;      min/max: %m .. %M
 median: %15p(50); mean/std_dev: %a +- %d
-     skewness: %s; kurtosis: %k
+     skewness: %S; kurtosis: %K
 SUMMARY
 	. join "", map { sprintf ("%5.1f%%%%: %%15p(%0.1f)\n", $_, $_) }
 		 0.5, 1, 5, 10, 25, 50, 75, 90, 95, 99.5;
@@ -114,7 +114,8 @@ if (%cut) {
 # print summary
 # TODO draw image as well
 if (defined $format) {
-	print format_summary( $stat, $format );
+    $format =~ s#\\n#\n#g;
+	print $stat->format( $format );
 };
 
 # save data.
@@ -123,58 +124,6 @@ if (defined $save) {
 };
 
 # all folks - main ends here
-
-# FORMAT
-# We'll have printf-like expression in the form "%<format><function><arg>
-sub format_summary {
-	my ($stat, $format) = @_;
-
-	my %format = (
-		# percent literal
-		'%' => '%',
-		# placeholders without parameters
-		n => 'count',
-		m => 'min',
-		M => 'max',
-		a => 'mean',
-		d => 'std_dev',
-		s => 'skewness',
-		k => 'kurtosis',
-		# placeholders with 1 parameter
-		q => 'quantile?',
-		p => 'percentile?',
-		P => 'cdf?',
-		e => 'central_moment?',
-		E => 'std_moment?',
-	);
-	my $re_format = join "|", keys %format;
-	$re_format = qr((?:$re_format));
-
-	# FIXME this accepts %m(5), then dies - UGLY
-	$format =~ s/\\n/\n/g;
-	$format =~ s <%([0-9.\-+ #]*)($re_format)(?:\(($re_num)?\)){0,1}>
-		< _dispatch($stat, $format{$2}, $1, $3) >ge;
-	return $format;
-};
-
-sub _dispatch {
-	my ($obj, $method, $float, $arg) = @_;
-
-	if ($method !~ /^[a-z_]/) {
-		return $method;
-	};
-	if ($method =~ s/\?$//) {
-		die "Missing argument in method $method" if !defined $arg;
-	} else {
-		die "Extra argument in method $method" if defined $arg;
-	};
-	my $result = $obj->$method($arg);
-
-	# work around S::D::Full's convention that "-inf == undef"
-	$result = -9**9**9
-		if ($method eq 'percentile' and !defined $result);
-	return sprintf "%${float}f", $result;
-};
 
 sub load_file {
 	my ($stat, $file) = @_;

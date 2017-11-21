@@ -1,0 +1,52 @@
+{
+   "abstract" : "Documentation hub for Test2 and Test2-Suite.",
+   "author" : [
+      "Chad Granum <exodist@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Test2-Manual",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41",
+            "Test::Spelling" : "0.12"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::Tools::Tiny" : "1.302111"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/Test-More/Test2-Manual/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/Test-More/Test2-Manual/"
+      }
+   },
+   "version" : "0.000002",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+}
+

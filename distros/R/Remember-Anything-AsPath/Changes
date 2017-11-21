@@ -8,3 +8,6 @@ Revision history for Remember-Anything-AsPath
 0.05    Date/time
         use 'canonical' instead of 'sort_keys' to ensure
         equality between serialized obects
+0.06    Date/time
+        generalize tests to work with different versions of 'Serial'
+

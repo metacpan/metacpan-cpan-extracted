@@ -37,8 +37,10 @@
 "use strict";
 
 define ([
+    "jquery",
     "lib",
 ], function (
+    $,
     coreLib,
 ) {
 
@@ -46,10 +48,20 @@ define ([
                 'June', 'July', 'August', 'September', 'October',
                 'November', 'December'],
 
-        mlo = { 'jan': 'January', 'feb': 'February', 'mar': 'March',
-                'apr': 'April', 'may': 'May', 'jun': 'June', 'jul': 'July',
-                'aug': 'August', 'sep': 'September', 'oct': 'October',
-                'nov': 'November', 'dec': 'December' },
+        mlo = {
+            'j': 'January', 'ja': 'January', 'jan': 'January',
+            'f': 'February', 'fe': 'February', 'feb': 'February',
+            'mar': 'March',
+            'a': 'April', 'ap': 'April', 'apr': 'April',
+            'may': 'May',
+            'jun': 'June',
+            'jul': 'July',
+            'a': 'August', 'au': 'August', 'aug': 'August',
+            's': 'September', 'se': 'September', 'sep': 'September',
+            'o': 'October', 'oc': 'October', 'oct': 'October',
+            'n': 'November', 'no': 'November', 'nov': 'November',
+            'd': 'December', 'de': 'December', 'dec': 'December',
+        },
 
         mlt =  [null, 'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL',
                 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'],
@@ -109,17 +121,18 @@ define ([
             return ct[0] + ":" + ct[1];
         },
 
-        canonicalizeTimeRange = function (tr) {
+        canonicalizeTimeRange = function (tr, opts) {
             console.log("Entering canonicalizeTimeRange() with argument", tr);
             var ttr = String(tr).trim().replace(/\s/g, ''),
                 ttrs;
+            opts = $.extend({"offset": true}, opts);
             if (/^\d*:{0,1}\d*-\d*:{0,1}\d*$/.test(ttr)) {
                 console.log(tr + " is a standard time range");
                 return canonicalizeTimeRangeStandard(ttr);
-            } else if (/^\d+:{0,1}\d*\+\d+:{0,1}\d*/.test(ttr)) {
+            } else if (/^\d+:{0,1}\d*\+\d+:{0,1}\d*/.test(ttr) && opts.offset) {
                 console.log(tr + " is an offset time range");
                 return canonicalizeTimeRangeOffset(ttr);
-            } else if (/^\+\d+:{0,1}\d*/.test(ttr)) {
+            } else if (/^\+\d+:{0,1}\d*/.test(ttr) && opts.offset) {
                 console.log(tr + " is a last-interval-plus-offset time range");
                 ttrs = canonicalizeTime(ttr.replace(/\+/g, ''));
                 if (ttrs === null) {
@@ -374,14 +387,14 @@ define ([
         strToMonth = function (buf, full) {
             console.log("Entering strToMonth() with argument", buf);
             var m = String(buf).trim().toLowerCase().slice(0, 3);
-            if (m.length < 3) {
+            if (m.length < 1) {
                 return null;
             }
             if (mlo.hasOwnProperty(m)) {
                 if (full === true) {
                     return mlo[m];
                 } else {
-                    return m.toUpperCase();
+                    return mlo[m].toUpperCase().slice(0, 3);
                 }
             }
             return null;
@@ -634,7 +647,17 @@ define ([
         },
 
         vetTimeRange = function (tr) {
-            var ctr = canonicalizeTimeRange(tr);
+            var ctr = canonicalizeTimeRange(tr, { "offset": true });
+            if (ctr === null) {
+                return null
+            } else if (coreLib.isArray(ctr)) {
+                return ctr[0] + '-' + ctr[1];
+            }
+            return ctr;
+        },
+
+        vetTimeRangeNoOffset = function (tr) {
+            var ctr = canonicalizeTimeRange(tr, { "offset": false });
             if (ctr === null) {
                 return null
             } else if (coreLib.isArray(ctr)) {
@@ -692,6 +715,7 @@ define ([
         vetDayList: vetDayList,
         vetMonth: vetMonth,
         vetTimeRange: vetTimeRange,
+        vetTimeRangeNoOffset: vetTimeRangeNoOffset,
         vetYear: vetYear,
     };
 

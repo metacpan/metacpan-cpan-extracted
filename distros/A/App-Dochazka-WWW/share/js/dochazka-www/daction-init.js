@@ -38,10 +38,12 @@
 
 define ([
     'target',
-    'app/daction-start'
+    'app/daction-start',
+    'app/emp-lib',
 ], function (
     target,
-    dactionStart
+    dactionStart,
+    empLib,
 ) {
 
     return function () {
@@ -76,10 +78,10 @@ define ([
         target.push('myProfileAction', {
             'name': 'myProfileAction',
             'type': 'daction',
-            'menuText': 'My profile',
+            'menuText': 'Profile',
             'aclProfile': 'passerby',
             'start': dactionStart('myProfileAction'),
-            'pushable': false
+            'pushable': true
         });
         target.push('empProfileEditSave', {
             'name': 'empProfileEditSave',
@@ -117,17 +119,18 @@ define ([
             'name': 'actionEmplSearch',
             'type': 'daction',
             'menuText': 'Search',
-            'aclProfile': 'admin',
+            'aclProfile': 'inactive',
             'start': dactionStart('actionEmplSearch'),
             'pushable': false
         });
         target.push('masqEmployee', {
             'name': 'masqEmployee',
             'type': 'daction',
-            'menuText': 'Masquerade (begin/end)',
-            'aclProfile': 'admin',
+            'menuText': 'Masquerade',
+            'aclProfile': 'inactive',
             'start': dactionStart('masqEmployee'),
-            'pushable': false
+            'pushable': false,
+            'onlyWhen': empLib.currentEmpHasReports,
         });
         target.push('empProfileSetSuperChoose', {
             'name': 'empProfileSetSuperChoose',
@@ -145,6 +148,14 @@ define ([
             'start': dactionStart('empProfileSetSuperCommit'),
             'pushable': false
         });
+        target.push('empProfileSetSuperDelete', {
+            'name': 'empProfileSetSuperDelete',
+            'type': 'daction',
+            'menuText': 'Remove supervisor',
+            'aclProfile': 'admin',
+            'start': dactionStart('empProfileSetSuperDelete'),
+            'pushable': false
+        });
         target.push('empProfileSetSuperSearch', {
             'name': 'empProfileSetSuperSearch',
             'type': 'daction',
@@ -158,7 +169,7 @@ define ([
         target.push('actionPrivHistory', { // read-only
             'name': 'actionPrivHistory',
             'type': 'daction',
-            'menuText': 'Privilege (status) history',
+            'menuText': 'Status history',
             'aclProfile': 'passerby',
             'start': dactionStart('actionPrivHistory'),
             // this starts the privhistory dtable, and if the dataset changes
@@ -200,21 +211,13 @@ define ([
         });
 
         // Schedhistory actions
-        target.push('actionSchedHistory', { // read-only
+        target.push('actionSchedHistory', {
             'name': 'actionSchedHistory',
             'type': 'daction',
             'menuText': 'Schedule history',
-            'aclProfile': 'passerby',
+            'aclProfile': 'inactive',
             'start': dactionStart('actionSchedHistory'),
             'pushable': true
-        });
-        target.push('actionSchedHistoryEdit', { // read-write
-            'name': 'actionSchedHistoryEdit',
-            'type': 'daction',
-            'menuText': 'Edit',
-            'aclProfile': 'admin',
-            'start': dactionStart('actionSchedHistoryEdit'),
-            'pushable': false
         });
         target.push('schedHistorySaveAction', {
             'name': 'schedHistorySaveAction',
@@ -253,7 +256,7 @@ define ([
         target.push('actionSchedLookup', {
             'name': 'actionSchedLookup',
             'type': 'daction',
-            'menuText': 'Lookup',
+            'menuText': 'Detail',
             'aclProfile': 'inactive',
             'start': dactionStart('actionSchedLookup'),
             'pushable': false
@@ -291,87 +294,21 @@ define ([
             'pushable': false
         });
 
-        // Interval actions - browse
-        target.push('browseIntToday', {
-            'name': 'browseIntToday',
-            'type': 'daction',
-            'menuText': 'Today',
-            'aclProfile': 'inactive',
-            'start': dactionStart('actionNoop'),
-            'pushable': false
-        });
-        target.push('browseIntYesterday', {
-            'name': 'browseIntYesterday',
-            'type': 'daction',
-            'menuText': 'Yesterday',
-            'aclProfile': 'inactive',
-            'start': dactionStart('actionNoop'),
-            'pushable': false
-        });
-        target.push('browseIntAnyday', {
-            'name': 'browseIntAnyday',
-            'type': 'daction',
-            'menuText': 'Any day',
-            'aclProfile': 'inactive',
-            'start': dactionStart('actionNoop'),
-            'pushable': false
-        });
-        target.push('browseIntThisWeek', {
-            'name': 'browseIntThisWeek',
-            'type': 'daction',
-            'menuText': 'This week',
-            'aclProfile': 'inactive',
-            'start': dactionStart('actionNoop'),
-            'pushable': false
-        });
-        target.push('browseIntLastWeek', {
-            'name': 'browseIntLastWeek',
-            'type': 'daction',
-            'menuText': 'Last week',
-            'aclProfile': 'inactive',
-            'start': dactionStart('actionNoop'),
-            'pushable': false
-        });
-        target.push('browseIntAnyWeek', {
-            'name': 'browseIntAnyWeek',
-            'type': 'daction',
-            'menuText': 'Any week',
-            'aclProfile': 'inactive',
-            'start': dactionStart('actionNoop'),
-            'pushable': false
-        });
-        target.push('browseIntThisMonth', {
-            'name': 'browseIntThisMonth',
-            'type': 'daction',
-            'menuText': 'This month',
-            'aclProfile': 'inactive',
-            'start': dactionStart('actionNoop'),
-            'pushable': false
-        });
-        target.push('browseIntLastMonth', {
-            'name': 'browseIntLastMonth',
-            'type': 'daction',
-            'menuText': 'Last month',
-            'aclProfile': 'inactive',
-            'start': dactionStart('actionNoop'),
-            'pushable': false
-        });
-        target.push('browseIntAnyMonth', {
-            'name': 'browseIntAnyMonth',
-            'type': 'daction',
-            'menuText': 'Any month',
-            'aclProfile': 'inactive',
-            'start': dactionStart('actionNoop'),
-            'pushable': false
-        });
-
-        // Interval actions - create
+        // Interval actions
         target.push('createMultipleIntSave', {
             'name': 'createMultipleIntSave',
             'type': 'daction',
             'menuText': 'Save',
             'aclProfile': 'active',
             'start': dactionStart('createMultipleIntSave'),
+            'pushable': false
+        });
+        target.push('createSingleIntMenuItem', {
+            'name': 'createSingleIntMenuItem',
+            'type': 'daction',
+            'menuText': 'Create single',
+            'aclProfile': 'active',
+            'start': dactionStart('createSingleIntMenuItem'),
             'pushable': false
         });
         target.push('createSingleIntSave', {
@@ -382,13 +319,53 @@ define ([
             'start': dactionStart('createSingleIntSave'),
             'pushable': false
         });
+        target.push('createLockSave', {
+            'name': 'createLockSave',
+            'type': 'daction',
+            'menuText': 'Save',
+            'aclProfile': 'active',
+            'start': dactionStart('createLockSave'),
+            'pushable': false
+        });
+        target.push('deleteSingleInt', {
+            'name': 'deleteSingleInt',
+            'type': 'daction',
+            'menuText': 'Delete',
+            'aclProfile': 'active',
+            'start': dactionStart('deleteSingleInt'),
+            'pushable': false
+        });
+        target.push('deleteLock', {
+            'name': 'deleteLock',
+            'type': 'daction',
+            'menuText': 'Delete',
+            'aclProfile': 'active',
+            'start': dactionStart('deleteLock'),
+            'pushable': false
+        });
+        target.push('updateSingleIntSave', {
+            'name': 'updateSingleIntSave',
+            'type': 'daction',
+            'menuText': 'Save',
+            'aclProfile': 'active',
+            'start': dactionStart('updateSingleIntSave'),
+            'pushable': false
+        });
         target.push('viewIntervalsAction', {
             'name': 'viewIntervalsAction',
             'type': 'daction',
             'menuText': 'View',
             'aclProfile': 'active',
             'start': dactionStart('viewIntervalsAction'),
-            'pushable': false
+            'pushable': true
+        });
+        target.push('viewLocksAction', {
+            'name': 'viewLocksAction',
+            'type': 'daction',
+            'menuText': 'View',
+            'aclProfile': 'active',
+            'start': dactionStart('viewLocksAction'),
+            'pushable': true
         });
 
         // Activity actions - select

@@ -1,0 +1,13 @@
+[AGENT]
+
+Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN; rv:1.9.1.2) Firefox/3.5.2
+
+extras          => [ 'Windows' ],
+lang            => 'zh-CN',
+mozilla         => [ '1.9.1.2', '1.009001002' ],
+name            => 'Firefox',
+os              => 'Windows XP',
+parser          => 'ff_suspect',
+strength        => 'U',
+version         => '3.005002',
+version_raw     => '3.5.2',

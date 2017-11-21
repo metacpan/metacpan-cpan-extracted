@@ -1,7 +1,7 @@
 package Dancer2::Plugin::WebSocket;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: add a websocket interface to your Dancers app
-$Dancer2::Plugin::WebSocket::VERSION = '0.1.0';
+$Dancer2::Plugin::WebSocket::VERSION = '0.1.1';
 
 use Plack::App::WebSocket;
 
@@ -54,7 +54,8 @@ has connections => (
 sub websocket_url :PluginKeyword {
     my $self = shift;
     my $request = $self->app->request;
-    my $address = 'ws://' . $request->host . $self->mount_path;
+    my $proto = $request->secure ? 'wss://' : 'ws://';
+    my $address = $proto . $request->host . $self->mount_path;
 
     return $address;
 }
@@ -122,7 +123,7 @@ Dancer2::Plugin::WebSocket - add a websocket interface to your Dancers app
 
 =head1 VERSION
 
-version 0.1.0
+version 0.1.1
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,9 @@
 Revision history for RT-Extension-RepeatTicket
 
+1.11 2017-11-07
+
+ - Correctly display concurrent ticket number of 0
+
 1.10 2015-05-11
 
  - allow to disable Repeat Ticket for some queues

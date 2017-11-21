@@ -8,6 +8,7 @@ use strict;
 use warnings;
 
 use constant type => "Label";
+use Variable::Disposition qw( retain_future );
 
 sub build
 {
@@ -15,10 +16,9 @@ sub build
    my ( $obj, $tab ) = @_;
 
    my $widget = Gtk2::Label->new("");
-   $obj->watch_property(
-      property => "text",
-      on_set   => sub { $widget->set_text( $_[0] ) },
-      want_initial => 1,
+   retain_future $obj->watch_property_with_initial(
+      "text",
+      on_set => sub { $widget->set_text( $_[0] ) },
    );
 
    return $widget;

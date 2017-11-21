@@ -1,11 +1,39 @@
 Revision history for Perl extension Hash::Merge.
 
-0.200	2013-11-03
+0.299       2017-11-20
+    - Fixed behavior change if Hash contains blessed hashes (Thanks to
+      David E. Wheeler)
+    - Extended testing with blessed objects.
+
+0.298       2017-11-15
+    - Version 0.298 release
+
+0.200_003   2017-11-07
+    - Documentation updated and extended.
+    - Do not clone if not a reference. This fixes a failure when using
+      Storable as backend.
+    - Update dependencies and requirements. 
+    - Extended testing in order to test all the different clone() backends.
+
+0.200_002	2017-10-16
+    - Rely on backend() debug helper of Clone::Choose 0.003 to help
+      identifying issues depending on underlying clone implementation
+
+0.200_001   2017-10-11
+    - Switch to Clone::Choose instead of NIH clone detector.
+    - Fixed weird object vs. global behavior
+    - Aligned distribution sets, perltidy, perlcritic, etc.
+    - RT#55978 Fixed avoid the eval in _get_obj (Thanks to Larry Leszczynski)
+    - RT#81156 Fixed behavior name bug (Thanks to Matt D. Garrett)
+    - RT#69872 Fixed cloning does not happen bug (Thanks to John Busco)
+    - PR#1 Fixed syntax errors in code samples (Thanks to book)
+
+0.200   2013-11-03
     - modernize toolchain
     - reformat changes as per CPAN::Changes::Spec
     - move repository to GitHub
 
-0.12	2010-02-15
+0.12    2010-02-15
     - rt 39183 fallback to Clone::PP if needed/possible (thanks to MONS)
     - rt 43056 OO support for more sane behavior non-trampling (thanks to MONS)
     
@@ -13,14 +41,14 @@ Revision history for Perl extension Hash::Merge.
     - Cleaned up POD a little
     - perltidy
     
-0.11	2009-04-09
+0.11    2009-04-09
     - fix ||= typo, thanks GWADEJ or bringing it to my attention
 
-0.10	2007-04-08
+0.10    2007-04-08
     - DMUEY rt.cpan.org id 13390
     - POD Synopsis cleanup
 
-0.09	2007-04-03
+0.09    2007-04-03
     - DMUEY: Merge.pm - refactored code as per rt.cpan.org id 26076
       (passes all tests)
     - DMUEY: removed 'HISTORY' from POD since its in the Changes file
@@ -29,37 +57,37 @@ Revision history for Perl extension Hash::Merge.
     - DMUEY: README: Updated version from 0.07 to 0.09
 
 
-0.08	2006-08-08
+0.08    2006-08-08
     - Fixed hash reference issue (per Perl 5.8.8) in test sequence
 
-0.07	2002-02-19
+0.07    2002-02-19
     - Fixed problem with ActiveState Perl's Clone.pm implementation.
     - Fixed typo in POD.
     - Fixed formatting of code in general.
 
-0.06	2001-11-10
+0.06    2001-11-10
     - Version 0.06 release (and more CVS fixes)
 
-0.05.02.1	2001-11-08
+0.05.02.1   2001-11-08
     - Fixing CVS problems
 
-0.05.01.2	2001-11-06
+0.05.01.2   2001-11-06
     - Fixed some undefined variable problems for 5.005.
     - Added cloning of data and set/get_clone_behavior functions
     - Added associated testing of data cloning
     - Fixed some problems with POD
 
-0.05	2001-11-02
+0.05    2001-11-02
     - Yet another fix to Test::More requirement (=> 0.33)
 
-0.04	2001-10-31
+0.04    2001-10-31
     - Forced Test::More requirement in makefile
     - Fixed problems with pod documentation
 
-0.03	2001-10-28
+0.03    2001-10-28
     - CPAN Release with CVS fixes
 
-0.02	2001-10-28 23:05:03
+0.02    2001-10-28 23:05:03
     - CPAN release
 
 0.01.1.1  2001/10/23 03:01:34  mneylon

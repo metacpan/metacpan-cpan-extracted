@@ -1,0 +1,15 @@
+Testing rangedet
+
+Testing default without options
+<RangeDetect attribute="Match" context="#stay" char="a" char1="d"  />
+<Test>
+every character between a and d is matched
+EVERY CHARACTER BETWEEN A AND D IS MATCHED
+<Test>
+
+Testing insensitive
+<RangeDetect attribute="Match" insensitive="true" context="#stay" char="a" char1="d"  />
+<TestI>
+every character between a and d is matched
+EVERY CHARACTER BETWEEN A AND D IS MATCHED
+<TestI>

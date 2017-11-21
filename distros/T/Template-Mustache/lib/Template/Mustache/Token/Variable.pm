@@ -1,7 +1,7 @@
 package Template::Mustache::Token::Variable;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Object representing a Variable block
-$Template::Mustache::Token::Variable::VERSION = '1.1.0';
+$Template::Mustache::Token::Variable::VERSION = '1.2.0';
 use Escape::Houdini qw/ escape_html /;
 use Scalar::Util qw/ looks_like_number /;
 
@@ -58,7 +58,7 @@ Template::Mustache::Token::Variable - Object representing a Variable block
 
 =head1 VERSION
 
-version 1.1.0
+version 1.2.0
 
 =head1 AUTHORS
 

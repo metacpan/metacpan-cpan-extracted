@@ -1,4 +1,8 @@
 package MYDan::Collector::Parse;
+
+use strict;
+use warnings;
+
 use MYDan::Util::Logger qw(debug verbose info warning error);
 
 use POSIX;

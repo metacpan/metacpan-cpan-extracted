@@ -1,0 +1,6 @@
+Revision history for Perl extension Text-VisualPrintf
+
+2.01 2017-11-19T10:15:56Z
+
+    - Moved from MBPrintf
+

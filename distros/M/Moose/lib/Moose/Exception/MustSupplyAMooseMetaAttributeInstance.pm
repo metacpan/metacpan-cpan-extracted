@@ -1,5 +1,5 @@
 package Moose::Exception::MustSupplyAMooseMetaAttributeInstance;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -15,4 +15,5 @@ sub _build_message {
     "You must supply an attribute which is a 'Moose::Meta::Attribute' instance";
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

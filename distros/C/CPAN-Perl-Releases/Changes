@@ -1,6 +1,34 @@
 ==================================================
-Changes from 2012-10-21 00:00:00 +0000 to present.
+Changes from 2012-11-21 00:00:00 +0000 to present.
 ==================================================
+
+-----------------------------------------
+version 3.42 at 2017-11-20 23:24:42 +0000
+-----------------------------------------
+
+  Change: f9969c44f95f47f541ed64f21be32368d6566d12
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2017-11-20 23:24:42 +0000
+
+    DAGOLDEN has removed .xz for v5.23.6 
+
+  Change: ce509e7fc64975713d83bb05eb97cdf6ead2d871
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2017-11-20 23:18:35 +0000
+
+    XSAWYER has removed all dev and RCs 
+
+  Change: 2f02d02c0e215b3dcff2680013b4e94f17e05458
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2017-11-20 21:41:35 +0000
+
+    Updated for v5.27.6 
+
+  Change: 064a18f9b350102b2298a355d9be7408bc640bdf
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2017-11-20 21:33:20 +0000
+
+    No bz2 tarballs after v5.27.5 
 
 -----------------------------------------
 version 3.40 at 2017-10-20 22:14:11 +0000
@@ -1311,62 +1339,6 @@ version 0.92 at 2012-12-18 18:41:33 +0000
 
     Updated for v5.17.7 
 
------------------------------------------
-version 0.90 at 2012-11-20 23:56:50 +0000
------------------------------------------
-
-  Change: dfd81b85147e6bf85fda0ef855c542ca6c242883
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2012-11-20 23:56:50 +0000
-
-    Updated for v5.17.6 
-
------------------------------------------
-version 0.88 at 2012-11-10 15:39:33 +0000
------------------------------------------
-
-  Change: 7fba080dc2856fb6a00a748edd6cc9bf34302b55
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2012-11-10 15:39:33 +0000
-
-    Updated for v5.12.5 
-
------------------------------------------
-version 0.86 at 2012-11-08 21:24:01 +0000
------------------------------------------
-
-  Change: 36f5199dcba6333b6040f155497c7acb6e73a79d
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2012-11-08 21:24:01 +0000
-
-    Updated for v5.12.5-RC2 
-
------------------------------------------
-version 0.84 at 2012-11-03 21:38:52 +0000
------------------------------------------
-
-  Change: 7caec9a17b31ff90fe95be68ccc66171d3442979
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2012-11-03 21:38:52 +0000
-
-    Updated for v5.12.5-RC1 
-
-  Change: ef41f7c2d79af5657d8a5ddbb1ab44f76197181c
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2012-11-03 21:33:08 +0000
-
-    Updated for v5.16.2 
-
------------------------------------------
-version 0.80 at 2012-10-27 06:17:18 +0000
------------------------------------------
-
-  Change: 63beb4c2041c76ce6e0b67e98358e6474cd1ed78
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2012-10-27 07:17:18 +0000
-
-    updated for v5.16.2-RC1 
-
 =================================================
-Plus 39 releases after 2012-10-21 00:00:00 +0000.
+Plus 44 releases after 2012-11-21 00:00:00 +0000.
 =================================================

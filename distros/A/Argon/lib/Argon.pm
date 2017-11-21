@@ -1,159 +1,144 @@
 package Argon;
-
-our $VERSION = '0.16';
-
+# ABSTRACT: Simple, fast, and flexible distributed computing
+$Argon::VERSION = '0.18';
 use strict;
 use warnings;
 use Carp;
-use Const::Fast;
-use Coro;
-use Scalar::Util  qw(weaken refaddr);
-use POSIX         qw(strftime);
-use Log::Log4perl qw();
 
-if ($^O eq 'MSWin32') {
-    die 'MSWin32 is not supported';
-}
+our $ALLOW_EVAL = 0;
+sub ASSERT_EVAL_ALLOWED { $Argon::ALLOW_EVAL || croak 'not permitted: $Argon::ALLOW_EVAL is not set' };
 
-require Exporter;
-use base qw/Exporter/;
-
-our %EXPORT_TAGS = (
-    # Priorities
-    priorities => [qw($PRI_HIGH $PRI_NORMAL $PRI_LOW)],
-
-    # Command verbs and responses
-    commands => [qw(
-        $CMD_PING $CMD_QUEUE $CMD_COLLECT $CMD_REGISTER $CMD_STATUS
-        $CMD_ACK $CMD_COMPLETE $CMD_ERROR $CMD_REJECTED
-    )],
-
-    logging => [qw(
-        SET_LOG_LEVEL
-        $TRACE TRACE
-        $DEBUG DEBUG
-        $INFO  INFO
-        $WARN  WARN
-        $ERROR ERROR
-        $FATAL FATAL
-    )],
-);
-
-our @EXPORT_OK = ('K', map { @$_ } values %EXPORT_TAGS);
-
-#-------------------------------------------------------------------------------
-# Returns a new function suitable for use as a callback. This is useful to pass
-# instance methods as callbacks without leaking references.
-#
-# Inputs:
-#     $fn      : CODE reference or function name
-#     $context : class name or object instance
-#     @args    : other arguments to pass to $fn
-#
-# Output:
-#     CODE reference
-#
-# Examples:
-#     # Using a function reference
-#     my $cb = K(\&on_connection);
-#
-#     # Using an instance method
-#     my $cb = K('on_connection', $client);
-#
-#     # Using a class method
-#     my $cb = K('on_connection', 'ClientClass');
-#
-#     # With extra arguments
-#     my $cb = K('on_connection', $client, 'x', 'y', 'z');
-#-------------------------------------------------------------------------------
-sub K {
-    my ($fn, $context, @args) = @_;
-
-    croak "unknown method $fn"
-        if !ref $context
-        || !$context->can($fn);
-
-    weaken $context;
-    my $k = $context->can($fn);
-
-    return sub {
-        unshift @_, $context, @args;
-        goto $k;
-    };
-}
-
-#-------------------------------------------------------------------------------
-# Defaults
-#-------------------------------------------------------------------------------
-our $EOL                = "\n";    # end of line/message character(s)
-our $MSG_SEPARATOR      = ' ';     # separator between parts of a message (command, priority, payload, etc)
-our $TRACK_MESSAGES     = 10;      # number of message times to track for computing avg processing time at a host
-our $POLL_INTERVAL      = 5;       # number of seconds between polls for connectivity between cluster/node
-our $CONNECT_TIMEOUT    = 5;       # number of seconds after which a stream times out attempting to connect
-our $DEL_COMPLETE_AFTER = 30 * 60; # number of seconds after which a completed task's result is delete if not collected
-
-#-------------------------------------------------------------------------------
-# Priorities
-#-------------------------------------------------------------------------------
-const our $PRI_HIGH   => Coro::PRIO_HIGH;
-const our $PRI_NORMAL => Coro::PRIO_NORMAL;
-const our $PRI_LOW    => Coro::PRIO_MIN;
-
-#-------------------------------------------------------------------------------
-# Commands
-#-------------------------------------------------------------------------------
-const our $CMD_PING     => 0; # Verify that a worker is responding
-const our $CMD_QUEUE    => 1; # Queue a message
-const our $CMD_COLLECT  => 2; # Collect results
-const our $CMD_REGISTER => 3; # Add a node to a cluster
-const our $CMD_STATUS   => 4; # Get process and system status from a manager
-
-const our $CMD_ACK      => 5; # Acknowledgement (respond OK)
-const our $CMD_COMPLETE => 6; # Response - message is complete
-const our $CMD_ERROR    => 7; # Response - error processing message or invalid message format
-const our $CMD_REJECTED => 8; # Response - no available capacity for handling tasks
-
-#-------------------------------------------------------------------------------
-# Logging
-#-------------------------------------------------------------------------------
-const our $TRACE => $Log::Log4perl::TRACE;
-const our $DEBUG => $Log::Log4perl::DEBUG;
-const our $INFO  => $Log::Log4perl::INFO;
-const our $WARN  => $Log::Log4perl::WARN;
-const our $ERROR => $Log::Log4perl::ERROR;
-const our $FATAL => $Log::Log4perl::FATAL;
-
-my $LOGGER = Log::Log4perl->get_logger('argon');
-
-sub SET_LOG_LEVEL {
-    Log::Log4perl->easy_init($_[0]);
-}
-
-# Strips an error message of line number and file information.
-sub error {
-    my $msg = shift;
-    $msg =~ s/ at (.+?) line \d+.//gsm;
-    $msg =~ s/eval {...} called$//gsm;
-    $msg =~ s/\s+$//gsm;
-    $msg =~ s/^\s+//gsm;
-    return $msg;
-}
-
-sub LOG {
-    my $lvl  = lc shift;
-    my $coro = $Coro::current + 0;
-    my $msg  = sprintf('[%s] [%s] => %s', $$, $coro, error(sprintf(shift, @_)));
-    $LOGGER->$lvl($msg);
-}
-
-sub TRACE { LOG(trace => @_) }
-sub DEBUG { LOG(debug => @_) }
-sub INFO  { LOG(info  => @_) }
-sub WARN  { LOG(warn  => @_) }
-sub ERROR { LOG(error => @_) }
-sub FATAL { LOG(fatal => @_) }
-
-SET_LOG_LEVEL $ERROR
-    unless Log::Log4perl->initialized;
 
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Argon - Simple, fast, and flexible distributed computing
+
+=head1 VERSION
+
+version 0.18
+
+=head1 DESCRIPTION
+
+Argon is a distributed processing platform built for Perl. It is designed to
+offer a simple, flexible, system for quickly building scalable systems with the
+minimum impact on existing workflows and code structure.
+
+=head1 QUICK START
+
+An argon system is controlled by a I<manager> process, whose job it is to
+schedule tasks among registered I<workers>.
+
+=head2 MANAGER
+
+A manager process is started with C<ar-manager>. The manager, workers, and
+clients must all use the same key (a file containing a key phrase used for
+encryption).
+
+  ar-manager --host localhost --port 8000 --key path/to/secret --verbose 7
+
+=head2 WORKER
+
+Workers are started with C<ar-worker> and must use the same C<key> as the
+manager.
+
+  ar-worker --mgr mgrhost:8000 --capacity 8 --key path/to/secret --verbose 7
+
+=head2 CLIENT
+
+Connecting to an Argon service is straightforward.
+
+  use Argon::Client;
+  use AnyEvent;
+
+  # Connect
+  my $cv = AnyEvent->condvar;
+
+  my $ar = Argon::Client->new(
+    host    => 'mgrhost',
+    port    => 8000,
+    keyfile => 'path/to/key',
+    ready   => $cv,
+    retry   => 1,
+  );
+
+  # Connected!
+  $cv->recv;
+
+A code ref (or any callable reference) may be passed using the C<ready>
+parameter which will be called once the client is connected. The example uses a
+condition variable (see L<AnyEvent/CONDITION VARIABLES>) to sleep until it
+is called, making the connection blocking.
+
+=head1 RUNNING TASKS
+
+Once connected, there are a number of ways to schedule tasks with the manager,
+the most basic being the L<Argon::Client/queue> method.
+
+  $client->queue('My::Task::Class', $arg_list, sub {
+    my $reply = shift;
+    my $result = $reply->result;
+  });
+
+There are a couple things to note here. The task class is any class that
+defines both a C<new> and a C<run> method. The C<$arg_list> will be passed to
+C<new>. A subroutine is passed which is called when the result is ready. The
+call to the C<result> method will C<croak> if the task failed.
+
+If C<retry> was set when the client was connected, the task will retry on a
+logarithmic backoff until the server has the capacity to process the task
+(see L<Argon/PREDICTABLE PERFORMANCE DEGREDATION>).
+
+If the workers were started with the C<--allow-eval> switch, the client may
+pass code references directly to be evaluated by the workers using the
+L<Argon::Client/process> method.
+
+  local $Argon::ALLOW_EVAL = 1;
+
+  $client->process(sub { ... }, $arg_list, sub {
+    ...
+  });
+
+=head1 PREDICTABLE PERFORMANCE DEGREDATION
+
+One of the key problems with many task queue implementations is the manner in
+which the system recovers from an interruption in service. In most cases, tasks
+continue to pile up while the system is unavailable. Once the service is again
+ready to process tasks, a significant backlog has built up, creating further
+delay for new tasks added to the queue. This creates a log jam that is often
+accompanied by incidental service slowdowns that can be difficult to diagnose
+(for example, overloaded workers clearing out the backlog tie up the database,
+causing other services to slow down).
+
+Argon prevents these cases by placing the responsibility for the backlog on the
+client. When the manager determines that the system has reached max capacity,
+new tasks are I<rejected> until there is room in the queue. From the
+perspective of the client, there is still a delay in the processing of tasks,
+but the task queue itself never becomes overloaded and the performance
+degredation will never overflow onto neighborhing systems as a result.
+
+Another adavantage of having a bounded queue is that clients are aware of the
+backlog and may report this to callers. System administrators may effectively
+plan for and respond to increased load by spinning up new servers as needed
+because they can reliably predict the performance of the system under load
+given a reliable estimate of the cost imposed by the tasks being performed.
+
+=head1 AUTHOR
+
+Jeff Ober <sysread@fastmail.fm>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Jeff Ober.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

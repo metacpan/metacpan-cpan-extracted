@@ -1,5 +1,5 @@
 package Moose::Exception::PackageDoesNotUseMooseExporter;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -24,4 +24,5 @@ sub _build_message {
            . ( $self->is_loaded ? "" : " (is it loaded?)" );
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

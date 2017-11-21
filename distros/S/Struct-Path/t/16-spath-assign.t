@@ -2,14 +2,36 @@
 use 5.006;
 use strict;
 use warnings;
-use Test::More tests => 4;
+use Test::More tests => 8;
 
 use Struct::Path qw(spath);
 
 use lib "t";
 use _common qw($s_mixed t_dump);
 
-my @r;
+my ($got, @r);
+
+$got = undef;
+spath(\$got, [], assign => 'test');
+is_deeply($got, 'test', "Replace entire thing (scalar) via assign opt") ||
+    diag t_dump $got;
+
+$got = [ 'original' ];
+spath($got, [], assign => 'test');
+is_deeply($got, 'test', "Replace entire thing (array) via assign opt") ||
+    diag t_dump $got;
+
+$got = 42;
+@r = spath(\$got, []);
+${$r[0]} = 'test';
+is_deeply($got, 'test', "Replace entire thing (scalar) via output") ||
+    diag t_dump $got;
+
+$got = [0, 1];
+@r = spath($got, []);
+${$r[0]} = 'test';
+is_deeply($got, 'test', "Replace entire thing (array) via output") ||
+    diag t_dump $got;
 
 @r = spath($s_mixed, [ {keys => ['c']} ]);
 ${$r[0]} = "vc_replaced";

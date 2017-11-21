@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 use Carp;
-our $VERSION = '0.9.13';
+our $VERSION = '0.9.14';
 
 print __PACKAGE__.' is version: '.$VERSION.$/ if($ENV{'PDF_TABLE_DEBUG'});
 
@@ -287,7 +287,7 @@ sub table
 
     # Validate settings key
     my %valid_settings_key = (
-	x                     => 1,
+        x                     => 1,
         w                     => 1,
         start_y               => 1,
         start_h               => 1,
@@ -320,6 +320,7 @@ sub table
         cell_props            => 1,
         max_word_length       => 1,
         cell_render_hook      => 1,
+        default_text          => 1,
     );
     foreach my $key (keys %arg)
     {
@@ -389,6 +390,7 @@ sub table
     my $pad_right     = $arg{'padding_right' } || $arg{'padding'} || 0;
     my $pad_top       = $arg{'padding_top'   } || $arg{'padding'} || 0;
     my $pad_bot       = $arg{'padding_bottom'} || $arg{'padding'} || 0;
+    my $default_text  = $arg{'default_text'  } // '-';
     my $line_w        = defined $arg{'border'} ? $arg{'border'} : 1 ;
     my $horiz_borders = defined $arg{'horizontal_borders'}
         ? $arg{'horizontal_borders'}
@@ -634,11 +636,6 @@ sub table
 
             # Row cell props - TODO in another commit
 
-            # Added to resolve infite loop bug with returned undef values
-            for(my $d = 0; $d < scalar(@{$record}) ; $d++)
-            {
-                $record->[$d] = '-' unless( defined $record->[$d]);
-            }
 
             # Choose colors for this row
             $background_color = $row_index % 2 ? $background_color_even  : $background_color_odd;
@@ -700,6 +697,11 @@ sub table
                 # Init cell font object
                 $txt->font( $cell_font, $cell_font_size );
                 $txt->fillcolor($cell_font_color);
+
+                # Added to resolve infite loop bug with returned undef values
+                $record->[$column_idx] //= $cell_props->[$row_index][$column_idx]->{'default_text'}
+                                       //  $col_props->[$column_idx]->{'default_text'}
+                                       //  $default_text;
 
                 # If the content is wider than the specified width, we need to add the text as a text block
                 if( $record->[$column_idx] !~ m/(.\n.)/ and

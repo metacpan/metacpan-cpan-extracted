@@ -4,13 +4,13 @@
       "Makamaka Hannyaharamitu, E<lt>makamaka[at]cpan.orgE<gt>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "JSON-PP",
    "no_index" : {
@@ -32,6 +32,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Scalar::Util" : "1.08",
             "Test::More" : "0"
          }
       }
@@ -42,5 +43,5 @@
          "url" : "http://github.com/makamaka/JSON-PP"
       }
    },
-   "version" : "2.27400"
+   "version" : "2.97000"
 }

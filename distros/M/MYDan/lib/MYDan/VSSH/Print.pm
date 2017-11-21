@@ -57,17 +57,14 @@ sub result
 
         printf "%s[", $range->load( $re{$_} )->dump;
         my $count = scalar @{$re{$_}};
-        if( $MYDan::VSSH::Execute::dan )
-        {
-            my $exit = $_ && $_ =~ s/--- (\d+)\n$// ? $1 : 1;
 
-            $exit ? print BOLD RED $count : print BOLD GREEN $count;
+        my $exit = $_ && $_ =~ s/--- (\d+)\r?\n$// ? $1 : 1;
 
-            print "]:\n";
+        $exit ? print BOLD RED $count : print BOLD GREEN $count;
 
-            $exit ? print BOLD RED "$_\n" : print BOLD GREEN  "$_\n";
-        }
-        else { print "$count]:\n$_\n"; }
+        print "]:\n";
+
+        $exit ? print BOLD RED "$_\n" : print BOLD GREEN  "$_\n";
 
         print "=" x 68, "\n";
     }keys %re;

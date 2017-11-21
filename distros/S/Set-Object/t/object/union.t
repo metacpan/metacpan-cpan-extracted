@@ -5,7 +5,7 @@ use Test::More tests => 10;
 
 my (@simpsons, $homer, $marge, $bart, $lisa, $maggie, $patty, $selma);
 
-require 't/object/Person.pm';
+require './t/object/Person.pm';
 package Person;
 
 populate();

@@ -8,7 +8,7 @@ use Data::Dumper;
 use base 'Error';
 use overload ( '""' => 'stringify' );
 
-$VERSION = '2.04';
+$VERSION = '2.08';
 
 sub new {
     my ($self, $time) = @_;
@@ -32,13 +32,11 @@ Test::Timer::TimeoutException - exception class for Test::Timer
 
 =head1 VERSION
 
-This documentation describes 2.04 of Test::Timer::TimeoutException
+This documentation describes 2.08 of Test::Timer::TimeoutException
 
 =head1 SYNOPSIS
 
     use Test::Timer::TimeoutException;
-
-    throw Test::Timer::TimeoutException($timeout);
 
     throw Test::Timer::TimeoutException($timeout);
 

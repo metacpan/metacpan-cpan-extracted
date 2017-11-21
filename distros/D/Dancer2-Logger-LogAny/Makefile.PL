@@ -2,32 +2,33 @@
 use strict;
 use warnings;
 
-use 5.008;
+use 5.006;
 
-use ExtUtils::MakeMaker 6.17;
+use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Use Log::Any to log from your Dancer2 app",
   "AUTHOR" => "Nick Tonkin <tonkin\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
-    "ExtUtils::MakeMaker" => "6.17"
+    "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Dancer2-Logger-LogAny",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.008",
+  "MIN_PERL_VERSION" => "5.006",
   "NAME" => "Dancer2::Logger::LogAny",
   "PREREQ_PM" => {
-    "Dancer2" => 0,
-    "Log::Any::Adapter" => 0,
+    "Dancer2" => "0.157",
+    "Log::Any::Adapter" => "1.049",
     "Moo" => 0
   },
   "TEST_REQUIRES" => {
     "HTTP::Request::Common" => 0,
     "Log::Any::Test" => 0,
     "Plack::Test" => 0,
+    "Test::More" => 0,
     "Test::Pod::Coverage" => 0
   },
-  "VERSION" => "0.9907",
+  "VERSION" => "0.9912",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -35,12 +36,13 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Dancer2" => 0,
+  "Dancer2" => "0.157",
   "HTTP::Request::Common" => 0,
-  "Log::Any::Adapter" => 0,
+  "Log::Any::Adapter" => "1.049",
   "Log::Any::Test" => 0,
   "Moo" => 0,
   "Plack::Test" => 0,
+  "Test::More" => 0,
   "Test::Pod::Coverage" => 0
 );
 

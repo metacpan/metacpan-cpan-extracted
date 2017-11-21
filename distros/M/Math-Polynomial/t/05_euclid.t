@@ -15,7 +15,7 @@ use Test;
 use lib 't/lib';
 use Test::MyUtils;
 BEGIN {
-    use_or_bail('Math::BigNum');
+    use_or_bail('Math::AnyNum');
     plan tests => 22;
 }
 use Math::Polynomial 1.000;
@@ -23,22 +23,22 @@ ok(1);  # modules loaded
 
 #########################
 
-my $x = Math::Polynomial->monomial(1, Math::BigNum->new('1'));
+my $x = Math::Polynomial->monomial(1, Math::AnyNum->new('1'));
 my $p = 4 * ($x + 1)**2 * ($x - 2) * ($x - 5);
 my $q = 5 * ($x + 4) * ($x + 1) * ($x - 2);
 
 my $dd = 2700 * ($x + 1) * ($x - 2);
 ok($dd == $p->gcd($q, 'mmod'));
 
-$x = Math::Polynomial->monomial(1, Math::BigNum->new('1'));
+$x = Math::Polynomial->monomial(1, Math::AnyNum->new('1'));
 $p = 4 * ($x + 1)**2 * ($x - 2) * ($x - 5);
 $q = 5 * ($x + 4) * ($x + 1) * ($x - 2);
 
 $dd = 108 * ($x + 1) * ($x - 2);
 ok($dd == $p->gcd($q));
 
-my $dd1 = $x->new(Math::BigNum->new('1'));
-my $dd2 = $x->new(Math::BigNum->new('32/5'), Math::BigNum->new('-4/5'));
+my $dd1 = $x->new(Math::AnyNum->new('1'));
+my $dd2 = $x->new(Math::AnyNum->new('32/5'), Math::AnyNum->new('-4/5'));
 my $mm1 = -5 * ($x + 4) / 108;
 my $mm2 =  4 * ($x + 1) * ($x - 5) / 108;
 my $qqi =  (-$x + 8) / 135;

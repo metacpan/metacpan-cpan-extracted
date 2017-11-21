@@ -14,7 +14,7 @@
 package App::orgdaemon;
 
 use strict;
-our $VERSION = '1.05';
+our $VERSION = '1.08';
 
 1;
 

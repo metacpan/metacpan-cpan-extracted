@@ -11,7 +11,7 @@ use Function::Parameters;
 use GraphQL::Debug qw(_debug);
 use GraphQL::Directive;
 use GraphQL::Introspection qw($SCHEMA_META_TYPE);
-use GraphQL::Type::Scalar qw($Int $Float $String $Boolean $ID);
+use GraphQL::Type::Scalar qw($Int $Float $String $Boolean $ID $DateTime);
 use GraphQL::Language::Parser qw(parse);
 use Module::Runtime qw(require_module);
 use Exporter 'import';
@@ -19,7 +19,7 @@ use Exporter 'import';
 our $VERSION = '0.02';
 our @EXPORT_OK = qw(lookup_type);
 use constant DEBUG => $ENV{GRAPHQL_DEBUG};
-my %BUILTIN2TYPE = map { ($_->name => $_) } ($Int, $Float, $String, $Boolean, $ID);
+my %BUILTIN2TYPE = map { ($_->name => $_) } ($Int, $Float, $String, $Boolean, $ID, $DateTime);
 my @TYPE_ATTRS = qw(query mutation subscription);
 
 =head1 NAME
@@ -201,15 +201,25 @@ method assert_object_implements_interface(
   return;
 }
 
-=head2 from_ast($ast)
+=head2 from_ast($ast[, \%kind2class])
 
 Class method. Takes AST (array-ref of hash-refs) made by
 L<GraphQL::Language::Parser/parse> and returns a schema object. Will
 not be a complete schema since it will have only default resolvers.
 
+If C<\%kind2class> is given, it will override the default
+mapping of SDL keywords to Perl classes. This is probably most
+useful for L<GraphQL::Type::Object>. The default is available as
+C<%GraphQL::Schema::KIND2CLASS>. E.g.
+
+  my $schema = GraphQL::Schema->from_ast(
+    $doc,
+    { %GraphQL::Schema::KIND2CLASS, type => 'GraphQL::Type::Object::DBIC' }
+  );
+
 =cut
 
-my %kind2class = qw(
+our %KIND2CLASS = qw(
   type GraphQL::Type::Object
   enum GraphQL::Type::Enum
   interface GraphQL::Type::Interface
@@ -217,20 +227,21 @@ my %kind2class = qw(
   scalar GraphQL::Type::Scalar
   input GraphQL::Type::InputObject
 );
-my %class2kind = reverse %kind2class;
+my %CLASS2KIND = reverse %KIND2CLASS;
 method from_ast(
   ArrayRef[HashRef] $ast,
+  HashRef $kind2class = \%KIND2CLASS,
 ) :ReturnType(InstanceOf[__PACKAGE__]) {
   DEBUG and _debug('Schema.from_ast', $ast);
-  my @type_nodes = grep $kind2class{$_->{kind}}, @$ast;
+  my @type_nodes = grep $kind2class->{$_->{kind}}, @$ast;
   my ($schema_node, $e) = grep $_->{kind} eq 'schema', @$ast;
   die "Must provide only one schema definition.\n" if $e;
   my %name2type = %BUILTIN2TYPE;
   for (@type_nodes) {
     die "Type '$_->{name}' was defined more than once.\n"
       if $name2type{$_->{name}};
-    require_module $kind2class{$_->{kind}};
-    $name2type{$_->{name}} = $kind2class{$_->{kind}}->from_ast(\%name2type, $_);
+    require_module $kind2class->{$_->{kind}};
+    $name2type{$_->{name}} = $kind2class->{$_->{kind}}->from_ast(\%name2type, $_);
   }
   if (!$schema_node) {
     # infer one
@@ -279,7 +290,6 @@ schema object.
 
 has to_doc => (is => 'lazy', isa => Str);
 my %directive2builtin = map { ($_=>1) } @GraphQL::Directive::SPECIFIED_DIRECTIVES;
-my %scalar2builtin = map { ($_->name=>1) } ($Int, $Float, $String, $Boolean, $ID);
 sub _build_to_doc {
   my ($self) = @_;
   my $schema_doc;
@@ -296,8 +306,8 @@ sub _build_to_doc {
       @{ $self->directives }),
     (map $self->name2type->{$_}->to_doc,
       grep !/^__/,
-      grep !$scalar2builtin{$_},
-      grep $class2kind{ref $self->name2type->{$_}},
+      grep !$BUILTIN2TYPE{$_},
+      grep $CLASS2KIND{ref $self->name2type->{$_}},
       sort keys %{$self->name2type}),
     ;
 }

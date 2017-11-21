@@ -15,7 +15,7 @@ use Perl::Critic::Utils qw< :booleans :characters hashify :severities >;
 
 use base 'Perl::Critic::Policy';
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 #-----------------------------------------------------------------------------
 
@@ -64,9 +64,9 @@ Readonly::Hash my %GLOBAL_DECLARATION => (
 # $3 = the variable (\w+, since we are not worried about built-ins, but
 #      possibly with enclosing {})
 # $4 = the first character of the subscript ( '[' or '{' ), if any
-Readonly::Scalar my $FIND_INTERPOLATION => qr/
+Readonly::Scalar my $FIND_INTERPOLATION => qr<
     ( \\* ) ( [\$\@]{1,2} ) ( \w+ | [{] \w+ [}] ) ( [[{]? )
-/smx;
+>smx;
 
 Readonly::Scalar my $LAST_CHARACTER => -1;
 
@@ -154,9 +154,12 @@ sub _get_symbol_declarations {
 
     # Because we need multiple passes to find all the declarations, we
     # have to put them in reverse order when we're done.
+    # Re the 'no critic' annotation. I understand that 'reverse ...' is
+    # faster and clearer than 'sort { $b cmp $a } ...', but I think the
+    # dereferenes negate this.
     foreach my $decls ( values %{ $declared } ) {
         @{ $decls } = map { $_->[0] }
-            sort { $b->[1][0] <=> $a->[1][0] || $b->[1][1] <=> $a->[1][1] }
+            sort { $b->[1][0] <=> $a->[1][0] || $b->[1][1] <=> $a->[1][1] } ## no critic (ProhibitReverseSortBlock)
             map { [ $_, $_->{element}->location() ] }
             @{ $decls };
     }
@@ -764,9 +767,11 @@ policy simply looks at the first word after the equals sign, if any.
 
 Thomas R. Wyant, III F<wyant at cpan dot org>
 
-=head1 COPYRIGHT AND LICENSE
+=head1 COPYRIGHT
 
-Copyright (C) 2012-2016 Thomas R. Wyant, III
+Copyright (C) 2012-2017 Thomas R. Wyant, III
+
+=head1 LICENSE
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

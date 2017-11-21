@@ -1,0 +1,18 @@
+#!/usr/bin/env perl
+#
+# highlights consonant clusters in the input (files or from STDIN)
+# though the regex will need tweaks depending on the input language for
+# example to include á or y as vowels (or the data could be pre-
+# filtered to normalize these; Text::Unidecode may help)
+
+use 5.14.0;
+use warnings;
+use open IO => ':locale';
+
+my $match = qr/[^aeiou]{3,}/;
+
+shift @ARGV if @ARGV == 1 and $ARGV[0] eq '-';
+
+while (readline) {
+    print if s/($match)/\e[1m$1\e[0m/g;
+}

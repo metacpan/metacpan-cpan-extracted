@@ -4,8 +4,10 @@ use warnings;
 
 # Modules.
 use Map::Tube::Bucharest;
-use Test::Map::Tube 'tests' => 2;
+use Test::Map::Tube 'tests' => 3;
 use Test::NoWarnings;
 
 # Test.
-ok_map(Map::Tube::Bucharest->new, 'Test validity of map.');
+my $map = Map::Tube::Bucharest->new;
+ok_map($map, 'Test validity of map.');
+ok_map_functions($map, 'Test map functions.');

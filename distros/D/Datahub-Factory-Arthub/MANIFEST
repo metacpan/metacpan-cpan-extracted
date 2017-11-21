@@ -14,5 +14,9 @@ lib/Datahub/Factory/Importer/EIZ.pm
 lib/Datahub/Factory/Importer/KMSKA.pm
 lib/Datahub/Factory/Importer/KMSKA/TMS/Index.pm
 lib/Datahub/Factory/Importer/VKC.pm
+lib/Datahub/Factory/Module/PID.pm
+lib/Datahub/Factory/Module/PID/CloudFiles.pm
+lib/Datahub/Factory/Module/PID/File.pm
+lib/Datahub/Factory/Module/PID/WebFile.pm
 t/author-pod-syntax.t
 t/basic.t

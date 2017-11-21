@@ -1,0 +1,5 @@
+0.02 2017-11-14
+-Bugfix: set minimum List::Util version to 1.26 for sum0 support
+
+0.01 2017-11-12
+-Initial release

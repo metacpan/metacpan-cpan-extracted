@@ -137,7 +137,7 @@ Search::Elasticsearch::Plugin::XPack::1_0::Role::API - This class contains the s
 
 =head1 VERSION
 
-version 5.02
+version 6.00
 
 =head1 AUTHOR
 

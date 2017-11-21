@@ -12,6 +12,8 @@ use_ok $_ for qw/
     WebService::Slack::WebApi::Api
     WebService::Slack::WebApi::Auth
     WebService::Slack::WebApi::Chat
+    WebService::Slack::WebApi::Dialog
+    WebService::Slack::WebApi::Pins
     WebService::Slack::WebApi::Users
     WebService::Slack::WebApi::Files
     WebService::Slack::WebApi::Emoji

@@ -1,5 +1,5 @@
 package Moose::Exception::MustSupplyPackageNameAndName;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -16,4 +16,5 @@ sub _build_message {
     "You must supply the package_name and name parameters";
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

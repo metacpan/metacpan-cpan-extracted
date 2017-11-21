@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: A Dancer2 plugin for creating routes from a Swagger2 spec
-our $VERSION = '0.02';    # VERSION
+our $VERSION = '0.03';                     # VERSION
 use File::Spec;
 use Dancer2::Plugin;
 use Module::Load;
@@ -14,11 +14,21 @@ use JSON::Pointer;
 use YAML::XS;
 use Data::Walk;
 
+our $ValidationCompiler; ## no critic (Variables::ProhibitPackageVars)
+
+BEGIN {
+    no strict 'refs';
+    if (%{"JSV::Compiler::"}) {
+        $ValidationCompiler = JSV::Compiler->new;
+    }
+}
+
 sub _path2mod {
     ## no critic (BuiltinFunctions::ProhibitComplexMappings)
     map {s/[\W_]([[:lower:]])/\u$1/g; ucfirst} @_;
 }
 
+# this complex function makes routes to module::function mapping
 sub _build_path_map {
     my $schema = $_[0];
     my $paths  = $schema->{paths};
@@ -153,21 +163,23 @@ sub load_schema {
     return $schema;
 }
 
-sub _make_handler_params {
+sub _make_handler_params {    ## no critic (Subroutines::ProhibitExcessComplexity)
     my ($mpath, $parameters) = @_;
     my $param_eval = '';
+    my %schema;
     for my $parameter_spec (@$parameters) {
         next if $parameter_spec =~ /^x-/;
         my $in       = $parameter_spec->{in};
         my $name     = $parameter_spec->{name};
         my $required = $parameter_spec->{required};
-        my $req_code = "push \@errors, \"required parameter '$name'" . " is absent\" if not exists \$input{\"$name\"};\n ";
+        my $req_code = "push \@\$errors, \"required parameter '$name' is absent\" if not exists \$input->{\"$name\"};\n ";
         my $src;
         ## no critic (ControlStructures::ProhibitCascadingIfElse)
         if ($in eq 'body') {
             $req_code
-                = $required
-                ? "push \@errors, \"required parameter '$name'" . " is absent\" if not keys %{\$input{\"$name\"}};"
+                = $required && !$ValidationCompiler
+                ? "push \@\$errors, \"required parameter '$name' is absent\""
+                . " if not ref \$input->{\"$name\"} or not keys %{\$input->{\"$name\"}};"
                 : '';
               #<<<
             $param_eval .=
@@ -176,12 +188,12 @@ sub _make_handler_params {
               . "    && \$app->request->header(\"Content-Type\") =~ m{application/json}) {\n"
               . "    \$value = JSON::decode_json (\$app->request->body)\n } else {\n"
               . "    \$value = \$app->request->body }\n"
-              . "  \$input{\"$name\"} = \$value if defined \$value; $req_code" 
+              . "  \$input->{\"$name\"} = \$value if defined \$value; $req_code" 
               . "}\n";
               #>>>
             $req_code = '';
         } elsif ($in eq 'header') {
-            $param_eval .= "\$input{\"$name\"} = \$app->request->header(\"$name\");\n";
+            $param_eval .= "\$input->{\"$name\"} = \$app->request->header(\"$name\");\n";
         } elsif ($in eq 'query') {
             $src = "\$app->request->params('query')";
         } elsif ($in eq 'path') {
@@ -193,17 +205,31 @@ sub _make_handler_params {
             }
         } elsif ($in eq 'formData') {
             if ($parameter_spec->{type} && $parameter_spec->{type} eq 'file') {
-                $param_eval .= "\$input{\"$name\"} = \$app->request->upload(\"$name\");\n";
+                $param_eval .= "\$input->{\"$name\"} = \$app->request->upload(\"$name\");\n";
             } else {
                 $src = "\$app->request->params('body')";
             }
         }
         if ($src) {
-            $param_eval .= "{ my \$src = $src; \$input{\"$name\"} = " . "\$src->{\"$name\"} if 'HASH' eq ref \$src; }\n";
+            $param_eval .= "{ my \$src = $src; \$input->{\"$name\"} = \$src->{\"$name\"} if 'HASH' eq ref \$src; }\n";
         }
-        $param_eval .= $req_code if $required;
+        if ($ValidationCompiler) {
+            $schema{properties}{$name} = $parameter_spec;
+            if ($schema{properties}{$name}{type} && $schema{properties}{$name}{type} eq 'file') {
+                $schema{properties}{$name}{type}   = 'string';
+                $schema{properties}{$name}{format} = 'binary';
+            }
+            push @{$schema{required}}, $name if $required;
+        } else {
+            $param_eval .= $req_code if $required;
+        }
     }
-    $param_eval .= "if(\@errors) { \$dsl->status('unprocessable_entity'); \$res = { errors => \\\@errors }; }\n";
+    if ($ValidationCompiler) {
+        $ValidationCompiler->load_schema(\%schema);
+        $param_eval .= $ValidationCompiler->compile(input_symbole => '$input', is_required => 0);
+    }
+    $param_eval
+        .= "if(\@\$errors) { \$dsl->status('unprocessable_entity'); \$res = { error => join \"; \", \@\$errors }; }\n";
     if ($mpath =~ /\(\?</) {
         $mpath = "\\Q$mpath\\E";
         $mpath =~ s/\\Q(.*?)\\E/quotemeta($1)/eg;
@@ -263,27 +289,29 @@ register OpenAPIRoutes => sub {
                 my ($env_var) = /^x-env-(.+)/;
                 $env_var = uc $env_var;
                 $env_var =~ s/\W/_/;
-                $get_env .= "\$input{'$name'} = \$app->request->env->{'$env_var'} // '';\n";
+                $get_env .= "\$input->{'$name'} = \$app->request->env->{'$env_var'} // '';\n";
             }
             my $prolog_code_src = <<"EOS";
             sub {
-                my %input  = ();
-                my \@errors = ();
+                my \$input  = {};
+                my \$errors = [];
                 my \$res;
                 my \$status;
                 my \$callback;
                 $param_eval;
                 $get_env;
-                (\$res, \$status, \$callback) = eval {${module_name}::$module_func( \\%input, \$dsl )} if not \$res;
+                (\$res, \$status, \$callback) = eval {${module_name}::$module_func( \$input, \$dsl )} if not \$res;
                 if(\$callback && 'CODE' eq ref \$callback) {
                     \$callback->();
                 }
+                my \$exception = \$\@;
                 if( \$app->request->header(\"Accept\")
                     && \$app->request->header(\"Accept\") =~ m{application/json}
-                    && (\$\@ || ref \$res)) {
+                    && (\$exception || ref \$res)) {
                     \$dsl->content_type("application/json");
                     if (not defined \$res) {
-                        \$res = { error => \$\@ };
+                        \$dsl->error(\$exception) if \$exception;
+                        \$res = { error => \$exception };
                         \$res->{error} =~ s/ at .*? line \\d+\.\\n?//;
                         \$dsl->status('bad_request');
                     } else {
@@ -291,7 +319,7 @@ register OpenAPIRoutes => sub {
                     }
                     return \$json->encode(\$res);
                 } else {
-                    die \$\@ if \$\@ and not defined \$res; 
+                    die \$exception if \$exception and not defined \$res; 
                     \$dsl->status(\$status) if \$status;
                     if(!\$status && \$res && ref(\$res) && "\$res" =~ /^(HASH|ARRAY|SCALAR|CODE)\\(/ ) {
                         \$dsl->status('not_acceptable');
@@ -302,6 +330,9 @@ register OpenAPIRoutes => sub {
             }
 EOS
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
+            if ($debug > 1) {
+                print STDERR "$method $mpath: $prolog_code_src\n";
+            }
             my $prolog_code = eval $prolog_code_src;
             if ($@) {
                 my $error = $@;
@@ -333,6 +364,8 @@ register_plugin;
 
 1;
 
+## no critic (Documentation::RequirePodLinksIncludeText)
+
 __END__
 
 =encoding utf8
@@ -356,8 +389,11 @@ L<Dancer2::Core::Request::Upload> objects.
 
 Automatically decodes JSON parameters if "Content-Type" is application/json.
 Automatically encodes answers to application/json if "Accept" header asks for
-it and returned value is reference. It checks also whether parameter is 
-required or not but doesn't do real validation yet.
+it and returned value is reference. 
+
+IFF L<JSV::Compilator> module was loaded before, then it will be used for
+input data validation. Otherwise it checks whether parameter is 
+required or not but doesn't do real validation.
 
 Catches thrown exceptions and makes JSON error messages if "Accept" 
 is application/json. 

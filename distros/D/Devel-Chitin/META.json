@@ -1,0 +1,66 @@
+{
+   "abstract" : "Programmatic interface to the Perl debugging API",
+   "author" : [
+      "Anthony Brummett <brummett@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Devel-Chitin",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "B" : "0",
+            "Carp" : "0",
+            "Devel::Callsite" : "0",
+            "Digest::MD5" : "0",
+            "Exporter" : "0",
+            "Fcntl" : "0",
+            "IO::File" : "0",
+            "POSIX" : "0",
+            "PadWalker" : "0",
+            "Scalar::Util" : "0",
+            "Socket" : "0",
+            "base" : "0",
+            "constant" : "0",
+            "perl" : "5.008009",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Basename" : "0",
+            "IO::Pipe" : "0",
+            "Sub::Name" : "0",
+            "Test::Builder" : "0",
+            "Test::More" : "0",
+            "experimental" : "0",
+            "lib" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/amb43790/Devel-Chitin.git",
+         "web" : "https://github.com/amb43790/Devel-Chitin"
+      }
+   },
+   "version" : "0.12",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0218"
+}
+

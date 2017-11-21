@@ -24,12 +24,13 @@ name: Jojo-Base
 provides:
   Jojo::Base:
     file: lib/Jojo/Base.pm
-    version: v0.5.0
+    version: v0.6.0
 recommends:
   Jojo::Role: v0.2.0
 requires:
   Mojo::Base: '0'
   Mojo::Util: '0'
+  Mojolicious: '7.43'
   Sub::Inject: v0.2.0
   experimental: '0'
   perl: '5.018'
@@ -37,5 +38,5 @@ resources:
   bugtracker: https://github.com/aferreira/cpan-Mojo-Bass/issues
   homepage: https://github.com/aferreira/cpan-Mojo-Bass
   repository: https://github.com/aferreira/cpan-Mojo-Bass.git
-version: 0.5.0
+version: 0.6.0
 x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -2,8 +2,8 @@
  * Filename : tee.xs
  * 
  * Author   : Paul Marquess 
- * Date     : 26th March 2000
- * Version  : 1.01
+ * Date     : 2017-11-14 18:25:18 rurban
+ * Version  : 1.02
  *
  */
 
@@ -19,7 +19,7 @@ filter_tee(pTHX_ int idx, SV *buf_sv, int maxlen)
 #if PERL_VERSION > 8 || (PERL_VERSION == 8 && PERL_SUBVERSION > 8)
     PerlIO * fil = (PerlIO*) IoOFP(FILTER_DATA(idx));
 #else
-    PerlIO * fil = (PerlIO*) SvIV(FILTER_DATA(idx));
+    PerlIO * fil = INT2PTR(PerlIO*, SvIV(FILTER_DATA(idx)));
 #endif
     int old_len = SvCUR(buf_sv) ;
  
@@ -68,8 +68,11 @@ import(module, filename)
 
 	/* save the tee'd file handle. */
 #if PERL_VERSION > 8 || (PERL_VERSION == 8 && PERL_SUBVERSION > 8)
-        IoOFP(stream) = (PerlIO*) fil;
+        IoOFP(stream) = fil;
 #else
-	SvIV_set(stream, (PerlIO*) fil);
+        {
+            IV iv = PTR2IV(fil);
+            SvIV_set(stream, iv);
+        }
 #endif
 

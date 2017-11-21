@@ -7,12 +7,33 @@ use MYDan::Util::OptConf;
 
 $| ++;
 
+=head1 SYNOPSIS
+
+ $0
+ $0 foo.bar=123
+ $0 foo.bar --del
+ $0 [--raw] 
+
+=cut
+
 my $option = MYDan::Util::OptConf->load();
+
+my %opt = $option->get( qw( raw del ) )->dump();
+$option = MYDan::Util::OptConf->load( raw => $opt{raw} );
 
 if( my $name = shift )
 {
-    my ( $n, $k ) = split /\./, $name, 2;
-    my %o = $option->get()->dump( $n );
-    $k ? print "$o{$k}\n" : YAML::XS::DumpFile \*STDOUT, \%o;   
+    my ( $t, $v ) = split /=/, $name, 2;
+    my ( $n, $k ) = split /\./, $t, 2;
+
+    if( defined $v || $opt{del} )
+    {
+        $option->save( name => $n, key => $k, value => $v );
+    }
+    else
+    {
+        my %o = $option->get()->dump( $n );
+        $k ? printf( "%s\n", $o{$k}||'') : YAML::XS::DumpFile \*STDOUT, \%o;   
+    }
 }
 else { YAML::XS::DumpFile \*STDOUT, $option; }

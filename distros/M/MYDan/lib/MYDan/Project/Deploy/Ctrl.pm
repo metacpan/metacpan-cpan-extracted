@@ -83,6 +83,9 @@ sub explain
     my ( $conf, $currpath, $packtype, $datatype )= @$this{qw( conf currpath packtype datatype )};
     my ( $repo, $path, $link, $version ) = @$conf{qw( repo path link version )};
 
+    my @try = ( split /\s+/, join " ",`cat '$currpath/explain.try'`  ) if -f "$currpath/explain.try";
+    if( @try > 3 ) { map{ unlink "$currpath/$_" if -f "$currpath/$_" }( 'pack', 'pack.md5', 'pack.try', 'explain.try', 'info/stage.succ' ); }
+
     $this->stage( %param, mark => undef )
         unless -f "$currpath/pack" && -f "$currpath/info/stage.succ";
 
@@ -99,6 +102,8 @@ sub explain
 
     $this->syscmd( 'explain' => "mkdir -p '$currpath/data'") unless -d "$currpath/data";
     my $opt = ( $packtype eq 'tar.gz' ||  $packtype eq 'raw' ) ? 'z' : '';
+
+    system "echo 'explain' >> '$currpath/explain.try'";
 
     $datatype eq 'patch' && $packtype eq 'raw'
         ? $this->syscmd( 'explain' => "rsync '$currpath/pack' '$currpath/data/patch'")

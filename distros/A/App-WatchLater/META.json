@@ -1,0 +1,65 @@
+{
+   "abstract" : "Manage your YouTube Watch Later videos",
+   "author" : [
+      "Aaron L. Zeng <me@bcc32.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "App-WatchLater",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBD::SQLite" : "0",
+            "DBI" : "0",
+            "HTTP::Tiny" : "0.055",
+            "IO::Socket::SSL" : "0",
+            "JSON" : "0",
+            "Try::Tiny" : "0",
+            "URI::Find" : "0",
+            "perl" : "5.016"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::MockObject::Extends" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "App::WatchLater" : {
+         "file" : "lib/App/WatchLater.pm",
+         "version" : "0.02"
+      },
+      "App::WatchLater::YouTube" : {
+         "file" : "lib/App/WatchLater/YouTube.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/mit-license.php"
+      ]
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

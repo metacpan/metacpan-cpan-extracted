@@ -4,7 +4,7 @@ use 5.022001;
 use strict;
 use warnings;
 
-our $VERSION = "1.0.2";
+our $VERSION = "1.0.3";
 
 # for reading in configs
 use File::Slurp;
@@ -49,7 +49,7 @@ sub new {
 		'ot-cookie-domain' => ['The domain name for the authentication cookie',$domainname],
 		'ot-primary-hostname' => ['The full hostname for the main Web URI for this system',$hostname],
 		'omnitool-admin' => ['The email address of the responsible party(ies) for this OmniTool system',$ENV{USER}.'@'.$domainname],
-		'omnitool-username' => ['The OS username who will run and own all OmniTool processes and resources',$ENV{USER}],
+		'os-username' => ['The OS username who will run and own all OmniTool processes and resources',$ENV{USER}],
 		'admin-ui-password' => [qq{The password for the 'omnitool_admin' user in the OT Admin Web UI; value must be provided}],
 		'source_git_repo' => [qq{The source repo for OmniTool; change from default only if you have your own trusted fork.}, $my_git_repo],
 	};
@@ -57,7 +57,7 @@ sub new {
 		'config-file','save-config-file','save-config-file-only',
 		'othome','database-server','db-username','db-password',
 		'init-vector','salt-phrase',
-		'omnitool-admin','omnitool-username','admin-ui-password',
+		'omnitool-admin','os-username','admin-ui-password',
 		'ot-cookie-domain','ot-primary-hostname','source_git_repo'
 	];
 
@@ -67,7 +67,7 @@ sub new {
 		-config-file=s -save-config-file=s -save-config-file-only=s
 		-othome=s -database-server=s
 		-db-username=s -db-password=s init-vector=s -salt-phrase=s -ot-cookie-domain=s
-		-admin-ui-password=s -ot-primary-hostname=s -omnitool-admin=s -omnitool-username=s
+		-admin-ui-password=s -ot-primary-hostname=s -omnitool-admin=s -os-username=s
 		-source_git_repo=s)
 	);
 
@@ -242,8 +242,8 @@ sub do_the_installation {
 	symlink $self->{options}{othome}.'/distribution/configs/ot6_modules.yml', $self->{options}{othome}.'/configs/ot6_modules.yml';
 
 	# if the user who will run OT6 is not the same username running this script, run a chown
-	if ($ENV{USER} ne $self->{options}{'omnitool-username'}) {
-		system('chown -R '.$self->{options}{'omnitool-username'}.' '.$self->{options}{othome});
+	if ($ENV{USER} ne $self->{options}{'os-username'}) {
+		system('chown -R '.$self->{options}{'os-username'}.' '.$self->{options}{othome});
 	}
 
 	# final step is the database work
@@ -338,7 +338,7 @@ sub create_config_files {
 	}
 
 	# i hate dashes, but felt like they were standard in the args
-	foreach $key ('database-server','omnitool-admin','omnitool-username','omnitool-username','init-vector','salt-phrase','ot-cookie-domain','ot-primary-hostname') {
+	foreach $key ('database-server','omnitool-admin','os-username','init-vector','salt-phrase','ot-cookie-domain','ot-primary-hostname') {
 		($new_key = $key) =~ s/-/_/g;
 		$self->{options}{$new_key} = $self->{options}{$key};
 	}

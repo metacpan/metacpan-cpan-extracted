@@ -1,9 +1,43 @@
 ==================================================
-Changes from 2016-10-19 00:00:00 +0000 to present.
+Changes from 2016-11-15 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.021 at 2017-10-19 14:23:09 +0000
+version 0.023 at 2017-11-15 17:24:29 +0000
+------------------------------------------
+
+  Change: 3f5b8fe0e03a4995e9d0657513c594692e0201e4
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-11-15 10:15:07 +0000
+
+    Added missing test dep 
+
+------------------------------------------
+version 0.022 at 2017-11-14 14:20:18 +0000
+------------------------------------------
+
+  Change: c089f4bbf4dda57d2c94fd40491d3ff19a0a2149
+  Author: Jerome Eteve <jeteve@users.noreply.github.com>
+  Date : 2017-11-14 14:20:18 +0000
+
+    Merge pull request #15 from skinnyjeans/retry
+
+    Retry on transaction deadlocks 
+
+  Change: 329a8ff706c2306ec797d81f2d50ea111fdefefd
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-11-14 13:58:07 +0000
+
+    Retry updates and create on deadlocks; 
+
+  Change: a3600f564581d4ae03b248500f3c5403bc3c8e43
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2017-11-13 16:57:23 +0000
+
+    Wrap updating a stored process in a storage method 
+
+------------------------------------------
+version 0.021 at 2017-10-19 12:58:36 +0000
 ------------------------------------------
 
   Change: ee9c4ea079356f979ca4c21a15f01764b4c63eec
@@ -208,5 +242,5 @@ version 0.015 at 2017-04-13 16:21:48 +0000
     Use strict 
 
 =================================================
-Plus 14 releases after 2016-10-19 00:00:00 +0000.
+Plus 14 releases after 2016-11-15 00:00:00 +0000.
 =================================================

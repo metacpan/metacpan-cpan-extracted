@@ -9,6 +9,7 @@ use lib "$FindBin::Bin/../lib";
 
 use Crypt::DRBG::Hash;
 use Crypt::DRBG::HMAC;
+use Digest::SHA;
 use Test::More;
 
 # The spec for HMAC and Hash requires that the seed, nonce, and personalization
@@ -30,6 +31,25 @@ test_instantiation({
 );
 test_instantiation({seed => 'abcdef'}, 'seed');
 test_instantiation({seed => sub { 'abcdef' }}, 'seed as coderef');
+if (eval { require Digest::HMAC }) {
+	test_hmac_instantiation(
+		{
+			seed => 'abcdef',
+			func => sub {
+				return Digest::HMAC::hmac(@_, \&Digest::SHA::sha512, 128);
+			},
+		},
+		'custom function'
+	);
+}
+test_hash_instantiation(
+	{
+		seed => 'abcdef',
+		func => \&Digest::SHA::sha512
+	},
+	'custom function'
+);
+
 
 done_testing();
 
@@ -45,7 +65,7 @@ sub test_hash_instantiation {
 	my $expected = 'c7dfc3a61d94f45d0570';
 	my $obj = Crypt::DRBG::Hash->new(%$params);
 	my $hex = unpack 'H*', $obj->generate(10);
-	is($hex, $expected, "Generates expected value for $desc");
+	is($hex, $expected, "Generates expected value for $desc (Hash)");
 	return;
 }
 
@@ -54,6 +74,6 @@ sub test_hmac_instantiation {
 	my $expected = '10a912824b76baaec94b';
 	my $obj = Crypt::DRBG::HMAC->new(%$params);
 	my $hex = unpack 'H*', $obj->generate(10);
-	is($hex, $expected, "Generates expected value for $desc");
+	is($hex, $expected, "Generates expected value for $desc (HMAC)");
 	return;
 }

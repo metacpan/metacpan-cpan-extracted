@@ -58,11 +58,15 @@ define ([
         test_desc = 'create "active" and "inactive" users if necessary';
         QUnit.test(test_desc, function (assert) {
             console.log('***TEST*** ' + prefix + test_desc);
-            var done = assert.async(5);
-            assert.expect(23);
+            var done = assert.async(6);
+            assert.expect(25);
             login({"nam": "root", "pwd": "immutable"});
             setTimeout(function () {
                 ct.login(assert, "root", "admin");
+                done();
+            }, 1000);
+            setTimeout(function () {
+                ct.mainMenu(assert);
                 done();
             }, 2000);
             setTimeout(function () {

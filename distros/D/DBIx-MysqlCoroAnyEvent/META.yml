@@ -1,0 +1,34 @@
+---
+abstract: unknown
+author:
+  - 'Anton Petrusevich'
+build_requires:
+  DBI: '0'
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+  Test::mysqld: '0'
+  Time::HiRes: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-MysqlCoroAnyEvent
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  AnyEvent: '0'
+  Coro: '0'
+  Coro::AnyEvent: '0'
+  DBD::mysql: '4.019'
+  perl: '5.014000'
+resources:
+  bugtracker: https://github.com/jef-sure/dbd-mysql-cae/issues
+  repository: https://github.com/jef-sure/dbd-mysql-cae.git
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

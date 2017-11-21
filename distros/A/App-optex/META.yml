@@ -1,0 +1,60 @@
+---
+abstract: 'optex command module direcrtory'
+author:
+  - 'Kaz Utashiro <kaz@utashiro.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.13, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-optex
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::optex:
+    file: lib/App/optex.pm
+    version: v0.0.1
+  App::optex::debug:
+    file: lib/App/optex/debug.pm
+  App::optex::help:
+    file: lib/App/optex/help.pm
+  App::optex::util:
+    file: lib/App/optex/util.pm
+  App::optex::util::argv:
+    file: lib/App/optex/util/argv.pm
+  App::optex::util::filter:
+    file: lib/App/optex/util/filter.pm
+  Tmpfile:
+    file: lib/App/optex/util/argv.pm
+  debug:
+    file: lib/App/optex/debug.pm
+  help:
+    file: lib/App/optex/help.pm
+  util:
+    file: lib/App/optex/util.pm
+  util::argv:
+    file: lib/App/optex/util/argv.pm
+  util::filter:
+    file: lib/App/optex/util/filter.pm
+requires:
+  Getopt::EX: v1.2.1
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/kaz-utashiro/optex/issues
+  homepage: https://github.com/kaz-utashiro/optex
+  repository: git://github.com/kaz-utashiro/optex.git
+version: v0.0.1
+x_authority: cpan:UTASHIRO

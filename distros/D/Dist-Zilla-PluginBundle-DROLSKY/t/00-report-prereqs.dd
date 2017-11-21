@@ -31,8 +31,7 @@ do { my $x = {
                                       'Test::Portability::Files' => '0',
                                       'Test::Spelling' => '0.12',
                                       'Test::Vars' => '0.009',
-                                      'Test::Version' => '2.05',
-                                      'blib' => '1.01'
+                                      'Test::Version' => '2.05'
                                     }
                     },
        'runtime' => {

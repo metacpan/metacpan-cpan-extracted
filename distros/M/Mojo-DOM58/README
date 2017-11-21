@@ -46,7 +46,7 @@ FORK INFO
     not related to these changes should be reported directly to the
     Mojolicious issue tracker.
 
-    This release of Mojo::DOM58 is up to date with version 7.36 of
+    This release of Mojo::DOM58 is up to date with version 7.55 of
     Mojolicious.
 
 NODES AND ELEMENTS
@@ -887,6 +887,15 @@ METHODS
       # "on"
       $dom->parse('<input name=test type=checkbox>')->at('input')->val;
 
+ with_roles
+
+      my $new_class = Mojo::DOM58->with_roles('Mojo::DOM58::Role::One');
+      my $new_class = Mojo::DOM58->with_roles('+One', '+Two');
+      $dom          = $dom->with_roles('+One', '+Two');
+
+    Equivalent to "with_roles" in Mojo::Base. Note that role support
+    depends on Role::Tiny (2.000001+).
+
  wrap
 
       $dom = $dom->wrap('<div></div>');
@@ -1138,6 +1147,13 @@ COLLECTION METHODS
     
       # $collection contains ([1, 2], [2, 1], [3, 2])
       $collection->uniq(sub{ $_->[1] })->to_array; # "[[1, 2], [2, 1]]"
+
+ with_roles
+
+      $collection = $collection->with_roles('Mojo::Collection::Role::One');
+
+    Equivalent to "with_roles" in Mojo::Base. Note that role support
+    depends on Role::Tiny (2.000001+).
 
 BUGS
 

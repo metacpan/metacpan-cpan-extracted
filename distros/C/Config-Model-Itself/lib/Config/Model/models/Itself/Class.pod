@@ -23,6 +23,10 @@ Explain the purpose of this configuration class. This description is re-used to 
 
 I< Optional. Type string.  > 
 
+=head2 gist
+
+String used to construct a summary of the content of a node. This parameter is used by user interface to show users the gist of the content of this node. This parameter has no other effect. This string may contain element values in the form "C<{foo} or {bar}>". When constructing the gist, C<{foo}> is replaced by the value of element C<foo>. Likewise for C<{bar}>. I< Optional. Type string.  > 
+
 =head2 author
 
 I< Optional. Type list of uniline.  > 
@@ -61,11 +65,11 @@ Specify the backend used to read and write configuration data. See L<Config::Mod
 
 =head2 read_config
 
-Deprecated - specify the Perl class(es) and function(s) used to read configuration data. The specified functions are tried in sequence to get configuration data. B<Deprecated> I< Optional. Type list of node of class L<Itself::ConfigRead|Config::Model::models::Itself::ConfigRead> .  > 
+Obsolete - specify the Perl class(es) and function(s) used to read configuration data. The specified functions are tried in sequence to get configuration data. B<Deprecated> I< Optional. Type list of node of class L<Itself::ConfigRead|Config::Model::models::Itself::ConfigRead> .  > 
 
 =head2 write_config
 
-Deprecated - Specify the Perl class and function used to write configuration data. B<Deprecated> I< Optional. Type list of node of class L<Itself::ConfigWrite|Config::Model::models::Itself::ConfigWrite> .  > 
+Obsolete - Specify the Perl class and function used to write configuration data. B<Deprecated> I< Optional. Type list of node of class L<Itself::ConfigWrite|Config::Model::models::Itself::ConfigWrite> .  > 
 
 =head2 accept
 

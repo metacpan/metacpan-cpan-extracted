@@ -1,5 +1,8 @@
 Revision history for Map::Tube::London
 
+0.94  2017-11-19
+      - Updated dependency on Map::Tube v3.40.
+
 0.93  2017-11-09
       - Updated dependency on Map::Tube v3.37.
       - Upgraded to use Test::Map::Tube v0.35.

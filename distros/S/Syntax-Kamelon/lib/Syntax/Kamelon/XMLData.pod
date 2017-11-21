@@ -1,0 +1,116 @@
+=head1 NAME
+
+Syntax::Kamelon::XMLData - load Kate syntax definition xml files.
+
+=head1 SYNOPSIS
+
+ use Syntax::Kamelon::XMLData;
+ my $indexer = Syntax::Kamelon::XMLData->new(xmlfile => $file);
+
+=head1 DESCRIPTION
+
+This module loads a syntax definition xml file and holds it's data.
+
+=head1 OPTIONS
+
+The constructor is called with a paired list or hash of options as parameters. You can use
+the following options.
+
+=over 4
+
+=item B<xmlfile> => filename
+
+Full path and file name of the xml file to load.
+
+=back
+
+=head1 METHODS
+
+=over 4
+
+=item B<Attributes>(I<$reftohash>);
+
+Sets and returns the hash that contains style information.
+
+=item B<BaseContext>(I<$string>);
+
+Sets and returns the base context. The base context is the context which starts the highlighting process in Kate.
+It is the first context that B<XMLLoad> encounters in an xml file.
+
+=item B<Booleanize>(I<$string>);
+
+Accepts 'true' or 'false' and converts it to the corresponding boolean value.
+
+=item B<Clear>
+
+Clears all data. What remains is an empty object.
+
+=item B<ContextData>(I<$reftohash>);
+
+Sets and returns the hash that contains context information.
+
+=item B<AdditionalDeliminator>(I<$string>);
+
+Sets and returns the additional deliminators.
+
+=item B<WeakDeliminator>(I<$string>);
+
+Sets and returns the weak deliminators.
+
+=item B<FileName>(I<$filename>);
+
+=item B<GetItems>
+
+=item B<KeywordsCase>(I<$boolean>);
+
+Sets and returns case sensitivity for keyword testing.
+
+=item B<Language>(I<$reftohash>);
+
+Sets and returns the hash that contains language information.
+
+=item B<Lists>(I<$reftohash>);
+
+Sets and returns the hash that contains the lists.
+
+=item B<Syntax>
+
+Returns the language name.
+
+=item B<XMLXXXX>
+
+These methods are all involved in the loading of a Kate syntax definition xml.
+
+=item B<XMLGetAttribute>
+
+=item B<XMLGetContext>
+
+=item B<XMLGetKeywordSettings>
+
+=item B<XMLGetLanguage>
+
+=item B<XMLGetList>
+
+=item B<XMLLoad>(I<$filename>);
+
+=item B<XMLSetContext>
+
+=back
+
+=head1 AUTHOR AND COPYRIGHT
+
+This module is written and maintained by:
+
+Hans Jeuken < hansjeuken at xs4all dot nl>
+
+Copyright (c) 2017 by Hans Jeuken, all rights reserved.
+
+Published under the GPLV3 license.
+
+=head1 SEE ALSO
+
+B<Syntax::Kamelon>, B<Syntax::Kamelon::Builder>, B<Syntax::Kamelon::Debugger>, B<Syntax::Kamelon::Diagnostics>, B<Syntax::Kamelon::Indexer>, 
+B<Syntax::Kamelon::Format::Base>, B<Syntax::Kamelon::Format::ANSI>, B<Syntax::Kamelon::Format:HTML4>
+
+=cut
+

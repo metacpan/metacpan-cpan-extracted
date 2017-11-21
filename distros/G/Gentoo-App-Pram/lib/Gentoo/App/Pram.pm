@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 package Gentoo::App::Pram;
 
-our $VERSION = '0.004000';
+our $VERSION = '0.100000';
 
 use warnings;
 use strict;
@@ -19,28 +19,32 @@ use constant E_YES   => colored('YES',   'green');
 use constant E_OK    => colored('OK',    'green');
 use constant E_MERGE => colored('MERGE', 'blue');
 
+use constant CLOSES_GITHUB => qr#\ACloses: https?://github\.com#;
+
 use Getopt::Long;
 use Pod::Usage;
 
 sub new {
-    my ( $class, @args ) = @_;
+    my ($class, @args) = @_;
     return bless { ref $args[0] ? %{ $args[0] } : @args }, $class;
 }
 
 sub new_with_opts {
-    my ( $class ) =  @_;
+    my ($class) = @_;
     my @opts = (
         'repository|r=s',
+        'closes|c=s',
         'editor|e=s',
         'signoff|s',
+        'bug|b=s',
         'help|h',
         'man|m'
     );
     my %opts;
-    GetOptions(
-        \%opts,
-        @opts
-    );
+    if (!GetOptions(\%opts, @opts)) {
+        print "\n";
+        pod2usage(-verbose => 1)
+    }
     $opts{pr_number} = shift @ARGV;
     return $class->new(\%opts);
 }
@@ -49,21 +53,22 @@ sub run {
     my ($self) = @_;
 
     my $pr_number = $self->{pr_number};
+    my $closes = $self->{closes};
+    my $bug = $self->{bug};
 
     $| = 1;
 
     $self->{help} and pod2usage(-verbose => 1);
     $self->{man} and pod2usage(-verbose => 2);
 
-    $pr_number || pod2usage(
-        -message => E_ERROR . qq#! You must specify a Pull Request number!\n#,
+    $bug and $closes and pod2usage(
+        -message => E_ERROR . qq#! --bug and --closes options are mutually exclusive!\n#,
         -verbose => 1
     );
-    
-    $pr_number =~ /^\d+$/ || pod2usage(
-        -message => E_ERROR . qq#! "$pr_number" is NOT a number!\n#,
-        -verbose => 1
-    );
+
+    run_checks($pr_number, "You must specify a Pull Request number!");
+    $bug and run_checks($bug, "You must specify a bug number when using --bug!");
+    $closes and run_checks($closes, "You must specify a bug number when using --closes!");
 
     # Defaults to 'gentoo/gentoo' because we're worth it.
     my $repo_name   = $self->{repository} || 'gentoo/gentoo';
@@ -73,19 +78,35 @@ sub run {
     $self->{signoff} and $git_command = "$git_command -s";
 
     my $patch_url   = "https://patch-diff.githubusercontent.com/raw/$repo_name/pull/$pr_number.patch";
-    my $close_url   = "https://github.com/$repo_name/pull/$pr_number";
+    $self->{pr_url} = "https://github.com/$repo_name/pull/$pr_number";
     
     # Go!
     $self->apply_patch(
         $editor,
         $git_command,
-        $self->add_closes_header(
-            $close_url,
-            $self->fetch_patch(
-                $patch_url
-            )
+        $self->modify_patch(
+            $self->fetch_patch($patch_url)
         )
     );
+}
+
+sub run_checks {
+    @_ == 2 || die qq#Usage: run_checks(obj, error_msg)#;
+    my ($obj, $error_msg) = @_;
+
+    $obj || pod2usage(
+        -message => E_ERROR . qq#! $error_msg\n#,
+        -verbose => 1
+    );
+
+    $obj =~ /^\d+$/ || pod2usage(
+        -message => E_ERROR . qq#! "$obj" is NOT a number!\n#,
+        -verbose => 1
+    );
+}
+
+sub my_sleep {
+    select(undef, undef, undef, 0.50);
 }
 
 sub fetch_patch {
@@ -107,32 +128,52 @@ sub fetch_patch {
     return decode('UTF-8', $patch);
 }
 
-sub add_closes_header {
-    @_ == 3 || die qq#Usage: add_closes_header(close_url, patch)\n#;
-    my ($self, $close_url, $patch) = @_;
+sub add_header {
+    @_ == 3 || die qq#Usage: add_header(patch, header, msg)\n#;
+    my ($patch, $header, $msg) = @_;
 
-    print qq#Adding "Closes:" header ... #;
-    my $confirm = E_NO;
-    
-    my $header = "Closes: $close_url\n---";
-    my @patch = ();
-    
-    for (split /\n/, $patch) {
-        chomp;
-        # Some folks might add this header already to their PR
-        # so don't add it twice.
-        if ($patch !~ /Closes:/) {
-            if (/(\A---\Z)/) { 
-                s/$1/$header/g; 
-                $confirm = E_YES;
-            }
-        }
-        push @patch, "$_\n";
+    print qq#$msg#;
+    my_sleep();
+    my $confirm = E_ERROR;
+    my $is_sub = $patch =~ s#---#$header#;
+    $is_sub and $confirm = E_OK;
+    print "$confirm!\n";
+    my_sleep();
+    return $patch;
+}
+
+sub modify_patch {
+    @_ == 2 || die qq#Usage: modify_patch(patch)\n#;
+    my ($self, $patch) = @_;
+
+    if (not $patch =~ CLOSES_GITHUB) {
+        my $pr_url = $self->{pr_url};
+        $patch = add_header(
+            $patch,
+            qq#Closes: $pr_url\n---#,
+            qq#Adding Github "Closes:" header ... #
+        );
     }
 
-    print "$confirm!\n";
+    if ($self->{bug}) {
+        my $bug = $self->{bug};
+        $patch = add_header(
+            $patch,
+            qq#Bug: https://bugs.gentoo.org/$bug\n---#,
+            qq#Adding Gentoo "Bug:" header with bug $bug ... #
+        );
+    }
 
-    return join '', @patch;
+    if ($self->{closes}) {
+        my $closes = $self->{closes};
+        $patch = add_header(
+            $patch,
+            qq#Closes: https://bugs.gentoo.org/$closes\n---#,
+            qq#Adding Gentoo "Closes:" header with bug $closes ... #
+        );
+    }
+
+    return $patch;
 }
 
 sub apply_patch {
@@ -145,6 +186,7 @@ sub apply_patch {
     close $fh;
 
     print "Opening $patch_location with $editor ... ";
+    my_sleep();
     my $exit = system $editor => $patch_location;
     $exit eq 0 || die E_ERROR . qq#! Could not open $patch_location: $!!\n#;
     print E_OK . "!\n";
@@ -157,7 +199,6 @@ sub apply_patch {
         $git_command = "$git_command $patch_location";
         print E_YES . "!\n";
         print "Launching '$git_command' ... ";
-    
         $exit = system join ' ', $git_command;
         $exit eq 0 || die E_ERROR . qq#! Error when launching '$git_command': $!!\n#;
         print E_OK . "!\n";
@@ -182,7 +223,8 @@ Gentoo::App::Pram - Library to fetch a GitHub Pull Request as an am-like patch.
 
 The purpose of this module is to fetch Pull Requests from GitHub's CDN as
 am-like patches in order to facilitate the merging and closing of Pull
-Requests.
+Requests. This module also takes care of adding "Closes:" and "Bug:" which are
+Gentoo-specific. See GLEP 0066.
 
 =head1 FUNCTIONS
 
@@ -192,10 +234,20 @@ Requests.
 
 Fetch patch from $patch_url. Return patch as a string.
 
-=item * add_closes_header($close_url, $patch)
+=item * modify_patch($patch)
 
-Add a "Closes:" header to each commit in $patch using $close_url. If the patch already
-contains such headers, skip this step.
+Modify the patch headers. This function only modifies the headers of the first
+commit. Namely:
+* Add a "Closes: https://github.com/XXX" header. Check first if it wasn't
+added already. This header is parsed by the Github bot upon merge. The bot
+then automatically closes the pull request. See
+https://help.github.com/articles/closing-issues-using-keywords for more info.
+* Add a "Bug: https://bugs.gentoo.org/XXX" header when the `--bug XXX` option
+is given. This header is parsed by the Gentoo Bugzilla bot upon merge. The bot
+then writes a message in the bug report. See GLEP 0066 for more info.
+* Add a "Closes: https://bugs.gentoo.org/XXX" header when the `--closes XXX`
+option is given. This header is parsed by the Gentoo Bugzilla bot upon merge.
+The bot then automatically closes the bug report. See GLEP 0066 for more info.
 
 =item * apply_patch($editor, $git_command, $patch)
 
@@ -206,7 +258,7 @@ functions also shows $patch in $editor for a final review.
 
 =head1 VERSION
 
-version 0.004
+version 0.100
 
 =head1 COPYRIGHT AND LICENSE
 
@@ -217,6 +269,7 @@ the same terms as the Perl 5 programming language system itself.
 
 =head1 AUTHOR
 
-Patrice Clement <monsieurp@gentoo.org> and Kent Fredric <kentnl@gentoo.org>.
+Patrice Clement <monsieurp@gentoo.org>
+Kent Fredric <kentnl@gentoo.org>
 
 =cut

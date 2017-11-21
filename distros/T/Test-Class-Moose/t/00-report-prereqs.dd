@@ -1,7 +1,8 @@
 do { my $x = {
        'configure' => {
                         'requires' => {
-                                        'ExtUtils::MakeMaker' => '0'
+                                        'ExtUtils::MakeMaker' => '0',
+                                        'perl' => 'v5.10.0'
                                       }
                       },
        'develop' => {
@@ -68,7 +69,7 @@ do { my $x = {
                                       'Test::Most' => '0',
                                       'Try::Tiny' => '0',
                                       'namespace::autoclean' => '0',
-                                      'perl' => 'v5.10.0',
+                                      'perl' => '5.010',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }
@@ -91,7 +92,8 @@ do { my $x = {
                                    'Test::More' => '1.302015',
                                    'Test::Requires' => '0',
                                    'Test::Warnings' => '0',
-                                   'lib' => '0'
+                                   'lib' => '0',
+                                   'perl' => '5.010'
                                  }
                  }
      };

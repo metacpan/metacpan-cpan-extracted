@@ -3,7 +3,7 @@ NAME
     Search::Elasticsearch
 
 VERSION
-    version 5.02
+    version 6.00
 
 SYNOPSIS
         use Search::Elasticsearch();
@@ -21,6 +21,8 @@ SYNOPSIS
     using and load the corresponding XPack API.
 
     For more details, see:
+
+    *   Search::Elasticsearch::Plugin::XPack::6_0
 
     *   Search::Elasticsearch::Plugin::XPack::5_0
 

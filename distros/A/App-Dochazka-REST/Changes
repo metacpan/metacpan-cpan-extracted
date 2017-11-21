@@ -3744,3 +3744,9 @@ SPLIT OFF App::MREST into separate distribution
 - Fillup: fix status code when no intervals created/identified
 - Dispatch: fix regression in POST interval/fillup
 
+0.557 2017-11-15 12:07 CET
+- Add has_reports property to GET employee/.../full
+- doc: ResourceDefs: mention URI encoding in employee/search/nick/:key
+- ResourceDefs: let inactive and above search employee profiles
+- Dispatch: refrain from returning 400 on certain harmless updates
+

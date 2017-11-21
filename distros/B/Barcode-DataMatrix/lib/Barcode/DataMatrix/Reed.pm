@@ -1,6 +1,10 @@
 package Barcode::DataMatrix::Reed;
 
-=head1 Barcode::DataMatrix::Reed
+=head1 NAME
+
+Barcode::DataMatrix::Reed - Renamed version of Algorithm::DataMatrix::Reed
+
+=head1 DESCRIPTION
 
 This is just a renamed version of Algorithm::DataMatrix::Reed
 by Mons Anderson

@@ -5,12 +5,12 @@ use warnings;
 use Carp qw/croak/;
 use XSLoader;
 
-our $VERSION = '3.015'; # Don't forget to update the TestCompat set for testing against installed encoders!
+our $VERSION = '4.004'; # Don't forget to update the TestCompat set for testing against installed encoders!
 our $XS_VERSION = $VERSION; $VERSION= eval $VERSION;
 
 # not for public consumption, just for testing.
 (my $num_version = $VERSION) =~ s/_//;
-my $TestCompat = [ map sprintf("%.2f", $_/100), reverse( 300 .. int($num_version * 100) ) ]; # compat with 3.00 to ...
+my $TestCompat = [ map sprintf("%.2f", $_/100), reverse( 400 .. int($num_version * 100) ) ]; # compat with 4.00 to ...
 sub _test_compat { return(@$TestCompat, $VERSION) }
 
 use Exporter 'import';
@@ -36,6 +36,7 @@ use constant #begin generated
   'SRL_F_DECODER_ALIAS_VARINT' => 8192,
   'SRL_F_DECODER_DECOMPRESS_SNAPPY' => 8,
   'SRL_F_DECODER_DECOMPRESS_ZLIB' => 16,
+  'SRL_F_DECODER_DECOMPRESS_ZSTD' => 131072,
   'SRL_F_DECODER_DESTRUCTIVE_INCREMENTAL' => 1024,
   'SRL_F_DECODER_DIRTY' => 2,
   'SRL_F_DECODER_NEEDS_FINALIZE' => 4,
@@ -45,12 +46,13 @@ use constant #begin generated
   'SRL_F_DECODER_REFUSE_OBJECTS' => 128,
   'SRL_F_DECODER_REFUSE_SNAPPY' => 32,
   'SRL_F_DECODER_REFUSE_ZLIB' => 64,
+  'SRL_F_DECODER_REFUSE_ZSTD' => 262144,
   'SRL_F_DECODER_REUSE' => 1,
   'SRL_F_DECODER_SET_READONLY' => 32768,
   'SRL_F_DECODER_SET_READONLY_SCALARS' => 65536,
   'SRL_F_DECODER_USE_UNDEF' => 16384,
   'SRL_F_DECODER_VALIDATE_UTF8' => 256,
-  'SRL_F_DECODER_VOLATILE_FLAGS' => 2078,
+  'SRL_F_DECODER_VOLATILE_FLAGS' => 133150,
   '_FLAG_NAME' => [
                     'REUSE',
                     'DIRTY',
@@ -68,27 +70,31 @@ use constant #begin generated
                     'ALIAS_VARINT',
                     'USE_UNDEF',
                     'SET_READONLY',
-                    'SET_READONLY_SCALARS'
+                    'SET_READONLY_SCALARS',
+                    'DECOMPRESS_ZSTD',
+                    'REFUSE_ZSTD'
                   ],
   '_FLAG_NAME_STATIC' => [
-                                'REUSE',
-                                undef,
-                                undef,
-                                undef,
-                                undef,
-                                'REFUSE_SNAPPY',
-                                'REFUSE_ZLIB',
-                                'REFUSE_OBJECTS',
-                                'VALIDATE_UTF8',
-                                'NO_BLESS_OBJECTS',
-                                'DESTRUCTIVE_INCREMENTAL',
-                                undef,
-                                'ALIAS_SMALLINT',
-                                'ALIAS_VARINT',
-                                'USE_UNDEF',
-                                'SET_READONLY',
-                                'SET_READONLY_SCALARS'
-                              ],
+                           'REUSE',
+                           undef,
+                           undef,
+                           undef,
+                           undef,
+                           'REFUSE_SNAPPY',
+                           'REFUSE_ZLIB',
+                           'REFUSE_OBJECTS',
+                           'VALIDATE_UTF8',
+                           'NO_BLESS_OBJECTS',
+                           'DESTRUCTIVE_INCREMENTAL',
+                           undef,
+                           'ALIAS_SMALLINT',
+                           'ALIAS_VARINT',
+                           'USE_UNDEF',
+                           'SET_READONLY',
+                           'SET_READONLY_SCALARS',
+                           undef,
+                           'REFUSE_ZSTD'
+                         ],
   '_FLAG_NAME_VOLATILE' => [
                              undef,
                              'DIRTY',
@@ -106,6 +112,8 @@ use constant #begin generated
                              undef,
                              undef,
                              undef,
+                             undef,
+                             'DECOMPRESS_ZSTD',
                              undef
                            ]
 }; #end generated
@@ -192,11 +200,12 @@ and feature-rich binary protocol called I<Sereal>.
 Its sister module L<Sereal::Encoder> implements an encoder for this format.
 The two are released separately to allow for independent and safer upgrading.
 
-The Sereal protocol versions that are compatible with this decoder implementation
-are currently protocol versions 1, 2, and 3. As it stands, it will refuse to attempt to
-decode future versions of the protocol, but if necessary there is likely
-going to be an option to decode the parts of the input that are compatible
-with version 3 of the protocol. The protocol was designed to allow for this.
+The Sereal protocol versions that are compatible with this decoder
+implementation are currently protocol versions 1, 2, 3 and 4. As it stands, it
+will refuse to attempt to decode future versions of the protocol, but if
+necessary there is likely going to be an option to decode the parts of the
+input that are compatible with version 4 of the protocol. The protocol was
+designed to allow for this.
 
 The protocol specification and many other bits of documentation
 can be found in the github repository. Right now, the specification is at
@@ -225,7 +234,7 @@ desirable for robustness. See the section C<ROBUSTNESS> below.
 =head3 refuse_objects
 
 If set, the decoder will refuse deserializing any objects in the input stream and
-instead throw and exception. Defaults to off. See the section C<ROBUSTNESS> below.
+instead throw an exception. Defaults to off. See the section C<ROBUSTNESS> below.
 
 =head3 no_bless_objects
 
@@ -352,7 +361,7 @@ It accepts an optional second parameter, which is a scalar to write the body
 to, and an optional third parameter, which is a scalar to write the header to.
 
 Regardless of the number of parameters received, C<decode_with_header> returns
-an ArrayRef containing the deserialized body, and the deserialized header, in
+an ArrayRef containing the deserialized header, and the deserialized body, in
 this order.
 
 See C<decode> for the subtle difference between the one, two and three

@@ -1,5 +1,5 @@
 package Moose::Exception::ValidationFailedForInlineTypeConstraint;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -45,4 +45,5 @@ sub _build_message {
     return $line1 . $self->type_constraint_message;
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

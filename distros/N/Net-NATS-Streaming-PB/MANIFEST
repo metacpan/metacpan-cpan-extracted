@@ -1,0 +1,11 @@
+Changes
+lib/Net/NATS/Streaming/PB.pm
+lib/Net/NATS/Streaming/PB/StartPosition.pm
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+nats_streaming.proto
+PB.xs
+README
+t/Net-NATS-Streaming-PB.t

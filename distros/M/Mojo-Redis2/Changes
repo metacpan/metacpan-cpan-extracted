@@ -1,4 +1,13 @@
 Revision history for perl distribution Mojo-Redis2
+0.29 2017-11-19T20:16:11-0500
+ - Prevent forked processes from terminating the Mojo::Redis2::Server test
+   server when they destroy the object. #29
+   Contributor: Dan Book
+
+0.28 2017-11-11T09:59:37+0800
+ - Fix monkey_patch() usage
+ - Add Geo command support
+ - Add HyperLogLog command support
 
 0.27 2017-10-09T12:50:29+0200
  - Add new methods: bitcount, bitop bitpos, hincrbyfloat, incrbyfloat, pexpire,

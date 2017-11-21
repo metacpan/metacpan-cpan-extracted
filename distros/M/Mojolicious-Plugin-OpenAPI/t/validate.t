@@ -3,13 +3,13 @@ use Test::More;
 use Mojolicious::Lite;
 
 eval { plugin OpenAPI => {url => 'data://main/invalid.json'} };
-like $@, qr{Invalid schema.*Missing}si, 'missing spec elements';
+like $@, qr{Invalid.*Missing}si, 'missing spec elements';
 
 eval { plugin OpenAPI => {url => 'data://main/swagger2/issues/89.json'} };
-like $@, qr{Properties not allowed.*\$ref}si, 'ref in the wrong place';
+like $@, qr{/definitions/\$ref}si, 'ref in the wrong place';
 
 eval { plugin OpenAPI => {allow_invalid_ref => 1, url => 'data://main/swagger2/issues/89.json'} };
-ok !$@, 'allow_invalid_ref=1';
+ok !$@, 'allow_invalid_ref=1' or diag $@;
 
 done_testing;
 
@@ -25,11 +25,25 @@ __DATA__
   "info" : { "version": "0.8", "title" : "Test auto response" },
   "paths" : { "$ref": "#/x-def/paths" },
   "definitions": { "$ref": "#/x-def/defs" },
+  "x-responses": {
+    "with_ref": {
+      "post": {"$ref": "#/x-responses/with_get_ref"}
+    },
+    "with_get_ref": {
+      "responses": {
+        "201": { "description": "response", "schema": { "type": "object" } }
+      }
+    }
+  },
   "x-def": {
     "defs": {
       "foo": { "properties": {} }
     },
     "paths": {
+      "/with-ref": {"$ref": "#/x-responses/with_ref"},
+      "/with-get-ref": {
+        "get": {"$ref": "#/x-responses/with_get_ref"}
+      },
       "/auto" : {
         "post" : {
           "responses" : {

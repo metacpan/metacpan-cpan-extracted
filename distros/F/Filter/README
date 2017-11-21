@@ -1,12 +1,13 @@
                               Source Filters
  
-                               Version 1.57
+                               Version 1.58
  
-                              2014-12-09 rurban
+                              2017-11-15 rurban
  
         Copyright (c) 1995-2011 Paul Marquess. All rights reserved.
         Copyright (c) 2011-2014 Reini Urban. All rights reserved.
-         This program is free software; you can redistribute it and/or
+        Copyright (c) 2014-2017 cPanel Inc. All rights reserved.
+        This program is free software; you can redistribute it and/or
                  modify it under the same terms as Perl itself.
  
  
@@ -56,11 +57,9 @@ PREREQUISITES
 Before you can build the Source Filters you need to have the following
 installed on your system:
 
-    * Perl 5.005 or better. 5.6.0 or better is recommended for Win32.
+    * Perl 5.6.0 or better
 
-If your Perl is less than version 5.004_55, the "order" test harness
-will be skipped.
-
+For older Perls use older versions of Filter.
 
 BUILDING THE MODULES
 --------------------
@@ -74,8 +73,6 @@ The modules can now be built using this sequence of commands:
     make
     make test
 
-Building in parallel (-j4) does not work.
- 
 The filters have been successfully built and tested on the following
 systems (at least):
 
@@ -95,10 +92,3 @@ INSTALLATION
 ------------
  
     make install
- 
-UPDATES
--------
- 
-The most recent version of the Filters is always available at
- 
-    http://www.cpan.org/modules/by-module/Filter

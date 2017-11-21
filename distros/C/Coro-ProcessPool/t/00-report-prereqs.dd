@@ -1,0 +1,39 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Test::Pod' => '1.41'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'AnyEvent' => '7.14',
+                                      'AnyEvent::ProcessPool' => '0.06',
+                                      'Coro' => '6.514',
+                                      'Coro::Countdown' => '0.02',
+                                      'common::sense' => '3.74',
+                                      'perl' => '5.010'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'Devel::Cover' => '0',
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'List::Util' => '0',
+                                   'Test2' => '0',
+                                   'Test2::Bundle::Extended' => '0',
+                                   'Test::More' => '0',
+                                   'Test::Pod' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

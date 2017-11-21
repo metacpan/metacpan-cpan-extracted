@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "language.dtd">
+<language name="detectchar" version="0.1" section="Test" extensions="*.detectchar;">
+<highlighting>
+
+<contexts>
+
+<context name="Base" attribute="Normal Text" lineEndContext="#stay">
+	<StringDetect attribute="Test Area" context="Test" String="&lt;Test&gt;" />
+	<StringDetect attribute="Test Area" context="TestD" String="&lt;TestD&gt;" />
+	<StringDetect attribute="Test Area" context="TestDI" String="&lt;TestDI&gt;" />
+	<StringDetect attribute="Test Area" context="TestI" String="&lt;TestI&gt;" />
+	<IncludeRules context="##XML" />
+</context>
+
+<context name="Comment" attribute="Comment" lineEndContext="#pop">
+</context>
+
+<!-- Testing default without options -->
+<context name="Test" attribute="Test Area" lineEndContext="#stay">
+	<DetectChar attribute="Comment" context="Comment" char="#" />
+	<!-- tests go here -->
+	<DetectChar attribute="Match" context="#stay" char="e" />
+	<StringDetect attribute="Test Area" context="#pop" String="&lt;Test&gt;" />
+</context>
+
+<!-- Testing dynamic in two steps-->
+<context name="TestD" attribute="Test Area" lineEndContext="#stay">
+	<DetectChar attribute="Comment" context="Comment" char="#" />
+	<RegExpr attribute="Match" context="TestDT" String="\s(e)" />
+	<StringDetect attribute="Test Area" context="#pop" String="&lt;TestD&gt;" />
+</context>
+
+<context name="TestDT" attribute="Test Area" dynamic="true" lineEndContext="#stay">
+	<DetectChar attribute="Comment" context="Comment" char="#" />
+	<!-- tests go here -->
+	<DetectChar attribute="Match" dynamic="true" context="#pop" char="1" />
+	<StringDetect attribute="Test Area" context="#pop#pop" String="&lt;TestD&gt;" />
+</context>
+
+<!-- Testing dynamic insensitive in two steps-->
+<context name="TestDI" attribute="Test Area" dynamic="true" lineEndContext="#stay">
+	<DetectChar attribute="Comment" context="Comment" char="#" />
+	<RegExpr attribute="Match" context="TestDIT" String="\s(e)" />
+	<StringDetect attribute="Test Area" context="#pop" String="&lt;TestDI&gt;" />
+</context>
+
+<context name="TestDIT" attribute="Test Area" dynamic="true" lineEndContext="#stay">
+	<DetectChar attribute="Comment" context="Comment" char="#" />
+	<!-- tests go here -->
+	<DetectChar attribute="Match" dynamic="true" insensitive="true" context="#pop" char="1" />
+	<StringDetect attribute="Test Area" context="#pop#pop" String="&lt;TestDI&gt;" />
+</context>
+
+<!-- Testing insensitive -->
+<context name="TestI" attribute="Test Area" lineEndContext="#stay">
+	<DetectChar attribute="Comment" context="Comment" char="#" />
+	<!-- tests go here -->
+	<DetectChar attribute="Match" insensitive="true" context="#stay" char="e" />
+	<StringDetect attribute="Test Area" context="#pop" String="&lt;TestI&gt;" />
+</context>
+
+</contexts>
+
+<itemDatas>
+	<itemData name="Normal Text" defStyleNum="dsNormal" />
+	<itemData name="Test Area"  defStyleNum="dsOthers" />
+	<itemData name="Match"  defStyleNum="dsDataType" />
+	<itemData name="Match2"  defStyleNum="dsString" />
+	<itemData name="Match3"  defStyleNum="dsChar" />
+	<itemData name="Match4"  defStyleNum="dsDataType" />
+	<itemData name="Match5"  defStyleNum="dsString" />
+	<itemData name="Comment"  defStyleNum="dsComment" />
+</itemDatas>
+
+</highlighting>
+
+<general>
+	<keywords casesensitive="1" weakDeliminator="."/>
+</general>
+
+</language>

@@ -61,9 +61,11 @@ define([
         var logoutPostAJAX = function (msg) {
                 currentUser('obj', null);
                 currentUser('priv', null);
-                $('#userbox').html(appLib.fillUserBox()); // reset userbox
+                appLib.fillUserBox();
                 $('#mainarea').html(html.logout());
-                // automated page reloads are a source of woe
+                // This code used to automatically reload the page upon logout,
+                // but experience showed that automated page reloads are a
+                // source of woe because they make debugging difficult
                 // if (! cf('testing')) {
                 //     setTimeout(function() {
                 //         location.reload();

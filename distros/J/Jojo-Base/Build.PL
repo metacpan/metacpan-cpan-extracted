@@ -18,7 +18,7 @@ my %module_build_args = (
     "Adriano Ferreira <ferreira\@cpan.org>"
   ],
   "dist_name" => "Jojo-Base",
-  "dist_version" => "0.5.0",
+  "dist_version" => "0.6.0",
   "license" => "artistic_2",
   "module_name" => "Jojo::Base",
   "recommends" => {
@@ -28,6 +28,7 @@ my %module_build_args = (
   "requires" => {
     "Mojo::Base" => 0,
     "Mojo::Util" => 0,
+    "Mojolicious" => "7.43",
     "Sub::Inject" => "v0.2.0",
     "experimental" => 0,
     "perl" => "5.018"

@@ -8,6 +8,7 @@ META.json
 META.yml
 Makefile.PL
 README.md
+appveyor.yml
 cpanfile
 dist.ini
 lib/Test/Class/Moose.pm

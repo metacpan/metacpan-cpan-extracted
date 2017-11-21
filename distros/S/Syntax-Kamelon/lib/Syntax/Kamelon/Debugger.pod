@@ -1,0 +1,187 @@
+=head1 NAME
+
+Syntax::Kamelon::Debugger - That's what it is
+
+=head1 SYNOPSIS
+
+ use Syntax::Kamelon::Debugger;
+ my $debugger = Syntax::Kamelon::Debugger->new(%options);
+
+=head1 DESCRIPTION
+
+This module inherets B<Syntax::Kamelon>. It contains a debugging mechanism on top of that.
+The debugger can do three things, called tasks:
+
+=over 4
+
+=item B<Step>
+
+Step through the highlighting process and check Kamelon's state along the way (not yet implemented)
+
+=item B<Watch>
+
+Set a watchpoint. The debugger reports if a match occured or failed at the watchpoint. And gives information
+about which rule in which context did this.
+
+=item B<Timing>
+
+Used for optimizing Kamelon. Sets a timer on each test method.
+
+=back
+
+=head1 OPTIONS
+
+The constructor is called with the same options as B<Syntax::Kamelon>.
+
+=head1 USER METHODS
+
+The debugger overrides some methods of B<Syntax::Kamelon>. It has the following additonal methods available.
+
+=over 4
+
+=item B<CurRule>
+
+=item B<GetStackImage>
+
+Returns an image of the highlight stack. ie a snapshot. It is different from
+B<GetState> in that it is stripped of unreadable clutter.
+
+=item B<Line>
+
+Returns the current line number
+
+=item B<Reset>
+
+Overwritten method. 
+
+=item B<SetTasks>('step', 'timer', 'watch');
+
+Set the things you want the debugger to do.
+
+=item B<SetWatch>(I<$line>, I<$column>);
+
+Set the point you want to place the watch on.
+
+=back
+
+=head1 SYSTEM METHODS
+
+The debugger overrides some methods of B<Syntax::Kamelon>. It has the following additonal methods available.
+
+=over 4
+
+=item B<DebugStackPull>
+
+Pulls the last item of the stack, returning it as a list.
+
+=item B<DebugStackPush>(I<$text>, I<$rule>, I<$time>);
+
+Pushes some stuff onto the DebugStack.
+
+=item B<GetStackImage>
+
+Returns an image of the highlight stack. ie a snapshot. It is different from
+B<GetState> in that it is stripped of unreadable clutter.
+
+=item B<HighlightLine>(I<$text>);
+
+Overwritten method. Called by B<Highlight>. It is given one line (including the newline) as a parameter.
+
+=item B<NewLine>
+
+Increments the current line number with 1.
+
+=item B<ParseContext>
+
+Overwritten method. Besides Parsing the context it also transfers debug information to 
+the debugger.
+
+=item B<ParseResult>
+
+Overwritten method. Besides Parsing the result it also transfers debug information to 
+the debugger.
+
+=item B<ParseResultLookAhead>
+
+Overwritten method. Besides Parsing the result it also transfers debug information to 
+the debugger.
+
+=item B<PreTask>
+
+Takes care of everything that needs to be done before the next step in the highlighting
+process.
+
+=item B<PostTask>
+
+Takes care of everything that needs to be done after a step in the highlighting
+process.
+
+=item B<StepPost>
+
+Takes care of the 'step'=task after a step in the highlighting
+process.
+
+=item B<StepPre>
+
+Takes care of the 'step'=task before the next step in the highlighting
+process.
+
+=item B<TimerPost>
+
+Takes care of the 'timer'=task after a step in the highlighting
+process.
+
+=item B<TimerPre>
+
+Takes care of the 'timer'=task before the next step in the highlighting
+process.
+
+=item B<WatchPosition>
+
+Checks if the highlighting process is before, on top or after the watch point.
+
+- before returns 0
+
+- on top returns 1
+
+- after returns 2
+
+=item B<WatchPost>
+
+Takes care of the 'watch'=task after a step in the highlighting
+process.
+
+=item B<WatchPre>
+
+Takes care of the 'watch'=task before the next step in the highlighting
+process.
+
+=item B<WatchResult>
+
+Contains information about the state of Kamelon at the moment it passed
+the watch point. At this moment it returns the following structures:
+ ('Matched', [$debuginf, $matched, $stackimage]) 
+ or
+ ('Failed', [$debuginf, undef, $stackimage]) 
+ 
+We aim to make this a bit more friendly.
+
+=back
+
+=head1 AUTHOR AND COPYRIGHT
+
+This module is written and maintained by:
+
+Hans Jeuken < hansjeuken at xs4all dot nl>
+
+Copyright (c) 2017 by Hans Jeuken, all rights reserved.
+
+Published under the GPLV3 license
+
+=head1 SEE ALSO
+
+B<Syntax::Kamelon>, B<Syntax::Kamelon::Builder>, B<Syntax::Kamelon::Diagnostics>, B<Syntax::Kamelon::Indexer>, 
+B<Syntax::Kamelon::XMLData>, B<Syntax::Kamelon::Format::ANSI>, B<Syntax::Kamelon::Format:HTML4>
+
+
+=cut

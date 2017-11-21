@@ -1,5 +1,5 @@
 package Moose::Util::TypeConstraints;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Carp ();
 use Scalar::Util qw( blessed );
@@ -407,12 +407,12 @@ sub coerce {
 #
 # If as() returns all its extra arguments, this just works, and
 # preserves backwards compatibility.
-sub as { { as => shift }, @_ }
-sub where (&)       { { where       => $_[0] } }
-sub message (&)     { { message     => $_[0] } }
-sub inline_as (&)   { { inline_as   => $_[0] } }
+sub as { +{ as => shift }, @_ }
+sub where (&)       { +{ where       => $_[0] } }
+sub message (&)     { +{ message     => $_[0] } }
+sub inline_as (&)   { +{ inline_as   => $_[0] } }
 
-sub from    {@_}
+sub from    { @_ }
 sub via (&) { $_[0] }
 
 sub enum {
@@ -770,7 +770,7 @@ Moose::Util::TypeConstraints - Type constraint system for Moose
 
 =head1 VERSION
 
-version 2.2006
+version 2.2007
 
 =head1 SYNOPSIS
 

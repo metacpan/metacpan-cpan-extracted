@@ -20,7 +20,7 @@ use Moxie::Object;
 use Moxie::Object::Immutable;
 use Moxie::Traits::Provider;
 
-our $VERSION   = '0.06';
+our $VERSION   = '0.07';
 our $AUTHORITY = 'cpan:STEVAN';
 
 sub import ($class, %opts) {
@@ -37,6 +37,7 @@ sub import ($class, %opts) {
 }
 
 sub import_into ($class, $caller, $opts) {
+
     # NOTE:
     # create the meta-object, we start
     # with this as a role, but it will
@@ -87,9 +88,24 @@ sub import_into ($class, $caller, $opts) {
                 if scalar @args == 1
                 && ref $args[0] eq 'CODE';
 
+            my %args = @args;
+
+            # NOTE:
+            # handle the simple case of `required => 1`
+            # by providing this default error message
+            # with the name embedded. This has to be done
+            # here because the Initializer object does
+            # not know the name (nor does it need to)
+            # - SL
+
+            # TODO - i18n the error message
+            $args{required} = 'A value for `'.$name.'` is required'
+                if exists $args{required}
+                && $args{required} =~ /^1$/;
+
             my $initializer = MOP::Slot::Initializer->new(
                 within_package => $meta->name,
-                @args
+                %args
             );
 
             $meta->add_slot( $name, $initializer );
@@ -123,10 +139,19 @@ sub import_into ($class, $caller, $opts) {
         }
     );
 
-    # setup the base traits, and
-    my @traits = ('Moxie::Traits::Provider');
+    # setup the base traits,
+    my @traits = Moxie::Traits::Provider::list_providers();
     # and anything we were asked to load ...
-    push @traits => $opts->{'traits'}->@* if exists $opts->{'traits'};
+    if ( exists $opts->{'traits'} ) {
+        foreach my $trait ( $opts->{'traits'}->@* ) {
+            if ( $trait eq ':experimental' ) {
+                push @traits => Moxie::Traits::Provider::list_experimental_providers();;
+            }
+            else {
+                push @traits => $trait;
+            }
+        }
+    }
 
     # then schedule the trait collection ...
     Method::Traits->import_into( $meta->name, @traits );
@@ -161,7 +186,7 @@ Moxie - Not Another Moose Clone
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -198,34 +223,60 @@ version 0.06
 
 =head1 DESCRIPTION
 
-L<Moxie> is a reference implementation for an object system built
-on top of a set of modules.
+L<Moxie> is a new object system for Perl 5 that aims to be a
+successor to the L<Moose> module. The goal is to provide the same
+key features of L<Moose>; syntactic sugar, common base class, slot
+management, role composition, accessor generation and a meta-object
+protocol – but to do it in a more straightforward and resource
+efficient way that requires lower cognative overhead.
 
-=over 4
+The key tenents of L<Moxie> are as follows:
 
-=item L<UNIVERSAL::Object>
+=head2 Aims to be ultra-modern
 
-This is the suggested base class (through L<Moxie::Object>) for
-all L<Moxie> classes.
+L<Moose> was a post-modern object system, so what is after post
+modernism? Post, post modernism? Who knows, it is 2017 and instead
+of flying cars we are careening towards a dystopian timeline and
+a future that none of us can forsee. So given that, B<ultra> seemed
+to work as well as anything else.
 
-=item L<MOP>
+This tenent means that we will not shy away from new Perl features
+and we have core a commitment to helping to push the language forward.
 
-This provides an API to Classes, Roles, Methods and Slots, which
-is used by many elements within this module.
+=head2 Better distinction between public & private
 
-=item L<BEGIN::Lift>
+The clean sepeartion of the public and private interfaces of your
+class is key to maintaining good encapsulation. This is one of the key
+features required for writing robust and reusable software that can
+resist the abuses of fellow programmers and still retain it's
+usefulness over time.
 
-This module is used to create three new keywords; C<extends>,
-C<with> and C<has>. These keywords are executed during compile
-time and just make calls to the L<MOP> to affect the class
-being built.
+=head2 Re-use existing Perl features
 
-=item L<Method::Traits>
+Perl is a large language with many features, some of which are useful
+and some – I believe – people just haven't found a good use for I<yet>.
+L<Moxie> aims to use as many existing B<native> features in Perl when
+possible. This can be seen as just another facet of the commitment to
+modernity mentioned above, ... it is not old, it is B<retro>!
 
-This module is used to handle the method traits which are used
-mostly for method generation (accessors, predicates, etc.).
+=head2 Reduce cognative burdon of the MOP
 
-=back
+The Meta-Object protocol that powered all the L<Moose> features was
+large, complex and difficult to understand unless you were willing to
+put in the cognative investment. Because the MOP was the primary means
+of extension for L<Moose>, this meant it was not optional if you wanted
+to extend L<Moose>. L<Moxie> instead turns the tables, such that it has
+multiple means of extension, most (but not all) of which are empowered
+by the L<MOP>. This means that an understanding of the L<MOP> is no
+longer required to extend L<Moxie>, but when needed the full power of
+a L<MOP> is available.
+
+=head2 Better resource usage
+
+L<Moose> is famous for it's high startup overhead and heavy memory
+usage. These were consequences of the way in which L<Moose> was
+implemented. With L<Moxie> we instead try to do the least amount of
+work possible so as to introduce the least amount of overhead.
 
 =head1 KEYWORDS
 
@@ -283,6 +334,14 @@ this is done when C<use>ing L<Moxie> like this:
 By default L<Moxie> will enable the L<Moxie::Traits::Provider> module
 to supply this set of traits for use in L<Moxie> classes.
 
+Some traits below are listed as experimental, in order to enable those
+traits the string C<:experimental> (with the leading colon) must appear
+in your traits list.
+
+    use Moxie traits => [ ':experimental' ];
+    # or
+    use Moxie traits => [ 'My::Trait::Provider', ..., ':experimental' ];
+
 =head3 B<A word about slot names and method trait syntax>
 
 The way C<perl> parses C<CODE> attributes is that everything within the
@@ -292,21 +351,23 @@ and all examples (eventually) will confrom to this syntax. This is a matter
 of choice, do as you prefer, but I promise you there is no additional
 safety or certainty you get from quoting slot names in trait arguments.
 
+=head2 CONSTRUCTOR TRAITS
+
 =over 4
 
-=item C<< init( arg_key => slot_name, ... ) >>
+=item C<< strict( arg_key => slot_name, ... ) >>
 
 This is a trait that is exclusively applied to the C<BUILDARGS>
-method. This is simply a shortcut to generate a C<BUILDARGS> method
-that can map a given constructor parameter to a given slot, this
-is useful for maintaining encapsulation for things like a private
-slot with a different public name.
+method. This is a means for generating a strict interface for the
+C<BUILDARGS> method that will map a set of constructor parameters
+to a set of given slots, this is useful for maintaining encapsulation
+for things like a private slot with a different public name.
 
     # declare a slot with a private name
     has _bar => sub {};
 
     # map the `foo` key to the `_bar` slot
-    sub BUILDARGS : init_arg( foo => _bar );
+    sub BUILDARGS : strict( foo => _bar );
 
 All other parameters will be rejected and an exception thrown. If
 you wish to have an optional parameter, simply follow the parameter
@@ -317,7 +378,7 @@ name with a question mark, like so:
 
     # the `foo` key is optional, but if
     # given, will store in the `_bar` slot
-    sub BUILDARGS : init_arg( foo? => _bar );
+    sub BUILDARGS : strict( foo? => _bar );
 
 If you wish to accept parameters for your superclass's constructor
 but do not want to specify storage location because of encapsulation
@@ -325,7 +386,7 @@ concerns, simply use the C<super> designator, like so:
 
     # map the `foo` key to the local `_bar` slot
     # with the `bar` key, let the superclass decide ...
-    sub BUILDARGS : init_arg(
+    sub BUILDARGS : strict(
         foo => _bar,
         bar => super(bar)
     );
@@ -333,10 +394,14 @@ concerns, simply use the C<super> designator, like so:
 If you wish to have a constructor that accepts no parameters at
 all, then simply do this.
 
-    sub BUILDARGS : init_arg;
+    sub BUILDARGS : strict;
 
 And the constructor will throw an exception if any arguments at
 all are passed in.
+
+=head2 ACCESSOR TRAITS
+
+=over 4
 
 =item C<ro( ?$slot_name )>
 
@@ -433,6 +498,28 @@ Is the equivalent of writing this:
 
     sub clear_foo : ro(foo);
 
+=back
+
+=head2 EXPERIMENTAL TRAITS
+
+In order to enable these traits, you must pass the C<experimental>
+flag for L<Moxie>. The interfaces to these traits may change until
+we settle upon one we like, use them bravely and/or sparingly.
+
+=over 4
+
+=item C<lazy( ?$slot_name ) { ... }>
+
+This will transform the associated subroutine into a lazy read-only
+accessor for a slot. The body of the subroutine is expected to be
+the initializer for the slot and will receive the instance as it's
+first arguemnt. The C<$slot_name> can optionally be specified,
+otherwise it will use the name of the method that the trait is being
+applied to.
+
+    sub foo : lazy { ... }
+    sub foo : lazy(_foo) { ... }
+
 =item C<< handles( $slot_name->$delegate_method ) >>
 
 This will generate a simple delegate method for a slot. The
@@ -472,8 +559,36 @@ results in code that looks like this:
         foo->call_method_on_foo();
     }
 
-This feature is considered experimental, but then again, so is this
-whole module, so I guess you can safely ignore that then.
+=back
+
+=head1 USED MODULES
+
+L<Moxie> could be thought of as a reference implementation for an
+object system built on top of a set of modules (listed below).
+
+=over 4
+
+=item L<UNIVERSAL::Object>
+
+This is the suggested base class (through L<Moxie::Object>) for
+all L<Moxie> classes.
+
+=item L<MOP>
+
+This provides an API to Classes, Roles, Methods and Slots, which
+is used by many elements within this module.
+
+=item L<BEGIN::Lift>
+
+This module is used to create three new keywords; C<extends>,
+C<with> and C<has>. These keywords are executed during compile
+time and just make calls to the L<MOP> to affect the class
+being built.
+
+=item L<Method::Traits>
+
+This module is used to handle the method traits which are used
+mostly for method generation (accessors, predicates, etc.).
 
 =back
 
@@ -500,6 +615,8 @@ module for more information.
 =item C<state>
 
 =item C<refaliasing>
+
+=item C<declared_refs>
 
 =back
 

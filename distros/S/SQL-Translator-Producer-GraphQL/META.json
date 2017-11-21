@@ -39,8 +39,8 @@
       },
       "runtime" : {
          "requires" : {
-            "GraphQL" : "0.20",
-            "GraphQL::Plugin::Convert::DBIC" : "0.02",
+            "GraphQL" : "0.21",
+            "GraphQL::Plugin::Convert::DBIC" : "0.03",
             "SQL::Translator" : "0",
             "SQL::Translator::Producer::DBIx::Class::File" : "0",
             "perl" : "5.014"
@@ -48,10 +48,6 @@
       },
       "test" : {
          "requires" : {
-            "GraphQL" : "0.20",
-            "GraphQL::Plugin::Convert::DBIC" : "0.02",
-            "SQL::Translator" : "0",
-            "SQL::Translator::Producer::DBIx::Class::File" : "0",
             "Test::More" : "0.98"
          }
       }
@@ -70,5 +66,5 @@
       },
       "x_IRC" : "irc://irc.perl.org/#graphql-perl"
    },
-   "version" : "0.03"
+   "version" : "0.04"
 }

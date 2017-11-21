@@ -17,11 +17,11 @@ use File::Spec;
 
 no warnings 'utf8';
 
-our $VERSION = '1.21';
+our $VERSION = '1.24';
 our $PACKAGE = __PACKAGE__;
 
 my @Path = qw(Unicode Collate);
-my $KeyFile = "allkeys.txt";
+my $KeyFile = 'allkeys.txt';
 
 # Perl's boolean
 use constant TRUE  => 1;
@@ -101,11 +101,13 @@ use constant HangulT2Fin   => 0xD7FB; # Unicode 5.2
 
 use constant CJK_UidIni   =>  0x4E00;
 use constant CJK_UidFin   =>  0x9FA5;
-use constant CJK_UidF41   =>  0x9FBB;
-use constant CJK_UidF51   =>  0x9FC3;
-use constant CJK_UidF52   =>  0x9FCB;
-use constant CJK_UidF61   =>  0x9FCC;
-use constant CJK_UidF80   =>  0x9FD5;
+use constant CJK_UidF41   =>  0x9FBB; # Unicode 4.1
+use constant CJK_UidF51   =>  0x9FC3; # Unicode 5.1
+use constant CJK_UidF52   =>  0x9FCB; # Unicode 5.2
+use constant CJK_UidF61   =>  0x9FCC; # Unicode 6.1
+use constant CJK_UidF80   =>  0x9FD5; # Unicode 8.0
+use constant CJK_UidF100  =>  0x9FEA; # Unicode 10.0
+
 use constant CJK_ExtAIni  =>  0x3400; # Unicode 3.0
 use constant CJK_ExtAFin  =>  0x4DB5; # Unicode 3.0
 use constant CJK_ExtBIni  => 0x20000; # Unicode 3.1
@@ -116,6 +118,8 @@ use constant CJK_ExtDIni  => 0x2B740; # Unicode 6.0
 use constant CJK_ExtDFin  => 0x2B81D; # Unicode 6.0
 use constant CJK_ExtEIni  => 0x2B820; # Unicode 8.0
 use constant CJK_ExtEFin  => 0x2CEA1; # Unicode 8.0
+use constant CJK_ExtFIni  => 0x2CEB0; # Unicode 10.0
+use constant CJK_ExtFFin  => 0x2EBE0; # Unicode 10.0
 
 my %CompatUI = map +($_ => 1), (
     0xFA0E, 0xFA0F, 0xFA11, 0xFA13, 0xFA14, 0xFA1F,
@@ -126,6 +130,9 @@ use constant TangIdeoIni  => 0x17000; # Unicode 9.0
 use constant TangIdeoFin  => 0x187EC; # Unicode 9.0
 use constant TangCompIni  => 0x18800; # Unicode 9.0
 use constant TangCompFin  => 0x18AF2; # Unicode 9.0
+use constant NushuIni     => 0x1B170; # Unicode 10.0
+use constant NushuFin     => 0x1B2FB; # Unicode 10.0
+
 ### end PP only ###
 
 # Logical_Order_Exception in PropList.txt
@@ -237,6 +244,7 @@ my %DerivCode = (
    30 => \&_derivCE_24, # 30 == 24
    32 => \&_derivCE_32,
    34 => \&_derivCE_34,
+   36 => \&_derivCE_36,
 );
 
 sub checkCollator {
@@ -460,13 +468,17 @@ sub parseEntry
 	# if and only if "all" CEs are [.0000.0000.0000].
     }
 
+    # mapping: be an array ref or not exists (any false value is disallowed)
     $self->{mapping}{$entry} = $is_L3_ignorable ? [] : \@key;
 
+    # maxlength: be more than 1 or not exists (any false value is disallowed)
     if (@uv > 1) {
 	if (!$self->{maxlength}{$uv[0]} || $self->{maxlength}{$uv[0]} < @uv) {
 	    $self->{maxlength}{$uv[0]} = @uv;
 	}
     }
+
+    # contraction: be 1 or not exists (any false value is disallowed)
     while (@uv > 2) {
 	pop @uv;
 	my $fake_entry = join(CODE_SEP, @uv); # in JCPS
@@ -497,6 +509,10 @@ sub varCE
 		$vbl eq 'blanked' ? $wt[3] : $wt[0]);
     } elsif ($vbl eq 'blanked') {
 	return pack(VCE_TEMPLATE, $var, @wt);
+    } elsif ($self->{UCA_Version} >= 36 &&
+	     $vbl eq 'shifted' && !$wt[1] && !$wt[2]) {
+	# completely ignorable or the second derived CE
+	return pack(VCE_TEMPLATE, $var, $wt[0], 0, 0, 0);
     } else {
 	return pack(VCE_TEMPLATE, $var, @wt[0..2],
 	    $vbl eq 'shifted' && $wt[0]+$wt[1]+$wt[2] ?
@@ -579,7 +595,7 @@ sub splitEnt
 	if ($vers <= 20 && _isIllegal($src[$i])) {
 	    $src[$i] = undef;
 	} elsif ($ver9) {
-	    $src[$i] = undef if $map->{ $src[$i] }
+	    $src[$i] = undef if exists $map->{ $src[$i] }
 			  && @{ $map->{ $src[$i] } } == 0;
 	}
     }
@@ -598,7 +614,7 @@ sub splitEnt
 	my $i_orig = $i;
 
 	# find contraction
-	if ($max->{$jcps}) {
+	if (exists $max->{$jcps}) {
 	    my $temp_jcps = $jcps;
 	    my $jcpsLen = 1;
 	    my $maxLen = $max->{$jcps};
@@ -607,7 +623,7 @@ sub splitEnt
 		next if ! defined $src[$p];
 		$temp_jcps .= CODE_SEP . $src[$p];
 		$jcpsLen++;
-		if ($map->{$temp_jcps}) {
+		if (exists $map->{$temp_jcps}) {
 		    $jcps = $temp_jcps;
 		    $i = $p;
 		}
@@ -634,7 +650,7 @@ sub splitEnt
 		    last unless $curCC;
 		    my $tail = CODE_SEP . $src[$p];
 
-		    if ($preCC != $curCC && $map->{$jcps.$tail}) {
+		    if ($preCC != $curCC && exists $map->{$jcps.$tail}) {
 			$jcps .= $tail;
 			push @out, $p;
 		    } else {
@@ -643,8 +659,9 @@ sub splitEnt
 
 		    next if !$long;
 
-		    if ($preCC_uc != $curCC && ($map->{$jcps_uc.$tail} ||
-					       $cont->{$jcps_uc.$tail})) {
+		    if ($preCC_uc != $curCC &&
+			    (exists $map->{$jcps_uc.$tail} ||
+			    exists $cont->{$jcps_uc.$tail})) {
 			$jcps_uc .= $tail;
 			push @out_uc, $p;
 		    } else {
@@ -652,7 +669,7 @@ sub splitEnt
 		    }
 		}
 
-		if (@out_uc && $map->{$jcps_uc}) {
+		if (@out_uc && exists $map->{$jcps_uc}) {
 		    $jcps = $jcps_uc;
 		    $src[$_] = undef for @out_uc;
 		} else {
@@ -662,7 +679,7 @@ sub splitEnt
 	}
 
 	# skip completely ignorable
-	if ($map->{$jcps} && @{ $map->{$jcps} } == 0) {
+	if (exists $map->{$jcps} && @{ $map->{$jcps} } == 0) {
 	    if ($wLen && @buf) {
 		$buf[-1][2] = $i + 1;
 	    }
@@ -709,7 +726,7 @@ sub getWt
     $u = 0xFFFD if $u !~ /;/ && 0x10FFFF < $u && !$out;
 
     my @ce;
-    if ($map->{$u}) {
+    if (exists $map->{$u}) {
 	@ce = @{ $map->{$u} }; # $u may be a contraction
     } elsif (Hangul_SIni <= $u && $u <= Hangul_SFin) {
 	my $hang = $self->{overrideHangul};
@@ -723,27 +740,27 @@ sub getWt
 
 	    if (@decH == 2) {
 		my $contract = join(CODE_SEP, @decH);
-		@decH = ($contract) if $map->{$contract};
+		@decH = ($contract) if exists $map->{$contract};
 	    } else { # must be <@decH == 3>
-		if ($max->{$decH[0]}) {
+		if (exists $max->{$decH[0]}) {
 		    my $contract = join(CODE_SEP, @decH);
-		    if ($map->{$contract}) {
+		    if (exists $map->{$contract}) {
 			@decH = ($contract);
 		    } else {
 			$contract = join(CODE_SEP, @decH[0,1]);
-			$map->{$contract} and @decH = ($contract, $decH[2]);
+			exists $map->{$contract} and @decH = ($contract, $decH[2]);
 		    }
 		    # even if V's ignorable, LT contraction is not supported.
 		    # If such a situation were required, NFD should be used.
 		}
-		if (@decH == 3 && $max->{$decH[1]}) {
+		if (@decH == 3 && exists $max->{$decH[1]}) {
 		    my $contract = join(CODE_SEP, @decH[1,2]);
-		    $map->{$contract} and @decH = ($decH[0], $contract);
+		    exists $map->{$contract} and @decH = ($decH[0], $contract);
 		}
 	    }
 
 	    @ce = map({
-		    $map->{$_} ? @{ $map->{$_} } : $der->($_);
+		    exists $map->{$_} ? @{ $map->{$_} } : $der->($_);
 		} @decH);
 	}
     } elsif ($out && 0x10FFFF < $u) {
@@ -884,13 +901,39 @@ sub sort {
 }
 
 ### begin PP only ##
+sub _derivCE_36 {
+    my $u = shift;
+    my $tang = (TangIdeoIni <= $u && $u <= TangIdeoFin ||
+		TangCompIni <= $u && $u <= TangCompFin);
+    my $nush = (NushuIni <= $u && $u <= NushuFin);
+    my $base = ($tang)
+		? 0xFB00 : # Tangut
+	       ($nush)
+		? 0xFB01 : # Nushu
+	       (CJK_UidIni  <= $u && $u <= CJK_UidF100 || $CompatUI{$u})
+		? 0xFB40 : # CJK
+	       (CJK_ExtAIni <= $u && $u <= CJK_ExtAFin ||
+		CJK_ExtBIni <= $u && $u <= CJK_ExtBFin ||
+		CJK_ExtCIni <= $u && $u <= CJK_ExtCFin ||
+		CJK_ExtDIni <= $u && $u <= CJK_ExtDFin ||
+		CJK_ExtEIni <= $u && $u <= CJK_ExtEFin ||
+		CJK_ExtFIni <= $u && $u <= CJK_ExtFFin)
+		? 0xFB80  # CJK ext.
+		: 0xFBC0; # others
+    my $aaaa = $tang || $nush ? $base : $base + ($u >> 15);
+    my $bbbb = ($tang ? ($u - TangIdeoIni) :
+		$nush ? ($u - NushuIni) : ($u & 0x7FFF)) | 0x8000;
+    return pack(VCE_TEMPLATE, NON_VAR, $aaaa, Min2Wt, Min3Wt, $u),
+	   pack(VCE_TEMPLATE, NON_VAR, $bbbb,      0,      0, $u);
+}
+
 sub _derivCE_34 {
     my $u = shift;
     my $tang = (TangIdeoIni <= $u && $u <= TangIdeoFin ||
 		TangCompIni <= $u && $u <= TangCompFin);
-    my $base =  ($tang)
+    my $base = ($tang)
 		? 0xFB00 : # Tangut
-		(CJK_UidIni  <= $u && $u <= CJK_UidF80 || $CompatUI{$u})
+	       (CJK_UidIni  <= $u && $u <= CJK_UidF80 || $CompatUI{$u})
 		? 0xFB40 : # CJK
 	       (CJK_ExtAIni <= $u && $u <= CJK_ExtAFin ||
 		CJK_ExtBIni <= $u && $u <= CJK_ExtBFin ||
@@ -1028,6 +1071,7 @@ sub _isUIdeo {
     # $uca_vers = 0 for _uideoCE_8()
     my ($u, $uca_vers) = @_;
     return((CJK_UidIni <= $u && (
+	    $uca_vers >= 36 ? ($u <= CJK_UidF100) :
 	    $uca_vers >= 32 ? ($u <= CJK_UidF80) :
 	    $uca_vers >= 24 ? ($u <= CJK_UidF61) :
 	    $uca_vers >= 20 ? ($u <= CJK_UidF52) :
@@ -1044,6 +1088,8 @@ sub _isUIdeo {
 	($uca_vers >= 22 && CJK_ExtDIni <= $u && $u <= CJK_ExtDFin)
 		||
 	($uca_vers >= 32 && CJK_ExtEIni <= $u && $u <= CJK_ExtEFin)
+		||
+	($uca_vers >= 36 && CJK_ExtFIni <= $u && $u <= CJK_ExtFFin)
     );
 }
 
@@ -1445,6 +1491,7 @@ The following revisions are supported.  The default is 34.
      30             7.0.0               7.0.0 (7.0.0)
      32             8.0.0               8.0.0 (8.0.0)
      34             9.0.0               9.0.0 (9.0.0)
+     36            10.0.0              10.0.0(10.0.0)
 
 * See below for C<long_contraction> with C<UCA_Version> 22 and 24.
 
@@ -1785,12 +1832,14 @@ those in the CJK Unified Ideographs Extension A etc.
     U+4E00..U+9FCB if UCA_Version is 20 or 22.
     U+4E00..U+9FCC if UCA_Version is 24 to 30.
     U+4E00..U+9FD5 if UCA_Version is 32 or 34.
+    U+4E00..U+9FEA if UCA_Version is 36.
 
     In the CJK Unified Ideographs Extension blocks:
     Ext.A (U+3400..U+4DB5) and Ext.B (U+20000..U+2A6D6) in any UCA_Version.
     Ext.C (U+2A700..U+2B734) if UCA_Version is 20 or later.
     Ext.D (U+2B740..U+2B81D) if UCA_Version is 22 or later.
     Ext.E (U+2B820..U+2CEA1) if UCA_Version is 32 or later.
+    Ext.F (U+2CEB0..U+2EBE0) if UCA_Version is 36.
 
 Through C<overrideCJK>, ordering of CJK unified ideographs (including
 extensions) can be overridden.

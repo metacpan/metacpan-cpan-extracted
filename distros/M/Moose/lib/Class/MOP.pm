@@ -1,5 +1,5 @@
 package Class::MOP;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use strict;
 use warnings;
@@ -796,7 +796,7 @@ Class::MOP - A Meta Object Protocol for Perl 5
 
 =head1 VERSION
 
-version 2.2006
+version 2.2007
 
 =head1 DESCRIPTION
 

@@ -10,7 +10,7 @@
 # ABSTRACT: Work on the configuration model of an application
 
 package App::Cme::Command::meta ;
-$App::Cme::Command::meta::VERSION = '2.012';
+$App::Cme::Command::meta::VERSION = '2.013';
 use strict ;
 use warnings ;
 use 5.10.1;
@@ -406,7 +406,7 @@ App::Cme::Command::meta - Work on the configuration model of an application
 
 =head1 VERSION
 
-version 2.012
+version 2.013
 
 =head1 SYNOPSIS
 

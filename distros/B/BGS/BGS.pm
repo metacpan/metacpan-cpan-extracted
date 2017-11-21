@@ -7,7 +7,7 @@ use Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(bgs_call bgs_back bgs_wait bgs_break);
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use IO::Select;
 use Scalar::Util qw(refaddr);
@@ -17,14 +17,13 @@ use POSIX ":sys_wait_h";
 
 our $limit = 0; 
 
-$SIG{CHLD} = "IGNORE";
 
 my $sel = IO::Select->new();
 
 my %fh2data   = (); 
 my %vpid2data = (); 
+my @to_call   = (); 
 
-my @to_call = (); 
 
 
 sub _call {
@@ -49,6 +48,10 @@ sub _call {
 		$vpid2data{$vpid}      = $data;
 
 	} else {
+		%fh2data   = ();
+		%vpid2data = ();
+		@to_call   = ();
+
 		binmode $to_parent_fh;
 		print $to_parent_fh freeze \ scalar $sub->();
 		close $to_parent_fh;
@@ -89,6 +92,10 @@ sub bgs_back(&) { shift }
 sub bgs_wait(;$) {
 	my ($waited) = @_;
 
+	if ($waited and not exists $vpid2data{$waited} and not grep { $$_{vpid} eq $waited } @to_call) {
+		return;
+	}
+
 	local $SIG{PIPE} = "IGNORE";
 	my $buf;            
 	my $blksize = 1024; 
@@ -103,28 +110,30 @@ sub bgs_wait(;$) {
 				close $fh or warn "Kid is existed: $?";
 
 				delete $$data{fh};
-				delete $$data{pid};
+				my $pid = delete $$data{pid};
 				my $callback = delete $$data{callback};
 				
-				if (exists $$data{from_kid}) {
-					my $r = join "", @{$$data{from_kid}};
-					delete $$data{from_kid};
-					if ($callback) {
-						$callback->(${thaw $r});
+				unless ($$data{break}) {
+					if (exists $$data{from_kid} and my $r = eval { thaw(join "", @{delete $$data{from_kid}}) }) {
+						if ($callback) {
+							$callback->($$r);
+						} else {
+							$$data{result} = $$r;
+						}
 					} else {
-						$$data{result} = ${thaw $r};
-					}
-				} else {
-					if ($callback) {
-						$callback->();
-					} else {
-						$$data{result} = undef;
+						if ($callback) {
+							$callback->();
+						} else {
+							$$data{result} = undef;
+						}
 					}
 				}
 
 				my $vpid = $$data{vpid};
 				delete $fh2data{$fh};
 				delete $vpid2data{$vpid};
+
+				waitpid($pid, 0);
 
 				if (my $call = shift @to_call) {
 					_call($call);
@@ -142,16 +151,6 @@ sub bgs_wait(;$) {
 }
 
 
-sub _clean {
-	my ($data) = @_;
-	my $vpid = $$data{vpid};
-	delete $vpid2data{$vpid};
-	my $fh = $$data{fh} or return;
-	$sel->remove($fh);
-	close $fh;
-	delete $fh2data{$fh};
-}
-
 
 sub bgs_break(;$) {
 	my ($vpid) = @_;
@@ -159,16 +158,17 @@ sub bgs_break(;$) {
 		my $data = $vpid2data{$vpid};
 		defined $data or return;
 		if (my $pid = $$data{pid}) {
-			kill 15, $pid;
-			1 while waitpid($pid, WNOHANG) > 0;
+			$$data{break} = 1;
+			kill "TERM", $pid;
 		}
-		_clean($data);
 		 @to_call = grep { $$_{vpid} ne $vpid } @to_call;
 	} else {
-		local $SIG{TERM} = "IGNORE";
-		kill 15, -$$;
-		1 while waitpid(-1, WNOHANG) > 0;
-		_clean($_) foreach values %vpid2data;
+		foreach my $data (values %vpid2data) {
+			if (my $pid = $$data{pid}) {
+				$$data{break} = 1;
+				kill "TERM", $pid;
+			}
+		}
 		@to_call = ();
 	}
 }

@@ -6,9 +6,12 @@ use Test::More;
 
 use MVC::Neaf;
 
+$SIG{__DIE__} = \&Carp::confess;
+
 note "TESTING error_template()";
 my $n = MVC::Neaf->new;
-$n->set_error_handler( 404, { -template => \'NotFounded [% status %]' } );
+$n->load_view( TT => 'TT' );
+$n->set_error_handler( 404, { -template => \'NotFounded [% status %]', -view => 'TT' } );
 is_deeply ( $n->run->({})->[0], 404, "Status preserved" );
 is_deeply ( $n->run->({})->[2], [ "NotFounded 404" ], "Template worked" );
 
@@ -24,11 +27,13 @@ note "TESTING set_default()";
 my @warn;
 $SIG{__WARN__} = sub {push @warn, shift};
 $n = MVC::Neaf->new;
-$n->set_default( -template => \'NotFounded2' );
+$n->load_view( TT => 'TT' );
+$n->set_default( -template => \'NotFounded2', -view => 'TT' );
 $n->route( '/' => sub { +{} } );
 is ( $n->run_test({}), "NotFounded2", "Template worked" );
 is (scalar @warn, 1, "1 warning issues" );
 like ($warn[0], qr/DEPRECATED/, "deprecated" );
+note "WARN: $_" for @warn;
 delete $SIG{__WARN__};
 
 note "TESTING duplicate route protection";

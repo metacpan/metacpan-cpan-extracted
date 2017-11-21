@@ -41,7 +41,7 @@ define ([
     'target'
 ], function (
     cf,
-    lib,
+    coreLib,
     appLib,
     target
 ) {
@@ -153,9 +153,9 @@ define ([
                 // display table header
                 for (column = 0; column < allEntries.length; column += 1) {
                     entry = allEntries[column];
-                    if (lib.privCheck(entry.aclProfileRead)) {
+                    if (coreLib.privCheck(entry.aclProfileRead)) {
                         r += '<span style="text-decoration: underline">';
-                        r += lib.rightPadSpaces(entry.text, maxl[column]);
+                        r += coreLib.rightPadSpaces(entry.text, maxl[column]);
                         r += '</span>';
                     }
                     if (column !== allEntries.length - 1) {
@@ -175,10 +175,10 @@ define ([
                         for (column = 0; column < allEntries.length; column += 1) {
                             entry = allEntries[column];
                             // console.log("entry", entry);
-                            if (lib.privCheck(entry.aclProfileRead)) {
+                            if (coreLib.privCheck(entry.aclProfileRead)) {
                                 var val = obj[entry.prop];
                                 // console.log("value", val);
-                                r += lib.rightPadSpaces(val, maxl[column]);
+                                r += coreLib.rightPadSpaces(val, maxl[column]);
                             }
                             if (column !== allEntries.length - 1) {
                                 r += ' ';
@@ -202,7 +202,7 @@ define ([
 
 		// miniMenu at the bottom: selections are target names defined
 		// in the 'miniMenu' property of the dform object
-                r += miniMenu(tobj.miniMenu);
+                r += miniMenu(tobj);
 
                 // your choice section
                 r += yourChoice();
@@ -235,28 +235,35 @@ define ([
             return max;
         }, // maxLength
 
-        miniMenu = function (mm) {
-            var entries = (mm.entries === null) ? [] : mm.entries,
-                len = entries.length,
+        miniMenu = function (tobj) {
+            var entries,
                 entry,
+                menuText,
+                mm = tobj.miniMenu.menuObj,
                 i,
                 r;
-            // console.log("miniMenu is ", mm);
-            // console.log("miniMenu length is " + len);
-            if (len > 0) {
-                r = 'Menu:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-                for (i = 0; i < len; i += 1) {
+            r = "<div class='minimenu' id='minimenu'>";
+            console.log("Generating miniMenu HTML for target", tobj);
+            // console.log("menu object is", mm);
+            if (mm.isEmpty) {
+                r += "To leave this page, press ENTER or click the Submit button";
+            } else {
+                entries = mm.entries;
+                r += "<div class='minimenuleft'>";
+                // r += 'Menu:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+                r += 'Menu:';
+                r += "</div>"; // minimenuleft
+                r += "<div class='minimenuright'>";
+                for (i = 1; i < entries.length; i += 1) {
                     // console.log("i === " + i);
-                    // console.log("Attempting to pull target " + entries[i] + " from miniMenu");
-                    entry = target.pull(entries[i]);
-                    if (lib.privCheck(entry.aclProfile)) {
-                        r += i + '.&nbsp' + entry.menuText + '&nbsp; ';
-                    }
+                    entry = entries[i];
+                    menuText = entry.menuText.replace(/ /g, '&nbsp;');
+                    r += i + '.&nbsp' + menuText + '&nbsp; ';
                 }
                 r += 'X.&nbspExit/back';
-            } else {
-                r = "To leave this page, press ENTER or click the Submit button";
+                r += '</div>'; // minimenuright
             }
+            r += "</div>"; // minimenu
             return r;
         }, // miniMenu       
 
@@ -317,8 +324,18 @@ define ([
 
         // "Your choice" section at the bottom - shared by all target types
         yourChoice = function () {
-            return '<br><b>Your choice:</b> <input name="sel" size=3 maxlength=2> ' +
-                   '<input id="submitButton" type="submit" value="Submit"><br><br>'
+            var r = '<br>';
+            r += "<div class='yourchoice'>";
+            r += "<div class='yourchoiceleft'>";
+            r += "Your choice:";
+            r += "</div>"; // yourchoiceleft
+            r += "<div class='yourchoiceright'>";
+            r += '<input name="sel" size=3 maxlength=2> ' +
+                 '<input id="submitButton" type="submit" value="Submit">';
+            r += "</div>"; // yourchoiceright
+            r += "</div>"; // yourchoice
+            r += "<br>";
+            return r;
         };
 
 
@@ -336,7 +353,7 @@ define ([
             r += '</p>';
 
             r += '<p class="alignright"><span id="userbox">';
-            r += appLib.fillUserBox();
+            r += appLib.userBoxContent();
             r += '</span></p>';
 
             r += '</div>';
@@ -357,7 +374,6 @@ define ([
                 r += 'Plack session ID: ' + cf('sessionID');
                 r += ' (last_seen ' + cf('sessionLastSeen') + ')</br>';
             }
-            r += '<div class="d3"></div>';
             return r;
         }, // body
 
@@ -402,8 +418,8 @@ define ([
                             r += Array(entry.maxlen).join(entry.text) + '<br>';
                         } else if (entry.name === 'emptyLine') {
                             r += '<br>';
-                        } else if (lib.privCheck(entry.aclProfileRead)) {
-                            r += lib.rightPadSpaces(entry.text.concat(':'), needed);
+                        } else if (coreLib.privCheck(entry.aclProfileRead)) {
+                            r += coreLib.rightPadSpaces(entry.text.concat(':'), needed);
                             r += '<span id="' + entry.name + '">';
                             r += valueToDisplay(obj, entry.prop);
                             r += '</span><br>';
@@ -418,7 +434,7 @@ define ([
                 
 		// miniMenu at the bottom: selections are target names defined
 		// in the 'miniMenu' property of the dbrowser object
-                r += miniMenu(dbo.miniMenu);
+                r += miniMenu(dbo);
 
                 // your choice section
                 r += yourChoice();
@@ -441,7 +457,7 @@ define ([
 
             r += '<form id="' + dcn + '">';
             // miniMenu at the bottom
-            r += miniMenu(dco.miniMenu);
+            r += miniMenu(dco);
             // your choice section
             r += yourChoice();
             r += '</form>';
@@ -472,10 +488,10 @@ define ([
                 // entry)
                 if (dfo.entriesRead === undefined || dfo.entriesRead === null) {
                     // console.log("No entriesRead, initializing allEntries to empty array");
-                    allEntries = lib.forceArray([]);
+                    allEntries = coreLib.forceArray([]);
                 } else {
                     // console.log("entriesRead", dfo.entriesRead);
-                    allEntries = lib.forceArray(dfo.entriesRead);
+                    allEntries = coreLib.forceArray(dfo.entriesRead);
                 }
                 if (dfo.entriesWrite !== undefined) {
                     // console.log("entriesWrite", dfo.entriesWrite);
@@ -501,9 +517,9 @@ define ([
                         r += '<br>';
                     } else if (entry.name === 'textOnly') {
                         r += entry.textOnly + '<br>';
-                    } else if (lib.privCheck(entry.aclProfileRead)) {
+                    } else if (coreLib.privCheck(entry.aclProfileRead)) {
                         if (! entry.hidden) {
-                            r += lib.rightPadSpaces(entry.text.concat(':'), needed);
+                            r += coreLib.rightPadSpaces(entry.text.concat(':'), needed);
                         }
                         r += '<span ';
                         if (entry.hidden) {
@@ -529,8 +545,8 @@ define ([
                     if (! entry.hasOwnProperty('size') && entry.hasOwnProperty('maxlen')) {
                         entry.size = entry.maxlen;
                     }
-                    if (lib.privCheck(entry.aclProfileWrite)) {
-                        r += lib.rightPadSpaces(entry.text.concat(':'), needed);
+                    if (coreLib.privCheck(entry.aclProfileWrite)) {
+                        r += coreLib.rightPadSpaces(entry.text.concat(':'), needed);
                         r += '<input id="' + entry.name + '" ';
                         r += 'name="entry' + i + '" ';
                         r += 'value="' + valueToDisplay(obj, entry.prop, "write") + '" ';
@@ -543,7 +559,7 @@ define ([
                 }
 
                 // miniMenu at the bottom
-                r += miniMenu(dfo.miniMenu);
+                r += miniMenu(dfo);
 
                 // your choice section
                 r += yourChoice();
@@ -559,18 +575,19 @@ define ([
             // dmn is dmenu name
             // dmo is dmenu object
             var dmo = target.pull(dmn),
-                r = '',
-                len = dmo.entries.length,
+                menuObj = dmo.menuObj,
+                entry,
                 i,
-                entry;
+                len,
+                r = '';
         
             r += '<form id="' + dmn + '"><br><b>' + dmo.title + '</b><br><br>';
 
-            for (i = 0; i < len; i += 1) {
-                // the entries are names of targets
-                entry = target.pull(dmo.entries[i]);
-                // console.log("Pulled target " + dmo.entries[i] + " with result ", entry);
-                if (lib.privCheck(entry.aclProfile)) {
+            if (! menuObj.isEmpty) {
+                len = menuObj.entries.length;
+                for (i = 1; i < len; i += 1) {
+                    // the entries are names of targets
+                    entry = menuObj.entries[i];
                     r += i + '. ' + entry.menuText + '<br>';
                 }
             }

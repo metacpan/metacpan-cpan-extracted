@@ -2,7 +2,7 @@ package MVC::Neaf::X::Form;
 
 use strict;
 use warnings;
-our $VERSION = 0.17;
+our $VERSION = 0.18;
 
 =head1 NAME
 
@@ -69,7 +69,7 @@ B<NOTE> Format may be subject to extention with extra options.
 =cut
 
 sub new {
-    # TODO other constructor forms e.g. with options
+    # TODO 0.90 other constructor forms e.g. with options
     my ($class, $profile) = @_;
 
     my $self = bless {

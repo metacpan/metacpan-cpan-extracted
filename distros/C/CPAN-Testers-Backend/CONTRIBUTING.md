@@ -164,7 +164,7 @@ installed.
 
 ### Using `carton` to install prereqs in an isolated directory
 
-If you with to isolate the prerequisites of this project so they do not
+If you wish to isolate the prerequisites of this project so they do not
 interfere with other projects, you can use the
 [Carton](http://metacpan.org/pod/Carton) tool. Install Carton normally
 from CPAN using `cpanm Carton`, then use the `carton` command to install

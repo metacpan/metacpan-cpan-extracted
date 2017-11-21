@@ -14,7 +14,11 @@ my $tt = MVC::Neaf::View::TT->new(
     POST_CHOMP => 1,
 );
 
-is_deeply ( [$tt->render({})], [ '', 'text/plain' ], "Plain return if no tpl");
+eval {
+    $tt->render({})
+};
+like $@, qr(template.*required), "No template = no go";
+
 is_deeply ( [$tt->render( { -template => \"[% foo %]", foo => 42 } ) ]
     , [ 42, 'text/html' ], "TT as expected" );
 

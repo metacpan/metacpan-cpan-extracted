@@ -1,11 +1,18 @@
 package eris::dictionary::syslog;
+# ABSTRACT: Contains fields extracted from syslog messages
 
 use Moo;
 use namespace::autoclean;
 with qw(
     eris::role::dictionary::hash
 );
-sub _build_priority { 100; }
+
+our $VERSION = '0.004'; # VERSION
+
+
+sub _build_priority { 90; }
+
+
 my $_hash=undef;
 sub hash {
     return $_hash if defined $_hash;
@@ -17,6 +24,8 @@ sub hash {
     }
     $_hash = \%data;
 }
+
+
 1;
 
 =pod
@@ -25,11 +34,28 @@ sub hash {
 
 =head1 NAME
 
-eris::dictionary::syslog
+eris::dictionary::syslog - Contains fields extracted from syslog messages
 
 =head1 VERSION
 
-version 0.003
+version 0.004
+
+=head1 SYNOPSIS
+
+This dictionary contains elements extracted from the syslog header and
+meta-data.
+
+=head1 ATTRIBUTES
+
+=head2 priority
+
+Defaults to 90, or towards the end.
+
+=for Pod::Coverage hash
+
+=head1 SEE ALSO
+
+L<eris::dictionary>, L<eris::role::dictionary>
 
 =head1 AUTHOR
 
@@ -46,6 +72,8 @@ This is free software, licensed under:
 =cut
 
 __DATA__
+timestamp The timestamp encoded in the message
+message Message contents, often truncated to relevance.
 severity Syslog severity of the message
 facility Syslog facility of the message
 program The program name or tag that generated the message

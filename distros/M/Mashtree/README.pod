@@ -1,0 +1,7 @@
+=head1 NAME
+
+Mashtree - Create a tree using Mash distances.
+
+
+=cut
+

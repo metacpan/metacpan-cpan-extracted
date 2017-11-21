@@ -19,7 +19,8 @@ use Test::More;
 
 {
     package App;
-    use Moxie;
+    use Moxie
+        traits => [':experimental'];
 
     extends 'Moxie::Object', 'My::Component';
 
@@ -66,7 +67,8 @@ is($app->bar, 'BAR');
 
 {
     package My::DBI::MOP;
-    use Moxie;
+    use Moxie
+        traits => [':experimental'];
 
     extends 'Moxie::Object', 'My::DBI';
 

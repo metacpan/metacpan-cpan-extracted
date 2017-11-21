@@ -11,7 +11,7 @@ struct SPVM_sub {
   SPVM_OP* op_package;
   SPVM_OP* op_constant;
   SPVM_DYNAMIC_ARRAY* op_args;
-  SPVM_DYNAMIC_ARRAY* op_my_vars;
+  SPVM_DYNAMIC_ARRAY* op_mys;
   void* native_address;
   const char* abs_name;
   const char* file_name;
@@ -22,6 +22,7 @@ struct SPVM_sub {
   _Bool is_native;
   _Bool is_constant;
   _Bool is_destructor;
+  _Bool is_jit;
 };
 
 SPVM_SUB* SPVM_SUB_new(SPVM_COMPILER* compiler);

@@ -1,5 +1,8 @@
 Revision history for MooseX-AttributeShortcuts
 
+0.037     2017-11-20 16:48:24 CST-0600
+	* Add `init_arg` shortcuts.
+
 0.036     2017-10-31 21:34:35 CDT-0500
 	* When creating an inline builder method's metaclass, take a copy of the
 	  attribute's own definition context; previously we were inadvertently

@@ -17,7 +17,8 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "v5.10.0"
          }
       },
       "develop" : {
@@ -84,7 +85,7 @@
             "Test::Most" : "0",
             "Try::Tiny" : "0",
             "namespace::autoclean" : "0",
-            "perl" : "v5.10.0",
+            "perl" : "5.010",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -107,102 +108,103 @@
             "Test::More" : "1.302015",
             "Test::Requires" : "0",
             "Test::Warnings" : "0",
-            "lib" : "0"
+            "lib" : "0",
+            "perl" : "5.010"
          }
       }
    },
    "provides" : {
       "Test::Class::Moose" : {
          "file" : "lib/Test/Class/Moose.pm",
-         "version" : "0.88"
+         "version" : "0.89"
       },
       "Test::Class::Moose::AttributeRegistry" : {
          "file" : "lib/Test/Class/Moose/AttributeRegistry.pm",
-         "version" : "0.88"
+         "version" : "0.89"
       },
       "Test::Class::Moose::CLI" : {
          "file" : "lib/Test/Class/Moose/CLI.pm",
-         "version" : "0.88"
+         "version" : "0.89"
       },
       "Test::Class::Moose::Config" : {
          "file" : "lib/Test/Class/Moose/Config.pm",
-         "version" : "0.88"
+         "version" : "0.89"
       },
       "Test::Class::Moose::Deprecated" : {
          "file" : "lib/Test/Class/Moose/Deprecated.pm",
-         "version" : "0.88"
+         "version" : "0.89"
       },
       "Test::Class::Moose::Executor::Parallel" : {
          "file" : "lib/Test/Class/Moose/Executor/Parallel.pm",
-         "version" : "0.88"
+         "version" : "0.89"
       },
       "Test::Class::Moose::Executor::Sequential" : {
          "file" : "lib/Test/Class/Moose/Executor/Sequential.pm",
-         "version" : "0.88"
+         "version" : "0.89"
       },
       "Test::Class::Moose::Load" : {
          "file" : "lib/Test/Class/Moose/Load.pm",
-         "version" : "0.88"
+         "version" : "0.89"
       },
       "Test::Class::Moose::Report" : {
          "file" : "lib/Test/Class/Moose/Report.pm",
-         "version" : "0.88"
+         "version" : "0.89"
       },
       "Test::Class::Moose::Report::Class" : {
          "file" : "lib/Test/Class/Moose/Report/Class.pm",
-         "version" : "0.88"
+         "version" : "0.89"
       },
       "Test::Class::Moose::Report::Instance" : {
          "file" : "lib/Test/Class/Moose/Report/Instance.pm",
-         "version" : "0.88"
+         "version" : "0.89"
       },
       "Test::Class::Moose::Report::Method" : {
          "file" : "lib/Test/Class/Moose/Report/Method.pm",
-         "version" : "0.88"
+         "version" : "0.89"
       },
       "Test::Class::Moose::Report::Time" : {
          "file" : "lib/Test/Class/Moose/Report/Time.pm",
-         "version" : "0.88"
+         "version" : "0.89"
       },
       "Test::Class::Moose::Role" : {
          "file" : "lib/Test/Class/Moose/Role.pm",
-         "version" : "0.88"
+         "version" : "0.89"
       },
       "Test::Class::Moose::Role::AutoUse" : {
          "file" : "lib/Test/Class/Moose/Role/AutoUse.pm",
-         "version" : "0.88"
+         "version" : "0.89"
       },
       "Test::Class::Moose::Role::CLI" : {
          "file" : "lib/Test/Class/Moose/Role/CLI.pm",
-         "version" : "0.88"
+         "version" : "0.89"
       },
       "Test::Class::Moose::Role::Executor" : {
          "file" : "lib/Test/Class/Moose/Role/Executor.pm",
-         "version" : "0.88"
+         "version" : "0.89"
       },
       "Test::Class::Moose::Role::HasTimeReport" : {
          "file" : "lib/Test/Class/Moose/Role/HasTimeReport.pm",
-         "version" : "0.88"
+         "version" : "0.89"
       },
       "Test::Class::Moose::Role::ParameterizedInstances" : {
          "file" : "lib/Test/Class/Moose/Role/ParameterizedInstances.pm",
-         "version" : "0.88"
+         "version" : "0.89"
       },
       "Test::Class::Moose::Role::Reporting" : {
          "file" : "lib/Test/Class/Moose/Role/Reporting.pm",
-         "version" : "0.88"
+         "version" : "0.89"
       },
       "Test::Class::Moose::Runner" : {
          "file" : "lib/Test/Class/Moose/Runner.pm",
-         "version" : "0.88"
+         "version" : "0.89"
       },
       "Test::Class::Moose::Tutorial" : {
          "file" : "lib/Test/Class/Moose/Tutorial.pm",
-         "version" : "0.88"
+         "version" : "0.89"
       },
       "Test::Class::Moose::Util" : {
          "file" : "lib/Test/Class/Moose/Util.pm",
-         "version" : "0.88"
+         "version" : "0.89"
       }
    },
    "release_status" : "stable",
@@ -217,7 +219,7 @@
          "web" : "https://github.com/houseabsolute/test-class-moose"
       }
    },
-   "version" : "0.88",
+   "version" : "0.89",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"
@@ -307,6 +309,11 @@
             "class" : "Dist::Zilla::Plugin::VersionFromMainModule",
             "name" : "@DROLSKY/VersionFromMainModule",
             "version" : "0.03"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MinimumPerl",
+            "name" : "@DROLSKY/MinimumPerl",
+            "version" : "1.006"
          },
          {
             "class" : "Dist::Zilla::Plugin::Authority",
@@ -666,7 +673,7 @@
          {
             "class" : "Dist::Zilla::Plugin::DROLSKY::Contributors",
             "name" : "@DROLSKY/DROLSKY::Contributors",
-            "version" : "0.85"
+            "version" : "0.87"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
@@ -828,7 +835,7 @@
          {
             "class" : "Dist::Zilla::Plugin::DROLSKY::WeaverConfig",
             "name" : "@DROLSKY/DROLSKY::WeaverConfig",
-            "version" : "0.85"
+            "version" : "0.87"
          },
          {
             "class" : "Dist::Zilla::Plugin::ReadmeAnyFromPod",
@@ -873,7 +880,7 @@
          {
             "class" : "Dist::Zilla::Plugin::DROLSKY::License",
             "name" : "@DROLSKY/DROLSKY::License",
-            "version" : "0.85"
+            "version" : "0.87"
          },
          {
             "class" : "Dist::Zilla::Plugin::CheckStrictVersion",
@@ -910,7 +917,7 @@
                }
             },
             "name" : "@DROLSKY/DROLSKY::Git::CheckFor::CorrectBranch",
-            "version" : "0.85"
+            "version" : "0.87"
          },
          {
             "class" : "Dist::Zilla::Plugin::EnsureChangesHasContent",
@@ -931,7 +938,7 @@
          {
             "class" : "Dist::Zilla::Plugin::DROLSKY::TidyAll",
             "name" : "@DROLSKY/DROLSKY::TidyAll",
-            "version" : "0.85"
+            "version" : "0.87"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Check",
@@ -998,7 +1005,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.88",
+                  "tag" : "v0.89",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },
@@ -1179,6 +1186,7 @@
    "x_authority" : "cpan:DROLSKY",
    "x_contributors" : [
       "Andy Jack <github@veracity.ca>",
+      "Chuck Adams <charles_adams@symantec.com>",
       "Denny de la Haye <denny@users.noreply.github.com>",
       "Desmond Daignault <nawglan@users.noreply.github.com>",
       "Doug Bell <madcityzen@gmail.com>",

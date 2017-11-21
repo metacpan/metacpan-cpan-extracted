@@ -1,5 +1,3 @@
-.ship.conf
-.travis.yml
 Changes
 cpanfile
 lib/Test/Applify.pm
@@ -17,6 +15,7 @@ t/coding-error-3.pl
 t/file.pl
 t/file.t
 t/subclass.t
+t/subcommand.pl
 t/syntax-error-1.pl
 t/syntax-error-2.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)

@@ -8,7 +8,7 @@ use Example::Synopsis::Set;
 
 my $set = Example::Synopsis::Set::->new;
 
-is reftype $set->{$Example::Synopsis::HashSet::SET} => 'HASH';
+is reftype $set->[ $Example::Synopsis::HashSet::SET ] => 'HASH';
 
 ok ! $set->has(1);
 $set->add(1);

@@ -1,7 +1,6 @@
 requires 'perl', '5.008005';
 
 requires 'Class::Method::Modifiers', '2.12';
-requires 'Hash::Merge', '0.2';
 requires 'List::MoreUtils',  '0.33';
 requires 'Module::Runtime', '0.014';
 requires 'Package::Stash', '0.36';

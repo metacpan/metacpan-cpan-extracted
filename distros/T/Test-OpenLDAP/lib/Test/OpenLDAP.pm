@@ -12,17 +12,7 @@ use URI::Escape();
 use Net::LDAP();
 use English qw( -no_match_vars );
 
-=head1 NAME
-
-Test::OpenLDAP - Creates a temporary instance of OpenLDAP's slapd daemon to run tests against.
-
-=head1 VERSION
-
-Version 0.04
-
-=cut
-
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 our @CARP_NOT = ('Test::OpenLDAP');
 sub USER_READ_WRITE_PERMISSIONS         { return 600; }
@@ -36,40 +26,12 @@ sub COMMA                               { return q[,]; }
 sub LENGTH_OF_RANDOM_ADMIN_PASSWORD     { return 20; }
 sub MAX_VALUE_OF_BYTE                   { return 255; }
 
-=head1 SYNOPSIS
-
-This module allows easy creation and tear down of a OpenLDAP slapd instance.  When the variable goes 
-out of scope, the slapd instance is torn down and the file system objects it relies on are removed.
-
-  my $slapd = Test::OpenLDAP->new(); # Test::OpenLDAP->new({ suffix => 'dc=foobar,dc=com' });
-
-  my $ldap = Net::LDAP->new($slapd->uri()) or Carp::croak("Failed to connect:$@");
-
-  my $mesg = $ldap->bind($slapd->admin_user(), password => $slapd->admin_password());
-
-  ... add / modify / search entries
-
-  $slapd->stop();
-
-  $slapd->start();
-
-  $slapd->DESTROY();
-
-
-=head1 SUBROUTINES/METHODS
-
-=head2 new
-
-This method initialises and starts an OpenLDAP slapd instance, listening on a unix socket.  It then creates an admin user and password and returns the slapd instance to the user.
-The method accepts a hash parameter of configuration options.  The only option it accepts at the moment is the 'suffix' option.
-
-=cut
-
 sub new {
     my ( $class, $params ) = @_;
     my $self = {};
     bless $self, $class;
     $self->{suffix} = $params->{suffix} || 'dc=example,dc=com';
+    $self->{debug}  = $params->{debug}  || '0';
     $self->{admin_user} = 'cn=root,' . $self->{suffix};
     my $string = q[];
     foreach ( 0 .. LENGTH_OF_RANDOM_ADMIN_PASSWORD() ) {
@@ -98,7 +60,7 @@ sub new {
     $self->{cn_schema_ldif_path} =
       File::Spec->catfile( $self->{cn_config_directory}, 'cn=schema.ldif' );
     $self->{cn_schema_core_ldif_path} =
-      File::Spec->catfile( $self->{cn_schema_directory}, 'cn={1}core.ldif' );
+      File::Spec->catfile( $self->{cn_schema_directory}, 'cn={0}core.ldif' );
     $self->{olc_database_config_path} =
       File::Spec->catfile( $self->{cn_config_directory},
         'olcDatabase={0}config.ldif' );
@@ -137,12 +99,6 @@ sub new {
     return $self;
 }
 
-=head2 skip
-
-This method allows the user to skip tests requiring Test::OpenLDAP by checking to see if the slapd binary exists AND that the OS uses fork for process control.
-
-=cut
-
 sub skip {
     my ($class) = @_;
     if (   ( exists $Config{d_fork} )
@@ -171,12 +127,6 @@ sub skip {
     return;
 }
 
-=head2 start
-
-This methods starts the slapd process 
-
-=cut
-
 sub start {
     my ($self) = @_;
     if ( $self->{slapd_pid} ) {
@@ -204,7 +154,8 @@ sub start {
               ;    # adding /usr/lib/openldap for OpenSUSE deployments
 
             exec { OPENLDAP_SLAPD_BINARY_NAME() } OPENLDAP_SLAPD_BINARY_NAME(),
-              '-d', '0', '-h', "ldapi://$self->{encoded_socket_path}", '-F',
+              '-d', $self->debug(), '-h',
+              "ldapi://$self->{encoded_socket_path}", '-F',
               $self->_slapd_d_directory()
               or Carp::croak( q[Failed to exec ']
                   . OPENLDAP_SLAPD_BINARY_NAME()
@@ -215,6 +166,11 @@ sub start {
         exit 1;
     }
     return $self;
+}
+
+sub debug {
+    my ($self) = @_;
+    return $self->{debug};
 }
 
 sub _uuid {
@@ -234,12 +190,6 @@ sub _term_signal {
     }
     return $signals_by_name{TERM};
 }
-
-=head2 start
-
-This method stops the slapd process 
-
-=cut
 
 sub stop {
     my ($self) = @_;
@@ -265,44 +215,20 @@ sub stop {
     }
 }
 
-=head2 uri
-
-This method gives the uri for the test code to connect to via a Net::LDAP->new() call.
-
-=cut
-
 sub uri {
     my ($self) = @_;
     return $self->{uri};
 }
-
-=head2 suffix
-
-This method gives the dn used as the suffix for the slapd database.
-
-=cut
 
 sub suffix {
     my ($self) = @_;
     return $self->{suffix};
 }
 
-=head2 admin_user
-
-This method gives the admin user name for the slapd database.
-
-=cut
-
 sub admin_user {
     my ($self) = @_;
     return $self->{admin_user};
 }
-
-=head2 admin_password
-
-This method gives the admin password for the slapd database.
-
-=cut
 
 sub admin_password {
     my ($self) = @_;
@@ -1623,7 +1549,7 @@ sub _remove_db_directory {
         while ( my $entry = $db_handle->read() ) {
             next if ( $entry eq File::Spec->curdir() );
             next if ( $entry eq File::Spec->updir() );
-            if ( $entry =~ /^(\w+[.]\w+|\w+)$/smx ) {
+            if ( $entry =~ /^([\w\-]+[.]\w+|[\w\-]+)$/smx ) {
                 my $path = "$self->{db_directory}/$1";
                 unlink $path
                   or Carp::croak("Failed to unlink '$path':$OS_ERROR");
@@ -1658,7 +1584,7 @@ sub _remove_cn_schema_directory {
         while ( my $entry = $cn_schema_handle->read() ) {
             next if ( $entry eq File::Spec->curdir() );
             next if ( $entry eq File::Spec->updir() );
-            if ( $entry =~ /^(cn=[{]\d+[}]x[-]com[-]synchroad[.]ldif)$/smx ) {
+            if ( $entry =~ /^(cn=[\w\-=,]*[{]\d+[}][\w\-=,]*[.]ldif)$/smx ) {
                 my $path = "$self->{cn_schema_directory}/$1";
                 unlink $path
                   or Carp::croak("Failed to unlink '$path':$OS_ERROR");
@@ -1681,6 +1607,36 @@ sub _remove_cn_schema_directory {
     return;
 }
 
+sub _remove_cn_config_directory {
+    my ($self) = @_;
+    my $cn_config_handle = DirHandle->new( $self->{cn_config_directory} );
+    if ($cn_config_handle) {
+        while ( my $entry = $cn_config_handle->read() ) {
+            next if ( $entry eq File::Spec->curdir() );
+            next if ( $entry eq File::Spec->updir() );
+            if ( $entry =~ /^(cn=[\w\-=,]*[{]\d+[}][\w\-=,]*[.]ldif)$/smx ) {
+                my $path = "$self->{cn_config_directory}/$1";
+                unlink $path
+                  or Carp::croak("Failed to unlink '$path':$OS_ERROR");
+            }
+        }
+        $cn_config_handle->close()
+          or Carp::croak(
+            "Failed to close directory '$self->{cn_config_directory}':$OS_ERROR"
+          );
+    }
+    elsif ( $OS_ERROR != POSIX::ENOENT() ) {
+        Carp::croak(
+            "Failed to open directory '$self->{cn_config_directory}':$OS_ERROR"
+        );
+    }
+    rmdir $self->{cn_config_directory}
+      or ( $OS_ERROR == POSIX::ENOENT() )
+      or
+      Carp::croak("Failed to rmdir '$self->{cn_config_directory}':$OS_ERROR");
+    return;
+}
+
 sub DESTROY {
     my ($self) = @_;
     $self->stop();
@@ -1697,10 +1653,7 @@ sub DESTROY {
       or Carp::croak(
         "Failed to unlink '$self->{olc_database_config_path}':$OS_ERROR");
     $self->_remove_cn_schema_directory();
-    rmdir $self->{cn_config_directory}
-      or ( $OS_ERROR == POSIX::ENOENT() )
-      or
-      Carp::croak("Failed to rmdir '$self->{cn_config_directory}':$OS_ERROR");
+    $self->_remove_cn_config_directory();
     unlink $self->{config_ldif_path}
       or ( $OS_ERROR == POSIX::ENOENT() )
       or Carp::croak("Failed to unlink '$self->{config_ldif_path}':$OS_ERROR");
@@ -1716,18 +1669,124 @@ sub DESTROY {
     return;
 }
 
+1;
+__END__
+
+=head1 NAME
+
+Test::OpenLDAP - Creates a temporary instance of OpenLDAP's slapd daemon to run tests against.
+
+=head1 VERSION
+
+Version 0.06
+
+=head1 SYNOPSIS
+
+  my $slapd = Test::OpenLDAP->new(); # Test::OpenLDAP->new({ suffix => 'dc=foobar,dc=com', 'debug' => '-1' });
+
+  my $ldap = Net::LDAP->new($slapd->uri()) or Carp::croak("Failed to connect:$@");
+
+  my $mesg = $ldap->bind($slapd->admin_user(), password => $slapd->admin_password());
+
+  ... add / modify / search entries
+
+  $slapd->stop();
+
+  $slapd->start();
+
+  $slapd->DESTROY();
+
+=head1 DESCRIPTION
+
+This module allows easy creation and tear down of a OpenLDAP slapd instance.  When the variable goes 
+out of scope, the slapd instance is torn down and the file system objects it relies on are removed.
+
+=head1 SUBROUTINES/METHODS
+
+=head2 new
+
+This method initialises and starts an OpenLDAP slapd instance, listening on a unix socket.  It then creates an admin user and password and returns the slapd instance to the user.
+The method accepts a hash parameter of configuration options.  The only option it accepts at the moment is the 'suffix' option.
+
+=head2 skip
+
+This method allows the user to skip tests requiring Test::OpenLDAP by checking to see if the slapd binary exists AND that the OS uses fork for process control.
+
+=head2 start
+
+This methods starts the slapd process 
+
+=head2 start
+
+This method stops the slapd process 
+
+=head2 uri
+
+This method gives the uri for the test code to connect to via a Net::LDAP->new() call.
+
+=head2 suffix
+
+This method gives the dn used as the suffix for the slapd database.
+
+=head2 admin_user
+
+This method gives the admin user name for the slapd database.
+
+=head2 admin_password
+
+This method gives the admin password for the slapd database.
+
+=head2 debug 
+
+Specify the debug level of the slapd instance.  To see valid values for debug, execute the command 'slapd -d ?'.  slapd will list all the valid debug levels
+
+=head1 DIAGNOSTICS
+ 
+=over
+ 
+=item C<< slapd already started >>
+ 
+Test::OpenLDAP 
+ 
+=back
+ 
+=head1 CONFIGURATION AND ENVIRONMENT
+ 
+Test::OpenLDAP requires no configuration files or environment variables.  
+ 
+=head1 DEPENDENCIES
+ 
+Test::OpenLDAP requires the following non-core Perl modules
+ 
+=over
+ 
+=item *
+L<Data::UUID|Data::UUID>
+ 
+=item *
+L<File::Temp|File::Temp>
+ 
+=item *
+L<URI::Escape|URI::Escape>
+ 
+=item *
+L<Net::LDAP|Net::LDAP>
+ 
+=back
+ 
+=head1 INCOMPATIBILITIES
+ 
+None reported
+
 =head1 AUTHOR
 
 David Dick, C<< <ddick at cpan.org> >>
 
-=head1 BUGS
+=head1 BUGS AND LIMITATIONS
 
 Please report any bugs or feature requests to C<bug-test-openldap at rt.cpan.org>, or through
 the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Test-OpenLDAP>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
-
-
-
 
 =head1 SUPPORT
 
@@ -1758,10 +1817,6 @@ L<http://search.cpan.org/dist/Test-OpenLDAP/>
 
 =back
 
-
-=head1 ACKNOWLEDGEMENTS
-
-
 =head1 LICENSE AND COPYRIGHT
 
 Copyright 2013 David Dick.
@@ -1775,4 +1830,3 @@ See http://dev.perl.org/licenses/ for more information.
 
 =cut
 
-1;

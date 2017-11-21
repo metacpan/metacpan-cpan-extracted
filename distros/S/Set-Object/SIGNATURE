@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.73.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,50 +14,51 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 fb999d1c9cc33eefe354b2187866aac55f01b3d5 Changes.pod
+SHA1 aeab085ba01ef9be4d0df7814cd6b705f9527940 Changes.pod
 SHA1 555574ecd72fc31417309a60e8c708af93ef4e8c LICENSE
-SHA1 ffd672acc8f1716255c8a106c5425184b7703dd7 MANIFEST
-SHA1 30a0281325919fdf19ef1745d4db13dd3206e21e META.json
-SHA1 6397bbcfebb7aac0929f2431fbc743e88ee1fc17 META.yml
-SHA1 317f58bf5fae12f87b1c1c17c620e1b7404076c0 Makefile.PL
-SHA1 a2761c62ceaf67fd1406c63bc486c9633245043f Object.xs
+SHA1 90867e2218bfa857d3b59c2d6aba9ad2c18af062 MANIFEST
+SHA1 1d98979d6399cde848367d9179586dd798e96ff9 META.json
+SHA1 5f66b1db0374fc185509510af8862e3f51346900 META.yml
+SHA1 1423d9257880fa7ebf9237ce4aa9c3228e4e97da Makefile.PL
+SHA1 08dfc9fdc539a7f56820920d6b5502b6dec63d99 Object.xs
 SHA1 5e98a7ceabf3a58e98e9414ae731a997c44319dc README
-SHA1 2a6d77a62614e0cc36a6d8b326052c2a9128ce4c lib/Set/Object.pm
+SHA1 584986dea2fceaa90131e2a909c8838f1e2f2c34 lib/Set/Object.pm
 SHA1 9a13fde101efb19d54b2706ab93862ebe53387b0 lib/Set/Object/Weak.pm
 SHA1 f04d25338c1e35bda69ac5eda0bc672e10ca5b6f ppport.h
 SHA1 213b597a69c1f909d585a14a6a094a25c3e684af t/ingy/arrayref.t
-SHA1 e1f0e92ec6cbf295f7a84a0c5708b55c282592bf t/misc/kwalitee.t
+SHA1 ed613233292f0dc3218e7502cf1a88a66e1d22bc t/misc/kwalitee.t
 SHA1 db433f58da0fbecc971da5815ef5a530cd7f59f4 t/misc/leaks.t
 SHA1 814b1f451b3db7acb9337a0fd133312af3169c5a t/misc/leaktrace.t
-SHA1 0e1c671134b9405b438dd6b1eae5097cb5ae233d t/misc/manifest.t
+SHA1 7a26c17338c83960f336655bca5147bf9fbd6cca t/misc/manifest.t
 SHA1 870cca8308f9dd75360dbf623216f6252b678ab9 t/misc/meta.t
 SHA1 65ab384cd581403af529384551803e6268010d79 t/misc/more_leaks.t
 SHA1 ace5e81d6d512c2dd862f56de8d1b0d6ffb6503e t/misc/perl_minimum_version.t
 SHA1 4a159d3dccb6918ec790905d0e2bec3e58db15e9 t/misc/pod.t
 SHA1 dfb47bc536bc8bface7f95144e4985dd79447977 t/misc/pod_coverage.t
 SHA1 cef10bf7c0f4611887c5e68113eac6c2339071d6 t/misc/segfault.t
-SHA1 7812f8bc9b04bd0724a9c5dec3d0c52fceefe2df t/misc/threads.t
+SHA1 531f184820c52eb944bef3cf6b17bec52d43c998 t/misc/threads.t
 SHA1 494c2f3a77ce211ffcbedc5e44dd8a6454764fe2 t/misc/undef.t
 SHA1 018c38db837777290619ec16a5f1c0dd5783263a t/object/Person.pm
 SHA1 40b4a7db1302cbd1d9b57e23508209818c8542dc t/object/Saint.pm
 SHA1 2f7367c13bd3fc272908a063c8faca0def9340ec t/object/SetSubClass.pm
 SHA1 43d23a70fc188eca2f3be40004f41f02566f6799 t/object/abuse.t
-SHA1 e5f245b3ce754e52cb1249f54dcf4bb1727ec5b3 t/object/clear.t
-SHA1 a1010227618a41f14016e7a38f4dcee4efd69fc0 t/object/difference.t
-SHA1 3e2b850e81f541f830bfedaeff8ba85af6bcd649 t/object/equal.t
-SHA1 665f991b4e74d7862add019e509712f056519f82 t/object/flags.t
-SHA1 08dc84c25ee176e912e502446085b2e2398d5f2d t/object/includes.t
-SHA1 b7207bb82ed39ac4a63200668b17396be58eaed0 t/object/insert.t
-SHA1 e2fb433f51c0b25c1d166c5ca81be5162686924f t/object/intersection.t
-SHA1 6be12139ecb92e44e5f7317904eff9e385c55b7f t/object/members.t
+SHA1 d6e13b787aa7c863f5d60f697ad49e783155d9fc t/object/clear.t
+SHA1 aa7c26f81dd6ba3d6ded91e8b591695e0b6476b2 t/object/difference.t
+SHA1 3066f1cc7cd750401cd25223db613cd4cbdf2444 t/object/equal.t
+SHA1 70c6bb52920e287d5388472f684b33f94e3580cc t/object/flags.t
+SHA1 0d49ef3f08136723beba3180436f6f6290b22043 t/object/includes.t
+SHA1 77b57a4a8e96de516d64bd90cd3ea99407125019 t/object/insert.t
+SHA1 ef59e07865396ad8fd8eb11a99f1d44c484a6263 t/object/intersection.t
+SHA1 744031b4f0dbf1408fdec87e07601c5a830f642f t/object/magic.t
+SHA1 d667fb5e32fd19f00e11e8285d4ab1f149651407 t/object/members.t
 SHA1 47f77220eec4b2e2c4e6b38b5325c9bf77769826 t/object/properties.t
-SHA1 00d74a93e88189b54e5570cee979913ace7abdb0 t/object/refcount.t
-SHA1 b6cca34a00416fa6c4a61b604b2933f434c9cdb8 t/object/remove.t
-SHA1 7b904d702fd08cddd44819f6aa38c631c9a62bfa t/object/set_subclass.t
+SHA1 c1156dab76dfb07ba335d581629b740479d3686e t/object/refcount.t
+SHA1 9c6133d62011aa78f909b4649d4972fb548bc327 t/object/remove.t
+SHA1 202267f037f54b6190468acf2956544c6aa5c993 t/object/set_subclass.t
 SHA1 35a2ea64d0f939557f15c4e55f22715ebe5dafaf t/object/storable.t
-SHA1 479a9f5cd91b03a7ef37a833886c54e8e19c18cd t/object/subsuper.t
-SHA1 d18eaba2928ec2aa58a09feb70e49aad7d05e3f6 t/object/symmetric_difference.t
-SHA1 ee100a55511f208155e2ca071032e46383f2d102 t/object/union.t
+SHA1 5d44b19013ca4314ac40d00d15dceb8e3f9e93d8 t/object/subsuper.t
+SHA1 39e998b8df3c55f2d643726075b11c8961f470d4 t/object/symmetric_difference.t
+SHA1 02e7a8a21c58e477aeafe6c0c98d4d8af4c6623b t/object/union.t
 SHA1 eebb5dae0215a01ec427abafac502d534c20d524 t/object/weakref.t
 SHA1 85b0418c45937ccfc37694fc0463617d9d926261 t/scalar/basic.t
 SHA1 547133fca61d8af7abfd6774be681f65b48ca43e t/scalar/basic_overload.t
@@ -78,9 +79,8 @@ SHA1 908f3fedbcff83d7ecca66c0b4ef99aa5bd69481 t/scalar/union.t
 SHA1 31d6d80a33dd2da72ab10b51bb272c24ad556f89 t/scalar/unique.t
 SHA1 66dca8177780e09a12de4970c27820624ef46249 typemap
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iEYEARECAAYFAlV4tOQACgkQmm2SYo/9yUI/PQCeMT1SQQgTbE39f+epYsgZAM1E
-qAUAmwU7ahp27AjziM98j+gsJPRPwIni
-=GpdM
+iF0EARECAB0WIQRZHhhUcL58V8z0UW2abZJij/3JQgUCWgcTXAAKCRCabZJij/3J
+QuxZAJ4lbZgcKRLNb5WZwa7U6L7f2bFxJACfQhr99ytoFOfb0ypczLOJ62VAZZk=
+=GRkk
 -----END PGP SIGNATURE-----

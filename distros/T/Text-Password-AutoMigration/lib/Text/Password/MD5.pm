@@ -1,5 +1,5 @@
 package Text::Password::MD5;
-our $VERSION = "0.09";
+our $VERSION = "0.12";
 
 use Moose;
 extends 'Text::Password::CoreCrypt';
@@ -68,7 +68,7 @@ override 'verify' => sub {
 
      die __PACKAGE__. " doesn't allow any Wide Characters or white spaces\n"
     if $input !~ /[!-~]/ or $input =~ /\s/;
-     croak "Crypt::PasswdMD5 makes 34bytes hash strings. Your data must be wrong."
+     croak "Crypt::PasswdMD5 makes 34bytes hash strings. Your data must be wrong"
     if $data !~ /^\$1\$[!-~]{1,8}\$[!-~]{22}$/;
 
     return $data eq unix_md5_crypt( $input, $data );
@@ -94,13 +94,12 @@ override 'encrypt' => sub {
     my $min = $self->minimum();
     croak __PACKAGE__ ." requires at least $min length" if length $input < $min;
      die __PACKAGE__. " doesn't allow any Wide Characters or white spaces\n"
-    if $input !~ /[!-~]/ or $input =~ /\s/;
+    if $input =~ /[^!-~]/ or $input =~ /\s/;
 
-    my $salt = shift || $self->nonce();
-    carp "warning: short lengths salt is set. you don't have to." if length($salt) < 8;
-    carp "warning: too many string lengths for salt. unix_md5_crypt() ignores more than 8." if $salt and length($salt) > 8;
-
-    return unix_md5_crypt( $input, $salt );
+    my $hash;
+     do{ $hash = unix_md5_crypt( $input, $self->nonce(8) ) }
+    until( $hash =~ /^\$1\$[!-~]{1,8}\$[!-~]{22}$/ );
+    return $hash;
 };
 
 =head3 generate($length)

@@ -32,7 +32,7 @@ no_index:
 provides:
   APISchema:
     file: lib/APISchema.pm
-    version: '1.27'
+    version: '1.30'
   APISchema::DSL:
     file: lib/APISchema/DSL.pm
   APISchema::Generator::Markdown:
@@ -92,7 +92,7 @@ resources:
   bugtracker: https://github.com/hitode909/APISchema/issues
   homepage: https://github.com/hitode909/APISchema
   repository: git://github.com/hitode909/APISchema.git
-version: '1.27'
+version: '1.30'
 x_authority: cpan:HITODE
 x_contributors:
   - 'Tomohiro Nishimura <tomohiro68@gmail.com>'

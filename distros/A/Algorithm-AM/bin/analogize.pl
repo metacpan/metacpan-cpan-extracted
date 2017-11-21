@@ -2,10 +2,13 @@ package analogize;
 # ABSTRACT: classify data with AM from the command line
 use strict;
 use warnings;
-our $VERSION = '3.10';
+our $VERSION = '3.11';
 use 5.010;
 use Carp;
 use Algorithm::AM::Batch;
+# Log only warnings by default, since the user chooses the desired reports using
+# the script parameters
+use Log::Any::Adapter ('Stdout', log_level => 'warn');
 use Path::Tiny;
 # 2.13 needed for aliases
 use Getopt::Long 2.13 qw(GetOptionsFromArray);
@@ -139,7 +142,7 @@ analogize - classify data with AM from the command line
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 SYNOPSIS
 

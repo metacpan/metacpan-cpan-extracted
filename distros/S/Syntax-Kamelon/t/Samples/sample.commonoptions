@@ -1,0 +1,32 @@
+Testing commonoptions
+
+column option
+<RegExpr attribute="Match" context="#stay" column="5" String="\d" />
+<C>
+#every digit on column 5 is matched
+0123456789
+<C>
+
+column and firstNonSpace both set
+<RegExpr attribute="Match" firstNonSpace="true" context="#stay" column="5" String="\d" />
+<CFNS>
+#if the first non space on column 5 is a digit, it is matched
+     56789
+1    56789
+<CFNS>
+
+firstNonSpace
+<RegExpr attribute="Match" firstNonSpace="true" context="#stay" String="\d" />
+<FNS>
+#if the first non space is a digit, it is matched.
+   4u
+1  4u
+q  4u
+<FNS>
+
+lookAhead
+<StringDetect attribute="Match2" lookAhead="true" context="LT" String="aap" />
+<StringDetect attribute="Match" context="#pop" String="aap" />
+<L>
+Daar zit een aap.
+<L>

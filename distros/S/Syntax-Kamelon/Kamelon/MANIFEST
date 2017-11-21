@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+Kamelon.xs
+t/Kamelon.t
+fallback/const-c.inc
+fallback/const-xs.inc
+lib/Syntax/Kamelon.pm

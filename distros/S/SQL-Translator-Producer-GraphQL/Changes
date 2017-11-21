@@ -1,5 +1,8 @@
 Revision history for Perl extension SQL-Translator-Producer-GraphQL
 
+0.04	Thu Nov 16 06:10:44 GMT 2017
+ - update to plugin 0.03
+
 0.03	Wed Nov  1 04:37:28 GMT 2017
  - change of plugin API to take callback
 

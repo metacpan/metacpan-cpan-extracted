@@ -185,3 +185,7 @@ of time. Sorry about that.
 2.2  Fri 23 Oct 2015 17:55:31 BST
     - Convert to PERL_NO_GET_CONTEXT
       https://github.com/robinhouston/PadWalker/pull/2
+
+2.3  Fri 10 Nov 2017 18:26:29 GMT
+    - Make tests work with -Ddefault_inc_excludes_dot
+      https://rt.cpan.org/Public/Bug/Display.html?id=120421

@@ -4,7 +4,7 @@
       "Lincoln Stein <lincoln.stein@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.28, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -45,6 +45,12 @@
          "requires" : {
             "Math::Trig" : "0"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Fork" : "0.02",
+            "Test::More" : "0.88"
+         }
       }
    },
    "release_status" : "stable",
@@ -56,6 +62,6 @@
          "url" : "http://github.com/lstein/Perl-GD"
       }
    },
-   "version" : "2.66",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "version" : "2.67",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

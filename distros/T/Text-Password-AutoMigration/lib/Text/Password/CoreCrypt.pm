@@ -1,5 +1,5 @@
 package Text::Password::CoreCrypt;
-our $VERSION = "0.09";
+our $VERSION = "0.12";
 
 use 5.8.8;
 use Moose;
@@ -19,7 +19,12 @@ __PACKAGE__->meta->make_immutable;
 no Moose;
 
 use Carp;
-my @ascii = ( '!' .. '/', 0 .. 9, ':' .. '@', 'A'..'Z', '[' .. '`', 'a'..'z', '{' .. '~' );
+my @ascii = (
+    '!', '"', '#', qw| $ % & ' ( ) * + |, ',', qw| - . / |,
+    0 .. 9, qw( : ; < = > ? @ ),
+    'A'..'Z', qw( [ \ ] ^ _ ` ), # to void syntax highlighting -> `
+    'a'..'z', qw( { | } ~ ),
+);
 
 =encoding utf-8
 
@@ -122,7 +127,7 @@ sub encrypt {
     my $min = $self->minimum();
     croak __PACKAGE__ ." requires at least $min length" if length $input < $min;
      die __PACKAGE__. " doesn't allow any Wide Characters or white spaces\n"
-    if $input !~ /[!-~]/ or $input =~ /\s/;
+    if $input =~ /[^!-~]/ or $input =~ /\s/;
     carp __PACKAGE__ . " ignores the password with over 8bytes" unless $input =~ /^[!-~]{8}$/;
 
     my $encrypt;
@@ -150,8 +155,8 @@ sub generate {
     my $min = $self->minimum();
 
     croak "unvalid length was set" unless $length =~ /^\d+$/;
-    croak ref($self) . "::generate requires list context." unless wantarray;
-    croak ref($self) . "::generate requires at least $min length." if $length < $min;
+    croak ref($self) . "::generate requires list context" unless wantarray;
+    croak ref($self) . "::generate requires at least $min length" if $length < $min;
 
     my $raw;
     do {	# redo unless it gets enough readability

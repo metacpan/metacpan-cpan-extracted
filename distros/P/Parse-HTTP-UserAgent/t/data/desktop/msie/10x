@@ -1,0 +1,77 @@
+[AGENT]
+
+Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)
+
+name            => 'MSIE',
+os              => 'Windows 7',
+parser          => 'msie',
+toolkit         => [ 'Trident', '6.0', '6.000' ],
+version         => '10.000',
+version_raw     => '10.0',
+
+[AGENT]
+
+# compat mode. only identifier is the trident version
+# http://blogs.msdn.com/b/ie/archive/2011/04/15/the-ie10-user-agent-string.aspx
+
+Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.1; Trident/6.0)
+
+name             => 'MSIE',
+original_name    => 'MSIE',
+original_version => 10,
+os               => 'Windows 7',
+parser           => 'msie',
+toolkit          => [ 'Trident', '6.0', '6.000' ],
+version          => '7.000',
+version_raw      => '7.0',
+
+[AGENT]
+
+Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; Trident/6.0)
+
+name            => 'MSIE',
+os              => 'Windows 8',
+parser          => 'msie',
+toolkit         => [ 'Trident', '6.0', '6.000' ],
+version         => '10.000',
+version_raw     => '10.0',
+
+[AGENT]
+
+# http://msdn.microsoft.com/en-us/library/ie/hh920767(v=vs.85).aspx
+
+Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; Trident/6.0; Touch)
+
+name            => 'MSIE',
+mobile          => 1,
+os              => 'Windows 8',
+parser          => 'msie',
+toolkit         => [ 'Trident', '6.0', '6.000' ],
+touch           => 1,
+version         => '10.000',
+version_raw     => '10.0',
+
+[AGENT]
+
+Mozilla/5.0 (compatible;FW 2.0.4857.p; MSIE 10.0; Windows NT 6.1; Trident/6.0)
+
+name            => 'MSIE',
+os              => 'Windows 7',
+parser          => 'msie',
+toolkit         => [ 'Trident', '6.0', '6.000' ],
+version         => '10.000',
+version_raw     => '10.0',
+
+[AGENT]
+
+Mozilla/5.0 (compatible; MSIE 9.0; qdesk 2.5.1270.201; Windows NT 6.1; WOW64; Trident/6.0; QQBrowser/7.4.16830.400)
+
+extras           => [ 'qdesk 2.5.1270.201', 'WOW64', 'QQBrowser/7.4.16830.400' ],
+name             => 'MSIE',
+original_name    => 'MSIE',
+original_version => 10,
+os               => 'Windows 7',
+parser           => 'msie',
+toolkit          => [ 'Trident', '6.0', '6.000' ],
+version          => '9.000',
+version_raw      => '9.0',

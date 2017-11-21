@@ -3,9 +3,10 @@ abstract: 'convert DBIx::Class schema to GraphQL schema'
 author:
   - 'Ed J <etj@cpan.org>'
 build_requires:
+  DBD::SQLite: '0'
   DBIx::Class::Schema: '0'
   ExtUtils::MakeMaker: '0'
-  GraphQL: '0.20'
+  GraphQL: '0.21'
   Test::More: '0.98'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -22,11 +23,11 @@ no_index:
     - inc
 requires:
   DBIx::Class::Schema: '0'
-  GraphQL: '0.20'
+  GraphQL: '0.21'
   perl: '5.014'
 resources:
   IRC: irc://irc.perl.org/#graphql-perl
   bugtracker: https://github.com/graphql-perl/GraphQL-Plugin-Convert-DBIC/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/graphql-perl/GraphQL-Plugin-Convert-DBIC
-version: '0.02'
+version: '0.03'

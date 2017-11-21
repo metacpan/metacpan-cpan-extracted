@@ -1,5 +1,5 @@
 package Moose::Exception::DelegationToAClassWhichIsNotLoaded;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -16,4 +16,5 @@ sub _build_message {
     "The ".$self->attribute->name." attribute is trying to delegate to a class which has not been loaded - ".$self->class_name;
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

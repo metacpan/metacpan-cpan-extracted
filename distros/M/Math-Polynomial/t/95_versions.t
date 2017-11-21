@@ -57,15 +57,15 @@ my $signature = Test::MyUtils::slurp_or_bail('SIGNATURE');
 if (
     $signature =~ m{
         ^-----BEGIN\s+PGP\s+SIGNED\s+MESSAGE-----\n
-        Hash:\s+(\S+)\n
+        Hash:\s+\S+\n
         \n
         (.*)
         ^-----BEGIN\s+PGP\s+SIGNATURE-----\n
     }msx
 ) {
-    my ($hash_type, $checksums_txt) = ($1, $2);
-    while ($checksums_txt =~ m/^\Q$hash_type\E ([a-f\d]+)\s+(.*)$/mgo) {
-        $checksums{$2} = [$hash_type, $1];
+    my $checksums_txt = $1;
+    while ($checksums_txt =~ m/^(\S+)\s+([a-f\d]+)\s+(.*)$/mgo) {
+        $checksums{$3} = [$1, $2];
     }
 }
 else {

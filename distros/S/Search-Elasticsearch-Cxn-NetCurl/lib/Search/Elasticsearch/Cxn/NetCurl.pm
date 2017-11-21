@@ -3,8 +3,8 @@ package Search::Elasticsearch::Cxn::NetCurl;
 use Moo;
 with 'Search::Elasticsearch::Role::Cxn', 'Search::Elasticsearch::Role::Is_Sync';
 
-use Search::Elasticsearch 5.02;
-our $VERSION = "5.02";
+use Search::Elasticsearch 6.00;
+our $VERSION = "6.00";
 
 use HTTP::Parser::XS qw(HEADERS_AS_HASHREF parse_http_response);
 use Try::Tiny;
@@ -24,6 +24,7 @@ use Net::Curl::Easy qw(
     CURLOPT_HEADERDATA
     CURLINFO_RESPONSE_CODE
     CURLOPT_TCP_NODELAY
+    CURLOPT_NOBODY
 );
 
 has 'connect_timeout' => ( is => 'ro', default => 2 );
@@ -46,6 +47,7 @@ sub perform_request {
     $handle->setopt( CURLOPT_TCP_NODELAY,   1 );
     $handle->setopt( CURLOPT_URL,           $uri );
     $handle->setopt( CURLOPT_CUSTOMREQUEST, $method );
+    $handle->setopt( CURLOPT_NOBODY,        1 ) if $method eq 'HEAD';
 
     $handle->setopt( CURLOPT_CONNECTTIMEOUT_MS, $self->connect_timeout * 1000 );
     $handle->setopt( CURLOPT_TIMEOUT_MS,
@@ -148,7 +150,7 @@ Search::Elasticsearch::Cxn::NetCurl - A Cxn implementation which uses libcurl vi
 
 =head1 VERSION
 
-version 5.02
+version 6.00
 
 =head1 DESCRIPTION
 

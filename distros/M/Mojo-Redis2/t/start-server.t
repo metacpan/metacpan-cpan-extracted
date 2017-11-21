@@ -1,6 +1,7 @@
 use Mojo::Base -strict;
 use Test::More;
 use Mojo::Redis2::Server;
+use POSIX ':sys_wait_h';
 my $pid;
 
 plan skip_all => 'Cannot test on Win32' if $^O eq 'MSWin32';
@@ -31,6 +32,12 @@ SKIP: {
   eval { $server->start };
   skip "redis-server is not installed: $@", 1 if $@;
   $pid = $server->pid;
+
+  my $child = fork // die "Fork failed: $!";
+  exit unless $child;
+  waitpid $child, 0;
+  waitpid $pid, WNOHANG;
+  ok kill(0, $pid), 'server is still running';
 }
 
 if ($pid) {

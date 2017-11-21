@@ -1,5 +1,13 @@
 Revision history for Net-CalDAVTalk
 
+0.12    Wed Nov 15 14:44 2017
+   - fix missing POD coverage
+   - add canSync response to GetCalendars
+
+0.11    Sun Nov 12 18:55 2017
+   - add GetEventLinks, GetEventsMulti and SyncEventLinks APIs
+   - $Net::CalDAVTalk::BATCHSIZE = 100 default for GetEventsMulti
+
 0.10    Wed Feb 15 16:46 2017
    - set the timezone on recurrences based on the top level timezone, not
      the recurrence timezone

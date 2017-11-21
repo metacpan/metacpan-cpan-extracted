@@ -1,8 +1,14 @@
 Revision history for Mojolicious-Plugin-Vparam
 
+3.03    15-11-2017
+    - No error for hash params if optional and value not set
+
+3.02    14-11-2017
+    - Add "json?" type
+
 3.00    27-06-2017
     - Fix version
-    
+
 2.2     26-06-2017
     - Fix bool type: now only true or false
     - Fix multijoin

@@ -4,39 +4,36 @@ author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires: {}
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4001, CPAN::Meta::Converter version 2.120921'
-license: open_source
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: circle-fe-gtk
 provides:
   Circle::FE::Gtk:
     file: lib/Circle/FE/Gtk.pm
-    version: 0.130560
+    version: '0.173170'
   Circle::FE::Gtk::Tab:
     file: lib/Circle/FE/Gtk/Tab.pm
-    version: 0
   Circle::FE::Gtk::Widget::Box:
     file: lib/Circle/FE/Gtk/Widget/Box.pm
-    version: 0
   Circle::FE::Gtk::Widget::Entry:
     file: lib/Circle/FE/Gtk/Widget/Entry.pm
-    version: 0
   Circle::FE::Gtk::Widget::Label:
     file: lib/Circle/FE/Gtk/Widget/Label.pm
-    version: 0
   Circle::FE::Gtk::Widget::Scroller:
     file: lib/Circle/FE/Gtk/Widget/Scroller.pm
-    version: 0
 requires:
-  File::ShareDir: 1.00
-  Glib: 0
-  Gtk2: 0
-  IO::Async: 0.14
-  IO::Async::Loop::Glib: 0
-  Net::Async::Tangence::Client: 0.08
-  Tangence::ObjectProxy: 0.18
+  File::ShareDir: '1.00'
+  Glib: '0'
+  Gtk2: '0'
+  IO::Async: '0.14'
+  IO::Async::Loop::Glib: '0'
+  Module::Pluggable: '0'
+  Net::Async::Tangence::Client: '0.13'
+  Tangence::ObjectProxy: '0.18'
 resources:
-  license: http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt
-version: 0.130560
+  license: http://dev.perl.org/licenses/
+version: '0.173170'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

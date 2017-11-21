@@ -32,4 +32,4 @@ my $closure;
 
 print (var_name($closure, $closure->()) eq '$aaa' ? "ok 4\n" : "not ok 4\n");
 
-require "vn-inc-1.pl";
+require "./vn-inc-1.pl";

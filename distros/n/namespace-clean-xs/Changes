@@ -1,5 +1,14 @@
 Revision history for namespace::clean::xs.
 
+#TODO: inline pieces from hv_delete when we already have an entry
+
+0.09 Tue Nov 21 01:54:49 MSK 2017
+    - skip threading tests on perl 5.10.0
+    - update docs
+
+0.08 Thu Nov 16 18:28:10 MSK 2017
+    - fix tests for perl 5.27.6
+
 0.07 Thu Jun  9 16:03:22 MSK 2016
     - fix compilation for older clang
 

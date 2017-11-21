@@ -1,0 +1,15 @@
+Testing anychar
+
+Testing default without options
+<AnyChar attribute="Match" context="#stay" String="aeiouy" />
+<Test>
+The Dog that is my friend.
+THE DOG THAT IS MY FRIEND.
+<Test>
+
+Testing insensitive
+<AnyChar attribute="Match" context="#stay" insensitive="true" String="aeiouy" />
+<TestI>
+The Dog that is my friend.
+THE DOG THAT IS MY FRIEND.
+<TestI>

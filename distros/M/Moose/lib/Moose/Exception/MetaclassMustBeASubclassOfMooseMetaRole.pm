@@ -1,5 +1,5 @@
 package Moose::Exception::MetaclassMustBeASubclassOfMooseMetaRole;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -10,4 +10,5 @@ sub _build_message {
     "The Metaclass ".$self->role_name." must be a subclass of Moose::Meta::Role."
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

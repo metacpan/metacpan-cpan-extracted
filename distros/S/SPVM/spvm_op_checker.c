@@ -15,7 +15,7 @@
 #include "spvm_sub.h"
 #include "spvm_constant.h"
 #include "spvm_field.h"
-#include "spvm_my_var.h"
+#include "spvm_my.h"
 #include "spvm_var.h"
 #include "spvm_enumeration_value.h"
 #include "spvm_type.h"
@@ -29,43 +29,37 @@
 #include "spvm_sub_check_info.h"
 #include "spvm_our.h"
 #include "spvm_package_var.h"
+#include "spvm_undef.h"
 
 SPVM_OP* SPVM_OP_CHECKEKR_new_op_var_tmp(SPVM_COMPILER* compiler, SPVM_TYPE* type, SPVM_SUB_CHECK_INFO* sub_check_info, const char* file, int32_t line) {
 
-  assert(sub_check_info->my_var_length <= SPVM_LIMIT_C_MY_VARS);
-  if (sub_check_info->my_var_length == SPVM_LIMIT_C_MY_VARS) {
-    SPVM_yyerror_format(compiler, "too many lexical variables(Temparay variable is created in new) at %s line %d\n", file, line);
-    compiler->fatal_error = 1;
-    return NULL;
-  }
-                    
   // Create temporary variable
-  // my_var
-  SPVM_MY_VAR* my_var = SPVM_MY_VAR_new(compiler);
+  // my
+  SPVM_MY* my = SPVM_MY_new(compiler);
 
   // Temparary variable name
   char* name = SPVM_COMPILER_ALLOCATOR_alloc_string(compiler, compiler->allocator, strlen("@tmp2147483647"));
-  sprintf(name, "@tmp%d", sub_check_info->my_var_tmp_index++);
+  sprintf(name, "@tmp%d", sub_check_info->my_tmp_index++);
   SPVM_OP* op_name = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_NAME, file, line);
   op_name->uv.name = name;
-  my_var->op_name = op_name;
+  my->op_name = op_name;
 
   // Set type to my var
-  my_var->op_type = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_TYPE, file, line);
-  my_var->op_type->uv.type = type;
+  my->op_type = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_TYPE, file, line);
+  my->op_type->uv.type = type;
 
   // Index
-  my_var->index = sub_check_info->my_var_length++;
+  my->index = sub_check_info->op_mys->length;
 
-  // op my_var
-  SPVM_OP* op_my_var = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_MY, file, line);
-  op_my_var->uv.my_var = my_var;
+  // op my
+  SPVM_OP* op_my = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_MY, file, line);
+  op_my->uv.my = my;
 
   // Add my var
-  SPVM_DYNAMIC_ARRAY_push(sub_check_info->op_my_vars, op_my_var);
-  SPVM_DYNAMIC_ARRAY_push(sub_check_info->op_my_var_stack, op_my_var);
+  SPVM_DYNAMIC_ARRAY_push(sub_check_info->op_mys, op_my);
+  SPVM_DYNAMIC_ARRAY_push(sub_check_info->op_my_stack, op_my);
   
-  SPVM_OP* op_var = SPVM_OP_new_op_var_from_op_my_var(compiler, op_my_var);
+  SPVM_OP* op_var = SPVM_OP_new_op_var_from_op_my(compiler, op_my);
   
   return op_var;
 }
@@ -152,7 +146,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
       SPVM_DYNAMIC_ARRAY* op_fields = package->op_fields;
 
       if (islower(package_name[0])) {
-        if (strcmp(package_name, "std") != 0) {
+        if (strcmp(package_name, "CORE") != 0) {
           SPVM_yyerror_format(compiler, "Package name \"%s\" must be start with upper case. Lowercase is reserved for core package  at %s line %d\n", package_name, op_package->file, op_package->line);
           compiler->fatal_error = 1;
           return;
@@ -249,11 +243,12 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
           SPVM_yyerror_format(compiler, "DESTROY argument type must be %s\n", package->op_name->uv.name, op_sub->file, op_sub->line);
         }
       }
+
+        
+      SPVM_SUB_CHECK_INFO* sub_check_info = SPVM_SUB_CHECK_INFO_new(compiler);
       
       // Only process normal subroutine
       if (!sub->is_native) {
-        
-        SPVM_SUB_CHECK_INFO* sub_check_info = SPVM_SUB_CHECK_INFO_new(compiler);
         
         // Run OPs
         SPVM_OP* op_base = SPVM_OP_get_op_block_from_op_sub(compiler, op_sub);
@@ -272,16 +267,16 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
             // Start scope
             case SPVM_OP_C_CODE_BLOCK: {
               
-              sub_check_info->block_my_var_base = sub_check_info->op_my_var_stack->length;
-              int32_t* block_my_var_base_ptr = SPVM_COMPILER_ALLOCATOR_alloc_int(compiler, compiler->allocator);
-              *block_my_var_base_ptr = sub_check_info->block_my_var_base;
-              SPVM_DYNAMIC_ARRAY_push(sub_check_info->block_my_var_base_stack, block_my_var_base_ptr);
+              int32_t block_my_base = sub_check_info->op_my_stack->length;
+              int32_t* block_my_base_ptr = SPVM_COMPILER_ALLOCATOR_alloc_int(compiler, compiler->allocator);
+              *block_my_base_ptr = block_my_base;
+              SPVM_DYNAMIC_ARRAY_push(sub_check_info->block_my_base_stack, block_my_base_ptr);
               
               if (op_cur->flag & SPVM_OP_C_FLAG_BLOCK_LOOP) {
-                SPVM_DYNAMIC_ARRAY_push(sub_check_info->loop_block_my_var_base_stack, block_my_var_base_ptr);
+                SPVM_DYNAMIC_ARRAY_push(sub_check_info->loop_block_my_base_stack, block_my_base_ptr);
               }
               else if (op_cur->flag & SPVM_OP_C_FLAG_BLOCK_EVAL) {
-                SPVM_DYNAMIC_ARRAY_push(sub_check_info->try_block_my_var_base_stack, block_my_var_base_ptr);
+                SPVM_DYNAMIC_ARRAY_push(sub_check_info->try_block_my_base_stack, block_my_base_ptr);
               }
               
               break;
@@ -297,7 +292,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
               // [START]Postorder traversal position
               switch (op_cur->code) {
                 case SPVM_OP_C_CODE_NEXT: {
-                  if (sub_check_info->loop_block_my_var_base_stack->length == 0) {
+                  if (sub_check_info->loop_block_my_base_stack->length == 0) {
                     SPVM_yyerror_format(compiler, "next statement must be in loop block at %s line %d\n", op_cur->file, op_cur->line);
                     compiler->fatal_error = 1;
                     return;
@@ -305,40 +300,10 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                   break;
                 }
                 case SPVM_OP_C_CODE_LAST: {
-                  if (sub_check_info->loop_block_my_var_base_stack->length == 0 && sub_check_info->op_switch_stack->length == 0) {
+                  if (sub_check_info->loop_block_my_base_stack->length == 0 && sub_check_info->op_switch_stack->length == 0) {
                     SPVM_yyerror_format(compiler, "last statement must be in loop block or switch block at %s line %d\n", op_cur->file, op_cur->line);
                     compiler->fatal_error = 1;
                     return;
-                  }
-                  break;
-                }
-                case SPVM_OP_C_CODE_POP: {
-                  if (op_cur->first->code == SPVM_OP_C_CODE_CALL_SUB) {
-                    SPVM_OP* op_call_sub = op_cur->first;
-                    
-                    const char* sub_name = op_call_sub->uv.call_sub->resolved_name;
-                    
-                    SPVM_OP* op_sub= SPVM_HASH_search(
-                      compiler->op_sub_symtable,
-                      sub_name,
-                      strlen(sub_name)
-                    );
-                    SPVM_SUB* sub = op_sub->uv.sub;
-                    
-                    if (sub->op_return_type->uv.type->code == SPVM_TYPE_C_CODE_VOID) {
-                      op_cur->code = SPVM_OP_C_CODE_NULL;
-                    }
-                  }
-                  else if (op_cur->first->code == SPVM_OP_C_CODE_ASSIGN) {
-                    op_cur->code = SPVM_OP_C_CODE_NULL;
-                  }
-                  else if (op_cur->first->code == SPVM_OP_C_CODE_VAR) {
-                    op_cur->code = SPVM_OP_C_CODE_NULL;
-                    op_cur->first->code = SPVM_OP_C_CODE_NULL;
-                  }
-                  else if (op_cur->first->code == SPVM_OP_C_CODE_ASSIGN_PROCESS && op_cur->first->first->code  == SPVM_OP_C_CODE_VAR) {
-                    op_cur->code = SPVM_OP_C_CODE_NULL;
-                    op_cur->first->first->code = SPVM_OP_C_CODE_NULL;
                   }
                   break;
                 }
@@ -451,12 +416,42 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                   }
                   break;
                 }
+                case SPVM_OP_C_CODE_BOOL: {
+                  SPVM_OP* op_first = op_cur->first;
+                  
+                  // undef
+                  if (op_first->code == SPVM_OP_C_CODE_UNDEF) {
+                    
+                    SPVM_OP* op_false = SPVM_OP_new_op_constant_int(compiler, 0, op_first->file, op_first->line);
+                    
+                    SPVM_OP* op_stab = SPVM_OP_cut_op(compiler, op_first);
+                    
+                    SPVM_OP_replace_op(compiler, op_stab, op_false);
+                    
+                    op_cur = op_false;
+                  }
+                  
+                  break;
+                }
                 case SPVM_OP_C_CODE_EQ: {
                   SPVM_OP* op_first = op_cur->first;
                   SPVM_OP* op_last = op_cur->last;
                   
                   // term == term
-                  if (op_first->code != SPVM_OP_C_CODE_UNDEF && op_last->code != SPVM_OP_C_CODE_UNDEF) {
+                  if (op_first->code == SPVM_OP_C_CODE_UNDEF && op_last->code == SPVM_OP_C_CODE_UNDEF) {
+                    
+                    SPVM_OP* op_true = SPVM_OP_new_op_constant_int(compiler, 1, op_first->file, op_first->line);
+                    SPVM_OP* op_bool = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_BOOL, op_first->file, op_first->line);
+                    
+                    SPVM_OP_insert_child(compiler, op_bool, op_bool->last, op_true);
+                    
+                    SPVM_OP* op_stab = SPVM_OP_cut_op(compiler, op_cur);
+                    
+                    SPVM_OP_replace_op(compiler, op_stab, op_bool);
+                    
+                    op_cur = op_true;
+                  }
+                  else if (op_first->code != SPVM_OP_C_CODE_UNDEF && op_last->code != SPVM_OP_C_CODE_UNDEF) {
                     SPVM_TYPE* first_type = SPVM_OP_get_type(compiler, op_cur->first);
                     SPVM_TYPE* last_type = SPVM_OP_get_type(compiler, op_cur->last);
                     
@@ -468,13 +463,13 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                         return;
                       }
                     }
-                    // core == OBJ
+                    // numeric == OBJ
                     else if (SPVM_TYPE_is_numeric(compiler, first_type)) {
                       SPVM_yyerror_format(compiler, "== left value must be object at %s line %d\n", op_cur->file, op_cur->line);
                       compiler->fatal_error = 1;
                       return;
                     }
-                    // OBJ == core
+                    // OBJ == numeric
                     else if (SPVM_TYPE_is_numeric(compiler, last_type)) {
                       SPVM_yyerror_format(compiler, "== right value must be object at %s line %d\n", op_cur->file, op_cur->line);
                       compiler->fatal_error = 1;
@@ -506,12 +501,25 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                   SPVM_OP* op_first = op_cur->first;
                   SPVM_OP* op_last = op_cur->last;
 
-                  // term == term
-                  if (op_first->code != SPVM_OP_C_CODE_UNDEF && op_last->code != SPVM_OP_C_CODE_UNDEF) {
+                  // term != term
+                  if (op_first->code == SPVM_OP_C_CODE_UNDEF && op_last->code == SPVM_OP_C_CODE_UNDEF) {
+                    
+                    SPVM_OP* op_false = SPVM_OP_new_op_constant_int(compiler, 0, op_first->file, op_first->line);
+                    SPVM_OP* op_bool = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_BOOL, op_first->file, op_first->line);
+                    
+                    SPVM_OP_insert_child(compiler, op_bool, op_bool->last, op_false);
+                    
+                    SPVM_OP* op_stab = SPVM_OP_cut_op(compiler, op_cur);
+                    
+                    SPVM_OP_replace_op(compiler, op_stab, op_bool);
+                    
+                    op_cur = op_false;
+                  }
+                  else if (op_first->code != SPVM_OP_C_CODE_UNDEF && op_last->code != SPVM_OP_C_CODE_UNDEF) {
                     SPVM_TYPE* first_type = SPVM_OP_get_type(compiler, op_cur->first);
                     SPVM_TYPE* last_type = SPVM_OP_get_type(compiler, op_cur->last);
 
-                    // core == core
+                    // numeric != numeric
                     if (SPVM_TYPE_is_numeric(compiler, first_type) && SPVM_TYPE_is_numeric(compiler, last_type)) {
                       if (first_type->code != last_type->code) {
                         SPVM_yyerror_format(compiler, "!= operator two operands must be same type at %s line %d\n", op_cur->file, op_cur->line);
@@ -519,20 +527,20 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                         return;
                       }
                     }
-                    // core == OBJ
+                    // numeric != OBJ
                     else if (SPVM_TYPE_is_numeric(compiler, first_type)) {
                       SPVM_yyerror_format(compiler, "!= left value must be object at %s line %d\n", op_cur->file, op_cur->line);
                       compiler->fatal_error = 1;
                       return;
                     }
-                    // OBJ == core
+                    // OBJ != numeric
                     else if (SPVM_TYPE_is_numeric(compiler, last_type)) {
                       SPVM_yyerror_format(compiler, "!= right value must be object at %s line %d\n", op_cur->file, op_cur->line);
                       compiler->fatal_error = 1;
                       return;
                     }
                   }
-                  // term == undef
+                  // term != undef
                   else if (op_first->code != SPVM_OP_C_CODE_UNDEF && op_last->code == SPVM_OP_C_CODE_UNDEF) {
                     SPVM_TYPE* first_type = SPVM_OP_get_type(compiler, op_cur->first);
 
@@ -542,7 +550,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                       return;
                     }
                   }
-                  // undef == term
+                  // undef != term
                   else if (op_first->code == SPVM_OP_C_CODE_UNDEF && op_last->code != SPVM_OP_C_CODE_UNDEF) {
                     SPVM_TYPE* last_type = SPVM_OP_get_type(compiler, op_cur->last);
 
@@ -572,14 +580,14 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                     return;
                   }
                   
-                  // Can receive only core type
+                  // Can receive only numeric type
                   if (!SPVM_TYPE_is_numeric(compiler, first_type)) {
-                    SPVM_yyerror_format(compiler, "< left value must be core type at %s line %d\n", op_cur->file, op_cur->line);
+                    SPVM_yyerror_format(compiler, "< left value must be numeric type at %s line %d\n", op_cur->file, op_cur->line);
                     compiler->fatal_error = 1;
                     return;
                   }
                   if (!SPVM_TYPE_is_numeric(compiler, last_type)) {
-                    SPVM_yyerror_format(compiler, "< right value must be core type at %s line %d\n", op_cur->file, op_cur->line);
+                    SPVM_yyerror_format(compiler, "< right value must be numeric type at %s line %d\n", op_cur->file, op_cur->line);
                     compiler->fatal_error = 1;
                     return;
                   }
@@ -609,14 +617,14 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                     return;
                   }
                                   
-                  // Can receive only core type
+                  // Can receive only numeric type
                   if (!SPVM_TYPE_is_numeric(compiler, first_type)) {
-                    SPVM_yyerror_format(compiler, "<= left value must be core type at %s line %d\n", op_cur->file, op_cur->line);
+                    SPVM_yyerror_format(compiler, "<= left value must be numeric type at %s line %d\n", op_cur->file, op_cur->line);
                     compiler->fatal_error = 1;
                     return;
                   }
                   if (!SPVM_TYPE_is_numeric(compiler, last_type)) {
-                    SPVM_yyerror_format(compiler, "<= right value must be core type at %s line %d\n", op_cur->file, op_cur->line);
+                    SPVM_yyerror_format(compiler, "<= right value must be numeric type at %s line %d\n", op_cur->file, op_cur->line);
                     compiler->fatal_error = 1;
                     return;
                   }
@@ -646,14 +654,14 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                     return;
                   }
                   
-                  // Can receive only core type
+                  // Can receive only numeric type
                   if (!SPVM_TYPE_is_numeric(compiler, first_type)) {
-                    SPVM_yyerror_format(compiler, "> left value must be core type at %s line %d\n", op_cur->file, op_cur->line);
+                    SPVM_yyerror_format(compiler, "> left value must be numeric type at %s line %d\n", op_cur->file, op_cur->line);
                     compiler->fatal_error = 1;
                     return;
                   }
                   if (!SPVM_TYPE_is_numeric(compiler, last_type)) {
-                    SPVM_yyerror_format(compiler, "> right value must be core type at %s line %d\n", op_cur->file, op_cur->line);
+                    SPVM_yyerror_format(compiler, "> right value must be numeric type at %s line %d\n", op_cur->file, op_cur->line);
                     compiler->fatal_error = 1;
                     return;
                   }
@@ -683,14 +691,14 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                     return;
                   }
                   
-                  // Can receive only core type
+                  // Can receive only numeric type
                   if (SPVM_TYPE_is_numeric(compiler, first_type) && !SPVM_TYPE_is_numeric(compiler, last_type)) {
-                    SPVM_yyerror_format(compiler, ">= left value must be core type at %s line %d\n", op_cur->file, op_cur->line);
+                    SPVM_yyerror_format(compiler, ">= left value must be numeric type at %s line %d\n", op_cur->file, op_cur->line);
                     compiler->fatal_error = 1;
                     return;
                   }
                   if (!SPVM_TYPE_is_numeric(compiler, first_type) && SPVM_TYPE_is_numeric(compiler, last_type)) {
-                    SPVM_yyerror_format(compiler, ">= right value must be core type at %s line %d\n", op_cur->file, op_cur->line);
+                    SPVM_yyerror_format(compiler, ">= right value must be numeric type at %s line %d\n", op_cur->file, op_cur->line);
                     compiler->fatal_error = 1;
                     return;
                   }
@@ -707,7 +715,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                   SPVM_TYPE* first_type = SPVM_OP_get_type(compiler, op_cur->first);
                   SPVM_TYPE* last_type = SPVM_OP_get_type(compiler, op_cur->last);
                   
-                  // Can receive only core type
+                  // Can receive only numeric type
                   if (!SPVM_TYPE_is_integral(compiler, first_type)) {
                     SPVM_yyerror_format(compiler, "<< operator left value must be integral at %s line %d\n", op_cur->file, op_cur->line);
                     compiler->fatal_error = 1;
@@ -725,7 +733,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                   SPVM_TYPE* first_type = SPVM_OP_get_type(compiler, op_cur->first);
                   SPVM_TYPE* last_type = SPVM_OP_get_type(compiler, op_cur->last);
                   
-                  // Can receive only core type
+                  // Can receive only numeric type
                   if (!SPVM_TYPE_is_integral(compiler, first_type)) {
                     SPVM_yyerror_format(compiler, ">> operator left value must be integral at %s line %d\n", op_cur->file, op_cur->line);
                     compiler->fatal_error = 1;
@@ -743,7 +751,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                   SPVM_TYPE* first_type = SPVM_OP_get_type(compiler, op_cur->first);
                   SPVM_TYPE* last_type = SPVM_OP_get_type(compiler, op_cur->last);
                   
-                  // Can receive only core type
+                  // Can receive only numeric type
                   if (!SPVM_TYPE_is_integral(compiler, first_type)) {
                     SPVM_yyerror_format(compiler, ">>> operator left value must be integral at %s line %d\n", op_cur->file, op_cur->line);
                     compiler->fatal_error = 1;
@@ -780,7 +788,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                     else {
                       if (SPVM_TYPE_is_numeric(compiler, type)) {
                         SPVM_yyerror_format(compiler,
-                          "new operator can't receive core type at %s line %d\n", op_cur->file, op_cur->line);
+                          "new operator can't receive numeric type at %s line %d\n", op_cur->file, op_cur->line);
                         compiler->fatal_error = 1;
                         return;
                       }
@@ -796,30 +804,6 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                   else {
                     assert(0);
                   }
-                  
-                  // If NEW is not rvalue, temparary variable is created, and assinged.
-                  if (!op_cur->rvalue) {
-                    
-                    // Create temporary variable
-                    SPVM_TYPE* var_type = SPVM_OP_get_type(compiler, op_cur->first);
-                    SPVM_OP* op_var_tmp = SPVM_OP_CHECKEKR_new_op_var_tmp(compiler, var_type, sub_check_info, op_cur->file, op_cur->line);
-                    if (op_var_tmp == NULL) {
-                      return;
-                    }
-                    
-                    // Cut new op
-                    SPVM_OP* op_new = op_cur;
-                    SPVM_OP* op_stab = SPVM_OP_cut_op(compiler, op_new);
-
-                    // Assing op
-                    SPVM_OP* op_assign = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_ASSIGN, op_cur->file, op_cur->line);
-                    SPVM_OP* op_build_assign = SPVM_OP_build_assign(compiler, op_assign, op_var_tmp, op_new);
-                    
-                    // Convert cur new op to var
-                    SPVM_OP_replace_op(compiler, op_stab, op_build_assign);
-                    
-                    op_cur = op_new;
-                  }
 
                   break;
                 }
@@ -827,7 +811,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                   SPVM_TYPE* first_type = SPVM_OP_get_type(compiler, op_cur->first);
                   SPVM_TYPE* last_type = SPVM_OP_get_type(compiler, op_cur->last);
                   
-                  // Can receive only core type
+                  // Can receive only numeric type
                   if (first_type->code >= SPVM_TYPE_C_CODE_FLOAT || last_type->code >= SPVM_TYPE_C_CODE_FLOAT) {
                     SPVM_yyerror_format(compiler,
                       "& operator can receive only integral type at %s line %d\n", op_cur->file, op_cur->line);
@@ -841,7 +825,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                   SPVM_TYPE* first_type = SPVM_OP_get_type(compiler, op_cur->first);
                   SPVM_TYPE* last_type = SPVM_OP_get_type(compiler, op_cur->last);
                   
-                  // Can receive only core type
+                  // Can receive only numeric type
                   if (first_type->code >= SPVM_TYPE_C_CODE_FLOAT || last_type->code >= SPVM_TYPE_C_CODE_FLOAT) {
                     SPVM_yyerror_format(compiler,
                       "& operator can receive only integral type at %s line %d\n", op_cur->file, op_cur->line);
@@ -855,7 +839,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                   SPVM_TYPE* first_type = SPVM_OP_get_type(compiler, op_cur->first);
                   SPVM_TYPE* last_type = SPVM_OP_get_type(compiler, op_cur->last);
                   
-                  // Can receive only core type
+                  // Can receive only numeric type
                   if (first_type->code >= SPVM_TYPE_C_CODE_FLOAT || last_type->code >= SPVM_TYPE_C_CODE_FLOAT) {
                     SPVM_yyerror_format(compiler,
                       "& operator can receive only integral type at %s line %d\n", op_cur->file, op_cur->line);
@@ -899,48 +883,83 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                 }
                 case SPVM_OP_C_CODE_ASSIGN: {
                   
-                  // Check left term
-                  if (op_cur->first->code == SPVM_OP_C_CODE_VAR
-                    || op_cur->first->code == SPVM_OP_C_CODE_PACKAGE_VAR
-                    || op_cur->first->code == SPVM_OP_C_CODE_ARRAY_ELEM
-                    || op_cur->first->code == SPVM_OP_C_CODE_CALL_FIELD
-                    || op_cur->first->code == SPVM_OP_C_CODE_EXCEPTION_VAR
-                  )
-                  {
-                    SPVM_TYPE* first_type = SPVM_OP_get_type(compiler, op_cur->first);
-                    SPVM_TYPE* last_type = SPVM_OP_get_type(compiler, op_cur->last);
-                    
-                    // Type inference
+                  SPVM_TYPE* first_type = SPVM_OP_get_type(compiler, op_cur->first);
+                  SPVM_TYPE* last_type = SPVM_OP_get_type(compiler, op_cur->last);
+                  
+                  // Type inference
+                  if (op_cur->first->code == SPVM_OP_C_CODE_VAR) {
                     if (!first_type) {
-                      SPVM_OP* op_var = op_cur->first;
-                      SPVM_MY_VAR* my_var = op_var->uv.var->op_my_var->uv.my_var;
                       first_type = last_type;
-                      
-                      if (last_type) {
-                        my_var->op_type->uv.type = last_type;
-                      }
-                      else {
-                        SPVM_yyerror_format(compiler, "Type can't be detected at %s line %d\n", op_cur->first->file, op_cur->first->line);
-                        compiler->fatal_error = 1;
-                        return;
-                      }
                     }
                     
-                    // It is OK that left type is object and right is undef
-                    if (!SPVM_TYPE_is_numeric(compiler, first_type) && !last_type) {
-                      // OK
-                    }
-                    // Invalid type
-                    else if (first_type->code != last_type->code) {
-                      SPVM_yyerror_format(compiler, "Invalid type value is assigned at %s line %d\n", op_cur->file, op_cur->line);
-                      compiler->fatal_error = 1;
-                      return;
+                    if (first_type) {
+                      SPVM_OP* op_var = op_cur->first;
+                      SPVM_MY* my = op_var->uv.var->op_my->uv.my;
+                      my->op_type->uv.type = first_type;
                     }
                   }
-                  else {
-                    SPVM_yyerror_format(compiler, "Can't assign to left at %s line %d\n", op_cur->file, op_cur->line);
+                  
+                  // Type can't be detected
+                  if (!first_type) {
+                    SPVM_yyerror_format(compiler, "Type can't be detected at %s line %d\n", op_cur->first->file, op_cur->first->line);
                     compiler->fatal_error = 1;
                     return;
+                  }
+                  
+                  // Can't assign undef to numeric value
+                  if (SPVM_TYPE_is_numeric(compiler, first_type) && op_cur->last->code == SPVM_OP_C_CODE_UNDEF) {
+                    SPVM_yyerror_format(compiler, "Can't assign undef to numeric type at %s line %d\n", op_cur->first->file, op_cur->first->line);
+                    compiler->fatal_error = 1;
+                    return;
+                  }
+                  
+                  // Copy left type to undef
+                  if (op_cur->last->code == SPVM_OP_C_CODE_UNDEF) {
+                    last_type = first_type;
+                    op_cur->last->uv.undef->type = last_type;
+                  }
+                  
+                  // Invalid if left type is different to right value
+                  if (first_type->code != last_type->code) {
+                    SPVM_yyerror_format(compiler, "Invalid type value is assigned at %s line %d\n", op_cur->file, op_cur->line);
+                    compiler->fatal_error = 1;
+                    return;
+                  }
+                  
+                  if (op_cur->first->code == SPVM_OP_C_CODE_VAR) {
+                    if (op_cur->last->code == SPVM_OP_C_CODE_CONCAT_STRING) {
+                      int32_t index_out = SPVM_OP_get_my_index(compiler, op_cur->first);
+                      
+                      if (op_cur->last->first->code == SPVM_OP_C_CODE_VAR) {
+                        int32_t index_in1 = SPVM_OP_get_my_index(compiler, op_cur->last->first);
+                        if (index_out == index_in1) {
+                          op_cur->last->first->uv.var->create_tmp_var = 1;
+                        }
+                      }
+                      
+                      if (op_cur->last->last->code == SPVM_OP_C_CODE_VAR) {
+                        int32_t index_in2 = SPVM_OP_get_my_index(compiler, op_cur->last->last);
+                        if (index_out == index_in2) {
+                          op_cur->last->last->uv.var->create_tmp_var = 1;
+                        }
+                      }
+                    }
+                    else if (op_cur->last->code == SPVM_OP_C_CODE_CALL_SUB) {
+                      int32_t index_out = SPVM_OP_get_my_index(compiler, op_cur->first);
+                      
+                      // Push args
+                      SPVM_OP* op_args =op_cur->last->last;
+                      SPVM_OP* op_arg = op_args->first;
+                      while ((op_arg = SPVM_OP_sibling(compiler, op_arg))) {
+                        if (op_arg->code == SPVM_OP_C_CODE_VAR) {
+                          int32_t index_arg = SPVM_OP_get_my_index(compiler, op_arg);
+                          if (index_arg == index_out) {
+                            op_arg->uv.var->create_tmp_var = 1;
+                            break;
+                          }
+                        }
+                      }
+                    }
                   }
                   
                   break;
@@ -964,6 +983,9 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                       else {
                         if (SPVM_TYPE_is_numeric(compiler, sub_return_type)) {
                           is_invalid = 1;
+                        }
+                        else {
+                          op_term->uv.undef->type = sub_return_type;
                         }
                       }
                     }
@@ -991,9 +1013,21 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                 case SPVM_OP_C_CODE_NEGATE: {
                   SPVM_TYPE* first_type = SPVM_OP_get_type(compiler, op_cur->first);
                   
-                  // Must be int, long, float, double
+                  // Must be numeric type
                   if (!SPVM_TYPE_is_numeric(compiler, first_type)) {
-                    SPVM_yyerror_format(compiler, "Type of - operator right value must be int, long, float, double at %s line %d\n", op_cur->file, op_cur->line);
+                    SPVM_yyerror_format(compiler, "- operator right value must be numeric type at %s line %d\n", op_cur->file, op_cur->line);
+                    compiler->fatal_error = 1;
+                    return;
+                  }
+                  
+                  break;
+                }
+                case SPVM_OP_C_CODE_COMPLEMENT: {
+                  SPVM_TYPE* first_type = SPVM_OP_get_type(compiler, op_cur->first);
+                  
+                  // Must be numeric type
+                  if (!SPVM_TYPE_is_integral(compiler, first_type)) {
+                    SPVM_yyerror_format(compiler, "~ operator right value must be integral type at %s line %d\n", op_cur->file, op_cur->line);
                     compiler->fatal_error = 1;
                     return;
                   }
@@ -1003,9 +1037,9 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                 case SPVM_OP_C_CODE_PLUS: {
                   SPVM_TYPE* first_type = SPVM_OP_get_type(compiler, op_cur->first);
                   
-                  // Must be int, long, float, double
+                  // Must be numeric type
                   if (!SPVM_TYPE_is_numeric(compiler, first_type)) {
-                    SPVM_yyerror_format(compiler, "Type of + operator right value must be int, long, float, double at %s line %d\n", op_cur->file, op_cur->line);
+                    SPVM_yyerror_format(compiler, "+ operator right value must be numeric type at %s line %d\n", op_cur->file, op_cur->line);
                     compiler->fatal_error = 1;
                     return;
                   }
@@ -1032,14 +1066,14 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                   
                   // Must be same type
                   if (first_type->code != last_type->code) {
-                    SPVM_yyerror_format(compiler, "Type of + operator left and right value must be same at %s line %d\n", op_cur->file, op_cur->line);
+                    SPVM_yyerror_format(compiler, "+ operator left and right value must be same at %s line %d\n", op_cur->file, op_cur->line);
                     compiler->fatal_error = 1;
                     return;
                   }
                                                   
-                  // Value must be int, long, float, double
+                  // Value must be numeric type
                   if (!SPVM_TYPE_is_numeric(compiler, first_type)) {
-                    SPVM_yyerror_format(compiler, "Type of + operator left and right value must be core type at %s line %d\n", op_cur->file, op_cur->line);
+                    SPVM_yyerror_format(compiler, "+ operator left and right value must be numeric type at %s line %d\n", op_cur->file, op_cur->line);
                     compiler->fatal_error = 1;
                     return;
                   }
@@ -1066,14 +1100,14 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                   
                   // Must be same type
                   if (first_type->code != last_type->code) {
-                    SPVM_yyerror_format(compiler, "Type of - operator left and right value must be same at %s line %d\n", op_cur->file, op_cur->line);
+                    SPVM_yyerror_format(compiler, "- operator left and right value must be same at %s line %d\n", op_cur->file, op_cur->line);
                     compiler->fatal_error = 1;
                     return;
                   }
                                                   
-                  // Value must be int, long, float, double
+                  // Value must be numeric type
                   if (!SPVM_TYPE_is_numeric(compiler, first_type)) {
-                    SPVM_yyerror_format(compiler, "Type of - operator left and right value must be core type at %s line %d\n", op_cur->file, op_cur->line);
+                    SPVM_yyerror_format(compiler, "- operator left and right value must be numeric type at %s line %d\n", op_cur->file, op_cur->line);
                     compiler->fatal_error = 1;
                     return;
                   }
@@ -1096,26 +1130,6 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                     SPVM_yyerror_format(compiler, ". operator right value must be numeric or string at %s line %d\n", op_cur->file, op_cur->line);
                     compiler->fatal_error = 1;
                     return;
-                  }
-                  
-                  if (!op_cur->rvalue) {
-                    // Create temporary variable
-                    SPVM_TYPE* var_type = SPVM_TYPE_get_string_type(compiler);
-                    SPVM_OP* op_var_tmp = SPVM_OP_CHECKEKR_new_op_var_tmp(compiler, var_type, sub_check_info, op_cur->file, op_cur->line);
-                    if (op_var_tmp == NULL) {
-                      return;
-                    }
-                    
-                    // Cut new op
-                    SPVM_OP* op_concat_string = op_cur;
-                    SPVM_OP* op_stab = SPVM_OP_cut_op(compiler, op_concat_string);
-
-                    // Assing op
-                    SPVM_OP* op_assign = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_ASSIGN, op_cur->file, op_cur->line);
-                    SPVM_OP* op_build_assign = SPVM_OP_build_assign(compiler, op_assign, op_var_tmp, op_concat_string);
-                    
-                    // Convert cur new op to var
-                    SPVM_OP_replace_op(compiler, op_stab, op_build_assign);
                   }
                   
                   // If left type is not string, add another concat
@@ -1149,44 +1163,6 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                     SPVM_OP_insert_child(compiler, op_concat_string2, op_concat_string2->last, op_term1);
                     
                     SPVM_OP_replace_op(compiler, op_stab, op_concat_string2);
-                    
-                    {
-                      // Create temporary variable for concat_string2
-                      SPVM_TYPE* var_type = SPVM_TYPE_get_string_type(compiler);
-                      SPVM_OP* op_var_tmp = SPVM_OP_CHECKEKR_new_op_var_tmp(compiler, var_type, sub_check_info, op_cur->file, op_cur->line);
-                      if (op_var_tmp == NULL) {
-                        return;
-                      }
-                      
-                      // Cut new op
-                      SPVM_OP* op_stab = SPVM_OP_cut_op(compiler, op_concat_string2);
-
-                      // Assing op
-                      SPVM_OP* op_assign = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_ASSIGN, op_cur->file, op_cur->line);
-                      SPVM_OP* op_build_assign = SPVM_OP_build_assign(compiler, op_assign, op_var_tmp, op_concat_string2);
-                      
-                      // Convert cur new op to var
-                      SPVM_OP_replace_op(compiler, op_stab, op_build_assign);
-                    }
-
-                    {
-                      // Create temporary variable for new
-                      SPVM_TYPE* var_type = SPVM_TYPE_get_string_type(compiler);
-                      SPVM_OP* op_var_tmp = SPVM_OP_CHECKEKR_new_op_var_tmp(compiler, var_type, sub_check_info, op_cur->file, op_cur->line);
-                      if (op_var_tmp == NULL) {
-                        return;
-                      }
-                      
-                      // Cut new op
-                      SPVM_OP* op_stab = SPVM_OP_cut_op(compiler, op_build_constant);
-
-                      // Assing op
-                      SPVM_OP* op_assign = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_ASSIGN, op_cur->file, op_cur->line);
-                      SPVM_OP* op_build_assign = SPVM_OP_build_assign(compiler, op_assign, op_var_tmp, op_build_constant);
-                      
-                      // Convert cur new op to var
-                      SPVM_OP_replace_op(compiler, op_stab, op_build_assign);
-                    }                    
                   }
                   
                   break;
@@ -1211,14 +1187,14 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                   
                   // Must be same type
                   if (first_type->code != last_type->code) {
-                    SPVM_yyerror_format(compiler, "Type of * operator left and right value must be same at %s line %d\n", op_cur->file, op_cur->line);
+                    SPVM_yyerror_format(compiler, "* operator left and right value must be same at %s line %d\n", op_cur->file, op_cur->line);
                     compiler->fatal_error = 1;
                     return;
                   }
                                                   
-                  // Value must be int, long, float, double
+                  // Value must be numeric type
                   if (!SPVM_TYPE_is_numeric(compiler, first_type)) {
-                    SPVM_yyerror_format(compiler, "Type of * operator left and right value must be core type at %s line %d\n", op_cur->file, op_cur->line);
+                    SPVM_yyerror_format(compiler, "* operator left and right value must be numeric type at %s line %d\n", op_cur->file, op_cur->line);
                     compiler->fatal_error = 1;
                     return;
                   }
@@ -1245,14 +1221,14 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                   
                   // Must be same type
                   if (first_type->code != last_type->code) {
-                    SPVM_yyerror_format(compiler, "Type of / operator left and right value must be same at %s line %d\n", op_cur->file, op_cur->line);
+                    SPVM_yyerror_format(compiler, "/ operator left and right value must be same at %s line %d\n", op_cur->file, op_cur->line);
                     compiler->fatal_error = 1;
                     return;
                   }
                                                   
-                  // Value must be int, long, float, double
+                  // Value must be numeric type
                   if (!SPVM_TYPE_is_numeric(compiler, first_type)) {
-                    SPVM_yyerror_format(compiler, "Type of / operator left and right value must be core type at %s line %d\n", op_cur->file, op_cur->line);
+                    SPVM_yyerror_format(compiler, "/ operator left and right value must be numeric type at %s line %d\n", op_cur->file, op_cur->line);
                     compiler->fatal_error = 1;
                     return;
                   }
@@ -1279,14 +1255,14 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                   
                   // Must be same type
                   if (first_type->code != last_type->code) {
-                    SPVM_yyerror_format(compiler, "Type of % operator left and right value must be same at %s line %d\n", op_cur->file, op_cur->line);
+                    SPVM_yyerror_format(compiler, "% operator left and right value must be same at %s line %d\n", op_cur->file, op_cur->line);
                     compiler->fatal_error = 1;
                     return;
                   }
                                                   
-                  // Value must be int, long, float, double
+                  // Value must be numeric type
                   if (!SPVM_TYPE_is_numeric(compiler, first_type)) {
-                    SPVM_yyerror_format(compiler, "Type of % operator left and right value must be core type at %s line %d\n", op_cur->file, op_cur->line);
+                    SPVM_yyerror_format(compiler, "% operator left and right value must be numeric type at %s line %d\n", op_cur->file, op_cur->line);
                     compiler->fatal_error = 1;
                     return;
                   }
@@ -1294,12 +1270,16 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                   break;
                 }
                 case SPVM_OP_C_CODE_CROAK: {
-                  SPVM_TYPE* first_type = SPVM_OP_get_type(compiler, op_cur->first);
-                  
-                  if (!first_type || first_type->code != SPVM_TYPE_C_CODE_STRING) {
-                    SPVM_yyerror_format(compiler, "croak argument type must be String at %s line %d\n", op_cur->file, op_cur->line);
-                    compiler->fatal_error = 1;
-                    return;
+                  if (op_cur->first->code == SPVM_OP_C_CODE_UNDEF) {
+                    op_cur->first->uv.undef->type = SPVM_TYPE_get_string_type(compiler);
+                  }
+                  else {
+                    SPVM_TYPE* first_type = SPVM_OP_get_type(compiler, op_cur->first);
+                    if (first_type->code != SPVM_TYPE_C_CODE_STRING) {
+                      SPVM_yyerror_format(compiler, "croak argument type must be String at %s line %d\n", op_cur->file, op_cur->line);
+                      compiler->fatal_error = 1;
+                      return;
+                    }
                   }
                   break;
                 }
@@ -1309,7 +1289,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                 case SPVM_OP_C_CODE_POST_DEC: {
                   SPVM_OP* op_first = op_cur->first;
                   if (op_first->code != SPVM_OP_C_CODE_VAR) {
-                    SPVM_yyerror_format(compiler, "invalid lvalue in increment at %s line %d\n", op_cur->file, op_cur->line);
+                    SPVM_yyerror_format(compiler, "invalid is_assign_left in increment at %s line %d\n", op_cur->file, op_cur->line);
                     compiler->fatal_error = 1;
                     return;
                   }
@@ -1317,12 +1297,12 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                   
                   // Only int or long
                   if (first_type->code > SPVM_TYPE_C_CODE_LONG) {
-                    SPVM_yyerror_format(compiler, "Type of increment or decrement target must be integral at %s line %d\n", op_cur->file, op_cur->line);
+                    SPVM_yyerror_format(compiler, "increment or decrement target must be integral at %s line %d\n", op_cur->file, op_cur->line);
                     compiler->fatal_error = 1;
                     return;
                   }
                   
-                  op_cur->first->lvalue = 1;
+                  op_cur->first->is_assign_left = 1;
                   
                   break;
                 }
@@ -1336,36 +1316,36 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                   op_block_loop->sibparent = op_condition;
                   op_condition->moresib = 0;
                   op_condition->sibparent = op_cur;
+                  
+                  
+                  
                   break;
                 }
                 // End of scope
                 case SPVM_OP_C_CODE_BLOCK: {
                   // Pop block my variable base
-                  assert(sub_check_info->block_my_var_base_stack->length > 0);
-                  int32_t* block_my_var_base_ptr = SPVM_DYNAMIC_ARRAY_pop(sub_check_info->block_my_var_base_stack);
-                  sub_check_info->block_my_var_base = *block_my_var_base_ptr;
+                  assert(sub_check_info->block_my_base_stack->length > 0);
+                  int32_t* block_my_base_ptr = SPVM_DYNAMIC_ARRAY_pop(sub_check_info->block_my_base_stack);
+                  int32_t block_my_base = *block_my_base_ptr;
+                    
+                  int32_t my_stack_pop_count = sub_check_info->op_my_stack->length - block_my_base;
+                  
+                  {
+                    int32_t i;
+                    for (i = 0; i < my_stack_pop_count; i++) {
+                      SPVM_DYNAMIC_ARRAY_pop(sub_check_info->op_my_stack);
+                    }
+                  }
 
                   // Pop loop block my variable base
                   if (op_cur->flag & SPVM_OP_C_FLAG_BLOCK_LOOP) {
-                    assert(sub_check_info->loop_block_my_var_base_stack->length > 0);
-                    SPVM_DYNAMIC_ARRAY_pop(sub_check_info->loop_block_my_var_base_stack);
+                    assert(sub_check_info->loop_block_my_base_stack->length > 0);
+                    SPVM_DYNAMIC_ARRAY_pop(sub_check_info->loop_block_my_base_stack);
                   }
                   // Pop try block my variable base
                   else if (op_cur->flag & SPVM_OP_C_FLAG_BLOCK_EVAL) {
-                    assert(sub_check_info->try_block_my_var_base_stack->length > 0);
-                    SPVM_DYNAMIC_ARRAY_pop(sub_check_info->try_block_my_var_base_stack);
-                  }
-                  
-                  if (sub_check_info->block_my_var_base_stack->length > 0) {
-                    int32_t* before_block_my_var_base_ptr = SPVM_DYNAMIC_ARRAY_fetch(
-                      sub_check_info->block_my_var_base_stack,
-                      sub_check_info->block_my_var_base_stack->length - 1
-                    );
-                    int32_t before_block_my_var_base = *before_block_my_var_base_ptr;
-                    sub_check_info->block_my_var_base = before_block_my_var_base;
-                  }
-                  else {
-                    sub_check_info->block_my_var_base = 0;
+                    assert(sub_check_info->try_block_my_base_stack->length > 0);
+                    SPVM_DYNAMIC_ARRAY_pop(sub_check_info->try_block_my_base_stack);
                   }
                   
                   break;
@@ -1376,22 +1356,22 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                   SPVM_VAR* var = op_cur->uv.var;
                   
                   // Search same name variable
-                  SPVM_OP* op_my_var = NULL;
+                  SPVM_OP* found_op_my = NULL;
                   {
                     int32_t i;
-                    for (i = sub_check_info->op_my_var_stack->length; i-- > 0; ) {
-                      SPVM_OP* op_my_var_tmp = SPVM_DYNAMIC_ARRAY_fetch(sub_check_info->op_my_var_stack, i);
-                      SPVM_MY_VAR* my_var_tmp = op_my_var_tmp->uv.my_var;
-                      if (strcmp(var->op_name->uv.name, my_var_tmp->op_name->uv.name) == 0) {
-                        op_my_var = op_my_var_tmp;
+                    for (i = sub_check_info->op_my_stack->length - 1; i >= 0; i--) {
+                      SPVM_OP* op_my = SPVM_DYNAMIC_ARRAY_fetch(sub_check_info->op_my_stack, i);
+                      SPVM_MY* my = op_my->uv.my;
+                      if (strcmp(var->op_name->uv.name, my->op_name->uv.name) == 0) {
+                        found_op_my = op_my;
                         break;
                       }
                     }
                   }
                   
-                  if (op_my_var) {
+                  if (found_op_my) {
                     // Add my var information to var
-                    var->op_my_var = op_my_var;
+                    var->op_my = found_op_my;
                   }
                   else {
                     // Error
@@ -1402,24 +1382,24 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                   break;
                 }
                 case SPVM_OP_C_CODE_MY: {
-                  SPVM_MY_VAR* my_var = op_cur->uv.my_var;
-                  
-                  assert(sub_check_info->my_var_length <= SPVM_LIMIT_C_MY_VARS);
-                  if (sub_check_info->my_var_length == SPVM_LIMIT_C_MY_VARS) {
-                    SPVM_yyerror_format(compiler, "too many lexical variables, my \"%s\" ignored at %s line %d\n", my_var->op_name->uv.name, op_cur->file, op_cur->line);
-                    compiler->fatal_error = 1;
-                    return;
-                  }
+                  SPVM_MY* my = op_cur->uv.my;
                   
                   // Search same name variable
                   _Bool found = 0;
                   
+                  int32_t* block_my_base_ptr = SPVM_DYNAMIC_ARRAY_fetch(
+                    sub_check_info->block_my_base_stack,
+                    sub_check_info->block_my_base_stack->length - 1
+                  );
+                  
+                  int32_t block_my_base = *block_my_base_ptr;
+                  
                   {
                     int32_t i;
-                    for (i = sub_check_info->op_my_var_stack->length; i-- > sub_check_info->block_my_var_base; ) {
-                      SPVM_OP* op_bef_my_var = SPVM_DYNAMIC_ARRAY_fetch(sub_check_info->op_my_var_stack, i);
-                      SPVM_MY_VAR* bef_my_var = op_bef_my_var->uv.my_var;
-                      if (strcmp(my_var->op_name->uv.name, bef_my_var->op_name->uv.name) == 0) {
+                    for (i = block_my_base; i < sub_check_info->op_my_stack->length; i++) {
+                      SPVM_OP* op_bef_my = SPVM_DYNAMIC_ARRAY_fetch(sub_check_info->op_my_stack, i);
+                      SPVM_MY* bef_my = op_bef_my->uv.my;
+                      if (strcmp(my->op_name->uv.name, bef_my->op_name->uv.name) == 0) {
                         found = 1;
                         break;
                       }
@@ -1427,14 +1407,14 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                   }
                   
                   if (found) {
-                    SPVM_yyerror_format(compiler, "redeclaration of my \"%s\" at %s line %d\n", my_var->op_name->uv.name, op_cur->file, op_cur->line);
+                    SPVM_yyerror_format(compiler, "redeclaration of my \"%s\" at %s line %d\n", my->op_name->uv.name, op_cur->file, op_cur->line);
                     compiler->fatal_error = 1;
                     return;
                   }
                   else {
-                    my_var->index = sub_check_info->my_var_length++;
-                    SPVM_DYNAMIC_ARRAY_push(sub_check_info->op_my_vars, op_cur);
-                    SPVM_DYNAMIC_ARRAY_push(sub_check_info->op_my_var_stack, op_cur);
+                    my->index = sub_check_info->op_mys->length;
+                    SPVM_DYNAMIC_ARRAY_push(sub_check_info->op_mys, op_cur);
+                    SPVM_DYNAMIC_ARRAY_push(sub_check_info->op_my_stack, op_cur);
                   }
                   
                   break;
@@ -1442,7 +1422,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                 case SPVM_OP_C_CODE_CALL_SUB: {
                   
                   // Check sub name
-                  SPVM_OP_resolve_call_sub(compiler, op_cur);
+                  SPVM_OP_resolve_call_sub(compiler, op_cur, op_package);
                   
                   SPVM_OP* op_list_args = op_cur->last;
                   
@@ -1450,7 +1430,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
 
                   if (!call_sub->sub) {
                     SPVM_yyerror_format(compiler, "unknown sub \"%s\" at %s line %d\n",
-                      call_sub->resolved_name, op_cur->file, op_cur->line);
+                      op_cur->first->uv.name, op_cur->file, op_cur->line);
                     compiler->fatal_error = 1;
                     return;
                   }
@@ -1470,14 +1450,18 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                     
                     _Bool is_invalid = 0;
                     
-                    SPVM_OP* op_sub_arg_my_var = SPVM_DYNAMIC_ARRAY_fetch(call_sub->sub->op_args, call_sub_args_count - 1);
+                    SPVM_OP* op_sub_arg_my = SPVM_DYNAMIC_ARRAY_fetch(call_sub->sub->op_args, call_sub_args_count - 1);
                     
-                    SPVM_TYPE* sub_arg_type = SPVM_OP_get_type(compiler, op_sub_arg_my_var);
+                    SPVM_TYPE* sub_arg_type = SPVM_OP_get_type(compiler, op_sub_arg_my);
                     
                     // Undef
                     if (op_term->code == SPVM_OP_C_CODE_UNDEF) {
                       if (SPVM_TYPE_is_numeric(compiler, sub_arg_type)) {
                         is_invalid = 1;
+                      }
+                      else {
+                        // Set undef type
+                        op_term->uv.undef->type = sub_arg_type;
                       }
                     }
                     // Normal
@@ -1489,7 +1473,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                       }
                     }
                     if (is_invalid) {
-                      SPVM_yyerror_format(compiler, "Type of %d argument must be %s(%s()) at %s line %d\n", (int)call_sub_args_count, sub_arg_type->name, sub_abs_name, op_cur->file, op_cur->line);
+                      SPVM_yyerror_format(compiler, "%d argument must be %s (%s()) at %s line %d\n", (int)call_sub_args_count, sub_arg_type->name, sub_abs_name, op_cur->file, op_cur->line);
                       compiler->fatal_error = 1;
                       return;
                     }
@@ -1512,39 +1496,12 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                     break;
                   }
                   
-                  SPVM_TYPE* return_type = SPVM_OP_get_type(compiler, call_sub->sub->op_return_type);
-                  
-                  // If CALL_SUB is is not rvalue and return type is object, temparary variable is created, and assinged.
-                  if (!op_cur->rvalue && (return_type->code != SPVM_TYPE_C_CODE_VOID && !SPVM_TYPE_is_numeric(compiler, return_type))) {
-
-                    // Create temporary variable
-                    SPVM_TYPE* var_type = SPVM_OP_get_type(compiler, call_sub->sub->op_return_type);
-                    SPVM_OP* op_var_tmp = SPVM_OP_CHECKEKR_new_op_var_tmp(compiler, var_type, sub_check_info, op_cur->file, op_cur->line);
-                    if (op_var_tmp == NULL) {
-                      return;
-                    }
-                    
-                    // New op
-                    SPVM_OP* op_call_sub = op_cur;
-                    SPVM_OP* op_stab = SPVM_OP_cut_op(compiler, op_call_sub);
-
-                    // Assing op
-                    SPVM_OP* op_assign = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_ASSIGN, op_cur->file, op_cur->line);
-                    SPVM_OP* op_build_assign = SPVM_OP_build_assign(compiler, op_assign, op_var_tmp, op_call_sub);
-                    
-                    // Convert cur call_sub op to var
-                    SPVM_OP_replace_op(compiler, op_stab, op_build_assign);
-                    op_call_sub->uv.call_sub = call_sub;
-                    
-                    op_cur = op_call_sub;
-                  }
-                  
                   break;
                 }
                 case SPVM_OP_C_CODE_PACKAGE_VAR: {
                   
                   // Check field name
-                  SPVM_OP_resolve_package_var(compiler, op_cur);
+                  SPVM_OP_resolve_package_var(compiler, op_cur, op_package);
                   if (!op_cur->uv.package_var->op_our) {
                     SPVM_yyerror_format(compiler, "Package variable not found \"%s\" at %s line %d\n",
                       op_cur->uv.package_var->op_name->uv.name, op_cur->file, op_cur->line);
@@ -1556,7 +1513,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                   
                   if (package != our->op_package->uv.package) {
                     SPVM_yyerror_format(compiler, "Package variable is private \"%s\" \"%s\" at %s line %d\n",
-                      our->op_package->uv.package->op_name->uv.name, our->op_var->uv.var->op_name->uv.name, op_cur->file, op_cur->line);
+                      our->op_package->uv.package->op_name->uv.name, our->op_package_var->uv.package_var->op_name->uv.name, op_cur->file, op_cur->line);
                   }
                   
                   break;
@@ -1565,7 +1522,7 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
                   SPVM_OP* op_term_invocker = op_cur->first;
                   SPVM_OP* op_name = op_cur->last;
                   
-                  if (op_term_invocker->code == SPVM_OP_C_CODE_ASSIGN_PROCESS) {
+                  if (op_term_invocker->code == SPVM_OP_C_CODE_ASSIGN) {
                     op_term_invocker = op_term_invocker->first;
                   }
                   
@@ -1665,10 +1622,137 @@ void SPVM_OP_CHECKER_check(SPVM_COMPILER* compiler) {
           }
         }
         // Set my var information
-        sub->op_my_vars = sub_check_info->op_my_vars;
+        sub->op_mys = sub_check_info->op_mys;
         
         // Operand stack max
         sub->operand_stack_max = sub_check_info->op_count * 2;
+      }
+
+      if (!sub->is_native) {
+        // Run OPs
+        SPVM_OP* op_base = SPVM_OP_get_op_block_from_op_sub(compiler, op_sub);
+        SPVM_OP* op_cur = op_base;
+        _Bool finish = 0;
+        while (op_cur) {
+          
+          if (op_cur->first) {
+            op_cur = op_cur->first;
+          }
+          else {
+            while (1) {
+              // Create temporary variable for no is_var_assign_right term witch is not variable
+              int32_t create_tmp_var = 0;
+              SPVM_TYPE* tmp_var_type = SPVM_OP_get_type(compiler, op_cur);
+              
+              // [START]Postorder traversal position
+              if (!op_cur->is_assign_left && !op_cur->is_var_assign_right) {
+                switch (op_cur->code) {
+                  case SPVM_OP_C_CODE_ADD:
+                  case SPVM_OP_C_CODE_SUBTRACT:
+                  case SPVM_OP_C_CODE_MULTIPLY:
+                  case SPVM_OP_C_CODE_DIVIDE:
+                  case SPVM_OP_C_CODE_BIT_AND:
+                  case SPVM_OP_C_CODE_BIT_OR:
+                  case SPVM_OP_C_CODE_BIT_XOR:
+                  case SPVM_OP_C_CODE_BIT_NOT:
+                  case SPVM_OP_C_CODE_REMAINDER:
+                  case SPVM_OP_C_CODE_LEFT_SHIFT:
+                  case SPVM_OP_C_CODE_RIGHT_SHIFT:
+                  case SPVM_OP_C_CODE_RIGHT_SHIFT_UNSIGNED:
+                  case SPVM_OP_C_CODE_COMPLEMENT:
+                  case SPVM_OP_C_CODE_NEGATE:
+                  case SPVM_OP_C_CODE_PLUS:
+                  case SPVM_OP_C_CODE_CONVERT:
+                  case SPVM_OP_C_CODE_ARRAY_LENGTH:
+                  case SPVM_OP_C_CODE_NEW:
+                  case SPVM_OP_C_CODE_CONCAT_STRING:
+                  case SPVM_OP_C_CODE_EXCEPTION_VAR:
+                  case SPVM_OP_C_CODE_PACKAGE_VAR:
+                  case SPVM_OP_C_CODE_ARRAY_ELEM:
+                  case SPVM_OP_C_CODE_SWITCH_CONDITION:
+                    create_tmp_var = 1;
+                    break;
+                  case SPVM_OP_C_CODE_UNDEF: {
+                    if (op_cur->uv.undef->type) {
+                      create_tmp_var = 1;
+                    }
+                    break;
+                  }
+                  case SPVM_OP_C_CODE_CONSTANT: {
+                    if (SPVM_TYPE_is_numeric(compiler, tmp_var_type) && op_cur->flag != SPVM_OP_C_FLAG_CONSTANT_CASE) {
+                      create_tmp_var = 1;
+                    }
+                    break;
+                  }
+                  case SPVM_OP_C_CODE_CALL_FIELD: {
+                    if (!(op_cur->flag &= SPVM_OP_C_FLAG_CALL_FIELD_WEAKEN)) {
+                      create_tmp_var = 1;
+                    }
+                    break;
+                  }
+                  case SPVM_OP_C_CODE_CALL_SUB: {
+                    if (tmp_var_type->code != SPVM_TYPE_C_CODE_VOID) {
+                      create_tmp_var = 1;
+                    }
+                    break;
+                  }
+                  case SPVM_OP_C_CODE_VAR: {
+                    if (op_cur->uv.var->create_tmp_var) {
+                      if (!op_cur->uv.var->created_tmp_var) {
+                        create_tmp_var = 1;
+                        op_cur->uv.var->created_tmp_var = 1;
+                      }
+                    }
+                    break;
+                  }
+                }
+              }
+
+              // Create temporary variable
+              if (create_tmp_var) {
+                SPVM_OP* op_var_tmp = SPVM_OP_CHECKEKR_new_op_var_tmp(compiler, tmp_var_type, sub_check_info, op_cur->file, op_cur->line);
+                if (op_var_tmp == NULL) {
+                  return;
+                }
+                
+                // Cut new op
+                SPVM_OP* op_target = op_cur;
+                SPVM_OP* op_stab = SPVM_OP_cut_op(compiler, op_target);
+
+                // Assing op
+                SPVM_OP* op_assign = SPVM_OP_new_op(compiler, SPVM_OP_C_CODE_ASSIGN, op_cur->file, op_cur->line);
+                SPVM_OP* op_build_assign = SPVM_OP_build_assign(compiler, op_assign, op_var_tmp, op_target);
+                
+                // Convert cur new op to var
+                SPVM_OP_replace_op(compiler, op_stab, op_build_assign);
+                op_target->uv = op_cur->uv;
+                
+                op_cur = op_target;
+              }
+
+              if (op_cur == op_base) {
+
+                // Finish
+                finish = 1;
+                
+                break;
+              }
+              
+              // Next sibling
+              if (op_cur->moresib) {
+                op_cur = SPVM_OP_sibling(compiler, op_cur);
+                break;
+              }
+              // Next is parent
+              else {
+                op_cur = op_cur->sibparent;
+              }
+            }
+            if (finish) {
+              break;
+            }
+          }
+        }
       }
 
       assert(sub->file_name);

@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<link rel="stylesheet" href="defaultstyle.css" type="text/css">
+<title>Testfile detectchar</title>
+</head>
+<body>
+<font class="Normal">Testing&nbsp;detectchar</font></br>
+</br>
+<font class="Normal">Testing&nbsp;default&nbsp;without&nbsp;options</font></br>
+<font class="Keyword">&lt;DetectChar</font><font class="Others">&nbsp;attribute=</font><font class="String">&quot;Match&quot;</font><font class="Others">&nbsp;context=</font><font class="String">&quot;#stay&quot;</font><font class="Others">&nbsp;char=</font><font class="String">&quot;e&quot;</font><font class="Normal">&nbsp;</font><font class="Keyword">/&gt;</font></br>
+</br>
+<font class="Others">&lt;Test&gt;</font></br>
+<font class="DataType">e</font><font class="Others">v</font><font class="DataType">e</font><font class="Others">ry&nbsp;</font><font class="DataType">e</font><font class="Others">&nbsp;is&nbsp;match</font><font class="DataType">e</font><font class="Others">d.</font></br>
+<font class="Others">EVERY&nbsp;E&nbsp;IS&nbsp;MATCHED.</font></br>
+<font class="Others">&lt;Test&gt;</font></br>
+</br>
+<font class="Normal">Testing&nbsp;dynamic</font></br>
+<font class="Keyword">&lt;RegExpr</font><font class="Others">&nbsp;attribute=</font><font class="String">&quot;Match&quot;</font><font class="Others">&nbsp;context=</font><font class="String">&quot;TestDT&quot;</font><font class="Others">&nbsp;String=</font><font class="String">&quot;\s(e)&quot;</font><font class="Normal">&nbsp;</font><font class="Keyword">/&gt;</font></br>
+<font class="Keyword">&lt;DetectChar</font><font class="Others">&nbsp;attribute=</font><font class="String">&quot;Match&quot;</font><font class="Others">&nbsp;dynamic=</font><font class="String">&quot;true&quot;</font><font class="Others">&nbsp;context=</font><font class="String">&quot;#pop&quot;</font><font class="Others">&nbsp;char=</font><font class="String">&quot;1&quot;</font><font class="Normal">&nbsp;</font><font class="Keyword">/&gt;</font></br>
+</br>
+<font class="Others">&lt;TestD&gt;</font></br>
+<font class="Others">scoop&nbsp;an</font><font class="DataType">&nbsp;e</font><font class="Others">.</font></br>
+<font class="Others">match&nbsp;it&nbsp;</font><font class="DataType">e</font><font class="Others">.&nbsp;1&nbsp;</font><font class="Comment">#if&nbsp;this&nbsp;matches,&nbsp;dynamic&nbsp;was&nbsp;not&nbsp;called</font></br>
+<font class="Others">&lt;TestD&gt;</font></br>
+</br>
+<font class="Others">&lt;TestD&gt;</font></br>
+<font class="Others">SCOOP&nbsp;AN</font><font class="DataType">&nbsp;e</font><font class="Others">.</font></br>
+<font class="Others">MATCH&nbsp;IT&nbsp;E.&nbsp;1&nbsp;</font><font class="Comment">#if&nbsp;this&nbsp;matches,&nbsp;dynamic&nbsp;was&nbsp;not&nbsp;called</font></br>
+<font class="Others">&lt;TestD&gt;</font></br>
+</br>
+<font class="Normal">Testing&nbsp;dynamic&nbsp;insensitive</font></br>
+<font class="Keyword">&lt;RegExpr</font><font class="Others">&nbsp;attribute=</font><font class="String">&quot;Match&quot;</font><font class="Others">&nbsp;context=</font><font class="String">&quot;TestDIT&quot;</font><font class="Others">&nbsp;String=</font><font class="String">&quot;\s(e)&quot;</font><font class="Normal">&nbsp;</font><font class="Keyword">/&gt;</font></br>
+<font class="Keyword">&lt;DetectChar</font><font class="Others">&nbsp;attribute=</font><font class="String">&quot;Match&quot;</font><font class="Others">&nbsp;dynamic=</font><font class="String">&quot;true&quot;</font><font class="Others">&nbsp;insensitive=</font><font class="String">&quot;true&quot;</font><font class="Others">&nbsp;context=</font><font class="String">&quot;#pop&quot;</font><font class="Others">&nbsp;char=</font><font class="String">&quot;1&quot;</font><font class="Normal">&nbsp;</font><font class="Keyword">/&gt;</font></br>
+<font class="Others">&lt;TestDI&gt;</font></br>
+<font class="Others">scoop&nbsp;an</font><font class="DataType">&nbsp;e</font><font class="Others">.</font></br>
+<font class="Others">match&nbsp;it&nbsp;</font><font class="DataType">e</font><font class="Others">.&nbsp;1&nbsp;</font><font class="Comment">#if&nbsp;this&nbsp;matches,&nbsp;dynamic&nbsp;was&nbsp;not&nbsp;called</font></br>
+<font class="Others">&lt;TestDI&gt;</font></br>
+</br>
+<font class="Others">&lt;TestDI&gt;</font></br>
+<font class="Others">SCOOP&nbsp;AN</font><font class="DataType">&nbsp;e</font><font class="Others">.</font></br>
+<font class="Others">MATCH&nbsp;IT&nbsp;</font><font class="DataType">E</font><font class="Others">.&nbsp;1&nbsp;</font><font class="Comment">#if&nbsp;this&nbsp;matches,&nbsp;dynamic&nbsp;was&nbsp;not&nbsp;called</font></br>
+<font class="Others">&lt;TestDI&gt;</font></br>
+</br>
+<font class="Normal">Testing&nbsp;insensitive</font></br>
+<font class="Keyword">&lt;DetectChar</font><font class="Others">&nbsp;attribute=</font><font class="String">&quot;Match&quot;</font><font class="Others">&nbsp;insensitive=</font><font class="String">&quot;true&quot;</font><font class="Others">&nbsp;context=</font><font class="String">&quot;#stay&quot;</font><font class="Others">&nbsp;char=</font><font class="String">&quot;e&quot;</font><font class="Normal">&nbsp;</font><font class="Keyword">/&gt;</font></br>
+<font class="Others">&lt;TestI&gt;</font></br>
+<font class="DataType">e</font><font class="Others">v</font><font class="DataType">e</font><font class="Others">ry&nbsp;</font><font class="DataType">e</font><font class="Others">&nbsp;is&nbsp;match</font><font class="DataType">e</font><font class="Others">d.</font></br>
+<font class="DataType">E</font><font class="Others">V</font><font class="DataType">E</font><font class="Others">RY&nbsp;</font><font class="DataType">E</font><font class="Others">&nbsp;IS&nbsp;MATCH</font><font class="DataType">E</font><font class="Others">D.</font></br>
+<font class="Others">&lt;TestI&gt;</font></br>
+</body>
+</html>

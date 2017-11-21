@@ -2,7 +2,7 @@ package Acme::MetaSyntactic::wales_towns;
 use strict;
 use Acme::MetaSyntactic::List;
 our @ISA = qw( Acme::MetaSyntactic::List );
-our $VERSION = '1.010';
+our $VERSION = '1.011';
 __PACKAGE__->init();
 
 our %Remote = (
@@ -40,6 +40,12 @@ Abigail, Philippe Bruhat (BooK).
 =head1 CHANGES
 
 =over 4
+
+=item *
+
+2017-11-13 - v1.011
+
+Updated from the source web site in Acme-MetaSyntactic-Themes version 1.051.
 
 =item *
 
@@ -202,6 +208,7 @@ Kidwelly
 Knighton
 Lampeter
 Laugharne
+Llanberis
 Llanddulas
 Llandeilo
 Llandovery
@@ -216,7 +223,6 @@ Llanfyllin
 Llangefni
 Llangollen
 Llanidloes
-Llanishen
 Llanrwst
 Llantrisant
 Llantwit_Major
@@ -265,7 +271,6 @@ Prestatyn
 Presteigne
 Pwllheli
 Queensferry
-Radyr
 Rhayader
 Rhuddlan
 Rhyl

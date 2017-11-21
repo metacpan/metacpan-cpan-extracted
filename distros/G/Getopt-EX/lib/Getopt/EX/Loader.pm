@@ -35,7 +35,7 @@ sub configure {
     my %opt = @_;
 
     for my $opt (qw(BASECLASS MODULE_OPT DEFAULT)) {
-	if (my $value = delete $opt{$opt}) {
+	if (defined (my $value = delete $opt{$opt})) {
 	    $obj->{$opt} = $value;
 	}
     }
@@ -147,7 +147,7 @@ sub parseopt {
     ## Check -Mmod::func(arg) or -Mmod::func=arg
     ##
     if ($argv->[0] =~ s{
-	^ (?<name> \w+ )
+	^ (?<name> \w+ (?: :: \w+)* )
 	  (?:
 	    ::
 	    (?<call>
@@ -198,42 +198,72 @@ sub expand {
     ##
   ARGV:
     for (my $i = 0; $i < @$argv; $i++) {
+
 	last if $argv->[$i] eq '--';
-	my($opt, $value) = split /=/, $argv->[$i], 2;
+	my $current = $argv->[$i];
+
 	for my $bucket ($obj->buckets) {
-	    if (my @s = $bucket->getopt($opt)) {
 
-		splice @$argv, $i, 1, ($opt, $value) if defined $value;
-
-		##
-		## Convert $<n> and $<shift>
-		##
-		my @follow = splice @$argv, $i;
-		s/\$<(\d+)>/$follow[$1]/ge foreach @s;
-		shift @follow;
-		s/\$<shift>/shift @follow/ge foreach @s;
-
-		printf(STDERR "\@ARGV = %s\n",
-		       join(' ', @$argv, @s, @follow)) if $debug;
-
-		my @module = $obj->modopt(\@s);
-
-		my @default = map { $_->default } @module;
-		push @$argv, @default, @s, @follow;
-		redo ARGV;
+	    ##
+	    ## Try entire string match, and check --option=value.
+	    ##
+	    my @s = $bucket->getopt($current);
+	    if (not @s) {
+		$current =~ /^(.+?)=(.*)/ or next;
+		@s = $bucket->getopt($1)  or next;
+		splice @$argv, $i, 1, ($1, $2);
 	    }
+
+	    my @follow = splice @$argv, $i;
+
+	    ##
+	    ## $<n>
+	    ##
+	    s/\$<(-?\d+)>/$follow[$1]/ge foreach @s;
+
+	    shift @follow;
+
+	    ##
+	    ## $<shift>, $<move>, $<remove>, $<copy>
+	    ##
+	    @s = map sub {
+		s/\$<shift>/@follow ? shift @follow : ''/ge;
+		my($cmd) = m{^\$ < (.+) >$}x or return $_;
+		($cmd =~ m{^(?<cmd> move | remove | copy )
+			   (?: \(      (?<off> -?\d+ ) ?
+				  (?: ,(?<len> -?\d+ ))? \) )? $ }x)
+		    or return $_;
+		my $p = ($+{cmd} ne 'copy')
+		    ? \@follow
+		    : do { my @new = @follow; \@new };
+		my @arg = @$p == 0 ? ()
+		    : defined $+{len} ? splice @$p, $+{off}//0, $+{len}
+		    : splice @$p, $+{off}//0;
+		($+{cmd} eq 'remove') ? () : @arg;
+	    }->(), @s;
+
+	    printf(STDERR "\@ARGV = %s\n",
+		   join(' ', @$argv, @s, @follow)) if $debug;
+
+	    my @module = $obj->modopt(\@s);
+
+	    my @default = map { $_->default } @module;
+	    push @$argv, @default, @s, @follow;
+
+	    redo ARGV if $i < @$argv;
 	}
     }
 }
 
 sub modules {
     my $obj = shift;
-    my $base = $obj->baseclass or return ();
+    my $base = $obj->baseclass // return ();
     $base =~ s/::/\//g;
+    $base = "/$base" if $base ne "";
 
     grep { /^[a-z]/ }
     map  { /(\w+)\.pm$/ }
-    map  { glob "$_/$base/*.pm" }
+    map  { glob $_ . $base . "/*.pm" }
     @INC;
 }
 

@@ -2,7 +2,7 @@ package Test2::Util::Grabber;
 use strict;
 use warnings;
 
-our $VERSION = '0.000083';
+our $VERSION = '0.000084';
 
 use Test2::Hub::Interceptor();
 use Test2::Util::Trace();
@@ -231,7 +231,7 @@ F<http://github.com/Test-More/Test-Stream/>.
 
 =head1 COPYRIGHT
 
-Copyright 2016 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+Copyright 2017 Chad Granum E<lt>exodist@cpan.orgE<gt>.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

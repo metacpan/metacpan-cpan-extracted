@@ -1,17 +1,14 @@
 #
 # This file is part of Config-Model-Approx
 #
-# This software is Copyright (c) 2013 by Dominique Dumont.
+# This software is Copyright (c) 2009-2017 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::Approx ;
-{
-  $Config::Model::Backend::Approx::VERSION = '1.009';
-}
-
+$Config::Model::Backend::Approx::VERSION = '1.010';
 use Mouse ;
 use Log::Log4perl qw(get_logger :levels);
 use Carp ;

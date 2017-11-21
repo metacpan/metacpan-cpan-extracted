@@ -1,0 +1,50 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use YAML::XS;
+
+use MYDan::Node;
+use MYDan::Node::DBI::Cache;
+use MYDan::Util::OptConf;
+
+$| ++;
+
+=head1 SYNOPSIS
+
+Show cache
+
+ $0
+
+ $0 cluster
+
+=cut
+
+my $option = MYDan::Util::OptConf->load();
+
+my %range = $option->dump( 'range' );
+
+my $range = MYDan::Node->new( %range );
+my $cache = MYDan::Node::DBI::Cache->new( $range{cache} );
+
+my $name = shift @ARGV;
+
+my ( @x, %data, %d )= $cache->select( '*', $name ? ( name => [ 1 => $name ] ) : () );
+
+for my $x ( @x )
+{
+    my ( $c, $a, $n, $i ) = @$x;
+    push @{$data{$c}{$a}{$i}}, $n;
+}
+
+for my $c ( keys %data )
+{
+    for my $a ( keys %{$data{$c}} )
+    {
+        while( my ( $i, $n ) = each %{$data{$c}{$a}} )
+        {
+            $d{$c}{$a}{$range->load( $n )->dump()} = $i;
+        }
+    }
+}
+
+YAML::XS::DumpFile \*STDOUT, \%d;

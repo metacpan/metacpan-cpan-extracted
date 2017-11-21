@@ -11,6 +11,7 @@ use Glib qw( TRUE FALSE );
 
 use File::ShareDir qw( dist_file );
 
+use Variable::Disposition qw( retain_future );
 use Module::Pluggable search_path => "Circle::FE::Gtk::Widget",
                       sub_name => "widgets",
                       require => 1;
@@ -55,14 +56,12 @@ sub new
       root => Gtk2::VBox->new(),
    }, $class;
 
-   $object->call_method(
-      method => "get_widget",
-      args => [],
-      on_result => sub {
-         $self->{root}->add( $self->build_widget( $_[0] ) );
-         $self->{root}->show_all;
-      }
-   );
+   retain_future $object->call_method(
+       get_widget => ()
+   )->on_done(sub {
+      $self->{root}->add( $self->build_widget( $_[0] ) );
+      $self->{root}->show_all;
+   });
 
    return $self;
 }
@@ -101,13 +100,12 @@ sub get_label
    my $label = $self->{label} = Gtk2::Label->new("");
 
    my $object = $self->{object};
-   $object->watch_property(
-      property => "level",
+   retain_future $object->watch_property_with_initial(
+      "level",
       on_set => sub {
          my ( $level ) = @_;
          $label->modify_fg( $_ => $self->get_theme_colour( "level$level" ) ) for qw( normal active );
       },
-      want_initial => 1,
    );
 
    return $label;
@@ -128,10 +126,8 @@ sub activated
    my $object = $self->{object};
 
    if( $object->prop("level") > 0 ) {
-      $object->call_method(
-         method => "reset_level",
-         args   => [],
-         on_result => sub {}, # ignore
+      retain_future $object->call_method(
+         reset_level => ()
       );
    }
 }

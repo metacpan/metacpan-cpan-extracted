@@ -2,6 +2,7 @@ use Test::More tests => 23;
 
 use qbit;
 use QBit::Validator;
+use Exception::Validator::FailedField;
 
 #########
 # type => 'array' #

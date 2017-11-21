@@ -1,5 +1,5 @@
 package Moose::Meta::Method::Constructor;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use strict;
 use warnings;
@@ -70,14 +70,14 @@ Moose::Meta::Method::Constructor - Method Meta Object for constructors
 
 =head1 VERSION
 
-version 2.2006
+version 2.2007
 
 =head1 DESCRIPTION
 
 This class is a subclass of L<Class::MOP::Method::Constructor> that
 provides additional Moose-specific functionality
 
-To understand this class, you should read the the
+To understand this class, you should read the
 L<Class::MOP::Method::Constructor> documentation as well.
 
 =head1 INHERITANCE

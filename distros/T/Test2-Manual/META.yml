@@ -1,0 +1,22 @@
+---
+abstract: 'Documentation hub for Test2 and Test2-Suite.'
+author:
+  - 'Chad Granum <exodist@cpan.org>'
+build_requires:
+  Test2::Tools::Tiny: '1.302111'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test2-Manual
+requires:
+  perl: '5.008001'
+resources:
+  bugtracker: http://github.com/Test-More/Test2-Manual/issues
+  repository: http://github.com/Test-More/Test2-Manual/
+version: '0.000002'
+x_serialization_backend: 'YAML::Tiny version 1.70'

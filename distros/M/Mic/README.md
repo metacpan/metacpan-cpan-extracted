@@ -27,20 +27,20 @@ Mic - Messages, Interfaces and Contracts.
 
     package Example::Synopsis::ArraySet;
 
-    use Mic::Implementation
+    use Mic::Impl
         has => { SET => { default => sub { [] } } },
     ;
 
     sub has {
         my ($self, $e) = @_;
-        scalar grep { $_ == $e } @{ $self->{$SET} };
+        scalar grep { $_ == $e } @{ $self->[SET] };
     }
 
     sub add {
         my ($self, $e) = @_;
 
         if ( ! $self->has($e) ) {
-            push @{ $self->{$SET} }, $e;
+            push @{ $self->[SET] }, $e;
         }
     }
 
@@ -63,18 +63,18 @@ Mic - Messages, Interfaces and Contracts.
 
     package Example::Synopsis::HashSet;
 
-    use Mic::Implementation
+    use Mic::Impl
         has => { SET => { default => sub { {} } } },
     ;
 
     sub has {
         my ($self, $e) = @_;
-        exists $self->{$SET}{$e};
+        exists $self->[SET]{$e};
     }
 
     sub add {
         my ($self, $e) = @_;
-        ++$self->{$SET}{$e};
+        ++$self->[SET]{$e};
     }
 
     1;
@@ -124,7 +124,6 @@ Mic is an OOP automation framework with the following features:
 - Enables trivial swapping of implementations (see [Mic::Bind](https://metacpan.org/pod/Mic::Bind)).
 - Encourages self documenting code.
 - Encourages robustness via Eiffel style [contracts](https://metacpan.org/pod/Mic::Contracts).
-- Supports hash and array based objects.
 
 Modularity means there is an obvious separation between what the users of an object need to know (the interface for using the object) and implementation details that users
 don't need to know about.
@@ -158,23 +157,23 @@ The class defined in the SYNOPSIS could also be defined like this
             class => { new => {} }
         },
 
-        implementation => 'Example::Usage::HashSet',
+        via => 'Example::Usage::HashSet',
     });
 
     package Example::Usage::HashSet;
 
-    use Mic::Implementation
+    use Mic::Impl
         has => { SET => { default => sub { {} } } },
     ;
 
     sub has {
         my ($self, $e) = @_;
-        exists $self->{$SET}{$e};
+        exists $self->[SET]{$e};
     }
 
     sub add {
         my ($self, $e) = @_;
-        ++$self->{$SET}{$e};
+        ++$self->[SET]{$e};
     }
 
     1;
@@ -212,15 +211,23 @@ Specifies the names of each class method that the class can respond to, as well 
 
 See [Mic::Contracts](https://metacpan.org/pod/Mic::Contracts) for more details about invariants.
 
-#### extends => ARRAYREF
+#### extends => STRING | ARRAYREF
 
-Specifies the names of one or more super-interfaces. This means the interface will include any methods from the super-interfaces that aren't declared locally. This is how Mic supports interface inheritance.
+Specifies the names of one or more super-interfaces. This means the interface will include any methods from the super-interfaces that aren't declared locally.
 
 ### implementation => STRING
 
 The name of a package that defines the subroutines declared in the interface.
 
-[Mic::Implementation](https://metacpan.org/pod/Mic::Implementation) and [Mic::ArrayImpl](https://metacpan.org/pod/Mic::ArrayImpl) describe how implementations are configured.
+[Mic::Impl](https://metacpan.org/pod/Mic::Impl) describes how implementations are configured.
+
+### impl => STRING
+
+An alias of "implementation" above.
+
+### via => STRING
+
+An alias of "implementation" above.
 
 # Interface Sharing
 

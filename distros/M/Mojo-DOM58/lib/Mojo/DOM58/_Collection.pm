@@ -12,7 +12,11 @@ use Scalar::Util 'blessed';
 
 use constant REDUCE => ($] >= 5.008009 ? \&List::Util::reduce : \&_reduce);
 
-our $VERSION = '1.003';
+# Role support requires Role::Tiny 2.000001+
+use constant ROLES =>
+  !!(eval { require Role::Tiny; Role::Tiny->VERSION('2.000001'); 1 });
+
+our $VERSION = '1.004';
 
 sub new {
   my $class = shift;
@@ -104,6 +108,18 @@ sub uniq {
   my %seen;
   return $self->new(grep { !$seen{$_->$cb(@_)}++ } @$self) if $cb;
   return $self->new(grep { !$seen{$_}++ } @$self);
+}
+
+sub with_roles {
+  croak 'Role::Tiny 2.000001+ is required for roles' unless ROLES;
+  my ($self, @roles) = @_;
+  
+  return Role::Tiny->create_class_with_roles($self,
+    map { /^\+(.+)$/ ? "${self}::Role::$1" : $_ } @roles)
+    unless my $class = blessed $self;
+  
+  return Role::Tiny->apply_roles_to_object($self,
+    map { /^\+(.+)$/ ? "${class}::Role::$1" : $_ } @roles);
 }
 
 sub _flatten {

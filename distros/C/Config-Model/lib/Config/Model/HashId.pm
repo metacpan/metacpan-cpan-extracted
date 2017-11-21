@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::HashId;
-$Config::Model::HashId::VERSION = '2.113';
+$Config::Model::HashId::VERSION = '2.114';
 use Mouse;
 use 5.10.1;
 
@@ -538,7 +538,7 @@ Config::Model::HashId - Handle hash element for configuration model
 
 =head1 VERSION
 
-version 2.113
+version 2.114
 
 =head1 SYNOPSIS
 

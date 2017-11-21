@@ -1,0 +1,23 @@
+## Name
+
+```
+My::Module
+```
+
+## Synopsis
+
+```perl
+use My::Module;
+my $thing = do_some_stuff();
+print "Yay!";
+```
+
+## Functions
+
+- foo
+
+    Foo function
+
+- bar
+
+    Bar function

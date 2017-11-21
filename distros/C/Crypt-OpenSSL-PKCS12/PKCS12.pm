@@ -5,7 +5,7 @@ use vars qw($VERSION @EXPORT_OK);
 use Exporter;
 use base qw(Exporter);
 
-$VERSION = '0.7';
+$VERSION = '0.8';
 
 @EXPORT_OK = qw(NOKEYS NOCERTS INFO CLCERTS CACERTS);
 

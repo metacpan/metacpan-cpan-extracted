@@ -1,0 +1,14 @@
+Testing dynamic contexts
+
+<Test1>
+Scoop something <<_SMT_
+Go to _SMT_ another context {{
+Some sample text
+ _SMT_
+}}
+<Test1>
+
+<Test2>
+The Dog that is my friend.
+THE DOG THAT IS MY FRIEND.
+<Test2>

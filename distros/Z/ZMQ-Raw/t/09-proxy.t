@@ -8,9 +8,18 @@ use ZMQ::Raw;
 
 if (!$Config{useithreads})
 {
-	diag ("threads not available, skipping");
 	my $proxy = ZMQ::Raw::Proxy->new();
 	isa_ok $proxy, 'ZMQ::Raw::Proxy';
+
+	my $ctx = ZMQ::Raw::Context->new;
+	my $frontend = ZMQ::Raw::Socket->new ($ctx, ZMQ::Raw->ZMQ_ROUTER);
+	$frontend->bind ('tcp://*:5557');
+
+	my $backend = ZMQ::Raw::Socket->new ($ctx, ZMQ::Raw->ZMQ_DEALER);
+	$backend->bind ('tcp://*:5558');
+
+	ok (!eval {$proxy->start ($frontend, $backend)});
+
 	done_testing;
 	exit;
 }
@@ -21,10 +30,10 @@ my $ctx = ZMQ::Raw::Context->new;
 sub Proxy
 {
 	my $frontend = ZMQ::Raw::Socket->new ($ctx, ZMQ::Raw->ZMQ_ROUTER);
-	$frontend->bind ('tcp://*:5555');
+	$frontend->bind ('tcp://*:5557');
 
 	my $backend = ZMQ::Raw::Socket->new ($ctx, ZMQ::Raw->ZMQ_DEALER);
-	$backend->bind ('tcp://*:5556');
+	$backend->bind ('tcp://*:5558');
 
 	my $proxy = ZMQ::Raw::Proxy->new();
 	$proxy->start ($frontend, $backend);
@@ -33,10 +42,10 @@ sub Proxy
 my $proxy = threads->create ('Proxy');
 
 my $req = ZMQ::Raw::Socket->new ($ctx, ZMQ::Raw->ZMQ_REQ);
-$req->connect ('tcp://127.0.0.1:5555');
+$req->connect ('tcp://127.0.0.1:5557');
 
 my $rep = ZMQ::Raw::Socket->new ($ctx, ZMQ::Raw->ZMQ_REP);
-$rep->connect ('tcp://127.0.0.1:5556');
+$rep->connect ('tcp://127.0.0.1:5558');
 
 # send/recv
 $req->send ('hello');

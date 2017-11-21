@@ -33,4 +33,9 @@ sub prepare_status {
     };
 }
 
+sub prepare_boolean {
+    APISchema::DSL::process {
+        include 't/fixtures/boolean.def';
+    };
+}
 1;

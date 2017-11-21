@@ -19,10 +19,10 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "JSON::MaybeXS" => 0,
     "JSON::RPC2::TwoWay" => "0.02",
-    "MojoX::NetstringStream" => "0.04",
+    "MojoX::NetstringStream" => "0.06",
     "Mojolicious" => "6.00"
   },
-  "VERSION" => "0.28",
+  "VERSION" => "0.30",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -32,7 +32,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "JSON::MaybeXS" => 0,
   "JSON::RPC2::TwoWay" => "0.02",
-  "MojoX::NetstringStream" => "0.04",
+  "MojoX::NetstringStream" => "0.06",
   "Mojolicious" => "6.00"
 );
 

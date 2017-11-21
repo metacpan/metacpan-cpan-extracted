@@ -128,16 +128,20 @@ NCX_debugger_fake_stash(pTHX_ HV* old_stash) {
     HEK* orig_hek = HvNAME_HEK(old_stash);
     assert(orig_hek);
 
+    #define FAKE_PREFIX "namespace::clean::xs::d::"
+
     char* full_name;
-    Newxz(full_name, HEK_LEN(orig_hek) + 26, char);
+    Newx(full_name, HEK_LEN(orig_hek) + strlen(FAKE_PREFIX) + 1, char);
 
-    strcat(full_name, "namespace::clean::xs::d::");
-    strcat(full_name, HEK_KEY(orig_hek));
+    memcpy(full_name, FAKE_PREFIX, strlen(FAKE_PREFIX));
+    memcpy(full_name + strlen(FAKE_PREFIX), HEK_KEY(orig_hek), HEK_LEN(orig_hek) + 1);
+    assert(full_name[HEK_LEN(orig_hek) + strlen(FAKE_PREFIX)] == '\0');
 
-    HV* fake_stash = gv_stashpvn(full_name, HEK_LEN(orig_hek) + 25, GV_ADD | HEK_UTF8(orig_hek));
+    HV* fake_stash = gv_stashpvn(full_name, HEK_LEN(orig_hek) + strlen(FAKE_PREFIX), GV_ADD | HEK_UTF8(orig_hek));
     assert(fake_stash);
 
     Safefree(full_name);
+    #undef FAKE_PREFIX
 
     return fake_stash;
 }
@@ -314,7 +318,7 @@ void
 import(SV* self, ...)
 PPCODE:
 {
-    HV* stash = CopSTASH(PL_curcop);;
+    HV* stash = CopSTASH(PL_curcop);
 
     ++SP;
     SV* except = NULL;

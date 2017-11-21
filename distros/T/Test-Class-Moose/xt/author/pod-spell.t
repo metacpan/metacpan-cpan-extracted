@@ -11,6 +11,7 @@ add_stopwords(<DATA>);
 all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
 API
+Adams
 Alders
 Andy
 AnnoCPAN
@@ -22,6 +23,7 @@ Bowers
 Boyd
 CLI
 CPAN
+Chuck
 Class
 Config
 Copypasta
@@ -95,6 +97,7 @@ Williams
 arisdottle
 autarch
 catchgithub
+charles_adams
 de
 denny
 distro

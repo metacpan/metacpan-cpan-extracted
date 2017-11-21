@@ -40,6 +40,8 @@
       },
       "runtime" : {
          "requires" : {
+            "DateTime" : "0",
+            "DateTime::Format::ISO8601" : "0",
             "Function::Parameters" : "2.001001",
             "JSON::MaybeXS" : "1.003009",
             "JSON::PP" : "2.92",
@@ -57,7 +59,6 @@
       },
       "test" : {
          "requires" : {
-            "DateTime" : "0",
             "Test::Deep" : "1.127",
             "Test::Exception" : "0.42",
             "Test::More" : "0.88"
@@ -78,5 +79,5 @@
       },
       "x_IRC" : "irc://irc.perl.org/#graphql-perl"
    },
-   "version" : "0.20"
+   "version" : "0.21"
 }

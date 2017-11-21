@@ -128,8 +128,7 @@ fragment c on DataType {
 EOF
   my $ast = parse($doc);
 
-  my $res = execute($schema, $ast, $data, undef, { size => 100 }, 'Example');
-  is_deeply $res, {
+  run_test([$schema, $ast, $data, undef, { size => 100 }, 'Example'], {
     data => {
       a => 'Apple',
       b => 'Banana',
@@ -149,7 +148,7 @@ EOF
         ],
       },
     },
-  };
+  });
 };
 
 subtest 'merges parallel fragments' => sub{
@@ -299,99 +298,79 @@ EOF
   is $resolved_args->{string_arg}, 'foo';
 };
 
-# TODO
-# subtest 'nulls out error subtrees' => sub {
-#   my $doc = '{
-#     sync
-#     syncError
-#     syncRawError
-#     syncReturnError
-#     syncReturnErrorList
-#   }';
-
-#   my $data = {
-#     sync => sub {
-#     return 'sync';
-#     },
-#     syncError => sub {
-#     die Error('Error getting syncError');
-#     },
-#     syncRawError => sub {
-#     # eslint-disable
-#     die 'Error getting syncRawError';
-#     # eslint-enable
-#     },
-#     syncReturnError => sub {
-#     return Error('Error getting syncReturnError');
-#     },
-#     syncReturnErrorList => sub {
-#     return [
-#       'sync0',
-#       Error('Error getting syncReturnErrorList1'),
-#       'sync2',
-#       Error('Error getting syncReturnErrorList3')
-#     ];
-#     },
-#   };
-
-#   my $ast = parse($doc);
-#   my $schema = GraphQL::Schema->new(
-#     query => GraphQL::Type::Object->new(
-#     name => 'Type',
-#     fields => {
-#       sync => { type => $String },
-#       syncError => { type => $String },
-#       syncRawError => { type => $String },
-#       syncReturnError => { type => $String },
-#       syncReturnErrorList => { type => $String->list },
-#     }
-#     )
-#   );
-
-#   my $result = execute($schema, $ast, $data);
-
-#   is_deeply $result->{data}, {
-#     sync => 'sync',
-#     syncError => undef,
-#     syncRawError => undef,
-#     syncReturnError => undef,
-#     syncReturnErrorList => ['sync0', undef, 'sync2', undef],
-#   };
-
-#   ok $result->{errors} && @{ $result->{errors} };
-
-#   is_deeply [map { format_error($_) } @{ $result->{errors} }], [
-#     {
-#       message   => 'Error getting syncError',
-#       locations => [{ line => 3, column => 7 }],
-#       path    => ['syncError']
-#     },
-#     {
-#       message   => 'Error getting syncRawError',
-#       locations => [{ line => 4, column => 7 }],
-#       path    => ['syncRawError']
-#     },
-#     {
-#       message   => 'Error getting syncReturnError',
-#       locations => [{ line => 5, column => 7 }],
-#       path    => ['syncReturnError']
-#     },
-#     {
-#       message   => 'Error getting syncReturnErrorList1',
-#       locations => [{ line => 6, column => 7 }],
-#       path    => ['syncReturnErrorList', 1]
-#     },
-#     {
-#       message   => 'Error getting syncReturnErrorList3',
-#       locations => [{ line => 6, column => 7 }],
-#       path    => ['syncReturnErrorList', 3]
-#     },
-#   ];
-# };
+subtest 'nulls out error subtrees' => sub {
+  my $doc = '{
+    sync
+    syncError
+    syncRawError
+    syncReturnError
+    syncReturnErrorList
+  }';
+  my $data = {
+    sync => sub { 'sync' },
+    syncError => sub { die "Error getting syncError\n" },
+    syncRawError => sub { die "Error getting syncRawError\n" },
+    syncReturnError => sub { GraphQL::Error->coerce('Error getting syncReturnError') },
+    syncReturnErrorList => sub {
+      [
+        'sync0',
+        GraphQL::Error->coerce('Error getting syncReturnErrorList1'),
+        'sync2',
+        GraphQL::Error->coerce('Error getting syncReturnErrorList3')
+      ];
+    },
+  };
+  my $ast = parse($doc);
+  my $schema = GraphQL::Schema->new(
+    query => GraphQL::Type::Object->new(
+      name => 'Type',
+      fields => {
+        sync => { type => $String },
+        syncError => { type => $String },
+        syncRawError => { type => $String },
+        syncReturnError => { type => $String },
+        syncReturnErrorList => { type => $String->list },
+      }
+    )
+  );
+  my $got = execute($schema, $ast, $data);
+  is_deeply $got->{data}, {
+    sync => 'sync',
+    syncError => undef,
+    syncRawError => undef,
+    syncReturnError => undef,
+    syncReturnErrorList => ['sync0', undef, 'sync2', undef],
+  } or diag nice_dump($got->{data});
+  is_deeply [ sort { $a->{message} cmp $b->{message} } @{ $got->{errors} } ], [
+    {
+      message   => "Error getting syncError\n",
+      locations => [{ line => 4, column => 5 }],
+      path    => ['syncError']
+    },
+    {
+      message   => "Error getting syncRawError\n",
+      locations => [{ line => 5, column => 5 }],
+      path    => ['syncRawError']
+    },
+    {
+      message   => "Error getting syncReturnError",
+      locations => [{ line => 6, column => 5 }],
+      path    => ['syncReturnError']
+    },
+    {
+      message   => "Error getting syncReturnErrorList1",
+      locations => [{ line => 7, column => 3 }],
+      path    => ['syncReturnErrorList', 1]
+    },
+    {
+      message   => "Error getting syncReturnErrorList3",
+      locations => [{ line => 7, column => 3 }],
+      path    => ['syncReturnErrorList', 3]
+    },
+  ] or diag nice_dump($got->{errors});
+};
 
 subtest 'Full response path is included for non-nullable fields' => sub {
-  plan skip_all => 'FAILS';
-
   my $A; $A = GraphQL::Type::Object->new(
     name => 'A',
     fields => sub { {
@@ -405,14 +384,12 @@ subtest 'Full response path is included for non-nullable fields' => sub {
       },
       throws => {
         type  => $String->non_null,
-        resolve => sub {
-          die GraphQL::Error->coerce('Catch me if you can');
-        },
+        resolve => sub { die GraphQL::Error->coerce('Catch me if you can') },
       },
     } },
   );
   my $queryType = GraphQL::Type::Object->new(
-    name   => 'query',
+    name => 'query',
     fields => sub { {
       nullableA => {
         type  => $A,
@@ -423,34 +400,32 @@ subtest 'Full response path is included for non-nullable fields' => sub {
   my $schema = GraphQL::Schema->new(
     query => $queryType,
   );
-
   my $query = <<EOF;
-    query {
-    nullableA {
-      aliasedA: nullableA {
+query {
+  nullableA {
+    aliasedA: nullableA {
       nonNullA {
         anotherA: nonNullA {
-        throws
+          throws
         }
       }
-      }
     }
-    }
+  }
+}
 EOF
-
   my $result = execute($schema, parse($query));
   is_deeply $result, {
     data => {
       nullableA => {
-        aliasedA => undef,
+        aliasedA => { nonNullA => { anotherA => {} } },
       },
     },
     errors => [{
       message => 'Catch me if you can',
-      locations => [{ line => 7, column => 17 }],
+      locations => [{ line => 7, column => 9 }],
       path => ['nullableA', 'aliasedA', 'nonNullA', 'anotherA', 'throws'],
     }],
-  };
+  } or diag nice_dump $result;
 };
 
 subtest 'uses the inline operation if no operation name is provided' => sub {

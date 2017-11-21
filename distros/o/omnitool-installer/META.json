@@ -98,7 +98,7 @@
    "provides" : {
       "omnitool::installer" : {
          "file" : "lib/omnitool/installer.pm",
-         "version" : "v1.0.2"
+         "version" : "v1.0.3"
       }
    },
    "release_status" : "stable",
@@ -112,7 +112,7 @@
          "web" : "https://github.com/ericschernoff/omnitool-installer"
       }
    },
-   "version" : "1.0.2",
+   "version" : "1.0.3",
    "x_contributors" : [
       "Eric Chernoff <echernof@cisco.com>",
       "Eric Chernoff <ericschernoff@gmail.com>",

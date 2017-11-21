@@ -1,0 +1,31 @@
+appname: ExampleApp
+charset: UTF-8
+log:     core
+logger:  LogAny
+engines:
+    logger:
+        LogAny:
+            category: ExampleApp Messages
+            logger:
+                - Dispatch
+                - outputs
+                -
+                    -
+                        - Screen
+                        - min_level
+                        - warning
+                        - stderr
+                        - 1
+                        - newline
+                        - 1
+                    -
+                        - File
+                        - min_level
+                        - debug
+                        - filename
+                        - /tmp/dancer2_logany_test.log
+                        - mode
+                        - '>>'
+                        - newline
+                        - 1
+

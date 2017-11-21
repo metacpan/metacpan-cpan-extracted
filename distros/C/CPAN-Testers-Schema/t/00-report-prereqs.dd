@@ -9,7 +9,6 @@ do { my $x = {
                       'requires' => {
                                       'DBIx::Class' => '0',
                                       'DBIx::Class::Candy' => '0',
-                                      'DBIx::Class::InflateColumn::Serializer' => '0.09',
                                       'Data::UUID' => '0',
                                       'DateTime' => '0',
                                       'DateTime::Format::ISO8601' => '0',

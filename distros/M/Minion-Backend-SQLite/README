@@ -33,6 +33,13 @@ ATTRIBUTES
     Minion::Backend::SQLite inherits all attributes from Minion::Backend
     and implements the following new ones.
 
+ dequeue_interval
+
+      my $seconds = $backend->dequeue_interval;
+      $backend    = $backend->dequeue_interval($seconds);
+
+    Interval in seconds between "dequeue" attempts. Defaults to 0.5.
+
  sqlite
 
       my $sqlite = $backend->sqlite;
@@ -70,7 +77,8 @@ METHODS
 
     Wait a given amount of time in seconds for a job, dequeue it and
     transition from inactive to active state, or return undef if queues
-    were empty.
+    were empty. Jobs will be checked for in intervals defined by
+    "dequeue_interval" until the timeout is reached.
 
     These options are currently available:
 
@@ -180,17 +188,46 @@ METHODS
 
     Transition from active to finished state.
 
- job_info
+ list_jobs
 
-      my $job_info = $backend->job_info($job_id);
+      my $results = $backend->list_jobs($offset, $limit);
+      my $results = $backend->list_jobs($offset, $limit, {state => 'inactive'});
 
-    Get information about a job, or return undef if job does not exist.
+    Returns the information about jobs in batches.
 
       # Check job state
-      my $state = $backend->job_info($job_id)->{state};
+      my $results = $backend->list_jobs(0, 1, {ids => [$job_id]});
+      my $state = $results->{jobs}[0]{state};
     
       # Get job result
-      my $result = $backend->job_info($job_id)->{result};
+      my $results = $backend->list_jobs(0, 1, {ids => [$job_id]});
+      my $result = $results->{jobs}[0]{result};
+
+    These options are currently available:
+
+    ids
+
+        ids => ['23', '24']
+
+      List only jobs with these ids.
+
+    queue
+
+        queue => 'important'
+
+      List only jobs in this queue.
+
+    state
+
+        state => 'inactive'
+
+      List only jobs in this state.
+
+    task
+
+        task => 'test'
+
+      List only jobs for this task.
 
     These fields are currently available:
 
@@ -296,38 +333,63 @@ METHODS
 
       Id of worker that is processing the job.
 
- list_jobs
+ list_workers
 
-      my $batch = $backend->list_jobs($offset, $limit);
-      my $batch = $backend->list_jobs($offset, $limit, {state => 'inactive'});
+      my $results = $backend->list_workers($offset, $limit);
+      my $results = $backend->list_workers($offset, $limit, {ids => [23]});
 
-    Returns the same information as "job_info" but in batches.
+    Returns information about workers in batches.
+
+      # Check worker host
+      my $results = $backend->list_workers(0, 1, {ids => [$worker_id]});
+      my $host    = $results->{workers}[0]{host};
 
     These options are currently available:
 
-    queue
+    ids
 
-        queue => 'important'
+        ids => ['23', '24']
 
-      List only jobs in this queue.
+      List only workers with these ids.
 
-    state
+    These fields are currently available:
 
-        state => 'inactive'
+    host
 
-      List only jobs in this state.
+        host => 'localhost'
 
-    task
+      Worker host.
 
-        task => 'test'
+    jobs
 
-      List only jobs for this task.
+        jobs => ['10023', '10024', '10025', '10029']
 
- list_workers
+      Ids of jobs the worker is currently processing.
 
-      my $batch = $backend->list_workers($offset, $limit);
+    notified
 
-    Returns the same information as "worker_info" but in batches.
+        notified => 784111777
+
+      Epoch time worker sent the last heartbeat.
+
+    pid
+
+        pid => 12345
+
+      Process id of worker.
+
+    started
+
+        started => 784111777
+
+      Epoch time worker was started.
+
+    status
+
+        status => {queues => ['default', 'important']}
+
+      Hash reference with whatever status information the worker would like
+      to share.
 
  lock
 
@@ -456,8 +518,8 @@ METHODS
         delayed_jobs => 100
 
       Number of jobs in inactive state that are scheduled to run at
-      specific time in the future or have unresolved dependencies. Note
-      that this field is EXPERIMENTAL and might change without warning!
+      specific time in the future. Note that this field is EXPERIMENTAL and
+      might change without warning!
 
     enqueued_jobs
 
@@ -490,6 +552,12 @@ METHODS
 
       Number of workers that are currently not processing a job.
 
+    uptime
+
+        uptime => undef
+
+      Uptime in seconds. Always undefined for SQLite.
+
  unlock
 
       my $bool = $backend->unlock('foo');
@@ -501,55 +569,6 @@ METHODS
       $backend->unregister_worker($worker_id);
 
     Unregister worker.
-
- worker_info
-
-      my $worker_info = $backend->worker_info($worker_id);
-
-    Get information about a worker, or return undef if worker does not
-    exist.
-
-      # Check worker host
-      my $host = $backend->worker_info($worker_id)->{host};
-
-    These fields are currently available:
-
-    host
-
-        host => 'localhost'
-
-      Worker host.
-
-    jobs
-
-        jobs => ['10023', '10024', '10025', '10029']
-
-      Ids of jobs the worker is currently processing.
-
-    notified
-
-        notified => 784111777
-
-      Epoch time worker sent the last heartbeat.
-
-    pid
-
-        pid => 12345
-
-      Process id of worker.
-
-    started
-
-        started => 784111777
-
-      Epoch time worker was started.
-
-    status
-
-        status => {queues => ['default', 'important']}
-
-      Hash reference with whatever status information the worker would like
-      to share.
 
 BUGS
 

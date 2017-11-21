@@ -20,7 +20,8 @@ TODO:
 
 
 package BinaryTree {
-    use Moxie;
+    use Moxie
+        traits => [':experimental'];
 
     use Scalar::Util ();
 
@@ -34,7 +35,7 @@ package BinaryTree {
 
     my sub _parent : private;
 
-    sub BUILDARGS : init(
+    sub BUILDARGS : strict(
         node?   => _node,
         parent? => _parent,
     );

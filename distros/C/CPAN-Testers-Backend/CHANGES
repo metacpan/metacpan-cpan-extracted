@@ -1,5 +1,15 @@
 Changelog for CPAN-Testers-Backend
 
+0.003     2017-11-18 16:03:00-06:00 America/Chicago
+
+    [Fixed]
+
+    - Updated Beam::Minion to v0.007, which allows one worker to be used
+      for all containers (instead of one per container).
+    - Updated to Minion 8 which includes a new Admin UI
+    - Fixed unprocessed report detection to work in pages instead of all at
+      once.
+
 0.002     2017-08-22 20:03:05-05:00 America/Chicago
 
     [Added]

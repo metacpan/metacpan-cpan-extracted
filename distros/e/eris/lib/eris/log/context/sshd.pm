@@ -1,20 +1,15 @@
 package eris::log::context::sshd;
+# ABSTRACT: Parse sshd logs into structured data
 
 use Const::Fast;
 use Moo;
 use namespace::autoclean;
-
 with qw(
     eris::role::context
 );
 
-# Constants
-const my %RE => (
-    extract_details => qr/(?:Accepted|Failed) (\S+) for (\S+) from (\S+) port (\S+) (\S+)/,
-);
-const my %F => (
-    extract_details => [qw(driver acct src_ip src_port proto_app)],
-);
+our $VERSION = '0.004'; # VERSION
+
 
 sub sample_messages {
     my @msgs = split /\r?\n/, <<EOF;
@@ -32,23 +27,29 @@ EOF
     return @msgs;
 }
 
+
+const my %RE => (
+    extract_details => qr/(?:Accepted|Failed) (\S+) for (\S+) from (\S+) port (\S+) (\S+)/,
+);
+const my %F => (
+    extract_details => [qw(driver acct src_ip src_port proto_app)],
+);
+
 sub contextualize_message {
     my ($self,$log) = @_;
     my $str = $log->context->{message};
 
     my %ctxt = ();
-    $ctxt{status} = index($str,'Accepted') >= 0 ? 'success'
-                  : index($str,'Failed')   >= 0 ? 'failure'
+    $ctxt{status} = $str =~ /Accepted/ ? 'success'
+                  : $str =~ /Failed/   ? 'failure'
                   : undef;
     if( defined $ctxt{status} ) {
-        $log->add_tags(qw(authentication));
-        if( my @data = ($str =~ /$RE{extract_details}/o) ) {
-            for(my $i=0; $i < @data; $i++) {
-                $ctxt{$F{extract_details}->[$i]} = $data[$i];
-            }
+        $ctxt{action} = 'authentication';
+        if( my @data = ($str =~ /(?>$RE{extract_details})/o) ) {
+            @ctxt{@{ $F{extract_details} }} = @data;
         }
     }
-    elsif( index($str, 'Invalid') >= 0 ) {
+    elsif( $str =~ /Invalid/ ) {
         $ctxt{status} = 'invalid';
         @ctxt{qw(acct src_ip)} = ($str =~ /Invalid user (\S+) from (\S+)/);
     }
@@ -56,8 +57,9 @@ sub contextualize_message {
         delete $ctxt{status};
     }
 
-    $log->add_context($self->name,\%ctxt);
+    $log->add_context($self->name,\%ctxt) if keys %ctxt;
 }
+
 
 1;
 
@@ -69,11 +71,37 @@ __END__
 
 =head1 NAME
 
-eris::log::context::sshd
+eris::log::context::sshd - Parse sshd logs into structured data
 
 =head1 VERSION
 
-version 0.003
+version 0.004
+
+=head1 SYNOPSIS
+
+Parse sshd logs into structured data
+
+=head1 METHODS
+
+=head2 contextualize_message
+
+Parses an sshd log and extracts the relevant details
+
+    action    => authentication/..
+    status    => succes/failure/invalid
+    driver    => keyboard/password/public key
+    acct      => user in question
+    proto_app => sshv2 / sshv1
+
+And
+
+    src_ip, src_port
+
+=for Pod::Coverage sample_messages
+
+=head1 SEE ALSO
+
+L<eris::log::contextualizer>, L<eris::role::context>
 
 =head1 AUTHOR
 

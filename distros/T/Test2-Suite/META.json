@@ -4,7 +4,7 @@
       "Chad Granum <exodist@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -29,6 +29,7 @@
             "B" : "0",
             "Carp" : "0",
             "Importer" : "0.024",
+            "Module::Pluggable" : "2.7",
             "Scalar::Util" : "0",
             "Sub::Info" : "0.001",
             "Term::Table" : "0.002",
@@ -49,7 +50,7 @@
          "url" : "http://github.com/Test-More/Test2-Suite/"
       }
    },
-   "version" : "0.000083",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+   "version" : "0.000084",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

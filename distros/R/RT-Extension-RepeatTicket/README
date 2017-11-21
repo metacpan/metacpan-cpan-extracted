@@ -157,6 +157,14 @@ FAQ
             of the week occurs after the start date you set (if the start
             date isn't on that day of the week).
 
+    I want to enable the repeat function only on some queues
+        To do this, insetad of applying the "Original Ticket" custom field
+        globally, you can apply it to the chosen queues and that's it.
+
+    some users can't see or use this feature successfully.
+        Make sure those users have "SeeCustomField" and "ModifyCusotmField"
+        rights granted for "Original Ticket" custom field.
+
 METHODS
   Run( RT::Attribute $attr, DateTime $checkday )
     Repeat the ticket if $checkday meets the repeat settings. It also tries

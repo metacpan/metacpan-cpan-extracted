@@ -63,14 +63,16 @@ is $worker2->info->{jobs}[0], $job->id, 'right id';
 $id = $worker2->id;
 undef $worker2;
 is $job->info->{state}, 'active', 'job is still active';
-ok !!$minion->backend->worker_info($id), 'is registered';
+ok !!$minion->backend->list_workers(0, 1, {ids => [$id]})->{workers}[0],
+  'is registered';
 $minion->backend->mysql->db->query(
   "update minion_workers
    set notified = DATE_SUB(now(), interval ? second) where id = ?",
   $minion->missing_after + 1, $id
 );
 $minion->repair;
-ok !$minion->backend->worker_info($id), 'not registered';
+ok !$minion->backend->list_workers(0, 1, {ids => [$id]})->{workers}[0],
+  'not registered';
 like $job->info->{finished}, qr/^[\d.]+$/,       'has finished timestamp';
 is $job->info->{state},      'failed',           'job is no longer active';
 is $job->info->{result},     'Worker went away', 'right result';
@@ -116,7 +118,9 @@ ok !$minion->job($id3), 'job has been cleaned up';
 # List workers
 $worker  = $minion->worker->register;
 $worker2 = $minion->worker->register;
-my $batch = $minion->backend->list_workers(0, 10);
+my $results = $minion->backend->list_workers(0, 10);
+is $results->{total}, 2, 'two workers total';
+my $batch = $results->{workers};
 ok $batch->[0]{id},        'has id';
 is $batch->[0]{host},      $host, 'right host';
 is $batch->[0]{pid},       $$, 'right pid';
@@ -124,10 +128,10 @@ like $batch->[0]{started}, qr/^[\d.]+$/, 'has timestamp';
 is $batch->[1]{host},      $host, 'right host';
 is $batch->[1]{pid},       $$, 'right pid';
 ok !$batch->[2], 'no more results';
-$batch = $minion->backend->list_workers(0, 1);
+$batch = $minion->backend->list_workers(0, 1)->{workers};
 is $batch->[0]{id}, $worker2->id, 'right id';
 ok !$batch->[1], 'no more results';
-$batch = $minion->backend->list_workers(1, 1);
+$batch = $minion->backend->list_workers(1, 1)->{workers};
 is $batch->[0]{id}, $worker->id, 'right id';
 ok !$batch->[1], 'no more results';
 $worker->unregister;
@@ -162,6 +166,7 @@ is $stats->{active_jobs},      0, 'no active jobs';
 is $stats->{failed_jobs},      0, 'no failed jobs';
 is $stats->{finished_jobs},    0, 'no finished jobs';
 is $stats->{inactive_jobs},    0, 'no inactive jobs';
+ok $stats->{uptime},              'has uptime';
 $worker = $minion->worker->register;
 is $minion->stats->{inactive_workers}, 1, 'one inactive worker';
 $minion->enqueue('fail');
@@ -198,7 +203,9 @@ is $stats->{inactive_jobs},    0, 'no inactive jobs';
 
 # List jobs
 $id = $minion->enqueue('add');
-$batch = $minion->backend->list_jobs(0, 10);
+$results = $minion->backend->list_jobs(0, 10);
+is $results->{total}, 4, 'four jobs total';
+$batch = $results->{jobs};
 ok $batch->[0]{id},        'has id';
 is $batch->[0]{task},      'add', 'right task';
 is $batch->[0]{state},     'inactive', 'right state';
@@ -222,19 +229,19 @@ is $batch->[3]{task},       'fail',       'right task';
 is $batch->[3]{state},      'finished',   'right state';
 is $batch->[3]{retries},    0,            'job has not been retried';
 ok !$batch->[4], 'no more results';
-$batch = $minion->backend->list_jobs(0, 10, {state => 'inactive'});
+$batch = $minion->backend->list_jobs(0, 10, {state => 'inactive'})->{jobs};
 is $batch->[0]{state},   'inactive', 'right state';
 is $batch->[0]{retries}, 0,          'job has not been retried';
 ok !$batch->[1], 'no more results';
-$batch = $minion->backend->list_jobs(0, 10, {task => 'add'});
+$batch = $minion->backend->list_jobs(0, 10, {task => 'add'})->{jobs};
 is $batch->[0]{task},    'add', 'right task';
 is $batch->[0]{retries}, 0,     'job has not been retried';
 ok !$batch->[1], 'no more results';
-$batch = $minion->backend->list_jobs(0, 1);
+$batch = $minion->backend->list_jobs(0, 1)->{jobs};
 is $batch->[0]{state},   'inactive', 'right state';
 is $batch->[0]{retries}, 0,          'job has not been retried';
 ok !$batch->[1], 'no more results';
-$batch = $minion->backend->list_jobs(1, 1);
+$batch = $minion->backend->list_jobs(1, 1)->{jobs};
 is $batch->[0]{state},   'finished', 'right state';
 is $batch->[0]{retries}, 1,          'job has been retried';
 ok !$batch->[1], 'no more results';
@@ -260,7 +267,8 @@ is $job->info->{state}, 'active', 'right state';
 is $job->task,    'add', 'right task';
 is $job->retries, 0,     'job has not been retried';
 $id = $job->info->{worker};
-is $minion->backend->worker_info($id)->{pid}, $$, 'right worker';
+is $minion->backend->list_workers(0, 1, {ids => [$id]})->{workers}[0]{pid},
+  $$, 'right worker';
 ok !$job->info->{finished}, 'no finished timestamp';
 $job->perform;
 is $worker->info->{jobs}[0], undef, 'no jobs';

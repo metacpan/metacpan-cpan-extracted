@@ -21,6 +21,7 @@ use POSIX qw(uname);
 sub new
 {
 	my $class = shift;
+	my $args = shift;
 	my $workdir = shift;
 	my $suiteRoot = shift;
 	
@@ -44,6 +45,7 @@ sub new
 	my $self = bless
 				(
 					{
+						args => $args,
 						suiteroot => $suiteRoot,
 						root => $workdir,
 						tmp => slashify("$workdir/tmp"),
@@ -104,6 +106,7 @@ sub endTestRun
 
 	my $testinfo =
 		{
+			config => $self->{args}->getConfig()->getRawCfg(),
 			dispensedorder => $self->{dispensedorder},
 			found => $self->{foundtests},
 			commandlines => $self->{commandlines},

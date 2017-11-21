@@ -38,6 +38,33 @@ p {
    background: #ccc;
 }
 
+.minimenu {
+   display: flex;
+   flex-direction: row;
+   width: 100%;
+}
+.minimenuleft {
+   flex: 0 0 130px;
+}
+.minimenuright {
+   display: inline-block;
+   flex: 1;
+}
+.yourchoice {
+   display: flex;
+   flex-direction: row;
+   width: 100%;
+   vertical-align: bottom;
+}
+.yourchoiceleft {
+   flex: 0 0 130px;
+   align-self: baseline;
+}
+.yourchoiceright {
+   flex: 1;
+   align-self: baseline;
+}
+
 .boxtopbot {
    background: #ccc;
 }

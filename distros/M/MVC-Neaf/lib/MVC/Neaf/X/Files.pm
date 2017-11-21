@@ -2,7 +2,7 @@ package MVC::Neaf::X::Files;
 
 use strict;
 use warnings;
-our $VERSION = 0.17;
+our $VERSION = 0.18;
 
 =head1 NAME
 
@@ -30,6 +30,7 @@ So this module is here to fill the gap.
 =cut
 
 use File::Basename;
+use Encode;
 
 use MVC::Neaf::Util qw(http_date canonize_path);
 use MVC::Neaf::View::TT;
@@ -90,7 +91,7 @@ sub new {
         or $class->my_croak( "option 'root' is required" );
 
     my @extra = grep { !$static_options{$_} } keys %options;
-    $class->_croak( "Unknown options @extra" )
+    $class->my_croak( "Unknown options @extra" )
         if @extra;
 
     $options{buffer} ||= 4096;
@@ -173,7 +174,7 @@ sub serve_file {
     };
 
     # don't let unsafe paths through
-    $file =~ m#/../# and die 404;
+    $file =~ m#/\.\./# and die 404;
     $file =~ m#(^|/)\.# and die 404
         unless $self->{allow_dots};
 
@@ -187,7 +188,7 @@ sub serve_file {
     };
     my $ok = open (my $fd, "<", "$xfile");
     if (!$ok) {
-        # TODO Warn
+        # TODO 0.30 Warn
         die 404;
     };
     binmode $fd;
@@ -251,12 +252,13 @@ As of current, indices are not cached.
 sub list_dir {
     my ($self, $dir) = @_;
 
-    # TODO better error handling (404 or smth)
+    # TODO 0.30 better error handling (404 or smth)
     opendir( my $fd, "$self->{root}/$dir" )
         or $self->my_croak( "Failed to locate directory at $dir: $!" );
 
     my @ret;
     while (my $entry = readdir($fd)) {
+        $entry = decode_utf8($entry);
         $entry =~ /^\./ and next
             unless $self->{allow_dots};
 

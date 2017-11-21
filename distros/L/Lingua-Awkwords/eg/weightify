@@ -1,0 +1,69 @@
+#!/usr/bin/env perl
+#
+# shows the character frequency counts of the given input in the awkword
+# format. custom sets can be defined, e.g.
+#
+#   echo the quick brown fox | ./weightify -s vowel:aeiou
+#
+# which will show character counts (if any) for the given set along with
+# the usual counts at the head, middle, tail, and overall. another
+# example might count strong, weak, and regular Spanish vowels (having
+# first stripped the áccents) in a word list
+#
+#   ./weightify -s vowel:aeiou -s stvow:aeo -s wevow:iu ... | grep vow
+#
+# however exact weights may produce material too close to the corpus;
+# less common letter may need to be weighted, especially early in the
+# exploratory process
+
+use 5.14.0;
+use warnings;
+use open IO => ':locale';
+use Getopt::Long qw(GetOptions);
+use Lingua::Awkwords qw(weights2str weights_from);
+
+GetOptions(
+    'sets|s=s' => \my @csets,
+) or exit 64;
+
+my @names = qw/head body tail all/;
+my @counts = ( {}, {}, {}, {} );
+
+my %sets;
+for my $set (@csets) {
+    my ( $name, $characters ) = split ':', $set;
+    die "invalid set\n" if !$name or !$characters;
+    @{ $sets{$name} }{ split //, $characters } = ();
+}
+
+shift @ARGV if @ARGV == 1 and $ARGV[0] eq '-';
+
+if (@ARGV) {
+    for my $file (@ARGV) {
+        open my $fh, '<', $file or die "weightify: could not open '$file': $!\n";
+        weightify($fh);
+    }
+} else {
+    weightify( \*STDIN );
+}
+
+for my $i ( 0 .. $#counts ) {
+    say $names[$i], "\t\t", weights2str( $counts[$i] );
+    for my $set (sort keys %sets) {
+        my %counts;
+        for my $c (keys %{ $sets{$set} }) {
+            $counts{$c} = $counts[$i]->{$c} if exists $counts[$i]->{$c};
+        }
+        say $names[$i], "\t$set\t", weights2str( \%counts ) if %counts;
+    }
+}
+
+sub weightify {
+    my ($fh)  = @_;
+    my (@new) = weights_from($fh);
+    for my $i ( 0 .. $#new ) {
+        for my $k ( keys %{ $new[$i] } ) {
+            $counts[$i]->{$k} += $new[$i]->{$k};
+        }
+    }
+}

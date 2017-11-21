@@ -2,10 +2,10 @@ package Module::CoreList::Utils;
 
 use strict;
 use warnings;
-use vars qw[$VERSION %utilities];
 use Module::CoreList;
 
-$VERSION = '5.20171020';
+our $VERSION = '5.20171120';
+our %utilities;
 
 sub utilities {
     my $perl = shift;
@@ -1328,6 +1328,13 @@ my %delta = (
     },
     5.027005 => {
         delta_from => 5.027004,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.027006 => {
+        delta_from => 5.027005,
         changed => {
         },
         removed => {

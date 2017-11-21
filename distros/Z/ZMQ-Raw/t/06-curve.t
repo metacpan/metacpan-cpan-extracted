@@ -24,12 +24,12 @@ my $req = ZMQ::Raw::Socket->new ($ctx, ZMQ::Raw->ZMQ_REQ);
 $req->setsockopt (ZMQ::Raw::Socket->ZMQ_CURVE_SECRETKEY, $c_private);
 $req->setsockopt (ZMQ::Raw::Socket->ZMQ_CURVE_PUBLICKEY, $c_public);
 $req->setsockopt (ZMQ::Raw::Socket->ZMQ_CURVE_SERVERKEY, $s_public);
-$req->connect ('tcp://127.0.0.1:5555');
+$req->connect ('tcp://127.0.0.1:5556');
 
 my $rep = ZMQ::Raw::Socket->new ($ctx, ZMQ::Raw->ZMQ_REP);
 $rep->setsockopt (ZMQ::Raw::Socket->ZMQ_CURVE_SECRETKEY, $s_private);
 $rep->setsockopt (ZMQ::Raw::Socket->ZMQ_CURVE_SERVER, 1);
-$rep->bind ('tcp://*:5555');
+$rep->bind ('tcp://*:5556');
 
 # send/recv
 $req->send ('hello');

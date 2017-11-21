@@ -1,5 +1,8 @@
 Revision history for PkgConfig
 
+0.18026 2017-11-21
+  - Add support for Slackware 64bit
+
 0.17026 2017-09-18
   - --modversion does not require dependencies
 

@@ -1,8 +1,10 @@
 package QBit::Validator::Type::array;
-$QBit::Validator::Type::array::VERSION = '0.010';
+$QBit::Validator::Type::array::VERSION = '0.011';
 use qbit;
 
 use base qw(QBit::Validator::Type);
+
+use Exception::Validator;
 
 #order is important
 my $OPTIONS = [

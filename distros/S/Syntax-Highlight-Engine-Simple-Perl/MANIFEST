@@ -2,8 +2,6 @@ Changes
 lib/Syntax/Highlight/Engine/Simple/Perl.pm
 Makefile.PL
 MANIFEST
-MYMETA.json
-MYMETA.yml
 README
 README.pod
 t/00.load.t

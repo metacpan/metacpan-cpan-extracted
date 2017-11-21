@@ -1,0 +1,55 @@
+---
+abstract: 'WRiting Tool, a static site/blog generator and related utilities'
+author:
+  - unknown
+build_requires: {}
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.142690'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-WRT
+provides:
+  App::WRT:
+    file: lib/App/WRT.pm
+    version: v4.2.1
+  App::WRT::Date:
+    file: lib/App/WRT/Date.pm
+  App::WRT::HTML:
+    file: lib/App/WRT/HTML.pm
+  App::WRT::Image:
+    file: lib/App/WRT/Image.pm
+  App::WRT::LaTeX:
+    file: lib/App/WRT/LaTeX.pm
+  App::WRT::Markup:
+    file: lib/App/WRT/Markup.pm
+  App::WRT::MethodSpit:
+    file: lib/App/WRT/MethodSpit.pm
+  App::WRT::Renderer:
+    file: lib/App/WRT/Renderer.pm
+  App::WRT::Util:
+    file: lib/App/WRT/Util.pm
+recommends:
+  CGI::Fast: '0'
+requires:
+  Data::Dumper: '0'
+  Exporter: '0'
+  File::Basename: '0'
+  File::Copy: '0'
+  File::Spec: '0'
+  Getopt::Long: '0'
+  HTML::Entities: '0'
+  Image::Size: '0'
+  JSON: '0'
+  POSIX: '0'
+  Text::Markdown::Discount: '0.11'
+  Text::Textile: '0'
+  XML::Atom::SimpleFeed: '0.8'
+  XML::Feed: '0'
+  perl: v5.10.0
+resources:
+  license: http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt
+version: v4.2.1

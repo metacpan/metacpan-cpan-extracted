@@ -298,6 +298,7 @@ sub __gen_mod {
    my($TYPE)         = uc($type);
 
    print $o <<"EOS";
+use if \$] >= 5.027007, 'deprecate';
 use Locale::Codes;
 use Locale::Codes::Constants;
 

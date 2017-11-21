@@ -1,5 +1,5 @@
 package Search::Elasticsearch::Role::Cxn;
-$Search::Elasticsearch::Role::Cxn::VERSION = '5.02';
+$Search::Elasticsearch::Role::Cxn::VERSION = '6.00';
 use Moo::Role;
 use Search::Elasticsearch::Util qw(parse_params throw to_list);
 use List::Util qw(min);
@@ -304,10 +304,10 @@ sub process_response {
 
     # Deprecation warnings
     if ( my $warnings = $headers->{warning} ) {
-        $warnings = join( "; ", @$warnings ) if ref $warnings eq 'ARRAY';
+        my $warning_string = _parse_warnings($warnings);
         my %temp = (%$params);
         delete $temp{data};
-        $self->logger->deprecation( $warnings, \%temp );
+        $self->logger->deprecation( $warning_string, \%temp );
     }
 
     # Request is successful
@@ -358,6 +358,24 @@ sub process_response {
 }
 
 #===================================
+sub _parse_warnings {
+#===================================
+    my @warnings = ref $_[0] eq 'ARRAY' ? @{ shift() } : shift();
+    my @str;
+    for (@warnings) {
+        if ( $_ =~ /^\d+\s+\S+\s+"((?:\\"|[^"])+)"/ ) {
+            my $msg = $1;
+            $msg=~s/\\"/"/g,
+            push @str, $msg;
+        }
+        else {
+            push @str, $_;
+        }
+    }
+    return join "; ", @str;
+}
+
+#===================================
 sub _munge_elasticsearch_exception {
 #===================================
     my ( $self, $body ) = @_;
@@ -402,7 +420,7 @@ Search::Elasticsearch::Role::Cxn - Provides common functionality to HTTP Cxn imp
 
 =head1 VERSION
 
-version 5.02
+version 6.00
 
 =head1 DESCRIPTION
 

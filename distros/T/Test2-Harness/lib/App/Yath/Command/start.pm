@@ -2,7 +2,14 @@ package App::Yath::Command::start;
 use strict;
 use warnings;
 
-our $VERSION = '0.001031';
+use vars qw/$DTRACE/;
+
+BEGIN {
+    require Test2::Harness::Util::DepTracer;
+    $DTRACE = Test2::Harness::Util::DepTracer->new;
+}
+
+our $VERSION = '0.001034';
 
 use File::Spec();
 
@@ -63,6 +70,7 @@ sub run {
             dir => $settings->{dir},
             run => $run,
             script => find_yath(),
+            dtrace => $DTRACE,
         );
 
         my $queue = $runner->queue;

@@ -1,16 +1,15 @@
 #
 # This file is part of Config-Model-Approx
 #
-# This software is Copyright (c) 2013 by Dominique Dumont.
+# This software is Copyright (c) 2009-2017 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Approx ;
-{
-  $Config::Model::Approx::VERSION = '1.009';
-}
+$Config::Model::Approx::VERSION = '1.010';
+use Config::Model 2.109;
 
 1 ;
 
@@ -22,7 +21,7 @@ Config::Model::Approx - Approx configuration file editor
 
  # full blown editor
  sudo cme edit approx
- 
+
  # command line use
  sudo cme modify approx distributions:multimedia=http://www.debian-multimedia.org
 
@@ -62,14 +61,14 @@ Dominique Dumont, (ddumont at cpan dot org)
    This file is part of Config-Model-Approx.
 
    Config-Model-Approx is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser Public License as
+   modify it under the terms of the GNU Lesser General Public License as
    published by the Free Software Foundation; either version 2.1 of
    the License, or (at your option) any later version.
 
    Config-Xorg is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser Public License for more details.
+   Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public License
    along with Config-Model; if not, write to the Free Software

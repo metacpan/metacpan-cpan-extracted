@@ -1,10 +1,10 @@
 =head1 NAME
 
-Syntax::Highlight::Engine::Simple::Perl - (EXPERIMENTAL) Perl code highlighting class
+Syntax::Highlight::Engine::Simple::Perl - Perl code highlighting class
 
 =head1 VERSION
 
-This document describes Syntax::Highlight::Engine::Simple::Perl version 0.0.1
+This document describes Syntax::Highlight::Engine::Simple::Perl version 0.05
 
 =head1 SYNOPSIS
 
@@ -36,10 +36,6 @@ Highlighting stage
 =head1 DESCRIPTION
 
 This is a sub class of Syntax::Highlight::Engine::Simple.
-
-A working example of This module is at bellow.
-
-http://jamadam.com/dev/cpan/demo/Syntax/Highlight/Engine/Simple/
 
 =head1 INTERFACE 
 

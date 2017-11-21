@@ -1,0 +1,19 @@
+0.06 - 2017-11-15
+ - Don't use oct for non-encoded integer values
+ - Appease Grinnz with his use parent PR
+
+0.05 - 2017-11-15
+ - Allow constants to be input as hex, oct, and binary
+
+0.04 - 2017-11-14
+ - Remove string eval for parsing ints.
+ - Add more checks for invalid values being passed in
+
+0.03 - 2017-11-14
+ - Actually fix precedence.  Damned right recursive parsers in my left associative operators.
+
+0.02 - 2017-11-14
+ - Fix precedence.  What you thought this was gonna be right the first time?
+
+0.01 - 2017-11-14
+ - First version

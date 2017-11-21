@@ -1,0 +1,34 @@
+---
+abstract: 'Generate changes file based on vcs commits'
+author:
+  - 'Renee Baecker <reneeb@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: OTRS-OPM-Maker-Command-changes
+requires:
+  Capture::Tiny: '0.24'
+  Carp: '0'
+  File::Basename: '0'
+  File::Find::Rule: '0'
+  File::Spec: '0'
+  IO::File: '0'
+  JSON: '2.27'
+  List::Util: '1.33'
+  OTRS::OPM::Maker: '0'
+  Path::Class: '0'
+  Test::Exception: '0.35'
+  Test::LongString: '0.15'
+  perl: '5.010'
+resources:
+  bugtracker: http://github.com/reneeb/OTRS-OPM-Maker-Command-changes/issues
+  homepage: http://github.com/reneeb/OTRS-OPM-Maker-Command-changes
+  repository: http://github.com/reneeb/OTRS-OPM-Maker-Command-changes.git
+version: '0.02'
+x_serialization_backend: 'YAML::Tiny version 1.69'

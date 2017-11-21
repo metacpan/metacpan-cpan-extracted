@@ -1,5 +1,5 @@
 package App::JESP::Cmd::Command::deploy;
-$App::JESP::Cmd::Command::deploy::VERSION = '0.013';
+$App::JESP::Cmd::Command::deploy::VERSION = '0.015';
 use base qw/App::JESP::Cmd::CommandJESP/;
 use strict; use warnings;
 use Log::Any qw/$log/;

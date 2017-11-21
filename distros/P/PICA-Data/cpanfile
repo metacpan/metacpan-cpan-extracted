@@ -7,6 +7,8 @@ requires 'IO::Handle', '0';
 requires 'IO::File', '1.14';
 requires 'Exporter', '0';
 requires 'XML::LibXML', '2';
+requires 'XML::Writer', 0;
+
 
 # don't included here because Dist::Zilla::App::Command::listdeps would include it
 # recommends 'Catmandu::PICA';

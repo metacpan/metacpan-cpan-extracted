@@ -1,15 +1,20 @@
 #!/usr/bin/env perl
 # PODNAME: eris-context.pl
 # ABSTRACT: Utility for testing the logging contextualizer
+## no critic (RequireEndWithOne)
 use strict;
 use warnings;
 
 use CLI::Helpers qw(:output);
 use Data::Printer;
 use FindBin;
+use Hash::Flatten qw(flatten);
 use Getopt::Long::Descriptive;
 use Path::Tiny;
+use YAML;
+
 use eris::log::contextualizer;
+use eris::schemas;
 
 #------------------------------------------------------------------------#
 # Path Setup
@@ -20,27 +25,37 @@ my $path_base = path("$FindBin::Bin")->parent;
 my ($opt,$usage) = describe_options(
     "%c %o ",
     [ 'sample|s:s', "Sample messages from the specified context" ],
+    ['bulk|b',      "Show the bulk output from the schema match instead." ],
+    ['flatten|F',   "Flatten the hash keys, defaults to false."],
+    ['complete|C',  "Use the complete object instead of just the uniqued context."],
     [],
     [ 'config|c:s', "eris config file", {
         callbacks => { exists => sub { -f shift } }
     }],
+    [ 'help' => 'Display this message and exit', { shortcircuit => 1 } ],
 );
+if( $opt->help ) {
+    print $usage->text;
+    exit 0;
+}
 
 #------------------------------------------------------------------------#
 # Main
-my $ctxr = eris::log::contextualizer->new( $opt->config ? (config => $opt->config) : () );
+my $cfg  = $opt->config ? YAML::LoadFile($opt->config) : {};
+my $ctxr = eris::log::contextualizer->new( config => $cfg );
+my $schm = eris::schemas->new( $cfg->{schemas} ? %{ $cfg->{schemas} } : () );
 
 my @sampled = ();
 foreach my $c ( @{ $ctxr->contexts->plugins } ) {
     verbose({color=>'magenta'}, sprintf "Loaded context: %s", $c->name);
-    if( lc $opt->sample eq $c->name ) {
+    if( $opt->sample and lc $opt->sample eq lc $c->name ) {
         push @sampled, $c->sample_messages;
     }
 }
 
 if( @sampled ) {
     foreach my $msg ( @sampled ) {
-        p( $ctxr->parse($msg) );
+        dump_record($msg);
     }
 }
 else {
@@ -48,8 +63,21 @@ else {
     while(<>) {
         chomp;
         verbose({color=>'cyan'}, $_);
-        my $l = $ctxr->parse($_);
-        p($l);
+        dump_record($_);
+    }
+}
+
+sub dump_record {
+    my $msg = shift;
+    my $l = $ctxr->parse($msg);
+    if( $opt->bulk ) {
+        output({data=>1}, $schm->as_bulk($l));
+    }
+    else {
+        p($l->as_doc(
+            $opt->flatten  ? ( flatten => 1 )  : (),
+            $opt->complete ? ( complete => 1 ) : (),
+        ));
     }
 }
 
@@ -65,7 +93,7 @@ eris-context.pl - Utility for testing the logging contextualizer
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 AUTHOR
 

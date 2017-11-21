@@ -120,6 +120,7 @@ my %tests = (
     'ໜ້າ' => { consonant => 'ໜ', live => 1, tone => 'MID_FALLING', tone_mark => MAI_THO, vowel => 'Xາ', vowel_length => 'long' },
     'ເຫດ' => { consonant => 'ຫ', end_consonant => "ດ", live => 0, tone => 'MID_FALLING',  vowel => "ເX", vowel_length => 'long' },
     'ເອື້ອຢ' => { consonant => "ອ", end_consonant => "ຢ", live => 1, tone => "HIGH_FALLING", tone_mark => MAI_THO, vowel => "ເ◌ືອ", vowel_length => "long" },
+    'ສວນ' => { consonant => "ສ", end_consonant => "ນ", live => 1, tone => "RISING", vowel => "◌ວ", vowel_length => "long" },
     #TODO 'ນ້ໍາ' => { consonant => "ນ", live => 0, tone => "HIGH_FALLING", tone_mark => MAI_THO, vowel => "◌ໍາ", vowel_length => "short" },
 
     # TODO verify

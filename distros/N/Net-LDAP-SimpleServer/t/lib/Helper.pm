@@ -6,8 +6,14 @@ use Exporter 'import';
 our @EXPORT_OK   = qw(ldap_client test_requests server_ok server_nok);
 our %EXPORT_TAGS = (
     LDIFSTORE => [
-        qw/ldifstore_check_param ldifstore_check_param_success ldifstore_check_param_failure/
-    ]
+        qw(
+          ldifstore_check_param
+          ldifstore_check_param_success
+          ldifstore_check_param_failure
+          )
+    ],
+    PARAMS => [qw(server_ok server_nok)],
+    CLIENT => [qw/ldap_client test_requests/],
 );
 
 use Carp;
@@ -41,15 +47,14 @@ my $default_test_port   = 30389;
 my $default_start_delay = 5;
 my $default_end_signal  = 3;
 
-my $server_fixed_opts = {
+my $test_fixed_opts = {
     log_file => '/tmp/ldapserver.log',
     port     => $default_test_port,
     host     => 'localhost',
 };
 
-my $alarm_wait = 5;
-my $OK         = 'OK';
-my $NOK        = 'NOK ';
+my $OK  = 'OK';
+my $NOK = 'NOK ';
 
 sub _eval_params {
     my $p      = shift;
@@ -58,36 +63,28 @@ sub _eval_params {
     our $pipe = IO::Pipe->new;
 
     run_fork {
+        parent {
+            # parent code
+            $pipe->reader;
+            $result = <$pipe>;
+        }
         child {
             $pipe->writer;
 
-            sub quit {
-                print $pipe shift . "\n";
-                exit;
-            }
+            my $quit = sub { print $pipe shift; exit; };
 
             alarm 0;
-            local $SIG{ALRM} = sub { quit($OK) };
-            alarm $alarm_wait;
+            local $SIG{ALRM} = sub { $quit->($OK) };
+            alarm $default_start_delay;
 
             try {
-                use Net::LDAP::SimpleServer;
-
-                my $s = Net::LDAP::SimpleServer->new($server_fixed_opts);
-                $s->run($p);
+                Net::LDAP::SimpleServer->new($test_fixed_opts)->run($p);
             }
             catch {
-                quit( $NOK . $@ );
+                $quit->( $NOK . '[' . $@ . ']' );
             }
         }
     };
-
-    # parent code
-    $pipe->reader;
-
-    $result = <$pipe>;
-    chomp $result;
-
     return $result;
 }
 
@@ -95,26 +92,16 @@ sub server_nok {
     my ( $params, $test_name ) = @_;
     my $res = _eval_params($params);
 
-    #diag( 'res = ', $res);
-    if ( $res eq $OK ) {
-        diag( 'params = ', explain($params) );
-        fail($test_name);
-        return;
-    }
-    pass($test_name);
+    isnt( $res, $OK, $test_name )
+      || diag( $res . ': params=' . explain($params) );
 }
 
 sub server_ok {
     my ( $params, $test_name ) = @_;
     my $res = _eval_params($params);
 
-    #diag( 'res = ', $res);
-    if ( $res eq $OK ) {
-        pass($test_name);
-        return;
-    }
-    diag( 'params = ', explain($params) );
-    fail( $test_name ? $test_name : $res );
+    is( $res, $OK, $test_name )
+      || diag( $res . ': params=' . explain($params) );
 }
 
 sub ldap_client {
@@ -127,19 +114,16 @@ sub test_requests {
     my $requests_sub = $opts->{requests_sub}
       || croak "Must pass 'requests_sub'";
     my $server_opts = $opts->{server_opts} || croak "Must pass 'server_opts'";
-
     my $start_delay = $opts->{start_delay} || $default_start_delay;
     my $end_signal  = $opts->{end_signal}  || $default_end_signal;
 
     run_fork {
         parent {
+            # client side
             my $child = shift;
 
             try {
-                # give the server some time to start
                 sleep $start_delay;
-
-                # run client
                 $requests_sub->();
             }
             finally {
@@ -147,10 +131,8 @@ sub test_requests {
             }
         }
         child {
-            my $s = Net::LDAP::SimpleServer->new($server_fixed_opts);
-
-            # run server
-            $s->run($server_opts);
+            # server side
+            Net::LDAP::SimpleServer->new($test_fixed_opts)->run($server_opts);
         }
     };
 }

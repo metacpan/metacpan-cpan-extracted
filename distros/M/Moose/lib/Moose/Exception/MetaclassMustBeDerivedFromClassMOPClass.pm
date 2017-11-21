@@ -1,5 +1,5 @@
 package Moose::Exception::MetaclassMustBeDerivedFromClassMOPClass;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -15,4 +15,5 @@ sub _build_message {
     "The metaclass (".$self->class_name.") must be derived from Class::MOP::Class";
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

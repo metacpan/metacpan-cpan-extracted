@@ -1,5 +1,10 @@
 Revision history for Perl module YAHC
 
+0.035 2017-11-13 IKRUGLOV
+    - *change in behaivor* - lowercase header keys
+    - provide ability to pass external eventlog in ->new()
+    - include new tests
+
 0.034 2017-06-20 IKRUGLOV
     - support of reposponses without Content-Length by joaquim.rovira@booking.com
     - check that Content-Length is numeric value by joaquim.rovira@booking.com

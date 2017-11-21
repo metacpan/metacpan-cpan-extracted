@@ -1,5 +1,24 @@
 Revision history for Perl extension Crypt::OpenSSL::PKCS12.
 
+0.8   Sun Nov 20 19:21:47 CET 2017
+
+    - Patch from jonasbn improving handling of C include paths
+
+    - Patch from jonasbn reinitializing inc/ and Module::Install integration
+
+    - Patch from Songmu adjusting use of paths and flags in Makeilfe.PL
+
+    - Patch from jonasbn adding inc/Module/Install/External.pm from Module::Install
+      missing from MANIFEST
+
+    - Patch from jonasbn for compability with required C libraries installed
+      via Homebrew on OSX
+
+    - Patch from jonasbn to address clang changes
+
+    - Patch from Christopher Hoskin enabling compability with OpenSSL 1.1.0 and
+      backwards compability with OpenSSL 1.0.2
+
 0.7   Fri Oct 24 06:16:43 PDT 2014
 	- Patch from Mikołaj Zalewski to fix C90 issue on CentOS.
 	- Patch from Darko Prelec to fix compile issue #2.

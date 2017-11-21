@@ -1,7 +1,7 @@
 package Devel::Chitin::OpTree::LOOP;
 use base 'Devel::Chitin::OpTree::LISTOP';
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use strict;
 use warnings;

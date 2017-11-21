@@ -7,9 +7,11 @@ use warnings;
 
 mydan - A suite of cluster administration tools and platforms
 
+http://www.mydan.org
+
 =cut
 
-our $VERSION = '0.0.1';
+our $VERSION = '0.1.9';
 our $PATH;
 
 require 5.000;

@@ -1,0 +1,62 @@
+<html>
+<head>
+    <title>[% title | html %]</title>
+    <style>
+        .plain {
+            color: gray;
+        }
+        .color {
+            color: green;
+            border: red dotted 1px;
+        }
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <script lang="javascript" src="[% root | html %]/main.js">
+    </script>
+    <script lang="javascript">
+        "use strict";
+        function upd() {
+            document.getElementById("reply").innerHTML = 'Waiting...';
+            document.getElementById("raw_reply").innerHTML = 'Waiting...';
+
+            var form = document.forms['request'];
+            var data = {
+                regex:  form.regex.value,
+                sample: form.sample.value
+            };
+
+            do_request("[% root | html %]/backend", data,
+                function(text) {
+                    document.getElementById("raw_reply").innerHTML = text;
+                    document.getElementById("reply").innerHTML =
+                        colorize_nested( JSON.parse( text ), 'plain', 'color' );
+                },
+                function(err) {
+                    document.getElementById("reply").innerHTML =
+                        '<span class="error">Error '+err+'</span>'
+                }
+            );
+            return false;
+        };
+    </script>
+<h1>[% title | html %]</h1>
+<h2>Enter a regular expression and several example strings below</h2>
+<form name="request" onSubmit="return upd()" onLoad="return upd()">
+    Regex: <input name="regex" onChange="return upd()">
+    <input type="submit" value="Run"><br>
+    <textarea name="sample" cols=80 rows=10 onChange="return upd()"></textarea>
+</form>
+<h2>Reply:</h2>
+<div id="reply">
+    Waiting...
+</div>
+<h2>Raw reply</h2>
+<tt id="raw_reply">
+Waiting...
+</tt>
+</body>
+</html>

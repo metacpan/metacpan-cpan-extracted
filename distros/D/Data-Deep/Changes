@@ -47,3 +47,7 @@ Revision history for Perl extension Data::DeepManip.
 	add public functions patternDom2Text() & patternText2Dom() (redesigned from previous internal function)
 
 0.12    Warning purify
+
+0.13  	-  bad encoded characters, little correction in POD
+	-  correction in POD characters (l.1814 & l.1916) 
+

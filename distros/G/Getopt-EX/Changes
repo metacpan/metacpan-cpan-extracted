@@ -1,5 +1,18 @@
 Revision history for Perl extension Getopt-EX
 
+v1.2.1 2017-11-16T11:07:06Z
+
+    Most of these changes are made to implement `optex' command.
+
+    - Pre-define __PACKAGE__ macro.
+    - Localize @ARGV before calling function.
+    - Allow subdirectory module.
+    - Implement $<move>, $<remove> and $<copy> notation.
+    - Call module initialize() before function given by -M.
+    - Support HERE document.
+    - Fix to accept "--option=value" lvalue in "define" statement.
+    - Fix to accept empty BASECLASS.
+
 v1.1.1 2017-08-18T04:17:58Z
 
     - Spun off from Greple command repository.

@@ -1,0 +1,8 @@
+Utility or example scripts.
+
+ * athshean - word generator based on place and individual names in
+   Ursula K. Le Guin's "The Word for World is Forest"
+ * shwcnsnntclstrs - highlights consonant clusters in the input (may
+   need tweaks depending on the input)
+ * tokiponaish - word generator for something like Toki Pona
+ * weightify - shows character frequencies in awkwords choices format

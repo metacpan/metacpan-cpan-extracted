@@ -2,7 +2,7 @@ package Example::Extension::BoundedQueue;
 
 use Mic::Class
     interface => { 
-        extends => [qw/Example::Extension::Queue/],
+        extends => 'Example::Extension::Queue',
 
         object => {
             max_size => {},

@@ -1,14 +1,10 @@
 package Filter::decrypt ;
 
-require 5.002 ;
-require DynaLoader;
-use strict;
-use warnings;
-use vars qw(@ISA $VERSION);
-@ISA = qw(DynaLoader);
-$VERSION = "1.57" ;
+require 5.006 ;
+require XSLoader;
+our $VERSION = "1.58" ;
 
-bootstrap Filter::decrypt ;
+XSLoader::load('Filter::decrypt');
 1;
 __END__
 

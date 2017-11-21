@@ -48,6 +48,8 @@ if ($is_gcc)
 if ($is_windows)
 {
 	$def .= ' -D_WINSOCK_DEPRECATED_NO_WARNINGS -D_CRT_SECURE_NO_WARNINGS -DFD_SETSIZE=16384';
+	$def .= ' -D_WIN32_WINNT=0x0600';
+
 	$lib .= ' -lws2_32 -lrpcrt4 -liphlpapi msvcprt.lib';
 
 	if ($is_msvc)
@@ -195,7 +197,7 @@ close $fh;
 my @cpp_srcs = glob 'deps/libzmq/src/*.cpp';
 my @cpp_objs = map { substr ($_, 0, -3) . 'o' } (@cpp_srcs);
 
-my @c_srcs = glob 'deps/libzmq/src/*.c';
+my @c_srcs = (glob ('deps/libzmq/src/*.c'), glob ('deps/libzmqraw/*.c'));
 my @c_objs = map { substr ($_, 0, -1) . 'o' } (@c_srcs);
 
 sub MY::c_o {
@@ -230,7 +232,7 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => "6.63_03"
   },
   "DISTNAME" => "ZMQ-Raw",
-  "INC" => "-I. -Ideps/libzmq/include",
+  "INC" => "-I. -Ideps -Ideps/libzmq/include",
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.008",
   "NAME" => "ZMQ::Raw",
@@ -238,6 +240,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Carp" => 0,
     "XSLoader" => 0,
+    "constant" => 0,
     "overload" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -252,7 +255,7 @@ my %WriteMakefileArgs = (
     "Test::Pod::Coverage" => "0.0",
     "threads" => 0
   },
-  "VERSION" => "0.14",
+  "VERSION" => "0.17",
   "test" => {
     "TESTS" => "t/*.t"
   }

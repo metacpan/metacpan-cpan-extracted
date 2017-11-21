@@ -90,10 +90,10 @@ sub type {
     return 'Shipyard' if $$source =~ s/^(?:shipyard|shipwright)://i;
 
     # prefix that can be omitted
-    for my $type (qw/svn http ftp git/) {
+    for my $type (qw/svn http https ftp git/) {
         if ( $$source =~ /^$type:(?!:\w+)/i ) {
             $$source =~ s{^$type:(?!//)}{}i;
-            return $type eq 'git' ? 'Git' : uc $type;
+            return $type eq 'git' ? 'Git' : $type eq 'https' ? 'HTTP' : uc $type;
         }
     }
 

@@ -30,7 +30,7 @@ eval
                            else
                            {
                                $cont .= $_[1];
-                               if( $cont =~ s/^\**#\*keepalive\*#// )
+                               if( $cont =~ s/^\**#\*MYDan_\d+\*#// )
                                {
                                    print $cont;
                                    $skip = 1;

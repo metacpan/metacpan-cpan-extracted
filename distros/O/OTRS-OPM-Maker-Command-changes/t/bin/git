@@ -1,0 +1,69 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+my $args = join ' ', @ARGV[0,1];
+
+if ( $args eq 'rev-parse --show-toplevel' ) {
+    print "hello";
+}
+elsif ( $args eq 'log -G<Version>' ) {
+    print qq~e9f8d024fdc68ca4cd819c5b3aacf02617beb80f 2017-11-14T10:35:07+01:00
+c842453d814948e863e638c871e07e953a9416f0 2017-09-29T14:41:14+02:00
+831646b16e8ac21db9312e129c4e36aa0e92751d 2017-09-29T13:37:57+02:00
+61b83ea4cca42985209a638cda1ce76204eb3d66 2017-09-08T13:46:20+02:00
+a0a18c6b4795635c44604eb7f88dced638f40869 2017-07-14T13:21:44+02:00
+717a8b939e948990318a8244f2893c93487750b2 2017-04-27T15:40:30+02:00~;
+}
+elsif ( $args eq 'log -p' ) {
+    my %map = (
+        'e9f8d024fdc68ca4cd819c5b3aacf02617beb80f' => [ '17.1.0', '17.1.1' ],
+        'c842453d814948e863e638c871e07e953a9416f0' => [ '17.0.99', '17.1.0' ],
+        '831646b16e8ac21db9312e129c4e36aa0e92751d' => [ '17.0.98', '17.0.99' ],
+        '61b83ea4cca42985209a638cda1ce76204eb3d66' => [ '16.0.1', '17.0.98' ],
+        'a0a18c6b4795635c44604eb7f88dced638f40869' => [ '16.0.0', '16.0.1' ],
+        '717a8b939e948990318a8244f2893c93487750b2' => [ '15.3.1', '15.3.2' ],
+    );
+
+    my $commit = $ARGV[2];
+    my ($old_version, $new_version) = @{ $map{$commit} || [] };
+
+    print qq~commit $commit
+Author: reneeb <info\@perl-services.de>
+Date:   Tue Nov 14 10:35:07 2017 +0100
+
+    noch ein Test
+    
+    Fuer den Text des Commits
+
+diff --git a/AtheneCore.sopm b/AtheneCore.sopm
+index 322a282..a6068d6 100644
+--- a/AtheneCore.sopm
++++ b/AtheneCore.sopm
+@@ -2,7 +2,7 @@
+ <otrs_package version="1.0">
+     <!-- GENERATED WITH OTRS::OPM::Maker::Command::sopm (1.37) -->
+     <Name>AtheneCore</Name>
+-    <Version>$old_version</Version>
++    <Version>$new_version</Version>
+     <Framework>17.1.x</Framework>
+     <PackageRequired Version="15.99.81">AtheneExtensions</PackageRequired>
+     <PackageRequired Version="5.0.1">DynamicFieldInteger</PackageRequired>~;
+    
+}
+elsif ( $args eq 'log --pretty=format:---%n%m%H%n%B' ) {
+    print q~---
+>e9f8d024fdc68ca4cd819c5b3aacf02617beb80f
+noch ein Test
+
+Fuer den Text des Commits
+
+---
+>c842453d814948e863e638c871e07e953a9416f0
+prepare release
+
+---
+>831646b16e8ac21db9312e129c4e36aa0e92751d
+prepare release~;
+}

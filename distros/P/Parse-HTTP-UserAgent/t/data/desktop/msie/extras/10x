@@ -1,0 +1,13 @@
+[AGENT]
+
+Mozilla/5.0 (compatible; MSIE 10.6; Windows NT 6.1; Trident/5.0; InfoPath.2; SLCC1; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729; .NET CLR 2.0.50727) 3gpp-gba UNTRUSTED/1.0
+
+dotnet          => [ '3.0.4506.2152', '3.5.30729', '2.0.50727' ],
+extras          => [ 'InfoPath.2', 'SLCC1', '3gpp-gba', 'UNTRUSTED/1.0' ],
+name            => 'MSIE',
+os              => 'Windows 7',
+parser          => 'msie',
+toolkit         => [ 'Trident', '5.0', '5.000' ],
+version         => '10.600',
+version_raw     => '10.6',
+

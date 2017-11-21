@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 # PODNAME: ncp
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use strict;
 use warnings;
@@ -14,7 +14,7 @@ ncp - parse network device configurations.
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -31,7 +31,7 @@ version 0.005
 -o, --output=STRING     file to write to, defaults to STDOUT.
 
 
-Type 'man ncp' for more information.
+Type 'perldoc ncp' or 'man ncp' for more information.
 
 =back
 
@@ -41,17 +41,17 @@ Type 'man ncp' for more information.
 
 =item B<-v|--vendor> <string>
 
-Specfies the vendor of the configuration to be parsed - e.g. 'CheckPoint', 'Cisco'. This is combined with the '--type' command line argument to load the appropriate parser.
+Specfies the vendor of the configuration to be parsed - e.g. 'CheckPoint', 'Cisco'. This is combined with the '--type' command line argument to load the appropriate parser. If not supplied, 'Cisco' is assumed.
 
 =item B<-t|--type> <string>
 
-Specifies the type of vendor device the configuration is for - e.g. 'Gaia', 'ASA'. This is combined with the '--vendor' command line argument to load the appropriate parser.
+Specifies the type of vendor device the configuration is for - e.g. 'Gaia', 'ASA'. This is combined with the '--vendor' command line argument to load the appropriate parser. If not supplied, 'ASA' is assumed.
 
 =item B<-f|--format> <string>
 
-Specify the format of the output parsed configuration. The 'raw' type is always available, and this will output the raw Perl structures. This is the default if no format is specified.
+Specify the format of the output parsed configuration. The 'raw' & 'json' drivers are always availabler. The 'raw' driver dumps the Perl data structre, and the 'json' driver encodes this data structure as JSON. If not supplied, 'raw' is assumed.
 
-Other types available are dependent on the parser module loaded. Examples may incude 'json' for JavaScript Object Notation and 'csv' for comma separated values. 
+Other output drivers available are dependent on the parser module loaded. For example a parser module may supply a 'csv' output driver to output the configuration as comma separated values.
 
 =item B<-o|--output> <string>
 
@@ -77,11 +77,11 @@ A list of configuration files to parse. If no configuration files are listed it 
 
 =head1 Examples
 
-    # Use the CheckPoint::Gaia module parse a configuration file and output Perl format to STDOUT
-    ncp checkpoint_gaia.conf
-    
     # Use the Cisco::ASA module to parse the configuration to JSON 
     ncp --vendor Cisco --type ASA --format json --output asa.conf
+
+    # As Cisco::ASA is the default, the above command could also be achieved with
+    ncp --format json --output asa.conf
 
 
     # Use the Cisco::ASA module to parse the configuration of three config files, outputting JSON

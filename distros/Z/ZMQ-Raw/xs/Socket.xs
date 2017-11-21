@@ -162,10 +162,7 @@ sendmsg (self, ...)
 	SENDMSG:
 				rc = zmq_sendmsg (sock->socket, &msg, flags | extra);
 				if (rc < 0)
-				{
-					int error = zmq_errno();
 					zmq_msg_close (&msg);
-				}
 				zmq_raw_check_error (rc);
 
 				rc = zmq_msg_close (&msg);
@@ -215,10 +212,7 @@ recv (self, flags=0)
 				flags);
 
 			if (rc < 0)
-			{
-				int error = zmq_errno();
 				zmq_msg_close (&msg);
-			}
 			zmq_raw_check_error (rc);
 
 			sv_catpvn (buffer, zmq_msg_data (&msg), zmq_msg_size (&msg));
@@ -275,10 +269,7 @@ recvmsg (self, flags=0)
 		{
 			rc = zmq_recvmsg (sock->socket, &msg, flags);
 			if (rc < 0)
-			{
-				int error = zmq_errno();
 				zmq_msg_close (&msg);
-			}
 
 			zmq_raw_check_error (rc);
 			++count;
@@ -435,6 +426,9 @@ close (self)
 
 	CODE:
 		sock = ZMQ_SV_TO_PTR (Socket, self);
+
+		if (sock->context == NULL)
+			croak_usage ("close() cannot be called on this socket");
 
 		rc = zmq_close (sock->socket);
 		zmq_raw_check_error (rc);

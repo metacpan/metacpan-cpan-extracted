@@ -1,86 +1,105 @@
 Revision history for Perl extension Parse::HTTP::UserAgent
 
+0.42 2017-11-20 BURAK
+    - Re-release after distro fixes.
+
+0.41 2017-11-20 BURAK
+    - New tests for new browsers
+
+0.40_02 2017-08-09 BURAK
+    - RT#112106 Nigel Gregoire / Slaven Resic
+
+0.40_01 Fri Dec  6 15:38:22 2013
+    - Get rid of pre5.6-isms.
+    - Refactor constant definitions.
+    - Support MSIE 10/11
+    - New TOUCH property.
+    - Support new windows versions in the OS name fixer.
+    - New test strings (mostly TODO).
+    - Always check the existance of Trident.
+    - Support Symbian.
+
 0.39 Mon Dec  2 02:20:23 2013
-    => Fix for RT#89274
+    - Fix for RT#89274
 
 0.38 Mon Sep 16 07:45:22 2013
-    => Fix packaging issue.
+    - Fix packaging issue.
 
 0.37 Thu Sep 12 15:09:15 2013
-    => Support new Opera
-    => Fix RT#80323
+    - Support new Opera
+    - Fix RT#80323
 
 0.36 Sun Jul  8 01:50:04 2012
-    => Bump version.
+    - Bump version.
 
 0.35 Mon May 14 03:53:18 2012
-   => New .NET string support.
-   => Handle embedded parens in a better way.
-   => Set the ua parser name only if it wasn't set inside the actual parser.
-   => Fixes for Maxthon and Android stupidities.
-   => Fix for emacs parser.
-   => Fix mozilla parser.
-   => Fennec support.
+    - New .NET string support.
+    - Handle embedded parens in a better way.
+    - Set the ua parser name only if it wasn't set inside the actual parser.
+    - Fixes for Maxthon and Android stupidities.
+    - Fix for emacs parser.
+    - Fix mozilla parser.
+    - Fennec support.
 
 0.34 Sun Apr  8 00:08:41 2012
-   => "normalize" option.
-   => Fix RT#76351 reported by DAMOG.
+    - "normalize" option.
+    - Fix RT#76351 reported by DAMOG.
 
 0.33 Tue Nov 15 05:22:15 2011
-   => Fix version warning regex.
+    - Fix version warning regex.
 
 0.32 Sun Nov  6 00:55:40 2011
-   => Internal cleanup.
-   => Fixed RT#72159 (Arsen Shirokov).
+    - Internal cleanup.
+    - Fixed RT#72159 (Arsen Shirokov).
 
 0.31 Sat Oct 29 19:47:01 2011
-   => Version parsing fix for RT#71999.
-   => iPad support (RT#71999).
+    - Version parsing fix for RT#71999.
+    - iPad support (RT#71999).
 
 0.30 Thu Oct 27 00:13:10 2011
-   => Update test suite strings.
-   => Internal cleanup.
-   => Android support (+Tablet).
-   => Konqueror support.
-   => Overhaul test suite.
-   => New test strings.
+    - Update test suite strings.
+    - Internal cleanup.
+    - Android support (+Tablet).
+    - Konqueror support.
+    - Overhaul test suite.
+    - New test strings.
 
 0.21 Wed Oct 19 02:13:29 2011
-   => Data::Dumper dumps are now sorted.
-   => Unit test fixes.
-   => Fix RT#71753 (Neil Bowers)
+    - Data::Dumper dumps are now sorted.
+    - Unit test fixes.
+    - Fix RT#71753 (Neil Bowers)
 
 0.20 Tue Oct 27 05:32:45 2009
-   => New parsers for Emacs, HotJava and a generic parser for robot types.
+    - New parsers for Emacs, HotJava and a generic parser for robot types.
 
 0.17 Wed Sep 23 20:55:50 2009
-   => Perl::Critic refactoring
-   => Fix _parse_opera_pre() to prevent die()ing. Reported by: Jim Butler
+    - Perl::Critic refactoring
+    - Fix _parse_opera_pre() to prevent die()ing. Reported by: Jim Butler
 
 0.16 Sat Sep  5 08:51:22 2009
-   => Internal cleanup.
-   => Parser fixes for os/lang fields.
+    - Internal cleanup.
+    - Parser fixes for os/lang fields.
 
 0.15 Sun Aug 30 03:09:49 2009
-   => Opera 10 beta support.
-   => Work around for version::vpp bug which was causing regressions under
+    - Opera 10 beta support.
+    - Work around for version::vpp bug which was causing regressions under
       legacy perls (probably the xs version couldn't be installed on them).
 
 0.14 Fri Aug 28 10:30:49 2009
-   => Pod updates.
-   => Epiphany support.
-   => Add bench.pl to distro
+    - Pod updates.
+    - Epiphany support.
+    - Add bench.pl to distro
 
 0.13 Thu Aug 27 07:19:32 2009
-   => Monolithic version is now bundled.
+    - Monolithic version is now bundled.
 
 0.12 Thu Aug 27 06:55:49 2009
-   => Use version->new() instead of qv().
-   => Moved accessors into base class.
-   => Moved all base classes into ::Base::.
+    - Use version->new() instead of qv().
+    - Moved accessors into base class.
+    - Moved all base classes into ::Base::.
 
 0.11 Wed Aug 26 08:43:04 2009
-   => Add Trident detection to msie parser. remove duplicate from maxthon.
+    - Add Trident detection to msie parser. remove duplicate from maxthon.
 
 0.10 Tue Aug 25 09:39:48 2009
-   => First release.
+    - First release.

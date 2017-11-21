@@ -21,13 +21,13 @@ name: Dancer2-Plugin-WebSocket
 provides:
   Dancer2::Plugin::WebSocket:
     file: lib/Dancer2/Plugin/WebSocket.pm
-    version: v0.1.0
+    version: v0.1.1
   Dancer2::Plugin::WebSocket::Connection:
     file: lib/Dancer2/Plugin/WebSocket/Connection.pm
-    version: v0.1.0
+    version: v0.1.1
   Dancer2::Plugin::WebSocket::Group:
     file: lib/Dancer2/Plugin/WebSocket/Group.pm
-    version: v0.1.0
+    version: v0.1.1
 requires:
   Dancer2::Plugin: '0'
   JSON::MaybeXS: '0'
@@ -43,10 +43,10 @@ resources:
   bugtracker: https://github.com/yanick/Dancer2-Plugin-WebSocket/issues
   homepage: https://github.com/yanick/Dancer2-Plugin-WebSocket
   repository: https://github.com/yanick/Dancer2-Plugin-WebSocket.git
-version: 0.1.0
+version: 0.1.1
 x_author_pledge:
   version: 1
 x_authority: cpan:YANICK
 x_contributors:
-  - 'Yanick Champoux <yanick@babyl.dyndns.org>'
+  - 'Frank Schreiner <schreiner@suse.de>'
 x_serialization_backend: 'YAML::Tiny version 1.67'

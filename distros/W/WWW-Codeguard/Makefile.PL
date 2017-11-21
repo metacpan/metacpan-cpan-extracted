@@ -3,20 +3,23 @@ use strict;
 use warnings FATAL => 'all';
 use ExtUtils::MakeMaker;
 
+my $eumm_version = eval ExtUtils::MakeMaker->VERSION(); # Force versions like 7.12_34 into 7.1234. See perldoc perlmodstyle
+my $authors = [
+    'Rishwanth Yeddula <ryeddula@cpan.org>',
+    'David Oswald <davido@cpan.org>',
+    'James Jacobson <shames@cpan.org>'
+];
+
 WriteMakefile(
     NAME             => 'WWW::Codeguard',
-    AUTHOR           => [
-        'Rishwanth Yeddula <ryeddula@cpan.org>',
-        'David Oswald <davido@cpan.org>',
-        'James Jacobson <shames@cpan.org>'
-    ],
+    AUTHOR           => ($eumm_version < 6.5702 ? $authors->[0] : $authors),
     VERSION_FROM     => 'lib/WWW/Codeguard.pm',
     ABSTRACT_FROM    => 'lib/WWW/Codeguard.pm',
-    LICENSE          => 'Artistic_2_0',
+    LICENSE          => 'artistic_2',
     PL_FILES         => {},
     MIN_PERL_VERSION => 5.008009,
     CONFIGURE_REQUIRES => {
-        'ExtUtils::MakeMaker' => 0,
+        'ExtUtils::MakeMaker' => '7.30', # Multiple authors require EU::MM 6.57_02 or newer.
     },
     BUILD_REQUIRES => {
         'Test::More'       => 0,

@@ -1,0 +1,8 @@
+Revision history for App-WatchLater
+
+0.02    2017/11/12
+        Actually implement the -m and -n flag behaviors.
+        Friendlier command-line syntax.
+
+0.01    2017/11/11
+        First version, released on an unsuspecting world.

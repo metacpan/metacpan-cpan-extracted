@@ -18,7 +18,7 @@ use Test::Timer::TimeoutException;
 
 @EXPORT = qw(time_ok time_nok time_atleast time_atmost time_between);
 
-$VERSION = '2.04';
+$VERSION = '2.08';
 
 my $test  = Test::Builder->new;
 my $timeout = 0;
@@ -196,6 +196,9 @@ sub _benchmark {
     # running code
     &{$code};
 
+    # clear alarm
+    alarm( 0 );
+
     # setting second benchmark
     my $t1 = new Benchmark;
 
@@ -228,6 +231,7 @@ __END__
 # Test::Timer
 
 [![CPAN version](https://badge.fury.io/pl/Test-Timer.svg)](http://badge.fury.io/pl/Test-Timer)
+![stability-stable](https://img.shields.io/badge/stability-stable-green.svg)
 [![Build Status](https://travis-ci.org/jonasbn/perl-test-timer.svg?branch=master)](https://travis-ci.org/jonasbn/perl-test-timer)
 [![Coverage Status](https://coveralls.io/repos/github/jonasbn/perl-test-timer/badge.svg?branch=master)](https://coveralls.io/github/jonasbn/perl-test-timer?branch=master)
 [![License: Artistic-2.0](https://img.shields.io/badge/License-Artistic%202.0-0298c3.svg)](https://opensource.org/licenses/Artistic-2.0)
@@ -245,7 +249,7 @@ Test::Timer - test module to test/assert response times
 
 =head1 VERSION
 
-The documentation describes version 2.04 of Test::Timer
+The documentation describes version 2.08 of Test::Timer
 
 =head1 FEATURES
 
@@ -255,7 +259,7 @@ The documentation describes version 2.04 of Test::Timer
 
 =item * Test subroutines to implement unit-tests to time that your code execution exceeds a specified threshold
 
-=item * Test subroutine to mplement unit-tests to time that your code executes within a specified time frame
+=item * Test subroutine to implement unit-tests to time that your code executes within a specified time frame
 
 =item * Supports measurements in seconds
 
@@ -274,19 +278,18 @@ The documentation describes version 2.04 of Test::Timer
     time_between( sub { doYourStuffYouHave5-10Seconds(); }, 5, 10,
         'lower threshold of 5 seconds and upper threshold of 10 seconds');
 
-    #Will succeed
+    # Will succeed
     time_nok( sub { sleep(2); }, 1, 'threshold of one second');
 
     time_atleast( sub { sleep(2); }, 2, 'threshold of one second');
 
-    #Will fail after 5 (threshold) + 2 seconds (default alarm)
+    # Will fail after 5 (threshold) + 2 seconds (default alarm)
     time_ok( sub { while(1) { sleep(1); } }, 5, 'threshold of one second');
 
     $test::Timer::alarm = 6 #default 2 seconds
 
-    #Will fail after 5 (threshold) + 6 seconds (specified alarm)
+    # Will fail after 5 (threshold) + 6 seconds (specified alarm)
     time_ok( sub { while(1) { sleep(1); } }, 5, 'threshold of one second');
-
 
 =head1 DESCRIPTION
 
@@ -338,7 +341,6 @@ Takes the following parameters:
 
 =back
 
-
     time_nok( sub { sleep(2); }, 1, 'threshold of one second');
 
 If the execution of the code exceeds the threshold specified the test fail with the following diagnostic message
@@ -371,6 +373,25 @@ If the execution of the code exceeds the threshold specified the test fail with 
 
 N will be the actual measured execution time of the specified code
 
+=for HTML <img src='https://jonasbn.github.io/perl-test-timer/assets/images/time_atmost.png' alt='time_atmost visualisation' /></a>
+
+=for markdown ![time_atmost visualisation](https://jonasbn.github.io/perl-test-timer/assets/images/time_atmost.png)
+
+=begin text
+
+Graphical visualisation of the above example.
+
+    +------------------+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    | Time in seconds: | 0| 1| 2| 3| 4| 5| 6| 7| 8| 9|10|11|12|13|14|
+    +------------------+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    | Test outcome:    | S| S| F| F| F| F| F| F| F| F| F| F| F| F| F|
+    +------------------+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+
+    F = failure
+    S = Success
+
+=end text
+
 =head2 time_atleast
 
     time_atleast( sub { doYourStuffAndTakeYourTimeAboutIt(); }, 1, 'threshold of 1 second');
@@ -390,6 +411,25 @@ execution to run longer, set the alarm accordingly.
 
 See also L<diagnostics|/DIAGNOSTICS>.
 
+=for HTML <img src='https://jonasbn.github.io/perl-test-timer/assets/images/time_atleast.png' alt='time_atleast visualisation' /></a>
+
+=for markdown ![time_atleast visualisation](https://jonasbn.github.io/perl-test-timer/assets/images/time_atleast.png)
+
+=begin text
+
+Graphical visualisation of the above example.
+
+    +------------------+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    | Time in seconds: | 0| 1| 2| 3| 4| 5| 6| 7| 8| 9|10|11|12|13|14|
+    +------------------+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    | Test outcome:    | F| F| S| S| S| S| S| S| S| S| S| S| S| S| S|
+    +------------------+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+
+    F = failure
+    S = Success
+
+=end text
+
 =head2 time_between
 
 This method is a more extensive variant of L<time_atmost|/time_atmost> and L<time_ok|/time_ok>, you
@@ -406,6 +446,25 @@ If the code executes faster than the lower threshold or exceeds the upper thresh
 Or
 
     Test ran 12 seconds and did not execute within specified interval 5 - 10 seconds
+
+=for HTML <img src='https://jonasbn.github.io/perl-test-timer/assets/images/time_between.png' alt='time_between visualisation' /></a>
+
+=for markdown ![time_between visualisation](https://jonasbn.github.io/perl-test-timer/assets/images/time_between.png)
+
+=begin text
+
+Graphical visualisation of the above example.
+
+    +------------------+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    | Time in seconds: | 0| 1| 2| 3| 4| 5| 6| 7| 8| 9|10|11|12|13|14|
+    +------------------+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    | Test outcome:    | F| F| F| F| F| S| S| S| S| S| S| F| F| F| F|
+    +------------------+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+
+    F = failure
+    S = Success
+
+=end text
 
 =head1 PRIVATE FUNCTIONS
 
@@ -535,9 +594,9 @@ Coverage report for the release described in this documentation (see L<VERSION|/
     ---------------------------- ------ ------ ------ ------ ------ ------ ------
     File                           stmt   bran   cond    sub    pod   time  total
     ---------------------------- ------ ------ ------ ------ ------ ------ ------
-    blib/lib/Test/Timer.pm         96.1  100.0   64.2   95.4  100.0  100.0   93.8
+    blib/lib/Test/Timer.pm        100.0   95.0   66.6  100.0  100.0   99.9   98.0
     ...Timer/TimeoutException.pm  100.0    n/a    n/a  100.0  100.0    0.0  100.0
-    Total                          96.8  100.0   64.2   96.4  100.0  100.0   94.7
+    Total                         100.0   95.0   66.6  100.0  100.0  100.0   98.4
     ---------------------------- ------ ------ ------ ------ ------ ------ ------
 
 The L<Test::Perl::Critic> test runs with severity 5 (gentle) for now, please
@@ -614,6 +673,8 @@ You can also look for information at:
 =head1 ACKNOWLEDGEMENTS
 
 =over
+
+=item * Erik Johansen, suggestion for clearing alarm
 
 =item * Gregor Herrmann, PR #16 fixes to spelling mistakes
 

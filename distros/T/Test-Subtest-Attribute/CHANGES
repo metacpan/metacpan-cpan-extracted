@@ -1,0 +1,118 @@
+==================================================
+Changes from 2016-11-20 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.03 at 2017-11-20 02:56:07 +0000
+-----------------------------------------
+
+  Change: 92d8fa8d80102724cbe79c6ecd77564371a5c74f
+  Author: Ben Marcotte <33464129+bmarcotte@users.noreply.github.com>
+  Date : 2017-11-19 18:50:03 +0000
+
+    Bumped version to 0.03. 
+
+  Change: ec8ff00040e24d99df8526064cb22a6a693f7852
+  Author: Ben Marcotte <33464129+bmarcotte@users.noreply.github.com>
+  Date : 2017-11-19 18:48:26 +0000
+
+    Added [Test::Kwalitee] plugin to dist.ini. 
+
+  Change: 8845b0e362d62fac28e860a0edf6d51529f839fa
+  Author: Ben Marcotte <33464129+bmarcotte@users.noreply.github.com>
+  Date : 2017-11-19 18:35:49 +0000
+
+    Removed duplicated 'run()' subtest that was previously refactored
+    into the 'Saw expected TAP from fixture: simple_subtest_script.pl'
+    subtest. 
+
+  Change: 22f3421ad854725ea3196f38019a770ccd1162d9
+  Author: Ben Marcotte <33464129+bmarcotte@users.noreply.github.com>
+  Date : 2017-11-19 18:14:00 +0000
+
+    Added the [MetaProvides::Package] plugin to hopefully satisfy the
+    meta_yml_has_provides Kwalitee check. 
+
+  Change: 26a191e02e6a07482bd0bfb06c25afe368386037
+  Author: Ben Marcotte <33464129+bmarcotte@users.noreply.github.com>
+  Date : 2017-11-19 17:55:46 +0000
+
+    Added the [MinimumPerl] plugin to hopefully satisfy the
+    meta_yml_declares_perl_version Kwalitee check. 
+
+  Change: 3f0dee835926a57abf044c4e2cc5f2a62a97941f
+  Author: Ben Marcotte <33464129+bmarcotte@users.noreply.github.com>
+  Date : 2017-11-19 17:32:48 +0000
+
+    Added explicit requires to the cpanfile for Attribute::Handlers and
+    Test::Builder to hopefully satisfy the 'prereq_matches_use' Kwalitee
+    check. 
+
+  Change: 00ad86274b43367dc790f8fcf427388549caad39
+  Author: Ben Marcotte <33464129+bmarcotte@users.noreply.github.com>
+  Date : 2017-11-19 12:35:38 +0000
+
+    As per a recommendation from chorny in Issue #1, moved the modules
+    needed by Dist::Zilla in the cpanfile from the 'build' phase to the
+    'develop' phase. 
+
+  Change: f6052cd13a47efd6180eade2f6989a64b6d4e332
+  Author: Ben Marcotte <33464129+bmarcotte@users.noreply.github.com>
+  Date : 2017-11-19 11:58:16 +0000
+
+    Merge pull request #2 from manwar/auto-generate-meta-json
+
+    - Auto generate META.json using dzil plugin [MetaJSON]. 
+
+  Change: 69c0fb1b0aab4cc261a7b7a045ee9cf5544262da
+  Author: Mohammad S Anwar <mohammad.anwar@yahoo.com>
+  Date : 2017-11-19 04:05:46 +0000
+
+    - Auto generate META.json using dzil plugin [MetaJSON]. 
+
+-----------------------------------------
+version 0.02 at 2017-11-18 22:19:24 +0000
+-----------------------------------------
+
+  Change: d07f989026f5ca10a1f7bd27dc0b7354f5ab3677
+  Author: Ben Marcotte <33464129+bmarcotte@users.noreply.github.com>
+  Date : 2017-11-18 14:19:24 +0000
+
+    Switched from using [NextRelease] to [ChangelogFromGit] for
+    generating the Changes file. Turned on "issues" for [GithubMeta].
+    Started using [CopyFilesFromBuild] to pull the built README and
+    LICENSE files into the repo, so they're visiable via Github.
+    Re-ordered the testing plugins to better match their paths within the
+    build. 
+
+  Change: 04297d2ccff484c6140dff7fedd733776b04dc52
+  Author: Ben Marcotte <33464129+bmarcotte@users.noreply.github.com>
+  Date : 2017-11-18 11:32:07 +0000
+
+    Push update to Changes file. 
+
+-----------------------------------------
+version 0.01 at 2017-11-18 19:15:25 +0000
+-----------------------------------------
+
+  Change: 48adaee59d34f548ad0310bef8e5d233a5c392ea
+  Author: Ben Marcotte <33464129+bmarcotte@users.noreply.github.com>
+  Date : 2017-11-18 11:15:25 +0000
+
+    Initial commit of Test-Subtest-Attribute. 
+
+  Change: cdb09985a762d05666b79f47e3a214b31823ebf8
+  Author: Ben Marcotte <33464129+bmarcotte@users.noreply.github.com>
+  Date : 2017-11-17 18:06:59 +0000
+
+    Added exclusions for Carton files and CPAN distro bundles. 
+
+  Change: cfa81ab9b0690dc7b27e8446eaa4d450185b45b4
+  Author: Ben Marcotte <33464129+bmarcotte@users.noreply.github.com>
+  Date : 2017-11-17 17:26:44 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

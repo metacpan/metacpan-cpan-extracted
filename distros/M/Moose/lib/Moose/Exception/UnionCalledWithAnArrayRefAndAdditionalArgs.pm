@@ -1,5 +1,5 @@
 package Moose::Exception::UnionCalledWithAnArrayRefAndAdditionalArgs;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -20,4 +20,5 @@ sub _build_message {
     "union called with an array reference and additional arguments";
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

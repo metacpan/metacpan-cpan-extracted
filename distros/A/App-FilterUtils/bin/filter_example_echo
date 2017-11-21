@@ -1,0 +1,34 @@
+#!/usr/bin/perl -CA
+
+use strict;
+use warnings;
+
+use App::FilterUtils::filter_example_echo;
+our $VERSION = '0.001'; # VERSION
+
+App::FilterUtils::filter_example_echo->run();
+
+exit 0;
+
+__END__
+
+=head1 Command-line utility
+
+filter_example_echo - Echo input
+
+=head1 DOCUMENTATION
+
+See 'L<perldoc App::FilterUtils::filter_example_echo|App::FilterUtils::filter_example_echo>' or 'filter_example_echo --help' for documentation.
+
+=head1 AUTHOR
+
+Ahmad Fatoum C<< <athreef@cpan.org> >>, L<http://a3f.at>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2017 Ahmad Fatoum
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

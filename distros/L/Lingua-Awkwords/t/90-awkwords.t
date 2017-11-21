@@ -115,7 +115,7 @@ $deeply->(
     $deeply->( $last, { a => 14.3, e => 14.3, o => 42.9, u => 28.6 } );
 
     is( weights2str( ( weights_from("toki sin li toki pona") )[-1] ),
-        'a*1/i*4/k*2/l*1/n*2/o*3/p*1/s*1/t*2' );
+        'a/i*4/k*2/l/n*2/o*3/p/s/t*2' );
 }
 
 plan tests => 13;

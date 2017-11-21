@@ -1,112 +1,185 @@
 package Argon::Simple;
+# ABSTRACT: Utilities for concisely writing Argon client applications
+$Argon::Simple::VERSION = '0.18';
 
 use strict;
 use warnings;
 use Carp;
+use AnyEvent;
+use Try::Catch;
+use Argon;
 use Argon::Client;
+use Argon::Constants qw(:commands);
+use Argon::Log;
+use Argon::Util qw(param);
 
-use parent qw(Exporter);
-our @EXPORT = qw(connect process task);
+use parent 'Exporter';
 
-my $CLIENT;
+our @EXPORT = qw(Argon remote sync async try_async send);
 
-sub connect {
-    my ($host, $port) = @_;
+our $ARGON;
 
-    unless ($port) {
-        ($host, $port) = split /:/, $host;
-    }
+sub Argon (&) {
+  my $code = shift;
 
-    croak 'usage: connect($host, $port)'
-        unless $host && $port;
+  my $context = {
+    _argon => 1,
+    client => undef,
+    sent   => AnyEvent->condvar,
+    async  => {},
+  };
 
-    if (!$CLIENT || $host ne $CLIENT->host || $port != $CLIENT->port) {
-        $CLIENT = Argon::Client->new(host => $host, port => $port);
-    }
+  local $ARGON = $context;
+  local $Argon::ALLOW_EVAL = 1;
 
-    return $CLIENT;
+  $code->();
 }
 
-sub process (&@) {
-    goto \&task;
+sub assert_context {
+  croak 'not within an Argon context'
+    unless defined $ARGON
+        && (ref $ARGON || '') eq 'HASH'
+        && exists $ARGON->{_argon};
 }
 
-sub task ($@) {
-    my ($task_class, @args) = @_;
-    croak 'not connected' unless $CLIENT;
+sub assert_client {
+  assert_context;
+  croak 'not connected' unless defined $ARGON->{client};
+}
 
-    my $msgid    = $CLIENT->queue($task_class, \@args);
-    my $deferred = sub { $CLIENT->collect($msgid) };
+sub remote ($;%) {
+  assert_context;
+  my ($addr, %param) = @_;
+  my ($host, $port) = $addr =~ /^(.+?):(\d+)$/;
 
-    return $deferred unless wantarray;
+  my $cv = AnyEvent->condvar;
+  my $opened = delete $param{opened};
+  $cv->cb($opened) if $opened;
 
-    my $is_finished = sub {
-        my $status = $CLIENT->server_status;
+  $ARGON->{client} = Argon::Client->new(
+    host   => $host,
+    port   => $port,
+    opened => $cv,
+    %param,
+  );
 
-        foreach my $pending (values %{$status->{pending}}) {
-            return 0 if exists $pending->{$msgid};
-        }
+  $cv->recv;
+}
 
-        return 1;
-    };
+sub async (\$&;@) {
+  assert_client;
+  my ($var, $code, @args) = @_;
+  my $cv = AnyEvent->condvar;
+  $ARGON->{async}{$var} = $cv;
+  $ARGON->{client}->process($code, \@args, sub {
+    my $reply = shift;
+    if ($reply->failed) {
+      $cv->croak($reply->info);
+    } else {
+      $cv->send($reply->info);
+    }
+  });
+}
 
-    return ($deferred, $is_finished);
+sub try_async (\$&;@) {
+  assert_client;
+  my ($var, $code, @args) = @_;
+  my $cv = AnyEvent->condvar;
+  $ARGON->{async}{$var} = $cv;
+  $ARGON->{client}->process($code, \@args, sub {
+    my $reply = shift;
+    my $result;
+    my $error;
+
+    if ($reply->denied) {
+      try   { $result = $code->(@args) }
+      catch { $error  = $_ };
+    } else {
+      try   { $result = $reply->result }
+      catch { $error  = $_ };
+    }
+
+    if ($error) {
+      $cv->croak($error);
+    } else {
+      $cv->send($result);
+    }
+  });
+}
+
+sub sync (;\[$@]) {
+  assert_client;
+
+  if (@_) {
+    my $var = shift;
+    return unless exists $ARGON->{async}{$var};
+    $$var = $ARGON->{async}{$var}->recv;
+    delete $ARGON->{async}{$var};
+    return $$var;
+  }
+  else {
+    $ARGON->{sent}->recv;
+    $ARGON->{sent} = AnyEvent->condvar;
+  }
+}
+
+sub send (&@) {
+  assert_client;
+  my $code = shift;
+  my $cb   = pop;
+  my @args = @_;
+  $ARGON->{sent}->begin;
+  $ARGON->{client}->process(
+    $code,
+    [@args],
+    sub { $ARGON->{sent}->end; $cb->(@_) },
+  );
 }
 
 1;
-__DATA__
+
+__END__
+
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
-Argon::Simple
+Argon::Simple - Utilities for concisely writing Argon client applications
+
+=head1 VERSION
+
+version 0.18
 
 =head1 SYNOPSIS
 
-    use Argon::Simple;
+  use Argon::Simple;
 
-    connect 'somehost:9999';
+  Argon {
+    remote 'some.argon-host.com:4242', keyfile => '/path/to/secret';
 
-    my $deferred = process { $_[0] * 2 } 21;
-    if ($deferred->() == 42) {
-        print "So long, and thanks for all the fish!\n";
-    }
+    async my $task => sub { run_task(@_) }, @task_parameters;
+    sync $task;
 
-    my ($deferred, $is_finished) = process { $_[0] * 2 } 21;
-    do { print "." } until $is_finished->();
-    print "So long, and thanks for all the fish!\n";
+    send { run_task($_[0]) } @task_parameters,
+      sub { log_completion($_[0]->result) };
+  };
 
 =head1 DESCRIPTION
 
-In most cases, a script or application is going to connect to a single Argon
-system. For these cases, this module provides simplified access to the Argon
-system.
-
-=head1 SUBROUTINES
-
-=head2 connect("host:port")
-
-Connects to a single Argon manager. If called with a single argument, a string
-in the form of "host:port" is expected. Alternately, the host and port may be
-passed as two separate arguments (e.g. C<connect($host, $port)>).
-
-=head2 process { code } @args
-
-When called in scalar context, returns a CODE reference. When called, the
-C<Coro> thread will block (cede) until the result is retrieved from the Argon
-system and is available.
-
-When called in list context, additionally returns a CODE reference which
-evaluates to true when the task has been completed by the Argon system.
-
-See also L<Coro::ProcessPool/A NOTE ABOUT IMPORTS AND CLOSURES>, which has
-some important information about C<use> and C<require>.
-
-=head2 task 'Task::Class', @args
-
-Similar to process, but passes in the name of a class implementing the methods
-C<new(@args)> and C<run>. The result of C<run> is returned. Note that the class
-must be found on the workers' include paths.
+This module is experimental (read: not done) and the API will likely change
+half a dozen times before I am anywhere near satisfied with it.
 
 =head1 AUTHOR
 
-Jeff Ober <jeffober@gmail.com>
+Jeff Ober <sysread@fastmail.fm>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Jeff Ober.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

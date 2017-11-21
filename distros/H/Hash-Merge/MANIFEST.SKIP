@@ -28,5 +28,6 @@ _Inline/.*
 ^\..*
 Hash-Merge-.*
 \bxt
+Sandbox
 ^MYMETA\.json$
 ^MYMETA\..*$

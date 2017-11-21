@@ -1,0 +1,43 @@
+Testing detectchar
+
+Testing default without options
+<DetectChar attribute="Match" context="#stay" char="e" />
+
+<Test>
+every e is matched.
+EVERY E IS MATCHED.
+<Test>
+
+Testing dynamic
+<RegExpr attribute="Match" context="TestDT" String="\s(e)" />
+<DetectChar attribute="Match" dynamic="true" context="#pop" char="1" />
+
+<TestD>
+scoop an e.
+match it e. 1 #if this matches, dynamic was not called
+<TestD>
+
+<TestD>
+SCOOP AN e.
+MATCH IT E. 1 #if this matches, dynamic was not called
+<TestD>
+
+Testing dynamic insensitive
+<RegExpr attribute="Match" context="TestDIT" String="\s(e)" />
+<DetectChar attribute="Match" dynamic="true" insensitive="true" context="#pop" char="1" />
+<TestDI>
+scoop an e.
+match it e. 1 #if this matches, dynamic was not called
+<TestDI>
+
+<TestDI>
+SCOOP AN e.
+MATCH IT E. 1 #if this matches, dynamic was not called
+<TestDI>
+
+Testing insensitive
+<DetectChar attribute="Match" insensitive="true" context="#stay" char="e" />
+<TestI>
+every e is matched.
+EVERY E IS MATCHED.
+<TestI>

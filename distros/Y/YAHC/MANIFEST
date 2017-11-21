@@ -12,22 +12,27 @@ LICENSE
 Makefile.PL
 MANIFEST			This list of files
 META.yml
+README.md
 scripts/utf8_test.pl
 t/000_compile.t
 t/005_circular_references_check.t
 t/010_build_http_message.t
 t/015_parse_http_headers.t
 t/016_chunked.t
+t/017_content_length.t
 t/023_state_connected.t
 t/024_state_write.t
 t/025_state_read.t
 t/100_account_for_signal.t
 t/110_attempt.t
 t/120_selected_target.t
+t/130_yahc_functions.t
+t/140_yahc_loop.t
 t/200_live_google.t
 t/210_live_timeout_connected.t
 t/220_live_unixis.t
 t/230_live_requests.t
+t/240_live_socket_cache.t
 t/300_robust.t
 t/cert/server.crt
 t/cert/server.key

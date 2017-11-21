@@ -6,7 +6,7 @@ use Cwd 'abs_path';
 use Exporter 'import';
 use Panda::Install::Payload;
 
-our $VERSION = '1.2.8';
+our $VERSION = '1.2.9';
 
 our @EXPORT_OK = qw/write_makefile makemaker_args/;
 our @EXPORT;
@@ -254,7 +254,10 @@ sub process_BIN_DEPS {
     my $params = shift;
     my $bin_deps = delete $params->{BIN_DEPS} or return;
     $bin_deps = [$bin_deps] unless ref($bin_deps) eq 'ARRAY';
+    my $typemaps = $params->{TYPEMAPS} ||= [];
+    $params->{TYPEMAPS} = [];
     _apply_BIN_DEPS($params, $_, {}) for @$bin_deps;
+    push @{$params->{TYPEMAPS}}, @{$typemaps};
 }
 
 sub _apply_BIN_DEPS {
@@ -294,15 +297,6 @@ sub _apply_BIN_DEPS {
     _string_merge($params->{DEFINE},  $info->{DEFINE});
     _string_merge($params->{XSOPT},   $info->{XSOPT});
     
-    if (my $typemaps = $info->{TYPEMAPS}) {
-        my $tm_dir = Panda::Install::Payload::typemap_dir($module);
-        foreach my $typemap (reverse @$typemaps) {
-            my $tmfile = "$tm_dir/$typemap";
-            $tmfile =~ s#[/\\]{2,}#/#g;
-            unshift @{$params->{TYPEMAPS} ||= []}, $tmfile;
-        }
-    }
-    
     if (my $add_libs = $info->{LIBS}) {{
         last unless @$add_libs;
         my $libs = $params->{LIBS} or last;
@@ -322,7 +316,16 @@ sub _apply_BIN_DEPS {
     }}
     
     if (my $passthrough = $info->{PASSTHROUGH}) {
-        _apply_BIN_DEPS($params, $_) for @$passthrough;
+        _apply_BIN_DEPS($params, $_, $seen) for @$passthrough;
+    }
+    
+    if (my $typemaps = $info->{TYPEMAPS}) {
+        my $tm_dir = Panda::Install::Payload::typemap_dir($module);
+        foreach my $typemap (@$typemaps) {
+            my $tmfile = "$tm_dir/$typemap";
+            $tmfile =~ s#[/\\]{2,}#/#g;
+            push @{$params->{TYPEMAPS} ||= []}, $tmfile;
+        }
     }
     
     $params->{CPLUS} = $info->{CPLUS} if $info->{CPLUS} and (!$params->{CPLUS} or $params->{CPLUS} < $info->{CPLUS});

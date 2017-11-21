@@ -9,7 +9,7 @@
 #
 package MooseX::AttributeShortcuts::Trait::Role::Method::Builder;
 our $AUTHORITY = 'cpan:RSRCHBOY';
-$MooseX::AttributeShortcuts::Trait::Role::Method::Builder::VERSION = '0.036';
+$MooseX::AttributeShortcuts::Trait::Role::Method::Builder::VERSION = '0.037';
 # ABSTRACT: Trait for inline builder method metaclasses
 
 use Moose::Role;
@@ -41,7 +41,7 @@ MooseX::AttributeShortcuts::Trait::Role::Method::Builder - Trait for inline buil
 
 =head1 VERSION
 
-This document describes version 0.036 of MooseX::AttributeShortcuts::Trait::Role::Method::Builder - released October 31, 2017 as part of MooseX-AttributeShortcuts.
+This document describes version 0.037 of MooseX::AttributeShortcuts::Trait::Role::Method::Builder - released November 20, 2017 as part of MooseX-AttributeShortcuts.
 
 =head1 DESCRIPTION
 

@@ -21,8 +21,6 @@ share/js/000boilerplate.js
 share/js/core/ajax.js
 share/js/core/cf.js
 share/js/core/current-user.js
-share/js/core/d3-4.10.2.js
-share/js/core/d3.js
 share/js/core/datetime.js
 share/js/core/html.js
 share/js/core/init2.js

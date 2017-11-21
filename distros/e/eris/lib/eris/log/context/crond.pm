@@ -1,4 +1,5 @@
 package eris::log::context::crond;
+# ABSTRACT: Parse crond messages to structured data
 
 use Moo;
 with qw(
@@ -6,9 +7,13 @@ with qw(
 );
 use namespace::autoclean;
 
+our $VERSION = '0.004'; # VERSION
+
+
 sub _build_matcher {
     [qw(crond cron CROND /usr/sbin/cron)]
 }
+
 
 sub sample_messages {
     my @msgs = split /\r?\n/, <<'EOF';
@@ -19,22 +24,23 @@ EOF
     return @msgs;
 }
 
+
 sub contextualize_message {
     my ($self,$log) = @_;
     my $str = $log->context->{message};
 
     my %ctxt = ();
-
     if( $str =~ / CMD / ) {
-        my @parts = map { s/^\(//; s/\)$//; $_ } split / CMD /, $str;
+        my @parts = map { s/(?:^\()|(?:\)$)//rg } split / CMD /, $str;
         $ctxt{src_user} = $parts[0];
         $ctxt{exe} = $parts[1];
         $ctxt{file} = (split /\s+/, $parts[1])[0];
-        $ctxt{action} = 'exec';
+        $ctxt{action} = 'execute';
     }
 
-    $log->add_context($self->name,\%ctxt);
+    $log->add_context($self->name,\%ctxt) if keys %ctxt;
 }
+
 
 1;
 
@@ -46,11 +52,37 @@ __END__
 
 =head1 NAME
 
-eris::log::context::crond
+eris::log::context::crond - Parse crond messages to structured data
 
 =head1 VERSION
 
-version 0.003
+version 0.004
+
+=head1 SYNOPSIS
+
+Parses the crond execution log file entries into structured data
+
+=head1 ATTRIBUTES
+
+=head2 matcher
+
+Matches 'cron', 'CROND', '/usr/sbin/cron'
+
+=head1 METHODS
+
+=head2 contextualize_message
+
+Parses the crond log messages specifying what was run into:
+
+    src_user => User executing
+    exe      => Full command as run by cron
+    file     => Just the executeable without arguments
+
+=for Pod::Coverage sample_messages
+
+=head1 SEE ALSO
+
+L<eris::log::contextualizer>, L<eris::role::context>
 
 =head1 AUTHOR
 

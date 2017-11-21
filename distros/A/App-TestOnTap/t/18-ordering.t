@@ -17,9 +17,8 @@ like($stderr->[0], qr/^WARNING: No execmap found, using internal default!$/, "de
 like($stdout->[13], qr/^Files=3, Tests=3, /, "Three tests found");
 is($stdout->[14], "Result: PASS", "Passed");
 
-$App::TestOnTap::_dbgvars::CONFIG_FILE_NAME = 'alphabetic_config.testontap';
 note("alphabetic (config) ordering");
-($ret, $stdout, $stderr) = TestUtils::xeqsuite([qw(--verbose)]);
+($ret, $stdout, $stderr) = TestUtils::xeqsuite(['--verbose', '--cfg', "$Bin/misc/18-alphabetic_config.testontap"]);
 
 is($ret, 0, "Exited with 0");
 like($stderr->[0], qr/^WARNING: No execmap found, using internal default!$/, "default execmap");
@@ -40,9 +39,8 @@ like($stdout->[8], qr/^t1\.pl /, "t1 last");
 like($stdout->[13], qr/^Files=3, Tests=3, /, "Three tests found");
 is($stdout->[14], "Result: PASS", "Passed");
 
-$App::TestOnTap::_dbgvars::CONFIG_FILE_NAME = 'natural_config.testontap';
 note("natural (config) ordering");
-($ret, $stdout, $stderr) = TestUtils::xeqsuite([qw(--verbose)]);
+($ret, $stdout, $stderr) = TestUtils::xeqsuite(['--verbose', '--cfg', "$Bin/misc/18-natural_config.testontap"]);
 
 is($ret, 0, "Exited with 0");
 like($stderr->[0], qr/^WARNING: No execmap found, using internal default!$/, "default execmap");

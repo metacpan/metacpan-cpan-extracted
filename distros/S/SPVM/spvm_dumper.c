@@ -12,7 +12,7 @@
 #include "spvm_constant.h"
 #include "spvm_field.h"
 #include "spvm_sub.h"
-#include "spvm_my_var.h"
+#include "spvm_my.h"
 #include "spvm_var.h"
 #include "spvm_op.h"
 #include "spvm_enumeration_value.h"
@@ -72,19 +72,19 @@ void SPVM_DUMPER_dump_ast(SPVM_COMPILER* compiler, SPVM_OP* op_base) {
       printf(" (index %" PRId32 ")", constant->id);
     }
     else if (code == SPVM_OP_C_CODE_MY) {
-      SPVM_MY_VAR* my_var = op_cur->uv.my_var;
-      printf(" \"%s\"", my_var->op_name->uv.name);
-      printf(" (my_var->index:%d)", my_var->index);
+      SPVM_MY* my = op_cur->uv.my;
+      printf(" \"%s\"", my->op_name->uv.name);
+      printf(" (my->index:%d)", my->index);
     }
     else if (code == SPVM_OP_C_CODE_OUR) {
       SPVM_OUR* our = op_cur->uv.our;
-      printf(" \"%s\"", our->op_var->uv.var->op_name->uv.name);
+      printf(" \"%s\"", our->op_package_var->uv.package_var->op_name->uv.name);
       printf(" (id :%d)", our->id);
     }
     else if (code == SPVM_OP_C_CODE_VAR) {
       SPVM_VAR* var = op_cur->uv.var;
       printf(" \"%s\"", var->op_name->uv.name);
-      printf(" (my_var->index:%d)", var->op_my_var->uv.my_var->index);
+      printf(" (my->index:%d)", var->op_my->uv.my->index);
     }
     else if (code == SPVM_OP_C_CODE_PACKAGE_VAR) {
       SPVM_PACKAGE_VAR* package_var = op_cur->uv.package_var;
@@ -98,7 +98,7 @@ void SPVM_DUMPER_dump_ast(SPVM_COMPILER* compiler, SPVM_OP* op_base) {
       printf(" \"%s\"", op_cur->uv.type->name);
     }
     else if (code == SPVM_OP_C_CODE_PACKAGE) {
-      if (strcmp(op_cur->uv.package->op_name->uv.name, "std") == 0) {
+      if (strcmp(op_cur->uv.package->op_name->uv.name, "CORE") == 0) {
         printf(" std(omit)\n");
         op_cur = op_cur->sibparent;
         continue;
@@ -257,6 +257,192 @@ void SPVM_DUMPER_dump_bytecode_array(SPVM_COMPILER* compiler, SPVM_BYTECODE_ARRA
       switch (bytecode) {
         
         // Have no operands
+        case SPVM_BYTECODE_C_CODE_POP_CATCH_EXCEPTION:
+        case SPVM_BYTECODE_C_CODE_RETURN_VOID:
+        case SPVM_BYTECODE_C_CODE_CROAK:
+        {
+          break;
+        }
+        
+        // Have one operands
+        case SPVM_BYTECODE_C_CODE_INC_REF_COUNT:
+        case SPVM_BYTECODE_C_CODE_DEC_REF_COUNT:
+        case SPVM_BYTECODE_C_CODE_GOTO:
+        case SPVM_BYTECODE_C_CODE_RETURN_BYTE:
+        case SPVM_BYTECODE_C_CODE_RETURN_SHORT:
+        case SPVM_BYTECODE_C_CODE_RETURN_INT:
+        case SPVM_BYTECODE_C_CODE_RETURN_LONG:
+        case SPVM_BYTECODE_C_CODE_RETURN_FLOAT:
+        case SPVM_BYTECODE_C_CODE_RETURN_DOUBLE:
+        case SPVM_BYTECODE_C_CODE_RETURN_OBJECT:
+        case SPVM_BYTECODE_C_CODE_UNDEF:
+        case SPVM_BYTECODE_C_CODE_LOAD_EXCEPTION_VAR:
+        case SPVM_BYTECODE_C_CODE_STORE_EXCEPTION_VAR:
+        case SPVM_BYTECODE_C_CODE_CURRENT_LINE:
+        case SPVM_BYTECODE_C_CODE_BOOL_BYTE:
+        case SPVM_BYTECODE_C_CODE_BOOL_SHORT:
+        case SPVM_BYTECODE_C_CODE_BOOL_INT:
+        case SPVM_BYTECODE_C_CODE_BOOL_LONG:
+        case SPVM_BYTECODE_C_CODE_BOOL_FLOAT:
+        case SPVM_BYTECODE_C_CODE_BOOL_DOUBLE:
+        case SPVM_BYTECODE_C_CODE_BOOL_OBJECT:
+        case SPVM_BYTECODE_C_CODE_IS_UNDEF:
+        case SPVM_BYTECODE_C_CODE_IS_NOT_UNDEF:
+        case SPVM_BYTECODE_C_CODE_IF_EQ_ZERO:
+        case SPVM_BYTECODE_C_CODE_IF_NE_ZERO:
+        case SPVM_BYTECODE_C_CODE_PUSH_CATCH_EXCEPTION:
+        case SPVM_BYTECODE_C_CODE_CALL_VOID_SUB:
+        case SPVM_BYTECODE_C_CODE_PUSH_ARG:
+        {
+          i++;
+          bytecode = bytecode_array->values[i];
+          printf("        [%" PRId32 "] %d\n", i, bytecode);
+          
+          break;
+        }
+
+        // Have two operands
+        case SPVM_BYTECODE_C_CODE_EQ_BYTE:
+        case SPVM_BYTECODE_C_CODE_EQ_SHORT:
+        case SPVM_BYTECODE_C_CODE_EQ_INT:
+        case SPVM_BYTECODE_C_CODE_EQ_LONG:
+        case SPVM_BYTECODE_C_CODE_EQ_FLOAT:
+        case SPVM_BYTECODE_C_CODE_EQ_DOUBLE:
+        case SPVM_BYTECODE_C_CODE_EQ_OBJECT:
+        case SPVM_BYTECODE_C_CODE_NE_BYTE:
+        case SPVM_BYTECODE_C_CODE_NE_SHORT:
+        case SPVM_BYTECODE_C_CODE_NE_INT:
+        case SPVM_BYTECODE_C_CODE_NE_LONG:
+        case SPVM_BYTECODE_C_CODE_NE_FLOAT:
+        case SPVM_BYTECODE_C_CODE_NE_DOUBLE:
+        case SPVM_BYTECODE_C_CODE_NE_OBJECT:
+        case SPVM_BYTECODE_C_CODE_GT_BYTE:
+        case SPVM_BYTECODE_C_CODE_GT_SHORT:
+        case SPVM_BYTECODE_C_CODE_GT_INT:
+        case SPVM_BYTECODE_C_CODE_GT_LONG:
+        case SPVM_BYTECODE_C_CODE_GT_FLOAT:
+        case SPVM_BYTECODE_C_CODE_GT_DOUBLE:
+        case SPVM_BYTECODE_C_CODE_GE_BYTE:
+        case SPVM_BYTECODE_C_CODE_GE_SHORT:
+        case SPVM_BYTECODE_C_CODE_GE_INT:
+        case SPVM_BYTECODE_C_CODE_GE_LONG:
+        case SPVM_BYTECODE_C_CODE_GE_FLOAT:
+        case SPVM_BYTECODE_C_CODE_GE_DOUBLE:
+        case SPVM_BYTECODE_C_CODE_LT_BYTE:
+        case SPVM_BYTECODE_C_CODE_LT_SHORT:
+        case SPVM_BYTECODE_C_CODE_LT_INT:
+        case SPVM_BYTECODE_C_CODE_LT_LONG:
+        case SPVM_BYTECODE_C_CODE_LT_FLOAT:
+        case SPVM_BYTECODE_C_CODE_LT_DOUBLE:
+        case SPVM_BYTECODE_C_CODE_LE_BYTE:
+        case SPVM_BYTECODE_C_CODE_LE_SHORT:
+        case SPVM_BYTECODE_C_CODE_LE_INT:
+        case SPVM_BYTECODE_C_CODE_LE_LONG:
+        case SPVM_BYTECODE_C_CODE_LE_FLOAT:
+        case SPVM_BYTECODE_C_CODE_LE_DOUBLE:
+        case SPVM_BYTECODE_C_CODE_CALL_SUB:
+        case SPVM_BYTECODE_C_CODE_CALL_OBJECT_SUB:
+        case SPVM_BYTECODE_C_CODE_MOVE:
+        case SPVM_BYTECODE_C_CODE_NEW_OBJECT:
+        case SPVM_BYTECODE_C_CODE_NEW_STRING:
+        case SPVM_BYTECODE_C_CODE_LOAD_PACKAGE_VAR:
+        case SPVM_BYTECODE_C_CODE_STORE_PACKAGE_VAR:
+        case SPVM_BYTECODE_C_CODE_STORE_PACKAGE_VAR_OBJECT:
+        case SPVM_BYTECODE_C_CODE_NEW_BYTE_ARRAY:
+        case SPVM_BYTECODE_C_CODE_NEW_SHORT_ARRAY:
+        case SPVM_BYTECODE_C_CODE_NEW_INT_ARRAY:
+        case SPVM_BYTECODE_C_CODE_NEW_LONG_ARRAY:
+        case SPVM_BYTECODE_C_CODE_NEW_FLOAT_ARRAY:
+        case SPVM_BYTECODE_C_CODE_NEW_DOUBLE_ARRAY:
+        case SPVM_BYTECODE_C_CODE_ARRAY_LENGTH:
+        case SPVM_BYTECODE_C_CODE_LOAD_CONSTANT:
+        case SPVM_BYTECODE_C_CODE_LOAD_CONSTANT2:
+        case SPVM_BYTECODE_C_CODE_INC_BYTE:
+        case SPVM_BYTECODE_C_CODE_INC_SHORT:
+        case SPVM_BYTECODE_C_CODE_INC_INT:
+        case SPVM_BYTECODE_C_CODE_INC_LONG:
+        case SPVM_BYTECODE_C_CODE_NEGATE_BYTE:
+        case SPVM_BYTECODE_C_CODE_NEGATE_SHORT:
+        case SPVM_BYTECODE_C_CODE_NEGATE_INT:
+        case SPVM_BYTECODE_C_CODE_NEGATE_LONG:
+        case SPVM_BYTECODE_C_CODE_NEGATE_FLOAT:
+        case SPVM_BYTECODE_C_CODE_NEGATE_DOUBLE:
+        case SPVM_BYTECODE_C_CODE_COMPLEMENT_BYTE:
+        case SPVM_BYTECODE_C_CODE_COMPLEMENT_SHORT:
+        case SPVM_BYTECODE_C_CODE_COMPLEMENT_INT:
+        case SPVM_BYTECODE_C_CODE_COMPLEMENT_LONG:
+        case SPVM_BYTECODE_C_CODE_CONVERT_BYTE_TO_SHORT:
+        case SPVM_BYTECODE_C_CODE_CONVERT_BYTE_TO_INT:
+        case SPVM_BYTECODE_C_CODE_CONVERT_BYTE_TO_LONG:
+        case SPVM_BYTECODE_C_CODE_CONVERT_BYTE_TO_FLOAT:
+        case SPVM_BYTECODE_C_CODE_CONVERT_BYTE_TO_DOUBLE:
+        case SPVM_BYTECODE_C_CODE_CONVERT_SHORT_TO_BYTE:
+        case SPVM_BYTECODE_C_CODE_CONVERT_SHORT_TO_INT:
+        case SPVM_BYTECODE_C_CODE_CONVERT_SHORT_TO_LONG:
+        case SPVM_BYTECODE_C_CODE_CONVERT_SHORT_TO_FLOAT:
+        case SPVM_BYTECODE_C_CODE_CONVERT_SHORT_TO_DOUBLE:
+        case SPVM_BYTECODE_C_CODE_CONVERT_INT_TO_BYTE:
+        case SPVM_BYTECODE_C_CODE_CONVERT_INT_TO_SHORT:
+        case SPVM_BYTECODE_C_CODE_CONVERT_INT_TO_LONG:
+        case SPVM_BYTECODE_C_CODE_CONVERT_INT_TO_FLOAT:
+        case SPVM_BYTECODE_C_CODE_CONVERT_INT_TO_DOUBLE:
+        case SPVM_BYTECODE_C_CODE_CONVERT_LONG_TO_BYTE:
+        case SPVM_BYTECODE_C_CODE_CONVERT_LONG_TO_SHORT:
+        case SPVM_BYTECODE_C_CODE_CONVERT_LONG_TO_INT:
+        case SPVM_BYTECODE_C_CODE_CONVERT_LONG_TO_FLOAT:
+        case SPVM_BYTECODE_C_CODE_CONVERT_LONG_TO_DOUBLE:
+        case SPVM_BYTECODE_C_CODE_CONVERT_FLOAT_TO_BYTE:
+        case SPVM_BYTECODE_C_CODE_CONVERT_FLOAT_TO_SHORT:
+        case SPVM_BYTECODE_C_CODE_CONVERT_FLOAT_TO_INT:
+        case SPVM_BYTECODE_C_CODE_CONVERT_FLOAT_TO_LONG:
+        case SPVM_BYTECODE_C_CODE_CONVERT_FLOAT_TO_DOUBLE:
+        case SPVM_BYTECODE_C_CODE_CONVERT_DOUBLE_TO_BYTE:
+        case SPVM_BYTECODE_C_CODE_CONVERT_DOUBLE_TO_SHORT:
+        case SPVM_BYTECODE_C_CODE_CONVERT_DOUBLE_TO_INT:
+        case SPVM_BYTECODE_C_CODE_CONVERT_DOUBLE_TO_LONG:
+        case SPVM_BYTECODE_C_CODE_CONVERT_DOUBLE_TO_FLOAT:
+        case SPVM_BYTECODE_C_CODE_CONVERT_BYTE_TO_BYTE:
+        case SPVM_BYTECODE_C_CODE_CONVERT_SHORT_TO_SHORT:
+        case SPVM_BYTECODE_C_CODE_CONVERT_INT_TO_INT:
+        case SPVM_BYTECODE_C_CODE_CONVERT_LONG_TO_LONG:
+        case SPVM_BYTECODE_C_CODE_CONVERT_FLOAT_TO_FLOAT:
+        case SPVM_BYTECODE_C_CODE_CONVERT_DOUBLE_TO_DOUBLE:
+        case SPVM_BYTECODE_C_CODE_WEAKEN_FIELD_OBJECT:
+        {
+          i++;
+          bytecode = bytecode_array->values[i];
+          printf("        [%" PRId32 "] %d\n", i, bytecode);
+          
+          i++;
+          bytecode = bytecode_array->values[i];
+          printf("        [%" PRId32 "] %d\n", i, bytecode);
+          
+          break;
+        }
+
+        // Have three operands
+        case SPVM_BYTECODE_C_CODE_GET_FIELD_BYTE:
+        case SPVM_BYTECODE_C_CODE_GET_FIELD_SHORT:
+        case SPVM_BYTECODE_C_CODE_GET_FIELD_INT:
+        case SPVM_BYTECODE_C_CODE_GET_FIELD_LONG:
+        case SPVM_BYTECODE_C_CODE_GET_FIELD_FLOAT:
+        case SPVM_BYTECODE_C_CODE_GET_FIELD_DOUBLE:
+        case SPVM_BYTECODE_C_CODE_GET_FIELD_OBJECT:
+        case SPVM_BYTECODE_C_CODE_SET_FIELD_BYTE:
+        case SPVM_BYTECODE_C_CODE_SET_FIELD_SHORT:
+        case SPVM_BYTECODE_C_CODE_SET_FIELD_INT:
+        case SPVM_BYTECODE_C_CODE_SET_FIELD_LONG:
+        case SPVM_BYTECODE_C_CODE_SET_FIELD_FLOAT:
+        case SPVM_BYTECODE_C_CODE_SET_FIELD_DOUBLE:
+        case SPVM_BYTECODE_C_CODE_SET_FIELD_OBJECT:
+        case SPVM_BYTECODE_C_CODE_NEW_OBJECT_ARRAY:
+        case SPVM_BYTECODE_C_CODE_CONCAT_STRING_STRING:
+        case SPVM_BYTECODE_C_CODE_CONCAT_STRING_BYTE:
+        case SPVM_BYTECODE_C_CODE_CONCAT_STRING_SHORT:
+        case SPVM_BYTECODE_C_CODE_CONCAT_STRING_INT:
+        case SPVM_BYTECODE_C_CODE_CONCAT_STRING_LONG:
+        case SPVM_BYTECODE_C_CODE_CONCAT_STRING_FLOAT:
+        case SPVM_BYTECODE_C_CODE_CONCAT_STRING_DOUBLE:
         case SPVM_BYTECODE_C_CODE_ARRAY_LOAD_BYTE:
         case SPVM_BYTECODE_C_CODE_ARRAY_LOAD_SHORT:
         case SPVM_BYTECODE_C_CODE_ARRAY_LOAD_INT:
@@ -271,10 +457,6 @@ void SPVM_DUMPER_dump_bytecode_array(SPVM_COMPILER* compiler, SPVM_BYTECODE_ARRA
         case SPVM_BYTECODE_C_CODE_ARRAY_STORE_FLOAT:
         case SPVM_BYTECODE_C_CODE_ARRAY_STORE_DOUBLE:
         case SPVM_BYTECODE_C_CODE_ARRAY_STORE_OBJECT:
-        case SPVM_BYTECODE_C_CODE_LOAD_EXCEPTION:
-        case SPVM_BYTECODE_C_CODE_STORE_EXCEPTION:
-        case SPVM_BYTECODE_C_CODE_POP_CATCH_EXCEPTION:
-        case SPVM_BYTECODE_C_CODE_POP:
         case SPVM_BYTECODE_C_CODE_ADD_BYTE:
         case SPVM_BYTECODE_C_CODE_ADD_SHORT:
         case SPVM_BYTECODE_C_CODE_ADD_INT:
@@ -305,12 +487,6 @@ void SPVM_DUMPER_dump_bytecode_array(SPVM_COMPILER* compiler, SPVM_BYTECODE_ARRA
         case SPVM_BYTECODE_C_CODE_REMAINDER_LONG:
         case SPVM_BYTECODE_C_CODE_REMAINDER_FLOAT:
         case SPVM_BYTECODE_C_CODE_REMAINDER_DOUBLE:
-        case SPVM_BYTECODE_C_CODE_NEGATE_BYTE:
-        case SPVM_BYTECODE_C_CODE_NEGATE_SHORT:
-        case SPVM_BYTECODE_C_CODE_NEGATE_INT:
-        case SPVM_BYTECODE_C_CODE_NEGATE_LONG:
-        case SPVM_BYTECODE_C_CODE_NEGATE_FLOAT:
-        case SPVM_BYTECODE_C_CODE_NEGATE_DOUBLE:
         case SPVM_BYTECODE_C_CODE_LEFT_SHIFT_BYTE:
         case SPVM_BYTECODE_C_CODE_LEFT_SHIFT_SHORT:
         case SPVM_BYTECODE_C_CODE_LEFT_SHIFT_INT:
@@ -335,144 +511,28 @@ void SPVM_DUMPER_dump_bytecode_array(SPVM_COMPILER* compiler, SPVM_BYTECODE_ARRA
         case SPVM_BYTECODE_C_CODE_BIT_XOR_SHORT:
         case SPVM_BYTECODE_C_CODE_BIT_XOR_INT:
         case SPVM_BYTECODE_C_CODE_BIT_XOR_LONG:
-        case SPVM_BYTECODE_C_CODE_CONVERT_INT_TO_LONG:
-        case SPVM_BYTECODE_C_CODE_CONVERT_INT_TO_FLOAT:
-        case SPVM_BYTECODE_C_CODE_CONVERT_INT_TO_DOUBLE:
-        case SPVM_BYTECODE_C_CODE_CONVERT_LONG_TO_INT:
-        case SPVM_BYTECODE_C_CODE_CONVERT_LONG_TO_FLOAT:
-        case SPVM_BYTECODE_C_CODE_CONVERT_LONG_TO_DOUBLE:
-        case SPVM_BYTECODE_C_CODE_CONVERT_FLOAT_TO_INT:
-        case SPVM_BYTECODE_C_CODE_CONVERT_FLOAT_TO_LONG:
-        case SPVM_BYTECODE_C_CODE_CONVERT_FLOAT_TO_DOUBLE:
-        case SPVM_BYTECODE_C_CODE_CONVERT_DOUBLE_TO_INT:
-        case SPVM_BYTECODE_C_CODE_CONVERT_DOUBLE_TO_LONG:
-        case SPVM_BYTECODE_C_CODE_CONVERT_DOUBLE_TO_FLOAT:
-        case SPVM_BYTECODE_C_CODE_CONVERT_INT_TO_BYTE:
-        case SPVM_BYTECODE_C_CODE_CONVERT_INT_TO_SHORT:
-        case SPVM_BYTECODE_C_CODE_CONVERT_BYTE_TO_INT:
-        case SPVM_BYTECODE_C_CODE_CONVERT_SHORT_TO_INT:
-        case SPVM_BYTECODE_C_CODE_CONVERT_BYTE_TO_LONG:
-        case SPVM_BYTECODE_C_CODE_CONVERT_BYTE_TO_FLOAT:
-        case SPVM_BYTECODE_C_CODE_CONVERT_BYTE_TO_DOUBLE:
-        case SPVM_BYTECODE_C_CODE_CONVERT_SHORT_TO_BYTE:
-        case SPVM_BYTECODE_C_CODE_CONVERT_SHORT_TO_LONG:
-        case SPVM_BYTECODE_C_CODE_CONVERT_SHORT_TO_FLOAT:
-        case SPVM_BYTECODE_C_CODE_CONVERT_SHORT_TO_DOUBLE:
-        case SPVM_BYTECODE_C_CODE_CONVERT_LONG_TO_BYTE:
-        case SPVM_BYTECODE_C_CODE_CONVERT_LONG_TO_SHORT:
-        case SPVM_BYTECODE_C_CODE_CONVERT_FLOAT_TO_BYTE:
-        case SPVM_BYTECODE_C_CODE_CONVERT_FLOAT_TO_SHORT:
-        case SPVM_BYTECODE_C_CODE_CONVERT_DOUBLE_TO_BYTE:
-        case SPVM_BYTECODE_C_CODE_CONVERT_DOUBLE_TO_SHORT:
-        case SPVM_BYTECODE_C_CODE_CONVERT_BYTE_TO_SHORT:
-        case SPVM_BYTECODE_C_CODE_CMP_BYTE:
-        case SPVM_BYTECODE_C_CODE_CMP_SHORT:
-        case SPVM_BYTECODE_C_CODE_CMP_LONG:
-        case SPVM_BYTECODE_C_CODE_CMP_FLOAT_L:
-        case SPVM_BYTECODE_C_CODE_CMP_FLOAT_G:
-        case SPVM_BYTECODE_C_CODE_CMP_DOUBLE_L:
-        case SPVM_BYTECODE_C_CODE_CMP_DOUBLE_G:
-        case SPVM_BYTECODE_C_CODE_UNDEF:
-        case SPVM_BYTECODE_C_CODE_CONCAT_STRING_STRING:
-        case SPVM_BYTECODE_C_CODE_CONCAT_STRING_BYTE:
-        case SPVM_BYTECODE_C_CODE_CONCAT_STRING_SHORT:
-        case SPVM_BYTECODE_C_CODE_CONCAT_STRING_INT:
-        case SPVM_BYTECODE_C_CODE_CONCAT_STRING_LONG:
-        case SPVM_BYTECODE_C_CODE_CONCAT_STRING_FLOAT:
-        case SPVM_BYTECODE_C_CODE_CONCAT_STRING_DOUBLE:
-        case SPVM_BYTECODE_C_CODE_ARRAY_LENGTH:
-        case SPVM_BYTECODE_C_CODE_NEW_BYTE_ARRAY:
-        case SPVM_BYTECODE_C_CODE_NEW_SHORT_ARRAY:
-        case SPVM_BYTECODE_C_CODE_NEW_INT_ARRAY:
-        case SPVM_BYTECODE_C_CODE_NEW_LONG_ARRAY:
-        case SPVM_BYTECODE_C_CODE_NEW_FLOAT_ARRAY:
-        case SPVM_BYTECODE_C_CODE_NEW_DOUBLE_ARRAY:
-        case SPVM_BYTECODE_C_CODE_RETURN_VOID:
-        case SPVM_BYTECODE_C_CODE_RETURN_BYTE:
-        case SPVM_BYTECODE_C_CODE_RETURN_SHORT:
-        case SPVM_BYTECODE_C_CODE_RETURN_INT:
-        case SPVM_BYTECODE_C_CODE_RETURN_LONG:
-        case SPVM_BYTECODE_C_CODE_RETURN_FLOAT:
-        case SPVM_BYTECODE_C_CODE_RETURN_DOUBLE:
-        case SPVM_BYTECODE_C_CODE_RETURN_OBJECT:
-        case SPVM_BYTECODE_C_CODE_CROAK:
-        {
-          break;
-        }
-        
-        // Have one operands
-        case SPVM_BYTECODE_C_CODE_IF_EQ_CMP:
-        case SPVM_BYTECODE_C_CODE_IF_NE_CMP:
-        case SPVM_BYTECODE_C_CODE_IF_LT_CMP:
-        case SPVM_BYTECODE_C_CODE_IF_GE_CMP:
-        case SPVM_BYTECODE_C_CODE_IF_GT_CMP:
-        case SPVM_BYTECODE_C_CODE_IF_LE_CMP:
-        case SPVM_BYTECODE_C_CODE_IF_EQ_ZERO:
-        case SPVM_BYTECODE_C_CODE_IF_NE_ZERO:
-        case SPVM_BYTECODE_C_CODE_IF_LT_ZERO:
-        case SPVM_BYTECODE_C_CODE_IF_GE_ZERO:
-        case SPVM_BYTECODE_C_CODE_IF_GT_ZERO:
-        case SPVM_BYTECODE_C_CODE_IF_LE_ZERO:
-        case SPVM_BYTECODE_C_CODE_IF_EQ_CMP_OBJECT:
-        case SPVM_BYTECODE_C_CODE_IF_NE_CMP_OBJECT:
-        case SPVM_BYTECODE_C_CODE_IF_NON_NULL:
-        case SPVM_BYTECODE_C_CODE_IF_NULL:
-        case SPVM_BYTECODE_C_CODE_GOTO:
-        case SPVM_BYTECODE_C_CODE_CURRENT_LINE:
-        case SPVM_BYTECODE_C_CODE_LOAD_PACKAGE_VAR:
-        case SPVM_BYTECODE_C_CODE_STORE_PACKAGE_VAR:
-        case SPVM_BYTECODE_C_CODE_STORE_PACKAGE_VAR_OBJECT:
-        case SPVM_BYTECODE_C_CODE_NEW_OBJECT:
-        case SPVM_BYTECODE_C_CODE_NEW_OBJECT_ARRAY:
-        case SPVM_BYTECODE_C_CODE_NEW_STRING:
-        case SPVM_BYTECODE_C_CODE_PUSH_CATCH_EXCEPTION:
-        case SPVM_BYTECODE_C_CODE_CALL_SUB:
-        case SPVM_BYTECODE_C_CODE_LOAD_CONSTANT:
-        case SPVM_BYTECODE_C_CODE_LOAD_CONSTANT2:
-        case SPVM_BYTECODE_C_CODE_STORE:
-        case SPVM_BYTECODE_C_CODE_STORE_OBJECT:
-        case SPVM_BYTECODE_C_CODE_LOAD:
-        case SPVM_BYTECODE_C_CODE_GET_FIELD_BYTE:
-        case SPVM_BYTECODE_C_CODE_GET_FIELD_SHORT:
-        case SPVM_BYTECODE_C_CODE_GET_FIELD_INT:
-        case SPVM_BYTECODE_C_CODE_GET_FIELD_LONG:
-        case SPVM_BYTECODE_C_CODE_GET_FIELD_FLOAT:
-        case SPVM_BYTECODE_C_CODE_GET_FIELD_DOUBLE:
-        case SPVM_BYTECODE_C_CODE_GET_FIELD_OBJECT:
-        case SPVM_BYTECODE_C_CODE_SET_FIELD_BYTE:
-        case SPVM_BYTECODE_C_CODE_SET_FIELD_SHORT:
-        case SPVM_BYTECODE_C_CODE_SET_FIELD_INT:
-        case SPVM_BYTECODE_C_CODE_SET_FIELD_LONG:
-        case SPVM_BYTECODE_C_CODE_SET_FIELD_FLOAT:
-        case SPVM_BYTECODE_C_CODE_SET_FIELD_DOUBLE:
-        case SPVM_BYTECODE_C_CODE_SET_FIELD_OBJECT:
-        case SPVM_BYTECODE_C_CODE_WEAKEN_FIELD_OBJECT:
         {
           i++;
           bytecode = bytecode_array->values[i];
           printf("        [%" PRId32 "] %d\n", i, bytecode);
           
-          break;
-        }
+          i++;
+          bytecode = bytecode_array->values[i];
+          printf("        [%" PRId32 "] %d\n", i, bytecode);
 
-        // Have two operands
-        case SPVM_BYTECODE_C_CODE_INC_BYTE:
-        case SPVM_BYTECODE_C_CODE_INC_SHORT:
-        case SPVM_BYTECODE_C_CODE_INC_INT:
-        case SPVM_BYTECODE_C_CODE_INC_LONG:
-        {
-          i++;
-          bytecode = bytecode_array->values[i];
-          printf("        [%" PRId32 "] %d\n", i, bytecode);
-          
           i++;
           bytecode = bytecode_array->values[i];
           printf("        [%" PRId32 "] %d\n", i, bytecode);
           
           break;
         }
-        
         case SPVM_BYTECODE_C_CODE_TABLE_SWITCH: {
+          // variable index
+          {
+            i++;
+            bytecode = bytecode_array->values[i];
+            printf("        [%" PRId32 "] %d\n", i, bytecode);
+          }
 
           // Default
           {
@@ -510,6 +570,12 @@ void SPVM_DUMPER_dump_bytecode_array(SPVM_COMPILER* compiler, SPVM_BYTECODE_ARRA
           break;
         }
         case SPVM_BYTECODE_C_CODE_LOOKUP_SWITCH: {
+          // variable index
+          {
+            i++;
+            bytecode = bytecode_array->values[i];
+            printf("        [%" PRId32 "] %d\n", i, bytecode);
+          }
 
           // Default
           {
@@ -589,22 +655,22 @@ void SPVM_DUMPER_dump_sub(SPVM_COMPILER* compiler, SPVM_SUB* sub) {
       int32_t i;
       for (i = 0; i < op_args->length; i++) {
         SPVM_OP* op_arg = SPVM_DYNAMIC_ARRAY_fetch(sub->op_args, i);
-        SPVM_MY_VAR* my_var = op_arg->uv.my_var;
+        SPVM_MY* my = op_arg->uv.my;
         printf("        arg[%" PRId32 "]\n", i);
-        SPVM_DUMPER_dump_my_var(compiler, my_var);
+        SPVM_DUMPER_dump_my(compiler, my);
       }
     }
     
     if (!sub->is_native) {
-      printf("      my_vars\n");
-      SPVM_DYNAMIC_ARRAY* op_my_vars = sub->op_my_vars;
+      printf("      mys\n");
+      SPVM_DYNAMIC_ARRAY* op_mys = sub->op_mys;
       {
         int32_t i;
-        for (i = 0; i < op_my_vars->length; i++) {
-          SPVM_OP* op_my_var = SPVM_DYNAMIC_ARRAY_fetch(sub->op_my_vars, i);
-          SPVM_MY_VAR* my_var = op_my_var->uv.my_var;
-          printf("        my_var[%" PRId32 "]\n", i);
-          SPVM_DUMPER_dump_my_var(compiler, my_var);
+        for (i = 0; i < op_mys->length; i++) {
+          SPVM_OP* op_my = SPVM_DYNAMIC_ARRAY_fetch(sub->op_mys, i);
+          SPVM_MY* my = op_my->uv.my;
+          printf("        my[%" PRId32 "]\n", i);
+          SPVM_DUMPER_dump_my(compiler, my);
         }
       }
       
@@ -652,13 +718,13 @@ void SPVM_DUMPER_dump_enumeration_value(SPVM_COMPILER* compiler, SPVM_ENUMERATIO
   }
 }
 
-void SPVM_DUMPER_dump_my_var(SPVM_COMPILER* compiler, SPVM_MY_VAR* my_var) {
+void SPVM_DUMPER_dump_my(SPVM_COMPILER* compiler, SPVM_MY* my) {
   (void)compiler;
 
-  if (my_var) {
-    printf("          name => \"%s\"\n", my_var->op_name->uv.name);
+  if (my) {
+    printf("          name => \"%s\"\n", my->op_name->uv.name);
     
-    SPVM_TYPE* type = my_var->op_type->uv.type;
+    SPVM_TYPE* type = my->op_type->uv.type;
     printf("          type => \"%s\"\n", type->name);
     
   }

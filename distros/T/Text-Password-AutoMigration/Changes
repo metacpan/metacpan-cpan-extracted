@@ -1,5 +1,14 @@
 Revision history for Perl extension Text-Password-AutoMigration
 
+0.12 2017-11-16T06:00:58Z
+  - fix the tests and codes for denying sometimes fail the test at random
+
+0.11 2017-11-15T13:19:25Z
+  - support OpenBSD.amd64-openbsd
+
+0.10 2017-11-13T09:57:09Z
+  - support perl 5.26
+
 0.09 2017-10-30T03:48:16Z
   - just upgaraded the POD
   - just renamed the tests

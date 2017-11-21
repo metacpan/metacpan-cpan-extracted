@@ -16,16 +16,19 @@ name: Device-Network-ConfigParser
 provides:
   Device::Network::ConfigParser:
     file: lib/Device/Network/ConfigParser.pm
-    version: '0.005'
-  Device::Network::ConfigParser::CheckPoint::Expert:
-    file: lib/Device/Network/ConfigParser/CheckPoint/Expert.pm
-    version: '0.005'
+    version: '0.006'
   Device::Network::ConfigParser::CheckPoint::Gaia:
     file: lib/Device/Network/ConfigParser/CheckPoint/Gaia.pm
-    version: '0.005'
+    version: '0.006'
   Device::Network::ConfigParser::Cisco::ASA:
     file: lib/Device/Network/ConfigParser/Cisco/ASA.pm
-    version: '0.005'
+    version: '0.006'
+  Device::Network::ConfigParser::Linux::NetUtils:
+    file: lib/Device/Network/ConfigParser/Linux/NetUtils.pm
+    version: '0.006'
+  Device::Network::ConfigParser::Linux::iproute2:
+    file: lib/Device/Network/ConfigParser/Linux/iproute2.pm
+    version: '0.006'
 requires:
   Data::Dumper: '0'
   Exporter: '0'
@@ -44,5 +47,5 @@ resources:
   bugtracker: https://github.com/gregfoletta/Device-Network-ConfigParser/issues
   homepage: https://github.com/gregfoletta/Device-Network-ConfigParser
   repository: https://github.com/gregfoletta/Device-Network-ConfigParser.git
-version: '0.005'
+version: '0.006'
 x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -1,87 +1,95 @@
 Revision history for Statistics-Descriptive-LogScale
 
+0.10    Sun Nov 12 2017
+    - API Added abs_moment(s) for absolute moment of power s (may be fractional)
+    - API Added std_abs_moment(s) for standardized moment of fractional power
+    - BUG Fixed tests
+
+0.10    Sun Nov 5 2017
+    - API Added a printf-like format() method
+
 0.09    Fri Dec 11 2015
-	DOC Improved documentation a bit
-	API Add noize_thresh clone arg to remove small bins
-	API Add clone() args (min, max, data, etc)
-	API histogram(): add normalize_to=nn param to simplify pictures
-	BUG Rewrite add_data_hash to handle -Inf properly (as in 'forget this data')
-	BUG Fix stdev/variance calculation, fix pod
-	TST save-load.pl: read pairs; min|max|trim|noize; - for STDIN/OUT; summary
-	TST Use proper RE for numbers across examples
-	TST Rewrite example/gen-sample.pl: arbitrary formulas + some std. distros
-	TST Remove unneeded dependency on Test::Exception
+    - DOC Improved documentation a bit
+    - API Add noize_thresh clone arg to remove small bins
+    - API Add clone() args (min, max, data, etc)
+    - API histogram(): add normalize_to=nn param to simplify pictures
+    - BUG Rewrite add_data_hash to handle -Inf properly (as in 'forget this data')
+    - BUG Fix stdev/variance calculation, fix pod
+    - TST save-load.pl: read pairs; min|max|trim|noize; - for STDIN/OUT; summary
+    - TST Use proper RE for numbers across examples
+    - TST Rewrite example/gen-sample.pl: arbitrary formulas + some std. distros
+    - TST Remove unneeded dependency on Test::Exception
 
 0.08    Tue May 12 2015
-	API Change default base 10**1/48 (~5%) => 10**1/232 (~1%);
-	API Remove broken mode() method, replace with a naive one
-	    that at least works for discrete distributions;
-	API add_data_hash() can be used to forget data if needed;
-	API Add cdf(x,y) for probability of value between x and y;
-	BUG Make all methods return undef if there's no data;
-	DOC Add more examples to POD: basic usage, save/load, histogram;
-	DOC Add examples/save-load.pl (works with JSON files);
-	DOC Cleanup examples (summary, png) in examples directory;
-	DOC Add README.md for github
+    - API Change default base 10**1/48 (~5%) => 10**1/232 (~1%);
+    - API Remove broken mode() method, replace with a naive one
+    - that at least works for discrete distributions;
+    - API add_data_hash() can be used to forget data if needed;
+    - API Add cdf(x,y) for probability of value between x and y;
+    - BUG Make all methods return undef if there's no data;
+    - DOC Add more examples to POD: basic usage, save/load, histogram;
+    - DOC Add examples/save-load.pl (works with JSON files);
+    - DOC Cleanup examples (summary, png) in examples directory;
+    - DOC Add README.md for github
 
 0.07    Mon Apr 27 2015
-	DOC Rename buckets => bins in POD and comments
-	API Add linear approximation approximation around zero
-	    ('linear_width' and 'linear_thresh' parameters in new())
-	API Add TO_JSON() method which returns unblessed hash
-	API Add 'data' parameter to new() to add initial data
-	API Deprecate old zero handling (zero_thresh)
+    - DOC Rename buckets => bins in POD and comments
+    - API Add linear approximation approximation around zero
+    - ('linear_width' and 'linear_thresh' parameters in new())
+    - API Add TO_JSON() method which returns unblessed hash
+    - API Add 'data' parameter to new() to add initial data
+    - API Deprecate old zero handling (zero_thresh)
 
 0.06	Wed Jul 10 2013
-	TST Add png example
-	API Add histogram() - better frequency_distribution_ref
-	API Add scale_sample() to gradually "forget" data
-	API Add find_boundaries to get (min, max) of selected sample part
+    - TST Add png example
+    - API Add histogram() - better frequency_distribution_ref
+    - API Add scale_sample() to gradually "forget" data
+    - API Add find_boundaries to get (min, max) of selected sample part
 
 0.0509	Tue Jul 2 2013
-	DOC Minor POD improvement
-	BUG Make infinity portable
+    - DOC Minor POD improvement
+    - BUG Make infinity portable
 
 0.0507	Sun Jun 30 2013
-	BUG Fix bugs revealed by CPAN testers (mainly in tests)
-	API add cdf($x) method - cumulative distribution function, P(X<$x)
-	DOC pod improved a bit
+    - BUG Fix bugs revealed by CPAN testers (mainly in tests)
+    - API add cdf($x) method - cumulative distribution function, P(X<$x)
+    - DOC pod improved a bit
 
 0.0503	Sat Jun 29 2013
-	Fix stuff before uploading to CPAN.
+    - Fix stuff before uploading to CPAN.
 
 0.05	Fri Jun 28 2013
-	API frequency_distribution_ref() for histograms
-	API mode() - estimate probability density maximum (EXPERIMENTAL)
-	API Implement all of Statistics::Descriptive::Full
-	API sum_of(CODE, a, b) to sum given function  over sample data
-	API Get rid of mandatory parameters in new()
-	BUG Some bugs fixed, more added.
-	TST Add histogram.pl, compare-full.pl and gen-sample.pl examples
-	REF move binary search into subroutine
-	REF rewrite memoization for great good
+    - API frequency_distribution_ref() for histograms
+    - API mode() - estimate probability density maximum (EXPERIMENTAL)
+    - API Implement all of Statistics::Descriptive::Full
+    - API sum_of(CODE, a, b) to sum given function  over sample data
+    - API Get rid of mandatory parameters in new()
+    - BUG Some bugs fixed, more added.
+    - TST Add histogram.pl, compare-full.pl and gen-sample.pl examples
+    - REF move binary search into subroutine
+    - REF rewrite memoization for great good
 
 0.04	Mon Jun 24 2013
-	RENAME Statistics::Approx::Bucket => Statistics::Descriptive::LogScale
-	REF Rewrite engine: neg + poz + zero counters => one big hash
-	API bucket_width() and zero_threshold() getters
-	API mean_of( $function, $min, $max ) - arbitrary function expectation
-	BUG Fix another log abs(x) error, fix test
+    - RENAME Statistics::Approx::Bucket => Statistics::Descriptive::LogScale
+    - REF Rewrite engine: neg + poz + zero counters => one big hash
+    - API bucket_width() and zero_threshold() getters
+    - API mean_of( $function, $min, $max ) - arbitrary function expectation
+    - BUG Fix another log abs(x) error, fix test
 
 0.03	Sun Jun 16 2013
-	API add_data_hash/get_data_hash data export/import
-	API central/standardized moments of any power
-	API geometric_mean, harmonic_mean, quantile, median
-	BIN Add example/summary.pl
-	SPD Add result caching for CPU-intensive getters
-	TST More tests (coverage 93%)
-	BUG Numerous bugfixes
+    - API add_data_hash/get_data_hash data export/import
+    - API central/standardized moments of any power
+    - API geometric_mean, harmonic_mean, quantile, median
+    - BIN Add example/summary.pl
+    - SPD Add result caching for CPU-intensive getters
+    - TST More tests (coverage 93%)
+    - BUG Numerous bugfixes
 
 0.02    Mon Jun 10 2013
-	API count, mean, and standard deviation added.
-	DOC a brief description and aknowledgements added.
+    - API count, mean, and standard deviation added.
+    - DOC a brief description and aknowledgements added.
 
 0.01    Mon Jun 10 2013
-        First version, released on an unsuspecting world.
-	API percentile and add_data added.
+    - First version, released on an unsuspecting world.
+    - API percentile and add_data added.
 

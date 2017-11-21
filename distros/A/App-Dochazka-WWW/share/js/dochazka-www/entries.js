@@ -42,11 +42,13 @@ define ([
     'app/int-lib',
     'datetime',
 ], function (
-    caches,
+    appCaches,
     actLib,
     intLib,
     datetime,
 ) {
+
+    console.log("appCaches", appCaches);
 
     return {
 
@@ -58,7 +60,7 @@ define ([
             prop: 'aid',
             hidden: true,
             maxlen: 6,
-            populate: caches.populateAIDfromCode,
+            populate: appCaches.populateAIDfromCode,
         },
         acTcode: {
             name: 'acTcode',
@@ -115,7 +117,6 @@ define ([
             text: 'Status',
             prop: 'priv',
             maxlen: 10,
-            // populate: empLib.populateProfilePriv,
         },
         ePprivEffective: {
             name: 'ePprivEffective',
@@ -124,7 +125,6 @@ define ([
             text: 'Status since',
             prop: 'privEffective',
             maxlen: 30,
-            // populate: empLib.populateProfilePrivEffective,
         },
         ePremark: {
             name: 'ePremark',
@@ -207,14 +207,22 @@ define ([
             text: 'Supervisor',
             prop: 'ePsuperNick',
             maxlen: 30,
-            populate: caches.populateSupervisorNick,
+            populate: appCaches.populateSupervisorNick,
+        },
+        ePhasReports: {
+            name: 'ePhasReports',
+            aclProfileRead: 'inactive',
+            aclProfileWrite: 'admin',
+            text: 'Supervisees',
+            prop: 'has_reports',
+            maxlen: 8,
         },
         iNact: {
             name: 'iNact',
             aclProfileRead: 'active',
             aclProfileWrite: 'active',
             text: 'Activity',
-            prop: 'iNact',
+            prop: 'code',
             maxlen: 32,
             vetter: actLib.vetActivity,
         },
@@ -296,8 +304,16 @@ define ([
             aclProfileRead: 'active',
             aclProfileWrite: 'active',
             text: 'Description',
-            prop: 'iNdesc',
+            prop: 'long_desc',
             maxlen: 60,
+        },
+        iNshortDesc: {
+            name: 'iNshortDesc',
+            aclProfileRead: 'active',
+            aclProfileWrite: 'active',
+            text: 'Description',
+            prop: 'long_desc',
+            maxlen: 30,
         },
         iNexistintvls: {
             name: 'iNexistintvls',
@@ -306,7 +322,7 @@ define ([
             text: 'Existing',
             prop: 'iNexistintvls',
             maxlen: 50,
-            populate: caches.populateExistingIntervals,
+            populate: appCaches.populateExistingIntervals,
         },
         iNiid: {
             name: 'iNiid',
@@ -314,7 +330,7 @@ define ([
             aclProfileWrite: 'admin',
             text: 'IID',
             prop: 'iid',
-            maxlen: 8,
+            maxlen: 10,
         },
         iNlastexistintvl: {
             name: 'iNlastexistintvl',
@@ -323,7 +339,7 @@ define ([
             text: 'Last existing',
             prop: 'iNlastexistintvl',
             maxlen: 50,
-            populate: caches.populateLastExisting,
+            populate: appCaches.populateLastExisting,
         },
         iNlastplusoffset: {
             name: 'iNlastplusoffset',
@@ -332,7 +348,7 @@ define ([
             text: 'Time range',
             prop: 'iNlastplusoffset',
             maxlen: 50,
-            populate: caches.populateLastPlusOffset,
+            populate: appCaches.populateLastPlusOffset,
         },
         iNmonth: {
             name: 'iNmonth',
@@ -350,7 +366,7 @@ define ([
             text: 'To be created',
             prop: 'iNnextscheduled',
             maxlen: 50,
-            populate: caches.populateNextScheduled,
+            populate: appCaches.populateNextScheduled,
         },
         iNoffset: {
             name: 'iNoffset',
@@ -367,7 +383,7 @@ define ([
             text: 'Scheduled',
             prop: 'iNschedintvls',
             maxlen: 50,
-            populate: caches.populateSchedIntvlsForDate,
+            populate: appCaches.populateSchedIntvlsForDate,
         },
         iNsid: {
             name: 'iNsid',
@@ -377,7 +393,7 @@ define ([
             prop: 'iNsid',
             hidden: true,
             maxlen: 20,
-            populate: caches.populateSIDByDate,
+            populate: appCaches.populateSIDByDate,
         },
         iNtimerange: {
             name: 'iNtimerange',
@@ -387,6 +403,15 @@ define ([
             prop: 'iNtimerange',
             maxlen: 20,
             vetter: datetime.vetTimeRange,
+        },
+        iNtimerangeNoOffset: {
+            name: 'iNtimerangeNoOffset',
+            aclProfileRead: 'active',
+            aclProfileWrite: 'active',
+            text: 'Time range',
+            prop: 'iNtimerange',
+            maxlen: 20,
+            vetter: datetime.vetTimeRangeNoOffset,
         },
         iNtoBeCreated: {
             name: 'textOnly',
@@ -409,7 +434,23 @@ define ([
             prop: 'iNyear',
             hidden: true,
             maxlen: 5,
-            populate: caches.populateYear,
+            populate: appCaches.populateYear,
+        },
+        lOintvl: {
+            name: 'lOintvl',
+            aclProfileRead: 'inactive',
+            aclProfileWrite: 'active',
+            text: 'Interval',
+            prop: 'intvl',
+            maxlen: 40,
+        },
+        lOlid: {
+            name: 'lOlid',
+            aclProfileRead: 'inactive',
+            aclProfileWrite: 'admin',
+            text: 'LID',
+            prop: 'lid',
+            maxlen: 10,
         },
         LDAPdochazka: {
             name: 'LDAPdochazka',
@@ -541,7 +582,7 @@ define ([
         sEnick: {
             name: 'sEnick',
             aclProfileRead: null,
-            aclProfileWrite: 'admin',
+            aclProfileWrite: 'inactive',
             text: 'Nick',
             prop: 'searchKeyNick',
             maxlen: 20,

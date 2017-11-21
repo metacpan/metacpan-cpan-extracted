@@ -39,3 +39,10 @@ t/FilterTry.pm
 /Filter-*.patch
 /Makefile.old
 /log.test-*
+/log.make*
+*.c.gcov
+*.xs.gcov
+inline.h.gcov
+*/*.gcda
+*/*.gcno
+/cover_db

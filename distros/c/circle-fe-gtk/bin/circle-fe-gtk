@@ -10,7 +10,8 @@ use warnings;
 use Glib qw( TRUE FALSE );
 use Gtk2 qw( init );
 
-use Net::Async::Tangence::Client;
+use Net::Async::Tangence::Client 0.13; # Future-returning API
+use Variable::Disposition qw( retain_future );
 
 use Circle::FE::Gtk::Tab;
 
@@ -171,25 +172,21 @@ $notebook->signal_connect( 'key-press-event' => sub {
    return 0;
 } );
 
-$conn->connect_url( $URL );
+my $f = $conn->connect_url( $URL );
 
 $mainwin->show_all;
+
+$f->get;
 
 my $rootobj;
 $loop->loop_once until $rootobj = $conn->rootobj;
 
-my $session;
-$rootobj->call_method(
-   method => "get_session",
-   args   => [ [ 'tabs' ] ],
-   on_result => sub {
-      ( $session ) = @_;
-   }
-);
-$loop->loop_once until $session;
+my $session = $rootobj->call_method(
+   get_session => [qw( tabs )],
+)->get;
 
-$session->watch_property(
-   property => "tabs",
+$session->watch_property_with_initial(
+   'tabs',
    on_set => sub {
       my ( $objarray ) = @_;
 
@@ -228,7 +225,7 @@ $session->watch_property(
    },
    on_splice => sub {
       my ( $index, $count, @objs ) = @_;
-      
+
       $notebook->remove_page( $index ) for 1 .. $count;
 
       my @newtabs;
@@ -249,10 +246,9 @@ $session->watch_property(
 
       splice @tabs, $index+$delta, 0, ( splice @tabs, $index, 1, () );
    },
-   want_initial => 1,
-);
+)->get;
 
-$loop->loop_forever;
+$loop->run;
 
 sub new_tab
 {
@@ -266,20 +262,19 @@ sub new_tab
       $tab->set_label_text( "Global" );
    }
    else {
-      $obj->watch_property(
-         property => "tag",
+      retain_future $obj->watch_property_with_initial(
+         'tag',
          on_set => sub {
             my ( $newtag ) = @_;
             $tab->set_label_text( $newtag );
          },
-         want_initial => 1,
       );
    }
 
    my $widget = $tab->get_widget;
 
-   $obj->subscribe_event(
-      event => "destroy",
+   retain_future $obj->subscribe_event(
+      'destroy',
       on_fire => sub {
          while( ( my $pagenum = $notebook->page_num( $widget ) ) > -1 ) {
             $notebook->remove_page( $pagenum );

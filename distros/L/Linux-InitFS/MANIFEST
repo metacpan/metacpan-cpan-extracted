@@ -1,0 +1,33 @@
+MANIFEST
+Makefile.PL
+gen_init_cpio_spec
+lib/Linux/InitFS.pm
+lib/Linux/InitFS/Entry.pm
+lib/Linux/InitFS/Feature.pm
+lib/Linux/InitFS/Kernel.pm
+lib/Linux/InitFS/Spec.pm
+share/files/core/init
+share/files/core/init.d/01_busybox.sh
+share/files/core/init.d/02_mountsys.sh
+share/files/core/done.d/98_dismount.sh
+share/files/core/done.d/99_fixup_stderr.sh
+share/files/core/done.d/95_preserve.sh
+share/files/lvm/lvm.conf
+share/files/lvm/init.d/20_lvm.sh
+share/files/lvm/load.d/20_lvm.sh
+share/files/devtmpfs/init.d/10_mount_dev.sh
+share/files/devtmpfs/done.d/97_umount_dev.sh
+share/files/devtmpfs-mount/done.d/97_move_devfs.sh
+share/files/rescue/init.d/80_rescue.sh
+share/specs/core.cfg
+share/specs/default.cfg
+share/specs/devtmpfs-mount.cfg
+share/specs/devtmpfs.cfg
+share/specs/feature.cfg
+share/specs/lvm.cfg
+share/specs/rescue.cfg
+share/specs/symlink.cfg
+share/specs/vendor.cfg
+
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

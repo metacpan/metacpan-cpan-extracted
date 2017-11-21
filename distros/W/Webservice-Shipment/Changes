@@ -1,5 +1,9 @@
 Revision history for Perl module Webservice::Shipment
 
+0.05 2017-11-13
+  - Add FedEx carrier (rperry)
+  - Protect against upcoming changes to Mojo::IOLoop::Delay yet again
+
 0.04 2017-10-28
   - Protect against upcoming changes to Mojo::IOLoop::Delay->catch
 

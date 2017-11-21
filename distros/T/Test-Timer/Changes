@@ -1,5 +1,31 @@
 Revision history for Test-Timer
 
+2.08 2017-11-20 Maintenance release, update not required
+
+- Addressing reports on failing tests from CPAN testers
+
+
+2.07 2017-11-18 Maintenance release, update not required
+
+- Addressing issue #17, the tests are now more liberal, so when executed
+  on smokers, CI environments and similar, load will not influence the
+  test results. The requirement for Test::Tester has been updated and a patch
+  required by this distribution has been included
+
+
+2.06 2017-11-14 Maintenance release, update not required
+
+- Added cancellation of alarm, based on advice from Erik Johansen
+
+- Implemented own sleep, based on select, this might address possible issues with
+  sleep implementations
+
+
+2.05 2017-11-12 Maintenance release, update not required
+
+- Addressed issue #11 adding experimental graphical support elements to the documentation
+
+
 2.04 2017-10-15 Maintenance release, update not required
 
 - Minor improvements to Test::Timer::TimeoutException, some obsoleted code could

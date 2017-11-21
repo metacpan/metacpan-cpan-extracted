@@ -1,4 +1,5 @@
 package eris::log::context::postfix;
+# ABSTRACT: Parses postfix messages into structured data
 
 use Const::Fast;
 use Moo;
@@ -8,13 +9,11 @@ with qw(
     eris::role::context
 );
 
+our $VERSION = '0.004'; # VERSION
+
+
 sub _build_matcher { qr/^postfix/ }
 
-# Constants
-const my %MAP => qw(
-    from src
-    size in_bytes
-);
 
 sub sample_messages {
     my @msgs = split /\r?\n/, <<'EOF';
@@ -42,6 +41,12 @@ EOF
     return @msgs;
 }
 
+
+const my %MAP => qw(
+    from src
+    size in_bytes
+);
+
 sub contextualize_message {
     my ($self,$log) = @_;
     my $str = $log->context->{message};
@@ -68,14 +73,15 @@ sub contextualize_message {
     }
     else {
         # Last ditch effort to grab information
-        if( my @conn = ($str =~ / (from|to) ([^\[]+)\[([^\]]+)\]/) ) {
+        if( my @conn = ($str =~ /(?>\b(from|to) ([^\[]+)\[([^\]]+)\])/) ) {
             my @fields = shift @conn eq 'from' ? qw(src src_ip) : qw(dst dst_ip);
             @ctxt{@fields} = @conn;
         }
     }
 
-    $log->add_context($self->name,\%ctxt);
+    $log->add_context($self->name,\%ctxt) if keys %ctxt;
 }
+
 
 1;
 
@@ -87,11 +93,37 @@ __END__
 
 =head1 NAME
 
-eris::log::context::postfix
+eris::log::context::postfix - Parses postfix messages into structured data
 
 =head1 VERSION
 
-version 0.003
+version 0.004
+
+=head1 SYNOPSIS
+
+Parses postfix messages to extract relevant and interesting data.
+
+=head1 ATTRIBUTES
+
+=head2 matcher
+
+A regex starting with the word 'postfix'
+
+=head1 METHODS
+
+=head2 contextualize_message
+
+Parses a postfic messages into a structured thing
+
+TODO: Update these docs with the keys/values
+
+Tags messages with 'mail'
+
+=for Pod::Coverage sample_messages
+
+=head1 SEE ALSO
+
+L<eris::log::contextualizer>, L<eris::role::context>
 
 =head1 AUTHOR
 

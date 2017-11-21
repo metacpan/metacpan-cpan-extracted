@@ -4,8 +4,8 @@ NAME
 
 VERSION
 
-    This document describes version 0.036 of MooseX::AttributeShortcuts -
-    released October 31, 2017 as part of MooseX-AttributeShortcuts.
+    This document describes version 0.037 of MooseX::AttributeShortcuts -
+    released November 20, 2017 as part of MooseX-AttributeShortcuts.
 
 SYNOPSIS
 
@@ -191,6 +191,27 @@ NEW ATTRIBUTE OPTIONS
         predicate => "_has$name"
 
     (that is, an attribute named _foo would get _has_foo)
+
+ init_arg => 1 / -1
+
+    This is a somewhat esoteric shortcut; you probably don't want to use
+    this (or even read this section).
+
+    Specifying init_arg => 1 will cause the following options to be set:
+
+        # attribute: "name"
+        init_arg => 'name'
+    
+        # or, attribute: "_name"
+        init_arg => '_name'
+
+    ...while init_arg => -1 will cause the following options to be set:
+
+        # attribute: "name"
+        init_arg => '_name'
+    
+        # or, attribute: "_name"
+        init_arg => 'name'
 
  trigger => 1
 

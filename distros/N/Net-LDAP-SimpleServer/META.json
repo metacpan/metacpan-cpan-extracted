@@ -35,8 +35,7 @@
             "Test::Pod::Coverage" : "1.08",
             "Test::Pod::LinkCheck" : "0",
             "Test::Portability::Files" : "0",
-            "Test::Version" : "1",
-            "version" : "0.9901"
+            "Test::Version" : "1"
          }
       },
       "runtime" : {
@@ -61,14 +60,18 @@
             "base" : "0",
             "constant" : "0",
             "fields" : "0",
-            "perl" : "5.010",
+            "perl" : "5.014",
             "strict" : "0",
             "warnings" : "0"
          }
       },
       "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
          "requires" : {
             "Authen::SASL" : "0",
+            "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IO::Pipe" : "0",
@@ -76,7 +79,7 @@
             "Net::LDAP" : "0",
             "Proc::Fork" : "0",
             "Test::Deep" : "0",
-            "Test::More" : "0.88",
+            "Test::More" : "0",
             "Test::UseAllModules" : "0",
             "Try::Tiny" : "0",
             "lib" : "0"
@@ -93,7 +96,7 @@
          "web" : "https://github.com/russoz/Net-LDAP-SimpleServer"
       }
    },
-   "version" : "0.0.20",
+   "version" : "0.0.21",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

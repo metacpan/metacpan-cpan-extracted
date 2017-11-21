@@ -9,6 +9,7 @@ Mozilla/5.0 (Macintosh; Intel Mac OS X 10.6; rv:7.0.1) Gecko/20100101 Firefox/7.
 'version'     => '7.000001',
 'mozilla'     => ['7.0.1','7.000001'],
 'name'        => 'Firefox',
+extras        => ['Macintosh'],
 
 [AGENT]
 

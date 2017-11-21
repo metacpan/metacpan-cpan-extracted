@@ -1,3 +1,8 @@
+2.013 2017-11-19
+
+  New feature:
+    * add Node gist parameter (req Config::Model 2.114)
+
 2.012 2017-09-24
 
   The release deals with the modifications done with backend

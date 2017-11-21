@@ -1,5 +1,5 @@
 package Schedule::LongSteps::Storage;
-$Schedule::LongSteps::Storage::VERSION = '0.021';
+$Schedule::LongSteps::Storage::VERSION = '0.023';
 use Moose;
 
 =head1 NAME
@@ -63,5 +63,21 @@ sub find_process{
     die "Please implement this in $self";
 }
 
+
+=head2 update_process
+
+Updates the given stored process (as returned by 'find_process')
+with the given properties.
+
+Usage:
+
+ $this->update_process( $process , { run_at => DateTime->now(), .. } );
+
+=cut
+
+sub update_process{
+    my ($self, $process, $properties) = @_;
+    $process->update( $properties );
+}
 
 __PACKAGE__->meta()->make_immutable();

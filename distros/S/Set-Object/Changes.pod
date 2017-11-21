@@ -5,6 +5,50 @@
 
 REVISION HISTORY - Set::Object
 
+=head1 1.38, 2017-11-11
+
+=over
+
+=item *
+
+Add test_cover and release targets
+
+=back
+
+=head1 1.37, 2017-11-11
+
+=over
+
+=item *
+
+Test fixes for -Ddefault_inc_excludes_dot, RT #120540
+
+=item *
+
+Skip failing threads test <= 5.10.0
+
+=item *
+
+Add CI hooks
+
+=back
+
+=head1 1.36, 2017-11-10
+
+=over
+
+=item *
+
+Davem fixed get-magic for the new arguments, fixing
+NetHack-Item L<[perl #132152]|https://rt.perl.org/Public/Bug/Display.html?id=132152>.
+See L<[cpan #123582]|https://rt.cpan.org/Ticket/Display.html?id=123582>
+
+=item *
+
+Stabilize F<t/misc/kwalitee.t> test
+
+=back
+
 =head1 1.35, 2015-06-10
 
 =over

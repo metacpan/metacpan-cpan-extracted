@@ -1,5 +1,10 @@
 Revision history for Device-Chip-HTU21D
 
+0.02    2017-11-11 02:02:19
+        [CHANGES]
+         * Declare dependency on Data::Bitfield
+         * Fix POD error
+
 0.01    2016/10/02 22:15:25
         First version, released on an unsuspecting world.
 

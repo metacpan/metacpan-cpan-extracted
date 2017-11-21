@@ -1,7 +1,7 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2017 -- leonerd@leonerd.org.uk
 
 package Device::Chip::HTU21D;
 
@@ -11,9 +11,9 @@ use base qw( Device::Chip );
 
 use Carp;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
-use Data::Bitfield qw( bitfield boolfield );
+use Data::Bitfield 0.02 qw( bitfield boolfield );
 use Future::Utils qw( repeat );
 use List::Util qw( first );
 
@@ -74,7 +74,7 @@ use constant {
    CMD_SOFT_RESET           => 0xFE,
 };
 
-bitfield REG_USER =>
+bitfield { format => "bytes-BE" }, REG_USER =>
    RES0       => boolfield( 0 ),
    OTPDISABLE => boolfield( 1 ),
    HEATER     => boolfield( 2 ),
@@ -92,7 +92,7 @@ Returns a C<HASH> reference of the contents of the user register.
    HEATER     => 0 | 1
    ENDOFBATT  => 0 | 1
 
-=head1 change_config
+=head2 change_config
 
    $chip->change_config( %changes )->get
 
@@ -107,7 +107,7 @@ sub read_config
    my $self = shift;
 
    $self->protocol->write_then_read( pack( "C", CMD_READ_REG ), 1 )->then( sub {
-      my %config = unpack_REG_USER( unpack "C", $_[0] );
+      my %config = unpack_REG_USER( $_[0] );
       my $res = ( delete $config{RES0} ) | ( delete $config{RES1} ) << 1;
       $config{RES} = $RES_VALUES[$res];
 
@@ -136,7 +136,7 @@ sub change_config
          %$config,
       );
 
-      $self->protocol->write( pack "C C", CMD_WRITE_REG, $val );
+      $self->protocol->write( pack "C a", CMD_WRITE_REG, $val );
    });
 }
 

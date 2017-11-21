@@ -13,7 +13,7 @@ use HTTP::Tiny::FileProtocol;
 use XML::LibXML;
 use Regexp::Common qw(URI);
 
-our $VERSION = 0.06;
+our $VERSION = 0.08;
 
 our $ALLOWED_SCHEME = [ 'HTTP', 'file' ];
 
@@ -60,13 +60,37 @@ sub list {
     my %packages = %{ $self->packages };
     my $otrs     = $params{otrs};
 
-    my @packages = sort keys %packages;
+    my @package_names = sort keys %packages;
 
     if ( $otrs ) {
-        @packages = grep{ $packages{$_}->{$otrs} }@packages;
+        @package_names = grep{ $packages{$_}->{$otrs} }@package_names;
     }
 
-    return @packages;
+    if ( $params{details} ) {
+        my @package_list;
+
+        NAME:
+        for my $name ( @package_names ) {
+            my @all_otrs_versions = $otrs ? $otrs : keys %{ $packages{$name} || {} };
+
+            OTRS_VERSION:
+            for my $otrs_version ( @all_otrs_versions ) {
+
+                VERSION:
+                for my $version ( keys %{ $packages{$name}->{$otrs_version}->{versions} || {} } ) {
+                    push @package_list, {
+                        name    => $name,
+                        version => $version,
+                        url     => $packages{$name}->{$otrs_version}->{versions}->{$version},
+                    }
+                }
+            }
+        }
+
+        return sort { $a->{name} cmp $b->{name} || $a->{version} cmp $b->{version} } @package_list;
+    }
+
+    return @package_names;
 }
 
 sub _check_uri {
@@ -202,7 +226,7 @@ OTRS::Repository::Source - Parser for a single otrs.xml file
 
 =head1 VERSION
 
-version 0.07
+version 0.09
 
 =head1 AUTHOR
 

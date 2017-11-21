@@ -17,7 +17,7 @@ sub gen ($) { ## no critic # yes need proto in this helper sub
 };
 
 # test route
-MVC::Neaf->route( '/foo/bar/baz' => sub { +{} }, view => 'JS' );
+MVC::Neaf->route( '/foo/bar/baz' => sub { +{} }, -view => 'JS' );
 
 MVC::Neaf->add_hook( pre_route => gen 0.1 );
 MVC::Neaf->add_hook( pre_route => gen 0.2, prepend => 1 );

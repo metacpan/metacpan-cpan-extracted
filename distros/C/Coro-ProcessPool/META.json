@@ -1,60 +1,68 @@
 {
-   "abstract" : "unknown",
+   "abstract" : "An asynchronous pool of perl processes",
    "author" : [
-      "\"Jeff Ober\" <\"jeffober@gmail.com\">"
+      "Jeff Ober <sysread@fastmail.fm>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
       "version" : "2"
    },
    "name" : "Coro-ProcessPool",
-   "no_index" : {
-      "directory" : [
-         "t",
-         "inc"
-      ]
-   },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0",
-            "Test::More" : "0"
-         }
-      },
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
          }
       },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
       "runtime" : {
          "requires" : {
-            "AnyEvent" : "0",
-            "Const::Fast" : "0",
-            "Coro" : "0",
-            "Data::UUID" : "0",
-            "Devel::StackTrace" : "0",
-            "Guard" : "0",
-            "Module::Load" : "0",
-            "Moo" : "0",
-            "Sereal" : "0",
-            "Storable" : "2.05",
-            "String::Escape" : "0",
-            "Sub::Override" : "0",
-            "Types::Standard" : "1.0",
-            "perl" : "5.006"
+            "AnyEvent" : "7.14",
+            "AnyEvent::ProcessPool" : "0.06",
+            "Coro" : "6.514",
+            "Coro::Countdown" : "0.02",
+            "common::sense" : "3.74",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "Devel::Cover" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "List::Util" : "0",
+            "Test2" : "0",
+            "Test2::Bundle::Extended" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "0"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/sysread/Coro-ProcessPool/issues"
+      },
+      "homepage" : "https://github.com/sysread/Coro-ProcessPool",
       "repository" : {
-         "url" : "https://github.com/jsober/Coro-ProcessPool"
+         "type" : "git",
+         "url" : "https://github.com/sysread/Coro-ProcessPool.git",
+         "web" : "https://github.com/sysread/Coro-ProcessPool"
       }
    },
-   "version" : "0.26"
+   "version" : "0.30",
+   "x_serialization_backend" : "JSON::XS version 3.03"
 }
+

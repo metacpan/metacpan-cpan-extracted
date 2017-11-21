@@ -9,4 +9,5 @@ lib/Data/Deep.pm        - the main module
 
 t/deep.t                - the tests and test functions
 
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

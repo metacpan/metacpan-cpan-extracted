@@ -1,9 +1,14 @@
 use strict;
 use Test::More;
+use Config;
 BEGIN {
     eval 'use threads';
     if ($@) {
       plan skip_all => 'threads missing';
+      exit(0);
+    }
+    if ($] <= 5.010 && $Config{useithreads}) {
+      plan skip_all => 'threads unstable < 5.10';
       exit(0);
     }
 }

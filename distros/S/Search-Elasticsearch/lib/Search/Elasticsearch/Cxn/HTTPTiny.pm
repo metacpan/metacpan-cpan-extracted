@@ -1,5 +1,5 @@
 package Search::Elasticsearch::Cxn::HTTPTiny;
-$Search::Elasticsearch::Cxn::HTTPTiny::VERSION = '5.02';
+$Search::Elasticsearch::Cxn::HTTPTiny::VERSION = '6.00';
 use Moo;
 with 'Search::Elasticsearch::Role::Cxn', 'Search::Elasticsearch::Role::Is_Sync';
 
@@ -85,7 +85,7 @@ Search::Elasticsearch::Cxn::HTTPTiny - A Cxn implementation which uses HTTP::Tin
 
 =head1 VERSION
 
-version 5.02
+version 6.00
 
 =head1 DESCRIPTION
 

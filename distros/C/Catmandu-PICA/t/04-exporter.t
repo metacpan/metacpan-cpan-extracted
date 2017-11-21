@@ -85,21 +85,22 @@ $out = do { local (@ARGV,$/)=$filename; <> };
 
 is $out, <<'XML';
 <?xml version="1.0" encoding="UTF-8"?>
-<collection xlmns="info:srw/schema/5/picaXML-v1.0">
-<record>
-  <datafield tag="003@">
-    <subfield code="0">1041318383</subfield>
-  </datafield>
-  <datafield tag="021A">
-    <subfield code="a">Hello $¥!</subfield>
-  </datafield>
-</record>
-<record>
-  <datafield tag="028C" occurrence="01">
-    <subfield code="d">Emma</subfield>
-    <subfield code="a">Goldman</subfield>
-  </datafield>
-</record>
+
+<collection xmlns="info:srw/schema/5/picaXML-v1.0">
+  <record>
+    <datafield tag="003@">
+      <subfield code="0">1041318383</subfield>
+    </datafield>
+    <datafield tag="021A">
+      <subfield code="a">Hello $¥!</subfield>
+    </datafield>
+  </record>
+  <record>
+    <datafield tag="028C" occurrence="01">
+      <subfield code="d">Emma</subfield>
+      <subfield code="a">Goldman</subfield>
+    </datafield>
+  </record>
 </collection>
 XML
 

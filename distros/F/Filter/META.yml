@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 8.0403, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,11 +18,19 @@ no_index:
     - t
     - inc
 recommends:
+  Class::XSAccessor: '0'
   Filter::Simple: '0.88'
   Filter::Simple::Compile: '0.02'
-requires: {}
+  List::MoreUtils: '0'
+  Perl::MinimumVersion: '0'
+  Pod::Spell::CommonMistakes: '0'
+  Test::CPAN::Meta: '0'
+  Test::Kwalitee: '0'
+  Test::More: '0.88'
+  Test::Pod: '1.00'
+  Text::CSV_XS: '0'
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/rurban/Filter
-version: '1.57'
+version: '1.58'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

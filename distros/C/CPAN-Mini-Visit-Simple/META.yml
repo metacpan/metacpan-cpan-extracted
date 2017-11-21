@@ -21,6 +21,7 @@ no_index:
     - inc
 requires:
   Archive::Extract: '0.8'
+  Archive::Zip: '0'
   CPAN::Mini: '0'
   File::Find: '0'
   File::Path: '2.06'
@@ -33,5 +34,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Mini-Visit-Simple
   homepage: http://thenceforward.net/perl/modules/CPAN-Mini-Visit-Simple/
   repository: https://github.com/jkeenan/cpan-mini-visit-simple.git
-version: '0.015'
+version: '0.016'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

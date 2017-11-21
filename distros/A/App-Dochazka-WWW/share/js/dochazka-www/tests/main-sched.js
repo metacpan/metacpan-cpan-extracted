@@ -65,12 +65,13 @@ define ([
         QUnit.test(test_desc, function (assert) {
             console.log('***TEST*** ' + prefix + test_desc);
             var done = assert.async(3);
-            login({"nam": "demo", "pwd": "demo"});
+            login({"nam": "root", "pwd": "immutable"});
             setTimeout(function () {
-                ct.login(assert, "demo", "passerby");
+                ct.login(assert, "root", "admin");
                 done();
             }, 1000);
             setTimeout(function () {
+                ct.mainMenu(assert);
                 ct.mainMenuToMainSched(assert);
                 loggout();
                 done();
@@ -78,7 +79,7 @@ define ([
             setTimeout(function () {
                 ct.loggout(assert);
                 done();
-            }, 2000);
+            }, 2200);
         });
 
         test_desc = 'schedule lookup - bogus ID';
@@ -92,12 +93,13 @@ define ([
             }, 1000);
             setTimeout(function () {
                 var entry1;
+                ct.mainMenu(assert);
                 ct.mainMenuToMainSched(assert);
                 ct.mainSchedToSchedLookup(assert);
                 entry1 = $('form#schedLookup input[name="entry1"]');
                 entry1.val('BOGOSITYWHELP');
                 assert.strictEqual(entry1.val(), 'BOGOSITYWHELP', "Form filled out with bogus data");
-                $('input[name="sel"]').val('0');
+                $('input[name="sel"]').val('1');
                 $('input[name="sel"]').focus();
                 start.mmKeyListener($.Event("keydown", {keyCode: 13}));
                 assert.ok(true, "*** REACHED schedLookup form submitted");

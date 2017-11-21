@@ -9,12 +9,11 @@ build_requires:
   IPC::Open3: '0'
   Test::MetaSyntactic: '0'
   Test::More: '0'
-  blib: '1.01'
   perl: '5.006'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -34,7 +33,7 @@ requires:
 resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Acme-MetaSyntactic-Themes
   repository: http://github.com/book/Acme-MetaSyntactic-Themes.git
-version: '1.050'
+version: '1.051'
 x_contributors:
   - 'Éric Guirbal <eguirbal@cpan.org>'
   - 'Brian Gottreu <gottreu@cpan.org>'

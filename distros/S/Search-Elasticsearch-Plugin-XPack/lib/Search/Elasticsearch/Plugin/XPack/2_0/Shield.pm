@@ -23,7 +23,7 @@ Search::Elasticsearch::Plugin::XPack::2_0::Shield - Plugin providing Shield API 
 
 =head1 VERSION
 
-version 5.02
+version 6.00
 
 =head1 SYNOPSIS
 

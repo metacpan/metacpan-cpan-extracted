@@ -232,7 +232,11 @@ $ARGSRef->{'repeat-details-monthly'} ||= 'day';
 $ARGSRef->{'repeat-details-yearly'} ||= 'day';
 $ARGSRef->{'repeat-end'} ||= 'none';
 $ARGSRef->{'repeat-lead-time'} //= RT->Config->Get('RepeatTicketLeadTime') // 14;
-$ARGSRef->{'repeat-coexistent-number'} ||= RT->Config->Get('RepeatTicketCoexistentNumber') || 1;
+
+# 0 is a valid value, so check for defined before setting to default
+if ( not defined $ARGSRef->{'repeat-coexistent-number'} ){
+    $ARGSRef->{'repeat-coexistent-number'} = RT->Config->Get('RepeatTicketCoexistentNumber') || 1;
+}
 
 my $input = sub {
     my ($name, $width, $default) = (@_);

@@ -43,7 +43,6 @@
       "runtime" : {
          "requires" : {
             "Class::Method::Modifiers" : "2.12",
-            "Hash::Merge" : "0.2",
             "List::MoreUtils" : "0.33",
             "Module::Runtime" : "0.014",
             "Package::Stash" : "0.36",
@@ -64,7 +63,7 @@
    "provides" : {
       "Mic" : {
          "file" : "lib/Mic.pm",
-         "version" : "0.000005"
+         "version" : "0.000006"
       },
       "Mic::ArrayImpl" : {
          "file" : "lib/Mic/ArrayImpl.pm"
@@ -105,7 +104,7 @@
          "web" : "https://github.com/arunbear/Mic"
       }
    },
-   "version" : "0.000005",
+   "version" : "0.000006",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "arunbear <arunbear@gmail.com>"

@@ -1,0 +1,12 @@
+[AGENT]
+
+Mozilla/5.0 (Windows NT 6.1; WOW64; rv:17.0) Gecko/20130801 Thunderbird/17.0.8
+
+extras          => [ 'WOW64' ],
+mozilla         => [ '17.0', '17.000' ],
+name            => 'Thunderbird',
+os              => 'Windows 7',
+parser          => 'mozilla_family:generic',
+toolkit         => [ 'Gecko', '20130801', '20130801.000' ],
+version         => '17.000008',
+version_raw     => '17.0.8',

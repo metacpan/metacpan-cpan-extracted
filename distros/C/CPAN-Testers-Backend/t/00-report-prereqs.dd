@@ -6,7 +6,7 @@ do { my $x = {
                       },
        'runtime' => {
                       'requires' => {
-                                      'Beam::Minion' => '0',
+                                      'Beam::Minion' => '0.007',
                                       'Beam::Runner' => '0.013',
                                       'Beam::Wire' => '1.020',
                                       'CPAN::Testers::Report' => '0',
@@ -18,8 +18,9 @@ do { my $x = {
                                       'JSON::MaybeXS' => '0',
                                       'Log::Any' => '1.046',
                                       'Metabase::User::Profile' => '0',
+                                      'Minion' => '8',
                                       'Minion::Backend::SQLite' => '0',
-                                      'Minion::Backend::mysql' => '0',
+                                      'Minion::Backend::mysql' => '0.11',
                                       'Sereal' => '0',
                                       'perl' => '5.024'
                                     }

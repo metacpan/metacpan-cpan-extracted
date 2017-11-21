@@ -1,5 +1,5 @@
 package Text::Password::AutoMigration;
-our $VERSION = "0.09";
+our $VERSION = "0.12";
 
 use Moose;
 extends 'Text::Password::SHA';
@@ -104,17 +104,20 @@ override 'verify' => sub {
     my $self = shift;
     my ( $input, $data ) = @_;
      die __PACKAGE__. " doesn't allow any Wide Characters or white spaces\n"
-    if $input !~ /[!-~]/ or $input =~ /\s/;
+    if $input =~ /[^!-~]/ or $input =~ /\s/;
 
+    my $new;
     if (   $data =~ /^\$6\$[!-~]{1,8}\$[!-~]{86}$/
         or $data =~ /^\$5\$[!-~]{1,8}\$[!-~]{43}$/
         or $data =~ /^[0-9a-f]{40}$/i
     ) {
-        return $self->encrypt($input) if super() and $self->migrate();
-        return super();
+        return super() unless $self->migrate();
+        do{ $new = $self->encrypt($input) } until( $new =~ /^\$6\$[!-~]{1,8}\$[!-~]{86}$/ );
+        return $new;
     }elsif( $self->Text::Password::MD5::verify(@_) ){
-        return $self->encrypt($input) if $self->migrate();
-        return 1;
+        return 1 unless $self->migrate();
+        do{ $new = $self->encrypt($input) } until( $new =~ /^\$6\$[!-~]{1,8}\$[!-~]{86}$/ );
+        return $new;
     }
     return undef;
 };

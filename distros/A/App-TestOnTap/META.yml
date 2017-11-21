@@ -11,7 +11,7 @@ configure_requires:
   ExtUtils::MakeMaker: '7.12'
   Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -57,5 +57,5 @@ requires:
   perl: '5.010001'
 resources:
   repository: https://github.com/kenneth-olwing/App-TestOnTap.git
-version: '0.044'
+version: '0.046'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

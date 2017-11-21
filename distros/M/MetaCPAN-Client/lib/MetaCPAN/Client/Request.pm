@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package MetaCPAN::Client::Request;
 # ABSTRACT: Object used for making requests to MetaCPAN
-$MetaCPAN::Client::Request::VERSION = '2.018000';
+$MetaCPAN::Client::Request::VERSION = '2.021000';
 use Moo;
 use Carp;
 use JSON::MaybeXS qw<decode_json encode_json>;
@@ -158,7 +158,8 @@ sub _build_body {
         query => $query,
         $self->_read_filters($params),
         $self->_read_fields($params),
-        $self->_read_aggregations($params)
+        $self->_read_aggregations($params),
+        $self->_read_sort($params)
     };
 }
 
@@ -211,6 +212,16 @@ sub _read_filters {
     ref($filter) or return ();
 
     return ( filter => $filter );
+}
+
+sub _read_sort {
+    my $self   = shift;
+    my $params = shift;
+
+    my $sort = delete $params->{sort};
+    ref($sort) or return ();
+
+    return ( sort => $sort );
 }
 
 sub _build_query_rec {
@@ -271,7 +282,7 @@ MetaCPAN::Client::Request - Object used for making requests to MetaCPAN
 
 =head1 VERSION
 
-version 2.018000
+version 2.021000
 
 =head1 ATTRIBUTES
 

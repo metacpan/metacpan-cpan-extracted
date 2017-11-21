@@ -5,7 +5,7 @@ use warnings;
 
 # ABSTRACT: Constants used in Net::LDAP::SimpleServer
 
-our $VERSION = '0.0.20';    # VERSION
+our $VERSION = '0.0.21';    # VERSION
 
 use Exporter 'import';
 our @EXPORT = qw(SCOPE_BASEOBJ SCOPE_ONELEVEL SCOPE_SUBTREE
@@ -33,7 +33,7 @@ Net::LDAP::SimpleServer::Constant - Constants used in Net::LDAP::SimpleServer
 
 =head1 VERSION
 
-version 0.0.20
+version 0.0.21
 
 =head1 SEE ALSO
 

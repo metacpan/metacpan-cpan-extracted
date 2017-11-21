@@ -18,7 +18,8 @@ WriteMakefile(
     'Cwd' => 0,
     'List::MoreUtils' => 0,
     'Term::ANSIColor' => 0,
-    'Term::ReadKey' => 0
+    'Term::ReadKey' => 0,
+    'IO::All' => 0
   },
   (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
       'meta-spec' => { version => 2 },

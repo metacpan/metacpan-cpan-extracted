@@ -2,7 +2,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME             => "Dancer2::Plugin::OpenAPIRoutes",
     AUTHOR           => "Anton Petrusevich",
-    VERSION          => "0.02",
+    VERSION          => "0.03",
     INSTALLDIRS      => 'site',
     LICENSE          => "artistic_2",
     MIN_PERL_VERSION => "5.010000",

@@ -6,12 +6,13 @@ use Test::More;
 use JSON;
 
 use MVC::Neaf;
-use MVC::Neaf::X::Form::LIVR;
 
 if ( !eval {require Validator::LIVR;} ) {
     plan skip_all => "No LIVR found, skipping";
+    exit;
 };
 
+require MVC::Neaf::X::Form::LIVR;
 my $val = MVC::Neaf::X::Form::LIVR->new({
     foo => 'required',
     bar => 'integer',
@@ -30,7 +31,7 @@ MVC::Neaf->route( "/" => sub {
         fail => $form->error,
         raw  => $form->raw,
     };
-}, view => 'JS' );
+}, -view => 'JS' );
 
 my $app = MVC::Neaf->run;
 

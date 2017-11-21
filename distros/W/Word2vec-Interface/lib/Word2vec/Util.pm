@@ -111,8 +111,8 @@ sub IsFileOrDirectory
     return "unknown" if !defined( $path );
     return "unknown" if !( -e $path );
 
-    return "file" if ( -f $path );
-    return "dir" if ( -d $path );
+    return "file"    if ( -f $path );
+    return "dir"     if ( -d $path );
 }
 
 sub IsWordOrCUITerm

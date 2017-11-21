@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use 5.010;
  
-use Test::Simple tests => 80;
+use Test::Simple tests => 82;
 use Word2vec::Xmltow2v;
 
 my $xmltow2v = Word2vec::Xmltow2v->new();
@@ -16,6 +16,7 @@ ok( $xmltow2v->GetBeginDate() eq "00/00/0000" );
 ok( $xmltow2v->GetEndDate() eq "99/99/9999" );
 ok( $xmltow2v->_DateCheck() == 0 );
 ok( $xmltow2v->GetCompoundifyText() == 0 );
+ok( $xmltow2v->GetStoreAsSentencePerLine() == 0 );
 ok( defined( $xmltow2v->GetCompoundWordAry() ) && $xmltow2v->GetCompoundWordAry() == 0 );
 ok( defined( $xmltow2v->GetCompoundWordBST() ) );
 ok( !defined( $xmltow2v->GetFileHandle() ) );
@@ -53,6 +54,10 @@ $xmltow2v->SetEndDate( "99/99/9999" );
 
 $xmltow2v->SetCompoundifyText( 1 );
 ok( $xmltow2v->GetCompoundifyText() == 1 );
+
+$xmltow2v->SetStoreAsSentencePerLine( 1 );
+ok( $xmltow2v->GetStoreAsSentencePerLine() == 1 );
+$xmltow2v->SetStoreAsSentencePerLine( 0 );
 
 $xmltow2v->SetMaxCompoundWordLength( 12 );
 ok( $xmltow2v->GetMaxCompoundWordLength() == 12 );

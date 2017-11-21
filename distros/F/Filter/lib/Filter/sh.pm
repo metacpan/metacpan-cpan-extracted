@@ -1,22 +1,20 @@
 package Filter::sh;
  
-use Carp ;
+use Filter::Util::Exec ;
 use strict ;
 use warnings ;
-use vars qw($VERSION) ;
-$VERSION = "1.43" ;
 
-use Filter::Util::Exec ;
+our $VERSION = "1.58" ;
 
 sub import 
 { 
     my($self, @args) = @_ ;
 
-    croak ("Usage: use Filter::sh 'command'")
-	unless @args ;
+    unless (@args) {
+        require Carp;
+        Carp::croak("Usage: use Filter::sh 'command'");
+    }
 
-    #require "Filter/exec.pm" ;
-    #Filter::exec::import ($self, 'sh', '-c', "@args") ; 
     if ($^O eq 'MSWin32') {
         Filter::Util::Exec::filter_add ($self, 'cmd', '/c', "@args") ; 
     }

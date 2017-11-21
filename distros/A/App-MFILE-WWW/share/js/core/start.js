@@ -71,17 +71,11 @@ define ([
             // dmo is dmenu object
             var dmo = target.pull(dmn),
                 sel = $('input[name="sel"]').val(),
-                len = dmo.entries.length,
                 entry,
-                selection;
+                entries = dmo.menuObj.entries;
         
-            if ($.isNumeric(sel) && sel >= 0 && sel <= len) {
-                // we can only select the entry if we have sufficient priv level
-                selection = target.pull(dmo.entries[sel]);
-                if (coreLib.privCheck(selection.aclProfile)) {
-                    //console.log('Selection ' + sel + ' passed priv check');
-                    entry = selection;
-                }
+            if ($.isNumeric(sel) && sel > 0 && sel <= entries.length) {
+                entry = entries[sel];
             } else if (sel === 'X' || sel === 'x') {
                 stack.pop(undefined, { "logout": true });
                 return;
@@ -205,19 +199,16 @@ define ([
                 i,
                 newObj,
                 selection,
-                entry,
-                item,
-                wlen,
-                entries = currentTarget.miniMenu.entries;
+                formEntry,
+                menuEntry,
+                menuObj = currentTarget.miniMenu.menuObj;
 
-            // if miniMenu has zero or one entries, 'Back' is the only option
-            // console.log("entries", entries);
-            if (! coreLib.isArray(entries) || entries.length === 0) {
+            if (menuObj.isEmpty) {
                 console.log("Setting sel to 'X' by default because miniMenu has no entries");
                 sel = 'X';
                 len = 0;
             } else {
-                len = entries.length;
+                len = menuObj.entries.length;
             }
             if (len > 0 && sel === '') {
                 console.log("User hit ENTER ambiguously; doing nothing");
@@ -225,14 +216,8 @@ define ([
             }
 
             // console.log("sel === " + sel + " and len === " + len);
-            if (sel >= 0 && sel <= len) {
-                // console.log("sel " + sel + " is within range");
-                // we can only select the item if we have sufficient priv level
-                selection = target.pull(currentTarget.miniMenu.entries[sel]);
-                if (coreLib.privCheck(selection.aclProfile)) {
-                    //console.log('Selection ' + sel + ' passed priv check');
-                    item = selection;
-                }
+            if (sel > 0 && sel <= len) {
+                menuEntry = menuObj.entries[sel];
             } else if (sel === 'X' || sel === 'x') {
                 var xtgt = stack.getXTarget();
                 if (typeof xtgt === "string") {
@@ -244,28 +229,27 @@ define ([
             } else {
                 console.log('Selection is ' + sel + ' (invalid) -- doing nothing');
             }
-            if (item !== undefined) {
-                //console.log("Selected " + dfn + " menu item: " + item.name);
+            if (menuEntry !== undefined) {
                 if (obj === undefined) {
                     newObj = {};
                 } else {
                     newObj = $.extend({}, obj);
                 }
-                // Vet all writable entries
+                // Vet all writable form entries
                 len = currentTarget.entriesWrite ? currentTarget.entriesWrite.length : 0;
                 console.log("Vetting " + len + " writable dform entries");
                 for (i = 0; i < len; i += 1) {
-                    entry = currentTarget.entriesWrite[i];
-                    if (! mmVetEntry(i, entry.name)) {
+                    formEntry = currentTarget.entriesWrite[i];
+                    if (! mmVetEntry(i, formEntry.name)) {
                         return;
                     }
-                    newObj[entry.prop] = $('#' + entry.name).val();
+                    newObj[formEntry.prop] = $('#' + formEntry.name).val();
                 }
                 if (currentTarget.rememberState) {
                     console.log("Changing stack state to", newObj);
                     stack.setState(newObj);
                 }
-                stack.push(item, newObj);
+                stack.push(menuEntry, newObj);
             }
         },
 
@@ -469,14 +453,15 @@ define ([
                 }
             };
         },
-        drowselectListen = function () {
+        drowselectListen = function (resultLine) {
             var drso = coreLib.drowselectState.obj,
                 set = coreLib.drowselectState.set,
                 pos = coreLib.drowselectState.pos;
-            $('#result').text("Displaying rowselect with " + coreLib.genObjStr(set.length));
+            resultLine = resultLine ? resultLine : "Displaying rowselect with " + coreLib.genObjStr(set.length);
+            coreLib.displayResult(resultLine);
             $('#mainarea').html(drso.source(set));
             coreLib.reverseVideo(pos, true);
-            console.log("Listening in rowselect " + drso.name);
+            // console.log("Listening in rowselect " + drso.name);
             $('#' + drso.name).submit(suppressSubmitEvent);
             $('input[name="sel"]').val('').focus();
             $('#submitButton').on("click", function (event) {
@@ -554,7 +539,7 @@ define ([
             var dfo = target.pull(dfn);
             return function (state, opts) {
                 currentTarget = dfo;
-                console.log('Entering start method of target ' + dfn);
+                console.log('Entering start method of target ' + dfn + ', unadulterated opts', opts);
                 var entry,
                     i,
                     populateArray = [];
@@ -563,8 +548,8 @@ define ([
                 }
                 opts.populate = ('populate' in opts) ? opts.populate : "true";
                 opts.resultLine = ('resultLine' in opts) ? opts.resultLine : "&nbsp";
-                opts.resultLine = (opts.resultLine === null) ? "&nbsp" : opts.resultLine;
                 opts.inputId = ('inputId' in opts) ? opts.inputId : null;
+                console.log("opts", opts);
                 // determine dform "state" (i.e. starting content of form entries)
                 if (! state) {
                     state = stack.getState();
@@ -585,10 +570,10 @@ define ([
                 }
                 // call first populate function to trigger sequential,
                 // asynchronous population of all entries with "populate" property
+                coreLib.displayResult(opts.resultLine);
                 if (opts.populate && populateArray.length > 0) {
                     populate.bootstrap(populateArray);
                 }
-                coreLib.displayResult(opts.resultLine);
                 // listen for user input in form
                 dformListen(dfn, state, opts.inputId);
             };
@@ -657,7 +642,7 @@ define ([
                         coreLib.drowselectState.pos = state.pos;
                     }
                     // start browsing
-                    drowselectListen();
+                    drowselectListen(opts.resultLine);
                 };
             }
         }, // drowselect

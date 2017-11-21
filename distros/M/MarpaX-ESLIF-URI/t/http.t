@@ -42,6 +42,7 @@ my %DATA =
    "http://[1080:0:0:0:8:800:200C:417A]" => {
        scheme    => { origin => "http",                                 decoded => "http",                                 normalized => "http" },
        host      => { origin => "[1080:0:0:0:8:800:200C:417A]",         decoded => "[1080:0:0:0:8:800:200C:417A]",         normalized => "[1080:0:0:0:8:800:200c:417a]" },
+       hostname  => { origin => "1080:0:0:0:8:800:200C:417A",           decoded => "1080:0:0:0:8:800:200C:417A",           normalized => "1080:0:0:0:8:800:200c:417a" },
        path      => { origin => "",                                     decoded => "",                                     normalized => "/" },
        ip        => { origin => "1080:0:0:0:8:800:200C:417A",           decoded => "1080:0:0:0:8:800:200C:417A",           normalized => "1080:0:0:0:8:800:200c:417a" },
        ipv6      => { origin => "1080:0:0:0:8:800:200C:417A",           decoded => "1080:0:0:0:8:800:200C:417A",           normalized => "1080:0:0:0:8:800:200c:417a" },
@@ -52,6 +53,7 @@ my %DATA =
    "http://[2001:db8:a0b:12f0::1%25Eth0]:80/index.html" => {
        scheme    => { origin => "http",                                 decoded => "http",                                 normalized => "http" },
        host      => { origin => "[2001:db8:a0b:12f0::1%25Eth0]",        decoded => "[2001:db8:a0b:12f0::1%Eth0]",          normalized => "[2001:db8:a0b:12f0::1%25eth0]" },
+       hostname  => { origin => "2001:db8:a0b:12f0::1%25Eth0",          decoded => "2001:db8:a0b:12f0::1%Eth0",            normalized => "2001:db8:a0b:12f0::1%25eth0" },
        path      => { origin => "/index.html",                          decoded => "/index.html",                          normalized => "/index.html" },
        ip        => { origin => "2001:db8:a0b:12f0::1%25Eth0",          decoded => "2001:db8:a0b:12f0::1%Eth0",            normalized => "2001:db8:a0b:12f0::1%25eth0" },
        ipv6      => { origin => "2001:db8:a0b:12f0::1",                 decoded => "2001:db8:a0b:12f0::1",                 normalized => "2001:db8:a0b:12f0::1" },
@@ -60,6 +62,7 @@ my %DATA =
    "http://[2001:db8:a0b:12f0::1%Eth0]:80/index.html" => {
        scheme    => { origin => "http",                                 decoded => "http",                                 normalized => "http" },
        host      => { origin => "[2001:db8:a0b:12f0::1%Eth0]",          decoded => "[2001:db8:a0b:12f0::1%Eth0]",          normalized => "[2001:db8:a0b:12f0::1%25eth0]" },
+       hostname  => { origin => "2001:db8:a0b:12f0::1%Eth0",            decoded => "2001:db8:a0b:12f0::1%Eth0",            normalized => "2001:db8:a0b:12f0::1%25eth0" },
        path      => { origin => "/index.html",                          decoded => "/index.html",                          normalized => "/index.html" },
        ip        => { origin => "2001:db8:a0b:12f0::1%Eth0",            decoded => "2001:db8:a0b:12f0::1%Eth0",            normalized => "2001:db8:a0b:12f0::1%25eth0" },
        ipv6      => { origin => "2001:db8:a0b:12f0::1",                 decoded => "2001:db8:a0b:12f0::1",                 normalized => "2001:db8:a0b:12f0::1" },

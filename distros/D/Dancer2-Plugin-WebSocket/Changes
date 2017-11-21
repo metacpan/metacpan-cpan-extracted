@@ -1,5 +1,13 @@
 Revision history for Dancer2-Plugin-WebSocket
 
+0.1.1 2017-11-20
+  [ BUG FIXES ]
+    - change protocol to 'wss://' if request is secure. (Frank Schreiner,
+      GH#1)
+
+  [ STATISTICS ]
+    - code churn: 3 files changed, 12 insertions(+), 3 deletions(-)
+
 0.1.0 2017-10-14
   [ ENHANCEMENTS ]
     - Use Moo::Role instead of Role::Tiny.

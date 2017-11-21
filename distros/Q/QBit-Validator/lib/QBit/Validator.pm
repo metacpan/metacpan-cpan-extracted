@@ -1,16 +1,10 @@
-package Exception::Validator;
-$Exception::Validator::VERSION = '0.010';
-use base qw(Exception);
-
-package FF;
-$FF::VERSION = '0.010';
-use base qw(Exception::Validator);
-
 package QBit::Validator;
-$QBit::Validator::VERSION = '0.010';
+$QBit::Validator::VERSION = '0.011';
 use qbit;
 
 use base qw(QBit::Class);
+
+use Exception::Validator;
 
 __PACKAGE__->mk_ro_accessors(qw(data app));
 

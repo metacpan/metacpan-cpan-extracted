@@ -1,0 +1,82 @@
+package App::WRT::Util;
+
+use strict;
+use warnings;
+
+use base qw(Exporter);
+our @EXPORT_OK = qw(dir_list get_date);
+
+=item dir_list($dir, $sort_order, $pattern)
+
+Return a $sort_order sorted list of files matching regex $pattern in a
+directory.
+
+Calls $sort_order, which can be one of:
+
+         alpha - alphabetical
+ reverse_alpha - alphabetical, reversed
+   high_to_low - numeric, high to low
+   low_to_high - numeric, low to high
+
+=cut
+
+sub dir_list {
+  my ($dir, $sort_order, $pattern) = @_;
+
+  $pattern    ||= qr/^[0-9]{1,2}$/;
+  $sort_order ||= 'high_to_low';
+
+  opendir my $list_dir, $dir
+    or die "Couldn't open $dir: $!";
+
+  my @files = sort $sort_order
+              grep { m/$pattern/ }
+              readdir $list_dir;
+
+  closedir $list_dir;
+
+  return @files;
+}
+
+# Various named sorts for dir_list:
+sub alpha         { $a cmp $b; } # alphabetical
+sub high_to_low   { $b <=> $a; } # numeric, high to low
+sub low_to_high   { $a <=> $b; } # numberic, low to high
+sub reverse_alpha { $b cmp $a; } # alphabetical, reversed
+
+=item get_date('key', 'other_key', ...)
+
+Return current date values for the given key. Valid keys are sec, min, hour,
+mday (day of month), mon, year, wday (day of week), yday (day of year), and
+isdst (is daylight savings).
+
+Remember that year is given in years after 1900.
+
+=cut
+
+# Below replaces:
+# my ($sec, $min, $hour, $mday, $mon,
+#     $year, $wday, $yday, $isdst) = localtime(time);
+{
+  my %name_map = (
+    sec   => 0,  min   => 1, hour => 2, mday => 3,
+    mon   => 4,  year  => 5, wday => 6, yday => 5,
+    isdst => 6,
+  );
+
+  sub get_date {
+    my (@names) = @_;
+    my (@indices) = @name_map{@names};
+    my (@values) = (localtime time)[@indices];
+
+    if (wantarray()) {
+        # my ($foo, $bar) = get_date('foo', 'bar');
+        return @values;
+    } else {
+        # this is probably useless unless you're getting just one value
+        return join '', @values;
+    }
+  }
+}
+
+1;

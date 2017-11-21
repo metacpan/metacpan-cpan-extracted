@@ -159,8 +159,11 @@ fun _variables_apply_defaults(
     my $parsed_value;
     my $maybe_value = $variable_values->{$_} // $opvar->{default_value};
     eval { $parsed_value = $opvar_type->graphql_to_perl($maybe_value) };
-    die "Variable '\$$_' got invalid value @{[$JSON->canonical->encode($maybe_value)]}.\n$@"
-      if $@;
+    if ($@) {
+      my $error = $@;
+      $error =~ s#\s+at.*line\s+\d+\.#.#;
+      die "Variable '\$$_' got invalid value @{[$JSON->canonical->encode($maybe_value)]}.\n$error";
+    }
     ($_ => { value => $parsed_value, type => $opvar_type })
   } keys %$operation_variables };
 }
@@ -187,13 +190,13 @@ fun _execute_operation(
 ) {
   my $op_type = $operation->{operationType} || 'query';
   my $type = $context->{schema}->$op_type;
-  my ($fields) = _collect_fields(
+  my ($fields) = $type->_collect_fields(
     $context,
-    $type,
     $operation->{selections},
     {},
     {},
   );
+  DEBUG and _debug('_execute_operation(fields)', $fields, $root_value);
   my $path = [];
   my $execute = $op_type eq 'mutation'
     ? \&_execute_fields_serially : \&_execute_fields;
@@ -204,111 +207,53 @@ fun _execute_operation(
   ($result, $context);
 }
 
-fun _collect_fields(
-  HashRef $context,
-  (InstanceOf['GraphQL::Type']) $runtime_type,
-  ArrayRef $selections,
-  Map[StrNameValid,ArrayRef[HashRef]] $fields_got,
-  Map[StrNameValid,Bool] $visited_fragments,
-) {
-  DEBUG and _debug('_collect_fields', $runtime_type->to_string, $fields_got, $selections);
-  for my $selection (@$selections) {
-    my $node = $selection;
-    next if !_should_include_node($context->{variable_values}, $node);
-    if ($selection->{kind} eq 'field') {
-      my $use_name = $node->{alias} || $node->{name};
-      $fields_got = {
-        %$fields_got,
-        $use_name => [ @{$fields_got->{$use_name} || []}, $node ],
-      }; # like push but no mutation
-    } elsif ($selection->{kind} eq 'inline_fragment') {
-      next if !_fragment_condition_match($context, $node, $runtime_type);
-      ($fields_got, $visited_fragments) = _collect_fields(
-        $context,
-        $runtime_type,
-        $node->{selections},
-        $fields_got,
-        $visited_fragments,
-      );
-    } elsif ($selection->{kind} eq 'fragment_spread') {
-      my $frag_name = $node->{name};
-      next if $visited_fragments->{$frag_name};
-      $visited_fragments = { %$visited_fragments, $frag_name => 1 }; # !mutate
-      my $fragment = $context->{fragments}{$frag_name};
-      next if !$fragment;
-      next if !_fragment_condition_match($context, $fragment, $runtime_type);
-      DEBUG and _debug('_collect_fields(fragment_spread)', $fragment);
-      ($fields_got, $visited_fragments) = _collect_fields(
-        $context,
-        $runtime_type,
-        $fragment->{selections},
-        $fields_got,
-        $visited_fragments,
-      );
-    }
-  }
-  ($fields_got, $visited_fragments);
-}
-
-fun _should_include_node(
-  HashRef $variables,
-  HashRef $node,
-) :ReturnType(Bool) {
-  DEBUG and _debug('_should_include_node', $variables, $node);
-  my $skip = _get_directive_values($GraphQL::Directive::SKIP, $node, $variables);
-  return '' if $skip and $skip->{if};
-  my $include = _get_directive_values($GraphQL::Directive::INCLUDE, $node, $variables);
-  return '' if $include and !$include->{if};
-  1;
-}
-
-fun _get_directive_values(
-  (InstanceOf['GraphQL::Directive']) $directive,
-  HashRef $node,
-  HashRef $variables,
-) {
-  DEBUG and _debug('_get_directive_values', $directive->name, $node, $variables);
-  my ($d) = grep $_->{name} eq $directive->name, @{$node->{directives} || []};
-  return if !$d;
-  _get_argument_values($directive, $d, $variables);
-}
-
-fun _fragment_condition_match(
-  HashRef $context,
-  HashRef $node,
-  (InstanceOf['GraphQL::Type']) $runtime_type,
-) :ReturnType(Bool) {
-  DEBUG and _debug('_fragment_condition_match', $runtime_type->to_string, $node);
-  return 1 if !$node->{on};
-  return 1 if $node->{on} eq $runtime_type->name;
-  my $condition_type = $context->{schema}->name2type->{$node->{on}} //
-    die GraphQL::Error->new(
-      message => "Unknown type for fragment condition '$node->{on}'."
-    );
-  return '' if !$condition_type->DOES('GraphQL::Role::Abstract');
-  $context->{schema}->is_possible_type($condition_type, $runtime_type);
-}
-
 fun _execute_fields(
   HashRef $context,
   (InstanceOf['GraphQL::Type']) $parent_type,
   Any $root_value,
   ArrayRef $path,
   Map[StrNameValid,ArrayRef[HashRef]] $fields,
-) :ReturnType(Map[StrNameValid,Any]){
+) :ReturnType(Map[StrNameValid,Any]) {
   my %results;
   DEBUG and _debug('_execute_fields', $parent_type->to_string, $fields, $root_value);
   map {
     my $result_name = $_;
     my $result;
     eval {
-      ($result, $context) = _resolve_field(
+      my $nodes = $fields->{$result_name};
+      my $field_node = $nodes->[0];
+      my $field_name = $field_node->{name};
+      DEBUG and _debug('_execute_fields(resolve)', $parent_type->to_string, $nodes, $root_value);
+      my $field_def = _get_field_def($context->{schema}, $parent_type, $field_name);
+      my $resolve = $field_def->{resolve} || $context->{field_resolver};
+      my $info = _build_resolve_info(
         $context,
         $parent_type,
-        $root_value,
+        $field_def,
         [ @$path, $result_name ],
-        $fields->{$result_name},
+        $nodes,
       );
+      my $resolve_node = _build_resolve_node(
+        $context,
+        $field_def,
+        $nodes,
+        $resolve,
+        $info,
+      );
+      if (!GraphQL::Error->is($resolve_node)) {
+        $result = _resolve_field_value_or_error($resolve_node, $root_value);
+      } else {
+        $result = $resolve_node; # failed early
+      }
+      ($result, $context) = _complete_value_catching_error(
+        $context,
+        $field_def->{type},
+        $nodes,
+        $info,
+        [ @$path, $result_name ],
+        $result,
+      );
+      DEBUG and _debug('_execute_fields(complete)', $result);
     };
     if ($@) {
       $context = _context_error(
@@ -320,6 +265,7 @@ fun _execute_fields(
       # TODO promise stuff
     }
   } keys %$fields; # TODO ordering of fields
+  DEBUG and _debug('_execute_fields(done)', \%results);
   (\%results, $context);
 }
 
@@ -333,44 +279,6 @@ fun _execute_fields_serially(
   DEBUG and _debug('_execute_fields_serially', $parent_type->to_string, $fields, $root_value);
   # TODO implement
   goto &_execute_fields;
-}
-
-# NB same ordering as _execute_fields - graphql-js switches last 2
-fun _resolve_field(
-  HashRef $context,
-  (InstanceOf['GraphQL::Type']) $parent_type,
-  Any $root_value,
-  ArrayRef $path,
-  ArrayRef[HashRef] $nodes,
-) {
-  my $field_node = $nodes->[0];
-  my $field_name = $field_node->{name};
-  DEBUG and _debug('_resolve_field', $parent_type->to_string, $nodes, $root_value);
-  my $field_def = _get_field_def($context->{schema}, $parent_type, $field_name);
-  my $resolve = $field_def->{resolve} || $context->{field_resolver};
-  my $info = _build_resolve_info(
-    $context,
-    $parent_type,
-    $field_def,
-    $path,
-    $nodes,
-  );
-  my $result = _resolve_field_value_or_error(
-    $context,
-    $field_def,
-    $nodes,
-    $resolve,
-    $root_value,
-    $info,
-  );
-  _complete_value_catching_error(
-    $context,
-    $field_def->{type},
-    $nodes,
-    $info,
-    $path,
-    $result,
-  );
 }
 
 use constant FIELDNAME2SPECIAL => {
@@ -413,19 +321,32 @@ fun _build_resolve_info(
   };
 }
 
-fun _resolve_field_value_or_error(
+fun _build_resolve_node(
   HashRef $context,
   HashRef $field_def,
   ArrayRef[HashRef] $nodes,
   Maybe[CodeLike] $resolve,
-  Maybe[Any] $root_value,
   HashRef $info,
 ) {
-  DEBUG and _debug('_resolve_field_value_or_error', $nodes, $root_value, $field_def, eval { $JSON->encode($nodes->[0]) });
+  DEBUG and _debug('_build_resolve_node', $nodes, $field_def, eval { $JSON->encode($nodes->[0]) });
+  my $args = eval {
+    _get_argument_values($field_def, $nodes->[0], $context->{variable_values});
+  };
+  return GraphQL::Error->coerce($@) if $@;
+  DEBUG and _debug("_build_resolve_node(args)", $args, eval { $JSON->encode($args) });
+  {
+    args => [ $args, $context->{context_value}, $info ],
+    resolve => $resolve,
+  };
+}
+
+fun _resolve_field_value_or_error(
+  HashRef $resolve_node,
+  Maybe[Any] $root_value,
+) {
+  DEBUG and _debug('_resolve_field_value_or_error', $resolve_node);
   my $result = eval {
-    my $args = _get_argument_values($field_def, $nodes->[0], $context->{variable_values});
-    DEBUG and _debug("_resolve_field_value_or_error(resolve)", $args, $JSON->encode($args));
-    $resolve->($root_value, $args, $context->{context_value}, $info);
+    $resolve_node->{resolve}->($root_value, @{$resolve_node->{args}})
   };
   return GraphQL::Error->coerce($@) if $@;
   $result;
@@ -476,179 +397,18 @@ fun _complete_value(
   ArrayRef $path,
   Any $result,
 ) {
-  DEBUG and _debug('_complete_value', $return_type->to_string, $result);
+  DEBUG and _debug('_complete_value', $return_type->to_string, $path, $result);
   # TODO promise stuff
   die $result if GraphQL::Error->is($result);
-  if ($return_type->isa('GraphQL::Type::NonNull')) {
-    (my $completed, $context) = _complete_value(
-      $context,
-      $return_type->of,
-      $nodes,
-      $info,
-      $path,
-      $result,
-    );
-    die GraphQL::Error->new(
-      message => "Cannot return null for non-nullable field @{[$info->{parent_type}->name]}.@{[$info->{field_name}]}."
-    ) if !defined $completed;
-    return ($completed, $context);
-  }
-  return ($result, $context) if !defined $result;
-  return _complete_list_value(@_) if $return_type->isa('GraphQL::Type::List');
-  return (_complete_leaf_value($return_type, $result), $context)
-    if $return_type->DOES('GraphQL::Role::Leaf');
-  return _complete_abstract_value(@_) if $return_type->DOES('GraphQL::Role::Abstract');
-  return _complete_object_value(@_) if $return_type->isa('GraphQL::Type::Object');
-  # shouldn't get here
-  die GraphQL::Error->new(
-    message => "Cannot complete value of unexpected type '@{[$return_type->to_string]}'."
-  );
-}
-
-fun _complete_list_value(
-  HashRef $context,
-  (InstanceOf['GraphQL::Type::List']) $return_type,
-  ArrayRef[HashRef] $nodes,
-  HashRef $info,
-  ArrayRef $path,
-  ArrayRef $result,
-) {
-  # TODO promise stuff
-  my $item_type = $return_type->of;
-  my $index = 0;
-  my @completed_results = map {
-    (my $r, $context) = _complete_value_catching_error(
-      $context,
-      $item_type,
-      $nodes,
-      $info,
-      [ @$path, $index++ ],
-      $_,
-    );
-    $r;
-  } @$result;
-  (\@completed_results, $context);
-}
-
-fun _complete_leaf_value(
-  (ConsumerOf['GraphQL::Role::Leaf']) $return_type,
-  Any $result,
-) {
-  DEBUG and _debug('_complete_leaf_value', $return_type->to_string, $result);
-  my $serialised = $return_type->perl_to_graphql($result);
-  die GraphQL::Error->new(message => "Expected a value of type '@{[$return_type->to_string]}' but received: '$result'.\n$@") if $@;
-  $serialised;
-}
-
-fun _complete_abstract_value(
-  HashRef $context,
-  (ConsumerOf['GraphQL::Role::Abstract']) $return_type,
-  ArrayRef[HashRef] $nodes,
-  HashRef $info,
-  ArrayRef $path,
-  Any $result,
-) {
-  my $runtime_type = ($return_type->resolve_type || \&_default_resolve_type)->(
-    $result, $context->{context_value}, $info, $return_type
-  );
-  # TODO promise stuff
-  _complete_object_value(
+  return ($result, $context) if !defined $result
+    and !$return_type->isa('GraphQL::Type::NonNull');
+  $return_type->_complete_value(
     $context,
-    _ensure_valid_runtime_type(
-      $runtime_type,
-      $context,
-      $return_type,
-      $nodes,
-      $info,
-      $result,
-    ),
     $nodes,
     $info,
     $path,
     $result,
   );
-}
-
-fun _ensure_valid_runtime_type(
-  (Str | InstanceOf['GraphQL::Type::Object']) $runtime_type_or_name,
-  HashRef $context,
-  (ConsumerOf['GraphQL::Role::Abstract']) $return_type,
-  ArrayRef[HashRef] $nodes,
-  HashRef $info,
-  Any $result,
-) :ReturnType(InstanceOf['GraphQL::Type::Object']) {
-  my $runtime_type = is_InstanceOf($runtime_type_or_name)
-    ? $runtime_type_or_name
-    : $context->{schema}->name2type->{$runtime_type_or_name};
-  die GraphQL::Error->new(
-    message => "Abstract type @{[$return_type->name]} must resolve to an " .
-      "Object type at runtime for field @{[$info->{parent_type}->name]}." .
-      "@{[$info->{field_name}]} with value $result, received '@{[$runtime_type->name]}'.",
-    nodes => [ $nodes ],
-  ) if !$runtime_type->isa('GraphQL::Type::Object');
-  die GraphQL::Error->new(
-    message => "Runtime Object type '@{[$runtime_type->name]}' is not a possible type for " .
-      "'@{[$return_type->name]}'.",
-    nodes => [ $nodes ],
-  ) if !$context->{schema}->is_possible_type($return_type, $runtime_type);
-  $runtime_type;
-}
-
-fun _default_resolve_type(
-  Any $value,
-  Any $context,
-  HashRef $info,
-  (ConsumerOf['GraphQL::Role::Abstract']) $abstract_type,
-) {
-  my @possibles = @{ $info->{schema}->get_possible_types($abstract_type) };
-  # TODO promise stuff
-  (grep $_->is_type_of->($value, $context, $info), grep $_->is_type_of, @possibles)[0];
-}
-
-fun _complete_object_value(
-  HashRef $context,
-  (InstanceOf['GraphQL::Type::Object']) $return_type,
-  ArrayRef[HashRef] $nodes,
-  HashRef $info,
-  ArrayRef $path,
-  Any $result,
-) {
-  if ($return_type->is_type_of) {
-    my $is_type_of = $return_type->is_type_of->($result, $context->{context_value}, $info);
-    # TODO promise stuff
-    die GraphQL::Error->new(message => "Expected a value of type '@{[$return_type->to_string]}' but received: '@{[ref($result)||$result]}'.") if !$is_type_of;
-  }
-  _collect_and_execute_subfields(
-    $context,
-    $return_type,
-    $nodes,
-    $info,
-    $path,
-    $result,
-  );
-}
-
-fun _collect_and_execute_subfields(
-  HashRef $context,
-  (InstanceOf['GraphQL::Type::Object']) $return_type,
-  ArrayRef[HashRef] $nodes,
-  HashRef $info,
-  ArrayRef $path,
-  Any $result,
-) {
-  my $subfield_nodes = {};
-  my $visited_fragment_names = {};
-  for (grep $_->{selections}, @$nodes) {
-    ($subfield_nodes, $visited_fragment_names) = _collect_fields(
-      $context,
-      $return_type,
-      $_->{selections},
-      $subfield_nodes,
-      $visited_fragment_names,
-    );
-  }
-  DEBUG and _debug('_collect_and_execute_subfields', $return_type->to_string, $subfield_nodes, $result);
-  _execute_fields($context, $return_type, $result, $path, $subfield_nodes);
 }
 
 fun _located_error(
@@ -750,10 +510,12 @@ fun _get_argument_values(
     eval { $coerced_values{$name} = $arg_type->graphql_to_perl($coerced_values{$name}) };
     DEBUG and _debug("_get_argument_values($name after coerce)", $JSON->encode(\%coerced_values));
     if ($@) {
+      my $error = $@;
+      $error =~ s#\s+at.*line\s+\d+\.#.#;
       die GraphQL::Error->new(
         message => "Argument '$name' got invalid value"
           . " @{[$JSON->encode($coerced_values{$name})]}.\nExpected '"
-          . $arg_type->to_string . "'.",
+          . $arg_type->to_string . "'.\n$error",
         nodes => [ $node ],
       );
     }

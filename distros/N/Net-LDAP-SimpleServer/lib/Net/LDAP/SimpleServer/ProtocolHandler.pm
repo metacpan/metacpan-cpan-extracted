@@ -5,7 +5,7 @@ use warnings;
 
 # ABSTRACT: LDAP protocol handler used with Net::LDAP::SimpleServer
 
-our $VERSION = '0.0.20';    # VERSION
+our $VERSION = '0.0.21';    # VERSION
 
 use constant MD5_PREFIX => '{md5}';
 
@@ -253,7 +253,7 @@ Net::LDAP::SimpleServer::ProtocolHandler - LDAP protocol handler used with Net::
 
 =head1 VERSION
 
-version 0.0.20
+version 0.0.21
 
 =head1 SYNOPSIS
 

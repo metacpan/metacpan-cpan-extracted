@@ -8,9 +8,9 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Itself ;
-$Config::Model::Itself::VERSION = '2.012';
+$Config::Model::Itself::VERSION = '2.013';
 use Mouse ;
-use Config::Model 2.111;
+use Config::Model 2.114;
 use 5.010;
 
 use IO::File ;
@@ -799,7 +799,7 @@ Config::Model::Itself - Model editor for Config::Model
 
 =head1 VERSION
 
-version 2.012
+version 2.013
 
 =head1 SYNOPSIS
 

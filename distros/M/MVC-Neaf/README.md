@@ -99,7 +99,7 @@ until half a page micro-app can be written to demonstrate it works.
 * Don't rely on side effects. Use *explicit* functions receiving *arguments*
 and returning *a value*.
 
-* Zeroconf: everything can be configured, nothing needs to.
+* Zeroconf: everything can be configured, nothing needs to be.
 
 * It's not software unless you can run it.
 

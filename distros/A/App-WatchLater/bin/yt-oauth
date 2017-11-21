@@ -1,0 +1,197 @@
+#!/usr/bin/env perl
+
+use 5.016;
+use strict;
+use warnings;
+use autodie;
+
+=head1 NAME
+
+yt-oauth - A simple script for retrieving access and refresh tokens
+
+=head1 VERSION
+
+Version 0.02
+
+=cut
+
+our $VERSION = '0.02';
+
+use Carp;
+use Getopt::Long qw(:config auto_help gnu_getopt);
+use HTTP::Tiny;
+use JSON;
+use Pod::Usage;
+use Socket;
+
+BEGIN {
+  my ($ok, $why) = HTTP::Tiny->can_ssl;
+  croak $why unless $ok;
+}
+
+my $CLIENT_ID;
+my $CLIENT_SECRET;
+my $http = HTTP::Tiny->new;
+
+use constant OAUTH_URL_TEMPLATE => <<'URL' =~ s/\s//gr;
+  https://accounts.google.com/o/oauth2/v2/auth
+    ?scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fyoutube.readonly
+    &response_type=code
+    &redirect_uri=http://127.0.0.1:PORT
+    &client_id=CLIENT_ID
+URL
+
+# We ignore SIGCHLD, which has the effect of causing children to be
+# automatically reaped instead of turning into zombie processes.
+$SIG{CHLD} = 'IGNORE';
+
+sub listen_for_code {
+  my ($pipe, $sock) = @_;
+  listen $sock, SOMAXCONN;
+  accept my $client, $sock;
+  select $client; $| = 1;
+  print "204 No Content\r\n\r\n";
+  my $response = <$client>;
+  print $pipe $response;
+  exit;
+}
+
+sub start_http_listener {
+  # setup pipe to communicate response back to parent
+  pipe my $r, my $w;
+
+  # setup socket for listening
+  socket my $sock, PF_INET, SOCK_STREAM, 0;
+  my $sockaddr = pack_sockaddr_in 0, v127.0.0.1;
+  bind $sock, $sockaddr;
+  my ($port) = unpack_sockaddr_in getsockname $sock;
+
+  if (fork) {
+    # parent
+    close $w;
+    close $sock;
+    return ($port, $r);
+  } else {
+    # child
+    close $r;
+    listen_for_code $w, $sock;
+  }
+}
+
+sub authenticate {
+  my ($port, $fh) = start_http_listener;
+
+  my $oauth_url = OAUTH_URL_TEMPLATE;
+  $oauth_url =~ s/CLIENT_ID/$CLIENT_ID/;
+  $oauth_url =~ s/PORT/$port/;
+  say "Please visit $oauth_url in your browser.";
+
+  my $response = <$fh>;
+
+  if ($response =~ m{GET /\?error=(\S+) HTTP/1.1}) {
+    croak "error authenticating: $1";
+  }
+
+  $response =~ m{GET /\?code=(\S+) HTTP/1.1} or confess "didn't authenticate";
+  $1, "http://127.0.0.1:$port";
+}
+
+sub get_tokens {
+  my ($auth_code, $redirect_uri) = @_;
+  my $resp = $http->post_form('https://www.googleapis.com/oauth2/v4/token', {
+    code          => $auth_code,
+    client_id     => $CLIENT_ID,
+    client_secret => $CLIENT_SECRET,
+    grant_type    => 'authorization_code',
+    redirect_uri  => $redirect_uri,
+  });
+  croak "$resp->{status} $resp->{reason}" unless $resp->{success};
+  my $json = $resp->{content};
+  my $obj = decode_json($json);
+  $obj->{access_token}, $obj->{refresh_token};
+}
+
+sub refresh_access {
+  my ($refresh_token) = @_;
+  my $resp = $http->post_form('https://www.googleapis.com/oauth2/v4/token', {
+    refresh_token => $refresh_token,
+    client_id     => $CLIENT_ID,
+    client_secret => $CLIENT_SECRET,
+    grant_type    => 'refresh_token',
+  });
+  croak "$resp->{status} $resp->{reason}" unless $resp->{success};
+  my $json = $resp->{content};
+  my $obj = decode_json($json);
+  $obj->{access_token};
+}
+
+my $access_token;
+my $refresh_token;
+my $show_version;
+GetOptions(
+  'client-id|i=s'     => \$CLIENT_ID,
+  'client-secret|s=s' => \$CLIENT_SECRET,
+  'refresh-token|r=s' => \$refresh_token,
+  'version|v'         => \$show_version,
+) or pod2usage(2);
+
+if ($show_version) {
+  say 'yt-oauth ' . $VERSION;
+  exit;
+}
+
+$CLIENT_ID     //= $ENV{YT_CLIENT_ID};
+$CLIENT_SECRET //= $ENV{YT_CLIENT_SECRET};
+
+pod2usage(2) unless defined $CLIENT_ID && defined $CLIENT_SECRET;
+
+if (defined $refresh_token) {
+  $access_token = refresh_access($refresh_token);
+} else {
+  my ($auth_code, $redirect_uri) = authenticate;
+  ($access_token, $refresh_token) = get_tokens $auth_code, $redirect_uri;
+}
+
+say "access token: $access_token";
+say "refresh token: $refresh_token";
+
+=head1 SYNOPSIS
+
+    yt-oauth --client-id=ID --client-secret=SECRET [--refresh-token=TOKEN]
+
+        -i, --client-id      set the client ID
+        -s, --client-secret  set the client secret
+        -r, --refresh-token  get a fresh access token using TOKEN
+
+=head1 DESCRIPTION
+
+Authenticate with Google APIs using OAuth2. Retrieves an access token and a
+refresh token. Access token can be used to authorize API requests, and
+furthermore provides access to user data. Access tokens will expire, so a new
+one can be requested using the refresh token (B<--refresh-token>).
+
+Client ID and client secret are mandatory, and may be provided on the command
+line or by environment variable. A client ID and secret can be obtained from
+Google's L<API Console|https://console.developers.google.com/apis/credentials>.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-i> I<id>, B<--client-id>=I<id>
+
+=item B<-s> I<secret>, B<--client-secret>=I<secret>
+
+=item B<-t> I<token>, B<--refresh-token>=I<token>
+
+Obtain an access token using the provided refresh token instead of asking the
+user to authorize. Refresh tokens may be stored and reused until they are
+revoked by the user, while access tokens expire after a short amount of time.
+
+=back
+
+=head1 AUTHOR
+
+Aaron L. Zeng <me@bcc32.com>
+
+=cut

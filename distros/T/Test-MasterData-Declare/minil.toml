@@ -1,0 +1,6 @@
+name = "Test-MasterData-Declare"
+# badges = ["travis"]
+authority="cpan:MACOPY"
+
+module_maker="ModuleBuildTiny"
+

@@ -1,6 +1,6 @@
 =head1 NAME
 
-Syntax::Highlight::Engine::Simple::HTML - (EXPERIMENTAL)HTML code highlighting class
+Syntax::Highlight::Engine::Simple::HTML - (EXPERIMENTAL) HTML code highlighting class
 
 =head1 VERSION
 

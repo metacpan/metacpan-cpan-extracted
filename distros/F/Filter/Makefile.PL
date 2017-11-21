@@ -70,7 +70,16 @@ WriteMakefile
      {recommends =>
       {
 	'Filter::Simple'          => '0.88',
-	'Filter::Simple::Compile' => '0.02',
+        'Filter::Simple::Compile' => '0.02',
+        'Test::More'        => '0.88',
+        'Test::Kwalitee'    => 0,
+        'Class::XSAccessor' => 0,
+        'Text::CSV_XS'      => 0,
+        'List::MoreUtils'   => 0,
+        'Pod::Spell::CommonMistakes' => 0,
+        'Test::Pod'         => '1.00',
+        'Test::CPAN::Meta'   => 0,
+        'Perl::MinimumVersion' => 0,
       },
       resources =>
       {

@@ -13,7 +13,7 @@ Moose::Cookbook::Basics::Genome_OverloadingSubtypesAndCoercion - Operator overlo
 
 =head1 VERSION
 
-version 2.2006
+version 2.2007
 
 =head1 SYNOPSIS
 
@@ -210,7 +210,7 @@ returns a new C<Human::EyeColor> object.
 Our original C<Human> class requires just a few changes to incorporate
 our new C<Human::EyeColor> class.
 
-  use List::MoreUtils qw( zip );
+  use List::SomeUtils qw( zip );
 
   coerce 'Human::EyeColor'
       => from 'ArrayRef'

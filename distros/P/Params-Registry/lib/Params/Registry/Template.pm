@@ -19,11 +19,11 @@ Params::Registry::Template - Template class for an individual parameter
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 SYNOPSIS
 
@@ -173,6 +173,11 @@ has _depends => (
     },
 );
 
+# # XXX HOLY SHIT TRAITS ARE SLOW
+# sub depends {
+#     keys %{$_[0]->_depends};
+# }
+
 =item conflicts
 
 An C<ARRAY> reference containing a list of parameters which I<must
@@ -195,6 +200,11 @@ has _conflicts => (
         _add_conflict  => 'set',
     },
 );
+
+# # XXX HOLY SHIT TRAITS ARE SLOW
+# sub conflicts {
+#     keys %{$_[0]->_conflicts};
+# }
 
 =item consumes
 
@@ -219,17 +229,39 @@ has _consumes => (
     },
 );
 
+# # XXX HOLY SHIT TRAITS ARE SLOW
+# sub consumes {
+#     keys %{$_[0]->_consumes};
+# }
+
+has __consdep => (
+    is => 'ro',
+    isa => ArrayRef,
+    traits => [qw(Array)],
+    lazy    => 1,
+    default => sub { [ $_[0]->__UGH_CONSDEP ] },
+    handles => {
+        _consdep => 'elements',
+    },
+);
+
 # this thing merges 'consumes' and 'depends' together, in order
-sub _consdep {
+sub __UGH_CONSDEP {
     my $self = shift;
 
-    my @out = $self->consumes;
+    my $c = $self->_consumes;
+    $c = tied %$c;
+
+    my @out = $c->Keys;
+    my %c = map { $_ => 1 } @out;
 
     # tack this on but only if there is a preprocessor present
     if ($self->preproc) {
-        my $c = $self->_consumes;
+        my $d = $self->_depends;
+        $d = tied %$d;
+        #my $c = $self->_consumes;
         # ordered union of 'consumes' and 'depends'
-        push @out, grep { !$c->{$_} } $self->depends;
+        push @out, grep { !$c{$_} } $d->Keys;
     }
 
     @out;
@@ -536,7 +568,7 @@ L<Moose>, is expected to be a C<CODE> reference.
 
 has default => (
     is  => 'ro',
-    isa => CodeRef,
+    isa => CodeRef|Str,
 );
 
 =item universe
@@ -696,6 +728,8 @@ sub process {
     my ($self, @in) = @_;
 
     my $t  = $self->type;
+    # XXX get rid of AUTOLOAD garbage
+    $t = $t->__type_constraint if ref $t eq 'MooseX::Types::TypeDecorator';
     my $e  = $self->empty;
     my $ac = $t->coercion;
 
@@ -739,7 +773,10 @@ sub process {
     # deal with cardinality
     if (my $max = $self->max) {
         # force scalar
-        return $out[0] if $max == 1;
+        if ($max == 1) {
+            return unless @out; # this will be empty
+            return $out[0];
+        }
 
         # force cardinality
         splice @out, ($self->shift ? -$max : 0), $max if @out > $max;
@@ -747,6 +784,9 @@ sub process {
 
     # coerce to composite
     if (my $comp = $self->composite) {
+        # XXX again get rid of AUTOLOAD
+        $comp = $comp->__type_constraint
+            if ref $comp eq 'MooseX::Types::TypeDecorator';
         # try to coerce into composite
         if (my $cc = $comp->coercion) {
             #warn "lol $c";

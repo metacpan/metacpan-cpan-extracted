@@ -8,19 +8,14 @@
 use strict;
 use warnings;
 use FindBin;
+use lib $FindBin::RealBin;
+
 use IPC::Run 'run';
 use Test::More 'no_plan';
 
-my $use_blib = 1;
-my $org_daemon = "$FindBin::RealBin/../blib/script/org-daemon";
-unless (-f $org_daemon) {
-    # blib version not available, use ../bin source version
-    $org_daemon = "$FindBin::RealBin/../bin/org-daemon";
-    $use_blib = 0;
-}
+use TestUtil;
 
-# Special handling for systems without shebang handling
-my @full_script = $^O eq 'MSWin32' || !$use_blib ? ($^X, $org_daemon) : ($org_daemon);
+my @full_script = get_full_script('org-daemon');
 
 {
     my $res = run [@full_script, '--help'], '2>', \my $stderr;

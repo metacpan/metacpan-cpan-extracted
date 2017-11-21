@@ -1,0 +1,46 @@
+NAME
+
+    adler32 - Command-line utility for computing Adler32 digest
+
+VERSION
+
+    version 0.001
+
+SYNOPSIS
+
+        $ echo Hey | adler32
+        31014f03
+
+OPTIONS
+
+ version / v
+
+    Shows the current version number
+
+        $ adler32 --version
+
+ help / h
+
+    Shows a brief help message
+
+        $ adler32 --help
+
+GIT REPOSITORY
+
+    http://github.com/athreef/App-adler32
+
+SEE ALSO
+
+    Digest::Adler32
+
+AUTHOR
+
+    Ahmad Fatoum <athreef@cpan.org>, http://a3f.at
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2017 Ahmad Fatoum
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

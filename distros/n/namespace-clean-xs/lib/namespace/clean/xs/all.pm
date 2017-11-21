@@ -12,7 +12,7 @@ BEGIN {
         *{"namespace::clean::$glob"} = *{"namespace::clean::xs::$glob"}{CODE};
     }
 
-    $namespace::clean::VERSION = 0.26; # latest as of times of writing
+    $namespace::clean::VERSION = 0.26; # feature set compability
 }
 
 1;
@@ -29,8 +29,10 @@ namespace::clean::xs::all - Use XS for namespace::clean globally
 =head1 DESCRIPTION
 
 This module replaces L<namespace::clean> with L<namespace::clean::xs> globally,
-so you won't have to search-and-replace usage lines. All L<namespace::clean>
-unfinished calls will be finished by non-xs version.
+so you won't have to seek-and-replace usage lines. All L<namespace::clean>
+pending calls are finished by the original non-xs version.
+
+Sets L<namespace::clean> version to 0.26 to indicate feature set compability.
 
 =head1 COPYRIGHT AND LICENSE
 

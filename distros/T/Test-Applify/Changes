@@ -1,10 +1,13 @@
 Revision history for perl module Test::Applify
 
+0.04 2017-11-20T12:29:50+1300
+ - accommodate subcommands in new()
+
 0.03 2017-11-02T07:20:04+1300
  - extends_ok
  - perl 5.10 and 5.12 support
  - improve temporary directory detection and testing
- 
+
 0.02 2017-10-27T12:40:57+1300
  - perl 5.26 support
  - applify_ok

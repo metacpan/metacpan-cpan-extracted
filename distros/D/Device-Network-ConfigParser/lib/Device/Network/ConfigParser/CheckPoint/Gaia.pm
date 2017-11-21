@@ -1,6 +1,6 @@
 package Device::Network::ConfigParser::CheckPoint::Gaia;
 # ABSTRACT: Parse CheckPoint Configuration
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use 5.006;
 use strict;
@@ -20,7 +20,7 @@ Device::Network::ConfigParser::CheckPoint::Gaia - parse CheckPoint Gaia configur
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -161,18 +161,20 @@ Currently supported output drivers are:
 
 =item * csv - writes the parsed configuration out in CSV format.
 
-=item * json - writes the parsed configuration out as JSON.
-
 =back
+
+=cut
+
 
 sub get_output_drivers {
     return { 
         csv => \&csv_output_driver,
-        json => \&json_output_driver,
     };
 }
 
 =head2 csv_output_driver
+
+This function outputs certain configuration elements as CSV. It currently supports C<interface> and C<static_route> configuration.
 
 =cut
 
@@ -242,19 +244,6 @@ sub _csv_not_config_driver {
     }
 }
 
-
-
-
-
-=head2 json_output_driver
-
-=cut
-
-sub json_output_driver {
-    my ($fh, $filename, $parsed_config) = @_;
-
-    print encode_json($parsed_config);
-}
 
 =head1 AUTHOR
 

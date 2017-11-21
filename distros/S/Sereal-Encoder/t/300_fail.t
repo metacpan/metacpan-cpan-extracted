@@ -11,10 +11,19 @@ BEGIN {
 }
 
 use Sereal::TestSet qw(:all);
-use Test::More tests => 19;
+use Test::More;
 
 use Sereal::Encoder;
 use Sereal::Encoder::Constants qw(:all);
+BEGIN {
+    if (not have_encoder_and_decoder()) {
+        plan skip_all => 'Did not find right version of decoder';
+        exit 0;
+    } else {
+        plan tests => 19;
+    }
+}
+use Sereal::Decoder;
 
 my ($ok, $err, $out);
 
@@ -152,5 +161,3 @@ SCOPE: {
         qr/Sereal/,
         "warn_unknown == -1 warns about stringified sub without overloading";
 }
-
-

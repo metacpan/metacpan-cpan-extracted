@@ -16,8 +16,8 @@
   </developer>
   <helper>
     <foaf:Person>
-      <foaf:name>Yanick Champoux</foaf:name>
-      <foaf:mbox rdf:resource="mailto:yanick@babyl.dyndns.org" />
+      <foaf:name>Frank Schreiner</foaf:name>
+      <foaf:mbox rdf:resource="mailto:schreiner@suse.de" />
     </foaf:Person>
   </helper>
   <license rdf:resource="http://dev.perl.org/licenses/" />
@@ -33,6 +33,12 @@
     <Version>
       <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.0.1</revision>
       <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2017-10-06</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.1.0</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2017-10-14</dc:issued>
     </Version>
   </release>
   <programming-language>Perl</programming-language>

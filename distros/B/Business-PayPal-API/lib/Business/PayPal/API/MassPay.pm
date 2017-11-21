@@ -1,5 +1,5 @@
 package Business::PayPal::API::MassPay;
-$Business::PayPal::API::MassPay::VERSION = '0.76';
+$Business::PayPal::API::MassPay::VERSION = '0.77';
 use 5.008001;
 use strict;
 use warnings;
@@ -119,7 +119,7 @@ Business::PayPal::API::MassPay - PayPal MassPay API
 
 =head1 VERSION
 
-version 0.76
+version 0.77
 
 =head1 SYNOPSIS
 

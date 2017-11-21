@@ -4,7 +4,7 @@
       "Lincoln Stein <lincoln.stein@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.421",
+   "generated_by" : "Module::Build version 0.4222",
    "license" : [
       "perl_5"
    ],
@@ -21,6 +21,7 @@
       },
       "runtime" : {
          "requires" : {
+            "DB_File" : "0",
             "Net::Netmask" : "0",
             "Pod::Usage" : "0",
             "perl" : "v5.8.0"
@@ -30,7 +31,7 @@
    "provides" : {
       "Net::ISP::Balance" : {
          "file" : "lib/Net/ISP/Balance.pm",
-         "version" : "1.25"
+         "version" : "1.27"
       }
    },
    "release_status" : "stable",
@@ -39,5 +40,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "1.25"
+   "version" : "1.27",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
 }

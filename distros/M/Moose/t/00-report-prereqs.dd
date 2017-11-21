@@ -28,6 +28,7 @@ do { my $x = {
                                       'IO::Handle' => '0',
                                       'IO::String' => '0',
                                       'IPC::Open3' => '0',
+                                      'List::SomeUtils' => '0',
                                       'Locale::US' => '0',
                                       'Module::CPANTS::Analyse' => '0.92',
                                       'Module::Refresh' => '0',

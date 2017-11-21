@@ -5,7 +5,7 @@ use warnings;
 use GraphQL::Schema;
 use GraphQL::Debug qw(_debug);
 
-our $VERSION = "0.02";
+our $VERSION = "0.03";
 use constant DEBUG => $ENV{GRAPHQL_DEBUG};
 
 my %TYPEMAP = (
@@ -90,15 +90,48 @@ sub _apply_modifier {
   [ $modifier, { type => $typespec } ];
 }
 
-sub _type2input {
+sub _remove_modifiers {
+  my ($typespec) = @_;
+  return $typespec->{type} if ref $typespec eq 'HASH';
+  return $typespec if ref $typespec ne 'ARRAY';
+  _remove_modifiers($typespec->[1]);
+}
+
+sub _type2createinput {
   my ($name, $fields, $name2pk21, $fk21, $column21, $name2type) = @_;
   +{
     kind => 'input',
-    name => "${name}Input",
+    name => "${name}CreateInput",
     fields => {
       (map { ($_ => $fields->{$_}) }
         grep !$name2pk21->{$name}{$_} && !$fk21->{$_}, keys %$column21),
       _make_fk_fields($name, $fk21, $name2type, $name2pk21),
+    },
+  };
+}
+
+sub _type2searchinput {
+  my ($name, $column2rawtype, $name2pk21, $column21, $name2type) = @_;
+  +{
+    kind => 'input',
+    name => "${name}SearchInput",
+    fields => {
+      (map { ($_ => { type => $column2rawtype->{$_} }) }
+        grep !$name2pk21->{$name}{$_}, keys %$column21),
+    },
+  };
+}
+
+sub _type2mutateinput {
+  my ($name, $column2rawtype, $fields, $name2pk21, $column21) = @_;
+  +{
+    kind => 'input',
+    name => "${name}MutateInput",
+    fields => {
+      (map { ($_ => { type => $column2rawtype->{$_} }) }
+        grep !$name2pk21->{$name}{$_}, keys %$column21),
+      (map { ($_ => $fields->{$_}) }
+        grep $name2pk21->{$name}{$_}, keys %$column21),
     },
   };
 }
@@ -108,29 +141,56 @@ sub _make_fk_fields {
   my $type = $name2type->{$name};
   (map {
     my $field_type = $type->{fields}{$_}{type};
-    $TYPE2SCALAR{$field_type}
-      ? ($_ => { type => $field_type })
-      : map {
-          (lcfirst "${field_type}_${_}" => {
-            type => $name2type->{$field_type}{fields}{$_}{type}
-          })
-        } keys %{ $name2pk21->{$field_type} }
+    if (!$TYPE2SCALAR{_remove_modifiers($field_type)}) {
+      my $non_null =
+        ref($field_type) eq 'ARRAY' && $field_type->[0] eq 'non_null';
+      $field_type = _apply_modifier(
+        $non_null && 'non_null', _remove_modifiers($field_type)."MutateInput"
+      );
+    }
+    ($_ => { type => $field_type })
   } keys %$fk21);
 }
 
-sub _make_pk_fields {
-  my ($name, $pk21, $name2type) = @_;
-  my $type = $name2type->{$name};
-  (map {
-    $_ => { type => $type->{fields}{$_}{type} }
-  } keys %$pk21),
+sub field_resolver {
+  my ($root_value, $args, $context, $info) = @_;
+  my $field_name = $info->{field_name};
+  DEBUG and _debug('DBIC.resolver', $root_value, $field_name, $args);
+  my $property = ref($root_value) eq 'HASH'
+    ? $root_value->{$field_name}
+    : $root_value;
+  return $property->($args, $context, $info) if ref $property eq 'CODE';
+  return $property // die "DBIC.resolver could not resolve '$field_name'\n"
+    if ref $root_value eq 'HASH' or !$root_value->can($field_name);
+  return $root_value->$field_name($args, $context, $info)
+    if !UNIVERSAL::isa($root_value, 'DBIx::Class::Core');
+  # dbic search
+  my $rs = $root_value->$field_name;
+  $rs = [ $rs->all ] if $info->{return_type}->isa('GraphQL::Type::List');
+  return $rs;
+}
+
+sub _subfieldrels {
+  my ($name, $name2rel21, $field_nodes) = @_;
+  grep $name2rel21->{$name}->{$_},
+    map $_->{name}, grep $_->{kind} eq 'field', map @{$_->{selections}},
+    grep $_->{kind} eq 'field', @$field_nodes;
+}
+
+sub _make_update_arg {
+  my ($name, $pk21, $input) = @_;
+  +{ map { $_ => $input->{$_} } grep !$pk21->{$_}, keys %$input };
 }
 
 sub to_graphql {
   my ($class, $dbic_schema_cb) = @_;
   my $dbic_schema = $dbic_schema_cb->();
-  my @ast = ({kind => 'scalar', name => 'DateTime'});
-  my (%name2type, %name2column21, %name2pk21, %name2fk21);
+  my %root_value;
+  my @ast;
+  my (
+    %name2type, %name2column21, %name2pk21, %name2fk21, %name2rel21,
+    %name2column2rawtype,
+  );
   for my $source (map $dbic_schema->source($_), $dbic_schema->sources) {
     my $name = _dbicsource2pretty($source);
     my %fields;
@@ -142,13 +202,14 @@ sub to_graphql {
     for my $column (keys %$columns_info) {
       my $info = $columns_info->{$column};
       DEBUG and _debug("schema_dbic2graphql($name.col)", $column, $info);
-      $fields{$column} = +{
-        type => _apply_modifier(
-          !$info->{is_nullable} && 'non_null',
-          $TYPEMAP{ lc $info->{data_type} }
-            // die "'$column' unknown data type: @{[lc $info->{data_type}]}\n",
-        ),
-      };
+      my $rawtype = $TYPEMAP{ lc $info->{data_type} };
+      $name2column2rawtype{$name}->{$column} = $rawtype;
+      my $fulltype = _apply_modifier(
+        !$info->{is_nullable} && 'non_null',
+        $rawtype
+          // die "'$column' unknown data type: @{[lc $info->{data_type}]}\n",
+      );
+      $fields{$column} = +{ type => $fulltype };
       $name2fk21{$name}->{$column} = 1 if $info->{is_foreign_key};
       $name2column21{$name}->{$column} = 1;
     }
@@ -158,10 +219,13 @@ sub to_graphql {
       my $type = _dbicsource2pretty($info->{source});
       $rel =~ s/_id$//; # dumb heuristic
       delete $name2column21{$name}->{$rel}; # so it's not a "column" now
+      # if it WAS a column, capture its non-null-ness
+      my $non_null = ref(($fields{$rel} || {})->{type}) eq 'ARRAY';
+      $type = _apply_modifier('non_null', $type) if $non_null;
       $type = _apply_modifier('list', $type) if $info->{attrs}{accessor} eq 'multi';
-      $fields{$rel} = +{
-        type => $type,
-      };
+      $type = _apply_modifier('non_null', $type) if $non_null; # in case list
+      $fields{$rel} = +{ type => $type };
+      $name2rel21{$name}->{$rel} = 1;
     }
     my $spec = +{
       kind => 'type',
@@ -171,9 +235,17 @@ sub to_graphql {
     $name2type{$name} = $spec;
     push @ast, $spec;
   }
-  push @ast, map _type2input(
+  push @ast, map _type2createinput(
     $_, $name2type{$_}->{fields}, \%name2pk21, $name2fk21{$_},
     $name2column21{$_}, \%name2type,
+  ), keys %name2type;
+  push @ast, map _type2searchinput(
+    $_, $name2column2rawtype{$_}, \%name2pk21,
+    $name2column21{$_}, \%name2type,
+  ), keys %name2type;
+  push @ast, map _type2mutateinput(
+    $_, $name2column2rawtype{$_}, $name2type{$_}->{fields}, \%name2pk21,
+    $name2column21{$_},
   ), keys %name2type;
   push @ast, {
     kind => 'type',
@@ -182,9 +254,40 @@ sub to_graphql {
       map {
         my $name = $_;
         my $type = $name2type{$name};
+        my $pksearch_name = lcfirst $name;
+        my $input_search_name = "search$name";
+        # TODO now only one deep, no handle fragments or abstract types
+        $root_value{$pksearch_name} = sub {
+          my ($args, $context, $info) = @_;
+          my @subfieldrels = _subfieldrels($name, \%name2rel21, $info->{field_nodes});
+          DEBUG and _debug('DBIC.root_value', @subfieldrels);
+          [
+            $dbic_schema_cb->()->resultset($name)->search(
+              +{ map { ("me.$_" => $args->{$_}) } keys %$args },
+              {
+                prefetch => \@subfieldrels,
+              },
+            )
+          ];
+        };
+        $root_value{$input_search_name} = sub {
+          my ($args, $context, $info) = @_;
+          my @subfieldrels = _subfieldrels($name, \%name2rel21, $info->{field_nodes});
+          DEBUG and _debug('DBIC.root_value', @subfieldrels);
+          [
+            $dbic_schema_cb->()->resultset($name)->search(
+              +{
+                map { ("me.$_" => $args->{input}{$_}) } keys %{$args->{input}}
+              },
+              {
+                prefetch => \@subfieldrels,
+              },
+            )
+          ];
+        };
         (
           # the PKs query
-          lcfirst($name) => {
+          $pksearch_name => {
             type => _apply_modifier('list', $name),
             args => {
               map {
@@ -196,16 +299,12 @@ sub to_graphql {
               } keys %{ $name2pk21{$name} }
             },
           },
-          "search$name" => {
-            description => 'list of ORs each of which is list of ANDs',
+          $input_search_name => {
+            description => 'input to search',
             type => _apply_modifier('list', $name),
             args => {
               input => {
-                type => _apply_modifier('non_null', _apply_modifier('list',
-                  _apply_modifier('non_null', _apply_modifier('list',
-                    _apply_modifier('non_null', "${name}Input")
-                  ))
-                ))
+                type => _apply_modifier('non_null', "${name}SearchInput")
               },
             },
           },
@@ -220,24 +319,97 @@ sub to_graphql {
       map {
         my $name = $_;
         my $type = $name2type{$name};
+        my $create_name = "create$name";
+        $root_value{$create_name} = sub {
+          my ($args, $context, $info) = @_;
+          my @subfieldrels = _subfieldrels($name, \%name2rel21, $info->{field_nodes});
+          DEBUG and _debug("DBIC.root_value($create_name)", $args, \@subfieldrels);
+          [
+            map $dbic_schema_cb->()->resultset($name)->create(
+              $_,
+              {
+                prefetch => \@subfieldrels,
+              },
+            ), @{ $args->{input} }
+          ];
+        };
+        my $update_name = "update$name";
+        $root_value{$update_name} = sub {
+          my ($args, $context, $info) = @_;
+          my @subfieldrels = _subfieldrels($name, \%name2rel21, $info->{field_nodes});
+          DEBUG and _debug("DBIC.root_value($update_name)", $args, \@subfieldrels);
+          [
+            map {
+              my $input = $_;
+              my $row = $dbic_schema_cb->()->resultset($name)->find(
+                +{
+                  map {
+                    my $key = $_;
+                    ("me.$key" => $input->{$key})
+                  } keys %{$name2pk21{$name}}
+                },
+                {
+                  prefetch => \@subfieldrels,
+                },
+              );
+              $row
+                ? $row->update(
+                  _make_update_arg($name, $name2pk21{$name}, $input)
+                )->discard_changes
+                : GraphQL::Error->coerce("$name not found");
+            } @{ $args->{input} }
+          ];
+        };
+        my $delete_name = "delete$name";
+        $root_value{$delete_name} = sub {
+          my ($args, $context, $info) = @_;
+          DEBUG and _debug("DBIC.root_value($delete_name)", $args);
+          [
+            map {
+              my $input = $_;
+              my $row = $dbic_schema_cb->()->resultset($name)->find(
+                +{
+                  map {
+                    my $key = $_;
+                    ("me.$key" => $input->{$key})
+                  } keys %{$name2pk21{$name}}
+                },
+              );
+              $row
+                ? $row->delete && 1
+                : GraphQL::Error->coerce("$name not found");
+            } @{ $args->{input} }
+          ];
+        };
         (
-          "create$name" => {
-            type => $name,
+          $create_name => {
+            type => _apply_modifier('list', $name),
             args => {
-              input => { type => _apply_modifier('non_null', "${name}Input") },
+              input => { type => _apply_modifier('non_null',
+                _apply_modifier('list',
+                  _apply_modifier('non_null', "${name}CreateInput")
+                )
+              ) },
             },
           },
-          "update$name" => {
-            type => $name,
+          $update_name => {
+            type => _apply_modifier('list', $name),
             args => {
-              input => { type => _apply_modifier('non_null', "${name}Input") },
-              _make_pk_fields($name, $name2pk21{$name}, \%name2type),
+              input => { type => _apply_modifier('non_null',
+                _apply_modifier('list',
+                  _apply_modifier('non_null', "${name}MutateInput")
+                )
+              ) },
             },
           },
-          "delete$name" => {
-            type => 'Boolean',
+          $delete_name => {
+            type => _apply_modifier('list', 'Boolean'),
             args => {
-              _make_pk_fields($name, $name2pk21{$name}, \%name2type),
+              input => { type => _apply_modifier('non_null',
+                _apply_modifier('list',
+                  _apply_modifier('non_null', "${name}MutateInput")
+                )
+              ) },
             },
           },
         )
@@ -246,6 +418,8 @@ sub to_graphql {
   };
   +{
     schema => GraphQL::Schema->from_ast(\@ast),
+    root_value => \%root_value,
+    resolver => \&field_resolver,
   };
 }
 
@@ -282,11 +456,117 @@ This module implements the L<GraphQL::Plugin::Convert> API to convert
 a L<DBIx::Class::Schema> to L<GraphQL::Schema> etc.
 
 Its C<Query> type represents a guess at what fields are suitable, based
-on providing a lookup for each type (a L<DBIx::Class::ResultSource>)
-by each of its columns.
+on providing a lookup for each type (a L<DBIx::Class::ResultSource>).
 
-The C<Mutation> type is similar: one C<create/update/delete(type)> per
-"real" type.
+=head2 Example
+
+Consider this minimal data model:
+
+  blog:
+    id # primary key
+    articles # has_many
+    title # non null
+    language # nullable
+  article:
+    id # primary key
+    blog # foreign key to Blog
+    title # non null
+    content # nullable
+
+=head2 Generated Output Types
+
+These L<GraphQL::Type::Object> types will be generated:
+
+  type Blog {
+    id: Int!
+    articles: [Article]
+    title: String!
+    language: String
+  }
+
+  type Article {
+    id: Int!
+    blog: Blog
+    title: String!
+    content: String
+  }
+
+  type Query {
+    blog(id: [Int!]!): [Blog]
+    article(id: [Int!]!): [Blog]
+  }
+
+Note that while the queries take a list, the return order is
+undefined. This also applies to the mutations. If this matters, request
+the primary key fields and use those to sort.
+
+=head2 Generated Input Types
+
+Different input types are needed for each of CRUD (Create, Read, Update,
+Delete).
+
+The create one needs to have non-null fields be non-null, for idiomatic
+GraphQL-level error-catching. The read one needs all fields nullable,
+since this will be how searches are implemented, allowing fields to be
+left un-searched-for. Both need to omit primary key fields. The read
+one also needs to omit foreign key fields, since the idiomatic GraphQL
+way for this is to request the other object, with this as a field on it,
+then request any required fields of this.
+
+Meanwhile, the update and delete ones need to include the primary key
+fields, to indicate what to mutate, and also all non-primary key fields
+as nullable, which for update will mean leaving them unchanged, and for
+delete is to be ignored.
+
+Therefore, for the above, these input types (and an updated Query,
+and Mutation) are created:
+
+  input BlogCreateInput {
+    title: String!
+    language: String
+  }
+
+  input BlogSearchInput {
+    title: String
+    language: String
+  }
+
+  input BlogMutateInput {
+    id: Int!
+    title: String
+    language: String
+  }
+
+  input ArticleCreateInput {
+    blog_id: Int!
+    title: String!
+    content: String
+  }
+
+  input ArticleSearchInput {
+    title: String
+    content: String
+  }
+
+  input ArticleMutateInput {
+    id: Int!
+    title: String!
+    language: String
+  }
+
+  type Mutation {
+    createBlog(input: [BlogCreateInput!]!): [Blog]
+    createArticle(input: [ArticleCreateInput!]!): [Article]
+    deleteBlog(input: [BlogMutateInput!]!): [Boolean]
+    deleteArticle(input: [ArticleMutateInput!]!): [Boolean]
+    updateBlog(input: [BlogMutateInput!]!): [Blog]
+    updateArticle(input: [ArticleMutateInput!]!): [Article]
+  }
+
+  extends type Query {
+    searchBlog(input: BlogSearchInput!): [Blog]
+    searchArticle(input: ArticleSearchInput!): [Article]
+  }
 
 =head1 ARGUMENTS
 
@@ -295,6 +575,14 @@ object. This is so it can be called during the conversion process,
 but also during execution of a long-running process to e.g. execute
 database queries, when the database handle passed to this method as a
 simple value might have expired.
+
+=head1 PACKAGE FUNCTIONS
+
+=head2 field_resolver
+
+This is available as C<\&GraphQL::Plugin::Convert::DBIC::field_resolver>
+in case it is wanted for use outside of the "bundle" of the C<to_graphql>
+method.
 
 =head1 DEBUGGING
 

@@ -1,0 +1,68 @@
+Testing worddet
+
+Testing default without options
+<WordDetect attribute="Match" context="#stay" String="antimoon" />
+<Test>
+antimoon ddantimoondd
+ANTIMOON DDANTIMOONDD
+<Test>
+
+Testing dynamic
+
+<RegExpr attribute="Match" context="TestDT" String="\s(a)ntimoo(n)" />
+<WordDetect attribute="Match" dynamic="true" context="#pop" String="%1ntimoo%2" />
+
+<TestD>
+scoop antimoon
+#This one should highlight
+antimoon %1ntimoo%2 #if this matches, dynamic was not called
+<TestD>
+
+<TestD>
+scoop antimoon
+ddantimoondd %1ntimoo%2 #if this matches, dynamic was not called
+<TestD>
+
+<TestD>
+scoop antimoon
+ ANTIMOON %1ntimoo%2 #if this matches, dynamic was not called
+<TestD>
+
+<TestD>
+scoop antimoon
+DDANTIMOONDD %1ntimoo%2 #if this matches, dynamic was not called
+<TestD>
+
+
+Testing dynamic insensitive
+<RegExpr attribute="Match" context="TestDIT" String="\s(a)ntimoo(n)" />
+<WordDetect attribute="Match" insensitive="true" dynamic="true" context="#pop" String="%1ntimoo%2" />
+
+<TestDI>
+scoop antimoon
+#This one should highlight
+antimoon %1ntimoo%2 #if this matches, dynamic was not called
+<TestDI>
+
+<TestDI>
+scoop antimoon
+ddantimoondd %1ntimoo%2 #if this matches, dynamic was not called
+<TestDI>
+
+<TestDI>
+scoop antimoon
+#This one should highlight
+ANTIMOON %1ntimoo%2 #if this matches, dynamic was not called
+<TestDI>
+
+<TestDI>
+scoop antimoon
+DDANTIMOONDD %1ntimoo%2 #if this matches, dynamic was not called
+<TestDI>
+
+Testing insensitive
+<WordDetect attribute="Match" insensitive="true" context="#stay" String="antimoon" />
+<TestI>
+antimoon ddantimoondd
+ANTIMOON DDANTIMOONDD
+<TestI>

@@ -1,0 +1,3 @@
+#!/bin/sh
+
+./circle-fe-gtk sshunix://$1/var/run/circle.sock "$@"

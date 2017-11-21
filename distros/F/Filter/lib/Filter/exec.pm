@@ -1,19 +1,19 @@
 package Filter::exec ;
 
-use Carp ;
 use Filter::Util::Exec ;
 use strict ;
 use warnings ;
-use vars qw($VERSION) ;
 
-$VERSION = "1.43" ;
+our $VERSION = "1.58" ;
 
 sub import
 {
     my($self, @args) = @_ ;
 
-    croak("Usage: use Filter::exec 'command'")
-	unless @args ;
+    unless (@args) {
+        require Carp;
+        Carp::croak("Usage: use Filter::exec 'command'");
+    }
 
     Filter::Util::Exec::filter_add($self, @args) ;
 }

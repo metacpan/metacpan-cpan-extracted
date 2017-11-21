@@ -3,7 +3,7 @@ use strict;
 
 package RT::Extension::RepeatTicket;
 
-our $VERSION = "1.10";
+our $VERSION = "1.11";
 
 use RT::Interface::Web;
 use DateTime;
@@ -965,6 +965,16 @@ after the start date you set (if the start date isn't on that
 day of the week).
 
 =back
+
+=item I want to enable the repeat function only on some queues
+
+To do this, insetad of applying the "Original Ticket" custom field globally,
+you can apply it to the chosen queues and that's it.
+
+=item some users can't see or use this feature successfully.
+
+Make sure those users have "SeeCustomField" and "ModifyCusotmField" rights
+granted for "Original Ticket" custom field.
 
 =back
 

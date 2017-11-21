@@ -1,14 +1,37 @@
-commit 36fe72a6cdf9dd23da39030617b403202f370369
+commit f0881b968e39eadbac2cae33604b84cf806395e5
+Merge: 84b66db 37e9f37
+Author: Mark Nunberg <mnunberg@users.noreply.github.com>
+Date:   Fri Nov 10 08:47:36 2017 -0500
+
+    Merge pull request #5 from blackwinter/fix-tuba-negative-numbers
+    
+    Fix parsing of negative numbers with Tuba.
+
+commit 84b66db1bdb735a3d757a975b65efac15275c312
 Author: Mark Nunberg <mnunberg@haskalah.org>
-Date:   Mon Jul 6 16:11:56 2015 -0700
+Date:   Fri Nov 3 08:15:54 2017 -0400
 
-    Update embeddded jsonsl
+    Replace pos_cur with jsn->pos
 
-commit b12c325c8d2427f7816c5f956e8fa181c51d865d
+commit 37e9f372f65be080f138de37e20a3cb2924a128a
+Author: Jens Wille <jens.wille@gmail.com>
+Date:   Mon Oct 9 12:25:07 2017 +0200
+
+    Fix parsing of negative numbers with Tuba.
+    
+    Would pass leading dash as its own event which is not handled by `convert_to_tuba_cbt` and hence dies with "wtf?". Instead, let dash be handled by number callback.
+
+commit bdfebe9bf38b1fe053cb5e6f7f3fd3f0f2d19c39
 Author: Mark Nunberg <mnunberg@haskalah.org>
 Date:   Mon Jul 6 16:11:07 2015 -0700
 
     Version bump: 1.0.6
+
+commit 3cc703e85b6823b83335546ac584a7ebad3d5877
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Mon Jul 6 16:11:56 2015 -0700
+
+    Update embeddded jsonsl
 
 commit f88d28651aed9f31bd16c895d9f51bc06cec8f5a
 Author: Mark Nunberg <mnunberg@haskalah.org>

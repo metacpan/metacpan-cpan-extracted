@@ -18,12 +18,12 @@ my @test_cases = (
             'Content-Length: 4'
         ),
         {
-            "Date" => "Sat, 23 Nov 2013 23:10:28 GMT",
-            "Last-Modified" => "Sat, 26 Oct 2013 19:41:47 GMT",
-            "ETag" => '"4b9d0211dd8a2819866bccff777af225"',
-            "Content-Type" => "text/html",
-            "Content-Length" => "4",
-            "Server" => "Example",
+            "date" => "Sat, 23 Nov 2013 23:10:28 GMT",
+            "last-modified" => "Sat, 26 Oct 2013 19:41:47 GMT",
+            "etag" => '"4b9d0211dd8a2819866bccff777af225"',
+            "content-type" => "text/html",
+            "content-length" => "4",
+            "server" => "Example",
         },
     ]
 );

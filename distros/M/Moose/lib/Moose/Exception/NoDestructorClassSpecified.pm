@@ -1,5 +1,5 @@
 package Moose::Exception::NoDestructorClassSpecified;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -9,4 +9,5 @@ sub _build_message {
     "The 'inline_destructor' option is present, but no destructor class was specified";
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

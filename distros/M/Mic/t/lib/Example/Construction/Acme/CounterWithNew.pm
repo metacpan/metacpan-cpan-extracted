@@ -10,7 +10,7 @@ use Mic::Impl
 sub next {
     my ($self) = @_;
 
-    $self->[ $COUNT ]++;
+    $self->[COUNT]++;
 }
 
 sub new {

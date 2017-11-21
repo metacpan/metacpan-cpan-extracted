@@ -1,0 +1,37 @@
+Changes file for Dancer2::Plugin::SyntaxHighlight::Perl
+
+0.0009    2017-11-16 09:33:24-05:00 America/New_York
+
+  - require the current version of Dancer2 to bring in bug fixes
+
+0.0008    2017-11-15 15:44:48-05:00 America/New_York
+
+  - up minimum required Perl version to 5.8.1
+
+0.0007    2017-11-15 11:34:04-05:00 America/New_York
+
+  - manually specify the minimum Perl version required
+
+0.0006    2017-11-15 09:40:34-05:00 America/New_York
+
+  - Fix bad test data
+
+0.0005    2017-11-15 08:41:07-05:00 America/New_York
+
+  - Fix contents so minimum Perl version required is 5.6
+
+0.0004    2017-11-14 19:44:54-05:00 America/New_York
+
+  - Add example inage to POD
+
+0.0003    2017-11-14 19:32:56-05:00 America/New_York
+
+  - Fix broken links in POD
+
+0.0002    2017-11-14 19:29:30-05:00 America/New_York
+
+  - Add README.md
+
+0.0001    2017-11-14 19:23:27-05:00 America/New_York
+
+  - Initial release

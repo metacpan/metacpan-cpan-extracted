@@ -42,7 +42,7 @@ resources:
   bugtracker: https://github.com/thedatahub/Datahub-Factory-Arthub/issues
   homepage: https://github.com/thedatahub/Datahub-Factory-Arthub
   repository: https://github.com/thedatahub/Datahub-Factory-Arthub.git
-version: '0.93'
+version: '0.94'
 x_contributors:
   - 'Matthias Vandermaesen <matthias@colada.be>'
   - 'Pieter De Praetere <pieter.de.praetere@helptux.be>'

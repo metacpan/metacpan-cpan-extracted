@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "language.dtd">
+<language name="kwinsens" version="0.1" casesensitive="0" section="Test" extensions="*.kwinsens;">
+<highlighting>
+<list name="colours">
+	<item> black </item>
+	<item> blue </item>
+	<item> green </item>
+	<item> red </item>
+	<item> yellow </item>
+</list>
+
+<contexts>
+
+<context name="Base" attribute="Normal Text" lineEndContext="#stay">
+	<StringDetect attribute="Test Area" context="Test" String="&lt;Test&gt;" />
+	<IncludeRules context="##XML" />
+</context>
+
+<context name="Comment" attribute="Comment" lineEndContext="#pop">
+</context>
+
+<context name="Test" attribute="Test Area" lineEndContext="#stay">
+	<DetectChar attribute="Comment" context="Comment" char="#" />
+	<!-- tests go here -->
+	<keyword attribute="Match" context="#stay" String="colours"/>
+	<StringDetect attribute="Test Area" context="#pop" String="&lt;Test&gt;" />
+</context>
+
+</contexts>
+
+<itemDatas>
+	<itemData name="Normal Text" defStyleNum="dsNormal" />
+	<itemData name="Test Area"  defStyleNum="dsOthers" />
+	<itemData name="Match"  defStyleNum="dsDataType" />
+	<itemData name="Match2"  defStyleNum="dsString" />
+	<itemData name="Match3"  defStyleNum="dsChar" />
+	<itemData name="Match4"  defStyleNum="dsDataType" />
+	<itemData name="Match5"  defStyleNum="dsString" />
+	<itemData name="Comment"  defStyleNum="dsComment" />
+</itemDatas>
+
+</highlighting>
+
+<general>
+	<keywords casesensitive="0" weakDeliminator="."/>
+</general>
+
+</language>
+

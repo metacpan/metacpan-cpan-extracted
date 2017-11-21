@@ -22,8 +22,10 @@ pram is the frontend script for the Gentoo::App::Pram module.
 pram <Pull Request #>
 
  --repository|r <repository> Set repository to fetch PR from.
- --editor|e     <editor>     Set editor to visualise patch in.
  --signoff|-s                Pass --signoff option to git am.
+ --editor|e     <editor>     Set editor to visualise patch in.
+ --closes|c     <bug number> Add "Closes: https://bugs.gentoo.org/<bug number>" header to first commit.
+ --bug|b        <bug number> Add "Bug: https://bugs.gentoo.org/<bug number>" header to first commit.
  --help|h                    Display help.
  --man|m                     Display a man page.
 
@@ -35,7 +37,7 @@ pram <Pull Request #>
 
 =head1 VERSION
 
-version 0.004
+version 0.100
 
 =head1 COPYRIGHT AND LICENSE
 
@@ -46,6 +48,7 @@ the same terms as the Perl 5 programming language system itself.
 
 =head1 AUTHOR
 
-Patrice Clement <monsieurp@gentoo.org>, Kent Fredric <kentnl@gentoo.org>.
+Patrice Clement <monsieurp@gentoo.org>
+Kent Fredric <kentnl@gentoo.org>.
 
 =cut

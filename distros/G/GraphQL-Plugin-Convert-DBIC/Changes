@@ -1,5 +1,9 @@
 Revision history for Perl extension GraphQL-Plugin-Convert-DBIC
 
+0.03	Thu Nov 16 06:00:14 GMT 2017
+ - implement mutations and inputs
+ - doc them plus queries
+
 0.02	Wed Nov  1 04:41:33 GMT 2017
  - switch api to take coderef
 

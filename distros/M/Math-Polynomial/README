@@ -1,4 +1,4 @@
-Math-Polynomial version 1.013
+Math-Polynomial version 1.014
 =============================
 
 Math::Polynomial is a Perl class representing polynomials in one
@@ -51,7 +51,7 @@ Additional requirements to run the test suite:
 Recommended modules for increased functionality:
 
   - Math::Complex   (usually bundled with perl)
-  - Math::BigNum    (available on CPAN)
+  - Math::AnyNum    (available on CPAN)
   - Math::ModInt    (available on CPAN)
 
 AUTHOR

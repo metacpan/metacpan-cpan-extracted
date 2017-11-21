@@ -4,7 +4,7 @@ Business::PayPal::API - PayPal SOAP API client with sandbox support
 
 # VERSION
 
-version 0.76
+version 0.77
 
 # SYNOPSIS
 
@@ -538,15 +538,3 @@ This software is copyright (c) 2006-2017 by Scott Wiersdorf, Danny Hembree, Brad
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
-
-# POD ERRORS
-
-Hey! **The above document had some coding errors, which are explained below:**
-
-- Around line 205:
-
-    '=item' outside of any '=over'
-
-- Around line 214:
-
-    You forgot a '=back' before '=head1'

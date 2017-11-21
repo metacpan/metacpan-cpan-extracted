@@ -6,17 +6,23 @@ use warnings;
 
 use Test::More;
 
-plan tests => 9 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 15 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'ZMQ/Raw.pm',
     'ZMQ/Raw/Context.pm',
     'ZMQ/Raw/Curve.pm',
     'ZMQ/Raw/Error.pm',
+    'ZMQ/Raw/Loop.pm',
+    'ZMQ/Raw/Loop/Event.pm',
+    'ZMQ/Raw/Loop/Handle.pm',
+    'ZMQ/Raw/Loop/Promise.pm',
+    'ZMQ/Raw/Loop/Timer.pm',
     'ZMQ/Raw/Message.pm',
     'ZMQ/Raw/Poller.pm',
     'ZMQ/Raw/Proxy.pm',
     'ZMQ/Raw/Socket.pm',
+    'ZMQ/Raw/Timer.pm',
     'ZMQ/Raw/Z85.pm'
 );
 

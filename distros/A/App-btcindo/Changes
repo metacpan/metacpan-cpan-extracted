@@ -1,3 +1,17 @@
+0.005   2017-11-19 (PERLANCAR)
+
+	- Update currencies: +BCH (bitcoin cash), -CRAVE, +ETC (Ethereum
+	  Classic), -NBT (NuBits), -SDC (ShadowCash), +WAVES, -XPY
+	  (PayCoin), +XZC (ZCoin).
+
+	- Update pairs.
+
+	- balance: remove --hold option, include both available + held balances
+          (as well as total), include IDR estimates.
+
+	- ticker: Add option --pair.
+
+
 0.004   2017-06-03 (PERLANCAR)
 
 	- Adjust to Finance::BTCIndo 0.005 (new period argument for

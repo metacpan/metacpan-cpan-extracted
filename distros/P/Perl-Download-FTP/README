@@ -1,0 +1,47 @@
+README for Perl extension Perl-Download-FTP
+
+Perl::Download::FTP - Identify Perl releases and download the most recent via FTP
+
+This document refers to version 0.01 of Perl-Download-FTP.
+This version was released November 15, 2017.
+
+SYNOPSIS
+
+        use Perl::Download::FTP;
+
+        $self = Perl::Download::FTP->new( {
+            host        => 'ftp.cpan.org',
+            dir         => '/pub/CPAN/src/5.0',
+            verbose     => 1,
+        } );
+
+        @all_releases = $self->ls();
+
+        $classified_releases = $self->classify_releases();
+
+        @releases = $self->list_releases( {
+            type            => 'production',
+            compression     => 'gz',
+        } );
+
+        $latest_release = $self->get_latest_release( {
+            compression     => 'gz',
+            type            => 'dev',
+            dir             => '/path/to/download',
+            verbose         => 1,
+        } );
+
+INSTALLATION
+
+To install this module on your system, place the tarball archive file in a
+temporary directory and call the following:
+
+    gunzip Perl-Download-FTP-0.01.tar.gz
+    tar xf Perl-Download-FTP-0.01.tar
+    cd Perl-Download-FTP-0.01
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+If you are on a windows box you should use 'nmake' rather than 'make'.

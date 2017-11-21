@@ -1,0 +1,171 @@
+#!/usr/bin/env perl
+
+use 5.016;
+use strict;
+use warnings;
+
+use App::WatchLater;
+exit App::WatchLater::main();
+
+=head1 NAME
+
+watch-later - Manage your YouTube Watch Later videos
+
+=head1 VERSION
+
+Version 0.02
+
+=cut
+
+our $VERSION = '0.02';
+
+
+=head1 SYNOPSIS
+
+    watch-later [-a | -w] [OPTION]... [<video-id-or-url>...]
+
+    -a, --add         add videos to the queue (default)
+    -w, --watch       remove videos from the queue
+
+    -f, --[no-]force  add videos even if they've been added/watched before
+                      (default is off)
+    -o, --[no-]open   open videos in the browser (default is on)
+
+    -d, --db-path <file>  use the given file as the database (default is
+                          ~/.watch-later.db)
+
+    --help     display this help message
+    --version  display version info
+
+=head1 OPTIONS
+
+=head2 Universal Options
+
+=head3 B<-d> <file>, B<--db-path>=<file>
+
+Use the provided file as the database, instead of the default database at
+F<$HOME/.watch-later.db>.
+
+=head2 Modes of Operation
+
+=head3 B<-a>, B<--add>
+
+Add videos to the queue. Marks a video as unwatched if it is already in the
+database. This the default if no mode is specified.
+
+=head3 B<-w>, B<--watch>
+
+Watch a video from the queue by opening its URL in the browser. Marks the given
+video as watched. If no video is provided on the command line, picks one at
+random.
+
+=head2 Add Mode
+
+=head3 B<-f>, B<--[no-]force>
+
+Adding a video to the database when it is already present will cause it to be
+overwritten and marked as unwatched. B<--no-force> disables that behavior and
+leaves the record for that video it in whatever state it was found.
+
+The default behavior is equivalent to B<--no-force>.
+
+=head2 Watch Mode
+
+=head3 B<-o>, B<--[no-]open>
+
+Watching a video will cause its YouTube URL to be opened in a browser.
+B<--no-open> causes the video to simply be marked as watched and no browser
+will be opened.
+
+The default behavior is equivalent to B<--open>.
+
+=head1 ENVIRONMENT
+
+=over 4
+
+=item YT_API_KEY
+
+Set the YouTube Data API key.
+
+=item YT_ACCESS_TOKEN
+
+Set the OAuth2 access token.
+
+=back
+
+=head1 AUTHOR
+
+Aaron L. Zeng, C<< <me at bcc32.com> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-app-watchlater at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=App-WatchLater>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+
+
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc App::WatchLater
+
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker (report bugs here)
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-WatchLater>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/App-WatchLater>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/App-WatchLater>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/App-WatchLater/>
+
+=back
+
+
+=head1 ACKNOWLEDGEMENTS
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2017 Aaron L. Zeng.
+
+This program is distributed under the MIT (X11) License:
+L<http://www.opensource.org/licenses/mit-license.php>
+
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without
+restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+
+
+=cut

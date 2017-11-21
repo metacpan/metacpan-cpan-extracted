@@ -2,7 +2,7 @@ package PICA::Path;
 use strict;
 use warnings;
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 use Carp qw(confess);
 use Scalar::Util qw(reftype);
@@ -14,7 +14,7 @@ sub new {
 
     confess "invalid pica path" if $path !~ /
         ([012*.][0-9*.][0-9*.][A-Z@*.]) # tag
-        (\[([0-9*.]{2})\])?             # occurence
+        (\[([0-9*.]{2,3})\])?           # occurence
         (\$?([_A-Za-z0-9]+))?           # subfields
         (\/(\d+)?(-(\d+)?)?)?           # position
     /x;
@@ -229,8 +229,8 @@ or C<@>.  The character C<*> can be used as wildcard.
 
 =item
 
-An optional occurrence, given by two digits (or C<*> as wildcard) in brackets,
-e.g. C<[12]> or C<[0*]>.
+An optional occurrence, given by two or three digits (or C<*> as wildcard) in brackets,
+e.g. C<[12]>, C<[0*]> or C<[102]>.
 
 =item
 

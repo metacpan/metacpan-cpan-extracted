@@ -128,6 +128,11 @@ set( 'SQL_EMPLOYEE_SELECT_TEAM', q/
      / );
 
 #
+set( 'SQL_EMPLOYEE_HAS_REPORTS', q/
+     SELECT has_reports(?)
+     / );
+
+#
 set( 'SQL_EMPLOYEE_PRIV_CHANGE_DURING_RANGE', q/
      SELECT priv_change_during_range( ?, ? )
      / );

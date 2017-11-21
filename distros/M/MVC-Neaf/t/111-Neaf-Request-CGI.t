@@ -7,6 +7,9 @@ use Test::More;
 use MVC::Neaf;
 # Must autoload Request::CGI - so don't use explicitly!
 
+my $warn = 0;
+$SIG{__WARN__} = sub { $warn++; warn $_[0]; };
+
 my $capture_req;
 my $capture_stdout;
 MVC::Neaf->route( "/my/script" => sub {
@@ -52,5 +55,5 @@ like ($capture_stdout, qr/\n\n%42\n$/s, "Reply as expected");
 like ($capture_stdout, qr#Content-Type: text/plain#
     , "content type ok");
 
-
+ok !$warn, "$warn warnings issued";
 done_testing;

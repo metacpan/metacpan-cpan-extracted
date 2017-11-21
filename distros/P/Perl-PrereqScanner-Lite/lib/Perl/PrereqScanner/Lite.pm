@@ -7,7 +7,7 @@ use Compiler::Lexer;
 use CPAN::Meta::Requirements;
 use Perl::PrereqScanner::Lite::Constants;
 
-our $VERSION = "0.26";
+our $VERSION = "0.28";
 
 sub new {
     my ($class, $opt) = @_;
@@ -347,7 +347,7 @@ __END__
 
 =encoding utf-8
 
-=for stopwords prepend reimplement
+=for stopwords prepend reimplement tokenizer
 
 =head1 NAME
 

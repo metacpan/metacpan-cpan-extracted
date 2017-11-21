@@ -1,5 +1,9 @@
 Revision history for Minions
 
+0.000006 2017-11-12T21:15:36Z
+        - Add "impl" and "via" as aliases for "implementation"
+        - hash based objects are deprecated
+
 0.000005 2017-08-20T17:02:07Z
         - Fix for failing test with Perl < 5.16
 

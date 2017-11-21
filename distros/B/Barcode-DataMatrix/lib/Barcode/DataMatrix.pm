@@ -2,7 +2,7 @@ package Barcode::DataMatrix;
 use Moo;
 use Barcode::DataMatrix::Engine ();
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 has 'encoding_mode' => (
     is       => 'ro',

@@ -44,40 +44,40 @@ define ([
 
     return function () {
 
-        target.push('createInt', {
-            'name': 'createInt',
-            'type': 'dmenu',
-            'menuText': 'Create',
-            'title': 'Create interval(s)',
-            'aclProfile': 'active',
-            'entries': ['createSingleInt', 'createMultipleInt',],
-        });
-
         target.push('mainAdmin', {
             'name': 'mainAdmin',
             'type': 'dmenu',
-            'menuText': 'Adminitrivia',
-            'title': 'Adminitrivia menu',
+            'menuText': 'Admin',
+            'title': 'Admin menu',
             'aclProfile': 'admin',
-            'entries': ['restServerDetailsAction']
+            'entries': ['ldapLookup', 'searchEmployee', 'restServerDetailsAction']
         });
 
         target.push('mainEmpl', {
             'name': 'mainEmpl',
             'type': 'dmenu',
-            'menuText': 'Employee',
+            'menuText': 'Profile',
             'title': 'Employee menu',
             'aclProfile': 'passerby',
-            'entries': ['myProfileAction', 'ldapLookup', 'searchEmployee']
+            'entries': ['myProfileAction', 'ldapLookup', 'searchEmployee',]
         });
 
         target.push('mainInt', {
             'name': 'mainInt',
             'type': 'dmenu',
-            'menuText': 'Interval',
+            'menuText': 'Intervals',
             'title': 'Interval menu',
             'aclProfile': 'passerby',
-            'entries': ['viewIntervalsPrep', 'createInt'],
+            'entries': ['viewIntervalsPrep', 'createSingleIntMenuItem', 'createMultipleInt',],
+        });
+
+        target.push('mainLock', {
+            'name': 'mainLock',
+            'type': 'dmenu',
+            'menuText': 'Locks',
+            'title': 'Lock menu',
+            'aclProfile': 'passerby',
+            'entries': ['viewLocksPrep', 'createLock',],
         });
 
         target.push('mainMenu', {
@@ -86,26 +86,17 @@ define ([
             'menuText': 'Main',
             'title': 'Main menu',
             'aclProfile': 'passerby',
-            'entries': ['mainEmpl', 'mainPriv', 'mainSched', 'mainInt', 'masqEmployee',
+            'entries': ['myProfileAction', 'mainInt', 'mainLock', 'mainSched', 'masqEmployee',
                         'mainAdmin']
-        });
-
-        target.push('mainPriv', {
-            'name': 'mainPriv',
-            'type': 'dmenu',
-            'menuText': 'Priv (status)',
-            'title': 'Priv (status) menu',
-            'aclProfile': 'passerby',
-            'entries': ['actionPrivHistory']
         });
 
         target.push('mainSched', {
             'name': 'mainSched',
             'type': 'dmenu',
-            'menuText': 'Schedule',
+            'menuText': 'Schedules',
             'title': 'Schedule menu',
-            'aclProfile': 'passerby',
-            'entries': ['actionSchedHistory', 'schedLookup',
+            'aclProfile': 'admin',
+            'entries': ['schedLookup',
                         'browseAllSchedules', 'schedNew']
         });
 

@@ -90,12 +90,12 @@ define ([
             // console.log('current-user function called with "obj"', arg);
             if (typeof arg === 'object' && arg) {
                 console.log('NOTICE: setting current user object to ', arg);
-                cu = arg;
+                cu = $.extend({}, arg);
                 cf('currentUser', cu);
             }
             if (arg === null) {
                 console.log('NOTICE: resetting currentUser object');
-                cu = emptyObj;
+                cu = $.extend({}, emptyObj);
                 cf('currentUser', cu);
             }
             return cu;

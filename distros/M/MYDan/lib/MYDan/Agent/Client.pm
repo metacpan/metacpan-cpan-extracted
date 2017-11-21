@@ -30,6 +30,7 @@ use Time::HiRes qw(time);
 use MYDan::API::Agent;
 use MYDan::Util::Percent;
 use MYDan::Agent::Proxy;
+use MYDan::Util::Hosts;
 
 our %RUN = ( user => 'root', max => 128, timeout => 300 );
 
@@ -91,18 +92,19 @@ sub run
         map{ $cv->end; } 1 .. $cv->{_ae_counter}||0;
     };
 
+    my %hosts = MYDan::Util::Hosts->new()->match( @node );
     my $work;$work = sub{
         return unless my $node = shift @node;
         $result{$node} = '';
         
         $cv->begin;
-        tcp_connect $node, $run{port}, sub {
+        tcp_connect $hosts{$node}, $run{port}, sub {
              my ( $fh ) = @_;
              unless( $fh ){
-                 $cv->end;
 		 $percent->add()->print() if $run{verbose};
                  $result{$node} = "tcp_connect: $!";
                  $work->();
+                 $cv->end;
                  return;
              }
              if( $stop )
@@ -125,8 +127,8 @@ sub run
                   on_eof => sub{
                       undef $hdl;
 		      $percent->add()->print() if $run{verbose};
-                      $cv->end;
                       $work->();
+                      $cv->end;
                   }
              );
              $hdl->push_write($query);
@@ -193,7 +195,7 @@ sub run
 		      $percent->add(scalar @node)->print() if $run{verbose};
                       $cv->end;
 
-                      $rresult{$node}  =~ s/^\**#\*keepalive\*#//;
+                      $rresult{$node}  =~ s/^\**#\*MYDan_\d+\*#//;
                       my @c = eval{ YAML::XS::Load $rresult{$node} };
 
                       my $error = $@ ? "\$@ = $@" :
@@ -235,7 +237,7 @@ sub run
     $cv->recv;
     undef $w;
 
-    map{ $_ =~ s/^\**#\*keepalive\*#//;}values %result;
+    map{ $_ =~ s/^\**#\*MYDan_\d+\*#//;}values %result;
     return %result;
 }
 

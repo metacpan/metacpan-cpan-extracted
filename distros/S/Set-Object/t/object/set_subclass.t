@@ -2,7 +2,7 @@
 
 use strict;
 use Test::More tests => 4;
-require 't/object/SetSubClass.pm';
+require './t/object/SetSubClass.pm';
 
 
 my $sd1  = SetSubClass::set( 1,2,3,4 );

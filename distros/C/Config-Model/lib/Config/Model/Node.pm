@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Node;
-$Config::Model::Node::VERSION = '2.113';
+$Config::Model::Node::VERSION = '2.114';
 use Mouse;
 with "Config::Model::Role::NodeLoader";
 
@@ -82,9 +82,29 @@ has initialized => ( is => 'rw', isa => 'Bool', default => 0 );
 
 has config_class_name => ( is => 'ro', isa => 'Str', required => 1 );
 
+has gist => (
+    is => 'rw',
+    isa => 'Str',
+    default => '',
+);
+
+sub fetch_gist {
+    my $self = shift;
+    my $gist = $self->gist // '';
+    $gist =~ s!{([\w -]+)}!$self->grab_value($1) // '<undef>'!ge;
+    return $gist;
+}
+
 has [qw/config_file element_name/] => ( is => 'ro', isa => 'Maybe[Str]', required => 0 );
 
-has instance => ( is => 'ro', isa => 'Config::Model::Instance', weak_ref => 1, required => 1 );
+has instance => (
+    is => 'ro',
+    isa => 'Config::Model::Instance',
+    weak_ref => 1,
+    required => 1,
+    handles => [qw/read_check/],
+);
+
 has config_model => (
     is       => 'ro',
     isa      => 'Config::Model',
@@ -98,7 +118,6 @@ sub _config_model {
     my $p    = $self->instance->config_model;
 }
 
-has check      => ( is => 'ro', isa => 'Str', default => 'yes' );
 has model      => ( is => 'rw', isa => 'HashRef' );
 has needs_save => ( is => 'rw', isa => 'Bool', default => 0 );
 
@@ -114,14 +133,6 @@ sub _backend_support_annotation {
 
 sub BUILD {
     my $self = shift;
-
-    my $read_check = $self->instance->read_check;
-
-    my $req_check = $self->check;
-    my $check =
-          $req_check eq 'no'   || $read_check eq 'no'   ? 'no'
-        : $req_check eq 'skip' || $read_check eq 'skip' ? 'skip'
-        :                                                 'yes';
 
     my $caller_class = defined $self->parent ? $self->parent->name : 'user';
 
@@ -197,7 +208,6 @@ sub create_node {
         config_class_name => $config_class_name,
         instance          => $self->{instance},
         element_name      => $element_name,
-        check             => $check,
         parent            => $self,
         container         => $self,
     );
@@ -325,9 +335,7 @@ sub init {
     my $model = $self->{model};
 
     return
-        unless defined $model->{rw_config}
-        or defined $model->{read_config}
-        or defined $model->{write_config};
+        unless defined $model->{rw_config};
 
     my $initial_load_backup = $self->instance->initial_load;
     $self->instance->initial_load_start;
@@ -338,26 +346,10 @@ sub init {
         node => $self,
     );
 
-    if ( $model->{rw_config} or $model->{read_config} ) {
-        $self->read_config_data( check => $args{check} // $self->check );
-        $user_logger->warn("read_config parameter for backend is deprecated. ",
-            "Please use rw_config to specify both read and write parameters.") if $model->{read_config};
-    }
-
-    if (defined $model->{write_config}) {
-        $user_logger->warn("write_config parameter for backend is deprecated. ",
-            "Please use only rw_config to specify both read and write parameters.");
-    }
-
-    # use read_config data if write_config is missing
-    $model->{write_config} ||= dclone $model->{read_config}
-        if defined $model->{read_config};
-
-    if ( $model->{rw_config} || $model->{write_config} ) {
+    if ( $model->{rw_config} ) {
+        $self->read_config_data( check => $self->read_check );
         # setup auto_write
-        $self->backend_mgr->auto_write_init(
-            rw_config     => $model->{rw_config} || $model->{write_config},
-        );
+        $self->backend_mgr->auto_write_init(rw_config => $model->{rw_config});
     }
 
     $self->instance->initial_load($initial_load_backup);
@@ -376,7 +368,7 @@ sub read_config_data {
     # setup auto_read
     # may use an overridden config file
     $self->backend_mgr->read_config_data(
-        rw_config       => $model->{rw_config} || $model->{read_config},
+        rw_config       => $model->{rw_config},
         check           => $args{check},
         config_file     => $args{config_file} || $self->{config_file},
         auto_create     => $args{auto_create} || $self->instance->auto_create,
@@ -510,12 +502,17 @@ sub get_element_names {
     my $type       = $args{type};              # optional
     my $cargo_type = $args{cargo_type};        # optional
 
-    $self->init(check => $args{check});
+    $self->init();
 
     my @result;
 
     my $info         = $self->{model};
     my @element_list = @{ $self->{model}{element_list} };
+
+    if ($args{all}) {
+        my @res = grep { $self->{level}{$_} ne 'hidden' } @element_list;
+        return wantarray ? @res : "@res";
+    }
 
     # this is a bit convoluted, but the order of the returned element
     # must respect the order of the elements declared in the model by
@@ -649,7 +646,7 @@ sub fetch_element {
     my $check         = $self->_check_check( $args{check} );
     my $accept_hidden = $args{accept_hidden} || 0;
 
-    $self->init(check => $check);
+    $self->init();
 
     my $model = $self->{model};
 
@@ -1032,7 +1029,7 @@ sub load_data {
 sub dump_tree {
     my $self = shift;
     my %args = @_;
-    $self->init(check => $args{check});
+    $self->init();
     my $dumper = Config::Model::Dumper->new;
     $dumper->dump_tree( node => $self, @_ );
 }
@@ -1040,7 +1037,7 @@ sub dump_tree {
 sub migrate {
     my $self = shift;
     my %args = @_;
-    $self->init(check => $args{check});
+    $self->init();
     Config::Model::Dumper->new->dump_tree( node => $self, mode => 'full', @_ );
 
     return $self->needs_save;
@@ -1049,7 +1046,7 @@ sub migrate {
 sub dump_annotations_as_pod {
     my $self = shift;
     my %args = @_;
-    $self->init(check => $args{check});
+    $self->init();
     my $dumper = Config::Model::DumpAsData->new;
     $dumper->dump_annotations_as_pod( node => $self, @_ );
 }
@@ -1057,7 +1054,7 @@ sub dump_annotations_as_pod {
 sub describe {
     my $self = shift;
     my %args = @_;
-    $self->init(check => $args{check});
+    $self->init();
 
     my $descriptor = Config::Model::Describe->new;
     $descriptor->describe( node => $self, @_ );
@@ -1066,7 +1063,7 @@ sub describe {
 sub report {
     my $self = shift;
     my %args = @_;
-    $self->init(check => $args{check});
+    $self->init();
     my $reporter = Config::Model::Report->new;
     $reporter->report( node => $self );
 }
@@ -1074,7 +1071,7 @@ sub report {
 sub audit {
     my $self = shift;
     my %args = @_;
-    $self->init(check => $args{check});
+    $self->init();
     my $reporter = Config::Model::Report->new;
     $reporter->report( node => $self, audit => 1 );
 }
@@ -1214,7 +1211,7 @@ Config::Model::Node - Class for configuration tree node
 
 =head1 VERSION
 
-version 2.113
+version 2.114
 
 =head1 SYNOPSIS
 
@@ -1336,6 +1333,15 @@ Element names can be grouped to save typing:
   element => [ [qw/foo bar/] => { type = 'leaf', ... } ]
 
 See below for details on element declaration.
+
+=item B<gist>
+
+String used to construct a summary of the content of a node. This
+parameter is used by user interface to show users the gist of the
+content of this node. This parameter has no other effect. This string
+may contain element values in the form "C<{foo} or {bar}>". When
+constructing the gist, C<{foo}> is replaced by the value of element
+C<foo>. Likewise for C<{bar}>.
 
 =item B<level>
 
@@ -1638,13 +1644,20 @@ configuration file.
 
 =head1 Element property management
 
-=head2 get_element_names (  ...  )
+=head2 get_element_names
 
-Return all elements names available.
+Return all available element names, including the element that were accepted.
 
 Optional parameters are:
 
 =over
+
+=item *
+
+B<all>: Boolean. When set return all element names, even the hidden
+ones and does not trigger warp mechanism. Defaults to 0. This option
+should be set to 1 when this method is needed to read configuration data from a
+backend.
 
 =item *
 
@@ -1725,6 +1738,10 @@ element is unknown, or 0 if the element is not available (hidden).
 =head2 fetch_element_value ( name => ... [ check => ...] )
 
 Fetch and returns the I<value> of a leaf element from a node.
+
+=head2 fetch_gist
+
+Return the gist of the node. See description of C<gist> parameter above.
 
 =head2 store_element_value ( name, value )
 

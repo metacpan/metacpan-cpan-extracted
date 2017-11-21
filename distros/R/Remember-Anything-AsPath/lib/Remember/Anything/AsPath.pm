@@ -7,7 +7,7 @@ use warnings;
 use Carp;
 use Sereal::Encoder;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 sub new {
     my ($class, %args) = @_;
@@ -31,7 +31,8 @@ sub new {
 
     $args{out_dir} ||= '.';
     $args{out_dir} =~ s{[\/\\]$}{}; # remove trailing slash or backslash
-    croak 'out dir does not exist' unless -d $args{out_dir};
+    eval { mkdir $args{out_dir} unless -d $args{out_dir} }
+        || croak 'could not create dir: "' . $args{out_dir} . '"';
 
     return bless \%args, $class;
 }

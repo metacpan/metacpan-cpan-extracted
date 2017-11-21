@@ -106,7 +106,7 @@ sub runtests
 		# run postprocessing
 		#
 		my $postcmd = $self->{testontap}->{args}->getConfig()->getPostprocessCmd();
-		if ($postcmd)
+		if ($postcmd && @$postcmd)
 		{
 			my @postproc;
 			my $xit = runprocess

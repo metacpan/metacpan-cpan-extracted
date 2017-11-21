@@ -33,3 +33,5 @@ svndiff/
 ^.git
 ^MYMETA.*
 .version_info.pl
+\.travis.yml
+\.appveyor.yml

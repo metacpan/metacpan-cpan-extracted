@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::CheckList;
-$Config::Model::CheckList::VERSION = '2.113';
+$Config::Model::CheckList::VERSION = '2.114';
 use Mouse;
 use 5.010;
 
@@ -264,7 +264,7 @@ sub check {
     }
 
     my @changed;
-    map { push @changed, $_ if $self->store( $_, 1, $check ) } @list;
+    map { push @changed, $_ if $self->_store( $_, 1, $check ) } @list;
 
     $self->notify_change( note => "check @changed" )
         unless $self->instance->initial_load;
@@ -295,7 +295,7 @@ sub clear_item {
 }
 
 # internal
-sub store {
+sub _store {
     my ( $self, $choice, $value, $check ) = @_;
 
     my $inst = $self->instance;
@@ -359,7 +359,7 @@ sub uncheck {
     }
 
     my @changed;
-    map { push @changed, $_ if $self->store( $_, 0, $check ) } @list;
+    map { push @changed, $_ if $self->_store( $_, 0, $check ) } @list;
 
     $self->notify_change( note => "uncheck @changed" )
         unless $self->instance->initial_load;
@@ -596,8 +596,16 @@ sub set {
 }
 
 sub load {
-    my ( $self, $string ) = @_;
-    my @set = split /,/, $string;
+    goto &store;
+}
+
+sub store     {
+    my $self = shift;
+     my %args =
+          @_ == 1 ? ( value => $_[0] )
+        : @_ == 3 ? ( 'value', @_ )
+        :           @_;
+    my @set = split /\s*,\s*/, $args{value};
     foreach (@set) { s/^"|"$//g; s/\\"/"/g; }
     $self->set_checked_list(@set);
 }
@@ -611,7 +619,7 @@ sub set_checked_list {
     my @changed;
 
     foreach my $c ( $self->get_choice ) {
-        push @changed, $c if $self->store( $c, $set{$c} // 0 );
+        push @changed, $c if $self->_store( $c, $set{$c} // 0 );
     }
 
     $self->{ordered_data} = [@_];    # copy list
@@ -626,7 +634,7 @@ sub set_checked_list_as_hash {
 
     foreach my $c ( $self->get_choice ) {
         if ( defined $check{$c} ) {
-            $self->store( $c, $check{$c} );
+            $self->_store( $c, $check{$c} );
         }
         else {
             $self->clear_item($c);
@@ -747,7 +755,7 @@ Config::Model::CheckList - Handle check list element
 
 =head1 VERSION
 
-version 2.113
+version 2.114
 
 =head1 SYNOPSIS
 
@@ -1124,7 +1132,7 @@ should be empty. The values are a comma separated list of checked items.
 
 Example : C<< $leaf->set('','A,C,Z') ; >>
 
-=head2 set_checked_list ( item1, item2, ..)
+=head2 set_checked_list
 
 Set all passed items to checked (1). All other available items
 in the check list are set to 0.
@@ -1133,6 +1141,25 @@ Example:
 
   # set cl to A=0 B=1 C=0 D=1
   $cl->set_checked_list('B','D')
+
+=head2 store_set
+
+Alias to L</set_checked_list>, so a list and a check_list can use the same store method
+
+=head2 store
+
+Set all items listed in a string to checked. The items must be
+separated by commas. All other available items in the check list are
+set to 0.
+
+Example:
+
+  $cl->store('B, D')
+  $cl->store( value => 'B,C' )
+
+=head2 load
+
+Alias to L</store>.
 
 =head2 set_checked_list_as_hash ()
 

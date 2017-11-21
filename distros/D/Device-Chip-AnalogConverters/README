@@ -13,6 +13,8 @@ ADCs
 
       * Device::Chip::LTC2400
 
+      * Device::Chip::MAX11200
+
 DACs
 
       * Device::Chip::AD5691R

@@ -1,115 +1,188 @@
 package Argon::Message;
+# ABSTRACT: Encodable message structure used for cross-system coordination
+$Argon::Message::VERSION = '0.18';
 
 use strict;
 use warnings;
-
 use Carp;
-use Storable       qw();
-use Coro::Storable qw(nfreeze thaw);
+use Moose;
 use Data::UUID;
-use MIME::Base64   qw(encode_base64 decode_base64);
-use Argon          qw(:priorities);
+use Argon::Constants qw(:priorities :commands);
+use Argon::Types;
+use Argon::Util qw(param);
 
-use fields qw(
-    id
-    cmd
-    pri
-    payload
-    key
+
+has id => (
+  is  => 'ro',
+  isa => 'Str',
+  default => sub { Data::UUID->new->create_str },
 );
 
-#-------------------------------------------------------------------------------
-# Creates a new message.
-#-------------------------------------------------------------------------------
-sub new {
-    my ($class, %param) = @_;
-    defined $param{cmd} || croak 'expected parameter "cmd"';
-    my $self = fields::new($class);
-    $self->{id}  = $param{id}  || Data::UUID->new->create_str;
-    $self->{cmd} = $param{cmd};
-    $self->{pri} = $param{pri} || $PRI_NORMAL;
-    $self->{key} = $param{key} || 'OPEN';
-    $self->{payload} = $param{payload};
-    return $self;
-}
 
-#-------------------------------------------------------------------------------
-# Accessors and comparison method
-#-------------------------------------------------------------------------------
-sub cmp     { $_[0]->{pri} <=> $_[1]->{pri} }
-sub id      { $_[0]->{id}      }
-sub cmd     { $_[0]->{cmd}     }
-sub pri     { $_[0]->{pri}     }
-sub key     { $_[0]->{key}     }
-sub payload { $_[0]->{payload} }
+has cmd => (
+  is  => 'ro',
+  isa => 'Ar::Command',
+  required => 1,
+);
 
-#-------------------------------------------------------------------------------
-# Encodes a message into a line of ASCII (base64-encoded) which can be
-# transmitted on the line.
-#-------------------------------------------------------------------------------
-sub encode {
-    my $self = shift;
 
-    my $data = do {
-        no warnings 'once';
-        local $Storable::Deparse    = 1;
-        local $Storable::forgive_me = 1;
+has pri => (
+  is  => 'ro',
+  isa => 'Ar::Priority',
+  default => $NORMAL,
+);
 
-        defined $self->{payload}
-            ? encode_base64(nfreeze([$self->{payload}]), '')
-            : '-';
-    };
 
-    my $line = join(
-        $Argon::MSG_SEPARATOR,
-        $self->{id},
-        $self->{cmd},
-        $self->{pri},
-        $self->{key},
-        $data,
-    );
+has info => (
+  is  => 'ro',
+  isa => 'Any',
+);
 
-    return $line;
-}
 
-#-------------------------------------------------------------------------------
-# Decodes a line of data and returns a new Argon::Message object.
-#-------------------------------------------------------------------------------
-sub decode {
-    my ($class, $line) = @_;
-    my ($id, $cmd, $pri, $key, $payload) = split $Argon::MSG_SEPARATOR, $line;
+has token => (
+  is  => 'rw',
+  isa => 'Maybe[Str]',
+);
 
-    croak 'incomplete message'
-        unless defined $id
-            && defined $cmd
-            && defined $pri
-            && defined $key;
 
-    if ($payload eq '-') {
-        undef $payload;
-    } else {
-        no warnings 'once';
-        local $Storable::Eval = 1;
-        $payload = thaw(decode_base64($payload))->[0];
-    }
+sub failed { $_[0]->cmd eq $ERROR }
+sub denied { $_[0]->cmd eq $DENY }
+sub copy   { $_[0]->reply(id => Data::UUID->new->create_str) }
 
-    return $class->new(
-        id      => $id,
-        cmd     => $cmd,
-        pri     => $pri,
-        key     => $key,
-        payload => $payload,
-    );
-}
 
-#-------------------------------------------------------------------------------
-# Creates a new Argon::Message object replying to this instance. Named
-# parameters passed in are forwarded to the constructor to override those
-# values in this instance.
-#-------------------------------------------------------------------------------
 sub reply {
-    my ($self, %param) = @_;
-    return $self->new(%$self, %param)
+  my ($self, %param) = @_;
+  Argon::Message->new(
+    %$self,         # copy $self
+    token => undef, # remove token (unless in %param)
+    %param,         # add caller's parameters
+  );
 }
+
+
+sub error {
+  my ($self, $error, %param) = @_;
+  $self->reply(%param, cmd => $ERROR, info => $error);
+}
+
+
+sub result {
+  my $self = shift;
+  return $self->failed ? croak($self->info)
+       : $self->denied ? croak($self->info)
+       : $self->cmd eq $ACK ? 1
+       : $self->info;
+}
+
+
+sub explain {
+  my $self = shift;
+  sprintf '[P%d %5s %s %s]', $self->pri, $self->cmd, $self->token || '-', $self->id;
+}
+
+__PACKAGE__->meta->make_immutable;
 
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Argon::Message - Encodable message structure used for cross-system coordination
+
+=head1 VERSION
+
+version 0.18
+
+=head1 SYNOPSIS
+
+  use Argon::Message;
+  use Argon ':commands', ':priorities';
+
+  my $msg = Argon::Message->new(
+    cmd  => $PING,
+    pri  => $NORMAL,
+    info => {thing => ['with', 'data', 'in', 'it']},
+  );
+
+  my $reply = $msg->reply(info => '...');
+  my $error = $msg->error("some error message");
+
+=head1 DESCRIPTION
+
+Argon protocol messages.
+
+=head1 ATTRIBUTES
+
+=head2 id
+
+Unique identifier for the conversation. Used to track the course of a task from
+the client to the manager to the worker and back.
+
+=head2 cmd
+
+The command verb. See L<Argon::Constants/:commands>.
+
+=head2 pri
+
+The message priority. See L<Argon::Constants/:priorities>.
+
+=head2 info
+
+The data payload of the message. May be a string, reference, et al.
+
+=head2 token
+
+Used internally by L<Argon::SecureChannel> to identify message senders.
+
+=head1 METHODS
+
+=head2 failed
+
+Returns true if the C<cmd> is C<$ERROR>.
+
+=head2 denied
+
+Returns true if the C<cmd> is C<$DENY>.
+
+=head2 copy
+
+Returns a shallow copy of the message with a new id and token.
+
+=head2 reply
+
+Returns a copy of the message. Any additional parameters passed are passed
+transparently to C<new>.
+
+=head2 error
+
+Returns a new message with the same id, C<cmd> set to C<$ERROR>, and C<info>
+set to the supplied error message.
+
+=head2 result
+
+Returns the decoded data playload. If the message is an C<$ERROR> or C<$DENY>,
+croaks with C<info> as the error message. If the message is an C<$ACK>, returns
+true.
+
+=head2 explain
+
+Returns a formatted string describing the message. Useful for debugging and
+logging.
+
+=head1 AUTHOR
+
+Jeff Ober <sysread@fastmail.fm>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Jeff Ober.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,2 @@
+id,type,effect_name,bottom,top,description
+1,1,night_resistance,10,100,"The <?= $item->{name} ?> recovery <?= $item_effect->{notice_parameters}{affect} ?> the Night Resistance."

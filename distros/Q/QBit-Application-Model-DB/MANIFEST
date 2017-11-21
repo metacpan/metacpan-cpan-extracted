@@ -16,7 +16,6 @@ debian/rules
 dist.ini
 lib/Exception/DB.pm
 lib/Exception/DB/DuplicateEntry.pm
-lib/Exception/DB/TimeOut.pm
 lib/QBit/Application/Model/DB.pm
 lib/QBit/Application/Model/DB/Class.pm
 lib/QBit/Application/Model/DB/Field.pm
@@ -30,5 +29,7 @@ t/lib/Test/SecondDB.pm
 t/lib/TestAppDB.pm
 t/lib/TestTimeLog.pm
 t/qbit-application-model-db-multiple.t
+t/qbit-application-model-db-query-comment.t
 t/qbit-application-model-db-query-having.t
+t/qbit-application-model-db-query-update.t
 t/qbit-application-model-db.t

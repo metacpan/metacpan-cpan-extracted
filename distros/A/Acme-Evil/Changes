@@ -1,5 +1,8 @@
 Revision history for Perl extension Acme::Evil.
 
+0.003002 2017-11-11T21:40+00:00
+ - Make dist CPANTS compliant
+
 0.003001 2017-04-15T00:15+03:00
  - Bump MIN_PERL_VERSION to 5.10.1
  - Fix tests when @INC has no '.' (RT #121030)

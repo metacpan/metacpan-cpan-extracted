@@ -1,5 +1,5 @@
 package Moose::Exception::CouldNotEvalConstructor;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -30,4 +30,5 @@ sub _build_message {
     return "Could not eval the constructor :\n\n$source\n\nbecause :\n\n$error";
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

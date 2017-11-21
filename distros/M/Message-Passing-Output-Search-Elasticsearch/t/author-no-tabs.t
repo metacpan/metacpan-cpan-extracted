@@ -22,6 +22,7 @@ my @files = (
     't/author-mojibake.t',
     't/author-no-tabs.t',
     't/author-pod-coverage.t',
+    't/author-pod-linkcheck.t',
     't/author-pod-syntax.t',
     't/author-portability.t',
     't/author-synopsis.t',
@@ -34,7 +35,6 @@ my @files = (
     't/release-kwalitee.t',
     't/release-meta-json.t',
     't/release-minimum-version.t',
-    't/release-pod-linkcheck.t',
     't/release-unused-vars.t'
 );
 

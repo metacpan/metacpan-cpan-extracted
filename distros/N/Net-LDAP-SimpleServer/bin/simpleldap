@@ -6,7 +6,7 @@ use warnings;
 # PODNAME:  simpleldap
 # ABSTRACT: Script to invoke the LDAP server.
 
-our $VERSION = '0.0.20';    # VERSION
+our $VERSION = '0.0.21';    # VERSION
 
 use Net::LDAP::SimpleServer;
 
@@ -29,16 +29,17 @@ simpleldap - Script to invoke the LDAP server.
 
 =head1 VERSION
 
-version 0.0.20
+version 0.0.21
 
 =head1 SYNOPSIS
 
-	host:~ # simpleldap
+	$ simpleldap
 
 =head1 DESCRIPTION
 
 This script simply instantiates and executes a L<Net::LDAP::SimpleServer>
-server.
+server. Bear in mind that, by default, it will use port 389 (standard
+LDAP port), and being <1024, one needs to be root to open it.
 
 =head1 SEE ALSO
 

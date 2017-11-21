@@ -1,0 +1,36 @@
+#!/usr/bin/env perl
+
+=pod
+
+=head1 NAME
+
+wrt-fcgi - Sample FastCGI wrapper script for App::WRT
+
+=head1 DESCRIPTION
+
+Pulls in App::WRT and CGI::Fast, runs a configuration file, and loops over
+FastCGI queries, passing their parameters to C<App::WRT::display()>.
+
+Useful for local testing of output.  Please do not expose to the public web.
+
+=cut
+
+use strict;
+use warnings;
+no  warnings 'uninitialized';
+
+use CGI::Fast;
+use App::WRT;
+
+my $w = App::WRT::new_from_file('wrt.json');
+
+# use Data::Dumper;
+
+# Handle input from FastCGI:
+while (my $query = CGI::Fast->new) {
+  my @params = $query->multi_param('keywords');
+  print "Content-Type: text/html\n\n"; 
+  print $w->display(@params);
+}
+
+exit;

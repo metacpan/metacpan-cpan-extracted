@@ -1,6 +1,6 @@
 package Map::Tube::Line;
 
-$Map::Tube::Line::VERSION   = '3.37';
+$Map::Tube::Line::VERSION   = '3.41';
 $Map::Tube::Line::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube::Line - Class to represent the line in the map.
 
 =head1 VERSION
 
-Version 3.37
+Version 3.41
 
 =cut
 
@@ -21,7 +21,7 @@ use Map::Tube::Exception::InvalidNodeObject;
 use Map::Tube::Types qw(Color Nodes);
 
 use Moo;
-use namespace::clean;
+use namespace::autoclean;
 
 use overload q{""} => 'as_string', fallback => 1;
 

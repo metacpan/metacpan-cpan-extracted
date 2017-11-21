@@ -1,0 +1,65 @@
+---
+abstract: 'Datas for every Pokemon in Pokemon Go'
+author:
+  - 'Yuki Yoshida <worthmine@gmail.com>'
+build_requires:
+  Test::More: '1.302'
+  Text::CSV_XS: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.13, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Pokemon-Go
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Data::Pokemon::Go:
+    file: lib/Data/Pokemon/Go.pm
+    version: '0.02'
+  Data::Pokemon::Go::IV:
+    file: lib/Data/Pokemon/Go/IV.pm
+  Data::Pokemon::Go::Pokemon:
+    file: lib/Data/Pokemon/Go/Pokemon.pm
+  Data::Pokemon::Go::Relation:
+    file: lib/Data/Pokemon/Go/Relation.pm
+  Data::Pokemon::Go::Relation::Dual:
+    file: lib/Data/Pokemon/Go/Relation/Dual.pm
+  Data::Pokemon::Go::Relation::Single:
+    file: lib/Data/Pokemon/Go/Relation/Single.pm
+  Data::Pokemon::Go::Role::Types:
+    file: lib/Data/Pokemon/Go/Role/Types.pm
+  Data::Pokemon::Go::Skill:
+    file: lib/Data/Pokemon/Go/Skill.pm
+  Pokemon::Go::Role::Pokemon:
+    file: lib/Data/Pokemon/Go/Role/Pokemon.pm
+requires:
+  List::Util: '0'
+  Moose: '0'
+  Moose::Role: '0'
+  Moose::Util::TypeConstraints: '0'
+  Path::Tiny: '0'
+  Text::CSV_XS: '1.34'
+  YAML::XS: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/worthmine/Data-Pokemon-Go/issues
+  homepage: https://github.com/worthmine/Data-Pokemon-Go
+  repository: git://github.com/worthmine/Data-Pokemon-Go.git
+version: '0.02'
+x_authority: cpan:WORTHMINE
+x_contributors:
+  - 'AnaTofuZ <anatofuz@gmail.com>'
+  - 'Yuki Yoshida <worthmine@users.noreply.github.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

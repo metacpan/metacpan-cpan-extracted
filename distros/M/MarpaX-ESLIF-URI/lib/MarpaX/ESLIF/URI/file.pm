@@ -7,7 +7,7 @@ package MarpaX::ESLIF::URI::file;
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use Class::Tiny::Antlers;
 use Class::Method::Modifiers qw/around/;
@@ -75,7 +75,7 @@ MarpaX::ESLIF::URI::file - URI::file syntax as per RFC8089
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SUBROUTINES/METHODS
 

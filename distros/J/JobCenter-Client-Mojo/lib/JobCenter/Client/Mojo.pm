@@ -1,7 +1,7 @@
 package JobCenter::Client::Mojo;
 use Mojo::Base -base;
 
-our $VERSION = '0.28'; # VERSION
+our $VERSION = '0.30'; # VERSION
 
 #
 # Mojo's default reactor uses EV, and EV does not play nice with signals
@@ -32,11 +32,11 @@ use JSON::RPC2::TwoWay 0.02;
 # JSON::RPC2::TwoWay depends on JSON::MaybeXS anyways, so it can be used here
 # without adding another dependency
 use JSON::MaybeXS qw(decode_json encode_json);
-use MojoX::NetstringStream 0.04; # older versions have utf-8 bugs
+use MojoX::NetstringStream 0.06; # for the enhanced close
 
 has [qw(
 	actions address auth clientid conn daemon debug jobs json lastping log
-	method ping_timeout port rpc timeout tls token who
+	method ns ping_timeout port rpc timeout tls token who
 )];
 
 sub new {
@@ -82,6 +82,7 @@ sub new {
 			return;
 		}
 		my $ns = MojoX::NetstringStream->new(stream => $stream);
+		$self ->{ns} = $ns;
 		my $conn = $rpc->newconnection(
 			owner => $self,
 			write => sub { $ns->write(@_) },
@@ -276,6 +277,15 @@ sub call_nb {
 	});
 }
 
+sub close {
+	my ($self) = @_;
+
+	$self->log->debug('closing connection');
+	$self->conn->close();
+	$self->ns->close();
+	%$self = ();
+}
+
 sub find_jobs {
 	my ($self, $filter) = @_;
 	croak('no filter?') unless $filter;
@@ -344,7 +354,7 @@ sub get_job_status {
 
 	Mojo::IOLoop->singleton->reactor->one_tick while !$done;
 
-	$outargs = encode_json($outargs) if $self->{json};
+	$outargs = encode_json($outargs) if $self->{json} and ref $outargs;
 	return $job_id2, $outargs;
 }
 
@@ -368,8 +378,6 @@ sub ping {
 		$done++;
 	});
 
-	# we could recurse here
-        #Mojo::IOLoop->one_tick while !$done;
 	Mojo::IOLoop->singleton->reactor->one_tick while !$done;
 
 	return $ret;
@@ -525,7 +533,7 @@ sub _subproc {
 	unless ($pid) {# Child
 		$self->log->debug("in child $$");;
 		$ioloop->reset;
-		close $reader; # or we won't get a sigpipe when daddy dies..
+		CORE::close $reader; # or we won't get a sigpipe when daddy dies..
 		my $undo = 0;
 		my $outargs = eval { $action->{cb}->($job_id, @args) };
 		if ($@) {
@@ -551,7 +559,7 @@ sub _subproc {
 		# if the parent is gone we get a sigpipe here:
 		print $writer Storable::freeze($outargs);
 		$writer->flush or $undo++;
-		close $writer or $undo++;
+		CORE::close $writer or $undo++;
 		if ($undo and $action->{undocb}) {
 			$self->log->info("undoing for $job_id");;
 			eval { $action->{undocb}->($job_id, @args); };
@@ -563,7 +571,7 @@ sub _subproc {
 
 	# Parent
 	my $me = $$;
-	close $writer;
+	CORE::close $writer;
 	my $stream = Mojo::IOLoop::Stream->new($reader)->timeout(0);
 	$ioloop->stream($stream);
 	my $buffer = '';
@@ -600,6 +608,11 @@ sub _daemonize {
 	open STDOUT, '>/dev/null';
 	open STDERR, '>&STDOUT';
 }
+
+#sub DESTROY {
+#	my $self = shift;
+#	say 'destroying ', $self;
+#}
 
 1;
 
@@ -782,6 +795,13 @@ $status = $client->ping($timeout);
 
 Tries to ping the JobCenter API. On success return true. On failure returns
 the undefined value, after that the client object should be undefined.
+
+=head2 close
+
+$client->close()
+
+Closes the connection to the JobCenter API and tries to de-allocate
+everything.  Trying to use the client afterwards will produce errors.
 
 =head2 announce
 

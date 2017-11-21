@@ -12,7 +12,7 @@
 use strict;
 use warnings;
 use Test;
-BEGIN { plan tests => 207 };
+BEGIN { plan tests => 217 };
 use Math::Polynomial 1.000;
 ok(1);  # module loaded
 
@@ -417,6 +417,21 @@ $qq = $p->nest($zp);
 ok(has_coeff($qq, -0.25));              # q(0)
 $qq = $zp->nest($p);
 ok(has_coeff($qq));                     # 0(p)
+
+$pp = $p->new(1, 2, 3)->mirror;
+ok(has_coeff($pp, 1, -2, 3));           # mirror, degree 2
+$pp = $p->new(1, 2, 3, 4)->mirror;
+ok(has_coeff($pp, 1, -2, 3, -4));       # mirror, degree 3
+
+ok(!$pp->is_even);                      # pp is not an even function
+ok(!$pp->is_odd);                       # pp is not an odd function
+ok($q->is_even);                        # q is an even function
+ok(!$q->is_odd);                        # q is not an odd function
+$qq = $q << 1;
+ok(!$qq->is_even);                      # qq is an even function
+ok($qq->is_odd);                        # qq is not an odd function
+ok($zp->is_even);                       # 0 is an even function
+ok($zp->is_odd);                        # 0 is an odd function
 
 $bool = $q->is_monic;
 ok(!$bool);                             # q is not monic

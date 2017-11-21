@@ -1,5 +1,8 @@
 Revision history for Alien-libuv
 
+0.013     2017-11-12
+  - Update to the libuv v1.16.1 release
+
 0.012     2017-10-03
   - Update to the libuv v1.15.0 release
   - Support for NetBSD

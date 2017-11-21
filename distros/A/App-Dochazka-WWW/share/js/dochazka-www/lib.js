@@ -37,54 +37,21 @@
 "use strict";
 
 define ([
+    "jquery",
     "current-user",
     "datetime",
 ], function (
+    $,
     currentUser,
     datetime,
 ) {
 
-    return {
-
-        displayIntervals: function (intervals, formField) {
-            var i;
-            if (intervals.length === 1) {
-                formField.html(
-                    datetime.tsrangeToTimeRange(intervals[0].intvl)
-                );
-            } else {
-                formField.html('');
-                for (i = 0; i < intervals.length - 1; i += 1) {
-                    formField.append(
-                        datetime.tsrangeToTimeRange(intervals[i].intvl)
-                    );
-                    formField.append('; ');
-                }
-                formField.append(
-                    datetime.tsrangeToTimeRange(intervals[i].intvl)
-                );
-            }
-        },
-
-        //
-        // function returns string that will be displayed at the very
-        // bottom of the screen (directly under the frame)
-        //
-        fillNoticesLine: function () {
-            var r = '';
-            r += 'Copyright \u00A9 SUSE LLC, 2014-2016. All rights reserved. ';
-            r += 'Report bugs at ';
-            r += '<a href="https://github.com/smithfarm/dochazka/issues">';
-            r += 'https://github.com/smithfarm/dochazka/issues</a>';
-            return r;
-        },
-
+    var userBoxContent = function () {
         //
         // function returns string to be displayed in the 'userbox'
         // <span> element at the top right of the "screen" (i.e. browser
         // window) -- called from html.js
         //
-        fillUserBox: function () {
 
             var r = '', 
                 cu = currentUser(),
@@ -122,8 +89,48 @@ define ([
             }
 
             return r;
+        };
 
+    return {
+
+        displayIntervals: function (intervals, formField) {
+            var i;
+            if (intervals.length === 1) {
+                formField.html(
+                    datetime.tsrangeToTimeRange(intervals[0].intvl)
+                );
+            } else {
+                formField.html('');
+                for (i = 0; i < intervals.length - 1; i += 1) {
+                    formField.append(
+                        datetime.tsrangeToTimeRange(intervals[i].intvl)
+                    );
+                    formField.append('; ');
+                }
+                formField.append(
+                    datetime.tsrangeToTimeRange(intervals[i].intvl)
+                );
+            }
         },
+
+        //
+        // function returns string that will be displayed at the very
+        // bottom of the screen (directly under the frame)
+        //
+        fillNoticesLine: function () {
+            var r = '';
+            r += 'Copyright \u00A9 SUSE LLC, 2014-2016. All rights reserved. ';
+            r += 'Report bugs at ';
+            r += '<a href="https://github.com/smithfarm/dochazka/issues">';
+            r += 'https://github.com/smithfarm/dochazka/issues</a>';
+            return r;
+        },
+
+        fillUserBox: function () {
+            $('#userbox').html(userBoxContent());
+        },
+
+        userBoxContent: userBoxContent,
 
     };
 

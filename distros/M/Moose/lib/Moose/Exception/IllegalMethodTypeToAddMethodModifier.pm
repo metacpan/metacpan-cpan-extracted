@@ -1,5 +1,5 @@
 package Moose::Exception::IllegalMethodTypeToAddMethodModifier;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -27,4 +27,5 @@ sub _build_message {
     "Methods passed to ".$self->modifier_name." must be provided as a list, arrayref or regex, not ".$self->params->[0];
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

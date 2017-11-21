@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,55 +12,57 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: SHA512
 
-SHA1 2537bd4f54399bc3959f7f1be661e4c2e89796d1 Bucharest.pm
-SHA1 3d7a24de1ac23dd9815a5a21b30df4c52b11f273 Changes
+SHA1 1281c12a7161f54f6ee0a0c4fd68af883481614d Bucharest.pm
+SHA1 280040915a1ec00bc63ec00026c7d032297f2e46 Changes
 SHA1 882221895a73bad18eb9f16a0ce523a968a932c1 LICENSE.artistic_2
-SHA1 507a10efa92555ddddfbe72be27964d9e3eef80f LICENSE.bsd
-SHA1 85239f8efcf165744861111f982385aaf4c695ad MANIFEST
-SHA1 cc4c21dccef1fc06f0fe0c5ef03d7a6d4875a8b2 META.yml
-SHA1 b29d0b9927a18f7e85eda02e0ce5dd73708f1bc4 Makefile.PL
-SHA1 9b1e240b844c4b9c4bb799ef3265967875d02352 README
+SHA1 c2a761283151cfab0e2f28a22cbbb24cbde838fc LICENSE.bsd
+SHA1 39941261839127995d76d6d01948aef85de8a119 MANIFEST
+SHA1 375b3c9a7136cbb747824b909207b9c06c83f758 META.yml
+SHA1 12535e968fbef8611d33eb47f723f670833476e4 Makefile.PL
+SHA1 988ed8f58621adb3916d4445e11b8e40a4de366c README
 SHA1 5c2758776ee58f6528d5d429c746c252230194fc examples/ex1.pl
 SHA1 12bb9b1743a767b76d43b18550a92a4ce6460528 examples/ex2.pl
 SHA1 49a0689091cb43ddeec24581d40cef2db6f90b68 examples/ex3.pl
 SHA1 013fc411839b35a63a37c52d07d528a3331fa2ed examples/ex4.pl
+SHA1 eb137d5ff51d1c7baa13f5dce0fd3e2d1931dbb0 examples/ex5.pl
 SHA1 79ef13c7f0597d62beb55e2ac8705983d4490a51 images/ex3.png
-SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 fb87e7e7964647af0e7f6422bc7943754935dca7 inc/Module/Install.pm
+SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
 SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
-SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
-SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
-SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
-SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
-SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
-SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
-SHA1 42de62df31eaf796d8bfd49a11fdc9cff1b50b74 inc/Module/Install/Share.pm
-SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
-SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 06ca84c52f555dfd7cf8bb7c941c975e25adfc9d inc/Module/Install/Base.pm
+SHA1 3eeb29878c8a435182b492e22315166a0229a373 inc/Module/Install/Can.pm
+SHA1 3bb596078a0413cc568ff3a834d9fc54dbddd54b inc/Module/Install/Fetch.pm
+SHA1 5885b5a7af6c3d54cbeb1274a896a565e5cbdb9a inc/Module/Install/Makefile.pm
+SHA1 9247628a32ad889e815a356fb39b2bc94ff3cc3a inc/Module/Install/Metadata.pm
+SHA1 8d19f4485276b987b7838d4ec01909f8055a4724 inc/Module/Install/ReadmeFromPod.pm
+SHA1 47c4d01e2a0df08bf3be46fcc132783f5228d238 inc/Module/Install/Share.pm
+SHA1 b0b3ad3cfea40b508eb61e0e5c8ea477f81f3eb1 inc/Module/Install/Win32.pm
+SHA1 b162866505fb2a1141efa422cfdc864394cb4444 inc/Module/Install/WriteAll.pm
 SHA1 8ce4a5b1ee87c66d23c24ba5d86b653340fcc0a8 share/bucharest-map.xml
 SHA1 1635b1a4acefead67663346d5823944e3940d549 t/Map-Tube-Bucharest/01-use.t
-SHA1 67cbd8b4bef9ed1a6af40e6e9e2b6f5379d95644 t/Map-Tube-Bucharest/02-version.t
-SHA1 aec24cb1c284d929fa1708430363baf3cb1ecdc4 t/Map-Tube-Bucharest/03-map.t
+SHA1 35cf5bff2d566aa8b191be83ce49a731b339b3a3 t/Map-Tube-Bucharest/02-version.t
+SHA1 4935b5cbeb0f77055003fb9677b4b5f9afb24233 t/Map-Tube-Bucharest/03-map.t
 SHA1 cdaa88f3d759e779661438f85f46b58b1a1b943a t/Map-Tube-Bucharest/04-get_line_by_id.t
 SHA1 d613dd56c9f4998ad2f1c3b83348a96e9f522fd7 t/Map-Tube-Bucharest/05-get_line_by_name.t
 SHA1 ca19a125387f549f8e157b6de1708f54155c6368 t/Map-Tube-Bucharest/06-get_lines.t
 SHA1 6c53e4fbab8350e38f53729484121e440a451b24 t/Map-Tube-Bucharest/07-get_node_by_id.t
 SHA1 4e658ecf1416a830dcb32a64b1abe5b010096283 t/Map-Tube-Bucharest/08-get_node_by_name.t
 SHA1 e15de63cb4f2272db466bf8d2cc0af512371d03c t/Map-Tube-Bucharest/09-get_shortest_route.t
-SHA1 55ae85e4bc550a647b22c50723ad42387761e262 t/Map-Tube-Bucharest/10-get_stations.t
+SHA1 f12ca9341bcb2e0a4ea1c611bd5188875979b0f7 t/Map-Tube-Bucharest/10-get_stations.t
 SHA1 1087b4d7caea7150906582392ca3773e0e76fe06 t/Map-Tube-Bucharest/11-name.t
 SHA1 4f2d12e8454193c00385c7c5a8c445b10cab5b68 t/Map-Tube-Bucharest/12-xml.t
 SHA1 745444d6f90c68e4854f85051900006cec8ab7e0 xt/Map-Tube-Bucharest/01-pod_coverage.t
 SHA1 77ded2751325d83c3083a849f35ca94fcf83b275 xt/Map-Tube-Bucharest/02-pod.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQEcBAEBAgAGBQJWKe22AAoJEJe+XXKaIuTlAy4H/jvlVit2QbqcoqMeEOmKhMtx
-kl00UJ51GXdtnX5peOrY4b4NUkkEpmHI8JdOmY5WxFIvBFW9+KEbolf6mB52F2vF
-cbAHTwzDufLggqBPpAZCSDKzmkuNl5xsDc1Axamoji25gawz+2E4YVvKNKbHY9uJ
-cbO1Hla8uzXPtEB6k7ui07xPR/RUVP0t6NutuulwkWEgkaL6dSPP3zU9GM2kci49
-3/Q7ZS88045sNMiToEq+7tb7+EBA5EbtbSt7dJ3/xkAR1QMIm7dKzglb1FztSMSz
-EZX6ux102SlA4HpLxkza3VGvV41AhfbTPqy/sNUahYFD7YtuiiMk3t1U/E0Ku5w=
-=bDfu
+iQEzBAEBCgAdFiEEAxWqUSy7qDLVZJQKKyiOZjWerHYFAloRLDMACgkQKyiOZjWe
+rHaE5Af/b6JxCodrBgyie+1pjxQdSg80UxxQ39YROCzSZ8n6Q0ewWlK/7MK44QKm
+MgT3EEQG7s52Ez8IzNXMccvCHn05pgDmN+Mt9PD6XZb/Do74t6ATgst4lYF6Gpgr
+J8LhN0LkvnajFELKsxDzDVohhyXnmq3w7FOEq9CirzfVr7csjxpGUNKL8nBmUZ40
+8Pus1idNdnZETLf8pRmUb3+8QxJSyu9JCaDLQ3UBp0WaKdf7kRjsY/g8gkKL8Sro
+Wfz9aJkYFuj6KFLDgYLIz0EGjOUyGAE6dY2zeTbYlMV6W02qM25XuDYfS43j+RLm
+zgPVS4sugugQD47OxPDYqLRs696nSg==
+=EHDi
 -----END PGP SIGNATURE-----

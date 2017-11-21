@@ -1,5 +1,19 @@
 Revision history for Map::Tube
 
+3.41  2017-11-20T14:30:00+00:00
+      - Added sample code for all the supported plugins.
+      - Updated CONTRIBUTORS section.
+
+3.40  2017-11-18T03:00:00+00:00
+      - Handle one line in xml format map data.
+
+3.39  2017-11-17T10:45:00+00:00
+      - Fixed double encoding of map data in JSON format.
+
+3.38  2017-11-16T10:20:00+00:00
+      - Replaced namespace::clean with namespace::autoclean.
+      - Used allow_nonref where ever json decoding happens.
+
 3.37  2017-11-07T15:35:00+00:00
       - Updated method get_stations() to return all map stations
         if no line name is passed.

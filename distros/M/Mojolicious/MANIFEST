@@ -120,7 +120,9 @@ lib/Mojolicious/Renderer.pm
 lib/Mojolicious/resources/public/favicon.ico
 lib/Mojolicious/resources/public/mojo/failraptor.png
 lib/Mojolicious/resources/public/mojo/jquery/jquery.js
+lib/Mojolicious/resources/public/mojo/logo-black-2x.png
 lib/Mojolicious/resources/public/mojo/logo-black.png
+lib/Mojolicious/resources/public/mojo/logo-white-2x.png
 lib/Mojolicious/resources/public/mojo/logo-white.png
 lib/Mojolicious/resources/public/mojo/noraptor.png
 lib/Mojolicious/resources/public/mojo/notfound.png
@@ -129,7 +131,6 @@ lib/Mojolicious/resources/public/mojo/pinstripe-light.png
 lib/Mojolicious/resources/public/mojo/prettify/prettify-mojo-dark.css
 lib/Mojolicious/resources/public/mojo/prettify/prettify-mojo-light.css
 lib/Mojolicious/resources/public/mojo/prettify/run_prettify.js
-lib/Mojolicious/resources/public/mojo/stripes.png
 lib/Mojolicious/resources/templates/mojo/debug.html.ep
 lib/Mojolicious/resources/templates/mojo/exception.html.ep
 lib/Mojolicious/resources/templates/mojo/menubar.html.ep

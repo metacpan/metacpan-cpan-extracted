@@ -41,26 +41,83 @@
 
 define([
     'html',
+    'lib',
+    'prototypes',
     'start',
     'target'
 ], function (
     html,
+    coreLib,
+    prototypes,
     start,
     target
 ) {
 
+    var transformMenu = function (menu, type) {
+            // transform array of strings into a menu object
+
+            var entry,
+                i,
+                newMenu;
+
+            if (! coreLib.isArray(menu)) {
+                throw("CRITICAL ERROR: non-array sent to transformMenu");
+            }
+
+            newMenu = Object.create(prototypes.menu);
+            newMenu.entries = [ null, ]; // 0th menu entry is not used
+            for (i = 0; i < menu.length; i += 1) {
+                entry = target.pull(menu[i]);
+                if (coreLib.privCheck(entry.aclProfile) && entry.onlyWhen()) {
+                    newMenu.entries.push(entry);
+                }
+            }
+
+            newMenu.isEmpty = (menu.length === 0);
+            newMenu.isDmenu = (type === 'dmenu');
+            newMenu.isMiniMenu = (type === 'miniMenu');
+
+            // return transformed array of target objects
+            // console.log("Transformed menu into", newMenu);
+            return newMenu;
+        };
+
     return function (wtype) {
 
-        var i,
-            widgets;
+        var entry,
+            i,
+            tgt,
+            widgets = target.getAll(wtype);
     
-        // iterate over certain types of target objects, adding 'source' and 'start' to each
-
-        widgets = target.getAll(wtype);
         for (i in widgets ) {
             if (widgets.hasOwnProperty(i)) {
-                widgets[i].source = html[wtype](i);
-                widgets[i].start = start[wtype](i);
+                tgt = widgets[i];
+                tgt.start = start[wtype](i);
+                // adjust dmenu and miniMenu - the idea here is to remove items
+                // for which the current user does not have sufficient privileges
+                if (wtype === 'dmenu') {
+                    if (! tgt.menuObj) {
+                        if ('entries' in tgt && coreLib.isArray(tgt.entries)) {
+                            // console.log("Transforming dmenu " + tgt.name);
+                            tgt.menuObj = transformMenu(tgt.entries, "dmenu");
+                        } else {
+                            tgt.menuObj = Object.create(prototypes.menu);
+                            tgt.menuObj.isDmenu = true;
+                        }
+                    }
+                    tgt.source = html[wtype](i);
+                    continue; // dmenus do not have miniMenus
+                }
+                // console.log("Considering miniMenu of target", tgt);
+                if (   tgt.miniMenu &&
+                       'entries' in tgt.miniMenu &&
+                       coreLib.isArray(tgt.miniMenu.entries) &&
+                       ! tgt.miniMenu.menuObj
+                   ) {
+                    // console.log("Transforming miniMenu of " + tgt.name);
+                    tgt.miniMenu.menuObj = transformMenu(tgt.miniMenu.entries, "miniMenu");
+                }
+                tgt.source = html[wtype](i);
             }
         }
 

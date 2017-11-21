@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Acme::MetaSyntactic::MultiList;
 our @ISA = qw( Acme::MetaSyntactic::MultiList );
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 
 =encoding iso-8859-1
 
@@ -919,8 +919,8 @@ The winners are:
  2006   Chemistry   Roger D. Kornberg
  2006   Economics   Edmund S. Phelps
  2006   Literature  Orhan Pamuk
- 2006   Medecine    Andrew Z. Fire
- 2006   Medecine    Craig C. Mello
+ 2006   Medicine    Andrew Z. Fire
+ 2006   Medicine    Craig C. Mello
  2006   Peace       Grameen Bank
  2006   Peace       Muhammad Yunus
  2006   Physics     George F. Smoot
@@ -931,9 +931,9 @@ The winners are:
  2007   Economics   Leonid Hurwicz
  2007   Economics   Roger B. Myerson
  2007   Literature  Doris Lessing
- 2007   Medecine    Mario R. Capecchi
- 2007   Medecine    Oliver Smithies
- 2007   Medecine    Sir Martin J. Evans
+ 2007   Medicine    Mario R. Capecchi
+ 2007   Medicine    Oliver Smithies
+ 2007   Medicine    Sir Martin J. Evans
  2007   Peace       Albert Arnold Gore Jr.
  2007   Peace       Intergovernmental Panel on Climate Change
  2007   Physics     Albert Fert
@@ -944,9 +944,9 @@ The winners are:
  2008   Chemistry   Roger Y. Tsien
  2008   Economics   Paul Krugman
  2008   Literature  Jean-Marie Gustave Le Clézio
- 2008   Medecine    Françoise Barré-Sinoussi
- 2008   Medecine    Harald zur Hausen
- 2008   Medecine    Luc Montagnier
+ 2008   Medicine    Françoise Barré-Sinoussi
+ 2008   Medicine    Harald zur Hausen
+ 2008   Medicine    Luc Montagnier
  2008   Peace       Martti Ahtisaari
  2008   Physics     Makoto Kobayashi
  2008   Physics     Toshihide Maskawa
@@ -958,9 +958,9 @@ The winners are:
  2009   Economics   Elinor Ostrom
  2009   Economics   Oliver E. Williamson
  2009   Literature  Herta Müller
- 2009   Medecine    Carol W. Greider
- 2009   Medecine    Elizabeth H. Blackburn
- 2009   Medecine    Jack W. Szostak
+ 2009   Medicine    Carol W. Greider
+ 2009   Medicine    Elizabeth H. Blackburn
+ 2009   Medicine    Jack W. Szostak
  2009   Peace       Barack H. Obama
  2009   Physics     Charles Kuen Kao
  2009   Physics     George E. Smith
@@ -973,7 +973,7 @@ The winners are:
  2010   Economics   Dale T. Mortensen
  2010   Economics   Peter A. Diamond
  2010   Literature  Mario Vargas Llosa
- 2010   Medecine    Robert G. Edwards
+ 2010   Medicine    Robert G. Edwards
  2010   Peace       Liu Xiaobo
  2010   Physics     Andre Geim
  2010   Physics     Konstantin Novoselov
@@ -982,9 +982,9 @@ The winners are:
  2011   Economics   Christopher A. Sims
  2011   Economics   Thomas J. Sargent
  2011   Literature  Tomas Tranströmer
- 2011   Medecine    Bruce A. Beutler
- 2011   Medecine    Jules A. Hoffmann
- 2011   Medecine    Ralph M. Steinman
+ 2011   Medicine    Bruce A. Beutler
+ 2011   Medicine    Jules A. Hoffmann
+ 2011   Medicine    Ralph M. Steinman
  2011   Peace       Ellen Johnson Sirleaf
  2011   Peace       Leymah Gbowee
  2011   Peace       Tawakkol Karman
@@ -997,8 +997,8 @@ The winners are:
  2012   Economics   Alvin E. Roth
  2012   Economics   Lloyd S. Shapley
  2012   Literature  Mo Yan
- 2012   Medecine    Shinya Yamanaka
- 2012   Medecine    Sir John B. Gurdon
+ 2012   Medicine    Shinya Yamanaka
+ 2012   Medicine    Sir John B. Gurdon
  2012   Peace       European Union
  2012   Physics     David J. Wineland
  2012   Physics     Serge Haroche
@@ -1010,9 +1010,9 @@ The winners are:
  2013   Economics   Lars Peter Hansen
  2013   Economics   Robert J. Shiller
  2013   Literature  Alice Munro
- 2013   Medecine    James E. Rothman
- 2013   Medecine    Randy W. Schekman
- 2013   Medecine    Thomas C. Südhof
+ 2013   Medicine    James E. Rothman
+ 2013   Medicine    Randy W. Schekman
+ 2013   Medicine    Thomas C. Südhof
  2013   Peace       Organization for the Prohibition of Chemical Weapons
  2013   Physics     François Englert
  2013   Physics     Peter Higgs
@@ -1022,9 +1022,9 @@ The winners are:
  2014   Chemistry   William E. Moerner
  2014   Economics   Jean Tirole
  2014   Literature  Patrick Modiano
- 2014   Medecine    John O'Keefe
- 2014   Medecine    May-Britt Moser
- 2014   Medecine    Edvard I. Moser
+ 2014   Medicine    John O'Keefe
+ 2014   Medicine    May-Britt Moser
+ 2014   Medicine    Edvard I. Moser
  2014   Peace       Kailash Satyarthi
  2014   Peace       Malala Yousafzai
  2014   Physics     Isamu Akasaki
@@ -1036,9 +1036,9 @@ The winners are:
  2015   Chemistry   Aziz Sancar
  2015   Economics   Angus Deaton
  2015   Literature  Svetlana Alexievich
- 2015   Medecine    William C. Campbell
- 2015   Medecine    Satoshi Omura
- 2015   Medecine    Youyou Tu
+ 2015   Medicine    William C. Campbell
+ 2015   Medicine    Satoshi Omura
+ 2015   Medicine    Youyou Tu
  2015   Peace       National Dialogue Quartet
  2015   Physics     Takaaki Kajita
  2015   Physics     Arthur B. McDonald
@@ -1049,11 +1049,24 @@ The winners are:
  2016   Economics   Oliver Hart
  2016   Economics   Bengt Holmström
  2016   Literature  Bob Dylan
- 2016   Medecine    Yoshinori Ohsumi
+ 2016   Medicine    Yoshinori Ohsumi
  2016   Peace       Juan Manuel Santos
  2016   Physics     David J. Thouless
  2016   Physics     F. Duncan M. Haldane
  2016   Physics     J. Michael Kosterlitz
+
+ 2017   Chemistry   Jacques Dubochet
+ 2017   Chemistry   Joachim Frank
+ 2017   Chemistry   Richard Henderson
+ 2017   Economics   Richard H. Thaler
+ 2017   Literature  Kazuo Ishiguro
+ 2017   Medicine    Jeffrey C. Hall
+ 2017   Medicine    Michael Rosbash
+ 2017   Medicine    Michael W. Young
+ 2017   Peace       International Campaign to Abolish Nuclear Weapons
+ 2017   Physics     Rainer Weiss
+ 2017   Physics     Barry C. Barish
+ 2017   Physics     Kip S. Thorne
 
 =cut
 
@@ -1086,6 +1099,13 @@ Abigail
 =head1 CHANGES
 
 =over 4
+
+=item *
+
+2017-11-13 - v1.006
+
+Updated with the Nobel prizes for 2017, and
+published in Acme-MetaSyntactic-Themes version 1.051.
 
 =item *
 

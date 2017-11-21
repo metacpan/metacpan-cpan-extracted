@@ -1,5 +1,5 @@
 package Moose::Exception::NeedsTypeConstraintUnionForTypeCoercionUnion;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -21,4 +21,5 @@ sub _build_message {
            "Moose::Meta::TypeConstraint::Union, not a $type_constraint"
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

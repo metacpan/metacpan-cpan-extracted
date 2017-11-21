@@ -1,3 +1,9 @@
+2017-11-13 Guillaume Rousse <guillomovitch@zarb.org> 0.2.4
+	* exclude old version from itself from distribution
+
+2017-11-11 Guillaume Rousse <guillomovitch@zarb.org> 0.2.3
+	* exclude MYMETA.* from distribution (cpan bug #123487)
+
 2017-10-28 Guillaume Rousse <guillomovitch@zarb.org> 0.2.2
 	* complete dependencies list in Makefile.PL
 	* regenerate distribution to fix META.yml format

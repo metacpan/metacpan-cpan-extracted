@@ -1,0 +1,35 @@
+/* terminal-dark.css */
+
+.perl-code {
+    border:           10px solid #c0c0c0;
+    border-radius:    8px;
+    width:            95%;
+    margin:           1em auto;
+    padding:          1em;
+    background-color: #000;
+    font-family:      'Lucida Console', monospace;
+    font-size:        100%;
+    white-space:      pre-wrap;
+}
+
+/* Class names from PPI::HTML */
+/* Colors best attempt at copying vim-perl default */
+
+.keyword   { color: #f2b90d; } /* keyword   - Gold  */
+.pragma    { color: #f2b90d; } /* pragma    - Gold  */
+.structure { color: #ffcc99; } /* structure - Tan   */
+.words     { color: #cc0000; } /* words     - Red   */
+.word      { color: #ffffff; } /* word      - White */
+.number    { color: #cc0000; } /* number    - Red   */
+.operator  { color: #f2b90d; } /* operator  - Gold  */
+.single    { color: #cc0000; } /* single    - White */
+.double    { color: #00cccc; } /* double    - Teal  */
+.symbol    { color: #00cccc; } /* symbol    - Teal  */
+.magic     { color: #00cccc; } /* magic     - Teal  */
+.separator { color: #4d4dff; } /* separator - Blue  */
+.comment   { color: #b3b3cc; } /* comment   - Grey  */
+
+/* Extra classes */
+.prompt    { color: #39e600; } /* shell prompt - neon green */
+.output    { color: #ffffff; } /* output lines - white */
+

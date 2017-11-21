@@ -643,6 +643,7 @@ new(pkg, ...)
      sv_bless(self, gv_stashsv(pkg, FALSE));
 
      for (item = 1; item < items; ++item) {
+       SvGETMAGIC(ST(item));
        ISET_INSERT(s, ST(item));
      }
 

@@ -1,5 +1,5 @@
 package Search::Elasticsearch::Serializer::JSON::PP;
-$Search::Elasticsearch::Serializer::JSON::PP::VERSION = '5.02';
+$Search::Elasticsearch::Serializer::JSON::PP::VERSION = '6.00';
 use Moo;
 use JSON::PP;
 
@@ -23,7 +23,7 @@ Search::Elasticsearch::Serializer::JSON::PP - A JSON Serializer using JSON::PP
 
 =head1 VERSION
 
-version 5.02
+version 6.00
 
 =head1 SYNOPSIS
 

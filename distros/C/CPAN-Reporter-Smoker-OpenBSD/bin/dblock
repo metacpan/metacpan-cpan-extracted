@@ -7,7 +7,7 @@ use Getopt::Long;
 use Pod::Usage 1.69;
 use CPAN;
 use CPAN::Reporter::Smoker::OpenBSD qw(is_distro_ok);
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.009'; # VERSION
 my ($distro,$help,$version_check);
 
 GetOptions(

@@ -1,9 +1,9 @@
-localhost{1~100}:
-  user1: "passwd1"
-  user2: "passwd2"
-node1:
-  uu: pp
-  default: ppp
-default:
-  u1: p1
-  default: p
+#localhost{1~100}:
+#  user1: "passwd1"
+#  user2: "passwd2"
+#node1:
+#  uu: pp
+#  default: ppp
+#default:
+#  u1: p1
+#  default: p

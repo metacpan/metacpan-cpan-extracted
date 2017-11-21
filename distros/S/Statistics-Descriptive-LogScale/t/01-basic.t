@@ -32,6 +32,19 @@ foreach (@samples) {
 
 	about ($stat->central_moment(2), $stat->variance, "2nd moment = variance");
 	about ($stat->std_moment(2), 1, "2nd normalized = 1");
+	is ($stat->abs_moment(2), $stat->central_moment(2)
+		, "abs_power(2) == power(2)");
+	is ($stat->abs_moment(4), $stat->central_moment(4)
+		, "abs_power(4) == power(4)");
+
+    is $stat->std_abs_moment(2), 1, "Standardizedmoment obvious value";
+
+    about( $stat->std_abs_moment(4)
+        , $stat->central_moment(4)/($stat->std_dev ** 4)
+        , "Moment like formula (4)");
+    about( $stat->std_abs_moment(6)
+        , $stat->central_moment(6)/($stat->std_dev ** 6)
+        , "Moment like formula (6)");
 
 	# ad-hoc basic statistics
 	my $n;  $n  += 1     for @data;

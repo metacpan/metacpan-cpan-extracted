@@ -1,8 +1,10 @@
 package QBit::Validator::Type::hash;
-$QBit::Validator::Type::hash::VERSION = '0.010';
+$QBit::Validator::Type::hash::VERSION = '0.011';
 use qbit;
 
 use base qw(QBit::Validator::Type);
+
+use Exception::Validator;
 
 #order is important
 my $OPTIONS = [
@@ -67,16 +69,33 @@ sub deps {
         if (exists($data->{$field})) {
             my $deps = $template->{$option}{$field};
 
+            my ($dep_fields, $cases, $set_template);
+            if (ref($deps) eq 'HASH') {
+                throw Exception::Validator gettext('You must specify option "fields"')
+                  unless exists($deps->{'fields'});
+
+                $dep_fields = $deps->{'fields'};
+
+                my @exists_options = grep {exists($deps->{$_})} qw(cases set_template);
+                throw Exception::Validator gettext('You must specify option "cases" or "set_template"')
+                  if @exists_options != 1;
+
+                $cases        = $deps->{'cases'};
+                $set_template = $deps->{'set_template'};
+            } else {
+                $dep_fields = $deps;
+            }
+
             throw Exception::Validator gettext('You must specify the fields on which the field "%s"', $field)
-              unless defined($deps);
+              unless defined($dep_fields);
 
-            $deps = [$deps] unless ref($deps) eq 'ARRAY';
+            $dep_fields = [$dep_fields] unless ref($dep_fields) eq 'ARRAY';
 
-            foreach my $dep_field (@$deps) {
+            my @dep_fields_with_errors = ();
+            my $has_errors             = FALSE;
+            foreach my $dep_field (@$dep_fields) {
                 unless (exists($data->{$dep_field})) {
-                    $qv->_add_error($template, gettext('Key "%s" depends from "%s"', $field, $dep_field), \@path);
-
-                    $no_error = FALSE;
+                    push(@dep_fields_with_errors, $dep_field);
 
                     next;
                 }
@@ -86,7 +105,56 @@ sub deps {
                 $qv->_validation($data->{$dep_field}, $template->{'fields'}{$dep_field}, undef, @dep_path)
                   unless $qv->checked(\@dep_path);
 
-                $no_error = FALSE if $qv->has_error(\@dep_path);
+                $has_errors = TRUE if $qv->has_error(\@dep_path);
+            }
+
+            if (@dep_fields_with_errors) {
+                $qv->_add_error($template,
+                    gettext('Key "%s" depends from: %s', $field, join(',', map {"\"$_\""} @dep_fields_with_errors)),
+                    \@path);
+
+                return FALSE;
+            }
+
+            if ($has_errors) {
+                $no_error = FALSE;
+                next;
+            }
+
+            if (defined($cases)) {
+                throw Exception::Validator gettext('Option "%s" must be ARRAY', 'cases') if ref($cases) ne 'ARRAY';
+
+                foreach my $case (@$cases) {
+                    my $case_template =
+                      {%{$case->[0]}, map {$_ => {skip => TRUE}} grep {!exists($case->[0]{$_})} @$dep_fields};
+
+                    my $case_qv = $qv->new(
+                        data => {map {$_ => $data->{$_}} @$dep_fields},
+                        template => {type => 'hash', fields => $case_template}
+                    );
+
+                    unless ($case_qv->has_errors) {
+                        $template->{'fields'}{$field} = $case->[1];
+
+                        last;
+                    }
+                }
+            }
+
+            if (defined($set_template)) {
+                throw Exception::Validator gettext('Option "%s" must be code', 'set_template')
+                  if ref($set_template) ne 'CODE';
+
+                try {
+                    my $new_template = $set_template->($qv, $data);
+
+                    if (defined($new_template) && ref($new_template) eq 'HASH') {
+                        $template->{'fields'}{$field} = $new_template;
+                    }
+                }
+                catch {
+                    throw Exception::Validator gettext('Internal error');
+                };
             }
         }
     }

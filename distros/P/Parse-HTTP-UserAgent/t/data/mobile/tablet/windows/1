@@ -1,0 +1,13 @@
+[AGENT]
+
+Mozilla/5.0 (Windows NT 6.3; ARM; Trident/7.0; Touch; rv:11.0) like Gecko
+
+device          => 'ARM',
+name            => 'MSIE',
+os              => 'Windows 8.1',
+parser          => 'msie11',
+toolkit         => [ 'Trident', '7.0', '7.000' ],
+touch           => 1,
+version         => '11.000',
+version_raw     => '11.0',
+mobile          => 1,

@@ -1,5 +1,5 @@
 package Moose::Exception::ReferencesAreNotAllowedAsDefault;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -23,4 +23,5 @@ sub _build_message {
         $self->attribute_name."' in a CODE reference (ex: sub { [] } and not [])";
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

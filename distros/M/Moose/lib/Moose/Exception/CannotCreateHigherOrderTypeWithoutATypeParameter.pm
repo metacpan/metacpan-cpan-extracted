@@ -1,5 +1,5 @@
 package Moose::Exception::CannotCreateHigherOrderTypeWithoutATypeParameter;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -9,4 +9,5 @@ sub _build_message {
     "You cannot create a Higher Order type without a type parameter";
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

@@ -1,9 +1,10 @@
 Changes
 lib/XML/RPC.pm
-make-dist.sh
 Makefile.PL
-MANIFEST
-META.yml
+MANIFEST			This list of files
+MANIFEST.SKIP
 README
 t/00-load.t
 t/01.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

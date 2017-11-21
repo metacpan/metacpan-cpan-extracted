@@ -1,5 +1,5 @@
 package Crypt::DRBG;
-$Crypt::DRBG::VERSION = '0.000002';
+$Crypt::DRBG::VERSION = '0.001000';
 use 5.006;
 use strict;
 use warnings;
@@ -12,15 +12,43 @@ Crypt::DRBG - Base class for fast, cryptographically-secure PRNGs
 
 =head1 SYNOPSIS
 
-    use Crypt::DRBG::HMAC;
+	use Crypt::DRBG::HMAC;
 
-    my $drbg = Crypt::DRBG::HMAC->new(auto => 1);
+	my $drbg = Crypt::DRBG::HMAC->new(auto => 1);
 	my $data = $drbg->generate(42);
-    ... # do something with your 42 bytes here
+	... # do something with your 42 bytes here
 
 	my $drbg2 = Crypt::DRBG::HMAC->new(seed => "my very secret seed");
 	my @randdigits = $drbg->randitems(20, [0..9]);
 	... # do something with your 20 random digits here
+
+=head1 DESCRIPTION
+
+Crypt::DRBG is a collection of fast, cryptographically-secure PRNGs
+(pseudo-random number generators).  It can be useful for a variety of
+situations:
+
+=over 4
+
+=item *
+
+Cryptographically secure random numbers are needed in production, but for
+testing reproducibility is needed
+
+=item *
+
+A large number of random values are needed, but using /dev/urandom (or the
+equivalent) frequently or persistently is unsuitable
+
+=item *
+
+Selection of random values in a range (e.g. digits, letters, identifiers) is
+required and biasing the results is unacceptable
+
+=back
+
+Crypt::DRBG::HMAC is the recommended class to use, as it's currently the
+fastest.  All algorithms are assumed to provide equivalent security.
 
 =head1 SUBROUTINES/METHODS
 
@@ -38,9 +66,9 @@ fork_safe.
 
 =item autoseed
 
-If true, derive a seed from /dev/urandom, /dev/arandom, or /dev/random, in that
-order.  Windows support is lacking, but may be added in the future; however,
-this should function on Cygwin.
+If true, derive a seed from Crypt::URandom, if available,
+or from /dev/urandom, /dev/arandom, or /dev/random, in that order.
+Windows support requires Crypt::URandom to function properly.
 
 =item seed
 
@@ -84,7 +112,15 @@ before generating more.
 sub _rand_bytes {
 	my ($len) = @_;
 
-	my $data = '';
+	my $data = eval {
+		require Crypt::URandom;
+		Crypt::URandom::urandom($len);
+	};
+
+	return $data if defined $data;
+
+	$data = '';
+
 	my @sources = qw{/dev/urandom /dev/arandom /dev/random};
 	foreach my $source (@sources) {
 		my $fh = IO::File->new($source, 'r') or next;
@@ -167,6 +203,7 @@ sub _check_reseed {
 		die "No seed source" if !$self->{seedfunc};
 		$self->_reseed($self->{seedfunc}->($self->{seedlen}));
 		$self->{pid} = $$ if $self->{fork_safe};
+		$self->{cache} = '' if defined $self->{cache};
 	}
 
 	return 1;
@@ -187,9 +224,10 @@ sub initialize {
 		$self->{cache_size} = $params{cache};
 	}
 
-	$self->{fork_safe} = $params{fork_safe};
-	$self->{fork_safe} = 1 if $params{auto} && !defined $params{fork_safe};
-	$self->{pid} = $$ if $self->{fork_safe};
+	if ($params{fork_safe} || (!exists $params{fork_safe} && $params{auto})) {
+		$self->{fork_safe} = 1;
+		$self->{pid} = $$;
+	}
 
 	return 1;
 }
@@ -210,6 +248,8 @@ sub generate {
 
 	return $self->_generate($len, $seed)
 		if !defined $self->{cache} || defined $seed;
+
+	$self->_check_reseed;
 
 	my $data = '';
 	my $left = $len;
@@ -347,7 +387,7 @@ automatically be notified of progress on your bug as I make changes.
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc Crypt::DRBG
+	perldoc Crypt::DRBG
 
 
 You can also look for information at:

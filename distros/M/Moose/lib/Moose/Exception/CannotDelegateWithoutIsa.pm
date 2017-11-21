@@ -1,5 +1,5 @@
 package Moose::Exception::CannotDelegateWithoutIsa;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -9,4 +9,5 @@ sub _build_message {
     "Cannot delegate methods based on a Regexp without a type constraint (isa)";
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

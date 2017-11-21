@@ -1,0 +1,7 @@
+Testing detectid
+
+<DetectIdentifier context="#stay" attribute="Match" />
+<Test>
+detecting a bunch of identifiers 34does &&do&&
+<Test>
+

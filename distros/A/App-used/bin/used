@@ -9,6 +9,7 @@
 use strict;
 use warnings;
 use version;
+use v5;
 use Getopt::Long;
 use Pod::Usage;
 use List::Util qw/max/;
@@ -22,7 +23,7 @@ use Perl::MinimumVersion;
 use Term::ANSIColor qw/colored/;
 use YAML::Syck qw/LoadFile/;
 
-our $VERSION = version->new('0.0.7');
+our $VERSION = version->new('0.0.8');
 my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 
 my %option = (
@@ -304,6 +305,7 @@ sub process_file {
     push @modules, $contents =~ m{^ \s* (?: (?: use | require ) \s+ ok | extends ) \s+ ['"]( [\w:]+ )['"] }gxms;
 
     for my $module (@modules) {
+        next if $module =~ /^v5$/;
         $used->{$module}++;
     }
 

@@ -1,10 +1,22 @@
 Revision history for Perl module Unicode::Collate.
 
+1.24  Sun Nov 19 22:06:03 2017
+    - xs: [rt.cpan.org #123631] Switch Unicode::Collate to XSLoader
+
+1.23  Mon Nov 13 19:10:28 2017
+    - Now UCA_Version 36 (for Unicode 10.0.0) is supported.
+      * But the default UCA_Version is still 34.
+    - added nushu.t in t.
+
+1.22  Sat Nov 11 10:53:35 2017
+    - internal: someone suggests using 'exists' for checking the truth of
+      $collator->{mapping}{$variable} and $collator->{maxlength}{$variable},
+      where $variable may stand for codepoints whose mapping is not defined;
+      though such a problem was not reproduced on my environment.
+
 1.21  Sat Nov  4 10:49:19 2017
     - mklocale: [rt.cpan.org #121664] . removed from @INC (take 2)
     - DUCET is updated (for Unicode 9.0.0) as Collate/allkeys.txt.
-      * Please notice that allkeys.txt will be overwritten if you have had
-        other allkeys.txt already.
     - The default UCA_Version is 34.
     - added tangut.t in t.
     - Locale/*.pl and CJK/Korean.pm are updated.
@@ -25,8 +37,6 @@ Revision history for Perl module Unicode::Collate.
 
 1.17  Wed Oct 26 21:46:12 2016
     - DUCET is updated (for Unicode 8.0.0) as Collate/allkeys.txt.
-      * Please notice that allkeys.txt will be overwritten if you have had
-        other allkeys.txt already.
     - The default UCA_Version is 32.
     - U+9FCD..U+9FD5 and U+2B820..U+2CEA1 are new CJK unified ideographs.
     - Cyrillic contractions except SHORT I are removed from DUCET.
@@ -47,7 +57,7 @@ Revision history for Perl module Unicode::Collate.
 
 1.14  Sat Jul 11 13:20:03 2015
     - [rt.cpan.org #105621]
-      mklocale fails because it creates Locale direcory without executable bit
+      mklocale fails as it creates Locale directory without executable bit.
 
 1.13  Sat Jul 11 12:13:50 2015
     - something to remove 'use Unicode::Collate' from CJK/Korean.pm
@@ -78,8 +88,8 @@ Revision history for Perl module Unicode::Collate.
     - XS: for the world without utf8n_to_uvuni().
 
 1.06  Tue May 27 21:11:09 2014
-    - 0.67's improved discontiguous contractions is invalidated by default
-      and is supported as a parameter 'long_contraction.'
+    - 0.67's improved discontiguous contractions are invalidated by default
+      and are supported as a parameter 'long_contraction.'
 
 1.05  Sat May 24 16:30:42 2014
     - XS: avoid unused expression 1; for no-op.

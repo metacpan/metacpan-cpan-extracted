@@ -1,5 +1,5 @@
 package Moose::Exception::CircularReferenceInAlso;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -27,4 +27,5 @@ sub _build_message {
            ."$existing_stack and $also_member";
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

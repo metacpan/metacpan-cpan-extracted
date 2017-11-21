@@ -7,6 +7,9 @@ WriteMakefile(
     NAME            => 'namespace::clean::xs',
     VERSION_FROM    => 'lib/namespace/clean/xs.pm',
     AUTHOR          => ['Sergey Aleynikov <randir@cpan.org>'],
+    CONFIGURE_REQUIRES => {
+        'ExtUtils::MakeMaker'   => 6.64,
+    },
     PREREQ_PM       => {
         'XSLoader'    => 0,
     },
@@ -16,7 +19,7 @@ WriteMakefile(
     META_MERGE => {
         resources => {
             repository => 'https://github.com/dur-randir/namespace-clean-xs',
-            bugtracker => {web => 'https://github.com/dur-randir/namespace-clean-xs/issues'},
+            bugtracker => 'https://github.com/dur-randir/namespace-clean-xs/issues',
         },
         dynamic_config => 0,
     },

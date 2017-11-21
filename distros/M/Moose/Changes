@@ -1,6 +1,27 @@
 Also see Moose::Manual::Delta for more details of, and workarounds
 for, noteworthy changes.
 
+2.2007   2017-11-12
+
+  [DOCUMENTATION]
+
+  - The Moose::Manual::Attributes pod has been amended to clarify that
+    'required' attributes can be satisfied with a 'default' or 'builder' sub,
+    and that 'ro' attributes can be set through the constructor.
+
+  - The Moose::Manual::Types pod has been amended to recommend
+    Params::ValidationCompiler and Moops instead of older modules (which are
+    slow and/or deprecated).
+
+  - other small documentation fixes (thanks to Chris Weyl and Anirvan
+    Chatterjee!)
+
+  [OTHER]
+
+  - some dead code has been removed (thanks, Jens Berthold!)
+
+  - all Moose exception classes have been made immutable.
+
 2.2006   2017-07-12
 
   [BUG FIXES]
@@ -4654,8 +4675,8 @@ for, noteworthy changes.
         release because it uses the a new
         instance sub-protocol and a fairly
         complete Role implementation. It has
-        not yet been optimized, so it slower
-        the the previous CPAN version. This
+        not yet been optimized, so it is slower
+        than the previous CPAN version. This
         release also lacks good updated docs,
         the official release will have updated docs.
 

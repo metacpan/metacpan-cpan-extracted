@@ -36,5 +36,35 @@ is_deeply($arra, [qw/a b c/], 'array ref without coercion');
 my $stringArrayref = $maybe->coe('a b c');
 is_deeply($stringArrayref, [qw/a b c/], 'array ref via coercion');
 
+my @tnamed = $maybe->named;
+is_deeply(\@tnamed, [qw/one two three/]);
+
+my @cnamed = $maybe->named(2 => 'okay');
+is_deeply(\@cnamed, [qw/one two okay/]);
+
+my @ccamed = $maybe->named(0 => 'meh', 2 => 'okay');
+is_deeply(\@ccamed, [qw/meh two okay/]);
+
+my @thnamed = $maybe->hnamed;
+is_deeply(\@thnamed, [qw/one two/, { three => 'four' }]);
+
+my @chnamed = $maybe->hnamed(2 => { five => 'six' });
+is_deeply(\@chnamed, [qw/one two/, { five => 'six' }]);
+
+my @tanamed = $maybe->anamed;
+is_deeply(\@tanamed, [qw/one two/, [qw/three four/]]);
+
+my @canamed = $maybe->anamed(2 => ['five', 'six']);
+is_deeply(\@canamed, [qw/one two/, [qw/five six/]]);
+
+my @keys = $maybe->keys;
+is_deeply(\@keys, [qw/three two one/]);
+
+my @hkeys = $maybe->keys(one => 'a', two => 'b', three => 'c');
+is_deeply(\@hkeys, [qw/c b a/]);
+
+my @hrkeys = $maybe->keys({one => 'a', two => 'b', three => 'c'});
+is_deeply(\@hrkeys, [qw/c b a/]);
+
 done_testing();
 

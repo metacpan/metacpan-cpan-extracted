@@ -1,0 +1,4 @@
+id,effect_type,effect_parameters,description_parameters
+1,1,"{""night_resistance"":50}","{""affect"":""a little""}"
+2,1,"{""night_resistance"":75}","{""affect"":""fairly""}"
+3,1,"{""night_resistance"":100}","{""affect"":""fully""}"

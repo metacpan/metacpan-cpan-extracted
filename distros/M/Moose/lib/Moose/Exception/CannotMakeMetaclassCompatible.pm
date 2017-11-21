@@ -1,5 +1,5 @@
 package Moose::Exception::CannotMakeMetaclassCompatible;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -19,4 +19,5 @@ sub _build_message {
     return "Can't make $class_name compatible with metaclass $superclass";
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

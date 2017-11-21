@@ -7,38 +7,31 @@ use Catmandu::Store::DBI::Bag;
 use Moo;
 use namespace::clean;
 
-our $VERSION = "0.0511";
+our $VERSION = "0.0701";
 
 with 'Catmandu::Store';
 with 'Catmandu::Transactional';
 
 has data_source => (
-    is => 'ro',
+    is       => 'ro',
     required => 1,
-    trigger => sub {
+    trigger  => sub {
         my $ds = $_[0]->{data_source};
         $ds = $ds =~ /^DBI:/i ? $ds : "DBI:$ds";
         $_[0]->{data_source} = $ds;
     },
 );
-has username => (is => 'ro', default => sub { '' });
-has password => (is => 'ro', default => sub { '' });
+has username => (is => 'ro', default => sub {''});
+has password => (is => 'ro', default => sub {''});
 has timeout => (is => 'ro', predicate => 1);
 has reconnect_after_timeout => (is => 'ro');
-has handler => (is => 'lazy');
-has _in_transaction => (
-    is => 'rw',
-    writer => '_set_in_transaction',
-);
-has _connect_time => (is => 'rw', writer => '_set_connect_time');
-has _dbh => (
-    is => 'lazy',
-    builder => '_build_dbh',
-    writer => '_set_dbh',
-);
+has handler                 => (is => 'lazy');
+has _in_transaction         => (is => 'rw', writer => '_set_in_transaction',);
+has _connect_time           => (is => 'rw', writer => '_set_connect_time');
+has _dbh => (is => 'lazy', builder => '_build_dbh', writer => '_set_dbh',);
 
 sub handler_namespace {
-   'Catmandu::Store::DBI::Handler';
+    'Catmandu::Store::DBI::Handler';
 }
 
 sub _build_handler {
@@ -48,11 +41,14 @@ sub _build_handler {
     my $pkg;
     if ($driver =~ /pg/i) {
         $pkg = 'Pg';
-    } elsif ($driver =~ /sqlite/i) {
+    }
+    elsif ($driver =~ /sqlite/i) {
         $pkg = 'SQLite';
-    } elsif ($driver =~ /mysql/i) {
+    }
+    elsif ($driver =~ /mysql/i) {
         $pkg = 'MySQL';
-    } else {
+    }
+    else {
         Catmandu::NotImplemented->throw(
             'Only Pg, SQLite and MySQL are supported.');
     }
@@ -62,36 +58,40 @@ sub _build_handler {
 sub _build_dbh {
     my ($self) = @_;
     my $opts = {
-        AutoCommit => 1,
-        RaiseError => 1,
-        mysql_auto_reconnect => 1,
+        AutoCommit                       => 1,
+        RaiseError                       => 1,
+        mysql_auto_reconnect             => 1,
+        mysql_enable_utf8                => 1,
+        pg_utf8_strings                  => 1,
         sqlite_use_immediate_transaction => 1,
+        sqlite_unicode                   => 1,
     };
-    my $dbh = DBI->connect(
-        $self->data_source,
-        $self->username,
-        $self->password,
-        $opts,
-    );
+    my $dbh
+        = DBI->connect($self->data_source, $self->username, $self->password,
+        $opts,);
     $self->_set_connect_time(time);
     $dbh;
 }
 
 sub dbh {
-    my ($self) = @_;
-    my $dbh = $self->_dbh;
+    my ($self)       = @_;
+    my $dbh          = $self->_dbh;
     my $connect_time = $self->_connect_time;
     my $driver = $dbh->{Driver}{Name} // '';
 
     # MySQL has builtin option mysql_auto_reconnect
-    if ($driver !~ /mysql/i && $self->has_timeout &&
-            time - $connect_time > $self->timeout) {
+    if (   $driver !~ /mysql/i
+        && $self->has_timeout
+        && time - $connect_time > $self->timeout)
+    {
         if ($self->reconnect_after_timeout || !$dbh->ping) {
+
             # ping failed, so try to reconnect
             $dbh->disconnect;
             $dbh = $self->_build_dbh;
             $self->_set_dbh($dbh);
-        } else {
+        }
+        else {
             $self->_set_connect_time(time);
         }
     }
@@ -118,7 +118,7 @@ sub transaction {
         1;
     } or do {
         my $err = $@;
-        eval { $dbh->rollback };
+        eval {$dbh->rollback};
         $self->_set_in_transaction(0);
         die $err;
     };
@@ -152,14 +152,30 @@ Version 0.0424
     # From the command line
     $ catmandu import JSON to DBI --data_source SQLite:mydb.sqlite < data.json
 
-    # From Perl code
+    # Or via a configuration file
+    $ cat catmandu.yml
+    ---
+    store:
+       mydb:
+         package: DBI
+         options:
+            data_source: "dbi:mysql:database=mydb"
+            username: xyz
+            password: xyz
+    ...
+    $ catmandu import JSON to mydb < data.json
+    $ catmandu export mydb to YAML > data.yml
+    $ catmandu export mydb --id 012E929E-FF44-11E6-B956-AE2804ED5190 to JSON > record.json
+    $ catmandu count mydb
+    $ catmandy delete mydb
 
-    use Catmandu;
+    # From perl
+    use Catmandu::Store::DBI;
 
-    my $store = Catmandu->store('DBI',
-        data_source => 'dbi:mysql:database=test',
-        username => 'foo', # optional
-        password => 'bar', # optional
+    my $store = Catmandu::Store::DBI->new(
+        data_source => 'DBI:mysql:database=mydb', # prefix "DBI:" optional
+        username => 'xyz', # optional
+        password => 'xyz', # optional
     );
 
     my $obj1 = $store->bag->add({ name => 'Patrick' });

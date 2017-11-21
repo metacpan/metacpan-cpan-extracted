@@ -1,8 +1,12 @@
 Revision history for Perl distribution libnet
 
+3.11 2017-11-14
+
+    - Treat FTP MLSD commands case-insensitively.  [Brian M. Carlson, PR#32]
+
 3.10 2016-08-01
 
-    - Remove . from @INC when loading optional modules.  [Tony Cook, Perl
+    - Removed . from @INC when loading optional modules.  [Tony Cook, Perl
       RT#127834, CVE-2016-1238]
 
     - Removed the default Net::Cmd::timeout() since it inadvertently overrode

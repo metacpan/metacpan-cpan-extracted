@@ -1,5 +1,5 @@
 package Moose::Exception::CannotCreateMethodAliasLocalMethodIsPresent;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -21,4 +21,5 @@ sub _build_message {
     "Cannot create a method alias if a local method of the same name exists";
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

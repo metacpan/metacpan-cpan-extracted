@@ -92,7 +92,6 @@ t/augment_class.t
 t/auto_load_model.t
 t/backend_ini.t
 t/backend_ini_with_section_map.t
-t/backend_mgr.t
 t/backend_multiple.t
 t/backend_plainfile.t
 t/backend_yaml.t

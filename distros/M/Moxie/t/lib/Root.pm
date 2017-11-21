@@ -1,5 +1,6 @@
 package Root;
-use Moxie;
+use Moxie
+    traits => [':experimental'];
 
 extends 'Moxie::Object';
 
@@ -7,7 +8,7 @@ has '_foo';
 
 my sub _foo : private;
 
-sub BUILDARGS : init( foo? => _foo );
+sub BUILDARGS : strict( foo? => _foo );
 
 sub foo { _foo }
 

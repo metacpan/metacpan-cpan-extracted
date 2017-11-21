@@ -6,6 +6,9 @@ use Path::Tiny qw( path );
 use lib 't/lib';
 use Repo;
 
+skip_all 'Test requires Sort::Versions'
+  unless eval { require Sort::Versions; 1 };
+
 my $build = alienfile_ok q{
   use alienfile;
   

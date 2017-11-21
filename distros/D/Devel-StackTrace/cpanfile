@@ -11,6 +11,7 @@ on 'test' => sub {
   requires "Test::More" => "0.96";
   requires "base" => "0";
   requires "bytes" => "0";
+  requires "perl" => "5.006";
 };
 
 on 'test' => sub {
@@ -19,6 +20,7 @@ on 'test' => sub {
 
 on 'configure' => sub {
   requires "ExtUtils::MakeMaker" => "0";
+  requires "perl" => "5.006";
 };
 
 on 'configure' => sub {
@@ -26,6 +28,8 @@ on 'configure' => sub {
 };
 
 on 'develop' => sub {
+  requires "Code::TidyAll" => "0.56";
+  requires "Code::TidyAll::Plugin::SortLines::Naturally" => "0.000003";
   requires "Code::TidyAll::Plugin::Test::Vars" => "0.02";
   requires "File::Spec" => "0";
   requires "IO::Handle" => "0";
@@ -49,5 +53,4 @@ on 'develop' => sub {
   requires "Test::Synopsis" => "0";
   requires "Test::Vars" => "0.009";
   requires "Test::Version" => "2.05";
-  requires "blib" => "1.01";
 };

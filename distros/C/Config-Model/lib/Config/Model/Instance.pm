@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Instance;
-$Config::Model::Instance::VERSION = '2.113';
+$Config::Model::Instance::VERSION = '2.114';
 #use Scalar::Util qw(weaken) ;
 use strict;
 
@@ -18,7 +18,6 @@ use Mouse::Util::TypeConstraints;
 use MouseX::StrictConstructor;
 with "Config::Model::Role::NodeLoader";
 
-use Text::Diff;
 use File::Path;
 use Path::Tiny;
 use Log::Log4perl qw(get_logger :levels);
@@ -284,7 +283,6 @@ sub reset_config {
         config_class_name => $self->{root_class_name},
         instance          => $self,
         container         => $self,
-        check             => $self->read_check,
         config_file       => $self->{config_file},
     );
 }
@@ -456,23 +454,29 @@ sub list_changes {
 
     foreach my $c (@$l) {
         my $path = $c->{path} ;
-        $path .= ': ' if $path;
 
         my $vt = $c->{value_type} || '';
-        my ( $o, $n ) = map { $_ // '<undef>'; } ( $c->{old}, $c->{new} );
+        my ( $o, $n ) = map {
+            if (defined $_) {
+                s/\n/ /g;
+                substr ($_, 60) = '[...]' if length $_ > 60; # limit string length
+            }
+            $_;
+        } ( $c->{old}, $c->{new} );
 
-        if ( $vt eq 'string' and ( $o =~ /\n/ or $n =~ /\n/ ) ) {
-            # append \n if needed so diff works as expected
-            map { $_ .= "\n" unless /\n$/; } ( $o, $n );
-            my $diff = diff \$o, \$n;
-            push @all, $path . ( $c->{note} ? " # $c->{note}" : '' ) . "\n" . $diff;
+        my $note = $c->{note} ? " # $c->{note}" : '';
+
+        if ( defined $n and not defined $o ) {
+            push @all, "$path has new value: '$n'$note";
         }
-        elsif ( defined $c->{old} or defined $c->{new} ) {
-            map { s/\n.*/.../s; } ( $o, $n );
-            push @all, $path."'$o' -> '$n'" . ( $c->{note} ? " # $c->{note}" : '' );
+        elsif ( not defined $n and defined $o) {
+            push @all, "$path deleted value: '$o'$note";
         }
-        elsif (defined $c->{note}){
-            push @all, $path.$c->{note};
+        elsif ( defined $o and defined $n ) {
+            push @all, "$path: '$o' -> '$n'$note";
+        }
+        elsif ( defined $c->{note} ) {
+            push @all, "$path: ".$c->{note};
         }
         else {
             # something's unexpected with the call to notify_change
@@ -646,7 +650,7 @@ Config::Model::Instance - Instance of configuration tree
 
 =head1 VERSION
 
-version 2.113
+version 2.114
 
 =head1 SYNOPSIS
 

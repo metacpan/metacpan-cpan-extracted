@@ -1,9 +1,237 @@
 ==================================================
-Changes from 2015-03-02 00:00:00 +0000 to present.
+Changes from 2015-11-17 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.003 at 2017-03-01 06:27:14 +0000
+version 0.004 at 2017-11-16 17:45:55 +0000
+------------------------------------------
+
+  Change: b7737fd29826f94cfab9f91d02bfb142ff7a9dac
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2017-11-16 18:43:11 +0000
+
+    Remove App::ElasticSearch::Utilites from the prereqs and fix some bugs with
+    the indexer. 
+
+  Change: ed5eb795a6a7beb21e6ce36c66b527e5b727fb40
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2017-11-16 09:56:57 +0000
+
+    Remove the eris::dictionary global singleton
+
+    It makes more sense to allow the schema to define it's own dictionary.
+    Dictionaries can now be configured per-schema allowing them to be as
+    configurable as necessary. Allow hash flattening of the documents and
+    enable that option in eris-context.pl. 
+
+  Change: eea981c6695f603eccde4865581b84a689a877c5
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2017-11-05 10:33:28 +0000
+
+    Regenerated README 
+
+  Change: 6c9167d2ed6e6f2b6b655b9a2137482791c418b2
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2017-11-04 16:20:31 +0000
+
+    Catch documentation up to the current state of affairs. 
+
+  Change: 0d15fa7fcf4b0fad7d8f83904ce5c1edcc47dc9a
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2017-11-04 15:53:56 +0000
+
+    Removing the type library since I'm not using it anymore 
+
+  Change: 773f3a247bb14dde25e4f393e5ac6dfbf7c132e6
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2017-11-04 15:53:22 +0000
+
+    Added all POD required for author tests to pass
+
+    Add version tags in the modules where they were missing Add abstracts
+    everywhere they were missing Ensure all the final POD elements were closed 
+
+  Change: 55293219e715ac9668c09c25afe80fa901ae917c
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2017-11-04 13:04:27 +0000
+
+    Fix Perl::Critic and POD syntax errors. 
+
+  Change: 129c0539a53e7f28f44e506c412c231a053fb76c
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2017-10-29 08:09:15 +0000
+
+    Fix parse and pod errors. 
+
+  Change: ddfe01b50fc4e2893924feb3d036ec7559059b9c
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2017-10-29 07:46:18 +0000
+
+    Started documenting the overall project goals and design 
+
+  Change: 128d6c3fc0ec36504055fcbfaa379012e0e018d4
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2017-10-28 11:54:01 +0000
+
+    Documentation added to more classes. 
+
+  Change: 570dfb821e79bbffd202520ead08731837e28daf
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2017-10-28 10:47:53 +0000
+
+    Documentation added to roles
+
+    * Technical debt being collected * Migrate the '_build_name' method all the
+    way back to
+
+    eris::role::plugin.
+
+    Push down smarter logic for automatically determining the name of a
+
+    plugin. Require a namespace parameter for eris::role::plugin that's
+
+    automatically passed from the eris::role::pluggable consumer from it's
+
+    required parameter. This makes naming the consumers easier and smarter. 
+
+  Change: 21799c506625b11dcd27696297fda40de866d865
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2017-10-27 17:36:48 +0000
+
+    Allow schemas to choose not to be final.
+
+    This means a single log entry can be interpretted by more than one schema.
+    This might be useful for storing events in a large short term index, but
+    particular events in a longer term index. 
+
+  Change: fdf10a5c1ad228c6555e57d858e97089baecc45c
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2017-10-26 23:04:28 +0000
+
+    Working out the kinks in cleaning up the separation of eris::log and the
+    underlying elasticsearch schemas. 
+
+  Change: e24a07509590e27cdfa8e228bdd3a48b2e0f284a
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2017-10-26 19:14:51 +0000
+
+    Separation of the schema and parsing done! 
+
+  Change: 27201c0df79a737549e701596e710d7797521c1e
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2017-10-20 21:14:58 +0000
+
+    Reworking the system
+
+    * Contextualizing and Storage separated so you can apply different
+
+    storage rules to the same message * Working out how to mimic the ES
+    mappings 
+
+  Change: 06deb277d97b92779b1539ec7a851242eedbdd73
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2017-08-15 20:19:02 +0000
+
+    Store the raw message
+
+    * Add the raw context and update the elasticsearch mappings to store the
+
+    raw data without indexing it. * Anchor dhcpd parser * Fix protocol
+    extraction in pfsense::filterlog 
+
+  Change: bc4da89bcb71189294d75cf95cfedc1ea0ec2eb8
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2017-07-14 23:32:17 +0000
+
+    Add static context to add k/v pairs to every log event.
+
+    Add a special "double star" matcher to match every event. Add a
+    "SuppressWarnings" variable to the contexts. If a context wishes to be
+    silently ignored, it can set "our $SuppressWarnings".
+
+    Use both of these features in the static context. The advantage is one less
+    subroutine dispatch if the static context isn't configured. 
+
+  Change: 867feb6940ef4d11b275bcd6e56acf63296d3558
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2017-07-14 18:22:46 +0000
+
+    Overhaul of the reference implementations.
+
+    * eris-eris-client.pl - Added options to control the flow of information.
+
+    Added graphite output for statistics reporting. Currently only
+
+    "dispatched" statistics work. Reads the config file for a client
+
+    section, which is then passed to the POE::Component::Client::eris
+
+    constructor, e.g.:
+
+    client:
+
+    Subscribe: [ "sshd", "sudo", "kernel" ]
+
+    Match: [ "error", "failed", "failure" ]
+
+    * eris-es-indexer.pl - Added support for ES versioning via the
+
+    --es-version option. Defaults to '5'. Supports the following options
+
+    via the config file:
+
+    es_addr: a host in the cluster to index to
+
+    es_default_type: Type to index message
+
+    es_default_index: 'syslog' Index to write the message to
+
+    TODO: eris-es-indexer.pl should autodetect the version of the cluster and
+    apply the appropriate mapping.
+
+    es_addr should accept an array 
+
+  Change: 385513cd4c1e713dd2565d693832960110f4ada2
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2017-07-06 07:38:26 +0000
+
+    More cleanup, record pid and program sub in a CEE Compatible way. 
+
+  Change: 93fa0a2b5926c7d1c697f90cdf0149e26c7dff9c
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2017-07-05 07:37:51 +0000
+
+    Fix up tags and streamline context calls. 
+
+  Change: abb30c813e3589349dc66f8d89058fb08ab50471
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2017-07-05 06:54:45 +0000
+
+    Fix protocol handling
+
+    Normalize protocols to lowercase. Use 'proto_app' instead of 'proto' per
+    CEE. Add 'service' of 'firewall' to the logs. 
+
+  Change: fe5849d08fd174325074fb84bfd0db4791da3ba6
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2017-07-05 06:30:33 +0000
+
+    Added parsing for pfSense's CSV filterlog.
+
+    Changes to the eris-context.pl tool to accomodate mixed case names.
+    pfSense::filterlog can parse out IPv(4|6) and TCP/UDP meta-data 
+
+  Change: 9d845334e6c321fad188936fa1ba8228e8b8da49
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2017-07-05 05:28:58 +0000
+
+    Added dhcpd parser.
+
+    Fixed up older contexts to take advantage of better logic. Added help
+    option to the eris-context script 
+
+------------------------------------------
+version 0.003 at 2017-03-01 06:24:50 +0000
 ------------------------------------------
 
   Change: acee6050a6cae7fee3db0b8f962404302c6a8c1a

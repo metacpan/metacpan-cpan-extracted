@@ -1,0 +1,106 @@
+#!/usr/bin/env perl
+
+=pod
+
+=head1 NAME
+
+wrt-display - print static HTML from wrt entries
+
+=head1 USAGE
+
+    wrt display new       # newest entries
+    wrt display all       # table of contents for all dated entries
+    wrt display 2016/4/1  # a specific date
+    wrt display 2016/4    # all entries for a specific month
+    wrt display 2016/4    # summary of entries for a year
+    wrt display fulltext  # complete text of archive
+    wrt display feed      # Atom feed of most recent month's entries
+
+    # Take list of entries to display from standard input:
+    echo 2016/4/1 | wrt display --stdin
+
+    # Specify a different config file:
+    wrt display --config ./wrt.json ...
+
+    # Display help:
+    wrt display --help
+
+=head1 DESCRIPTION
+
+C<wrt-display> displays HTML for the given entry or entries in the current wrt
+repository to F<stdout>.  Entries may be specified by date or name.
+
+=head2 Special Entries
+
+B<new> will return entries for the most recent month.
+
+B<feed> will return an Atom feed for the most recent month.
+
+B<all> will return a table-of-contents for all date-based entries.
+
+B<fulltext> will return the full content of all date-based entries in the
+archive.
+
+Months in the form of B<yyyy/mm> will return all entries for that month.
+
+Years in the form of B<yyyy> will return a summary of entries for the year.
+
+Detailed documentation can be found in the L<App::WRT> man page or at
+L<https://github.com/brennen/wrt>.
+
+=head1 LICENSE
+
+    wrt is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+=head1 AUTHOR
+
+Brennen Bearnes
+
+=cut
+
+use 5.10.0;
+
+use strict;
+use warnings;
+no  warnings 'uninitialized';
+
+# use Data::Dumper;
+use Getopt::Long;
+use Pod::Usage;
+use App::WRT;
+
+# Handle options, including help generated from the POD above.  See:
+# - http://perldoc.perl.org/Getopt/Long.html#User-defined-subroutines-to-handle-options
+# - https://metacpan.org/pod/Pod::Usage
+# - http://michael.thegrebs.com/2014/06/08/Pod-Usage/
+my $from_stdin  = 0;
+my $config_file = 'wrt.json';
+GetOptions(
+  stdin  => \$from_stdin,
+  config => \$config_file,
+  help   => sub { pod2usage(0) },
+) or pod2usage(2);
+
+unless (-e $config_file) {
+  die "No wrt config file found.  Tried: $config_file";
+}
+
+my $w = App::WRT::new_from_file($config_file);
+
+# With --stdin, take names of entries to display from standard input, one line
+# per name.  Otherwise, take names from arguments.
+my @to_display = ();
+if ($from_stdin) {
+  while (my $entry = <>) {
+    chomp($entry);
+    push @to_display, $entry;
+  }
+} else {
+  (@to_display) = @ARGV;
+}
+
+print $w->display(@to_display);
+exit(0);

@@ -1,0 +1,51 @@
+---
+abstract: "It's testing tool for CSV (and other structures) by DSL."
+author:
+  - 'mackee a.k.a macopy <macopy123@gmail.com>'
+build_requires: {}
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.13, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-MasterData-Declare
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Test::MasterData::Declare:
+    file: lib/Test/MasterData/Declare.pm
+    version: '0.01'
+  Test::MasterData::Declare::CompareRow:
+    file: lib/Test/MasterData/Declare/CompareRow.pm
+  Test::MasterData::Declare::Reader:
+    file: lib/Test/MasterData/Declare/Reader.pm
+  Test::MasterData::Declare::Row:
+    file: lib/Test/MasterData/Declare/Row.pm
+  Test::MasterData::Declare::Runner:
+    file: lib/Test/MasterData/Declare/Runner.pm
+requires:
+  Class::Accessor::Lite: '0'
+  JSON: '0'
+  Scalar::Util: '0'
+  Test2::V0: '0'
+  Test::Simple: '1.302015'
+  Text::CSV: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/mackee/Test-MasterData-Declare/issues
+  homepage: https://github.com/mackee/Test-MasterData-Declare
+  repository: git://github.com/mackee/Test-MasterData-Declare.git
+version: '0.01'
+x_authority: cpan:MACOPY
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

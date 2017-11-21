@@ -1,5 +1,5 @@
 package Moose::Exception::CannotInitializeMooseMetaRoleComposite;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -26,4 +26,5 @@ sub _build_message {
     'Moose::Meta::Role::Composite instances can only be reinitialized from an existing metaclass instance';
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

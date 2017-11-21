@@ -9,7 +9,6 @@ Makefile.PL
 README
 author.yml
 corpus/example1.tar
-cpanfile
 dist.ini
 examples/castxml.alienfile
 lib/Alien/Build/Git.pm

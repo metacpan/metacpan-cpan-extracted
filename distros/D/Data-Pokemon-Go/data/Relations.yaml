@@ -1,0 +1,192 @@
+ノーマル:
+    effective:
+    invalid:
+        - いわ
+        - はがね
+    void:
+        - ゴースト
+かくとう:
+    effective:
+        - ノーマル
+        - いわ
+        - はがね
+        - こおり
+        - あく
+    invalid:
+        - どく
+        - ひこう
+        - むし
+        - エスパー
+        - フェアリー
+    void:
+        - ゴースト
+どく:
+    effective:
+        - くさ
+        - フェアリー
+    invalid:
+        - どく
+        - じめん
+        - いわ
+        - ゴースト
+    void:
+        - はがね
+じめん:
+    effective:
+        - どく
+        - いわ
+        - はがね
+        - ほのお
+        - でんき
+    invalid:
+        - むし
+        - くさ
+    void:
+        - ひこう
+ひこう:
+    effective:
+        - かくとう
+        - むし
+        - くさ
+    invalid:
+        - いわ
+        - はがね
+        - でんき
+    void:
+むし:
+    effective:
+        - くさ
+        - エスパー
+        - あく
+    invalid:
+        - かくとう
+        - どく
+        - ひこう
+        - ゴースト
+        - はがね
+        - ほのお
+        - フェアリー
+    void:
+いわ:
+    effective:
+        - ひこう
+        - むし
+        - ほのお
+        - こおり
+    invalid:
+        - かくとう
+        - じめん
+        - はがね
+    void:
+ゴースト:
+    effective:
+        - ゴースト
+        - エスパー
+    invalid:
+        - あく
+    void:
+        - ノーマル
+はがね:
+    effective:
+        - いわ
+        - こおり
+        - フェアリー
+    invalid:
+        - はがね
+        - ほのお
+        - みず
+        - でんき
+    void:
+ほのお:
+    effective:
+        - むし
+        - はがね
+        - くさ
+        - こおり
+    invalid:
+        - いわ
+        - ほのお
+        - みず
+        - ドラゴン
+    void:
+みず:
+    effective:
+        - じめん
+        - いわ
+        - ほのお
+    invalid:
+        - みず
+        - くさ
+        - ドラゴン
+    void:
+でんき:
+    effective:
+        - ひこう
+        - みず
+    invalid:
+        - でんき
+        - くさ
+        - ドラゴン
+    void:
+        - じめん
+くさ:
+    effective:
+        - じめん
+        - いわ
+        - みず
+    invalid:
+        - どく
+        - ひこう
+        - むし
+        - はがね
+        - ほのお
+        - くさ
+        - ドラゴン
+    void:
+こおり:
+    effective:
+        - じめん
+        - ひこう
+        - くさ
+        - ドラゴン
+    invalid:
+        - はがね
+        - ほのお
+        - みず
+        - こおり
+    void:
+エスパー:
+    effective:
+        - かくとう
+        - どく
+    invalid:
+        - はがね
+        - あく
+    void:
+        - エスパー
+ドラゴン:
+    effective:
+        - ドラゴン
+    invalid:
+        - はがね
+    void:
+        - フェアリー
+あく:
+    effective:
+        - ゴースト
+        - エスパー
+    invalid:
+        - かくとう
+        - あく
+        - フェアリー
+    void:
+フェアリー:
+    effective:
+        - かくとう
+        - ドラゴン
+        - あく
+    invalid:
+        - どく
+        - はがね
+        - ほのお
+    void:

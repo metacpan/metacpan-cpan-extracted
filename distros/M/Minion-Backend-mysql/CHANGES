@@ -1,5 +1,15 @@
 Revision history for Perl extension Minion::Backend::mysql.
 
+0.11      2017-11-18 13:43:48-06:00 America/Chicago
+
+  [Fixed]
+
+  - Upgraded backend to work with Minion 8 and the Minion admin UI
+
+  - Allow hashref of options to Mojo::mysql. This lets us pass in a full
+    DBI connection string to use options not normally available via the
+    `mysql://` URL string.
+
 0.10      2017-11-05 19:12:38-06:00 America/Chicago
 
   [Fixed]

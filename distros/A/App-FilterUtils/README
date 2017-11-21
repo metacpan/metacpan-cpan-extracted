@@ -1,0 +1,66 @@
+NAME
+
+    App::FilterUtils - Command-line filter utilities
+
+SYNOPSIS
+
+        $ 2base 16 16
+        10
+        $ 2u 👨‍🎓
+        MAN <👨>  128104, Hex 1f468, Octal 372150
+        ZERO WIDTH JOINER <>  8205, Hex 200d, Octal 20015
+        GRADUATION CAP <🎓>  127891, Hex 1f393, Octal 371623
+    
+        $ echo "مِــكَــرٍّ مِــفَــرٍّ مُــقْــبِــلٍ مُــدْبِــرٍ مَــعــاً" | artype
+        ٍّرــَﻜــِﻣ ٍّرــَﻔــِﻣ ٍﻠــِﺒــْﻘــُﻣ ٍرــِﺒْدــُﻣ ًاــﻌــَﻣ
+        $ ascii café
+        caf
+        $ byte 66062639
+        64M
+        $ hz 10000
+        100us
+        $ NFC é | xxd
+        00000000: c3a9 0a                                  ...
+        $ NFD é | xxd
+        00000000: 65cc 810a                                e...
+        $ unac café
+        cafe
+        $ echo "خوخ" | unpt
+        حوح
+        $ echo "مِــكَــرٍّ مِــفَــرٍّ مُــقْــبِــلٍ مُــدْبِــرٍ مَــعــاً" | untashkeel
+        مــكــر مــفــر مــقــبــل مــدبــر مــعــا
+
+USAGE
+
+    All utilities answer to --version and --help. If arguments are
+    provided, they are filtered. If there are no arguments, STDIN is read.
+
+UTILITIES
+
+    App::FilterUtils::2base =item App::FilterUtils::2u =item
+    App::FilterUtils::artype =item App::FilterUtils::ascii =item
+    App::FilterUtils::byte =item App::FilterUtils::hz =item
+    App::FilterUtils::NFC =item App::FilterUtils::NFD =item
+    App::FilterUtils::unac =item App::FilterUtils::unpt =item
+    App::FilterUtils::untashkeel
+
+GIT REPOSITORY
+
+    http://github.com/athreef/App-FilterUtils
+
+SEE ALSO
+
+    Migrated out of my .dotfiles repository
+    <http://github.com/a3f/.dotfiles>
+
+AUTHOR
+
+    Ahmad Fatoum <athreef@cpan.org>, http://a3f.at
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2017 Ahmad Fatoum
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

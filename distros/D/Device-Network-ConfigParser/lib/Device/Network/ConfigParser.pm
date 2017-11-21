@@ -1,6 +1,6 @@
 package Device::Network::ConfigParser;
 # ABSTRACT: A harness for parsing network device configuration.
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 
 use 5.006;
@@ -12,6 +12,7 @@ use Pod::Usage;
 use Perl6::Slurp;
 use Module::Load;
 use Data::Dumper;
+use JSON;
 use Scalar::Util qw{reftype};
 
 
@@ -25,7 +26,7 @@ Device::Network::ConfigParser - harness for parsing network configurations.
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -51,7 +52,9 @@ The harness supports specific parsing modules by:
 
 =item L<Device::Network::ConfigParser::CheckPoint::Gaia>
 
-=item L<Device::Network::ConfigParser::CheckPoint::Expert>
+=item L<Device::Network::ConfigParser::Linux::NetUtils>
+
+=item L<Device::Network::ConfigParser::Linux::iproute2>
 
 =back
 
@@ -96,7 +99,17 @@ The drivers themselves take a filehandle to write the output to (this may be STD
 
 The driver called is based on the C<--output csv> as a command line argument
 
-There is a default 'raw' driver, which uses Data::Dumper to serialise the structure. A module may return its own 'raw' driver which will override this default.
+There are two default drivers: 
+
+=over 4
+
+=item * the 'raw' driver, which uses Data::Dumper to serialise the structure, and
+
+=item * the 'json' driver, which encodes the data structure as JSON.
+
+=back
+
+ A module may return their own 'raw' or 'json' drivers which override these defaults.
 
 =head1 SUBROUTINES
 
@@ -118,8 +131,8 @@ sub app {
     ) or pod2usage(2);
 
     # Set the defaults
-    $args{vendor} //= 'CheckPoint';
-    $args{type}   //= 'Gaia';
+    $args{vendor} //= 'Cisco';
+    $args{type}   //= 'ASA';
     $args{format} //= 'raw';
     $args{output} //= '-';      # STDOUT
 
@@ -142,6 +155,7 @@ sub app {
     my $parser = get_parser();
     my $output_drivers = get_output_drivers();
     $output_drivers->{raw} //= \&_default_raw_output_driver;
+    $output_drivers->{json} //= \&_default_json_output_driver;
     my $active_output_driver = $output_drivers->{ $args{format} };
 
     if (!defined $active_output_driver || reftype $active_output_driver ne 'CODE' ) {
@@ -188,6 +202,12 @@ sub app {
 sub _default_raw_output_driver {
     my ($fh, $filename, $parsed_config) = @_;
     print $fh Dumper($parsed_config);
+}
+
+sub _default_json_output_driver {
+    my ($fh, $filename, $parsed_config) = @_;
+
+    print encode_json($parsed_config);
 }
 
 =head1 AUTHOR

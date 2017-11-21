@@ -46,7 +46,7 @@
             "Type::Tiny" : "1.000005",
             "XML::Parser" : "2.23",
             "XML::Twig" : "3.48",
-            "namespace::clean" : "0.24",
+            "namespace::autoclean" : "0.28",
             "overload" : "0",
             "perl" : "5.006"
          }
@@ -55,35 +55,35 @@
    "provides" : {
       "Map::Tube" : {
          "file" : "lib/Map/Tube.pm",
-         "version" : "3.37"
+         "version" : "3.41"
       },
       "Map::Tube::Line" : {
          "file" : "lib/Map/Tube/Line.pm",
-         "version" : "3.37"
+         "version" : "3.41"
       },
       "Map::Tube::Node" : {
          "file" : "lib/Map/Tube/Node.pm",
-         "version" : "3.37"
+         "version" : "3.41"
       },
       "Map::Tube::Pluggable" : {
          "file" : "lib/Map/Tube/Pluggable.pm",
-         "version" : "3.37"
+         "version" : "3.41"
       },
       "Map::Tube::Route" : {
          "file" : "lib/Map/Tube/Route.pm",
-         "version" : "3.37"
+         "version" : "3.41"
       },
       "Map::Tube::Table" : {
          "file" : "lib/Map/Tube/Table.pm",
-         "version" : "3.37"
+         "version" : "3.41"
       },
       "Map::Tube::Types" : {
          "file" : "lib/Map/Tube/Types.pm",
-         "version" : "3.37"
+         "version" : "3.41"
       },
       "Map::Tube::Utils" : {
          "file" : "lib/Map/Tube/Utils.pm",
-         "version" : "3.37"
+         "version" : "3.41"
       }
    },
    "release_status" : "stable",
@@ -94,6 +94,6 @@
          "web" : "https://github.com/manwar/Map-Tube"
       }
    },
-   "version" : "3.37",
+   "version" : "3.41",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

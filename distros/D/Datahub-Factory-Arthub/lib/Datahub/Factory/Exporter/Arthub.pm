@@ -2,7 +2,7 @@ package Datahub::Factory::Exporter::Arthub;
 
 use Datahub::Factory::Sane;
 
-our $VERSION = '0.93';
+our $VERSION = '0.94';
 
 use Lido::XML;
 use Moo;

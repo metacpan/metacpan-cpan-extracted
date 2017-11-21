@@ -1,5 +1,5 @@
 package Moose::Exception::RequiredAttributeLacksInitialization;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -15,4 +15,5 @@ sub _build_message {
     "A required attribute must have either 'init_arg', 'builder', or 'default'";
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

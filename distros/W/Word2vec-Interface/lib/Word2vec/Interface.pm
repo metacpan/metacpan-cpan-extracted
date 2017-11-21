@@ -4,7 +4,7 @@
 #                                                                                    #
 #    Author: Clint Cuffy                                                             #
 #    Date:    06/16/2016                                                             #
-#    Revised: 09/05/2017                                                             #
+#    Revised: 11/14/2017                                                             #
 #    UMLS Similarity Word2Vec Package Interface Module                               #
 #                                                                                    #
 ######################################################################################
@@ -37,7 +37,7 @@ use Word2vec::Util;
 
 use vars qw($VERSION);
 
-$VERSION = '0.036';
+$VERSION = '0.037';
 
 
 ######################################################################################
@@ -143,10 +143,10 @@ sub new
     my $debugLog            = $self->{ _debugLog };
     my $writeLog            = $self->{ _writeLog };
     $self->{ _spearmans }   = Word2vec::Spearmans->new( $debugLog, $writeLog )                   if !defined ( $self->{ _spearmans } );
-    $self->{ _word2vec }    = Word2vec::Word2vec->new( $debugLog, $writeLog )                 if !defined ( $self->{ _word2vec } );
-    $self->{ _word2phrase } = Word2vec::Word2phrase->new( $debugLog, $writeLog )              if !defined ( $self->{ _word2phrase } );
-    $self->{ _xmltow2v }    = Word2vec::Xmltow2v->new( $debugLog, $writeLog, 1, 1, 1, 1, 2 )  if !defined ( $self->{ _xmltow2v } );
-    $self->{ _util }        = Word2vec::Util->new( $debugLog, $writeLog )                     if !defined ( $self->{ _util } );
+    $self->{ _word2vec }    = Word2vec::Word2vec->new( $debugLog, $writeLog )                    if !defined ( $self->{ _word2vec } );
+    $self->{ _word2phrase } = Word2vec::Word2phrase->new( $debugLog, $writeLog )                 if !defined ( $self->{ _word2phrase } );
+    $self->{ _xmltow2v }    = Word2vec::Xmltow2v->new( $debugLog, $writeLog, 1, 1, 1, 1, 1, 2 )  if !defined ( $self->{ _xmltow2v } );
+    $self->{ _util }        = Word2vec::Util->new( $debugLog, $writeLog )                        if !defined ( $self->{ _util } );
 
     # Set word2vec Directory In Respective Objects
     $self->{ _word2vec }->SetWord2VecExeDir( $self->{ _word2vecDir } );
@@ -729,6 +729,7 @@ sub CLCompileTextCorpus
     my $storeAbstract           = undef;
     my $quickParse              = undef;
     my $compoundWordFile        = undef;
+    my $storeAsSentencePerLine  = undef;
     my $numOfThreads            = undef;
     my $overwriteExistingFile   = undef;
 
@@ -743,6 +744,7 @@ sub CLCompileTextCorpus
         $storeAbstract              = $options{$option}      if $option eq "-abstract";
         $quickParse                 = $options{$option}      if $option eq "-qparse";
         $compoundWordFile           = $options{$option}      if $option eq "-compwordfile";
+        $storeAsSentencePerLine     = $options{$option}      if $option eq "-sentenceperline";
         $numOfThreads               = $options{$option}      if $option eq "-threads";
         $overwriteExistingFile      = $options{$option}      if $option eq "-overwrite";
     }
@@ -769,6 +771,8 @@ sub CLCompileTextCorpus
     $quickParse = 1 if !defined( $quickParse );
     $self->WriteLog( "CLCompileTextCorpus - Warning: Compound Word File Not Defined - Compoundify Option Disabled" ) if !defined( $compoundWordFile );
     $self->XTWSetCompoundifyText( 0 ) if !defined( $compoundWordFile );
+    $self->WriteLog( "CLCompileTextCorpus - Warning: Store As Sentence Per Line Not Defined - Store As Sentence Per Line Disabled" ) if !defined( $storeAsSentencePerLine );
+    $storeAsSentencePerLine = 0 if !defined( $storeAsSentencePerLine );
     print "Warning: Number Of Working Threads Not Defined - Using 1 Thread Per CPU Core\n" if !defined( $numOfThreads ) && $self->GetDebugLog() == 0;
     $self->WriteLog( "CLCompileTextCorpus - Warning: Number Of Working Threads Not Defined - Using 1 Thread Per CPU Core By Default / " . Sys::CpuAffinity::getNumCpus() . " Threads" ) if !defined( $numOfThreads );
     $numOfThreads = Sys::CpuAffinity::getNumCpus() if !defined( $numOfThreads );
@@ -795,15 +799,16 @@ sub CLCompileTextCorpus
 
     # Print Status Messages In The Event Debug Logging Is Disabled
     print "Working Directory: $workingDir\n" if $self->GetDebugLog() == 0;
-    print "Save Directory: $saveDir\n" if $self->GetDebugLog() == 0;
-    print "Start Date: $startDate\n" if $self->GetDebugLog() == 0;
-    print "End Date: $endDate\n" if $self->GetDebugLog() == 0;
-    print "Store Title: $storeTitle - ( 0=Disabled / 1=Enabled )\n" if $self->GetDebugLog() == 0;
-    print "Store Abstract: $storeAbstract - ( 0=Disabled / 1=Enabled )\n" if $self->GetDebugLog() == 0;
-    print "Quick Parse: $quickParse - ( 0=Disabled / 1=Enabled )\n" if $self->GetDebugLog() == 0;
-    print "Warning: No Compound Word File Specified - Compoundify Option Disabled\n" if $self->GetDebugLog() == 0 && $self->XTWGetCompoundifyText() == 0;
-    print "Compound Word File Specified - Compoundify Option Enabled\n" if $self->GetDebugLog() == 0 && $self->XTWGetCompoundifyText() == 1;
-    print "Compound Word File: $compoundWordFile\n" if $self->GetDebugLog() == 0 && $self->XTWGetCompoundifyText() == 1;
+    print "Save Directory: $saveDir\n"       if $self->GetDebugLog() == 0;
+    print "Start Date: $startDate\n"         if $self->GetDebugLog() == 0;
+    print "End Date: $endDate\n"             if $self->GetDebugLog() == 0;
+    print "Store Title: $storeTitle - ( 0=Disabled / 1=Enabled )\n"         if $self->GetDebugLog() == 0;
+    print "Store Abstract: $storeAbstract - ( 0=Disabled / 1=Enabled )\n"   if $self->GetDebugLog() == 0;
+    print "Quick Parse: $quickParse - ( 0=Disabled / 1=Enabled )\n"         if $self->GetDebugLog() == 0;
+    print "Store As Sentence Per Line $storeAsSentencePerLine - ( 0=Disabled / 1=Enabled )\n" if $self->GetDebugLog() == 0 && $self->XTWGetStoreAsSentencePerLine() == 1;
+    print "Warning: No Compound Word File Specified - Compoundify Option Disabled\n"          if $self->GetDebugLog() == 0 && $self->XTWGetCompoundifyText() == 0;
+    print "Compound Word File Specified - Compoundify Option Enabled\n"                       if $self->GetDebugLog() == 0 && $self->XTWGetCompoundifyText() == 1;
+    print "Compound Word File: $compoundWordFile\n"                                           if $self->GetDebugLog() == 0 && $self->XTWGetCompoundifyText() == 1;
 
     $self->WriteLog( "CLCompileTextCorpus - Working Directory: \"$workingDir\"" );
     $self->WriteLog( "CLCompileTextCorpus - Save Directory: \"$saveDir\"" );
@@ -815,6 +820,7 @@ sub CLCompileTextCorpus
     $self->WriteLog( "CLCompileTextCorpus - Number Of Working Threads: $numOfThreads" );
     $self->WriteLog( "CLCompileTextCorpus - Overwrite Previous File: $overwriteExistingFile" );
     $self->WriteLog( "CLCompileTextCorpus - Compoundifying Using File: \"$compoundWordFile\"" ) if $self->XTWGetCompoundifyText() == 1;
+    $self->WriteLog( "CLCompileTextCorpus - Store As Sentence Per Line: $storeAsSentencePerLine" );
 
     my @beginDateAry = split( '/', $startDate );
     my @endDateAry   = split( '/', $endDate );
@@ -840,6 +846,7 @@ sub CLCompileTextCorpus
     $xmlconv->SetQuickParse( $quickParse );
     $xmlconv->SetNumOfThreads( $numOfThreads );
     $xmlconv->SetOverwriteExistingFile( $overwriteExistingFile );
+    $xmlconv->SetStoreAsSentencePerLine( $storeAsSentencePerLine );
 
     if( defined( $compoundWordFile ) && ( -e "$compoundWordFile" ) )
     {
@@ -1132,6 +1139,51 @@ sub CLSortVectorFile
     $self->WriteLog( "CLSortVectorFile - Complete" );
 
     return $result;
+}
+
+sub CLFindSimilarTerms
+{
+    my ( $self, $term, $numberOfSimilarTerms ) = @_;
+
+    # Check(s)
+    $self->WriteLog( "CLFindSimilarTerms - Error: Term Not Defined" )     if !defined( $term );
+    $self->WriteLog( "CLFindSImilarTerms - Error: Term Is Empty String" ) if defined( $term ) && $term eq "";
+    return undef if !defined( $term ) || ( defined( $term  ) && $term eq "" );
+
+    $self->WriteLog( "CLFindSimilarTerms - Warning: Number Of Similar Terms Not Defined / Using Default = 10" ) if !defined( $numberOfSimilarTerms );
+    $numberOfSimilarTerms = 10 if !defined( $numberOfSimilarTerms );
+
+    $self->WriteLog( "CLFindSimilarTerms - Error: Vocabulary Is Empty / No Vector Data In Memory" ) if $self->W2VIsVectorDataInMemory() == 0;
+    return undef if $self->W2VIsVectorDataInMemory() == 0;
+
+    # Get Nearest Similar Neighbors
+    my %similarWords = ();
+    my @returnWords  = ();
+    my $vocabularyHash = $self->W2VGetVocabularyHash();
+
+    # Check To See If The "$term" Parameters Exists Within The Vocabulary
+    my $result = $vocabularyHash->{ $term };
+
+    $self->WriteLog( "CLFindSimilarTerms - Error: \"$term\" Does Not Exist Within The Vocabulary" ) if !defined( $result );
+    return undef if !defined( $result );
+
+    for my $word ( keys %{ $vocabularyHash } )
+    {
+        # Skip Number Of Words and Vector Length Information
+        next if ( $word eq $self->W2VGetNumberOfWords() );
+
+        $result = $self->W2VComputeCosineSimilarity( $term, $word );
+        $similarWords{ $result } = $word if defined( $result );
+    }
+
+    my @sortedValues = sort {$b <=> $a} keys( %similarWords );
+
+    for( 0..$numberOfSimilarTerms )
+    {
+        push( @returnWords, $similarWords{ $sortedValues[ $_] } . " : " . $sortedValues[ $_ ] );
+    }
+
+    return \@returnWords;
 }
 
 sub CleanWord2VecDirectory
@@ -2389,8 +2441,8 @@ sub SetWord2VecDir
     $self->WriteLog( "SetWord2VecDir - Adjusting For \"word2vec\" And \"word2phrase\" Objects" ) if defined( $dir );
 
     # Set word2vec Directory In Respective Objects
-    $self->W2VSetWord2VecExeDir( $dir ) if defined( $dir );;
-    $self->W2PSetWord2PhraseExeDir( $dir ) if defined( $dir );;
+    $self->W2VSetWord2VecExeDir( $dir ) if defined( $dir );
+    $self->W2PSetWord2PhraseExeDir( $dir ) if defined( $dir );
 
     return $self->{ _word2vecDir } = $dir if defined( $dir );
 }
@@ -2732,7 +2784,7 @@ sub W2VSubtractTwoWordVectors
 sub W2VAverageOfTwoWordVectors
 {
     my ( $self, $wordA, $wordB ) = @_;
-    return $self->GetWord2VecHandler()->W2VAverageOfTwoWordVectors( $wordA, $wordB );
+    return $self->GetWord2VecHandler()->AverageOfTwoWordVectors( $wordA, $wordB );
 }
 
 sub W2VGetWordVector
@@ -3386,6 +3438,12 @@ sub XTWGetCompoundifyText
     return $self->GetXMLToW2VHandler()->GetCompoundifyText();
 }
 
+sub XTWGetStoreAsSentencePerLine
+{
+    my ( $self ) = @_;
+    return $self->GetXMLToW2VHandler()->GetStoreAsSentencePerLine();
+}
+
 sub XTWGetNumOfThreads
 {
     my ( $self ) = @_;
@@ -3516,6 +3574,12 @@ sub XTWSetCompoundifyText
 {
     my ( $self, $value ) = @_;
     return $self->GetXMLToW2VHandler()->SetCompoundifyText( $value );
+}
+
+sub XTWSetStoreAsSentencePerLine
+{
+    my ( $self, $value ) = @_;
+    return $self->GetXMLToW2VHandler()->SetStoreAsSentencePerLine( $value );
 }
 
 sub XTWSetBeginDate
@@ -3808,7 +3872,7 @@ Input:
  $word2vec                    -> Word2vec::Word2vec object.
  $word2phrase                 -> Word2vec::Word2phrase object.
  $xmltow2v                    -> Word2vec::Xmltow2v object.
- $interface                        -> Word2vec::Interface object.
+ $interface                   -> Word2vec::Interface object.
  $instanceAry                 -> Word Sense Disambiguation: Array of instances.
  $senseAry                    -> Word Sense Disambiguation: Array of senses.
  $instanceCount               -> Number of Word Sense Disambiguation instances loaded in memory.
@@ -4463,6 +4527,40 @@ Example:
 
  print( "Success!\n" ) if $result == 0;
  print( "Failed!\n" ) if $result == -1;
+
+ undef( $interface );
+
+=head3 CLFindSimilarTerms
+
+Description:
+
+ Fetches an array containing the nearest n terms using cosine similarity as the metric of determining similar terms.
+
+Input:
+
+ $term                  -> Comparison term used to find similar terms.
+ $numberOfSimilarTerms  -> Integer value used to limit the number of elements in array returned.
+
+Output:
+
+ $value                 -> 'Array reference' = Successful / 'undef' = Un-successful
+
+Example:
+
+ use Word2vec::Interface;
+
+ my $interface = Word2vec::Interface->new();
+ my $result = $interface->W2VReadTrainedVectorDataFromFile( "vectors.bin" );
+ $result = $interface->CLFindSimilarTerms( "cookie", 10 ) if $result == 0;
+
+ print "Success\n"                     if  defined( $result );
+ print "Error: No Elements Returned\n" if !defined( $result );
+ return if !defined( $result );
+
+ for my $element ( @{ $result } )
+ {
+    print "$element\n";
+ }
 
  undef( $interface );
 
@@ -8939,6 +9037,32 @@ Example:
 
  undef( $interface );
 
+=head3 XTWGetStoreAsSentencePerLine
+
+Description:
+
+ Returns the _storeAsSentencePerLine member variable set during Word2vec::Xmltow2v object instantiation of new function.
+
+Input:
+
+ None
+
+Output:
+
+ $value -> '1' = True / '0' = False
+
+Example:
+
+ use Word2vec::Interface;
+
+ my $interface = Word2vec::Interface->new();
+ my $storeAsSentencePerLine = $interface->GetStoreAsSentencePerLine();
+
+ print( "Store As Sentence Per Line: Enabled\n" )  if $storeAsSentencePerLine == 1;
+ print( "Store As Sentence Per Line: Disabled\n" ) if $storeAsSentencePerLine == 0;
+
+ undef( $interface );
+
 =head3 XTWGetNumOfThreads
 
 Description:
@@ -9493,6 +9617,29 @@ Example:
 
  my $interface = Word2vec::Interface->new();
  $interface->XTWSetCompoundifyText( 1 );
+
+ undef( $interface );
+
+=head3 XTWSetStoreAsSentencePerLine
+
+Description:
+
+ Sets member variable to passed integer parameter. Instructs module to utilize 'storeAsSentencePerLine' option if true.
+
+Input:
+
+ $value -> '1' = Store as sentence per line / '0' = Do not store as sentence per line
+
+Ouput:
+
+ None
+
+Example:
+
+ use Word2vec::Interface;
+
+ my $interface = Word2vec::Interface->new();
+ $interface->XTWSetStoreAsSentencePerLine( 1 );
 
  undef( $interface );
 

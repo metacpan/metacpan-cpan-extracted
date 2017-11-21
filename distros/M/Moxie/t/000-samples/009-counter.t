@@ -11,7 +11,8 @@ BEGIN {
 }
 
 package Counter {
-    use Moxie;
+    use Moxie
+        traits => [':experimental'];
 
     extends 'Moxie::Object';
 

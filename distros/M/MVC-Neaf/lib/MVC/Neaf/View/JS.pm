@@ -3,7 +3,7 @@ package MVC::Neaf::View::JS;
 use strict;
 use warnings;
 
-our $VERSION = 0.17;
+our $VERSION = 0.18;
 
 =head1 NAME
 
@@ -28,7 +28,8 @@ use JSON;
 
 use parent qw(MVC::Neaf::View);
 
-my $codec = JSON->new->allow_blessed->convert_blessed->allow_unknown;
+my $codec = JSON->new->allow_blessed->convert_blessed
+    ->allow_unknown->allow_nonref;
 my $js_id_re = qr/[A-Z_a-z][A-Z_a-z\d]*/;
 my $jsonp_re = qr/^$js_id_re(?:\.$js_id_re)*$/;
 
@@ -59,12 +60,16 @@ sub render {
     my $callback = $data->{-jsonp};
     my $type = $data->{-type};
 
-    $self->{preserve_dash} or $data = do {
-        my %shallow_copy;
-        /^-/ or $shallow_copy{$_} = $data->{$_}
-            for keys %$data;
-        \%shallow_copy;
-    };
+    if( exists $data->{-serial} ) {
+        $data = $data->{-serial}
+    } else {
+        $self->{preserve_dash} or $data = do {
+            my %shallow_copy;
+            /^-/ or $shallow_copy{$_} = $data->{$_}
+                for keys %$data;
+            \%shallow_copy;
+        };
+    }
 
     my $content = $codec->encode( $data );
     return $callback && $callback =~ $jsonp_re

@@ -1,5 +1,8 @@
 package MYDan::Agent::Path;
 
+use strict;
+use warnings;
+
 =head1 NAME
 
 MYDan::Agent::Path - Implements MYDan::Util::DirConf

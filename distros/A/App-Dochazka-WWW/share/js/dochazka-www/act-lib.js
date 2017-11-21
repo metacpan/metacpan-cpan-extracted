@@ -60,8 +60,8 @@ define ([
             }
             state = stack.getState();
             // replace activity code with the one from obj (selected by user)
-            state['iNact'] = obj.code;
-            state['acTaid'] = obj.aid;
+            state['code'] = obj.code;
+            state['aid'] = obj.aid;
             stack.restart(state);
         },
 

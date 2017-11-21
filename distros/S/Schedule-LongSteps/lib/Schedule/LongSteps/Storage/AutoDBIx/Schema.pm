@@ -1,5 +1,5 @@
 package Schedule::LongSteps::Storage::AutoDBIx::Schema;
-$Schedule::LongSteps::Storage::AutoDBIx::Schema::VERSION = '0.021';
+$Schedule::LongSteps::Storage::AutoDBIx::Schema::VERSION = '0.023';
 use strict;
 use warnings;
 use base qw/DBIx::Class::Schema/;

@@ -6,7 +6,7 @@ use Test::More;
 use Devel::StackTrace;
 
 {
-    my $trace = baz();
+    my $trace = baz(2);
     my @f;
     while ( my $f = $trace->next_frame ) { push @f, $f; }
 
@@ -26,16 +26,30 @@ use Devel::StackTrace;
     );
 }
 
+{
+    for my $i ( 1 .. 6 ) {
+        my $trace = baz($i);
+        like(
+            $trace->as_string,
+            qr/trace message/,
+            "stringified trace includes message when skipping $i frame(s)"
+        );
+    }
+}
+
 done_testing();
 
 sub foo {
-    return Devel::StackTrace->new( skip_frames => 2 );
+    return Devel::StackTrace->new(
+        message     => 'trace message',
+        skip_frames => shift,
+    );
 }
 
 sub bar {
-    foo();
+    foo(@_);
 }
 
 sub baz {
-    bar();
+    bar(@_);
 }

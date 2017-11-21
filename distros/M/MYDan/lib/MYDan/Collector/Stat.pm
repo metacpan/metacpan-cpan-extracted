@@ -79,8 +79,8 @@ sub new
     else { $base = 1; }
 
     my ( @data, %data ) = 
-        ( [ [qw(VERSION MYDan COLLECTOR )],
-            [ 'value', $MYDan::VERSION, $MYDan::Collector::VERSION ]
+        ( [ [qw(VERSION MYDan)],
+            [ 'value', $MYDan::VERSION ]
           ] 
         );
 

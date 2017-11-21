@@ -1,0 +1,626 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use lib './tools/lib';
+use lib './lib';
+use Syntax::Kamelon::XMLData;
+use Syntax::Kamelon;
+use Wx;
+
+my $cursample;
+my $curxml;
+my $noindex = 1;
+my $sampledir = '.';
+my $section = '';
+my $xmldir = undef;
+
+while (@ARGV) {
+	my $o = shift @ARGV;
+	if ($o eq '-xmlfolder') {
+		$xmldir = shift @ARGV;
+	} elsif ($o eq '-samplefolder') {
+		$sampledir = shift @ARGV;
+	} elsif ($o eq '-section') {
+		$section = shift @ARGV
+	} else {
+		die "available options: -xmlfolder, -samplefolder, -section";
+	}
+}
+
+unless (-e $sampledir) { die "$sampledir does not exist" }
+unless (-d $sampledir) { die "$sampledir is not a folder" }
+
+my @o = (noindex => $noindex);
+if (defined $xmldir) {
+	unless (-e $xmldir) { die "$xmldir folder does not exist" }
+	unless (-d $xmldir) { die "$xmldir is not a folder" }
+	push @o, 'xmlfolder', $xmldir;
+}
+my $highlighter = Syntax::Kamelon->new(@o);
+
+$xmldir = $highlighter->Indexer->XMLFolder;
+
+my $curentry = '';
+#my $curtest;
+my $spaces = "                                                                 ";
+
+package MyTextCtrl;
+
+use Wx qw( :font :colour );
+use base qw(Wx::TextCtrl);
+
+my $blue                = [0x00, 0x00, 0xff];
+my $darkgreen           = [0x00, 0x80, 0x00];
+my $brown               = [0xa5, 0x2a, 0x2a];
+my $red                 = [0xff, 0x00, 0x00];
+
+my @dtlstyles = (
+	['title', undef, undef, [12, undef, undef, wxFONTWEIGHT_BOLD]],
+	['key', $blue],
+	['value', $brown],
+	['error', $red],
+	['header', undef, undef, [undef, undef, undef,  wxFONTWEIGHT_BOLD]],
+	['message', $darkgreen],
+	['normal'],
+);
+
+sub new {
+	my $class = shift;
+	my $self = $class->SUPER::new(@_);
+   $self->SetFont( Wx::Font->new(10, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, 0) );
+	$self->SetStyles(\@dtlstyles);
+	return $self;
+}
+
+
+sub SetStyles {
+   my ($self, $styles) = @_;
+   unless (defined($styles)) { $styles = \@dtlstyles };
+   $self->Styles({});
+   foreach (@$styles) {
+      my @s = @$_;
+      my $name = shift @s;
+      my $fgcolour = shift @s;
+      my $bgcolour = shift @s;
+      my $fontinfo = shift @s;
+      my ($fg, $bg, $font) = (undef, undef, undef);
+      my $attr = Wx::TextAttr->new;
+      if (defined($fgcolour)) {
+         $attr->SetTextColour(Wx::Colour->new(@$fgcolour));
+      } else {
+         $attr->SetTextColour($self->GetForegroundColour);
+      }
+      if (defined($bgcolour)) {
+         $attr->SetBackgroundColour(Wx::Colour->new(@$bgcolour));
+      } else {
+         $attr->SetBackgroundColour($self->GetBackgroundColour);
+      }
+      if (defined($fontinfo)) {
+         my $curfont = $self->GetFont;
+
+         my $size = shift @$fontinfo;
+         unless (defined($size)) { $size = $curfont->GetPointSize }
+
+         my $family = shift @$fontinfo;
+         unless (defined($family)) { $family = $curfont->GetFamily }
+
+         my $style = shift @$fontinfo;
+         unless (defined($style)) { $style = $curfont->GetStyle }
+
+         my $weight = shift @$fontinfo;
+         unless (defined($weight)) { $weight = $curfont->GetWeight }
+
+         my $underline = shift @$fontinfo;
+         unless (defined($underline)) { $underline = $curfont->GetUnderlined }
+
+         my $face = shift @$fontinfo;
+         unless (defined($face)) { $face = $curfont->GetFaceName }
+
+         $font = Wx::Font->new($size, $family, $style, $weight, $underline, $face);
+         $attr->SetFont($font);
+      }  else {
+         $attr->SetFont($self->GetFont);
+      }
+
+      $self->Styles->{$name} = $attr;
+   }
+}
+
+sub Styles {
+   my $self = shift;
+   if (@_) { $self->{STYLES} = shift; }
+   return $self->{STYLES};
+}
+
+sub rstring {
+	my ($self, $str, $l, $dir) = @_;
+	unless (defined($dir)) { $dir = 0 }
+	if ($dir) {
+		while (length($str) < $l) {
+			$str = "$str ";
+		}
+	} else {
+		while (length($str) < $l) {
+			$str = " $str";
+		}
+	}
+	return $str;
+}
+
+sub WriteStyle {
+	my $self = shift;
+	while (@_) {
+		my $txt = shift;
+		my $style = shift;
+		unless (defined($style)) { $style = 'normal' }
+		my $begin = $self->GetInsertionPoint;
+		$self->WriteText($txt);
+		my $end = $self->GetInsertionPoint;
+		if (defined($style)) {
+			$self->SetStyle($begin, $end, $self->Styles->{$style});
+		}
+	}
+}
+
+package ListPanel;
+
+use Wx qw(:sizer :panel :window :id :listbox :dialog :filedialog wxDefaultPosition);
+use base qw( Wx::Panel );
+use Wx::Event qw( EVT_BUTTON EVT_LISTBOX );
+use File::Copy;
+use File::Basename;
+
+sub new {
+	my $class = shift;
+	my $self = $class->SUPER::new(@_);
+
+	my $buttonbar = Wx::Panel->new($self, -1);
+	my $bsiz = Wx::BoxSizer->new(wxHORIZONTAL);
+	$buttonbar->SetSizer($bsiz);
+	
+	my $id = Wx::NewId;
+	my $list = Wx::ListBox->new($self, $id, [-1,-1],[200,250], [], wxLB_NEEDED_SB | wxLB_HSCROLL | wxLB_SINGLE);
+	$self->{List} = $list;
+	
+	EVT_LISTBOX($self, $list, \&listOpen);
+
+	my $sizer = Wx::BoxSizer->new(wxVERTICAL);
+	$sizer->Add($buttonbar, 0, wxEXPAND | wxALL, 2);
+	$sizer->Add($list, 1, wxEXPAND | wxALL, 2);
+	$self->SetSizer($sizer);
+
+	$self->{ListCallback} = sub { print "opening " . shift . "\n" };
+	my @l = $highlighter->AvailableSyntaxes;
+	my @li = ();
+	for (@l) {
+		if ($section ne '') {
+			if ($highlighter->Indexer->InfoSection($_) eq $section) {
+				push @li, $_
+			}
+		} else {
+			push @li, $_
+		}
+	}
+	$list->Set(\@li);
+
+	return $self;
+}
+
+sub lastSel {
+	my $self = shift;
+	if (@_) { $self->{LastSel} = shift; }
+	return $self->{LastSel}
+}
+
+sub listCallback {
+	my $self = shift;
+	if (@_) { $self->{ListCallback} = shift; }
+	return $self->{ListCallback}
+}
+
+sub listOpen {
+	my ($self, $event) = @_;
+	my $lang = $event->GetString;
+	my $sub = $self->listCallback;
+	if (&$sub($lang)) {
+		$self->lastSel($lang)
+	} 
+}
+
+sub listRemove {
+}
+
+package PagePanel;
+
+use Wx qw(:sizer :panel :window :id :textctrl :dialog );
+use base qw( Wx::Panel );
+use Wx::Event qw( EVT_BUTTON );
+
+sub new {
+	my $class = shift;
+	my $self = $class->SUPER::new(@_);
+	
+	my $buttonbar = Wx::Panel->new($self, -1);
+	my $bsiz = Wx::BoxSizer->new(wxHORIZONTAL);
+	$buttonbar->SetSizer($bsiz);
+	$self->{BAR} = $buttonbar;
+	$buttonbar->Hide;
+
+	my $sizer = Wx::BoxSizer->new(wxVERTICAL);
+	$sizer->Add($buttonbar, 0, wxEXPAND|wxALL, 2);
+	$self->SetSizer($sizer);
+	
+	return $self;
+}
+
+sub addButton {
+	my ($self, $label, $call) = @_;
+	my $bb = $self->{BAR};
+	my $b = Wx::Button->new($bb, -1, $label);
+	$bb->GetSizer->Add($b, 0, wxALL, 2);
+	EVT_BUTTON($self, $b, $call);
+	$bb->Show;
+}
+
+sub Bar {
+	my $self = shift;
+	return $self->{BAR};
+}
+
+sub Base {
+	my $self = shift;
+	return $self->GetParent->GetParent
+}
+
+sub entryCanClose {
+	return 1
+}
+
+sub entryClose {
+	return 1
+}
+
+sub entryOpen {
+	return 1
+}
+
+sub NotImpl {
+	my $self = shift;
+	Wx::MessageBox("Not implemented.", "Sorry!", wxOK|wxCENTRE, $self);
+}
+	
+package XMLPage;
+
+use Wx qw(:sizer :panel :window :id :textctrl :dialog );
+use base qw( PagePanel );
+use Wx::Event qw( EVT_BUTTON );
+use Syntax::Kamelon::Wx::PluggableTextCtrl;
+
+sub new {
+	my $class = shift;
+	my $self = $class->SUPER::new(@_);
+	
+	$self->addButton('Save', \&entryCommit);
+	
+	my $txtc = Syntax::Kamelon::Wx::PluggableTextCtrl->new($self, -1, "", [-1, -1], [800,600], wxHSCROLL|wxTE_MULTILINE|wxTE_PROCESS_TAB);
+	$self->{TXTC} = $txtc;
+	$txtc->LoadPlugin('UndoRedo');
+	$txtc->LoadPlugin('Highlighter');
+	$self->{POSTSAVE} = sub {};
+	
+	$self->GetSizer->Add($txtc, 1, wxEXPAND|wxALL, 2);
+	
+	return $self;
+}
+
+
+sub entryCommit {
+	my $self = shift;
+	if ($curentry eq '') { return }
+	my $t = $self->{TXTC};
+	my $sf = "$xmldir/$curentry.xml";
+	$self->{TXTC}->SaveFile($sf);
+	my $ps = $self->postSave;
+	&$ps;
+	return 1
+}
+
+sub entryCanClose {
+	my $self = shift;
+	if ($curentry eq '') { return 1 }
+	my $t = $self->{TXTC};
+	if ($t->IsModified) {
+		my $answer = Wx::MessageBox("XML file for $curentry altered. Commit changes?", "Save modifications?", wxYES_NO|wxCANCEL|wxCENTRE, $self);
+		if ($answer eq wxYES) {
+			$self->entryCommit;
+			return 1
+		} elsif ($answer eq wxNO) {
+			return 1
+		} else {
+			return 0;
+		}
+	}
+	return 1;
+}
+
+sub entryClose {
+	my $self = shift;
+	$self->{TXTC}->Clear;
+	return 1
+}
+
+sub entryOpen {
+	my ($self, $item) = @_;
+	my $t = $self->{TXTC};
+	my $file = $highlighter->Indexer->InfoXMLFile($item);
+	my $sf = "$xmldir/$file";
+	if ($t->LoadFile($sf)) {
+		$t->Syntax('XML');
+		return 1;
+	} else {
+		$t->Syntax('Off');
+	}
+}
+
+sub postSave {
+	my $self = shift;
+	if (@_) { $self->{POSTSAVE} = shift; }
+	return $self->{POSTSAVE};
+}
+
+package SamplePage;
+
+use Wx qw(:sizer :panel :window :id :textctrl :dialog :filedialog);
+use base qw( PagePanel );
+use Wx::Event qw( EVT_BUTTON );
+use File::Basename;
+use File::Copy;
+use Syntax::Kamelon::Wx::PluggableTextCtrl;
+
+sub new {
+	my $class = shift;
+	my $self = $class->SUPER::new(@_);
+	
+	$self->addButton('&Save', \&Save);
+	$self->addButton('&Load', \&SetSampleFile);
+	
+	my $txtc = Syntax::Kamelon::Wx::PluggableTextCtrl->new($self, -1, "", [-1, -1], [800,600], wxHSCROLL|wxTE_MULTILINE|wxTE_PROCESS_TAB);
+	$self->{TXTC} = $txtc;
+	$txtc->LoadPlugin('UndoRedo');
+	$txtc->LoadPlugin('Highlighter');
+	my $hl = $txtc->FindPlugin('Highlighter');
+	$hl->Engine($highlighter);
+	my $styles = $hl->Styles;
+	$highlighter->{FORMATTABLE} = $styles;
+	$highlighter->Reset;
+# 	$self->{HIGHLIGHTER} = $hl;
+	
+	$self->GetSizer->Add($txtc, 1, wxEXPAND|wxALL, 2);
+	
+	return $self;
+}
+
+sub entryClose {
+	my $self = shift;
+	if ($curentry eq '') { return 1 }
+	my $t = $self->{TXTC};
+	my $sf = "$sampledir/sample.$curentry";
+	if (($sf ne '') and ($t->IsModified)) {
+		my $answer = Wx::MessageBox("Sample file for $curentry altered. Save changes?", "Save modifications?", wxYES_NO|wxCANCEL|wxCENTRE, $self);
+		if ($answer eq wxYES) {
+ 			$t->SaveFile($sf);
+			$t->Clear;
+		} elsif ($answer eq wxNO) {
+			$t->Clear;
+		} else {
+			return 0;
+		}
+	} else {
+		$t->Clear;
+	}
+	return 1;
+}
+
+sub entryOpen {
+	my ($self, $item) = @_;
+	print "opening $item\n";
+	my $t = $self->{TXTC};
+	my $ext = $highlighter->Indexer->InfoExtensions($item);
+	my @e = split /;/, $ext;
+	for (@e) {
+		my $f = $_;
+		$f =~ s/^\*//;
+		my $sf = "$sampledir/highlight$f";
+		print "testing $sf\n";
+		if (-e $sf) {
+			$t->LoadFile($sf);
+			$t->Syntax($item);
+			return 1
+		}
+	}
+	$t->WriteText("No sample file\n");
+	return 1;
+}
+
+sub Save {
+	my $self = shift;
+	if ($curentry eq '') { return }
+	my $t = $self->{TXTC};
+	my $sf = "$sampledir/sample.$curentry";
+	$self->{TXTC}->SaveFile($sf);
+}
+
+sub SetSampleFile {
+	my $self = shift;
+	my $samplefile = '';
+	my $filedlg = Wx::FileDialog->new($self, 'Set sample file', '', '', "Any file (*)|*", wxOPEN);
+	if ($filedlg->ShowModal==wxID_OK) {
+		$samplefile = $filedlg->GetPath;
+	}
+	if ($samplefile ne '') {
+		my $t = $self->{TXTC};
+		$t->LoadFile($samplefile);
+# 		$t->SaveFile;
+	}
+}
+
+package ContentPanel;
+
+use Wx qw(:sizer :panel :window :id :textctrl :dialog :listbox);
+use base qw( PagePanel );
+use Wx::Event qw( EVT_BUTTON EVT_LISTBOX );
+
+my $not = "Nothing open";
+
+sub new {
+	my $class = shift;
+	my $self = $class->SUPER::new(@_);
+	
+	my $label = Wx::StaticText->new($self, -1, $not, [-1, -1], [-1, -1], wxALIGN_LEFT);
+	$self->{LABEL} = $label;
+	my $nb = Wx::Notebook->new($self, -1); 
+	$self->{NB} = $nb;
+	
+	my %pages = ();
+	my $xmlp = XMLPage->new($nb, -1);
+	$nb->AddPage($xmlp, 'XML');
+	$pages{'XML'} = $xmlp;
+
+	my $smpp = SamplePage->new($nb, -1);
+	$nb->AddPage($smpp, 'Sample');
+	$pages{'Sample'} = $smpp;
+	
+	$self->{PAGES} = \%pages;
+	
+	
+	$xmlp->postSave(sub {
+		$highlighter->{HLPOOL} = {};
+		$highlighter->Reset;
+		$smpp->{TXTC}->Syntax($curentry);
+	});
+	
+
+	
+	my $sizer = Wx::BoxSizer->new(wxVERTICAL);
+	$sizer->Add($label, 0, wxEXPAND|wxALL, 1);
+	$sizer->Add($nb, 1, wxEXPAND|wxALL, 1);
+	$self->SetSizer($sizer);
+	
+	return $self;
+}
+
+sub entryClose {
+	my $self = shift;
+	my $p = $self->{PAGES};
+	my $success = 1;
+	foreach (keys %$p) {
+		unless ($p->{$_}->entryCanClose) { $success = 0 }
+	}
+	if ($success) {
+		foreach (keys %$p) {
+			$p->{$_}->entryClose
+		}
+	}
+	return $success;
+}
+
+sub entryOpen {
+	my ($self, $item) = @_;
+	if ($self->entryClose) {
+		my $p = $self->{PAGES};
+		my $success = 1;
+		foreach (keys %$p) {
+			unless ($p->{$_}->entryOpen($item)) { $success = 0 }
+		}
+		if ($success) {
+			$curentry = $item;
+			$self->{LABEL}->SetLabel($item);
+			return 1;
+		}
+	}
+	return 0;
+}
+
+sub Render {
+	my ($self, $page) = @_;
+	my $pgs = $self->{PAGES};
+	if (my $p = $pgs->{$page}) {
+		if ($p->entryClose) {
+			return $p->entryOpen($curentry);
+		}
+	}
+	return 0;
+}
+
+package Console;
+
+use strict;
+use warnings;
+use Carp;
+
+use Wx qw( :frame :textctrl :sizer :panel :window :id);
+use base qw( Wx::Frame );
+
+sub new {
+	my $class = shift;
+	my $self = $class->SUPER::new(@_);
+	
+	#Create widgets and controls
+	my $splitter = Wx::SplitterWindow->new($self, wxID_ANY);
+	my $listpane = ListPanel->new($splitter, wxID_ANY);
+	my $contentpane = ContentPanel->new($splitter, wxID_ANY);
+	$splitter->SplitVertically($listpane, $contentpane);
+	$splitter->SetSashPosition(200);
+	
+	$self->{CONTENT} = $contentpane;
+	
+	$listpane->listCallback(sub {
+		my $item = shift;
+		if ($contentpane->entryOpen($item)) {
+			return 1
+		}
+		return 0;
+	});
+	
+	#Do layout
+	my $topsizer = Wx::BoxSizer->new(wxHORIZONTAL);
+	$topsizer->Add($splitter, 1, wxEXPAND);
+	$self->SetSizer($topsizer);
+	$topsizer->Fit($self);
+	$self->Layout();
+
+	return $self;
+}
+
+sub entryClose {
+	my $self = shift;
+	return $self->{CONTENT}->entryClose;
+}
+
+package ConsoleApp;
+
+use base qw(Wx::App);   # Inherit from Wx::App
+
+my $frame;
+sub OnInit {
+	my $self = shift;
+	$frame = Console->new( 
+		undef,         # Parent window
+		-1,            # Window id
+		'SHEK Development Console',  # Title
+	);
+	$self->SetTopWindow($frame);    
+	$frame->Show(1);                
+}
+
+sub OnExit {
+ 	my $self = shift;
+# 	$frame->entryClose;
+#  	$ktk->registrySave;
+}
+
+package main;
+
+my $wxobj = ConsoleApp->new(); 
+$wxobj->MainLoop;

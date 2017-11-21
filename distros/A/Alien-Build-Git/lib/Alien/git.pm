@@ -7,7 +7,7 @@ use Capture::Tiny qw( capture );
 use File::Which qw( which );
 
 # ABSTRACT: Find system git
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
 sub cflags {''}
@@ -61,7 +61,7 @@ Alien::git - Find system git
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

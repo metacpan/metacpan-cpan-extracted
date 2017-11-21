@@ -3,7 +3,7 @@ use warnings;
 use Test::More;
 
 use lib 't/lib';
-use Helper qw(ldap_client test_requests);
+use Helper qw(:CLIENT);
 
 use Net::LDAP::Constant
   qw/LDAP_SUCCESS LDAP_INVALID_DN_SYNTAX LDAP_INVALID_CREDENTIALS/;

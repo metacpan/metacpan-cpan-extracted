@@ -34,6 +34,7 @@ my @files = (
     't/handles/coderef-class.t',
     't/handles/coderef.t',
     't/handles/metaclass.t',
+    't/init_arg.t',
     't/inline_subtyping/basic.t',
     't/inline_subtyping/coercion.t',
     't/inline_subtyping/with_coercion.t',

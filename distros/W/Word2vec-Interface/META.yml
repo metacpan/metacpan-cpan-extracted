@@ -25,5 +25,5 @@ requires:
   Sys::CpuAffinity: '1.10'
   Text::Unidecode: '1.27'
   XML::Twig: '3.49'
-version: '0.036'
+version: '0.037'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

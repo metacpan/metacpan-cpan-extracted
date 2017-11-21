@@ -1,6 +1,6 @@
 use utf8;
 package CPAN::Testers::Schema::ResultSet::TestReport;
-our $VERSION = '0.019';
+our $VERSION = '0.020';
 # ABSTRACT: Query the raw test reports
 
 #pod =head1 SYNOPSIS
@@ -21,6 +21,7 @@ our $VERSION = '0.019';
 
 use CPAN::Testers::Schema::Base 'ResultSet';
 use Scalar::Util qw( blessed );
+use Log::Any qw( $LOG );
 
 #pod =method dist
 #pod
@@ -58,6 +59,7 @@ sub dist( $self, $lang, $dist, $version=undef ) {
 #pod =cut
 
 sub insert_metabase_fact( $self, $fact ) {
+    $LOG->infof( 'Inserting test report from Metabase fact (%s)', $fact->core_metadata->{guid} );
     my ( $fact_report ) = grep { blessed $_ eq 'CPAN::Testers::Fact::LegacyReport' } $fact->content->@*;
     my %fact_data = (
         $fact_report->content->%*,
@@ -69,13 +71,17 @@ sub insert_metabase_fact( $self, $fact ) {
     my ( $metabase_user ) = $self->result_source->schema->resultset( 'MetabaseUser' )
         ->search( { resource => $user_id }, { order_by => { -desc => 'id' }, limit => 1 } )->all;
 
+    if ( !$metabase_user ) {
+        warn $LOG->warn( "Could not find metabase user $user_id" ) . "\n";
+    }
+
     # Remove leading "v" from Perl version
     $fact_data{perl_version} =~ s/^v+//;
 
     my %report = (
         reporter => {
-            name => $metabase_user->fullname,
-            email => $metabase_user->email,
+            name => ( $metabase_user ? $metabase_user->fullname : 'Unknown' ),
+            email => ( $metabase_user ? $metabase_user->email : undef ),
         },
         environment => {
             system => {
@@ -122,7 +128,7 @@ CPAN::Testers::Schema::ResultSet::TestReport - Query the raw test reports
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 SYNOPSIS
 

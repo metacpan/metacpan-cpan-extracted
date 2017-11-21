@@ -6,7 +6,7 @@ use Carp;
 use Params::Validate qw(:all);
 use Mic::Assembler;
 
-our $VERSION = '0.000005';
+our $VERSION = '0.000006';
 $VERSION = eval $VERSION;
 
 my $Class_count = 0;
@@ -39,6 +39,7 @@ sub assemble {
         $spec = $assembler->load_spec_from($caller_pkg);
     }
 
+    _check_imp_aliases($spec);
     my @args = %$spec;
     validate(@args, {
         interface => { type => HASHREF | SCALAR },
@@ -46,6 +47,19 @@ sub assemble {
         name => { type => SCALAR, optional => 1 },
     });
     return $assembler->assemble;
+}
+
+sub _check_imp_aliases {
+    my ($spec) = @_;
+    
+    my @imp_aliases = qw[via impl];
+    foreach my $k (@imp_aliases) {
+        if (! exists $spec->{implementation} && exists $spec->{$k}) {
+            $spec->{implementation} = $spec->{$k};
+            delete @{$spec}{ @imp_aliases };
+            last;
+        }
+    }
 }
 
 *setup_class = \&assemble;
@@ -92,20 +106,20 @@ Mic - Messages, Interfaces and Contracts.
 
     package Example::Synopsis::ArraySet;
 
-    use Mic::Implementation
+    use Mic::Impl
         has => { SET => { default => sub { [] } } },
     ;
 
     sub has {
         my ($self, $e) = @_;
-        scalar grep { $_ == $e } @{ $self->{$SET} };
+        scalar grep { $_ == $e } @{ $self->[SET] };
     }
 
     sub add {
         my ($self, $e) = @_;
 
         if ( ! $self->has($e) ) {
-            push @{ $self->{$SET} }, $e;
+            push @{ $self->[SET] }, $e;
         }
     }
 
@@ -128,18 +142,18 @@ Mic - Messages, Interfaces and Contracts.
 
     package Example::Synopsis::HashSet;
 
-    use Mic::Implementation
+    use Mic::Impl
         has => { SET => { default => sub { {} } } },
     ;
 
     sub has {
         my ($self, $e) = @_;
-        exists $self->{$SET}{$e};
+        exists $self->[SET]{$e};
     }
 
     sub add {
         my ($self, $e) = @_;
-        ++$self->{$SET}{$e};
+        ++$self->[SET]{$e};
     }
 
     1;
@@ -206,10 +220,6 @@ Encourages self documenting code.
 
 Encourages robustness via Eiffel style L<contracts|Mic::Contracts>.
 
-=item *
-
-Supports hash and array based objects.
-
 =back
 
 
@@ -245,23 +255,23 @@ The class defined in the SYNOPSIS could also be defined like this
             class => { new => {} }
         },
 
-        implementation => 'Example::Usage::HashSet',
+        via => 'Example::Usage::HashSet',
     });
 
     package Example::Usage::HashSet;
 
-    use Mic::Implementation
+    use Mic::Impl
         has => { SET => { default => sub { {} } } },
     ;
 
     sub has {
         my ($self, $e) = @_;
-        exists $self->{$SET}{$e};
+        exists $self->[SET]{$e};
     }
 
     sub add {
         my ($self, $e) = @_;
-        ++$self->{$SET}{$e};
+        ++$self->[SET]{$e};
     }
 
     1;
@@ -299,15 +309,23 @@ Specifies the names of each class method that the class can respond to, as well 
 
 See L<Mic::Contracts> for more details about invariants.
 
-=head4 extends => ARRAYREF
+=head4 extends => STRING | ARRAYREF
 
-Specifies the names of one or more super-interfaces. This means the interface will include any methods from the super-interfaces that aren't declared locally. This is how Mic supports interface inheritance.
+Specifies the names of one or more super-interfaces. This means the interface will include any methods from the super-interfaces that aren't declared locally.
 
 =head3 implementation => STRING
 
 The name of a package that defines the subroutines declared in the interface.
 
-L<Mic::Implementation> and L<Mic::ArrayImpl> describe how implementations are configured.
+L<Mic::Impl> describes how implementations are configured.
+
+=head3 impl => STRING
+
+An alias of "implementation" above.
+
+=head3 via => STRING
+
+An alias of "implementation" above.
 
 =head1 Interface Sharing
 

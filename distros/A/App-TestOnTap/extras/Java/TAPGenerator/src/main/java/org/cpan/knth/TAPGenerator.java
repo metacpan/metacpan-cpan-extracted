@@ -8,7 +8,7 @@ import java.util.Map;
 
 /**
  * @author knth@cpan.org
- * @version 0.044
+ * @version 0.046
  * 
  *          <h1>Simple TAP generator</h1>
  * 

@@ -13,7 +13,7 @@ use FindBin;
 use lib "$FindBin::Bin/lib";
 
 use SPVM 'TestCase'; my $use_test_line = __LINE__;
-use SPVM 'std'; my $use_std_line = __LINE__;
+use SPVM 'CORE'; my $use_core_line = __LINE__;
 
 use SPVM 'TestCase::Extension';
 use SPVM 'TestCase::Extension2';
@@ -48,11 +48,19 @@ my $NaN = SPVM::NaN();
 
 use SPVM 'Double';
 use SPVM 'Float';
-use SPVM 'std';
+use SPVM 'CORE';
 
 # time
 {
-  cmp_ok(abs(time - SPVM::std::time()), '<', 2);
+  cmp_ok(abs(time - SPVM::CORE::time()), '<', 2);
+}
+
+# Package variable relative name
+{
+  my $start_objects_count = SPVM::get_objects_count();
+  ok(SPVM::TestCase::package_var_rel_name());
+  my $end_objects_count = SPVM::get_objects_count();
+  is($start_objects_count, $end_objects_count);
 }
 
 # Package variable
@@ -73,53 +81,6 @@ use SPVM 'std';
   ok(SPVM::TestCase::Extension::call_float_sub_exception());
   ok(SPVM::TestCase::Extension::call_double_sub_exception());
   ok(SPVM::TestCase::Extension::call_object_sub_exception());
-}
-
-# SPVM::Arrays;
-{
-  ok(SPVM::TestCase::Arrays::equals_byte());
-  ok(SPVM::TestCase::Arrays::equals_short());
-  ok(SPVM::TestCase::Arrays::equals_int());
-  ok(SPVM::TestCase::Arrays::equals_long());
-  ok(SPVM::TestCase::Arrays::equals_float());
-  ok(SPVM::TestCase::Arrays::equals_double());
-
-  ok(SPVM::TestCase::Arrays::copy_of_byte());
-  ok(SPVM::TestCase::Arrays::copy_of_byte_over());
-  ok(SPVM::TestCase::Arrays::copy_of_byte_less());
-  ok(SPVM::TestCase::Arrays::copy_of_byte_undef());
-  ok(SPVM::TestCase::Arrays::copy_of_byte_negative());
-
-  ok(SPVM::TestCase::Arrays::copy_of_short());
-  ok(SPVM::TestCase::Arrays::copy_of_short_over());
-  ok(SPVM::TestCase::Arrays::copy_of_short_less());
-  ok(SPVM::TestCase::Arrays::copy_of_short_undef());
-  ok(SPVM::TestCase::Arrays::copy_of_short_negative());
-
-  ok(SPVM::TestCase::Arrays::copy_of_int());
-  ok(SPVM::TestCase::Arrays::copy_of_int_over());
-  ok(SPVM::TestCase::Arrays::copy_of_int_less());
-  ok(SPVM::TestCase::Arrays::copy_of_int_undef());
-  ok(SPVM::TestCase::Arrays::copy_of_int_negative());
-
-  ok(SPVM::TestCase::Arrays::copy_of_long());
-  ok(SPVM::TestCase::Arrays::copy_of_long_over());
-  ok(SPVM::TestCase::Arrays::copy_of_long_less());
-  ok(SPVM::TestCase::Arrays::copy_of_long_undef());
-  ok(SPVM::TestCase::Arrays::copy_of_long_negative());
-
-  ok(SPVM::TestCase::Arrays::copy_of_float());
-  ok(SPVM::TestCase::Arrays::copy_of_float_over());
-  ok(SPVM::TestCase::Arrays::copy_of_float_less());
-  ok(SPVM::TestCase::Arrays::copy_of_float_undef());
-  ok(SPVM::TestCase::Arrays::copy_of_float_negative());
-
-  ok(SPVM::TestCase::Arrays::copy_of_double());
-  ok(SPVM::TestCase::Arrays::copy_of_double_over());
-  ok(SPVM::TestCase::Arrays::copy_of_double_less());
-  ok(SPVM::TestCase::Arrays::copy_of_double_undef());
-  ok(SPVM::TestCase::Arrays::copy_of_double_negative());
-  1;
 }
 
 {
@@ -261,7 +222,7 @@ my $start_objects_count = SPVM::get_objects_count();
 # Native subroutine
 {
   my $sp_values = SPVM::new_int_array([1, 2, 3]);
-  my $total = SPVM::std::sum_int($sp_values);
+  my $total = SPVM::CORE::sum_int($sp_values);
   is($total, 6);
 }
 
@@ -269,6 +230,13 @@ my $start_objects_count = SPVM::get_objects_count();
 {
   ok(SPVM::TestCase::call_sub_last_camma());
   ok(SPVM::TestCase::call_sub_undef(undef));
+  
+  {
+    my $start_objects_count = SPVM::get_objects_count();
+    SPVM::TestCase::call_sub_assign();
+    my $end_objects_count = SPVM::get_objects_count();
+    is($start_objects_count, $end_objects_count);
+  }
 }
 
 # Destructor
@@ -352,60 +320,6 @@ my $start_objects_count = SPVM::get_objects_count();
   }
 }
 
-# Exception
-{
-  {
-    ok(SPVM::TestCase::exception_eval_call_sub());
-  }
-  
-  {
-    eval { SPVM::TestCase::exception_call_stack() };
-    like($@, qr/Error/);
-    like($@, qr/exception_croak_return_int/);
-    like($@, qr/exception_call_stack/);
-  }
-
-  {
-    eval { SPVM::TestCase::exception_croak_return_byte() };
-    like($@, qr/Error/);
-    like($@, qr/exception_croak_return_byte/);
-  }
-  {
-    eval { SPVM::TestCase::exception_croak_return_short() };
-    like($@, qr/Error/);
-  }
-  {
-    eval { SPVM::TestCase::exception_croak_return_int() };
-    like($@, qr/Error/);
-    like($@, qr/exception_croak_return_int/);
-    like($@, qr/TestCase\.spvm/);
-  }
-  {
-    eval { SPVM::TestCase::exception_croak_return_long() };
-    like($@, qr/Error/);
-  }
-  {
-    eval { SPVM::TestCase::exception_croak_return_float() };
-    like($@, qr/Error/);
-  }
-  {
-    eval { SPVM::TestCase::exception_croak_return_double() };
-    like($@, qr/Error/);
-  }
-  {
-    eval { SPVM::TestCase::exception_croak_return_object() };
-    like($@, qr/Error/);
-  }
-  {
-    eval { SPVM::TestCase::exception_croak_return_void() };
-    like($@, qr/Error/);
-  }
-  
-  {
-    ok(SPVM::TestCase::exception_croak_return_int_eval_catch());
-  }
-}
-
 # Call void subroutine
 {
   ok(SPVM::TestCase::call_void());
@@ -427,14 +341,6 @@ my $start_objects_count = SPVM::get_objects_count();
   ok(SPVM::TestCase::array_init_double());
 }
 
-# Exception
-{
-  eval { SPVM::TestCase::exception_zero_divide_int() }; my $line = __LINE__;
-  like($@, qr|\Q0 division (int / int)|);
-  like($@, qr/\Q$file/);
-  like($@, qr/$line/);
-}
-
 # Default return value
 {
   ok(SPVM::TestCase::default_return_value_byte());
@@ -453,7 +359,9 @@ my $start_objects_count = SPVM::get_objects_count();
   ok(SPVM::TestCase::switch_table_switch());
 }
 
+# my variable
 {
+  ok(SPVM::TestCase::my_var_initialized_zero());
   ok(SPVM::TestCase::my_var_initialized_zero());
 }
 
@@ -491,7 +399,7 @@ is_deeply(
   \@SPVM::PACKAGE_INFOS,
   [
     {name => 'TestCase', file => $file, line => $use_test_line},
-    {name => 'std', file => $file, line => $use_std_line}
+    {name => 'CORE', file => $file, line => $use_core_line}
   ]
 );
 =cut
@@ -857,7 +765,15 @@ is_deeply(
   is(SPVM::TestCase::multiply_long_overflow(), -9223372036854775808);
 }
 
+# Negate
+{
+  ok(SPVM::TestCase::negate());
+}
 
+# Complement
+{
+  ok(SPVM::TestCase::complement());
+}
 
 # get and set
 {
@@ -1431,7 +1347,6 @@ is_deeply(
   ok(SPVM::TestCase::if_elsif());
   ok(SPVM::TestCase::if_elsif_2());
   ok(SPVM::TestCase::if_duplicate());
-  
 }
 
 # If a > b
@@ -1538,6 +1453,7 @@ is_deeply(
   ok(SPVM::TestCase::if_eq_double_different());
   ok(SPVM::TestCase::if_eq_object_same());
   ok(SPVM::TestCase::if_eq_object_different());
+  ok(SPVM::TestCase::if_eq_undef());
 }
 
 # If a != b
@@ -1556,6 +1472,7 @@ is_deeply(
   ok(SPVM::TestCase::if_ne_double_different());
   ok(SPVM::TestCase::if_ne_object_same());
   ok(SPVM::TestCase::if_ne_object_different());
+  ok(SPVM::TestCase::if_ne_undef());
 }
 
 # Number literal
@@ -1691,4 +1608,114 @@ is_deeply(
 # All object is freed
 my $end_objects_count = SPVM::get_objects_count();
 is($end_objects_count, $start_objects_count);
+
+# SPVM::Arrays;
+{
+  ok(SPVM::TestCase::Arrays::equals_byte());
+  ok(SPVM::TestCase::Arrays::equals_short());
+  ok(SPVM::TestCase::Arrays::equals_int());
+  ok(SPVM::TestCase::Arrays::equals_long());
+  ok(SPVM::TestCase::Arrays::equals_float());
+  ok(SPVM::TestCase::Arrays::equals_double());
+
+  ok(SPVM::TestCase::Arrays::copy_of_byte());
+  ok(SPVM::TestCase::Arrays::copy_of_byte_over());
+  ok(SPVM::TestCase::Arrays::copy_of_byte_less());
+  ok(SPVM::TestCase::Arrays::copy_of_byte_undef());
+  ok(SPVM::TestCase::Arrays::copy_of_byte_negative());
+
+  ok(SPVM::TestCase::Arrays::copy_of_short());
+  ok(SPVM::TestCase::Arrays::copy_of_short_over());
+  ok(SPVM::TestCase::Arrays::copy_of_short_less());
+  ok(SPVM::TestCase::Arrays::copy_of_short_undef());
+  ok(SPVM::TestCase::Arrays::copy_of_short_negative());
+
+  ok(SPVM::TestCase::Arrays::copy_of_int());
+  ok(SPVM::TestCase::Arrays::copy_of_int_over());
+  ok(SPVM::TestCase::Arrays::copy_of_int_less());
+  ok(SPVM::TestCase::Arrays::copy_of_int_undef());
+  ok(SPVM::TestCase::Arrays::copy_of_int_negative());
+
+  ok(SPVM::TestCase::Arrays::copy_of_long());
+  ok(SPVM::TestCase::Arrays::copy_of_long_over());
+  ok(SPVM::TestCase::Arrays::copy_of_long_less());
+  ok(SPVM::TestCase::Arrays::copy_of_long_undef());
+  ok(SPVM::TestCase::Arrays::copy_of_long_negative());
+
+  ok(SPVM::TestCase::Arrays::copy_of_float());
+  ok(SPVM::TestCase::Arrays::copy_of_float_over());
+  ok(SPVM::TestCase::Arrays::copy_of_float_less());
+  ok(SPVM::TestCase::Arrays::copy_of_float_undef());
+  ok(SPVM::TestCase::Arrays::copy_of_float_negative());
+
+  ok(SPVM::TestCase::Arrays::copy_of_double());
+  ok(SPVM::TestCase::Arrays::copy_of_double_over());
+  ok(SPVM::TestCase::Arrays::copy_of_double_less());
+  ok(SPVM::TestCase::Arrays::copy_of_double_undef());
+  ok(SPVM::TestCase::Arrays::copy_of_double_negative());
+  1;
+}
+
+# Exception
+{
+  eval { SPVM::TestCase::exception_zero_divide_int() }; my $line = __LINE__;
+  like($@, qr|\Q0 division (int / int)|);
+  like($@, qr/\Q$file/);
+  like($@, qr/$line/);
+}
+
+
+# Exception
+{
+  {
+    ok(SPVM::TestCase::exception_eval_call_sub());
+  }
+  
+  {
+    eval { SPVM::TestCase::exception_call_stack() };
+    like($@, qr/Error/);
+    like($@, qr/exception_croak_return_int/);
+    like($@, qr/exception_call_stack/);
+  }
+
+  {
+    eval { SPVM::TestCase::exception_croak_return_byte() };
+    like($@, qr/Error/);
+    like($@, qr/exception_croak_return_byte/);
+  }
+  {
+    eval { SPVM::TestCase::exception_croak_return_short() };
+    like($@, qr/Error/);
+  }
+  {
+    eval { SPVM::TestCase::exception_croak_return_int() };
+    like($@, qr/Error/);
+    like($@, qr/exception_croak_return_int/);
+    like($@, qr/TestCase\.spvm/);
+  }
+  {
+    eval { SPVM::TestCase::exception_croak_return_long() };
+    like($@, qr/Error/);
+  }
+  {
+    eval { SPVM::TestCase::exception_croak_return_float() };
+    like($@, qr/Error/);
+  }
+  {
+    eval { SPVM::TestCase::exception_croak_return_double() };
+    like($@, qr/Error/);
+  }
+  {
+    eval { SPVM::TestCase::exception_croak_return_object() };
+    like($@, qr/Error/);
+  }
+  {
+    eval { SPVM::TestCase::exception_croak_return_void() };
+    like($@, qr/Error/);
+  }
+  
+  {
+    ok(SPVM::TestCase::exception_croak_return_int_eval_catch());
+  }
+}
 

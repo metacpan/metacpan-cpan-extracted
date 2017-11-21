@@ -5,7 +5,7 @@
       "Andreas K. Huettel <mail@akhuettel.de>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -51,6 +51,6 @@
          "web" : "https://github.com/lab-measurement/Syntax-Highlight-Engine-Simple-Perl"
       }
    },
-   "version" : "0.04",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

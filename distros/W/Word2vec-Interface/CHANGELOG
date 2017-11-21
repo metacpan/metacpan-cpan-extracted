@@ -1,6 +1,45 @@
 NAME
     word2vec CHANGES
 
+	version 0.037
+		(11/14/2017)
+		 - Interface.pm - Added CLFindSimilarTerms() Function
+		 - Word2vec-Inteface.pl - Added FindSimilarTerms() Function
+		                        - ShowHelp() - Updated with the above changes.
+		                        - ShowVersion() - Updated to version 0.037
+
+		(11/06/2017)
+		 - Interface.pm - W2VAverageOfTwoWordVectors() - Bug Fix: Calling Word2vec::Word2vec::W2VAverageOfTwoWordVectors vs Word2vec::Word2vec::AverageOfTwoWordVectors
+
+		(10/17/2017)
+		 - Word2vec-Interface.pl - ShowHelp() - Minor Styling Issue
+
+		(10/11/2017)
+		 - Xmltow2v.pm - AppendToTextCorpus() - Reworked checking last line for "\n" (newline) character. Performance increase.
+		                                      - Removed regex that checks for more than one space between words over corpus in memory.
+		               - _SaveTextCorpusToFile() - Added regex that checks for more than one space between words over corpus prior to saving to file.
+
+		(10/10/2017)
+		 - Xmltow2v.pm - ConvertMedlineXMLToW2V() - Bug Fix: Parses data when single file parse option is used, but does not save parsed data to specified file.
+		               - SaveTextFileToCorpus() - Bug Fix: GetOverwriteExistingFile() versus GetOverwriteExitingFile()
+
+		(10/06/2017)
+		 - Added functionality to compile Medline XML file to text corpus by sentence per line format. (Changes below)
+		 - Xmltow2v.pm - Added _storeAsSentencePerLine variable
+		               - Added GetStoreAsSentencePerLine() function
+		               - Added SetStoreAsSentencePerLine() function
+		               - Modified RemoveSpecialCharactersFromString() to support the above changes
+		               - Modified AppendStrToTextCorpus() to support the above changes
+		               - Modified AppendToTempStr() to support the above changes
+		               - Updated 1Xmltow2v.t file to test the above changes
+		 - Word2vec-Inteface.pl - CompileTextCorpus - Updated to support the above changes / Added "-sentenceperline" option.
+		 - Interface.pm - CLCompileTextCorpus - Updated to support the above changes / Added "-sentenceperline" option parser.
+		                - Added XTWGetStoreAsSentencePerLine() function
+		                - Added XTWSetStoreAsSentencePerLine() function
+		                - Updated / Added debug log statements
+		                - Updated / Added checks
+		 - Updated POD documentation with the above changes.
+
 	version 0.036
 	  (09/04/2017)
 		 - Word2vec-Interface - Similarity() - Bug Fix: Error out gracefully when reading vector data results in an error.

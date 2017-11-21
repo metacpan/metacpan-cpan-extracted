@@ -1,0 +1,87 @@
+{
+   "abstract" : "It's testing tool for CSV (and other structures) by DSL.",
+   "author" : [
+      "mackee a.k.a macopy <macopy123@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.13",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-MasterData-Declare",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor::Lite" : "0",
+            "JSON" : "0",
+            "Scalar::Util" : "0",
+            "Test2::V0" : "0",
+            "Test::Simple" : "1.302015",
+            "Text::CSV" : "0",
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "provides" : {
+      "Test::MasterData::Declare" : {
+         "file" : "lib/Test/MasterData/Declare.pm",
+         "version" : "0.01"
+      },
+      "Test::MasterData::Declare::CompareRow" : {
+         "file" : "lib/Test/MasterData/Declare/CompareRow.pm"
+      },
+      "Test::MasterData::Declare::Reader" : {
+         "file" : "lib/Test/MasterData/Declare/Reader.pm"
+      },
+      "Test::MasterData::Declare::Row" : {
+         "file" : "lib/Test/MasterData/Declare/Row.pm"
+      },
+      "Test::MasterData::Declare::Runner" : {
+         "file" : "lib/Test/MasterData/Declare/Runner.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mackee/Test-MasterData-Declare/issues"
+      },
+      "homepage" : "https://github.com/mackee/Test-MasterData-Declare",
+      "repository" : {
+         "url" : "git://github.com/mackee/Test-MasterData-Declare.git",
+         "web" : "https://github.com/mackee/Test-MasterData-Declare"
+      }
+   },
+   "version" : "0.01",
+   "x_authority" : "cpan:MACOPY",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

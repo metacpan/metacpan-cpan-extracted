@@ -1,5 +1,5 @@
 package Message::Passing::Output::Search::Elasticsearch;
-$Message::Passing::Output::Search::Elasticsearch::VERSION = '0.003';
+$Message::Passing::Output::Search::Elasticsearch::VERSION = '0.004';
 # ABSTRACT: index messages in Elasticsearch
 
 use Moo;
@@ -119,7 +119,7 @@ Message::Passing::Output::Search::Elasticsearch - index messages in Elasticsearc
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 DESCRIPTION
 
@@ -182,7 +182,7 @@ Alexander Hartmaier <abraxxa@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Alexander Hartmaier.
+This software is copyright (c) 2017 by Alexander Hartmaier.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

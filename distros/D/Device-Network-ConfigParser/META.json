@@ -53,19 +53,23 @@
    "provides" : {
       "Device::Network::ConfigParser" : {
          "file" : "lib/Device/Network/ConfigParser.pm",
-         "version" : "0.005"
-      },
-      "Device::Network::ConfigParser::CheckPoint::Expert" : {
-         "file" : "lib/Device/Network/ConfigParser/CheckPoint/Expert.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       },
       "Device::Network::ConfigParser::CheckPoint::Gaia" : {
          "file" : "lib/Device/Network/ConfigParser/CheckPoint/Gaia.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       },
       "Device::Network::ConfigParser::Cisco::ASA" : {
          "file" : "lib/Device/Network/ConfigParser/Cisco/ASA.pm",
-         "version" : "0.005"
+         "version" : "0.006"
+      },
+      "Device::Network::ConfigParser::Linux::NetUtils" : {
+         "file" : "lib/Device/Network/ConfigParser/Linux/NetUtils.pm",
+         "version" : "0.006"
+      },
+      "Device::Network::ConfigParser::Linux::iproute2" : {
+         "file" : "lib/Device/Network/ConfigParser/Linux/iproute2.pm",
+         "version" : "0.006"
       }
    },
    "release_status" : "stable",
@@ -80,7 +84,7 @@
          "web" : "https://github.com/gregfoletta/Device-Network-ConfigParser"
       }
    },
-   "version" : "0.005",
+   "version" : "0.006",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

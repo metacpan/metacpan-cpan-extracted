@@ -1,5 +1,5 @@
 package Moose::Exception::AccessorMustReadWrite;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -10,4 +10,5 @@ sub _build_message {
     "Cannot define an accessor name on a read-only attribute, accessors are read/write";
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

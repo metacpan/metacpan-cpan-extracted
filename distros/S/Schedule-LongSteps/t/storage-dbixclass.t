@@ -1,9 +1,13 @@
 #! perl -wt
 
 use Test::More;
+use Test::Exception;
+use Test::MockModule;
 
 use Schedule::LongSteps::Storage::DBIxClass;
 use DateTime;
+
+use Log::Any::Adapter;
 
 eval "use DBD::SQLite";
 plan skip_all => "DBD::SQLite is required for this test."
@@ -75,6 +79,42 @@ $storage->create_process({ process_class => 'Blabla', what => 'whatever', run_at
         is( scalar( $storage->prepare_due_processes() ) , 0 , "Preparing steps again whilst they are running give zero steps");
     }
     $dbh->commit();
+}
+
+{
+    ok( $storage->find_process($process->id()));
+    ok( $storage->update_process( $process , { run_at => DateTime->now() }) );
+}
+
+{
+    # Log::Any::Adapter->set({ lexically => \my $lex }, 'Stderr' );
+    my $times_called = 0;
+    my $mock_process = Test::MockModule->new( ref( $process ) );
+    $mock_process->mock( update => sub{
+                             my @args = @_;
+                             # Simulate a deadlock for the first two times.
+                             ( $times_called++ < 2 ) && die ( "Deadlock found when trying to get lock; try restarting transaction" );
+                             # Works after a while
+                             return $mock_process->original( 'update' )->( @args ) ;
+                         });
+    ok( $storage->find_process($process->id()));
+    ok( $storage->update_process( $process , { run_at => DateTime->now() }) );
+    is( $times_called , 3 , "Ok called 3 times. The third time worked");
+}
+
+{
+    # Log::Any::Adapter->set({ lexically => \my $lex }, 'Stderr' );
+    my $times_called = 0;
+    my $mock_process = Test::MockModule->new( ref( $process ) );
+    $mock_process->mock( update => sub{
+                             my @args = @_;
+                             # This dies straight away with some unmanaged exception
+                             ( $times_called++ < 2 ) && die ( "Some unmanaged exception" );
+                             die "NEVER REACHED";
+                         });
+    ok( $storage->find_process($process->id()));
+    throws_ok { $storage->update_process( $process , { run_at => DateTime->now() } ) } qr/unmanaged exception/;
+    is( $times_called , 1 , "Ok called only one time, because it died with something unmanaged");
 }
 
 

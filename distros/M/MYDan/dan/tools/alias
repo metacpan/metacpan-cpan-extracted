@@ -1,0 +1,28 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use MYDan::Util::Alias;
+my $alias = MYDan::Util::Alias->new();
+
+my ( $name, $k, $v  ) = shift;
+if( $name )
+{
+    $name =~ s/^alias //;
+    ( $k, $v ) =  split /=/, $name, 2;
+}
+
+if( defined $k && defined $v )
+{
+    $alias->alias( $k, $v );
+}
+elsif( defined $k )
+{
+    my $x = $alias->alias( $k );
+    printf "alias $k%s\n", $x ? "='$x'" : ": not found";
+}
+else
+{
+    my %alias = $alias->alias();
+    map{ print "alias $_='$alias{$_}'\n";}keys %alias;
+}

@@ -2,7 +2,7 @@ package Webservice::Shipment;
 
 use Mojo::Base -base;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 $VERSION = eval $VERSION;
 
 use Scalar::Util 'blessed';
@@ -205,17 +205,21 @@ Returns undef if no carrier matches.
 
 =back
 
-=head1 DEVELOPMENT SPONSORED BY
+=head1 SPECIAL THANKS
 
-Restore Health Corporation, L<http://restorehc.com>
+Pharmetika Software, L<http://pharmetika.com>
 
 =head1 AUTHOR
 
 Joel Berger, E<lt>joel.a.berger@gmail.comE<gt>
 
+=head1 CONTRIBUTORS
+
+Ryan Perry
+
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2015 by Joel Berger
+Copyright (C) 2015 by L</AUTHOR> and L</CONTRIBUTORS>.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

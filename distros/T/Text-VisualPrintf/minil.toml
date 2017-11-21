@@ -1,0 +1,6 @@
+name = "Text-VisualPrintf"
+# badges = ["travis"]
+authority="cpan:UTASHIRO"
+
+module_maker="ModuleBuildTiny"
+

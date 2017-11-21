@@ -1,0 +1,120 @@
+#!/usr/bin/env perl
+
+package App::YtDescLinks;
+
+use 5.016;
+use strict;
+use warnings;
+
+use Carp;
+use Getopt::Long qw(:config auto_help gnu_getopt);
+use List::Util qw(any);
+use Pod::Usage;
+use Try::Tiny;
+use URI::Find;
+
+use App::WatchLater::YouTube;
+
+my %opts;
+
+GetOptions(
+  \%opts,
+  'filter|f!',
+  'version|v',
+) or pod2usage(2);
+
+if ($opts{version}) {
+  say 'yt-desc-links ' . App::WatchLater::YouTube->VERSION;
+  exit;
+}
+
+my $api = App::WatchLater::YouTube->new(
+  api_key      => $ENV{YT_API_KEY},
+  access_token => $ENV{YT_ACCESS_TOKEN},
+);
+
+while (<>) {
+  try {
+    my $video_id = find_video_id($_);
+    my $snippet = $api->get_video($video_id);
+    say $video_id;
+    say biggest_thumbnail($snippet->{thumbnails});
+    say_uris($snippet->{description});
+  } catch {
+    print STDERR $_;
+  };
+}
+
+use constant FILTERS => (
+  qr/pixiv/,
+  qr/deviantart/,
+  qr/imgur/,
+  qr/zerochan/,
+  qr/anime-pictures/,
+);
+
+sub should_print {
+  return 1 unless $opts{filter};
+
+  my ($uri) = @_;
+  any { $uri =~ $_ } FILTERS;
+}
+
+sub say_uris {
+  my ($text) = @_;
+  my $finder = URI::Find->new(sub { say $_[1] if should_print $_[1] });
+  $finder->find(\$text);
+}
+
+sub biggest_thumbnail {
+  my ($href) = @_;
+  my $maxw = 0;
+  my $url;
+  for my $thumb (values %$href) {
+    if ($thumb->{width} > $maxw) {
+      $maxw = $thumb->{width};
+      $url = $thumb->{url};
+    }
+  }
+  $url;
+}
+
+=head1 NAME
+
+yt-desc-links - display links to thumbnail image and links from description
+
+=head1 SYNOPSIS
+
+    yt-desc-links [OPTION]...
+
+    -f, --[no]filter    only display links from common image sites (e.g., pixiv)
+    --help              display this help message
+    --version           display version info
+
+=head1 DESCRIPTION
+
+Accepts YouTube video IDs or watch URLs from stdin, and prints the ID, followed
+by the thumbnail link, followed by description links, to stdout.
+
+An API key is required to access the YouTube Data API. Alternatively, requests
+may be authorized by providing an OAuth2 access token.
+
+=head1 ENVIRONMENT
+
+=over 4
+
+=item YT_API_KEY
+
+Set the YouTube Data API key.
+
+=item YT_ACCESS_TOKEN
+
+Set the OAuth2 access token.
+
+=back
+
+=head1 AUTHOR
+
+Aaron L. Zeng <me@bcc32.com>
+
+=cut

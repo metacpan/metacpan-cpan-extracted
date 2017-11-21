@@ -17,19 +17,28 @@ name: Moxie
 provides:
   Moxie:
     file: lib/Moxie.pm
-    version: '0.06'
+    version: '0.07'
   Moxie::Enum:
     file: lib/Moxie/Enum.pm
-    version: '0.06'
+    version: '0.07'
   Moxie::Object:
     file: lib/Moxie/Object.pm
-    version: '0.06'
+    version: '0.07'
   Moxie::Object::Immutable:
     file: lib/Moxie/Object/Immutable.pm
-    version: '0.06'
+    version: '0.07'
   Moxie::Traits::Provider:
     file: lib/Moxie/Traits/Provider.pm
-    version: '0.06'
+    version: '0.07'
+  Moxie::Traits::Provider::Accessor:
+    file: lib/Moxie/Traits/Provider/Accessor.pm
+    version: '0.07'
+  Moxie::Traits::Provider::Constructor:
+    file: lib/Moxie/Traits/Provider/Constructor.pm
+    version: '0.07'
+  Moxie::Traits::Provider::Experimental:
+    file: lib/Moxie/Traits/Provider/Experimental.pm
+    version: '0.07'
 requires:
   BEGIN::Lift: '0.06'
   MOP: '0.12'
@@ -43,5 +52,5 @@ requires:
 resources:
   bugtracker: https://github.com/stevan/p5-Moxie/issues
   repository: https://github.com/stevan/p5-Moxie.git
-version: '0.06'
+version: '0.07'
 x_serialization_backend: 'YAML::Tiny version 1.70'

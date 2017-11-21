@@ -3,8 +3,10 @@ use strictures 2;
 
 use Test::More;
 
+use lib 't/lib';
+
 BEGIN {
-  use t::loader qw(build_schema);
+  use loader qw(build_schema);
   build_schema([
     Country => {
       table => 'countries',
@@ -21,7 +23,7 @@ BEGIN {
   ]);
 }
 
-use t::common qw(sims_test);
+use common qw(sims_test);
 
 sims_test "Can use a default value for a char PK" => {
   spec => {

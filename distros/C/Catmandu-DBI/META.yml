@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.28'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.039, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,12 +17,12 @@ meta-spec:
 name: Catmandu-DBI
 no_index:
   directory:
-    - t
-    - xt
-    - inc
-    - share
     - eg
     - examples
+    - inc
+    - share
+    - t
+    - xt
 requires:
   Catmandu: '1.0'
   DBI: '1.630'
@@ -33,12 +33,15 @@ resources:
   bugtracker: https://github.com/LibreCat/Catmandu-DBI/issues
   homepage: https://github.com/LibreCat/Catmandu-DBI
   repository: https://github.com/LibreCat/Catmandu-DBI.git
-version: '0.0511'
+version: '0.0701'
 x_contributors:
   - 'Jakob Voss <jakob@nichtich.de>'
   - 'Nicolas Franck <nicolas.franck@ugent.be>'
+  - 'Nicolas Franck <njfranck@ca20c526.ugent.be>'
+  - 'Nicolas Franck <njfranck@ca20c533.ugent.be>'
   - 'Nicolas Steenlant <nicolas.steenlant@gmail.com>'
   - 'Nicolas Steenlant <nicolas.steenlant@ugent.be>'
   - 'njfranck <njfranck@ca20c521.ugent.be>'
   - 'Patrick Hochstenbach <patrick.hochstenbach@ugent.be>'
   - 'vpeil <vitali.peil@uni-bielefeld.de>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

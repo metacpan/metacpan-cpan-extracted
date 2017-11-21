@@ -18,7 +18,6 @@ WriteMakefile(
     },
     TEST_REQUIRES   => {
         'Test::More'      => 0,
-        'Test::Deep'      => 0.11,
         'File::Temp'      => 0,
     },
     test      => { TESTS    => 't/*.t' },

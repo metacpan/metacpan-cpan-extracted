@@ -1,0 +1,103 @@
+#!perl
+
+# PODNAME: manager
+# ABSTRACT: Starts an Argon manager service
+#
+
+use strict;
+use warnings;
+use AnyEvent;
+use Argon::Log;
+use Argon::Manager;
+use Getopt::Long::Descriptive;
+
+my ($opt, $usage) = describe_options(
+  'manager %o',
+  ['key|k=s',     '(required) path to file containing encryption key', {required => 1}],
+  ['host|h=s',    '(optional) hostname on which to listen (defaults to localhost)'],
+  ['port|p=i',    '(optional) port on which to listen (defaults to OS-assigned port)', {callbacks => {'port number' => sub { shift > 0 }}}],
+  ['persist=s',   '(optional, also doesn\'t work yet) maintain a persistent copy of the message queue'],
+  ['verbose|v=i', '(optional) level of verbosity (1 - 9; defaults to 5 [warn])', {default => 'warn'}],
+  [],
+  ['help|h',  'prints this help text and exits', {shortcircuit => 1}],
+  ['usage|u', 'prints this help text and exits', {shortcircuit => 1}],
+);
+
+if ($opt->help) {
+  print $usage->text;
+  exit;
+}
+
+log_level $opt->verbose;
+
+my $cv      = AnyEvent->condvar;
+my $sigint  = AnyEvent->signal(signal => 'INT' , cb => sub { log_info 'Caught SIGINT';  $cv->send });
+my $sigterm = AnyEvent->signal(signal => 'TERM', cb => sub { log_info 'Caught SIGTERM'; $cv->send });
+
+my $manager = Argon::Manager->new(
+  host    => $opt->host,
+  port    => $opt->port,
+  keyfile => $opt->key,
+  persist => $opt->persist,
+);
+
+$manager->start;
+
+$cv->recv;
+
+exit 0;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+manager - Starts an Argon manager service
+
+=head1 VERSION
+
+version 0.18
+
+=head1 SYNOPSIS
+
+  manager --host localhost --port 4242
+
+=head1 DESCRIPTION
+
+Starts the Argon manager service. The service will not accept any tasks until
+at least one worker has registered with it.
+
+=head1 OPTIONS
+
+=head2 port
+
+Optionally specifies the port to listen on. Defaults to an OS-assigned port.
+
+=head2 host
+
+Optionally specifies the device address to listen on. Defaults to an
+OS-assigned address.
+
+=head2 key
+
+Path to the file containing the encryption key.
+
+=head2 verbose
+
+Level of verbosity (1-9; defaults to 5/warn).
+
+=head1 AUTHOR
+
+Jeff Ober <sysread@fastmail.fm>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Jeff Ober.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

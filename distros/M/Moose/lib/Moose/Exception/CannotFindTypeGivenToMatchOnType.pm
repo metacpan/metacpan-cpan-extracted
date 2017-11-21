@@ -1,5 +1,5 @@
 package Moose::Exception::CannotFindTypeGivenToMatchOnType;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -29,4 +29,5 @@ sub _build_message {
     return "Cannot find or parse the type '$type'"
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

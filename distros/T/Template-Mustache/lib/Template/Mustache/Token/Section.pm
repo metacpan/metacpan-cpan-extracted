@@ -1,7 +1,7 @@
 package Template::Mustache::Token::Section;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Object representing a Section block
-$Template::Mustache::Token::Section::VERSION = '1.1.0';
+$Template::Mustache::Token::Section::VERSION = '1.2.0';
 use Moo;
 
 use MooseX::MungeHas { has_ro => [ 'is_ro' ] };
@@ -63,7 +63,7 @@ Template::Mustache::Token::Section - Object representing a Section block
 
 =head1 VERSION
 
-version 1.1.0
+version 1.2.0
 
 =head1 AUTHORS
 

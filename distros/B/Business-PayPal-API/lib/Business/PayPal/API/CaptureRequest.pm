@@ -1,5 +1,5 @@
 package Business::PayPal::API::CaptureRequest;
-$Business::PayPal::API::CaptureRequest::VERSION = '0.76';
+$Business::PayPal::API::CaptureRequest::VERSION = '0.77';
 use 5.008001;
 use strict;
 use warnings;
@@ -98,7 +98,7 @@ Business::PayPal::API::CaptureRequest - PayPal CaptureRequest API
 
 =head1 VERSION
 
-version 0.76
+version 0.77
 
 =head1 SYNOPSIS
 

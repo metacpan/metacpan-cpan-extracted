@@ -1,0 +1,30 @@
+#!# perl: agent/argv/dump
+
+use strict;
+use warnings;
+
+use Cwd;
+use Digest::MD5;
+use Getopt::Long;
+
+return sub
+{
+    local $/;
+    my ( $file, %o ) = shift;
+    return [ %o ] unless $file && -f $file;
+
+    
+    %o = ( path => $file =~ /^\// ? $file : Cwd::abs_path( $file ) );
+
+    Getopt::Long::GetOptionsFromArray( \@_, \%o, qw( path=s chmod=s chown=s cc ) );
+
+    if( delete $o{cc} )
+    {
+        my ( $uid, $mode ) = ( stat $file )[ 4, 2 ];
+        $o{chmod} ||= $mode = sprintf( "%04o", $mode & 07777 );
+	$o{chown} ||= ( getpwuid($uid) )[0];
+    }
+
+    $o{md5} = Digest::MD5->new()->add( $o{file} = `cat $file` )->hexdigest();
+    return [ \%o ];
+};

@@ -1,5 +1,5 @@
 package Moose::Exception::CoercionAlreadyExists;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -16,4 +16,5 @@ sub _build_message {
     "A coercion action already exists for '".$self->constraint_name."'";
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

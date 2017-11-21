@@ -430,7 +430,7 @@ sub fix_columns {
 
     $sim_spec //= $info->{sim};
     if ( ref($sim_spec // '') eq 'HASH' ) {
-      if ( exists $sim_spec->{null_chance} && !$info->{is_nullable} ) {
+      if ( exists $sim_spec->{null_chance} && $info->{is_nullable} ) {
         # Add check for not a number
         if ( rand() < $sim_spec->{null_chance} ) {
           $item->{$col_name} = undef;

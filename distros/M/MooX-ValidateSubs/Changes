@@ -4,14 +4,24 @@ Revision history for MooX-ValidateSubs
         First version, released on an unsuspecting world.
 
 0.06    14/03/2017
-        - Count correctly
-        - Kind of fix optional, so [ [Str], [Str, 1], [Str, 1] ] (logical) actually works.
-        - Replace (shift,shift,shift,shift) with @_ in _validate_sub.]
+		- Count correctly
+		- Kind of fix optional, so [ [Str], [Str, 1], [Str, 1] ] (logical) actually works.
+		- Replace (shift,shift,shift,shift) with @_ in _validate_sub.]
 
 0.09    16/03/2017
-        - Fix a couple of typos in the pod.
-        - Add some extra tests for around.
+		- Fix a couple of typos in the pod.
+		- Add some extra tests for around.
 
 1.012001 19/09/2017
-        - Allow for ArrayRef on ArrayRef validation 
-	    - coercion now works (ArrayRef[Str])->plus_coercions(Split[qr{\s}])
+		- Allow for ArrayRef on ArrayRef validation 
+		- coercion now works (ArrayRef[Str])->plus_coercions(Split[qr{\s}])
+	
+1.012002 19/11/2017
+		This morning a Python colleague told me I can't do these things in perl 
+		- Allow for override of indexed defaults "2='okay'" - will set the third passed argument into the sub - current caveats here are
+			- Arguments need to be stringified so for a hashref you will need - "2={ one => 'two' }".
+			- Passing a stringified Object will not currently work (logic only caters for ArrayRefs, HashRefs and Strings).
+		- setting a keys arrayref allows you to pass in a **dict** and transform it into a list with controlled order.
+
+1.012003 19/11/2017
+		Aparently I was in a special mood this morning no caveats - no stringification of indexed params. Everything should work.

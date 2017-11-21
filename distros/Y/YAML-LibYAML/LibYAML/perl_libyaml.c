@@ -126,6 +126,26 @@ Load(SV *yaml_sv)
     const unsigned char *yaml_str;
     STRLEN yaml_len;
 
+    GV *gv = gv_fetchpv("YAML::XS::Boolean", FALSE, SVt_PV);
+    char* boolean = "";
+    loader.load_bool_jsonpp = 0;
+    loader.load_bool_boolean = 0;
+    if (SvTRUE(GvSV(gv))) {
+        boolean = SvPV_nolen(GvSV(gv));
+        if (strEQ(boolean, "JSON::PP")) {
+            loader.load_bool_jsonpp = 1;
+            load_module(PERL_LOADMOD_NOIMPORT, newSVpv("JSON::PP", 0), Nullsv);
+        }
+        else if (strEQ(boolean, "boolean")) {
+            loader.load_bool_boolean = 1;
+            load_module(PERL_LOADMOD_NOIMPORT, newSVpv("boolean", 0), Nullsv);
+        }
+        else {
+            croak("%s",
+                "$YAML::XS::Boolean only accepts 'JSON::PP', 'boolean' or a false value");
+        }
+    }
+
     yaml_str = (const unsigned char *)SvPV_const(yaml_sv, yaml_len);
 
     if (DO_UTF8(yaml_sv)) {
@@ -139,6 +159,7 @@ Load(SV *yaml_sv)
     if (0 && (items || ax)) {} /* XXX Quiet the -Wall warnings for now. */
 
     yaml_parser_initialize(&loader.parser);
+
     loader.document = 0;
     yaml_parser_set_input_string(
         &loader.parser,
@@ -318,21 +339,25 @@ load_mapping(perl_yaml_loader_t *loader, char *tag)
     }
 
     /* Deal with possibly blessing the hash if the YAML tag has a class */
-    if (tag && strEQ(tag, TAG_PERL_PREFIX "hash"))
-        tag = NULL;
     if (tag) {
-        char *class;
-        char *prefix = TAG_PERL_PREFIX "hash:";
-        if (*tag == '!') {
-            prefix = "!";
+        if (strEQ(tag, TAG_PERL_PREFIX "hash")) {
         }
-        else if (strlen(tag) <= strlen(prefix) ||
-            ! strnEQ(tag, prefix, strlen(prefix))
-        ) croak("%s",
-            loader_error_msg(loader, form("bad tag found for hash: '%s'", tag))
-        );
-        class = tag + strlen(prefix);
-        sv_bless(hash_ref, gv_stashpv(class, TRUE));
+        else if (strEQ(tag, YAML_MAP_TAG)) {
+        }
+        else {
+            char *class;
+            char *prefix = TAG_PERL_PREFIX "hash:";
+            if (*tag == '!') {
+                prefix = "!";
+            }
+            else if (strlen(tag) <= strlen(prefix) ||
+                ! strnEQ(tag, prefix, strlen(prefix))
+            ) croak("%s",
+                loader_error_msg(loader, form("bad tag found for hash: '%s'", tag))
+            );
+            class = tag + strlen(prefix);
+            sv_bless(hash_ref, gv_stashpv(class, TRUE));
+        }
     }
 
     return hash_ref;
@@ -352,20 +377,24 @@ load_sequence(perl_yaml_loader_t *loader)
     while ((node = load_node(loader))) {
         av_push(array, node);
     }
-    if (tag && strEQ(tag, TAG_PERL_PREFIX "array"))
-        tag = NULL;
     if (tag) {
-        char *class;
-        char *prefix = TAG_PERL_PREFIX "array:";
-        if (*tag == '!')
-            prefix = "!";
-        else if (strlen(tag) <= strlen(prefix) ||
-            ! strnEQ(tag, prefix, strlen(prefix))
-        ) croak("%s",
-            loader_error_msg(loader, form("bad tag found for array: '%s'", tag))
-        );
-        class = tag + strlen(prefix);
-        sv_bless(array_ref, gv_stashpv(class, TRUE));
+        if (strEQ(tag, TAG_PERL_PREFIX "array")) {
+        }
+        else if (strEQ(tag, YAML_SEQ_TAG)) {
+        }
+        else {
+            char *class;
+            char *prefix = TAG_PERL_PREFIX "array:";
+            if (*tag == '!')
+                prefix = "!";
+            else if (strlen(tag) <= strlen(prefix) ||
+                ! strnEQ(tag, prefix, strlen(prefix))
+            ) croak("%s",
+                loader_error_msg(loader, form("bad tag found for array: '%s'", tag))
+            );
+            class = tag + strlen(prefix);
+            sv_bless(array_ref, gv_stashpv(class, TRUE));
+        }
     }
     return array_ref;
 }
@@ -379,39 +408,75 @@ load_scalar(perl_yaml_loader_t *loader)
     STRLEN length = (STRLEN)loader->event.data.scalar.length;
     char *anchor = (char *)loader->event.data.scalar.anchor;
     char *tag = (char *)loader->event.data.scalar.tag;
+    yaml_scalar_style_t style = loader->event.data.scalar.style;
     if (tag) {
-        char *class;
-        char *prefix = TAG_PERL_PREFIX "regexp";
-        if (strnEQ(tag, prefix, strlen(prefix)))
-            return load_regexp(loader);
-        prefix = TAG_PERL_PREFIX "scalar:";
-        if (*tag == '!')
-            prefix = "!";
-        else if (strlen(tag) <= strlen(prefix) ||
-            ! strnEQ(tag, prefix, strlen(prefix))
-        ) croak("%sbad tag found for scalar: '%s'", ERRMSG, tag);
-        class = tag + strlen(prefix);
-        scalar = sv_setref_pvn(newSV(0), class, string, strlen(string));
-        SvUTF8_on(scalar);
-    return scalar;
+        if (strEQ(tag, YAML_STR_TAG)) {
+            style = YAML_SINGLE_QUOTED_SCALAR_STYLE;
+        }
+        else {
+            char *class;
+            char *prefix = TAG_PERL_PREFIX "regexp";
+            if (strnEQ(tag, prefix, strlen(prefix)))
+                return load_regexp(loader);
+            prefix = TAG_PERL_PREFIX "scalar:";
+            if (*tag == '!')
+                prefix = "!";
+            else if (strlen(tag) <= strlen(prefix) ||
+                ! strnEQ(tag, prefix, strlen(prefix))
+            ) croak("%sbad tag found for scalar: '%s'", ERRMSG, tag);
+            class = tag + strlen(prefix);
+            scalar = sv_setref_pvn(newSV(0), class, string, strlen(string));
+            SvUTF8_on(scalar);
+            return scalar;
+        }
     }
 
-    if (loader->event.data.scalar.style == YAML_PLAIN_SCALAR_STYLE) {
+    else if (style == YAML_PLAIN_SCALAR_STYLE) {
         if (strEQ(string, "~"))
             return newSV(0);
         else if (strEQ(string, ""))
             return newSV(0);
         else if (strEQ(string, "null"))
             return newSV(0);
-        else if (strEQ(string, "true"))
-            return &PL_sv_yes;
-        else if (strEQ(string, "false"))
-            return &PL_sv_no;
+        else if (strEQ(string, "true")) {
+            if (loader->load_bool_jsonpp) {
+                char *name = "JSON::PP::Boolean";
+                SV *rv = newSV(1);
+                SV* sv = sv_setref_iv(rv, name, 1);
+                return rv;
+            }
+            else if (loader->load_bool_boolean) {
+                char *name = "boolean";
+                SV *rv = newSV(1);
+                SV* sv = sv_setref_iv(rv, name, 1);
+                return rv;
+            }
+            else {
+                return &PL_sv_yes;
+            }
+        }
+        else if (strEQ(string, "false")) {
+            if (loader->load_bool_jsonpp) {
+                char *name = "JSON::PP::Boolean";
+                SV *rv = newSV(1);
+                SV* sv = sv_setref_iv(rv, name, 0);
+                return rv;
+            }
+            else if (loader->load_bool_boolean) {
+                char *name = "boolean";
+                SV *rv = newSV(1);
+                SV* sv = sv_setref_iv(rv, name, 0);
+                return rv;
+            }
+            else {
+                return &PL_sv_no;
+            }
+        }
     }
 
     scalar = newSVpvn(string, length);
 
-    if (loader->event.data.scalar.style == YAML_PLAIN_SCALAR_STYLE && looks_like_number(scalar) ) {
+    if (style == YAML_PLAIN_SCALAR_STYLE && looks_like_number(scalar) ) {
         /* numify */
         SvIV_please(scalar);
     }
@@ -521,6 +586,27 @@ set_dumper_options(perl_yaml_dumper_t *dumper)
         ((gv = gv_fetchpv("YAML::XS::QuoteNumericStrings", TRUE, SVt_PV)) &&
         SvTRUE(GvSV(gv)))
     );
+
+    gv = gv_fetchpv("YAML::XS::Boolean", FALSE, SVt_PV);
+    char* boolean = "";
+    dumper->dump_bool_jsonpp = 0;
+    dumper->dump_bool_boolean = 0;
+    if (SvTRUE(GvSV(gv))) {
+        boolean = SvPV_nolen(GvSV(gv));
+        if (strEQ(boolean, "JSON::PP")) {
+            dumper->dump_bool_jsonpp = 1;
+            load_module(PERL_LOADMOD_NOIMPORT, newSVpv("JSON::PP", 0), Nullsv);
+        }
+        else if (strEQ(boolean, "boolean")) {
+            dumper->dump_bool_boolean = 1;
+            load_module(PERL_LOADMOD_NOIMPORT, newSVpv("boolean", 0), Nullsv);
+        }
+        else {
+            croak("%s",
+                "$YAML::XS::Boolean only accepts 'JSON::PP', 'boolean' or a false value");
+        }
+    }
+
     /* dumper->emitter.open_ended = 1;
      */
 }
@@ -701,15 +787,33 @@ dump_node(perl_yaml_dumper_t *dumper, SV *node)
                     if (!strEQ(class, "Regexp"))
                         tag = (yaml_char_t *)form("%s:%s", tag, class);
                 }
+                dump_scalar(dumper, node, tag);
             }
             else {
-                tag = (yaml_char_t *)form(
-                    TAG_PERL_PREFIX "scalar:%s",
-                    sv_reftype(rnode, TRUE)
-                );
-                node = rnode;
+                class = sv_reftype(rnode, TRUE);
+                if (
+                        dumper->dump_bool_jsonpp
+                        && strEQ(class, "JSON::PP::Boolean")
+                    ||
+                        dumper->dump_bool_boolean
+                        && strEQ(class, "boolean")
+                    ) {
+                    if (SvIV(node)) {
+                        dump_scalar(dumper, &PL_sv_yes, NULL);
+                    }
+                    else {
+                        dump_scalar(dumper, &PL_sv_no, NULL);
+                    }
+                }
+                else {
+                    tag = (yaml_char_t *)form(
+                        TAG_PERL_PREFIX "scalar:%s",
+                        class
+                    );
+                    node = rnode;
+                    dump_scalar(dumper, node, tag);
+                }
             }
-            dump_scalar(dumper, node, tag);
         }
 #if PERL_REVISION > 5 || (PERL_REVISION == 5 && PERL_VERSION >= 11)
         else if (ref_type == SVt_REGEXP) {

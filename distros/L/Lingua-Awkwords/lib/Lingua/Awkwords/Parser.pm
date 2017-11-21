@@ -7,14 +7,14 @@ package Lingua::Awkwords::Parser;
 use strict;
 use warnings;
 
-use base qw( Parser::MGC );
+use parent qw( Parser::MGC );
 
 use Lingua::Awkwords::ListOf;
 use Lingua::Awkwords::OneOf;
 use Lingua::Awkwords::String;
 use Lingua::Awkwords::Subpattern;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 sub parse {
     my $self = shift;

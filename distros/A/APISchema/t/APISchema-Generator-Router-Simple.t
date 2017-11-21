@@ -1,4 +1,5 @@
 package t::APISchema::Generator::Router::Simple;
+use lib '.';
 use t::test;
 use t::test::fixtures;
 use APISchema::Schema;

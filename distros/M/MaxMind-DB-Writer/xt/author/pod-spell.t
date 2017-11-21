@@ -15,8 +15,6 @@ Alders'
 Bieron
 CIDR
 DB
-DROLSKY
-DROLSKY's
 Dave
 Eilam
 Eilam's
@@ -26,6 +24,8 @@ GeoIP
 Greg
 Inc
 Jan
+MAXMIND
+MAXMIND's
 MMDB
 Mark
 MaxMind
@@ -39,11 +39,13 @@ Ragwitz
 Rolsky
 Rolsky's
 Serializer
+Storey
 TW
 Teredo
 Tree
 Util
 VisualizeTree
+William
 Writer
 docs
 drolsky
@@ -58,4 +60,5 @@ routable
 tjmather
 toplevel
 uint
+wstorey
 zh

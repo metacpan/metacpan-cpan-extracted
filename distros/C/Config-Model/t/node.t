@@ -31,6 +31,8 @@ $model->create_config_class(
     summary     => [ X => 'X-ray (summary)' ],
     class => 'Config::Model::Node',
 
+    gist => '{X} and {Y}',
+
     element => [
         [qw/D X Y Z/] => {
             type       => 'leaf',
@@ -42,6 +44,9 @@ $model->create_config_class(
 
 $model->create_config_class(
     name       => 'Captain',
+
+    gist => '{bar X} and {bar Y}',
+
     element    => [
         bar => {
             type              => 'node',
@@ -51,6 +56,7 @@ $model->create_config_class(
 $model->create_config_class(
     name       => "Master",
     level   => [ qw/captain/ => 'important' ],
+    gist => '{captain bar X} and {captain bar Y}',
     element => [
         captain => {
             type              => 'node',
@@ -88,18 +94,6 @@ is_deeply(
     "check Master elements"
 );
 
-is_deeply(
-    [ sort $root->get_element_name( ) ],
-    [qw/array_args captain hash_args/],
-    "check Master elements"
-);
-
-is_deeply(
-    [ sort $root->get_element_name( ) ],
-    [qw/array_args captain hash_args/],
-    "check Master elements"
-);
-
 my $w = $root->fetch_element('captain');
 ok( $w, "Created Captain" );
 
@@ -117,6 +111,14 @@ is( $b->fetch_element_value('Z'), undef, "test Z value" );
 warning_like { $b->fetch_element('D'); }
 qr/Element 'D' of node 'captain bar' is deprecated/,
     'Check deprecated element warning';
+
+
+$b->fetch_element('X')->store('Av');
+$b->fetch_element('Y')->store('Bv');
+my $expected_gist = 'Av and Bv';
+is($b->fetch_gist,$expected_gist, 'test Sarge gist');
+is($w->fetch_gist,$expected_gist, 'test Captain gist');
+is($root->fetch_gist,$expected_gist, 'test Master gist');
 
 my $tested = $root->fetch_element('hash_args')->fetch_element('bar');
 

@@ -1,5 +1,5 @@
 package Search::Elasticsearch::Role::Client::Direct;
-$Search::Elasticsearch::Role::Client::Direct::VERSION = '5.02';
+$Search::Elasticsearch::Role::Client::Direct::VERSION = '6.00';
 use Moo::Role;
 with 'Search::Elasticsearch::Role::Client';
 use Search::Elasticsearch::Util qw(load_plugin is_compat throw);
@@ -30,11 +30,7 @@ sub parse_request {
     catch {
         chomp $_;
         my $name = $defn->{name} || '<unknown method>';
-        $self->logger->throw_error( 'Param',
-                  "$_ in ($name) request. "
-                . "See docs at: http://www.elastic.co/guide/en/elasticsearch/reference/current/"
-                . $defn->{doc}
-                . '.html' );
+        $self->logger->throw_error( 'Param', "$_ in ($name) request. " );
     };
     return $request;
 }
@@ -179,7 +175,7 @@ Search::Elasticsearch::Role::Client::Direct - Request parsing for Direct clients
 
 =head1 VERSION
 
-version 5.02
+version 6.00
 
 =head1 DESCRIPTION
 

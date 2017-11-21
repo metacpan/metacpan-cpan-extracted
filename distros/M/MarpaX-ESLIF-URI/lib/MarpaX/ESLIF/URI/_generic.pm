@@ -7,7 +7,7 @@ package MarpaX::ESLIF::URI::_generic;
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use Carp qw/croak/;
 use Class::Method::Modifiers qw/fresh around/;
@@ -141,6 +141,15 @@ sub host {
     my ($self, $type) = @_;
 
     return $self->_generic_getter('_host', $type)
+}
+
+
+sub hostname {
+    my ($self, $type) = @_;
+
+    my $hostname = $self->_generic_getter('_host', $type);
+    $hostname =~ s/^\[(.*)\]$/$1/ if defined($hostname);
+    return $hostname
 }
 
 
@@ -667,7 +676,7 @@ MarpaX::ESLIF::URI::_generic - URI Generic syntax as per RFC3986/RFC6874
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SUBROUTINES/METHODS
 
@@ -710,6 +719,10 @@ Returns the userinfo, or undef. C<$type> is either 'decoded' (default value), 'o
 =head2 $self->host($type)
 
 Returns the host (which may contain C<[]> delimiters in case of IPv6 literal), or undef. C<$type> is either 'decoded' (default value), 'origin' or 'normalized'.
+
+=head2 $self->hostname($type)
+
+Returns the hostname (without eventual C<[]> delimiters), or undef. C<$type> is either 'decoded' (default value), 'origin' or 'normalized'.
 
 =head2 $self->ip($type)
 

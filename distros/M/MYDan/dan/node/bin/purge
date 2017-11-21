@@ -8,9 +8,6 @@ use FindBin qw( $Bin );
 use MYDan::Node;
 use MYDan::Node::DBI::Root;
 use MYDan::Util::OptConf;
-use MYDan::Util::Sudo;
-
-MYDan::Util::Sudo->sudo();
 
 $| ++;
 

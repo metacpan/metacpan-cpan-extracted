@@ -12,9 +12,13 @@ Commandline options and arguments understood for TestOnTap processing
     	{
     		--_pp
     			|
+    		--_pp_path <file>
+    			|
     		--_info
     			|
-    		--_info_cmd
+    		--_info_ppcmd
+    			|
+    		--_info_ppname
     			|
     		--_info_config
     			|
@@ -38,9 +42,14 @@ not ready for prime time...
 
 Displays usage and help with options/arguments. If given, nothing else will be done.
 
-=item B<--_pp>
+=item B<--_pp> or B<--_pp_file E<lt>fileE<gt>>
 
-Will attempt to generate a binary using the 'pp' command from PAR::Packer (must be installed first).
+Will attempt to generate a binary using the 'pp' command from PAR::Packer.
+
+The first form will generate a default name for the binary (use C<--_info_ppname> to see this),
+and the second form makes it possible to use an arbitrary name and path.
+
+An existing file will not be overwritten.
 
 By using the C<--verbose> flag, pp verbosity can be raised.
 
@@ -56,10 +65,11 @@ When a packed binary is run, any C<PERL5LIB> envvar is just dropped which is und
 is needed when running the tests, set the C<TESTONTAP_PERL5LIB> to the desired value and the C<PERL5LIB> variable
 will be set with that value during the running of the tests.  
 
-=item B<--_info>, B<--_info_cmd>, B<--_info_config> or C<--_info_modules>
+=item B<--_info>, B<--_info_ppcmd>, B<--_info_ppname>, B<--_info_config> or C<--_info_modules>
 
 Prints information about the current context - the configuration (perl -V), the modules
-available (according to L<ExtUtils::Installed>) and the command line to use for <--_pp>.
+available (according to L<ExtUtils::Installed>), the default file name and the command line
+to use for <--_pp>.
 
 The C<--_info> is just a simple wrapper to print all information in one go.
 

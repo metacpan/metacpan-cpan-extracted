@@ -8,10 +8,10 @@ use File::Spec;
 
 use MYDan::Util::ExpSSH;
 use MYDan::Util::OptConf;
+use MYDan::Util::Go;
 
 $| ++;
 
-$MYDan::Util::OptConf::ARGC = -1;
 $MYDan::Util::OptConf::THIS = 'util';
 
 =head1 SYNOPSIS
@@ -23,6 +23,14 @@ $MYDan::Util::OptConf::THIS = 'util';
 
 my $option = MYDan::Util::OptConf->load();
 my %o = $option->get( qw( user=s ) )->dump();
+
+
+if( ! @ARGV || $ARGV[0] =~ s/^\/// )
+{
+    $option->assert() unless "$o{conf}/go" && -e "$o{conf}/go";
+    MYDan::Util::Go->new( "$o{conf}/go" )->go( $ARGV[0] );
+    exit;
+}
 
 die "cannot resolve host\n" unless MYDan::Util::ExpSSH->new()
     ->conn( pass => "$o{conf}/pass", user => $o{user}, host => shift, sudo => shift );

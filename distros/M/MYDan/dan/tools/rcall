@@ -7,6 +7,7 @@ use File::Spec;
 use MYDan::Node;
 use MYDan::Util::OptConf;
 use MYDan::Agent::Client;
+use MYDan::VSSH::Print;
 
 $| ++;
 
@@ -21,12 +22,13 @@ $MYDan::Util::OptConf::ARGC = -1;
      [--user username (default `logname`)]
      [--timeout seconds (default 500)] 
      [--max number ( default 128 )]
+     [--port number ( default from .config )]
      [--env "A=123;B=abc" ]
 
 =cut
 my $option = MYDan::Util::OptConf->load();
 my %o = $option->get(
-     qw( range=s sudo=s timeout=i max=i verbose env=s user=s )
+     qw( range=s sudo=s timeout=i max=i verbose env=s user=s port=s )
 )->dump();
 
 $option->assert( 'range' );
@@ -48,25 +50,12 @@ $query{sudo} = delete $o{sudo} if $o{sudo};
 
 my $range = MYDan::Node->new( $option->dump( 'range' ) );
 
-
-my ( %result, %re, %mesg )= MYDan::Agent::Client->new( 
+my %result = MYDan::Agent::Client->new( 
     $range->load( delete $o{range} )->list
 )->run( %o, query => \%query ); 
 
-while( my( $node, $mesg ) = each %result )
-{
-    push @{$re{$mesg}}, $node;
-}
+MYDan::VSSH::Print::result( 'rcal' => %result );
 
-while( my( $mesg, $node ) = each %re )
-{
-    $mesg =~ s/--- \d+\n$//;
-    $node = $range->load( $node );
-    $node = sprintf "%s[%d]", $node->dump(), scalar $node->list;
-    $mesg{$node} = $mesg;
-}
-
-YAML::XS::DumpFile \*STDOUT, \%mesg if %mesg;
 exit 0;
 
 sub argv

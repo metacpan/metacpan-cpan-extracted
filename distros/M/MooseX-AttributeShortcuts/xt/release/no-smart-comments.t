@@ -44,6 +44,7 @@ no_smart_comments_in("t/funcs.pm");
 no_smart_comments_in("t/handles/coderef-class.t");
 no_smart_comments_in("t/handles/coderef.t");
 no_smart_comments_in("t/handles/metaclass.t");
+no_smart_comments_in("t/init_arg.t");
 no_smart_comments_in("t/inline_subtyping/basic.t");
 no_smart_comments_in("t/inline_subtyping/coercion.t");
 no_smart_comments_in("t/inline_subtyping/with_coercion.t");

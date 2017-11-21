@@ -42,7 +42,7 @@ use constant NFIELDS  => 4;
 
 # ----- static data -----
 
-our $VERSION      = '1.013';
+our $VERSION      = '1.014';
 our $max_degree   = 10_000;    # limit for power operator
 
 # default values for as_string options
@@ -92,35 +92,16 @@ my @tree_defaults = (
 
 # ----- private/protected subroutines -----
 
-# generic polynomial detection hook (see Math::Polynomial::Generic)
-sub _is_generic {
-    return 0;
-}
-
 # binary operator wrapper generator
 # generates functions to be called via overload:
 # - upgrading a non-polynomial operand to a compatible polynomial
-# - casting a generic operand if appropriate
 # - restoring the original operand order
 sub _binary {
     my ($method) = @_;
     return sub {
         my ($this, $that, $reversed) = @_;
         if (!ref($that) || !eval { $that->isa('Math::Polynomial') }) {
-            if ($this->_is_generic) {
-                $that = Math::Polynomial->new($that);
-            }
-            else {
-                $that = $this->new($that);
-            }
-        }
-        if ($this->_is_generic) {
-            if (!$that->_is_generic) {
-                $this = $this->_cast($that);
-            }
-        }
-        elsif ($that->_is_generic) {
-            $that = $that->_cast($this);
+            $that = $this->new($that);
         }
         if ($reversed) {
             ($this, $that) = ($that, $this);
@@ -306,6 +287,12 @@ sub nest {
     return $result;
 }
 
+sub mirror {
+    my ($this) = @_;
+    my $i = 0;
+    return $this->new( map { $i++ & 1? -$_: $_ } $this->coeff );
+}
+
 sub is_zero {
     my ($this) = @_;
     return $this->degree < 0;
@@ -336,6 +323,16 @@ sub is_unequal {
         --$i;
     }
     return !$eq;
+}
+
+sub is_even {
+    my ($this) = @_;
+    return $this->is_equal($this->mirror);
+}
+
+sub is_odd {
+    my ($this) = @_;
+    return $this->is_equal($this->mirror->neg);
 }
 
 sub neg {
@@ -912,7 +909,7 @@ Math::Polynomial - Perl class for polynomials in one variable
 
 =head1 VERSION
 
-This documentation refers to version 1.013 of Math::Polynomial.
+This documentation refers to version 1.014 of Math::Polynomial.
 
 =head1 SYNOPSIS
 
@@ -1193,6 +1190,18 @@ polynomials might be involved.
 C<$p-E<gt>is_monic> returns a boolean value which is true if C<$p> is
 monic, which means it is not the zero polynomial and its highest-degree
 coefficient is equal to one.  Cf. L</monize>.
+
+=item I<is_even>
+
+C<$p-E<gt>is_even> returns a boolean value which is true if C<$p> is
+an even function, which means it is identical to its reflection about
+the axis I<x = 0>.
+
+=item I<is_odd>
+
+C<$p-E<gt>is_odd> returns a boolean value which is true if C<$p> is an
+odd function, which means it is the negative of its reflection about
+the axis I<x = 0>.
 
 =back
 
@@ -1516,6 +1525,14 @@ degree I<m> and I<n> this takes I<O(m*m*n*n)> multiplications and
 additions in the coefficient space.  The result will be a polynomial
 of degree I<m*n> if neither of the polynomials is a zero polynomial,
 otherwise a constant or zero polynomial.
+
+=item I<mirror>
+
+C<$p-E<gt>mirror> gives the reflection of a polynomial about the axis
+I<x = 0>.  This is equivalent to the substitution of I<x> by I<-x>,
+or C<$p-E<gt>nest(- $p-E<gt>monomial(1))>, only more efficient.  For a
+polynomial of degree I<n>, it takes I<floor( (n+1)/2 )> negations in
+the coefficient space.
 
 =item I<gcd>
 
@@ -1993,6 +2010,12 @@ ordered space, i.e. lacking operators like C<E<lt>> (less than).
 
   $q = $p1->nest($p2);                         # q(x) == p1(p2(x))
 
+  $q = $p->mirror;                             # q(x) == p(-x)
+
+  $bool = $p->is_even;                         # whether p(-x) == p(x)
+
+  $bool = $p->is_odd;                          # whether p(-x) == -p(x)
+
   $bool = $p->is_monic;                        # whether p is monic
 
   $q = $p->monize;                             # p(x) == q(x) * c,
@@ -2131,10 +2154,10 @@ ordered space, i.e. lacking operators like C<E<lt>> (less than).
   });
   print "$p\n";                                # prints ((2+i) x + 3i)
 
-  use Math::BigNum;
-  $c0 = Math::BigNum->new('-1/2');
-  $c1 = Math::BigNum->new('0');
-  $c2 = Math::BigNum->new('3/2');
+  use Math::AnyNum;
+  $c0 = Math::AnyNum->new('-1/2');
+  $c1 = Math::AnyNum->new('0');
+  $c2 = Math::AnyNum->new('3/2');
   $p = Math::Polynomial->new($c0, $c1, $c2);  # p(x) == 3/2*x**2 - 1/2
 
   use Math::ModInt qw(mod);
@@ -2328,7 +2351,7 @@ Math::BigInt (usually bundled with perl)
 
 =item *
 
-Math::BigNum (available on CPAN)
+Math::AnyNum (available on CPAN)
 
 =item *
 
@@ -2427,7 +2450,7 @@ arbitrary precision math libraries.
 
 =item *
 
-Math::BigNum -
+Math::AnyNum -
 another arbitrary precision library (using GMP).
 
 =item *

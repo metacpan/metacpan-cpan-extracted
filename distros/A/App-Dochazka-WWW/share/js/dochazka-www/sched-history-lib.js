@@ -54,69 +54,43 @@ define ([
     start
 ) {
 
-    var genSchedHistoryAction = function (tgt) {
-            return function () {
-                var nick = currentUser('obj').nick,
-                    rest = {
-                        "method": 'GET',
-                        "path": 'schedule/history/nick/' + currentUser('obj').nick
-                    },
-                    // success callback
-                    sc = function (st) {
-                        if (st.code === 'DISPATCH_RECORDS_FOUND') {
-                            console.log("Payload is", st.payload);
-                            var history = st.payload.history.map(
-                                function (row) {
-                                    return {
-                                        "nick": nick,
-                                        "shid": row.shid,
-                                        "sid": row.sid,
-                                        "effective": datetime.readableDate(row.effective),
-                                        "scode": row.scode
-                                    };
-                                }
-                            );
-                            if (tgt === 'schedHistoryDtable') {
-                                stack.push(tgt, history, {
-                                    "xtarget": "mainSched"
-                                });
-                            } else if (tgt === 'schedHistoryDrowselect') {
-                                stack.push(tgt, {
-                                    'pos': 0,
-                                    'set': history
-                                });
+    var actionSchedHistory = function () {
+            var rest = {
+                    "method": 'GET',
+                    "path": 'schedule/history/nick/' + currentUser('obj').nick
+                },
+                // success callback
+                sc = function (st) {
+                    if (st.code === 'DISPATCH_RECORDS_FOUND') {
+                        console.log("Payload is", st.payload);
+                        var history = st.payload.history.map(
+                            function (row) {
+                                return {
+                                    "shid": row.shid,
+                                    "sid": row.sid,
+                                    "effective": datetime.readableDate(row.effective),
+                                    "scode": row.scode
+                                };
                             }
-                        }
-                    },
-                    fc = function (st) {
-                        lib.displayError(st.payload.message);
-                        if (st.payload.code === "404") {
-                            // The employee has no history records. This is not
-                            // really an error condition.
-                            if (tgt === 'schedHistoryDtable') {
-                                stack.push(tgt, [], {
-                                    "xtarget": "mainSched"
-                                });
-                            } else if (tgt === 'schedHistoryDrowselect') {
-                                stack.push(tgt, {
-                                    'pos': 0,
-                                    'set': []
-                                });
-                            }
-                        }
-                    };
-                ajax(rest, sc, fc);
-            };
-        };
+                        );
+                        stack.push('schedHistoryDrowselect', {
+                            'pos': 0,
+                            'set': history
+                        }, { "xtarget": "myProfileAction" });
+                    }
+                },
+                fc = function (st) {
+                    if (st.payload.code === "404") {
+                        stack.push('schedHistoryDrowselect', {
+                            'pos': 0,
+                            'set': []
+                        }, { "xtarget": "myProfileAction" });
+                    }
+                };
+            ajax(rest, sc, fc);
+        },
 
-    return {
-        "actionSchedHistory":     genSchedHistoryAction(
-                                     'schedHistoryDtable'
-                                 ),
-        "actionSchedHistoryEdit": genSchedHistoryAction(
-                                     'schedHistoryDrowselect'
-                                 ),
-        "schedHistorySaveAction": function () {
+        schedHistorySaveAction = function () {
             var rest = {
                     "method": 'POST',
                     "path": 'schedule/history/nick/' + currentUser('obj').nick,
@@ -143,7 +117,8 @@ define ([
             ajax(rest, sc, fc);
             // start.drowselectListen();
         },
-        "schedHistoryDeleteAction": function () {
+
+        schedHistoryDeleteAction = function () {
             var shid,
                 set = lib.drowselectState.set,
                 pos = lib.drowselectState.pos,
@@ -174,12 +149,21 @@ define ([
             ajax(rest, sc, fc);
             // start.drowselectListen();
         },
-        "schedHistoryAddRecordAction": function (obj) {
-            console.log("Entering schedHistoryAddRecordAction with obj", obj);
+
+        schedHistoryAddRecordAction = function () {
+            var cu = currentUser('obj');
+            console.log("Entering schedHistoryAddRecordAction, nick is " + cu.nick);
             stack.push('schedHistoryAddRecord', {
-                'nick': obj.nick
+                'nick': cu.nick
             });
         }
+        ;
+
+    return {
+        "actionSchedHistory": actionSchedHistory,
+        "schedHistorySaveAction": schedHistorySaveAction,
+        "schedHistoryDeleteAction": schedHistoryDeleteAction,
+        "schedHistoryAddRecordAction": schedHistoryAddRecordAction,
     };
 });
 

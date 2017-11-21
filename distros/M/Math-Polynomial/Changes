@@ -1,5 +1,16 @@
 Revision history for Perl extension Math::Polynomial.
 
+                    Math::Polynomial Version 1.014
+                    ------------------------------
+
+- Release date: 2017-11-14
+
+- Added mirror and is_even/is_odd methods.
+
+- Removed deprecated Math::Polynomial::Generic extension.  Almost.
+
+- Math::AnyNum replaces Math::BigNum in recommendations and examples.
+
                     Math::Polynomial Version 1.013
                     ------------------------------
 

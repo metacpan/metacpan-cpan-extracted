@@ -35,7 +35,8 @@ is( Scalar::Util::blessed($foo), 'Foo', '... the class of this object is Foo' );
 }
 
 package Bar {
-    use Moxie;
+    use Moxie
+        traits => [':experimental'];
 
     extends 'Moxie::Object';
 
@@ -43,7 +44,7 @@ package Bar {
 
     my sub _foo : private;
 
-    sub BUILDARGS : init( foo? => _foo );
+    sub BUILDARGS : strict( foo? => _foo );
 
     sub foo { _foo }
 }

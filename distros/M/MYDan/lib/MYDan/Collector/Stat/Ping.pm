@@ -1,4 +1,6 @@
 package MYDan::Collector::Stat::Ping;
+use strict;
+use warnings;
 use Data::Dumper;
 use MYDan::Collector::Util;
 

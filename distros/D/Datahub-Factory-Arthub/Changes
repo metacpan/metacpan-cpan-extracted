@@ -1,5 +1,9 @@
 Revision history for Datahub-Factory-VKC
 
+0.94  2017-11-13 11:28:19 CET
+
+    - Changed: reverted back to 0.92 changes because bugs.
+
 0.93  2017-11-08 13:17:10 CET
 
     - Added: added generate_temp_tables and generate_vocabularies plugin options.

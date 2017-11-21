@@ -4,6 +4,9 @@ use strict;
 use warnings;
 use utf8;
 use FindBin;
+
+use lib "$FindBin::Bin/..";
+
 use lib "$FindBin::Bin/../lib";
 use Perl::PrereqScanner::Lite;
 

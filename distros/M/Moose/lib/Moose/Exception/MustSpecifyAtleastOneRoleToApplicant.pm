@@ -1,5 +1,5 @@
 package Moose::Exception::MustSpecifyAtleastOneRoleToApplicant;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -15,4 +15,5 @@ sub _build_message {
     "Must specify at least one role to apply to ".$self->applicant;
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

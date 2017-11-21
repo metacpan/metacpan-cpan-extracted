@@ -27,6 +27,8 @@ use IPC::Open3;
 use Time::HiRes qw( time );
 use POSIX qw( :sys_wait_h );
 use IO::Poll qw( POLLIN POLLHUP POLLOUT );
+use Tie::File;
+use FindBin qw( $Script );
 
 use base qw( MYDan::Util::MIO );
 
@@ -57,104 +59,72 @@ Returns HASH of HASH of nodes. First level is indexed by type
 =cut
 sub run
 {
-    confess "poll: $!" unless my $poll = IO::Poll->new();
-
     local $| = 1;
-    local $/ = undef;
 
     my $self = shift;
     my @node = keys %$self;
-    my ( %run, %result, %buffer, %busy ) = ( %RUN, @_ );
-    my ( $log, $max, $timeout, $interchange ) = @run{ qw( log max timeout interchange ) };
-    my %node = map { $_ => {} } qw( stdout stderr );
+    my ( $run, $ext, %run, %result, %busy ) = ( 1, "$Script.$$", %RUN, @_ );
+    my ( $max, $timeout, $interchange ) = @run{ qw( max timeout interchange ) };
     my $input = defined $run{input} ? $run{input} : -t STDIN ? '' : <STDIN>;
 
-    for ( my $time = time; @node || $poll->handles; )
+    $SIG{INT} = $SIG{TERM} = sub
     {
-        if ( time - $time > $timeout ) ## timeout
-        {
-            for my $node ( keys %busy )
-            {
-                my ( $pid ) = @{ delete $busy{$node} };
-                kill 9, $pid;
-                waitpid $pid, WNOHANG;
-                push @{ $result{error}{timeout} }, $node;
-            }
+        print STDERR "killed\n";
+        $run = 0;
+    };
 
-            print $log "timeout!\n";
-            last;
-        }
+    for ( my $time = time; $run && ( @node || %busy ); )
+    {
+        $run = 0 if time - $time > $timeout;
 
         while ( @node && keys %busy < $max )
         {
             my $node = shift @node;
+	    my $log = "/tmp/$node.$ext";
             my $cmd = $self->{$node};
             my @cmd = map { my $t = $_; $t =~ s/$interchange/$node/g; $t } @$cmd;
 
             if ( $run{noop} )
             {
-                print $log join ' ', @cmd, "\n";
+                print join ' ', @cmd, "\n";
                 next;
             }
 
-            my @io = ( undef, undef, Symbol::gensym );
-            my $pid = eval { IPC::Open3::open3( @io, @cmd ) };
+            print "$node started.\n" if $run{verbose};
 
-            if ( $@ )
-            {
-                push @{ $result{error}{ "open3: $@" } }, $node;
-                next;
-            }
+            if ( my $pid = fork() ) { $busy{$pid} = [ $log, $node ]; next } 
 
-            $poll->mask( $io[0] => POLLOUT ) if $input;
-            $poll->mask( $io[1] => POLLIN );
-            $poll->mask( $io[2] => POLLIN );
-
-            $node{ $io[1] } = [ stdout => $node ]; 
-            $node{ $io[2] } = [ stderr => $node ]; 
-
-            $busy{$node} = [ $pid, 2 ];
-            print $log "$node started.\n" if $run{verbose};
+	    open STDOUT, ">>$log";
+	    open STDERR, ">>$log";
+	    
+	    exec sprintf join ' ', @cmd;
+	    exit 0;
         }
 
-        $poll->poll( $MAX{period} );
-
-        for my $fh ( $poll->handles( POLLIN ) ) ## stdout/stderr
+        for ( keys %busy )
         {
-            sysread $fh, my $buffer, $MAX{buffer};
-            $buffer{$fh} .= $buffer;
-        }
+            my $pid = waitpid( -1, WNOHANG );
+            next if $pid <= 0;
 
-        for my $fh ( $poll->handles( POLLOUT ) ) ## stdin
-        {
-            syswrite $fh, $input;
-            $poll->remove( $fh );
-            close $fh;
-        }
+	    my $stat = $? >> 8;
 
-        for my $fh ( $poll->handles( POLLHUP ) ) ## done
-        {
-            my ( $io, $node ) = @{ delete $node{$fh} };
+            my ( $log, $node ) = @{ delete $busy{$pid} };
 
-            push @{ $result{$io}{ delete $buffer{$fh} } }, $node
-                if defined $buffer{$fh} && length $buffer{$fh} 
-                    && ( $buffer{$fh} =~ s/$node/$interchange/g || 1 );
+            print "$node done.\n" if $run{verbose};
 
-            unless ( -- $busy{$node}[1] )
-            {
-                waitpid $busy{$node}[0], WNOHANG;
-                my $stat = $? == -1 ? 110 : $? & 127 ? 112 : $? >> 8;
-                push @{ $result{status}{$stat} }, $node;
-                delete $busy{$node};
-                print $log "$node done.\n" if $run{verbose};
-            }
+            tie my @log, 'Tie::File', $log,recsep => "\n";
 
-            $poll->remove( $fh );
-            close $fh;
+            push @{ $result{output}{ join "\n", @log, "--- $stat", '' } }, $node;
+            unlink $log;
         }
     }
 
-    push @{ $result{error}{'not run'} }, @node if @node;
+    kill 9, keys %busy;
+    push @{ $result{output}{killed} }, map{ $busy{$_}[1]}keys %busy;
+    push @{ $result{output}{norun} }, @node;
+    unlink glob "/tmp/*.$ext";
+    unlink $input if $input && -f $input;
+
     return wantarray ? %result : \%result;
 }
 

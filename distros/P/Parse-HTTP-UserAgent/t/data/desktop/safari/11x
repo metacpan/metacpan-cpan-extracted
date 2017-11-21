@@ -1,0 +1,11 @@
+[AGENT]
+
+Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/604.3.5 (KHTML, like Gecko) Version/11.0.1 Safari/604.3.5
+
+extras          => [ 'Macintosh', 'KHTML, like Gecko', 'Safari/604.3.5' ],
+name            => 'Safari',
+os              => 'Intel Mac OS X 10_12_6',
+parser          => 'safari',
+toolkit         => [ 'AppleWebKit', '604.3.5', '604.003005' ],
+version         => '11.000001',
+version_raw     => '11.0.1',

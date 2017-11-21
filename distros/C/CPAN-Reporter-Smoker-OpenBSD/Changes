@@ -1,10 +1,73 @@
 ==================================================
-Changes from 2016-06-28 00:00:00 +0000 to present.
+Changes from 2016-11-20 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.007 at 2017-06-28 23:01:03 +0000
+version 0.009 at 2017-11-20 12:53:03 +0000
 ------------------------------------------
+
+  Change: 6d4f46cf469ddedf71064209df681ecfa84d814e
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-11-20 10:50:05 +0000
+
+    Pod added and refactoring
+
+    Added Pod for --quiet option, fixed some typos on the rest of
+    documentation. Small refactoring in the script by using perltidy. 
+
+  Change: 942b55c10193e16f5e007d204281e12f417ee61d
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-11-20 10:42:30 +0000
+
+    Added TODO file 
+
+  Change: 5a2b8b126853dc62dcbc46bde483ffe2a4bb4028
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-11-16 15:24:33 +0000
+
+    More distributions blocked from smoking 
+
+  Change: 8450f8946a311dbbaced40b31971ad374271cf42
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-11-14 19:34:06 +0000
+
+    New command line options to send_reports
+
+    Added --exclude e --quiet command line options to send_report.
+    Applied some small refactorings that were delaying exceptions when
+    wrong parameters were supplied in the command line. Also incremented
+    the distro version. 
+
+  Change: 90b957c3edf2af7bd821732d68005abd3becf60d
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-11-14 14:18:55 +0000
+
+    Added new distribution which are blocked to be tested on smoker 
+
+  Change: 1f0348e3abf5c39c3caba7217188b4dd73eb6e6b
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-11-12 11:12:09 +0000
+
+    Merge branch 'master' of
+    https://github.com/glasswalk3r/cpan-openbsd-smoker 
+
+  Change: 96573d157a69a31226774768a7cb3b1ab4cc72d9
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-11-12 11:11:31 +0000
+
+    Disabling more distro through preferences 
+
+  Change: 5daedf74b897e9a5402d8b3af41ad431695c306a
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-11-11 10:41:59 +0000
+
+    Increased version number for CPAN release 
+
+  Change: 6443f020ff57572106261511903f00cf3b36ddfd
+  Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>
+  Date : 2017-11-11 10:41:01 +0000
+
+    Fixed bug when creating Set::Tiny instance 
 
   Change: 8cbdc00b6be8dd1281086f910a66bf8d00f735e8
   Author: Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>

@@ -1,5 +1,5 @@
 package CPAN::Perl::Releases;
-$CPAN::Perl::Releases::VERSION = '3.40';
+$CPAN::Perl::Releases::VERSION = '3.42';
 #ABSTRACT: Mapping Perl releases on CPAN to the location of the tarballs
 
 use strict;
@@ -144,7 +144,6 @@ our $data =
 "5.21.8" => { id => 'WOLFSAGE' },
 "5.20.2-RC1" => { id => 'SHAY' },
 "5.20.2" => { id => 'SHAY' },
-"5.21.9" => { id => 'XSAWYERX' },
 "5.21.10" => { id => 'SHAY' },
 "5.21.11" => { id => 'SHAY' },
 "5.22.0" => { id => 'RJBS' },
@@ -162,9 +161,8 @@ our $data =
 "5.22.1-RC3" => { id => 'SHAY' },
 "5.22.1-RC4" => { id => 'SHAY' },
 "5.22.1" => { id => 'SHAY' },
-"5.23.6" => { id => 'DAGOLDEN' },
+"5.23.6" => { id => 'DAGOLDEN', noxz => 1 },
 "5.23.7" => { id => 'STEVAN' },
-"5.23.8" => { id => 'XSAWYERX' },
 "5.23.9" => { id => 'ABIGAIL' },
 "5.22.2-RC1" => { id => 'SHAY' },
 "5.24.0-RC1" => { id => 'RJBS' },
@@ -175,7 +173,6 @@ our $data =
 "5.24.0-RC5" => { id => 'RJBS' },
 "5.24.0" => { id => 'RJBS' },
 "5.25.0" => { id => 'RJBS' },
-"5.25.1" => { id => 'XSAWYERX' },
 "5.25.2" => { id => 'WOLFSAGE' },
 "5.22.3-RC1" => { id => 'SHAY' },
 "5.24.1-RC1" => { id => 'SHAY' },
@@ -190,19 +187,13 @@ our $data =
 "5.24.1-RC4" => { id => 'SHAY' },
 "5.25.6" => { id => 'ARC' },
 "5.25.7" => { id => 'EXODIST' },
-"5.25.8" => { id => 'XSAWYERX' },
 "5.22.3-RC5" => { id => 'SHAY' },
 "5.24.1-RC5" => { id => 'SHAY' },
 "5.22.3" => { id => 'SHAY' },
 "5.24.1" => { id => 'SHAY' },
 "5.25.9" => { id => 'ABIGAIL' },
 "5.25.10" => { id => 'RENEEB' },
-"5.25.11" => { id => 'XSAWYERX' },
-"5.25.12" => { id => 'XSAWYERX' },
-"5.26.0-RC1" => { id => 'XSAWYERX' },
-"5.26.0-RC2" => { id => 'XSAWYERX' },
 "5.26.0" => { id => 'XSAWYERX' },
-"5.27.0" => { id => 'XSAWYERX' },
 "5.27.1" => { id => 'EHERMAN' },
 "5.22.4-RC1" => { id => 'SHAY' },
 "5.24.2-RC1" => { id => 'SHAY' },
@@ -216,6 +207,7 @@ our $data =
 "5.24.3" => { id => 'SHAY' },
 "5.26.1" => { id => 'SHAY' },
 "5.27.5" => { id => 'SHAY' },
+"5.27.6" => { id => 'ETHER' },
 };
 
 sub perl_tarballs {
@@ -243,7 +235,7 @@ sub perl_tarballs {
   }
   my $foo = { };
   $foo->{'tar.gz'} = "$path/$perl.tar.gz" unless $onlybz2;
-  $foo->{'tar.bz2'} = "$path/$perl.tar.bz2" unless $onlygz;
+  $foo->{'tar.bz2'} = "$path/$perl.tar.bz2" unless $onlygz || $lvers > 5.027005;
   $foo->{'tar.xz'} = "$path/$perl.tar.xz" if $lvers > 5.021005 && !$noxz;
   $cache->{ $vers } = $foo;
   return { %$foo };
@@ -283,7 +275,7 @@ CPAN::Perl::Releases - Mapping Perl releases on CPAN to the location of the tarb
 
 =head1 VERSION
 
-version 3.40
+version 3.42
 
 =head1 SYNOPSIS
 

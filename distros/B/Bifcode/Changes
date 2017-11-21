@@ -1,0 +1,109 @@
+1.0 (2017-11-13)
+
+    First stable release.
+
+0.001_12 (2017-11-12)
+
+    API / Behaviour Changes:
+        - UTF8 and BYTES strings now encode with a trailing ","
+
+0.001_11 (2017-11-08)
+
+    Enhancements:
+        - Document use of BIFCODE_UTF8 only for hash keys
+        - Convert all errors to exception objects
+        - Minor documentation and testing improvements
+
+    Bug Fixes:
+        - Return correct encode_bifcode() result in array context.
+
+0.001_10 (2017-11-06)
+
+    API / Behaviour Changes:
+        - decode_bifcode() now does what the documentation says with
+          repect to inflating BIFCODE_BYTES. They become normal scalars
+          and not SCALAR references.
+
+    Enhancements:
+        - Refactor decode()
+
+    Packaging:
+        - Fix README file
+
+0.001_9 (2017-11-05)
+
+    Enhancements:
+        - Minor documentation edits.
+        - Reduced recursion during encoding.
+        - Minor documentation edits.
+
+    Dependencies:
+        - No longer need Test::Differences for tests
+        - Require "boolean" for true/false
+
+    Packaging:
+        - Added a package ABSTRACT
+        - Correctly specify *configure* dependencies which were
+          previously marked as *build* dependencies
+        - Only re-create README when .git/ exists (only a developer
+          action)
+
+0.001_8 (2017-09-10)
+
+    New Features:
+        - diff-bifcode command line utility
+
+    Enhancements:
+        - Clearer output format from diff_bifcode()
+        - Pass Text::Diff options through diff_bifcode()
+
+0.001_7 (2017-09-02)
+
+    Dependencies:
+        - Restore Perl 5.10 and 5.12 support by not using the /r regex
+          and replace operator.
+
+0.001_6 (2017-09-01)
+
+    Bug Fixes:
+        - Fix possible regex interpolation error on Perls >= 5.22
+        - Fix float precision in tests
+
+0.001_5 (2017-08-30)
+
+    New Features:
+        - Add diff_bifcode() function to aid debugging
+
+    Enhancements:
+        - Test that encode_bifcode doesn't strip utf8 flag from string
+        - Decode integers as strings in support of infinite length
+        - Make code dealing with floats more robust
+        - Minor test improvements
+
+    Packaging:
+        - Add licence to meta data
+
+0.001_4 (2017-08-11)
+
+    Enhancements:
+        - Minor documentation fixes.
+
+    Dependencies:
+        - Require Perl 5.10.0 for the defined-or (//) operator.
+
+0.001_3 (2017-08-11)
+
+    Bug Fixes:
+        - Restore ability to encode infinite-length integers
+        - Add missing strings to MANIFEST.SKIP
+
+0.001_2 (2017-08-11)
+
+    Enhancements:
+        - Add Git repository to META info
+        - Accept a wider range of float formats
+        - Various small test and efficiency improvements
+
+0.001_1 (2017-08-09)
+
+    Initial Bifcode release (based heavily on Bencode)

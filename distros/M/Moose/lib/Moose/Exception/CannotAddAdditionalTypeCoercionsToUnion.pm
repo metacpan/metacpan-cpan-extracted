@@ -1,5 +1,5 @@
 package Moose::Exception::CannotAddAdditionalTypeCoercionsToUnion;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -14,4 +14,5 @@ sub _build_message {
     return "Cannot add additional type coercions to Union types";
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

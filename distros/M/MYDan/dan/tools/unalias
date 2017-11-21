@@ -1,0 +1,9 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use MYDan::Util::Alias;
+
+die "unalias: usage: unalias name\n" unless my $name = shift;
+
+MYDan::Util::Alias->new()->unalias( $name );

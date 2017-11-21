@@ -1,15 +1,34 @@
-package inc::Sereal::BuildTools;
+package #
+inc::Sereal::BuildTools;
 use strict;
 use warnings;
 
 use Config;
 use constant OSNAME => $^O;
 
+my %bare_minimum_files= map { $_ => 1 } qw{
+    typemap
+    ppport.h
+    srl_stack.h
+    srl_common.h
+    srl_inline.h
+    srl_taginfo.h
+    srl_protocol.h
+    srl_reader_error.h
+    srl_reader_types.h
+    inc/Sereal/BuildTools.pm
+    inc/Devel/CheckLib.pm
+    inc/Sereal
+    inc/Devel
+    inc
+};
+
 sub link_files {
   my $shared_dir = shift;
-  my $do_tests = shift || "";
-  my $exclude_tests= $do_tests eq "without_tests";
-  my $tests_only= $do_tests eq "tests_only";
+  my $mode = shift || "";
+  my $exclude_tests= $mode eq "without_tests";
+  my $tests_only= $mode eq "tests_only";
+  my $bare_minimum= $mode eq "bare_minimum";
 
   # This fires from a git source tree only.
   # Right now, all devs are on Linux. Feel free to make portable.
@@ -26,6 +45,7 @@ sub link_files {
           return unless $_;
           return if $exclude_tests && m#^/?t/#;
           return if $tests_only && !m#^/?t/#;
+          return if $bare_minimum && !exists $bare_minimum_files{$_};
 
           if (-d $f) {
             File::Path::mkpath($_)
@@ -60,7 +80,7 @@ sub generate_constant_includes {
 
 # Prefer external csnappy and miniz libraries over the bundled ones.
 sub check_external_libraries {
-  my ($libs, $defines, $objects) = @_;
+  my ($libs, $defines, $objects, $subdirs) = @_;
   require Devel::CheckLib;
 
   if (
@@ -90,6 +110,22 @@ sub check_external_libraries {
   } else {
     print "Using bundled miniz code\n";
     $$objects .= ' miniz$(OBJ_EXT)';
+  }
+
+  if (
+    !$ENV{SEREAL_USE_BUNDLED_LIBS} &&
+    !$ENV{SEREAL_USE_BUNDLED_ZSTD} &&
+    Devel::CheckLib::check_lib(
+      lib      => 'zstd',
+      header   => 'zstd.h'
+  )) {
+    print "Using installed zstd library\n";
+    $$libs .= ' -lzstd';
+    $$defines .= ' -DHAVE_ZSTD';
+  } else {
+    print "Using bundled zstd code\n";
+    push @{ $subdirs }, 'zstd';
+    $$objects .= ' zstd/libzstd$(OBJ_EXT)';
   }
 }
 

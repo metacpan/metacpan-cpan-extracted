@@ -1,0 +1,18 @@
+{
+   "feed_url": "https://p1k3.com/feed",
+   "entry_dir": "./archives",
+   "publish_dir": "./public",
+   "title_prefix": "p1k3",
+   "template": "basic",
+   "description": "a test wrt site",
+   "url_root": "https://p1k3.com/",
+   "image_url_root": "https://p1k3.com/",
+   "favicon_url": "https://p1k3.com/favicon.png",
+   "template_dir": "./templates",
+   "stylesheet_url": "https://p1k3.com/css/p1k3.css",
+   "author": "Brennen Bearnes",
+   "entry_descriptions": {
+     "new": "newest entries",
+     "all": "all entries"
+   }
+}

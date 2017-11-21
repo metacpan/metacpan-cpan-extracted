@@ -3,7 +3,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 $VERSION = eval $VERSION; ## no critic
 
 use Archive::Extract;
@@ -218,11 +218,6 @@ sub visit {
     }
     my $here = cwd();
     LIST: foreach my $distro ( @{$self->{list}} ) {
-        my $proper_distro = q{};
-        my $real_id_dir = $self->get_id_dir();
-        if ( $distro =~ m|\Q$real_id_dir\E| ) {
-            $proper_distro = basename($distro);
-        }
 
         my $olderr;
         # stderr > /dev/null if quiet
@@ -263,7 +258,7 @@ sub visit {
           chdir $children[0];
         }
 
-        &{$args->{action}}($proper_distro, @action_args);# execute command
+        &{$args->{action}}($distro, @action_args);# execute command
         chdir $here or croak "Unable to change back to starting point";
     }
     return 1;

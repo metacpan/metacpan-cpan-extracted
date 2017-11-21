@@ -68,6 +68,25 @@ define ([
     stack,
 ) {
 
+    var populateTargetsAndStart = function (populateArray) {
+            var populateContinue;
+            console.log("Entering populateTargetsAndStart()");
+            populateContinue = populate.shift(populateArray);
+            console.log("populateContinue", populateContinue);
+
+            // populate target objects
+            initRoundTwo('dform');
+            initRoundTwo('dmenu');
+            initRoundTwo('dcallback');
+            initRoundTwo('dbrowser');
+            initRoundTwo('dnotice');
+            initRoundTwo('dtable');
+            initRoundTwo('drowselect');
+
+            stack.push('mainMenu');
+            populateContinue(populateArray);
+        };
+
     return function () {
 
         // round one - set up the targets
@@ -81,29 +100,15 @@ define ([
         dtableInitRoundOne();
         drowselectInitRoundOne();
 
-        // round two - add 'source' and 'start' properties
-        // (widget targets only)
-        console.log("dochazka-www/target-init.js: round two");
-        initRoundTwo('dform');
-        initRoundTwo('dmenu');
-        initRoundTwo('dcallback');
-        initRoundTwo('dbrowser');
-        initRoundTwo('dnotice');
-        initRoundTwo('dtable');
-        initRoundTwo('drowselect');
-
         // use "populate" pattern to populate caches
         // (activities, full employee profile)
         populate.bootstrap([
             appCaches.populateFullEmployeeProfileCache,
             appCaches.populateScheduleBySID,
             appCaches.populateActivityCache,
+            populateTargetsAndStart,
         ]);
-
-        // fire up the main menu
-        stack.push('mainMenu');
 
     };
 
 });
-

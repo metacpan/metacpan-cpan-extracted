@@ -3,25 +3,43 @@ package Devel::StackTrace::Frame;
 use strict;
 use warnings;
 
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 # Create accessor routines
 BEGIN {
     ## no critic (TestingAndDebugging::ProhibitNoStrict)
     no strict 'refs';
-    foreach my $f (
-        qw( package filename line subroutine hasargs
-        wantarray evaltext is_require hints bitmask args )
-        ) {
-        next if $f eq 'args';
-        *{$f} = sub { my $s = shift; return $s->{$f} };
+
+    my @attrs = qw(
+        package
+        filename
+        line
+        subroutine
+        hasargs
+        wantarray
+        evaltext
+        is_require
+        hints
+        bitmask
+    );
+
+    for my $a (@attrs) {
+        *{$a} = sub { my $s = shift; return $s->{$a} };
     }
 }
 
 {
-    my @fields = (
-        qw( package filename line subroutine hasargs wantarray
-            evaltext is_require hints bitmask )
+    my @args = qw(
+        package
+        filename
+        line
+        subroutine
+        hasargs
+        wantarray
+        evaltext
+        is_require
+        hints
+        bitmask
     );
 
     sub new {
@@ -30,20 +48,15 @@ BEGIN {
 
         my $self = bless {}, $class;
 
-        @{$self}{@fields} = @{ shift() };
+        @{$self}{@args} = @{ shift() };
+        $self->{args}             = shift;
+        $self->{respect_overload} = shift;
+        $self->{max_arg_length}   = shift;
+        $self->{message}          = shift;
+        $self->{indent}           = shift;
 
         # fixup unix-style paths on win32
         $self->{filename} = File::Spec->canonpath( $self->{filename} );
-
-        $self->{args} = shift;
-
-        $self->{respect_overload} = shift;
-
-        $self->{max_arg_length} = shift;
-
-        $self->{message} = shift;
-
-        $self->{indent} = shift;
 
         return $self;
     }
@@ -170,7 +183,7 @@ Devel::StackTrace::Frame - A single frame in a stack trace
 
 =head1 VERSION
 
-version 2.02
+version 2.03
 
 =head1 DESCRIPTION
 
@@ -218,9 +231,13 @@ Returns a string containing a description of the frame.
 
 =head1 SUPPORT
 
-Bugs may be submitted through L<https://github.com/houseabsolute/Devel-StackTrace/issues>.
+Bugs may be submitted at L<https://github.com/houseabsolute/Devel-StackTrace/issues>.
 
 I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
+
+=head1 SOURCE
+
+The source code repository for Devel-StackTrace can be found at L<https://github.com/houseabsolute/Devel-StackTrace>.
 
 =head1 AUTHOR
 
@@ -228,10 +245,13 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2000 - 2016 by David Rolsky.
+This software is Copyright (c) 2000 - 2017 by David Rolsky.
 
 This is free software, licensed under:
 
   The Artistic License 2.0 (GPL Compatible)
+
+The full text of the license can be found in the
+F<LICENSE> file included with this distribution.
 
 =cut

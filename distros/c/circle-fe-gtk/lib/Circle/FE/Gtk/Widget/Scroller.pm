@@ -9,6 +9,7 @@ use warnings;
 
 use constant type => "Scroller";
 
+use Variable::Disposition qw( retain_future );
 use Glib qw( TRUE FALSE );
 
 use POSIX qw( strftime );
@@ -54,8 +55,8 @@ sub build
    $self->{start_para_mark} = $buffer->create_mark( "start_para", $buffer->get_end_iter, TRUE );
    my $endmark = $buffer->create_mark( "end", $buffer->get_end_iter, FALSE );
 
-   $obj->watch_property(
-      property => "displayevents",
+   retain_future $obj->watch_property_with_initial(
+      "displayevents",
       on_set => sub {
          $textview->set_buffer( Gtk2::TextBuffer->new( $buffer->get_tag_table ) );
          $self->append_event( $_ ) for @{ $_[0] };
@@ -71,7 +72,6 @@ sub build
          $self->shift_events( $_[0] );
       },
       on_splice => sub { 'TODO' },
-      want_initial => 1,
    );
 
    return $widget;

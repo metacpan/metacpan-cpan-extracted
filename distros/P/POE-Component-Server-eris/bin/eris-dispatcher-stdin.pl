@@ -7,8 +7,8 @@ use warnings;
 
 use Getopt::Long::Descriptive;
 use POE qw(
-	Wheel::ReadWrite
-	Component::Server::eris
+    Wheel::ReadWrite
+    Component::Server::eris
 );
 
 #--------------------------------------------------------------------------#
@@ -33,23 +33,23 @@ if( $opt->help ) {
 # POE Session Initialization
 #
 # TCP Session Master
-POE::Component::Server::eris->spawn(
-		ListenAddress	=> $opt->eris_listen,
-		ListenPort		=> $opt->eris_port,
-        GraphitePort    => $opt->graphite_port,
-        $opt->graphite_host ? ( GraphiteHost => $opt->graphite_host ) : (),
-        $opt->graphite_prefix ? ( GraphitePrefix => $opt->graphite_prefix ) : (),
+my $server = POE::Component::Server::eris->spawn(
+    ListenAddress   => $opt->eris_listen,
+    ListenPort      => $opt->eris_port,
+    GraphitePort    => $opt->graphite_port,
+    $opt->graphite_host   ? ( GraphiteHost => $opt->graphite_host ) : (),
+    $opt->graphite_prefix ? ( GraphitePrefix => $opt->graphite_prefix ) : (),
 );
 
 # Syslog-ng Stream Master
 POE::Session->create(
-		inline_states => {
-			_start		=> \&stream_start,
-			_stop		=> sub { print "SESSION ", $_[SESSION]->ID, " stopped.\n"; },
+    inline_states => {
+        _start      => \&stream_start,
+        _stop       => sub { print "SESSION ", $_[SESSION]->ID, " stopped.\n"; },
 
-			stream_line		=> \&stream_line,
-			stream_error	=> \&stream_error,
-		},
+        stream_line     => \&stream_line,
+        stream_error    => \&stream_error,
+    },
 );
 
 
@@ -62,42 +62,49 @@ exit 0;
 
 #--------------------------------------------------------------------------#
 # POE Event Functions
-
 sub stream_start {
-	my ($kernel, $heap) = @_[KERNEL, HEAP];
+    my ($kernel, $heap) = @_[KERNEL, HEAP];
 
-	$kernel->alias_set( 'stream' );
+    # Initialize the connection to STDIN as a POE::Wheel
+    my $stdin = IO::Handle->new_from_fd( \*STDIN, 'r' );
+    my $stderr = IO::Handle->new_from_fd( \*STDERR, 'w' );
 
-	#
-	# Initialize the connection to STDIN as a POE::Wheel
-	my $stdin = IO::Handle->new_from_fd( \*STDIN, 'r' );
-	my $stderr = IO::Handle->new_from_fd( \*STDERR, 'w' );
-
-	$heap->{stream} = POE::Wheel::ReadWrite->new(
-		InputHandle		=> $stdin,
-		OutputHandle	=> $stderr,
-		InputEvent		=> 'stream_line',
-		ErrorEvent		=> 'stream_error',
-	);
+    $heap->{stream} = POE::Wheel::ReadWrite->new(
+        InputHandle     => $stdin,
+        OutputHandle    => $stderr,
+        InputEvent      => 'stream_line',
+        ErrorEvent      => 'stream_error',
+    );
 }
 #--------------------------------------------------------------------------#
 
 
 sub stream_line {
-	my ($kernel,$msg) = @_[KERNEL,ARG0];
-
-	return unless length $msg;
-
-	$kernel->post( eris_dispatch => dispatch_message => $msg );
-
+    my ($kernel,$msg) = @_[KERNEL,ARG0];
+    return unless length $msg;
+    $kernel->post( $server->{ID} => dispatch_message => $msg );
 }
 #--------------------------------------------------------------------------#
 
 sub stream_error {
-	my ($kernel) = $_[KERNEL];
+    my ($kernel,$heap,$op,$errnum,$errstr,$id) = @_[KERNEL,HEAP,ARG0..ARG3];
 
-	debug("STREAM ERROR!!!!!!!!!!\n");
-	$kernel->call( eris_dispatcher => server_shutdown => 'Stream lost' );
+    warn sprintf "Received stream_error on handle %d trying %s op [%d] %s",
+        $id, $op, $errnum, $errstr;
+
+    # Reached EOF on STDIN, shutdown
+    if( $op eq 'read' && $id == $heap->{stream}->ID && $errnum == 0 ) {
+        warn "Shutting down due to stream disconnect";
+        #
+        # Delete the Stream
+        delete $heap->{stream};
+
+        # Shutdown the dispatcher
+        $kernel->call( $server->{ID} => server_shutdown => 'Stream lost' );
+
+        # Bail early
+        $kernel->stop;
+    }
 }
 #--------------------------------------------------------------------------#
 
@@ -113,7 +120,7 @@ eris-dispatcher-stdin.pl - Example Implementation for using with STDIN
 
 =head1 VERSION
 
-version 2.2
+version 2.3
 
 =head1 AUTHOR
 

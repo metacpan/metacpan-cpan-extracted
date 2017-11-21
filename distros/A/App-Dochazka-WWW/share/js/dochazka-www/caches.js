@@ -39,6 +39,7 @@
 define ([
     'jquery',
     'app/lib',
+    'app/prototypes',
     'ajax',
     'current-user',
     'datetime',
@@ -48,6 +49,7 @@ define ([
 ], function (
     $,
     appLib,
+    appPrototypes,
     ajax,
     currentUser,
     dt,
@@ -97,10 +99,10 @@ define ([
 
         endTheMasquerade = function () {
             currentUser('flag1', 0); // turn off masquerade flag
-            console.log('flag1 === ', currentUser('flag1'));
+            // console.log('flag1 === ', currentUser('flag1'));
             currentUser('obj', currentEmployeeStashed);
             currentEmployeeStashed = null;
-            $('#userbox').html(appLib.fillUserBox()); // reset userbox
+            appLib.fillUserBox();
             $('body').css("background-color", backgroundColorStashed);
             coreLib.displayResult('Masquerade is finished');
             $('input[name="sel"]').val('');
@@ -189,7 +191,7 @@ define ([
                     populateFullEmployeeProfileCache,
                     populateScheduleBySID,
                 ]);
-                $('#userbox').html(appLib.fillUserBox()); // reset userbox
+                appLib.fillUserBox(); // reset userbox
                 $('body').css("background-color", "#669933");
                 stack.unwindToType('dmenu'); // return to most recent dmenu
                 return;
@@ -205,40 +207,47 @@ define ([
             var ao, rest, sc, fc, populateContinue;
             console.log("Entering populateActivityCache()");
             populateContinue = populate.shift(populateArray);
-            if (activityCache.length === 0) {
-                rest = {
-                    "method": 'GET',
-                    "path": 'activity/all'
-                };
-                sc = function (st) {
-                    var i;
-                    for (i = 0; i < st.payload.length; i += 1) {
-                        ao = st.payload[i];
-                        ao.color = colorList[i];
-                        activityCache.push(ao);
-                        activityByAID[st.payload[i].aid] = ao;
-                        activityByCode[st.payload[i].code] = ao;
-                    }
-                    coreLib.displayResult(i + 1 + " activity objects loaded into cache");
-                    populateContinue();
-                };
-                fc = function (st) {
-                    coreLib.displayError(st.payload.message);
-                    populateContinue();
-                };
-                ajax(rest, sc, fc);
+            if (activityCache) {
+                console.log("populateActivityCache(): noop, cache already populated");
+                populateContinue(populateArray);
+                return null;
             }
-            console.log("populateActivityCache(): noop, cache already populated");
-            populateContinue();
+            rest = {
+                "method": 'GET',
+                "path": 'activity/all'
+            };
+            sc = function (st) {
+                var i;
+                for (i = 0; i < st.payload.length; i += 1) {
+                    ao = st.payload[i];
+                    ao.color = colorList[i];
+                    activityCache.push(ao);
+                    activityByAID[st.payload[i].aid] = ao;
+                    activityByCode[st.payload[i].code] = ao;
+                }
+                coreLib.displayResult(i + 1 + " activity objects loaded into cache");
+                populateContinue(populateArray);
+            };
+            fc = function (st) {
+                coreLib.displayError(st.payload.message);
+                populateContinue(populateArray);
+            };
+            ajax(rest, sc, fc);
         },
 
         populateAIDfromCode = function (populateArray) {
             var aid, code, populateContinue;
-            console.log("Entering populateAIDfromCode()");
             populateContinue = populate.shift(populateArray);
             // assume there is a form with the code in it
-            code = $('#iNact').text();
-            console.log("Activity code is " + code);
+            code = coreLib.nullify($('#iNact').text());
+            if (! code) {
+                code = coreLib.nullify($('input[id="iNact"]').val());
+                if (! code) {
+                    console.log("CRITICAL ERROR: populateAIDfromCode: no code in form");
+                    populateContinue(populateArray);
+                }
+            }
+            console.log("populateAIDfromCode: Activity code is " + code);
             aid = getActivityByCode(code).aid;
             $('#acTaid').html(String(aid));
             populateContinue(populateArray);
@@ -286,11 +295,6 @@ define ([
             console.log("populateArray.length is " + populateArray.length);
             populateContinue = populate.shift(populateArray);
             profileObj = getProfileByEID(parseInt(cu.eid, 10));
-            if (profileObj) {
-                // if our profile is already in the cache, nothing to do
-                populateContinue(populateArray);
-                return null;
-            }
             // load profile into cache
             rest = {
                 "method": 'GET',
@@ -303,11 +307,8 @@ define ([
             }
             sc = function (st) {
                 if (st.code === 'DISPATCH_EMPLOYEE_PROFILE_FULL') {
-                    profileObj = $.extend({}, st.payload);
-                    profileCache.push(profileObj);
-                    profileByEID[parseInt(st.payload.emp.eid, 10)] = $.extend({}, profileObj);
-                    profileByNick[String(st.payload.emp.nick)] = $.extend({}, profileObj);
-                    coreLib.displayResult("Profile of employee " + st.payload.emp.nick + " loaded into cache");
+                    profileObj = $.extend(Object.create(appPrototypes.empProfile), st.payload);
+                    setProfileCache(profileObj);
                 } else {
                     m = "Unexpected status code " + st.code;
                     console.log("CRITICAL ERROR: " + m);
@@ -556,17 +557,24 @@ define ([
         populateScheduleBySID = function (populateArray) {
             var cu = currentUser('obj'),
                 fullProfile = getProfileByEID(parseInt(cu.eid, 10)),
-                sid = fullProfile.schedule,
+                sid,
                 schedObj,
                 m,
                 rest, sc, fc, populateContinue;
             console.log("populateArray.length is " + populateArray.length);
             populateContinue = populate.shift(populateArray);
-            if (! sid) {
+            if (
+                    typeof fullProfile !== 'object' ||
+                    ! fullProfile ||
+                    ! 'schedule' in fullProfile ||
+                    ! fullProfile.schedule
+               )
+            {
                 // no SID; nothing to do
                 populateContinue(populateArray);
                 return null;
             }
+            sid = fullProfile.schedule;
             schedObj = getScheduleBySID(sid);
             if (schedObj) {
                 // schedule already in cache
@@ -674,6 +682,38 @@ define ([
             } else {
                 coreLib.displayError("CRITICAL ERROR: activity cache is empty");
             }
+        },
+
+        setProfileCache = function (profileObj) {
+            var eid, nick, cacheEID, i, cached = false;
+            if ( typeof profileObj !== 'object' ||
+                 profileObj === null ||
+                 ! 'emp' in profileObj ||
+                 ! 'eid' in profileObj.emp
+               )
+            {
+                console.log("CRITICAL ERROR: bad profileObj in setProfileCache()", profileObj);
+                throw "bad profile object";
+            }
+            eid = parseInt(profileObj.emp.eid, 10);
+            nick = String(profileObj.emp.nick);
+            console.log("setProfileCache() EID, nick", eid, nick);
+            console.log(profileCache.length + " objects in profileCache");
+            for (i = 0; i < profileCache.length; i += 1) {
+                cacheEID = parseInt(profileCache[i].emp.eid, 10);
+                if (eid === cacheEID) {
+                    cached = true;
+                    profileCache[i] = $.extend(profileCache[i], profileObj);
+                    console.log("Employee " + nick + ": profile cache updated");
+                    profileObj = profileCache[i];
+                }
+            }
+            if (! cached) {
+                profileCache.push($.extend({}, profileObj));
+                coreLib.displayResult("Employee " + nick + ": profile cache created");
+            }
+            profileByEID[eid] = $.extend({}, profileObj);
+            profileByNick[nick] = $.extend({}, profileObj);
         }
         ;
 
@@ -706,9 +746,7 @@ define ([
             return scheduleCache.length
         },
         selectActivityAction: selectActivityAction,
-        setProfileByEID: function (eid, obj) {
-            profileByEID[parseInt(eid, 10)] = obj;
-        },
+        setProfileCache: setProfileCache,
     };
 
 });

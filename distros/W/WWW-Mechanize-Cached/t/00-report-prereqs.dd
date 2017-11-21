@@ -1,0 +1,70 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0',
+                                        'perl' => '5.006'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Pod::Coverage::TrustPod' => '0',
+                                      'Pod::Wordlist' => '0',
+                                      'Test::CPAN::Changes' => '0.19',
+                                      'Test::Code::TidyAll' => '0.50',
+                                      'Test::More' => '0.96',
+                                      'Test::Pod::Coverage' => '1.08',
+                                      'Test::Spelling' => '0.12',
+                                      'Test::Synopsis' => '0'
+                                    },
+                      'suggests' => {
+                                      'Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional' => '0.004',
+                                      'Dist::Zilla::Plugin::CopyFilesFromRelease' => '0',
+                                      'Dist::Zilla::Plugin::Git::Commit' => '2.020',
+                                      'Dist::Zilla::Plugin::Git::Tag' => '0',
+                                      'Dist::Zilla::Plugin::NextRelease' => '5.033',
+                                      'Dist::Zilla::Plugin::RewriteVersion::Transitional' => '0.004'
+                                    }
+                    },
+       'runtime' => {
+                      'recommends' => {
+                                        'CHI' => '0'
+                                      },
+                      'requires' => {
+                                      'Cache::FileCache' => '0',
+                                      'Carp' => '0',
+                                      'Data::Dump' => '0',
+                                      'Module::Runtime' => '0',
+                                      'Moo' => '1.004005',
+                                      'MooX::Types::MooseLike::Base' => '0',
+                                      'Storable' => '2.21',
+                                      'WWW::Mechanize' => '0',
+                                      'namespace::clean' => '0',
+                                      'perl' => '5.006',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'CHI' => '0',
+                                   'Cache::FileCache' => '0',
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'Find::Lib' => '0',
+                                   'HTTP::Request' => '0',
+                                   'Path::Class' => '0',
+                                   'Test::Fatal' => '0',
+                                   'Test::More' => '0',
+                                   'Test::Requires' => '0',
+                                   'Test::RequiresInternet' => '0',
+                                   'constant' => '0',
+                                   'lib' => '0',
+                                   'perl' => '5.006'
+                                 }
+                 }
+     };
+  $x;
+ }

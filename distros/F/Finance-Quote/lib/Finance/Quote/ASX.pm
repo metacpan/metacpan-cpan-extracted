@@ -44,7 +44,7 @@ use HTTP::Cookies;
 
 use vars qw/$ASX_URL @ASX_SEC_CODES/;
 
-our $VERSION = '1.45'; # VERSION
+our $VERSION = '1.47'; # VERSION
 
 # mobile site:
 # Following URL seems to need javascript so does not work with LWP

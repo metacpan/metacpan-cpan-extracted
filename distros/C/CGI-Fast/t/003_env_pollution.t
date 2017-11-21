@@ -3,8 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 5;
-use Test::Deep;
+use Test::More tests => 18;
 
 use CGI::Fast socket_path => ":7070";
 
@@ -42,26 +41,12 @@ foreach my $i ( 1 .. 5 ) {
     };
 
     if ( $i % 2 == 0 ) {
-        cmp_deeply(
-            $cgi_vars,
-            {
-                remote_addr  => ignore(),
-                raw_cookie   => '',
-                path_info    => '',
-                query_string => '',
-            },
-            'ENV variables not reused from last request'
-        );
+		is( $cgi_vars->{$_},'','ENV variables not reused from last request' )
+			for qw/ raw_cookie path_info query_string /;
     } else {
-        cmp_deeply(
-            $cgi_vars,
-            {
-                remote_addr  => 'REMOTE_ADDR',
-                raw_cookie   => 'HTTP_COOKIE',
-                path_info    => 'PATH_INFO',
-                query_string => '',
-            },
-            'ENV variables set from current environment'
-        );
+		is( $cgi_vars->{remote_addr},'REMOTE_ADDR','ENV variables set from current environment' );
+		is( $cgi_vars->{raw_cookie},'HTTP_COOKIE','ENV variables set from current environment' );
+		is( $cgi_vars->{path_info},'PATH_INFO','ENV variables set from current environment' );
+		is( $cgi_vars->{query_string},'','ENV variables set from current environment' );
     }
 }

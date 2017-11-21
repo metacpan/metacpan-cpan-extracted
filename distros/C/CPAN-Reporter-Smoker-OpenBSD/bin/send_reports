@@ -6,21 +6,23 @@ use Test::Reporter::Transport::Socket 0.32;
 use Term::ProgressBar 2.18;
 use Getopt::Long;
 use Pod::Usage 1.69;
-use Set::Tiny 0.04;
 use File::Spec;
-our $VERSION = '0.007'; # VERSION
 
-my ($help, $reports, $host, $version, $port, $GRADE);
+our $VERSION = '0.009'; # VERSION
+
+my ( $help, $reports, $host, $version, $port, $GRADE, $EXCLUDE, $quiet );
 $help = $version = 0;
 $port = 8080;
 $host = 'localhost';
 GetOptions(
-    'help'         => \$help,
-    'host=s'       => \$host,
-    'reports:s'    => \$reports,
-    'port=i'       => \$port,
-    'grade=s'      => \&grades_handler,
-    'version'      => \$version
+    'help'      => \$help,
+    'host=s'    => \$host,
+    'reports:s' => \$reports,
+    'port=i'    => \$port,
+    'grade=s'   => \&grade_handler,
+    'exclude=s' => \&exclude_handler,
+    'quiet'     => \$quiet,
+    'version'   => \$version
 ) or pod2usage(1);
 
 pod2usage( -exitval => 0, -verbose => 2 ) if $help;
@@ -30,65 +32,130 @@ if ($version) {
     exit(0);
 }
 
-pod2usage( -exitval => 1, -verbose => 2 ) unless(defined($reports));
-
-my $sender = Test::Reporter->new(
-    transport => 'Socket',
-    transport_args => [
-        host => $host,
-        port => $port
-    ],
-);
+pod2usage( -exitval => 1, -verbose => 2 ) unless ( defined($reports) );
+my $files_ref;
 my $sent_counter = 0;
-my $files_ref = read_reports($reports, $GRADE);
-my $progress = Term::ProgressBar->new( { count => scalar( @{$files_ref} ) });
 
-foreach my $report(@{$files_ref}) {
-
-    if (-z $report) {
-        warn "report $report has zero bytes lenght, skipping...\n";
-        next;
-    }
-
-    $progress->update( $sent_counter ) if ( submit( $sender, $report ) );
+if ($GRADE) {
+    print "Will submit tests reports that have '$GRADE' grade\n" unless $quiet;
+    $files_ref = read_reports( $reports, qr/^$GRADE/ );
+}
+elsif ($EXCLUDE) {
+    print "Will submit tests reports that DO NOT have '$EXCLUDE' grade\n"
+      unless $quiet;
+    $files_ref = read_reports( $reports, qr/^$EXCLUDE/, 1 );
+}
+else {
+    $files_ref = read_reports($reports);
 }
 
-sub grades_handler {
-    my ($opt_name, $opt_value) = @_;
-    # See CPAN::Reporter for grades definitions
-    my $grades = Set::Tiny(qw(pass fail unknown na));
-    die "Invalid grade value passed as parameter: '$opt_value'" unless($grades->has($opt_value));
+if (    ( defined($files_ref) )
+    and ( ref($files_ref) eq 'ARRAY' )
+    and ( scalar( @{$files_ref} ) > 0 ) )
+{
+    my $sender = Test::Reporter->new(
+        transport      => 'Socket',
+        transport_args => [
+            host => $host,
+            port => $port
+        ],
+    );
+
+    my $progress;
+    $progress = Term::ProgressBar->new( { count => scalar( @{$files_ref} ) } )
+      unless $quiet;
+
+    foreach my $report ( @{$files_ref} ) {
+
+        if ( -z $report ) {
+            warn "report $report has zero bytes lenght, skipping...\n"
+              unless $quiet;
+            next;
+        }
+
+        unless ($quiet) {
+            $progress->update($sent_counter) if ( submit( $sender, $report ) );
+        }
+        else {
+            submit( $sender, $report );
+        }
+    }
+}
+else {
+    print "No reports to send in $reports directory\n" unless $quiet;
+}
+
+# SUBS
+
+sub grade_handler {
+    my ( $opt_name, $opt_value ) = @_;
+    validate_grade( $opt_name, $opt_value );
     $GRADE = $opt_value;
 }
 
+sub exclude_handler {
+    my ( $opt_name, $opt_value ) = @_;
+    validate_grade( $opt_name, $opt_value );
+    $EXCLUDE = $opt_value;
+}
+
+sub validate_grade {
+    my ( $opt_name, $opt_value ) = @_;
+    die "Cannot have both --grade and --exclude specified at the same time"
+      if ( $GRADE || $EXCLUDE );
+
+    # See CPAN::Reporter for grades definitions
+    if ( defined($opt_value) ) {
+        my %grades =
+          ( pass => undef, fail => undef, unknown => undef, na => undef );
+        die "Invalid $opt_name value passed as parameter: '$opt_value'"
+          unless ( exists( $grades{$opt_value} ) );
+    }
+    else {
+        die "Empty $opt_name value passed as parameter is not acceptable";
+    }
+    return 1;
+}
+
 sub submit {
-    my ($sender,$report) = @_;
+    my ( $sender, $report ) = @_;
 
     if ( $sender->read($report)->send ) {
         $sent_counter++;
         unlink $report or warn "failed to remove $report: $!";
         return 1;
-    } else {
+    }
+    else {
         die $sender->errstr();
     }
 
 }
 
 sub read_reports {
-    my ($dir, $grade_filter) = @_;
-    opendir(my $input,$dir) or die "cannot read $dir: $!";
+    my ( $dir, $grade_filter, $is_exclude ) = @_;
+    opendir( my $input, $dir ) or die "cannot read $dir: $!";
     my @files;
-   
-    if ( defined($grade_filter) and ($grade_filter ne '') ) {
-        my $grade_regex = qr/^$grade_filter/;
-        print "Sending only reports with grade $grade_filter...\n";
-        while(readdir($input)) {
-            push(@files, File::Spec->catfile($dir,$_)) if ( $_ =~ $grade_regex );
+
+    if ( defined($grade_filter) ) {
+        unless ($is_exclude) {
+            while ( readdir($input) ) {
+                push( @files, File::Spec->catfile( $dir, $_ ) )
+                  if ( $_ =~ $grade_filter );
+            }
         }
-    } else {
-        while(readdir($input)) {
-            push(@files, File::Spec->catfile($dir,$_));
+        else {
+            while ( readdir($input) ) {
+                push( @files, File::Spec->catfile( $dir, $_ ) )
+                  if (  ( ( $_ ne '.' ) and ( $_ ne '..' ) )
+                    and ( $_ !~ $grade_filter ) );
+            }
         }
+    }
+    else {
+        while ( readdir($input) ) {
+            push( @files, File::Spec->catfile( $dir, $_ ) );
+        }
+
         # removing "dot" files
         shift(@files);
         shift(@files);
@@ -130,9 +197,23 @@ The port number to metabase-relayd server. Optional, defaults to 8080.
 
 =item B<--grade>
 
-A grade filter to decide which reports to send. See L<CPAN::Reporter> for grades definitions.
+A grade filter to select which reports to send. See L<CPAN::Reporter> for grades definitions.
+
+Only reports with the given grade will be sent: all others will be ignored.
 
 Any test file that corresponds to the grade passed as parameter will be sent through the metabase-relayd server.
+
+=item B<--exclude>
+
+Same concept of C<--grade> option, but the inverse result: tests with the given grade will be ignore while all
+others will be sent through the metabase-relayd server.
+
+One cannot set both C<--grade> and C<--exclude> options: trying to do that will make the program to abort execution.
+
+=item B<--quiet>
+
+The program will not print anything to C<STDOUT> if this option is used. Only error messages will be sent to C<STDERR>, which in 
+case makes it useful to be used together with C<crontab>.
 
 =item B<--version>
 
@@ -158,7 +239,8 @@ You can release the smoker very quickly when submitting a report. This usually i
 
 =item *
 
-You can selective report your tests. For instance, you might be unsure about sending tests with "unknown" grade, sou you skip than.
+You can selective report your tests. For instance, you might be unsure about sending tests with "unknown" grade, so you can just skip them with C<--exclude> 
+or C<--grade> command line options.
 
 =back
 

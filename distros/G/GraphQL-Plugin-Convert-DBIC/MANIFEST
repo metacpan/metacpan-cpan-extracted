@@ -6,6 +6,7 @@ README.md
 t/00-compile.t
 t/00-report-prereqs.t
 t/01-dbicschema.t
+t/02-execute.t
 t/lib-dbicschema/Schema.pm
 t/lib-dbicschema/Schema/Result/Blog.pm
 t/lib-dbicschema/Schema/Result/BlogTag.pm
@@ -14,6 +15,7 @@ t/lib-dbicschema/Schema/Result/Photoset.pm
 t/lib-dbicschema/Schema/ResultSet/Blog.pm
 t/lib-dbicschema/Schema/ResultSet/Photo.pm
 t/lib-dbicschema/Schema/ResultSet/Photoset.pm
+t/test.db
 xt/manifest.t
 xt/pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

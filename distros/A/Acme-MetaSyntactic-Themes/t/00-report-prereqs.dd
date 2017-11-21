@@ -37,7 +37,6 @@ do { my $x = {
                                    'IPC::Open3' => '0',
                                    'Test::MetaSyntactic' => '0',
                                    'Test::More' => '0',
-                                   'blib' => '1.01',
                                    'perl' => '5.006'
                                  }
                  }

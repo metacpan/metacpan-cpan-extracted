@@ -37,4 +37,4 @@ requires:
 resources:
   homepage: https://github.com/jeteve/App-JESP
   repository: https://github.com/jeteve/App-JESP.git
-version: '0.013'
+version: '0.015'

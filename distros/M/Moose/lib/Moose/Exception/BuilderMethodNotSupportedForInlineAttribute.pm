@@ -1,5 +1,5 @@
 package Moose::Exception::BuilderMethodNotSupportedForInlineAttribute;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -22,4 +22,5 @@ sub _build_message {
     $self->class_name." does not support builder method '". $self->builder ."' for attribute '" . $self->attribute_name . "'";
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

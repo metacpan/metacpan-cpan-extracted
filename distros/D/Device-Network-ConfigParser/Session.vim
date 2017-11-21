@@ -71,8 +71,8 @@ set shortmess=aoO
 badd +1 lib/Device/Network/ConfigParser/CheckPoint/Gaia.pm
 badd +1 t/01-checkpoint_gaia.t
 badd +1 t/00-load.t
-badd +0 t/02-cisco_asa.t
-badd +0 lib/Device/Network/ConfigParser/Cisco/ASA.pm
+badd +1 t/02-cisco_asa.t
+badd +1 lib/Device/Network/ConfigParser/Cisco/ASA.pm
 argglobal
 silent! argdel *
 argadd lib/Device/Network/ConfigParser/CheckPoint/Gaia.pm
@@ -125,7 +125,7 @@ setlocal filetype=perl
 endif
 setlocal fixendofline
 setlocal foldcolumn=0
-setlocal foldenable
+setlocal nofoldenable
 setlocal foldexpr=0
 setlocal foldignore=#
 setlocal foldlevel=10
@@ -198,20 +198,44 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
-33
+72
 normal! zo
-34
+73
 normal! zo
-37
+76
 normal! zo
-51
+124
 normal! zo
-let s:l = 42 - ((13 * winheight(0) + 22) / 45)
+141
+normal! zo
+150
+normal! zo
+150
+normal! zo
+150
+normal! zo
+155
+normal! zo
+158
+normal! zo
+161
+normal! zo
+171
+normal! zo
+171
+normal! zo
+186
+normal! zo
+193
+normal! zo
+200
+normal! zo
+let s:l = 145 - ((18 * winheight(0) + 22) / 44)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-42
-normal! 0
+145
+normal! 013|
 tabedit t/02-cisco_asa.t
 set splitbelow splitright
 wincmd t
@@ -333,13 +357,147 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
-let s:l = 1 - ((0 * winheight(0) + 22) / 44)
+111
+normal! zo
+112
+normal! zo
+114
+normal! zo
+114
+normal! zo
+114
+normal! zo
+114
+normal! zo
+115
+normal! zo
+121
+normal! zo
+123
+normal! zo
+123
+normal! zo
+123
+normal! zo
+123
+normal! zo
+123
+normal! zo
+131
+normal! zo
+133
+normal! zo
+133
+normal! zo
+133
+normal! zo
+133
+normal! zo
+133
+normal! zo
+141
+normal! zo
+143
+normal! zo
+143
+normal! zo
+143
+normal! zo
+143
+normal! zo
+143
+normal! zo
+151
+normal! zo
+153
+normal! zo
+153
+normal! zo
+153
+normal! zo
+153
+normal! zo
+153
+normal! zo
+161
+normal! zo
+163
+normal! zo
+163
+normal! zo
+163
+normal! zo
+163
+normal! zo
+164
+normal! zo
+164
+normal! zo
+164
+normal! zo
+164
+normal! zo
+164
+normal! zo
+169
+normal! zo
+171
+normal! zo
+171
+normal! zo
+171
+normal! zo
+171
+normal! zo
+177
+normal! zo
+179
+normal! zo
+179
+normal! zo
+179
+normal! zo
+179
+normal! zo
+179
+normal! zo
+180
+normal! zo
+187
+normal! zo
+189
+normal! zo
+189
+normal! zo
+189
+normal! zo
+189
+normal! zo
+189
+normal! zo
+190
+normal! zo
+197
+normal! zo
+199
+normal! zo
+199
+normal! zo
+199
+normal! zo
+199
+normal! zo
+199
+normal! zo
+200
+normal! zo
+let s:l = 197 - ((28 * winheight(0) + 22) / 44)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-1
-normal! 0
-tabnext 2
+197
+normal! 05|
+tabnext 1
 set stal=1
 if exists('s:wipebuf')
   silent exe 'bwipe ' . s:wipebuf

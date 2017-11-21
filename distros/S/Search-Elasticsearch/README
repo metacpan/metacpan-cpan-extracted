@@ -2,7 +2,7 @@ NAME
     Search::Elasticsearch - The official client for Elasticsearch
 
 VERSION
-    version 5.02
+    version 6.00
 
 SYNOPSIS
         use Search::Elasticsearch;
@@ -271,7 +271,7 @@ RUNNING REQUESTS
             }
         );
 
-    See Search::Elasticsearch::Client::5_0::Direct for more details about
+    See Search::Elasticsearch::Client::6_0::Direct for more details about
     the requests that can be run.
 
 MODULES
@@ -301,11 +301,11 @@ MODULES
     "delete()". The client parses the user's requests and passes them to the
     "transport" class to be executed.
 
-    The default version of the client is "5_0::Direct", which can be
+    The default version of the client is "6_0::Direct", which can be
     explicitly specified as follows:
 
         $e = Search::Elasticsearch->new(
-            client => '5_0::Direct'
+            client => '6_0::Direct'
         );
 
   "transport"

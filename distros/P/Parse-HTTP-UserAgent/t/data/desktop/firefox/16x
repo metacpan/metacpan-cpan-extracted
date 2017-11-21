@@ -1,0 +1,12 @@
+[AGENT]
+
+Mozilla/5.0 (X11; SunOS i86pc; rv:16.0) Gecko/20100101 Firefox/16.0
+
+extras          => [ 'X11' ],
+mozilla         => [ '16.0', '16.000' ],
+name            => 'Firefox',
+os              => 'SunOS i86pc',
+parser          => 'firefox',
+toolkit         => [ 'Gecko', '20100101', '20100101.000' ],
+version         => '16.000',
+version_raw     => '16.0',

@@ -1,5 +1,5 @@
 package Search::Elasticsearch::Serializer::JSON;
-$Search::Elasticsearch::Serializer::JSON::VERSION = '5.02';
+$Search::Elasticsearch::Serializer::JSON::VERSION = '6.00';
 use Moo;
 use JSON::MaybeXS 1.002002 ();
 
@@ -24,7 +24,7 @@ Search::Elasticsearch::Serializer::JSON - The default JSON Serializer, using JSO
 
 =head1 VERSION
 
-version 5.02
+version 6.00
 
 =head1 SYNOPSIS
 

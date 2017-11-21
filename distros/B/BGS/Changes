@@ -1,5 +1,10 @@
 Revision history for Perl extension BGS.
 
+0.12  2017-11-14
+	- eval for Storable::thaw
+	- fix for bgs_wait($vpid)
+	- wait with help pipe
+
 0.11  2017-11-03
 	- BGS::Future
 

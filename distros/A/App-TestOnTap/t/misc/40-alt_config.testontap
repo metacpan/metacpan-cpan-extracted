@@ -1,0 +1,7 @@
+id = 3a0a8f29-cd0d-11e6-8904-ca40c01b5eb5
+
+execmap = plfiles
+
+[EXECMAP plfiles]
+match = regexp(\.pl[12]$)
+cmd = perl

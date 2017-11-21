@@ -2,7 +2,7 @@ package Example::Delegates::Acme::BoundedQueue_v1;
 
 use Example::Delegates::Queue;
 
-use Mic::Implementation
+use Mic::Impl
     has  => {
         Q => { 
             default => sub { Example::Delegates::Queue::->new },
@@ -18,9 +18,9 @@ use Mic::Implementation
 sub push {
     my ($self, $val) = @_;
 
-    $self->{$Q}->push($val);
+    $self->[Q]->push($val);
 
-    if ($self->size > $self->{$MAX_SIZE}) {
+    if ($self->size > $self->[MAX_SIZE]) {
         $self->pop;        
     }
 }

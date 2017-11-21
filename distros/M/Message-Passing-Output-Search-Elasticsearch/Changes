@@ -1,3 +1,6 @@
+0.004     2017-11-14 09:32:13+01:00 Europe/Vienna
+    - fix missing es_version when using Search::Elasticsearch 5.02 (RT#121186)
+
 0.003     2016-11-18 10:31:40+01:00 Europe/Vienna
     - now asynchronous
     - compatible with Elasticsearch 5.0

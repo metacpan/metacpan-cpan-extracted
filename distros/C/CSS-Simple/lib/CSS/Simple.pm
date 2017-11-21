@@ -2,12 +2,13 @@ package CSS::Simple;
 use strict;
 use warnings;
 
-our $VERSION = '3223';
+our $VERSION = '3224';
 
 use Carp;
 
 use Tie::IxHash;
 use Storable qw(dclone);
+use Ref::Util qw(is_plain_arrayref is_plain_hashref);
 
 =pod
 
@@ -40,7 +41,7 @@ See the read method for more information.
 =cut
 
 BEGIN {
-  my $members = ['ordered','stylesheet','warns_as_errors','content_warnings','browser_specific_properties'];
+  my $members = ['ordered','stylesheet','warns_as_errors','content_warnings','browser_specific_properties', 'allow_duplicate_properties'];
 
   #generate all the getter/setter we need
   foreach my $member (@{$members}) {
@@ -89,7 +90,8 @@ sub new {
               ordered => tie(%{$css}, 'Tie::IxHash'),
               content_warnings => undef,
               warns_as_errors => (defined($$params{warns_as_errors}) && $$params{warns_as_errors}) ? 1 : 0,
-              browser_specific_properties => (defined($$params{browser_specific_properties}) && $$params{browser_specific_properties}) ? 1 : 0
+              browser_specific_properties => (defined($$params{browser_specific_properties}) && $$params{browser_specific_properties}) ? 1 : 0,
+              allow_duplicate_properties => (defined($$params{allow_duplicate_properties}) && $$params{allow_duplicate_properties}) ? 1 : 0,
              };
 
   bless $self, $class;
@@ -173,7 +175,6 @@ sub read {
 
     # Split into styles
     foreach (grep { /\S/ } split /(?<=\})/, $string) {
-
       unless ( /^\s*([^{]+?)\s*\{(.*)\}\s*$/ ) {
         $self->_report_warning({ info => "Invalid or unexpected style data '$_'" });
         next;
@@ -201,7 +202,7 @@ sub read {
         }
 
         #store the property for later
-        $$properties{lc $1} = $2;
+        $self->_store_property($properties, $1, $2);
       }
 
       my @selectors = split /,/, $rule; # break the rule into the component selector(s)
@@ -229,6 +230,34 @@ sub read {
   }
 
   return();
+}
+
+# store the value as a string or as arrayref of strings
+sub _store_property {
+    my ($self, $properties, $key, $value) = @_;
+        $key = lc $key;
+
+	if (!$self->_allow_duplicate_properties()) {
+        # store as scalar
+        $properties->{$key} = $value;
+		return;
+	}
+
+    if (exists $properties->{$key}) {
+        my $existing_value = $properties->{$key};
+
+        # store in arrayref
+        if (is_plain_arrayref $existing_value) {
+            push @$existing_value, $value;
+        }
+        else {
+            $properties->{$key} = [ $existing_value, $value ];
+        }
+    }
+    else {
+        # store as scalar
+        $properties->{$key} = $value;
+    }
 }
 
 =pod
@@ -284,13 +313,58 @@ sub write {
     if (keys(%{$properties})) { # only output if the selector has properties
       $contents .= "$selector {\n";
       foreach my $property ( sort keys %{ $properties } ) {
-        $contents .= "\t" . lc($property) . ": ".$properties->{$property}. ";\n";
+        my $values  = $self->_retrieve_property_values($properties->{$property});
+        for my $a_val (@$values) {
+            $contents .= "\t" .  lc($property) . ": $a_val;\n" ;
+        }
       }
       $contents .= "}\n";
     }
   }
 
   return $contents;
+}
+
+=item output_selector 
+
+Output the parsed and manipulated CSS for a specific selector.
+The string that is output does not contain tabs or carriage returns.
+The output is mainly to be inserted in the 'style' html attribute. 
+
+=cut
+
+sub output_selector {
+	my ($self, $params) = @_;
+	
+	croak "Parameters must be passed as a hashref" unless is_plain_hashref($params);
+	croak "No selector specified" unless $params->{selector};
+
+  	$self->_check_object();
+  	my $contents = '';
+
+    #grab the properties that make up this particular selector
+    my $properties = $self->get_properties({selector => $params->{selector}});
+
+    if (keys(%{$properties})) { # only output if the selector has properties
+      foreach my $property ( sort keys %{ $properties } ) {
+        my $values  = $self->_retrieve_property_values($properties->{$property});
+        for my $a_val (@$values) {
+            $contents .= lc($property) . ":$a_val;" ;
+        }
+      }
+    }
+	return $contents;
+}
+
+# the value may be a scalar or an arrayref of scalars.
+# If the value is a scalar return an array ref containing the scalar.
+# This simplifies processing when it can be assumed everything 
+# is in a list. 
+sub _retrieve_property_values {
+    my ($self, $value) = @_;
+    return is_plain_arrayref $value ?
+        $value :
+        [ $value ];
 }
 
 =pod

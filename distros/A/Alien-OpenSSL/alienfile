@@ -1,0 +1,129 @@
+use alienfile;
+use Config;
+
+plugin 'PkgConfig' => (
+  pkg_name => 'openssl',
+);
+
+share {
+
+  requires 'Test::More' => '0.96';
+  requires 'Text::Template';
+
+  meta->prop->{env}->{CC}   = $Config{cc};
+  meta->prop->{env}->{PERL} = $^X;
+  meta->prop->{destdir} = 1;
+
+  # when building OpenSSL from source we have a few challenges.
+  # - AB uses Net::SSLeay (via HTTP::Tiny) by default when downloading https URLs
+  # - Net::SSLeay requires OpenSSL
+  # - We can download OpenSSL from FTP, but that is susceptible to man-in-the-middle attacks
+  #   (and that is a bad look for a security product)
+
+  # Solution:
+  # - try downloading with curl or wget via the 'bootstrap_ssl' option.
+  # - if that doesn't work, fallback on FTP
+  # - don't attempt FTP transfer if ALIEN_OPENSSL_FTP is set to 0
+
+  my @download_args = ( bootstrap_ssl => 1 );
+  my $download_path = "/source/";
+
+  if(my $version = meta->prop->{my_openssl_version})
+  {
+    $download_path = "/source/openssl-$version.tar.gz";
+  }
+  else
+  {
+    push @download_args, version => qr/^openssl-([0-9\.]+[a-z]*)\.tar\.gz$/;
+  }
+
+  start_url "https://www.openssl.org$download_path";
+  plugin Download => @download_args;
+
+  unless(meta->has_hook('fetch'))
+  {
+    my $ftp_ok = $ENV{ALIEN_OPENSSL_FTP};
+    $ftp_ok = 1 unless defined $ftp_ok;
+    if($ftp_ok)
+    {
+      log(" ************************************************* ");
+      log(" *  WARNING downloading OpenSSL via FTP          * ");
+      log(" ************************************************* ");
+      start_url "ftp://ftp.openssl.org$download_path";
+      plugin 'Fetch::NetFTP';
+      plugin 'Decode::DirListing';
+    }
+    else
+    {
+      log("Unable to download OpenSSL via https without OpenSSL!");
+      log("Recommend installing wget or curl to bootstrap Alien::OpenSSL");
+      die "unable to download OpenSSL via https";
+    }
+  }
+
+  plugin 'Extract' => 'tar.gz';
+
+  my $system_type = meta->prop->{platform}->{system_type};
+
+  if($system_type =~ /^(unix|windows-mingw)$/)
+  {
+    build [
+      './config --prefix=%{.install.prefix} shared',
+      '%{make}',
+      '%{make} DESTDIR=%{env.DESTDIR} INSTALL_PREFIX=%{env.DESTDIR} install',
+    ];
+  }
+  elsif($system_type eq 'windows-microsoft')
+  {
+    delete meta->prop->{destdir};
+    my $type = $Config{ptrsize} == 4 ? 'VC-WIN32' : 'VC-WIN64A';
+    requires 'Alien::nasm' => '0.19';
+    build [
+      "%{perl} Configure --prefix=%{.install.prefix} --openssldir=%{.runtime.prefix}/ssl no-shared $type",
+      '%{make}',
+      '%{make} OPENSSLDIR=%{.install.prefix}/ssl install',
+    ];
+    gather sub {
+      my($build) = @_;
+      my $prefix = $build->runtime_prop->{prefix};
+      $build->runtime_prop->{$_} = "-I$prefix/include " for qw( cflags cflags_static );
+      $build->runtime_prop->{$_} = "-LIBPATH:$prefix/lib libcrypto.lib libssl.lib " for qw( libs libs_static );
+    };
+  }
+  else
+  {
+    # Not supported by OpenSSL for building from Source code:
+    # (MSWin32 Perl) + (GCC)
+    # (Perl 5.8)
+    # That means that building from source is not possible on Strawberry currently.
+    # (Strawberry is basically MSWin32 Perl with gcc, we can sometimes work around
+    #  this (eg autoconf) with the MSYS Perl that comes with Alien::MSYS, but that
+    #  is 5.8, which is also not supported by OpenSSL.  Boo).
+    #
+    # ActiveState Perl is probably in a similar state.
+    #
+    # Happily, OpenSSL + Net::SSLeay are bundled with Strawberry, and it is relatively
+    # easy to install Net::SSLeay on ActiveState Perl.
+
+    log("not sure how to do a share install with system_type = $system_type");
+    build sub {
+      die "unable to build";
+    };
+  }
+
+  test [ '%{make} test' ];
+
+  plugin 'Gather::IsolateDynamic';
+
+};
+
+sys {
+
+  meta->after_hook(
+    gather_system => sub {
+      my($build) = @_;
+      $build->runtime_prop->{ffi_name} = ['crypto','ssl'];
+    },
+  );
+
+};

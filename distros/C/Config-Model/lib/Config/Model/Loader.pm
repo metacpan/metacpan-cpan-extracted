@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Loader;
-$Config::Model::Loader::VERSION = '2.113';
+$Config::Model::Loader::VERSION = '2.114';
 use Carp;
 use strict;
 use warnings;
@@ -887,7 +887,7 @@ Config::Model::Loader - Load serialized data into config tree
 
 =head1 VERSION
 
-version 2.113
+version 2.114
 
 =head1 SYNOPSIS
 

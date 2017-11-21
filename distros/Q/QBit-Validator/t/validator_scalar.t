@@ -2,6 +2,7 @@ use Test::More tests => 39;
 
 use qbit;
 use QBit::Validator;
+use Exception::Validator::FailedField;
 
 my $error = FALSE;
 try {

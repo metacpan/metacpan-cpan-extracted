@@ -119,7 +119,6 @@ my $build = $class->new(
     'Regexp::Common' => '0',
     'Scalar::Util' => '0',
     'Storable' => '0',
-    'Text::Diff' => '0',
     'Text::Levenshtein::Damerau' => '0',
     'Text::Wrap' => '0',
     'parent' => '0',

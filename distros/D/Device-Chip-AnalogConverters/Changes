@@ -1,5 +1,9 @@
 Revision history for Device-Chip-AnalogConverters
 
+0.04    2017-11-11 00:46:06
+        [CHANGES]
+         * Added MAX11200 driver
+
 0.03    2017-09-20 01:52:22
         [CHANGES]
          * Added AD5691R driver

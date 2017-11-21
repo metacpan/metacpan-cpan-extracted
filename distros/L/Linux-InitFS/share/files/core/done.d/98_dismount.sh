@@ -1,0 +1,4 @@
+
+umount /sys
+umount /proc
+

@@ -1,5 +1,5 @@
 package Moose::Exception::CannotAugmentNoSuperMethod;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -22,4 +22,5 @@ sub _build_message {
     "You cannot augment '".$self->method_name."' because it has no super method";
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

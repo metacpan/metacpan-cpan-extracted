@@ -1,0 +1,11 @@
+pek:
+  go: 'ssh  -qTNf -D 127.0.0.1:12345 $ENV{MYUSERNAME}@gw1.mydan.org' 
+  expect:
+    code: 'googlecode:$ENV{TOKEN_N}'
+    assword: $ENV{PASSWD}
+
+aws:
+  go: 'ssh  -qTNf -D 127.0.0.1:12346 $ENV{MYUSERNAME}@gw2.mydan.org' 
+  expect:
+    code: 'googlecode:$ENV{TOKEN_W}'
+    assword: $ENV{PASSWD}

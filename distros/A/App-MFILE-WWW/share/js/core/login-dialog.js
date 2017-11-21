@@ -36,11 +36,13 @@
 
 define ([
     'jquery', 
+    'cf',
     'html', 
     'lib',
     'login'
 ], function (
     $, 
+    cf,
     html, 
     lib,
     login

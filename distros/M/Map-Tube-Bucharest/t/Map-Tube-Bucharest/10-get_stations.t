@@ -6,18 +6,11 @@ use warnings;
 use Encode qw(decode_utf8);
 use English;
 use Map::Tube::Bucharest;
-use Test::More tests => 4;
+use Test::More tests => 3;
 use Test::NoWarnings;
 
 # Test.
 my $map = Map::Tube::Bucharest->new;
-eval {
-	$map->get_stations;
-};
-like($EVAL_ERROR, qr{^Map::Tube::get_stations\(\): ERROR: Missing Line Name. \(status: 104\)},
-	'Missing line name.');
-
-# Test.
 eval {
 	$map->get_stations('foo');
 };

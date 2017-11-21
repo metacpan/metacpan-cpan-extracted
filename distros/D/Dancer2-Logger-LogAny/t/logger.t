@@ -1,7 +1,7 @@
 use strict; use warnings;
 use Test::More;
 
-use Dancer2 qw/ :syntax !log !pass /;
+use Dancer2 qw/ !log !pass /;
 use Plack::Test;
 use HTTP::Request::Common;
 

@@ -8,6 +8,7 @@ use MYDan::Node;
 use MYDan::Util::MIO::SSH;
 use MYDan::Util::OptConf;
 use MYDan::Util::Pass;
+use MYDan::VSSH::Print;
 
 $| ++;
 
@@ -37,24 +38,15 @@ map { $_ .= '\;' if $_ !~ s/([&|]){2}\s*$/\\$1\\$1/ } @ARGV;
 my $range = MYDan::Node->new( $option->dump( 'range' ) );
 my %cmd = map { $_ => \@ARGV } $range->load( delete $o{range} )->list();
 
-$o{user} = `logname` and chop $o{user} unless $o{user};
+$o{user} = `id -un` and chop $o{user} unless $o{user};
 $o{pass} = +{ MYDan::Util::Pass->new( conf => "$o{conf}/pass", range => $range )
     ->pass( [ keys %cmd ] => $o{user} ) } unless $o{noop};
     
-my ( %result, %mesg )= MYDan::Util::MIO::SSH->new( %cmd )->run( %o );
+my ( %result, %re )= MYDan::Util::MIO::SSH->new( %cmd )->run( %o );
 
-while ( my ( $io, $mesg ) = each %result )
+while( my ( $type, $result ) = each %result )
 {
-    while ( my ( $mesg, $node ) = each %$mesg )
-    {
-        push @{ $mesg{$io} }, join ': ', $range->load( $node )->dump, $mesg;
-    }
+    map{ my $t = $_; map{ $re{$_} .= $t } @{$result->{$t}};}keys %$result;
 }
 
-for my $io ( sort keys %mesg )
-{
-    print "\n---\n$io:\n";
-    map { print "  $_" } @{ $mesg{$io} };
-}
-
-exit 0;
+MYDan::VSSH::Print::result( 'mssh' => %re );

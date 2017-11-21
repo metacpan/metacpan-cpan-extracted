@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "language.dtd">
+<language name="commonoptions" version="0.1" section="Test" extensions="*.commonoptions;">
+<highlighting>
+
+<contexts>
+
+<context name="Base" attribute="Normal Text" lineEndContext="#stay">
+	<StringDetect attribute="Test Area" context="C" String="&lt;C&gt;" />
+	<StringDetect attribute="Test Area" context="CFNS" String="&lt;CFNS&gt;" />
+	<StringDetect attribute="Test Area" context="FNS" String="&lt;FNS&gt;" />
+	<StringDetect attribute="Test Area" context="L" String="&lt;L&gt;" />
+	<IncludeRules context="##XML" />
+</context>
+
+<context name="Comment" attribute="Comment" lineEndContext="#pop">
+</context>
+
+<!-- Testing default without options -->
+<context name="C" attribute="Test Area" lineEndContext="#stay">
+	<DetectChar attribute="Comment" context="Comment" char="#" />
+	<!-- tests go here -->
+	<RegExpr attribute="Match" context="#stay" column="5" String="\d" />
+	<StringDetect attribute="Test Area" context="#pop" String="&lt;C&gt;" />
+</context>
+
+<context name="CFNS" attribute="Test Area" lineEndContext="#stay">
+	<DetectChar attribute="Comment" context="Comment" char="#" />
+	<!-- tests go here -->
+	<RegExpr attribute="Match" firstNonSpace="true" context="#stay" column="5" String="\d" />
+	<StringDetect attribute="Test Area" context="#pop" String="&lt;CFNS&gt;" />
+</context>
+
+<context name="FNS" attribute="Test Area" lineEndContext="#stay">
+	<DetectChar attribute="Comment" context="Comment" char="#" />
+	<!-- tests go here -->
+	<RegExpr attribute="Match" firstNonSpace="true" context="#stay" String="\d" />
+	<StringDetect attribute="Test Area" context="#pop" String="&lt;FNS&gt;" />
+</context>
+
+<context name="L" attribute="Test Area" lineEndContext="#stay">
+	<DetectChar attribute="Comment" context="Comment" char="#" />
+	<!-- tests go here -->
+	<StringDetect attribute="Match2" lookAhead="true" context="LT" String="aap" />
+	<StringDetect attribute="Test Area" context="#pop" String="&lt;L&gt;" />
+</context>
+
+<context name="LT" attribute="Test Area" lineEndContext="#stay">
+	<DetectChar attribute="Comment" context="Comment" char="#" />
+	<!-- tests go here -->
+	<StringDetect attribute="Match" context="#pop" String="aap" />
+	<StringDetect attribute="Test Area" context="#pop#pop" String="&lt;L&gt;" />
+</context>
+
+</contexts>
+
+<itemDatas>
+	<itemData name="Normal Text" defStyleNum="dsNormal" />
+	<itemData name="Test Area"  defStyleNum="dsOthers" />
+	<itemData name="Match"  defStyleNum="dsDataType" />
+	<itemData name="Match2"  defStyleNum="dsString" />
+	<itemData name="Match3"  defStyleNum="dsChar" />
+	<itemData name="Match4"  defStyleNum="dsDataType" />
+	<itemData name="Match5"  defStyleNum="dsString" />
+	<itemData name="Comment"  defStyleNum="dsComment" />
+</itemDatas>
+
+</highlighting>
+
+<general>
+	<keywords casesensitive="1" weakDeliminator="."/>
+</general>
+
+</language>

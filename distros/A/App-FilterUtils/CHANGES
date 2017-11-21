@@ -1,0 +1,23 @@
+==================================================
+Changes from 2016-11-16 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.001 at 2017-11-16 22:31:37 +0000
+------------------------------------------
+
+  Change: 289e7f4efefb6b8ca8b2a0fecf5d680900e2e212
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-11-16 23:30:56 +0000
+
+    Migrate more of my utilities 
+
+  Change: e1a2782815850fc4cb5815a0ad334e5092334608
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-11-16 14:40:51 +0000
+
+    Migrate bin/2base script to module 
+
+================
+End of releases.
+================

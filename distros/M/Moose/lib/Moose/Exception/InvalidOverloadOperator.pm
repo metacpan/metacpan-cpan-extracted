@@ -1,5 +1,5 @@
 package Moose::Exception::InvalidOverloadOperator;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -17,4 +17,5 @@ sub _build_message {
         . ') was not a valid overloading operator';
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

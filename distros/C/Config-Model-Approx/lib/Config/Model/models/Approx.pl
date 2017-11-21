@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Approx
 #
-# This software is Copyright (c) 2013 by Dominique Dumont.
+# This software is Copyright (c) 2009-2017 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
@@ -9,128 +9,121 @@
 #
 [
   {
-    'class_description' => 'Configuration model for Approx',
     'accept' => [
       '.*',
       {
-        'value_type' => 'uniline',
-        'summary' => 'unknown parameter',
-        'type' => 'leaf',
         'description' => 'Either the configuration file has an error or the author of this
 module forgot to implement this parameter. In the latter case, please
 file a bug on CPAN request tracker:
-http://rt.cpan.org/NoAuth/Bugs.html?Dist=Config-Model-Approx'
+http://rt.cpan.org/NoAuth/Bugs.html?Dist=Config-Model-Approx',
+        'summary' => 'unknown parameter',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
       }
-    ],
-    'name' => 'Approx',
-    'copyright' => [
-      '2011, Dominique Dumont'
     ],
     'author' => [
       'Dominique Dumont'
     ],
-    'license' => 'LGPL-2.1+',
+    'class_description' => 'Configuration model for Approx',
+    'copyright' => [
+      '2011, Dominique Dumont'
+    ],
     'element' => [
       'cache',
       {
-        'value_type' => 'uniline',
+        'description' => 'Specifies the location of the approx cache directory (default: /var/cache/approx). It and all its subdirectories must be owned by the approx server (see also the $user and $group parameters, below.)',
         'summary' => 'approx cache directory',
-        'upstream_default' => '/var/cache/approx',
-        'experience' => 'advanced',
         'type' => 'leaf',
-        'description' => 'Specifies the location of the approx cache directory (default: /var/cache/approx). It and all its subdirectories must be owned by the approx server (see also the $user and $group parameters, below.)'
+        'upstream_default' => '/var/cache/approx',
+        'value_type' => 'uniline'
       },
       'interval',
       {
-        'value_type' => 'integer',
+        'description' => 'Specifies the time in minutes after which a cached file will be considered too old to deliver without first checking with the remote repository for a newer version',
         'summary' => 'file cache expiration in minutes',
-        'upstream_default' => '720',
-        'experience' => 'advanced',
         'type' => 'leaf',
-        'description' => 'Specifies the time in minutes after which a cached file will be considered too old to deliver without first checking with the remote repository for a newer version'
+        'upstream_default' => '720',
+        'value_type' => 'integer'
       },
       'max_rate',
       {
-        'value_type' => 'uniline',
+        'description' => 'Specifies the maximum download rate from remote repositories, in bytes per second (default: unlimited). The value may be suffixed with "K", "M", or "G" to indicate kilobytes, megabytes, or gigabytes per second, respectively.',
         'summary' => 'maximum download rate from remote repositories',
         'type' => 'leaf',
-        'description' => 'Specifies the maximum download rate from remote repositories, in bytes per second (default: unlimited). The value may be suffixed with "K", "M", or "G" to indicate kilobytes, megabytes, or gigabytes per second, respectively.'
+        'value_type' => 'uniline'
       },
       'max_redirects',
       {
-        'value_type' => 'integer',
+        'description' => 'Specifies the maximum number of HTTP redirections that will be followed when downloading a remote file',
         'summary' => 'maximum number of HTTP redirections',
-        'upstream_default' => '5',
         'type' => 'leaf',
-        'description' => 'Specifies the maximum number of HTTP redirections that will be followed when downloading a remote file'
+        'upstream_default' => '5',
+        'value_type' => 'integer'
       },
       'user',
       {
-        'value_type' => 'uniline',
         'summary' => 'user that owns the files in the approx cache',
+        'type' => 'leaf',
         'upstream_default' => 'approx',
-        'type' => 'leaf'
+        'value_type' => 'uniline'
       },
       'group',
       {
-        'value_type' => 'uniline',
         'summary' => 'group that owns the files in the approx cache',
+        'type' => 'leaf',
         'upstream_default' => 'approx',
-        'type' => 'leaf'
+        'value_type' => 'uniline'
       },
       'syslog',
       {
-        'value_type' => 'uniline',
         'summary' => 'syslog(3) facility to use when logging',
+        'type' => 'leaf',
         'upstream_default' => 'daemon',
-        'type' => 'leaf'
+        'value_type' => 'uniline'
       },
       'pdiffs',
       {
-        'value_type' => 'boolean',
         'summary' => 'support IndexFile diffs',
+        'type' => 'leaf',
         'upstream_default' => '1',
-        'type' => 'leaf'
+        'value_type' => 'boolean'
       },
       'offline',
       {
-        'value_type' => 'boolean',
+        'description' => 'Specifies whether to deliver (possibly out-of-date) cached files when they cannot be downloaded from remote repositories',
         'summary' => 'use cached files when offline',
-        'upstream_default' => '0',
         'type' => 'leaf',
-        'description' => 'Specifies whether to deliver (possibly out-of-date) cached files when they cannot be downloaded from remote repositories'
+        'upstream_default' => '0',
+        'value_type' => 'boolean'
       },
       'max_wait',
       {
-        'value_type' => 'integer',
+        'description' => 'Specifies how many seconds an approx(8) process will wait for a concurrent download of a file to complete, before attempting to download the file itself',
         'summary' => 'max wait for concurrent file download',
-        'upstream_default' => '10',
         'type' => 'leaf',
-        'description' => 'Specifies how many seconds an approx(8) process will wait for a concurrent download of a file to complete, before attempting to download the file itself'
+        'upstream_default' => '10',
+        'value_type' => 'integer'
       },
       'verbose',
       {
-        'value_type' => 'boolean',
-        'upstream_default' => '0',
+        'description' => 'Specifies whether informational messages should be printed in the log',
         'type' => 'leaf',
-        'description' => 'Specifies whether informational messages should be printed in the log'
+        'upstream_default' => '0',
+        'value_type' => 'boolean'
       },
       'debug',
       {
-        'value_type' => 'boolean',
-        'upstream_default' => '0',
+        'description' => 'Specifies whether debug messages should be printed in the log',
         'type' => 'leaf',
-        'description' => 'Specifies whether debug messages should be printed in the log'
+        'upstream_default' => '0',
+        'value_type' => 'boolean'
       },
       'distributions',
       {
-        'level' => 'important',
         'cargo' => {
-          'value_type' => 'uniline',
-          'type' => 'leaf'
+          'type' => 'leaf',
+          'value_type' => 'uniline'
         },
-        'summary' => 'remote repositories',
-        'type' => 'hash',
         'description' => 'The other name/value pairs are used to map distribution names to remote repositories. For example,
 
   debian     =>   http://ftp.debian.org/debian
@@ -138,16 +131,19 @@ http://rt.cpan.org/NoAuth/Bugs.html?Dist=Config-Model-Approx'
 
 Use the distribution name as the key of the hash element and the URL as the value
 ',
-        'index_type' => 'string'
+        'index_type' => 'string',
+        'level' => 'important',
+        'summary' => 'remote repositories',
+        'type' => 'hash'
       }
     ],
-    'read_config' => [
-      {
-        'file' => 'approx.conf',
-        'backend' => 'Approx',
-        'config_dir' => '/etc/approx'
-      }
-    ]
+    'license' => 'LGPL-2.1+',
+    'name' => 'Approx',
+    'rw_config' => {
+      'backend' => 'Approx',
+      'config_dir' => '/etc/approx',
+      'file' => 'approx.conf'
+    }
   }
 ]
 ;

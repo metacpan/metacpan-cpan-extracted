@@ -1,7 +1,7 @@
 use strict; use warnings;
 
 package YAML::XS;
-our $VERSION = '0.66';
+our $VERSION = '0.67';
 
 use base 'Exporter';
 
@@ -10,7 +10,7 @@ use base 'Exporter';
 %YAML::XS::EXPORT_TAGS = (
     all => [qw(Dump Load LoadFile DumpFile)],
 );
-our ($UseCode, $DumpCode, $LoadCode);
+our ($UseCode, $DumpCode, $LoadCode, $Boolean);
 # $YAML::XS::UseCode = 0;
 # $YAML::XS::DumpCode = 0;
 # $YAML::XS::LoadCode = 0;

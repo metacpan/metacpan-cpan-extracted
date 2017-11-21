@@ -33,6 +33,6 @@ Mic::Interface
 
 =head1 DESCRIPTION
 
-Defines a reusable interface.
+Defines a reusable interface using the same (hashref) specification as the C<interface> key that is passed to C<< Mic->define_class(...) >> (see L<Mic/USAGE>).
 
 See L<Mic/Interface Sharing> for an example.

@@ -1,26 +1,27 @@
---- #YAML:1.0
-name:               Statistics-Descriptive-LogScale
-version:            0.09
-abstract:           Memory-efficient approximate univariate
+---
+abstract: 'Memory-efficient approximate univariate descriptive statistics class.'
 author:
-    - Konstantin S. Uvarin <khedin@gmail.com>
-license:            perl
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'Konstantin S. Uvarin <khedin@gmail.com>'
 build_requires:
-    Data::Dumper:         0
-    FindBin:              0
-    Test::More:           0
-    Test::Number::Delta:  0
-requires:
-    Carp:   0
-    POSIX:  0
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.57_05
+  Data::Dumper: '0'
+  FindBin: '0'
+  Test::More: '0'
+  Test::Number::Delta: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005'
+license: perl
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Statistics-Descriptive-LogScale
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  POSIX: '0'
+version: 0.11
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

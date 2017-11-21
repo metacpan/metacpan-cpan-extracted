@@ -1,8 +1,36 @@
-SYNOPSIS
+NAME
+    App::btcindo - CLI for bitcoin.co.id
 
+VERSION
+    This document describes version 0.005 of App::btcindo (from Perl
+    distribution App-btcindo), released on 2017-11-19.
+
+SYNOPSIS
     Please see included script btcindo.
 
-SEE ALSO
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-btcindo>.
 
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-App-btcindo>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-btcindo>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
     Finance::BTCInfo
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

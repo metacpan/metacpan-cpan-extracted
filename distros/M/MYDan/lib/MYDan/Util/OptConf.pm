@@ -65,23 +65,26 @@ sub load
         confess "$error: $@" if $@;
         confess "$error: not HASH" if ref $self ne 'HASH';
 
-        $ROOT ||= dirname( Cwd::abs_path( $conf ) );
-        for my $conf ( values %$self )
-        {
-            while ( my ( $opt, $value ) = each %$conf )
+	unless( $load{raw} )
+	{
+            $ROOT ||= dirname( Cwd::abs_path( $conf ) );
+            for my $conf ( values %$self )
             {
-                unless ( my $ref = ref $value )
+                while ( my ( $opt, $value ) = each %$conf )
                 {
-                    $conf->{$opt} = $class->macro( $conf->{$opt} );
-                }
-                elsif ( $ref eq 'ARRAY' )
-                {
-                    $value = [ map { $class->macro( $_ ) } @$value ];
-                }
-                elsif ( $ref eq 'HASH' )
-                {
-                    map { $value->{$_} = $class->macro( $value->{$_} ) }
-                        keys %$value;
+                    unless ( my $ref = ref $value )
+                    {
+                        $conf->{$opt} = $class->macro( $conf->{$opt} );
+                    }
+                    elsif ( $ref eq 'ARRAY' )
+                    {
+                        $value = [ map { $class->macro( $_ ) } @$value ];
+                    }
+                    elsif ( $ref eq 'HASH' )
+                    {
+                        map { $value->{$_} = $class->macro( $value->{$_} ) }
+                            keys %$value;
+                    }
                 }
             }
         }
@@ -169,5 +172,40 @@ sub macro
 
     return $path;
 };
+
+sub save
+{
+    my ( $class, %save ) = @_;
+
+    return unless defined $save{name} && $save{key};
+
+    my $self = {};
+    my $base = $save{base} || $RealBin; 
+    my @conf =  map { 
+        my $p = $_;
+        map{ File::Spec->join( $base, $p, $_ ) }( $PRIVATE, $CONF )
+    } qw( . .. ../.. ../../.. );
+    return unless my ( $conf ) = $save{conf} ? $save{conf} : grep { -l $_ || -f $_ } @conf;
+
+    my $error = "invalid config $conf";
+    $conf = readlink $conf if -l $conf;
+    confess "$error: not a regular file" unless -f $conf;
+    
+    my $data = eval { YAML::XS::LoadFile( $conf ) };
+    confess "$error: $@" if $@;
+    confess "$error: not HASH" if ref $self ne 'HASH';
+    
+    if( defined $save{value} )
+    {
+        $data->{$save{name}}{$save{key}} = $save{value};
+    }
+    else
+    {
+        delete $data->{$save{name}}{$save{key}};
+    }
+    eval { YAML::XS::DumpFile( $conf, $data ) };
+
+    confess "save error: $@" if $@;
+}
 
 1;

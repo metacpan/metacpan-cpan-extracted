@@ -22,7 +22,7 @@ is exists $funcs->{stub}, 1;
 is exists $funcs->{CONST}, 1;
 is exists $funcs->{bar}, 1;
 
-is $funcs->{CONST}->(), 42;
+#is $funcs->{CONST}->(), 42; # do not try to call const as a sub - it'd fail on modern perls
 is $funcs->{bar}->(), 124;
 
 eval 'sub Foo::stub {-3}';

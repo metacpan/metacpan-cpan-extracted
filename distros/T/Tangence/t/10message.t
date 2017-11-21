@@ -513,6 +513,11 @@ test_typed "any (string)",
    data   => "hello",
    stream => "\x25hello";
 
+test_typed "any (string wide)",
+   sig    => "any",
+   data   => "\x{263A}",
+   stream => "\x23\xE2\x98\xBA";
+
 test_typed "any (ARRAY empty)",
    sig    => "any",
    data   => [],

@@ -1,4 +1,4 @@
-requires "Minion" => "7";
+requires "Minion" => "8";
 requires "Mojo::mysql" => "1.04";
 requires "Mojolicious" => "0";
 requires "perl" => "5.010";

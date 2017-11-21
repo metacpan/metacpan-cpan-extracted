@@ -1,4 +1,5 @@
 package t::Plack::App::APISchema::MockServer;
+use lib '.';
 use t::test;
 use t::test::fixtures;
 use Plack::Test;

@@ -1,0 +1,29 @@
+Source: libmojolicious-plugin-vparam-perl
+Section: perl
+Homepage: https://github.com/rshadow/libmojolicious-plugin-vparam-perl
+Maintainer: Dmitry E. Oboukhov <unera@debian.org>
+Uploaders: Roman V. Nikolaev <rshadow@rambler.ru>
+Build-Depends: debhelper (>= 7),
+ libmojolicious-perl,
+ libdatetime-perl,
+ libdatetime-format-dateparse-perl,
+ libmail-rfc822-address-perl,
+ libxml-libxml-perl,
+ liblist-moreutils-perl
+Standards-Version: 3.9.3
+Priority: extra
+
+Package: libmojolicious-plugin-vparam-perl
+Depends: ${perl:Depends}, ${misc:Depends},
+ libmojolicious-perl,
+ libdatetime-perl,
+ libdatetime-format-dateparse-perl,
+ libmail-rfc822-address-perl,
+ libxml-libxml-perl,
+ liblist-moreutils-perl
+Architecture: all
+Description: Mojolicious plugin validator for GET/POST data.
+ This module uses simple parameters types str, int, email, bool, etc.
+ to validate.  Instead of many other modules you not need add specific
+ validation subs or rules. Just set parameter type. But if you want
+ sub or rule you can do it too.

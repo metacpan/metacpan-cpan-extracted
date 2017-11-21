@@ -4,7 +4,7 @@ Devel::StackTrace - An object representing a stack trace
 
 # VERSION
 
-version 2.02
+version 2.03
 
 # SYNOPSIS
 
@@ -212,11 +212,23 @@ The optional `\%p` parameter only has one option. The `max_arg_length`
 parameter truncates each subroutine argument's string representation if it is
 longer than this number of characters.
 
+If all the frames in a trace are skipped then this just returns the `message`
+passed to the constructor or the string `"Trace begun"`.
+
+## $trace->message
+
+Returns the message passed to the constructor. If this wasn't passed then this
+method returns `undef`.
+
 # SUPPORT
 
-Bugs may be submitted through [https://github.com/houseabsolute/Devel-StackTrace/issues](https://github.com/houseabsolute/Devel-StackTrace/issues).
+Bugs may be submitted at [https://github.com/houseabsolute/Devel-StackTrace/issues](https://github.com/houseabsolute/Devel-StackTrace/issues).
 
 I am also usually active on IRC as 'autarch' on `irc://irc.perl.org`.
+
+# SOURCE
+
+The source code repository for Devel-StackTrace can be found at [https://github.com/houseabsolute/Devel-StackTrace](https://github.com/houseabsolute/Devel-StackTrace).
 
 # DONATIONS
 
@@ -250,8 +262,11 @@ Dave Rolsky <autarch@urth.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2000 - 2016 by David Rolsky.
+This software is Copyright (c) 2000 - 2017 by David Rolsky.
 
 This is free software, licensed under:
 
     The Artistic License 2.0 (GPL Compatible)
+
+The full text of the license can be found in the
+`LICENSE` file included with this distribution.

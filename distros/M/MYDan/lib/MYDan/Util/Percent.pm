@@ -32,7 +32,7 @@ sub print
     $prompt ||= $this->{prompt};
     my $p = $size ? sprintf( "%d", $len*100/$size ) : 0;
     $p = 100 if $p >100;
-    print "\r$prompt $p% $len/".($size||'unkown');
+    print "\r$prompt $p% $len/".($size||'unkown').' ';
     print "\n" if $p==100;
     return $this;
 }

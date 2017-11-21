@@ -21,6 +21,7 @@ use strict;
 use warnings;
 
 # load the two modules to have perl check them
+
 use Mojolicious::Plugin::Qooxdoo;
 use Mojo::URL;
 use Mojo::JSON;
@@ -31,7 +32,7 @@ use CallBackery::Config;
 use CallBackery::Plugin::Doc;
 use CallBackery::Database;
 
-our $VERSION = '0.11.0';
+our $VERSION = '0.11.1';
 
 use Mojo::Base 'Mojolicious';
 

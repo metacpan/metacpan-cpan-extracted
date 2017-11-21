@@ -1,3 +1,23 @@
+libqbit-application-model-db-perl (0.025) raring; urgency=low
+
+  * added documentation
+
+  * added documentation
+
+  * added test
+
+  * added method update for query
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 19 Nov 2017 10:09:32 +0300
+
+libqbit-application-model-db-perl (0.024) raring; urgency=low
+
+  * refactoring sub _commit
+
+  * added comments, offset, delete select_timeout
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Thu, 16 Nov 2017 00:48:49 +0300
+
 libqbit-application-model-db-perl (0.023) raring; urgency=low
 
   * added select_timeout

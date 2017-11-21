@@ -1,5 +1,5 @@
 package Moose::Exception::NoConstraintCheckForTypeConstraint;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -10,4 +10,5 @@ sub _build_message {
     "Could not compile type constraint '".$self->type_name."' because no constraint check";
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

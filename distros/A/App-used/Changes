@@ -1,5 +1,15 @@
 Revision history for App-used
 
+0.0.8   2017-11-13
+        Updating for release of version 0.0.8
+        Skip "v5" dependencies (Ivan Wills)
+        Removed testing in travis of Perl v5.8 (Ivan Wills)
+        Updated date (Ivan Wills)
+        Updating Test dependencies for better windows experience (Ivan Wills)
+        Added perl version (Ivan Wills)
+        Added perl 5.24 to travis build (Ivan Wills)
+        Added default actions (Ivan Wills)
+
 0.0.7   2016-03-20
         Updating for release of version 0.0.7
         Updated date (Ivan Wills)

@@ -4,7 +4,7 @@
 package Lingua::Interset::FeatureStructure;
 use strict;
 use warnings;
-our $VERSION = '3.007';
+our $VERSION = '3.008';
 
 use utf8;
 use open ':utf8';
@@ -628,6 +628,18 @@ my %matrix = @_matrix =
             ['4', '3']
         ],
         'uname' => 'Person'
+    },
+    # Clusivity distinguishes inclusive and exclusive first person plural pronouns.
+    'clusivity' =>
+    {
+        'priority' => 265,
+        'values' => ['in', 'ex', ''],
+        'replacements' =>
+        [
+            ['in'], # I + you (+ optionally they)
+            ['ex']  # I + they (excluding you)
+        ],
+        'uname' => 'Clusivity'
     },
     # Politeness, formal vs. informal word forms.
     'polite' =>
@@ -2209,6 +2221,9 @@ sub is_essive {my $self = shift; return $self->contains('case', 'ess');}
 sub is_exclamative {my $self = shift; return $self->contains('prontype', 'exc');}
 
 #------------------------------------------------------------------------------
+sub is_exclusive {my $self = shift; return $self->contains('clusivity', 'ex');}
+
+#------------------------------------------------------------------------------
 sub is_factive {my $self = shift; return $self->contains('case', 'tra');}
 
 #------------------------------------------------------------------------------
@@ -2276,6 +2291,9 @@ sub is_impersonal {my $self = shift; return $self->contains('person', '0');}
 
 #------------------------------------------------------------------------------
 sub is_inanimate {my $self = shift; return $self->contains('animacy', 'inan');}
+
+#------------------------------------------------------------------------------
+sub is_inclusive {my $self = shift; return $self->contains('clusivity', 'in');}
 
 #------------------------------------------------------------------------------
 sub is_indefinite {my $self = shift; return $self->contains('prontype', 'ind') || $self->contains('definite', 'ind');}
@@ -2930,7 +2948,7 @@ Lingua::Interset::FeatureStructure - Definition of morphosyntactic features and 
 
 =head1 VERSION
 
-version 3.007
+version 3.008
 
 =head1 SYNOPSIS
 
@@ -3381,6 +3399,8 @@ If you want to exclude pronouns, test C<is_noun() && !is_pronominal()>.
 
 =head2 is_exclamative()
 
+=head2 is_exclusive()
+
 =head2 is_factive()
 
 =head2 is_feminine()
@@ -3426,6 +3446,8 @@ If you want to exclude pronouns, test C<is_noun() && !is_pronominal()>.
 =head2 is_impersonal()
 
 =head2 is_inanimate()
+
+=head2 is_inclusive()
 
 =head2 is_indefinite()
 

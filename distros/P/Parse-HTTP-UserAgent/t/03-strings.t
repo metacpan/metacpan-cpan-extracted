@@ -13,6 +13,13 @@ use File::Spec;
 use Getopt::Long;
 use Parse::HTTP::UserAgent;
 
+# Work-around for the removal of "." from @INC in Perl 5.26
+if (! grep { $_ eq '.' } @INC) {
+    require FindBin;
+    no warnings 'once';
+    push @INC, $FindBin::Bin . '/..';
+}
+
 require_ok( File::Spec->catfile( t => 'db.pl' ) );
 
 GetOptions(\my %opt, qw(

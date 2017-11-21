@@ -2,12 +2,15 @@ package Minion::Backend::SQLite;
 use Mojo::Base 'Minion::Backend';
 
 use Carp 'croak';
+use List::Util 'min';
 use Mojo::SQLite;
+use Mojo::Util 'steady_time';
 use Sys::Hostname 'hostname';
 use Time::HiRes 'usleep';
 
-our $VERSION = '2.003';
+our $VERSION = '3.000';
 
+has dequeue_interval => 0.5;
 has 'sqlite';
 
 sub new {
@@ -29,7 +32,13 @@ sub broadcast {
 
 sub dequeue {
   my ($self, $id, $wait, $options) = @_;
-  usleep($wait * 1000000) unless my $job = $self->_try($id, $options);
+  my $job = $self->_try($id, $options);
+  unless ($job) {
+    my $int = $self->dequeue_interval;
+    my $end = steady_time + $wait;
+    usleep(min($int, $end - steady_time) * 1000000)
+      until steady_time >= $end or $job = $self->_try($id, $options);
+  }
   return $job || $self->_try($id, $options);
 }
 
@@ -51,39 +60,77 @@ sub enqueue {
 sub fail_job   { shift->_update(1, @_) }
 sub finish_job { shift->_update(0, @_) }
 
-sub job_info {
-  shift->sqlite->db->query(
-    q{select id, args, attempts,
-        (select json_group_array(distinct child.id)
-          from minion_jobs as child, json_each(child.parents) as parent_id
-          where j.id = parent_id.value) as children,
-        strftime('%s',created) as created,
-        strftime('%s',delayed) as delayed,
-        strftime('%s',finished) as finished, notes, parents, priority, queue,
-        result, strftime('%s',retried) as retried, retries,
-        strftime('%s',started) as started, state, task, worker
-      from minion_jobs as j where id = ?}, shift
-  )->expand(json => [qw(args children notes parents result)])->hash;
-}
-
 sub list_jobs {
   my ($self, $offset, $limit, $options) = @_;
 
-  return $self->sqlite->db->query(
-    'select id from minion_jobs
-     where (queue = :1 or :1 is null) and (state = :2 or :2 is null)
-       and (task = :3 or :3 is null)
-     order by id desc
-     limit :4 offset :5', @$options{qw(queue state task)}, $limit, $offset
-  )->arrays->map(sub { $self->job_info($_->[0]) })->to_array;
+  my (@where, @where_params);
+  if (defined(my $ids = $options->{ids})) {
+    my $ids_in = join ',', ('?')x@$ids;
+    push @where, @$ids ? "id in ($ids_in)" : 'id is null';
+    push @where_params, @$ids;
+  }
+  if (defined(my $queue = $options->{queue})) {
+    push @where, 'queue = ?';
+    push @where_params, $queue;
+  }
+  if (defined(my $state = $options->{state})) {
+    push @where, 'state = ?';
+    push @where_params, $state;
+  }
+  if (defined(my $task = $options->{task})) {
+    push @where, 'task = ?';
+    push @where_params, $task;
+  }
+
+  my $where_str = @where ? 'where ' . join(' and ', @where) : '';
+
+  my $jobs = $self->sqlite->db->query(
+    qq{select id, args, attempts,
+       (select json_group_array(distinct child.id)
+         from minion_jobs as child, json_each(child.parents) as parent_id
+         where j.id = parent_id.value) as children,
+       strftime('%s',created) as created,
+       strftime('%s',delayed) as delayed,
+       strftime('%s',finished) as finished, notes, parents, priority, queue,
+       result, strftime('%s',retried) as retried, retries,
+       strftime('%s',started) as started, state, task, worker
+       from minion_jobs as j
+       $where_str order by id desc limit ? offset ?},
+       @where_params, $limit, $offset
+  )->expand(json => [qw(args children notes parents result)])->hashes->to_array;
+
+  my $total = $self->sqlite->db->query(qq{select count(*) from minion_jobs as j
+    $where_str}, @where_params)->arrays->first->[0];
+  
+  return {jobs => $jobs, total => $total};
 }
 
 sub list_workers {
-  my ($self, $offset, $limit) = @_;
+  my ($self, $offset, $limit, $options) = @_;
 
-  my $sql = 'select id from minion_workers order by id desc limit ? offset ?';
-  return $self->sqlite->db->query($sql, $limit, $offset)
-    ->arrays->map(sub { $self->worker_info($_->[0]) })->to_array;
+  my (@where, @where_params);
+  if (defined(my $ids = $options->{ids})) {
+    my $ids_in = join ',', ('?')x@$ids;
+    push @where, @$ids ? "w.id in ($ids_in)" : 'w.id is null';
+    push @where_params, @$ids;
+  }
+
+  my $where_str = @where ? 'where ' . join(' and ', @where) : '';
+  my $workers = $self->sqlite->db->query(
+    qq{select w.id, strftime('%s',w.notified) as notified,
+       group_concat(j.id) as jobs, w.host, w.pid, w.status,
+       strftime('%s',w.started) as started
+       from minion_workers as w
+       left join minion_jobs as j on j.worker = w.id and j.state = 'active'
+       $where_str group by w.id order by w.id desc limit ? offset ?},
+       @where_params, $limit, $offset
+  )->expand(json => 'status')->hashes->to_array;
+  $_->{jobs} = [split /,/, ($_->{jobs} // '')] for @$workers;
+
+  my $total = $self->sqlite->db->query(qq{select count(*)
+    from minion_workers as w $where_str}, @where_params)->arrays->first->[0];
+
+  return {total => $total, workers => $workers};
 }
 
 sub lock {
@@ -206,12 +253,13 @@ sub stats {
       count(case state when 'active' then 1 end) as active_jobs,
       count(case state when 'failed' then 1 end) as failed_jobs,
       count(case state when 'finished' then 1 end) as finished_jobs,
-      count(case when state = 'inactive' and (delayed > datetime('now')
-        or json_array_length(parents) > 0) then 1 end) as delayed_jobs,
-      count(distinct case when state = 'active' then worker end) as active_workers,
+      count(case when state = 'inactive' and delayed > datetime('now')
+        then 1 end) as delayed_jobs,
+      count(distinct case when state = 'active' then worker end)
+        as active_workers,
       ifnull((select seq from sqlite_sequence where name = 'minion_jobs'), 0)
         as enqueued_jobs,
-      (select count(*) from minion_workers) as inactive_workers
+      (select count(*) from minion_workers) as inactive_workers, null as uptime
       from minion_jobs}
   )->hash;
   $stats->{inactive_workers} -= $stats->{active_workers};
@@ -230,18 +278,6 @@ sub unlock {
 
 sub unregister_worker {
   shift->sqlite->db->query('delete from minion_workers where id = ?', shift);
-}
-
-sub worker_info {
-  my $info = shift->sqlite->db->query(
-    q{select w.id, strftime('%s',w.notified) as notified, group_concat(j.id) as jobs,
-      w.host, w.pid, status, strftime('%s',w.started) as started
-      from minion_workers as w
-      left join minion_jobs as j on j.worker = w.id and j.state = 'active'
-      where w.id = ? group by w.id}, shift
-  )->expand(json => 'status')->hash // return undef;
-  $info->{jobs} = [split /,/, ($info->{jobs} // '')];
-  return $info;
 }
 
 sub _try {
@@ -339,6 +375,13 @@ will be created in a temporary directory.
 L<Minion::Backend::SQLite> inherits all attributes from L<Minion::Backend> and
 implements the following new ones.
 
+=head2 dequeue_interval
+
+  my $seconds = $backend->dequeue_interval;
+  $backend    = $backend->dequeue_interval($seconds);
+
+Interval in seconds between L</"dequeue"> attempts. Defaults to C<0.5>.
+
 =head2 sqlite
 
   my $sqlite = $backend->sqlite;
@@ -376,6 +419,8 @@ Broadcast remote control command to one or more workers.
 
 Wait a given amount of time in seconds for a job, dequeue it and transition
 from C<inactive> to C<active> state, or return C<undef> if queues were empty.
+Jobs will be checked for in intervals defined by L</"dequeue_interval"> until
+the timeout is reached.
 
 These options are currently available:
 
@@ -496,17 +541,50 @@ delay based on L<Minion/"backoff">.
 
 Transition from C<active> to C<finished> state.
 
-=head2 job_info
+=head2 list_jobs
 
-  my $job_info = $backend->job_info($job_id);
+  my $results = $backend->list_jobs($offset, $limit);
+  my $results = $backend->list_jobs($offset, $limit, {state => 'inactive'});
 
-Get information about a job, or return C<undef> if job does not exist.
+Returns the information about jobs in batches.
 
   # Check job state
-  my $state = $backend->job_info($job_id)->{state};
+  my $results = $backend->list_jobs(0, 1, {ids => [$job_id]});
+  my $state = $results->{jobs}[0]{state};
 
   # Get job result
-  my $result = $backend->job_info($job_id)->{result};
+  my $results = $backend->list_jobs(0, 1, {ids => [$job_id]});
+  my $result = $results->{jobs}[0]{result};
+
+These options are currently available:
+
+=over 2
+
+=item ids
+
+  ids => ['23', '24']
+
+List only jobs with these ids.
+
+=item queue
+
+  queue => 'important'
+
+List only jobs in this queue.
+
+=item state
+
+  state => 'inactive'
+
+List only jobs in this state.
+
+=item task
+
+  task => 'test'
+
+List only jobs for this task.
+
+=back
 
 These fields are currently available:
 
@@ -616,42 +694,70 @@ Id of worker that is processing the job.
 
 =back
 
-=head2 list_jobs
+=head2 list_workers
 
-  my $batch = $backend->list_jobs($offset, $limit);
-  my $batch = $backend->list_jobs($offset, $limit, {state => 'inactive'});
+  my $results = $backend->list_workers($offset, $limit);
+  my $results = $backend->list_workers($offset, $limit, {ids => [23]});
 
-Returns the same information as L</"job_info"> but in batches.
+Returns information about workers in batches.
+
+  # Check worker host
+  my $results = $backend->list_workers(0, 1, {ids => [$worker_id]});
+  my $host    = $results->{workers}[0]{host};
 
 These options are currently available:
 
 =over 2
 
-=item queue
+=item ids
 
-  queue => 'important'
+  ids => ['23', '24']
 
-List only jobs in this queue.
-
-=item state
-
-  state => 'inactive'
-
-List only jobs in this state.
-
-=item task
-
-  task => 'test'
-
-List only jobs for this task.
+List only workers with these ids.
 
 =back
 
-=head2 list_workers
+These fields are currently available:
 
-  my $batch = $backend->list_workers($offset, $limit);
+=over 2
 
-Returns the same information as L</"worker_info"> but in batches.
+=item host
+
+  host => 'localhost'
+
+Worker host.
+
+=item jobs
+
+  jobs => ['10023', '10024', '10025', '10029']
+
+Ids of jobs the worker is currently processing.
+
+=item notified
+
+  notified => 784111777
+
+Epoch time worker sent the last heartbeat.
+
+=item pid
+
+  pid => 12345
+
+Process id of worker.
+
+=item started
+
+  started => 784111777
+
+Epoch time worker was started.
+
+=item status
+
+  status => {queues => ['default', 'important']}
+
+Hash reference with whatever status information the worker would like to share.
+
+=back
 
 =head2 lock
 
@@ -791,8 +897,8 @@ Number of workers that are currently processing a job.
   delayed_jobs => 100
 
 Number of jobs in C<inactive> state that are scheduled to run at specific time
-in the future or have unresolved dependencies. Note that this field is
-EXPERIMENTAL and might change without warning!
+in the future. Note that this field is EXPERIMENTAL and might change without
+warning!
 
 =item enqueued_jobs
 
@@ -825,6 +931,12 @@ Number of jobs in C<inactive> state.
 
 Number of workers that are currently not processing a job.
 
+=item uptime
+
+  uptime => undef
+
+Uptime in seconds. Always undefined for SQLite.
+
 =back
 
 =head2 unlock
@@ -838,57 +950,6 @@ Release a named lock.
   $backend->unregister_worker($worker_id);
 
 Unregister worker.
-
-=head2 worker_info
-
-  my $worker_info = $backend->worker_info($worker_id);
-
-Get information about a worker, or return C<undef> if worker does not exist.
-
-  # Check worker host
-  my $host = $backend->worker_info($worker_id)->{host};
-
-These fields are currently available:
-
-=over 2
-
-=item host
-
-  host => 'localhost'
-
-Worker host.
-
-=item jobs
-
-  jobs => ['10023', '10024', '10025', '10029']
-
-Ids of jobs the worker is currently processing.
-
-=item notified
-
-  notified => 784111777
-
-Epoch time worker sent the last heartbeat.
-
-=item pid
-
-  pid => 12345
-
-Process id of worker.
-
-=item started
-
-  started => 784111777
-
-Epoch time worker was started.
-
-=item status
-
-  status => {queues => ['default', 'important']}
-
-Hash reference with whatever status information the worker would like to share.
-
-=back
 
 =head1 BUGS
 

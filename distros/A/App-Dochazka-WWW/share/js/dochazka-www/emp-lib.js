@@ -114,16 +114,50 @@ define ([
             ajax(rest, sc, fc);
         },
 
+        currentEmpHasReports = function () {
+            var cu = currentUser('obj'),
+                cup = appCaches.getProfileByEID(cu.eid),
+                priv = currentUser('priv');
+            console.log("Entering currentEmpHasReports(), current employee profile", cup);
+            if (priv === 'admin') {
+                // not applicable to admins
+                return true;
+            }
+            if (typeof cup !== 'object' || ! 'hasReports' in cup || typeof cup.hasReports !== 'function') {
+                throw "Profile of current user has not been loaded into the cache";
+            }
+            if (typeof cup.hasReports === 'function') {
+                return cup.hasReports();
+            }
+            console.log("CRITICAL ERROR: Bad current user profile object", cup);
+            throw "Bad current user profile object";
+        },
+
         empProfileEditSave = function (emp) {
-            var protoEmp = Object.create(prototypes.empProfile),
-                employeeProfile,
-                parentTarget;
+                // protoEmp = Object.create(prototypes.empProfile),
+            var empObj,
+                parentTarget,
+                protoEmp = $.extend(Object.create(prototypes.empObject), emp);
             console.log("Entering empProfileEditSave with object", emp);
-            $.extend(protoEmp, emp);
+            // protoEmp = {
+            //     'emp': { 'eid': emp.eid,
+            //              'email': coreLib.nullify(emp.email),
+            //              'fullname': coreLib.nullify(emp.fullname),
+            //              'nick': coreLib.nullify(emp.nick),
+            //              'remark': coreLib.nullify(emp.remark),
+            //              'sec_id': coreLib.nullify(emp.sec_id), },
+            //     'has_reports': emp.has_reports,
+            //     'priv': emp.priv,
+            //     'privhistory': { 'effective': emp.privEffective },
+            //     'schedhistory': { 'effective': emp.schedEffective,
+            //                       'scode': emp.scode,
+            //                       'sid': emp.sid },
+            //     'schedule': { 'scode': emp.scode, 'sid': emp.sid },
+            // };
             var rest = {
                     "method": 'POST',
                     "path": 'employee/nick',
-                    "body": protoEmp.sanitize()
+                    "body": protoEmp.sanitize(),
                 },
                 sc = function (st) {
                     console.log("POST employee/nick returned status", st);
@@ -133,19 +167,23 @@ define ([
                     // "simpleEmployeeBrowser"
                     parentTarget = stack.getTarget(-1);
                     console.log("parentTarget", parentTarget);
-                    employeeProfile = Object.create(prototypes.empProfile);
-                    $.extend(employeeProfile, st.payload);
+                    empObj = Object.create(prototypes.empObject);
+                    $.extend(empObj, st.payload);
                     if (parentTarget.name === 'empProfile') {
-                        console.log("Profile object is", employeeProfile);
-                        currentUser('obj', employeeProfile);
-                        stack.pop(employeeProfile, {"resultLine": "Employee profile updated"});
+                        console.log("Employee object is", empObj);
+                        currentUser('obj', empObj);
+                        appCaches.setProfileCache({"emp": empObj});
+                        stack.unwindToTarget(
+                            'myProfileAction', undefined,
+                            {"resultLine": "Employee profile updated"}
+                        );
                     } else if (parentTarget.name === 'simpleEmployeeBrowser') {
                         console.log("Parent target is " + parentTarget.name);
                         console.log("current object in dbrowerState set",
                                     coreLib.dbrowserState.set[coreLib.dbrowserState.pos]);
                         $.extend(
                             coreLib.dbrowserState.set[coreLib.dbrowserState.pos],
-                            employeeProfile
+                            empObj,
                         );
                         stack.pop(undefined, {"resultLine": "Employee profile updated"});
                     } else {
@@ -157,6 +195,10 @@ define ([
                     coreLib.displayError(st.payload.message);
                 };
             ajax(rest, sc, fc);
+        },
+
+        empProfileSetSuperDelete = function () {
+            stack.push('empProfileSetSuperChoose', { "eid": null, "nick": null });
         },
 
         empProfileSetSuperChoose = function (superEmp) {
@@ -184,12 +226,12 @@ define ([
                     }
                 },
                 sc = function (st) {
-                    if (st.code === 'DOCHAZKA_CUD_OK') {
+                    if (st.code === 'DOCHAZKA_CUD_OK' || st.code === 'DISPATCH_UPDATE_NO_CHANGE_OK' ) {
                         cu.supervisor = obj.ePsetsupertoEID;
                         empProfile = appCaches.getProfileByEID(obj.ePsetsuperofEID);
                         if (empProfile) {
                              empProfile.supervisor = obj.ePsetsupertoEID;
-                             appCaches.setProfileByEID(obj.ePsetsuperofEID, empProfile);
+                             appCaches.setProfileCache(empProfile);
                         }
                         stack.unwindToType('dmenu', {
                             "_start": false
@@ -199,6 +241,7 @@ define ([
                         });
                     } else {
                         coreLib.displayError("CRITICAL ERROR THIS IS A BUG: " + st.code);
+                        throw st.code;
                     }
                 };
             console.log("Entered empProfileSetSuperCommit() with obj", obj);
@@ -212,18 +255,12 @@ define ([
             });
         },
 
-        myProfileAction = function () {
+        myProfileActionNewOpts,
+        myProfileActionPopulate = function (populateArray) {
             var cu = currentUser('obj'),
-                profileObj = appCaches.getProfileByEID(cu.eid),
                 obj = {},
-                m;
-            // if the employee profile has not been loaded into the cache, we have a problem
-            if (! profileObj) {
-                m = "CRITICAL ERROR: the employee profile has not been loaded into the cache";
-                console.log(m);
-                coreLib.displayError(m);
-                return null;
-            }
+                populateContinue = populate.shift(populateArray),
+                profileObj = appCaches.getProfileByEID(cu.eid);
             if (profileObj.privhistory) {
                 obj['priv'] = profileObj.privhistory.priv;
                 obj['privEffective'] = datetime.readableDate(
@@ -254,14 +291,30 @@ define ([
             obj['email'] = profileObj.emp.email;
             obj['remark'] = profileObj.emp.remark;
             obj['sec_id'] = profileObj.emp.sec_id;
-            stack.push('empProfile', obj);
-        };
+            obj['has_reports'] = ( profileObj.has_reports === 0 || profileObj.has_reports === undefined ) ? null : profileObj.has_reports;
+            stack.push('empProfile', obj, myProfileActionNewOpts);
+            populateContinue(populateArray);
+        },
+        myProfileAction = function (obj, opts) {
+            myProfileActionNewOpts = {
+                'resultLine': (typeof opts === 'object') ? opts.resultLine : null,
+                'xtarget': 'mainEmpl',
+            };
+            populate.bootstrap([
+                appCaches.populateFullEmployeeProfileCache,
+                appCaches.populateScheduleBySID,
+                myProfileActionPopulate,
+            ]);
+        }
+        ;
 
     return {
         actionEmplSearch: actionEmplSearch,
+        currentEmpHasReports: currentEmpHasReports,
         empProfileEditSave: empProfileEditSave,
         empProfileSetSuperChoose: empProfileSetSuperChoose,
         empProfileSetSuperCommit: empProfileSetSuperCommit,
+        empProfileSetSuperDelete: empProfileSetSuperDelete,
         empProfileSetSuperSearch: empProfileSetSuperSearch,
         myProfileAction: myProfileAction,
     };

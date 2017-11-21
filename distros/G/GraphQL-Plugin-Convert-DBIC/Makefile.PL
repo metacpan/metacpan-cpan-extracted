@@ -16,11 +16,12 @@ WriteMakefile(
   TEST_REQUIRES => {
     'Test::More' => '0.98',
     'DBIx::Class::Schema' => 0,
-    'GraphQL' => '0.20', # plugin convert
+    'GraphQL' => '0.21', # DateTime scalar type
+    'DBD::SQLite' => 0,
   },
   PREREQ_PM => {
     'DBIx::Class::Schema' => 0,
-    'GraphQL' => '0.20', # plugin convert
+    'GraphQL' => '0.21', # DateTime scalar type
   },
   clean => { FILES => 'GraphQL-Plugin-Convert-DBIC-*' },
   META_MERGE => {

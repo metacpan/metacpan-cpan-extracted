@@ -32,11 +32,12 @@ inc::Sereal::BuildTools::generate_constant_includes($module) if $in_source_repo;
 my $optimize = inc::Sereal::BuildTools::build_optimize();
 
 my $libs = '';
+my $subdirs = [];
 my $objects = '$(BASEEXT)$(OBJ_EXT) srl_encoder$(OBJ_EXT)';
 my $defines = inc::Sereal::BuildTools::build_defines('ENABLE_DANGEROUS_HACKS');
 
 # Prefer external libraries over the bundled one.
-inc::Sereal::BuildTools::check_external_libraries(\$libs, \$defines, \$objects);
+inc::Sereal::BuildTools::check_external_libraries(\$libs, \$defines, \$objects, $subdirs);
 
 if ($defines !~ /HAVE_CSNAPPY/) {
     # from Compress::Snappy
@@ -64,13 +65,15 @@ inc::Sereal::BuildTools::WriteMakefile(
         'meta-spec' => { version => 2 },
     },
     TEST_REQUIRES => {
-        'Test::More' => 0.88,
-        'Scalar::Util' => 0,
-        'File::Spec' => 0,
+        'Test::More' => '0.88',
+        'Scalar::Util' => '0',
+        'File::Spec' => '0',
         'Test::LongString' => '0',
         'Test::Warn' => '0',
+        'Test::Deep' => '0',
+        'Test::Differences' => '0',
         'Data::Dumper' => '0',
-        'Sereal::Decoder' => '3.00',
+        'Sereal::Decoder' => '4.002',
     },
     BUILD_REQUIRES => {
         'File::Find' => 0,
@@ -92,6 +95,7 @@ inc::Sereal::BuildTools::WriteMakefile(
     DEFINE            => $defines,
     INC               => '-I.', # e.g., '-I. -I/usr/include/other'
     OPTIMIZE          => $optimize,
+    DIR               => $subdirs,
     OBJECT            => $objects,
     test              => {
         TESTS => "t/*.t t/*/*/*.t",

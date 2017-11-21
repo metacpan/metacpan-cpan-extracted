@@ -11,7 +11,7 @@ use experimental qw[
 use Scalar::Util ();
 use BEGIN::Lift  ();
 
-our $VERSION   = '0.06';
+our $VERSION   = '0.07';
 our $AUTHORITY = 'cpan:STEVAN';
 
 # ...
@@ -84,7 +84,7 @@ Moxie::Enum - Yet Another Enum Generator
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 DESCRIPTION
 

@@ -11,7 +11,7 @@
 #                                                                                    #
 #    Description:                                                                    #
 #    ============                                                                    #
-#                 Spearman's Rank Correlation Module for UMLS Similarity             #
+#                 Spearman's Rank Correlation Module for Word2vec::Interface         #
 #    Features:                                                                       #
 #    =========                                                                       #
 #                 Calculates Spearman's Rank Correlation Scores                      #

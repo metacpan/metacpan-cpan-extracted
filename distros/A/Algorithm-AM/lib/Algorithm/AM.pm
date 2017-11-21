@@ -1,7 +1,7 @@
 package Algorithm::AM;
 use strict;
 use warnings;
-our $VERSION = '3.10';
+our $VERSION = '3.11';
 # ABSTRACT: Classify data with Analogical Modeling
 use feature 'state';
 use Carp;
@@ -327,7 +327,7 @@ Algorithm::AM - Classify data with Analogical Modeling
 
 =head1 VERSION
 
-version 3.10
+version 3.11
 
 =head1 SYNOPSIS
 
@@ -544,17 +544,13 @@ Theron Stanford <shixilun@yahoo.com>, Nathan Glenn <garfieldnate@gmail.com>
 
 =head1 CONTRIBUTORS
 
-=for stopwords garfieldnate Nathan Glenn Nick Logan
+=for stopwords Nathan Glenn Nick Logan
 
 =over 4
 
 =item *
 
-garfieldnate <garfieldnate@gmail.com>
-
-=item *
-
-Nathan Glenn <garfieldnate@gmail.com>
+Nathan Glenn <nathan-gary.glenn@trivago.com>
 
 =item *
 

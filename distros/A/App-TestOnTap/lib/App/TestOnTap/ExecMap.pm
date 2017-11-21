@@ -5,57 +5,17 @@ use warnings;
 
 use App::TestOnTap::Util qw(trim $IS_WINDOWS ensureArray);
 
-use Config::Std;
 use Grep::Query;
-use Sort::Naturally qw(nsort);
 
 # CTOR
 #
 sub new
 {
 	my $class = shift;
-	my $fn = shift;
-	my $delegate = shift;
-
-	my $execmapCfg;
-	if ($fn)
-	{
-		# read in the file in Config::Std style
-		#
-		read_config($fn, my %cfg);
-	
-		# this looks weird, I know - see https://rt.cpan.org/Public/Bug/Display.html?id=56862
-		#
-		# I seem to hit the problem with "Warning: Name "Config::Std::Hash::DEMOLISH" used only once..."
-		# when running a Par::Packer binary but not when as a 'normal' script.
-		#
-		# The below incantation seem to get rid of that, at least for now. Let's see if it reappears... 
-		#
-		my $dummy = *Config::Std::Hash::DEMOLISH;
-		$dummy = *Config::Std::Hash::DEMOLISH;
-			
-		$execmapCfg = $cfg{EXECMAP};
-		die("Missing EXECMAP section in '$fn'\n") unless $execmapCfg;
-	}
-	else
-	{
-		if (!$delegate)
-		{
-			warn("WARNING: No execmap found, using internal default!\n");
-			$execmapCfg = __defaultCfg();
-		}
-	}
+	my $cfg = shift;
 
 	my $self = bless( {}, $class);
-	
-	if (!$execmapCfg)
-	{
-		$execmapCfg = $delegate;
-		$delegate = undef;
-	}
-	$self->{delegate} = $delegate ? $class->new(undef, $delegate) : undef;
-	
-	$self->__parseExecMap($execmapCfg);
+	$self->__parseExecMap($cfg);
 	
 	return $self;
 }
@@ -66,22 +26,34 @@ sub __parseExecMap
 	my $cfg = shift;
 
 	my @matcherCmdlinePairs;
-	
-	# get all match<n> keys
-	# ensure to sort them by 'natural sort', e.g. the number suffix
-	# defines the order
-	#
-	foreach my $matchKey (nsort(grep(/^match\d+$/, keys(%$cfg))))
+
+	my $emOrder = $cfg->{''}->{execmap};
+	if (!$emOrder)
 	{
-		# find the corresponding cmd<n> key, complain if missing
+		warn("WARNING: No execmap found, using internal default!\n");
+		$cfg = __defaultCfg();
+		$emOrder = $cfg->{''}->{execmap};
+	}
+	$emOrder = ensureArray($emOrder);
+	
+	foreach my $em (@$emOrder)
+	{
+		my $emSec = $cfg->{"EXECMAP $em"};
+		die("Missing execmap section for '$em'\n") unless $emSec;
+
+		# trip any unknown keys
 		#
-		$matchKey =~ /^match(\d+)$/;
-		my $cmdKey = "cmd$1";
-		die("The key '$matchKey' has no corresponding '$cmdKey'\n") unless exists($cfg->{$cmdKey});
+		warn("WARNING: Unknown key '$_' in execmap section '$em'\n") foreach (grep(!/^(match|cmd)$/, keys(%$emSec)));
 		
+		# extract the ones we want
+		#
+		my $match = $emSec->{match};
+		my $cmd = $emSec->{cmd};
+		die("The execmap section '$em' must have both the 'match' and the 'cmd' keys\n") unless ($match && $cmd);
+
 		# compile the query
 		#
-		my $matcher = Grep::Query->new($cfg->{$matchKey});
+		my $matcher = Grep::Query->new($match);
 
 		# we want to store the cmd as an array
 		# Config::Std allows it to be in multiple forms:
@@ -89,7 +61,7 @@ sub __parseExecMap
 		#   a ready-made array (take as is)
 		#   a string with embedded \n (split on that)
 		#
-		my $cmdline = ensureArray($cfg->{$cmdKey});
+		my $cmdline = ensureArray($cmd);
 					
 		# now store the matcher and cmdline in an array so we can evaluate them
 		# in a defined order when we need to
@@ -102,84 +74,73 @@ sub __parseExecMap
 	die("No entries in the execmap\n") unless @matcherCmdlinePairs;
 
 	$self->{mcpairs} = \@matcherCmdlinePairs;
-
-	# finally check the config for unknown keys...
-	#
-	foreach my $key (sort(keys(%$cfg)))
-	{
-		if ($key =~ /^(match|cmd)(\d+)$/)
-		{
-			warn("Unmatched '$key' in section '[EXECMAP]'\n") if ($1 eq 'cmd' && !exists($cfg->{"match$2"})); 
-		}
-		else
-		{
-			warn("Unknown key '$key' in section '[EXECMAP]'\n");
-		}
-	}
 }
 
 sub __defaultCfg
 {
 	# TODO: add more useful standard mappings here
 	#
-	return
-		{
-			# well, a no-brainer...:-)
-			#
-			'match1' => 'regexp[\.(t|pl)$]',
-			'cmd1' => 'perl',
-			
-			# if python is preferred...
-			#
-			'match2' => 'regexp[\.py$]',
-			'cmd2' => 'python',
-
-			# quite possible and important for java shops
-			# (couple with some nice junit and other helpers)
-			#
-			'match3' => 'regexp[\.jar$]',
-			'cmd3' => [qw(java -jar)],
-			
-			# common variants for groovy scripts, I understand...
-			#
-			'match4' => 'regexp[\.(groovy|gsh|gvy|gy)$]',
-			'cmd4' => 'groovy',
-			
-			# basic platform specifics
-			# 
-			$IS_WINDOWS
-				?
-					(
-						# possible, but perhaps not likely
-						#
-						'match5' => 'regexp[\.(bat|cmd)$]',
-						'cmd5' => [qw(cmd.exe /c)],
-					)
-				:
-					(
-						# shell scripting is powerful, so why not
-						#
-						'match5' => 'regexp[\.sh$]',
-						'cmd5' => '/bin/sh',
-					),
-
-			# For using AutoIt scripts (https://www.autoitscript.com/site/autoit/)
-			# (Windows only)
-			#
-			$IS_WINDOWS
-				?
-					(
-						'match6' => 'regexp[\.au3$]',
-						'cmd6' => 'autoit3',
-					)
-				:
-					(),
-			
-			#######
-			# add other conveniences here - ensure numbering is as desired
-			#
-			#######
-		}
+	my %cfg = 
+		(
+			'' =>
+				{
+					execmap => [qw(perl python java groovy shell autoit3 batch)] 
+				},
+			'EXECMAP perl' =>
+				{
+					# well, a no-brainer...:-)
+					#
+					'match' => 'regexp[\.(t|pl)$]',
+					'cmd' => 'perl',
+				},
+			'EXECMAP python' =>
+				{
+					# if python is preferred...
+					#
+					'match' => 'regexp[\.py$]',
+					'cmd' => 'python',
+				},
+			'EXECMAP java' =>
+				{
+					# quite possible and important for java shops
+					# (couple with some nice junit and other helpers)
+					#
+					'match' => 'regexp[\.jar$]',
+					'cmd' => [qw(java -jar)],
+				},
+			'EXECMAP groovy' =>
+				{
+					# common variants for groovy scripts, I understand...
+					#
+					'match' => 'regexp[\.(groovy|gsh|gvy|gy)$]',
+					'cmd' => 'groovy',
+				},
+			'EXECMAP shell' =>
+				{
+					# shell scripting is powerful, so why not
+					#
+					'match' => 'regexp[\.sh$]',
+					'cmd' => 'sh',
+				},
+			'EXECMAP autoit3' =>
+				{
+					# For using AutoIt scripts (https://www.autoitscript.com/site/autoit/)
+					# (Windows only)
+					#
+					'match' => 'regexp[\.au3$]',
+					'cmd' => 'autoit3',
+				},
+			'EXECMAP batch' =>
+				{
+					# possible, but perhaps not likely
+					# (Windows only)
+					#
+					'match' => 'regexp[\.(bat|cmd)$]',
+					'cmd' => [qw(cmd.exe /c)],
+				},
+		);
+	
+	return \%cfg;
 }
 
 # just check if the given test has a mapping

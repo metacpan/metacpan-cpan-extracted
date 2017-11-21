@@ -1,5 +1,17 @@
 Revision history for Net-CardDAVTalk
 
+0.08    Wed Nov 15 16:04 2017
+  - always request syncToken and fetch canSync
+
+0.07    Sun Nov 12 18:07 2017
+  - add BATCHSIZE support to GetContactsMulti
+  - set $Net::CardDAVTalk::BATCHSIZE = 100 (default, overridable)
+
+0.06    Sun Nov 12 17:45 2017
+  - add GetContactLinks
+  - add SyncContactLinks
+  - add GetContactsMulti
+
 0.05    Wed Feb 15 16:51 2017
   - depend on List::MoreUtils, it's not always an included battery
 

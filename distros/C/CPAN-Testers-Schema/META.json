@@ -5,7 +5,7 @@
       "Doug Bell <preaction@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -35,7 +35,6 @@
          "requires" : {
             "DBIx::Class" : "0",
             "DBIx::Class::Candy" : "0",
-            "DBIx::Class::InflateColumn::Serializer" : "0.09",
             "Data::UUID" : "0",
             "DateTime" : "0",
             "DateTime::Format::ISO8601" : "0",
@@ -75,55 +74,55 @@
    "provides" : {
       "CPAN::Testers::Schema" : {
          "file" : "lib/CPAN/Testers/Schema.pm",
-         "version" : "0.019"
+         "version" : "0.020"
       },
       "CPAN::Testers::Schema::Base" : {
          "file" : "lib/CPAN/Testers/Schema/Base.pm",
-         "version" : "0.019"
+         "version" : "0.020"
       },
       "CPAN::Testers::Schema::Result::LatestIndex" : {
          "file" : "lib/CPAN/Testers/Schema/Result/LatestIndex.pm",
-         "version" : "0.019"
+         "version" : "0.020"
       },
       "CPAN::Testers::Schema::Result::MetabaseUser" : {
          "file" : "lib/CPAN/Testers/Schema/Result/MetabaseUser.pm",
-         "version" : "0.019"
+         "version" : "0.020"
       },
       "CPAN::Testers::Schema::Result::Release" : {
          "file" : "lib/CPAN/Testers/Schema/Result/Release.pm",
-         "version" : "0.019"
+         "version" : "0.020"
       },
       "CPAN::Testers::Schema::Result::ReleaseStat" : {
          "file" : "lib/CPAN/Testers/Schema/Result/ReleaseStat.pm",
-         "version" : "0.019"
+         "version" : "0.020"
       },
       "CPAN::Testers::Schema::Result::Stats" : {
          "file" : "lib/CPAN/Testers/Schema/Result/Stats.pm",
-         "version" : "0.019"
+         "version" : "0.020"
       },
       "CPAN::Testers::Schema::Result::TestReport" : {
          "file" : "lib/CPAN/Testers/Schema/Result/TestReport.pm",
-         "version" : "0.019"
+         "version" : "0.020"
       },
       "CPAN::Testers::Schema::Result::Upload" : {
          "file" : "lib/CPAN/Testers/Schema/Result/Upload.pm",
-         "version" : "0.019"
+         "version" : "0.020"
       },
       "CPAN::Testers::Schema::ResultSet::Release" : {
          "file" : "lib/CPAN/Testers/Schema/ResultSet/Release.pm",
-         "version" : "0.019"
+         "version" : "0.020"
       },
       "CPAN::Testers::Schema::ResultSet::Stats" : {
          "file" : "lib/CPAN/Testers/Schema/ResultSet/Stats.pm",
-         "version" : "0.019"
+         "version" : "0.020"
       },
       "CPAN::Testers::Schema::ResultSet::TestReport" : {
          "file" : "lib/CPAN/Testers/Schema/ResultSet/TestReport.pm",
-         "version" : "0.019"
+         "version" : "0.020"
       },
       "CPAN::Testers::Schema::ResultSet::Upload" : {
          "file" : "lib/CPAN/Testers/Schema/ResultSet/Upload.pm",
-         "version" : "0.019"
+         "version" : "0.020"
       }
    },
    "release_status" : "stable",
@@ -139,7 +138,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#cpantesters-discuss"
    },
-   "version" : "0.019",
+   "version" : "0.020",
    "x_authority" : "cpan:PREACTION",
    "x_contributors" : [
       "Breno G. de Oliveira <garu@cpan.org>",

@@ -20,8 +20,8 @@ MANIFEST
 MANIFEST.SKIP
 META.yml
 META.json
-t/common.pm
-t/loader.pm
+t/lib/common.pm
+t/lib/loader.pm
 t/column_defaults.t
 t/column_types.t
 t/datetime.t

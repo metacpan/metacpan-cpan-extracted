@@ -2,7 +2,7 @@ package MVC::Neaf::X::Session;
 
 use strict;
 use warnings;
-our $VERSION = 0.17;
+our $VERSION = 0.18;
 
 =head1 NAME
 
@@ -78,9 +78,24 @@ use parent qw(MVC::Neaf::X);
 
 =head2 new( %options )
 
-The default constructor just happily closes over whatever is given to it.
+%options may include
+
+=over
+
+=item * session_ttl, expire - the lifetime of session.
+Default is 24 hours.
+
+=back
 
 =cut
+
+sub new {
+    my ($class, %opt) = @_;
+
+    $opt{session_ttl} ||= delete $opt{expire} || 24*60*60;
+
+    $class->SUPER::new( %opt );
+};
 
 =head2 session_id_regex()
 
@@ -156,6 +171,8 @@ sub get_session_id {
 get_session_id();
 
 =head2 session_ttl()
+
+Return session ttl.
 
 =cut
 

@@ -15,16 +15,12 @@ WriteMakefile(
   },
   TEST_REQUIRES => {
     'Test::More' => '0.98',
-    'SQL::Translator' => '0',
-    'SQL::Translator::Producer::DBIx::Class::File' => '0',
-    'GraphQL' => '0.20', # convert plugin
-    'GraphQL::Plugin::Convert::DBIC' => '0.02', # callback API
   },
   PREREQ_PM => {
     'SQL::Translator' => '0',
     'SQL::Translator::Producer::DBIx::Class::File' => '0',
-    'GraphQL' => '0.20', # convert plugin
-    'GraphQL::Plugin::Convert::DBIC' => '0.02', # callback API
+    'GraphQL' => '0.21', # DateTime
+    'GraphQL::Plugin::Convert::DBIC' => '0.03', # new mutations etc
   },
   clean => { FILES => 'SQL-Translator-Producer-GraphQL-*' },
   META_MERGE => {

@@ -35,6 +35,8 @@ XML::RPC module provides simple Pure Perl methods for XML-RPC communication.
 It's goals are simplicity and flexibility. XML::RPC uses XML::TreePP
 for parsing.
 
+This version of XML::RPC merges the changes from XML::RPC::CustomUA.
+
 =head1 CONSTRUCTOR AND OPTIONS
 
 =head2 $xmlrpc = XML::RPC->new();
@@ -46,6 +48,10 @@ This constructor method returns a new XML::RPC object. Usable for XML-RPC server
 Its first argument is the full URL for your server. The second argument
 is for options passing to XML::TreePP, for example: output_encoding => 'ISO-8859-1'
 (default is UTF-8).
+
+You can also define the UserAgent string, for example:
+
+    my $rpcfoo = XML::RPC->new($apiurl, ('User-Agent' => 'Baz/3000 (Mozilla/1.0; FooBar phone app)'));
 
 =head1 METHODS
 
@@ -93,14 +99,17 @@ CODE ref to create these types.
 
 =head1 AUTHOR
 
-Niek Albers, http://www.daansystems.com/
+Original author: Niek Albers, http://www.daansystems.com/
+Current author: Rene Schickbauer, https://www.cavac.at
 
 =head1 COPYRIGHT AND LICENSE
 
 Copyright (c) 2007-2008 Niek Albers.  All rights reserved.  This program
-is free software; you can redistribute it and/or modify it under the same
-terms as Perl itself.
 
+Copyright (c) 2012-2017 Rene Schickbauer
+
+This program is free software; you can redistribute it and/or modify it under the same
+terms as Perl itself.
 =cut
 
 package XML::RPC;
@@ -110,7 +119,7 @@ use XML::TreePP;
 use vars qw($VERSION $faultCode);
 no strict 'refs';
 
-$VERSION   = 0.9;
+$VERSION   = 1.0;
 $faultCode = 0;
 
 sub new {
@@ -138,7 +147,7 @@ sub call {
         $xml_out,
         {
             'Content-Type'   => 'text/xml',
-            'User-Agent'     => 'XML-RPC/' . $VERSION,
+            'User-Agent'     => defined($self->{tpp}->{'User-Agent'}) ? $self->{tpp}->{'User-Agent'} : 'XML-RPC/' . $VERSION,
             'Content-Length' => length($xml_out)
         }
     );

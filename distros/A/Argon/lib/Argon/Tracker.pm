@@ -1,153 +1,199 @@
-#-------------------------------------------------------------------------------
-# Tracks the length of time it takes to process requests for a node. Used by
-# Argon::Cluster to monitor Node responsiveness.
-#-------------------------------------------------------------------------------
 package Argon::Tracker;
+# ABSTRACT: Internal class used to track node capacity
+$Argon::Tracker::VERSION = '0.18';
 
 use strict;
 use warnings;
 use Carp;
+use Moose;
+use List::Util  qw(sum0);
+use Time::HiRes qw(time);
+use Argon::Util qw(param);
 
-use Moo;
-use MooX::HandlesVia;
-use Types::Standard qw(-types);
-use Time::HiRes qw/time/;
 
-#-------------------------------------------------------------------------------
-# The length of tracking history to keep.
-#-------------------------------------------------------------------------------
-has tracking => (
-    is       => 'ro',
-    isa      => Int,
-    required => 1,
+has length => (
+  is      => 'rw',
+  isa     => 'Int',
+  default => 20,
 );
 
-#-------------------------------------------------------------------------------
-# The number of workers a node has.
-#-------------------------------------------------------------------------------
-has workers => (
-    is       => 'ro',
-    isa      => Int,
-    required => 1,
+
+has capacity => (
+  is      => 'rw',
+  isa     => 'Int',
+  default => 0,
+  traits  => ['Counter'],
+  handles => {
+    add_capacity    => 'inc',
+    remove_capacity => 'dec',
+  },
 );
 
-#-------------------------------------------------------------------------------
-# The total number of requests this node has served.
-#-------------------------------------------------------------------------------
-has requests => (
-    is       => 'ro',
-    isa      => Int,
-    init_arg => undef,
-    default  => 0,
+has started => (
+  is      => 'rw',
+  isa     => 'HashRef[Num]',
+  default => sub {{}},
+  traits  => ['Hash'],
+  handles => {
+    track      => 'set',
+    untrack    => 'delete',
+    start_time => 'get',
+    is_tracked => 'exists',
+    assigned   => 'count',
+  },
 );
 
-sub inc_requests {
-    my ($self, $amount) = @_;
-    $amount ||= 0;
-    $self->{requests} += $amount;
-}
-
-#-------------------------------------------------------------------------------
-# Stores the last <tracking> request timings.
-#-------------------------------------------------------------------------------
 has history => (
-    is          => 'ro',
-    isa         => ArrayRef[Num],
-    init_arg    => undef,
-    default     => sub {[]},
-    handles_via => 'Array',
-    handles     => {
-        add_history    => 'push',
-        del_history    => 'shift',
-        len_history    => 'count',
-        reduce_history => 'reduce',
-    }
+  is      => 'rw',
+  isa     => 'ArrayRef[Num]',
+  default => sub {[]},
+  traits  => ['Array'],
+  handles => {
+    record        => 'push',
+    record_count  => 'count',
+    prune_records => 'shift',
+  },
 );
 
-#-------------------------------------------------------------------------------
-# Hash of pending requests (msgid => tracking start time).
-#-------------------------------------------------------------------------------
-has pending => (
-    is          => 'ro',
-    isa         => Map[Str,Num],
-    init_arg    => undef,
-    default     => sub {{}},
-    handles_via => 'Hash',
-    handles     => {
-        set_pending => 'set',
-        get_pending => 'get',
-        del_pending => 'delete',
-        num_pending => 'count',
-        all_pending => 'keys',
-        is_pending  => 'exists',
-    }
+has avg_time => (
+  is      => 'rw',
+  isa     => 'Num',
+  default => 0,
 );
 
-#-------------------------------------------------------------------------------
-# Avg processing time, calculated after each request completes.
-#-------------------------------------------------------------------------------
-has avg_proc_time => (
-    is       => 'rw',
-    isa      => Num,
-    init_arg => undef,
-    default  => 0,
-);
 
-#-------------------------------------------------------------------------------
-# Begins tracking a request.
-#-------------------------------------------------------------------------------
-sub start_request {
-    my ($self, $msg_id) = @_;
-    $self->set_pending($msg_id, time);
-    $self->inc_requests;
-}
+sub available_capacity { $_[0]->capacity - $_[0]->assigned }
+sub has_capacity { $_[0]->available_capacity > 0 }
+sub load { ($_[0]->assigned + 1) * $_[0]->avg_time }
 
-#-------------------------------------------------------------------------------
-# Completes tracking for a request and updates tracking stats.
-#-------------------------------------------------------------------------------
-sub end_request {
-    my ($self, $msg_id) = @_;
-    my $taken = time - $self->get_pending($msg_id);
 
-    $self->del_pending($msg_id);
-    $self->add_history($taken);
-
-    if ($self->len_history > $self->tracking) {
-        my $to_delete = $self->len_history - $self->tracking;
-        $self->del_history foreach 1 .. $to_delete;
-    }
-
-    my $sum  = $self->reduce_history(sub { $_[0] + $_[1] });
-    $self->avg_proc_time($sum / $self->len_history);
-}
-
-#-------------------------------------------------------------------------------
-# Returns the current capacity (workers - pending requests).
-#-------------------------------------------------------------------------------
-sub capacity {
-    my $self = shift;
-    return $self->workers - $self->num_pending;
-}
-
-#-------------------------------------------------------------------------------
-# Returns the estimated time it would take to process a task, based on the
-# number of pending tasks for this node and the average processing time.
-#-------------------------------------------------------------------------------
-sub est_proc_time {
-    my $self = shift;
-    return $self->avg_proc_time * ($self->num_pending + 1);
-}
-
-#-------------------------------------------------------------------------------
-# Calculates the age of a tracked job.
-#-------------------------------------------------------------------------------
 sub age {
-    my ($self, $msg_id) = @_;
-    if ($self->is_pending($msg_id)) {
-        return time - $self->get_pending($msg_id);
-    } else {
-        return;
-    }
+  my ($self, $msg) = @_;
+  return unless $self->is_tracked($msg->id);
+  time - $self->start_time($msg->id);
 }
+
+
+sub start {
+  my ($self, $msg) = @_;
+  croak 'no capacity' unless $self->has_capacity;
+  croak "msg id $msg->id is already tracked" if $self->is_tracked($msg->id);
+  $self->track($msg->id, time);
+  $self->assigned;
+}
+
+
+sub finish {
+  my ($self, $msg) = @_;
+  croak "msg id $msg->id is not tracked" unless $self->is_tracked($msg->id);
+  --$self->{assigned};
+  $self->_add_to_history(time - $self->untrack($msg->id));
+  $self->_update_avg_time;
+}
+
+
+sub touch {
+  my ($self, $msg) = @_;
+  croak "msg id $msg->id is not tracked" unless $self->is_tracked($msg->id);
+  $self->track($msg->id, time);
+}
+
+sub _add_to_history {
+  my ($self, $taken) = @_;
+  $self->record($taken);
+  while ($self->record_count > $self->length) {
+    $self->prune_records;
+  }
+}
+
+sub _update_avg_time {
+  my $self = shift;
+  my $total = sum0 @{$self->{history}};
+  $self->{avg_time} = $total == 0 ? 0 : $total / @{$self->{history}};
+}
+
+__PACKAGE__->meta->make_immutable;
 
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Argon::Tracker - Internal class used to track node capacity
+
+=head1 VERSION
+
+version 0.18
+
+=head1 DESCRIPTION
+
+An internally used class that tracks capacity of worker nodes.
+
+=head1 ATTRIBUTES
+
+=head2 length
+
+The number of completed past transactions used to calculate load.
+
+=head2 capacity
+
+The capacity as the sum of tracked worker capacities.
+
+=head1 METHODS
+
+=head2 add_capacity
+
+Increment capacity by the supplied value.
+
+=head2 remove_capacity
+
+Decrement capacity by the supplied value.
+
+=head2 available_capacity
+
+Returns the number of task slots available; equivalent to the total capacity
+less the number of actively tracked tasks.
+
+=head2 has_capacity
+
+Returns true if the L</available_capacity> is greater than zero.
+
+=head2 load
+
+Estimates and returns the time required to complete one more than the number of
+currently tracked tasks.
+
+=head2 age
+
+Returns the number of seconds since the tracker began tracking the supplied
+L<Argon::Message>.
+
+=head2 start
+
+Begins tracking an L<Argon::Message>.
+
+=head2 finish
+
+Completes tracking on an L<Argon::Message>.
+
+=head2 touch
+
+Resets the start time on an L<Argon::Message>.
+
+=head1 AUTHOR
+
+Jeff Ober <sysread@fastmail.fm>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Jeff Ober.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

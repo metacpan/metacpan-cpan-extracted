@@ -1,6 +1,6 @@
 package Map::Tube;
 
-$Map::Tube::VERSION   = '3.37';
+$Map::Tube::VERSION   = '3.41';
 $Map::Tube::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube - Lightweight Routing Framework.
 
 =head1 VERSION
 
-Version 3.37
+Version 3.41
 
 =cut
 
@@ -45,7 +45,7 @@ use Map::Tube::Types qw(Routes Tables Lines NodeMap LineMap);
 
 use Moo::Role;
 use Role::Tiny qw();
-use namespace::clean;
+use namespace::autoclean;
 
 =encoding utf8
 
@@ -62,6 +62,7 @@ documented in L<Map::Tube::Cookbook>.
 
     +---------------------+--------+--------------------------------------------+
     | Author              | PAUSE  | Map Count (City)                           |
+    |                     |  ID    |                                            |
     +---------------------+--------+--------------------------------------------+
     | Michal Josef Spacek | SKIM   | 22 (Bucharest, Budapest, Dnipropetrovsk,   |
     |                     |        | Kazan, Kharkiv, Kiev, KualaLumpur, Malaga, |
@@ -73,7 +74,7 @@ documented in L<Map::Tube::Cookbook>.
     | Mohammad S Anwar    | MANWAR | 6 (Barcelona, Delhi, Kolkatta, London, NYC,|
     |                     |        | Tokyo)                                     |
     |                     |        |                                            |
-    | Gisbert W Selker    | GWS    | 4 (Beijing, Glasgow, KoeinBonn, Lyon)      |
+    | Gisbert W Selke     | GWS    | 4 (Beijing, Glasgow, KoeinBonn, Lyon)      |
     |                     |        |                                            |
     | Slaven Rezic        | SREZIC | 1 (Berlin)                                 |
     +---------------------+--------+--------------------------------------------+
@@ -426,7 +427,14 @@ sub get_map_data {
     my $data;
     my $xml = $self->xml;
     if ($xml ne '') {
-        eval { $data = XML::Twig->new->parsefile($xml)->simplify(keyattr => 'stations', forcearray => 0); };
+        eval {
+            $data = XML::Twig->new->parsefile($xml)->simplify(keyattr => 'stations', forcearray => 0);
+            # Handle if there is only one line.
+            my $lines = $data->{lines}->{line};
+            if (ref($lines) eq 'HASH') {
+                $data->{lines}->{line} = [ $lines ];
+            }
+        };
         return $data unless ($@);
 
         Map::Tube::Exception::MalformedMapData->throw({
@@ -471,12 +479,55 @@ sub get_map_data {
 The L<Map::Tube::Plugin::Graph> plugin add the support to generate the entire map
 or map for a particular line as base64 encoded string (png image).
 
+    use strict; use warnings;
+    use MIME::Base64;
+    use Map::Tube::London;
+
+    my $tube = Map::Tube::London->new;
+
+    # Entire map image
+    my $name = $tube->name;
+    open(my $MAP_IMAGE, ">$name.png");
+    binmode($MAP_IMAGE);
+    print $MAP_IMAGE decode_base64($tube->as_image);
+    close($MAP_IMAGE);
+
+    # Just a particular line map image
+    my $line = 'Bakerloo';
+    open(my $LINE_IMAGE, ">$line.png");
+    binmode($LINE_IMAGE);
+    print $LINE_IMAGE decode_base64($tube->as_image($line));
+    close($LINE_IMAGE);
+
 Please refer to the L<documentation|Map::Tube::Plugin::Graph> for more details.
 
 =head2 * L<Map::Tube::Plugin::Formatter>
 
 The L<Map::Tube::Plugin::Formatter> plugin adds the  support to format the object
 supported by the plugin.
+
+    use strict; use warnings;
+    use Map::Tube::London;
+
+    my $tube = Map::Tube::London->new;
+
+    my $node = $tube->get_node_by_name('Baker Street');
+    print $tube->to_xml($node) ,   "\n\n";
+    print $tube->to_json($node),   "\n\n";
+    print $tube->to_yaml($node),   "\n\n";
+    print $tube->to_string($node), "\n\n";
+
+    my $line = $tube->get_line_by_name('Metropolitan');
+    print $tube->to_xml($line) ,   "\n\n";
+    print $tube->to_json($line),   "\n\n";
+    print $tube->to_yaml($line),   "\n\n";
+    print $tube->to_string($line), "\n\n";
+
+    my $route = $tube->get_shortest_route('Baker Street', 'Wembley Park');
+    print $tube->to_xml($route),   "\n\n";
+    print $tube->to_json($route),  "\n\n";
+    print $tube->to_yaml($route),  "\n\n";
+    print $tube->to_string($route),"\n\n";
 
 Please refer to the L<documentation|Map::Tube::Plugin::Formatter> for more info.
 
@@ -485,6 +536,14 @@ Please refer to the L<documentation|Map::Tube::Plugin::Formatter> for more info.
 Gisbert W. Selke, built the add-on for L<Map::Tube> to find stations and lines by
 name, possibly partly or inexactly specified. The module is a Moo role which gets
 plugged into the Map::Tube::* family automatically once it is installed.
+
+    use strict; use warnings;
+    use Map::Tube::London;
+
+    my $tube = Map::Tube::London->new();
+
+    print 'line matches exactly: ', scalar($tube->fuzzy_find(search => 'erloo', objects => 'lines')), "\n";
+    print 'line contains       : ', scalar($tube->fuzzy_find(search => 'erloo', objects => 'lines', method  => 'in')), "\n";
 
 Please refer to the L<documentation|Map::Tube::Plugin::FuzzyFind> for more info.
 
@@ -1169,9 +1228,11 @@ L<https://github.com/manwar/Map-Tube>
 
 =over 2
 
-=item * Gisbert W. Selke, C<< <gws at cpan.org> >>
-
 =item * Michal Špaček, C<< <skim at cpan.org> >>
+
+=item * Slaven Rezic, C<< <srezic at cpan.org> >>
+
+=item * Gisbert W. Selke, C<< <gws at cpan.org> >>
 
 =back
 

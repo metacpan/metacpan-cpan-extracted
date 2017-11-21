@@ -16,7 +16,7 @@ use Lingua::Awkwords::Parser;
 use Moo;
 use namespace::clean;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 has pattern => (
     is      => 'rw',
@@ -59,8 +59,9 @@ sub set_filter {
 }
 
 sub weights2str {
-    my ($href) = @_;
-    join '/', map { join '*', $_, $href->{$_} } sort keys %$href;
+    my ($hr) = @_;
+    return join '/',
+      map { $hr->{$_} == 1 ? $_ : join( '*', $_, $hr->{$_} ) } sort keys %$hr;
 }
 
 sub weights_from {
@@ -69,9 +70,9 @@ sub weights_from {
     my $type = ref $input;
     my $fh;
 
-    if ($type eq '') {
+    if ( $type eq '' ) {
         open $fh, '<', \$input;
-    } elsif ($type eq 'GLOB') {
+    } elsif ( $type eq 'GLOB' ) {
         $fh = $input;
     } else {
         croak "unknown input type";
@@ -79,7 +80,7 @@ sub weights_from {
 
     my ( %first, %mid, %last, %all );
 
-    while (readline $fh) {
+    while ( readline $fh ) {
         chomp;
       LOOP: {
             redo LOOP if /\G\s+/cg;

@@ -27,7 +27,7 @@ WriteMakefile(
                 runtime => {
                     recommends => {
                         'Math::Complex'       => 0,
-                        'Math::BigNum'        => 0,
+                        'Math::AnyNum'        => 0,
                         'Math::ModInt'        => 0,
                     },
                 },
@@ -35,11 +35,11 @@ WriteMakefile(
             provides => {
                 'Math::Polynomial' => {
                     file    => 'lib/Math/Polynomial.pm',
-                    version => '1.013',
+                    version => '1.014',
                 },
                 'Math::Polynomial::Generic' => {
                     file    => 'lib/Math/Polynomial/Generic.pm',
-                    version => '1.013',
+                    version => '1.014',
                 },
             },
         },

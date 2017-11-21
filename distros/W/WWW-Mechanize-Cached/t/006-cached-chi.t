@@ -3,7 +3,6 @@
 use strict;
 use warnings FATAL => 'all';
 
-use LWP::ConsoleLogger::Easy qw( debug_ua );
 use Test::More;
 use Test::Requires 'CHI';
 use Test::RequiresInternet ( 'www.wikipedia.com' => 443 );
@@ -49,7 +48,6 @@ FIRST_CACHE: {
 
     my $mech
         = WWW::Mechanize::Cached->new( autocheck => 0, cache => $cache, );
-    debug_ua( $mech );
     isa_ok( $mech, 'WWW::Mechanize::Cached' );
 
     ok( !defined( $mech->is_cached ), "No request status" );
@@ -79,7 +77,6 @@ SECOND_CACHE: {
     isa_ok( $cache, 'CHI::Driver' );
 
     my $mech = WWW::Mechanize::Cached->new( autocheck => 0, cache => $cache );
-    debug_ua( $mech );
     isa_ok( $mech, 'WWW::Mechanize::Cached' );
 
     my $fourth = $mech->get(URL)->content;

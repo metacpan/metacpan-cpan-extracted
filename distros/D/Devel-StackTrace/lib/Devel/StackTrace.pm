@@ -5,7 +5,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 use Devel::StackTrace::Frame;
 use File::Spec;
@@ -246,18 +246,28 @@ sub frame_count {
     return scalar( $self->frames );
 }
 
+sub message { $_[0]->{message} }
+
 sub as_string {
     my $self = shift;
     my $p    = shift;
 
-    my $st    = q{};
-    my $first = 1;
-    foreach my $f ( $self->frames ) {
-        $st .= $f->as_string( $first, $p ) . "\n";
-        $first = 0;
+    my @frames = $self->frames;
+    if (@frames) {
+        my $st    = q{};
+        my $first = 1;
+        for my $f (@frames) {
+            $st .= $f->as_string( $first, $p ) . "\n";
+            $first = 0;
+        }
+
+        return $st;
     }
 
-    return $st;
+    my $msg = $self->message;
+    return $msg if defined $msg;
+
+    return 'Trace begun';
 }
 
 {
@@ -284,7 +294,7 @@ Devel::StackTrace - An object representing a stack trace
 
 =head1 VERSION
 
-version 2.02
+version 2.03
 
 =head1 SYNOPSIS
 
@@ -498,11 +508,23 @@ The optional C<\%p> parameter only has one option. The C<max_arg_length>
 parameter truncates each subroutine argument's string representation if it is
 longer than this number of characters.
 
+If all the frames in a trace are skipped then this just returns the C<message>
+passed to the constructor or the string C<"Trace begun">.
+
+=head2 $trace->message
+
+Returns the message passed to the constructor. If this wasn't passed then this
+method returns C<undef>.
+
 =head1 SUPPORT
 
-Bugs may be submitted through L<https://github.com/houseabsolute/Devel-StackTrace/issues>.
+Bugs may be submitted at L<https://github.com/houseabsolute/Devel-StackTrace/issues>.
 
 I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
+
+=head1 SOURCE
+
+The source code repository for Devel-StackTrace can be found at L<https://github.com/houseabsolute/Devel-StackTrace>.
 
 =head1 DONATIONS
 
@@ -559,10 +581,13 @@ Ricardo Signes <rjbs@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2000 - 2016 by David Rolsky.
+This software is Copyright (c) 2000 - 2017 by David Rolsky.
 
 This is free software, licensed under:
 
   The Artistic License 2.0 (GPL Compatible)
+
+The full text of the license can be found in the
+F<LICENSE> file included with this distribution.
 
 =cut

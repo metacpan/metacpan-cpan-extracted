@@ -54,8 +54,13 @@ sub new
     $self{conf} ||= MYDan::Util::OptConf->load()->dump( 'util' )->{conf} .'/pass';
     $self{range} ||= MYDan::Node->new( MYDan::Util::OptConf->load()->dump( 'range' ) );
 
-    $self{pass} = eval{ YAML::XS::LoadFile $self{conf} };
+    my $conf = eval{ YAML::XS::Dump YAML::XS::LoadFile $self{conf} };
     confess "error $self{conf}:$@" if $@;
+
+    map{ $conf =~ s/\$ENV\{$_\}/$ENV{$_}/g; }keys %ENV;
+    $self{pass} =  eval{ YAML::XS::Load $conf };
+
+    die "load conf fail:$@" if $@;
 
     bless \%self, ref $class || $class;
 }

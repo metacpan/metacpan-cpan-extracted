@@ -59,7 +59,7 @@ subtest 'insert_test_report' => sub {
         my $stat = eval { $rs->insert_test_report($report) };
         my $err = $@;
         ok !$stat, 'stat record was not created';
-        like $err, qr'No upload match for GUID d0ab4d36-3343-11e7-b830-917e22bfee97', 'correct error';
+        like $err, qr'No upload matches for dist Sorauta-SVN-AutoCommit version 0.02 \(report d0ab4d36-3343-11e7-b830-917e22bfee97\)', 'correct error';
     };
 
     my $upload = $schema->resultset('Upload')->create({

@@ -2,7 +2,7 @@ package Syntax::Highlight::Engine::Simple::Perl;
 use strict;
 use warnings;
 use base qw(Syntax::Highlight::Engine::Simple);
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 ### ----------------------------------------------------------------------------
 ### set syntax

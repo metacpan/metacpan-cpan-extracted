@@ -1,5 +1,9 @@
 Revision history for Tangence
 
+0.24    2017-11-14 17:48:45
+        [BUGFIXES]
+         * Avoid harmless warning about wide characters during SvIV test
+
 0.23    2017/01/09 13:40:23
         [BUGFIXES]
          * Fix handling of Inf and NaN float values to work on perl versions

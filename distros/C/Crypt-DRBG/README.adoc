@@ -5,10 +5,27 @@ Crypt-DRBG
 
 Crypt-DRBG is a set of fast, cryptographically-secure PRNGs.  It can be used
 either as a supplement to the system PRNG (e.g. /dev/random or /dev/urandom) or
-where reproducible results are needed.
+where reproducible results are sometimes needed (e.g. in unit tests).
+It also provides bias-free selection of bytes or array elements.
 
 The algorithms implemented are the NIST HMAC_DRBG and Hash_DRBG.  Unit tests are
 included to ensure conformance with the specification.
+The HMAC implementation (`Crypt::DRBG::HMAC`)
+is the preferred implementation for speed reasons.
+Both algorithms are generally believed to be secure.
+
+== Dependencies
+
+Crypt::DRBG requires only core Perl on Unix systems with a random device.
+
+Digest::SHA is required, so if you're using an older version of Perl where that
+isn't included in core, you'll need to install it.
+
+Performance of the Hash DRBG and unit tests will be improved if
+Math::BigInt::GMP is available.
+
+Finally, Crypt::URandom will be used if it's available; this is required for
+Windows machines when not using Cygwin.
 
 == Installation
 
@@ -18,6 +35,23 @@ To install this module, run the following commands:
 	make
 	make test
 	make install
+
+== Basic Usage
+
+[source,perl]
+----
+use Crypt::DRBG::HMAC;
+
+# Non-deterministic, automatically seeded option.
+my $drbg = Crypt::DRBG::HMAC->new(auto => 1);
+my $data = $drbg->generate(42);
+... # do something with your 42 bytes here
+
+# Deterministic option
+my $drbg2 = Crypt::DRBG::HMAC->new(seed => "my very secret seed");
+my @randdigits = $drbg->randitems(20, [0..9]);
+... # do something with your 20 random digits here
+----
 
 == License and Copyright
 

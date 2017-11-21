@@ -1,5 +1,5 @@
 package Moose::Exception::CannotCallAnAbstractBaseMethod;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -15,4 +15,5 @@ sub _build_message {
     $self->package_name. " is an abstract base class, you must provide a constructor.";
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

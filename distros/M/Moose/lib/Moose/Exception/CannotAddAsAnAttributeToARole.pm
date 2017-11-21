@@ -1,5 +1,5 @@
 package Moose::Exception::CannotAddAsAnAttributeToARole;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -16,4 +16,5 @@ sub _build_message {
     "Cannot add a ".$self->attribute_class." as an attribute to a role";
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

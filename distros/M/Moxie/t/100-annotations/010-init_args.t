@@ -25,7 +25,7 @@ This test
 
     has foo => sub { 'foo' };
 
-    sub BUILDARGS : init;
+    sub BUILDARGS : strict;
 }
 
 {
@@ -36,7 +36,7 @@ This test
 
     has foo => sub { 'foo' };
 
-    sub BUILDARGS : init( foo => 'foo' );
+    sub BUILDARGS : strict( foo => 'foo' );
 }
 
 {
@@ -48,7 +48,7 @@ This test
     has foo => sub { 'foo' };
     has bar => sub { 'bar' };
 
-    sub BUILDARGS : init(
+    sub BUILDARGS : strict(
         bar => 'foo',
         foo => 'bar',
     );
@@ -63,7 +63,7 @@ This test
     has foo => sub { 'foo' };
     has bar => sub { 'bar' };
 
-    sub BUILDARGS : init(
+    sub BUILDARGS : strict(
         bar  => 'bar',
         foo? => 'foo',
     );

@@ -2,7 +2,7 @@ package PICA::Parser::Plus;
 use strict;
 use warnings;
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 use charnames qw(:full);
 use Carp qw(carp croak);
@@ -31,7 +31,7 @@ sub _next_record {
 
     foreach my $field (@fields) {
         my ($tag, $occurence, $data);
-        if ( $field =~ m/^(\d{3}[A-Z@])(\/(\d{2}))?\s(.+)/ ) {
+        if ( $field =~ m/^(\d{3}[A-Z@])(\/(\d{2,3}))?\s(.+)/ ) {
             $tag       = $1;
             $occurence = $3 // '';
             $data      = $4;

@@ -18,13 +18,25 @@ package # hide from PAUSE indexer
 use strict;
 use 5.008; # scalar open
 
-our $VERSION = '1.05';
+our $VERSION = '1.08';
 
 use Getopt::Long;
 use List::Util qw(max);
-use Time::Local qw(timelocal);
 use Tk qw(tkinit Ev MainLoop);
 use Tk::PNG;
+
+BEGIN {
+    if ($] < 5.010) {
+	require Time::y2038;
+	*timelocal = sub (@) {
+	    $_[5] -= 1900;
+	    Time::y2038::timelocal(@_);
+	};
+    } else {
+	require Time::Local;
+	Time::Local->import('timelocal');
+    }
+}
 
 {
     package # hide from PAUSE indexer
@@ -224,10 +236,17 @@ sub update_lb {
 	}
     } else {
 	my $now = time;
-	my @l1 = localtime $now;
-	my $today_end = timelocal 59,59,23,@l1[3..5];
-	my @l2 = localtime $now+86400; # XXX which is not correct during DST switches, but well
-	my $tomorrow_end = timelocal 59,59,23,@l2[3..5];
+	my($today_begin, $today_end);
+	{
+	    my @l1 = localtime $now;
+	    $today_begin = timelocal 0,0,0,@l1[3..5];
+	    $today_end = timelocal 59,59,23,@l1[3..5];
+	}
+	my $tomorrow_end;
+	{
+	    my @l2 = localtime $now+86400; # XXX which is not correct during DST switches, but well
+	    $tomorrow_end = timelocal 59,59,23,@l2[3..5];
+	}
 
 	# XXX find a solution with less parsing here (i.e. $date
 	# should have more information available)
@@ -272,12 +291,17 @@ sub update_lb {
 	    my $this_day = $date->date_of_date;
 	    if (!defined $last_day || $this_day ne $last_day) {
 		my $today_or_tomorrow;
-		if      ($date->{epoch} <= $today_end) {
+		if      ($date->{epoch} <  $today_begin) {
+		    $today_or_tomorrow = ' (yesterday)';
+		} elsif ($date->{epoch} <= $today_end) {
 		    $today_or_tomorrow = ' (today)';
 		} elsif ($date->{epoch} <= $tomorrow_end) {
 		    $today_or_tomorrow = ' (tomorrow)';
 		} else {
-		    $today_or_tomorrow = '';
+		    my @l = localtime $date->{epoch};
+		    my $day_begin = timelocal 0,0,0,@l[3..5];
+		    my $days = int(($day_begin - $today_begin) / 86400); # XXX probably inaccurate through DST switches
+		    $today_or_tomorrow = " (in $days days)"; # always plural at this point
 		}
 		my $text = '  ' . $this_day . $today_or_tomorrow;
 		if ($overview_widget eq 'listbox') {
@@ -919,6 +943,10 @@ $mw->protocol('WM_DELETE_WINDOW', sub {
 			      -default => 'No',
 			     ) =~ /no/i);
 		  $mw->destroy;
+		  if ($AnyEvent::Impl::Tk::mw) {
+		      $AnyEvent::Impl::Tk::mw->destroy;
+		      # otherwise process would still run & hang
+		  }
 	      });
 
 # emacsclient does not start if a directory is missing,
@@ -975,8 +1003,12 @@ org-daemon - watch for appointments in org-mode files
 =head1 DESCRIPTION
 
 B<org-daemon> is a Perl/Tk program which watches one or more emacs
-org-mode files for appointments, that is, entries in the form of C<<
-<YYYY-MM-DD AAA HH:MM> >> and fires alarms.
+org-mode files for
+L<appointments|http://orgmode.org/manual/Timestamps.html>, that is,
+entries in the form of C<< <YYYY-MM-DD AAA HH:MM> >> and fires alarms
+in the form of non-modal dialogs. "Passive" timestamps (enclosed in
+square brackets) are ignored. Diary-style sexp entries are not
+implemented (see L</TODO>).
 
 =head1 OPTIONS
 
@@ -984,9 +1016,10 @@ org-mode files for appointments, that is, entries in the form of C<<
 
 =item --early-warning=I<seconds>
 
-There's an warning before the real alarm 30 minutes (1800 seconds)
-before. This option can be used to change this period. Use 0 to turn
-early warnings off completely.
+There's an warning (a non-modal dialog with orange background) before
+the real alarm, by default 30 minutes (1800 seconds) before. This
+option can be used to change this default. Use 0 to turn early
+warnings off completely.
 
 =item --recheck-interval=I<seconds>
 
@@ -1008,8 +1041,8 @@ is used, then a referenced org entry is not opened automatically.
 =item --emacsclient-cmd=I<cmdline ... %l %f ...>
 
 Provide an alternative commandline for emacsclient calls. The
-placeholder strings C<%l> and C<%f> are replaced by line and file.
-Example:
+placeholder strings C<%l> and C<%f> are replaced by line and file of
+the current appointment. Example:
 
     org-daemon --emacsclient-cmd="ssh otheruser@otherhost emacsclient +%l '%f'" ...
 
@@ -1036,8 +1069,8 @@ C<--recheck-interval> is still applied for periodic checks.
 
 =over
 
-=item * Watch all given files periodically every minute (or the
-interval as given with the C<--recheck-interval> switch).
+=item * Watch all given org-mode files periodically every minute (or
+the interval as given with the C<--recheck-interval> switch).
 
 =item * Iconified list of next appointments, with entries in different
 colors (red for appointments in near future, over orange and yellow to
@@ -1045,14 +1078,15 @@ green for appointments in far future)
 
 =item * By double-clicking on an entry in the appointment list, or
 clicking on the Edit button in the alarm window, the corresponding
-entry will be shown in emacs itself (needs B<emacsclient> and emacs
+entry will be shown in emacs itself (needs L<emacsclient(1)> and emacs
 has to be put into C<server-start> mode)
 
 =item * Show an early warning 30 minutes before (or the period
 specified with C<--early-warning>. Individual early warnings may be
-specified with the following extended org syntax: C<< <YYYY-MM-DD AAA
-HH:MM -CountUnit> >>, where Unit may be one of s (seconds), min
-(minutes), h (hours), w (weeks), m (months), and y (years). Example:
+specified with the following non-standard extended org-mode syntax:
+C<< <YYYY-MM-DD AAA HH:MM -CountUnit> >>, where Unit may be one of s
+(seconds), min (minutes), h (hours), w (weeks), m (months), and y
+(years). Example:
 
      <2009-12-25 Fr 12:00 -10min>
 
@@ -1060,27 +1094,19 @@ HH:MM -CountUnit> >>, where Unit may be one of s (seconds), min
 
 =head1 TODO
 
- * it would be nice if it was possible to specify individual pre-alarm
-   times in org-mode and use them in org-daemon
-
  * what about locations attached to lon/lat, and automatic routing and
    automatic pre-alarm calculation?
 
- * it may happen that the update check happens just in the moment when
-   emacs is about to save the file, leaving a half-written file. this
-   may be workarounded by reading the file contents twice and compare
-   if the contents are the same
-
  * more gui elements:
    * close button for alarm toplevel
-   * reload button for data list window
    * iconify button for data list window
    * add another file into watcher list
    * remove a file from the watcher list
    * show the current watcher list
    * maybe some debugging helpers (time of the update, parsed contents...)
 
- * do things asynchronously (like reading files etc.)?
+ * support "Diary-style sexp entries", i.e. timestamps in the form
+     <%%(diary-float t 4 2)>
 
 =head1 PREREQUISITES
 

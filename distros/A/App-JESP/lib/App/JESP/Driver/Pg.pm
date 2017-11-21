@@ -1,5 +1,5 @@
 package App::JESP::Driver::Pg;
-$App::JESP::Driver::Pg::VERSION = '0.013';
+$App::JESP::Driver::Pg::VERSION = '0.015';
 use Moose;
 extends qw/App::JESP::Driver/;
 

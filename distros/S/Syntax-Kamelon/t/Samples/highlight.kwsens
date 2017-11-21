@@ -1,0 +1,11 @@
+Testing for keyword sensitivity.
+
+This is the line of XML code that performs the test:
+Green is in the list, brown is not.
+
+<keyword attribute="Match" context="#stay" String="colours"/>
+<Test>
+#only lower case green is matched
+green brown
+GREEN BROWN
+<Test>

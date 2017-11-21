@@ -3,6 +3,7 @@ use strict;
 use warnings;
 BEGIN { unshift @INC, 't'; }
 require "filter-util.pl" ;
+use Config;
 use Cwd ;
 my $here = getcwd ;
 
@@ -69,9 +70,13 @@ ok(2, $a eq $expected_output) or diag("Got '$a'");
 # try to catch error cases
 
 # case 1 - Perl debugger
-$ENV{'PERLDB_OPTS'} = 'noTTY' ;
-$a = `$Perl $Inc -d $filename 2>&1` ;
-ok(3, $a =~ /debugger disabled/)  or diag("Got '$a'");;
+unless ($Config{usecperl}) {
+  $ENV{'PERLDB_OPTS'} = 'noTTY' ;
+  $a = `$Perl $Inc -d $filename 2>&1` ;
+  ok(3, $a =~ /debugger disabled/)  or diag("Got '$a'");;
+} else {
+  ok(3, 1, "SKIP cperl -d");
+}
 
 # case 2 - Perl Compiler in use
 $a = `$Perl $Inc -MCarp -MO=Deparse $filename 2>&1` ;

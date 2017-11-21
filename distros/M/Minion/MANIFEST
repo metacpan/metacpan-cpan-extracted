@@ -1,4 +1,5 @@
 Changes
+examples/admin.png
 examples/linkcheck/lib/LinkCheck.pm
 examples/linkcheck/lib/LinkCheck/Controller/Links.pm
 examples/linkcheck/lib/LinkCheck/Task/CheckLinks.pm
@@ -18,6 +19,29 @@ lib/Minion/Command/minion/worker.pm
 lib/Minion/Job.pm
 lib/Minion/Worker.pm
 lib/Mojolicious/Plugin/Minion.pm
+lib/Mojolicious/Plugin/Minion/Admin.pm
+lib/Mojolicious/Plugin/Minion/resources/public/minion/app.css
+lib/Mojolicious/Plugin/Minion/resources/public/minion/app.js
+lib/Mojolicious/Plugin/Minion/resources/public/minion/bootstrap/bootstrap.css
+lib/Mojolicious/Plugin/Minion/resources/public/minion/bootstrap/bootstrap.js
+lib/Mojolicious/Plugin/Minion/resources/public/minion/d3/d3.js
+lib/Mojolicious/Plugin/Minion/resources/public/minion/epoch/epoch.css
+lib/Mojolicious/Plugin/Minion/resources/public/minion/epoch/epoch.js
+lib/Mojolicious/Plugin/Minion/resources/public/minion/fontawesome/font-awesome.css
+lib/Mojolicious/Plugin/Minion/resources/public/minion/fonts/fontawesome-webfont.eot
+lib/Mojolicious/Plugin/Minion/resources/public/minion/fonts/fontawesome-webfont.svg
+lib/Mojolicious/Plugin/Minion/resources/public/minion/fonts/fontawesome-webfont.ttf
+lib/Mojolicious/Plugin/Minion/resources/public/minion/fonts/fontawesome-webfont.woff
+lib/Mojolicious/Plugin/Minion/resources/public/minion/fonts/fontawesome-webfont.woff2
+lib/Mojolicious/Plugin/Minion/resources/public/minion/logo-black-2x.png
+lib/Mojolicious/Plugin/Minion/resources/public/minion/logo-black.png
+lib/Mojolicious/Plugin/Minion/resources/public/minion/moment/moment.js
+lib/Mojolicious/Plugin/Minion/resources/templates/layouts/minion.html.ep
+lib/Mojolicious/Plugin/Minion/resources/templates/minion/_limit.html.ep
+lib/Mojolicious/Plugin/Minion/resources/templates/minion/_pagination.html.ep
+lib/Mojolicious/Plugin/Minion/resources/templates/minion/dashboard.html.ep
+lib/Mojolicious/Plugin/Minion/resources/templates/minion/jobs.html.ep
+lib/Mojolicious/Plugin/Minion/resources/templates/minion/workers.html.ep
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
@@ -27,6 +51,7 @@ README.md
 t/backend.t
 t/commands.t
 t/pg.t
+t/pg_admin.t
 t/pg_lite_app.t
 t/pod.t
 t/pod_coverage.t

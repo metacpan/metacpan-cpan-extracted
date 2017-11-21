@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "language.dtd">
+<language name="numbers" version="0.1" section="Test" extensions="*.numbers;">
+<highlighting>
+
+<contexts>
+
+<context name="Base" attribute="Normal Text" lineEndContext="#stay">
+	<StringDetect attribute="Test Area" context="Float" String="&lt;Float&gt;" />
+	<StringDetect attribute="Test Area" context="HlCChar" String="&lt;HlCChar&gt;" />
+	<StringDetect attribute="Test Area" context="HlCHex" String="&lt;HlCHex&gt;" />
+	<StringDetect attribute="Test Area" context="HlCOct" String="&lt;HlCOct&gt;" />
+	<StringDetect attribute="Test Area" context="HlCStringChar" String="&lt;HlCStringChar&gt;" />
+	<StringDetect attribute="Test Area" context="Int" String="&lt;Int&gt;" />
+	<IncludeRules context="##XML" />
+</context>
+
+<context name="Comment" attribute="Comment" lineEndContext="#pop">
+</context>
+
+<context name="Float" attribute="Test Area" lineEndContext="#stay">
+	<DetectChar attribute="Comment" context="Comment" char="#" />
+	<!-- tests go here -->
+	<Float attribute="Match" context="#stay" />
+	<StringDetect attribute="Test Area" context="#pop" String="&lt;Float&gt;" />
+</context>
+
+<context name="HlCChar" attribute="Test Area" lineEndContext="#stay">
+	<DetectChar attribute="Comment" context="Comment" char="#" />
+	<!-- tests go here -->
+	<HlCChar attribute="Match" context="#stay" />
+	<StringDetect attribute="Test Area" context="#pop" String="&lt;HlCChar&gt;" />
+</context>
+
+<context name="HlCHex" attribute="Test Area" lineEndContext="#stay">
+	<DetectChar attribute="Comment" context="Comment" char="#" />
+	<!-- tests go here -->
+	<HlCHex attribute="Match" context="#stay" />
+	<StringDetect attribute="Test Area" context="#pop" String="&lt;HlCHex&gt;" />
+</context>
+
+<context name="HlCOct" attribute="Test Area" lineEndContext="#stay">
+	<DetectChar attribute="Comment" context="Comment" char="#" />
+	<!-- tests go here -->
+	<HlCOct attribute="Match" context="#stay" />
+	<StringDetect attribute="Test Area" context="#pop" String="&lt;HlCOct&gt;" />
+</context>
+
+<context name="HlCStringChar" attribute="Test Area" lineEndContext="#stay">
+	<DetectChar attribute="Comment" context="Comment" char="#" />
+	<!-- tests go here -->
+	<HlCStringChar attribute="Match" context="#stay" />
+	<StringDetect attribute="Test Area" context="#pop" String="&lt;HlCStringChar&gt;" />
+</context>
+
+<context name="Int" attribute="Test Area" lineEndContext="#stay">
+	<DetectChar attribute="Comment" context="Comment" char="#" />
+	<!-- tests go here -->
+	<Int attribute="Match" context="#stay" />
+	<StringDetect attribute="Test Area" context="#pop" String="&lt;Int&gt;" />
+</context>
+
+</contexts>
+
+<itemDatas>
+	<itemData name="Normal Text" defStyleNum="dsNormal" />
+	<itemData name="Test Area"  defStyleNum="dsOthers" />
+	<itemData name="Match"  defStyleNum="dsDataType" />
+	<itemData name="Match2"  defStyleNum="dsString" />
+	<itemData name="Match3"  defStyleNum="dsChar" />
+	<itemData name="Match4"  defStyleNum="dsDataType" />
+	<itemData name="Match5"  defStyleNum="dsString" />
+	<itemData name="Comment"  defStyleNum="dsComment" />
+</itemDatas>
+
+</highlighting>
+
+<general>
+	<keywords casesensitive="1" weakDeliminator="."/>
+</general>
+
+</language>

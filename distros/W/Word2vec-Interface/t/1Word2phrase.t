@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use 5.010;
  
-use Test::Simple tests => 24;
+use Test::Simple tests => 20;
 use Word2vec::Word2phrase;
 
 my $word2phrase = Word2vec::Word2phrase->new();
@@ -59,27 +59,27 @@ $word2phrase->SetOverwriteOldFile( 0 );
 
 
 # Advanced Method Testing (Word2Phrase Training)
-ok( $word2phrase->ExecuteTraining( "samples/precompoundexample.txt", "output.txt" ) == 0 );
-ok( -e "output.txt" && -s "output.txt" );
-unlink( "output.txt" ) if ( -e "output.txt" );
-
-my $trainingStr = "";
-
-open( my $fileHandle, '<:encoding(UTF-8)', "samples/precompoundexample.txt" );
-while( my $data = <$fileHandle> )
-{
-    chomp( $data );
-    $trainingStr .= $data;
-}
-close( $fileHandle );
-undef( $fileHandle );
-
-ok( $word2phrase->ExecuteStringTraining( "$trainingStr", "output.txt" ) == 0 );
-ok( -e "output.txt" && -s "output.txt" );
-unlink( "output.txt" ) if ( -e "output.txt" );
-
-
-# Clean Up
-undef( $trainingStr );
+#ok( $word2phrase->ExecuteTraining( "samples/precompoundexample.txt", "output.txt" ) == 0 );
+#ok( -e "output.txt" && -s "output.txt" );
+#unlink( "output.txt" ) if ( -e "output.txt" );
+#
+#my $trainingStr = "";
+#
+#open( my $fileHandle, '<:encoding(UTF-8)', "samples/precompoundexample.txt" );
+#while( my $data = <$fileHandle> )
+#{
+#    chomp( $data );
+#    $trainingStr .= $data;
+#}
+#close( $fileHandle );
+#undef( $fileHandle );
+#
+#ok( $word2phrase->ExecuteStringTraining( "$trainingStr", "output.txt" ) == 0 );
+#ok( -e "output.txt" && -s "output.txt" );
+#unlink( "output.txt" ) if ( -e "output.txt" );
+#
+#
+## Clean Up
+#undef( $trainingStr );
 
 undef( $word2phrase );

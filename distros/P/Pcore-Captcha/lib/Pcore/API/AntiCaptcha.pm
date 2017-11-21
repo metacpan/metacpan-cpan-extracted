@@ -75,6 +75,35 @@ sub resolve ( $self, @ ) {
     return;
 }
 
+sub recaptcha ( $self, @ ) {
+    my $cb = $_[-1];
+
+    my %args = (
+        website_url => undef,
+        website_key => undef,
+        user_agent  => undef,
+        cookies     => undef,
+        @_[ 1 .. $#_ - 1 ]
+    );
+
+    my $captcha = Pcore::Captcha->new( { image => \q[] } );
+
+    my $body = {
+        clientKey => $self->api_key,
+        task      => {
+            type       => 'NoCaptchaTaskProxyless',
+            websiteURL => $args{website_url},
+            websiteKey => $args{website_key},
+            userAgent  => $args{user_agent},
+            $args{cookies} ? ( cookies => $args{cookies} ) : (),
+        },
+    };
+
+    $self->_resolve( $captcha, $body, $cb );
+
+    return;
+}
+
 sub recaptcha_proxy ( $self, @ ) {
     my $cb = $_[-1];
 
@@ -305,7 +334,7 @@ sub _run_resolver ($self) {
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ## | Sev. | Lines                | Policy                                                                                                         |
 ## |======+======================+================================================================================================================|
-## |    1 | 81                   | CodeLayout::RequireTrailingCommas - List declaration without trailing comma                                    |
+## |    1 | 81, 110              | CodeLayout::RequireTrailingCommas - List declaration without trailing comma                                    |
 ## +------+----------------------+----------------------------------------------------------------------------------------------------------------+
 ##
 ## -----SOURCE FILTER LOG END-----

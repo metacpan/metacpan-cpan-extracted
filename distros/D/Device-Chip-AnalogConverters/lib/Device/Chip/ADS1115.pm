@@ -10,9 +10,9 @@ use warnings;
 use base qw( Device::Chip::Base::RegisteredI2C );
 Device::Chip::Base::RegisteredI2C->VERSION( '0.10' );
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
-use Data::Bitfield qw( bitfield boolfield enumfield );
+use Data::Bitfield 0.02 qw( bitfield boolfield enumfield );
 
 use constant REG_DATA_SIZE => 16;
 
@@ -86,7 +86,7 @@ Returns a C<HASH> reference containing the chip's current configuration.
 
 =cut
 
-bitfield CONFIG =>
+bitfield { format => "bytes-BE" }, CONFIG =>
    OS   => boolfield(15),
    MUX  => enumfield(12, qw( 0-1 0-3 1-3 2-3 0 1 2 3 )),
    PGA  => enumfield( 9, qw( 6.144V 4.096V 2.048V 1.024V 0.512V 0.256V )),
@@ -103,7 +103,7 @@ sub read_config
 
    $self->cached_read_reg( REG_CONFIG, 1 )->then( sub {
       my ( $bytes ) = @_;
-      Future->done( $self->{config} = { unpack_CONFIG( unpack "S>", $bytes ) } );
+      Future->done( $self->{config} = { unpack_CONFIG( $bytes ) } );
    });
 }
 
@@ -128,7 +128,7 @@ sub change_config
 
       delete $self->{fullscale_f} if exists $changes{PGA};
 
-      $self->cached_write_reg( REG_CONFIG, pack "S>", pack_CONFIG( %$config ) );
+      $self->cached_write_reg( REG_CONFIG, pack_CONFIG( %$config ) );
    });
 }
 
@@ -148,7 +148,7 @@ sub trigger
    $self->read_config->then( sub {
       my ( $config ) = @_;
       # Not "cached" as OS is a volatile bit
-      $self->write_reg( REG_CONFIG, pack "S>", pack_CONFIG( %$config, OS => 1 ) );
+      $self->write_reg( REG_CONFIG, pack_CONFIG( %$config, OS => 1 ) );
    });
 }
 

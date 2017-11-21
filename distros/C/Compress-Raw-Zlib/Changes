@@ -1,6 +1,20 @@
 CHANGES
 -------
 
+  2.075 14 Nov 2017
+
+      * Update zlib-src directory to use zlib 1.2.11
+        #123245: perl 5.26.1 is vulnerable to CVE-2016-9843, CVE-2016-9841, CVE-2016-9840, CVE-2016-9842
+
+      * Zlib.xs
+        Don't allow offset to be greater than length of buffer in crc32.
+
+      * Zlib.xs
+        Change my_zcalloc to use safecalloc.
+        The link, https://github.com/madler/zlib/issues/253, is the upstream report for the remaining 
+        valgrind errors not already dealt with by 1.2.11. Using calloc in Zlib.xs for now as a workaround.
+        #121074: valgrind errors in the test suite
+
   2.074 19 Feb 2017
 
       * Fix bad 2.073 release

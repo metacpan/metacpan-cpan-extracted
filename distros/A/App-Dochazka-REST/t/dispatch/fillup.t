@@ -212,7 +212,14 @@ foreach $resource ( 'interval/fillup', 'interval/scheduled' ) {
     ] }
 EOH
     is( $status->level, 'OK' );
-    is( $status->code, 'DISPATCH_NO_SCHEDULED_INTERVALS_CREATED' );
+    if ( $resource eq 'interval/fillup' ) {
+        is( $status->code, 'DISPATCH_NO_SCHEDULED_INTERVALS_CREATED' );
+    } elsif ( $resource eq 'interval/scheduled' ) {
+        is( $status->code, 'DISPATCH_NO_SCHEDULED_INTERVALS_IDENTIFIED' );
+    } else {
+        diag( "FAJDCCCCCDDDP!" );
+        BAIL_OUT(0);
+    }
     is( $status->{'count'}, 0 );
 }
 

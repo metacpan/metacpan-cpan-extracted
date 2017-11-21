@@ -39,6 +39,26 @@ Lynx/2.8.3rel.1 libwww-FM/2.14
 'name'             => 'Lynx',
 
 [AGENT]
+
+Lynx/2.8.3rel.1 libwww-FM/2.14FM
+
+extras          => [ 'libwww-FM/2.14FM' ],
+name            => 'Lynx',
+parser          => 'moz_only',
+version         => '2.008003001',
+version_raw     => '2.8.3rel.1',
+
+[AGENT]
+
+Lynx/2.8.8dev.5 libwww-FM/2.14 SSL-MM/1.4.1 GNUTLS/2.8.6
+
+extras          => [ 'libwww-FM/2.14', 'SSL-MM/1.4.1', 'GNUTLS/2.8.6' ],
+name            => 'Lynx',
+parser          => 'moz_only',
+version         => '2.008008005',
+version_raw     => '2.8.8dev.5',
+
+[AGENT]
 # HotJava
 
 Mozilla/3.0 (x86 [en] Windows NT 5.1; Sun)

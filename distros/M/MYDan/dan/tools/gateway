@@ -1,0 +1,41 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use YAML::XS;
+use File::Spec;
+
+use MYDan::Util::OptConf;
+use MYDan::Util::Gateway;
+
+$| ++;
+
+$MYDan::Util::OptConf::THIS = 'util';
+
+=head1 SYNOPSIS
+
+ $0 
+ $0 on | off
+ $0 on abc 
+ $0 off foo bar
+ $0 restart | oo # oo and restart are the same, oo == off on
+ $0 --help 
+
+=cut
+
+my $option = MYDan::Util::OptConf->load();
+my %o = $option->get()->dump();
+
+my $gateway = MYDan::Util::Gateway->new( "$o{conf}/gateway" );
+
+unless( @ARGV ) { $gateway->status(); exit; }
+
+my $ctrl = shift @ARGV;
+
+$ctrl = 'restart' if $ctrl eq 'oo';
+
+$option->assert() unless $ctrl eq 'on' || $ctrl eq 'off' || $ctrl eq 'restart';
+
+$gateway->off( @ARGV ) if $ctrl eq 'off'  || $ctrl eq 'restart';;
+$gateway->on( @ARGV )  if $ctrl eq 'on'   || $ctrl eq 'restart';

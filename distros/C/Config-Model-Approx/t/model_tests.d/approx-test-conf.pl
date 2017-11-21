@@ -1,7 +1,7 @@
 #
 # This file is part of Config-Model-Approx
 #
-# This software is Copyright (c) 2013 by Dominique Dumont.
+# This software is Copyright (c) 2009-2017 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #

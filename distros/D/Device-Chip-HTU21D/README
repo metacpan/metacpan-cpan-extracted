@@ -38,7 +38,7 @@ ACCESSORS
        HEATER     => 0 | 1
        ENDOFBATT  => 0 | 1
 
-change_config
+ change_config
 
        $chip->change_config( %changes )->get
 

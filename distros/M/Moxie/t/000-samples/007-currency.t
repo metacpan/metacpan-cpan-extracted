@@ -50,13 +50,13 @@ BEGIN {
         }
     }
 
-    package Printable {
+    package Printable 0.01 {
         use Moxie;
 
         sub to_string;
     }
 
-    package US::Currency {
+    package US::Currency 0.01 {
         use Moxie;
 
         extends 'Moxie::Object';
@@ -64,7 +64,7 @@ BEGIN {
 
         has _amount => ( default => sub { 0 } );
 
-        sub BUILDARGS : init( amount? => _amount );
+        sub BUILDARGS : strict( amount? => _amount );
 
         sub amount : ro(_amount);
 
@@ -81,6 +81,7 @@ BEGIN {
 
 my $Eq         = MOP::Role->new( name => 'Eq' );
 my $Comparable = MOP::Role->new( name => 'Comparable');
+my $Printable  = MOP::Role->new( name => 'Printable');
 my $USCurrency = MOP::Class->new( name => 'US::Currency');
 
 ok($Comparable->does_role( 'Eq' ), '... Comparable does the Eq role');
@@ -91,6 +92,9 @@ ok($USCurrency->does_role( 'Printable' ), '... US::Currency does Printable');
 
 ok($Eq->requires_method('equal_to'), '... EQ::equal_to is a stub method');
 ok(!$Eq->requires_method('not_equal_to'), '... EQ::not_equal_to is NOT a stub method');
+
+is($USCurrency->version, '0.01', '... got the expected version number');
+is($Printable->version, '0.01', '... got the expected version number');
 
 {
     my $dollar = US::Currency->new( amount => 10 );

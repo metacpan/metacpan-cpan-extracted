@@ -1,6 +1,12 @@
-.travis.yml
 Changes
-lib/Mojolicious/Plugin/Vparam.pm
+debian/changelog
+debian/compat
+debian/control
+debian/copyright
+debian/libmojolicious-plugin-vparam-perl.docs
+debian/rules
+debian/source/format
+.gitignore
 lib/Mojolicious/Plugin/Vparam/Address.pm
 lib/Mojolicious/Plugin/Vparam/Barcode.pm
 lib/Mojolicious/Plugin/Vparam/Bool.pm
@@ -13,13 +19,14 @@ lib/Mojolicious/Plugin/Vparam/ISIN.pm
 lib/Mojolicious/Plugin/Vparam/JSON.pm
 lib/Mojolicious/Plugin/Vparam/Numbers.pm
 lib/Mojolicious/Plugin/Vparam/Phone.pm
+lib/Mojolicious/Plugin/Vparam.pm
 lib/Mojolicious/Plugin/Vparam/RU.pm
 lib/Mojolicious/Plugin/Vparam/Text.pm
 lib/Mojolicious/Plugin/Vparam/UUID.pm
 lib/Mojolicious/Plugin/Vparam/Vsort.pm
 lib/Mojolicious/Plugin/Vparam/XML.pm
 Makefile.PL
-MANIFEST			This list of files
+MANIFEST
 MANIFEST.SKIP
 README.pod
 t/001_use_ok.t
@@ -81,6 +88,7 @@ t/715_address-optional.t
 t/716_address_json.t
 t/720_jpath.t
 t/721_jpath_array.t
+t/722_jpath_maybe.t
 t/730_cpath.t
 t/740_xpath.t
 t/800_inn.t
@@ -97,5 +105,6 @@ t/920_range.t
 t/925_size.t
 t/990_manifest.t
 t/995_pod.t
+.travis.yml
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

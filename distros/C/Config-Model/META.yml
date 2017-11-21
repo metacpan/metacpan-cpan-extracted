@@ -59,7 +59,6 @@ requires:
   Regexp::Common: '0'
   Scalar::Util: '0'
   Storable: '0'
-  Text::Diff: '0'
   Text::Levenshtein::Damerau: '0'
   Text::Wrap: '0'
   parent: '0'
@@ -68,5 +67,5 @@ resources:
   bugtracker: https://github.com/dod38fr/config-model/issues
   homepage: https://github.com/dod38fr/config-model/wiki
   repository: git://github.com/dod38fr/config-model.git
-version: '2.113'
+version: '2.114'
 x_serialization_backend: 'YAML::Tiny version 1.70'

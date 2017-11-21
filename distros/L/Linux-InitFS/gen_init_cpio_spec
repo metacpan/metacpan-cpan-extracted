@@ -1,0 +1,37 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+#
+# gen_init_cpio_spec - spit out what the kernel needs to build-in an
+#                      initfs that can find and mount any kind of
+#                      root filesystem the same kernel can support
+#
+# outline:
+#
+#   1. Load the kernel config.
+#       a. Identify our parent process
+#       b. If it's make, investigate what makefile
+#       c. Find the kernel source from there
+#       d. Otherwise, assume /usr/src/linux
+#	2. Check for which supported features are compiled-in
+#       a. Allow the subclasses to include things
+#   3. Spit out the results
+#       b. By calling the collection of objects' class
+
+use Linux::InitFS;
+
+
+# go looking for a kernel config
+detect_kernel_config
+	or die "Unable to locate kernel sources.\n";
+
+# see that we're in any way useful
+kernel_feature_enabled 'BLK_DEV_INITRD'
+	or die "Initial root filesystems are disabled.\n";
+
+# go looking for features
+enable_initfs_features
+	or die "Error while enabling initfs features.\n";
+
+# spit it out...
+exit ( generate_initfs_spec ? 0 : 1 );

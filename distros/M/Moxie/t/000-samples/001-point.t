@@ -11,7 +11,8 @@ BEGIN {
 }
 
 package Point {
-    use Moxie;
+    use Moxie
+        traits => [':experimental'];
 
     extends 'Moxie::Object';
 
@@ -21,7 +22,7 @@ package Point {
     my sub _x : private;
     my sub _y : private;
 
-    sub BUILDARGS : init(
+    sub BUILDARGS : strict(
         x? => _x,
         y? => _y,
     );
@@ -44,7 +45,8 @@ package Point {
 # ... subclass it ...
 
 package Point3D {
-    use Moxie;
+    use Moxie
+        traits => [':experimental'];
 
     extends 'Point';
 
@@ -52,7 +54,7 @@ package Point3D {
 
     my sub _z : private;
 
-    sub BUILDARGS : init(
+    sub BUILDARGS : strict(
         x? => super(x),
         y? => super(y),
         z? => _z

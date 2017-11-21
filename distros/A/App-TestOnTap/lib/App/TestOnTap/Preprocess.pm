@@ -18,7 +18,7 @@ sub new
 	my $argv = shift;
 
 	my $self = bless( { env => $env, argv => $argv }, $class);
-	$self->__execPreprocess($cmd, $args) if $cmd;
+	$self->__execPreprocess($cmd, $args) if ($cmd && @$cmd);
 	
 	return $self;
 }

@@ -31,9 +31,14 @@ my %argv = (
     'passed --help will get a help'  => ['--help'],
 );
 
+my $new_cli;
 for my $msg ( keys %argv ) {
     @ARGV = @{ $argv{$msg} };
-    my $cmd = Shipwright::Script->prepare();
+    if ( !defined $new_cli ) {
+        eval { Shipwright::Script->prepare() };
+        $new_cli = $@ ? 1 : 0;
+    }
+    my $cmd = $new_cli ? Shipwright::Script->new->prepare() : Shipwright::Script->prepare();
     isa_ok( $cmd, 'Shipwright::Script::Help' );
 }
 
@@ -53,12 +58,12 @@ for my $msg ( keys %wrong_argv ) {
         if ( $v->[2] && $v->[2] =~ /^svn/ ) {
           SKIP: {
                 skip 'svn: no svn found or env SHIPWRIGHT_TEST_SVN not set', 1 if skip_svn;
-                eval { @ARGV = @$v; Shipwright::Script->prepare };
+                eval { @ARGV = @$v; $new_cli ? Shipwright::Script->new->prepare() : Shipwright::Script->prepare() };
                 like( $@, qr/$msg/, $msg );
             }
         }
         else {
-            eval { @ARGV = @$v; Shipwright::Script->prepare };
+            eval { @ARGV = @$v; $new_cli ? Shipwright::Script->new->prepare() : Shipwright::Script->prepare() };
             like( $@, qr/$msg/, $msg );
         }
     }

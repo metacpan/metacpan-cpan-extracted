@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "language.dtd">
+<language name="Test2" version="0.1" kateversion="0.0" section="Test">
+
+<highlighting>
+<contexts>
+  <context name="Only" attribute="Value" lineEndContext="#stay">
+      <Detect2Chars attribute="Normal Text" context="#pop" char="#" char1="]"/>
+   </context>
+</contexts>
+<itemDatas>
+  <itemData name="Normal Text" defStyleNum="dsNormal" />
+  <itemData name="Other Text" defStyleNum="dsNormal" />
+  <itemData name="Comment" defStyleNum="dsComment" spellChecking="false" />
+  <itemData name="CDATA" defStyleNum="dsBaseN" bold="1" spellChecking="false" />
+  <itemData name="Processing" defStyleNum="dsKeyword" spellChecking="false" />
+  <itemData name="Doctype" defStyleNum="dsDataType" bold="1" spellChecking="false" />
+  <itemData name="Element" defStyleNum="dsKeyword" spellChecking="false" />
+  <itemData name="Attribute" defStyleNum="dsOthers" spellChecking="false" />
+  <itemData name="Value" defStyleNum="dsString" color="#a00" spellChecking="false" />
+  <itemData name="EntityRef" defStyleNum="dsDecVal" spellChecking="false" />
+  <itemData name="PEntityRef" defStyleNum="dsDecVal" spellChecking="false" />
+  <itemData name="Error" defStyleNum="dsError" spellChecking="false" />
+</itemDatas>
+
+</highlighting>
+<general>
+</general>
+</language>

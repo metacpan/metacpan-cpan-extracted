@@ -1,0 +1,45 @@
+{
+   "abstract" : "Perl interface to NATS Streaming",
+   "author" : [
+      "Sergey Kolychev <sergeykolychev.github@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-NATS-Streaming-Client",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Net::NATS::Streaming::PB" : "0.01",
+            "Net::NATS::Client" : "0.2.0",
+            "UUID" : "0.05",
+            "Class::XSAccessor" : "1.19"
+         }
+      },
+      "test" : {
+         "requires" : {}
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.03"
+}

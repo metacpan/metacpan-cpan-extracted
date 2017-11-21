@@ -1,5 +1,5 @@
 package Moose::Exception::RequiredAttributeNeedsADefault;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -10,4 +10,5 @@ sub _build_message {
     "You cannot have a required attribute (".$self->attribute_name.") without a default, builder, or an init_arg";
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

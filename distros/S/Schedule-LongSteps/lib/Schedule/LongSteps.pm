@@ -1,5 +1,5 @@
 package Schedule::LongSteps;
-$Schedule::LongSteps::VERSION = '0.021';
+$Schedule::LongSteps::VERSION = '0.023';
 # ABSTRACT: Manage long term processes over arbitrary large spans of time.
 
 use Moose;
@@ -153,12 +153,14 @@ Persist processes in memory. Not very useful, except for testing. This is the st
 =item L<Schedule::LongSteps::Storage::AutoDBIx>
 
 Persist processes in a relational DB (a $dbh from L<DBI>). This is the easiest thing to use if you want to persist processes in a database, without having
-to worry about creating a DBIx::Class model yourself.
+to worry about creating a DBIx::Class model yourself. We recommend you give this storage its own dbh connection, segregated from the rest
+of your application.
 
 =item L<Schedule::LongSteps::Storage::DBIxClass>
 
-Persist processes in an existing L<DBIx::Class> schema. Nice if you want to have only one instance of Schema in your application and if
-don't mind writing your own resultset.
+Persist processes in an existing L<DBIx::Class> schema. Note that although this makes a reasonable attempts not to interfer
+with your own transactions, we recommend that you build a instance of your schema with a dedicated and segregated L<DBI> connection
+just for this LongSteps purpose.
 
 =item L<Schedule::LongSteps::Storage::DynamoDB>
 
@@ -440,7 +442,7 @@ sub run_due_processes{
                 $err = substr( $err , 0 , $self->error_limit() );
             }
             $log->error("Error running process ".$stored_process->process_class().':'.$stored_process->id().' :'.$err);
-            $stored_process->update({
+            $self->storage()->update_process( $stored_process, {
                 status => 'terminated',
                 error => $err,
                 run_at => undef,
@@ -456,7 +458,7 @@ sub run_due_processes{
             next;
         }
 
-        $stored_process->update({
+        $self->storage()->update_process( $stored_process, {
             status => 'paused',
             run_at => undef,
             run_id => undef,
@@ -528,7 +530,7 @@ sub revive {
     $stored_process->error(undef);
     $stored_process->status("paused");
     $stored_process->run_at( $now );
-    $stored_process->update({
+    $self->storage()->update_process( $stored_process, {
         what => $revive_to,
         error => undef,
         status => "paused",

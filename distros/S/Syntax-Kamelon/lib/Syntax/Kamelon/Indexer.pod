@@ -1,0 +1,142 @@
+=head1 NAME
+
+Syntax::Kamelon::Indexer - Keeps track of available syntax definitions
+
+=head1 SYNOPSIS
+
+ use Syntax::Kamelon::Indexer;
+ my $indexer = Syntax::Kamelon::Indexer->new(%options);
+
+=head1 DESCRIPTION
+
+This module keeps track of available syntax definitions. It attemptds to load an index file
+in the B<xmlfolder>. If that fails it will rebuild the index and attempt to save it.
+
+=head1 OPTIONS
+
+The constructor is called with a paired list or hash of options as parameters. You can use
+the following options.
+
+=over 4
+
+=item B<indexfile> => filename
+
+Specifies the filename where Kamelon stores information about available syntax definitions.
+
+By default it points to 'indexrc' in the B<xmlfolder>. If the file does not exist Kamelon will 
+load all xml files in the B<xmlfolder> and attempt to create the indexfile.
+
+Once the indexfile has been created it becomes static. If you add a syntax definition 
+XML file to the B<xmlfolder> it will no longer be recognized. Delete the indexfile and reload
+Kamelon to fix that. 
+
+=item B<noindex> => boolean
+
+By default 0. If you set this option Kamelon will ignore the existence of an indexfile
+and manually build the index, without saving it. But it gives
+you the liberty of adding and removing syntax highlight definition files.
+
+This option comes with a considerable startup penalty.
+
+=item B<xmlfolder> => folder
+
+This is the place where Kamelon looks for syntax highlight definition XML files. By
+default it searches @INC for 'Syntax/Kamelon/XML'. Here you find the
+XML files used in the Kate text editor. They are specially crafted for this module.
+
+=back
+
+=head1 METHODS
+
+=over 4
+
+=item B<AvailableSyntaxes>
+
+Returns a list of all available syntax definitions.
+
+=item B<CreateExtIndex>
+
+Creates an index of all available file extensions in the Kate XML files. This is needed if you want to use 
+the B<SyntaxPropose> method.
+
+=item B<CreateIndex>
+
+Creates an index of all available xml files in the xmlfolder. This may take a while.
+
+=item B<ExtensionSyntaxes>(I<$fileextension>)
+
+Returns a list of Syntax definitions that support the given file extension.
+
+=item B<Extensions>(I<$reftofileextensiontable>)
+
+Sets and returns the table that supports the B<ExtensionSyntaxes> method.
+It is a hash in the form of:
+
+ extension => [syntax1, syntax2, ...]
+
+=item B<FindINC>(I<$filename>);
+
+Searches @INC for $filename and returns the full path of its first occurance.
+
+=item B<GetXMLObject>(I<$syntax>);
+
+Creates and returns a Syntax::Kamelon::XMLData object loaded with the xml file belonging
+to $syntax.
+
+=item B<IndexFile>
+
+Sets and returns the index file name. Corrsponds with the B<indexfile> option.
+
+=item B<InfoXXXXX>
+
+These methods return general information about the syntax definitions.
+
+=item B<Info>(I<$syntax>, I<$tag>);
+
+$tag can have the value: 'ext', 'mime', 'menu' or 'file'.
+
+=item B<InfoExtensions>(I<$syntax>);
+
+=item B<InfoMimeType>(I<$syntax>);
+
+=item B<InfoSection>(I<$syntax>);
+
+=item B<InfoXMLFile>(I<$syntax>);
+
+=item B<LoadIndex>(I<$noindex>);
+
+Loads the index of XMLFolder into memory. $noindex is a boolean. If it is set it will
+not load the index file but rebuild the index.
+
+=item B<LoadXML>($fullpathandfilename);
+
+Creates and returns an XMLData object for the given filename.
+
+=item B<SaveIndex>
+
+Saves the index to B<xmlfolder>/B<indexfile>.
+
+=item B<XMLFolder>
+
+Sets and returns the xml folder name. Corresponds with the B<xmlfolder> option.
+
+=back
+
+=head1 AUTHOR AND COPYRIGHT
+
+This module is written and maintained by:
+
+Hans Jeuken < hansjeuken at xs4all dot nl>
+
+Copyright (c) 2017 by Hans Jeuken, all rights reserved.
+
+Published under the GPLV3 license
+
+=head1 SEE ALSO
+
+B<Syntax::Kamelon>, B<Syntax::Kamelon::Builder>, B<Syntax::Kamelon::Debugger>, B<Syntax::Kamelon::Diagnostics>,
+B<Syntax::Kamelon::XMLData>, B<Syntax::Kamelon::Format::Base>, B<Syntax::Kamelon::Format::ANSI>, B<Syntax::Kamelon::Format:HTML4>
+
+=cut
+
+

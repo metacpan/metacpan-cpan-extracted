@@ -1,5 +1,21 @@
 Revision history for App-TestOnTap
 
+0.046	2017-11-14
+
+	Removed module remained in personal Perl...
+
+0.045	2017-11-13
+
+	Non-backward compat changes
+	
+	Removed the --execmap mechanism, instead replacing with the ability to specify a
+	full config instead.
+	Made some mods to the --_pp/info flags
+	The style of the execmap is rewritten to use a better list/section combo for
+	each match
+	
+	
+
 0.044	2017-11-06
 
 	Clean up warn message

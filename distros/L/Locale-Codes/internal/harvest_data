@@ -22,7 +22,7 @@ use Text::Iconv;
 use lib "./internal";
 
 our $VERSION;
-$VERSION='3.54';
+$VERSION='3.55';
 
 # Some required executables
 my @exe     = qw( wget xls2csv );
@@ -692,7 +692,7 @@ sub _country_name {
 #    <tr ...>
 #       <th>Domain</th>
 #       <th>Type</th>
-#       <th>Sponsoring Organisation</th>
+#       <th>TLD Manager</th>
 #    </tr>
 #    <tr ...>
 #       <td><span ...><a ...>.AD</a></span></td>
@@ -747,9 +747,9 @@ sub _country_name {
                       );
 
       # Look for a table who's first row has the header:
-      #    Sponsoring Organisation
+      #    TLD Manager
 
-      my $found = jump_to_row(\$in,"Sponsoring Organisation");
+      my $found = jump_to_row(\$in,"TLD Manager");
       if (! $found) {
          die "ERROR [iana]: country code file format changed!\n";
       }
@@ -1716,7 +1716,7 @@ use warnings;
 use utf8;
 
 our(\$VERSION);
-\$VERSION='3.54';
+\$VERSION='3.55';
 
 \$Locale::Codes::Data{'$type'}{'id'} = '$ID';
 

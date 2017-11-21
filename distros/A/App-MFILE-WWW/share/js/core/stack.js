@@ -71,7 +71,7 @@ define ([
             opts = lib.objectify(opts);
             opts['logout'] = ('logout' in opts) ? opts.logout : false;
             opts['inputId'] = ('inputId' in opts) ? opts.inputId : null;
-            opts['resultLine'] = ('resultLine' in opts) ? opts.resultLine : "&nbsp";
+            opts['resultLine'] = ('resultLine' in opts) ? opts.resultLine : null;
             opts['_start'] = ('_start' in opts) ? opts._start : true;
             opts['_restart'] = ('_restart' in opts) ? opts._restart : false;
             opts['_start'] = opts._restart ? true : opts._start;
@@ -153,7 +153,7 @@ define ([
                 });
             }
             if (opts._start) {
-                tgt.start(obj);
+                tgt.start(obj, opts);
             }
         },
 
@@ -265,6 +265,7 @@ define ([
         unwindToTarget = function (tname, newObj, opts) {
             var i, tgt;
             console.log("Unwinding the stack to target " + tname);
+            opts = $.extend({"start": true}, opts);
             for (i = _stack.length; i > 0; i -= 1) {
                 tgt = _stack[i - 1].target;
                 console.log("Does " + tgt.name + " equal " + tname + " ?");
@@ -273,7 +274,9 @@ define ([
                 }
                 popWithoutStart(newObj, opts);
             }
-            tgt.start(newObj, opts);
+            if (opts.start) {
+                tgt.start(newObj, opts);
+            }
         },
         
         unwindToFlag = function (newObj, opts) {

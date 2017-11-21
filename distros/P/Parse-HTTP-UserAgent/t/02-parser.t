@@ -21,6 +21,13 @@ GetOptions(\my %opt, qw(
     dump
 ));
 
+# Work-around for the removal of "." from @INC in Perl 5.26
+if (! grep { $_ eq '.' } @INC) {
+    require FindBin;
+    no warnings 'once';
+    push @INC, $FindBin::Bin . '/..';
+}
+
 require_ok( File::Spec->catfile( t => 'db.pl' ) );
 
 my %wanted = $opt{ids} ? map { ( $_, $_ ) } @{ $opt{ids} } : ();
@@ -70,7 +77,7 @@ foreach my $test ( database({ thaw => 1 }) ) {
                 } keys %got;
     delete @got{ @empty };
 
-    is_deeply(
+    my $is_eq = is_deeply(
         \%got,
         $test->{struct},
         sprintf q{Frozen data matches parse result for '%s' -> %s -> %s},
@@ -79,7 +86,7 @@ foreach my $test ( database({ thaw => 1 }) ) {
                     $test->{id}
     );
 
-    if ( $opt{dump} ) {
+    if ( ! $is_eq || $opt{dump} ) {
         diag sprintf "GOT: %s\nEXPECTED: %s\n",
                         Dumper( \%got ),
                         Dumper( $test->{struct} );

@@ -2,13 +2,12 @@ Build.PL
 Changes
 examples/htu21d.pl
 lib/Device/Chip/HTU21D.pm
+LICENSE
 MANIFEST			This list of files
+META.json
+META.yml
+README
 t/00use.t
 t/01config.t
 t/10read.t
 t/99pod.t
-Makefile.PL
-README
-LICENSE
-META.yml
-META.json

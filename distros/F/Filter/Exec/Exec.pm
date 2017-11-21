@@ -1,14 +1,10 @@
 package Filter::Util::Exec ;
 
-require 5.002 ;
-require DynaLoader;
-use strict;
-use warnings;
-use vars qw(@ISA $VERSION) ;
-@ISA = qw(DynaLoader);
-$VERSION = "1.57" ;
+require 5.006 ;
+require XSLoader;
+our $VERSION = "1.58" ;
 
-bootstrap Filter::Util::Exec ;
+XSLoader::load('Filter::Util::Exec');
 1 ;
 __END__
 

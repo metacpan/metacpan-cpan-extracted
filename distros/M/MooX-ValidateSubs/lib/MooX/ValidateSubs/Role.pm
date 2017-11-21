@@ -33,8 +33,14 @@ sub _validate_sub {
 	if ( ref $spec eq 'ARRAY' ) {
 		push @count, scalar @{$spec};
 
+		@params = $self->_preprocess_params(@params) and $count[0] = scalar @params if ( do { 
+				my $preprocess = $count[0];  
+				$_ == 0 || ! $_ % 2 ? $params[$_] =~ m/[0-9]+/ && $params[$_] <= $count[1] ? next : do { $preprocess = 0 } && last : next foreach 0 .. $count[0] - 1; 
+				$preprocess; 
+		} );
+
 		if ( $count[0] == 1 && $count[1] != 1 and ref $params[0] eq 'ARRAY' ) {
-			@params   = @{ $params[0] };
+			@params = @{ $params[0] };
 			$count[0] = scalar @params;
 			$count[3] = 'ref';
 		}
@@ -46,7 +52,7 @@ sub _validate_sub {
 
 		foreach ( 0 .. $count[1] - 1 ) {
 			not $params[$_] and $spec->[$_]->[1]
-			  and ( $spec->[$_]->[1] =~ m/^1$/ and next or $params[$_] = $self->_default( $spec->[$_]->[1] ) );
+				and ( $spec->[$_]->[1] =~ m/^1$/ and next or $params[$_] = $self->_default( $spec->[$_]->[1] ) );
 		}
 
 		@params = $compiled_check->(@params);
@@ -72,6 +78,14 @@ sub _default {
 		return $default->();
 	}
 	return $self->$default;
+}
+
+sub _preprocess_params {
+	my ($self, %params) = @_;
+
+	my @world;
+	map { $world[$_] = $params{$_} } sort keys %params;
+	return @world;
 }
 
 1;

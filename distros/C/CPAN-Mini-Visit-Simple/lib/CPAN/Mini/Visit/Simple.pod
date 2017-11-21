@@ -119,7 +119,7 @@ returns the full path to that directory as stored within the object.
 
 =item * Arguments
 
-    $id_dir_dir = $self->get_id_dir();
+    $minicpan_id_dir = $self->get_id_dir();
 
 =item * Return Value
 

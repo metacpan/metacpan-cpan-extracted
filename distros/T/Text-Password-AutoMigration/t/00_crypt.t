@@ -44,7 +44,7 @@ eval{ $pwd->verify( $raw, '$1$l1PMyqG!$mNPUHQnly7oLJjt/jb/m/.' ) };
 
 ( $raw, $hash ) = eval{ $pwd->generate(3) };
  like $@ ,
- qr/^Text::Password::CoreCrypt::generate requires at least 4 length\./i,
+ qr/^Text::Password::CoreCrypt::generate requires at least 4 length/i,
 "fail to make too short password";                                      # 9
 
 done_testing();

@@ -4,9 +4,9 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4001, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
-      "open_source"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -21,7 +21,8 @@
             "Gtk2" : "0",
             "IO::Async" : "0.14",
             "IO::Async::Loop::Glib" : "0",
-            "Net::Async::Tangence::Client" : "0.08",
+            "Module::Pluggable" : "0",
+            "Net::Async::Tangence::Client" : "0.13",
             "Tangence::ObjectProxy" : "0.18"
          }
       }
@@ -29,34 +30,30 @@
    "provides" : {
       "Circle::FE::Gtk" : {
          "file" : "lib/Circle/FE/Gtk.pm",
-         "version" : "0.130560"
+         "version" : "0.173170"
       },
       "Circle::FE::Gtk::Tab" : {
-         "file" : "lib/Circle/FE/Gtk/Tab.pm",
-         "version" : 0
+         "file" : "lib/Circle/FE/Gtk/Tab.pm"
       },
       "Circle::FE::Gtk::Widget::Box" : {
-         "file" : "lib/Circle/FE/Gtk/Widget/Box.pm",
-         "version" : 0
+         "file" : "lib/Circle/FE/Gtk/Widget/Box.pm"
       },
       "Circle::FE::Gtk::Widget::Entry" : {
-         "file" : "lib/Circle/FE/Gtk/Widget/Entry.pm",
-         "version" : 0
+         "file" : "lib/Circle/FE/Gtk/Widget/Entry.pm"
       },
       "Circle::FE::Gtk::Widget::Label" : {
-         "file" : "lib/Circle/FE/Gtk/Widget/Label.pm",
-         "version" : 0
+         "file" : "lib/Circle/FE/Gtk/Widget/Label.pm"
       },
       "Circle::FE::Gtk::Widget::Scroller" : {
-         "file" : "lib/Circle/FE/Gtk/Widget/Scroller.pm",
-         "version" : 0
+         "file" : "lib/Circle/FE/Gtk/Widget/Scroller.pm"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "license" : [
-         "http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt"
+         "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.130560"
+   "version" : "0.173170",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

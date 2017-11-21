@@ -1,3 +1,9 @@
+0.100000
+- Add two new options to support GLEP 0066 header types.
+
+0.005000
+- Slim down add_closes_header to a couple of lines.
+
 0.004000
 - Make --signoff optional.
 

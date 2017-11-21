@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 # PODNAME: eris-stdin-listener.pl
 # ABSTRACT: Simple wrapper to spawn workers for handling syslog stream
+## no critic (RequireEndWithOne)
 use strict;
 use warnings;
 
@@ -134,7 +135,7 @@ eris-stdin-listener.pl - Simple wrapper to spawn workers for handling syslog str
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 AUTHOR
 

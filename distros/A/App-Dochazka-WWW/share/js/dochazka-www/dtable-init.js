@@ -49,8 +49,8 @@ define ([
         target.push('privHistoryDtable', {
             'name': 'privHistoryDtable',
             'type': 'dtable',
-            'menuText': 'Privilege (status) history',
-            'title': 'Privilege (status) history',
+            'menuText': 'Status history',
+            'title': 'Status history',
             'preamble': null,
             'aclProfile': 'passerby',
             'entriesRead': [entries.ePnick, entries.pHeffective, entries.pHpriv],
@@ -58,32 +58,6 @@ define ([
                 entries: ['actionPrivHistoryEdit']
             }
         });
-
-        target.push('schedHistoryDtable', {
-            'name': 'schedHistoryDtable',
-            'type': 'dtable',
-            'menuText': 'Schedule history',
-            'title': 'Schedule history',
-            'preamble': null,
-            'aclProfile': 'passerby',
-            'entriesRead': [entries.pHeffective, entries.sDid, entries.sDcode],
-            'miniMenu': {
-                entries: ['actionSchedHistoryEdit']
-            }
-        });
-
-        target.push('viewIntervalsDtable', {
-            'name': 'viewIntervalsDtable',
-            'type': 'dtable',
-            'menuText': 'View',
-            'title': 'Intervals in date range',
-            'preamble': null,
-            'aclProfile': 'passerby',
-            'entriesRead': [entries.iNdate, entries.iNtimerange, entries.iNiid, entries.acTcode],
-            'miniMenu': {
-                entries: null,
-            }
-        }); // viewIntervalsDtable
 
     };
 

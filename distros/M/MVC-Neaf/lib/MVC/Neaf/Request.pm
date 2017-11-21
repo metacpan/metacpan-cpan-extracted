@@ -3,7 +3,7 @@ package MVC::Neaf::Request;
 use strict;
 use warnings;
 
-our $VERSION = 0.17;
+our $VERSION = 0.18;
 
 =head1 NAME
 
@@ -47,7 +47,7 @@ use URI::Escape;
 use Encode;
 use HTTP::Headers;
 
-use MVC::Neaf::Util qw(http_date run_all_nodie);
+use MVC::Neaf::Util qw(http_date run_all_nodie canonize_path);
 use MVC::Neaf::Upload;
 use MVC::Neaf::Exception;
 
@@ -63,10 +63,12 @@ Restrictions MAY BE added in the future though.
 
 sub new {
     my ($class, %args) = @_;
+
+    # TODO 0.20 restrict params
     return bless \%args, $class;
 };
 
-# TODO A lot of copypasted methods down here.
+# TODO 0.90 A lot of copypasted methods down here.
 # Should we join them all? Maybe...
 
 =head2 client_ip()
@@ -122,6 +124,7 @@ Returns true if https:// is used, false otherwise.
 
 =cut
 
+# TODO 0.90 secure should be a flag, scheme should depend on it
 sub secure {
     my $self = shift;
     return $self->scheme eq 'https';
@@ -167,7 +170,7 @@ sub hostname {
     my $self = shift;
 
     return $self->{hostname} ||= $self->do_get_hostname || "localhost";
-    # TODO what if http://0/?
+    # TODO 0.90 what if http://0/?
 };
 
 =head2 port()
@@ -191,27 +194,51 @@ Returns the path part of the uri. Path is guaranteed to start with a slash.
 sub path {
     my $self = shift;
 
-    $self->set_full_path
-        unless exists $self->{path};
+    return $self->{path} ||= $self->do_get_path;
+};
 
-    return $self->{path};
+=head2 set_path( $new_path )
+
+Set path() to new value. This may be useful in C<pre_route> hook.
+
+Path will be canonized.
+
+If no argument given, or it is C<undef>, resets path() value to
+what was given to system value (if any).
+
+Returns self.
+
+=cut
+
+sub set_path {
+    my ($self, $new_path) = @_;
+
+    $self->{path} = defined $new_path
+        ? canonize_path( $new_path, 1 )
+        : $self->do_get_path;
+
+    $self;
 };
 
 =head2 script_name()
 
-The part of the request that mathed the route to the
+The part of the request that matched the route to the
 application being executed.
-Guaranteed to start with slash and be a prefix of C<path()>.
+
+Guaranteed to start with slash.
+Unless C<set_path> was called, it is a prefix of C<path()>.
+
+Not avilable before routing was applied to request.
 
 =cut
 
 sub script_name {
     my $self = shift;
 
-    $self->set_full_path
-        unless exists $self->{script_name};
+    carp "NEAF: script_name call before routing was applied is DEPRECATED"
+        unless $self->{route};
 
-    return $self->{script_name};
+    return $self->{script_name} ||= $self->path;
 };
 
 =head2 get_url_base()
@@ -293,18 +320,12 @@ B<NOTE> Experimental. This part of API is undergoing changes.
 sub path_info {
     my ($self) = @_;
 
-    if ($self->{no_path_info_regex}) {
-        # TODO all instances of no_path_info_regex must be killed in v.0.16,
-        # and undefined path_info die here
-        $self->_croak( "path_info() called, but path_info_regex validation was not set in route()" );
-    };
-
     return $self->{path_info};
 };
 
 =head2 set_full_path( $path )
 
-=head2 set_full_path( $script_name, $path_info, $no_path_info_regex=1|0 )
+=head2 set_full_path( $script_name, $path_info )
 
 Set new path elements which will be returned from this point onward.
 
@@ -316,13 +337,14 @@ by the underlying driver.
 
 Returns self.
 
-B<NOTE> This is an internal method, don't call it
-unless you know what you're doing.
+B<DEPRECATED> Use set_path() and set_path_info() instead.
 
 =cut
 
 sub set_full_path {
-    my ($self, $script_name, $path_info, $no_path_info_regex) = @_;
+    my ($self, $script_name, $path_info) = @_;
+
+    carp "NEAF: set_full_path() is DEPRECATED and will be removed in 0.20";
 
     if (!defined $script_name) {
         $script_name = $self->do_get_path;
@@ -338,7 +360,6 @@ sub set_full_path {
         $self->{path_info} = Encode::is_utf8($path_info)
                 ? $path_info
                 : decode_utf8(uri_unescape($path_info));
-        $self->{no_path_info_regex} = $no_path_info_regex;
     } elsif (!defined $self->{path_info}) {
         $self->{path_info} = '';
     };
@@ -346,6 +367,17 @@ sub set_full_path {
 
     $self->{path} = "$self->{script_name}"
         .(length $self->{path_info} ? "/$self->{path_info}" : '');
+    return $self;
+};
+
+sub _import_route {
+    my ($self, $route, $path, $path_info, $tail) = @_;
+
+    $self->{route}        = $route;
+    $self->{script_name}  = $path;
+    $self->{path_info}    = $path_info;
+    $self->{tail_split}   = $tail;
+
     return $self;
 };
 
@@ -368,8 +400,7 @@ sub set_path_info {
     $path_info =~ s#^/+##;
 
     $self->{path_info} = $path_info;
-    delete $self->{no_path_info_regex};
-    $self->{path} = "$self->{script_name}"
+    $self->{path} = $self->script_name
         .(length $self->{path_info} ? "/$self->{path_info}" : '');
 
     return $self;
@@ -381,7 +412,11 @@ Return param, if it passes regex check, default value or undef otherwise.
 
 The regular expression is applied to the WHOLE string,
 from beginning to end, not just the middle.
-Use '.*' if you really need none.
+Use '.*' if you really trust the data.
+
+B<EXPERIMENTAL> If C<param_regex> hash was given during route definition,
+C<$regex> MAY be omitted for params that were listed there.
+This feature is not stable yet, though. Use with care.
 
 If method other than GET/HEAD is being used, whatever is in the
 address line after ? is IGNORED.
@@ -398,15 +433,19 @@ interpreted as '', returns undef.
 sub param {
     my ($self, $name, $regex, $default) = @_;
 
-    $self->_croak( "validation regex is REQUIRED" )
+    $regex ||= $self->{route}{param_regex}{$name};
+
+    $self->_croak( "NEAF: param(): a validation regex is REQUIRED" )
         unless defined $regex;
 
     # Some write-through caching
     my $value = $self->_all_params->{ $name };
 
-    return (defined $value and $value =~ /^(?:$regex)$/s)
-        ? $value
-        : $default;
+    return $default if !defined $value;
+    return $value   if  $value =~ /^(?:$regex)$/s;
+
+    # TODO 0.30 die 422 if strict mode on
+    return $default;
 };
 
 =head2 url_param( name => qr/regex/ )
@@ -458,17 +497,22 @@ The name generally follows that of newer L<CGI> (4.08+).
 
 ALL values must match the regex, or an empty list is returned.
 
+B<EXPERIMENTAL> If C<param_regex> hash was given during route definition,
+C<$regex> MAY be omitted for params that were listed there.
+This feature is not stable yet, though. Use with care.
+
 B<EXPERIMENTAL> This method's behaviour MAY change in the future.
 Please be careful when upgrading.
 
 =cut
 
-# TODO merge multi_param, param, and _all_params
+# TODO 0.90 merge multi_param, param, and _all_params
 # backend mechanism.
 
 sub multi_param {
     my ($self, $name, $regex) = @_;
 
+    $regex ||= $self->{route}{param_regex}{$name};
     $self->_croak( "validation regex is REQUIRED" )
         unless defined $regex;
 
@@ -598,8 +642,8 @@ This will be removed in v.0.20+.
 sub set_default {
     my ($self, %args) = @_;
 
-    # TODO remove in v.0.20
-    carp "Neaf:set_default() DEPRECATED. Use path-based defaults or stash()";
+    # TODO 0.20 remove
+    carp "NEAF:set_default() DEPRECATED. Use path-based defaults or stash()";
     foreach (keys %args) {
         defined $args{$_}
             ? $self->{defaults}{$_} = $args{$_}
@@ -737,7 +781,7 @@ sub set_cookie {
     defined $opt{regex} and $cook !~ /^$opt{regex}$/
         and $self->_croak( "output value doesn't match regex" );
     if (exists $opt{expires}) {
-        carp( "set_cookie(): 'expires' parameter detected, use 'expire' instead" );
+        carp( "NEAF set_cookie(): 'expires' parameter detected, use 'expire' instead" );
         $opt{expire} = delete $opt{expires};
     };
 
@@ -751,7 +795,7 @@ sub set_cookie {
         $opt{domain}, $opt{path}, $opt{expire}, $opt{secure}, $opt{httponly}
     ];
 
-    # TODO also set cookie_in for great consistency, but don't
+    # TODO 0.90 also set cookie_in for great consistency, but don't
     # break reading cookies from backend by cache vivification!!!
     return $self;
 };
@@ -790,7 +834,7 @@ sub format_cookies {
     foreach my $name (keys %$cookies) {
         my ($cook, $regex, $domain, $path, $expire, $secure, $httponly)
             = @{ $cookies->{$name} };
-        next unless defined $cook; # TODO erase cookie if undef?
+        next unless defined $cook; # TODO 0.90 erase cookie if undef?
 
         $path = "/" unless defined $path;
         defined $expire and $expire = http_date( $expire );
@@ -839,7 +883,7 @@ sub error {
 Redirect to a new location.
 
 This throws an MVC::Neaf::Exception object.
-See C<error()> dsicussion above.
+See C<error()> discussion above.
 
 =cut
 
@@ -847,8 +891,10 @@ sub redirect {
     my ($self, $location) = @_;
 
     die MVC::Neaf::Exception->new(
-        -status => 302,
+        -status   => 302,
         -location => $location,
+        -content  => 'See '.$location,
+        -type     => 'text/plain',
     );
 };
 
@@ -1042,7 +1088,7 @@ sub save_session {
     return $self
         unless exists $self->{session_engine};
 
-    # TODO set "save session" flag, save later
+    # TODO 0.90 set "save session" flag, save later
     my $id = $self->get_cookie( $self->{session_cookie}, $self->{session_regex} );
     $id ||= $self->{session_engine}->get_session_id();
 
@@ -1078,8 +1124,8 @@ sub delete_session {
     return $self;
 };
 
-# TODO This is awkward, but... Maybe optimize later
-# TODO Replace with callback generator (managed by cb anyway)
+# TODO 0.90 This is awkward, but... Maybe optimize later
+# TODO 0.90 Replace with callback generator (managed by cb anyway)
 sub _set_session_handler {
     my ($self, $data) = @_;
     $self->{session_engine} = $data->[0];
@@ -1312,10 +1358,32 @@ sub clear {
     return $self;
 }
 
-=head1 METHODS FOR DRIVER DEVELOPERS
+=head1 DEVELOPER METHODS
 
-The following methods are to be used/redefined by backend writers
-(e.g. if someone makes Request subclass for FastCGI or Microsoft IIS).
+=head2 endpoint_origin
+
+Returns file:line where the route was created.
+
+B<EXPERIMENTAL>. Name and semantics subject to change.
+
+=cut
+
+sub endpoint_origin {
+    my $self = shift;
+
+    return '(unspecified file):0' unless $self->{route}{caller};
+    return join ":", @{ $self->{route}{caller} }[1,2];
+};
+
+# If called outside user's code, carp() will point at http server
+#     which is misleading.
+# So make a warn/die message that actually blames user's code
+sub _message {
+    my ($self, $message) = @_;
+
+    return "NEAF: $message in handler ".$self->method." '".$self->script_name
+        ."' at ".$self->endpoint_origin."\n";
+};
 
 =head2 execute_postponed()
 
@@ -1335,7 +1403,8 @@ sub execute_postponed {
 
     $self->{continue}++;
     run_all_nodie( delete $self->{response}{postponed}, sub {
-            carp "WARN ".(ref $self).": postponed action failed: $@"
+            # TODO 0.30 prettier error handling
+            carp "NEAF WARN ".(ref $self).": postponed action failed: $@";
         }, $self );
 
     return $self;
@@ -1344,6 +1413,9 @@ sub execute_postponed {
 sub DESTROY {
     my $self = shift;
 
+    # TODO 0.90 Check that request isn't destroyed because of an exception
+    # during sending headers
+    # In this case we're gonna fail silently with cryptic warnings. :(
     $self->execute_postponed
         if (exists $self->{response}{postponed});
 };

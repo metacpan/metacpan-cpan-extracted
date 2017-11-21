@@ -21,12 +21,12 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : 0
+            "ExtUtils::MakeMaker" : 6.48
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : 0
+            "ExtUtils::MakeMaker" : 6.48
          }
       },
       "runtime" : {
@@ -42,8 +42,24 @@
             "YAML::XS" : "0.41",
             "threads" : "1.8"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
       }
    },
    "release_status" : "stable",
-   "version" : "0.0.1"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mydan/mayi/issues"
+      },
+      "homepage" : "https://github.com/mydan/mayi",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/mydan/mayi.git",
+         "web" : "https://github.com/mydan/mayi"
+      }
+   },
+   "version" : "0.1.9"
 }

@@ -1,5 +1,5 @@
 package Moose::Exception::RolesDoNotSupportRegexReferencesForMethodModifiers;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -16,4 +16,5 @@ sub _build_message {
     "Roles do not currently support regex references for ".$self->modifier_type." method modifiers";
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

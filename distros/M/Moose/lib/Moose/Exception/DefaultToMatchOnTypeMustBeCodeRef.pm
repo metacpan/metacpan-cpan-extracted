@@ -1,5 +1,5 @@
 package Moose::Exception::DefaultToMatchOnTypeMustBeCodeRef;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -29,4 +29,5 @@ sub _build_message {
     return "Default case must be a CODE ref, not $default";
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

@@ -1,5 +1,5 @@
 package Moose::Exception::IllegalInheritedOptions;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -19,4 +19,5 @@ sub _build_message {
     "Illegal inherited options => (".$self->_join_options(', ').")";
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

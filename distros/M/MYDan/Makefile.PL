@@ -37,6 +37,10 @@ our %PREREQ_PM =
     'IO::Pty' => 1.12,
     'Term::Size' => 0,
     'File::Temp' => 0,
+    'Authen::OATH' => 0,#box
+    'Convert::Base32' => 0,#box
+    'Net::IP::Match::Regexp' => 0,#box
+    'Data::Validate::IP' => 0,#box
 );
 
 our $PKG_NAME = 'mydan';
@@ -50,7 +54,7 @@ WriteMakefile
     ABSTRACT_FROM => $PKG_FILE,
     PREREQ_PM     => \%PREREQ_PM, 
     dist          => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean         => { FILES => [ "$PKG_NAME-*", "dan.i", "box.i", qw( *.in *.ex ) ] },
+    clean         => { FILES => [ "$PKG_NAME-*", qw( dan.i box.i bin.i def.i *.in *.ex ) ] },
     ( $ExtUtils::MakeMaker::VERSION >= 6.3002 ? ( LICENSE => 'perl' ) : () ),
 );
 

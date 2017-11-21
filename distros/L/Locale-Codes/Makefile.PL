@@ -14,6 +14,7 @@ my $ConvVers= $ExtUtils::MakeMaker::VERSION;
 
 my %module_prereq = (
    'Carp'                     => '0',
+   'if'                       => '0',
    'utf8'                     => '0',
 );
 
@@ -38,7 +39,7 @@ if ($EU_MM_V < 6.64) {
 
 WriteMakefile(
    NAME             => "Locale::Codes",
-   VERSION          => "3.54",
+   VERSION          => "3.55",
    ABSTRACT         => "a distribution of modules to handle locale codes",
    LICENSE          => "perl",
    ($EU_MM_V >= 6.48
@@ -59,111 +60,111 @@ WriteMakefile(
           provides     => {
              'Locale::Codes' => {
                 file    => 'Codes.pm',
-                version => '3.54',
+                version => '3.55',
              },
              'Locale::Codes::Constants' => {
                 file    => 'Constants.pm',
-                version => '3.54',
+                version => '3.55',
              },
              'Locale::Codes::Country' => {
                 file    => 'Country.pm',
-                version => '3.54',
+                version => '3.55',
              },
              'Locale::Codes::Country_Codes' => {
                 file    => 'Country_Codes.pm',
-                version => '3.54',
+                version => '3.55',
              },
              'Locale::Codes::Country_Retired' => {
                 file    => 'Country_Retired.pm',
-                version => '3.54',
+                version => '3.55',
              },
              'Locale::Codes::Currency' => {
                 file    => 'Currency.pm',
-                version => '3.54',
+                version => '3.55',
              },
              'Locale::Codes::Currency_Codes' => {
                 file    => 'Currency_Codes.pm',
-                version => '3.54',
+                version => '3.55',
              },
              'Locale::Codes::Currency_Retired' => {
                 file    => 'Currency_Retired.pm',
-                version => '3.54',
+                version => '3.55',
              },
              'Locale::Codes::LangExt' => {
                 file    => 'LangExt.pm',
-                version => '3.54',
+                version => '3.55',
              },
              'Locale::Codes::LangExt_Codes' => {
                 file    => 'LangExt_Codes.pm',
-                version => '3.54',
+                version => '3.55',
              },
              'Locale::Codes::LangExt_Retired' => {
                 file    => 'LangExt_Retired.pm',
-                version => '3.54',
+                version => '3.55',
              },
              'Locale::Codes::LangFam' => {
                 file    => 'LangFam.pm',
-                version => '3.54',
+                version => '3.55',
              },
              'Locale::Codes::LangFam_Codes' => {
                 file    => 'LangFam_Codes.pm',
-                version => '3.54',
+                version => '3.55',
              },
              'Locale::Codes::LangFam_Retired' => {
                 file    => 'LangFam_Retired.pm',
-                version => '3.54',
+                version => '3.55',
              },
              'Locale::Codes::LangVar' => {
                 file    => 'LangVar.pm',
-                version => '3.54',
+                version => '3.55',
              },
              'Locale::Codes::LangVar_Codes' => {
                 file    => 'LangVar_Codes.pm',
-                version => '3.54',
+                version => '3.55',
              },
              'Locale::Codes::LangVar_Retired' => {
                 file    => 'LangVar_Retired.pm',
-                version => '3.54',
+                version => '3.55',
              },
              'Locale::Codes::Language' => {
                 file    => 'Language.pm',
-                version => '3.54',
+                version => '3.55',
              },
              'Locale::Codes::Language_Codes' => {
                 file    => 'Language_Codes.pm',
-                version => '3.54',
+                version => '3.55',
              },
              'Locale::Codes::Language_Retired' => {
                 file    => 'Language_Retired.pm',
-                version => '3.54',
+                version => '3.55',
              },
              'Locale::Codes::Script' => {
                 file    => 'Script.pm',
-                version => '3.54',
+                version => '3.55',
              },
              'Locale::Codes::Script_Codes' => {
                 file    => 'Script_Codes.pm',
-                version => '3.54',
+                version => '3.55',
              },
              'Locale::Codes::Script_Retired' => {
                 file    => 'Script_Retired.pm',
-                version => '3.54',
+                version => '3.55',
              },
              'Locale::Country' => {
                 file    => 'Country.pm',
-                version => '3.54',
+                version => '3.55',
              },
              'Locale::Currency' => {
                 file    => 'Currency.pm',
-                version => '3.54',
+                version => '3.55',
              },
              'Locale::Language' => {
                 file    => 'Language.pm',
-                version => '3.54',
+                version => '3.55',
              },
              'Locale::Script' => {
                 file    => 'Script.pm',
-                version => '3.54',
+                version => '3.55',
              },
 
           },
@@ -189,6 +190,6 @@ WriteMakefile(
 
 
 
-   INSTALLDIRS      => (($] >= 5.007003) ? 'perl' : 'site'),
+   INSTALLDIRS      => (($] >= 5.007003 && $] < 5.012) ? 'perl' : 'site'),
 
 );

@@ -1,7 +1,6 @@
 package App::JESP::Plan;
-$App::JESP::Plan::VERSION = '0.013';
+$App::JESP::Plan::VERSION = '0.015';
 use Moose;
-use JSON;
 use File::Slurp;
 
 use App::JESP::Patch;
@@ -22,7 +21,7 @@ has 'raw_data' => ( is => 'ro', isa => 'HashRef' , lazy_build => 1);
 sub _build_raw_data{
     my ($self) = @_;
     my $content = File::Slurp::read_file( $self->file() );
-    return JSON::decode_json( $content );
+    return $self->jesp->json->decode( $content );
 }
 
 sub _build_patches{

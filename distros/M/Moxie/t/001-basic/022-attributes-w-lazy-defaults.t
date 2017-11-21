@@ -12,7 +12,8 @@ use Test::More;
 =cut
 
 package Foo {
-    use Moxie;
+    use Moxie
+        traits => [':experimental'];
 
     extends 'Moxie::Object';
 
@@ -20,7 +21,7 @@ package Foo {
 
     my sub _bar : private;
 
-    sub BUILDARGS : init( bar? => _bar );
+    sub BUILDARGS : strict( bar? => _bar );
 
     sub init_bar ($self) { _bar = 200 }
     sub bar      ($self) { _bar //= 333 }

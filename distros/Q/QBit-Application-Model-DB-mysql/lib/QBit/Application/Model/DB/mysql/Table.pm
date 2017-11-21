@@ -1,5 +1,5 @@
 package QBit::Application::Model::DB::mysql::Table;
-$QBit::Application::Model::DB::mysql::Table::VERSION = '0.015';
+$QBit::Application::Model::DB::mysql::Table::VERSION = '0.017';
 use qbit;
 
 use base qw(QBit::Application::Model::DB::Table);
@@ -195,42 +195,6 @@ sub add {
     } @{$self->primary_key || []};
 
     return @res == 1 ? $res[0] : \@res;
-}
-
-sub edit {
-    my ($self, $pkeys_or_filter, $data, %opts) = @_;
-
-    my @fields = keys(%$data);
-
-    my $sql = 'UPDATE ' . $self->quote_identifier($self->name) . "\n" . 'SET ';
-
-    my $fields = $self->_fields_hs();
-
-    my @locales = keys(%{$self->db->get_option('locales', {})});
-
-    my $ssql             = '';
-    my @real_field_names = ();
-    my @field_data       = ();
-    foreach my $name (@fields) {
-        $ssql .= ",\n    " unless $ssql;
-        if ($fields->{$name}{'i18n'} && @locales) {
-            foreach my $locale (@locales) {
-                push(@real_field_names, "${name}_${locale}");
-                push(@field_data, ref($data->{$name}) eq 'HASH' ? $data->{$name}{$locale} : $data->{$name});
-            }
-        } else {
-            push(@real_field_names, $name);
-            push(@field_data,       $data->{$name});
-        }
-    }
-    $sql .= join(",\n    ", map {$self->quote_identifier($_) . ' = ?'} @real_field_names) . "\n";
-
-    my $query = $self->db->query()->select(table => $self, fields => {});
-    my $filter_expr = $query->filter($self->_pkeys_or_filter_to_filter($pkeys_or_filter))->expression();
-    my ($filter_sql, @filter_data) = $query->_field_to_sql(undef, $filter_expr, $query->_get_table($self));
-    $sql .= 'WHERE ' . $filter_sql;
-
-    return $self->db->_do($sql, @field_data, @filter_data);
 }
 
 sub delete {
@@ -496,29 +460,6 @@ B<Example:>
   $app->db->users->delete([1]);
   $app->db->users->delete({id => 1});
   $app->db->users->delete($app->db->filter({login => 'Login'}));
-
-=head2 edit
-
-B<Arguments:>
-
-=over
-
-=item *
-
-B<$pkeys_or_filter> - perl variables or object (QBit::Application::Model::DB::filter)
-
-=item *
-
-B<$data> - reference to hash
-
-=back
-
-B<Example:>
-
-  $app->db->users->edit(1, {login => 'LoginNew'});
-  $app->db->users->edit([1], {login => 'LoginNew'});
-  $app->db->users->edit({id => 1}, {login => 'LoginNew'});
-  $app->db->users->edit($app->db->filter({login => 'Login'}), {login => 'LoginNew'});
 
 =head2 replace
 

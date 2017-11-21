@@ -1,0 +1,219 @@
+2017-11-20T23:02:47+08:00 : 发布0.1.9版本到cpan.org
+2017-11-20T23:00:40+08:00 : 把协议中的keepalive 改成 MYDan_$version
+2017-11-20T22:48:51+08:00 : tools/mrsync MYDan::Agent::Mrsync 添加--chown --chmod --cc参数
+2017-11-20T22:45:12+08:00 : tools/load MYDan::Agent::Load 添加--chown --chmod --cc参数
+2017-11-20T22:39:47+08:00 : tools/{load,mrsync,grsync} 默认用户改成id -un，不使用logname
+2017-11-20T22:37:05+08:00 : 添加--cc参数，默认情况下不dump文件的属性，添加-—cc继承文件属性，或单独--chown --chmod 控制
+2017-11-20T22:33:22+08:00 : agent/code/{dump,sdump} 修改，先chmod和chown 后 rename，失败的情况不保留文件。同时失败的时候把信息返回给 客户端
+2017-11-20T22:28:03+08:00 : fix 在todo的任务中，sp改成dp
+2017-11-20T22:26:03+08:00 : 修改mydan安装路径
+2017-11-20T22:24:03+08:00 : MYDan::VSSH::Comp  Bareword "Term::Completion" not allowed while "strict subs" in use
+2017-11-20T13:06:25+08:00 : 发布0.1.8版本到cpan.org
+2017-11-20T13:04:06+08:00 : 携带的data数据进行压缩传输，同时允许data是数组或者hash等
+2017-11-20T12:59:51+08:00 : 通过api请求权限时，不提交data数据，请求结束后拼接回来
+2017-11-19T16:04:56+08:00 : agent dump插件使用不加密数据,原来的dump改名成sdump
+2017-11-19T15:59:02+08:00 : 修复升级agent协议时引入的bug
+2017-11-19T14:27:04+08:00 : 升级agent协议，在头部可以携带不用加密的数据
+2017-11-18T23:24:30+08:00 : 发布0.1.7版本到cpan.org
+2017-11-18T23:01:52+08:00 : add resources into META.json
+2017-11-18T22:50:56+08:00 : add test.requires in META.json
+2017-11-18T22:44:49+08:00 : ExtUtils::MakeMaker 指定版本 6.48
+2017-11-18T22:13:56+08:00 : 发布0.1.6版本到cpan.org
+2017-11-18T22:12:44+08:00 : 删除MANIFEST,在上传脚本中自动生成
+2017-11-18T22:11:09+08:00 : add t/00-load.t t/manifest.t
+2017-11-18T15:04:29+08:00 : 发布0.1.5版本到cpan.org
+2017-11-18T15:03:21+08:00 : 修改MANIFEST
+2017-11-18T14:30:50+08:00 : 发布0.1.4版本到cpan.org
+2017-11-18T14:27:48+08:00 : delete dan/monitor/conf/collect/project1:dic1
+2017-11-18T14:25:55+08:00 : add MANIFEST
+2017-11-18T12:43:40+08:00 : 发布0.1.3版本到cpan.org
+2017-11-18T12:40:44+08:00 : 删除Collector中的版本标志
+2017-11-18T12:27:35+08:00 : use_strict: MYDan::Collector::Parse, MYDan::Collector::Stat::Ping, MYDan::VSSH::Comp;use_warnings:MYDan::Agent::Path, MYDan::Collector::Parse, MYDan::Collector::Stat::Ping
+2017-11-18T10:21:10+08:00 : 发布0.1.2版本到cpan.org
+2017-11-18T10:20:30+08:00 : cpan安装时不默认全部安装，需要指定环境变量来确定安装，安装不在mydan目录下时工具会安装在/opt/mydan
+2017-11-18T02:38:49+08:00 : 发布0.1.1到cpan.org
+2017-11-18T02:37:43+08:00 : 安装路径不在mydan下面时，默认安装在/opt/mydan下,cpan install MYDan 默认安装在/opt/mydan
+2017-11-18T01:20:41+08:00 : Agent::Grsync 在子网中同步时如果dst为空，跳过
+2017-11-18T00:33:13+08:00 : fix bug MYDan::Agent::Proxy
+2017-11-17T23:25:48+08:00 : 发布0.1.0版本到cpan.org
+2017-11-17T23:24:31+08:00 : 添加tools/grsync， 全局批量同步工具，可以在多个隔离网络中通过代理进行同步
+2017-11-17T23:15:41+08:00 : 修改Agent::Load 和agent/code/load，同步文件owner时候以owner名为主，而不用uid,gid
+2017-11-17T23:05:43+08:00 : 升级Agent::Proxy
+2017-11-16T22:55:07+08:00 : 发布0.0.7版本到cpan.org
+2017-11-16T22:40:22+08:00 : 上一次更新误删除bin/mydan中的git工具信息
+2017-11-16T22:35:25+08:00 : 安装时允许添加别名，把mydan安装成别的名字
+2017-11-16T21:37:27+08:00 : mydan协议下载数据时如果数据已经存在而且md5一致则不再重复下载
+2017-11-16T21:34:57+08:00 : mydan协议下载数据时候临时数据放到mydan/tmp下
+2017-11-16T21:30:41+08:00 : Util::Percent 进度显示修改
+2017-10-25T21:26:13+08:00 : add git 工具，可以指定sshkey
+2017-10-18T21:25:16+08:00 : toosl/mssh 把默认用户改成当前有效用户
+2017-10-17T21:44:56+08:00 : Agent::Load 添加解析hosts
+2017-10-17T20:55:04+08:00 : release 工具多打包etc/util目录
+2017-10-17T20:53:22+08:00 : MYDan::Util::Hosts 匹配域名前缀是数字
+2017-10-17T20:52:08+08:00 : Agent::Client.pm 添加解析hosts
+2017-10-17T10:15:29+08:00 : tools/rsync 运行用户名中有@ ，如果rsync -av foo lijinfeng2011@gmail.com@host:/tmp/
+2017-10-16T20:50:11+08:00 : update MIO:SSH ,debug 时显示过滤掉的信息
+2017-10-14T23:32:01+08:00 : fix bug Util::Command
+2017-10-14T23:23:05+08:00 : bin/mydan 添加dan和box之间的切换开关
+2017-10-14T22:45:19+08:00 : bin/mydan 添加显示详细信息
+2017-10-14T19:53:59+08:00 : MIO::SSH 过滤掉最后一行 Last Login ... 信息
+2017-10-14T14:19:25+08:00 : bin/mydan 添加go别名g
+2017-10-14T13:05:14+08:00 : add rsync to bin/mydan
+2017-10-14T13:01:26+08:00 : tools/srsync rename rsync
+2017-10-14T11:20:52+08:00 : bin/mydan 调用的命令首字母为大写为调试模式
+2017-10-14T01:12:06+08:00 : sync 如果有锁文件时候跳过同步
+2017-10-13T23:32:41+08:00 : bin/mydan 添加whois 别名w
+2017-10-13T23:09:18+08:00 : bin/mydan,mydan.node 添加别名
+2017-10-13T22:49:57+08:00 : gateway 添加oo参数
+2017-10-13T22:41:36+08:00 : 修改$ENV 正则,在不同版本的perl中兼容
+2017-10-13T22:27:40+08:00 : bin/mydan  config命令添加box路径
+2017-10-13T22:25:18+08:00 : Util::Sync 添加同步pass
+2017-10-13T22:23:03+08:00 : MYDan::VSSH::Execute  sudo 失败后不执行后续命令
+2017-10-12T22:52:32+08:00 : Util::ExpSSH 支持多expect
+2017-10-12T22:36:43+08:00 : MIO::SSH 添加debug信息输出
+2017-10-12T21:55:43+08:00 : mssh 统一输出格式
+2017-10-12T21:29:15+08:00 : Util::MIO::SSH 支持多expect 和googlecode
+2017-10-12T21:23:02+08:00 : Util::Pass添加处理环境变量
+2017-10-12T21:20:51+08:00 : tools/mcmd 输出结果格式调整成统一格式
+2017-10-12T21:18:45+08:00 : MIO::CMD 不用poll 兼容性不好, POLLHUP有问题
+2017-10-12T21:14:18+08:00 : tools/gateway添加restart
+2017-10-12T21:10:10+08:00 : srsync 优化，走代理
+2017-10-12T21:05:32+08:00 : 修改sync 多同步几个文件
+2017-10-12T21:01:18+08:00 : util/proxy 默认配置文件
+2017-10-11T22:34:51+08:00 : add gateway 功能
+2017-10-11T22:28:11+08:00 : MYDan::MIO::SSH 添加代理
+2017-10-11T21:58:58+08:00 : MYDan::Util::ExpSSH 添加代理
+2017-10-11T21:50:47+08:00 : add MYDan::Util::Proxy
+2017-10-01T22:38:53+08:00 : Agent::Client bug 修复,并发数少的时候会提前结束
+2017-10-01T22:05:17+08:00 : MIO::SSH 运行时显示进度
+2017-10-01T21:56:49+08:00 : MIO::SSH ctrl + c 不直接退出,返回已经运行的信息
+2017-10-01T21:43:15+08:00 : VSSH/Execute 传递%run
+2017-10-01T20:02:44+08:00 : mcmd 输出结果不把操作对象替换成{}
+2017-10-01T19:58:58+08:00 : Util::Hosts.pm 指定解析etc/hosts用\n做分隔符
+2017-10-01T19:55:16+08:00 : mcmd 添加解析 etc/hosts
+2017-10-01T19:29:24+08:00 : 允许没有 etc/hosts 文件
+2017-10-01T18:59:50+08:00 : Util:MIO::SSH 不替换返回结果中的操作对象成{}
+2017-10-01T13:29:38+08:00 : box/tools/vssh 添加解析 etc/hosts
+2017-09-30T23:28:03+08:00 : Util::Hosts 添加dump函数
+2017-09-30T23:11:29+08:00 : whois 工具加到mydan命令提示中
+2017-09-30T23:08:38+08:00 : box 中添加 tools/whois
+2017-09-30T23:07:33+08:00 : add dan/tools/whios 用于查询机器和模糊查询机器信息
+2017-09-30T15:46:57+08:00 : add tools/config to box
+2017-09-30T15:45:41+08:00 : tools/config 添加通过命令修改配置功能
+2017-09-30T11:34:27+08:00 : etc/hosts.private 在sync后追加的内容
+2017-09-30T00:39:59+08:00 : ExpSSH.pm 多次筛选
+2017-09-30T00:28:15+08:00 : go 多次筛选机器
+2017-09-29T23:47:54+08:00 : update go.example
+2017-09-29T23:43:57+08:00 : go 允许把敏感信息放到环境变量中
+2017-09-29T23:18:28+08:00 : 添加go配置文件的例子 go.example
+2017-09-29T22:56:08+08:00 : box/tools/vssh 急救箱中的vssh工具显示命令状态
+2017-09-29T21:06:13+08:00 : tools/go 添加grep
+2017-09-29T21:03:56+08:00 : add range 到tools/go
+2017-09-29T21:01:38+08:00 : add Authen::OATH Convert::Base32 到Makefile.PL
+2017-09-29T20:58:57+08:00 : Go.pm ExpSSH.pm添加yes应答
+2017-09-29T14:04:15+08:00 : mydan 命令用＊号标识已经安装的命令
+2017-09-29T13:50:24+08:00 : go 没配置跳板机信息时，没参数情况下显示提示
+2017-09-29T13:45:45+08:00 : go 工具没有参数时默认登陆跳板机
+2017-09-28T20:47:31+08:00 : box/tools/vssh add --sudo
+2017-09-28T13:12:19+08:00 : fix bin/mydan 添加box中的range
+2017-09-28T13:10:58+08:00 : box/.config 也需要api地址用于下载配置
+2017-09-28T13:03:05+08:00 : add node/bin/show
+2017-09-28T12:59:48+08:00 : add sync 用于同步配置
+2017-09-27T23:22:44+08:00 : mydan go 添加解析hosts
+2017-09-27T21:03:36+08:00 : 删除默认密码配置
+2017-09-27T13:24:57+08:00 : box/tools/vssh 默认用户不用logname，用effective user name
+2017-09-27T13:15:28+08:00 : box/tools/vssh去除sudo参数
+2017-09-27T12:54:08+08:00 : MIO::SSH.pm 过去部分标准输出
+2017-09-27T12:52:48+08:00 : fix MYDan::Command
+2017-09-26T21:50:08+08:00 : SSH.pm 添加alias
+2017-09-26T21:46:35+08:00 : go 工具添加alias
+2017-09-26T21:38:31+08:00 : mydan/bin 中添加alias unalias
+2017-09-26T21:36:41+08:00 : box 中添加alias unalias
+2017-09-26T21:34:13+08:00 : add alias unalias
+2017-09-25T22:21:45+08:00 : 添加mydan/bin 用于放到PATH环境变量中
+2017-09-25T13:03:59+08:00 : fix Util::ExpSSH, 通过返回码判断host不准确
+2017-09-25T11:11:16+08:00 : tools/rcall 使用vssh的打印结果函数
+2017-09-24T12:59:51+08:00 : node/bin/* 改成不必sudo
+2017-09-24T02:19:46+08:00 : tools/go 添加解析 etc/hosts
+2017-09-24T02:19:01+08:00 : fix Hosts.pm正则错误
+2017-09-24T01:57:53+08:00 : add etc/hosts 和 Util::Hosts 用于mydan系统间自定义hosts文件
+2017-09-23T12:16:08-05:00 : Merge pull request #10 from g112wdh/wdh_dev
+2017-09-23T23:07:01+08:00 : 恢复code/dump 上次提交错误
+2017-09-23T23:02:27+08:00 : set dump default chmod and chown
+2017-09-17T18:02:28+08:00 : rcall add --port
+2017-09-17T00:36:57+08:00 : Revert "修改Proxy.pm 增加default的代理（0.0.0.0/0)"
+2017-09-17T00:36:41+08:00 : Revert "add range"
+2017-09-17T00:19:06+08:00 : add srsync for rsync single host password come from MYDan::Util::Pass
+2017-09-05T21:48:33+08:00 : add range
+2017-09-05T21:37:56+08:00 : 修改Proxy.pm 增加default的代理（0.0.0.0/0) 修改etc/agent/proxy 变成yaml的格式 使key 支持正则和range（Node 表达式）
+2017-08-29T21:33:04+08:00 : 如果解压三次失败重新下载安装包
+2017-08-20T00:56:56+08:00 : add META.json
+2017-08-20T00:51:45+08:00 : dan/tools/release 添加$mydan/etc/agent/proxy
+2017-08-20T00:47:12+08:00 : tools/release 打包时同时打可执行包
+2017-08-18T00:27:30+08:00 : 修改Agent/Query.pm中关于user的正则
+2017-08-17T11:08:57-05:00 : Merge pull request #8 from g112wdh/wdh_dev
+2017-08-18T00:08:06+08:00 : 订阅支持 订阅＊ 或者 *abc*
+2017-08-18T00:05:15+08:00 : Makefile 中添加File::Temp
+2017-08-18T00:03:51+08:00 : agent/code/apps 支持其它脚本,如python
+2017-08-16T16:33:06+08:00 : fix $user - like j-suncongcong
+2017-08-13T23:08:24+08:00 : update m.sync
+2017-08-13T23:07:37+08:00 : add deploy/code/b.sync
+2017-08-13T23:03:59+08:00 : 修改deploy信号问题
+2017-08-13T22:54:11+08:00 : fix deploy/code/m.lock
+2017-08-13T19:26:40+08:00 : agent/code/collector 只返回TEST数据
+2017-08-13T12:01:07+08:00 : update mayi/dan/agent/code/collector
+2017-08-13T09:33:43+08:00 : deploy发往subscribe的消息改成项目维度
+2017-08-13T01:38:00+08:00 : clean deploy/lib/DumpCrontab.pm
+2017-08-13T00:58:49+08:00 : deploy添加m.check 用于检查服务
+2017-08-13T00:46:22+08:00 : agent添加check功能
+2017-08-12T18:58:04+08:00 : fix  MYDan::Subscribe::Conf
+2017-08-12T18:18:02+08:00 : 清理deploy/service/{clear-alarm,dump_crontab,dump_watch}
+2017-08-12T18:16:37+08:00 : deploy中的watch数据输出到订阅模块
+2017-08-12T16:37:58+08:00 : 更新deploy中的demo配置文件
+2017-08-12T16:34:20+08:00 : 删除deploy中的m.sync和m.test插件
+2017-08-12T16:29:54+08:00 : 更新deploy中m.mcmd插件
+2017-08-12T15:51:24+08:00 : Util::MIO::CMD收集子进程返回码
+2017-08-12T15:15:58+08:00 : 发布添加m.deploy插件
+2017-08-12T15:07:56+08:00 : agent deploy 插件结束时输出done.
+2017-08-12T14:05:22+08:00 : 更新发布中的添加m.apps插件
+2017-08-12T13:52:30+08:00 : 更新发布中的m.exec插件
+2017-08-12T13:13:29+08:00 : 给ns/deploy/bin中的工具添加命令提示
+2017-08-12T12:52:19+08:00 : 修改项目发布包的存放路径
+2017-08-12T11:33:08+08:00 : 修改project配置文件的路径到etc下
+2017-08-12T10:28:00+08:00 : agent读取proxy文件改成只读
+2017-08-12T10:14:16+08:00 : load 添加代理功能，同时改proxy名
+2017-08-06T23:42:02-05:00 : Merge pull request #7 from g112wdh/wdh_dev
+2017-08-04T18:43:37+08:00 : Merge branch 'wdh_dev' of https://github.com/g112wdh/mayi into wdh_dev
+2017-08-04T18:40:41+08:00 : 修改断点续传时候 打开文件的方式，之前的方式我测了有问题
+2017-08-02T23:15:21+08:00 : agent添加代理执行功能
+2017-07-27T08:20:32-05:00 : Merge pull request #6 from MYDan/release-0.0.1-dev
+2017-07-27T08:12:01-05:00 : Merge pull request #5 from g112wdh/wdh_dev
+2017-07-27T21:06:55+08:00 : 减少stat次数
+2017-07-27T14:10:05+08:00 : 增加load 使下载来的 包含chmod 和chown （通过uid gid 来设定，如果本机没有响应的用户的话，直接就是数字的uid和gid了）
+2017-07-19T22:08:53+08:00 : 添加agent代理的默认配置
+2017-07-19T22:07:15+08:00 : add agent.porxy to .config
+2017-07-19T22:02:29+08:00 : 添加Porxy.pm
+2017-07-18T23:44:57-05:00 : Merge pull request #3 from g112wdh/master
+2017-07-19T10:07:17+08:00 : fix shell
+2017-07-18T00:57:44+08:00 : 修改进度显示相关
+2017-07-17T23:59:00+08:00 : agent调用时显示进度
+2017-07-17T23:57:59+08:00 : 进度显示模块update
+2017-07-16T14:49:45+08:00 : agent调用error信息打在日志的同时返回给调用者
+2017-07-16T14:23:10+08:00 : clean
+2017-07-16T14:20:34+08:00 : 处理Agent/Client.pm的Ctrl＋C
+2017-07-16T08:58:11+08:00 : 解决linux中的用户名和sso中的用户名不一致问题
+2017-07-16T07:53:12+08:00 : mrsync 工具修改命令提示和添加gave参数
+2017-07-15T20:08:34+08:00 : 反弹shell识别窗口大小
+2017-07-15T19:00:17+08:00 : vssh提示符中添加机器数量信息
+2017-07-15T18:53:59+08:00 : 修改Makefile添加模块信息
+2017-07-15T18:04:24+08:00 : 反弹shell优化
+2017-07-15T12:54:19+08:00 : load工具是从某一个机器下载数据的工具，机器应该用host而不是range
+2017-07-14T23:30:29-05:00 : Merge pull request #2 from g112wdh/wdh_dev
+2017-07-15T00:26:05+08:00 : modify tools/shell agent/code/shell add pty color (can use top vim )
+2017-07-15T00:23:08+08:00 : Merge branch 'master' into wdh_dev
+2017-07-13T11:11:39+08:00 : Merge branch 'master' into wdh_dev
+2017-07-11T23:36:28-05:00 : Merge pull request #1 from g112wdh/wdh_dev
+2017-07-12T09:28:26+08:00 : git fetch upstream Merge branch 'master' into wdh_dev
+2017-07-11T22:39:55+08:00 : access user add group
+2017-07-11T22:26:46+08:00 : modify SSH.pm only output fix INSTALL.PL
+2017-06-08T20:32:53+08:00 : Initial commit

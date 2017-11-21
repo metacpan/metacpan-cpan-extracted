@@ -27,4 +27,4 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: git://github.com/mstratman/Barcode-DataMatrix.git
-version: 0.09
+version: 0.10

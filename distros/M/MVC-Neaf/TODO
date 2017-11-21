@@ -1,28 +1,37 @@
 SINCE VERSION | TBD VERSION | COMMENT
 
 -- next --
+0.17    0.20    MOD Add JSON body support w/form validation - pre-logic
+0.17    0.20    CLI --listen foo:1337 to run server
+0.17    0.20    API Add tail_split for path_info_regex captures
+0.17    0.20    REF get rid of CGI & apache backends
 
 -- backlog --
+0.17    0.20    TPL Predefined header/footer to spare user of boilerplate
+0.17    0.20    TPL More robust options for TPL view
+0.17    0.20    API wildcard parameters qr/.../ => qr/.../ (node_6 => 42)
+0.17    0.20    MOD Add well-known regexes from Regexp::Common to default Form
 0.16    0.20    MOD Oauth2 example/helper
 0.16    0.20    MOD OpenAPI plugin: model+in-spec+out-spec => swagger.txt+routes
-0.09    0.20    MOD Add form defaults populating BOTH raw and data
-0.14    0.20    API Add param regex to route defn
 0.16    0.20    TPL view default directory layout (./tpl or smth)
-0.02    0.20    DOC HOWTO add dumper to TT view (pre-render)
-0.12    0.30    MOD static file_regex, dir_regex
-0.16    0.30    API Add -charset for content encoding, cleanup -type handling
-0.10    0.30    DOC HOWTO SQL transactions via pre-logic/pre-content hooks
-0.15    0.30    DOC Make fun sugar main API, OO as backup
-0.16    0.30    MOD rewrite performance stats
-0.16    0.30    API Param strict mode - die 422 if bad params
-0.13    0.30    MOD static: X-Accel-Redirect (@cono)
-0.09    0.30    MOD Add predefined regexps to default FORM impl
+0.17    0.20    API Better and more robust exception handling
+0.15    0.20    DOC Make fun sugar main API, OO as backup
+0.13    0.30    TPL Add XSLate support
+0.16    0.30    API Add -charset for content encoding
 0.14    0.30    DEV iterate through get_routes w/callback
-0.08    0.30    API Req->reply to return immediately
-0.08    0.30    API Add Req alias methods for -dashed -return -keys
+0.13    0.30    MOD static: X-Accel-Redirect (@cono)
+0.16    0.30    API Param strict mode - die 422 if bad params
+0.17    0.30    MOD Add DSL sugar for forms
+0.12    0.30    MOD static file_regex, dir_regex
+0.09    0.30    MOD Add form defaults populating BOTH raw and data
+0.02    0.30    DOC HOWTO add dumper to TT view (pre-render)
+0.17    0.30    MOD form->data_hash instead of %{ form->data }
 0.07    0.30    MOD Add "cleanup" method to X::Session - for offline cleanups
+0.10    0.40    DOC HOWTO SQL transactions via pre-logic/pre-content hooks
+0.16    0.40    MOD rewrite performance stats
+0.08    0.40    API Add Req alias methods for -dashed -return -keys
+0.08    0.40    API Req->reply to return immediately
 0.13    0.90    NET Add FastCGI support
-0.13    0.90    TPL Add XSLate support
 0.04    0.90    REF Req https detection: change to is_secure? http:https.
 0.06    0.90    NET POST/PUT request HMAC via HTTP header
 0.07    0.90    API Periodic actions in webapp

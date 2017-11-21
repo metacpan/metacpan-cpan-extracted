@@ -1,3 +1,21 @@
+0.88     2017-11-21
+
+- Removed the MinimumPerl plugin. It scans all sorts of non-perl files (like
+  html) and comes up with bogus minimum versions because of that.
+
+
+0.87     2017-11-18
+
+- Add a has_xs configuration option. Normally this is determined by looking
+  for XS files in the distro, but I have a new distro where I need to set this
+  explicitly.
+
+
+0.86     2017-11-12
+
+- Added the MinimumPerl plugin.
+
+
 0.85     2017-03-14
 
 - Add Code::TidyAll::Plugin::SortLines::Naturally to develop prereqs for

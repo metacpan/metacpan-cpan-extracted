@@ -8,7 +8,8 @@ use Test::More;
 use MOP;
 
 package Foo {
-    use Moxie;
+    use Moxie
+        traits => [':experimental'];
 
     has _bar => sub { 'bar' };
 

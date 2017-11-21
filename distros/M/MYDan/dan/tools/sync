@@ -1,0 +1,14 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use MYDan::Node;
+use MYDan::Util::OptConf;
+use MYDan::Util::Sync;
+
+=head1 SYNOPSIS
+
+ $0 
+    
+=cut
+
+MYDan::Util::Sync->new(  MYDan::Util::OptConf->load() )->sync( @ARGV );

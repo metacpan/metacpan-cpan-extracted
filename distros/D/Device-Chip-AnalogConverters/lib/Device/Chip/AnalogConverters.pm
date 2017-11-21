@@ -1,5 +1,5 @@
 package Device::Chip::AnalogConverters;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 NAME
 
@@ -21,6 +21,10 @@ L<Device::Chip::ADS1115>
 =item *
 
 L<Device::Chip::LTC2400>
+
+=item *
+
+L<Device::Chip::MAX11200>
 
 =back
 

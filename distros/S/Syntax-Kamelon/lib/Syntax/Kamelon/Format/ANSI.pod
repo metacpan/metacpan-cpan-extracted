@@ -1,0 +1,56 @@
+=head1 NAME
+
+Syntax::Kamelon::Format::ANSI - Formatting module for ANSI output
+
+=head1 SYNOPSIS
+
+ $kam = Syntax::Kamelon->new(
+    syntax => 'Perl',
+    formatter => ['ANSI',
+       lineoffset => 1,
+    ],
+ );
+
+=head1 DESCRIPTION
+
+B<Syntax::Kamelon::Format::ANSI> provides a formatting interface for ANSI escape
+sequence output. It inherits B<Syntax::Kamelon::Format::Base>
+
+=head1 OPTIONS
+
+The constructor is called with a paired list of options as parameters. You can use
+the following options.
+
+=over 4
+
+=item B<theme> => $themename
+
+sets the color theme to be used for highlighting. 
+
+Available themes are: B<black>, B<bright_black>, B<blue>, B<bright_blue>, B<cyan>, 
+B<bright_cyan>, B<green>, B<bright_green>, B<magenta>, B<bright_magenta>, B<red>, 
+B<bright_red>, B<white>, B<bright_white>, B<yellow>, B<bright_yellow>. By default
+it is set to B<black>.
+
+If you think the predefined color themes are hideous you can always set your own
+colors by using the B<format_table> option. If you do this option is ignored.
+
+=back
+
+=head1 AUTHOR AND COPYRIGHT
+
+This module is written and maintained by:
+
+Hans Jeuken < hansjeuken at xs4all dot nl>
+
+Copyright (c) 2017 by Hans Jeuken, all rights reserved.
+
+Published under the GPLV3 license
+
+=head1 SEE ALSO
+
+B<Syntax::Kamelon>, B<Syntax::Kamelon::Builder>, B<Syntax::Kamelon::Debugger>, B<Syntax::Kamelon::Diagnostics>, B<Syntax::Kamelon::Indexer>, 
+B<Syntax::Kamelon::XMLData>, B<Syntax::Kamelon::Format::Base>, B<Syntax::Kamelon::Format::HTML4>
+
+=cut
+

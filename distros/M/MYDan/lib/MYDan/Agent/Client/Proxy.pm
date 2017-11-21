@@ -115,7 +115,7 @@ sub run
     $cv->recv;
     undef $w;
 
-    map{ $_ =~ s/^\**#\*keepalive\*#//;}values %result;
+    map{ $_ =~ s/^\**#\*MYDan_\d+\*#//;}values %result;
     return %result;
 }
 

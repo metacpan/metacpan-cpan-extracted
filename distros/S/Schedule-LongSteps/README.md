@@ -146,12 +146,14 @@ Out of the box, the following storage classes are available:
 - [Schedule::LongSteps::Storage::AutoDBIx](https://metacpan.org/pod/Schedule::LongSteps::Storage::AutoDBIx)
 
     Persist processes in a relational DB (a $dbh from [DBI](https://metacpan.org/pod/DBI)). This is the easiest thing to use if you want to persist processes in a database, without having
-    to worry about creating a DBIx::Class model yourself.
+    to worry about creating a DBIx::Class model yourself. We recommend you give this storage its own dbh connection, segregated from the rest
+    of your application.
 
 - [Schedule::LongSteps::Storage::DBIxClass](https://metacpan.org/pod/Schedule::LongSteps::Storage::DBIxClass)
 
-    Persist processes in an existing [DBIx::Class](https://metacpan.org/pod/DBIx::Class) schema. Nice if you want to have only one instance of Schema in your application and if
-    don't mind writing your own resultset.
+    Persist processes in an existing [DBIx::Class](https://metacpan.org/pod/DBIx::Class) schema. Note that although this makes a reasonable attempts not to interfer
+    with your own transactions, we recommend that you build a instance of your schema with a dedicated and segregated [DBI](https://metacpan.org/pod/DBI) connection
+    just for this LongSteps purpose.
 
 - [Schedule::LongSteps::Storage::DynamoDB](https://metacpan.org/pod/Schedule::LongSteps::Storage::DynamoDB)
 

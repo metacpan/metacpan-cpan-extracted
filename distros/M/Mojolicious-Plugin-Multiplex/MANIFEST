@@ -2,11 +2,14 @@ Build.PL
 Changes
 LICENSE
 MANIFEST
+MANIFEST.SKIP
 META.json
 META.yml
+README
 cpanfile
 ex/vue_chat.pl
 lib/Mojolicious/Plugin/Multiplex.pm
 lib/Mojolicious/Plugin/Multiplex/Multiplexer.pm
+share/websocket_multiplex.js
 t/server.t
 xt/reconnect.t

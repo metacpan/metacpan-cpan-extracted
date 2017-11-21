@@ -8,6 +8,9 @@ use Encode;
 
 use MVC::Neaf::Request;
 
+my $warn = 0;
+$SIG{__WARN__} = sub { $warn++; warn $_[0]; };
+
 my $copy = uri_unescape( "%C2%A9" ); # a single (c) symbol
 $copy = decode_utf8($copy);
 
@@ -18,8 +21,10 @@ my $req = MVC::Neaf::Request->new(
         Referer => 'http://google.com',
         User_Agent => 'test bot',
     ),
+    route => {}, # this one to avoid warnings
+                 # - normally script_name is unavailable before routing occurs
 );
-$req->set_full_path("/foo/bar");
+$req->set_path("/foo/bar");
 
 is ($req->path, "/foo/bar", "Path round trip");
 
@@ -37,7 +42,7 @@ is ($req->param( foo => '1|7' ), undef, "^foo|bar\$ forbids partial match" );
 is ($req->referer, "http://google.com", "referer works");
 is ($req->user_agent, "test bot", "user_agent works");
 
-$req->set_full_path( "" );
+$req->set_path( "" );
 is ($req->path, "/", "set_path round trip" );
 
 # TODO more thorough unicode testing
@@ -80,5 +85,7 @@ $req->push_header( foobar => 42 );
 is ($req->header_out( "foobar" ), 42, "Header set");
 $req->clear;
 is ($req->header_out( "foobar" ), undef, "Clear removed header" );
+
+ok !$warn, "$warn warnings issued";
 
 done_testing;

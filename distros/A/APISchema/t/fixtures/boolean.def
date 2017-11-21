@@ -1,0 +1,14 @@
+title 'Object with Boolean';
+
+resource value => {
+    type => 'object',
+    description => 'the result',
+    properties => {
+        value  => {
+            type => 'boolean',
+            description => 'The Value',
+            example => \1,
+        },
+    },
+    required => ['value'],
+};

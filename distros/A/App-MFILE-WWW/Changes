@@ -1106,3 +1106,28 @@ Revision history for App::MFILE::WWW
 - js: core/datetime: implement dateToDay()
 - start.css: make boxtopbot have the same background color as mainarea
 
+0.172 2017-11-10 15:17 CET
+- js: core/current-user: use jQuery to reset object
+- js: core/datetime: implement vetTimeRangeNoOffset
+- js: core/lib: implement "nullify" function
+- js: core/stack: add ability to unwind to target without starting
+
+0.173 2017-11-11 13:23 CET
+- js: core/datetime: improve tab completion of months
+- js: core/datetime: fix strToMonth() regression
+- js: core/populate: do not clobber result line
+- css, js/html: implement proper miniMenu indenting
+- js: core: html/start: make menu entries start at 1
+
+0.174 2017-11-13 11:43 CET
+- Revert "Integrate D3 into the application"
+- js: core/html: fix dmenu regression
+- js: core/html: give minimenu div an id
+- js: reflect appLib.fillUserBox() behavior change
+
+0.175 2017-11-14 17:24 CET
+- js: core/start: pass resultLine to drowselectListen()
+- js: core: implement "menu" prototype
+- js: core/populate: handle undefined populateArray a little less stupidly
+- js: core/init2: do not clobber miniMenu objects
+

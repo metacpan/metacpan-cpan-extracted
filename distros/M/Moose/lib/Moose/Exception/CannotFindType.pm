@@ -1,5 +1,5 @@
 package Moose::Exception::CannotFindType;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -15,4 +15,5 @@ sub _build_message {
     "Cannot find type '".$self->type_name."', perhaps you forgot to load it";
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

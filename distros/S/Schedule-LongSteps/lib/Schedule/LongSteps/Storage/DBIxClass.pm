@@ -1,11 +1,12 @@
 package Schedule::LongSteps::Storage::DBIxClass;
-$Schedule::LongSteps::Storage::DBIxClass::VERSION = '0.021';
+$Schedule::LongSteps::Storage::DBIxClass::VERSION = '0.023';
 use Moose;
 extends qw/Schedule::LongSteps::Storage/;
 
 use DateTime;
 use Log::Any qw/$log/;
 use Scope::Guard;
+use Action::Retry;
 
 has 'schema' => ( is => 'ro', isa => 'DBIx::Class::Schema', required => 1);
 has 'resultset_name' => ( is => 'ro', isa => 'Str', required => 1);
@@ -182,11 +183,16 @@ sub prepare_due_processes{
 
 See L<Schedule::LongSteps::Storage>
 
+This override adds retrying in case of deadlock detection.
+
 =cut
 
 sub create_process{
     my ($self, $process_properties) = @_;
-    return $self->_get_resultset()->create($process_properties);
+    return $self->_retry_transaction(
+        sub{
+            return $self->_get_resultset()->create($process_properties);
+        });
 }
 
 =head2 find_process
@@ -198,6 +204,46 @@ See L<Schedule::LongSteps::Storage>
 sub find_process{
     my ($self, $process_id) = @_;
     return $self->_get_resultset()->find({ id => $process_id });
+}
+
+=head2 update_process
+
+Overrides L<Schedule::LongSteps::Storage#update_process> to add
+some retrying in case of DB deadlock detection.
+
+=cut
+
+override 'update_process' => sub{
+    my ($self, $process, $properties) = @_;
+    return $self->_retry_transaction( sub{
+                                          $log->trace("Attempting to update process ".$process->id());
+                                          $process->update( $properties );
+                                      } );
+};
+
+sub _retry_transaction{
+    my ($self, $code) = @_;
+
+    my $retry = Action::Retry->new(
+        attempt_code => $code,
+        retry_if_code => sub{
+            my $exception = $_[0];
+            # The driver tells us to retry the transaction.
+            # For instance: https://dev.mysql.com/doc/refman/5.6/en/innodb-deadlocks-handling.html
+
+            # Note that if this is false, then the Action::Retry code
+            # will set $@ to the last error and return whatever the code has returned (most
+            # probably undef in this case.
+            # This is managed by the error testing after the call to 'run'
+            return !! ( ( $exception || '' )  =~ m/try restarting transaction/ );
+        },
+        strategy => 'Fibonacci',
+    );
+    my $ret = $retry->run();
+    if( my $err = $@ ){
+        confess($err);
+    }
+    return $ret;
 }
 
 __PACKAGE__->meta->make_immutable();

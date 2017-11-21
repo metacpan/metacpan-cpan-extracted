@@ -91,6 +91,14 @@ dies_ok { pica_parser( xml => '' ) } 'invalid handle';
 dies_ok { pica_parser( plus => [] ) } 'invalid handle';
 dies_ok { pica_parser( plain => bless( {}, 'MyFooBar' ) ) } 'invalid handle';
 
+note '3-digit occurrence';
+{
+    my $data = '00045     003@ 012345231@/102 d10j19660d11j1970';
+    my $parser = PICA::Parser::Plus->new(\$data);
+    my $record = $parser->next;
+    is $record->{record}->[1]->[1], '102', '3-digit occurrence';
+}
+
 SKIP: {
     my $str
         = '003@ '

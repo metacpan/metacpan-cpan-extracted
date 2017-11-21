@@ -38,6 +38,8 @@ sub run
     my $this = shift;
     my ( $port, $max, $exec, $tmp ) = @$this{qw( port max exec tmp )};
 
+    my $version = $MYDan::VERSION; $version =~ s/\./0/g;
+
     $SIG{'USR1'} = sub {
         print Dumper \%index;
     };
@@ -60,7 +62,7 @@ sub run
 
             if( $data->{handle}->fh )
             {
-                $data->{handle}->push_write('*#*keepalive*#');
+                $data->{handle}->push_write( "*#*MYDan_$version*#" );
                 if ( open my $tmp_handle, '<', "$tmp/$index.out" )
                 {
                     #seek( $tmp_handle, -16384, SEEK_END );

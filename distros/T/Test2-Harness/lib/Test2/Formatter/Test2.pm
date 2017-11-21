@@ -2,7 +2,7 @@ package Test2::Formatter::Test2;
 use strict;
 use warnings;
 
-our $VERSION = '0.001031';
+our $VERSION = '0.001034';
 
 use Scalar::Util qw/blessed/;
 use List::Util qw/shuffle first/;
@@ -514,7 +514,7 @@ sub render_plan {
         return $self->build_line('plan', 'SKIP ALL', $tree, "No reason given");
     }
 
-    return $self->build_line('plan', 'PLAN', $tree, "Expected asserions: $f->{plan}->{count}");
+    return $self->build_line('plan', 'PLAN', $tree, "Expected assertions: $f->{plan}->{count}");
 }
 
 sub render_assert {

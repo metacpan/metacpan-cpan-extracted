@@ -6,7 +6,8 @@ use warnings;
 use Test::More;
 
 package Foo {
-    use Moxie;
+    use Moxie
+        traits => [':experimental'];
 
     has _bar => sub { 'bar' };
 
@@ -16,7 +17,8 @@ package Foo {
 }
 
 package Bar {
-    use Moxie;
+    use Moxie
+        traits => [':experimental'];
 
     has _foo => sub { 'foo' };
 

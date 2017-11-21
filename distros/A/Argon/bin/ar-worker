@@ -1,0 +1,123 @@
+#!perl
+
+# PODNAME: worker
+# ABSTRACT: Starts an Argon worker service
+
+
+use strict;
+use warnings;
+use AnyEvent;
+use Argon::Log;
+use Argon::Worker;
+use Getopt::Long::Descriptive;
+
+my ($opt, $usage) = describe_options(
+  'worker %o',
+  ['key|k=s',      '(required) path to file containing encryption key', {required => 1}],
+  ['capacity|c=i', '(required) max number of worker processes permitted', {required => 1, callbacks => {'positive int' => sub { shift > 0 }}}],
+  ['mgr|m=s',      '(required) address of Argon manager service (e.g. some.host.com:4242)', {required => 1, callbacks => {'host:port' => sub { shift =~ /^.+?:\d+$/ }}}],
+  ['allow-eval|a', '(optional) permit execution of serialized code (warning: this is a security risk if not running in a safe environment)'],
+  ['verbose|v=i',  '(optional) level of verbosity (1 - 9; defaults to 5 [warn])', {default => 'warn'}],
+  [],
+  ['help|h',  'prints this help text and exits', {shortcircuit => 1}],
+  ['usage|u', 'prints this help text and exits', {shortcircuit => 1}],
+);
+
+if ($opt->help) {
+  print $usage->text;
+  exit;
+}
+
+my ($mgr_host, $mgr_port) = split /:/, $opt->mgr;
+unless ($mgr_host && $mgr_port) {
+  warn "Expected format host:port for --mgr\n";
+  print $usage->text;
+  exit;
+}
+
+log_level $opt->verbose;
+$Argon::ALLOW_EVAL = $opt->allow_eval ? 1 : 0;
+
+my $cv      = AnyEvent->condvar;
+my $sigint  = AnyEvent->signal(signal => 'INT' , cb => sub { log_info 'Caught SIGINT';  $cv->send });
+my $sigterm = AnyEvent->signal(signal => 'TERM', cb => sub { log_info 'Caught SIGTERM'; $cv->send });
+
+my $worker = Argon::Worker->new(
+  keyfile  => $opt->key,
+  capacity => $opt->capacity,
+  mgr_host => $mgr_host,
+  mgr_port => $mgr_port,
+);
+
+$worker->start;
+
+$cv->recv;
+
+exit 0;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+worker - Starts an Argon worker service
+
+=head1 VERSION
+
+version 0.18
+
+=head1 SYNOPSIS
+
+  worker --mgr some.host.com:4242 --capacity 16
+
+=head1 DESCRIPTION
+
+Starts an Argon worker service. The worker will attempt to connect and register
+with the manager service at the address specified by C<--mgr>. Up to
+C<--capacity> forked processes will be used to execute tasks assigned by the
+manager.
+
+=head1 OPTIONS
+
+=head2 capacity
+
+Specifies the maximum number of concurrent, forked processes to be made
+available for the execution of tasks assigned by the manager.
+
+=head2 mgr
+
+The address of the manager service to which this worker is to be assigned. The
+address must be specified as hostname:portnumber.
+
+=head2 allow-eval
+
+By default, tasks must be specified as a class name and instantiation arguments.
+If specified, C<--allow-eval> allows code refs to be serialized using C<Storable>
+and executed in the forked worker process.
+
+This is obviously a security risk and therefore should only be permitted when
+running in a secure environment.
+
+=head2 key
+
+Path to the file containing the encryption key.
+
+=head2 verbose
+
+Level of verbosity (1-9; defaults to 5/warn).
+
+=head1 AUTHOR
+
+Jeff Ober <sysread@fastmail.fm>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Jeff Ober.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

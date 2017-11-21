@@ -1,10 +1,10 @@
 package MYDan::VSSH::Comp;
+use base Term::Completion;
 
-#use strict;
+use strict;
 use warnings;
 
 use MYDan::VSSH::History;
-use base Term::Completion;
 
 
 sub get_term_size

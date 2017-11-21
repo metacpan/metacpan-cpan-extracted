@@ -34,13 +34,24 @@ type Author {
   name: String
 }
 
-input AuthorInput {
+input AuthorCreateInput {
   age: Int!
   message: String!
   name: String
 }
 
-scalar DateTime
+input AuthorMutateInput {
+  age: Int
+  id: Int!
+  message: String
+  name: String
+}
+
+input AuthorSearchInput {
+  age: Int
+  message: String
+  name: String
+}
 
 type Module {
   author: Author
@@ -49,25 +60,36 @@ type Module {
   name: String
 }
 
-input ModuleInput {
+input ModuleCreateInput {
+  author_id: Int
+  name: String
+}
+
+input ModuleMutateInput {
+  author_id: Int
+  id: Int!
+  name: String
+}
+
+input ModuleSearchInput {
   author_id: Int
   name: String
 }
 
 type Mutation {
-  createAuthor(input: AuthorInput!): Author
-  createModule(input: ModuleInput!): Module
-  deleteAuthor(id: Int!): Boolean
-  deleteModule(id: Int!): Boolean
-  updateAuthor(id: Int!, input: AuthorInput!): Author
-  updateModule(id: Int!, input: ModuleInput!): Module
+  createAuthor(input: [AuthorCreateInput!]!): [Author]
+  createModule(input: [ModuleCreateInput!]!): [Module]
+  deleteAuthor(input: [AuthorMutateInput!]!): [Boolean]
+  deleteModule(input: [ModuleMutateInput!]!): [Boolean]
+  updateAuthor(input: [AuthorMutateInput!]!): [Author]
+  updateModule(input: [ModuleMutateInput!]!): [Module]
 }
 
 type Query {
   author(id: [Int!]!): [Author]
   module(id: [Int!]!): [Module]
-  # list of ORs each of which is list of ANDs
-  searchAuthor(input: [[AuthorInput!]!]!): [Author]
-  # list of ORs each of which is list of ANDs
-  searchModule(input: [[ModuleInput!]!]!): [Module]
+  # input to search
+  searchAuthor(input: AuthorSearchInput!): [Author]
+  # input to search
+  searchModule(input: ModuleSearchInput!): [Module]
 }

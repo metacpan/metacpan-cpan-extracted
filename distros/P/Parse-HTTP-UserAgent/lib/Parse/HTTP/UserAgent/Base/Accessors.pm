@@ -1,29 +1,26 @@
 package Parse::HTTP::UserAgent::Base::Accessors;
+$Parse::HTTP::UserAgent::Base::Accessors::VERSION = '0.42';
 use strict;
 use warnings;
-use vars qw( $VERSION );
 use Parse::HTTP::UserAgent::Constants qw(:all);
-
-$VERSION = '0.39';
-
-#TODO: new accessors
-#wap
-#mobile
-#device
-#tablet
 
 BEGIN {
     my @simple = qw(
-        name
-        unknown
+        device
         generic
-        os
         lang
-        strength
-        parser
+        mobile
+        name
         original_name
         original_version
+        os
+        parser
         robot
+        strength
+        tablet
+        touch
+        unknown
+        wap
     );
 
     my @multi = qw(
@@ -97,9 +94,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
-Parse::HTTP::UserAgent::Base::Accessors - Available accessors
+Parse::HTTP::UserAgent::Base::Accessors
+
+=head1 VERSION
+
+version 0.42
 
 =head1 SYNOPSIS
 
@@ -112,14 +115,17 @@ Parse::HTTP::UserAgent::Base::Accessors - Available accessors
 
 =head1 DESCRIPTION
 
-This document describes version C<0.39> of C<Parse::HTTP::UserAgent::Base::Accessors>
-released on C<2 December 2013>.
-
 Ther methods can be used to access the various parts of the parsed structure.
+
+=head1 NAME
+
+Parse::HTTP::UserAgent::Base::Accessors - Available accessors
 
 =head1 ACCESSORS
 
 The parts of the parsed structure can be accessed using these methods:
+
+=head2 device
 
 =head2 dotnet
 
@@ -128,6 +134,8 @@ The parts of the parsed structure can be accessed using these methods:
 =head2 generic
 
 =head2 lang
+
+=head2 mobile
 
 =head2 mozilla
 
@@ -145,11 +153,17 @@ The parts of the parsed structure can be accessed using these methods:
 
 =head2 strength
 
+=head2 tablet
+
+=head2 touch
+
 =head2 toolkit
 
 =head2 unknown
 
 =head2 version
+
+=head2 wap
 
 =head1 SEE ALSO
 
@@ -157,15 +171,13 @@ L<Parse::HTTP::UserAgent>.
 
 =head1 AUTHOR
 
-Burak Gursoy <burak@cpan.org>.
+Burak Gursoy <burak@cpan.org>
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-Copyright 2009 - 2013 Burak Gursoy. All rights reserved.
+This software is copyright (c) 2009 by Burak Gursoy.
 
-=head1 LICENSE
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.16.2 or,
-at your option, any later version of Perl 5 you may have available.
 =cut

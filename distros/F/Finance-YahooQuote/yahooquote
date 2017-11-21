@@ -47,7 +47,10 @@ yahooquote - Get stock quotes from Yahoo!
 
 =head1 DESCRIPTION
 
-This scripts provides a simple example for the use of B<Finance::YahooQuote>
+B<NOTE>: As of November 2017, the script is no longer all that useful
+as Yahoo! decided to halt the API service it relies on.
+
+This script provides a simple example for the use of B<Finance::YahooQuote>
 as well as a simple check means of downloading a quote, or checking a symbol.
 
 =head1 COPYRIGHT

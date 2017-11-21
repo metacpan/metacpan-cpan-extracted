@@ -1,0 +1,25 @@
+---
+abstract: 'A versatile and fully programmable textual content parser that is extremely well suited for syntax highlighting and code folding '
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Syntax-Kamelon
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Template: '0'
+  Time::HiRes: '0'
+  XML::TokeParser: '0'
+version: '0.15'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

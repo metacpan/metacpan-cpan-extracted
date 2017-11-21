@@ -3,9 +3,12 @@ package Barcode::DataMatrix::CharDataFiller;
 use strict;
 use warnings;
 
-=head1 Barcode::DataMatrix::CharDataFiller
+=head1 NAME
 
-Handle filling character data within the data matrix array.
+Barcode::DataMatrix::CharDataFiller - Handle filling character data within the
+data matrix array.
+
+=head1 DESCRIPTION
 
 The documentation for the methods in this class has been adapted from the
 comments in

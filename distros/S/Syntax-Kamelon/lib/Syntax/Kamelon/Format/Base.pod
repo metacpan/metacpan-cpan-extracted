@@ -1,0 +1,267 @@
+=head1 NAME
+
+Syntax::Kamelon::Format::Base - Basic formatting module
+
+=head1 SYNOPSIS
+
+ use Syntax::Kamelon;
+ 
+ my @attributes = Syntax::Kamelon->AvailableAttributes;
+ my %formtab = ();
+ for (@attributes) {
+    $formtab{$_} = "<font class=\"$_\">"
+ }
+
+ my $textfilter = "[%~ text FILTER html FILTER replace('\\040', '&nbsp;') FILTER replace('\\t', '&nbsp;&nbsp;&nbsp;') ~%]";
+ my $hl = new Syntax::Kamelon(
+    formatter => ['Base',
+       textfilter => \$textfilter,
+       format_table => \%formtab,
+       newline => "</br>\n",
+       tagend => '</font>',
+    ],
+);
+
+=head1 DESCRIPTION
+
+B<Syntax::Kamelon::Format::Base> provides a basic formatting interface to 
+B<Syntax::Kamelon>. You do not have to create an instance of B<Base> 
+yourself. B<Kamelon> will do that for you. During the parsing process it 
+collects all the parsing information from B<Kamelon> through the B<Parse> 
+method. When all information is collected you can start the formatting 
+through the B<Format> method. It is based on and inherits B<Template> toolkit.
+
+=head1 OPTIONS
+
+The constructor is called with a paired list of options as parameters. You can use
+the following options.
+
+=over 4
+
+=item B<data> => ref to hash
+
+Set a user defined hash that is used by the B<process> method. Parsing data is added to this hash.
+
+=item B<foldingdepth> => integer
+
+This option specifies if the code folding mechanism in B<Kamelon> should be activated and to which nesting depth you
+want code folding to be detected. If you set it to 0 the codefolding routines are not loaded. With any other value they
+are and parsing speed will be lower. If you set it to 1 only the top folds will be passed on to the formatter, making it 
+ideal to create an indexed document. If you want all code folding points detected, set it to a high value, like 999 or so.
+The default value is 0.
+
+=item B<format_table> => ref to hash
+
+If you use the B<HighlightAndFormat> method, every attribute tag expects a reference of a list with two values. 
+The first one is parsed before the matched text. The second one is parsed after the matched text.
+
+If you know which attributes are used by the syntax definition files you are using you do not have
+to specify all. If you want to play it safe, specify all available attribute tags.
+
+If you do not specify this option, Kamelon will return the attribute tag name.
+
+The following attribute tags are available:
+
+ Alert              Annotation          Attribute           BaseN
+ BuiltIn            Char                Comment             CommentVar
+ Constant           ControlFlow         DataType            DecVal
+ Documentation      Error               Extension           Float
+ Function           Import              Information         Keyword
+ Normal             Operator            Others              Preprocessor
+ RegionMarker       SpecialChar         SpecialString       String
+ Variable           VerbatimString      Warning
+
+The syntax definition XML files have them specified with 'ds' in front of them. When
+loading the XML file, these are removed.
+
+=item B<minfoldsize> => integer
+
+Specifies the minimum size, in lines, of a fold. Default is 1 line.
+
+=item B<newline> => string
+
+Specifies what a newline looks like. By default it is set to "\n". If you are, for example, parsing to HTML you might want to 
+set it to "</br>\n".
+
+=item B<lineoffset> => integer
+
+Specifies the start line number in the output. If you do not specify this option
+no line numbers are shown.
+
+=item B<outmethod> => various
+
+This option is passed on to the B<process> method of the Template Toolkit. It can be a reference to a scalar,
+a reference to a output file handle, or a filename. You can also set it to 'returnscalar', which is also the default value.
+If this case the B<Format> method returns the formatted document in a scalar variable.
+
+=item B<tagend> => string
+
+Specifies the end of a highlight tag.
+
+=item B<template> => various
+
+This option is passed on to the B<process> method of the Template Toolkit. It can be a reference to a scalar,
+a reference to a input file handle, or a file name.
+
+=item B<textfilter> => various
+
+This otion allows you to run every line through a user defined template. A sort of pre-formatting.
+This means you do not have to rewrite the core template.
+
+=item B<ttconfig> ref to hash
+
+This is the config hash that is used in Template Tookits constructor. By default it is set to {}.
+
+=back
+
+=head1 PUBLIC METHODS
+
+=over 4
+
+=item B<Foldingdepth>
+
+Corresponds with the B<folding> option. You can set and get the folding depth here. If the folding depth changes from 0 to something
+else or vice versa, all the loaded lexers in B<Kamelon> are removed and need to be reloaded.
+
+=item B<Folds>
+
+Returns a reference to the folds hash.
+
+=item B<Format>
+
+Usually called through B<Kamelon>. It turns the parsing and folding information into a textstring and returns it.
+
+=item B<FormatTable>(I<$tagname>);
+
+Returns the format data belonging to $tagname. Used by the B<Builder> module. The data is set through
+the B<format_table> option.
+
+=item B<GetData>
+
+Use this method if you want to use your own instance of Template Tooolkit instead of B<TT>'s internal one. It returns
+a data structure that looks like this:
+
+ {
+    folds => { #the keys of this hash are line numbers
+	    4 => {
+          end => $endline,
+		    depth => $folddepth,
+		    line => $text,
+		    region => $regionname,
+	    },
+	    ...
+    },
+    content => [
+       [{ text => $snippet, tag => $tagname}, ...], #this is one line
+       ...
+    ],
+ }
+
+=item B<Lines>
+
+Returns a reference to the lines array.
+
+=item B<OutMethod>(I<$various>)
+
+Corresponds with the B<outmethod> option. Sets and returns the output method.
+
+=item B<Reset>
+
+Clears all parser data.
+
+=item B<Template>(I<$various>)
+
+Corresponds with the B<template> option. Sets and returns the template that will
+be processed by B<Format>.
+
+=item B<TextFilter>(I<$template>)
+
+Corresponds with the B<textfilter> option. Sets and returns the template that is
+used for preprocessing a line of text.
+
+=item B<Toolkit> ref to Template Toolkit instance
+
+Corresponds with the B<toolkit> option. Sets and returns the Template Toolkit
+instance that is used for formatting.
+
+=back
+
+=head1 PRIVATE METHODS
+
+=over 4
+
+=item B<FindINC>
+
+=item B<FoldBegin>(I<$regionname>) 
+
+Called By Kamelon when it encounters a beginRegion attribute in a rule.
+It collects the line number, the current line that is parsed, and pushes
+all that to the fold stack in a hash.
+
+=item B<FoldEnd>(I<$regionname>)
+
+Called By Kamelon when it encounters an endRegion attribute in a rule.
+Pulls the top item from the foldhash. It checks if the fold end occurred
+in a different line then where it started. If so it passes a valid fold
+record to the folds hash with the starting line number as key. 
+This hash looks like:
+ 	$linenumber => {
+ 		end => $endline,
+ 		depth => $folddepth,
+ 		line => $text,
+ 		region => $regionname,
+ 	}
+
+=item B<FoldStackLevel>
+
+Returns the nesting depth of folds.
+
+=item B<FoldStackPull>
+
+Returns the top item on the foldstack and removes it from the stack.
+
+=item B<FoldStackPush>(I<$reftohash>)
+
+Pushes $reftohash to the fold stack.
+
+=item B<FoldStackTop>
+
+Returns top item from the fold stack.
+
+=item B<Parse>(I<@out>)
+
+Called by Kamelon to send the line it just parsed to the formatter.
+
+=item B<PreProcessOff>(I<$line>)
+
+Called when no textfilter is defined. Actually only returns $line.
+
+=item B<PreProcessOn>(I<$line>)
+
+Called when a textfilter is defined. Pre-formats $line using the template
+defined in B<TextFilter>.
+
+=item B<Process>
+
+Convenience method. Does the same as B<process> in Template::Toolkit. Adds
+error reporting and always retuns the processed input as a scalar.
+
+=back
+
+=head1 AUTHOR AND COPYRIGHT
+
+This module is written and maintained by:
+
+Hans Jeuken < hansjeuken at xs4all dot nl>
+
+Copyright (c) 2017 by Hans Jeuken, all rights reserved.
+
+Published under the GPLV3 license
+
+=head1 SEE ALSO
+
+B<Syntax::Kamelon>, B<Syntax::Kamelon::Builder>, B<Syntax::Kamelon::Debugger>, B<Syntax::Kamelon::Diagnostics>, B<Syntax::Kamelon::Indexer>, 
+B<Syntax::Kamelon::XMLData>, B<Syntax::Kamelon::Format::HTML4>, B<Syntax::Kamelon::Format::ANSI>
+
+=cut
+

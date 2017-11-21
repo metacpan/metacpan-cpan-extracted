@@ -320,6 +320,18 @@ LIBGD_VERSION()
     PPCODE:
     mXPUSHn(GD_VERSION/10000.0);
 
+#if GD_VERSION >= 20101
+
+bool
+supportsFileType(char *filename, int writing=0)
+  PROTOTYPE: $;$
+  CODE:
+    RETVAL = gdSupportsFileType(filename, writing);
+  OUTPUT:
+    RETVAL
+
+#endif
+
 BOOT:
 {
 #ifdef START_MY_CXT
@@ -375,6 +387,21 @@ gd_new(packname="GD::Image", x=64, y=64, ...)
   OUTPUT:
     RETVAL
 
+#if GD_VERSION >= 20101
+
+bool
+gd_file(image, filename)
+      GD::Image image
+      char *	filename
+  PROTOTYPE: $$
+  CODE:
+    RETVAL = gdImageFile(image, filename);
+  OUTPUT:
+    RETVAL
+
+#endif
+
+    
 #ifdef HAVE_PNG
 GD::Image
 gd_newFromPng(packname="GD::Image", filehandle, ...)

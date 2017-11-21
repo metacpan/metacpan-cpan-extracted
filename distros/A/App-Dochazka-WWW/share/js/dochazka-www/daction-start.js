@@ -47,6 +47,7 @@ define ([
     "app/act-lib",
     "app/emp-lib",
     "app/ldap-lib",
+    "app/lock-lib",
     "app/priv-lib",
     "app/sched-history-lib",
     "app/sched-lib",
@@ -63,6 +64,7 @@ define ([
     actLib,
     empLib,
     ldapLib,
+    lockLib,
     privLib,
     schedHistLib,
     schedLib,
@@ -97,6 +99,7 @@ define ([
         "masqEmployee": appCaches.masqEmployee,
         "empProfileSetSuperChoose": empLib.empProfileSetSuperChoose,
         "empProfileSetSuperCommit": empLib.empProfileSetSuperCommit,
+        "empProfileSetSuperDelete": empLib.empProfileSetSuperDelete,
         "empProfileSetSuperSearch": empLib.empProfileSetSuperSearch,
 
         // Employee LDAP actions
@@ -113,7 +116,6 @@ define ([
 
         // actions triggered from Schedule menu
         "actionSchedHistory": schedHistLib.actionSchedHistory,
-        "actionSchedHistoryEdit": schedHistLib.actionSchedHistoryEdit,
         "schedHistorySaveAction": schedHistLib.schedHistorySaveAction,
         "schedHistoryDeleteAction": schedHistLib.schedHistoryDeleteAction,
         "schedHistoryAddRecordAction": schedHistLib.schedHistoryAddRecordAction,
@@ -127,8 +129,14 @@ define ([
         // create interval actions
         "createMultipleIntSave": intLib.createMultipleIntSave,
         "createNextScheduledIntervalSave": intLib.createNextScheduledIntervalSave,
+        "createSingleIntMenuItem": intLib.createSingleIntMenuItem,
         "createSingleIntSave": intLib.createSingleIntSave,
+        "createLockSave": lockLib.createLockSave,
+        "deleteSingleInt": intLib.deleteSingleInt,
+        "deleteLock": lockLib.deleteLock,
+        "updateSingleIntSave": intLib.updateSingleIntSave,
         "viewIntervalsAction": intLib.viewIntervalsAction,
+        "viewLocksAction": lockLib.viewLocksAction,
         
         // activity select actions
         "selectActivityAction": appCaches.selectActivityAction,

@@ -1,0 +1,12 @@
+
+Version 0.13 November 18, 2017
+
+	Initial release
+
+Version 0.14 November 18, 2017
+
+	Fixed failing test due to t/HTML_OUT not existing
+
+Version 0.15
+
+	Updated documentation

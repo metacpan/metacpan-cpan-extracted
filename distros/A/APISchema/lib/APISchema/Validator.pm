@@ -92,12 +92,8 @@ sub _validate {
 sub validate {
     my ($self, $route_name, $target, $schema) = @_;
 
-    my @target_keys = grep {
-        $target->{$_};
-    } @{+TARGETS};
+    my @target_keys = @{+TARGETS};
     my $valid = _valid_result(@target_keys);
-
-    return $valid unless scalar @target_keys;
 
     my $route = $schema->get_route_by_name($route_name)
         or return $valid;
@@ -110,12 +106,12 @@ sub validate {
     );
     @target_keys = grep { $resource_spec->{$_} } @target_keys;
 
-    my $body_encoding = $target->{body} && do {
+    my $body_encoding = $resource_spec->{body} && do {
         my ($enc, $err) = _resolve_encoding(
             $target->{content_type} // '',
             $resource_spec->{encoding},
         );
-        if ($err && $resource_spec->{body}) {
+        if ($err) {
             return _error_result(body => $err);
         }
         $enc;

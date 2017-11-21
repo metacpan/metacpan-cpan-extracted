@@ -3,11 +3,13 @@ Changes
 examples/ad5691r.pl
 examples/ads1115.pl
 examples/ltc2400.pl
+examples/max11200.pl
 examples/mcp4725.pl
 lib/Device/Chip/AD5691R.pm
 lib/Device/Chip/ADS1115.pm
 lib/Device/Chip/AnalogConverters.pm
 lib/Device/Chip/LTC2400.pm
+lib/Device/Chip/MAX11200.pm
 lib/Device/Chip/MCP4725.pm
 LICENSE
 MANIFEST			This list of files
@@ -18,5 +20,6 @@ t/00use.t
 t/50-ad5691r.t
 t/50-ads1115.t
 t/50-ltc2400.t
+t/50-max11200.t
 t/50-mcp4725.t
 t/99pod.t

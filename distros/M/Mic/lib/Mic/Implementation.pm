@@ -79,6 +79,10 @@ __END__
 
 Mic::Implementation
 
+=head1 STATUS
+
+Hash based implementations are now deprecated. This module will provide the same functionality as L<Mic::ArrayImpl> in a future release. 
+
 =head1 SYNOPSIS
 
     package Example::Construction::Acme::Set_v1;

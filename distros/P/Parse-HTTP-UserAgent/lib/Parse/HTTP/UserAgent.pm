@@ -1,9 +1,7 @@
 package Parse::HTTP::UserAgent;
+$Parse::HTTP::UserAgent::VERSION = '0.42';
 use strict;
 use warnings;
-use vars qw( $VERSION );
-
-$VERSION = '0.39';
 
 use base qw(
     Parse::HTTP::UserAgent::Base::IS
@@ -11,10 +9,12 @@ use base qw(
     Parse::HTTP::UserAgent::Base::Dumper
     Parse::HTTP::UserAgent::Base::Accessors
 );
+
 use overload '""',    => 'name',
              '0+',    => 'version',
              fallback => 1,
 ;
+
 use version;
 use Carp qw( croak );
 use Parse::HTTP::UserAgent::Constants qw(:all);
@@ -33,9 +33,12 @@ my %OSFIX = (
     'Win 9x 4.90'    => 'Windows Me',
     'Windows NT 5.0' => 'Windows 2000',
     'Windows NT 5.1' => 'Windows XP',
+    'Windows XP 5.1' => 'Windows XP', # huh?
     'Windows NT 5.2' => 'Windows Server 2003',
     'Windows NT 6.0' => 'Windows Vista / Server 2008',
     'Windows NT 6.1' => 'Windows 7',
+    'Windows NT 6.2' => 'Windows 8',
+    'Windows NT 6.3' => 'Windows 8.1',
 );
 
 sub new {
@@ -100,13 +103,17 @@ sub _parse {
 }
 
 sub _pre_parse {
-    my $self = shift;
-    $self->[IS_MAXTHON] = index(uc $self->[UA_STRING], 'MAXTHON') != NO_IMATCH;
-    my $ua = $self->[UA_STRING];
+    my $self  = shift;
+    my $ua    = $self->[UA_STRING];
+    my $uc_ua = uc $ua;
+
+    $self->[IS_MAXTHON] = index($uc_ua, 'MAXTHON')  != NO_IMATCH;
+    $self->[IS_TRIDENT] = index($uc_ua, 'TRIDENT/') != NO_IMATCH;
 
     my @parts;
     my $i     = 0;
     my $depth = 0;
+
     foreach my $token ( split RE_SPLIT_PARSE, $ua ) {
         if ( $token eq '(' ) {
             $i++ if ++$depth == 1;
@@ -135,23 +142,59 @@ sub _pre_parse {
 
 sub _do_parse {
     my($self, $m, $t, $e, @o) = @_;
+
     my $c = $t->[0] && $t->[0] eq 'compatible';
 
-    if ( $c && shift @{$t} && ! $e && ! $self->[IS_MAXTHON] ) {
+    if ( $c
+        && shift @{$t}                     # just inline removal of "compatible"
+        && ( ! $e || $self->[IS_TRIDENT] ) # older versions don't have junk outside, while newer might have
+        && ! $self->[IS_MAXTHON]           # be sure that this is not the faker
+    ) {
         my($n, $v) = split RE_WHITESPACE, $t->[0];
         if ( $n eq 'MSIE' && index($m, q{ }) == NO_IMATCH ) {
             return $self->_parse_msie($m, $t, $e, $n, $v);
         }
     }
 
-    my $rv =  $self->[IS_MAXTHON]        ? [maxthon    => $m, $t, $e, @o       ]
-            : $self->_is_opera_pre($m)   ? [opera_pre  => $m, $t, $e           ]
-            : $self->_is_opera_post($e)  ? [opera_post => $m, $t, $e, $c       ]
-            : $self->_is_opera_ff($e)    ? [opera_pre  => "$e->[2]/$e->[3]", $t]
-            : $self->_is_ff($e)          ? [firefox    => $m, $t, $e, @o       ]
-            : $self->_is_safari($e, \@o) ? [safari     => $m, $t, $e, @o       ]
-            : $self->_is_chrome($e, \@o) ? [chrome     => $m, $t, $e, @o       ]
-            : $self->_is_android($t,\@o) ? [android    => $m, $t, $e, @o       ]
+    if ( $self->[IS_TRIDENT] ) {
+        # http://blogs.msdn.com/b/ieinternals/archive/2013/09/21/internet-explorer-11-user-agent-string-ua-string-sniffing-compatibility-with-gecko-webkit.aspx
+        my %msie11 = map {
+              index( $_, 'Windows')  != NO_IMATCH ? ( windows => 1 )
+            : index( $_, 'Trident/') != NO_IMATCH ? ( trident => 1 )
+            : index( $_, 'rv:')      != NO_IMATCH ? ( version => 1 )
+            : ()
+        } @{ $t };
+        my $msie_matched = keys %msie11;
+
+        if ( $msie_matched == 3 ){
+            return $self->_parse_msie_11($m, $t, $e);
+        }
+        elsif ( ! $self->[IS_MAXTHON] && $msie_matched == 2 && ! $msie11{version} ) {
+            # another weird case. robot?
+            my(@buf, $vstr);
+            for my $junk ( @{ $t } ) {
+                if ( index( $junk, 'MSIE') != NO_IMATCH ) {
+                    $vstr = $junk;
+                    next;
+                }
+                push @buf, $junk;
+            }
+
+            my $rv = $self->_parse_msie($m, \@buf, $e, split( RE_WHITESPACE, $vstr ) );
+            return $rv;
+        }
+        # fall back to the dispatch table below
+    }
+
+    my $rv =  $self->[IS_MAXTHON]          ? [ maxthon    => $m, $t, $e, @o        ]
+            : $self->_is_opera_pre($m)     ? [ opera_pre  => $m, $t, $e            ]
+            : $self->_is_opera_post($e)    ? [ opera_post => $m, $t, $e, $c        ]
+            : $self->_is_opera_ff($e)      ? [ opera_pre  => "$e->[2]/$e->[3]", $t ]
+            : $self->_is_ff($e)            ? [ firefox    => $m, $t, $e, @o        ]
+            : $self->_is_safari($e, \@o)   ? [ safari     => $m, $t, $e, @o        ]
+            : $self->_is_chrome($e, \@o)   ? [ chrome     => $m, $t, $e, @o        ]
+            : $self->_is_android($t,\@o)   ? [ android    => $m, $t, $e, @o        ]
+            : $self->_is_suspicious_ff($e) ? [ ff_suspect => $m, $t, $e, @o        ]
             : undef;
 
     if ( $rv ) {
@@ -184,7 +227,7 @@ sub _post_parse {
         push @buf, $e;
     }
 
-    $self->[UA_EXTRAS] = [ @buf ];
+    $self->[UA_EXTRAS] = @buf ? [ @buf ] : undef;
 
     if ( $self->[UA_TOOLKIT] ) {
         my $v = $self->[UA_TOOLKIT][TK_ORIGINAL_VERSION];
@@ -243,6 +286,7 @@ sub _numify {
                 gold     |
                 [ab]\d+  |
                 a\-XXXX  |
+                dev      |
                 [+]
                )}{}xmsig
     ){
@@ -265,6 +309,13 @@ sub _numify {
         push @removed, '-' x $rc if INSIDE_VERBOSE_TEST;
     }
 
+    # convert _ to .
+    # version.pm has changed its interpretation of versions with underlines
+    # cf. https://bugs.debian.org/825611
+    if ( my $rc = $v =~ tr/_/./ ) {
+        push @removed, '-' x $rc if INSIDE_VERBOSE_TEST;
+    }
+
     # Finally, be aggressive to prevent dying on bogus stuff.
     # It's interesting how people provide highly stupid version "numbers".
     # Version parameters are probably more stupid than the UA string itself.
@@ -279,6 +330,7 @@ sub _numify {
     if ( INSIDE_VERBOSE_TEST ) {
         if ( @removed ) {
             my $r = join q{','}, @removed;
+            require Test::More;
             Test::More::diag("[DEBUG] _numify: removed '$r' from version string");
         }
     }
@@ -340,9 +392,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
-Parse::HTTP::UserAgent - Parser for the User Agent string
+Parse::HTTP::UserAgent
+
+=head1 VERSION
+
+version 0.42
 
 =head1 SYNOPSIS
 
@@ -356,9 +414,6 @@ Parse::HTTP::UserAgent - Parser for the User Agent string
    print $ua->dumper;
 
 =head1 DESCRIPTION
-
-This document describes version C<0.39> of C<Parse::HTTP::UserAgent>
-released on C<2 December 2013>.
 
 Quoting L<http://www.webaim.org/blog/user-agent-string-history/>:
 
@@ -385,6 +440,10 @@ This module implements a rules-based parser and tries to identify
 MSIE, FireFox, Opera, Safari & Chrome first. It then tries to identify Mozilla,
 Netscape, Robots and the rest will be tried with a generic parser. There is
 also a structure dumper, useful for debugging.
+
+=head1 NAME
+
+Parse::HTTP::UserAgent - Parser for the User Agent string
 
 =head1 METHODS
 
@@ -533,15 +592,13 @@ L<http://use.perl.org/~Burak/journal/39577> (4 September 2009).
 
 =head1 AUTHOR
 
-Burak Gursoy <burak@cpan.org>.
+Burak Gursoy <burak@cpan.org>
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-Copyright 2009 - 2013 Burak Gursoy. All rights reserved.
+This software is copyright (c) 2009 by Burak Gursoy.
 
-=head1 LICENSE
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.16.2 or,
-at your option, any later version of Perl 5 you may have available.
 =cut

@@ -1,5 +1,9 @@
 Changes for Alien::OpenSSL
 
+* 0.10
+- Change build system to Alien::Build; basically entirely contributed by
+  plicease.
+
 * 0.09
 - require higher Alien::Base version due to test bug
 - fix a test for windows

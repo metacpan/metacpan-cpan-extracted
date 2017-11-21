@@ -2,15 +2,15 @@ README for Perl extension CPAN-Mini-Visit-Simple
 
 CPAN::Mini::Visit::Simple - Lightweight traversal of a minicpan repository.
 
-This document refers to version 0.015 of CPAN::Mini::Visit::Simple.
-This version was released February 10 2017.
+This document refers to version 0.016 of CPAN::Mini::Visit::Simple.
+This version was released November 20 2017.
 
 To install this module on your system, place the tarball archive file in a
 temporary directory and call the following:
 
-% gunzip CPAN-Mini-Visit-Simple-0.015.tar.gz
-% tar xf CPAN-Mini-Visit-Simple-0.015.tar
-% cd CPAN-Mini-Visit-Simple-0.015
+% gunzip CPAN-Mini-Visit-Simple-0.016.tar.gz
+% tar xf CPAN-Mini-Visit-Simple-0.016.tar
+% cd CPAN-Mini-Visit-Simple-0.016
 % perl Makefile.PL
 % make
 % make test

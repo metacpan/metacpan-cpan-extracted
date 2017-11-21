@@ -1,371 +1,453 @@
 package Argon::Client;
+# ABSTRACT: Client-side connection class for Argon systems
+$Argon::Client::VERSION = '0.18';
 
-use Moo;
-use MooX::HandlesVia;
-use Types::Standard qw(-types);
+use strict;
+use warnings;
 use Carp;
+use Moose;
 use AnyEvent;
-use AnyEvent::Socket;
-use Coro;
-use Coro::AnyEvent;
-use Coro::Handle;
-use List::Util qw(max);
-use Guard qw(scope_guard);
-use Argon qw(:commands :priorities :logging);
+use AnyEvent::Socket qw(tcp_connect);
+use Data::Dump::Streamer;
+use Argon;
+use Argon::Async;
+use Argon::Constants qw(:commands :priorities);
+use Argon::SecureChannel;
+use Argon::Log;
 use Argon::Message;
-use Argon::Stream;
+use Argon::Types;
+use Argon::Util qw(K param interval);
+
+with qw(Argon::Encryption);
+
 
 has host => (
-    is       => 'ro',
-    isa      => Str,
-    required => 1,
+  is       => 'ro',
+  isa      => 'Str',
+  required => 1,
 );
+
 
 has port => (
-    is       => 'ro',
-    isa      => Int,
-    required => 1,
+  is       => 'ro',
+  isa      => 'Int',
+  required => 1,
 );
 
-has stream => (
-    is       => 'lazy',
-    isa      => InstanceOf['Argon::Stream'],
-    init_arg => undef,
-    handles  => {
-        addr => 'addr',
-    },
+
+has retry => (
+  is      => 'ro',
+  isa     => 'Bool',
+  default => 0,
 );
 
-sub _build_stream {
-    my $self = shift;
-    return Argon::Stream->connect($self->host, $self->port);
+
+has opened => (
+  is      => 'rw',
+  isa     => 'Ar::Callback',
+  default => sub { sub {} },
+);
+
+
+has ready => (
+  is      => 'rw',
+  isa     => 'Ar::Callback',
+  default => sub { sub {} },
+);
+
+
+has failed => (
+  is      => 'rw',
+  isa     => 'Ar::Callback',
+  default => sub { sub {} },
+);
+
+
+has closed => (
+  is      => 'rw',
+  isa     => 'Ar::Callback',
+  default => sub { sub {} },
+);
+
+
+has notify => (
+  is      => 'rw',
+  isa     => 'Ar::Callback',
+  default => sub { sub {} },
+);
+
+has remote => (
+  is  => 'rw',
+  isa => 'Maybe[Str]',
+);
+
+has msg => (
+  is      => 'rw',
+  isa     => 'HashRef',
+  default => sub {{}},
+  traits  => ['Hash'],
+  handles => {
+    has_msg => 'exists',
+    get_msg => 'get',
+    add_msg => 'set',
+    del_msg => 'delete',
+    msg_ids => 'keys',
+    msgs    => 'values',
+  },
+);
+
+has channel => (
+  is      => 'rw',
+  isa     => 'Maybe[Argon::SecureChannel]',
+  handles => [qw(send)],
+);
+
+has addr => (
+  is      => 'ro',
+  isa     => 'Str',
+  lazy    => 1,
+  builder => '_build_addr',
+);
+
+sub _build_addr {
+  my $self = shift;
+  join ':', $self->host, $self->port;
 }
 
-after _build_stream => sub {
-    my $self = shift;
-    $self->read_loop;
+
+around BUILDARGS => sub {
+  my $orig  = shift;
+  my $class = shift;
+  my %args  = @_;
+
+  if (exists $args{channel}) {
+    # Match encryption settings
+    $args{$_} = $args{channel}{$_}
+      foreach grep { exists $args{channel}{$_} }
+        qw(key keyfile cipher token);
+  }
+
+  $class->$orig(%args);
 };
 
-has pending => (
-    is          => 'ro',
-    isa         => HashRef,
-    init_arg    => undef,
-    default     => sub {{}},
-    handles_via => 'Hash',
-    handles  => {
-        set_pending => 'set',
-        get_pending => 'get',
-        del_pending => 'delete',
-        has_pending => 'exists',
-        all_pending => 'keys',
+sub BUILD {
+  my ($self, $args) = @_;
+
+  if ($self->channel) {
+    # Set callbacks
+    $self->channel->on_msg(K('_notify', $self));
+    $self->channel->on_err(K('_error', $self));
+    $self->channel->on_close(K('_close', $self));
+
+    if ($self->channel->is_ready) {
+      $self->opened->();
+      $self->ready->();
+    } else {
+      $self->channel->on_ready(K('_ready', $self));
+      $self->opened->();
     }
-);
-
-has inbox => (
-    is       => 'ro',
-    isa      => InstanceOf['Coro::Channel'],
-    init_arg => undef,
-    default  => sub { Coro::Channel->new() },
-);
-
-has read_loop => (
-    is       => 'lazy',
-    isa      => InstanceOf['Coro'],
-    init_arg => undef,
-);
-
-sub _build_read_loop {
-    my $self = shift;
-
-    return async {
-        scope_guard { $self->shutdown };
-
-        while (1) {
-            my $msg = $self->stream->read or last;
-
-            if ($self->has_pending($msg->id)) {
-                $self->get_pending($msg->id)->put($msg);
-            } else {
-                $self->inbox->put($msg);
-            }
-        }
-    };
-}
-
-sub shutdown {
-    my $self = shift;
-
-    $self->stream->close;
-    $self->inbox->shutdown;
-
-    my $error = 'Lost connection to worker while processing request';
-    foreach my $msgid ($self->all_pending) {
-        my $msg = Argon::Message->new(cmd => $CMD_ERROR, id => $msgid, payload => $error);
-        $self->get_pending($msgid)->put($msg);
-    }
+  }
+  else {
+    $self->connect;
+  }
 }
 
 sub connect {
-    my $self = shift;
-    $self->stream;
+  my $self = shift;
+  log_debug 'Connecting to %s', $self->addr;
+  tcp_connect $self->host, $self->port, K('_connected', $self);
 }
 
-sub _wait_msgid {
-    my ($self, $msgid) = @_;
-    my $reply = $self->get_pending($msgid)->get();
-    $self->del_pending($msgid);
-    return $reply;
+sub _connected {
+  my ($self, $fh) = @_;
+
+  if ($fh) {
+    log_debug '[%s] Connection established', $self->addr;
+
+    $self->channel(Argon::SecureChannel->new(
+      fh       => $fh,
+      key      => $self->key,
+      token    => $self->token,
+      remote   => $self->remote,
+      on_msg   => K('_notify', $self),
+      on_ready => K('_ready',  $self),
+      on_err   => K('_error',  $self),
+      on_close => K('_close',  $self),
+    ));
+
+    $self->opened->();
+  }
+  else {
+    log_debug '[%s] Connection attempt failed: %s', $self->addr, $!;
+    $self->cleanup;
+    $self->failed->($!);
+  }
 }
 
-sub send {
-    my ($self, $msg) = @_;
-    $self->set_pending($msg->id, Coro::Channel->new());
-    $self->stream->write($msg);
-    return $self->_wait_msgid($msg->id);
+sub reply_cb {
+  my ($self, $msg, $cb, $retry) = @_;
+  $self->add_msg($msg->id, {
+    orig  => $msg,
+    cb    => $cb,
+    intvl => interval(1),
+    retry => $retry,
+  });
 }
+
+
+sub ping {
+  my ($self, $cb) = @_;
+  my $msg = Argon::Message->new(cmd => $PING);
+  $self->send($msg);
+  $self->reply_cb($msg, $cb);
+}
+
 
 sub queue {
-    my ($self, $f, $args, $pri, $max_tries) = @_;
-    defined $f && (!ref $f || ref $f eq 'CODE') || croak 'expected CODE ref or class name';
-
-    $args ||= [];
-    ref $args eq 'ARRAY' || croak 'expected ARRAY ref of args';
-
-    $pri       ||= $PRI_NORMAL;
-    $max_tries ||= 10;
-
-    my $msg = Argon::Message->new(
-        cmd     => $CMD_QUEUE,
-        pri     => $pri,
-        payload => [$f, $args],
-    );
-
-    my $next_try = 0.1;
-    my $reply;
-
-    for (my $tries = 1; $tries <= $max_tries; ++$tries) {
-        $reply = $self->send($msg);
-
-        if ($reply->cmd == $CMD_REJECTED) {
-            $next_try = log(max($tries, 1.1)) / log(10);
-            Coro::AnyEvent::sleep $next_try;
-            next;
-        }
-        elsif ($reply->cmd == $CMD_ACK) {
-            return $reply->id;
-        }
-        else {
-            croak sprintf('Unknown response type: %s', $reply->cmd);
-        }
-    }
-
-    croak sprintf('Request failed after %d attempts. %s', $max_tries, $reply->payload);
+  my ($self, $class, $args, $cb) = @_;
+  my $msg = Argon::Message->new(cmd => $QUEUE, info => [$class, @$args]);
+  $self->send($msg);
+  $self->reply_cb($msg, $cb, $self->retry);
 }
 
-sub collect {
-    my ($self, $id) = @_;
-    my $msg   = Argon::Message->new(id => $id, cmd => $CMD_COLLECT, payload => $id);
-    my $reply = $self->send($msg);
-
-    if ($reply->cmd == $CMD_COMPLETE) {
-        return $reply->payload;
-    } else {
-        croak $reply->payload;
-    }
-}
 
 sub process {
-    my ($self, $f, $args, $pri, $max_tries) = @_;
-    my $id     = $self->queue($f, $args, $pri, $max_tries);
-    my $result = $self->collect($id);
-    return $result;
+  Argon::ASSERT_EVAL_ALLOWED;
+  my ($self, $code_ref, $args, $cb) = @_;
+  $args ||= [];
+
+  my $code = Dump($code_ref)
+    ->Purity(1)
+    ->Declare(1)
+    ->Out;
+
+  $self->queue('Argon::Task', [$code, $args], $cb);
 }
 
-sub defer {
-    my $self  = shift;
-    my $msgid = $self->queue(@_);
-    return sub { $self->collect($msgid) };
+
+sub async ($\[&$]\@) {
+  my ($self, $code_ref, $args) = @_;
+  my $cv = AnyEvent->condvar;
+  $self->process($code_ref, $args, $cv);
+  tie my $async, 'Argon::Async', $cv;
+  return $async;
 }
 
-sub server_status {
-    my $self  = shift;
-    my $msg   = Argon::Message->new(cmd => $CMD_STATUS);
-    my $reply = $self->send($msg);
+sub cleanup {
+  my $self = shift;
+  $self->closed->();
+  $self->channel(undef);
 
-    if ($reply->cmd == $CMD_COMPLETE) {
-        return $reply->payload;
-    } elsif ($reply->cmd == $CMD_ERROR) {
-        croak $reply->payload;
-    } else {
-        DEBUG 'Invalid server response [%d]: %s', $reply->cmd, $reply->payload;
-        croak 'Invalid server response';
+  my $error = 'Remote host was disconnected before task completed';
+
+  foreach my $id ($self->msg_ids) {
+    my $info = $self->get_msg($id);
+    my $cb   = $info->{cb} or next;
+    my $msg  = $info->{orig};
+    $cb->($msg->error($error));
+  }
+}
+
+sub _ready { shift->ready->() }
+
+sub _error {
+  my ($self, $error) = @_;
+  log_error '[%s] %s', $self->addr, $error;
+  $self->cleanup;
+}
+
+sub _close {
+  my ($self) = @_;
+  log_debug '[%s] Remote host disconnected', $self->addr;
+  $self->cleanup;
+}
+
+sub _notify {
+  my ($self, $msg) = @_;
+
+  if ($self->has_msg($msg->id)) {
+    my $info = $self->del_msg($msg->id);
+
+    if ($msg->denied && $info->{retry}) {
+      my $copy  = $info->{orig}->copy;
+      my $intvl = $info->{intvl}->();
+      log_debug 'Retrying message in %0.2fs: %s', $intvl, $info->{orig}->explain;
+
+      $self->add_msg($copy->id, {
+        orig  => $copy,
+        cb    => $info->{cb},
+        intvl => $info->{intvl},
+        retry => 1,
+        timer => AnyEvent->timer(after => $intvl, cb => K('send', $self, $copy)),
+      });
+
+      return;
     }
+
+    if ($info->{cb}) {
+      $info->{cb}->($msg);
+    }
+    else {
+      $self->notify->($msg);
+    }
+  }
+  else {
+    $self->notify->($msg);
+  }
 }
+
+__PACKAGE__->meta->make_immutable;
 
 1;
-__DATA__
+
+__END__
+
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
-Argon::Client
+Argon::Client - Client-side connection class for Argon systems
+
+=head1 VERSION
+
+version 0.18
 
 =head1 SYNOPSIS
 
-    use Argon::Client;
+  use Argon::Client;
+  use AnyEvent;
 
-    # Connect
-    my $client = Argon::Client->new(host => '...', port => XXXX);
+  my $cv = AnyEvent->condvar;
 
-    # Send task and wait for result
-    my $the_answer = $client->queue(sub {
-        my ($x, $y) = @_;
-        return $x * $y;
-    }, [6, 7]);
+  my $ar = Argon::Client->new(
+    host   => 'some.host.net',
+    port   => 1234,
+    retry  => 1,
+    opened => $cv,
+    ready  => sub{},
+    failed => sub{},
+    closed => sub{},
+    notify => sub{},
+  );
 
-    # Send task and get a deferred result that can be synchronized later
-    my $deferred = $client->defer(sub {
-        my ($x, $y) = @_;
-        return $x * $y;
-    }, [6, 7]);
+  $cv->recv;
 
-    my $result = $deferred->();
+  while (my $task = get_next_task) {
+    $ar->process($task->class, $task->args, \&task_complete);
+  }
 
-    # Close the client connection
-    $client->shutdown;
+  my $result = $ar->async(sub{ ... });
+  if ($result eq 'fnord') {
+    ...
+  }
 
 =head1 DESCRIPTION
 
-Establishes a connection to an Argon network and provides methods for executing
-tasks and collecting the results.
+Provides the client connection to an L<Argon> network.
+
+=head1 ATTRIBUTES
+
+=head2 host
+
+The hostname of the L<Argon::Manager> serving as the entry point for the
+Argon network.
+
+=head2 port
+
+The port number for the L<Argon::Manager>.
+
+=head2 retry
+
+By default, when the network is at capacity, new tasks may be rejected, causing
+L<Argon::Message/result> to croak. If C<retry> is set, the C<Argon::Client>
+will instead retry the task on a logarithmic backoff timer until the task is
+accepted by the manager.
+
+=head2 opened
+
+A code ref that is triggered when the connection is initially opened.
+
+=head2 ready
+
+A code ref that is triggered when the connection has been opened and the
+client is ready to begin sending tasks.
+
+=head2 failed
+
+A code ref that is triggered when the connection fails. The value of C<$!> is
+passed as an argument.
+
+=head2 closed
+
+A code ref that is triggered when the connection to the remote host is
+closed.
+
+=head2 notify
+
+When tasks are created without a callback (see L<Argon::Client/process>),
+the C<notify> callback is used in its place. The L<Argon::Message> reply
+is passed as an argument.
 
 =head1 METHODS
 
-=head2 new(host => $host, port => $port)
+=head2 ping
 
-Creates a new C<Argon::Client>. The connection is made lazily when the first
-call to L</queue> or L</connect> is performed. The connection can be forced by
-calling L</connect>.
+Pings the L<Argon::Manager> and calls the supplied callback with the manager's
+reply.
 
-=head2 connect
+  $ar->ping(sub{ my $reply = shift; ... });
 
-Connects to the remote host.
+=head2 queue
 
-=head2 server_status
+Queues a task with the Ar manager. Accepts the name of a class accessible to
+the workers defining a C<new> and C<run> method, an array of arguments to be
+passed to C<new>, and an optional code ref to be called when the task is
+complete. If not supplied, the L<Argon::Client/notify> method will be called in
+its place.
 
-Returns a hash of status information about the manager's load, capacity, and
-workers.
+  $ar->queue('Task::Class', $args_list, sub{
+    my $reply = shift;
+    ...
+  });
 
-=head2 queue($f, $args, $pri, $max_tries)
+=head2 process
 
-Queues a task with the L<Argon::Manager> and returns a message id which can
-be used to collect the results at a later time. The results are stored for
-at least C<$Argon::DEL_COMPLETE_AFTER> seconds.
+If the Ar workers were started with C<--allow-eval> and if the client process
+itself has C<$Argon::ALLOW_EVAL> set to a true value, a code ref may be passed
+in place of a task class. The code ref will be serialized using
+L<Data::Dump::Streamer> and has limited support for closures.
 
-Similarly, a class implementing 'new' and 'run' methods may be used in place
-of a CODE ref:
+  $ar->process(sub{ ... }, $args_list, sub{
+    my $reply = shift;
+    ...
+  });
 
-    my $msgid = $client->queue('Task::Whatever', $args);
-    # Executes Task::Whatever->new(@$args)->run();
+=head2 async
 
-This avoids import and closure issues that can occur when passing in a CODE
-reference.
+As an alternative to passing a callback or using a default callback, the
+C<async> method returns a tied scalar that, when accessed, blocks until the
+result is available. Note that if the task resulted in an error, it is thrown
+when the async is fetched.
 
-=over
+  my $async = $ar->async(sub{ ... }, $arg_list);
 
-=item $f <code ref|string>
+  if ($async eq 'slood') {
+    ...
+  }
 
-Subroutine to execute or a task class implementing C<new(@$args)> and C<run>.
-
-=item $args <array ref>
-
-Arguments to pass to C<$f>.
-
-=item $pri <int|undef - $Argon::PRI_(LOW|NORMAL|HIGH) constant>
-
-Task priority. Affects how the task is queued with the Manager when load is
-high enough that tasks are not immediately serviced. Defaults to
-C<$Argon::PRI_NORMAL>.
-
-=item $max_tries <int|undef>
-
-When Manager's queue is full, new tasks are rejected until the queue is
-reduced.  Tasks will be retried up to 10 times (by default) until they are
-accepted by the manager. If the task has not been accepted after C<$max_tries>,
-an error is thrown.
-
-=back
-
-=head2 collect($msgid)
-
-Blocks the thread until the result identified by C<$msgid> is available and
-returns the result. If processing the task resulted in an error, the error is
-rethrown when C<collect> is called.
-
-=head2 process($f, $args, $pri, $max_tries)
-
-Equivalent to calling:
-
-    my $msg = $client->queue($f, $args, $pri, $max_tries);
-    my $result = $client->collect($msg);
-
-=head2 defer($f, $args)
-
-Similar to L</process>, but instead of waiting for the result, returns an
-anonymous function that, when called, waits and returns the result. If an error
-occurs when calling <$f>, it is re-thrown from the anonymous function.
-
-C<defer> accepts a either a CODE ref or a task class.
-
-=head2 shutdown
-
-Disconnects from the Argon network.
-
-=head1 A NOTE ABOUT SCOPE
-
-L<Storable> is used to serialize code that is sent to the Argon network. This
-means that the code sent I<will not have access to variables and modules outside
-of itself> when executed. Therefore, the following I<will not work>:
-
-    my $x = 0;
-    $client->queue(sub { return $x + 1 }); # $x not found!
-
-The right way is to pass it to the function as part of the task's arguments:
-
-    my $x = 0;
-
-    $client->queue(sub {
-        my $x = shift;
-        return $x + 1;
-    }, [$x]);
-
-Similarly, module imports are not available to the function:
-
-    use Data::Dumper;
-
-    my $data = [1,2,3];
-    my $string = $client->queue(sub {
-        my $data = shift;
-        return Dumper($data); # Dumper not found
-    }, [$data]);
-
-The right way is to import the module inside the task:
-
-    my $data = [1,2,3];
-    my $string = $client->queue(sub {
-        require Data::Dumper;
-        my $data = shift;
-        return Data::Dumper::Dumper($data);
-    }, [$data]);
-
-Note the use of C<require> instead of C<use>. This is because C<use> is
-performed at compilation time, causing it to be triggered when the calling code
-is compiled, rather than from within the worker process. C<require>, on the
-other hand, is triggered at runtime and will behave as expected.
-
-Using a task class avoids this issue entirely; the task is loaded within the
-Argon worker process at run time, including any C<use> or C<require>
-statements.
+See L<Argon::Async>.
 
 =head1 AUTHOR
 
-Jeff Ober <jeffober@gmail.com>
+Jeff Ober <sysread@fastmail.fm>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Jeff Ober.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

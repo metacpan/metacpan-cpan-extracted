@@ -39,6 +39,7 @@ my @tests = (
 		timeout => 240,
 	},
 );
+my $has_blake2 = eval { require Digest::HMAC; require Digest::BLAKE2; 1 };
 my %objs;
 my @functions = (
 	{
@@ -75,6 +76,28 @@ my @functions = (
 		},
 		name => 'cached HMAC (large)',
 	},
+	($has_blake2 ? (
+		{
+			func => sub {
+				return hmac_drbg(@_, %base_params, cache => 65536,
+					func => sub {
+						return Digest::HMAC::hmac(@_, \&Digest::BLAKE2::blake2b);
+					},
+				)
+			},
+			name => 'cached HMAC (large BLAKE2b)',
+		},
+		{
+			func => sub {
+				return hmac_drbg(@_, %base_params,
+					func => sub {
+						return Digest::HMAC::hmac(@_, \&Digest::BLAKE2::blake2b);
+					},
+				)
+			},
+			name => 'uncached HMAC (BLAKE2b)',
+		},
+	) : ()),
 );
 
 foreach my $test (@tests) {

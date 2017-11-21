@@ -1,0 +1,124 @@
+#content {
+  width: 944px;
+  font-family: "Monospace";
+  font-size: 1em;
+  background: LightGray;
+  color: Black;
+  padding: 20px;
+  height: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+font.Alert {
+	color: Yellow;
+	font-weight: bold;
+}
+font.Annotation {
+   color: Yellow;
+	font-style: italic;
+}
+font.Attribute {
+   color: Maroon;
+}
+font.BaseN {
+   color: DarkGreen;
+}
+font.BuiltIn {
+   color: Coral;
+}
+font.Char {
+   color: Magenta;
+}
+font.Comment {
+   color: Brown;
+	font-style: italic;
+}
+font.CommentVar {
+   color: Blue;
+	font-style: italic;
+}
+font.Constant {
+   color: Gray;
+	font-weight: bold;
+}
+font.ControlFlow {
+   color: Darkblue;
+}
+font.DataType {
+   color: Blue;
+}
+font.DecVal {
+   color: DarkBlue;
+	font-weight: bold;
+}
+font.Documentation {
+   color: DarkSlateGray;
+	font-style: italic;
+}
+font.Error {
+   color: Red;
+	font-weight: bold;
+}
+font.Extension {
+   color: DarkGray;
+	font-weight: bold;
+}
+font.Float {
+   color: Blue;
+	font-weight: bold;
+}
+font.Function {
+   color: Brown;
+}
+font.Import {
+   color: DarkRed;
+}
+font.Information {
+   color: Green;
+	font-style: italic;
+}
+font.Keyword {
+   color: DarkGreen;
+	font-weight: bold;
+}
+font.Normal {
+   color: Black;
+}
+font.Operator {
+   color: DarkMagenta;
+}
+font.Others {
+   color: #408040;
+}
+font.Preprocessor {
+   color: Indigo;
+	font-weight: bold;
+}
+font.RegionMarker {
+   color: Purple;
+}
+font.Reserved {
+   color: Purple;
+}
+font.SpecialChar {
+   color: Purple;
+	font-weight: bold;
+}
+font.SpecialString {
+   color: Sienna;
+}
+font.String {
+   color: Red;
+}
+font.Variable {
+   color: DarkTurquoise;
+	font-weight: bold;
+}
+font.VerbatimString {
+   color: OrangeRed;
+}
+font.Warning {
+   color: Brown;
+	font-weight: bold;
+}
+

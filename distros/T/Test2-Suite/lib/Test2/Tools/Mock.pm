@@ -11,7 +11,7 @@ use Test2::Mock();
 
 use base 'Exporter';
 
-our $VERSION = '0.000083';
+our $VERSION = '0.000084';
 
 our @CARP_NOT = (__PACKAGE__, 'Test2::Mock');
 our @EXPORT = qw/mock mocked/;
@@ -523,7 +523,7 @@ F<http://github.com/Test-More/Test2-Suite/>.
 
 =head1 COPYRIGHT
 
-Copyright 2016 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+Copyright 2017 Chad Granum E<lt>exodist@cpan.orgE<gt>.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

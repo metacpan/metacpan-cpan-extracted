@@ -6,7 +6,7 @@ use utf8;
 use open qw(:std :utf8);
 use lib qw(lib ../lib ../../lib);
 
-use Test::More tests => 23;
+use Test::More tests => 26;
 use Encode qw(decode encode);
 
 BEGIN {
@@ -41,7 +41,10 @@ note 'jpath body empty';
     });
 
     $t->post_ok("/test/jpath/empty/vparam", '');
+    diag decode utf8 => $t->tx->res->body unless $t->tx->success;
 
+    # do not parse form
+    $t->post_ok("/test/jpath/empty/vparam", form => { int0 => 123 });
     diag decode utf8 => $t->tx->res->body unless $t->tx->success;
 }
 

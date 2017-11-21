@@ -97,7 +97,7 @@ sub run
     $work->() for 1 .. $max ;
 
     $cv->recv;
-    map{ $_ =~ s/^\**#\*keepalive\*#//;}values %result;
+    map{ $_ =~ s/^\**#\*MYDan_\d+\*#//;}values %result;
     return %result;
 }
 

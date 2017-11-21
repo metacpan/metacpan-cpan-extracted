@@ -15,10 +15,6 @@ META.json
 META.yml
 Makefile.PL
 README
-debian/changelog
-debian/control
-debian/copyright
-debian/rules
 htdocs/Images/Button1.gif
 htdocs/Images/Button2.gif
 htdocs/Images/bg.jpg

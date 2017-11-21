@@ -4,6 +4,8 @@ perl -I../lib country_oo.t 1
 perl -I../lib currency_func.t 1
 perl -I../lib currency_old.t 1
 perl -I../lib currency_oo.t 1
+perl -I../lib errors.1.t 1
+perl -I../lib errors.2.t 1
 perl -I../lib langext_func.t 1
 perl -I../lib langext_oo.t 1
 perl -I../lib langfam_func.t 1

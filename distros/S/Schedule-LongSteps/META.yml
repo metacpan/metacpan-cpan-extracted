@@ -3,7 +3,9 @@ abstract: 'Manage long term processes over arbitrary large spans of time.'
 author:
   - 'Jerome Eteve <jerome.eteve@gmail.com>'
 build_requires:
+  Test::Exception: '0'
   Test::MockDateTime: '0'
+  Test::MockModule: '0'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -15,6 +17,7 @@ meta-spec:
   version: '1.4'
 name: Schedule-LongSteps
 requires:
+  Action::Retry: '0.24'
   Class::Load: '0'
   Data::UUID: '1.220'
   DateTime: '1.18'
@@ -23,6 +26,6 @@ requires:
   Moose: '2.1405'
   Scope::Guard: '0.21'
 resources:
-  homepage: https://github.com/jeteve/Schedule-LongSteps
-  repository: https://github.com/jeteve/Schedule-LongSteps.git
-version: '0.021'
+  homepage: https://github.com/skinnyjeans/Schedule-LongSteps
+  repository: https://github.com/skinnyjeans/Schedule-LongSteps.git
+version: '0.023'

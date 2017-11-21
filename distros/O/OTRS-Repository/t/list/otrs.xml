@@ -1,0 +1,1568 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<otrs_package_list version="1.0">
+<Package>
+    <Name>Calendar</Name>
+    <Version>1.9.5</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <ChangeLog Date="2011-02-15 16:16:16" Version="1.9.5">Added database indexes to improve the performance.</ChangeLog>
+    <ChangeLog Date="2010-01-12 10:44:41" Version="1.9.4">Fixed bug#4681 - Wrong Content-Transfer-Encoding value in outgoing ICS messages from calendar prevents Exchange from accepting invitations.</ChangeLog>
+    <ChangeLog Date="2009-07-28 13:09:41" Version="1.9.3">Added Chinese Simple translation.</ChangeLog>
+    <ChangeLog Date="2009-07-09 04:18:13" Version="1.9.2">Added Polish and Latvian translation.</ChangeLog>
+    <ChangeLog Date="2009-04-23 11:01:09" Version="1.9.1">First version for OTRS 2.4.</ChangeLog>
+    <Description Lang="en">A web calendar.</Description>
+    <Description Lang="de">Ein Web Kalender.</Description>
+    <Framework>2.4.x</Framework>
+    <Filelist>
+    </Filelist>
+  <File>Calendar-1.9.5.opm</File>
+</Package>
+<Package>
+    <Name>Calendar</Name>
+    <Version>1.9.4</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <ChangeLog Date="2010-01-12 10:44:41" Version="1.9.4">Fixed bug#4681 - Wrong Content-Transfer-Encoding value in outgoing ICS messages from calendar prevents Exchange from accepting invitations.</ChangeLog>
+    <ChangeLog Date="2009-07-28 13:09:41" Version="1.9.3">Added Chinese Simple translation.</ChangeLog>
+    <ChangeLog Date="2009-07-09 04:18:13" Version="1.9.2">Added Polish and Latvian translation.</ChangeLog>
+    <ChangeLog Date="2009-04-23 11:01:09" Version="1.9.1">First version for OTRS 2.4.</ChangeLog>
+    <Description Lang="en">A web calendar.</Description>
+    <Description Lang="de">Ein Web Kalender.</Description>
+    <Framework>2.4.x</Framework>
+    <Filelist>
+    </Filelist>
+  <File>Calendar-1.9.4.opm</File>
+</Package>
+<Package>
+    <Name>Calendar</Name>
+    <Version>1.7.1</Version>
+    <Vendor>OTRS GmbH</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
+    <ChangeLog Date="2007-06-28 01:08:50" Version="1.7.1">Updated to 2.2 framework.</ChangeLog>
+    <Description Lang="en">A web calendar.</Description>
+    <Description Lang="de">Ein Web Kalender.</Description>
+    <Framework>2.2.x</Framework>
+    <Filelist>
+    </Filelist>
+  <File>Calendar-1.7.1.opm</File>
+</Package>
+<Package>
+    <Name>Calendar</Name>
+    <Version>1.5.1</Version>
+    <Vendor>OTRS GmbH</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
+    <ChangeLog Date="2006-10-18 11:51:18" Version="1.5.1">upgrade to 2.1.x</ChangeLog>
+    <ChangeLog Date="2006-02-01">added resource management</ChangeLog>
+    <ChangeLog Date="2005-12-21">added unit tests</ChangeLog>
+    <ChangeLog Date="2005-10-31">added new security sql quote()</ChangeLog>
+    <ChangeLog Date="2005-10-31">added delete email notify, moved to own css, delete yes/no screen, added event typs in different collors, removed Kernel/Config/Files/Calendar.pm</ChangeLog>
+    <ChangeLog Date="2005-10-04">moved to table content size of 1000 chars</ChangeLog>
+    <ChangeLog Date="2005-08-18">added nb_NO translation, thanks to Espen Stefansen!</ChangeLog>
+    <ChangeLog Date="2005-08-04">new it translation from Giordano Bianchi</ChangeLog>
+    <ChangeLog Date="2005-06-12">added involved user and notification feature</ChangeLog>
+    <ChangeLog Date="2005-06-12">added xml</ChangeLog>
+    <ChangeLog Date="2005-04-05">fixed status selection on update</ChangeLog>
+    <ChangeLog Date="2005-04-05">fixed print modus</ChangeLog>
+    <ChangeLog Date="2005-01-25">added multi view and print modus</ChangeLog>
+    <ChangeLog Date="2004-12-02">added change log</ChangeLog>
+    <ChangeLog Date="2004-12-02">New package</ChangeLog>
+    <Description Lang="en">A web calendar.</Description>
+    <Description Lang="de">Ein Web Kalender.</Description>
+    <Framework>2.1.x</Framework>
+    <Filelist>
+    </Filelist>
+  <File>Calendar-1.5.1.opm</File>
+</Package>
+<Package>
+    <Name>FAQ</Name>
+    <Version>2.3.1</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <ChangeLog Date="2013-11-08 01:59:34" Version="2.3.1">Build for FAQ 2.3.1.</ChangeLog>
+    <ChangeLog Date="2013-11-01 23:38:14" Version="2.2.94">Build for FAQ 2.3.0 rc1.</ChangeLog>
+    <ChangeLog Date="2013-10-17 20:18:23" Version="2.2.93">Build for FAQ 2.3.0 beta3.</ChangeLog>
+    <ChangeLog Date="2013-10-02 23:02:47" Version="2.2.92">Build for FAQ 2.3.0 beta2.</ChangeLog>
+    <ChangeLog Date="2013-09-20 00:27:36" Version="2.2.91">First version for OTRS 3.3.x.</ChangeLog>
+    <Description Lang="en">The FAQ/knowledge base.</Description>
+    <Description Lang="de">Die FAQ-/Wissensdatenbank.</Description>
+    <Framework>3.3.x</Framework>
+    <Filelist>
+        <FileDoc Location="doc/faq-database.png" Permission="644"/>
+        <FileDoc Location="doc/en/FAQ.pdf" Permission="644"/>
+    </Filelist>
+  <File>FAQ-2.3.1.opm</File>
+</Package>
+<Package>
+    <Name>FAQ</Name>
+    <Version>2.2.91</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <ChangeLog Date="2013-09-20 00:27:27" Version="2.2.91">First version for OTRS 3.3.x.</ChangeLog>
+    <Description Lang="en">The FAQ/knowledge base.</Description>
+    <Description Lang="de">Die FAQ-/Wissensdatenbank.</Description>
+    <Framework>3.3.x</Framework>
+    <Filelist>
+        <FileDoc Location="doc/faq-database.png" Permission="644"/>
+        <FileDoc Location="doc/en/FAQ.pdf" Permission="644"/>
+    </Filelist>
+  <File>FAQ-2.2.91.opm</File>
+</Package>
+<Package>
+    <Name>FAQ</Name>
+    <Version>1.2.2</Version>
+    <Vendor>OTRS GmbH</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
+    <ChangeLog Date="2007-07-02 13:14:45" Version="1.2.2">Fixed sql insert bug.</ChangeLog>
+    <ChangeLog Date="2007-06-29 15:03:43" Version="1.2.1">First version for otrs framework 2.2.x.</ChangeLog>
+    <ChangeLog>2005-12-04 New package</ChangeLog>
+    <Description Lang="en">A FAQ/knowledge base.</Description>
+    <Description Lang="de">Eine FAQ-/Wissensdatenbank.</Description>
+    <Framework>2.2.x</Framework>
+    <Filelist>
+    </Filelist>
+  <File>FAQ-1.2.2.opm</File>
+</Package>
+<Package>
+    <Name>FAQ</Name>
+    <Version>1.2.1</Version>
+    <Vendor>OTRS GmbH</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
+    <ChangeLog Date="2007-06-29 15:03:43" Version="1.2.1">First version for otrs framework 2.2.x.</ChangeLog>
+    <ChangeLog>2005-12-04 New package</ChangeLog>
+    <Description Lang="en">A FAQ/knowledge base.</Description>
+    <Description Lang="de">Eine FAQ-/Wissensdatenbank.</Description>
+    <Framework>2.2.x</Framework>
+    <Filelist>
+    </Filelist>
+  <File>FAQ-1.2.1.opm</File>
+</Package>
+<Package>
+    <Name>FAQ</Name>
+    <Version>1.0.13</Version>
+    <Vendor>OTRS GmbH</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
+    <ChangeLog Date="2006-12-13 16:22:51" Version="1.0.13">fixed bug not display category</ChangeLog>
+    <ChangeLog Date="2006-12-13 13:48:21" Version="1.0.12">fixed faq link bug</ChangeLog>
+    <ChangeLog>2005-12-04 New package</ChangeLog>
+    <Description Lang="en">A FAQ/knowledge base.</Description>
+    <Description Lang="de">Eine FAQ-/Wissensdatenbank.</Description>
+    <Framework>2.1.x</Framework>
+    <Filelist>
+    </Filelist>
+  <File>FAQ-1.0.13.opm</File>
+</Package>
+<Package>
+    <Name>FAQ</Name>
+    <Version>1.0.12</Version>
+    <Vendor>OTRS GmbH</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
+    <ChangeLog Date="2006-12-13 13:48:21" Version="1.0.12">fixed faq link bug</ChangeLog>
+    <ChangeLog>2005-12-04 New package</ChangeLog>
+    <Description Lang="en">A FAQ/knowledge base.</Description>
+    <Description Lang="de">Eine FAQ-/Wissensdatenbank.</Description>
+    <Framework>2.1.x</Framework>
+    <Filelist>
+    </Filelist>
+  <File>FAQ-1.0.12.opm</File>
+</Package>
+<Package>
+    <Name>FileManager</Name>
+    <Version>1.4.3</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
+    <ChangeLog Date="2009-01-28 13:46:01" Version="1.4.3">Fixed bug# 3631 - Problem while creating TrashDir because of a not replaced &lt;OTRS_FileManager::Root&gt; placeholder.</ChangeLog>
+    <ChangeLog Date="2009-01-28 12:39:33" Version="1.4.2">Fixed bug# 2292, 3511, 3494, 3177 - Improved descriptions and error warnings for a easier configuration.</ChangeLog>
+    <ChangeLog Date="2008-06-03 15:10:08" Version="1.4.1">Upgrade to OTRS 2.3 framework.</ChangeLog>
+    <Description Lang="en">A web file system manager with download/upload option.</Description>
+    <Description Lang="de">Ein Web Datei Manager mit download/upload moeglichkeit.</Description>
+    <Framework>2.3.x</Framework>
+    <Filelist>
+    </Filelist>
+  <File>FileManager-1.4.3.opm</File>
+</Package>
+<Package>
+    <Name>FileManager</Name>
+    <Version>1.4.2</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
+    <ChangeLog Date="2009-01-28 12:39:33" Version="1.4.2">Fixed bug# 2292, 3511, 3494, 3177 - Improved descriptions and error warnings for a easier configuration.</ChangeLog>
+    <ChangeLog Date="2008-06-03 15:10:08" Version="1.4.1">Upgrade to OTRS 2.3 framework.</ChangeLog>
+    <Description Lang="en">A web file system manager with download/upload option.</Description>
+    <Description Lang="de">Ein Web Datei Manager mit download/upload moeglichkeit.</Description>
+    <Framework>2.3.x</Framework>
+    <Filelist>
+    </Filelist>
+  <File>FileManager-1.4.2.opm</File>
+</Package>
+<Package>
+    <Name>FileManager</Name>
+    <Version>1.4.1</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
+    <ChangeLog Date="2008-06-03 15:10:08" Version="1.4.1">Upgrade to OTRS 2.3 framework.</ChangeLog>
+    <Description Lang="en">A web file system manager with download/upload option.</Description>
+    <Description Lang="de">Ein Web Datei Manager mit download/upload moeglichkeit.</Description>
+    <Framework>2.3.x</Framework>
+    <Filelist>
+    </Filelist>
+  <File>FileManager-1.4.1.opm</File>
+</Package>
+<Package>
+    <Name>FileManager</Name>
+    <Version>1.3.1</Version>
+    <Vendor>OTRS GmbH</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
+    <ChangeLog Date="2007-06-28 01:17:30" Version="1.3.1">Upgrade to 2.2.x.</ChangeLog>
+    <Description Lang="en">A web file system manager with download/upload option.</Description>
+    <Description Lang="de">Ein Web Datei Manager mit download/upload moeglichkeit.</Description>
+    <Framework>2.2.x</Framework>
+    <Filelist>
+    </Filelist>
+  <File>FileManager-1.3.1.opm</File>
+</Package>
+<Package>
+    <Name>FileManager</Name>
+    <Version>1.2.1</Version>
+    <Vendor>OTRS GmbH</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
+    <ChangeLog Date="2006-10-17 22:39:41" Version="1.2.1">upgrade to 2.1.x</ChangeLog>
+    <ChangeLog Date="2005-10-26">renamed filemanager picture</ChangeLog>
+    <ChangeLog Date="2005-08-19">fixed bug with empty directory spaces</ChangeLog>
+    <ChangeLog Date="2005-08-18">added nb_NO translation, thanks to Espen Stefansen!</ChangeLog>
+    <ChangeLog Date="2005-06-12">added check if root exists</ChangeLog>
+    <ChangeLog Date="2005-06-12">added xml config file</ChangeLog>
+    <ChangeLog Date="2005-02-22">fixed css</ChangeLog>
+    <ChangeLog Date="2004-12-02">added change log</ChangeLog>
+    <ChangeLog Date="2004-12-02">New package</ChangeLog>
+    <Description Lang="en">A web file system manager with download/upload option.</Description>
+    <Description Lang="de">Ein Web Datei Manager mit download/upload moeglichkeit.</Description>
+    <Framework>2.1.x</Framework>
+    <Filelist>
+    </Filelist>
+  <File>FileManager-1.2.1.opm</File>
+</Package>
+<Package>
+    <Name>FileManager</Name>
+    <Version>1.1.7</Version>
+    <Vendor>OTRS GmbH</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
+    <ChangeLog Date="2006-10-17 22:38:44" Version="1.1.7">code clean up</ChangeLog>
+    <ChangeLog Date="2005-10-26">renamed filemanager picture</ChangeLog>
+    <ChangeLog Date="2005-08-19">fixed bug with empty directory spaces</ChangeLog>
+    <ChangeLog Date="2005-08-18">added nb_NO translation, thanks to Espen Stefansen!</ChangeLog>
+    <ChangeLog Date="2005-06-12">added check if root exists</ChangeLog>
+    <ChangeLog Date="2005-06-12">added xml config file</ChangeLog>
+    <ChangeLog Date="2005-02-22">fixed css</ChangeLog>
+    <ChangeLog Date="2004-12-02">added change log</ChangeLog>
+    <ChangeLog Date="2004-12-02">New package</ChangeLog>
+    <Description Lang="en">A web file system manager with download/upload option.</Description>
+    <Description Lang="de">Ein Web Datei Manager mit download/upload moeglichkeit.</Description>
+    <Framework>2.0.x</Framework>
+    <Filelist>
+    </Filelist>
+  <File>FileManager-1.1.7.opm</File>
+</Package>
+<Package>
+    <Name>iPhoneHandle</Name>
+    <Version>0.0.2</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <ChangeLog Date="2010-06-25 18:14:39" Version="0.0.2">Improved ScreenConfig feature for Dynamic iPhone Screens.</ChangeLog>
+    <ChangeLog Date="2010-06-22 23:39:01" Version="1.0.1">Init release.</ChangeLog>
+    <Description Lang="en">The iPhoneHandle Package.</Description>
+    <Description Lang="de">Das iPhoneHandle Paket.</Description>
+    <Framework>2.4.x</Framework>
+    <Framework>3.0.x</Framework>
+    <Filelist>
+    </Filelist>
+  <File>iPhoneHandle-0.0.2.opm</File>
+</Package>
+<Package>
+    <Name>MasterSlave</Name>
+    <Version>1.0.1</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <ChangeLog Date="2009-07-16 22:08:35" Version="1.0.1">Init release.</ChangeLog>
+    <Description Lang="en">Includes "Ticket Master/Slave" feature.</Description>
+    <Description Lang="de">Enthält "Ticket Master/Slave" Funktionalität.</Description>
+    <Framework>2.4.x</Framework>
+    <Filelist>
+    </Filelist>
+  <File>MasterSlave-1.0.1.opm</File>
+</Package>
+<Package>
+    <Name>OTRSCodePolicy</Name>
+    <Version>1.0.1</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <ChangeLog Date="2013-10-24 17:29:57" Version="1.0.1">First version.</ChangeLog>
+    <Description Lang="en">OTRS code quality checks.</Description>
+    <Framework>3.3.x</Framework>
+    <Framework>3.2.x</Framework>
+    <Framework>3.1.x</Framework>
+    <ModuleRequired Version="0.17">Code::TidyAll</ModuleRequired>
+    <ModuleRequired>Perl::Critic</ModuleRequired>
+    <ModuleRequired>Perl::Tidy</ModuleRequired>
+    <Filelist>
+        <FileDoc Location="doc/en/OTRSCodePolicy.pdf" Permission="644"/>
+    </Filelist>
+  <File>OTRSCodePolicy-1.0.1.opm</File>
+</Package>
+<Package>
+    <Name>OTRSMasterSlave</Name>
+    <Version>1.3.1</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <ChangeLog Date="2012-11-23 04:18:48" Version="1.3.1">First version for OTRS 3.2.</ChangeLog>
+    <Description Lang="en">Includes "Ticket Master/Slave" feature.</Description>
+    <Description Lang="de">Enthält "Ticket Master/Slave" Funktionalität.</Description>
+    <Framework>3.2.x</Framework>
+    <Filelist>
+        <FileDoc Location="doc/en/OTRSMasterSlave.pdf" Permission="644"/>
+        <FileDoc Location="doc/de/OTRSMasterSlave.pdf" Permission="644"/>
+    </Filelist>
+  <File>OTRSMasterSlave-1.3.1.opm</File>
+</Package>
+<Package>
+    <Name>Support</Name>
+    <Version>1.5.1</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <ChangeLog Date="2013-08-15 15:25:31" Version="1.5.1">Ported to OTRS 3.3.</ChangeLog>
+    <Description Lang="en">Verifies System settings and gives performance tips.</Description>
+    <Description Lang="de">Das Support-Assessment-Modul prüft fehlerhafte System-Einstellungen und gibt Performance-Tips.</Description>
+    <Description Lang="es">Comprueba configuraciones del sistema y brinda consejos de rendimiento.</Description>
+    <Framework>3.3.x</Framework>
+    <Filelist>
+    </Filelist>
+  <File>Support-1.5.1.opm</File>
+</Package>
+<Package>
+    <Name>Support</Name>
+    <Version>1.4.1</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <ChangeLog Date="2012-10-11 06:59:29" Version="1.4.1">Init release for OTRS 3.2.</ChangeLog>
+    <Description Lang="en">Verifies System settings and gives performance tips.</Description>
+    <Description Lang="de">Das Support-Assessment-Modul prüft fehlerhafte System-Einstellungen und gibt Performance-Tips.</Description>
+    <Description Lang="es">Comprueba configuraciones del sistema y brinda consejos de rendimiento.</Description>
+    <Framework>3.2.x</Framework>
+    <Filelist>
+    </Filelist>
+  <File>Support-1.4.1.opm</File>
+</Package>
+<Package>
+    <Name>Support</Name>
+    <Version>1.3.5</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <ChangeLog Date="2012-08-08 16:19:24" Version="1.3.5">Fixed benchmark feature.</ChangeLog>
+    <ChangeLog Date="2012-07-13 14:49:14" Version="1.3.4">Disable TableCheck to fix crash of the database and webserver.</ChangeLog>
+    <ChangeLog Date="2012-01-26 16:49:28" Version="1.3.3">Code cleanup.</ChangeLog>
+    <ChangeLog Date="2011-11-25 12:16:28" Version="1.3.2">Fixed division by zero bug.</ChangeLog>
+    <ChangeLog Date="2011-11-18 05:34:34" Version="1.3.1">Init release for OTRS 3.1.</ChangeLog>
+    <Description Lang="en">Verifies System settings and gives performance tips.</Description>
+    <Description Lang="de">Das Support-Assessment-Modul prüft fehlerhafte System-Einstellungen und gibt Performance-Tips.</Description>
+    <Description Lang="es">Comprueba configuraciones del sistema y brinda consejos de rendimiento.</Description>
+    <Framework>3.1.x</Framework>
+    <Filelist>
+    </Filelist>
+  <File>Support-1.3.5.opm</File>
+</Package>
+<Package>
+    <Name>Support</Name>
+    <Version>1.3.4</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <ChangeLog Date="2012-07-13 14:49:14" Version="1.3.4">Disable TableCheck to fix crash of the database and webserver.</ChangeLog>
+    <ChangeLog Date="2012-01-26 16:49:28" Version="1.3.3">Code cleanup.</ChangeLog>
+    <ChangeLog Date="2011-11-25 12:16:28" Version="1.3.2">Fixed division by zero bug.</ChangeLog>
+    <ChangeLog Date="2011-11-18 05:34:34" Version="1.3.1">Init release for OTRS 3.1.</ChangeLog>
+    <Description Lang="en">Verifies System settings and gives performance tips.</Description>
+    <Description Lang="de">Das Support-Assessment-Modul prüft fehlerhafte System-Einstellungen und gibt Performance-Tips.</Description>
+    <Description Lang="es">Comprueba configuraciones del sistema y brinda consejos de rendimiento.</Description>
+    <Framework>3.1.x</Framework>
+    <Filelist>
+    </Filelist>
+  <File>Support-1.3.4.opm</File>
+</Package>
+<Package>
+    <Name>Support</Name>
+    <Version>1.1.2</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <ChangeLog Date="2010-05-28 09:33:51" Version="1.1.2">Fixed bug#5369 - Support Module fails on Oracle databases.</ChangeLog>
+    <ChangeLog Date="2010-05-13 18:14:29" Version="1.1.1">Added new check to compare the application and DB servers timestamp.</ChangeLog>
+    <ChangeLog Date="2010-02-23 16:28:03" Version="1.0.99">Fixed bug with check.xml files containing no information.</ChangeLog>
+    <ChangeLog Date="2010-02-16 20:09:33" Version="1.0.98">Fixed bug# 4992 - Support package 1.0.96 and 1.0.97 not working on OTRS 2.1.9.</ChangeLog>
+    <ChangeLog Date="2010-02-15 13:55:24" Version="1.0.97">Fixed error message in log about missing cron check.</ChangeLog>
+    <ChangeLog Date="2010-02-09 22:38:30" Version="1.0.96">Made it possible to enable/disable each check via sysconfig.</ChangeLog>
+    <ChangeLog Date="2010-01-07 21:15:31" Version="1.0.95">Fixed some performance issues of tar files with OTRS 2.4 (support package took 100% cpu time up to 30 min.).</ChangeLog>
+    <ChangeLog Date="2009-12-01 18:32:16" Version="1.0.94">Added some debug info to fnd out where a support package stop the process and added max file count protection of application archive file.</ChangeLog>
+    <ChangeLog Date="2009-10-01 18:06:11" Version="1.0.93">Added new checks for root@otrs password and SOAP, improved Win32 version detection, improved PostgreSQL version detection, fixed typos.</ChangeLog>
+    <ChangeLog Date="2009-08-01 13:48:51" Version="1.0.92">Improved DirectoryFiles() to exclude TempDir und ArticleDir based on current config setting (prevent possible Mail Bomb mail rejects).</ChangeLog>
+    <ChangeLog Date="2009-04-17 16:58:02" Version="1.0.91">Init release for OTRS 2.4. Add new Encode handling.</ChangeLog>
+    <Description Lang="en">Verifies System settings and gives performance tips.</Description>
+    <Description Lang="de">Das Support Assessment Modul prüft fehlerhafte System-Einstellungen und gibt Performance-Tips.</Description>
+    <Framework>2.4.x</Framework>
+    <Framework>2.3.x</Framework>
+    <Framework>2.2.x</Framework>
+    <Framework>2.1.x</Framework>
+    <Filelist>
+    </Filelist>
+  <File>Support-1.1.2.opm</File>
+</Package>
+<Package>
+    <Name>Support</Name>
+    <Version>1.1.1</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <ChangeLog Date="2010-05-13 18:14:29" Version="1.1.1">Added new check to compare the application and DB servers timestamp.</ChangeLog>
+    <ChangeLog Date="2010-02-23 16:28:03" Version="1.0.99">Fixed bug with check.xml files containing no information.</ChangeLog>
+    <ChangeLog Date="2010-02-16 20:09:33" Version="1.0.98">Fixed bug# 4992 - Support package 1.0.96 and 1.0.97 not working on OTRS 2.1.9.</ChangeLog>
+    <ChangeLog Date="2010-02-15 13:55:24" Version="1.0.97">Fixed error message in log about missing cron check.</ChangeLog>
+    <ChangeLog Date="2010-02-09 22:38:30" Version="1.0.96">Made it possible to enable/disable each check via sysconfig.</ChangeLog>
+    <ChangeLog Date="2010-01-07 21:15:31" Version="1.0.95">Fixed some performance issues of tar files with OTRS 2.4 (support package took 100% cpu time up to 30 min.).</ChangeLog>
+    <ChangeLog Date="2009-12-01 18:32:16" Version="1.0.94">Added some debug info to fnd out where a support package stop the process and added max file count protection of application archive file.</ChangeLog>
+    <ChangeLog Date="2009-10-01 18:06:11" Version="1.0.93">Added new checks for root@otrs password and SOAP, improved Win32 version detection, improved PostgreSQL version detection, fixed typos.</ChangeLog>
+    <ChangeLog Date="2009-08-01 13:48:51" Version="1.0.92">Improved DirectoryFiles() to exclude TempDir und ArticleDir based on current config setting (prevent possible Mail Bomb mail rejects).</ChangeLog>
+    <ChangeLog Date="2009-04-17 16:58:02" Version="1.0.91">Init release for OTRS 2.4. Add new Encode handling.</ChangeLog>
+    <Description Lang="en">Verifies System settings and gives performance tips.</Description>
+    <Description Lang="de">Das Support Assessment Modul prüft fehlerhafte System-Einstellungen und gibt Performance-Tips.</Description>
+    <Framework>2.4.x</Framework>
+    <Framework>2.3.x</Framework>
+    <Framework>2.2.x</Framework>
+    <Framework>2.1.x</Framework>
+    <Filelist>
+    </Filelist>
+  <File>Support-1.1.1.opm</File>
+</Package>
+<Package>
+    <Name>Support</Name>
+    <Version>1.0.99</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <ChangeLog Date="2010-02-23 16:28:03" Version="1.0.99">Fixed bug with check.xml files containing no information.</ChangeLog>
+    <ChangeLog Date="2010-02-16 20:09:33" Version="1.0.98">Fixed bug# 4992 - Support package 1.0.96 and 1.0.97 not working on OTRS 2.1.9.</ChangeLog>
+    <ChangeLog Date="2010-02-15 13:55:24" Version="1.0.97">Fixed error message in log about missing cron check.</ChangeLog>
+    <ChangeLog Date="2010-02-09 22:38:30" Version="1.0.96">Made it possible to enable/disable each check via sysconfig.</ChangeLog>
+    <ChangeLog Date="2010-01-07 21:15:31" Version="1.0.95">Fixed some performance issues of tar files with OTRS 2.4 (support package took 100% cpu time up to 30 min.).</ChangeLog>
+    <ChangeLog Date="2009-12-01 18:32:16" Version="1.0.94">Added some debug info to fnd out where a support package stop the process and added max file count protection of application archive file.</ChangeLog>
+    <ChangeLog Date="2009-10-01 18:06:11" Version="1.0.93">Added new checks for root@otrs password and SOAP, improved Win32 version detection, improved PostgreSQL version detection, fixed typos.</ChangeLog>
+    <ChangeLog Date="2009-08-01 13:48:51" Version="1.0.92">Improved DirectoryFiles() to exclude TempDir und ArticleDir based on current config setting (prevent possible Mail Bomb mail rejects).</ChangeLog>
+    <ChangeLog Date="2009-04-17 16:58:02" Version="1.0.91">Init release for OTRS 2.4. Add new Encode handling.</ChangeLog>
+    <Description Lang="en">Verifies System settings and gives performance tips.</Description>
+    <Description Lang="de">Das Support Assessment Modul prüft fehlerhafte System-Einstellungen und gibt Performance-Tips.</Description>
+    <Framework>2.4.x</Framework>
+    <Framework>2.3.x</Framework>
+    <Framework>2.2.x</Framework>
+    <Framework>2.1.x</Framework>
+    <Filelist>
+    </Filelist>
+  <File>Support-1.0.99.opm</File>
+</Package>
+<Package>
+    <Name>Support</Name>
+    <Version>1.0.98</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <ChangeLog Date="2010-02-16 20:09:33" Version="1.0.98">Fixed bug# 4992 - Support package 1.0.96 and 1.0.97 not working on OTRS 2.1.9.</ChangeLog>
+    <ChangeLog Date="2010-02-15 13:55:24" Version="1.0.97">Fixed error message in log about missing cron check.</ChangeLog>
+    <ChangeLog Date="2010-02-09 22:38:30" Version="1.0.96">Made it possible to enable/disable each check via sysconfig.</ChangeLog>
+    <ChangeLog Date="2010-01-07 21:15:31" Version="1.0.95">Fixed some performance issues of tar files with OTRS 2.4 (support package took 100% cpu time up to 30 min.).</ChangeLog>
+    <ChangeLog Date="2009-12-01 18:32:16" Version="1.0.94">Added some debug info to fnd out where a support package stop the process and added max file count protection of application archive file.</ChangeLog>
+    <ChangeLog Date="2009-10-01 18:06:11" Version="1.0.93">Added new checks for root@otrs password and SOAP, improved Win32 version detection, improved PostgreSQL version detection, fixed typos.</ChangeLog>
+    <ChangeLog Date="2009-08-01 13:48:51" Version="1.0.92">Improved DirectoryFiles() to exclude TempDir und ArticleDir based on current config setting (prevent possible Mail Bomb mail rejects).</ChangeLog>
+    <ChangeLog Date="2009-04-17 16:58:02" Version="1.0.91">Init release for OTRS 2.4. Add new Encode handling.</ChangeLog>
+    <Description Lang="en">Verifies System settings and gives performance tips.</Description>
+    <Description Lang="de">Das Support Assessment Modul prüft fehlerhafte System-Einstellungen und gibt Performance-Tips.</Description>
+    <Framework>2.4.x</Framework>
+    <Framework>2.3.x</Framework>
+    <Framework>2.2.x</Framework>
+    <Framework>2.1.x</Framework>
+    <Filelist>
+    </Filelist>
+  <File>Support-1.0.98.opm</File>
+</Package>
+<Package>
+    <Name>Support</Name>
+    <Version>0.1.13</Version>
+    <Vendor>OTRS GmbH</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
+    <ChangeLog Date="2007-11-22 17:51:49" Version="0.1.13">Fix bug in dtl template.</ChangeLog>
+    <ChangeLog Date="2007-11-22 16:23:37" Version="0.1.12">Fix bugs in mssql and posgresql driver.</ChangeLog>
+    <ChangeLog Date="2007-11-22 14:07:57" Version="0.1.11">Code review and fix oracle and psql bugs.</ChangeLog>
+    <ChangeLog Date="2007-10-04 09:03:39" Version="0.1.10">Complete Win32 compat.</ChangeLog>
+    <ChangeLog Date="2007-10-04 08:43:45" Version="0.1.9">Fixed bug in Hardware.pm.</ChangeLog>
+    <ChangeLog Date="2007-10-02 09:53:30" Version="0.1.8">Fixed Bug in Support.xml.</ChangeLog>
+    <ChangeLog Date="2007-10-02 09:38:41" Version="0.1.7">Support Modul review.</ChangeLog>
+    <ChangeLog Date="2007-09-03 20:44:35" Version="0.1.6">Add new database checks.</ChangeLog>
+    <ChangeLog Date="2007-06-19 15:09:43" Version="0.1.5">Added more database checks.</ChangeLog>
+    <ChangeLog Date="2007-06-13 14:14:26" Version="0.1.4">Improved notifications.</ChangeLog>
+    <ChangeLog Date="2007-06-12 15:03:51" Version="0.1.3">Added init apache checks.</ChangeLog>
+    <ChangeLog Date="2007-06-11 16:52:58" Version="0.1.2">Added init mysql and oracle checks.</ChangeLog>
+    <ChangeLog Date="2007-05-08 16:58:24" Version="0.1.1">Add new admin checks and quote xml input.</ChangeLog>
+    <ChangeLog Date="2007-05-08 10:03:55" Version="0.0.3">Fixed xml and formatting bug.</ChangeLog>
+    <ChangeLog Date="2007-05-07 21:28:55" Version="0.0.2">Init release.</ChangeLog>
+    <Description Lang="en">A admin support tool.</Description>
+    <Description Lang="de">Ein Admin Support Tool.</Description>
+    <Framework>2.1.x</Framework>
+    <Framework>2.2.x</Framework>
+    <Filelist>
+    </Filelist>
+  <File>Support-0.1.13.opm</File>
+</Package>
+<Package>
+    <Name>Support</Name>
+    <Version>0.1.12</Version>
+    <Vendor>OTRS GmbH</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
+    <ChangeLog Date="2007-11-22 16:23:37" Version="0.1.12">Fix bugs in mssql and posgresql driver.</ChangeLog>
+    <ChangeLog Date="2007-11-22 14:07:57" Version="0.1.11">Code review and fix oracle and psql bugs.</ChangeLog>
+    <ChangeLog Date="2007-10-04 09:03:39" Version="0.1.10">Complete Win32 compat.</ChangeLog>
+    <ChangeLog Date="2007-10-04 08:43:45" Version="0.1.9">Fixed bug in Hardware.pm.</ChangeLog>
+    <ChangeLog Date="2007-10-02 09:53:30" Version="0.1.8">Fixed Bug in Support.xml.</ChangeLog>
+    <ChangeLog Date="2007-10-02 09:38:41" Version="0.1.7">Support Modul review.</ChangeLog>
+    <ChangeLog Date="2007-09-03 20:44:35" Version="0.1.6">Add new database checks.</ChangeLog>
+    <ChangeLog Date="2007-06-19 15:09:43" Version="0.1.5">Added more database checks.</ChangeLog>
+    <ChangeLog Date="2007-06-13 14:14:26" Version="0.1.4">Improved notifications.</ChangeLog>
+    <ChangeLog Date="2007-06-12 15:03:51" Version="0.1.3">Added init apache checks.</ChangeLog>
+    <ChangeLog Date="2007-06-11 16:52:58" Version="0.1.2">Added init mysql and oracle checks.</ChangeLog>
+    <ChangeLog Date="2007-05-08 16:58:24" Version="0.1.1">Add new admin checks and quote xml input.</ChangeLog>
+    <ChangeLog Date="2007-05-08 10:03:55" Version="0.0.3">Fixed xml and formatting bug.</ChangeLog>
+    <ChangeLog Date="2007-05-07 21:28:55" Version="0.0.2">Init release.</ChangeLog>
+    <Description Lang="en">A admin support tool.</Description>
+    <Description Lang="de">Ein Admin Support Tool.</Description>
+    <Framework>2.1.x</Framework>
+    <Framework>2.2.x</Framework>
+    <Filelist>
+    </Filelist>
+  <File>Support-0.1.12.opm</File>
+</Package>
+<Package>
+    <Name>Support</Name>
+    <Version>0.1.3</Version>
+    <Vendor>OTRS GmbH</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
+    <ChangeLog Date="2007-06-12 15:03:51" Version="0.1.3">Added init apache checks.</ChangeLog>
+    <ChangeLog Date="2007-06-11 16:52:58" Version="0.1.2">Added init mysql and oracle checks.</ChangeLog>
+    <ChangeLog Date="2007-05-08 16:58:24" Version="0.1.1">Add new admin checks and quote xml input.</ChangeLog>
+    <ChangeLog Date="2007-05-08 10:03:55" Version="0.0.3">Fixed xml and formatting bug.</ChangeLog>
+    <ChangeLog Date="2007-05-07 21:28:55" Version="0.0.2">Init release.</ChangeLog>
+    <Description Lang="en">A admin support tool.</Description>
+    <Description Lang="de">Ein Admin Support Tool.</Description>
+    <Framework>2.1.x</Framework>
+    <Framework>2.2.x</Framework>
+    <Filelist>
+    </Filelist>
+  <File>Support-0.1.3.opm</File>
+</Package>
+<Package>
+    <Name>Support</Name>
+    <Version>0.1.2</Version>
+    <Vendor>OTRS GmbH</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
+    <ChangeLog Date="2007-06-11 16:52:58" Version="0.1.2">Added init mysql and oracle checks.</ChangeLog>
+    <ChangeLog Date="2007-05-08 16:58:24" Version="0.1.1">Add new admin checks and quote xml input.</ChangeLog>
+    <ChangeLog Date="2007-05-08 10:03:55" Version="0.0.3">Fixed xml and formatting bug.</ChangeLog>
+    <ChangeLog Date="2007-05-07 21:28:55" Version="0.0.2">Init release.</ChangeLog>
+    <Description Lang="en">A admin support tool.</Description>
+    <Description Lang="de">Ein Admin Support Tool.</Description>
+    <Framework>2.1</Framework>
+    <Framework>2.2</Framework>
+    <Filelist>
+    </Filelist>
+  <File>Support-0.1.2.opm</File>
+</Package>
+<Package>
+    <Name>Support</Name>
+    <Version>0.1.1</Version>
+    <Vendor>OTRS GmbH</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
+    <ChangeLog Date="2007-05-08 16:58:24" Version="0.1.1">Add new admin checks and quote xml input.</ChangeLog>
+    <ChangeLog Date="2007-05-08 10:03:55" Version="0.0.3">Fixed xml and formatting bug.</ChangeLog>
+    <ChangeLog Date="2007-05-07 21:28:55" Version="0.0.2">Init release.</ChangeLog>
+    <Description Lang="en">A admin support tool.</Description>
+    <Description Lang="de">Ein Admin Support Tool.</Description>
+    <Framework>2.2</Framework>
+    <Filelist>
+    </Filelist>
+  <File>Support-0.1.1.opm</File>
+</Package>
+<Package>
+    <Name>Support</Name>
+    <Version>0.0.3</Version>
+    <Vendor>OTRS GmbH</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
+    <ChangeLog Date="2007-05-08 10:03:55" Version="0.0.3">Fixed xml and formatting bug.</ChangeLog>
+    <ChangeLog Date="2007-05-07 21:28:55" Version="0.0.2">Init release.</ChangeLog>
+    <Description Lang="en">A admin support tool.</Description>
+    <Description Lang="de">Ein Admin Support Tool.</Description>
+    <Framework>2.2</Framework>
+    <Filelist>
+    </Filelist>
+  <File>Support-0.0.3.opm</File>
+</Package>
+<Package>
+    <Name>Survey</Name>
+    <Version>2.0.2</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <ChangeLog Date="2011-07-27 15:51:09" Version="2.0.2">Build for Survey 2.0.2.</ChangeLog>
+    <ChangeLog Date="2011-03-14 19:11:10" Version="2.0.1">Build for Survey 2.0.1.</ChangeLog>
+    <ChangeLog Date="2011-03-04 06:22:58" Version="1.2.94">Build for Survey 2.0.0 rc1.</ChangeLog>
+    <ChangeLog Date="2011-02-18 01:55:14" Version="1.2.93">Build for Survey 2.0.0 beta3.</ChangeLog>
+    <ChangeLog Date="2011-02-04 00:28:38" Version="1.2.92">Build for Survey 2.0.0 beta2.</ChangeLog>
+    <ChangeLog Date="2011-01-20 18:46:12" Version="1.2.91">Build for Survey 2.0.0 beta1.</ChangeLog>
+    <Description Lang="en">A customer survey tool.</Description>
+    <Description Lang="de">Ein Kundenumfragen Werkzeug.</Description>
+    <Description Lang="es">Una herramienta de encuestas a clientes.</Description>
+    <Framework>3.0.x</Framework>
+    <Filelist>
+        <FileDoc Location="doc/survey-database.png" Permission="644"/>
+    </Filelist>
+  <File>Survey-2.0.2.opm</File>
+</Package>
+<Package>
+    <Name>Survey</Name>
+    <Version>2.0.1</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <ChangeLog Date="2011-03-14 19:11:10" Version="2.0.1">Build for Survey 2.0.1.</ChangeLog>
+    <ChangeLog Date="2011-03-04 06:22:58" Version="1.2.94">Build for Survey 2.0.0 rc1.</ChangeLog>
+    <ChangeLog Date="2011-02-18 01:55:14" Version="1.2.93">Build for Survey 2.0.0 beta3.</ChangeLog>
+    <ChangeLog Date="2011-02-04 00:28:38" Version="1.2.92">Build for Survey 2.0.0 beta2.</ChangeLog>
+    <ChangeLog Date="2011-01-20 18:46:12" Version="1.2.91">Build for Survey 2.0.0 beta1.</ChangeLog>
+    <Description Lang="en">A customer survey tool.</Description>
+    <Description Lang="de">Ein Kundenumfragen Werkzeug.</Description>
+    <Description Lang="es">Una herramienta de encuestas a clientes.</Description>
+    <Framework>3.0.x</Framework>
+    <Filelist>
+        <FileDoc Location="doc/survey-database.png" Permission="644"/>
+    </Filelist>
+  <File>Survey-2.0.1.opm</File>
+</Package>
+<Package>
+    <Name>Survey</Name>
+    <Version>1.2.94</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <ChangeLog Date="2011-03-04 06:22:58" Version="1.2.94">Build for Survey 2.0.0 rc1.</ChangeLog>
+    <ChangeLog Date="2011-02-18 01:55:14" Version="1.2.93">Build for Survey 2.0.0 beta3.</ChangeLog>
+    <ChangeLog Date="2011-02-04 00:28:38" Version="1.2.92">Build for Survey 2.0.0 beta2.</ChangeLog>
+    <ChangeLog Date="2011-01-20 18:46:12" Version="1.2.91">Build for Survey 2.0.0 beta1.</ChangeLog>
+    <Description Lang="en">A customer survey tool.</Description>
+    <Description Lang="de">Ein Kundenumfragen Werkzeug.</Description>
+    <Description Lang="es">Una herramienta de encuestas a clientes.</Description>
+    <Framework>3.0.x</Framework>
+    <Filelist>
+        <FileDoc Location="doc/survey-database.png" Permission="644"/>
+    </Filelist>
+  <File>Survey-1.2.94.opm</File>
+</Package>
+<Package>
+    <Name>Survey</Name>
+    <Version>1.2.93</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <ChangeLog Date="2011-02-18 01:55:14" Version="1.2.93">Build for Survey 2.0.0 beta3.</ChangeLog>
+    <ChangeLog Date="2011-02-04 00:28:38" Version="1.2.92">Build for Survey 2.0.0 beta2.</ChangeLog>
+    <ChangeLog Date="2011-01-20 18:46:12" Version="1.2.91">Build for Survey 2.0.0 beta1.</ChangeLog>
+    <Description Lang="en">A customer survey tool.</Description>
+    <Description Lang="de">Ein Kundenumfragen Werkzeug.</Description>
+    <Description Lang="es">Una herramienta de encuestas a clientes.</Description>
+    <Framework>3.0.x</Framework>
+    <Filelist>
+        <FileDoc Location="doc/survey-database.png" Permission="644"/>
+    </Filelist>
+  <File>Survey-1.2.93.opm</File>
+</Package>
+<Package>
+    <Name>Survey</Name>
+    <Version>1.2.92</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <ChangeLog Date="2011-02-04 00:28:37" Version="1.2.92">Build for Survey 2.0.0 beta2.</ChangeLog>
+    <ChangeLog Date="2011-01-20 18:46:12" Version="1.2.91">Build for Survey 2.0.0 beta1.</ChangeLog>
+    <Description Lang="en">A customer survey tool.</Description>
+    <Description Lang="de">Ein Kundenumfragen Werkzeug.</Description>
+    <Description Lang="es">Una herramienta de encuestas a clientes.</Description>
+    <Framework>3.0.x</Framework>
+    <Filelist>
+        <FileDoc Location="doc/survey-database.png" Permission="644"/>
+    </Filelist>
+  <File>Survey-1.2.92.opm</File>
+</Package>
+<Package>
+    <Name>Survey</Name>
+    <Version>1.2.91</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <ChangeLog Date="2011-01-20 18:46:11" Version="1.2.91">Build for Survey 2.0.0 beta1.</ChangeLog>
+    <Description Lang="en">A customer survey tool.</Description>
+    <Description Lang="de">Ein Kundenumfragen Werkzeug.</Description>
+    <Description Lang="es">Una herramienta de encuestas a clientes.</Description>
+    <Framework>3.0.x</Framework>
+    <Filelist>
+        <FileDoc Location="doc/survey-database.png" Permission="644"/>
+    </Filelist>
+  <File>Survey-1.2.91.opm</File>
+</Package>
+<Package>
+    <Name>Survey</Name>
+    <Version>1.2.5</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <ChangeLog Date="2011-03-24 20:02:33" Version="1.2.5">Fixed bug# 4202 - Surveys are sent to the queue email instead of customer for email-tickets.</ChangeLog>
+    <ChangeLog Date="2010-08-18 11:24:58" Version="1.2.4">Added spanish translation.</ChangeLog>
+    <ChangeLog Date="2010-05-21 14:53:26" Version="1.2.3">Improved handling of request mails.</ChangeLog>
+    <ChangeLog Date="2010-05-03 15:23:44" Version="1.2.2">Fixed bug# 5319 - Url link send in email does not open.</ChangeLog>
+    <ChangeLog Date="2010-04-27 15:07:04" Version="1.2.1">Init release for OTRS 2.4.</ChangeLog>
+    <Description Lang="en">A customer survey tool.</Description>
+    <Description Lang="de">Ein Kundenumfragen Werkzeug.</Description>
+    <Framework>2.4.x</Framework>
+    <Filelist>
+    </Filelist>
+  <File>Survey-1.2.5.opm</File>
+</Package>
+<Package>
+    <Name>Survey</Name>
+    <Version>1.2.2</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <ChangeLog Date="2010-05-03 15:23:44" Version="1.2.2">Fixed bug# 5319 - Url link send in email does not open.</ChangeLog>
+    <ChangeLog Date="2010-04-27 15:07:04" Version="1.2.1">Init release for OTRS 2.4.</ChangeLog>
+    <Description Lang="en">A customer survey tool.</Description>
+    <Description Lang="de">Ein Kundenumfragen Werkzeug.</Description>
+    <Framework>2.4.x</Framework>
+    <Filelist>
+    </Filelist>
+  <File>Survey-1.2.2.opm</File>
+</Package>
+<Package>
+    <Name>Survey</Name>
+    <Version>1.2.1</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <ChangeLog Date="2010-04-27 15:07:04" Version="1.2.1">Init release for OTRS 2.4.</ChangeLog>
+    <Description Lang="en">A customer survey tool.</Description>
+    <Description Lang="de">Ein Kundenumfragen Werkzeug.</Description>
+    <Framework>2.4.x</Framework>
+    <Filelist>
+    </Filelist>
+  <File>Survey-1.2.1.opm</File>
+</Package>
+<Package>
+    <Name>SystemMonitoring</Name>
+    <Version>2.5.2</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <ChangeLog Date="2013-09-23 20:24:08" Version="2.5.2">Updated documentation.</ChangeLog>
+    <ChangeLog Date="2013-09-05 01:32:55" Version="2.5.1">First version for OTRS 3.2.x.</ChangeLog>
+    <Description Lang="en">Basic mail interface to System Monitoring Suites. Also provides deeper integration to Nagios (Acknowledge on lock and Checkscript).</Description>
+    <Description Lang="de">Einfache Email Schnittstelle zu System Monitoring Suites. Weitergehende Integration mit Nagios (Acknowledge on lock and Checkscript).</Description>
+    <Framework>3.3.x</Framework>
+    <Filelist>
+        <FileDoc Location="doc/en/SystemMonitoring.xml" Permission="644"/>
+        <FileDoc Location="doc/en/SystemMonitoring.pdf" Permission="644"/>
+    </Filelist>
+  <File>SystemMonitoring-2.5.2.opm</File>
+</Package>
+<Package>
+    <Name>SystemMonitoring</Name>
+    <Version>2.5.1</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <ChangeLog Date="2013-09-05 01:32:50" Version="2.5.1">First version for OTRS 3.2.x.</ChangeLog>
+    <Description Lang="en">Basic mail interface to System Monitoring Suites. Also provides deeper integration to Nagios (Acknowledge on lock and Checkscript).</Description>
+    <Description Lang="de">Einfache Email Schnittstelle zu System Monitoring Suites. Weitergehende Integration mit Nagios (Acknowledge on lock and Checkscript).</Description>
+    <Framework>3.3.x</Framework>
+    <Filelist>
+        <FileDoc Location="doc/en/SystemMonitoring.xml" Permission="644"/>
+        <FileDoc Location="doc/en/SystemMonitoring.pdf" Permission="644"/>
+    </Filelist>
+  <File>SystemMonitoring-2.5.1.opm</File>
+</Package>
+<Package>
+    <Name>SystemMonitoring</Name>
+    <Version>2.4.3</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <ChangeLog Date="2013-05-28 14:31:19" Version="2.4.3">Added documentation for missnaming of dynamic fields and error messages for missnamed dynamic fields (Bug 8381).</ChangeLog>
+    <ChangeLog Date="2013-05-23 21:48:52" Version="2.4.2">Including new handling for TicketID param.</ChangeLog>
+    <ChangeLog Date="2012-11-01 17:14:59" Version="2.4.1">First version for OTRS 3.2.</ChangeLog>
+    <Description Lang="en">Basic mail interface to System Monitoring Suites. Also provides deeper integration to Nagios (Acknowledge on lock and Checkscript).</Description>
+    <Description Lang="de">Einfache Email Schnittstelle zu System Monitoring Suites. Weitergehende Integration mit Nagios (Acknowledge on lock and Checkscript).</Description>
+    <Framework>3.2.x</Framework>
+    <Filelist>
+        <FileDoc Location="doc/en/SystemMonitoring.pdf" Permission="644"/>
+    </Filelist>
+  <File>SystemMonitoring-2.4.3.opm</File>
+</Package>
+<Package>
+    <Name>SystemMonitoring</Name>
+    <Version>2.4.2</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <ChangeLog Date="2013-05-23 21:48:48" Version="2.4.2">Including new handling for TicketID param.</ChangeLog>
+    <ChangeLog Date="2012-11-01 17:14:59" Version="2.4.1">First version for OTRS 3.2.</ChangeLog>
+    <Description Lang="en">Basic mail interface to System Monitoring Suites. Also provides deeper integration to Nagios (Acknowledge on lock and Checkscript).</Description>
+    <Description Lang="de">Einfache Email Schnittstelle zu System Monitoring Suites. Weitergehende Integration mit Nagios (Acknowledge on lock and Checkscript).</Description>
+    <Framework>3.2.x</Framework>
+    <Filelist>
+        <FileDoc Location="doc/en/SystemMonitoring.pdf" Permission="644"/>
+    </Filelist>
+  <File>SystemMonitoring-2.4.2.opm</File>
+</Package>
+<Package>
+    <Name>SystemMonitoring</Name>
+    <Version>2.4.1</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <ChangeLog Date="2012-11-01 17:14:52" Version="2.4.1">First version for OTRS 3.2.</ChangeLog>
+    <Description Lang="en">Basic mail interface to System Monitoring Suites. Also provides deeper integration to Nagios (Acknowledge on lock and Checkscript).</Description>
+    <Description Lang="de">Einfache Email Schnittstelle zu System Monitoring Suites. Weitergehende Integration mit Nagios (Acknowledge on lock and Checkscript).</Description>
+    <Framework>3.2.x</Framework>
+    <Filelist>
+        <FileDoc Location="doc/en/SystemMonitoring.pdf" Permission="644"/>
+    </Filelist>
+  <File>SystemMonitoring-2.4.1.opm</File>
+</Package>
+<Package>
+    <Name>SystemMonitoring</Name>
+    <Version>2.3.1</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <ChangeLog Date="2012-02-10 10:08:43" Version="2.3.1">First Stable Release for OTRS 3.1 framework.</ChangeLog>
+    <ChangeLog Date="2012-02-02 17:01:08" Version="2.2.92">Fixed dynamic field upgrade code.</ChangeLog>
+    <ChangeLog Date="2012-02-02 09:23:14" Version="2.2.91">First version for OTRS 3.1.</ChangeLog>
+    <Description Lang="en">Basic mail interface to System Monitoring Suites. Also provides deeper integration to Nagios (Acknowledge on lock and Checkscript).</Description>
+    <Description Lang="de">Einfache Email Schnittstelle zu System Monitoring Suites. Weitergehende Integration mit Nagios (Acknowledge on lock and Checkscript).</Description>
+    <Framework>3.1.x</Framework>
+    <Filelist>
+        <FileDoc Location="doc/en/SystemMonitoring.pdf" Permission="644"/>
+    </Filelist>
+  <File>SystemMonitoring-2.3.1.opm</File>
+</Package>
+<Package>
+    <Name>SystemMonitoring</Name>
+    <Version>2.2.92</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <ChangeLog Date="2012-02-02 17:01:02" Version="2.2.92">Fixed dynamic field upgrade code.</ChangeLog>
+    <ChangeLog Date="2012-02-02 09:23:14" Version="2.2.91">First version for OTRS 3.1.</ChangeLog>
+    <Description Lang="en">Basic mail interface to System Monitoring Suites. Also provides deeper integration to Nagios (Acknowledge on lock and Checkscript).</Description>
+    <Description Lang="de">Einfache Email Schnittstelle zu System Monitoring Suites. Weitergehende Integration mit Nagios (Acknowledge on lock and Checkscript).</Description>
+    <Framework>3.1.x</Framework>
+    <Filelist>
+        <FileDoc Location="doc/en/SystemMonitoring.pdf" Permission="644"/>
+    </Filelist>
+  <File>SystemMonitoring-2.2.92.opm</File>
+</Package>
+<Package>
+    <Name>SystemMonitoring</Name>
+    <Version>2.2.91</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <ChangeLog Date="2012-02-02 09:23:08" Version="2.2.91">First version for OTRS 3.1.</ChangeLog>
+    <Description Lang="en">Basic mail interface to System Monitoring Suites. Also provides deeper integration to Nagios (Acknowledge on lock and Checkscript).</Description>
+    <Description Lang="de">Einfache Email Schnittstelle zu System Monitoring Suites. Weitergehende Integration mit Nagios (Acknowledge on lock and Checkscript).</Description>
+    <Framework>3.1.x</Framework>
+    <Filelist>
+        <FileDoc Location="doc/en/SystemMonitoring.pdf" Permission="644"/>
+    </Filelist>
+  <File>SystemMonitoring-2.2.91.opm</File>
+</Package>
+<Package>
+    <Name>SystemMonitoring</Name>
+    <Version>2.2.2</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <ChangeLog Date="2011-08-25 08:33:26" Version="2.2.2">Updated documentation.</ChangeLog>
+    <ChangeLog Date="2010-11-12 13:44:57" Version="2.2.1">Init version for OTRS 3.0.x.</ChangeLog>
+    <Description Lang="en">Basic mail interface to System Monitoring Suites. Also provides deeper integration to Nagios (Acknowledge on lock and Checkscript).</Description>
+    <Description Lang="de">Einfache Email Schnittstelle zu System Monitoring Suites. Weitergehende Integration mit Nagios (Acknowledge on lock and Checkscript).</Description>
+    <Framework>3.0.x</Framework>
+    <Filelist>
+        <FileDoc Location="doc/en/SystemMonitoring.pdf" Permission="644"/>
+    </Filelist>
+  <File>SystemMonitoring-2.2.2.opm</File>
+</Package>
+<Package>
+    <Name>SystemMonitoring</Name>
+    <Version>2.2.1</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <ChangeLog Date="2010-11-12 13:44:39" Version="2.2.1">Init version for OTRS 3.0.x.</ChangeLog>
+    <Description Lang="en">Basic mail interface to System Monitoring Suites. Also provides deeper integration to Nagios (Acknowledge on lock and Checkscript).</Description>
+    <Description Lang="de">Einfache Email Schnittstelle zu System Monitoring Suites. Weitergehende Integration mit Nagios (Acknowledge on lock and Checkscript).</Description>
+    <Framework>3.0.x</Framework>
+    <Filelist>
+        <FileDoc Location="doc/en/SystemMonitoring.pdf" Permission="644"/>
+    </Filelist>
+  <File>SystemMonitoring-2.2.1.opm</File>
+</Package>
+<Package>
+    <Name>SystemMonitoring</Name>
+    <Version>2.1.2</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <ChangeLog Date="2010-03-08 10:34:46" Version="2.1.2">Added functionality for OTRS::ITSM.</ChangeLog>
+    <ChangeLog Date="2009-07-22 05:21:54" Version="2.1.1">Init release for OTRS 2.4.</ChangeLog>
+    <Description Lang="en">Basic mail interface to System Monitoring Suites. Also provides deeper integration to Nagios (Acknowledge on lock and Checkscript).</Description>
+    <Description Lang="de">Einfache Email Schnittstelle zu System Monitoring Suites. Weitergehende Integration mit Nagios (Acknowledge on lock and Checkscript).</Description>
+    <Framework>2.4.x</Framework>
+    <Filelist>
+        <FileDoc Location="doc/SystemMonitoring.txt" Permission="644"/>
+    </Filelist>
+  <File>SystemMonitoring-2.1.2.opm</File>
+</Package>
+<Package>
+    <Name>SystemMonitoring</Name>
+    <Version>2.1.1</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <ChangeLog Date="2009-07-22 05:21:54" Version="2.1.1">Init release for OTRS 2.4.</ChangeLog>
+    <Description Lang="en">Basic mail interface to System Monitoring Suites. Also provides deeper integration to Nagios (Acknowledge on lock and Checkscript).</Description>
+    <Description Lang="de">Einfache Email Schnittstelle zu System Monitoring Suites. Weitergehende Integration mit Nagios (Acknowledge on lock and Checkscript).</Description>
+    <Framework>2.4.x</Framework>
+    <Filelist>
+        <FileDoc Location="doc/SystemMonitoring.txt" Permission="644"/>
+    </Filelist>
+  <File>SystemMonitoring-2.1.1.opm</File>
+</Package>
+<Package>
+    <Name>SystemMonitoring</Name>
+    <Version>2.0.4</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <ChangeLog Date="2009-05-07 22:48:47" Version="2.0.4">Added CodeUpgrade for wrong SysConfig settings.</ChangeLog>
+    <ChangeLog Date="2008-12-10 18:39:48" Version="2.0.3">Fixed some minor bugs, added Lookup for Status, Host and Service in Subject.</ChangeLog>
+    <ChangeLog Date="2008-09-22 20:59:03" Version="2.0.2">Fixed Nagios Performance Data.</ChangeLog>
+    <ChangeLog Date="2008-09-11 21:05:52" Version="2.0.1">New version with Nagios an acknowledge feature and Nagios checker script.</ChangeLog>
+    <Description Lang="en">Basic mail interface to System Monitoring Suites. Also provides deeper integration to Nagios (Acknowledge on lock and Checkscript).</Description>
+    <Description Lang="de">Einfache Email Schnittstelle zu System Monitoring Suites. Weitergehende Integration mit Nagios (Acknowledge on lock and Checkscript).</Description>
+    <Framework>2.3.x</Framework>
+    <Filelist>
+        <FileDoc Location="doc/SystemMonitoring.txt" Permission="644"/>
+    </Filelist>
+  <File>SystemMonitoring-2.0.4.opm</File>
+</Package>
+<Package>
+    <Name>SystemMonitoring</Name>
+    <Version>2.0.3</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
+    <ChangeLog Date="2008-12-10 18:39:48" Version="2.0.3">Fixed some minor bugs, added Lookup for Status, Host and Service in Subject.</ChangeLog>
+    <ChangeLog Date="2008-09-22 20:59:03" Version="2.0.2">Fixed Nagios Performance Data.</ChangeLog>
+    <ChangeLog Date="2008-09-11 21:05:52" Version="2.0.1">New version with Nagios an acknowledge feature and Nagios checker script.</ChangeLog>
+    <Description Lang="en">Basic mail interface to System Monitoring Suites. Also provides deeper integration to Nagios (Acknowledge on lock and Checkscript).</Description>
+    <Description Lang="de">Einfache Email Schnittstelle zu System Monitoring Suites. Weitergehende Integration mit Nagios (Acknowledge on lock and Checkscript).</Description>
+    <Framework>2.3.x</Framework>
+    <Filelist>
+        <FileDoc Location="doc/SystemMonitoring.txt" Permission="644"/>
+    </Filelist>
+  <File>SystemMonitoring-2.0.3.opm</File>
+</Package>
+<Package>
+    <Name>SystemMonitoring</Name>
+    <Version>2.0.2</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
+    <ChangeLog Date="2008-09-22 20:59:03" Version="2.0.2">Fixed Nagios Performance Data.</ChangeLog>
+    <ChangeLog Date="2008-09-11 21:05:52" Version="2.0.1">New version with Nagios an acknowledge feature and Nagios checker script.</ChangeLog>
+    <Description Lang="en">Basic mail interface to System Monitoring Suites. Also provides deeper integration to Nagios (Acknowledge on lock and Checkscript).</Description>
+    <Description Lang="de">Einfache Email Schnittstelle zu System Monitoring Suites. Weitergehende Integration mit Nagios (Acknowledge on lock and Checkscript).</Description>
+    <Framework>2.3.x</Framework>
+    <Filelist>
+        <FileDoc Location="doc/SystemMonitoring.txt" Permission="644"/>
+    </Filelist>
+  <File>SystemMonitoring-2.0.2.opm</File>
+</Package>
+<Package>
+    <Name>SystemMonitoring</Name>
+    <Version>2.0.1</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
+    <ChangeLog Date="2008-09-11 21:05:52" Version="2.0.1">New version with Nagios an acknowledge feature and Nagios checker script.</ChangeLog>
+    <Description Lang="en">Basic mail interface to System Monitoring Suites.</Description>
+    <Description Lang="de">Einfache Email Schnittstelle zur System Monitoring Suites.</Description>
+    <Framework>2.3.x</Framework>
+    <Filelist>
+        <FileDoc Location="doc/SystemMonitoring.txt" Permission="644"/>
+    </Filelist>
+  <File>SystemMonitoring-2.0.1.opm</File>
+</Package>
+<Package>
+    <Name>SystemMonitoring</Name>
+    <Version>1.1.1</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
+    <ChangeLog Date="2008-06-03 17:14:10" Version="1.1.1">Upgrade to OTRS 2.3 framework.</ChangeLog>
+    <Description Lang="en">Basic mail interface to System Monitoring Suites.</Description>
+    <Description Lang="de">Einfache Email Schnittstelle zur System Monitoring Suites.</Description>
+    <Framework>2.3.x</Framework>
+    <Filelist>
+        <FileDoc Location="doc/SystemMonitoring.txt" Permission="644"/>
+    </Filelist>
+  <File>SystemMonitoring-1.1.1.opm</File>
+</Package>
+<Package>
+    <Name>SystemMonitoring</Name>
+    <Version>1.0.2</Version>
+    <Vendor>OTRS GmbH</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
+    <ChangeLog Date="2007-10-10 14:16:09" Version="1.0.2">Minor Bug fix release.</ChangeLog>
+    <ChangeLog Date="2007-10-10 11:17:41" Version="1.0.1">Main version.</ChangeLog>
+    <Description Lang="en">Basic mail interface to System Monitoring Suites.</Description>
+    <Description Lang="de">Einfache Email Schnittstelle zur System Monitoring Suites.</Description>
+    <Framework>2.2.x</Framework>
+    <Filelist>
+        <FileDoc Location="doc/SystemMonitoring.txt" Permission="644"/>
+    </Filelist>
+  <File>SystemMonitoring-1.0.2.opm</File>
+</Package>
+<Package>
+    <Name>SystemMonitoring</Name>
+    <Version>1.0.1</Version>
+    <Vendor>OTRS GmbH</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
+    <ChangeLog Date="2007-10-10 11:17:41" Version="1.0.1">Main version.</ChangeLog>
+    <Description Lang="en">Basic mail interface to System Monitoring Suites</Description>
+    <Description Lang="de">Einfache Email Schnittstelle zur System Monitoring Suites</Description>
+    <Framework>2.2.x</Framework>
+    <Filelist>
+        <FileDoc Location="doc/SystemMonitoring.txt" Permission="644"/>
+    </Filelist>
+  <File>SystemMonitoring-1.0.1.opm</File>
+</Package>
+<Package>
+    <Name>TimeAccounting</Name>
+    <Version>1.4.2</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <ChangeLog Date="2011-01-20 17:25:27" Version="1.4.2">Optimized DB.</ChangeLog>
+    <ChangeLog Date="2010-12-10 16:30:30" Version="1.4.1">First stable release.</ChangeLog>
+    <ChangeLog Date="2010-12-06 09:36:58" Version="1.3.92">Second beta with one timezone related bugfix.</ChangeLog>
+    <ChangeLog Date="2010-11-29 16:02:48" Version="1.3.91">First beta release of version 1.4.</ChangeLog>
+    <Description Lang="en">A TimeAccounting Modul.</Description>
+    <Description Lang="de">Ein Zeiterfassungsmodul.</Description>
+    <Framework>2.4.x</Framework>
+    <Filelist>
+    </Filelist>
+  <File>TimeAccounting-1.4.2.opm</File>
+</Package>
+<Package>
+    <Name>TimeAccounting</Name>
+    <Version>1.4.1</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <ChangeLog Date="2010-12-10 16:30:30" Version="1.4.1">First stable release.</ChangeLog>
+    <ChangeLog Date="2010-12-06 09:36:58" Version="1.3.92">Second beta with one timezone related bugfix.</ChangeLog>
+    <ChangeLog Date="2010-11-29 16:02:48" Version="1.3.91">First beta release of version 1.4.</ChangeLog>
+    <Description Lang="en">A TimeAccounting Modul.</Description>
+    <Description Lang="de">Ein Zeiterfassungsmodul.</Description>
+    <Framework>2.4.x</Framework>
+    <Filelist>
+    </Filelist>
+  <File>TimeAccounting-1.4.1.opm</File>
+</Package>
+<Package>
+    <Name>TimeAccounting</Name>
+    <Version>1.3.92</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <ChangeLog Date="2010-12-06 09:36:58" Version="1.3.92">Second beta with one timezone related bugfix.</ChangeLog>
+    <ChangeLog Date="2010-11-29 16:02:48" Version="1.3.91">First beta release of version 1.4.</ChangeLog>
+    <Description Lang="en">A TimeAccounting Modul.</Description>
+    <Description Lang="de">Ein Zeiterfassungsmodul.</Description>
+    <Framework>2.4.x</Framework>
+    <Filelist>
+    </Filelist>
+  <File>TimeAccounting-1.3.92.opm</File>
+</Package>
+<Package>
+    <Name>TimeAccounting</Name>
+    <Version>1.3.91</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <ChangeLog Date="2010-11-29 16:02:48" Version="1.3.91">First beta release of version 1.4.</ChangeLog>
+    <Description Lang="en">A TimeAccounting Modul.</Description>
+    <Description Lang="de">Ein Zeiterfassungsmodul.</Description>
+    <Framework>2.4.x</Framework>
+    <Filelist>
+    </Filelist>
+  <File>TimeAccounting-1.3.91.opm</File>
+</Package>
+<Package>
+    <Name>TimeAccounting</Name>
+    <Version>1.3.3</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <ChangeLog Date="2009-07-14 08:28:45" Version="1.3.3">Fixed bug #Bug 3849 - The default button for the Edit screen in Safari v4 is the delete button (Step 4).</ChangeLog>
+    <ChangeLog Date="2009-07-13 09:08:47" Version="1.3.2">Fixed bug# 3849 and 3968 - thanks to Thorsten Thau.</ChangeLog>
+    <ChangeLog Date="2009-04-03 13:49:59" Version="1.3.1">First version for OTRS 2.4.</ChangeLog>
+    <Description Lang="en">A TimeAccounting Modul.</Description>
+    <Description Lang="de">Ein Zeiterfassungsmodul.</Description>
+    <Framework>2.4.x</Framework>
+    <Filelist>
+    </Filelist>
+  <File>TimeAccounting-1.3.3.opm</File>
+</Package>
+<Package>
+    <Name>TimeAccounting</Name>
+    <Version>1.3.2</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <ChangeLog Date="2009-07-13 09:08:47" Version="1.3.2">Fixed bug# 3849 and 3968 - thanks to Thorsten Thau.</ChangeLog>
+    <ChangeLog Date="2009-04-03 13:49:59" Version="1.3.1">First version for OTRS 2.4.</ChangeLog>
+    <Description Lang="en">A TimeAccounting Modul.</Description>
+    <Description Lang="de">Ein Zeiterfassungsmodul.</Description>
+    <Framework>2.4.x</Framework>
+    <Filelist>
+    </Filelist>
+  <File>TimeAccounting-1.3.2.opm</File>
+</Package>
+<Package>
+    <Name>TimeAccounting</Name>
+    <Version>1.3.1</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <ChangeLog Date="2009-04-03 13:49:59" Version="1.3.1">First version for OTRS 2.4.</ChangeLog>
+    <Description Lang="en">A TimeAccounting Modul.</Description>
+    <Description Lang="de">Ein Zeiterfassungsmodul.</Description>
+    <Framework>2.4.x</Framework>
+    <Filelist>
+    </Filelist>
+  <File>TimeAccounting-1.3.1.opm</File>
+</Package>
+<Package>
+    <Name>TimeAccounting</Name>
+    <Version>1.2.5</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
+    <ChangeLog Date="2009-03-10 12:26:06" Version="1.2.5">Fixed problem with the invalid attribute in the action drop down menu. Fixed missing data problem (if you have insert invalid data).</ChangeLog>
+    <ChangeLog Date="2009-02-20 16:32:21" Version="1.2.4">Improved the delete handling and the favorite project function.</ChangeLog>
+    <ChangeLog Date="2009-02-16 15:57:47" Version="1.2.3">Add a handling to provide additional input fields.</ChangeLog>
+    <ChangeLog Date="2009-01-21 11:44:48" Version="1.2.2">Reworked code. Fixed bug#3392. Add a favorite handling for projects. Add a configuration for project&lt;-&gt;remark relations. Add functions: ProjectTotalHours and ProjectHistory.</ChangeLog>
+    <ChangeLog Date="2008-09-30 13:52:32" Version="1.2.1">First official version for OTRS 2.3.</ChangeLog>
+    <Description Lang="en">A TimeAccounting Modul.</Description>
+    <Description Lang="de">Ein Zeiterfassungsmodul.</Description>
+    <Framework>2.3.4</Framework>
+    <Framework>2.3.5</Framework>
+    <Framework>2.3.6</Framework>
+    <Filelist>
+    </Filelist>
+  <File>TimeAccounting-1.2.5.opm</File>
+</Package>
+<Package>
+    <Name>TimeAccounting</Name>
+    <Version>1.2.4</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
+    <ChangeLog Date="2009-02-20 16:32:21" Version="1.2.4">Improved the delete handling and the favorite project function.</ChangeLog>
+    <ChangeLog Date="2009-02-16 15:57:47" Version="1.2.3">Add a handling to provide additional input fields.</ChangeLog>
+    <ChangeLog Date="2009-01-21 11:44:48" Version="1.2.2">Reworked code. Fixed bug#3392. Add a favorite handling for projects. Add a configuration for project&lt;-&gt;remark relations. Add functions: ProjectTotalHours and ProjectHistory.</ChangeLog>
+    <ChangeLog Date="2008-09-30 13:52:32" Version="1.2.1">First official version for OTRS 2.3.</ChangeLog>
+    <Description Lang="en">A TimeAccounting Modul.</Description>
+    <Description Lang="de">Ein Zeiterfassungsmodul.</Description>
+    <Framework>2.3.4</Framework>
+    <Framework>2.3.5</Framework>
+    <Framework>2.3.6</Framework>
+    <Filelist>
+    </Filelist>
+  <File>TimeAccounting-1.2.4.opm</File>
+</Package>
+<Package>
+    <Name>TimeAccounting</Name>
+    <Version>1.2.3</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
+    <ChangeLog Date="2009-02-16 15:57:47" Version="1.2.3">Add a handling to provide additional input fields.</ChangeLog>
+    <ChangeLog Date="2009-01-21 11:44:48" Version="1.2.2">Reworked code. Fixed bug#3392. Add a favorite handling for projects. Add a configuration for project&lt;-&gt;remark relations. Add functions: ProjectTotalHours and ProjectHistory.</ChangeLog>
+    <ChangeLog Date="2008-09-30 13:52:32" Version="1.2.1">First official version for OTRS 2.3.</ChangeLog>
+    <Description Lang="en">A TimeAccounting Modul.</Description>
+    <Description Lang="de">Ein Zeiterfassungsmodul.</Description>
+    <Framework>2.3.4</Framework>
+    <Framework>2.3.5</Framework>
+    <Framework>2.3.6</Framework>
+    <Filelist>
+    </Filelist>
+  <File>TimeAccounting-1.2.3.opm</File>
+</Package>
+<Package>
+    <Name>TimeAccounting</Name>
+    <Version>1.2.2</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
+    <ChangeLog Date="2009-01-21 11:44:48" Version="1.2.2">Reworked code. Fixed bug#3392. Add a favorite handling for projects. Add a configuration for project&lt;-&gt;remark relations. Add functions: ProjectTotalHours and ProjectHistory.</ChangeLog>
+    <ChangeLog Date="2008-09-30 13:52:32" Version="1.2.1">First official version for OTRS 2.3.</ChangeLog>
+    <Description Lang="en">A TimeAccounting Modul.</Description>
+    <Description Lang="de">Ein Zeiterfassungsmodul.</Description>
+    <Framework>2.3.4</Framework>
+    <Framework>2.3.5</Framework>
+    <Framework>2.3.6</Framework>
+    <Filelist>
+    </Filelist>
+  <File>TimeAccounting-1.2.2.opm</File>
+</Package>
+<Package>
+    <Name>TimeAccounting</Name>
+    <Version>1.0.4</Version>
+    <Vendor>OTRS GmbH</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
+    <ChangeLog Date="2007-10-30 13:26:55" Version="1.0.4">Fixed a translation bug which costs 10 percent performance in the edit mode.</ChangeLog>
+    <ChangeLog Date="2007-06-05 16:22:39" Version="1.0.3">A new release with the improvements of Torsten Thau. Thank you Torsten.</ChangeLog>
+    <ChangeLog Date="2007-05-23 16:37:08" Version="1.0.2">Fixed the problem if the agent has ro-permissions and try to see old time accounting overviews.</ChangeLog>
+    <ChangeLog Date="2007-05-11 16:39:42" Version="1.0.1">Make the TimeAccounting module fit for OTRS 2.2.</ChangeLog>
+    <ChangeLog Date="2006-12-08 10:12:30" Version="0.9.10">first version build with OPMS</ChangeLog>
+    <Description Lang="en">A TimeAccounting Modul.</Description>
+    <Description Lang="de">Ein Zeiterfassungsmodul.</Description>
+    <Framework>2.1.x</Framework>
+    <Framework>2.2.x</Framework>
+    <Filelist>
+    </Filelist>
+  <File>TimeAccounting-1.0.4.opm</File>
+</Package>
+<Package>
+    <Name>TimeAccounting</Name>
+    <Version>1.0.3</Version>
+    <Vendor>OTRS GmbH</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
+    <ChangeLog Date="2007-06-05 16:22:39" Version="1.0.3">A new release with the improvements of Torsten Thau. Thank you Torsten.</ChangeLog>
+    <ChangeLog Date="2007-05-23 16:37:08" Version="1.0.2">Fixed the problem if the agent has ro-permissions and try to see old time accounting overviews.</ChangeLog>
+    <ChangeLog Date="2007-05-11 16:39:42" Version="1.0.1">Make the TimeAccounting module fit for OTRS 2.2.</ChangeLog>
+    <ChangeLog Date="2006-12-08 10:12:30" Version="0.9.10">first version build with OPMS</ChangeLog>
+    <ChangeLog>2006-05-23 insert a ProjectReporting page</ChangeLog>
+    <ChangeLog>2006-05-16 fixed action new bug in setting</ChangeLog>
+    <ChangeLog>2006-04-24 insert the delete dtl</ChangeLog>
+    <ChangeLog>2006-04-18 fixed vacation bug</ChangeLog>
+    <ChangeLog>2006-04-11 fixed Show all bug</ChangeLog>
+    <ChangeLog>2006-04-11 fixed typo</ChangeLog>
+    <ChangeLog>2006-04-10 include new functions</ChangeLog>
+    <ChangeLog>2005-08-10 fixed initial bugs</ChangeLog>
+    <ChangeLog>2005-08-08 first package</ChangeLog>
+    <Description Lang="en">A TimeAccounting Modul.</Description>
+    <Description Lang="de">Ein Zeiterfassungsmodul.</Description>
+    <Framework>2.1.x</Framework>
+    <Framework>2.2.x</Framework>
+    <Filelist>
+    </Filelist>
+  <File>TimeAccounting-1.0.3.opm</File>
+</Package>
+<Package>
+    <Name>TimeAccounting</Name>
+    <Version>1.0.2</Version>
+    <Vendor>OTRS GmbH</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
+    <ChangeLog Date="2007-05-23 16:37:08" Version="1.0.2">Fixed the problem if the agent has ro-permissions and try to see old time accounting overviews.</ChangeLog>
+    <ChangeLog Date="2007-05-11 16:39:42" Version="1.0.1">Make the TimeAccounting module fit for OTRS 2.2.</ChangeLog>
+    <ChangeLog Date="2006-12-08 10:12:30" Version="0.9.10">first version build with OPMS</ChangeLog>
+    <ChangeLog>2006-05-23 insert a ProjectReporting page</ChangeLog>
+    <ChangeLog>2006-05-16 fixed action new bug in setting</ChangeLog>
+    <ChangeLog>2006-04-24 insert the delete dtl</ChangeLog>
+    <ChangeLog>2006-04-18 fixed vacation bug</ChangeLog>
+    <ChangeLog>2006-04-11 fixed Show all bug</ChangeLog>
+    <ChangeLog>2006-04-11 fixed typo</ChangeLog>
+    <ChangeLog>2006-04-10 include new functions</ChangeLog>
+    <ChangeLog>2005-08-10 fixed initial bugs</ChangeLog>
+    <ChangeLog>2005-08-08 first package</ChangeLog>
+    <Description Lang="en">A TimeAccounting Modul.</Description>
+    <Description Lang="de">Ein Zeiterfassungsmodul.</Description>
+    <Framework>2.1.x</Framework>
+    <Framework>2.2.x</Framework>
+    <Filelist>
+    </Filelist>
+  <File>TimeAccounting-1.0.2.opm</File>
+</Package>
+<Package>
+    <Name>TimeAccounting</Name>
+    <Version>1.0.1</Version>
+    <Vendor>OTRS GmbH</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
+    <ChangeLog Date="2007-05-11 16:39:42" Version="1.0.1">Make the TimeAccounting module fit for OTRS 2.2.</ChangeLog>
+    <ChangeLog Date="2006-12-08 10:12:30" Version="0.9.10">first version build with OPMS</ChangeLog>
+    <ChangeLog>2006-05-23 insert a ProjectReporting page</ChangeLog>
+    <ChangeLog>2006-05-16 fixed action new bug in setting</ChangeLog>
+    <ChangeLog>2006-04-24 insert the delete dtl</ChangeLog>
+    <ChangeLog>2006-04-18 fixed vacation bug</ChangeLog>
+    <ChangeLog>2006-04-11 fixed Show all bug</ChangeLog>
+    <ChangeLog>2006-04-11 fixed typo</ChangeLog>
+    <ChangeLog>2006-04-10 include new functions</ChangeLog>
+    <ChangeLog>2005-08-10 fixed initial bugs</ChangeLog>
+    <ChangeLog>2005-08-08 first package</ChangeLog>
+    <Description Lang="en">A TimeAccounting Modul.</Description>
+    <Description Lang="de">Ein Zeiterfassungsmodul.</Description>
+    <Framework>2.1.x</Framework>
+    <Framework>2.2.x</Framework>
+    <Filelist>
+    </Filelist>
+  <File>TimeAccounting-1.0.1.opm</File>
+</Package>
+<Package>
+    <Name>TimeAccounting</Name>
+    <Version>0.9.10</Version>
+    <Vendor>OTRS GmbH</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
+    <ChangeLog Date="2006-12-08 10:12:30" Version="0.9.10">first version build with OPMS</ChangeLog>
+    <ChangeLog>2006-05-23 insert a ProjectReporting page</ChangeLog>
+    <ChangeLog>2006-05-16 fixed action new bug in setting</ChangeLog>
+    <ChangeLog>2006-04-24 insert the delete dtl</ChangeLog>
+    <ChangeLog>2006-04-18 fixed vacation bug</ChangeLog>
+    <ChangeLog>2006-04-11 fixed Show all bug</ChangeLog>
+    <ChangeLog>2006-04-11 fixed typo</ChangeLog>
+    <ChangeLog>2006-04-10 include new functions</ChangeLog>
+    <ChangeLog>2005-08-10 fixed initial bugs</ChangeLog>
+    <ChangeLog>2005-08-08 first package</ChangeLog>
+    <Description Lang="en">A TimeAccounting Modul.</Description>
+    <Description Lang="de">Ein Zeiterfassungsmodul.</Description>
+    <Framework>2.0.x</Framework>
+    <Filelist>
+    </Filelist>
+  <File>TimeAccounting-0.9.10.opm</File>
+</Package>
+<Package>
+    <Name>WebMail</Name>
+    <Version>0.9.91</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <ChangeLog Date="2009-04-03 15:00:01" Version="0.9.91">First version for OTRS 2.4.</ChangeLog>
+    <Description Lang="en">A web mail (IMAP) program.</Description>
+    <Description Lang="de">Ein Web Email (IMAP) Programm.</Description>
+    <Framework>2.4.x</Framework>
+    <Filelist>
+    </Filelist>
+  <File>WebMail-0.9.91.opm</File>
+</Package>
+<Package>
+    <Name>WebMail</Name>
+    <Version>0.9.10</Version>
+    <Vendor>OTRS GmbH</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
+    <ChangeLog Date="2006-10-17 22:50:16" Version="0.9.10">code clean up</ChangeLog>
+    <ChangeLog Date="2005-10-25">fixed wrong formated mail body</ChangeLog>
+    <ChangeLog Date="2005-10-15">moved to xml config file</ChangeLog>
+    <ChangeLog Date="2005-08-18">added nb_NO translation, thanks to Espen Stefansen!</ChangeLog>
+    <ChangeLog Date="2005-04-01">added spell checker, some small fixes</ChangeLog>
+    <ChangeLog Date="2005-01-25">Navigation bar updated</ChangeLog>
+    <ChangeLog Date="2004-12-28">New package</ChangeLog>
+    <Description Lang="en">A web mail (IMAP) program.</Description>
+    <Description Lang="de">Ein Web Email (IMAP) Programm.</Description>
+    <Framework>2.0.x</Framework>
+    <Filelist>
+    </Filelist>
+  <File>WebMail-0.9.10.opm</File>
+</Package>
+<Package>
+    <Name>WebMail</Name>
+    <Version>0.12.2</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
+    <ChangeLog Date="2009-01-28 08:27:10" Version="0.12.2">Fixed bug# 3380 - Lost the attachment while sending a email.</ChangeLog>
+    <ChangeLog Date="2008-06-03 15:03:26" Version="0.12.1">Upgrade to OTRS 2.3 framework.</ChangeLog>
+    <Description Lang="en">A web mail (IMAP) program.</Description>
+    <Description Lang="de">Ein Web Email (IMAP) Programm.</Description>
+    <Framework>2.3.x</Framework>
+    <Filelist>
+    </Filelist>
+  <File>WebMail-0.12.2.opm</File>
+</Package>
+<Package>
+    <Name>WebMail</Name>
+    <Version>0.12.1</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
+    <ChangeLog Date="2008-06-03 15:03:26" Version="0.12.1">Upgrade to OTRS 2.3 framework.</ChangeLog>
+    <Description Lang="en">A web mail (IMAP) program.</Description>
+    <Description Lang="de">Ein Web Email (IMAP) Programm.</Description>
+    <Framework>2.3.x</Framework>
+    <Filelist>
+    </Filelist>
+  <File>WebMail-0.12.1.opm</File>
+</Package>
+<Package>
+    <Name>WebMail</Name>
+    <Version>0.11.4</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
+    <ChangeLog Date="2009-01-28 08:34:17" Version="0.11.4">Fixed bug# 3380 - Lost the attachment while sending a email.</ChangeLog>
+    <ChangeLog Date="2008-02-17 16:48:03" Version="0.11.3">Improved intro and fixed html formating problem in compose email mask under Mac OS X.</ChangeLog>
+    <ChangeLog Date="2007-08-07 15:52:52" Version="0.11.2">Fixed bug# 2119 - Fixed incorrect introduction.</ChangeLog>
+    <ChangeLog Date="2007-06-28 01:36:19" Version="0.11.1">Upgrade to 2.2.x. Added .fr translation.</ChangeLog>
+    <Description Lang="en">A web mail (IMAP) program.</Description>
+    <Description Lang="de">Ein Web Email (IMAP) Programm.</Description>
+    <Framework>2.2.x</Framework>
+    <Filelist>
+    </Filelist>
+  <File>WebMail-0.11.4.opm</File>
+</Package>
+<Package>
+    <Name>WebMail</Name>
+    <Version>0.11.3</Version>
+    <Vendor>OTRS AG</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
+    <ChangeLog Date="2008-02-17 16:48:03" Version="0.11.3">Improved intro and fixed html formating problem in compose email mask under Mac OS X.</ChangeLog>
+    <ChangeLog Date="2007-08-07 15:52:52" Version="0.11.2">Fixed bug# 2119 - Fixed incorrect introduction.</ChangeLog>
+    <ChangeLog Date="2007-06-28 01:36:19" Version="0.11.1">Upgrade to 2.2.x. Added .fr translation.</ChangeLog>
+    <Description Lang="en">A web mail (IMAP) program.</Description>
+    <Description Lang="de">Ein Web Email (IMAP) Programm.</Description>
+    <Framework>2.2.x</Framework>
+    <Filelist>
+    </Filelist>
+  <File>WebMail-0.11.3.opm</File>
+</Package>
+<Package>
+    <Name>WebMail</Name>
+    <Version>0.11.2</Version>
+    <Vendor>OTRS GmbH</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
+    <ChangeLog Date="2007-08-07 15:52:52" Version="0.11.2">Fixed bug# 2119 - Fixed incorrect introduction.</ChangeLog>
+    <ChangeLog Date="2007-06-28 01:36:19" Version="0.11.1">Upgrade to 2.2.x. Added .fr translation.</ChangeLog>
+    <Description Lang="en">A web mail (IMAP) program.</Description>
+    <Description Lang="de">Ein Web Email (IMAP) Programm.</Description>
+    <Framework>2.2.x</Framework>
+    <Filelist>
+    </Filelist>
+  <File>WebMail-0.11.2.opm</File>
+</Package>
+<Package>
+    <Name>WebMail</Name>
+    <Version>0.11.1</Version>
+    <Vendor>OTRS GmbH</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
+    <ChangeLog Date="2007-06-28 01:36:19" Version="0.11.1">Upgrade to 2.2.x. Added .fr translation.</ChangeLog>
+    <Description Lang="en">A web mail (IMAP) program.</Description>
+    <Description Lang="de">Ein Web Email (IMAP) Programm.</Description>
+    <Framework>2.2.x</Framework>
+    <Filelist>
+    </Filelist>
+  <File>WebMail-0.11.1.opm</File>
+</Package>
+<Package>
+    <Name>WebMail</Name>
+    <Version>0.10.2</Version>
+    <Vendor>OTRS GmbH</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
+    <ChangeLog Date="2008-02-17 17:34:19" Version="0.10.2">Fixed html formating problem in compose email mask.</ChangeLog>
+    <ChangeLog Date="2006-10-17 22:51:29" Version="0.10.1">upgrade to 2.1.x</ChangeLog>
+    <ChangeLog Date="2005-10-25">fixed wrong formated mail body</ChangeLog>
+    <ChangeLog Date="2005-10-15">moved to xml config file</ChangeLog>
+    <ChangeLog Date="2005-08-18">added nb_NO translation, thanks to Espen Stefansen!</ChangeLog>
+    <ChangeLog Date="2005-04-01">added spell checker, some small fixes</ChangeLog>
+    <ChangeLog Date="2005-01-25">Navigation bar updated</ChangeLog>
+    <ChangeLog Date="2004-12-28">New package</ChangeLog>
+    <Description Lang="en">A web mail (IMAP) program.</Description>
+    <Description Lang="de">Ein Web Email (IMAP) Programm.</Description>
+    <Framework>2.1.x</Framework>
+    <Filelist>
+    </Filelist>
+  <File>WebMail-0.10.2.opm</File>
+</Package>
+<Package>
+    <Name>WebMail</Name>
+    <Version>0.10.1</Version>
+    <Vendor>OTRS GmbH</Vendor>
+    <URL>http://otrs.org/</URL>
+    <License>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</License>
+    <ChangeLog Date="2006-10-17 22:51:29" Version="0.10.1">upgrade to 2.1.x</ChangeLog>
+    <ChangeLog Date="2005-10-25">fixed wrong formated mail body</ChangeLog>
+    <ChangeLog Date="2005-10-15">moved to xml config file</ChangeLog>
+    <ChangeLog Date="2005-08-18">added nb_NO translation, thanks to Espen Stefansen!</ChangeLog>
+    <ChangeLog Date="2005-04-01">added spell checker, some small fixes</ChangeLog>
+    <ChangeLog Date="2005-01-25">Navigation bar updated</ChangeLog>
+    <ChangeLog Date="2004-12-28">New package</ChangeLog>
+    <Description Lang="en">A web mail (IMAP) program.</Description>
+    <Description Lang="de">Ein Web Email (IMAP) Programm.</Description>
+    <Framework>2.1.x</Framework>
+    <Filelist>
+    </Filelist>
+  <File>WebMail-0.10.1.opm</File>
+</Package>
+</otrs_package_list>

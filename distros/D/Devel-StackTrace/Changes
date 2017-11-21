@@ -1,3 +1,12 @@
+2.03   2017-11-18
+
+- If all frames in the trace were skipped (via skip_frames, frame_filter,
+  ignore_*, etc.), then the stringified stack trace would be an empty
+  string. Now this has been changed to always return the message given to the
+  constructor or the string "Trace begun". Fixes GH #15, reported by Karen
+  Etheridge.
+
+
 2.02   2016-12-07
 
 - Switch to GitHub Issues.

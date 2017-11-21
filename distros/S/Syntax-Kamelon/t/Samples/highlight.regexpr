@@ -1,0 +1,70 @@
+Testing RegExprSimple.
+<RegExpr attribute="Match" context="#stay" String="&lt;@&gt;" />
+<Test>
+This matches: <@>
+<Test>
+
+Testing RegExprSimpleI.
+<RegExpr attribute="Match" insensitive="true" context="#stay" String="kameel" />
+<TestI>
+This matches: kameel
+This matches: KAMEEL
+<TestI>
+
+Testing RegExpr.
+<RegExpr attribute="Match" context="#stay" String="^kameel" />
+<TestComplex>
+#only matches at the beginning of a line.
+kameel matches. kameel
+KAMEEL does not. KAMEEL
+<TestComplex>
+
+Testing RegExpr word boundary
+<RegExpr attribute="Match" context="#stay" String="\bkameel" />
+<TestComplexB>
+kameel matches. :kameel $kameel also but notkameel
+<TestComplexB>
+
+Testing RegExpr non word boundary
+<RegExpr attribute="Match" context="#stay" String="\Bkameel" />
+<TestComplexNB>
+kameel :kameel $kameel all do not match butt notkameel does.
+<TestComplexNB>
+
+Testing RegExprD.
+<RegExpr attribute="Match" context="RegExprDT" String="\b(\d+)" />
+<RegExpr attribute="Match" dynamic="true" context="#pop" String="kameel%1" />
+<TestComplexD>
+scoop number 12. 
+aap12 egel12 kameel12 kameel%1 #if this matches, dynamic was not called
+<TestComplexD>
+
+<TestComplexD>
+scoop number 13. 
+AAP13 EGEL13 KAMEEL13 kameel%1 #if this matches, dynamic was not called
+<TestComplexD>
+
+Testing RegExprDI.
+<RegExpr attribute="Match" context="TestComplexDIT" String="\s(\d+)" />
+<RegExpr attribute="Match" insensitive="true" dynamic="true" context="#pop" String="kameel%1" />
+<TestComplexDI>
+scoop number 12. 
+aap12 egel12 kameel12 kameel%1 #if this matches, dynamic was not called
+<TestComplexDI>
+
+<TestComplexDI>
+scoop number 13. 
+AAP13 EGEL13 KAMEEL13 kameel%1 #if this matches, dynamic was not called
+<TestComplexDI>
+
+Testing RegExprI.
+<RegExpr attribute="Match" insensitive="true" context="#stay" String="^kameel" />
+<TestComplexI>
+#only matches at the beginning of a line.
+kameel matches. kameel
+KAMEEL matches. KAMEEL
+<TestComplexI>
+
+
+
+

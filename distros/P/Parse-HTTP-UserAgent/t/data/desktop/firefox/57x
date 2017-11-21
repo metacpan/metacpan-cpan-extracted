@@ -1,0 +1,12 @@
+[AGENT]
+
+Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:57.0) Gecko/20100101 Firefox/57.0
+
+extras          => [ 'Macintosh' ],
+mozilla         => [ '57.0', '57.000' ],
+name            => 'Firefox',
+os              => 'Intel Mac OS X 10.12',
+parser          => 'firefox',
+toolkit         => [ 'Gecko', '20100101', '20100101.000' ],
+version         => '57.000',
+version_raw     => '57.0',

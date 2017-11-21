@@ -44,7 +44,13 @@ sub type ($) {
 
 sub json ($) {
     my $x = shift;
-    if (ref $x) {
+    if (ref $x eq 'SCALAR') {
+        if ($$x eq 1) {
+            $x = 'true';
+        } elsif ($$x eq 0) {
+            $x = 'false';
+        }
+    } elsif (ref $x) {
         $x = $JSON->encode($x);
     } else {
         $x = $JSON->encode([$x]);

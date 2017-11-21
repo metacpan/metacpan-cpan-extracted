@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = 0.17;
+our $VERSION = 0.18;
 
 =head1 NAME
 
@@ -41,12 +41,27 @@ as a CGI script, PSGI application, or Apache handler.
         my $name = $req->param( name => qr/[\w\s]+/, "Yet another perl hacker" );
 
         return {
+            -view     => 'TT',
             -template => \"Hello, [% name %]",
             -type     => "text/plain",
             name      => $name,
         };
     });
     MVC::Neaf->run;
+
+The same may be written in modernised syntax:
+
+    use MVC::Neaf qw(:sugar);
+
+    get+post '/app' => sub {
+        my $req = shift;
+
+        my $name = $req->param( name => qr/[\w\s]+/, "Yet another perl hacker" );
+        return {
+            -template => \"Hello, [% name %]",
+            name      => $name,
+        }
+    }, -view => 'TT', -type => "text/plain";
 
 =head1 CREATING AN APPLICATION
 
@@ -58,7 +73,8 @@ and outputs a C<\%hashref>.
 It may also die, which will be interpreted as an error 500,
 UNLESS error message starts with 3 digits and a whitespace,
 in which case this is considered the return status.
-E.g. C<die 404;> is a valid method to return "Not Found" right away.
+E.g. C<die 404;> is a valid method to return
+aconfigurable "Not Found" page right away.
 
 Handlers are set using the C<route( path =E<gt> CODEREF );>
 method discussed below.
@@ -86,7 +102,7 @@ or L<Plack::Request> with some minor differences:
 
 One I<major> difference is that there's no (easy) way to fetch
 query parameters or cookies without validation.
-Just use qr/.*/ if you know better.
+Just use C<qr/.*/> if you know better.
 
 Also there are some methods that affect the reply,
 mainly the headers, like C<set_cookie> or C<redirect>.
@@ -127,7 +143,13 @@ L<jsonp|https://en.wikipedia.org/wiki/JSONP> response.
 Callback MUST be a set of identifiers separated by dots.
 Otherwise it's ignored for security reasons.
 
-=item * -location - HTTP Location: header.
+=item * -location - HTTP Location: header for 3xx statuses.
+This is set by C<$request-E<gt>redirect(...)>.
+
+=item * -serial - if present, the JS view will render this instead of
+the whole response hash.
+This can be used e.g. to return non-hash data in REST API.
+B<EXPERIMENTAL>. Name and meaning may change in the future.
 
 =item * -status - HTTP status (200, 404, 500 etc).
 Default is 200 if the app managed to live through, and 500 if it died.
@@ -145,6 +167,10 @@ are currently supported.
 New short aliases may be created by
 C<MVC::Neaf-E<gt>load_view( "name" =E<gt> $your_view );> (see below).
 
+The default is the JS aka L<MVC::Neaf::View::JS> engine.
+Adding C<-template> key will cause switching to C<MVC::Neaf::View::TT>,
+but it is deprecated and will go away in v.0.20.
+
 =back
 
 Though more dash-prefixed parameters may be returned
@@ -160,10 +186,10 @@ They have nothing to do with serving the request.
 =cut
 
 use Carp;
-use Scalar::Util qw(blessed looks_like_number);
 use Encode;
-use URI::Escape;
 use Module::Load;
+use Scalar::Util qw(blessed looks_like_number);
+use URI::Escape;
 use parent qw(Exporter);
 
 our @EXPORT_OK = qw( neaf_err neaf get post head put );
@@ -174,7 +200,7 @@ our %EXPORT_TAGS = (
 use MVC::Neaf::Util qw(http_date canonize_path path_prefixes run_all run_all_nodie);
 use MVC::Neaf::Request;
 
-our $Inst = __PACKAGE__->new;
+our $Inst;
 
 =head2 route( path => CODEREF, %options )
 
@@ -211,10 +237,20 @@ and PATH_INFO matches the regex (without the leading slash).
 
 B<EXPERIMENTAL>. Name and semantics MAY change in the future.
 
+=item * param_regex => { name => qr/.../, name2 => '\d+' }
+
+Add predefined regular expression validation to certain request parameters,
+so that they can be queried by name only.
+See param() in L<MVC::Neaf::Request>.
+
+B<EXPERIMENTAL>. Name and semantics MAY change in the future.
+
 =item * view - default View object for this Controller.
 Must be an object with a C<render> method, or a CODEREF
 receiving hashref and returning a list of two scalars
 (content and content-type).
+
+B<DEPRECATED>. Use -view instead, semantics are the same.
 
 =item * cache_ttl - if set, set Expires: HTTP header accordingly.
 
@@ -236,7 +272,9 @@ This is totally the same as putting them into C<default> hash.
 
 my $year = 365 * 24 * 60 * 60;
 my %known_route_args;
-$known_route_args{$_}++ for qw(default method view cache_ttl path_info_regex description);
+$known_route_args{$_}++ for qw(default method view cache_ttl
+    path_info_regex param_regex
+    description caller);
 
 sub route {
     my $self = shift;
@@ -278,28 +316,39 @@ sub route {
     # Do the work
     my %profile;
     $profile{code}     = $sub;
-    $profile{caller}   = [caller(0)]; # file,line
-    if ( !defined $args{path_info_regex} ) {
-        # TODO replace def path_info_regex with '' in v.0.16 aka '404 if unspecified'
-        $args{path_info_regex}      = '';
-        $profile{no_path_info_regex} = 1;
-    };
-    $profile{path_info_regex}  = qr#^/*($args{path_info_regex})$#;
+    $profile{caller}   = $args{caller} || [caller(0)]; # file,line
+
+    # Always have regex defined to simplify routing
+    $profile{path_info_regex} = (defined $args{path_info_regex})
+        ? qr#^($args{path_info_regex})$#
+        : qr#^$#;
 
     # Just for information
     $profile{path}        = $path;
     $profile{description} = $args{description};
 
     if (my $view = $args{view}) {
-        # preload view so we can fail early
-        $view = $self->get_view( $view );
-
-        $args{default}{-view} = ref $args{view} ? $view : $args{view};
+        carp "NEAF: route(): view argument is deprecated, use -view instead";
+        $args{default}{-view} = $view;
     };
+
+    # preload view so that we can fail early
+    $args{default}{-view} = $self->get_view( $args{default}{-view} )
+        if $args{default}{-view};
 
     # todo_default because some path-based defs will be mixed in later
     $profile{todo_default} = $args{default}
         if $args{default};
+
+    # preprocess regular expression for params
+    if ( my $reg = $args{param_regex} ) {
+        my %real_reg;
+        $self->_croak("param_regex must be a hash of regular expressions")
+            if ref $reg ne 'HASH' or grep { !defined $reg->{$_} } keys %$reg;
+        $real_reg{$_} = qr(^$reg->{$_}$)s
+            for keys %$reg;
+        $profile{param_regex} = \%real_reg;
+    };
 
     if ( $args{cache_ttl} ) {
         $self->_croak("cache_ttl must be a number")
@@ -322,7 +371,7 @@ sub route {
 }; # end sub route
 
 # This is for get+post sugar
-# TODO merge with alias, GET => implicit HEAD
+# TODO 0.90 merge with alias, GET => implicit HEAD
 sub _dup_route {
     my ($self, $method, $profile) = @_;
 
@@ -455,16 +504,19 @@ sub pre_route {
     my ($self, $code) = @_;
     $self = $Inst unless ref $self;
 
-    carp ("DEPRECATED: pre_route(): use add_hook( pre_route => CODE ) instead");
+    # TODO 0.20 remove
+    carp ("NEAF: pre_route(): DEPRECATED until 0.20, use add_hook( pre_route => CODE )");
     $self->add_hook( pre_route => $code );
     return $self;
 };
 
 =head2 load_view( $name, $object || coderef || ($module_name, %options) )
 
-Load a view object and cache it under name $name, if $name is true.
-The loaded view is returned.
-All subsequent calls to get_view( $name ) would return that object, too.
+Setup view under name $name.
+Subsequent requests with C<-view = $name> wouldbe processed by that view
+object.
+
+Use C<get_view> to fetch the object itself.
 
 =over
 
@@ -473,8 +525,9 @@ All subsequent calls to get_view( $name ) would return that object, too.
 =item * if module name + parameters is given, try to load module
 and create new() instance.
 
-=item * as a last resort, load stock view: C<TT>, C<JS>, or C<Dumper>.
-Those are prefixed with C<MVC::Neaf::View::>.
+Short aliases JS, TT, and Dumper may be used for MVC::Neaf::View::*
+
+=item * if coderef is given, use it as a C<render> method.
 
 =back
 
@@ -482,7 +535,7 @@ If C<set_forced_view> was called, return its argument instead.
 
 =cut
 
-my %known_view = (
+my %view_alias = (
     TT     => 'MVC::Neaf::View::TT',
     JS     => 'MVC::Neaf::View::JS',
     Dumper => 'MVC::Neaf::View::Dumper',
@@ -494,14 +547,10 @@ sub load_view {
     $self->_croak("At least two arguments required")
         unless defined $name and defined $obj;
 
-    # We've been overridden!
-    return $self->{force_view}
-        if exists $self->{force_view};
-
     # Instantiate if needed
     if (!ref $obj) {
         # in case an alias is used, apply alias
-        $obj = $known_view{ $obj } || $obj;
+        $obj = $view_alias{ $obj } || $obj;
 
         # Try loading...
         if (!$obj->can("new")) {
@@ -515,8 +564,7 @@ sub load_view {
         unless blessed $obj and $obj->can("render")
             or ref $obj eq 'CODE';
 
-    $self->{seen_view}{$name} = $obj
-        if $name;
+    $self->{seen_view}{$name} = $obj;
 
     return $obj;
 };
@@ -537,7 +585,8 @@ sub set_default {
     my ($self, %data) = @_;
     $self = $Inst unless ref $self;
 
-    carp "DEPRECATED use set_path_defaults( '/', \%data ) instead of MVC::Neaf->set_default()";
+    # TODO 0.20 remove
+    carp "DEPRECATED use set_path_defaults( '/', \%data ) instead of set_default()";
 
     return $self->set_path_defaults( '/', \%data );
 };
@@ -712,7 +761,7 @@ B<DEPRECATED>. Same as above, but issues a warning.
 
 =cut
 
-# TODO kill in v.0.20
+# TODO 0.20 remove
 sub error_template {
     my $self = shift;
 
@@ -781,7 +830,7 @@ sub run {
     };
 
     # initialize stuff if first run
-    # TODO don't allow modification after lock
+    # TODO 0.30 don't allow modification after lock
     # Please bear in mind that $_[0] in callbacks is ALWAYS the Request object
     if (!$self->{lock}) {
         if (my $engine = $self->{session_handler}) {
@@ -840,7 +889,8 @@ sub _make_route_re {
     my $re = join "|", map { quotemeta } reverse sort keys %$hash;
 
     # make $1, $2 always defined
-    return qr{^($re)((?:/[^?]*)?)(?:\?|$)};
+    # split into (/foo/bar)/(baz)?param=value
+    return qr{^($re)(?:/*([^?]*)?)(?:\?|$)};
 };
 
 =head1 EXPORTED FUNCTIONS
@@ -886,7 +936,7 @@ In order to minimize typing, a less cumbersome prototyped interface is provided:
 
     use MVC::Neaf qw(:sugar);
 
-    get '/foo/bar' => sub { ... }, view => 'TT';
+    get '/foo/bar' => sub { ... }, -view => 'TT';
     neaf error => 404 => \&my_error_template;
 
     neaf->run;
@@ -931,7 +981,8 @@ foreach (qw(get head post put)) {
         # normal operation
         my ($path, $handler, @args) = @_;
 
-        return $Inst->route( $path, $handler, @args, method => $method );
+        return $Inst->route(
+            $path, $handler, @args, method => $method, caller => [caller(0)] );
     };
 
     no strict 'refs'; ## no critic
@@ -1105,7 +1156,7 @@ Instead, the corresponding error handler is executed right away.
 Options C<path> and C<exclude> are not available on this stage.
 
 May be useful for mangling path.
-Use C<$request-E<gt>set_full_path($new_path)> if you need to.
+Use C<$request-E<gt>set_path($new_path)> if you need to.
 
 =head3 pre_logic
 
@@ -1215,7 +1266,7 @@ sub add_hook {
     return $self;
 };
 
-# TODO util?
+# TODO 0.90 util?
 # usage: listify ( \$var, default1, default2... )
 # converts scalar in-place to arrayref if needed
 sub _listify {
@@ -1242,8 +1293,22 @@ sub get_routes {
     my $self = shift;
     $self = $Inst unless ref $self;
 
-    # shallow copy TODO need 2 layers!
-    return { %{ $self->{route} } };
+    # TODO 0.30 must do deeper copying
+    # TODO 0.30 need callback here
+    # TODO 0.30 filter routes by path & method
+    my $all = $self->{route};
+    my %ret;
+    foreach my $path ( keys %$all ) {
+        my $batch = $all->{$path};
+        foreach my $method ( keys %$batch ) {
+            my $route = $batch->{$method};
+            $self->_post_setup( $route )
+                unless $route->{lock};
+            $ret{$path}{$method} = { %$route };
+        };
+    };
+
+    return \%ret;
 };
 
 =head2 set_forced_view( $view )
@@ -1334,20 +1399,19 @@ that handles MVC::Neaf->... requests.
 sub new {
     my ($class, %opt) = @_;
 
-    $opt{-type}     ||= "text/html";
-    $opt{-view}     ||= "TT";
     my $force = delete $opt{force_view};
 
     my $self = bless \%opt, $class;
 
     $self->{on_error} ||= sub {
-        my ($req, $err, $where) = @_;
+        my ($req, $err) = @_;
         $self->_log_error( $req->script_name, $err );
     };
 
     $self->set_forced_view( $force )
         if $force;
-    # avoid an extra ||= in handle requ
+
+    # TODO 0.20 set default (-view => JS)
     $self->set_path_defaults( '/' => { -status => 200 } );
 
     return $self;
@@ -1360,11 +1424,15 @@ Should not be called directly - use C<run()> instead.
 
 =cut
 
-sub handle_request {
-    my ($self, $req) = @_;
-    $self = $Inst unless ref $self;
+# sub handle_request is now split into four separate "procedures",
+# but it is still a 200-line method by nature.
 
-    # ROUTE REQUEST
+# In:   request
+# Out:  $route + $data
+# Side: request modified
+sub _route_request {
+    my ($self, $req) = @_;
+
     my $route;
     my $data = eval {
         my $method = $req->method;
@@ -1375,21 +1443,21 @@ sub handle_request {
         # Lookup the rules for the given path
         $req->path =~ $self->{route_re} and my $node = $self->{route}{$1}
             or die "404\n";
+        my ($path, $path_info) = ($1, $2);
         unless ($route = $node->{ $method }) {
             $req->set_header( Allow => join ", ", keys %$node );
             die "405\n";
         };
 
-        # TODO optimize this or do smth. Still MUST keep route_re a prefix tree
-        my ($path, $path_info) = ($1, $2);
+        # TODO 0.90 optimize this or do smth. Still MUST keep route_re a prefix tree
         if ($path_info =~ /%/) {
             $path_info = decode_utf8( uri_unescape( $path_info ) );
         };
         $path_info =~ $route->{path_info_regex}
             or die "404\n";
-        $req->set_full_path( $path, $path_info, $route->{no_path_info_regex} );
         $self->_post_setup( $route )
             unless exists $route->{lock};
+        $req->_import_route( $route, $path, $path_info );
 
         # execute hooks
         run_all( $route->{hooks}{pre_logic}, $req)
@@ -1400,18 +1468,34 @@ sub handle_request {
 
     if ($data) {
         # post-process data - fill in request(RD) & global(GD) defaults.
-        # TODO kill request defaults in v.0.20
+        unless( UNIVERSAL::isa($data, 'HASH') ) {
+            # prevent dying with criptic error message
+            $data = $self->_error_to_reply(
+                $req, $req->_message("returned value is not a hash") );
+        };
+        # TODO 0.20 kill request defaults
         my $RD = $req->get_default;
         my $GD = $route->{default};
         exists $data->{$_} or $data->{$_} = $RD->{$_} for keys %$RD;
         exists $data->{$_} or $data->{$_} = $GD->{$_} for keys %$GD;
     } else {
         # Fall back to error page
-        # TODO $req->clear; - but don't kill cleanup hooks
-        $data = $self->_error_to_reply( $req, $@, $route->{caller} );
+        # TODO 0.90 $req->clear; - but don't kill cleanup hooks
+        $data = $self->_error_to_reply( $req, $@ );
     };
 
-    # END ROUTE REQUEST
+    if (my $append = $data->{-headers}) {
+        if (ref $append eq 'ARRAY') {
+            my $head = $req->header_out;
+            for (my $i = 0; $i < @$append; $i+=2) {
+                $head->push_header($append->[$i], $append->[$i+1]);
+            };
+        }
+        else {
+            # Would love to die, but it's impossible here
+            warn $req->_message("-headers must be ARRAY, not ".(ref $append));
+        };
+    };
 
     $req->_set_reply( $data );
     if (exists $route->{hooks}{pre_content}) {
@@ -1420,33 +1504,52 @@ sub handle_request {
         }, $req );
     };
 
-    # PROCESS REPLY
+    return ($route, $data);
+}; # end _route_request
 
-    # Render content if needed. This may alter type, so
-    # produce headers later.
-    my $content = \$data->{-content};
-    if( !defined $$content) {
-        my $view = $self->get_view( $data->{-view} || $route->{view} );
+sub _render_content {
+    my ($self, $route, $req) = @_;
+
+    my $data = $req->reply;
+    my $content;
+        # TODO 0.20 remove, set default( -view => JS ) instead
+        if (!$data->{-view}) {
+            if ($data->{-template}) {
+                $data->{-view} = 'TT';
+                warn $req->_message( "default -view=TT is DEPRECATED, will switch to JS in 0.20" );
+            } else {
+                $data->{-view} = 'JS';
+            };
+        };
+
+        my $view = $self->get_view( $data->{-view} );
         eval {
             run_all( $route->{hooks}{pre_render}, $req )
                 if exists $route->{hooks}{pre_render};
-            ($$content, my $type) = blessed $view
+
+            ($content, my $type) = blessed $view
                 ? $view->render( $data ) : $view->( $data );
             $data->{-type} ||= $type;
         };
-        if (!defined $$content) {
-            # TODO $req->clear; - but don't kill cleanup hooks
+        if (!defined $content) {
+            # TODO 0.90 $req->clear; - but don't kill cleanup hooks
             # FIXME bug here - resetting data does NOT affect the inside of req
             $self->_log_error( view => $@ );
             $data = {
                 -status => 500,
                 -type   => "text/plain",
             };
-            $$content = "Template error."; # TODO configurable
+            $content = "Template error."; # TODO 0.30 configurable
         };
-    };
 
-    # TODO should this be a sub?
+    return $content;
+}; # end _render_content
+
+sub _fix_encoding {
+    my (undef, $data) = @_;
+
+    my $content = \$data->{-content};
+
     # Encode unicode content NOW so that we don't lie about its length
     # Then detect ascii/binary
     if (Encode::is_utf8( $$content )) {
@@ -1465,21 +1568,30 @@ sub handle_request {
         $data->{-type} .= "; charset=utf-8"
             unless $data->{-type} =~ /; charset=/;
     };
+}; # end _fix_encoding
 
-    # Mangle headers - NOTE these modifications remain stored in req
+sub handle_request {
+    my ($self, $req) = @_;
+    $self = $Inst unless ref $self;
+
+    # Route request, process logic, generate reply
+    my ($route, $data) = $self->_route_request( $req );
+    # $data == $req->reply at this point
+
+    # Render content if needed.
+    my $content = \$data->{-content};
+    $$content = $self->_render_content( $route, $req )
+        unless defined $$content;
+
+    # encode_utf8 if needed, define -type if none
+    $self->_fix_encoding( $data );
+
+    # MANGLE HEADERS
+    # NOTE these modifications remain stored in req
     my $head = $req->header_out;
-    if (my $append = $data->{-headers}) {
-        if (ref $append eq 'ARRAY') {
-            for (my $i = 0; $i < @$append; $i+=2) {
-                $head->push_header($append->[$i], $append->[$i+1]);
-            };
-        }
-        else {
-            carp("Neaf: -headers must be ARRAY, not ".(ref $append));
-            # Would love to die, but it's impossible here
-        };
-    };
-    $head->init_header( content_type => $data->{-type} || $self->{-type} );
+
+    # The most standard ones...
+    $head->init_header( content_type => $data->{-type} );
     $head->init_header( location => $data->{-location} )
         if $data->{-location};
     $head->push_header( set_cookie => $req->format_cookies );
@@ -1487,9 +1599,8 @@ sub handle_request {
         unless $data->{-continue};
     $head->init_header( expires => http_date( time + $route->{cache_ttl} ) )
         if exists $route->{cache_ttl} and $data->{-status} == 200;
-    $$content = '' if $req->method eq 'HEAD';
 
-    # END PROCESS REPLY
+    # END MANGLE HEADERS
 
     if (exists $route->{hooks}{pre_cleanup}) {
         $req->postpone( $route->{hooks}{pre_cleanup} );
@@ -1502,6 +1613,7 @@ sub handle_request {
 
     # DISPATCH CONTENT
 
+    $$content = '' if $req->method eq 'HEAD';
     if ($data->{-continue} and $req->method ne 'HEAD') {
         $req->postpone( $data->{'-continue'}, 1 );
         $req->postpone( sub { $_[0]->write( $$content ); }, 1 );
@@ -1519,6 +1631,10 @@ sub handle_request {
 # 3) lock
 sub _post_setup {
     my ($self, $route) = @_;
+
+    # LOCK PROFILE
+    $route->{lock}++
+        and die "MVC::Neaf broken, please file a bug";
 
     # CALCULATE DEFAULTS
     my %def;
@@ -1561,9 +1677,9 @@ sub _post_setup {
                 grep { $route->{path} =~ m#^\Q$_\E(?:/|$)# }
                     @{ $hook->{exclude} }
                         and next;
-                # TODO filter out repetition
+                # TODO 0.90 filter out repetition
                 push @{ $phases{$phase} }, $hook->{code};
-                # TODO also store hook info somewhere for better error logging
+                # TODO 0.30 also store hook info somewhere for better error logging
             };
         };
     };
@@ -1575,14 +1691,11 @@ sub _post_setup {
 
     $route->{hooks} = \%phases;
 
-    # LOCK PROFILE
-    $route->{lock}++
-        and die "MVC::Neaf broken, please file a bug";
     return;
 };
 
 sub _error_to_reply {
-    my ($self, $req, $err, $where) = @_;
+    my ($self, $req, $err) = @_;
 
     if (blessed $err and $err->isa("MVC::Neaf::Exception")) {
         $err->{-status} ||= 500;
@@ -1593,7 +1706,8 @@ sub _error_to_reply {
 
     # Try exception handler
     if( !$1 and exists $self->{on_error}) {
-        eval { $self->{on_error}->($req, $err, $where); 1 }
+        # TODO 0.30 Make error processing more robust
+        eval { $self->{on_error}->($req, $err, $req->endpoint_origin); 1 }
             or $self->_log_error( "error handler", $@ );
     };
 
@@ -1602,12 +1716,14 @@ sub _error_to_reply {
         my $ret = eval {
             $self->{error_template}{$status}->( $req,
                 status => $status,
-                caller => $where,
+                caller => $req->endpoint_origin,
                 error => $err,
             );
         };
-        return $ret
-            if (ref $ret eq 'HASH');
+        if (ref $ret eq 'HASH') {
+            $ret->{-status} ||= $status;
+            return $ret;
+        };
         $self->_log_error( "status $status handler:", $@ );
     };
 
@@ -1648,13 +1764,20 @@ sub get_view {
     my ($self, $view) = @_;
     $self = $Inst unless ref $self;
 
-    if (ref $view) {
-        return $self->load_view( '' => $view );
-    }
-    else {
-        $view = $self->{-view} unless defined $view;
-        return $self->{seen_view}{$view} || $self->load_view( $view, $view );
-    };
+    # We've been overridden!
+    return $self->{force_view}
+        if exists $self->{force_view};
+
+    # An object/code means controller knows better
+    return $view
+        if ref $view;
+
+    # Try loading & caching if not present.
+    $self->load_view( $view, $view )
+        unless $self->{seen_view}{$view};
+
+    # Finally, return the thing.
+    return $self->{seen_view}{$view};
 };
 
 =head2 run_test( \%PSGI_ENV, %options )
@@ -1668,7 +1791,7 @@ Returns just the content in scalar context.
 
 Just as the name suggests, useful for testing only (it reduces boilerplate).
 
-Continuation responses are supported.
+Continuation responses are supported, but will be returned in one chunk.
 
 %options may include:
 
@@ -1679,6 +1802,10 @@ Continuation responses are supported.
 =item * override = \%hash - force certain data in ENV
 
 =item * cookie = \%hash - force HTTP_COOKIE header
+
+=item * body = 'DATA' - force body in request
+
+=item * secure = 0|1 - http vs https
 
 =back
 
@@ -1697,17 +1824,35 @@ sub run_test {
             SERVER_PORT => 80,
             SCRIPT_NAME => '',
             PATH_INFO => $1,
+            'psgi.version' => [1,1],
         }
     };
-    # TODO more civilized stuff like cookies, headers...
+    # TODO 0.30 complete emulation of everything a sane person needs
     $env->{REQUEST_METHOD} = $opt{method} if $opt{method};
     $env->{$_} = $opt{override}{$_} for keys %{ $opt{override} };
 
+    if (exists $opt{secure}) {
+        $env->{'psgi.url_scheme'} = $opt{secure} ? 'https' : 'http';
+    };
     if (my $cook = $opt{cookie}) {
-        # TODO hash processing
+        if (ref $cook eq 'HASH') {
+            $cook = join '; ', map {
+                uri_escape_utf8($_).'='.uri_escape_utf8($cook->{$_})
+            } keys %$cook;
+        };
         $env->{HTTP_COOKIE} = $env->{HTTP_COOKIE}
-            ? "$env->{HTTP_COOKIE}, $cook"
+            ? "$env->{HTTP_COOKIE}; $cook"
             : $cook;
+    };
+    if (my $body = $opt{body} ) {
+        open my $dummy, "<", \$body
+            or die ("NEAF: FATAL: Redirect failed in run_test");
+        $env->{'psgi.input'} = $dummy;
+        $env->{CONTENT_LENGTH} = length $body;
+    };
+    if (my $type = $opt{type}) {
+        $type = 'application/x-www-form-urlencoded' if $type eq '?';
+        $env->{CONTENT_TYPE} = $opt{type} eq '?' ? '' : $opt{type}
     };
 
     my $ret = $self->run->( $env );
@@ -1723,6 +1868,9 @@ sub run_test {
         join '', @{ $ret->[2] },
     );
 };
+
+# Setup default instance, no more code after this
+$Inst = __PACKAGE__->new;
 
 =head1 MORE EXAMPLES
 

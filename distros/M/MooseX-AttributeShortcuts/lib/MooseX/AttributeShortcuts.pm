@@ -9,8 +9,8 @@
 #
 package MooseX::AttributeShortcuts;
 our $AUTHORITY = 'cpan:RSRCHBOY';
-# git description: 0.035-1-gb1a3ab6
-$MooseX::AttributeShortcuts::VERSION = '0.036';
+# git description: 0.036-2-g03ef7bc
+$MooseX::AttributeShortcuts::VERSION = '0.037';
 
 # ABSTRACT: Shorthand for common attribute options
 
@@ -119,7 +119,7 @@ MooseX::AttributeShortcuts - Shorthand for common attribute options
 
 =head1 VERSION
 
-This document describes version 0.036 of MooseX::AttributeShortcuts - released October 31, 2017 as part of MooseX-AttributeShortcuts.
+This document describes version 0.037 of MooseX::AttributeShortcuts - released November 20, 2017 as part of MooseX-AttributeShortcuts.
 
 =head1 SYNOPSIS
 
@@ -304,6 +304,27 @@ or, if your attribute name begins with an underscore:
     predicate => "_has$name"
 
 (that is, an attribute named C<_foo> would get C<_has_foo>)
+
+=head2 init_arg => 1 / -1
+
+This is a somewhat esoteric shortcut; you probably don't want to use this (or
+even read this section).
+
+Specifying C<init_arg =E<gt> 1> will cause the following options to be set:
+
+    # attribute: "name"
+    init_arg => 'name'
+
+    # or, attribute: "_name"
+    init_arg => '_name'
+
+...while C<init_arg =E<gt> -1> will cause the following options to be set:
+
+    # attribute: "name"
+    init_arg => '_name'
+
+    # or, attribute: "_name"
+    init_arg => 'name'
 
 =head2 trigger => 1
 

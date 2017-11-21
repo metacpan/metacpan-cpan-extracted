@@ -1,0 +1,70 @@
+Testing stringdet
+
+Testing default without options
+<StringDetect attribute="Match" context="#stay" String="antimoon" />
+<Test>
+antimoon ddantimoondd
+ANTIMOON DDANTIMOONDD
+<Test>
+
+Testing dynamic
+
+<RegExpr attribute="Match" context="TestDT" String="\s(a)ntimoo(n)" />
+<StringDetect attribute="Match" dynamic="true" context="#pop" String="%1ntimoo%2" />
+
+<TestD>
+#should match
+scoop antimoon
+antimoon %1ntimoo%2 #if this matches, dynamic was not called
+<TestD>
+
+<TestD>
+#should match
+scoop antimoon
+ddantimoondd %1ntimoo%2 #if this matches, dynamic was not called
+<TestD>
+
+<TestD>
+scoop antimoon
+ANTIMOON %1ntimoo%2 #if this matches, dynamic was not called
+<TestD>
+
+<TestD>
+scoop antimoon
+DDANTIMOONDD %1ntimoo%2 #if this matches, dynamic was not called
+<TestD>
+
+Testing dynamic insensitive
+<RegExpr attribute="Match" context="TestDIT" String="\s(a)ntimoo(n)" />
+<StringDetect attribute="Match" insensitive="true" dynamic="true" context="#pop" String="%1ntimoo%2" />
+
+<TestDI>
+#should match
+scoop antimoon
+antimoon %1ntimoo%2 #if this matches, dynamic was not called
+<TestDI>
+
+<TestDI>
+#should match
+scoop antimoon
+ddantimoondd %1ntimoo%2 #if this matches, dynamic was not called
+<TestDI>
+
+<TestDI>
+#should match
+scoop antimoon
+ANTIMOON %1ntimoo%2 #if this matches, dynamic was not called
+<TestDI>
+
+<TestDI>
+#should match
+scoop antimoon
+DDANTIMOONDD %1ntimoo%2 #if this matches, dynamic was not called
+<TestDI>
+
+Testing insensitive
+<StringDetect attribute="Match" insensitive="true" context="#stay" String="antimoon" />
+<TestI>
+antimoon ddantimoondd
+ANTIMOON DDANTIMOONDD
+<TestI>

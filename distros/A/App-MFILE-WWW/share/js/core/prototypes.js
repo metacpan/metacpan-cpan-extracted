@@ -80,13 +80,21 @@ define([
             pushable: true,
             source: '(none)',
             start: function () {},
+            onlyWhen: function () { return true; },
         },
 
         // prototype for users ("employees" in App::Dochazka::WWW)
         user: {
             nick: '',
-        }
+        },
+
+        // prototype for menus (dmenu and miniMenu)
+        menu: {
+            entries: [],
+            isDmenu: false,
+            isMiniMenu: false,
+            isEmpty: true,
+        },
 
     };
 });
-

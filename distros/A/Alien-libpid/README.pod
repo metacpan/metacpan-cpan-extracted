@@ -16,7 +16,6 @@ L<http://github.com/athreef/Alien-libpid>
 
 =head1 SEE ALSO
 
-L<Alien>
 L<libpid|http://github.com/a3f/libpid>
 
 =head1 AUTHOR
@@ -30,4 +29,3 @@ Copyright (C) 2016 Ahmad Fatoum
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
-=cut

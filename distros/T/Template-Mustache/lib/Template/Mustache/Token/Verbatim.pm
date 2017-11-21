@@ -1,7 +1,7 @@
 package Template::Mustache::Token::Verbatim;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Object representing a Verbatim block
-$Template::Mustache::Token::Verbatim::VERSION = '1.1.0';
+$Template::Mustache::Token::Verbatim::VERSION = '1.2.0';
 use Moo;
 
 use MooseX::MungeHas { has_ro => [ 'is_ro' ], has_rw => [ 'is_rw' ] };
@@ -41,7 +41,7 @@ Template::Mustache::Token::Verbatim - Object representing a Verbatim block
 
 =head1 VERSION
 
-version 1.1.0
+version 1.2.0
 
 =head1 AUTHORS
 

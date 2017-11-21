@@ -40,14 +40,15 @@
       "runtime" : {
          "requires" : {
             "DBIx::Class::Schema" : "0",
-            "GraphQL" : "0.20",
+            "GraphQL" : "0.21",
             "perl" : "5.014"
          }
       },
       "test" : {
          "requires" : {
+            "DBD::SQLite" : "0",
             "DBIx::Class::Schema" : "0",
-            "GraphQL" : "0.20",
+            "GraphQL" : "0.21",
             "Test::More" : "0.98"
          }
       }
@@ -66,5 +67,5 @@
       },
       "x_IRC" : "irc://irc.perl.org/#graphql-perl"
    },
-   "version" : "0.02"
+   "version" : "0.03"
 }

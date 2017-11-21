@@ -194,6 +194,10 @@ subtest 'string functions' => sub {
         formline_fcn => join("\n",  q(my($a, $b);),
                                     q($a = formline('one', $b, 'three'))),
 
+        concat_op => join("\n", q(my $a;),
+                                q($a = qq(abc$a);),
+                                q(my $b = qq(123$a) . $a . qq(456$a) . $a . '789')),
+
         map { ( "${_}_dfl"      => "$_()",
                 "${_}_to_var"   => join("\n",   q(my $a;),
                                                 "\$a = $_()"),
@@ -1311,7 +1315,7 @@ sub _run_tests {
             $@;
         };
         if ($exception) {
-            die "Couldn't compile code for $test_name: $@\nCode was:\n$eval_string";
+            die "Couldn't compile code for $test_name: $exception\nCode was:\n$eval_string";
         }
         (my $expected = $code) =~ s/\b(?:my|our)\b\s*//mg;
         my $ops = _get_optree_for_sub_named($test_name);

@@ -4,7 +4,7 @@
 package Lingua::Interset::Tagset::EN::Conll;
 use strict;
 use warnings;
-our $VERSION = '3.007';
+our $VERSION = '3.008';
 
 use utf8;
 use open ':utf8';
@@ -121,7 +121,7 @@ Lingua::Interset::Tagset::EN::Conll - Driver for the English tagset of the CoNLL
 
 =head1 VERSION
 
-version 3.007
+version 3.008
 
 =head1 SYNOPSIS
 

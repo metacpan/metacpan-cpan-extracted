@@ -17,8 +17,11 @@
 
     The following parameters are valid only in dan
 
-    [--user username(default `logname`)] 
+    [--user username(default `id -un`)] 
     [--sudo user1 ] 
+    [--chown root]
+    [--chmod 777]
+    [--cc]
 
 =cut
 use strict;
@@ -35,12 +38,12 @@ $| ++;
 
 my $option = MYDan::Util::OptConf->load();
 my %o = $option->set( retry => 2, timeout => 300, gave => 3, src => hostname() )
-    ->get( qw( src=s dst=s sp=s dp=s timeout=i max=i retry=i nice=i user=s sudo=s gave=i ) )
+    ->get( qw( src=s dst=s sp=s dp=s timeout=i max=i retry=i nice=i user=s sudo=s gave=i chown=s chmod=s cc ) )
     ->dump();
 
 $option->assert( qw( src dst sp ) );
 
-$o{user} = `logname` and chop $o{user} unless $o{user};
+$o{user} = `id -un` and chop $o{user} unless $o{user};
 
 my $range = MYDan::Node->new( $option->dump( 'range' ) );
 my $mrsync = MYDan::Agent::Mrsync->new

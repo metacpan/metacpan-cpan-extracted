@@ -1,0 +1,11 @@
+[AGENT]
+
+Mozilla/4.0 (compatible; GoogleToolbar 6.4.1208.1530; Windows XP 5.1; MSIE 6.0.2900.2180)
+
+extras          => [ 'GoogleToolbar/6.4.1208.1530' ],
+name            => 'MSIE',
+os              => 'Windows XP',
+parser          => 'msie',
+version         => '6.00029002180',
+version_raw     => '6.0.2900.2180',
+

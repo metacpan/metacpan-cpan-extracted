@@ -83,9 +83,9 @@ sub _get_table_class {
 }
 
 sub query {
-    my ($self) = @_;
+    my ($self, %opts) = @_;
 
-    return QBit::Application::Model::DB::Query->new(db => $self);
+    return QBit::Application::Model::DB::Query->new(db => $self, %opts);
 }
 
 sub _connect {

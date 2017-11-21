@@ -2,7 +2,7 @@ package Acme::MetaSyntactic::linux;
 use strict;
 use Acme::MetaSyntactic::List;
 our @ISA = qw( Acme::MetaSyntactic::List );
-our $VERSION = '1.031';
+our $VERSION = '1.032';
 
 our %Remote = (
     source  => 'http://distrowatch.com/',
@@ -45,6 +45,12 @@ Philippe Bruhat (BooK).
 =head1 CHANGES
 
 =over 4
+
+=item *
+
+2017-11-13 - v1.032
+
+Updated from the source web site in Acme-MetaSyntactic-Themes version 1.051.
 
 =item *
 
@@ -295,6 +301,9 @@ antiX
 APODIO
 Arch
 ArchBang
+ArchLabs
+ArchStrike
+Artix
 Arya
 Asianux
 AsteriskNOW
@@ -302,9 +311,12 @@ Audiophile
 AUSTRUMI
 AV_Linux
 BackBox
+BackSlash
 Baruwa
+BeeFree
 Berry
 Bicom
+BigLinux
 Bio_Linux
 BitKey
 Black_Lab
@@ -327,10 +339,12 @@ Chapeau
 Clear
 ClearOS
 Clonezilla
+ClonOS
 CloudReady
 Connochaet
 Container
 CRUX
+Cucumber
 Debian
 Debian_Edu
 deepin
@@ -355,7 +369,6 @@ Fatdog64
 Fedora
 feren
 Fermi
-Finnix
 FreeBSD
 FreeNAS
 FreePBX
@@ -366,14 +379,16 @@ Gecko
 Gentoo
 GhostBSD
 gNewSense
+GNUstep
 GoboLinux
 GParted
 Greenie
 Grml
 GuixSD
 Haiku
+HardenedBSD
+heads
 IPFire
-Kaiana
 Kali
 KANOTIX
 KaOS
@@ -389,6 +404,7 @@ Kwort
 KXStudio
 Lakka
 Leeenux
+Legacy
 LFS
 LibreELEC
 LinHES
@@ -424,17 +440,16 @@ NetBSD
 NethServer
 Netrunner
 NexentaStor
+Nitrux
 NixOS
 NST
 NuTyX
 OB2D
-OBRevenge
 OLPC
 Omoikane
 OpenBSD
 OpenELEC
 OpenIndiana
-OpenLX
 OpenMandriva
 OpenMediaVault
 openSUSE
@@ -443,10 +458,11 @@ OPNsense
 Oracle
 OSGeo
 OSMC
-Overclockix
 OviOS
 paldo
 Parabola
+Pardus
+Pardus_Topluluk
 Parrot
 Parsix
 Parted_Magic
@@ -457,38 +473,42 @@ PelicanHPC
 Pentoo
 Peppermint
 pfSense
-Pinguy
+Photon
 Pisi
 Plamo
 PLD
 Plop
-Point
 PoliArch
+Pop_OS
 Porteus
 Porteus_Kiosk
 PrimTux
 Proxmox
 Puppy
+PureOS
 Q4OS
 Qubes
 Quirky
 RancherOS
 Raspbian
 RaspBSD
+RasPlex
+RDS
 ReactOS
 RebeccaBlackOS
 Rebellin
 Red_Hat
+Redcore
 Refracta
-RemixOS
-REMnux
 Rescatux
 Resulinux
+Revenge
 RISC
 Robolinux
 Rocks_Cluster
 Rockstor
 ROSA
+RSS
 Runtu
 Sabayon
 SalentOS
@@ -496,10 +516,8 @@ Salix
 Scientific
 Securepoint
 SELKS
-Semplice
 Shark
 siduction
-Simplicity
 Slackel
 Slackware
 SliTaz
@@ -514,9 +532,8 @@ Sophos
 Source_Mage
 SparkyLinux
 Springdale
+Star
 SteamOS
-Stella
-StressLinux
 Subgraph
 SuliX
 Super_Grub2
@@ -540,10 +557,10 @@ TrueOS
 TurnKey
 tuxtrans
 UberStudent
+UBOS
 Ubuntu
 Ubuntu_Budgie
 Ubuntu_DP
-Ubuntu_GNOME
 Ubuntu_Kylin
 Ubuntu_MATE
 Ubuntu_Studio
@@ -573,4 +590,5 @@ Xubuntu
 Zentyal
 Zenwalk
 Zeroshell
+Zevenet
 Zorin

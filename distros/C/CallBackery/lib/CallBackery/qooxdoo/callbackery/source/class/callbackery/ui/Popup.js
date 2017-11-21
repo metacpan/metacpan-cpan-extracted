@@ -32,6 +32,7 @@ qx.Class.define("callbackery.ui.Popup", {
             label : 'Cancel',
             action : 'cancel'
         };
+        cfg.instanciationMode = 'onStartup';
         var screen = new callbackery.ui.Screen(cfg,getParentFormData,extraAction);
         this.add(screen);
         screen.addListener('actionResponse',function(e){

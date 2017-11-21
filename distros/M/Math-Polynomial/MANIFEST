@@ -17,15 +17,14 @@ t/04_lagrange.t
 t/05_euclid.t
 t/06_calculus.t
 t/07_strings.t
-t/08_generic.t
 t/09_linear_terms.t
 t/10_math_complex.t
 t/11_math_bigrat.t
-t/12_gf3.t
+t/12_gf3_4.t
 t/13_trees.t
 t/14_math_modint.t
 t/15_deprecation.t
-t/16_math_bignum.t
+t/16_math_anynum.t
 t/90_pod.t
 t/91_pod_cover_cp.t
 t/92_consistency.t

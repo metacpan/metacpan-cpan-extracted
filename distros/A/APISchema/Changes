@@ -1,5 +1,15 @@
 Revision history for Perl extension APISchema
 
+1.30 2017-11-20T17:00:38Z
+   - Empty input could pass validations unexpectedly
+   - Add . to lib
+
+1.29 2017-11-20T01:34:11Z
+   - Handle boolean on generating document(1.28 was broken)
+
+1.28 2017-11-17T09:49:53Z
+   - Handle boolean on generating document
+
 1.27 2017-09-19T09:58:40Z
    - Sort keys when encoding JSON
 

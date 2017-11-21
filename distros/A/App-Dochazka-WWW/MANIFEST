@@ -30,6 +30,7 @@ share/js/dochazka-www/emp-lib.js
 share/js/dochazka-www/entries.js
 share/js/dochazka-www/int-lib.js
 share/js/dochazka-www/ldap-lib.js
+share/js/dochazka-www/lock-lib.js
 share/js/dochazka-www/priv-lib.js
 share/js/dochazka-www/sched-history-lib.js
 share/js/dochazka-www/sched-lib.js

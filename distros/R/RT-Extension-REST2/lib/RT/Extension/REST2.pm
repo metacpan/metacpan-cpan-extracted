@@ -4,7 +4,7 @@ use 5.010001;
 
 package RT::Extension::REST2;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 our $REST_PATH = '/REST/2.0';
 
 use Plack::Builder;
@@ -239,6 +239,10 @@ like you do when browsing a website on your computer. We've better
 decoupled the client's implementation from the server's REST API.
 Additionally, this system lets you be informed of new capabilities in
 the form of additional hyperlinks.
+
+Using these tools and principles, REST2 will help you build rich,
+robust, and powerful integrations with the other applications and
+services that your team uses.
 
 =head2 Endpoints
 
@@ -557,12 +561,18 @@ handle them appropriately.
 
 # XXX TODO: API doc
 
-sub to_psgi_app { shift->to_app(@_) }
+sub to_psgi_app {
+    my $self = shift;
+    my $res = $self->to_app(@_);
+
+    return Plack::Util::response_cb($res, sub {
+        my $res = shift;
+        $self->CleanupRequest;
+    });
+}
 
 sub to_app {
     my $class = shift;
-
-    RT::ConnectToDatabase();
 
     return builder {
         enable '+RT::Extension::REST2::Middleware::ErrorAsJSON';
@@ -587,6 +597,24 @@ sub PSGIWrap {
         mount $REST_PATH => $class->to_app;
         mount '/' => $app;
     };
+}
+
+sub CleanupRequest {
+
+    if ( $RT::Handle && $RT::Handle->TransactionDepth ) {
+        $RT::Handle->ForceRollback;
+        $RT::Logger->crit(
+            "Transaction not committed. Usually indicates a software fault."
+            . "Data loss may have occurred" );
+    }
+
+    # Clean out the ACL cache. the performance impact should be marginal.
+    # Consistency is imprived, too.
+    RT::Principal->InvalidateACLCache();
+    DBIx::SearchBuilder::Record::Cachable->FlushCache
+      if ( RT->Config->Get('WebFlushDbCacheEveryRequest')
+        and UNIVERSAL::can(
+            'DBIx::SearchBuilder::Record::Cachable' => 'FlushCache' ) );
 }
 
 =head1 AUTHOR

@@ -1,5 +1,5 @@
 package Moose::Exception::InvalidTypeGivenToCreateParameterizedTypeConstraint;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -10,4 +10,5 @@ sub _build_message {
     "Could not parse type name (".$self->type_name.") correctly";
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

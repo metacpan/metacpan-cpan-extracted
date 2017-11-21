@@ -1,0 +1,11 @@
+<html>
+<head>
+    <title>[% title | html %] - Session demo - [% file | html %]</title>
+</head>
+<body>
+<h1>[% title| html %]</h1>
+[% IF user %]
+<form action="[% root | html %]/logout" method="POST">
+    <input type="submit" value="Log out">
+</form>
+[% END %]

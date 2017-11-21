@@ -21,6 +21,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Action::Retry" : "0.24",
             "Class::Load" : "0",
             "Data::UUID" : "1.220",
             "DateTime" : "1.18",
@@ -32,20 +33,22 @@
       },
       "test" : {
          "requires" : {
+            "Test::Exception" : "0",
             "Test::MockDateTime" : "0",
+            "Test::MockModule" : "0",
             "Test::More" : "0"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "homepage" : "https://github.com/jeteve/Schedule-LongSteps",
+      "homepage" : "https://github.com/skinnyjeans/Schedule-LongSteps",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/jeteve/Schedule-LongSteps.git",
-         "web" : "https://github.com/jeteve/Schedule-LongSteps"
+         "url" : "https://github.com/skinnyjeans/Schedule-LongSteps.git",
+         "web" : "https://github.com/skinnyjeans/Schedule-LongSteps"
       }
    },
-   "version" : "0.021"
+   "version" : "0.023"
 }
 

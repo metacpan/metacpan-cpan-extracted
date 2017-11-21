@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "language.dtd">
+<language name="dyncontext" version="0.1" section="Test" extensions="*.dyncontext;">
+<highlighting>
+
+<contexts>
+
+<context name="Base" attribute="Normal Text" lineEndContext="#stay">
+	<StringDetect attribute="Test Area" context="Test1" String="&lt;Test1&gt;" />
+<!--	<StringDetect attribute="Test Area" context="Test2" String="&lt;Test2&gt;" />-->
+	<IncludeRules context="##XML" />
+</context>
+
+<context name="Comment" attribute="Comment" lineEndContext="#pop">
+</context>
+
+<context name="Test1" attribute="Test Area" lineEndContext="#stay">
+	<DetectChar attribute="Comment" context="Comment" char="#" />
+	<!-- tests go here -->
+   <RegExpr attribute="Match" context="Step1" String="\s*&lt;&lt;(\w+)"/>
+	<StringDetect attribute="Test Area" context="#pop" String="&lt;Test1&gt;" />
+</context>
+
+<context name="Step1" attribute="Match2" dynamic="true" lineEndContext="#stay">
+   <RegExpr attribute="Match" context="#stay" dynamic="true" String="%1"/>
+   <Detect2Chars attribute="Match" context="Step2" char="{" char1="{"/>
+	<StringDetect attribute="Test Area" context="#pop#pop" String="&lt;Test1&gt;" />
+</context>
+
+<context name="Step2" attribute="Match3" dynamic="true" lineEndContext="#stay">
+   <RegExpr attribute="Match" context="#stay" dynamic="true" String="%1"/>
+   <Detect2Chars attribute="Match" context="#pop#pop" char="}" char1="}"/>
+</context>
+
+</contexts>
+
+<itemDatas>
+	<itemData name="Normal Text" defStyleNum="dsNormal" />
+	<itemData name="Test Area"  defStyleNum="dsOthers" />
+	<itemData name="Match"  defStyleNum="dsDataType" />
+	<itemData name="Match2"  defStyleNum="dsString" />
+	<itemData name="Match3"  defStyleNum="dsChar" />
+	<itemData name="Match4"  defStyleNum="dsDataType" />
+	<itemData name="Match5"  defStyleNum="dsBaseN" />
+	<itemData name="Comment"  defStyleNum="dsComment" />
+</itemDatas>
+
+</highlighting>
+
+<general>
+	<keywords casesensitive="1" weakDeliminator="."/>
+</general>
+
+</language>
+

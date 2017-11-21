@@ -1,7 +1,51 @@
 [AGENT]
 
-#TODO: Nokia6630/1.0 (3.45.113) SymbianOS/8.0 Series60/2.6 Profile/MIDP-2.0 Configuration/CLDC-1.1
+Nokia6630/1.0 (3.45.113) SymbianOS/8.0 Series60/2.6 Profile/MIDP-2.0 Configuration/CLDC-1.1
+
+device          => 'Nokia6630/1.0',
+extras          => [ 'Profile/MIDP-2.0', 'Configuration/CLDC-1.1', '(3.45.113)' ],
+mobile          => 1,
+name            => 'Series60',
+os              => 'SymbianOS/8.0',
+parser          => 'symbian',
+version         => '2.600',
+version_raw     => '2.6',
 
 [AGENT]
 
-#TODO: Nokia6682/2.0 (3.01.1) SymbianOS/8.0 Series60/2.6 Profile/MIDP-2.0 configuration/CLDC-1.1 UP.Link/6.3.0.0.0 (compatible;YahooSeeker/M1A1-R2D2; http://help.yahoo.com/help/us/ysearch/crawling/crawling-01.html)
+Nokia6682/2.0 (3.01.1) SymbianOS/8.0 Series60/2.6 Profile/MIDP-2.0 configuration/CLDC-1.1 UP.Link/6.3.0.0.0 (compatible;YahooSeeker/M1A1-R2D2; http://help.yahoo.com/help/us/ysearch/crawling/crawling-01.html)
+
+device          => 'Nokia6682/2.0',
+extras          => [ 'Profile/MIDP-2.0', 'configuration/CLDC-1.1', 'UP.Link/6.3.0.0.0', '(compatible', 'YahooSeeker/M1A1-R2D2', 'http://help.yahoo.com/help/us/ysearch/crawling/crawling-01.html)', '(3.01.1)' ],
+mobile          => 1,
+name            => 'Series60',
+os              => 'SymbianOS/8.0',
+parser          => 'symbian',
+version         => '2.600',
+version_raw     => '2.6',
+
+[AGENT]
+
+SymbianOS/9.4; Series60/5.0 NokiaN97-4/30.0.004; Profile/MIDP-2.1 Configuration/CLDC-1.1)
+
+device          => 'NokiaN97-4/30.0.004',
+extras          => [ 'Profile/MIDP-2.1', 'Configuration/CLDC-1.1' ],
+mobile          => 1,
+name            => 'Series60',
+os              => 'SymbianOS/9.4',
+parser          => 'symbian',
+version         => '5.000',
+version_raw     => '5.0',
+
+[AGENT]
+
+Symbian/3; Series60/5.3 Nokia603/111.020.0310; Profile/MIDP-2.1 Configuration/CLDC-1.1
+
+device          => 'Nokia603/111.020.0310',
+extras          => [ 'Profile/MIDP-2.1', 'Configuration/CLDC-1.1' ],
+mobile          => 1,
+name            => 'Series60',
+os              => 'Symbian/3',
+parser          => 'symbian',
+version         => '5.300',
+version_raw     => '5.3',

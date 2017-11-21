@@ -4,7 +4,7 @@
       "moznion <moznion@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v2.3.0",
+   "generated_by" : "Minilla/v3.0.13",
    "license" : [
       "perl_5"
    ],
@@ -30,7 +30,8 @@
          "requires" : {
             "CPAN::Meta" : "0",
             "CPAN::Meta::Prereqs" : "0",
-            "Module::Build" : "0.38"
+            "Module::Build" : "0",
+            "Module::Build::Tiny" : "0.035"
          }
       },
       "develop" : {
@@ -66,7 +67,7 @@
    "provides" : {
       "Perl::PrereqScanner::Lite" : {
          "file" : "lib/Perl/PrereqScanner/Lite.pm",
-         "version" : "0.26"
+         "version" : "0.28"
       },
       "Perl::PrereqScanner::Lite::Constants" : {
          "file" : "lib/Perl/PrereqScanner/Lite/Constants.pm"
@@ -89,8 +90,10 @@
          "web" : "https://github.com/moznion/Perl-PrereqScanner-Lite"
       }
    },
-   "version" : "0.26",
+   "version" : "0.28",
    "x_contributors" : [
+      "Chris Reinhardt <creinhardt@liquidweb.com>",
       "Kenichi Ishigaki <ishigaki@cpan.org>"
-   ]
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

@@ -1,4 +1,4 @@
-Acme-Evil version 0.003001
+Acme-Evil version 0.003002
 ==========================
 
 RFC3514 introduces a new flag called the "evil bit" in all IP packets.

@@ -1,10 +1,27 @@
 Revision history for ZMQ-Raw
 
+0.17      2017-11-21 14:03:13+02:00 Africa/Johannesburg
+
+ - Added Loop methods:
+    + remove()
+ - Documentation improvements
+
+0.16      2017-11-20 19:03:39+02:00 Africa/Johannesburg
+
+ - Make timers fork() friendlier
+ - Build on more version of perl on Windows (appveyor)
+
+0.15      2017-11-17 10:46:40+02:00 Africa/Johannesburg
+
+ - Added Loop and Timer classes (Beta, not heavily tested
+   nor documented)
+
 0.14      2017-11-07 12:48:33+02:00 Africa/Johannesburg
+
+ - Handle all instances of EAGAIN
 
 0.13      2017-11-03 11:32:45+02:00 Africa/Johannesburg
 
- - Handle all instances of EAGAIN
  - Methods now return undef on EINTR
 
 0.12      2017-10-30 13:32:06+02:00 Africa/Johannesburg

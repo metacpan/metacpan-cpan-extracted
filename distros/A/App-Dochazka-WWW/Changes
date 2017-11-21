@@ -407,3 +407,41 @@ Revision history for App-Dochazka-WWW
 - js: Implement "Multi-day interval viewer" feature
 - build/ops: require App::MFILE::WWW 0.171 for dcallback widget
 
+0.163 2017-11-10 15:19 CET
+- js: viewer: display periods with no scheduled intervals
+- js: int-lib: refactor createSingleIntSave
+- js: add "Direct reports" field to Employee profile
+- build/ops: designed to work with App::Dochazka::REST 0.557
+- js: fix improperly populated nick in "Add schedule history record"
+- js: implement create, update, delete of single intervals
+- build/ops: require App::MFILE::WWW 0.172 for nullify and vetTimeRangeNoOffset
+
+0.164 2017-11-11 04:16 CET
+- js: int-lib: make iNshortDesc really be short by truncating it
+- js: do not lose information when updating employee profile
+- js: move status and schedule histories to profile
+- js: simplify interval menu
+
+0.165 2017-11-14 17:25 CET
+- js: int-lib: properly detect null long_desc in interval object
+- js: lib: change fillUserBox() behavior
+- js: Rearrange menus
+- js: initial Locks implementation
+- js: viewLocksAction: implement caching of year input
+- js: reinstate viewIntervalsDrowselect target
+- js: Throw up multi-day interval viewer even for empty query
+- js: drop schedHistoryDtable which is no longer used
+- js: emp-lib: display "Direct reports" as "(none)" instead of "(undefined)"
+- js: let supervisors masquerade as their reports
+- js: fix functional tests
+- build/ops: require App::MFILE::WWW 0.175 for menu prototype and new fillUserBox() behavior
+
+0.166 2017-11-15 12:11 CET
+- js: canned-tests: implement log() - logs messages to both console log and test
+  protocol
+- js: canned-tests: implement getMenuEntry() - avoids hard-coding of menu entry
+  numbers
+- js: tests: implement new test "Masquerading as active, set inactive as supervisor"
+- js: empProfile: call reports "Supervisees"
+- js: Always load employee profile from server
+

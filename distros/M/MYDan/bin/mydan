@@ -1,0 +1,54 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use MYDan::Util::Command;
+use FindBin qw( $Script );
+
+my $name = $ENV{MYDan_NAME} = $Script;
+
+my @cmd =
+(
+    [ 'go', "登陆服务器.\n", 'dan/tools/go', 'box/tools/go' ],
+
+    [ 'range', "操作对象描述.\n", 'dan/tools/range', 'box/tools/range' ],
+
+    [ 'whois',   "查询、模糊查询机器信息.\n", 'dan/tools/whois', 'box/tools/whois' ],
+
+    [ 'gateway',   "代理.\n", 'dan/tools/gateway', 'box/tools/gateway' ],
+
+    [ 'rcall', "远程调用${name}的agent.", 'dan/tools/rcall' ],
+    [ 'vssh',  '虚拟登陆多个机器.', 'dan/tools/vssh', 'box/tools/vssh' ],
+    [ 'mssh',  '批量ssh命令.', 'dan/tools/mssh', 'box/tools/mssh' ],
+    [ 'mcmd',  '批量命令.', 'dan/tools/mcmd', 'box/tools/mcmd' ],
+    [ 'load',  '从远程机器下载文件.', 'dan/tools/load' ],
+    [ 'rsync', "同步文件.", 'dan/tools/rsync', 'box/tools/rsync' ],
+    [ 'mrsync', "批量同步文件.\n", 'dan/tools/mrsync', 'box/tools/mrsync' ],
+    [ 'grsync', "全局批量同步文件，可以在多个隔离的网络中通过代理同步.\n", 'dan/tools/grsync' ],
+
+    [ 'access', '给远程机器添加用户.', 'dan/tools/access' ],
+    [ 'keys',   "给运程机器添加key信任.\n", 'dan/tools/keys' ],
+
+    [ 'config', "${name}配置.\n", 'dan/tools/config', 'box/tools/config' ],
+
+    [ 'shell', "获取远程机器反弹shell.\n", 'dan/tools/shell' ],
+
+    [ 'alias', "${name}内部使用的alias.", 'dan/tools/alias', 'box/tools/alias' ],
+    [ 'unalias', "${name}内部使用的unalias.\n", 'dan/tools/unalias', 'box/tools/unalias' ],
+
+    [ 'sync', "同步${name}的配置", 'dan/tools/sync', 'box/tools/sync' ],
+    [ 'xtar', '脚本和数据压缩工具.', 'dan/tools/xtar' ],
+    [ 'git', 'git命令，添加了指定key功能.', 'dan/tools/git', 'box/tools/git' ],
+    [ 'alarm', '设置超时闹钟运行命令.', 'dan/tools/alarm' ],
+    [ 'bigest', '查找大文件.', 'dan/tools/bigest' ],
+    [ 'expect', '自动应答.', 'dan/tools/expect' ],
+    [ 'release', '发布${name}.', 'dan/tools/release' ],
+    [ 'tai64nlocal', '查看tai64格式日志.', 'dan/tools/tai64nlocal' ],
+    [ 'tcpserver', "脚本提供tcp服务.\n", 'dan/tools/tcpserver' ],
+
+    [ 'node', '机器管理.', 'bin/mydan.node' ],
+);
+
+MYDan::Util::Command->new( $name => \@cmd,
+    +{ gw => 'gateway', w => 'whois', g => 'go' }
+)->do( @ARGV );

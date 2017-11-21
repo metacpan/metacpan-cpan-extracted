@@ -85,27 +85,27 @@
    "provides" : {
       "MarpaX::ESLIF::URI" : {
          "file" : "lib/MarpaX/ESLIF/URI.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "MarpaX::ESLIF::URI::file" : {
          "file" : "lib/MarpaX/ESLIF/URI/file.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "MarpaX::ESLIF::URI::ftp" : {
          "file" : "lib/MarpaX/ESLIF/URI/ftp.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "MarpaX::ESLIF::URI::http" : {
          "file" : "lib/MarpaX/ESLIF/URI/http.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "MarpaX::ESLIF::URI::https" : {
          "file" : "lib/MarpaX/ESLIF/URI/https.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       },
       "MarpaX::ESLIF::URI::mailto" : {
          "file" : "lib/MarpaX/ESLIF/URI/mailto.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
@@ -117,11 +117,11 @@
       "homepage" : "https://metacpan.org/release/MarpaX-ESLIF-URI",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/jddurand/perl-config-autoconf-ini.git",
-         "web" : "https://github.com/jddurand/perl-config-autoconf-ini"
+         "url" : "git://github.com/jddurand/perl-marpax-eslif-uri.git",
+         "web" : "https://github.com/jddurand/perl-marpax-eslif-uri"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_authority" : "cpan:JDDPAUSE",
    "x_contributors" : [
       "Jean-Damien Durand <Jean-Damien.Durand@newaccess.ch>"

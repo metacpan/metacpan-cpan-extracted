@@ -7,7 +7,7 @@ their TAP output and optionally save the aggregated results for later processing
 
 =head1 VERSION
 
-Version 0.044
+Version 0.046
 
 =head1 SYNOPSIS
 
@@ -186,8 +186,8 @@ This is optional. The value is a L<Grep::Query> expression, and can be multi-lin
 If not present, all files/parts of the tree are included/searched for matches given extensions in
 the "exec mapping" (see below)).
 
-This is useful for excluding parts of the suite tree, e.g. parts which are merely data to be used by the tests and
-that may contain files with extensions that would otherwise be mistaken for active tests.
+The C<skip> is useful for excluding parts of the suite tree, e.g. parts which are merely data to be used
+by the tests and that may contain files with extensions that would otherwise be mistaken for active tests.
 
 As the suite is scanned for tests, paths will be tested against the query, and if matching, will be pruned
 completely from the set of possible tests. In particular, not selecting a directory will prune the entire subtree.
@@ -277,15 +277,23 @@ C<--order> flag.
 
 If not given, the default commandline setting applies (C<none>).
 
-=item B<[EXECMAP]> (section)
+=item B<execmap>
 
-This section is technically optional, but recommended. It details how to decide which files are tests and how
-they should be executed. Note that there is also possible to pass a file with this section manually using the
-'--execmap' option, in order to override or complement any defined execmap.
+This is in principle optional but recommended. The value is a list of execmap section names, and can be
+multi-line/part for readability.
 
-The section should contain matched pairs of key/values named C<matchI<n>> and C<cmdI<n>>, where the C<match> part defines
+The list of section names defines the mapping order and they must be found as detailed below.
+
+If not given, a default/internal list will be used.
+
+=item B<[EXECMAP E<lt>nameE<gt>]> (section)
+
+Every section mentioned in the list above must be present, but a section not listed is ignored.
+
+The sections together detail how to decide which files are tests and how they should be executed.
+
+The section should contain pairs of key/values named C<match> and C<cmd>, where the C<match> part defines a
 a L<Grep::Query> expression to match to test names, and the C<cmd> part defines the command line to use for matching tests.
-The numbering defines the match order, i.e. tests will be checked for matches in ascending numerical order. 
 
 The C<cmd> value may be in multi-line/part format, which is required if the command contains
 whitespace in the individual parts. A plain string will be split on space in order to separate the command into
@@ -293,46 +301,69 @@ parts.
 
 Example:
 
-  [EXECMAP]
-  match1 = regexp/\.(t|pl)$/
-  cmd1 = perl
-  match2 = regexp(\.jar$)
-  cmd2 = java
-       = -jar
-  # in this case, could also have been written simpler as 'cmd2 = java -jar'
+  execmap = plfiles jarfiles
+  
+  [EXECMAP plfiles]
+  match = regexp/\.(t|pl)$/
+  cmd = perl
+  
+  [EXECMAP jarfiles]
+  match = regexp(\.jar$)
+  cmd = java
+      = -jar
+  # in this case, could also have been written simpler as 'cmd = java -jar'
   
 This means that any files found with the extensions 'pl' or 't' will be run by 'perl <file>' and that any 'jar' files
 will be run by 'java -jar <file>'. Any other files will be ignored.
 
-If no "EXECMAP" section is present, an internal one can be used by specifying a commandline of
-C<--execmap :internal> which uses an execmap equivalent to this (for this release, may change):
+If no "execmap" list is present, an internal one with corresponding sections will be used, equivalent to
+this (for this release, may change):
 
-  [EXECMAP]
-  # Perl, including common test extension
-  match1 = regexp[\.(t|pl)$]
-  cmd1 = perl
-  # Python
-  match2 = regexp[\.py$]
-  cmd2 = python
-  # Java (jar files with main entry point)
-  match3 = regexp[\.jar$]
-  cmd3 = java
-       = -jar
-  # Groovy with common extensions
-  match4 = regexp[\.(groovy|gsh|gvy|gy)$]
-  cmd4 = groovy
-  # only on windows
-    # Batch files
-    match5 = regexp[\.(bat|cmd)$]
-    cmd5 = cmd.exe
-         = /c
-    # AutoIt scripts (https://www.autoitscript.com/site/autoit/)
-    match6 = regexp(\.au3)
-    cmd6 = autoit3
-  # only on unix/linux
-    # Shell scripts
-    match5 = regexp[\.sh$]
-    cmd5 = /bin/sh
+  execmap = perl python java groovy shell autoit3 batch
+  
+  [EXECMAP perl]
+  # well, a no-brainer...:-)
+  #
+  match = regexp[\.(t|pl)$]
+  cmd = perl
+  
+  [EXECMAP python]
+  # if python is preferred...
+  #
+  match = regexp[\.py$]
+  cmd = python
+
+  [EXECMAP java]
+  # quite possible and important for java shops
+  # (couple with some nice junit and other helpers)
+  #
+  match = regexp[\.jar$]
+  cmd = java -jar
+
+  [EXECMAP groovy]
+  # common variants for groovy scripts, I understand...
+  #
+  match = regexp[\.(groovy|gsh|gvy|gy)$]
+  cmd = groovy
+
+  [EXECMAP shell]
+  # shell scripting is powerful, so why not
+  #
+  match = regexp[\.sh$]
+  cmd = sh
+
+  [EXECMAP autoit3]
+  # For using AutoIt scripts (https://www.autoitscript.com/site/autoit/)
+  #
+  match = regexp[\.au3$]
+  cmd = autoit3
+		
+  [EXECMAP batch]
+  # possible, but perhaps not likely
+  # (Windows only)
+  #
+  match = regexp[\.(bat|cmd)$]
+  cmd = cmd.exe /c
 
 While useful in the early stages for quickly getting started, good form is to ensure the execmap is explicitly 
 defined in the configuration, avoiding surprises if other extensions are added to the default, and also to use
@@ -658,6 +689,10 @@ The name of the user that ran the test.
 This holds various information about tests found and acted upon.
 
 =over
+
+=item * commandlines (key/value pairs)
+
+A hash representation of the configuration used for the suite.
 
 =item * commandlines (key/value pairs)
 

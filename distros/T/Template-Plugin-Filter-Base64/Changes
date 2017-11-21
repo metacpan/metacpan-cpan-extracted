@@ -1,5 +1,13 @@
 Revision history for Perl extension Template-Plugin-Filter-Base64
 
+0.04 2017-11-14T15:52:27Z
+
+    - correct documentation
+
+0.03 2017-11-14T15:48:58Z
+
+    - added optional input parameter dont_broken_into_lines_each_76_char (thanks to gilgamesh44) 
+
 0.02 2017-01-11T14:00:00Z
 
     - allow to convert text with html entities before base64-encoding

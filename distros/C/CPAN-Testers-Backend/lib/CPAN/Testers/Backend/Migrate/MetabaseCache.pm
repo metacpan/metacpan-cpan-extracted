@@ -1,5 +1,5 @@
 package CPAN::Testers::Backend::Migrate::MetabaseCache;
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 # ABSTRACT: Migrate old metabase cache to new test report format
 
 #pod =head1 SYNOPSIS
@@ -83,19 +83,18 @@ sub run( $self, @args ) {
 sub process_sth( $self, $sth ) {
     my $rs = $self->schema->resultset( 'TestReport' );
     my $count = 0;
-    my %ids;
     while ( my $row = $sth->fetchrow_hashref ) {
-        next if $ids{ $row->{guid} }++;
         my $fact = $self->parse_metabase_report( $row );
         $rs->insert_metabase_fact( $fact );
         $count++;
     }
+    $LOG->info( 'Processed ' . $count . ' entries' );
     return $count;
 }
 
 #pod =method find_unprocessed_entries
 #pod
-#pod     @rows = $self->find_unprocessed_rows;
+#pod     $sth = $self->find_unprocessed_entries;
 #pod
 #pod Returns a L<DBI> statement handle on to a list of C<metabase.metabase>
 #pod row hashrefs for reports that are not in the main test report table
@@ -104,17 +103,33 @@ sub process_sth( $self, $sth ) {
 #pod =cut
 
 sub find_unprocessed_entries( $self ) {
-    my $sth = $self->metabase_dbh->prepare(
-        "SELECT * FROM metabase WHERE guid NOT IN ( SELECT id FROM cpanstats.test_report ) LIMIT 10000",
+    my @ids;
+    my $i = 0;
+    my $page = 10000;
+    my $current_page = $self->metabase_dbh->selectcol_arrayref(
+        'SELECT guid FROM metabase LIMIT ' . $page . ' OFFSET ' . $i
     );
-    $sth->execute;
-    return $sth;
+    while ( @$current_page > 0 && @ids < $page ) {
+        my %found = map {; $_ => 1 } $self->schema->resultset( 'TestReport' )->search( {
+            id => {
+                -in => $current_page,
+            }
+        } )->get_column( 'id' )->all;
+        push @ids, grep !$found{ $_ }, @$current_page;
+        $i += 1000;
+        $current_page = $self->metabase_dbh->selectcol_arrayref(
+            'SELECT guid FROM metabase LIMIT ' . $page . ' OFFSET ' . $i
+        );
+    }
+    die "No unprocessed reports" unless @ids;
+    $LOG->info( 'Found ' . (scalar @ids) . ' entries to process' );
+    return $self->find_entries( @ids );
 }
 
 #pod =method find_entries
 #pod
-#pod     @entries = $self->find_entries;
-#pod     @entries = $self->find_entries( @ids );
+#pod     $sth = $self->find_entries;
+#pod     $sth = $self->find_entries( @ids );
 #pod
 #pod Find all the cache entries to be processed by this module, optionally
 #pod limited only to the IDs passed-in. Returns a list of row hashrefs.
@@ -124,7 +139,7 @@ sub find_unprocessed_entries( $self ) {
 sub find_entries( $self, @ids ) {
     my ( $where, @values );
     if ( @ids ) {
-        $where = " WHERE guid IN (" . join( ', ', ( '?' x @ids ) ) . ")";
+        $where = " WHERE guid IN (" . join( ', ', ( '?' ) x @ids ) . ")";
         @values = @ids;
     }
     my $sth = $self->metabase_dbh->prepare(
@@ -187,7 +202,7 @@ CPAN::Testers::Backend::Migrate::MetabaseCache - Migrate old metabase cache to n
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -218,7 +233,7 @@ of reports processed
 
 =head2 find_unprocessed_entries
 
-    @rows = $self->find_unprocessed_rows;
+    $sth = $self->find_unprocessed_entries;
 
 Returns a L<DBI> statement handle on to a list of C<metabase.metabase>
 row hashrefs for reports that are not in the main test report table
@@ -226,8 +241,8 @@ row hashrefs for reports that are not in the main test report table
 
 =head2 find_entries
 
-    @entries = $self->find_entries;
-    @entries = $self->find_entries( @ids );
+    $sth = $self->find_entries;
+    $sth = $self->find_entries( @ids );
 
 Find all the cache entries to be processed by this module, optionally
 limited only to the IDs passed-in. Returns a list of row hashrefs.

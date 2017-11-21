@@ -1,0 +1,14 @@
+Changes
+lib/Perl/Download/FTP.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/001-new.t
+t/002-ls.t
+t/003-classify-releases.t
+t/004-get.t
+Todo
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

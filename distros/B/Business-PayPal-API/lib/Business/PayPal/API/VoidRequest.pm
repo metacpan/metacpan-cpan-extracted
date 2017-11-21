@@ -1,5 +1,5 @@
 package Business::PayPal::API::VoidRequest;
-$Business::PayPal::API::VoidRequest::VERSION = '0.76';
+$Business::PayPal::API::VoidRequest::VERSION = '0.77';
 use 5.008001;
 use strict;
 use warnings;
@@ -65,7 +65,7 @@ Business::PayPal::API::VoidRequest - PayPal VoidRequest API
 
 =head1 VERSION
 
-version 0.76
+version 0.77
 
 =head1 SYNOPSIS
 

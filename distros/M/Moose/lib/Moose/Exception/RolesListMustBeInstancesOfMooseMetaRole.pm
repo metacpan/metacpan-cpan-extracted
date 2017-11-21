@@ -1,5 +1,5 @@
 package Moose::Exception::RolesListMustBeInstancesOfMooseMetaRole;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -22,4 +22,5 @@ sub _build_message {
     "The list of roles must be instances of Moose::Meta::Role, not ".$self->role;
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

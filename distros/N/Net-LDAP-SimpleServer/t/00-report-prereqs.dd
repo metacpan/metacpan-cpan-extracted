@@ -1,0 +1,75 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Pod::Coverage::TrustPod' => '0',
+                                      'Test::CPAN::Meta' => '0',
+                                      'Test::CPAN::Meta::JSON' => '0.16',
+                                      'Test::EOL' => '0',
+                                      'Test::Kwalitee' => '1.21',
+                                      'Test::MinimumVersion' => '0',
+                                      'Test::Mojibake' => '0',
+                                      'Test::More' => '0.88',
+                                      'Test::NoTabs' => '0',
+                                      'Test::Perl::Critic' => '0',
+                                      'Test::Pod' => '1.41',
+                                      'Test::Pod::Coverage' => '1.08',
+                                      'Test::Pod::LinkCheck' => '0',
+                                      'Test::Portability::Files' => '0',
+                                      'Test::Version' => '1'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Carp' => '0',
+                                      'Digest::MD5' => '0',
+                                      'Exporter' => '0',
+                                      'File::Basename' => '0',
+                                      'File::HomeDir' => '0',
+                                      'File::Path' => '2.08',
+                                      'File::Spec' => '0',
+                                      'MIME::Base64' => '0',
+                                      'Net::LDAP::Constant' => '0',
+                                      'Net::LDAP::Filter' => '0',
+                                      'Net::LDAP::FilterMatch' => '0',
+                                      'Net::LDAP::LDIF' => '0',
+                                      'Net::LDAP::Server' => '0',
+                                      'Net::LDAP::Util' => '0',
+                                      'Net::Server' => '2.003',
+                                      'Scalar::Util' => '0',
+                                      'UNIVERSAL::isa' => '0',
+                                      'base' => '0',
+                                      'constant' => '0',
+                                      'fields' => '0',
+                                      'perl' => '5.014',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'Authen::SASL' => '0',
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'IO::Handle' => '0',
+                                   'IO::Pipe' => '0',
+                                   'IPC::Open3' => '0',
+                                   'Net::LDAP' => '0',
+                                   'Proc::Fork' => '0',
+                                   'Test::Deep' => '0',
+                                   'Test::More' => '0',
+                                   'Test::UseAllModules' => '0',
+                                   'Try::Tiny' => '0',
+                                   'lib' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

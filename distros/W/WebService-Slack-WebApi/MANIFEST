@@ -13,6 +13,7 @@ lib/WebService/Slack/WebApi/Base.pm
 lib/WebService/Slack/WebApi/Channels.pm
 lib/WebService/Slack/WebApi/Chat.pm
 lib/WebService/Slack/WebApi/Client.pm
+lib/WebService/Slack/WebApi/Dialog.pm
 lib/WebService/Slack/WebApi/Emoji.pm
 lib/WebService/Slack/WebApi/Exception.pm
 lib/WebService/Slack/WebApi/Files.pm

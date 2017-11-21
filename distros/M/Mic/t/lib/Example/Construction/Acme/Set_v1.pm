@@ -1,6 +1,6 @@
 package Example::Construction::Acme::Set_v1;
 
-use Mic::Implementation
+use Mic::Impl
     has => { 
         SET => {
             default => sub { {} },
@@ -13,14 +13,14 @@ sub has {
     my ($self, $e) = @_;
 
     log_info($self);
-    exists $self->{$SET}{$e};
+    exists $self->[SET]{$e};
 }
 
 sub add {
     my ($self, $e) = @_;
 
     log_info($self);
-    ++$self->{$SET}{$e};
+    ++$self->[SET]{$e};
 }
 
 sub log_info {
@@ -31,7 +31,7 @@ sub log_info {
 
 sub size {
     my ($self) = @_;
-    scalar(keys %{ $self->{$SET} });
+    scalar(keys %{ $self->[SET] });
 }
 
 1;

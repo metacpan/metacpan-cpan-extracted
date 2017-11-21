@@ -16,7 +16,7 @@ use Mojo::DOM58::_CSS;
 use Mojo::DOM58::_HTML;
 use Scalar::Util qw(blessed weaken);
 
-our $VERSION = '1.003';
+our $VERSION = '1.004';
 
 sub new {
   my $class = shift;
@@ -183,6 +183,8 @@ sub val {
     ->grep(sub { !$_->ancestors('optgroup[disabled]')->size })->map('val');
   return exists $self->{multiple} ? $v->size ? $v->to_array : undef : $v->last;
 }
+
+sub with_roles { Mojo::DOM58::_Collection::with_roles(@_) }
 
 sub wrap         { shift->_wrap(0, @_) }
 sub wrap_content { shift->_wrap(1, @_) }
@@ -404,7 +406,7 @@ closely compatible with upstream. It differs only in the standalone format and
 compatibility with Perl 5.8. Any bugs or patches not related to these changes
 should be reported directly to the L<Mojolicious> issue tracker.
 
-This release of L<Mojo::DOM58> is up to date with version C<7.36> of
+This release of L<Mojo::DOM58> is up to date with version C<7.55> of
 L<Mojolicious>.
 
 =head1 NODES AND ELEMENTS
@@ -1240,6 +1242,15 @@ C<undef> if none could be found.
   # "on"
   $dom->parse('<input name=test type=checkbox>')->at('input')->val;
 
+=head2 with_roles
+
+  my $new_class = Mojo::DOM58->with_roles('Mojo::DOM58::Role::One');
+  my $new_class = Mojo::DOM58->with_roles('+One', '+Two');
+  $dom          = $dom->with_roles('+One', '+Two');
+
+Equivalent to L<Mojo::Base/"with_roles">. Note that role support depends on
+L<Role::Tiny> (2.000001+).
+
 =head2 wrap
 
   $dom = $dom->wrap('<div></div>');
@@ -1492,6 +1503,13 @@ the callback/method.
 
   # $collection contains ([1, 2], [2, 1], [3, 2])
   $collection->uniq(sub{ $_->[1] })->to_array; # "[[1, 2], [2, 1]]"
+
+=head2 with_roles
+
+  $collection = $collection->with_roles('Mojo::Collection::Role::One');
+
+Equivalent to L<Mojo::Base/"with_roles">. Note that role support depends on
+L<Role::Tiny> (2.000001+).
 
 =head1 BUGS
 

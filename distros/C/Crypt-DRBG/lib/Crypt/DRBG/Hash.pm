@@ -1,5 +1,5 @@
 package Crypt::DRBG::Hash;
-$Crypt::DRBG::Hash::VERSION = '0.000002';
+$Crypt::DRBG::Hash::VERSION = '0.001000';
 use 5.006;
 use strict;
 use warnings;
@@ -14,11 +14,11 @@ Crypt::DRBG::Hash - Fast, cryptographically secure PRNG
 
 =head1 SYNOPSIS
 
-    use Crypt::DRBG::Hash;
+	use Crypt::DRBG::Hash;
 
-    my $drbg = Crypt::DRBG::Hash->new(auto => 1);
+	my $drbg = Crypt::DRBG::Hash->new(auto => 1);
 	my $data = $drbg->generate(42);
-    ... # do something with your 42 bytes here
+	... # do something with your 42 bytes here
 
 	my $drbg2 = Crypt::DRBG::Hash->new(seed => "my very secret seed");
 	my $data2 = $drbg->generate(42);
@@ -59,6 +59,26 @@ If Perl (and hence Digest::SHA) was built with a compiler lacking 64-bit integer
 support, use "256" here.  "256" may also provide better performance for 32-bit
 machines.
 
+=item func
+
+If you would like to use a different hash function, you can specify a function
+implemeting your specific algorithm.
+
+For example, if you had C<Digest::BLAKE2> installed, you could do the following
+to use BLAKE2b:
+
+	my $drbg = Crypt::DRBG::Hash->new(
+		auto => 1,
+		func => \&Digest::BLAKE2::blake2b,
+		algo => 512
+	);
+	my $data = $drbg->generate(42);
+
+Note that the algo parameter is still required, in order to know how large a
+seed to use.
+
+=back
+
 =back
 
 =cut
@@ -71,7 +91,7 @@ sub new {
 
 	my $algo = $self->{algo} = $params{algo} || '512';
 	$algo =~ tr{/}{}d;
-	$self->{s_func} = Digest::SHA->can("sha$algo") or
+	$self->{s_func} = ($params{func} || Digest::SHA->can("sha$algo")) or
 		die "Unsupported algorithm '$algo'";
 	$self->{seedlen} = $algo =~ /^(384|512)$/ ? 111 : 55;
 	$self->{reseed_interval} = 4294967295; # (2^32)-1
@@ -166,12 +186,10 @@ sub _add_64 {
 		foreach my $val (@vals) {
 			$total += $val->[$i];
 		}
-		if ($total > 0xffffffff) {
-			$result[$i+1] += $total >> 32;
-		}
+		$result[$i+1] += $total >> 32;
 		$result[$i] = $total;
 	}
-	return substr(reverse(pack("V*", @result)), 1);
+	return substr(reverse(pack("V*", @result[0..($nu32s-1)])), 1);
 }
 
 sub _hashgen {
@@ -231,7 +249,7 @@ automatically be notified of progress on your bug as I make changes.
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc Crypt::DRBG::Hash
+	perldoc Crypt::DRBG::Hash
 
 
 You can also look for information at:

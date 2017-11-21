@@ -3,8 +3,10 @@ use strictures 2;
 
 use Test::More;
 
+use lib 't/lib';
+
 BEGIN {
-  use t::loader qw(build_schema);
+  use loader qw(build_schema);
   build_schema([
     Artist => {
       table => 'artists',
@@ -75,7 +77,7 @@ BEGIN {
   ]);
 }
 
-use t::common qw(sims_test);
+use common qw(sims_test);
 
 sims_test "Specify child->parent->other_child" => {
   spec => {

@@ -1,5 +1,5 @@
 package Moose::Exception::ClassDoesNotHaveInitMeta;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -18,4 +18,5 @@ sub _build_message {
     return "Cannot provide traits when $class does not have an init_meta() method";
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

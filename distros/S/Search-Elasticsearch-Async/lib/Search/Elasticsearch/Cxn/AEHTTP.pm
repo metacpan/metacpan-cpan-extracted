@@ -1,5 +1,5 @@
 package Search::Elasticsearch::Cxn::AEHTTP;
-$Search::Elasticsearch::Cxn::AEHTTP::VERSION = '5.02';
+$Search::Elasticsearch::Cxn::AEHTTP::VERSION = '6.00';
 use AnyEvent::HTTP qw(http_request);
 use Promises qw(deferred);
 use Try::Tiny;
@@ -95,7 +95,7 @@ Search::Elasticsearch::Cxn::AEHTTP - An async Cxn implementation which uses AnyE
 
 =head1 VERSION
 
-version 5.02
+version 6.00
 
 =head1 DESCRIPTION
 

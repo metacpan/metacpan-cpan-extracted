@@ -1,6 +1,6 @@
 package Geo::UK::Postcode::CodePointOpen;
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 use Moo;
 use Types::Path::Tiny qw/ Dir /;

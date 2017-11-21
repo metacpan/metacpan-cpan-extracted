@@ -12,7 +12,8 @@ BEGIN {
 
 {
     package Foo;
-    use Moxie;
+    use Moxie
+        traits => [':experimental'];
 
     extends 'Moxie::Object';
 

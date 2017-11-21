@@ -1,4 +1,4 @@
-# $Id: Config.pm 2416 2017-10-28 10:43:00Z guillomovitch $
+# $Id: Config.pm 2458 2017-11-13 18:30:13Z guillomovitch $
 package Youri::Config;
 
 =head1 NAME
@@ -82,7 +82,7 @@ use Getopt::Long;
 use File::Spec;
 use Pod::Usage;
 use Carp;
-use version; our $VERSION = qv('0.2.2');
+use version; our $VERSION = qv('0.2.4');
 
 =head2 new(%args)
 

@@ -49,4 +49,71 @@ subtest 'upload' => sub {
     is $got_upload->filename, $expect_upload->filename, 'upload object filename is correct';
 };
 
+subtest 'JSON decode problem on MySQL' => sub {
+    if ( !eval { require Test::mysqld; 1 } ) {
+        plan skip_all => 'Requires Test::mysqld';
+        return;
+    }
+
+    no warnings 'once';
+    my $mysqld = Test::mysqld->new(
+        my_cnf => {
+            'skip-networking' => '', # no TCP socket
+        },
+    );
+    if ( !$mysqld ) {
+        plan skip_all => "Failed to start up server: $Test::mysqld::errstr";
+        return;
+    }
+
+    my ( undef, $version ) = DBI->connect( $mysqld->dsn(dbname => 'test') )->selectrow_array( q{SHOW VARIABLES LIKE 'version'} );
+    my ( $mversion ) = $version =~ /^(\d+[.]\d+)/;
+    diag "MySQL version: $version; Major version: $mversion";
+    if ( $mversion < 5.7 ) {
+        plan skip_all => "Need MySQL version 5.7 or higher. This is $version";
+        return;
+    }
+
+    my $schema = CPAN::Testers::Schema->connect(
+        $mysqld->dsn(dbname => 'test'), undef, undef, { ignore_version => 1 },
+    );
+    $schema->deploy;
+
+    my $row = $schema->resultset( 'TestReport' )->create( {
+        report => {
+            reporter => {
+                name => 'Doug Bell',
+                email => 'doug@preaction.me',
+            },
+            environment => {
+                system => {
+                    osname => 'linux',
+                    osversion => '2.14.4',
+                },
+                language => {
+                    name => 'Perl 5',
+                    archname => 'x86_64-linux',
+                    version => '5.12.0',
+                },
+            },
+            distribution => {
+                name => 'Foo-Bar',
+                version => '1.00',
+            },
+            result => {
+                grade => 'pass',
+                output => {
+                    uncategorized => "1\x{001f}", # ASCII below 0x20
+                },
+            },
+        },
+    } );
+    my $id = $row->id;
+
+    my $got_row = $schema->resultset( 'TestReport' )->find( $id );
+    is $got_row->report->{result}{output}{uncategorized}, "1\x{001f}",
+        'output is deserialized correctly';
+
+};
+
 done_testing;

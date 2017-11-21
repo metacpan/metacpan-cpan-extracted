@@ -1,4 +1,5 @@
 package t::Plack::App::APISchema::Document;
+use lib '.';
 use t::test;
 use t::test::fixtures;
 use t::test::InheritedDocument;

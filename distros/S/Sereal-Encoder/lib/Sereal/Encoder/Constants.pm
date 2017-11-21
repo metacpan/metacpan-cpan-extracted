@@ -4,7 +4,7 @@ use warnings;
 require Exporter;
 our @ISA= qw(Exporter);
 
-our $VERSION = '3.015'; # Don't forget to update the TestCompat set for testing against installed encoders!
+our $VERSION = '4.004'; # Don't forget to update the TestCompat set for testing against installed encoders!
 
 our (@EXPORT_OK, %DEFINE, %TAG_INFO_HASH, @TAG_INFO_ARRAY);
 
@@ -79,9 +79,10 @@ BEGIN {
       "SRL_PROTOCOL_ENCODING_SNAPPY" => 16,
       "SRL_PROTOCOL_ENCODING_SNAPPY_INCREMENTAL" => 32,
       "SRL_PROTOCOL_ENCODING_ZLIB" => 48,
+      "SRL_PROTOCOL_ENCODING_ZSTD" => 64,
       "SRL_PROTOCOL_HDR_CONTINUE" => 8,
       "SRL_PROTOCOL_HDR_USER_DATA" => 1,
-      "SRL_PROTOCOL_VERSION" => 3,
+      "SRL_PROTOCOL_VERSION" => 4,
       "SRL_PROTOCOL_VERSION_BITS" => 4,
       "SRL_PROTOCOL_VERSION_MASK" => 15
     );

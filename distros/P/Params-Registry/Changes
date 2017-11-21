@@ -1,5 +1,11 @@
 Revision history for Params-Registry
 
+0.07    Mon 20 Nov 16:42:17 PST 2017
+        Fixed bug for empty values with max cardinality of 1.
+
+0.05    Thu Sep 15 11:57:00 PDT 2016
+        Added -force to Instance->set; major profiling cleanup.
+
 0.01    Thu Mar  5 22:57:10 PST 2015
         After two and a half years of whingeing, the first release.
 

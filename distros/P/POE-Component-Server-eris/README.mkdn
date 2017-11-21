@@ -4,7 +4,7 @@ POE::Component::Server::eris - POE eris message dispatcher
 
 # VERSION
 
-version 2.2
+version 2.3
 
 # SYNOPSIS
 
@@ -20,6 +20,7 @@ rsyslog are included in the examples directory!
 
     # Message Dispatch Service
     my $SESSION = POE::Component::Server::eris->spawn(
+            Alias               => 'eris_dispatch',     #optional
             ListenAddress       => 'localhost',         #default
             ListenPort          => '9514',              #default
             GraphiteHost        => undef,               #default
@@ -27,7 +28,7 @@ rsyslog are included in the examples directory!
             GraphitePrefix      => 'eris.dispatcher',   #default
     );
 
-    # $SESSION = { alias => 'eris_dispatcher', ID => POE::Session->ID };
+    # $SESSION = { alias => 'eris_dispatch', ID => POE::Session->ID };
 
 
     # Take Input from a TCP Socket
@@ -182,6 +183,10 @@ Send debug message to DEBUG clients
 ## client\_input
 
 Parse the Client Input for eris::dispatcher commands and enact those commands
+
+## help\_client
+
+Display the help message
 
 ## client\_term
 

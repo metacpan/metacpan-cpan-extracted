@@ -1177,7 +1177,7 @@ EOH
         handler => {
             'GET' => 'handler_get_employee_search_nick',
         },
-        acl_profile => 'admin',
+        acl_profile => 'inactive',
         cli => 'employee search nick $KEY',
         description => 'Search employee profiles on nick (% is wild)',
         validations => {
@@ -1191,7 +1191,8 @@ a wildcard ('%'). For example:
 
     GET employee/search/nick/foo%
 
-would return a list of employees whose nick starts with 'foo'.
+would return a list of employees whose nick starts with 'foo', provided the '%'
+character in the URI is properly encoded (as '%25') by the client.
 
 Note that if the user provides no wildcard characters in the key, they will
 implicitly be added. Example: a search for 'foo' would be converted to

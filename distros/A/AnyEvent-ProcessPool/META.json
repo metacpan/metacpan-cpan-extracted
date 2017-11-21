@@ -1,0 +1,72 @@
+{
+   "abstract" : "Asynchronously runs code concurrently in a pool of perl processes",
+   "author" : [
+      "Jeff Ober <sysread@fastmail.fm>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "AnyEvent-ProcessPool",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "7.14",
+            "AnyEvent::Open3::Simple" : "0.86",
+            "Carp" : "0",
+            "Class::Load" : "0",
+            "Config" : "0",
+            "Data::Dump::Streamer" : "0",
+            "Data::UUID::MT" : "0",
+            "Exporter" : "0",
+            "MIME::Base64" : "0",
+            "String::Escape" : "0",
+            "Try::Catch" : "0",
+            "parent" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "Test2::Bundle::Extended" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.41"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/sysread/AnyEvent-ProcessPool/issues"
+      },
+      "homepage" : "https://github.com/sysread/AnyEvent-ProcessPool",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/sysread/AnyEvent-ProcessPool.git",
+         "web" : "https://github.com/sysread/AnyEvent-ProcessPool"
+      }
+   },
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::XS version 3.03"
+}
+

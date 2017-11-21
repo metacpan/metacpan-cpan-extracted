@@ -1,0 +1,59 @@
+{
+   "abstract" : "Make beautiful Markdown readmes from your POD",
+   "author" : [
+      "Richard Harris <richardjharris@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Pod-Github",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Encode" : "0",
+            "File::Slurp" : "0",
+            "FindBin" : "0",
+            "Getopt::Long" : "0",
+            "Pod::Markdown" : "3.005",
+            "Pod::Usage" : "0",
+            "Test::More" : "0",
+            "YAML::XS" : "0",
+            "parent" : "0",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/richardjharris/perl-Pod-Github.git",
+         "web" : "https://github.com/richardjharris/perl-Pod-Github"
+      }
+   },
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

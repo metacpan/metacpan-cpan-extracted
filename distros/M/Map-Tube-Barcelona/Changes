@@ -1,5 +1,9 @@
 Revision history for Map::Tube::Barcelona
 
+0.49  Sat Nov 11 03:50:00 2017
+      - Updated dependency on Map::Tube v3.37.
+      - Upgraded to use Test::Map::Tube v0.35.
+
 0.48  Fri Oct 20 16:15:00 2017
       - Upgraded to use Map::Tube v3.36.
       - Indexed Line 9 stations.

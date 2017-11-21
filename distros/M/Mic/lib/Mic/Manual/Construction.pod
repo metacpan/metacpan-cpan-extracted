@@ -6,7 +6,7 @@ This default constructor supports two forms of usage described below.
 
 =head2 Keyword Parameters
 
-For objects constructed using keyword parameters, the constructor should be passed a hashref containing the the keyword parameters.
+For objects constructed using keyword parameters, the constructor should be passed a hashref containing the keyword parameters.
 
 Imagine a counter that starts from a user supplied value, so we can use it this way
 
@@ -46,7 +46,7 @@ The class and implementation:
     sub next {
         my ($self) = @_;
 
-        $self->[ $COUNT ]++;
+        $self->[COUNT]++;
     }
 
     1;
@@ -93,7 +93,7 @@ In the implementation, we convert the argument array to a hash
 
     package Example::Construction::Acme::Set_v2;
 
-    use Mic::ArrayImpl
+    use Mic::Impl
         has => {
             SET => {
                 default => sub { {} },
@@ -104,24 +104,24 @@ In the implementation, we convert the argument array to a hash
     sub BUILD {
         my ($self, $args) = @_;
 
-        $self->[$SET] = { map { $_ => 1 } @{ $args } };
+        $self->[SET] = { map { $_ => 1 } @{ $args } };
     }
 
     sub has {
         my ($self, $e) = @_;
 
-        exists $self->[$SET]{$e};
+        exists $self->[SET]{$e};
     }
 
     sub add {
         my ($self, $e) = @_;
 
-        ++$self->[$SET]{$e};
+        ++$self->[SET]{$e};
     }
 
     sub size {
         my ($self) = @_;
-        scalar(keys %{ $self->[$SET] });
+        scalar(keys %{ $self->[SET] });
     }
 
     1;
@@ -140,7 +140,7 @@ is preferable due to being more concise).
 
     package Example::Construction::Acme::Counter_v2;
 
-    use Mic::Implementation
+    use Mic::Impl
         has  => {
             COUNT => { },
         },
@@ -149,13 +149,13 @@ is preferable due to being more concise).
     sub BUILD {
         my ($self, $arg) = @_;
 
-        $self->{$COUNT} = $arg->{start};
+        $self->[COUNT] = $arg->{start};
     }
 
     sub next {
         my ($self) = @_;
 
-        $self->{$COUNT}++;
+        $self->[COUNT]++;
     }
 
     1;
@@ -197,7 +197,7 @@ We'll rewrite the counter example above providing a C<new> method:
     sub next {
         my ($self) = @_;
 
-        $self->[ $COUNT ]++;
+        $self->[COUNT]++;
     }
 
     sub new {

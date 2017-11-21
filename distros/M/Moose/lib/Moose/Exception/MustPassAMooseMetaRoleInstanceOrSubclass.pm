@@ -1,5 +1,5 @@
 package Moose::Exception::MustPassAMooseMetaRoleInstanceOrSubclass;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -20,4 +20,5 @@ sub _build_message {
     "You must pass a Moose::Meta::Role instance (or a subclass)";
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

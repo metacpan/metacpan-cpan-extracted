@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Test::More tests => 3;
 use Syntax::Highlight::Engine::Simple::HTML;
-use encoding 'utf8';
+use utf8;
 binmode(STDIN,	":utf8");
 binmode(STDOUT,	":utf8");
 binmode(STDERR,	":utf8");

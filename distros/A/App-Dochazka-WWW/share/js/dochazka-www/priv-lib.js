@@ -76,9 +76,7 @@ define ([
                                 }
                             );
                             if (tgt === 'privHistoryDtable') {
-                                stack.push(tgt, history, {
-                                    "xtarget": "mainPriv"
-                                });
+                                stack.push(tgt, history, { "xtarget": "myProfileAction" });
                             } else if (tgt === 'privHistoryDrowselect') {
                                 stack.push(tgt, {
                                     'pos': 0,
@@ -92,9 +90,7 @@ define ([
                             // The employee has no history records. This is not
                             // really an error condition.
                             if (tgt === 'privHistoryDtable') {
-                                stack.push(tgt, [], {
-                                    "xtarget": "mainPriv"
-                                });
+                                stack.push(tgt, [], { "xtarget": "empProfile" });
                             } else if (tgt === 'privHistoryDrowselect') {
                                 stack.push(tgt, {
                                     'pos': 0,
@@ -169,9 +165,10 @@ define ([
             // start.drowselectListen();
         },
         "privHistoryAddRecordAction": function (obj) {
-            console.log("Entering privHistoryAddRecordAction with obj", obj);
+            var cu = currentUser('obj');
+            console.log("Entering privHistoryAddRecordAction with nick " + cu.nick);
             stack.push('privHistoryAddRecord', {
-                'nick': obj.nick
+                'nick': cu.nick
             });
         }
     };

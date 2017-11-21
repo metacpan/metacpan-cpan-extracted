@@ -59,7 +59,7 @@ decreasearray deg2rad_ rad2deg_ purifyarray replace_nth rotate2dabs rotate2d rot
 gatherseparators supercleanarray modish $max_processes
 ); # our @EXPORT = qw( );
 
-$VERSION = '0.63.35'; # our $VERSION = '';
+$VERSION = '0.63.39'; # our $VERSION = '';
 $ABSTRACT = 'Sim::OPT::Morph is a morphing program for performing parametric variations on model descriptions for simulation programs.';
 
 ################################################# MORPH          
@@ -160,8 +160,120 @@ sub morph
 	#my $getpars = shift;
 	#eval( $getpars );
 	#if ( fileno (MORPHLIST) 
+	my ( %numvertmenu, %vertnummenu );
+
+	if ( ( $dowhat{menus} eq "shortb" ) or ( not ( defined ( $dowhat{menus} ) ) ) )
+	{
+		%numvertmenu = ( 1 => "a", 2 => "b", 3 => "c", 4 => "d", 5 => "e", 6 => "f", 7 => "g", 
+		8 => "h", 9 => "i", 10 => "j", 11 => "k", 12 => "l", 
+		13 => "m", 14 => "n", 15 => "o", 16 => "p", 17 => "0\nq", 18 => "0\nr", 19 => "0\ns", 
+		20 => "0\nt", 		21 => "0\nu", 22 => "0\nv", 23 => "0\nw", 24 => "0\nx", 25 => "0\ny", 
+		26 => "0\nz", 27 => "0\na", 28 => "0\nb", 29 => "0\nc", 30 => "0\nd", 31 => "0\ne", 
+		32 => "0\n0\nb\nf", 33 => "0\n0\nb\ng", 34 => "0\n0\nb\nh", 35 => "0\n0\nb\ni", 36 => "0\n0\nb\nj", 
+		37 => "0\n0\nb\nk", 38 => "0\n0\nb\nl", 39 => "0\n0\nb\nm", 40 => "0\n0\nb\nn", 41 => "0\n0\nb\no", 
+		42 => "0\n0\nb\np", 43 => "0\n0\nb\nq", 44 => "0\n0\nb\nr", 45 => "0\n0\nb\ns", 46 => "0\n0\nb\nt", 
+		47 => "0\n0\nb\n0\nb\nu", 48 => "0\n0\nb\n0\nb\nv", 49 => "0\n0\nb\n0\nb\nw", 50 => "0\n0\nb\n0\nb\nx", 
+		51 => "0\n0\nb\n0\nb\ny", 52 => "0\n0\nb\n0\nb\nz", 
+		53 => "0\n0\nc\n0\nc\na", 54 => "0\n0\nc\n0\nc\nb", 55 => "0\n0\nc\n0\nc\nc", 56 => "0\n0\nc\n0\nc\nd", 
+		57 => "0\n0\nb\n0\nb\ne", 58 => "0\n0\nb\n0\nb\nf", 
+		59 => "0\n0\nb\n0\nb\ng", 60 => "0\n0\nb\n0\nb\nh", 61 => "0\n0\nb\n0\nb\ni", 
+		62 => "0\n0\nb\n0\nb\n0\nb\nj", 63 => "0\n0\nb\n0\nb\n0\nb\nk", 64 => "0\n0\nb\n0\nb\n0\nb\nl", 
+		65 => "0\n0\nb\n0\nb\n0\nb\nm", 66 => "0\n0\nb\n0\nb\n0\nb\nn", 
+		67 => "0\n0\nb\n0\nb\n0\nb\no", 68 => "0\n0\nb\n0\nb\n0\nb\np", 69 => "0\n0\nb\n0\nb\n0\nb\nq", 
+		70 => "0\n0\nb\n0\nb\n0\nb\nr", 71 => "0\n0\nb\n0\nb\n0\nb\ns", 
+		72 => "0\n0\nb\n0\nb\n0\nb\nt", 73 => "0\n0\nb\n0\nb\n0\nb\nu", 74 => "0\n0\nb\n0\nb\n0\nb\nv", 
+		75 => "0\n0\nb\n0\nb\n0\nb\nw", 76 => "0\n0\nb\n0\nb\n0\nb\nx", 
+		77 => "0\n0\nb\n0\nb\n0\nb\n0\nb\ny", 78 => "0\n0\nb\n0\nb\n0\nb\n0\nb\nz", 79 => "0\n0\nb\n0\nb\n0\nb\n0\nb\na", 
+		80 => "0\n0\nb\n0\nb\n0\nb\n0\nb\nb", 81 => "0\n0\nb\n0\nb\n0\nb\n0\nb\nc", 82 => "0\n0\nb\n0\nb\n0\nb\n0\nb\nd", 
+		83 => "0\n0\nb\n0\nb\n0\nb\n0\nb\ne", 84 => "0\n0\nb\n0\nb\n0\nb\n0\nb\nf", 85 => "0\n0\nb\n0\nb\n0\nb\n0\nb\ng", 
+		86 => "0\n0\nb\n0\nb\n0\nb\n0\nb\nh", 87 => "0\n0\nb\n0\nb\n0\nb\n0\nb\ni", 88 => "0\n0\nb\n0\nb\n0\nb\n0\nb\nj", 
+		89 => "0\n0\nb\n0\nb\n0\nb\n0\nb\nk", 90 => "0\n0\nb\n0\nb\n0\nb\n0\nb\nl", 91 => "0\n0\nb\n0\nb\n0\nb\n0\nb\nm", 
+		92 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nn", 93 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\no", 
+		94 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\np", 95 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nq", 
+		96 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nr", 97 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\ns", 
+		98 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nt", 99 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nu", 
+		100 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nv", 101 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nw", 
+		102 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nx", 103 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\ny", );
+
+		%vertnummenu = ( "a" => 1, "b" => 2, "c" => 3, "d" => 4, "e" => 5, "f" => 6, "g" => 7, "h" => 8, "i" => 9, "j" => 10, "k" => 11, "l" => 12, 
+	"m" => 13, "n" => 14, "o" => 15, "p" => 16, 
+	"0\nq" => 17, "0\nr" => 18, "0\ns" => 19, "0\nt" => 20, "0\nu" => 21, "0\nv" => 22, "0\nw" => 23, "0\nx" => 24, "0\ny" => 25, "0\nz" => 26, 
+	"0\na" => 27, "0\nb" => 28, "0\nc" => 29, "0\nd" => 30, "0\ne" => 31, 
+	"0\n0\nb\nf" => 32, "0\n0\nb\ng" => 33, "0\n0\nb\nh" => 34, "0\n0\nb\ni" => 35, "0\n0\nb\nj" => 36, "0\n0\nb\nk" => 37, "0\n0\nb\nl" => 38, 
+	"0\n0\nb\nm" => 39, "0\n0\nb\nn" => 40, "0\n0\nb\no" => 41, "0\n0\nb\np" => 42, "0\n0\nb\nq" => 43, "0\n0\nb\nr" => 44, "0\n0\nb\ns" => 45, 
+	"0\n0\nb\nt" => 46, 
+	"0\n0\nb\n0\nb\nu" => 47, "0\n0\nb\n0\nb\nv" => 48, "0\n0\nb\n0\nb\nw" => 49, "0\n0\nb\n0\nb\nx" => 50, "0\n0\nb\n0\nb\ny" => 51, "0\n0\nc0\nc\nz" => 52, 
+	"0\n0\nb\n0\nb\na" => 53, "0\n0\nb\n0\nb\nb" => 54, "0\n0\nb\n0\nb\nc" => 55, "0\n0\nb\n0\nb\nd" => 56, "0\n0\nb\n0\nb\ne" => 57, "0\n0\nb0\nb\nf" => 58, 
+	"0\n0\nb\n0\nb\ng" => 59, "0\n0\nb\n0\nb\nh" => 60, "0\n0\nb\n0\nb\ni" => 61, 
+	"0\n0\nb\n0\nb\n0\nb\nj" => 62, "0\n0\nb\n0\nb\n0\nb\nk" => 63, "0\n0\nb\n0\nb\n0\nb\nl" => 64, "0\n0\nb\n0\nb\n0\nb\nm" => 65, "0\n0\nb\n0\nb\n0\nb\nn" => 66, 
+	"0\n0\nb\n0\nb\n0\nb\no" => 67, "0\n0\nb\n0\nb\n0\nb\np" => 68, "0\n0\nb\n0\nb\n0\nb\nq" => 69, "0\n0\nb\n0\nb\n0\nb\nr" => 70, "0\n0\nb\n0\nb\n0\nb\ns" => 71, 
+	"0\n0\nb\n0\nb\n0\nb\nt" => 72, "0\n0\nb\n0\nb\n0\nb\nu" => 73, "0\n0\nb\n0\nb\n0\nb\nv" => 74, "0\n0\nb\n0\nb\n0\nb\nw" => 75, "0\n0\nb\n0\nb\n0\nb\nx" => 76, 
+	"0\n0\nb\n0\nb\n0\nb\n0\nb\ny" => 77, "0\n0\nb\n0\nb\n0\nb\n0\nb\nz" => 78, "0\n0\nb\n0\nb\n0\nb\n0\nb\na" => 79, "0\n0\nb\n0\nb\n0\nb\n0\nb\nb" => 80, 
+	"0\n0\nb\n0\nb\n0\nb\n0\nb\nc" => 81, "0\n0\nb\n0\nb\n0\nb\n0\nb\nd" => 82, "0\n0\nb\n0\nb\n0\nb\n0\nb\ne" => 83, "0\n0\nb\n0\nb\n0\nb\n0\nb\nf" => 84, 
+	"0\n0\nb\n0\nb\n0\nb\n0\nb\ng" => 85, "0\n0\nb\n0\nb\n0\nb\n0\nb\nh" => 86, "0\n0\nb\n0\nb\n0\nb\n0\nb\ni" => 87, "0\n0\nb\n0\nb\n0\nb\n0\nb\nj" => 88, 
+	"0\n0\nb\n0\nb\n0\nb\n0\nb\nk" => 89, "0\n0\nb\n0\nb\n0\nb\n0\nb\nl" => 90, "0\n0\nb\n0\nb\n0\nb\n0\nb\nm" => 91, 
+	"0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nn" => 92, "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\no" => 93, "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\np" => 94, "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nq" => 95, 
+	"0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nr" => 96, "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\ns" => 97, "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nt" => 98, "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nu" => 99, 
+	"0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nv" => 100, "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nw" => 101, "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nx" => 102, "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\ny" => 103, 
+	"0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nz" => 104 );
+	}
+	elsif ( $dowhat{menus} eq "shortc" )
+	{
+		%numvertmenu = ( 1 => "a", 2 => "b", 3 => "c", 4 => "d", 5 => "e", 6 => "f", 7 => "g", 
+		8 => "h", 9 => "i", 10 => "j", 11 => "k", 12 => "l", 
+		13 => "m", 14 => "n", 15 => "o", 16 => "p", 17 => "0\nq", 18 => "0\nr", 19 => "0\ns", 
+		20 => "0\nt", 		21 => "0\nu", 22 => "0\nv", 23 => "0\nw", 24 => "0\nx", 25 => "0\ny", 
+		26 => "0\nz", 27 => "0\na", 28 => "0\nb", 29 => "0\nc", 30 => "0\nd", 31 => "0\ne", 
+		32 => "0\n0\nc\nf", 33 => "0\n0\nc\ng", 34 => "0\n0\nc\nh", 35 => "0\n0\nc\ni", 36 => "0\n0\nc\nj", 
+		37 => "0\n0\nc\nk", 38 => "0\n0\nc\nl", 39 => "0\n0\nc\nm", 40 => "0\n0\nc\nn", 41 => "0\n0\nc\no", 
+		42 => "0\n0\nc\np", 43 => "0\n0\nc\nq", 44 => "0\n0\nc\nr", 45 => "0\n0\nc\ns", 46 => "0\n0\nc\nt", 
+		47 => "0\n0\nc\n0\nc\nu", 48 => "0\n0\nc\n0\nc\nv", 49 => "0\n0\nc\n0\nc\nw", 50 => "0\n0\nc\n0\nc\nx", 
+		51 => "0\n0\nc\n0\nc\ny", 52 => "0\n0\nc\n0\nc\nz", 
+		53 => "0\n0\nc\n0\nc\na", 54 => "0\n0\nc\n0\nc\nb", 55 => "0\n0\nc\n0\nc\nc", 56 => "0\n0\nc\n0\nc\nd", 
+		57 => "0\n0\nc\n0\nc\ne", 58 => "0\n0\nc\n0\nc\nf", 
+		59 => "0\n0\nc\n0\nc\ng", 60 => "0\n0\nc\n0\nc\nh", 61 => "0\n0\nc\n0\nc\ni", 
+		62 => "0\n0\nc\n0\nc\n0\nc\nj", 63 => "0\n0\nc\n0\nc\n0\nc\nk", 64 => "0\n0\nc\n0\nc\n0\nc\nl", 
+		65 => "0\n0\nc\n0\nc\n0\nc\nm", 66 => "0\n0\nc\n0\nc\n0\nc\nn", 
+		67 => "0\n0\nc\n0\nc\n0\nc\no", 68 => "0\n0\nc\n0\nc\n0\nc\np", 69 => "0\n0\nc\n0\nc\n0\nc\nq", 
+		70 => "0\n0\nc\n0\nc\n0\nc\nr", 71 => "0\n0\nc\n0\nc\n0\nc\ns", 
+		72 => "0\n0\nc\n0\nc\n0\nc\nt", 73 => "0\n0\nc\n0\nc\n0\nc\nu", 74 => "0\n0\nc\n0\nc\n0\nc\nv", 
+		75 => "0\n0\nc\n0\nc\n0\nc\nw", 76 => "0\n0\nc\n0\nc\n0\nc\nx", 
+		77 => "0\n0\nc\n0\nc\n0\nc\n0\nc\ny", 78 => "0\n0\nc\n0\nc\n0\nc\n0\nc\nz", 79 => "0\n0\nc\n0\nc\n0\nc\n0\nc\na", 
+		80 => "0\n0\nc\n0\nc\n0\nc\n0\nc\nb", 81 => "0\n0\nc\n0\nc\n0\nc\n0\nc\nc", 82 => "0\n0\nc\n0\nc\n0\nc\n0\nc\nd", 
+		83 => "0\n0\nc\n0\nc\n0\nc\n0\nc\ne", 84 => "0\n0\nc\n0\nc\n0\nc\n0\nc\nf", 85 => "0\n0\nc\n0\nc\n0\nc\n0\nc\ng", 
+		86 => "0\n0\nc\n0\nc\n0\nc\n0\nc\nh", 87 => "0\n0\nc\n0\nc\n0\nc\n0\nc\ni", 88 => "0\n0\nc\n0\nc\n0\nc\n0\nc\nj", 
+		89 => "0\n0\nc\n0\nc\n0\nc\n0\nc\nk", 90 => "0\n0\nc\n0\nc\n0\nc\n0\nc\nl", 91 => "0\n0\nc\n0\nc\n0\nc\n0\nc\nm", 
+		92 => "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nn", 93 => "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\no", 
+		94 => "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\np", 95 => "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nq", 
+		96 => "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nr", 97 => "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\ns", 
+		98 => "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nt", 99 => "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nu", 
+		100 => "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nv", 101 => "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nw", 
+		102 => "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nx", 103 => "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\ny", );
+
+		%vertnummenu = ( "a" => 1, "b" => 2, "c" => 3, "d" => 4, "e" => 5, "f" => 6, "g" => 7, "h" => 8, "i" => 9, "j" => 10, "k" => 11, "l" => 12, 
+			"m" => 13, "n" => 14, "o" => 15, "p" => 16, 
+		"0\nq" => 17, "0\nr" => 18, "0\ns" => 19, "0\nt" => 20, "0\nu" => 21, "0\nv" => 22, "0\nw" => 23, "0\nx" => 24, "0\ny" => 25, "0\nz" => 26, 
+		"0\na" => 27, "0\nb" => 28, "0\nc" => 29, "0\nd" => 30, "0\ne" => 31, 
+		"0\n0\nc\nf" => 32, "0\n0\nc\ng" => 33, "0\n0\nc\nh" => 34, "0\n0\nc\ni" => 35, "0\n0\nc\nj" => 36, "0\n0\nc\nk" => 37, "0\n0\nc\nl" => 38, 
+		"0\n0\nc\nm" => 39, "0\n0\nc\nn" => 40, "0\n0\nc\no" => 41, "0\n0\nc\np" => 42, "0\n0\nc\nq" => 43, "0\n0\nc\nr" => 44, "0\n0\nc\ns" => 45, 
+		"0\n0\nc\nt" => 46, 
+		"0\n0\nc\n0\nc\nu" => 47, "0\n0\nc\n0\nc\nv" => 48, "0\n0\nc\n0\nc\nw" => 49, "0\n0\nc\n0\nc\nx" => 50, "0\n0\nc\n0\nc\ny" => 51, "0\n0\nc0\nc\nz" => 52, 
+		"0\n0\nc\n0\nc\na" => 53, "0\n0\nc\n0\nc\nb" => 54, "0\n0\nc\n0\nc\nc" => 55, "0\n0\nc\n0\nc\nd" => 56, "0\n0\nc\n0\nc\ne" => 57, "0\n0\nc0\nc\nf" => 58, 
+		"0\n0\nc\n0\nc\ng" => 59, "0\n0\nc\n0\nc\nh" => 60, "0\n0\nc\n0\nc\ni" => 61, 
+		"0\n0\nc\n0\nc\n0\nc\nj" => 62, "0\n0\nc\n0\nc\n0\nc\nk" => 63, "0\n0\nc\n0\nc\n0\nc\nl" => 64, "0\n0\nc\n0\nc\n0\nc\nm" => 65, "0\n0\nc\n0\nc\n0\nc\nn" => 66, 
+		"0\n0\nc\n0\nc\n0\nc\no" => 67, "0\n0\nc\n0\nc\n0\nc\np" => 68, "0\n0\nc\n0\nc\n0\nc\nq" => 69, "0\n0\nc\n0\nc\n0\nc\nr" => 70, "0\n0\nc\n0\nc\n0\nc\ns" => 71, 
+		"0\n0\nc\n0\nc\n0\nc\nt" => 72, "0\n0\nc\n0\nc\n0\nc\nu" => 73, "0\n0\nc\n0\nc\n0\nc\nv" => 74, "0\n0\nc\n0\nc\n0\nc\nw" => 75, "0\n0\nc\n0\nc\n0\nc\nx" => 76, 
+		"0\n0\nc\n0\nc\n0\nc\n0\nc\ny" => 77, "0\n0\nc\n0\nc\n0\nc\n0\nc\nz" => 78, "0\n0\nc\n0\nc\n0\nc\n0\nc\na" => 79, "0\n0\nc\n0\nc\n0\nc\n0\nc\nb" => 80, 
+		"0\n0\nc\n0\nc\n0\nc\n0\nc\nc" => 81, "0\n0\nc\n0\nc\n0\nc\n0\nc\nd" => 82, "0\n0\nc\n0\nc\n0\nc\n0\nc\ne" => 83, "0\n0\nc\n0\nc\n0\nc\n0\nc\nf" => 84, 
+		"0\n0\nc\n0\nc\n0\nc\n0\nc\ng" => 85, "0\n0\nc\n0\nc\n0\nc\n0\nc\nh" => 86, "0\n0\nc\n0\nc\n0\nc\n0\nc\ni" => 87, "0\n0\nc\n0\nc\n0\nc\n0\nc\nj" => 88, 
+		"0\n0\nc\n0\nc\n0\nc\n0\nc\nk" => 89, "0\n0\nc\n0\nc\n0\nc\n0\nc\nl" => 90, "0\n0\nc\n0\nc\n0\nc\n0\nc\nm" => 91, 
+		"0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nn" => 92, "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\no" => 93, "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\np" => 94, "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nq" => 95, 
+		"0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nr" => 96, "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\ns" => 97, "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nt" => 98, "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nu" => 99, 
+		"0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nv" => 100, "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nw" => 101, "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nx" => 102, "0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\ny" => 103, 
+		"0\n0\nc\n0\nc\n0\nc\n0\nc\n0\nc\nz" => 104 );
+	}
 	
-	
+	my @menus = ( \%numvertmenu, \%vertnummenu );
 	
 	my $numberof_morphings = scalar ( keys %{ $dowhat{simtools} } ); 
 	my ( @done_instances, @done_tos );
@@ -584,7 +696,7 @@ sub morph
 									
 									change_groundreflectance
 									( $to, $stepsvar, $countop, $countstep,
-										\@applytype, $change_groundreflectance, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline   );
+										\@applytype, $change_groundreflectance, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus   );
 								} 
 								elsif ( $modification_type eq "genchange" )#
 								{  
@@ -592,7 +704,7 @@ sub morph
 									( $to, $stepsvar, $countop, $countstep,
 										\@applytype, $genchange, $countvar, $fileconfig, $mypath, $file, 
 										$countmorphing, "vary", $names_ref, $nums_ref, 
-										$newcontents_ref, $filecontents_ref, $newfilecontents_ref, $launchline );
+										$newcontents_ref, $filecontents_ref, $newfilecontents_ref, $launchline, \@menus );
 									%names = %$names_ref;
 									%nums = %$nums_ref;
 									%newcontents = %$newcontents_ref;
@@ -603,112 +715,112 @@ sub morph
 								{
 									make_generic_change
 									( $to, $stepsvar, $countop, $countstep,
-										\@applytype, $generic_change, $countvar, $fileconfig, $countmorphing, $launchline  );
+										\@applytype, $generic_change, $countvar, $fileconfig, $countmorphing, $launchline, \@menus );
 								} #
 								elsif ( $modification_type eq "translate_surface" )
 								{
 									translate_surfaces 
 									($to, $stepsvar, $countop, $countstep, 
-										\@applytype, $translate_surface, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline   );
+										\@applytype, $translate_surface, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );
 								} 
 								elsif ( $modification_type eq "rotate_surface" )              #
 								{
 									rotate_surface
 									($to, $stepsvar, $countop, $countstep, 
-										\@applytype, $rotate_surface, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline  );
+										\@applytype, $rotate_surface, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );
 								} 
 								elsif ( $modification_type eq "shift_vertices" )
 								{
 									shift_vertices
 									( $to, $stepsvar, $countop, $countstep, 
-										\@applytype, $shift_vertices, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline  );
+										\@applytype, $shift_vertices, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );
 								}
 								elsif ( $modification_type eq "translate_vertices" )
 								{
 									translate_vertices
 									( $to, $stepsvar, $countop, $countstep, 
-										\@applytype, \@translate_vertices, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline  );                         
+										\@applytype, \@translate_vertices, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );                         
 								}  
 								elsif ( $modification_type eq "construction_reassign" )
 								{
 									reassign_construction
 									( $to, $stepsvar, $countop, $countstep, 
-										\@applytype, $construction_reassign, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline  );
+										\@applytype, $construction_reassign, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );
 								} 
 								elsif ( $modification_type eq "rotate" )
 								{
 									rotate
 									( $to, $stepsvar, $countop, $countstep, 
-										\@applytype, $rotate, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline  );
+										\@applytype, $rotate, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );
 								} 
 								elsif ( $modification_type eq "translate" )
 								{
 									
 									translate
 									( $to, $stepsvar, $countop, $countstep, 
-										\@applytype, $translate, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline  );
+										\@applytype, $translate, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );
 								} 
 								elsif ( $modification_type eq "apply_constraints" )
 								{
 									
 									apply_constraints
 									( $to, $stepsvar, $countop, $countstep, 
-										\@applytype, \@apply_constraints, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline  );
+										\@applytype, \@apply_constraints, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );
 								} 
 								elsif ( $modification_type eq "change_thickness" )
 								{
 									change_thickness
 									( $to, $stepsvar, $countop, $countstep, 
-										\@applytype, $change_thickness, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline  );
+										\@applytype, $change_thickness, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );
 								} 
 								elsif ( $modification_type eq "rotatez" )
 								{
 									rotatez
 									($to, $stepsvar, $countop, $countstep, 
-										\@applytype, $rotatez, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline  );
+										\@applytype, $rotatez, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );
 								} 
 								elsif ( $modification_type eq "change_config" )
 								{
 									change_config
 									( $to, $stepsvar, $countop, $countstep, 
-										\@applytype, \@change_config, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline  );
+										\@applytype, \@change_config, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );
 								}
 								elsif ( $modification_type eq "reshape_windows" ) 
 								{
 									reshape_windows
 									($to, $stepsvar, $countop, $countstep, 
-										\@applytype, \@reshape_windows, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline );          
+										\@applytype, \@reshape_windows, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );          
 								}
 								elsif ( $modification_type eq "obs_modify" ) 
 								{  
 									obs_modify
 									( $to, $stepsvar, $countop, $countstep, 
-										\@applytype, $obs_modify, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline  );
+										\@applytype, $obs_modify, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );
 									
 								}
 								elsif ( $modification_type eq "warping" )
 								{
 									warp
 									( $to, $stepsvar, $countop, $countstep, 
-										\@applytype, $warp, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline  );
+										\@applytype, $warp, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );
 								}
 								elsif ( $modification_type eq "vary_controls" )
 								{
 									vary_controls
 									( $to, $stepsvar, $countop, $countstep, 
-										\@applytype, \@vary_controls, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline  );
+										\@applytype, \@vary_controls, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );
 								}
 								elsif ( $modification_type eq "vary_net" )
 								{
 									vary_net
 									( $to, $stepsvar, $countop, $countstep, 
-										\@applytype, \@vary_net, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline  );
+										\@applytype, \@vary_net, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus );
 								}
 								elsif ( $modification_type eq "change_climate" )
 								{
 									change_climate
 									( $to, $stepsvar, $countop, $countstep, 
-										\@applytype, \@change_climate, $countvar, $fileconfig, $mypath, $file, $countmorphing, $countmorphing, $launchline  );
+										\@applytype, \@change_climate, $countvar, $fileconfig, $mypath, $file, $countmorphing, $countmorphing, $launchline, \@menus );
 								}
 								else 
 								{ 
@@ -738,7 +850,7 @@ sub morph
 												
 												my ( $v_ref ) = constrain_geometry
 												( $to, $stepsvar, $countop, 
-													$countstep, \@applytype, \@constrain_geometry, $countvar, $fileconfig, \@v_, $countmorphing, $exeonfiles, \@v_, $action, $launchline ); 
+													$countstep, \@applytype, \@constrain_geometry, $countvar, $fileconfig, \@v_, $countmorphing, $exeonfiles, \@v_, $action, $launchline, \@menus ); 
 												@v = @$v_ref;
 												@v_ = @$v__ref;
 											}
@@ -761,7 +873,7 @@ sub morph
 											{   
 												my ( $obs_ref, $obs__ref ) = constrain_obstructions
 												( $to, $stepsvar, $countop, 
-													$countstep, \@applytype, \@constrain_obstructions, $countvar, $fileconfig, $countmorphing, $exeonfiles, $obs_ref, $obs__ref, $action, $launchline ); 
+													$countstep, \@applytype, \@constrain_obstructions, $countvar, $fileconfig, $countmorphing, $exeonfiles, $obs_ref, $obs__ref, $action, $launchline, \@menus ); 
 													@obs = @$obs_ref;
 													@obs_ = @$obs__ref;
 											}
@@ -770,7 +882,7 @@ sub morph
 											{ 
 												my ( $node_ref, $component_ref, $donode_ref, $docomponent_ref ) = constrain_net( $to, $stepsvar, $countop, 
 													$countstep, \@applytype, \@constrain_net, $countvar, $fileconfig, $countmorphing, $exeonfiles, $action,
-													$node_ref, $component_ref, $donode_ref, $docomponent_ref, $launchline ); 
+													$node_ref, $component_ref, $donode_ref, $docomponent_ref, $launchline, \@menus ); 
 													@node = @$node_ref;
 													@component = @$component_ref;
 													@donode = @$donode_ref;
@@ -782,7 +894,7 @@ sub morph
 												my ( $loopcontrol_ref, $flowcontrol_ref, $new_loopcontrol_ref, $new_flowcontrol_ref ) = constrain_controls
 												( $to, $stepsvar, $countop, 
 													$countstep, \@applytype, \@constrain_controls, $countvar, $fileconfig, $countmorphing, $exeonfiles, $action, 
-													$loopcontrol_ref, $flowcontrol_ref, $new_loopcontrol_ref, $new_flowcontrol_ref, $launchline  ); 
+													$loopcontrol_ref, $flowcontrol_ref, $new_loopcontrol_ref, $new_flowcontrol_ref, $launchline, \@menus ); 
 													@loopcontrol = @$loopcontrol_ref;
 													@flowcontrol = @$flowcontrol_ref;
 													@new_loopcontrol = @$new_loopcontrol_ref;
@@ -793,35 +905,35 @@ sub morph
 											{ 
 												apply_constraints
 												( $to, $stepsvar, $countop, 
-													$countstep, \@applytype, \@apply_constraints, $countvar, $fileconfig, $countmorphing, $launchline  ); 
+													$countstep, \@applytype, \@apply_constraints, $countvar, $fileconfig, $countmorphing, $launchline, \@menus ); 
 											}
 											
 											if ( defined( $pin_obstructions->[ $countop ] ) and ( $action eq "pin_obstructions" ) )
 											{   
 												pin_obstructions
 												( $to, $stepsvar, $countop, 
-													$countstep, \@applytype, $pin_obstructions, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline  ); 
+													$countstep, \@applytype, $pin_obstructions, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus ); 
 											}
 											
 											if ( defined( $recalculatenet[$countop] ) and ( $action eq "recalculatenet" ) ) 
 											{ 
 												recalculatenet
 												( $to, $stepsvar, $countop, 
-													$countstep, \@applytype, \@recalculatenet, $countvar, $fileconfig, $countmorphing, $launchline  ); 
+													$countstep, \@applytype, \@recalculatenet, $countvar, $fileconfig, $countmorphing, $launchline, \@menus ); 
 											}
 											
 											if ( defined( $recalculateish->[$countop] ) and ( $action eq "recalculateish" ) ) 
 											{   
 												recalculateish
 												( $to, $stepsvar, $countop, 
-													$countstep, \@applytype, $recalculateish, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline  ); 
+													$countstep, \@applytype, $recalculateish, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus ); 
 											}
 											
 											if ( defined( $daylightcalc->[$countop] )  and ( $action eq "daylightcalc" ) ) 
 											{   
 												daylightcalc
 												( $to, $stepsvar, $countop,  
-													$countstep, \@applytype, $filedf, \@daylightcalc, $countvar, $fileconfig, $countmorphing, $launchline  ); 
+													$countstep, \@applytype, $filedf, \@daylightcalc, $countvar, $fileconfig, $countmorphing, $launchline, \@menus ); 
 											}
 											if ( defined( $use_modish->[$countop] )  and ( $action eq "use_modish" ) ) 
 											{ 
@@ -833,7 +945,7 @@ sub morph
 
 												use_modish
 												( $to, $stepsvar, $countop, 
-													$countstep, \@applytype, $use_modish, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline ); 
+													$countstep, \@applytype, $use_modish, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus ); 
 											
 
 
@@ -843,7 +955,7 @@ sub morph
 											{ 
 												export_toenergyplus
 												( $to, $stepsvar, $countop, 
-													$countstep, \@applytype, $export_toenergyplus, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline  ); 
+													$countstep, \@applytype, $export_toenergyplus, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, \@menus ); 
 											}
 										}
 									}
@@ -947,7 +1059,7 @@ sub morph
 															
 															my ( $v_ref ) = constrain_geometry
 															( $to, $stepsvar, $countop, 
-																$countstep, \@applytype, \@constrain_geometry, $countvar, $fileconfig, \@v_, $countmorphing, $exeonfiles, \@v_, $action, $newlaunchline ); 
+																$countstep, \@applytype, \@constrain_geometry, $countvar, $fileconfig, \@v_, $countmorphing, $exeonfiles, \@v_, $action, $newlaunchline, \@menus ); 
 															@v = @$v_ref;
 															@v_ = @$v__ref;
 														}
@@ -960,7 +1072,7 @@ sub morph
 																genprop ( $to_, $stepsvar_, $countop, $countstep_,
 																	\@applytype, $genchange, $countvar_, $fileconfig, $mypath, $file, $countmorphing, $action_,  
 																	$names_ref, $nums_ref, $newcontents_ref, $filecontents_ref, 
-																	$newfilecontents_ref, $newlaunchline );
+																	$newfilecontents_ref, $newlaunchline, \@menus );
 																	%nums = %$nums_ref;
 																	%names = %$names_ref;
 																	%newcontents = %$newcontents_ref;
@@ -972,7 +1084,7 @@ sub morph
 														{   
 															my ( $obs_ref, $obs__ref ) = constrain_obstructions
 															( $to, $stepsvar, $countop, 
-																$countstep, \@applytype, \@constrain_obstructions, $countvar, $fileconfig, $countmorphing, $exeonfiles, $obs_ref, $obs__ref, $action, $newlaunchline ); 
+																$countstep, \@applytype, \@constrain_obstructions, $countvar, $fileconfig, $countmorphing, $exeonfiles, $obs_ref, $obs__ref, $action, $newlaunchline, \@menus ); 
 																@obs = @$obs_ref;
 																@obs_ = @$obs__ref;
 														}
@@ -981,7 +1093,7 @@ sub morph
 														{ 
 															my ( $node_ref, $component_ref, $donode_ref, $docomponent_ref ) = constrain_net( $to, $stepsvar, $countop, 
 																$countstep, \@applytype, \@constrain_net, $countvar, $fileconfig, $countmorphing, $exeonfiles, $action,
-																$node_ref, $component_ref, $donode_ref, $docomponent_ref, $newlaunchline ); 
+																$node_ref, $component_ref, $donode_ref, $docomponent_ref, $newlaunchline, \@menus ); 
 																@node = @$node_ref;
 																@component = @$component_ref;
 																@donode = @$donode_ref;
@@ -993,7 +1105,7 @@ sub morph
 															my ( $loopcontrol_ref, $flowcontrol_ref, $new_loopcontrol_ref, $new_flowcontrol_ref ) = constrain_controls
 															( $to, $stepsvar, $countop, 
 																$countstep, \@applytype, \@constrain_controls, $countvar, $fileconfig, $countmorphing, $exeonfiles, $action, 
-																$loopcontrol_ref, $flowcontrol_ref, $new_loopcontrol_ref, $new_flowcontrol_ref, $newlaunchline  ); 
+																$loopcontrol_ref, $flowcontrol_ref, $new_loopcontrol_ref, $new_flowcontrol_ref, $newlaunchline, \@menus  ); 
 																@loopcontrol = @$loopcontrol_ref;
 																@flowcontrol = @$flowcontrol_ref;
 																@new_loopcontrol = @$new_loopcontrol_ref;
@@ -1004,35 +1116,35 @@ sub morph
 														{ 
 															apply_constraints
 															( $to, $stepsvar, $countop, 
-																$countstep, \@applytype, \@apply_constraints, $countvar, $fileconfig, $countmorphing, $newlaunchline  ); 
+																$countstep, \@applytype, \@apply_constraints, $countvar, $fileconfig, $countmorphing, $newlaunchline, \@menus ); 
 														}
 														
 														if ( defined( $pin_obstructions->[ $countop ] ) and ( $action eq "pin_obstructions" ) )
 														{   
 															pin_obstructions
 															( $to, $stepsvar, $countop, 
-																$countstep, \@applytype, $pin_obstructions, $countvar, $fileconfig, $mypath, $file, $countmorphing, $newlaunchline  ); 
+																$countstep, \@applytype, $pin_obstructions, $countvar, $fileconfig, $mypath, $file, $countmorphing, $newlaunchline, \@menus ); 
 														}
 														
 														if ( defined( $recalculatenet[$countop] ) and ( $action eq "recalculatenet" ) ) 
 														{ 
 															recalculatenet
 															( $to, $stepsvar, $countop, 
-																$countstep, \@applytype, \@recalculatenet, $countvar, $fileconfig, $countmorphing, $newlaunchline  ); 
+																$countstep, \@applytype, \@recalculatenet, $countvar, $fileconfig, $countmorphing, $newlaunchline, \@menus ); 
 														}
 														
 														if ( defined( $recalculateish->[$countop] ) and ( $action eq "recalculateish" ) ) 
 														{   say $tee "FOR $to CALLED \$recalculateish EX-POST " . dump( $recalculateish );
 															recalculateish
 															( $to, $stepsvar, $countop, 
-																$countstep, \@applytype, $recalculateish, $countvar, $fileconfig, $mypath, $file, $countmorphing, $newlaunchline  ); 
+																$countstep, \@applytype, $recalculateish, $countvar, $fileconfig, $mypath, $file, $countmorphing, $newlaunchline, \@menus ); 
 														}
 														
 														if ( defined( $daylightcalc->[$countop] )  and ( $action eq "daylightcalc" ) ) 
 														{   
 															daylightcalc
 															( $to, $stepsvar, $countop,  
-																$countstep, \@applytype, $filedf, \@daylightcalc, $countvar, $fileconfig, $countmorphing, $newlaunchline  ); 
+																$countstep, \@applytype, $filedf, \@daylightcalc, $countvar, $fileconfig, $countmorphing, $newlaunchline, \@menus ); 
 														}
 														
 
@@ -1040,13 +1152,13 @@ sub morph
 														{   say $tee "FOR $to CALLED \$use_modish EX-POST " . dump( $use_modish );
 															use_modish
 															( $to, $stepsvar, $countop, 
-																$countstep, \@applytype, $use_modish, $countvar, $fileconfig, $mypath, $file, $countmorphing, $newlaunchline ); 
+																$countstep, \@applytype, $use_modish, $countvar, $fileconfig, $mypath, $file, $countmorphing, $newlaunchline, \@menus ); 
 														}
 														if ( defined( $export_toenergyplus->[$countop] )  and ( $action eq "export_toenergyplus" ) ) 
 														{ 
 															export_toenergyplus
 															( $to, $stepsvar, $countop, 
-																$countstep, \@applytype, $export_toenergyplus, $countvar, $fileconfig, $mypath, $file, $countmorphing, $newlaunchline  ); 
+																$countstep, \@applytype, $export_toenergyplus, $countvar, $fileconfig, $mypath, $file, $countmorphing, $newlaunchline, \@menus ); 
 														}
 														
 													}                          
@@ -1352,10 +1464,14 @@ sub gatherseparators
 
 sub translate
 {
-	my ( $to, $stepsvar, $countop, $countstep, $swap, $translate, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline ) = @_;
+	my ( $to, $stepsvar, $countop, $countstep, $swap, $translate, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
 	my @applytype = @$swap;
 	my $zone_letter = $applytype[$countop][3];
-	
+
+	my @menus = @$menus_ref;
+	my %numvertmenu = %{ $menus[0] };
+	my %vertnummenu = %{ $menus[1] };
+
 	say $tee "Translating zones for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
 	if ( $stepsvar > 1 )
@@ -1463,14 +1579,15 @@ $printthis
 
 sub translate_surfaces
 {
-	my ( $to, $stepsvar, $countop, $countstep, $swap, $translate_surface, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline ) = @_; 
-	
-	
-	
+	my ( $to, $stepsvar, $countop, $countstep, $swap, $translate_surface, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_; 
 	
 	
 	my @applytype = @$swap; 
 	my $zone_letter = $applytype[$countop][3]; 
+
+	my @menus = @$menus_ref;
+	my %numvertmenu = %{ $menus[0] };
+	my %vertnummenu = %{ $menus[1] };
 	
 	say "Translating surfaces for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
@@ -1644,10 +1761,14 @@ $printthis";
 
 sub rotate_surface
 {
-	my ( $to, $stepsvar, $countop, $countstep, $applytyperef, $rotate_surface, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline ) = @_;
+	my ( $to, $stepsvar, $countop, $countstep, $applytyperef, $rotate_surface, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
 	
 	my @applytype = @$applytyperef;
 	my $zone_letter = $applytype[$countop][3];
+
+	my @menus = @$menus_ref;
+	my %numvertmenu = %{ $menus[0] };
+	my %vertnummenu = %{ $menus[1] };
 	
 	say "Rotating surfaces for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 	
@@ -1731,10 +1852,15 @@ $printthis";
 
 sub translate_vertices
 {
-	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $translate_vertices_ref, $countvar, $fileconfig , $mypath, $file, $countmorphing, $launchline ) = @_;
+	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $translate_vertices_ref, $countvar, $fileconfig , $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
 	
 	my @applytype = @$applytype_ref;
 	my @translate_vertices = @$translate_vertices_ref; 
+
+	my @menus = @$menus_ref;
+	my %numvertmenu = %{ $menus[0] };
+	my %vertnummenu = %{ $menus[1] };
+
 	say "Translating vertices for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 	my @v;
 	my @verts_to_transl = @{ $translate_vertices[$countop][0] }; 
@@ -1754,27 +1880,7 @@ sub translate_vertices
 	my $countlines = 0;
 	my $countvert = 0;
 
-	my %verts = ( "a" => 1, "b" => 2, "c" => 3, "d" => 4, "e" => 5, "f" => 6, "g" => 7, "h" => 8, "i" => 9, "j" => 10, "k" => 11, "l" => 12, 
-	"m" => 13, "n" => 14, "o" => 15, "p" => 16, 
-	"0\nq" => 17, "0\nr" => 18, "0\ns" => 19, "0\nt" => 20, "0\nu" => 21, "0\nv" => 22, "0\nw" => 23, "0\nx" => 24, "0\ny" => 25, "0\nz" => 26, 
-	"0\na" => 27, "0\nb" => 28, "0\nc" => 29, "0\nd" => 30, "0\ne" => 31, 
-	"0\n0\nb\nf" => 32, "0\n0\nb\ng" => 33, "0\n0\nb\nh" => 34, "0\n0\nb\ni" => 35, "0\n0\nb\nj" => 36, "0\n0\nb\nk" => 37, "0\n0\nb\nl" => 38, 
-	"0\n0\nb\nm" => 39, "0\n0\nb\nn" => 40, "0\n0\nb\no" => 41, "0\n0\nb\np" => 42, "0\n0\nb\nq" => 43, "0\n0\nb\nr" => 44, "0\n0\nb\ns" => 45, 
-	"0\n0\nb\nt" => 46, 
-	"0\n0\nb\n0\nb\nu" => 47, "0\n0\nb\n0\nb\nv" => 48, "0\n0\nb\n0\nb\nw" => 49, "0\n0\nb\n0\nc\nx" => 50, "0\n0\nb\n0\nb\ny" => 51, "0\n0\nc0\nc\nz" => 52, 
-	"0\n0\nb\n0\nb\na" => 53, "0\n0\nb\n0\nb\nb" => 54, "0\n0\nb\n0\nb\nc" => 55, "0\n0\nb\n0\nb\nd" => 56, "0\n0\nb\n0\nb\ne" => 57, "0\n0\nc0\nc\nf" => 58, 
-	"0\n0\nb\n0\nb\ng" => 59, "0\n0\nb\n0\nb\nh" => 60, "0\n0\nb\n0\nb\ni" => 61, 
-	"0\n0\nb\n0\nb\n0\nb\nj" => 62, "0\n0\nb\n0\nb\n0\nb\nk" => 63, "0\n0\nb\n0\nb\n0\nb\nl" => 64, "0\n0\nb\n0\nb0\nb\nm" => 65, "0\n0\nc0\nb\n0\nb\nn" => 66, 
-	"0\n0\nb\n0\nb\n0\nb\no" => 67, "0\n0\nb\n0\nb\n0\nb\np" => 68, "0\n0\nb\n0\nb\n0\nb\nq" => 69, "0\n0\nb\n0\nb\n0\nb\nr" => 70, "0\n0\nb\n0\nb\n0\nb\ns" => 71, 
-	"0\n0\nb\n0\nb\n0\nb\nt" => 72, "0\n0\nb\n0\nb\n0\nb\nu" => 73, "0\n0\nb\n0\nc0\nb\nv" => 74, "0\n0\nb\n0\nb\n0\nb\nw" => 75, "0\n0\nb\n0\nb\n0\nb\nx" => 76, 
-	"0\n0\nb\n0\nb\n0\nb\n0\nb\ny" => 77, "0\n0\nb\n0\nb\n0\nb\n0\nb\nz" => 78, "0\n0\nb\n0\nb\n0\nb\n0\nb\na" => 79, "0\n0\nb\n0\nb\n0\nb\n0\nb\nb" => 80, 
-	"0\n0\nb\n0\nb\n0\nb\n0\nb\nc" => 81, "0\n0\nb\n0\nb\n0\nb\n0\nb\nd" => 82, "0\n0\nb\n0\nb\n0\nb\n0\nb\ne" => 83, "0\n0\nb\n0\nb\n0\nb\n0\nb\nf" => 84, 
-	"0\n0\nb\n0\nb\n0\nb\n0\nb\ng" => 85, "0\n0\nb\n0\nb\n0\nb\n0\nb\n\nh" => 86, "0\n0\nb\n0\nb\n0\nb\n0\nb\ni" => 87, "0\n0\nb\n0\nb\n0\nb\n0\nb\nj" => 88, 
-	"0\n0\nb\n0\nb\n0\nb\n0\nb\nk" => 89, "0\n0\nb\n0\nb\n0\nb\n0\nb\nl" => 90, "0\n0\nb\n0\nb\n0\nb\n0\nb\nm" => 91, 
-	"0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nn" => 92, "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\no" => 93, "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\np" => 94, "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nq" => 95, 
-	"0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nr" => 96, "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\ns" => 97, "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nt" => 98, "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nu" => 99, 
-	"0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nv" => 100, "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nw" => 101, "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nx" => 102, "0\n0\nc0\nc0\nc0\nc0\nc\ny" => 103, 
-	"0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nz" => 104 );
+	my %verts = %vertnummenu;
 
 	foreach my $vert ( @verts_to_transl )
 		{
@@ -1900,10 +2006,14 @@ $printthis";
 
 sub shift_vertices
 {
-	my ( $to, $stepsvar, $countop, $countstep, $swap, $shift_vertices, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline ) = @_;
+	my ( $to, $stepsvar, $countop, $countstep, $swap, $shift_vertices, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
 	
 	my @applytype = @$swap;
 	my $zone_letter = $applytype[$countop][3];
+
+	my @menus = @$menus_ref;
+	my %numvertmenu = %{ $menus[0] };
+	my %vertnummenu = %{ $menus[1] };
 	
 	say "Shifting vertices for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
@@ -2031,9 +2141,14 @@ $printthis";
 
 sub rotate    # generic zone rotation
 {
-	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $rotate, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline ) = @_;
+	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $rotate, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
+
 	my @applytype = @$applytype_ref; 
 	my $zone_letter = $applytype[$countop][3]; 
+
+	my @menus = @$menus_ref;
+	my %numvertmenu = %{ $menus[0] };
+	my %vertnummenu = %{ $menus[1] };
 	
 	say "Rotating zones for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
@@ -2112,10 +2227,14 @@ $printthis
 
 sub rotatez # PUT THE ROTATION POINT AT POINT 0, 0, 0. I HAVE NOT YET MADE THE FUNCTION GENERIC ENOUGH.
 {  
-	my ( $to, $stepsvar, $countop, $countstep, $swap, $rotatez, $countvar, $fileconfig, $countmorphing, $launchline ) = @_;
+	my ( $to, $stepsvar, $countop, $countstep, $swap, $rotatez, $countvar, $fileconfig, $countmorphing, $launchline, $menus_ref ) = @_;
 	
 	my @applytype = @$swap;
 	my $zone_letter = $applytype[$countop][3];
+
+	my @menus = @$menus_ref;
+	my %numvertmenu = %{ $menus[0] };
+	my %vertnummenu = %{ $menus[1] };
 	
 	say "Rotating zones on the vertical plane for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
@@ -2273,10 +2392,14 @@ sub rotatez # PUT THE ROTATION POINT AT POINT 0, 0, 0. I HAVE NOT YET MADE THE F
 
 sub reassign_construction
 {
-	my ( $to, $stepsvar, $countop, $countstep, $swap, $construction_reassignment, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline ) = @_;
+	my ( $to, $stepsvar, $countop, $countstep, $swap, $construction_reassignment, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
 	
 	my @applytype = @$swap;
 	my $zone_letter = $applytype[$countop][3];
+
+	my @menus = @$menus_ref;
+	my %numvertmenu = %{ $menus[0] };
+	my %vertnummenu = %{ $menus[1] };
 	
 	say "Reassign construction solutions for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
@@ -2335,8 +2458,12 @@ $printthis";
 					
 sub change_thickness
 {
-	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $thickness_change, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline ) = @_;
+	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $thickness_change, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
 	my @applytype = @$applytype_ref; 
+
+	my @menus = @$menus_ref;
+	my %numvertmenu = %{ $menus[0] };
+	my %vertnummenu = %{ $menus[1] };
 
 	say "Changing thicknesses in construction layer for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
@@ -2417,15 +2544,7 @@ sub readobsfile
 
 	my $countelt = 0;
 	my %obs_letter = ( 
-				1 => "e", 2 => "f", 3 => "g", 4 => "h", 5 => "i", 6 => "j", 7 => "k", 8 => "l", 9 => "m", 10 => "n", 11 => "o", 
-				12 => "0\no", 13 => "0\np", 14 => "0\nq", 15 => "0\nr", 16 => "0\ns", 17 => "0\nt", 18 => "0\nu", 19 => "0\nv", 20 => "0\nw", 21 => "0\nx", 22 => "0\ny", 
-				23 => "0\n0\nb\ny", 24 => "0\n0\nb\nz", 25 => "0\n0\nb\na", 26 => "0\n0\nb\nb", 27 => "0\n0\nb\nc", 28 => "0\n0\nb\nd", 
-				29 => "0\n0\nb\ne", 30 => "0\n0\nb\nf", 31 => "0\n0\nb\ng", 32 => "0\n0\nb\nh", 33 => "0\n0\nb\ni",
-				34 => "0\n0\nb\n0\nb\ni", 35 => "0\n0\nb\n0\nb\nj", 36 => "0\n0\nb\n0\nb\nk", 37 => "0\n0\nb\n0\nb\nl", 38 => "0\n0\nb\n0\nb\nm", 39 => "0\n0\nb\n0\nb\nn", 
-				40 => "0\n0\nb\n0\nb\no", 41 => "0\n0\nb\n0\nb\np", 42 => "0\n0\nb\n0\nb\nq", 43 => "0\n0\nb\n0\nb\nr", 44 => "0\n0\nb\n0\nb\ns",
-				45 => "0\n0\nb\n0\nb\n0\nb\ns", 46 => "0\n0\nb\n0\nb\n0\nb\nt", 47 => "0\n0\nb\n0\nb\n0\nb\nv", 48 => "0\n0\nb\n0\nb\n0\nb\nw", 49 => "0\n0\nb\n0\nb\n0\nb\nx", 50 => "0\n0\nb\n0\nb\n0\nb\ny", 
-				51 => "0\n0\nb\n0\nb\n0\nb\nz", 52 => "0\n0\nb\n0\nb\n0\nb\na", 53 => "0\n0\nb\n0\nb\n0\nb\nb", 54 => "0\n0\nb\n0\nb\n0\nb\nc", 55 => "0\n0\nb\n0\nb\n0\nb\nd",
-			); # RE-CHECK
+				1 => "e", 2 => "f", 3 => "g", 4 => "h", 5 => "i", 6 => "j", 7 => "k", 8 => "l", 9 => "m", 10 => "n", 11 => "o" ); # RE-CHECK
 		
 	my %obsts;
 
@@ -2452,9 +2571,14 @@ sub readobsfile
 sub obs_modify
 {
 	
-	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $obs_modify_ref, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline ) = @_;
+	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $obs_modify_ref, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
 	my @applytype = @$applytype_ref; #say $tee "\@applytype : " . dump( @applytype );
 	my $zone_letter = $applytype[$countop][3]; #say $tee "\$zone_letter : " . dump( $zone_letter );
+
+	my @menus = @$menus_ref;
+	my %numvertmenu = %{ $menus[0] };
+	my %vertnummenu = %{ $menus[1] };
+
 	say $tee "Modifying obstructions for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";    
 	my $case_cycle_ref = $obs_modify_ref->[$countop]; #say $tee "\$case_cycle_ref : " . dump( $case_cycle_ref );
 	my @case_cycle = @$case_cycle_ref; #say $tee "\@case_cycle : " . dump( @case_cycle );
@@ -2857,11 +2981,15 @@ $printthis";
 
 sub recalculateish
 {   
-	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $recalculateish_ref, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline ) = @_;
+	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $recalculateish_ref, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
 	
 	my @applytype = @$applytype_ref;
 	my $zone_letter = $applytype[$countop][3]; 
 	my $recalculateish = $recalculateish_ref->[ $countop ]; 
+
+	my @menus = @$menus_ref;
+	my %numvertmenu = %{ $menus[0] };
+	my %vertnummenu = %{ $menus[1] };
 	
 	unless ( ( "$^O" eq "MSWin32" ) or ( "$^O" eq "MSWin64" ) ) 
 	{
@@ -2911,11 +3039,15 @@ sub ifempty
 										
 sub daylightcalc # IT WORKS ONLY IF THE "RAD" DIRECTORY IS EMPTY
 {
-	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $filedf, $swap2, $countvar, $fileconfig, $countmorphing, $launchline ) = @_;
+	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $filedf, $swap2, $countvar, $fileconfig, $countmorphing, $launchline, $menus_ref ) = @_;
 	
 	my @applytype = @$applytype_ref;
 	my $zone_letter = $applytype[$countop][3];
 	my @daylightcalc = @$swap2;
+
+	my @menus = @$menus_ref;
+	my %numvertmenu = %{ $menus[0] };
+	my %vertnummenu = %{ $menus[1] };
 	
 	say $tee "Performing daylight calculations through Radiance for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
@@ -3134,11 +3266,15 @@ $printthis";
 
 sub change_config
 {
-	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $change_config_ref, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline ) = @_;
+	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $change_config_ref, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
 	
 	my @applytype = @$applytype_ref;
 	my $zone_letter = $applytype[$countop][3];
 	my @change_config = @$change_config_ref;
+
+	my @menus = @$menus_ref;
+	my %numvertmenu = %{ $menus[0] };
+	my %vertnummenu = %{ $menus[1] };
 	
 	say $tee "Substituting a configuration file for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
@@ -3209,15 +3345,16 @@ sub checkfile # THIS CHECKS IF A SOURCE FILE MUST BE SUBSTITUTED BY ANOTHER ONE.
 
 sub change_climate ### THIS SIMPLE SCRIPT HAS TO BE DEBUGGED. WHY DOES IT BLOCK ITSELF IF PRINTED TO THE SHELL?
 {  # THIS FUNCTION CHANGES THE CLIMATE FILES. 
-	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $change_climate_ref, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline ) = @_;
-	
-	
-	
-	
+	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $change_climate_ref, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
+
 	
 	
 	my @applytype = @{ $applytype_ref }; 
 	my $zone_letter = $applytype[$countop][3]; 
+
+	my @menus = @$menus_ref;
+	my %numvertmenu = %{ $menus[0] };
+	my %vertnummenu = %{ $menus[1] };
 	
 	my @change_climates = @{ $change_climate_ref }; 
 	
@@ -3289,11 +3426,15 @@ $printthis";
 	
 sub recalculatenet # THIS FUNCTION HAS BEEN OUTDATED BY THOSE FOR CONSTRAINING THE NETS, BELOW, BUT WORKS AND IS SIMPLER
 {
-	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $recalculatenet_ref, $countvar, $fileconfig, $countmorphing, $launchline ) = @_;
+	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $recalculatenet_ref, $countvar, $fileconfig, $countmorphing, $launchline, $menus_ref ) = @_;
 	
 	my @applytype = @$applytype_ref;
 	my $zone_letter = $applytype[$countop][3];
 	my @recalculatenet = @{ $recalculatenet_ref->[ $countop ] };
+
+	 my @menus = @$menus_ref;
+	my %numvertmenu = %{ $menus[0] };
+	my %vertnummenu = %{ $menus[1] };
 	
 	say $tee "Adequating the ventilation network for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 	
@@ -3412,12 +3553,12 @@ sub recalculatenet # THIS FUNCTION HAS BEEN OUTDATED BY THOSE FOR CONSTRAINING T
 	my @letters = ( 
 	"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", 
 	"0\nr", "0\ns", "0\nt", "0\nu", "0\nv", "0\nw", "0\nx", "0\ny", "0\nz", "0\nz", "0\na", "0\nb", "0\nc", "0\nd", "0\ne", "0\nf",  "0\ng", "0\nh", 
-	"0\n0\nb\nh", "0\n0\nb\ni", "0\n0\nb\nj", "0\n0\nb\nk", "0\n0\nb\nl", "0\n0\nb\nm", "0\n0\nb\nn", "0\n0\nb\no", "0\n0\nb\np", "0\n0\nb\nq", "0\n0\nb\nr", 
-	"0\n0\nb\ns", "0\n0\nb\nt", "0\n0\nb\nu", "0\n0\nb\nv", "0\n0\nb\nw", "0\n0\nb\nx", "0\n0\nb\ny",
-	"0\n0\nb\n0\nb\ny", "0\n0\nb\n0\nb\nz", "0\n0\nb\n0\nb\na", "0\n0\nb\n0\nb\nb", "0\n0\nb\n0\nb\nc", "0\n0\nb\n0\nb\nd", "0\n0\nb\n0\nb\ne", "0\n0\nb\n0\nb\nf", "0\n0\nb\n0\nb\ng", "0\n0\nb\n0\nb\nh", "0\n0\nb\n0\nb\ni", "0\n0\nb\n0\nb\nj", 
-	"0\n0\nb\n0\nb\nk", "0\n0\nb\n0\nb\nl", "0\n0\nb\n0\nb\nm", "0\n0\nb\n0\nb\nn", "0\n0\nb\n0\nb\no", "0\n0\nb\n0\nb\np", 
-	"0\n0\nb\n0\nb\n0\nb\np", "0\n0\nb\n0\nb\n0\nb\nq", "0\n0\nb\n0\nb\n0\nb\nr", "0\n0\nb\n0\nb\n0\nb\ns", "0\n0\nb\n0\nb\n0\nb\nt", "0\n0\nb\n0\nb\n0\nb\nu", "0\n0\nb\n0\nb\n0\nb\nv", "0\n0\nb\n0\nb\n0\nb\nw", "0\n0\nb\n0\nb\n0\nb\nx", "0\n0\nb\n0\nb\n0\nb\ny", "0\n0\nb\n0\nb\n0\nb\nz", "0\n0\nb\n0\nb\n0\nb\na", "0\n0\nb\n0\nb\n0\nb\nb", 
-	"0\n0\nb\n0\nb\n0\nb\nc", "0\n0\nb\n0\nb\n0\nb\nd", "0\n0\nb\n0\nb\n0\nb\ne", "0\n0\nb\n0\nb\n0\nb\nf", "0\n0\nb\n0\nb\n0\nb\ng"
+	"0\n0\nc\nh", "0\n0\nc\ni", "0\n0\nc\nj", "0\n0\nc\nk", "0\n0\nc\nl", "0\n0\nc\nm", "0\n0\nc\nn", "0\n0\nc\no", "0\n0\nc\np", "0\n0\nc\nq", "0\n0\nc\nr", 
+	"0\n0\nc\ns", "0\n0\nc\nt", "0\n0\nc\nu", "0\n0\nc\nv", "0\n0\nc\nw", "0\n0\nc\nx", "0\n0\nc\ny",
+	"0\n0\nc\n0\nc\ny", "0\n0\nc\n0\nc\nz", "0\n0\nc\n0\nc\na", "0\n0\nc\n0\nc\nb", "0\n0\nc\n0\nc\nc", "0\n0\nc\n0\nc\nd", "0\n0\nc\n0\nc\ne", "0\n0\nc\n0\nc\nf", "0\n0\nc\n0\nc\ng", "0\n0\nc\n0\nc\nh", "0\n0\nc\n0\nc\ni", "0\n0\nc\n0\nc\nj", 
+	"0\n0\nc\n0\nc\nk", "0\n0\nc\n0\nc\nl", "0\n0\nc\n0\nc\nm", "0\n0\nc\n0\nc\nn", "0\n0\nc\n0\nc\no", "0\n0\nc\n0\nc\np", 
+	"0\n0\nc\n0\nc\n0\nc\np", "0\n0\nc\n0\nc\n0\nc\nq", "0\n0\nc\n0\nc\n0\nc\nr", "0\n0\nc\n0\nc\n0\nc\ns", "0\n0\nc\n0\nc\n0\nc\nt", "0\n0\nc\n0\nc\n0\nc\nu", "0\n0\nc\n0\nc\n0\nc\nv", "0\n0\nc\n0\nc\n0\nc\nw", "0\n0\nc\n0\nc\n0\nc\nx", "0\n0\nc\n0\nc\n0\nc\ny", "0\n0\nc\n0\nc\n0\nc\nz", "0\n0\nc\n0\nc\n0\nc\na", "0\n0\nc\n0\nc\n0\nc\nb", 
+	"0\n0\nc\n0\nc\n0\nc\nc", "0\n0\nc\n0\nc\n0\nc\nd", "0\n0\nc\n0\nc\n0\nc\ne", "0\n0\nc\n0\nc\n0\nc\nf", "0\n0\nc\n0\nc\n0\nc\ng"
 	); # RE-CHECK
 	
 	my $countnode = 0;
@@ -3630,9 +3771,14 @@ YYY
 sub pin_obstructions
 {
 	#use strict; use warnings;
-	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $pin_obstructions_ref, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline ) = @_;
+	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $pin_obstructions_ref, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
 	my @applytype = @$applytype_ref;
 	my $zone_letter = $applytype[$countop][3]; 
+
+	my @menus = @$menus_ref;
+	my %numvertmenu = %{ $menus[0] };
+	my %vertnummenu = %{ $menus[1] };
+
 	my @pin_obstructions = @{ $pin_obstructions_ref->[ $countop ] }; 
 	my $sourcefile = shift( @pin_obstructions ); 
 	my $sourcepath = $mypath . "/" . $file . $sourcefile; 
@@ -3693,10 +3839,15 @@ sub pin_obstructions
 sub apply_constraints
 { #DDD
 
-	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $apply_constraints_ref, $countvar, $fileconfig , $mypath, $file, $countmorphing, $launchline ) = @_;
+	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $apply_constraints_ref, $countvar, $fileconfig , $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
 	
 	my @applytype = @$applytype_ref;
 	my @apply_constraints = @$apply_constraints_ref; 
+
+	my @menus = @$menus_ref;
+	my %numvertmenu = %{ $menus[0] };
+	my %vertnummenu = %{ $menus[1] };
+
 	say "Applying constraints for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
 	my @sourcefiles = @{ $apply_constraints[$countop][0] }; #say $tee "\@sourcefiles: " . dump( @sourcefiles );
@@ -3708,36 +3859,7 @@ sub apply_constraints
     #say $tee "\$countstep: " . dump( $countstep );
 	#say TOFILE "TO: " . dump( $to );
 
-	my %verts = ( 1 => "a", 2 => "b", 3 => "c", 4 => "d", 5 => "e", 6 => "f", 7 => "g", 
-	8 => "h", 9 => "i", 10 => "j", 11 => "k", 12 => "l", 
-	13 => "m", 14 => "n", 15 => "o", 16 => "p", 17 => "0\nq", 18 => "0\nr", 19 => "0\ns", 
-	20 => "0\nt", 		21 => "0\nu", 22 => "0\nv", 23 => "0\nw", 24 => "0\nx", 25 => "0\ny", 
-	26 => "0\nz", 27 => "0\na", 28 => "0\nb", 29 => "0\nc", 30 => "0\nd", 31 => "0\ne", 
-	32 => "0\n0\nb\nf", 33 => "0\n0\nb\ng", 34 => "0\n0\nb\nh", 35 => "0\n0\nb\ni", 36 => "0\n0\nb\nj", 
-	37 => "0\n0\nb\nk", 38 => "0\n0\nb\nl", 39 => "0\n0\nb\nm", 40 => "0\n0\nb\nn", 41 => "0\n0\nb\no", 
-	42 => "0\n0\nb\np", 43 => "0\n0\nb\nq", 44 => "0\n0\nb\nr", 45 => "0\n0\nb\ns", 46 => "0\n0\nb\nt", 
-	47 => "0\nu", 48 => "0\n0\ncv", 49 => "0\n0\ncw", 50 => "0\n0\ncx", 
-	51 => "0\n0\nb\n0\nb\ny", 52 => "0\n0\nb\n0\nb\nz", 
-	53 => "0\n0\nb\n0\nb\na", 54 => "0\n0\nb\n0\nb\nb", 55 => "0\n0\nb\n0\nb\nc", 56 => "0\n0\nb\n0\nb\nd", 
-	57 => "0\n0\nce", 58 => "0\n0\ncf", 
-	59 => "0\n0\nb\n0\nb\ng", 60 => "0\n0\nb\n0\nb\nh", 61 => "0\n0\nb\n0\nb\ni", 
-	62 => "0\n0\nb\n0\nb\n0\nb\nj", 63 => 63, 64 => "0\n0\nb\n0\nb\n0\nb\nl", 
-	65 => "0\n0\nb\n0\nb\n0\nb\nm", 66 => "0\n0\nb\n0\nb\n0\nb\nn", 
-	67 => "0\n0\nb\n0\nb\n0\nb\no", 68 => "0\n0\nb\n0\nb\n0\nb\np", 69 => "0\n0\nb\n0\nb\n0\nb\nq", 
-	70 => "0\n0\nb\n0\nb\n0\nb\nr", 71 => "0\n0\nb\n0\nb\n0\nb\ns", 
-	72 => "0\n0\nb\n0\nb\n0\nb\nt", 73 => "0\n0\nb\n0\nb\n0\nb\nu", 74 => "0\n0\nb\n0\nb\n0\nb\nv", 
-	75 => "0\n0\nb\n0\nb\n0\nb\nw", 76 => "0\n0\nb\n0\nb\n0\nb\nx", 
-	77 => "0\n0\nb\n0\nb\n0\nb\n0\nb\ny", 78 => "0\n0\nb\n0\nb\n0\nb\n0\nb\nz", 79 => "0\n0\nb\n0\nb\n0\nb\n0\nb\na", 
-	80 => "0\n0\nb\n0\nb\n0\nb\n0\nb\nb", 81 => "0\n0\nb\n0\nb\n0\nb\n0\nb\nc", 82 => "0\n0\nb\n0\nb\n0\nb\n0\nb\nd", 
-	83 => "0\n0\nb\n0\nb\n0\nb\n0\nb\ne", 84 => "0\n0\nb\n0\nb\n0\nb\n0\nb\nf", 85 => "0\n0\nb\n0\nb\n0\nb\n0\nb\ng", 
-	86 => "0\n0\nb\n0\nb\n0\nb\n0\nb\nh", 87 => "0\n0\nb\n0\nb\n0\nb\n0\nb\ni", 88 => "0\n0\nb\n0\nb\n0\nb\n0\nb\nj", 
-	89 => "0\n0\nb\n0\nb\n0\nb\n0\nb\nk", 90 => "0\n0\nb\n0\nb\n0\nb\n0\nb\nl", 91 => "0\n0\nb\n0\nb\n0\nb\n0\nb\nm", 
-	92 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nn", 93 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\no", 
-	94 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\np", 95 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nq", 
-	96 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nr", 97 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\ns", 
-	98 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nt", 99 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nu", 
-	100 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nv", 101 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nw", 
-	102 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\nx", 103 => "0\n0\nb\n0\nb\n0\nb\n0\nb\n0\nb\ny", );
+	my %verts = %numvertmenu;
 
 
 	my %zones = ( 1 => "a", 2 => "b", 3 => "c", 4 => "d", 5 => "e", 6 => "f", 7 => "g", 
@@ -3756,17 +3878,17 @@ sub apply_constraints
 	8 => "l", 9 => "m", 10 => "n", 11 => "o", 12 => "0\no", 13 => "0\np", 
 	14 => "0\nq", 15 => "0\nr", 16 => "0\ns", 
 	17 => "0\nt", 18 => "0\nu", 19 => "0\nv", 20 => "0\nw", 21 => "0\nx", 22 => "0\ny", 
-	23 => "0\n0\nb\ny", 24 => "0\n0\nb\nz", 25 => "0\n0\nb\na", 26 => "0\n0\nb\nb", 
-	27 => "0\n0\nb\nc", 28 => "0\n0\nb\nd", 29 => "0\n0\nb\ne", 30 => "0\n0\nb\nf", 
-	31 => "0\n0\nb\ng", 32 => "0\n0\nb\nh", 33 => "0\n0\nb\ni",
-	34 => "0\n0\nb\n0\nb\ni", 35 => "0\n0\nb\n0\nb\nj", 36 => "0\n0\nb\n0\nb\nk", 
-	37 => "0\n0\nb\n0\nb\nl", 38 => "0\n0\nb\n0\nb\nm", 39 => "0\n0\nb\n0\nb\nn", 
-	40 => "0\n0\nb\n0\nb\no", 41 => "0\n0\nb\n0\nb\np", 42 => "0\n0\nb\n0\nb\nq", 
-	43 => "0\n0\nb\n0\nb\nr", 44 => "0\n0\nb\n0\nb\ns", 
-	45 => "0\n0\nb\n0\nb\n0\nb\ns", 46 => "0\n0\nb\n0\nb\n0\nb\nt", 47 => "0\n0\nb\n0\nb\n0\nb\nu", 
-	48 => "0\n0\nb\n0\nb\n0\nb\nvs", 49 => "0\n0\nb\n0\nb\n0\nb\nw", 50 => "0\n0\nb\n0\nb\n0\nb\nx", 
-	51 => "0\n0\nb\n0\nb\n0\nb\ny", 52 => "0\n0\nb\n0\nb\n0\nb\nz", 53 => "0\n0\nb\n0\nb\n0\nb\na", 
-	54 => "0\n0\nb\n0\nb\n0\nb\nb", 55 => "0\n0\nb\n0\nb\n0\nb\nc" );
+	23 => "0\n0\nc\ny", 24 => "0\n0\nc\nz", 25 => "0\n0\nc\na", 26 => "0\n0\nc\nb", 
+	27 => "0\n0\nc\nc", 28 => "0\n0\nc\nd", 29 => "0\n0\nc\ne", 30 => "0\n0\nc\nf", 
+	31 => "0\n0\nc\ng", 32 => "0\n0\nc\nh", 33 => "0\n0\nc\ni",
+	34 => "0\n0\nc\n0\nc\ni", 35 => "0\n0\nc\n0\nc\nj", 36 => "0\n0\nc\n0\nc\nk", 
+	37 => "0\n0\nc\n0\nc\nl", 38 => "0\n0\nc\n0\nc\nm", 39 => "0\n0\nc\n0\nc\nn", 
+	40 => "0\n0\nc\n0\nc\no", 41 => "0\n0\nc\n0\nc\np", 42 => "0\n0\nc\n0\nc\nq", 
+	43 => "0\n0\nc\n0\nc\nr", 44 => "0\n0\nc\n0\nc\ns", 
+	45 => "0\n0\nc\n0\nc\n0\nc\ns", 46 => "0\n0\nc\n0\nc\n0\nc\nt", 47 => "0\n0\nc\n0\nc\n0\nc\nu", 
+	48 => "0\n0\nc\n0\nc\n0\nc\nvs", 49 => "0\n0\nc\n0\nc\n0\nc\nw", 50 => "0\n0\nc\n0\nc\n0\nc\nx", 
+	51 => "0\n0\nc\n0\nc\n0\nc\ny", 52 => "0\n0\nc\n0\nc\n0\nc\nz", 53 => "0\n0\nc\n0\nc\n0\nc\na", 
+	54 => "0\n0\nc\n0\nc\n0\nc\nb", 55 => "0\n0\nc\n0\nc\n0\nc\nc" );
 
 	my %nodes = ( 1 => "a", 2 => "b", 3 => "c", 4 => "d", 5 => "e", 6 => "f", 7 => "g", 
 	8 => "h", 9 => "i", 10 => "j", 11 => "k", 12 => "l", 
@@ -4324,11 +4446,15 @@ $printthis";
 
 sub reshape_windows # IT APPLIES CONSTRAINTS
 {
-	my ( $to, $stepsvar, $countop, $countstep, $swap, $swap2, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline ) = @_;
+	my ( $to, $stepsvar, $countop, $countstep, $swap, $swap2, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
 	
 	my @applytype = @$swap;
 	my $zone_letter = $applytype[$countop][3];
 	my @reshape_windows = @$swap2;
+
+	my @menus = @$menus_ref;
+	my %numvertmenu = %{ $menus[0] };
+	my %vertnummenu = %{ $menus[1] };
 	
 	say $tee "Reshaping windows for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
@@ -4413,12 +4539,12 @@ sub reshape_windows # IT APPLIES CONSTRAINTS
 			my @vertexletters = (
 			"a",   "b",   "c",   "d",   "e",   "f",   "g",   "h",   "i",   "j",   "k",   "l",   "m",   "n",   "o",   "p", 
 			"0\np", "0\nq", "0\nr", "0\ns", "0\nt", "0\nu", "0\nv", "0\nw", "0\nx", "0\ny", "0\nz", "0\na", "0\nb",  "0\nc",  "0\nd",  "0\ne",
-			"0\n0\nb\ne", "0\n0\nb\nf", "0\n0\nb\ng", "0\n0\nb\nh", "0\n0\nb\ni", "0\n0\nb\nj", "0\n0\nb\nk", "0\n0\nb\nl", 
-			"0\n0\nb\nm", "0\n0\nb\nn", "0\n0\nb\no", "0\n0\nb\np", "0\n0\nb\nq", "0\n0\nb\nr", "0\n0\nb\ns", "0\n0\nb\nt", 
-			"0\n0\nb\n0\nb\nt", "0\n0\nb\n0\nb\nu", "0\n0\nb\n0\nb\nv", "0\n0\nb\n0\nb\nw", "0\n0\nb\n0\nb\nx", "0\n0\nb\n0\nb\ny", "0\n0\nb\n0\nb\nz", "0\n0\nb\n0\nb\na", 
-			"0\n0\nb\n0\nb\nb", "0\n0\nb\n0\nb\nc", "0\n0\nb\n0\nb\nd", "0\n0\nb\n0\nb\ne", "0\n0\nb\n0\nb\nf", "0\n0\nb\n0\nb\ng", "0\n0\nb\n0\nb\nh", "0\n0\nb\n0\nb\ni", 
-			"0\n0\nb\n0\nb\n0\nb\ni", "0\n0\nb\n0\nb\n0\nb\nj", "0\n0\nb\n0\nb\n0\nb\nk", "0\n0\nb\n0\nb\n0\nb\nl", "0\n0\nb\n0\nb\n0\nb\nm", "0\n0\nb\n0\nb\n0\nb\nn", "0\n0\nb\n0\nb\n0\nb\no", "0\n0\nb\n0\nb\n0\nb\np", 
-			"0\n0\nb\n0\nb\n0\nb\nq", "0\n0\nb\n0\nb\n0\nb\nr", "0\n0\nb\n0\nb\n0\nb\ns", "0\n0\nb\n0\nb\n0\nb\nt", "0\n0\nb\n0\nb\n0\nb\nu", "0\n0\nb\n0\nb\n0\nb\nv", "0\n0\nb\n0\nb\n0\nb\nw", "0\n0\nb\n0\nb\n0\nb\nx"
+			"0\n0\nc\ne", "0\n0\nc\nf", "0\n0\nc\ng", "0\n0\nc\nh", "0\n0\nc\ni", "0\n0\nc\nj", "0\n0\nc\nk", "0\n0\nc\nl", 
+			"0\n0\nc\nm", "0\n0\nc\nn", "0\n0\nc\no", "0\n0\nc\np", "0\n0\nc\nq", "0\n0\nc\nr", "0\n0\nc\ns", "0\n0\nc\nt", 
+			"0\n0\nc\n0\nc\nt", "0\n0\nc\n0\nc\nu", "0\n0\nc\n0\nc\nv", "0\n0\nc\n0\nc\nw", "0\n0\nc\n0\nc\nx", "0\n0\nc\n0\nc\ny", "0\n0\nc\n0\nc\nz", "0\n0\nc\n0\nc\na", 
+			"0\n0\nc\n0\nc\nb", "0\n0\nc\n0\nc\nc", "0\n0\nc\n0\nc\nd", "0\n0\nc\n0\nc\ne", "0\n0\nc\n0\nc\nf", "0\n0\nc\n0\nc\ng", "0\n0\nc\n0\nc\nh", "0\n0\nc\n0\nc\ni", 
+			"0\n0\nc\n0\nc\n0\nc\ni", "0\n0\nc\n0\nc\n0\nc\nj", "0\n0\nc\n0\nc\n0\nc\nk", "0\n0\nc\n0\nc\n0\nc\nl", "0\n0\nc\n0\nc\n0\nc\nm", "0\n0\nc\n0\nc\n0\nc\nn", "0\n0\nc\n0\nc\n0\nc\no", "0\n0\nc\n0\nc\n0\nc\np", 
+			"0\n0\nc\n0\nc\n0\nc\nq", "0\n0\nc\n0\nc\n0\nc\nr", "0\n0\nc\n0\nc\n0\nc\ns", "0\n0\nc\n0\nc\n0\nc\nt", "0\n0\nc\n0\nc\n0\nc\nu", "0\n0\nc\n0\nc\n0\nc\nv", "0\n0\nc\n0\nc\n0\nc\nw", "0\n0\nc\n0\nc\n0\nc\nx"
 			);      
 
 			$value_reshape_window =  ( ( $basevalue - $swingvalue) + ( $pace * ( $countstep - 1 )) );
@@ -4488,10 +4614,14 @@ $printthis";
 
 sub warp #
 {
-	my ( $to, $stepsvar, $countop, $countstep, $swap, $warp, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline ) = @_;
+	my ( $to, $stepsvar, $countop, $countstep, $swap, $warp, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
 	
 	my @applytype = @$swap;
 	my $zone_letter = $applytype[$countop][3];
+
+	my @menus = @$menus_ref;
+	my %numvertmenu = %{ $menus[0] };
+	my %vertnummenu = %{ $menus[1] };
 	
 	say "Warping zones for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
@@ -4603,12 +4733,12 @@ $printthis";
 	my @vertexletters = (
 	"a",   "b",   "c",   "d",   "e",   "f",   "g",   "h",   "i",   "j",   "k",   "l",   "m",   "n",   "o",   "p", 
 	"0\np", "0\nq", "0\nr", "0\ns", "0\nt", "0\nu", "0\nv", "0\nw", "0\nx", "0\ny", "0\nz", "0\na", "0\nb",  "0\nc",  "0\nd",  "0\ne",
-	"0\n0\nb\ne", "0\n0\nb\nf", "0\n0\nb\ng", "0\n0\nb\nh", "0\n0\nb\ni", "0\n0\nb\nj", "0\n0\nb\nk", "0\n0\nb\nl", 
-	"0\n0\nb\nm", "0\n0\nb\nn", "0\n0\nb\no", "0\n0\nb\np", "0\n0\nb\nq", "0\n0\nb\nr", "0\n0\nb\ns", "0\n0\nb\nt", 
-	"0\n0\nb\n0\nb\nt", "0\n0\nb\n0\nb\nu", "0\n0\nb\n0\nb\nv", "0\n0\nb\n0\nb\nw", "0\n0\nb\n0\nb\nx", "0\n0\nb\n0\nb\ny", "0\n0\nb\n0\nb\nz", "0\n0\nb\n0\nb\na", 
-	"0\n0\nb\n0\nb\nb", "0\n0\nb\n0\nb\nc", "0\n0\nb\n0\nb\nd", "0\n0\nb\n0\nb\ne", "0\n0\nb\n0\nb\nf", "0\n0\nb\n0\nb\ng", "0\n0\nb\n0\nb\nh", "0\n0\nb\n0\nb\ni", 
-	"0\n0\nb\n0\nb\n0\nb\ni", "0\n0\nb\n0\nb\n0\nb\nj", "0\n0\nb\n0\nb\n0\nb\nk", "0\n0\nb\n0\nb\n0\nb\nl", "0\n0\nb\n0\nb\n0\nb\nm", "0\n0\nb\n0\nb\n0\nb\nn", "0\n0\nb\n0\nb\n0\nb\no", "0\n0\nb\n0\nb\n0\nb\np", 
-	"0\n0\nb\n0\nb\n0\nb\nq", "0\n0\nb\n0\nb\n0\nb\nr", "0\n0\nb\n0\nb\n0\nb\ns", "0\n0\nb\n0\nb\n0\nb\nt", "0\n0\nb\n0\nb\n0\nb\nu", "0\n0\nb\n0\nb\n0\nb\nv", "0\n0\nb\n0\nb\n0\nb\nw", "0\n0\nb\n0\nb\n0\nb\nx"
+	"0\n0\nc\ne", "0\n0\nc\nf", "0\n0\nc\ng", "0\n0\nc\nh", "0\n0\nc\ni", "0\n0\nc\nj", "0\n0\nc\nk", "0\n0\nc\nl", 
+	"0\n0\nc\nm", "0\n0\nc\nn", "0\n0\nc\no", "0\n0\nc\np", "0\n0\nc\nq", "0\n0\nc\nr", "0\n0\nc\ns", "0\n0\nc\nt", 
+	"0\n0\nc\n0\nc\nt", "0\n0\nc\n0\nc\nu", "0\n0\nc\n0\nc\nv", "0\n0\nc\n0\nc\nw", "0\n0\nc\n0\nc\nx", "0\n0\nc\n0\nc\ny", "0\n0\nc\n0\nc\nz", "0\n0\nc\n0\nc\na", 
+	"0\n0\nc\n0\nc\nb", "0\n0\nc\n0\nc\nc", "0\n0\nc\n0\nc\nd", "0\n0\nc\n0\nc\ne", "0\n0\nc\n0\nc\nf", "0\n0\nc\n0\nc\ng", "0\n0\nc\n0\nc\nh", "0\n0\nc\n0\nc\ni", 
+	"0\n0\nc\n0\nc\n0\nc\ni", "0\n0\nc\n0\nc\n0\nc\nj", "0\n0\nc\n0\nc\n0\nc\nk", "0\n0\nc\n0\nc\n0\nc\nl", "0\n0\nc\n0\nc\n0\nc\nm", "0\n0\nc\n0\nc\n0\nc\nn", "0\n0\nc\n0\nc\n0\nc\no", "0\n0\nc\n0\nc\n0\nc\np", 
+	"0\n0\nc\n0\nc\n0\nc\nq", "0\n0\nc\n0\nc\n0\nc\nr", "0\n0\nc\n0\nc\n0\nc\ns", "0\n0\nc\n0\nc\n0\nc\nt", "0\n0\nc\n0\nc\n0\nc\nu", "0\n0\nc\n0\nc\n0\nc\nv", "0\n0\nc\n0\nc\n0\nc\nw", "0\n0\nc\n0\nc\n0\nc\nx"
 	);
 		
 	if (-e $configfile)
@@ -4674,12 +4804,17 @@ $printthis";
 
 sub export_toenergyplus
 {
-				my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $export_toenergyplus_ref, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline ) = @_;
+				my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $export_toenergyplus_ref, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
 				
 				
 				
 				my @applytype = @{ $applytype_ref->[ $countop ] }; 
 				my @export_toenergypluses = @{ $export_toenergyplus_ref->[ $countop ] }; 
+
+				my @menus = @$menus_ref;
+				my %numvertmenu = %{ $menus[0] };
+				my %vertnummenu = %{ $menus[1] };
+
 				shift( @export_toenergypluses );
 				my $sim = shift( @export_toenergypluses ); 
 				my $retrieve = shift( @export_toenergypluses ); 
@@ -4792,15 +4927,19 @@ sub use_modish
 	#use strict;
 	#use warnings;
 	
-				my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $use_modish_ref, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline ) = @_;
+				my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $use_modish_ref, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
 				
 				
 				my @applytype = @$applytype_ref; 
 				my @use_modish = @{ $use_modish_ref->[ $countop ] }; 
 				my $pathhere = "$to/cfg/$fileconfig"; 
 				say $tee "Executing modish.pl for calculating the effect of solar reflections on obstructions for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
+
+				my @menus = @$menus_ref;
+				my %numvertmenu = %{ $menus[0] };
+				my %vertnummenu = %{ $menus[1] };
 				
-				my %numletter = ( 1 => "a", 2 => "b", 3 => "c", 4 => "d", 5 => "e", 6 => "f", 7 => "g", 8 => "h", 9 => "i", 10 => "j", 11 => "k", 12 => "l", 13 => "m", 14 => "o" ); # ZZZ THESE LETTERS HAVE TO BE CHECKED WITH REGARDS TO THE CHANGE OF PAGES!
+				my %numletter = %numvertmenu;
 
 				if ( @use_modish )
 				{
@@ -4889,7 +5028,7 @@ sub genchange
 	
 	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $genchange, $countvar, $fileconfig, $mypath, $file, 
 	$countmorphing, $todo, $names_ref, $nums_ref, $newcontents_ref, 
-	$filecontents_ref, $newfilecontents_ref, $launchline ) = @_;
+	$filecontents_ref, $newfilecontents_ref, $launchline, $menus_ref ) = @_;
 	
 	
 	
@@ -4897,7 +5036,10 @@ sub genchange
 	#my %names = %$names_ref; #
 	#my %nums = %$nums_ref;
 	#my %newcontents = %$newcontents_ref;
-	
+
+	my @menus = @$menus_ref;
+	my %numvertmenu = %{ $menus[0] };
+	my %vertnummenu = %{ $menus[1] };	
 	
 	say $tee "Executing genchange for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 	my $this_cycledata = $genchange->[$countop]; 
@@ -5473,7 +5615,7 @@ sub genprop
 	#use warnings;
 	
 	my ($to, $stepsvar, $countop, $countstep, $applytype_ref, $genchange, $countvar, $fileconfig, $mypath, $file, $countmorphing, $todo, 
-		$names_ref, $nums_ref, $newcontents_ref, $filecontents_ref, $newfilecontents_ref, $launchline ) = @_;
+		$names_ref, $nums_ref, $newcontents_ref, $filecontents_ref, $newfilecontents_ref, $launchline, $menus_ref ) = @_;
 	( $names_ref, $nums_ref, $newcontents_ref, $filecontents_ref, $newfilecontents_ref ) = genchange ($to, $stepsvar, $countop, $countstep, 
 												$applytype_ref, $genchange, $countvar, $fileconfig, $mypath, $file, $countmorphing, $to_do,
 												$names_ref, $nums_ref, $newcontents_ref, $filecontents_ref, $newfilecontents_ref, 
@@ -5482,6 +5624,11 @@ sub genprop
 	%newcontents = %$newcontents_ref;
 	@filecontents = @$filecontents_ref;
 	@newfilecontents = @$newfilecontents_ref;
+
+	my @menus = @$menus_ref;
+	my %numvertmenu = %{ $menus[0] };
+	my %vertnummenu = %{ $menus[1] };
+
 	return ( \%names, \%newcontents, \@filecontents, \@newfilecontents );
 }
 
@@ -5489,8 +5636,13 @@ sub change_groundreflectance
 {
 	#use strict; 
 	#use warnings;
-	( $to, $stepsvar, $countop, $countstep, $applytype_ref, $change_groundreflectance, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline ) = @_;
+	( $to, $stepsvar, $countop, $countstep, $applytype_ref, $change_groundreflectance, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
 	my @applytype = @$applytype_ref; 
+
+	my @menus = @$menus_ref;
+	my %numvertmenu = %{ $menus[0] };
+	my %vertnummenu = %{ $menus[1] };
+
 	say $tee "Changing ground reflectance for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 	my ( $low, $high, $swing, $pace, $newvalue );
 	
@@ -5540,11 +5692,15 @@ $printthis
 
 sub vary_controls
 {    # IT IS CALLED FROM THE MAIN FILE
-	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $vary_controls_ref, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline ) = @_;
+	my ( $to, $stepsvar, $countop, $countstep, $applytype_ref, $vary_controls_ref, $countvar, $fileconfig, $mypath, $file, $countmorphing, $launchline, $menus_ref ) = @_;
 	
 	my @applytype = @$applytype_ref;
 	my $zone_letter = $applytype[$countop][3];
 	my @vary_controls = @{ $vary_controls_ref[ $countop ] } ;
+
+	my @menus = @$menus_ref;
+	my %numvertmenu = %{ $menus[0] };
+	my %vertnummenu = %{ $menus[1] };
 	
 	say "Variating controls for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
@@ -5783,7 +5939,12 @@ sub vary_controls
 sub constrain_controls 
 {  # IT READS CONTROL USER-IMPOSED CONSTRAINTS
 	my ( $to, $filecon, $countop, $countstep, $applytype_ref, $constrain_controls_ref, $countvar, $fileconfig, $countmorphing, $todo, 
-		$loopcontrol_ref, $flowcontrol_ref, $new_loopcontrol_ref, $new_flowcontrol_ref, $launchline ) = @_;
+		$loopcontrol_ref, $flowcontrol_ref, $new_loopcontrol_ref, $new_flowcontrol_ref, $launchline, $menus_ref ) = @_;
+
+	my @menus = @$menus_ref;
+	my %numvertmenu = %{ $menus[0] };
+	my %vertnummenu = %{ $menus[1] };
+	
 	say "Constraining controls for case " . ($countcase + 1) . ", block " . ($countblock + 1) . ", parameter $countvar at iteration $countstep. Instance $countinstance.";
 
 	my $zone_letter = $applytype[$countop][3];

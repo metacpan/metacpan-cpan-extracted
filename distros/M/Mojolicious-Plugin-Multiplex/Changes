@@ -1,5 +1,10 @@
 Revision history for Perl module Mojolicious-Plugin-Multiplex
 
+0.03 2017-11-13
+  - Use File::Share to move javascript files to share directory
+  - Add url parameter to multiplex js object
+  - Allow changing url between reconnects in javascript
+
 0.02 2016-08-23
   - Client caches channel objects rather than overwriting them
   - Rename error method to send_error

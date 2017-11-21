@@ -4,7 +4,7 @@ package Test::Class::Moose::Role::Executor;
 
 use 5.10.0;
 
-our $VERSION = '0.88';
+our $VERSION = '0.89';
 
 use Moose::Role 2.0000;
 use Carp;
@@ -42,19 +42,7 @@ sub runtests {
     $report->_start_benchmark;
     my @test_classes = $self->test_classes;
 
-    my @bad = grep { !$_->isa('Test::Class::Moose') } @test_classes;
-    if (@bad) {
-        my $msg = 'Found the following class';
-        $msg .= 'es' if @bad > 1;
-        $msg
-          .= ' that '
-          . ( @bad > 1 ? 'are'        : 'is' ) . ' not '
-          . ( @bad > 1 ? 'subclasses' : 'a subclass' )
-          . " of Test::Class::Moose: @bad";
-        $msg .= ' (did you load '
-          . ( @bad > 1 ? 'these classes' : 'this class' ) . '?)';
-        die $msg;
-    }
+    $self->_validate_test_classes(@test_classes);
 
     context_do {
         my $ctx = shift;
@@ -75,6 +63,24 @@ END
 
     $report->_end_benchmark;
     return $self;
+}
+
+sub _validate_test_classes {
+    my $self = shift;
+
+    my @bad = grep { !$_->isa('Test::Class::Moose') } @_
+      or return;
+
+    my $msg = 'Found the following class';
+    $msg .= 'es' if @bad > 1;
+    $msg
+      .= ' that '
+      . ( @bad > 1 ? 'are'        : 'is' ) . ' not '
+      . ( @bad > 1 ? 'subclasses' : 'a subclass' )
+      . " of Test::Class::Moose: @bad";
+    $msg .= ' (did you load '
+      . ( @bad > 1 ? 'these classes' : 'this class' ) . '?)';
+    die $msg;
 }
 
 sub _run_test_classes {
@@ -530,7 +536,7 @@ Test::Class::Moose::Role::Executor - Common code for Runner classes
 
 =head1 VERSION
 
-version 0.88
+version 0.89
 
 =for Pod::Coverage runtests test_classes
 

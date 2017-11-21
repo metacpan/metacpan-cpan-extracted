@@ -9,8 +9,8 @@ use MVC::Neaf;
 
 MVC::Neaf->route( '/foo/bar' => sub { +{} }
     , default => { lang => 'Perl' }
-    , view => 'JS',
-    -type => 'x-text/jason',
+    , -view => 'JS'
+    , -type => 'x-text/jason'
 );
 
 MVC::Neaf->set_path_defaults( '/foo' => { answer => 42 } );

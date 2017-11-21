@@ -12,8 +12,8 @@ use Params::Registry::Error;
 use Scalar::Util ();
 use Try::Tiny;
 
-use constant INF => 100**100**100;
-use constant NEG_INF => 1 - INF;
+#use constant INF => 100**100**100;
+#use constant NEG_INF => 1 - INF;
 
 =head1 NAME
 
@@ -21,11 +21,11 @@ Params::Registry::Instance - An instance of registered parameters
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 has _registry => (
     is       => 'ro',
@@ -196,7 +196,7 @@ sub set {
         %p = @_;
 
         # pull metaparams out of ordinary params
-        %meta = map { $_ => delete $p{$_} } qw(-defaults);
+        %meta = map { $_ => delete $p{$_} } qw(-defaults -force);
     }
 
     # grab the parent object that stores all the configuration data
@@ -221,8 +221,6 @@ sub set {
         # each rank has a list of parameters which are roughly in the
         # original sequence provided to the registry
         for my $p (@$list) {
-            # retrieve the appropriate template object
-            my $t = $r->template($p);
 
             # normalize input value(s) if present
             my @v;
@@ -232,6 +230,12 @@ sub set {
                 $v = [$v] if !$rv || $rv ne 'ARRAY';
                 @v = @$v;
             }
+
+            # skip if there's nothing to set
+            next if @v == 0 and !$meta{-force};
+
+            # retrieve the appropriate template object
+            my $t = $r->template($p);
 
             # run the preprocessor
             my @deps = $t->_consdep;
@@ -252,7 +256,7 @@ sub set {
             if (!$err{$p} and @v > 0) {
                 try {
                     my $tmp = $t->process(@v);
-                    $out{$p} = $tmp if defined $tmp;
+                    $out{$p} = $tmp if defined $tmp or $t->empty;
                 } catch {
                     $err{$p} = $_;
                 };
@@ -347,7 +351,7 @@ sub clone {
         _content => \%orig,
     );
 
-    $out->set(\%p);
+    $out->set(\%p) if keys %p;
 
     $out;
 }
@@ -361,17 +365,29 @@ Generates a data structure suitable to pass into L<SQL::Abstract>
 
 sub _do_span {
     my ($span, $universe) = @_;
-    my $u = $universe->isa('DateTime::SpanSet') ? $universe->span : $universe;
-    my ($s, $e, $us, $ue) = ($span->start, $span->end, $u->start, $u->end);
 
+    my ($s, $e) = ($span->start, $span->end);
+
+    # deal with possibly-empty universe
+    my ($us, $ue);
+    if ($universe) {
+        my $u = $universe->isa('DateTime::SpanSet')
+            ? $universe->span : $universe;
+        ($us, $ue) = ($u->start, $u->end);
+    }
+
+    # adjust for open sets
     my $sop = $span->start_is_open ? '>' : '>=';
     my $eop = $span->end_is_open   ? '<' : '<=';
 
+    # XXX this does not adjust for BETWEEN or when start and end are
+    # the same
+
     my %out;
-    if ($s->is_finite and $s > $us) {
+    if ($s->is_finite and (!$us or $s > $us)) {
         $out{$sop} = $s;
     }
-    if ($e->is_finite and $e < $ue) {
+    if ($e->is_finite and (!$ue or $e < $ue)) {
         $out{$eop} = $e;
     }
 
@@ -413,9 +429,13 @@ my %TYPES = (
         my ($key, $val, $template) = @_;
         return if $val->is_empty;
 
+        # bail out if the span is wider than the universe
         my $universe = $template->universe;
-        return if $val->is_span
+        return if $universe and $val->is_span
             and $val->min <= $universe->min and $val->max >= $universe->max;
+
+        my $inf  = Set::Infinite->inf;
+        my $ninf = Set::Infinite->minus_inf;
 
         my @ranges;
         my ($span, $tail) = $val->first;
@@ -428,15 +448,15 @@ my %TYPES = (
             $xop = $xop ? '<' : '<=';
 
             my %rec;
-            if ($min == NEG_INF and $max == INF) {
+            if ($min == $ninf and $max == $inf) {
                 next;
             }
-            elsif ($closed and $min > NEG_INF and $max < INF) {
+            elsif ($closed and $min > $ninf and $max < $inf) {
                 $rec{-between} = [$min, $max];
             }
             else {
-                $rec{$mop} = $min + 0 unless $min == NEG_INF;
-                $rec{$xop} = $max + 0 unless $max == INF;
+                $rec{$mop} = $min + 0 unless $min == $ninf;
+                $rec{$xop} = $max + 0 unless $max == $inf;
             }
 
             push @ranges, \%rec;

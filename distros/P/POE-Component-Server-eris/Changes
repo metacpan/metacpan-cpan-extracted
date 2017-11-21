@@ -1,4 +1,10 @@
 Revision History for POE-Component-Server-eris
+2.3     2017-11-19 Brad Lhotsky <brad@divisionbyzero.net>
+        - Fix the reference implementation to shutdown when STDIN is closed
+        - Make commands easier to add
+        - Add a 'help' commands and tweak other commands to be more helpful
+        - Add routing to server_shutdown and ensure the shutdown happens
+
 2.2     2017-07-15 Brad Lhotsky <brad@divisionbyzero.net>
         - Minor performance optimizations in the regex
           and program flow.

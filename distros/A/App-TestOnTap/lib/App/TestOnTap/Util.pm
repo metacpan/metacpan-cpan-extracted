@@ -81,19 +81,14 @@ sub stringifyTime
 # 
 sub ensureArray
 {
-	my $data = shift;
+	my $data = shift || [];
 	
-	if (defined($data))
-	{
-		$data =
-			(ref($data) eq 'ARRAY')
-				? $data
-				: ($data =~ m#\n#)
-					? [ split("\n", $data) ]
-					: [ split(' ', $data) ];
-	}
-
-	return $data;
+	return
+		(ref($data) eq 'ARRAY')
+			? $data
+			: ($data =~ m#\n#)
+				? [ split("\n", $data) ]
+				: [ split(' ', $data) ];
 }
 
 # expand any array elements using '@xyz' as new line elements read from 'xyz'

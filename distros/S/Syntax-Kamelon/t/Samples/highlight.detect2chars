@@ -1,0 +1,45 @@
+Testing detect2chars
+
+Testing default without options
+<Detect2Chars attribute="Match" context="#stay" char="c" char1="s"/>
+
+<Test>
+amsterdam cs
+AMSTERDAM CS
+<Test>
+
+Testing dynamic
+<RegExpr attribute="Match" context="TestDT" String="\s(c)har(s)" />
+<Detect2Chars attribute="Match" dynamic="true" context="#pop" char="1" char1="2"/>
+
+<TestD>
+scoop chars 
+amsterdam cs 12 #if this matches, dynamic was not called
+<TestD>
+
+<TestD>
+scoop chars
+AMSTERDAM CS 12 #if tthis matches, dynamic was not called
+<TestD>
+
+Testing dynamic insensitive
+<RegExpr attribute="Match" context="TestDIT" String="\s(c)har(s)" />
+<Detect2Chars attribute="Match" dynamic="true" insensitive="true" context="#pop" char="1" char1="2"/>
+
+<TestDI>
+scoop chars
+amsterdam cs 12 #if this matches, dynamic was not called
+<TestDI>
+
+<TestDI>
+scoop chars
+AMSTERDAM CS 12 #if this matches, dynamic was not called
+<TestDI>
+
+Testing insensitive
+<Detect2Chars attribute="Match" insensitive="true" context="#stay" char="c" char1="s"/>
+
+<TestI>
+amsterdam cs
+AMSTERDAM CS
+<TestI>

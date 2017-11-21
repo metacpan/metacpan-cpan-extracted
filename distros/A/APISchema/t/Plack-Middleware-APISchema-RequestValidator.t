@@ -1,4 +1,5 @@
 package t::Plack::Middleware::APISchema::RequestValidator;
+use lib '.';
 use t::test;
 use t::test::fixtures;
 use Plack::Test;

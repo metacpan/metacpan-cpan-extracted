@@ -1,7 +1,11 @@
 
 Release history for Jojo-Base
 
-0.5.0     2017-11-08 10:53:07-08:00 America/Los_Angeles
+0.6.0     2017-11-11 10:45:46-08:00 America/Los_Angeles
+
+    - Require Mojolicious 7.43+
+
+v0.5     2017-11-08 10:53:07-08:00 America/Los_Angeles
 
     - Export a dummy "with" when role support is missing
     - Depend on Jojo::Role 0.4.0+

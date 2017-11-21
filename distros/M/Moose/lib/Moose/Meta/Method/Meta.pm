@@ -1,5 +1,5 @@
 package Moose::Meta::Method::Meta;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use strict;
 use warnings;
@@ -41,7 +41,7 @@ Moose::Meta::Method::Meta - A Moose Method metaclass for C<meta> methods
 
 =head1 VERSION
 
-version 2.2006
+version 2.2007
 
 =head1 DESCRIPTION
 
@@ -49,7 +49,7 @@ This class is a subclass of L<Class::MOP::Method::Meta> that
 provides additional Moose-specific functionality, all of which is
 private.
 
-To understand this class, you should read the the
+To understand this class, you should read the
 L<Class::MOP::Method::Meta> documentation.
 
 =head1 BUGS

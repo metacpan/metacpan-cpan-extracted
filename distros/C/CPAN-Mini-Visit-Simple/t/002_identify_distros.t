@@ -215,8 +215,7 @@ my $modules_dir = $self->get_minicpan() . 'modules';
 for my $k (@distros_found) {
     push @unwanted_tarballs, $k if $k =~ m{\Q$modules_dir\E};
 }
-is(scalar(@unwanted_tarballs), 0, "Excluded tarballs in minicpan/modules")
-    or pp(\@unwanted_tarballs);
+is(scalar(@unwanted_tarballs), 0, "Excluded tarballs in minicpan/modules");
 
 $self = CPAN::Mini::Visit::Simple->new({});
 eval {
@@ -277,4 +276,3 @@ like($@, qr/'pattern' is a regex, which means it must be a REGEXP ref/,
     }
     is( $seen, scalar(@expected), "All distro names seen on STDOUT" );
 }
-

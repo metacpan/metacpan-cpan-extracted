@@ -1,5 +1,4 @@
 .travis.yml
-Build.PL
 Changes
 examples/code2country
 examples/country2code
@@ -78,6 +77,8 @@ t/currency_func.t
 t/currency_old.t
 t/currency_oo.t
 t/do_tests.pl
+t/errors.1.t
+t/errors.2.t
 t/langext_func.t
 t/langext_oo.t
 t/langfam_func.t
@@ -98,6 +99,7 @@ t/script_oo.t
 t/testfunc.pl
 t/vals_country.pl
 t/vals_currency.pl
+t/vals_error.pl
 t/vals_langext.pl
 t/vals_langfam.pl
 t/vals_language.pl

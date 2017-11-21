@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Tk::CheckListViewer;
-$Config::Model::Tk::CheckListViewer::VERSION = '1.364';
+$Config::Model::Tk::CheckListViewer::VERSION = '1.365';
 use strict;
 use warnings;
 use Carp;

@@ -485,8 +485,14 @@ sub pack_value
    elsif( !ref $value ) {
       no warnings 'numeric';
 
-      # use  X^X  operator to distinguish actual numbers from strings
-      my $is_numeric = ( $value ^ $value ) eq "0";
+      my $is_numeric = do {
+         my $tmp = $value;
+
+         # use  X^X  operator to distinguish actual numbers from strings
+         # If $tmp contains any non-ASCII bytes the it's definitely not a
+         # decimal representation of a number
+         $tmp =~ m/^[[:ascii:]]+$/ and ( $value ^ $value ) eq "0"
+      };
 
       # test for integers, but exclude NaN
       if( int($value) eq $value and $value == $value ) {

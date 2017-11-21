@@ -1,5 +1,5 @@
 package Moose::Exception::OverloadRequiresAnOperator;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -9,4 +9,5 @@ sub _build_message {
     'You must provide an operator parameter when constructing a Moose::Meta::Overload object';
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

@@ -1,0 +1,12 @@
+Testing linecont
+
+<LineContinue context="#stay" attribute="Match" />
+<Test1>
+Testing LineContinue \
+<Test1>
+
+<LineContinue context="#stay" attribute="Match" char="%" />
+<Test2>
+Testing LineContinue %
+<Test2>
+

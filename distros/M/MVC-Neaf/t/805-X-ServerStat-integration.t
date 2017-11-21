@@ -13,7 +13,7 @@ my $stat = MVC::Neaf::X::ServerStat->new(
     on_write => sub { push @trace, @{ +shift } },
 );
 
-MVC::Neaf->route( '/foo' => sub { +{} }, view => 'JS' );
+MVC::Neaf->route( '/foo' => sub { +{} }, -view => 'JS' );
 MVC::Neaf->server_stat( $stat );
 
 my @warn;

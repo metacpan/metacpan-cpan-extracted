@@ -12,7 +12,7 @@ my $req = ZMQ::Raw::Socket->new ($ctx, ZMQ::Raw->ZMQ_REQ);
 my $rep = ZMQ::Raw::Socket->new ($ctx, ZMQ::Raw->ZMQ_REP);
 my $unknown = ZMQ::Raw::Socket->new ($ctx, ZMQ::Raw->ZMQ_REP);
 
-ok (!eval {$poller->add, 'bad', ZMQ::Raw->ZMQ_POLLIN});
+ok (!eval {$poller->add ('bad', ZMQ::Raw->ZMQ_POLLIN)});
 
 $poller->add ($req, ZMQ::Raw->ZMQ_POLLIN);
 $poller->add ($rep, ZMQ::Raw->ZMQ_POLLIN);

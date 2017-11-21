@@ -1,5 +1,8 @@
 Revision history for Syntax-Highlight-Engine-Simple-HTML
 
+v0.05  2017/11/13
+    - Drop the encoding pragma in tests, no longer supported by Perl
+
 v0.04  2017/09/21
     - Metadata updates
 

@@ -1,7 +1,7 @@
 ---
 abstract: 'Background execution of subroutines in child processes.'
 author:
-  - 'Nick Kostirya <nick@ToDo.org>'
+  - 'Nick Kostirya <kni@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
@@ -18,5 +18,5 @@ no_index:
     - t
     - inc
 requires: {}
-version: '0.11'
+version: '0.12'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

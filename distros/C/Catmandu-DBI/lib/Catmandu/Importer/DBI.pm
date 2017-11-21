@@ -4,26 +4,18 @@ use Catmandu::Sane;
 use DBI;
 use Moo;
 
-our $VERSION = '0.0511';
+our $VERSION = '0.0701';
 
 with 'Catmandu::Importer';
 
-has dsn      => (is => 'ro' , required => 1);
+has dsn => (is => 'ro', required => 1);
 has user     => (is => 'ro');
 has password => (is => 'ro');
-has query    => (is => 'ro' , required => 1);
-has dbh  => (
-    is       => 'ro',
-    init_arg => undef,
-    lazy     => 1,
-    builder  => '_build_dbh',
-);
-has sth  => (
-	is       => 'ro',
-    init_arg => undef,
-    lazy     => 1,
-    builder  => '_build_sth',
-);
+has query    => (is => 'ro', required => 1);
+has dbh =>
+    (is => 'ro', init_arg => undef, lazy => 1, builder => '_build_dbh',);
+has sth =>
+    (is => 'ro', init_arg => undef, lazy => 1, builder => '_build_sth',);
 
 sub _build_dbh {
     my $self = $_[0];
@@ -38,17 +30,17 @@ sub _build_sth {
 }
 
 sub generator {
-	my ($self) = @_;
+    my ($self) = @_;
 
-	return sub {
-		$self->sth->fetchrow_hashref();
-	}
+    return sub {
+        $self->sth->fetchrow_hashref();
+        }
 }
 
 sub DESTROY {
-	my ($self) = @_;
-	$self->sth->finish;
-	$self->dbh->disconnect;
+    my ($self) = @_;
+    $self->sth->finish;
+    $self->dbh->disconnect;
 }
 
 =head1 NAME

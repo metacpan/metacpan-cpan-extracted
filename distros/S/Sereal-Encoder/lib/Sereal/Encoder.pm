@@ -5,12 +5,12 @@ use warnings;
 use Carp qw/croak/;
 use XSLoader;
 
-our $VERSION = '3.015'; # Don't forget to update the TestCompat set for testing against installed decoders!
+our $VERSION = '4.004'; # Don't forget to update the TestCompat set for testing against installed decoders!
 our $XS_VERSION = $VERSION; $VERSION= eval $VERSION;
 
 # not for public consumption, just for testing.
 (my $num_version = $VERSION) =~ s/_//;
-my $TestCompat = [ map sprintf("%.2f", $_/100), reverse( 300 .. int($num_version * 100) ) ]; # compat with 3.00 to ...
+my $TestCompat = [ map sprintf("%.2f", $_/100), reverse( 400 .. int($num_version * 100) ) ]; # compat with 4.00 to ...
 sub _test_compat {return(@$TestCompat, $VERSION)}
 
 # Make sure to keep these constants in sync with the C code in srl_encoder.c.
@@ -20,6 +20,7 @@ use constant {
     SRL_UNCOMPRESSED => 0,
     SRL_SNAPPY       => 1,
     SRL_ZLIB         => 2,
+    SRL_ZSTD         => 3,
 };
 use constant #begin generated
 {
@@ -28,9 +29,11 @@ use constant #begin generated
   'SRL_F_COMPRESS_SNAPPY' => 64,
   'SRL_F_COMPRESS_SNAPPY_INCREMENTAL' => 128,
   'SRL_F_COMPRESS_ZLIB' => 256,
+  'SRL_F_COMPRESS_ZSTD' => 262144,
   'SRL_F_CROAK_ON_BLESS' => 4,
   'SRL_F_DEDUPE_STRINGS' => 2048,
   'SRL_F_ENABLE_FREEZE_SUPPORT' => 16384,
+  'SRL_F_ENCODER_COMPRESS_FLAGS_MASK' => '0',
   'SRL_F_NOWARN_UNKNOWN_OVERLOAD' => 512,
   'SRL_F_NO_BLESS_OBJECTS' => 8192,
   'SRL_F_REUSE_ENCODER' => 2,
@@ -42,6 +45,10 @@ use constant #begin generated
   'SRL_F_UNDEF_UNKNOWN' => 8,
   'SRL_F_WARN_UNKNOWN' => 32,
   '_FLAG_NAME' => [
+                    'COMPRESS_SNAPPY',
+                    'COMPRESS_SNAPPY_INCREMENTAL',
+                    'COMPRESS_ZLIB',
+                    'COMPRESS_ZSTD',
                     'SHARED_HASHKEYS',
                     'REUSE',
                     'CROAK_ON_BLESS',
@@ -59,7 +66,8 @@ use constant #begin generated
                     'ENABLE_FREEZE_SUPPORT',
                     'CANONICAL_REFS',
                     'SORT_KEYS_PERL',
-                    'SORT_KEYS_PERL_REV'
+                    'SORT_KEYS_PERL_REV',
+                    'COMPRESS_ZSTD'
                   ]
 }; #end generated
 
@@ -136,7 +144,7 @@ If you care greatly about performance, consider reading the L<Sereal::Performanc
 documentation after finishing this document.
 
 The Sereal protocol version emitted by this encoder implementation is currently
-protocol version 3 by default.
+protocol version 4 by default.
 
 The protocol specification and many other bits of documentation
 can be found in the github repository. Right now, the specification is at
@@ -162,11 +170,10 @@ by default.
 =head3 compress
 
 If this option provided and true, compression of the document body is enabled.
-As of Sereal version 3, two different compression techniques are supported
+As of Sereal version 4, three different compression techniques are supported
 and can be enabled by setting C<compress> to the respective named
 constants (exportable from the C<Sereal::Encoder> module):
-Snappy (named constant: C<SRL_SNAPPY>),
-and Zlib (C<SRL_ZLIB>).
+Snappy (named constant: C<SRL_SNAPPY>), Zlib (C<SRL_ZLIB>) and Zstd (C<SRL_ZSTD>).
 For your convenience, there is also a C<SRL_UNCOMPRESSED>
 constant.
 
@@ -184,8 +191,9 @@ will be bigger than the original size (even if C<compress_threshold> is 0).
 
 =head3 compress_level
 
-If Zlib compression is used, then this option will set a compression
-level from 1 (fastest) to 9 (best). Defaults to 6.
+If Zlib or Zstd compressions are used, then this option will set a compression
+level: Zlib uses range from 1 (fastest) to 9 (best). Defaults to 6. Zstd uses
+range from 1 (fastest) to 22 (best). Default is 3.
 
 =head3 snappy
 
@@ -602,7 +610,7 @@ several other modes which may also be enabled independently, and as and when
 we add new options to the encoder that would assist in this regard then
 the C<canonical> will also enable them. These options may come with a
 performance penalty so care should be taken to read the Changes file and
-test the peformance implications when upgrading a system that uses this
+test the performance implications when upgrading a system that uses this
 option.
 
 It is important to note that using canonical representation to determine

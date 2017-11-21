@@ -20,7 +20,7 @@ package
 package PkgConfig;
 
 #First two digits are Perl version, second two are pkg-config version
-our $VERSION = '0.17026';
+our $VERSION = '0.18026';
 
 $VERSION =~ /([0-9]{2})$/;
 my $compat_version = $1;
@@ -118,6 +118,7 @@ if($ENV{PKG_CONFIG_NO_OS_CUSTOMIZATION}) {
           /usr/lib/pkgconfig/ /usr/share/pkgconfig/
         !;
     }
+
 } elsif($^O =~ /^(gnukfreebsd|linux)$/ && -r "/etc/debian_version") {
 
     my $arch;
@@ -201,6 +202,25 @@ if($ENV{PKG_CONFIG_NO_OS_CUSTOMIZATION}) {
             /usr/share/pkgconfig
         );
     }
+
+} elsif($^O eq 'linux' && -r "/etc/slackware-version") {
+
+    # Fetch ptrsize value
+    my $ptrsize = $Config{ptrsize};
+
+    # Are we running on 64 bit system?
+    if ($ptrsize == 8) {
+        # We do
+        @DEFAULT_SEARCH_PATH = qw!
+          /usr/lib64/pkgconfig/ /usr/share/pkgconfig/
+        !;
+    } else {
+        # We're running on a 32 bit system (hopefully)
+        @DEFAULT_SEARCH_PATH = qw!
+          /usr/lib/pkgconfig/ /usr/share/pkgconfig/
+        !;
+    }
+  
 
 } elsif($^O eq 'freebsd') {
 
@@ -1301,7 +1321,7 @@ PkgConfig - Pure-Perl Core-Only replacement for pkg-config
 
 C<pkg-config.pl> can be used as an alias for C<ppkg-config> on platforms that
 support it.  It can also be installed as C<pkg-config> though this is not
-recomended if your system has a native C<pkg-config>.
+recommended if your system has a native C<pkg-config>.
 
 Compare to:
     $ pkg-config --libs --cflags --static gio-2.0

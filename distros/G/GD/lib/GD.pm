@@ -16,7 +16,7 @@ use GD::Polygon;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $AUTOLOAD);
 
-$VERSION = '2.66';
+$VERSION = '2.67';
 our $XS_VERSION = $VERSION;
 $VERSION = eval $VERSION;
 
@@ -464,6 +464,29 @@ support.
 NOTE: The libgd library is unable to read certain XPM files, returning
 an all-black image instead.
 
+=item B<$bool = GD::supportsFileType($filename, $is_writing)>
+
+This returns a TRUE or FALSE value, if libgd supports reading or when
+the 2nd argument is 1, if libgd supports writing the given filetype,
+depending on the filename extension. Only with libgd versions E<gt>= gd-2.1.1.
+
+Assuming LibGD is compiled with support for these image types, the
+following extensions are supported:
+
+    .gif
+    .gd, .gd2
+    .wbmp
+    .bmp
+    .xbm
+    .tga
+    .png
+    .jpg, .jpeg
+    .tiff, .tif
+    .webp
+    .xpm
+
+Filenames are parsed case-insensitively.
+
 =back
 
 =head1 GD::Image Methods
@@ -587,6 +610,30 @@ format.
 This returns the image data in WBMP format, which is a black-and-white
 image format.  Provide the index of the color to become the foreground
 color.  All other pixels will be considered background.
+
+=item B<$success = $image-E<gt>_file($filename)>
+
+Writes an image to a file in the format indicated by the filename, with
+libgd versions E<gt>= gd-2.1.1.
+
+File type is determined by the extension of the file name.  See
+C<supportsFiletype> for an overview of the parsing.
+
+For file types that require extra arguments, C<_file> attempts to
+use sane defaults:
+
+  C<gdImageGd2>	chunk size = 0, compression is enabled.
+  C<gdImageJpeg>	quality = -1 (i.e. the reasonable default)
+  C<gdImageWBMP>	foreground is the darkest available color
+
+Everything else is called with the two-argument function and so will
+use the default values.
+
+C<_file> and the underlying libgd C<gdImageFile> has some rudimentary
+error detection and will return FALSE (0) if a detectable error
+occurred.  However, the image loaders do not normally return their
+error status so a result of TRUE (1) does **not** mean the file was
+saved successfully.
 
 =back
 
@@ -777,9 +824,9 @@ module is loaded.
 =item B<$image-E<gt>setBrush($image)>
 
 You can draw lines and shapes using a brush pattern.  Brushes are just
-images that you can create and manipulate in the usual way. When you
-draw with them, their contents are used for the color and shape of the
-lines.
+palette, not TrueColor, images that you can create and manipulate in
+the usual way. When you draw with them, their contents are used for
+the color and shape of the lines.
 
 To make a brushed line, you must create or load the brush first, then
 assign it to the image using setBrush().  You can then draw in that
@@ -1036,7 +1083,7 @@ This draws arcs and ellipses.  (cx,cy) are the center of the arc, and
 (width,height) specify the width and height, respectively.  The
 portion of the ellipse covered by the arc are controlled by start and
 end, both of which are given in degrees from 0 to 360.  Zero is at the
-top of the ellipse, and angles increase clockwise.  To specify a
+right end of the ellipse, and angles increase clockwise.  To specify a
 complete ellipse, use 0 and 360 as the starting and ending angles.  To
 draw a circle, use the same value for width and height.
 
@@ -1512,6 +1559,11 @@ In case of an error (such as the font not being available, or FT
 support not being available), the method returns an empty list and
 sets $@ to the error message.
 
+The B<fontname> argument is the name of the font, which can be a full
+pathname to a F<.ttf> file, or if not the paths in C<$ENV{GDFONTPATH}>
+will be searched or if empty the libgd compiled DEFAULT_FONTPATH.
+The TrueType extensions .ttf, .pfa, .pfb or .dfont can be omitted.
+
 The string may contain UTF-8 sequences like: "&#192;" 
 
 You may also call this method from the GD::Image class name, in which
@@ -1551,7 +1603,7 @@ default kerning of text.
 
 Example:
 
- $gd->stringFT($black,'/dosc/windows/Fonts/pala.ttf',40,0,20,90,
+ $gd->stringFT($black,'/c/windows/Fonts/pala.ttf',40,0,20,90,
               "hi there\r\nbye now",
 	      {linespacing=>0.6,
 	       charmap  => 'Unicode',

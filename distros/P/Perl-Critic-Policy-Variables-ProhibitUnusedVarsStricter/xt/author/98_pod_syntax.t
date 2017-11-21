@@ -1,11 +1,3 @@
-#!perl
-
-##############################################################################
-#     $URL: http://perlcritic.tigris.org/svn/perlcritic/trunk/distributions/Perl-Critic/xt/author/98_pod_syntax.t $
-#    $Date: 2011-05-18 23:15:29 -0400 (Wed, 18 May 2011) $
-#   $Author: thaljef $
-# $Revision: 4082 $
-##############################################################################
 
 use 5.006001;
 use strict;
@@ -17,7 +9,7 @@ use Test::More;# 1.41;  # Need 1.41 or newer for correct support of L<text|schem
 
 #-----------------------------------------------------------------------------
 
-our $VERSION = '0.100';
+our $VERSION = '0.101';
 
 #-----------------------------------------------------------------------------
 

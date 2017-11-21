@@ -163,7 +163,7 @@ See conversion function
 # General version and rules
 ##############################################################################
 use 5.004;
-$VERSION = '0.12';
+$VERSION = '0.13';
 #$| = 1;
 
 ##############################################################################
@@ -1853,7 +1853,7 @@ EX:
 
 #}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
 
-  # patternDom2Text is a singlé join without key defined
+  # patternDom2Text is a single join without key defined
 
   (defined $CFG->{o_key}) or   return join('',@path);
 
@@ -1912,8 +1912,6 @@ EX:
 #{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{
 sub domPatch2TEXT(@) {
 #}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}
-
-=over 4
 
 =item I<domPatch2TEXT>(<patch 1>, <patch 2> [,<patch N>])
 
@@ -2083,7 +2081,7 @@ EX:
 
     patternText2Dom( '%r' );
 
-             Return ['%', 'r']
+             Return '%', r']
 
     patternText2Dom( '@3%r' );
 
@@ -2135,7 +2133,7 @@ EX:
     }
   }
 
-  # post - convertion § array & key convertion
+  # post - convertion of array & key convertion
 
   my $i;
   for $i (0..$#path) {
@@ -2237,6 +2235,7 @@ returns (
    return [@res];
 }
 
+=back
 
 =begin end
 

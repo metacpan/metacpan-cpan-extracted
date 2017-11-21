@@ -98,8 +98,18 @@ $t->is_required_option($_) for qw{input};
 $t->version_ok('1.0.999');
 $t->subcommand_ok(undef);
 
-my ($app) = $t->app_instance(qw{--input test.t});
+my $app = $t->app_instance(qw{--input test.t});
+ok $app, 'app instance';
+is $app->input, 'test.t';
 
-#$app->run(qw{run args});
+#
+# subcommand in file - when applify_subcommands_ok an option.
+#
+$t = Test::Applify->new('./t/subcommand.pl');
+$t->is_option('input');
+
+$t = Test::Applify->new('./t/subcommand.pl', 'cat');
+$t->is_option('line-number');
+$t->is_option('input');
 
 done_testing;

@@ -61,11 +61,16 @@ Most of the modules in this library have an option to output a debug
 transcript to STDERR. When reporting bugs/problems please, if possible,
 include a transcript of a run.
 
+INSTALLATION
+
+See the INSTALL file.
+
 COPYRIGHT
 
-  Versions up to 1.22_01 (C) 1996-2007 Graham Barr. All rights reserved.
-  Changes in Version 1.22_02 onwards Copyright (C) 2013-2016 Steve Hay.
-  All rights reserved.
+Copyright (C) 1996-2007 Graham Barr.  All rights reserved.
+Copyright (C) 2013-2017 Steve Hay.  All rights reserved.
+
+LICENCE
 
 This distribution is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself, i.e. under the terms of either the GNU

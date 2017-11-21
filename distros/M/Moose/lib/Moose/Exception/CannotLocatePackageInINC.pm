@@ -1,5 +1,5 @@
 package Moose::Exception::CannotLocatePackageInINC;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -37,4 +37,5 @@ sub _build_message {
     return "Can't locate $possible_packages in \@INC (\@INC contains: @INC)."
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

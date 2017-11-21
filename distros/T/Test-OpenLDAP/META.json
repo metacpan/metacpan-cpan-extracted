@@ -1,0 +1,51 @@
+{
+   "abstract" : "Creates a temporary instance of OpenLDAP's slapd daemon to run tests against.",
+   "author" : [
+      "David Dick <ddick@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Test-OpenLDAP",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config" : "0",
+            "Data::UUID" : "0",
+            "DirHandle" : "0",
+            "English" : "0",
+            "File::Temp" : "0",
+            "FileHandle" : "0",
+            "Net::LDAP" : "0",
+            "POSIX" : "0",
+            "Test::More" : "0",
+            "URI::Escape" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 2.94"
+}

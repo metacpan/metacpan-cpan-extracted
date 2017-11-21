@@ -1,3 +1,13 @@
+v1.0.3  2017-11-14
+	* BUGFIX: fixed regression in v1.0.2 that broke vowel Xວ
+
+v1.0.2  2017-11-13
+	* BUGFIX: fixed two IPA transcriptions:
+	  * ຫວ as a core consonant is ʋ (was w)
+	  * Xອຍ was incorrectly transliterated as oːi, changed to ɔːi
+	* IMPROVEMENT: simplified consonant tables in the IPA module by
+	  removing some bogus (though harmless as they were never used) entries.
+
 v1.0.1  2017-10-03
 	* BUGFIX: remove /n/ as final-position pronunciation of ລ/ຣ
 	* BUGFIX: remove useless/misspelled vowel Xັວ

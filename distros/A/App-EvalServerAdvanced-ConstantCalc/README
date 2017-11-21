@@ -1,0 +1,30 @@
+App::EvalServerAdvanced::ConstantCalc
+
+This module handles calculating bitwise expressions using constant
+values. Things like O_CREAT|O_RDWR|O_EXCL|O_CLOEXEC. Mainly intended to
+be used for parsing rules/values for Seccomp plugins for
+App::EvalServerAdvanced but does not depend on it.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Ryan Voots.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

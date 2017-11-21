@@ -5,10 +5,11 @@ MANIFEST
 META.json
 META.yml
 Makefile.PL
-README
 README.md
 cpanfile
-dist.ini
+example/README
+example/app.pl
+example/config.yml
 lib/Dancer2/Logger/LogAny.pm
 t/00-load.t
 t/config.yml

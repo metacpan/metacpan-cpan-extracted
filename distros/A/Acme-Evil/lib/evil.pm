@@ -10,7 +10,7 @@ use Carp;
 my $INTERMEDIATE = __PACKAGE__.'/intermediate';
 my $LAX          = __PACKAGE__.'/lax';
 
-our $VERSION = 0.003001;
+our $VERSION = 0.003002;
 
 our %tainted;
 our %wants_strict;

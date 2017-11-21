@@ -14,6 +14,8 @@ sub build
 
    my $autoclear = $obj->prop("autoclear");
 
+   my $want_typing = $obj->can_property( "want_typing" ) && $obj->prop( "want_typing" );
+
    my $prehistory;
    my $history_index;
 
@@ -37,7 +39,7 @@ sub build
                $self->send_pending( $pending_count );
             })->on_fail( sub {
                my ( $message ) = @_;
-               # TODO: write the error message somewhere
+               warn "Failed while sending text:\n$message";
                $pending_count--;
                $self->send_pending( $pending_count );
             })
@@ -46,6 +48,13 @@ sub build
          $self->set_text( "" ) if $autoclear;
          undef $history_index;
       },
+
+      ( $want_typing ? (
+         on_typing => sub {
+            my ( $typing ) = @_;
+            $tab->adopt_future( $obj->call_method( typing => $typing ) );
+         }
+      ) : () ),
    );
 
    $tab->adopt_future(
@@ -136,6 +145,8 @@ package Circle::FE::Term::Widget::Entry::Widget;
 use base qw( Tickit::Widget::Entry );
 Tickit::Window->VERSION( '0.42' );
 
+Tickit::Async->VERSION( '0.21' ); # ->cancel_timer
+
 use Tickit::Style -copy;
 
 use constant KEYPRESSES_FROM_STYLE => 1;
@@ -154,10 +165,21 @@ sub new
    my %args = @_;
 
    my $tab = delete $args{tab};
+   my $on_typing = delete $args{on_typing};
+
+   if( $on_typing ) {
+      my $on_enter = $args{on_enter};
+      $args{on_enter} = sub {
+         my ( $self ) = @_;
+         $self->stopped_typing;
+         $on_enter->( @_ );
+      };
+   }
 
    my $self = $class->SUPER::new( %args );
 
    $self->{tab} = $tab;
+   $self->{on_typing} = $on_typing;
 
    return $self;
 }
@@ -183,7 +205,34 @@ sub on_key
       }
    }
 
+   if( $ret && $self->{on_typing} and length $self->text ) {
+      my $tickit = $self->window->tickit;
+
+      if( $self->{typing_timer_id} ) {
+         $tickit->cancel_timer( $self->{typing_timer_id} );
+      }
+      else {
+         $self->started_typing;
+      }
+
+      $self->{typing_timer_id} = $tickit->timer( after => 5, sub { $self->stopped_typing });
+   }
+
    return $ret;
+}
+
+sub started_typing
+{
+   my $self = shift;
+   $self->{on_typing}->( 1 );
+}
+
+sub stopped_typing
+{
+   my $self = shift;
+   $self->window->tickit->cancel_timer( $self->{typing_timer_id} ) if defined $self->{typing_timer_id};
+   undef $self->{typing_timer_id};
+   $self->{on_typing}->( 0 );
 }
 
 sub key_tab_complete

@@ -44,8 +44,7 @@ my $SESSION = POE::Component::Server::eris->spawn(
 );
 
 # Syslog "server"
-POE::Component::Server::TCP->new(
-		Alias		=> 'server',
+my $SERVER = POE::Component::Server::TCP->new(
 		Address		=> $opt->syslog_listen,
 		Port		=> $opt->syslog_port,
         # Handle Inbound Syslog Data
@@ -105,7 +104,7 @@ eris-dispatch-tcp.pl - Example using POE::Component::Server::eris with a PoCo::S
 
 =head1 VERSION
 
-version 2.2
+version 2.3
 
 =head1 AUTHOR
 

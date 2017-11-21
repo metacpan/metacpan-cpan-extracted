@@ -2,29 +2,27 @@ package PICA::Writer::XML;
 use strict;
 use warnings;
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 use Scalar::Util qw(reftype);
+use XML::Writer;
 
 use parent 'PICA::Writer::Base';
 
 sub new {
     my $self = PICA::Writer::Base::new(@_);
-    $self->{fh}->print("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-    $self->start if $self->{start} // 1;
+    $self->{writer} = XML::Writer->new(OUTPUT => $self->{fh}, DATA_MODE => 1, DATA_INDENT => 2);
+    $self->{writer}->xmlDecl('UTF-8');
+    $self->{writer}->startTag('collection', xmlns => 'info:srw/schema/5/picaXML-v1.0');
     $self;
 }
 
-sub start {
-    my $fh = $_[0]->{fh};
-    $fh->print("<collection xlmns=\"info:srw/schema/5/picaXML-v1.0\">\n");
-}
 
 sub write_record {
     my ($self, $record) = @_;
     $record = $record->{record} if reftype $record eq 'HASH';
 
-    my $fh = $self->{fh};
+    my $writer = $self->{writer};
 
     my $i = 0;
     my $pica_sort = sub {
@@ -35,27 +33,27 @@ sub write_record {
     };
 
     @$record = map $_->[1], sort { $a->[0] cmp $b->[0] } map { $pica_sort->($_) } @$record;
-    $fh->print("<record>\n");
+    $writer->startTag('record');
     foreach my $field (@$record) {
-        # this may break on invalid tag/occurrence values
-        $fh->print("  <datafield tag=\"$field->[0]\"" . ( 
-                defined $field->[1] && $field->[1] ne '' ?
-                " occurrence=\"$field->[1]\"" : ""
-            ) . ">\n");
-            for (my $i=2; $i<scalar @$field; $i+=2) {
-                my $value = $field->[$i+1];
-                $value =~ s/</&lt;/g;
-                $value =~ s/&/&amp;/g;
-                # TODO: disallowed code points (?)
-                $fh->print("    <subfield code=\"$field->[$i]\">$value</subfield>\n");
-            } 
-        $fh->print("  </datafield>\n");
+        if ( defined $field->[1] && $field->[1] ne '') {
+            $writer->startTag('datafield', tag => $field->[0], occurrence => $field->[1] );
+        }
+        else {
+            $writer->startTag('datafield', tag => $field->[0]);
+        }
+        for (my $i=2; $i<scalar @$field; $i+=2) {
+            my $value = $field->[$i+1];
+            $writer->dataElement('subfield', $value, code => $field->[$i]);
+        } 
+        $writer->endTag('datafield');
     }
-    $fh->print("</record>\n");
+    $writer->endTag('record');
 }
 
 sub end {
-    $_[0]->{fh}->print("</collection>\n");
+    my $self = shift;
+     $self->{writer}->endTag('collection');
+     $self->{writer}->end();
 }
 
 1;
@@ -73,13 +71,12 @@ The counterpart of this module is L<PICA::Parser::XML>.
 
 =head2 METHODS
 
-In addition to C<write>, this writer also contains methods C<start> and C<end>
-to emit an XML header with start tag C<< <collection> >> or an end tag,
-respectively. The start method is automatically called on construction, unless
-suppressed with option C<< start => 0 >>:
+In addition to C<write>, this writer also contains C<end> method to finish 
+creating the XML document und check for well-formedness.
 
-    my $writer = PICA::Writer::XML->new( fh => $file, start => 0 );
-    $writer->write( $record ); # no <collection> start tag
+    my $writer = PICA::Writer::XML->new( fh => $file );
+    $writer->write( $record );
+    $writer->end();
 
 The C<end> method does not close the underlying file handle.
 

@@ -5,7 +5,7 @@
 package Lingua::Interset::Tagset::TR::Conll;
 use strict;
 use warnings;
-our $VERSION = '3.007';
+our $VERSION = '3.008';
 
 use utf8;
 use open ':utf8';
@@ -1771,7 +1771,7 @@ Lingua::Interset::Tagset::TR::Conll - Driver for the Turkish tagset of the CoNLL
 
 =head1 VERSION
 
-version 3.007
+version 3.008
 
 =head1 SYNOPSIS
 

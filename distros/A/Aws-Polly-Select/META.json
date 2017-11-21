@@ -4,7 +4,7 @@
       "philiprbrenan@gmail.com"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.422",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
@@ -16,22 +16,25 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.42"
+            "Module::Build" : "0.4224"
          }
       },
       "runtime" : {
          "requires" : {
             "Carp" : "0",
             "Data::Dump" : "0",
-            "Data::Table::Text" : "0",
-            "JSON" : "0"
+            "Data::Table::Text" : "20171116",
+            "JSON" : "0",
+            "Test2::API" : "0",
+            "Test::More" : "0",
+            "utf8" : "0"
          }
       }
    },
    "provides" : {
       "Aws::Polly::Select" : {
          "file" : "lib/Aws/Polly/Select.pm",
-         "version" : "2017.444"
+         "version" : "20171111"
       },
       "Aws::Polly::Select::Speaker" : {
          "file" : "lib/Aws/Polly/Select.pm"
@@ -43,5 +46,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "2017.444"
+   "version" : "20171111"
 }

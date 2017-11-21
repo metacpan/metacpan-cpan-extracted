@@ -4,7 +4,7 @@
       "Dominique Dumont"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.132140",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "lgpl_2_1"
    ],
@@ -49,8 +49,8 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-project@rt.cpan.org",
-         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Config-Model-Approx"
+         "mailto" : "ddumont at cpan.org",
+         "web" : "http://github.com/dod38fr/config-model-approx/issues"
       },
       "homepage" : "https://github.com/dod38fr/config-model/wiki",
       "repository" : {
@@ -59,6 +59,7 @@
          "web" : "http://github.com/dod38fr/config-model-approx"
       }
    },
-   "version" : "1.009"
+   "version" : "1.010",
+   "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

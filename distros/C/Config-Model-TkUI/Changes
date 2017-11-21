@@ -1,3 +1,8 @@
+1.365 2017-11-19
+
+    * display node gist in tree widget (req Config::Model 2.114)
+    * fix font issue when elements pop in node editor
+
 1.364 2017-08-23
 
     * fix font loading in TkUI (also gh #12)

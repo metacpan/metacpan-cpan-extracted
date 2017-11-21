@@ -1,6 +1,6 @@
 package Device::Network::ConfigParser::Cisco::ASA;
 # ABSTRACT: Parse Cisco ASA Configuration
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use 5.006;
 use strict;
@@ -20,7 +20,7 @@ Device::Network::ConfigParser::Cisco::ASA - parse Cisco ASA configuration.
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -58,9 +58,23 @@ Any other lines within the file are classified as 'unrecognised'.
 
 =cut
 
+# This function is used with the (?) RecDescent operator, which returns an ARRAYREF.
+# If there's an array member, it's returned.
+# If not, the empty string is returned.
+sub Parse::RecDescent::_zero_or_one {
+    my ($array_ref, $action, $return) = @_;
+
+    $return //= '';
+    $action //= sub { return $_[0]->[0] }; # By default, return the first member
+
+    scalar @{ $array_ref } ? $action->($array_ref) : $return;
+}
+    
+
+
 sub get_parser {
     return new Parse::RecDescent(q{
-        <autoaction: { [@item] }>
+        <autoaction: { \%item }>
         startrule: config(s) { $item[1] }
         config:
             hostname { $item[1] } |
@@ -69,8 +83,8 @@ sub get_parser {
             route { $item[1] } |
             acl { $item[1] } |
             nat { $item[1] } |
-            object { $item[1] } |
-            object_group { $item[1] } |
+            object(s) { { type => 'object', config => $item{'object(s)'} } } |
+            object_group(s) { { type => 'object-group', config => $item[1] } } |
             unrecognised { $item[1] }
 
             hostname: 'hostname' m{\w+} { { type => $item{__RULE__}, config => $item{__PATTERN1__} } }
@@ -100,8 +114,6 @@ sub get_parser {
             acl: 'access-list' m{\N+} { { type => 'acl', slurp => $item{__PATTERN1__} } }
 
             nat: 'nat' int_interface ext_interface source_nat destination_nat(?) proxy_arp(?) route_lookup(?) nat_description(?) {
-                #use Data::Dumper;
-                #print STDERR Dumper \%item;
                 { type => $item{__RULE__}, config => {
                     int_interface => $item{int_interface},
                     ext_interface => $item{ext_interface},
@@ -129,75 +141,103 @@ sub get_parser {
                 proxy_arp: 'no-proxy-arp' { 1; }
                 route_lookup: 'route-lookup' { 1; }
 
-                object: 'object' m{network|service} object_name <matchrule:$item{__PATTERN1__}_obj_body>(0..2) {
-                    #use Data::Dumper;
-                    #print Dumper \%item;
-                    { type => 'object', config => {
-                        name => $item{object_name},
-                        obj_type => $item{__PATTERN1__},
-                        obj_value => $item{'$item{__PATTERN1__}_obj_body(0..2)'} 
+            object: 'object' m{network|service} object_name  <matchrule:$item{__PATTERN1__}_obj_body>(?) description(?) {
+                {
+                    name => $item{object_name},
+                    object_type => $item{__PATTERN1__},
+                    object_value => _zero_or_one($item{'$item{__PATTERN1__}_obj_body(?)'}, undef, {}),
+                    description => _zero_or_one($item{'description(?)'})
+                }
+            }
+
+            network_obj_body: 'host' ipv4 { { type => 'host', ip => $item{ipv4} } } | 
+                              'range' range { { type => 'range', range_start => $item{range}->[0], range_end => $item{range}->[1] } } | 
+                              'subnet' subnet { { type => 'subnet', network => $item{subnet}->[0], netmask => $item{subnet}->[1] } } | 
+                              'fqdn' fqdn { { type => 'fqdn', fqdn => $item{fqdn} } } 
+
+            service_obj_body: 
+                'service' protocol { $item{protocol} } 
+
+                protocol: 
+                    m{\d{1,3}} { { protocol => $item{__PATTERN1__} } } | 
+                    m{ah|eigrp|esp|gre|igmp|igrp|ip|ipinip|ipsec|nos|ospf|pcp|pim|pptp|sctp|snp} { { protocol => $item{__PATTERN1__} } } |
+                    m{tcp|udp} ('source' port_spec)(?) ('destination' port_spec)(?) {
+                        my $source_spec = $item{'_alternation_1_of_production_3_of_rule_protocol(?)'};
+                        my $dest_spec = $item{'_alternation_2_of_production_3_of_rule_protocol(?)'};
+
+                        {
+                            protocol => $item{__PATTERN1__},
+                            source => _zero_or_one($source_spec, sub { $_[0]->[0]->{port_spec} }, {}),
+                            destination => _zero_or_one($dest_spec, sub { $_[0]->[0]->{port_spec} }, {}),
                         }
                     }
-                }
 
-                network_obj_body: 'host' ipv4 { { type => 'host', ip => $item{ipv4} } } | 
-                                  'range' range { { type => 'range', range_start => $item{range}->[0], range_end => $item{range}->[1] } } | 
-                                  'subnet' subnet { { type => 'subnet', network => $item{subnet}->[0], netmask => $item{subnet}->[1] } } | 
-                                  'fqdn' fqdn { { type => 'fqdn', fqdn => $item{fqdn} } } |
-                                  description { { type => 'description', description => $item{description} } }
+                    port_spec: 
+                        m{eq|gt|lt|neq} m{\w+} { { op => $item{__PATTERN1__}, port => $item{__PATTERN2__} } } |
+                        'range' m{\w+} m{\w+} { { op => $item{__STRING1__}, port_start => $item{__PATTERN1__}, port_end => $item{__PATTERN2__} } }
 
-                service_obj_body: 'service' protocol description(?) { $item{protocol} } | 
-
-                                  protocol: m{\d{1,3}} { protocol => $item{__PATTERN1__} } | 
-                                            tcp_udp { $item[1] } |
-                                            m{ah|eigrp|esp|gre|igmp|igrp|ip|ipinip|ipsec|nos|ospf|pcp|pim|pptp|sctp|snp} { { protocol => $item{__PATTERN1__} } }
-                                            description { type => 'description', description => $item{description} }
                                             
-                                tcp_udp: m{tcp|udp} 'destination' m{eq|gt|lt|neq|range} m{[\w-]+} { 
-                                    { protocol => $item{__PATTERN1__}, destination => { op => $item{__PATTERN2__}, port => $item{__PATTERN3__} } }
-                                }
 
 
-
-
-                object_group: 'object-group' m{network|service|protocol} object_name m{(tcp|tcp-udp|udp)?} <matchrule:$item{__PATTERN1__}_obj_grp_body>(s?) {
-                #use Data::Dumper;
-                #print Dumper \%item;
+            object_group: 
+                'object-group' m{network|service|protocol} object_name m{(tcp|tcp-udp|udp)?} 
+                description(?) <matchrule:$item{__PATTERN1__}_obj_grp_body>(s?) {
                     { 
-                        type => $item{__RULE__}, 
                         name => $item{object_name},
-                        obj_grp_type => $item{__PATTERN1__},
-                        obj_grp_value => $item{'$item{__PATTERN1__}_obj_grp_body(s?)'},
+                        group_type => $item{__PATTERN1__},
+                        group_members => $item{'$item{__PATTERN1__}_obj_grp_body(s?)'},
+                        description => _zero_or_one($item{'description(?)'}),
                     }
-                }
-                    
-                    network_obj_grp_body:   'group-object' object_name { { type => 'group-object', group => $item{object_name} } } | 
-                                            'network-object host' ipv4 { { type => 'host', host => $item{ipv4} } } | 
-                                            'network-object' subnet { { type => 'subnet', network => $item{subnet}->[0], netmask => $item{subnet}->[1] } } |
-                                            description { { type => $item{__RULE__}, description => $item{description} } }
+            }
+                
+                network_obj_grp_body:
+                    'group-object' object_name { { type => 'group-object', group => $item{object_name} } } | 
+                    'network-object host' ipv4 { { type => 'host', ip => $item{ipv4} } } | 
+                    'network-object' subnet { { type => 'subnet', network => $item{subnet}->[0], netmask => $item{subnet}->[1] } } |
+                    'network-object object' object_name { { type => 'object', object => $item{object_name} } }
 
 
-                    service_obj_grp_body:   port_object { $item{port_object} } | 
-                                            group_object { $item{group_object} } | 
-                                            service_object { $item{service_object} } |
-                                            description { { description => $item{description} } }
+                service_obj_grp_body:
+                    port_object { $item{port_object} } | 
+                    group_object { $item{group_object} } | 
+                    service_object { $item{service_object} } 
 
-                        group_object: 'group-object' object_name { { type => 'group', object => $item{object_name} } }
-                        port_object: 'port-object' m{eq|range} m{\N+} { 
-                            { 
-                                type => 'port', 
-                                op => $item{__PATTERN1__},
-                                value => $item{__PATTERN2__},
+                    port_object: 
+                        'port-object' 'eq' m{\w+} { 
+                            {
+                                type => 'port-object',
+                                operator => 'eq',  
+                                port => $item{__PATTERN1__}
                             }
                         }
-                        service_object: 'service-object' m{\N+} { { type => 'service', slurp => $item{__PATTERN1__} } }
-                                 
+                        |
+                        'port-object' 'range' m{\w+} m{\w+} {     
+                            { 
+                                type => 'port-object',
+                                operator => 'range',
+                                port_start => $item{__PATTERN1__},
+                                port_end => $item{__PATTERN2__},
+                            }
+                        }
 
-                    protocol_obj_grp_body: 'protocol' m{\N+} { { slurp => $item{__PATTERN1__} } }
+                    group_object: 'group-object' object_name { { type => 'group', object => $item{object_name} } }
 
-                        
-                                      
-                    
+                    service_object: 
+                        'service-object object' object_name { { type => 'service-object', object => $item{object_name} } } |
+                        'service-object' protocol { { type => 'service', %{ $item{protocol} } } }
+
+                             
+
+                protocol_obj_grp_body: 
+                    group_object { $item{group_object} } | 
+                    protocol_object { $item{protocol_object} } 
+
+                    protocol_object: 'protocol-object' m{\w+} { 
+                        {
+                            type => 'protocol-object',
+                            protocol => $item{__PATTERN1__}
+                        }
+                    }
                     
              
 
@@ -234,7 +274,6 @@ sub parse_config {
     my ($parser, $config_contents) = @_;
 
     #$::RD_TRACE = 1;
-    #$::RD_HINT = 1;
 
     my $parse_tree = $parser->startrule($config_contents);
 
@@ -266,7 +305,6 @@ This module supports the following output drivers:
 
 =item * csv - writes the parsed configuration out in CSV format.
 
-=item * json - writes the parsed configuration out as JSON.
 
 =back
 
@@ -275,7 +313,6 @@ This module supports the following output drivers:
 sub get_output_drivers {
     return { 
         csv => \&csv_output_driver,
-        json => \&json_output_driver,
     };
 }
 
@@ -350,19 +387,6 @@ sub _csv_not_config_driver {
     }
 }
 
-
-
-
-
-=head2 json_output_driver
-
-=cut
-
-sub json_output_driver {
-    my ($fh, $filename, $parsed_config) = @_;
-
-    print encode_json($parsed_config);
-}
 
 =head1 AUTHOR
 

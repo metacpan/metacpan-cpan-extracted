@@ -23,12 +23,14 @@ sub handle
 	my $manualPodName = shift;
 	my $manualPodInput = shift;
 	
-	die("Only one of --_pp, --_info, --_info_cmd, --_info_config, --_info_modules allowed\n") if grep(/^_(pp|info)$/, keys(%$opts)) > 1;
-	if    ($opts->{'_pp'})           { _pp($opts, $version, $_argsPodName, $_argsPodInput, $argsPodName, $argsPodInput, $manualPodName, $manualPodInput); }
-	elsif ($opts->{'_info'})         { _info($opts, $_argsPodName, $_argsPodInput, $argsPodName, $argsPodInput, $manualPodName, $manualPodInput); }
-	elsif ($opts->{'_info_cmd'})     { _info_cmd($opts, $_argsPodName, $_argsPodInput, $argsPodName, $argsPodInput, $manualPodName, $manualPodInput); }
-	elsif ($opts->{'_info_config'})  { _info_config(); }
-	elsif ($opts->{'_info_modules'}) { _info_modules(); }
+	die("Only one of --_pp, --_pp_path, --_info, --_info_ppcmd, --_info_ppname, --_info_config, --_info_modules allowed\n") if grep(/^_(pp|info)$/, keys(%$opts)) > 1;
+	if    ($opts->{_pp})           { _pp(undef, $opts, $version, $_argsPodName, $_argsPodInput, $argsPodName, $argsPodInput, $manualPodName, $manualPodInput); }
+	elsif ($opts->{_pp_path})      { _pp($opts->{_pp_path}, $opts, $version, $_argsPodName, $_argsPodInput, $argsPodName, $argsPodInput, $manualPodName, $manualPodInput); }
+	elsif ($opts->{_info})         { _info($opts, $_argsPodName, $_argsPodInput, $argsPodName, $argsPodInput, $manualPodName, $manualPodInput); }
+	elsif ($opts->{_info_ppcmd})   { _info_ppcmd($opts, $_argsPodName, $_argsPodInput, $argsPodName, $argsPodInput, $manualPodName, $manualPodInput); }
+	elsif ($opts->{_info_ppname})  { _info_ppname($version); }
+	elsif ($opts->{_info_config})  { _info_config(); }
+	elsif ($opts->{_info_modules}) { _info_modules(); }
 	else { die("INTERNAL ERROR"); }
 		
 	exit(0);
@@ -36,6 +38,7 @@ sub handle
 
 sub _pp
 {
+	my $ppout = shift;
 	my $opts = shift;
 	my $version = shift;
 	my $_argsPodName = shift;
@@ -50,7 +53,9 @@ sub _pp
 	eval "require PAR::Packer";
 	warn("Sorry, it appears PAR::Packer is not installed/working!\n") if $@;
 
-	my $output = __construct_output($version);
+	my $output = $ppout || __construct_output($version);
+	my $outputDir = dirname($output);
+	die("The output directory doesn't exist: '$outputDir'\n") unless -d $outputDir;
 	die("The output file exists: '$output'\n") if -e $output;
 
 	my (undef, $configFile) = tempfile('testontap_config_XXXX', TMPDIR => 1, UNLINK => 1);
@@ -60,7 +65,7 @@ sub _pp
 	write_file($modulesFile, __find_modules()) || die("Failed to write '$modulesFile': $!\n");
 
 	my (undef, $cmdFile) = tempfile('testontap_cmd_XXXX', TMPDIR => 1, UNLINK => 1);
-	my @cmd = __find_cmd($opts, $_argsPodName, $_argsPodInput, $argsPodName, $argsPodInput, $manualPodName, $manualPodInput, $output, $cmdFile, $configFile, $modulesFile);
+	my @cmd = __find_ppcmd($opts, $_argsPodName, $_argsPodInput, $argsPodName, $argsPodInput, $manualPodName, $manualPodInput, $output, $cmdFile, $configFile, $modulesFile);
 	my @cmdCopy = @cmd;
 	$_ .= "\n" foreach (@cmdCopy);
 	write_file($cmdFile, { binmode => ':raw' }, @cmdCopy) || die("Failed to write '$cmdFile': $!\n");
@@ -94,7 +99,7 @@ sub _info
 	print "$0 (packed: $isPacked)\n";
 	
 	print "### CMD BEGIN\n";
-	_info_cmd($opts, $_argsPodName, $_argsPodInput, $argsPodName, $argsPodInput, $manualPodName, $manualPodInput);
+	_info_ppcmd($opts, $_argsPodName, $_argsPodInput, $argsPodName, $argsPodInput, $manualPodName, $manualPodInput);
 	print "### CMD END\n";
 
 	print "### CONFIG BEGIN\n";
@@ -106,7 +111,7 @@ sub _info
 	print "### MODULES END\n";
 }
 
-sub _info_cmd
+sub _info_ppcmd
 {
 	my $opts = shift;
 	my $_argsPodName = shift;
@@ -116,7 +121,14 @@ sub _info_cmd
 	my $manualPodName = shift;
 	my $manualPodInput = shift;
 
-	print __cmd2string(__find_cmd($opts, $_argsPodName, $_argsPodInput, $argsPodName, $argsPodInput, $manualPodName, $manualPodInput)); 	
+	print __cmd2string(__find_ppcmd($opts, $_argsPodName, $_argsPodInput, $argsPodName, $argsPodInput, $manualPodName, $manualPodInput)); 	
+}
+
+sub _info_ppname
+{
+	my $version = shift;
+
+	print __construct_output($version), "\n";
 }
 
 sub _info_config
@@ -131,7 +143,7 @@ sub _info_modules
 
 ###
 
-sub __find_cmd
+sub __find_ppcmd
 {
 	my $opts = shift;
 	my $_argsPodName = shift;

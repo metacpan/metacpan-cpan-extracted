@@ -1,0 +1,9 @@
+<h1>image test</h1>
+
+<p>The following image tag should correctly point to machin_stderr.png from the
+URL root, have dimensions, and use the provided alt/title text.</p>
+
+<p>
+<image>image_test/machin_stderr.png
+a test image</image>
+</p>

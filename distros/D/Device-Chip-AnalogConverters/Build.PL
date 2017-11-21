@@ -7,7 +7,7 @@ my $build = Module::Build->new(
    module_name => "Device::Chip::AnalogConverters",
 
    requires => {
-      'Data::Bitfield' => 0,
+      'Data::Bitfield' => '0.02',
       'Device::Chip' => '0.10',
    },
    test_requires => {

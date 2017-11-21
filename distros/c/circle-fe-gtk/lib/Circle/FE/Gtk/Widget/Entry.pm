@@ -7,6 +7,7 @@ package Circle::FE::Gtk::Widget::Entry;
 use strict;
 use warnings;
 
+use Variable::Disposition qw( retain_future );
 use constant type => "Entry";
 
 use Gtk2::Gdk::Keysyms;
@@ -19,20 +20,18 @@ sub build
    my $tabobj = $tab->{object};
 
    my $widget = Gtk2::Entry->new();
-   $obj->watch_property(
-      property => "text",
+   retain_future $obj->watch_property_with_initial(
+      "text",
       on_set => sub {
          my ( $text ) = @_;
          $text = "" unless defined $text;
          $widget->set_text( $text );
       },
-      want_initial => 1,
    );
 
-   $obj->watch_property(
-      property => "history",
+   retain_future $obj->watch_property_with_initial(
+      "history",
       on_updated => sub {}, # We ignore this, we just want a local cache
-      want_initial => 1,
    );
 
    my $autoclear = $obj->prop("autoclear");
@@ -41,16 +40,8 @@ sub build
 
    $widget->signal_connect( activate =>
       sub {
-         $obj->call_method(
-            method => "enter",
-            args => [ $widget->get_text ],
-
-            on_result => sub {}, # IGNORE
-
-            on_error => sub {
-               my ( $message ) = @_;
-               # TODO: write the error message somewhere
-            },
+         retain_future $obj->call_method(
+            enter => $widget->get_text,
          );
          $widget->set_text( "" ) if $autoclear;
          undef $history_index;

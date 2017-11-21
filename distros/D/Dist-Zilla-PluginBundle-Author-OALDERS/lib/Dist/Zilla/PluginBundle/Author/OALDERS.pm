@@ -1,7 +1,9 @@
 package Dist::Zilla::PluginBundle::Author::OALDERS;
-$Dist::Zilla::PluginBundle::Author::OALDERS::VERSION = '0.000016';
+
 use Moose;
 use namespace::autoclean;
+
+our $VERSION = '0.000017';
 
 use feature qw( say );
 
@@ -91,19 +93,10 @@ sub configure {
         'RunExtraTests',
 
         'MinimumPerl',
-        'PkgVersion',
         'PodWeaver',
         'PruneCruft',
 
         [ 'CopyFilesFromBuild' => { copy => \@copy_from_build } ],
-
-        [
-            'NextRelease' => {
-                time_zone => 'UTC',
-                format =>
-                    q{%-8v  %{yyyy-MM-dd HH:mm:ss'Z'}d%{ (TRIAL RELEASE)}T},
-            }
-        ],
 
         [ 'GithubMeta' => { issues => 1 } ],
         [
@@ -113,14 +106,7 @@ sub configure {
         ],
         [ 'CopyFilesFromRelease' => { filename    => [@copy_from_release] } ],
         [ 'Git::Check'           => { allow_dirty => \@allow_dirty } ],
-        [
-            'Git::Commit' => 'commit generated files' => {
-                allow_dirty => \@allow_dirty,
-            },
-        ],
         'Git::Contributors',
-        'Git::Tag',
-        'Git::Push',
 
         [
             'ReadmeAnyFromPod' => 'ReadmeMdInBuild' => {
@@ -136,6 +122,9 @@ sub configure {
     );
 
     $self->add_plugins($_) for @plugins;
+    $self->add_bundle( '@Git::VersionManager' =>
+            { commit_files_after_release => \@allow_dirty } );
+    $self->add_plugins('Git::Push');
 }
 
 sub _all_stopwords {
@@ -175,7 +164,7 @@ Dist::Zilla::PluginBundle::Author::OALDERS - A plugin bundle for distributions b
 
 =head1 VERSION
 
-version 0.000016
+version 0.000017
 
 =head2 configure
 
@@ -194,7 +183,7 @@ Olaf Alders <olaf@wundercounter.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Olaf Alders.
+This software is copyright (c) 2017 by Olaf Alders.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

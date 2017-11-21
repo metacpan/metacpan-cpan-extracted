@@ -1,6 +1,6 @@
 
 package Jojo::Base;
-$Jojo::Base::VERSION = '0.5.0';
+$Jojo::Base::VERSION = '0.6.0';
 # ABSTRACT: Mojo::Base + lexical "has"
 use 5.018;
 use strict;
@@ -27,8 +27,9 @@ our %EXPORT_TAGS;
 our %EXPORT_GEN;
 
 sub import {
-  my ($class, $caller) = (shift, caller);
+  my $class = shift;
   return unless my $flag = shift;
+  my $caller = caller;
 
   # Base
   my $base;
@@ -237,6 +238,57 @@ sub _generate_subs {
 #pod
 #pod =back
 #pod
+#pod =head1 FUNCTIONS
+#pod
+#pod L<Jojo::Base> implements the following functions, which can be imported with
+#pod the C<-base> flag, or by setting a base class.
+#pod
+#pod =head2 has
+#pod
+#pod   has 'name';
+#pod   has ['name1', 'name2', 'name3'];
+#pod   has name => 'foo';
+#pod   has name => sub {...};
+#pod   has ['name1', 'name2', 'name3'] => 'foo';
+#pod   has ['name1', 'name2', 'name3'] => sub {...};
+#pod
+#pod Create attributes for hash-based objects, just like the L<Mojo::Base/"attr"> method.
+#pod
+#pod =head2 with
+#pod
+#pod   with 'SubClass::Role::One';
+#pod   with '+One', '+Two';
+#pod
+#pod Composes the current package with one or more L<Jojo::Role> roles.
+#pod For roles following the naming scheme C<MyClass::Role::RoleName> you
+#pod can use the shorthand C<+RoleName>. Note that role support depends on
+#pod L<Jojo::Role> (0.4.0+).
+#pod
+#pod It works with L<Jojo::Role> or L<Role::Tiny> roles.
+#pod
+#pod =head1 METHODS
+#pod
+#pod L<Jojo::Base> inherits all methods from L<Mojo::Base> and implements
+#pod the following new ones.
+#pod
+#pod =head2 with_roles
+#pod
+#pod   my $new_class = SubClass->with_roles('SubClass::Role::One');
+#pod   my $new_class = SubClass->with_roles('+One', '+Two');
+#pod   $object       = $object->with_roles('+One', '+Two');
+#pod
+#pod Create a new class with one or more roles. If called on a class
+#pod returns the new class, or if called on an object reblesses the object into the
+#pod new class. For roles following the naming scheme C<MyClass::Role::RoleName> you
+#pod can use the shorthand C<+RoleName>. Note that role support depends on
+#pod L<Jojo::Role> (0.4.0+).
+#pod
+#pod   # Create a new class with the role "SubClass::Role::Foo" and instantiate it
+#pod   my $new_class = SubClass->with_roles('+Foo');
+#pod   my $object    = $new_class->new;
+#pod
+#pod It works with L<Jojo::Role> or L<Role::Tiny> roles.
+#pod
 #pod =head1 CAVEATS
 #pod
 #pod =over 4
@@ -258,6 +310,11 @@ sub _generate_subs {
 #pod
 #pod L<Mojo::Base>, L<Jojo::Role>.
 #pod
+#pod =head1 ACKNOWLEDGMENTS
+#pod
+#pod Thanks to Sebastian Riedel and others, the authors
+#pod and copyright holders of L<Mojo::Base>.
+#pod
 #pod =cut
 
 __END__
@@ -272,7 +329,7 @@ Jojo::Base - Mojo::Base + lexical "has"
 
 =head1 VERSION
 
-version 0.5.0
+version 0.6.0
 
 =head1 SYNOPSIS
 
@@ -397,6 +454,57 @@ by default
 
 =back
 
+=head1 FUNCTIONS
+
+L<Jojo::Base> implements the following functions, which can be imported with
+the C<-base> flag, or by setting a base class.
+
+=head2 has
+
+  has 'name';
+  has ['name1', 'name2', 'name3'];
+  has name => 'foo';
+  has name => sub {...};
+  has ['name1', 'name2', 'name3'] => 'foo';
+  has ['name1', 'name2', 'name3'] => sub {...};
+
+Create attributes for hash-based objects, just like the L<Mojo::Base/"attr"> method.
+
+=head2 with
+
+  with 'SubClass::Role::One';
+  with '+One', '+Two';
+
+Composes the current package with one or more L<Jojo::Role> roles.
+For roles following the naming scheme C<MyClass::Role::RoleName> you
+can use the shorthand C<+RoleName>. Note that role support depends on
+L<Jojo::Role> (0.4.0+).
+
+It works with L<Jojo::Role> or L<Role::Tiny> roles.
+
+=head1 METHODS
+
+L<Jojo::Base> inherits all methods from L<Mojo::Base> and implements
+the following new ones.
+
+=head2 with_roles
+
+  my $new_class = SubClass->with_roles('SubClass::Role::One');
+  my $new_class = SubClass->with_roles('+One', '+Two');
+  $object       = $object->with_roles('+One', '+Two');
+
+Create a new class with one or more roles. If called on a class
+returns the new class, or if called on an object reblesses the object into the
+new class. For roles following the naming scheme C<MyClass::Role::RoleName> you
+can use the shorthand C<+RoleName>. Note that role support depends on
+L<Jojo::Role> (0.4.0+).
+
+  # Create a new class with the role "SubClass::Role::Foo" and instantiate it
+  my $new_class = SubClass->with_roles('+Foo');
+  my $object    = $new_class->new;
+
+It works with L<Jojo::Role> or L<Role::Tiny> roles.
+
 =head1 CAVEATS
 
 =over 4
@@ -417,6 +525,11 @@ some code may need to be enclosed in blocks to avoid warnings like
 =head1 SEE ALSO
 
 L<Mojo::Base>, L<Jojo::Role>.
+
+=head1 ACKNOWLEDGMENTS
+
+Thanks to Sebastian Riedel and others, the authors
+and copyright holders of L<Mojo::Base>.
 
 =head1 AUTHOR
 

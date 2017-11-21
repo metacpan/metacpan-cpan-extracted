@@ -4,12 +4,14 @@ use strictures 2;
 use Test::More;
 use Test::Deep;
 
+use lib 't/lib';
+
 BEGIN {
-  use t::loader qw(build_schema);
+  use loader qw(build_schema);
   build_schema();
 }
 
-use t::common qw(Schema);
+use common qw(Schema);
 
 use_ok 'DBIx::Class::Sims';
 my $sub = \&DBIx::Class::Sims::massage_input;

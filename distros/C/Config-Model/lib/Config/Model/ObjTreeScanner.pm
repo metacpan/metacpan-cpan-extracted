@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::ObjTreeScanner;
-$Config::Model::ObjTreeScanner::VERSION = '2.113';
+$Config::Model::ObjTreeScanner::VERSION = '2.114';
 use strict;
 use Config::Model::Exception;
 use Scalar::Util qw/blessed/;
@@ -203,7 +203,7 @@ sub scan_element {
             ( $autov or $node->is_element_defined($element_name) )
             ? $node->fetch_element( name => $element_name, check => $self->{check} )
             : undef;
-        $self->{node_element_cb}->( $self, $data_r, $node, $element_name, undef, $next_obj );
+        $self->{node_element_cb}->( $self, $data_r, $node, $element_name, undef, $next_obj ) if $next_obj;
     }
     elsif ( $element_type eq 'leaf' ) {
         my $next_obj = $node->fetch_element( name => $element_name, check => $self->{check} );
@@ -285,7 +285,7 @@ Config::Model::ObjTreeScanner - Scan config tree and perform call-backs for each
 
 =head1 VERSION
 
-version 2.113
+version 2.114
 
 =head1 SYNOPSIS
 

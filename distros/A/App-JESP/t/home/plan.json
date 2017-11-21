@@ -3,6 +3,6 @@
         { "id":"foobartable", "sql": "CREATE TABLE foobar(id INTEGER PRIMARY KEY AUTOINCREMENT)"},
         { "id":"foobar_more", "file": "patches/morefoobar.sql" },
         { "id":"customertrigger", "file": "patches/customertrigger.sql" },
-        { "id":"insert_one_foobar", "sql": "INSERT INTO foobar(bla,baz) VALUES('bla',datetime() )" }
+      { "id":"insert_one_foobar", "sql": "INSERT INTO foobar(bla,baz) VALUES('bla',datetime() )" },
     ]
 }

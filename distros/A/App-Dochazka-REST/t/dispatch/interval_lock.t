@@ -435,15 +435,21 @@ foreach my $il ( qw( interval lock ) ) {
     note( 'test with demo fail 405' );
     req( $test, 403, 'demo', 'PUT', "$base/$test_id", $int_obj );
     note( 'test with root no request body' );
-    req( $test, 400, 'root', 'PUT', "$base/$test_id" );
+    $status = req( $test, 200, 'root', 'PUT', "$base/$test_id" );
+    is( $status->level, 'OK' );
+    is( $status->code, 'DISPATCH_UPDATE_NO_CHANGE_OK' );
     note( 'test with root fail invalid JSON' );
     req( $test, 400, 'root', 'PUT', "$base/$test_id", '{ asdf' );
     note( 'test with root fail invalid IID' );
     req( $test, 400, 'root', 'PUT', "$base/asdf", '{ "legal":"json" }' );
     note( 'with valid JSON that is not what we are expecting (valid IID)' );
-    req( $test, 400, 'root', 'PUT', "$base/$test_id", '0' );
+    $status = req( $test, 200, 'root', 'PUT', "$base/$test_id", '0' );
+    is( $status->level, 'OK' );
+    is( $status->code, 'DISPATCH_UPDATE_NO_CHANGE_OK' );
     note( 'with valid JSON that has some bogus properties' );
-    req( $test, 400, 'root', 'PUT', "$base/$test_id", '{ "legal":"json" }' );
+    $status = req( $test, 200, 'root', 'PUT', "$base/$test_id", '{ "legal":"json" }' );
+    is( $status->level, 'OK' );
+    is( $status->code, 'DISPATCH_UPDATE_NO_CHANGE_OK' );
     
     note( 'POST' );
     req( $test, 405, 'demo', 'POST', "$base/1" );

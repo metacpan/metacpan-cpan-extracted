@@ -1,0 +1,37 @@
+---
+abstract: 'Manage your YouTube Watch Later videos'
+author:
+  - 'Aaron L. Zeng <me@bcc32.com>'
+build_requires:
+  Test::Exception: '0'
+  Test::MockObject::Extends: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-WatchLater
+provides:
+  App::WatchLater:
+    file: lib/App/WatchLater.pm
+    version: '0.02'
+  App::WatchLater::YouTube:
+    file: lib/App/WatchLater/YouTube.pm
+    version: '0.02'
+requires:
+  DBD::SQLite: '0'
+  DBI: '0'
+  HTTP::Tiny: '0.055'
+  IO::Socket::SSL: '0'
+  JSON: '0'
+  Try::Tiny: '0'
+  URI::Find: '0'
+  perl: '5.016'
+resources:
+  license: http://opensource.org/licenses/mit-license.php
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

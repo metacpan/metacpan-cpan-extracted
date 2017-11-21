@@ -6,8 +6,8 @@ use Test::More;
 
 use MVC::Neaf qw(:sugar);
 
-get  foo => sub {+{}}, view => 'JS';
-post bar => sub {+{}}, view => 'JS';
+get  foo => sub {+{}}, -view => 'JS';
+post bar => sub {+{}}, -view => 'JS';
 get + post '/plus' => sub { +{-content => 'sugar='.$_[0]->method} };
 
 neaf error => 404 => { -content => 'Second Foundation' };

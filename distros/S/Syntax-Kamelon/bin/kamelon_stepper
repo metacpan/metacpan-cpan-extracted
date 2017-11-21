@@ -1,0 +1,51 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Syntax::Kamelon::Debugger;
+use Data::Dumper;
+
+my $noindex = 0;
+my $syntax;
+my $xmldir;
+my $file;
+
+while (@ARGV) {
+	my $o = shift @ARGV;
+	if ($o eq '-xmlfolder') {
+		$xmldir = shift @ARGV;
+	} elsif ($o eq '-syntax') {
+		$syntax = shift @ARGV
+	} elsif ($o eq '-file') {
+		$file = shift @ARGV
+	} elsif ($o eq '-noindex') {
+		$noindex = shift @ARGV
+	} else {
+		die "available options: -xmlfolder, -syntax, -file, -noindex";
+	}
+}
+
+my @o = (noindex => $noindex);
+if (defined $xmldir) {
+	unless (-e $xmldir) { die "$xmldir folder does not exist" }
+	unless (-d $xmldir) { die "$xmldir is not a folder" }
+	push @o, 'xmlfolder', $xmldir;
+}
+
+unless (defined $file) { die "Option -file must be specified" }
+unless (-e $file) { die "File $file does not exist" }
+unless (-f $file) { die "File $file is a folder" }
+
+unless (defined $syntax) { die "Option -syntax must be specified" }
+
+my $kam = Syntax::Kamelon::Debugger->new(@o);
+$kam->Syntax($syntax);
+$kam->SetTasks('step');
+
+unless (open(IFILE, "<", $file)) { die "Cannot open input $file" }
+
+while (my $in = <IFILE>) {
+	$kam->ParseRaw($in);
+}
+
+close IFILE;

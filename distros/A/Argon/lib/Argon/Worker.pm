@@ -1,272 +1,320 @@
 package Argon::Worker;
+# ABSTRACT: Argon worker node providing capacity to an Argon::Manager
+$Argon::Worker::VERSION = '0.18';
 
-use Moo;
-use Types::Standard qw(-types);
+use strict;
+use warnings;
 use Carp;
-use Coro;
-use Coro::ProcessPool;
-use Guard;
-use List::Util qw(max);
-use Argon::Message;
-use Argon::Stream;
-use Argon qw(K :commands :logging);
+use Moose;
+use AnyEvent;
+use AnyEvent::Util qw(fork_call portable_socketpair fh_nonblocking);
+use Argon;
+use Argon::Constants qw(:commands :defaults);
+use Argon::Log;
+use Argon::Marshal;
+use Argon::Types;
+use Argon::Util qw(K param interval);
+require Argon::Channel;
+require Argon::Client;
+require Argon::Message;
 
-extends 'Argon::Dispatcher';
+with qw(Argon::Encryption);
 
-#-------------------------------------------------------------------------------
-# Manager's address in the format "host:port"
-#-------------------------------------------------------------------------------
-has manager => (
-    is        => 'rwp',
-    isa       => sub {
-        croak sprintf("'%s' does not match host:port", ($_[0] || 'undef'))
-            if !defined $_[0]
-            || $_[0] !~ /^[\w\.]+:\d+$/;
-    },
-    predicate => 'is_managed',
-);
 
-#-------------------------------------------------------------------------------
-# Number of worker processes
-#-------------------------------------------------------------------------------
-has workers => (
-    is  => 'rwp',
-    isa => Maybe[Int],
-);
-
-#-------------------------------------------------------------------------------
-# Number of requests each worker process may handle before being restarted
-#-------------------------------------------------------------------------------
-has max_requests => (
-    is  => 'ro',
-    isa => Maybe[Int],
-);
-
-#-------------------------------------------------------------------------------
-# Coro::ProcessPool object which manages the worker processes
-#-------------------------------------------------------------------------------
-has pool => (
-    is  => 'lazy',
-    isa => InstanceOf['Coro::ProcessPool'],
-);
-
-sub _build_pool {
-    my $self = shift;
-
-    INFO 'Starting worker with %s pool processes', ($self->workers || 'default');
-
-    my $pool = Coro::ProcessPool->new(
-        ($self->workers      ? (max_procs => $self->workers)      : ()),
-        ($self->max_requests ? (max_reqs  => $self->max_requests) : ()),
-    );
-
-    $self->_set_workers($pool->{max_procs}) unless $self->workers;
-
-    return $pool;
-}
-
-#-------------------------------------------------------------------------------
-# Unique key to identify the worker with the manager
-#-------------------------------------------------------------------------------
-has key => (
-    is      => 'lazy',
-    isa     => Str,
-    default => sub { Data::UUID->new->create_str },
-);
-
-#-------------------------------------------------------------------------------
-# Total capacity of the worker, equating to the number of worker processes
-# available.
-#-------------------------------------------------------------------------------
 has capacity => (
-    is  => 'lazy',
-    isa => Int,
+  is       => 'ro',
+  isa      => 'Int',
+  required => 1,
 );
 
-sub _build_capacity { $_[0]->pool->{max_procs} }
 
-#-------------------------------------------------------------------------------
-# Set to true once the worker has registered with the manager. Set to false if
-# the connection is lost or the worker is not managed.
-#-------------------------------------------------------------------------------
-has is_registered => (
-    is       => 'rwp',
-    isa      => Bool,
-    default  => 0,
-    init_arg => undef,
+has mgr_host => (
+  is       => 'ro',
+  isa      => 'Str',
+  required => 1,
 );
 
-#-------------------------------------------------------------------------------
-# When the worker has registered with the manager, this stores the address of
-# the Argon::Client being used by the manager to send tasks to this worker.
-#-------------------------------------------------------------------------------
-has manager_client_addr => (
-    is        => 'rwp',
-    isa       => Str,
-    init_arg  => undef,
-    clearer   => 'clear_manager_client_addr',
+
+has mgr_port => (
+  is       => 'ro',
+  isa      => 'Int',
+  required => 1,
 );
 
-#-------------------------------------------------------------------------------
-# Shut down the process pool when the server stops
-#-------------------------------------------------------------------------------
-around stop => sub {
-    my $orig = shift;
-    my $self = shift;
-    $self->pool->shutdown;
-    $self->$orig(@_);
-};
+has timer => (
+  is  => 'rw',
+  isa => 'Any',
+);
 
-#-------------------------------------------------------------------------------
-# Initialize the worker, configure responders. Start registration loop if this
-# is a managed worker.
-#-------------------------------------------------------------------------------
-after init => sub {
-    my $self = shift;
-    $self->respond_to($CMD_QUEUE, K('cmd_queue', $self));
-    $self->respond_to($CMD_PING,  K('cmd_ping',  $self));
+has tries => (
+  is      => 'rw',
+  isa     => 'Int',
+  default => 0,
+);
 
-    if ($self->is_managed) {
-        INFO 'Starting worker node in managed mode with %d processes', $self->capacity;
-        async_pool { $self->register_loop };
-    } else {
-        INFO 'Starting worker node in standalone mode with %d processes', $self->capacity;
-    }
-};
+has intvl => (
+  is       => 'ro',
+  isa      => 'CodeRef',
+  default  => sub { interval(1) },
+  init_arg => undef,
+);
 
-#-------------------------------------------------------------------------------
-# Called by Argon::Service when a client is disconnected. If this is a managed
-# worker and the client being disconnected is the manager, reset manager
-# tracking attributes so the registration monitor will attempt to reconnect.
-#-------------------------------------------------------------------------------
-sub client_disconnected {
-    my ($self, $addr) = @_;
-    DEBUG 'Worker: client %s disconnected', $addr;
+has mgr => (
+  is  => 'rw',
+  isa => 'Argon::Client',
+);
 
-    return unless $self->is_managed;
-    return unless $self->is_registered;
+has workers => (
+  is  => 'rw',
+  isa => 'ArrayRef',
+  default => sub {[]},
+);
 
-    if ($addr eq $self->manager_client_addr) {
-        WARN 'Lost connection to manager';
-        $self->clear_manager_client_addr;
-        $self->_set_is_registered(0);
-    }
+has assigned => (
+  is  => 'rw',
+  isa => 'HashRef',
+  default => sub {{}},
+);
+
+
+sub BUILD {
+  my ($self, $args) = @_;
+  $AnyEvent::Util::MAX_FORKS = $self->capacity;
+  $self->add_worker foreach 1 .. $self->capacity;
 }
 
-#-------------------------------------------------------------------------------
-# Called by Argon::Service when new client is connected
-#-------------------------------------------------------------------------------
-sub client_connected {
-    my ($self, $addr) = @_;
-    DEBUG 'Worker: client %s connected', $addr;
+
+sub start {
+  my $self = shift;
+  $self->connect;
 }
 
-#-------------------------------------------------------------------------------
-# Perform single registration attempt with the manager.
-#-------------------------------------------------------------------------------
+
+sub connect {
+  my $self = shift;
+  $self->timer(undef);
+  $self->tries($self->tries + 1);
+
+  log_trace 'Connecting to manager (attempt %d)', $self->tries;
+
+  $self->mgr(Argon::Client->new(
+    key    => $self->key,
+    token  => $self->token,
+    host   => $self->mgr_host,
+    port   => $self->mgr_port,
+    ready  => K('register', $self),
+    closed => K('_disconnected', $self),
+    notify => K('_queue', $self),
+  ));
+
+  $self->intvl->(1); # reset
+}
+
+sub _disconnected {
+  my $self = shift;
+  log_debug 'Manager disconnected' unless $self->timer;
+  $self->reconnect;
+}
+
+sub reconnect {
+  my $self = shift;
+  my $intvl = $self->intvl->();
+  $self->timer(AnyEvent->timer(after => $intvl, cb => K('connect', $self)));
+  log_debug 'Reconection attempt in %0.4fs', $intvl;
+}
+
 sub register {
-    my $self = shift;
-    croak 'Cannot register in standalone mode' unless $self->is_managed;
-    INFO 'Attempting registration with manager (%s)', $self->manager;
+  my $self = shift;
+  log_note 'Connected to manager';
+  log_trace 'Registering with manager';
 
-    $self->_set_is_registered(0);
+  my $msg = Argon::Message->new(
+    cmd  => $HIRE,
+    info => {capacity => $self->capacity},
+  );
 
-    # Connect to manager
-    my ($mgr_host, $mgr_port) = split ':', $self->manager;
-    my $stream = eval { Argon::Stream->connect($mgr_host, $mgr_port) };
-
-    if ($@) {
-        ERROR 'Error connecting to manager: %s', $@;
-        return 0;
-    } else {
-        DEBUG 'Connected to manager; sending registration message';
-
-        # Send registration message
-        my $msg = Argon::Message->new(
-            cmd     => $CMD_REGISTER,
-            key     => $self->key,
-            payload => {
-                host     => $self->host,
-                port     => $self->port,
-                capacity => $self->capacity,
-            },
-        );
-
-        $stream->write($msg);
-
-        # Manager will connect as a client here before returning a reply
-        my $reply = $stream->read;
-
-        # Evaluate results
-        if ($reply->cmd == $CMD_ACK) {
-            INFO 'Registered with manager (%s from %s)', $self->manager, $reply->payload->{client_addr};
-            $self->_set_is_registered(1);
-            $self->_set_manager_client_addr($reply->payload->{client_addr});
-            return 1;
-        } else {
-            ERROR 'Error registering with manager (%s): %s', $self->manager, $reply->payload;
-            croak sprintf('Error registering with manager (%s): %s', $self->manager, $reply->payload);
-        }
-    }
+  $self->mgr->send($msg);
+  $self->mgr->reply_cb($msg, K('_mgr_registered', $self));
 }
 
-#-------------------------------------------------------------------------------
-# Timer that checks whether a managed worker is connected and reconnects as
-# needed. The time between attempts increases logarithmically until a
-# connection is made, at which point it is reset.
-#-------------------------------------------------------------------------------
-sub register_loop {
-    my $self  = shift;
-    my $sleep = $Argon::POLL_INTERVAL;
-
-    while (1) {
-        DEBUG 'Checking registration with manager';
-
-        # Attempt to register until manager connects back
-        if ($self->is_registered) {
-            DEBUG 'Already registered';
-            Coro::AnyEvent::sleep $sleep;
-        } else {
-            if ($self->register) {
-                DEBUG 'Registration successful';
-                # Reset sleep timer after successful registration.
-                $sleep = $Argon::POLL_INTERVAL;
-                Coro::AnyEvent::sleep $sleep;
-            } else {
-                DEBUG 'Failed to register; will try again in %f seconds', $sleep;
-                Coro::AnyEvent::sleep $sleep;
-                $sleep += log(max(2, $sleep)) / log(10);
-            }
-        }
-    }
+sub _mgr_registered {
+  my ($self, $msg) = @_;
+  if ($msg->failed) {
+    log_error 'Failed to register with manager: %s', $msg->info;
+  }
+  else {
+    log_info 'Accepting tasks';
+    log_note 'Direct code execution is permitted'
+      if $Argon::ALLOW_EVAL;
+  }
 }
 
-#-------------------------------------------------------------------------------
-# Handler for CMD_PING
-#-------------------------------------------------------------------------------
-sub cmd_ping {
-    my ($self, $msg, $addr) = @_;
-    return $msg->reply(cmd => $CMD_ACK);
+sub _queue {
+  my ($self, $msg) = @_;
+  if (my $worker = shift @{$self->{workers}}) {
+    my ($id, $chan) = @$worker;
+    $chan->send($msg);
+    $self->{assigned}{$id} = $worker;
+  } else {
+    log_debug 'No available capacity';
+    $self->mgr->send($msg->reply(cmd => $DENY, info => "No available capacity. Please try again later."));
+  }
 }
 
-#-------------------------------------------------------------------------------
-# Handler for CMD_QUEUE. Shunts msgs to the process pool and returns the
-# results.
-#-------------------------------------------------------------------------------
-sub cmd_queue {
-    my ($self, $msg, $addr) = @_;
-
-    # Ignore non-manager connections in managed mode.
-    if ($self->is_managed && ($msg->key ne $self->key)) {
-        return $msg->reply(
-            cmd     => $CMD_ERROR,
-            payload => 'Cannot accept tasks from arbitrary sources in managed mode.',
-        );
-    }
-
-    my $result = eval { $self->pool->process(@{$msg->payload}) };
-    return $@ ? $msg->reply(cmd => $CMD_ERROR,    payload => $@)
-              : $msg->reply(cmd => $CMD_COMPLETE, payload => $result);
+sub _result {
+  my ($self, $id, $reply) = @_;
+  push @{$self->{workers}}, delete $self->{assigned}{$id};
+  $self->mgr->send($reply);
 }
+
+sub _worker_closed {
+  my ($self, $id) = @_;
+  delete $self->assigned->{$id};
+  $self->{workers} = [ grep { $_->[0] ne $id } @{$self->{workers}} ];
+  $self->add_worker;
+}
+
+sub add_worker {
+  my $self = shift;
+  my $id = $self->create_token;
+  my $on_close = K('_worker_closed', $self, $id);
+
+  my ($left, $right) = portable_socketpair;
+
+  fork_call {
+    use Class::Load qw(load_class);
+    use Argon::Log;
+    use Argon::Marshal;
+
+    close $left;
+    $\ = $EOL;
+
+    log_trace 'subprocess: running';
+
+    eval {
+      while (defined(my $line = <$right>)) {
+        eval {
+          chomp $line;
+          my $msg = decode_msg($line);
+
+          my $result = eval {
+            my ($class, @args) = @{$msg->info};
+            load_class($class);
+            $class->new(@args)->run;
+          };
+
+          my $reply = $@
+            ? $msg->error($@)
+            : $msg->reply(cmd => $DONE, info => $result);
+
+          syswrite $right, encode_msg($reply);
+          syswrite $right, $EOL;
+        };
+
+        $@ && log_warn 'subprocess: %s', $@;
+      }
+    };
+
+    $@ && log_error 'subprocess: %s', $@;
+    exit 0;
+  };
+
+  close $right;
+  fh_nonblocking $left, 1;
+
+  my $channel = Argon::Channel->new(
+    fh       => $left,
+    on_close => $on_close,
+    on_err   => $on_close,
+    on_msg   => K('_result', $self, $id),
+  );
+
+  push @{$self->{workers}}, [$id, $channel];
+  log_trace 'subprocess started';
+  return $id;
+}
+
+__PACKAGE__->meta->make_immutable;
 
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Argon::Worker - Argon worker node providing capacity to an Argon::Manager
+
+=head1 VERSION
+
+version 0.18
+
+=head1 SYNOPSIS
+
+  use Argon::Worker;
+  use AnyEvent;
+
+  my $cv = AnyEvent->condvar;
+
+  my $worker = Argon::Worker->new(
+    keyfile  => 'path/to/secret',
+    capacity => 4,
+    mgr_host => 'some.host-addr.com',
+    mgr_port => 8000,
+  );
+
+  $cv->recv;
+
+=head1 DESCRIPTION
+
+Workers do the actual work of executing the tasks assigned to them by
+the L<Argon::Manager>.
+
+For most use cases, this class need not be access directly; instead,
+L<bin/ar-worker> provides a command-line interface to control the manager
+process.
+
+=head1 ATTRIBUTES
+
+=head2 keyfile
+
+Path to the file containing the encryption pass phrase. Inherited from
+L<Argon::Encryption>.
+
+=head2 capacity
+
+The number of tasks which this worker can handle concurrently.
+
+=head2 mgr_hsot
+
+The host name or IP of the manager process.
+
+=head2 mgr_port
+
+The port number on which the manager is listening.
+
+=head1 METHODS
+
+=head2 start
+
+Starts the worker.
+
+=head2 connect
+
+Connects to the manager service. Called by L</start>.
+
+=head1 AUTHOR
+
+Jeff Ober <sysread@fastmail.fm>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Jeff Ober.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

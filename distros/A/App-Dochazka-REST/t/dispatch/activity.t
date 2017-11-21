@@ -200,7 +200,9 @@ is( $foobar->remark, "Change is good", "PUT $base/:aid 6" );
 ok( $foobar->disabled, "PUT $base/:aid 7" );
 
 note( 'test with root no request body' );
-req( $test, 400, 'root', 'PUT', "$base/$aid_of_foobar" );
+$status = req( $test, 200, 'root', 'PUT', "$base/$aid_of_foobar" );
+is( $status->level, 'OK', "PUT $base/:aid 8" );
+is( $status->code, 'DISPATCH_UPDATE_NO_CHANGE_OK', "PUT $base/:aid 9" );
 
 note( 'test with root fail invalid JSON' );
 req( $test, 400, 'root', 'PUT', "$base/$aid_of_foobar", '{ asdf' );
@@ -209,10 +211,14 @@ note( 'test with root fail invalid AID' );
 req( $test, 400, 'root', 'PUT', "$base/asdf", '{ "legal":"json" }' );
 
 note( 'with valid JSON that is not what we are expecting' );
-req( $test, 400, 'root', 'PUT', "$base/$aid_of_foobar", '0' );
+$status = req( $test, 200, 'root', 'PUT', "$base/$aid_of_foobar", '0' );
+is( $status->level, 'OK', "PUT $base/:aid 10" );
+is( $status->code, 'DISPATCH_UPDATE_NO_CHANGE_OK', "PUT $base/:aid 11" );
 
 note( 'with valid JSON that has some bogus properties' );
-req( $test, 400, 'root', 'PUT', "$base/$aid_of_foobar", '{ "legal":"json" }' );
+$status = req( $test, 200, 'root', 'PUT', "$base/$aid_of_foobar", '{ "legal":"json" }' );
+is( $status->level, 'OK', "PUT $base/:aid 12" );
+is( $status->code, 'DISPATCH_UPDATE_NO_CHANGE_OK', "PUT $base/:aid 13" );
 
 note( "POST on $base/:aid" );
 req( $test, 405, 'demo', 'POST', "$base/1" );

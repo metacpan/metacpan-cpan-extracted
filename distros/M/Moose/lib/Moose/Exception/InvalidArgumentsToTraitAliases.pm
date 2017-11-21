@@ -1,5 +1,5 @@
 package Moose::Exception::InvalidArgumentsToTraitAliases;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -28,4 +28,5 @@ sub _build_message {
         . "valid arguments to the 'trait_aliases' option";
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

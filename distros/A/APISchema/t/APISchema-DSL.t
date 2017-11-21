@@ -1,4 +1,5 @@
 package t::APISchema::Generator::Router::Simple;
+use lib '.';
 use t::test;
 use Encode qw(decode_utf8);
 

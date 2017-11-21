@@ -11,7 +11,7 @@ use Sys::Hostname 'hostname';
 
 has 'mysql';
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 sub dequeue {
   my ($self, $id, $wait, $options) = @_;
@@ -55,52 +55,110 @@ sub enqueue {
 sub fail_job   { shift->_update(1, @_) }
 sub finish_job { shift->_update(0, @_) }
 
-sub job_info {
-  my $hash = shift->mysql->db->query(
-    'select id, `args`, UNIX_TIMESTAMP(`created`) as `created`,
-       UNIX_TIMESTAMP(`delayed`) as `delayed`,
-       UNIX_TIMESTAMP(`finished`) as `finished`, `priority`, `queue`, `result`,
-       UNIX_TIMESTAMP(`retried`) as `retried`, COALESCE(`retries`, 0) as retries,
-       UNIX_TIMESTAMP(`started`) as `started`, `state`, `task`, `worker`, `attempts`
-     from minion_jobs where id = ?', shift
-  )->hash;
-
-  return undef unless $hash;
-
-  $hash->{args} = $hash->{args} ? decode_json($hash->{args}) : undef;
-  $hash->{result} = $hash->{result} ? decode_json($hash->{result}) : undef;
-  return $hash;
-}
-
 sub list_jobs {
   my ($self, $offset, $limit, $options) = @_;
 
-  my $state = $options->{state} ? "state in (?)" : "1";
-  my $task = $options->{task} ? "task in (?)" : "1";
+  my ( @where, @params );
+  if ( my $state = $options->{state} ) {
+    my @states = ref $state eq 'ARRAY' ? @$state : ( $state );
+    push @where, 'state in (' . join( ',', ('?') x @states ) . ')';
+    push @params, @states;
+  }
+  if ( my $task = $options->{task} ) {
+    my @tasks = ref $task eq 'ARRAY' ? @$task : ( $task );
+    push @where, 'task in (' . join( ',', ('?') x @tasks ) . ')';
+    push @params, @tasks;
+  }
+  if ( my $id = $options->{ids} ) {
+    my @ids = ref $id eq 'ARRAY' ? @$id : ( $id );
+    push @where, 'id in (' . join( ',', ('?') x @ids ) . ')';
+    push @params, @ids;
+  }
 
-  my @args = ($limit, $offset);
-  unshift(@args, $options->{task}) if $options->{task};
-  unshift(@args, $options->{state}) if $options->{state};
+  my $where = @where ? 'WHERE ' . join( ' AND ', @where ) : '';
+  # XXX: notes column missing
+  my $jobs = $self->mysql->db->query(
+    "SELECT
+      id, args, attempts,
+      UNIX_TIMESTAMP(created) AS created,
+      UNIX_TIMESTAMP(`delayed`) AS `delayed`,
+      UNIX_TIMESTAMP(finished) AS finished, priority,
+      queue, result, UNIX_TIMESTAMP(retried) AS retried, retries,
+      UNIX_TIMESTAMP(started) AS started, state, task,
+      worker
+    FROM minion_jobs
+    $where
+    ORDER BY id DESC
+    LIMIT ?
+    OFFSET ?", @params, $limit, $offset,
+  )->hashes;
+  $jobs->map( _decode_json_fields(qw{ args result }) )
+    # XXX: Job children/parents not supported
+    # Add fake arrayrefs to make the Minion UI work
+    ->map( sub { $_[0]->{parents} = $_[0]->{children} = []; return $_[0] } );
 
-  return $self->mysql->db->query(
-    "select id from minion_jobs
-     where ($state) and ($task)
-     order by id desc
-     limit ?
-     offset ?", @args
-  )->arrays->map(sub { $self->job_info($_->[0]) })->to_array;
+  my $total = $self->mysql->db->query(
+    'SELECT COUNT(*) AS count FROM minion_jobs',
+  )->hash->{count};
+
+  return {
+    jobs => $jobs,
+    total => $total,
+  }
+}
+
+sub _decode_json_fields {
+  my @fields = @_;
+  return sub {
+    my $hash = shift;
+    for my $field ( @fields ) {
+      next unless $hash->{ $field };
+      $hash->{ $field } = decode_json( $hash->{ $field } );
+    }
+    return $hash;
+  };
 }
 
 sub list_workers {
-  my ($self, $offset, $limit) = @_;
+  my ($self, $offset, $limit, $options) = @_;
 
-  my $sql = 'select id from minion_workers order by id desc limit ? offset ?';
-  return $self->mysql->db->query($sql, $limit, $offset)
-    ->arrays->map(sub { $self->worker_info($_->[0]) })->to_array;
+  my ( @where, @params );
+  if ( my $ids = $options->{ids} ) {
+    push @where, 'id in (' . join( ',', ('?') x @{$options->{ids}} ) . ')';
+    push @params, @{ $options->{ids} };
+  }
+
+  my $where = @where ? 'WHERE ' . join ' AND ', @where : '';
+  # XXX: Missing "status" column for workers
+  my $sql = "SELECT
+    id, UNIX_TIMESTAMP(notified) AS notified, host, pid,
+    UNIX_TIMESTAMP(started) AS started
+  FROM minion_workers $where ORDER BY id DESC LIMIT ? OFFSET ?";
+  my $workers = $self->mysql->db->query($sql, @params, $limit, $offset)
+    ->hashes;
+
+  # Add jobs to each worker
+  my $jobs_sql = q{SELECT id FROM minion_jobs WHERE state='active' AND worker=?};
+  $workers->map( sub {
+      $_->{jobs} = $self->mysql->db->query($jobs_sql, $_->{id})->arrays->flatten->to_array
+  } );
+
+  my $total = $self->mysql->db->query(
+    'SELECT COUNT(*) AS count FROM minion_workers',
+  )->hash->{count};
+
+  return {
+    workers => $workers,
+    total => $total,
+  };
 }
 
 sub new {
-  my $self = shift->SUPER::new(mysql => Mojo::mysql->new(@_));
+  my ( $class, @args ) = @_;
+  if ( ref $args[0] eq 'HASH' ) {
+    @args = %{ $args[0] };
+  }
+  my $self = $class->SUPER::new(mysql => Mojo::mysql->new(@args));
   my $mysql = $self->mysql->max_connections(1);
   $mysql->migrations->name('minion')->from_data;
   $mysql->once(connection => sub { shift->migrations->migrate });
@@ -161,9 +219,9 @@ sub repair {
   );
 }
 
-sub reset { 
+sub reset {
     my $self = shift;
-    
+
     $self->mysql->db->query("truncate table minion_jobs");
     $self->mysql->db->query("truncate table minion_workers");
 }
@@ -204,6 +262,8 @@ sub stats {
     $states->{$next->[0]} = $next->[1];
   }
 
+  my $uptime = $db->query( 'SHOW GLOBAL STATUS LIKE "Uptime"' )->hash->{Value};
+
   return {
     active_workers   => $active,
     inactive_workers => $all - $active,
@@ -211,33 +271,12 @@ sub stats {
     inactive_jobs    => $states->{inactive} || 0,
     failed_jobs      => $states->{failed} || 0,
     finished_jobs    => $states->{finished} || 0,
+    uptime           => $uptime || 0,
   };
 }
 
 sub unregister_worker {
   shift->mysql->db->query('delete from minion_workers where id = ?', shift);
-}
-
-sub worker_info {
-  my ($self, $id) = @_;
-
-  my $hash = $self->mysql->db->query(
-    "select `id`, UNIX_TIMESTAMP(`notified`) as `notified`, `host`, 
-    `pid`, UNIX_TIMESTAMP(`started`) as `started`
-     from `minion_workers`
-     where id = ?", $id
-  )->hash;
-
-  return undef unless $hash;
-
-  my $jobs = $self->mysql->db->query(
-   "select `id` from `minion_jobs`
-   where `state` = 'active' and `worker` = ?", $id
-  )->arrays()->flatten->to_array;
-
-  $hash->{jobs} = $jobs;
-
-  return $hash;
 }
 
 sub _try {
@@ -256,14 +295,14 @@ sub _try {
   my $job = $tx->db->query(qq(select id, args, retries, task from minion_jobs
     where state = 'inactive' and `delayed` <= NOW() and queue in ($qq)
     and task in ($qt)
-    order by priority desc, created limit 1 for update), 
+    order by priority desc, created limit 1 for update),
    @{ $options->{queues} || ['default']}, @{ $tasks }
   )->hash;
 
   return undef unless $job;
 
   $tx->db->query(
-     qq(update minion_jobs set started = now(), state = 'active', worker = ? where id = ?), 
+     qq(update minion_jobs set started = now(), state = 'active', worker = ? where id = ?),
      $id, $job->{id}
   );
   $tx->commit;
@@ -282,7 +321,7 @@ sub _update {
      encode_json($result), $fail ? 'failed' : 'finished', $id,
     $retries
   )->{affected_rows};
-  my $job = $self->job_info( $id );
+  my $job = $self->list_jobs( 0, 1, { ids => [$id] } )->{jobs}[0];
   return 1 if !$fail || (my $attempts = $job->{attempts}) == 1;
   return 1 if $retries >= ( $attempts - 1 );
   my $delay = $self->minion->backoff->( $retries );
@@ -737,7 +776,7 @@ Minion::Backend::mysql
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 SYNOPSIS
 

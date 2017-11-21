@@ -1,9 +1,11 @@
 Build.PL
 Changes
+LICENSE
 MANIFEST
 MANIFEST.SKIP
 META.json
 META.yml
+README
 README.pod
 cpanfile
 lib/Gentoo/App/Pram.pm

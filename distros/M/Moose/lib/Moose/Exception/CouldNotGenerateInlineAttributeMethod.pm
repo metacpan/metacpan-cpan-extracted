@@ -1,5 +1,5 @@
 package Moose::Exception::CouldNotGenerateInlineAttributeMethod;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -22,4 +22,5 @@ sub _build_message {
     "Could not generate inline ".$self->option." because : ".$self->error;
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

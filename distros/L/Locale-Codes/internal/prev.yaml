@@ -46541,7 +46541,8 @@ script:
       Cher: Cherokee
       Cirt: Cirth
       Copt: Coptic
-      Cprt: Cypriot
+      Cpmn: Cypro-Minoan
+      Cprt: Cypriot syllabary
       Cyrl: Cyrillic
       Cyrs: Cyrillic (Old Church Slavonic variant)
       Deva: Devanagari
@@ -46574,6 +46575,7 @@ script:
       Hira: Hiragana
       Hluw: Anatolian Hieroglyphs
       Hmng: Pahawh Hmong
+      Hmnp: Nyiakeng Puachue Hmong
       Hrkt: Japanese syllabaries (alias for Hiragana + Katakana)
       Hung: Old Hungarian
       Inds: Indus
@@ -46628,7 +46630,8 @@ script:
       Narb: Old North Arabian
       Nbat: Nabataean
       Newa: Newa
-      Nkgb: Nakhi Geba
+      Nkdb: Naxi Dongba
+      Nkgb: Naxi Geba
       Nkoo: N'Ko
       Nshu: Nushu
       Ogam: Ogham
@@ -46660,6 +46663,7 @@ script:
       Sgnw: SignWriting
       Shaw: Shavian
       Shrd: Sharada
+      Shui: Shuishu
       Sidd: Siddham
       Sind: Khudawadi
       Sinh: Sinhala
@@ -46690,6 +46694,7 @@ script:
       Vaii: Vai
       Visp: Visible Speech
       Wara: Warang Citi
+      Wcho: Wancho
       Wole: Woleai
       Xpeo: Old Persian
       Xsux: Sumero-Akkadian cuneiform
@@ -46787,9 +46792,12 @@ script:
       coptic: 
         - Copt
         - Coptic
-      cypriot: 
+      cypriot syllabary: 
         - Cprt
-        - Cypriot
+        - Cypriot syllabary
+      cypro-minoan: 
+        - Cpmn
+        - Cypro-Minoan
       cyrillic: 
         - Cyrl
         - Cyrillic
@@ -47051,9 +47059,12 @@ script:
       nabataean: 
         - Nbat
         - Nabataean
-      nakhi geba: 
+      naxi dongba: 
+        - Nkdb
+        - Naxi Dongba
+      naxi geba: 
         - Nkgb
-        - Nakhi Geba
+        - Naxi Geba
       new tai lue: 
         - Talu
         - New Tai Lue
@@ -47063,6 +47074,9 @@ script:
       nushu: 
         - Nshu
         - Nushu
+      nyiakeng puachue hmong: 
+        - Hmnp
+        - Nyiakeng Puachue Hmong
       ogham: 
         - Ogam
         - Ogham
@@ -47147,6 +47161,9 @@ script:
       shavian: 
         - Shaw
         - Shavian
+      shuishu: 
+        - Shui
+        - Shuishu
       siddham: 
         - Sidd
         - Siddham
@@ -47246,6 +47263,9 @@ script:
       visible speech: 
         - Visp
         - Visible Speech
+      wancho: 
+        - Wcho
+        - Wancho
       warang citi: 
         - Wara
         - Warang Citi
@@ -47267,6 +47287,7 @@ script:
       "060": Egyptian hieratic
       "070": Egyptian demotic
       "080": Anatolian Hieroglyphs (Luwian Hieroglyphs, Hittite Hieroglyphs)
+      "085": Naxi Dongba (Nakhi Tomba)
       "090": Mayan hieroglyphs
       "095": SignWriting
       100: Meroitic Hieroglyphs
@@ -47334,6 +47355,7 @@ script:
       280: Visible Speech
       281: Shavian (Shaw)
       282: Miao (Pollard)
+      283: Wancho
       284: Jamo (alias for Jamo subset of Hangul)
       285: Bopomofo
       286: Hangul (Hangul, Hangeul)
@@ -47409,12 +47431,13 @@ script:
       399: Lisu (Fraser)
       400: Linear A
       401: Linear B
-      403: Cypriot
+      402: Cypro-Minoan
+      403: Cypriot syllabary
       410: Hiragana
       411: Katakana
       412: Japanese syllabaries (alias for Hiragana + Katakana)
       413: Japanese (alias for Han + Hiragana + Katakana)
-      420: Nakhi Geba ('Na-'Khi Ggo-baw, Naxi Geba)
+      420: Naxi Geba (Nakhi Geba, 'Na-'Khi Ggo-baw)
       430: Ethiopic (Geez)
       435: Bamum
       436: Kpelle
@@ -47424,6 +47447,7 @@ script:
       440: Unified Canadian Aboriginal Syllabics
       445: Cherokee
       450: Pahawh Hmong
+      451: Nyiakeng Puachue Hmong
       460: Yi
       470: Vai
       480: Woleai
@@ -47435,6 +47459,7 @@ script:
       505: Khitan large script
       510: Jurchen
       520: Tangut
+      530: Shuishu
       550: Blissymbols
       570: Braille
       610: Indus (Harappan)
@@ -47537,9 +47562,12 @@ script:
       cuneiform, sumero-akkadian: 
         - '020'
         - Cuneiform, Sumero-Akkadian
-      cypriot: 
+      cypriot syllabary: 
         - 403
-        - Cypriot
+        - Cypriot syllabary
+      cypro-minoan: 
+        - 402
+        - Cypro-Minoan
       cyrillic: 
         - 220
         - Cyrillic
@@ -47801,9 +47829,12 @@ script:
       nabataean: 
         - 159
         - Nabataean
-      nakhi geba ('na-'khi ggo-baw, naxi geba): 
+      naxi dongba (nakhi tomba): 
+        - '085'
+        - Naxi Dongba (Nakhi Tomba)
+      naxi geba (nakhi geba, 'na-'khi ggo-baw): 
         - 420
-        - Nakhi Geba ('Na-'Khi Ggo-baw, Naxi Geba)
+        - Naxi Geba (Nakhi Geba, 'Na-'Khi Ggo-baw)
       new tai lue: 
         - 354
         - New Tai Lue
@@ -47813,6 +47844,9 @@ script:
       nushu: 
         - 499
         - Nushu
+      nyiakeng puachue hmong: 
+        - 451
+        - Nyiakeng Puachue Hmong
       ogham: 
         - 212
         - Ogham
@@ -47897,6 +47931,9 @@ script:
       shavian (shaw): 
         - 281
         - Shavian (Shaw)
+      shuishu: 
+        - 530
+        - Shuishu
       siddham, siddham, siddhamatrka: 
         - 302
         - Siddham, Siddham, Siddhamatrka
@@ -47993,6 +48030,9 @@ script:
       visible speech: 
         - 280
         - Visible Speech
+      wancho: 
+        - 283
+        - Wancho
       warang citi (varang kshiti): 
         - 262
         - Warang Citi (Varang Kshiti)

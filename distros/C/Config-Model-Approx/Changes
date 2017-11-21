@@ -1,3 +1,14 @@
+2017-11-13 - 1.010
+
+    * upgrade model with cme meta
+    * update support info in application file
+    * dist.ini: update copyright years
+    * dist.ini: switch bug tracker to github
+    * remove dependency on EV and AnyEvent from test
+    * Build.PL: avoid build dep on cme
+    * fix GPL wording to keep Debian's lintian happy (and may be RMS)
+    * fix typo detected by Debian lintian
+
 2013-08-21 - 1.009
 
     * Build-depends on Config::Model::Tester

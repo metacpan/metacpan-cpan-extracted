@@ -1,0 +1,302 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Syntax::Kamelon::XMLData;
+use Syntax::Kamelon::Diagnostics;
+use Wx;
+
+
+my $help = <<__EOF;
+This is a viewer/debugger for the Kamelon syntax highlight engine.
+
+yashe_xml_updater takes the following arguments:
+
+-help
+   Displays this text.
+
+-u
+-updateedir
+   Sets the folder where the updates are located.
+
+-x
+-xmldir
+   Specifies the XML directory. By default it uses Kamelon's.
+
+__EOF
+
+my $noindex = 1;
+my $xmldir;
+my $updatedir = './updates';
+
+my %shortargs = (
+	'-u' => sub  {
+		$updatedir = shift @ARGV;
+		unless (-e $updatedir) { die "$updatedir does not exist" }
+		unless (-d $updatedir) { die "$updatedir is not a directory" }
+		print "updatdir: $updatedir\n"
+	},
+	'-x' => sub  {
+		$xmldir = shift @ARGV;
+		unless (-e $xmldir) { die "$xmldir does not exist" }
+		unless (-d $xmldir) { die "$xmldir is not a directory" }
+		print "xmldir: $xmldir\n"
+	},
+);
+
+my %args = (%shortargs,
+	'-updatedir' => $shortargs{'-u'},
+	'-xmldir' => $shortargs{'-x'},
+	'-help' => sub { print "$help\n"; exit }
+);
+
+while (@ARGV) {
+	my $t = shift @ARGV;
+	if (exists $args{$t}) {
+		my $call = $args{$t};
+		&$call;
+	} else {
+		my @op = sort keys %args;
+		my $opstr = "";
+		for (@op) {
+			$opstr = "$opstr $_"
+		}
+		die "Invalid option $t. Available options:$opstr\n";
+	}
+}
+
+###########################################################################################
+
+my $highlighter = Syntax::Kamelon::Diagnostics->new(
+# 	noindex => $noindex,
+	xmlfolder => $xmldir,
+);
+
+my $updater = Syntax::Kamelon::Diagnostics->new(
+	noindex => $noindex,
+	xmlfolder => $updatedir,
+);
+
+
+$xmldir = $highlighter->GetIndexer->XMLFolder;
+
+###########################################################################################
+
+package DataPanel;
+
+use strict;
+use warnings;
+use Carp;
+
+use Wx qw( :frame :textctrl :sizer :panel :window :id :dialog );
+use Wx::Event qw( EVT_BUTTON EVT_CHECKBOX );
+use base qw( Wx::Panel );
+use Syntax::Kamelon::Wx::PluggableTextCtrl;
+
+my @attributes = qw(
+	Alert
+	Annotation
+	Attribute
+	BaseN
+	BuiltIn
+	Char
+	Comment
+	CommentVar
+	Constant
+	ControlFlow
+	DataType
+	DecVal
+	Documentation
+	Error
+	Extension
+	Float
+	Function
+	Import
+	Information
+	Keyword
+	Normal
+	Operator
+	Others
+	Preprocessor
+	RegionMarker
+	SpecialChar
+	SpecialString
+	String
+	Variable
+	VerbatimString 
+	Warning
+);
+
+sub new {
+	my $class = shift;
+	my $self = $class->SUPER::new(@_);
+	
+	my $sizer = Wx::BoxSizer->new(wxHORIZONTAL);
+	$self->SetSizer($sizer);
+	
+	my $txt = Syntax::Kamelon::Wx::PluggableTextCtrl->new($self, -1, "", [-1, -1], [400, 300], wxHSCROLL|wxTE_MULTILINE|wxTE_PROCESS_TAB);
+	$txt->LoadPlugin("Highlighter");
+	$txt->LoadPlugin("UndoRedo");
+	
+	$txt->Syntax('XML');
+	$self->{TXT} = $txt;
+	$sizer->Add($txt, 1, wxEXPAND);
+	
+	
+	my $lp = Wx::Panel->new($self);
+	my $lsiz = Wx::BoxSizer->new(wxVERTICAL);
+	$lp->SetSizer($lsiz);
+	foreach my $a (@attributes) {
+		my $b = Wx::Button->new($lp, -1, $a );
+		$lsiz->Add($b);
+		EVT_BUTTON($self, $b, sub { $self->DoReplace($a) });
+	}
+	my $filler = Wx::Panel->new($lp);
+	$lsiz->Add($filler, 1, wxEXPAND);
+	my $updb = Wx::Button->new($lp, -1, "Update");
+	EVT_BUTTON($self, $updb, \&Update);
+	$lsiz->Add($updb);
+	$sizer->Add($lp,0, wxEXPAND);
+	$sizer->Fit($self);
+	$self->Layout();
+	$self->{CURENTRY} = '';
+
+	return $self;
+}
+
+sub DoReplace {
+	my ($self, $item) = @_;
+	print "Replace $item\n";
+	my $txt = $self->{TXT};
+	my $bpos = $txt->GetInsertionPoint;
+	my $pos = $bpos;
+	my $string = '';
+	while (($txt->GetRange($pos, $pos + 1) ne '"') and ($pos <= $txt->GetLastPosition)) { $pos ++ };
+	$txt->Remove($bpos, $pos);
+	$txt->SetInsertionPoint($bpos);
+	$txt->WriteText($item);
+}
+
+sub entryOpen {
+	my ($self, $entry) = @_;
+	if ($self->entryClose) {
+		my $file = $updater->GetIndexer->InfoXMLFile($entry);
+		my $txt = $self->{TXT};
+		$txt->LoadFile("$xmldir/$file");
+		$txt->Syntax('XML');
+		$self->{CURENTRY} = $entry;
+	}
+}
+
+sub entryClose {
+	my $self = shift;
+	my $t = $self->{TXT};
+	if ($t->IsModified) {
+		my $e = $self->{CURENTRY};
+		my $answer = Wx::MessageBox("XML file $e altered. Proceed with upgrade?", "Save modifications?", wxYES_NO|wxCANCEL|wxCENTRE, $self);
+		if ($answer eq wxCANCEL) {
+			return 0
+		}
+		if ($answer eq wxYES) {
+ 			return $self->Update;
+		}
+	}
+	$t->Clear;
+	return 1
+}
+
+sub Update {
+	my $self = shift;
+	my $entry = $self->{CURENTRY};
+	my $file = $updater->GetIndexer->InfoXMLFile($entry);
+	my $t = $self->{TXT};
+	if ($t->SaveFile("$xmldir/$file")) {
+		Wx::MessageBox("XML file $entry saved", "Saved", wxOK, $self);
+		return 1
+	}
+	return 0;
+}
+
+###########################################################################################
+
+package ConsoleFrame;
+
+use strict;
+use warnings;
+use Carp;
+
+use Wx qw( :frame :textctrl :sizer :panel :window :id);
+use base qw( Wx::Frame );
+use Syntax::Kamelon::Wx::KamelonList;
+
+sub new {
+	my $class = shift;
+	my $self = $class->SUPER::new(@_);
+	my $indexer = $updater->GetIndexer;
+	#Create widgets and controls
+	my $splitter = Wx::SplitterWindow->new($self, wxID_ANY);
+	my $listpane = Syntax::Kamelon::Wx::KamelonList->new($indexer, sub  {
+		my $item = shift;
+		my $cur = $highlighter->GetXMLObject($item);
+		unless (defined $cur) { return 1 }
+		my $upd = $updater->GetXMLObject($item);
+		my $cver = $cur->Language->{version};
+		my $uver = $upd->Language->{version};
+		print "comparing $item, current: $cver update: $uver\n";
+		return ($cver >= $uver)
+	}, $splitter, wxID_ANY);
+	my $contentpane = DataPanel->new($splitter, wxID_ANY);
+	$splitter->SplitVertically($listpane, $contentpane);
+	$splitter->SetSashPosition(200);
+	
+	$self->{CONTENT} = $contentpane;
+	
+	$listpane->listCallback(sub {
+		my $item = shift;
+		if ($contentpane->entryOpen($item)) {
+			return 1
+		}
+		return 0;
+	});
+	
+	#Do layout
+	my $topsizer = Wx::BoxSizer->new(wxHORIZONTAL);
+	$topsizer->Add($splitter, 1, wxEXPAND);
+	$self->SetSizer($topsizer);
+	$topsizer->Fit($self);
+	$self->Layout();
+
+	return $self;
+}
+
+sub entryClose {
+	my $self = shift;
+	return $self->{CONTENT}->entryClose;
+}
+
+###########################################################################################
+
+package ConsoleApp;
+
+use base qw(Wx::App);   # Inherit from Wx::App
+
+sub OnInit {
+	my $self = shift;
+	my $frame = ConsoleFrame->new( 
+		undef,         # Parent window
+		-1,            # Window id
+		'Kamelon XML Updater',  # Title
+		[1200, 800],
+	);
+	$self->SetTopWindow($frame);    
+	$frame->Show(1);                
+}
+
+sub OnExit {
+ 	my $self = shift;
+}
+
+package main;
+
+my $wxobj = ConsoleApp->new(); 
+$wxobj->MainLoop;

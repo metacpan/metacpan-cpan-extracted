@@ -49,6 +49,6 @@
          "url" : "https://git.ieval.ro/?p=www-oxontime.git"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

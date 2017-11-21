@@ -1,0 +1,35 @@
+---
+abstract: 'Easy to use concurrency primitives inspired by Cilk'
+author:
+  - 'Jeff Ober <sysread@fastmail.fm>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test: '0'
+  Test2::Bundle::Extended: '0'
+  Test::More: '0'
+  Test::Pod: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+conflicts:
+  perl: '5.020'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: IPC-Pleather
+requires:
+  AnyEvent: '7.14'
+  Guard: '1.023'
+  IPC::Semaphore: '0'
+  IPC::SysV: '0'
+  Keyword::Declare: '0.001006'
+  perl: '5.014'
+resources:
+  bugtracker: https://github.com/sysread/IPC-Pleather/issues
+  homepage: https://github.com/sysread/IPC-Pleather
+  repository: https://github.com/sysread/IPC-Pleather.git
+version: '0.01'
+x_serialization_backend: 'YAML::Tiny version 1.70'

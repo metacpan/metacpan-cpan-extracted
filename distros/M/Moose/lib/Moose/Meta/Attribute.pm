@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Moose::Meta::Attribute;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use B ();
 use Scalar::Util 'blessed';
@@ -550,8 +550,6 @@ sub _make_initializer_writer_callback {
 sub set_value {
     my ($self, $instance, @args) = @_;
     my $value = $args[0];
-
-    my $attr_name = quotemeta($self->name);
 
     my $class_name = blessed( $instance );
     if ($self->is_required and not @args) {
@@ -1337,8 +1335,8 @@ sub verify_against_type_constraint {
                           );
 }
 
-package Moose::Meta::Attribute::Custom::Moose;
-our $VERSION = '2.1403';
+package  # hide from PAUSE
+    Moose::Meta::Attribute::Custom::Moose;
 
 sub register_implementation { 'Moose::Meta::Attribute' }
 1;
@@ -1357,7 +1355,7 @@ Moose::Meta::Attribute - The Moose attribute metaclass
 
 =head1 VERSION
 
-version 2.2006
+version 2.2007
 
 =head1 DESCRIPTION
 

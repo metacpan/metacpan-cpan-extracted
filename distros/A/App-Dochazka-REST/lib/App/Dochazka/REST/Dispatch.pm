@@ -1045,21 +1045,33 @@ sub handler_whoami {
 
 sub _handler_get_employee_full_pass2 {
     my ( $self ) = @_;
+    my ( $emp, $has_reports, $status );
     my $context = $self->context;
-    my $emp = $context->{'stashed_employee_object'};
     my $conn = $context->{'dbix_conn'};
-    my $current_priv = priv_by_eid( $conn, $emp->{'eid'} );
-    my $current_sched = schedule_by_eid( $conn, $emp->{'eid'} );
+    my @ARGS = ( $conn, $context->{'stashed_employee_object'}->{'eid'} );
+    # need a real Employee object
+    $status = App::Dochazka::REST::Model::Employee->load_by_eid( @ARGS );
+    if ( $status->ok ) {
+        $emp = $status->payload;
+    } else {
+        die "YYURIEFFE has_reports returned not-OK status " . Dumper( $status );
+    }
+    my $current_priv = priv_by_eid( @ARGS );
+    my $current_sched = schedule_by_eid( @ARGS );
+    $status = $emp->has_reports( $conn );
+    if ( $status->ok ) {
+        $has_reports = $status->payload;
+    } else {
+        die "YYURIEFFF has_reports returned not-OK status " . Dumper( $status );
+    }
     my %history;
     foreach my $prop ( 'priv', 'schedule' ) {
-        my $status;
-        my @ARGS = ( $conn, $emp->{'eid'} );
         if ( $prop eq 'priv' ) {
             $status = App::Dochazka::REST::Model::Privhistory->load_by_eid( @ARGS );
         } elsif ( $prop eq 'schedule' ) {
             $status = App::Dochazka::REST::Model::Schedhistory->load_by_eid( @ARGS );
         } else {
-            die "DEFDXXEGUG!";
+            die "DEFDXXEGUGaloblast!";
         }
         $history{$prop} = $status->payload;
     }
@@ -1068,6 +1080,7 @@ sub _handler_get_employee_full_pass2 {
         args => [ $emp->{'nick'}, $current_priv ],
         payload => { 
             'emp' => $emp,
+            'has_reports' => $has_reports,
             'priv' => $current_priv,
             'privhistory' => $history{'priv'},
             'schedule' => $current_sched,

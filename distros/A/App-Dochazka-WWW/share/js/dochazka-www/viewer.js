@@ -97,6 +97,7 @@ define ([
         sortedDates,
 
         entryPoint = function (obj) {
+            // generate viewer HTML
             var cu = currentUser('obj'),
                 date,
                 i,
@@ -113,6 +114,7 @@ define ([
             r += '<br><br>';
             r += svgLib.dayViewerScale();
             for (i = 0; i < sortedDates.length; i += 1) {
+                // draw a new scale, if needed, for each week, more or less
                 date = sortedDates[i];
                 if (lwhow && ! holidayOrWeekend(date) && i !== sortedDates.length - 1) {
                     r += svgLib.dayViewerScale();
@@ -121,7 +123,7 @@ define ([
                 r += svgLib.dayViewerIntervals(date, haw[date], lwhow);
             }
             r += svgLib.dayViewerScale();
-            $('#dcallback').html(r);
+            return r;
         },
 
         addScheduledIntervals = function (obj) {
@@ -139,18 +141,18 @@ define ([
                     },
                 },
                 sc = function (st) {
-                    if (st.code === 'DISPATCH_SCHEDULED_INTERVALS_IDENTIFIED' || 
-                        st.code === 'DISPATCH_NO_SCHEDULED_INTERVALS_IDENTIFIED') {
+                    if (st.code === 'DISPATCH_SCHEDULED_INTERVALS_IDENTIFIED') {
                         scheduledIntervals = st.payload.success.intervals;
                         for (i = 0; i < scheduledIntervals.length; i += 1) {
                             [date, tr] = dt.tsrangeToDateAndTimeRange(scheduledIntervals[i].intvl);
                             haw[date].scheduled.push(tr);
                         }
-                        console.log("haw", haw);
-                        entryPoint(obj);
+                    } else if (st.code === 'DISPATCH_NO_SCHEDULED_INTERVALS_IDENTIFIED') {
+                        // do nothing, for the time being
                     } else {
                         console.log("CRITICAL ERROR: unexpected \"interval/scheduled\" status code " + st.code);
                     }
+                    $('#dcallback').html(entryPoint(obj));
                 };
             ajax(rest, sc);
             return null;
@@ -170,6 +172,22 @@ define ([
                 console.log("CRITICAL ERROR: haw lookup failed (unexpectedly) for key " + d);
             }
             return rv;
+        },
+
+        initializeStore = function (pl) {
+            // by "Store" here, I mean "haw" and "sortedDates"
+            var date, i;
+            haw = $.extend({}, pl);
+            sortedDates = Object.keys(haw).sort();
+            for (i = 0; i < sortedDates.length; i += 1) {
+                date = sortedDates[i];
+                if (! haw[date].hasOwnProperty('scheduled')) {
+                    haw[date].scheduled = [];
+                }
+                if (! haw[date].hasOwnProperty('clocked')) {
+                    haw[date].clocked = [];
+                }
+            }
         }
         ;
 
@@ -185,17 +203,7 @@ define ([
                 },
                 sc = function (st) {
                     if (st.code === 'DOCHAZKA_HOLIDAYS_AND_WEEKENDS_IN_TSRANGE') {
-                        haw = $.extend({}, st.payload);
-                        sortedDates = Object.keys(haw).sort();
-                        for (i = 0; i < sortedDates.length; i += 1) {
-                            date = sortedDates[i];
-                            if (! haw[date].hasOwnProperty('scheduled')) {
-                                haw[date].scheduled = [];
-                            }
-                            if (! haw[date].hasOwnProperty('clocked')) {
-                                haw[date].clocked = [];
-                            }
-                        }
+                        initializeStore(st.payload);
                         for (i = 0; i < obj.intervals.length; i += 1) {
                             aid = obj.intervals[i].aid;
                             [date, tr] = [obj.intervals[i].iNdate, obj.intervals[i].iNtimerange];

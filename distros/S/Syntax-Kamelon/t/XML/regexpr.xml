@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "language.dtd">
+<language name="regexpr" version="0.1" section="Test" extensions="*.regexpr;">
+<highlighting>
+
+<contexts>
+
+<context name="Base" attribute="Normal Text" lineEndContext="#stay">
+	<StringDetect attribute="Test Area" context="Test" String="&lt;Test&gt;" />
+	<StringDetect attribute="Test Area" context="TestI" String="&lt;TestI&gt;" />
+	<StringDetect attribute="Test Area" context="TestComplex" String="&lt;TestComplex&gt;" />
+	<StringDetect attribute="Test Area" context="TestComplexB" String="&lt;TestComplexB&gt;" />
+	<StringDetect attribute="Test Area" context="TestComplexNB" String="&lt;TestComplexNB&gt;" />
+	<StringDetect attribute="Test Area" context="TestComplexD" String="&lt;TestComplexD&gt;" />
+	<StringDetect attribute="Test Area" context="TestComplexDI" String="&lt;TestComplexDI&gt;" />
+	<StringDetect attribute="Test Area" context="TestComplexI" String="&lt;TestComplexI&gt;" />
+	<IncludeRules context="##XML" />
+</context>
+
+<context name="Comment" attribute="Comment" lineEndContext="#pop">
+</context>
+
+<context name="Test" attribute="Test Area" lineEndContext="#stay">
+	<DetectChar attribute="Comment" context="Comment" char="#" />
+	<!-- tests go here -->
+	<RegExpr attribute="Match" context="#stay" String="&lt;@&gt;" />
+	<StringDetect attribute="Test Area" context="#pop" String="&lt;Test&gt;" />
+</context>
+
+<context name="TestI" attribute="Test Area" lineEndContext="#stay">
+	<DetectChar attribute="Comment" context="Comment" char="#" />
+	<!-- tests go here -->
+	<RegExpr attribute="Match" insensitive="true" context="#stay" String="kameel" />
+	<StringDetect attribute="Test Area" context="#pop" String="&lt;TestI&gt;" />
+</context>
+
+<context name="TestComplex" attribute="Test Area" lineEndContext="#stay">
+	<DetectChar attribute="Comment" context="Comment" char="#" />
+	<!-- tests go here -->
+	<RegExpr attribute="Match" context="#stay" String="^kameel" />
+	<StringDetect attribute="Test Area" context="#pop" String="&lt;TestComplex&gt;" />
+</context>
+
+<context name="TestComplexB" attribute="Test Area" lineEndContext="#stay">
+	<DetectChar attribute="Comment" context="Comment" char="#" />
+	<!-- tests go here -->
+	<RegExpr attribute="Match" context="#stay" String="\bkameel" />
+	<StringDetect attribute="Test Area" context="#pop" String="&lt;TestComplexB&gt;" />
+</context>
+
+<context name="TestComplexNB" attribute="Test Area" lineEndContext="#stay">
+	<DetectChar attribute="Comment" context="Comment" char="#" />
+	<!-- tests go here -->
+	<RegExpr attribute="Match" context="#stay" String="\Bkameel" />
+	<StringDetect attribute="Test Area" context="#pop" String="&lt;TestComplexNB&gt;" />
+</context>
+
+<context name="TestComplexD" attribute="Test Area" lineEndContext="#stay">
+	<DetectChar attribute="Comment" context="Comment" char="#" />
+	<!-- tests go here -->
+        <RegExpr attribute="Match" context="TestComplexDT" String="\s(\d+)" />
+	<StringDetect attribute="Test Area" context="#pop" String="&lt;TestComplexD&gt;" />
+</context>
+
+<context name="TestComplexDT" attribute="Test Area" dynamic="true" lineEndContext="#stay">
+	<DetectChar attribute="Comment" context="Comment" char="#" />
+	<RegExpr attribute="Match" dynamic="true" context="#pop" String="kameel%1" />
+	<StringDetect attribute="Test Area" context="#pop#pop" String="&lt;TestComplexD&gt;" />
+</context>
+
+<context name="TestComplexDI" attribute="Test Area" lineEndContext="#stay">
+	<DetectChar attribute="Comment" context="Comment" char="#" />
+	<!-- tests go here -->
+        <RegExpr attribute="Match" context="TestComplexDIT" String="\s(\d+)" />
+  	<StringDetect attribute="Test Area" context="#pop" String="&lt;TestComplexDI&gt;" />
+</context>
+
+<context name="TestComplexDIT" attribute="Test Area" dynamic="true" lineEndContext="#stay">
+	<DetectChar attribute="Comment" context="Comment" char="#" />
+	<RegExpr attribute="Match" insensitive="true" dynamic="true" context="#pop" String="kameel%1" />
+	<StringDetect attribute="Test Area" context="#pop#pop" String="&lt;TestComplexDI&gt;" />
+</context>
+
+<context name="TestComplexI" attribute="Test Area" lineEndContext="#stay">
+	<DetectChar attribute="Comment" context="Comment" char="#" />
+	<!-- tests go here -->
+	<RegExpr attribute="Match" insensitive="true" context="#stay" String="^kameel" />
+	<StringDetect attribute="Test Area" context="#pop" String="&lt;TestComplexI&gt;" />
+</context>
+
+</contexts>
+
+<itemDatas>
+	<itemData name="Normal Text" defStyleNum="dsNormal" />
+	<itemData name="Test Area"  defStyleNum="dsOthers" />
+	<itemData name="Match"  defStyleNum="dsDataType" />
+	<itemData name="Match2"  defStyleNum="dsString" />
+	<itemData name="Match3"  defStyleNum="dsChar" />
+	<itemData name="Match4"  defStyleNum="dsDataType" />
+	<itemData name="Match5"  defStyleNum="dsString" />
+	<itemData name="Comment"  defStyleNum="dsComment" />
+</itemDatas>
+
+</highlighting>
+
+<general>
+	<keywords casesensitive="1" weakDeliminator="."/>
+</general>
+
+</language>
+

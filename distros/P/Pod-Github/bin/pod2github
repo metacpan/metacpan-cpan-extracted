@@ -1,0 +1,243 @@
+#!/usr/bin/perl
+use 5.008;
+use strict;
+use warnings;
+# PODNAME: pod2github
+# ABSTRACT: Make beautiful GitHub readmes from your POD
+
+use Pod::Github;
+use Getopt::Long;
+use Pod::Usage;
+use YAML::XS;
+
+my %command_opts = (
+    'help|h'        => sub { pod2usage(1) },
+    'usage'         => sub { pod2usage({ -verbose => 0 }) },
+    'man|perldoc'   => sub { pod2usage({ -verbose => 2 }) },
+    'version'       => sub { print $Pod::Github::VERSION, "\n"; exit 0 },
+);
+
+# Enable these features by default
+my %opts = (
+    'syntax-highlight' => 1,
+    'title-case' => 1,
+    'shift-headings' => 1,
+);
+
+Getopt::Long::Configure(qw(bundling no_auto_abbrev));
+GetOptions(\%opts,
+    %command_opts,
+    'input=s',
+    'output=s',
+    'exclude=s',
+    'inline=s',
+    'header=s',
+    'footer=s',
+    'header-file=s',
+    'footer-file=s',
+    'title-case!',
+    'syntax-highlight!',
+    'shift-headings=i',
+    'config-file=s',
+    'no-config',
+) or pod2usage(2);
+
+unless ($opts{'no-config'}) {
+    if (defined $opts{'config-file'}) {
+        load_config($opts{'config-file'}, \%opts);
+    }
+    else {
+        my @default_configs = map { (".$_", $_) } map { ("$_.yaml", "$_.yml") } ('pod2github'); 
+        for my $file (@default_configs) {
+            if (-f $file) {
+                load_config($file, \%opts);
+                last;
+            }
+        }
+    }
+}
+
+my $in_fh  = get_handle($opts{input}, '<', \*ARGV);
+my $out_fh = get_handle($opts{output}, '>', \*STDOUT);
+
+# Expand CSV options to hashes
+for my $key (qw(include exclude inline)) {
+    $opts{$key} = [ map { _trim($_) => 1 } split /,/ => ($opts{$key} || '') ];
+}
+
+my $parser = Pod::Github->new(%opts);
+$parser->output_fh($out_fh);
+$parser->parse_file($in_fh);
+exit 0;
+
+sub get_handle {
+  my ($path, $op, $default) = @_;
+  (!defined($path) || $path eq '-') ? $default : do {
+    open(my $fh, $op, $path)
+      or die "Failed to open '$path': $!\n";
+    $fh;
+  };
+}
+
+sub load_config {
+    my ($filename, $config) = @_;
+
+    my $user_config = YAML::XS::LoadFile($filename);
+    ref $user_config eq 'HASH' or pod2usage "Config '$filename' must be a dictionary";
+
+    while (my ($key, $value) = each %$user_config) {
+        $key =~ tr/_/-/;
+        $config->{$key} = $value;
+    }
+}
+
+sub _trim {
+    my $str = shift;
+    $str =~ s/^\s*//;
+    $str =~ s/\s*$//;
+    return $str;
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+pod2github - Make pretty GitHub readmes from your POD
+
+=head1 SYNOPSIS
+
+ $ pod2github lib/Foo/Bar.pm > README.md
+
+=head1 DESCRIPTION
+
+This program converts your POD into Markdown, with GitHub-specific formatting
+of source code. Because your project's README.md probably diverges from your
+POD, C<pod2github> offers various other functions:
+
+=over 4
+
+=item *
+
+Improve formatting: syntax-highlight Perl sections, and render command-line
+options, methods and functions as code. Title-case allcaps headers.
+
+=item *
+
+Hide or inline arbitrary sections
+
+=item *
+
+Optionally add a header or footer
+
+=back
+
+=head1 OPTIONS
+
+=over
+
+=item C<--exclude HEADER,HEADER...>
+
+Exclude one or more sections from the output. For this and below
+sections, header matching is case-sensitive and matches headers at
+any level.
+
+=item C<--include HEADER,HEADER...>
+
+Include I<only> the listed sections in the output.
+
+=item C<--inline HEADER,HEADER...>
+
+When these sections are encountered, remove the header but keep the
+section body. Useful to remove the 'Name' header from the top of
+your readme.
+
+=item C<--header header-string>, C<--header-file file>
+
+Output the specified header text or the contents of the specified file
+before outputting the converted input.
+
+=item C<--footer footer-string>, C<--footer-file file>
+
+Output the specified footer text or the contents of the specified file
+after outputting the converted input.
+
+=item C<--title-case>, C<--no-title-case> (default: on)
+
+Convert section headings to title case.
+
+=item C<--syntax-highlight>, C<--no-syntax-highlight> (default: on)
+
+Convert verbatim code blocks to Github Flavored Markdown blocks, with
+Perl syntax highlighting.
+
+=item C<--shift-headings OFFSET> (default: 1)
+
+Shift POD headings by I<offset> to yield a smaller Markdown heading.
+The default of 1 maps C<=head1> to a level-2 heading (i.e. C<##>)
+which is nicer than the overly large level-1 headings. Set to I<0>
+to disable.
+
+=item C<--input FILENAME>
+
+Set input filename, instead of STDIN/command line argument.
+
+=item C<--output FILENAME>
+
+Set output filename, instead of STDOUT.
+
+=item C<--config-file FILENAME>
+
+Load configuration from C<FILENAME> (see below)
+
+=item C<--help>
+
+Show this POD and exit.
+
+=item C<--man>, C<--perldoc>
+
+Show this POD in your C<man> pager, and exit.
+
+=item C<--version>
+
+Output version and exit.
+
+=item C<--usage>
+
+Output the synopsis section only and exit.
+
+=back
+
+=head1 YAML CONFIGURATION
+
+Instead of passing command line arguments, configuration can be loaded
+from a file named C<pod2gitub.yaml> (or .yml; optionally preceded with
+a single dot). Or from any other file via the C<--config-file> option.
+
+The YAML document should contain a top-level dictionary mapping keys
+to values. Keys may use either underscores or dashes. For binary options,
+use a value of 0/1.
+
+An example configuration:
+
+ input: lib/Pod/Github.pm
+ output: README.md
+ inline: NAME
+
+=head1 AUTHOR
+
+Richard Harris <richardharris@gmail.com>
+
+However the hard work is done by L<Pod::Markdown> by Randy Stauner.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 Richard Harris.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

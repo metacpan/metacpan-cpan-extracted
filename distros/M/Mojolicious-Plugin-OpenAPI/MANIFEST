@@ -4,9 +4,9 @@
 Changes
 cpanfile
 lib/Mojolicious/Plugin/OpenAPI.pm
-lib/Mojolicious/Plugin/OpenAPI/Guides/Security.pod
 lib/Mojolicious/Plugin/OpenAPI/Guides/Swagger2.pod
 lib/Mojolicious/Plugin/OpenAPI/Guides/Tutorial.pod
+lib/Mojolicious/Plugin/OpenAPI/Security.pm
 Makefile.PL
 MANIFEST			This list of files
 README
@@ -23,20 +23,18 @@ t/empty-string.t
 t/example-array-of-hashes.t
 t/headers.t
 t/issue-24-booleans-in-yaml-schema.t
+t/issue-48-refs.t
 t/mixin.t
 t/path-parameters.t
 t/register.t
 t/renderer.t
-t/reply-asset.t
 t/reply-spec.t
-t/reply.t
 t/route-names.t
 t/security-disabled.t
 t/security.t
 t/set-request.t
 t/spec.t
 t/swagger2.t
-t/synopsis.t
 t/tutorial.t
 t/validate.t
 t/x-mojo-placeholder.t

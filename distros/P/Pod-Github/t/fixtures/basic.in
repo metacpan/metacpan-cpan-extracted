@@ -1,0 +1,23 @@
+=head1 NAME
+
+ My::Module
+
+=head1 SYNOPSIS
+
+ use My::Module;
+ my $thing = do_some_stuff();
+ print "Yay!";
+
+=head1 FUNCTIONS
+
+=over
+
+=item foo
+
+Foo function
+
+=item bar
+
+Bar function
+
+=back

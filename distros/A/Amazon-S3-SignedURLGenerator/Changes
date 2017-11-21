@@ -1,0 +1,7 @@
+Revision history for Amazon-S3-SignedURLGenerator
+
+0.02  2017-11-17 11:28:47 CST
+        - remove 5.008_005 dependency
+
+0.01  2017-11-16 12:25:59 CST
+        - Initial release

@@ -14,6 +14,8 @@ debian/control
 debian/copyright
 debian/rules
 dist.ini
+lib/Exception/Validator.pm
+lib/Exception/Validator/FailedField.pm
 lib/QBit/Validator.pm
 lib/QBit/Validator/Type.pm
 lib/QBit/Validator/Type/array.pm

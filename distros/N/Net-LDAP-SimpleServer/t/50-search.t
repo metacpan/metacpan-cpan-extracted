@@ -3,7 +3,7 @@ use warnings;
 use Test::More tests => 8;
 
 use lib 't/lib';
-use Helper qw(ldap_client test_requests);
+use Helper qw(:CLIENT);
 
 use Net::LDAP::Constant qw/LDAP_SUCCESS LDAP_NO_SUCH_OBJECT/;
 

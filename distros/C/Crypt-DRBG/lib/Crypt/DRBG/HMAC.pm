@@ -1,5 +1,5 @@
 package Crypt::DRBG::HMAC;
-$Crypt::DRBG::HMAC::VERSION = '0.000002';
+$Crypt::DRBG::HMAC::VERSION = '0.001000';
 use 5.006;
 use strict;
 use warnings;
@@ -14,11 +14,11 @@ Crypt::DRBG::HMAC - Fast, cryptographically secure PRNG
 
 =head1 SYNOPSIS
 
-    use Crypt::DRBG::HMAC;
+	use Crypt::DRBG::HMAC;
 
-    my $drbg = Crypt::DRBG::HMAC->new(auto => 1);
+	my $drbg = Crypt::DRBG::HMAC->new(auto => 1);
 	my $data = $drbg->generate(42);
-    ... # do something with your 42 bytes here
+	... # do something with your 42 bytes here
 
 	my $drbg2 = Crypt::DRBG::HMAC->new(seed => "my very secret seed");
 	my $data2 = $drbg->generate(42);
@@ -59,6 +59,24 @@ If Perl (and hence Digest::SHA) was built with a compiler lacking 64-bit integer
 support, use "256" here.  "256" may also provide better performance for 32-bit
 machines.
 
+=item func
+
+If you would like to use a different hash function, you can specify a function
+implemeting HMAC for your specific algorithm.  The function should take two
+arguments, the value and the key, in that order.
+
+For example, if you had C<Digest::BLAKE2> and C<Digest::HMAC> installed, you
+could do the following to use BLAKE2b:
+
+	my $func = sub {
+		return Digest::HMAC::hmac(@_, \&Digest::BLAKEx::blake2b, 128);
+	};
+	my $drbg = Crypt::DRBG::HMAC->new(auto => 1, func => $func;
+	my $data = $drbg->generate(42);
+
+Note that the algo parameter is still required, explicitly or implicitly, in
+order to know how large a seed to use.
+
 =back
 
 =cut
@@ -71,7 +89,7 @@ sub new {
 
 	my $algo = $self->{algo} = $params{algo} || '512';
 	$algo =~ tr{/}{}d;
-	$self->{s_func} = Digest::SHA->can("hmac_sha$algo") or
+	$self->{s_func} = ($params{func} || Digest::SHA->can("hmac_sha$algo")) or
 		die "Unsupported algorithm '$algo'";
 	$self->{seedlen} = $algo =~ /^(384|512)$/ ? 111 : 55;
 	$self->{reseed_interval} = 4294967295; # (2^32)-1
@@ -167,7 +185,7 @@ automatically be notified of progress on your bug as I make changes.
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc Crypt::DRBG::HMAC
+	perldoc Crypt::DRBG::HMAC
 
 
 You can also look for information at:

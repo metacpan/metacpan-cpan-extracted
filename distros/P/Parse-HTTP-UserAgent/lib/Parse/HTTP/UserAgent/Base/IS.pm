@@ -1,10 +1,8 @@
 package Parse::HTTP::UserAgent::Base::IS;
+$Parse::HTTP::UserAgent::Base::IS::VERSION = '0.42';
 use strict;
 use warnings;
-use vars qw( $VERSION );
 use Parse::HTTP::UserAgent::Constants qw(:all);
-
-$VERSION = '0.39';
 
 sub _is_opera_pre {
     my($self, $moz) = @_;
@@ -79,6 +77,14 @@ sub _is_ff {
     ;
 }
 
+sub _is_suspicious_ff {
+    my($self, $extra) = @_;
+    return if  ref $extra ne 'ARRAY'
+            || @{ $extra } != 1
+            || index( lc $extra->[0], 'firefox/' ) == NO_IMATCH;
+    return 1;
+}
+
 sub _is_gecko {
     return index(shift->[UA_STRING], 'Gecko/') != NO_IMATCH;
 }
@@ -136,11 +142,12 @@ sub _is_hotjava {
 
 sub _is_generic_bogus_ie {
     my($self, $extra) = @_;
-    return $extra
+    my $rv = $extra
         && $extra->[0]
         && index( $extra->[0], 'compatible' ) != NO_IMATCH
         && $extra->[1]
         && $extra->[1] eq 'MSIE';
+    return $rv;
 }
 
 1;
@@ -149,16 +156,23 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
-Parse::HTTP::UserAgent::Base::IS - Base class
+Parse::HTTP::UserAgent::Base::IS
+
+=head1 VERSION
+
+version 0.42
 
 =head1 DESCRIPTION
 
-This document describes version C<0.39> of C<Parse::HTTP::UserAgent::Base::IS>
-released on C<2 December 2013>.
-
 Internal module.
+
+=head1 NAME
+
+Parse::HTTP::UserAgent::Base::IS - Base class
 
 =head1 SEE ALSO
 
@@ -166,15 +180,13 @@ L<Parse::HTTP::UserAgent>.
 
 =head1 AUTHOR
 
-Burak Gursoy <burak@cpan.org>.
+Burak Gursoy <burak@cpan.org>
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-Copyright 2009 - 2013 Burak Gursoy. All rights reserved.
+This software is copyright (c) 2009 by Burak Gursoy.
 
-=head1 LICENSE
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.16.2 or,
-at your option, any later version of Perl 5 you may have available.
 =cut

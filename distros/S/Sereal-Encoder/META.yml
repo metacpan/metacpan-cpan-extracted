@@ -9,14 +9,16 @@ build_requires:
   File::Path: '0'
   File::Spec: '0'
   Scalar::Util: '0'
-  Sereal::Decoder: '3.00'
+  Sereal::Decoder: '4.002'
+  Test::Deep: '0'
+  Test::Differences: '0'
   Test::LongString: '0'
   Test::More: '0.88'
   Test::Warn: '0'
 configure_requires:
   ExtUtils::MakeMaker: '7.0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.143240'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,4 +34,5 @@ requires:
 resources:
   bugtracker: https://github.com/Sereal/Sereal/issues
   repository: git://github.com/Sereal/Sereal.git
-version: '3.015'
+version: '4.004'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.011'

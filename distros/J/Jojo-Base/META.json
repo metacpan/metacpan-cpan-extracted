@@ -37,6 +37,7 @@
          "requires" : {
             "Mojo::Base" : "0",
             "Mojo::Util" : "0",
+            "Mojolicious" : "7.43",
             "Sub::Inject" : "v0.2.0",
             "experimental" : "0",
             "perl" : "5.018"
@@ -61,7 +62,7 @@
    "provides" : {
       "Jojo::Base" : {
          "file" : "lib/Jojo/Base.pm",
-         "version" : "v0.5.0"
+         "version" : "v0.6.0"
       }
    },
    "release_status" : "stable",
@@ -76,7 +77,7 @@
          "web" : "https://github.com/aferreira/cpan-Mojo-Bass"
       }
    },
-   "version" : "0.5.0",
+   "version" : "0.6.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0228"
 }
 

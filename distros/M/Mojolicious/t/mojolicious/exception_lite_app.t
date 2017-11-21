@@ -256,7 +256,11 @@ $t->get_ok('/mojo/failraptor.png')->status_is(200)
   ->content_type_is('image/png');
 $t->get_ok('/mojo/logo-black.png')->status_is(200)
   ->content_type_is('image/png');
+$t->get_ok('/mojo/logo-black-2x.png')->status_is(200)
+  ->content_type_is('image/png');
 $t->get_ok('/mojo/logo-white.png')->status_is(200)
+  ->content_type_is('image/png');
+$t->get_ok('/mojo/logo-white-2x.png')->status_is(200)
   ->content_type_is('image/png');
 $t->get_ok('/mojo/noraptor.png')->status_is(200)->content_type_is('image/png');
 $t->get_ok('/mojo/notfound.png')->status_is(200)->content_type_is('image/png');
@@ -264,7 +268,6 @@ $t->get_ok('/mojo/pinstripe-dark.png')->status_is(200)
   ->content_type_is('image/png');
 $t->get_ok('/mojo/pinstripe-light.png')->status_is(200)
   ->content_type_is('image/png');
-$t->get_ok('/mojo/stripes.png')->status_is(200)->content_type_is('image/png');
 
 done_testing();
 

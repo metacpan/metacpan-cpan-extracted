@@ -1,11 +1,9 @@
 package Parse::HTTP::UserAgent::Base::Dumper;
+$Parse::HTTP::UserAgent::Base::Dumper::VERSION = '0.42';
 use strict;
 use warnings;
-use vars qw( $VERSION );
 use Carp qw( croak );
 use Parse::HTTP::UserAgent::Constants qw(:all);
-
-$VERSION = '0.39';
 
 sub dumper {
     my($self, @args) = @_;
@@ -77,19 +75,19 @@ sub _dumper_dumper {
     foreach my $id ( @ids ) {
         my $name = $args ? $id->{name} : $id;
         my $val  = $args ? $id->{value} : $self->[ $self->$id() ];
-        $val = do {
-                    my $d = Data::Dumper->new([$val]);
-                    $d->Indent(0);
-                    my $rv = $d->Dump;
-                    $rv =~ s{ \$VAR1 \s+ = \s+ }{}xms;
-                    $rv =~ s{ ; }{}xms;
-                    $rv eq '[]' ? q{} : $rv;
-                } if $val && ref $val;
+        if ( $val && ref $val ) {
+            my $d = Data::Dumper->new([$val]);
+            $d->Indent(0);
+            my $rv = $d->Dump;
+            $rv =~ s{ \$VAR1 \s+ = \s+ }{}xms;
+            $rv =~ s{ ; }{}xms;
+            $val = $rv eq '[]' ? q{} : $rv;
+        }
         push @buf, [
-                        $name,
-                        (q{ } x (2 + $max - length $name)),
-                        defined $val ? $val : q{}
-                    ];
+            $name,
+            (q{ } x (2 + $max - length $name)),
+            defined $val ? $val : q{}
+        ];
     }
     foreach my $row ( sort { lc $a->[0] cmp lc $b->[0] } @buf ) {
         $buf .= sprintf "%s%s%s\n", @{ $row };
@@ -103,16 +101,23 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
-Parse::HTTP::UserAgent::Base::Dumper - Base class to dump parsed structure
+Parse::HTTP::UserAgent::Base::Dumper
+
+=head1 VERSION
+
+version 0.42
 
 =head1 DESCRIPTION
 
-This document describes version C<0.39> of C<Parse::HTTP::UserAgent::Base::Dumper>
-released on C<2 December 2013>.
-
 The parsed structure can be dumped to a text table for debugging.
+
+=head1 NAME
+
+Parse::HTTP::UserAgent::Base::Dumper - Base class to dump parsed structure
 
 =head1 METHODS
 
@@ -127,15 +132,13 @@ L<Parse::HTTP::UserAgent>.
 
 =head1 AUTHOR
 
-Burak Gursoy <burak@cpan.org>.
+Burak Gursoy <burak@cpan.org>
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-Copyright 2009 - 2013 Burak Gursoy. All rights reserved.
+This software is copyright (c) 2009 by Burak Gursoy.
 
-=head1 LICENSE
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.16.2 or,
-at your option, any later version of Perl 5 you may have available.
 =cut

@@ -1,0 +1,41 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<link rel="stylesheet" href="defaultstyle.css" type="text/css">
+<title>Testfile commonoptions</title>
+</head>
+<body>
+<font class="Normal">Testing&nbsp;commonoptions</font></br>
+</br>
+<font class="Normal">column&nbsp;option</font></br>
+<font class="Keyword">&lt;RegExpr</font><font class="Others">&nbsp;attribute=</font><font class="String">&quot;Match&quot;</font><font class="Others">&nbsp;context=</font><font class="String">&quot;#stay&quot;</font><font class="Others">&nbsp;column=</font><font class="String">&quot;5&quot;</font><font class="Others">&nbsp;String=</font><font class="String">&quot;\d&quot;</font><font class="Normal">&nbsp;</font><font class="Keyword">/&gt;</font></br>
+<font class="Others">&lt;C&gt;</font></br>
+<font class="Comment">#every&nbsp;digit&nbsp;on&nbsp;column&nbsp;5&nbsp;is&nbsp;matched</font></br>
+<font class="Others">01234</font><font class="DataType">5</font><font class="Others">6789</font></br>
+<font class="Others">&lt;C&gt;</font></br>
+</br>
+<font class="Normal">column&nbsp;and&nbsp;firstNonSpace&nbsp;both&nbsp;set</font></br>
+<font class="Keyword">&lt;RegExpr</font><font class="Others">&nbsp;attribute=</font><font class="String">&quot;Match&quot;</font><font class="Others">&nbsp;firstNonSpace=</font><font class="String">&quot;true&quot;</font><font class="Others">&nbsp;context=</font><font class="String">&quot;#stay&quot;</font><font class="Others">&nbsp;column=</font><font class="String">&quot;5&quot;</font><font class="Others">&nbsp;String=</font><font class="String">&quot;\d&quot;</font><font class="Normal">&nbsp;</font><font class="Keyword">/&gt;</font></br>
+<font class="Others">&lt;CFNS&gt;</font></br>
+<font class="Comment">#if&nbsp;the&nbsp;first&nbsp;non&nbsp;space&nbsp;on&nbsp;column&nbsp;5&nbsp;is&nbsp;a&nbsp;digit,&nbsp;it&nbsp;is&nbsp;matched</font></br>
+<font class="Others">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font><font class="DataType">5</font><font class="Others">6789</font></br>
+<font class="Others">1&nbsp;&nbsp;&nbsp;&nbsp;56789</font></br>
+<font class="Others">&lt;CFNS&gt;</font></br>
+</br>
+<font class="Normal">firstNonSpace</font></br>
+<font class="Keyword">&lt;RegExpr</font><font class="Others">&nbsp;attribute=</font><font class="String">&quot;Match&quot;</font><font class="Others">&nbsp;firstNonSpace=</font><font class="String">&quot;true&quot;</font><font class="Others">&nbsp;context=</font><font class="String">&quot;#stay&quot;</font><font class="Others">&nbsp;String=</font><font class="String">&quot;\d&quot;</font><font class="Normal">&nbsp;</font><font class="Keyword">/&gt;</font></br>
+<font class="Others">&lt;FNS&gt;</font></br>
+<font class="Comment">#if&nbsp;the&nbsp;first&nbsp;non&nbsp;space&nbsp;is&nbsp;a&nbsp;digit,&nbsp;it&nbsp;is&nbsp;matched.</font></br>
+<font class="Others">&nbsp;&nbsp;&nbsp;</font><font class="DataType">4</font><font class="Others">u</font></br>
+<font class="DataType">1</font><font class="Others">&nbsp;&nbsp;4u</font></br>
+<font class="Others">q&nbsp;&nbsp;4u</font></br>
+<font class="Others">&lt;FNS&gt;</font></br>
+</br>
+<font class="Normal">lookAhead</font></br>
+<font class="Keyword">&lt;StringDetect</font><font class="Others">&nbsp;attribute=</font><font class="String">&quot;Match2&quot;</font><font class="Others">&nbsp;lookAhead=</font><font class="String">&quot;true&quot;</font><font class="Others">&nbsp;context=</font><font class="String">&quot;LT&quot;</font><font class="Others">&nbsp;String=</font><font class="String">&quot;aap&quot;</font><font class="Normal">&nbsp;</font><font class="Keyword">/&gt;</font></br>
+<font class="Keyword">&lt;StringDetect</font><font class="Others">&nbsp;attribute=</font><font class="String">&quot;Match&quot;</font><font class="Others">&nbsp;context=</font><font class="String">&quot;#pop&quot;</font><font class="Others">&nbsp;String=</font><font class="String">&quot;aap&quot;</font><font class="Normal">&nbsp;</font><font class="Keyword">/&gt;</font></br>
+<font class="Others">&lt;L&gt;</font></br>
+<font class="Others">Daar&nbsp;zit&nbsp;een&nbsp;</font><font class="DataType">aap</font><font class="Others">.</font></br>
+<font class="Others">&lt;L&gt;</font></br>
+</body>
+</html>

@@ -60,12 +60,14 @@ my $r = Apache2::Request->new (
 $r->{retval}{headers_out} = $r;
 $r->{retval}{headers_in}  = $r;
 
+MVC::Neaf->load_view( TT => 'TT' );
 MVC::Neaf->route( '/foo' => sub  {
     my $req = shift;
 
     local $SIG{__DIE__} = \&Carp::cluck;
     ok (!$req->secure, "No ssl under fake apache!!");
     return {
+        -view => 'TT',
         -template => \'[% foo %] [% bar %]',
         foo => scalar $req->param( foo => '.*', 42 ),
         bar => scalar $req->get_cookie( bar => '\w+', 42 ),

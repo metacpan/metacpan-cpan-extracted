@@ -30,5 +30,5 @@ requires:
 resources:
   bugtracker: https://github.com/jef-sure/d2-oar/issues
   repository: https://github.com/jef-sure/d2-oar.git
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

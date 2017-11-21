@@ -9,7 +9,7 @@
 #
 package MooseX::AttributeShortcuts::Trait::Method::HasDefinitionContext;
 our $AUTHORITY = 'cpan:RSRCHBOY';
-$MooseX::AttributeShortcuts::Trait::Method::HasDefinitionContext::VERSION = '0.036';
+$MooseX::AttributeShortcuts::Trait::Method::HasDefinitionContext::VERSION = '0.037';
 # ABSTRACT: Trait for method metaclasses that have definition contexts
 
 use Moose::Role;
@@ -38,7 +38,7 @@ MooseX::AttributeShortcuts::Trait::Method::HasDefinitionContext - Trait for meth
 
 =head1 VERSION
 
-This document describes version 0.036 of MooseX::AttributeShortcuts::Trait::Method::HasDefinitionContext - released October 31, 2017 as part of MooseX-AttributeShortcuts.
+This document describes version 0.037 of MooseX::AttributeShortcuts::Trait::Method::HasDefinitionContext - released November 20, 2017 as part of MooseX-AttributeShortcuts.
 
 =head1 DESCRIPTION
 

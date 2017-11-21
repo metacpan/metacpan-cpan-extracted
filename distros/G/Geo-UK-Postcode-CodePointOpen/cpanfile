@@ -1,4 +1,4 @@
-requires "Geo::Coordinates::OSGB" => "2.12";
+requires "Geo::Coordinates::OSGB" => "2.20";
 requires "Geo::UK::Postcode::Regex";
 requires "List::MoreUtils";
 requires "Moo";

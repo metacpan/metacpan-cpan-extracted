@@ -9,7 +9,7 @@ use File::Temp ();
 use Test::More ();
 
 our @EXPORT_OK = ('applify_ok', 'applify_subcommands_ok');
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 sub app {
   @_ == 2 and $_[0]->{app} = $_[1];
@@ -64,7 +64,7 @@ sub app_instance {
   my ($self, $name) = (shift, @_);
   $name = shift if ($name and $name =~ /^\w+/); # no change to specialisation now
   local @ARGV = @_;
-  return $self->app_script->app;
+  return ($self->app_script->app)[0];
 }
 
 sub can_ok {
@@ -134,7 +134,7 @@ sub new {
   my $class = shift;
   my $self  = bless {}, ref $class || $class || __PACKAGE__;
   return $self unless my $app = shift;
-  $self->app(ref $app ? $app : $self->_build_code($self->_filename($app)->_filename));
+  $self->app(ref $app ? $app : $self->_build_code($self->_filename($app)->_filename, @_));
   return $self;
 }
 
@@ -364,6 +364,8 @@ Test that the option is a required option.
 =head2 new
 
   my $t = Test::Applify->new('script.pl');
+  # instance for the 'list' subcommand
+  my $t = Test::Applify->new('script.pl', 'list');
 
 Instantiate a new test instance for the supplied script name.
 

@@ -1,7 +1,11 @@
+#!perl
+
 use strict;
 use warnings;
 use utf8;
 use FindBin;
+use lib "$FindBin::Bin/..";
+
 use File::Spec::Functions qw/catfile/;
 use Perl::PrereqScanner::Lite;
 

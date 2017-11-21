@@ -2,7 +2,7 @@ package Acme::MetaSyntactic::pm_groups;
 use strict;
 use Acme::MetaSyntactic::List;
 our @ISA = qw( Acme::MetaSyntactic::List );
-our $VERSION = '1.027';
+our $VERSION = '1.028';
 __PACKAGE__->init();
 
 our %Remote = (
@@ -35,6 +35,12 @@ Philippe Bruhat (BooK)
 =head1 CHANGES
 
 =over 4
+
+=item *
+
+2017-11-13 - v1.028
+
+Updated from the source web site in Acme-MetaSyntactic-Themes version 1.051.
 
 =item *
 
@@ -318,6 +324,7 @@ Chicago_pm
 Cincinnati_pm
 Cleveland_pm
 Columbus_pm
+DFW_pm
 DC_pm
 Denver_pm
 DesMoines_pm
@@ -325,11 +332,9 @@ HudsonValley_pm
 Houston_pm
 KansasCity_pm
 LasVegas_pm
-Madison_pm
 Milwaukee_pm
 Minneapolis_pm
 Montreal_pm
-Omaha_pm
 OrangeCounty_pm
 Ottawa_pm
 Philadelphia_pm
@@ -344,7 +349,6 @@ StLouis_pm
 Tallahassee_pm
 Toronto_pm
 Vancouver_pm
-MexicoCity_pm
 Curitiba_pm
 Amsterdam_pm
 Bath_pm
@@ -358,7 +362,6 @@ Copenhagen_pm
 Leipzig_pm
 Lisbon_pm
 London_pm
-Moscow_pm
 Munich_pm
 Paris_pm
 Porto_pm
@@ -392,7 +395,6 @@ Budapest_pm
 Purdue_pm
 Frankfurt_pm
 Milan_pm
-NewOrleans_pm
 Coimbra_pm
 Kansai_pm
 Madras_pm
@@ -424,7 +426,6 @@ Nordest_pm
 CaFe_pm
 Tucson_pm
 Devon_and_Cornwall_pm
-CostaRica_pm
 Lyon_pm
 Basel_pm
 Bruxelles_pm
@@ -446,11 +447,11 @@ Pisa_pm
 Arnhem_pm
 Stuttgart_pm
 Dahut_pm
-Jakarta_pm
 Roederbergweg_pm
 Bielefeld_pm
 Nottingham_pm
 Jerusalem_pm
+Ankara_pm
 Italia_pm
 Geneva_pm
 Paderborn_pm
@@ -482,13 +483,11 @@ Yokohama_pm
 Krasnodar_pm
 Fredericton_pm
 Northwestengland_pm
-Kostroma_pm
 Quito_pm
 Kushiro_pm
 Lima_pm
 Advent_pm
 Madurai_pm
-Cali_pm
 Hokkaido_pm
 Linz_pm
 Nagoya_pm
@@ -504,7 +503,6 @@ SouthernOregon_pm
 Plzen_pm
 Sendai_pm
 Kerman_pm
-Weston_pm
 Cluj_pm
 Niigata_pm
 Hardware_pm
@@ -514,7 +512,6 @@ CorpusChristi_pm
 Cochin_pm
 AmsterdamX_pm
 UKCoordinators_pm
-Lukavac_pm
 Swindon_pm
 NewTaipeiCity_pm
 Gdansk_pm
@@ -524,3 +521,4 @@ Fleet_pm
 Niceville_pm
 Okinawa_pm
 Ryazan_pm
+BlairCountyPA_pm

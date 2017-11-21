@@ -1,10 +1,9 @@
 package Dancer2::Logger::LogAny;
-our $AUTHORITY = 'cpan:TONKIN';
-# ABSTRACT: Use Log::Any to log from your Dancer2 app
-our $VERSION = '0.9907';
+
+our $VERSION = '0.9912';
 
 use strict; use warnings;
-use Dancer2 qw/ :syntax !log !debug !info !notice !warning !error /;
+#use Dancer2 qw/ !log !debug !info !notice !warning !error /;
 use Dancer2::Core::Types qw/ Str ArrayRef /;
 
 use Log::Any::Adapter;
@@ -26,7 +25,6 @@ sub _build__logger_obj {
     return Log::Any->get_logger( %category ); 
 }
 
-
 sub log {
     my ( $self, $level, $message ) = @_;
 
@@ -41,26 +39,18 @@ __END__
 
 =pod
 
-=encoding UTF-8
+=head1 VERSION
+
+version 0.9912
 
 =head1 NAME
 
 Dancer2::Logger::LogAny - Use Log::Any to log from your Dancer2 app
 
-=head1 VERSION
-
-version 0.9907
-
 =head1 DESCRIPTION
 
 This module implements a Dancer2 logging engine using C<Log::Any>.
 You can then use any C<Log::Any::Adapter>-based output class on the backend.
-
-=head1 METHODS
-
-=head2 log( @args )
-
-This is the function required by C<Dancer2::Core::Role::Logger>
 
 =head1 CONFIGURATION
 
@@ -79,6 +69,16 @@ In your Dancer2 config:
 
 If you omit the category setting, C<Log::Any::Adapter> will use the name of
 this class as the category.
+
+The above is a simple configuration example. For a complete working example
+app, logging to two different C<Log::Dispatch> output engines,  see the
+C<example/> directory in this module's distribution.
+
+=head1 FUNCTIONS
+
+=head2 log( @args )
+
+This is the function required by C<Dancer2::Core::Role::Logger>
 
 =head1 SEE ALSO
 

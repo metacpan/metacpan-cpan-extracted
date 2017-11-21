@@ -1,5 +1,5 @@
 package Moose::Exception::MetaclassIsNotASubclassOfGivenMetaclass;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -19,4 +19,5 @@ sub _build_message {
     $self->class_name." already has a metaclass, but it does not inherit ".$self->metaclass." ($class).";
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

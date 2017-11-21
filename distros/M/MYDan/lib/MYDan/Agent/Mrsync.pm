@@ -94,7 +94,7 @@ sub new
 
             my %query = ( 
                 argv => [ +{ load => $load, src => $src, port => $agent{port}, sp => $sp, dp => $dp } ],
-		code => 'download', map{ $_ => $param{$_} }qw( user sudo )
+		code => 'download', map{ $_ => $param{$_} }qw( user sudo chown chmod cc )
             );
 
             $query{node} = [ $dst ] if $isc;
@@ -117,7 +117,7 @@ sub new
                                    unless( $keepalive{skip} )
                                    {
                                        $keepalive{cont} =~ s/^\*+//g;
-                                       $keepalive{skip} = 1 if $keepalive{cont} =~ s/^#\*keepalive\*#//;
+                                       $keepalive{skip} = 1 if $keepalive{cont} =~ s/^#\*MYDan_\d+\*#//;
                                    }
                                }
                            );

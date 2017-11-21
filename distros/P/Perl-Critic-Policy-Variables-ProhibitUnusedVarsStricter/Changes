@@ -1,3 +1,7 @@
+0.101		2017-11-20	T. R. Wyant
+    Remove 'mailto' bugtracker metadata Its presence appears to tell RT
+    not to allow filings.
+
 0.100		2016-07-06	T. R. Wyant
   Refactor the logic that discovers which variables are interpolated
     into double-quotish strings into PPIx::QuoteLike. This does not

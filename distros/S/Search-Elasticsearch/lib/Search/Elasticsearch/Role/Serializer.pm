@@ -1,5 +1,5 @@
 package Search::Elasticsearch::Role::Serializer;
-$Search::Elasticsearch::Role::Serializer::VERSION = '5.02';
+$Search::Elasticsearch::Role::Serializer::VERSION = '6.00';
 use Moo::Role;
 
 requires qw(encode decode encode_pretty encode_bulk mime_type);
@@ -20,7 +20,7 @@ Search::Elasticsearch::Role::Serializer - An interface for Serializer modules
 
 =head1 VERSION
 
-version 5.02
+version 6.00
 
 =head1 DESCRIPTION
 

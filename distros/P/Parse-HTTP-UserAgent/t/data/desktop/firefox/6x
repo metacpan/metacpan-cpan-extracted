@@ -9,3 +9,4 @@ Mozilla/5.0 (Macintosh; Intel Mac OS X 10.6; rv:6.0.2) Gecko/20100101 Firefox/6.
 'mozilla'     => ['6.0.2','6.000002'],
 'name'        => 'Firefox',
 parser        => 'firefox',
+extras        => ['Macintosh'],

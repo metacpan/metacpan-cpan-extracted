@@ -11,7 +11,7 @@ use Test2::Harness::Util qw/read_file write_file open_file/;
 use Test2::Harness::Run::Runner::ProcMan::Persist();
 use Test2::Harness::Util::DepTracer();
 
-our $VERSION = '0.001031';
+our $VERSION = '0.001034';
 
 use parent 'Test2::Harness::Run::Runner';
 use Test2::Harness::Util::HashBase qw{
@@ -51,7 +51,7 @@ BEGIN {
 sub init {
     my $self = shift;
 
-    $self->{+DTRACE} = Test2::Harness::Util::DepTracer->new;
+    $self->{+DTRACE} ||= Test2::Harness::Util::DepTracer->new;
     $self->{+ROOT_PID} = $$;
 
     $self->load_blacklist;

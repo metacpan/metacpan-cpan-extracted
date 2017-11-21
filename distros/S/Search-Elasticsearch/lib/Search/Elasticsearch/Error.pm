@@ -1,5 +1,5 @@
 package Search::Elasticsearch::Error;
-$Search::Elasticsearch::Error::VERSION = '5.02';
+$Search::Elasticsearch::Error::VERSION = '6.00';
 our $DEBUG = 0;
 
 @Search::Elasticsearch::Error::Internal::ISA     = __PACKAGE__;
@@ -179,7 +179,7 @@ Search::Elasticsearch::Error - Errors thrown by Search::Elasticsearch
 
 =head1 VERSION
 
-version 5.02
+version 6.00
 
 =head1 DESCRIPTION
 
@@ -246,7 +246,7 @@ L<max_content_length|Search::Elasticsearch::Role::Cxn/max_content_length>.
 
 The request took longer than the specified C<timeout>.  Currently only
 applies to the
-L<cluster_health|Search::Elasticsearch::Client::5_0::Direct::Cluster/cluster_health()>
+L<cluster_health|Search::Elasticsearch::Client::6_0::Direct::Cluster/cluster_health()>
 request.
 
 =back

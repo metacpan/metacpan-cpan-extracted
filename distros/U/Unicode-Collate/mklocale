@@ -96,7 +96,7 @@ use Carp;
 use File::Spec;
 
 my $Use4th; # Use 4th level (Unicode 6.2.0 or before)
-my $DEFAULT_LOCALE_VERSION = '1.21'; # should be same as $VERSION of Collate.pm
+my $DEFAULT_LOCALE_VERSION = '1.24'; # should be same as $VERSION of Collate.pm
 
 BEGIN {
     unless ("A" eq pack('U', 0x41)) {

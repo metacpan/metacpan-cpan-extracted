@@ -1,9 +1,9 @@
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
-    AUTHOR              =>  'Niek Albers',
+    AUTHOR              =>  'Rene Schickbauer  <maplat@cavac.at>',
     ABSTRACT            =>  'Pure Perl implementation for an XML-RPC client and server',
-    NAME                =>  'XML-RPC',
+    NAME                =>  'XML::RPC',
     VERSION_FROM        =>  'lib/XML/RPC.pm',
     PREREQ_PM           =>  {
         'XML::TreePP'       =>  '0',

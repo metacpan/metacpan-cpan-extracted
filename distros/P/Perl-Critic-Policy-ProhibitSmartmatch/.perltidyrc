@@ -1,0 +1,4 @@
+#--perl-best-practices
+--nostandard-output
+--backup-and-modify-in-place
+--backup-file-extension=/

@@ -1,13 +1,19 @@
 Build.PL
 Changes
 lib/Webservice/Shipment.pm
+lib/Webservice/Shipment/.Carrier.pm.swp
 lib/Webservice/Shipment/Carrier.pm
+lib/Webservice/Shipment/Carrier/.FedEx.pm.swp
+lib/Webservice/Shipment/Carrier/.UPS.pm.swp
+lib/Webservice/Shipment/Carrier/.USPS.pm.swp
+lib/Webservice/Shipment/Carrier/FedEx.pm
 lib/Webservice/Shipment/Carrier/UPS.pm
 lib/Webservice/Shipment/Carrier/USPS.pm
 lib/Webservice/Shipment/MockUserAgent.pm
 MANIFEST			This list of files
 META.json
 META.yml
+t/FexEx.t
 t/shipment.t
 t/ups.t
 t/usps.t

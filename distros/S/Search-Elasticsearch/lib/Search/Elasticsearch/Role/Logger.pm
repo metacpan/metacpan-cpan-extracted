@@ -1,5 +1,5 @@
 package Search::Elasticsearch::Role::Logger;
-$Search::Elasticsearch::Role::Logger::VERSION = '5.02';
+$Search::Elasticsearch::Role::Logger::VERSION = '6.00';
 use Moo::Role;
 
 use URI();
@@ -67,16 +67,19 @@ sub trace_request {
         ? $self->serializer->encode_pretty( $params->{body} )
         : $params->{data};
 
+    my $content_type = '';
     if ( defined $body ) {
         $body =~ s/'/\\u0027/g;
-        $body = " -d '\n$body'\n";
+        $body         = " -d '\n$body'\n";
+        $content_type = '-H "Content-type: ' . $params->{mime_type} . '" ';
     }
     else { $body = "\n" }
 
     my $msg = sprintf(
-        "# Request to: %s\n"         #
-            . "curl -X%s '%s'%s",    #
+        "# Request to: %s\n"           #
+            . "curl %s-X%s '%s'%s",    #
         $cxn->stringify,
+        $content_type,
         $params->{method},
         $uri,
         $body
@@ -132,7 +135,8 @@ sub trace_comment {
 sub deprecation {
 #===================================
     my $self = shift;
-    $self->deprecate_handle->warnf( "[DEPRECATION] %s. In request: %s", @_ );
+
+    $self->deprecate_handle->warnf( "[DEPRECATION] %s - In request: %s", @_ );
 }
 1;
 
@@ -150,7 +154,7 @@ Search::Elasticsearch::Role::Logger - Provides common functionality to Logger im
 
 =head1 VERSION
 
-version 5.02
+version 6.00
 
 =head1 DESCRIPTION
 

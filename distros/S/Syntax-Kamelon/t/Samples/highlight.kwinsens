@@ -1,0 +1,11 @@
+Testing for keyword sensitivity.
+
+This is the line of XML code that performs the test:
+<keyword attribute="Match" context="#stay" String="colours"/>
+Green is in the list, brown is not.
+
+<Test>
+#both green and GREEN are matched
+green brown
+GREEN BROWN
+<Test>

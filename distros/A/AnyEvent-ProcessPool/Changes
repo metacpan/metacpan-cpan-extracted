@@ -1,0 +1,27 @@
+0.06 2017-11-13
+- Added support for alternately passing a "task class" + args rather than a
+  code ref
+
+0.05 2017-11-13
+- Explicitly drop MSWin32 support intests (AnyEvent::Open3::Simple does not
+  support MSWin32 due to lack of support for writing to process pipes)
+- Support for specifying includes to the perl path (e.g., -Ilib) in the worker
+  process
+
+0.04 2017-11-13
+- More straightforward error handling
+- Existing pool may be specified to pipeline
+
+0.03 2017-11-13
+- Support for passing parameters to task code
+- Backward incompatible change: pipeline 'in' now expects list of (code, args
+  array) or empty list to signal completion
+
+0.02 2017-11-12
+- Add Async::ProcessPool::Pipeline
+- More thorough cleanup
+- New method AnyEvent::ProcessPool->join
+- 'workers' now defaults to number of cpus (threw an error previously)
+
+0.01 2017-11-12
+- Initial release

@@ -1,5 +1,8 @@
 Revision history for Alien-Build-Git
 
+0.06      2017-11-11 08:15:04 -0500
+  - Fix testing fail when Sort::Versions is not installed
+
 0.05      2017-08-10 16:42:19 -0400
   - Add IRC to metadata
   - Fix for windows

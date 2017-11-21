@@ -22,11 +22,13 @@ Net::CardDAVTalk - A library for talking to CardDAV servers
 
 =head1 VERSION
 
-Version 0.05
+Version 0.08
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.08';
+
+our $BATCHSIZE = 100;
 
 
 =head1 SYNOPSIS
@@ -190,9 +192,7 @@ sub GetAddressBook {
 
 =head2 $self->GetAddressBooks(%Args)
 
-Get all the addressbooks on the server.  If the arg 'Sync' is true,
-also requests the DAV:sync-token and returns it as syncToken in the
-addressbook hash.
+Get all the addressbooks on the server.
 
 Returns an arrayref of hashrefs
 
@@ -208,10 +208,7 @@ e.g.
 sub GetAddressBooks {
   my ($Self, %Args) = @_;
 
-  my @props;
-  if ($Args{Sync}) {
-    push @props, x('D:sync-token');
-  }
+  my $props = $Args{Properties} || [];
 
   my $Response = $Self->Request(
     'PROPFIND',
@@ -222,7 +219,9 @@ sub GetAddressBooks {
         x('D:resourcetype'),
         x('D:current-user-privilege-set'),
         x('D:acl'),
-        @props,
+        x('D:sync-token'),
+        x('D:supported-report-set'),
+        @$props,
       ),
     ),
     Depth => 1,
@@ -243,6 +242,14 @@ sub GetAddressBooks {
 
       # XXX - this is really quite specific and probably wrong-namespaced...
       my $Perms = $Propstat->{"{$NS_D}prop"}{"{$NS_D}current-user-privilege-set"}{"{$NS_D}privilege"};
+
+      my $CanSync;
+      my $Report = $Propstat->{"{$NS_D}prop"}{"{$NS_D}supported-report-set"}{"{$NS_D}supported-report"};
+      $Report = [] unless ($Report and ref($Report) eq 'ARRAY');
+      foreach my $item (@$Report) {
+        # XXX - do we want to check the other things too?
+        $CanSync = 1 if $item->{"{$NS_D}report"}{"{$NS_D}sync-collection"};
+      }
 
       my @ShareWith;
       my $ace = $Propstat->{"{$NS_D}prop"}{"{$NS_D}acl"}{"{$NS_D}ace"};
@@ -277,10 +284,10 @@ sub GetAddressBooks {
         mayWrite   => (grep { exists $_->{"{$NS_D}write-content"} } @{$Perms || []}) ? $JSON::true : $JSON::false,
         mayAdmin   => (grep { exists $_->{"{$NS_CY}admin"} } @{$Perms || []}) ? $JSON::true : $JSON::false,
         shareWith  => (@ShareWith ? \@ShareWith : $JSON::false),
+        syncToken  => $Propstat->{"{$NS_D}prop"}{"{$NS_D}sync-token"}{content} || '',
+        canSync    => $CanSync ? $JSON::true : $JSON::false,
       );
-      if ($Args{Sync}) {
-        $AddressBook{syncToken} = $Propstat->{"{$NS_D}prop"}{"{$NS_D}sync-token"}{content} || '';
-      }
+
       push @AddressBooks, \%AddressBook;
     }
   }
@@ -419,6 +426,7 @@ sub GetContactAndProps {
     x('C:addressbook-multiget', $Self->NS(),
       x('D:prop',
         x('D:getetag'),
+        x('D:getcontenttype'),
         x('C:address-data'),
         map { x(join ":", @$_) } @$Props,
       ),
@@ -456,8 +464,25 @@ contacts in scalar context again)
 =cut
 
 sub GetContacts {
-  my ($Self, $Path, $Props, %Args) = @_;
-  $Props //= [];
+  my ($Self, $Path, $Props) = @_;
+
+  my $data = $Self->GetContactLinks($Path);
+  my @AllUrls = sort keys %$data;
+
+  my ($Contacts, $Errors, $HRefs) = $Self->GetContactsMulti($Path, \@AllUrls, $Props);
+
+  return wantarray ? ($Contacts, $Errors, $HRefs) : $Contacts;
+}
+
+=head2 $self->GetContactLinks($Path)
+
+Returns a hash of href => etag for every contact URL (type: text/(x-)?vcard)
+inside the collection at \$Path.
+
+=cut
+
+sub GetContactLinks {
+  my ($Self, $Path) = @_;
 
   my $Response = $Self->Request(
     'PROPFIND',
@@ -471,22 +496,36 @@ sub GetContacts {
     Depth => '1',
   );
 
-  my @Urls;
+  my %response;
   my $NS_C = $Self->ns('C');
   my $NS_D = $Self->ns('D');
   foreach my $Response (@{$Response->{"{$NS_D}response"} || []}) {
-    my $HRef = $Response->{"{$NS_D}href"}{content};
-    next unless $HRef;
+    my $href = $Response->{"{$NS_D}href"}{content};
+    next unless $href;
     if ($Response->{"{$NS_D}prop"}{"{$NS_D}getcontenttype"}) {
       my $type = $Response->{"{$NS_D}prop"}{"{$NS_D}getcontenttype"}{content} || '';
       next unless $type =~ m{text/(x-)?vcard};
     }
-    push @Urls, $HRef;
+    my $etag = $Response->{"{$NS_D}prop"}{"{$NS_D}getetag"}{content} || '';
+    $response{$href} = $etag;
   }
 
-  my (@Contacts, @Errors);
+  return \%response;
+}
 
-  if (@Urls) {
+=head2 $self->GetContactsMulti($Path, $Urls, $Props)
+
+Does an addressbook-multiget on the \$Path for all the URLs in \$Urls
+also fetching \$Props on top of the address-data and getetag.
+
+=cut
+
+sub GetContactsMulti {
+  my ($Self, $Path, $Urls, $Props) = @_;
+  $Props //= [];
+  my (@Contacts, @Errors, %Links);
+
+  while (my @urls = splice(@$Urls, 0, $BATCHSIZE)) {
     my $Response = $Self->Request(
       'REPORT',
       "$Path/",
@@ -496,7 +535,7 @@ sub GetContacts {
           x('C:address-data'),
           map { x(join ":", @$_) } @$Props,
         ),
-        map { x('D:href', $_) } @Urls,
+        map { x('D:href', $_) } @urls,
       ),
       Depth => '0',
     );
@@ -504,18 +543,23 @@ sub GetContacts {
     my $NS_C = $Self->ns('C');
     my $NS_D = $Self->ns('D');
     foreach my $Response (@{$Response->{"{$NS_D}response"} || []}) {
+      my $href = $Response->{"{$NS_D}href"}{content};
+      next unless $href;
       foreach my $Propstat (@{$Response->{"{$NS_D}propstat"} || []}) {
+        my $etag = $Propstat->{"{$NS_D}prop"}{"{$NS_D}getetag"}{content} || '';
         my $VCard = eval { $Self->_ParseReportData($Response, $Propstat, $Props) } || do {
           push @Errors, $@ if $@;
           next;
         };
 
         push @Contacts, $VCard;
+
+        $Links{$href} = $etag;
       }
     }
   }
 
-  return wantarray ? (\@Contacts, \@Errors) : \@Contacts;
+  return wantarray ? (\@Contacts, \@Errors, \%Links) : \@Contacts;
 }
 
 =head2 $self->SyncContacts($Path, $Props, %Args)
@@ -530,7 +574,33 @@ list context.
 
 sub SyncContacts {
   my ($Self, $Path, $Props, %Args) = @_;
-  $Props //= [];
+
+  my ($Added, $Removed, $Errors, $SyncToken) = $Self->SyncContactLinks($Path, %Args);
+
+  my @AllUrls = sort keys %$Added;
+
+  my ($Contacts, $ThisErrors, $Links) = $Self->GetContactsMulti($Path, \@AllUrls, $Props);
+  push @$Errors, @$ThisErrors;
+
+  return wantarray ? ($Contacts, $Removed, $Errors, $SyncToken, $Links) : $Contacts;
+}
+
+=head2 $self->SyncContactLinks($Path, %Args)
+
+uses the argument 'syncToken' to find newly added and removed
+cards from the server.
+
+Returns a list of:
+
+* Hash of href to etag for added/changed cargs
+* List of href of removed cards
+* List of errors
+* Scalar value of new syncToken
+
+=cut
+
+sub SyncContactLinks {
+  my ($Self, $Path, %Args) = @_;
 
   $Path || confess "Sync contacts path required";
 
@@ -543,25 +613,17 @@ sub SyncContacts {
       x('D:sync-level', 1),
       x('D:prop',
         x('D:getetag'),
-        x('C:address-data'),
-        map { x(join ":", @$_) } @$Props,
       ),
     ),
   );
 
-  if (($Response->{error} // "") eq 'valid-sync-token') {
-    delete $Args{syncToken};
-    return $Self->SyncContacts($Path, $Props, %Args);
-  }
-
-  my (@Contacts, @Removed, @Errors);
+  my (%Added, @Removed, @Errors);
 
   my $NS_C = $Self->ns('C');
   my $NS_D = $Self->ns('D');
   foreach my $Response (@{$Response->{"{$NS_D}response"} || []}) {
-    my $HRef = $Response->{"{$NS_D}href"}{content}
+    my $href = $Response->{"{$NS_D}href"}{content}
       || next;
-    my $CPath = $Self->_unrequest_url($HRef);
 
     # For members that have been removed, the DAV:response MUST
     # contain one DAV:status with a value set to '404 Not Found' and
@@ -569,10 +631,10 @@ sub SyncContacts {
     if (!$Response->{"{$NS_D}propstat"}) {
       my $Status = $Response->{"{$NS_D}status"}{content};
       if ($Status =~ m/ 404 /) {
-        push @Removed, $CPath;
+        push @Removed, $href;
       } else {
         warn "ODD STATUS";
-        push @Errors, "Odd status in non-propstat response: $Status";
+        push @Errors, "Odd status in non-propstat response $href: $Status";
       }
       next;
     }
@@ -585,12 +647,8 @@ sub SyncContacts {
       my $Status = $Propstat->{"{$NS_D}status"}{content};
 
       if ($Status =~ m/ 200 /) {
-        my $VCard = eval { $Self->_ParseReportData($Response, $Propstat, $Props) } || do {
-          push @Errors, $@ if $@;
-          next;
-        };
-
-        push @Contacts, $VCard;
+        my $etag = $Propstat->{"{$NS_D}prop"}{"{$NS_D}getetag"}{content};
+        $Added{$href} = $etag;
       }
       elsif ($Status =~ m/ 404 /) {
         # Missing properties return 404 status response, ignore
@@ -598,14 +656,14 @@ sub SyncContacts {
       }
       else {
         warn "ODD STATUS";
-        push @Errors, "Odd status in propstat response: $Status";
+        push @Errors, "Odd status in propstat response $href: $Status";
       }
     }
   }
 
   my $SyncToken = $Response->{"{$NS_D}sync-token"}{content};
 
-  return wantarray ? (\@Contacts, \@Removed, \@Errors, $SyncToken) : \@Contacts;
+  return (\%Added, \@Removed, \@Errors, $SyncToken);
 }
 
 =head2 $self->MoveContact($Path, $NewPath)
@@ -650,6 +708,7 @@ sub _ParseReportData {
   return unless $VCard;
 
   $VCard->{CPath} = $CPath;
+  $VCard->{href} = $HRef;
 
   my %Props;
   for (@$Props) {

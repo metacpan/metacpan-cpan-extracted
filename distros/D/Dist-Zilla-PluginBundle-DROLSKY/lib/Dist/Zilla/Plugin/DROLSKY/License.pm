@@ -7,7 +7,7 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '0.85';
+our $VERSION = '0.88';
 
 use Module::Runtime qw( use_module );
 use String::RewritePrefix;
@@ -60,7 +60,7 @@ Dist::Zilla::Plugin::DROLSKY::License - Sets up default license and copyright ho
 
 =head1 VERSION
 
-version 0.85
+version 0.88
 
 =for Pod::Coverage .*
 

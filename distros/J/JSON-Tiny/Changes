@@ -1,5 +1,12 @@
 Revision history for Perl module JSON::Tiny
 
+0.58 2017-11-12
+  - Version bump to fix inconsistency in version number.
+
+0.57 2017-11-11
+  - Resolved https://rt.cpan.org/Public/Bug/Display.html?id=122139 via
+    https://github.com/daoswald/JSON-Tiny/pull/4
+
 0.56 2016-05-18
   - Removed B as a tested dependency.
 

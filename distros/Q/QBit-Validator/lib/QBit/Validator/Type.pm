@@ -1,8 +1,10 @@
 package QBit::Validator::Type;
-$QBit::Validator::Type::VERSION = '0.010';
+$QBit::Validator::Type::VERSION = '0.011';
 use qbit;
 
 use base qw(QBit::Class);
+
+use Exception::Validator;
 
 __PACKAGE__->abstract_methods(qw(_get_options _get_options_name));
 
@@ -33,7 +35,7 @@ sub check_options {
     if (exists($template->{'check'}) && !$$already_check) {
         $$already_check = TRUE;
 
-        throw Exception::Validator gettext('Option "check" must be code')
+        throw Exception::Validator gettext('Option "%s" must be code', 'check')
           if !defined($template->{'check'}) || ref($template->{'check'}) ne 'CODE';
 
         if (!defined($data) && $template->{'optional'}) {
@@ -47,7 +49,7 @@ sub check_options {
         try {
             $template->{'check'}($qv, $data, $template, @path_field);
         }
-        catch Exception::Validator catch FF with {
+        catch Exception::Validator with {
             $error     = TRUE;
             $error_msg = shift->message;
         }

@@ -2,7 +2,7 @@ package MVC::Neaf::X::Session::Cookie;
 
 use strict;
 use warnings;
-our $VERSION = 0.17;
+our $VERSION = 0.18;
 
 =head1 NAME
 
@@ -11,6 +11,12 @@ MVC::Neaf::X::Session::Cookie - Stateless cookie-based session for Neaf
 =head1 DESCRIPTION
 
 Use this module as a session handler in a Neaf app.
+
+The session data is stored within user's cookies without encryption.
+However, it is signed with a key only known to the application owner.
+So the session can be read, but not tampered with.
+
+Please take these concern into account, or better use server-side storage.
 
 =head1 METHODS
 
@@ -27,8 +33,7 @@ use parent qw( MVC::Neaf::X::Session::Base );
 
 =over
 
-=item * key (required) - a security key to prevent tampering with
-the cookie data.
+=item * key (required) - a secret text string used to sign session data.
 This should be the same throughout the application.
 
 =item * hmac_function - HMAC to be used, default is hmac_sha224_base64
@@ -56,7 +61,7 @@ Create a cookie from $data hash. Given $id is ignored.
 sub store {
     my ($self, $id, $data) = @_;
 
-    # TODO Make universal HMAC for ALL cookies
+    # TODO 0.90 Make universal HMAC mechanism for ALL cookies
     my $str = encode_base64($data);
     $str =~ s/\s//gs;
     $str .= "~".$self->get_expire;

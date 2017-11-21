@@ -29,10 +29,13 @@
    "provides" : {
       "Webservice::Shipment" : {
          "file" : "lib/Webservice/Shipment.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "Webservice::Shipment::Carrier" : {
          "file" : "lib/Webservice/Shipment/Carrier.pm"
+      },
+      "Webservice::Shipment::Carrier::FedEx" : {
+         "file" : "lib/Webservice/Shipment/Carrier/FedEx.pm"
       },
       "Webservice::Shipment::Carrier::UPS" : {
          "file" : "lib/Webservice/Shipment/Carrier/UPS.pm"
@@ -56,6 +59,6 @@
          "url" : "https://github.com/jberger/Webservice-Shipment"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

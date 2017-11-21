@@ -105,7 +105,6 @@ SRL_STATIC_INLINE void srl_read_header(pTHX_ srl_decoder_t *dec, SV *header_user
 SRL_STATIC_INLINE void srl_read_single_value(pTHX_ srl_decoder_t *dec, SV* into, SV** container); /* main recursive dump routine */
 SRL_STATIC_INLINE void srl_finalize_structure(pTHX_ srl_decoder_t *dec);             /* optional finalize structure logic */
 SRL_STATIC_INLINE void srl_clear_decoder(pTHX_ srl_decoder_t *dec);                 /* clean up decoder after a dump */
-SRL_STATIC_INLINE void srl_clear_decoder_body_state(pTHX_ srl_decoder_t *dec);      /* clean up after each document body */
 
 /* the internal routines to handle each kind of object we have to deserialize */
 SRL_STATIC_INLINE void srl_read_copy(pTHX_ srl_decoder_t *dec, SV* into);
@@ -124,12 +123,13 @@ SRL_STATIC_INLINE void srl_read_string(pTHX_ srl_decoder_t *dec, int is_utf8, SV
 SRL_STATIC_INLINE void srl_read_varint_into(pTHX_ srl_decoder_t *dec, SV* into, SV** container, const U8 *track_it);
 SRL_STATIC_INLINE void srl_read_zigzag_into(pTHX_ srl_decoder_t *dec, SV* into, SV** container, const U8 *track_it);
 SRL_STATIC_INLINE void srl_read_reserved(pTHX_ srl_decoder_t *dec, U8 tag, SV* into);
-SRL_STATIC_INLINE void srl_read_object(pTHX_ srl_decoder_t *dec, SV* into, U8 obj_tag);
+SRL_STATIC_INLINE void srl_read_object(pTHX_ srl_decoder_t *dec, SV* into, U8 obj_tag, int read_class_name_only);
 SRL_STATIC_INLINE void srl_read_objectv(pTHX_ srl_decoder_t *dec, SV* into, U8 obj_tag);
 
 SRL_STATIC_INLINE void srl_track_sv(pTHX_ srl_decoder_t *dec, const U8 *track_pos, SV *sv);
 SRL_STATIC_INLINE void srl_read_frozen_object(pTHX_ srl_decoder_t *dec, HV *class_stash, SV *into);
-SRL_STATIC_INLINE SV * srl_follow_reference(pTHX_ srl_decoder_t *dec, UV offset);
+SRL_STATIC_INLINE SV * srl_follow_refp_alias_reference(pTHX_ srl_decoder_t *dec, UV offset);
+SRL_STATIC_INLINE AV * srl_follow_objectv_reference(pTHX_ srl_decoder_t *dec, UV offset);
 
 /* FIXME unimplemented!!! */
 SRL_STATIC_INLINE SV *srl_read_extend(pTHX_ srl_decoder_t *dec, SV* into);
@@ -232,6 +232,10 @@ srl_build_decoder_struct(pTHX_ HV *opt, sv_with_hash *options)
         my_hv_fetchs(he,val,opt, SRL_DEC_OPT_IDX_REFUSE_ZLIB);
         if ( val && SvTRUE(val) )
             SRL_DEC_SET_OPTION(dec, SRL_F_DECODER_REFUSE_ZLIB);
+
+        my_hv_fetchs(he,val,opt, SRL_DEC_OPT_IDX_REFUSE_ZSTD);
+        if ( val && SvTRUE(val) )
+            SRL_DEC_SET_OPTION(dec, SRL_F_DECODER_REFUSE_ZSTD);
 
         my_hv_fetchs(he,val,opt, SRL_DEC_OPT_IDX_REFUSE_OBJECTS);
         if ( val && SvTRUE(val) )
@@ -403,6 +407,9 @@ srl_decode_into_internal(pTHX_ srl_decoder_t *origdec, SV *src, SV *header_into,
     } else if (expect_false( SRL_DEC_HAVE_OPTION(dec, SRL_F_DECODER_DECOMPRESS_ZLIB) )) {
         dec->bytes_consumed = srl_decompress_body_zlib(aTHX_ dec->pbuf, NULL);
         origdec->bytes_consumed = dec->bytes_consumed;
+    } else if (expect_false( SRL_DEC_HAVE_OPTION(dec, SRL_F_DECODER_DECOMPRESS_ZSTD) )) {
+        dec->bytes_consumed = srl_decompress_body_zstd(aTHX_ dec->pbuf, NULL);
+        origdec->bytes_consumed = dec->bytes_consumed;
     }
 
     /* this function *MUST* be called right after srl_decompress* functions */
@@ -486,7 +493,7 @@ srl_clear_decoder(pTHX_ srl_decoder_t *dec)
     dec->buf.body_pos = dec->buf.start = dec->buf.end = dec->buf.pos = dec->save_pos = NULL;
 }
 
-SRL_STATIC_INLINE void
+void
 srl_clear_decoder_body_state(pTHX_ srl_decoder_t *dec)
 {
     SRL_DEC_UNSET_OPTION(dec, SRL_F_DECODER_NEEDS_FINALIZE);
@@ -580,7 +587,7 @@ srl_read_header(pTHX_ srl_decoder_t *dec, SV *header_user_data)
 
         if (expect_false( dec->proto_version == 1 ))
             SRL_DEC_SET_OPTION(dec, SRL_F_DECODER_PROTOCOL_V1); /* compat mode */
-        else if (expect_false( dec->proto_version > 3 || dec->proto_version < 1 ))
+        else if (expect_false( dec->proto_version > SRL_PROTOCOL_VERSION || dec->proto_version < 1 ))
             SRL_RDR_ERRORf1(dec->pbuf, "Unsupported Sereal protocol version %u", dec->proto_version);
 
         if (dec->encoding_flags == SRL_PROTOCOL_ENCODING_RAW) {
@@ -604,6 +611,15 @@ srl_read_header(pTHX_ srl_decoder_t *dec, SV *header_user_data)
                               "but this decoder is configured to refuse ZLIB-compressed input.");
             }
             dec->flags |= SRL_F_DECODER_DECOMPRESS_ZLIB;
+        }
+        else
+        if (dec->encoding_flags == SRL_PROTOCOL_ENCODING_ZSTD)
+        {
+            if (expect_false( SRL_DEC_HAVE_OPTION(dec, SRL_F_DECODER_REFUSE_ZSTD) )) {
+                SRL_RDR_ERROR(dec->pbuf, "Sereal document is compressed with ZSTD, "
+                              "but this decoder is configured to refuse ZSTD-compressed input.");
+            }
+            dec->flags |= SRL_F_DECODER_DECOMPRESS_ZSTD;
         }
         else
         {
@@ -1072,6 +1088,9 @@ srl_read_hash(pTHX_ srl_decoder_t *dec, SV* into, U8 tag) {
         } else {
             SRL_RDR_ERROR_UNEXPECTED(dec->pbuf, tag, "a stringish type");
         }
+        if (SvREADONLY(into)) {
+            SvREADONLY_off(into);
+        }
 #ifdef OLDHASH
         fetched_sv= hv_fetch((HV *)into, (char *)from, key_len, IS_LVALUE);
 #else
@@ -1083,7 +1102,7 @@ srl_read_hash(pTHX_ srl_decoder_t *dec, SV* into, U8 tag) {
         else
         if ( expect_false( SvTYPE(*fetched_sv) != SVt_NULL ) ) {
             /* sv_dump(*fetched_sv); */
-            SRL_RDR_ERRORf2(dec->pbuf, "duplicate key '%.*s' in hash", key_len, (char *)from);
+            SRL_RDR_ERRORf2(dec->pbuf, "duplicate key '%.*s' in hash", (int) key_len, (char *)from);
         }
         srl_read_single_value(aTHX_ dec, *fetched_sv, fetched_sv );
     }
@@ -1138,14 +1157,42 @@ srl_read_refn(pTHX_ srl_decoder_t *dec, SV* into)
 }
 
 SRL_STATIC_INLINE SV *
-srl_follow_reference(pTHX_ srl_decoder_t *dec, UV offset)
+srl_follow_refp_alias_reference(pTHX_ srl_decoder_t *dec, UV offset)
 {
-    SV* into = FRESH_SV();
-    srl_reader_char_ptr pos = dec->buf.pos;
-    dec->buf.pos = dec->buf.body_pos + offset;
+    SV* into = sv_2mortal(FRESH_SV());
+    srl_reader_char_ptr orig_pos = dec->buf.pos;
+    srl_reader_char_ptr new_pos = dec->buf.body_pos + offset;
+
+    if (new_pos >= orig_pos) {
+        SRL_RDR_ERROR(dec->pbuf, "Corrupted packed. Reference offset points forward!");
+    }
+
+    dec->buf.pos = new_pos;
     srl_read_single_value(aTHX_ dec, into, NULL);
-    dec->buf.pos = pos;
+    dec->buf.pos = orig_pos;
     return into;
+}
+
+SRL_STATIC_INLINE AV *
+srl_follow_objectv_reference(pTHX_ srl_decoder_t *dec, UV offset)
+{
+    AV *av= NULL;
+    srl_reader_char_ptr orig_pos = dec->buf.pos;
+    srl_reader_char_ptr new_pos = dec->buf.body_pos + offset;
+
+    if (new_pos >= orig_pos) {
+        SRL_RDR_ERROR(dec->pbuf, "Corrupted packed. Reference offset points forward!");
+    }
+
+    SRL_ASSERT_REF_PTR_TABLES(dec); /* init dec->ref_stashes and dec->ref_bless_av */
+
+    dec->buf.pos = new_pos;
+    /* call srl_read_object() with read_class_name_only=1 */
+    /* into and obj_tag are not used in this case */
+    srl_read_object(aTHX_ dec, NULL, 0, 1);
+    av= (AV *)PTABLE_fetch(dec->ref_bless_av, (void *)offset);
+    dec->buf.pos = orig_pos;
+    return av;
 }
 
 SRL_STATIC_INLINE void
@@ -1163,7 +1210,7 @@ srl_read_refp(pTHX_ srl_decoder_t *dec, SV* into)
 
 #ifdef FOLLOW_REFERENCES_IF_NOT_STASHED
     if (referent == NULL)
-        referent = srl_follow_reference(aTHX_ dec, item);
+        referent = srl_follow_refp_alias_reference(aTHX_ dec, item);
 #endif
 
     (void)SvREFCNT_inc(referent);
@@ -1192,7 +1239,7 @@ srl_read_weaken(pTHX_ srl_decoder_t *dec, SV* into)
         SRL_RDR_ERROR(dec->pbuf, "WEAKEN op");
     referent= SvRV(into);
     /* we have to be careful to not allow the referent's refcount
-     * to go to zero in the process of us weakening the the ref.
+     * to go to zero in the process of us weakening the ref.
      * For instance this may be aliased or reused later by a non-weakref
      * which will "fix" the refcount, however we need to be able to deserialize
      * in the opposite order, so if the referent's refcount is 1
@@ -1206,7 +1253,15 @@ srl_read_weaken(pTHX_ srl_decoder_t *dec, SV* into)
         av_push(dec->weakref_av, SvREFCNT_inc(referent));
         SRL_DEC_SET_OPTION(dec, SRL_F_DECODER_NEEDS_FINALIZE);
     }
-    sv_rvweaken(into);
+
+    /* If read-only reference, set to rw only to weaken it, otherwise "Modification of a read-only value attempted". */
+    if ( SRL_DEC_HAVE_OPTION(dec, SRL_F_DECODER_READONLY_FLAGS) && SvREADONLY(into)) {
+        SvREADONLY_off(into);
+        sv_rvweaken(into);
+        SvREADONLY_on(into);
+    } else {
+        sv_rvweaken(into);
+    }
 }
 
 SRL_STATIC_INLINE void
@@ -1220,12 +1275,22 @@ srl_read_objectv(pTHX_ srl_decoder_t *dec, SV* into, U8 obj_tag)
 
     ofs= srl_read_varint_uv_offset(aTHX_ dec->pbuf, " while reading OBJECTV(_FREEZE) classname");
 
-    if (expect_false( !dec->ref_bless_av ))
+    if (expect_false( !dec->ref_bless_av )) {
+#ifdef FOLLOW_REFERENCES_IF_NOT_STASHED
+        SRL_ASSERT_REF_PTR_TABLES(dec); /* init dec->ref_stashes and dec->ref_bless_av */
+#else
         SRL_RDR_ERROR(dec->pbuf, "Corrupted packet. OBJECTV(_FREEZE) used without "
                       "preceding OBJECT(_FREEZE) to define classname");
+#endif
+    }
+
     av= (AV *)PTABLE_fetch(dec->ref_bless_av, (void *)ofs);
     if (expect_false( NULL == av )) {
-        SRL_RDR_ERRORf1(dec->pbuf, "Corrupted packet. OBJECTV(_FREEZE) references unknown classname offset: %"UVuf, (UV)ofs);
+#ifdef FOLLOW_REFERENCES_IF_NOT_STASHED
+        av = srl_follow_objectv_reference(aTHX_ dec, (UV) ofs);
+        if (expect_false( NULL == av ))
+#endif
+            SRL_RDR_ERRORf1(dec->pbuf, "Corrupted packet. OBJECTV(_FREEZE) references unknown classname offset: %"UVuf, (UV)ofs);
     }
 
     /* checking tag: SRL_HDR_OBJECTV_FREEZE or SRL_HDR_OBJECTV? */
@@ -1258,7 +1323,7 @@ srl_read_objectv(pTHX_ srl_decoder_t *dec, SV* into, U8 obj_tag)
 }
 
 SRL_STATIC_INLINE void
-srl_read_object(pTHX_ srl_decoder_t *dec, SV* into, U8 obj_tag)
+srl_read_object(pTHX_ srl_decoder_t *dec, SV* into, U8 obj_tag, int read_class_name_only)
 {
     HV *class_stash= NULL;
     AV *av= NULL;
@@ -1371,6 +1436,16 @@ srl_read_object(pTHX_ srl_decoder_t *dec, SV* into, U8 obj_tag)
         if ( !av )
             SRL_RDR_ERRORf1(dec->pbuf, "Panic, no ref_bless_av for %"UVuf, (UV)storepos);
     }
+
+#ifdef FOLLOW_REFERENCES_IF_NOT_STASHED
+    /* at this point we have class name read and have coressponding records in
+     * dec->dec->ref_stashes and dec->ref_bless_av. So, we can simply fetch
+     * from hashes outside this function. The code */
+    if (read_class_name_only) return;
+#else
+    assert(into != NULL);
+    assert(obj_tag != 0);
+#endif
 
     if (expect_false( obj_tag == SRL_HDR_OBJECT_FREEZE )) {
         srl_read_frozen_object(aTHX_ dec, class_stash, into);
@@ -1712,7 +1787,7 @@ srl_read_single_value(pTHX_ srl_decoder_t *dec, SV* into, SV** container)
         case SRL_HDR_REFN:          srl_read_refn(aTHX_ dec, into);         is_ref=1; break;
         case SRL_HDR_REFP:          srl_read_refp(aTHX_ dec, into);         is_ref=1; break;
         case SRL_HDR_OBJECT_FREEZE:
-        case SRL_HDR_OBJECT:        srl_read_object(aTHX_ dec, into, tag);  is_ref=1; break;
+        case SRL_HDR_OBJECT:        srl_read_object(aTHX_ dec, into, tag, 0); is_ref=1; break;
         case SRL_HDR_OBJECTV_FREEZE:
         case SRL_HDR_OBJECTV:       srl_read_objectv(aTHX_ dec, into, tag); is_ref=1; break;
         case SRL_HDR_COPY:          srl_read_copy(aTHX_ dec, into);                   break;
@@ -1728,6 +1803,9 @@ srl_read_single_value(pTHX_ srl_decoder_t *dec, SV* into, SV** container)
                 SRL_RDR_ERROR(dec->pbuf, "ALIAS tag not inside container, corrupt packet?");
             offset= srl_read_varint_uv_offset(aTHX_ dec->pbuf," while reading ALIAS tag");
             alias= srl_fetch_item(aTHX_ dec, offset, "ALIAS");
+#ifdef FOLLOW_REFERENCES_IF_NOT_STASHED
+            if (!alias) alias= srl_follow_refp_alias_reference(aTHX_ dec, offset);
+#endif
             SvREFCNT_inc(alias);
             SvREFCNT_dec(into);
             *container= alias;
@@ -1761,7 +1839,12 @@ srl_read_single_value(pTHX_ srl_decoder_t *dec, SV* into, SV** container)
         if (
              dec->flags_readonly == 1 || !is_ref
         ) {
-            SvREADONLY_on(into);
+            if (is_ref && !SvREADONLY(SvRV(into)) ) {
+                SvREADONLY_on(SvRV(into));
+            }
+            if (!SvREADONLY(into)) {
+                SvREADONLY_on(into);
+            }
         }
     }
 #endif

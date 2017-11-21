@@ -1,10 +1,13 @@
 package Barcode::DataMatrix::Constants;
 
-=head1 Barcode::DataMatrix::Constants
+=head1 NAME
 
-Constants associated with the Reed-Solomon error correction encoding used
-for data matrices.  See
-L<https://en.wikipedia.org/wiki/Reed%E2%80%93Solomon_error_correction> for
+Barcode::DataMatrix::Constants - Constants associated with the Reed-Solomon
+error correction encoding used for data matrices.
+
+=head1 DESCRIPTION
+
+See L<https://en.wikipedia.org/wiki/Reed%E2%80%93Solomon_error_correction> for
 more information.
 
 =cut

@@ -7,7 +7,7 @@ package Circle::FE::Gtk;
 use strict;
 use warnings;
 
-our $VERSION = '0.130560';
+our $VERSION = '0.173170';
 
 1;
 

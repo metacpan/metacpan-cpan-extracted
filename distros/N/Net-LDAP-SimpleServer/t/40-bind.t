@@ -3,7 +3,7 @@ use warnings;
 use Test::More;
 
 use lib 't/lib';
-use Helper qw(ldap_client test_requests);
+use Helper qw(:CLIENT);
 
 our $DATA    = 'examples/single-entry.ldif';
 our $ROOT_DN = 'cn=root';

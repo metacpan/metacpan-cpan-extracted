@@ -1,0 +1,6 @@
+name = "Data-Pokemon-Go"
+badges = ["travis"]
+authority="cpan:WORTHMINE"
+
+module_maker="ModuleBuildTiny"
+

@@ -1,0 +1,21 @@
+.travis.yml
+bin/watch-later
+bin/yt-desc-links
+bin/yt-oauth
+Build.PL
+Changes
+INSTALL
+lib/App/WatchLater.pm
+lib/App/WatchLater/YouTube.pm
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00-load.t
+t/01-api.t
+t/02-find-video-id.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t

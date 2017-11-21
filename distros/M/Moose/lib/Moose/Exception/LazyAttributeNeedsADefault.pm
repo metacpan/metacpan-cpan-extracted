@@ -1,5 +1,5 @@
 package Moose::Exception::LazyAttributeNeedsADefault;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -10,4 +10,5 @@ sub _build_message {
     "You cannot have a lazy attribute (".$self->attribute_name.") without specifying a default value for it";
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

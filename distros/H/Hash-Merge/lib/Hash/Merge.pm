@@ -2,152 +2,168 @@ package Hash::Merge;
 
 use strict;
 use warnings;
+
 use Carp;
+use Clone::Choose 0.008;
+use Scalar::Util qw(blessed);
 
 use base 'Exporter';
-use vars qw($VERSION @ISA @EXPORT_OK %EXPORT_TAGS $context);
+our $CONTEXT;
 
-my ( $GLOBAL, $clone );
+our $VERSION     = '0.299';
+our @EXPORT_OK   = qw( merge _hashify _merge_hashes );
+our %EXPORT_TAGS = ('custom' => [qw( _hashify _merge_hashes )]);
 
-$VERSION     = '0.200';
-@EXPORT_OK   = qw( merge _hashify _merge_hashes );
-%EXPORT_TAGS = ( 'custom' => [qw( _hashify _merge_hashes )] );
+sub _init
+{
+    my $self = shift;
 
-$GLOBAL = {};
-bless $GLOBAL, __PACKAGE__;
-$context = $GLOBAL;    # $context is a variable for merge and _merge_hashes. used by functions to respect calling context
+    defined $self->{behaviors}
+      or $self->{behaviors} = {
+        'LEFT_PRECEDENT' => {
+            'SCALAR' => {
+                'SCALAR' => sub { $_[0] },
+                'ARRAY'  => sub { $_[0] },
+                'HASH'   => sub { $_[0] },
+            },
+            'ARRAY' => {
+                'SCALAR' => sub { [@{$_[0]}, $_[1]] },
+                'ARRAY'  => sub { [@{$_[0]}, @{$_[1]}] },
+                'HASH'   => sub { [@{$_[0]}, values %{$_[1]}] },
+            },
+            'HASH' => {
+                'SCALAR' => sub { $_[0] },
+                'ARRAY'  => sub { $_[0] },
+                'HASH'   => sub { $self->_merge_hashes($_[0], $_[1]) },
+            },
+        },
 
-$GLOBAL->{'behaviors'} = {
-    'LEFT_PRECEDENT' => {
-        'SCALAR' => {
-            'SCALAR' => sub { $_[0] },
-            'ARRAY'  => sub { $_[0] },
-            'HASH'   => sub { $_[0] },
+        'RIGHT_PRECEDENT' => {
+            'SCALAR' => {
+                'SCALAR' => sub { $_[1] },
+                'ARRAY'  => sub { [$_[0], @{$_[1]}] },
+                'HASH'   => sub { $_[1] },
+            },
+            'ARRAY' => {
+                'SCALAR' => sub { $_[1] },
+                'ARRAY'  => sub { [@{$_[0]}, @{$_[1]}] },
+                'HASH'   => sub { $_[1] },
+            },
+            'HASH' => {
+                'SCALAR' => sub { $_[1] },
+                'ARRAY'  => sub { [values %{$_[0]}, @{$_[1]}] },
+                'HASH'   => sub { $self->_merge_hashes($_[0], $_[1]) },
+            },
         },
-        'ARRAY' => {
-            'SCALAR' => sub { [ @{ $_[0] }, $_[1] ] },
-            'ARRAY'  => sub { [ @{ $_[0] }, @{ $_[1] } ] },
-            'HASH'   => sub { [ @{ $_[0] }, values %{ $_[1] } ] },
-        },
-        'HASH' => {
-            'SCALAR' => sub { $_[0] },
-            'ARRAY'  => sub { $_[0] },
-            'HASH'   => sub { _merge_hashes( $_[0], $_[1] ) },
-        },
-    },
 
-    'RIGHT_PRECEDENT' => {
-        'SCALAR' => {
-            'SCALAR' => sub { $_[1] },
-            'ARRAY'  => sub { [ $_[0], @{ $_[1] } ] },
-            'HASH'   => sub { $_[1] },
+        'STORAGE_PRECEDENT' => {
+            'SCALAR' => {
+                'SCALAR' => sub { $_[0] },
+                'ARRAY'  => sub { [$_[0], @{$_[1]}] },
+                'HASH'   => sub { $_[1] },
+            },
+            'ARRAY' => {
+                'SCALAR' => sub { [@{$_[0]}, $_[1]] },
+                'ARRAY'  => sub { [@{$_[0]}, @{$_[1]}] },
+                'HASH'   => sub { $_[1] },
+            },
+            'HASH' => {
+                'SCALAR' => sub { $_[0] },
+                'ARRAY'  => sub { $_[0] },
+                'HASH'   => sub { $self->_merge_hashes($_[0], $_[1]) },
+            },
         },
-        'ARRAY' => {
-            'SCALAR' => sub { $_[1] },
-            'ARRAY'  => sub { [ @{ $_[0] }, @{ $_[1] } ] },
-            'HASH'   => sub { $_[1] },
-        },
-        'HASH' => {
-            'SCALAR' => sub { $_[1] },
-            'ARRAY'  => sub { [ values %{ $_[0] }, @{ $_[1] } ] },
-            'HASH'   => sub { _merge_hashes( $_[0], $_[1] ) },
-        },
-    },
 
-    'STORAGE_PRECEDENT' => {
-        'SCALAR' => {
-            'SCALAR' => sub { $_[0] },
-            'ARRAY'  => sub { [ $_[0], @{ $_[1] } ] },
-            'HASH'   => sub { $_[1] },
+        'RETAINMENT_PRECEDENT' => {
+            'SCALAR' => {
+                'SCALAR' => sub { [$_[0],                                      $_[1]] },
+                'ARRAY'  => sub { [$_[0],                                      @{$_[1]}] },
+                'HASH'   => sub { $self->_merge_hashes($self->_hashify($_[0]), $_[1]) },
+            },
+            'ARRAY' => {
+                'SCALAR' => sub { [@{$_[0]},                                   $_[1]] },
+                'ARRAY'  => sub { [@{$_[0]},                                   @{$_[1]}] },
+                'HASH'   => sub { $self->_merge_hashes($self->_hashify($_[0]), $_[1]) },
+            },
+            'HASH' => {
+                'SCALAR' => sub { $self->_merge_hashes($_[0], $self->_hashify($_[1])) },
+                'ARRAY'  => sub { $self->_merge_hashes($_[0], $self->_hashify($_[1])) },
+                'HASH'   => sub { $self->_merge_hashes($_[0], $_[1]) },
+            },
         },
-        'ARRAY' => {
-            'SCALAR' => sub { [ @{ $_[0] }, $_[1] ] },
-            'ARRAY'  => sub { [ @{ $_[0] }, @{ $_[1] } ] },
-            'HASH'   => sub { $_[1] },
-        },
-        'HASH' => {
-            'SCALAR' => sub { $_[0] },
-            'ARRAY'  => sub { $_[0] },
-            'HASH'   => sub { _merge_hashes( $_[0], $_[1] ) },
-        },
-    },
+      };
 
-    'RETAINMENT_PRECEDENT' => {
-        'SCALAR' => {
-            'SCALAR' => sub { [ $_[0],                          $_[1] ] },
-            'ARRAY'  => sub { [ $_[0],                          @{ $_[1] } ] },
-            'HASH'   => sub { _merge_hashes( _hashify( $_[0] ), $_[1] ) },
-        },
-        'ARRAY' => {
-            'SCALAR' => sub { [ @{ $_[0] },                     $_[1] ] },
-            'ARRAY'  => sub { [ @{ $_[0] },                     @{ $_[1] } ] },
-            'HASH'   => sub { _merge_hashes( _hashify( $_[0] ), $_[1] ) },
-        },
-        'HASH' => {
-            'SCALAR' => sub { _merge_hashes( $_[0], _hashify( $_[1] ) ) },
-            'ARRAY'  => sub { _merge_hashes( $_[0], _hashify( $_[1] ) ) },
-            'HASH'   => sub { _merge_hashes( $_[0], $_[1] ) },
-        },
-    },
-};
+    defined $self->{behavior} or $self->{behavior} = 'LEFT_PRECEDENT';
 
-$GLOBAL->{'behavior'} = 'LEFT_PRECEDENT';
-$GLOBAL->{'matrix'}   = $GLOBAL->{behaviors}{ $GLOBAL->{'behavior'} };
-$GLOBAL->{'clone'}    = 1;
+    croak "Behavior '$self->{behavior}' does not exist"
+      if !exists $self->{behaviors}{$self->{behavior}};
 
-sub _get_obj {
-    if ( my $type = ref $_[0] ) {
-        return shift() if $type eq __PACKAGE__ || eval { $_[0]->isa(__PACKAGE__) };
-    }
-
-    return $context;
+    $self->{matrix} = $self->{behaviors}{$self->{behavior}};
+    $self->{clone}  = 1;
 }
 
-sub new {
-    my $pkg = shift;
+sub new
+{
+    my ($pkg, $beh) = @_;
     $pkg = ref $pkg || $pkg;
-    my $beh = shift || $context->{'behavior'};
 
-    croak "Behavior '$beh' does not exist" if !exists $context->{'behaviors'}{$beh};
+    my $instance = bless {($beh ? (behavior => $beh) : ())}, $pkg;
+    $instance->_init;
 
-    return bless {
-        'behavior' => $beh,
-        'matrix'   => $context->{'behaviors'}{$beh},
-    }, $pkg;
+    return $instance;
 }
 
-sub set_behavior {
+sub set_behavior
+{
     my $self  = &_get_obj;    # '&' + no args modifies current @_
-    my $value = uc(shift);
-    if ( !exists $self->{'behaviors'}{$value} and !exists $GLOBAL->{'behaviors'}{$value} ) {
-        carp 'Behavior must be one of : ' . join( ', ', keys %{ $self->{'behaviors'} }, keys %{ $GLOBAL->{'behaviors'}{$value} } );
+    my $value = shift;
+
+    my @behaviors = grep { /$value/i } keys %{$self->{'behaviors'}};
+    if (scalar @behaviors == 0)
+    {
+        carp 'Behavior must be one of : ' . join(', ', keys %{$self->{'behaviors'}});
         return;
     }
+    if (scalar @behaviors > 1)
+    {
+        croak 'Behavior must be unique in uppercase letters! You specified: ' . join ', ', @behaviors;
+    }
+    if (scalar @behaviors == 1)
+    {
+        $value = $behaviors[0];
+    }
+
     my $oldvalue = $self->{'behavior'};
     $self->{'behavior'} = $value;
-    $self->{'matrix'} = $self->{'behaviors'}{$value} || $GLOBAL->{'behaviors'}{$value};
-    return $oldvalue;         # Use classic POSIX pattern for get/set: set returns previous value
+    $self->{'matrix'}   = $self->{'behaviors'}{$value};
+    return $oldvalue;    # Use classic POSIX pattern for get/set: set returns previous value
 }
 
-sub get_behavior {
-    my $self = &_get_obj;     # '&' + no args modifies current @_
+sub get_behavior
+{
+    my $self = &_get_obj;    # '&' + no args modifies current @_
     return $self->{'behavior'};
 }
 
-sub specify_behavior {
-    my $self = &_get_obj;     # '&' + no args modifies current @_
-    my ( $matrix, $name ) = @_;
+sub specify_behavior
+{
+    my $self = &_get_obj;    # '&' + no args modifies current @_
+    my ($matrix, $name) = @_;
     $name ||= 'user defined';
-    if ( exists $self->{'behaviors'}{$name} ) {
+    if (exists $self->{'behaviors'}{$name})
+    {
         carp "Behavior '$name' was already defined. Please take another name";
         return;
     }
 
     my @required = qw( SCALAR ARRAY HASH );
 
-    foreach my $left (@required) {
-        foreach my $right (@required) {
-            if ( !exists $matrix->{$left}->{$right} ) {
+    foreach my $left (@required)
+    {
+        foreach my $right (@required)
+        {
+            if (!exists $matrix->{$left}->{$right})
+            {
                 carp "Behavior does not specify action for '$left' merging with '$right'";
                 return;
             }
@@ -158,72 +174,73 @@ sub specify_behavior {
     $self->{'behaviors'}{$name} = $self->{'matrix'} = $matrix;
 }
 
-sub set_clone_behavior {
+sub set_clone_behavior
+{
     my $self     = &_get_obj;          # '&' + no args modifies current @_
     my $oldvalue = $self->{'clone'};
     $self->{'clone'} = shift() ? 1 : 0;
     return $oldvalue;
 }
 
-sub get_clone_behavior {
+sub get_clone_behavior
+{
     my $self = &_get_obj;              # '&' + no args modifies current @_
     return $self->{'clone'};
 }
 
-sub merge {
+sub merge
+{
     my $self = &_get_obj;              # '&' + no args modifies current @_
 
-    my ( $left, $right ) = @_;
+    my ($left, $right) = @_;
 
     # For the general use of this module, we want to create duplicates
     # of all data that is merged.  This behavior can be shut off, but
     # can create havoc if references are used heavily.
 
-    my $lefttype =
-        ref $left eq 'HASH'  ? 'HASH'
-      : ref $left eq 'ARRAY' ? 'ARRAY'
-      :                        'SCALAR';
+    my $lefttype = ref($left);
+    $lefttype = "SCALAR" unless defined $lefttype and defined $self->{'matrix'}->{$lefttype};
 
-    my $righttype =
-        ref $right eq 'HASH'  ? 'HASH'
-      : ref $right eq 'ARRAY' ? 'ARRAY'
-      :                         'SCALAR';
+    my $righttype = ref($right);
+    $righttype = "SCALAR" unless defined $righttype and defined $self->{'matrix'}->{$righttype};
 
-    if ( $self->{'clone'} ) {
-        $left  = _my_clone( $left,  1 );
-        $right = _my_clone( $right, 1 );
+    if ($self->{'clone'})
+    {
+        $left  = ref($left)  ? clone($left)  : $left;
+        $right = ref($right) ? clone($right) : $right;
     }
 
-    local $context = $self;
-    return $self->{'matrix'}->{$lefttype}{$righttype}->( $left, $right );
+    local $CONTEXT = $self;
+    return $self->{'matrix'}->{$lefttype}{$righttype}->($left, $right);
 }
 
 # This does a straight merge of hashes, delegating the merge-specific
 # work to 'merge'
 
-sub _merge_hashes {
+sub _merge_hashes
+{
     my $self = &_get_obj;    # '&' + no args modifies current @_
 
-    my ( $left, $right ) = ( shift, shift );
-    if ( ref $left ne 'HASH' || ref $right ne 'HASH' ) {
+    my ($left, $right) = (shift, shift);
+    if (ref $left ne 'HASH' || ref $right ne 'HASH')
+    {
         carp 'Arguments for _merge_hashes must be hash references';
         return;
     }
 
     my %newhash;
-    foreach my $leftkey ( keys %$left ) {
-        if ( exists $right->{$leftkey} ) {
-            $newhash{$leftkey} = $self->merge( $left->{$leftkey}, $right->{$leftkey} );
-        }
-        else {
-            $newhash{$leftkey} = $self->{clone} ? $self->_my_clone( $left->{$leftkey} ) : $left->{$leftkey};
-        }
+    foreach my $key (keys %$left)
+    {
+        $newhash{$key} =
+          exists $right->{$key}
+          ? $self->merge($left->{$key}, $right->{$key})
+          : $left->{$key};
+
     }
 
-    foreach my $rightkey ( keys %$right ) {
-        if ( !exists $left->{$rightkey} ) {
-            $newhash{$rightkey} = $self->{clone} ? $self->_my_clone( $right->{$rightkey} ) : $right->{$rightkey};
-        }
+    foreach my $key (grep { !exists $left->{$_} } keys %$right)
+    {
+        $newhash{$key} = $right->{$key};
     }
 
     return \%newhash;
@@ -233,81 +250,51 @@ sub _merge_hashes {
 # the passed scalar or array, the key is equal to the value.  Returns
 # this new hash
 
-sub _hashify {
+sub _hashify
+{
     my $self = &_get_obj;    # '&' + no args modifies current @_
     my $arg  = shift;
-    if ( ref $arg eq 'HASH' ) {
+    if (ref $arg eq 'HASH')
+    {
         carp 'Arguement for _hashify must not be a HASH ref';
         return;
     }
 
     my %newhash;
-    if ( ref $arg eq 'ARRAY' ) {
-        foreach my $item (@$arg) {
+    if (ref $arg eq 'ARRAY')
+    {
+        foreach my $item (@$arg)
+        {
             my $suffix = 2;
             my $name   = $item;
-            while ( exists $newhash{$name} ) {
+            while (exists $newhash{$name})
+            {
                 $name = $item . $suffix++;
             }
             $newhash{$name} = $item;
         }
     }
-    else {
+    else
+    {
         $newhash{$arg} = $arg;
     }
     return \%newhash;
 }
 
-# This adds some checks to the clone process, to deal with problems that
-# the current distro of ActiveState perl has (specifically, it uses 0.09
-# of Clone, which does not support the cloning of scalars).  This simply
-# wraps around clone as to prevent a scalar from being cloned via a
-# Clone 0.09 process.  This might mean that CODEREFs and anything else
-# not a HASH or ARRAY won't be cloned.
+my $_global;
 
-# $clone is global, which should point to coderef
-
-sub _my_clone {
-    my $self = &_get_obj;    # '&' + no args modifies current @_
-    my ( $arg, $depth ) = @_;
-
-    if ( $self->{clone} && !$clone ) {
-        if ( eval { require Clone; 1 } ) {
-            $clone = sub {
-                if (   !( $Clone::VERSION || 0 ) > 0.09
-                    && ref $_[0] ne 'HASH'
-                    && ref $_[0] ne 'ARRAY' ) {
-                    my $var = shift;    # Forced clone
-                    return $var;
-                }
-                Clone::clone( shift, $depth );
-            };
-        }
-        elsif ( eval { require Storable; 1 } ) {
-            $clone = sub {
-                my $var = shift;        # Forced clone
-                return $var if !ref($var);
-                Storable::dclone($var);
-            };
-        }
-        elsif ( eval { require Clone::PP; 1 } ) {
-            $clone = sub {
-                my $var = shift;        # Forced clone
-                return $var if !ref($var);
-                Clone::PP::clone( $var, $depth );
-            };
-        }
-        else {
-            croak "Can't load Clone, Storable, or Clone::PP for cloning purpose";
-        }
+sub _get_obj
+{
+    if (my $type = ref $_[0])
+    {
+        return shift()
+          if $type eq __PACKAGE__
+          || (blessed $_[0] && $_[0]->isa(__PACKAGE__));
     }
 
-    if ( $self->{'clone'} ) {
-        return $clone->($arg);
-    }
-    else {
-        return $arg;
-    }
+    defined $CONTEXT and return $CONTEXT;
+    defined $_global or $_global = Hash::Merge->new;
+    return $_global;
 }
 
 1;
@@ -320,52 +307,50 @@ Hash::Merge - Merges arbitrarily deep hashes into a single hash
 
 =head1 SYNOPSIS
 
-    use Hash::Merge qw( merge );
-    my %a = ( 
-		'foo'    => 1,
-	    'bar'    => [ qw( a b e ) ],
-	    'querty' => { 'bob' => 'alice' },
-	);
-    my %b = ( 
-		'foo'     => 2, 
-		'bar'    => [ qw(c d) ],
-		'querty' => { 'ted' => 'margeret' }, 
-	);
-
+    my %a = (
+        'foo'    => 1,
+        'bar'    => [qw( a b e )],
+        'querty' => { 'bob' => 'alice' },
+    );
+    my %b = (
+        'foo'    => 2,
+        'bar'    => [qw(c d)],
+        'querty' => { 'ted' => 'margeret' },
+    );
+    
     my %c = %{ merge( \%a, \%b ) };
-
-    Hash::Merge::set_behavior( 'RIGHT_PRECEDENT' );
-
+    
+    Hash::Merge::set_behavior('RIGHT_PRECEDENT');
+    
     # This is the same as above
-
-	Hash::Merge::specify_behavior(
-	    {
-			'SCALAR' => {
-				'SCALAR' => sub { $_[1] },
-				'ARRAY'  => sub { [ $_[0], @{$_[1]} ] },
-				'HASH'   => sub { $_[1] },
-			},
-			'ARRAY => {
-				'SCALAR' => sub { $_[1] },
-				'ARRAY'  => sub { [ @{$_[0]}, @{$_[1]} ] },
-				'HASH'   => sub { $_[1] }, 
-			},
-			'HASH' => {
-				'SCALAR' => sub { $_[1] },
-				'ARRAY'  => sub { [ values %{$_[0]}, @{$_[1]} ] },
-				'HASH'   => sub { Hash::Merge::_merge_hashes( $_[0], $_[1] ) }, 
-			},
-		}, 
-		'My Behavior', 
-	);
-	
-	# Also there is OO interface.
-	
-	my $merge = Hash::Merge->new( 'LEFT_PRECEDENT' );
-	my %c = %{ $merge->merge( \%a, \%b ) };
-	
-	# All behavioral changes (e.g. $merge->set_behavior(...)), called on an object remain specific to that object
-	# The legacy "Global Setting" behavior is respected only when new called as a non-OO function.
+    
+    Hash::Merge::specify_behavior(
+        {   'SCALAR' => {
+                'SCALAR' => sub { $_[1] },
+                'ARRAY'  => sub { [ $_[0], @{ $_[1] } ] },
+                'HASH'   => sub { $_[1] },
+            },
+            'ARRAY' => {
+                'SCALAR' => sub { $_[1] },
+                'ARRAY'  => sub { [ @{ $_[0] }, @{ $_[1] } ] },
+                'HASH'   => sub { $_[1] },
+            },
+            'HASH' => {
+                'SCALAR' => sub { $_[1] },
+                'ARRAY'  => sub { [ values %{ $_[0] }, @{ $_[1] } ] },
+                'HASH'   => sub { Hash::Merge::_merge_hashes( $_[0], $_[1] ) },
+            },
+        },
+        'My Behavior',
+    );
+    
+    # Also there is OO interface.
+    
+    my $merge = Hash::Merge->new('LEFT_PRECEDENT');
+    my %c = %{ $merge->merge( \%a, \%b ) };
+    
+    # All behavioral changes (e.g. $merge->set_behavior(...)), called on an object remain specific to that object
+    # The legacy "Global Setting" behavior is respected only when new called as a non-OO function.
 
 =head1 DESCRIPTION
 
@@ -398,19 +383,19 @@ The values buried in the left hash will never
 be lost; any values that can be added from the right hash will be
 attempted.
 
-   my $merge = Hash::Merge->new();
-   my $merge = Hash::Merge->new('LEFT_PRECEDENT');
-   $merge->set_set_behavior('LEFT_PRECEDENT')
-   Hash::Merge::set_set_behavior('LEFT_PRECEDENT')
+    my $merge = Hash::Merge->new();
+    my $merge = Hash::Merge->new('LEFT_PRECEDENT');
+    $merge->set_set_behavior('LEFT_PRECEDENT');
+    Hash::Merge::set_set_behavior('LEFT_PRECEDENT');
 
 =item Right Precedence
 
 Same as Left Precedence, but with the right
 hash values never being lost
 
-   my $merge = Hash::Merge->new('RIGHT_PRECEDENT');
-   $merge->set_set_behavior('RIGHT_PRECEDENT')
-   Hash::Merge::set_set_behavior('RIGHT_PRECEDENT')
+    my $merge = Hash::Merge->new('RIGHT_PRECEDENT');
+    $merge->set_set_behavior('RIGHT_PRECEDENT');
+    Hash::Merge::set_set_behavior('RIGHT_PRECEDENT');
 
 =item Storage Precedence
 
@@ -419,9 +404,9 @@ storage mediums, the 'bigger' medium will win; arrays are preferred over
 scalars, hashes over either.  The other medium will try to be fitted in
 the other, but if this isn't possible, the data is dropped.
 
-   my $merge = Hash::Merge->new('STORAGE_PRECEDENT');
-   $merge->set_set_behavior('STORAGE_PRECEDENT')
-   Hash::Merge::set_set_behavior('STORAGE_PRECEDENT')
+    my $merge = Hash::Merge->new('STORAGE_PRECEDENT');
+    $merge->set_set_behavior('STORAGE_PRECEDENT');
+    Hash::Merge::set_set_behavior('STORAGE_PRECEDENT');
 
 =item Retainment Precedence
 
@@ -429,9 +414,9 @@ No data will be lost; scalars will be joined
 with arrays, and scalars and arrays will be 'hashified' to fit them into
 a hash.
 
-   my $merge = Hash::Merge->new('RETAINMENT_PRECEDENT');
-   $merge->set_set_behavior('RETAINMENT_PRECEDENT')
-   Hash::Merge::set_set_behavior('RETAINMENT_PRECEDENT')
+    my $merge = Hash::Merge->new('RETAINMENT_PRECEDENT');
+    $merge->set_set_behavior('RETAINMENT_PRECEDENT');
+    Hash::Merge::set_set_behavior('RETAINMENT_PRECEDENT');
 
 =back
 
@@ -488,7 +473,7 @@ _hashify and _merge_hashes as helper functions for these.  For example,
 if you want to add the left SCALAR to the right ARRAY, you can have your
 behavior specification include:
 
-   %spec = ( ...SCALAR => { ARRAY => sub { [ $_[0], @$_[1] ] }, ... } } );
+    %spec = ( ...SCALAR => { ARRAY => sub { [ $_[0], @$_[1] ] }, ... } } );
 
 Note that you can import _hashify and _merge_hashes into your program's
 namespace with the 'custom' tag.
@@ -501,59 +486,42 @@ Here is the specifics on how the current internal behaviors are called,
 and what each does.  Assume that the left value is given as $a, and
 the right as $b (these are either scalars or appropriate references)
 
-	LEFT TYPE   RIGHT TYPE      LEFT_PRECEDENT       RIGHT_PRECEDENT
-	 SCALAR      SCALAR            $a                   $b
-	 SCALAR      ARRAY             $a                   ( $a, @$b )
-	 SCALAR      HASH              $a                   %$b
-	 ARRAY       SCALAR            ( @$a, $b )          $b
-	 ARRAY       ARRAY             ( @$a, @$b )         ( @$a, @$b )
-	 ARRAY       HASH              ( @$a, values %$b )  %$b 
-	 HASH        SCALAR            %$a                  $b
-	 HASH        ARRAY             %$a                  ( values %$a, @$b )
-	 HASH        HASH              merge( %$a, %$b )    merge( %$a, %$b )
+    LEFT TYPE    RIGHT TYPE    LEFT_PRECEDENT       RIGHT_PRECEDENT
+     SCALAR       SCALAR        $a                   $b
+     SCALAR       ARRAY         $a                   ( $a, @$b )
+     SCALAR       HASH          $a                   %$b
+     ARRAY        SCALAR        ( @$a, $b )          $b
+     ARRAY        ARRAY         ( @$a, @$b )         ( @$a, @$b )
+     ARRAY        HASH          ( @$a, values %$b )  %$b 
+     HASH         SCALAR        %$a                  $b
+     HASH         ARRAY         %$a                  ( values %$a, @$b )
+     HASH         HASH          merge( %$a, %$b )    merge( %$a, %$b )
 
-	LEFT TYPE   RIGHT TYPE  STORAGE_PRECEDENT   RETAINMENT_PRECEDENT
-	 SCALAR      SCALAR     $a                  ( $a ,$b )
-	 SCALAR      ARRAY      ( $a, @$b )         ( $a, @$b )
-	 SCALAR      HASH       %$b                 merge( hashify( $a ), %$b )
-	 ARRAY       SCALAR     ( @$a, $b )         ( @$a, $b )
-	 ARRAY       ARRAY      ( @$a, @$b )        ( @$a, @$b )
-	 ARRAY       HASH       %$b                 merge( hashify( @$a ), %$b )
-	 HASH        SCALAR     %$a                 merge( %$a, hashify( $b ) )
-	 HASH        ARRAY      %$a                 merge( %$a, hashify( @$b ) )
-	 HASH        HASH       merge( %$a, %$b )   merge( %$a, %$b )
-
+    LEFT TYPE    RIGHT TYPE    STORAGE_PRECEDENT    RETAINMENT_PRECEDENT
+     SCALAR       SCALAR        $a                   ( $a ,$b )
+     SCALAR       ARRAY         ( $a, @$b )          ( $a, @$b )
+     SCALAR       HASH          %$b                  merge( hashify( $a ), %$b )
+     ARRAY        SCALAR        ( @$a, $b )          ( @$a, $b )
+     ARRAY        ARRAY         ( @$a, @$b )         ( @$a, @$b )
+     ARRAY        HASH          %$b                  merge( hashify( @$a ), %$b )
+     HASH         SCALAR        %$a                  merge( %$a, hashify( $b ) )
+     HASH         ARRAY         %$a                  merge( %$a, hashify( @$b ) )
+     HASH         HASH          merge( %$a, %$b )    merge( %$a, %$b )
 
 (*) note that merge calls _merge_hashes, hashify calls _hashify.
 
-=head1 CAVEATS
-
-This will not handle self-referencing/recursion within hashes well.  
-Plans for a future version include incorporate deep recursion protection.
-
-As of Feb 16, 2002, ActiveState Perl's PPM of Clone.pm is only at
-0.09.  This version does not support the cloning of scalars if passed
-to the function.  This is fixed by 0.10 (and currently, Clone.pm is at
-0.13).  So while most other users can upgrade their Clone.pm
-appropriately (and I could put this as a requirement into the
-Makefile.PL), those using ActiveState would lose out on the ability to
-use this module.  (Clone.pm is not pure perl, so it's not simply a
-matter of moving the newer file into place).  Thus, for the time
-being, a check is done at the start of loading of this module to see
-if a newer version of clone is around.  Then, all cloning calls have
-been wrapped in the internal _my_clone function to block any scalar
-clones if Clone.pm is too old.  However, this also prevents the
-cloning of anything that isn't a hash or array under the same
-conditions.  Once ActiveState updates their Clone, I'll remove this 
-wrapper.
-
 =head1 AUTHOR
 
-Michael K. Neylon E<lt>mneylon-pm@masemware.comE<gt>
+Michael K. Neylon E<lt>mneylon-pm@masemware.comE<gt>,
+Daniel Muey E<lt>dmuey@cpan.orgE<gt>,
+Jens Rehsack E<lt>rehsack@cpan.orgE<gt>,
+Stefan Hermes E<lt>hermes@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
 Copyright (c) 2001,2002 Michael K. Neylon. All rights reserved.
+Copyright (c) 2013-2017 Jens Rehsack. All rights reserved.
+Copyright (c) 2017 Stefan Hermes. All rights reserved.
 
 This library is free software.  You can redistribute it and/or modify it 
 under the same terms as Perl itself.

@@ -30,7 +30,7 @@ my %WriteMakefileArgs = (
     "Test::Fatal" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.06",
+  "VERSION" => "0.07",
   "test" => {
     "TESTS" => "t/000-samples/*.t t/001-basic/*.t t/030-roles/*.t t/040-method/*.t t/050-non-mop-integration/*.t t/080-enum/*.t t/100-annotations/*.t"
   }

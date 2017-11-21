@@ -1,5 +1,16 @@
 Revision history for MetaCPAN-Client (previously MetaCPAN-API)
 
+2.021000    18.11.17
+            * Scroller fix for page skipping (Thomas Sibley)
+            * Sorting in scrolled searches (Thomas Sibley)
+            * Type check cleanup (Thomas Sibley)
+
+2.020000    17.11.17
+            * Added support for /search/autocomplete/suggest (Mickey)
+
+2.019000    16.11.17
+            * Added 'package' type support for scrolled searches (Mickey)
+
 2.018000    16.10.17
             * Fix fetch URL (Mickey, GH#92)
             * Removed critic author test (Mickey)

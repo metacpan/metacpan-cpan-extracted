@@ -14,7 +14,7 @@ use Data::Table::Text qw(:all);
 use File::Copy;
 use POSIX qw(strftime);                                                         # http://www.cplusplus.com/reference/ctime/strftime/
 
-our $VERSION = '20171007';
+our $VERSION = '20171114';
 
 #-------------------------------------------------------------------------------
 # Constants
@@ -443,10 +443,10 @@ sub make
 
     my $J = join ':', $androidJar, @libs;                                       # Jar files for javac
 
-    my $r = xxx("javac -g -Xlint:-options -source $javaTarget ".
-                " -target $javaTarget -cp $J -d $classes $j");
+    my $r = xxx("javac -g -Xlint:-options -source $javaTarget ".                # Compile java source files
+                " -target $javaTarget -cp $J          -d $classes $j");
     $android->logMessage($r) if $r;
-    $r !~ /error/ or confess "Java errors\n";
+    $r !~ /error/ or confess "Java errors\n$r\n";
    }
 
   if (1)                                                                        # Dx
@@ -474,25 +474,31 @@ sub make
    {xxx("cp $api $apj");                                                        # Create apk
     xxx("cd $bin && zip -qv $apj classes.dex");                                 # Add dexed classes
 
-    my $alg = $android->debug ? '' : "-sigalg SHA1withRSA -digestalg SHA1";
+    if (1)                                                                      # Sign
+     {my $alg = $android->debug ? '' : "-sigalg SHA1withRSA -digestalg SHA1";
 
-    my $s = xxx("echo $keyStorePwd |",                                          # Sign
-     "jarsigner $alg -keystore $keyStoreFile $apj $keyAlias");
+      my $s = xxx("echo $keyStorePwd |",
+       "jarsigner $alg -keystore $keyStoreFile $apj $keyAlias");
 
-    $s =~ /reference a valid KeyStore key entry containing a private key/s and
-      confess "Invalid keystore password: $keyStorePwd ".
-              "for keystore:\n$keyStoreFile\n".
-              "Specify the correct password via the keyStorePwd() method\n";
+      $s =~ /reference a valid KeyStore key entry containing a private key/s and
+        confess "Invalid keystore password: $keyStorePwd ".
+                "for keystore:\n$keyStoreFile\n".
+                "Specify the correct password via the keyStorePwd() method\n";
 
-    $s =~ /jar signed/s or confess "Unable to sign $apj\n";
-    $android->logMessage($s);
+      $s =~ /jar signed/s or confess "Unable to sign $apj\n";
+      $android->logMessage($s);
+     }
 
-    my $v = xxx("jarsigner -verify $apj");
-    $v =~ /jar verified/s  or confess "Unable to verify $apk\n";
-    $android->logMessage($v);
+    if ($android->verifyApk)                                                    # Optional verify
+     {my $v = xxx("jarsigner -verify $apj");
+      $v =~ /jar verified/s  or confess "Unable to verify $apk\n";
+      $android->logMessage($v);
+     }
 
-    my $z = xxx("$zipAlign -f 4 $apj $apk");
-    $android->logMessage($z);
+    if (1)                                                                      # Zip align as required by Google Play
+     {my $z = xxx("$zipAlign -f 4 $apj $apk");
+      $android->logMessage($z);
+     }
    }
  }
 
@@ -532,6 +538,7 @@ if (1) {                                                                        
   genLValueArrayMethods (qw(sdkLevels));                                        # [minSdkVersion, targetSdkVersion], default is [15, 25]
   genLValueArrayMethods (qw(src));                                              # A reference to an array of java source files to be compiled to create this app
   genLValueScalarMethods(qw(title));                                            # Title of app, the default is name of app
+  genLValueScalarMethods(qw(verifyApk));                                        # Verify the signed apk
   genLValueScalarMethods(qw(version));                                          # Version of app, default is today's date
  }
 

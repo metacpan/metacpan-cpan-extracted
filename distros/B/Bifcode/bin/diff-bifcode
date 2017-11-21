@@ -1,0 +1,131 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Bifcode ':all';
+use OptArgs2;
+
+arg file1 => (
+    comment  => 'first file containing bifcode',
+    isa      => 'Str',
+    required => 1,
+);
+
+arg file2 => (
+    comment  => 'second file containing bifcode',
+    isa      => 'Str',
+    required => 1,
+);
+
+opt strip => (
+    alias   => 's',
+    comment => 'strip newlines from bifcode before checking',
+    isa     => 'Flag',
+);
+
+opt help => (
+    alias   => 'h',
+    comment => 'print full help message and exit',
+    isa     => 'Flag',
+    ishelp  => 1,
+);
+
+# Code to generate the example in the documentation
+if (0) {
+    my $a = { one => 1, two => 2 };
+    my $b = { one => 1, two => 2, three => 3 };
+
+    print my $bc1 = encode_bifcode($a), "\n";
+    print my $bc2 = encode_bifcode($b), "\n";
+    print diff_bifcode $bc1, $bc2;
+    exit;
+}
+
+my $opts = optargs;
+
+sub _slurp {
+    my $file = shift;
+    local $| = 1;
+    open my $fh, '<', $file or die 'open: ' . $!;
+    my $str = join( '', <$fh> );
+    $str =~ s/\n+$// if $opts->{strip};
+    return $str;
+}
+
+my $bc1 = _slurp( $opts->{file1} );
+my $bc2 = _slurp( $opts->{file2} );
+
+foreach my $pair ( [ $opts->{file1}, $bc1 ], [ $opts->{file2}, $bc2 ] ) {
+    if ( !eval { Bifcode::decode_bifcode( $pair->[1] ) } ) {
+        my $err = $@;
+        $err =~ s/^/  /mg;
+        warn sprintf "warning: invalid Bifcode in file '%s'\n$err", $pair->[0];
+    }
+}
+
+print my $diff = Bifcode::diff_bifcode( $bc1, $bc2 );
+exit length($diff) ? 1 : 0;
+
+__END__
+
+=head1 NAME
+
+diff-bifcode - compare files containing Bifcode
+
+=head1 SYNOPSIS
+
+    diff-bifcode FILE1 FILE2 [OPTIONS...]
+
+=head1 DESCRIPTION
+
+The B<diff-bifcode> utility compares two files contining Bifcode. For
+example, if file1 contains:
+
+    {U3:oneI1,U3:twoI2,}
+
+And file2 contains:
+
+    {U3:oneI1,U5:threeI3,U3:twoI2,}
+
+Then running B<diff-bifcode> against the two results in the following:
+
+    $ diff-bifcode file1 file2
+    @@ -2,6 +2,8 @@
+     {
+     U3:one
+     I1,
+    +U5:three
+    +I3,
+     U3:two
+     I2,
+     }
+
+A warning is printed to I<stderr> if either file does not contain valid
+Bifcode.
+
+Bifcode does not allow trailing newlines which makes it a little tricky
+to create them with a text editor. You can use the C<--strip | -s>
+options to strip newlines from the end of each file before parsing.
+
+=head1 EXIT VALUE
+
+This command exists with a value of 0 when the files match, and 1 when
+they do not.
+
+=head1 SEE ALSO
+
+This utility is a tiny command-line wrapper around the L<Bifcode>
+C<diff_bifcode()> function.
+
+=head1 AUTHOR
+
+Mark Lawrence E<lt>nomad@null.netE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2017 Mark Lawrence <nomad@null.net>
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation; either version 3 of the License, or (at your
+option) any later version.
+

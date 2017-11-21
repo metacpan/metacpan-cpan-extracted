@@ -14,6 +14,7 @@ my $preop =
 WriteMakefile1(
   NAME         => 'Mashtree',
   VERSION_FROM => 'lib/Mashtree.pm',
+  ABSTRACT_FROM => 'lib/Mashtree.pm',
   EXE_FILES    => [
     "bin/mashtree.pl",
     "bin/mashtree_wrapper.pl",
@@ -41,7 +42,7 @@ WriteMakefile1(
     'Test::More'     => 0.47,
   },
   MIN_PERL_VERSION => '5.10.0',
-  LICENSE          => "GPLv3",
+  LICENSE          => "gpl_3",
   dist=>{
     COMPRESS => "gzip -9f",
     SUFFIX   => "gz",

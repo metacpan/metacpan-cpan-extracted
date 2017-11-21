@@ -1,0 +1,15 @@
+#!/bin/sh
+
+if [ ! "$1" ]; then
+  echo "Usage: wrt findprop <property>"
+  exit
+fi
+
+# find all the marker files and get the name of
+# the directory containing each
+
+# TODO: handle the case where nothing is found
+
+find . -name "$1.prop" | xargs -n1 dirname
+
+exit 0

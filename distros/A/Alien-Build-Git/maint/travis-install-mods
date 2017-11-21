@@ -3,7 +3,7 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-rm -rf /tmp/Test2-Tools-URL /tmp/Alien-Build.git
+rm -rf /tmp/Test2-Tools-URL /tmp/Alien-Build
 
 cpanm -n Dist::Zilla
 
@@ -14,8 +14,8 @@ dzil authordeps --missing | cpanm -n
 dzil listdeps   --missing | cpanm -n
 dzil install --install-command 'cpanm -n .'
 
-git clone --depth 2 https://github.com/Perl5-Alien/Alien-Build.git.git /tmp/Alien-Build.git
-cd /tmp/Alien-Build.git
+git clone --depth 2 https://github.com/Perl5-Alien/Alien-Build.git /tmp/Alien-Build
+cd /tmp/Alien-Build
 dzil authordeps --missing | cpanm -n
 dzil listdeps   --missing | cpanm -n
 dzil install --install-command 'cpanm -n .'

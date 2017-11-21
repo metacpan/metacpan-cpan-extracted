@@ -1,5 +1,9 @@
 Revision history for DBIx::Class::Sims (ordered by revision number).
 
+0.300900 Nov 12 2017 14:00:00 PDT
+   - Fix a bug preventing null_chance from working.
+   - Fixes for running tests under 5.26 (was depending on dot-in-INC)
+
 0.300800 Apr 21 2017 19:00:00 PDT
    - Use a hashref instead of a hashrefref when setting a sims-spec within a
      column.

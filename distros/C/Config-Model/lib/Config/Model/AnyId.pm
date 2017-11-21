@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::AnyId;
-$Config::Model::AnyId::VERSION = '2.113';
+$Config::Model::AnyId::VERSION = '2.114';
 use 5.010;
 
 use Mouse;
@@ -810,6 +810,11 @@ sub fetch_all {
     return map { $self->fetch_with_id($_); } @keys;
 }
 
+sub fetch {
+    my $self = shift;
+    return join(',', $self->fetch_all_values(@_) );
+}
+
 sub fetch_all_values {
     my $self  = shift;
     my %args  = @_ > 1 ? @_ : ( mode => shift );
@@ -938,6 +943,7 @@ sub auto_vivify {
     my $imode = $self->instance->get_data_mode;
     $self->set_data_mode( $idx, $imode );
 
+    $self->notify_change(note => "added entry $idx");
     $self->_store( $idx, $item );
 }
 
@@ -1032,7 +1038,7 @@ Config::Model::AnyId - Base class for hash or list element
 
 =head1 VERSION
 
-version 2.113
+version 2.114
 
 =head1 SYNOPSIS
 
@@ -1560,6 +1566,11 @@ The value entered in preset mode or checked by default.
 The default value (defined by the configuration model)
 
 =back
+
+=head2 fetch
+
+Similar to L</fetch_all_values>, with the same parameters, Returns the
+result as a string with comma separated list values.
 
 =head2 fetch_all_indexes()
 

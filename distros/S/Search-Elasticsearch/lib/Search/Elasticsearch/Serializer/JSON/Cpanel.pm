@@ -1,5 +1,5 @@
 package Search::Elasticsearch::Serializer::JSON::Cpanel;
-$Search::Elasticsearch::Serializer::JSON::Cpanel::VERSION = '5.02';
+$Search::Elasticsearch::Serializer::JSON::Cpanel::VERSION = '6.00';
 use Cpanel::JSON::XS;
 use Moo;
 
@@ -20,7 +20,7 @@ Search::Elasticsearch::Serializer::JSON::Cpanel - A JSON Serializer using Cpanel
 
 =head1 VERSION
 
-version 5.02
+version 6.00
 
 =head1 SYNOPSIS
 

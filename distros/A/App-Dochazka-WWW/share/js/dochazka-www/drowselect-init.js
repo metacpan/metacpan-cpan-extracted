@@ -49,8 +49,8 @@ define ([
         target.push('privHistoryDrowselect', {
             'name': 'privHistoryDrowselect',
             'type': 'drowselect',
-            'menuText': 'Privilege (status) history - edit',
-            'title': 'Privilege (status) history - edit',
+            'menuText': 'privHistoryDrowselect',
+            'title': 'Status history - edit',
             'preamble': null,
             'aclProfile': 'admin',
             'entriesRead': [entries.ePnick, entries.pHeffective, entries.pHpriv],
@@ -62,13 +62,13 @@ define ([
         target.push('schedHistoryDrowselect', {
             'name': 'schedHistoryDrowselect',
             'type': 'drowselect',
-            'menuText': 'Schedule history - edit',
-            'title': 'Schedule history - edit',
+            'menuText': 'schedHistoryDrowselect',
+            'title': 'Schedule history',
             'preamble': null,
-            'aclProfile': 'admin',
+            'aclProfile': 'inactive',
             'entriesRead': [entries.pHeffective, entries.sDid, entries.sDcode],
             'miniMenu': {
-                entries: ['schedHistoryAddRecordAction', 'schedHistoryDeleteAction'],
+                entries: ['actionSchedLookup', 'schedHistoryAddRecordAction', 'schedHistoryDeleteAction'],
             }
         });
 
@@ -85,6 +85,37 @@ define ([
                 entries: [],
             }
         });
+
+        target.push('viewIntervalsDrowselect', {
+            'name': 'viewIntervalsDrowselect',
+            'type': 'drowselect',
+            'menuText': 'View',
+            'title': 'Intervals in date',
+            'preamble': null,
+            'aclProfile': 'passerby',
+            'entriesRead': [
+                entries.iNdate, entries.iNtimerange, entries.iNiid, entries.acTcode,
+                entries.iNshortDesc,
+            ],
+            'miniMenu': {
+                entries: ['createSingleIntFixedDay', 'updateSingleInt', 'deleteSingleInt'],
+            }
+        }); // viewIntervalsDrowselect
+
+        target.push('viewLocksDrowselect', {
+            'name': 'viewLocksDrowselect',
+            'type': 'drowselect',
+            'menuText': 'View',
+            'title': 'Lock list',
+            'preamble': null,
+            'aclProfile': 'passerby',
+            'entriesRead': [
+                entries.lOintvl, entries.lOlid,
+            ],
+            'miniMenu': {
+                entries: ['deleteLock'],
+            }
+        }); // viewLocksDrowselect
 
     };
 });

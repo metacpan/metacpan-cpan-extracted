@@ -1,25 +1,30 @@
 ---
 abstract: 'Merges arbitrarily deep hashes into a single hash'
 author:
-  - 'Michael K. Neylon <mneylon-pm@masemware.com'
+  - 'Michael K. Neylon <mneylon-pm@masemware.com>'
+  - 'Daniel Muey <dmuey@cpan.org>'
+  - 'Jens Rehsack <rehsack@cpan.org>'
+  - 'Stefan Hermes <hermes@cpan.org>'
 build_requires:
-  Test::More: 0.9
+  Test::More: '0.9'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.8, CPAN::Meta::Converter version 2.132830'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Hash-Merge
 no_index:
   directory:
     - t
     - inc
 requires:
-  Clone: 0
+  Clone::Choose: '0.008'
+  Scalar::Util: '0'
   perl: v5.8.1
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.200
+version: '0.299'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

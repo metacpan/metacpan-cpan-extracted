@@ -14,7 +14,7 @@ L<MVC::Neaf::Request> object.
 
 =cut
 
-our $VERSION = 0.17;
+our $VERSION = 0.18;
 use Carp;
 
 =head2 new(%options)
@@ -37,6 +37,8 @@ use Carp;
 
 sub new {
     my ($class, %args) = @_;
+
+    # TODO 0.19 add "unicode" flag to open & slurp in utf8 mode
 
     defined $args{id}
         or croak( "$class->new(): id option is required" );
@@ -155,7 +157,7 @@ sub rewind {
 };
 
 sub DESTROY {
-    # TODO kill the file
+    # TODO 0.30 kill the file
 };
 
 1;

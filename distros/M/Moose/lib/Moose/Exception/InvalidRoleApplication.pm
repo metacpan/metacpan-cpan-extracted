@@ -1,5 +1,5 @@
 package Moose::Exception::InvalidRoleApplication;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -15,4 +15,5 @@ sub _build_message {
     "Role applications must be instances of Moose::Meta::Role::Application::ToClass";
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

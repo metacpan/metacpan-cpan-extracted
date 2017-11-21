@@ -1,3 +1,13 @@
+finance-yahooquote (0.26) unstable; urgency=medium
+
+  * README.md: Noted that API no longer supported by Yahoo!
+  * YahooQuote.om: Idem
+  * yahooquote: Idem
+  
+  * t-deactivated/*: Deactivated tests
+
+ -- Dirk Eddelbuettel <edd@debian.org>  Sat, 11 Nov 2017 09:16:38 -0600
+
 finance-yahooquote (0.25) unstable; urgency=low
 
   * YahooQuote.pm: Applied patch by Nicola Chiapolini restoring

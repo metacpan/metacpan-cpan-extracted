@@ -28,6 +28,10 @@ package TestCase {
   our $PACKAGE_VAR_LONG : long;
   our $PACKAGE_VAR_MINIMAL : TestCase::Minimal;
 
+  our $PACKAGE_VAR_INT2 : int;
+  our $PACKAGE_VAR_LONG2 : long;
+  our $PACKAGE_VAR_MINIMAL2 : TestCase::Minimal;
+
   has x_byte : byte;
   has x_short : short;
   has x_int : int;
@@ -66,6 +70,26 @@ package TestCase {
           
           if ($TestCase::PACKAGE_VAR_MINIMAL->get_x == 4) {
             $TestCase::PACKAGE_VAR_MINIMAL = undef;
+            return 1;
+          }
+        }
+      }
+    }
+    return 0;
+  }
+
+  sub package_var_rel_name() : int {
+    if ($PACKAGE_VAR_INT2 == 0) {
+      $PACKAGE_VAR_INT2 = Integer::MAX_VALUE();
+      if ($PACKAGE_VAR_INT2 == Integer::MAX_VALUE()) {
+        $PACKAGE_VAR_LONG2 = Long::MAX_VALUE();
+        if ($PACKAGE_VAR_LONG2 == Long::MAX_VALUE()) {
+          $PACKAGE_VAR_MINIMAL2 = TestCase::Minimal::new();
+          
+          $PACKAGE_VAR_MINIMAL2->set_x(4);
+          
+          if ($PACKAGE_VAR_MINIMAL2->get_x == 4) {
+            $PACKAGE_VAR_MINIMAL2 = undef;
             return 1;
           }
         }
@@ -604,6 +628,11 @@ package TestCase {
     return 0;
   }
 
+  sub call_sub_assign() : int {
+    my $m = TestCase::Minimal::new();
+    $m = TestCase::Minimal::new();
+  }
+  
   sub call_sub_undef($value : TestCase) : int {
     
     if ($value == undef) {
@@ -815,13 +844,14 @@ package TestCase {
   }
 
   sub spvm_new_object_array_len_element_byte_array($nums : byte[][]) : int {
+    
     if ($nums->[0][0] == (byte)1) {
       if ($nums->[0][1] == (byte)2) {
         if ($nums->[0][2] == (byte)3) {
           if ($nums->[1][0] == (byte)4) {
             if ($nums->[1][1] == (byte)5) {
               if ($nums->[1][2] == (byte)6) {
-                return ;
+                return 1;
               }
             }
           }
@@ -839,7 +869,7 @@ package TestCase {
           if ($nums->[1][0] == (short)4) {
             if ($nums->[1][1] == (short)5) {
               if ($nums->[1][2] == (short)6) {
-                return ;
+                return 1;
               }
             }
           }
@@ -857,7 +887,7 @@ package TestCase {
           if ($nums->[1][0] == 4) {
             if ($nums->[1][1] == 5) {
               if ($nums->[1][2] == 6) {
-                return ;
+                return 1;
               }
             }
           }
@@ -875,7 +905,7 @@ package TestCase {
           if ($nums->[1][0] == (long)4) {
             if ($nums->[1][1] == (long)5) {
               if ($nums->[1][2] == (long)6) {
-                return ;
+                return 1;
               }
             }
           }
@@ -893,7 +923,7 @@ package TestCase {
           if ($nums->[1][0] == (float)4) {
             if ($nums->[1][1] == (float)5) {
               if ($nums->[1][2] == (float)6) {
-                return ;
+                return 1;
               }
             }
           }
@@ -911,7 +941,7 @@ package TestCase {
           if ($nums->[1][0] == (double)4) {
             if ($nums->[1][1] == (double)5) {
               if ($nums->[1][2] == (double)6) {
-                return ;
+                return 1;
               }
             }
           }
@@ -1211,6 +1241,57 @@ package TestCase {
     if ($success1) {
       if ($success2) {
         if ($success3) {
+          return 1;
+        }
+      }
+    }
+    
+    return 0;
+  }
+
+  sub my_var_scope() : int {
+    my $ok1 = 0;
+    my $ok2 = 0;
+    my $ok3 = 0;
+    
+    my $var1 = 1;
+    my $var2 = 2;
+    
+    if ($var1 == 1) {
+      if ($var2 == 2) {
+        $ok1 = 1;
+      }
+    }
+    
+    {
+      my $var1 = 3;
+      my $var2 = 4;
+      my $var3 = 5;
+      
+      if ($var1 == 3) {
+        if ($var2 == 4) {
+          if ($var3 == 5) {
+            $ok2 = 1;
+          }
+        }
+      }
+    }
+    
+    my $var3 = 6;
+    
+    CORE::say("AAAAAAAAAAAAAAAAAA" . $var1);
+    
+    if ($var1 == 1) {
+      if ($var2 == 2) {
+        if ($var3 == 6) {
+          $ok3 = 1;
+        }
+      }
+    }
+    
+    if ($ok1) {
+      if ($ok2) {
+        if ($ok3) {
           return 1;
         }
       }
@@ -1700,9 +1781,9 @@ package TestCase {
     return 0;
   }
   sub convert_double_to_float() : int {
-    my $value = (float)346638529e+38;
+    my $value = (float)0.5;
     
-    if ($value == (float)346638529e+38f) {
+    if ($value == 0.5f) {
       return 1;
     }
     
@@ -2276,6 +2357,64 @@ package TestCase {
       if ($nums->[1] == (double)2) {
         if ($nums->[2] == (double)3) {
           if (@$nums == 3) {
+            return 1;
+          }
+        }
+      }
+    }
+    
+    return 0;
+  }
+  
+  # Negate
+  sub negate() : int {
+    my $num_byte = 1y;
+    my $num_short = 1s;
+    my $num_int = 1;
+    my $num_long = 1L;
+    my $num_float = 1f;
+    my $num_double = 1d;
+    
+    my $num_byte_negate = -$num_byte;
+    my $num_short_negate = -$num_short;
+    my $num_int_negate = -$num_int;
+    my $num_long_negate = -$num_long;
+    my $num_float_negate = -$num_float;
+    my $num_double_negate = -$num_double;
+    
+    if ($num_byte_negate == -1y) {
+      if ($num_short_negate == -1s) {
+        if ($num_int_negate == -1) {
+          if ($num_long_negate == -1L) {
+            if ($num_float_negate == -1f) {
+              if ($num_double_negate == -1d) {
+                return 1;
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    return 0;
+  }
+
+  # Complement
+  sub complement() : int {
+    my $num_byte = 0xF0y;
+    my $num_short = 0xFFF0s;
+    my $num_int = 0xFFFFFFF0;
+    my $num_long = 0xFFFFFFFFFFFFFFF0L;
+    
+    my $num_byte_complement = ~$num_byte;
+    my $num_short_complement = ~$num_short;
+    my $num_int_complement = ~$num_int;
+    my $num_long_complement = ~$num_long;
+    
+    if ($num_byte_complement == 0xFy) {
+      if ($num_short_complement == 0xFs) {
+        if ($num_int_complement == 0xF) {
+          if ($num_long_complement == 0xFL) {
             return 1;
           }
         }
@@ -3047,8 +3186,22 @@ package TestCase {
       return 0;
     }
   }
+  
+  # eq 
+  sub if_eq_undef () : int {
+    my $test_case : TestCase = undef;
+    
+    if (undef == undef) {
+      if ($test_case == undef) {
+        if (undef == $test_case) {
+          return 1;
+        }
+      }
+    }
+    
+    return 0;
+  }
 
-  # If a == b
   sub if_eq_byte_same () : int {
     
     if ((byte)3 == (byte)3) {
@@ -3194,6 +3347,22 @@ package TestCase {
   }
 
   # If a != b
+  sub if_ne_undef () : int {
+    my $test_case : TestCase = new TestCase;
+    
+    if (undef != undef) {
+    
+    }
+    else {
+      if ($test_case != undef) {
+        if (undef != $test_case) {
+          return 1;
+        }
+      }
+    }
+    
+    return 0;
+  }
   sub if_ne_byte_same () : int {
     
     if ((byte)3 != (byte)3) {

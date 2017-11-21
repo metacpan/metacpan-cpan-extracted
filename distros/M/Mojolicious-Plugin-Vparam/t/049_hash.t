@@ -6,7 +6,7 @@ use utf8;
 use open qw(:std :utf8);
 use lib qw(lib ../lib ../../lib);
 
-use Test::More tests => 22;
+use Test::More tests => 39;
 use Encode qw(decode encode);
 
 
@@ -39,26 +39,37 @@ note 'hash';
             $self->vparam( hash1 => 'int', hash => '::' ),
             {a => 1, b => 2, c => 3},
             'hash1 = {a => 1, b => 2, c => 3}';
+        ok ! $self->verror('hash1'), 'hash1 no error';
 
         is_deeply
             $self->vparam( hash2 => 'int', hash => 1 ),
             {a => 1, b => 2, c => 3},
             'hash2 = {a => 1, b => 2, c => 3}';
+        ok ! $self->verror('hash2'), 'hash2 no error';
 
         is_deeply
             $self->vparam( hash3 => 'int', hash => 1 ),
             {a => 1},
             'hash3 = {a => 1}';
+        ok ! $self->verror('hash3'), 'hash3 no error';
 
         is_deeply
             $self->vparam( hash4 => 'str' ),
             'a=>1',
             'hash4 not hash';
+        ok ! $self->verror('hash4'), 'hash4 no error';
 
         is_deeply
             $self->vparam( hash5 => 'int', hash => '_' ),
             {a => 1, b => 2, c => 3},
             'hash5 = {a => 1, b => 2, c => 3}';
+        ok ! $self->verror('hash5'), 'hash5 no error';
+
+        is_deeply
+            $self->vparam( hash6 => 'int', hash => 1, optional => 1 ),
+            {a => 1, b => undef, c => undef},
+            'hash6 = {a => 1, b => undef, c => undef}';
+        ok ! $self->verror('hash6'), 'hash6 no error';
 
         $self->render(text => 'OK.');
     });
@@ -70,6 +81,7 @@ note 'hash';
         hash3      => 'a=>1',
         hash4      => 'a=>1',
         hash5      => ['a_1', 'b_2', 'c_3'],
+        hash6      => ['a=>1', 'b=>', 'c=>'],
 
     })-> status_is( 200 );
 
@@ -85,11 +97,13 @@ note 'preudo type %...';
             $self->vparam( hash1 => '%int' ),
             {a => 1, b => 2, c => 3},
             'hash1 = {a => 1, b => 2, c => 3}';
+        ok ! $self->verror('hash1'), 'hash1 no error';
 
         is_deeply
             $self->vparam( hash2 => '%int' ),
             {a => 1},
             'hash2 = {a => 1}';
+        ok ! $self->verror('hash2'), 'hash2 no error';
 
         $self->render(text => 'OK.');
     });
@@ -110,20 +124,36 @@ note 'broken hash';
 
         is_deeply $self->vparam( 'hash1' => 'int', hash => 1 ), {},
             'hash1';
+        ok $self->verror('hash1'), 'hash1 error';
+
         is_deeply $self->vparam( 'hash2' => 'int', hash => 1 ), {},
             'hash2';
+        ok $self->verror('hash2'), 'hash2 error';
+
         is_deeply $self->vparam( 'hash3' => 'int', hash => 1 ),
             {a => 1, b => 2, c => undef, d => 4},
             'hash3';
+        ok $self->verror('hash3'), 'hash3 error';
+
         is_deeply $self->vparam( 'hash4' => 'int', hash => 1 ),
             {a => 1, b => 2, d => 4},
             'hash4';
+        ok $self->verror('hash4'), 'hash4 error';
+
         is_deeply $self->vparam( 'hash5' => 'int', hash => 1, skipundef => 1 ),
             {a => 1, b => 2, d => 4},
             'hash5';
+        ok $self->verror('hash5'), 'hash5 error';
+
+        is_deeply
+            $self->vparam( hash6 => 'int', hash => 1 ),
+            {a => 1, b => undef, c => undef},
+            'hash6 = {a => 1, b => undef, c => undef}';
+        ok $self->verror('hash6'), 'hash6 error';
 
         is_deeply $self->vparam( 'unknown' => 'int', hash => 1 ), {},
             'unknown';
+        ok $self->verror('unknown'), 'unknown no error';
 
         $self->render(text => 'OK.');
     });
@@ -135,6 +165,7 @@ note 'broken hash';
         hash3      => ['a=>1', 'b=>2', 'c=>aaa', 'd=>4'],
         hash4      => ['a=>1', 'b=>2', 'bbb', 'd=>4'],
         hash5      => ['a=>1', 'b=>2', 'c=>ddd', 'd=>4'],
+        hash6      => ['a=>1', 'b=>', 'c=>'],
 
     })-> status_is( 200 );
 

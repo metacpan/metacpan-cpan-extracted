@@ -13,7 +13,7 @@ my @module_files = (
 );
 
 my @scripts = (
-    'bin/btcindo'
+    'script/btcindo'
 );
 
 # no fake home requested

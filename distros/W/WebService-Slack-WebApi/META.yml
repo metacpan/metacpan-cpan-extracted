@@ -28,7 +28,7 @@ no_index:
 provides:
   WebService::Slack::WebApi:
     file: lib/WebService/Slack/WebApi.pm
-    version: '0.11'
+    version: '0.12'
   WebService::Slack::WebApi::Api:
     file: lib/WebService/Slack/WebApi/Api.pm
   WebService::Slack::WebApi::Auth:
@@ -41,6 +41,8 @@ provides:
     file: lib/WebService/Slack/WebApi/Chat.pm
   WebService::Slack::WebApi::Client:
     file: lib/WebService/Slack/WebApi/Client.pm
+  WebService::Slack::WebApi::Dialog:
+    file: lib/WebService/Slack/WebApi/Dialog.pm
   WebService::Slack::WebApi::Emoji:
     file: lib/WebService/Slack/WebApi/Emoji.pm
   WebService::Slack::WebApi::Exception:
@@ -86,11 +88,12 @@ resources:
   bugtracker: https://github.com/mihyaeru21/p5-WebService-Slack-WebApi/issues
   homepage: https://github.com/mihyaeru21/p5-WebService-Slack-WebApi
   repository: git://github.com/mihyaeru21/p5-WebService-Slack-WebApi.git
-version: '0.11'
+version: '0.12'
 x_contributors:
   - 'Askar Timirgazin <anotheroneackap@gmail.com>'
   - 'Ivan Wills <Ivan.Wills2@optus.com.au>'
   - 'Sterling Hanenkamp <sterling@hanenkamp.com>'
+  - 'Sterling Hanenkamp <sterling@ziprecruiter.com>'
   - 'Steven Arnott <steven.arnott@grantstreet.com>'
   - 'Yanick Champoux <yanick@babyl.dyndns.org>'
   - 'likkradyus <git@li.que.jp>'

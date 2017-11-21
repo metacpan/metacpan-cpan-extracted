@@ -2,6 +2,8 @@
 
 use inc::Module::Install;
 
+use Config;
+
 name('Crypt-OpenSSL-PKCS12');
 license('perl');
 perl_version('5.005');
@@ -17,11 +19,15 @@ test_requires 'Test::More' => '0.47';
 
 requires_external_cc();
 
-cc_inc_paths('/usr/include/openssl', '/usr/local/include/ssl', '/usr/local/ssl/include');
-cc_lib_paths('/usr/lib', '/usr/local/lib', '/usr/local/ssl/lib');
+inc '-I/usr/local/opt/openssl/include -I/usr/include/openssl -I/usr/local/include/ssl -I/usr/local/ssl/include';
+libs '-L/usr/local/opt/openssl/lib -L/usr/lib -L/usr/local/lib -L/usr/local/ssl/lib -lcrypto -lssl';
 
-cc_lib_links('crypto');
-cc_optimize_flags('-O2 -g -Wall -Werror');
+if ($^O ne 'darwin') {
+    cc_optimize_flags('-O2 -g -Wall -Werror');
+}
+else {
+    cc_optimize_flags('-O2 -g -Wall -Werror -Wno-deprecated-declarations');
+}
 
 auto_install();
 WriteAll();

@@ -2,7 +2,7 @@
 
 Mozilla/5.0 (Android; Linux armv7l; rv:10.0.1) Gecko/20100101 Firefox/10.0.1 Fennec/10.0.1
 
-extras           => [ 'Linux armv7l' ],
+device           => 'Linux armv7l',
 mobile           => 1,
 mozilla          => [ '10.0.1', '10.000001' ],
 name             => 'Firefox',
@@ -18,7 +18,7 @@ version_raw      => '10.0.1',
 
 Mozilla/5.0 (Maemo; Linux armv7l; rv:10.0.1) Gecko/20100101 Firefox/10.0.1 Fennec/10.0.1
 
-extras           => [ 'Linux armv7l' ],
+device           => 'Linux armv7l',
 mobile           => 1,
 mozilla          => [ '10.0.1', '10.000001' ],
 name             => 'Firefox',
@@ -34,13 +34,14 @@ version_raw      => '10.0.1',
 
 Mozilla/5.0 (X11; Linux armv7l; rv:10.0.1) Gecko/20100101 Firefox/10.0.1 Fennec/10.0.1
 
-extras           => [ 'Linux armv7l' ],
+device           => 'Linux armv7l',
+extras           => ['X11'],
 mobile           => 1,
 mozilla          => [ '10.0.1', '10.000001' ],
 name             => 'Firefox',
 original_name    => 'Fennec',
 original_version => '10.0.1',
-os               => 'X11',
+os               => 'Linux',
 parser           => 'firefox',
 toolkit          => [ 'Gecko', '20100101', '20100101.000' ],
 version          => '10.000001',
@@ -50,13 +51,13 @@ version_raw      => '10.0.1',
 
 Mozilla/5.0 (X11; Linux i686; rv:10.0.1) Gecko/20100101 Firefox/10.0.1 Fennec/10.0.1
 
-extras           => [ 'Linux i686' ],
+extras           => [ 'X11' ],
 mobile           => 1,
 mozilla          => [ '10.0.1', '10.000001' ],
 name             => 'Firefox',
 original_name    => 'Fennec',
 original_version => '10.0.1',
-os               => 'X11',
+os               => 'Linux i686',
 parser           => 'firefox',
 toolkit          => [ 'Gecko', '20100101', '20100101.000' ],
 version          => '10.000001',
@@ -66,6 +67,7 @@ version_raw      => '10.0.1',
 
 Mozilla/5.0 (Android; Tablet; rv:10.0.4) Gecko/10.0.4 Firefox/10.0.4 Fennec/10.0.4
 
+device           => 'Tablet',
 mobile           => 1,
 mozilla          => [ '10.0.4', '10.000004' ],
 name             => 'Firefox',

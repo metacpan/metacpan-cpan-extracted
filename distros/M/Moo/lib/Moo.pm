@@ -11,6 +11,7 @@ use Moo::_Utils qw(
   _set_loaded
   _unimport_coderefs
 );
+use Scalar::Util qw(reftype);
 use Carp qw(croak);
 BEGIN {
   our @CARP_NOT = qw(
@@ -22,8 +23,8 @@ BEGIN {
   );
 }
 
-our $VERSION = '2.003002';
-$VERSION = eval $VERSION;
+our $VERSION = '2.003003';
+$VERSION =~ tr/_//d;
 
 require Moo::sification;
 Moo::sification->import;
@@ -86,7 +87,9 @@ sub import {
   }
   return if $MAKERS{$target}{is_class}; # already exported into this package
   my $stash = _getstash($target);
-  my @not_methods = map { *$_{CODE}||() } grep !ref($_), values %$stash;
+  my @not_methods = map +(
+    !ref($_) ? *$_{CODE}||() : reftype($_) eq 'CODE' ? $_ : ()
+  ), values %$stash;
   @{$MAKERS{$target}{not_methods}={}}{@not_methods} = @not_methods;
   $MAKERS{$target}{is_class} = 1;
   {
@@ -192,7 +195,8 @@ sub _constructor_maker_for {
     my $con;
     my @isa = @{mro::get_linear_isa($target)};
     shift @isa;
-    if (my ($parent_new) = grep { *{_getglob($_.'::new')}{CODE} } @isa) {
+    no strict 'refs';
+    if (my ($parent_new) = grep +(defined &{$_.'::new'}), @isa) {
       if ($parent_new eq 'Moo::Object') {
         # no special constructor needed
       }
@@ -228,19 +232,20 @@ sub _constructor_maker_for {
 }
 
 sub _concrete_methods_of {
-  my ($me, $role) = @_;
-  my $makers = $MAKERS{$role};
-  # grab role symbol table
-  my $stash = _getstash($role);
+  my ($me, $class) = @_;
+  my $makers = $MAKERS{$class};
+  # grab class symbol table
+  my $stash = _getstash($class);
   # reverse so our keys become the values (captured coderefs) in case
   # they got copied or re-used since
   my $not_methods = { reverse %{$makers->{not_methods}||{}} };
   +{
     # grab all code entries that aren't in the not_methods list
-    map {
-      my $code = *{$stash->{$_}}{CODE};
+    map {;
+      no strict 'refs';
+      my $code = exists &{"${class}::$_"} ? \&{"${class}::$_"} : undef;
       ( ! $code or exists $not_methods->{$code} ) ? () : ($_ => $code)
-    } grep !ref($stash->{$_}), keys %$stash
+    } grep +(!ref($stash->{$_}) || reftype($stash->{$_}) eq 'CODE'), keys %$stash
   };
 }
 

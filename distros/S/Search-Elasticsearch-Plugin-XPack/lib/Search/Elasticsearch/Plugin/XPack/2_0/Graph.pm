@@ -23,7 +23,7 @@ Search::Elasticsearch::Plugin::XPack::2_0::Graph - Plugin providing Graph API fo
 
 =head1 VERSION
 
-version 5.02
+version 6.00
 
 =head1 SYNOPSIS
 

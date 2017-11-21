@@ -12,18 +12,18 @@ SPVM_OBJECT* SPVM_RUNTIME_API_concat_string_float(SPVM_API* api, SPVM_OBJECT* st
 SPVM_OBJECT* SPVM_RUNTIME_API_concat_string_double(SPVM_API* api, SPVM_OBJECT* string1, double string2);
 SPVM_OBJECT* SPVM_RUNTIME_API_concat_string_string(SPVM_API* api, SPVM_OBJECT* string1, SPVM_OBJECT* string2);
 
-int32_t SPVM_RUNTIME_API_get_sub_object_my_vars_length(SPVM_API* api, int32_t sub_id);
+int32_t SPVM_RUNTIME_API_get_sub_object_mys_length(SPVM_API* api, int32_t sub_id);
 int32_t SPVM_RUNTIME_API_get_sub_object_args_base(SPVM_API* api, int32_t sub_id);
 int32_t SPVM_RUNTIME_API_get_sub_is_native(SPVM_API* api, int32_t sub_id);
 int32_t SPVM_RUNTIME_API_get_sub_return_type_id(SPVM_API* api, int32_t sub_id);
 void* SPVM_RUNTIME_API_get_sub_native_address(SPVM_API* api, int32_t sub_id);
 int32_t SPVM_RUNTIME_API_get_sub_bytecode_base(SPVM_API* api, int32_t sub_id);
 int32_t SPVM_RUNTIME_API_get_sub_is_void(SPVM_API* api, int32_t sub_id);
-int32_t SPVM_RUNTIME_API_get_sub_object_my_vars_base(SPVM_API* api, int32_t sub_id);
+int32_t SPVM_RUNTIME_API_get_sub_object_mys_base(SPVM_API* api, int32_t sub_id);
 
 int32_t SPVM_RUNTIME_API_get_sub_object_args_length(SPVM_API* api, int32_t sub_id);
 int32_t SPVM_RUNTIME_API_get_sub_operand_stack_max(SPVM_API* api, int32_t sub_id);
-int32_t SPVM_RUNTIME_API_get_sub_my_vars_length(SPVM_API* api, int32_t sub_id);
+int32_t SPVM_RUNTIME_API_get_sub_mys_length(SPVM_API* api, int32_t sub_id);
 int32_t SPVM_RUNTIME_API_get_sub_args_length(SPVM_API* api, int32_t sub_id);
 int32_t SPVM_RUNTIME_API_get_sub_name_id(SPVM_API* api, int32_t sub_id);
 int32_t SPVM_RUNTIME_API_get_sub_file_name_id(SPVM_API* api, int32_t sub_id);
@@ -70,6 +70,7 @@ int64_t SPVM_RUNTIME_API_get_long_field(SPVM_API* api, SPVM_OBJECT* object, int3
 float SPVM_RUNTIME_API_get_float_field(SPVM_API* api, SPVM_OBJECT* object, int32_t field_id);
 double SPVM_RUNTIME_API_get_double_field(SPVM_API* api, SPVM_OBJECT* object, int32_t field_id);
 SPVM_OBJECT* SPVM_RUNTIME_API_get_object_field(SPVM_API* api, SPVM_OBJECT* object, int32_t field_id);
+void SPVM_RUNTIME_API_weaken_object_field(SPVM_API* api, SPVM_OBJECT* object, int32_t field_id);
 void SPVM_RUNTIME_API_set_byte_field(SPVM_API* api, SPVM_OBJECT* object, int32_t field_id, int8_t value);
 void SPVM_RUNTIME_API_set_short_field(SPVM_API* api, SPVM_OBJECT* object, int32_t field_id, int16_t value);
 void SPVM_RUNTIME_API_set_int_field(SPVM_API* api, SPVM_OBJECT* object, int32_t field_id, int32_t value);

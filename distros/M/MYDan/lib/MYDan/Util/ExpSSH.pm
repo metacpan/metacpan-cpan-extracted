@@ -4,12 +4,26 @@ use strict;
 use warnings;
 
 use Expect;
+use MYDan;
 use MYDan::Node;
 use MYDan::Util::OptConf;
 use MYDan::Util::Pass;
+use MYDan::Util::Hosts;
+use MYDan::Util::Alias;
+use MYDan::Util::Proxy;
+
+use Authen::OATH;
+use Convert::Base32 qw( decode_base32 ); 
 
 our $TIMEOUT = 20;
-our $SSH = 'ssh -o StrictHostKeyChecking=no -o NumberOfPasswordPrompts=1 -t';
+our $SSH;
+our $RSYNC;
+
+BEGIN{
+    my $alias = MYDan::Util::Alias->new();
+    $RSYNC = $alias->alias( 'rsync' ) || 'rsync';
+    $SSH =  $alias->alias( 'ssh' ) || 'ssh' . ' -o StrictHostKeyChecking=no -o NumberOfPasswordPrompts=1';
+};
 
 =head1 SYNOPSIS
 
@@ -19,7 +33,8 @@ our $SSH = 'ssh -o StrictHostKeyChecking=no -o NumberOfPasswordPrompts=1 -t';
 
  $ssh->conn( host => 'foo', user => 'joe', 
              pass => '/conf/file', 
-             sudo => 'user1' 
+             sudo => 'user1',
+             rsync => '-aP /tmp/foo user@host:/tmp/bar', #if rsync
            );
 
 =cut
@@ -32,17 +47,25 @@ sub new
 
 sub conn
 {
-    my ( $self, %conn ) = splice @_;
+    my ( $self, %conn, $grep ) = splice @_;
+
+    my $hosts = MYDan::Util::Hosts->new();
+    my @host = $conn{rsync} ? ( $conn{host} ) : $self->host( $hosts, $conn{host} );
+
+    GOTO:
+
+    @host = grep{ $_ =~ /$grep/ }@host if defined $grep;
+    return unless @host;
+
     my $i = 0;
-
-    return unless my @host = $self->host( $conn{host} );
-
-
     if ( @host > 1 )
     {
         my @host = map { sprintf "[ %d ] %s", $_ + 1, $host[$_] } 0 .. $#host; 
         print STDERR join "\n", @host, "please select: [ 1 ] ";
-        $i = $1 - 1 if <STDIN> =~ /(\d+)/ && $1 && $1 <= @host;
+
+        my $x = <STDIN>;
+        if( $x && $x =~ s/^\/// ) { $grep = $x; chomp $grep; goto GOTO; }
+        $i = $1 - 1 if $x =~ /(\d+)/ && $1 && $1 <= @host;
     }
 
     my ( undef, $pass ) = MYDan::Util::Pass->new( conf => $conn{pass} )
@@ -70,9 +93,42 @@ sub conn
         }
     }
 
-    $pass .= "\n" if defined $pass;
+    my %expect;
+    if ( $pass && ref $pass )
+    {
+        %expect = %$pass;
+	for( keys %expect ) 
+	{
+            next unless $expect{$_} =~ /googlecode\s*:\s*(\w+)/;  
+	    $expect{$_} = Authen::OATH->new->totp(  decode_base32( $1 ));
+	}
+    }
+    elsif( defined $pass )
+    {
+        $expect{assword} = $pass;
+    }
 
-    my $ssh = sprintf "$SSH %s $host[$i]", $conn{user} ? "-l $conn{user}" : '';
+    my $ssh;
+    my $node = $host[$i];
+    my %node = $hosts->match( $node );
+    
+    my $p = MYDan::Util::Proxy->new( "$MYDan::PATH/etc/util/conf/proxy" );
+    my %x = $p->search( $node{$node} );
+    
+    $ssh = $SSH. sprintf " %s %s", $conn{user} ? "-l $conn{user}" : '', 
+       $x{$node{$node}} ? " -o ProxyCommand='nc -X 5 -x $x{$node{$node}} %h %p'":'';
+    
+    if ($conn{rsync} )
+    {
+	$conn{rsync} =~ s/$node:/$node{$node}:/g;
+        $ssh = "$RSYNC -e \"$ssh\" $conn{rsync}"
+    }
+    else
+    {
+        $ssh = "$ssh -t $node{$node}";
+    }
+    warn "debug:$ssh\n" if $ENV{MYDan_DEBUG};
+
     my $prompt = '::sudo::';
     if ( my $sudo = $conn{sudo} ) { $ssh .= " sudo -p '$prompt' su - $sudo" }
 
@@ -92,17 +148,18 @@ sub conn
     $exp->expect
     ( 
         $TIMEOUT, 
-        [ qr/[Pp]assword: *$/ => sub { $exp->send( $pass ); exp_continue; } ],
+	[ qr/yes\/no/ => sub { $exp->send( "yes\n" ); exp_continue; } ],
         [ qr/[#\$%] $/ => sub { $exp->interact; } ],
         [ qr/$prompt$/ => sub { $exp->send( $pass ); $exp->interact; } ],
+	map{ my $v = $expect{$_};[ qr/$_/ => sub { $exp->send( "$v\n" ); exp_continue; } ] }keys %expect        
     );
 }
 
 sub host
 {
-    my ( $self, $host ) = splice @_;
+    my ( $self, $hosts, $host ) = splice @_;
 
-    return $host unless system "host $host > /dev/null";
+    return $host if $host =~ /^\d+\.\d+\.\d+\.\d+$/;
 
     my $range = MYDan::Node->new( MYDan::Util::OptConf->load()->dump( 'range') );
     my $db = $range->db;
@@ -110,6 +167,7 @@ sub host
     my %node = map{ $_ => 1 }grep{ /$host/ && /^[\w.-]+$/ }
                    map{ @$_ }$db->select( 'node' );
 
+    map{ $node{$_} = 1 }grep{ /$host/ && /^[\w.-]+$/ }$hosts->hosts();
     return %node ? sort keys %node : $host;
 }
 

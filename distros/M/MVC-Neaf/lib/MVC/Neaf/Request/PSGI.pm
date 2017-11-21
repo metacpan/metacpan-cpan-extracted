@@ -2,7 +2,7 @@ package MVC::Neaf::Request::PSGI;
 
 use strict;
 use warnings;
-our $VERSION = 0.17;
+our $VERSION = 0.18;
 
 =head1 NAME
 
@@ -171,7 +171,7 @@ sub do_get_upload {
     my ($self, $id) = @_;
 
     $self->{driver_upload} ||= $self->{driver}->uploads;
-    my $up = $self->{driver_upload}{$id}; # TODO don't garble multivalues
+    my $up = $self->{driver_upload}{$id}; # TODO 0.90 don't garble multivalues
 
     return $up ? { tempfile => $up->path, filename => $up->filename } : ();
 };
@@ -210,7 +210,7 @@ sub do_reply {
 
     my @header_array;
     $self->header_out->scan( sub {
-            push @header_array, $_[0], $_[1];
+            push @header_array, encode_utf8($_[0]), encode_utf8($_[1]);
     });
 
     # HACK - we're being returned by handler in MVC::Neaf itself in case of
@@ -221,10 +221,12 @@ sub do_reply {
         # we must use PSGI functional interface to ensure
         # reply is sent to client BEFORE
         # postponed calls get executed.
+
         return sub {
             my $responder = shift;
-            $self->{writer} = $responder->( [ $status, \@header_array ] );
 
+            # TODO 0.90 should handle responder's failure somehow
+            $self->{writer} = $responder->( [ $status, \@header_array ] );
             $self->{writer}->write( $content ) if defined $content;
 
             # Now we may need to output more stuff
@@ -249,6 +251,11 @@ sub do_write {
     my ($self, $data) = @_;
 
     return unless defined $data;
+
+    # NOTE "can't call method write on undefined value" here
+    # probably means that PSGI responder failed unexpectedly in do_reply()
+    # and we didn't handle it properly and got empty {writer}
+    # and the request is being destroyed.
     $self->{writer}->write( $data );
     return 1;
 };

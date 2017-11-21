@@ -630,7 +630,6 @@ t/dep_no_inherit_vars.t
 t/env.t
 t/file_path.t
 t/gh36.t
-t/lib/PkgConfig/.Path.pm.swp
 t/lib/PkgConfig/Capture.pm
 t/lib/PkgConfig/Path.pm
 t/pcfiledir.t

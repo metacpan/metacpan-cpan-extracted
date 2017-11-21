@@ -24,7 +24,7 @@ Commandline options and arguments understood for TestOnTap processing
     [ --order <strategy> ]
     [ --timer ]
     [ --no-harness ]
-    [ --execmap <mapfile> ]
+    [ --configuration <cfgfile> || --cfg <cfgfile> ]
     [ --archive ]
     [ --savedirectory <path> ]
     [ --define | -D <key>=<value> [ --define ... ] ]
@@ -216,31 +216,39 @@ This can be convenient to directly see the TAP (or other) output which can be ha
 for debugging the tests themselves. Also, since stdin should work normally, using an
 execmap that starts the test in debug mode enables them to run under a real debugger.
 
- Example execmap file 'debug.execmap':
+ # Example config file 'debug.cfg':
  
- [EXECMAP]
- match1 = eq(some/test.pl)
- cmd1 = perl -d
+ # (copies of the real config settings)
+ 
+ execmap = debug normal
+ 
+ [EXECMAP normal]
+ match = regexp(\.pl$)
+ cmd = perl
+
+ [EXECMAP debug]
+ match = eq(some/test.pl)
+ cmd = perl -d
 
 and run with:
 
- testontap --no-harness --execmap debug.execmap some/path/to/suite
+ testontap --no-harness --configuration debug.execmap some/path/to/suite
  
-would start the some/test.pl file under the Perl debugger.
+would start the some/test.pl file under the Perl debugger but run the rest normally.
 
 Note that this renders several options and mechanisms useless:
 for example C<--verbose>, C<--jobs>, C<--timer>. Also, the work directory
 will miss most of the data normally seen, such as TAP output, aggregated
 test results etc. 
 
-=item B<--execmap E<lt>mapfileE<gt>>
+=item B<--configuration E<lt>cfgfileE<gt>> (or B<--cfg ...>)
 
-By default, the test suite will be searched for 'executables' based on the exec map defined in the suite, but this option
-allows overriding the choices of the suite exec map.
+By default, the test suite is required to have a configuration file (even if it's empty).
+With this option, another configuration file can be used instead. 
 
-If this option is not used, and there is no defined execmap in the configuration, an internal default will be used.  
+If this option is not used, and the configuration in the suite, some internal defaults will be used.  
 
-For more on execmaps, see the L<manual regarding the 'execmap section' config setting|App::TestOnTap/"THE SUITE CONFIG">.
+For more on configuration, see the L<manual regarding the config setting|App::TestOnTap/"THE SUITE CONFIG">.
 
 =item B<--archive>, B<--savedirectory E<lt>pathE<gt>> 
 

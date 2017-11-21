@@ -19,7 +19,7 @@ my %module_build_args = (
     "Jonas B. Nielsen <jonasbn\@cpan.org>"
   ],
   "dist_name" => "Test-Timer",
-  "dist_version" => "2.04",
+  "dist_version" => "2.08",
   "license" => "artistic_2",
   "module_name" => "Test::Timer",
   "recursive_test_files" => 1,
@@ -42,7 +42,7 @@ my %module_build_args = (
     "Test::More" => 0,
     "Test::Pod" => "1.41",
     "Test::Pod::Coverage" => "1.08",
-    "Test::Tester" => 0
+    "Test::Tester" => "1.302111"
   }
 );
 
@@ -58,7 +58,7 @@ my %fallback_build_requires = (
   "Test::More" => 0,
   "Test::Pod" => "1.41",
   "Test::Pod::Coverage" => "1.08",
-  "Test::Tester" => 0
+  "Test::Tester" => "1.302111"
 );
 
 

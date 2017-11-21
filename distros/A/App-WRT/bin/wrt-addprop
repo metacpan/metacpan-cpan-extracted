@@ -1,0 +1,38 @@
+#!/bin/sh
+
+entry="$1"
+property="$2"
+
+# Complain and exit if we weren't given a path and a property:
+if [ ! "$entry" ] || [ ! "$property" ]; then
+  echo "Usage: wrt addprop <path> <property>"
+  exit 64
+fi
+
+if [ ! -e "$entry" ]; then
+  echo "$entry not found"
+  exit 66
+fi
+
+# If the target is a plain file instead of a directory, make it into
+# a directory and move the content into $entry/index:
+if [ -f "$entry" ]; then
+
+  # Get a safe temporary file:
+  tempfile=`mktemp`
+
+  echo "move $entry to $entry/index"
+  mv "$entry" "$tempfile"
+  mkdir "$entry"
+  mv "$tempfile" "$entry/index"
+fi
+
+if [ -d "$entry" ]; then
+  echo "touch $entry/$property.prop"
+  touch "$entry/$property.prop"
+else
+  echo "something broke - why isn't $entry a directory?"
+  file "$entry"
+fi
+
+exit 0

@@ -202,6 +202,16 @@ $body$
     q/COMMENT ON TRIGGER no_employee_supervise_self ON employees
       IS 'Make it impossible for an employee to supervise her- or himself'/,
 
+    q#-- Given an EID, returns an integer indicating how many "reports"
+      -- the employee has (i.e. how many other employees there are, for whom
+      -- this EID is their supervisor). The integer return value can be used
+      -- as a boolean, too.
+      -- foobar
+      CREATE OR REPLACE FUNCTION has_reports(INTEGER)
+      RETURNS integer AS $$
+          SELECT count(*)::integer FROM employees WHERE supervisor = $1
+      $$ LANGUAGE sql IMMUTABLE#,
+
     # the 'schedintvls' table
 
     q/CREATE SEQUENCE scratch_sid_seq/,

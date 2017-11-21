@@ -1,5 +1,5 @@
 package Moose::Exception::TypeParameterMustBeMooseMetaType;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -9,4 +9,5 @@ sub _build_message {
     "The type parameter must be a Moose meta type";
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

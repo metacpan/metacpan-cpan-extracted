@@ -1,5 +1,5 @@
 package Business::PayPal::API::GetTransactionDetails;
-$Business::PayPal::API::GetTransactionDetails::VERSION = '0.76';
+$Business::PayPal::API::GetTransactionDetails::VERSION = '0.77';
 use 5.008001;
 use strict;
 use warnings;
@@ -189,7 +189,7 @@ Business::PayPal::API::GetTransactionDetails - PayPal GetTransactionDetails API
 
 =head1 VERSION
 
-version 0.76
+version 0.77
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,10 @@
 Revision history for PICA::Data
 
+0.34  2017-11-18 13:04:04 CET
+    - add dependencies to cpanfile
+    - use XML::Writer to generate XML files
+    - add support for 3-digit occurrences 
+
 0.33  2017-07-10 13:19:46 CEST
     - new writer PPXML
     - list denpencies in cpanfile

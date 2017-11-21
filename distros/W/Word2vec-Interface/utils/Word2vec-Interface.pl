@@ -4,7 +4,7 @@
 #                                                                                    #
 #    Author: Clint Cuffy                                                             #
 #    Date:    10/01/2016                                                             #
-#    Revised: 09/04/2017                                                             #
+#    Revised: 11/14/2017                                                             #
 #    UMLS Similarity Word2Vec Package Interface Driver                               #
 #                                                                                    #
 ######################################################################################
@@ -32,7 +32,7 @@ use Word2vec::Interface;
 
 use vars qw($VERSION);
 
-$VERSION = '0.036';
+$VERSION = '0.037';
 
 # Check For No Command-Line Arguments
 AskHelp() if @ARGV == 0;
@@ -111,6 +111,7 @@ if( $packageInterface->GetExitFlag() == 1 )
         ConvertTextToBin()                                  if( $arg eq "--converttobinaryvectors" );
         ConvertTextToSparse()                               if( $arg eq "--converttosparsevectors" );
         CompoundifyFile()                                   if( $arg eq "--compoundifyfile"        );
+        FindSimilarTerms()                                  if( $arg eq "--findsimilarterms"       );
         Similarity()                                        if( $arg eq "--similarity"             );
         Spearmans()                                         if( $arg eq "--spearmans"              );
         SortVectorFile()                                    if( $arg eq "--sortvectorfile"         );
@@ -181,6 +182,7 @@ sub FindNextCommandIndex
         return $i if $ARGV[$i] eq "--converttobinaryvectors";
         return $i if $ARGV[$i] eq "--converttosparsevectors";
         return $i if $ARGV[$i] eq "--compoundifyfile";
+        return $i if $ARGV[$i] eq "--findsimilarterms";
         return $i if $ARGV[$i] eq "--similarity";
         return $i if $ARGV[$i] eq "--spearmans";
         return $i if $ARGV[$i] eq "--sortvectorfile";
@@ -421,7 +423,7 @@ sub CompileTextCorpus
     if( !defined( $optionsHash{ "-workdir" } ) )
     {
         print "\nWarning: Improper Format\n";
-        print "Format: --compiletextcorpus -workdir _ -savedir _ -startdate _ -enddate _ -title _ -abstract _ -qparse _ -compwordfile _ -threads _ -overwrite _\n\n";
+        print "Format: --compiletextcorpus -workdir _ -savedir _ -startdate _ -enddate _ -title _ -abstract _ -qparse _ -compwordfile _ -sentenceperline _ -threads _ -overwrite _\n\n";
         print "Minimal Requirements: -workdir\n\n";
         print "Note: All options not specified will result in text corpus compilation using default options.\n";
         return;
@@ -545,6 +547,41 @@ sub SortVectorFile
     print "Finished - File Skipped\n" if $result == 1;
     print "Error Sorting And Saving File\n" if $result == -1;
     print "See \"Word2vecLog.txt\" log file for details\n" if $result == -1 && $packageInterface->GetWriteLog() == 1;
+}
+
+sub FindSimilarTerms
+{
+    my $vectorDataFilePath = $ARGV[ $argIndex + 1 ];
+    my $term               = $ARGV[ $argIndex + 2 ];
+    my $numberOfNeighbors  = $ARGV[ $argIndex + 3 ];
+
+    # Check(s)
+    if( !defined( $vectorDataFilePath ) || !defined( $term ) || !defined( $numberOfNeighbors ) || $vectorDataFilePath eq "" || $term eq "" || $numberOfNeighbors eq "" )
+    {
+        print "Warning: Improper format\n";
+        print "Format: --findnearestterms vector_binary_file_path term number_of_neighbors\n";
+        return;
+    }
+
+    my $result = $packageInterface->W2VReadTrainedVectorDataFromFile( "$vectorDataFilePath" );
+
+    # Check(s)
+    print "Error Reading Vector Binary File: \"$vectorDataFilePath\"\n" if $result == -1;
+    return if $result == -1;
+
+    my $neighbors = $packageInterface->CLFindSimilarTerms( $term, $numberOfNeighbors );
+
+    # Results
+    print "=========\n";
+    print " Results\n";
+    print "=========\n";
+
+    for my $neighboringTerm ( @{ $neighbors } )
+    {
+        print "$neighboringTerm\n";
+    }
+
+    print "\n";
 }
 
 sub Spearmans
@@ -939,8 +976,8 @@ sub ShowHelp
                              given a trained vector file \n\n";
     print "--cosavg                     Computes cosine similarity average between multiple\n
                              words given a trained vector file \n\n";
-    print "--cos2v                      Computes cosine similarity between two words, each in\n
-                             a differing trained vector data file\n\n";
+    print "--cos2v                      Computes cosine similarity between two words, each\n
+                             in a differing trained vector data file\n\n";
     print "--multiwordcosuserinput      Computes cosine similarity based on user input on a\n
                              trained vector file \n\n";
     print "--addvectors                 Adds two word vectors and outputs the value \n\n";
@@ -959,6 +996,8 @@ sub ShowHelp
                              to sparse word vector formatted file \n\n";
     print "--compoundifyfile            Compoundifies file based on user-specified\n
                              compound word file \n\n";
+    print "--findsimilarterms           Prints N-Nearest terms using cosine similarity \n
+                             metric \n\n";
     print "--similarity                 Computes Similarity For SVL Formatted Files \n\n";
     print "--spearmans                  Computes Spearman's Rank Correlation Score
                              between two files \n\n";
@@ -987,7 +1026,7 @@ sub ShowHelp
 
 sub ShowVersion
 {
-    print 'Word2vec-Interface.pl, v 0.36 2017/09/09 13:04 cuffyca';
+    print 'Word2vec-Interface.pl, v 0.37 2017/11/14 13:04 cuffyca';
     print "\nCopyright (c) 2016- Bridgett McInnes, Clint Cuffy\n";
 }
 
@@ -1381,6 +1420,26 @@ Example:
  Or
 
  Word2vec-Interface.pl --sortvectorfile "vectors.bin" -overwrite 0
+
+=head3 --findsimilarterms
+
+Description:
+
+ Prints the nearest n terms using cosine similarity as the metric of determining similar terms.
+
+Parameters:
+
+ vector_binary_file          (String)
+ term                        (String)
+ number_of_similar_neighbors (Integer)
+
+Output:
+
+ "number_of_similar_neighbors" value nearest similar terms using cosine similarity.
+
+Example:
+
+ Word2vec-Interface.pl --findsimilarterms vectors.bin heart 10
 
 =head3 --spearmans
 

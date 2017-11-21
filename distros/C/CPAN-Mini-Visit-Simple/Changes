@@ -1,4 +1,11 @@
 Revision history for Perl module CPAN::Mini::Visit::Simple
+
+0.016 Mon Nov 20 19:46:04 EST 2017
+    - visit() internals modified to pass an absolute path to the
+      action coderef.  This should provide more flexibility in
+      constructing such coderefs, but have no significant impact
+      on existing code.
+
 0.015 Fri Feb 10 08:27:21 EST 2017
     - Further path separator corrections, made with great assistance
       from Charlie Gonzalez.

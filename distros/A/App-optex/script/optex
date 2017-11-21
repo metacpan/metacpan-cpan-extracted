@@ -1,0 +1,685 @@
+#!/usr/bin/env perl
+
+use App::optex;
+my $version = $App::optex::VERSION;
+
+
+=encoding utf8
+
+=head1 NAME
+
+optex - General purpose command option wrapper
+
+=head1 SYNOPSIS
+
+B<optex> I<command> [ B<-M>I<module> ] ...
+
+or I<command> -> B<optex> symlink, or
+
+B<optex> I<options> [ -l | -m ] ...
+
+    --link,   --ln  create symlink
+    --unlink, --rm  remove symlink
+    --ls            list link files
+    --rc            list rc files
+    --nop, -x       disable option processing
+
+=cut
+
+
+use v5.10;
+use strict;
+use warnings;
+
+use Pod::Usage;
+use Data::Dumper;
+use Cwd qw(abs_path);
+
+our $rcloader;
+our $debug;
+our $no_operation;
+our $mod_opt = '-M';
+
+my($cmd_dir, $cmd_name) = ($0           =~ m{ (.*) / ([^/]+) $ }x) or die;
+my($abs_dir, $abs_name) = (abs_path($0) =~ m{ (.*) / ([^/]+) $ }x) or die;
+my $env_MODULE_OPT  = sprintf '%s_MODULE_OPT',  uc($abs_name);
+my $env_MODULE_PATH = sprintf '%s_MODULE_PATH', uc($abs_name);
+my $env_ROOT        = sprintf '%s_ROOT',        uc($abs_name);
+my $env_BINDIR      = sprintf '%s_BINDIR',      uc($abs_name);
+
+my $HOME = $ENV{HOME} or die "No \$HOME.\n";
+my $config_dir = $ENV{$env_ROOT} || "${HOME}/.${abs_name}.d";
+my $module_dir = $config_dir;
+my $bin_dir = $ENV{$env_BINDIR} || "$config_dir/bin";
+
+require Getopt::EX::Loader;
+$rcloader = Getopt::EX::Loader->new(BASECLASS => "");
+if (my $opt = $ENV{$env_MODULE_OPT}) {
+    $mod_opt = $opt;
+    $rcloader->configure(MODULE_OPT => $opt);
+}
+
+sub load_rc {
+    my $rc = shift;
+    $rcloader->load(FILE => $rc);
+    warn "$abs_name: load $rc\n" if $debug;
+}
+
+load_rc "$config_dir/default.rc";
+
+my @system_mod_path =
+    grep { -d $_ } map { "$_/App/$abs_name" } @INC;
+
+my @private_mod_path = (
+    do {
+	if (my $mod_path = $ENV{$env_MODULE_PATH}) {
+	    split /:/, $mod_path;
+	} else {
+	    ();
+	}
+    },
+    $module_dir,
+    );
+
+prepend_path(@private_mod_path, @system_mod_path);
+
+my $target_name = do {
+    if ($cmd_name ne $abs_name) {
+	$cmd_name;
+    } else {
+	self_option(\@ARGV);
+	if (@ARGV) {
+	    shift @ARGV;
+	} else {
+	    usage();
+	    exit 1;
+	}
+    }
+};
+
+my @command_mod_path =
+    grep { -d $_ } map { "$_/$target_name" } @private_mod_path;
+
+prepend_path(@command_mod_path, @private_mod_path, @system_mod_path);
+
+if (@ARGV > 0 and $ARGV[0] eq $mod_opt) {
+    show_modules();
+    exit;
+}
+
+unless ($no_operation) {
+    load_rc "$config_dir/$target_name.rc";
+    $rcloader->deal_with(\@ARGV);
+}
+
+$ENV{PATH} = join(':',
+		  grep { not remove_path($_) }
+		  split /:+/, $ENV{PATH});
+
+sub remove_path {
+    my $dir = shift;
+    -d $dir or return 0; # useless, but harmless.
+    if (($cmd_name ne $abs_name) and (abs_path($dir) eq $cmd_dir)) {
+	warn "$abs_name($$): remove $dir\n" if $debug;
+	return 1;
+    }
+    my $path = "$dir/$target_name";
+    -l $path or return 0;
+    my $link = readlink $path or return 1; # impossible?
+    if ($link =~ m:/$abs_name$:o) {
+	warn "optex($$): remove $dir\n" if $debug;
+	return 1;
+    }
+    return 0;
+}
+
+warn "$abs_name: exec $target_name @ARGV\n" if $debug;
+
+no warnings 'exec';
+
+exec $target_name, @ARGV
+    or warn "$target_name: $!\n";
+
+exit 1;
+
+######################################################################
+
+sub self_option {
+    my $argv = shift;
+
+    my $rcloader = Getopt::EX::Loader->new(BASECLASS => "");
+    $rcloader->load(FILE => "$config_dir/$abs_name.rc");
+    $rcloader->deal_with($argv);
+
+    use Getopt::Long qw(GetOptionsFromArray);
+    Getopt::Long::Configure(qw"bundling require_order");
+    my %opt;
+    my @optargs = (
+	"d|debug!"  => \$debug,
+	"v|version" => \$opt{version},
+	"h|man"     => \$opt{man},
+	"link|ln"   => \$opt{link},
+	"unlink|rm" => \$opt{unlink},
+	"f|force"   => \$opt{force},
+	"ls"        => \$opt{ls},
+	"rc"        => \$opt{rc},
+	"l|long"    => \$opt{long},
+	"m|cat"     => \$opt{cat},
+	"M|module"  => \$opt{module},
+	"x|nop!"    => \$main::no_operation,
+	);
+    GetOptionsFromArray $argv, @optargs;
+
+    if ($opt{man}) {
+	exec "perldoc $abs_name";
+	die "exec: $!";
+    }
+    elsif ($opt{version}) {
+	print $version, "\n";
+	exit;
+    }
+    elsif ($opt{link} || $opt{unlink}) {
+	_symlink($argv, \%opt);
+	exit 0;
+    }
+    elsif ($opt{ls}) {
+	_ls($argv, \%opt);
+	exit 0;
+    }
+    elsif ($opt{rc}) {
+	_rc($argv, \%opt);
+	exit 0;
+    }
+    elsif ($opt{module}) {
+	show_modules();
+	exit 0;
+    }
+
+    return;
+}
+
+sub _symlink {
+    my($argv, $op) = @_;
+    -d $bin_dir or die "Directory $bin_dir does not exists.\n";
+
+    my @target = @$argv;
+    for my $target (@target) {
+	my $link = "$bin_dir/$target";
+	if ($op->{link}) {
+	    -f $link and do { warn "$link already exists.\n"; next };
+	    symlink $0, $link or die "$link: $!\n";
+	    print "$link created.\n";
+	}
+	elsif ($op->{unlink}) {
+	    -l $link or do { warn "$link is not symlink\n"; next };
+	    if ((my $name = readlink $link) ne $0 ) {
+		if (not $op->{force}) {
+		    warn
+			"$link has unexpected link: -> $name\n" .
+			"Use -f option to force unlink.\n" ;
+		    next;
+		}
+			
+	    }
+	    unlink $link or die "$link: $!\n";
+	    print "$link removed.\n";
+	}
+    }
+}
+
+sub _ls {
+    my($argv, $op) = @_;
+    my @files = @$argv;
+    use IO::Dir;
+    my $dir = IO::Dir->new($bin_dir) or die "$bin_dir: $!\n";
+    my @dirent = @files ? @files : do {
+	sort { $a cmp $b }
+	grep { not /^\./ }
+	$dir->read;
+    };
+    $dir->close;
+
+    for my $ent (@dirent) {
+	my $path = "$bin_dir/$ent";
+	if (-l $path) {
+	    print $op->{path} ? $path : $ent;
+	    printf " -> %s", readlink $path if $op->{long};
+	    print "\n";
+	}
+	warn "$ent: not exist\n" unless -f $path;
+    }
+}
+
+sub _rc {
+    my($argv, $op) = @_;
+    my @command = @$argv;
+    my @rc = map { s/(?<!\.rc)$/.rc/r } @command;
+    my %rc = map { ($_ => 1) } @rc;
+    use IO::Dir;
+    my $dir = IO::Dir->new($config_dir) or die "$config_dir: $!\n";
+    my @dirent = do {
+	grep { %rc == 0 or $rc{$_} }
+	grep { /\.rc$/ }
+	@rc ? @rc : sort $dir->read
+    };
+    $dir->close;
+
+    for my $ent (@dirent) {
+	my $path = "$config_dir/$ent";
+	if ($op->{cat}) {
+	    use IO::File;
+	    my $fh = IO::File->new($path) or do {
+		warn "$path: $!\n";
+		next;
+	    };
+	    while (<$fh>) {
+		print "$ent:" if @dirent > 1;
+		print;
+	    }
+	    $fh->close;
+	} else {
+	    print $op->{long} ? $path : $ent;
+	    print "\n";
+	}
+    }
+}
+
+######################################################################
+
+sub usage {
+    pod2usage(-verbose => 0,
+	      -message => <<"	      EOS" =~ s/^\s+//mgr
+	      Use `perldoc $abs_name` for document.
+	      Use `$abs_name [command] ${mod_opt}help` for available options.
+	      EOS
+	);
+}
+
+my @ORIG_INC; BEGIN { @ORIG_INC = @INC }
+my @mod_path;
+sub prepend_path {
+    @mod_path = uniq(@_);
+    @INC = (@mod_path, @ORIG_INC);
+}
+
+sub show_modules {
+    my $path = @_ ? shift : \@mod_path;
+    print "MODULES:\n";
+    for my $path (@$path) {
+	my($name) = $path =~ m:([^/]+)$:;
+	my @module = do {
+#	    grep { not /\bdefault\.pm$/ }
+	    glob "$path/*.pm";
+	};
+	next unless @module;
+	print "    $path\n";
+	for my $mod (@module) {
+	    printf "        ${mod_opt}%s\n", $mod =~ /([^\/]*)\.pm/;
+	}
+	print "\n";
+    }
+}
+
+sub uniq {
+    my %seen;
+    grep { not $seen{$_}++ } @_;
+}
+
+=head1 DESCRIPTION
+
+B<optex> is a general purpose option handling wrapper utilizing Perl
+module L<Getopt::EX>.  It enables user to define their own option
+aliases for any commands on the system, and provide module style
+extendible capability.
+
+Target command is given as argument:
+
+    % optex command
+
+or symbolic link file linked to B<optex>:
+
+    command -> optex
+
+If the configuration file F<~/.optex.d/>I<command>F<.rc> exits, it is
+read before execution and command arguments are pre-processed using
+that configuration.
+
+
+=head2 OPTION ALIASES
+
+Think of macOS's C<date> command, which does not have C<-I[TIMESPEC]>
+option.  Using B<optex>, these can be implemented by preparing
+following setting in F<~/.optex.d/date.rc> file.
+
+    option -I        -Idate
+    option -Idate    +%F
+    option -Iseconds +%FT%T%z
+    option -Iminutes +%FT%H:%M%z
+    option -Ihours   +%FT%H%z
+
+    option --iso-8601         -I
+    option --iso-8601=date    -Idate
+    option --iso-8601=seconds -Iseconds
+    option --iso-8601=minutes -Iminutes
+    option --iso-8601=hours   -Ihours
+
+Then next command will work as expected.
+
+    % optex date -Iseconds
+
+If a symbolic link C<< date -> optex >> is found in command search
+path, you can use it just same as standard command, but with
+unsupported options.
+
+    % date -Iseconds
+
+Common configuration is stored in F<~/.optex.d/optex.rc> file, and
+those rules are applied to all commands executed through B<optex>.
+
+Actually, C<--iso-8601> option can be defined simpler as this:
+
+    option --iso-8601 -I$<shift>
+
+This works fine almost always, but fails with sole C<--iso-8601>
+option preceding other option like this:
+
+    % date --iso-8601 -u
+
+=head2 MACROS
+
+Complex string can be composed using macro C<define>.  Next example is
+an awk script to count vowels in the text, to be declared in file
+F<~/.optex.d/awk.rc>.
+
+    define __delete__ /[bcdfgkmnpsrtvwyz]e( |$)/
+    define __match__  /ey|y[aeiou]*|[aeiou]+/
+    define __count_vowels__ <<EOS
+    {
+        s = tolower($0);
+        gsub(__delete__, " ", s);
+        for (count=0; match(s, __match__); count++) {
+            s=substr(s, RSTART + RLENGTH);
+        }
+        print count " " $0;
+    }
+    EOS
+    option --vowels __count_vowels__
+
+This can be used like this:
+
+    % awk --vowels /usr/share/dict/words
+
+When setting complex option, C<expand> directive is useful.  C<expand>
+works almost same as C<option>, but effective only within the file
+scope, and not available for command line option.
+
+    expand repository	( -name .git -o -name .svn -o -name RCS )
+    expand no_dots	! -name .*
+    expand no_version	! -name *,v
+    expand no_backup	! -name *~
+    expand no_image 	! -iname *.jpg  ! -iname *.jpeg \
+			! -iname *.gif  ! -iname *.png
+    expand no_archive	! -iname *.tar  ! -iname *.tbz  ! -iname *.tgz
+    expand no_pdf	! -iname *.pdf
+
+    option --clean \
+            repository -prune -o \
+            -type f \
+            no_dots \
+            no_version no_backup \
+            no_image \
+            no_archive \
+            no_pdf
+
+    % find . --clean -print
+
+
+=head2 MODULES
+
+B<optex> also supports module extension.  In the example of C<date>,
+module file is found at F<~/.optex.d/date/> directory.  If default
+module, F<~/.optex.d/date/default.pm> exists, it is loaded
+automatically on every execution.
+
+This is a normal Perl module, so package declaration and the final
+true value is necessary.  Between them, you can put any kind of Perl
+code.  For example, next program set environment variable C<LANG> to
+C<C> before executing C<date> command.
+
+    package default;
+    $ENV{LANG} = 'C';
+    1;
+
+    % /bin/date
+    2017年 10月22日 日曜日 18時00分00秒 JST
+
+    % date
+    Sun Oct 22 18:00:00 JST 2017
+
+Other modules are loaded using C<-M> option.  Unlike other options,
+C<-M> have to be placed at the beginning of argument list.  Module
+files in F<~/.optex.d/date/> directory are used only for C<date>
+command.  If the module is placed on F<~/.optex.d/> directory, it can
+be used from all commands.
+
+If you want use C<-Mes> module, make a file F<~/.optex.d/es.pm> with
+following content.
+
+    package es;
+    $ENV{LANG} = 'es_ES';
+    1;
+
+    % date -Mes
+    domingo, 22 de octubre de 2017, 18:00:00 JST
+
+Module is also used with subroutine call.  Suppose
+F<~/.optex.d/env.pm> module look like:
+
+    package env;
+    sub setenv {
+        while (($a, $b) = splice @_, 0, 2) {
+            $ENV{$a} = $b;
+        }
+    }
+    1;
+
+Then it can be used in more generic fashion.  In the next example,
+first format is easy to read, but second one is more easy to type
+because it does not have special characters to be escaped.
+
+    % date -Menv::setenv(LANG=de_DE) # need shell quote
+    % date -Menv::setenv=LANG=de_DE  # alternative format
+    So 22 Okt 2017 18:00:00 JST
+
+Option aliases can be also declared in the module, at the end of file,
+following special literal C<__DATA__>.  Using this, you can prepare
+multiple set of options for different purposes.  Think about generic
+i18n module:
+
+    package i18n;
+    1;
+    __DATA__
+    option --cn -Menv::setenv(LANG=zh_CN) // 中国語 - 簡体字
+    option --tw -Menv::setenv(LANG=zh_TW) // 中国語 - 繁体字
+    option --us -Menv::setenv(LANG=en_US) // 英語
+    option --fr -Menv::setenv(LANG=fr_FR) // フランス語
+    option --de -Menv::setenv(LANG=de_DE) // ドイツ語
+    option --it -Menv::setenv(LANG=it_IT) // イタリア語
+    option --jp -Menv::setenv(LANG=ja_JP) // 日本語
+    option --kr -Menv::setenv(LANG=ko_KR) // 韓国語
+    option --br -Menv::setenv(LANG=pt_BR) // ポルトガル語 - ブラジル
+    option --es -Menv::setenv(LANG=es_ES) // スペイン語
+    option --ru -Menv::setenv(LANG=ru_RU) // ロシア語
+
+This can be used like:
+
+    % date -Mi18n --tw
+    2017年10月22日 週日 18時00分00秒 JST
+
+You can declare autoload module in your F<~/.optex.d/optex.rc> like:
+
+    autoload -Mi18n --cn --tw --us --fr --de --it --jp --kr --br --es --ru
+
+Then you can use them without module option.  In this case, option
+C<--ru> is replaced by C<-Mi18n --ru> automatically.
+
+    % date --ru
+    воскресенье, 22 октября 2017 г. 18:00:00 (JST)
+
+
+=head1 STANDARD MODULES
+
+=over 4
+
+=item -MB<help>
+
+Print available option list.  Option name is printed with substitution
+form, or help message if defined.  Use B<-x> option to omit help
+message.
+
+Option B<--man> or B<-h> will print document if available.  Option
+B<-l> will print module path.  Option B<-m> will show the module
+itself.  When used after other modules, print information about the
+last declared module.  Next command show the document about B<second>
+module.
+
+    optex -Mfirst -Msecond -Mhelp --man
+
+=item -MB<debug>
+
+Print debug messages.
+
+=back
+
+
+=head1 OPTIONS
+
+These options are not effective when B<optex> was executed from a
+symbolic link.
+
+=over 4
+
+
+=item B<--link>, B<--ln> [ I<command> ]
+
+Create symbolic link in F<~/.optex.d/bin> directory.
+
+
+=item B<--unlink>, B<--rm> [ B<-f> ] [ I<command> ]
+
+Remove symbolic link in F<~/.optex.d/bin> directory.
+
+
+=item B<--ls> [ B<-l> ] [ I<command> ]
+
+List symbolic link files in F<~/.optex.d/bin> directory.
+
+
+=item B<--rc> [ B<-l> ] [ B<-m> ] [ I<command> ]
+
+List rc files in F<~/.optex.d> directory.
+
+
+=item B<--nop>, B<-x> I<command>
+
+Stop option manipulation.  Use full pathname otherwise.
+
+
+=back
+
+
+=head1 FILES AND DIRECTORIES
+
+=over 4
+
+
+=item F<PERLLIB/App/optex>
+
+System module directory.
+
+
+=item F<~/.optex.d/>
+
+Personal root directory.
+
+
+=item F<~/.optex.d/default.rc>
+
+Common startup file.
+
+
+=item F<~/.optex.d/>I<command>F<.rc>
+
+Startup file for I<command>.
+
+
+=item F<~/.optex.d/>I<command>F</>
+
+Module directory for I<command>.
+
+
+=item F<~/.optex.d/>I<command>F</default.pm>
+
+Default module for I<command>.
+
+
+=item F<~/.optex.d/bin>
+
+Default directory to store symbolic links.
+
+This is not necessary, but it seems a good idea to make special
+directory to contain symbolic links for B<optex>, placing it in your
+command search path.  Then you can easily add/remove it from the path,
+or create/remove symbolic links.
+
+=back
+
+
+=head1 ENVIRONMENT
+
+=over 4
+
+=item OPTEX_ROOT
+
+Override default root directory F<~/.optex.d>.
+
+=item OPTEX_MODULE_PATH
+
+Set module paths separated by colon (C<:>).  These are inserted before
+standard path.
+
+=item OPTEX_MODULE_OPT
+
+Passed to L<Getopt::EX::Loader> module, and standard module option
+B<-M> is replaced by its value.
+
+=item OPTEX_BINDIR
+
+Override default symbolic link directory F<~/.optex.d/bin>.
+
+=back
+
+
+=head1 SEE ALSO
+
+L<Getopt::EX>, L<Getopt::EX::Loader>, L<Getopt::EX::Module>
+
+
+=head1 AUTHOR
+
+Kaz Utashiro
+
+
+=head1 COPYRIGHT
+
+The following copyright notice applies to all the files provided in
+this distribution, including binary files, unless explicitly noted
+otherwise.
+
+Copyright 2017 Kazumasa Utashiro
+
+
+=cut
+
+
+#  LocalWords:  optex

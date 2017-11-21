@@ -40,6 +40,7 @@ t/Plack-Middleware-APISchema-RequestValidator.t
 t/Plack-Middleware-APISchema-ResponseValidator.t
 t/fixtures/author.def
 t/fixtures/bmi.def
+t/fixtures/boolean.def
 t/fixtures/family.def
 t/fixtures/runtime-error.def
 t/fixtures/status.def

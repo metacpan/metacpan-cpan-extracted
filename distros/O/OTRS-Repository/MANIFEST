@@ -9,10 +9,13 @@ dist.ini
 lib/OTRS/Repository.pm
 lib/OTRS/Repository/Source.pm
 t/data/otrs.xml
+t/list/otrs.xml
 t/repository.t
 t/repository_dup.t
 t/repository_list.t
+t/repository_list_details.t
 t/source.t
 t/source_does_not_exist.t
 t/source_invalid_xml.t
 t/source_list.t
+t/source_list_details.t

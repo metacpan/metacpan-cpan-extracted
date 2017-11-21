@@ -8,6 +8,7 @@ use GraphQL::Type::Library -all;
 use GraphQL::Debug qw(_debug);
 use Types::Standard -all;
 use JSON::MaybeXS qw(JSON is_bool);
+use DateTime::Format::ISO8601;
 use Exporter 'import';
 extends qw(GraphQL::Type);
 with qw(
@@ -22,7 +23,7 @@ use Return::Type;
 use GraphQL::Debug qw(_debug);
 
 our $VERSION = '0.02';
-our @EXPORT_OK = qw($Int $Float $String $Boolean $ID);
+our @EXPORT_OK = qw($Int $Float $String $Boolean $ID $DateTime);
 
 use constant DEBUG => $ENV{GRAPHQL_DEBUG};
 my $JSON = JSON::MaybeXS->new->allow_nonref->canonical;
@@ -105,7 +106,8 @@ method from_ast(
   DEBUG and _debug('Scalar.from_ast', $ast_node);
   $self->new(
     $self->_from_ast_named($ast_node),
-    serialize => sub {}, # fake
+    serialize => sub { require Carp; Carp::croak "Fake serialize called" },
+    parse_value => sub { require Carp; Carp::croak "Fake parse_value called" },
   );
 }
 
@@ -129,10 +131,11 @@ our $Int = GraphQL::Type::Scalar->new(
   description =>
     'The `Int` scalar type represents non-fractional signed whole numeric ' .
     'values. Int can represent values between -(2^31) and 2^31 - 1.',
-  serialize => sub { defined $_[0] and Int32Signed->(@_); $_[0]+0 },
+  serialize => sub { return undef if !defined $_[0]; Int32Signed->(@_); $_[0]+0 },
   parse_value => sub {
     DEBUG and _debug('Int.parse_value', @_, $JSON->encode({ intval => $_[0] }));
-    defined $_[0] and Int32Signed->(@_);
+    return undef if !defined $_[0];
+    Int32Signed->(@_);
     DEBUG and _debug('Int.parse_value(after asserts)', @_, $JSON->encode({ intval => $_[0] }));
     $_[0]+0
   },
@@ -148,8 +151,8 @@ our $Float = GraphQL::Type::Scalar->new(
     'The `Float` scalar type represents signed double-precision fractional ' .
     'values as specified by ' .
     '[IEEE 754](http://en.wikipedia.org/wiki/IEEE_floating_point).',
-  serialize => sub { defined $_[0] and Num->(@_); $_[0]+0 },
-  parse_value => sub { defined $_[0] and Num->(@_); $_[0]+0 },
+  serialize => sub { return undef if !defined $_[0]; Num->(@_); $_[0]+0 },
+  parse_value => sub { return undef if !defined $_[0]; Num->(@_); $_[0]+0 },
 );
 
 =head2 $String
@@ -174,8 +177,8 @@ our $Boolean = GraphQL::Type::Scalar->new(
   name => 'Boolean',
   description =>
     'The `Boolean` scalar type represents `true` or `false`.',
-  serialize => sub { defined $_[0] and Bool->(@_); $_[0] ? JSON->true : JSON->false },
-  parse_value => sub { defined $_[0] and is_bool(@_); $_[0]+0 },
+  serialize => sub { return undef if !defined $_[0]; Bool->(@_); $_[0] ? JSON->true : JSON->false },
+  parse_value => sub { return undef if !defined $_[0]; is_bool(@_); $_[0]+0 },
 );
 
 =head2 $ID
@@ -192,6 +195,21 @@ our $ID = GraphQL::Type::Scalar->new(
     '(such as `4`) input value will be accepted as an ID.',
   serialize => sub { defined $_[0] and Str->(@_); $_[0] },
   parse_value => sub { defined $_[0] and Str->(@_); $_[0] },
+);
+
+=head2 $DateTime
+
+=cut
+
+my $iso8601 = DateTime::Format::ISO8601->new;
+our $DateTime = GraphQL::Type::Scalar->new(
+  name => 'DateTime',
+  description =>
+    'The `DateTime` scalar type represents a point in time. ' .
+    'Canonically represented using ISO 8601 format, e.g. 20171114T07:41:10, ' .
+    'which is 14 November 2017 at 07:41am.',
+  serialize => sub { return if !defined $_[0]; $_[0].'' },
+  parse_value => sub { return if !defined $_[0]; $iso8601->parse_datetime(@_); },
 );
 
 __PACKAGE__->meta->make_immutable();

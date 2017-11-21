@@ -4,6 +4,7 @@ use utf8;
 use 5.10.0;
 
 use Test::More;
+use lib '.';
 use t::Util qw/ slack set_any_mock_response /;
 
 my %tests = (
@@ -127,6 +128,12 @@ my %tests = (
             attachments => [{hoge => 'fuga'}],
             link_names  => 1,
             parse       => 'hoge',
+        },
+    },
+    dialog => {
+        open => {
+            trigger_id => '13345224609.738474920.8088930838d88f008e0',
+            dialog     => {callback_id=>'test',title=>'Nice Dialog',submit_label=>'Do It',elements=>[{type=>'text',label=>'Something',name=>'something'}]},
         },
     },
     emoji => {

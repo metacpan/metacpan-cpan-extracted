@@ -160,12 +160,16 @@ SRL_STATIC_INLINE srl_encoder_t *srl_dump_data_structure(pTHX_ srl_encoder_t *en
 
 #elif defined(SvRX)
 #    define MODERN_REGEXP
+#    if ( PERL_VERSION > 27 || (PERL_VERSION == 27 && PERL_SUBVERSION >= 3) )
+     /* Commit df6b4bd56551f2d39f7c0019c23f27181d8c39c4
+      * changed the behavior mentioned below, so that the POK flag is on again. Sigh.
+      * So this branch is a deliberate NO-OP, it just makes the conditions easier to read.*/
+#    elif ( PERL_VERSION > 17 || (PERL_VERSION == 17 && PERL_SUBVERSION >= 6) )
      /* With commit 8d919b0a35f2b57a6bed2f8355b25b19ac5ad0c5 (perl.git) and
       * release 5.17.6, regular expression are no longer SvPOK (IOW are no longer
       * considered to be containing a string).
       * This breaks some of the REGEXP detection logic in srl_dump_sv, so
       * we need yet another CPP define. */
-#    if PERL_VERSION > 17 || (PERL_VERSION == 17 && PERL_SUBVERSION >= 6)
 #        define REGEXP_NO_LONGER_POK
 #    endif
 #else
@@ -455,7 +459,7 @@ srl_build_encoder_struct(pTHX_ HV *opt, sv_with_hash *options)
             if (enc->protocol_version < 1
                 || enc->protocol_version > SRL_PROTOCOL_VERSION)
             {
-                croak("Specified Sereal protocol version ('%"UVuf") is invalid",
+                croak("Specified Sereal protocol version (%"UVuf") is invalid",
                       (UV)enc->protocol_version);
             }
         }
@@ -505,6 +509,20 @@ srl_build_encoder_struct(pTHX_ HV *opt, sv_with_hash *options)
                     IV lvl = SvIV(val);
                     if (expect_false( lvl < 1 || lvl > 10 )) /* Sekrit: compression lvl 10 is a miniz thing that doesn't exist in normal zlib */
                         croak("'compress_level' needs to be between 1 and 9");
+                    enc->compress_level = lvl;
+                }
+                break;
+            case 3:
+                SRL_ENC_SET_OPTION(enc, SRL_F_COMPRESS_ZSTD);
+                if (enc->protocol_version < 3)
+                    croak("zstd compression was introduced in protocol version 3 and you are asking for only version %i", (int)enc->protocol_version);
+
+                enc->compress_level = 3; /* default compression level */
+                my_hv_fetchs(he, val, opt, SRL_ENC_OPT_IDX_COMPRESS_LEVEL);
+                if ( val && SvTRUE(val) ) {
+                    IV lvl = SvIV(val);
+                    if (expect_false( lvl < 1 || lvl > 22 )) /* TODO: ZSTD_maxCLevel() */
+                        croak("'compress_level' needs to be between 1 and 22");
                     enc->compress_level = lvl;
                 }
                 break;
@@ -670,7 +688,7 @@ srl_write_header(pTHX_ srl_encoder_t *enc, SV *user_header_src, const U32 compre
 {
     /* 4th to 8th bit are flags. Using 4th for snappy flag. FIXME needs to go in spec. */
 
-    U8 flags= SRL_F_COMPRESS_FLAGS_TO_PROTOCOL_ENCODING[ compress_flags >> SRL_F_COMPRESS_FLAGS_SHIFT ];
+    U8 flags= srl_get_compression_header_flag(compress_flags);
     const U8 version_and_flags = (U8)enc->protocol_version | flags;
 
     /* 4 byte magic string + proto version
@@ -990,6 +1008,7 @@ srl_dump_data_structure(pTHX_ srl_encoder_t *enc, SV *src, SV *user_header_src)
     { /* Have some sort of compression */
         ptrdiff_t sereal_header_len;
         STRLEN uncompressed_body_length;
+        const STRLEN max_len = 1 << 32 - 1;
 
         /* Alas, have to write entire packet first since the header length
          * will determine offsets. */
@@ -1001,7 +1020,12 @@ srl_dump_data_structure(pTHX_ srl_encoder_t *enc, SV *src, SV *user_header_src)
         assert(BUF_POS_OFS(&enc->buf) > sereal_header_len);
         uncompressed_body_length = BUF_POS_OFS(&enc->buf) - sereal_header_len;
 
-        if (uncompressed_body_length < (STRLEN)enc->compress_threshold) {
+        if ((uncompressed_body_length < (STRLEN)enc->compress_threshold) || uncompressed_body_length > max_len) {
+            if (uncompressed_body_length > max_len) {
+                /* we dont support SNAPPY on super long buffers, it has a 2**32 limit
+                 * and we currently don't support splitting things up. See Issue #88 */
+                warn("disabling SNAPPY compression as buffer is too large!");
+            }
             /* Don't bother with compression at all if we have less than $threshold bytes of payload */
             srl_reset_compression_header_flag(&enc->buf);
         }

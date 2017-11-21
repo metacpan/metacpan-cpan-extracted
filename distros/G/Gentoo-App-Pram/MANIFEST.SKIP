@@ -63,5 +63,3 @@
 
 # Avoid MYMETA files
 ^MYMETA\.
-#!end included /home/kent/perl5/perlbrew/perls/5.24.0-RC5/lib/5.24.0/ExtUtils/MANIFEST.SKIP
-

@@ -1,5 +1,5 @@
 package Business::PayPal::API::RecurringPayments;
-$Business::PayPal::API::RecurringPayments::VERSION = '0.76';
+$Business::PayPal::API::RecurringPayments::VERSION = '0.77';
 use 5.008001;
 use strict;
 use warnings;
@@ -566,7 +566,7 @@ Business::PayPal::API::RecurringPayments - PayPal RecurringPayments API
 
 =head1 VERSION
 
-version 0.76
+version 0.77
 
 =head1 SYNOPSIS
 

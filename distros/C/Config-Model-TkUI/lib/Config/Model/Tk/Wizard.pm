@@ -9,7 +9,7 @@
 #
 
 package Config::Model::Tk::Wizard;
-$Config::Model::Tk::Wizard::VERSION = '1.364';
+$Config::Model::Tk::Wizard::VERSION = '1.365';
 use strict;
 use warnings;
 use Carp;

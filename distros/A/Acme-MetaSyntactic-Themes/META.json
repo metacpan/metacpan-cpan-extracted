@@ -4,13 +4,13 @@
       "Philippe Bruhat (BooK) <book@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Acme-MetaSyntactic-Themes",
    "prereqs" : {
@@ -52,7 +52,6 @@
             "IPC::Open3" : "0",
             "Test::MetaSyntactic" : "0",
             "Test::More" : "0",
-            "blib" : "1.01",
             "perl" : "5.006"
          }
       }
@@ -69,7 +68,7 @@
          "web" : "http://github.com/book/Acme-MetaSyntactic-Themes"
       }
    },
-   "version" : "1.050",
+   "version" : "1.051",
    "x_contributors" : [
       "\u00c9ric Guirbal <eguirbal@cpan.org>",
       "Brian Gottreu <gottreu@cpan.org>",
@@ -119,6 +118,6 @@
       "David Landgren <dland@cpan.org>",
       "Vahe Sarkissian <vsarkiss@cpan.org>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+   "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

@@ -5,7 +5,7 @@ use warnings;
 
 # ABSTRACT: Data store to support Net::LDAP::SimpleServer
 
-our $VERSION = '0.0.20';    # VERSION
+our $VERSION = '0.0.21';    # VERSION
 
 use 5.010;
 use Carp qw/carp croak/;
@@ -243,7 +243,7 @@ Net::LDAP::SimpleServer::LDIFStore - Data store to support Net::LDAP::SimpleServ
 
 =head1 VERSION
 
-version 0.0.20
+version 0.0.21
 
 =head1 SYNOPSIS
 

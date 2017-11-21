@@ -16,6 +16,7 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Schedule::LongSteps",
   "PREREQ_PM" => {
+    "Action::Retry" => "0.24",
     "Class::Load" => 0,
     "Data::UUID" => "1.220",
     "DateTime" => "1.18",
@@ -25,10 +26,12 @@ my %WriteMakefileArgs = (
     "Scope::Guard" => "0.21"
   },
   "TEST_REQUIRES" => {
+    "Test::Exception" => 0,
     "Test::MockDateTime" => 0,
+    "Test::MockModule" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.021",
+  "VERSION" => "0.023",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -36,6 +39,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Action::Retry" => "0.24",
   "Class::Load" => 0,
   "Data::UUID" => "1.220",
   "DateTime" => "1.18",
@@ -43,7 +47,9 @@ my %FallbackPrereqs = (
   "Log::Any" => "1.032",
   "Moose" => "2.1405",
   "Scope::Guard" => "0.21",
+  "Test::Exception" => 0,
   "Test::MockDateTime" => 0,
+  "Test::MockModule" => 0,
   "Test::More" => 0
 );
 

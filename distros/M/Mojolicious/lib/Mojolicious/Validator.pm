@@ -9,6 +9,7 @@ has checks => sub {
     equal_to => \&_equal_to,
     in       => \&_in,
     like     => sub { $_[2] !~ $_[3] },
+    num      => \&_num,
     size     => \&_size,
     upload   => sub { !ref $_[2] || !$_[2]->isa('Mojo::Upload') }
   };
@@ -32,6 +33,12 @@ sub _in {
   my ($validation, $name, $value) = (shift, shift, shift);
   $value eq $_ && return undef for @_;
   return 1;
+}
+
+sub _num {
+  my ($validation, $name, $value, $min, $max) = @_;
+  return 1 if $value !~ /^[0-9]+$/;
+  return defined $min && $max ? $min > $value || $max < $value : undef;
 }
 
 sub _size {
@@ -86,6 +93,14 @@ String value needs to match one of the values in the list.
 
 String value needs to match the regular expression.
 
+=head2 num
+
+  $validation = $validation->num;
+  $validation = $validation->num(2, 5);
+
+String value needs to be a non-fractional number and if provided in the given
+range.
+
 =head2 size
 
   $validation = $validation->size(2, 5);
@@ -120,7 +135,7 @@ L<Mojolicious::Validator> implements the following attributes.
   $validator = $validator->checks({size => sub {...}});
 
 Registered validation checks, by default only L</"equal_to">, L</"in">,
-L</"like">, L</"size"> and L</"upload"> are already defined.
+L</"like">, L</"num">, L</"size"> and L</"upload"> are already defined.
 
 =head1 METHODS
 

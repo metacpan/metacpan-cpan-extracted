@@ -1,5 +1,10 @@
 Revision history for Geo-UK-Postcode-CodePointOpen
 
+0.007  2017-11-14 13:26:36 GMT
+
+  [Maintenance]
+  - updated tests to work with latest output from Geo::Coordinates::OSGB >= 2.20
+
 0.006  2016-01-29 10:27:35 GMT
 
   [Maintenance]

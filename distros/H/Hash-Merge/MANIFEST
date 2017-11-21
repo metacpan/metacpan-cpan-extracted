@@ -1,11 +1,24 @@
 Changes
 lib/Hash/Merge.pm
+MAINTAINER.md
 Makefile.PL
-MANIFEST			This list of files
+MANIFEST
 MANIFEST.SKIP
-META.json
-META.yml
-README
-t/00-load.t
-t/01-merge.t
-t/02-oo.t
+README.md
+t/Auto/00-load.t
+t/Auto/01-merge.t
+t/Auto/02-oo.t
+t/Clone/00-load.t
+t/Clone/01-merge.t
+t/Clone/02-oo.t
+t/ClonePP/00-load.t
+t/ClonePP/01-merge.t
+t/ClonePP/02-oo.t
+t/inline/00-load.t
+t/inline/01-merge.t
+t/inline/02-oo.t
+t/Storable/00-load.t
+t/Storable/01-merge.t
+t/Storable/02-oo.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

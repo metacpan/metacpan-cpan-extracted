@@ -143,7 +143,8 @@ THX_pp1_looks_like_sereal(pTHX)
 {
     dSP;
     SV *data= TOPs;
-    /* shoud this be SvPOK() maybe? */
+    /* Should this be SvPOK()? Or better yet, check if it's *really* a string pointer: SvPOKp(data). After all
+       the serialization format is a string and anything otherwise would not look sereal. */
     if ( SvOK(data) ) {
         STRLEN len;
         char *strdata= SvPV(data, len);
@@ -318,6 +319,7 @@ BOOT:
         SRL_INIT_OPTION( SRL_DEC_OPT_IDX_SET_READONLY_SCALARS,       SRL_DEC_OPT_STR_SET_READONLY_SCALARS       );
         SRL_INIT_OPTION( SRL_DEC_OPT_IDX_USE_UNDEF,                  SRL_DEC_OPT_STR_USE_UNDEF                  );
         SRL_INIT_OPTION( SRL_DEC_OPT_IDX_VALIDATE_UTF8,              SRL_DEC_OPT_STR_VALIDATE_UTF8              );
+        SRL_INIT_OPTION( SRL_DEC_OPT_IDX_REFUSE_ZSTD,                SRL_DEC_OPT_STR_REFUSE_ZSTD                );
     }
 #if USE_CUSTOM_OPS
     {

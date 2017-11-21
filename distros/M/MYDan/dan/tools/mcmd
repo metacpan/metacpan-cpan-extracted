@@ -6,6 +6,7 @@ use warnings;
 use MYDan::Node;
 use MYDan::Util::MIO::CMD;
 use MYDan::Util::OptConf;
+use MYDan::VSSH::Print;
 
 $| ++;
 
@@ -31,21 +32,11 @@ $option->assert( 'range' );
 my $range = MYDan::Node->new( $option->dump( 'range' ) );
 my %cmd = map { $_ => \@ARGV } $range->load( delete $o{range} )->list();
 
-my %result = MYDan::Util::MIO::CMD->new( %cmd )->run( %o );
-my %mesg;
+my ( %result, %re ) = MYDan::Util::MIO::CMD->new( %cmd )->run( %o );
 
-while ( my ( $io, $mesg ) = each %result )
+while( my ( $type, $result ) = each %result )
 {
-    while ( my ( $mesg, $node ) = each %$mesg )
-    {
-        push @{ $mesg{$io} }, join ': ', $range->load( $node )->dump, $mesg;
-    }
+    map{ my $t = $_; map{ $re{$_} .= $t } @{$result->{$t}};}keys %$result;
 }
 
-for my $io ( sort keys %mesg )
-{
-    print "\n---\n$io:\n";
-    map { print "  $_" } @{ $mesg{$io} };
-}
-
-exit 0;
+MYDan::VSSH::Print::result( 'mcmd' => %re );

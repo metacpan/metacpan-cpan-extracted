@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010;
+use 5.014;
 
 use ExtUtils::MakeMaker;
 
@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
     "bin/simpleldap"
   ],
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.010",
+  "MIN_PERL_VERSION" => "5.014",
   "NAME" => "Net::LDAP::SimpleServer",
   "PREREQ_PM" => {
     "Carp" => 0,
@@ -45,6 +45,7 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "Authen::SASL" => 0,
+    "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IO::Pipe" => 0,
@@ -52,12 +53,12 @@ my %WriteMakefileArgs = (
     "Net::LDAP" => 0,
     "Proc::Fork" => 0,
     "Test::Deep" => 0,
-    "Test::More" => "0.88",
+    "Test::More" => 0,
     "Test::UseAllModules" => 0,
     "Try::Tiny" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.0.20",
+  "VERSION" => "0.0.21",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -69,6 +70,7 @@ my %FallbackPrereqs = (
   "Carp" => 0,
   "Digest::MD5" => 0,
   "Exporter" => 0,
+  "ExtUtils::MakeMaker" => 0,
   "File::Basename" => 0,
   "File::HomeDir" => 0,
   "File::Path" => "2.08",
@@ -88,7 +90,7 @@ my %FallbackPrereqs = (
   "Proc::Fork" => 0,
   "Scalar::Util" => 0,
   "Test::Deep" => 0,
-  "Test::More" => "0.88",
+  "Test::More" => 0,
   "Test::UseAllModules" => 0,
   "Try::Tiny" => 0,
   "UNIVERSAL::isa" => 0,

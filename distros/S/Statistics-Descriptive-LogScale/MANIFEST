@@ -38,4 +38,8 @@ t/19-partial-insert.t
 README.md
 t/20-empty-dataset-consistency.t
 t/21-clone-with-args.t
-META.yml                                 Module meta-data (added by MakeMaker)
+t/22-format.t
+t/23-inf-thresh.t
+t/24-exact-integrals.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

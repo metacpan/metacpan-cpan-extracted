@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.73.
+signed via the Module::Signature module, version 0.79.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,10 +14,11 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 d1ab97a9ce542265a8900ed1de849da8bc5a6c20 MANIFEST
-SHA1 27b4be76723bb93cd35e875bd2ebf91dc221325a META.yml
-SHA1 dff0ea35dc3f9c29e166f8c0364b329e5d164c90 Makefile.PL
-SHA1 bc8fb761c3d0dc384faa167b7d06094bf82f0d6f README
+SHA1 12af0e3be6483733cc7e6cf8f13032e7c0af22d3 Changes
+SHA1 8dbd264664f23df3d07aec42e02dbb81df1a0e97 MANIFEST
+SHA1 942ba7e911fe665a905ffc56b7d918089eedd4f3 META.yml
+SHA1 33a6bcea4f92d8d3eed198b512aa538e74c8d961 Makefile.PL
+SHA1 52ac675bfab25167a74224262af6c16bf707f0c9 README
 SHA1 146b3a6b4aaea6dc4a1dbceca2fc17e177de9e47 TODO
 SHA1 fb87e7e7964647af0e7f6422bc7943754935dca7 inc/Module/Install.pm
 SHA1 06ca84c52f555dfd7cf8bb7c941c975e25adfc9d inc/Module/Install/Base.pm
@@ -33,11 +34,10 @@ SHA1 8d19f4485276b987b7838d4ec01909f8055a4724 inc/Module/Install/ReadmeFromPod.p
 SHA1 13c903897bad7f0fdd7871a4a0182ff62dfbefd5 inc/Module/Install/Substitute.pm
 SHA1 b0b3ad3cfea40b508eb61e0e5c8ea477f81f3eb1 inc/Module/Install/Win32.pm
 SHA1 b162866505fb2a1141efa422cfdc864394cb4444 inc/Module/Install/WriteAll.pm
-SHA1 4afcd32d7a733dcf0d21f2cda456fed47012cd9c inc/YAML/Tiny.pm
-SHA1 3b39cfb54fdbc374793e4c8581a8cdf3062fb2c8 inc/unicore/Name.pm
-SHA1 07c110a66da437319b53a162cefc3550376aba8a lib/RT/Extension/REST2.pm
-SHA1 7edd4229d9d30a9f0a08e7636ff1435cce79c0b0 lib/RT/Extension/REST2/Dispatcher.pm
-SHA1 b6c7247adc174f8aadb48cbc585d2982cae257de lib/RT/Extension/REST2/Middleware/Auth.pm
+SHA1 1bb8b3e76788e691f83dacdee5a2c02aacf1222a inc/YAML/Tiny.pm
+SHA1 de1dcf61a2caa2d3d53cf0090ffd503c121610e7 lib/RT/Extension/REST2.pm
+SHA1 14088b4223ec9394f6b076ebcc794216f0024fcf lib/RT/Extension/REST2/Dispatcher.pm
+SHA1 1b812daf32fde4252fae54dbcb35528b6ae8a3a0 lib/RT/Extension/REST2/Middleware/Auth.pm
 SHA1 70199496b833c026743d3720c709e5f28171b171 lib/RT/Extension/REST2/Middleware/ErrorAsJSON.pm
 SHA1 5ac07b8f8da65dbb4129d2a11513ab3195d8e423 lib/RT/Extension/REST2/Middleware/Log.pm
 SHA1 31dc9a795b7f043e8603617708c3e356cf9458b0 lib/RT/Extension/REST2/PodViewer.pm
@@ -68,7 +68,7 @@ SHA1 384f21e3e2fcbceb1d88c1a1914b92c74b1d943b lib/RT/Extension/REST2/Resource/Re
 SHA1 cb2130466b5f027f6049d7512d961d54a5688a4a lib/RT/Extension/REST2/Resource/Record/Hypermedia.pm
 SHA1 4e40814ada51de4ab2fcaf2a6993f0d81ee364f3 lib/RT/Extension/REST2/Resource/Record/Readable.pm
 SHA1 eed6315e2e96ed427f661bd2f9f3d44df3145a5a lib/RT/Extension/REST2/Resource/Record/WithETag.pm
-SHA1 f8f636560b6ad359eef46d931c008bf7582491c6 lib/RT/Extension/REST2/Resource/Record/Writable.pm
+SHA1 8eafea7c2e585e48e6139d96b4b111376307c194 lib/RT/Extension/REST2/Resource/Record/Writable.pm
 SHA1 3725a5f4b09e5f6d73875d14dff487647f080791 lib/RT/Extension/REST2/Resource/Role/RequestBodyIsJSON.pm
 SHA1 c74f9cc27306d2a9808f8fb45a5c7268c6831c76 lib/RT/Extension/REST2/Resource/Root.pm
 SHA1 7c11425587353189bb130471f7fef409e8fbea66 lib/RT/Extension/REST2/Resource/Ticket.pm
@@ -77,12 +77,12 @@ SHA1 7afd931b4900b6b2e99241fa5b1a0b034750e02e lib/RT/Extension/REST2/Resource/Tr
 SHA1 34c3713a654b0a21d302c5de18deb665112c108c lib/RT/Extension/REST2/Resource/Transactions.pm
 SHA1 0c5b5289bf16d0eb204d430997fc0e2d11847a44 lib/RT/Extension/REST2/Resource/User.pm
 SHA1 ecf051c4538577f7b291313a00a84fb0aa4c8f37 lib/RT/Extension/REST2/Resource/Users.pm
-SHA1 f8aee6c3af6061effaa4c57d7688976b59471bcc lib/RT/Extension/REST2/Util.pm
-SHA1 e44128c9a0ea8040c98c794bee1f881d56452290 t/asset-customfields.t
+SHA1 b01d222577c51cbccb29f37a733a9b033e8fbabf lib/RT/Extension/REST2/Util.pm
+SHA1 e0d4656c83343a8441846b684b206c6477e81daa t/asset-customfields.t
 SHA1 2f3267255c2bb0b4365db5b6639b189df8d70673 t/assets.t
 SHA1 843a92bb588ac533963a7d5b1cff32195006eacc t/catalogs.t
 SHA1 79c29e0de6cf9165bc858d6a473e718355bb4b49 t/conflict.t
-SHA1 71de280e702eba9ffc7d9e9a27de397a916ab4a4 t/lib/RT/Extension/REST2/Test.pm
+SHA1 d63f5119adb705f31c70f9165bcffd57f942a27e t/lib/RT/Extension/REST2/Test.pm
 SHA1 71de280e702eba9ffc7d9e9a27de397a916ab4a4 t/lib/RT/Extension/REST2/Test.pm.in
 SHA1 140f6d1a7bc195f3fbfc3c99e737605e212d7db1 t/not_found.t
 SHA1 1fe9d49659085fe9f5b4b6b5571f68277855051d t/queues.t
@@ -96,18 +96,13 @@ SHA1 0ed8277a4c77baaf908d19b92e82d03ee7b3f360 t/tickets.t
 SHA1 6e349b8bd6ea66639c9ed7a1fee0559064b21e26 t/transactions.t
 SHA1 ee5b34efb131d01ec3e2abd6b998cd61aaa0a649 t/user-customfields.t
 -----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
 
-iQIcBAEBAgAGBQJZcL6FAAoJEDdW4lQxRAUgwOcQAIZ9/rZACgTV0KOMJOfSUs0k
-ScG4IZC+eTjbbPgkkdRTYfvboHCQUj41CFY1EcDkbOn8Kzzl74l9ux3K6m6vow25
-h9uzzsGveVqN6yMH68vAixHAqNJSb64RWQWskUVVMqF/0gviIOinFh+skFSeW0fB
-/TJGsSCWfLufhtfjS7jmZxFLwmWg6H5ZkmEo14g5lCneB3tswIxi9AqF65sD5bRp
-9Bq/iEFjF5gL2FlY2mU1mIBNXDK/AT9V4xTmzfxRWIbF/5W1cY06gVdu1k/eEe8A
-/Z14TzXwO8FEWUVlASH0nIjlrYEBokK5yIRRPuZoMbFclvQeosNhCnmriLUoRp0W
-1BnFe3efxAmk+k+Q9XeNUd2FDAWq34RJz5kZTU+yIwEq5FUOF5X0idwRuk1wavyn
-Ai7XVH4UnQ7On6f5sVKfbB41KCv1zovpwgqSGcqCd0mdMTWhF7oK2Lub3QK5+4vE
-Q9xmqD4FZPWQdXmJQVddZgH7L67W+TmSJ3Sm6IiNQNzhh/8kO/OEWBzqQSYDGFPp
-YhUnGpwTn5sQVKtuSTKNW2Mt0oVL8ZuoOhjkwyNF5ZSuQchxloDpUHnl5G6ZHs3F
-+YwCbLTlFDqzI+NdzcNq8RZ0BbqfSudPon5AWSMTXLTsVr2dsGS7c+TrYB1Ea9Iw
-QMnmUKlwDESBEkOiVeJt
-=F8zJ
+iQEcBAEBAgAGBQJaE0+2AAoJEBXncVGnZqUUbacH/3ipRSUZLQKraVZpXxqjAvYx
+j6VyUS36OKbDqYEspM3q/mH8Q85HUjWfWvA7j9HbtbIirpw/q6/YWNPC4kNKLWIW
+X1ECLdgOLdCQfJQsr0Dr5aa48b8dd2fcrGLno/DtF/0NW2j0SoGsII1IcBq1REVX
+ds+T24FUeFJq1Mvmprt5VmPW/zT08ldM9ZAEdfSHexLi4V4cErft/Zxp6Z84z16q
+1XMbQxNkLgJbrQZdAWibUxG3YqEDKrG2ZxTjas1FG3xrxwEuO3IUxeX2ThZ+5bTK
+WygPAyMTFGDW12yktPOlCnceJTxHuihqE5KqdlQpLSjRn3Hb6KS113JvE6WcNT4=
+=SEmv
 -----END PGP SIGNATURE-----

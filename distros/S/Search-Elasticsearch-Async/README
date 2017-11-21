@@ -3,7 +3,7 @@ NAME
     Promises
 
 VERSION
-    version 5.02
+    version 6.00
 
 SYNOPSIS
         use Search::Elasticsearch::Async;
@@ -373,7 +373,7 @@ RUNNING REQUESTS
             );
         });
 
-    See Search::Elasticsearch::Client::5_0::Direct for more details about
+    See Search::Elasticsearch::Client::6_0::Direct for more details about
     the requests that can be run.
 
 MODULES
@@ -404,16 +404,18 @@ MODULES
     "delete()". The client parses the user's requests and passes them to the
     "transport" class to be executed.
 
-    The default version of the client is "5_0::Direct", which can be
+    The default version of the client is "6_0::Direct", which can be
     explicitly specified as follows:
 
         $e = Search::Elasticsearch::Async->new(
-            client => '5_0::Direct'
+            client => '6_0::Direct'
         );
 
     See :
 
-    *   Search::Elasticsearch::Client::5_0::Direct (default, for 5.0 branch)
+    *   Search::Elasticsearch::Client::6_0::Direct (default, for 6.0 branch)
+
+    *   Search::Elasticsearch::Client::5_0::Direct (for 5.0 branch)
 
     *   Search::Elasticsearch::Client::2_0::Direct (for 2.0 branch)
 
@@ -469,8 +471,8 @@ MODULES
     *   Search::Elasticsearch::Serializer::JSON::PP
 
 HELPER MODULES
-    Search::Elasticsearch::Client::5_0::Async::Bulk and
-    Search::Elasticsearch::Client::5_0::Async::Scroll are helper modules
+    Search::Elasticsearch::Client::6_0::Async::Bulk and
+    Search::Elasticsearch::Client::6_0::Async::Scroll are helper modules
     which assist with bulk indexing and scrolled searching, eg:
 
         $es->scroll_helper(

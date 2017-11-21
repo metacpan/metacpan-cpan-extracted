@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Tk::NodeEditor;
-$Config::Model::Tk::NodeEditor::VERSION = '1.364';
+$Config::Model::Tk::NodeEditor::VERSION = '1.365';
 use strict;
 use warnings;
 use Carp;
@@ -44,7 +44,7 @@ sub Populate {
         || die "NodeViewer: no -item, got ", keys %$args;
     $cw->{path} = delete $args->{-path};
     $cw->{store_cb} = delete $args->{-store_cb} || die __PACKAGE__, "no -store_cb";
-    my $cme_font = delete $args->{-font};
+    my $cme_font = $cw->{my_font} = delete $args->{-font};
 
     $cw->add_header( Edit => $node )->pack(@fx);
 
@@ -78,8 +78,12 @@ sub Populate {
 
     $cw->ConfigSpecs(-font => [['SELF','DESCENDANTS'], 'font','Font', $cme_font ],);
 
-    # don't call directly SUPER::Populate as it's LeafViewer's populate
+    # don't call directly SUPER::Populate as it's NodeViewer's populate
     $cw->Tk::Frame::Populate($args);
+
+    # TODO: above is a hack. The required methods of NodeViewer and
+    # AnyViewer should be moved into a role. Question: how can roles
+    # be done with Tk ??
 }
 
 sub reload {
@@ -97,6 +101,7 @@ sub fill_pane {
     my %values;
     my %modified;
     my $prev_elt;
+    my $font = $cw->{my_font}; #cget('-font');
 
     foreach my $c ( $node->get_element_name() ) {
         if ( delete $is_elt_drawn{$c} ) {
@@ -113,7 +118,7 @@ sub fill_pane {
         $f->pack( -side => 'top', @fx, @after );
 
         $cw->{elt_widgets}{$c} = $f;
-        my $label = $f->Label( -text => $c, -width => 22, -anchor => 'w' );
+        my $label = $f->Label( -text => $c, -font => $font, -width => 22, -anchor => 'w' );
         $label->pack(qw/-side left -fill x -anchor w/);
 
         my $help = $node->get_help_as_text( summary => $c ) || $node->get_help_as_text( description => $c );
@@ -137,7 +142,7 @@ sub fill_pane {
             }
 
             if ( $v_type =~ /boolean/ ) {
-                my $e = $f->Checkbutton( -variable => \$v, -command => $store_sub )
+                my $e = $f->Checkbutton( -variable => \$v, -font => $font, -command => $store_sub )
                     ->pack(qw/-side left -anchor w/);
                 next;
             }
@@ -147,6 +152,7 @@ sub fill_pane {
                 require Tk::BrowseEntry;
                 my $e = $f->BrowseEntry(
                     -variable  => \$v,
+                    -font => $font,
                     -browsecmd => $store_sub,
                     -choices   => \@choices
                 )->pack( qw/-side left -anchor w/, @fxe1 );
@@ -163,7 +169,7 @@ sub fill_pane {
         };
         my $edb = $f->Button(
             -text    => '...',
-            -font    => [ -size => 6 ],
+            -font => $font,
             -command => $edit_sub
         );
         $edb->pack( -anchor => 'w' );
@@ -186,10 +192,12 @@ sub add_accept_entry {
     my $f = $cw->Frame( -relief => 'groove', -borderwidth => 1 );
     $f->pack( -side => 'top', @fx );
 
-    my $accepted = '';
-    $f->Label( -text => 'accept : /' . join( '/, /', @rexp ) . '/' )->pack;
+    my $font = $cw->{my_font}; #cget('-font');
 
-    my $e = $f->Entry( -textvariable => \$accepted )->pack( qw/-side left -anchor w/, @fxe1 );
+    my $accepted = '';
+    $f->Label( -text => 'accept : /' . join( '/, /', @rexp ) . '/', -font => $font )->pack;
+
+    my $e = $f->Entry( -textvariable => \$accepted, -font => $font)->pack( qw/-side left -anchor w/, @fxe1 );
     my $sub = sub {
         return unless $accepted;
         my $ok = 0;

@@ -1,0 +1,52 @@
+/* light-background.css */
+
+/* Example stylesheet for use with Dancer2::Plugin::SyntaxHighlight::Perl */
+
+/* Blocks displaying syntax-highlighted Perl code */
+
+.perl-code-caption {
+    width:       95%;
+    margin:      1em auto;
+}
+/* links to download perl code are styled in style.css */
+
+.perl-code {
+    border:           1px solid #000000;
+    border-radius:    2px;
+    width:            95%;
+    margin:           .25em;
+    padding:          .25em;
+    background-color: #f5f5f5;
+    font-family:      'Lucida Console', monospace;
+    font-size:        100%;
+    white-space:      pre-wrap;
+}
+
+/* Class names from PPI::HTML */
+/* Colors based on meta::cpan style 11/2017 */
+
+.keyword   { color: #006699; font-weight: bold }
+.pragma    { color: #000000; }
+.structure { color: #000000; }
+.words     { color: #0000ff; }
+.word      { color: #cc0000; }
+.number    { color: #000000; }
+.operator  { color: #006699; font-weight: bold }
+.single    { color: #0000ff; }
+.double    { color: #0000ff; }
+.symbol    { color: #aa7700; }
+.magic     { color: #aa7700; }
+.separator { color: #008200; }
+.comment   { color: #008200; }
+
+/* Extra classes */
+.prompt    { color: #008200; font-weight: bold }
+.output    { color: #000000; }
+
+span.line_number {
+    margin-top: 0;
+    margin-bottom: 0;
+    background-color: #f2eeee;
+    color: #9b9999 !important;
+} /* IE indents via margin-left */
+

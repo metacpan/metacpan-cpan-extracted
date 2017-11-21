@@ -1,3 +1,15 @@
+0.09 2017-11-19T08:01:06+01:00
+ - Add EXAMPLE5 section to doc.
+ - Add test for ok_map_functions().
+ - Fix Makefile.PL for new version of Perl and no default »use lib '.'«.
+ - Fix author test dependencies.
+ - Remove bad test.
+ - Update Module::Install to 1.18 version.
+ - Update README file.
+ - Update author name.
+ - Update copyright years to 2017.
+ - Update to Map::Tube 3.37.
+
 0.08 2015-10-23T10:20:03+02:00
  - Implement station order.
  - Improve comment in tests.

@@ -7,7 +7,7 @@ use Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(future);
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use overload '&{}' => sub { my $self = shift; sub { $self->join() } };
 

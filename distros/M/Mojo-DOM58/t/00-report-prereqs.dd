@@ -18,6 +18,9 @@ do { my $x = {
                                       'List::Util' => '0',
                                       'Scalar::Util' => '0',
                                       'perl' => '5.008001'
+                                    },
+                      'suggests' => {
+                                      'Role::Tiny' => '2.000001'
                                     }
                     },
        'test' => {

@@ -12,9 +12,9 @@ build_requires:
   warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '6.17'
-  Module::Build::Tiny: '0.039'
+  Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.032, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001'
+generated_by: 'Dist::Milla version v1.0.18, Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,18 +22,18 @@ meta-spec:
 name: Geo-UK-Postcode-CodePointOpen
 no_index:
   directory:
-    - t
-    - xt
-    - inc
-    - share
     - eg
     - examples
+    - inc
+    - share
+    - t
+    - xt
 provides:
   Geo::UK::Postcode::CodePointOpen:
     file: lib/Geo/UK/Postcode/CodePointOpen.pm
-    version: '0.006'
+    version: '0.007'
 requires:
-  Geo::Coordinates::OSGB: '2.12'
+  Geo::Coordinates::OSGB: '2.20'
   Geo::UK::Postcode::Regex: '0'
   List::MoreUtils: '0'
   Moo: '0'
@@ -45,6 +45,7 @@ resources:
   bugtracker: https://github.com/mjemmeson/Geo-UK-Postcode-CodePointOpen/issues
   homepage: https://github.com/mjemmeson/Geo-UK-Postcode-CodePointOpen
   repository: https://github.com/mjemmeson/Geo-UK-Postcode-CodePointOpen.git
-version: '0.006'
+version: '0.007'
 x_contributors:
   - 'Tom Hukins <tom@eborcom.com>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

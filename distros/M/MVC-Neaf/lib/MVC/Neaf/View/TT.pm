@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = 0.17;
+our $VERSION = 0.18;
 
 =head1 NAME
 
@@ -27,6 +27,8 @@ MVC::Neaf::View::TT - Template toolkit-based view module for Neaf.
 use Carp;
 use Template;
 
+our @CARP_NOT = qw(MVC::Neaf::View MVC::Neaf MVC::Neaf::Request);
+
 use parent qw(MVC::Neaf::View);
 
 =head2 new( %options )
@@ -34,6 +36,8 @@ use parent qw(MVC::Neaf::View);
 %options may include:
 
 =over
+
+=item * template - default template to use.
 
 =item * preserve_dash - don't strip dashed options. Useful for debugging.
 
@@ -73,8 +77,10 @@ sub render {
     my ($self, $data) = @_;
 
     my $template = $data->{-template} || $self->{template};
-    return ('', "text/plain")
-        unless $template;
+
+    if (!defined $template) {
+        croak __PACKAGE__.": -template option is required";
+    };
 
     my $out;
     $self->{engine}->process( $template, $data, \$out )

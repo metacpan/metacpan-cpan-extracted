@@ -1,5 +1,5 @@
 package Moose::Exception::CannotGenerateInlineConstraint;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -26,4 +26,5 @@ sub _build_message {
     return "Can't generate an inline constraint for $type, since none was defined";
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

@@ -263,12 +263,24 @@ $status = $mrfu->update( $faux_context );
 is( $status->level, 'ERR' );
 is( $status->code, 'DOCHAZKA_DBI_ERR' );
 
-note( "Mrs. Fu is Mr. Fu's supervisor" );
+note( "Load Mr. Fu employee object" );
 $status = App::Dochazka::REST::Model::Employee->load_by_nick( $dbix_conn, 'mrfu' );
 is( $status->code, 'DISPATCH_RECORDS_FOUND', "Nick mrsfu exists" );
 $mrfu = $status->payload;
 
-note( "Mr. Fu's supervisor changed to $eid_of_mrsfu" );
+note( "Mr. Fu has no reports" );
+$status = $mrfu->has_reports( $dbix_conn );
+is( $status->level, 'OK' );
+is( $status->code, 'DISPATCH_EMPLOYEE_HAS_REPORTS_EID' );
+is( $status->payload, 0 );
+
+note( "Mrs. Fu has no reports" );
+$status = $mrfu->has_reports( $dbix_conn );
+is( $status->level, 'OK' );
+is( $status->code, 'DISPATCH_EMPLOYEE_HAS_REPORTS_EID' );
+is( $status->payload, 0 );
+
+note( "Change Mr. Fu's supervisor to Mrs. Fu (EID $eid_of_mrsfu)" );
 $mrfu->supervisor( $eid_of_mrsfu );
 $status = $mrfu->update( $faux_context );
 ok( $status->ok, "UPDATE status is OK" );
@@ -279,6 +291,18 @@ $status = $emp->team_nicks( $dbix_conn );
 is( $status->level, 'OK' );
 is( $status->code, 'DISPATCH_LIST_EMPLOYEE_NICKS_TEAM' );
 is_deeply( $status->payload, [ 'mrfu' ] );
+
+note( "Mr. Fu still has no reports" );
+$status = $mrfu->has_reports( $dbix_conn );
+is( $status->level, 'OK' );
+is( $status->code, 'DISPATCH_EMPLOYEE_HAS_REPORTS_EID' );
+is( $status->payload, 0 );
+
+note( "Mrs. Fu now has 1 report" );
+$status = $emp->has_reports( $dbix_conn );
+is( $status->level, 'OK' );
+is( $status->code, 'DISPATCH_EMPLOYEE_HAS_REPORTS_EID' );
+is( $status->payload, 1 );
 
 note( "attempt to change Mrs. Fu's EID" );
 my $saved_eid = $emp->eid;

@@ -13,6 +13,9 @@ lib/Moxie/Enum.pm
 lib/Moxie/Object.pm
 lib/Moxie/Object/Immutable.pm
 lib/Moxie/Traits/Provider.pm
+lib/Moxie/Traits/Provider/Accessor.pm
+lib/Moxie/Traits/Provider/Constructor.pm
+lib/Moxie/Traits/Provider/Experimental.pm
 t/000-samples/000-synopsis.t
 t/000-samples/001-point.t
 t/000-samples/002-bank-account.t

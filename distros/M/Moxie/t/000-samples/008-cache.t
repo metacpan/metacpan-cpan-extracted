@@ -11,14 +11,15 @@ BEGIN {
 }
 
 package Cache {
-    use Moxie;
+    use Moxie
+        traits => [':experimental'];
 
     extends 'Moxie::Object';
 
     has '_fetcher' => ( required => 1 );
     has '_data';
 
-    sub BUILDARGS : init( fetcher => _fetcher );
+    sub BUILDARGS : strict( fetcher => _fetcher );
 
     sub data ($self) : lazy(_data) { $self->{_fetcher}->() }
 

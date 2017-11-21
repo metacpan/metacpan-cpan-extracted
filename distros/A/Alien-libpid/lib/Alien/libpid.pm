@@ -7,7 +7,7 @@ package Alien::libpid;
 
 use parent 'Alien::Base';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =pod
 
@@ -33,7 +33,6 @@ L<http://github.com/athreef/Alien-libpid>
 
 =head1 SEE ALSO
 
-L<Alien>
 L<libpid|http://github.com/a3f/libpid>
 
 =head1 AUTHOR

@@ -1,5 +1,5 @@
 package QBit::Application::Model::DB::mysql;
-$QBit::Application::Model::DB::mysql::VERSION = '0.015';
+$QBit::Application::Model::DB::mysql::VERSION = '0.017';
 use qbit;
 
 use base qw(QBit::Application::Model::DB);
@@ -15,13 +15,9 @@ sub filter {
 }
 
 sub query {
-    my ($self) = @_;
+    my ($self, %opts) = @_;
 
-    return QBit::Application::Model::DB::mysql::Query->new(db => $self);
-}
-
-sub get_query_id {
-    return $_[0]->dbh->{"mysql_thread_id"};
+    return QBit::Application::Model::DB::mysql::Query->new(db => $self, %opts);
 }
 
 sub transaction {
@@ -48,6 +44,12 @@ sub _do {
     };
 
     return $res;
+}
+
+sub kill_query {
+    my ($self, $query_id) = @_;
+
+    $self->_do("KILL QUERY $query_id");
 }
 
 sub _get_table_class {
@@ -179,37 +181,41 @@ B<Example:>
 
   my $filter = $app->db->filter([id => '=' => \23]);
 
-=head2 get_query_id
-
-B<No arguments.>
-
-Returns a current query ID or undef
-
-B<Return values:>
-
-=over
-
-=item
-
-B<$query_id> - number
-
-=back
-
-B<Example:>
-
-  my $query_id = $app->db->get_query_id();
-
 =head2 query
-
-B<No arguments.>
 
 Create and returns a new query object.
 
+B<Arguments:>
+
+=over
+
+=item *
+
+B<%opts> - options
+
+=over
+
+=item *
+
+comment
+
+=item *
+
+without_check_fields
+
+=item *
+
+without_table_alias
+
+=back
+
+=back
+
 B<Return values:>
 
 =over
 
-=item
+=item *
 
 B<$query> - object (QBit::Application::Model::DB::mysql::Query)
 
@@ -217,7 +223,35 @@ B<$query> - object (QBit::Application::Model::DB::mysql::Query)
 
 B<Example:>
 
-  my $query = $app->db->query();
+  my $query = $app->db->query(comment => 'example query');
+
+=head2 kill_query
+
+B<Arguments:>
+
+=over
+
+=item *
+
+B<$query_id> - number (ID query)
+
+=back
+
+B<Return values:>
+
+=over
+
+=item *
+
+B<$res> - Returns the number of rows affected or undef on error.
+
+A return value of -1 means the number of rows is not known, not applicable, or not available.
+
+=back
+
+B<Example:>
+
+  my $res = $app->db->kill_query(35); #SQL: KILL QUERY 35;
 
 =head2 transaction
 
@@ -225,7 +259,7 @@ B<Arguments:>
 
 =over
 
-=item
+=item *
 
 B<$sub> - reference to sub
 

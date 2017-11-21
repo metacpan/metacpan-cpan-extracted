@@ -41,6 +41,7 @@ sub start {
 
   require Mojo::Redis2;
 
+  $self->{parent_pid} = $$;
   if ($self->{pid} = fork) {    # parent
     $self->{config} = \%config;
     $self->{url} = sprintf 'redis://x:%s@%s:%s/', map { $_ // '' } @config{qw( requirepass bind port )};
@@ -92,7 +93,7 @@ sub _wait_for_server_to_start {
   die $e;
 }
 
-sub DESTROY { shift->stop; }
+sub DESTROY { $_[0]->stop if ($_[0]{parent_pid} // 0) == $$; }
 
 1;
 

@@ -1,5 +1,5 @@
 package Moose::Exception::AddParameterizableTypeTakesParameterizableType;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -15,4 +15,5 @@ sub _build_message {
     "Type must be a Moose::Meta::TypeConstraint::Parameterizable not ".$self->type_name;
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

@@ -4,7 +4,7 @@
 package Lingua::Interset::Tagset::FA::Conll;
 use strict;
 use warnings;
-our $VERSION = '3.007';
+our $VERSION = '3.008';
 
 use utf8;
 use open ':utf8';
@@ -704,7 +704,7 @@ Lingua::Interset::Tagset::FA::Conll - Driver for the tagset of the Persian Depen
 
 =head1 VERSION
 
-version 3.007
+version 3.008
 
 =head1 SYNOPSIS
 

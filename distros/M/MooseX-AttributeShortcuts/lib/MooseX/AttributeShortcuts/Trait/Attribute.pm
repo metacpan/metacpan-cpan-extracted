@@ -9,7 +9,7 @@
 #
 package MooseX::AttributeShortcuts::Trait::Attribute;
 our $AUTHORITY = 'cpan:RSRCHBOY';
-$MooseX::AttributeShortcuts::Trait::Attribute::VERSION = '0.036';
+$MooseX::AttributeShortcuts::Trait::Attribute::VERSION = '0.037';
 # ABSTRACT: Shortcuts attribute trait proper
 
 use namespace::autoclean;
@@ -117,6 +117,9 @@ sub _mxas_process_options {
     $class->_mxas_is_rwp($name, $options, $_has, $_opt, $_ref);
     $class->_mxas_is_lazy($name, $options, $_has, $_opt, $_ref);
 
+    # handle: init_arg => 1/-1
+    $class->_mxas_init_arg($name, $options, $_has, $_opt, $_ref);
+
     # handle: builder => 1, builder => sub { ... }
     $class->_mxas_builder($name, $options, $_has, $_opt, $_ref);
 
@@ -191,6 +194,25 @@ sub _mxas_is_rwp {
 
     $options->{is}     = 'ro';
     $options->{writer} = $class->_mxas_private_writer_name($name);
+
+    return;
+}
+
+# handle: init_arg => 1/-1
+sub _mxas_init_arg {
+    my ($class, $name, $options, $_has, $_opt, $_ref) = @_;
+
+    return unless exists $options->{init_arg};
+
+    my $one     = ($name !~ /^_/) ? $name : $name;
+    my $not_one = ($name !~ /^_/) ? "_$name" : do { (local $_ = $name) =~ s/^_//; $_ };
+
+    $options->{init_arg}
+        = ! defined $options->{init_arg} ? return
+        : "$options->{init_arg}" eq 1  ? $one
+        : "$options->{init_arg}" eq -1 ? $not_one
+        :                                $options->{init_arg}
+        ;
 
     return;
 }
@@ -378,7 +400,7 @@ MooseX::AttributeShortcuts::Trait::Attribute - Shortcuts attribute trait proper
 
 =head1 VERSION
 
-This document describes version 0.036 of MooseX::AttributeShortcuts::Trait::Attribute - released October 31, 2017 as part of MooseX-AttributeShortcuts.
+This document describes version 0.037 of MooseX::AttributeShortcuts::Trait::Attribute - released November 20, 2017 as part of MooseX-AttributeShortcuts.
 
 =head1 DESCRIPTION
 

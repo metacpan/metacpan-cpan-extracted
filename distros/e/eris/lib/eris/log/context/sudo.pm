@@ -1,4 +1,5 @@
 package eris::log::context::sudo;
+# ABSTRACT: Parses the sudo key=value pairs into structured documents
 
 use Const::Fast;
 use Moo;
@@ -7,12 +8,8 @@ with qw(
 );
 use namespace::autoclean;
 
-const my %MAP => (
-    TTY     => 'dev',
-    COMMAND => 'exe',
-    PWD     => 'location',
-    USER    => 'dst_user',
-);
+our $VERSION = '0.004'; # VERSION
+
 
 sub sample_messages {
     my @msgs = split /\r?\n/, <<'EOF';
@@ -22,13 +19,21 @@ EOF
     return @msgs;
 }
 
+
+const my %MAP => (
+    TTY     => 'dev',
+    COMMAND => 'exe',
+    PWD     => 'location',
+    USER    => 'dst_user',
+);
+
 sub contextualize_message {
     my ($self,$log) = @_;
     my $str = $log->context->{message};
 
     my %ctxt = ();
 
-    my ($user,$variables) = split ' : ', $str;
+    my ($user,$variables) = split ' : ', $str, 2;
     if( defined $variables ) {
         chomp($variables);
         foreach my $pair (split ' ; ', $variables) {
@@ -40,12 +45,13 @@ sub contextualize_message {
     }
     if( exists $ctxt{exe} ) {
         $ctxt{file} = (split /\s+/, $ctxt{exe})[0];
-        $ctxt{action} = 'exec';
+        $ctxt{action} = 'execute';
     }
     $ctxt{src_user} = $user if $user;
 
-    $log->add_context($self->name,\%ctxt);
+    $log->add_context($self->name,\%ctxt) if keys %ctxt;
 }
+
 
 1;
 
@@ -57,11 +63,35 @@ __END__
 
 =head1 NAME
 
-eris::log::context::sudo
+eris::log::context::sudo - Parses the sudo key=value pairs into structured documents
 
 =head1 VERSION
 
-version 0.003
+version 0.004
+
+=head1 SYNOPSIS
+
+Translates the sudo syslog lines containing "key=value" to structured documents.
+
+=head1 METHODS
+
+=head2 contextualize_message
+
+Transforms the sudo syslog messages into structured data.
+
+    dev      => TTY
+    exe      => COMMAND
+    location => PWD
+    dst_user => USER
+    src_user => from the syslog header
+    action   => literal string 'execute'
+    file     => extracts just the executeable from the 'exe' parameter
+
+=for Pod::Coverage sample_messages
+
+=head1 SEE ALSO
+
+L<eris::log::contextualizer>, L<eris::role::context>
 
 =head1 AUTHOR
 

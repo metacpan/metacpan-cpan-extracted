@@ -4,7 +4,7 @@
       "Martin Becker <becker-cpan-mp@cozap.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.28, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -33,7 +33,7 @@
       },
       "runtime" : {
          "recommends" : {
-            "Math::BigNum" : "0",
+            "Math::AnyNum" : "0",
             "Math::Complex" : "0",
             "Math::ModInt" : "0"
          },
@@ -47,14 +47,14 @@
    "provides" : {
       "Math::Polynomial" : {
          "file" : "lib/Math/Polynomial.pm",
-         "version" : "1.013"
+         "version" : "1.014"
       },
       "Math::Polynomial::Generic" : {
          "file" : "lib/Math/Polynomial/Generic.pm",
-         "version" : "1.013"
+         "version" : "1.014"
       }
    },
    "release_status" : "stable",
-   "version" : "1.013",
+   "version" : "1.014",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

@@ -1,3 +1,12 @@
+1.58 2017-11-15 rurban
+----
+  * Drop 5.005 support
+  * Switch from DynaLoader to XSLoader [atoomic #5]
+  * Replace use vars by our. [atoomic #5]
+  * Lazy load Carp only when required. [atoomic #5]
+  * Minor test improvements
+  * Fix v5.8 cast warnings
+
 1.57 2017-01-22 rurban
 ----
   * Todo the t/exec.t test 2 on cygwin.

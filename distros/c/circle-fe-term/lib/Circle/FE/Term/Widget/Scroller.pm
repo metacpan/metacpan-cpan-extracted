@@ -188,12 +188,37 @@ sub _apply_formatting
 
          my @parts = ref $val eq "ARRAY" ? @$val : ( $val );
 
+         my $is_initial = 1;
+         my $needs_linefeed;
+
          foreach my $part ( @parts ) {
             my ( $text, %format ) = ref $part eq "ARRAY" ? @$part : ( $part );
 
+            $str->append( "\n" ) if $needs_linefeed; $needs_linefeed = 0;
+
+            # Convert some tags
+            if( delete $format{m} ) {
+               # Monospace
+               $format{af} = 1;
+               $format{bg} = "#303030";
+            }
+            if( delete $format{bq} ) {
+               # Quoted text
+               $format{bg} = "#303030";
+               $format{fg} = "#00C0C0";
+
+               # blockquotes get to be on their own line, with "> " prefixed on each
+               $text = join( "\n", map { "> $_" } split m/\n/, $text );
+
+               # surround the text by linefeeds
+               $str->append( "\n" ) if !$is_initial;
+               $needs_linefeed++;
+            }
+
             # Tickit::Widget::Scroller::Item::Text doesn't like C0, C1 or DEL
             # control characters. Replace them with U+FFFD
-            $text =~ s/[\x00-\x1f\x80-\x9f\x7f]/\x{fffd}/g;
+            # Be sure to leave linefeed alone
+            $text =~ s/[\x00-\x09\x0b-\x1f\x80-\x9f\x7f]/\x{fffd}/g;
 
             foreach (qw( fg bg )) {
                defined $format{$_} or next;
@@ -201,6 +226,8 @@ sub _apply_formatting
             }
 
             $str->append_tagged( $text, %format );
+
+            $is_initial = 0;
          }
       }
       elsif( $format =~ m/^\{/ ) {

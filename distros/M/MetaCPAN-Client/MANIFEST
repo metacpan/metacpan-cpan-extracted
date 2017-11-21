@@ -15,6 +15,7 @@ examples/author.pl
 examples/author_releases.pl
 examples/authors_blogs.pl
 examples/autocomplete.pl
+examples/autocomplete_suggest.pl
 examples/changes.pl
 examples/complex-either-and.pl
 examples/complex-either-not.pl

@@ -15,7 +15,7 @@ has _json_validator => sub { state $v = JSON::Validator->new; };
 sub load_and_validate_schema {
   my ($self, $spec, $args) = @_;
 
-  $spec = $self->_explode($self->_reset->_resolve($spec)) if $args->{allow_invalid_ref};
+  $spec = $self->bundle({replace => 1, schema => $spec}) if $args->{allow_invalid_ref};
   local $args->{schema} = $args->{schema} || SPECIFICATION_URL;
   $self->SUPER::load_and_validate_schema($spec, $args);
 
@@ -145,10 +145,10 @@ sub validate_response {
   }
 }
 
-sub _register_ref {
-  my ($self, $topic, $schema_url) = @_;
+sub _resolve_ref {
+  my ($self, $topic, $url) = @_;
   $topic->{'$ref'} = "#/definitions/$topic->{'$ref'}" if $topic->{'$ref'} =~ /^\w+$/;
-  return $self->SUPER::_register_ref($topic, $schema_url);
+  return $self->SUPER::_resolve_ref($topic, $url);
 }
 
 sub _validate_request_value {

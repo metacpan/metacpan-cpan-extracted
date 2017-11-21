@@ -1,6 +1,7 @@
-Build.PL
+alienfile
 Changes
 lib/Alien/OpenSSL.pm
+Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 META.json
@@ -9,4 +10,6 @@ README
 t/00-use.t
 t/01-signature.t
 t/author-pod.t
-SIGNATURE    Added here by Module::Build
+t/ffi.t
+t/xs.t
+SIGNATURE                                Public-key signature (added by MakeMaker)

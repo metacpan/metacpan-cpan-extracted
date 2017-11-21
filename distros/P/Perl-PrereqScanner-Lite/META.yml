@@ -8,9 +8,10 @@ build_requires:
 configure_requires:
   CPAN::Meta: '0'
   CPAN::Meta::Prereqs: '0'
-  Module::Build: '0.38'
+  Module::Build: '0'
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Minilla/v3.0.13, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,7 +30,7 @@ no_index:
 provides:
   Perl::PrereqScanner::Lite:
     file: lib/Perl/PrereqScanner/Lite.pm
-    version: '0.26'
+    version: '0.28'
   Perl::PrereqScanner::Lite::Constants:
     file: lib/Perl/PrereqScanner/Lite/Constants.pm
   Perl::PrereqScanner::Lite::Scanner::Moose:
@@ -47,6 +48,8 @@ resources:
   bugtracker: https://github.com/moznion/Perl-PrereqScanner-Lite/issues
   homepage: https://github.com/moznion/Perl-PrereqScanner-Lite
   repository: git://github.com/moznion/Perl-PrereqScanner-Lite.git
-version: '0.26'
+version: '0.28'
 x_contributors:
+  - 'Chris Reinhardt <creinhardt@liquidweb.com>'
   - 'Kenichi Ishigaki <ishigaki@cpan.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

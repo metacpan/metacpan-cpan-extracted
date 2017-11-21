@@ -1,5 +1,5 @@
 package Moose::Exception::RoleExclusionConflict;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -23,4 +23,5 @@ sub _build_message {
     return "Conflict detected: $role_noun $all_roles $verb role '$role_name'";
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

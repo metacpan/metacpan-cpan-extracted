@@ -1,5 +1,13 @@
 Revision history for Perl extension Perl-PrereqScanner-Lite
 
+0.28 2017-11-17T07:02:04Z
+
+    - Fix tests: problem of `@INC` doesn't contain current dir (Fixed #18)
+
+0.27 2017-11-17T02:11:36Z
+
+    - Fix v_string test to work with modern version.pm (@ctriv++)
+
 0.26 2015-05-14T16:15:05Z
 
     - Fix moose scanner (@charsbar++)

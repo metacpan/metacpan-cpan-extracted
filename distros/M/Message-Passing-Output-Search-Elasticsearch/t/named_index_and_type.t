@@ -7,10 +7,20 @@ use Message::Passing::Output::Search::Elasticsearch;
 use Search::Elasticsearch::Client::5_0::Async::Bulk;
 use Search::Elasticsearch;
 use AnyEvent;
+use File::Temp qw( tempdir );
+
+my $tempdir = tempdir( CLEANUP => 1);
 
 my $server =
     Search::Elasticsearch::TestServer->new(
-    es_home => '/usr/share/elasticsearch' );
+        es_home     => '/usr/share/elasticsearch',
+        es_version  => '5_0',
+        conf        => [
+            "path.conf=$tempdir",
+            "path.data=$tempdir",
+            "path.logs=$tempdir",
+        ]
+    );
 
 my $nodes;
 

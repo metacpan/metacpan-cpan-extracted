@@ -1,5 +1,5 @@
 package Moose::Exception::ClassDoesTheExcludedRole;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -18,4 +18,5 @@ sub _build_message {
     return "The class $class_name does the excluded role '$excluded_role_name'";
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

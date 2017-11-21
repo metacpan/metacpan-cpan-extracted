@@ -1,5 +1,32 @@
 Changes file for Dancer2::Logger::LogAny
 
+0.9912    2017-11-12 15:39:21-05:00 America/New_York
+
+  - Require minimum v1.049 for Log::Any::Adapter
+
+0.9911    2017-11-12 10:08:23-05:00 America/New_York
+
+  - Add Test::More to build deps
+  - Add MetaProvides::Package dzil plugin
+  - Add GitHub::Meta dzil plugin
+
+0.9910    2017-11-11 22:34:19-05:00 America/New_York
+
+  - Add Perl minimum version to prereqs
+  - Exclude dist.ini (and weaver.ini) from build
+
+0.9909    2017-11-11 18:51:51-05:00 America/New_York
+
+  - Document the example/ directory
+  - Update dist.ini
+  - Use Pod::Weaver but not '=method'
+
+0.9908    2017-11-11 18:37:46-05:00 America/New_York
+
+  - Require Dancer2 min v0.157 (for to_app())
+  - Drop obsolete import tag ':syntax'
+  - Add an example application using the logger
+
 0.9907    2017-09-18 14:14:10-04:00 America/New_York
 
   - Add missing dependencies

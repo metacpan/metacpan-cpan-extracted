@@ -1,5 +1,18 @@
 Revision history for MVC-Neaf
 
+Mon Nov 20 2017
+
+        - TST Rework examples to use the new declarative get+post syntax
+        - API BREAK Use -view=>JS by default; switch to TT & issue warning if -template seen
+        - API Add experimental predefined param_regex to route
+        - TPL Add non-hash response support to JS view via -serial return key
+        - DEV Add req->endpoint_origin method for file:line where current handler was defined
+        - API BREAK Deprecate set_full_path() for good
+        - DEV run_test(): add support for body, hash cookies, https
+        - CLI More details in --list output
+        - REF A BIG refactoring of core, handle_request() broken down
+        - BUG Lots of bug fixes
+
 0.17    Fri Apr 28 2017
         - API Add postmodern sugar: get + post '/path' => sub { ... }.
         - API Add put(), head() prototyped sugar.

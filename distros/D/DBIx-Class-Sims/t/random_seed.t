@@ -4,8 +4,10 @@ use strictures 2;
 use Test::More;
 use Test::Deep;
 
+use lib 't/lib';
+
 BEGIN {
-  use t::loader qw(build_schema);
+  use loader qw(build_schema);
   build_schema([
     Artist => {
       table => 'artists',
@@ -31,7 +33,7 @@ BEGIN {
   ]);
 }
 
-use t::common qw(sims_test);
+use common qw(sims_test);
 
 subtest "Same random value when reusing a seed" => sub {
   my ($email, $seed);

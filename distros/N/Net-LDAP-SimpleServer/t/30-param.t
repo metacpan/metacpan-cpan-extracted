@@ -3,7 +3,7 @@ use warnings;
 use Test::More;
 
 use lib 't/lib';
-use Helper qw(server_ok server_nok);
+use Helper qw/:PARAMS/;
 
 # undef or empty hash
 server_nok( undef, 'should not work without parameters' );

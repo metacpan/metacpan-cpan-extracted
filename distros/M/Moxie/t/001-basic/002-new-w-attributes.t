@@ -25,7 +25,8 @@ of the case.
 our $BAZ; BEGIN { $BAZ = [] };
 
 package Foo {
-    use Moxie;
+    use Moxie
+        traits => [':experimental'];
 
     extends 'Moxie::Object';
 
@@ -50,7 +51,8 @@ is( $foo->bar->{'baz'}, $BAZ, '... these are the same values' );
 }
 
 package Bar {
-    use Moxie;
+    use Moxie
+        traits => [':experimental'];
 
     extends 'Moxie::Object';
 

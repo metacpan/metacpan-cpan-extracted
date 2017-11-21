@@ -1,5 +1,5 @@
 package Moose::Exception::InstanceBlessedIntoWrongClass;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -10,4 +10,5 @@ sub _build_message {
     "Objects passed as the __INSTANCE__ parameter must already be blessed into the correct class, but ".$self->instance." is not a " . $self->class_name;
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

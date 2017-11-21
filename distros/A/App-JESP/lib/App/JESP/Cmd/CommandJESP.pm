@@ -1,5 +1,5 @@
 package App::JESP::Cmd::CommandJESP;
-$App::JESP::Cmd::CommandJESP::VERSION = '0.013';
+$App::JESP::Cmd::CommandJESP::VERSION = '0.015';
 
 use base qw/App::JESP::Cmd::Command/;
 use strict; use warnings;

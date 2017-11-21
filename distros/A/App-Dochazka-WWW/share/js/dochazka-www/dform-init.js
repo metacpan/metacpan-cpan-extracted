@@ -102,7 +102,7 @@ define ([
         target.push('createMultipleInt', {
             'name': 'createMultipleInt',
             'type': 'dform',
-            'menuText': 'Multiple intervals (\"Fillup\")',
+            'menuText': 'Create multiple',
             'title': 'Create multiple intervals according to schedule',
             'preamble': "Hints: (1) TAB or ENTER to validate and advance to next field " +
                         "(2) enter month by name (e.g. \"June\") or number (e.g. \"6\"); " +
@@ -170,7 +170,7 @@ define ([
         target.push('createSingleInt', {
             'name': 'createSingleInt',
             'type': 'dform',
-            'menuText': 'Single interval',
+            'menuText': 'Create',
             'title': 'Create an arbitrary interval',
             'preamble': "Hints: (1) TAB or ENTER to validate and advance to next field " +
                         "(2) date YYYY-MM-DD; year is optional " +
@@ -185,6 +185,38 @@ define ([
                 entries: ['selectActivityAction', 'createSingleIntSave']
             }
         }); // createSingleInt
+
+        target.push('createLock', {
+            'name': 'createLock',
+            'type': 'dform',
+            'menuText': 'Create',
+            'title': 'Create a Lock',
+            'preamble': "Hints: (1) TAB or ENTER to validate and advance to next field ",
+            'aclProfile': 'active',
+            'entriesWrite': [entries.iNyear, entries.iNmonth,],
+            'rememberState': true,
+            'miniMenu': {
+                entries: ['createLockSave']
+            }
+        }); // createLock
+
+        target.push('createSingleIntFixedDay', {
+            'name': 'createSingleIntFixedDay',
+            'type': 'dform',
+            'menuText': 'Create',
+            'title': 'Create an arbitrary interval',
+            'preamble': "Hints: (1) TAB or ENTER to validate and advance to next field " +
+                        "(2) time range HH:MM-HH:MM " +
+                        "(3) Use 'Select activity' if you don't know activity code " +
+                        '(4) Description is optional',
+            'aclProfile': 'active',
+            'entriesRead': [entries.iNdate,],
+            'entriesWrite': [entries.iNtimerangeNoOffset, entries.iNact, entries.iNdesc,],
+            'rememberState': true,
+            'miniMenu': {
+                entries: ['selectActivityAction', 'createSingleIntSave']
+            }
+        }); // createSingleIntFixedDay
 
         target.push('displaySingleInt', {
             'name': 'displaySingleInt',
@@ -201,21 +233,30 @@ define ([
         target.push('empProfile', {
             'name': 'empProfile',
             'type': 'dform',
-            'menuText': 'My profile',
-            'title': 'My profile',
+            'menuText': 'Profile',
+            'title': 'Employee profile',
             'preamble': null,
             'aclProfile': 'passerby',
             'entriesRead': [
                 entries.ePfullname, entries.ePnick,
                 entries.ePsec_id, entries.ePemail,
-                entries.ePsuperNick, entries.ePremark,
+                entries.ePremark,
+                coreLib.emptyLineEntry,
+                entries.ePsuperNick, entries.ePhasReports,
                 coreLib.emptyLineEntry,
                 entries.ePpriv, entries.ePprivEffective,
                 coreLib.emptyLineEntry,
                 entries.ePscode, entries.ePsid, entries.ePschedEffective
             ],
             'miniMenu': {
-                entries: ['empProfileEdit', 'ldapSync', 'empProfileSetSuperSearch']
+                entries: [
+                    'actionPrivHistory',
+                    'actionSchedHistory',
+                    'empProfileEdit',
+                    'ldapSync',
+                    'empProfileSetSuperSearch',
+                    'empProfileSetSuperDelete',
+                ]
             }
         }); // empProfile
 
@@ -315,9 +356,6 @@ define ([
             'type': 'dform',
             'menuText': 'REST server',
             'title': 'REST server details',
-            'preamble': '<b>URI</b> used by this App::Dochazka::WWW instance to communicate ' +
-                        'with REST server;<br><b>version</b> of App::Dochazka::REST running ' +
-                        'on REST server',
             'aclProfile': 'admin',
             'entriesRead': [entries.rSDurl, entries.rSDversion],
             'miniMenu': {
@@ -449,10 +487,28 @@ define ([
             }
         }); // searchEmployee
 
+        target.push('updateSingleInt', {
+            'name': 'updateSingleInt',
+            'type': 'dform',
+            'menuText': 'Update',
+            'title': 'Update an interval',
+            'preamble': "Hints: (1) TAB or ENTER to validate and advance to next field " +
+                        "(2) time range HH:MM-HH:MM " +
+                        "(3) Use 'Select activity' if you don't know activity code " +
+                        '(4) Description is optional',
+            'aclProfile': 'active',
+            'entriesRead': [entries.iNdate, entries.acTaid],
+            'entriesWrite': [entries.iNtimerangeNoOffset, entries.iNact, entries.iNdesc,],
+            'rememberState': true,
+            'miniMenu': {
+                entries: ['selectActivityAction', 'updateSingleIntSave']
+            }
+        }); // updateSingleInt
+
         target.push('viewIntervalsPrep', {
             'name': 'viewIntervalsPrep',
             'type': 'dform',
-            'menuText': 'View intervals',
+            'menuText': 'View',
             'title': 'View intervals for date or range of dates',
             'preamble': "Hints: (1) TAB or ENTER to validate and advance to next field " +
                         "(2) enter month by name (e.g. \"June\") or number (e.g. \"6\"); " +
@@ -475,6 +531,24 @@ define ([
                 entries: ['viewIntervalsAction']
             }
         }); // viewIntervalsPrep
+
+        target.push('viewLocksPrep', {
+            'name': 'viewLocksPrep',
+            'type': 'dform',
+            'menuText': 'View',
+            'title': 'View locks',
+            'preamble': "Hints: (1) TAB or ENTER to validate and advance to next field " +
+                        "(2) enter month by name (e.g. \"June\") or number (e.g. \"6\"); " +
+                        "DEFAULT: current month ",
+            'aclProfile': 'inactive',
+            'entriesWrite': [
+                entries.iNyear,
+            ],
+            'rememberState': true,
+            'miniMenu': {
+                entries: ['viewLocksAction']
+            }
+        }); // viewLocksPrep
 
     }; // return function ()
     

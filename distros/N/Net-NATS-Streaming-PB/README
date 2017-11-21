@@ -1,0 +1,12 @@
+This archive contains the distribution Net-NATS-Streaming-PB,
+version 0.06:
+
+  Perl interface to NATS Streaming Google's Protocol Buffers
+  You'll need Google protobuf support to install this module.
+  On Ubuntu you can get it by:
+  apt-get install libprotobuf-dev libprotoc-dev protobuf-compiler
+
+Copyright (C) 2017 by Sergey Kolychev <sergeykolychev.github@gmail.com>
+
+This library is licensed under Apache 2.0 license https://www.apache.org/licenses/LICENSE-2.0
+

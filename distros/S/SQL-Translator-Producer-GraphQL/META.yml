@@ -4,10 +4,6 @@ author:
   - 'Ed J <etj@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  GraphQL: '0.20'
-  GraphQL::Plugin::Convert::DBIC: '0.02'
-  SQL::Translator: '0'
-  SQL::Translator::Producer::DBIx::Class::File: '0'
   Test::More: '0.98'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -23,8 +19,8 @@ no_index:
     - t
     - inc
 requires:
-  GraphQL: '0.20'
-  GraphQL::Plugin::Convert::DBIC: '0.02'
+  GraphQL: '0.21'
+  GraphQL::Plugin::Convert::DBIC: '0.03'
   SQL::Translator: '0'
   SQL::Translator::Producer::DBIx::Class::File: '0'
   perl: '5.014'
@@ -33,4 +29,4 @@ resources:
   bugtracker: https://github.com/graphql-perl/SQL-Translator-Producer-GraphQL/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/graphql-perl/SQL-Translator-Producer-GraphQL
-version: '0.03'
+version: '0.04'

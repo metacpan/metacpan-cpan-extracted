@@ -1,5 +1,11 @@
 Revision history for Circle::FE::Gtk
 
+0.173170 2017-11-14 18:57:45
+        [CHANGES]
+         * Fixes for new Net::Async::Tangence 0.13 Future-returning API
+           (RT123626)
+         * Declare dependency on Module::Pluggable (RT123627)
+
 0.130560 CHANGES:
          * Switched to date-based version numbering scheme
              http://rjbs.manxome.org/rubric/entry/1749

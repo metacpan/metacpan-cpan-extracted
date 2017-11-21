@@ -1,7 +1,7 @@
 package Devel::Chitin::OpTree::PADOP;
 use base 'Devel::Chitin::OpTree';
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use strict;
 use warnings;

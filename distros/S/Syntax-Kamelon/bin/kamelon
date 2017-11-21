@@ -1,0 +1,302 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Template;
+use Syntax::Kamelon;
+
+
+#help text for the ANSI formatter
+my $help_ansi = <<__EOF;
+
+ANSI formatter help text.
+Use the following options:
+-l -lineoffset: Starting line number. If you set this option
+                linenumbers will be shown.
+-t -theme     : Select the theme to use. Default black
+                Available themes: black, bright_black, blue, bright blue,
+                cyan, bright_cyan, green, bright_green, magenta,
+                bright_magenta, red, bright_red, yellow, bright_yellow,
+                white, bright_white.
+__EOF
+
+#help text for the Base formatter
+my $help_base = <<__EOF;
+
+Base formatter help text.
+Specify -m -formatter before the [] options.
+Use the following options:
+
+__EOF
+
+#help text for the HTML formatter
+my $help_html4 = <<__EOF;
+
+HTML4 formatter help text.
+Specify -m -formatter before the [] options.
+Use the following options:
+-c -scrolled:    [0|1] Show content in a scrolled frame.
+-f -footer:      Specify footer template.
+-o -folding:     Specify folding depth. No folding if you do not specify.
+-h -header:      Specify header template.
+-l -lineoffset:  Starting line number. If you set this option
+                 linenumbers will be shown
+-m -minfoldsize: Minimum number of lines for a valid fold.
+-p -foldpoints:  [0|1] Set folding points.
+-s -sections:    [0|1]Divide content into sections. It uses the code
+                 folding information to do this.
+-t -theme:       Select the theme to use. Default DarkGray
+                 Available themes: White, LightGray, Gray,
+                 DarkGray and Black.
+
+__EOF
+
+#main help text
+my $help_main = <<__EOF;
+
+Main help text.
+Use the following options:
+-h -help:      [main|ANSI|Base|HTML4] Displays help. Default main.
+-i -indexfile: Specify the indexfile to use. By default Kamelon's.
+-f -file:      Specify input file. By default STDIN.
+-m -formatter: [ options ] Specify formatter module.
+               Options for formatter come in between [ ].
+-n -noindex:   Do not use an index file. Index xml files manually.
+-o -output:    Specify output file. By default STDOUT.
+-s -syntax:    Specify which syntax definition to use.
+-x -xmldir:    Specifies the XML directory. By default Kamelon's.
+
+__EOF
+
+#setting up the help text depot
+my %help_depot = (
+	ANSI => $help_ansi,
+	Base => $help_base,
+	HTML4 => $help_html4,
+	main => $help_main,
+);
+
+#lay down infrastructure for handling options
+#we have 4 sets: main Base ANSI HTML
+#we fill them up later
+my %ansi_args = ();
+my %base_args = ();
+my %html4_args = ();
+my %main_args = (
+);
+my %args_depot = (
+	ANSI => \%ansi_args,
+	Base => \%base_args,
+	HTML4 => \%html4_args,
+	main => \%main_args,
+);
+
+my $inputfile;
+my $outputfile;
+my $formatter = 'ANSI';
+
+my %formatter_options = ();
+
+my %main_options = (
+	formatter => $formatter,
+);
+
+#some reusable items
+my $lineoffset_arg = sub {
+	my $lo = shift @ARGV;
+	unless (defined $lo) { die "please specify lineoffset" }
+	$formatter_options{lineoffset} = $lo;
+	return 0
+};
+
+my $theme_arg = sub {
+	my $theme = shift @ARGV;
+	unless (defined $theme) { die "please specify theme" }
+	$formatter_options{theme} = $theme;
+	return 0
+};
+
+#setting up ANSI options
+my %ansi_short_args = (
+	'-l' => $lineoffset_arg,
+	'-t' => $theme_arg,
+);
+
+%ansi_args = (%ansi_short_args,
+	-lineoffset => $ansi_short_args{'-l'},
+	-theme => $ansi_short_args{'-t'},
+);
+
+#setting up Base options
+my %base_short_args = (
+	'-p' => sub {
+		$formatter_options{template} = shift @ARGV;
+		return 0
+	},
+
+);
+
+%base_args = (%base_short_args,
+	-template => $base_short_args{'-p'},
+);
+
+#setting up HTML4 options
+my %html4_short_args = (
+	'-c' => sub {
+		$formatter_options{sections} = shift @ARGV;
+		return 0
+	},
+	'-f' => sub {
+		$formatter_options{footer} = shift @ARGV;
+		return 0
+	},
+	'-h' => sub {
+		$formatter_options{header} = shift @ARGV;
+		return 0
+	},
+	'-l' => $lineoffset_arg,
+	'-t' => $theme_arg,
+	'-s' => sub {
+		$formatter_options{scrolled} = shift @ARGV;
+		return 0
+	},
+);
+
+%html4_args = (%html4_short_args,
+	-footer => $html4_short_args{'-f'},
+	-header => $html4_short_args{'-h'},
+	-lineoffset => $html4_short_args{'-l'},
+	-sections => $html4_short_args{'-s'},
+	-theme => $html4_short_args{'-t'},
+	-scrolled => $html4_short_args{'-t'},
+);
+
+#setting up main options
+my %main_short_args = (
+	'-f' => sub { 
+		$inputfile = shift @ARGV;
+		unless (defined $inputfile) { die "please specify input file" }
+		unless (-e $inputfile) { die "inputfile '$inputfile' does not exist" }
+		return 0
+	},
+	'-h' => sub {
+		my $subject = shift @ARGV;
+		unless (defined $subject) {
+			print $help_depot{main};
+			exit
+		}
+		unless (exists $help_depot{$subject}) {
+			print $help_depot{main};
+			exit
+		}
+		print $help_depot{$subject}; 
+		exit
+	},
+	'-i' => sub {
+		my $indexfile = shift @ARGV;
+		unless (defined $indexfile) { die "please specify index file" }
+		unless (-e $indexfile) { die "indexfile '$indexfile' does not exist" }
+		$main_options{indexfile} = $indexfile;
+		return 0
+	},
+	'-m' => sub {
+		$formatter = shift @ARGV;
+		unless (defined $formatter) { die "please specify formatter module" }
+	},
+	'-n' => sub { 
+		$main_options{noindex} = 1;
+		return 0
+	},
+	'-o' => sub { 
+		$outputfile = shift @ARGV;
+		unless (defined $outputfile) { die "please specify output file name" }
+		return 0
+	},
+	'-s' => sub  {
+		my $syntax = shift @ARGV;
+		unless (defined $syntax) { die "please specify syntax name" }
+		$main_options{syntax} = $syntax;
+		return 0
+	},
+	'-x' => sub  {
+		my $xmldir = shift @ARGV;
+		unless (defined $xmldir) { die "please specify xml directory" }
+		unless (-e $xmldir) { die "$xmldir does not exist" }
+		unless (-d $xmldir) { die "$xmldir is not a directory" }
+		$main_options{xmldir} = $xmldir;
+		return 0
+	},
+);
+
+%main_args = (%main_short_args,
+	'-file' => $main_short_args{'-f'},
+	'-help' => $main_short_args{'-h'},
+	'-indexfile' => $main_short_args{'-i'},
+	'-formatter' => $main_short_args{'-f'},
+	'-noindex' => $main_short_args{'-n'},
+	'-output' => $main_short_args{'-o'},
+	'-syntax' => $main_short_args{'-s'},
+	'-xmldir' => $main_short_args{'-x'},
+);
+
+#We finally did it. All setting up done. Now we can process and collect
+# out command line options.
+&ProcessARGV('main');
+
+unless (exists $main_options{syntax}) {
+	die "You must specify the syntax option";
+}
+
+my $ifh;
+if (defined $inputfile) {
+	print "opening $inputfile\n";
+	open $ifh, '<', $inputfile or die "Could not open $inputfile; $!";
+} else {
+	$ifh = *STDIN;
+}
+
+my $ofh;
+if (defined $outputfile) {
+	open $ofh, '>', $outputfile or die "Could not open $outputfile; $!";
+} else {
+	$ofh = *STDOUT;
+}
+
+my $kam = Syntax::Kamelon->new(%main_options,
+	formatter => [ $formatter, %formatter_options	],
+);
+
+while (my $line = <$ifh>) { 
+	$kam->Parse($line) 
+}
+print $ofh, $kam->Format;
+
+if (defined $inputfile) {
+	 close $ifh
+}
+
+if (defined $outputfile) {
+	 close $ofh
+}
+
+sub ProcessARGV {
+	my $name = shift;
+	my $args = $args_depot{$name};
+	while (@ARGV) {
+		my $t = shift @ARGV;
+		if ($t eq '[') {
+			&ProcessARGV($formatter);
+		} elsif ($t eq ']') {
+			return
+		} elsif (exists $args->{$t}) {
+			print "processing $t\n";
+			my $call = $args->{$t};
+			&$call;
+		} else {
+			die "Invalid option $t.\n" . $help_depot{$name};
+		}
+	}
+}
+
+
+

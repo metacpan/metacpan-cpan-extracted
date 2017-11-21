@@ -35,7 +35,7 @@ Philippe Bruhat (BooK).
 
 2017-06-12 - v1.001
 
-Updated with the cast and characters from the Batman television series
+Updated with the cast, characters, and cameos from the Batman television series
 in Acme-MetaSyntactic-Themes version 1.050.
 
 This update is a tribute to Adam West, who passed away on June 9, 2017.

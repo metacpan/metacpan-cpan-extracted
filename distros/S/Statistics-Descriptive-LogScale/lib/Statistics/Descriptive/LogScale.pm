@@ -11,11 +11,11 @@ descriptive statistics class.
 
 =head1 VERSION
 
-Version 0.09
+Version 0.10
 
 =cut
 
-our $VERSION = 0.09;
+our $VERSION = 0.11;
 
 =head1 SYNOPSIS
 
@@ -131,12 +131,14 @@ use POSIX qw(floor ceil);
 # Fields are NOT used internally for now, so this is just a declaration
 use fields qw(
 	data count
-	linear_width base logbase floor linear_thresh logfloor
+	linear_width base logbase floor linear_thresh only_linear logfloor
 	cache
 );
 
+# Some internal constants
 # This is for infinite portability^W^W portable infinity
 my $INF = 9**9**9;
+my $re_num = qr/(?:[-+]?(?:\d+\.?\d*|\.\d+)(?:[Ee][-+]?\d+)?)/;
 
 =head2 new( %options )
 
@@ -166,6 +168,14 @@ However, user may want to specify both in some cases.
 B<NOTE> Actual value may be less (by no more than a factor of C<base>)
 so that borders of linear and logarithmic bins fit nicely.
 
+=item * only_linear = 1 (B<EXPERIMENTAL>) -
+throw away log approximation and become a discrete statistics
+class with fixed precision.
+C<linear_width> must be given in this case.
+
+B<NOTE> This obviously kills memory efficiency, unless one knows beforehand
+that all values come from a finite pool.
+
 =item * data - hashref with C<{ value => weight }> for initializing data.
 Used for cloning.
 See C<add_data_hash()>.
@@ -178,11 +188,20 @@ DEPRECATED, C<linear_width> and C<linear_thresh> override this if given.
 
 =cut
 
-my @new_keys = qw( base linear_thresh linear_width zero_thresh data );
+my @new_keys = qw( base linear_width linear_thresh data zero_thresh only_linear );
 	# TODO Throw if extra options given?
+	# TODO Check args better
 sub new {
 	my $class = shift;
 	my %opt = @_;
+
+	# First, check for only_linear option
+	if ($opt{only_linear}) {
+		$opt{linear_width}
+			or croak "only_linear option given, but no linear width";
+		$opt{only_linear} = $opt{linear_width};
+		delete $opt{$_} for qw(linear_width base linear_thresh zero_thresh);
+	};
 
 	# base for logarithmic bins, sane default: +-1%, exact decimal powers
 	# UGLY HACK number->string->number to avoid
@@ -229,6 +248,12 @@ sub new {
 		my $n_linear = ceil(2 * $self->{linear_thresh} / abs($linear_width));
 		$n_linear++ unless $n_linear % 2;
 		$self->{linear_width} = (2 * $self->{linear_thresh} / $n_linear);
+	};
+
+	if ($opt{only_linear}) {
+		$self->{linear_width} = $opt{only_linear};
+		$self->{linear_thresh} = $INF;
+		$self->{only_linear} = 1;
 	};
 
 	$self->clear;
@@ -403,6 +428,8 @@ sub variance {
 =head2 standard_deviation( $correction )
 
 =head2 std_dev
+
+=head2 stdev
 
 Return standard deviation, i.e. square root of variance.
 
@@ -646,6 +673,47 @@ sub std_moment {
 	my $dev = $self->std_dev;
 	return $self->sum_of(sub{ ($_[0] - $mean) ** $n })
 		/ ( $dev**$n * $self->{count} );
+};
+
+=head2 abs_moment( $power, [$offset] )
+
+Return $n-th moment of absolute value, that is, C<E(|x - offset|^$n)>.
+
+Default value for offset if E(x).
+Power may be fractional.
+
+B<NOTE> Experimental. Not present in Statistics::Descriptive::Full.
+
+=cut
+
+sub abs_moment {
+	my ($self, $power, $offset) = @_;
+
+	$offset = $self->mean unless defined $offset;
+	return $self->sum_of(sub{ return abs($_[0] - $offset) ** $power })
+		 / $self->{count};
+};
+
+=head2 std_abs_moment( $power, [$offset] )
+
+Returns standardized absolute moment - like above, but scaled
+down by a factor of to standard deviation to n-th power.
+
+That is, C<E(|x - offset|^$n) / E(|x - offset|^2)^($n/2)>
+
+Default value for offset if E(x).
+Power may be fractional.
+
+B<NOTE> Experimental. Not present in Statistics::Descriptive::Full.
+
+=cut
+
+sub std_abs_moment {
+    my ($self, $power, $offset) = @_;
+
+    return  $self->abs_moment($power, $offset)
+                /
+            ($self->abs_moment(2, $offset) ** ($power/2));
 };
 
 =head2 mode
@@ -940,6 +1008,7 @@ sub TO_JSON {
 		base => $self->{base},
 		linear_width => $self->{linear_width},
 		linear_thresh => $self->{linear_thresh} * ($self->{base}+9)/10,
+		only_linear => $self->{only_linear},
 		data => $self->get_data_hash,
 	};
 };
@@ -1184,6 +1253,135 @@ sub find_boundaries {
 	return ($min, $max);
 };
 
+=head2 format( "printf-like expression", ... )
+
+Returns a summary as requested by format string.
+Just as with printf and sprintf, a placeholder starts with a C<%>,
+followed by formatting options and a
+
+The following placeholders are supported:
+
+=over
+
+=item * % - a literal %
+
+=item * s, f, g - a normal printf acting on an extra argument.
+The number of extra arguments MUST match the number of such placeholders,
+or this function dies.
+
+=item * n - count;
+
+=item * m - min;
+
+=item * M - max,
+
+=item * a - mean,
+
+=item * d - standard deviation,
+
+=item * S - skewness,
+
+=item * K - kurtosis,
+
+=item * q(x) - x-th quantile (requires argument),
+
+=item * p(x) - x-th percentile (requires argument),
+
+=item * P(x) - cdf - the inferred cumulative distribution function (x)
+(requires argument),
+
+=item * e(n) - central_moment - central moment of n-th power
+(requires argument),
+
+=item * E(n) - std_moment - standard moment of n-th power (requires argument),
+
+=item * A(n) - abs_moment - absolute moment of n-th power (requires argument).
+
+=back
+
+For example,
+
+    $stat->format( "99%% results lie between %p(0.5) and %p(99.5)" );
+
+Or
+
+    for( my $i = 0; $i < @stats; $i++ ) {
+        print $stats[$i]->format( "%s-th average value is %a +- %d", $i );
+    };
+
+=cut
+
+my %format = (
+    # percent literal
+    '%' => '%',
+    # placeholders without parameters
+    n => 'count',
+    m => 'min',
+    M => 'max',
+    a => 'mean',
+    d => 'std_dev',
+    S => 'skewness',
+    K => 'kurtosis',
+    # placeholders with 1 parameter
+    q => 'quantile?',
+    p => 'percentile?',
+    P => 'cdf?',
+    e => 'central_moment?',
+    E => 'std_moment?',
+    A => 'abs_moment?',
+);
+
+my %printf = (
+    s => 1,
+    f => 1,
+    g => 1,
+);
+
+my $re_format = join "|", keys %format, keys %printf;
+$re_format = qr((?:$re_format));
+
+sub format {
+	my ($self, $format, @extra) = @_;
+
+	# FIXME this accepts %m(5), then dies - UGLY
+    # TODO rewrite this as a giant sprintf... one day...
+	$format =~ s <%([0-9.\-+ #]*)($re_format)(?:\(($re_num)?\)){0,1}>
+		< _format_dispatch($self, $2, $1, $3, \@extra) >ge;
+
+    croak __PACKAGE__.": Extra arguments in format()"
+        if @extra;
+	return $format;
+};
+
+sub _format_dispatch {
+	my ($obj, $method, $float, $arg, $extra) = @_;
+
+    # Handle % escapes
+	if ($method !~ /^[a-zA-Z]/) {
+		return $method;
+	};
+    # Handle printf built-in formats
+    if (!$format{$method}) {
+        croak __PACKAGE__.": Not enough arguments in format()"
+            unless @$extra;
+        return sprintf "%${float}${method}", shift @$extra;
+    };
+
+    # Now we know it's LogScale's own method
+    $method = $format{$method};
+	if ($method =~ s/\?$//) {
+		die "Missing argument in method $method" if !defined $arg;
+	} else {
+		die "Extra argument in method $method" if defined $arg;
+	};
+	my $result = $obj->$method($arg);
+
+	# work around S::D::Full's convention that "-inf == undef"
+	$result = -9**9**9
+		if ($method eq 'percentile' and !defined $result);
+	return sprintf "%${float}f", $result;
+};
+
 ################################################################
 #  No more public methods please
 
@@ -1216,11 +1414,13 @@ sub _memoize_method {
 	}
 	: sub {
 		my $self = shift;
-		my $arg = shift;
-		$arg = '' unless defined $arg;
+		my $arg = do {
+			no warnings 'uninitialized'; ## no critic
+			join ':', @_;
+		};
 
 		if (!exists $self->{cache}{"$name:$arg"}) {
-			$self->{cache}{"$name:$arg"} = $orig_code->($self, $arg);
+			$self->{cache}{"$name:$arg"} = $orig_code->($self, @_);
 		};
 		return $self->{cache}{"$name:$arg"};
 	};
@@ -1237,7 +1437,8 @@ foreach ( qw(sum sumsq mean min max mode) ) {
 };
 
 # Memoize methods with 1 argument
-foreach (qw(quantile central_moment std_moment standard_deviation variance)) {
+foreach (qw(quantile central_moment std_moment abs_moment standard_deviation
+	variance)) {
 	__PACKAGE__->_memoize_method($_, 1);
 };
 
@@ -1245,6 +1446,7 @@ foreach (qw(quantile central_moment std_moment standard_deviation variance)) {
 {
 	no warnings 'once'; ## no critic
 	*std_dev = \&standard_deviation;
+	*stdev = \&standard_deviation;
 };
 
 # Get number of values below $x

@@ -3,7 +3,7 @@ package Devel::Chitin::OpTree;
 use strict;
 use warnings;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use Carp;
 use Scalar::Util qw(blessed reftype weaken refaddr);
@@ -300,6 +300,15 @@ sub pre_siblings {
     });
 }
 
+sub _parse_bit_flags {
+    my($bits, %flags) = @_;
+    map {
+        $bits & $flags{$_}
+            ? $_
+            : ()
+    } sort keys %flags;
+}
+
 my %flag_values = (
     WANT_VOID => B::OPf_WANT_VOID,
     WANT_SCALAR => B::OPf_WANT_SCALAR,
@@ -310,6 +319,10 @@ my %flag_values = (
     MOD => B::OPf_MOD,
     STACKED => B::OPf_STACKED,
     SPECIAL => B::OPf_SPECIAL,
+);
+my %private_values = (
+    BARE => B::OPpCONST_BARE,
+    TARGMY => B::OPpTARGET_MY,
 );
 sub print_as_tree {
     my $self = shift;
@@ -324,13 +337,8 @@ sub print_as_tree {
             $name .= ' (ex-' . $op->_ex_name . ')';
         }
 
-        my $flags = $op->op->flags;
-        my @flags = map {
-                        $flags & $flag_values{$_}
-                            ? $_
-                            : ()
-                    }
-                    qw(WANT_VOID WANT_SCALAR WANT_LIST KIDS PARENS REF MOD STACKED SPECIAL);
+        my @flags = _parse_bit_flags($op->op->flags, %flag_values);
+        my @private = _parse_bit_flags($op->op->private, %private_values);
 
         my $mini_deparsed = '';
         if ($op->class eq 'COP') {
@@ -340,14 +348,32 @@ sub print_as_tree {
                 or $op->op->name eq 'const'
         ) {
             $mini_deparsed = $op->deparse;
+            $mini_deparsed = '' unless defined $mini_deparsed;  # multiconcat can optimze away the target of an assignment
+
+        } elsif ($op->op->name eq 'multiconcat') {
+            my($nargs, $const_str, @substr_lengths) = $op->op->aux_list($op->cv);
+            my $substr_lengths = join(',', @substr_lengths);
+
+            my $target= '';
+            if ($op->op->private & B::OPpTARGET_MY) {
+                $target = $op->_padname_sv($op->op->targ)->PV . ' = ';
+            }
+
+            push @private, _parse_bit_flags($op->op->private,
+                                              ( APPEND => &B::OPpMULTICONCAT_APPEND,
+                                                STRINGIFY => &B::OPpMULTICONCAT_STRINGIFY,
+                                                SPRINTF => &B::OPpMULTICONCAT_FAKE,
+                                              ));
+            $mini_deparsed = qq(${target}"$const_str"[$substr_lengths]);
         }
 
         my $indent = ($current_callsite and ${$op->op} == $current_callsite)
                         ? '=>' . ('  ' x($level-1))
                         : '  'x$level;
-        printf("%s%s %s (%s) %s 0x%x\n", $indent, $op->class, $name,
+        printf("%s%s %s (%s) %s %s 0x%x\n", $indent, $op->class, $name,
                                  join(', ', @flags),
                                  $mini_deparsed,
+                                join(', ', @private),
                                  $current_callsite ? ${$op->op} : refaddr($op));
     });
 }
@@ -830,8 +856,14 @@ sub is_postfix_loop {
 sub _quote_sv {
     my($self, $sv, %params) = @_;
     my $string = $sv->PV;
+    $self->_quote_string($string, %params);
+}
 
-    my $quote = ($params{skip_quotes} or $self->op->private & B::OPpCONST_BARE)
+sub _quote_string {
+    my($self, $string, %params) = @_;
+
+    # Seems that multiconcat can have the BARE flag set erroneously? on 5.27.6
+    my $quote = ($params{skip_quotes} or ($self->op->private & B::OPpCONST_BARE and $self->op->name ne 'multiconcat'))
                     ? ''
                     : q(');
     if ($string =~ m/[\000-\037]/ and !$params{regex_x_flag}) {

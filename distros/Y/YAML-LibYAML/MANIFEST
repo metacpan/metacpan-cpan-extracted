@@ -42,6 +42,9 @@ t/api.t
 t/ascii.t
 t/author-pod-syntax.t
 t/blessed.t
+t/boolean-boolean.t
+t/boolean-invalid.t
+t/boolean-jsonpp.t
 t/boolean.t
 t/bug-pvf.t
 t/bug-stack.t
@@ -58,6 +61,7 @@ t/glob.t
 t/io-handle.t
 t/leak.t
 t/load.t
+t/load_standard_tags.t
 t/loadfile-empty.t
 t/long_plain_wrap.t
 t/magic.t

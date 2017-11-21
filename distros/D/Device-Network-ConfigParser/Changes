@@ -20,4 +20,9 @@ Revision history for Device-CheckPoint-ConfigParse
 
 0.005   2017-11-02
         * Documentation Updates
+
+0.006   2017-11-13
+        * Significant improvements to the Cisco::ASA object and object-group parsing.
+        * Added Linux::NetUtils parser with support for 'ifconfig' output.
+        * Added Linux::iproute2 parser with support for 'ip route' output.
         

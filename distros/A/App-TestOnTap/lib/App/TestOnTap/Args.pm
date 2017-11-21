@@ -50,7 +50,7 @@ sub __parseArgv
 			help => 0,
 			manual => 0,
 			version => 0,
-			execmap => undef,			# no execmap from file to apply
+			configuration => undef,		# no alternate config
 			define => {},				# arbitrary key=value defines
 			skip => undef,				# no skip filter
 			include => undef,			# no include filter
@@ -67,10 +67,13 @@ sub __parseArgv
 			#
 			_help => 0,
 			_pp => 0,
+			_pp_path => undef,
 			_info => 0,
-			_info_cmd => 0,
+			_info_ppcmd => 0,
+			_info_ppname => 0,
 			_info_config => 0,
 			_info_modules => 0,
+			_ignore_dependencies => 0,
 		);
 		
 	my @specs =
@@ -79,7 +82,7 @@ sub __parseArgv
 			'help|h',
 			'manual',
 			'version',
-			'execmap=s',
+			'configuration|cfg=s',
 			'define|D=s%',
 			'skip=s',
 			'include=s',
@@ -96,10 +99,13 @@ sub __parseArgv
 			#
 			'_help',
 			'_pp',
+			'_pp_path=s',
 			'_info',
-			'_info_cmd',
+			'_info_ppcmd',
+			'_info_ppname',
 			'_info_config',
 			'_info_modules',
+			'_ignore_dependencies',
 		);
 
 	my $_argsPodName = 'App/TestOnTap/_Args._pod';
@@ -242,7 +248,7 @@ sub __parseArgv
 	#
 	eval
 	{
-		$self->{config} = App::TestOnTap::Config->new($self->{suiteroot}, $rawOpts{execmap}); 
+		$self->{config} = App::TestOnTap::Config->new($self->{suiteroot}, $rawOpts{configuration}, $rawOpts{_ignore_dependencies}); 
 	};
 	if ($@)
 	{
@@ -254,7 +260,7 @@ sub __parseArgv
 	#
 	eval
 	{
-		$self->{workdirmgr} = App::TestOnTap::WorkDirManager->new($rawOpts{workdirectory}, $self->{suiteroot});
+		$self->{workdirmgr} = App::TestOnTap::WorkDirManager->new($self, $rawOpts{workdirectory}, $self->{suiteroot});
 	};
 	if ($@)
 	{

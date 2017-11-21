@@ -3,11 +3,10 @@ package MojoX::NetstringStream;
 use Mojo::Base 'Mojo::EventEmitter';
 
 use Carp;
-use Encode;
 
-our $VERSION  = '0.04';
+our $VERSION  = '0.06';
 
-has [qw(_buf debug stream _want)];
+has [qw(buf debug stream want)];
 
 sub new {
 	my ($class, %args) = @_;
@@ -20,6 +19,7 @@ sub new {
 	$self->{want} = \$want; # if set: number of bytes expected
 	$self->{stream} = $stream;
 	$self->{debug} = $args{debug} // 0;
+	$self->{maxsize} = $args{maxsize};
 	$stream->timeout(0);
 	$stream->on(read => sub{ $self->_on_read(@_); });
 	$stream->on(close => sub{ $self->_on_close(@_); });
@@ -30,25 +30,37 @@ sub _on_read {
 	my ($self, $stream, $bytes) = @_;
 	my $buf = $self->{buf};
 	my $want = $self->{want};
+	my $maxsize = $self->{maxsize};
 
 	$$buf .= $bytes;
-	say "on_read: bytes: $bytes buf now: $$buf" if $self->debug;
+	say "on_read: bytes: $bytes buf now: $$buf" if $self->{debug};
 	
 	while (1) { # fixme: does this always end? 
 		if (!$$want) {
-		 	return if $$buf !~ /^(\d*):/;
+			return unless $$buf;
+			#return if $$buf !~ /^(\d*):/;
+			return unless (my $i = index($$buf, ':')) > 0;
 		 	# fixme: we don't detect a framing error this way
 		 	# but just hang when that happens
-			$$want = $1;
-			substr($$buf, 0, length($1)+1, ''); # 123:
-			$$want++; # inlclude trailing ,
+			#$$want = $1;
+			$$want = substr($$buf, 0, $i);
+			if ($maxsize and $$want > $maxsize) {
+				$self->emit(nserr => "netstring too big: $$want > $maxsize");
+				return;
+			}
+			#substr($$buf, 0, length($1)+1, ''); # 123:
+			substr($$buf, 0, $i+1, '');
+			$$want++; # include trailing ,
 			#say "on_read: want: $$want buf now: $$buf";
 		}
 
 		return if $$want > length($$buf);
 
 		my $chunk = substr($$buf, 0, $$want, '');
-		croak 'no trailing , in chunk' if chop $chunk ne ',';
+		if (chop $chunk ne ',') {
+			$self->emit(nserr => 'no trailing , in chunk');
+			return;
+		}
 		$$want = 0;
 		#say "on_read: chunk: $chunk buf now: $$buf";
 
@@ -59,13 +71,14 @@ sub _on_read {
 sub _on_close {
 	my ($self, $stream) = @_;
 	$self->emit(close => $stream);
-	say 'got close!' if $self->debug;
+	say 'got close!' if $self->{debug};
 	delete $self->{stream};
 }
 
 sub close {
 	my ($self) = @_;
 	$self->stream->close;
+	%$self = ();
 }
 
 sub write {
@@ -73,9 +86,14 @@ sub write {
 	my ($self, $chunk) = @_;
 	my $len = length($chunk);
 	my $out = sprintf('%u:%s,', $len, $chunk);
-	say "write: $out" if $self->debug;
-	$self->stream->write($out);
+	say "write: $out" if $self->{debug};
+	$self->{stream}->write($out);
 }
+
+#sub DESTROY {
+#	my $self = shift;
+#	say 'destroying ', $self;
+#}
 
 1;
 
@@ -111,6 +129,23 @@ MojoX::NetstringStream - Turn a (tcp) stream into a NetstringStream
 L<MojoX::NetstringStream> is a wrapper around L<Mojo::IOLoop::Stream> that
 adds framing using the netstring encoding.
 
+=head1 ATTRIBUTES
+
+=head2 stream
+
+The underlying Mojo::IOLoop stream to use for reading and writing
+
+=head2 debug
+
+Enables debugging
+
+=head2 maxsize
+
+Maximum size of the accepted netstring frames, if set.  A nserr event is
+raised when a oversized frame is received.
+
+Default: none
+
 =head1 EVENTS
 
 L<MojoX::NetstringStream> inherits all events from L<Mojo::EventEmitter> and can
@@ -133,6 +168,16 @@ Emitted for every (full) netstring received on the underlying stream.
   });
 
 Emitted if the underlying stream gets closed.
+
+=head2 nserr
+
+  $ns->on(nserr => sub {
+    my ($ns, $err) = @_;
+    ...
+  });
+
+Emitted if there was some kind of framing error, currenty either a missing
+',' at the end or a oversized frame.
 
 =head1 ATTRIBUTES
 
@@ -203,7 +248,7 @@ Wieger Opmeer <wiegerop@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Wieger Opmeer.
+This software is copyright (c) 2017 by Wieger Opmeer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

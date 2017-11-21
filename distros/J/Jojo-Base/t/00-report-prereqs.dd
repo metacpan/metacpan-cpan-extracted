@@ -22,6 +22,7 @@ do { my $x = {
                       'requires' => {
                                       'Mojo::Base' => '0',
                                       'Mojo::Util' => '0',
+                                      'Mojolicious' => '7.43',
                                       'Sub::Inject' => 'v0.2.0',
                                       'experimental' => '0',
                                       'perl' => '5.018'

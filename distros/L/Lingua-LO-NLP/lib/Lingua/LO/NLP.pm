@@ -4,7 +4,7 @@ use warnings;
 use 5.012000;
 use utf8;
 use feature 'unicode_strings';
-use version 0.77; our $VERSION = version->declare('v1.0.1');
+use version 0.77; our $VERSION = version->declare('v1.0.3');
 use Lingua::LO::NLP::Syllabify;
 use Lingua::LO::NLP::Analyze;
 use Lingua::LO::NLP::Romanize;

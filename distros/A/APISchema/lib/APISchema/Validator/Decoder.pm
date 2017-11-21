@@ -20,6 +20,7 @@ sub json {
 
 sub url_parameter {
     my ($self, $body) = @_;
+    return undef unless defined $body;
     return url_params_mixed($body, 1);
 }
 

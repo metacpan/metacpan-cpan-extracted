@@ -3,7 +3,7 @@
 Mozilla/5.0 (compatible; SnapPreviewBot; en-US; rv:1.8.0.9) Gecko/20061206 Firefox/1.5.0.9
 
 'parser'           => 'firefox',
-'os'               => 'SnapPreviewBot',
+'extras'           => ['SnapPreviewBot'],
 'version_raw'      => '1.5.0.9',
 'lang'             => 'en-US',
 'mozilla'          => ['1.8.0.9','1.008000009'],

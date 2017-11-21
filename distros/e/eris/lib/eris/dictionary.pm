@@ -1,15 +1,20 @@
 package eris::dictionary;
+# ABSTRACT: Field dictionary loader
 
 use Moo;
 with qw(
     eris::role::pluggable
-    MooX::Singleton
 );
 use Types::Standard qw(HashRef);
 use namespace::autoclean;
 
-########################################################################
-# Attributes
+our $VERSION = '0.004'; # VERSION
+
+
+
+sub _build_namespace { 'eris::dictionary' }
+
+
 has fields => (
     is => 'ro',
     isa => HashRef,
@@ -17,9 +22,6 @@ has fields => (
     builder => '_build_fields',
 );
 
-########################################################################
-# Builders
-sub _build_namespace { 'eris::dictionary' }
 sub _build_fields {
     my ($self) = @_;
 
@@ -40,8 +42,7 @@ sub _build_fields {
     return \%complete;
 }
 
-########################################################################
-# Methods
+
 my %_dict = ();
 sub lookup {
     my ($self,$field) = @_;
@@ -56,6 +57,7 @@ sub lookup {
     defined $entry ? $_dict{$field} = $entry : undef;  # Assignment carries Left to Right and is returned;
 }
 
+
 1;
 
 __END__
@@ -66,11 +68,48 @@ __END__
 
 =head1 NAME
 
-eris::dictionary
+eris::dictionary - Field dictionary loader
 
 =head1 VERSION
 
-version 0.003
+version 0.004
+
+=head1 SYNOPSIS
+
+    use eris::dictionary;
+    use YAML;
+
+    my $dict = eris::dictionary->new();
+
+    while(<>) {
+        chomp;
+        foreach my $word (split /\s+/) {
+            my $def = $dict->lookup($word);
+            print Dump $def if $def;
+        }
+    }
+
+=head1 ATTRIBUTES
+
+=head2 namespace
+
+Defaults to C<eris::dictionary>
+
+=head2 fields
+
+HashRef of fields with true/false values indicated whether they exist in the dictionary.
+
+=head1 METHODS
+
+=head2 lookup
+
+Takes a field name, returns the entry for that field from
+the first matching dictionary or undef if nothing is found
+
+=head1 SEE ALSO
+
+L<eris::role::dictionary>, L<eris::dictionary::cee>, L<eris::dictionary::eris>,
+L<eris::dictionary::eris::debug>, L<eris::dictionary::syslog>
 
 =head1 AUTHOR
 

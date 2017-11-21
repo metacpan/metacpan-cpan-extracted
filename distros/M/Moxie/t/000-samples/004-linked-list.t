@@ -11,7 +11,8 @@ BEGIN {
 }
 
 package LinkedList {
-    use Moxie;
+    use Moxie
+        traits => [':experimental'];
 
     extends 'Moxie::Object';
 
@@ -91,7 +92,8 @@ package LinkedList {
 }
 
 package LinkedListNode {
-    use Moxie;
+    use Moxie
+        traits => [':experimental'];
 
     extends 'Moxie::Object';
 

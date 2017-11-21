@@ -1,5 +1,5 @@
 package Search::Elasticsearch::Role::Serializer::JSON;
-$Search::Elasticsearch::Role::Serializer::JSON::VERSION = '5.02';
+$Search::Elasticsearch::Role::Serializer::JSON::VERSION = '6.00';
 use Moo::Role;
 requires 'JSON';
 
@@ -103,7 +103,7 @@ Search::Elasticsearch::Role::Serializer::JSON - A Serializer role for JSON modul
 
 =head1 VERSION
 
-version 5.02
+version 6.00
 
 =head1 DESCRIPTION
 

@@ -1,3 +1,11 @@
+libqbit-validator-perl (0.011) raring; urgency=low
+
+  * deleted empty string
+
+  * new deps and refactoring exceptions
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 19 Nov 2017 13:41:04 +0300
+
 libqbit-validator-perl (0.010) raring; urgency=low
 
   * next => return and use ref

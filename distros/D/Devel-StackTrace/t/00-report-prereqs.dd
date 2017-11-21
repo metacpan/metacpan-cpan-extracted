@@ -1,7 +1,8 @@
 do { my $x = {
        'configure' => {
                         'requires' => {
-                                        'ExtUtils::MakeMaker' => '0'
+                                        'ExtUtils::MakeMaker' => '0',
+                                        'perl' => '5.006'
                                       },
                         'suggests' => {
                                         'JSON::PP' => '2.27300'
@@ -9,6 +10,8 @@ do { my $x = {
                       },
        'develop' => {
                       'requires' => {
+                                      'Code::TidyAll' => '0.56',
+                                      'Code::TidyAll::Plugin::SortLines::Naturally' => '0.000003',
                                       'Code::TidyAll::Plugin::Test::Vars' => '0.02',
                                       'File::Spec' => '0',
                                       'IO::Handle' => '0',
@@ -31,8 +34,7 @@ do { my $x = {
                                       'Test::Spelling' => '0.12',
                                       'Test::Synopsis' => '0',
                                       'Test::Vars' => '0.009',
-                                      'Test::Version' => '2.05',
-                                      'blib' => '1.01'
+                                      'Test::Version' => '2.05'
                                     }
                     },
        'runtime' => {
@@ -54,7 +56,8 @@ do { my $x = {
                                    'File::Spec' => '0',
                                    'Test::More' => '0.96',
                                    'base' => '0',
-                                   'bytes' => '0'
+                                   'bytes' => '0',
+                                   'perl' => '5.006'
                                  }
                  }
      };

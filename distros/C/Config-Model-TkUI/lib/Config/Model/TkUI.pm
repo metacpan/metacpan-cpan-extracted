@@ -10,7 +10,7 @@
 # copyright at the end of the file in the pod section
 
 package Config::Model::TkUI;
-$Config::Model::TkUI::VERSION = '1.364';
+$Config::Model::TkUI::VERSION = '1.365';
 use 5.10.1;
 use strict;
 use warnings;
@@ -39,7 +39,7 @@ use Tk::FontDialog;
 use Tk::Pod;
 use Tk::Pod::Text;    # for findpod
 
-use Config::Model 2.095; # Node::get_help_as_text
+use Config::Model 2.114; # Node::gist
 
 use Config::Model::Tk::LeafEditor;
 use Config::Model::Tk::CheckListEditor;
@@ -897,6 +897,10 @@ sub disp_hash {
             $tkt->itemCreate( $newpath, 0, -text => $node->shorten_idx($idx) );
             $tkt->setmode( $newpath => $eltmode );
         }
+
+        # update the node gist
+        my $gist = $elt_type =~ /node/ ? $elt->fetch_with_id($idx)->fetch_gist : '';
+        $tkt->itemCreate( $newpath, 2, -text => $gist );
 
         my $elt_loc = $node_loc;
         $elt_loc .= ' ' if $elt_loc;

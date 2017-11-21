@@ -4,8 +4,10 @@ use strictures 2;
 use Test::More;
 use Test::Deep;
 
+use lib 't/lib';
+
 BEGIN {
-  use t::loader qw(build_schema);
+  use loader qw(build_schema);
   build_schema([
     Artist => {
       table => 'artists',
@@ -32,7 +34,7 @@ BEGIN {
   ]);
 }
 
-use t::common qw(sims_test Schema);
+use common qw(sims_test Schema);
 
 sims_test "A single row succeeds" => {
   spec => {
@@ -148,6 +150,18 @@ sims_test "See that a set of values works" => {
   },
   expect => {
     Artist => { id => 1, name => any(qw/george bill/), hat_color => 'purple' },
+  },
+};
+
+delete Schema->source('Artist')->column_info('hat_color')->{sim}{value};
+Schema->source('Artist')->column_info('hat_color')->{sim}{null_chance} = 1;
+
+sims_test "See that null_chance=1 works" => {
+  spec => {
+    Artist => 1,
+  },
+  expect => {
+    Artist => { id => 1, name => any(qw/george bill/), hat_color => undef },
   },
 };
 

@@ -325,8 +325,8 @@ sub shared_update_employee {
     hash_the_password( $over );
 
     return $emp->update( $d_obj->context ) if pre_update_comparison( $emp, $over );
-    $d_obj->mrest_declare_status( code => 400, explanation => "DISPATCH_ILLEGAL_ENTITY" );
-    return $fail;
+    $log->notice( "Update operation would not change database; skipping it" );
+    return $CELL->status_ok( 'DISPATCH_UPDATE_NO_CHANGE_OK' );
 }
 
 
@@ -685,8 +685,8 @@ sub shared_update_activity {
     $log->debug("Entering " . __PACKAGE__ . "::shared_update_activity" );
     delete $over->{'aid'} if exists $over->{'aid'};
     return $act->update( $d_obj->context ) if pre_update_comparison( $act, $over );
-    $d_obj->mrest_declare_status( code => 400, explanation => "DISPATCH_ILLEGAL_ENTITY" );
-    return $fail;
+    $log->notice( "Update operation would not change database; skipping it" );
+    return $CELL->status_ok( 'DISPATCH_UPDATE_NO_CHANGE_OK' );
 }
 
 
@@ -732,8 +732,8 @@ sub shared_update_history {
     $log->debug("Entering " . __PACKAGE__ . "::shared_update_history" );
     delete $over->{'eid'} if exists $over->{'eid'};
     return $obj->update( $d_obj->context ) if pre_update_comparison( $obj, $over );
-    $d_obj->mrest_declare_status( code => 400, explanation => "DISPATCH_ILLEGAL_ENTITY" );
-    return $fail;
+    $log->notice( "Update operation would not change database; skipping it" );
+    return $CELL->status_ok( 'DISPATCH_UPDATE_NO_CHANGE_OK' );
 }
 
 
@@ -901,9 +901,8 @@ sub shared_update_intlock {
     # make sure $over does not contain any non-kosher fields, and merge
     # $over into $int
     return $int->update( $context ) if pre_update_comparison( $int, $over );
-    $log->notice( "Failed pre_update_comparison" );
-    $d_obj->mrest_declare_status( code => 400, explanation => 'Check request entity syntax' );
-    return $fail;
+    $log->notice( "Update operation would not change database; skipping it" );
+    return $CELL->status_ok( 'DISPATCH_UPDATE_NO_CHANGE_OK' );
 }
 
 

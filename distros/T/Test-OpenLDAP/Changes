@@ -1,5 +1,8 @@
 Revision history for Test-OpenLDAP
 
+0.6  Sat Nov 11 19:56:00 2013
+       Adding debug method
+
 0.5  Wed Mar 13 21:00:58 2013
        Added /usr/lib/openldap to PATH for OpenSUSE
 

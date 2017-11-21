@@ -4,6 +4,14 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+// spvm_undef.h
+struct SPVM_undef;
+typedef struct SPVM_undef SPVM_UNDEF;
+
+// spvm_string_buffer.h
+struct SPVM_string_buffer;
+typedef struct SPVM_string_buffer SPVM_STRING_BUFFER;
+
 // spvm_package_var.h
 struct SPVM_package_var;
 typedef struct SPVM_package_var SPVM_PACKAGE_VAR;
@@ -144,9 +152,9 @@ typedef struct SPVM_memory_pool SPVM_MEMORY_POOL;
 struct SPVM_var;
 typedef struct SPVM_var SPVM_VAR;
 
-// spvm_my_var.h
-struct SPVM_my_var;
-typedef struct SPVM_my_var SPVM_MY_VAR;
+// spvm_my.h
+struct SPVM_my;
+typedef struct SPVM_my SPVM_MY;
 
 // spvm_constant.h
 struct SPVM_constant;

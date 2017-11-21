@@ -3,6 +3,7 @@ lib/CSS/Simple.pm
 MANIFEST
 Makefile.PL
 README
+t/allow_duplicate_properties.t
 t/basic.t
 t/browser_specific_properties.t
 t/create.t

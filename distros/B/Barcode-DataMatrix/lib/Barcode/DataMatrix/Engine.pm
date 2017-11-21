@@ -1,8 +1,9 @@
 package Barcode::DataMatrix::Engine;
 
-=head1 Barcode::DataMatrix::Engine
+=head1 NAME
 
-The engine which generates the data matrix bitmap.
+Barcode::DataMatrix::Engine - The engine which generates the data matrix
+bitmap.
 
 =cut
 

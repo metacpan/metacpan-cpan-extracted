@@ -22,6 +22,7 @@ has template => <<'XML';
 </TrackFieldRequest>
 XML
 
+has carrier_description => sub { 'USPS' };
 has validation_regex => sub { qr/\b(9\d\d\d ?\d\d\d\d ?\d\d\d\d ?\d\d\d\d ?\d\d\d\d ?\d\d|91\d\d ?\d\d\d\d ?\d\d\d\d ?\d\d\d\d ?\d\d\d\d)\b/i };
 
 sub human_url {
@@ -100,7 +101,7 @@ sub request {
       my $dom = _handle_response($tx);
       $self->$cb(undef, $dom);
     },
-  )->tap(on => error => sub{ $self->$cb($_[1], undef) })->wait;
+  )->catch(sub{ $self->$cb(pop, undef) })->wait;
 }
 
 sub _handle_response {

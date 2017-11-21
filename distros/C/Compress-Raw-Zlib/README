@@ -1,17 +1,17 @@
 
                             Compress-Raw-Zlib
 
-                         Version 2.074
+                         Version 2.075
 
-                            19th February 2017
+                            14th November 2017
 
        Copyright (c) 2005-2017 Paul Marquess. All rights reserved.
           This program is free software; you can redistribute it
            and/or modify it under the same terms as Perl itself.
 
-              The directory zlib-src contains a subset of the 
-             source files copied directly from zlib version 1.2.8.
-                  These files are Copyright(C) 1995-2012
+              The directory zlib-src contains a subset of the
+             source files copied directly from zlib version 1.2.11.
+                  These files are Copyright(C) 1995-2017
                      Jean-loup Gailly and Mark Adler.
              Full source for the zlib library is available at
                             http://www.zlib.org
@@ -19,7 +19,7 @@
 DESCRIPTION
 -----------
 
-This module provides a Perl interface to the zlib compression library.  
+This module provides a Perl interface to the zlib compression library. 
 
 PREREQUISITES
 -------------
@@ -29,12 +29,12 @@ installed on your system:
 
     * A C compiler
 
-    * Perl 5.006 or better. 
+    * Perl 5.006 or better.
 
-By default, Compress-Raw-Zlib will build its own private copy of the 
-zlib library. If you want to use a different version of 
-zlib, follow the instructions in the section called 
-"Controlling the version of zlib used by Compress-Raw-Zlib" 
+By default, Compress-Raw-Zlib will build its own private copy of the
+zlib library. If you want to use a different version of
+zlib, follow the instructions in the section called
+"Controlling the version of zlib used by Compress-Raw-Zlib"
 later in this document.
 
 BUILDING THE MODULE
@@ -54,18 +54,18 @@ To install Compress-Raw-Zlib, run the command below:
 
     make install
 
-Controlling the version of zlib used by Compress-Raw-Zlib 
+Controlling the version of zlib used by Compress-Raw-Zlib
 ----------------------------------------------------------
 
 Compress-Raw-Zlib interfaces to the zlib compression library. There
-are three options available to control which version/instance of the 
+are three options available to control which version/instance of the
 zlib library is used:
 
-    1. Build a private copy of the zlib library using the 
+    1. Build a private copy of the zlib library using the
        zlib library source that is included with this module.
        This is the default and recommended option.
 
-    2. Build a private copy of the zlib library using a standard 
+    2. Build a private copy of the zlib library using a standard
        zlib source distribution.
 
     3. Use a pre-built zlib library.
@@ -76,58 +76,56 @@ zlib version 1.2.0 or better.
 The contents of the file config.in are used to control which of the
 three options is actually used. This file is read during the
 
-    perl Makefile.PL 
+    perl Makefile.PL
 
 step of the build, so remember to make any required changes to config.in
 before building this module.
 
   Option 1
   --------
-  
+ 
   For option 1, edit the file config.in and set the variables in it
   as follows:
-  
+
       BUILD_ZLIB   = True
       INCLUDE      = ./zlib-src
       LIB          = ./zlib-src
       OLD_ZLIB     = False
       GZIP_OS_CODE = AUTO_DETECT
-  
-  
+
   Option 2
   --------
-  
+
   For option 2, fetch a copy of the zlib source distribution from
-  http://www.zlib.org and unpack it into the Compress-Raw-Zlib source 
-  directory. Assuming you have fetched zlib 1.2.8, 
-  it will create a directory called zlib-1.2.8. 
-  
+  http://www.zlib.org and unpack it into the Compress-Raw-Zlib source
+  directory. Assuming you have fetched zlib 1.2.11,
+  it will create a directory called zlib-1.2.11.
+
   Now set the variables in the file config.in as follows (if the version
-  you have fetched isn't 1.2.8, change the INCLUDE and LIB
+  you have fetched isn't 1.2.11, change the INCLUDE and LIB
   variables appropriately):
-  
+
       BUILD_ZLIB   = True
-      INCLUDE      = ./zlib-1.2.8
-      LIB          = ./zlib-1.2.8
+      INCLUDE      = ./zlib-1.2.11
+      LIB          = ./zlib-1.2.11
       OLD_ZLIB     = False
       GZIP_OS_CODE = AUTO_DETECT
-  
-  
+
   Option 3
   --------
-  
+
   For option 3, you need to find out where zlib is stored on your
   system.  There are two parts to this.
 
   First, find the directory where the zlib library is stored (some
   common names for the library are libz.a and libz.so). Set the LIB variable
   in the config.in file to that directory.
-  
+
   Secondly, find the directory where the file zlib.h is stored. Now set
   the INCLUDE variable in the config.in file to that directory.
-  
+
   Next set BUILD_ZLIB to False.
-  
+
   Finally, if you are running zlib 1.0.5 or older, set the OLD_ZLIB
   variable to True. Otherwise set it to False.
 
@@ -141,7 +139,6 @@ before building this module.
       LIB          = /usr/local/lib
       OLD_ZLIB     = False
       GZIP_OS_CODE = AUTO_DETECT
-  
 
 Setting the Gzip OS Code
 ------------------------
@@ -149,8 +146,8 @@ Setting the Gzip OS Code
 Every gzip stream stores a byte in its header to identify the Operating
 System that was used to create the gzip stream. When you build Compress-Raw-Zlib it will attempt to determine the value that is correct for
 your Operating System. This will then be used by IO::Compress::Gzip as the
-default value for the OS byte in all gzip headers it creates. 
- 
+default value for the OS byte in all gzip headers it creates.
+
 The variable GZIP_OS_CODE in the config.in file controls the setting of
 this value when building Compress-Raw-Zlib. If GZIP_OS_CODE is set to
 AUTO_DETECT, Compress-Raw-Zlib will attempt to determine the correct value for
@@ -159,7 +156,7 @@ your Operating System.
 Alternatively, you can override auto-detection of the default OS code and
 explicitly set it yourself. Set the GZIP_OS_CODE variable in the config.in
 file to be a number between 0 and 255. For example
- 
+
     GZIP_OS_CODE = 3
 
 See RFC 1952 for valid OS codes that can be used.
@@ -184,7 +181,7 @@ If you get the error shown below when you run the Compress-Raw-Zlib test
 harness it probably means you are running a copy of zlib that is
 version 1.0.5 or older.
 
-t/01version.........Can't load 'blib/arch/auto/Compress/Zlib/Zlib.so' for 
+t/01version.........Can't load 'blib/arch/auto/Compress/Zlib/Zlib.so' for
                     module Compress::Raw::Zlib: blib/arch/auto/Compress/Raw/Zlib/Zlib.so:
                     undefined symbol: gzsetparams at ...
 
@@ -197,14 +194,14 @@ There are two ways to fix this problem:
 Test Harness 01version fails
 ----------------------------
 If the 01version test harness fails, and the problem isn't covered by the
-scenario above, it probably means that you have two versions of 
+scenario above, it probably means that you have two versions of
 zlib installed on your system.
 
 Run the command below to see if this is indeed the case
 
-    make test TEST_VERBOSE=1 TEST_FILES=t/01version.t 
+    make test TEST_VERBOSE=1 TEST_FILES=t/01version.t
 
-Try removing the one you don't want to use and rebuild.   
+Try removing the one you don't want to use and rebuild.
 
 Solaris build fails with "language optional software package not installed"
 ---------------------------------------------------------------------------
@@ -333,16 +330,16 @@ To help me help you, I need all of the following information:
     This includes:
 
      a. The *complete* output from running this
-     
+ 
             perl -V
-     
+ 
         Do not edit the output in any way.
         Note, I want you to run "perl -V" and NOT "perl -v".
-     
+ 
         If your perl does not understand the "-V" option it is too
-        old. This module needs Perl version 5.004 or better.     
+        old. This module needs Perl version 5.004 or better.
 
-     b. The version of Compress-Raw-Zlib you have. 
+     b. The version of Compress-Raw-Zlib you have.
         If you have successfully installed Compress-Raw-Zlib, this one-liner
         will tell you:
 
@@ -355,15 +352,15 @@ To help me help you, I need all of the following information:
         If you haven't installed Compress-Raw-Zlib then search Compress::Raw::Zlib.pm
         for a line like this:
 
-          $VERSION = "2.074" ;
+          $VERSION = "2.075" ;
 
      c. The version of zlib you have used.
         If you have successfully installed Compress-Raw-Zlib, this one-liner
         will tell you:
 
-          perl -MCompress::Raw::Zlib -e "print q[zlib ver ]. Compress::Raw::Zlib::ZLIB_VERSION.qq[\n]" 
+          perl -MCompress::Raw::Zlib -e "print q[zlib ver ]. Compress::Raw::Zlib::ZLIB_VERSION.qq[\n]"
 
-        If not, look at the beginning of the file zlib.h. 
+        If not, look at the beginning of the file zlib.h.
 
  2. If you are having problems building Compress-Raw-Zlib, send me a
     complete log of what happened. Start by unpacking the Compress-Raw-Zlib
@@ -372,6 +369,6 @@ To help me help you, I need all of the following information:
         [edit config.in, if necessary]
         perl Makefile.PL
         make
-        make test TEST_VERBOSE=1          
+        make test TEST_VERBOSE=1
 
 Paul Marquess <pmqs@cpan.org>

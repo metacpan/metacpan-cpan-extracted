@@ -21,6 +21,7 @@ requires:
   Cwd: '0'
   DateTime: '0.37'
   File::Find::Rule: '0'
+  IO::All: '0'
   List::MoreUtils: '0'
   Modern::Perl: '0'
   Term::ANSIColor: '0'
@@ -30,5 +31,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/tewk/tt.git
-version: 0.03
+version: 0.04
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

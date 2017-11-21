@@ -1,5 +1,5 @@
 package Moose::Exception::ConflictDetectedInCheckRoleExclusionsInToClass;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -12,4 +12,5 @@ sub _build_message {
     return "Conflict detected: $class_name excludes role '$role_name'";
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

@@ -1,0 +1,69 @@
+{
+   "abstract" : "Easy to use concurrency primitives inspired by Cilk",
+   "author" : [
+      "Jeff Ober <sysread@fastmail.fm>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "IPC-Pleather",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "conflicts" : {
+            "perl" : "5.020"
+         },
+         "requires" : {
+            "AnyEvent" : "7.14",
+            "Guard" : "1.023",
+            "IPC::Semaphore" : "0",
+            "IPC::SysV" : "0",
+            "Keyword::Declare" : "0.001006",
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "Test" : "0",
+            "Test2::Bundle::Extended" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/sysread/IPC-Pleather/issues"
+      },
+      "homepage" : "https://github.com/sysread/IPC-Pleather",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/sysread/IPC-Pleather.git",
+         "web" : "https://github.com/sysread/IPC-Pleather"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::XS version 3.03"
+}
+

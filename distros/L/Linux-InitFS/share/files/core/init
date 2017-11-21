@@ -1,0 +1,142 @@
+#!/bin/bash
+
+###############################################################################
+# capture boot process for troubleshooting
+
+exec 2>/run/initfs.trc
+set -x
+
+
+###############################################################################
+# environment init
+
+if [[ -f /etc/inputrc ]]
+then
+	INPUTRC=/etc/inputrc
+	export INPUTRC
+fi
+
+if [[ -f /etc/profile ]]
+then
+	source /etc/profile
+fi
+
+
+###############################################################################
+# program variables
+
+ROOTMNT='/mnt/rootfs'
+INITBIN='/sbin/init'
+ROOTDEV='LABEL=root'
+MNTFLAG='ro'
+
+
+###############################################################################
+# import kernel command line
+
+import_arg() {
+	local arg="$1"
+
+	case $arg in
+
+		ro)
+			MNTFLAG="ro"
+			;;
+		rw)
+			MNTFLAG="rw"
+			;;
+
+		root=*)
+			ROOTDEV=${arg#root=}
+			;;
+
+		init=*)
+			INITBIN=${arg#init=}
+			;;
+
+		rescue)
+			RESCUE=nonempty
+			;;
+
+	esac
+}
+
+import_cmdline() {
+	local arg
+
+	for arg in $(cat /proc/cmdline)
+	do
+		import_arg "$arg"
+	done
+
+}
+
+
+###############################################################################
+# ensure the root device is accessible
+
+# try it
+mount_rootfs() {
+
+	mount -o $MNTFLAG $ROOTDEV $ROOTMNT
+
+	return $?
+}
+
+# probe it
+load_rootdev() {
+	local f
+
+	for f in /etc/load.d/*.sh
+	do
+		[[ -r $f ]] && source $f
+	done
+
+}
+
+# test for it
+is_rootfs_mounted() {
+	grep -q $ROOTMNT /etc/mtab
+}
+
+# if we have no rootfs
+rootfs_not_mounted() {
+	exit # give up, kernel panic
+}
+
+
+###############################################################################
+# MAIN BLOCK
+
+for f in /etc/init.d/*.sh
+do
+	[[ -r $f ]] && source $f
+done
+unset f
+
+import_cmdline
+
+mount_rootfs 2> /dev/null
+
+if ! is_rootfs_mounted
+then
+	load_rootdev
+	mount_rootfs
+fi
+
+if ! is_rootfs_mounted
+then
+	rootfs_not_mounted
+fi
+
+if [[ -n $INIT_HAS_RESCUE && -n $RESCUE ]]
+then
+	rescue_shell
+fi
+
+for f in /etc/done.d/*.sh
+do
+	[[ -r $f ]] && source $f
+done
+
+exec chroot $ROOTMNT $INITBIN

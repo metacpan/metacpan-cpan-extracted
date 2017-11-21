@@ -1,5 +1,8 @@
 Revision history for Perl module Business::PayPal::API
 
+0.77      2017-11-13 16:18:04Z
+    - Fix Pod errors in API.pm (Florian Schlichting) (GH#13)
+
 0.76      2017-04-24 11:00:58-04:00 America/Toronto
     - Fix path to Salutation field in GetExpressCheckoutDetailsResponseDetails
 

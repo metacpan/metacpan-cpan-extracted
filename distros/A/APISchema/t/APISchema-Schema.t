@@ -1,4 +1,5 @@
 package t::APISchema::Schema;
+use lib '.';
 use t::test;
 
 sub _require : Test(startup => 1) {

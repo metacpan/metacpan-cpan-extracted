@@ -5,9 +5,31 @@ use strict;
 use warnings;
 use parent qw/Exporter/;
 
-our $VERSION = '0.001';
-our @EXPORT_OK = qw/stops_for_route departures_for_stop/;
-our @EXPORT = '';
+use constant +{
+	NEXTBUS_FROM_HEADINGTON_CAMPUS => 'headington',
+	NEXTBUS_FROM_HARCOURT_HILL     => 'harcourt',
+	NEXTBUS_FROM_MARSTON_ROAD      => 'marston',
+	NEXTBUS_FROM_WHEATLEY_CAMPUS   => 'wheatley',
+	NEXTBUS_FROM_CRESCENT_HALL     => 'crescent',
+	NEXTBUS_FROM_PAUL_KENT_HALL    => 'paulkent',
+	NEXTBUS_FROM_SLADE_PARK        => 'sladepark',
+	NEXTBUS_FROM_CITY_CENTRE       => 'citycentre',
+};
+
+my @CONSTANTS =
+  qw/NEXTBUS_FROM_HEADINGTON_CAMPUS
+     NEXTBUS_FROM_HARCOURT_HILL
+     NEXTBUS_FROM_MARSTON_ROAD
+     NEXTBUS_FROM_WHEATLEY_CAMPUS
+     NEXTBUS_FROM_CRESCENT_HALL
+     NEXTBUS_FROM_PAUL_KENT_HALL
+     NEXTBUS_FROM_SLADE_PARK
+     NEXTBUS_FROM_CITY_CENTRE/;
+
+our $VERSION = '0.002';
+our @EXPORT_OK = (qw/stops_for_route departures_for_stop nextbus_from_to/, @CONSTANTS);
+our @EXPORT = ();
+our %EXPORT_TAGS = (all => [@EXPORT_OK], constants => [@CONSTANTS]);
 
 use HTML::TreeBuilder;
 use HTTP::Tiny;
@@ -17,6 +39,7 @@ use Time::Piece;
 our $STOPS_URL = 'http://www.buscms.com/Nimbus/operatorpages/widgets/departureboard/ssi.aspx?method=updateRouteStops&routeid=%d&callback=cb&_=%d';
 our $DEPARTS_URL = 'http://www.buscms.com/api/REST/html/departureboard.aspx?clientid=Nimbus&stopid=%d&format=jsonp&cachebust=123&sourcetype=siri&requestor=Netescape&includeTimestamp=true&_=%d';
 our $DEPART_TIME_FORMAT = '%d/%m/%Y %T';
+our $NEXTBUS_URL = 'http://nextbus.brookes.ac.uk/%s?format=json&%s';
 
 our $ht = HTTP::Tiny->new(agent => "WWW-Oxontime/$VERSION");
 
@@ -54,6 +77,17 @@ sub departures_for_stop {
 	wantarray ? @result : \@result
 }
 
+sub nextbus_from_to {
+	my ($from, $to) = @_;
+	my $data = $ht->www_form_urlencode({ destination => $to});
+	my $url = sprintf $NEXTBUS_URL, $from, $data;
+	my $result = $ht->get($url);
+	die $result->{reason} unless $result->{success};
+	my $content = $result->{content};
+	my $departures = JSON->new->decode($content)->{departures};
+	wantarray ? @$departures : $departures
+}
+
 1;
 __END__
 
@@ -65,12 +99,18 @@ WWW::Oxontime - live Oxford bus departures from Oxontime
 
 =head1 SYNOPSIS
 
-  use WWW::Oxontime qw/stops_for_route departures_for_stop/;
+  use WWW::Oxontime qw/stops_for_route departures_for_stop nextbus_from_to :constants/;
   my @stops_on_8_outbound = stops_for_route 15957;
   my $queens_lane = $stops_on_8_outbound[2]->{stopId};
   my @from_queens_lane = departures_for_stop $queens_lane;
   for my $entry (@from_queens_lane) {
     say $entry->{service}, ' towards ', $entry->{destination}, ' departs at ', $entry->{departs};
+  }
+  my @from_city_centre_to_headington_campus =
+    nextbus_from_to NEXTBUS_FROM_CITY_CENTRE, 'Headington Campus';
+  for my $line (@from_city_centre_to_headington_campus) {
+    my ($from, $service, $departs_in, $departs_in_mins) = @$line;
+    say "Bus $service leaves from $from in $departs_in";
   }
 
 =head1 DESCRIPTION
@@ -103,6 +143,28 @@ is returned.
 Note that C<departs> is in the time zone of Oxford, but Time::Piece
 interprets it as being in local time. If local time is different from
 time in Oxford, this needs to be taken into account.
+
+=item B<nextbus_from_to>(I<$from>, I<$to>)
+
+Given a place to start from and a place to arrive at this method
+returns a list of the next buses to serve that route. I<$from> must be
+one of the 8 provided constants:
+
+  NEXTBUS_FROM_HEADINGTON_CAMPUS
+  NEXTBUS_FROM_HARCOURT_HILL
+  NEXTBUS_FROM_MARSTON_ROAD
+  NEXTBUS_FROM_WHEATLEY_CAMPUS
+  NEXTBUS_FROM_CRESCENT_HALL
+  NEXTBUS_FROM_PAUL_KENT_HALL
+  NEXTBUS_FROM_SLADE_PARK
+  NEXTBUS_FROM_CITY_CENTRE
+
+whereas I<$to> is the name of an important station.
+
+This function calls the Nextbus service at
+L<http://nextbus.brookes.ac.uk/>. It is unclear what values for I<$to>
+are implemented by Nextbus; it is probably best to inspect the website
+to see what destinations are available.
 
 =back
 

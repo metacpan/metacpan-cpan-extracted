@@ -1,19 +1,19 @@
 package Exception::DB::NoFieldsAvailable;
-$Exception::DB::NoFieldsAvailable::VERSION = '0.023';
+$Exception::DB::NoFieldsAvailable::VERSION = '0.025';
 use base qw(Exception::DB);
 
 =head1 Name
- 
+
 QBit::Application::Model::DB::Query
- 
+
 =head1 Description
- 
+
 Base class for DB queries.
 
 =cut
 
 package QBit::Application::Model::DB::Query;
-$QBit::Application::Model::DB::Query::VERSION = '0.023';
+$QBit::Application::Model::DB::Query::VERSION = '0.025';
 use qbit;
 
 use base qw(QBit::Application::Model::DB::Class);
@@ -41,7 +41,7 @@ __PACKAGE__->abstract_methods(qw(_found_rows));
 B<No arguments.>
 
 Method called from L</new> before return object.
- 
+
 =cut
 
 sub init {
@@ -97,13 +97,14 @@ B<Example:>
       fields => [qw(id login)],
       filter => {id => 3},
   );
-  
+
 =cut
 
 sub select {
     my ($self, %opts) = @_;
 
     $self->{'__TABLES__'} = [];
+    $self->{'__TYPE__'}   = 'select';
 
     return $self->_add_table(%opts);
 }
@@ -167,7 +168,7 @@ B<Example:>
       join_type => 'INNER JOIN',
       join_on   => ['user_id' => '=' => {'id' => $app->db->users}],
   );
- 
+
 =cut
 
 sub join {
@@ -227,7 +228,7 @@ sub join {
 =head2 left_join
 
 join_type => 'LEFT JOIN'
- 
+
 =cut
 
 sub left_join {
@@ -239,7 +240,7 @@ sub left_join {
 =head2 right_join
 
 join_type => 'RIGHT JOIN'
- 
+
 =cut
 
 sub right_join {
@@ -273,7 +274,7 @@ B<$query> - object
 B<Example:>
 
   my $group_query = $query->group_by(qw(name surname));
- 
+
 =cut
 
 sub group_by {
@@ -353,7 +354,7 @@ B<$query> - object
 B<Example:>
 
   my $order_query = $query->order_by('id', ['login', 1]);
- 
+
 =cut
 
 sub order_by {
@@ -389,7 +390,7 @@ B<$query> - object
 B<Example:>
 
   my $limit_query = $query->limit(100, 200);
- 
+
 =cut
 
 sub limit {
@@ -417,7 +418,7 @@ B<$query> - object
 B<Example:>
 
   my $distinct_query = $query->distinct();
- 
+
 =cut
 
 sub distinct {
@@ -471,7 +472,7 @@ B<Example:>
       ),
       all => FALSE,
   );
- 
+
 =cut
 
 sub union {
@@ -489,7 +490,7 @@ sub union {
 =head2 union_all
 
 all => TRUE
- 
+
 =cut
 
 sub union_all {
@@ -523,7 +524,7 @@ B<$query> - object
 B<Example:>
 
   my $calc_rows_query = $query->calc_rows(TRUE);
- 
+
 =cut
 
 sub calc_rows {
@@ -559,7 +560,7 @@ B<$query> - object
 B<Example:>
 
   my $all_langs_query = $query->all_langs(TRUE);
- 
+
 =cut
 
 sub all_langs {
@@ -587,7 +588,7 @@ B<$query> - object
 B<Example:>
 
   my $for_update_query = $query->for_update();
- 
+
 =cut
 
 sub for_update {
@@ -599,7 +600,7 @@ sub for_update {
 }
 
 =head2 filter
- 
+
 =cut
 
 sub filter {shift->db->filter(@_)}
@@ -637,10 +638,10 @@ B<$sql> - string
 B<Example:>
 
   my $sql = $query->get_sql_with_data();
- 
+
 =cut
 
-sub get_sql_with_data {
+sub get_sql_with_data_for_select {
     my ($self, %opts) = @_;
 
     my @sql_data = ();
@@ -656,6 +657,8 @@ sub get_sql_with_data {
         $sql    .= "(\n$offset";
     }
 
+    $sql .= $self->_comment() . "\n$offset" if $self->{'comment'};
+
     $sql .= 'SELECT';
 
     $sql .= ' DISTINCT' if $self->{'__DISTINCT__'};
@@ -669,7 +672,7 @@ sub get_sql_with_data {
             throw Exception::BadArguments gettext('Duplicate field name "%s", table "%s"', $field,
                 $table->{'table'}->name)
               if exists($all_fields{$field});
-            $all_fields{$field} = [$self->_field_to_sql($field, $table->{'fields'}{$field}, $table)];
+            $all_fields{$field} = [$self->_field_to_sql($field, $table->{'fields'}{$field}, $table, %opts)];
         }
     }
 
@@ -682,13 +685,14 @@ sub get_sql_with_data {
     $sql .= "\n${offset}FROM";
 
     if ($select_query_table->{'table'}->isa('QBit::Application::Model::DB::VirtualTable')) {
-        my ($vt_sql, @vt_data) = $select_query_table->{'table'}->get_sql_with_data(offset => $opts{'offset'} + 4);
+        my ($vt_sql, @vt_data) =
+          $select_query_table->{'table'}->get_sql_with_data(%opts, offset => $opts{'offset'} + 4);
 
         $sql .= " (\n${offset}    $vt_sql\n${offset}) " . $self->quote_identifier($select_query_table->{'table'}->name);
         push(@sql_data, @vt_data);
     } else {
         $sql .=
-            ' ' 
+            ' '
           . $self->quote_identifier($select_query_table->{'table'}->name)
           . (
             exists($select_query_table->{'alias'})
@@ -701,13 +705,13 @@ sub get_sql_with_data {
         $sql .= "\n${offset}" . $table->{'join_type'};
 
         if ($table->{'table'}->isa('QBit::Application::Model::DB::VirtualTable')) {
-            my ($vt_sql, @vt_data) = $table->{'table'}->get_sql_with_data(offset => $opts{'offset'} + 4);
+            my ($vt_sql, @vt_data) = $table->{'table'}->get_sql_with_data(%opts, offset => $opts{'offset'} + 4);
 
             $sql .= " (\n${offset}    $vt_sql\n${offset}) " . $self->quote_identifier($table->{'table'}->name);
             push(@sql_data, @vt_data);
         } else {
             $sql .=
-                ' ' 
+                ' '
               . $self->quote_identifier($table->{'table'}->name)
               . (
                 exists($table->{'alias'})
@@ -719,7 +723,7 @@ sub get_sql_with_data {
         next unless exists($table->{'join_on'});
         my $filter_expr = $self->filter($table->{'join_on'})->expression();
         next unless defined($filter_expr);
-        my ($filter_sql) = $self->_field_to_sql(undef, $filter_expr, $table, offset => $opts{'offset'});
+        my ($filter_sql) = $self->_field_to_sql(undef, $filter_expr, $table, %opts, offset => $opts{'offset'});
         $sql .= " ON " . $filter_sql if $filter_sql;
     }
 
@@ -728,7 +732,7 @@ sub get_sql_with_data {
         next unless defined($table->{'filter'});
         my $filter_expr = $self->filter($table->{'filter'})->expression();
         next unless defined($filter_expr);
-        my ($filter_sql) = $self->_field_to_sql(undef, $filter_expr, $table, offset => $opts{'offset'});
+        my ($filter_sql) = $self->_field_to_sql(undef, $filter_expr, $table, %opts, offset => $opts{'offset'});
         $where_sql .= "\n${offset}" . ($where_sql ? 'AND ' : 'WHERE ') . $filter_sql if $filter_sql;
     }
     $sql .= $where_sql;
@@ -742,7 +746,7 @@ sub get_sql_with_data {
         local $self->{'without_check_fields'} = {};
         local $self->{'without_table_alias'}  = TRUE;
 
-        my ($having, @having_data) = $self->_field_to_sql(undef, $self->{'__HAVING__'}, $select_query_table);
+        my ($having, @having_data) = $self->_field_to_sql(undef, $self->{'__HAVING__'}, $select_query_table, %opts);
 
         $sql .= "\n${offset}HAVING $having";
         push(@sql_data, @having_data) if @having_data;
@@ -764,7 +768,7 @@ sub get_sql_with_data {
         $sql .= ' ALL' if $union_query->{'all'};
         $sql .= "\n${orig_offset}(\n$offset";
 
-        my ($usql, @udata) = $union_query->{'query'}->get_sql_with_data(offset => $opts{'offset'});
+        my ($usql, @udata) = $union_query->{'query'}->get_sql_with_data(%opts, offset => $opts{'offset'});
         $sql .= $usql;
         push(@sql_data, @udata);
         $sql .= "\n${orig_offset})";
@@ -772,6 +776,8 @@ sub get_sql_with_data {
 
     return ($sql, @sql_data);
 }
+
+sub _comment {"/* $_[0]->{'comment'} */"}
 
 =head2 get_all
 
@@ -790,7 +796,7 @@ B<$data> - reference to array
 B<Example:>
 
   my $data = $query->get_all();
-   
+
 =cut
 
 sub get_all {
@@ -804,6 +810,235 @@ sub get_all {
     $self->{'__FOUND_ROWS__'} = $self->{'__CALC_ROWS__'} ? $self->_found_rows() : undef;
 
     return $res;
+}
+
+=head2 update
+
+B<Arguments:>
+
+=over
+
+=item *
+
+B<%opts> - options with keys
+
+=over
+
+=item *
+
+B<table> - object
+
+=item *
+
+B<alias> - alias for table (type: string)
+
+=item *
+
+B<data> - data for update (type: reference to hash)
+
+=item *
+
+B<filter> (optional)
+
+=back
+
+=back
+
+B<Return values:>
+
+=over
+
+=item *
+
+B<$query> - object
+
+=back
+
+B<Example:>
+
+  my $query = $app->db->query->update(
+      table  => $app->db->users,
+      alias  => 'u',
+      data   => {
+          login => 'ChuckNorris',
+          date  => {NOW => []},
+      },
+      filter => {id => 3},
+  );
+
+=cut
+
+sub update {
+    my ($self, %opts) = @_;
+
+    throw '"table" is not defined' unless defined $opts{'table'};
+
+    throw '"table" must be QBit::Application::Model::DB::Table'
+      unless blessed($opts{'table'}) && $opts{'table'}->isa('QBit::Application::Model::DB::Table');
+
+    throw '"data" must be defined and be a reference to the hash'
+      unless defined($opts{'data'}) && ref($opts{'data'}) eq 'HASH' && %{$opts{'data'}};
+
+    $self->{'__TABLES__'} = [];
+    $self->{'__TYPE__'}   = 'update';
+
+    my %table_info =
+      map {exists($opts{$_}) ? ($_ => $opts{$_}) : ()} qw(table alias data filter);
+
+    push(@{$self->{'__TABLES__'}}, \%table_info);
+
+    return $self;
+}
+
+=head2 do
+
+Execute query and returns results
+
+B<No arguments>
+
+B<Return values:>
+
+=over
+
+=item *
+
+B<$res> - count of a affected rows or -1
+
+=back
+
+B<Example:>
+
+  my $res = $query->do();
+
+=cut
+
+sub do {
+    my ($self) = @_;
+
+    return -1
+      unless exists($self->{'__TABLES__'}) && @{$self->{'__TABLES__'}};
+
+    return $self->db->_do($self->get_sql_with_data());
+}
+
+sub get_sql_with_data_for_update {
+    my ($self, %opts) = @_;
+
+    my $sql      = '';
+    my @sql_data = ();
+
+    $opts{'offset'} ||= 0;
+    my $offset = ' ' x $opts{'offset'};
+    my $offset_params = $offset . (' ' x 4);
+
+    $sql .= $self->_comment() . "\n$offset" if $self->{'comment'};
+
+    my ($update_table, @join_query_tables) = @{$self->{'__TABLES__'}};
+    my ($table, $data, $filter) = @$update_table{qw(table data filter)};
+
+    $sql .=
+        "UPDATE\n$offset_params"
+      . $self->quote_identifier($table->name)
+      . (
+        exists($update_table->{'alias'})
+        ? ' AS ' . $self->quote_identifier($update_table->{'alias'})
+        : ''
+      );
+
+    foreach my $qtable (@join_query_tables) {
+        $sql .= "\n${offset}" . $qtable->{'join_type'};
+
+        if ($qtable->{'table'}->isa('QBit::Application::Model::DB::VirtualTable')) {
+            my ($vt_sql, @vt_data) = $qtable->{'table'}->get_sql_with_data(%opts, offset => $opts{'offset'} + 4);
+
+            $sql .= " (\n${offset}    $vt_sql\n${offset}) " . $self->quote_identifier($qtable->{'table'}->name);
+            push(@sql_data, @vt_data);
+        } else {
+            $sql .=
+                ' '
+              . $self->quote_identifier($qtable->{'table'}->name)
+              . (
+                exists($qtable->{'alias'})
+                ? ' AS ' . $self->quote_identifier($qtable->{'alias'})
+                : ''
+              );
+        }
+
+        next unless exists($qtable->{'join_on'});
+        my $filter_expr = $self->filter($qtable->{'join_on'})->expression();
+        next unless defined($filter_expr);
+        my ($filter_sql) = $self->_field_to_sql(undef, $filter_expr, $qtable, %opts, offset => $opts{'offset'});
+        $sql .= " ON " . $filter_sql if $filter_sql;
+    }
+
+    $sql .= "\n${offset}SET\n";
+
+    my $fields = $table->_fields_hs();
+
+    my @locales = sort keys(%{$self->db->get_option('locales', {})});
+
+    my $sql_params = '';
+    foreach my $name (sort keys(%$data)) {
+        if ($fields->{$name}{'i18n'} && @locales) {
+            foreach my $locale (@locales) {
+                $sql_params .= ",\n" if $sql_params;
+
+                my $field_data = ref($data->{$name}) eq 'HASH' ? $data->{$name}{$locale} : $data->{$name};
+
+                my ($sql_field, @field_data) = $self->_field_to_sql(
+                    undef,
+                    ref($field_data) ? $field_data : \$field_data,
+                    $self->_get_table($table),
+                    %opts,
+                    offset => $opts{'offset'},
+                    locale => $locale,
+                );
+
+                $sql_params .= $offset_params . $self->quote_identifier("${name}_${locale}") . " = $sql_field";
+                push(@sql_data, @field_data);
+            }
+        } else {
+            $sql_params .= ",\n" if $sql_params;
+
+            my ($sql_field, @field_data) = $self->_field_to_sql(
+                undef,
+                ref($data->{$name}) ? $data->{$name} : \$data->{$name},
+                $self->_get_table($table),
+                %opts, offset => $opts{'offset'},
+            );
+
+            $sql_params .= $offset_params . $self->quote_identifier($name) . " = $sql_field";
+            push(@sql_data, @field_data);
+        }
+    }
+    $sql .= $sql_params;
+
+    my $where_sql = '';
+    foreach my $table (@{$self->{'__TABLES__'}}) {
+        next unless defined($table->{'filter'});
+
+        my $filter_expr = $self->filter($table->{'filter'})->expression();
+        next unless defined($filter_expr);
+
+        my ($filter_sql, @filter_data) =
+          $self->_field_to_sql(undef, $filter_expr, $table, %opts, offset => $opts{'offset'});
+
+        if ($filter_sql) {
+            $where_sql .= "\n${offset}" . ($where_sql ? 'AND ' : 'WHERE ') . $filter_sql;
+            push(@sql_data, @filter_data);
+        }
+    }
+    $sql .= $where_sql;
+
+    return ($sql, @sql_data);
+}
+
+sub get_sql_with_data {
+    my ($self, %opts) = @_;
+
+    my $method = 'get_sql_with_data_for_' . $self->{'__TYPE__'};
+
+    return $self->$method(%opts);
 }
 
 =head2 found_rows
@@ -823,7 +1058,7 @@ B<$bool>
 B<Example:>
 
   my $bool = $query->found_rows();
- 
+
 =cut
 
 sub found_rows {
@@ -888,7 +1123,9 @@ sub _table_alias {
 }
 
 sub _get_locale_suffixes {
-    my ($self) = @_;
+    my ($self, $locale) = @_;
+
+    return "_$locale" if defined($locale);
 
     my @locales =
       $self->{'__ALL_LANGS__'}
@@ -927,7 +1164,7 @@ sub _field_to_sql {
                     $self->_get_table_alias($cur_query_table)
                   . $self->quote_identifier($alias . $_) . ' AS '
                   . $self->quote_identifier($alias . ($field->{'i18n'} && $self->{'__ALL_LANGS__'} ? $_ : ''))
-              } $field->{'i18n'} ? $self->_get_locale_suffixes() : ('')
+              } $field->{'i18n'} ? $self->_get_locale_suffixes($opts{'locale'}) : ('')
         );
 
     } elsif (!ref($expr)) {
@@ -948,7 +1185,7 @@ sub _field_to_sql {
                       . $self->quote_identifier($alias . ($field->{'i18n'} && $self->{'__ALL_LANGS__'} ? $_ : ''))
                     : ''
                   )
-              } $field->{'i18n'} ? $self->_get_locale_suffixes() : ('')
+              } $field->{'i18n'} ? $self->_get_locale_suffixes($opts{'locale'}) : ('')
         );
 
     } elsif (
@@ -975,7 +1212,7 @@ sub _field_to_sql {
                       . $self->quote_identifier($alias . ($field->{'i18n'} && $self->{'__ALL_LANGS__'} ? $_ : ''))
                     : ''
                   )
-              } $field->{'i18n'} ? $self->_get_locale_suffixes() : ('')
+              } $field->{'i18n'} ? $self->_get_locale_suffixes($opts{'locale'}) : ('')
         );
 
     } elsif (ref($expr) eq 'HASH' && ref([%$expr]->[1]) eq 'ARRAY') {
@@ -987,7 +1224,7 @@ sub _field_to_sql {
           map {[$self->_field_to_sql(undef, $_, $cur_query_table, %opts, offset => $opts{'offset'} + 4)]}
           @{[%$expr]->[1]};
         my @locale_suffixes =
-          $self->{'__ALL_LANGS__'} && (grep {@$_ > 1} @arg_sets) ? $self->_get_locale_suffixes() : ('');
+          $self->{'__ALL_LANGS__'} && (grep {@$_ > 1} @arg_sets) ? $self->_get_locale_suffixes($opts{'locale'}) : ('');
 
         for my $i (0 .. @locale_suffixes - 1) {
             my @args = map {@$_ > 1 ? $_->[$i] : $_->[0]} @arg_sets;
@@ -1007,8 +1244,8 @@ sub _field_to_sql {
         my @operand_sets =
           map {[$self->_field_to_sql(undef, $_, $cur_query_table, %opts, offset => $opts{'offset'} + 4)]} @{$expr->[1]};
 
-        my @locale_suffixes =
-          $self->{'__ALL_LANGS__'} && (grep {@$_ > 1} @operand_sets) ? $self->_get_locale_suffixes() : ('');
+        my @locale_suffixes = $self->{'__ALL_LANGS__'}
+          && (grep {@$_ > 1} @operand_sets) ? $self->_get_locale_suffixes($opts{'locale'}) : ('');
 
         for my $i (0 .. @locale_suffixes - 1) {
             my @operands = map {@$_ > 1 ? $_->[$i] : $_->[0]} @operand_sets;
@@ -1071,13 +1308,14 @@ sub _field_to_sql {
 
             $cmp2 = ['(' . CORE::join(', ', map {$self->quote($_)} @{$$cmp2}) . ')'];
         } elsif (blessed($cmp2) && $cmp2->isa(__PACKAGE__)) {
-            ($cmp2) = $cmp2->get_sql_with_data(offset => $opts{'offset'} + 4);
+            ($cmp2) = $cmp2->get_sql_with_data(%opts, offset => $opts{'offset'} + 4);
             $cmp2 = ["(\n$offset    $cmp2\n$offset)"];
         } else {
             $cmp2 = [$self->_field_to_sql(undef, $cmp2, $cur_query_table, %opts, offset => $opts{'offset'} + 4)];
         }
 
-        my @locale_suffixes = $self->{'__ALL_LANGS__'} && @$cmp1 + @$cmp2 > 2 ? $self->_get_locale_suffixes() : ('');
+        my @locale_suffixes =
+          $self->{'__ALL_LANGS__'} && @$cmp1 + @$cmp2 > 2 ? $self->_get_locale_suffixes($opts{'locale'}) : ('');
 
         for my $i (0 .. @locale_suffixes - 1) {
             push(@res,

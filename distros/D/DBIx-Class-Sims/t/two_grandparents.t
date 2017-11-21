@@ -4,8 +4,10 @@ use strictures 2;
 use Test::More;
 use Test::Deep;
 
+use lib 't/lib';
+
 BEGIN {
-  use t::loader qw(build_schema);
+  use loader qw(build_schema);
   build_schema([
     House => {
       table => 'houses',
@@ -125,7 +127,7 @@ BEGIN {
   ]);
 }
 
-use t::common qw(sims_test Schema);
+use common qw(sims_test Schema);
 
 sims_test "Autogenerate ancestors (2 lineages)" => {
   spec => {

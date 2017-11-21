@@ -1,0 +1,8 @@
+Testing detectsp
+
+<DetectSpaces context="Bingo" attribute="Match" />
+<Test>
+        spaces were detected
+	tab was detected
+<Test>
+

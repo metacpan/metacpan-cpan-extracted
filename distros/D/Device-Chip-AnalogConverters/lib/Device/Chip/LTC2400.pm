@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Device::Chip );
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use constant PROTOCOL => "SPI";
 

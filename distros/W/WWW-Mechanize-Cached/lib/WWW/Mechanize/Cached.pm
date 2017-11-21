@@ -2,10 +2,10 @@ use strict;
 use warnings FATAL => 'all';
 
 package WWW::Mechanize::Cached;
-$WWW::Mechanize::Cached::VERSION = '1.50';
+
 use 5.006;
 
-use Class::Load 'try_load_class';
+use Module::Runtime 'use_module';
 use Moo 1.004005;
 use MooX::Types::MooseLike::Base qw(AnyOf Bool Enum Maybe);
 use namespace::clean;
@@ -15,15 +15,16 @@ use Carp qw( carp croak );
 use Data::Dump qw( dump );
 use Storable qw( nfreeze thaw );
 
+our $VERSION = '1.51';
+
 has is_cached => ( is => 'rw', isa => Maybe [Bool], default => undef );
 has positive_cache   => ( is => 'rw', isa => Bool, default => 1 );
 has ref_in_cache_key => ( is => 'rw', isa => Bool, default => 0 );
 has _verbose_dwarn   => ( is => 'rw', isa => Bool, default => 0 );
 
-for (qw(cache_undef_content_length cache_zero_content_length)) {
-    has $_ =>
-        ( is => 'rw', isa => AnyOf [ Bool, Enum ['warn'] ], default => 0 );
-}
+has [qw/ cache_undef_content_length cache_zero_content_length /] =>
+    ( is => 'rw', isa => AnyOf [ Bool, Enum ['warn'] ], default => 0 );
+
 has cache_mismatch_content_length => (
     is      => 'rw',
     isa     => AnyOf [ Bool, Enum ['warn'] ],
@@ -49,12 +50,13 @@ sub _build_cache {
             default_expires_in => '1d',
             namespace          => 'www-mechanize-cached',
         }
-    ) if try_load_class 'Cache::FileCache';
+    ) if eval { use_module('Cache::FileCache') };
+
     return CHI->new(
         driver     => 'File',
         expires_in => '1d',
         namespace  => 'www-mechanize-cached',
-    ) if try_load_class 'CHI';
+    ) if eval { use_module('CHI') };
 
     croak(    'Could not create a default cache.'
             . 'Please make sure either CHI or Cache::FileCache are installed or configure manually as appropriate'
@@ -105,7 +107,6 @@ around _make_request => sub {
 };
 
 sub _dwarn_filter {
-    my ( $ctx, $ref ) = @_;
     return {
         hide_keys => [
             qw( _content cookie content set-cookie handlers cookie_jar cache req res page_stack )
@@ -169,7 +170,7 @@ sub _response_cache_ok {
     if ( not defined $size ) {
         if ( $self->cache_undef_content_length . q{} eq q{warn} ) {
             $self->_dwarn(
-                q[Content-Length header was undefined, not caching]
+                      q[Content-Length header was undefined, not caching]
                     . q[ (E=WWW_MECH_CACHED_CONTENTLENGTH_MISSING)],
                 $headers
             );
@@ -183,7 +184,7 @@ sub _response_cache_ok {
     if ( defined $size and $size == 0 ) {
         if ( $self->cache_zero_content_length . q{} eq q{warn} ) {
             $self->_dwarn(
-                q{Content-Length header was 0, not caching}
+                      q{Content-Length header was 0, not caching}
                     . q{ (E=WWW_MECH_CACHED_CONTENTLENGTH_ZERO)},
                 $headers
             );
@@ -241,14 +242,14 @@ WWW::Mechanize::Cached - Cache response to be polite
 
 =head1 VERSION
 
-version 1.50
+version 1.51
 
 =head1 SYNOPSIS
 
     use WWW::Mechanize::Cached;
 
     my $cacher = WWW::Mechanize::Cached->new;
-    $cacher->get( $url );
+    $cacher->get( 'https://metacpan.org' );
 
     # or, with your own Cache object
     use CHI;
@@ -266,7 +267,7 @@ version 1.50
 
 Uses the L<Cache::Cache> hierarchy by default to implement a caching Mech. This
 lets one perform repeated requests without hammering a server impolitely.
-Please note that L<Cache::Cache> has been superceded by L<CHI>, but the default
+Please note that L<Cache::Cache> has been superseded by L<CHI>, but the default
 has not been changed here for reasons of backwards compatibility.  For this
 reason, you are encouraged to provide your own L<CHI> caching object to
 override the default.
@@ -386,7 +387,7 @@ This is configuration option which adjusts how caching behaviour performs when
 the Content-Length header differs from the length of the content itself. ( Which
 usually indicates a transmission error )
 
-Setting this value to 0, will silenly not cache pages with a Content-Length
+Setting this value to 0, will silently not cache pages with a Content-Length
 mismatch.
 
 Setting this value to 1, will cache pages even if the Content-Length header

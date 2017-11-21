@@ -9,9 +9,6 @@ use MYDan::Node;
 use MYDan::Node::DBI::Root;
 use MYDan::Node::DBI::Cache;
 use MYDan::Util::OptConf;
-use MYDan::Util::Sudo;
-
-MYDan::Util::Sudo->sudo();
 
 use constant DOWN => 1;
 

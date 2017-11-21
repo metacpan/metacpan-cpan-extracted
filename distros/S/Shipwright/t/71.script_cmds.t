@@ -95,7 +95,7 @@ sub start_test {
         [
             [ 'obra', ],
             undef, undef,
-            qr/Command not recognized/,
+            qr/Command.*not recognized/,
             "non exist cmd",
         ],
 

@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Data-Enumerable-Lazy.t
+lib/Data/Enumerable/Lazy.pm

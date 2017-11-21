@@ -1,7 +1,7 @@
 package Devel::Chitin::OpTree::BINOP;
 use base 'Devel::Chitin::OpTree::UNOP';
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use strict;
 use warnings;
@@ -132,9 +132,17 @@ sub pp_stringify {
             . ': ' . join(', ', map { $_->op->name } @$children);
     }
 
-    my $target = $self->_maybe_targmy;
+    if ($self->is_null
+        and $self->op->private & B::OPpTARGET_MY
+        and $children->[1]->op->name eq 'concat'
+    ) {
+        $children->[1]->deparse(skip_concat => 1, force_quotes => ['qq(', ')']);
 
-    "${target}qq(" . $children->[1]->deparse(skip_concat => 1, skip_quotes => 1) . ')';
+    } else {
+        my $target = $self->_maybe_targmy;
+
+        "${target}qq(" . $children->[1]->deparse(skip_concat => 1, skip_quotes => 1) . ')';
+    }
 }
 
 sub pp_concat {
@@ -151,9 +159,13 @@ sub pp_concat {
 
     } else {
         my $target = $self->_maybe_targmy;
-        $target . join($params{skip_concat} ? '' : ' . ',
-                        $first->deparse(%params),
+        my $concat_str = join($params{skip_concat} ? '' : ' . ',
+                        $first->deparse(%params, $params{force_quotes} ? (skip_quotes => 1) : ()),
                         $self->last->deparse(%params));
+        if ($params{force_quotes}) {
+            $concat_str = join($concat_str, @{$params{force_quotes}});
+        }
+        $target . $concat_str;
     }
 }
 

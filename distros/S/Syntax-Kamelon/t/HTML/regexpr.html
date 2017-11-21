@@ -1,0 +1,79 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<link rel="stylesheet" href="defaultstyle.css" type="text/css">
+<title>Testfile regexpr</title>
+</head>
+<body>
+<font class="Normal">Testing&nbsp;RegExprSimple.</font></br>
+<font class="Keyword">&lt;RegExpr</font><font class="Others">&nbsp;attribute=</font><font class="String">&quot;Match&quot;</font><font class="Others">&nbsp;context=</font><font class="String">&quot;#stay&quot;</font><font class="Others">&nbsp;String=</font><font class="String">&quot;</font><font class="DecVal">&amp;lt;</font><font class="String">@</font><font class="DecVal">&amp;gt;</font><font class="String">&quot;</font><font class="Normal">&nbsp;</font><font class="Keyword">/&gt;</font></br>
+<font class="Others">&lt;Test&gt;</font></br>
+<font class="Others">This&nbsp;matches:&nbsp;</font><font class="DataType">&lt;@&gt;</font></br>
+<font class="Others">&lt;Test&gt;</font></br>
+</br>
+<font class="Normal">Testing&nbsp;RegExprSimpleI.</font></br>
+<font class="Keyword">&lt;RegExpr</font><font class="Others">&nbsp;attribute=</font><font class="String">&quot;Match&quot;</font><font class="Others">&nbsp;insensitive=</font><font class="String">&quot;true&quot;</font><font class="Others">&nbsp;context=</font><font class="String">&quot;#stay&quot;</font><font class="Others">&nbsp;String=</font><font class="String">&quot;kameel&quot;</font><font class="Normal">&nbsp;</font><font class="Keyword">/&gt;</font></br>
+<font class="Others">&lt;TestI&gt;</font></br>
+<font class="Others">This&nbsp;matches:&nbsp;</font><font class="DataType">kameel</font></br>
+<font class="Others">This&nbsp;matches:&nbsp;</font><font class="DataType">KAMEEL</font></br>
+<font class="Others">&lt;TestI&gt;</font></br>
+</br>
+<font class="Normal">Testing&nbsp;RegExpr.</font></br>
+<font class="Keyword">&lt;RegExpr</font><font class="Others">&nbsp;attribute=</font><font class="String">&quot;Match&quot;</font><font class="Others">&nbsp;context=</font><font class="String">&quot;#stay&quot;</font><font class="Others">&nbsp;String=</font><font class="String">&quot;^kameel&quot;</font><font class="Normal">&nbsp;</font><font class="Keyword">/&gt;</font></br>
+<font class="Others">&lt;TestComplex&gt;</font></br>
+<font class="Comment">#only&nbsp;matches&nbsp;at&nbsp;the&nbsp;beginning&nbsp;of&nbsp;a&nbsp;line.</font></br>
+<font class="DataType">kameel</font><font class="Others">&nbsp;matches.&nbsp;kameel</font></br>
+<font class="Others">KAMEEL&nbsp;does&nbsp;not.&nbsp;KAMEEL</font></br>
+<font class="Others">&lt;TestComplex&gt;</font></br>
+</br>
+<font class="Normal">Testing&nbsp;RegExpr&nbsp;word&nbsp;boundary</font></br>
+<font class="Keyword">&lt;RegExpr</font><font class="Others">&nbsp;attribute=</font><font class="String">&quot;Match&quot;</font><font class="Others">&nbsp;context=</font><font class="String">&quot;#stay&quot;</font><font class="Others">&nbsp;String=</font><font class="String">&quot;\bkameel&quot;</font><font class="Normal">&nbsp;</font><font class="Keyword">/&gt;</font></br>
+<font class="Others">&lt;TestComplexB&gt;</font></br>
+<font class="DataType">kameel</font><font class="Others">&nbsp;matches.&nbsp;:</font><font class="DataType">kameel</font><font class="Others">&nbsp;$</font><font class="DataType">kameel</font><font class="Others">&nbsp;also&nbsp;but&nbsp;notkameel</font></br>
+<font class="Others">&lt;TestComplexB&gt;</font></br>
+</br>
+<font class="Normal">Testing&nbsp;RegExpr&nbsp;non&nbsp;word&nbsp;boundary</font></br>
+<font class="Keyword">&lt;RegExpr</font><font class="Others">&nbsp;attribute=</font><font class="String">&quot;Match&quot;</font><font class="Others">&nbsp;context=</font><font class="String">&quot;#stay&quot;</font><font class="Others">&nbsp;String=</font><font class="String">&quot;\Bkameel&quot;</font><font class="Normal">&nbsp;</font><font class="Keyword">/&gt;</font></br>
+<font class="Others">&lt;TestComplexNB&gt;</font></br>
+<font class="Others">kameel&nbsp;:kameel&nbsp;$kameel&nbsp;all&nbsp;do&nbsp;not&nbsp;match&nbsp;butt&nbsp;not</font><font class="DataType">kameel</font><font class="Others">&nbsp;does.</font></br>
+<font class="Others">&lt;TestComplexNB&gt;</font></br>
+</br>
+<font class="Normal">Testing&nbsp;RegExprD.</font></br>
+<font class="Keyword">&lt;RegExpr</font><font class="Others">&nbsp;attribute=</font><font class="String">&quot;Match&quot;</font><font class="Others">&nbsp;context=</font><font class="String">&quot;RegExprDT&quot;</font><font class="Others">&nbsp;String=</font><font class="String">&quot;\b(\d+)&quot;</font><font class="Normal">&nbsp;</font><font class="Keyword">/&gt;</font></br>
+<font class="Keyword">&lt;RegExpr</font><font class="Others">&nbsp;attribute=</font><font class="String">&quot;Match&quot;</font><font class="Others">&nbsp;dynamic=</font><font class="String">&quot;true&quot;</font><font class="Others">&nbsp;context=</font><font class="String">&quot;#pop&quot;</font><font class="Others">&nbsp;String=</font><font class="String">&quot;kameel%1&quot;</font><font class="Normal">&nbsp;</font><font class="Keyword">/&gt;</font></br>
+<font class="Others">&lt;TestComplexD&gt;</font></br>
+<font class="Others">scoop&nbsp;number</font><font class="DataType">&nbsp;12</font><font class="Others">.&nbsp;</font></br>
+<font class="Others">aap12&nbsp;egel12&nbsp;</font><font class="DataType">kameel12</font><font class="Others">&nbsp;kameel%1&nbsp;</font><font class="Comment">#if&nbsp;this&nbsp;matches,&nbsp;dynamic&nbsp;was&nbsp;not&nbsp;called</font></br>
+<font class="Others">&lt;TestComplexD&gt;</font></br>
+</br>
+<font class="Others">&lt;TestComplexD&gt;</font></br>
+<font class="Others">scoop&nbsp;number</font><font class="DataType">&nbsp;13</font><font class="Others">.&nbsp;</font></br>
+<font class="Others">AAP13&nbsp;EGEL13&nbsp;KAMEEL13&nbsp;kameel%1&nbsp;</font><font class="Comment">#if&nbsp;this&nbsp;matches,&nbsp;dynamic&nbsp;was&nbsp;not&nbsp;called</font></br>
+<font class="Others">&lt;TestComplexD&gt;</font></br>
+</br>
+<font class="Normal">Testing&nbsp;RegExprDI.</font></br>
+<font class="Keyword">&lt;RegExpr</font><font class="Others">&nbsp;attribute=</font><font class="String">&quot;Match&quot;</font><font class="Others">&nbsp;context=</font><font class="String">&quot;TestComplexDIT&quot;</font><font class="Others">&nbsp;String=</font><font class="String">&quot;\s(\d+)&quot;</font><font class="Normal">&nbsp;</font><font class="Keyword">/&gt;</font></br>
+<font class="Keyword">&lt;RegExpr</font><font class="Others">&nbsp;attribute=</font><font class="String">&quot;Match&quot;</font><font class="Others">&nbsp;insensitive=</font><font class="String">&quot;true&quot;</font><font class="Others">&nbsp;dynamic=</font><font class="String">&quot;true&quot;</font><font class="Others">&nbsp;context=</font><font class="String">&quot;#pop&quot;</font><font class="Others">&nbsp;String=</font><font class="String">&quot;kameel%1&quot;</font><font class="Normal">&nbsp;</font><font class="Keyword">/&gt;</font></br>
+<font class="Others">&lt;TestComplexDI&gt;</font></br>
+<font class="Others">scoop&nbsp;number</font><font class="DataType">&nbsp;12</font><font class="Others">.&nbsp;</font></br>
+<font class="Others">aap12&nbsp;egel12&nbsp;</font><font class="DataType">kameel12</font><font class="Others">&nbsp;kameel%1&nbsp;</font><font class="Comment">#if&nbsp;this&nbsp;matches,&nbsp;dynamic&nbsp;was&nbsp;not&nbsp;called</font></br>
+<font class="Others">&lt;TestComplexDI&gt;</font></br>
+</br>
+<font class="Others">&lt;TestComplexDI&gt;</font></br>
+<font class="Others">scoop&nbsp;number</font><font class="DataType">&nbsp;13</font><font class="Others">.&nbsp;</font></br>
+<font class="Others">AAP13&nbsp;EGEL13&nbsp;</font><font class="DataType">KAMEEL13</font><font class="Others">&nbsp;kameel%1&nbsp;</font><font class="Comment">#if&nbsp;this&nbsp;matches,&nbsp;dynamic&nbsp;was&nbsp;not&nbsp;called</font></br>
+<font class="Others">&lt;TestComplexDI&gt;</font></br>
+</br>
+<font class="Normal">Testing&nbsp;RegExprI.</font></br>
+<font class="Keyword">&lt;RegExpr</font><font class="Others">&nbsp;attribute=</font><font class="String">&quot;Match&quot;</font><font class="Others">&nbsp;insensitive=</font><font class="String">&quot;true&quot;</font><font class="Others">&nbsp;context=</font><font class="String">&quot;#stay&quot;</font><font class="Others">&nbsp;String=</font><font class="String">&quot;^kameel&quot;</font><font class="Normal">&nbsp;</font><font class="Keyword">/&gt;</font></br>
+<font class="Others">&lt;TestComplexI&gt;</font></br>
+<font class="Comment">#only&nbsp;matches&nbsp;at&nbsp;the&nbsp;beginning&nbsp;of&nbsp;a&nbsp;line.</font></br>
+<font class="DataType">kameel</font><font class="Others">&nbsp;matches.&nbsp;kameel</font></br>
+<font class="DataType">KAMEEL</font><font class="Others">&nbsp;matches.&nbsp;KAMEEL</font></br>
+<font class="Others">&lt;TestComplexI&gt;</font></br>
+</br>
+</br>
+</br>
+</br>
+</body>
+</html>

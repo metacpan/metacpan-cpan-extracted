@@ -44,8 +44,8 @@ for my $len (0, 1, 2, 8, 23, 345, 1024, 65535, 131072, 9812, 19874, 1473451, 100
         $yahc->run;
 
         cmp_ok($c->{response}{body}, 'eq', $body, "We got expected body");
-        cmp_ok($c->{response}{head}{'Content-Length'}, '==', $len, "We got expected Content-Length");
-        cmp_ok($c->{response}{head}{'Content-Type'}, 'eq', 'raw', "We got expected Content-Type");
+        cmp_ok($c->{response}{head}{'content-length'}, '==', $len, "We got expected content-length");
+        cmp_ok($c->{response}{head}{'content-type'}, 'eq', 'raw', "We got expected content-type");
     };
 
     subtest "chunked_content_length_$len" => sub {
@@ -60,7 +60,7 @@ for my $len (0, 1, 2, 8, 23, 345, 1024, 65535, 131072, 9812, 19874, 1473451, 100
         $yahc->run;
 
         cmp_ok($c->{response}{body}, 'eq', $body, "We got expected body");
-        cmp_ok($c->{response}{head}{'Content-Type'}, 'eq', 'raw', "We got expected Content-Type");
+        cmp_ok($c->{response}{head}{'content-type'}, 'eq', 'raw', "We got expected content-type");
     };
 }
 

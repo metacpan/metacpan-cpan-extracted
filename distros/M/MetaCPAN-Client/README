@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 2.018000
+    version 2.021000
 
 SYNOPSIS
 
@@ -176,6 +176,14 @@ METHODS
 
     Returns an array reference.
 
+ autocomplete_suggest
+
+        my $ac = $mcpan->autocomplete_suggest('Moo');
+
+    Call the search/autocomplete/suggest endpoint with a query string.
+
+    Returns an array reference.
+
  recent
 
         my $recent = $mcpan->recent(10);
@@ -291,6 +299,15 @@ SEARCH PARAMS
     object at a time.
 
         my $module = $mcpan->all('releases', { scroller_size => 500 });
+
+  sort
+
+    Pass a raw Elasticsearch sort specification for the query.
+
+        my $some_releases = $mcpan->all('releases', { sort => [{ date => { order => 'desc' } }] })
+
+    Note: this param and is a bit too specific to Elasticsearch. Just like
+    "es_filter", only use this if you know what you're dealing with.
 
 SEARCH SPEC
 

@@ -7,9 +7,10 @@ do { my $x = {
                       },
        'develop' => {
                       'requires' => {
+                                      'Pod::Wordlist' => '0',
                                       'Test::CPAN::Changes' => '0.19',
                                       'Test::Code::TidyAll' => '0.50',
-                                      'Test::More' => '0.88',
+                                      'Test::More' => '0.96',
                                       'Test::Spelling' => '0.12'
                                     }
                     },

@@ -1,5 +1,5 @@
 package Moose::Exception::AttributeNamesDoNotMatch;
-our $VERSION = '2.2006';
+our $VERSION = '2.2007';
 
 use Moose;
 extends 'Moose::Exception';
@@ -21,4 +21,5 @@ sub _build_message {
     "attribute_name (".$self-> attribute_name.") does not match attribute->name (".$self->attribute->name.")";
 }
 
+__PACKAGE__->meta->make_immutable;
 1;

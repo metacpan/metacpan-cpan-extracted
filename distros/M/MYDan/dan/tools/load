@@ -14,23 +14,26 @@ $| ++;
      [--dp dstfile (default sp )]
 
      [--sudo sudoer ]
-     [--user username (default `logname`)]
+     [--user username (default `id -un`)]
      [--timeout seconds (default 500)]
      [--continue]
+     [--chown root]
+     [--chmod 777]
+     [--cc]
 
 =cut
 
 $MYDan::Util::OptConf::THIS = 'agent';
 my $option = MYDan::Util::OptConf->load();
 my %o = $option->get( 
-    qw( host=s sp=s dp=s verbose user=s sudo=s timeout=i continue ) 
+    qw( host=s sp=s dp=s verbose user=s sudo=s timeout=i continue chown=s chmod=s cc ) 
 )->dump();
 
 $option->assert( 'host', 'sp' );
 $o{dp} ||= $o{sp};
 $o{verbose} = 1;
 
-$o{user} = `logname` and chop $o{user} unless $o{user};
+$o{user} = `id -un` and chop $o{user} unless $o{user};
 
 MYDan::Agent::Load->new(
     node => $o{host}, 

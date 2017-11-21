@@ -1,0 +1,24 @@
+Dancer2::Logger::LogAny Sample App
+
+This directory contains a simple Dancer2 app that demonstrates
+use of Dancer2::Logger::LogAny.
+
+Besides the logger (and Dancer2) you will have to install 
+Log::Any::Adapter::Dispatch.
+
+Run the app with:
+
+  $ perl example app.pl
+
+And in a separate terminal run:
+
+  $ tail -f /tmp/Dancer2_LogAny_example.log
+
+Then in a browser load http://localhost:3000
+
+You will see that the logger logs all messages to the file but
+only those with level debug or higher to the console.
+
+You don't have to use Log::Dispatch -- any Log::Any::Adapter-based
+logging class will work. If you use only one logging class, refer to
+the POD for configuration example.

@@ -5,8 +5,8 @@ use Data::Dumper;
 print "1..6\n";
 
 chdir "t";
-require "bar.pl";
-do "baz.pl";
+require "./bar.pl";
+do "./baz.pl";
 
 my $nono;
 

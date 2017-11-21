@@ -28,17 +28,15 @@ apt-get install libqbit-application-model-db-perl (http://perlhub.ru/)
 =cut
 
 package QBit::Application::Model::DB;
-$QBit::Application::Model::DB::VERSION = '0.023';
+$QBit::Application::Model::DB::VERSION = '0.025';
 use qbit;
 
 use base qw(QBit::Application::Model);
 
 use Exception::DB;
 use Exception::DB::DuplicateEntry;
-use Exception::DB::TimeOut;
 
 use DBI;
-use Sys::SigAction;
 
 =head1 Debug
 
@@ -84,22 +82,7 @@ B<_is_connection_error>
 
 =cut
 
-__PACKAGE__->abstract_methods(
-    qw(query filter get_query_id _get_table_object _create_sql_db _connect _is_connection_error));
-
-=head1 Accessors
-
-=over
-
-=item *
-
-B<select_timeout> - timeout for select statement
-
-=back
-
-=cut
-
-__PACKAGE__->mk_accessors(qw(select_timeout));
+__PACKAGE__->abstract_methods(qw(query filter _get_table_object _create_sql_db _connect _is_connection_error));
 
 =head1 Package methods
 
@@ -526,42 +509,6 @@ sub transaction {
     $self->commit();
 }
 
-=head2 kill_query
-
-B<Arguments:>
-
-=over
-
-=item
-
-B<$query_id> - number (ID query)
-
-=back
-
-B<Return values:>
-
-=over
-
-=item
-
-B<$res> - Returns the number of rows affected or undef on error.
-
-A return value of -1 means the number of rows is not known, not applicable, or not available.
-
-=back
-
-B<Example:>
-
-  my $res = $app->db->kill_query(35); #SQL: KILL QUERY 35;
-
-=cut
-
-sub kill_query {
-    my ($self, $query_id) = @_;
-
-    $self->_do("KILL QUERY $query_id");
-}
-
 sub _get_list_tables {
     my ($self, @tables) = @_;
 
@@ -698,22 +645,6 @@ sub _get_all {
         sub {
             my ($self, $sql, @params) = @_;
 
-            my $TimeOut = Sys::SigAction::set_sig_handler(
-                'ALRM',
-                sub {
-                    my $q_id = $self->get_query_id();
-
-                    #for reconnect
-                    $self->set_dbh();
-
-                    $self->kill_query($q_id);
-
-                    throw Exception::DB::TimeOut gettext("Timeout for sql:\n%s", $self->_log_sql($sql, \@params));
-                }
-            );
-
-            alarm($self->select_timeout // 0);
-
             my $err_code;
             $self->timelog->start(gettext('DBH prepare'));
             my $sth = $self->dbh->prepare($sql)
@@ -743,8 +674,6 @@ sub _get_all {
               && throw Exception::DB $sth->errstr() . " ($err_code)\n" . $self->_log_sql($sql, \@params),
               errorcode => $err_code;
             $self->timelog->finish();
-
-            alarm(0);
 
             return $data;
         },

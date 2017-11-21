@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language SYSTEM "language.dtd">
+<language name="anychar" version="0.1" section="Test" extensions="*.anychar;">
+<highlighting>
+
+<contexts>
+
+<context name="Base" attribute="Normal Text" lineEndContext="#stay">
+	<StringDetect attribute="Test Area" context="Test" String="&lt;Test&gt;" />
+	<StringDetect attribute="Test Area" context="TestI" String="&lt;TestI&gt;" />
+	<IncludeRules context="##XML" /> -->
+</context>
+
+<context name="Comment" attribute="Comment" lineEndContext="#pop">
+</context>
+
+<!-- Testing default without options -->
+<context name="Test" attribute="Test Area" lineEndContext="#stay">
+	<DetectChar attribute="Comment" context="Comment" char="#" />
+	<!-- tests go here -->
+	<AnyChar attribute="Match" context="#stay" String="aeiouy" />
+	<StringDetect attribute="Test Area" context="#pop" String="&lt;Test&gt;" />
+</context>
+
+<!-- Testing insensitive -->
+<context name="TestI" attribute="Test Area" lineEndContext="#stay">
+	<DetectChar attribute="Comment" context="Comment" char="#" />
+	<!-- tests go here -->
+	<AnyChar attribute="Match" context="#stay" insensitive="true" String="aeiouy" />
+	<StringDetect attribute="Test Area" context="#pop" String="&lt;TestI&gt;" />
+</context>
+
+
+</contexts>
+
+<itemDatas>
+	<itemData name="Normal Text" defStyleNum="dsNormal" />
+	<itemData name="Test Area"  defStyleNum="dsOthers" />
+	<itemData name="Match"  defStyleNum="dsDataType" />
+	<itemData name="Match2"  defStyleNum="dsString" />
+	<itemData name="Match3"  defStyleNum="dsChar" />
+	<itemData name="Match4"  defStyleNum="dsDataType" />
+	<itemData name="Match5"  defStyleNum="dsString" />
+	<itemData name="Comment"  defStyleNum="dsComment" />
+</itemDatas>
+
+</highlighting>
+
+<general>
+	<keywords casesensitive="1" weakDeliminator="."/>
+</general>
+
+</language>
+

@@ -19,7 +19,7 @@ sub pick
 	push( @keys,  'A' .. 'Z' );
 	#push( @keys,  (split //, '!"#%&\'()*+,-./:;<=>?@[\]^_`{|}~' ) );
 	my %hash;
-	if( $#files > 62 )
+	if( ($#files + 1)  > 62 )
 	{
 		@keys = ();
 		for( my $i = 0; $i <= $#files; ++$i )
@@ -38,7 +38,7 @@ sub pick
 		chomp( $s );
 		say colored(['bright_red'], "$first" ), $s;
 	}
-	if( $#files > 62 )
+	if( ($#files + 1) > 62 )
 	{
 		my @k;
 		for( my $i = 0; $i <= 2; ++$i )

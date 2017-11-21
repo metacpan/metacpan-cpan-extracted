@@ -1,10 +1,82 @@
 ==================================================
-Changes from 2016-11-05 00:00:00 +0000 to present.
+Changes from 2016-11-19 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.023 at 2017-11-05 00:22:39 +0000
+version 0.025 at 2017-11-19 07:09:32 +0000
 ------------------------------------------
+
+  Change: f07c0bd5603c142abd516afe930274388c012a4c
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2017-11-19 10:08:42 +0000
+
+    Merge pull request #27 from Madskill/update_for_for_low_level
+
+    Update for for low level 
+
+  Change: 8c193113559d9816dc856e969c3d1eccc497676b
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-11-19 10:07:55 +0000
+
+    added documentation 
+
+  Change: 3415433b15db3a1ad56e437b4910e6dc2fd6d393
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-11-19 10:03:27 +0000
+
+    added documentation 
+
+  Change: ce68d8253b8d3c0e53832cf1828f5f54f53d54ec
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-11-19 09:41:19 +0000
+
+    added test 
+
+  Change: 78085e7f6838091903dd84cb9c5f417ed965497e
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-11-19 09:40:54 +0000
+
+    added method update for query 
+
+------------------------------------------
+version 0.024 at 2017-11-15 21:49:15 +0000
+------------------------------------------
+
+  Change: 3fb743532a92e38594e6b8dbe570f6ea1834cd01
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-11-16 00:49:15 +0000
+
+    Version 0.024 
+
+  Change: 741925fd53d2864edfc97e6ac6ef495cbadc60f4
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2017-11-16 00:47:58 +0000
+
+    Merge pull request #26 from Madskill/use_comments
+
+    added comments, offset, delete select_timeout 
+
+  Change: 167cb47f7a3ec08de1617c247d61484dd9f29267
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-11-16 00:45:59 +0000
+
+    refactoring sub _commit 
+
+  Change: 6c0b0001d533d08a8c745a257637922b91c78cb7
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-11-16 00:42:17 +0000
+
+    added comments, offset, delete select_timeout 
+
+------------------------------------------
+version 0.023 at 2017-11-05 00:22:58 +0000
+------------------------------------------
+
+  Change: 06ad9cd69b31bc37e5b29abf17e0c5f75d14779f
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-11-05 03:22:58 +0000
+
+    Version 0.023 
 
   Change: 17a60bfbd024b8dd737f4a6cfeddc012e90e6522
   Author: Igor <igor-sverdlov@mail.ru>
@@ -292,5 +364,5 @@ version 0.013 at 2016-12-01 23:33:04 +0000
     deleted connect if transaction 
 
 =================================================
-Plus 12 releases after 2016-11-05 00:00:00 +0000.
+Plus 12 releases after 2016-11-19 00:00:00 +0000.
 =================================================

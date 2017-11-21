@@ -2,7 +2,7 @@ package Acme::MetaSyntactic::pokemon;
 use strict;
 use Acme::MetaSyntactic::List;
 our @ISA = qw( Acme::MetaSyntactic::List );
-our $VERSION = '1.008';
+our $VERSION = '1.009';
 __PACKAGE__->init();
 
 our %Remote = (
@@ -10,7 +10,7 @@ our %Remote = (
         'http://en.wikipedia.org/wiki/List_of_Pok%C3%A9mon',
     extract => sub {
         my %by_idx =
-            $_[0] =~ m!^<td>([0-9]{3})</td>\n<td><a href="/wiki/[^>]+" [^>]*title="[^>]+">([^<]+)</a></td>$!gm;
+            $_[0] =~ m!^<td[^>]*>([0-9]{3})</td>\n<td[^>]*><a href="/wiki/[^>]+" [^>]*title="[^>]+">([^<]+)</a>!gm;
         return    # support for Unicode female/male symbols
             map { tr/-'.: /_/s; s/_$//; $_ }
             map { Acme::MetaSyntactic::RemoteList::tr_accent($_) }
@@ -43,6 +43,13 @@ Abigail, Philippe Bruhat (BooK)
 =head1 CHANGES
 
 =over 4
+
+=item *
+
+2017-11-13 - v1.009
+
+Fixed the regular expression used to extract the pokemon names from Wikipedia
+in Acme-MetaSyntactic-Themes version 1.051.
 
 =item *
 

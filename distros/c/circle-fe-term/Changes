@@ -1,5 +1,15 @@
 Revision history for Circle-FE-Term
 
+0.173170 2017-11-14 18:06:13
+        [CHANGES]
+         * Render multiline events properly
+         * Support blockquote formatting
+         * Send typing notifications
+         * Other Matrix-related fixes
+
+        [BUGFIXES]
+         * Don't apply indent tag within topic change events (RT120786)
+
 0.170850 2017/03/27 18:38:29
         [CHANGES]
          * Pay attention to the "transient" class hint on static widgets

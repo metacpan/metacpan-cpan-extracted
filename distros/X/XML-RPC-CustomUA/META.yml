@@ -1,22 +1,23 @@
 ---
 abstract: 'XML::RPC with custom user agent string'
 author:
-  - 'A. U. Thor <a.u.thor@a.galaxy.far.far.away>'
+  - 'Rene Schickbauer <maplat@cavac.at>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.72, CPAN::Meta::Converter version 2.120921'
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: XML-RPC-CustomUA
 no_index:
   directory:
     - t
     - inc
 requires:
-  XML::RPC: 0.9
-version: 0.9
+  XML::RPC: '0.9'
+version: 0.91
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

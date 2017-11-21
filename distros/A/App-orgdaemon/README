@@ -1,6 +1,6 @@
 The App-orgdaemon distribution provides the "org-daemon" program, a
-Tk application which sits in the background and "warns" about
-appointments found in configured org-mode files.
+Perl/Tk application which sits in the background and "warns" about
+appointments found in configured Emacs org-mode files.
 
 Installation:
 
@@ -9,9 +9,20 @@ Installation:
 	make test
 	make install
 
-You can use the org-daemon script found in the bin subdirectory
+Installation without downloading the distribution:
+
+	cpan App::orgdaemon
+
+or
+
+	cpanm App::orgdaemon
+
+You can use the org-daemon script found in the bin subdirectory also
 directly, without installation. Make sure that at least Perl/Tk is
-installed.
+installed. On a Debian based system this dependency could be installed
+using
+
+	sudo apt-get install perl-tk
 
 Usage:
 

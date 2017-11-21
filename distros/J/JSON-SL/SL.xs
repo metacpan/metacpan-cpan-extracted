@@ -224,6 +224,7 @@ process_special_THX(pTHX_
 {
     SV *newsv;
     char *buf = GET_STATE_BUFFER(pjsn, state->pos_begin);
+size_t poscur = pjsn->jsn->pos;
 
     switch (state->special_flags) {
     /* might look redundant, but is most common, so it's first */
@@ -231,7 +232,7 @@ process_special_THX(pTHX_
     case JSONSL_SPECIALf_SIGNED:
         newsv = pljsonsl_common_mknumeric(state,
                                           buf,
-                                          state->pos_cur - state->pos_begin);
+                                          poscur - state->pos_begin);
         break;
 
     case JSONSL_SPECIALf_TRUE:
@@ -244,13 +245,13 @@ process_special_THX(pTHX_
     default:
         newsv = pljsonsl_common_mknumeric(state,
                                           buf,
-                                          state->pos_cur - state->pos_begin);
+                                          poscur - state->pos_begin);
         break;
     }
 
     if (newsv == NULL) {
         warn("Buffer is %p", buf);
-        warn("Length is %lu", state->pos_cur - state->pos_begin);
+        warn("Length is %lu", poscur - state->pos_begin);
         warn("Special flag is %d", state->special_flags);
         die("WTF!");
     }
@@ -272,8 +273,9 @@ process_string_THX(pTHX_
     SV *retsv;
     char *buf = GET_STATE_BUFFER(pjsn, state->pos_begin);
     size_t buflen;
+    size_t poscur = pjsn->jsn->pos;
     buf++;
-    buflen = (state->pos_cur - state->pos_begin) - 1;
+    buflen = (poscur - state->pos_begin) - 1;
     retsv = newSV(buflen);
 
     sv_upgrade(retsv, SVt_PV);
@@ -506,7 +508,8 @@ create_hk_THX(pTHX_ PLJSONSL *pjsn,
               struct jsonsl_state_st *parent)
 {
     char *buf = GET_STATE_BUFFER(pjsn, state->pos_begin);
-    STRLEN len = (state->pos_cur - state->pos_begin)-1;
+    size_t poscur = pjsn->jsn->pos;
+    STRLEN len = (poscur - state->pos_begin)-1;
 
     assert(pjsn->curhk == NULL);
     buf++;
@@ -886,11 +889,12 @@ convert_to_tuba_cbt(struct jsonsl_state_st *state)
     }
     if (state->special_flags & JSONSL_SPECIALf_BOOLEAN) {
         return PLTUBA_CALLBACK_BOOLEAN;
-    } else if (state->special_flags & JSONSL_SPECIALf_NUMERIC) {
+    } else if (state->special_flags & (JSONSL_SPECIALf_NUMERIC | JSONSL_SPECIALf_DASH)) {
         return PLTUBA_CALLBACK_NUMBER;
     } else if (state->special_flags == JSONSL_SPECIALf_NULL) {
         return PLTUBA_CALLBACK_NULL;
     }
+    warn("Special flag is %d", state->special_flags);
     die("wtf?");
     return 0;
 }
@@ -1117,6 +1121,7 @@ pltuba_process_accum_THX(pTHX_
                          PLTUBA *tuba,
                          struct jsonsl_state_st *state)
 {
+    size_t poscur = tuba->jsn->pos;
     if (state->type == JSONSL_T_SPECIAL) {
         SV *newsv;
 
@@ -1127,7 +1132,7 @@ pltuba_process_accum_THX(pTHX_
         } else if (state->special_flags & JSONSL_SPECIALf_NUMNOINT) {
             newsv = pljsonsl_common_mknumeric(state,
                                               SvPVX_const(tuba->accum),
-                                              state->pos_cur - state->pos_begin);
+                                              poscur - state->pos_begin);
         } else if (state->special_flags & JSONSL_SPECIALf_BOOLEAN) {
             newsv = pljsonsl_common_mkboolean((PLJSONSL*)tuba,
                                               state->special_flags);
@@ -1173,10 +1178,11 @@ pltuba_jsonsl_pop_callback(jsonsl_t jsn,
     PLTUBA *tuba = (PLTUBA*)jsn->data;
     PLJSONSL_dTHX(tuba);
     pltuba_callback_type cbt = convert_to_tuba_cbt(state);
+    size_t poscur = jsn->pos;
 
     if (!JSONSL_STATE_IS_CONTAINER(state)) {
         /* Special handling for character crap.. */
-        pltuba_flush_characters(tuba, state->pos_cur);
+        pltuba_flush_characters(tuba, poscur);
 
 
         if (tuba->accum) {

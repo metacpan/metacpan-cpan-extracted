@@ -26,7 +26,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.99",
     "XML::LibXML" => "2.0106"
   },
-  "VERSION" => "0.07",
+  "VERSION" => "0.09",
   "test" => {
     "TESTS" => "t/*.t"
   }

@@ -24,7 +24,7 @@ Search::Elasticsearch::Plugin::XPack::1_0::Watcher - Plugin providing Watcher AP
 
 =head1 VERSION
 
-version 5.02
+version 6.00
 
 =head1 SYNOPSIS
 

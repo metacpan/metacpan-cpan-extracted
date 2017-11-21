@@ -1,5 +1,9 @@
 Revision history for CGI::Fast
 
+2.13 2017-11-17
+    [TESTING]
+    remove use of Test::Deep completely (GH #17)
+
 2.12 2016-11-22
     [DOCUMENTATION]
     - tweak docs about overriding STDIN due to interference with POST

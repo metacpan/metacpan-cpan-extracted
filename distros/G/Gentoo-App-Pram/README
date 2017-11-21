@@ -1,0 +1,56 @@
+NAME
+
+    Gentoo::App::Pram - Library to fetch a GitHub Pull Request as an
+    am-like patch.
+
+DESCRIPTION
+
+    The purpose of this module is to fetch Pull Requests from GitHub's CDN
+    as am-like patches in order to facilitate the merging and closing of
+    Pull Requests. This module also takes care of adding "Closes:" and
+    "Bug:" which are Gentoo-specific. See GLEP 0066.
+
+FUNCTIONS
+
+      * fetch_patch($patch_url)
+
+      Fetch patch from $patch_url. Return patch as a string.
+
+      * modify_patch($patch)
+
+      Modify the patch headers. This function only modifies the headers of
+      the first commit. Namely: * Add a "Closes: https://github.com/XXX"
+      header. Check first if it wasn't added already. This header is parsed
+      by the Github bot upon merge. The bot then automatically closes the
+      pull request. See
+      https://help.github.com/articles/closing-issues-using-keywords for
+      more info. * Add a "Bug: https://bugs.gentoo.org/XXX" header when the
+      `--bug XXX` option is given. This header is parsed by the Gentoo
+      Bugzilla bot upon merge. The bot then writes a message in the bug
+      report. See GLEP 0066 for more info. * Add a "Closes:
+      https://bugs.gentoo.org/XXX" header when the `--closes XXX` option is
+      given. This header is parsed by the Gentoo Bugzilla bot upon merge.
+      The bot then automatically closes the bug report. See GLEP 0066 for
+      more info.
+
+      * apply_patch($editor, $git_command, $patch)
+
+      Apply $patch onto HEAD of the current git repository using
+      $git_command. This functions also shows $patch in $editor for a final
+      review.
+
+VERSION
+
+    version 0.100
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2016 by Patrice Clement.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+AUTHOR
+
+    Patrice Clement <monsieurp@gentoo.org> Kent Fredric <kentnl@gentoo.org>
+

@@ -4,6 +4,7 @@ use LWP::UserAgent;
 use Test::More;
 # use Net::Amazon::AlexaValidator;
 
+ok 1, 'No-op test';
 # This test will fail. The signature is all wrong. However, I don't have access to Amazon's
 # private key :) so I can't generate a correct one.
   # my $request_body = {

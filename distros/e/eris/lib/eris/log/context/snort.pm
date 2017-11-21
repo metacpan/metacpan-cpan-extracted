@@ -1,16 +1,19 @@
 package eris::log::context::snort;
+# ABSTRACT: Parses the Snort and Suricata alert logs
 
-use Const::Fast;
 use Moo;
 use namespace::autoclean;
-
 with qw(
     eris::role::context
 );
 
+our $VERSION = '0.004'; # VERSION
+
+
 sub _build_matcher {
     [qw(suricata snort)]
 }
+
 
 sub sample_messages {
     my @msgs = split /\r?\n/, <<EOF;
@@ -25,6 +28,7 @@ EOF
     return @msgs;
 }
 
+
 sub contextualize_message {
     my ($self,$log) = @_;
     my $str = $log->context->{message};
@@ -32,18 +36,21 @@ sub contextualize_message {
     $log->add_tags(qw(security ids));
 
     my %ctxt = ();
-    if ( $str =~ s/^\[(\S+)\]\s+// ) {
+    if ( $str =~ /^\[(\S+)\]\s+/g ) {
         $ctxt{id} = (split /:/, $1, 3)[1];
-        if ( $str =~ /([^\[]+)/ ) {
+        if ( $str =~ /\G([^\[]+)/gc ) {
             $ctxt{name} = $1;
             $ctxt{name} =~ s/\s+$//;
-            if ( $str =~ /\[Classification: ([^\]]+)\]/ )  {
+            if ( $str =~ /(?>\[Classification: ([^\]]+)\])/ )  {
                 $ctxt{class} = $1;
             }
-            if ( $str =~ /\{(\S+)\}/ ) {
+            if ( $str =~ /(?>\[Priority: (\d+)\])/ )  {
+                $ctxt{pri} = $1;
+            }
+            if ( $str =~ /(?>\{(\S+)\})/ ) {
                 $ctxt{proto_app} = $1;
             }
-            if( $str =~ /(\S+):(\d+) -> (\S+):(\d+)/ ) {
+            if( $str =~ /(?>(\S+):(\d+) -> (\S+):(\d+))/ ) {
                 @ctxt{qw(src_ip src_port dst_ip dst_port)} = ($1,$2,$3,$4);
             }
         }
@@ -51,6 +58,7 @@ sub contextualize_message {
 
     $log->add_context($self->name,\%ctxt) if keys %ctxt;
 }
+
 
 1;
 
@@ -62,11 +70,44 @@ __END__
 
 =head1 NAME
 
-eris::log::context::snort
+eris::log::context::snort - Parses the Snort and Suricata alert logs
 
 =head1 VERSION
 
-version 0.003
+version 0.004
+
+=head1 SYNOPSIS
+
+This parses data in the Snort and Suricata alert logs into structured data.
+
+=head1 ATTRIBUTES
+
+=head2 matcher
+
+Matches the literal string 'snort' and 'suricata'
+
+=head1 METHODS
+
+=head2 contextualize_message
+
+Extracts information from the Snort and Suricata alert logs
+
+    name      => rule name
+    class     => rule classification
+    pri       => rule priority
+    proto_app => protocol
+
+And
+
+    src_ip src_port dst_ip dst_port
+
+Tags messages with 'security' and 'ids'.
+
+=for Pod::Coverage sample_messages
+
+=head1 SEE ALSO
+
+L<eris::log::contextualizer>, L<eris::role::context>
 
 =head1 AUTHOR
 

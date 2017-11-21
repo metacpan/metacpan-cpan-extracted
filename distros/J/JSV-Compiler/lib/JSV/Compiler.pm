@@ -11,7 +11,7 @@ use Data::Dumper;
 use Regexp::Common('RE_ALL', 'Email::Address', 'URI', 'time');
 use Scalar::Util qw(looks_like_number blessed weaken reftype);
 
-our $VERSION = "0.03";
+our $VERSION = "0.04";
 
 sub new {
     my ($class, %args) = @_;
@@ -42,6 +42,7 @@ sub load_schema {
 sub _deep_walk {
     my $visitor = shift;
     my $recurse;
+    ## no critic (Variables::RequireInitializationForLocalVars)
     local $_;
     $recurse = sub {
         my ($cnode) = @_;
@@ -71,7 +72,7 @@ sub _deep_walk {
     $visitor->('ARRAY', \@_, 0);
 }
 
-sub _resolve_references {
+sub _resolve_references {    ## no critic (Subroutines::ProhibitExcessComplexity)
     my $self = $_[0];
     $self->{full_schema} = dclone $self->{original_schema};
     my $base_uri = $self->{full_schema}{id} || $self->{full_schema}{'$id'};
@@ -129,6 +130,7 @@ sub _resolve_references {
 
 sub compile {
     my ($self, %opts) = @_;
+    ## no critic (Variables::ProhibitLocalVars)
     local $self->{coersion} = $opts{coersion} // 0;
     local $self->{to_json}  = $opts{to_json}  // 0;
     $self->{required_modules} = {};
@@ -138,8 +140,7 @@ sub compile {
     my $is_required = $opts{is_required} // $type eq 'object' || 0;
     my $val_func    = "_validate_$type";
     my $val_expr    = $self->$val_func($input_sym, $schema, "", $is_required);
-    return
-        wantarray
+    return wantarray
         ? ($val_expr, map {$_ => [sort keys %{$self->{required_modules}{$_}}]} keys %{$self->{required_modules}})
         : $val_expr;
 }
@@ -155,7 +156,7 @@ sub _norm_schema {
     $shmpt;
 }
 
-sub _guess_schema_type {
+sub _guess_schema_type {    ## no critic (Subroutines::ProhibitExcessComplexity)
     my $shmpt = $_[0];
     if (my $class = blessed($shmpt)) {
         if ($class =~ /bool/i) {
@@ -184,8 +185,8 @@ sub _guess_schema_type {
     return 'number'
         if defined $shmpt->{minimum}
         or defined $shmpt->{maximum}
-        or defined $shmpt->{exclusiveMinimum}
-        or defined $shmpt->{exclusiveMaximum}
+        or exists $shmpt->{exclusiveMinimum}
+        or exists $shmpt->{exclusiveMaximum}
         or defined $shmpt->{multipleOf};
     return 'string';
 }
@@ -211,6 +212,7 @@ my %formats = (
 );
 #>>>
 
+## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
 sub _validate_null {
     my ($self, $sympt, $schmptm, $path) = @_;
     my @sp = split /->/, $sympt;
@@ -224,7 +226,7 @@ sub _validate_boolean {
     my ($self, $sympt, $schmpt, $path, $is_required) = @_;
     $schmpt = _norm_schema($schmpt);
     my $r = '';
-    if (defined $schmpt->{default}) {
+    if (exists $schmpt->{default}) {
         my $val = _quote_var($schmpt->{default});
         $r = "$sympt = $val if not defined $sympt;\n";
     }
@@ -301,7 +303,7 @@ sub _validate_string {
     return $r;
 }
 
-sub _validate_any_number {
+sub _validate_any_number {    ## no critic (Subroutines::ProhibitManyArgs Subroutines::ProhibitExcessComplexity)
     my ($self, $sympt, $schmpt, $path, $is_required, $re, $ntype) = @_;
     $schmpt = _norm_schema($schmpt);
     my $r = '';
@@ -314,21 +316,31 @@ sub _validate_any_number {
     $r .= $self->_validate_schemas_array($sympt, $schmpt, $path);
     $r .= "  {\n";
     $r .= "  if($sympt !~ /^$re\$/){ push \@\$errors, '$path does not look like $ntype number'; last }\n";
-    if (defined $schmpt->{minimum}) {
-        $r .= "  push \@\$errors, '$path must be not less than $schmpt->{minimum}'";
-        $r .= " if $sympt < $schmpt->{minimum};\n";
+    my ($minimum, $exclusiveMinimum, $maximum, $exclusiveMaximum)
+        = @{$schmpt}{qw(minimum exclusiveMinimum maximum exclusiveMaximum)};
+    if (defined $minimum && $exclusiveMinimum) {
+        $exclusiveMinimum = $minimum;
+        undef $minimum;
     }
-    if (defined $schmpt->{exclusiveMinimum}) {
-        $r .= "  push \@\$errors, '$path must be greater than $schmpt->{exclusiveMinimum}'";
-        $r .= " if $sympt <= $schmpt->{exclusiveMinimum};\n";
+    if (defined $maximum && $exclusiveMaximum) {
+        $exclusiveMaximum = $maximum;
+        undef $maximum;
     }
-    if (defined $schmpt->{maximum}) {
-        $r .= "  push \@\$errors, '$path must be not greater than $schmpt->{maximum}'";
-        $r .= " if $sympt > $schmpt->{maximum};\n";
+    if (defined $minimum) {
+        $r .= "  push \@\$errors, '$path must be not less than $minimum'";
+        $r .= " if $sympt < $minimum;\n";
     }
-    if (defined $schmpt->{exclusiveMaximum}) {
-        $r .= "  push \@\$errors, '$path must be less than $schmpt->{exclusiveMaximum}'";
-        $r .= " if $sympt >= $schmpt->{exclusiveMaximum};\n";
+    if (defined $exclusiveMinimum) {
+        $r .= "  push \@\$errors, '$path must be greater than $exclusiveMinimum'";
+        $r .= " if $sympt <= $exclusiveMinimum;\n";
+    }
+    if (defined $maximum) {
+        $r .= "  push \@\$errors, '$path must be not greater than $maximum'";
+        $r .= " if $sympt > $maximum;\n";
+    }
+    if (defined $exclusiveMaximum) {
+        $r .= "  push \@\$errors, '$path must be less than $exclusiveMaximum'";
+        $r .= " if $sympt >= $exclusiveMaximum;\n";
     }
     if (defined $schmpt->{const}) {
         $r .= "  push \@\$errors, '$path must be $schmpt->{const}' if $sympt != $schmpt->{const};\n";
@@ -442,7 +454,7 @@ sub _validate_schemas_array {
     return $r;
 }
 
-sub _validate_object {
+sub _validate_object {    ## no critic (Subroutines::ProhibitExcessComplexity)
     my ($self, $sympt, $schmpt, $path, $is_required) = @_;
     $schmpt = _norm_schema($schmpt);
     my $rpath = !$path ? "(object)" : $path;

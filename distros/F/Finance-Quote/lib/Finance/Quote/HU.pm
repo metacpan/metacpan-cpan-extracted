@@ -19,7 +19,7 @@ use HTTP::Request::Common;
 use HTML::TableExtract;
 use Encode;
 
-our $VERSION = '1.45'; # VERSION
+our $VERSION = '1.47'; # VERSION
 
 my $BAMOSZ_MAINURL = "http://www.bamosz.hu/";
 my $BAMOSZ_URL = $BAMOSZ_MAINURL . "alapoldal?isin=";

@@ -9,7 +9,7 @@ use Test2::API qw/test2_stack/;
 
 use overload '""' => \&reason, fallback => 1;
 
-our $VERSION = '0.000083';
+our $VERSION = '0.000084';
 
 sub init {
     my $self = shift;
@@ -174,7 +174,7 @@ F<http://github.com/Test-More/Test2-Suite/>.
 
 =head1 COPYRIGHT
 
-Copyright 2016 Chad Granum E<lt>exodist@cpan.orgE<gt>.
+Copyright 2017 Chad Granum E<lt>exodist@cpan.orgE<gt>.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

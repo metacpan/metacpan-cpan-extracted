@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150001'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.143240'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,7 +18,8 @@ no_index:
     - t
     - inc
 requires:
+  Scalar::Util: '1.08'
   Test::More: '0'
 resources:
   repository: http://github.com/makamaka/JSON-PP
-version: '2.27400'
+version: '2.97000'

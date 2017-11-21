@@ -37,7 +37,7 @@ typedef struct {
 
     void *snappy_workmem;     /* lazily allocated if and only if using Snappy */
     IV compress_threshold;    /* do not compress things smaller than this even if compression enabled */
-    IV compress_level;        /* For ZLIB, the compression level 1..9 */
+    IV compress_level;        /* For ZLIB and ZSTD, the compression level */
 
                               /* only used if SRL_F_ENABLE_FREEZE_SUPPORT is set. */
     SV *sereal_string_sv;     /* SV that says "Sereal" for FREEZE support */
@@ -103,6 +103,7 @@ SV *srl_dump_data_structure_mortal_sv(pTHX_ srl_encoder_t *enc, SV *src, SV *use
  * #define SRL_F_COMPRESS_SNAPPY_INCREMENTAL   0x00080UL
  * #define SRL_F_COMPRESS_ZLIB                 0x00100UL
  * are moved to srl_compress.h
+ * note that there is SRL_F_COMPRESS_ZSTD defined below
  */
 
 /* Only meaningful if SRL_F_WARN_UNKNOWN also set. If this one is set, then we don't warn
@@ -134,6 +135,12 @@ SV *srl_dump_data_structure_mortal_sv(pTHX_ srl_encoder_t *enc, SV *src, SV *use
 
 #define SRL_F_SORT_KEYS_PERL                    0x10000UL
 #define SRL_F_SORT_KEYS_PERL_REV                0x20000UL
+
+/* WARNING:
+ * SRL_F_COMPRESS_ZSTD is defined in srl_compress.h
+ * #define SRL_F_COMPRESS_ZSTD                  0x40000UL
+ */
+
 /* ====================================================================
  * oper flags
  */

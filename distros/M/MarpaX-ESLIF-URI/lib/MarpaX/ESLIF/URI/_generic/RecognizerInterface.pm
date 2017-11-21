@@ -3,7 +3,7 @@ use warnings FATAL => 'all';
 
 package MarpaX::ESLIF::URI::_generic::RecognizerInterface;
 
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 our $AUTHORITY = 'cpan:JDDPAUSE'; # AUTHORITY
 
@@ -45,7 +45,7 @@ MarpaX::ESLIF::URI::_generic::RecognizerInterface - MarpaX::ESLIF's URI Recogniz
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =for Pod::Coverage *EVERYTHING*
 

@@ -2,9 +2,10 @@ package JSON::Validator;
 use Mojo::Base -base;
 
 use B;
-use Carp ();
+use Carp 'confess';
 use Exporter 'import';
 use JSON::Validator::Error;
+use JSON::Validator::Ref;
 use Mojo::File 'path';
 use Mojo::JSON::Pointer;
 use Mojo::JSON;
@@ -14,21 +15,26 @@ use Mojo::Util 'url_unescape';
 use Scalar::Util qw(blessed refaddr);
 use Time::Local ();
 
-use constant DEBUG           => $ENV{JSON_VALIDATOR_DEBUG}           || 0;
+use constant COLORS => eval { require Term::ANSIColor };
+use constant DEBUG => $ENV{JSON_VALIDATOR_DEBUG};
+use constant REPORT => $ENV{JSON_VALIDATOR_REPORT} // $ENV{JSON_VALIDATOR_DEBUG};
 use constant RECURSION_LIMIT => $ENV{JSON_VALIDATOR_RECURSION_LIMIT} || 100;
 use constant SPECIFICATION_URL => 'http://json-schema.org/draft-04/schema#';
 use constant VALIDATE_HOSTNAME => eval 'require Data::Validate::Domain;1';
 use constant VALIDATE_IP       => eval 'require Data::Validate::IP;1';
 
 our $ERR;    # ugly hack to improve validation errors
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 our @EXPORT_OK = 'validate_json';
 
 my $BUNDLED_CACHE_DIR = path(path(__FILE__)->dirname, qw(Validator cache));
 my $HTTP_SCHEME_RE = qr{^https?:};
 
+sub D {
+  Data::Dumper->new([@_])->Sortkeys(1)->Indent(0)->Maxdepth(2)->Pair(':')->Useqq(1)->Terse(1)->Dump;
+}
 sub E { JSON::Validator::Error->new(@_) }
-sub S { Mojo::Util::md5_sum(Data::Dumper->new([@_])->Sortkeys(1)->Useqq(1)->Dump); }
+sub S { Mojo::Util::md5_sum(Data::Dumper->new([@_])->Sortkeys(1)->Useqq(1)->Dump) }
 
 has cache_paths => sub {
   my $self = shift;
@@ -54,6 +60,61 @@ has ua => sub {
   $ua;
 };
 
+sub bundle {
+  my ($self, $args) = @_;
+  my $def_name_cb = $args->{definitions_name} || \&_definitions_name;
+  my @topics = ([undef, my $bundle = {}]);
+  my ($cloner, $tied);
+
+  $topics[0][0] = $args->{schema} ? $self->_reset->_resolve($args->{schema}) : $self->schema->data;
+
+  if ($args->{replace}) {
+    $cloner = sub {
+      my $from = shift;
+      my $ref  = ref $from;
+      $from = $tied->schema if $ref eq 'HASH' and $tied = tied %$from;
+      my $to = $ref eq 'ARRAY' ? [] : $ref eq 'HASH' ? {} : $from;
+      push @topics, [$from, $to] if $ref;
+      return $to;
+    };
+  }
+  else {
+    $bundle->{definitions} ||= {%{$topics[0][0]{definitions} || {}}};
+    $cloner = sub {
+      my $from = shift;
+      my $ref  = ref $from;
+
+      if ($ref eq 'HASH' and my $tied = tied %$from) {
+        return $from if $tied->fqn =~ m!^\#!;
+        my $name = $self->$def_name_cb($tied->fqn);
+        push @topics, [$tied->schema, $bundle->{definitions}{$name} = {}];
+        tie my %ref, 'JSON::Validator::Ref', $tied->schema, "#/definitions/$name";
+        return \%ref;
+      }
+
+      my $to = $ref eq 'ARRAY' ? [] : $ref eq 'HASH' ? {} : $from;
+      push @topics, [$from, $to] if $ref;
+      return $to;
+    };
+  }
+
+  while (@topics) {
+    my ($from, $to) = @{shift @topics};
+    if (ref $from eq 'ARRAY') {
+      for (my $i = 0; $i < @$from; $i++) {
+        $to->[$i] = $cloner->($from->[$i]);
+      }
+    }
+    elsif (ref $from eq 'HASH') {
+      while (my ($key, $value) = each %$from) {
+        $to->{$key} //= $cloner->($from->{$key});
+      }
+    }
+  }
+
+  return $bundle;
+}
+
 sub coerce {
   my $self = shift;
   return $self->{coerce} ||= {} unless @_;
@@ -62,20 +123,47 @@ sub coerce {
   $self;
 }
 
+sub get {
+  my ($self, $pointer) = @_;
+  my $data = $self->schema->data;
+  my $tied;
+
+  return $data unless ref $pointer or $pointer =~ s!^/!!;
+  $pointer = [length $pointer ? (split '/', $pointer, -1) : ($pointer)] unless ref $pointer;
+  for my $p (@$pointer) {
+    $p =~ s!~1!/!g;
+    $p =~ s/~0/~/g;
+
+    if (ref $data eq 'HASH' and exists $data->{$p}) {
+      $data = $data->{$p};
+    }
+    elsif (ref $data eq 'ARRAY' and $p =~ /^\d+$/ and @$data > $p) {
+      $data = $data->[$p];
+    }
+    else {
+      return undef;
+    }
+
+    $data = $tied->schema if ref $data eq 'HASH' and $tied = tied %$data;
+  }
+
+  return $data;
+}
+
 sub load_and_validate_schema {
   my ($self, $spec, $args) = @_;
   $spec = $self->_reset->_resolve($spec);
   my @errors = $self->new(%$self)->schema($args->{schema} || SPECIFICATION_URL)->validate($spec);
-  Carp::confess(join "\n", "Invalid schema:", @errors) if @errors;
+  confess join "\n", "Invalid JSON specification $spec:", map {"- $_"} @errors if @errors;
   $self->{schema} = Mojo::JSON::Pointer->new($spec);
   $self;
 }
 
 sub schema {
   my $self = shift;
-  my $schema = shift or return $self->{schema};
-  $self->{schema} = Mojo::JSON::Pointer->new($self->_reset->_resolve($schema));
-  $self;
+  return $self->{schema} unless @_;
+  $self->{schema} = Mojo::JSON::Pointer->new($self->_reset->_resolve(shift));
+  return $self;
 }
 
 sub singleton { state $validator = shift->new }
@@ -84,9 +172,14 @@ sub validate {
   my ($self, $data, $schema) = @_;
   $schema ||= $self->schema->data;
   return E '/', 'No validation rules defined.' unless $schema and %$schema;
-  local $self->{schema} = Mojo::JSON::Pointer->new($schema);
-  local $self->{seen}   = {};
-  return $self->_validate($data, '', $schema);
+
+  local $self->{grouped} = 0;
+  local $self->{schema}  = Mojo::JSON::Pointer->new($schema);
+  local $self->{seen}    = {};
+  $self->{report} = [];
+  my @errors = $self->_validate($data, '', $schema);
+  $self->_report if DEBUG and REPORT;
+  return @errors;
 }
 
 sub validate_json {
@@ -105,27 +198,6 @@ sub _build_formats {
   };
 }
 
-sub _explode {
-  my ($self, $schema) = @_;
-  my @topics = ($schema);
-
-  while (@topics) {
-    my $topic = shift @topics;
-    if (ref $topic eq 'ARRAY') {
-      push @topics, @$topic;
-    }
-    elsif (ref $topic eq 'HASH') {
-      if ($topic->{'$ref'}) {
-        my $other = $self->_ref_to_schema($topic);
-        %$topic = %$other;
-      }
-      push @topics, values %$topic;
-    }
-  }
-
-  return $schema;
-}
-
 sub _load_schema {
   my ($self, $url) = @_;
 
@@ -138,7 +210,7 @@ sub _load_schema {
     my ($module, $file) = ($1, $2);
     warn "[JSON::Validator] Loading schema from data section: $url\n" if DEBUG;
     my $text = Mojo::Loader::data_section($module, $file)
-      || Carp::confess("$file could not be found in __DATA__ section of $module.");
+      || confess "$file could not be found in __DATA__ section of $module.";
     return $self->_load_schema_from_text(\$text), "$url";
   }
 
@@ -156,7 +228,7 @@ sub _load_schema {
     return $self->_load_schema_from_text(\$file->slurp), $url;
   }
 
-  Carp::confess("Unable to load schema '$url'");
+  confess "Unable to load schema '$url'";
 }
 
 sub _load_schema_from_text {
@@ -194,7 +266,7 @@ sub _load_schema_from_url {
 
   $tx = $self->ua->get($url);
   $err = $tx->error && $tx->error->{message};
-  Carp::confess("GET $url == $err") if DEBUG and $err;
+  confess "GET $url == $err" if DEBUG and $err;
   die "[JSON::Validator] GET $url == $err" if $err;
 
   if ($cache_path and $cache_path ne $BUNDLED_CACHE_DIR and -w $cache_path) {
@@ -210,34 +282,13 @@ sub _ref_to_schema {
   my ($self, $schema) = @_;
 
   my @guard;
-  while ($schema->{'$ref'}) {
-    push @guard, $schema->{'$ref'};
-    Carp::confess("Seems like you have a circular reference: @guard") if @guard > RECURSION_LIMIT;
-    $schema = $self->{refs}{refaddr($schema)} // Carp::confess("Could not lookup @guard");
+  while (my $tied = tied %$schema) {
+    push @guard, $tied->ref;
+    confess "Seems like you have a circular reference: @guard" if @guard > RECURSION_LIMIT;
+    $schema = $tied->schema;
   }
 
   return $schema;
-}
-
-sub _register_ref {
-  my ($self, $topic, $schema_url) = @_;
-  my $ref = $topic->{'$ref'};
-  my $fqn = Mojo::URL->new($ref =~ m!^/! ? "#$ref" : $ref);
-
-  $fqn = $fqn->to_abs($schema_url) unless $fqn->is_abs;
-  $fqn = $fqn->to_string;
-  $fqn =~ s!(.)#$!$1!;
-  $fqn =~ s!#(.+)!{'#' . url_unescape $1}!e;
-
-  my ($base, $pointer) = split /#/, $fqn, 2;
-  my $other = $self->_resolve($base);
-
-  if (length $pointer) {
-    $other = Mojo::JSON::Pointer->new($other)->get($pointer)
-      or Carp::confess(qq[Possibly a typo in schema? Could not find "$ref" ($fqn)]);
-  }
-
-  $self->{refs}{refaddr($topic)} = $other;
 }
 
 sub _register_schema {
@@ -246,8 +297,34 @@ sub _register_schema {
   $self->{schemas}{$fqn} = $schema;
 }
 
+sub _report {
+  my $table = Mojo::Util::tablify($_[0]->{report});
+  $table =~ s!^(\W*)(N?OK|<<<)(.*)!{
+    my ($x, $y, $z) = ($1, $2, $3);
+    my $c = $y eq 'OK' ? 'green' : $y eq '<<<' ? 'blue' : 'magenta';
+    $c = "$c bold" if $z =~ /\s\w+Of\s/;
+    Term::ANSIColor::colored([$c], "$x$y$z")
+  }!gme if COLORS;
+  warn "---\n$table";
+}
+
+sub _report_errors {
+  my ($self, $path, $type, $errors) = @_;
+  push @{$self->{report}},
+    [
+    (('  ') x $self->{grouped}) . (@$errors ? 'NOK' : 'OK'),
+    $path || '/',
+    $type, join "\n", @$errors
+    ];
+}
+
+sub _report_schema {
+  my ($self, $path, $type, $schema) = @_;
+  push @{$self->{report}}, [(('  ') x $self->{grouped}) . ('<<<'), $path || '/', $type, D $schema];
+}
+
 sub _reset {
-  delete $_[0]->{$_} for qw(refs schemas);
+  delete $_[0]->{schemas}{''};
   $_[0]->{level} = 0;
   $_[0];
 }
@@ -271,8 +348,8 @@ sub _resolve {
   }
 
   if (!$self->{level}++ and my $id = $schema->{id}) {
-    Carp::confess("Root schema cannot have a fragment in the 'id'. ($id)") if $id =~ /\#./;
-    Carp::confess("Root schema cannot have a relative 'id'. ($id)") if $id and $id !~ /^\w+:/;
+    confess "Root schema cannot have a fragment in the 'id'. ($id)" if $id =~ /\#./;
+    confess "Root schema cannot have a relative 'id'. ($id)" if $id and $id !~ /^\w+:/;
   }
 
   $self->_register_schema($schema, $id);
@@ -285,22 +362,53 @@ sub _resolve {
       push @topics, map { [$_, $base] } @$topic;
     }
     elsif (UNIVERSAL::isa($topic, 'HASH')) {
-      if ($topic->{'$ref'} and !ref $topic->{'$ref'}) {
-        push @refs, [$topic, $base];
-      }
+      push @refs, [$topic, $base] and next if $topic->{'$ref'} and !ref $topic->{'$ref'};
+
       if ($topic->{id} and !ref $topic->{id}) {
         my $fqn = Mojo::URL->new($topic->{id});
         $fqn = $fqn->to_abs($base) unless $fqn->is_abs;
         $self->_register_schema($topic, $fqn->to_string);
       }
 
-      push @topics, map { [$topic->{$_}, $base] } grep { $_ ne '$ref' } keys %$topic;
+      push @topics, map { [$_, $base] } values %$topic;
     }
   }
 
-  $self->_register_ref(@$_) for @refs;
+  # Need to register "id":"..." before resolving "$ref":"..."
+  $self->_resolve_ref(@$_) for @refs;
 
   return $schema;
+}
+
+sub _resolve_ref {
+  my ($self, $topic, $url) = @_;
+  return if tied %$topic;
+
+  my $other = $topic;
+  my ($base, $fqn, $pointer, $ref, @guard);
+
+  while (1) {
+    $ref = $other->{'$ref'};
+    push @guard, $other->{'$ref'};
+    confess "Seems like you have a circular reference: @guard" if @guard > RECURSION_LIMIT;
+    last if !$ref or ref $ref;
+    $fqn = Mojo::URL->new($ref =~ m!^/! ? "#$ref" : $ref);
+    $fqn = $fqn->to_abs($url) unless $fqn->is_abs;
+    $url = $fqn;
+    $fqn = $fqn->to_string;
+    $fqn =~ s!(.)#$!$1!;
+    $fqn =~ s!#(.+)!{'#' . url_unescape $1}!e;
+
+    ($base, $pointer) = split /#/, $fqn, 2;
+    $other = $self->_resolve($base);
+
+    if (length $pointer) {
+      $other = Mojo::JSON::Pointer->new($other)->get($pointer)
+        or confess qq[Possibly a typo in schema? Could not find "$pointer" in "$base" ($ref)];
+    }
+  }
+
+  tie %$topic, 'JSON::Validator::Ref', $other, $topic->{'$ref'}, $fqn;
 }
 
 # This code is from Data::Dumper::format_refaddr()
@@ -317,7 +425,10 @@ sub _validate {
   $schema = $self->_ref_to_schema($schema) if $schema->{'$ref'};
 
   # Avoid recursion
-  return if ref $data and !_is_blessed_boolean($data) and $self->_seen($schema, $data);
+  if (ref $data and !_is_blessed_boolean($data) and $self->_seen($schema, $data)) {
+    $self->_report_schema($path || '/', 'seen', $schema) if REPORT;
+    return;
+  }
 
   # Make sure we validate plain data and not a perl object
   $data = $data->TO_JSON if blessed $data and UNIVERSAL::can($data, 'TO_JSON');
@@ -329,20 +440,21 @@ sub _validate {
   }
   elsif ($type) {
     my $method = sprintf '_validate_type_%s', $type;
+    $self->_report_schema($path || '/', $type, $schema);
     @errors = $self->$method($data, $path, $schema);
-    warn "[JSON::Validator] type @{[$path||'/']} $method [@errors]\n" if DEBUG > 1;
+    $self->_report_errors($path, $type, \@errors) if REPORT;
     return @errors if @errors;
   }
 
   if ($schema->{enum}) {
     @errors = $self->_validate_type_enum($data, $path, $schema);
-    warn "[JSON::Validator] type @{[$path||'/']} _validate_type_enum [@errors]\n" if DEBUG > 1;
+    $self->_report_errors($path, 'enum', \@errors) if REPORT;
     return @errors if @errors;
   }
 
   if (my $rules = $schema->{not}) {
     push @errors, $self->_validate($data, $path, $rules);
-    warn "[JSON::Validator] not @{[$path||'/']} == [@errors]\n" if DEBUG > 1;
+    $self->_report_errors($path, 'not', \@errors) if REPORT;
     return @errors ? () : (E $path, 'Should not match.');
   }
 
@@ -364,6 +476,9 @@ sub _validate_all_of {
   my $type = _guess_data_type($data);
   my (@errors, @expected);
 
+  $self->_report_schema($path, 'allOf', $rules) if REPORT;
+  $self->{grouped}++;
+
   for my $rule (@$rules) {
     my @e = $self->_validate($data, $path, $rule) or next;
     my $schema_type = _guess_schema_type($rule);
@@ -371,7 +486,9 @@ sub _validate_all_of {
     push @expected, $schema_type;
   }
 
-  warn "[JSON::Validator] allOf @{[$path||'/']} == [@errors]\n" if DEBUG > 1;
+  $self->{grouped}--;
+
+  $self->_report_errors($path, 'allOf', \@errors) if REPORT;
   my $expected = join ' or ', _uniq(@expected);
   return E $path, "allOf failed: Expected $expected, not $type."
     if $expected and @errors + @expected == @$rules;
@@ -384,10 +501,13 @@ sub _validate_any_of {
   my $type = _guess_data_type($data);
   my (@e, @errors, @expected);
 
+  $self->_report_schema($path, 'anyOf', $rules) if REPORT;
+  $self->{grouped}++;
+
   for my $rule (@$rules) {
     @e = $self->_validate($data, $path, $rule);
     if (!@e) {
-      warn "[JSON::Validator] anyOf @{[$path||'/']} == success\n" if DEBUG > 1;
+      $self->_report_errors($path, 'anyOf', \@errors) if REPORT;
       return;
     }
     my $schema_type = _guess_schema_type($rule);
@@ -395,7 +515,9 @@ sub _validate_any_of {
     push @expected, $schema_type;
   }
 
-  warn "[JSON::Validator] anyOf @{[$path||'/']} == [@errors]\n" if DEBUG > 1;
+  $self->{grouped}--;
+
+  $self->_report_errors($path, 'anyOf', \@errors) if REPORT;
   my $expected = join ' or ', _uniq(@expected);
   return E $path, "anyOf failed: Expected $expected, got $type." unless @errors;
   return E $path, sprintf "anyOf failed: %s", _merge_errors(@errors);
@@ -406,6 +528,9 @@ sub _validate_one_of {
   my $type = _guess_data_type($data);
   my (@errors, @expected);
 
+  $self->_report_schema($path, 'oneOf', $rules) if REPORT;
+  $self->{grouped}++;
+
   for my $rule (@$rules) {
     my @e = $self->_validate($data, $path, $rule) or next;
     my $schema_type = _guess_schema_type($rule);
@@ -413,18 +538,19 @@ sub _validate_one_of {
     push @expected, $schema_type;
   }
 
-  if (@errors + @expected + 1 == @$rules) {
-    warn "[JSON::Validator] oneOf @{[$path||'/']} == success\n" if DEBUG > 1;
-    return;
+  $self->{grouped}--;
+
+  if (REPORT) {
+    my @e
+      = @errors + @expected + 1 == @$rules ? ()
+      : @errors                            ? @errors
+      :                                      'All of the oneOf rules match.';
+    $self->_report_errors($path, 'oneOf', \@e);
   }
 
-  if (DEBUG > 1) {
-    warn sprintf "[JSON::Validator] oneOf %s == failed=%s/%s / @errors\n", $path || '/',
-      @errors + @expected, int @$rules;
-  }
-
+  return if @errors + @expected + 1 == @$rules;
   my $expected = join ' or ', _uniq(@expected);
-  return E $path, 'All of the oneOf rules match.' unless @errors + @expected;
+  return E $path, "All of the oneOf rules match." unless @errors + @expected;
   return E $path, "oneOf failed: Expected $expected, got $type." unless @errors;
   return E $path, sprintf 'oneOf failed: %s', _merge_errors(@errors);
 }
@@ -504,7 +630,7 @@ sub _validate_type_array {
       push @errors, E $path, sprintf "Invalid number of items: %s/%s.", int(@$data), int(@v);
     }
   }
-  elsif (ref $schema->{items} eq 'HASH') {
+  elsif (UNIVERSAL::isa($schema->{items}, 'HASH')) {
     for my $i (0 .. @$data - 1) {
       push @errors, $self->_validate($data->[$i], "$path/$i", $schema->{items});
     }
@@ -590,12 +716,14 @@ sub _validate_type_object {
   if (ref $data ne 'HASH') {
     return E $path, _expected(object => $data);
   }
-  if (defined $schema->{maxProperties} and $schema->{maxProperties} < keys %$data) {
-    push @errors, E $path, sprintf 'Too many properties: %s/%s.', int(keys %$data),
+
+  my @dkeys = sort keys %$data;
+  if (defined $schema->{maxProperties} and $schema->{maxProperties} < @dkeys) {
+    push @errors, E $path, sprintf 'Too many properties: %s/%s.', int @dkeys,
       $schema->{maxProperties};
   }
-  if (defined $schema->{minProperties} and $schema->{minProperties} > keys %$data) {
-    push @errors, E $path, sprintf 'Not enough properties: %s/%s.', int(keys %$data),
+  if (defined $schema->{minProperties} and $schema->{minProperties} > @dkeys) {
+    push @errors, E $path, sprintf 'Not enough properties: %s/%s.', int @dkeys,
       $schema->{minProperties};
   }
 
@@ -603,13 +731,13 @@ sub _validate_type_object {
     push @{$rules{$k}}, $r;
   }
   while (my ($p, $r) = each %{$schema->{patternProperties} || {}}) {
-    push @{$rules{$_}}, $r for grep { $_ =~ /$p/ } keys %$data;
+    push @{$rules{$_}}, $r for sort grep { $_ =~ /$p/ } @dkeys;
   }
 
   $additional = exists $schema->{additionalProperties} ? $schema->{additionalProperties} : {};
   if ($additional) {
-    $additional = {} unless ref $additional eq 'HASH';
-    $rules{$_} ||= [$additional] for keys %$data;
+    $additional = {} unless UNIVERSAL::isa($additional, 'HASH');
+    $rules{$_} ||= [$additional] for @dkeys;
   }
   else {
     # Special case used internally when validating schemas: This module adds "id"
@@ -617,21 +745,21 @@ sub _validate_type_object {
     # remove it again unless there's a rule.
     local $rules{id} = 1 if !$path and exists $data->{id};
 
-    if (my @keys = grep { !$rules{$_} } keys %$data) {
+    if (my @k = grep { !$rules{$_} } @dkeys) {
       local $" = ', ';
-      return E $path, "Properties not allowed: @keys.";
+      return E $path, "Properties not allowed: @k.";
     }
   }
 
-  for my $k (keys %required) {
+  for my $k (sort keys %required) {
     next if exists $data->{$k};
     push @errors, E _path($path, $k), 'Missing property.';
     delete $rules{$k};
   }
 
-  for my $k (keys %rules) {
+  for my $k (sort keys %rules) {
     for my $r (@{$rules{$k}}) {
-      if (!exists $data->{$k} and (ref $r eq 'HASH' and exists $r->{default})) {
+      if (!exists $data->{$k} and (UNIVERSAL::isa($r, 'HASH') and exists $r->{default})) {
 
         #$data->{$k} = $r->{default}; # TODO: This seems to fail when using oneOf and friends
       }
@@ -695,6 +823,13 @@ sub _cmp {
   return "$_[3]=" if $_[2] and $_[0] >= $_[1];
   return $_[3] if $_[0] > $_[1];
   return "";
+}
+
+sub _definitions_name {
+  local $_ = "$_[1]";
+  s!\#!-!g;
+  s![^\w-]!_!g;
+  return "_$_";
 }
 
 sub _expected {
@@ -870,7 +1005,7 @@ JSON::Validator - Validate data against a JSON schema
 
 =head1 VERSION
 
-1.05
+1.06
 
 =head1 SYNOPSIS
 
@@ -1125,6 +1260,33 @@ and might change without a warning)
 
 =head1 METHODS
 
+=head2 bundle
+
+  $schema = $self->bundle(\%args);
+
+Used to create a new schema, where the C<$ref> are resolved. C<%args> can have:
+
+=over 2
+
+=item * C<{replace => 1}>
+
+Used if you want to replace the C<$ref> inline in the schema. This currently
+does not work if you have circular references. The default is to move all the
+C<$ref> definitions into the main schema with custom names. Here is an example
+on how a C<$ref> looks before and after:
+
+  {"$ref":"../some/place.json#/foo/bar"}
+     => {"$ref":"#/definitions/____some_place_json-_foo_bar"}
+
+  {"$ref":"http://example.com#/foo/bar"}
+     => {"$ref":"#/definitions/_http___example_com-_foo_bar"}
+
+=item * C<{schema => {...}}>
+
+Default is to use the value from the L</schema> attribute.
+
+=back
+
 =head2 coerce
 
   $self = $self->coerce(booleans => 1, numbers => 1, strings => 1);
@@ -1149,6 +1311,20 @@ as L<Mojo::JSON> or other JSON parsers.
 The coercion rules are EXPERIMENTAL and will be tighten/loosen if
 bugs are reported. See L<https://github.com/jhthorsen/json-validator/issues/8>
 for more details.
+
+=head2 get
+
+  $sub_schema = $self->get("/x/y");
+
+Extract value from L</schema> identified by the given JSON Pointer. Will at the
+same time resolve C<$ref> if found. Example:
+
+  $self->schema({x => {'$ref' => '#/y'}, y => {'type' => 'string'}});
+  $self->schema->get('/x')           == undef
+  $self->schema->get('/x')->{'$ref'} == '#/y'
+  $self->get('/x')                   == {type => 'string'}
+
+This method is EXPERIMENTAL.
 
 =head2 load_and_validate_schema
 

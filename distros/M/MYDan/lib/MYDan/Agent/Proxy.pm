@@ -7,64 +7,60 @@ MYDan::Agent::Proxy
 =head1 SYNOPSIS
 
  use MYDan::Agent::Proxy;
-
  my $proxy = MYDan::Agent::Proxy->new( '/conf/file' );
-
  my %r = $proxy->search( 'node1', 'node2', '10.10.0.1', '10.10.0.2' );
  
  %r = (
       node1 => undef, node2 => undef,
       '10.10.0.1' => 'proxyip',
       '10.10.0.2' => 'proxyip',
-  );
+ );
 
 =cut
+
 use strict;
 use warnings;
 
 use Carp;
-use Tie::File;
-use Fcntl 'O_RDONLY';
+use YAML::XS;
+use Net::IP::Match::Regexp qw( match_ip create_iprange_regexp_depthfirst );
+use Data::Validate::IP qw( is_ipv4 );
+use Socket;
 
 sub new
 {
     my ( $class, $conf ) = @_;
     confess "no conf" unless $conf && -e $conf;
 
-    die "tie fail: $!" unless tie my @conf, 'Tie::File', $conf, mode => O_RDONLY;
-    
-    my @c;
-    for my $c ( @conf )
-    {
-        next unless $c =~ /^\s*(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\/(\d{1,2})\s*:\s*(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\s*$/;
-        push @c, +{ ip => $1, mask=> $2, proxy => $3, net => substr(unpack("B32",pack("C4", (split/\./,$1))),0,$2) };
-    }
+    eval { $conf = YAML::XS::LoadFile( $conf ) };
 
-    untie @conf;
+    confess "error: $@" if $@;
+    confess "error: not HASH" if ref $conf ne 'HASH';
 
-    bless [ sort{ $a->{mask} <=> $b->{mask} }@c ], ref $class || $class;
+    bless $conf, ref $class || $class;
 }
 
 sub search
 {
-    my ( $this, @node, %result ) = @_;
+    my ( $this, @node, %innet ) = @_;
 
-    my @conf = @$this;
-
-    for my $node ( @node )
+    for ( keys %$this )
     {
-        $result{$node} = undef;
-        next unless $node =~ /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/;
-
-        for my $conf ( @conf )
-        {
-             next unless substr(unpack("B32",pack("C4", (split/\./,$node))),0,$conf->{mask})  == $conf->{net};
-             $result{$node} = $conf->{proxy};
-             last;
-        }
+        next unless $_ =~ /^\s*(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\/(\d{1,2})\s*$/;
+	$innet{$_} = $this->{$_} if is_ipv4( $1 ) && $2 >=0 && $2 <= 32;
     }
 
-    return %result;
+    return map{ $_ => undef }@node unless %innet;
+
+    my $regexp = create_iprange_regexp_depthfirst( \%innet );
+
+    my %hosts = MYDan::Util::Hosts->new()->match( @node );
+    map{
+        $hosts{$_} = inet_ntoa( gethostbyname $_ ) 
+	    unless is_ipv4( $hosts{$_} )
+    }keys %hosts;
+
+    return map{ $_ => match_ip( $hosts{$_}, $regexp )}@node;
 }
 
 1;

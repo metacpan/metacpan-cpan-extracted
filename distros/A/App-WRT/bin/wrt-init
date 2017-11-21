@@ -1,0 +1,137 @@
+#!/bin/sh
+
+# Initialize a stub wrt project.
+
+: <<=cut
+=pod
+
+=head1 NAME
+
+wrt-init - initialize a stub wrt repository
+
+=head1 SYNOPSIS
+
+    wrt init     # Initialize a wrt repository in current directory
+    wrt init foo # Initialize a wrt repository in directory named foo
+    wrt init -h  # Print help message
+
+=head1 DESCRIPTION
+
+Creates a configuration file, a basic template, and archive and
+publication directories in a given path for use with wrt.
+
+If no path is given, the current working directory will be assumed.
+
+Detailed documentation can be found in the L<App::WRT> man page or at
+L<https://github.com/brennen/wrt>.
+
+=head1 LICENSE
+
+    wrt is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+=head1 AUTHOR
+
+Brennen Bearnes
+
+=cut
+
+print_help() {
+  echo "wrt-init - initialize a stub wrt repository"
+  echo
+  echo "Usage:"
+  echo "        wrt-init [target directory]"
+  echo
+  echo "Creates a configuration file, a basic template, and archive and"
+  echo "publication directories in a given path for use with wrt."
+  echo
+  echo "If no path is given, the current working directory will be assumed."
+  exit 1
+}
+
+if [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
+  print_help
+fi
+
+init_target="."
+if [ "$1" ]; then
+  init_target="$1"
+fi
+
+echo "Initializing new wrt repository in $init_target"
+
+if [ ! -e "$init_target" ]; then
+  echo "$init_target not found"
+  exit 66
+fi
+
+if [ ! -d "$init_target" ]; then
+  echo "$init_target is not a directory"
+  exit 73
+fi
+
+if [ -e "$init_target/wrt.json" ]; then
+  echo "$init_target/wrt.json already exists"
+  exit 73
+fi
+
+printf "Entries:\t%s/archives/\n" "$init_target"
+mkdir -p "$init_target/archives"
+
+printf "Publish to:\t%s/public/\n" "$init_target"
+mkdir -p "$init_target/public"
+
+printf "Configuration:\t%s/wrt.json\n" "$init_target"
+cat > "$init_target/wrt.json" << 'JSON'
+{
+   "feed_url": "https://example.com/feed",
+   "entry_dir": "./archives",
+   "publish_dir": "./public",
+   "title_prefix": "your title here",
+   "template": "default.html",
+   "description": "a wrt site",
+   "url_root": "https://example.com/",
+   "image_url_root": "https://example.com/",
+   "favicon_url": "https://example.com/favicon.png",
+   "template_dir": "./templates",
+   "stylesheet_url": "https://example.com/css/wrt.css",
+   "author": "Your Name Here",
+   "entry_descriptions": {
+     "new": "newest entries",
+     "all": "all entries"
+   }
+}
+JSON
+
+printf "Template:\t%s/templates/default.html\n" "$init_target"
+mkdir -p "$init_target/templates"
+
+cat > "$init_target/templates/default.html" << 'HTML'
+<!DOCTYPE html>
+<html>
+<head>
+  <title>${title_prefix}::${title}</title>
+  <meta name="keywords" content="keywords here" />
+  <meta name="description" content="${description}" /> 
+  <meta name="author" content="${author}" />
+  <link rel="stylesheet" href="${stylesheet_url}" />
+  <link rel="icon" type="image/x-png" href="${favicon_url}" />
+</head>
+
+<body>
+
+<perl>
+  return $self->link_bar();
+</perl>
+
+<h1>${title}</h1>
+
+${content}
+
+<p><small><em>${license}</em></small></p>
+
+</body>
+</html>
+HTML

@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::BackendMgr;
-$Config::Model::BackendMgr::VERSION = '2.113';
+$Config::Model::BackendMgr::VERSION = '2.114';
 use Mouse;
 use strict;
 use warnings;
@@ -255,84 +255,43 @@ sub read_config_data {
 
     $logger->trace( "called for node ", $self->node->location );
 
-    my $readlist_orig        = delete $args{rw_config};
+    my $rw_config_orig       = delete $args{rw_config};
     my $check                = delete $args{check};
     my $config_file_override = delete $args{config_file};
     my $auto_create_override = delete $args{auto_create};
 
     croak "unexpected args " . join( ' ', keys %args ) . "\n" if %args;
 
-    my $readlist = dclone $readlist_orig ;
+    my $rw_config = dclone $rw_config_orig ;
 
     my $instance = $self->node->instance();
 
     # root override is passed by the instance
     my $root_dir = $instance->read_root_dir || '';
 
-    my @list;
-    if (ref  $readlist eq 'ARRAY') {
-        $user_logger->warn("Multiple backends are deprecated (read_config)") if @$readlist > 1;
-        @list = @$readlist ;
-    }
-    elsif (ref  $readlist eq 'HASH') {
-        @list = ($readlist);
-    }
-    else {
-        croak "readlist must be a hash ref\n" unless ref $readlist;
+    my $auto_create  = $rw_config->{auto_create};
+    my $backend = delete $rw_config->{backend};
+
+    if ( $rw_config->{default_layer} ) {
+        $self->read_config_sub_layer( $rw_config, $root_dir, $config_file_override, $check,
+                                      $backend );
     }
 
-    my $pref_backend = $instance->backend || '';
-    my $read_done    = 0;
-    my $auto_create  = 0;
-    my @tried;
+    my ( $res, $file ) =
+        $self->try_read_backend( $rw_config, $root_dir, $config_file_override, $check, $backend );
 
-    foreach my $read (@list) {
-        my $backend = delete $read->{backend} || die "undefined read backend\n";
-        if ( $backend =~ /^(perl|ini|cds)$/ ) {
-            warn $self->config_class_name,
-                " deprecated  backend $backend. Should be '$ {backend}_file'\n";
-            $backend .= "_file";
-        }
-
-        next if ( $pref_backend and $backend ne $pref_backend );
-
-        if ( defined $read->{allow_empty} ) {
-            warn "backend $backend: allow_empty is deprecated. Use auto_create";
-            $auto_create ||= delete $read->{allow_empty};
-        }
-
-        $auto_create ||= $read->{auto_create} if defined $read->{auto_create};
-
-        if ( $read->{default_layer} ) {
-            $self->read_config_sub_layer( $read, $root_dir, $config_file_override, $check,
-                $backend );
-        }
-
-        my ( $res, $file ) =
-            $self->try_read_backend( $read, $root_dir, $config_file_override, $check, $backend );
-        push @tried, $file;
-
-        if ($res) {
-            $read_done = 1;
-            last;
-        }
-    }
-
-    Config::Model::Exception::ConfigFile::Missing->throw(
-        tried_files => \@tried,
-        object      => $self->node,
-        )
-        unless $read_done
-        or $auto_create_override
-        or $auto_create;
+    Config::Model::Exception::ConfigFile::Missing->throw (
+        file   => $file,
+        object => $self->node,
+    ) unless $res or $auto_create_override or $auto_create;
 
 }
 
 sub read_config_sub_layer {
-    my ( $self, $read, $root_dir, $config_file_override, $check, $backend ) = @_;
+    my ( $self, $rw_config, $root_dir, $config_file_override, $check, $backend ) = @_;
 
-    my $layered_config = delete $read->{default_layer};
-    my $layered_read   = dclone $read ;
+    my $layered_config = delete $rw_config->{default_layer};
+    my $layered_read   = dclone $rw_config ;
 
     map { my $lc = delete $layered_config->{$_}; $layered_read->{$_} = $lc if $lc; }
         qw/file config_dir os_config_dir/;
@@ -365,16 +324,16 @@ sub read_config_sub_layer {
 #
 sub try_read_backend {
     my $self                 = shift;
-    my $read                 = shift;
+    my $rw_config            = shift;
     my $root_dir             = shift;
     my $config_file_override = shift;
     my $check                = shift;
     my $backend              = shift;
 
-    my $read_dir = $self->get_tuned_config_dir(%$read);
+    my $read_dir = $self->get_tuned_config_dir(%$rw_config);
 
     my @read_args = (
-        %$read,
+        %$rw_config,
         root        => $root_dir,
         config_dir  => $read_dir,
         backend     => $backend,
@@ -385,9 +344,9 @@ sub try_read_backend {
     my ( $res, $file_path, $error );
 
     warn("function parameter for a backend is deprecated. Please implement 'read' method in backend $backend")
-        if $read->{function};
+        if $rw_config->{function};
     # try to load a specific Backend class
-    my $f = delete $read->{function} || 'read';
+    my $f = delete $rw_config->{function} || 'read';
     my $c = load_backend_class( $backend, $f );
     return ( 0, 'unknown' ) unless defined $c;
 
@@ -445,115 +404,86 @@ sub try_read_backend {
 
 sub auto_write_init {
     my ( $self, %args ) = @_;
-    my $wrlist_orig = delete $args{rw_config};
+    my $rw_config_orig = delete $args{rw_config};
 
     croak "auto_write_init: unexpected args " . join( ' ', sort keys %args ) . "\n"
         if %args;
 
-    my $wrlist = dclone $wrlist_orig ;
+    my $rw_config = dclone $rw_config_orig ;
 
     my $instance = $self->node->instance();
 
     # root override is passed by the instance
     my $root_dir = $instance->write_root_dir || '';
 
-    my @array;
-    if (ref  $wrlist eq 'ARRAY') {
-        $user_logger->warn("Multiple backends are deprecated (write_config)") if @$wrlist > 1;
-        @array = @$wrlist ;
-    }
-    elsif (ref  $wrlist eq 'HASH') {
-        @array = ($wrlist);
-    }
-    else {
-        croak "wrlist must be a hash ref\n" unless ref $wrlist;
-    }
+    my $backend = $rw_config->{backend};
 
-    # ensure that one auto_create specified applies to all wr backends
-    my $auto_create = 0;
-    foreach my $write (@array) {
-        $auto_create ||= delete $write->{auto_create}
-            if defined $write->{auto_create};
-    }
+    my $write_dir = $self->get_tuned_config_dir(%$rw_config);
+
+    $logger->trace( "auto_write_init creating write cb ($backend) for ", $self->node->name );
+
+    my @wr_args = (
+        %$rw_config,            # model data
+        config_dir  => $write_dir,    # override from instance
+        write       => 1,             # for get_cfg_file_path
+        root        => $root_dir,     # override from instance
+    );
+
+    # used bby C::M::Dumper and C::M::DumpAsData
+    # TODO: is this needed once multi backend are removed
+    $self->{auto_write}{$backend} = 1;
+
+    my $wb;
+    my $f = $rw_config->{function} || 'write';
+    my $c = load_backend_class( $backend, $f );
+    my $location = $self->node->name;
+    my $node = $self->node;     # closure
 
     # provide a proper write back function
-    foreach my $write (@array) {
-        my $backend = delete $write->{backend} || die "undefined write backend\n";;
+    $wb = sub {
+        my %cb_args = @_;
 
-        if ( $backend =~ /^(perl|ini|cds)$/ ) {
-            warn $self->config_class_name,
-                " deprecated backend $backend. Should be '$ {backend}_file'\n";
-            $backend .= "_file";
-        }
+        my $force_delete = delete $cb_args{force_delete} ;
+        $logger->debug( "write cb ($backend) called for $location ", $force_delete ? '' : ' (deleted)' );
+        my $backend_obj = $self->get_backend($backend)
+            || $c->new( node => $self->node, name => $backend );
+        my $suffix = $backend_obj->suffix if $backend_obj->can('suffix');
+        my ( $file_ok, $file_path, $fh );
+        ( $file_ok, $file_path, $fh ) =
+            $self->open_file_to_write( $backend, suffix => $suffix, @wr_args, %cb_args )
+            unless $c->skip_open;
 
-        my $write_dir = $self->get_tuned_config_dir(%$write);
-
-        $logger->trace( "auto_write_init creating write cb ($backend) for ", $self->node->name );
-
-        my @wr_args = (
-            %$write,    # model data
-            auto_create => $auto_create,
-            backend     => $backend,
-            config_dir  => $write_dir,     # override from instance
-            write       => 1,              # for get_cfg_file_path
-            root        => $root_dir,      # override from instance
+        # override needed for "save as" button
+        my %backend_args = (
+            @wr_args,
+            io_handle => $fh,
+            file_path => $file_path,
+            object    => $node,
+            %cb_args            # override from user
         );
 
-        # used bby C::M::Dumper and C::M::DumpAsData
-        # TODO: is this needed once multi backend are removed
-        $self->{auto_write}{$backend} = 1;
+        my $res;
+        if ($force_delete) {
+            $backend_obj->delete(%backend_args);
+        }
+        else {
+            $res = eval { $backend_obj->$f( %backend_args ); };
+            my $error = $@;
+            $logger->warn( "write backend $backend $c" . '::' . "$f failed: $error" ) if $error;
+            $self->close_file_to_write( $error, $fh, $file_path, $rw_config->{file_mode} );
 
-        my $wb;
-        my $f = $write->{function} || 'write';
-        my $c = load_backend_class( $backend, $f );
-        my $location = $self->node->name;
-        my $node = $self->node; # closure
+            $self->auto_delete($file_path, \%backend_args)
+                if $rw_config->{auto_delete} and not $c->skip_open ;
+        }
 
-        $wb = sub {
-            my %cb_args = @_;
+        return defined $res ? $res : $@ ? 0 : 1;
+    };
 
-            my $force_delete = delete $cb_args{force_delete} ;
-            $logger->debug( "write cb ($backend) called for $location ", $force_delete ? '' : ' (deleted)' );
-            my $backend_obj = $self->get_backend($backend)
-                || $c->new( node => $self->node, name => $backend );
-            my $suffix = $backend_obj->suffix if $backend_obj->can('suffix');
-            my ( $file_ok, $file_path, $fh );
-            ( $file_ok, $file_path, $fh ) =
-                $self->open_file_to_write( $backend, suffix => $suffix, @wr_args, %cb_args )
-                unless $c->skip_open;
+    # FIXME: enhance write back mechanism so that different backend *and* different nodes
+    # work as expected
+    $logger->trace( "registering write $backend in node " . $self->node->name );
 
-            # override needed for "save as" button
-            my %backend_args = (
-                @wr_args,
-                io_handle => $fh,
-                file_path => $file_path,
-                object    => $node,
-                %cb_args        # override from user
-            );
-
-            my $res;
-            if ($force_delete) {
-                $backend_obj->delete(%backend_args);
-            }
-            else {
-                $res = eval { $backend_obj->$f( %backend_args ); };
-                my $error = $@;
-                $logger->warn( "write backend $backend $c" . '::' . "$f failed: $error" ) if $error;
-                $self->close_file_to_write( $error, $fh, $file_path, $write->{file_mode} );
-
-                $self->auto_delete($file_path, \%backend_args)
-                    if $write->{auto_delete} and not $c->skip_open ;
-            }
-
-            return defined $res ? $res : $@ ? 0 : 1;
-        };
-
-        # FIXME: enhance write back mechanism so that different backend *and* different nodes
-        # work as expected
-        $logger->trace( "registering write $backend in node " . $self->node->name );
-
-        $instance->register_write_back(  $self->node->location, $backend, $wb  );
-    }
+    $instance->register_write_back(  $self->node->location, $backend, $wb  );
 }
 
 sub auto_delete {
@@ -655,7 +585,7 @@ Config::Model::BackendMgr - Load configuration node on demand
 
 =head1 VERSION
 
-version 2.113
+version 2.114
 
 =head1 SYNOPSIS
 

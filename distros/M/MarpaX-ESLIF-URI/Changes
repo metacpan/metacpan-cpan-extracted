@@ -1,6 +1,13 @@
 Changelog for MarpaX-ESLIF-URI
 
-0.002 2017-09-23T03:26:07
+0.003 2017-11-17T05:21:09
+ [Jean-Damien Durand]
+ - dzil xtest
+ - better synopsis
+ - hostname() method
+ - dist.ini repository url fix [ci skip]
+
+0.002 2017-09-23T03:26:07Z
  [Jean-Damien Durand]
  - xtest and trusted POD coverage [ci skip]
  - ea protection, cosmetic code and POD fixes [ci skip]

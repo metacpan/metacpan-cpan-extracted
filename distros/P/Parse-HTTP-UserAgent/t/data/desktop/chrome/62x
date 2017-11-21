@@ -1,0 +1,11 @@
+[AGENT]
+
+Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36
+
+extras          => [ 'Macintosh', 'KHTML, like Gecko' ],
+name            => 'Chrome',
+os              => 'Intel Mac OS X 10_12_6',
+parser          => 'chrome',
+toolkit         => [ 'AppleWebKit', '537.36', '537.360' ],
+version         => '62.0003202094',
+version_raw     => '62.0.3202.94',

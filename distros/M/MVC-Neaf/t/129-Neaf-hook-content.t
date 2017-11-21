@@ -6,7 +6,7 @@ use Test::More;
 
 use MVC::Neaf;
 
-MVC::Neaf->route( '/' => sub { +{} }, view => 'JS' );
+MVC::Neaf->route( '/' => sub { +{} }, -view => 'JS' );
 
 my $trace;
 MVC::Neaf->add_hook( pre_reply => sub {

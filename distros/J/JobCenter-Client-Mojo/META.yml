@@ -15,12 +15,12 @@ name: JobCenter-Client-Mojo
 requires:
   JSON::MaybeXS: '0'
   JSON::RPC2::TwoWay: '0.02'
-  MojoX::NetstringStream: '0.04'
+  MojoX::NetstringStream: '0.06'
   Mojolicious: '6.00'
   perl: '5.010'
 resources:
   bugtracker: https://github.com/a6502/JobCenter-Client-Mojo/issues
   homepage: https://github.com/a6502/JobCenter-Client-Mojo
   repository: https://github.com/a6502/JobCenter-Client-Mojo.git
-version: '0.28'
+version: '0.30'
 x_serialization_backend: 'YAML::Tiny version 1.70'

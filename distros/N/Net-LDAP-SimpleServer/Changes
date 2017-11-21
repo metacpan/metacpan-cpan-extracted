@@ -1,6 +1,39 @@
 Revision History for Net-LDAP-SimpleServer
 ==========================================
 
+v0.0.21 2017-11-12
+------------------
+
+commit 6b9f524dfc176a6960afebb2d8a0fc785351cfb8
+Author: Alexei Znamensky <russoz@gmail.com>
+
+    minor code improvements in test code
+
+commit ae26471a7e153fcd2d866bf9afdb14408a1c8c11
+Author: Alexei Znamensky <russoz@gmail.com>
+
+    code simplification
+
+commit f0e3e966f6314417d7d906ad6b317af0662c7bbb
+Author: Alexei Znamensky <russoz@gmail.com>
+
+    minimum version now is perl 5.14
+
+commit e872020b605b6284db07a7c517f3b2a0bc419fb7
+Author: Alexei Znamensky <russoz@gmail.com>
+
+    improved documentation
+
+commit c80f126d4e964365cf1b339d9423926b48aa166e
+Author: Alexei Znamensky <russoz@gmail.com>
+
+    added .mailmap
+
+commit 25873a2db8762f8ab74b27b086a1d09b58c938d8
+Author: Alexei Znamensky <russoz@gmail.com>
+
+    perldoc improvement
+
 v0.0.20 2017-11-04
 ------------------
 

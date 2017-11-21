@@ -4,8 +4,8 @@
 # in the correct order we should get a "filter_del can only delete in
 # reverse order" error
 
-# skip this set of tests is running on anything less than 5.004_55
-if ($] < 5.004_55) {
+# skip this set of tests is running on anything less than 5.006
+if ($] < 5.006) {
     print "1..0\n";
     exit 0;
 }

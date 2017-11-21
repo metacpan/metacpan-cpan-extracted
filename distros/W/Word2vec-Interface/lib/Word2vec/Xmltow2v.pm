@@ -4,7 +4,7 @@
 #                                                                                    #
 #    Author: Clint Cuffy                                                             #
 #    Date:    06/16/2016                                                             #
-#    Revised: 04/06/2017                                                             #
+#    Revised: 10/10/2017                                                             #
 #    UMLS Similarity - Medline XML-To-Word2Vec Input Format Conversion Module        #
 #                                                                                    #
 ######################################################################################
@@ -49,14 +49,14 @@ use Word2vec::Bst;
 
 use vars qw($VERSION);
 
-$VERSION = '0.02';
+$VERSION = '0.021';
 
 
 # Global Variables
-my $debugLock  :shared;
-my $writeLock  :shared;
-my $queueLock  :shared;
-my $appendLock :shared;
+my $debugLock         :shared;
+my $writeLock         :shared;
+my $queueLock         :shared;
+my $appendLock        :shared;
 my @xmlJobQueue       :shared;
 my $totalJobCount     :shared;
 my $finishedJobCount  :shared;
@@ -94,58 +94,60 @@ sub new
     my $class = shift;
     my $self = {
         # Private Member Variables
-        _debugLog              => shift,                # Boolean (Binary): 0 = False, 1 = True
-        _writeLog              => shift,                # Boolean (Binary): 0 = False, 1 = True
-        _storeTitle            => shift,                # Boolean (Binary): 0 = False, 1 = True
-        _storeAbstract         => shift,                # Boolean (Binary): 0 = False, 1 = True
-        _quickParse            => shift,                # Boolean (Binary): 0 = False, 1 = True
-        _compoundifyText       => shift,                # Boolean (Binary): 0 = False, 1 = True
-        _numOfThreads          => shift,                # Integer
-        _workingDir            => shift,                # String
-        _savePath              => shift,                # String
-        _beginDate             => shift,                # String Format: Month/Day/Year
-        _endDate               => shift,                # String Format: Month/Day/Year
-        _xmlStringToParse      => shift,                # String
-        _textCorpusStr         => shift,                # String
-        _fileHandle            => shift,                # File Handle
-        _twigHandler           => shift,                # File Handle
-        _parsedCount           => shift,                # Int
-        _tempDate              => shift,                # String (Temporary Placeholder)
-        _tempStr               => shift,                # String (Temporary Placeholder)
-        _compoundWordAry       => shift,                # Array Of Compound Words
-        _compoundWordBST       => shift,                # Binary Search Tree Reference
-        _maxCompoundWordLength => shift,                # Integer
-        _overwriteExistingFile => shift,                # Integer
-        _compoundWordCount     => shift,                # Integer
+        _debugLog               => shift,                # Boolean (Binary): 0 = False, 1 = True
+        _writeLog               => shift,                # Boolean (Binary): 0 = False, 1 = True
+        _storeTitle             => shift,                # Boolean (Binary): 0 = False, 1 = True
+        _storeAbstract          => shift,                # Boolean (Binary): 0 = False, 1 = True
+        _quickParse             => shift,                # Boolean (Binary): 0 = False, 1 = True
+        _compoundifyText        => shift,                # Boolean (Binary): 0 = False, 1 = True
+        _storeAsSentencePerLine => shift,                # Boolean (Binary): 0 = False, 1 = True
+        _numOfThreads           => shift,                # Integer
+        _workingDir             => shift,                # String
+        _savePath               => shift,                # String
+        _beginDate              => shift,                # String Format: Month/Day/Year
+        _endDate                => shift,                # String Format: Month/Day/Year
+        _xmlStringToParse       => shift,                # String
+        _textCorpusStr          => shift,                # String
+        _fileHandle             => shift,                # File Handle
+        _twigHandler            => shift,                # File Handle
+        _parsedCount            => shift,                # Int
+        _tempDate               => shift,                # String (Temporary Placeholder)
+        _tempStr                => shift,                # String (Temporary Placeholder)
+        _compoundWordAry        => shift,                # Array Of Compound Words
+        _compoundWordBST        => shift,                # Binary Search Tree Reference
+        _maxCompoundWordLength  => shift,                # Integer
+        _overwriteExistingFile  => shift,                # Integer
+        _compoundWordCount      => shift,                # Integer
     };
 
     # Set debug log variable to false if not defined
-    $self->{ _debugLog } = 0 if !defined ( $self->{ _debugLog } );
-    $self->{ _writeLog } = 0 if !defined ( $self->{ _writeLog } );
-    $self->{ _storeTitle } = 1 if !defined ( $self->{ _storeTitle } );
-    $self->{ _storeAbstract } = 1 if !defined ( $self->{ _storeAbstract } );
-    $self->{ _quickParse } = 0 if !defined ( $self->{ _quickParse } );
-    $self->{ _compoundifyText } = 0 if !defined ( $self->{ _compoundifyText } );
-    $self->{ _numOfThreads } = Sys::CpuAffinity::getNumCpus() if !defined ( $self->{ _numOfThreads } );
-    $self->{ _workingDir } = Cwd::getcwd() if !defined ( $self->{ _workingDir } );
-    $self->{ _savePath } = Cwd::getcwd() if !defined ( $self->{ _savePath } );
-    $self->{ _beginDate } = "00/00/0000" if !defined ( $self->{ _beginDate } );
-    $self->{ _endDate } = "99/99/9999" if !defined ( $self->{ _endDate } );
-    $self->{ _xmlStringToParse } = "(null)" if !defined ( $self->{ _xmlStringToParse } );
-    $self->{ _textCorpusStr } = "" if !defined ( $self->{ _textCorpusStr } );
-    $self->{ _twigHandler } = 0 if !defined ( $self->{ _twigHandler } );
-    $self->{ _parsedCount } = 0 if !defined ( $self->{ _parsedCount } );
-    $self->{ _tempDate } = "" if !defined ( $self->{ _tempDate } );
-    $self->{ _tempStr } = "" if !defined ( $self->{ _tempStr } );
-    $self->{ _outputFileName } = "textcorpus.txt" if !defined ( $self->{ _outputFileName } );
-    @{ $self->{ _compoundWordAry } } = () if !defined ( $self->{ _compoundWordAry } );
-    @{ $self->{ _compoundWordAry } } = @{ $self->{ _compoundWordAry } } if defined ( $self->{ _compoundWordAry } );
-    $self->{ _compoundWordBST } = Word2vec::Bst->new() if !defined ( $self->{ _compoundWordBST } );
-    $self->{ _maxCompoundWordLength } = 20 if !defined ( $self->{ _maxCompoundWordLength } );
-    $self->{ _overwriteExistingFile } = 0 if !defined ( $self->{ _overwriteExistingFile } );
+    $self->{ _debugLog }                    = 0 if !defined ( $self->{ _debugLog } );
+    $self->{ _writeLog }                    = 0 if !defined ( $self->{ _writeLog } );
+    $self->{ _storeTitle }                  = 1 if !defined ( $self->{ _storeTitle } );
+    $self->{ _storeAbstract }               = 1 if !defined ( $self->{ _storeAbstract } );
+    $self->{ _quickParse }                  = 0 if !defined ( $self->{ _quickParse } );
+    $self->{ _compoundifyText }             = 0 if !defined ( $self->{ _compoundifyText } );
+    $self->{ _storeAsSentencePerLine }      = 0 if !defined ( $self->{ _storeAsSentencePerLine } );
+    $self->{ _numOfThreads }                = Sys::CpuAffinity::getNumCpus() if !defined ( $self->{ _numOfThreads } );
+    $self->{ _workingDir }                  = Cwd::getcwd() if !defined ( $self->{ _workingDir } );
+    $self->{ _savePath }                    = Cwd::getcwd() if !defined ( $self->{ _savePath } );
+    $self->{ _beginDate }                   = "00/00/0000" if !defined ( $self->{ _beginDate } );
+    $self->{ _endDate }                     = "99/99/9999" if !defined ( $self->{ _endDate } );
+    $self->{ _xmlStringToParse }            = "(null)" if !defined ( $self->{ _xmlStringToParse } );
+    $self->{ _textCorpusStr }               = "" if !defined ( $self->{ _textCorpusStr } );
+    $self->{ _twigHandler }                 = 0 if !defined ( $self->{ _twigHandler } );
+    $self->{ _parsedCount }                 = 0 if !defined ( $self->{ _parsedCount } );
+    $self->{ _tempDate }                    = "" if !defined ( $self->{ _tempDate } );
+    $self->{ _tempStr }                     = "" if !defined ( $self->{ _tempStr } );
+    $self->{ _outputFileName }              = "textcorpus.txt" if !defined ( $self->{ _outputFileName } );
+    @{ $self->{ _compoundWordAry } }        = () if !defined ( $self->{ _compoundWordAry } );
+    @{ $self->{ _compoundWordAry } }        = @{ $self->{ _compoundWordAry } } if defined ( $self->{ _compoundWordAry } );
+    $self->{ _compoundWordBST }             = Word2vec::Bst->new() if !defined ( $self->{ _compoundWordBST } );
+    $self->{ _maxCompoundWordLength }       = 20 if !defined ( $self->{ _maxCompoundWordLength } );
+    $self->{ _overwriteExistingFile }       = 0 if !defined ( $self->{ _overwriteExistingFile } );
     
     # Initialize Thread Safe Counting Variables
-    @xmlJobQueue = ();
+    @xmlJobQueue       = ();
     $compoundWordCount = 0;
     $preCompWordCount  = 0;
     $postCompWordCount = 0;
@@ -164,9 +166,9 @@ sub new
         $self->{ _twigHandler } = XML::Twig->new(
             twig_handlers =>
             {
-                'DateCreated' => sub { _QuickParseDateCreated( @_, $self ) },
-                'Journal' => sub { _QuickParseJournal( @_, $self ) },
-                'Article' => sub { _QuickParseArticle( @_, $self ) },
+                'DateCreated'   => sub { _QuickParseDateCreated( @_, $self ) },
+                'Journal'       => sub { _QuickParseJournal( @_, $self ) },
+                'Article'       => sub { _QuickParseArticle( @_, $self ) },
                 'OtherAbstract' => sub { _QuickParseOtherAbstract( @_, $self ) },
             },
         );
@@ -256,6 +258,7 @@ sub ConvertMedlineXMLToW2V
 
         $self->WriteLog( "ConvertMedlineXMLToW2V - Parsing XML File: $dir" );
         $self->_ParseXMLString( $self->GetXMLStringToParse() );
+        $self->_SaveTextCorpusToFile( $self->GetSavePath() );
         $self->WriteLog( "ConvertMedlineXMLToW2V - Parsing Complete" );
     }
     # Process All Files In Directory
@@ -1179,7 +1182,7 @@ sub _SaveTextCorpusToFile
         $self->WriteLog( "_SaveTextCorpusToFile - Error: No Save Path Specified" ) if !defined( $savePath );
         return -1 if !defined( $savePath );
     
-        $appendToFile = $self->GetOverwriteExitingFile() if !defined ( $appendToFile );
+        $appendToFile = $self->GetOverwriteExistingFile() if !defined ( $appendToFile );
     
         $self->WriteLog( "_SaveTextCorpusToFile - Saving Text Corpus To \"$savePath\"" );
     
@@ -1193,7 +1196,12 @@ sub _SaveTextCorpusToFile
         open( $fileHandle, '>>:encoding(UTF-8)', "$savePath" ) if $appendToFile == 1;
     
         # Write Data To File
-        print( $fileHandle $self->GetTextCorpusStr() );
+        my $str = $self->GetTextCorpusStr();
+        
+        # Remove Extra Spaces In Text Corpus String
+        $str =~ s/ +/ /g;
+        
+        print( $fileHandle $str );
     
         close( $fileHandle );
         undef( $fileHandle );
@@ -1278,12 +1286,13 @@ sub IsFileOrDirectory
 sub RemoveSpecialCharactersFromString
 {
     my ( $self, $str ) = @_;
-    $str = lc( $str );                                      # Convert all characters to lowercase
-    $str =~ s/ +/ /g;                                       # Remove duplicate white spaces between words
-    $str =~ s/'s//g;                                        # Remove "'s" characters (Apostrophe 's')
-    $str =~ s/-/ /g;                                        # Replace all hyphen characters to spaces
-    $str =~ tr/a-z\015\012/ /cs;                            # Remove all characters except 'a' to 'z' and new-line characters
-    #$str =~ s/[\$#@~!&*()\[\];.,:?^\-'`\\\/]+//g;          # Does not include numeric characters
+    $str = lc( $str );                                                 # Convert all characters to lowercase
+    $str =~ s/ +/ /g;                                                  # Remove duplicate white spaces between words
+    $str =~ s/'s//g;                                                   # Remove "'s" characters (Apostrophe 's')
+    $str =~ s/-/ /g;                                                   # Replace all hyphen characters to spaces
+    $str =~ s/\./\n/g if ( $self->GetStoreAsSentencePerLine() == 1 );  # Convert Period To New Line Character
+    $str =~ tr/a-z\015\012/ /cs;                                       # Remove all characters except 'a' to 'z' and new-line characters
+    #$str =~ s/[\$#@~!&*()\[\];.,:?^\-'`\\\/]+//g;                     # Does not include numeric characters
     
     # Convert String Line Ending Suitable To The Target 
     my $lineEnding = "";
@@ -1295,8 +1304,11 @@ sub RemoveSpecialCharactersFromString
     
     $str =~ s/(\015\012|\012|\015)/$lineEnding/g;
     
+    # Removes Spaces At Left Side Of String
+    $str =~ s/^\s+//                if ( $self->GetStoreAsSentencePerLine() == 1 );
+    
     # Removes Spaces At Both Ends Of String And More Than Once Space In-Between Ends
-    $str =~ s/^\s+|\s(?=\s)|\s+$//g;
+    $str =~ s/^\s+|\s(?=\s)|\s+$//g if ( $self->GetStoreAsSentencePerLine() == 0 );
     
     return $str;
 }
@@ -1460,6 +1472,13 @@ sub GetCompoundifyText
     return $self->{ _compoundifyText };
 }
 
+sub GetStoreAsSentencePerLine
+{
+    my ( $self ) = @_;
+    $self->{ _storeAsSentencePerLine } = 0 if !defined ( $self->{ _storeAsSentencePerLine } );
+    return $self->{ _storeAsSentencePerLine };
+}
+
 sub GetNumOfThreads
 {
     my ( $self ) = @_;
@@ -1613,6 +1632,12 @@ sub SetCompoundifyText
     return $self->{ _compoundifyText } = $value;
 }
 
+sub SetStoreAsSentencePerLine
+{
+    my ( $self, $value ) = @_;
+    return $self->{ _storeAsSentencePerLine } = $value;
+}
+
 sub SetNumOfThreads
 {
     my ( $self, $value ) = @_;
@@ -1658,11 +1683,21 @@ sub AppendStrToTextCorpus
     {
         lock( $appendLock );
         
+        # Removes Spaces At Left Side Of String
+        $str =~ s/^\s+//                if ( $self->GetStoreAsSentencePerLine() == 1 );
+        
         # Removes Spaces At Both Ends Of String And More Than Once Space In-Between Ends
-        $str =~ s/^\s+|\s(?=\s)|\s+$//g;
+        $str =~ s/^\s+|\s(?=\s)|\s+$//g if ( $self->GetStoreAsSentencePerLine() == 0 );
         
         # Append string to text corpus
-        $self->{ _textCorpusStr } .= "$str ";
+        if( substr( $str, -1 ) eq "\n" )
+        {
+            $self->{ _textCorpusStr } .= "$str" ;
+        }
+        else
+        {
+            $self->{ _textCorpusStr } .= "$str ";
+        }
     }
 }
 
@@ -1691,15 +1726,19 @@ sub AppendToTempStr
     $str = $self->RemoveSpecialCharactersFromString( $str );
     $str = Text::Unidecode::unidecode( $str );
     
+    # Removes Spaces At Left Side Of String
+    $str =~ s/^\s+//                if ( $self->GetStoreAsSentencePerLine() == 1 );
+    
     # Removes Spaces At Both Ends Of String And More Than Once Space In-Between Ends
-    $str =~ s/^\s+|\s(?=\s)|\s+$//g;
+    $str =~ s/^\s+|\s(?=\s)|\s+$//g if ( $self->GetStoreAsSentencePerLine() == 0 );
     
     # Increment Word Counter
     my @words = split( ' ', $str );
     $preCompWordCount += scalar( @words );
     undef( @words );
     
-    # Append string to text corpus
+    # Append String To Temp String
+    return $self->{ _tempStr } .= "$str" if ( index( ( scalar reverse $str ), "\n" ) == 0 );
     return $self->{ _tempStr } .= "$str ";
 }
 
@@ -1848,7 +1887,7 @@ Word2vec::Xmltow2v - Medline XML-To-W2V Module.
  use Word2vec::Xmltow2v;
 
  # Parameters: Debug Output = True, Write Log = False, StoreTitle = True, StoreAbstract = True, Quick Parse = True, CompoundifyText = True, Use Multi-Threading (Default = 1 Thread Per CPU Core)
- my $xmlconv = new xmltow2v( 1, 0, 1, 1, 1, 1, 2 );      # Note: Specifying no parameters implies default settings.
+ my $xmlconv = Word2vec::Xmltow2v->new( 1, 0, 1, 1, 1, 1, 2 );      # Note: Specifying no parameters implies default settings.
  $xmlconv->SetWorkingDir( "Medline/XML/Directory/Here" );
  $xmlconv->SetSavePath( "textcorpus.txt" );
  $xmlconv->SetStoreTitle( 1 );
@@ -1889,6 +1928,7 @@ Description:
     storeAbstract               = 1
     quickParse                  = 0
     compoundifyText             = 0
+    storeAsSentencePerLine      = 0
     numOfThreads                = Number of CPUs/CPU cores (1 thread per core/CPU)
     workingDir                  = Current Directory
     savePath                    = Current Directory
@@ -1915,6 +1955,7 @@ Input:
  $quickParse                  -> Instructs module to utilize quick XML parsing Functions for known Medline article title and abstract tags. (1 = True / 0 = False)
  $compoundifyText             -> Instructs module to compoundify text on the fly given a compound word file. This is automatically set
                                  when reading the compound word file to memory regardless of user setting. (1 = True / 0 = False)
+ $storeAsSentencePerLine      -> Instructs module to store parsed medline data as a length single sentence or separate sentences on new lines based on period character. (1 = True / 0 = False)
  $numOfThreads                -> Specifies the number of worker threads which parse Medline XML files simultaneously to create the text corpus.
                                  This speeds up text corpus generation by the number of physical cores present an a given machine. (Positive integer value)
                                  ie. Using four threads of a Intel i7 core machine speeds up text corpus generation roughly four times faster than being single threaded.
@@ -2618,7 +2659,7 @@ Example:
 
  use Word2vec::Xmltow2v;
 
- my $xmlconv = Word2vec::Xmltow2v->new()
+ my $xmlconv = Word2vec::Xmltow2v->new();
  my $fileType = $xmlconv->GetFileType( "samples/textcorpus.txt" );
 
  undef( $xmlconv );
@@ -2641,7 +2682,7 @@ Example:
 
  use Word2vec::Xmltow2v;
 
- my $xmlconv = Word2vec::Xmltow2v->new()
+ my $xmlconv = Word2vec::Xmltow2v->new();
  print "Passed Date Checks\n" if ( $xmlconv->_DateCheck() == 0 );
  print "Failed Date Checks\n" if ( $xmlconv->_DateCheck() == -1 );
 
@@ -2667,7 +2708,7 @@ Example:
 
  use Word2vec::Xmltow2v;
 
- my $xmlconv = Word2vec::Xmltow2v->new()
+ my $xmlconv = Word2vec::Xmltow2v->new();
  my $debugLog = $xmlconv->GetDebugLog();
 
  print( "Debug Logging Enabled\n" ) if $debugLog == 1;
@@ -2801,8 +2842,34 @@ Example:
  my $xmlconv = Word2vec::Xmltow2v->new();
  my $compoundify = $xmlconv->GetCompoundifyText();
 
- print( "Compoundify Text Option: Enabled\n" ) if $compoundify == 1;
+ print( "Compoundify Text Option: Enabled\n" )  if $compoundify == 1;
  print( "Compoundify Text Option: Disabled\n" ) if $compoundify == 0;
+
+ undef( $xmlconv );
+
+=head3 GetStoreAsSentencePerLine
+
+Description:
+
+ Returns the _storeAsSentencePerLine member variable set during Word2vec::Xmltow2v object instantiation of new function.
+
+Input:
+
+ None
+
+Output:
+
+ $value -> '1' = True / '0' = False
+
+Example:
+
+ use Word2vec::Xmltow2v;
+
+ my $xmlconv = Word2vec::Xmltow2v->new();
+ my $storeAsSentencePerLine = $xmlconv->GetStoreAsSentencePerLine();
+
+ print( "Store As Sentence Per Line: Enabled\n" )  if $storeAsSentencePerLine == 1;
+ print( "Store As Sentence Per Line: Disabled\n" ) if $storeAsSentencePerLine == 0;
 
  undef( $xmlconv );
 
@@ -3363,6 +3430,29 @@ Example:
 
  undef( $xmlconv );
 
+=head3 SetStoreAsSentencePerLine
+
+Description:
+
+ Sets member variable to passed integer parameter. Instructs module to utilize 'storeAsSentencePerLine' option if true.
+
+Input:
+
+ $value -> '1' = Store as sentence per line / '0' = Do not store as sentence per line
+
+Ouput:
+
+ None
+
+Example:
+
+ use Word2vec::Xmltow2v;
+
+ my $xmlconv = Word2vec::Xmltow2v->new();
+ $xmlconv->SetStoreAsSentencePerLine( 1 );
+
+ undef( $xmlconv );
+
 =head3 SetNumOfThreads
 
 Description:
@@ -3818,8 +3908,27 @@ Example:
 
 =head3 SetOverwriteExistingFile
 
-Sets member variable to passed integer parameter. Requires 0 = False or 1 = True. Sets option to overwrite
-existing text corpus during compilation if 1 or append to existing text corpus if 0.
+Description:
+
+ Sets member variable to passed integer parameter. Sets option to overwrite existing text corpus during compilation
+ if 1 or append to existing text corpus if 0.
+
+Input:
+
+ $value -> '1' = Overwrite existing text corpus / '0' = Append to existing text corpus during compilation.
+
+Output:
+
+ None
+
+Example:
+
+ use Word2vec::Xmltow2v;
+
+ my $xmltow2v = Word2vec::Xmltow2v->new();
+ $xmltow2v->SetOverWriteExistingFile( 1 );
+
+ undef( $xmltow2v );
 
 =head2 Debug Functions
 

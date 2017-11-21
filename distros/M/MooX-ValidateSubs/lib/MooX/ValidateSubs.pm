@@ -5,7 +5,7 @@ use warnings;
 
 use MooX::ReturnModifiers;
 
-our $VERSION = '1.012001';
+our $VERSION = '1.012003';
 
 sub import {
 	my $target	= caller;
@@ -30,6 +30,11 @@ sub import {
 								@params = $self->_validate_sub(
 									$name, 'params', $param_spec, @params
 								);
+							}
+
+							if (my $keys = $current_spec->{keys}) {
+								my $hash = scalar @params > 1 ? { @params } : $params[0];
+								@params = map { $hash->{$_} } @{ $keys };
 							}
 
 							@params = $self->$orig(@params);
@@ -68,7 +73,7 @@ MooX::ValidateSubs - Validating sub routines via Type::Tiny.
 
 =head1 VERSION
 
-Version 1.012001
+Version 1.012003
 
 =cut
 
@@ -95,6 +100,17 @@ Version 1.012001
 			},
 		},
 		goodbye_world => { params => [ [Str], [ArrayRef], [HashRef] ] },
+		spec => {
+			params => {
+				one   => [ Str, sub { 'one' } ],
+				two   => [ Str, sub { 'two' } ],
+				three => [ Str, sub { 'three' } ],
+			},
+			keys => [qw/three two one/]
+		},
+		indexed => {
+			params => [ [Str, sub { 'one' }], [Str, sub { 'two' }], [Str, sub { 'three' }] ],
+		},
 	);
 
 	sub before_add_me {
@@ -120,6 +136,8 @@ Version 1.012001
 
 		return %args;
 	}
+
+	$self->indexed(2 => 'changed'); # one, two, changed
 
 =head1 Exports
 

@@ -4,8 +4,10 @@ use strictures 2;
 use Test::More;
 use Test::Deep;
 
+use lib 't/lib';
+
 BEGIN {
-  use t::loader qw(build_schema);
+  use loader qw(build_schema);
   build_schema([
     Artist => {
       table => 'artists',
@@ -35,7 +37,7 @@ BEGIN {
   ]);
 }
 
-use t::common qw(sims_test Schema);
+use common qw(sims_test Schema);
 
 subtest "Load and retrieve a row by multi-col UK" => sub {
   my $spec = {

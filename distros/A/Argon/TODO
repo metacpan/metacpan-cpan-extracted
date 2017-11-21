@@ -1,0 +1,8 @@
+- Automatic reconnection (client)
+- File-backed storage for queue
+- Process management tooling
+- Better test coverage
+- POD
+- Persistent worker processes
+  - Pre-load libraries in worker
+  - Execution sandbox

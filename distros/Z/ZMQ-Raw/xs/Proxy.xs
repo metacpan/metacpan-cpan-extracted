@@ -29,7 +29,11 @@ start (self, frontend, backend, ...)
 			c = ZMQ_SV_TO_PTR (Socket, ST (3));
 		if (SvOK (ST (4)))
 			s = ZMQ_SV_TO_PTR (Socket, ST (4));
-
+#ifdef USE_ITHREADS
 		zmq_proxy_steerable (f->socket, b->socket,
 			c ? c->socket : NULL,
 			s ? s->socket : NULL);
+#else
+		croak_usage ("proxy requires interpreter threads");
+#endif
+

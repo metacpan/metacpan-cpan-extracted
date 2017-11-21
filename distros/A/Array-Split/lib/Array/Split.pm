@@ -2,10 +2,7 @@ use strict;
 use warnings;
 
 package Array::Split;
-
-BEGIN {
-    $Array::Split::VERSION = '1.103261';
-}
+$Array::Split::VERSION = '1.173190';
 
 # ABSTRACT: split an array into sub-arrays
 
@@ -14,16 +11,13 @@ use List::Util 'max';
 use POSIX 'ceil';
 
 sub split_by {
-    my ( $split_size, @original ) = @_;
+    my $split_size = shift;
 
-    $split_size = ceil max( $split_size, 1 );
+    $split_size = max( $split_size, 1 );
 
     my @sub_arrays;
-    for my $element ( @original ) {
-        push @sub_arrays, [] if !@sub_arrays;
-        push @sub_arrays, [] if @{ $sub_arrays[-1] } >= $split_size;
-
-        push @{ $sub_arrays[-1] }, $element;
+    while ( @_ ) {
+        push @sub_arrays, [ splice @_, 0, $split_size ];
     }
 
     return @sub_arrays;
@@ -45,13 +39,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Array::Split - split an array into sub-arrays
 
 =head1 VERSION
 
-version 1.103261
+version 1.173190
 
 =head1 SYNOPSIS
 
@@ -74,16 +70,29 @@ $count indicates, but will return less if there are not enough elements in @orig
 
 Returns a list of array references.
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Christian Walde <mithaldu@yahoo.de>
+=over 4
+
+=item *
+
+Christian Walde (MITHALDU) <walde.christian@gmail.com>
+
+=item *
+
+Tomasz Konojacki (XENU) <me@xenu.tk>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2010 by Christian Walde.
 
-This is free software, licensed under:
+Christian Walde has dedicated the work to the Commons by waiving all of his
+or her rights to the work worldwide under copyright law and all related or
+neighboring legal rights he or she had in the work, to the extent allowable by
+law.
 
-  DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE, Version 2, December 2004
+Works under CC0 do not require attribution. When citing the work, you should
+not imply endorsement by the author.
 
 =cut

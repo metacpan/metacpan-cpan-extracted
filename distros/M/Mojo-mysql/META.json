@@ -4,7 +4,7 @@
       "Jan Henning Thorsen <jhthorsen@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -33,7 +33,7 @@
       "runtime" : {
          "requires" : {
             "DBD::mysql" : "4.042",
-            "Mojolicious" : "7.18",
+            "Mojolicious" : "7.55",
             "SQL::Abstract" : "1.81"
          }
       }
@@ -48,6 +48,6 @@
          "url" : "https://github.com/jhthorsen/mojo-mysql.git"
       }
    },
-   "version" : "1.04",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "version" : "1.05",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

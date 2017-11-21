@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::ShellVar;
-$Config::Model::Backend::ShellVar::VERSION = '2.113';
+$Config::Model::Backend::ShellVar::VERSION = '2.114';
 use Carp;
 use Mouse;
 use Config::Model::Exception;
@@ -114,7 +114,7 @@ Config::Model::Backend::ShellVar - Read and write config as a C<SHELLVAR> data s
 
 =head1 VERSION
 
-version 2.113
+version 2.114
 
 =head1 SYNOPSIS
 

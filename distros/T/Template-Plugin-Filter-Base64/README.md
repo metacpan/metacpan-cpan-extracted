@@ -4,7 +4,7 @@ Template::Plugin::Filter::Base64 - encoding b64 filter for Template Toolkit
 
 # SYNOPSIS
 
-    [% USE Filter.Base64 trim => 1, use_html_entity => 'cp1251' %]
+    [% USE Filter.Base64 trim => 1, use_html_entity => 'cp1251', dont_broken_into_lines_each_76_char => 1 %]
     [% FILTER b64 %]
         Hello, world!
     [% END %]
@@ -18,6 +18,10 @@ Template::Plugin::Filter::Base64 - encoding b64 filter for Template Toolkit
 - use\_html\_entity (string)
 
     Optional. Value means default charset (e.g. 'cp1251'). Result - convert text with html entities before base64-encoding
+
+- dont\_broken\_into\_lines\_each\_76\_char
+
+    Optional. If true, call the function MIME::Base64::encode\_base64( $bytes, '' ) whith empty string for the parameter $eol. The returned encoded string is broken into lines of no more than 76 characters each and it will end with $eol unless it is empty. Pass an empty string as second argument if you do not want the encoded string to be broken into lines
 
 # SEE ALSO
 

@@ -1,7 +1,7 @@
 package Devel::Chitin::OpTree::UNOP_AUX;
 use base 'Devel::Chitin::OpTree::UNOP';
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use strict;
 use warnings;
@@ -74,6 +74,87 @@ sub pp_multideref {
     }
 
     $deparsed;
+}
+
+my %multiconcat_skip_optimized_children = ( pp_padsv => 1, pp_const => 1, pp_pushmark => 1 );
+sub pp_multiconcat {
+    my($self, %flags) = @_;
+
+    # Skip children that were optimized away by the multiconcat
+    my @kids = grep { my $name = $_->op->name;
+                      if ($name eq 'null') {
+                          $name = 'ex-' . $_->_ex_name;
+                      }
+                      ! ( $_->is_null && $multiconcat_skip_optimized_children{ $_->_ex_name } )
+                    }
+                @{$self->children};
+
+    my $is_assign;
+    my $lhs = '';
+    my $op = $self->op;
+    my $is_append = $op->private & &B::OPpMULTICONCAT_APPEND;
+    if ($op->private & B::OPpTARGET_MY) {
+        # $var = ... or $var .= ...
+        $lhs = $self->_padname_sv($op->targ)->PV;
+        $is_assign = 1;
+    } elsif ($op->flags & B::OPf_STACKED) {
+        # expr = ,,, or expr .= ...
+        my $expr = $is_append ? shift(@kids) : pop(@kids);
+        $lhs = $expr->deparse;
+        $is_assign = 1;
+    }
+
+    if ($is_assign) {
+        $lhs .= $is_append ? ' .= ' : ' = ';
+    }
+
+    # extract a list of string constants from the combined string and list of substring lengths
+    my($nargs, $const_str, @substr_lengths) = $self->op->aux_list($self->cv);
+    my $str_idx = 0;
+    my @string_parts;
+    foreach my $len ( @substr_lengths ) {
+        if ($len == -1) {
+            push @string_parts, undef;
+        } else {
+            push @string_parts, substr($const_str, $str_idx, $len);
+            $str_idx += $len;
+        }
+    }
+
+    my $rhs = '';
+    if ($op->private & &B::OPpMULTICONCAT_STRINGIFY
+        or $op->parent->name eq 'substcont'
+    ) {
+        # A double quoted string with variable interpolation: "foo = $foo bar = $bar"
+        foreach my $str_part ( @string_parts ) {
+            $rhs .= $str_part if defined $str_part;
+            $rhs .= shift(@kids)->deparse if @kids;
+        }
+        $rhs = $self->_quote_string($rhs, skip_quotes => 1, %flags);
+        $rhs = "qq($rhs)" unless $flags{skip_quotes};
+
+    } elsif ($op->private & &B::OPpMULTICONCAT_FAKE) {
+        # sprintf() with only %s and %% formats
+        my $format_str = join('%s', map { s/%/%%/g }
+                                    map { defined ? $_ : '' }
+                                    @string_parts);
+        $rhs .= sprintf('sprintf(%s, %s)',
+                        $format_str,
+                        join(', ', map { $_->deparse } @kids));
+    } else {
+        # one or more explicit concats: "foo" . $foo
+        my @parts;
+        foreach my $str_part ( @string_parts ) {
+            if (defined $str_part) {
+                $str_part = $self->_quote_string($str_part) unless $flags{skip_quotes};
+                push @parts, $str_part;
+            }
+            push @parts, shift(@kids)->deparse if @kids;
+        }
+        $rhs .= join(' . ', @parts);
+    }
+
+    return "${lhs}${rhs}";
 }
 
 1;

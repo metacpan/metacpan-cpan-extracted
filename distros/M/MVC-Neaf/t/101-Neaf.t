@@ -32,7 +32,7 @@ MVC::Neaf->route( bar => sub {
     return {
         data => $bar,
     };
-}, -template => \"[% data %]" );
+}, -template => \"[% data %]", -view => 'foo' );
 
 my $code = MVC::Neaf->run;
 

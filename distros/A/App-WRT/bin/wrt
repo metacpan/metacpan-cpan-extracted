@@ -1,0 +1,71 @@
+#!/bin/sh
+
+: <<=cut
+=pod
+
+=head1 NAME
+
+wrt - WRiting Tool, a static site/blog generator and related utilites
+
+=head1 SYNOPSIS
+
+    wrt init        # Initialize a wrt repository
+    wrt display     # Print HTML for entries
+    wrt render-all  # Render all defined entries to filesystem
+    wrt addprop     # Add a property to an entry
+    wrt findprop    # Find entries containing certain properties
+    wrt -h          # Print help message
+
+=head1 DESCRIPTION
+
+wrt is a small collection of utilities for authoring a simple, date-based
+blog or other static site.
+
+C<wrt> is a simple wrapper script which invokes other subcommands.  It will
+pass its arguments along to any command of the form C<wrt-command>.
+
+Detailed documentation can be found in the L<App::WRT> man page or at
+L<https://github.com/brennen/wrt>.
+
+=head1 LICENSE
+
+    wrt is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+=head1 AUTHOR
+
+Brennen Bearnes
+
+=cut
+
+print_help() {
+  echo "wrt - a writing tool"
+  echo
+  echo "Usage: $0 [command] [args]"
+  echo "    wrt init        Initialize a wrt repository"
+  echo "    wrt display     Print HTML for entries"
+  echo "    wrt render-all  Render all defined entries to filesystem"
+  echo "    wrt addprop     Add a property to an entry"
+  echo "    wrt findprop    Find entries containing certain properties"
+  echo "    wrt -h          Print this help message"
+  echo
+  echo "You must specify a command."
+  exit 1
+}
+
+if [ $# -lt 1 ] || [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
+  print_help
+fi
+
+subprog="wrt-$1"
+
+# Make sure that the command we've been given exists:
+command -v "$subprog" >/dev/null 2>&1 || {
+  echo "wrt: '$1' is not a wrt command.  See 'wrt -h'."
+  exit 1
+}
+
+shift
+exec "$subprog" "$@"

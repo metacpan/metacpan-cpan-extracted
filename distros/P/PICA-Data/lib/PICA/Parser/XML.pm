@@ -2,7 +2,7 @@ package PICA::Parser::XML;
 use strict;
 use warnings;
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 use Carp qw(croak);
 use XML::LibXML::Reader;

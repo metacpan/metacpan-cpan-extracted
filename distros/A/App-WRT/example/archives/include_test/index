@@ -1,0 +1,3 @@
+<h1>wrt include test</h1>
+
+<include>files/include_me</include>

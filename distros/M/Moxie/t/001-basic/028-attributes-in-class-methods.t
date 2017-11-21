@@ -8,7 +8,8 @@ use Test::More;
 # this comes up in, for instance, Plack::Middleware::wrap
 
 package Foo {
-    use Moxie;
+    use Moxie
+        traits => [':experimental'];
 
     extends 'Moxie::Object';
 
@@ -16,7 +17,7 @@ package Foo {
 
     my sub _bar : private;
 
-    sub BUILDARGS : init( bar? => _bar );
+    sub BUILDARGS : strict( bar? => _bar );
 
     sub bar : ro(_bar);
 

@@ -61,3 +61,35 @@ parser      => 'chrome',
 toolkit     => [ 'AppleWebKit', '535.2', '535.200' ],
 version     => '15.000874106',
 version_raw => '15.0.874.106',
+
+[AGENT]
+
+Mozilla/5.0 (X11; Linux i686 (x86_64)) AppleWebKit/535.1 (KHTML, like Gecko) Chrome/14.0.785.0 Safari/535.1
+
+extras          => [ 'X11', 'KHTML, like Gecko' ],
+name            => 'Chrome',
+os              => 'Linux i686 x86_64 ',
+parser          => 'chrome',
+toolkit         => [ 'AppleWebKit', '535.1', '535.100' ],
+version         => '14.000785000',
+version_raw     => '14.0.785.0',
+
+[AGENT]
+
+Mozilla/5.0 (X11; Linux x86_64; 6.0) AppleWebKit/537.31 (KHTML, like Gecko) Chrome/12.0.1410.63 Safari/537.31
+
+extras          => [ 'X11', 'KHTML, like Gecko', '6.0' ],
+name            => 'Chrome',
+os              => 'Linux x86_64',
+parser          => 'chrome',
+toolkit         => [ 'AppleWebKit', '537.31', '537.310' ],
+version         => '12.0001410063',
+version_raw     => '12.0.1410.63',
+
+[AGENT]
+
+#TODO: Mozilla/5.0 (X11; FreeBSD; U; Viera; bg-BG) AppleWebKit/535.1 (KHTML, like Gecko) Viera/1.5.2 Chrome/14.0.835.202 Safari/535.1
+
+[AGENT]
+
+#TODO: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/30.0.1599.114 Chrome/30.0.1599.114 Safari/537.36

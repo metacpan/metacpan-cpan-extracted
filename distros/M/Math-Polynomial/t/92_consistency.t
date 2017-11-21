@@ -93,14 +93,16 @@ undef $/;
 
 maintainer_only();
 
-plan 38;
+plan 42;
 
 my $MAKEFILE_PL            = 'Makefile.PL';
 my $README                 = 'README';
 my $META_YML               = 'META.yml';
+my $AGENDA_YML             = 't/data/AGENDA.yml';
 my $MANIFEST               = 'MANIFEST';
 my $CHANGES                = 'Changes';
 my ($modname, $authormail) = info_from_makefile_pl();
+my ($ambox, $amhost)       = split /\@/, $authormail;
 (my $distname              = $modname) =~ s{::}{-}g;
 (my $modfilename           = $modname) =~ s{::}{/}g;
 $modfilename .= '.pm';
@@ -114,6 +116,7 @@ my %ignore_copyright = map {($_ => 1)} qw(
     MYMETA.json
     MYMETA.yml
     SIGNATURE
+    t/data/AGENDA.yml
     t/data/KNOWN_VERSIONS
 );
 
@@ -147,7 +150,7 @@ my %pattern = (
         qr{^(\d+\.\d\S*)\s+(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun)\b},
     'changes_version_headlines' =>
         qr{^\s*\Q$modname\E\s+(?:[Vv]ersion\s+)?(\d\S*)\s*$},
-    'authormail_code' => qr[\QE<lt>${authormail}E<gt>\E],
+    'authormail_code' => qr[\QE<lt>$ambox\E(?:\@|E<64>)\Q${amhost}E<gt>\E],
     'package_line' => qr/^\s*package\s+(\w+(?:\:\:\w+)*)\s*;/,
     'version_line' => qr/^\s*(?:our\s*)\$VERSION\s*=\s*(.*?)\s*\z/,
     'version' => qr/^'([\d._]+)';\z/,
@@ -228,6 +231,34 @@ if (open FILE, '<', $META_YML) {
 }
 else {
     skip 6, "cannot open $META_YML file";
+}
+
+my $agenda       = undef;
+my %agenda_fixme = ();
+my %agenda_todo  = ();
+my %agenda_debug = ();
+if (open FILE, '<', $AGENDA_YML) {
+    my $agendayml = <FILE>;
+    close FILE;
+    $agenda = eval { YAML::Load($agendayml) || {} };
+    my $agenda_is_ok =
+        defined($agenda) &&
+        'HASH' eq ref($agenda) &&
+        !grep { 'ARRAY' ne ref $_ } values %{$agenda};
+    test $agenda_is_ok, "$AGENDA_YML is syntactically correct";
+    $agenda = {} if !$agenda_is_ok;
+}
+else {
+    $agenda = {};
+    test 1, "$AGENDA_YML is not present";
+}
+foreach my $ca (
+    [fixme => \%agenda_fixme],
+    [todo  => \%agenda_todo ],
+    [debug => \%agenda_debug],
+) {
+    my ($cat, $ag) = @{$ca};
+    @{$ag}{@{$agenda->{$cat}}} = () if exists $agenda->{$cat};
 }
 
 my $changes_version = undef;
@@ -334,6 +365,7 @@ if ($manifest_open) {
                 my $seen_badchar     = 0;
                 my $seen_hardtab     = 0;
                 my $in_signature     = 0;
+                my $before_end       = 1;
                 my $in_author        = 0;
                 my $copyright_year   = undef;
                 my $checkin_filename = undef;
@@ -382,12 +414,15 @@ if ($manifest_open) {
                         push @authors, $1;
                     }
                     next if !$is_module;
-                    if (!$in_signature && /$pattern{'package_line'}/o) {
+                    if (/^__END__$/) {
+                        $before_end = 0;
+                    }
+                    if ($before_end && /$pattern{'package_line'}/o) {
                         $package = $1;
                         $provided_items{$package} ||= { file => $file };
                     }
                     elsif (
-                        !$in_signature &&
+                        $before_end &&
                         defined($package) &&
                         exists($provided_items{$package}) &&
                         !exists($provided_items{$package}->{'version'}) &&
@@ -471,18 +506,67 @@ if ($manifest_open) {
         print qq{# missing file: "$file"\n};
     }
     test !@missing_distfiles, 'distribution complete';
+
+    my (@fixme_a, @fixme_u) = ();
     foreach my $file (@fixme_distfiles) {
-        print "# file with FIX", "ME tag: $file\n";
+        my $in_a = q[];
+        if (exists $agenda_fixme{$file}) {
+            $in_a = ' (in agenda)';
+            push @fixme_a, $file;
+            delete $agenda_fixme{$file};
+        }
+        else {
+            push @fixme_u, $file;
+        }
+        print "# file with FIX", "ME tag: $file$in_a\n";
     }
-    test !@fixme_distfiles, 'no files flagged as needing fix';
+    test !@fixme_u, 'no files flagged as needing fix';
+    my @fixme_x = sort keys %agenda_fixme;
+    foreach my $file (@fixme_x) {
+        print "# extra file in fixme agenda: $file\n";
+    }
+    test !@fixme_x, 'no extra files in fixme agenda';
+
+    my (@todo_a, @todo_u) = ();
     foreach my $file (@todo_distfiles) {
-        print "# file with TO", "DO tag: $file\n";
+        my $in_a = q[];
+        if (exists $agenda_todo{$file}) {
+            $in_a = ' (in agenda)';
+            push @todo_a, $file;
+            delete $agenda_todo{$file};
+        }
+        else {
+            push @todo_u, $file;
+        }
+        print "# file with TO", "DO tag: $file$in_a\n";
     }
-    test !@todo_distfiles, 'no files flagged as needing more work';
+    test !@todo_u, 'no files flagged as needing more work';
+    my @todo_x = sort keys %agenda_todo;
+    foreach my $file (@todo_x) {
+        print "# extra file in todo agenda: $file\n";
+    }
+    test !@todo_x, 'no extra files in todo agenda';
+
+    my (@debug_a, @debug_u) = ();
     foreach my $file (@debug_distfiles) {
-        print "# file with DE", "BUG tag: $file\n";
+        my $in_a = q[];
+        if (exists $agenda_debug{$file}) {
+            $in_a = ' (in agenda)';
+            push @debug_a, $file;
+            delete $agenda_debug{$file};
+        }
+        else {
+            push @debug_u, $file;
+        }
+        print "# file with DE", "BUG tag: $file$in_a\n";
     }
     test !@debug_distfiles, 'no files with temporary debugging aids';
+    my @debug_x = sort keys %agenda_debug;
+    foreach my $file (@debug_x) {
+        print "# extra file in debug agenda: $file\n";
+    }
+    test !@debug_x, 'no extra files in debug agenda';
+
     foreach my $file (@badchar_distfiles) {
         print "# file with strange characters: $file\n";
     }
@@ -516,14 +600,14 @@ if ($manifest_open) {
             print "# file lacking revision ID: $file\n";
         }
         test !@lacking_revision_id, 'revision ID present in perl source code';
+        foreach my $file (@uncommited_files) {
+            print "# file probably not yet commited: $file\n";
+        }
+        test !@uncommited_files, 'revision IDs have date and match filenames';
     }
     else {
-        skip 1, 'no revision ids in this distro';
+        skip 2, 'no revision ids in this distro';
     }
-    foreach my $file (@uncommited_files) {
-        print "# file probably not yet commited: $file\n";
-    }
-    test !@uncommited_files, 'revision IDs have date and match filenames';
     foreach my $pkg (@bad_package_versions) {
         print "# strange package version: @{$pkg}\n";
     }

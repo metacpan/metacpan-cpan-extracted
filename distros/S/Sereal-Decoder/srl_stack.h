@@ -39,7 +39,7 @@ typedef struct srl_stack srl_stack_t;
 typedef struct srl_stack * srl_stack_ptr;
 
 struct srl_stack {
-    IV depth; // benchmarking showed that calculating depth takes up to 5%, so we store it
+    IV depth; /* benchmarking showed that calculating depth takes up to 5%, so we store it */
     srl_stack_type_t *ptr, *begin, *end;
 };
 
@@ -84,9 +84,9 @@ srl_stack_grow(pTHX_ srl_stack_t *stack)
 
 /* Free stack arrfer (not not the stack struct */
 SRL_STATIC_INLINE void
-srl_stack_destroy(pTHX_ srl_stack_t *stack)
+srl_stack_deinit(pTHX_ srl_stack_t *stack)
 {
-    if (stack == NULL) return;
+    if (stack == NULL || stack->begin == NULL) return;
     Safefree(stack->begin);
 }
 
