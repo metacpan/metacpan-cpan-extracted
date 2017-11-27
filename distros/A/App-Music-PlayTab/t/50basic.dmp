@@ -1,0 +1,665 @@
+$opus = {
+  'lines' => [
+    {
+      'bpm' => 4,
+      'height' => -15,
+      'measures' => [
+        [
+          bless( {
+            '_debug' => '',
+            '_unparsed' => 'a-7',
+            'duration' => 0,
+            'key' => bless( {
+              'key' => 9,
+              'unparsed' => 'a'
+            }, 'App::Music::PlayTab::Note' ),
+            'vec' => [
+              0,
+              3,
+              7,
+              10
+            ]
+          }, 'App::Music::PlayTab::Chord' ),
+          'space'
+        ],
+        [
+          bless( {
+            '_debug' => '',
+            '_unparsed' => 'd7',
+            'duration' => 0,
+            'key' => bless( {
+              'key' => 2,
+              'unparsed' => 'd'
+            }, 'App::Music::PlayTab::Note' ),
+            'vec' => [
+              0,
+              4,
+              7,
+              10
+            ]
+          }, 'App::Music::PlayTab::Chord' ),
+          'space'
+        ],
+        [
+          bless( {
+            '_debug' => '',
+            '_unparsed' => 'gmaj7',
+            'duration' => 0,
+            'key' => bless( {
+              'key' => 7,
+              'unparsed' => 'g'
+            }, 'App::Music::PlayTab::Note' ),
+            'vec' => [
+              0,
+              4,
+              7,
+              11
+            ]
+          }, 'App::Music::PlayTab::Chord' ),
+          'space'
+        ],
+        [
+          bless( {
+            '_debug' => '',
+            '_unparsed' => 'cmaj7',
+            'duration' => 0,
+            'key' => bless( {
+              'key' => 0,
+              'unparsed' => 'c'
+            }, 'App::Music::PlayTab::Note' ),
+            'vec' => [
+              0,
+              4,
+              7,
+              11
+            ]
+          }, 'App::Music::PlayTab::Chord' ),
+          'space'
+        ]
+      ],
+      'width' => 35
+    },
+    {
+      'bpm' => 4,
+      'height' => -15,
+      'measures' => [
+        [
+          bless( {
+            '_debug' => '',
+            '_unparsed' => 'f#%',
+            'duration' => 0,
+            'key' => bless( {
+              'key' => 6,
+              'unparsed' => 'f#'
+            }, 'App::Music::PlayTab::Note' ),
+            'vec' => [
+              0,
+              3,
+              6,
+              10
+            ]
+          }, 'App::Music::PlayTab::Chord' ),
+          'space'
+        ],
+        [
+          bless( {
+            '_debug' => '',
+            '_unparsed' => 'b7',
+            'duration' => 0,
+            'key' => bless( {
+              'key' => 11,
+              'unparsed' => 'b'
+            }, 'App::Music::PlayTab::Note' ),
+            'vec' => [
+              0,
+              4,
+              7,
+              10
+            ]
+          }, 'App::Music::PlayTab::Chord' ),
+          'space'
+        ],
+        [
+          bless( {
+            '_debug' => '',
+            '_unparsed' => 'e-',
+            'duration' => 0,
+            'key' => bless( {
+              'key' => 4,
+              'unparsed' => 'e'
+            }, 'App::Music::PlayTab::Note' ),
+            'vec' => [
+              0,
+              3,
+              7
+            ]
+          }, 'App::Music::PlayTab::Chord' ),
+          'space'
+        ],
+        [
+          bless( {
+            '_debug' => '',
+            '_unparsed' => 'f#%',
+            'duration' => 0,
+            'key' => bless( {
+              'key' => 6,
+              'unparsed' => 'f#'
+            }, 'App::Music::PlayTab::Note' ),
+            'vec' => [
+              0,
+              3,
+              6,
+              10
+            ]
+          }, 'App::Music::PlayTab::Chord' ),
+          'space'
+        ]
+      ],
+      'width' => 35
+    },
+    {
+      'bpm' => 4,
+      'height' => -15,
+      'measures' => [
+        [
+          bless( {
+            '_debug' => '',
+            '_unparsed' => 'a-7',
+            'duration' => 0,
+            'key' => bless( {
+              'key' => 9,
+              'unparsed' => 'a'
+            }, 'App::Music::PlayTab::Note' ),
+            'vec' => [
+              0,
+              3,
+              7,
+              10
+            ]
+          }, 'App::Music::PlayTab::Chord' ),
+          'space'
+        ],
+        [
+          bless( {
+            '_debug' => '',
+            '_unparsed' => 'd7',
+            'duration' => 0,
+            'key' => bless( {
+              'key' => 2,
+              'unparsed' => 'd'
+            }, 'App::Music::PlayTab::Note' ),
+            'vec' => [
+              0,
+              4,
+              7,
+              10
+            ]
+          }, 'App::Music::PlayTab::Chord' ),
+          'space'
+        ],
+        [
+          bless( {
+            '_debug' => '',
+            '_unparsed' => 'gmaj7',
+            'duration' => 0,
+            'key' => bless( {
+              'key' => 7,
+              'unparsed' => 'g'
+            }, 'App::Music::PlayTab::Note' ),
+            'vec' => [
+              0,
+              4,
+              7,
+              11
+            ]
+          }, 'App::Music::PlayTab::Chord' ),
+          'space'
+        ],
+        [
+          bless( {
+            '_debug' => '',
+            '_unparsed' => 'cmaj7',
+            'duration' => 0,
+            'key' => bless( {
+              'key' => 0,
+              'unparsed' => 'c'
+            }, 'App::Music::PlayTab::Note' ),
+            'vec' => [
+              0,
+              4,
+              7,
+              11
+            ]
+          }, 'App::Music::PlayTab::Chord' ),
+          'space'
+        ]
+      ],
+      'width' => 35
+    },
+    {
+      'bpm' => 4,
+      'height' => -15,
+      'measures' => [
+        [
+          bless( {
+            '_debug' => '',
+            '_unparsed' => 'f#%',
+            'duration' => 0,
+            'key' => bless( {
+              'key' => 6,
+              'unparsed' => 'f#'
+            }, 'App::Music::PlayTab::Note' ),
+            'vec' => [
+              0,
+              3,
+              6,
+              10
+            ]
+          }, 'App::Music::PlayTab::Chord' ),
+          'space'
+        ],
+        [
+          bless( {
+            '_debug' => '',
+            '_unparsed' => 'b7',
+            'duration' => 0,
+            'key' => bless( {
+              'key' => 11,
+              'unparsed' => 'b'
+            }, 'App::Music::PlayTab::Note' ),
+            'vec' => [
+              0,
+              4,
+              7,
+              10
+            ]
+          }, 'App::Music::PlayTab::Chord' ),
+          'space'
+        ],
+        [
+          bless( {
+            '_debug' => '',
+            '_unparsed' => 'e-',
+            'duration' => 0,
+            'key' => bless( {
+              'key' => 4,
+              'unparsed' => 'e'
+            }, 'App::Music::PlayTab::Note' ),
+            'vec' => [
+              0,
+              3,
+              7
+            ]
+          }, 'App::Music::PlayTab::Chord' ),
+          'space'
+        ],
+        [
+          bless( {
+            '_debug' => '',
+            '_unparsed' => 'e-',
+            'duration' => 0,
+            'key' => bless( {
+              'key' => 4,
+              'unparsed' => 'e'
+            }, 'App::Music::PlayTab::Note' ),
+            'vec' => [
+              0,
+              3,
+              7
+            ]
+          }, 'App::Music::PlayTab::Chord' ),
+          'space'
+        ]
+      ],
+      'width' => 35
+    },
+    {
+      'bpm' => 4,
+      'height' => -15,
+      'measures' => [
+        [
+          bless( {
+            '_debug' => '',
+            '_unparsed' => 'f#%',
+            'duration' => 0,
+            'key' => bless( {
+              'key' => 6,
+              'unparsed' => 'f#'
+            }, 'App::Music::PlayTab::Note' ),
+            'vec' => [
+              0,
+              3,
+              6,
+              10
+            ]
+          }, 'App::Music::PlayTab::Chord' ),
+          'space'
+        ],
+        [
+          bless( {
+            '_debug' => '',
+            '_unparsed' => 'b7b9',
+            'duration' => 0,
+            'key' => bless( {
+              'key' => 11,
+              'unparsed' => 'b'
+            }, 'App::Music::PlayTab::Note' ),
+            'vec' => [
+              0,
+              4,
+              7,
+              10,
+              13
+            ]
+          }, 'App::Music::PlayTab::Chord' ),
+          'space'
+        ],
+        [
+          bless( {
+            '_debug' => '',
+            '_unparsed' => 'e-',
+            'duration' => 0,
+            'key' => bless( {
+              'key' => 4,
+              'unparsed' => 'e'
+            }, 'App::Music::PlayTab::Note' ),
+            'vec' => [
+              0,
+              3,
+              7
+            ]
+          }, 'App::Music::PlayTab::Chord' ),
+          'space'
+        ],
+        [
+          bless( {
+            '_debug' => '',
+            '_unparsed' => 'e-',
+            'duration' => 0,
+            'key' => bless( {
+              'key' => 4,
+              'unparsed' => 'e'
+            }, 'App::Music::PlayTab::Note' ),
+            'vec' => [
+              0,
+              3,
+              7
+            ]
+          }, 'App::Music::PlayTab::Chord' ),
+          'space'
+        ]
+      ],
+      'pfx_vsp' => 1,
+      'prefix' => '',
+      'width' => 35
+    },
+    {
+      'bpm' => 4,
+      'height' => -15,
+      'measures' => [
+        [
+          bless( {
+            '_debug' => '',
+            '_unparsed' => 'a-7',
+            'duration' => 0,
+            'key' => bless( {
+              'key' => 9,
+              'unparsed' => 'a'
+            }, 'App::Music::PlayTab::Note' ),
+            'vec' => [
+              0,
+              3,
+              7,
+              10
+            ]
+          }, 'App::Music::PlayTab::Chord' ),
+          'space'
+        ],
+        [
+          bless( {
+            '_debug' => '',
+            '_unparsed' => 'd7',
+            'duration' => 0,
+            'key' => bless( {
+              'key' => 2,
+              'unparsed' => 'd'
+            }, 'App::Music::PlayTab::Note' ),
+            'vec' => [
+              0,
+              4,
+              7,
+              10
+            ]
+          }, 'App::Music::PlayTab::Chord' ),
+          'space'
+        ],
+        [
+          bless( {
+            '_debug' => '',
+            '_unparsed' => 'gmaj7',
+            'duration' => 0,
+            'key' => bless( {
+              'key' => 7,
+              'unparsed' => 'g'
+            }, 'App::Music::PlayTab::Note' ),
+            'vec' => [
+              0,
+              4,
+              7,
+              11
+            ]
+          }, 'App::Music::PlayTab::Chord' ),
+          'space'
+        ],
+        [
+          bless( {
+            '_debug' => '',
+            '_unparsed' => 'gmaj7',
+            'duration' => 0,
+            'key' => bless( {
+              'key' => 7,
+              'unparsed' => 'g'
+            }, 'App::Music::PlayTab::Note' ),
+            'vec' => [
+              0,
+              4,
+              7,
+              11
+            ]
+          }, 'App::Music::PlayTab::Chord' ),
+          'space'
+        ]
+      ],
+      'width' => 35
+    },
+    {
+      'bpm' => 4,
+      'height' => -15,
+      'measures' => [
+        [
+          bless( {
+            '_debug' => '',
+            '_unparsed' => 'f#%',
+            'duration' => 0,
+            'key' => bless( {
+              'key' => 6,
+              'unparsed' => 'f#'
+            }, 'App::Music::PlayTab::Note' ),
+            'vec' => [
+              0,
+              3,
+              6,
+              10
+            ]
+          }, 'App::Music::PlayTab::Chord' ),
+          'space'
+        ],
+        [
+          bless( {
+            '_debug' => '',
+            '_unparsed' => 'b7b9',
+            'duration' => 0,
+            'key' => bless( {
+              'key' => 11,
+              'unparsed' => 'b'
+            }, 'App::Music::PlayTab::Note' ),
+            'vec' => [
+              0,
+              4,
+              7,
+              10,
+              13
+            ]
+          }, 'App::Music::PlayTab::Chord' ),
+          'space'
+        ],
+        [
+          bless( {
+            '_debug' => '',
+            '_unparsed' => 'e-7',
+            'duration' => 0,
+            'key' => bless( {
+              'key' => 4,
+              'unparsed' => 'e'
+            }, 'App::Music::PlayTab::Note' ),
+            'vec' => [
+              0,
+              3,
+              7,
+              10
+            ]
+          }, 'App::Music::PlayTab::Chord' ),
+          bless( {
+            '_debug' => '',
+            '_unparsed' => 'es7',
+            'duration' => 0,
+            'key' => bless( {
+              'key' => 3,
+              'unparsed' => 'es',
+              'useflat' => 1
+            }, 'App::Music::PlayTab::Note' ),
+            'vec' => [
+              0,
+              4,
+              7,
+              10
+            ]
+          }, 'App::Music::PlayTab::Chord' )
+        ],
+        [
+          bless( {
+            '_debug' => '',
+            '_unparsed' => 'd-7',
+            'duration' => 0,
+            'key' => bless( {
+              'key' => 2,
+              'unparsed' => 'd'
+            }, 'App::Music::PlayTab::Note' ),
+            'vec' => [
+              0,
+              3,
+              7,
+              10
+            ]
+          }, 'App::Music::PlayTab::Chord' ),
+          bless( {
+            '_debug' => '',
+            '_unparsed' => 'des7',
+            'duration' => 0,
+            'key' => bless( {
+              'key' => 1,
+              'unparsed' => 'des',
+              'useflat' => 1
+            }, 'App::Music::PlayTab::Note' ),
+            'vec' => [
+              0,
+              4,
+              7,
+              10
+            ]
+          }, 'App::Music::PlayTab::Chord' )
+        ]
+      ],
+      'width' => 35
+    },
+    {
+      'bpm' => 4,
+      'height' => -15,
+      'measures' => [
+        [
+          bless( {
+            '_debug' => '',
+            '_unparsed' => 'cmaj7',
+            'duration' => 0,
+            'key' => bless( {
+              'key' => 0,
+              'unparsed' => 'c'
+            }, 'App::Music::PlayTab::Note' ),
+            'vec' => [
+              0,
+              4,
+              7,
+              11
+            ]
+          }, 'App::Music::PlayTab::Chord' ),
+          'space'
+        ],
+        [
+          bless( {
+            '_debug' => '',
+            '_unparsed' => 'b7b9',
+            'duration' => 0,
+            'key' => bless( {
+              'key' => 11,
+              'unparsed' => 'b'
+            }, 'App::Music::PlayTab::Note' ),
+            'vec' => [
+              0,
+              4,
+              7,
+              10,
+              13
+            ]
+          }, 'App::Music::PlayTab::Chord' ),
+          'space'
+        ],
+        [
+          bless( {
+            '_debug' => '',
+            '_unparsed' => 'e-',
+            'duration' => 0,
+            'key' => bless( {
+              'key' => 4,
+              'unparsed' => 'e'
+            }, 'App::Music::PlayTab::Note' ),
+            'vec' => [
+              0,
+              3,
+              7
+            ]
+          }, 'App::Music::PlayTab::Chord' ),
+          'space'
+        ],
+        [
+          bless( {
+            '_debug' => '',
+            '_unparsed' => 'e-',
+            'duration' => 0,
+            'key' => bless( {
+              'key' => 4,
+              'unparsed' => 'e'
+            }, 'App::Music::PlayTab::Note' ),
+            'vec' => [
+              0,
+              3,
+              7
+            ]
+          }, 'App::Music::PlayTab::Chord' ),
+          'space'
+        ]
+      ],
+      'width' => 35
+    }
+  ],
+  'title' => 'Autumn Leaves'
+};

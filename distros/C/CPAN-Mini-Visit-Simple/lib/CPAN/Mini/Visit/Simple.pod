@@ -398,6 +398,33 @@ in the list.  This element is required.
 Reference to an array of arguments to be provided to each iteration of the
 code reference defined in C<action>.  This element is optional.
 
+=item * C<do_not_visit>
+
+Reference to an array of strings which are absolute paths to tarballs which
+are not to be visited.  This should be used, for example, where experience has
+shown that a tarball has technical defects which prevent it from being
+extracted without warnings.
+
+    %build_generators = ();
+    my @non_visits = (
+        '/home/username/minicpan/authors/id/J/JK/JKEENAN/Data-Presenter-1.03.tar.gz'),
+    );
+    $rv = $self->visit( {
+        do_not_visit => [ @non_visits ],
+        action  => sub {
+            my $distro = shift @_;
+            if ( -f 'Makefile.PL' ) {
+                $build_generators{Makefile}{$distro}++;
+            }
+            elsif ( -f 'Build.PL' ) {
+                $build_generators{Build}{$distro}++;
+            }
+            else {
+                $build_generators{unidentified}++;
+            }
+        },
+    } );
+
 =item * C<quiet>
 
     $rv = $self->visit( {

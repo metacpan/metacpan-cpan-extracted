@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean 0.09;
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 use Markdent::Parser::BlockParser;
 use Markdent::Parser::SpanParser;
@@ -247,7 +247,7 @@ Markdent::Parser - A markdown parser
 
 =head1 VERSION
 
-version 0.27
+version 0.28
 
 =head1 SYNOPSIS
 

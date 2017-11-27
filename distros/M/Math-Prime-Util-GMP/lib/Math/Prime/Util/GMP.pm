@@ -5,7 +5,7 @@ use Carp qw/croak confess carp/;
 
 BEGIN {
   $Math::Prime::Util::GMP::AUTHORITY = 'cpan:DANAJ';
-  $Math::Prime::Util::GMP::VERSION = '0.48';
+  $Math::Prime::Util::GMP::VERSION = '0.49';
 }
 
 # parent is cleaner, and in the Perl 5.10.1 / 5.12.0 core, but not earlier.
@@ -62,13 +62,14 @@ our @EXPORT_OK = qw(
                      sigma
                      chinese
                      moebius
-                     prime_count
+                     prime_count prime_count_lower prime_count_upper
                      primorial
                      pn_primorial
                      factorial factorialmod
                      consecutive_integer_lcm
                      partitions bernfrac bernreal harmfrac harmreal stirling
-                     zeta riemannr lambertw
+                     zeta li ei riemannr lambertw
+                     logreal expreal powreal agmreal
                      gcd lcm kronecker valuation binomial gcdext hammingweight
                      invmod sqrtmod addmod mulmod divmod powmod
                      vecsum vecprod
@@ -85,7 +86,7 @@ our @EXPORT_OK = qw(
                      znorder
                      znprimroot
                      ramanujan_tau
-                     Pi
+                     Pi Euler
                      todigits
                      random_prime random_nbit_prime random_ndigit_prime
                      random_strong_prime
@@ -189,7 +190,7 @@ __END__
 
 =encoding utf8
 
-=for stopwords Möbius Deléglise Bézout s-gonal gcdext vecsum vecprod moebius totient liouville znorder znprimroot bernfrac bernreal harmfrac harmreal stirling zeta riemannr lambertw lucasu lucasv OpenPFGW gmpy2 nonresidue chinese tuplets sqrtmod addmod mulmod powmod divmod superset sqrtint rootint logint todigits urandomb urandomr
+=for stopwords Möbius Deléglise Bézout s-gonal gcdext vecsum vecprod moebius totient liouville znorder znprimroot bernfrac bernreal harmfrac harmreal logreal expreal powreal agmreal stirling zeta li ei riemannr lambertw lucasu lucasv OpenPFGW gmpy2 nonresidue chinese tuplets sqrtmod addmod mulmod powmod divmod superset sqrtint rootint logint todigits urandomb urandomr
 
 =head1 NAME
 
@@ -198,7 +199,7 @@ Math::Prime::Util::GMP - Utilities related to prime numbers and factoring, using
 
 =head1 VERSION
 
-Version 0.48
+Version 0.49
 
 
 =head1 SYNOPSIS
@@ -792,6 +793,26 @@ of the same name in L<Math::Prime::Util>.
 Values above 64-bit are extra-strong BPSW probable primes.
 
 
+=head2 prime_count
+
+Returns the number of primes between 2 and C<n> (single argument)
+or C<lo> and C<hi> given two arguments.  The values are inclusive.
+
+The method is simple sieving followed by primality testing.  This is
+appropriate for small ranges and is useful for very large arguments.
+The L<Math::Prime::Util> module has much more sophisticated methods
+for 64-bit arguments.
+
+
+=head2 prime_count_lower
+
+=head2 prime_count_upper
+
+Returns lower or upper bounds for the prime count of the input C<n>.
+
+Bounds use Dusart 2010, Büthe 2014, Büthe 2015, and Axler 2017.
+
+
 =head2 sieve_primes
 
   my @primes = sieve_primes(2**100, 2**100 + 10000);
@@ -1144,6 +1165,52 @@ case.  GMP's API does not allow negative C<k> but otherwise matches.
 L<Math::BigInt> does not implement any extensions and the results for
 C<n E<lt> 0, k E<gt> 0> are undefined.
 
+=head2 logreal
+
+Returns the natural logarithm of the input C<n>.
+An optional second argument indicates the number of significant digits
+(default 40) with the result rounded.
+
+For C<logreal(2)> we use Formula 25 from Gourdon and Sebah (2010).
+For other values we use AGM (Sasaki and Kanada theta method).
+Performance is 100-1000x faster than Math::BigFloat's GMP backend.
+It is 10x slower than Pari/GP 2.10 and MPFR.
+
+Negative inputs are returned as C<-log(-n)>, which matches L<bignum>.
+Pari/GP and Mathematica return C<log(-n) + Pi*i>.
+
+=head2 expreal
+
+Returns C<e^n> for the input C<n>.
+An optional second argument indicates the number of significant digits
+(default 40) with the result rounded.
+
+The implementation computes C<sinh(n)>, then C<e^x> from that.
+
+=head2 powreal
+
+Returns C<n^x> for the inputs C<n> and C<x>.
+An optional third argument indicates the number of significant digits
+(default 40) with the result rounded.
+
+Like L<logreal> and L<expreal>, this is a basic math function that is
+not available from the GMP library but implemented in MPFR.  Since the
+latter is not always available, this can be useful to have.
+
+=head2 agmreal
+
+Returns the Arithmetic-Geometric mean (AGM) of C<a> and C<b>.
+An optional third argument indicates the number of significant digits
+(default 40) with the result rounded.
+
+Examples of use include elementary constants (e.g. C<Pi> and C<e>),
+logs, exponentials, trigonometric functions, elliptic integrals,
+computing pendulum periods, and more.
+
+This corresponds to Pari's C<agm(x,y)> function, limited to positive
+reals (Pari also handles negative, complex, p-adic, and power series
+arguments).
+
 =head2 bernfrac
 
 Returns the Bernoulli number C<B_n> for an integer argument C<n>, as a
@@ -1200,8 +1267,25 @@ the number of digits past the decimal point (default 40).
 
 The implementation is algorithm 2 of Borwein (1991).  Performance with
 integer inputs is good, but floating point arguments with high precision
-will be much slower than methods using MPFR.  L<Math::Prime::Util> will
+will be slower than methods using MPFR.  L<Math::Prime::Util> will
 try to use L<Math::MPFR> if possible.
+
+=head2 li
+
+Given a positive integer or float C<n>, returns the real Logarithmic Integral
+as a string floating point.  An optional second argument indicates the number
+of significant digits (default 40) with the result rounded.
+
+The implementation uses Ramanjan's series.
+This corresponds to Mathematica's C<Li> function.
+
+=head2 ei
+
+Given a positive integer or float C<n>, returns the real Exponential Integral
+as a string floating point.  An optional second argument indicates the number
+of significant digits (default 40) with the result rounded.
+
+The implementation is simply li(exp(x)).
 
 =head2 riemannr
 
@@ -1210,6 +1294,7 @@ as a string floating point.  An optional second argument indicates the number
 of significant digits (default 40) with the result rounded.
 
 The implementation is the standard Gram series.
+This corresponds to Mathematica's C<RiemannR> function.
 
 =head2 lambertw
 
@@ -1454,8 +1539,29 @@ C<n> must be present.  The result will be between C<0> and C<n!-1>.
 Takes a positive integer argument C<n> and returns the constant Pi with that
 many digits (including the leading 3).  Rounding is performed.
 
-The implementation uses AGM and is only slightly slower than MPFR (which has
-tighter bounds on the intermediate bits and exit conditions).
+The implementation uses either AGM or Ramanujan/Chudnovsky with binary
+splitting, depending on the number of digits.  It is a little over 2x
+faster than MPFR, similar in speed to Pari/GP, but about 1.5x slower than
+Xue's Chudnovsky demo from the GMP web site.
+Specialized programs such as C<y-cruncher> are even faster.
+
+Note there is a non-trivial amount of overhead in turning the result into
+a string, as well as even more if using the L<ntheory> module which
+further converts the result into a Math::BigFloat object.
+
+Called in void context, this just calculates and caches the result.
+
+
+=head2 Euler
+
+Takes a positive integer argument C<n> and returns Euler's constant
+with that many digits.  Rounding is performed.
+
+The implementation is Brent-McMillan algorithm B, just like Pari/GP.
+Performance is about 3x faster than Pari/GP, but 2-10x slower than MPFR
+which uses binary splitting.
+
+Called in void context, this just calculates and caches the result.
 
 
 =head2 exp_mangoldt
@@ -2034,7 +2140,8 @@ preprint, Jan 2003.  L<http://cr.yp.to/papers/aks.pdf>
 
 Dana Jacobsen E<lt>dana@acm.orgE<gt>
 
-William Hart wrote the SIMPQS code which is the basis for the QS code.
+Jason Papadopoulos wrote the tinyqs code which is basically unchanged.
+William Hart wrote SIMPQS which is the basis for the QS code.
 
 
 =head1 ACKNOWLEDGEMENTS
@@ -2050,8 +2157,8 @@ and the like happen, and still get decent performance for my purposes.
 
 Ben Buhrow and Jason Papadopoulos deserve special mention for their open
 source factoring tools, which are both readable and fast.  In particular I am
-leveraging their SQUFOF work in the current implementation.  They are a huge
-resource to the community.
+leveraging their work on SQUFOF in the current implementation.
+They are a huge resource to the community.
 
 Jonathan Leto and Bob Kuo, who wrote and distributed the L<Math::Primality>
 module on CPAN.  Their implementation of BPSW provided the motivation I needed
@@ -2059,7 +2166,7 @@ to do it in this module and L<Math::Prime::Util>.  I also used their
 module quite a bit for testing against.
 
 Paul Zimmermann's papers and GMP-ECM code were of great value for my projective
-ECM implementation, as well as the papers by Brent and Montgomery.
+ECM implementation, as well as the many papers by Brent and Montgomery.
 
 
 =head1 COPYRIGHT

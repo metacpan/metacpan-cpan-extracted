@@ -31,11 +31,11 @@ note $data;
 {
     local *STDOUT;
     open (STDOUT, ">", \$data) or die "Failed to redirect STDOUT";
-    local @ARGV = qw(--view JS /foo);
+    local @ARGV = qw(--view Dumper /foo);
 
     $app->run;
 };
-like ($data, qr/\n\n\{\}$/s, "force view worked");
+like ($data, qr/\n\n\$VAR1\s*=\s*\{.*\};?$/s, "force view worked");
 note $data;
 
 ok !$warn, "$warn warnings issued";

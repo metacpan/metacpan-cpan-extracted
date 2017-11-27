@@ -1,6 +1,6 @@
 package Map::Tube;
 
-$Map::Tube::VERSION   = '3.41';
+$Map::Tube::VERSION   = '3.42';
 $Map::Tube::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Map::Tube - Lightweight Routing Framework.
 
 =head1 VERSION
 
-Version 3.41
+Version 3.42
 
 =cut
 
@@ -90,6 +90,11 @@ has routes => (is => 'rw', isa => Routes );
 has _lines => (is => 'rw', isa => LineMap);
 
 our $AUTOLOAD;
+our $PLUGINS = {
+    'Map::Tube::Plugin::Graph'     => 1,
+    'Map::Tube::Plugin::Formatter' => 1,
+    'Map::Tube::Plugin::FuzzyFind' => 1,
+};
 
 sub AUTOLOAD {
 
@@ -625,12 +630,12 @@ something like below:
 =head2 FUNCTIONAL VALIDATION
 
 The package L<Test::Map::Tube> v0.09 or above  can easily be used to validate map
-basic functions provided by L<Map::Tube>.
+basic functions provided by L<Map::Tube>. However we recommend v0.35 or above.
 
     use strict; use warnings;
     use Test::More;
 
-    my $min_ver = 0.09;
+    my $min_ver = 0.35;
     eval "use Test::Map::Tube $min_ver";
     plan skip_all => "Test::Map::Tube $min_ver required" if $@;
 
@@ -638,12 +643,12 @@ basic functions provided by L<Map::Tube>.
     ok_map_functions(Map::Tube::London->new);
 
 The package L<Test::Map::Tube> v0.17 or above  can easily be used to validate map
-routing functions provided by L<Map::Tube>.
+routing functions provided by L<Map::Tube>. However we recommend v0.35 or above.
 
     use strict; use warnings;
     use Test::More;
 
-    my $min_ver = 0.17;
+    my $min_ver = 0.35;
     eval "use Test::Map::Tube $min_ver tests => 1";
     plan skip_all => "Test::Map::Tube $min_ver required" if $@;
 
@@ -893,8 +898,10 @@ sub _load_plugins {
     my ($self) = @_;
 
     $self->{plugins} = [ Map::Tube::Pluggable::plugins ];
-    foreach (@{$self->plugins}) {
-        Role::Tiny->apply_roles_to_object($self, $_);
+    foreach my $plugin (@{$self->plugins}) {
+        # Only bother applying the approved plugins.
+        next unless (exists $PLUGINS->{$plugin});
+        Role::Tiny->apply_roles_to_object($self, $plugin);
     }
 }
 

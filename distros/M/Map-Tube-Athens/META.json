@@ -1,0 +1,73 @@
+{
+   "abstract" : "Map::Tube interface to the Athens Metro",
+   "author" : [
+      "Errietta Kostala <errietta@errietta.me>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.13",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Map-Tube-Athens",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Share" : "0",
+            "Map::Tube" : "3.32",
+            "Moo" : "0",
+            "namespace::clean" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Map::Tube::Athens" : {
+         "file" : "lib/Map/Tube/Athens.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/errietta/Map-Tube-Athens/issues"
+      },
+      "homepage" : "https://github.com/errietta/Map-Tube-Athens",
+      "repository" : {
+         "url" : "git://github.com/errietta/Map-Tube-Athens.git",
+         "web" : "https://github.com/errietta/Map-Tube-Athens"
+      }
+   },
+   "version" : "0.01",
+   "x_contributors" : [
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
+   ]
+}

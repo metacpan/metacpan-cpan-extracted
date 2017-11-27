@@ -8,15 +8,15 @@ my $builder = Module::Build->new(
     dist_author       => 'Ivan Wills <ivan.wills@gmail.com>',
     dist_version_from => 'lib/Group/Git/Taggers/Ruby.pm',
     requires          => {
-        'perl'                 => 5.008,
+        'perl'                 => 5.010,
         'Group::Git::Taggers'  => '0.5.0',
         'Moo'                  => '1.0',
         'namespace::autoclean' => 0,
         'version'              => 0,
     },
     build_requires => {
-        'Test::More'     => 0,
-        'Test::Warnings' => 0,
+        'Test::More'     => '0.88',
+        'Test::Warnings' => '0.026',
     },
     add_to_cleanup     => [ 'Group-Git-Taggers-Ruby-*' ],
     create_license     => 1,

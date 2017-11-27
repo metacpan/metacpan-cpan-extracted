@@ -1,16 +1,33 @@
 DONE
 
+    
+    
+    
+ 
+
 DOING
+    Moo(se) support
+        Always
+            better subroutine/method return types; GRAMMAR
+            new() accept properties init values; GRAMMAR
+            subroutine arguments received via 'shift' instead of @ARG only; GRAMMAR
+            package 'integer' exports sub 'integer()' to check type, and friends
+            accessors & mutators available (only?) w/out using 'get_' & 'set_' prefixes; Class.pm PERLOPS_PERLTYPES, Properties.pm? CPPOPS_CPPTYPES
+        When Moo(se) is enabled
+            'use parent' should not exist, replaced by 'extends'; GRAMMAR
+            $properties should not exist, replaced by 'has'; GRAMMAR
+            new() from Moo(se) instead of RPerl
+    RPerl::Exporter
+        re-enable t/10 & t/11  <<< ==== DO THIS FIRST!!! === >>>
+        Class/Generator.pm, error if class name from 'use parent Foo' does not match class name from following 'use Foo' or '{ Foo->import(); }'
+        Class/Generator.pm & Package.pm & Include.pm: CPPOPS_CPPTYPES
+        fix & test *_CHECK*() exporting in rperlgmp.pm & rperlsse.pm, as hard-coded in rperlgsl.pm
+        enable qw(:all)
+        Learning RPerl
     new subroutine headers
         Learning RPerl
         PhysicsPerl
         MathPerl
-    RPerl::Exporter
-        re-enable t/10 & t/11
-        Class::Generator & Package: CPPOPS_CPPTYPES
-        fix & test *_CHECK*() exporting in rperlgmp.pm & rperlsse.pm, as hard-coded in rperlgsl.pm
-        enable qw(:all)
-        Learning RPerl
     Quick-Start Guide
         finish
     GSL support
@@ -18,7 +35,7 @@ DOING
         gsl_matrix_CHECK*() CPPOPS_CPPTYPES
         tests for all EMAV00 - EMAV09
         enable gsl_linalg.h & other gsl friends
-        
+
     Alien::PCRE2
         ensure tests pass on both share & system installs
         replace mirrored DEV version (Windows bug fix) w/ new official version when released
@@ -33,17 +50,6 @@ DOING
         substitution LHS must be variable
         non-destructive regex /r
         !~ logic
-    Moo(se) support
-        Always
-            better subroutine/method return types; GRAMMAR
-            new() accept properties init values; GRAMMAR
-            subroutine arguments received via 'shift' instead of @ARG only; GRAMMAR
-            package 'integer' exports sub 'integer()' to check type, and friends
-            accessors & mutators available (only?) w/out using 'get_' & 'set_' prefixes; Class.pm PERLOPS_PERLTYPES, Properties.pm? CPPOPS_CPPTYPES
-        When Moo(se) is enabled
-            'use parent' should not exist, replaced by 'extends'; GRAMMAR
-            $properties should not exist, replaced by 'has'; GRAMMAR
-            new() from Moo(se) instead of RPerl
 
     allow non-standard shebangs
 
@@ -64,10 +70,11 @@ DOING
         subroutines, final operation must be return operator
         WHAT ELSE?!?
 
+    Alien::GSL
     Alien::Pluto
     Alien::astyle upgrade to EU::MM
-    Alien::GSL
     Alien::GMP
+    Alien::???  what else?
     Inline::RPerl
     update tests to emit more useful failure info, for CPAN testers debugging
     update CPPOPS_DUALTYPES reference files
@@ -159,6 +166,7 @@ OPERATORS, CPPOPS_CPPTYPES MODE
         abs, sqrt, exp, log
 
 LEARNING RPERL
+    new subroutine headers!!!
     tables on metacpan, fix headers and borders CSS
     fix <noncode> on metacpan, elsewhere
     check X<break_code_blocks> everywhere other than pod2rperlhtml
@@ -298,6 +306,7 @@ DEV NOTES
     perlall
 
 WINDOWS
+    Makefile.PL, replace pm_to_blib() with usage of File::Temp, do not modify files under lib/ or blib/lib or t/ etc.
     gmp in windows
     pass tests on vc2013
     pass tests on appveyor activperl
@@ -332,6 +341,7 @@ PARALLELAPPSTORE.COM
     content
 
 DATA TYPES & STRUCTURES
+    enable subroutine argument type-checking of user-defined Class types, see "NEED UPGRADE" in Class.pm create_symtab_entries_and_accessors_mutators()
     disable use of 'constant_FOO' data types?  currently converted in RPerl::Generator::type_convert_perl_to_cpp(), possible 'const const' conflict in RPerl::CompileUnit::Constant
     sort hash keys when generating string output in *hashref_to_string() CPPOPS Hash.cpp, as is done with 'sort keys' in PERLOPS Hash/Subtypes.pm
     determine if 'long long' or 'long double' can be used at all???
@@ -413,4 +423,6 @@ COMPILER
  
 INTERPRETER
     Class.pm, remove auto-export of subroutines from their package's namespace into main:: namespace?
-    update RPerl::filter() to properly handle *.pl files
+    RPerl::filter()
+        update to properly handle *.pl files
+        collapse newline characters from all added code to avoid artificially increasing line numbers in error messages, `rperl -t lib/RPerl/Test/Properties/Class_00_Bad_09.pm`

@@ -54,4 +54,21 @@ $ast = $parser->parse_tokens($lexer->parse_text("{% if line_item.variant_title c
 $ast->verify;
 ok($ast);
 
+
+my @tokens = $lexer->parse_text("{% assign cards = db.cards.search({ name: \"asdasd\" }) %}");
+$ast = $parser->parse_tokens(@tokens);
+ok($ast);
+
+@tokens = $lexer->parse_text("{% assign cards = db.cards.search({ name: (\"%\" + test + \"%\") }) %}");
+$ast = $parser->parse_tokens(@tokens);
+ok($ast);
+
+
+@tokens = $lexer->parse_text('{% assign hash = { name: { "-like": ("%" + arguments[0] + "%") } } %}');
+$ast = $parser->parse_tokens(@tokens);
+ok($ast);
+
+
+
+
 done_testing();

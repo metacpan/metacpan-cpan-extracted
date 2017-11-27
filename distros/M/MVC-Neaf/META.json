@@ -4,7 +4,7 @@
       "Konstantin S. Uvarin <khedin@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.08, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -34,12 +34,12 @@
          "requires" : {
             "DBD::SQLite" : "0",
             "DBI" : "0",
-            "GD::Simple" : "0"
+            "GD::Simple" : "0",
+            "Validator::LIVR" : "0"
          }
       },
       "runtime" : {
          "requires" : {
-            "CGI" : "0",
             "Carp" : "0",
             "Data::Dumper" : "0",
             "Digest::MD5" : "0",
@@ -72,6 +72,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.18",
+   "version" : 0.19,
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

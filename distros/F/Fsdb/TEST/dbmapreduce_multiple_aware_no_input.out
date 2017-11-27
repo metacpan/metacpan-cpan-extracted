@@ -1,5 +1,4 @@
 #fsdb experiment mean stddev pct_rsd conf_range conf_low conf_high conf_pct sum sum_squared min max n
--	-	-	-	-	-	-	0.95	0	0	-	-	0
 # test trailing comment
-#  | dbmultistats duration
-#   | dbmapreduce -M -k experiment -- dbmultistats duration
+#   | dbmultistats --output-on-no-input duration
+#   | dbmapreduce -M -k experiment -- dbmultistats --output-on-no-input duration

@@ -8,7 +8,7 @@
 #include <raylib.h>
 
 #include "const-c.inc"
-
+#
 static bool ColorEqual(Color a, Color b) {
     return a.r == b.r && a.g == b.g && a.b == b.b && a.a == b.a;
 }
@@ -71,7 +71,8 @@ ImageSet(Color *dst, Rectangle dst_rect, Color color, unsigned width, unsigned h
 }
 
 
-MODULE = Graphics::Raylib::XS        PACKAGE = Graphics::Raylib::XS
+
+MODULE = Graphics::Raylib::XS        PACKAGE = Graphics::Raylib::XS        
 
 INCLUDE: const-xs.inc
 
@@ -98,76 +99,83 @@ void
 BeginTextureMode(target)
     RenderTexture2D    target
 
+void
+BeginVrDrawing()
+
 BoundingBox
 CalculateBoundingBox(mesh)
     Mesh    mesh
 
-int
+bool
+ChangeDirectory(dir)
+    const char *    dir
+
+bool
 CheckCollisionBoxSphere(box, centerSphere, radiusSphere)
     BoundingBox    box
     Vector3    centerSphere
     float    radiusSphere
 
-int
+bool
 CheckCollisionBoxes(box1, box2)
     BoundingBox    box1
     BoundingBox    box2
 
-int
+bool
 CheckCollisionCircleRec(center, radius, rec)
     Vector2    center
     float    radius
     Rectangle    rec
 
-int
+bool
 CheckCollisionCircles(center1, radius1, center2, radius2)
     Vector2    center1
     float    radius1
     Vector2    center2
     float    radius2
 
-int
+bool
 CheckCollisionPointCircle(point, center, radius)
     Vector2    point
     Vector2    center
     float    radius
 
-int
+bool
 CheckCollisionPointRec(point, rec)
     Vector2    point
     Rectangle    rec
 
-int
+bool
 CheckCollisionPointTriangle(point, p1, p2, p3)
     Vector2    point
     Vector2    p1
     Vector2    p2
     Vector2    p3
 
-int
+bool
 CheckCollisionRayBox(ray, box)
     Ray    ray
     BoundingBox    box
 
-int
+bool
 CheckCollisionRaySphere(ray, spherePosition, sphereRadius)
     Ray    ray
     Vector3    spherePosition
     float    sphereRadius
 
-int
+bool
 CheckCollisionRaySphereEx(ray, spherePosition, sphereRadius, collisionPoint)
     Ray    ray
     Vector3    spherePosition
     float    sphereRadius
     Vector3 *    collisionPoint
 
-int
+bool
 CheckCollisionRecs(rec1, rec2)
     Rectangle    rec1
     Rectangle    rec2
 
-int
+bool
 CheckCollisionSpheres(centerA, radiusA, centerB, radiusB)
     Vector3    centerA
     float    radiusA
@@ -189,7 +197,7 @@ CloseAudioStream(stream)
     AudioStream    stream
 
 void
-CloseVrDevice()
+CloseVrSimulator()
 
 void
 CloseWindow()
@@ -197,16 +205,6 @@ CloseWindow()
 float *
 ColorToFloat(color)
     Color    color
-
-Light
-CreateLight(type, position, diffuse)
-    int    type
-    Vector3    position
-    Color    diffuse
-
-void
-DestroyLight(light)
-    Light    light
 
 void
 DisableCursor()
@@ -333,10 +331,6 @@ DrawGrid(slices, spacing)
     float    spacing
 
 void
-DrawLight(light)
-    Light    light
-
-void
 DrawLine(startPosX, startPosY, endPosX, endPosY, color)
     int    startPosX
     int    startPosY
@@ -348,6 +342,20 @@ void
 DrawLine3D(startPos, endPos, color)
     Vector3    startPos
     Vector3    endPos
+    Color    color
+
+void
+DrawLineBezier(startPos, endPos, thick, color)
+    Vector2    startPos
+    Vector2    endPos
+    float    thick
+    Color    color
+
+void
+DrawLineEx(startPos, endPos, thick, color)
+    Vector2    startPos
+    Vector2    endPos
+    float    thick
     Color    color
 
 void
@@ -439,7 +447,24 @@ DrawRectangle(posX, posY, width, height, color)
     Color    color
 
 void
-DrawRectangleGradient(posX, posY, width, height, color1, color2)
+DrawRectangleGradientEx(rec, col1, col2, col3, col4)
+    Rectangle    rec
+    Color    col1
+    Color    col2
+    Color    col3
+    Color    col4
+
+void
+DrawRectangleGradientH(posX, posY, width, height, color1, color2)
+    int    posX
+    int    posY
+    int    width
+    int    height
+    Color    color1
+    Color    color2
+
+void
+DrawRectangleGradientV(posX, posY, width, height, color1, color2)
     int    posX
     int    posY
     int    width
@@ -456,8 +481,23 @@ DrawRectangleLines(posX, posY, width, height, color)
     Color    color
 
 void
+DrawRectanglePro(rec, origin, rotation, color)
+    Rectangle    rec
+    Vector2    origin
+    float    rotation
+    Color    color
+
+void
 DrawRectangleRec(rec, color)
     Rectangle    rec
+    Color    color
+
+void
+DrawRectangleT(posX, posY, width, height, color)
+    int    posX
+    int    posY
+    int    width
+    int    height
     Color    color
 
 void
@@ -577,6 +617,9 @@ EndShaderMode()
 void
 EndTextureMode()
 
+void
+EndVrDrawing()
+
 Color
 Fade(color, alpha)
     Color    color
@@ -586,13 +629,164 @@ const char *
 FormatText(text, ...)
     const char *    text
 
+Image
+GenImageCellular(width, height, tileSize)
+    int    width
+    int    height
+    int    tileSize
+
+Image
+GenImageChecked(width, height, checksX, checksY, col1, col2)
+    int    width
+    int    height
+    int    checksX
+    int    checksY
+    Color    col1
+    Color    col2
+
+Image
+GenImageColor(width, height, color)
+    int    width
+    int    height
+    Color    color
+
+Image
+GenImageGradientH(width, height, left, right)
+    int    width
+    int    height
+    Color    left
+    Color    right
+
+Image
+GenImageGradientRadial(width, height, density, inner, outer)
+    int    width
+    int    height
+    float    density
+    Color    inner
+    Color    outer
+
+Image
+GenImageGradientV(width, height, top, bottom)
+    int    width
+    int    height
+    Color    top
+    Color    bottom
+
+Image
+GenImagePerlinNoise(width, height, scale)
+    int    width
+    int    height
+    float    scale
+
+Image
+GenImageWhiteNoise(width, height, factor)
+    int    width
+    int    height
+    float    factor
+
+Mesh
+GenMeshCube(width, height, length)
+    float    width
+    float    height
+    float    length
+
+Mesh
+GenMeshCubicmap(cubicmap, cubeSize)
+    Image    cubicmap
+    Vector3    cubeSize
+
+Mesh
+GenMeshCylinder(radius, height, slices)
+    float    radius
+    float    height
+    int    slices
+
+Mesh
+GenMeshHeightmap(heightmap, size)
+    Image    heightmap
+    Vector3    size
+
+Mesh
+GenMeshHemiSphere(radius, rings, slices)
+    float    radius
+    int    rings
+    int    slices
+
+Mesh
+GenMeshKnot(radius, size, radSeg, sides)
+    float    radius
+    float    size
+    int    radSeg
+    int    sides
+
+Mesh
+GenMeshPlane(width, length, resX, resZ)
+    float    width
+    float    length
+    int    resX
+    int    resZ
+
+Mesh
+GenMeshSphere(radius, rings, slices)
+    float    radius
+    int    rings
+    int    slices
+
+Mesh
+GenMeshTorus(radius, size, radSeg, sides)
+    float    radius
+    float    size
+    int    radSeg
+    int    sides
+
+Texture2D
+GenTextureBRDF(shader, cubemap, size)
+    Shader    shader
+    Texture2D    cubemap
+    int    size
+
+Texture2D
+GenTextureCubemap(shader, skyHDR, size)
+    Shader    shader
+    Texture2D    skyHDR
+    int    size
+
+Texture2D
+GenTextureIrradiance(shader, cubemap, size)
+    Shader    shader
+    Texture2D    cubemap
+    int    size
+
 void
 GenTextureMipmaps(texture)
     Texture2D *    texture
 
+Texture2D
+GenTexturePrefilter(shader, cubemap, size)
+    Shader    shader
+    Texture2D    cubemap
+    int    size
+
 Matrix
 GetCameraMatrix(camera)
     Camera    camera
+
+RayHitInfo
+GetCollisionRayGround(ray, groundHeight)
+    Ray    ray
+    float    groundHeight
+
+RayHitInfo
+GetCollisionRayMesh(ray, mesh)
+    Ray    ray
+    Mesh *    mesh
+
+RayHitInfo
+GetCollisionRayTriangle(ray, p1, p2, p3)
+    Ray    ray
+    Vector3    p1
+    Vector3    p2
+    Vector3    p3
 
 Rectangle
 GetCollisionRec(rec1, rec2)
@@ -606,13 +800,15 @@ GetColor(hexValue)
 SpriteFont
 GetDefaultFont()
 
-Shader
-GetDefaultShader()
+const char *
+GetDirectoryPath(fileName)
+    const char *    fileName
 
-Texture2D
-GetDefaultTexture()
+const char *
+GetExtension(fileName)
+    const char *    fileName
 
-float
+int
 GetFPS()
 
 float
@@ -699,17 +895,20 @@ GetScreenHeight()
 int
 GetScreenWidth()
 
+Shader
+GetShaderDefault()
+
 int
 GetShaderLocation(shader, uniformName)
     Shader    shader
     const char *    uniformName
 
-Shader
-GetStandardShader()
-
 Image
 GetTextureData(texture)
     Texture2D    texture
+
+Texture2D
+GetTextureDefault()
 
 int
 GetTouchPointsCount()
@@ -724,9 +923,16 @@ GetTouchX()
 int
 GetTouchY()
 
+VrDeviceInfo
+GetVrDeviceInfo(vrDeviceType)
+    int    vrDeviceType
+
 float *
 GetWaveData(wave)
     Wave    wave
+
+const char *
+GetWorkingDirectory()
 
 Vector2
 GetWorldToScreen(position, camera)
@@ -860,121 +1066,111 @@ InitAudioStream(sampleRate, sampleSize, channels)
     unsigned int    channels
 
 void
-InitVrDevice(vdDevice)
-    int    vdDevice
+InitVrSimulator(info)
+    VrDeviceInfo    info
 
 void
-InitWindow(width, height, title)
+InitWindow(width, height, data)
     int    width
     int    height
-    const char *    title
+    const char *    data
 
-int
+bool
 IsAudioBufferProcessed(stream)
     AudioStream    stream
 
-int
+bool
 IsAudioDeviceReady()
 
-int
+bool
 IsCursorHidden()
 
-int
+bool
 IsFileDropped()
 
-int
+bool
+IsFileExtension(fileName, ext)
+    const char *    fileName
+    const char *    ext
+
+bool
 IsGamepadAvailable(gamepad)
     int    gamepad
 
-int
+bool
 IsGamepadButtonDown(gamepad, button)
     int    gamepad
     int    button
 
-int
+bool
 IsGamepadButtonPressed(gamepad, button)
     int    gamepad
     int    button
 
-int
+bool
 IsGamepadButtonReleased(gamepad, button)
     int    gamepad
     int    button
 
-int
+bool
 IsGamepadButtonUp(gamepad, button)
     int    gamepad
     int    button
 
-int
+bool
 IsGamepadName(gamepad, name)
     int    gamepad
     const char *    name
 
-int
+bool
 IsGestureDetected(gesture)
     int    gesture
 
-int
+bool
 IsKeyDown(key)
     int    key
 
-int
+bool
 IsKeyPressed(key)
     int    key
 
-int
+bool
 IsKeyReleased(key)
     int    key
 
-int
+bool
 IsKeyUp(key)
     int    key
 
-int
+bool
 IsMouseButtonDown(button)
     int    button
 
-int
+bool
 IsMouseButtonPressed(button)
     int    button
 
-int
+bool
 IsMouseButtonReleased(button)
     int    button
 
-int
+bool
 IsMouseButtonUp(button)
     int    button
 
-int
+bool
 IsMusicPlaying(music)
     Music    music
 
-int
+bool
 IsSoundPlaying(sound)
     Sound    sound
 
-int
-IsVrDeviceReady()
+bool
+IsVrSimulatorReady()
 
-int
-IsVrSimulator()
-
-int
+bool
 IsWindowMinimized()
-
-Model
-LoadCubicmap(cubicmap)
-    Image    cubicmap
-
-Material
-LoadDefaultMaterial()
-
-Model
-LoadHeightmap(heightmap, size)
-    Image    heightmap
-    Vector3    size
 
 Image
 LoadImage(fileName)
@@ -987,9 +1183,11 @@ LoadImageEx(pixels, width, height)
     int    height
 
 Image
-LoadImageFromRES(rresName, resId)
-    const char *    rresName
-    int    resId
+LoadImagePro(data, width, height, format)
+    void *    data
+    int    width
+    int    height
+    int    format
 
 Image
 LoadImageRaw(fileName, width, height, format, headerSize)
@@ -1083,19 +1281,20 @@ Material
 LoadMaterial(fileName)
     const char *    fileName
 
+Material
+LoadMaterialDefault()
+
+Mesh
+LoadMesh(fileName)
+    const char *    fileName
+
 Model
 LoadModel(fileName)
     const char *    fileName
 
 Model
-LoadModelEx(data, dynamic)
-    Mesh    data
-    int    dynamic
-
-Model
-LoadModelFromRES(rresName, resId)
-    const char *    rresName
-    int    resId
+LoadModelFromMesh(mesh)
+    Mesh    mesh
 
 Music
 LoadMusicStream(fileName)
@@ -1116,11 +1315,6 @@ LoadSound(fileName)
     const char *    fileName
 
 Sound
-LoadSoundFromRES(rresName, resId)
-    const char *    rresName
-    int    resId
-
-Sound
 LoadSoundFromWave(wave)
     Wave    wave
 
@@ -1129,34 +1323,23 @@ LoadSpriteFont(fileName)
     const char *    fileName
 
 SpriteFont
-LoadSpriteFontTTF(fileName, fontSize, numChars, fontChars)
+LoadSpriteFontEx(fileName, fontSize, charsCount, fontChars)
     const char *    fileName
     int    fontSize
-    int    numChars
+    int    charsCount
     int *    fontChars
 
-Material
-LoadStandardMaterial()
+char *
+LoadText(fileName)
+    const char *    fileName
 
 Texture2D
 LoadTexture(fileName)
     const char *    fileName
 
 Texture2D
-LoadTextureEx(data, width, height, textureFormat)
-    void *    data
-    int    width
-    int    height
-    int    textureFormat
-
-Texture2D
 LoadTextureFromImage(image)
     Image    image
-
-Texture2D
-LoadTextureFromRES(rresName, resId)
-    const char *    rresName
-    int    resId
 
 Wave
 LoadWave(fileName)
@@ -1164,11 +1347,14 @@ LoadWave(fileName)
 
 Wave
 LoadWaveEx(data, sampleCount, sampleRate, sampleSize, channels)
-    float *    data
+    void *    data
     int    sampleCount
     int    sampleRate
     int    sampleSize
     int    channels
+
+Matrix
+MatrixIdentity()
 
 float *
 MatrixToFloat(mat)
@@ -1223,6 +1409,11 @@ ResumeSound(sound)
     Sound    sound
 
 void
+SaveImageAs(fileName, image)
+    const char *    fileName
+    Image    image
+
+void
 SetCameraAltControl(altKey)
     int    altKey
 
@@ -1261,6 +1452,10 @@ SetGesturesEnabled(gestureFlags)
     unsigned int    gestureFlags
 
 void
+SetMasterVolume(volume)
+    float    volume
+
+void
 SetMatrixModelview(view)
     Matrix    view
 
@@ -1271,6 +1466,11 @@ SetMatrixProjection(proj)
 void
 SetMousePosition(position)
     Vector2    position
+
+void
+SetMusicLoopCount(music, count)
+    Music    music
+    float    count
 
 void
 SetMusicPitch(music, pitch)
@@ -1286,7 +1486,7 @@ void
 SetShaderValue(shader, uniformLoc, value, size)
     Shader    shader
     int    uniformLoc
-    float *    value
+    const float *    value
     int    size
 
 void
@@ -1299,7 +1499,7 @@ void
 SetShaderValuei(shader, uniformLoc, value, size)
     Shader    shader
     int    uniformLoc
-    int *    value
+    const int *    value
     int    size
 
 void
@@ -1325,6 +1525,32 @@ void
 SetTextureWrap(texture, wrapMode)
     Texture2D    texture
     int    wrapMode
+
+void
+SetVrDistortionShader(shader)
+    Shader    shader
+
+void
+SetWindowIcon(image)
+    Image    image
+
+void
+SetWindowMinSize(width, height)
+    int    width
+    int    height
+
+void
+SetWindowMonitor(monitor)
+    int    monitor
+
+void
+SetWindowPosition(x, y)
+    int    x
+    int    y
+
+void
+SetWindowTitle(title)
+    const char *    title
 
 void
 ShowCursor()
@@ -1360,10 +1586,19 @@ SubText(text, position, length)
     int    length
 
 void
+TakeScreenshot(fileName)
+    const char *    fileName
+
+void
 ToggleFullscreen()
 
 void
 ToggleVrMode()
+
+void
+TraceLog(logType, text, ...)
+    int    logType
+    const char *    text
 
 void
 UnloadImage(image)
@@ -1372,6 +1607,10 @@ UnloadImage(image)
 void
 UnloadMaterial(material)
     Material    material
+
+void
+UnloadMesh(mesh)
+    Mesh *    mesh
 
 void
 UnloadModel(model)
@@ -1406,10 +1645,10 @@ UnloadWave(wave)
     Wave    wave
 
 void
-UpdateAudioStream(stream, data, numSamples)
+UpdateAudioStream(stream, data, samplesCount)
     AudioStream    stream
-    void *    data
-    int    numSamples
+    const void *    data
+    int    samplesCount
 
 void
 UpdateCamera(camera)
@@ -1420,15 +1659,15 @@ UpdateMusicStream(music)
     Music    music
 
 void
-UpdateSound(sound, data, numSamples)
+UpdateSound(sound, data, samplesCount)
     Sound    sound
-    void *    data
-    int    numSamples
+    const void *    data
+    int    samplesCount
 
 void
 UpdateTexture(texture, pixels)
     Texture2D    texture
-    void *    pixels
+    const void *    pixels
 
 void
 UpdateTextureFromImage(texture, image)
@@ -1441,9 +1680,15 @@ void
 UpdateVrTracking(camera)
     Camera *    camera
 
+Vector3
+Vector3One()
+
 float *
-VectorToFloat(vec)
+Vector3ToFloat(vec)
     Vector3    vec
+
+Vector3
+Vector3Zero()
 
 Wave
 WaveCopy(wave)
@@ -1462,5 +1707,5 @@ WaveFormat(wave, sampleRate, sampleSize, channels)
     int    sampleSize
     int    channels
 
-int
+bool
 WindowShouldClose()

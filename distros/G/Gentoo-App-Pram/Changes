@@ -1,3 +1,8 @@
+0.100100
+- Fix a bug with chomp.
+- Improve man pages and add more examples.
+- Rewrite README.pod. This file now contains pram man page.
+
 0.100000
 - Add two new options to support GLEP 0066 header types.
 

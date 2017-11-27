@@ -4,7 +4,7 @@ use warnings;
 package Dist::Zilla::PluginBundle::NGLENN;
 # ABSTRACT: Dist::Zilla plugin configuration for me
 
-our $VERSION = '0.03';
+our $VERSION = '0.07';
 
 # Dependencies
 use Moose 0.99;
@@ -28,6 +28,7 @@ use Dist::Zilla::Plugin::CPANFile                     ();
 use Dist::Zilla::Plugin::Git::NextVersion             ();
 # use Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch ();
 use Dist::Zilla::Plugin::GithubMeta 0.36       ();
+use Dist::Zilla::Plugin::GitHub::UploadRelease        ();
 use Dist::Zilla::Plugin::TravisYML ();
 use Dist::Zilla::Plugin::TravisCI::StatusBadge;
 use Dist::Zilla::Plugin::InsertCopyright 0.001 ();
@@ -39,6 +40,7 @@ use Dist::Zilla::Plugin::PromptIfStale 0.011 ();
 use Dist::Zilla::Plugin::Prereqs::AuthorDeps ();
 use Dist::Zilla::Plugin::RewriteVersion ();
 use Dist::Zilla::Plugin::ReadmeFromPod 0.19            (); # for dzil v5
+use Dist::Zilla::Plugin::InstallGuide                  ();
 use Dist::Zilla::Plugin::TaskWeaver 0.101620           ();
 use Dist::Zilla::Plugin::Test::Compile 2.036           (); # various features
 use Dist::Zilla::Plugin::Test::MinimumVersion 2.000003 ();
@@ -230,10 +232,10 @@ sub configure {
         # gather and prune
         (
             $self->no_git
-            ? [ 'GatherDir' => { exclude_filename => [qw/README.mkdn cpanfile Makefile.PL/] }
+            ? [ 'GatherDir' => { exclude_filename => [qw/README.mkdn cpanfile Makefile.PL LICENSE INSTALL/] }
               ] # core
             : [
-                'Git::GatherDir' => { exclude_filename => [qw/README.mkdn cpanfile Makefile.PL/] }
+                'Git::GatherDir' => { exclude_filename => [qw/README.mkdn cpanfile Makefile.PL LICENSE INSTALL/] }
             ]
         ),
         'PruneCruft',   # core
@@ -256,6 +258,7 @@ sub configure {
 
         # generated distribution files
         'ReadmeFromPod', # in build dir
+        'InstallGuide',   # in build dir
         'TravisCI::StatusBadge', # in readme file
         'License',       # core
 
@@ -377,7 +380,7 @@ sub configure {
         # copy files from build back to root for inclusion in VCS;
         # for auto_version we want cpanfile.  For embedded version we want Makefile.PL
         [
-            CopyFilesFromBuild => { copy => $self->auto_version ? 'cpanfile' : 'Makefile.PL' }
+            CopyFilesFromBuild => { copy => $self->auto_version ? ['cpanfile', 'LICENSE', 'INSTALL'] : ['Makefile.PL', 'LICENSE', 'INSTALL'] }
         ],
 
         # manifest -- must come after all generated files
@@ -410,12 +413,6 @@ sub configure {
         # Note -- NextRelease is here to get the ordering right with
         # git actions.  It is *also* a file munger that acts earlier
 
-        (
-            $self->no_git
-            ? ()
-            : ( [ 'Git::Tag' => { tag_format => $self->tag_format } ], )
-        ),
-
         # bumps Changes
         'NextRelease', # core (also munges files)
 
@@ -433,11 +430,13 @@ sub configure {
                             allow_dirty       => [qw/Changes Makefile.PL/],
                             allow_dirty_match => '^lib|^bin',
                         )
-                    }
+                    },
+                    'Git::Tag' => { tag_format => $self->tag_format },
+                    'Git::Push' => { push_to => \@push_to },
+                    'GitHub::UploadRelease' => {}
                 ],
-                [ 'Git::Push' => { push_to => \@push_to } ],
             )
-        ),
+        )
 
     );
 
@@ -450,7 +449,7 @@ __PACKAGE__->meta->make_immutable;
 #
 # This file is part of Dist-Zilla-PluginBundle-NGLENN
 #
-# This software is Copyright (c) 2015 by Nathan Glenn.
+# This software is Copyright (c) 2017 by Nathan Glenn.
 #
 # This is free software, licensed under:
 #
@@ -469,7 +468,7 @@ Dist::Zilla::PluginBundle::NGLENN - Dist::Zilla plugin configuration for me
 
 =head1 VERSION
 
-version 0.03
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -506,6 +505,7 @@ following dist.ini:
   ; generated files
   [License]           ; boilerplate license
   [ReadmeFromPod]     ; from Pod (runs after PodWeaver)
+  [InstallGuide]      ; installation guide
   [TravisYML]         ; Travis-CI configuration
   build_branch = master
   ; t tests
@@ -601,6 +601,7 @@ following dist.ini:
   [Git::Tag]          ; tag repo with custom tag
   tag_format = release-%v
 
+
   ; NextRelease acts *during* pre-release to write $VERSION and
   ; timestamp to Changes and  *after* release to add a new {{$NEXT}}
   ; section, so to act at the right time after release, it must actually
@@ -614,6 +615,8 @@ following dist.ini:
 
   [Git::Push]         ; push repo to remote
   push_to = origin
+
+  [GitHub::UploadRelease] ; upload release to tag on GitHub
 
 This distribution was forked from the DAGOLDEN plugin bundle. The
 abstract should really be "Dist::Zilla configuration the way NGLENN,
@@ -804,6 +807,10 @@ Nathan Glenn <garfieldnate@gmail.com>
 
 =item *
 
+Nathan Glenn <nathan-gary.glenn@trivago.com>
+
+=item *
+
 Philippe Bruhat (BooK) <book@cpan.org>
 
 =item *
@@ -814,7 +821,7 @@ Sergey Romanov <complefor@rambler.ru>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2015 by Nathan Glenn.
+This software is Copyright (c) 2017 by Nathan Glenn.
 
 This is free software, licensed under:
 

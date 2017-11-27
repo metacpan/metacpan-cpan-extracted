@@ -245,7 +245,7 @@ sub loadIDPs {
     unless ( $self->{samlIDPMetaDataXML}
         and keys %{ $self->{samlIDPMetaDataXML} } )
     {
-        $self->lmLog( "No IDP found in configuration", 'warn' );
+        $self->lmLog( "No IDP found in configuration", 'debug' );
     }
 
     # Load identity provider metadata
@@ -344,7 +344,7 @@ sub loadSPs {
     unless ( $self->{samlSPMetaDataXML}
         and keys %{ $self->{samlSPMetaDataXML} } )
     {
-        $self->lmLog( "No SP found in configuration", 'warn' );
+        $self->lmLog( "No SP found in configuration", 'debug' );
     }
 
     # Load service provider metadata
@@ -3472,7 +3472,7 @@ L<Lemonldap::NG::Portal::AuthSAML>, L<Lemonldap::NG::Portal::UserDBSAML>
 =head1 BUG REPORT
 
 Use OW2 system to report bug or ask for features:
-L<http://jira.ow2.org>
+L<https://gitlab.ow2.org/lemonldap-ng/lemonldap-ng/issues>
 
 =head1 DOWNLOAD
 

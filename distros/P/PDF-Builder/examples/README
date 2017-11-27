@@ -128,18 +128,25 @@ tested against 3.004 July 2017
 
  032_separation  show color separation (CMYK) grid.
 
- 040_annotation  demonstrate open and closed annotations on a page. Some of
-                 the behavior seems a little unintuitive, so future corrections 
-		 may be in order. The "closed" note is only mouseover text,
-                 while the "open" permits appending of additional text. If you
+ 040_annotation  demonstrate open and closed "text" annotations on a page. Both
+                 permit editing of the text, with the "open" annotation 
+                 coming up already opened for editing, and the "closed"
+                 annotation needing to be clicked on to allow editing. If you
                  make a change to the open annotation, when you exit you will be                 prompted to save the changes (you don't have to, unless you
                  want to open the PDF again and see your entry still there).
+
+ 041_annot_fileattach  demonstrate file attachment annotations on a page. Two
+                 small files are attached in six different ways (mostly a 
+                 variety of icons and their coloring).
 
  050_pagelabels  all 26 pages show "Page Index=n" (0..25). The reader's 
                  thumbnail display is labeled with the appropriate Roman
                  Numerals, etc., and is NOT on the page itself. Note that each
                  time the display format is changed, the page number resets to
                  1 (I, i, A, a).
+
+ 055_outlines    take PDF like 012_page's, and add three outlines (bookmarks)
+                 to physical pages 1, 4, and 11 (labeled i, 1, 7).
 
  060_transparency  show writing opaque and translucent text by two methods.
 
@@ -155,6 +162,9 @@ BarCode.pl       demonstrate the bar code library, 1 page.
   mostly looks OK, but suspect some heavy bars are merging into their neighbors
   and there may be other problems, so my advice is NOT to use the barcodes in
   production code until they have been tested and verified.
+
+ShowFont.pl      list glyphs in a font. output varies by font, encoding(s),
+                 and font type.
 
 Windows/
   027_winfont  demo Windows registry access

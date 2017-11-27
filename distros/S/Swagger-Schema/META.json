@@ -50,7 +50,7 @@
          "web" : "https://github.com/pplu/swagger-schema-perl"
       }
    },
-   "version" : "1.01",
+   "version" : "1.02",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

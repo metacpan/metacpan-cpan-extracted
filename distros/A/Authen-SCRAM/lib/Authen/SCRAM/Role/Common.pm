@@ -4,11 +4,11 @@ use warnings;
 
 package Authen::SCRAM::Role::Common;
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 use Moo::Role 1.001000;
 
-use Authen::SASL::SASLprep qw/saslprep/;
+use Authen::SASL::SASLprep 1.100 qw/saslprep/;
 use Carp qw/croak/;
 use Crypt::URandom qw/urandom/;
 use Encode qw/encode_utf8/;
@@ -224,7 +224,7 @@ sub _saslprep {
     return $name if $self->skip_saslprep;
 
     my $prepped = try {
-        saslprep($name);
+        saslprep($name, 1); # '1' makes it use stored mode
     }
     catch {
         croak "SCRAM username '$name' invalid: $_";

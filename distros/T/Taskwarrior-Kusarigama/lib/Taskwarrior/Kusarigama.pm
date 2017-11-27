@@ -1,7 +1,7 @@
 package Taskwarrior::Kusarigama;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: plugin system for the Taskwarrior task manager
-$Taskwarrior::Kusarigama::VERSION = '0.3.1';
+$Taskwarrior::Kusarigama::VERSION = '0.4.0';
 
 # TODO document the kusarigama.dir key
 1;
@@ -18,7 +18,7 @@ Taskwarrior::Kusarigama - plugin system for the Taskwarrior task manager
 
 =head1 VERSION
 
-version 0.3.1
+version 0.4.0
 
 =head1 SYNOPSIS
 
@@ -229,7 +229,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Yanick Champoux.
+This software is copyright (c) 2017 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

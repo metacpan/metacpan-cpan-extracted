@@ -2,7 +2,7 @@
 
 #
 # dbroweval.pm
-# Copyright (C) 1991-2015 by John Heidemann <johnh@isi.edu>
+# Copyright (C) 1991-2017 by John Heidemann <johnh@isi.edu>
 # $Id: 8c28f7b692255da8ba7895ca3d5c79edcf00f160 $
 #
 # This program is distributed under terms of the GNU general
@@ -485,8 +485,9 @@ sub setup ($) {
 	            ' . (defined($code) ? $code : '') . q'
 		    # end user MAINLINE CODE
 		    ' . ($any_needs_lfref ? q'
-		    $lfref = $fref;  # save for next pass
                     ' : '') . $row_output_code . q'
+		} continue {
+		    $lfref = $fref;  # save for next pass
 		};
 		' . $output_end_pre . q'
 		# begin user END CODE
@@ -544,7 +545,7 @@ Override compute_program_log to do pretty-printed arguments.
 sub compute_program_log($) {
     my $self = shift @_;
 
-    my $log = " | " . $self->{_prog} . $self->{_pretty_args};
+    my $log = "  | " . $self->{_prog} . $self->{_pretty_args};
     return $log;
 }
 
@@ -552,7 +553,7 @@ sub compute_program_log($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1991-2007 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1991-2017 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

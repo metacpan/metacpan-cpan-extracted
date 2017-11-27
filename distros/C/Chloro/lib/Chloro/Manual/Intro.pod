@@ -2,9 +2,11 @@ package Chloro::Manual::Intro;
 
 # ABSTRACT: Basic form and field definition
 
-
+__END__
 
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -12,7 +14,7 @@ Chloro::Manual::Intro - Basic form and field definition
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 DEFINING A BASIC FORM
 
@@ -33,6 +35,7 @@ well as some other optional parameters.
     package MyApp::Form::User;
 
     use Moose;
+    use MooseX::Types::Email qw/EmailAddress/;
     use Chloro;
 
     field username => (
@@ -41,7 +44,7 @@ well as some other optional parameters.
     );
 
     field email_address => (
-        isa      => 'EmailAddress',
+        isa      => EmailAddress,
         required => 1,
     );
 
@@ -189,9 +192,9 @@ input. If you're using Catalyst you could write this:
     my $resultset = $form->process( params => $c->request()->params() );
 
 The first thing you should do with the resultset is check whether it is
-valid. Valid means that there I<all> of the fields passed their required,
-type, validator checks. If the form defined any form-level validations, these
-must also pass for the resultset to be valid.
+valid. Valid means that I<all> of the fields passed their required, type,
+validator checks. If the form defined any form-level validations, these must
+also pass for the resultset to be valid.
 
     if ( $resultset->is_valid() ) {
         ...
@@ -279,12 +282,13 @@ method to your form class:
     package MyApp::Form::User;
 
     use Moose;
+    use MooseX::Types::Email qw/EmailAddress/;
     use Chloro;
 
     use List::AllUtils qw( any );
 
     field email_address => (
-        isa      => 'EmailAddress',
+        isa      => EmailAddress,
         required => 1,
     );
 
@@ -308,7 +312,7 @@ method to your form class:
 
         return unless any { defined && length } $pw1, $pw2;
 
-        return if ( $pw1 // q{} ) eq ( $pw1 // q{} );
+        return if ( $pw1 // q{} ) eq ( $pw2 // q{} );
 
         return 'The two passwords you provided did not match.';
     }
@@ -342,20 +346,29 @@ L<Chloro::ResultSet> object.
 Chloro also supports the use of repeatable groups in forms. This is discussed
 in L<Chloro::Manual::Groups>.
 
+=head1 SUPPORT
+
+Bugs may be submitted at L<http://rt.cpan.org/Public/Dist/Display.html?Name=Chloro> or via email to L<bug-chloro@rt.cpan.org|mailto:bug-chloro@rt.cpan.org>.
+
+I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
+
+=head1 SOURCE
+
+The source code repository for Chloro can be found at L<https://github.com/autarch/Chloro>.
+
 =head1 AUTHOR
 
 Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2011 by Dave Rolsky.
+This software is Copyright (c) 2017 by Dave Rolsky.
 
 This is free software, licensed under:
 
   The Artistic License 2.0 (GPL Compatible)
 
+The full text of the license can be found in the
+F<LICENSE> file included with this distribution.
+
 =cut
-
-
-__END__
-

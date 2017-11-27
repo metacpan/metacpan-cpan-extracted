@@ -10,7 +10,7 @@ use Chloro::Test::User;
 my $form = Chloro::Test::User->new();
 
 {
-    my $set = $form->process(
+    my $result_set = $form->process(
         params => {
             username      => 'Foo',
             email_address => 'foo@example.com',
@@ -18,13 +18,13 @@ my $form = Chloro::Test::User->new();
     );
 
     ok(
-        $set->is_valid(),
+        $result_set->is_valid(),
         'form is valid when no password fields are present'
     );
 }
 
 {
-    my $set = $form->process(
+    my $result_set = $form->process(
         params => {
             username      => 'Foo',
             email_address => 'foo@example.com',
@@ -34,13 +34,13 @@ my $form = Chloro::Test::User->new();
     );
 
     ok(
-        $set->is_valid(),
+        $result_set->is_valid(),
         'form is valid when password fields match'
     );
 }
 
 {
-    my $set = $form->process(
+    my $result_set = $form->process(
         params => {
             username      => 'Foo',
             email_address => 'foo@example.com',
@@ -49,14 +49,14 @@ my $form = Chloro::Test::User->new();
     );
 
     ok(
-        !$set->is_valid(),
+        !$result_set->is_valid(),
         'form is invalid when one password field is empty'
     );
 
     is_deeply(
         [
             map { [ $_->message()->category(), $_->message()->text() ] }
-                $set->form_errors()
+                $result_set->form_errors()
         ],
         [
             [
@@ -69,7 +69,7 @@ my $form = Chloro::Test::User->new();
 }
 
 {
-    my $set = $form->process(
+    my $result_set = $form->process(
         params => {
             username      => 'Foo',
             email_address => 'foo@example.com',
@@ -79,14 +79,14 @@ my $form = Chloro::Test::User->new();
     );
 
     ok(
-        !$set->is_valid(),
+        !$result_set->is_valid(),
         'form is invalid when password fields do not match'
     );
 
     is_deeply(
         [
             map { [ $_->message()->category(), $_->message()->text() ] }
-                $set->form_errors()
+                $result_set->form_errors()
         ],
         [
             [
@@ -99,7 +99,7 @@ my $form = Chloro::Test::User->new();
 }
 
 {
-    my $set = $form->process(
+    my $result_set = $form->process(
         params => {
             username      => 'Special',
             email_address => 'foo@example.com',
@@ -109,14 +109,14 @@ my $form = Chloro::Test::User->new();
     );
 
     ok(
-        !$set->is_valid(),
+        !$result_set->is_valid(),
         'form is invalid when password fields do not match'
     );
 
     is_deeply(
         [
             map { [ $_->message()->category(), $_->message()->text() ] }
-                $set->form_errors()
+                $result_set->form_errors()
         ],
         [
             [

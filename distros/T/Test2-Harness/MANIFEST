@@ -13,6 +13,7 @@ cpanfile
 dist.ini
 lib/App/Yath.pm
 lib/App/Yath/Command.pm
+lib/App/Yath/Command/failed.pm
 lib/App/Yath/Command/help.pm
 lib/App/Yath/Command/init.pm
 lib/App/Yath/Command/reload.pm
@@ -75,6 +76,7 @@ lib/Test2/Tools/HarnessTester.pm
 scripts/yath
 t/App/Yath.t
 t/App/Yath/Command.t
+t/App/Yath/Command/failed.t
 t/App/Yath/Command/help.t
 t/App/Yath/Command/init.t
 t/App/Yath/Command/reload.t

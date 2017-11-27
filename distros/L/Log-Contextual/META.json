@@ -4,7 +4,7 @@
       "Arthur Axel \"fREW\" Schmidt <frioux+cpan@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -51,7 +51,7 @@
          "web" : "https://github.com/frioux/Log-Contextual"
       }
    },
-   "version" : "0.007001",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.023"
+   "version" : "0.008000",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
 }
 

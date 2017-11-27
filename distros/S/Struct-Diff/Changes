@@ -1,5 +1,10 @@
 Revision history for Struct-Diff
 
+0.92    2017-11-27
+        diff fixed for emptied/filled subhashes
+        patch fixed for cases when entire data type changed
+        subdiff squash fixed for A/R
+
 0.91    2017-11-04
         regexps comparison support added to diff()
 

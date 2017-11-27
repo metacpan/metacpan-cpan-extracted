@@ -7,9 +7,11 @@ WriteMakefile(
     AUTHOR              => 'Ruey-Cheng Chen <rueycheng@cpan.com>',
     VERSION_FROM        => 'lib/Module/Starter/Smart.pm',
     ABSTRACT_FROM       => 'lib/Module/Starter/Smart.pm',
+    MIN_PERL_VERSION    => 5.6.0,
     PL_FILES            => {},
+    LICENSE             => 'perl',
     BUILD_REQUIRES      => {
-        'ExtUtils::MakeMaker'  => 0,
+        'ExtUtils::MakeMaker'  => 6.48,
         'File::Spec'           => 0,
         'parent'               => 0,
         'Module::Starter'      => 1.58,

@@ -1,7 +1,7 @@
 package Git::Bunch;
 
-our $DATE = '2017-10-19'; # DATE
-our $VERSION = '0.620'; # VERSION
+our $DATE = '2017-11-24'; # DATE
+our $VERSION = '0.621'; # VERSION
 
 use 5.010001;
 use strict;
@@ -775,6 +775,7 @@ non-repo file/dir is aborted. If you want to force the rsync anyway, use this
 option.
 
 _
+            cmdline_aliases => {M=>{}},
         },
         create_bare_target => {
             summary      => 'Whether to create bare git repo '.
@@ -1118,7 +1119,7 @@ Git::Bunch - Manage gitbunch directory (directory which contain git repos)
 
 =head1 VERSION
 
-This document describes version 0.620 of Git::Bunch (from Perl distribution Git-Bunch), released on 2017-10-19.
+This document describes version 0.621 of Git::Bunch (from Perl distribution Git-Bunch), released on 2017-11-24.
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,7 @@
 use strict;
 use warnings;
+use FindBin;
+use lib "$FindBin::Bin/../../";
 use t::scan::Util;
 
 test(<<'TEST'); # EGROSS/Lingua-PT-Conjugate-1.20/Infinitives.pm

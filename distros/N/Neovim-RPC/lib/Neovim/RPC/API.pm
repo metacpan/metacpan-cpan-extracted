@@ -1,6 +1,6 @@
 package Neovim::RPC::API;
 our $AUTHORITY = 'cpan:YANICK';
-$Neovim::RPC::API::VERSION = '0.2.0';
+$Neovim::RPC::API::VERSION = '1.0.0';
 use 5.10.0;
 
 use strict;
@@ -10,9 +10,24 @@ use Moose::Role;
 
 use Neovim::RPC::API::Command;
 
-use List::AllUtils qw/ any /;
+use Log::Any;
 
-with 'MooseX::Role::Loggable';
+use List::AllUtils qw/ any /;
+use Promises qw/ deferred /;
+
+has log => (
+    is => 'ro',
+    lazy => 1,
+    default => sub {
+        Log::Any->get_logger->clone( prefix => '[Neovim::RPC::API] ' );
+    },
+);
+
+has ready => (
+    is => 'ro',
+    lazy => 1,
+    default => sub { deferred },
+);
 
 has "rpc" => (
     isa => 'Neovim::RPC',
@@ -70,7 +85,7 @@ sub add_command {
 
         my $struct = $c->args_to_struct(@args);
 
-        $self->rpc->request( $c->name => $struct);
+        return $self->rpc->send_request( $c->name => $struct);
     })
 
 }
@@ -112,7 +127,7 @@ Neovim::RPC::API
 
 =head1 VERSION
 
-version 0.2.0
+version 1.0.0
 
 =head1 METHODS
 
@@ -140,7 +155,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Yanick Champoux.
+This software is copyright (c) 2017, 2015 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

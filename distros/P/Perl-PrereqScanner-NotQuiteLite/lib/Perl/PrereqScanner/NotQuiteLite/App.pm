@@ -8,6 +8,7 @@ use File::Spec;
 use CPAN::Meta::Prereqs;
 use CPAN::Meta::Requirements;
 use Perl::PrereqScanner::NotQuiteLite;
+use Perl::PrereqScanner::NotQuiteLite::Util::Prereqs;
 
 sub new {
   my ($class, %opts) = @_;
@@ -20,8 +21,23 @@ sub new {
 
   $opts{prereqs} = CPAN::Meta::Prereqs->new;
   $opts{parsers} = [':installed'] unless defined $opts{parsers};
+  $opts{recommends} = 0 unless defined $opts{recommends};
   $opts{suggests} = 0 unless defined $opts{suggests};
   $opts{base_dir} ||= File::Spec->curdir;
+
+  $opts{cpanfile} = 1 if $opts{save_cpanfile};
+
+  if ($opts{features} and !ref $opts{features}) {
+    my %map;
+    for my $spec (split ';', $opts{features}) {
+      my ($identifier, $description, $paths) = split ':', $spec;
+      $map{$identifier} = {
+        description => $description,
+        paths => [split ',', $paths],
+      }
+    }
+    $opts{features} = \%map;
+  }
 
   bless \%opts, $class;
 }
@@ -46,7 +62,7 @@ sub run {
     }
 
     # for develop requires
-    push @args, "xt", "author", "inc" if $self->{develop};
+    push @args, "xt", "author" if $self->{develop};
   }
 
   for my $path (@args) {
@@ -58,15 +74,27 @@ sub run {
 
   $self->_exclude_local_modules;
 
-  if ($self->{exclude_core} or $self->{perl_version}) {
+  if ($self->{exclude_core}) {
     eval { require Module::CoreList; Module::CoreList->VERSION('2.99') } or die "requires Module::CoreList 2.99";
     $self->_exclude_core_prereqs;
   }
 
-  if ($self->{print}) {
+  $self->_dedupe;
+
+  if ($self->{print} or $self->{cpanfile}) {
     if ($self->{json}) {
+      # TODO: feature support (how should we express it?)
       eval { require JSON::PP } or die "requires JSON::PP";
       print JSON::PP->new->pretty(1)->canonical->encode($self->{prereqs}->as_string_hash);
+    } elsif ($self->{cpanfile}) {
+      eval { require Perl::PrereqScanner::NotQuiteLite::Util::CPANfile } or die "requires Module::CPANfile";
+      my $file = File::Spec->catfile($self->{base_dir}, "cpanfile");
+      my $cpanfile = Perl::PrereqScanner::NotQuiteLite::Util::CPANfile->load_and_merge($file, $self->{prereqs}, $self->{features});
+      if ($self->{save_cpanfile}) {
+        $cpanfile->save($file);
+      } else {
+        print $cpanfile->to_string, "\n";
+      }
     } else {
       $self->_print_prereqs;
     }
@@ -97,7 +125,7 @@ sub _requirements {
   my $prereqs = $self->{prereqs};
   my @phases = qw/configure runtime test/;
   push @phases, 'develop' if $self->{develop};
-  my @types = $self->{suggests} ? qw/requires suggests/ : qw/requires/;
+  my @types = $self->{suggests} ? qw/requires recommends suggests/ : $self->{recommends} ? qw/requires recommends/ : qw/requires/;
   my @requirements;
   for my $phase (@phases) {
     for my $type (@types) {
@@ -111,6 +139,26 @@ sub _requirements {
 
 sub _exclude_local_modules {
   my $self = shift;
+
+  my $inc_dir = File::Spec->catdir($self->{base_dir}, "inc");
+  if (-d $inc_dir) {
+    find({
+      wanted => sub {
+        my $file = $_;
+        return unless -f $file;
+        my $relpath = File::Spec->abs2rel($file, $self->{base_dir});
+
+        return unless $relpath =~ /\.pm$/;
+        my $module = $relpath;
+        $module =~ s!\.pm$!!;
+        $module =~ s![\\/]!::!g;
+        $self->{possible_modules}{$module} = 1;
+        $module =~ s!^inc::!!g;
+        $self->{possible_modules}{$module} = 1;
+      },
+      no_chdir => 1,
+    }, $inc_dir);
+  }
 
   for my $req ($self->_requirements) {
     for my $module ($req->required_modules) {
@@ -138,8 +186,16 @@ sub _exclude_core_prereqs {
       }
     }
   }
-  my $req = $self->{prereqs}->requirements_for('runtime', 'requires');
-  $req->add_minimum(perl => $perl_version);
+}
+
+sub _dedupe {
+  my $self = shift;
+
+  my $prereqs = $self->{prereqs};
+
+  my %features = map {$_ => $self->{features}{$_}{prereqs}} keys %{$self->{features} || {}};
+
+  dedupe_prereqs_and_features($prereqs, \%features);
 }
 
 sub _scan_dir {
@@ -154,7 +210,7 @@ sub _scan_dir {
       return unless $relpath =~ /\.(?:pl|PL|pm|cgi|psgi|t)$/ or
                     dirname($relpath) =~ m!\b(?:bin|scripts?)$! or
                     ($self->{develop} and $relpath =~ /^(?:author)\b/);
-      $self->_scan_file($relpath);
+      $self->_scan_file($file);
     },
   }, $dir);
 }
@@ -164,21 +220,36 @@ sub _scan_file {
 
   my $context = Perl::PrereqScanner::NotQuiteLite->new(
     parsers => $self->{parsers},
+    recommends => $self->{recommends},
     suggests => $self->{suggests},
   )->scan_file($file);
 
-  if ($file =~ m!(?:^|[\\/])(?:Makefile|Build)\.PL$!) {
-    $self->_add(configure => $context);
-  } elsif ($file =~ m!(?:^|[\\/])t[\\/]!) {
-    $self->_add(test => $context);
-  } elsif ($file =~ m!(?:^|[\\/])(?:xt|inc|author)[\\/]!) {
-    $self->_add(develop => $context);
-  } else {
-    $self->_add(runtime => $context);
+  my $relpath = File::Spec->abs2rel($file, $self->{base_dir});
+  $relpath =~ s|\\|/|g if $^O eq 'MSWin32';
+
+  my $prereqs = $self->{prereqs};
+  if ($self->{features}) {
+    for my $identifier (keys %{$self->{features}}) {
+      my $feature = $self->{features}{$identifier};
+      if (grep {$relpath =~ m!^$_(?:/|$)!} @{$feature->{paths}}) {
+        $prereqs = $feature->{prereqs} ||= CPAN::Meta::Prereqs->new;
+        last;
+      }
+    }
   }
 
-  if ($file =~ /\.pm$/) {
-    my $module = $file;
+  if ($relpath =~ m!(?:^|[\\/])(?:Makefile|Build)\.PL$!) {
+    $self->_add($prereqs, configure => $context);
+  } elsif ($relpath =~ m!(?:^|[\\/])t[\\/]!) {
+    $self->_add($prereqs, test => $context);
+  } elsif ($relpath =~ m!(?:^|[\\/])(?:xt|inc|author)[\\/]!) {
+    $self->_add($prereqs, develop => $context);
+  } else {
+    $self->_add($prereqs, runtime => $context);
+  }
+
+  if ($relpath =~ /\.pm$/) {
+    my $module = $relpath;
     $module =~ s!\.pm$!!;
     $module =~ s![\\/]!::!g;
     $self->{possible_modules}{$module} = 1;
@@ -190,17 +261,20 @@ sub _scan_file {
 }
 
 sub _add {
-  my ($self, $phase, $context) = @_;
-
-  my $prereqs = $self->{prereqs};
+  my ($self, $prereqs, $phase, $context) = @_;
 
   $prereqs->requirements_for($phase, 'requires')
           ->add_requirements($context->requires);
 
-  return unless $self->{suggests};
+  if ($self->{suggests} or $self->{recommends}) {
+    $prereqs->requirements_for($phase, 'recommends')
+            ->add_requirements($context->recommends);
+  }
 
-  $prereqs->requirements_for($phase, 'suggests')
-          ->add_requirements($context->suggests);
+  if ($self->{suggests}) {
+    $prereqs->requirements_for($phase, 'suggests')
+            ->add_requirements($context->suggests);
+  }
 }
 
 1;

@@ -1,5 +1,8 @@
 Revision history for Perl module Unicode::Collate.
 
+1.25  Wed Nov 22 20:48:48 2017
+    - Makefile.PL: [rt.cpan.org #123631] Switch Unicode::Collate to XSLoader
+
 1.24  Sun Nov 19 22:06:03 2017
     - xs: [rt.cpan.org #123631] Switch Unicode::Collate to XSLoader
 

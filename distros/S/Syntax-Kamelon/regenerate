@@ -1,0 +1,11 @@
+#!/bin/bash
+
+make realclean
+perl tools/generate_manifest > MANIFEST
+perl Makefile.PL
+make
+perl -Mblib tools/recreate_index
+perl -Mblib tools/generate_syntaxes_pod > lib/Syntax/Kamelon/Syntaxes.pod
+perl Makefile.PL
+make
+make test

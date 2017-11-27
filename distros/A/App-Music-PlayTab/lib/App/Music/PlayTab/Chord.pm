@@ -3,8 +3,8 @@
 # Author          : Johan Vromans
 # Created On      : Wed Aug 22 22:33:31 2007
 # Last Modified By: Johan Vromans
-# Last Modified On: Mon Jan 16 17:01:50 2012
-# Update Count    : 29
+# Last Modified On: Sun Jan 18 15:51:41 2015
+# Update Count    : 31
 # Status          : Unknown, Use with caution!
 
 package App::Music::PlayTab::Chord;
@@ -307,94 +307,13 @@ sub duration_base {
     16;
 }
 
-sub is_rest {
-    shift->{_isrest};
+sub bass {
+    my ( $self ) = @_;
+    $self->{bass};
 }
 
-sub ps {
-    my ($self) = @_;
-    my $res = $self->{key}->ps;
-
-    my @v = @{$self->{vec}};
-    my $v = "@v ";
-    shift (@v);
-
-    if ( $v =~ s/^0 (2 )?4 (6|7|8) / / ) {
-	$res .= $2 == 8 ? ' plus' : '';
-	$v = ' 6' . $v if $2 == 6;
-	$v = ' 2' . $v if defined $1;
-    }
-    elsif ( $v =~ s/^0 3 6 9 / / ) {
-	$res .= ' dim';
-    }
-    elsif ( $v =~ s/^0 (2 )?3 (6|7|8) / / ) {
-	if ( $2 == 6 ) {
-	    $res .= ( $v =~ s/^ 10 // ) ? ' hdim' : ' dim';
-	}
-	else {
-	    $res .= ' minus';
-	}
-	$v = ' 8' . $v 	if $2 == 8;
-	$v = ' 2' . $v  if defined $1;
-    }
-    $v =~ s/^0 5 7 / 5 7 /;
-    $v =~ s/ 10 14 18 (21) / $1 /;		# 13
-    $v =~ s/ 10 14 18 (20|22) / 10 $1 /;	#  7#13 7b13
-    $v =~ s/ 10 14 (17) / $1 /;			# 11
-    $v =~ s/ 10 14 (18) / 10 $1 /;		#  7#11
-    $v =~ s/ 10 (14) / $1 /;			#  9
-    $v =~ s/ 10 (15) / 10 $1 /;			#  7#9
-    $v =~ s/ 11 14 18 (21|22) / $1 11 /;	# 13#5
-    $v =~ s/ 11 14 (17|18) / $1 11 /;		# 11#5
-    $v =~ s/ 11 (14|15) / $1 11 /;		#  9#5
-    if ( $v =~ s/ 10 / / ) {
-	$res .= ' (7) addn';
-    }
-    elsif ( $v =~ s/^( \d| 10|) 11 / $1/ ) {
-	$res .= ' -2 0 rmoveto' if $res =~ / flat$/;
-	$res .= ' delta';
-    }
-    if ( $v =~ s/ 5 7 / / ) {
-	$res .= ' (4) susp';
-    }
-    elsif ( $v =~ s/^0 7 / / ) {
-	$res .= ' (2) susp';
-    }
-    elsif ( $v =~ s/^0 4 / / ) {
-	$res .= ' (no5) addn';
-    }
-    my $res1 = $res;		# for debug
-
-    chop ($v);
-    $v =~ s/^ //;
-    @v = split(' ', $v);
-    foreach ( @v ) {
-	$res .= ' ';
-	$res .= ( '(1) addn', '(2) addf', '(2) addn', '(3) addf', '(3) addn',
-		  '(4) addn', '(5) addf', '(5) addn', '(5) adds', '(6) addn',
-		  '(7) addn', '(7) adds', '(8) addn', '(9) addf', '(9) addn',
-		  '(9) adds','(11) addf','(11) addn','(11) adds',
-		 '(12) addn','(13) addf','(13) addn' )[$_];
-    }
-
-    if ( $self->{high} ) {
-	my $t = join(" bslash ", map { $_->ps } @{$self->{high}});
-	$t =~ s/root/hroot/g;
-	$res = join(" bslash ", $res, $t);
-    }
-
-    if ( $self->{bass} ) {
-	my $t = join(" slash ", map { $_->ps } @{$self->{bass}});
-	$t =~ s/root/hroot/g;
-	$res = join(" slash ", $res, $t);
-    }
-
-    warn("=> Chord ", $self->{_unparsed}, ": ", $self->{key}->key,
-	 " (", $self->{key}->name, ") [ @{$self->{vec}} ] ->",
-	 " $res1 [ $v ] -> $res\n")
-      if $self->{_debug};
-
-    return $res;
+sub is_rest {
+    shift->{_isrest};
 }
 
 1;

@@ -20,6 +20,7 @@
 #include "factor.h"
 #include "isaac.h"
 #include "random_prime.h"
+#include "real.h"
 #define _GMP_ECM_FACTOR(n, f, b1, ncurves) \
    _GMP_ecm_factor_projective(n, f, b1, 0, ncurves)
 
@@ -86,6 +87,8 @@ PROTOTYPES: ENABLE
 void _GMP_init()
 
 void _GMP_destroy()
+
+void _GMP_memfree()
 
 void _GMP_set_verbose(IN int v)
   PPCODE:
@@ -453,7 +456,9 @@ totient(IN char* strn)
     ramanujan_tau = 6
     sqrtint = 7
     is_prime_power = 8
-    urandomm = 9
+    prime_count_lower = 9
+    prime_count_upper = 10
+    urandomm = 11
   PREINIT:
     mpz_t res, n;
   PPCODE:
@@ -478,7 +483,9 @@ totient(IN char* strn)
       case 6:  ramanujan_tau(res, n);  break;
       case 7:  mpz_sqrt(res, n);  break;
       case 8:  mpz_set_ui(res, prime_power(res, n)); break;
-      case 9:
+      case 9:  prime_count_lower(res, n); break;
+      case 10: prime_count_upper(res, n); break;
+      case 11:
       default: mpz_isaac_urandomm(res, n); break;
     }
     if (ix == 5 && !mpz_sgn(res) && mpz_cmp_ui(n,1) != 0)
@@ -490,17 +497,20 @@ totient(IN char* strn)
 void harmreal(IN char* strn, IN UV prec = 40)
   ALIAS:
     bernreal = 1
-    zeta = 2
-    riemannr = 3
-    lambertw = 4
-    surround_primes = 5
+    logreal = 2
+    expreal = 3
+    zeta = 4
+    li = 5
+    ei = 6
+    riemannr = 7
+    lambertw = 8
+    surround_primes = 9
   PREINIT:
     mpz_t n;
     mpf_t f;
     char* res;
-    int retundef;
   PPCODE:
-    if (ix == 5) {  /* surround_primes */
+    if (ix == 9) {  /* surround_primes */
       UV prev, next;
       VALIDATE_AND_SET(n, strn);
       next = 1 + (mpz_sgn(n)==0);
@@ -512,32 +522,62 @@ void harmreal(IN char* strn, IN UV prec = 40)
       }
       XPUSHs(sv_2mortal(newSVuv(next)));
       mpz_clear(n);
+    } else if (ix <= 1) {
+      VALIDATE_AND_SET(n, strn);
+      res = (ix == 0) ? harmreal(n, prec) : bernreal(n, prec);
+      mpz_clear(n);
+      XPUSHs(sv_2mortal(newSVpv(res, 0)));
+      Safefree(res);
     } else {
-      retundef = 0;
+      unsigned long bits  = 64 + (unsigned long)(3.32193 * prec);
+      unsigned long bits2 = 64 + (unsigned long)(3.32193 * strlen(strn));
+      if (bits2 > bits) bits = bits2;
+      mpf_init2(f, bits);
+      if (mpf_set_str(f, strn, 10) != 0)
+        croak("Not valid base-10 floating point input: %s", strn);
       res = 0;
-      if (ix == 2 || ix == 3 || ix == 4) {
-        unsigned long bits = 64 + (unsigned long)(prec*3.32193);
-        mpf_init2(f, bits);
-        if (mpf_set_str(f, strn, 10) != 0)
-          croak("Not valid base-10 floating point input: %s", strn);
-        switch (ix) {
-          case 2:  res = zetareal(f, prec); break;
-          case 3:  res = riemannrreal(f, prec); break;
-          case 4:
-          default: res = lambertwreal(f, prec); break;
-        }
-        if (res == 0) retundef = 1;
-        mpf_clear(f);
-      } else {
-        VALIDATE_AND_SET(n, strn);
-        res = (ix == 0) ? harmreal(n, prec) : bernreal(n, prec);
-        mpz_clear(n);
+      switch (ix) {
+        case 2:  res = logreal(f, prec); break;
+        case 3:  res = expreal(f, prec); break;
+        case 4:  res = zetareal(f, prec); break;
+        case 5:  res = lireal(f, prec); break;
+        case 6:  res = eireal(f, prec); break;
+        case 7:  res = riemannrreal(f, prec); break;
+        case 8:
+        default: res = lambertwreal(f, prec); break;
       }
-      if (retundef)
+      mpf_clear(f);
+      if (res == 0)
         XSRETURN_UNDEF;
       XPUSHs(sv_2mortal(newSVpv(res, 0)));
       Safefree(res);
     }
+
+void powreal(IN char* strn, IN char* strx, IN UV prec = 40)
+  ALIAS:
+    agmreal = 1
+  PREINIT:
+    mpf_t n, x;
+    char* res;
+  PPCODE:
+    unsigned long bits  = 64 + (unsigned long)(3.32193 * prec);
+    unsigned long bits2 = 64 + (unsigned long)(3.32193 * strlen(strn));
+    unsigned long bits3 = 64 + (unsigned long)(3.32193 * strlen(strx));
+    if (bits2 > bits) bits = bits2;
+    if (bits3 > bits) bits = bits3;
+    mpf_init2(n, bits);
+    if (mpf_set_str(n, strn, 10) != 0)
+      croak("Not valid base-10 floating point input: %s", strn);
+    mpf_init2(x, bits);
+    if (mpf_set_str(x, strx, 10) != 0)
+      croak("Not valid base-10 floating point input: %s", strx);
+    res = (ix == 0) ? powreal(n, x, prec) : agmreal(n, x, prec);
+    mpf_clear(n);
+    mpf_clear(x);
+    if (res == 0)
+      XSRETURN_UNDEF;
+    XPUSHs(sv_2mortal(newSVpv(res, 0)));
+    Safefree(res);
 
 void
 gcd(...)
@@ -613,14 +653,14 @@ moebius(IN char* strn, IN char* stro = 0)
   PREINIT:
     mpz_t n;
   PPCODE:
-    VALIDATE_AND_SET(n, strn);
+    validate_and_set_signed(cv, n, "n", strn, VSETNEG_OK);
     if (stro == 0) {
       int result = moebius(n);
       mpz_clear(n);
       XSRETURN_IV(result);
     } else {   /* Ranged result */
       mpz_t nhi;
-      VALIDATE_AND_SET(nhi, stro);
+      validate_and_set_signed(cv, nhi, "nhi", stro, VSETNEG_OK);
       while (mpz_cmp(n, nhi) <= 0) {
         XPUSHs(sv_2mortal(newSViv( moebius(n) )));
         mpz_add_ui(n, n, 1);
@@ -814,17 +854,12 @@ int is_mersenne_prime(IN UV n)
 
 void Pi(IN UV n)
   ALIAS:
-    random_bytes = 1
+    Euler = 1
+    random_bytes = 2
+  PREINIT:
+    UV prec;
   PPCODE:
-    if (ix == 0) {
-      if (n == 1)
-        XSRETURN_IV(3);
-      else if (n > 0) {
-        char* pi = pidigits(n);
-        XPUSHs(sv_2mortal(newSVpvn(pi, n+1)));
-        Safefree(pi);
-      }
-    } else {
+    if (ix == 2) {  /* random_bytes */
       char* sptr;
       SV* sv = newSV(n == 0 ? 1 : n);
       SvPOK_only(sv);
@@ -834,6 +869,21 @@ void Pi(IN UV n)
       sptr[n] = '\0';
       PUSHs(sv_2mortal(sv));
       XSRETURN(1);
+    }
+    if (ix == 0 && n == 0) XSRETURN(0);
+    if (ix == 0 && n == 1) XSRETURN_IV(3);
+    if (ix == 1 && n == 0) XSRETURN_IV(1);
+    prec = (ix == 0) ? n+1 : n+2;
+    if (GIMME_V == G_VOID) {
+      mpf_t c;
+      mpf_init2(c, 7+prec*3.32193);
+      if (ix == 0)  const_pi(c, prec);
+      else          const_euler(c, prec);
+      mpf_clear(c);
+    } else {
+      char* cstr = (ix == 0) ? piconst(n) : eulerconst(n);
+      XPUSHs(sv_2mortal(newSVpvn(cstr, prec)));
+      Safefree(cstr);
     }
 
 void random_nbit_prime(IN UV n)
@@ -1209,7 +1259,7 @@ trial_factor(IN char* strn, ...)
         case 4: if (arg2 == 0)  arg2 = arg1*10;
                 success = _GMP_pplus1_factor(n, f, 0,arg1,arg2);  break;
         case 5: success = _GMP_holf_factor(n, f, arg1);           break;
-        case 6: success = squfof126(n, f, arg1);         break;
+        case 6: success = squfof126(n, f, arg1);                  break;
         case 7: if (arg2 == 0) arg2 = 100;
                 if (arg1 == 0) {
                   success =    _GMP_ECM_FACTOR(n, f,     1000, 40)

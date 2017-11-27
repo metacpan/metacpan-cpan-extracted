@@ -1,0 +1,3 @@
+#fsdb mean stddev pct_rsd conf_range conf_low conf_high conf_pct sum sum_squared min max n
+# empty input
+#   | dbcolstats --no-output-on-no-input absdiff

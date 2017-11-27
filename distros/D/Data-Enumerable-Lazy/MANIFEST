@@ -22,3 +22,5 @@ t/17-chain.t
 t/18-from_text_file.t
 t/19-from_bin_file.t
 t/20-count.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

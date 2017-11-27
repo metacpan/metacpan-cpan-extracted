@@ -12,11 +12,11 @@ an existing distribution
 
 =head1 VERSION
 
-version 0.0.8
+version 0.0.9
 
 =cut
 
-our $VERSION = '0.0.8';
+our $VERSION = '0.0.9';
 
 =head1 SYNOPSIS
 
@@ -369,6 +369,9 @@ Andrew Kirkpatrick
 
 =item *
 Markus Böhme
+
+=item *
+Lisa Hare
 
 =back
 

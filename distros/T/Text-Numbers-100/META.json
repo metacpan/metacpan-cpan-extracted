@@ -29,7 +29,7 @@
    "provides" : {
       "Text::Numbers::100" : {
          "file" : "lib/Text/Numbers/100.pm",
-         "version" : "20171112"
+         "version" : "20171124"
       }
    },
    "release_status" : "stable",
@@ -38,5 +38,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "20171112"
+   "version" : "20171124"
 }

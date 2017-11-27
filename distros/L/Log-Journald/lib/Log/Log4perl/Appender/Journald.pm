@@ -57,8 +57,8 @@ sub log
 		$log{uc $key} = $value;
 	}
 
-	# Rename
-	$log{PRIORITY} = delete $log{LEVEL};
+	# Turn syslog level into journald priority
+	$log{PRIORITY} = 7 - delete $log{LEVEL};
 
 	Log::Journald::send (%log) or warn $!;
 }

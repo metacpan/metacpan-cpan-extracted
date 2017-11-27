@@ -28,7 +28,7 @@ resources:
   bugtracker: http://rt.perl.org/rt3/
   homepage: http://search.cpan.org/dist/ExtUtils-CBuilder
   repository: git://github.com/Perl-Toolchain-Gang/ExtUtils-CBuilder.git
-version: '0.280226'
+version: '0.280230'
 x_Dist_Zilla:
   perl:
     version: '5.026000'
@@ -148,9 +148,9 @@ x_Dist_Zilla:
       name: PodSyntaxTests
       version: '6.010'
     -
-      class: Dist::Zilla::Plugin::PkgVersion
-      name: PkgVersion
-      version: '6.010'
+      class: Dist::Zilla::Plugin::OurPkgVersion
+      name: OurPkgVersion
+      version: '0.12'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:

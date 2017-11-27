@@ -32,10 +32,10 @@ requires:
   warnings: '0'
 resources:
   repository: git://github.com/reyjrar/POE-Component-Server-eris.git
-version: '2.3'
+version: '2.4'
 x_Dist_Zilla:
   perl:
-    version: '5.024001'
+    version: '5.026000'
   plugins:
     -
       class: Dist::Zilla::Plugin::GatherDir
@@ -127,7 +127,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::CopyFilesFromBuild
       name: CopyFilesFromBuild
-      version: '0.161350'
+      version: '0.170880'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: MetaJSON
@@ -143,7 +143,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::CheckChangeLog
       name: CheckChangeLog
-      version: '0.02'
+      version: '0.05'
     -
       class: Dist::Zilla::Plugin::PodWeaver
       config:
@@ -155,75 +155,75 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::EnsurePod5
               name: '@CorePrep/EnsurePod5'
-              version: '4.013'
+              version: '4.015'
             -
               class: Pod::Weaver::Plugin::H1Nester
               name: '@CorePrep/H1Nester'
-              version: '4.013'
+              version: '4.015'
             -
               class: Pod::Weaver::Plugin::SingleEncoding
               name: '@Default/SingleEncoding'
-              version: '4.013'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Name
               name: '@Default/Name'
-              version: '4.013'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Version
               name: '@Default/Version'
-              version: '4.013'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Region
               name: '@Default/prelude'
-              version: '4.013'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Generic
               name: SYNOPSIS
-              version: '4.013'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Generic
               name: DESCRIPTION
-              version: '4.013'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Generic
               name: OVERVIEW
-              version: '4.013'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Collect
               name: ATTRIBUTES
-              version: '4.013'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Collect
               name: METHODS
-              version: '4.013'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Collect
               name: FUNCTIONS
-              version: '4.013'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Leftovers
               name: '@Default/Leftovers'
-              version: '4.013'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Region
               name: '@Default/postlude'
-              version: '4.013'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Authors
               name: '@Default/Authors'
-              version: '4.013'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Legal
               name: '@Default/Legal'
-              version: '4.013'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Collect
               name: EVENTS
-              version: '4.013'
+              version: '4.015'
             -
               class: Pod::Weaver::Plugin::Transformer
               name: -Transformer
-              version: '4.013'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Contributors
               name: Contributors
@@ -240,12 +240,12 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Test::EOL:
           filename: xt/author/eol.t
           finder:
-            - ':InstallModules'
             - ':ExecFiles'
+            - ':InstallModules'
             - ':TestFiles'
-          trailing_whitespace: '1'
+          trailing_whitespace: 1
       name: Test::EOL
-      version: '0.18'
+      version: '0.19'
     -
       class: Dist::Zilla::Plugin::PodCoverageTests
       name: PodCoverageTests
@@ -257,7 +257,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Test::Perl::Critic
       name: Test::Perl::Critic
-      version: '3.000'
+      version: '3.001'
     -
       class: Dist::Zilla::Plugin::Test::Compile
       config:
@@ -273,8 +273,9 @@ x_Dist_Zilla:
           script_finder:
             - ':PerlExecFiles'
           skips: []
+          switch: []
       name: Test::Compile
-      version: '2.054'
+      version: '2.056'
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: AutoPrereqs
@@ -299,9 +300,10 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.15.0
           repo_root: .
       name: '@Git/Check'
-      version: '2.039'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -315,11 +317,12 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.15.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Git/Commit'
-      version: '2.039'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -327,15 +330,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v2.3
+          tag: v2.4
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.15.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@Git/Tag'
-      version: '2.039'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -344,9 +348,10 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
+          git_version: 2.15.0
           repo_root: .
       name: '@Git/Push'
-      version: '2.039'
+      version: '2.042'
     -
       class: Dist::Zilla::Plugin::InstallRelease
       name: InstallRelease
@@ -396,4 +401,4 @@ x_Dist_Zilla:
     config:
       is_trial: '0'
     version: '6.010'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+x_serialization_backend: 'YAML::Tiny version 1.70'

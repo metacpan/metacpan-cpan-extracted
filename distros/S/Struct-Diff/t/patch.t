@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use Struct::Diff qw(diff patch);
-use Test::More tests => 16;
+use Test::More tests => 18;
 
 ### primitives ###
 my ($a, $b) = (0, 0);
@@ -79,3 +79,13 @@ is_deeply($a, $b, "MIXED: complex");
 $a = { 'a' => [ { 'aa' => { 'aaa' => [ 7, 4 ]}}, 8 ]}; # restore a
 patch($a, diff($a, $b, noO => 1, noU => 1));
 is_deeply($a, $b, "MIXED: same, but patch doesn't contain Unchanged");
+
+### different types ###
+($a, $b) = ([], {});
+patch($a, diff($a, $b));
+is_deeply($a, $b);
+
+($a, $b) = ({}, undef);
+patch($a, diff($a, $b));
+is_deeply($a, $b);
+

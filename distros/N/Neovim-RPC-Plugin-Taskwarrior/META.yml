@@ -1,0 +1,44 @@
+---
+abstract: 'UI for taskwarrior'
+author:
+  - 'Yanick Champoux <yanick@babyl.dyndns.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  strict: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Neovim-RPC-Plugin-Taskwarrior
+provides:
+  Neovim::RPC::Plugin::Taskwarrior:
+    file: lib/Neovim/RPC/Plugin/Taskwarrior.pm
+    version: v0.0.1
+requires:
+  DateTime: '0'
+  DateTime::Format::ISO8601: '0'
+  Neovim::RPC::Plugin: '0'
+  Promises: '0'
+  Taskwarrior::Kusarigama::Wrapper: '0'
+  experimental: '0'
+  perl: v5.20.0
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/yanick/Neovim-RPC-Plugin-Taskwarrior/issues
+  homepage: https://github.com/yanick/Neovim-RPC-Plugin-Taskwarrior
+  repository: https://github.com/yanick/Neovim-RPC-Plugin-Taskwarrior.git
+version: 0.0.1
+x_author_pledge:
+  version: 1
+x_authority: cpan:YANICK
+x_contributors:
+  - 'Yanick Champoux <yanick@cpan.org>'
+x_serialization_backend: 'YAML::Tiny version 1.67'

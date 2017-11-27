@@ -1,3 +1,5 @@
+## -*- mode: perl; -*-
+## no critic(Modules::ProhibitMultiplePackages Modules::RequireFilenameMatchesPackage)
 package Test::App::StepA;
 use strict;
 use warnings;

@@ -8,663 +8,802 @@ use Carp;
 require Exporter;
 use AutoLoader;
 
-# ABSTRACT: XS Wrapper around raylib
-# VERSION
-
-
 our @ISA = qw(Exporter);
 
 # Items to export into callers namespace by default. Note: do not export
 # names by default without a very good reason. Use EXPORT_OK instead.
 # Do not simply export all your public functions/methods/constants.
 
-# This allows declaration	use Graphics::Raylib::XS ':all';
+# This allows declaration    use Graphics::Raylib::XS ':all';
 # If you do not need this, moving things directly into @EXPORT or @EXPORT_OK
 # will save memory.
 our %EXPORT_TAGS = ( 'all' => [ qw(
-	BLEND_ADDITIVE
-	BLEND_ALPHA
-	BLEND_MULTIPLIED
-	CAMERA_CUSTOM
-	CAMERA_FIRST_PERSON
-	CAMERA_FREE
-	CAMERA_ORBITAL
-	CAMERA_THIRD_PERSON
-	COMPRESSED_ASTC_4x4_RGBA
-	COMPRESSED_ASTC_8x8_RGBA
-	COMPRESSED_DXT1_RGB
-	COMPRESSED_DXT1_RGBA
-	COMPRESSED_DXT3_RGBA
-	COMPRESSED_DXT5_RGBA
-	COMPRESSED_ETC1_RGB
-	COMPRESSED_ETC2_EAC_RGBA
-	COMPRESSED_ETC2_RGB
-	COMPRESSED_PVRT_RGB
-	COMPRESSED_PVRT_RGBA
-	DEG2RAD
-	FILTER_ANISOTROPIC_16X
-	FILTER_ANISOTROPIC_4X
-	FILTER_ANISOTROPIC_8X
-	FILTER_BILINEAR
-	FILTER_POINT
-	FILTER_TRILINEAR
-	FLAG_CENTERED_MODE
-	FLAG_FULLSCREEN_MODE
-	FLAG_MSAA_4X_HINT
-	FLAG_RESIZABLE_WINDOW
-	FLAG_SHOW_LOGO
-	FLAG_SHOW_MOUSE_CURSOR
-	FLAG_VSYNC_HINT
-	GAMEPAD_PLAYER1
-	GAMEPAD_PLAYER2
-	GAMEPAD_PLAYER3
-	GAMEPAD_PLAYER4
-	GAMEPAD_PS3_AXIS_L2
-	GAMEPAD_PS3_AXIS_LEFT_X
-	GAMEPAD_PS3_AXIS_LEFT_Y
-	GAMEPAD_PS3_AXIS_R2
-	GAMEPAD_PS3_AXIS_RIGHT_X
-	GAMEPAD_PS3_AXIS_RIGHT_Y
-	GAMEPAD_PS3_BUTTON_CIRCLE
-	GAMEPAD_PS3_BUTTON_CROSS
-	GAMEPAD_PS3_BUTTON_DOWN
-	GAMEPAD_PS3_BUTTON_L1
-	GAMEPAD_PS3_BUTTON_L2
-	GAMEPAD_PS3_BUTTON_LEFT
-	GAMEPAD_PS3_BUTTON_PS
-	GAMEPAD_PS3_BUTTON_R1
-	GAMEPAD_PS3_BUTTON_R2
-	GAMEPAD_PS3_BUTTON_RIGHT
-	GAMEPAD_PS3_BUTTON_SELECT
-	GAMEPAD_PS3_BUTTON_SQUARE
-	GAMEPAD_PS3_BUTTON_START
-	GAMEPAD_PS3_BUTTON_TRIANGLE
-	GAMEPAD_PS3_BUTTON_UP
-	GAMEPAD_XBOX_AXIS_LEFT_X
-	GAMEPAD_XBOX_AXIS_LEFT_Y
-	GAMEPAD_XBOX_AXIS_LT
-	GAMEPAD_XBOX_AXIS_RIGHT_X
-	GAMEPAD_XBOX_AXIS_RIGHT_Y
-	GAMEPAD_XBOX_AXIS_RT
-	GAMEPAD_XBOX_BUTTON_A
-	GAMEPAD_XBOX_BUTTON_B
-	GAMEPAD_XBOX_BUTTON_DOWN
-	GAMEPAD_XBOX_BUTTON_HOME
-	GAMEPAD_XBOX_BUTTON_LB
-	GAMEPAD_XBOX_BUTTON_LEFT
-	GAMEPAD_XBOX_BUTTON_RB
-	GAMEPAD_XBOX_BUTTON_RIGHT
-	GAMEPAD_XBOX_BUTTON_SELECT
-	GAMEPAD_XBOX_BUTTON_START
-	GAMEPAD_XBOX_BUTTON_UP
-	GAMEPAD_XBOX_BUTTON_X
-	GAMEPAD_XBOX_BUTTON_Y
-	GESTURE_DOUBLETAP
-	GESTURE_DRAG
-	GESTURE_HOLD
-	GESTURE_NONE
-	GESTURE_PINCH_IN
-	GESTURE_PINCH_OUT
-	GESTURE_SWIPE_DOWN
-	GESTURE_SWIPE_LEFT
-	GESTURE_SWIPE_RIGHT
-	GESTURE_SWIPE_UP
-	GESTURE_TAP
-	HMD_DEFAULT_DEVICE
-	HMD_FOVE_VR
-	HMD_GOOGLE_CARDBOARD
-	HMD_OCULUS_RIFT_CV1
-	HMD_OCULUS_RIFT_DK2
-	HMD_RAZER_OSVR
-	HMD_SAMSUNG_GEAR_VR
-	HMD_SONY_PLAYSTATION_VR
-	HMD_VALVE_HTC_VIVE
-	KEY_A
-	KEY_B
-	KEY_BACK
-	KEY_BACKSPACE
-	KEY_C
-	KEY_D
-	KEY_DOWN
-	KEY_E
-	KEY_EIGHT
-	KEY_ENTER
-	KEY_ESCAPE
-	KEY_F
-	KEY_F1
-	KEY_F10
-	KEY_F11
-	KEY_F12
-	KEY_F2
-	KEY_F3
-	KEY_F4
-	KEY_F5
-	KEY_F6
-	KEY_F7
-	KEY_F8
-	KEY_F9
-	KEY_FIVE
-	KEY_FOUR
-	KEY_G
-	KEY_H
-	KEY_I
-	KEY_J
-	KEY_K
-	KEY_L
-	KEY_LEFT
-	KEY_LEFT_ALT
-	KEY_LEFT_CONTROL
-	KEY_LEFT_SHIFT
-	KEY_M
-	KEY_MENU
-	KEY_N
-	KEY_NINE
-	KEY_O
-	KEY_ONE
-	KEY_P
-	KEY_Q
-	KEY_R
-	KEY_RIGHT
-	KEY_RIGHT_ALT
-	KEY_RIGHT_CONTROL
-	KEY_RIGHT_SHIFT
-	KEY_S
-	KEY_SEVEN
-	KEY_SIX
-	KEY_SPACE
-	KEY_T
-	KEY_THREE
-	KEY_TWO
-	KEY_U
-	KEY_UP
-	KEY_V
-	KEY_VOLUME_DOWN
-	KEY_VOLUME_UP
-	KEY_W
-	KEY_X
-	KEY_Y
-	KEY_Z
-	KEY_ZERO
-	LIGHT_DIRECTIONAL
-	LIGHT_POINT
-	LIGHT_SPOT
-	MAX_TOUCH_POINTS
-	MOUSE_LEFT_BUTTON
-	MOUSE_MIDDLE_BUTTON
-	MOUSE_RIGHT_BUTTON
-	RAD2DEG
-	UNCOMPRESSED_GRAYSCALE
-	UNCOMPRESSED_GRAY_ALPHA
-	UNCOMPRESSED_R4G4B4A4
-	UNCOMPRESSED_R5G5B5A1
-	UNCOMPRESSED_R5G6B5
-	UNCOMPRESSED_R8G8B8
-	UNCOMPRESSED_R8G8B8A8
-	WRAP_CLAMP
-	WRAP_MIRROR
-	WRAP_REPEAT
-	false
-	true
-	Begin2dMode
-	Begin3dMode
-	BeginBlendMode
-	BeginDrawing
-	BeginShaderMode
-	BeginTextureMode
-	CalculateBoundingBox
-	CheckCollisionBoxSphere
-	CheckCollisionBoxes
-	CheckCollisionCircleRec
-	CheckCollisionCircles
-	CheckCollisionPointCircle
-	CheckCollisionPointRec
-	CheckCollisionPointTriangle
-	CheckCollisionRayBox
-	CheckCollisionRaySphere
-	CheckCollisionRaySphereEx
-	CheckCollisionRecs
-	CheckCollisionSpheres
-	ClearBackground
-	ClearDroppedFiles
-	CloseAudioDevice
-	CloseAudioStream
-	CloseVrDevice
-	CloseWindow
-	ColorToFloat
-	CreateLight
-	DestroyLight
-	DisableCursor
-	DrawBillboard
-	DrawBillboardRec
-	DrawBoundingBox
-	DrawCircle
-	DrawCircle3D
-	DrawCircleGradient
-	DrawCircleLines
-	DrawCircleV
-	DrawCube
-	DrawCubeTexture
-	DrawCubeV
-	DrawCubeWires
-	DrawCylinder
-	DrawCylinderWires
-	DrawFPS
-	DrawGizmo
-	DrawGrid
-	DrawLight
-	DrawLine
-	DrawLine3D
-	DrawLineV
-	DrawModel
-	DrawModelEx
-	DrawModelWires
-	DrawModelWiresEx
-	DrawPixel
-	DrawPixelV
-	DrawPlane
-	DrawPoly
-	DrawPolyEx
-	DrawPolyExLines
-	DrawRay
-	DrawRectangle
-	DrawRectangleGradient
-	DrawRectangleLines
-	DrawRectangleRec
-	DrawRectangleV
-	DrawSphere
-	DrawSphereEx
-	DrawSphereWires
-	DrawText
-	DrawTextEx
-	DrawTexture
-	DrawTextureEx
-	DrawTexturePro
-	DrawTextureRec
-	DrawTextureV
-	DrawTriangle
-	DrawTriangleLines
-	EnableCursor
-	End2dMode
-	End3dMode
-	EndBlendMode
-	EndDrawing
-	EndShaderMode
-	EndTextureMode
-	Fade
-	FormatText
-	GenTextureMipmaps
-	GetCameraMatrix
-	GetCollisionRec
-	GetColor
-	GetDefaultFont
-	GetDefaultShader
-	GetDefaultTexture
-	GetFPS
-	GetFrameTime
-	GetGamepadAxisCount
-	GetGamepadAxisMovement
-	GetGamepadButtonPressed
-	GetGamepadName
-	GetGestureDetected
-	GetGestureDragAngle
-	GetGestureDragVector
-	GetGestureHoldDuration
-	GetGesturePinchAngle
-	GetGesturePinchVector
-	GetHexValue
-	GetImageData
-	GetKeyPressed
-	GetMousePosition
-	GetMouseRay
-	GetMouseWheelMove
-	GetMouseX
-	GetMouseY
-	GetMusicTimeLength
-	GetMusicTimePlayed
-	GetRandomValue
-	GetScreenHeight
-	GetScreenWidth
-	GetShaderLocation
-	GetStandardShader
-	GetTextureData
-	GetTouchPointsCount
-	GetTouchPosition
-	GetTouchX
-	GetTouchY
-	GetWaveData
-	GetWorldToScreen
-	HideCursor
-	ImageAlphaMask
-	ImageColorBrightness
-	ImageColorContrast
-	ImageColorGrayscale
-	ImageColorInvert
-	ImageColorTint
-	ImageCopy
-	ImageCrop
-	ImageDither
-	ImageDraw
-	ImageDrawText
-	ImageDrawTextEx
-	ImageFlipHorizontal
-	ImageFlipVertical
-	ImageFormat
-	ImageResize
-	ImageResizeNN
-	ImageText
-	ImageTextEx
-	ImageToPOT
-	InitAudioDevice
-	InitAudioStream
-	InitVrDevice
-	InitWindow
-	IsAudioBufferProcessed
-	IsAudioDeviceReady
-	IsCursorHidden
-	IsFileDropped
-	IsGamepadAvailable
-	IsGamepadButtonDown
-	IsGamepadButtonPressed
-	IsGamepadButtonReleased
-	IsGamepadButtonUp
-	IsGamepadName
-	IsGestureDetected
-	IsKeyDown
-	IsKeyPressed
-	IsKeyReleased
-	IsKeyUp
-	IsMouseButtonDown
-	IsMouseButtonPressed
-	IsMouseButtonReleased
-	IsMouseButtonUp
-	IsMusicPlaying
-	IsSoundPlaying
-	IsVrDeviceReady
-	IsVrSimulator
-	IsWindowMinimized
-	LoadCubicmap
-	LoadDefaultMaterial
-	LoadHeightmap
-	LoadImage
-	LoadImageEx
-	LoadImageFromRES
-	LoadImageRaw
-	LoadImageFromAV
+    BLEND_ADDITIVE
+    BLEND_ALPHA
+    BLEND_MULTIPLIED
+    CAMERA_CUSTOM
+    CAMERA_FIRST_PERSON
+    CAMERA_FREE
+    CAMERA_ORBITAL
+    CAMERA_THIRD_PERSON
+    COMPRESSED_ASTC_4x4_RGBA
+    COMPRESSED_ASTC_8x8_RGBA
+    COMPRESSED_DXT1_RGB
+    COMPRESSED_DXT1_RGBA
+    COMPRESSED_DXT3_RGBA
+    COMPRESSED_DXT5_RGBA
+    COMPRESSED_ETC1_RGB
+    COMPRESSED_ETC2_EAC_RGBA
+    COMPRESSED_ETC2_RGB
+    COMPRESSED_PVRT_RGB
+    COMPRESSED_PVRT_RGBA
+    DEG2RAD
+    FILTER_ANISOTROPIC_16X
+    FILTER_ANISOTROPIC_4X
+    FILTER_ANISOTROPIC_8X
+    FILTER_BILINEAR
+    FILTER_POINT
+    FILTER_TRILINEAR
+    FLAG_FULLSCREEN_MODE
+    FLAG_MSAA_4X_HINT
+    FLAG_SHOW_LOGO
+    FLAG_VSYNC_HINT
+    FLAG_WINDOW_DECORATED
+    FLAG_WINDOW_RESIZABLE
+    FLAG_WINDOW_TRANSPARENT
+    GAMEPAD_PLAYER1
+    GAMEPAD_PLAYER2
+    GAMEPAD_PLAYER3
+    GAMEPAD_PLAYER4
+    GAMEPAD_PS3_AXIS_L2
+    GAMEPAD_PS3_AXIS_LEFT_X
+    GAMEPAD_PS3_AXIS_LEFT_Y
+    GAMEPAD_PS3_AXIS_R2
+    GAMEPAD_PS3_AXIS_RIGHT_X
+    GAMEPAD_PS3_AXIS_RIGHT_Y
+    GAMEPAD_PS3_BUTTON_CIRCLE
+    GAMEPAD_PS3_BUTTON_CROSS
+    GAMEPAD_PS3_BUTTON_DOWN
+    GAMEPAD_PS3_BUTTON_L1
+    GAMEPAD_PS3_BUTTON_L2
+    GAMEPAD_PS3_BUTTON_LEFT
+    GAMEPAD_PS3_BUTTON_PS
+    GAMEPAD_PS3_BUTTON_R1
+    GAMEPAD_PS3_BUTTON_R2
+    GAMEPAD_PS3_BUTTON_RIGHT
+    GAMEPAD_PS3_BUTTON_SELECT
+    GAMEPAD_PS3_BUTTON_SQUARE
+    GAMEPAD_PS3_BUTTON_START
+    GAMEPAD_PS3_BUTTON_TRIANGLE
+    GAMEPAD_PS3_BUTTON_UP
+    GAMEPAD_XBOX_AXIS_LEFT_X
+    GAMEPAD_XBOX_AXIS_LEFT_Y
+    GAMEPAD_XBOX_AXIS_LT
+    GAMEPAD_XBOX_AXIS_RIGHT_X
+    GAMEPAD_XBOX_AXIS_RIGHT_Y
+    GAMEPAD_XBOX_AXIS_RT
+    GAMEPAD_XBOX_BUTTON_A
+    GAMEPAD_XBOX_BUTTON_B
+    GAMEPAD_XBOX_BUTTON_DOWN
+    GAMEPAD_XBOX_BUTTON_HOME
+    GAMEPAD_XBOX_BUTTON_LB
+    GAMEPAD_XBOX_BUTTON_LEFT
+    GAMEPAD_XBOX_BUTTON_RB
+    GAMEPAD_XBOX_BUTTON_RIGHT
+    GAMEPAD_XBOX_BUTTON_SELECT
+    GAMEPAD_XBOX_BUTTON_START
+    GAMEPAD_XBOX_BUTTON_UP
+    GAMEPAD_XBOX_BUTTON_X
+    GAMEPAD_XBOX_BUTTON_Y
+    GESTURE_DOUBLETAP
+    GESTURE_DRAG
+    GESTURE_HOLD
+    GESTURE_NONE
+    GESTURE_PINCH_IN
+    GESTURE_PINCH_OUT
+    GESTURE_SWIPE_DOWN
+    GESTURE_SWIPE_LEFT
+    GESTURE_SWIPE_RIGHT
+    GESTURE_SWIPE_UP
+    GESTURE_TAP
+    HMD_DEFAULT_DEVICE
+    HMD_OCULUS_GO
+    HMD_OCULUS_RIFT_CV1
+    HMD_OCULUS_RIFT_DK2
+    HMD_SONY_PSVR
+    HMD_VALVE_HTC_VIVE
+    KEY_A
+    KEY_B
+    KEY_BACK
+    KEY_BACKSPACE
+    KEY_C
+    KEY_D
+    KEY_DOWN
+    KEY_E
+    KEY_EIGHT
+    KEY_ENTER
+    KEY_ESCAPE
+    KEY_F
+    KEY_F1
+    KEY_F10
+    KEY_F11
+    KEY_F12
+    KEY_F2
+    KEY_F3
+    KEY_F4
+    KEY_F5
+    KEY_F6
+    KEY_F7
+    KEY_F8
+    KEY_F9
+    KEY_FIVE
+    KEY_FOUR
+    KEY_G
+    KEY_H
+    KEY_I
+    KEY_J
+    KEY_K
+    KEY_L
+    KEY_LEFT
+    KEY_LEFT_ALT
+    KEY_LEFT_CONTROL
+    KEY_LEFT_SHIFT
+    KEY_M
+    KEY_MENU
+    KEY_N
+    KEY_NINE
+    KEY_O
+    KEY_ONE
+    KEY_P
+    KEY_Q
+    KEY_R
+    KEY_RIGHT
+    KEY_RIGHT_ALT
+    KEY_RIGHT_CONTROL
+    KEY_RIGHT_SHIFT
+    KEY_S
+    KEY_SEVEN
+    KEY_SIX
+    KEY_SPACE
+    KEY_T
+    KEY_THREE
+    KEY_TWO
+    KEY_U
+    KEY_UP
+    KEY_V
+    KEY_VOLUME_DOWN
+    KEY_VOLUME_UP
+    KEY_W
+    KEY_X
+    KEY_Y
+    KEY_Z
+    KEY_ZERO
+    LOC_COLOR_AMBIENT
+    LOC_COLOR_DIFFUSE
+    LOC_COLOR_SPECULAR
+    LOC_MAP_ALBEDO
+    LOC_MAP_BRDF
+    LOC_MAP_CUBEMAP
+    LOC_MAP_DIFFUSE
+    LOC_MAP_EMISSION
+    LOC_MAP_HEIGHT
+    LOC_MAP_IRRADIANCE
+    LOC_MAP_METALNESS
+    LOC_MAP_NORMAL
+    LOC_MAP_OCCUSION
+    LOC_MAP_PREFILTER
+    LOC_MAP_ROUGHNESS
+    LOC_MAP_SPECULAR
+    LOC_MATRIX_MODEL
+    LOC_MATRIX_MVP
+    LOC_MATRIX_PROJECTION
+    LOC_MATRIX_VIEW
+    LOC_VECTOR_VIEW
+    LOC_VERTEX_COLOR
+    LOC_VERTEX_NORMAL
+    LOC_VERTEX_POSITION
+    LOC_VERTEX_TANGENT
+    LOC_VERTEX_TEXCOORD01
+    LOC_VERTEX_TEXCOORD02
+    LOG_DEBUG
+    LOG_ERROR
+    LOG_INFO
+    LOG_OTHER
+    LOG_WARNING
+    MAP_ALBEDO
+    MAP_BRDF
+    MAP_CUBEMAP
+    MAP_DIFFUSE
+    MAP_EMISSION
+    MAP_HEIGHT
+    MAP_IRRADIANCE
+    MAP_METALNESS
+    MAP_NORMAL
+    MAP_OCCLUSION
+    MAP_PREFILTER
+    MAP_ROUGHNESS
+    MAP_SPECULAR
+    MAX_MATERIAL_MAPS
+    MAX_SHADER_LOCATIONS
+    MAX_TOUCH_POINTS
+    MOUSE_LEFT_BUTTON
+    MOUSE_MIDDLE_BUTTON
+    MOUSE_RIGHT_BUTTON
+    RAD2DEG
+    RRES_TYPE_DIRECTORY
+    RRES_TYPE_FONT_CHARDATA
+    RRES_TYPE_FONT_IMAGE
+    RRES_TYPE_IMAGE
+    RRES_TYPE_RAW
+    RRES_TYPE_TEXT
+    RRES_TYPE_VERTEX
+    RRES_TYPE_WAVE
+    UNCOMPRESSED_GRAYSCALE
+    UNCOMPRESSED_GRAY_ALPHA
+    UNCOMPRESSED_R32G32B32
+    UNCOMPRESSED_R4G4B4A4
+    UNCOMPRESSED_R5G5B5A1
+    UNCOMPRESSED_R5G6B5
+    UNCOMPRESSED_R8G8B8
+    UNCOMPRESSED_R8G8B8A8
+    WRAP_CLAMP
+    WRAP_MIRROR
+    WRAP_REPEAT
+    false
+    true
+    Begin2dMode
+    Begin3dMode
+    BeginBlendMode
+    BeginDrawing
+    BeginShaderMode
+    BeginTextureMode
+    BeginVrDrawing
+    CalculateBoundingBox
+    ChangeDirectory
+    CheckCollisionBoxSphere
+    CheckCollisionBoxes
+    CheckCollisionCircleRec
+    CheckCollisionCircles
+    CheckCollisionPointCircle
+    CheckCollisionPointRec
+    CheckCollisionPointTriangle
+    CheckCollisionRayBox
+    CheckCollisionRaySphere
+    CheckCollisionRaySphereEx
+    CheckCollisionRecs
+    CheckCollisionSpheres
+    ClearBackground
+    ClearDroppedFiles
+    CloseAudioDevice
+    CloseAudioStream
+    CloseVrSimulator
+    CloseWindow
+    ColorToFloat
+    DisableCursor
+    DrawBillboard
+    DrawBillboardRec
+    DrawBoundingBox
+    DrawCircle
+    DrawCircle3D
+    DrawCircleGradient
+    DrawCircleLines
+    DrawCircleV
+    DrawCube
+    DrawCubeTexture
+    DrawCubeV
+    DrawCubeWires
+    DrawCylinder
+    DrawCylinderWires
+    DrawFPS
+    DrawGizmo
+    DrawGrid
+    DrawLine
+    DrawLine3D
+    DrawLineBezier
+    DrawLineEx
+    DrawLineV
+    DrawModel
+    DrawModelEx
+    DrawModelWires
+    DrawModelWiresEx
+    DrawPixel
+    DrawPixelV
+    DrawPlane
+    DrawPoly
+    DrawPolyEx
+    DrawPolyExLines
+    DrawRay
+    DrawRectangle
+    DrawRectangleGradientEx
+    DrawRectangleGradientH
+    DrawRectangleGradientV
+    DrawRectangleLines
+    DrawRectanglePro
+    DrawRectangleRec
+    DrawRectangleT
+    DrawRectangleV
+    DrawSphere
+    DrawSphereEx
+    DrawSphereWires
+    DrawText
+    DrawTextEx
+    DrawTexture
+    DrawTextureEx
+    DrawTexturePro
+    DrawTextureRec
+    DrawTextureV
+    DrawTriangle
+    DrawTriangleLines
+    EnableCursor
+    End2dMode
+    End3dMode
+    EndBlendMode
+    EndDrawing
+    EndShaderMode
+    EndTextureMode
+    EndVrDrawing
+    Fade
+    FormatText
+    GenImageCellular
+    GenImageChecked
+    GenImageColor
+    GenImageGradientH
+    GenImageGradientRadial
+    GenImageGradientV
+    GenImagePerlinNoise
+    GenImageWhiteNoise
+    GenMeshCube
+    GenMeshCubicmap
+    GenMeshCylinder
+    GenMeshHeightmap
+    GenMeshHemiSphere
+    GenMeshKnot
+    GenMeshPlane
+    GenMeshSphere
+    GenMeshTorus
+    GenTextureBRDF
+    GenTextureCubemap
+    GenTextureIrradiance
+    GenTextureMipmaps
+    GenTexturePrefilter
+    GetCameraMatrix
+    GetCollisionRayGround
+    GetCollisionRayMesh
+    GetCollisionRayTriangle
+    GetCollisionRec
+    GetColor
+    GetDefaultFont
+    GetDirectoryPath
+    GetExtension
+    GetFPS
+    GetFrameTime
+    GetGamepadAxisCount
+    GetGamepadAxisMovement
+    GetGamepadButtonPressed
+    GetGamepadName
+    GetGestureDetected
+    GetGestureDragAngle
+    GetGestureDragVector
+    GetGestureHoldDuration
+    GetGesturePinchAngle
+    GetGesturePinchVector
+    GetHexValue
+    GetImageData
+    GetKeyPressed
+    GetMousePosition
+    GetMouseRay
+    GetMouseWheelMove
+    GetMouseX
+    GetMouseY
+    GetMusicTimeLength
+    GetMusicTimePlayed
+    GetRandomValue
+    GetScreenHeight
+    GetScreenWidth
+    GetShaderDefault
+    GetShaderLocation
+    GetTextureData
+    GetTextureDefault
+    GetTouchPointsCount
+    GetTouchPosition
+    GetTouchX
+    GetTouchY
+    GetVrDeviceInfo
+    GetWaveData
+    GetWorkingDirectory
+    GetWorldToScreen
+    HideCursor
+    ImageAlphaMask
+    ImageColorBrightness
+    ImageColorContrast
+    ImageColorGrayscale
+    ImageColorInvert
+    ImageColorTint
+    ImageCopy
+    ImageCrop
+    ImageDither
+    ImageDraw
+    ImageDrawText
+    ImageDrawTextEx
+    ImageFlipHorizontal
+    ImageFlipVertical
+    ImageFormat
+    ImageResize
+    ImageResizeNN
+    ImageText
+    ImageTextEx
+    ImageToPOT
+    InitAudioDevice
+    InitAudioStream
+    InitVrSimulator
+    InitWindow
+    IsAudioBufferProcessed
+    IsAudioDeviceReady
+    IsCursorHidden
+    IsFileDropped
+    IsFileExtension
+    IsGamepadAvailable
+    IsGamepadButtonDown
+    IsGamepadButtonPressed
+    IsGamepadButtonReleased
+    IsGamepadButtonUp
+    IsGamepadName
+    IsGestureDetected
+    IsKeyDown
+    IsKeyPressed
+    IsKeyReleased
+    IsKeyUp
+    IsMouseButtonDown
+    IsMouseButtonPressed
+    IsMouseButtonReleased
+    IsMouseButtonUp
+    IsMusicPlaying
+    IsSoundPlaying
+    IsVrSimulatorReady
+    IsWindowMinimized
+    LoadImage
+    LoadImageEx
+    LoadImagePro
+    LoadImageRaw
+    LoadImageFromAV
     LoadImageFromAV_uninitialized_mem
     LoadImageFromAV_transposed
     LoadImageFromAV_transposed_uninitialized_mem
-	LoadMaterial
-	LoadModel
-	LoadModelEx
-	LoadModelFromRES
-	LoadMusicStream
-	LoadRenderTexture
-	LoadShader
-	LoadSound
-	LoadSoundFromRES
-	LoadSoundFromWave
-	LoadSpriteFont
-	LoadSpriteFontTTF
-	LoadStandardMaterial
-	LoadTexture
-	LoadTextureEx
-	LoadTextureFromImage
-	LoadTextureFromRES
-	LoadWave
-	LoadWaveEx
-	MatrixToFloat
-	MeasureText
-	MeasureTextEx
-	PauseAudioStream
-	PauseMusicStream
-	PauseSound
-	PlayAudioStream
-	PlayMusicStream
-	PlaySound
-	ResumeAudioStream
-	ResumeMusicStream
-	ResumeSound
-	SetCameraAltControl
-	SetCameraMode
-	SetCameraMoveControls
-	SetCameraPanControl
-	SetCameraSmoothZoomControl
-	SetConfigFlags
-	SetExitKey
-	SetGesturesEnabled
-	SetMatrixModelview
-	SetMatrixProjection
-	SetMousePosition
-	SetMusicPitch
-	SetMusicVolume
-	SetShaderValue
-	SetShaderValueMatrix
-	SetShaderValuei
-	SetSoundPitch
-	SetSoundVolume
-	SetTargetFPS
-	SetTextureFilter
-	SetTextureWrap
-	ShowCursor
-	ShowLogo
-	StopAudioStream
-	StopMusicStream
-	StopSound
-	StorageLoadValue
-	StorageSaveValue
-	SubText
-	ToggleFullscreen
-	ToggleVrMode
-	UnloadImage
-	UnloadMaterial
-	UnloadModel
-	UnloadMusicStream
-	UnloadRenderTexture
-	UnloadShader
-	UnloadSound
-	UnloadSpriteFont
-	UnloadTexture
-	UnloadWave
-	UpdateAudioStream
-	UpdateCamera
-	UpdateMusicStream
-	UpdateSound
-	UpdateTexture
-	UpdateTextureFromImage
-	UpdateVrTracking
-	VectorToFloat
-	WaveCopy
-	WaveCrop
-	WaveFormat
-	WindowShouldClose
+    LoadMaterial
+    LoadMaterialDefault
+    LoadMesh
+    LoadModel
+    LoadModelFromMesh
+    LoadMusicStream
+    LoadRenderTexture
+    LoadShader
+    LoadSound
+    LoadSoundFromWave
+    LoadSpriteFont
+    LoadSpriteFontEx
+    LoadText
+    LoadTexture
+    LoadTextureFromImage
+    LoadWave
+    LoadWaveEx
+    MatrixIdentity
+    MatrixToFloat
+    MeasureText
+    MeasureTextEx
+    PauseAudioStream
+    PauseMusicStream
+    PauseSound
+    PlayAudioStream
+    PlayMusicStream
+    PlaySound
+    ResumeAudioStream
+    ResumeMusicStream
+    ResumeSound
+    SaveImageAs
+    SetCameraAltControl
+    SetCameraMode
+    SetCameraMoveControls
+    SetCameraPanControl
+    SetCameraSmoothZoomControl
+    SetConfigFlags
+    SetExitKey
+    SetGesturesEnabled
+    SetMasterVolume
+    SetMatrixModelview
+    SetMatrixProjection
+    SetMousePosition
+    SetMusicLoopCount
+    SetMusicPitch
+    SetMusicVolume
+    SetShaderValue
+    SetShaderValueMatrix
+    SetShaderValuei
+    SetSoundPitch
+    SetSoundVolume
+    SetTargetFPS
+    SetTextureFilter
+    SetTextureWrap
+    SetVrDistortionShader
+    SetWindowIcon
+    SetWindowMinSize
+    SetWindowMonitor
+    SetWindowPosition
+    SetWindowTitle
+    ShowCursor
+    ShowLogo
+    StopAudioStream
+    StopMusicStream
+    StopSound
+    StorageLoadValue
+    StorageSaveValue
+    SubText
+    TakeScreenshot
+    ToggleFullscreen
+    ToggleVrMode
+    TraceLog
+    UnloadImage
+    UnloadMaterial
+    UnloadMesh
+    UnloadModel
+    UnloadMusicStream
+    UnloadRenderTexture
+    UnloadShader
+    UnloadSound
+    UnloadSpriteFont
+    UnloadTexture
+    UnloadWave
+    UpdateAudioStream
+    UpdateCamera
+    UpdateMusicStream
+    UpdateSound
+    UpdateTexture
+    UpdateTextureFromImage
+    UpdateVrTracking
+    Vector3One
+    Vector3ToFloat
+    Vector3Zero
+    WaveCopy
+    WaveCrop
+    WaveFormat
+    WindowShouldClose
 ) ] );
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 
 our @EXPORT = qw(
-	BLEND_ADDITIVE
-	BLEND_ALPHA
-	BLEND_MULTIPLIED
-	CAMERA_CUSTOM
-	CAMERA_FIRST_PERSON
-	CAMERA_FREE
-	CAMERA_ORBITAL
-	CAMERA_THIRD_PERSON
-	COMPRESSED_ASTC_4x4_RGBA
-	COMPRESSED_ASTC_8x8_RGBA
-	COMPRESSED_DXT1_RGB
-	COMPRESSED_DXT1_RGBA
-	COMPRESSED_DXT3_RGBA
-	COMPRESSED_DXT5_RGBA
-	COMPRESSED_ETC1_RGB
-	COMPRESSED_ETC2_EAC_RGBA
-	COMPRESSED_ETC2_RGB
-	COMPRESSED_PVRT_RGB
-	COMPRESSED_PVRT_RGBA
-	DEG2RAD
-	FILTER_ANISOTROPIC_16X
-	FILTER_ANISOTROPIC_4X
-	FILTER_ANISOTROPIC_8X
-	FILTER_BILINEAR
-	FILTER_POINT
-	FILTER_TRILINEAR
-	FLAG_CENTERED_MODE
-	FLAG_FULLSCREEN_MODE
-	FLAG_MSAA_4X_HINT
-	FLAG_RESIZABLE_WINDOW
-	FLAG_SHOW_LOGO
-	FLAG_SHOW_MOUSE_CURSOR
-	FLAG_VSYNC_HINT
-	GAMEPAD_PLAYER1
-	GAMEPAD_PLAYER2
-	GAMEPAD_PLAYER3
-	GAMEPAD_PLAYER4
-	GAMEPAD_PS3_AXIS_L2
-	GAMEPAD_PS3_AXIS_LEFT_X
-	GAMEPAD_PS3_AXIS_LEFT_Y
-	GAMEPAD_PS3_AXIS_R2
-	GAMEPAD_PS3_AXIS_RIGHT_X
-	GAMEPAD_PS3_AXIS_RIGHT_Y
-	GAMEPAD_PS3_BUTTON_CIRCLE
-	GAMEPAD_PS3_BUTTON_CROSS
-	GAMEPAD_PS3_BUTTON_DOWN
-	GAMEPAD_PS3_BUTTON_L1
-	GAMEPAD_PS3_BUTTON_L2
-	GAMEPAD_PS3_BUTTON_LEFT
-	GAMEPAD_PS3_BUTTON_PS
-	GAMEPAD_PS3_BUTTON_R1
-	GAMEPAD_PS3_BUTTON_R2
-	GAMEPAD_PS3_BUTTON_RIGHT
-	GAMEPAD_PS3_BUTTON_SELECT
-	GAMEPAD_PS3_BUTTON_SQUARE
-	GAMEPAD_PS3_BUTTON_START
-	GAMEPAD_PS3_BUTTON_TRIANGLE
-	GAMEPAD_PS3_BUTTON_UP
-	GAMEPAD_XBOX_AXIS_LEFT_X
-	GAMEPAD_XBOX_AXIS_LEFT_Y
-	GAMEPAD_XBOX_AXIS_LT
-	GAMEPAD_XBOX_AXIS_RIGHT_X
-	GAMEPAD_XBOX_AXIS_RIGHT_Y
-	GAMEPAD_XBOX_AXIS_RT
-	GAMEPAD_XBOX_BUTTON_A
-	GAMEPAD_XBOX_BUTTON_B
-	GAMEPAD_XBOX_BUTTON_DOWN
-	GAMEPAD_XBOX_BUTTON_HOME
-	GAMEPAD_XBOX_BUTTON_LB
-	GAMEPAD_XBOX_BUTTON_LEFT
-	GAMEPAD_XBOX_BUTTON_RB
-	GAMEPAD_XBOX_BUTTON_RIGHT
-	GAMEPAD_XBOX_BUTTON_SELECT
-	GAMEPAD_XBOX_BUTTON_START
-	GAMEPAD_XBOX_BUTTON_UP
-	GAMEPAD_XBOX_BUTTON_X
-	GAMEPAD_XBOX_BUTTON_Y
-	GESTURE_DOUBLETAP
-	GESTURE_DRAG
-	GESTURE_HOLD
-	GESTURE_NONE
-	GESTURE_PINCH_IN
-	GESTURE_PINCH_OUT
-	GESTURE_SWIPE_DOWN
-	GESTURE_SWIPE_LEFT
-	GESTURE_SWIPE_RIGHT
-	GESTURE_SWIPE_UP
-	GESTURE_TAP
-	HMD_DEFAULT_DEVICE
-	HMD_FOVE_VR
-	HMD_GOOGLE_CARDBOARD
-	HMD_OCULUS_RIFT_CV1
-	HMD_OCULUS_RIFT_DK2
-	HMD_RAZER_OSVR
-	HMD_SAMSUNG_GEAR_VR
-	HMD_SONY_PLAYSTATION_VR
-	HMD_VALVE_HTC_VIVE
-	KEY_A
-	KEY_B
-	KEY_BACK
-	KEY_BACKSPACE
-	KEY_C
-	KEY_D
-	KEY_DOWN
-	KEY_E
-	KEY_EIGHT
-	KEY_ENTER
-	KEY_ESCAPE
-	KEY_F
-	KEY_F1
-	KEY_F10
-	KEY_F11
-	KEY_F12
-	KEY_F2
-	KEY_F3
-	KEY_F4
-	KEY_F5
-	KEY_F6
-	KEY_F7
-	KEY_F8
-	KEY_F9
-	KEY_FIVE
-	KEY_FOUR
-	KEY_G
-	KEY_H
-	KEY_I
-	KEY_J
-	KEY_K
-	KEY_L
-	KEY_LEFT
-	KEY_LEFT_ALT
-	KEY_LEFT_CONTROL
-	KEY_LEFT_SHIFT
-	KEY_M
-	KEY_MENU
-	KEY_N
-	KEY_NINE
-	KEY_O
-	KEY_ONE
-	KEY_P
-	KEY_Q
-	KEY_R
-	KEY_RIGHT
-	KEY_RIGHT_ALT
-	KEY_RIGHT_CONTROL
-	KEY_RIGHT_SHIFT
-	KEY_S
-	KEY_SEVEN
-	KEY_SIX
-	KEY_SPACE
-	KEY_T
-	KEY_THREE
-	KEY_TWO
-	KEY_U
-	KEY_UP
-	KEY_V
-	KEY_VOLUME_DOWN
-	KEY_VOLUME_UP
-	KEY_W
-	KEY_X
-	KEY_Y
-	KEY_Z
-	KEY_ZERO
-	LIGHT_DIRECTIONAL
-	LIGHT_POINT
-	LIGHT_SPOT
-	MAX_TOUCH_POINTS
-	MOUSE_LEFT_BUTTON
-	MOUSE_MIDDLE_BUTTON
-	MOUSE_RIGHT_BUTTON
-	RAD2DEG
-	UNCOMPRESSED_GRAYSCALE
-	UNCOMPRESSED_GRAY_ALPHA
-	UNCOMPRESSED_R4G4B4A4
-	UNCOMPRESSED_R5G5B5A1
-	UNCOMPRESSED_R5G6B5
-	UNCOMPRESSED_R8G8B8
-	UNCOMPRESSED_R8G8B8A8
-	WRAP_CLAMP
-	WRAP_MIRROR
-	WRAP_REPEAT
-	false
-	true
+    BLEND_ADDITIVE
+    BLEND_ALPHA
+    BLEND_MULTIPLIED
+    CAMERA_CUSTOM
+    CAMERA_FIRST_PERSON
+    CAMERA_FREE
+    CAMERA_ORBITAL
+    CAMERA_THIRD_PERSON
+    COMPRESSED_ASTC_4x4_RGBA
+    COMPRESSED_ASTC_8x8_RGBA
+    COMPRESSED_DXT1_RGB
+    COMPRESSED_DXT1_RGBA
+    COMPRESSED_DXT3_RGBA
+    COMPRESSED_DXT5_RGBA
+    COMPRESSED_ETC1_RGB
+    COMPRESSED_ETC2_EAC_RGBA
+    COMPRESSED_ETC2_RGB
+    COMPRESSED_PVRT_RGB
+    COMPRESSED_PVRT_RGBA
+    DEG2RAD
+    FILTER_ANISOTROPIC_16X
+    FILTER_ANISOTROPIC_4X
+    FILTER_ANISOTROPIC_8X
+    FILTER_BILINEAR
+    FILTER_POINT
+    FILTER_TRILINEAR
+    FLAG_FULLSCREEN_MODE
+    FLAG_MSAA_4X_HINT
+    FLAG_SHOW_LOGO
+    FLAG_VSYNC_HINT
+    FLAG_WINDOW_DECORATED
+    FLAG_WINDOW_RESIZABLE
+    FLAG_WINDOW_TRANSPARENT
+    GAMEPAD_PLAYER1
+    GAMEPAD_PLAYER2
+    GAMEPAD_PLAYER3
+    GAMEPAD_PLAYER4
+    GAMEPAD_PS3_AXIS_L2
+    GAMEPAD_PS3_AXIS_LEFT_X
+    GAMEPAD_PS3_AXIS_LEFT_Y
+    GAMEPAD_PS3_AXIS_R2
+    GAMEPAD_PS3_AXIS_RIGHT_X
+    GAMEPAD_PS3_AXIS_RIGHT_Y
+    GAMEPAD_PS3_BUTTON_CIRCLE
+    GAMEPAD_PS3_BUTTON_CROSS
+    GAMEPAD_PS3_BUTTON_DOWN
+    GAMEPAD_PS3_BUTTON_L1
+    GAMEPAD_PS3_BUTTON_L2
+    GAMEPAD_PS3_BUTTON_LEFT
+    GAMEPAD_PS3_BUTTON_PS
+    GAMEPAD_PS3_BUTTON_R1
+    GAMEPAD_PS3_BUTTON_R2
+    GAMEPAD_PS3_BUTTON_RIGHT
+    GAMEPAD_PS3_BUTTON_SELECT
+    GAMEPAD_PS3_BUTTON_SQUARE
+    GAMEPAD_PS3_BUTTON_START
+    GAMEPAD_PS3_BUTTON_TRIANGLE
+    GAMEPAD_PS3_BUTTON_UP
+    GAMEPAD_XBOX_AXIS_LEFT_X
+    GAMEPAD_XBOX_AXIS_LEFT_Y
+    GAMEPAD_XBOX_AXIS_LT
+    GAMEPAD_XBOX_AXIS_RIGHT_X
+    GAMEPAD_XBOX_AXIS_RIGHT_Y
+    GAMEPAD_XBOX_AXIS_RT
+    GAMEPAD_XBOX_BUTTON_A
+    GAMEPAD_XBOX_BUTTON_B
+    GAMEPAD_XBOX_BUTTON_DOWN
+    GAMEPAD_XBOX_BUTTON_HOME
+    GAMEPAD_XBOX_BUTTON_LB
+    GAMEPAD_XBOX_BUTTON_LEFT
+    GAMEPAD_XBOX_BUTTON_RB
+    GAMEPAD_XBOX_BUTTON_RIGHT
+    GAMEPAD_XBOX_BUTTON_SELECT
+    GAMEPAD_XBOX_BUTTON_START
+    GAMEPAD_XBOX_BUTTON_UP
+    GAMEPAD_XBOX_BUTTON_X
+    GAMEPAD_XBOX_BUTTON_Y
+    GESTURE_DOUBLETAP
+    GESTURE_DRAG
+    GESTURE_HOLD
+    GESTURE_NONE
+    GESTURE_PINCH_IN
+    GESTURE_PINCH_OUT
+    GESTURE_SWIPE_DOWN
+    GESTURE_SWIPE_LEFT
+    GESTURE_SWIPE_RIGHT
+    GESTURE_SWIPE_UP
+    GESTURE_TAP
+    HMD_DEFAULT_DEVICE
+    HMD_OCULUS_GO
+    HMD_OCULUS_RIFT_CV1
+    HMD_OCULUS_RIFT_DK2
+    HMD_SONY_PSVR
+    HMD_VALVE_HTC_VIVE
+    KEY_A
+    KEY_B
+    KEY_BACK
+    KEY_BACKSPACE
+    KEY_C
+    KEY_D
+    KEY_DOWN
+    KEY_E
+    KEY_EIGHT
+    KEY_ENTER
+    KEY_ESCAPE
+    KEY_F
+    KEY_F1
+    KEY_F10
+    KEY_F11
+    KEY_F12
+    KEY_F2
+    KEY_F3
+    KEY_F4
+    KEY_F5
+    KEY_F6
+    KEY_F7
+    KEY_F8
+    KEY_F9
+    KEY_FIVE
+    KEY_FOUR
+    KEY_G
+    KEY_H
+    KEY_I
+    KEY_J
+    KEY_K
+    KEY_L
+    KEY_LEFT
+    KEY_LEFT_ALT
+    KEY_LEFT_CONTROL
+    KEY_LEFT_SHIFT
+    KEY_M
+    KEY_MENU
+    KEY_N
+    KEY_NINE
+    KEY_O
+    KEY_ONE
+    KEY_P
+    KEY_Q
+    KEY_R
+    KEY_RIGHT
+    KEY_RIGHT_ALT
+    KEY_RIGHT_CONTROL
+    KEY_RIGHT_SHIFT
+    KEY_S
+    KEY_SEVEN
+    KEY_SIX
+    KEY_SPACE
+    KEY_T
+    KEY_THREE
+    KEY_TWO
+    KEY_U
+    KEY_UP
+    KEY_V
+    KEY_VOLUME_DOWN
+    KEY_VOLUME_UP
+    KEY_W
+    KEY_X
+    KEY_Y
+    KEY_Z
+    KEY_ZERO
+    LOC_COLOR_AMBIENT
+    LOC_COLOR_DIFFUSE
+    LOC_COLOR_SPECULAR
+    LOC_MAP_ALBEDO
+    LOC_MAP_BRDF
+    LOC_MAP_CUBEMAP
+    LOC_MAP_DIFFUSE
+    LOC_MAP_EMISSION
+    LOC_MAP_HEIGHT
+    LOC_MAP_IRRADIANCE
+    LOC_MAP_METALNESS
+    LOC_MAP_NORMAL
+    LOC_MAP_OCCUSION
+    LOC_MAP_PREFILTER
+    LOC_MAP_ROUGHNESS
+    LOC_MAP_SPECULAR
+    LOC_MATRIX_MODEL
+    LOC_MATRIX_MVP
+    LOC_MATRIX_PROJECTION
+    LOC_MATRIX_VIEW
+    LOC_VECTOR_VIEW
+    LOC_VERTEX_COLOR
+    LOC_VERTEX_NORMAL
+    LOC_VERTEX_POSITION
+    LOC_VERTEX_TANGENT
+    LOC_VERTEX_TEXCOORD01
+    LOC_VERTEX_TEXCOORD02
+    LOG_DEBUG
+    LOG_ERROR
+    LOG_INFO
+    LOG_OTHER
+    LOG_WARNING
+    MAP_ALBEDO
+    MAP_BRDF
+    MAP_CUBEMAP
+    MAP_DIFFUSE
+    MAP_EMISSION
+    MAP_HEIGHT
+    MAP_IRRADIANCE
+    MAP_METALNESS
+    MAP_NORMAL
+    MAP_OCCLUSION
+    MAP_PREFILTER
+    MAP_ROUGHNESS
+    MAP_SPECULAR
+    MAX_MATERIAL_MAPS
+    MAX_SHADER_LOCATIONS
+    MAX_TOUCH_POINTS
+    MOUSE_LEFT_BUTTON
+    MOUSE_MIDDLE_BUTTON
+    MOUSE_RIGHT_BUTTON
+    RAD2DEG
+    RRES_TYPE_DIRECTORY
+    RRES_TYPE_FONT_CHARDATA
+    RRES_TYPE_FONT_IMAGE
+    RRES_TYPE_IMAGE
+    RRES_TYPE_RAW
+    RRES_TYPE_TEXT
+    RRES_TYPE_VERTEX
+    RRES_TYPE_WAVE
+    UNCOMPRESSED_GRAYSCALE
+    UNCOMPRESSED_GRAY_ALPHA
+    UNCOMPRESSED_R32G32B32
+    UNCOMPRESSED_R4G4B4A4
+    UNCOMPRESSED_R5G5B5A1
+    UNCOMPRESSED_R5G6B5
+    UNCOMPRESSED_R8G8B8
+    UNCOMPRESSED_R8G8B8A8
+    WRAP_CLAMP
+    WRAP_MIRROR
+    WRAP_REPEAT
+    false
+    true
 );
 
 our $VERSION = '0.01';
@@ -680,14 +819,14 @@ sub AUTOLOAD {
     my ($error, $val) = constant($constname);
     if ($error) { croak $error; }
     {
-	no strict 'refs';
-	# Fixed between 5.005_53 and 5.005_61
-#XXX	if ($] >= 5.00561) {
-#XXX	    *$AUTOLOAD = sub () { $val };
-#XXX	}
-#XXX	else {
-	    *$AUTOLOAD = sub { $val };
-#XXX	}
+    no strict 'refs';
+    # Fixed between 5.005_53 and 5.005_61
+#XXX    if ($] >= 5.00561) {
+#XXX        *$AUTOLOAD = sub () { $val };
+#XXX    }
+#XXX    else {
+        *$AUTOLOAD = sub { $val };
+#XXX    }
     }
     goto &$AUTOLOAD;
 }
@@ -701,6 +840,7 @@ XSLoader::load('Graphics::Raylib::XS', $VERSION);
 
 1;
 __END__
+# Below is stub documentation for your module. You'd better edit it!
 
 =head1 NAME
 
@@ -712,7 +852,11 @@ Graphics::Raylib::XS - XS wrapper around raylib
 
 =head1 DESCRIPTION
 
-See L<Graphics::Raylib> for a Perlish wrapper.
+See L<Graphics::Raylib> for a Perlish wrapper. This XS wrapper wraps version 1.9.1-dev.
+
+=head2 EXPORT
+
+None by default.
 
 =head2 EXPORT
 
@@ -746,13 +890,13 @@ None by default.
   FILTER_BILINEAR
   FILTER_POINT
   FILTER_TRILINEAR
-  FLAG_CENTERED_MODE
   FLAG_FULLSCREEN_MODE
   FLAG_MSAA_4X_HINT
-  FLAG_RESIZABLE_WINDOW
   FLAG_SHOW_LOGO
-  FLAG_SHOW_MOUSE_CURSOR
   FLAG_VSYNC_HINT
+  FLAG_WINDOW_DECORATED
+  FLAG_WINDOW_RESIZABLE
+  FLAG_WINDOW_TRANSPARENT
   GAMEPAD_PLAYER1
   GAMEPAD_PLAYER2
   GAMEPAD_PLAYER3
@@ -809,13 +953,10 @@ None by default.
   GESTURE_SWIPE_UP
   GESTURE_TAP
   HMD_DEFAULT_DEVICE
-  HMD_FOVE_VR
-  HMD_GOOGLE_CARDBOARD
+  HMD_OCULUS_GO
   HMD_OCULUS_RIFT_CV1
   HMD_OCULUS_RIFT_DK2
-  HMD_RAZER_OSVR
-  HMD_SAMSUNG_GEAR_VR
-  HMD_SONY_PLAYSTATION_VR
+  HMD_SONY_PSVR
   HMD_VALVE_HTC_VIVE
   KEY_A
   KEY_B
@@ -883,16 +1024,69 @@ None by default.
   KEY_Y
   KEY_Z
   KEY_ZERO
-  LIGHT_DIRECTIONAL
-  LIGHT_POINT
-  LIGHT_SPOT
+  LOC_COLOR_AMBIENT
+  LOC_COLOR_DIFFUSE
+  LOC_COLOR_SPECULAR
+  LOC_MAP_ALBEDO
+  LOC_MAP_BRDF
+  LOC_MAP_CUBEMAP
+  LOC_MAP_DIFFUSE
+  LOC_MAP_EMISSION
+  LOC_MAP_HEIGHT
+  LOC_MAP_IRRADIANCE
+  LOC_MAP_METALNESS
+  LOC_MAP_NORMAL
+  LOC_MAP_OCCUSION
+  LOC_MAP_PREFILTER
+  LOC_MAP_ROUGHNESS
+  LOC_MAP_SPECULAR
+  LOC_MATRIX_MODEL
+  LOC_MATRIX_MVP
+  LOC_MATRIX_PROJECTION
+  LOC_MATRIX_VIEW
+  LOC_VECTOR_VIEW
+  LOC_VERTEX_COLOR
+  LOC_VERTEX_NORMAL
+  LOC_VERTEX_POSITION
+  LOC_VERTEX_TANGENT
+  LOC_VERTEX_TEXCOORD01
+  LOC_VERTEX_TEXCOORD02
+  LOG_DEBUG
+  LOG_ERROR
+  LOG_INFO
+  LOG_OTHER
+  LOG_WARNING
+  MAP_ALBEDO
+  MAP_BRDF
+  MAP_CUBEMAP
+  MAP_DIFFUSE
+  MAP_EMISSION
+  MAP_HEIGHT
+  MAP_IRRADIANCE
+  MAP_METALNESS
+  MAP_NORMAL
+  MAP_OCCLUSION
+  MAP_PREFILTER
+  MAP_ROUGHNESS
+  MAP_SPECULAR
+  MAX_MATERIAL_MAPS
+  MAX_SHADER_LOCATIONS
   MAX_TOUCH_POINTS
   MOUSE_LEFT_BUTTON
   MOUSE_MIDDLE_BUTTON
   MOUSE_RIGHT_BUTTON
   RAD2DEG
+  RRES_TYPE_DIRECTORY
+  RRES_TYPE_FONT_CHARDATA
+  RRES_TYPE_FONT_IMAGE
+  RRES_TYPE_IMAGE
+  RRES_TYPE_RAW
+  RRES_TYPE_TEXT
+  RRES_TYPE_VERTEX
+  RRES_TYPE_WAVE
   UNCOMPRESSED_GRAYSCALE
   UNCOMPRESSED_GRAY_ALPHA
+  UNCOMPRESSED_R32G32B32
   UNCOMPRESSED_R4G4B4A4
   UNCOMPRESSED_R5G5B5A1
   UNCOMPRESSED_R5G6B5
@@ -912,31 +1106,33 @@ None by default.
   void BeginDrawing(void)
   void BeginShaderMode(Shader shader)
   void BeginTextureMode(RenderTexture2D target)
+  void BeginVrDrawing(void)
   BoundingBox CalculateBoundingBox(Mesh mesh)
-  int CheckCollisionBoxSphere(BoundingBox box, Vector3 centerSphere, float radiusSphere)
-  int CheckCollisionBoxes(BoundingBox box1, BoundingBox box2)
-  int CheckCollisionCircleRec(Vector2 center, float radius, Rectangle rec)
-  int CheckCollisionCircles(Vector2 center1, float radius1, Vector2 center2, float radius2)
-  int CheckCollisionPointCircle(Vector2 point, Vector2 center, float radius)
-  int CheckCollisionPointRec(Vector2 point, Rectangle rec)
-  int CheckCollisionPointTriangle(Vector2 point, Vector2 p1, Vector2 p2, Vector2 p3)
-  int CheckCollisionRayBox(Ray ray, BoundingBox box)
-  int CheckCollisionRaySphere(Ray ray, Vector3 spherePosition, float sphereRadius)
-  int CheckCollisionRaySphereEx(Ray ray, Vector3 spherePosition, float sphereRadius, Vector3 *collisionPoint)
-  int CheckCollisionRecs(Rectangle rec1, Rectangle rec2)
-  int CheckCollisionSpheres(Vector3 centerA, float radiusA, Vector3 centerB, float radiusB)
+  bool ChangeDirectory(const char *dir)
+  bool CheckCollisionBoxSphere(BoundingBox box, Vector3 centerSphere, float radiusSphere)
+  bool CheckCollisionBoxes(BoundingBox box1, BoundingBox box2)
+  bool CheckCollisionCircleRec(Vector2 center, float radius, Rectangle rec)
+  bool CheckCollisionCircles(Vector2 center1, float radius1, Vector2 center2, float radius2)
+  bool CheckCollisionPointCircle(Vector2 point, Vector2 center, float radius)
+  bool CheckCollisionPointRec(Vector2 point, Rectangle rec)
+  bool CheckCollisionPointTriangle(Vector2 point, Vector2 p1, Vector2 p2, Vector2 p3)
+  bool CheckCollisionRayBox(Ray ray, BoundingBox box)
+  bool CheckCollisionRaySphere(Ray ray, Vector3 spherePosition, float sphereRadius)
+  bool CheckCollisionRaySphereEx(Ray ray, Vector3 spherePosition, float sphereRadius,
+                                     Vector3 *collisionPoint)
+  bool CheckCollisionRecs(Rectangle rec1, Rectangle rec2)
+  bool CheckCollisionSpheres(Vector3 centerA, float radiusA, Vector3 centerB, float radiusB)
   void ClearBackground(Color color)
   void ClearDroppedFiles(void)
   void CloseAudioDevice(void)
   void CloseAudioStream(AudioStream stream)
-  void CloseVrDevice(void)
+  void CloseVrSimulator(void)
   void CloseWindow(void)
   float *ColorToFloat(Color color)
-  Light CreateLight(int type, Vector3 position, Color diffuse)
-  void DestroyLight(Light light)
   void DisableCursor(void)
   void DrawBillboard(Camera camera, Texture2D texture, Vector3 center, float size, Color tint)
-  void DrawBillboardRec(Camera camera, Texture2D texture, Rectangle sourceRec, Vector3 center, float size, Color tint)
+  void DrawBillboardRec(Camera camera, Texture2D texture, Rectangle sourceRec,
+                            Vector3 center, float size, Color tint)
   void DrawBoundingBox(BoundingBox box, Color color)
   void DrawCircle(int centerX, int centerY, float radius, Color color)
   void DrawCircle3D(Vector3 center, float radius, Vector3 rotationAxis, float rotationAngle, Color color)
@@ -952,14 +1148,17 @@ None by default.
   void DrawFPS(int posX, int posY)
   void DrawGizmo(Vector3 position)
   void DrawGrid(int slices, float spacing)
-  void DrawLight(Light light)
   void DrawLine(int startPosX, int startPosY, int endPosX, int endPosY, Color color)
   void DrawLine3D(Vector3 startPos, Vector3 endPos, Color color)
+  void DrawLineBezier(Vector2 startPos, Vector2 endPos, float thick, Color color)
+  void DrawLineEx(Vector2 startPos, Vector2 endPos, float thick, Color color)
   void DrawLineV(Vector2 startPos, Vector2 endPos, Color color)
   void DrawModel(Model model, Vector3 position, float scale, Color tint)
-  void DrawModelEx(Model model, Vector3 position, Vector3 rotationAxis, float rotationAngle, Vector3 scale, Color tint)
+  void DrawModelEx(Model model, Vector3 position, Vector3 rotationAxis,
+                       float rotationAngle, Vector3 scale, Color tint)
   void DrawModelWires(Model model, Vector3 position, float scale, Color tint)
-  void DrawModelWiresEx(Model model, Vector3 position, Vector3 rotationAxis, float rotationAngle, Vector3 scale, Color tint)
+  void DrawModelWiresEx(Model model, Vector3 position, Vector3 rotationAxis,
+                            float rotationAngle, Vector3 scale, Color tint)
   void DrawPixel(int posX, int posY, Color color)
   void DrawPixelV(Vector2 position, Color color)
   void DrawPlane(Vector3 centerPos, Vector2 size, Color color)
@@ -968,9 +1167,13 @@ None by default.
   void DrawPolyExLines(Vector2 *points, int numPoints, Color color)
   void DrawRay(Ray ray, Color color)
   void DrawRectangle(int posX, int posY, int width, int height, Color color)
-  void DrawRectangleGradient(int posX, int posY, int width, int height, Color color1, Color color2)
+  void DrawRectangleGradientEx(Rectangle rec, Color col1, Color col2, Color col3, Color col4)
+  void DrawRectangleGradientH(int posX, int posY, int width, int height, Color color1, Color color2)
+  void DrawRectangleGradientV(int posX, int posY, int width, int height, Color color1, Color color2)
   void DrawRectangleLines(int posX, int posY, int width, int height, Color color)
+  void DrawRectanglePro(Rectangle rec, Vector2 origin, float rotation, Color color)
   void DrawRectangleRec(Rectangle rec, Color color)
+  void DrawRectangleT(int posX, int posY, int width, int height, Color color)
   void DrawRectangleV(Vector2 position, Vector2 size, Color color)
   void DrawSphere(Vector3 centerPos, float radius, Color color)
   void DrawSphereEx(Vector3 centerPos, float radius, int rings, int slices, Color color)
@@ -993,16 +1196,41 @@ None by default.
   void EndDrawing(void)
   void EndShaderMode(void)
   void EndTextureMode(void)
+  void EndVrDrawing(void)
   Color Fade(Color color, float alpha)
   const char *FormatText(const char *text, ...)
+  Image GenImageCellular(int width, int height, int tileSize)
+  Image GenImageChecked(int width, int height, int checksX, int checksY, Color col1, Color col2)
+  Image GenImageColor(int width, int height, Color color)
+  Image GenImageGradientH(int width, int height, Color left, Color right)
+  Image GenImageGradientRadial(int width, int height, float density, Color inner, Color outer)
+  Image GenImageGradientV(int width, int height, Color top, Color bottom)
+  Image GenImagePerlinNoise(int width, int height, float scale)
+  Image GenImageWhiteNoise(int width, int height, float factor)
+  Mesh GenMeshCube(float width, float height, float length)
+  Mesh GenMeshCubicmap(Image cubicmap, Vector3 cubeSize)
+  Mesh GenMeshCylinder(float radius, float height, int slices)
+  Mesh GenMeshHeightmap(Image heightmap, Vector3 size)
+  Mesh GenMeshHemiSphere(float radius, int rings, int slices)
+  Mesh GenMeshKnot(float radius, float size, int radSeg, int sides)
+  Mesh GenMeshPlane(float width, float length, int resX, int resZ)
+  Mesh GenMeshSphere(float radius, int rings, int slices)
+  Mesh GenMeshTorus(float radius, float size, int radSeg, int sides)
+  Texture2D GenTextureBRDF(Shader shader, Texture2D cubemap, int size)
+  Texture2D GenTextureCubemap(Shader shader, Texture2D skyHDR, int size)
+  Texture2D GenTextureIrradiance(Shader shader, Texture2D cubemap, int size)
   void GenTextureMipmaps(Texture2D *texture)
+  Texture2D GenTexturePrefilter(Shader shader, Texture2D cubemap, int size)
   Matrix GetCameraMatrix(Camera camera)
+  RayHitInfo GetCollisionRayGround(Ray ray, float groundHeight)
+  RayHitInfo GetCollisionRayMesh(Ray ray, Mesh *mesh)
+  RayHitInfo GetCollisionRayTriangle(Ray ray, Vector3 p1, Vector3 p2, Vector3 p3)
   Rectangle GetCollisionRec(Rectangle rec1, Rectangle rec2)
   Color GetColor(int hexValue)
   SpriteFont GetDefaultFont(void)
-  Shader GetDefaultShader(void)
-  Texture2D GetDefaultTexture(void)
-  float GetFPS(void)
+  const char *GetDirectoryPath(const char *fileName)
+  const char *GetExtension(const char *fileName)
+  int GetFPS(void)
   float GetFrameTime(void)
   int GetGamepadAxisCount(int gamepad)
   float GetGamepadAxisMovement(int gamepad, int axis)
@@ -1027,14 +1255,17 @@ None by default.
   int GetRandomValue(int min, int max)
   int GetScreenHeight(void)
   int GetScreenWidth(void)
+  Shader GetShaderDefault(void)
   int GetShaderLocation(Shader shader, const char *uniformName)
-  Shader GetStandardShader(void)
   Image GetTextureData(Texture2D texture)
+  Texture2D GetTextureDefault(void)
   int GetTouchPointsCount(void)
   Vector2 GetTouchPosition(int index)
   int GetTouchX(void)
   int GetTouchY(void)
+  VrDeviceInfo GetVrDeviceInfo(int vrDeviceType)
   float *GetWaveData(Wave wave)
+  const char *GetWorkingDirectory(void)
   Vector2 GetWorldToScreen(Vector3 position, Camera camera)
   void HideCursor(void)
   void ImageAlphaMask(Image *image, Image alphaMask)
@@ -1048,7 +1279,8 @@ None by default.
   void ImageDither(Image *image, int rBpp, int gBpp, int bBpp, int aBpp)
   void ImageDraw(Image *dst, Image src, Rectangle srcRec, Rectangle dstRec)
   void ImageDrawText(Image *dst, Vector2 position, const char *text, int fontSize, Color color)
-  void ImageDrawTextEx(Image *dst, Vector2 position, SpriteFont font, const char *text, float fontSize, int spacing, Color color)
+  void ImageDrawTextEx(Image *dst, Vector2 position, SpriteFont font, const char *text,
+                           float fontSize, int spacing, Color color)
   void ImageFlipHorizontal(Image *image)
   void ImageFlipVertical(Image *image)
   void ImageFormat(Image *image, int newFormat)
@@ -1058,65 +1290,60 @@ None by default.
   Image ImageTextEx(SpriteFont font, const char *text, float fontSize, int spacing, Color tint)
   void ImageToPOT(Image *image, Color fillColor)
   void InitAudioDevice(void)
-  AudioStream InitAudioStream(unsigned int sampleRate,
-                                  unsigned int sampleSize,
+  AudioStream InitAudioStream(unsigned int sampleRate, unsigned int sampleSize,
                                   unsigned int channels)
-  void InitVrDevice(int vdDevice)
-  void InitWindow(int width, int height, const char *title)
-  int IsAudioBufferProcessed(AudioStream stream)
-  int IsAudioDeviceReady(void)
-  int IsCursorHidden(void)
-  int IsFileDropped(void)
-  int IsGamepadAvailable(int gamepad)
-  int IsGamepadButtonDown(int gamepad, int button)
-  int IsGamepadButtonPressed(int gamepad, int button)
-  int IsGamepadButtonReleased(int gamepad, int button)
-  int IsGamepadButtonUp(int gamepad, int button)
-  int IsGamepadName(int gamepad, const char *name)
-  int IsGestureDetected(int gesture)
-  int IsKeyDown(int key)
-  int IsKeyPressed(int key)
-  int IsKeyReleased(int key)
-  int IsKeyUp(int key)
-  int IsMouseButtonDown(int button)
-  int IsMouseButtonPressed(int button)
-  int IsMouseButtonReleased(int button)
-  int IsMouseButtonUp(int button)
-  int IsMusicPlaying(Music music)
-  int IsSoundPlaying(Sound sound)
-  int IsVrDeviceReady(void)
-  int IsVrSimulator(void)
-  int IsWindowMinimized(void)
-  Model LoadCubicmap(Image cubicmap)
-  Material LoadDefaultMaterial(void)
-  Model LoadHeightmap(Image heightmap, Vector3 size)
+  void InitVrSimulator(VrDeviceInfo info)
+  void InitWindow(int width, int height, const char *data)
+  bool IsAudioBufferProcessed(AudioStream stream)
+  bool IsAudioDeviceReady(void)
+  bool IsCursorHidden(void)
+  bool IsFileDropped(void)
+  bool IsFileExtension(const char *fileName, const char *ext)
+  bool IsGamepadAvailable(int gamepad)
+  bool IsGamepadButtonDown(int gamepad, int button)
+  bool IsGamepadButtonPressed(int gamepad, int button)
+  bool IsGamepadButtonReleased(int gamepad, int button)
+  bool IsGamepadButtonUp(int gamepad, int button)
+  bool IsGamepadName(int gamepad, const char *name)
+  bool IsGestureDetected(int gesture)
+  bool IsKeyDown(int key)
+  bool IsKeyPressed(int key)
+  bool IsKeyReleased(int key)
+  bool IsKeyUp(int key)
+  bool IsMouseButtonDown(int button)
+  bool IsMouseButtonPressed(int button)
+  bool IsMouseButtonReleased(int button)
+  bool IsMouseButtonUp(int button)
+  bool IsMusicPlaying(Music music)
+  bool IsSoundPlaying(Sound sound)
+  bool IsVrSimulatorReady(void)
+  bool IsWindowMinimized(void)
   Image LoadImage(const char *fileName)
   Image LoadImageEx(Color *pixels, int width, int height)
-  Image LoadImageFromRES(const char *rresName, int resId)
+  Image LoadImagePro(void *data, int width, int height, int format)
   Image LoadImageRaw(const char *fileName, int width, int height, int format, int headerSize)
   Image LoadImageFromAV(SV *array_ref, SV *color_cb, int width, int height)
   Image LoadImageFromAV_uninitialized_mem(SV *array_ref, SV *color_cb, int width, int height)
   Image LoadImageFromAV_transposed(SV *array_ref, SV *color_cb, int width, int height)
   Image LoadImageFromAV_transposed_uninitialized_mem(SV *array_ref, SV *color_cb, int width, int height)
   Material LoadMaterial(const char *fileName)
+  Material LoadMaterialDefault(void)
+  Mesh LoadMesh(const char *fileName)
   Model LoadModel(const char *fileName)
-  Model LoadModelEx(Mesh data, int dynamic)
-  Model LoadModelFromRES(const char *rresName, int resId)
+  Model LoadModelFromMesh(Mesh mesh)
   Music LoadMusicStream(const char *fileName)
   RenderTexture2D LoadRenderTexture(int width, int height)
   Shader LoadShader(char *vsFileName, char *fsFileName)
   Sound LoadSound(const char *fileName)
-  Sound LoadSoundFromRES(const char *rresName, int resId)
   Sound LoadSoundFromWave(Wave wave)
   SpriteFont LoadSpriteFont(const char *fileName)
-  SpriteFont LoadSpriteFontTTF(const char *fileName, int fontSize, int numChars, int *fontChars)
-  Material LoadStandardMaterial(void)
+  SpriteFont LoadSpriteFontEx(const char *fileName, int fontSize, int charsCount, int *fontChars)
+  char *LoadText(const char *fileName)
   Texture2D LoadTexture(const char *fileName)
-  Texture2D LoadTextureEx(void *data, int width, int height, int textureFormat)
   Texture2D LoadTextureFromImage(Image image)
-  Texture2D LoadTextureFromRES(const char *rresName, int resId)
   Wave LoadWave(const char *fileName)
-  Wave LoadWaveEx(float *data, int sampleCount, int sampleRate, int sampleSize, int channels)
+  Wave LoadWaveEx(void *data, int sampleCount, int sampleRate, int sampleSize, int channels)
+  Matrix MatrixIdentity(void)
   float *MatrixToFloat(Matrix mat)
   int MeasureText(const char *text, int fontSize)
   Vector2 MeasureTextEx(SpriteFont spriteFont, const char *text, float fontSize, int spacing)
@@ -1129,6 +1356,7 @@ None by default.
   void ResumeAudioStream(AudioStream stream)
   void ResumeMusicStream(Music music)
   void ResumeSound(Sound sound)
+  void SaveImageAs(const char *fileName, Image image)
   void SetCameraAltControl(int altKey)
   void SetCameraMode(Camera camera, int mode)
   void SetCameraMoveControls(int frontKey, int backKey,
@@ -1139,19 +1367,27 @@ None by default.
   void SetConfigFlags(char flags)
   void SetExitKey(int key)
   void SetGesturesEnabled(unsigned int gestureFlags)
+  void SetMasterVolume(float volume)
   void SetMatrixModelview(Matrix view)
   void SetMatrixProjection(Matrix proj)
   void SetMousePosition(Vector2 position)
+  void SetMusicLoopCount(Music music, float count)
   void SetMusicPitch(Music music, float pitch)
   void SetMusicVolume(Music music, float volume)
-  void SetShaderValue(Shader shader, int uniformLoc, float *value, int size)
+  void SetShaderValue(Shader shader, int uniformLoc, const float *value, int size)
   void SetShaderValueMatrix(Shader shader, int uniformLoc, Matrix mat)
-  void SetShaderValuei(Shader shader, int uniformLoc, int *value, int size)
+  void SetShaderValuei(Shader shader, int uniformLoc, const int *value, int size)
   void SetSoundPitch(Sound sound, float pitch)
   void SetSoundVolume(Sound sound, float volume)
   void SetTargetFPS(int fps)
   void SetTextureFilter(Texture2D texture, int filterMode)
   void SetTextureWrap(Texture2D texture, int wrapMode)
+  void SetVrDistortionShader(Shader shader)
+  void SetWindowIcon(Image image)
+  void SetWindowMinSize(int width, int height)
+  void SetWindowMonitor(int monitor)
+  void SetWindowPosition(int x, int y)
+  void SetWindowTitle(const char *title)
   void ShowCursor(void)
   void ShowLogo(void)
   void StopAudioStream(AudioStream stream)
@@ -1160,10 +1396,13 @@ None by default.
   int StorageLoadValue(int position)
   void StorageSaveValue(int position, int value)
   const char *SubText(const char *text, int position, int length)
+  void TakeScreenshot(const char *fileName)
   void ToggleFullscreen(void)
   void ToggleVrMode(void)
+  void TraceLog(int logType, const char *text, ...)
   void UnloadImage(Image image)
   void UnloadMaterial(Material material)
+  void UnloadMesh(Mesh *mesh)
   void UnloadModel(Model model)
   void UnloadMusicStream(Music music)
   void UnloadRenderTexture(RenderTexture2D target)
@@ -1172,19 +1411,20 @@ None by default.
   void UnloadSpriteFont(SpriteFont spriteFont)
   void UnloadTexture(Texture2D texture)
   void UnloadWave(Wave wave)
-  void UpdateAudioStream(AudioStream stream, void *data, int numSamples)
+  void UpdateAudioStream(AudioStream stream, const void *data, int samplesCount)
   void UpdateCamera(Camera *camera)
   void UpdateMusicStream(Music music)
-  void UpdateSound(Sound sound, void *data, int numSamples)
-  void UpdateTexture(Texture2D texture, void *pixels)
+  void UpdateSound(Sound sound, const void *data, int samplesCount)
+  void UpdateTexture(Texture2D texture, const void *pixels)
   void UpdateTextureFromImage(Texture2D texture, Image image)
   void UpdateVrTracking(Camera *camera)
-  float *VectorToFloat(Vector3 vec)
+  Vector3 Vector3One(void)
+  float *Vector3ToFloat(Vector3 vec)
+  Vector3 Vector3Zero(void)
   Wave WaveCopy(Wave wave)
   void WaveCrop(Wave *wave, int initSample, int finalSample)
   void WaveFormat(Wave *wave, int sampleRate, int sampleSize, int channels)
-  int WindowShouldClose(void)
-
+  bool WindowShouldClose(void)
 
 
 =head1 SEE ALSO
@@ -1202,7 +1442,7 @@ Ahmad Fatoum, E<lt>ahmad@a3f.atE<gt>
 Copyright (C) 2017 by Ahmad Fatoum
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.24.0 or,
+it under the same terms as Perl itself, either Perl version 5.26.1 or,
 at your option, any later version of Perl 5 you may have available.
 
 

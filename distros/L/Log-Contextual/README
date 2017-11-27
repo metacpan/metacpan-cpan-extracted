@@ -2,7 +2,7 @@ NAME
     Log::Contextual - Simple logging interface with a contextual log
 
 VERSION
-    version 0.007001
+    version 0.008000
 
 SYNOPSIS
      use Log::Contextual qw( :log :dlog set_logger with_logger );
@@ -28,7 +28,7 @@ SYNOPSIS
          log_trace { 'foo entered' };
          my ($foo, $bar) = Dlog_trace { "params for foo: $_" } @args;
          # ...
-         log_trace { 'foo left' };
+         slog_trace 'foo left';
        };
      }
 
@@ -54,8 +54,8 @@ DESCRIPTION
 
     * Efficient
 
-      The logging functions take blocks, so if a log level is disabled, the
-      block will not run:
+      The default logging functions take blocks, so if a log level is
+      disabled, the block will not run:
 
        # the following won't run if debug is off
        log_debug { "the new count in the database is " . $rs->count };
@@ -303,6 +303,13 @@ FUNCTIONS
       Note: "log_fatal" does not call "die" for you, see "EXCEPTIONS AND
       ERROR HANDLING"
 
+  slog_$level
+    Mostly the same as "log_$level", but expects a string as first argument,
+    not a block. Arguments are passed through just the same, but since it's
+    just a string, interpolation of arguments into it must be done manually.
+
+     my @friends = slog_trace 'friends list being generated.', generate_friend_list();
+
   logS_$level
     Import Tag: ":log"
 
@@ -317,6 +324,14 @@ FUNCTIONS
      } friend();
 
     See also: "DlogS_$level".
+
+  slogS_$level
+    Mostly the same as "logS_$level", but expects a string as first
+    argument, not a block. Arguments are passed through just the same, but
+    since it's just a string, interpolation of arguments into it must be
+    done manually.
+
+     my $friend = slogS_trace 'I only have one friend.', friend();
 
   Dlog_$level
     Import Tag: ":dlog"
@@ -350,6 +365,14 @@ FUNCTIONS
       Note: "Dlog_fatal" does not call "die" for you, see "EXCEPTIONS AND
       ERROR HANDLING"
 
+  Dslog_$level
+    Mostly the same as "Dlog_$level", but expects a string as first
+    argument, not a block. Arguments are passed through just the same, but
+    since it's just a string, no interpolation point can be used, instead
+    the Dumper output is appended.
+
+     my @nicks = Dslog_debug "names: ", map $_->value, $frew->names->all;
+
   DlogS_$level
     Import Tag: ":dlog"
 
@@ -360,6 +383,15 @@ FUNCTIONS
     slurping up (and also setting "wantarray") all the @args
 
      my $pals_rs = DlogS_debug { "pals resultset: $_" }
+       $schema->resultset('Pals')->search({ perlers => 1 });
+
+  DslogS_$level
+    Mostly the same as "DlogS_$level", but expects a string as first
+    argument, not a block. Arguments are passed through just the same, but
+    since it's just a string, no interpolation point can be used, instead
+    the Dumper output is appended.
+
+     my $pals_rs = DslogS_debug "pals resultset: ",
        $schema->resultset('Pals')->search({ perlers => 1 });
 
 LOGGER CODEREF

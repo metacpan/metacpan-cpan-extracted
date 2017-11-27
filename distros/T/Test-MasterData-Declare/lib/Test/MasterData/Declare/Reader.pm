@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use utf8;
 
-use Text::CSV qw/csv/;
+use Text::CSV_PP;
 use Carp qw/croak/;
 
 use Class::Accessor::Lite (
@@ -21,11 +21,11 @@ sub read_csv_from {
     my $identifier_key = $args{identifier_key};
 
     open my $fh, "<:encoding(utf8)", $filepath or croak "cannot open $filepath";
-    my $csv = Text::CSV->new({
+    my $csv = Text::CSV_PP->new({
         binary             => 1,
         blank_is_undef     => 1,
         eol                => "\n",
-    }) or croak Text::CSV->error_diag();
+    }) or croak Text::CSV_PP->error_diag();
 
     $csv->header($fh);
     my @rows;

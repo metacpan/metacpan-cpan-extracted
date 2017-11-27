@@ -17,6 +17,7 @@ my $lexer = $liquid->lexer;
 my $parser = $liquid->parser;
 my $optimizer = $liquid->optimizer;
 my $renderer = $liquid->renderer;
+$parser->accept_unknown_filters(1);
 
 
 my $original_text = " {%if a.b%}asdfsdfdsaf{%else%} {%for a in (1..10)%}{{a}} fdsfds{%if b%}{{b}}{%else%}sfasdf{%endif%}{%endfor%}{%endif%}";
@@ -56,5 +57,21 @@ $ast = $optimizer->optimize({ }, $ast);
 @tokens = $parser->unparse_tokens($ast);
 $text = $lexer->unparse_text(@tokens);
 is($text, "{%assign input_format = 'YYYY/MM/DD'%}");
+
+
+$ast = $parser->parse_tokens($lexer->parse_text("{% assign input_format = 'YYYY/MM/DD' | t: name: 'Test' %}"));
+$ast = $optimizer->optimize({ }, $ast);
+$ast = $optimizer->optimize({ }, $ast);
+@tokens = $parser->unparse_tokens($ast);
+$text = $lexer->unparse_text(@tokens);
+is($text, "{%assign input_format = 'YYYY/MM/DD' | t: name:'Test'%}");
+
+
+$ast = $parser->parse_tokens($lexer->parse_text("{% assign a = b.first %}"));
+$ast = $optimizer->optimize({ }, $ast);
+$ast = $optimizer->optimize({ }, $ast);
+@tokens = $parser->unparse_tokens($ast);
+$text = $lexer->unparse_text(@tokens);
+is($text, "{%assign a = b.first%}");
 
 done_testing();

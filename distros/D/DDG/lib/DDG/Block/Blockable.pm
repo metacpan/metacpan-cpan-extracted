@@ -1,7 +1,7 @@
 package DDG::Block::Blockable;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Role for plugins that can go into a block
-$DDG::Block::Blockable::VERSION = '1017';
+$DDG::Block::Blockable::VERSION = '1018';
 use Moo::Role;
 
 requires qw(
@@ -29,7 +29,7 @@ DDG::Block::Blockable - Role for plugins that can go into a block
 
 =head1 VERSION
 
-version 1017
+version 1018
 
 =head1 DESCRIPTION
 

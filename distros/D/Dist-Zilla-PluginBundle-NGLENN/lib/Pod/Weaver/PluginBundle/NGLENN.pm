@@ -3,7 +3,7 @@ use warnings;
 
 package Pod::Weaver::PluginBundle::NGLENN;
 
-our $VERSION = '0.03';
+our $VERSION = '0.07';
 
 use Pod::Weaver 4; # he played knick-knack on my door
 use Pod::Weaver::Config::Assembler;
@@ -86,7 +86,7 @@ sub mvp_bundle_config {
 #
 # This file is part of Dist-Zilla-PluginBundle-NGLENN
 #
-# This software is Copyright (c) 2015 by Nathan Glenn.
+# This software is Copyright (c) 2017 by Nathan Glenn.
 #
 # This is free software, licensed under:
 #
@@ -107,7 +107,7 @@ Pod::Weaver::PluginBundle::NGLENN - NGLENN's default Pod::Weaver config
 
 =head1 VERSION
 
-version 0.03
+version 0.07
 
 =head1 DESCRIPTION
 
@@ -200,7 +200,7 @@ Nate Glenn <nglenn@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2015 by Nathan Glenn.
+This software is Copyright (c) 2017 by Nathan Glenn.
 
 This is free software, licensed under:
 

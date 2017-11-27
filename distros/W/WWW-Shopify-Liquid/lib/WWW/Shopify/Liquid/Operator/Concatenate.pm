@@ -27,7 +27,10 @@ sub process {
 			$self->{operands}->[$idx] = $ops[$idx] if $action eq "optimize";
 		};
 		if (my $exp = $@) {
-			$exp->initial_render(@ops[0..($idx-1)]) if $idx > 0 && defined $exp && blessed($exp) && $exp->isa('WWW::Shopify::Liquid::Exception::Control');
+			$exp->initial_render(@ops[0..($idx-1)]) if $idx > 0 && blessed($exp) && $exp->isa('WWW::Shopify::Liquid::Exception::Control');
+			if (blessed($exp) && $exp->isa('WWW::Shopify::Liquid::Exception::Control::Pause')) {
+				$exp->register_value($self->{operands}->[$_], $ops[$_]) for (0..($idx-1));
+			}
 			die $exp;
 		}
 	}

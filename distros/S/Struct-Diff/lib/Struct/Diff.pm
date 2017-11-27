@@ -31,11 +31,11 @@ Struct::Diff - Recursive diff for nested perl structures
 
 =head1 VERSION
 
-Version 0.91
+Version 0.92
 
 =cut
 
-our $VERSION = '0.91';
+our $VERSION = '0.92';
 
 =head1 SYNOPSIS
 
@@ -136,69 +136,62 @@ sub diff($$;@) {
         $d->{O} = $a unless ($opts{noO});
         $d->{N} = $b unless ($opts{noN});
     } elsif (ref $a eq 'ARRAY' and $a != $b) {
+        return $opts{noU} ? {} : { U => [] } unless (@{$a} or @{$b});
+
         my @sd = sdiff($a, $b, sub { freeze \$_[0] });
-        my ($s, $hidden, $item);
 
         for my $i (0 .. $#sd) {
-            undef $item;
             if ($sd[$i]->[0] eq 'u') {
-                $item->{U} = $sd[$i]->[1] unless ($opts{noU});
-            } elsif ($sd[$i]->[0] eq 'c') {
-                $item = diff($sd[$i]->[1], $sd[$i]->[2], %opts);
+                unless ($opts{noU}) {
+                    if (exists $d->{D}) {
+                        push @{$d->{D}}, { U => $sd[$i]->[1] };
+                    } else { # nobody else - fill U version
+                        push @{$d->{U}}, $sd[$i]->[1];
+                    }
+                }
+                next;
+            } elsif (exists $d->{U}) { # diff should be converted to D type
+                map { push @{$d->{D}}, { U => $_ } } @{delete $d->{U}};
+            }
+
+            if ($sd[$i]->[0] eq 'c') {
+                push @{$d->{D}}, diff($sd[$i]->[1], $sd[$i]->[2], %opts);
             } elsif ($sd[$i]->[0] eq '+') {
-                $item->{A} = $sd[$i]->[2] unless ($opts{noA});
+                push @{$d->{D}}, { A => $sd[$i]->[2] } unless ($opts{noA});
             } else { # '-'
-                $item->{R} = $opts{trimR} ? undef : $sd[$i]->[1]
+                push @{$d->{D}}, { R => $opts{trimR} ? undef : $sd[$i]->[1] }
                     unless ($opts{noR});
             }
 
-            if ($item) {
-                map { $s->{$_} = 1 } keys %{$item};
-                $item->{I} = $i if ($hidden);
-                push @{$d->{D}}, $item;
-            } else {
-                $hidden = 1;
-            }
+            $d->{D}->[-1]->{I} = $i if (exists $d->{D} and $#{$d->{D}} != $i);
         }
-
-        if ((my @k = keys %{$s}) == 1 and not ($hidden or exists $s->{D})) { # all items have same status
-            map { $_ = $_->{$k[0]} } @{$d->{D}};
-            $d->{$k[0]} = delete $d->{D};
-        }
-
-        $d->{U} = $a unless ($hidden or keys %{$d});
     } elsif (ref $a eq 'HASH' and $a != $b) {
         my @keys = keys %{{ %{$a}, %{$b} }}; # uniq keys for both hashes
         return $opts{noU} ? {} : { U => {} } unless (@keys);
 
-        my ($alt, $sd);
-        for my $key (@keys) {
-            if (exists $a->{$key} and exists $b->{$key}) {
-                if (freeze(\$a->{$key}) eq freeze(\$b->{$key})) {
-                    $d->{U}->{$key} = $alt->{D}->{$key}->{U} = $a->{$key}
-                        unless ($opts{noU});
+        for my $k (@keys) {
+            if (exists $a->{$k} and exists $b->{$k}) {
+                if (freeze(\$a->{$k}) eq freeze(\$b->{$k})) {
+                    $d->{U}->{$k} = $b->{$k} unless ($opts{noU});
                 } else {
-                    $sd = diff($a->{$key}, $b->{$key}, %opts);
-                    if (exists $sd->{D}) {
-                        $d->{D}->{$key} = $alt->{D}->{$key} = $sd;
-                    } else {
-                        map {
-                            $d->{$_}->{$key} = $alt->{D}->{$key}->{$_} = $sd->{$_}
-                        } keys %{$sd};
-                    }
+                    my $sd = diff($a->{$k}, $b->{$k}, %opts);
+                    $d->{D}->{$k} = $sd if (keys %{$sd});
                 }
-            } elsif (exists $a->{$key}) {
-                $d->{R}->{$key} = $alt->{D}->{$key}->{R} =
-                    $opts{trimR} ? undef : $a->{$key}
-                        unless ($opts{noR});
+                next;
+            }
+
+            if (exists $a->{$k}) {
+                $d->{D}->{$k}->{R} = $opts{trimR} ? undef : $a->{$k}
+                    unless ($opts{noR});
             } else {
-                $d->{A}->{$key} = $alt->{D}->{$key}->{A} = $b->{$key}
-                    unless ($opts{noA});
+                $d->{D}->{$k}->{A} = $b->{$k} unless ($opts{noA});
             }
         }
 
-        $d = $alt # return 'D' version of diff
-            if (keys %{$d} > 1 or ($sd) = values %{$d} and keys %{$sd} != @keys);
+        if (exists $d->{U} and exists $d->{D}) {
+            map { $d->{D}->{$_}->{U} = $d->{U}->{$_} } keys %{$d->{U}};
+            delete $d->{U};
+        }
     } elsif (ref $a eq 'Regexp' and $a != $b) {
         if ($a eq $b) {
             $d->{U} = $a unless ($opts{noU});
@@ -221,7 +214,7 @@ sub diff($$;@) {
 List pairs (path, ref_to_subdiff) for provided diff. See
 L<Struct::Path/ADDRESSING SCHEME> for path format specification.
 
-    @list = list_diff(diff($frst, $scnd);
+    @list = list_diff($diff);
 
 =head3 Options
 
@@ -229,7 +222,8 @@ L<Struct::Path/ADDRESSING SCHEME> for path format specification.
 
 =item depth E<lt>intE<gt>
 
-Don't dive deeper than defined number of levels.
+Don't dive deeper than defined number of levels. C<undef> used by default
+(unlimited).
 
 =item sort E<lt>sub|true|falseE<gt>
 
@@ -242,10 +236,8 @@ lexically sorted if set to some other true value.
 =cut
 
 sub list_diff($;@) {
-    my ($tmp, %opts) = @_;
-    $opts{depth} = 0 unless ($opts{depth});
-
-    my @stack = ([], \$tmp); # init: (path, diff)
+    my @stack = ([], \shift); # init: (path, diff)
+    my %opts = @_;
     my ($diff, @list, $path);
 
     while (@stack) {
@@ -330,6 +322,11 @@ Apply diff.
 =cut
 
 sub patch($$) {
+    if (exists $_[1]->{N} and ref $_[0] ne 'SCALAR') {
+        ${\$_[0]} = $_[1]->{N};
+        return;
+    }
+
     my @stack = @_;
     my ($s, $d, $i);
 

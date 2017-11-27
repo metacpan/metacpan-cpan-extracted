@@ -57,15 +57,20 @@ sub run
     else { %proxy  = map{ $_ => undef }@node; }
 
     my $isc = $run{role} && $run{role} eq 'client' ? 1 : 0;
-    $run{query}{node} = \@node if $isc;
 
-    my $query = MYDan::Agent::Query->dump($run{query});
-
-    eval{ $query = MYDan::API::Agent->new()->encryption( $query ) if $isc };
-    if( $@ )
+    my $query;
+    unless( $query = $run{queryx} )
     {
-        warn "ERROR:$@\n";
-        return map{ $_ => "norun --- 1\n" }@node;
+        $run{query}{node} = \@node if $isc;
+
+        $query = MYDan::Agent::Query->dump($run{query});
+
+        eval{ $query = MYDan::API::Agent->new()->encryption( $query ) if $isc };
+        if( $@ )
+        {
+            warn "ERROR:$@\n";
+            return map{ $_ => "norun --- 1\n" }@node;
+        }
     }
 
     @node = (); my %node;
@@ -195,6 +200,12 @@ sub run
 		      $percent->add(scalar @node)->print() if $run{verbose};
                       $cv->end;
 
+                      unless( $rresult{$node} )
+                      {
+                          map{ $result{$_} = "proxy $node result null" }@node;
+                          return;
+                      }
+
                       $rresult{$node}  =~ s/^\**#\*MYDan_\d+\*#//;
                       my @c = eval{ YAML::XS::Load $rresult{$node} };
 
@@ -237,7 +248,12 @@ sub run
     $cv->recv;
     undef $w;
 
-    map{ $_ =~ s/^\**#\*MYDan_\d+\*#//;}values %result;
+    if( $run{version} )
+    {
+        map{ $_ =~ s/^\**#\*MYDan_(\d+)\*#/runtime version:$1\n/;}values %result;
+    }
+    else { map{ $_ =~ s/^\**#\*MYDan_\d+\*#//;}values %result; }
+
     return %result;
 }
 

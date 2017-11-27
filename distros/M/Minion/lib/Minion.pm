@@ -17,9 +17,11 @@ has missing_after => 1800;
 has remove_after  => 172800;
 has tasks         => sub { {} };
 
-our $VERSION = '8.02';
+our $VERSION = '8.03';
 
 sub add_task { ($_[0]->tasks->{$_[1]} = $_[2]) and return $_[0] }
+
+sub broadcast { shift->backend->broadcast(@_) }
 
 sub enqueue {
   my $self = shift;
@@ -154,7 +156,12 @@ Minion - Job queue
   $minion->enqueue(something_slow => ['foo', 'bar']);
   $minion->perform_jobs;
 
-  # Build more sophisticated workers
+  # Start a worker to perform up to 12 jobs concurrently
+  my $worker = $minion->worker;
+  $worker->status->{jobs} = 12;
+  $worker->run;
+
+  # Build custom workers
   my $worker = $minion->repair->worker;
   while (int rand 2) {
     if (my $job = $worker->register->dequeue(5)) { $job->perform }
@@ -173,12 +180,13 @@ Minion - Job queue
 
 =end html
 
-L<Minion> is a job queue for the L<Mojolicious|http://mojolicious.org> real-time
-web framework, with support for multiple named queues, priorities, delayed jobs,
-job dependencies, job progress, job results, retries with backoff, rate
-limiting, unique jobs, statistics, distributed workers, parallel processing,
-autoscaling, remote control, admin ui, resource leak protection and multiple
-backends (such as L<PostgreSQL|http://www.postgresql.org>).
+L<Minion> is a high performance job queue for the Perl programming language,
+with support for multiple named queues, priorities, delayed jobs, job
+dependencies, job progress, job results, retries with backoff, rate limiting,
+unique jobs, statistics, distributed workers, parallel processing, autoscaling,
+remote control, L<Mojolicious|http://mojolicious.org> admin ui, resource leak
+protection and multiple backends (such as
+L<PostgreSQL|http://www.postgresql.org>).
 
 Job queues allow you to process time and/or computationally intensive tasks in
 background processes, outside of the request/response lifecycle. Among those
@@ -389,6 +397,14 @@ Register a task.
   });
   my $id = $minion->enqueue(add => [1, 1]);
   my $result = $minion->job($id)->info->{result};
+
+=head2 broadcast
+
+  my $bool = $minion->broadcast('some_command');
+  my $bool = $minion->broadcast('some_command', [@args]);
+  my $bool = $minion->broadcast('some_command', [@args], [$id1, $id2, $id3]);
+
+Broadcast remote control command to one or more workers.
 
 =head2 enqueue
 
@@ -671,6 +687,15 @@ Release a named lock that has been previously acquired with L</"lock">.
   my $worker = $minion->worker;
 
 Build L<Minion::Worker> object.
+
+  # Start a worker
+  $minion->worker->run;
+
+  # Perform one job manually
+  my $worker = $minion->repair->worker->register;
+  my $job    = $worker->dequeue(5);
+  $job->perform;
+  $worker->unregister;
 
 =head1 REFERENCE
 

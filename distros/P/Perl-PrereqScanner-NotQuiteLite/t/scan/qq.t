@@ -1,5 +1,7 @@
 use strict;
 use warnings;
+use FindBin;
+use lib "$FindBin::Bin/../../";
 use t::scan::Util;
 
 test(<<'TEST'); # HTML-Perlinfo-1.68/lib/HTML/Perlinfo/Base.pm

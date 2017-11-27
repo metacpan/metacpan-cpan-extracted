@@ -1,5 +1,7 @@
 use strict;
 use warnings;
+use FindBin;
+use lib "$FindBin::Bin/../../";
 use t::scan::Util;
 
 test(<<'TEST'); # SATOH/Text-Xatena-0.18/t/lib/Text/Xatena/Test.pm

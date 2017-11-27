@@ -20,8 +20,12 @@ sub retrieve_include {
 		my @inclusion_contexts = $pipeline->inclusion_context && ref($pipeline->inclusion_context) && ref($pipeline->inclusion_context) eq "ARRAY" ? @{$pipeline->inclusion_context} : $pipeline->inclusion_context;
 		die new WWW::Shopify::Liquid::Exception([], "Backtracking not allowed in inclusions.") if $string =~ m/\.\./;
 		for (@inclusion_contexts) {
-			my $path = $_ . "/" . $string . ".liquid";
-			return ($path, scalar(read_file($path))) if -e $path;
+			if (ref($_) eq "CODE") {
+				return $_->($self, $hash, $action, $pipeline, $string);
+			} else {
+				my $path = $_ . "/" . $string . ".liquid";
+				return ($path, scalar(read_file($path))) if -e $path;
+			}
 		}
 		die new WWW::Shopify::Liquid::Exception([], "Can't find include $string.");
 	} elsif ($action eq "render") {
@@ -30,13 +34,27 @@ sub retrieve_include {
 	return $self;
 }
 
+sub include_literal { 
+	my ($self) = @_;
+	my $literal = $self->{arguments}->[0];
+	if ($literal && ref($literal) && $literal->isa('WWW::Shopify::Liquid::Operator::With')) {
+		$literal = $literal->{arguments}->[0];
+	} else {
+		$literal = $literal;
+	}
+	return unless $literal->isa('WWW::Shopify::Liquid::Token::String');
+	return $literal->{core};
+}
+
 sub process_include {
-	my ($self, $hash, $action, $pipeline, $path, $text) = @_;
+	my ($self, $hash, $action, $pipeline, $string, $path, $text, $argument) = @_;
 	my $old_context = $pipeline->parent->lexer->file_context;
 	$pipeline->parent->lexer->file_context($path);
 	$pipeline->parent->parser->file_context($path);
 	$pipeline->parent->renderer->file_context($path);
-	my $ast = $pipeline->parent->parse_text($text);
+	# If text is already an AST, then we do not parse the text.
+	my $ast = ref($text) ? $text : $pipeline->parent->parse_text($text);
+	$hash->{$string} = $argument if defined $argument;
 	if ($action eq "optimize") {
 		$ast = $pipeline->optimize($hash, $ast);
 		$pipeline->parent->lexer->file_context($old_context);
@@ -64,8 +82,8 @@ sub process {
 	my $result = $self->{arguments}->[0]->$action($pipeline, $hash);
 	my ($string, $argument);
 	if ($result && ref($result) && $result->isa('WWW::Shopify::Liquid::Operator::With')) {
-		$string = $result->{arguments}->[0];
-		$argument = $result->{arguments}->[1];
+		$string = $result->{operands}->[0]->$action($pipeline, $hash);
+		$argument = $result->{operands}->[1]->$action($pipeline, $hash);
 	} else {
 		$string = $result;
 	}
@@ -74,7 +92,7 @@ sub process {
 	return $self if !$self->is_processed($path);
 	my $include_depth = $pipeline->inclusion_depth;
 	$pipeline->inclusion_depth($include_depth+1);
-	$result = $self->process_include($hash, $action, $pipeline, $path, $text);
+	$result = $self->process_include($hash, $action, $pipeline, $string, $path, $text, $argument);
 	$pipeline->inclusion_depth($include_depth);
 	return $result;
 	

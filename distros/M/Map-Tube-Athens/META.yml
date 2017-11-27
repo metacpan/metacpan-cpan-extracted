@@ -1,0 +1,40 @@
+---
+abstract: 'Map::Tube interface to the Athens Metro'
+author:
+  - 'Errietta Kostala <errietta@errietta.me>'
+build_requires: {}
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.13, CPAN::Meta::Converter version 2.143240'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Map-Tube-Athens
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Map::Tube::Athens:
+    file: lib/Map/Tube/Athens.pm
+    version: '0.01'
+requires:
+  File::Share: '0'
+  Map::Tube: '3.32'
+  Moo: '0'
+  namespace::clean: '0'
+resources:
+  bugtracker: https://github.com/errietta/Map-Tube-Athens/issues
+  homepage: https://github.com/errietta/Map-Tube-Athens
+  repository: git://github.com/errietta/Map-Tube-Athens.git
+version: '0.01'
+x_contributors:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'

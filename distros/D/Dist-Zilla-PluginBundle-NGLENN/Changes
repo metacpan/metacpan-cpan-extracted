@@ -1,5 +1,15 @@
 Revision history for Dist-Zilla-PluginBundle-NGLENN
 
+0.07      2017-11-22 17:50:23+01:00 Europe/Berlin
+    (hopefully) fixed Git action order
+0.06      2017-11-22 17:46:56+01:00 Europe/Berlin
+    (hopefully) fixed Git action order
+0.05      2017-11-22 17:39:27+01:00 Europe/Berlin
+    added GitHub release upload
+    copy INSTALL and LICENSE to repo
+0.04      2017-11-22 14:55:50+01:00 Europe/Berlin
+    Add install guide
+    fix build
 0.03      2015-06-03 21:53:18+09:00 Asia/Tokyo
     Commit bin folder after bumping version
     Add Pod::Markdown to prerequisites

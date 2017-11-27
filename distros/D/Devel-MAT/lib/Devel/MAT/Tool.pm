@@ -8,7 +8,7 @@ package Devel::MAT::Tool;
 use strict;
 use warnings;
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 use Getopt::Long qw( GetOptionsFromArray );
 use List::Util qw( any );

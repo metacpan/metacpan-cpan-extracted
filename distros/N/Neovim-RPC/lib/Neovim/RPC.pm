@@ -1,7 +1,7 @@
 package Neovim::RPC;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: RPC client for Neovim
-$Neovim::RPC::VERSION = '0.2.0';
+$Neovim::RPC::VERSION = '1.0.0';
 use strict;
 use warnings;
 
@@ -28,8 +28,19 @@ sub _build_io {
         open my $out, '>', '-';
         [ $in, $out ];
     };
-    $self->_set_io_accessors($io);
+    $self->_set_io_accessors($self->io);
     $io;
+}
+
+# sub BUILD { my $self = shift; $self->_set_io_accessors($self->io) if $self->io }
+
+sub BUILD {
+    my $self = shift;
+    $self->api->ready->done(sub {
+        $self->subscribe( 'nvimx_stop', sub {
+            $self->loop->stop;
+        });
+    })
 }
 
 has "api" => (
@@ -37,12 +48,12 @@ has "api" => (
     lazy => 1,
     default => sub {
         my $self = shift;
-        Neovim::RPC::API::AutoDiscover->new( rpc => $self, logger => $self->logger );      
+        Neovim::RPC::API::AutoDiscover->new( rpc => $self );      
     },
 );
 
 before subscribe => sub($self,$event,@){
-    $self->api->vim_subscribe( event => $event );
+    $self->api->ready->done( sub{ $self->api->vim_subscribe( event => $event ) });
 };
 
 0 and around emit_request => sub {
@@ -53,20 +64,20 @@ before subscribe => sub($self,$event,@){
 };
 
 has plugins => (
-    traits => [ 'Array' ],
-    isa => 'ArrayRef',
-    default => sub { [] },
-    handles => {
-        _push_plugin => 'push',
-    },
+    is => 'ro',
+    traits => [ 'Hash' ],
+    isa => 'HashRef',
+    default => sub { +{} },
 );
 
 # TODO make that a coerced type
+# TODO can load an object directly
+# TODO switch load_class for use_module
 sub load_plugin ( $self, $plugin ) { 
     my $class = 'Neovim::RPC::Plugin::' . $plugin;
-    $self->_push_plugin(
-        load_class($class)->new( rpc => $self )
-    );
+
+    return $self->plugins->{$plugin} ||=
+        load_class($class)->new( rpc => $self );
 }
 
 1;
@@ -83,7 +94,7 @@ Neovim::RPC - RPC client for Neovim
 
 =head1 VERSION
 
-version 0.2.0
+version 1.0.0
 
 =head1 SEE ALSO
 
@@ -101,7 +112,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Yanick Champoux.
+This software is copyright (c) 2017, 2015 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

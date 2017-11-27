@@ -11,6 +11,7 @@ t/01_simple.t
 t/03_ambigious.t
 t/04_ambigous_compat.t
 t/05_ambigous_compat2.t
+t/06_combined.t
 tools/benchmark.pl
 xt/02_perlcritic.t
 xt/perlcriticrc

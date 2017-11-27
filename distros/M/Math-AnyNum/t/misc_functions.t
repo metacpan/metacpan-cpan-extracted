@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 288;
+plan tests => 355;
 
 use Math::AnyNum qw(:misc);
 
@@ -191,15 +191,32 @@ is(denominator('0.75'),          '4');          # '3/4'
 is(denominator(complex('3+4i')), 'NaN');
 is(denominator("-42"),           "1");
 
-is(join(' ', digits('1234')),      '1 2 3 4');
-is(join(' ', digits('1234.5678')), '1 2 3 4');    # only the integer part is considered
-is(join(' ', digits('-1234')),     '1 2 3 4');
-is(join(' ', digits('1234',           16)),          '4 d 2');
-is(join(' ', digits($o->new('1234'),  16)),          '4 d 2');
-is(join(' ', digits($o->new('1234'),  $o->new(16))), '4 d 2');
-is(join(' ', digits('1234',           $o->new(16))), '4 d 2');
-is(join(' ', digits($o->new('-1234'), 36)),          'y a');
-is(join(' ', digits('-1234',          2)),           '1 0 0 1 1 0 1 0 0 1 0');
+is(join(' ', digits('1234')),      '4 3 2 1');
+is(join(' ', digits('1234.5678')), '4 3 2 1');    # only the integer part is considered
+is(join(' ', digits('-1234')),     '4 3 2 1');
+
+is(join(' ', digits('1234',           16)),          '2 13 4');
+is(join(' ', digits($o->new('1234'),  16)),          '2 13 4');
+is(join(' ', digits($o->new('1234'),  $o->new(16))), '2 13 4');
+is(join(' ', digits('1234',           $o->new(7))),  '2 1 4 3');
+is(join(' ', digits('-1234',          $o->new(9))),  '1 2 6 1');
+is(join(' ', digits($o->new('-1234'), $o->new(4))),  '2 0 1 3 0 1');
+is(join(' ', digits($o->new('-1234'), 36)),          '10 34');
+is(join(' ', digits('-1234',          2)),           '0 1 0 0 1 0 1 1 0 0 1');
+is(join(' ', digits('12345',          100)),         '45 23 1');
+
+is(join(' ', digits('3735928559', 16)), '15 14 14 11 13 10 14 13');
+is(join(' ', digits('3735928559', 17)), '8 7 16 6 3 13 1 9');
+is(join(' ', digits('3735928559', 9)),  '2 7 4 4 2 7 0 7 5 0 1');
+is(join(' ', digits('3735928559', 11)), '0 7 4 10 1 9 7 4 6 1');
+
+is(join(' ', digits('62748517',                       '2744')),                 '1469 915 8');
+is(join(' ', digits('27875458237207974418',           '4728933560')),           '365843178 1165727019 1');
+is(join(' ', digits('996105818874172862495850884533', '81592785159219522212')), '40776745621457483269 12208258572');
+
+is(join(' ', digits(1234, -12)), '');    # not defined for negative bases
+is(join(' ', digits(1234, 1)),   '');    # not defined for bases <= 1
+is(join(' ', digits(1234, 0)),   '');
 
 is(as_bin(42), '101010');
 is(as_oct(42), '52');
@@ -326,7 +343,71 @@ is(rat('+1.42e+13'),       '14200000000000');
 is(rat('12341.234125e2'),  '98729873/80');
 is(rat('12341.234125e-2'), '98729873/800000');
 is(rat('13e2'),            '1300');
+is(rat('0.13e2'),          '13');
+is(rat('0.013e2'),         '13/10');
+is(rat('0.013e5'),         '1300');
 is(rat('13e-2'),           '13/100');
+is(rat('12.0000'),         '12');
+is(rat('12.000e0'),        '12');
+is(rat('12.000e4'),        '120000');
+is(rat('1234.000e2'),      '123400');
+is(rat('0.000e2'),         '0');
+is(rat('0.000e12'),        '0');
+is(rat('0.000e-12'),       '0');
+is(rat('0.000e-0'),        '0');
+is(rat('1234.000e-2'),     '617/50');
+is(rat('1234.000e-5'),     '617/50000');
+is(rat('-3.000e-7'),       '-3/10000000');
+is(rat('-1234.000e-2'),    '-617/50');
+
+is(rat('foo'),  'NaN');
+is(rat('3+4i'), 'NaN');
+is(rat(Math::AnyNum->new_c(3, 4)), 'NaN');
+
+ok(!(float(0) != '0'));
+ok(!(complex(0) != '0'));
+ok(!(rat(0) != '0'));
+ok(!(int(0) != '0'));
+
+ok(float(0) != '-1');
+ok(complex(0) != '-1');
+ok(rat(0) != '-1');
+ok(int(0) != '-1');
+
+ok(float(0) != '1');
+ok(complex(0) != '1');
+ok(rat(0) != '1');
+ok(int(0) != '1');
+
+ok(float(0) == '0');
+ok(rat(0) == '0');
+ok(int(0) == '0');
+ok(complex(0) == '0');
+
+ok(!(float(0) == '1'));
+ok(!(rat(0) == '1'));
+ok(!(int(0) == '1'));
+ok(!(complex(0) == '1'));
+
+ok(!(float(0) == '-1'));
+ok(!(rat(0) == '-1'));
+ok(!(int(0) == '-1'));
+ok(!(complex(0) == '-1'));
+
+is(float(0) <=> '0',   0);
+is(rat(0) <=> '0',     0);
+is(int(0) <=> '0',     0);
+is(complex(0) <=> '0', 0);
+
+is(float(0) <=> '1',   -1);
+is(rat(0) <=> '1',     -1);
+is(int(0) <=> '1',     -1);
+is(complex(0) <=> '1', -1);
+
+is(float(0) <=> '-1',   1);
+is(rat(0) <=> '-1',     1);
+is(int(0) <=> '-1',     1);
+is(complex(0) <=> '-1', 1);
 
 ok(is_odd(int('43')));
 ok(is_odd(rat('43')));

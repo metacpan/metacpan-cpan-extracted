@@ -46,6 +46,9 @@ Because two tables are required,
 input is typically in files.
 Standard input is accessible by the file "-".
 
+If only one input is given, the first (left) input
+is taken from stdin.
+
 =head1 RESOURCE REQUIREMENTS AND PERFORMANCE
 
 Joins can be expensive. 

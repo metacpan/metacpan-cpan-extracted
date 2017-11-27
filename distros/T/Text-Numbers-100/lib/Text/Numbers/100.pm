@@ -11,7 +11,7 @@ use strict;
 use Carp;
 use utf8;
 
-our $VERSION = '20171112';
+our $VERSION = '20171124';
 
 #-------------------------------------------------------------------------------
 # Translate
@@ -371,7 +371,7 @@ sub translations{
           "19"  => "diecinueve",
           "20"  => "veinte",
           "21"  => "veintiuno",
-          "22"  => "veintid\eintidóseintidóss",
+          "22"  => "veintidós",
           "23"  => "veintitrés",
           "24"  => "veinticuatro",
           "25"  => "veinticinco",
@@ -1829,10 +1829,10 @@ Text::Numbers::100 - Translate the numbers from 0 to 100 into various languages
 
  use Text::Numbers::100;
 
- ok Text::Numbers::100::translate(qw(es),  42) eq "cuarentay dos";
- ok Text::Numbers::100::translate(qw(de),  42) eq "zwei und vierzig";
- ok Text::Numbers::100::translate(qw(tr), 100) eq "yüz";
- ok Text::Numbers::100::translate(qw(ru),  61) eq "шестьдесят один";
+ ok Text::Numbers::100::translate(q(es),  42) eq "cuarentay dos";
+ ok Text::Numbers::100::translate(q(de),  42) eq "zweiundvierzig";
+ ok Text::Numbers::100::translate(q(tr), 100) eq "yüz";
+ ok Text::Numbers::100::translate(q(ru),  61) eq "шестьдесят один";
 
 =head1 Description
 
@@ -1840,7 +1840,32 @@ Text::Numbers::100 - Translate the numbers from 0 to 100 into various languages
 
 Translates a number from 0 to 100 into text in the following languages:
 
- cy da de en es fr is it ja nb nl pl pt ro ru sv tr
+Code  Description
+
+  cy  Welsh
+  da  Danish
+  de  German
+  en  English
+  es  Spanish; Castilian
+  fr  French
+  is  Icelandic
+  it  Italian
+  ja  Japanese
+  nb  Norwegian
+  nl  Dutch; Flemish
+  pl  Polish
+  pt  Portuguese
+  ro  Romanian; Moldavian; Moldovan
+  ru  Russian
+  sv  Swedish
+  tr  Turkish
+
+Please <a href="mailto:philiprbrenan@gmail.com">email</a>email me the language code and
+numbers from zero to one hundred for languages not included above.
+
+=head1 See also
+
+L<ISO::639>
 
 =head1 Installation
 
@@ -1869,10 +1894,10 @@ under the same terms as Perl itself.
 __DATA__
 use Test::More tests=>22;
 
-ok Text::Numbers::100::translate(qw(es),  42) eq "cuarentay dos";
-ok Text::Numbers::100::translate(qw(de),  42) eq "zweiundvierzig";
-ok Text::Numbers::100::translate(qw(tr), 100) eq "yüz";
-ok Text::Numbers::100::translate(qw(ru),  61) eq "шестьдесят один";
+ok Text::Numbers::100::translate(q(es),  42) eq "cuarentay dos";
+ok Text::Numbers::100::translate(q(de),  42) eq "zweiundvierzig";
+ok Text::Numbers::100::translate(q(tr), 100) eq "yüz";
+ok Text::Numbers::100::translate(q(ru),  61) eq "шестьдесят один";
 
 if (1)
  {my $t = translations;

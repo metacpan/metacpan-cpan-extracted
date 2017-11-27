@@ -1,0 +1,40 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 79593db5d637bd0a7b7f2dc64169866c7dcf8cb3 AUTHOR_PLEDGE
+SHA1 fe0f657ac09973766955e58e59c112b98bbfcfdb CONTRIBUTORS
+SHA1 7f5cb9d9e51fe77488cddd646db8a1a2da628e34 Changes
+SHA1 61f69f3e63abc96000ee56ed6bad6ff06accb52f INSTALL
+SHA1 96d23fd0d5fce92a90b5c6cce7a1d10dc7f7afe8 LICENSE
+SHA1 dd140218f38c91442b096fa72900f80e2c89fa3b MANIFEST
+SHA1 fd12e9f91a3ff61487f7236500c79406ce1d55b2 META.json
+SHA1 cfa37feb3a82e956fdb0319b0d16fe8cc7f5313e META.yml
+SHA1 97fd8555d759e8f1549a7d6075d61499d978a6ea Makefile.PL
+SHA1 6dc9836c66c4a19fc742a894f22d24ce4f175e5a README.mkdn
+SHA1 5cc6fec7453179afadb680e33c1c59e3f4fa4acd cpanfile
+SHA1 1aac45b93878339145146998784c3cf6672384b6 doap.xml
+SHA1 cbed93e4bd3e0788195868645019766df9c35a51 lib/Neovim/RPC/Plugin/Taskwarrior.pm
+SHA1 2899cc83953fb89ff9816a18107e3e1852c5226a plugin/taskwarrior.vim
+SHA1 3a1b7cef45dfaab07eaa1c73bfab01376da5623d t/00-compile.t
+SHA1 c226b1458551db5ea1afd99c339c1cc17427f65f t/00-report-prereqs.dd
+SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
+SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+
+iEYEARECAAYFAlobH2EACgkQ34Hwf+GwC4zlrACgyIe3A2JYFdNMlDJv1VWTSZlO
+aDoAoMLZSvczqTHeXGEajhV3AF6ZcUAY
+=H0tV
+-----END PGP SIGNATURE-----

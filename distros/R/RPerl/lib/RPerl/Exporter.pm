@@ -3,7 +3,7 @@ package RPerl::Exporter;
 use strict;
 use warnings;
 use RPerl::Config;
-our $VERSION = 0.005_000;
+our $VERSION = 0.006_000;
 
 # [[[ OO INHERITANCE ]]]
 #use parent qw(RPerl::CompileUnit::Module::Class);
@@ -36,9 +36,11 @@ our $SUPPORTED_ALL = [
         number
         character
         string
+        arrayref
         integer_arrayref
         number_arrayref
         string_arrayref
+        hashref
         integer_hashref
         number_hashref
         string_hashref
@@ -96,6 +98,7 @@ sub import {
 
 #    RPerl::diag(q{in Exporter::import(), have $package_exporter = '}, $package_exporter, q{'}, "\n");
 #    RPerl::diag(q{in Exporter::import(), have @{$package_exporter . '::EXPORT'} = }, Dumper(\@{$package_exporter . '::EXPORT'}), "\n");
+#    RPerl::diag(q{in Exporter::import(), have @{$package_exporter . '::EXPORT_OK'} = }, Dumper(\@{$package_exporter . '::EXPORT_OK'}), "\n");
 
     # there are still arguments remaining to be received
     if (scalar @ARG) {
@@ -251,7 +254,7 @@ sub import {
                         
 #                       RPerl::diag('in Exporter::import(), have $SUPPORTED_ALL etc = ' . Dumper([@{$SUPPORTED_ALL}, @{$SUPPORTED_SPECIAL}]) . "\n");
                 
-                        # type-conversion subs
+                        # do NOT enable argument type-checking for RPerl's internal type-conversion subs
                         foreach my $rperl_type (sort @{[@{$SUPPORTED_ALL}, @{$SUPPORTED_SPECIAL}]}) {
                             my $subroutine_start = $rperl_type . '_to_';
                             my $subroutine_start_length = length $subroutine_start;
@@ -260,7 +263,7 @@ sub import {
                             }
                         }
                  
-                        # do NOT enable argument type-checking for these subs
+                        # do NOT enable argument type-checking for marked subs
                         if (not $args_type_checking) {
 #                            RPerl::diag('in Exporter::import(), @EXPORT_OK, NO CHECKING for non-RPerl or no-args or type-checking or type-conversion subroutine ' . $package_exporter . '::' . $subroutine . '()' . "\n");
                 
@@ -288,8 +291,8 @@ sub import {
 #                        $subroutine_arguments_check_code_call .= 'print eval ' . $subroutine_arguments_check_code_name . '(), "\n\n";';
 #                        $subroutine_arguments_check_code_call .= q{::integer_CHECKTRACE( $_[0], '$hard_coded', 'hard_coded()' );};
 #                        $subroutine_arguments_check_code_call .= q{::integer_CHECKTRACE( 21, '$hard_coded', 'hard_coded()' );};
-                        $subroutine_arguments_check_code_call = 'print qq{BEFORE ARGS CHECK CODE EVAL1\n};' . $subroutine_arguments_check_code_call;
-                        $subroutine_arguments_check_code_call .= 'print qq{AFTER ARGS CHECK CODE EVAL1\n};';
+#                        $subroutine_arguments_check_code_call = 'print qq{BEFORE ARGS CHECK CODE EVAL1\n};' . $subroutine_arguments_check_code_call;
+#                        $subroutine_arguments_check_code_call .= 'print qq{AFTER ARGS CHECK CODE EVAL1\n};';
     
                         # define actual exported subroutine
                         my $subroutine_definition_code = q{};

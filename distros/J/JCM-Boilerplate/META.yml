@@ -1,7 +1,7 @@
 ---
-abstract: "Default Boilerplate for J. Maslak's Code"
+abstract: "Default Boilerplate for Joelle Maslak's Code"
 author:
-  - 'J. Maslak <jmaslak@antelope.net>'
+  - 'Joelle Maslak <jmaslak@antelope.net>'
 build_requires:
   Test::More: '1.001014'
 configure_requires:
@@ -16,7 +16,10 @@ name: JCM-Boilerplate
 provides:
   JCM::Boilerplate:
     file: lib/JCM/Boilerplate.pm
-    version: '1.016'
+    version: '1.017'
+  JTM::Boilerplate:
+    file: lib/JTM/Boilerplate.pm
+    version: '1.017'
 requires:
   AnyEvent::Delay: '0.001'
   AnyEvent::Handle::UDP: '0.043'
@@ -108,5 +111,8 @@ requires:
   perl: v5.22.0
   strict: '0'
   warnings: '0'
-version: '1.016'
+resources:
+  bugtracker: https://github.com/jmaslak/dotfiles/issues
+  repository: git://github.com/jmaslak/dotfiles.git
+version: '1.017'
 x_serialization_backend: 'YAML::Tiny version 1.70'

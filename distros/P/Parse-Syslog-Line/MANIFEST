@@ -10,6 +10,7 @@ benchmarks/01-parse.pl
 benchmarks/02-benchsmarter.pl
 benchmarks/xt-date-parsing-iso.pl
 benchmarks/xt-date-parsing-legacy.pl
+bin/parse-syslog-line.pl
 lib/Parse/Syslog/Line.pm
 profile/01-minimal.pl
 t/00-compile.t

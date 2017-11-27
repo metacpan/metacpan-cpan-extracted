@@ -1,4 +1,4 @@
-Module-Starter-Smart version 0.0.8
+Module-Starter-Smart version 0.0.9
 
 INSTALLATION
 
@@ -12,6 +12,9 @@ DEPENDENCIES
 ExtUtils::Command
 File::Spec
 Module::Starter::Simple
+Test::More
+Test::TempDir::Tiny
+parent
 
 CONTRIBUTORS
 
@@ -20,6 +23,7 @@ CONTRIBUTORS
 * David Steinbrunner
 * Andrew Kirkpatrick
 * Markus Böhme
+* Lisa Hare
 
 COPYRIGHT AND LICENCE
 

@@ -42,7 +42,7 @@ check_test(
 
 check_test(
     sub {
-        time_between( sub { _sleep(2); }, 0, 3, 'time_between, passing test' );
+        time_between( sub { _sleep(1); }, 0, 3, 'time_between, passing test' );
     },
     { ok => 1, name => 'time_between, passing test', depth => 1, diag => '' }, 'Passing test of time_between'
 );
@@ -77,16 +77,16 @@ check_test(
 
 check_test(
     sub {
-        time_atleast( sub { _sleep(3); }, 1, 'time_atleast, passing test' );
+        time_atleast( sub { _sleep(2); }, 1, 'time_atleast, passing test' );
     },
     { ok => 1, name => 'time_atleast, passing test', depth => 1, diag => '' }, 'Passing test of time_atleast'
 );
 
 check_test(
     sub {
-        time_between( sub { _sleep(10); }, 1, 5, 'time_between, long running test' );
+        time_between( sub { _sleep(10); }, 1, 3, 'time_between, long running test, should time out' );
     },
-    { ok => 0, name => 'time_between, long running test', depth => 1, diag => qr/\w+ ran \d+ seconds and did not execute within specified interval 1 - 5 seconds.*/ }, 'failing long running test of time_between'
+    { ok => 0, name => 'time_between, long running test, should time out', depth => 1, diag => qr/Execution ran \d+ seconds and did not execute within specified interval 1 - 3 seconds/ }, 'failing long running test of time_between with timeout'
 );
 
 done_testing();

@@ -1,7 +1,8 @@
 #!perl
 use strict;
 use warnings;
-use Test::More tests => 10;
+
+use Test::More;
 use Test::WWW::Mechanize::PSGI;
 
 my $hello = Test::WWW::Mechanize::PSGI->new(
@@ -45,3 +46,20 @@ isa_ok( $die, 'Test::WWW::Mechanize::PSGI' );
 
 $die->get;
 
+my $base      = 'https://metacpan.org/foo/bar';
+my $base_href = Test::WWW::Mechanize::PSGI->new(
+    app => sub {
+        my $env = shift;
+        return [
+            200, [ 'Content-Type' => 'text/html' ],
+            [
+                qq[<html><head><base href="$base"><title>Hi</title></head><body>Hello World</body></html>]
+            ]
+        ];
+    }
+);
+
+my $res = $base_href->get('/');
+is( $base_href->base, $base );
+
+done_testing();

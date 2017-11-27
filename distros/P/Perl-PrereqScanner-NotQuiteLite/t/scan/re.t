@@ -1,6 +1,12 @@
 use strict;
 use warnings;
+use FindBin;
+use lib "$FindBin::Bin/../../";
 use t::scan::Util;
+
+test(<<'TEST'); # ZDM/Pcore-v0.31.4/lib/Pcore/App/Controller/API.pm
+my $method_id = $tx->{action} ? q[/] . ( $tx->{action} =~ s[[.]][/]smgr ) . "/$tx->{method}" : $tx->{method};
+TEST
 
 test(<<'TEST');
 while ( $message =~ m{((!)?(?:https?:)(?://[^\s/?#]*)[^\s?#]*(?:\?[^\s#]*)?(?:#.*)?)}g ) {
@@ -61,6 +67,7 @@ test(<<'TEST'); # ROSSI/LaTeX-Authors-0.81/Authors.pm
         }
         }
 
+    }
     }
 TEST
 

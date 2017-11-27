@@ -1,9 +1,25 @@
 ==================================================
-Changes from 2015-10-25 00:00:00 +0000 to present.
+Changes from 2015-11-25 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.002 at 2017-10-24 05:50:47 +0000
+version 0.003 at 2017-11-24 16:47:35 +0000
+------------------------------------------
+
+  Change: 10dcef7071300f9cd257c6e3359077b13cac9033
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2017-11-24 08:47:27 +0000
+
+    Ready for new release, docs regenerated. 
+
+  Change: 66a5880091a6709ead4d2abe2c1bdfbbdb74aab1
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2017-11-22 09:06:43 +0000
+
+    Fix Import Ratings script to use the proper data structures 
+
+------------------------------------------
+version 0.002 at 2017-10-24 05:49:39 +0000
 ------------------------------------------
 
   Change: ae59b9242d80ce1f775060148b25617dffe30b55

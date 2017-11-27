@@ -1,5 +1,15 @@
 Revision history for Devel-MAT
 
+0.31    2017-11-23 22:25:08
+        [CHANGES]
+         * Annotate each root SV with its rootname in formatted output
+         * Expanded userguide docs
+
+        [BUGFIXES]
+         * Use File::Spec->rel2abs() instead of Cwd::abs_path() to hopefully
+           keep MSWin32 happier (RT123235)
+         * chmod +x all the bin/ scripts
+
 0.30    2017-10-14 20:00:58
         [CHANGES]
          * Migrate `pmat-sizes` and `pmat-find-pv` stand-alone scripts into

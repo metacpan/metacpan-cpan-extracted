@@ -1,5 +1,8 @@
 Revision history for Hash-Merge-Extra
 
+0.04    2017-11-25
+        L_JSON_MERGE_PATCH and R_JSON_MERGE_PATCH behaviors added (rfc7386)
+
 0.03    2017-08-14
         docs improved
 

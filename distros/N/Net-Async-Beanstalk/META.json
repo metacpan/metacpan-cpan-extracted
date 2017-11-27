@@ -1,0 +1,51 @@
+{
+   "abstract" : "Non-blocking beanstalk client",
+   "author" : [
+      "Matthew King (cpan:CHOHAG) <chohag@jtan.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Net-Async-Beanstalk",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::Async" : "0",
+            "List::Util" : "0",
+            "Moo" : "0",
+            "MooX::EventHandler" : "0",
+            "MooX::HandlesVia" : "0",
+            "PerlX::Maybe" : "0",
+            "YAML::Any" : "0",
+            "namespace::clean" : "0",
+            "perl" : "5.014",
+            "strictures" : "2"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.001",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

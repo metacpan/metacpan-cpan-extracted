@@ -1,4 +1,4 @@
 #fsdb experiment mean stddev pct_rsd conf_range conf_low conf_high conf_pct sum sum_squared min max n
 -	-	-	-	-	-	-	0.95	0	0	-	-	0
 # test trailing comment
-#   | dbmapreduce -k experiment -C 'dbcolstats(qw(--nolog duration))'
+#   | dbmapreduce -k experiment -C 'dbcolstats(qw(--nolog --output-on-no-input duration))'

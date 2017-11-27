@@ -1,4 +1,5 @@
 # Pragmas.
+use lib 'inc';
 use strict;
 use warnings;
 
@@ -7,7 +8,7 @@ use inc::Module::Install;
 
 # Definition.
 abstract 'Interface to the Kharkiv Metro Map.';
-author 'Michal Spacek <skim@cpan.org>';
+author 'Michal Josef Spacek <skim@cpan.org>';
 author_requires 'English' => 0;
 author_requires 'File::Object' => 0.08;
 author_requires 'Test::More' => 0;
@@ -21,7 +22,7 @@ name 'Map-Tube-Kharkiv';
 readme_from 'Kharkiv.pm';
 recursive_author_tests('xt');
 requires 'File::Share' => 0;
-requires 'Map::Tube' => '3.06';
+requires 'Map::Tube' => '3.41';
 requires 'Moo' => 0;
 requires 'namespace::clean' => 0;
 requires 'perl' => '5.8.0';
@@ -31,11 +32,11 @@ resources 'homepage' => 'https://github.com/tupinek/Map-Tube-Kharkiv';
 resources 'repository' => 'git://github.com/tupinek/Map-Tube-Kharkiv';
 test_requires 'Encode' => 0;
 test_requires 'English' => 0;
-test_requires 'Test::Map::Tube' => 0.07;
+test_requires 'Test::Map::Tube' => 0.35;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.05';
+version '0.06';
 
 # Run.
 WriteAll();

@@ -6,7 +6,7 @@ use warnings;
 use Carp 'croak';
 use Exporter 'import';
 
-our $VERSION = '1.0';
+our $VERSION = '1.1';
 our @EXPORT = qw|
   dbInit dbh dbCheck dbDisconnect dbCommit dbRollBack
   dbExec dbRow dbAll dbPage

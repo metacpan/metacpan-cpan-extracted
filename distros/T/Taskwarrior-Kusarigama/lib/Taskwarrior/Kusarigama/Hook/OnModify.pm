@@ -1,7 +1,7 @@
 package Taskwarrior::Kusarigama::Hook::OnModify;
 our $AUTHORITY = 'cpan:YANICK';
 #ABSTRACT: Role for plugins running during the task modification stage
-$Taskwarrior::Kusarigama::Hook::OnModify::VERSION = '0.3.1';
+$Taskwarrior::Kusarigama::Hook::OnModify::VERSION = '0.4.0';
 use strict;
 use warnings;
 
@@ -23,7 +23,7 @@ Taskwarrior::Kusarigama::Hook::OnModify - Role for plugins running during the ta
 
 =head1 VERSION
 
-version 0.3.1
+version 0.4.0
 
 =head1 SYNOPSIS
 
@@ -65,7 +65,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Yanick Champoux.
+This software is copyright (c) 2017 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

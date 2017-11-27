@@ -146,14 +146,6 @@ ATTRIBUTES
     Holds an array ref with paths to all the screenshots taken with
     "capture_screenshot".
 
-  toggle_checked_ok
-      $self = $self->toggle_checked_ok("input[name=human]");
-
-    Used to toggle the "checked" attribute either with a click event or
-    fallback to javascript.
-
-    TODO: The implementation might change in the future.
-
 METHODS
   active_element_is
       $self = $self->active_element_is("input[name=username]");
@@ -342,6 +334,14 @@ METHODS
     Submit a form, either by selector or the current active form.
 
     See "submit" in Selenium::Remote::WebElement.
+
+  toggle_checked_ok
+      $self = $self->toggle_checked_ok("input[name=human]");
+
+    Used to toggle the "checked" attribute either with a click event or
+    fallback to javascript.
+
+    TODO: The implementation might change in the future.
 
   wait_for
       $self = $self->wait_for(0.2);

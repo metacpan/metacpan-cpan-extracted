@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 use Markdent::Types;
 use Params::ValidationCompiler qw( validation_for );
@@ -25,10 +25,9 @@ sub events {
 }
 
 {
-    my $event_type = object_does_type('Markdent::Role::Event');
-    my $validator  = validation_for(
-        params => [ { type => $event_type } ],
-        slurpy => $event_type,
+    my $validator = validation_for(
+        params => [ { type => t('EventObject') } ],
+        slurpy => t('EventObject'),
     );
 
     sub capture_events {
@@ -40,9 +39,8 @@ sub events {
 }
 
 {
-    my $handler_type = object_does_type('Markdent::Role::Handler');
-    my $validator    = validation_for(
-        params => [ { type => $handler_type } ],
+    my $validator = validation_for(
+        params => [ { type => t('HandlerObject') } ],
     );
 
     sub replay_events {
@@ -71,7 +69,7 @@ Markdent::CapturedEvents - Represents a series of captured events
 
 =head1 VERSION
 
-version 0.27
+version 0.28
 
 =head1 DESCRIPTION
 

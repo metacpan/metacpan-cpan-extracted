@@ -52,13 +52,16 @@ The default value is 0.
 
 =item B<format_table> => ref to hash
 
-If you use the B<HighlightAndFormat> method, every attribute tag expects a reference of a list with two values. 
-The first one is parsed before the matched text. The second one is parsed after the matched text.
+Here you specify what Kamelon should return for each attribute tag. For instance
+if you are formatting to HTML You might want to make it look like:
 
-If you know which attributes are used by the syntax definition files you are using you do not have
-to specify all. If you want to play it safe, specify all available attribute tags.
+ format_table => {
+	Alert => '<font class="Alert">'
+	Annotation => '<font class="Annotation">'
+ },
 
-If you do not specify this option, Kamelon will return the attribute tag name.
+If you do not specify this option, all attribute tags revert to their name, as in 
+Alert => 'Alert', Annotation => 'Annotation' etc.
 
 The following attribute tags are available:
 
@@ -96,7 +99,7 @@ If this case the B<Format> method returns the formatted document in a scalar var
 
 =item B<tagend> => string
 
-Specifies the end of a highlight tag.
+Specifies the end of a highlight tag. By default it is an empty string.
 
 =item B<template> => various
 

@@ -12,8 +12,9 @@ build_requires:
   perl: '5.008001'
 configure_requires:
   ExtUtils::MakeMaker: '6.17'
+  perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.036, CPAN::Meta::Converter version 2.142060'
+generated_by: 'Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,19 +22,19 @@ meta-spec:
 name: Dist-Zilla-PluginBundle-NGLENN
 no_index:
   directory:
+    - corpus
+    - examples
     - t
     - xt
-    - examples
-    - corpus
   package:
     - DB
 provides:
   Dist::Zilla::PluginBundle::NGLENN:
     file: lib/Dist/Zilla/PluginBundle/NGLENN.pm
-    version: '0.03'
+    version: '0.07'
   Pod::Weaver::PluginBundle::NGLENN:
     file: lib/Pod/Weaver/PluginBundle/NGLENN.pm
-    version: '0.03'
+    version: '0.07'
 requires:
   Dist::Zilla: '5.014'
   Dist::Zilla::Plugin::Authority: '1.006'
@@ -46,8 +47,10 @@ requires:
   Dist::Zilla::Plugin::CopyFilesFromBuild: '0'
   Dist::Zilla::Plugin::Git::Contributors: '0.007'
   Dist::Zilla::Plugin::Git::NextVersion: '0'
+  Dist::Zilla::Plugin::GitHub::UploadRelease: '0'
   Dist::Zilla::Plugin::GithubMeta: '0.36'
   Dist::Zilla::Plugin::InsertCopyright: '0.001'
+  Dist::Zilla::Plugin::InstallGuide: '0'
   Dist::Zilla::Plugin::MetaNoIndex: '0'
   Dist::Zilla::Plugin::MetaProvides::Package: '1.14'
   Dist::Zilla::Plugin::MinimumPerl: '0'
@@ -91,7 +94,7 @@ resources:
   bugtracker: https://github.com/garfieldnate/Dist-Zilla-PluginBundle-NGLENN/issues
   homepage: https://github.com/garfieldnate/Dist-Zilla-PluginBundle-NGLENN
   repository: https://github.com/garfieldnate/Dist-Zilla-PluginBundle-NGLENN.git
-version: '0.03'
+version: '0.07'
 x_authority: cpan:NGLENN
 x_contributors:
   - 'Christian Walde <walde.christian@googlemail.com>'
@@ -99,5 +102,7 @@ x_contributors:
   - 'Eric Johnson <eric.git@iijo.org>'
   - 'Karen Etheridge <ether@cpan.org>'
   - 'Nathan Glenn <garfieldnate@gmail.com>'
+  - 'Nathan Glenn <nathan-gary.glenn@trivago.com>'
   - 'Philippe Bruhat (BooK) <book@cpan.org>'
   - 'Sergey Romanov <complefor@rambler.ru>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -1,0 +1,48 @@
+#!# perl: agent/argv/dump
+
+use strict;
+use warnings;
+
+use Cwd;
+use Getopt::Long;
+use MYDan::Agent::Mrsync;
+
+return sub
+{
+    local $/;
+    my ( %o, $data );
+
+    unless( defined $_[0] ) { shift; %o = @_; }
+    else
+    {
+        Getopt::Long::GetOptionsFromArray( \@_, \%o, 
+            qw( src=s dst=s sp=s dp=s timeout=i max=i retry=i nice=i user=s sudo=s gave=i chown=s chmod=s cc ) 
+        );
+    }
+
+    $o{retry} = 2 unless defined $o{retry};
+    $o{timeout} = 300 unless defined $o{timeout};
+    $o{gave} = 3 unless defined $o{gave};
+    $o{user} = `id -un` and chop $o{user} unless $o{user};
+
+    use YAML::XS;
+
+    my $option = MYDan::Util::OptConf->load();
+    my $range = MYDan::Node->new( $option->dump( 'range' ) );
+
+    map{ $o{$_} =  [ $range->load( $o{$_} )->list ] if $o{$_} && ! ref $o{$_} }qw( src dst );
+
+    my %agent = $option->dump( 'agent' );
+    my $isc = $agent{role} && $agent{role} eq 'client' ? 1 : 0;
+
+
+    my %p = map{ $o{$_} => 1 }grep{ defined $o{$_} }qw( sp dp );
+    my %n = map{ $_ => 1 }@{$o{src}}, @{$o{dst}};
+
+    $o{queryxdata} = MYDan::Agent::Mrsync::queryx( node => [ keys %n ], map{ $_ => $o{$_} }qw( user sudo ) );
+
+    map{ die "agent/argv/mrsync: $_ null" unless $o{$_} && @{$o{$_}} }qw( src dst );
+    die "agent/argv/mrsync: sp undef" unless $o{sp};
+
+    return \%o;
+};

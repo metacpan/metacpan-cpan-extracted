@@ -1,5 +1,16 @@
 Revision history for Neovim-RPC
 
+1.0.0 2017-11-26
+  [ API CHANGES ]
+    - Overhaul of the plugins architecture.
+
+  [ ENHANCEMENTS ]
+    - add 'nvimx.pl' utility script.
+    - add example using Reply for interactive sessions.
+
+  [ STATISTICS ]
+    - code churn: 19 files changed, 837 insertions(+), 77 deletions(-)
+
 0.2.0 2017-03-02
   [ ENHANCEMENTS ]
     - Switch from Future to Promises for promise stuff.

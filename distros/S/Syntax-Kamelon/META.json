@@ -32,13 +32,24 @@
       },
       "runtime" : {
          "requires" : {
+            "Data::Dumper" : "0",
+            "Module::Load::Conditional" : "0",
             "Template" : "0",
+            "Term::ANSIColor" : "0",
+            "Test::More" : "0",
             "Time::HiRes" : "0",
-            "XML::TokeParser" : "0"
+            "XML::TokeParser" : "0.05"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.15",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/haje61/Kamelon.git",
+         "web" : "https://github.com/haje61/Kamelon"
+      }
+   },
+   "version" : "0.16",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

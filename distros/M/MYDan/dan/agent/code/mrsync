@@ -1,0 +1,23 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use YAML::XS;
+use MYDan::Agent::Mrsync;
+
+local $/ = undef;
+
+my %param = %{ YAML::XS::Load( <> ) };
+
+my %o = %{$param{argv}};
+
+
+my $mrsync = MYDan::Agent::Mrsync->new
+(
+     map { $_ => delete $o{$_} } qw( sp dp src dst queryxdata ) 
+);
+
+my @failed = $mrsync->run( %o, log => \*STDOUT , )->failed();
+
+print "###mrsync_failed:", join( ',',@failed ), ":mrsync_failed###";
+
+exit 0;

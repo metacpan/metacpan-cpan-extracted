@@ -6,6 +6,7 @@ MANIFEST
 META.json
 META.yml
 Makefile.PL
+NOTAS-Alberto
 README
 README.mkdn
 README.patching

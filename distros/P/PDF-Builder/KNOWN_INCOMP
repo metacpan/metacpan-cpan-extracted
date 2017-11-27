@@ -7,9 +7,13 @@ Bug fixes to PDF::API2 (in PDF::Builder) are not mentioned if they correct
 an error (that produces an error message and/or incorrect output) and do not 
 affect the operation or results of otherwise correct code.
 
-3.004     2017-07-12
+3.008     2017-11-19
 
-   No known incompatibilities added.
+   lib/PDF/Builder.pm [ref RT #118047] now uses the Graphics::TIFF package
+     by default for TIFF functionality. See the POD for image_tiff() for
+     details, including forcing the use of the old (buggy) code. The new code
+     does not permit filehandles to be passed to image_tiff() (use the old
+     code via -nouseGT => 1 option).
 
 3.003     2017-05-01
 

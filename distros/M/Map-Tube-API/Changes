@@ -1,0 +1,7 @@
+Revision history for Map::Tube::API
+
+0.02  Sun Nov 26 16:45:00 2017
+      - Added missing prereq as reported by CPANTS.
+
+0.01  Sat Nov 25 05:55:00 2017
+      - First version, released.

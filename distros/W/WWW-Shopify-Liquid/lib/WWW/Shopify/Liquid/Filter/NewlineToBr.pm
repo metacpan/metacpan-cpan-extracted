@@ -6,7 +6,7 @@ package WWW::Shopify::Liquid::Filter::NewlineToBr; use base 'WWW::Shopify::Liqui
 sub operate { 
 	my $str = $_[2];
 	$str = '' unless defined $str;
-	$str =~ s/[\r\n]+/<br\/>/g; 
+	$str =~ s/(\r\n|\n|\r)/<br\/>/g; 
 	return $str;
 }
 

@@ -1,3 +1,4 @@
+## no critic (Moose::RequireMakeImmutable, Modules::ProhibitMultiplePackages)
 use strict;
 use warnings;
 
@@ -9,6 +10,8 @@ use Chloro::Types qw( Int Str );
     package Role1;
 
     use Moose::Role;
+    use namespace::autoclean;
+
     use Chloro;
 
     use Chloro::Types qw( Int Str );
@@ -31,6 +34,8 @@ use Chloro::Types qw( Int Str );
     package Role2;
 
     use Moose::Role;
+    use namespace::autoclean;
+
     use Chloro;
 
     use Chloro::Types qw( Int Str );
@@ -48,6 +53,7 @@ use Chloro::Types qw( Int Str );
     package Class1;
 
     use Moose;
+    use namespace::autoclean;
 
     with 'Role1';
 }
@@ -74,7 +80,7 @@ use Chloro::Types qw( Int Str );
         \%groups, {
             bar => {
                 repetition_key => 'bar_id',
-                fields           => {
+                fields         => {
                     size => {
                         type     => Int,
                         required => 1,
@@ -96,6 +102,7 @@ use Chloro::Types qw( Int Str );
     package Class2;
 
     use Moose;
+    use namespace::autoclean;
 
     with 'Role1', 'Role2';
 }
@@ -127,7 +134,7 @@ use Chloro::Types qw( Int Str );
         \%groups, {
             bar => {
                 repetition_key => 'bar_id',
-                fields           => {
+                fields         => {
                     size => {
                         type     => Int,
                         required => 1,
@@ -142,7 +149,7 @@ use Chloro::Types qw( Int Str );
             },
             buz => {
                 repetition_key => 'buz_id',
-                fields           => {
+                fields         => {
                     x => {
                         type     => Int,
                         required => 0,
@@ -164,7 +171,9 @@ use Chloro::Types qw( Int Str );
     package Class3;
 
     use Moose;
+    use namespace::autoclean;
 
+    ## no critic (Moose::ProhibitMultipleWiths)
     with 'Role1';
     with 'Role2';
 }
@@ -196,7 +205,7 @@ use Chloro::Types qw( Int Str );
         \%groups, {
             bar => {
                 repetition_key => 'bar_id',
-                fields           => {
+                fields         => {
                     size => {
                         type     => Int,
                         required => 1,
@@ -211,7 +220,7 @@ use Chloro::Types qw( Int Str );
             },
             buz => {
                 repetition_key => 'buz_id',
-                fields           => {
+                fields         => {
                     x => {
                         type     => Int,
                         required => 0,

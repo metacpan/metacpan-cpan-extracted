@@ -1,5 +1,9 @@
 Revision history for Backup-EZ
 
+0.31    - bug fix for previous release
+
+0.30    - added feature to augment backup dir options
+
 0.25    - added use_sudo option to conf file
         - relaxed requirement that local dir exists
 

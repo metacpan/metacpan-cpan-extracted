@@ -1,5 +1,5 @@
 package Log::Contextual::Router;
-$Log::Contextual::Router::VERSION = '0.007001';
+$Log::Contextual::Router::VERSION = '0.008000';
 # ABSTRACT: Route messages to loggers
 
 use Moo;
@@ -134,6 +134,7 @@ sub get_loggers {
 sub handle_log_request {
    my ($self, %message_info) = @_;
    my $generator = $message_info{message_sub};
+   my $text      = $message_info{message_text};
    my $args      = $message_info{message_args};
    my $log_level = $message_info{message_level};
 
@@ -142,7 +143,7 @@ sub handle_log_request {
    my @loggers = $self->get_loggers(%message_info)
      or return;
 
-   my @log = $generator->(@$args);
+   my @log = defined $text ? ($text) : ($generator->(@$args));
    $_->$log_level(@log) for @loggers;
 }
 
@@ -160,7 +161,7 @@ Log::Contextual::Router - Route messages to loggers
 
 =head1 VERSION
 
-version 0.007001
+version 0.008000
 
 =head1 AUTHOR
 

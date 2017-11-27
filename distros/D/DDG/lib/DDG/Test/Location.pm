@@ -1,7 +1,7 @@
 package DDG::Test::Location;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Gives functions for getting test L<DDG::Location> objects.
-$DDG::Test::Location::VERSION = '1017';
+$DDG::Test::Location::VERSION = '1018';
 use strict;
 use warnings;
 use DDG::Location;
@@ -119,7 +119,7 @@ DDG::Test::Location - Gives functions for getting test L<DDG::Location> objects.
 
 =head1 VERSION
 
-version 1017
+version 1018
 
 =head1 DESCRIPTION
 

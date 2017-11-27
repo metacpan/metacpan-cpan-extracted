@@ -1,5 +1,8 @@
 Revision history for Map::Tube
 
+3.42  2017-11-24T10:45:00+00:00
+      - Improved applying approved plugins.
+
 3.41  2017-11-20T14:30:00+00:00
       - Added sample code for all the supported plugins.
       - Updated CONTRIBUTORS section.

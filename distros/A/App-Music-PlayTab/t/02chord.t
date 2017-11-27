@@ -12,6 +12,7 @@ BEGIN {
 }
 
 use App::Music::PlayTab::NoteMap qw(@FNotes @SNotes);
+use App::Music::PlayTab::Output::PostScript;
 
 # Foreach chord, check the name and ps function.
 foreach my $k ( @FNotes ) {

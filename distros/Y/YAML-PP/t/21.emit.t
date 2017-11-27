@@ -25,14 +25,20 @@ my @dirs = YAML::PP::Test->get_tests(
 
 # skip tests that parser can't parse
 my @skip = qw/
-    4ABK 54T7 5C5M 5KJE 5TRB 6HB6 87E4 8UDB 9MMW
-    C2DT C4HZ CT4Q D88J DBG4 DFF7 DHP8
-    EHF6 FRK4 FUP4
+    4ABK 5TRB 87E4 8CWC 8UDB 9MMW
+    C2DT CN3R CT4Q DFF7
+    EHF6 FRK4
     KZN9 L9U5 LP6E LQZ7 LX3P
-    M5DY M7A3 MXS3 N782
-    Q88A Q9WF QF4Y
-    R4YG SBG9 UDR7 UT92 WZ62 X38W YD5X ZF4X
+    M7A3 N782
+    Q9WF QF4Y
+    R4YG SBG9 UT92 WZ62 X38W
 
+    6BFJ
+    K54U
+    PUW8
+    36F6
+    XLQ9
+    Q5MG
 
 /;
 
@@ -165,7 +171,6 @@ diag "Skipped $skip_count tests";
 sub test {
     my ($title, $name, $yaml, $exp_yaml, $test_events) = @_;
 #    warn __PACKAGE__.':'.__LINE__.": ================================ $name\n";
-#    @$test_events = grep { m/DOC|STR/ } @$test_events;
     my $ok = 0;
     my $error = 0;
     my @events;
@@ -183,20 +188,10 @@ sub test {
         diag "ERROR: $@";
         $results{ERROR}++;
         my $error_type = 'unknown';
-        #if ($@ =~ m/(Expected .*?) at/) {
-        #    $error_type = "$1";
-        #}
-        #elsif ($@ =~ m/(Not Implemented: .*?) at/) {
-        #    $error_type = "$1";
-        #}
-        #elsif ($@ =~ m/(Unexpected .*?) at/) {
-        #    $error_type = "$1";
-        #}
         push @{ $errors{ $error_type } }, $name;
         $error = 1;
     }
 
-    #warn __PACKAGE__.':'.__LINE__.$".Data::Dumper->Dump([\@docs], ['docs']);
     my $out_yaml;
     if ($error) {
         ok(0, "$name - $title Parse ERROR");
@@ -204,7 +199,6 @@ sub test {
     else {
         my $yaml = emit_events($emitter, \@events);
         $out_yaml = $$yaml;
-    #    warn __PACKAGE__.':'.__LINE__.$".Data::Dumper->Dump([\$yaml], ['yaml']);
         $ok = cmp_ok($out_yaml, 'eq', $exp_yaml, "$name - $title - Emit events");
     }
     if ($ok) {
@@ -234,9 +228,6 @@ sub emit_events {
     $emitter->init;
     for my $event (@$events) {
         my ($type, $info) = @$event;
-#        warn __PACKAGE__.':'.__LINE__.": $emitter->$type()\n";
-#        warn __PACKAGE__.':'.__LINE__.$".Data::Dumper->Dump([\$type], ['type']);
-#        warn __PACKAGE__.':'.__LINE__.$".Data::Dumper->Dump([\$info], ['info']);
         $emitter->$type($info);
     }
     my $yaml = $emitter->yaml;

@@ -15,9 +15,9 @@ on 'test' => sub {
   requires "File::Spec" => "0";
   requires "Hash::Util" => "0";
   requires "Specio" => "0.14";
-  requires "Test2::Bundle::Extended" => "0";
   requires "Test2::Plugin::NoWarnings" => "0";
   requires "Test2::Require::Module" => "0";
+  requires "Test2::V0" => "0";
   requires "Test::More" => "1.302015";
   requires "Test::Without::Module" => "0";
 };
@@ -69,6 +69,5 @@ on 'develop' => sub {
   requires "Test::Version" => "2.05";
   requires "Type::Tiny" => "0";
   requires "Type::Utils" => "0";
-  requires "blib" => "1.01";
   requires "perl" => "5.006";
 };

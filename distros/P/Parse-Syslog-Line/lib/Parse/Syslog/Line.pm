@@ -14,7 +14,7 @@ use Module::Load   qw( load );
 use Module::Loaded qw( is_loaded );
 use POSIX          qw( strftime tzset );
 
-our $VERSION = '4.0';
+our $VERSION = '4.2';
 
 # Default for Handling Parsing
 our $DateParsing     = 1;
@@ -23,6 +23,7 @@ our $EpochCreate     = 1;
 our $NormalizeToUTC  = 0;
 our $OutputTimeZone  = 0;
 our $IgnoreTimeZones = 0;
+our $HiResFmt        = '%0.6f';
 
 our $ExtractProgram  = 1;
 our $PruneRaw        = 0;
@@ -201,20 +202,24 @@ sub parse_syslog_line {
                 $msg{epoch} = HTTP::Date::str2time($msg{datetime_raw});
 
                 # Format accordingly, keep highest resolution we can
-                my $diff   = ($msg{epoch} - int($msg{epoch}));
-                my $hires  = $diff > 0 ? substr(sprintf('%0.6f', $diff),1) : '';
+                my $diff  = ($msg{epoch} - int($msg{epoch}));
+                my $hires = '';
+                if( $diff ) {
+                    $msg{epoch} = sprintf $HiResFmt, $msg{epoch};
+                    $hires      = substr(sprintf($HiResFmt,$diff),1);
+                }
                 my $tm_fmt = '%FT%T' . $hires . ( $OutputTimeZone ? ($SYSLOG_TIMEZONE eq 'UTC' ? 'Z' : '%z') : '' );
 
                 # Set the Date Strings
                 $msg{datetime_str} = $NormalizeToUTC ? strftime($tm_fmt, gmtime $msg{epoch})
-                                   				     : strftime($tm_fmt, localtime $msg{epoch});
+                                                     : strftime($tm_fmt, localtime $msg{epoch});
                 # Split this up into parts
                 my @parts    = split /[ T]/, $msg{datetime_str};
                 $msg{date}   = $parts[0];
                 $msg{time}   = (split /[+\-Z]/, $parts[1])[0];
                 $msg{offset} = $NormalizeToUTC ? 'Z'
                              : $parts[1] =~ /([Z+\-].*)/ ? $1
-							 : $SYSLOG_TIMEZONE;
+                             : $SYSLOG_TIMEZONE;
 
                 # Debugging for my sanity
                 printf("TZ=%s Parsed: %s to [%s] %s D:%s T:%s O:%s\n",
@@ -318,7 +323,7 @@ sub parse_syslog_line {
         delete $msg{$_} for grep { $_ =~ /_raw$/ } keys %msg;
     }
     if( $PruneEmpty ) {
-        delete $msg{$_} for grep { !defined $msg{$_} } keys %msg;
+        delete $msg{$_} for grep { !defined $msg{$_} || !length $msg{$_} } keys %msg;
     }
     if( @PruneFields ) {
         no warnings;
@@ -363,16 +368,11 @@ sub preamble_facility {
 sub set_syslog_timezone {
     my ( $tz_name ) = @_;
 
-    if( defined $tz_name && (!exists $ENV{TZ} || $tz_name ne $ENV{TZ}) ) {
+    if( defined $tz_name && length $tz_name ) {
         $ENV{TZ} = $SYSLOG_TIMEZONE = $tz_name;
         tzset();
+        # Output Timezones
         $OutputTimeZone = 1;
-        # Output some useful debug information
-        printf("set_syslog_timezone('%s') results in a timezone of '%s' with offset: %s\n",
-                $tz_name,
-                strftime('%Z', localtime),
-                strftime('%z', localtime),
-            ) if $ENV{DEBUG_PARSE_SYSLOG_LINE};
     }
 
     return $SYSLOG_TIMEZONE;
@@ -403,7 +403,7 @@ Parse::Syslog::Line - Simple syslog line parser
 
 =head1 VERSION
 
-version 4.0
+version 4.2
 
 =head1 SYNOPSIS
 
@@ -481,8 +481,8 @@ Usage:
 
 =head2 DateParsing
 
-If this variable is set to 0 raw date will not be parsed further into components (datetime_str date time epoch).
-Default is 1 (parsing enabled).
+If this variable is set to 0 raw date will not be parsed further into
+components (datetime_str date time epoch).  Default is 1 (parsing enabled).
 
 Usage:
 
@@ -537,9 +537,16 @@ in your wanted format.
 
 B<NOTE>: No further date processing will be done, you're on your own here.
 
+=head2 HiResFmt
+
+Default is C<%0.6f>, or microsecond resolution.  This variable only comes into
+play when the syslog date string contains a high resolution timestamp.  It
+defaults to using microsecond resolution.
+
 =head2 PruneRaw
 
-This variable defaults to 0, set to 1 to delete all keys in the return hash ending in "_raw"
+This variable defaults to 0, set to 1 to delete all keys in the return hash
+ending in "_raw"
 
 Usage:
 
@@ -547,7 +554,8 @@ Usage:
 
 =head2 PruneEmpty
 
-This variable defaults to 0, set to 1 to delete all keys in the return hash which are undefined.
+This variable defaults to 0, set to 1 to delete all keys in the return hash
+which are undefined.
 
 Usage:
 

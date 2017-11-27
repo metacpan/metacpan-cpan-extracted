@@ -35,7 +35,7 @@
    "provides" : {
       "Mojolicious::Plugin::Multiplex" : {
          "file" : "lib/Mojolicious/Plugin/Multiplex.pm",
-         "version" : "0.03"
+         "version" : "0.05"
       },
       "Mojolicious::Plugin::Multiplex::Multiplexer" : {
          "file" : "lib/Mojolicious/Plugin/Multiplex/Multiplexer.pm"
@@ -53,6 +53,6 @@
          "url" : "http://github.com/jberger/Mojolicious-Plugin-Multiplex"
       }
    },
-   "version" : "0.03",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

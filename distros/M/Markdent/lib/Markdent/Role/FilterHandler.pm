@@ -4,9 +4,9 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
-use Specio::Declare;
+use Markdent::Types;
 
 use Moose::Role;
 
@@ -16,7 +16,7 @@ requires 'filter_event';
 
 has handler => (
     is       => 'ro',
-    does     => object_does_type('Markdent::Role::Handler'),
+    does     => t('HandlerObject'),
     required => 1,
 );
 
@@ -46,7 +46,7 @@ Markdent::Role::FilterHandler - A role for handlers which act as filters
 
 =head1 VERSION
 
-version 0.27
+version 0.28
 
 =head1 DESCRIPTION
 

@@ -1,0 +1,22 @@
+Version 0.005 - 2017-11-26
+ - Remove 'filters' feature since it adds overhead and not much value
+ - Fix bug when creating multiple parallel record iterators
+ - Sanitize data headers written in logging messages
+
+Version 0.004 - 2017-11-26
+ - Re-add Text::CSV as a hard dependency since it's small and I need a recent
+   version for all the tests to pass.
+
+Version 0.003 - 2017-11-25
+ - Remove hard dependencies on CSV and Excel parsers
+ - Use new "Mock" decoder for format-independent test cases
+ - Fix handling of $TableReader->log to match API description
+ - Fix bugs to be compatible back to 5.8.9
+
+Version 0.002 - 2017-11-24
+ - Fixed 'filters' feature
+ - Iterators of decoders are now created on each call, rather than cached
+ - Many documentation improvements
+
+Version 0.001 - 2017-11-24
+ - Initial public version

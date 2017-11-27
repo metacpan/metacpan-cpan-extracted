@@ -1,6 +1,55 @@
 See also Changes-ver_2 for changes released for PDF::API2, and incorporated
 into PDF::Builder.
 
+3.008     2017-11-26  
+
+   examples/ShowFont.pl added to list out many font file glyphs.
+     examples.bat, examples/README, examples/examples.output updated.
+
+   lib/PDF/Builder.pm [ref RT 121912/#67 and also RT 41971/#5] fix outlines 
+     method (thanks to "futuramedium"). Update test case into an example, and
+     add to examples.bat, MANIFEST, examples/README, examples/examples.output,
+     and (new) examples/055_outlines and examples/resources/samples_55.pdf.
+
+   lib/PDF/Builder.pm, lib/PDF/Builder/Resource/BaseFont.pm, 
+     lib/PDF/Builder/Resource/Font/SynFont.pm, examples/021_synfonts
+     [ref RT 120048/#47] fixes for synthetic fonts (via "futuramedium"). Some 
+     items carried over to new issues #79 and #81, and this one closed. 
+     021_synfonts make cleaner selection of what to run (which font types,
+     which fonts within a type, which variants).
+
+   lib/PDF/Builder.pm [ref RT 122393/#72] further work on diagnosing reported
+     problem. If this was actually a PDF::API2/Builder problem at one time, and 
+     not simply a corrupted local font issue, it has apparently been cleared 
+     up. Documented supported CJK names and aliases in Builder's POD.
+
+   lib/PDF/Builder/Annotation.pm, examples/040_annotation, 
+     examples/041_annot_fileattach (new), examples/resources/pod2htmd.temp 
+     (new), examples/resources/sample.txt (new), MANIFEST, DEPRECATED, 
+     examples.bat, examples/README, examples/examples.output, t/annotate.t 
+     [ref RT 117942/#41] (thanks to Johan Vromans). 
+     Extensions to annotation methods plus new file attachment annotation code 
+     contributed by Johan. There are still some minor glitches in the behavior, 
+     including the "border" specification not working, and inconsistent icon
+     size, so I'm leaving the issue open for now. Also, the annotation pdfile() 
+     method has been deprecated and replaced by pdf_file().
+
+   lib/PDF/Builder.pm, lib/PDF/Builder/Resource/XObject/Image/TIFF_GT.pm (new),
+     lib/PDF/Builder/Resource/XObject/Image/TIFF/File_GT.pm (new), MANIFEST,
+     KNOWN_INCOMP, t/tiff.t, lib/PDF/Builder/Resource/XObject/Image/TIFF.pm,
+     lib/PDF/Builder/Lite.pm [ref RT 118047/#42] (thanks to Jeffrey Ratcliffe).
+     Use Jeffrey's Graphics::TIFF wrapper around libtiff.a to simplify and
+     correct many bugs in TIFF support. As libtiff.a is not available on all
+     systems, add this as an extension (_GT modules) and have Builder.pm
+     select which one to use (preferably the new Graphics::TIFF-using version,
+     with fallback to the old pure Perl version, which has not been fixed). 
+     This can be overridden (force old version) with the -nouseGT option (see 
+     t/tiff.t).
+
+   lib/PDF/Builder.pm, lib/PDF/Builder/Resource/XObject/Image/TIFF_GT.pm,
+     lib/PDF/Builder/Resource/XObject/Image/TIFF/File_GT.pm,
+     lib/PDF/Builder/Basic/PDF/File.pm [ref RT 84665/#2] updates and fixes
+     while working on TIFF G3/G4 compression bug.
 
 3.007     2017-09-26
 

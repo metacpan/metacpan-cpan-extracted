@@ -1,5 +1,7 @@
 use strict;
 use warnings;
+use FindBin;
+use lib "$FindBin::Bin/../../";
 use t::scan::Util;
 
 test(<<'TEST'); # PHRED/WebService-NetSuite-0.04/lib/WebService/NetSuite.pm

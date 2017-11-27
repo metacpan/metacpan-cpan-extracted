@@ -32,6 +32,8 @@
 //
 // root.js
 //
+// entry point of application, whether for actual use or functional testing
+//
 // displays the application frame in the browser window or QUnit fixture,
 // determines user and privlevel, initializes targets, and loads the main menu
 //
@@ -58,10 +60,11 @@ define ([
 
     return function () {
 
-        var dummy = Object.create(null),
-            cu,
+        var cu,
             priv;
 
+        // In functional testing, test cases run in sequence. Since tests can
+        // fail, the initial state of the target stack is unknown.
         stack.resetStack();
 
         if ( cf('testing') ) {
@@ -69,6 +72,7 @@ define ([
         } else {
             $(document.body).html(html.body());
         }
+
         cu = currentUser('obj');
         console.log("root: current user object:", cu);
         priv = currentUser('priv');
@@ -81,7 +85,7 @@ define ([
             loginDialog();
         }
     
-        return dummy;
+        return null;
 
     }
 

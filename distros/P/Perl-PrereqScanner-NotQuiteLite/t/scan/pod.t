@@ -1,5 +1,7 @@
 use strict;
 use warnings;
+use FindBin;
+use lib "$FindBin::Bin/../../";
 use t::scan::Util;
 
 test(<<'TEST'); # JEPRICE/Meta-Widget-Gtk-Sprite-0.01/Sprite.pm

@@ -1,10 +1,15 @@
 sudo: required
+addons:
+  hosts:
+    - travis1.local
+    - travis1
 env:
   global:
-    - ETCD_VER=v3.2.0_plus_git
+    - ETCD_VER=v3.2.10_plus_git
     - ETCDCTL_API=3
     - ETCD_TEST_HOST=127.0.0.1
     - ETCD_TEST_PORT=2379
+    - ETCD_TEST_CAPATH=$BUILD_DIR/t/tls/ca.pem
     - RELEASE_TESTING=1
     - PATH=$PATH:/tmp/test-etcd/
 language: perl
@@ -27,8 +32,6 @@ before_install:
   - mkdir -p /tmp/test-etcd
   - tar xzvf /tmp/etcd-${ETCD_VER}-linux-amd64.tar.gz -C /tmp/test-etcd --strip-components=1
   - /tmp/test-etcd/etcd -version
-  - /tmp/test-etcd/etcd&
-  - sleep 3
   - git clone git://github.com/travis-perl/helpers ~/travis-perl-helpers
   - source ~/travis-perl-helpers/init
   - build-perl
@@ -39,6 +42,8 @@ install:
   - cpan-install --deps
   - cpan-install --coverage
 script:
+  - /tmp/test-etcd/etcd --name member1 --cert-file=$BUILD_DIR/t/tls/server.pem --key-file=$BUILD_DIR/t/tls/server-key.pem --advertise-client-urls=https://127.0.0.1:2379 --listen-client-urls=https://127.0.0.1:2379 &
+  - sleep 3
   - perl Makefile.PL
   - make
   - make test 

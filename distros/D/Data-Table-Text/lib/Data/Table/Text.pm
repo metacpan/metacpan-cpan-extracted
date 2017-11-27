@@ -7,7 +7,7 @@
 
 package Data::Table::Text;
 use v5.8.0;
-our $VERSION = '20171117';
+our $VERSION = '20171124';
 use warnings FATAL => qw(all);
 use strict;
 use Carp;
@@ -65,10 +65,9 @@ sub XXX($)                                                                      
    }
  }
 
-sub zzz($$)                                                                     # Execute lines of commands as one long command string separated by added &&'s and then check that the execution results match the specified regular expression, confess()ing to the error if they do not.
- {my ($cmd, $success) = @_;                                                     # Commands to execute - one per line with no trailing &&, regular expression to check the results
-  $cmd     or confess "No command\n";                                           # Check that there is a command to execute
-  $success or confess "No error checking regular expression\n";                 # Check that there is a success check
+sub zzz($;$)                                                                    # Execute lines of commands as one long command string separated by added &&'s and then check that the pipeline results in a return code of zero and that the execution results match the optional regular expression if one has been supplied; confess() to an error if either check fails.
+ {my ($cmd, $success) = @_;                                                     # Commands to execute - one per line with no trailing &&, optional regular expression to check the results
+  $cmd or confess "No command\n";                                               # Check that there is a command to execute
   my @c;                                                                        # Commands
   for(split /\n/, $cmd)                                                         # Split commands on new lines
    {s(#.*\Z)()gs;                                                               # Remove comments
@@ -77,8 +76,9 @@ sub zzz($$)                                                                     
    }
   my $c = join ' && ', @c;                                                      # Command string to execute
   my $r = qx($c 2>&1);                                                          # Execute command
+  my $R = $?;
   $r =~ s/\s+\Z//s;                                                             # Remove trailing white space from response
-  confess "$cmd\n$r\n" if $r !~ m/$success/;                                    # Error check if an error checking regular expression has been supplied
+  confess "$cmd\n\n$c\n$r\n" if $R or $success && $r !~ m/$success/s;                 # Error check with return code and an error checking regular expression if one has been supplied
   $r
  }
 
@@ -207,12 +207,6 @@ sub removeFilePrefix($@)                                                        
 
 sub currentDirectory                                                            # Get the current working directory.
  {renormalizeFolderName(getcwd)
- }
-
-sub userId                                                                      # Get the current user id via whoami
- {my $u = qx(whoami);
-  chomp($u);
-  $u
  }
 
 sub currentDirectoryAbove                                                       # The path to the folder above the current working folder.
@@ -494,7 +488,7 @@ sub decodeJson($)                                                               
 
 sub encodeBase64($)                                                             # Encode a string in base 64.
  {my ($string) = @_;                                                            # String to encode
-  encode_base64($string)
+  encode_base64($string, '')
  }
 
 sub decodeBase64($)                                                             # Decode a string in base 64.
@@ -550,9 +544,7 @@ sub setUnionOfTwoArraysOfWords($$)                                              
   sort keys %a
  }
 
-#1 Arrays                                                                       # Array operations
-
-sub contains($@)                                                                # Returns the indices at which an item matches an array. If item is a regular expression then it is matched as one else it is a number it is matched as a number, else a string.
+sub contains($@)                                                                # Returns the indices at which an item matches elements of the specified array. If the item is a regular expression then it is matched as one, else it is a number it is matched as a number, else as a string.
  {my ($item, @array) = @_;                                                      # Item, array
   my @r;
   if (ref($item) =~ m(Regexp))                                                  # Match via a regular expression
@@ -572,6 +564,8 @@ sub contains($@)                                                                
    }
   @r
  }
+
+#1 Minima and Maxima                                                            # Find the smallest and largest elements of arrays
 
 sub min(@)                                                                      # Find the minimum number in a list.
  {my (@n) = @_;                                                                 # Numbers
@@ -863,7 +857,7 @@ sub pad($$)                                                                     
   $string .= ' ' x $p;
  }
 
-sub nws($)                                                                      # Normalize white space in a string to make comparisons easier.
+sub nws($)                                                                      # Normalize white space in a string to make comparisons easier. Leading and trailing white space is removed; blocks of whitespace in the interior are reduced to a singe space.  In effect: this puts everything on one long line with never more than a space at a time.
  {my ($string) = @_;                                                            # String to normalize
   $string =~ s/\A\s+//r =~ s/\s+\Z//r =~ s/\s+/ /gr
  }
@@ -898,8 +892,15 @@ sub perlPackage($)                                                              
 
 sub addCertificate($)                                                           # Add a certificate to the current ssh session.
  {my ($file) = @_;                                                              # File containing certificate
-  my $c = q(ssh-add -t 100000000 $file);
-  qx($c);
+  qx(ssh-add -t 100000000 $file 2>/dev/null);
+ }
+
+sub hostName                                                                    # The name of the host we are running on
+ {trim(qx(hostname))
+ }
+
+sub userId                                                                      # The userid we are currently running under
+ {trim(qx(whoami))
  }
 
 #1 Documentation                                                                # Extract, format and update documentation for a perl module
@@ -1308,6 +1309,7 @@ filePath filePathDir filePathExt fileSize findDirs findFiles
 formatTableBasic fullFileName
 genLValueArrayMethods genLValueHashMethods
 genLValueScalarMethods genLValueScalarMethodsWithDefaultValues
+hostName
 imageSize indentString isBlank
 javaPackage javaPackageAsFileName
 keyCount
@@ -2707,7 +2709,7 @@ echo aaa
 echo bbb
 END
 
-if (1)
+if (1)                                                                          # Failure
  {eval {zzz(<<END, qr(SUCCESS)s)};
 echo aaa
 echo bbb

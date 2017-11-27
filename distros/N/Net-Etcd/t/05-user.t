@@ -8,19 +8,21 @@ use Test::More;
 use Test::Exception;
 use Data::Dumper;
 
-my ($host, $port);
+my $config;
 
 if ( $ENV{ETCD_TEST_HOST} and $ENV{ETCD_TEST_PORT}) {
-    $host = $ENV{ETCD_TEST_HOST};
-    $port = $ENV{ETCD_TEST_PORT};
-
+    $config->{host}     = $ENV{ETCD_TEST_HOST};
+    $config->{port}     = $ENV{ETCD_TEST_PORT};
+    $config->{cacert}   = $ENV{ETCD_TEST_CAPATH} if $ENV{ETCD_TEST_CAPATH};
+	$config->{name}     = 'root';
+    $config->{password} = 'toor';
     plan tests => 19;
 }
 else {
     plan skip_all => "Please set environment variable ETCD_TEST_HOST and ETCD_TEST_PORT.";
 }
 
-my $etcd = Net::Etcd->new( { host => $host, port => $port, name => 'root', password => 'toor' } );
+my $etcd = Net::Etcd->new( $config );
 
 my ($user, $role);
 
@@ -35,7 +37,7 @@ lives_ok(
 
 #print STDERR Dumper($user);
 
-cmp_ok( $user->{response}{success}, '==', 1, "add new user success" );
+cmp_ok( $user->is_success, '==', 1, "add new user success" );
 
 # add new role
 lives_ok( sub { $role = $etcd->role( { name => 'myrole' } )->add;
@@ -44,7 +46,7 @@ lives_ok( sub { $role = $etcd->role( { name => 'myrole' } )->add;
 
 #print STDERR Dumper($role);
 
-cmp_ok( $role->{response}{success}, '==', 1, "add new role success" );
+cmp_ok( $role->is_success, '==', 1, "add new role success" );
 
 # role get
 lives_ok(
@@ -54,7 +56,7 @@ lives_ok(
     },
     "get role"
 );
-cmp_ok( $role->{response}{success}, '==', 1, "get role success" );
+cmp_ok( $role->is_success, '==', 1, "get role success" );
 
 #print STDERR Dumper($role);
 
@@ -68,7 +70,7 @@ lives_ok(
 
 #print STDERR Dumper($role);
 
-cmp_ok( $role->{response}{success}, '==', 1, "role_perm grant success" );
+cmp_ok( $role->is_success, '==', 1, "role_perm grant success" );
 
 # grant role
 lives_ok(
@@ -81,7 +83,7 @@ lives_ok(
 
 #print STDERR Dumper($role);
 
-cmp_ok( $role->{response}{success}, '==', 1, "grant role success" );
+cmp_ok( $role->is_success, '==', 1, "grant role success" );
 
 # list role
 lives_ok(
@@ -92,7 +94,7 @@ lives_ok(
     "list role"
 );
 
-cmp_ok( $role->{response}{success}, '==', 1, "list role success" );
+cmp_ok( $role->is_success, '==', 1, "list role success" );
 #print STDERR Dumper($role);
 
 # revoke role
@@ -113,7 +115,7 @@ lives_ok(
     "remove role from user"
 );
 
-cmp_ok( $user->{response}{success}, '==', 1, "revoke role success" );
+cmp_ok( $user->is_success, '==', 1, "revoke role success" );
 
 #print STDERR Dumper($user);
 
@@ -122,7 +124,7 @@ lives_ok( sub { $user = $etcd->role( { role => 'myrole' } )->delete; },
     "delete role" );
 
 
-cmp_ok( $user->{response}{success}, '==', 1, "role delete success" );
+cmp_ok( $user->is_success, '==', 1, "role delete success" );
 
 
 # delete user
@@ -132,6 +134,6 @@ lives_ok( sub { $user = $etcd->user( { name => 'samba' } )->delete; },
 
 #print STDERR Dumper($user);
 
-cmp_ok( $user->{response}{success}, '==', 1, "delete user success" );
+cmp_ok( $user->is_success, '==', 1, "delete user success" );
 
 1;

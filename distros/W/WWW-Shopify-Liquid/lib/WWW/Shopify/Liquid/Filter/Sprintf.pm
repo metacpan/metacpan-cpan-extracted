@@ -7,7 +7,7 @@ sub min_arguments { return 0; }
 sub max_arguments { return undef; }
 sub operate { 
 	my ($self, $hash, $operand, @arguments) = @_;
-	return sprintf($operand, @arguments);
+	return sprintf($operand, map { defined $_ ? $_ : '' } @arguments);
 }
 
 1;

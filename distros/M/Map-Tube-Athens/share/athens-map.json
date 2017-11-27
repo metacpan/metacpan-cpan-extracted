@@ -1,0 +1,80 @@
+{
+    "name"     : "Athens Tube",
+    "lines"    : {
+        "line"    : [
+            { "id" : "M1", "name" : "M1", "color": "#108C10" },
+            { "id" : "M2", "name" : "M2", "color": "#FF0000" },
+            { "id" : "M3", "name" : "M3", "color": "#4A39EF" }
+        ]
+    },
+    "stations" : {
+        "station" :
+            [
+
+                 { "id" : "OMONIA",      "name": "Omonia",      "line": "M1:9,M2:8",  "link": "MONASTIRAKI,M1-10,M2-07,M2-09"      },
+                 { "id" : "ATTIKI",      "name": "Attiki",      "line": "M1:11,M2:5", "link": "M1-10,M1-12,M2-04,M2-06"            },
+                 { "id" : "SYNTAGMA",    "name": "Syntagma",    "line": "M2:10,M3:6", "link": "MONASTIRAKI,M2-09,M2-11,M3-07"      },
+                 { "id" : "MONASTIRAKI", "name": "Monastiraki", "line": "M1:8,M3:5",  "link": "M1-07,OMONIA,M3-04,SYNTAGMA"        },
+
+                 { "id" : "M1-01", "name": "Piraeus",         "line": "M1:1",     "link": "M1-02"             },
+                 { "id" : "M1-02", "name": "Faliro",          "line": "M1:2",     "link": "M1-01,M1-03"       },
+                 { "id" : "M1-03", "name": "Moschato",        "line": "M1:3",     "link": "M1-02,M1-04"       },
+                 { "id" : "M1-04", "name": "Kalithea",        "line": "M1:4",     "link": "M1-03,M1-05"       },
+                 { "id" : "M1-05", "name": "Tavros",          "line": "M1:5",     "link": "M1-04,M1-06"       },
+                 { "id" : "M1-06", "name": "Petralona",       "line": "M1:6",     "link": "M1-05,M1-07"       },
+                 { "id" : "M1-07", "name": "Thissio",         "line": "M1:7",     "link": "M1-06,MONASTIRAKI" },
+                 { "id" : "M1-10", "name": "Victoria",        "line": "M1:10",    "link": "OMONIA,ATTIKI"     },
+                 { "id" : "M1-12", "name": "Ag. Nikolaos",    "line": "M1:12",    "link": "ATTIKI,M1-13"      },
+                 { "id" : "M1-13", "name": "Kato Patissia",   "line": "M1:13",    "link": "M1-12,M1-14"       },
+                 { "id" : "M1-14", "name": "Ag. Eleftherios", "line": "M1:14",    "link": "M1-13,M1-15"       },
+                 { "id" : "M1-15", "name": "Ano Patissia",    "line": "M1:15",    "link": "M1-14,M1-16"       },
+                 { "id" : "M1-16", "name": "Perissos",        "line": "M1:16",    "link": "M1-15,M1-17"       },
+                 { "id" : "M1-17", "name": "Pefkakia",        "line": "M1:17",    "link": "M1-16,M1-18"       },
+                 { "id" : "M1-18", "name": "Nea Ionia",       "line": "M1:18",    "link": "M1-17,M1-19"       },
+                 { "id" : "M1-19", "name": "Iraklio",         "line": "M1:19",    "link": "M1-18,M1-20"       },
+                 { "id" : "M1-20", "name": "Irini",           "line": "M1:20",    "link": "M1-19,M1-21"       },
+                 { "id" : "M1-21", "name": "Neratziotissa",   "line": "M1:21",    "link": "M1-20,M1-22"       },
+                 { "id" : "M1-22", "name": "Maroussi",        "line": "M1:22",    "link": "M1-21,M1-23"       },
+                 { "id" : "M1-23", "name": "KAT",             "line": "M1:23",    "link": "M1-22,M1-24"       },
+                 { "id" : "M1-24", "name": "Kifissia",        "line": "M1:24",    "link": "M1-23"             },
+
+                 { "id" : "M2-01", "name": "Anthoupoli",                          "line": "M2:1",   "link": "M2-02"           },
+                 { "id" : "M2-02", "name": "Peristeri",                           "line": "M2:2",   "link": "M2-01,M2-03"     },
+                 { "id" : "M2-03", "name": "Ag. Antonios",                        "line": "M2:3",   "link": "M2-02,M2-04"     },
+                 { "id" : "M2-04", "name": "Sepolia",                             "line": "M2:4",   "link": "M2-03,ATTIKI"    },
+                 { "id" : "M2-06", "name": "Larissa",                             "line": "M2:6",   "link": "ATTIKI,M2-07"    },
+                 { "id" : "M2-07", "name": "Metaxourghio",                        "line": "M2:7",   "link": "M2-06,OMONIA"    },
+                 { "id" : "M2-09", "name": "Panepistimio",                        "line": "M2:9",   "link": "OMONIA,SYNTAGMA" },
+                 { "id" : "M2-11", "name": "Akropolis",                           "line": "M2:11",  "link": "SYNTAGMA,M2-12"  },
+                 { "id" : "M2-12", "name": "Syngrou/Fix",                         "line": "M2:12",  "link": "M2-11,M2-13"     },
+                 { "id" : "M2-13", "name": "Neos Kosmos",                         "line": "M2:13",  "link": "M2-12,M2-14"     },
+                 { "id" : "M2-14", "name": "Ag. Ioannis",                         "line": "M2:14",  "link": "M2-13,M2-15"     },
+                 { "id" : "M2-15", "name": "Dafni",                               "line": "M2:15",  "link": "M2-14,M2-16"     },
+                 { "id" : "M2-16", "name": "Ag. Dimitrios/Alexandros Panagoulis", "line": "M2:16",  "link": "M2-15,M2-17"     },
+                 { "id" : "M2-17", "name": "Ilioupoli",                           "line": "M2:17",  "link": "M2-16,M2-18"     },
+                 { "id" : "M2-18", "name": "Alimos",                              "line": "M2:18",  "link": "M2-17,M2-19"     },
+                 { "id" : "M2-19", "name": "Argyroupoli",                         "line": "M2:19",  "link": "M2-18,M2-20"     },
+                 { "id" : "M2-20", "name": "Elliniko",                            "line": "M2:20",  "link": "M2-19"           },
+
+                 { "id" : "M3-01", "name": "Aghia Marina",         "line": "M3:1",    "link": "M3-02"             },
+                 { "id" : "M3-02", "name": "Egaleo",               "line": "M3:2",    "link": "M3-01,M3-03"       },
+                 { "id" : "M3-03", "name": "Eleonas",              "line": "M3:3",    "link": "M3-02,M3-04"       },
+                 { "id" : "M3-04", "name": "Kerameikos",           "line": "M3:4",    "link": "M3-03,MONASTIRAKI" },
+                 { "id" : "M3-07", "name": "Evangelismos",         "line": "M3:7",    "link": "SYNTAGMA,M3-08"    },
+                 { "id" : "M3-08", "name": "Megaro Moussikis",     "line": "M3:8",    "link": "M3-07,M3-09"       },
+                 { "id" : "M3-09", "name": "Ambelokipi",           "line": "M3:9",    "link": "M3-08,M3-10"       },
+                 { "id" : "M3-10", "name": "Panormou",             "line": "M3:10",   "link": "M3-09,M3-11"       },
+                 { "id" : "M3-11", "name": "Katehaki",             "line": "M3:11",   "link": "M3-10,M3-12"       },
+                 { "id" : "M3-12", "name": "Ethniki Amyna",        "line": "M3:12",   "link": "M3-11,M3-13"       },
+                 { "id" : "M3-13", "name": "Holargos",             "line": "M3:13",   "link": "M3-12,M3-14"       },
+                 { "id" : "M3-14", "name": "Nomismatokopio",       "line": "M3:14",   "link": "M3-13,M3-15"       },
+                 { "id" : "M3-15", "name": "Ag. Paraskevi",        "line": "M3:15",   "link": "M3-14,M3-16"       },
+                 { "id" : "M3-16", "name": "Halandri",             "line": "M3:16",   "link": "M3-15,M3-17"       },
+                 { "id" : "M3-17", "name": "Doukissis Plakentias", "line": "M3:17",   "link": "M3-16,M3-18"       },
+                 { "id" : "M3-18", "name": "Pallini",              "line": "M3:18",   "link": "M3-17,M3-19"       },
+                 { "id" : "M3-19", "name": "Peania-Kantza",        "line": "M3:19",   "link": "M3-18,M3-20"       },
+                 { "id" : "M3-20", "name": "Koropi",               "line": "M3:20",   "link": "M3-19,M3-21"       },
+                 { "id" : "M3-21", "name": "Airport",              "line": "M3:21",   "link": "M3-20"             }
+            ]
+    }
+}

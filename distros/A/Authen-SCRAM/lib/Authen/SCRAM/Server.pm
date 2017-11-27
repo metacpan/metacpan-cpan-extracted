@@ -5,7 +5,7 @@ use warnings;
 package Authen::SCRAM::Server;
 # ABSTRACT: RFC 5802 SCRAM Server
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 use Moo 1.001000;
 
@@ -270,7 +270,7 @@ Authen::SCRAM::Server - RFC 5802 SCRAM Server
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -301,6 +301,14 @@ version 0.005
 =head1 DESCRIPTION
 
 This module implements the server-side SCRAM algorithm.
+
+=head1 NAME
+
+Authen::SCRAM::Server - RFC 5802 SCRAM Server
+
+=head1 VERSION
+
+version 0.006
 
 =head1 ATTRIBUTES
 
@@ -398,6 +406,18 @@ mechanism you are using.
 This is done to avoid double encoding/decoding problems if your transport is
 already doing UTF-8 encoding or decoding as it constructs outgoing messages or
 parses incoming messages.
+
+=head1 AUTHOR
+
+David Golden <dagolden@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2014 by David Golden.
+
+This is free software, licensed under:
+
+  The Apache License, Version 2.0, January 2004
 
 =head1 AUTHOR
 

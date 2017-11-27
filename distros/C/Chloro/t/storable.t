@@ -37,7 +37,8 @@ SKIP:
         )
     );
 
-    eval <<'EOF';
+    ## no critic (BuiltinFunctions::ProhibitStringyEval)
+    eval <<'EOF' or die $@;
     {
         package My::Types;
 
@@ -48,6 +49,8 @@ SKIP:
     }
 
     My::Types->import('MyHashRef');
+
+    1;
 EOF
 
     die $@ if $@;

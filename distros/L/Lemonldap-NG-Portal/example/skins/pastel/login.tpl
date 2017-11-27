@@ -101,6 +101,19 @@
 
   </TMPL_IF>
 
+  <TMPL_IF NAME="DISPLAY_KRB">
+
+    <form id="lform" action="#" method="post" class="login" role="form">
+      <!-- Hidden fields -->
+      <TMPL_VAR NAME="HIDDEN_INPUTS">
+      <input type="hidden" name="url" value="<TMPL_VAR NAME="AUTH_URL">" />
+      <input type="hidden" name="timezone" />
+      <input type="hidden" name="skin" value="<TMPL_VAR NAME="SKIN">" />
+      <TMPL_INCLUDE NAME="kerberos.tpl">
+    </form>
+
+  </TMPL_IF>
+
   <TMPL_IF NAME="DISPLAY_OPENID_FORM">
 
     <form action="#" method="post" class="login">

@@ -1,7 +1,7 @@
 package DDG;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: DuckDuckGo Search Engines Open Source Parts
-$DDG::VERSION = '1017';
+$DDG::VERSION = '1018';
 
 use strict;
 use warnings;
@@ -26,7 +26,7 @@ DDG - DuckDuckGo Search Engines Open Source Parts
 
 =head1 VERSION
 
-version 1017
+version 1018
 
 =head1 DESCRIPTION
 

@@ -23,16 +23,16 @@ no_index:
 provides:
   Mutex:
     file: lib/Mutex.pm
-    version: '1.004'
+    version: '1.005'
   Mutex::Channel:
     file: lib/Mutex/Channel.pm
-    version: '1.004'
+    version: '1.005'
   Mutex::Flock:
     file: lib/Mutex/Flock.pm
-    version: '1.004'
+    version: '1.005'
   Mutex::Util:
     file: lib/Mutex/Util.pm
-    version: '1.004'
+    version: '1.005'
 requires:
   Carp: '0'
   Fcntl: '0'
@@ -46,4 +46,4 @@ resources:
   homepage: https://github.com/marioroy/mutex-perl
   license: http://dev.perl.org/licenses/
   repository: https://github.com/marioroy/mutex-perl.git
-version: '1.004'
+version: '1.005'

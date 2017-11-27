@@ -18,7 +18,7 @@ use Test::Timer::TimeoutException;
 
 @EXPORT = qw(time_ok time_nok time_atleast time_atmost time_between);
 
-$VERSION = '2.08';
+$VERSION = '2.09';
 
 my $test  = Test::Builder->new;
 my $timeout = 0;
@@ -249,7 +249,7 @@ Test::Timer - test module to test/assert response times
 
 =head1 VERSION
 
-The documentation describes version 2.08 of Test::Timer
+The documentation describes version 2.09 of Test::Timer
 
 =head1 FEATURES
 

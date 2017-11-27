@@ -11,7 +11,7 @@ use Encode 'encode_utf8';
 use Scalar::Util 'looks_like_number';
 
 
-our $VERSION = '1.0';
+our $VERSION = '1.1';
 our @EXPORT = ('formValidate', 'mail');
 our @EXPORT_OK = ('uri_escape', 'kv_validate');
 
@@ -46,7 +46,7 @@ my %default_templates = (
   int    => { func => \&_template_validate_num, regex => qr/^-?(?:0|[1-9]\d*)$/, inherit => ['min','max'] },
   uint   => { func => \&_template_validate_num, regex => qr/^(?:0|[1-9]\d*)$/, inherit => ['min','max'] },
   ascii  => { regex => qr/^[\x20-\x7E]*$/ },
-  email  => { regex => qr/^[-\+\.!#\$=\w]+\@$re_domain$/, maxlength => 254 },
+  email  => { regex => qr/^[-\+\.#\$=\w]+\@$re_domain$/, maxlength => 254 },
   weburl => { regex => qr/^https?:\/\/$re_domain(?::[1-9][0-9]{0,5})?\/[^\s<>"]*$/, maxlength => 65536 }, # the maxlength is a bit arbitrary, but better than unlimited
 );
 

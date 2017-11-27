@@ -8,7 +8,7 @@ has name => ( is => 'lazy', isa => Str );
 has desc => ( is => 'lazy', isa => Str );
 
 # API settings
-has auth => ( is => 'ro', isa => Str, required => 1 );    # db, http or was uri
+has auth => ( is => 'ro', isa => Maybe [Str] );    # db, http or wss uri
 
 has devel => ( is => 'ro', isa => Bool, default => 0 );
 
@@ -132,7 +132,7 @@ around run => sub ( $orig, $self, $cb = undef ) {
     else {
 
         # die if API controller found, but no API server provided
-        die q[API is required] if $self->{router}->{host_api_path}->%* && !$self->api;
+        die q[API is required] if $self->{router}->{host_api_path} && !$self->api;
 
         $cv->send;
     }

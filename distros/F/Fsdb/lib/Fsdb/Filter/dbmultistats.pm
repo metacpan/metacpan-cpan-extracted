@@ -58,6 +58,13 @@ Options are the same as L<dbcolstats>.
 
 specify which column is the key for grouping (default: the first column)
 
+=item B<--output-on-no-input>
+
+Enables null output (all fields are "-", n is 0)
+if we get input with a schema but no records.
+Without this option, just output the schema but no rows.
+Default: no output if no input.
+
 =item B<-a> or B<--include-non-numeric>
 
 Compute stats over all records (treat non-numeric records
@@ -234,6 +241,7 @@ sub set_defaults ($) {
     $self->{_max_parallelism} = undef;
     $self->{_include_non_numeric} = undef;
     $self->{_header} = undef;
+    $self->{_output_on_no_input} = undef;
 }
 
 =head2 parse_options
@@ -265,6 +273,7 @@ sub parse_options ($@) {
 	'log!' => \$self->{_logprog},
 	'm|median!' =>  \$self->{_median},
 	'o|output=s' => sub { $self->parse_io_option('output', @_); },
+        'output-on-no-input!' => \$self->{_output_on_no_input},
 	'q|quantile=i' => \$self->{_quantile},
 	'S|pre-sorted+' => \$self->{_pre_sorted},
 	'T|tmpdir|tempdir=s' => \$self->{_tmpdir},
@@ -290,7 +299,7 @@ sub setup ($) {
     #
     # First, dbcolstats:
     #
-    my @dbcolstats_argv = (qw(--nolog));
+    my @dbcolstats_argv = (qw(--no-output-on-no-input --nolog));
     push(@dbcolstats_argv, '--include-non-numeric')
 	if (defined($self->{_include_non_numeric}));
     push(@dbcolstats_argv, '--confidence', $self->{_confidence_fraction})
@@ -379,7 +388,7 @@ sub finish ($) {
 #    $self->SUPER::finish();
     # xxx: hack hack hack
     # --saveoutput didn't work, so fake it up here
-    my $post = "#" . $self->compute_program_log() . "\n";
+    my $post = "# " . $self->compute_program_log() . "\n";
     if ($self->{_child_saves_output}) {
         $self->SUPER::finish();
     } else {

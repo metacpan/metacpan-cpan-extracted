@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.832';
+our $VERSION = '1.833';
 
 use MCE::Shared::Base ();
 use MCE::Util ();
@@ -235,7 +235,7 @@ use warnings;
 
 no warnings qw( threads recursion uninitialized numeric once );
 
-use Time::HiRes qw( sleep );
+use Time::HiRes qw( alarm sleep );
 use bytes;
 
 no overloading;
@@ -310,8 +310,8 @@ sub timedwait {
    return unless ( exists $_CV->{_cr_sock} );
    return $_[0]->wait() unless $_timeout;
 
-   _croak('Condvar: timedwait (timeout) is not an integer')
-      if (!looks_like_number($_timeout) || int($_timeout) != $_timeout);
+   _croak('Condvar: timedwait (timeout) is not valid')
+      if (!looks_like_number($_timeout) || $_timeout < 0);
 
    _req1('O~CVW', $_id.$LF);
    $_CV->{_mutex}->unlock();
@@ -325,10 +325,10 @@ sub timedwait {
 
       1 until sysread($_CV->{_cr_sock}, my($_b), 1) || ($! && !$!{'EINTR'});
 
-      alarm 0;
+      alarm 0 unless $_is_MSWin32;
    };
 
-   alarm 0;
+   alarm 0 unless $_is_MSWin32;
 
    if ($@) {
       chomp($@), _croak($@) unless $@ eq "alarm clock restart\n";
@@ -372,7 +372,7 @@ MCE::Shared::Condvar - Condvar helper class
 
 =head1 VERSION
 
-This document describes MCE::Shared::Condvar version 1.832
+This document describes MCE::Shared::Condvar version 1.833
 
 =head1 DESCRIPTION
 

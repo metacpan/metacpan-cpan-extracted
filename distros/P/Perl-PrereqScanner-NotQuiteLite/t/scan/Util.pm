@@ -10,7 +10,9 @@ our @EXPORT = (@Test::More::EXPORT, qw/test/);
 
 sub test {
   my $string = shift;
-  my $scanner = Perl::PrereqScanner::NotQuiteLite->new;
+  my $scanner = Perl::PrereqScanner::NotQuiteLite->new(
+    parsers => [':bundled'],
+  );
   my $c = $scanner->scan_string($string);
   ok !@{$c->{errors}} or note explain $c;
 }

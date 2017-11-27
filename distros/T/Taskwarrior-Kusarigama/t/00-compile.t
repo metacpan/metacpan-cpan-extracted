@@ -6,13 +6,15 @@ use warnings;
 
 use Test::More;
 
-plan tests => 24 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 26 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Taskwarrior/Kusarigama.pm',
     'Taskwarrior/Kusarigama/App.pm',
     'Taskwarrior/Kusarigama/App/Add.pm',
+    'Taskwarrior/Kusarigama/App/Decimate.pm',
     'Taskwarrior/Kusarigama/App/Install.pm',
+    'Taskwarrior/Kusarigama/App/Review.pm',
     'Taskwarrior/Kusarigama/Core.pm',
     'Taskwarrior/Kusarigama/Hook.pm',
     'Taskwarrior/Kusarigama/Hook/OnAdd.pm',

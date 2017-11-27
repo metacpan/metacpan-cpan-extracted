@@ -13,13 +13,13 @@ Date {{ date | date: "%m/%d/%Y" }}{% if requires_shipping and shipping_address %
    {{ billing_address.city }}, {{ billing_address.province }}  {{ billing_address.zip }}v
 {% endif %}<br><br>
  
-<b><ul>{% for line in line_items %} <li> <img src="{{ line.product.featured_image | product_img_url: "thumb" }}" /> {{ line.quantity }}x {{ line.title }} for {{ line.price | money }} each {% for note in line.properties %} {{note.first}} : {{note.last}} {% endfor %} </li> {% endfor %}</ul></b><br><br>
+<b><ul>{% for line in line_items %} <li> <img src="{{ line.product.featured_image  | replace: ".jpg", "_large.jpg" }}" /> {{ line.quantity }}x {{ line.title }} for {{ "%0.2f" | sprintf: line.price }} each {% for note in line.properties %} {{note.first}} : {{note.last}} {% endfor %} </li> {% endfor %}</ul></b><br><br>
 
-{% if discounts %}Discount (code: {{ discounts.first.code }}): {{ discounts_savings | money_with_currency }}{% endif %}<br>
-Subtotal  : {{ subtotal_price | money_with_currency  }}{% for tax_line in tax_lines %}
-{{ tax_line.title }}       : {{ tax_line.price | money_with_currency  }}{% endfor %}{% if requires_shipping %}<br>
-Shipping  : {{ shipping_price | money_with_currency }}{% endif %}<br>
-<p>Total : {{ total_price | money_with_currency }}</p><ul style="list-style-type:none"><br>{% assign gift_card_applied = false %}
+{% if discounts %}Discount (code: {{ discounts.first.code }}): {{ "%0.2f" | sprintf: discounts_savings }}{% endif %}<br>
+Subtotal  : {{ "%0.2f" | sprintf: subtotal_price  }}{% for tax_line in tax_lines %}
+{{ tax_line.title }}       : {{ "%0.2f" | sprintf: tax_line.price  }}{% endfor %}{% if requires_shipping %}<br>
+Shipping  : {{ "%0.2f" | sprintf: shipping_price }}{% endif %}<br>
+<p>Total : {{ "%0.2f" | sprintf: total_price }}</p><ul style="list-style-type:none"><br>{% assign gift_card_applied = false %}
 {% assign gift_card_amount = 0 %}
 {% for transaction in transactions %}
  {% if transaction.gateway  == "gift_card" %}
@@ -28,9 +28,9 @@ Shipping  : {{ shipping_price | money_with_currency }}{% endif %}<br>
  {% endif %}
 {% endfor %}
 {% if gift_card_amount > 0 %}
-<p>Gift cards: {{ gift_card_amount | times: -1 | money_with_currency }}</p>
+<p>Gift cards: {{ "%0.2f" | sprintf: (gift_card_amount | times: -1) }}</p>
 {% endif %}
-<p><b>Total: {{ total_price | minus: gift_card_amount | money_with_currency }}</p></b>
+<p><b>Total: {{ "%0.2f" | sprintf: (total_price | minus: gift_card_amount) }}</p></b>
 
 <br><br>Thank you for shopping with UCC Resources!<br>
 {{ shop.url }}';
@@ -353,7 +353,7 @@ is($text, '');
 ($text, $hash) = $liquid->render_text({ a => [1,2,3] }, "{% if a[5] !~ 'ASD' %}1{% endif %}");
 is($text, '1');
 
-($ast) = $liquid->parser->parse_argument_tokens($liquid->lexer->parse_expression(1, "order.created_at > (now | date_math: -2, 'weeks')"));
+($ast) = $liquid->parser->parse_argument_tokens($liquid->lexer->parse_expression([1,0,0,undef], "order.created_at > (now | date_math: -2, 'weeks')"));
 ok($ast);
 $ast = $liquid->optimizer->optimize({ now => DateTime->now }, $ast);
 is(int(@{$ast->{operands}}), 2);
@@ -374,7 +374,6 @@ isa_ok($ast, 'WWW::Shopify::Liquid::Tag::Output');
 
 ($text, $hash) = $liquid->render_text({ order => { } }, "{{ 'a{{ item }}b{{ item }}c' | split: '\\{\\{ item }}' | last }}");
 is($text, 'c');
-
 ($text, $hash) = $liquid->render_text({ order => { } }, "{{ 6 % 4 }}");
 is($text, '2');
 
@@ -386,16 +385,6 @@ is($text, q(["0","1"]));
 
 ($text, $hash) = $liquid->render_text({ order => { } }, q({{ (0..(1-1)) | json }}));
 like($text, qr/\["?0"?\]/);
-
-
-# use Data::Dumper;
-# print STDERR Dumper($liquid->parser->parse_tokens($liquid->lexer->parse_text("{% if tag | downcase != split_tags | last | downcase %}A{% else %}B{% endif %}")));
-
-# print STDERR "WAt\n";
-# ($text, $hash) = $liquid->render_text({ tag => 'a', split_tags => ['b'] }, "{% if tag | downcase != split_tags | last | downcase %}A{% else %}B{% endif %}");
-# is($text, 'A');
-# ($text, $hash) = $liquid->render_text({ tag => 'a', split_tags => ['a'] }, "{% if tag | downcase != split_tags | last | downcase %}A{% else %}B{% endif %}");
-# is($text, 'B');
 
 $text = $liquid->render_text({ line_item => { sku => "B", quantity => 2 } }, "{{ line_item.sku }}{% for i in (1..line_item.quantity) %}A{% endfor %}");
 is($text, 'BAA');
@@ -420,7 +409,34 @@ is($text, 2);
 $text = $liquid->render_text({ a => 1 }, "{% decrement a %}{{ a }}");
 is($text, 0);
 
-#repeat+1 doens't math, but just repeat works just fine.
-#{{ global.info.teams[global.keys[repeat+1]].leader }}
+($text, $hash) = $liquid->render_text({ a => [1,5,7] }, "{{ a | reverse | join: ';' }}");
+is($text, '7;5;1');
+
+($text, $hash) = $liquid->render_text({ a => [1,5,7] }, "{% for b in a %}{{ b }}{% endfor %}{% for b in a %}{{ b }}{% endfor %}");
+is($text, '157157');
+
+$ast = $liquid->parse_text("{% for b in a %}{{ b }}{% endfor %}{% for b in a %}{{ b }}{% endfor %}");
+ok($ast);
+
+$ast = $liquid->optimize_ast({ a => [1,5,7] }, $ast);
+
+$text = $liquid->render_ast($hash, $ast);
+is($text, '157157');
+
+
+$liquid->renderer->silence_exceptions(0);
+($text, $hash) = $liquid->render_text({ a => { b => "c", d => "e" } }, "{% remove_key a.b %}");
+ok(exists $hash->{a});
+ok(!exists $hash->{a}->{b});
+
+$text = $liquid->render_text({ a => [{ test => 2 }, { test => 3 }] }, "{{ a | map: op.test | sum }}");
+is($text, 5);
+$text = $liquid->render_text({ a => [{ test => 2 }, { test => 3 }] }, "{{ a | map: op.test | min }}");
+is($text, 2);
+$text = $liquid->render_text({ a => [{ test => 2 }, { test => 3 }] }, "{{ a | map: op.test | max }}");
+is($text, 3);
+
+$text = $liquid->render_text({ a => [{ test => 2 }, { test => 3 }] }, "{{ a | grep: (op.test == 2) | map: op.test | max }}");
+is($text, 2);
 
 done_testing();

@@ -1,6 +1,0 @@
-Revision history for Perl extension Syntax::Kamelon.
-
-0.01  Fri Apr 15 19:11:57 2016
-	- original version; created by h2xs 1.23 with options
-		parserc.h -n Syntax::Kamelon
-

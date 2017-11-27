@@ -1533,7 +1533,7 @@ required but not defined.
 
 This will parse the given C<$string> as a response header and extract
 information into \%header. These information then later will be given to
-C<in_request_header>. See there for more details about the contents of the
+C<in_response_header>. See there for more details about the contents of the
 hash.
 
 C<%request> contains information about the request. One might simple use the

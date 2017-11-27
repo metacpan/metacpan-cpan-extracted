@@ -11,6 +11,8 @@ WriteMakefile(
 #       'HTTP::Lite'        =>  '0',
 #       'Jcode'             =>  '0', # on Perl 5.005/5.6.x
         'Test::More'        => 0.17, #build
+        'MIME::Base64'      => 0,
+        'LWP::Protocol::https' => 0,
     },
     ($ExtUtils::MakeMaker::VERSION ge '6.31'? 
      ('LICENSE'		=> 'perl', ) : ()),

@@ -6,7 +6,7 @@ build_requires: {}
 configure_requires:
   Module::Build::Tiny: '0.034'
 dynamic_config: 0
-generated_by: 'App::ModuleBuildTiny version 0.018, CPAN::Meta::Converter version 2.150010'
+generated_by: 'App::ModuleBuildTiny version 0.022, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -15,7 +15,7 @@ name: Mojo-XMLRPC
 provides:
   Mojo::XMLRPC:
     file: lib/Mojo/XMLRPC.pm
-    version: '0.03'
+    version: '0.05'
   Mojo::XMLRPC::Base64:
     file: lib/Mojo/XMLRPC/Base64.pm
   Mojo::XMLRPC::Message:
@@ -30,5 +30,5 @@ resources:
   bugtracker: http://github.com/jberger/Mojo-XMLRPC/issues
   license: http://dev.perl.org/licenses/
   repository: http://github.com/jberger/Mojo-XMLRPC
-version: '0.03'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

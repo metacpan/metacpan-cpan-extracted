@@ -1,11 +1,11 @@
 #
-# Copyright (C) 2015,2016 J. Maslak
+# Copyright (C) 2015-2017 Joelle Maslak
 # All Rights Reserved - See License
 #
 
 package JCM::Boilerplate;
-# ABSTRACT: Default Boilerplate for J. Maslak's Code
-$JCM::Boilerplate::VERSION = '1.016';
+# ABSTRACT: Default Boilerplate for Joelle Maslak's Code
+$JCM::Boilerplate::VERSION = '1.017';
 
 use v5.22;
 use strict;
@@ -63,6 +63,8 @@ sub import($self, $type='script') {
 
     # For "switch" feature
     warnings->unimport::out_of($target, 'experimental::smartmatch');
+
+    return;
 }
 
 1;
@@ -75,11 +77,11 @@ __END__
 
 =head1 NAME
 
-JCM::Boilerplate - Default Boilerplate for J. Maslak's Code
+JCM::Boilerplate - Default Boilerplate for Joelle Maslak's Code
 
 =head1 VERSION
 
-version 1.016
+version 1.017
 
 =head1 SYNOPSIS
 
@@ -106,11 +108,11 @@ outside dependencies that may be undesired.
 
 =head1 AUTHOR
 
-J. Maslak <jmaslak@antelope.net>
+Joelle Maslak <jmaslak@antelope.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015-2017 by J. Maslak.
+This software is copyright (c) 2015-2017 by Joelle Maslak.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

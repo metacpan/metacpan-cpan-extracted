@@ -1,5 +1,8 @@
 Revision history for perl module Test::Applify
 
+0.05 2017-11-27T10:56:02+1300
+ - run_instance_ok and run_ok
+
 0.04 2017-11-20T12:29:50+1300
  - accommodate subcommands in new()
 

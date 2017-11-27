@@ -111,7 +111,7 @@ subtest "dispatch background", sub {
         $n++;
         diag "still waiting..." if $n == 12;
         $status = $client->get_status($handle);
-    } until $status->percent == 1 or $n == 20;
+    } until ($status->percent && $status->percent == 1) or $n == 20;
 
     is($status->percent, 1, "Background task completed using prefix");
 };

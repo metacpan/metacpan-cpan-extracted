@@ -121,7 +121,10 @@ SKIP: {
         my $w = new_ok($mn, [job_servers => @job_servers]);
         time_ok(
             sub {
-                $w->work(stop_if => sub { pass "work stop if"; });
+                $w->work(stop_if => sub { my ($idle) = @_;
+                    is $idle, 1, "stop work if idle";
+                    return 1;
+                  });
             },
             12,
             "stop if timeout"

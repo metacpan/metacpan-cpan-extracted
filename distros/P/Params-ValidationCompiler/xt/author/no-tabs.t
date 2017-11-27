@@ -13,6 +13,7 @@ my @files = (
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
     't/default.t',
+    't/exceptions.t',
     't/moose.t',
     't/name-fails.t',
     't/name.t',

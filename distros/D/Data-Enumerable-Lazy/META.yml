@@ -1,0 +1,20 @@
+---
+abstract: unknown
+author:
+  - 'Oleg S <me@whitebox.io>'
+build_requires: {}
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-Enumerable-Lazy
+no_index:
+  directory:
+    - t
+    - inc
+resources:
+  homepage: https://github.com/icanhazbroccoli/Data-Enumerable-Lazy
+  repository: https://github.com/icanhazbroccoli/Data-Enumerable-Lazy.git
+version: 0.03

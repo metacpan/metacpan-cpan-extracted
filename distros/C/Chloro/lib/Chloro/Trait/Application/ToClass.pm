@@ -1,11 +1,12 @@
 package Chloro::Trait::Application::ToClass;
-BEGIN {
-  $Chloro::Trait::Application::ToClass::VERSION = '0.06';
-}
+
+use strict;
+use warnings;
+use namespace::autoclean;
+
+our $VERSION = '0.07';
 
 use Moose::Role;
-
-use namespace::autoclean;
 
 use Moose::Util qw( does_role );
 
@@ -36,6 +37,7 @@ around apply => sub {
     $self->$orig( $role, $class );
 };
 
+## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
 sub _apply_form_components {
     my $self  = shift;
     my $role  = shift;
@@ -53,14 +55,17 @@ sub _apply_form_components {
         $class->add_group($group);
     }
 }
+## use critic
 
 1;
 
 # ABSTRACT: A trait that supports applying Chloro fields and groups to classes
 
-
+__END__
 
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -68,7 +73,7 @@ Chloro::Trait::Application::ToClass - A trait that supports applying Chloro fiel
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 DESCRIPTION
 
@@ -79,20 +84,27 @@ and groups.
 
 See L<Chloro> for details.
 
+Bugs may be submitted at L<http://rt.cpan.org/Public/Dist/Display.html?Name=Chloro> or via email to L<bug-chloro@rt.cpan.org|mailto:bug-chloro@rt.cpan.org>.
+
+I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
+
+=head1 SOURCE
+
+The source code repository for Chloro can be found at L<https://github.com/autarch/Chloro>.
+
 =head1 AUTHOR
 
 Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2011 by Dave Rolsky.
+This software is Copyright (c) 2017 by Dave Rolsky.
 
 This is free software, licensed under:
 
   The Artistic License 2.0 (GPL Compatible)
 
+The full text of the license can be found in the
+F<LICENSE> file included with this distribution.
+
 =cut
-
-
-__END__
-

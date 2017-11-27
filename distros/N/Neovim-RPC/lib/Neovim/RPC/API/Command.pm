@@ -1,6 +1,6 @@
 package Neovim::RPC::API::Command;
 our $AUTHORITY = 'cpan:YANICK';
-$Neovim::RPC::API::Command::VERSION = '0.2.0';
+$Neovim::RPC::API::Command::VERSION = '1.0.0';
 use strict;
 use warnings;
 
@@ -83,7 +83,7 @@ Neovim::RPC::API::Command
 
 =head1 VERSION
 
-version 0.2.0
+version 1.0.0
 
 =head1 AUTHOR
 
@@ -91,7 +91,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Yanick Champoux.
+This software is copyright (c) 2017, 2015 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

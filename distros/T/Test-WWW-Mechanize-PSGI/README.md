@@ -4,7 +4,7 @@ Test::WWW::Mechanize::PSGI - Test PSGI programs using WWW::Mechanize
 
 # VERSION
 
-version 0.37
+version 0.38
 
 # SYNOPSIS
 

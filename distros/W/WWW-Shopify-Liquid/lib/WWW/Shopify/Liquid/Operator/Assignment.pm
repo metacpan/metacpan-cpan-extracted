@@ -12,7 +12,6 @@ sub priority { return 1; }
 sub optimize {
 	my ($self, $optimizer) = (shift, shift);
 	$self->SUPER::optimize($self, $optimizer, @_);
-	print STDERR "A\n";
 	return $self;
 }	
 

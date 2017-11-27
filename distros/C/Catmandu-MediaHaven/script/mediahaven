@@ -28,33 +28,28 @@ use IO::Handle;
 use Cwd ();
 use Getopt::Long;
 
-Catmandu->default_load_path(Cwd::getcwd);
-
-my $url      = undef;
-my $username = undef;
-my $password = undef;
 my $exporter = 'YAML';
+my $cfg_path;
 
-if (my $cfg = Catmandu->config->{mediahaven}) {
-    $url      = $cfg->{url};
-    $username = $cfg->{username};
-    $password = $cfg->{password};
-}
-
-GetOptions ("url=s"      => \$url ,
-            "username=s" => \$username ,
-            "password=s" => \$password ,
-            "exporter=s" => \$exporter) || usage();
+GetOptions ("cfg=s" => \$cfg_path , "exporter=s" => \$exporter) || usage();
 
 my $cmd = shift;
 
 usage() unless $cmd;
 
-my $mh = Catmandu::MediaHaven->new(
-                url      => $url ,
-                username => $username,
-                password => $password,
-         );
+my $cfg;
+if (-r $cfg_path) {
+   $cfg = Catmandu->importer('YAML',file=>$cfg_path)->first->{mediahaven};
+}
+elsif ($ENV{MEDIAHAVEN_CONFIG}) {
+   $cfg = Catmandu->importer('YAML',file=>$ENV{MEDIAHAVEN_CONFIG})->first->{mediahaven};
+}
+else {
+   Catmandu->default_load_path($cfg_path);
+   $cfg = Catmandu->config->{mediahaven};
+}
+
+my $mh = Catmandu::MediaHaven->new(%$cfg);
 
 die "failed to create a MediaHaven connection: $!" unless $mh;
 
@@ -78,17 +73,20 @@ else {
 sub cmd_search {
     my ($query,$start,$num) = @_;
 
-    my $result = $mh->search($query, start => $start , num => $num);
-
-    die "search failed" unless defined($result);
-
     my $e = Catmandu->exporter($exporter);
 
-    my $n = 0;
-    for my $res (@{$result->{mediaDataList}}) {
-        $e->add($res);
-        $n++;
-    }
+    my $count = 20;
+    my $start = 0;
+    my $total;
+
+    do {
+	my $result = $mh->search($query, start => $start , num => $count);
+        for my $res (@{$result->{mediaDataList}}) {
+            $e->add($res);
+        }
+	$total = $result->{totalNrOfResults};
+        $start += $count;
+    } while ($start < $total);
 
     $e->commit;
 }
@@ -165,9 +163,7 @@ usage: $0 [options] edit ID FIELD VALUE [VALUE...]
 usage: $0 [options] export ID [FILE]
 
 options:
-    --url=...
-    --username=...
-    --password=...
+    --cfg=...
     --exporter=...
 EOF
     exit 1;

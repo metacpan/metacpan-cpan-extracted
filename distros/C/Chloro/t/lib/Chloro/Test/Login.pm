@@ -1,6 +1,8 @@
 package Chloro::Test::Login;
 
 use Moose;
+use namespace::autoclean;
+
 use Chloro;
 
 use Chloro::Types qw( Bool Str );

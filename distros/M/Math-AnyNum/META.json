@@ -1,7 +1,7 @@
 {
    "abstract" : "Arbitrary size precision for integers, rationals, floating-points and complex numbers.",
    "author" : [
-      "Daniel Șuteu <trizenx@gmail.com>"
+      "Daniel Șuteu <trizen@protonmail.com>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "Module::Build version 0.4224",
@@ -39,7 +39,7 @@
    "provides" : {
       "Math::AnyNum" : {
          "file" : "lib/Math/AnyNum.pm",
-         "version" : "0.17"
+         "version" : "0.18"
       }
    },
    "release_status" : "stable",
@@ -55,6 +55,6 @@
          "url" : "https://github.com/trizen/Math-AnyNum"
       }
    },
-   "version" : "0.17",
+   "version" : "0.18",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

@@ -3,7 +3,7 @@ package Udev::FFI::Device;
 use strict;
 use warnings;
 
-use Udev::FFI::FFIFunctions;
+use Udev::FFI::Functions qw(:all);
 
 
 

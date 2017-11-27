@@ -1,0 +1,79 @@
+=encoding UTF-8
+
+=head1 NAME
+
+C<Devel::MAT::UserGuide::IdentifyingAnSV> - working out what an SV actually is
+
+=head1 OVERVIEW
+
+Often when analysing a heap dump file to determine the cause of a memory issue
+the problem can be narrowed down to a single SV at a particular address. Even
+though the SV is often printed with a general type name, this simple address
+as a raw hex number does not directly help to find what part of the program is
+actually responsible for this SV.
+
+=head1 IDENTIFYING THE SV
+
+To find out more about what the SV is, in terms of what things can reach it,
+use the C<identify> command on its address.
+
+  pmat> identify 0x6a47708
+
+The output will form a tree of back-references, leading down ultimately to
+known roots of the program; fixed points in the F<perl> interpreter.
+
+Sometimes this will be a short and simple tree leading directly to a known
+root:
+
+  pmat> identify 0xfb4770
+  HASH(0) at 0xfb4770=strtab is:
+  └─the shared string table HV
+
+In this case, the SV is actually a known root directly; a particularly simple
+result.
+
+Other times this may be a longer less-direct path, perhaps having multiple
+branches:
+
+  pmat> identify 0x72a7140
+  ARRAY(457025) at 0x72a7140 is:
+  └─(via RV) value {error} of HASH(3) at 0x490ea40, which is:
+    └─(via RV) value {events} of HASH(8)=Mojo::Redis2 at 0x490e0b0, which is:
+      └─(via RV) value {ws_redis_master} of HASH(4) at 0x3ebef40, which is:
+        ├─(via RV) the lexical $instances at depth 1 of CODE(PP) at 0x4264c38, which is:
+        │ └─the symbol '&Binary::WebSocketAPI::v3::Wrapper::Streamer::shared_redis'
+        ├─(via RV) the lexical $instances at depth 1 of CODE(PP) at 0x42504a0, which is:
+        │ └─the symbol '&Binary::WebSocketAPI::v3::Instance::Redis::instances'
+        ├─(via RV) the lexical $instances at depth 1 of CODE(PP) at 0x4257500, which is:
+        │ └─the symbol '&Binary::WebSocketAPI::v3::Instance::Redis::redis_pricer'
+        ├─(via RV) the lexical $instances at depth 1 of CODE(PP) at 0x4264920, which is:
+        │ └─the symbol '&Binary::WebSocketAPI::Plugins::Helpers::ws_redis_slave'
+        └─(via RV) the lexical $instances at depth 1 of CODE(PP) at 0x4263eb8, which is:
+          └─the symbol '&Binary::WebSocketAPI::Plugins::Helpers::ws_redis_master'
+
+Here, the named symbols count as well-known roots for the purpose of
+identifying SVs. The SV in question has been identified as reachable via a
+chain of keys, coming from a hash stored in a lexical variable named
+C<$instances> captured by of five different functions.
+
+Sometimes, the path from a given SV to the known roots is somehow
+self-referential, and needs to refer back to itself. This is done with
+lettered markers.
+
+  pmat> identify 0x55d00c107218
+  REF() at 0x55d00c107218 is:
+  └─element [0] of ARRAY(1) at 0x55d00c106f90, which is (*A):
+    └─(via RV) value {cycle} of HASH(1) at 0x55d00c1240c8, which is:
+      ├─(via RV) element [0] of ARRAY(1) at 0x55d00c106f90, which is:
+      │ └─already found as *A
+      └─(via RV) the lexical $loop at depth 1 of CODE() at 0x55d00c107230=main_cv, which is:
+	└─the main code
+
+In each case, the output should at least help work out what any given SV is by
+noting what references it, recursively, up to the roots of the interpreter.
+
+=head1 AUTHOR
+
+Paul Evans <leonerd@leonerd.org.uk>
+
+=cut

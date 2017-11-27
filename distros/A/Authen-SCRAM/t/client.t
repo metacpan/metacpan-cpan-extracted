@@ -65,6 +65,35 @@ subtest "RFC 5802 example" => sub {
     ok( $client->validate("v=rmF9pqV8S7suAoZWja4dJRkFsKQ="),
         "server message validated" );
 
+    # Repeat to check credential caching by hooking the digest method,
+    # which is called to pass to 'derive'.
+    {
+        no warnings 'redefine';
+        my $digest_called;
+        my $orig = \&Authen::SCRAM::Client::digest;
+        local *Authen::SCRAM::Client::digest = sub {
+            $digest_called = 1;
+            &$orig;
+        };
+
+        # Reuse earlier client (recall that nonce is forced constant)
+        my $first = $client->first_msg();
+        is( $first, "n,,n=user,r=fyko+d2lbbFgONRv9qkxdawL", "client first message" )
+          or diag explain $client;
+
+        # RFC5802 example server-first-message
+        my $server_first =
+          "r=fyko+d2lbbFgONRv9qkxdawL3rfcNHYJY1ZVvWVs7j,s=QSXCR+Q6sek8bf92,i=4096";
+        my $final = $client->final_msg($server_first);
+        is(
+            $final,
+            "c=biws,r=fyko+d2lbbFgONRv9qkxdawL3rfcNHYJY1ZVvWVs7j,p=v0X8v3Bz2T0CJGbJQyF0X+HI4Ts=",
+            "client final message"
+        ) or diag explain $client;
+
+        ok( !$digest_called, "cached credentials used" );
+    }
+
 };
 
 done_testing;

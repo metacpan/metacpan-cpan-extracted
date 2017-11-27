@@ -19,9 +19,10 @@ BEGIN {
     close($td);
 }
 
-use Test::More tests => 2 + 2 * @tests;
+use Test::More tests => 3 + 2 * @tests;
 BEGIN {
     use_ok qw(App::Music::PlayTab::Chord);
+    use_ok qw(App::Music::PlayTab::Output::PostScript);
 }
 
 my $parser = App::Music::PlayTab::Chord->new;

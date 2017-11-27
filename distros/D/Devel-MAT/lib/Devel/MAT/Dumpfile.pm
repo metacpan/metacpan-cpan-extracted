@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2017 -- leonerd@leonerd.org.uk
 
 package Devel::MAT::Dumpfile;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 use Carp;
 use IO::Handle;   # ->read
@@ -249,6 +249,12 @@ sub _fixup
    my $heap = $self->{heap};
 
    my $heap_total = scalar keys %$heap;
+
+   # Annotate each root SV
+   foreach my $name ( keys %ROOTDESC ) {
+      my $sv = $self->$name or next;
+      $sv->{rootname} = $name;
+   }
 
    my $count = 0;
    while( my ( $addr ) = each %$heap ) {

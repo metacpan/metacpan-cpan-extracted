@@ -1,6 +1,6 @@
 package Catmandu::Store::File::MediaHaven;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use Catmandu::Sane;
 use Moo;

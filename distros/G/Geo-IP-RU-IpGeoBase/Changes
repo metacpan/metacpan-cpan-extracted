@@ -1,3 +1,8 @@
+0.05 2017-11-27
+
+    * fix precedence issue
+    * update Module::Install
+
 0.04 2012-11-28
 
     * change script to support new format of the files. Thanks to

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package YAML::PP::Render;
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use constant TRACE => $ENV{YAML_PP_TRACE};
 my $WS = '[\t ]';
@@ -37,29 +37,40 @@ sub render_tag {
 }
 
 my %control = (
-    '\\' => '\\', n => "\n", t => "\t", r => "\r", b => "\b",
-    'x0a' => "\n", 'x0d' => "\r",
+    '\\' => '\\', '/' => '/', n => "\n", t => "\t", r => "\r", b => "\b",
+    'a' => "\a", 'b' => "\b", 'e' => "\e", 'f' => "\f", 'v' => "\x0b",
+    'P' => "\x{2029}", L => "\x{2028}", 'N' => "\x85",
+    '0' => "\0", '_' => "\xa0", ' ' => ' ', q/"/ => q/"/,
 );
+
 sub render_quoted {
-    my (%args) = @_;
-    my $double = $args{double};
-    my $lines = $args{lines};
+    my ($self, $info) = @_;
+    my $double = $info->{style} eq '"';
+    my $lines = $info->{value};
+
+    if ($#$lines == 0) {
+        my $quoted = $lines->[0];
+        if ($double) {
+            $quoted =~ s{(?:
+                \\([ \\\/_0abefnrtvLNP"]) | \\x([0-9a-fA-F]{2})
+                | \\u([A-Fa-f0-9]{4}) | \\U([A-Fa-f0-9]{4,8})
+            )}{
+            defined $1 ? $control{ $1 } : defined $2 ? chr hex $2 :
+            defined $3 ? chr hex $3 : chr hex $4
+            }xeg;
+        }
+        else {
+            $quoted =~ s/''/'/g;
+        }
+        $info->{value} = $quoted;
+        return;
+    }
+
     my $quoted = '';
     my $addspace = 0;
+
     for my $i (0 .. $#$lines) {
         my $line = $lines->[ $i ];
-        if ($#$lines == 0) {
-            if ($double) {
-                $line =~ s/\\"/"/g;
-                $line =~ s/\\(x0d|x0a|[\\ntrb])/$control{ $1 }/g;
-                $line =~ s/\\u([A-Fa-f0-9]+)/chr(oct("x$1"))/eg;
-            }
-            else {
-                $line =~ s/''/'/g;
-            }
-            $quoted .= $line;
-            last;
-        }
         my $last = $i == $#$lines;
         my $first = $i == 0;
         if ($line =~ s/^$WS*$/\n/) {
@@ -70,45 +81,42 @@ sub render_quoted {
             else {
                 $quoted .= "\n";
             }
+            next;
         }
-        else {
-            $quoted .= ' ' if $addspace;
-            $addspace = 1;
-            if ($first) {
-            }
-            else {
-                $line =~ s/^$WS+//;
-            }
-            if ($last) {
-            }
-            else {
-                $line =~ s/$WS+$//;
-            }
-            if ($double) {
-                $line =~ s/\\"/"/g;
-            }
-            else {
-                $line =~ s/''/'/g;
-            }
-            if (not $last and $line =~ s/\\$//) {
+
+        $quoted .= ' ' if $addspace;
+        $addspace = 1;
+        if (not $first) {
+            $line =~ s/^$WS+//;
+        }
+        if (not $last) {
+            $line =~ s/$WS+$//;
+        }
+        if ($double) {
+            $line =~ s{(?:
+                \\([ \\\/_0abefnrtvLNP"]) | \\x([0-9a-fA-F]{2})
+                | \\u([A-Fa-f0-9]{4}) | \\U([A-Fa-f0-9]{4,8})
+            )}{
+            defined $1 ? $control{ $1 } : defined $2 ? chr hex $2 :
+            defined $3 ? chr hex $3 : chr hex $4
+            }xeg;
+            if ($line =~ s/\\$//) {
                 $addspace = 0;
             }
-            $line =~ s/^\\ / /;
-            if ($double) {
-                $line =~ s/\\(x0d|x0a|[\\ntrb])/$control{ $1 }/g;
-                $line =~ s/\\u([A-Fa-f0-9]+)/chr(oct("x$1"))/eg;
-            }
-            $quoted .= $line;
         }
+        else {
+            $line =~ s/''/'/g;
+        }
+        $quoted .= $line;
     }
-    return $quoted;
+    $info->{value} = $quoted;
 }
 
 sub render_block_scalar {
-    my (%args) = @_;
-    my $block_type = $args{block_type};
-    my $chomp = $args{chomp};
-    my $lines = $args{lines};
+    my ($self, $info) = @_;
+    my $block_type = $info->{style};
+    my $chomp = $info->{block_chomp} || '';
+    my $lines = $info->{value};
 
     my ($folded, $keep, $trim);
     if ($block_type eq '>') {
@@ -125,57 +133,63 @@ sub render_block_scalar {
     if (not $keep) {
         # remove trailing empty lines
         while (@$lines) {
-            if ($lines->[-1]->[0] ne 'EMPTY') {
-                last;
-            }
+            last if $lines->[-1] ne '';
             pop @$lines;
         }
     }
-    TRACE and warn __PACKAGE__.':'.__LINE__.$".Data::Dumper->Dump([\$lines], ['lines']);
-    my $prev = 'START';
-    for my $i (0 .. $#$lines) {
-        my $item = $lines->[ $i ];
-        my ($type, $indent, $line) = @$item;
-        TRACE and printf STDERR "=========== %7s '%s' '%s'\n", @$item;
-        if ($folded) {
+    if ($folded) {
 
-            if ($type eq 'EMPTY') {
-                if ($prev eq 'MORE') {
-                    $type = 'PARAGRAPH';
+        my $prev = '';
+        for my $i (0 .. $#$lines) {
+            my $line = $lines->[ $i ];
+
+            my $type = $line eq ''
+                ? 'EMPTY'
+                : $line =~ m/\A[ \t]/
+                ? 'MORE'
+                : 'CONTENT';
+            if ($i > 0) {
+                if ($type eq 'EMPTY' and $prev eq 'MORE') {
+                    $type = 'MORE';
                 }
-                $string .= "\n";
-            }
-            elsif ($type eq 'CONTENT') {
-                if ($prev eq 'CONTENT') {
-                    $string .= ' ';
+
+                if ($type eq 'CONTENT') {
+                    if ($prev eq 'MORE') {
+                        $string .= "\n";
+                    }
+                    elsif ($prev eq 'CONTENT') {
+                        $string .= ' ';
+                    }
                 }
-                $string .= $line;
-                if ($i == $#$lines) {
+                else {
                     $string .= "\n";
                 }
             }
-            elsif ($type eq 'MORE') {
-                if ($prev eq 'EMPTY' or $prev eq 'CONTENT') {
+            else {
+                if ($type eq 'EMPTY') {
                     $string .= "\n";
                 }
-                $string .=  $line . "\n";
             }
+            $string .= $line;
+
             $prev = $type;
-
         }
-        else {
-            $string .= $line . "\n";
+        $string .= "\n" if @$lines and not $trim;
+    }
+    else {
+        for my $i (0 .. $#$lines) {
+            $string .= $lines->[ $i ];
+            $string .= "\n" if ($i != $#$lines or not $trim);
         }
-        TRACE and warn __PACKAGE__.':'.__LINE__.$".Data::Dumper->Dump([\$string], ['string']);
     }
-    if ($trim) {
-        $string =~ s/\n$//;
-    }
-    return $string;
+    TRACE and warn __PACKAGE__.':'.__LINE__.$".Data::Dumper->Dump([\$string], ['string']);
+    $info->{value} = $string;
 }
 
 sub render_multi_val {
-    my ($multi) = @_;
+    my ($self, $info) = @_;
+    my $multi = $info->{value};
+    return $multi unless ref $multi;
     # remove empty lines at beginning and end
     while (@$multi and $multi->[0] eq '') {
         shift @$multi;
@@ -201,7 +215,7 @@ sub render_multi_val {
             $start = 0;
         }
     }
-    return $string;
+    $info->{value} = $string;
 }
 
 

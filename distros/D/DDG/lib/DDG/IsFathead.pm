@@ -1,7 +1,7 @@
 package DDG::IsFathead;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Role for Fathead
-$DDG::IsFathead::VERSION = '1017';
+$DDG::IsFathead::VERSION = '1018';
 use Moo::Role;
 
 ##requires qw(
@@ -21,7 +21,7 @@ DDG::IsFathead - Role for Fathead
 
 =head1 VERSION
 
-version 1017
+version 1018
 
 =head1 DESCRIPTION
 

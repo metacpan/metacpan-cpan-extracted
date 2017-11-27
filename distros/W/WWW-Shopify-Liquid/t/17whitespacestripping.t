@@ -37,4 +37,7 @@ $text = $liquid->renderer->render({ }, $ast);
 unlike($text, qr/\n/);
 
 
+@tokens = $lexer->parse_text(q(   {{- a -}}    ));
+is(int(@tokens), 1);
+
 done_testing();

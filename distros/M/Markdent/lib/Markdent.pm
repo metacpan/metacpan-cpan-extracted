@@ -1,9 +1,13 @@
+## no critic (Moose::RequireMakeImmutable)
 package Markdent;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.27';
+# The first version that completely worked with newer versions of Specio.
+use Moose 2.1802 ();
+
+our $VERSION = '0.28';
 
 1;
 
@@ -21,7 +25,7 @@ Markdent - An event-based Markdown parser toolkit
 
 =head1 VERSION
 
-version 0.27
+version 0.28
 
 =head1 SYNOPSIS
 

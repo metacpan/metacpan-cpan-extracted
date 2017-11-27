@@ -1,5 +1,9 @@
 Revision history for DBIx::Class::Sims (ordered by revision number).
 
+0.301000 Nov 26 2017 19:30:00 PDT
+   - Remove a section of code that takes parentage into account when looking for
+     existing rows. Please see the attached comment for explanation.
+
 0.300900 Nov 12 2017 14:00:00 PDT
    - Fix a bug preventing null_chance from working.
    - Fixes for running tests under 5.26 (was depending on dot-in-INC)

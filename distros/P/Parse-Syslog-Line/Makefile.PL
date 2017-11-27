@@ -13,18 +13,25 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Parse-Syslog-Line",
+  "EXE_FILES" => [
+    "bin/parse-syslog-line.pl"
+  ],
   "LICENSE" => "bsd",
   "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Parse::Syslog::Line",
   "PREREQ_PM" => {
     "Carp" => 0,
     "Const::Fast" => 0,
+    "Data::Printer" => 0,
     "English" => 0,
     "Exporter" => 0,
+    "Getopt::Long::Descriptive" => 0,
     "HTTP::Date" => 0,
+    "JSON" => 0,
     "Module::Load" => 0,
     "Module::Loaded" => 0,
     "POSIX" => 0,
+    "YAML" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -40,11 +47,10 @@ my %WriteMakefileArgs = (
     "Test::MockTime" => 0,
     "Test::More" => 0,
     "Time::Moment" => 0,
-    "YAML" => 0,
     "bignum" => 0,
     "blib" => "1.01"
   },
-  "VERSION" => "4.0",
+  "VERSION" => "4.2",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -55,14 +61,17 @@ my %FallbackPrereqs = (
   "Carp" => 0,
   "Const::Fast" => 0,
   "Data::Dumper" => 0,
+  "Data::Printer" => 0,
   "DateTime" => "1.23",
   "DateTime::TimeZone" => "2.13",
   "English" => 0,
   "Exporter" => 0,
   "File::Spec" => 0,
+  "Getopt::Long::Descriptive" => 0,
   "HTTP::Date" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "JSON" => 0,
   "Module::Load" => 0,
   "Module::Loaded" => 0,
   "POSIX" => 0,

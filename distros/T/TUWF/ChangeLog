@@ -1,3 +1,10 @@
+1.1 - 2017-11-26
+	- Disallow exclamation mark in email address validation
+	- Add reqProtocol() method
+	- Add reqFCGI() method
+	- Remove 'X-Powered-By' header
+	- Fix handling of space character in load_recursive()
+
 1.0 - 2015-09-17
 	- !! Some backwards-imcompatible changes, marked * !!
 	- kv_validate() improvements:

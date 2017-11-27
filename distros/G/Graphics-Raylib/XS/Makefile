@@ -17,13 +17,13 @@
 #     CONFIGURE_REQUIRES => {  }
 #     DEFINE => q[-Wno-format]
 #     INC => q[-I/Users/a3f/perl5/lib/perl5/darwin-thread-multi-2level/auto/share/dist/Alien-raylib/include ]
-#     LIBS => [q[-L/Users/a3f/perl5/lib/perl5/darwin-thread-multi-2level/auto/share/dist/Alien-raylib/lib -lraylib -lglfw]]
+#     LIBS => [q[-L/Users/a3f/perl5/lib/perl5/darwin-thread-multi-2level/auto/share/dist/Alien-raylib/lib -lraylib]]
 #     LICENSE => q[perl]
 #     NAME => q[Graphics::Raylib::XS]
 #     PREREQ_PM => {  }
 #     TEST_REQUIRES => {  }
 #     VERSION_FROM => q[lib/Graphics/Raylib/XS.pm]
-#     dynamic_lib => { OTHERLDFLAGS=>q[-framework OpenGL -framework OpenAL] }
+#     dynamic_lib => { OTHERLDFLAGS=>q[-framework OpenGL -framework OpenAL -framework Cocoa -framework AppKit] }
 
 # --- MakeMaker post_initialize section:
 
@@ -291,10 +291,9 @@ MPOLLUTE =
 # Graphics::Raylib::XS might depend on some other libraries:
 # See ExtUtils::Liblist for details
 #
-EXTRALIBS = -L/Users/a3f/perl5/lib/perl5/darwin-thread-multi-2level/auto/share/dist/Alien-raylib/lib -lraylib -lglfw
-LDLOADLIBS = -L/Users/a3f/perl5/lib/perl5/darwin-thread-multi-2level/auto/share/dist/Alien-raylib/lib -lraylib -lglfw
+EXTRALIBS = -L/Users/a3f/perl5/lib/perl5/darwin-thread-multi-2level/auto/share/dist/Alien-raylib/lib -lraylib
+LDLOADLIBS = -L/Users/a3f/perl5/lib/perl5/darwin-thread-multi-2level/auto/share/dist/Alien-raylib/lib -lraylib
 BSLOADLIBS = 
-LD_RUN_PATH = /usr/local/lib
 
 
 # --- MakeMaker const_cccmd section:
@@ -474,13 +473,13 @@ dynamic :: $(FIRST_MAKEFILE) config $(INST_BOOT) $(INST_DYNAMIC)
 # This section creates the dynamically loadable objects from relevant
 # objects and possibly $(MYEXTLIB).
 ARMAYBE = :
-OTHERLDFLAGS = -framework OpenGL -framework OpenAL
+OTHERLDFLAGS = -framework OpenGL -framework OpenAL -framework Cocoa -framework AppKit
 INST_DYNAMIC_DEP = 
 INST_DYNAMIC_FIX = 
 
 $(INST_DYNAMIC) : $(OBJECT) $(MYEXTLIB) $(INST_ARCHAUTODIR)$(DFSEP).exists $(EXPORT_LIST) $(PERL_ARCHIVEDEP) $(PERL_ARCHIVE_AFTER) $(INST_DYNAMIC_DEP) 
 	$(RM_F) $@
-	LD_RUN_PATH="$(LD_RUN_PATH)" $(LD)  $(LDDLFLAGS)  $(LDFROM) $(OTHERLDFLAGS) -o $@ $(MYEXTLIB) \
+	$(LD)  $(LDDLFLAGS)  $(LDFROM) $(OTHERLDFLAGS) -o $@ $(MYEXTLIB) \
 	  $(PERL_ARCHIVE) $(LDLOADLIBS) $(PERL_ARCHIVE_AFTER) $(EXPORT_LIST) \
 	  $(INST_DYNAMIC_FIX)
 	$(CHMOD) $(PERM_RWX) $@

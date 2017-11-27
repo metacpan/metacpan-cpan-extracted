@@ -28,7 +28,7 @@ my %WriteMakefileArgs = (
     "IO::Handle" => 0,
     "List::AllUtils" => 0,
     "Module::Runtime" => 0,
-    "Moose" => "0.92",
+    "Moose" => "2.1802",
     "Moose::Meta::Class" => 0,
     "Moose::Role" => 0,
     "MooseX::Getopt::Dashes" => 0,
@@ -68,7 +68,7 @@ my %WriteMakefileArgs = (
     "lib" => 0,
     "utf8" => 0
   },
-  "VERSION" => "0.27",
+  "VERSION" => "0.28",
   "test" => {
     "TESTS" => "t/*.t t/Handler/*.t t/Handler/HTMLStream/*.t t/Simple/*.t t/markup/github/*.t t/markup/multi-dialect/*.t t/markup/standard/*.t t/markup/theory/*.t"
   }
@@ -92,7 +92,7 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "List::AllUtils" => 0,
   "Module::Runtime" => 0,
-  "Moose" => "0.92",
+  "Moose" => "2.1802",
   "Moose::Meta::Class" => 0,
   "Moose::Role" => 0,
   "MooseX::Getopt::Dashes" => 0,

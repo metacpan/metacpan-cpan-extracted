@@ -10,7 +10,9 @@ use File::Temp qw/tempdir/;
 use File::Basename qw/dirname/;
 use File::Path qw/mkpath rmtree/;
 
-our @EXPORT = qw/test todo_test used test_app test_file/;
+our @EXPORT = qw/
+  test todo_test used test_app test_file test_cpanfile
+/;
 our $EVAL;
 our $PARSERS;
 
@@ -50,13 +52,16 @@ sub test {
       ok !$@, "no eval error";
       note $@ if $@;
     }
+    ok !@{$context->{errors} || []}, 'no errors' or note explain $context->{errors};
   };
 }
 
 sub used { return {map {$_ => 0} @_} }
 
 sub test_app {
-  my ($setup, $expected) = @_;
+  my ($description, $setup, $args, $expected) = @_;
+  note $description;
+
   my $tmpdir = tempdir(
     'PerlPrereqScannerNQLite_XXXX',
     CLEANUP => 1,
@@ -64,19 +69,17 @@ sub test_app {
   );
   $setup->($tmpdir);
 
-  my $suggests = 0;
-  for my $phase (keys %$expected) {
-    $suggests = 1 if $expected->{$phase}{suggests};
-  }
-
   my $prereqs = Perl::PrereqScanner::NotQuiteLite::App->new(
+    parsers => [':bundled'],
     base_dir => $tmpdir,
-    suggests => $suggests,
+    recommends => 1,
+    suggests => 1,
+    %{$args || {}},
   )->run->as_string_hash;
 
-  for my $phase (sort keys %$expected) {
-    for my $type (sort keys %{$expected->{$phase}}) {
-      for my $module (sort keys %{$expected->{$phase}{$type}}) {
+  for my $phase (sort keys %$prereqs) {
+    for my $type (sort keys %{$prereqs->{$phase}}) {
+      for my $module (sort keys %{$prereqs->{$phase}{$type}}) {
         is $prereqs->{$phase}{$type}{$module} => $expected->{$phase}{$type}{$module}, "found $module as $phase $type";
       }
     }
@@ -92,6 +95,35 @@ sub test_file {
   mkpath($dir) unless -d $dir;
   open my $fh, '>', $file or die "$file: $!";
   print $fh $body;
+}
+
+sub test_cpanfile {
+  my ($description, $setup, $args, $expected) = @_;
+  note $description;
+
+  my $tmpdir = tempdir(
+    'PerlPrereqScannerNQLite_XXXX',
+    CLEANUP => 1,
+    TMPDIR => 1,
+  );
+  $setup->($tmpdir);
+
+  my $prereqs = Perl::PrereqScanner::NotQuiteLite::App->new(
+    parsers => [':bundled'],
+    base_dir => $tmpdir,
+    recommends => 1,
+    suggests => 1,
+    save_cpanfile => 1,
+    %{$args || {}},
+  )->run;
+
+  my $file = "$tmpdir/cpanfile";
+  if (ok -f $file, "cpanfile exists") {
+    my $got = do { open my $fh, '<', $file; local $/; <$fh> };
+    is $got => $expected;
+  }
+
+  rmtree($tmpdir);
 }
 
 1;

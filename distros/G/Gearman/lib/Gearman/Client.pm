@@ -1,6 +1,6 @@
 package Gearman::Client;
 use version ();
-$Gearman::Client::VERSION = version->declare("2.004.009");
+$Gearman::Client::VERSION = version->declare("2.004.010");
 
 use strict;
 use warnings;
@@ -109,6 +109,12 @@ integers.
 
 See the L<Gearman::Worker> documentation for the worker for the I<sum>
 function.
+
+=head1 NOTE
+
+If you intend using UTF-8 data with SSL based connection,
+beware there is no UTF-8 support in underlying L<Net::SSLeay>.
+L<perlunicode/"Forcing-Unicode-in-Perl-(Or-Unforcing-Unicode-in-Perl)"> describes proper workarounds.
 
 =cut
 

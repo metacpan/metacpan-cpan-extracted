@@ -1,6 +1,6 @@
 package Neovim::RPC::API::AutoDiscover;
 our $AUTHORITY = 'cpan:YANICK';
-$Neovim::RPC::API::AutoDiscover::VERSION = '0.2.0';
+$Neovim::RPC::API::AutoDiscover::VERSION = '1.0.0';
 use strict;
 use warnings;
 
@@ -16,9 +16,7 @@ sub BUILD {
     
     $self->add_command({ name => 'vim_get_api_info' });
 
-    my $promise = deferred;
-
-    $self->vim_get_api_info->done(sub {
+    $self->vim_get_api_info->then(sub {
         my( $response ) = @_;
 
         $self->channel_id( $response->[0] );
@@ -27,20 +25,18 @@ sub BUILD {
 
         for my $f ( @funcs ) {
             next if $self->has_command( $f->{name} );
-            $self->log( [ "adding function %s", $f->{name} ] );
+            $self->log->debugf( "adding function %s", $f->{name} );
             $self->add_command( $f );
         }
 
         while ( my ( $type, $val ) = each $response->[1]{'types'}->%* ) {
             $self->types->{$type} = $val->{id};
         }
-
+    })
+    ->then(sub{
         $self->vim_set_var( name => 'nvimx_channel', value => $self->channel_id );
-
-        $promise->resolve;
-    } );
-
-    $self->rpc->loop( $promise );
+    })
+    ->then(sub{ $self->ready->resolve($self) });
 }
 
 1;
@@ -57,7 +53,7 @@ Neovim::RPC::API::AutoDiscover
 
 =head1 VERSION
 
-version 0.2.0
+version 1.0.0
 
 =head1 AUTHOR
 
@@ -65,7 +61,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Yanick Champoux.
+This software is copyright (c) 2017, 2015 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

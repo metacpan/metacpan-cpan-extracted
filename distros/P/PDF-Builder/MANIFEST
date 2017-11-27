@@ -21,6 +21,9 @@ contrib/pdf-deoptimize.pl
 contrib/pdf-optimize.pl
 contrib/text2pdf.pl
 examples/resources/aptfrontview.jpg
+examples/resources/sample_55.pdf
+examples/resources/sample.txt
+examples/resources/pod2htmd.temp
 examples/011_open_update
 examples/012_pages
 examples/020_corefonts
@@ -38,7 +41,9 @@ examples/030_colorspecs
 examples/031_color_hsv
 examples/032_separation
 examples/040_annotation
+examples/041_annot_fileattach
 examples/050_pagelabels
+examples/055_outlines
 examples/060_transparency
 examples/BarCode.pl
 examples/Content.pl
@@ -130,12 +135,14 @@ lib/PDF/Builder/Resource/XObject/Form/QRCode/placeholder
 lib/PDF/Builder/Resource/XObject/Form/BarCode.pm
 lib/PDF/Builder/Resource/XObject/Form/Hybrid.pm
 lib/PDF/Builder/Resource/XObject/Image/TIFF/File.pm
+lib/PDF/Builder/Resource/XObject/Image/TIFF/File_GT.pm
 lib/PDF/Builder/Resource/XObject/Image/GD.pm
 lib/PDF/Builder/Resource/XObject/Image/GIF.pm
 lib/PDF/Builder/Resource/XObject/Image/JPEG.pm
 lib/PDF/Builder/Resource/XObject/Image/PNG.pm
 lib/PDF/Builder/Resource/XObject/Image/PNM.pm
 lib/PDF/Builder/Resource/XObject/Image/TIFF.pm
+lib/PDF/Builder/Resource/XObject/Image/TIFF_GT.pm
 lib/PDF/Builder/Resource/XObject/Form.pm
 lib/PDF/Builder/Resource/XObject/Image.pm
 lib/PDF/Builder/Resource/BaseFont.pm

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test2::Bundle::Extended;
+use Test2::V0;
 use Test2::Plugin::NoWarnings;
 
 use Params::ValidationCompiler qw( validation_for );
@@ -17,13 +17,13 @@ use Specio::Library::Builtins;
 
     like(
         dies { $sub->( foo => 42, extra => [] ) },
-        qr/found extra parameters: \[extra\]/,
+        qr/Found extra parameters passed to an un-named validation subroutine: \[extra\]/,
         'dies when given one extra parameter'
     );
 
     like(
         dies { $sub->( foo => 42, extra => [], more => 0 ) },
-        qr/found extra parameters: \[extra, more\]/,
+        qr/Found extra parameters passed to an un-named validation subroutine: \[extra, more\]/,
         'dies when given two extra parameters'
     );
 }

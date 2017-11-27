@@ -31,7 +31,9 @@ WriteMakefile(
     SIGN       => 1,
     META_MERGE => {
         'meta-spec' => { version => 2 },
-        resources   => {
+          resources   => {
+            # TODO: 26 old issues still open at RT
+            # bugtracker  => 'https://github.com/rurban/net-ping/issues',
             repository => {
                 type => 'git',
                 url  => 'git://github.com/rurban/net-ping.git',

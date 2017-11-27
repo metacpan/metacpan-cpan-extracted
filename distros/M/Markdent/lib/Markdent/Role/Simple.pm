@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 use Encode qw( decode );
 use Markdent::Parser;
@@ -71,7 +71,7 @@ Markdent::Role::Simple - A role for simple markdown to html converter classes
 
 =head1 VERSION
 
-version 0.27
+version 0.28
 
 =head1 DESCRIPTION
 

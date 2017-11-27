@@ -2,7 +2,7 @@ package MVC::Neaf::Exception;
 
 use strict;
 use warnings;
-our $VERSION = 0.18;
+our $VERSION = 0.19;
 
 =head1 NAME
 
@@ -36,15 +36,57 @@ sub new {
     my $class = shift;
     if (@_ % 2) {
         my $err = shift;
-        $err =~ /^(\d\d\d)(?:\s|$)/
-            or croak "$class->new: status must be 3-digit";
-        push @_, -status => $1;
+        push @_, -status => $err;
     };
     my %opt = @_;
 
-    $opt{-status} ||= 500;
+    if ($opt{-status}) {
+        $opt{-status} =~ /^(\d\d\d)(?:\s|$)/s
+            or croak "$class->new: status must be 3-digit";
+        $opt{-status} = $1;
+    } else {
+        $opt{-status} = 500;
+        $opt{-sudden} = 1;
+    };
 
     return bless \%opt, $class;
+};
+
+=head2 status()
+
+Return error code.
+
+=cut
+
+sub status {
+    my $self = shift;
+    return $self->{-status};
+};
+
+=head2 is_sudden()
+
+Tells whether error was unexpected.
+
+B<EXPERIMENTAL>. Name and meaning subject to change.
+
+=cut
+
+sub is_sudden {
+    my $self = shift;
+    return $self->{-sudden} ? 1 : 0;
+};
+
+=head2 message()
+
+Error -message, if that was given.
+
+B<EXPERIMENTAL>. Name and meaning subject to change.
+
+=cut
+
+sub message {
+    my $self = shift;
+    return $self->{message};
 };
 
 =head2 as_string()

@@ -64,10 +64,16 @@ sub Devel::MAT::Cmd::format_sv
    shift;
    my ( $sv ) = @_;
 
-   return String::Tagged->new_tagged( $sv->desc_class_addr,
+   my $ret = String::Tagged->new_tagged( $sv->desc_class_addr,
       bold   => 1,
       italic => 1,
    );
+
+   if( my $rootname = $sv->rootname ) {
+      $ret .= "=" . Devel::MAT::Cmd->format_note( $rootname, 1 );
+   }
+
+   return $ret;
 }
 
 sub Devel::MAT::Cmd::_format_value

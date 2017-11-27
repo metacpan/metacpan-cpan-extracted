@@ -1,11 +1,12 @@
 package Chloro::Role::Trait::HasFormComponents;
-BEGIN {
-  $Chloro::Role::Trait::HasFormComponents::VERSION = '0.06';
-}
+
+use strict;
+use warnings;
+use namespace::autoclean;
+
+our $VERSION = '0.07';
 
 use Moose::Role;
-
-use namespace::autoclean;
 
 use Carp qw( croak );
 use Tie::IxHash;
@@ -28,7 +29,7 @@ has _groups => (
     default  => sub { Tie::IxHash->new() },
     handles  => {
         _add_group   => 'STORE',
-        has_group   => 'EXISTS',
+        has_group    => 'EXISTS',
         local_groups => 'Values',
     },
 );
@@ -71,6 +72,7 @@ sub add_group {
     return;
 }
 
+## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
 sub _make_field {
     my $self = shift;
 
@@ -79,14 +81,17 @@ sub _make_field {
         @_,
     );
 }
+## use critic
 
 1;
 
 # ABSTRACT: A metaclass trait for classes and roles which use Chloro
 
-
+__END__
 
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -94,11 +99,23 @@ Chloro::Role::Trait::HasFormComponents - A metaclass trait for classes and roles
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 DESCRIPTION
 
 This trait adds meta-information to classes and traits which C<use Chloro>.
+
+=for Pod::Coverage add_field add_group
+
+=head1 SUPPORT
+
+Bugs may be submitted at L<http://rt.cpan.org/Public/Dist/Display.html?Name=Chloro> or via email to L<bug-chloro@rt.cpan.org|mailto:bug-chloro@rt.cpan.org>.
+
+I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
+
+=head1 SOURCE
+
+The source code repository for Chloro can be found at L<https://github.com/autarch/Chloro>.
 
 =head1 AUTHOR
 
@@ -106,14 +123,13 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2011 by Dave Rolsky.
+This software is Copyright (c) 2017 by Dave Rolsky.
 
 This is free software, licensed under:
 
   The Artistic License 2.0 (GPL Compatible)
 
+The full text of the license can be found in the
+F<LICENSE> file included with this distribution.
+
 =cut
-
-
-__END__
-

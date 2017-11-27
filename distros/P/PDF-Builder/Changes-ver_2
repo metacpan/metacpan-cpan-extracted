@@ -1,5 +1,9 @@
 Change log for PDF::API2 version 2.xxx (predecessor to PDF::Builder)
 
+2.034     2017-08-18 (unreleased)
+
+    - Add additional author and license information to lib/PDF/API2.pm
+
 2.033     2017-07-10
 
     - [RT #122371] Remove a couple of improperly-placed weaken statements

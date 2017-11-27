@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test2::Bundle::Extended;
+use Test2::V0;
 use Test2::Plugin::NoWarnings;
 
 use Params::ValidationCompiler qw( validation_for );
@@ -15,19 +15,19 @@ use Params::ValidationCompiler qw( validation_for );
 
     like(
         dies { $sub->(42) },
-        qr/\QExpected a hash or hash reference but got a single non-reference argument/,
+        qr/\QExpected a hash or hash reference but a single non-reference argument was passed/,
         'dies when given a single non-ref argument'
     );
 
     like(
         dies { $sub->( [] ) },
-        qr/\QExpected a hash or hash reference but got a single ARRAY reference argument/,
+        qr/\QExpected a hash or hash reference but a single ARRAY reference argument was passed/,
         'dies when given a single arrayref argument'
     );
 
     like(
         dies { $sub->( foo => 42, 'bar' ) },
-        qr/\QExpected a hash or hash reference but got an odd number of arguments/,
+        qr/\QExpected a hash or hash reference but an odd number of arguments was passed/,
         'dies when given three arguments'
     );
 
@@ -45,7 +45,7 @@ use Params::ValidationCompiler qw( validation_for );
 
     like(
         dies { $sub->( bless { foo => 42 }, 'anything' ) },
-        qr/Expected a hash or hash reference but got a single object argument/,
+        qr/Expected a hash or hash reference but a single object argument was passed/,
         'dies when passed a blessed object',
     );
 

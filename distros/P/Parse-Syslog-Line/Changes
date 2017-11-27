@@ -1,9 +1,78 @@
 ==================================================
-Changes from 2015-07-18 00:00:00 +0000 to present.
+Changes from 2015-11-28 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 4.0 at 2017-07-17 04:52:25 +0000
+version 4.2 at 2017-11-27 00:11:24 +0000
+----------------------------------------
+
+  Change: 24ce203cfebfd5ee8c185f697c6166da2414d33c
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2017-11-26 15:49:10 +0000
+
+    Release version 4.2 to address test failures
+
+    CPAN Testers uncovered a few more issues with systems based on the
+    precision of local calculations and the timezone of the host system. Two
+    fixes in this release:
+
+    * Always set the OutputTimeZone when set_syslog_timezone() is called as
+
+    per the docs. This also makes the tests pass as the timezone is
+
+    expected. * New variable $HiResFmt and default to '%0.6f'. Use this to set
+    the
+
+    correct precision in the date strings. If tests continue to fail due
+
+    to precision erros, I will override the precision in the tests using
+
+    this variable. 
+
+  Change: 24c3cf8f168c1fbe02e45457a82a7ca46a006083
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2017-11-26 14:20:47 +0000
+
+    Allow cuotomizing the high resolution time format.
+
+    Allow overriding the default microsecond resolution timestamps for the high
+    resolution timestamps. This should address some test failures where
+    HTTP::Date::str2time() is causing rounding errors.
+
+    Touch up test output for easier debugging. 
+
+  Change: 89c1839a3ca33b9588884f2f4060a6a0e3ad734f
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2017-11-26 20:53:11 +0000
+
+    Fix timezone output in tests
+
+    * Ensure that OutputTimeZone is set to true when we call
+
+    set_syslog_timezone() so behavior matches the documentation * Correct
+    ordering of timezone related calls in t/01-parse.t 
+
+----------------------------------------
+version 4.1 at 2017-11-25 00:24:51 +0000
+----------------------------------------
+
+  Change: c24ed3db75f4e12e853f57ccdd099e206d930fd8
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2017-11-24 16:24:51 +0000
+
+    Version 4.1 fixes for CPAN Testers and bonus utility
+
+    * Force UTC timezone in the test suite so the parsing of timestamps is
+
+    reliable even on systems where Perl can't figure out the timezone, ie,
+
+    the BSD's and Darwin * Retab to pass all xtests * Install new utility
+    parse-syslog-line.pl to provide something for
+
+    everyone to play with immediately 
+
+----------------------------------------
+version 4.0 at 2017-07-17 04:52:15 +0000
 ----------------------------------------
 
   Change: 47382a670e105bae399d01ed68ec82fb4c4dc2d8
@@ -317,5 +386,5 @@ version 3.3 at 2016-01-24 21:09:02 +0000
     Parse microseconds 
 
 =================================================
-Plus 23 releases after 2015-07-18 00:00:00 +0000.
+Plus 23 releases after 2015-11-28 00:00:00 +0000.
 =================================================

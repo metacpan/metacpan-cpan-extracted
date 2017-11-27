@@ -116,3 +116,6 @@ Revision history for Sphinx-Search
 
 0.29   2015-03-17
        Updated for 2.2.8. Added experimental SphinxQL support.
+
+0.30   2017-11-23
+       rt.cpan.org #123648 - fixed connectretries.

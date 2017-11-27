@@ -1,9 +1,47 @@
 ==================================================
-Changes from 2016-10-08 00:00:00 +0000 to present.
+Changes from 2016-11-27 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.004 at 2017-10-08 00:46:25 +0000
+version 0.007 at 2017-11-27 02:11:52 +0000
+------------------------------------------
+
+  Change: d9dc6ee85ffe21e4a4ad8432ca7ebfcf610035de
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-11-27 03:10:43 +0000
+
+    Link XS code with private libs
+
+    as it should be 
+
+------------------------------------------
+version 0.006 at 2017-11-26 09:03:36 +0000
+------------------------------------------
+
+  Change: 3153cdccc0fa2b1d42e421e2a15c55a84a196723
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-11-26 10:03:36 +0000
+
+    'Customize' Graphics::Raylib::XS documentation 
+
+  Change: a943531bd8215047527e7da4095af9ef3e9336b9
+  Author: Mohammad S Anwar <Mohammad.Anwar@yahoo.com>
+  Date : 2017-11-26 09:56:58 +0000
+
+    - Added missing prereq Import::Into. (#2) 
+
+------------------------------------------
+version 0.005 at 2017-11-25 23:25:41 +0000
+------------------------------------------
+
+  Change: 3b427d7f7d0fb7ae12e9eb034b8b8fe5d7b3fbc2
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2017-11-26 00:25:41 +0000
+
+    Upgrade to raylib 1.8 
+
+------------------------------------------
+version 0.004 at 2017-10-08 00:46:01 +0000
 ------------------------------------------
 
   Change: f7f41fda6c22a50bf96dfd624d961acd70d39fcb

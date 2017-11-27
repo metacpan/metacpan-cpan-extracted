@@ -1,0 +1,27 @@
+---
+abstract: 'Perl interface to Snowball stemmer for the Catalan language.'
+author:
+  - 'Linas Valiukas <linas dot valiukas at gmail dot com>, Marvin Humphrey <marvin at rectangular dot com>, Israel Olalla of iSOCO <iolalla at isoco dot com>'
+build_requires:
+  ExtUtils::CBuilder: '0'
+  ExtUtils::ParseXS: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Lingua-Stem-Snowball-Ca
+provides:
+  Lingua::Stem::Snowball::Ca:
+    file: lib/Lingua/Stem/Snowball/Ca.pm
+    version: '0.01'
+requires:
+  Test::More: '0'
+  perl: v5.6.2
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

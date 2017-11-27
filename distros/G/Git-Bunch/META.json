@@ -91,7 +91,7 @@
          "web" : "https://github.com/perlancar/perl-Git-Bunch"
       }
    },
-   "version" : "0.620",
+   "version" : "0.621",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026000"

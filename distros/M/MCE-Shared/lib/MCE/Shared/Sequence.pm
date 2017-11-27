@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized numeric );
 
-our $VERSION = '1.832';
+our $VERSION = '1.833';
 
 use Scalar::Util qw( looks_like_number );
 use MCE::Shared::Base ();
@@ -54,12 +54,17 @@ sub _reset {
 
    _croak('invalid step' ) unless looks_like_number( $self->[_STEP] );
 
-   $self->[_CKSZ] = $opts->{'chunk_size'}  || 1;
+   for my $_k (_BEGV, _ENDV, _STEP) {
+      $self->[$_k] = int($self->[$_k]) unless ( $self->[$_k] =~ /\./ );
+   }
+
+   $self->[_CKSZ] = $opts->{'chunk_size' } || 1;
    $self->[_ONLY] = $opts->{'bounds_only'} // 0;
 
-   _croak('invalid chunk_size'  ) unless ( $self->[_CKSZ] =~ /^\d+$/  );
+   _croak('invalid chunk_size'  ) unless ( $self->[_CKSZ] =~ /^[0-9e\+]+$/ );
    _croak('invalid bounds_only' ) unless ( $self->[_ONLY] =~ /^[01]$/ );
 
+   $self->[_CKSZ] = int($self->[_CKSZ]);
    $self->[_ITER] = undef;
 
    return;
@@ -109,6 +114,7 @@ sub next {
 
       if ( $begv <= $endv ) {
          $begn = $seqn = $begv + ( $iter++ * $chunk_size * $step );
+         return if ( $begv == $endv && $begn != $begv );
          return if ( $seqn > $endv );
       }
       else {
@@ -118,7 +124,7 @@ sub next {
 
       $self->[_ITER] = $iter;
 
-      if ( $chunk_size == 1 ) {
+      if ( $chunk_size == 1 || $begv == $endv ) {
          $seqn = _sprintf( "%$fmt", $seqn ) if ( defined $fmt );
          return ( $bounds_only ) ? ( $seqn, $seqn ) : $seqn;
       }
@@ -165,7 +171,7 @@ sub next {
       my @n;
 
       if ( $begv <= $endv ) {
-         if ( !defined $fmt && $step == 1 ) {
+         if ( !defined $fmt && $step == 1 && abs($endv) < ~1 && abs($begv) < ~1 ) {
             return ( $seqn + $chunk_size <= $endv )
                ? ( $seqn .. $seqn + $chunk_size - 1 )
                : ( $seqn .. $endv );
@@ -224,7 +230,7 @@ MCE::Shared::Sequence - Sequence helper class
 
 =head1 VERSION
 
-This document describes MCE::Shared::Sequence version 1.832
+This document describes MCE::Shared::Sequence version 1.833
 
 =head1 DESCRIPTION
 

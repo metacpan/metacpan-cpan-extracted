@@ -1,3 +1,7 @@
+0.329 2017/11/22
+- L4::Tcp::pktin - fix merging of data into next packet if data were not
+  handled in the upper layer yet (merging was done with last unhandled packet
+  instead of next one).
 0.328 2017/06/11
 - L7::SMTP - call new_connection from upper flow to initialize it
 0.327 2017/05/25

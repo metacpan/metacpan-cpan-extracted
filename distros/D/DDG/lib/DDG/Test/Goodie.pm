@@ -1,7 +1,7 @@
 package DDG::Test::Goodie;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Adds keywords to easily test Goodie plugins.
-$DDG::Test::Goodie::VERSION = '1017';
+$DDG::Test::Goodie::VERSION = '1018';
 use strict;
 use warnings;
 use Carp;
@@ -74,7 +74,7 @@ DDG::Test::Goodie - Adds keywords to easily test Goodie plugins.
 
 =head1 VERSION
 
-version 1017
+version 1018
 
 =head1 DESCRIPTION
 

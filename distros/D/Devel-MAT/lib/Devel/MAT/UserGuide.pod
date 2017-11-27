@@ -48,8 +48,6 @@ documentation at L<Devel::MAT::Dumper/IMPORT OPTIONS>.
 
 =head1 ANALYSING THE HEAP
 
-=head2 The F<pmat> Shell
-
 Now that we have a F<.pmat> file, we can load it and start to inspect the
 contents. A lot of the smaller, simpler tools are built as plugins for the
 main F<pmat> command shell, so we can start by loading the heap file there.
@@ -58,6 +56,73 @@ main F<pmat> command shell, so we can start by loading the heap file there.
   Perl memory dumpfile from perl 5.24.1
   Heap contains 15624 objects
   pmat>
+
+In this shell a collection of commands is available to help analyse and
+inspect the contents of memory represented by this heap dump, which can be
+used in an interactive way, trying to narrow down to find the cause of the
+memory issue.
+
+It is hard in general to describe exactly what sequence of analysis commands
+will be best to find the problem, as the specifics of each individual case
+will call for different kinds of analysis and require us to ask different
+questions of the toolset.
+
+Ultimately there is quite a variety of possible underlying causes of memory
+growth in a Perl program; a few possible causes could be:
+
+=over 2
+
+=item *
+
+A single large SV such as a hash or array containing millions of items, or
+a single string possibly gigabytes in length.
+
+=item *
+
+A large number of SVs being created retained indefinitely, never being
+reclaimed.
+
+=item *
+
+A large number of temporary SVs being created, but due to internal reference
+cycles their memory is never reclaimed despite them now being unreachable.
+
+=back
+
+This list of course is quite incomplete - there are as many different
+variations of erroenous memory usage as there are possible programs to write.
+Additionally, a lot of more interesting programs often suffer multiple
+overlapping issues at once. Nevertheless, this broad categorisation can help
+to describe some overall approaches to finding memory usage issues.
+
+A good first step to take in the F<pmat> shell to try to distinguish these
+cases is to use the C<largest> command. This command requires no additional
+arguments, and by default will print (in size order), the five largest
+individual SVs in the entire heap.
+
+  pmat> largest
+
+For more information about the C<largest> command, see also
+L<Devel::MAT::Tool::Sizes/largest>.
+
+=head2 One Large SV
+
+Sometimes you'll find a single SV that far outweighs all the others; for
+example:
+
+  pmat> largest
+  SCALAR(PV) at 0x6a47708: 1.6 GiB
+  SCALAR(PV) at 0x1a59488: 4.0 MiB
+  HASH(0) at 0xfb4770=strtab: 1.5 MiB
+  SCALAR(PV) at 0x71b6468: 707.3 KiB
+  SCALAR(PV) at 0x71be2f0: 609.6 KiB
+  others: 46.2 MiB
+
+In this output, we see that the topmost SV reported, at address C<0x6a47708>
+is much larger than everything else put together. In this case we have
+essentially already found the cause of the memory usage growth, and we can
+proceed by identifying what this particular SV actually is, by following the
+process in L<Devel::MAT::UserGuide::IdentifyingAnSV>.
 
 For a brief overview, we can just count the total number of objects of various
 kinds in the heap:
@@ -78,15 +143,34 @@ We can inspect the callstack at the time the heap dump was made:
     $_[2]: 'here'
   ...
 
-For more information about a tool, for example the C<count> tool, note that
-each one is implemented by a (correctly-cased) package under the
-C<Devel::MAT::Tool> namespace. In this instance, the C<count> tool is
-implemented by, and therefore more documentation can be found in, the
-L<Devel::MAT::Tool::Count> package.
+=head1 COMMAND HELP
 
-A list of the commands currently available in the shell can be found by
+A list of the commands currently available in the shell can be found by the
+C<help> command:
 
   pmat> help
+  callstack - Display the call stack
+  count     - Count the various kinds of SV
+  elems     - List the elements of an ARRAY SV
+  ...
+
+For more information about a particular command, give its name as an argument
+to the C<help> command:
+
+  pmat> help sizes
+  sizes - Summarize object and byte counts across different SV types
+
+  SYNOPSIS:
+    sizes [OPTIONS...]
+
+  OPTIONS:
+    --owned     sum SVs by owned size
+    --struct    sum SVs by structural size
+
+Also note that each command is implemented by a (correctly-cased) package
+under the C<Devel::MAT::Tool> namespace. For example, the C<count> tool is
+implemented by, and therefore more documentation can be found in, the
+L<Devel::MAT::Tool::Count> package.
 
 =head1 AUTHOR
 

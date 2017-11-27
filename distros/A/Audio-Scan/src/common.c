@@ -21,7 +21,7 @@ int
 _check_buf(PerlIO *infile, Buffer *buf, int min_wanted, int max_wanted)
 {
   int ret = 1;
-  
+
   // Do we have enough data?
   if ( buffer_len(buf) < min_wanted ) {
     // Read more data
@@ -32,16 +32,16 @@ _check_buf(PerlIO *infile, Buffer *buf, int min_wanted, int max_wanted)
 #ifdef _MSC_VER
     uint32_t pos_check = PerlIO_tell(infile);
 #endif
-    
+
     if (min_wanted > max_wanted) {
       max_wanted = min_wanted;
     }
-    
+
     // Adjust actual amount to read by the amount we already have in the buffer
     actual_wanted = max_wanted - buffer_len(buf);
 
     New(0, tmp, actual_wanted, unsigned char);
-    
+
     DEBUG_TRACE("Buffering from file @ %d (min_wanted %d, max_wanted %d, adjusted to %d)\n",
       (int)PerlIO_tell(infile), min_wanted, max_wanted, actual_wanted
     );
@@ -208,21 +208,21 @@ _file_size(PerlIO *infile)
 #ifdef _MSC_VER
   // Win32 doesn't work right with fstat
   off_t file_size;
-  
+
   PerlIO_seek(infile, 0, SEEK_END);
   file_size = PerlIO_tell(infile);
   PerlIO_seek(infile, 0, SEEK_SET);
-  
+
   return file_size;
 #else
   struct stat buf;
-  
+
   if ( !fstat( PerlIO_fileno(infile), &buf ) ) {
     return buf.st_size;
   }
-  
+
   warn("Unable to stat: %s\n", strerror(errno));
-  
+
   return 0;
 #endif
 }
@@ -231,13 +231,13 @@ int
 _env_true(const char *name)
 {
   char *value;
-  
+
   value = getenv(name);
-  
+
   if ( value == NULL || value[0] == '0' ) {
     return 0;
   }
-  
+
   return 1;
 }
 
@@ -251,13 +251,13 @@ _decode_base64(char *s)
   char *p;
 
   n = i = 0;
-  
+
   while (*s && (p=strchr(b64,*s))) {
     idx = (int)(p - b64);
     byte_offset = (i*6)/8;
     bit_offset = (i*6)%8;
     d[byte_offset] &= ~((1<<(8-bit_offset))-1);
-    
+
     if (bit_offset < 3) {
       d[byte_offset] |= (idx << (2-bit_offset));
       n = byte_offset+1;
@@ -271,10 +271,10 @@ _decode_base64(char *s)
     s++;
     i++;
   }
-  
+
   /* null terminate */
   d[n] = 0;
-  
+
   return n;
 }
 
@@ -285,46 +285,46 @@ _decode_flac_picture(PerlIO *infile, Buffer *buf, uint32_t *pic_length)
   uint32_t desc_length;
   SV *desc;
   HV *picture = newHV();
-  
+
   // Check we have enough for picture_type and mime_length
   if ( !_check_buf(infile, buf, 8, DEFAULT_BLOCK_SIZE) ) {
     return NULL;
   }
-    
+
   my_hv_store( picture, "picture_type", newSVuv( buffer_get_int(buf) ) );
-  
+
   mime_length = buffer_get_int(buf);
   DEBUG_TRACE("  mime_length: %d\n", mime_length);
-  
+
   // Check we have enough for mime_type and desc_length
   if ( !_check_buf(infile, buf, mime_length + 4, DEFAULT_BLOCK_SIZE) ) {
     return NULL;
   }
-  
+
   my_hv_store( picture, "mime_type", newSVpvn( buffer_ptr(buf), mime_length ) );
   buffer_consume(buf, mime_length);
-  
+
   desc_length = buffer_get_int(buf);
   DEBUG_TRACE("  desc_length: %d\n", mime_length);
-  
+
   // Check we have enough for desc_length, width, height, depth, color_index, pic_length
   if ( !_check_buf(infile, buf, desc_length + 20, DEFAULT_BLOCK_SIZE) ) {
     return NULL;
   }
-  
+
   desc = newSVpvn( buffer_ptr(buf), desc_length );
   sv_utf8_decode(desc); // XXX needs test with utf8 desc
   my_hv_store( picture, "description", desc );
   buffer_consume(buf, desc_length);
-  
+
   my_hv_store( picture, "width", newSVuv( buffer_get_int(buf) ) );
   my_hv_store( picture, "height", newSVuv( buffer_get_int(buf) ) );
   my_hv_store( picture, "depth", newSVuv( buffer_get_int(buf) ) );
   my_hv_store( picture, "color_index", newSVuv( buffer_get_int(buf) ) );
-  
+
   *pic_length = buffer_get_int(buf);
   DEBUG_TRACE("  pic_length: %d\n", *pic_length);
-  
+
   if ( _env_true("AUDIO_SCAN_NO_ARTWORK") ) {
     my_hv_store( picture, "image_data", newSVuv(*pic_length) );
   }
@@ -332,9 +332,9 @@ _decode_flac_picture(PerlIO *infile, Buffer *buf, uint32_t *pic_length)
     if ( !_check_buf(infile, buf, *pic_length, *pic_length) ) {
       return NULL;
     }
-    
+
     my_hv_store( picture, "image_data", newSVpvn( buffer_ptr(buf), *pic_length ) );
   }
-  
+
   return picture;
 }

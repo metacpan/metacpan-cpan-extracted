@@ -22,9 +22,11 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "English" => 0,
+    "ExtUtils::MakeMaker" => 0,
+    "File::Spec" => 0,
     "Test::More" => "0.99"
   },
-  "VERSION" => "0.03",
+  "VERSION" => "0.04",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -34,6 +36,8 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Attribute::Handlers" => 0,
   "English" => 0,
+  "ExtUtils::MakeMaker" => 0,
+  "File::Spec" => 0,
   "Test::Builder" => 0,
   "Test::More" => "0.99"
 );

@@ -215,7 +215,7 @@ L<Lemonldap::NG::Manager>, L<Lemonldap::NG::Portal>, L<Lemonldap::NG::Handler>
 =head1 BUG REPORT
 
 Use OW2 system to report bug or ask for features:
-L<http://jira.ow2.org>
+L<https://gitlab.ow2.org/lemonldap-ng/lemonldap-ng/issues>
 
 =head1 DOWNLOAD
 

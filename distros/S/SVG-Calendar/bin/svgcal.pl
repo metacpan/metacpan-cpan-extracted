@@ -18,7 +18,7 @@ use SVG::Calendar;
 use Path::Tiny;
 use FindBin qw/$Bin/;
 
-our $VERSION = version->new('0.3.11');
+our $VERSION = version->new('0.3.12');
 
 my %option = (
     moon     => {},
@@ -285,7 +285,7 @@ svgcal.pl - Creates the pages for a calendar in SVG format
 
 =head1 VERSION
 
-This documentation refers to svgcal.pl version 0.3.11.
+This documentation refers to svgcal.pl version 0.3.12.
 
 =head1 SYNOPSIS
 

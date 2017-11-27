@@ -10,7 +10,7 @@ use warnings;
 
 use Exporter 'import';
 
-our $VERSION = '1.9.10';
+our $VERSION = '1.9.14';
 
 use warnings;
 use MIME::Base64;
@@ -554,7 +554,7 @@ sub setHiddenFormValue {
     $base64 = 1           unless defined $base64;
 
     # Store value
-    if ($val) {
+    if ( defined $val ) {
         $key = $prefix . $key;
         $val = encode_base64( $val, '' ) if $base64;
         $self->{portalHiddenFormValues}->{$key} = $val;
@@ -578,10 +578,11 @@ sub getHiddenFormValue {
     $key = $prefix . $key;
 
     # Get value
-    if ( my $val = $self->param($key) ) {
+    my $val = $self->param($key);
+    if ( defined $val ) {
         $val = decode_base64($val) if $base64;
-        return $val;
         $self->lmLog( "Hidden value $val found for key $key", 'debug' );
+        return $val;
     }
 
     # No value found
@@ -1077,7 +1078,7 @@ sub updateSession {
 
         # Update sessionInfo data
         ## sessionInfo updated if $id defined : quite strange !!
-        ## See http://jira.ow2.org/browse/LEMONLDAP-430
+        ## See https://gitlab.ow2.org/lemonldap-ng/lemonldap-ng/issues/430>
         foreach ( keys %$infos ) {
             $self->lmLog( "Update sessionInfo $_ with " . $infos->{$_},
                 'debug' );
@@ -3214,7 +3215,7 @@ L<http://lemonldap-ng.org/>
 =head1 BUG REPORT
 
 Use OW2 system to report bug or ask for features:
-L<http://jira.ow2.org>
+L<https://gitlab.ow2.org/lemonldap-ng/lemonldap-ng/issues>
 
 =head1 DOWNLOAD
 

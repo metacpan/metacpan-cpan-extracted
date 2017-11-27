@@ -3,25 +3,35 @@ use strict;
 use warnings;
 use 5.008001;
 use parent qw(Exporter);
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 use Unicode::EastAsianWidth;
 
 our @EXPORT_OK = qw(vwidth vtrim);
 
 our $EastAsian = $Unicode::EastAsianWidth::EastAsian;
 
+sub Spacing {
+    $_[0] . <<END
+-utf8::Nonspacing_Mark
+END
+}
+
 sub InVWPP1Fullwidth() {
+    Spacing
     InEastAsianFullwidth() . InEastAsianWide() . InEastAsianAmbiguous()
 }
 sub InVWPP0Fullwidth() {
+    Spacing
     InEastAsianFullwidth() . InEastAsianWide()
 }
 sub InVWPP1Halfwidth() {
+    Spacing
     InEastAsianHalfwidth().
     InEastAsianNarrow().
     InEastAsianNeutral()
 }
 sub InVWPP0Halfwidth() {
+    Spacing
     InEastAsianHalfwidth().
     InEastAsianNarrow().
     InEastAsianNeutral().
@@ -52,22 +62,23 @@ sub trim {
 
     my $cnt = 0;
     my $ret = '';
-    while ($str =~ /(\p{InFullwidth})|(\p{InHalfwidth})/g) {
-        if ($1) {
-            if ($cnt+2 <= $limit) {
-                $ret .= $1;
-                $cnt += 2;
-            } else {
-                last;
-            }
-        } else {
-            if ($cnt+1 <= $limit) {
-                $ret .= $2;
-                $cnt += 1;
-            } else {
-                last;
-            }
-        }
+    while ($str =~ /\G(\X)/g) {
+	my $ch = $1;
+	my $w = do {
+	    if ($ch =~ /\p{InFullwidth}/) {
+		2;
+	    } elsif (length($ch) == 1) {
+		1;
+	    } else {
+		width($ch);
+	    }
+	};
+	if ($cnt+$w <= $limit) {
+	    $ret .= $ch;
+	    $cnt += $w;
+	} else {
+	    last;
+	}
     }
     $ret;
 }

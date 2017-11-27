@@ -1,12 +1,13 @@
 package Chloro::Result::Field;
-BEGIN {
-  $Chloro::Result::Field::VERSION = '0.06';
-}
+
+use strict;
+use warnings;
+use namespace::autoclean;
+
+our $VERSION = '0.07';
 
 use Moose;
 use MooseX::StrictConstructor;
-
-use namespace::autoclean;
 
 use Chloro::Types qw( ArrayRef Item NonEmptyStr );
 
@@ -26,7 +27,7 @@ has _errors => (
 
 has param_names => (
     is       => 'ro',
-    isa      => ArrayRef[NonEmptyStr],
+    isa      => ArrayRef [NonEmptyStr],
     required => 1,
 );
 
@@ -51,7 +52,7 @@ sub BUILD {
 }
 
 after add_error => sub {
-    my $self = shift;
+    my $self  = shift;
     my $error = shift;
 
     $error->_set_result($self);
@@ -71,9 +72,11 @@ __PACKAGE__->meta()->make_immutable();
 
 # ABSTRACT: A result for a single field
 
-
+__END__
 
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -81,7 +84,7 @@ Chloro::Result::Field - A result for a single field
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -93,6 +96,8 @@ version 0.06
 
 This class represents the result for a single field after processing
 user-submitted data.
+
+=for Pod::Coverage BUILD
 
 =head1 METHODS
 
@@ -153,20 +158,29 @@ an API.
 
 This class does the L<Chloro::Role::Result> role.
 
+=head1 SUPPORT
+
+Bugs may be submitted at L<http://rt.cpan.org/Public/Dist/Display.html?Name=Chloro> or via email to L<bug-chloro@rt.cpan.org|mailto:bug-chloro@rt.cpan.org>.
+
+I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
+
+=head1 SOURCE
+
+The source code repository for Chloro can be found at L<https://github.com/autarch/Chloro>.
+
 =head1 AUTHOR
 
 Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2011 by Dave Rolsky.
+This software is Copyright (c) 2017 by Dave Rolsky.
 
 This is free software, licensed under:
 
   The Artistic License 2.0 (GPL Compatible)
 
+The full text of the license can be found in the
+F<LICENSE> file included with this distribution.
+
 =cut
-
-
-__END__
-

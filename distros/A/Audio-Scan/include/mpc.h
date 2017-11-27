@@ -57,7 +57,7 @@ typedef struct mpc_streaminfo {
   const char*      profile_name;       ///< name of profile used by stream
 
   /// @name replaygain related fields
-  int16_t         gain_title;          ///< replaygain title value 
+  int16_t         gain_title;          ///< replaygain title value
   int16_t         gain_album;          ///< replaygain album value
   uint16_t        peak_album;          ///< peak album loudness level
   uint16_t        peak_title;          ///< peak title loudness level
@@ -72,7 +72,7 @@ typedef struct mpc_streaminfo {
 
   int32_t         tag_offset;          ///< offset to file tags
   int32_t         total_file_length;   ///< total length of underlying file
-  
+
   Buffer *buf;
   PerlIO *infile;
 } mpc_streaminfo;

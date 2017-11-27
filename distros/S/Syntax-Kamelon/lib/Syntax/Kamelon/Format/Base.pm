@@ -1,5 +1,6 @@
 package Syntax::Kamelon::Format::Base;
 
+use 5.006;
 use strict;
 use warnings;
 use Carp;

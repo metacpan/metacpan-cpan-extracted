@@ -1,0 +1,6 @@
+A non-blocking beanstalk client based on IO::Async. It is loosely
+based on Graham Barr's AnyEvent::Beanstalk.
+
+This is the first release of this software and lacks any tests so
+although the API is unlikely to change it is nevertheless marked as
+version 0.1.

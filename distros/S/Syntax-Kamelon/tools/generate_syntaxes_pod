@@ -1,0 +1,90 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Syntax::Kamelon;
+use Syntax::Kamelon::Indexer;
+
+my $tab = 40;
+my $kam_version = Syntax::Kamelon->VERSION;
+
+my $indexer = Syntax::Kamelon::Indexer->new(
+);
+
+my @syntaxes = $indexer->AvailableSyntaxes;
+
+my %sections = ();
+
+for (@syntaxes) {
+	my $name = $_;
+	my $xml = $indexer->GetXMLObject($name);
+	my $lang_hash = $xml->Language;
+	my $section = $lang_hash->{section};
+	unless (defined $section) {
+		$section = 'None',
+	}
+	unless (exists $sections{$section}) {
+		$sections{$section} = {};
+	}
+	my $xmlversion = $lang_hash->{version};
+	unless (defined $xmlversion) {
+		$xmlversion = 'Unknown',
+	}
+	$sections{$section}->{$name} = $xmlversion;
+}
+
+print <<__EOF;
+=head1 NAME
+
+Syntax::Kamelon::Syntaxes - List of available syntaxes
+
+=head1 LIST
+
+This is a list of all included syntax definition files in this release $kam_version of B<Syntax::Kamelon>.
+Please note that the names may contain spaces.
+
+=over 4
+
+__EOF
+
+for (sort keys %sections) {
+	my $sct = $_;
+	print "=item B<$sct>\n\n";
+	print " --NAME--";
+	for (9 .. $tab) { print " " }
+	print "--VERSION--\n";
+	my $synt_hash = $sections{$sct};
+	for (sort keys %$synt_hash) {
+		my $nme = $_;
+		my $out = " $nme";
+		for (length($out) .. $tab) {
+			$out = $out . " ";
+		}
+		$out = $out . $synt_hash->{$nme};
+		print "$out\n";
+	}
+	print "\n";
+}
+
+print <<__EOF;
+=back
+
+=head1 AUTHOR AND COPYRIGHT
+
+This module is written and maintained by:
+
+Hans Jeuken < hansjeuken at xs4all dot nl>
+
+Copyright (c) 2017 by Hans Jeuken, all rights reserved.
+
+Published under the GPLV3 license
+
+=head1 SEE ALSO
+
+B<Syntax::Kamelon>, B<Syntax::Kamelon::Builder>, B<Syntax::Kamelon::Debugger>, B<Syntax::Kamelon::Diagnostics>,
+B<Syntax::Kamelon::XMLData>, B<Syntax::Kamelon::Format::Base>, B<Syntax::Kamelon::Format::ANSI>, 
+B<Syntax::Kamelon::Format:HTML4>
+
+=cut
+
+__EOF

@@ -14,7 +14,7 @@ use constant DEBUG => $ENV{MOJO_SELENIUM_DEBUG} || 0;
 $ENV{TEST_SELENIUM} //= '0';
 $ENV{MOJO_SELENIUM_BASE_URL} ||= $ENV{TEST_SELENIUM} =~ /^http/ ? $ENV{TEST_SELENIUM} : '';
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 my $SCRIPT_NAME = File::Basename::basename($0);
 my $SCREENSHOT  = 1;
@@ -69,7 +69,7 @@ sub active_element_is {
   my ($self, $selector, $desc) = @_;
   my $driver = $self->driver;
   my $active = $driver->get_active_element;
-  my $el     = $self->_proxy(find_element => $selector);
+  my $el     = $self->_find_element($selector);
   my $same   = $active && $el ? $driver->compare_elements($active, $el) : 0;
 
   return $self->_test('ok', $same, _desc($desc, "active element is $selector"));
@@ -87,7 +87,7 @@ sub capture_screenshot {
 
 sub click_ok {
   my ($self, $selector) = @_;
-  my $el = $selector ? $self->_proxy(find_element => $selector) : $self->driver->get_active_element;
+  my $el = $selector ? $self->_find_element($selector) : $self->driver->get_active_element;
   my $err = 'no such element';
 
   if ($el) {
@@ -115,14 +115,14 @@ sub current_url_like {
 
 sub element_is_displayed {
   my ($self, $selector, $desc) = @_;
-  my $el = $self->_proxy(find_element => $selector);
+  my $el = $self->_find_element($selector);
   return $self->_test('ok', ($el && $el->is_displayed),
     _desc($desc, "element $selector is displayed"));
 }
 
 sub element_is_hidden {
   my ($self, $selector, $desc) = @_;
-  my $el = $self->_proxy(find_element => $selector);
+  my $el = $self->_find_element($selector);
   return $self->_test('ok', ($el && $el->is_hidden), _desc($desc, "element $selector is hidden"));
 }
 
@@ -151,13 +151,13 @@ sub live_element_count_is {
 sub live_element_exists {
   my ($self, $selector, $desc) = @_;
   $desc = _desc($desc, qq{element for selector "$selector" exists});
-  return $self->_test('ok', $self->_proxy(find_element => $selector), $desc);
+  return $self->_test('ok', $self->_find_element($selector), $desc);
 }
 
 sub live_element_exists_not {
   my ($self, $selector, $desc) = @_;
   $desc = _desc($desc, qq{no element for selector "$selector"});
-  return $self->_test('ok', !$self->_proxy(find_element => $selector), $desc);
+  return $self->_test('ok', !$self->_find_element($selector), $desc);
 }
 
 sub live_text_is {
@@ -225,7 +225,7 @@ sub refresh { $_[0]->_proxy('refresh'); $_[0] }
 
 sub send_keys_ok {
   my ($self, $selector, $keys, $desc) = @_;
-  my $el = $selector ? $self->_proxy(find_element => $selector) : $self->driver->get_active_element;
+  my $el = $selector ? $self->_find_element($selector) : $self->driver->get_active_element;
 
   $selector ||= 'active element';
   $keys = [ref $keys ? $keys : split //, $keys] unless ref $keys eq 'ARRAY';
@@ -249,7 +249,8 @@ sub send_keys_ok {
     };
   }
 
-  return $self->_test('ok', $el, _desc($desc, "keys sent to $selector"));
+  $keys = Mojo::Util::url_escape(join '', @$keys);
+  return $self->_test('ok', $el, _desc($desc, "keys ($keys) sent to $selector"));
 }
 
 sub set_window_size {
@@ -272,14 +273,14 @@ sub setup_or_skip_all {
 
 sub submit_ok {
   my ($self, $selector, $desc) = @_;
-  my $el = $self->_proxy(find_element => $selector);
+  my $el = $self->_find_element($selector);
   $el->submit if $el;
   return $self->_test('ok', $el, _desc($desc, "click on $selector"));
 }
 
 sub toggle_checked_ok {
   my ($self, $selector) = @_;
-  my $el = $self->_proxy(find_element => $selector);
+  my $el = $self->_find_element($selector);
 
   if ($el) {
     if ($el->is_displayed) {
@@ -361,6 +362,14 @@ sub window_size_is {
 
 sub _desc { encode 'UTF-8', shift || shift }
 
+sub _find_element {
+  my ($self, $selector) = @_;
+  return $self->_proxy(find_element => $selector) unless ref $selector;
+
+  my ($by) = keys %$selector;
+  return $self->_proxy("find_element_by_$by" => $selector->{$by}) unless ref $selector;
+}
+
 sub _live_abs_url {
   my $self = shift;
   my $url  = Mojo::URL->new(shift);
@@ -382,7 +391,7 @@ sub _proxy {
 
 sub _element_data {
   my ($self, $method) = (shift, shift);
-  my $el = $self->_proxy(find_element => shift);
+  my $el = $self->_find_element(shift);
   return $el ? $el->$method : '';
 }
 
@@ -593,15 +602,6 @@ Where screenshots are saved.
 
 Holds an array ref with paths to all the screenshots taken with
 L</capture_screenshot>.
-
-=head2 toggle_checked_ok
-
-  $self = $self->toggle_checked_ok("input[name=human]");
-
-Used to toggle the "checked" attribute either with a click event or fallback to
-javascript.
-
-TODO: The implementation might change in the future.
 
 =head1 METHODS
 
@@ -817,6 +817,15 @@ Will also set L</MOJO_SELENIUM_BASE_URL> if C<TEST_SELENIUM> looks like a URL.
 Submit a form, either by selector or the current active form.
 
 See L<Selenium::Remote::WebElement/submit>.
+
+=head2 toggle_checked_ok
+
+  $self = $self->toggle_checked_ok("input[name=human]");
+
+Used to toggle the "checked" attribute either with a click event or fallback to
+javascript.
+
+TODO: The implementation might change in the future.
 
 =head2 wait_for
 

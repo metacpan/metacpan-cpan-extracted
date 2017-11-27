@@ -2,7 +2,7 @@ package Audio::Scan;
 
 use strict;
 
-our $VERSION = '0.98';
+our $VERSION = '0.99';
 
 require XSLoader;
 XSLoader::load('Audio::Scan', $VERSION);
@@ -12,38 +12,38 @@ use constant FILTER_TAGS_ONLY => 2;
 
 sub scan_info {
     my ( $class, $path, $opts ) = @_;
-    
+
     $opts ||= {};
     $opts->{filter} = FILTER_INFO_ONLY;
-    
+
     $class->scan( $path, $opts );
 }
 
 sub scan_tags {
     my ( $class, $path, $opts ) = @_;
-    
+
     $opts ||= {};
     $opts->{filter} = FILTER_TAGS_ONLY;
-    
+
     $class->scan( $path, $opts );
 }
 
 sub scan {
     my ( $class, $path, $opts ) = @_;
-    
+
     my ($filter, $md5_size, $md5_offset);
-      
+
     open my $fh, '<', $path or do {
         warn "Could not open $path for reading: $!\n";
         return;
     };
-    
+
     binmode $fh;
-    
+
     my ($suffix) = $path =~ /\.(\w+)$/;
-    
+
     return if !$suffix;
-    
+
     if ( defined $opts ) {
         if ( !ref $opts ) {
             # Back-compat to support filter as normal argument
@@ -56,25 +56,25 @@ sub scan {
             $md5_offset = $opts->{md5_offset};
         }
     }
-    
+
     if ( !defined $filter ) {
         $filter = FILTER_INFO_ONLY | FILTER_TAGS_ONLY;
     }
-    
+
     my $ret = $class->_scan( $suffix, $fh, $path, $filter, $md5_size || 0, $md5_offset || 0 );
-    
+
     close $fh;
-    
+
     return $ret;
 }
 
 sub scan_fh {
     my ( $class, $suffix, $fh, $opts ) = @_;
-    
+
     my ($filter, $md5_size, $md5_offset);
-    
+
     binmode $fh;
-    
+
     if ( defined $opts ) {
         if ( !ref $opts ) {
             # Back-compat to support filter as normal argument
@@ -87,69 +87,69 @@ sub scan_fh {
             $md5_offset = $opts->{md5_offset};
         }
     }
-    
+
     if ( !defined $filter ) {
         $filter = FILTER_INFO_ONLY | FILTER_TAGS_ONLY;
     }
-    
+
     return $class->_scan( $suffix, $fh, '(filehandle)', $filter, $md5_size || 0, $md5_offset || 0 );
 }
 
 sub find_frame {
     my ( $class, $path, $offset ) = @_;
-    
+
     open my $fh, '<', $path or do {
         warn "Could not open $path for reading: $!\n";
         return;
     };
-    
+
     binmode $fh;
-    
+
     my ($suffix) = $path =~ /\.(\w+)$/;
-    
+
     return -1 if !$suffix;
-    
+
     my $ret = $class->_find_frame( $suffix, $fh, $path, $offset );
-    
+
     close $fh;
-    
+
     return $ret;
 }
 
 sub find_frame_fh {
     my ( $class, $suffix, $fh, $offset ) = @_;
-    
+
     binmode $fh;
-    
+
     return $class->_find_frame( $suffix, $fh, '(filehandle)', $offset );
 }
 
 sub find_frame_return_info {
     my ( $class, $path, $offset ) = @_;
-    
+
     open my $fh, '<', $path or do {
         warn "Could not open $path for reading: $!\n";
         return;
     };
-    
+
     binmode $fh;
-    
+
     my ($suffix) = $path =~ /\.(\w+)$/;
-    
+
     return if !$suffix;
-    
+
     my $ret = $class->_find_frame_return_info( $suffix, $fh, $path, $offset );
-    
+
     close $fh;
-    
+
     return $ret;
 }
 
 sub find_frame_fh_return_info {
     my ( $class, $suffix, $fh, $offset ) = @_;
-    
+
     binmode $fh;
-    
+
     return $class->_find_frame_return_info( $suffix, $fh, '(filehandle)', $offset );
 }
 
@@ -171,19 +171,19 @@ Audio::Scan - Fast C metadata and tag reader for all common audio file formats
 
     # Just tags
     my $tags = Audio::Scan->scan_tags('/path/to/file.mp3');
-    
+
     # Scan without reading (possibly large) artwork into memory.
     # Instead of binary artwork data, the size of the artwork will be returned instead.
     {
         local $ENV{AUDIO_SCAN_NO_ARTWORK} = 1;
         my $data = Audio::Scan->scan('/path/to/file.mp3');
     }
-    
+
     # Scan a filehandle
     open my $fh, '<', 'my.mp3';
     my $data = Audio::Scan->scan_fh( mp3 => $fh );
     close $fh;
-    
+
     # Scan and compute an audio MD5 checksum
     my $data = Audio::Scan->scan( '/path/to/file.mp3', { md5_size => 100 * 1024 } );
     my $md5 = $data->{info}->{audio_md5};
@@ -283,7 +283,7 @@ For example, to seek 30 seconds into a file and write out a new MP4 file seeked 
 this point:
 
     my $info = Audio::Scan->find_frame_return_info( $file, 30000 );
-    
+
     open my $f, '<', $file;
     sysseek $f, $info->{seek_offset}, 1;
 
@@ -329,7 +329,7 @@ extensions.
 
 =head1 SKIPPING ARTWORK
 
-To save memory while reading tags, you can opt to skip potentially large 
+To save memory while reading tags, you can opt to skip potentially large
 embedded artwork.  To do this, set the environment variable AUDIO_SCAN_NO_ARTWORK:
 
     local $ENV{AUDIO_SCAN_NO_ARTWORK} = 1;
@@ -384,6 +384,7 @@ APE, Musepack, WavPack, MP3 with APEv2:
 The following metadata about a file may be returned:
 
     id3_version (i.e. "ID3v2.4.0")
+    id3_was_unsynced (if a v2.2/v2.3 file needed whole-tag unsynchronization)
     song_length_ms (duration in milliseconds)
     layer (i.e. 3)
     stereo
@@ -484,7 +485,7 @@ The following metadata about a file may be returned:
     dlna_profile (if file is compliant)
     tracks (array of tracks in the file)
         Each track may contain:
-        
+
         audio_type
         avg_bitrate
         bits_per_sample
@@ -496,7 +497,7 @@ The following metadata about a file may be returned:
         id
         max_bitrate
         samplerate
-        
+
 =head2 TAGS
 
 Tags are returned in a hash with all keys converted to upper-case.  Keys starting with
@@ -613,7 +614,7 @@ CUESHEET_BLOCK
 ALLPICTURES
 
     Embedded pictures are returned in an ALLPICTURES array.  Each picture has the following metadata:
-    
+
         mime_type
         description
         width
@@ -665,7 +666,7 @@ STREAMS
 
 The streams array contains metadata related to an individul stream within the file.
 The following metadata may be returned:
-    
+
     DeviceConformanceTemplate
     IsVBR
     alt_bitrate

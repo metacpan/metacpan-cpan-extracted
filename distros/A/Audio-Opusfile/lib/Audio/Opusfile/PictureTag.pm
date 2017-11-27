@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use subs qw/parse/;
 
-our $VERSION = '0.005001';
+our $VERSION = '1.000';
 
 sub new { parse $_[1] }
 

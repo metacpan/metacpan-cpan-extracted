@@ -1,11 +1,12 @@
 package Chloro::Trait::Class;
-BEGIN {
-  $Chloro::Trait::Class::VERSION = '0.06';
-}
+
+use strict;
+use warnings;
+use namespace::autoclean;
+
+our $VERSION = '0.07';
 
 use Moose::Role;
-
-use namespace::autoclean;
 
 with 'Chloro::Role::Trait::HasFormComponents';
 

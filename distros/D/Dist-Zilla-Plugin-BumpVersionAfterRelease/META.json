@@ -4,7 +4,7 @@
       "David Golden <dagolden@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "apache_2_0"
    ],
@@ -36,7 +36,6 @@
             "Dist::Zilla" : "5",
             "Dist::Zilla::Plugin::Prereqs" : "0",
             "Dist::Zilla::PluginBundle::DAGOLDEN" : "0.070",
-            "English" : "0",
             "File::Spec" : "0",
             "File::Temp" : "0",
             "IO::Handle" : "0",
@@ -45,12 +44,13 @@
             "Pod::Wordlist" : "0",
             "Software::License::Apache_2_0" : "0",
             "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0",
             "Test::More" : "0",
+            "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08",
             "Test::Spelling" : "0.12",
-            "Test::Version" : "1",
-            "blib" : "1.01"
+            "Test::Version" : "1"
          }
       },
       "runtime" : {
@@ -92,11 +92,11 @@
    "provides" : {
       "Dist::Zilla::Plugin::BumpVersionAfterRelease" : {
          "file" : "lib/Dist/Zilla/Plugin/BumpVersionAfterRelease.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       },
       "Dist::Zilla::Plugin::RewriteVersion" : {
          "file" : "lib/Dist/Zilla/Plugin/RewriteVersion.pm",
-         "version" : "0.015"
+         "version" : "0.016"
       }
    },
    "release_status" : "stable",
@@ -111,7 +111,7 @@
          "web" : "https://github.com/dagolden/Dist-Zilla-Plugin-BumpVersionAfterRelease"
       }
    },
-   "version" : "0.015",
+   "version" : "0.016",
    "x_authority" : "cpan:DAGOLDEN",
    "x_contributors" : [
       "Dave Rolsky <autarch@urth.org>",
@@ -119,6 +119,7 @@
       "Karen Etheridge <ether@cpan.org>",
       "Kent Fredric <kentfredric@gmail.com>",
       "Klaus Eichner <klaus03@gmail.com>"
-   ]
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
 }
 

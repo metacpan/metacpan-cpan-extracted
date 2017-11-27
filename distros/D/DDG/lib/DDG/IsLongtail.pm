@@ -1,7 +1,7 @@
 package DDG::IsLongtail;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Role for Longtail
-$DDG::IsLongtail::VERSION = '1017';
+$DDG::IsLongtail::VERSION = '1018';
 use Moo::Role;
 
 ##requires qw(
@@ -21,7 +21,7 @@ DDG::IsLongtail - Role for Longtail
 
 =head1 VERSION
 
-version 1017
+version 1018
 
 =head1 DESCRIPTION
 

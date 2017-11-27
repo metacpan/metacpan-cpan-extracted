@@ -14,6 +14,8 @@ examples/diff-Vietnamese
 examples/print_nameslist.pl
 examples/grep_nameslist.pl 
 examples/build-iz.pl
+examples/build-izX.pl
+examples/emoji
 examples/quotes-e
 examples/Sorted-mod_Unicode.txt
 examples/charlists/Adobe-GL-chars
@@ -69,5 +71,4 @@ examples/mini-en.kbdd
 examples/build-test.pl
 examples/logo-base.html
 examples/HOWTO-release-version
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -2,12 +2,14 @@
 
 #
 # test_command.t
-# Copyright (C) 1997-2013 by John Heidemann
-# $Id$
+# Copyright (C) 1997-2017 by John Heidemann
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
 # in $dblibdir for details.
+#
+# This program was developed as part of Fsdb;
+# http://www.isi.edu/~johnh/SOFTWARE/FSDB/
 #
 
 =head1 NAME
@@ -317,6 +319,7 @@ sub run_one {
 
     my $optref = parse_cmd_file($cmd_file);
 
+    die "missing prog\n" if (!defined($optref->{prog}));
     my $prog_path = fix_prog_path($optref->{prog});
 
     my $in;
@@ -438,6 +441,7 @@ sub run_one {
     #
     my($out_ok) = 1;
     my $trial_fn = "$cmd_base.trial";
+    $optref->{cmp} //= 'diff -c -b ';
     $out_ok = diff_output($cmd_base, $out, $trial_fn, $optref->{cmp}, $optref->{cmp_needs_input_flags}, 'altout');
     if (!$out_ok && defined($optref->{altcmp})) {
         $out_ok = diff_output($cmd_base, $out, $trial_fn, $optref->{altcmp}, $optref->{altcmp_needs_input_flags},  'altout');

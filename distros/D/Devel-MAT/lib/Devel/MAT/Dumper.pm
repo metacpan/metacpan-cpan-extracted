@@ -8,10 +8,10 @@ package Devel::MAT::Dumper;
 use strict;
 use warnings;
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
-use Cwd qw( abs_path );
 use File::Basename qw( basename );
+use File::Spec;
 
 require XSLoader;
 XSLoader::load( __PACKAGE__, $VERSION );
@@ -118,7 +118,7 @@ our $MAX_STRING = 256; # used by XS code
 
 my $basename = basename( $0 );
 $basename = "perl$basename" if $basename =~ m/^-e$/i; # RT119164
-my $dumpfile_name = abs_path( $basename ) . ".pmat";
+my $dumpfile_name = File::Spec->rel2abs( "$basename.pmat" );
 
 my $dumpfh;
 my $next_serial = 0;
@@ -181,7 +181,7 @@ sub import
          };
       }
       elsif( $sym eq "-file" ) {
-         $dumpfile_name = abs_path( shift );
+         $dumpfile_name = File::Spec->rel2abs( shift );
       }
       elsif( $sym eq "-max_string" ) {
          $MAX_STRING = shift;

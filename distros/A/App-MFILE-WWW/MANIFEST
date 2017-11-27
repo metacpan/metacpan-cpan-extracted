@@ -24,7 +24,6 @@ share/js/core/current-user.js
 share/js/core/datetime.js
 share/js/core/html.js
 share/js/core/init2.js
-share/js/core/jquery-2.1.1.js
 share/js/core/jquery-3.2.1.js
 share/js/core/jquery-private.js
 share/js/core/jquery.js
@@ -36,9 +35,7 @@ share/js/core/main.js
 share/js/core/populate.js
 share/js/core/prototypes.js
 share/js/core/qunit.js
-share/js/core/qunit-1.15.0.js
 share/js/core/qunit-2.4.0.js
-share/js/core/require-2.1.14.js
 share/js/core/require-2.3.5.js
 share/js/core/require.js
 share/js/core/root.js

@@ -1,4 +1,5 @@
 # Pragmas.
+use lib 'inc';
 use strict;
 use warnings;
 
@@ -7,7 +8,7 @@ use inc::Module::Install;
 
 # Definition.
 abstract 'Interface to the Vienna U-Bahn Map.';
-author 'Michal Spacek <skim@cpan.org>';
+author 'Michal Josef Spacek <skim@cpan.org>';
 author_requires 'English' => 0;
 author_requires 'File::Object' => 0.08;
 author_requires 'Test::More' => 0;
@@ -21,7 +22,7 @@ name 'Map-Tube-Vienna';
 readme_from 'Vienna.pm';
 recursive_author_tests('xt');
 requires 'File::Share' => 0;
-requires 'Map::Tube' => '3.10';
+requires 'Map::Tube' => '3.41';
 requires 'Moo' => 0;
 requires 'namespace::clean' => 0;
 requires 'perl' => '5.6.0';
@@ -31,11 +32,11 @@ resources 'homepage' => 'https://github.com/tupinek/Map-Tube-Vienna';
 resources 'repository' => 'git://github.com/tupinek/Map-Tube-Vienna';
 test_requires 'Encode' => 0;
 test_requires 'English' => 0;
-test_requires 'Test::Map::Tube' => 0.07;
+test_requires 'Test::Map::Tube' => 0.35;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.07';
+version '0.08';
 
 # Run.
 WriteAll();

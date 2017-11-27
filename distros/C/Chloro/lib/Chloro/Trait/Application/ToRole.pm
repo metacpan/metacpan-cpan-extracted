@@ -1,7 +1,11 @@
+## no critic (Moose::RequireMakeImmutable)
 package Chloro::Trait::Application::ToRole;
-BEGIN {
-  $Chloro::Trait::Application::ToRole::VERSION = '0.06';
-}
+
+use strict;
+use warnings;
+use namespace::autoclean;
+
+our $VERSION = '0.07';
 
 use Moose::Role;
 
@@ -22,8 +26,7 @@ around apply => sub {
                 role => ['Chloro::Trait::Role'],
                 application_to_class =>
                     ['Chloro::Trait::Application::ToClass'],
-                application_to_role =>
-                    ['Chloro::Trait::Application::ToRole'],
+                application_to_role => ['Chloro::Trait::Application::ToRole'],
             },
         );
     }
@@ -31,6 +34,7 @@ around apply => sub {
     $self->$orig( $role1, $role2 );
 };
 
+## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
 sub _apply_form_components {
     my $self  = shift;
     my $role1 = shift;
@@ -40,10 +44,10 @@ sub _apply_form_components {
         if ( $role2->has_field( $field->name() ) ) {
 
             require Moose;
-            Moose->throw_error( "Role '"
+            Moose->throw_error( q{Role '}
                     . $role1->name()
-                    . "' has encountered a field conflict "
-                    . "during composition. This is fatal error and cannot be disambiguated."
+                    . q{' has encountered a field conflict }
+                    . 'during composition. This is fatal error and cannot be disambiguated.'
             );
         }
         else {
@@ -55,10 +59,10 @@ sub _apply_form_components {
         if ( $role2->has_group( $group->name() ) ) {
 
             require Moose;
-            Moose->throw_error( "Role '"
+            Moose->throw_error( q{Role '}
                     . $role1->name()
-                    . "' has encountered a group conflict "
-                    . "during composition. This is fatal error and cannot be disambiguated."
+                    . q{' has encountered a group conflict }
+                    . 'during composition. This is fatal error and cannot be disambiguated.'
             );
         }
         else {
@@ -66,14 +70,17 @@ sub _apply_form_components {
         }
     }
 }
+## use critic
 
 1;
 
 # ABSTRACT: A trait that supports applying Chloro fields and groups to roles
 
-
+__END__
 
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -81,7 +88,7 @@ Chloro::Trait::Application::ToRole - A trait that supports applying Chloro field
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 DESCRIPTION
 
@@ -92,20 +99,27 @@ and groups.
 
 See L<Chloro> for details.
 
+Bugs may be submitted at L<http://rt.cpan.org/Public/Dist/Display.html?Name=Chloro> or via email to L<bug-chloro@rt.cpan.org|mailto:bug-chloro@rt.cpan.org>.
+
+I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
+
+=head1 SOURCE
+
+The source code repository for Chloro can be found at L<https://github.com/autarch/Chloro>.
+
 =head1 AUTHOR
 
 Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2011 by Dave Rolsky.
+This software is Copyright (c) 2017 by Dave Rolsky.
 
 This is free software, licensed under:
 
   The Artistic License 2.0 (GPL Compatible)
 
+The full text of the license can be found in the
+F<LICENSE> file included with this distribution.
+
 =cut
-
-
-__END__
-

@@ -11,12 +11,12 @@ use Audio::Scan;
 # WAV file with ID3 tags
 {
     local $ENV{AUDIO_SCAN_NO_ARTWORK} = 1;
-    
+
     my $s = Audio::Scan->scan( _f('id3.wav'), { md5_size => 4096 } );
-    
+
     my $info = $s->{info};
     my $tags = $s->{tags};
-    
+
     is( $info->{audio_offset}, 44, 'Audio offset ok' );
     is( $info->{audio_size}, 1904, 'Audio size ok' );
     is( $info->{audio_md5}, 'f69093529247ffd1dfaa5b7c66a19377', 'Audio MD5 ok' );
@@ -30,7 +30,7 @@ use Audio::Scan;
     is( $info->{song_length_ms}, 10, 'Song length ok' );
     is( $info->{id3_version}, 'ID3v2.3.0', 'ID3 version ok' );
     is( $info->{dlna_profile}, 'LPCM', 'DLNA profile ok' );
-    
+
     is( ref $tags->{COMM}, 'ARRAY', 'COMM ok' );
     is( $tags->{TALB}, 'WAV Album', 'TALB ok' );
     is( $tags->{TCON}, 'Alternative', 'TCON ok' );
@@ -39,7 +39,7 @@ use Audio::Scan;
     is( $tags->{TPE1}, 'WAV Artist', 'TPE1 ok' );
     is( $tags->{TPOS}, 1, 'TPOS ok' );
     is( $tags->{TRCK}, 5, 'TRCK ok' );
-    
+
     # Bug 17392, make sure artwork offset is correct when ID3 tag is not at the front of the file
     is( ref $tags->{APIC}, 'ARRAY', 'APIC ok' );
     is( $tags->{APIC}->[0], 'image/jpg', 'APIC type ok' );
@@ -50,9 +50,9 @@ use Audio::Scan;
 # 32-bit WAV with PEAK info
 {
     my $s = Audio::Scan->scan( _f('wav32.wav') );
-    
+
     my $info = $s->{info};
-    
+
     is( $info->{audio_offset}, 88, '32-bit WAV audio offset ok' );
     is( $info->{audio_size}, 3808, '32-bit WAV audio size ok' );
     is( $info->{bitrate}, 2822400, '32-bit WAV bitrate ok' );
@@ -69,9 +69,9 @@ use Audio::Scan;
 # MP3 in WAV
 {
     my $s = Audio::Scan->scan( _f('8kmp38.wav') );
-    
+
     my $info = $s->{info};
-    
+
     is( $info->{bitrate}, 8000, 'MP3 WAV bitrate ok' );
     is( $info->{format}, 85, 'MP3 WAV format ok' );
     is( $info->{samplerate}, 8000, 'MP3 WAV samplerate ok' );
@@ -81,9 +81,9 @@ use Audio::Scan;
 # Wav with INFO tags and wrong chunk size in header
 {
     my $s = Audio::Scan->scan( _f('wav32-info-badchunk.wav') );
-    
+
     my $tags = $s->{tags};
-    
+
     is( $tags->{IART}, 'They Might Be Giants', 'IART ok' );
     is( $tags->{ICRD}, 2005, 'ICRD ok' );
     is( $tags->{IGNR}, 'Soundtrack', 'IGNR ok' );
@@ -94,9 +94,9 @@ use Audio::Scan;
 # Bug 14946, WAV file with INFO tags with trailing nulls
 {
     my $s = Audio::Scan->scan( _f('wav32-info-nulls.wav') );
-    
+
     my $tags = $s->{tags};
-    
+
     is( $tags->{IART}, 'Archies, The', 'INFO nulls IART ok' );
     is( $tags->{ICMT}, 'Gift From Uncle Roddy', 'INFO nulls ICMT ok' );
     is( $tags->{ICRD}, 1997, 'INFO nulls ICRD ok' );
@@ -108,9 +108,9 @@ use Audio::Scan;
 # Bug 14462, WAV file with 18-byte fmt chunk
 {
     my $s = Audio::Scan->scan( _f('bug14462-wav-fmt.wav') );
-    
+
     my $info = $s->{info};
-    
+
     is( $info->{audio_offset}, 58, '18-byte fmt audio offset ok' );
     is( $info->{song_length_ms}, 7418, '18-byte fmt duration ok' );
 }
@@ -118,9 +118,9 @@ use Audio::Scan;
 # Bug 14462, WAV file with bad data size
 {
     my $s = Audio::Scan->scan( _f('bug14462-wav-bad-data-size.wav') );
-    
+
     my $info = $s->{info};
-    
+
     is( $info->{audio_offset}, 44, 'bad data size audio offset ok' );
     is( $info->{song_length_ms}, 2977, 'bad data size duration ok' );
 }

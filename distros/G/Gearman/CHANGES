@@ -1,3 +1,11 @@
+2.004.010 2017-11-19 14:46:00 Europe/Berlin
+    - bug fixing worker high CPU usage in idle state
+      https://github.com/p-alik/perl-Gearman/issues/28
+    - switch to blocking to continue fetching partial read
+        https://github.com/p-alik/perl-Gearman/pull/30
+    - pod notes with regard to usage of UTF-8
+      https://github.com/p-alik/perl-Gearman/issues/27
+
 2.004.009 2017-10-08 21:04:00 Europe/Berlin
     - bug fixing Worker->work: register functions on reconnect.
       see: https://github.com/p-alik/perl-Gearman/issues/23

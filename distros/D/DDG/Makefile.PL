@@ -58,7 +58,7 @@ my %WriteMakefileArgs = (
     "FindBin" => 0,
     "Scalar::Util" => 0
   },
-  "VERSION" => 1017,
+  "VERSION" => 1018,
   "test" => {
     "TESTS" => "t/*.t"
   }

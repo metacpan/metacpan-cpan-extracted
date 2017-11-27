@@ -4,21 +4,21 @@
       "David Golden <dagolden@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690",
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "apache_2_0"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Authen-SCRAM",
    "no_index" : {
       "directory" : [
-         "t",
-         "xt",
+         "corpus",
          "examples",
-         "corpus"
+         "t",
+         "xt"
       ],
       "package" : [
          "DB"
@@ -27,7 +27,8 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.17"
+            "ExtUtils::MakeMaker" : "6.17",
+            "perl" : "5.008"
          }
       },
       "develop" : {
@@ -42,11 +43,17 @@
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Pod::Coverage::TrustPod" : "0",
+            "Pod::Wordlist" : "0",
+            "Software::License::Apache_2_0" : "0",
             "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0",
             "Test::More" : "0",
+            "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08",
-            "Test::Spelling" : "0.12"
+            "Test::Portability::Files" : "0",
+            "Test::Spelling" : "0.12",
+            "Test::Version" : "1"
          }
       },
       "runtime" : {
@@ -54,7 +61,7 @@
             "String::Compare::ConstantTime" : "0.310"
          },
          "requires" : {
-            "Authen::SASL::SASLprep" : "0",
+            "Authen::SASL::SASLprep" : "1.100",
             "Carp" : "0",
             "Crypt::URandom" : "0",
             "Encode" : "0",
@@ -90,19 +97,19 @@
    "provides" : {
       "Authen::SCRAM" : {
          "file" : "lib/Authen/SCRAM.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       },
       "Authen::SCRAM::Client" : {
          "file" : "lib/Authen/SCRAM/Client.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       },
       "Authen::SCRAM::Role::Common" : {
          "file" : "lib/Authen/SCRAM/Role/Common.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       },
       "Authen::SCRAM::Server" : {
          "file" : "lib/Authen/SCRAM/Server.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       }
    },
    "release_status" : "stable",
@@ -117,7 +124,11 @@
          "web" : "https://github.com/dagolden/Authen-SCRAM"
       }
    },
-   "version" : "0.005",
-   "x_authority" : "cpan:DAGOLDEN"
+   "version" : "0.006",
+   "x_authority" : "cpan:DAGOLDEN",
+   "x_contributors" : [
+      "David Golden <xdg@xdg.me>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
 }
 

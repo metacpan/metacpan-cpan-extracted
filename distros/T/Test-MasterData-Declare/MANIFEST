@@ -5,6 +5,8 @@ META.json
 README.md
 cpanfile
 lib/Test/MasterData/Declare.pm
+lib/Test/MasterData/Declare/Compare/RowCustom.pm
+lib/Test/MasterData/Declare/Compare/RowHash.pm
 lib/Test/MasterData/Declare/CompareRow.pm
 lib/Test/MasterData/Declare/Reader.pm
 lib/Test/MasterData/Declare/Row.pm

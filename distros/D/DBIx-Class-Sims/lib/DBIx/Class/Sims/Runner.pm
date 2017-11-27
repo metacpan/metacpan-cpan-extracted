@@ -104,20 +104,30 @@ sub create_search {
   };
   $rs = $rs->search($search);
 
-  foreach my $rel_name ($source->relationships) {
-    next unless exists $cond->{$rel_name};
-    next unless reftype($cond->{$rel_name}) eq 'HASH';
-
-    my %search = map {
-      ;"$rel_name.$_" => $cond->{$rel_name}{$_}
-    } grep {
-      # Nested relationships are automagically handled. q.v. t/t5.t
-      !ref $cond->{$rel_name}{$_}
-    } keys %{$cond->{$rel_name}};
-
-
-    $rs = $rs->search(\%search, { join => $rel_name });
-  }
+  # This section needs to be rethought.
+  # 1. There are no tests that fail when it's commented out
+  # 2. Keeping it in breaks the test in t/parent_child_parent.t named
+  #     "Auto-generate other children of parent by amount"
+  # 3. It's unclear if the functionality is even desirable.
+  # The goal of this section looked to be to find the best match, including any
+  # parentage. The best element in the tree of parentage is a good goal, but it
+  # does require that we have converted the FK relationships first. We need a
+  # test before this section can be re-enabled.
+  #
+  # In any case, it definitely won't be in this form.
+  #foreach my $rel_name ($source->relationships) {
+  #  next unless exists $cond->{$rel_name};
+  #  next unless reftype($cond->{$rel_name}) eq 'HASH';
+  #
+  #  my %search = map {
+  #    ;"$rel_name.$_" => $cond->{$rel_name}{$_}
+  #  } grep {
+  #    # Nested relationships are automagically handled. q.v. t/t5.t
+  #    !ref $cond->{$rel_name}{$_}
+  #  } keys %{$cond->{$rel_name}};
+  #
+  #  $rs = $rs->search(\%search, { join => $rel_name });
+  #}
 
   return $rs;
 }
@@ -556,8 +566,9 @@ sub create_item {
     $row = eval {
       $self->schema->resultset($name)->create($item);
     }; if ($@) {
+      my $e = $@;
       warn "ERROR Creating $name (".np($item).")\n";
-      die $@;
+      die $e;
     }
     # This tracks everything that was created, not just what was requested.
     $self->{created}{$name}++;

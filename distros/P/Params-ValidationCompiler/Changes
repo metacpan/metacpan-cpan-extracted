@@ -1,3 +1,13 @@
+0.25     2017-11-23
+
+- All exceptions now include a stack trace by default when treated as a
+  string. This makes finding where validation failed a lot easier. Fixes GH
+  #18.
+
+- The name for a subroutine is now used in some exception messages, even if
+  Sub::Util cannot be installed.
+
+
 0.24     2017-04-08
 
 - The source_for() exported by Params::ValidationCompiler did not work at

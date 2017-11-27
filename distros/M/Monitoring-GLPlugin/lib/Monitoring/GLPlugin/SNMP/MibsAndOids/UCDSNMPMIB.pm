@@ -1,7 +1,7 @@
 package Monitoring::GLPlugin::SNMP::MibsAndOids::UCDSNMPMIB;
 
 $Monitoring::GLPlugin::SNMP::MibsAndOids::origin->{'UCD-SNMP-MIB'} = {
-  url => 'http://www.net-snmp.org/docs/mibs/UCD-SNMP-MIB.txt',
+  url => '',
   name => 'UCD-SNMP-MIB',
 };
 
@@ -115,6 +115,7 @@ $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{'UCD-SNMP-MIB'} = {
   ssCpuRawSteal => '1.3.6.1.4.1.2021.11.64',
   ssCpuRawGuest => '1.3.6.1.4.1.2021.11.65',
   ssCpuRawGuestNice => '1.3.6.1.4.1.2021.11.66',
+  ssCpuNumCpus => '1.3.6.1.4.1.2021.11.67',
   ucdInternal => '1.3.6.1.4.1.2021.12',
   ucdExperimental => '1.3.6.1.4.1.2021.13',
   fileTable => '1.3.6.1.4.1.2021.15',
@@ -189,12 +190,12 @@ $Monitoring::GLPlugin::SNMP::MibsAndOids::mibs_and_oids->{'UCD-SNMP-MIB'} = {
 };
 
 $Monitoring::GLPlugin::SNMP::MibsAndOids::definitions->{'UCD-SNMP-MIB'} = {
-  UCDErrorFlag => {
-    '0' => 'noError',
-    '1' => 'error',
-  },
   UCDErrorFix => {
     '0' => 'noError',
     '1' => 'runFix',
+  },
+  UCDErrorFlag => {
+    '0' => 'noError',
+    '1' => 'error',
   },
 };

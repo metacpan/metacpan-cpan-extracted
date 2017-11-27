@@ -1,9 +1,64 @@
 ==================================================
-Changes from 2016-11-20 00:00:00 +0000 to present.
+Changes from 2016-11-27 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 0.03 at 2017-11-20 02:56:07 +0000
+version 0.04 at 2017-11-27 02:09:16 +0000
+-----------------------------------------
+
+  Change: f9eed5ce55c8cbadf9fe40d4163da588768fa460
+  Author: Ben Marcotte <33464129+bmarcotte@users.noreply.github.com>
+  Date : 2017-11-26 18:08:32 +0000
+
+    Bump version to 0.04, new README format
+
+    The move from the @Basic dist.ini bundle to @Starter also migrated us
+    from the Readme plugin to the Pod2Readme plugin, which produces a
+    much more verbose README file format based on the POD of the main
+    module. 
+
+  Change: e97cf6abde9727632a8d476c327a87a30b5f25c8
+  Author: Ben Marcotte <33464129+bmarcotte@users.noreply.github.com>
+  Date : 2017-11-26 17:59:56 +0000
+
+    Moved to @Starter plugin, added Git::Contributors
+
+    Migrated dist.ini from using the @Basic plugin bundle to using the
+    @Starter plugin bundle. Removed explicit configs and dependencies for
+    the plugins that it pulls in by default. Also added the
+    Git::Contributors plugin, to automate adding a list of contributors
+    to the META.yml file. 
+
+  Change: 5e798119e04e8c146745cca6ebeb041404f44fc2
+  Author: Ben Marcotte <33464129+bmarcotte@users.noreply.github.com>
+  Date : 2017-11-26 16:12:38 +0000
+
+    Added a perlcritic.rc profile file for the Test::Perl::Critic plugin
+    (i.e. t/author-critic.t) to consume. To go with that, made a few
+    changes to t/test_subtests.t so that it now passes perlcritic -1 when
+    using this profile. 
+
+  Change: 2bb9c43ee382e10907e7a35ac1ace05a18f9c0ed
+  Author: Ben Marcotte <33464129+bmarcotte@users.noreply.github.com>
+  Date : 2017-11-26 13:41:17 +0000
+
+    Wrapped all of the lines at 120 characters. 
+
+  Change: ea55b33bdeb5fcaedfa00850dec524721ca2a98b
+  Author: Ben Marcotte <33464129+bmarcotte@users.noreply.github.com>
+  Date : 2017-11-26 13:37:52 +0000
+
+    Corrected an issue found via the CPAN Testers: Under older versions
+    of Attribute::Handlers, a string argument to the handler might be
+    passed in as a simple scalar, rather than an array ref with the
+    string as the first item in the array. This fix should support both
+    old and new versions of Attribute::Handlers. Also added a new test
+    script, t/attribute_arguments.t that helps check that this difference
+    is handled appropriately, and verifies other subtest fields are set
+    as expected. 
+
+-----------------------------------------
+version 0.03 at 2017-11-20 02:50:03 +0000
 -----------------------------------------
 
   Change: 92d8fa8d80102724cbe79c6ecd77564371a5c74f

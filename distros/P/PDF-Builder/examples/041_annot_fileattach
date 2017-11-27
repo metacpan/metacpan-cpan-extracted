@@ -1,0 +1,114 @@
+#!/usr/bin/perl
+
+# demonstrate file attachment annotations. 
+
+use strict;
+use warnings;
+
+use lib '../lib';
+use PDF::Builder;
+use PDF::Builder::Util;
+
+my $compress = 'none'; # uncompressed streams
+#my $compress = 'flate'; # compressed streams
+
+my $pdf = PDF::Builder->new(-compress => $compress);
+
+#my $f1 = $pdf->corefont('Helvetica', -encode=>'latin1'); # unused
+my $f2 = $pdf->corefont('Helvetica-Bold', -encode=>'latin1'); # page heading
+
+my $page = $pdf->page();
+$page->mediabox(595,842);
+
+# just some random text near the top of the page
+my $gfx = $page->gfx();
+my $text = $page->text();
+$text->textlabel(50,750, $f2,20, 'Hello World!', -color=>'red');
+
+# draw a grid with 50pt blocks to see where rectangles are
+$gfx->strokecolor("#CCC");
+my $gridH = 700;
+my $gridW = 500;
+
+# horizontal grid lines and labels
+for (my $i=0; $i<=$gridH; $i+=50) {
+  # i is Y coordinate (bottom is 0)
+  $gfx->poly(10,$i+10, $gridW+10,$i+10);
+  $text->textlabel($gridW+15,$i+7, $f2,10, $i);
+}
+
+# vertical grid lines and labels
+for (my $i=0; $i<=$gridW; $i+=50) {
+  # i is X coordinate (left is 0)
+  $gfx->poly($i+10,10, $i+10,$gridH+10); 
+  $text->textlabel($i+8,$gridH+20, $f2,10, $i);
+}
+$gfx->stroke();
+
+# location of file relative to where you run the example from
+my $base = "examples/resources/";
+
+# offset everything by 10,10 so grid has a little space around it
+# in each call, file name and click area -rect are required
+# single click enables drag and drop of icon, double click to run
+
+# default pushpin, 50x100 size at LL=50,50, default border
+# active area is supposed to be 50x50, but it seems to be little 
+# larger than the visible icon! BTW, the icon can be dragged and dropped (will
+# ask for confirmation to save PDF).
+my $ant1 = $page->annotation();
+$ant1->file_attachment($base."sample.txt", 
+	               -rect=>[60,60, 110,160]
+	               # usual default icon is PushPin
+		       # icon color default to black
+	              );
+
+# paperclip icon, 100x150 size at LL= 50,200, default border
+my $ant2 = $page->annotation();
+$ant2->file_attachment($base."pod2htmd.temp", 
+	               -rect=>[60,210, 160,360], 
+		       -icon=>'Paperclip',
+		       -color=>[0.8]   # very light gray icon (grayscale)
+	              );
+
+# tag icon, 150x100 size at LL= 250,200, border 10pt thick
+my $ant3 = $page->annotation();
+$ant3->file_attachment($base."pod2htmd.temp", 
+	               -rect=>[260,210, 410,310], 
+	               -icon=>'Tag', 
+		       -color=>[1, 0.4, 0.1],  # orange icon (RGB)
+		       -border=>[0,0, 10]
+	              );
+
+# graph icon, 100x100 size at LL= 250,50, border 10pt thick
+my $ant4 = $page->annotation();
+$ant4->file_attachment($base."pod2htmd.temp", 
+	               -rect=>[260,60, 360,160], 
+	               -icon=>'Graph', 
+		       -color=>[1, 1, 0, .5], # dark blue icon (CMYK)
+	               -border=>[10,10, 10]
+	              );
+
+# None icon, 100x100 size at LL= 50,400, border 10pt thick
+my $ant5 = $page->annotation();
+$ant5->file_attachment($base."sample.txt", 
+	               -rect=>[60,410, 160,510], 
+	               -icon=>'None', 
+		       -border=>[10,10, 10]
+	              );
+
+# None icon, 100x100 size at LL= 250,400, border 10pt thick, comment
+my $ant6 = $page->annotation();
+$ant6->file_attachment($base."sample.txt", 
+	               -rect=>[260,410, 360,510], 
+	               -icon=>'None', 
+		       -text=>'I am here', 
+		       -border=>[10,10, 10]
+	              );
+
+$pdf->saveas("$0.pdf");
+$pdf->end();
+
+exit;
+
+__END__

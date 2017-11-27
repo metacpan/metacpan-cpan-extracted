@@ -1,9 +1,11 @@
 package Syntax::Kamelon::Indexer;
 
+use 5.006;
 use strict;
 use warnings;
+use Syntax::Kamelon::XMLData;
 
-my $VERSION = '0.15';
+my $VERSION = '0.16';
 
 
 sub new {
@@ -14,6 +16,11 @@ sub new {
 	my $indexfile = delete $args{'indexfile'};
 	my $noindex = delete $args{'noindex'};
 	my $xmlfolder = delete $args{'xmlfolder'};
+	if (%args) {
+		for (keys %args) {
+			warn "unrecognized option: $_"
+		}
+	}
 
 	my $self = {};
    bless ($self, $class);
@@ -48,11 +55,12 @@ sub CreateIndex {
 				my $xml = $self->LoadXML("$folder/$file");
 				if (defined $xml) {
 					my $l = $xml->Language;
-					$index{$l->{'name'}} = { 
+					$index{$l->{name}} = { 
 						file => $file,
-						ext =>  $l->{'extensions'},
-						menu => $l->{'section'},
-						mime => $l->{'mimetype'},
+						ext =>  $l->{extensions},
+						menu => $l->{section},
+						mime => $l->{mimetype},
+						version => $l->{version},
 					};
 				}
 			} else {
@@ -117,12 +125,11 @@ sub FindINC {
 sub GetXMLObject {
 	my ($self, $syntax) = @_;
 	my $p = $self->{XMLPOOL};
-	my $id = $self->{INDEXER};
-	my $i = $id->{INDEX};
+	my $i = $self->{INDEX};
 	if (exists $p->{$syntax}) {
 		return $p->{$syntax}
 	} elsif (exists $i->{$syntax}) {
-		my $file = $id->{XMLFOLDER} . '/' . $i->{$syntax}->{'file'};
+		my $file = $self->{XMLFOLDER} . '/' . $i->{$syntax}->{'file'};
 		my $hl = Syntax::Kamelon::XMLData->new(
 			xmlfile => $file,
 		);
@@ -168,6 +175,11 @@ sub InfoSection {
 	return $self->Info($syntax, 'menu')
 }
 
+sub InfoVersion {
+	my ($self, $syntax) = @_;
+	return $self->Info($syntax, 'version')
+}
+
 sub InfoXMLFile {
 	my ($self, $syntax) = @_;
 	return $self->Info($syntax, 'file')
@@ -210,7 +222,7 @@ sub LoadXML {
 
 sub SaveIndex {
 	my $self = shift;
-	my $file = $self->IndexFile;
+	my $file = $self->XMLFolder . '/' . $self->IndexFile;
 	my $i = $self->{INDEX};
 	if (open(OFILE, ">", $file)) {
 		for (sort keys %$i) {

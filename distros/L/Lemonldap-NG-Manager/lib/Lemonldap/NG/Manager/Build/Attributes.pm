@@ -771,7 +771,7 @@ sub attributes {
         # OpenID-Connect issuer
         issuerDBOpenIDConnectActivation => {
             type          => 'bool',
-            default       => '0',
+            default       => 0,
             documentation => 'OpenID Connect server activation',
         },
         issuerDBOpenIDConnectPath => {
@@ -788,7 +788,7 @@ sub attributes {
         # GET issuer
         issuerDBGetActivation => {
             type          => 'bool',
-            default       => '0',
+            default       => 0,
             documentation => 'Get issuer activation',
         },
         issuerDBGetPath => {
@@ -1703,6 +1703,7 @@ sub attributes {
                 { k => 'Demo', v => 'Demonstration' },
                 { k => 'Facebook',      v => 'Facebook' },
                 { k => 'Google',        v => 'Google' },
+                { k => 'Kerberos',      v => 'Kerberos' },
                 { k => 'LDAP',          v => 'LDAP' },
                 { k => 'LinkedIn',      v => 'LinkedIn' },
                 { k => 'Multi',         v => 'Multiple' },
@@ -2148,6 +2149,32 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             documentation => 'Null authentication level',
         },
 
+        # Kerberos
+        krbKeytab => {
+            type          => 'text',
+            documentation => 'Kerberos keytab',
+        },
+        krbByJs => {
+            type          => 'bool',
+            default       => 0,
+            documentation => 'Launch Kerberos authentication by Ajax',
+        },
+        krbAuthnLevel => {
+            type          => 'int',
+            default       => 3,
+            documentation => 'Null authentication level',
+        },
+        krbUseModKrb => {
+            type          => 'bool',
+            default       => 0,
+            documentation => 'Rely on Web Server Kerberos module',
+        },
+        krbRemoveDomain => {
+            type          => 'bool',
+            default       => 1,
+            documentation => 'Remove domain in Kerberos username',
+        },
+
         # Slave
         slaveAuthnLevel => {
             type          => 'int',
@@ -2193,6 +2220,7 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
                     { k => 'Demo',          v => 'Demo' },
                     { k => 'Facebook',      v => 'Facebook' },
                     { k => 'Google',        v => 'Google' },
+                    { k => 'Kerberos',      v => 'Kerberos' },
                     { k => 'LDAP',          v => 'LDAP' },
                     { k => 'LinkedIn',      v => 'LinkedIn' },
                     { k => 'Null',          v => 'None' },
@@ -2351,22 +2379,22 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
         },
         oidcServiceAllowDynamicRegistration => {
             type          => 'bool',
-            default       => '0',
+            default       => 0,
             documentation => 'OpenID Connect allow dynamic client registration',
         },
         oidcServiceAllowAuthorizationCodeFlow => {
             type          => 'bool',
-            default       => '1',
+            default       => 1,
             documentation => 'OpenID Connect allow authorization code flow',
         },
         oidcServiceAllowImplicitFlow => {
             type          => 'bool',
-            default       => '0',
+            default       => 0,
             documentation => 'OpenID Connect allow implicit flow',
         },
         oidcServiceAllowHybridFlow => {
             type          => 'bool',
-            default       => '0',
+            default       => 0,
             documentation => 'OpenID Connect allow hybrid flow',
         },
         oidcStorage        => { type => 'PerlModule', },

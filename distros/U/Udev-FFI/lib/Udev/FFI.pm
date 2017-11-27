@@ -7,66 +7,25 @@ package Udev::FFI;
 use strict;
 use warnings;
 
-use Udev::FFI::FFIFunctions;
+use Udev::FFI::Functions qw(:all);
 use Udev::FFI::Device;
 use Udev::FFI::Monitor;
 use Udev::FFI::Enumerate;
 
-use IPC::Cmd qw(can_run run);
 
-
-$Udev::FFI::VERSION = '0.098005';
-
-
-use constant {
-    UDEVADM_LOCATIONS => [
-        '/bin/udevadm'
-    ]
-};
+$Udev::FFI::VERSION = '0.099001';
 
 
 
-sub udev_version {
-    my $full_path = can_run('udevadm');
-
-    if(!$full_path) {
-        for(@{ +UDEVADM_LOCATIONS }) {
-            if(-f) {
-                $full_path = $_;
-                last;
-            }
-        }
-    }
-
-    if(!$full_path) {
-        $@ = "Can't find udevadm utility";
-        return undef;
-    }
-
-
-    my ( $success, $error_message, undef, $stdout_buf, $stderr_buf ) =
-        run( command => [$full_path, '--version'], timeout => 60, verbose => 0 );
-
-    if(!$success) {
-        $@ = $error_message;
-        return undef;
-    }
-    if($stdout_buf->[0] !~ /^(\d+)\s*$/) {
-        $@ = "Can't get udev version from udevadm utility";
-        return undef;
-    }
-
-    return $1;
-}
+*Udev::FFI::udev_version = \&Udev::FFI::Functions::udev_version;
 
 
 
 sub new {
     my $class = shift;
-
     my $self = {};
 
-    if(0 == Udev::FFI::FFIFunctions->load_lib()) {
+    if(0 == Udev::FFI::Functions->init()) {
         $@ = "Can't find udev library";
         return undef;
     }
@@ -77,9 +36,7 @@ sub new {
         return undef;
     }
 
-
     bless $self, $class;
-
     return $self;
 }
 

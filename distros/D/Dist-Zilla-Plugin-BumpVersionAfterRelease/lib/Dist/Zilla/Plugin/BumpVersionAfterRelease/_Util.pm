@@ -4,7 +4,7 @@ use warnings;
 
 package Dist::Zilla::Plugin::BumpVersionAfterRelease::_Util;
 
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 
 use Moose::Role;
 
@@ -58,6 +58,16 @@ sub assign_re {
     }x;
 }
 
+sub matching_re {
+    my ( $self, $release_version ) = @_;
+    return qr{
+        our \s+ \$VERSION \s* = \s*
+        (['"])(\Q$release_version\E)\1 \s* ;
+        (?:\s* \# \s TRIAL)? [^\n]*
+        (?:\n \$VERSION \s = \s eval \s \$VERSION;)?
+    }x;
+}
+
 sub check_valid_version {
     my ( $self, $version ) = @_;
 
@@ -74,7 +84,8 @@ sub check_valid_version {
 
 1;
 
-=for Pod::Coverage is_strict_version is_loose_version assign_re is_tuple_alpha check_valid_version
+=for Pod::Coverage is_strict_version is_loose_version assign_re
+is_tuple_alpha check_valid_version matching_re
 
 =cut
 

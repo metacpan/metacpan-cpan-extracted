@@ -15,10 +15,22 @@ sub parse_version_args {
 
   my ($module_token, undef, undef, $args_tokens) = @$raw_tokens;
   my $module = $module_token->[0];
+  return unless ref $args_tokens->[0];
+
   my @tokens_in_parens = @{$args_tokens->[0] || []};
-  my ($module_version) = $tokens_in_parens[0][0][0];
+  return if @tokens_in_parens > 1;
+
+  my $version_token = $tokens_in_parens[0];
+  my $module_version;
+  if ($version_token->[1] and $version_token->[1] eq 'NUMBER') {
+    $module_version = $version_token->[0];
+  } elsif (ref $version_token->[0]) {
+    $module_version = $version_token->[0][0];
+  } else {
+    return;
+  }
   if ($module_version =~ /^v?[0-9._]+$/) {
-    $c->add_recommendation($module => $module_version) if $c->has_added_recommendation($module);
+    $c->add_conditional($module => $module_version) if $c->has_added_conditional($module);
   }
 }
 
@@ -34,7 +46,7 @@ Perl::PrereqScanner::NotQuiteLite::Parser::UniversalVersion
 
 =head1 DESCRIPTION
 
-This parser is to deal with a VERSION method called by a	 module.
+This parser is to deal with a VERSION method called by a module.
 
 =head1 AUTHOR
 

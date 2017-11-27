@@ -1,7 +1,7 @@
 package DDG::Block::Blockable::Triggers;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: A package which reflects the triggers of a blockable plugin.
-$DDG::Block::Blockable::Triggers::VERSION = '1017';
+$DDG::Block::Blockable::Triggers::VERSION = '1018';
 use Moo;
 use Carp;
 
@@ -96,7 +96,7 @@ DDG::Block::Blockable::Triggers - A package which reflects the triggers of a blo
 
 =head1 VERSION
 
-version 1017
+version 1018
 
 =head1 AUTHOR
 

@@ -14,7 +14,7 @@ use Data::Table::Text qw(:all);
 use File::Copy;
 use POSIX qw(strftime);                                                         # http://www.cplusplus.com/reference/ctime/strftime/
 
-our $VERSION = '20171114';
+our $VERSION = '20171125';
 
 #-------------------------------------------------------------------------------
 # Constants
@@ -208,7 +208,8 @@ sub pushIcon                                                                    
    {for my $d(qw(drawable))
      {makePath($getIcon);
       my $s = $size;
-      my $c = "convert -strip $icon -resize ${s}x${s}! $getIcon";
+
+      my $c = "convert -strip \"$icon\" -resize ${s}x${s}! \"$getIcon\"";       # Convert icon to required size and make it square
       my $r = xxx $c, qr(convert);
       !$r or confess "Unable to create icon:\n$r\n";
       my $T = $res.$d.'-'.$dir.'dpi/'.$i.'.png';

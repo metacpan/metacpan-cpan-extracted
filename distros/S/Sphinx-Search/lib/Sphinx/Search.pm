@@ -25,7 +25,7 @@ Sphinx::Search - Sphinx search engine API Perl client
 
 Please note that you *MUST* install a version which is compatible with your version of Sphinx.
 
-Use version 0.29 for Sphinx-2.2.8-release or later (or use DBI instead)
+Use version 0.30 for Sphinx-2.2.8-release or later (or use DBI instead)
 
 Use version 0.28 for Sphinx-2.0.8-release or later
 
@@ -61,7 +61,7 @@ Use version 0.02 for Sphinx 0.9.8-cvs-20070818
 
 =cut
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 =head1 SYNOPSIS
 
@@ -594,7 +594,7 @@ sub SetConnectRetries {
     my $self = shift;
     my $retries = shift;
     croak("connect retries is not numeric") unless ($retries =~  m/$num_re/);
-    $self->{connectretries} = $retries;
+    $self->{_connectretries} = $retries;
     return $self;
 }
 

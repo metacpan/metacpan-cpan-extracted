@@ -1,7 +1,7 @@
 package Taskwarrior::Kusarigama::Plugin;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Base class for Kusarigama plugins
-$Taskwarrior::Kusarigama::Plugin::VERSION = '0.3.1';
+$Taskwarrior::Kusarigama::Plugin::VERSION = '0.4.0';
 
 use 5.10.0;
 
@@ -73,7 +73,7 @@ Taskwarrior::Kusarigama::Plugin - Base class for Kusarigama plugins
 
 =head1 VERSION
 
-version 0.3.1
+version 0.4.0
 
 =head1 SYNOPSIS
 
@@ -143,7 +143,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Yanick Champoux.
+This software is copyright (c) 2017 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

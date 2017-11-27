@@ -1,3 +1,7 @@
+v0.56.2 2017-11-27T01:05:01Z
+ - typo in comments
+ - allow app to run without API fixed
+
 v0.56.1 2017-10-16T01:48:21Z
  - cookies expired date fixed
 

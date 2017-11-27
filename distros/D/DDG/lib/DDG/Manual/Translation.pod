@@ -11,7 +11,7 @@ DDG::Manual::Translation - Overview of the translation system of DuckDuckGo
 
 =head1 VERSION
 
-version 1017
+version 1018
 
 =encoding utf-8
 

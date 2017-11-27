@@ -1,7 +1,7 @@
 package DDG::Spice;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Spice package for easy keywords
-$DDG::Spice::VERSION = '1017';
+$DDG::Spice::VERSION = '1018';
 use strict;
 use warnings;
 use DDG::Meta;
@@ -27,7 +27,7 @@ DDG::Spice - Spice package for easy keywords
 
 =head1 VERSION
 
-version 1017
+version 1018
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,11 @@
 Revision history for Apache Clownfish
 
+0.6.2  2017-11-15
+
+  Improvements:
+
+    * [CLOWNFISH-118] - Prepare for CV-in-stash optimization in Perl 5.28
+
 0.6.1  2016-12-09
 
   Bugfixes:

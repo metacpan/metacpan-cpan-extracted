@@ -40,7 +40,7 @@ _varint(unsigned char *buf, int length)
 }
 
 int
-parse_id3(PerlIO *infile, char *file, HV *info, HV *tags, uint32_t seek, off_t file_size)
+parse_id3(PerlIO *infile, char *file, HV *info, HV *tags, off_t seek, off_t file_size)
 {
   int err = 0;
   unsigned char *bptr;
@@ -255,6 +255,8 @@ _id3_parse_v2(id3info *id3)
       id3->size_remain = _id3_deunsync( buffer_ptr(id3->buf), id3->size );
 
       DEBUG_TRACE("    Un-synchronized tag, new_size %d\n", id3->size_remain);
+
+      my_hv_store( id3->info, "id3_was_unsynced", newSVuv(1) );
     }
     else {
       DEBUG_TRACE("  Ignoring v2.4 tag un-synchronize flag\n");
@@ -1158,9 +1160,16 @@ _id3_parse_v2_frame_data(id3info *id3, char const *id, uint32_t size, id3_framet
           if (skip_art) {
             av_push( framedata, newSVuv(size - read) );
 
-            // Record offset of APIC image data too, unless the data needs to be unsynchronized or is empty
-            if (id3->tag_data_safe && (size - read) > 0)
-              av_push( framedata, newSVuv(id3->offset + (id3->size - id3->size_remain) + read) );
+            // I don't think it's possible to obtain an APIC offset when a tag has been unsync'ed,
+            // so we can't support skip_art mode in this case. See v2.3-unsync-apic-bad-offset.mp3
+            if (id3->flags & ID3_TAG_FLAG_UNSYNCHRONISATION && id3->version_major < 4) {
+              DEBUG_TRACE("    cannot obtain APIC offset due to v2.3 unsync tag\n");
+            }
+            else {
+              // Record offset of APIC image data too, unless the data needs to be unsynchronized or is empty
+              if (id3->tag_data_safe && (size - read) > 0)
+                av_push( framedata, newSVuv(id3->offset + (id3->size - id3->size_remain) + read) );
+            }
 
             _id3_skip(id3, size - read);
             read = size;

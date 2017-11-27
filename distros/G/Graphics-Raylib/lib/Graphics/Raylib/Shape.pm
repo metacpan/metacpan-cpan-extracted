@@ -3,7 +3,7 @@ use warnings;
 package Graphics::Raylib::Shape;
 
 # ABSTRACT: Collection of drawable shapes
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use List::Util qw(min max);
 use Graphics::Raylib::XS qw(:all);
@@ -21,7 +21,7 @@ Graphics::Raylib::Shape - Collection of drawable shapes
 
 =head1 VERSION
 
-version 0.004
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -160,12 +160,12 @@ Prepares a solid color rectangle for drawing. if $color is an arrayref of 2 Colo
 
 {
     package Graphics::Raylib::Shape::Rectangle;
-    use Graphics::Raylib::XS qw(DrawRectangle DrawRectangleGradient);
+    use Graphics::Raylib::XS qw(DrawRectangle DrawRectangleGradientV);
     sub draw {
         if (ref($_[0]->{color}) ne 'ARRAY') {
             DrawRectangle( @{$_[0]->{pos}}, @{$_[0]->{size}}, $_[0]->{color} )
         } else {
-            DrawRectangleGradient( @{$_[0]->{pos}}, @{$_[0]->{size}}, @{$_[0]->{color}} )
+            DrawRectangleGradientV( @{$_[0]->{pos}}, @{$_[0]->{size}}, @{$_[0]->{color}} )
         }
     }
     sub color :lvalue { $_[0]->{color}  }

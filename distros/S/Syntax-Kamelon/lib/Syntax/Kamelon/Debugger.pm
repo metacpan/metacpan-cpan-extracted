@@ -1,5 +1,6 @@
 package Syntax::Kamelon::Debugger;
 
+use 5.006;
 use strict;
 use warnings;
 use Time::HiRes qw(time);

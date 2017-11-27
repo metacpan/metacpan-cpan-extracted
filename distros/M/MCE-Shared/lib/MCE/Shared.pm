@@ -13,7 +13,7 @@ use 5.010001;
 
 no warnings qw( threads recursion uninitialized once );
 
-our $VERSION = '1.832';
+our $VERSION = '1.833';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitSubroutinePrototypes)
@@ -414,7 +414,7 @@ MCE::Shared - MCE extension for sharing data supporting threads and processes
 
 =head1 VERSION
 
-This document describes MCE::Shared version 1.832
+This document describes MCE::Shared version 1.833
 
 =head1 SYNOPSIS
 
@@ -825,28 +825,63 @@ This class method transfers the blessed-object to the shared-manager
 process and returns a C<MCE::Shared::Object> containing the C<SHARED_ID>.
 Starting with the 1.827 release, the module option sends parameters to the
 shared-manager, where the object is then constructed. This is useful for
-classes involving a file handle.
+classes involving XS code or a file handle.
 
  use MCE::Shared;
- use MCE::Shared::Ordhash;
 
- my $oh1 = MCE::Shared->share( MCE::Shared::Ordhash->new() );
- my $oh2 = MCE::Shared->share({ module => 'MCE::Shared::Ordhash' });
- my $oh3 = MCE::Shared->ordhash();      # same thing
+ {
+   use Math::BigFloat try => 'GMP';
+   use Math::BigInt   try => 'GMP';
 
- $oh1->assign( @pairs );
- $oh2->assign( @pairs );
- $oh3->assign( @pairs );
+   my $bf  = MCE::Shared->share({ module => 'Math::BigFloat' }, 0);
+   my $bi  = MCE::Shared->share({ module => 'Math::BigInt'   }, 0);
+   my $y   = 1e9;
 
- use Hash::Ordered;
+   $bf->badd($y);  # addition (add $y to shared BigFloat object)
+   $bi->badd($y);  # addition (add $y to shared BigInt object)
+ }
 
- my ($ho_shared, $ho_nonshared);
+ {
+   use Bio::Seq;
+   use Bio::SeqIO;
 
- $ho_shared = MCE::Shared->share({ module => 'Hash::Ordered' });
- $ho_shared->push( @pairs );
+   my $seq_io = MCE::Shared->share({ module => 'Bio::SeqIO' },
+      -file    => ">/path/to/fasta/file.fa",
+      -format  => 'Fasta',
+      -verbose => -1,
+   );
 
- $ho_nonshared = $ho_shared->export();   # back to non-shared
- $ho_nonshared = $ho_shared->destroy();  # including destruction
+   my $seq_obj = Bio::Seq->new(
+      -display_id => "name", -desc => "desc", -seq => "seq",
+      -alphabet   => "dna"
+   );
+
+   $seq_io->write_seq($seq_obj);  # write to shared SeqIO handle
+ }
+
+ {
+   use MCE::Shared::Ordhash;
+
+   my $oh1 = MCE::Shared->share( MCE::Shared::Ordhash->new() );
+   my $oh2 = MCE::Shared->share({ module => 'MCE::Shared::Ordhash' });
+   my $oh3 = MCE::Shared->ordhash();  # same thing
+
+   $oh1->assign( @pairs );
+   $oh2->assign( @pairs );
+   $oh3->assign( @pairs );
+ }
+
+ {
+   use Hash::Ordered;
+
+   my ($ho_shared, $ho_nonshared);
+
+   $ho_shared = MCE::Shared->share({ module => 'Hash::Ordered' });
+   $ho_shared->push( @pairs );
+
+   $ho_nonshared = $ho_shared->export();   # back to non-shared
+   $ho_nonshared = $ho_shared->destroy();  # including shared destruction
+ }
 
 The following provides long and short forms for constructing a shared array,
 hash, or scalar object.
@@ -1802,14 +1837,46 @@ Sharing a Python class is possible, starting with the 1.827 release.
 The construction is simply calling share with the module option.
 Methods are accessible via the OO interface.
 
+ #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ # Share Python class. Requires MCE::Shared 1.827 or later.
+ #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
  use strict;
  use warnings;
 
+ use MCE::Hobo;
+ use MCE::Shared;
+
+ my $py1 = MCE::Shared->share({ module => 'My::Class' });
+ my $py2 = MCE::Shared->share({ module => 'My::Class' });
+
+ MCE::Shared->start;
+
+ $py1->set(0, 100);
+ $py2->set(1, 200);
+
+ die "Ooops" unless $py1->get(0) eq '100';
+ die "Ooops" unless $py2->get(1) eq '200';
+
+ sub task {
+     $py1->incr(0) for 1 .. 50000;
+     $py2->incr(1) for 1 .. 50000;
+ }
+
+ MCE::Hobo->create(\&task) for 1 .. 3;
+ MCE::Hobo->waitall;
+
+ print $py1->get(0), "\n";  # 150100
+ print $py2->get(1), "\n";  # 150200
+
  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- # Define Python class.
+ # Python class.
  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
  package My::Class;
+
+ use strict;
+ use warnings;
 
  use Inline::Python qw( py_eval py_bind_class );
 
@@ -1841,51 +1908,54 @@ Methods are accessible via the OO interface.
 
  1;
 
- #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- # Share Python class. Requires MCE::Shared 1.827+.
- #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
- package main;
-
- use MCE::Hobo;
- use MCE::Shared;
-
- my $py1 = MCE::Shared->share({ module => 'My::Class' });
- my $py2 = MCE::Shared->share({ module => 'My::Class' });
-
- MCE::Shared->start;
-
- $py1->set(0, 100);
- $py2->set(1, 200);
-
- die "Ooops" unless $py1->get(0) eq '100';
- die "Ooops" unless $py2->get(1) eq '200';
-
- sub task {
-     $py1->incr(0) for 1 .. 50000;
-     $py2->incr(1) for 1 .. 50000;
- }
-
- MCE::Hobo->create(\&task) for 1 .. 3;
- MCE::Hobo->waitall;
-
- print $py1->get(0), "\n";  # 150100
- print $py2->get(1), "\n";  # 150200
-
 =head1 LOGGER DEMONSTRATION
 
 Often, the requirement may call for concurrent logging by many workers.
 Calling localtime or gmtime per each log entry is expensive. This uses
 the old time-stamp value until one second has elapsed.
 
+ #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ # Concurrent logger demo. Requires MCE::Shared 1.827 or later.
+ #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
  use strict;
  use warnings;
+
+ use MCE::Hobo;
+ use MCE::Shared;
+
+ my $file = "log.txt";
+ my $pid  = $$;
+
+ my $ob = MCE::Shared->share( { module => 'My::Logger' }, path => $file )
+     or die "open error '$file': $!";
+
+ # $ob->autoflush(1);   # optional, flush writes immediately
+
+ sub work {
+     my $id = shift;
+     for ( 1 .. 250_000 ) {
+         $ob->log("Hello from $id: $_");
+     }
+ }
+
+ MCE::Hobo->create('work', $_) for 1 .. 4;
+ MCE::Hobo->waitall;
+
+ # Threads and multi-process safety for closing the handle.
+
+ sub CLONE { $pid = 0; }
+
+ END { $ob->close if $ob && $pid == $$; }
 
  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  # Logger class.
  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
  package My::Logger;
+
+ use strict;
+ use warnings;
 
  use Time::HiRes qw( time );
 
@@ -1962,7 +2032,7 @@ the old time-stamp value until one second has elapsed.
      return;
  }
 
- # $ob->flush();
+ # $ob->flush()
 
  sub flush {
      my ( $self ) = @_;
@@ -1980,85 +2050,19 @@ the old time-stamp value until one second has elapsed.
 
  1;
 
- #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- # Main script. Requires MCE::Shared 1.827+.
- #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
- package main;
-
- use MCE::Hobo;
- use MCE::Shared;
-
- my $file = "log.txt";
- my $pid  = $$;
-
- my $ob = MCE::Shared->share( { module => 'My::Logger' }, path => $file )
-     or die "open error '$file': $!";
-
- # $ob->autoflush(1);   # optional, flush write immediately
-
- sub work {
-     my $id = shift;
-     for ( 1 .. 250_000 ) {
-         $ob->log("Hello from $id: $_");
-     }
- }
-
- MCE::Hobo->create('work', $_) for 1 .. 4;
- MCE::Hobo->waitall;
-
- # Threads and multi-process safety for closing the handle.
-
- sub CLONE { $pid = 0; }
-
- END { $ob->close if $ob && $pid == $$; }
-
 =head1 TIE::FILE DEMONSTRATION
 
 The following presents a concurrent L<Tie::File> demonstration. Each element
 in the array corresponds to a record in the text file. JSON, being readable,
 seems appropiate for encoding complex objects.
 
- use strict;
- use warnings;
-
- #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- # Class extending Tie::File with two sugar methods.
- # Requires MCE::Shared 1.827+.
- #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
- package My::File;
-
- use Tie::File;
-
- our @ISA = 'Tie::File';
-
- # $ob->append('string');
-
- sub append {
-     my ($self, $key) = @_;
-     my $val = $self->FETCH($key); $val .= $_[2];
-     $self->STORE($key, $val);
-     length $val;
- }
-
- # $ob->incr($key);
-
- sub incr {
-     my ( $self, $key ) = @_;
-     my $val = $self->FETCH($key); $val += 1;
-     $self->STORE($key, $val);
-     $val;
- }
-
- 1;
-
  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  # The MCE::Mutex module isn't needed unless IPC involves two or
  # more trips for the underlying action.
  #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
- package main;
+ use strict;
+ use warnings;
 
  use MCE::Hobo;
  use MCE::Mutex;
@@ -2119,9 +2123,9 @@ seems appropiate for encoding complex objects.
  printf "counter : %d\n", $db[20];
  print  $db[21]->[0], "\n";  # foo
 
- sub CLONE {
-     $pid = 0;       # thread safety for completeness
- }
+ # Threads and multi-process safety for closing the handle.
+
+ sub CLONE { $pid = 0; }
 
  END {
      if ( $pid == $$ ) {
@@ -2129,6 +2133,40 @@ seems appropiate for encoding complex objects.
          untie @db;  # untie @db to flush pending writes
      }
  }
+
+ #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ # Class extending Tie::File with two sugar methods.
+ # Requires MCE::Shared 1.827 or later.
+ #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+ package My::File;
+
+ use strict;
+ use warnings;
+
+ use Tie::File;
+
+ our @ISA = 'Tie::File';
+
+ # $ob->append('string');
+
+ sub append {
+     my ($self, $key) = @_;
+     my $val = $self->FETCH($key); $val .= $_[2];
+     $self->STORE($key, $val);
+     length $val;
+ }
+
+ # $ob->incr($key);
+
+ sub incr {
+     my ( $self, $key ) = @_;
+     my $val = $self->FETCH($key); $val += 1;
+     $self->STORE($key, $val);
+     $val;
+ }
+
+ 1;
 
 =head1 REQUIREMENTS
 

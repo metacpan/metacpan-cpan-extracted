@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use subs qw/query query_count/;
 
-our $VERSION = '0.005001';
+our $VERSION = '1.000';
 
 sub query_all {
 	my ($tags, $tag) = @_;

@@ -76,8 +76,8 @@ sub __bernfrac__ {
     }
 
     state $N = Math::MPFR::Rmpfr_init2_nobless(64);
-    Math::MPFR::Rmpfr_mul_z($N, $K, $d, $round);         # N = K*d
-    Math::MPFR::Rmpfr_root($N, $N, $n - 1, $round);      # N = N^(1/(n-1))
+    Math::MPFR::Rmpfr_mul_z($K, $K, $d, $round);         # K = K*d
+    Math::MPFR::Rmpfr_root($N, $K, $n - 1, $round);      # N = K^(1/(n-1))
     Math::MPFR::Rmpfr_ceil($N, $N);                      # N = ceil(N)
 
     my $bound = Math::MPFR::Rmpfr_get_ui($N, $round);    # bound = int(N)
@@ -87,6 +87,7 @@ sub __bernfrac__ {
 
     Math::MPFR::Rmpfr_set_ui($z, 1, $round);             # z = 1
 
+    # `Math::GMPf` would perform slightly faster here.
     for (my $i = 0 ; $primes[$i] <= $bound ; ++$i) {     # primes <= bound
         Math::GMPz::Rmpz_ui_pow_ui($u, $primes[$i], $n);    # u = p^n
         Math::MPFR::Rmpfr_mul_z($z, $z, $u, $round);        # z = z*u
@@ -95,7 +96,6 @@ sub __bernfrac__ {
     }
 
     Math::MPFR::Rmpfr_mul($z, $z, $K, $round);              # z = z * K
-    Math::MPFR::Rmpfr_mul_z($z, $z, $d, $round);            # z = z * d
     Math::MPFR::Rmpfr_ceil($z, $z);                         # z = ceil(z)
 
     my $q = Math::GMPq::Rmpq_init();

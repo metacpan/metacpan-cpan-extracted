@@ -16,10 +16,10 @@ my $form = Chloro::Test::Default->new();
         'baz.key2.x' => 12,
     );
 
-    my $set = $form->process( params => \%params );
+    my $result_set = $form->process( params => \%params );
 
     is_deeply(
-        $set->results_as_hash(), {
+        $result_set->results_as_hash(), {
             foo => 42,
             bar => [],
             baz => {

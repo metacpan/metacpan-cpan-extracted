@@ -232,6 +232,11 @@ _wavpack_parse_block(wvpinfo *wvp)
       _wavpack_parse_channel_info(wvp, size);
       break;
 
+    case ID_DSD_BLOCK:
+      DEBUG_TRACE("  Sub-Chunk: ID_DSD_BLOCK (size: %u)\n", size);
+      _wavpack_parse_dsd_block(wvp, size);
+      break;
+
     default:
       // Skip it
       DEBUG_TRACE("  Sub-Chunk: %x (size: %u) (skipped)\n", id, size);
@@ -257,7 +262,13 @@ _wavpack_parse_block(wvpinfo *wvp)
   if ( wvp->header->total_samples && wvp->file_size > 0 ) {
     SV **samplerate = my_hv_fetch( wvp->info, "samplerate" );
     if (samplerate != NULL) {
-      uint32_t song_length_ms = ((wvp->header->total_samples * 1.0) / SvIV(*samplerate)) * 1000;
+      uint32_t song_length_ms;
+
+      if (wvp->header->flags & 0x80000000)
+        wvp->header->total_samples *= 8; // DSD
+
+      song_length_ms = ((wvp->header->total_samples * 1.0) / SvIV(*samplerate)) * 1000;
+
       my_hv_store( wvp->info, "song_length_ms", newSVuv(song_length_ms) );
       my_hv_store( wvp->info, "bitrate", newSVuv( _bitrate(wvp->file_size - wvp->audio_offset, song_length_ms) ) );
       my_hv_store( wvp->info, "total_samples", newSVuv(wvp->header->total_samples) );
@@ -293,6 +304,27 @@ _wavpack_parse_channel_info(wvpinfo *wvp, uint32_t size)
   my_hv_store( wvp->info, "channels", newSVuv(channels) );
 
   buffer_consume(wvp->buf, size);
+
+  return 1;
+}
+
+int
+_wavpack_parse_dsd_block(wvpinfo *wvp, uint32_t size)
+{
+  if (wvp->header->flags & 0x80000000) {
+    unsigned char *bptr = buffer_ptr(wvp->buf);
+    uint32_t samplerate_index = (wvp->header->flags & 0x7800000) >> 23;
+    uint32_t samplerate;
+    if (samplerate_index < 0xF)
+      samplerate = wavpack_sample_rates[samplerate_index] * (1 << bptr[0]) * 8;
+    else
+      samplerate = 64 * 44100; // Default to DSD64 just in case
+
+    my_hv_store( wvp->info, "samplerate", newSVuv(samplerate) );
+    my_hv_store( wvp->info, "bits_per_sample", newSVuv(1) );
+  }
+
+  _wavpack_skip(wvp, size);
 
   return 1;
 }

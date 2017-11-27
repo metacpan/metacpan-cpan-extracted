@@ -3,7 +3,10 @@ use strict;
 use warnings;
 package YAML::PP;
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
+
+use base 'Exporter';
+our @EXPORT_OK = qw/ Load LoadFile Dump DumpFile /;
 
 sub new {
     my ($class, %args) = @_;
@@ -14,11 +17,26 @@ sub new {
 
 sub loader { return $_[0]->{loader} }
 
+# legagy interface
 sub Load {
     require YAML::PP::Loader;
-    my ($self, $yaml) = @_;
-    $self->{loader} = YAML::PP::Loader->new;
-    return $self->loader->load($yaml);
+    my ($yaml) = @_;
+    my $loader = YAML::PP::Loader->new;
+    return $loader->load_string($yaml);
+}
+
+sub LoadFile {
+    require YAML::PP::Loader;
+    my ($file) = @_;
+    my $loader = YAML::PP::Loader->new;
+    return $loader->load_file($file);
+}
+
+sub Dump {
+    require YAML::PP::Dumper;
+    my (@data) = @_;
+    my $dumper = YAML::PP::Dumper->new;
+    return $dumper->dump_string(@data);
 }
 
 1;
@@ -40,15 +58,19 @@ WARNING: This is highly experimental.
 Here are a few examples of what you can do right now:
 
     my $yppl = YAML::PP::Loader->new;
-    my @documents = $yppl->load($yaml);
+    my @documents = $yppl->load_string($yaml);
+
+    # load file
+    my $yppl = YAML::PP::Loader->new;
+    my @documents = $yppl->load_file($filename);
 
     # The loader offers JSON::PP, boolean.pm or pureperl 1/0 (default)
     # for booleans
     my $yppl = YAML::PP::Loader->new(boolean => 'JSON::PP');
-    my ($data1, $data2) = $yppl->load($yaml);
+    my ($data1, $data2) = $yppl->load_string($yaml);
 
     my $yppd = YAML::PP::Dumper->new();
-    my $yaml = $yppd->dump($data1, $data2);
+    my $yaml = $yppd->dump_string($data1, $data2);
 
 Some utility scripts:
 
@@ -118,12 +140,16 @@ Still TODO:
 
 =item Flow Style
 
-Flow style is not implemented yet, you will get an appropriate error message.
+Flow style is partially implemented.
+
+Not yet working: Implicit flow collection keys, implicit keys in
+flow sequences, content directly after the colon, empty nodes, explicit
+keys
 
 =item Supported Characters
 
-The regexes are not complete. It will not accept characters that should be
-valid, and it will accept characters that should be invalid.
+If you have valid YAML that's not parsed, or the other way round, please
+create an issue.
 
 =item Line Numbers
 
@@ -133,8 +159,6 @@ in some cases.
 =item Error Messages
 
 The error messages need to be improved. Column information is still missing.
-
-=item Unicode
 
 =item Possibly more
 
@@ -198,7 +222,7 @@ Example:
             : 23
         : 42
     EOM
-    my $data = $yppl->load($yaml);
+    my $data = $yppl->load_string($yaml);
     say $coder->encode($data);
     __END__
     {
@@ -266,7 +290,7 @@ Compare the output of the following YAML Loaders and JSON::PP dump:
     my $d2 = YAML::Load($yaml);
     my $d3 = YAML::Syck::Load($yaml);
     my $d4 = YAML::Tiny->read_string($yaml)->[0];
-    my $d5 = YAML::PP::Loader->new->load($yaml);
+    my $d5 = YAML::PP::Loader->new->load_string($yaml);
 
     Dump $d1->{foo};
     Dump $d2->{foo};

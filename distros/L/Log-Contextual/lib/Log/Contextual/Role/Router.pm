@@ -1,5 +1,5 @@
 package Log::Contextual::Role::Router;
-$Log::Contextual::Role::Router::VERSION = '0.007001';
+$Log::Contextual::Role::Router::VERSION = '0.008000';
 # ABSTRACT: Abstract interface between loggers and logging code blocks
 
 use Moo::Role;
@@ -22,7 +22,7 @@ Log::Contextual::Role::Router - Abstract interface between loggers and logging c
 
 =head1 VERSION
 
-version 0.007001
+version 0.008000
 
 =head1 SYNOPSIS
 

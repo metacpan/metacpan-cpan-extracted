@@ -4,7 +4,7 @@
       "Brad Fitzpatrick <brad@danga.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.82, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "perl_5"
    ],
@@ -33,6 +33,11 @@
             "Test::TCP" : "2.17",
             "Test::Timer" : "0",
             "version" : "0.77"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "runtime" : {
@@ -65,6 +70,5 @@
          "web" : "https://github.com/p-alik/perl-Gearman"
       }
    },
-   "version" : "v2.4.9",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "v2.4.10"
 }

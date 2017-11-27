@@ -30,16 +30,16 @@ my $test = 0;
 my $ua = LWP::UserAgent->new(
 #    ssl_opts	=> { verify_hostname	=> 0 },	# Necessary until Perl recognizes McCants' cert.
 );
-my $asof = time_gm( 0, 0, 20, 9, 9, 2017 );
+my $asof = time_gm( 0, 0, 13, 23, 10, 2017 );
 foreach (
 	["T. S. Kelso's Iridium list",
 	'http://celestrak.com/SpaceTrack/query/iridium.txt',
 	$asof,
 	kelso => <<'KELSO'],
-24792IRIDIUM 8 [+]
+24792IRIDIUM 8 [-]
 24793IRIDIUM 7 [+]
 24794IRIDIUM 6 [+]
-24795IRIDIUM 5 [+]
+24795IRIDIUM 5 [-]
 24796IRIDIUM 4 [-]
 24836IRIDIUM 914 [-]
 24837IRIDIUM 12 [+]
@@ -63,7 +63,6 @@ foreach (
 24945IRIDIUM 32 [+]
 24946IRIDIUM 33 [-]
 24948IRIDIUM 28 [-]
-24949IRIDIUM 30 [-]
 24950IRIDIUM 31 [+]
 24965IRIDIUM 19 [+]
 24966IRIDIUM 35 [+]
@@ -86,7 +85,7 @@ foreach (
 25171IRIDIUM 54 [+]
 25172IRIDIUM 50 [+]
 25173IRIDIUM 53 [+]
-25262IRIDIUM 51 [S]
+25262IRIDIUM 51 [-]
 25263IRIDIUM 61 [+]
 25272IRIDIUM 55 [+]
 25273IRIDIUM 57 [-]
@@ -120,7 +119,7 @@ foreach (
 25777IRIDIUM 14 [+]
 25778IRIDIUM 21 [+]
 27372IRIDIUM 91 [+]
-27373IRIDIUM 90 [S]
+27373IRIDIUM 90 [B]
 27374IRIDIUM 94 [+]
 27375IRIDIUM 95 [+]
 27376IRIDIUM 96 [+]
@@ -144,10 +143,77 @@ content="text/html; charset=iso-8859-1">
 
 <h1 align="center">Iridium Constellation Status</h1>
 
-<p align="center"><strong>** Updated 9 October 2017 **</strong></p>
+<p align="center"><strong>** Updated 23 November 2017 **</strong></p>
 
 <p align="left"><strong>Latest changes </strong>(see below for
 earlier changes):</p>
+
+<p align="left">(20 November 2017) The orbit of Iridium 6 (24794,
+1997-020C) has been lowered by 25km to the Engineering Orbit.</p>
+
+<p align="left">(18 November 2017) Iridium 97 (27450, 2002-031A)
+has been moved from Plane 4, Slot 4 (now covered by Iridium 107)
+to Plane 4, Slot 8, a few seconds ahead of Iridium 133 (42955,
+2017-061A)</p>
+
+<p align="left">(16 November 2017) <strong>The process of
+de-orbiting Iridium 5 (24795, 1997-020D) has started.</strong></p>
+
+<p align="left">(13 November 2017) Iridium 125 (42964, 2017-061K)
+has entered the operational constellation at Plane 4, Slot 9, a
+few seconds behind Iridium 96 (27376, 2002-005E).<br>
+All of the third batch of 10 Iridium Next satellites have now
+been raised to the operational orbit.</p>
+
+<p align="left">(12 November 2017) More satellites have recently
+been raised to the operational constellation:<br>
+Iridium 139 (42963, 2017- 061J) has entered the operational
+constellation at Plane 4, Slot 11, a few seconds behind Iridium
+61 (25263, 1998-018B)<br>
+Iridium 136 (42962, 2017- 061H) has entered the operational
+constellation at Plane 4, Slot 10, a few seconds behind Iridium
+37 (24968, 1997-056D)<br>
+<strong>The process of de-orbiting Iridium 51 (25262, 1998-018A)
+has started.</strong></p>
+
+<p align="left">(9 November 2017) More satellites have recently
+been raised to the operational constellation:<br>
+Iridium 129 (42958, 2017-061D) has entered the operational
+constellation at Plane 4, Slot 6, a few seconds behind Iridium 6
+(24794, 1997-020C)<br>
+Iridium 119 (42959, 2017-061E) has entered the operational
+constellation at Plane 4, Slot 1, a few seconds behind Iridium 19
+(24965, 1997-056A)<br>
+Iridium 132 (42961, 2017-061G) has entered the operational
+constellation at Plane 4, Slot 5, a few seconds behind Iridium 5
+(24795, 1997-020D)<br>
+Iridium 107 (42960, 2017-061F) has entered the operational
+constellation at Plane 4, Slot 4, a few seconds behind Iridium 97
+(27450, 2002-031A)</p>
+
+<p align="left">(1 November 2017) Iridium 127 (42956, 2017-061B)
+has entered the operational constellation at Plane 4, Slot 7, a
+few seconds behind Iridium 51 (25262, 1998-018A)<br>
+Note: Iridium 7 (24793, 1997-020B), which was paired with Iridium
+51, appears to be drifting away from Plane 4, Slot 7.<br>
+(1 November 2017): <strong>The process of de-orbiting Iridium 8
+(24792, 1997-020A) has started.</strong></p>
+
+<p align="left">(28 October 2017) Iridium 133 (42955, 2017-061A)
+has entered the operational constellation at Plane 4, Slot 8, a
+few seconds behind Iridium 8 (24792, 1997-020A)<br>
+(28 October 2017) Iridium 122 (42957, 2017-061C) has entered the
+operational constellation at Plane 4, Slot 2, a few seconds
+behind Iridium 34 (24969, 1997-056E)<br>
+(28 October 2017) The rest of the third batch of 10 Iridium Next
+satellites have now been raised to the storage orbit. Iridium 129
+(42958, 2017- 061D) is being raised towards the operational
+orbit.</p>
+
+<p align="left">(23 October 2017) Most of the third batch of 10
+Iridium Next satellites have now been raised to the storage
+orbit. Iridium 133 (42955, 2017-061A) is now being raised towards
+the operational orbit.</p>
 
 <p align="left">(9 October 2017) The third batch of 10 Iridium
 Next satellites (107, 119, 122, 125, 127, 129, 132, 133, 136,
@@ -162,32 +228,37 @@ Failures</a>.</p>
 
 <pre>Orbital  &lt;------------------- Operational satellites -------------------&gt;  Spares
 Plane
-Plane 1:  <a href="iridium74and21.htm">21</a>    72    75    70    62    14    64    65    66    67    68      					
+
+Plane 1:  <a href="iridium74and21.htm">21</a>    72    75    70    62    14    64    65    66    67    68     
+
 Plane 2:  22    <a href="iridium94.htm">94</a>    76    25    23    46    47    20    49    <a
-href="iridium11and26.htm">11</a>     3          				(note: Iridium 23 is probably a partial failure)
+href="iridium11and26.htm">11</a>     3     (note: Iridium 23 is probably a partial failure)
+                                                                          <strong>   (Iridiums 113, 120 and Iridiums 115, 124 migrating from Plane 3 towards plane 2 and/or plane 1</strong>
 Plane 3: <strong>117</strong>    <a href="iridium28and95.htm">95</a>    45   <strong>123</strong>   <strong>126</strong>    32    <a
-href="iridium33collision.htm">91</a>   <strong>121</strong>   <strong>118</strong>    59    60  <strong> </strong>(31) (55) (58) <strong>(plus 113, 120 and 115, 124 migrating towards plane 2 and/or plane 1; 128 migrating towards plane 4)</strong>					
-Plane 4:  19    34    35    <a href="iridium36and97.htm">97</a>     <a
-href="iridium5and51.htm">5</a>     <em>6</em>   <a
-href="iridium7and51.htm">7</a>/51    8    96    37    61   <strong>(107, 119, 122, 125, 127, 129, 132, 133, 136, 139)</strong> (note: Iridiums 6, 7 and 51 probably partial failures)
+href="iridium33collision.htm">91</a>   <strong>121</strong>   <strong>118</strong>    59    60  <strong> </strong>  (31) (55) (58)
+                                                                           <strong>  (Iridium 128 migrating from Plane 3 towards plane 4)</strong>
+Plane 4:19/<strong>119</strong> 34/<strong>122</strong> 35 <strong>  107</strong>   <strong>132</strong>   <strong>129</strong>   <strong>127</strong> <a
+href="iridium36and97.htm">97</a>/<strong>133</strong> 96/<strong>125</strong> 37/<strong>136</strong> 61/<strong>139</strong> ((6)) (note: Iridium 6 probably partial failure)
+
 Plane 5:  50    56    52    53    <a href="iridium9and84.htm">84</a>    10    54    12    13    83    <a
-href="iridium16and86.htm">86</a>   <a href="iridium91.htm">90 (launched to plane 3, but has been migrated to plane 5)</a>
-Plane 6: <strong>102   112   104   114   103   109   106</strong>    80    98    41  <strong> 111</strong>   (18)<strong> </strong>(15) (81) <strong>(plus 108, 105 now migrating from Plane 6 towards plane 5)
+href="iridium16and86.htm">86</a>     <a href="iridium91.htm">90 (launched to plane 3, but has been migrated to plane 5)</a>
+                                                                           <strong>  (Iridium 108 and Iridium 105 migrating from Plane 6 towards plane 5)</strong>
+Plane 6: <strong>102   112   104   114   103   109   106</strong>    80    98    41  <strong> 111</strong>     (18)<strong> </strong>(15) (81) <strong>
 </strong>                                                            </pre>
 
 <pre>Original &lt;----- Failed -----&gt;                             &lt;- Failed -&gt;    <em>Note that some of the failed</em> <em>satellites have drifted from the original orbital planes</em>
 Orbital  (but still in orbit)                              (decayed)
 Plane                                	          <em>     </em>
-Plane 1:  73t  63                                           74d           (Iridium 74 deliberately de-orbited. It was probably already a partial failure))
-Plane 2:  69t  24t  71t  <a href="iridium11and26.htm">26</a>           	 	            48d           (Iridium 48 deliberately de-orbited)
+Plane 1:  73t  63                                           74d           (Iridium 74 deliberately de-orbited. It was probably already a partial failure.)
+Plane 2:  69t  24t  71t  <a href="iridium11and26.htm">26</a>           	 	            48d           (Iridium 48 deliberately de-orbited.)
 Plane 3:  <a href="iridium28and95.htm">28</a>   29<font
 color="#FF0000">   </font><a href="iridium33collision.htm"><font
-color="#FF0000">33</font></a>t  57   30      		            27d           (Iridium 30 deliberately de-orbited)
-Plane 4:   4   <a href="iridium36and97.htm">36</a>t
+color="#FF0000">33</font></a>t  57           		            27d  30d      (Iridium 30 deliberately de-orbited.)
+Plane 4:   4   <a href="iridium36and97.htm">36</a>t   7    8   51   5                                      (Iridium  8, Iridium 51 and Iridium 5 deliberately de-orbited. Iridium 7 and Iridium 51 were probably already partial failures.)
 Plane 5:   2t 914t 911t  <a href="iridium16and86.htm">16</a>t          		            85d   <a
-href="iridium9and84.htm">9</a>d      (Iridium  9 deliberately de-orbited) <em>Iridium 2 has drifted far from</em> <em>its original launch plane, and continues to drift</em>
+href="iridium9and84.htm">9</a>d      (Iridium  9 deliberately de-orbited.) <em>Iridium 2 has drifted far from</em> <em>its original launch plane, and continues to drift</em>
 Plane 6: 920t 921t  44t  <a href="iridium38and82.htm">38</a>t  <a
-href="iridium17and77.htm">17</a>t 42t 39  40  82  43        79d  77       (Iridium 40, Iridium 82, Iridium 43, and Iridium 77 deliberately de-orbited)</pre>
+href="iridium17and77.htm">17</a>t 42t 39  40  82  43        79d  77d      (Iridium 40, Iridium 82, Iridium 43, and Iridium 77 deliberately de-orbited.)</pre>
 
 <p>t indicates satellites that have been reported as tumbling out
 of control. </p>
@@ -251,6 +322,9 @@ which originally belonged to (the second) Iridium 11. </p>
 
 <p><a name="Recent changes"><strong>Recent changes</strong></a>: </p>
 
+<p align="left">(28 September 2017): <strong>Iridium 30 (24949,
+1997-051F) decayed on 28 September 2017.</strong></p>
+
 <p align="left">(22 September 2017): <strong>Iridium 77 (25471,
 1998-051E) decayed on 22 September 2017.</strong></p>
 
@@ -310,7 +384,7 @@ the remaining 5 will be drifted to other planes.</p>
 
 <p align="left">(mid-June 2017) <a href="iridium7and51.htm">Iridium
 51 (25262, 1998-018A)</a>, which had been paired wth Iridium 6
-(24794. 1997-020C) since October2014, was moved within orbital
+(24794. 1997-020C) since October 2014, was moved within orbital
 plane 4 to be paired once again with <a href="iridium7and51.htm">Iridium
 7 (24793, 1997-020B)</a>. This is possibly a consequence of a
 further significant failure of either Iridium 6 or Iridium 7.</p>

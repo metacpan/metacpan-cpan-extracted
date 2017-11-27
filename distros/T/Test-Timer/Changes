@@ -1,5 +1,21 @@
 Revision history for Test-Timer
 
+2.09 2017-11-24 Maintenance release, update not required
+
+- Attempting to address issues with tests on Windows
+
+  REF: http://www.cpantesters.org/distro/T/Test-Timer.html?grade=3&perlmat=2&patches=2&oncpan=2&distmat=2&perlver=ALL&osname=ALL&version=2.08
+
+- Reinstated sleep over select in the test suite
+
+- Changed some test parameters was made a bit less relaxed attempting to decrease the execution time
+  for the test suite
+
+- Removed loose match in regular, it should be possible to anticipate the timeout
+
+- Removed redundant tests, trying to cut down execution time for the test suite
+
+
 2.08 2017-11-20 Maintenance release, update not required
 
 - Addressing reports on failing tests from CPAN testers

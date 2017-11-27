@@ -3,7 +3,7 @@ use strict;
 use warnings;
 package YAML::PP::Constructor;
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use constant DEBUG => ($ENV{YAML_PP_LOAD_DEBUG} or $ENV{YAML_PP_LOAD_TRACE}) ? 1 : 0;
 use constant TRACE => $ENV{YAML_PP_LOAD_TRACE} ? 1 : 0;
@@ -170,7 +170,7 @@ sub scalar_event {
 sub alias_event {
     my ($self, $event) = @_;
     my $value;
-    my $name = $event->{content};
+    my $name = $event->{value};
     if (my $anchor = $self->anchors->{ $name }) {
         $value = $$anchor;
     }
@@ -203,7 +203,7 @@ sub event {
 sub render_value {
     my ($self, $info) = @_;
     my $value;
-    my $content = $info->{content};
+    my $content = $info->{value};
     my $style = $info->{style};
     DEBUG and warn "CONTENT $content ($style)\n";
     if ($style eq ':') {

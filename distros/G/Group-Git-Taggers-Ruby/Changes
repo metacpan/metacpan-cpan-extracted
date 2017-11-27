@@ -1,5 +1,18 @@
 Revision history for Group-Git-Taggers-Ruby
 
+0.0.5   2017-11-24
+        Updating for release of version 0.0.5
+        Removing perl 5.8 support (Ivan Wills)
+        Added auto test (Ivan Wills)
+
+0.0.4   2017-11-23
+        Updating for release of version 0.0.4
+        Updated date (Ivan Wills)
+        Updating Test dependencies for better windows experience (Ivan Wills)
+        Added perl 5.24 to travis build (Ivan Wills)
+        License update (Ivan Wills)
+        Setting default editor vtide configs (Ivan Wills)
+
 0.0.3   2015-09-01
         Updating for release of version 0.0.3
         Removed creation of makefile (Ivan Wills)

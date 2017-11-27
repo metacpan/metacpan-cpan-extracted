@@ -40,7 +40,7 @@ METHODS
 
     "get_lines()"
              Get lines in metro map.
-             Returns reference to array with Map::Tube::Line objects.
+             Returns reference to unsorted array with Map::Tube::Line objects.
 
     "get_node_by_id($station_id)"
              Get station node by id.
@@ -160,6 +160,47 @@ EXAMPLE4
      # Салтівська лінія
      # Холодногірсько-Заводська лінія
 
+EXAMPLE5
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Encode qw(decode_utf8 encode_utf8);
+     use Map::Tube::Kharkiv;
+
+     # Arguments.
+     if (@ARGV < 1) {
+             print STDERR "Usage: $0 line\n";
+             exit 1;
+     }
+     my $line = decode_utf8($ARGV[0]);
+
+     # Object.
+     my $obj = Map::Tube::Kharkiv->new;
+
+     # Get stations for line.
+     my $stations_ar = $obj->get_stations($line);
+
+     # Print out.
+     map { print encode_utf8($_->name)."\n"; } @{$stations_ar};
+
+     # Output:
+     # Usage: __PROG__ line
+
+     # Output with 'foo' argument.
+     # Map::Tube::get_stations(): ERROR: Invalid Line Name [foo]. (status: 105) file __PROG__ on line __LINE__
+
+     # Output with 'Олексіївська лінія' argument.
+     # Олексіївська
+     # 23 Серпня
+     # Ботанічний сад
+     # Наукова
+     # Держпром
+     # Архітектора Бекетова
+     # Площа Повстання
+     # Метробудівників імені Ващенка
+
 DEPENDENCIES
     File::Share, Map::Tube, Moo, namespace::clean.
 
@@ -177,15 +218,15 @@ REPOSITORY
     <https://github.com/tupinek/Map-Tube-Kharkiv>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2014-2015 Michal Špaček
+     © 2014-2017 Michal Josef Špaček
      Artistic License
      BSD 2-Clause License
 
 VERSION
-    0.05
+    0.06
 

@@ -1,10 +1,10 @@
 package App::btcindo;
 
-our $DATE = '2017-11-19'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2017-11-24'; # DATE
+our $VERSION = '0.011'; # VERSION
 
 1;
-# ABSTRACT: CLI for bitcoin.co.id
+# ABSTRACT: CLI for bitcoin.co.id (VIP)
 
 __END__
 
@@ -14,11 +14,11 @@ __END__
 
 =head1 NAME
 
-App::btcindo - CLI for bitcoin.co.id
+App::btcindo - CLI for bitcoin.co.id (VIP)
 
 =head1 VERSION
 
-This document describes version 0.005 of App::btcindo (from Perl distribution App-btcindo), released on 2017-11-19.
+This document describes version 0.011 of App::btcindo (from Perl distribution App-btcindo), released on 2017-11-24.
 
 =head1 SYNOPSIS
 
@@ -42,7 +42,7 @@ feature.
 
 =head1 SEE ALSO
 
-L<Finance::BTCInfo>
+L<Finance::BTCIndo>
 
 =head1 AUTHOR
 

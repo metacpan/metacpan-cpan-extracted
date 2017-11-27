@@ -1,5 +1,9 @@
 Revision history for Perl extension Audio::Opusfile.
 
+1.000 2017-11-25T19:12+00:00
+ - Mark as stable
+ - Make dist perlcritic-compliant
+
 0.005001 2017-02-18T17:53+00:00
  - Export op_current_link
  - More functions die on error

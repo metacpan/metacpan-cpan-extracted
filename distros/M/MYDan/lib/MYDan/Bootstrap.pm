@@ -5,7 +5,7 @@ use Carp;
 use YAML::XS;
 
 use File::Basename;
-use MYDan::Util::ProcLock;
+use MYDan::Util::FLock;
 use POSIX qw( :sys_wait_h );
 use AnyEvent::Loop;
 use AnyEvent;
@@ -34,15 +34,10 @@ sub run
     my ( $this, %run ) = @_;
 
     our ( $logs, $exec, $lock ) = @$this{qw( logs exec lock )};
-    my $proclock = MYDan::Util::ProcLock->new( "$lock/lock" );
+
+    my $flock = MYDan::Util::FLock->new( "$lock/lock" );
+    die "Locked by other processes.\n" unless $flock->lock();
    
-    if ( my $pid = $proclock->check() )
-    {
-        print "master locked by $pid.\n" if $ENV{MYDan_DEBUG};
-        exit;
-    }
-   
-    $proclock->lock();
     $0 = 'mydan.bootstrap.master';
 
     

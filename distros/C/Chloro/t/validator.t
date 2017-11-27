@@ -10,7 +10,7 @@ use Chloro::Test::Validator;
 my $form = Chloro::Test::Validator->new();
 
 {
-    my $set = $form->process(
+    my $result_set = $form->process(
         params => {
             min => 1,
             max => 10,
@@ -18,7 +18,7 @@ my $form = Chloro::Test::Validator->new();
     );
 
     is_deeply(
-        $set->results_as_hash(), {
+        $result_set->results_as_hash(), {
             min => 1,
             max => 10,
         },
@@ -27,14 +27,14 @@ my $form = Chloro::Test::Validator->new();
 }
 
 {
-    my $set = $form->process(
+    my $result_set = $form->process(
         params => {
             min => 12,
             max => 10,
         }
     );
 
-    my %errors = $set->field_errors();
+    my %errors = $result_set->field_errors();
 
     is(
         scalar keys %errors, 1,

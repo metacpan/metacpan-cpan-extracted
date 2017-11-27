@@ -8,7 +8,7 @@ use Module::Build;
 my $builder = Module::Build->new(
      module_name        => 'Math::AnyNum',
      license            => 'artistic_2',
-     dist_author        => q{Daniel Șuteu <trizenx@gmail.com>},
+     dist_author        => q{Daniel Șuteu <trizen@protonmail.com>},
      dist_version_from  => 'lib/Math/AnyNum.pm',
      release_status     => 'stable',
      dist_abstract      => 'Arbitrary size precision for integers, rationals, floating-points and complex numbers.',

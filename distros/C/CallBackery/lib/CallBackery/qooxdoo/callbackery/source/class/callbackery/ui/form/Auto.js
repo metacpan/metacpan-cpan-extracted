@@ -352,7 +352,7 @@ qx.Class.define("callbackery.ui.form.Auto", {
                 switch(this._typeMap[key])
                 {
                     case 'text':
-                        model[setter](value ? String(value) : value);
+                        model[setter]((value !== undefined && value !== null) ? String(value) : value);
                         break;
 
                     case 'bool':

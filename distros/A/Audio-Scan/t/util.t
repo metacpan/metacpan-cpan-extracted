@@ -15,7 +15,7 @@ use Audio::Scan;
 # Test for get_types
 {
     my $types = Audio::Scan->get_types;
-    
+
     is( $types->[0], 'mp4', 'get_types 1 ok' );
     is( $types->[1], 'aac', 'get_types 2 ok' );
 }
@@ -32,6 +32,6 @@ use Audio::Scan;
     is( Audio::Scan->type_for('wma'), 'asf', 'type_for ok' );
 }
 
-sub _f {    
+sub _f {
     return catfile( $FindBin::Bin, 'mp3', shift );
 }

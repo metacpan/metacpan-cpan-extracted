@@ -59,6 +59,10 @@
               <TMPL_INCLUDE NAME="standardform.tpl">
             </TMPL_IF>
 
+            <TMPL_IF NAME="kerberos">
+              <TMPL_INCLUDE NAME="kerberos.tpl">
+            </TMPL_IF>
+
             <TMPL_IF NAME="openidform">
               <TMPL_INCLUDE NAME="openidform.tpl">
             </TMPL_IF>
@@ -110,6 +114,22 @@
       <input type="hidden" name="timezone" />
       <input type="hidden" name="skin" value="<TMPL_VAR NAME="SKIN">" />
       <TMPL_INCLUDE NAME="standardform.tpl">
+    </form>
+
+    </div>
+
+  </TMPL_IF>
+
+  <TMPL_IF NAME="DISPLAY_KRB">
+
+    <div class="panel panel-default">
+    <form id="lform" action="#" method="post" class="login" role="form">
+      <!-- Hidden fields -->
+      <TMPL_VAR NAME="HIDDEN_INPUTS">
+      <input type="hidden" name="url" value="<TMPL_VAR NAME="AUTH_URL">" />
+      <input type="hidden" name="timezone" />
+      <input type="hidden" name="skin" value="<TMPL_VAR NAME="SKIN">" />
+      <TMPL_INCLUDE NAME="kerberos.tpl">
     </form>
 
     </div>

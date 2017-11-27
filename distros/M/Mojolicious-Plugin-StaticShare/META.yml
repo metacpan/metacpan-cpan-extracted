@@ -1,0 +1,28 @@
+---
+abstract: 'browse, upload, copy, move, delete static files/dirs.'
+author:
+  - "Ð\x9CÐ¸Ñ\NÐ°Ð¸Ð» Ð§Ðµ (Mikhail Che) <mche[-at-]cpan.org>"
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-StaticShare
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  HTTP::AcceptLanguage: '0.02'
+  Mojolicious: '7.36'
+  Time::Piece: '1.31'
+  perl: '5.014'
+resources:
+  repository: git://github.com/mche/Mojolicious-Plugin-StaticShare.git
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

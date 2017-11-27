@@ -3,7 +3,7 @@ NAME
     5802)
 
 VERSION
-    version 0.005
+    version 0.006
 
 SYNOPSIS
         use Authen::SCRAM::Client;
@@ -61,6 +61,13 @@ DESCRIPTION
 
     See Authen::SCRAM::Client and Authen::SCRAM::Server for usage details.
 
+NAME
+    Authen::SCRAM - Salted Challenge Response Authentication Mechanism (RFC
+    5802)
+
+VERSION
+    version 0.006
+
 SUPPORT
   Bugs / Feature Requests
     Please report any bugs or feature requests through the issue tracker at
@@ -77,6 +84,36 @@ SUPPORT
 
 AUTHOR
     David Golden <dagolden@cpan.org>
+
+CONTRIBUTOR
+    David Golden <xdg@xdg.me>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2014 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/dagolden/Authen-SCRAM/issues>. You will be notified
+    automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/Authen-SCRAM>
+
+      git clone https://github.com/dagolden/Authen-SCRAM.git
+
+AUTHOR
+    David Golden <dagolden@cpan.org>
+
+CONTRIBUTOR
+    David Golden <xdg@xdg.me>
 
 COPYRIGHT AND LICENSE
     This software is Copyright (c) 2014 by David Golden.

@@ -1,0 +1,64 @@
+# NAME
+
+Neovim::RPC::Plugin::Taskwarrior - UI for taskwarrior
+
+# VERSION
+
+version 0.0.1
+
+# DESCRIPTION
+
+This plugin needs a few things to work.
+
+First, `nvim` must be configured to use [Neovim::RPC](https://metacpan.org/pod/Neovim::RPC) (duh).
+
+Then configure nvim to use the vim side of this plugin as well as
+TableMode. I use `Plugged`, and  my configuration looks like:
+
+```
+Plug 'yanick/Neovim-RPC-Plugin-Taskwarrior'
+Plug 'dhruvasagar/vim-table-mode', {
+    \ 'on': [ 'TableModeEnable' ]
+\ }
+```
+
+Once all of that is done, you can invoke the taskwarrior UI via
+`:Task`. Or straight from the command-line as 
+
+```
+$ nvim -c 'call Task()'
+```
+
+The plugin has a slew of commands built-in. Right now,
+if you want to change the aliases, just go and dive in
+`taskwarrior.vim`.
+
+```
+| command    | mode           | description                                |
+| ----       | ---            | ---                                        |
+| <leader>d  | normal, visual | mark task(s) as done                       |
+| <leader>D  | normal, visual | delete task(s)                             |
+| <leader>ll | normal         | show all +PENDING tasks                    |
+| <leader>lf | normal         | show all +focus tasks                      |
+| <leader>lq | normal         | show tasks, prompt for filter              |
+| <leader>m  | normal, visual | mod task(s), prompt for modification       |
+| <leader>m  | normal, visual | append to task(s), prompt for modification |
+| <leader>i  | normal, visual | show info for task(s)                      |
+| <leader>ph | normal, visual | set priority of task(s) to be high         |
+| <leader>pm | normal, visual | set priority of task(s) to be medium       |
+| <leader>pl | normal, visual | set priority of task(s) to be low          |
+| <leader>W  | normal, visual | set 'wait' for task(s)                     |
+```
+
+The plugin will set the buffer listing the tasks as  a file of type `task`.
+
+# AUTHOR
+
+Yanick Champoux <yanick@babyl.dyndns.org> [![endorse](http://api.coderwall.com/yanick/endorsecount.png)](http://coderwall.com/yanick)
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Yanick Champoux.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,10 @@
 Revision history for Perl extension App-BorgRestore
 
+2.2.0 2017-11-25T23:16:04Z
+	- Add borg 1.1 support
+	- Mention required positive return code of config in documentation
+	- Enable adhoc mode automatically when cache is empty
+
 2.1.1 2017-10-05T07:58:12Z
 	- Fix incorrect/missing dependencies
 	- Use autodie everywhere to catch errors early

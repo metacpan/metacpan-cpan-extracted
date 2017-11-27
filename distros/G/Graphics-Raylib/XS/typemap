@@ -7,13 +7,14 @@ Color						T_OPAQUE_STRUCT
 Color *						T_PTROBJ
 Image						T_OPAQUE_STRUCT
 Image *						T_PTROBJ
-Light						T_PTROBJ
 Material					T_OPAQUE_STRUCT
 Matrix						T_OPAQUE_STRUCT
 Mesh						T_OPAQUE_STRUCT
+Mesh *						T_PTROBJ
 Model						T_OPAQUE_STRUCT
 Music						T_PTROBJ
 Ray						T_OPAQUE_STRUCT
+RayHitInfo					T_OPAQUE_STRUCT
 Rectangle					T_OPAQUE_STRUCT
 RenderTexture2D					T_OPAQUE_STRUCT
 Shader						T_OPAQUE_STRUCT
@@ -25,8 +26,12 @@ Vector2						T_OPAQUE_STRUCT
 Vector2 *					T_PTROBJ
 Vector3						T_OPAQUE_STRUCT
 Vector3 *					T_PTROBJ
+VrDeviceInfo					T_OPAQUE_STRUCT
 Wave						T_OPAQUE_STRUCT
 Wave *						T_PTROBJ
+const float *					T_PTROBJ
+const int *					T_PTROBJ
+const void *					T_PTROBJ
 float *						T_PTROBJ
 int *						T_PTROBJ
 #############################################################################

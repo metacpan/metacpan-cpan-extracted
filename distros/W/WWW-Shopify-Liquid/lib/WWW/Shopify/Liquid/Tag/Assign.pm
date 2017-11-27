@@ -36,20 +36,27 @@ sub process {
 	
 	
 	my $result = $self->{arguments}->[0]->{operands}->[1];
-	$result = $result->$action($pipeline, $hash) if !$self->is_processed($result);
-	return $self unless $self->is_processed($result);
-	
 	# For now, only do renders.
 	if ($action eq "optimize") {
-		$self->{arguments}->[0]->{operands}->[1] = $result;
+		if (exists $inner_hash->{$vars[-1]}) {
+			my $value = delete $inner_hash->{$vars[-1]};
+			$result = $result->$action($pipeline, $hash) if !$self->is_processed($result);
+			$inner_hash->{$vars[-1]} = $result if $self->is_processed($result);
+		} else {
+			$result = $result->$action($pipeline, $hash) if !$self->is_processed($result);
+		}
+		$self->{arguments}->[0]->{operands}->[1] = $result if $self->is_processed($result);
 		# If we run across something that should be assigned, we must delete it in the hash to preserve uncertainty.
 		# OK, no. We still return ourselves, but we do a bit of a deeper analysis. If the assignment is out the in the open, we assign.
 		# If the assignment is contingent upon a conditional, (i.e. inside something that isn't fully resolved). Then we delete it.
 		$pipeline->flag_conditional_uncertainty(\@vars);
-		$inner_hash->{$vars[-1]} = $result;
-		return undef if $pipeline->remove_assignment && !defined $pipeline->conditional_state;;
+		$inner_hash->{$vars[-1]} = $result if $self->is_processed($result);
+		return undef if $pipeline->remove_assignment && !defined $pipeline->conditional_state;
 		return $self;
+	} else {
+		$result = $result->$action($pipeline, $hash) if !$self->is_processed($result);
 	}
+	return $self unless $self->is_processed($result);
 	
 	my $assignment = $self->{arguments}->[0];
 	if (looks_like_number($vars[-1]) && ref($inner_hash) && ref($inner_hash) eq "ARRAY") {

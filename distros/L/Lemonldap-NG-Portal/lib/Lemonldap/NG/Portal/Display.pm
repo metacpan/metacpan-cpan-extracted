@@ -310,12 +310,16 @@ sub display {
                     DISPLAY_OPENID_FORM => $displayType eq "openidform" ? 1 : 0,
                     DISPLAY_YUBIKEY_FORM => $displayType eq "yubikeyform" ? 1
                     : 0,
-                    DISPLAY_LOGO_FORM => $displayType eq "logo" ? 1 : 0,
+                    DISPLAY_LOGO_FORM => $displayType eq "logo"     ? 1 : 0,
+                    DISPLAY_KRB       => $displayType eq "kerberos" ? 1 : 0,
                     module => $displayType eq "logo" ? $self->get_module('auth')
                     : "",
                     AUTH_LOOP  => [],
-                    PORTAL_URL => ( !$displayType or $displayType eq "logo" )
-                    ? $self->{portal}
+                    PORTAL_URL => (
+                            !$displayType
+                          or $displayType eq "logo"
+                          or $displayType eq "kerberos"
+                      ) ? $self->{portal}
                     : 0,
                     MSG => $self->info(),
                 );
@@ -337,6 +341,7 @@ sub display {
         SKIN      => $skin,
         ANTIFRAME => $self->{portalAntiFrame},
         SKIN_BG   => $self->{portalSkinBackground},
+        KRBAUTO   => $self->{error} != PE_BADCREDENTIALS ? 1 : 0,
     );
 
     ## Custom template params
@@ -407,7 +412,7 @@ L<Lemonldap::NG::Portal>
 =head1 BUG REPORT
 
 Use OW2 system to report bug or ask for features:
-L<http://jira.ow2.org>
+L<https://gitlab.ow2.org/lemonldap-ng/lemonldap-ng/issues>
 
 =head1 DOWNLOAD
 

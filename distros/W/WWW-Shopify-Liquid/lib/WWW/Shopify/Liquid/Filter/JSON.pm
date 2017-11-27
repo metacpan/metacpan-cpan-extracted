@@ -19,7 +19,7 @@ sub walk_data {
 
 sub operate { 
 	# We allow decoding with this filter as well.
-	if (!ref($_[2]) && length($_[2]) >= 2) {
+	if (defined $_[2] && !ref($_[2]) && length($_[2]) >= 2) {
 		my $object = eval { from_json($_[2]) };
 		return $object if !$@;
 	}

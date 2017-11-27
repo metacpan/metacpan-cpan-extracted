@@ -1,7 +1,7 @@
 package DDG::Test::Fathead;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Adds keywords to easily test Fathead plugins.
-$DDG::Test::Fathead::VERSION = '1017';
+$DDG::Test::Fathead::VERSION = '1018';
 use strict;
 use warnings;
 use Carp;
@@ -29,7 +29,7 @@ DDG::Test::Fathead - Adds keywords to easily test Fathead plugins.
 
 =head1 VERSION
 
-version 1017
+version 1018
 
 =head1 DESCRIPTION
 

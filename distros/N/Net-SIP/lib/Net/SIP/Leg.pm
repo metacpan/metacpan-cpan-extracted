@@ -537,9 +537,8 @@ sub via_branch {
 	push @parts,
 	    ( sort $packet->get_header('proxy-require')),
 	    $packet->get_header('route'),
-	    $packet->get_header('to'),
 	    $packet->get_header('from'),
-	    ($packet->as_parts())[1];
+	    ($packet->as_parts())[1]; # URI
 	$val .= substr(md5_hex(@parts),0,15);
     }
     return $val;
@@ -584,7 +583,9 @@ sub can_deliver_to {
 sub match {
     my Net::SIP::Leg $self = shift;
     my $args = shift;
-    return if $args->{addr}  && $args->{addr}  ne $self->{src}{addr};
+    return if $args->{addr}
+	&& $args->{addr} ne $self->{src}{addr}
+	&& $args->{addr} ne $self->{src}{host};
     return if $args->{port}  && $args->{port}  != $self->{src}{port};
     return if $args->{proto} && $args->{proto} ne $self->{proto};
     return if $args->{sub}   && !invoke_callback($args->{sub},$self);

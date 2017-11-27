@@ -1,10 +1,10 @@
 package Chloro;
-BEGIN {
-  $Chloro::VERSION = '0.06';
-}
 
 use strict;
 use warnings;
+use namespace::autoclean;
+
+our $VERSION = '0.07';
 
 use Chloro::Field;
 use Chloro::Group;
@@ -77,9 +77,11 @@ sub group {
 
 # ABSTRACT: Form Processing So Easy It Will Knock You Out
 
-
+__END__
 
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -87,7 +89,7 @@ Chloro - Form Processing So Easy It Will Knock You Out
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -195,24 +197,58 @@ If the submission was valid, you can get the results as a hash reference:
 
 That's the basic workflow using Chloro.
 
+=for Pod::Coverage field group init_meta
+
 =head1 MANUAL
 
 If you're new to Chloro, you should start by reading L<Chloro::Manual>.
+
+=head1 SUPPORT
+
+Bugs may be submitted at L<http://rt.cpan.org/Public/Dist/Display.html?Name=Chloro> or via email to L<bug-chloro@rt.cpan.org|mailto:bug-chloro@rt.cpan.org>.
+
+I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
+
+=head1 SOURCE
+
+The source code repository for Chloro can be found at L<https://github.com/autarch/Chloro>.
+
+=head1 DONATIONS
+
+If you'd like to thank me for the work I've done on this module, please
+consider making a "donation" to me via PayPal. I spend a lot of free time
+creating free software, and would appreciate any support you'd care to offer.
+
+Please note that B<I am not suggesting that you must do this> in order for me
+to continue working on this particular software. I will continue to do so,
+inasmuch as I have in the past, for as long as it interests me.
+
+Similarly, a donation made in this way will probably not make me work on this
+software much more, unless I get so many donations that I can consider working
+on free software full time (let's all have a chuckle at that together).
+
+To donate, log into PayPal and send money to autarch@urth.org, or use the
+button at L<http://www.urth.org/~autarch/fs-donation.html>.
 
 =head1 AUTHOR
 
 Dave Rolsky <autarch@urth.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Robbie Bow
+
+Robbie Bow <robbie@iannounce.co.uk>
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2011 by Dave Rolsky.
+This software is Copyright (c) 2017 by Dave Rolsky.
 
 This is free software, licensed under:
 
   The Artistic License 2.0 (GPL Compatible)
 
+The full text of the license can be found in the
+F<LICENSE> file included with this distribution.
+
 =cut
-
-
-__END__
-

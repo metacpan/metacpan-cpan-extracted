@@ -1,3 +1,8 @@
+0.006   2017-11-24 (PERLANCAR)
+
+        - Pass 'pair' argument to cancelOrder trade API function.
+
+
 0.005   2017-06-03 (PERLANCAR)
 
 	- get_price_history(): add argument 'period' to allow getting all

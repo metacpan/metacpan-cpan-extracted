@@ -28,9 +28,6 @@ my $mydan = mydanpath();
 system "mkdir -p '$mydan'" unless -e $mydan;
 
 my $perl = $ENV{PERL_PATH} || $^X;
-my $cpan = $perl;$cpan =~ s/perl$/cpan/;
-$cpan = $ENV{cpan} unless -f $cpan;
-die "no find cpan" unless -f $cpan;
 
 sub mysystem
 {
@@ -66,37 +63,12 @@ sub repl
     }
 }
 
-sub insl
-{
-   
-    print '#' x 30, " check module ", '#' x 30, "\n";
-   
-    map{
-        $_ =~ s/'//g;
-        if( system "$perl -e \"use $_\" >/dev/null 2>&1" )
-        {
-            print "install $_\n";
-            mysystem( "$cpan install $_" );
-        }
-        else { print "$_=> ok.\n"; }
-        print '-' x 74, "\n";
-    }@_;
-    
-}
-
 
 if( $ENV{dan} )
 {
     mysystem "rsync -a dan/ dan.i/";
     repl( 'dan.i' );
     mysystem "rsync -a dan.i/ '$mydan/dan/'";
-
-    my %m;
-    tie my ( @file ), 'Tie::File', 'Makefile.PL';
-    map{ $m{$1} = 1 if $_ =~ /\s+'?([:\w]+)'? => [\d\.]+/ }@file;
-    untie @file;
-
-    insl( keys %m );   
 }
 
 if( $ENV{box} )
@@ -104,13 +76,12 @@ if( $ENV{box} )
 
     mysystem "rsync -a box/ box.i/";
     mysystem "rsync -a dan/node/ box.i/node/";
-    map { mysystem "rsync -a dan/tools/$_ box.i/tools/" } qw(range mcmd mssh expect vssh go mrsync rsync alias unalias sync config whois gateway git );
+    map { mysystem "rsync -a dan/tools/$_ box.i/tools/" } qw(range mcmd mssh expect vssh go rsync alias unalias sync config whois gateway git );
     
 
     my @sed = (
         'box.i/tools/vssh' => [ 'logname', 'id -un' ],
         'box.i/tools/vssh' => [ 'MYDan::VSSH::Execute::dan=1', 'MYDan::VSSH::Execute::dan=0' ],
-        'box.i/tools/mrsync' => [ 'MYDan::Agent::Mrsync', 'MYDan::Util::Mrsync' ],
     );
     while( my ( $f, $s ) = splice @sed, 0, 2  )
     {
@@ -121,16 +92,6 @@ if( $ENV{box} )
 
     repl( 'box.i' );
     mysystem "rsync -a box.i/ '$mydan/box/'";
-
-    unless( $ENV{dan} )
-    {
-         my %m;
-         tie my ( @file ), 'Tie::File', 'Makefile.PL';
-         map{ $m{$1} = 1 if $_ =~ /\s+'?([:\w]+)'? => [\d\.]+,\s*#box/ }@file;
-         untie @file;
-
-         insl( keys %m );
-    }
 }
 
 if( $ENV{dan} || $ENV{box} || $ENV{bin} )
@@ -146,7 +107,7 @@ if( $ENV{def} )
 {
     mysystem( "rsync -av def/ def.i/" );
     repl( 'def.i', MYDanROOT => $mydan );
-    mysystem( "rsync -av def.i/ ../" );
+    mysystem( "rsync -av def.i/ '$mydan/'" );
 }
 
 exit 0;

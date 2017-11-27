@@ -8,18 +8,18 @@ Log::Journald - Send messages to a systemd journal
   use Sys::Syslog qw/:macros/;
 
   # Easy.
-  journald_log(LOG_INFO, "Hello from PID $$!");
+  journal_log(LOG_INFO, "Hello (1) from PID $$!");
 
   # Send arbitrary fields, even binary data
   Log::Journald::send(PRIORITY => LOG_INFO,
-       MESSAGE => "Hello from PID $$!",
+       MESSAGE => "Hello (2) from PID $$!",
        PERL_PACKAGE => __PACKAGE__,
-       _YOLO => "SW\x00AG");
+       _YOLO => "SW\x00AG")
        or warn "Could not send log: $!";
 
   # Raw
   Log::Journald::sendv('PRIORITY=6',
-       "MESSAGE=Hello from PID $$!");
+       "MESSAGE=Hello (3) from PID $$!");
 
 Please consider this an alpha quality code, whose API can change
 at any time, until we reach version 1.00.
@@ -44,7 +44,7 @@ use warnings;
 
 require Exporter;
 
-our $VERSION = '0.20';
+our $VERSION = '0.30';
 our @ISA = qw/Exporter/;
 our @EXPORT_OK = qw/journal_log send sendv/;
 our @EXPORT = qw/journal_log send sendv/;

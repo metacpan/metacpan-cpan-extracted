@@ -42,7 +42,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Text::VisualWidth" : "0",
+            "Text::VisualWidth::PP" : "0.05",
             "perl" : "v5.10.0"
          }
       },
@@ -55,7 +55,7 @@
    "provides" : {
       "Text::VisualPrintf" : {
          "file" : "lib/Text/VisualPrintf.pm",
-         "version" : "2.01"
+         "version" : "2.03"
       }
    },
    "release_status" : "stable",
@@ -69,7 +69,7 @@
          "web" : "https://github.com/kaz-utashiro/Text-VisualPrintf"
       }
    },
-   "version" : "2.01",
+   "version" : "2.03",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kaz Utashiro <kaz@utashiro.com>"

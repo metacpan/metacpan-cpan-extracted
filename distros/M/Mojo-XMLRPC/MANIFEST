@@ -4,6 +4,7 @@ LICENSE
 MANIFEST
 META.json
 META.yml
+README
 cpanfile
 lib/Mojo/XMLRPC.pm
 lib/Mojo/XMLRPC/Base64.pm

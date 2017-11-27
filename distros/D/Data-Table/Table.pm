@@ -6,7 +6,7 @@ use vars qw($VERSION %DEFAULTS);
 use Carp;
 #use Data::Dumper;
 
-$VERSION = '1.75';
+$VERSION = '1.76';
 %DEFAULTS = (
   "CSV_DELIMITER"=>',', # controls how to read/write CSV file
   "CSV_QUALIFIER"=>'"',
@@ -1515,7 +1515,7 @@ sub fromCSV {
               # due to the tailing of split function in perl
     $s .= ' '; # e.g., split $s="a," will only return a list of size 1.
     $one = parseCSV($s, undef, {delimiter=>$delimiter, qualifier=>$qualifier});
-    $one->[$#{@$one}]=undef;
+    $one->[$#{$one}]=undef;
   } else {
     $one = parseCSV($s, undef, {delimiter=>$delimiter, qualifier=>$qualifier});
   }
@@ -1670,7 +1670,7 @@ sub fromTSV {
               # due to the tailing of split function in perl
     $s .= ' '; # e.g., split $s="a," will only return a list of size 1.
     @$one = split(/\t/, $s);
-    $one->[$#{@$one}]='';
+    $one->[$#{$one}]='';
   } else {
     @$one = split(/\t/, $s);
   }

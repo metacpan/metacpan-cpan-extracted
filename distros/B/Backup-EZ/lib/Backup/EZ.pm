@@ -10,22 +10,25 @@ use Time::localtime;
 use Unix::Syslog qw(:macros :subs);
 use Data::UUID;
 use Sys::Hostname;
-use File::Slurp qw(slurp);
+use File::Slurp qw(slurp read_dir);
 use File::Spec;
-use Test::More;
+use Backup::EZ::Dir;
 
 #use Data::Printer use_prototypes => 0;
+use Data::Printer alias => 'pdump';
 use Data::Dumper;
 
 #
 # CONSTANTS
 #
-use constant EXCLUDE_FILE        => '/etc/ezbackup/ezbackup_exclude.rsync';
-use constant CONF                => '/etc/ezbackup/ezbackup.conf';
-use constant COPIES              => 30;
-use constant DEST_HOSTNAME       => 'localhost';
-use constant DEST_APPEND_MACH_ID => 0;
-use constant USE_SUDO            => 0;
+use constant EXCLUDE_FILE            => '/etc/ezbackup/ezbackup_exclude.rsync';
+use constant CONF                    => '/etc/ezbackup/ezbackup.conf';
+use constant COPIES                  => 30;
+use constant DEST_HOSTNAME           => 'localhost';
+use constant DEST_APPEND_MACH_ID     => 0;
+use constant USE_SUDO                => 0;
+use constant DEFAULT_ARCHIVE_OPTS    => '-az';
+use constant ARCHIVE_NO_RECURSE_OPTS => '-dlptgoDz';
 
 =head1 NAME
 
@@ -33,11 +36,11 @@ Backup::EZ - Simple backups based on rsync
 
 =head1 VERSION
 
-Version 0.25
+Version 0.31
 
 =cut
 
-our $VERSION = '0.25';
+our $VERSION = '0.31';
 
 =head1 SYNOPSIS
 
@@ -177,16 +180,22 @@ sub _get_dirs {
     my @dirs;
 
     foreach my $dir ( @{ $self->{conf}->{dir} } ) {
-
-        if ( !File::Spec->file_name_is_absolute($dir) ) {
-            confess "relative dirs are not supported";
-        }
-
-        push( @dirs, $dir );
+        push( @dirs, Backup::EZ::Dir->new($dir) );
     }
 
     $self->_debug( Dumper \@dirs );
     return @dirs;
+}
+
+=head2 get_conf_dirs
+
+Returns a list Backup::EZ::Dir objects as read from the conf file.
+
+=cut
+
+sub get_conf_dirs {
+    my $self = shift;
+    return $self->_get_dirs;        
 }
 
 sub _ssh {
@@ -273,6 +282,122 @@ sub _get_dest_login {
     return sprintf( '%s@%s', $username, $hostname );
 }
 
+sub _rsync_no_recursion {
+    my $self          = shift;
+    my $dir           = shift;
+    my @extra_options = @_;
+
+    my $rsync_opts = '-dlptgoD';
+    my $cmd;
+    my $login;
+
+    if ( $self->{dryrun} ) {
+        push( @extra_options, '--dry-run' );
+    }
+
+    $self->_mk_dest_dir( sprintf( "%s%s", $self->_get_dest_tmp_dir, $dir ) );
+    $login = $self->_get_dest_login;
+
+    # uncoverable branch false
+    if ( $self->_is_unit_test ) {
+        $cmd = sprintf(
+            "rsync %s $rsync_opts %s/ %s%s",
+            join( ' ', @extra_options ), $dir,
+            $self->_get_dest_tmp_dir, $dir
+        );
+    }
+    else {
+        $cmd = sprintf(
+            "rsync %s $rsync_opts -e ssh %s/ %s:%s%s",
+            join( ' ', @extra_options ),
+            $dir, $login, $self->_get_dest_tmp_dir, $dir
+        );
+    }
+
+    $cmd .= " --exclude-from " . $self->{exclude_file};
+
+    $self->_debug($cmd);
+    system($cmd);
+
+    # uncoverable branch true
+    confess if $?;
+}
+
+sub _rsync2 {
+    my $self = shift;
+    my %a    = @_;
+    
+    my $dir          = $a{dir} or confess "missing dir arg";
+    my $link_dest    = $a{link_dest};
+    my $archive_opts = $a{archive_opts} || '-az';
+    my $extra_opts   = $a{extra_opts} || [];
+    
+    my $cmd;
+    my $login;
+
+    if ( $self->{dryrun} ) {
+        push @$extra_opts, '--dry-run';
+    }
+
+    if ($link_dest) {
+        push @$extra_opts, "--link-dest $link_dest";
+    }
+
+    if ( $self->{exclude_file} ) {
+        push @$extra_opts, "--exclude-from " . $self->{exclude_file};
+    }
+
+    $self->_mk_dest_dir( sprintf( "%s%s", $self->_get_dest_tmp_dir, $dir ) );
+    $login = $self->_get_dest_login;
+
+    # uncoverable branch false
+    if ( $self->_is_unit_test ) {
+        $cmd = sprintf(
+            "rsync %s %s %s/ %s%s",
+            join(' ', @$extra_opts),
+            $archive_opts,               # archive options
+            $dir,                        # src dir
+            $self->_get_dest_tmp_dir,    # dest tmp dir
+            $dir,                        # dest sub dir
+        );
+    }
+    else {
+        $cmd = sprintf(
+            "rsync %s %s -e ssh %s/ %s:%s%s",
+            join( ' ', @{$extra_opts} ),    # extra rsync options
+            $archive_opts,                  # archive options
+            $dir,                           # src dir
+            $login,                         # login
+            $self->_get_dest_tmp_dir,       # dest tmp dir
+            $dir,                           # dest sub dir
+        );
+    }
+   
+    #
+    # fail safe bailout in case of bug
+    # 
+    my @cmd = split(/\s+/, $cmd);
+    my $link_cnt = 0;
+    foreach my $c (@cmd) {
+        if ($c =~ /link-dest/) {
+            $link_cnt++    
+        }    
+    }
+    
+    if ($link_cnt > 1) {
+        confess "too many link-dest args: $cmd";     
+    }
+   
+    #
+    # ok execute 
+    # 
+    $self->_debug($cmd);
+    system($cmd);
+    
+    # uncoverable branch true
+    confess if $?;
+}
+
 sub _rsync {
     my $self          = shift;
     my $dir           = shift;
@@ -313,11 +438,73 @@ sub _rsync {
     confess if $?;
 }
 
+sub _full_backup_chunked {
+    my $self = shift;
+    my $dir  = shift;
+
+    $self->_rsync2(
+        dir          => $dir->dirname,
+        archive_opts => ARCHIVE_NO_RECURSE_OPTS,
+        extra_opts   => $dir->excludes(),
+    );
+
+    my @entries = read_dir( $dir->dirname, prefix => 1 );
+
+    foreach my $entry (@entries) {
+        if ( -d $entry ) {
+            $self->_rsync2(
+                dir          => $entry,
+                archive_opts => DEFAULT_ARCHIVE_OPTS,
+                extra_opts   => $dir->excludes(),
+            );
+        }
+    }
+}
+
 sub _full_backup {
     my $self = shift;
     my $dir  = shift;
 
-    $self->_rsync($dir);
+    if ( $dir->chunked ) {
+        $self->_full_backup_chunked($dir);
+    }
+    else {
+        $self->_rsync2(
+            dir          => $dir->dirname,
+            archive_opts => DEFAULT_ARCHIVE_OPTS,
+            extra_opts   => $dir->excludes(),
+        );
+    }
+}
+
+sub _inc_backup_chunked {
+    my $self            = shift;
+    my $dir             = shift;
+    my $last_backup_dir = shift;
+    my $link_dest       = shift;
+   
+    $self->_rsync2(
+        dir          => $dir->dirname,
+        archive_opts => ARCHIVE_NO_RECURSE_OPTS,
+        extra_opts   => $dir->excludes(),
+        link_dest    => $link_dest,
+    );
+
+    my @entries = read_dir( $dir->dirname, prefix => 0 );
+    
+    foreach my $entry (@entries) {
+        
+        my $abs_entry = sprintf( '%s/%s', $dir->dirname, $entry );
+
+        if ( -d $abs_entry ) {
+            $self->_rsync2(
+                dir          => $abs_entry,
+                archive_opts => DEFAULT_ARCHIVE_OPTS,
+                extra_opts   => $dir->excludes(),
+                link_dest    => sprintf( '%s/%s', $link_dest, $entry ),
+            );
+        }
+    }
 }
 
 sub _inc_backup {
@@ -325,10 +512,24 @@ sub _inc_backup {
     my $dir             = shift;
     my $last_backup_dir = shift;
 
-    my $link_dest =
-      sprintf( "%s/%s/%s", $self->get_dest_dir, $last_backup_dir, $dir );
+    my $link_dest = sprintf(
+        "%s/%s/%s",
+        $self->get_dest_dir,    #
+        $last_backup_dir,       #
+        $dir->dirname,          #
+    );
 
-    $self->_rsync( $dir, "--link-dest $link_dest" );
+    if ( $dir->chunked ) {
+        $self->_inc_backup_chunked( $dir, $last_backup_dir, $link_dest );
+    }
+    else {
+        $self->_rsync2(
+            dir          => $dir->dirname,
+            archive_opts => DEFAULT_ARCHIVE_OPTS,
+            extra_opts   => $dir->excludes(),
+            link_dest    => $link_dest,
+        );
+    }
 }
 
 sub _mk_dest_dir {
@@ -352,6 +553,18 @@ sub _set_datestamp {
     );
 }
 
+=head2 dump_conf
+
+Does what it says.
+
+=cut
+
+sub dump_conf {
+    my $self = shift;
+
+    pdump $self->{conf};
+}
+
 =head2 backup
 
 Invokes the backup process.  Takes no args.
@@ -364,13 +577,14 @@ sub backup {
     $self->_mk_dest_dir( $self->get_dest_dir );
     my @backups = $self->get_list_of_backups;
     $self->_set_datestamp;
+    $self->_mk_dest_dir( $self->_get_dest_tmp_dir, $self->{dryrun} );
 
     foreach my $dir ( $self->_get_dirs ) {
+        
+        my $dirname = $dir->dirname();
+        if ( -d $dirname ) {
 
-        if ( -d $dir ) {
-
-            $self->_info("backing up $dir");
-            $self->_mk_dest_dir( $self->_get_dest_tmp_dir, $self->{dryrun} );
+            $self->_info("backing up $dirname");
 
             if ( !@backups ) {
 
@@ -378,19 +592,16 @@ sub backup {
                 $self->_full_backup($dir);
             }
             else {
-
                 # incremental
                 $self->_inc_backup( $dir, $backups[$#backups] );
             }
         }
         else {
-            $self->_info("skipping $dir because it does not exist");
-
+            $self->_info("skipping $dirname because it does not exist");
         }
 
     }
 
-    $self->_mk_dest_dir( $self->get_dest_dir, $self->{dryrun} );
     $self->_ssh(
         sprintf( "mv %s %s",
             $self->_get_dest_tmp_dir, $self->_get_dest_backup_dir ),

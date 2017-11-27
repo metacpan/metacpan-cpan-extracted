@@ -3,7 +3,7 @@ package RPerl::CompileUnit::Module::Class::Generator;
 use strict;
 use warnings;
 use RPerl::AfterSubclass;
-our $VERSION = 0.012_000;
+our $VERSION = 0.016_000;
 
 # [[[ OO INHERITANCE ]]]
 use parent qw(RPerl::CompileUnit::Module::Class);
@@ -29,11 +29,11 @@ sub ast_to_rperl__generate {
     ( my object $self, my string $package_name_underscores, my string_hashref $modes ) = @ARG;
     my string_hashref $rperl_source_group = {};
 
-    #    RPerl::diag( 'in Class::Generator->ast_to_rperl__generate(), received $self = ' . "\n" . RPerl::Parser::rperl_ast__dump($self) . "\n" );
+#    RPerl::diag( 'in Class::Generator->ast_to_rperl__generate(), received $self = ' . "\n" . RPerl::Parser::rperl_ast__dump($self) . "\n" );
 
     my string $self_class = ref $self;
 
-    # unwrap Class_72 from Module_25
+    # unwrap Class_76 from Module_25
     if ( ($self_class) eq 'Module_25' ) {
         $self       = $self->{children}->[0];
         $self_class = ref $self;
@@ -42,16 +42,16 @@ sub ast_to_rperl__generate {
 #    RPerl::diag( 'in Class::Generator->ast_to_rperl__generate(), have possibly-unwrapped $self = ' . "\n" . RPerl::Parser::rperl_ast__dump($self) . "\n" );
 #    die 'TMP DEBUG';
 
-    if ( ($self_class) ne 'Class_72' ) {
+    if ( ($self_class) ne 'Class_76' ) {
         die RPerl::Parser::rperl_rule__replace( 'ERROR ECOGEASRP00, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: Grammar rule '
                 . ($self_class)
-                . ' found where Module_25 or Class_72 expected, dying' )
+                . ' found where Module_25 or Class_76 expected, dying' )
             . "\n";
     }
 
-    # Class:   'use parent qw(' WordScoped ')' ';' Include Critic* Include* Constant* Properties MethodOrSubroutine* LITERAL_NUMBER ';' ;
-    # Class:   'use parent qw(' WordScoped ')' ';' Include Critic* Exports? Include* Constant* Properties SubroutineOrMethod* LITERAL_NUMBER ';' ;
-    my string $use_parent_qw_keyword     = $self->{children}->[0];
+    # Class: UseParent WordScoped ')' ';' Include Critic* Exports? Include* Constant* Properties SubroutineOrMethod* LITERAL_NUMBER ';' ;
+    # UseParent: 'use parent qw(' | 'use parent -norequire, qw(' ;
+    my string $use_parent_qw_keyword     = $self->{children}->[0]->{children}->[0];
     my string $parent_name               = $self->{children}->[1]->{children}->[0];
     my string $right_parenthesis         = $self->{children}->[2];
     my string $use_parent_semicolon      = $self->{children}->[3];
@@ -65,6 +65,7 @@ sub ast_to_rperl__generate {
     my string $retval_literal_number     = $self->{children}->[11];
     my string $retval_semicolon          = $self->{children}->[12];
 
+#    RPerl::diag( 'in Class::Generator->ast_to_rperl__generate(), have $use_parent_qw_keyword = ' . "\n" . RPerl::Parser::rperl_ast__dump($use_parent_qw_keyword) . "\n" );
 #    RPerl::diag( 'in Class::Generator->ast_to_rperl__generate(), have $exports_optional = ' . "\n" . RPerl::Parser::rperl_ast__dump($exports_optional) . "\n" );
 #    RPerl::diag( 'in Class::Generator->ast_to_rperl__generate(), have $exports_optional->{children}->[0] = ' . "\n" . RPerl::Parser::rperl_ast__dump($exports_optional->{children}->[0]) . "\n" );
 
@@ -106,26 +107,38 @@ sub ast_to_rperl__generate {
         }
 #        RPerl::diag( 'in Class::Generator->ast_to_rperl__generate(), AFTER EXPORTS, have $rperl_source_group->{PMC} = ' . "\n" . RPerl::Parser::rperl_ast__dump($rperl_source_group->{PMC}) . "\n" );
     }
-    
+
+#    RPerl::diag( 'in Class::Generator->ast_to_rperl__generate(), CHECKPOINT a000', "\n" );
+
     if ( exists $include_star->{children}->[0] ) {
         if ( $modes->{label} eq 'ON' ) {
             $rperl_source_group->{PMC} .= "\n" . '# [[[ INCLUDES ]]]' . "\n";
         }
     }
+
+#    RPerl::diag( 'in Class::Generator->ast_to_rperl__generate(), CHECKPOINT a001', "\n" );
+
     foreach my object $include ( @{ $include_star->{children} } ) { ## no critic qw(ProhibitPostfixControls)  # SYSTEM SPECIAL 6: PERL CRITIC FILED ISSUE #639, not postfix foreach or if
         $rperl_source_subgroup = $include->ast_to_rperl__generate($modes);
         RPerl::Generator::source_group_append( $rperl_source_group, $rperl_source_subgroup );
     }
+
+#    RPerl::diag( 'in Class::Generator->ast_to_rperl__generate(), CHECKPOINT a002', "\n" );
 
     if ( exists $constant_star->{children}->[0] ) {
         if ( $modes->{label} eq 'ON' ) {
             $rperl_source_group->{PMC} .= "\n" . '# [[[ CONSTANTS ]]]' . "\n";
         }
     }
+
+#    RPerl::diag( 'in Class::Generator->ast_to_rperl__generate(), CHECKPOINT a003', "\n" );
+
     foreach my object $constant ( @{ $constant_star->{children} } ) { ## no critic qw(ProhibitPostfixControls)  # SYSTEM SPECIAL 6: PERL CRITIC FILED ISSUE #639, not postfix foreach or if
         $rperl_source_subgroup = $constant->ast_to_rperl__generate($modes);
         RPerl::Generator::source_group_append( $rperl_source_group, $rperl_source_subgroup );
     }
+
+#    RPerl::diag( 'in Class::Generator->ast_to_rperl__generate(), CHECKPOINT a004', "\n" );
 
     if ( $modes->{label} eq 'ON' ) {
         $rperl_source_group->{PMC} .= "\n" . '# [[[ OO PROPERTIES ]]]' . "\n";
@@ -136,10 +149,16 @@ sub ast_to_rperl__generate {
     # generate accessors & mutators for inherited $properties
     my string $package_name_colons = $package_name_underscores;
     $package_name_colons =~ s/__/::/gxms;
+
+#    RPerl::diag( 'in Class::Generator->ast_to_rperl__generate(), CHECKPOINT a005', "\n" );
+
     my $parent_package_names = RPerl::CompileUnit::Module::Class::parent_and_grandparent_package_names($package_name_colons);
+
+#    RPerl::diag( 'in Class::Generator->ast_to_rperl__generate(), CHECKPOINT a006', "\n" );
+
 #    RPerl::diag( 'in Class::Generator->ast_to_rperl__generate(), have $parent_package_names = ' . Dumper($parent_package_names) . "\n" );
 
-    if ( ref $properties eq 'Properties_76' ) { ## no critic qw(ProhibitPostfixControls)  # SYSTEM SPECIAL 6: PERL CRITIC FILED ISSUE #639, not postfix foreach or if
+    if ( ref $properties eq 'Properties_82' ) { ## no critic qw(ProhibitPostfixControls)  # SYSTEM SPECIAL 6: PERL CRITIC FILED ISSUE #639, not postfix foreach or if
                                                 # non-empty $properties
         my string $properties_our_hashref = $properties->{children}->[0];
         my string $properties_equal       = $properties->{children}->[1];
@@ -177,7 +196,7 @@ sub ast_to_rperl__generate {
         $property_name       = $property_type_inner->{children}->[3]->{children}->[0];
         $property_name =~ s/^(\w+)\s*$/$1/gxms;    # strip trailing whitespace, caused by grammar matching operator names with trailing spaces
 
-        # DEV NOTE: we can do error checking once here instead of twice for TypeInnerProperties_238 & TypeInnerProperties_239 below
+        # DEV NOTE: we can do error checking once here instead of twice for TypeInnerProperties_244 & TypeInnerProperties_245 below
         # because they both have OpStringOrWord as sub-element 3, grabbed as $property_name above
         if ( $property_name ne $property_key ) {
             die 'ERROR ECOGEASRP21, CODE GENERATOR, ABSTRACT SYNTAX TO RPERL: redundant name mismatch, inner type name ' . q{'}
@@ -200,7 +219,7 @@ sub ast_to_rperl__generate {
         }
 
         # TypeInnerProperties -> MY Type '$TYPED_' OpStringOrWord OP19_VARIABLE_ASSIGN SubExpression
-        if ( ref $property_type_inner eq 'TypeInnerProperties_238' ) {
+        if ( ref $property_type_inner eq 'TypeInnerProperties_244' ) {
             $property_my            = $property_type_inner->{children}->[0];
             $property_type          = $property_type_inner->{children}->[1]->{children}->[0];
             $property_TYPED         = $property_type_inner->{children}->[2];
@@ -221,7 +240,7 @@ sub ast_to_rperl__generate {
         }
 
         # TypeInnerProperties -> MY Type '$TYPED_' OpStringOrWord OP02_ARRAY_THINARROW SubExpression ']' OP19_VARIABLE_ASSIGN 'undef'
-        elsif ( ref $property_type_inner eq 'TypeInnerProperties_239' ) {
+        elsif ( ref $property_type_inner eq 'TypeInnerProperties_245' ) {
             $property_my                    = $property_type_inner->{children}->[0];
             $property_type                  = $property_type_inner->{children}->[1]->{children}->[0];
             $property_TYPED                 = $property_type_inner->{children}->[2];
@@ -248,7 +267,7 @@ sub ast_to_rperl__generate {
         else {
             die RPerl::Parser::rperl_rule__replace( 'ERROR ECOGEASCP00, CODE GENERATOR, ABSTRACT SYNTAX TO C++: Grammar rule '
                     . ( ref $self )
-                    . ' found where TypeInnerProperties_238 or TypeInnerProperties_239 expected, dying' )
+                    . ' found where TypeInnerProperties_244 or TypeInnerProperties_245 expected, dying' )
                 . "\n";
         }
 
@@ -313,7 +332,7 @@ sub ast_to_rperl__generate {
                 }
 
                 # TypeInnerProperties -> MY Type '$TYPED_' WORD OP19_VARIABLE_ASSIGN SubExpression
-                if ( ref $property_type_inner eq 'TypeInnerProperties_238' ) {
+                if ( ref $property_type_inner eq 'TypeInnerProperties_244' ) {
                     $property_my            = $property_type_inner->{children}->[0];
                     $property_type          = $property_type_inner->{children}->[1]->{children}->[0];
                     $property_TYPED         = $property_type_inner->{children}->[2];
@@ -334,7 +353,7 @@ sub ast_to_rperl__generate {
                 }
 
                 # TypeInnerProperties -> MY Type '$TYPED_' WORD OP02_ARRAY_THINARROW SubExpression ']' OP19_VARIABLE_ASSIGN 'undef'
-                elsif ( ref $property_type_inner eq 'TypeInnerProperties_239' ) {
+                elsif ( ref $property_type_inner eq 'TypeInnerProperties_245' ) {
                     $property_my                    = $property_type_inner->{children}->[0];
                     $property_type                  = $property_type_inner->{children}->[1]->{children}->[0];
                     $property_TYPED                 = $property_type_inner->{children}->[2];
@@ -361,7 +380,7 @@ sub ast_to_rperl__generate {
                 else {
                     die RPerl::Parser::rperl_rule__replace( 'ERROR ECOGEASCP00, CODE GENERATOR, ABSTRACT SYNTAX TO C++: Grammar rule '
                             . ( ref $self )
-                            . ' found where TypeInnerProperties_238 or TypeInnerProperties_239 expected, dying' )
+                            . ' found where TypeInnerProperties_244 or TypeInnerProperties_245 expected, dying' )
                         . "\n";
                 }
 
@@ -393,7 +412,7 @@ sub ast_to_rperl__generate {
         }
         $rperl_source_group->{PMC} .= "\n" . $properties_right_brace . $properties_semicolon . "\n";
     }
-    else { # ( ref $properties eq 'Properties_77' ) { ## no critic qw(ProhibitPostfixControls)  # SYSTEM SPECIAL 6: PERL CRITIC FILED ISSUE #639, not postfix foreach or if
+    else { # ( ref $properties eq 'Properties_83' ) { ## no critic qw(ProhibitPostfixControls)  # SYSTEM SPECIAL 6: PERL CRITIC FILED ISSUE #639, not postfix foreach or if
               # empty $properties
         my string $properties_our_hashref = $properties->{children}->[0];
         my string $properties_equal       = $properties->{children}->[1];
@@ -451,27 +470,33 @@ sub ast_to_cpp__generate__CPPOPS_CPPTYPES {
 
     my string $self_class = ref $self;
 
-    # unwrap Class_72 from Module_25
+    # unwrap Class_76 from Module_25
     if ( ($self_class) eq 'Module_25' ) {
         $self       = $self->{children}->[0];
         $self_class = ref $self;
     }
 
-    if ( ($self_class) ne 'Class_72' ) {
+    if ( ($self_class) ne 'Class_76' ) {
         die RPerl::Parser::rperl_rule__replace( 'ERROR ECOGEASCP00, CODE GENERATOR, ABSTRACT SYNTAX TO C++, CPPOPS_CPPTYPES: Grammar rule '
                 . ($self_class)
-                . ' found where Module_25 or Class_72 expected, dying' )
+                . ' found where Module_25 or Class_76 expected, dying' )
             . "\n";
     }
 
-    # Class:   'use parent qw(' WordScoped ')' ';' Include Critic* Exports? Include* Constant* Properties SubroutineOrMethod* LITERAL_NUMBER ';' ;
+    # Class: UseParent WordScoped ')' ';' Include Critic* Exports? Include* Constant* Properties SubroutineOrMethod* LITERAL_NUMBER ';' ;
+    # UseParent: 'use parent qw(' | 'use parent -norequire, qw(' ;
     my string $parent_name               = $self->{children}->[1]->{children}->[0];
-    my string $use_keyword               = $self->{children}->[4]->{children}->[0];
+#    my string $parent_include            = $self->{children}->[4];  # DEV NOTE: the C++ code does not currently make use of the $parent_include line, instead utilizing only the $parent_name 
     my object $exports_optional          = $self->{children}->[6];
     my object $include_star              = $self->{children}->[7];
     my object $constant_star             = $self->{children}->[8];
     my object $properties                = $self->{children}->[9];
     my object $method_or_subroutine_star = $self->{children}->[10];
+
+    if ((not exists $cpp_source_group->{_parent_names}) or (not defined $cpp_source_group->{_parent_names})) {
+        $cpp_source_group->{_parent_names} = {};
+    }
+    $cpp_source_group->{_parent_names}->{$package_name_underscores} = $parent_name;
 
     if ( $modes->{label} eq 'ON' ) {
         $cpp_source_group->{H_INCLUDES} .= '// [[[ INCLUDES & OO INHERITANCE INCLUDES ]]]' . "\n";
@@ -532,33 +557,80 @@ EOL
 
     # NEED FIX WIN32: change hard-coded forward-slash in generated path name below?
     # NEED FIX: handle absolute vs relative include paths
-    #    RPerl::diag('in Class::Generator->ast_to_cpp__generate__CPPOPS_CPPTYPES(), have $parent_name = ' . $parent_name . "\n");
+#    RPerl::diag('in Class::Generator->ast_to_cpp__generate__CPPOPS_CPPTYPES(), have $parent_name = ' . $parent_name . "\n");
     my string $parent_name_path = $parent_name;
     $parent_name_path =~ s/::/\//gxms;
     $parent_name_path .= '.cpp';
-    if ( $parent_name =~ /^\w+Perl::Config$/ ) {    # DEV NOTE, CORRELATION #rp027: MathPerl::Config, PhysicsPerl::Config, etc
 
+    my string $parent_name_underscores = $parent_name;
+    $parent_name_underscores =~ s/::/__/gxms;
+
+#    RPerl::diag( 'in Class::Generator->ast_to_cpp__generate__CPPOPS_CPPTYPES(), have $parent_name_underscores = ' . $parent_name_underscores . "\n");
+
+    # DEV NOTE: avoid namespace clobbering of CPPOPS base class over PERLOPS base class
+    if ( $parent_name_underscores eq 'RPerl__CompileUnit__Module__Class' ) {
+        $parent_name_underscores .= '__CPP';
+    }
+
+    # DEV NOTE, CORRELATION #rp044: shared logic between class parent includes and misc user includes, always check both when changing either
+    my boolean $is_rperl_system = 0;
+    my boolean $is_rperl_test = 0;
+    if ( ( ( substr $parent_name_path, 0, 5 ) eq 'RPerl' ) or ( ( substr $parent_name_path, 0, 5 ) eq 'rperl' ) ) {
+        if ( ( ( substr $parent_name_path, 0, 10 ) eq 'RPerl/Test' ) or ( ( substr $parent_name_path, 0, 10 ) eq 'RPerl\Test' ) ) {
+            $is_rperl_test = 1;
+        }
+        else {
+            $is_rperl_system = 1;
+        }
+    }
+    
+    if ( $parent_name =~ /^\w+Perl::Config$/ ) {    # DEV NOTE, CORRELATION #rp027: MathPerl::Config, PhysicsPerl::Config, etc
         #        RPerl::diag('in Class::Generator->ast_to_cpp__generate__CPPOPS_CPPTYPES(), skipping system config file $parent_name = ' . $parent_name . "\n");
     }
-    elsif ( ( ( substr $parent_name_path, 0, 5 ) ne 'RPerl' ) and ( ( substr $parent_name_path, 0, 5 ) ne 'rperl' ) ) {
-#        RPerl::diag('in Class::Generator->ast_to_cpp__generate__CPPOPS_CPPTYPES(), have user-defined module to possibly be #include $parent_name = ' . $parent_name . "\n");
+    elsif ( $is_rperl_test or (not $is_rperl_system) ) {
+        # DEV NOTE: RPerl::Test files do not qualify as RPerl system files
 #        RPerl::diag('in Class::Generator->ast_to_cpp__generate__CPPOPS_CPPTYPES(), have $modes = ' . Dumper($modes) . "\n");
 
         # DEV NOTE, CORRELATION #rp042: do not recursively load the same .cpp/.h file from within itself
         # it is incorrect for a subclass inside a multi-class file to include its parent class' .cpp file name, which is the .cpp version of it's own .h file name 
-        my $parent_name_length = (length $parent_name) + 3;
-        if (($parent_name . '.pm') ne (substr $modes->{_input_file_name_current}, ($parent_name_length * -1), $parent_name_length)) {
+        if ((not exists $modes->{_input_file_name_current}) or (not defined $modes->{_input_file_name_current}) or ($modes->{_input_file_name_current} eq q{})) {
+            die 'ERROR ECOGEASCP46, CODE GENERATOR, ABSTRACT SYNTAX TO C++: Undefined or empty value provided for current input file name, dying' . "\n";
+        }
+        my string $input_file_name_current_underscores = $modes->{_input_file_name_current};
+
+        substr $input_file_name_current_underscores, -3, 3, q{};  # remove trailing '.pm' 
+        $input_file_name_current_underscores =~ s/\//__/gxms;
+        $input_file_name_current_underscores =~ s/\\/__/gxms;
+
+        my integer $parent_name_underscores_length = (length $parent_name_underscores);
+        $input_file_name_current_underscores = substr $input_file_name_current_underscores, ($parent_name_underscores_length * -1), $parent_name_underscores_length;  # remove leading @INC directories 'lib', etc.
+#        RPerl::diag( 'in Class::Generator->ast_to_cpp__generate__CPPOPS_CPPTYPES(), have user-defined module to possibly #include $input_file_name_current_underscores = ' . $input_file_name_current_underscores . "\n");
+
+        if ($parent_name_underscores ne $input_file_name_current_underscores) {
             # non-RPerl user-defined module, wrapped in double-quotes " " to denote user nature
             $cpp_source_group->{H_INCLUDES} .= '#include "' . $parent_name_path . '"' . "\n";
+#            RPerl::diag('in Class::Generator->ast_to_cpp__generate__CPPOPS_CPPTYPES(), have user-defined module to #include $parent_name = ' . $parent_name . "\n");
+        }
+        else {
+            $cpp_source_group->{H_INCLUDES} .= '//#include "' . $parent_name_path . '" // DISABLED: do not recursively load the same .cpp/.h file from within itself' . "\n";
+#            RPerl::diag('in Class::Generator->ast_to_cpp__generate__CPPOPS_CPPTYPES(), have user-defined module to NOT #include $parent_name = ' . $parent_name . "\n");
         }
     }
     else {
         # RPerl system module, wrapped in angle-brackets < > to denote system nature
+#        RPerl::diag('in Class::Generator->ast_to_cpp__generate__CPPOPS_CPPTYPES(), have RPerl system module to #include $parent_name = ' . $parent_name . "\n");
         $cpp_source_group->{H_INCLUDES} .= '#include <' . $parent_name_path . '>' . "\n";
     }
     $cpp_source_group->{CPP} .= '#include "__NEED_HEADER_PATH"' . "\n";  # DEV NOTE, CORRELATION #rp033: defer setting header include path until files are saved in Compiler
 
+#    RPerl::diag('in Class::Generator->ast_to_cpp__generate__CPPOPS_CPPTYPES(), have $cpp_source_group->{H} = ' . "\n" . $cpp_source_group->{H} . "\n");
+#    RPerl::diag('in Class::Generator->ast_to_cpp__generate__CPPOPS_CPPTYPES(), have $cpp_source_group->{H_INCLUDES} = ' . "\n" . $cpp_source_group->{H_INCLUDES} . "\n");
+
     my string_hashref $cpp_source_subgroup;
+
+
+
+
 
 
 
@@ -588,6 +660,11 @@ EOL
 #        RPerl::diag( 'in Class::Generator->ast_to_cpp__generate__CPPOPS_CPPTYPES(), AFTER EXPORTS, have $rperl_source_group->{H} = ' . "\n" . RPerl::Parser::rperl_ast__dump($rperl_source_group->{H}) . "\n" );
     }
 =cut
+
+
+
+
+
 
 
 
@@ -632,15 +709,6 @@ EOL
     if ( $modes->{label} eq 'ON' ) {
         $cpp_source_group->{H} .= '// [[[ OO INHERITANCE ]]]' . "\n";
     }
-    my string $parent_name_underscores = $parent_name;
-    $parent_name_underscores =~ s/::/__/gxms;
-
-    #    RPerl::diag( 'in Class::Generator->ast_to_cpp__generate__CPPOPS_CPPTYPES(), have $parent_name_underscores = ' . $parent_name_underscores . "\n");
-
-    # DEV NOTE: avoid namespace clobbering of CPPOPS base class over PERLOPS base class
-    if ( $parent_name_underscores eq 'RPerl__CompileUnit__Module__Class' ) {
-        $parent_name_underscores .= '__CPP';
-    }
 
     $cpp_source_group->{H} .= 'class ' . $package_name_underscores . ' : public ' . $parent_name_underscores . ' {' . "\n";
     $cpp_source_group->{H} .= 'public:' . "\n";
@@ -649,6 +717,7 @@ EOL
     my string_arrayref $properties_accessors_mutators_shims = [];
     my string_arrayref $properties_declarations             = [];
     my string_arrayref $properties_initializations          = [];
+    my string_arrayref $properties_initializers             = [];
     my string $property_declaration;
 
     # prepare for later use in:
@@ -662,7 +731,7 @@ EOL
     # non-empty $properties
     # Properties -> 'our hashref $properties' OP19_VARIABLE_ASSIGN LBRACE HashEntryProperties STAR-27 '}' ';'
     # HashEntryProperties -> WORD OP20_HASH_FATARROW TypeInnerProperties
-    if ( ref $properties eq 'Properties_76' ) { ## no critic qw(ProhibitPostfixControls)  # SYSTEM SPECIAL 6: PERL CRITIC FILED ISSUE #639, not postfix foreach or if
+    if ( ref $properties eq 'Properties_82' ) { ## no critic qw(ProhibitPostfixControls)  # SYSTEM SPECIAL 6: PERL CRITIC FILED ISSUE #639, not postfix foreach or if
         $modes->{_inside_class_properties} = 1;
         $property_declaration = q{};
         my object $property_0        = $properties->{children}->[3];
@@ -682,7 +751,7 @@ EOL
         my string $property_name               = $property_type_inner->{children}->[3]->{children}->[0];
         $property_name =~ s/^(\w+)\s*$/$1/gxms;    # strip trailing whitespace, caused by grammar matching operator names with trailing spaces
 
-        # DEV NOTE: we can do error checking once here instead of twice for TypeInnerProperties_238 & TypeInnerProperties_239 below
+        # DEV NOTE: we can do error checking once here instead of twice for TypeInnerProperties_244 & TypeInnerProperties_245 below
         # because they both have OpStringOrWord as sub-element 3, grabbed as $property_name above
         if ( $property_name ne $property_key ) {
             # DEV NOTE, CORRELATION #rp030: matches numbering of ECOGEPPRP20 in RPerl/CompileUnit/Module/Class.pm
@@ -702,20 +771,20 @@ EOL
         }
 
         # TypeInnerProperties -> MY Type '$TYPED_' WORD OP19_VARIABLE_ASSIGN SubExpression
-        if ( ref $property_type_inner eq 'TypeInnerProperties_238' ) {
+        if ( ref $property_type_inner eq 'TypeInnerProperties_244' ) {
             $property_type          = $property_type_inner->{children}->[1]->{children}->[0];
             $property_subexpression = $property_type_inner->{children}->[5];
         }
 
         # TypeInnerProperties -> MY Type '$TYPED_' WORD OP02_ARRAY_THINARROW SubExpression ']' OP19_VARIABLE_ASSIGN 'undef'
-        elsif ( ref $property_type_inner eq 'TypeInnerProperties_239' ) {
+        elsif ( ref $property_type_inner eq 'TypeInnerProperties_245' ) {
             $property_type               = $property_type_inner->{children}->[1]->{children}->[0];
             $property_arrayref_index_max = $property_type_inner->{children}->[5];
         }
         else {
             die RPerl::Parser::rperl_rule__replace( 'ERROR ECOGEASCP00, CODE GENERATOR, ABSTRACT SYNTAX TO C++: Grammar rule '
                     . ( ref $self )
-                    . ' found where TypeInnerProperties_238 or TypeInnerProperties_239 expected, dying' )
+                    . ' found where TypeInnerProperties_244 or TypeInnerProperties_245 expected, dying' )
                 . "\n";
         }
 
@@ -765,9 +834,9 @@ EOL
 
         $property_declaration = q{    } . $property_type . q{ } . $property_key;
 
-        # SubExpression_150 ISA RPerl::Operation::Expression::SubExpression::Literal::Undefined,
+        # SubExpression_156 ISA RPerl::Operation::Expression::SubExpression::Literal::Undefined,
         # don't perform any C++ initialization for properties initialized to 'undef' in Perl
-        if ( ( defined $property_subexpression ) and ( ( ref $property_subexpression ) ne 'SubExpression_150' ) ) {
+        if ( ( defined $property_subexpression ) and ( ( ref $property_subexpression ) ne 'SubExpression_156' ) ) {
             $cpp_source_subgroup = $property_subexpression->ast_to_cpp__generate__CPPOPS_CPPTYPES($modes);
             $property_declaration .= ' = ' . $cpp_source_subgroup->{CPP};
         }
@@ -775,9 +844,12 @@ EOL
         $property_declaration .= ';';
         push @{$properties_declarations}, $property_declaration;
 
-        $cpp_source_subgroup = ast_to_cpp__generate_accessors_mutators__CPPOPS_CPPTYPES( $property_key, $modes->{_symbol_table}->{_namespace}, $modes );
+        $cpp_source_subgroup = ast_to_cpp__generate_accessors_mutators_initializers__CPPOPS_CPPTYPES( $property_key, $modes->{_symbol_table}->{_namespace}, $package_name_underscores, 0, $modes );  # $is_inherited = 0
         if ( $cpp_source_subgroup->{H} ne q{} ) {
             push @{$properties_accessors_mutators}, $cpp_source_subgroup->{H};
+        }
+        if ( $cpp_source_subgroup->{_H_initializers} ne q{} ) {
+            push @{$properties_initializers}, $cpp_source_subgroup->{_H_initializers};
         }
         if ((exists $cpp_source_subgroup->{PMC}) and (defined $cpp_source_subgroup->{PMC}) and ($cpp_source_subgroup->{PMC} ne q{})) {
             push @{$properties_accessors_mutators_shims}, $cpp_source_subgroup->{PMC};
@@ -804,7 +876,7 @@ EOL
             $property_name       = $property_type_inner->{children}->[3]->{children}->[0];
             $property_name =~ s/^(\w+)\s*$/$1/gxms;     # strip trailing whitespace, caused by grammar matching operator names with trailing spaces
 
-            # DEV NOTE: we can do error checking once here instead of twice for TypeInnerProperties_238 & TypeInnerProperties_239 below
+            # DEV NOTE: we can do error checking once here instead of twice for TypeInnerProperties_244 & TypeInnerProperties_245 below
             # because they both have OpStringOrWord as sub-element 3, grabbed as $property_name above
             if ( $property_name ne $property_key ) {
                 # DEV NOTE, CORRELATION #rp030: matches numbering of ECOGEPPRP20 in RPerl/CompileUnit/Module/Class.pm
@@ -824,20 +896,20 @@ EOL
             }
 
             # TypeInnerProperties -> MY Type '$TYPED_' WORD OP19_VARIABLE_ASSIGN SubExpression
-            if ( ref $property_type_inner eq 'TypeInnerProperties_238' ) {
+            if ( ref $property_type_inner eq 'TypeInnerProperties_244' ) {
                 $property_type          = $property_type_inner->{children}->[1]->{children}->[0];
                 $property_subexpression = $property_type_inner->{children}->[5];
             }
 
             # TypeInnerProperties -> MY Type '$TYPED_' WORD OP02_ARRAY_THINARROW SubExpression ']' OP19_VARIABLE_ASSIGN 'undef'
-            elsif ( ref $property_type_inner eq 'TypeInnerProperties_239' ) {
+            elsif ( ref $property_type_inner eq 'TypeInnerProperties_245' ) {
                 $property_type               = $property_type_inner->{children}->[1]->{children}->[0];
                 $property_arrayref_index_max = $property_type_inner->{children}->[5];
             }
             else {
                 die RPerl::Parser::rperl_rule__replace( 'ERROR ECOGEASCP00, CODE GENERATOR, ABSTRACT SYNTAX TO C++: Grammar rule '
                         . ( ref $self )
-                        . ' found where TypeInnerProperties_238 or TypeInnerProperties_239 expected, dying' )
+                        . ' found where TypeInnerProperties_244 or TypeInnerProperties_245 expected, dying' )
                     . "\n";
             }
 
@@ -887,9 +959,9 @@ EOL
 
             $property_declaration = q{    } . $property_type . q{ } . $property_key;
 
-            # SubExpression_150 ISA RPerl::Operation::Expression::SubExpression::Literal::Undefined,
+            # SubExpression_156 ISA RPerl::Operation::Expression::SubExpression::Literal::Undefined,
             # don't perform any C++ initialization for properties initialized to 'undef' in Perl
-            if ( ( defined $property_subexpression ) and ( ( ref $property_subexpression ) ne 'SubExpression_150' ) ) {
+            if ( ( defined $property_subexpression ) and ( ( ref $property_subexpression ) ne 'SubExpression_156' ) ) {
                 $cpp_source_subgroup = $property_subexpression->ast_to_cpp__generate__CPPOPS_CPPTYPES($modes);
                 $property_declaration .= ' = ' . $cpp_source_subgroup->{CPP};
             }
@@ -897,9 +969,12 @@ EOL
             $property_declaration .= ';';
             push @{$properties_declarations}, $property_declaration;
 
-            $cpp_source_subgroup = ast_to_cpp__generate_accessors_mutators__CPPOPS_CPPTYPES( $property_key, $modes->{_symbol_table}->{_namespace}, $modes );
+            $cpp_source_subgroup = ast_to_cpp__generate_accessors_mutators_initializers__CPPOPS_CPPTYPES( $property_key, $modes->{_symbol_table}->{_namespace}, $package_name_underscores, 0, $modes );  # $is_inherited = 0
             if ( $cpp_source_subgroup->{H} ne q{} ) {
                 push @{$properties_accessors_mutators}, $cpp_source_subgroup->{H};
+            }
+            if ( $cpp_source_subgroup->{_H_initializers} ne q{} ) {
+                push @{$properties_initializers}, $cpp_source_subgroup->{_H_initializers};
             }
             if ((exists $cpp_source_subgroup->{PMC}) and (defined $cpp_source_subgroup->{PMC}) and ($cpp_source_subgroup->{PMC} ne q{})) {
                 push @{$properties_accessors_mutators_shims}, $cpp_source_subgroup->{PMC};
@@ -908,15 +983,24 @@ EOL
         delete $modes->{_inside_class_properties};
     }
 
+
+
+
+
+
+
     # generate accessors & mutators for inherited $properties
     foreach my $parent_package_name (@{$parent_package_names}) {
 #        RPerl::diag( 'in Class::Generator->ast_to_cpp__generate__CPPOPS_CPPTYPES(), have $parent_package_name = ' . $parent_package_name . "\n" );
 #        RPerl::diag( 'in Class::Generator->ast_to_cpp__generate__CPPOPS_CPPTYPES(), have $modes->{_symbol_table}->{ $parent_package_name . q{::} } = ' . Dumper($modes->{_symbol_table}->{ $parent_package_name . q{::} }) . "\n" );
         foreach my $parent_property_key (keys %{ $modes->{_symbol_table}->{ $parent_package_name . q{::} }->{_properties} }) {
             if (not exists $modes->{_symbol_table}->{ $package_name_colons . q{::} }->{_properties}->{$parent_property_key}) {
-                $cpp_source_subgroup = ast_to_cpp__generate_accessors_mutators__CPPOPS_CPPTYPES( $parent_property_key, $parent_package_name . q{::}, $modes );
+                $cpp_source_subgroup = ast_to_cpp__generate_accessors_mutators_initializers__CPPOPS_CPPTYPES( $parent_property_key, $parent_package_name . q{::}, $package_name_underscores, 1, $modes );  # $is_inherited = 1
                 if ( $cpp_source_subgroup->{H} ne q{} ) {
                     push @{$properties_accessors_mutators}, $cpp_source_subgroup->{H};
+                }
+                if ( $cpp_source_subgroup->{_H_initializers} ne q{} ) {
+                    push @{$properties_initializers}, $cpp_source_subgroup->{_H_initializers};
                 }
                 if ((exists $cpp_source_subgroup->{PMC}) and (defined $cpp_source_subgroup->{PMC}) and ($cpp_source_subgroup->{PMC} ne q{})) {
                     push @{$properties_accessors_mutators_shims}, $cpp_source_subgroup->{PMC};
@@ -924,6 +1008,13 @@ EOL
             }
         }
     }
+
+
+
+
+
+
+
 
     if ( exists $properties_declarations->[0] ) {
         if ( $modes->{label} eq 'ON' ) {
@@ -995,7 +1086,7 @@ EOL
         @{ $method_or_subroutine_star->{children} }
         )
     {
-        if ( ( ref $method_or_subroutine ) eq 'SubroutineOrMethod_88' ) {    # METHOD
+        if ( ( ref $method_or_subroutine ) eq 'SubroutineOrMethod_94' ) {    # METHOD
             $cpp_source_subgroup = $method_or_subroutine->ast_to_cpp__generate_declaration__CPPOPS_CPPTYPES($modes);
             push @{$method_declarations}, $cpp_source_subgroup->{H};
             $cpp_source_subgroup = $method_or_subroutine->ast_to_cpp__generate__CPPOPS_CPPTYPES( $package_name_underscores, $modes );
@@ -1004,7 +1095,7 @@ EOL
                 $cpp_source_group->{H_INCLUDES} .= $cpp_source_subgroup->{H_INCLUDES};
             }
         }
-        elsif ( ( ref $method_or_subroutine ) eq 'SubroutineOrMethod_87' ) {    # SUBROUTINE
+        elsif ( ( ref $method_or_subroutine ) eq 'SubroutineOrMethod_93' ) {    # SUBROUTINE
             $cpp_source_subgroup = $method_or_subroutine->ast_to_cpp__generate_declaration__CPPOPS_CPPTYPES($modes);
             push @{$subroutine_declarations}, $cpp_source_subgroup->{H};
             $cpp_source_subgroup = $method_or_subroutine->ast_to_cpp__generate__CPPOPS_CPPTYPES($modes);
@@ -1021,7 +1112,7 @@ EOL
         else {
             die RPerl::Parser::rperl_rule__replace( 'ERROR ECOGEASCP00, CODE GENERATOR, ABSTRACT SYNTAX TO C++, CPPOPS_CPPTYPES: Grammar rule '
                     . ( ref $method_or_subroutine )
-                    . ' found where SubroutineOrMethod_88 or SubroutineOrMethod_87 expected, dying' )
+                    . ' found where SubroutineOrMethod_94 or SubroutineOrMethod_93 expected, dying' )
                 . "\n";
         }
     }
@@ -1065,6 +1156,38 @@ EOL
     $cpp_source_group->{H} .= 'typedef std::unordered_map<string, ' . $package_name_underscores . '_ptr> ' . $package_name_underscores . '_hashref;' . "\n";
     $cpp_source_group->{H}
         .= 'typedef std::unordered_map<string, ' . $package_name_underscores . '_ptr>::iterator ' . $package_name_underscores . '_hashref_iterator;' . "\n\n";
+
+    if ( $modes->{label} eq 'ON' ) {
+        $cpp_source_group->{H} .= '// [[[ OO CONSTRUCTOR WRAPPER CLASS ]]]' . "\n";
+    }
+
+    $cpp_source_group->{H} .= 'class NEW_' . $package_name_underscores . ' {' . "\n";
+    $cpp_source_group->{H} .= 'public:' . "\n";
+    $cpp_source_group->{H} .= q{    } . $package_name_underscores . '_ptr wrapped_object;' . "\n";
+    $cpp_source_group->{H} .= q{    } . 'NEW_' . $package_name_underscores . '() : wrapped_object{new ' . $package_name_underscores . '()} {}' . "\n";
+    $cpp_source_group->{H} .= q{    } . $package_name_underscores . '_ptr&& NEW() { return std::move(wrapped_object); }' . "\n\n";
+
+    if ( exists $properties_initializers->[0] ) {
+        if ( $modes->{label} eq 'ON' ) {
+            $cpp_source_group->{H} .= '    // <<< OO PROPERTIES, INITIALIZERS >>>' . "\n";
+        }
+        $cpp_source_group->{H} .= ( join "\n", @{$properties_initializers} ) . "\n";
+    }
+
+    $cpp_source_group->{H} .= '};' . "\n\n";
+
+=HARDCODED_EXAMPLE
+// [[[ OO CONSTRUCTOR WRAPPER CLASS ]]]
+class NEW_MyClass02LowRPerlNew {
+public:
+    MyClass02LowRPerlNew_ptr wrapped_object;
+    NEW_MyClass02LowRPerlNew() : wrapped_object{new MyClass02LowRPerlNew()} {}
+    MyClass02LowRPerlNew_ptr&& NEW() { return std::move(wrapped_object); }
+
+    // <<< OO PROPERTIES, INITIALIZERS >>>
+    NEW_MyClass02LowRPerlNew& bar(integer bar_init) { wrapped_object->bar = bar_init; return *this; }
+};
+=cut
 
     if ( exists $subroutine_declarations->[0] ) {
         if ( $modes->{label} eq 'ON' ) {
@@ -1116,12 +1239,12 @@ EOL
 }
 
 # generate accessors/mutators
-sub ast_to_cpp__generate_accessors_mutators__CPPOPS_CPPTYPES {
+sub ast_to_cpp__generate_accessors_mutators_initializers__CPPOPS_CPPTYPES {
     { my string_hashref $RETURN_TYPE };
-    ( my string $property_key, my string $namespace_from, my string_hashref $modes ) = @ARG;
-    my string_hashref $cpp_source_group = { H => q{} };
+    ( my string $property_key, my string $namespace_from, my string $package_name_underscores, my boolean $is_inherited, my string_hashref $modes ) = @ARG;
+    my string_hashref $cpp_source_group = { H => q{}, _H_initializers => q{} };
 
-#    RPerl::diag( "\n" . 'in Class::Generator::ast_to_cpp__generate_accessors_mutators__CPPOPS_CPPTYPES(), received $modes = ' . "\n" . Dumper($modes) . "\n" );
+#    RPerl::diag( "\n" . 'in Class::Generator::ast_to_cpp__generate_accessors_mutators_initializers__CPPOPS_CPPTYPES(), received $modes = ' . "\n" . Dumper($modes) . "\n" );
 
     # grab RPerl-style type out of symtab, instead of accepting-as-arg now-C++-style type from $property_type in caller
 #    my string $property_type = $modes->{_symbol_table}->{ $modes->{_symbol_table}->{_namespace} }->{_properties}->{$property_key}->{type};
@@ -1189,10 +1312,22 @@ sub ast_to_cpp__generate_accessors_mutators__CPPOPS_CPPTYPES {
     }
 
     if ($is_direct) {
-        $cpp_source_group->{H} = $property_type . ' get_' . $property_key . '() { return this->' . $property_key . '; }' . "\n";
-        $cpp_source_group->{H}
-            .= 'void set_' . $property_key . '(' . $property_type . q{ } . $property_key . '_new) { this->' . $property_key . ' = ' . $property_key . '_new; }';
+        my string $inherited_comment = q{};
+        if ($is_inherited) { $inherited_comment = '  // inherited from ' . $namespace_from; }
+
+        # disabled unnecessary usage of 'this->'
+#        $cpp_source_group->{H} = $property_type . ' get_' . $property_key . '() { return this->' . $property_key . '; }' . "\n";
+#        $cpp_source_group->{H} .= 'void set_' . $property_key . '(' . $property_type . q{ } . $property_key . '_new) { this->' . $property_key . ' = ' . $property_key . '_new; }';
+
+        $cpp_source_group->{H} = q{    } . $property_type . ' get_' . $property_key . '() { return ' . $property_key . '; }' . $inherited_comment . "\n";
+        $cpp_source_group->{H} .= q{    } . 'void set_' . $property_key . '(' . $property_type . q{ } . $property_key . '_new) { ' . $property_key . ' = ' . $property_key . '_new; }' . $inherited_comment;
+
+        # HARD-CODED EXAMPLE
+        # NEW_MyClass02LowRPerlNew& bar(integer bar_init) { wrapped_object->bar = bar_init; return *this; }
+        $cpp_source_group->{_H_initializers} .= q{    } . 'NEW_' . $package_name_underscores . '& ' . $property_key . '(' . $property_type . q{ } . $property_key . 
+                                                '_init) { wrapped_object->' . $property_key . ' = ' . $property_key . '_init; return *this; }' . $inherited_comment;
     }
+    # NEED UPDATE: remove unnecessary usage of 'this->' below
     else {
 # HARD-CODED EXAMPLE:
 #integer get_bodies_size() { return this->bodies.size(); }  // call from Perl or C++
@@ -1268,11 +1403,11 @@ sub ast_to_cpp__generate_accessors_mutators__CPPOPS_CPPTYPES {
             . $property_key
             . '_element_rawptr; }  // call from Perl';
 
-#        RPerl::diag( "\n" . 'in Class::Generator::ast_to_cpp__generate_accessors_mutators__CPPOPS_CPPTYPES(), have $modes->{subcompile} = ' . "\n" . $modes->{subcompile} . "\n" );
+#        RPerl::diag( "\n" . 'in Class::Generator::ast_to_cpp__generate_accessors_mutators_initializers__CPPOPS_CPPTYPES(), have $modes->{subcompile} = ' . "\n" . $modes->{subcompile} . "\n" );
 
         # DEV NOTE: only generate PMC output file in dynamic (default) subcompile mode
         if ($modes->{subcompile} eq 'DYNAMIC') {
-#            RPerl::diag( 'in Class::Generator::ast_to_cpp__generate_accessors_mutators__CPPOPS_CPPTYPES(), YES PMC SHIMS' . "\n" );
+#            RPerl::diag( 'in Class::Generator::ast_to_cpp__generate_accessors_mutators_initializers__CPPOPS_CPPTYPES(), YES PMC SHIMS' . "\n" );
             # Perl shim code
             # DEV NOTE: must create return variable object in Perl so it will be memory-managed by Perl,
             # and not wrongly destructed or double-destructed by Perl garbage collector and/or C++ memory.h,
@@ -1295,9 +1430,9 @@ sub ast_to_cpp__generate_accessors_mutators__CPPOPS_CPPTYPES {
 #            $cpp_source_group->{PMC} .= '}';  # DEV NOTE: use alternate syntax to avoid "subroutine redefined" errors
             $cpp_source_group->{PMC} .= '};';
         }
-#        else { RPerl::diag( 'in Class::Generator::ast_to_cpp__generate_accessors_mutators__CPPOPS_CPPTYPES(), NO PMC SHIMS' . "\n" ); }
+#        else { RPerl::diag( 'in Class::Generator::ast_to_cpp__generate_accessors_mutators_initializers__CPPOPS_CPPTYPES(), NO PMC SHIMS' . "\n" ); }
 
-#            RPerl::diag( 'in Class::Generator::ast_to_cpp__generate_accessors_mutators__CPPOPS_CPPTYPES(), have $cpp_source_group->{H} = ' . "\n" . $cpp_source_group->{H} . "\n" );
+#            RPerl::diag( 'in Class::Generator::ast_to_cpp__generate_accessors_mutators_initializers__CPPOPS_CPPTYPES(), have $cpp_source_group->{H} = ' . "\n" . $cpp_source_group->{H} . "\n" );
     }
     return $cpp_source_group;
 }

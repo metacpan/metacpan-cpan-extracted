@@ -16,32 +16,38 @@ Hash: SHA1
 
 SHA1 9f0bb4288bdd0bf6cc3ecf82287999f5b192bbf1 AUTHOR_PLEDGE
 SHA1 49995296ce73e15b4c391ed802370cf4aadf465d CONTRIBUTORS
-SHA1 094f5c30e4133d50b1d5b6902f1cc3cc7b618e95 Changes
+SHA1 a0b89559051d88f1e7c253b71d61e2d4de15e073 Changes
 SHA1 20acd1c8d2edc306404eb95a67387dc028fd0c4a INSTALL
-SHA1 5b807b764a3d24ce4f99fc96878cfe82bcc03288 LICENSE
-SHA1 54ad7d80049cfe9264ec2a7e9e2f133613309ac6 MANIFEST
-SHA1 8a44020f89f14645399bf6a857fe4bc3a0e2f4e2 META.json
-SHA1 10bdcf67412edbd1383fd35e1d4404ab7cc1e7be META.yml
-SHA1 0c0343e16a33e564aa567d87c3a147f1b2c991ee Makefile.PL
-SHA1 aac9e7c0953b84c12e12f7d34ebab888d43fbbab README.mkdn
-SHA1 b84cb735f744a40cdcf40f96b141022e3163800f cpanfile
-SHA1 6a3a86649aba6a1087cde80a30bb32aa629cfdb4 doap.xml
+SHA1 87ca88d6d75efdd70d3d87f5a4075f5508bc8829 LICENSE
+SHA1 68b3ac7d8896057516f7b216278526c03746d44e MANIFEST
+SHA1 cf471fba059d42272acc5b01ea79e246f00565ff META.json
+SHA1 877be130c688158e1677184de2a12c4e649550a3 META.yml
+SHA1 c32537e644f3686bb88bef09fa23739e9263cb0f Makefile.PL
+SHA1 9a8f53ae7554d46bd3a6e6af436bd247318435d5 README.mkdn
+SHA1 b37d3ef4c3ad859d3cc037e8f4619db29f984ef4 bin/nvimx.pl
+SHA1 a1b3edc3b28bdcfc5778cee9975b26afe1591e0c contrib/init.vim
+SHA1 6bf7d7c37027ebea7218240354d5c807593a2d18 cpanfile
+SHA1 44050823145d0320cfd1f2a2c23b15d0f5ddd2f7 doap.xml
 SHA1 ec5086c8d6212a77735993634c21a60afcf144b6 examples/channel.pl
 SHA1 d5c482fbcb06e4ea753b1dd65feec0af0bf0b98b examples/dsl.pl
-SHA1 c2efb1c83e01f3ed9ceeddc27a6e7778c8958666 examples/load_plugins.pl
-SHA1 ae6003599d44ad34573ec210efd2334b911b23dc examples/neovimx.pl
-SHA1 ccbde89b7437bcf2acf2aa4cce35b75817b612ec examples/print_commands.pl
+SHA1 9f6cacbb72f4f51a59aef77bce61f2477e876ed0 examples/load_plugins.pl
+SHA1 a392f223c9b591733a0969be3b450b7ab9e18713 examples/neovimx.pl
+SHA1 cd03dab6ef1c409e1b4b2fc1d5055fffb287793c examples/print_commands.pl
 SHA1 92d4310499b7a6a7fa6920d6febf116abe8aff51 examples/push-channel.pl
+SHA1 542d9e6689568884920126cfda877b9a0403d6a4 examples/reply.pl
 SHA1 533d6632ed436e57e778d5bff7dee91b336922d6 examples/simple-1.pl
-SHA1 609143d8cde3ad3dd768e32b874bea935754d193 lib/Neovim/RPC.pm
-SHA1 fad79292d110227da3a95cae24c8542184029c34 lib/Neovim/RPC/API.pm
-SHA1 b1071bab216a5e45f69e72ab9c59745db7895f5e lib/Neovim/RPC/API/AutoDiscover.pm
-SHA1 6dcc4899cd98b80f2d49994f6172b276848d9542 lib/Neovim/RPC/API/Command.pm
-SHA1 f3a5f726b1be7b499ac1c6e5cbf486e37b6583fc lib/Neovim/RPC/Plugin.pm
-SHA1 78f323fceeaeb207b1182ace2f6c723b6dd890e7 lib/Neovim/RPC/Plugin/FileToPackageName.pm
-SHA1 86218cb6f63cccf91a94a1e0ebf5bedc797c24f4 lib/Neovim/RPC/Plugin/LoadPlugin.pm
-SHA1 ee9792a6fd8ac2543d15ca50cf7e1bc9ee919f7c t/00-compile.t
-SHA1 6c82f1f00e6f41d4548bf259a16e1e41cedc04e9 t/00-report-prereqs.dd
+SHA1 0185bce8b0e0671e650d1e22817aa0456e357ce2 flip_operator/aliases.vim
+SHA1 8a82c96d3ecffa4a9ed5aa8a03c35b32b4d6d1d3 lib/Neovim/RPC.pm
+SHA1 a6694fa3f56da3b76b3fc88dfb0829a84aa1c2f5 lib/Neovim/RPC/API.pm
+SHA1 a3697f3a55792922d5c5befdd7331fca4c52d108 lib/Neovim/RPC/API/AutoDiscover.pm
+SHA1 65e42d0c03df9434e7d16cb81b2a7a5b6953dc93 lib/Neovim/RPC/API/Command.pm
+SHA1 7e1c8a9d0e9ab1e2dac49413ae3cb0d50a6f6289 lib/Neovim/RPC/Plugin.pm
+SHA1 921d084d54523b27af3b4b6d291a2362cf35e0af lib/Neovim/RPC/Plugin/Echo.pm
+SHA1 ffda888c007c1ad88f0b900c64b2f000d697082b lib/Neovim/RPC/Plugin/FileToPackageName.pm
+SHA1 1a1c68a490b3c8ba93cdd91ccdc2229b366d2bd4 lib/Neovim/RPC/Plugin/FlipOperator.pm
+SHA1 14ba56b453f5f78ac1914d7c2921ffbe3b9fc59a lib/Neovim/RPC/Plugin/LoadPlugin.pm
+SHA1 a88c017c5e5e7692c1a64163fd07dd2ea544a17f t/00-compile.t
+SHA1 ac36f0fcc364c6b86e56a8b1a8b29631f4c59b8d t/00-report-prereqs.dd
 SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
 SHA1 0b92d57bbf680c73871f530e7ed52ad9882c547f t/buffer.t
 SHA1 aed337ba99934f73e6be606abe5f8a91bc94985d t/lib/Test/Neovim.pm
@@ -51,7 +57,7 @@ SHA1 a22acea2146e69324247e9e464559b171705a279 taskwarrior/taskw.pl
 SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
 -----BEGIN PGP SIGNATURE-----
 
-iEYEARECAAYFAli4y+AACgkQ34Hwf+GwC4zf/ACgga822kH2IQUVxjdgQ0hb3mnx
-NS4AoNMNAqPXy2nVaDZBmLzjp/akALeE
-=8Izg
+iEYEARECAAYFAlobH4gACgkQ34Hwf+GwC4xlMACeMGD/kW1dmWv7uyHff3lAmg+w
+thUAoJ47mLdqijYP3gnE5aRhUz1pFF4y
+=MviL
 -----END PGP SIGNATURE-----

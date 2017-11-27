@@ -83,10 +83,10 @@
          "web" : "https://github.com/duckduckgo/duckduckgo"
       }
    },
-   "version" : "1017",
+   "version" : "1018",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.016003"
+         "version" : "5.026000"
       },
       "plugins" : [
          {
@@ -379,7 +379,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "1017",
+                  "tag" : "1018",
                   "tag_format" : "%v",
                   "tag_message" : "v%v"
                },

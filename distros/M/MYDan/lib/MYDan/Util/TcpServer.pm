@@ -30,13 +30,15 @@ sub new
     system( "mkdir -p '$this{tmp}'" ) unless -d $this{tmp};
     map{ unlink $_ if $_ =~ /\/\d+$/ || $_ =~ /\/\d+\.out$/ }glob "$this{tmp}/*";
 
+    map{ $this{$_} ||= $this{buf} }qw( rbuf wbuf );
+
     bless \%this, ref $class || $class;
 }
 
 sub run
 {
     my $this = shift;
-    my ( $port, $max, $exec, $tmp ) = @$this{qw( port max exec tmp )};
+    my ( $port, $max, $exec, $tmp, $rbuf, $wbuf ) = @$this{qw( port max exec tmp rbuf wbuf )};
 
     my $version = $MYDan::VERSION; $version =~ s/\./0/g;
 
@@ -63,7 +65,10 @@ sub run
             if( $data->{handle}->fh )
             {
                 $data->{handle}->push_write( "*#*MYDan_$version*#" );
-                if ( open my $tmp_handle, '<', "$tmp/$index.out" )
+
+                my $size = $wbuf ? ( stat "$tmp/$index.out" )[7] || 0 : 0;
+
+                if ( ( ! $wbuf || ( $wbuf && $size <= $wbuf ) ) && open my $tmp_handle, '<', "$tmp/$index.out" )
                 {
                     #seek( $tmp_handle, -16384, SEEK_END );
                     while(<$tmp_handle>)
@@ -131,10 +136,11 @@ sub run
            },
            on_read => sub {
                my $self = shift;
-               printf "read len:%s\n",  length $self->{rbuf};
+               $index{$index}{rbuf} += length $self->{rbuf};
+
                $self->unshift_read (
                    chunk => length $self->{rbuf},
-                   sub { print $tmp_handle $_[1]; }
+                   sub { print $tmp_handle $_[1] if ! $rbuf || ( $rbuf && $index{$index}{rbuf} <= $rbuf ); }
                );
             },
             on_error => sub {

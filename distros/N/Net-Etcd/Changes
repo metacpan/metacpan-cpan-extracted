@@ -1,8 +1,28 @@
 Revision history for Net::Etcd
+0.017
+[ ENHANCEMENTS ]
+* Add TLS support
+* Added cacert accessor.
+* Updated Travis to setup TLS etcd and run all tests using TLS.
+
+0.016
+[ ENHANCEMENTS ]
+* Added status, defragment, version and status methods to Maintenance class.
+* Added ability to check $etcd->version
+* Add is_success and content helper methods to Action role.
+* Updated POD.
+
+0.015
+[ ENHANCEMENTS ]
+* Add ability to retry_auth. This feature is very useful for refreshing stale tokens. Closes GH #26
 
 0.014
 [ BUG FIX ]
 * Resolved bug which prevented range delete transaction from completing. Closed via GH #25 Thanks Ananth Kavuri! 
+
+[ ANNOUNCEMENT ]
+* Added class Net::Etcd::KV::RangeDelete
+* Range delete is now rangedelete method calling delete against Range is deprecated.
 
 0.013
 [ ENHANCEMENTS ]

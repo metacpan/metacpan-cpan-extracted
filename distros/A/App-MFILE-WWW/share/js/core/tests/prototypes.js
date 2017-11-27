@@ -50,8 +50,8 @@ define ([
 
             // target
             assert.strictEqual(typeof t, 'object', 't is an object');
-            assert.strictEqual(typeof t.name, 'object', 'target.name OK');
-            assert.strictEqual(t.name, null, 't.name OK');
+            assert.strictEqual(typeof t.name, 'string', 'target.name OK');
+            assert.strictEqual(t.name, 'protoTarget', 't.name OK');
             assert.strictEqual(typeof t.menuText, 'string', 'target.menuText OK');
             assert.strictEqual(t.menuText, '(none)', 't.menuText OK');
             assert.strictEqual(typeof t.source, 'string', 'target.source OK');

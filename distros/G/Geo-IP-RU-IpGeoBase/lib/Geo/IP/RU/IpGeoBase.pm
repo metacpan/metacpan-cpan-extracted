@@ -4,7 +4,7 @@ use warnings;
 
 package Geo::IP::RU::IpGeoBase;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 NAME
 
@@ -157,7 +157,7 @@ sub insert_record {
     my $query = 
         "INSERT INTO $table(". join( ', ', map $dbh->quote_identifier($_), @keys) .")"
         ." VALUES (". join( ', ', map $dbh->quote( $rec{$_} ), @keys ) .")";
-    return $dbh->do( $query ) or die "Couldn't execute '$query': ". $dbh->errstr;
+    return $dbh->do( $query ) || die "Couldn't execute '$query': ". $dbh->errstr;
 }
 
 sub update_record {
@@ -181,7 +181,7 @@ sub update_record {
             map $dbh->quote_identifier($_) .' = '. $dbh->quote($rec{$_}),
                 qw(istart iend)
         );
-    return $dbh->do( $query ) or die "Couldn't execute '$query': ". $dbh->errstr;
+    return $dbh->do( $query ) || die "Couldn't execute '$query': ". $dbh->errstr;
 }
 
 sub delete_record {
@@ -192,7 +192,7 @@ sub delete_record {
     my $query = "DELETE FROM $table WHERE "
         . $dbh->quote_identifier('istart') .' = '. $dbh->quote($istart)
         .' AND '. $dbh->quote_identifier('iend') .' = '. $dbh->quote($iend);
-    return $dbh->do( $query ) or die "Couldn't execute '$query': ". $dbh->errstr;
+    return $dbh->do( $query ) || die "Couldn't execute '$query': ". $dbh->errstr;
 }
 
 sub decode {
@@ -271,7 +271,7 @@ CREATE TABLE $table (
 )
 END
     return $self->dbh->do( $query )
-        or die "Couldn't execute '$query': ". $self->dbh->errstr;
+        || die "Couldn't execute '$query': ". $self->dbh->errstr;
 }
 
 sub create_mysql_table {
@@ -293,7 +293,7 @@ CREATE TABLE $table (
 ) CHARACTER SET 'utf8'
 END
     return $self->dbh->do( $query )
-        or die "Couldn't execute '$query': ". $self->dbh->errstr;
+        || die "Couldn't execute '$query': ". $self->dbh->errstr;
 }
 
 sub create_pg_table {
@@ -316,7 +316,7 @@ CREATE TABLE $table (
 )
 END
     return $self->dbh->do( $query )
-        or die "Couldn't execute '$query': ". $self->dbh->errstr;
+        || die "Couldn't execute '$query': ". $self->dbh->errstr;
 }
 
 =head1 AUTHOR

@@ -4,7 +4,7 @@ Params::ValidationCompiler - Build an optimized subroutine parameter validator o
 
 # VERSION
 
-version 0.24
+version 0.25
 
 # SYNOPSIS
 
@@ -129,12 +129,12 @@ of these subs accept the same options:
 - named\_to\_list
 
     If this is true, the generated subroutine will expect a list of key-value
-    pairs or a hashref and it will return a list containing only the values.
-    `params` must be a arrayref of key-value pairs in the order of which the
-    values should be returned.
+    pairs or a hashref and it will return a list containing only values. The
+    `params` you pass must be a arrayref of key-value pairs. The order of these
+    pairs determines the order in which values are returned.
 
     You cannot combine `slurpy` with `named_to_list` as there is no way to know
-    how the order in which extra values should be returned.
+    how to order the extra return values.
 
 ## validation\_for(...)
 
@@ -151,13 +151,16 @@ a list of values.
 
 For now, you must shift off the invocant yourself.
 
-This subroutine accepts an additional parameter:
+This subroutine accepts the following additional parameters:
 
 - name
 
     If this is given, then the generated subroutine will be named using
     [Sub::Util](https://metacpan.org/pod/Sub::Util). This is strongly recommended as it makes it possible to
     distinguish different check subroutines when profiling or in stack traces.
+
+    This name will also be used in some exception messages, even if [Sub::Util](https://metacpan.org/pod/Sub::Util)
+    is not available.
 
     Note that you must install [Sub::Util](https://metacpan.org/pod/Sub::Util) yourself separately, as it is not
     required by this distribution, in order to avoid requiring a compiler.

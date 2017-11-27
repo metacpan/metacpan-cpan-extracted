@@ -8,10 +8,13 @@ my $build = Module::Build->new(
 	configure_requires => { 'Module::Build' => 0.38 },
 	script_files => ['scripts/shopify-liquid-verify.pl', 'scripts/shopify-liquid-beautify.pl'],
 	requires => {
+		'perl' => '5.12.5',
 		'Scalar::Util' => 0,
 		'Clone' => 0,
 		'URI::Escape' => 0,
 		'File::Slurp' => 0,
+		'File::Find' => 0,
+		'File::stat' => 0,
 		'JSON' => 0,
 		'List::Util' => 0,
 		'List::MoreUtils' => 0,
@@ -22,7 +25,9 @@ my $build = Module::Build->new(
 		'DateTime' => 0,
 		'Date::Parse' => 0,
 		'DateTime::Format::Strptime' => 0,
-		'HTML::Entities' => 0
+		'HTML::Entities' => 0,
+		're::engine::RE2' => 0,
+		'Text::Unaccent::PurePerl' => 0
 	}
 );
 $build->create_build_script;

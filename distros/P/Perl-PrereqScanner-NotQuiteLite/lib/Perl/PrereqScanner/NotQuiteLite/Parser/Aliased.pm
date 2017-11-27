@@ -18,8 +18,11 @@ sub parse_aliased_args {
   if (is_version($tokens->[0])) {
     $c->add($used_module => shift @$tokens);
   }
-  if (is_module_name($tokens->[0])) {
-    my $module = shift @$tokens;
+  my $module = $tokens->[0];
+  if (ref $module) {
+    $module = $module->[0];
+  }
+  if (is_module_name($module)) {
     $c->add($module => 0);
   }
 

@@ -11,10 +11,11 @@ build_requires:
   Test::Requires: '0'
   Try::Tiny: '0'
 configure_requires:
-  Devel::PPPort: '3.22'
+  Devel::PPPort: '3.33'
   ExtUtils::ParseXS: '3.22'
   Module::Build: '0.4005'
   Module::Build::XSUtil: '0'
+  version: '0.9913'
 dynamic_config: 0
 generated_by: 'Minilla/v3.0.13, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -34,7 +35,7 @@ no_index:
 provides:
   Mouse:
     file: lib/Mouse.pm
-    version: v2.4.10
+    version: v2.5.0
   Mouse::Exporter:
     file: lib/Mouse/Exporter.pm
   Mouse::Meta::Attribute:
@@ -71,15 +72,15 @@ provides:
     file: lib/Mouse/PurePerl.pm
   Mouse::Role:
     file: lib/Mouse/Role.pm
-    version: v2.4.10
+    version: v2.5.0
   Mouse::Spec:
     file: lib/Mouse/Spec.pm
-    version: v2.4.10
+    version: v2.5.0
   Mouse::TypeRegistry:
     file: lib/Mouse/TypeRegistry.pm
   Mouse::Util:
     file: lib/Mouse/Util.pm
-    version: v2.4.10
+    version: v2.5.0
   Mouse::Util::MetaRole:
     file: lib/Mouse/Util/MetaRole.pm
   Mouse::Util::TypeConstraints:
@@ -100,10 +101,11 @@ resources:
   bugtracker: https://github.com/gfx/p5-Mouse/issues
   homepage: https://github.com/gfx/p5-Mouse
   repository: git://github.com/gfx/p5-Mouse.git
-version: v2.4.10
+version: v2.5.0
 x_contributors:
   - 'Aleksandr Matveev <a.matveev@corp.mail.ru>'
   - 'Alex Solovey <a.solovey@gmail.com>'
+  - 'Bernhard M. Wiedemann <bwiedemann@suse.de>'
   - 'Boutros Lab User <blabuser@oicr.on.ca>'
   - 'Brett <orderthruchaos@gmail.com>'
   - 'Chris Prather <chris@prather.org>'
@@ -135,6 +137,8 @@ x_contributors:
   - 'Sergiy Zuban <s.zuban@trackingsoft.com>'
   - 'Shawn M Moore <sartak@bestpractical.com>'
   - 'Shawn M Moore <sartak@gmail.com>'
+  - 'Shoichi Kaji <skaji@cpan.org>'
+  - 'Shoichi Kaji <skaji@outlook.com>'
   - 'Stanislaw Pusep <creaktive@gmail.com>'
   - 'Syohei YOSHIDA <syohex@gmail.com>'
   - 'Todd Rinaldo <toddr@cpan.org>'
@@ -149,4 +153,4 @@ x_contributors:
   - 'wu-lee <mouse.git.wu-lee@noodlefactory.co.uk>'
   - 'Ævar Arnfjörð Bjarmason <avarab@gmail.com>'
   - '大沢 和宏 <yappo@shibuya.pl>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

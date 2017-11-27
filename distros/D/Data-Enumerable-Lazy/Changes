@@ -1,4 +1,12 @@
 Revision history for Perl extension Data::Enumerable::Lazy.
 
+0.03 Tue Nov 21 21:28:00 2017
+  - Fixed META.yml and META.json absence
+  - Removed VCS folder
+
+0.02 Tue Nov 14 08:50:00 2017
+  - Fixed documentation formatting
+  - Added Test::Exception to the manifest file
+
 0.01  Mon Nov 13 20:42:18 2017
 	- Packaged the very first version

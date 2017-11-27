@@ -3,8 +3,8 @@ package PDF::Builder::Lite;
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.007'; # VERSION
-my $LAST_UPDATE = '3.004'; # manually update whenever code is changed
+our $VERSION = '3.008'; # VERSION
+my $LAST_UPDATE = '3.008'; # manually update whenever code is changed
 
 BEGIN {
 
@@ -35,13 +35,15 @@ PDF::Builder::Lite - Lightweight PDF creation methods
 
 =over
 
+=item $pdf = PDF::Builder::Lite->new(%opts)
+
 =item $pdf = PDF::Builder::Lite->new()
 
 =cut
 
 sub new {
     my $class = shift;
-    my %opt = @_;
+   #my %opts = @_;
 
     my $self = {};
     bless($self, $class);
@@ -91,6 +93,9 @@ sub mediabox {
 Saves the document (may not be modified later) and
 deallocates the PDF structures.
 
+If C<$file> is just a hyphen '-', the stringified copy is returned, otherwise
+the file is saved, and C<$self> is returned (for chaining calls).
+
 =cut
 
 sub saveas {
@@ -102,6 +107,7 @@ sub saveas {
         $self->{'api'}->saveas($file);
         return $self;
     }
+    # is the following code ever reached? - Phil
     $self->{'api'}->end();
     foreach my $k (keys %{$self}) {
         if      (blessed($k) and $k->can('release')) {
@@ -236,6 +242,8 @@ sub image_png {
     return $self->{'api'}->image_png($file);
 }
 
+=item $img = $pdf->image_tiff($file, %opts)
+
 =item $img = $pdf->image_tiff($file)
 
 Returns a new TIFF image object.
@@ -243,9 +251,9 @@ Returns a new TIFF image object.
 =cut
 
 sub image_tiff {
-    my ($self, $file) = @_;
+    my ($self, $file, @opts) = @_;
 
-    return $self->{'api'}->image_tiff($file);
+    return $self->{'api'}->image_tiff($file, @opts);
 }
 
 =item $img = $pdf->image_pnm($file)
@@ -347,7 +355,7 @@ or the hsl-hex-notation:
 
     &hsl, &hhssll, &hhhssslll and &hhhhssssllll
 
-and additionally the hsv-hex-notation:
+or the hsv-hex-notation:
 
     !hsv, !hhssvv, !hhhsssvvv and !hhhhssssvvvv
 
@@ -446,15 +454,18 @@ sub curve { # x1,y1,x2,y2,x3,y3 ...
     return $self;
 }
 
+=item $pdf->arc($xc,$yc, $rx,$ry, $alpha,$beta, $move, $dir)
+
 =item $pdf->arc($xc,$yc, $rx,$ry, $alpha,$beta, $move)
 
 Draw an arc centered at C[$xc,$yc], with x radius C[$rx] and y radius C[$ry],
 from C[$alpha] degrees to C[$beta] degrees. If C[$move] is I<true>, do B<not>
-draw a line to the start of the arc.
+draw a line to the start of the arc. C[$dir] defaults to 0 for counter-clockwise
+sweep, and may be set to 1 for a clockwise sweep.
 
 =cut
 
-sub arc { # xc,yc, rx,ry, alpha,beta [,mov]
+sub arc { # xc,yc, rx,ry, alpha,beta ,move [,dir]
     my $self = shift;
 
     $self->{'gfx'}->arc(@_);

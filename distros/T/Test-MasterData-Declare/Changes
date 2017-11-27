@@ -1,5 +1,13 @@
 Revision history for Perl extension Test-MasterData-Declare
 
+0.02 2017-11-23T13:08:21Z
+    - fix `relation` and `expect_row`
+
+0.01_01 2017-11-21T09:56:31Z
+
+    - support perl-5.20 or under
+    - use Text::CSV_XS
+
 0.01 2017-11-21T08:19:36Z
 
     - original version

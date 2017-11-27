@@ -166,4 +166,63 @@ is($text, q{asjkldfskljghdfkjlghkjldfhglkjdfhgkljdfhgklj
 asdfsdfsadfsdfd});
 
 
+
+@tokens = $parser->unparse_tokens($ast);
+@tokens = $liquid->{beautifier}->beautify(@tokens);
+$liquid->lexer->unparse_spaces(1);
+$text = $liquid->lexer->unparse_text(@tokens);
+is($text, q{asjkldfskljghdfkjlghkjldfhglkjdfhgkljdfhgklj
+	{% assign has_one = 0 %}
+	{% capture order_list %}
+		{% for order in orders %}
+			{% assign should_capture = 0 %}
+			{% for line_item in order.line_items %}
+				{% assign builder_id = line_item.properties | pluck: 'name', 'builder_id', 'value' %}
+				{% assign dateProp = line_item.properties | pluck: 'name', 'Delivery Date Required', 'value' | replace: '[^0-9\/]', '' | date_parse: '%d/%m/%Y' %}
+				{% if dateProp and dateProp < end_date and dateProp > start_date and order.fulfillment_status == null %}
+					{% assign should_capture = 1 %}
+				{% endif %}
+			{% endfor %}
+			{% if should_capture %}
+				{% if has_one %}
+					,
+				{% endif %}
+				{{ order.id }}
+				{% for li in order.line_items %}
+					{% assign bid = li.properties | pluck: 'name', 'builder_id', 'value' %}
+					{% if bid == builder_id %}
+						:
+						{{ li.id }}
+					{% endif %}
+				{% endfor %}
+				{% assign has_one = 1 %}
+			{% endif %}
+		{% endfor %}
+	{% endcapture %}
+	{% assign override.html = '<a target="_blank" href="https://value-flora.myshopify.com/apps/notifyme/order_fulfillment?orders=" + order_list + "&secret=sljgalksjlfdhfdlghdlghfd">Fulfill</a>' %}
+asdfsdfsadfsdfd});
+
+
+
+$string = '{% if (a | first) == "B" %}A{% assign c = {} %}{% elsif a.first == "C" %}B{% else %}C{% endif %}';
+@tokens = $lexer->parse_text($string);
+
+$ast = $parser->parse_tokens(@tokens);
+
+@tokens = $parser->unparse_tokens($ast);
+@tokens = $liquid->{beautifier}->beautify(@tokens);
+
+$liquid->lexer->unparse_spaces(1);
+$text = $liquid->lexer->unparse_text(@tokens);
+is($text, "{% if a | first == 'B' %}
+	A
+	{% assign c = {} %}
+{% elsif a.first == 'C' %}
+	B
+{% else %}
+	C
+{% endif %}");
+
+
+
 done_testing();

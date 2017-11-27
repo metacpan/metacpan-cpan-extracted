@@ -1,5 +1,17 @@
 # XML::RPC Changes
 
+2017/11/21  (1.1)
+    * Add facility to add HTTP *Basic* Auth
+    * Require LWP::Protocol::https to be installed
+      (hey, it's 2017, we can assume that https is available....)
+      This implicitly fixes bug 118475 "XML::RPC not reporting error if https connection requested but LWP::Protocol::https not installed" 
+    * Implement recommended patch for #75078 "autodetection of XML datatyp <i4> for string of digits starting with 0"
+
+2017/11/21  (1.0) Rene "cavac" Schickbauer
+    * First release by me for this module
+    * Integrate/Merge changes from XML::RPC::CustomUA
+      (and deprecate CustomUA module at the same time)
+
 2009/01/01  (0.9) (by Alexandr Ciornii)
     * better Makefile.PL
     * 2 tests added

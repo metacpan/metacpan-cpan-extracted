@@ -1,7 +1,7 @@
 package DDG::Region;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: A region, can be empty [TODO]
-$DDG::Region::VERSION = '1017';
+$DDG::Region::VERSION = '1018';
 use Moo;
 
 my @region_attributes = qw();
@@ -23,7 +23,7 @@ DDG::Region - A region, can be empty [TODO]
 
 =head1 VERSION
 
-version 1017
+version 1018
 
 =head1 AUTHOR
 

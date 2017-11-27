@@ -1,3 +1,4 @@
+## no critic(Modules::RequireFilenameMatchesPackage)
 package Coding::Error::Pathological;
 
 use strict;

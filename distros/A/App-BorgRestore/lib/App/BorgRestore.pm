@@ -3,7 +3,7 @@ use v5.14;
 use strict;
 use warnings;
 
-our $VERSION = "2.1.1";
+our $VERSION = "2.2.0";
 
 use App::BorgRestore::Borg;
 use App::BorgRestore::DB;
@@ -13,10 +13,8 @@ use App::BorgRestore::Settings;
 use autodie;
 use Carp;
 use Cwd qw(abs_path getcwd);
-use File::Basename;
+use Path::Tiny;
 use File::pushd;
-use File::Spec;
-use File::Temp;
 use Function::Parameters;
 use Getopt::Long;
 use List::Util qw(any all);
@@ -130,7 +128,7 @@ Returns an absolute path for a given path.
 =cut
 
 method resolve_relative_path($path) {
-	my $canon_path = File::Spec->canonpath($path);
+	my $canon_path = path($path)->canonpath;
 	my $abs_path = abs_path($canon_path);
 
 	if (!defined($abs_path)) {
@@ -195,8 +193,7 @@ method find_archives($path) {
 	}
 
 	if (!@ret) {
-		$log->errorf("Path '%s' not found in any archive.\n", $path);
-		die "Failed to find archives for path\n";
+		die $log->errorf("Path '%s' not found in any archive.", $path)."\n";
 	}
 
 	@ret = sort { $a->{modification_time} <=> $b->{modification_time} } @ret;
@@ -228,13 +225,25 @@ method get_all_archives() {
 	}
 
 	if (!@ret) {
-		$log->errorf("No archives found.\n");
-		die "No archives found.\n";
+		die $log->error("No archives found.")."\n";
 	}
 
 	@ret = sort { $a->{modification_time} <=> $b->{modification_time} } @ret;
 
 	return \@ret;
+}
+
+=head3 cache_contains_data
+
+ if ($app->cache_contains_data()) { ... }
+
+Returns 1 if the cache contains any archive data, 0 otherwise.
+
+=cut
+
+method cache_contains_data() {
+	my $existing_archives = $self->{db}->get_archive_names();
+	return @{$existing_archives}+0 > 0 ? 1 : 0;
 }
 
 =head3 select_archive_timespec
@@ -252,8 +261,7 @@ s (seconds), min (minutes), h (hours), d (days), m (months = 31 days), y (year).
 method select_archive_timespec($archives, $timespec) {
 	my $seconds = $self->_timespec_to_seconds($timespec);
 	if (!defined($seconds)) {
-		$log->errorf("Invalid time specification: %s", $timespec);
-		croak "Invalid time specification";
+		croak $log->errorf("Invalid time specification: %s", $timespec);
 	}
 
 	my $target_timestamp = time - $seconds;
@@ -267,7 +275,7 @@ method select_archive_timespec($archives, $timespec) {
 		}
 	}
 
-	die "Failed to find archive matching time specification\n";
+	die $log->error("Failed to find archive matching time specification")."\n";
 }
 
 method _timespec_to_seconds($timespec) {
@@ -326,7 +334,7 @@ method restore($path, $archive, $destination) {
 
 	$log->infof("Restoring %s to %s from archive %s", $path, $destination, $archive->{archive});
 
-	my $basename = basename($path);
+	my $basename = path($path)->basename;
 	my $components_to_strip =()= $path =~ /\//g;
 
 	$log->debugf("CWD is %s", getcwd());
@@ -497,6 +505,12 @@ Updates the database used by e.g. C<find_archives>.
 =cut
 
 method update_cache() {
+	my $v2_basedir = App::BorgRestore::Settings::get_cache_base_dir_path("v2");
+	if (-e $v2_basedir) {
+		$log->info("Removing old v2 cache directory: $v2_basedir");
+		path($v2_basedir)->remove_tree;
+	}
+
 	$log->debug("Updating cache if required");
 
 	my $borg_archives = $self->{borg}->borg_list();

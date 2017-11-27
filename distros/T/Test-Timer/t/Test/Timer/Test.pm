@@ -11,7 +11,7 @@ our @EXPORT_OK = qw(_sleep);
 sub _sleep {
     my $interval = shift;
 
-    select(undef, undef, undef, $interval);
+    sleep($interval);
 
     return $interval;
 }

@@ -56,8 +56,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Alien::JPCRE2" : "0.009",
-            "Alien::PCRE2" : "0.014",
+            "Alien::JPCRE2" : "0.012",
+            "Alien::PCRE2" : "0.015",
             "Alien::astyle" : "0.009",
             "App::Pod2CpanHtml" : "0.04",
             "CPAN::Meta" : "2.150005",
@@ -107,6 +107,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#perl11"
    },
-   "version" : "3.200000",
+   "version" : "3.400000",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

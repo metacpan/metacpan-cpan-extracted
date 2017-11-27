@@ -19,7 +19,7 @@ Text::VisualWidth::PP - trimming text by the number of the column s of terminals
 
 This module provides functions to treat half-width and full-width characters and display correct size of text in one line on terminals and mobile phones. You can know the visual width of any text and truncate text by the visual width. Now this module support flagged UTF-8 and tested only with Japanese.
 
-This module is pure perl version of [Text::VisualWidth](http://search.cpan.org/perldoc?Text::VisualWidth). This is bit slow, but it's not require compiler.
+This module is pure perl version of [Text::VisualWidth](https://metacpan.org/pod/Text::VisualWidth). This is bit slow, but it's not require compiler.
 
 # Ambiguous Characters
 
@@ -29,17 +29,15 @@ And you can specify the behavior by the `$Text::VisualWidth::PP::EastAsian` flag
 
 Note: If `$Unicode::EastAsianWidth::EastAsian` is true on compilation time, this module set `$Text::VisualWidth::PP::EastAsian` as true for backward compatibility.
 
-
-
-If you want to detect the ambw parameter from users' environment, please look [Unicode::EastAsianWidth::Detect](http://search.cpan.org/perldoc?Unicode::EastAsianWidth::Detect).
+If you want to detect the ambw parameter from users' environment, please look [Unicode::EastAsianWidth::Detect](https://metacpan.org/pod/Unicode::EastAsianWidth::Detect).
 
 # AUTHOR
 
-Tokuhiro Matsuno <tokuhirom AAJKLFJEF GMAIL COM>
+Tokuhiro Matsuno &lt;tokuhirom AAJKLFJEF GMAIL COM>
 
 # SEE ALSO
 
-[Text::VisualWidth](http://search.cpan.org/perldoc?Text::VisualWidth)
+[Text::VisualWidth](https://metacpan.org/pod/Text::VisualWidth)
 
 # LICENSE
 

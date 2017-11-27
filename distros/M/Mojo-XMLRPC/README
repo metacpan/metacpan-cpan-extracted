@@ -1,0 +1,144 @@
+NAME
+
+    Mojo::XMLRPC - An XMLRPC message parser/encoder using the Mojo stack
+
+SYNOPSIS
+
+      use Mojo::UserAgent;
+      use Mojo::XMLRPC qw[to_xmlrpc from_xmlrpc];
+    
+      my $ua = Mojo::UserAgent->new;
+      my $url = ...;
+      my $tx = $ua->post($url, encode_xmlrpc(call => 'mymethod', 'myarg'));
+      my $res = decode_xmlrpc($tx->res->body)
+
+DESCRIPTION
+
+    Mojo::XMLRPC is a pure-perl XML-RPC message parser and encoder. It uses
+    tools from the Mojo toolkit to do all of the work.
+
+    This does not mean that it must only be used in conjunction with a
+    Mojolicious app, far from it. Feel free to use it in any circumstance
+    that needs XML-RPC messages.
+
+MAPPING
+
+    The mapping between Perl types and XMLRPC types is not perfectly
+    one-to-one, especially given Perl's scalar types. The following is a
+    description of the procedure used to encode and decode XMLRPC message
+    from/to Perl.
+
+ Perl to XMLRPC
+
+    If the item is a blessed reference:
+
+      * If the item/object implements a TO_XMLRPC method, it is called and
+      the result is encoded.
+
+      * If the item is a JSON::PP::Boolean, as the Mojo::JSON booleans are,
+      it is encoded as a boolean.
+
+      * If the item is a Mojo::Date then it is encoded as a
+      dateTime.iso8601.
+
+      * If the item is a Mojo::XMLRPC::Base64 then it is encode as a
+      base64. This wrapper class is used to distinguish a string from a
+      base64 and aid in encoding/decoding.
+
+      * If the item/object implements a TO_JSON method, it is called and
+      the result is encoded.
+
+      * If none of the above cases are true, the item is stringified and
+      encoded as a string.
+
+    If the item is an unblessed reference:
+
+      * An array reference is encoded as an array.
+
+      * A hash reference is encoded as a struct.
+
+      * A scalar reference is encoded as a boolean depending on the
+      truthiness of the referenced value. This is the standard shortcut
+      seen in JSON modules allowing \1 for true and \0 for false.
+
+    If the item is a non-reference scalar:
+
+      * If the item is undefined it is encoded as <nil/>.
+
+      * If the item has NOK (it has been used as a floating point number)
+      it is encoded as double.
+
+      * If the item has IOK (it has been used as an integer (and not a
+      float)) it is encoded as an int.
+
+      * All other values are encoded as string.
+
+ XMLRPC to Perl
+
+    Most values decode back into Perl in a manner that would survive a
+    round trip. The exceptions are blessed objects that implement TO_XMLRPC
+    or TO_JSON or are stringified. The shortcuts for booleans will
+    round-trip to being Mojo::JSON booleans objects.
+
+    Values encoded as integers will not be truncated via int however no
+    attempt is made to upgrade them to IOK or NOK. Values encoded as
+    floating point double will be forcably upgraded to NOK (by dividing by
+    1.0). This is so that an integer value encoded as a floating point will
+    round trip, the reverse case isn't as useful and thus isn't handled.
+
+FUNCTIONS
+
+ decode_xmlrpc
+
+    Like "from_xmlrpc" but first decodes from UTF-8 encoded bytes.
+
+ encode_xmlrpc
+
+    Like "to_xmlrpc" but encodes the result to UTF-8 encoded bytes.
+
+ from_xmlrpc
+
+    Takes a character string, interprets it, and returns a
+    Mojo::XMLRPC::Message containing the result. If the input is UTF-8
+    encoded bytes, you can use "decode_xmlrpc" instead.
+
+ to_xmlrpc
+
+    Generates an XMLRPC message from data passed to the function. The input
+    may be a Mojo::XMLRPC::Message or it could be of the following form.
+
+      * A message type, one of call, response, fault.
+
+      * If the message type is call, then the method name.
+
+      * If the message is not a fault, then all remaining arguments are
+      parameters. If the message is a fault, then the fault code followed
+      by the fault string, all remaining arguments are ignored.
+
+    The return value is a character string. To generate UTF-8 encoded
+    bytes, you can use "encode_xmlrpc" instead.
+
+THANKS
+
+    This module was inspired by XMLRPC::Fast written by SÃÂ©bastien
+    Aperghis-Tramoni.
+
+    Mojo::XMLRPC was a port of that module initially to use the Mojo::DOM
+    module rather than XML::Parser. By the time port to the Mojo stack was
+    complete, the module was entirely rewritten. That said, the algorithm
+    still owes a debt of gratitude to that one.
+
+SOURCE REPOSITORY
+
+    http://github.com/jberger/Mojo-XMLRPC
+
+AUTHOR
+
+    Joel Berger, <joel.a.berger@gmail.com>
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2017 by Joel Berger This library is free software; you
+    can redistribute it and/or modify it under the same terms as Perl
+    itself.
+

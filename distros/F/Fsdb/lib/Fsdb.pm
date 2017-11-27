@@ -33,7 +33,7 @@ Fsdb - a flat-text database for shell scripting
 
 
 =cut
-our $VERSION = '2.63';
+our $VERSION = '2.64';
 
 =head1 SYNOPSIS
 
@@ -176,7 +176,7 @@ add to the end of the output the lines
 
 =item *
 
-The library is mature, supporting large datasets, 
+The library is mature, supporting large datasets (more than 100GB), 
 corner cases, error handling, backed by an automated test suite.
 
 =over 4
@@ -221,7 +221,8 @@ forms support.  (But it's free, and probably has better statistics!).
 
 Fsdb-2.x will exploit multiple processors or cores,
 and provides Perl-level support for input, output, and threaded-pipelines.
-(As of Fsdb-2.44 it no longer uses Perl threading, just processes.)
+(As of Fsdb-2.44 it no longer uses Perl threading, just processes,
+since they are faster.)
 
 Installation instructions follow at the end of this document. 
 Fsdb-2.x requires Perl 5.8 to run.  
@@ -234,31 +235,33 @@ L<http://www.isi.edu/~johnh/SOFTWARE/FSDB/index.html>.
 
 =head1 WHAT'S NEW
 
-=head2 2.63, 2017-02-03
-Re-add some features supposedly in 2.62 but not, and add more --header options.
+=head2 2.64, 2017-11-20
+several small bugfixes and enhancements
 
 =over 4
 
-=item ENHANCEMENT
-
-The option B<-j> is now a synonym for B<--parallelism>.
-(And several documention bugs about this option are fixed.)
-
-=item ENHANCEMENT
-
-Additional support for C<--header> in L<dbcolmerge>, L<dbcol>, L<dbrow>,
-and L<dbroweval>.
-
 =item BUG FIX
 
-Version 2.62 was supposed to have this improvement, but did not (and now does):
-L<dbfilepivot> now allows the B<--possible-pivots> option,
-and if it is provided processes the data in one pass.
+In L<dbroweval>, the C<next row> option previously did not
+correctly set up C<_last_fieldname>.  It now does.
 
-=item BUG FIX
+=item ENHANCEMENT
 
-Version 2.62 was supposed to have this improvement, but did not (and now does):
-L<dbroweval> logs are now quoted.
+The L<csv_to_db> converter now has an optional C<-F x> option
+to set the field separator.
+
+=item ENHANCEMENT
+
+Finally L<dbcolsplittocols> has a C<--header> option,
+and a new C<-N> option to give the list of resulting output columns.
+
+=item INCOMPATIBLE CHANGE
+
+Now L<dbcolstats> and L<dbmultistats> produce no output
+(but a schema) when given no input but a schema.
+Previously they gave a null row of output.
+The C<--output-on-no-input> and C<--no-output-on-no-input> 
+options can control this behavior.
 
 =back
 
@@ -3416,6 +3419,34 @@ and if it is provided processes the data in one pass.
 
 =item ENHANCEMENT
 
+L<dbroweval> logs are now quoted.
+
+=back
+
+=head2 2.63, 2017-02-03
+Re-add some features supposedly in 2.62 but not, and add more --header options.
+
+=over 4
+
+=item ENHANCEMENT
+
+The option B<-j> is now a synonym for B<--parallelism>.
+(And several documention bugs about this option are fixed.)
+
+=item ENHANCEMENT
+
+Additional support for C<--header> in L<dbcolmerge>, L<dbcol>, L<dbrow>,
+and L<dbroweval>.
+
+=item BUG FIX
+
+Version 2.62 was supposed to have this improvement, but did not (and now does):
+L<dbfilepivot> now allows the B<--possible-pivots> option,
+and if it is provided processes the data in one pass.
+
+=item BUG FIX
+
+Version 2.62 was supposed to have this improvement, but did not (and now does):
 L<dbroweval> logs are now quoted.
 
 =back

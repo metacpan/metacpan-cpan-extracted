@@ -2,6 +2,20 @@ Revision history for Audio::Scan
 
 Note: Bug numbers refer to bugs at http://bugs.slimdevices.com
 
+0.99    2017-11-24
+        - Fixed a bug where an incorrect audio offset was returned when using
+          NO_ARTWORK and reading a file with an ID3v2.2 or v2.3 unsynchronization bit
+          set. The artwork in this type of file is only available when scanning in
+          normal mode (without NO_ARTWORK).
+        - Added id3_was_unsynced => 1 to the info section for v2.2/v2.3 files with the
+          whole-tag unsync bit set. This type of tag is generally harmful to parser performance,
+          so this flag might be useful if you want to find and upgrade this type of tag to v2.4.
+        - DSF: WAV_BLOCK_SIZE was being used instead of DSF_BLOCK_SIZE. (Kimmo Taskinen)
+        - ID3: Support for reading ID3 tags located >4GB into a file, such as in very large
+          DSF files. (Kimmo Taskinen)
+        - WavPack: Read correct samplerate and bits_per_sample for DSD files. (Kimmo Taskinen)
+        - DSF/DFF: added bitrate to info hash.
+
 0.98    2017-04-28
         - RT #119101, stop including MYMETA files in the tarball.
 

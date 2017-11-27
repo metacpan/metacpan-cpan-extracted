@@ -1,5 +1,6 @@
 #include <string.h>
 #include <time.h>
+#include <math.h>
 #include <gmp.h>
 #include "ptypes.h"
 
@@ -8,6 +9,7 @@
 #include "prime_iterator.h"
 #include "ecpp.h"
 #include "factor.h"
+#include "real.h"
 
 #define FUNC_gcd_ui 1
 #define FUNC_mpz_logn 1
@@ -48,14 +50,19 @@ void _GMP_init(void)
 
 void _GMP_destroy(void)
 {
+  _GMP_memfree();
   prime_iterator_global_shutdown();
   clear_randstate();
   mpz_clear(_bgcd);
   mpz_clear(_bgcd2);
   mpz_clear(_bgcd3);
-  destroy_ecpp_gcds();
 }
 
+void _GMP_memfree(void)
+{
+  free_float_constants();
+  destroy_ecpp_gcds();
+}
 
 static const unsigned char next_wheel[30] =
   {1,7,7,7,7,7,7,11,11,11,11,13,13,17,17,17,17,19,19,23,23,23,23,29,29,29,29,29,29,1};
@@ -484,739 +491,6 @@ void _GMP_primorial(mpz_t prim, UV n)
 
   }
 #endif
-}
-
-/*****************************************************************************/
-
-/* Put result into char with correct number of digits */
-static char* _str_real(mpf_t f, unsigned long prec) {
-  char* out;
-  unsigned long k;
-  int neg = (mpf_sgn(f) < 0);
-
-  if (neg)
-    mpf_neg(f, f);
-
-  for (k = 0;  mpf_cmp_ui(f, 1000000000U) >= 0;  k += 9)
-    mpf_div_ui(f, f, 1000000000U);
-  for (;  mpf_cmp_ui(f, 1) >= 0;  k++)
-    mpf_div_ui(f, f, 10);
-
-  New(0, out, 10+((k>prec) ? k : prec), char);
-  gmp_sprintf(out, "%.*Ff", prec, f);
-  memmove(out, out+2, prec);
-
-  if (k >= prec) { /* No decimal */
-    if (k-prec < 10) {
-      memset(out+prec, '0', k-prec);
-      prec=k-1;
-    } else {
-      out[prec++] = 'E';
-      prec += sprintf(out+prec, "%lu", k-prec+1);
-    }
-  } else {        /* insert decimal in correct place */
-    memmove(out+k+1, out+k, prec-k);
-    out[k] = '.';
-  }
-  out[prec+1]='\0';
-  if (neg) {
-    memmove(out+1, out, prec+2);
-    out[0] = '-';
-  }
-//printf("out=%s\n",out);
-  return out;
-}
-
-static char* _frac_real(mpz_t num, mpz_t den, unsigned long prec) {
-#if 0
-  char* out;
-  mpf_t fnum, fden, res;
-  unsigned long numbits = mpz_sizeinbase(num,  2);
-  unsigned long denbits = mpz_sizeinbase(den,  2);
-  unsigned long numdigs = mpz_sizeinbase(num, 10);
-  unsigned long dendigs = mpz_sizeinbase(den, 10);
-
-  mpf_init2(fnum, 1 + numbits);  mpf_set_z(fnum, num);
-  mpf_init2(fden, 1 + denbits);  mpf_set_z(fden, den);
-  mpf_init2(res, (unsigned long) (8 + (numbits-denbits+1) + prec*3.4) );
-  mpf_div(res, fnum, fden);
-  mpf_clear(fnum);  mpf_clear(fden);
-
-  New(0, out, (10+numdigs-dendigs)+prec, char);
-  gmp_sprintf(out, "%.*Ff", (int)(prec), res);
-  mpf_clear(res);
-
-  return out;
-#else
-  char* out;
-  mpf_t fnum, fden;
-  unsigned long bits = 32+(unsigned long)(prec*3.32193);
-  mpf_init2(fnum, bits);   mpf_set_z(fnum, num);
-  mpf_init2(fden, bits);   mpf_set_z(fden, den);
-  mpf_div(fnum, fnum, fden);
-  out = _str_real(fnum, prec);
-  mpf_clear(fden);
-  mpf_clear(fnum);
-  return out;
-#endif
-}
-
-
-/*********************     Riemann Zeta and Riemann R     *********************/
-
-static void _bern_real_zeta(mpf_t bn, mpz_t zn, unsigned long prec);
-static unsigned long zeta_n = 0;
-static mpz_t* zeta_d = 0;
-
-static void _borwein_d(unsigned long D) {
-  mpz_t t1, t2, t3, sum;
-  unsigned long i, n = 3 + (1.31 * D);
-
-  if (zeta_n >= n)
-    return;
-
-  if (zeta_n > 0) {
-    for (i = 0; i <= zeta_n; i++)
-      mpz_clear(zeta_d[i]);
-    Safefree(zeta_d);
-  }
-
-  n += 10;   /* Add some in case we want a few more digits later */
-  zeta_n = n;
-  New(0, zeta_d, n+1, mpz_t);
-  mpz_init(t1); mpz_init(t2); mpz_init(t3);
-
-  mpz_init_set_ui(sum, 1);
-  mpz_init_set(zeta_d[0], sum);
-
-  mpz_fac_ui(t1, n);
-  mpz_fac_ui(t2, n);
-  for (i = 1; i <= n; i++) {
-    mpz_mul_ui(t1, t1, 2*(n+i-1));    /* We've pulled out a 2 from t1 and t2 */
-    mpz_divexact_ui(t2, t2, n-i+1);
-    mpz_mul_ui(t2, t2, (2*i-1) * i);
-    mpz_divexact(t3, t1, t2);
-    mpz_add(sum, sum, t3);
-    mpz_init_set(zeta_d[i], sum);
-  }
-  mpz_clear(sum); mpz_clear(t3); mpz_clear(t2); mpz_clear(t1);
-}
-
-/* MPFR does some shortcuts, then does an in-place version of Borwein 1991.
- * It's quite clever, and has the advantage of not using the statics.  Our
- * code can be a little faster in some cases, slower in others.  They
- * certainly have done more rigorous error bounding, allowing fewer guard
- * bits and earlier loop exits.
- *
- * For real values, we use our home-grown mpf_pow function, which is very
- * slow at high precisions and again very crude compared to MPFR.
- * For non-integer values this won't compare at all in speed to MPFR or Pari.
- */
-
-static void _zeta(mpf_t z, mpf_t f, unsigned long prec)
-{
-  unsigned long k, S, p;
-  mpf_t s, tf, term;
-  mpz_t t1;
-
-  if (mpf_cmp_ui(f,1) == 0) {
-   mpf_set_ui(z, 0);
-   return;
- }
-
-  /* Shortcut if we know all prec terms are zeros. */
-  if (mpf_cmp_ui(f, 1+3.3219281*prec) >= 0 || mpf_cmp_ui(f, mpf_get_prec(z)) > 0) {
-    mpf_set_ui(z,1);
-    return;
-  }
-
-  S = (mpf_integer_p(f) && mpf_fits_ulong_p(f))  ?  mpf_get_ui(f)  :  0;
-
-  /* Negative integers using Bernoulli */
-  if (S == 0 && mpf_integer_p(f) && mpf_fits_slong_p(f) && mpf_sgn(f) != 0) {
-    S = -mpf_get_si(f);
-    if (!(S & 1)) { /* negative even integers are zero */
-      mpf_set_ui(z,0);
-    } else {        /* negative odd integers are -B_(n+1)/(n+1) */
-      mpz_t n;
-      mpz_init_set_ui(n, S+1);
-      _bern_real_zeta(z, n, prec);
-      mpf_div_ui(z, z, S+1);
-      mpf_neg(z,z);
-      mpz_clear(n);
-    }
-    return;
-  }
-
-  mpf_init2(s,    mpf_get_prec(z));   mpf_set(s, f);
-  mpf_init2(tf,   mpf_get_prec(z));
-  mpf_init2(term, mpf_get_prec(z));
-  mpz_init(t1);
-
-  if (S && S <= 14 && !(S & 1)) {         /* Small even S can be done with Pi */
-    unsigned long div[]={0,6,90,945,9450,93555,638512875,18243225};
-    char* pi = pidigits(prec+8);
-    mpf_set_str(z, pi, 10);
-    mpf_pow_ui(z, z, S);
-    if (S == 12) mpf_mul_ui(z, z, 691);
-    if (S == 14) mpf_mul_ui(z, z, 2);
-    mpf_div_ui(z, z, div[S/2]);
-    Safefree(pi);
-  } else if (mpf_cmp_ui(f, 3+prec*2.15) > 0) {  /* Only one term (3^s < prec) */
-    if (S) {
-      mpf_set_ui(term, 1);
-      mpf_mul_2exp(term, term, S);
-    } else {
-      mpf_set_ui(term, 2);
-      mpf_pow(term, term, s);
-    }
-    mpf_sub_ui(tf, term, 1);
-    mpf_div(z, term, tf);
-  } else if ( (mpf_cmp_ui(f,20) > 0 && mpf_cmp_ui(f, prec/3.5) > 0) ||
-              (prec > 500 && (mpz_ui_pow_ui(t1, 8*prec, S), mpz_sizeinbase(t1,2) > (20+3.3219281*prec))) ) {
-    /* Basic formula, for speed (also note only valid for > 1) */
-    PRIME_ITERATOR(iter);
-    mpf_set_ui(z, 1);
-    for (p = 2; p <= 1000000000; p = prime_iterator_next(&iter)) {
-      if (S) {
-        mpz_ui_pow_ui(t1, p, S);
-        mpf_set_z(term, t1);
-      } else {
-        mpf_set_ui(tf, p);
-        mpf_pow(term, tf, s);
-        mpz_set_f(t1, term);
-      }
-      if (mpz_sizeinbase(t1,2) > (20+3.3219281*prec)) break;
-      mpf_sub_ui(tf, term, 1);
-      mpf_div(term, term, tf);
-      mpf_mul(z, z, term);
-    }
-    prime_iterator_destroy(&iter);
-  } else {
-    /* TODO: negative non-integer inputs past -20 or so are very wrong. */
-    _borwein_d( (mpf_cmp_d(f,-3.0) >= 0)  ?  prec  :  80+2*prec );
-
-    mpf_set_ui(z, 0);
-    for (k = 0; k <= zeta_n-1; k++) {
-      if (S) {
-        mpz_ui_pow_ui(t1, k+1, S);
-        mpf_set_z(term, t1);
-      } else {
-        mpf_set_ui(tf, k+1);
-        mpf_pow(term, tf, s);
-      }
-
-      mpz_sub(t1, zeta_d[k], zeta_d[zeta_n]);
-      mpf_set_z(tf, t1);
-
-      mpf_div(term, tf, term);
-
-      if (k&1) mpf_sub(z, z, term);
-      else     mpf_add(z, z, term);
-    }
-
-    mpf_set_z(tf, zeta_d[zeta_n]);
-    mpf_div(z, z, tf);
-
-    if (S) {
-      mpf_set_ui(tf, 1);
-      mpf_div_2exp(tf, tf, S-1);
-    } else {
-      mpf_set_ui(term, 2);
-      mpf_ui_sub(tf, 1, s);
-      mpf_pow(tf, term, tf);
-    }
-
-    mpf_ui_sub(tf, 1, tf);
-    mpf_div(z, z, tf);
-
-    mpf_neg(z, z);
-  }
-  mpz_clear(t1);
-  mpf_clear(term); mpf_clear(tf); mpf_clear(s);
-}
-
-static void _zetaint(mpf_t z, unsigned long s, unsigned long prec)
-{
-  mpf_t f;
-
-  if (s <= 1) {
-    mpf_set_ui(z, 0);
-  } else if (s >= (1+3.3219281*prec) || s > mpf_get_prec(z)) {
-    /* Shortcut if we know all prec terms are zeros. */
-    mpf_set_ui(z,1);
-  } else {
-    mpf_init2(f, mpf_get_prec(z));
-    mpf_set_ui(f, s);
-    _zeta(z, f, prec);
-    mpf_clear(f);
-  }
-}
-
-static void _riemann_r(mpf_t r, mpf_t n, unsigned long prec)
-{
-  mpf_t logn, sum, term, part_term, tol, tf;
-  unsigned long k, bits = mpf_get_prec(n);
-
-  mpf_init2(logn,      bits);
-  mpf_init2(sum,       bits);
-  mpf_init2(term,      bits);
-  mpf_init2(part_term, bits);
-  mpf_init2(tol,       bits);
-  mpf_init2(tf,        bits);
-
-  mpf_log(logn, n);
-  mpf_set_ui(tol, 10);  mpf_pow_ui(tol, tol, prec);  mpf_ui_div(tol,1,tol);
-
-#if 1 /* Standard Gram Series */
-  mpf_set_ui(part_term, 1);
-  mpf_set_ui(sum, 1);
-  for (k = 1; k < 10000; k++) {
-    mpf_mul(part_term, part_term, logn);
-    mpf_div_ui(part_term, part_term, k);
-
-    _zetaint(tf, k+1, prec+1);
-    mpf_mul_ui(tf, tf, k);
-    mpf_div(term, part_term, tf);
-    mpf_add(sum, sum, term);
-
-    mpf_abs(term, term);
-    mpf_mul(tf, sum, tol);
-    if (mpf_cmp(term, tf) <= 0) break;
-  }
-#else  /* Accelerated (about half the number of terms needed) */
-  /* See:   http://mathworld.wolfram.com/GramSeries.html (5)
-   * Ramanujan's G (3) and its restatements (5) and (6) are equal,
-   * but G is only asymptotically equal to R (restated in (4) as per Gram).
-   * To avoid confusion we won't use this.  Too bad, as it can be 2x faster.
-   */
-  mpf_set(part_term, logn);
-  mpf_set_ui(sum, 0);
-  _zetaint(tf, 2, prec);
-  mpf_div(term, part_term, tf);
-  mpf_add(sum, sum, term);
-  for (k = 2; k < 1000000; k++) {
-    if (mpf_cmp(part_term, tol) <= 0) break;
-
-    mpf_mul(tf, logn, logn);
-    if (k < 32768) {
-      mpf_div_ui(tf, tf, (2*k-2) * (2*k-1));
-    } else {
-      mpf_div_ui(tf, tf, 2*k-2);  mpf_div_ui(tf, tf, 2*k-1);
-    }
-    mpf_mul(part_term, part_term, tf);
-
-    _zetaint(tf, 2*k, prec);
-    mpf_mul_ui(tf, tf, 2*k-1);
-    mpf_div(term, part_term, tf);
-    mpf_add(sum, sum, term);
-  }
-  mpf_mul_ui(sum, sum, 2);
-  mpf_add_ui(sum, sum, 1);
-#endif
-
-  mpf_set(r, sum);
-
-  mpf_clear(tf); mpf_clear(tol); mpf_clear(part_term);
-  mpf_clear(term); mpf_clear(sum); mpf_clear(logn);
-}
-
-
-char* zetareal(mpf_t z, unsigned long prec)
-{
-  size_t est_digits = 10+prec;
-  char* out;
-  if (mpf_cmp_ui(z,1) == 0) return 0;
-  if (mpz_sgn(z) < 0) est_digits += -mpf_get_si(z);
-  _zeta(z, z, prec);
-  New(0, out, est_digits, char);
-  gmp_sprintf(out, "%.*Ff", (int)(prec), z);
-  return out;
-}
-
-char* riemannrreal(mpf_t r, unsigned long prec)
-{
-  if (mpf_cmp_ui(r,0) <= 0) return 0;
-  _riemann_r(r, r, prec);
-  return _str_real(r, prec);
-}
-
-/***************************        Harmonic        ***************************/
-
-static void _harmonic(mpz_t a, mpz_t b, mpz_t t) {
-  mpz_sub(t, b, a);
-  if (mpz_cmp_ui(t, 1) == 0) {
-    mpz_set(b, a);
-    mpz_set_ui(a, 1);
-  } else {
-    mpz_t q, r;
-    mpz_add(t, a, b);
-    mpz_tdiv_q_2exp(t, t, 1);
-    mpz_init_set(q, t); mpz_init_set(r, t);
-    _harmonic(a, q, t);
-    _harmonic(r, b, t);
-    mpz_mul(a, a, b);
-    mpz_mul(t, q, r);
-    mpz_add(a, a, t);
-    mpz_mul(b, b, q);
-    mpz_clear(q); mpz_clear(r);
-  }
-}
-
-void harmfrac(mpz_t num, mpz_t den, mpz_t zn)
-{
-  mpz_t t;
-  mpz_init(t);
-  mpz_add_ui(den, zn, 1);
-  mpz_set_ui(num, 1);
-  _harmonic(num, den, t);
-  mpz_gcd(t, num, den);
-  mpz_divexact(num, num, t);
-  mpz_divexact(den, den, t);
-  mpz_clear(t);
-}
-
-char* harmreal(mpz_t zn, unsigned long prec) {
-  char* out;
-  mpz_t num, den;
-
-  mpz_init(num); mpz_init(den);
-  harmfrac(num, den, zn);
-  out = _frac_real(num, den, prec);
-  mpz_clear(den); mpz_clear(num);
-
-  return out;
-}
-
-/**************************        Bernoulli        **************************/
-
-static void _bern_real_zeta(mpf_t bn, mpz_t zn, unsigned long prec)
-{
-  unsigned long s = mpz_get_ui(zn);
-  mpf_t tf;
-
-  if (s & 1) {
-    mpf_set_d(bn, (s == 1) ? 0.5 : 0.0);
-    return;
-  }
-
-  mpf_init2(tf, mpf_get_prec(bn));
-
-  /* For large values with low precision, we should look at approximations.
-   *   http://www.ebyte.it/library/downloads/2008_MTH_Nemes_GammaApproximationUpdate.pdf
-   *   http://www.luschny.de/math/primes/bernincl.html
-   *   http://arxiv.org/pdf/math/0702300.pdf
-   */
-
-  _zetaint(bn, s, prec);
-
-  /* We should be using an approximation here, e.g. Pari's mpfactr.  For
-   * large values this is the majority of time taken for this function. */
-  { mpz_t t; mpz_init(t); mpz_fac_ui(t, s); mpf_set_z(tf, t); mpz_clear(t);}
-  mpf_mul(bn, bn, tf);
-  /* bn = s! * zeta(s) */
-
-  { char* pi = pidigits(prec+8); mpf_set_str(tf, pi, 10); Safefree(pi); }
-  mpf_mul_ui(tf, tf, 2);
-  mpf_pow_ui(tf, tf, s);
-  mpf_div(bn, bn, tf);
-  /* bn = s! * zeta(s) / (2Pi)^s */
-
-  mpf_mul_2exp(bn, bn, 1);
-  if ((s & 3) == 0) mpf_neg(bn, bn);
-  /* bn = (-1)^(n-1) * 2 * s! * zeta(s) / (2Pi)^s */
-  mpf_clear(tf);
-}
-
-
-static void _bernfrac_comb(mpz_t num, mpz_t den, mpz_t zn, mpz_t t)
-{
-  unsigned long k, j, n = mpz_get_ui(zn);
-  mpz_t* T;
-
-  if (n <= 1 || (n & 1)) {
-    mpz_set_ui(num, (n<=1) ? 1 : 0);
-    mpz_set_ui(den, (n==1) ? 2 : 1);
-    return;
-  }
-
-  /* Denominator */
-  mpz_set_ui(t, 1);
-  mpz_mul_2exp(den, t, n);    /* den = U = 1 << n  */
-  mpz_sub_ui(t, den, 1);      /* t = U-1            */
-  mpz_mul(den, den, t);       /* den = U*(U-1)      */
-
-  n >>= 1;
-
-  /* Luschny's version of the "Brent-Harvey" method */
-  /* Algorithm TangentNumbers from https://arxiv.org/pdf/1108.0286.pdf */
-  New(0, T, n+1, mpz_t);
-  for (k = 1; k <= n; k++)  mpz_init(T[k]);
-  mpz_set_ui(T[1], 1);
-
-  for (k = 2; k <= n; k++)
-    mpz_mul_ui(T[k], T[k-1], k-1);
-
-  for (k = 2; k <= n; k++) {
-    for (j = k; j <= n; j++) {
-      mpz_mul_ui(t, T[j], j-k+2);
-      mpz_mul_ui(T[j], T[j-1], j-k);
-      mpz_add(T[j], T[j], t);
-    }
-  }
-
-  /* (14), also last line of Algorithm FastTangentNumbers from paper */
-  mpz_mul_ui(num, T[n], n);
-  mpz_mul_si(num, num, (n & 1) ? 2 : -2);
-
-  for (k = 1; k <= n; k++)  mpz_clear(T[k]);
-  Safefree(T);
-}
-
-
-static void _bernfrac_zeta(mpz_t num, mpz_t den, mpz_t zn, mpz_t t)
-{
-  unsigned long prec, n = mpz_get_ui(zn);
-  double nbits;
-  mpf_t bn, tf;
-  /* Compute integer numerator by getting the real bn first. */
-
-  if (n <= 1 || (n & 1)) {
-    mpz_set_ui(num, (n<=1) ? 1 : 0);
-    mpz_set_ui(den, (n==1) ? 2 : 1);
-    return;
-  }
-  if (n == 2) { mpz_set_ui(num, 1); mpz_set_ui(den, 6); return; }
-
-  /* Calculate denominator */
-  {
-    int i, ndivisors;
-    mpz_t *D;
-
-    mpz_set_ui(t, n >> 1);
-    D = divisor_list(&ndivisors, t);
-    mpz_set_ui(den, 6);
-    for (i = 1; i < ndivisors; i++) {
-      mpz_mul_2exp(t,D[i],1);  mpz_add_ui(t,t,1);
-      if (_GMP_is_prime(t))
-        mpz_mul(den, den, t);
-    }
-    for (i = 0; i < ndivisors; i++)
-      mpz_clear(D[i]);
-    Safefree(D);
-  }
-
-  /* Estimate number of bits, from Pari, also see Stein 2006 */
-  nbits = mpz_logn(den) + (n+0.5) * log((double)n) - n*2.8378770664093454835606594728L + 1.712086L;
-  nbits /= log(2);
-  nbits += 32;
-  prec = (unsigned long)(nbits/3.32193 + 1);
-
-  mpf_init2(bn, nbits);
-  mpf_init2(tf, nbits);
-  _bern_real_zeta(bn, zn, prec);
-  mpf_set_z(tf, den);
-  mpf_mul(bn, bn, tf);
-
-  mpf_set_d(tf, (mpf_sgn(bn) < 0) ? -0.5 : 0.5);
-  mpf_add(bn, bn, tf);
-
-  mpz_set_f(num, bn);
-
-  mpf_clear(tf);
-  mpf_clear(bn);
-}
-
-
-void bernfrac(mpz_t num, mpz_t den, mpz_t zn)
-{
-  mpz_t t;
-  mpz_init(t);
-
-  if (mpz_cmp_ui(zn,46) < 0) {
-    _bernfrac_comb(num, den, zn, t);
-  } else {
-    _bernfrac_zeta(num, den, zn, t);
-  }
-
-  mpz_gcd(t, num, den);
-  mpz_divexact(num, num, t);
-  mpz_divexact(den, den, t);
-  mpz_clear(t);
-}
-
-char* bernreal(mpz_t zn, unsigned long prec) {
-  char* out;
-
-  if (mpz_cmp_ui(zn,40) < 0) {
-    mpz_t num, den, t;
-    mpz_init(num); mpz_init(den); mpz_init(t);
-    _bernfrac_comb(num, den, zn, t);
-    out = _frac_real(num, den, prec);
-    mpz_clear(t); mpz_clear(den); mpz_clear(num);
-  } else {
-    mpf_t z;
-    unsigned long bits = 32+(unsigned long)(prec*3.32193);
-    mpf_init2(z, bits);
-    _bern_real_zeta(z, zn, prec);
-    out = _str_real(z, prec);
-    mpf_clear(z);
-  }
-  return out;
-}
-
-/***************************       Lambert W       ***************************/
-
-static void _lambertw(mpf_t w, mpf_t x, unsigned long prec)
-{
-  int i;
-  unsigned long bits = 96+mpf_get_prec(x);  /* More bits for intermediate */
-  mpf_t t, w1, zn, qn, en, tol;
-
-  if (mpf_cmp_d(x, -0.36787944117145) < 0)
-    croak("Invalid input to LambertW:  x must be >= -1/e");
-  if (mpf_sgn(x) == 0)
-    { mpf_set(w, x); return; }
-
-  /* Use Fritsch rather than Halley. */
-  mpf_init2(t,   bits);
-  mpf_init2(w1,  bits);
-  mpf_init2(zn,  bits);
-  mpf_init2(qn,  bits);
-  mpf_init2(en,  bits);
-  mpf_init2(tol, bits);
-
-  /* Initial estimate */
-  if (mpf_cmp_d(x, -0.06) < 0) {  /* Pade(3,2) */
-    mpf_set_d(t, 5.4365636569180904707205749);
-    mpf_mul(t, t, x);
-    mpf_add_ui(t, t, 2);
-    if (mpf_sgn(t) <= 0) { mpf_set_ui(t, 0); } else { mpf_sqrt(t, t); }
-    mpf_mul(zn, t, t);
-    mpf_mul(qn, zn, t);
-
-    mpf_set_d(w, -1);
-    mpf_set_d(w1, 1.0L/6.0L);      mpf_mul(w1, w1,  t);  mpf_add(w, w, w1);
-    mpf_set_d(w1, 257.0L/720.0L);  mpf_mul(w1, w1, zn);  mpf_add(w, w, w1);
-    mpf_set_d(w1, 13.0L/720.0L);   mpf_mul(w1, w1, zn);  mpf_add(w, w, w1);
-    mpf_set(en, w);  /* numerator */
-
-    mpf_set_d(w, 1);
-    mpf_set_d(w1, 5.0L/6.0L);      mpf_mul(w1, w1,  t);  mpf_add(w, w, w1);
-    mpf_set_d(w1, 103.0L/720.0L);  mpf_mul(w1, w1, zn);  mpf_add(w, w, w1);
-
-    mpf_div(w, en, w);
-  } else if (mpf_cmp_d(x, 1.363) < 0) {  /* Winitzki 2003 */
-    mpf_add_ui(t, x, 1);
-    mpf_log(w1, t);
-    mpf_add_ui(zn, w1, 1);
-    mpf_log(zn, zn);
-    mpf_add_ui(qn, w1, 2);
-    mpf_div(t, zn, qn);
-    mpf_ui_sub(t, 1, t);
-    mpf_mul(w, w1, t);
-  } else if (mpf_cmp_d(x, 3.7) < 0) {  /* Vargas 2013 modified */
-    mpf_log(w, x);
-    mpf_log(w1, w);
-    mpf_div(t, w1, w);
-    mpf_ui_sub(t, 1, t);
-    mpf_log(t, t);
-    mpf_div_ui(t, t, 2);
-    mpf_sub(w, w, w1);
-    mpf_sub(w, w, t);
-  } else {  /* Corless et al. 1993 */
-    mpf_t l1, l2, d1, d2, d3;
-    mpf_init2(l1,bits); mpf_init2(l2,bits);
-    mpf_init2(d1,bits); mpf_init2(d2,bits); mpf_init2(d3,bits);
-
-    mpf_log(l1, x);
-    mpf_log(l2, l1);
-    mpf_mul(d1, l1, l1);  mpf_mul_ui(d1, d1, 2);
-    mpf_mul(d2, l1, d1);  mpf_mul_ui(d2, d2, 3);
-    mpf_mul(d3, l1, d2);  mpf_mul_ui(d3, d3, 2);
-
-    mpf_sub(w, l1, l2);
-
-    mpf_div(t, l2, l1);
-    mpf_add(w, w, t);
-
-    mpf_sub_ui(t, l2, 2);
-    mpf_mul(t, t, l2);
-    mpf_div(t, t, d1);
-    mpf_add(w, w, t);
-
-    mpf_mul_ui(t, l2, 2);
-    mpf_sub_ui(t, t, 9);
-    mpf_mul(t, t, l2);
-    mpf_add_ui(t, t, 6);
-    mpf_mul(t, t, l2);
-    mpf_div(t, t, d2);
-    mpf_add(w, w, t);
-
-    mpf_mul_ui(t, l2, 3);
-    mpf_sub_ui(t, t, 22);
-    mpf_mul(t, t, l2);
-    mpf_add_ui(t, t, 36);
-    mpf_mul(t, t, l2);
-    mpf_sub_ui(t, t, 12);
-    mpf_mul(t, t, l2);
-    mpf_div(t, t, d3);
-    mpf_add(w, w, t);
-
-    mpf_clear(l1); mpf_clear(l2);
-    mpf_clear(d1); mpf_clear(d2); mpf_clear(d3);
-  }
-
-  /* Divide prec by 2 since t should be have 4x number of zeros each round */
-  mpf_set_ui(tol, 10);
-  mpf_pow_ui(tol, tol, (mpf_cmp_d(x, -.36) < 0) ? prec : prec/2);
-  mpf_ui_div(tol,1,tol);
-
-  for (i = 0; i < 500 && mpz_sgn(w) != 0; i++) {
-    mpf_add_ui(w1, w, 1);
-
-    mpf_div(t, x, w);
-    mpf_log(zn, t);
-    mpf_sub(zn, zn, w);
-
-    mpf_mul_ui(t, zn, 2);
-    mpf_div_ui(t, t, 3);
-    mpf_add(t, t, w1);
-    mpf_mul(t, t, w1);
-    mpf_mul_ui(qn, t, 2);
-
-    mpf_sub(en, qn, zn);
-    mpf_mul_ui(t, zn, 2);
-    mpf_sub(t, qn, t);
-    mpf_div(en, en, t);
-    mpf_div(t, zn, w1);
-    mpf_mul(en, en, t);
-
-    mpf_mul(t, w, en);
-    mpf_add(w, w, t);
-
-    mpf_abs(t, t);
-    if (mpf_cmp(t, tol) <= 0) break;
-    if (mpf_cmp_d(w,-1) <= 0) break;
-  }
-
-  if (mpf_cmp_d(w, -1) <= 0)
-    mpf_set_si(w, -1);
-
-  mpf_clear(en); mpf_clear(qn); mpf_clear(zn);
-  mpf_clear(w1); mpf_clear(t); mpf_clear(tol);
-}
-
-char* lambertwreal(mpf_t x, unsigned long prec) {
-  char* out;
-  mpf_t w;
-  unsigned long bits = 64+(unsigned long)(prec*3.32193);
-
-  mpf_init2(w, bits);
-  _lambertw(w, x, 10+prec);
-  out = _str_real(w, prec);
-  mpf_clear(w);
-  return out;
 }
 
 /*****************************************************************************/
@@ -1817,175 +1091,229 @@ uint32_t* partial_sieve(mpz_t start, UV length, UV maxprime)
 }
 
 
-char* pidigits(UV n) {
-  char* out;
+/*****************************************************************************/
 
-  New(0, out, n+4, char);
-  out[0] = '3';  out[1] = '\0';
-  if (n <= 1)
-    return out;
-
-#if 0
-  /* If we want to compare with MPFR.  Add -lmpfr in Makefile. */
-  #include <mpfr.h>
-  mpfr_t pi;
-  mpfr_exp_t exp;
-  mpfr_init2(pi,  (n * 3.322) + 40  );
-  mpfr_const_pi(pi, MPFR_RNDN);
-  mpfr_free_cache();
-  char* mpi = mpfr_get_str(NULL, &exp, 10, n, pi, MPFR_RNDN);
-  strncpy(out+1, mpi, n);
-  mpfr_free_str(mpi);
-  out[1] = '.';
-#elif 0
-  /* Spigot method.
-   * ~40x slower than the Machin formulas, 2x slower than spigot in plain C */
-  {
-    mpz_t t1, t2, acc, den, num;
-    UV i, k, d, d2;
-
-    mpz_init(t1);  mpz_init(t2);
-    mpz_init_set_ui(acc, 0);
-    mpz_init_set_ui(den, 1);
-    mpz_init_set_ui(num, 1);
-    n++;   /* rounding */
-    for (i = k = 0; i < n; ) {
-      {
-        UV k2 = ++k * 2 + 1;
-        mpz_mul_2exp(t1, num, 1);
-        mpz_add(acc, acc, t1);
-        mpz_mul_ui(acc, acc, k2);
-        mpz_mul_ui(den, den, k2);
-        mpz_mul_ui(num, num, k);
-      }
-      if (mpz_cmp(num, acc) > 0)  continue;
-      {
-        mpz_mul_ui(t1, num, 3);
-        mpz_add(t2, t1, acc);
-        mpz_tdiv_q(t1, t2, den);
-        d = mpz_get_ui(t1);
-      }
-      {
-        mpz_mul_ui(t1, num, 4);
-        mpz_add(t2, t1, acc);
-        mpz_tdiv_q(t1, t2, den);
-        d2 = mpz_get_ui(t1);
-      }
-      if (d != d2)  continue;
-      out[++i] = '0' + d;
-      {
-        mpz_submul_ui(acc, den, d);
-        mpz_mul_ui(acc, acc, 10);
-        mpz_mul_ui(num, num, 10);
-      }
-    }
-    mpz_clear(num); mpz_clear(den); mpz_clear(acc); mpz_clear(t2);mpz_clear(t1);
-    if (out[n] >= '5') out[n-1]++;  /* Round */
-    for (i = n-1; out[i] == '9'+1; i--)    /* Keep rounding */
-      { out[i] = '0';  out[i-1]++; }
-    n--;  /* Undo the extra digit we used for rounding */
-    out[1] = '.';
-    out[n+1] = '\0';
-  }
-#elif 0
-  /* https://en.wikipedia.org/wiki/Machin-like_formula
-   * Thanks to Ledrug from RosettaCode for the simple code for base 10.
-   * Pretty fast, but growth is a lot slower than AGM. */
-  {
-    mpz_t t1, t2, term1, term2, pows;
-    UV i, k;
-
-    mpz_init(t1); mpz_init(t2); mpz_init(term1); mpz_init(term2); mpz_init(pows);
-    n++;   /* rounding */
-    mpz_ui_pow_ui(pows, 10, n+20);
-
-#if 0
-    /* Machin 1706 */
-    mpz_arctan(term1,       5, pows, t1, t2);  mpz_mul_ui(term1, term1, 4);
-    mpz_arctan(term2,     239, pows, t1, t2);
-    mpz_sub(term1, term1, term2);
-#elif 0
-    /* Störmer 1896 */
-    mpz_arctan(term1,      57, pows, t1, t2);  mpz_mul_ui(term1, term1, 44);
-    mpz_arctan(term2,     239, pows, t1, t2);  mpz_mul_ui(term2, term2, 7);
-    mpz_add(term1, term1, term2);
-    mpz_arctan(term2,     682, pows, t1, t2);  mpz_mul_ui(term2, term2, 12);
-    mpz_sub(term1, term1, term2);
-    mpz_arctan(term2,   12943, pows, t1, t2);  mpz_mul_ui(term2, term2, 24);
-    mpz_add(term1, term1, term2);
-#else
-    /* Chien-Lih 1997 */
-    mpz_arctan(term1,     239, pows, t1, t2);  mpz_mul_ui(term1, term1, 183);
-    mpz_arctan(term2,    1023, pows, t1, t2);  mpz_mul_ui(term2, term2,  32);
-    mpz_add(term1, term1, term2);
-    mpz_arctan(term2,    5832, pows, t1, t2);  mpz_mul_ui(term2, term2,  68);
-    mpz_sub(term1, term1, term2);
-    mpz_arctan(term2,  110443, pows, t1, t2);  mpz_mul_ui(term2, term2,  12);
-    mpz_add(term1, term1, term2);
-    mpz_arctan(term2, 4841182, pows, t1, t2);  mpz_mul_ui(term2, term2,  12);
-    mpz_sub(term1, term1, term2);
-    mpz_arctan(term2, 6826318, pows, t1, t2);  mpz_mul_ui(term2, term2, 100);
-    mpz_sub(term1, term1, term2);
-#endif
-    mpz_mul_ui(term1, term1, 4);
-
-    mpz_ui_pow_ui(pows, 10, 20);
-    mpz_tdiv_q(term1, term1, pows);
-
-    mpz_clear(t1); mpz_clear(t2); mpz_clear(term2); mpz_clear(pows);
-
-    k = mpz_sizeinbase(term1, 10);           /* Copy result to out string */
-    while (k > n+1) {                        /* making sure we don't overflow */
-      mpz_tdiv_q_ui(term1, term1, 10);
-      k = mpz_sizeinbase(term1, 10);
-    }
-    (void) mpz_get_str(out+1, 10, term1);
-    mpz_clear(term1);
-
-    if (out[n] >= '5') out[n-1]++;  /* Round */
-    for (i = n-1; out[i] == '9'+1; i--)    /* Keep rounding */
-      { out[i] = '0';  out[i-1]++; }
-    n--;  /* Undo the extra digit we used for rounding */
-    out[1] = '.';
-    out[n+1] = '\0';
-  }
-#else
-  /* AGM using GMP's floating point.  Fast and very good growth. */
-  {
-    mpf_t t, an, bn, tn, prev_an;
-    UV k = 0;
-    unsigned long oldprec = mpf_get_default_prec();
-    mpf_set_default_prec(10 + n * 3.322);
-
-    mpf_init(t);  mpf_init(prev_an);
-    mpf_init_set_d(an, 1);  mpf_init_set_d(bn, 0.5);  mpf_init_set_d(tn, 0.25);
-    mpf_sqrt(bn, bn);
-
-    while ((n >> k) > 0) {
-      mpf_set(prev_an, an);
-      mpf_add(t, an, bn);
-      mpf_div_ui(an, t, 2);
-      mpf_mul(t, bn, prev_an);
-      mpf_sqrt(bn, t);
-      mpf_sub(prev_an, prev_an, an);
-      mpf_mul(t, prev_an, prev_an);
-      mpf_mul_2exp(t, t, k);
-      mpf_sub(tn, tn, t);
-      k++;
-    }
-    mpf_add(t, an, bn);
-    mpf_mul(an, t, t);
-    mpf_mul_2exp(t, tn, 2);
-    mpf_div(bn, an, t);
-    gmp_sprintf(out, "%.*Ff", (int)(n-1), bn);
-    mpf_clear(tn); mpf_clear(bn); mpf_clear(an);
-    mpf_clear(prev_an); mpf_clear(t);
-    mpf_set_default_prec(oldprec);
-  }
-#endif
-  return out;
+static unsigned long small_prime_count(unsigned long n)
+{
+  unsigned long i, pc = 0;
+  for (i = 0; i <= NSMALLPRIMES; i++)
+    if (n < sprimes[i])
+      break;
+  return i;
 }
 
+void prime_count_lower(mpz_t pc, mpz_t n)
+{
+  mpf_t x, logx, logx2, t, s;
+  unsigned long bits = 7 + DIGS2BITS(mpz_sizeinbase(n,10));
+  unsigned long N = mpz_get_ui(n);
+
+  if (mpz_cmp_ui(n, 1000) < 0)
+    { mpz_set_ui(pc, small_prime_count(N)); return; }
+
+  mpf_init2(x,     bits);
+  mpf_init2(logx,  bits);
+  mpf_init2(logx2, bits);
+  mpf_init2(t,     bits);
+  mpf_init2(s,     bits);
+
+  mpf_set_z(x, n);
+  mpf_log(logx, x);
+  mpf_mul(logx2, logx, logx);
+
+  if (mpz_cmp_ui(n, 300000) < 0) {
+    double a = (N <  33000) ? 1190
+             : (N <  70200) ? 947
+             : (N < 176000) ? 904
+                            : 829;
+    mpf_set(s, logx);
+    mpf_sub_ui(s, s, 1);
+    mpf_ui_div(t, 1, logx);
+    mpf_sub(s, s, t);
+    mpf_set_d(t, 2.85);
+    mpf_div(t, t, logx2);
+    mpf_sub(s, s, t);
+    mpf_set_d(t, 13.15);
+    mpf_mul(logx2, logx2, logx);
+    mpf_div(t, t, logx2);
+    mpf_sub(s, s, t);
+    mpf_set_d(t, a);
+    mpf_mul(logx2, logx2, logx);
+    mpf_div(t, t, logx2);
+    mpf_add(s, s, t);
+    mpf_div(x, x, s);
+  } else if (mpf_cmp_d(x, 1e19) < 0) { /* Büthe 2015 1.9    1511.02032v2.pdf */
+    double a = 2.50;
+    double b = (N <     88783) ?   4.0
+             : (N <    300000) ?  -3.0
+             : (N <    303000) ?   5.0
+             : (N <   1100000) ?  -7.0
+             : (N <   4500000) ? -37.0
+             : (N <  10200000) ? -70.0
+             : (N <  36900000) ? -53.0
+             : (N <  38100000) ? -29.0
+             :                   -84.0;
+    mpf_set_str(s, "1.95", 10);
+    if (N >= 4000000000UL) {
+      mpf_set_str(t, "3.9", 10);
+      mpf_div(t, t, logx);
+      mpf_add(s, s, t);
+      mpf_set_str(t, "19.5", 10);
+      mpf_div(t, t, logx2);
+      mpf_add(s, s, t);
+    } else {
+      mpf_set_d(t, a);
+      mpf_div(t, t, logx);
+      mpf_add(s, s, t);
+      mpf_set_d(t, b);
+      mpf_div(t, t, logx2);
+      mpf_add(s, s, t);
+    }
+    mpf_sqrt(t, x);
+    mpf_div(t, t, logx);
+    mpf_mul(s, s, t);
+
+    li(t, x, 20);
+    mpf_sub(x, t, s);
+
+  } else if (mpf_cmp_d(x, 5.5e25) < 0) { /* Büthe 2014 v3 7.2 1410.7015v3.pdf */
+    mpf_sqrt(t, x);                      /* Axler 2017 2.2    1703.08032.pdf */
+    mpf_mul(s, logx, t);
+    const_pi(t, 30);
+    mpf_mul_2exp(t, t, 3);
+    mpf_div(s, s, t);
+    li(t, x, 30);
+    mpf_sub(x, t, s);
+  } else { /* Axler 2017 1.3  https://arxiv.org/pdf/1703.08032.pdf */
+    mpf_set(s, logx);
+    mpf_sub_ui(s, s, 1);
+    mpf_ui_div(t, 1, logx);
+    mpf_sub(s, s, t);
+    mpf_set_str(t, "2.85", 10);
+    mpf_div(t, t, logx2);
+    mpf_sub(s, s, t);
+    mpf_set_str(t, "13.15", 10);
+    mpf_mul(logx2, logx2, logx);
+    mpf_div(t, t, logx2);
+    mpf_sub(s, s, t);
+    mpf_set_str(t, "70.7", 10);
+    mpf_mul(logx2, logx2, logx);
+    mpf_div(t, t, logx2);
+    mpf_sub(s, s, t);
+    mpf_set_str(t, "458.7275", 10);
+    mpf_mul(logx2, logx2, logx);
+    mpf_div(t, t, logx2);
+    mpf_sub(s, s, t);
+    mpf_set_str(t, "3428.7225", 10);
+    mpf_mul(logx2, logx2, logx);
+    mpf_div(t, t, logx2);
+    mpf_sub(s, s, t);
+    mpf_div(x, x, s);
+  }
+  if (!mpf_integer_p(x)) mpf_add_ui(x, x, 1);  /* ceil */
+  mpz_set_f(pc,x);
+  mpf_clear(logx2); mpf_clear(logx); mpf_clear(x); mpf_clear(t); mpf_clear(s);
+}
+void prime_count_upper(mpz_t pc, mpz_t n)
+{
+  mpf_t x, logx, logx2, t, s;
+  unsigned long bits = 7 + DIGS2BITS(mpz_sizeinbase(n,10));
+  unsigned long N = mpz_get_ui(n);
+
+  if (mpz_cmp_ui(n, 1000) < 0)
+    { mpz_set_ui(pc, small_prime_count(N)); return; }
+
+  if (mpz_cmp_ui(n, 15900) < 0) {
+    if (N < 7) {
+      mpz_set_ui(pc, 0 + (N >= 2) + (N >= 3) + (N >= 5));
+    } else {
+      double a = (N < 1621) ? 1.048 : (N < 5000) ? 1.071 : 1.098;
+      double X = 1.0 + ((double)N) / (log((double)N) - a);
+      mpz_set_d(pc, X);
+    }
+    return;
+  }
+
+  mpf_init2(x,     bits);
+  mpf_init2(logx,  bits);
+  mpf_init2(logx2, bits);
+  mpf_init2(t,     bits);
+  mpf_init2(s,     bits);
+
+  mpf_set_z(x, n);
+  mpf_log(logx, x);
+  mpf_mul(logx2, logx, logx);
+
+  if (mpz_cmp_ui(n, 821800000UL) < 0) {
+    double a = (N <    356000) ? 2.54
+             : (N <  48000000) ? 2.51
+             : (N < 400000000) ? 2.47
+                               : 2.37;
+    mpf_set_ui(s, 1);
+    mpf_ui_div(t, 1, logx);
+    mpf_add(s, s, t);
+    mpf_set_d(t, a);
+    mpf_div(t, t, logx2);
+    mpf_add(s, s, t);
+
+    mpf_div(t, x, logx);
+    mpf_mul(x, t, s);
+  } else if (mpf_cmp_d(x, 1e19) < 0) { /* Büthe 2015 1.10    1511.02032v2.pdf */
+    double a = (mpf_cmp_d(x,   1100000000.0) < 0) ? 0.032
+             : (mpf_cmp_d(x,  10010000000.0) < 0) ? 0.027
+             : (mpf_cmp_d(x, 101260000000.0) < 0) ? 0.021
+                                                  : 0.0;
+    if (a > 0) {
+      mpf_sqrt(t, x);
+      mpf_mul(s, logx, t);
+      mpf_set_d(t, a);
+      mpf_mul(s, s, t);
+      const_pi(t, 25);
+      mpf_mul_2exp(t, t, 3);
+      mpf_div(s, s, t);
+      li(t, x, 25);
+      mpf_sub(x, t, s);
+    } else {
+      li(x, x, 25);
+    }
+  } else if (mpf_cmp_d(x, 5.5e25) < 0) { /* Büthe 2014 v3 7.2 1410.7015v3.pdf */
+    mpf_sqrt(t, x);                      /* Axler 2017 2.2    1703.08032.pdf */
+    mpf_mul(s, logx, t);
+    const_pi(t, 30);
+    mpf_mul_2exp(t, t, 3);
+    mpf_div(s, s, t);
+    li(t, x, 30);
+    mpf_add(x, t, s);
+  } else { /* Axler 2017 1.2  https://arxiv.org/pdf/1703.08032.pdf */
+    mpf_set(s, logx);
+    mpf_sub_ui(s, s, 1);
+    mpf_ui_div(t, 1, logx);
+    mpf_sub(s, s, t);
+    mpf_set_str(t, "3.15", 10);
+    mpf_div(t, t, logx2);
+    mpf_sub(s, s, t);
+    mpf_set_str(t, "12.85", 10);
+    mpf_mul(logx2, logx2, logx);
+    mpf_div(t, t, logx2);
+    mpf_sub(s, s, t);
+    mpf_set_str(t, "71.3", 10);
+    mpf_mul(logx2, logx2, logx);
+    mpf_div(t, t, logx2);
+    mpf_sub(s, s, t);
+    mpf_set_str(t, "463.2275", 10);
+    mpf_mul(logx2, logx2, logx);
+    mpf_div(t, t, logx2);
+    mpf_sub(s, s, t);
+    mpf_set_str(t, "4585", 10);
+    mpf_mul(logx2, logx2, logx);
+    mpf_div(t, t, logx2);
+    mpf_sub(s, s, t);
+    mpf_div(x, x, s);
+  }
+  /* floor */
+  mpz_set_f(pc,x);
+  mpf_clear(logx2); mpf_clear(logx); mpf_clear(x); mpf_clear(t); mpf_clear(s);
+}
 /*****************************************************************************/
 
 void count_primes(mpz_t count, mpz_t lo, mpz_t hi)

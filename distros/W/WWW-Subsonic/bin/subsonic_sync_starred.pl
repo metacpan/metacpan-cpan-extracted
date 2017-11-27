@@ -156,7 +156,7 @@ subsonic_sync_starred.pl - Download and/or sync starred media to a target direct
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 AUTHOR
 

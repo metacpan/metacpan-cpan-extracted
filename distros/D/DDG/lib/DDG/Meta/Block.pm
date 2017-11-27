@@ -1,7 +1,7 @@
 package DDG::Meta::Block;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Inject keywords to make a L<DDG::Block::Blockable> plugin
-$DDG::Meta::Block::VERSION = '1017';
+$DDG::Meta::Block::VERSION = '1018';
 use strict;
 use warnings;
 use Carp;
@@ -60,7 +60,7 @@ DDG::Meta::Block - Inject keywords to make a L<DDG::Block::Blockable> plugin
 
 =head1 VERSION
 
-version 1017
+version 1018
 
 =head1 DESCRIPTION
 

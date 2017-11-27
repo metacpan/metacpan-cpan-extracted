@@ -1,100 +1,194 @@
 package MsgPack::RPC;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: MessagePack RPC client
-$MsgPack::RPC::VERSION = '1.0.1';
+$MsgPack::RPC::VERSION = '2.0.0';
 
 use strict;
 use warnings;
 
 use Moose;
 
-use IO::Socket::INET;
-use IO::Socket::UNIX;
+use IO::Async::Loop;
+use Promises qw/ deferred /, backend => [  'IO::Async' ];
+
 use MsgPack::Decoder;
 use MsgPack::Encoder;
 use MsgPack::RPC::Message;
 use MsgPack::RPC::Message::Request;
+use MsgPack::RPC::Event::Write;
+use MsgPack::RPC::Message::Response;
+use MsgPack::RPC::Message::Notification;
+use MsgPack::RPC::Event::Receive;
 
-use Promises qw/ deferred /;
+use Scalar::Util qw/ blessed /;
 
-use experimental 'signatures';
+use experimental 'signatures', 'switch';
 
 with 'Beam::Emitter';
-with 'MooseX::Role::Loggable' => {
-    -excludes => [ 'Bool' ],
-};
 
 has io => (
-    required => 1,
     is       => 'ro',
     trigger  => \&_set_io_accessors,
 );
 
+has stream => (
+    is => 'rw',
+    handles => [ 'write' ],
+);
 
-sub _set_io_accessors($self,$io,@) {
-    if( ref $io eq 'ARRAY' ) {
-        $self->_io_read(sub{ 
-            my $buffer;
-            1 until read $io->[0], $buffer, 1;
-            $buffer;
-        });
+has loop => (
+    is => 'ro',
+    lazy => 1,
+    default => sub { IO::Async::Loop->new },
+    handles => [ 'run' ],
+);
 
-        $self->_io_write(sub(@stuff){
-            print { $io->[1] } @stuff
-                or die "couldn't write to output\n";
-        });
-    }
-    elsif( not ref $io ) {
-        if( $io =~ /:/ ) {
-            $self->socket( IO::Socket::INET->new( 
-                    Proto => 'tcp',
-                    Timeout => 60, PeerAddr => $io, Blocking => 1) or die "couldn't connect to socket '$io': $!\n" );
-        }
-        else {
-            $self->socket( IO::Socket::UNIX->new(
-                    Peer => $io,
-            ));
-        }
-
-        $self->_io_read(sub{
-            my $buffer;
-            $self->socket->recv($buffer, 1);
-            $buffer;
-        });
-        $self->_io_write(sub{
-            $self->socket->send(@_);
-        });
-    }
-    else {
-        die "don't know how to deal with '$io'";
-    }
+sub bin_2_hex {
+    join '', map { sprintf "%#x", ord } split '', shift;
 }
 
-has [ qw/ _io_read _io_write / ] => ( is => 'rw' );
-
-has "socket" => (
-    is => 'rw',
+has log => (
+    is => 'ro',
     lazy => 1,
-    default => sub {
-        my $self = shift;
-
-        my $addie = join ':', $self->host, $self->port;
-
-        IO::Socket::INET->new( $addie )
-            or die "couldn't connect to $addie";
+    default => sub { 
+        require Log::Any;
+        Log::Any->get_logger;
     },
 );
+
+sub _buffer_read ( $rpc, $stream, $buffref, $eof ) {
+    $rpc->log->tracef( 'reading %s', bin_2_hex($$buffref) );
+
+    $rpc->read( $$buffref );
+
+    $$buffref = '';
+
+    return 0;
+}
+
+sub _set_inet_io ( $self, $host, $port ) {
+
+    $self->loop->connect(
+        host      => $host,
+        port      => $port,
+        socktype  => 'stream',
+        on_stream => sub {
+            my $stream = shift;
+            $stream->configure(
+                on_read => sub { $self->_buffer_read(@_) },
+            );
+            $self->loop->add($stream);
+            $self->on( 'write', sub {
+                    my $event = shift;
+                    $stream->write( $event->encoded );
+            });
+        },
+        on_resolve_error => sub { die "Cannot resolve - $_[-1]\n"; },
+        on_connect_error => sub { die "Cannot connect - $_[0] failed $_[-1]\n"; },
+    );
+}
+
+sub _set_socket_io ( $self, $socket ) {
+
+    $self->loop->connect(
+        addr => {
+            family   => 'unix',
+            socktype => 'stream',
+            path     => $socket,
+        },
+        on_stream => sub {
+            my $stream = shift;
+            $self->stream($stream);
+            $stream->configure(
+                on_read => sub { $self->_buffer_read(@_) },
+            );
+            $self->loop->add($stream);
+            $self->on( 'write', sub {
+                    my $event = shift;
+                    $stream->write( $event->encoded );
+            });
+        },
+        on_resolve_error => sub { die "Cannot resolve - $_[-1]\n"; },
+        on_connect_error => sub { die "Cannot connect - $_[0] failed $_[-1]\n"; },
+    );
+}
+
+sub _set_fh_io ( $self, $in_fh, $out_fh ) {
+
+    $out_fh->autoflush(1);
+
+    require IO::Async::Stream;
+    my $stream = IO::Async::Stream->new(
+        read_handle => $in_fh,
+        on_read  => sub { $self->_buffer_read(@_) },
+    );
+
+    $self->loop->add($stream);
+    $self->on( 'write', sub {
+        $self->log->debugf( 'uh? %s', $_[0] );
+        my $event = shift;
+        $out_fh->syswrite( $event->encoded );
+    });
+}
+
+sub _set_io_accessors($self,$io,@) {
+
+    return $self->_set_fh_io( @$io ) if ref $io eq 'ARRAY';
+
+    return $self->_set_inet_io(split ':', $io)
+        if $io =~ /:/;
+
+    return $self->_set_socket_io($io);
+
+}
 
 has decoder => (
     isa => 'MsgPack::Decoder',
     is => 'ro',
     lazy => 1,
     default => sub {
-        MsgPack::Decoder->new(
-            logger => $_[0]->logger
-        );
+        my $self = shift;
+        
+        my $decoder = MsgPack::Decoder->new( emitter => 1 );
+
+        $decoder->on( decoded => sub {
+            my $event = shift;
+            $self->receive($_) for $event->payload_list;
+        });
+
+        return $decoder;
     },
+    handles => [ 'read' ],
 );
+
+sub receive ( $self, $message ) {
+    my @message = @$message;
+
+    my $m;
+    given ( $message[0] ) {
+        $m = MsgPack::RPC::Message::Request->new( id => $message[1], method => $message[2], params => $message[3] ) when 0;
+        $m = MsgPack::RPC::Message::Response->new( id => $message[1], error => $message[2], result => $message[3] ) when 1;
+        $m = MsgPack::RPC::Message::Notification->new( method => $message[1], params => $message[2] ) when 2;
+    }
+
+    $self->emit( 'receive', class => 'MsgPack::RPC::Event::Receive', message => $m );
+
+    # if a response, trigger the callback
+    if( $m->is_response ) {
+        if ( my $callback = delete $self->response_callbacks->{$m->id} ) {
+            if( $m->is_error ) {
+                $callback->{deferred}->reject($m->error);
+            }
+            else {
+                $callback->{deferred}->resolve($m->result);
+            }
+        }
+    }
+    else {
+        $self->emit( $m->method, class => 'MsgPack::RPC::Event::Receive', message => $m );
+    }
+}
+
 
 has "response_callbacks" => (
     is => 'ro',
@@ -102,6 +196,11 @@ has "response_callbacks" => (
     default => sub {
         {};
     },
+);
+
+has timeout => (
+    is => 'ro',
+    default => 300,
 );
 
 sub add_response_callback {
@@ -112,95 +211,62 @@ sub add_response_callback {
         deferred => $deferred,
     };
 
-    $deferred;
+    require IO::Async::Timer::Countdown;
+    my $timeout = IO::Async::Timer::Countdown->new(
+        delay => $self->timeout,
+        on_expire => sub { 
+            delete $self->response_callbacks->{$id};
+            $deferred->reject('timeout'); 
+        }
+    );
+
+    $self->loop->add($timeout->start);
+
+    $deferred->finally(sub{ $self->loop->remove($timeout) });
 }
 
-sub request($self,$method,$args=[],$id=++$MsgPack::RPC::MSG_ID) {
-    $self->send([ 0, $id, $method, $args ]);
-    $self->add_response_callback($id);
+sub send_request($self,$method,$args=[],$id=++$MsgPack::RPC::MSG_ID) {
+    my $request = MsgPack::RPC::Message::Request->new(
+        method => $method,
+        params => $args,
+    );
+
+    my $callback = $self->add_response_callback($request->id);
+
+    $self->send($request);
+
+    return $callback->{deferred};
 }
 
-sub response($self,$id,$args) {
-    $self->send([ 1, $id, undef, $args]);
+sub send_response($self,$id,$args) {
+    $self->send(
+        MsgPack::RPC::Message::Response->new(
+            id => $id,
+            result => $args,
+        )
+    );
 }
 
-sub response_error($self,$id,$args) {
-    $self->send([ 1, $id, $args, undef]);
+sub send_response_error($self,$id,$args) {
+    $self->send(
+        MsgPack::RPC::Message::Response->new(
+            id => $id,
+            error => $args,
+        )
+    );
 }
 
-sub notify($self,$method,$args=[]) {
-    $self->send([2,$method,$args]);
+sub send_notification ($self,$method,$args=[]) {
+    $self->send( MsgPack::RPC::Message::Notification->new(
+        method => $method, params => $args,
+    ));
 }
+
 
 sub send($self,$struct) {
-    $self->log( [ "sending %s", $struct] );
-
-    my $encoded = MsgPack::Encoder->new(struct => $struct)->encoded;
-
-    $self->log_debug( [ "encoded: %s", $encoded ] );
-    $self->_io_write->($encoded);
+    my $type = blessed $struct ? 'message' : 'payload';
+    $self->emit( 'write', class => 'MsgPack::RPC::Event::Write', $type => $struct );
 }
-
-sub emit_request($self,$id,$method,$args) {
-    $self->log_debug( [ "received a '%s(%s)' request", $method,$args ] );
-    $self->emit( $method, class => 'MsgPack::RPC::Message::Request', 
-        args => $args, message_id => $id );     
-}
-
-sub emit_notification($self,$method,$args) {
-    $self->log_debug( [ "it's a '%s' notification", $method ] );
-    $self->emit( $method, class => 'MsgPack::RPC::Message', args => $args );     
-}
-
-sub loop {
-    my $self = shift;
-    my $until = shift;
-
-    while ( ) {
-        my $byte = $self->_io_read->();
-        #    warn ord($byte)."!\n";
-        $self->decoder->read( $byte );
-
-        while( $self->decoder->has_buffer ) {
-            my $next = $self->decoder->next;
-            $self->log( [ "receiving %s" , $next ]);
-
-            if ( $next->[0] == 1 ) {
-                $self->log_debug( [ "it's a response for %d", $next->[1] ] );
-                if( my $callback =  $self->response_callbacks->{$next->[1]} ) {
-                    my $f = $callback->{deferred};
-                    $next->[2] 
-                        ? $f->reject($next->[2])
-                        : $f->resolve($next->[3])
-                        ;
-                }
-            }
-            elsif( $next->[0] == 2 ) {
-                $self->emit_notification($next->[1],$next->[2]);
-            }
-            elsif( $next->[0] == 0 ) {
-                $self->emit_request($next->[1], $next->[2], $next->[3]);
-            }
-
-            if( defined $until ) {
-                if( ref $until eq 'CODE' ) {
-                    return if $until->();
-                }
-                elsif( eval { $until->isa('Future') } ) {
-                    return if $until->is_done;
-                }
-                elsif( eval { $until->can('is_in_progress') } ) {
-                    return unless $until->is_in_progress;
-                }
-                else {
-                    return if $until and not --$until;
-                }
-            }
-
-        }
-    }
-}
-    
 
 1;
 
@@ -216,7 +282,7 @@ MsgPack::RPC - MessagePack RPC client
 
 =head1 VERSION
 
-version 1.0.1
+version 2.0.0
 
 =head1 SYNOPSIS
 
@@ -229,8 +295,6 @@ version 1.0.1
     $rpc->request( 
         request_method => [ 'some', 'args' ] 
     )->on_done(sub{
-        my $resp = @_;
-
         print "replied with: ", @_;
     });
 
@@ -243,18 +307,13 @@ the protocol described at L<https://github.com/msgpack-rpc/msgpack-rpc/blob/mast
 
 =head1 METHODS
 
-C<MsgPack::RPC> consumes the role L<MooseX::Role::Loggable>, and thus has all its
-exported methods.
-
 =head2 new( %args )
-
-The class constructor takes all the arguments for L<MooseX::Role::Loggable>, plus the following:
 
 =over
 
-=item io( [ $in_fh, $out_fh ] )
-
 =item io( $socket )
+
+=item io( [ $in_fh, $out_fh ] )
 
 Required. Defines which IO on which the MessagePack messages will be received and sent.
 
@@ -296,6 +355,7 @@ Sends a notification.
     });
 
 Register a callback for the given event. If a notification or a request matching the
+event
 is received, the callback will be called. The callback will be passed either a L<MsgPack::RPC::Message> (if triggered by
 a notification) or
 L<MsgPack::RPC::Message::Request> object.
@@ -338,7 +398,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Yanick Champoux.
+This software is copyright (c) 2017, 2016, 2015 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,7 +1,7 @@
 package MsgPack::Encoder;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Encode a structure into a MessagePack binary string
-$MsgPack::Encoder::VERSION = '1.0.1';
+$MsgPack::Encoder::VERSION = '2.0.0';
 
 use strict;
 use warnings;
@@ -489,7 +489,7 @@ MsgPack::Encoder - Encode a structure into a MessagePack binary string
 
 =head1 VERSION
 
-version 1.0.1
+version 2.0.0
 
 =head1 SYNOPSIS
 
@@ -606,7 +606,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Yanick Champoux.
+This software is copyright (c) 2017, 2016, 2015 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

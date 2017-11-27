@@ -99,6 +99,8 @@ sub header_in {
 sub set_header_in {
     my ( $class, %headers ) = @_;
     while ( my ( $h, $v ) = each %headers ) {
+        use utf8;
+        utf8::downgrade($v);
         $request->headers_in->set( $h => $v );
     }
 }

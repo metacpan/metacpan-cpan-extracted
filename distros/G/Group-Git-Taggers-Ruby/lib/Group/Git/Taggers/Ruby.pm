@@ -16,7 +16,7 @@ use English qw/ -no_match_vars /;
 
 extends 'Group::Git::Taggers';
 
-our $VERSION = version->new('0.0.3');
+our $VERSION = version->new('0.0.5');
 
 sub match {
     my ($self, $project) = @_;
@@ -36,7 +36,7 @@ Group::Git::Taggers::Ruby - Tags repositories as containing Ruby code for Group:
 
 =head1 VERSION
 
-This documentation refers to Group::Git::Taggers::Ruby version 0.0.3
+This documentation refers to Group::Git::Taggers::Ruby version 0.0.5
 
 =head1 SYNOPSIS
 

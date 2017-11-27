@@ -3,8 +3,8 @@
 # Author          : Johan Vromans
 # Created On      : Wed Aug 22 22:33:31 2007
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Apr 19 16:25:06 2011
-# Update Count    : 6
+# Last Modified On: Sat Mar 29 22:25:40 2014
+# Update Count    : 7
 # Status          : Unknown, Use with caution!
 
 package App::Music::PlayTab::Note;
@@ -80,21 +80,6 @@ sub key {
 sub name {
     my $self = shift;
     App::Music::PlayTab::NoteMap::key_to_note($self->{key}, $self->{useflat});
-}
-
-sub ps {
-    my $self = shift;
-    my $res = $self->name;
-    if ( $res =~ /(.)b/ ) {
-	$res = '('.$1.') root flat';
-    }
-    elsif ( $res =~ /(.)#/ ) {
-	$res = '('.$1.') root sharp';
-    }
-    else {
-	$res = '('.$res.') root';
-    }
-    $res;
 }
 
 1;

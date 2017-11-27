@@ -5,10 +5,7 @@ use Test::More tests => 2;
 
 use MsgPack::Decoder;
 
-my $decoder = MsgPack::Decoder->new(
-    log_to_stderr => 1,
-    debug         => 0,
-);
+my $decoder = MsgPack::Decoder->new;
 
 sub to_binary { map { chr } @_ }
 

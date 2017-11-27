@@ -57,7 +57,7 @@ use Catmandu;
 use Cache::LRU;
 use REST::Client;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 with 'Catmandu::Logger';
 
@@ -65,6 +65,7 @@ has 'url'          => (is => 'ro' , required => 1);
 has 'username'     => (is => 'ro' , required => 1);
 has 'password'     => (is => 'ro' , required => 1);
 has 'record_query' => (is => 'ro' , default => sub { "q=%%2B(MediaObjectFragmentId:%s)"; });
+has id_fixer       => (is => 'ro' , init_arg => 'record_id_fix', coerce => sub {Catmandu->fixer($_[0])},);
 has 'sleep'        => (is => 'ro' , default => sub { 1 });
 
 has 'cache'        => (is => 'lazy');
@@ -143,6 +144,10 @@ sub search {
            }
         }
 
+	if ($self->id_fixer) {
+            $hit = $self->id_fixer->fix($hit);
+    	}
+
         $self->cache->set($id => $hit) if defined($id);
     }
 
@@ -177,7 +182,13 @@ sub record {
     }
 
     if ($res->{mediaDataList}) {
-        return $res->{mediaDataList}->[0];
+	my $hit = $res->{mediaDataList}->[0];
+	if ($self->id_fixer) {
+          return $self->id_fixer->fix($hit);
+    	}
+	else {
+	  return $hit;
+	}
     }
     else {
         return undef;
@@ -212,7 +223,7 @@ sub edit {
     }
 
     my $res = $self->_rest_post("$fragmentId/$field", @param);
-    
+
     return $res;
 }
 

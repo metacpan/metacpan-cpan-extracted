@@ -10,20 +10,20 @@ use Chloro::Test::NoNameExtractor;
 my $form = Chloro::Test::NoNameExtractor->new();
 
 {
-    my $set = $form->process(
+    my $result_set = $form->process(
         params => {
             foo => 42,
         }
     );
 
     is_deeply(
-        $set->results_as_hash(),
+        $result_set->results_as_hash(),
         { foo => 42 },
         'foo is extracted from from form'
     );
 
     is_deeply(
-        $set->result_for('foo')->param_names(),
+        $result_set->result_for('foo')->param_names(),
         [],
         'foo field has no param_names'
     );

@@ -6,10 +6,12 @@ use Carp 'croak';
 use Exporter 'import';
 use File::Spec ();
 use File::Temp ();
+use IO::String ();
 use Test::More ();
 
 our @EXPORT_OK = ('applify_ok', 'applify_subcommands_ok');
-our $VERSION = '0.04';
+our $VERSION = '0.05';
+our $exited = 0;
 
 sub app {
   @_ == 2 and $_[0]->{app} = $_[1];
@@ -91,10 +93,8 @@ sub extends_ok {
 sub help_ok {
   my $self = shift;
   my $like = shift || qr/help/;
-  local *STDOUT;
-  local *STDERR;
-  my $stdout = '';
-  my $stderr = '';
+  local (*STDOUT, *STDERR);
+  my ($stdout, $stderr) = ('', '');
   open STDOUT, '>', \$stdout;
   open STDERR, '>', \$stderr;
   $self->app_script->print_help();
@@ -138,6 +138,37 @@ sub new {
   return $self;
 }
 
+sub run_instance_ok {
+    my $self = shift;
+    my $instance = shift;
+
+    $self->_test('ok', $instance, 'pass run_instance_ok return from app_instance');
+    $self->_test('like', ref($instance), qr/^Applify\:\:/, 'application class');
+    $self->_test('can_ok', $instance, '_script');
+
+    my ($stdout, $stderr) = ('', '');
+    #local (*STDOUT, *STDERR);
+    #open STDOUT, '>', \$stdout;
+    #open STDERR, '>', \$stderr;
+    # different approach to help_ok
+    tie *STDOUT, 'IO::String', \$stdout;
+    tie *STDERR, 'IO::String', \$stderr;
+
+    $exited = 0;
+    my $retval = eval { $instance->run() };
+
+    untie *STDOUT;
+    untie *STDERR;
+
+    return ($retval, $stdout || $@, $@ || $stderr, $exited);
+}
+
+sub run_ok {
+    my $self = shift;
+    $self->run_instance_ok($self->app_instance(@_));
+}
+
+
 sub subcommand_ok {
   my $self = shift;
   my $exp  = shift;
@@ -161,6 +192,7 @@ sub _build_code {
   foreach my $file (grep { not $seen{lc $_}++ }
                     grep { -e $_ and -r _ } $name, $ext) {
     {
+        ## no critic(Modules::ProhibitMultiplePackages)
       eval {
         package
           Test::Applify::Container; # do not index
@@ -169,6 +201,11 @@ sub _build_code {
         no warnings 'redefine';
         my $code = Applify->can('app');
         my $tmp; ## copy - help recovering bad code.
+        # like a BEGIN block https://stackoverflow.com/a/25376064
+        # "bakes" it into do().
+        *CORE::GLOBAL::exit = sub (;$) {
+            $exited = 1;
+        };
         local *{"Applify\::app"} = sub (&) {
           ## do not run the app - even if user authored incorrect code.
           ($tmp) = $code->(@_); ## force array context
@@ -176,6 +213,8 @@ sub _build_code {
         };
         local @ARGV = @_; # support subcommand
         $app = do $file;
+        # no warnings 'once' and https://stackoverflow.com/a/25376064
+        #*CORE::GLOBAL::exit = *CORE::exit;
 
         if ($@) {
           ## script didn't compile - syntax error, missing modules, etc...
@@ -216,22 +255,39 @@ sub _test {
 
 Test::Applify - Testing Applify scripts
 
-=for html <a href="https://travis-ci.org/kiwiroy/perl5-Test-Applify"><img src="https://travis-ci.org/kiwiroy/perl5-Test-Applify.svg?branch=master" alt="Build Status"></a>
+=begin html
 
-=for html <a href="https://coveralls.io/github/kiwiroy/perl5-Test-Applify?branch=master"><img src="https://coveralls.io/repos/github/kiwiroy/perl5-Test-Applify/badge.svg?branch=master" alt="Coverage Status"></a>
+<!-- Travis-CI.org -->
+<a href="https://travis-ci.org/kiwiroy/perl5-Test-Applify">
+  <img src="https://travis-ci.org/kiwiroy/perl5-Test-Applify.svg?branch=master"
+       alt="Build Status">
+</a>
+<!-- Coveralls.io -->
+<a href="https://coveralls.io/github/kiwiroy/perl5-Test-Applify?branch=master">
+  <img src="https://coveralls.io/repos/github/kiwiroy/perl5-Test-Applify/badge.svg?branch=master"
+       alt="Coverage Status">
+</a>
+<!-- Kritika.io -->
+<a href="https://kritika.io/users/kiwiroy/repos/9259367477562624/heads/master/">
+  <img src="https://kritika.io/users/kiwiroy/repos/9259367477562624/heads/master/status.svg"
+       alt="Kritika Analysis Status" />
+</a>
+<!-- CPAN version -->
+<a href="https://badge.fury.io/pl/Test-Applify">
+  <img src="https://badge.fury.io/pl/Test-Applify.svg" alt="CPAN version" height="18">
+</a>
 
-=for html <a href="https://badge.fury.io/pl/Test-Applify"><img src="https://badge.fury.io/pl/Test-Applify.svg" alt="CPAN version" height="18"></a>
+=end html
 
 =head1 SYNOPSIS
 
   use Test::More;
-  use Test::Applify;
+  use Test::Applify 'applify_ok';
 
   my $t = Test::Applify->new('./bin/app.pl');
-  my $help = $t->help_ok;
-  like $help, qr/basic/, 'help mentions basic mode';
-  $t->documentation_ok;
-  $t->version_ok('1.0.999');
+  $t->help_ok(qr/basic/)
+    ->documentation_ok
+    ->version_ok('1.0.999');
   $t->is_option($_) for qw{mode input};
   $t->is_required_option($_) for qw{input};
 
@@ -241,10 +297,10 @@ Test::Applify - Testing Applify scripts
   my $app2 = $t->app_instance(qw{-mode expert -input strings.txt});
   is $app2->mode, 'expert', 'expert mode enabled';
   is $app2->input, 'strings.txt', 'reading strings.txt';
+  $t->run_instance_ok($app2);
 
-  use Test::Applify 'applify_ok';
   my $inlineapp = applify_ok("use Applify; app { print 'hello world!'; 0;};");
-  my $t = Test::Applify->new($inlineapp);
+  $t = Test::Applify->new($inlineapp);
 
 =head1 DESCRIPTION
 
@@ -320,8 +376,13 @@ Access to the Applify object.
 =head2 app_instance
 
   my $safe  = $t->app_instance(qw{-opt value -mode safe});
+  is $safe->mode, 'safe', 'will run in safe mode';
   my $risky = $t->app_instance();
   is $risky->mode, 'expert', 'expert mode is the default';
+
+Create an instance of the application class, which will be the contents of the
+L<Applify> script created. The array passed will be turned into C<@ARGV> as if
+those options had been passed on the command line.
 
 =head2 can_ok
 
@@ -363,11 +424,42 @@ Test that the option is a required option.
 
 =head2 new
 
-  my $t = Test::Applify->new('script.pl');
+  my $t = Test::Applify->new('./script.pl');
   # instance for the 'list' subcommand
-  my $t = Test::Applify->new('script.pl', 'list');
+  my $t = Test::Applify->new('./script.pl', 'list');
 
 Instantiate a new test instance for the supplied script name.
+
+=head2 run_instance_ok
+
+  my $t = Test::Applify->new('./script.pl');
+  my $app = $t->app_instance(qw{-mode expert});
+  is $app->mode, 'expert', 'everyone is an expert';
+  my ($retval, $stdout, $stderr, $exited) = $t->run_instance_ok($app);
+
+Call C<run> on the L<Applify> application class instance
+(execute the C<app {}> block). Returns a list of scalars which are:
+
+=over 4
+
+=item retval - the return value of the C<app> block
+
+This is C<undef> when L<perlfunc/die> called
+
+=item stdout - the content that was printed to C<STDOUT> during the run
+
+=item stderr - L<perlvar/"$@"> or the content that was printed to C<STDERR> during the run
+
+=item exit - whether the code exited
+
+=back
+
+=head2 run_ok
+
+  my $t = Test::Applify->new('./script.pl');
+  my ($exit, $stdout, $stderr, $retval) = $t->run_ok(qw{-mode expert});
+
+Same as L</run_instance_ok>, but less code.
 
 =head2 subcommand_ok
 

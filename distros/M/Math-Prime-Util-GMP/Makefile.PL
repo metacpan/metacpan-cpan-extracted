@@ -17,12 +17,14 @@ WriteMakefile1(
                     'factor.o '         .
                     'pbrent63.o '       .
                     'squfof126.o '      .
-                    'simpqs.o '         .
                     'ecm.o '            .
+                    'tinyqs.o '         .
+                    'simpqs.o '         .
                     'bls75.o '          .
                     'ecpp.o '           .
                     'aks.o '            .
                     'gmp_main.o '       .
+                    'real.o '           .
                     'isaac.o '          .
                     'random_prime.o '   .
                     'XS.o',
@@ -62,7 +64,7 @@ WriteMakefile1(
                },
                provides => {
                  'Math::Prime::Util::GMP' => {
-                    version => '0.48',
+                    version => '0.49',
                     file => 'lib/Math/Prime/Util/GMP.pm',
                  },
                },

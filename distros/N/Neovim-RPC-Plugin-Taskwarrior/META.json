@@ -1,0 +1,82 @@
+{
+   "abstract" : "UI for taskwarrior",
+   "author" : [
+      "Yanick Champoux <yanick@babyl.dyndns.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Neovim-RPC-Plugin-Taskwarrior",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0.96",
+            "Test::Vars" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime" : "0",
+            "DateTime::Format::ISO8601" : "0",
+            "Neovim::RPC::Plugin" : "0",
+            "Promises" : "0",
+            "Taskwarrior::Kusarigama::Wrapper" : "0",
+            "experimental" : "0",
+            "perl" : "v5.20.0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "strict" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Neovim::RPC::Plugin::Taskwarrior" : {
+         "file" : "lib/Neovim/RPC/Plugin/Taskwarrior.pm",
+         "version" : "v0.0.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/yanick/Neovim-RPC-Plugin-Taskwarrior/issues"
+      },
+      "homepage" : "https://github.com/yanick/Neovim-RPC-Plugin-Taskwarrior",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/yanick/Neovim-RPC-Plugin-Taskwarrior.git",
+         "web" : "https://github.com/yanick/Neovim-RPC-Plugin-Taskwarrior"
+      }
+   },
+   "version" : "0.0.1",
+   "x_author_pledge" : {
+      "version" : 1
+   },
+   "x_authority" : "cpan:YANICK",
+   "x_contributors" : [
+      "Yanick Champoux <yanick@cpan.org>"
+   ],
+   "x_serialization_backend" : "JSON::XS version 3.01"
+}
+

@@ -14,7 +14,7 @@ use constant SKIP      => 2;
 #inherits Apache::Session
 #link Lemonldap::NG::Common::Apache::Session::SOAP protected globalStorage
 
-our $VERSION = '1.9.11';
+our $VERSION = '1.9.14';
 our ( %EXPORT_TAGS, @EXPORT_OK, @EXPORT );
 
 our $tsv = {};    # Hash ref containing thread-shared values, filled
@@ -745,7 +745,7 @@ sub postJavascript {
         use bytes;
         my $value = "x" x bytes::length( $data->{$name} );
         $filler .=
-"form.find('input[name=$name], select[name=$name], textarea[name=$name]').val('$value')\n";
+"form.find('input[name=\"$name\"], select[name=\"$name\"], textarea[name=\"$name\"]').val('$value')\n";
     }
 
     my $submitter =

@@ -1,3 +1,11 @@
+0.07     2017-11-26
+
+[BUG FIXES]
+
+- Remove (undeclared) dependency on List::MoreUtils. Reported by Slaven
+  Rezić. RT #123295.
+
+
 0.06     2011-07-29
 
 [BUG FIXES]
@@ -43,8 +51,8 @@
 
 0.02     2011-04-16
 
-- Why do I keep forgetting to include any prereqs when I first a new module? I
-  don't know, but I do.
+- Why do I keep forgetting to include any prereqs when I first release a new
+  module? I don't know, but I do.
 
 
 0.01     2011-04-16

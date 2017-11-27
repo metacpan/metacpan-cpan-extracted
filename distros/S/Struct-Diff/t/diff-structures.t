@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Storable qw(freeze);
 use Struct::Diff qw(diff);
-use Test::More tests => 39;
+use Test::More tests => 44;
 
 local $Storable::canonical = 1; # to have equal snapshots for equal by data hashes
 
@@ -12,37 +12,43 @@ my ($a, $b, $d, $frozen_a, $frozen_b);
 
 ### arrays ###
 $d = diff([], [ 1 ]);
-is_deeply($d, {A => [1]}, "[] vs [1]");
+is_deeply($d, {D => [{A => 1}]}, "[] vs [1]");
 
 $d = diff([], [ 1 ], 'noA' => 1);
 is_deeply($d, {}, "[] vs [1], noA => 1");
 
 $d = diff([ 1 ], []);
-is_deeply($d, {R => [1]}, "[1] vs []");
+is_deeply($d, {D => [{R => 1}]}, "[1] vs []");
 
 $d = diff([ 1 ], [], 'noR' => 1);
 is_deeply($d, {}, "[1] vs [], noR => 1");
+
+$d = diff([[ 0 ]], [[ 0 ]]); # deep single-nested unchanged
+is_deeply($d, {U => [[ 0 ]]}, "[[0]] vs [[0]]");
+
+$d = diff([[ 0 ]], [[ 0 ]], noU => 1); # deep single-nested unchanged, noU
+is_deeply($d, {}, "[[0]] vs [[0]], noU");
 
 $d = diff([[ 0 ]], [[ 1 ]]); # deep single-nested changed
 is_deeply($d, {D => [{D => [{N => 1,O => 0}]}]}, "[[0]] vs [[1]]");
 
 $d = diff([], [[[[[ 0, 1 ]]]]]);
-is_deeply($d, {A => [[[[[0,1]]]]]}, "[] vs [[[[[0,1]]]]]");
+is_deeply($d, {D => [{A => [[[[0,1]]]]}]}, "[] vs [[[[[0,1]]]]]");
 
 $d = diff([[[[[ 0, 1 ]]]]], []);
-is_deeply($d, {R => [[[[[0,1]]]]]}, "[[[[[0,1]]]]] vs []");
+is_deeply($d, {D => [{R => [[[[0,1]]]]}]}, "[[[[[0,1]]]]] vs []");
 
 $d = diff([[[[[ 0, 1 ]]]]], [], 'trimR' => 1);
-is_deeply($d, {R => [undef]}, "[[[[[0,1]]]]] vs [], trimR => 1");
+is_deeply($d, {D => [{R => undef}]}, "[[[[[0,1]]]]] vs [], trimR => 1");
 
 $d = diff([ 0, [[[[ 0, 1 ]]]]], [ 0 ], 'trimR' => 1);
 is_deeply($d, {D => [{U => 0},{R => undef}]}, "[ 0, [[[[ 0, 1 ]]]]] vs [ 0 ], trimR => 1");
 
 $d = diff([ 'a' ], [ 'b' ], 'noO' => 1);
-is_deeply($d, {N => ['b']}, "[a] vs [b], noO => 1");
+is_deeply($d, {D => [{N => 'b'}]}, "[a] vs [b], noO => 1");
 
 $d = diff([ 'a' ], [ 'b' ], 'noN' => 1);
-is_deeply($d, {O => ['a']}, "[a] vs [b], noN => 1");
+is_deeply($d, {D => [{O => 'a'}]}, "[a] vs [b], noN => 1");
 
 $d = diff([ 0 ], [ 0, 1 ]);
 is_deeply($d, {D => [{U => 0},{A => 1}]}, "[0] vs [0,1]");
@@ -125,17 +131,48 @@ is_deeply(
 ok($frozen_a eq freeze($a) and $frozen_b eq freeze($b)); # original structs must remain unchanged
 
 ### hashes ###
-$d = diff({}, { 'a' => 'va' });
-is_deeply($d, {A => {a => 'va'}}, "{} vs {a => 'va'}");
+$d = diff({}, { one => 1 });
+is_deeply($d, {D => {one => {A => 1}}}, "{} vs {one => 1}");
 
 $d = diff({}, { 'a' => 'va' }, 'noA' => 1);
 is_deeply($d, {}, "{} vs {a => 'va'}, noA => 1");
 
-$d = diff({ 'a' => 'va' }, {});
-is_deeply($d, {R => {a => 'va'}}, "{a => 'va'} vs {}");
+$d = diff({ one => 1 }, {});
+is_deeply($d, {D => {one => {R => 1}}}, "{one => 1} vs {}");
 
 $d = diff({ 'a' => 'va' }, {}, 'noR' => 1);
 is_deeply($d, {}, "{a => 'va'} vs {}, noR => 1");
+
+$d = diff(
+    {one => {two => 2}},
+    {one => {}},
+);
+is_deeply(
+    $d,
+    {D => {one => {D => {two => {R => 2}}}}},
+    "Subhash emptied"
+);
+
+$d = diff(
+    {one => {}},
+    {one => {two => 2}},
+);
+is_deeply(
+    $d,
+    {D => {one => {D => {two => {A => 2}}}}},
+    "Subhash filled"
+);
+
+$d = diff(
+    {one => {}},
+    {one => {two => 2}},
+    noA => 1
+);
+is_deeply(
+    $d,
+    {},
+    "Subhash filled, but noA used"
+);
 
 $d = diff(
     {a =>{aa => {aaa => 'aaav'}}},
@@ -158,8 +195,8 @@ is_deeply(
     "HASH: one subkey unchanged, one added, noU"
 );
 
-$d = diff({ 'a' => { 'aa' => { 'aaa' => 'vaaaa' }}}, {}, 'trimR' => 1);
-is_deeply($d, {R => {a => undef}}, "{a => {aa => {aaa => 'vaaaa'}}} vs {}, trimR => 1");
+$d = diff({ one => { two => { three => 3 }}}, {}, 'trimR' => 1);
+is_deeply($d, {D => {one => { R => undef } }}, "{one => {two => {three => 3}}} vs {}, trimR => 1");
 
 $d = diff({ 'a' => { 'aa' => { 'aaa' => 'vaaaa' }}, 'b' => 'vb'}, { 'b' => 'vb' }, 'trimR' => 1);
 is_deeply(
@@ -169,10 +206,10 @@ is_deeply(
 );
 
 $d = diff({ 'a' => 'va' }, { 'a' => 'vb' }, 'noO' => 1);
-is_deeply($d, {N => {a => 'vb'}}, "{a => 'va'} vs {a => 'vb'}, noO => 1");
+is_deeply($d, {D => {a => {N=> 'vb'}}}, "{a => 'va'} vs {a => 'vb'}, noO => 1");
 
 $d = diff({ 'a' => 'va' }, { 'a' => 'vb' }, 'noN' => 1);
-is_deeply($d, {O => {a => 'va'}}, "{a => 'va'} vs {a => 'vb'}, noN => 1");
+is_deeply($d, {D => {a => {O=>'va'}}}, "{a => 'va'} vs {a => 'vb'}, noN => 1");
 
 $a = { 'a' => 'a1', 'b' => { 'ba' => 'ba1', 'bb' => 'bb1' }, 'c' => 'c1' };
 $b = { 'a' => 'a1', 'b' => { 'ba' => 'ba2', 'bb' => 'bb1' }, 'd' => 'd1' };

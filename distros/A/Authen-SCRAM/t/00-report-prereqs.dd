@@ -1,7 +1,8 @@
 do { my $x = {
        'configure' => {
                         'requires' => {
-                                        'ExtUtils::MakeMaker' => '6.17'
+                                        'ExtUtils::MakeMaker' => '6.17',
+                                        'perl' => '5.008'
                                       }
                       },
        'develop' => {
@@ -16,19 +17,25 @@ do { my $x = {
                                       'IO::Handle' => '0',
                                       'IPC::Open3' => '0',
                                       'Pod::Coverage::TrustPod' => '0',
+                                      'Pod::Wordlist' => '0',
+                                      'Software::License::Apache_2_0' => '0',
                                       'Test::CPAN::Meta' => '0',
+                                      'Test::MinimumVersion' => '0',
                                       'Test::More' => '0',
+                                      'Test::Perl::Critic' => '0',
                                       'Test::Pod' => '1.41',
                                       'Test::Pod::Coverage' => '1.08',
-                                      'Test::Spelling' => '0.12'
+                                      'Test::Portability::Files' => '0',
+                                      'Test::Spelling' => '0.12',
+                                      'Test::Version' => '1'
                                     }
                     },
        'runtime' => {
                       'recommends' => {
-                                        'String::Compare::ConstantTime' => '0.310'
-                                      },
+                                      'String::Compare::ConstantTime' => '0.310'
+                                    },
                       'requires' => {
-                                      'Authen::SASL::SASLprep' => '0',
+                                      'Authen::SASL::SASLprep' => '1.100',
                                       'Carp' => '0',
                                       'Crypt::URandom' => '0',
                                       'Encode' => '0',

@@ -5,7 +5,7 @@ use warnings;
 
 use IO::Select;
 
-use Udev::FFI::FFIFunctions;
+use Udev::FFI::Functions qw(:all);
 use Udev::FFI::Device;
 
 

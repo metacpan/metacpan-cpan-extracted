@@ -32,6 +32,18 @@ The output is two-space-separated fsdb.
 Fsdb fields are normalized version of the CSV file:
 spaces are converted to single underscores.
 
+=head1 OPTIONS
+
+=over 4
+
+=item B<-F> or B<--fs> or B<--fieldseparator> S
+
+Specify the field (column) separator as C<S>.
+See L<dbfilealter> for valid field separators.
+Default is S (double space).
+
+=back
+
 =for comment
 begin_standard_fsdb_options
 
@@ -148,6 +160,7 @@ Internal: set up defaults.
 sub set_defaults ($) {
     my($self) = @_;
     $self->SUPER::set_defaults();
+    $self->{_fscode} = 'S';
 }
 
 =head2 parse_options
@@ -168,6 +181,7 @@ sub parse_options ($@) {
 	'man' => sub { pod2usage(-verbose => 2); },
 	'autorun!' => \$self->{_autorun},
 	'd|debug+' => \$self->{_debug},
+	'F|fs|cs|fieldseparator|columnseparator=s' => \$self->{_fscode},
 	'i|input=s' => sub { $self->parse_io_option('input', @_); },
 	'log!' => \$self->{_logprog},
 	'o|output=s' => sub { $self->parse_io_option('output', @_); },
@@ -195,7 +209,7 @@ sub setup ($) {
     my $e = $csv->parse($header) or croak $self->{_prog} . ": cannot parse header $header\n";
     my(@columns) = Fsdb::IO::clean_potential_columns($csv->fields());
 
-    $self->finish_io_option('output', -fscode => 'S', -cols => \@columns);
+    $self->finish_io_option('output', -fscode => $self->{_fscode}, -cols => \@columns);
 }
 
 =head2 run

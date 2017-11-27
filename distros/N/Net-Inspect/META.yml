@@ -25,4 +25,4 @@ requires:
   Scalar::Util: '0'
 resources:
   repository: https://github.com/noxxi/p5-net-inspect
-version: '0.328'
+version: '0.329'

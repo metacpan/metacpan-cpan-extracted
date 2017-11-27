@@ -26,7 +26,7 @@
 ################################################################
 
 
-our $VERSION='1.0000397';
+our $VERSION='1.0000399';
 
 
 if ($ENV{'AUTOMATED_TESTING'}) {
@@ -1220,6 +1220,13 @@ END
    }
    unless (-1<index $yins,'figlet') {
       fa_system("sudo yum -y install 'figlet'");
+      my $yins=`yum list installed`;
+      unless (-1<index $yins,'figlet') {
+         fa_system("sudo wget http://dl.fedoraproject.org/pub/epel/7/x86_64/".
+                   "Packages/e/epel-release-7-11.noarch.rpm");
+         fa_system("sudo rpm -Uvh epel-release*rpm");
+         fa_system("sudo yum -y install 'figlet'");
+      }
    }
    unless (-1<index $yins,'nano') {
       fa_system("sudo yum -y install 'nano'");
@@ -2051,8 +2058,8 @@ END
    &fa_install_module('Sub::Install','install','Makefile');
    &fa_install_module('Data::OptList','install','Makefile');
    &fa_install_module('B::Hooks::OP::Check','install','Makefile');
-   &fa_install_module('Lexical::SealRequireHints','install','Makefile');
    &fa_install_module('multidimensional','install','Makefile');
+   &fa_install_module('Lexical::SealRequireHints','install','Makefile');
    &fa_install_module('bareword::filehandles','install','Makefile');
    &fa_install_module('indirect','install','Makefile');
    &fa_install_module('strictures','install','Makefile');

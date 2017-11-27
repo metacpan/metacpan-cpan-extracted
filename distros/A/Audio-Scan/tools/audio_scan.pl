@@ -6,9 +6,18 @@ use strict;
 use Audio::Scan;
 use Data::Dump qw(dump);
 
-$ENV{AUDIO_SCAN_NO_ARTWORK} = 1;
+my $file;
+my $arg = shift;
 
-my $file = shift || die "Usage: $0 [file]\n";
+if ( $arg eq '--with-artwork' ) {
+    $file = shift;
+}
+else {
+    $ENV{AUDIO_SCAN_NO_ARTWORK} = 1;
+    $file = $arg;
+}
+
+die "Usage: $0 [--with-artwork] FILE\n" unless $file;
 
 my $s = Audio::Scan->scan($file);
 

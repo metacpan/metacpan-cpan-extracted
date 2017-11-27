@@ -733,6 +733,8 @@ my @files = (
     't/exceptions/traits.t',
     't/exceptions/typeconstraints.t',
     't/exceptions/util.t',
+    't/exceptions/with-debugging.t',
+    't/exceptions/without-debugging.t',
     't/immutable/apply_roles_to_immutable.t',
     't/immutable/buildargs.t',
     't/immutable/constructor_is_not_moose.t',

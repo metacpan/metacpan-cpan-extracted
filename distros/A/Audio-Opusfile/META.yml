@@ -8,7 +8,7 @@ configure_requires:
   Devel::CheckLib: '0'
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,5 +22,5 @@ requires:
   perl: '5.014000'
 resources:
   repository: https://git.ieval.ro/?p=audio-opusfile.git
-version: '0.005001'
+version: '1.000'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

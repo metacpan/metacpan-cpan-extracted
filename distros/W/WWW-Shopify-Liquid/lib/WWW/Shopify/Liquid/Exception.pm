@@ -4,9 +4,10 @@ use warnings;
 
 package WWW::Shopify::Liquid::Exception;
 use Devel::StackTrace;
+use Scalar::Util qw(blessed);
 use overload
 	fallback => 1,
-	'""' => sub { return $_[0]->english . ($_[0]->line ? " on line " . $_[0]->line . ", character " . $_[0]->{line}->[1] .  ($_[0]->{line}->[3] ? ", file " . $_[0]->{line}->[3] : '') : ''); };
+	'""' => sub { return $_[0]->english . ($_[0]->error && (!ref($_[0]->error) || blessed($_[0]->error)) ? ": " . $_[0]->error : "") . ($_[0]->line ? " on line " . $_[0]->line . ", character " . $_[0]->{line}->[1] .  ($_[0]->{line}->[3] ? ", file " . $_[0]->{line}->[3] : '') : ''); };
 sub line { return $_[0]->{line} ? (ref($_[0]->{line}) && ref($_[0]->{line}) eq "ARRAY" ? $_[0]->{line}->[0] : $_[0]->{line}) : undef; }
 sub column { return $_[0]->{line} && ref($_[0]->{line}) && ref($_[0]->{line}) eq "ARRAY" ? $_[0]->{line}->[1] : undef; }
 sub stack { return $_[0]->{stack}; }
@@ -29,8 +30,8 @@ sub new {
 		}
 	}
 	if (defined $line && ref($line) ne "ARRAY") {
-		print STDERR $self->stack->as_string . "\n";
-		die "Improper exception.";
+		$self->{error} = $line;
+		return $self;
 	}
 	$self->{line} = $line;
 	return $self;
@@ -53,6 +54,39 @@ package WWW::Shopify::Liquid::Exception::Control::Break;
 use base 'WWW::Shopify::Liquid::Exception::Control';
 sub english { return "Break exception"; }
 
+package WWW::Shopify::Liquid::Exception::Control::Pause;
+use base 'WWW::Shopify::Liquid::Exception::Control';
+sub english { return "Pause exception"; }
+
+sub new { 
+	my $self = shift->SUPER::new;
+	$self->{hash} = $_[1];
+	$self->{values} = {};
+	$self->register_value($_[0], $_[2]);
+	return $self;
+}
+
+use Scalar::Util qw(refaddr);
+sub register_value {
+	my ($self, $element, $value) = @_;
+	$self->{values}->{$element} = $value if !$element->isa('WWW::Shopify::Liquid::Token');
+}
+
+sub value {
+	my ($self, $element, $value) = @_;
+	if ((ref($element) || '') eq 'ARRAY') {
+		if (@_ > 2) {
+			for my $idx (0..(int(@$value)-1)) {
+				$self->register_value($element->[$idx], $value->[$idx]);
+			}
+		}
+		return [map { $self->{values}->{$_} } @$element];
+	} else {
+		$self->register_value($element, $value) if @_ > 2;
+		return $self->{values}->{$element};
+	}
+}
+
 package WWW::Shopify::Liquid::Exception::Lexer;
 use base 'WWW::Shopify::Liquid::Exception';
 sub english { return "Lexer exception"; }
@@ -69,9 +103,13 @@ package WWW::Shopify::Liquid::Exception::Lexer::UnbalancedDoubleQuote;
 use base 'WWW::Shopify::Liquid::Exception::Lexer';
 sub english { return "Unbalanced double quote found"; }
 
-package WWW::Shopify::Liquid::Exception::Lexer::UnbalancedTag;
+package WWW::Shopify::Liquid::Exception::Lexer::UnbalancedControlTag;
 use base 'WWW::Shopify::Liquid::Exception::Lexer';
-sub english { return "Unbalanced tag found"; }
+sub english { 
+	my ($self) = @_;
+	return "Unbalanced control tag '" . $self->{token}->stringify . "' found" if $self->{token};
+	return "Unbalanced control tag found";
+}
 
 package WWW::Shopify::Liquid::Exception::Lexer::UnbalancedOutputTag;
 use base 'WWW::Shopify::Liquid::Exception::Lexer';
@@ -117,7 +155,17 @@ sub english { return "Unable to find opening tag for '" . $_[0]->{token}->string
 
 package WWW::Shopify::Liquid::Exception::Parser::Arguments;
 use base 'WWW::Shopify::Liquid::Exception::Parser';
-sub english { return "Invalid arguments"; }
+sub english { 
+	my ($self) = @_;
+	if ($self->error && ref($self->error) eq 'ARRAY') {
+		my ($count, $min, $max) = @{$self->error};
+		return "Received $count arguments for '" . $_[0]->{token}->stringify . "', expected " . (defined $max ? ($min == $max ? "exactly $min" : "between $min and $max") : "at least $min") . " arguments" if $_[0]->{token} && $_[0]->{token}->can('stringify');
+		return "Invalid arguments.";
+	} else {
+		return "Invalid arguments for '" . $_[0]->{token}->stringify . "'" if $_[0]->{token} && $_[0]->{token}->can('stringify');
+		return "Invalid arguments.";
+	}
+}
 
 package WWW::Shopify::Liquid::Exception::Parser::UnknownTag;
 use base 'WWW::Shopify::Liquid::Exception::Parser';
@@ -142,6 +190,14 @@ sub english { return "Rendering exception"; }
 package WWW::Shopify::Liquid::Exception::Renderer::Unimplemented;
 use base 'WWW::Shopify::Liquid::Exception::Renderer';
 sub english { return "Unimplemented method"; }
+
+package WWW::Shopify::Liquid::Exception::Renderer::Forbidden;
+use base 'WWW::Shopify::Liquid::Exception::Renderer';
+sub english { return "Forbidden operation"; }
+
+package WWW::Shopify::Liquid::Exception::Renderer::Wrapped;
+use base 'WWW::Shopify::Liquid::Exception::Renderer';
+sub english { return "Wrapped internal exception"; }
 
 package WWW::Shopify::Liquid::Exception::Renderer::Arguments;
 use base 'WWW::Shopify::Liquid::Exception::Renderer';

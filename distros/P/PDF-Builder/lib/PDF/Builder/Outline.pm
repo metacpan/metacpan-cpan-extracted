@@ -5,8 +5,8 @@ use base 'PDF::Builder::Basic::PDF::Dict';
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.007'; # VERSION
-my $LAST_UPDATE = '3.005'; # manually update whenever code is changed
+our $VERSION = '3.008'; # VERSION
+my $LAST_UPDATE = '3.008'; # manually update whenever code is changed
 
 use PDF::Builder::Basic::PDF::Utils;
 use PDF::Builder::Util;
@@ -148,8 +148,10 @@ sub outline {
     my $self = shift;
 
     my $obj = PDF::Builder::Outline->new($self->{' api'}, $self);
-    $obj->prev($self->{' childs'}->[-1]) if defined $self->{' childs'};
-    $self->{' childs'}->[-1]->next($obj) if defined $self->{' childs'};
+    if (defined $self->{' childs'}) {
+        $obj->prev($self->{' childs'}->[-1]);
+        $self->{' childs'}->[-1]->next($obj);
+    }
     push(@{$self->{' childs'}}, $obj);
     $self->{' api'}->{'pdf'}->new_obj($obj) 
         if !$obj->is_obj($self->{' api'}->{'pdf'});

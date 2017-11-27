@@ -39,7 +39,7 @@ for %%f in (iz-la-4s.C iz-ru-4s.C iz-gr-p4.C iz-hb-4s.C) do (
 )
 
 @rem INSERT is handled OK by kbdutool ...  Replace #ERROR# by F2 and elts of ARROWSK (except Fn and INSERT) in order; "?" is replaced later by ???
-perl -i~ -wlpe "BEGIN { @ARGV = <*.[CH]>; $c=1; @K = (%ARROWSK%); @KK = (map(qq(F$_), 0), grep(!/^F\d+$/ && !/^INSERT$/, @K), map(qq(F$_), 1 .. 10), qw(SUBTRACT ?)); }; $vk = ($ARGV =~ /C$/i && q(VK_)); warn qq($c vs $#KK; $_) unless defined $KK[$c]; s/#ERROR#/${vk}$KK[$c]/ and $c++; $c=1 if eof"
+perl -i~ -wlpe "BEGIN { @ARGV = <*.[CH]>; $c=1; @K = (%ARROWSK%); @KK = (map(qq(F$_), 0), grep(!/^F\d+$/ && !/^INSERT$/, @K), map(qq(F$_), 1 .. 10), q(SUBTRACT), map(qq(NUMPAD$_),5,5,0,0,0), q(?)); }; $vk = ($ARGV =~ /C$/i && q(VK_)); warn qq($c vs $#KK; $_) unless defined $KK[$c]; s/#ERROR#/${vk}$KK[$c]/ and $c++; $c=1 if eof"
 
 @rem the "old" short rows contain -1 instead of WCH_NONE
 @@@rem perl -i~~ -wlpe "BEGIN { @ARGV = <*.C>; $k = {qw( ADD '+' SUBTRACT '-' MULTIPLY '*' DIVIDE '/' RETURN '\r' )}; $rx = join q(|), keys %%$k; }; s/^(\s+\{VK_($rx)\s*,\s*0\s*,\s*)'\S*\s+\S+\s+\S+\s*$//"

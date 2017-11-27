@@ -43,7 +43,7 @@ define([
 
         // prototype for front-end primitives ("targets")
         target: {
-            name: null,
+            name: 'protoTarget',
             aclProfile: 'passerby',
             getEntries: function () {
                     // return all entries, first read and then write

@@ -19,5 +19,6 @@ t/03_timespec.t
 t/04_find_archives.t
 t/05_pod.t
 t/06_pod_coverage.t
+t/07_cache_contains_data.t
 META.yml
 MANIFEST

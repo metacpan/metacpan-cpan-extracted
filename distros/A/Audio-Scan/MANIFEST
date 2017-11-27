@@ -163,6 +163,7 @@ t/mp3/v2.3-null-bytes.mp3
 t/mp3/v2.3-rgad.mp3
 t/mp3/v2.3-sylt.mp3
 t/mp3/v2.3-unsync.mp3
+t/mp3/v2.3-unsync-apic-bad-offset.mp3
 t/mp3/v2.3-utf16any.mp3
 t/mp3/v2.3-utf16be.mp3
 t/mp3/v2.3-utf16le.mp3
@@ -250,6 +251,7 @@ t/wavpack/hybrid.wv
 t/wavpack/silence-44-s.wv
 t/wavpack/v2.wv
 t/wavpack/v3.wv
+t/wavpack/v5-dsd.wv
 t/wavpack/win-executable.wv
 t/wavpack/zero-first-block.wv
 tools/audio_scan.pl

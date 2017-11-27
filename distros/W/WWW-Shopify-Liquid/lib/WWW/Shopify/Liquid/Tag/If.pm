@@ -4,7 +4,7 @@ use warnings;
 
 package WWW::Shopify::Liquid::Tag::If;
 use base 'WWW::Shopify::Liquid::Tag::Enclosing';
-use List::Util qw(first);
+use Scalar::Util qw(blessed);
 
 sub min_arguments { return 1; }
 sub max_arguments { return 1; }
@@ -22,6 +22,8 @@ sub new {
 	return $self;
 }
 sub inner_tags { return qw(elsif else) }
+sub subelements { qw(true_path false_path arguments); }
+
 sub interpret_inner_tokens {
 	my ($self, @tokens) = @_;
 	# Comes in [true_path], [tag, other_path], [tag, other_path], ...
@@ -41,14 +43,20 @@ sub interpret_inner_tokens {
 	}
 }
 
-sub tokens { return ($_[0], map { $_->tokens } grep { defined $_ } ($_[0]->{true_path}, $_[0]->{false_path}, @{$_[0]->{arguments}})) }
-
 sub render {
 	my ($self, $renderer, $hash) = @_;
-	my $arguments = $self->is_processed($self->{arguments}->[0]) ? $self->{arguments}->[0] : $self->{arguments}->[0]->render($renderer, $hash);
-	my $path = $self->{((!$self->inversion && $arguments) || ($self->inversion && !$arguments)) ? 'true_path' : 'false_path'};
-	$path = $path->render($renderer, $hash) if $path && !$self->is_processed($path);
-	return defined $path ? $path : '';
+	return $renderer->state->value($self) if $renderer->state && $renderer->state->value($self);	
+	my $arguments = $self->render_subelement($renderer, $hash, $self->{arguments});
+	my $result;
+	eval {
+		my $path = $self->{((!$self->inversion && $arguments->[0]) || ($self->inversion && !$arguments->[0])) ? 'true_path' : 'false_path'};
+		$result = $path && !$self->is_processed($path) ? $path->render($renderer, $hash) : $path;
+	};
+	if (my $exp = $@) {
+		$exp->value($self->{arguments}, $arguments) if blessed($exp) && $exp->isa('WWW::Shopify::Liquid::Exception::Control::Pause');
+		die $exp;
+	}
+	return defined $result ? $result : '';
 }
 
 sub inversion { return 0; }

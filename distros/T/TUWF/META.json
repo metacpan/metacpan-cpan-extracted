@@ -1,10 +1,10 @@
 {
    "abstract" : "The Ultimate Website Framework",
    "author" : [
-      "Yoran Heling <yorhel@cpan.org>"
+      "Yoran Heling <projects@yorhel.nl>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4205",
+   "generated_by" : "Module::Build version 0.4216",
    "license" : [
       "mit"
    ],
@@ -33,30 +33,30 @@
    "provides" : {
       "TUWF" : {
          "file" : "lib/TUWF.pm",
-         "version" : "1.0"
+         "version" : "1.1"
       },
       "TUWF::DB" : {
          "file" : "lib/TUWF/DB.pm",
-         "version" : "1.0"
+         "version" : "1.1"
       },
       "TUWF::Misc" : {
          "file" : "lib/TUWF/Misc.pm",
-         "version" : "1.0"
+         "version" : "1.1"
       },
       "TUWF::Object" : {
          "file" : "lib/TUWF.pm"
       },
       "TUWF::Request" : {
          "file" : "lib/TUWF/Request.pm",
-         "version" : "1.0"
+         "version" : "1.1"
       },
       "TUWF::Response" : {
          "file" : "lib/TUWF/Response.pm",
-         "version" : "1.0"
+         "version" : "1.1"
       },
       "TUWF::XML" : {
          "file" : "lib/TUWF/XML.pm",
-         "version" : "1.0"
+         "version" : "1.1"
       },
       "TUWF::func" : {
          "file" : "lib/TUWF.pm"
@@ -68,8 +68,9 @@
          "http://opensource.org/licenses/mit-license.php"
       ],
       "repository" : {
-         "url" : "http://g.blicky.net/tuwf.git/"
+         "url" : "https://g.blicky.net/tuwf.git/"
       }
    },
-   "version" : "1.0"
+   "version" : "1.1",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

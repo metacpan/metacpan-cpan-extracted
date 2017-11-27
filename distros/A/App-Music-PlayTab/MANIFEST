@@ -9,7 +9,11 @@ lib/App/Music/PlayTab/Chord.pm
 lib/App/Music/PlayTab/LyChord.pm
 lib/App/Music/PlayTab/Note.pm
 lib/App/Music/PlayTab/NoteMap.pm
-lib/App/Music/PlayTab/PostScript/Preamble.pm
+lib/App/Music/PlayTab/Output.pm
+lib/App/Music/PlayTab/Output/Dump.pm
+lib/App/Music/PlayTab/Output/PDF.pm
+lib/App/Music/PlayTab/Output/PostScript.pm
+lib/App/Music/PlayTab/res/fonts/MusicSymbols.ttf
 zzexamples/TOC
 zzexamples/allblues.ptb
 zzexamples/anighttunisia.ptb
@@ -70,12 +74,16 @@ t/03chord.ptb
 t/03chord.t
 t/04lychord.ptb
 t/04lychord.t
+t/50basic.dmp
 t/50basic.ps
 t/50basic.ptb
 t/50basic.t
+t/51basic.t
+t/60lilypond.dmp
 t/60lilypond.ps
 t/60lilypond.ptb
 t/60lilypond.t
+t/61lilypond.t
 t/dummy.pre
 t/testscript.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)

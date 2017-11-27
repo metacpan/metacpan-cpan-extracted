@@ -11,13 +11,14 @@ WWW::Shopify::Liquid::Dialect::Shopify - Emulates Shopify-like liquid as much as
 =cut
 
 package WWW::Shopify::Liquid::Dialect::Shopify;
-use base 'WWW::Shopify::Liquid';
+use base 'WWW::Shopify::Liquid::Dialect';
 
-sub load_modules {
-	my ($self) = @_;
-	$self->register_operator($_) for (grep { $_ !~ m/regex/i } findallmod WWW::Shopify::Liquid::Operator);
-	$self->register_filter($_) for (findallmod WWW::Shopify::Liquid::Filter);
-	$self->register_tag($_) for (findallmod WWW::Shopify::Liquid::Tag);
+use WWW::Shopify::Liquid::Dialect::Web;
+
+sub apply {
+	my ($self, $liquid) = @_;
+	WWW::Shopify::Liquid::Dialect::Web->apply($liquid);
+	$self->SUPER::apply($liquid);
 }
 
 1;

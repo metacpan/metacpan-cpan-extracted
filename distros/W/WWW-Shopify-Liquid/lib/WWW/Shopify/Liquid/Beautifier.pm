@@ -24,13 +24,15 @@ sub beautify {
 	my $level = 0;
 	my $modification = 0;
 	for my $idx (0..$#tokens) {
+		my $loop_mod = 0;
 		my $token = $tokens[$idx];
 		$modification = 0 if $level == 0 && $token->isa('WWW::Shopify::Liquid::Token::Text') && $token->{core} =~ m/\n/s;
-		$level-- if $token->isa('WWW::Shopify::Liquid::Token::Tag') && ($token->{tag} eq "else" || $token->{tag} =~ m/^end/ && $self->{tag_enclosing}->{do { my $a = $token->{tag}; $a =~ s/^end//; $a }});
+		$level-- if $token->isa('WWW::Shopify::Liquid::Token::Tag') && ($token->{tag} =~ m/^end/ && $self->{tag_enclosing}->{do { my $a = $token->{tag}; $a =~ s/^end//; $a }});
 		push(@result, WWW::Shopify::Liquid::Token::Text::Whitespace->new(undef, "\n")) if $idx > 0 && (!$tokens[$idx-1]->isa('WWW::Shopify::Liquid::Token::Text') || ($tokens[$idx-1]->{core} !~ m/\n\s*$/ && $tokens[$idx-1]->{core} !~ m/^\s*$/s)) && (!$tokens[$idx]->isa('WWW::Shopify::Liquid::Token::Text') || $tokens[$idx]->{core} !~ m/^\n/);
-		push(@result, WWW::Shopify::Liquid::Token::Text::Whitespace->new(undef, join("", ("\t" x ($level+$modification))))) if $level+$modification > 0;
+		$loop_mod = -1 if $token->isa('WWW::Shopify::Liquid::Token::Tag') && ($token->{tag} =~ m/(elsif|else)/);
+		push(@result, WWW::Shopify::Liquid::Token::Text::Whitespace->new(undef, join("", ("\t" x ($level+$modification+$loop_mod))))) if $level+$modification+$loop_mod > 0;
 		$modification = length($1) if $level == 0 && $token->isa('WWW::Shopify::Liquid::Token::Tag') && $idx > 0 && $tokens[$idx-1]->isa('WWW::Shopify::Liquid::Token::Text') && $tokens[$idx-1]->{core} =~ m/(\t*)$/;
-		$level++ if $token->isa('WWW::Shopify::Liquid::Token::Tag') && ($token->{tag} eq "else" || $self->{tag_enclosing}->{$token->{tag}});
+		$level++ if $token->isa('WWW::Shopify::Liquid::Token::Tag') && $self->{tag_enclosing}->{$token->{tag}};
 		push(@result, $token);
 	}
 	return @result;

@@ -55,6 +55,13 @@ You can also define the UserAgent string, for example:
 
 =head1 METHODS
 
+=head2 $xmlrpc->credentials( 'username', 'password );
+
+Set Credentials for HTTP Basic Authentication. This is only
+secure over HTTPS.
+
+Please, please, please do not use this over unencrypted connections!
+
 =head2 $xmlrpc->call( 'method_name', @arguments );
 
 This method calls the provides XML-RPC server's method_name with
@@ -116,10 +123,11 @@ package XML::RPC;
 
 use strict;
 use XML::TreePP;
+use MIME::Base64;
 use vars qw($VERSION $faultCode);
 no strict 'refs';
 
-$VERSION   = 1.0;
+$VERSION   = 1.1;
 $faultCode = 0;
 
 sub new {
@@ -129,6 +137,16 @@ sub new {
     $self->{url} = shift;
     $self->{tpp} = XML::TreePP->new(@_);
     return $self;
+}
+
+sub credentials {
+    my ($self, $username, $password) = @_;
+
+    my $authtoken = 'Basic ' . encode_base64($username . ':' . $password, '');
+
+    $self->{authtoken} = $authtoken;
+
+    return;
 }
 
 sub call {
@@ -142,14 +160,20 @@ sub call {
 
     $self->{xml_out} = $xml_out;
 
+    my %header = (
+        'Content-Type'   => 'text/xml',
+        'User-Agent'     => defined($self->{tpp}->{'User-Agent'}) ? $self->{tpp}->{'User-Agent'} : 'XML-RPC/' . $VERSION,
+        'Content-Length' => length($xml_out)
+    );
+
+    if(defined($self->{authtoken})) {
+        $header{'Authorization'} = $self->{authtoken}
+    }
+
     my ( $result, $xml_in ) = $self->{tpp}->parsehttp(
         POST => $self->{url},
         $xml_out,
-        {
-            'Content-Type'   => 'text/xml',
-            'User-Agent'     => defined($self->{tpp}->{'User-Agent'}) ? $self->{tpp}->{'User-Agent'} : 'XML-RPC/' . $VERSION,
-            'Content-Length' => length($xml_out)
-        }
+        \%header,
     );
 
     $self->{xml_in} = $xml_in;
@@ -230,7 +254,7 @@ sub parse_scalar {
     my $scalar = shift;
     local $^W = undef;
 
-    if (   ( $scalar =~ m/^[\-+]?\d+$/ )
+    if (   ( $scalar =~ m/^[\-+]?(0|[1-9]\d*)$/ )
         && ( abs($scalar) <= ( 0xffffffff >> 1 ) ) )
     {
         return { i4 => $scalar };

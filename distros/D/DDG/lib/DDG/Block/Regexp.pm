@@ -1,7 +1,7 @@
 package DDG::Block::Regexp;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Block implementation to handle regexp based plugins
-$DDG::Block::Regexp::VERSION = '1017';
+$DDG::Block::Regexp::VERSION = '1018';
 use Moo;
 with qw( DDG::Block );
 
@@ -51,7 +51,7 @@ DDG::Block::Regexp - Block implementation to handle regexp based plugins
 
 =head1 VERSION
 
-version 1017
+version 1018
 
 =head1 DESCRIPTION
 

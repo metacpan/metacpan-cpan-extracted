@@ -44,6 +44,7 @@ extern int chinese(mpz_t ret, mpz_t lcm, mpz_t *a, mpz_t *m, int items);
 extern UV mpz_order_ui(UV r, mpz_t n, UV limit);
 
 extern void mpz_arctan(mpz_t r, unsigned long base, mpz_t pow, mpz_t t1, mpz_t t2);
+extern void mpz_arctanh(mpz_t r, unsigned long base, mpz_t pow, mpz_t t1, mpz_t t2);
 extern void mpz_product(mpz_t* A, UV a, UV b);
 
 extern void poly_mod_mul(mpz_t* px, mpz_t* py, UV r, mpz_t mod, mpz_t t1, mpz_t t2, mpz_t t3);
@@ -90,9 +91,13 @@ extern int* poly_class_nums(void);
  */
 extern UV poly_class_poly_num(int i, int *D, mpz_t**T, int* type);
 
+#define BITS2DIGS(bits) ceil(bits/3.3219281)
+#define DIGS2BITS(digs) ceil(digs*3.3219281)
+
 extern void mpf_log(mpf_t logx, mpf_t x);
 extern void mpf_exp(mpf_t expx, mpf_t x);
 extern void mpf_pow(mpf_t powx, mpf_t b, mpf_t x);
+extern void mpf_agm(mpf_t r, mpf_t a, mpf_t b);
 
 extern UV logint(mpz_t n, UV base);
 

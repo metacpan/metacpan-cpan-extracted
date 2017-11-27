@@ -184,6 +184,8 @@ sub get_ctrl_by_class_name ( $self, $class_name ) {
 }
 
 sub get_host_api_path ( $self, $host ) {
+    return if !$self->{host_api_path};
+
     return $self->{host_api_path}->{$host};
 }
 

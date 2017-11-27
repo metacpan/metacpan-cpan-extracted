@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource';
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.007'; # VERSION
-my $LAST_UPDATE = '3.004'; # manually update whenever code is changed
+our $VERSION = '3.008'; # VERSION
+my $LAST_UPDATE = '3.008'; # manually update whenever code is changed
 
 use Compress::Zlib;
 use Encode qw(:all);
@@ -108,7 +108,7 @@ sub tounicodemap {
     $cmap .= qq|   /Ordering (XYZ)\n|;
     $cmap .= qq|   /Supplement 0\n|;
     $cmap .= qq|>> def\n|;
-    $cmap .= sprintf(qq|/CMapName /pdfapi4-%s+0 def\n|, $self->name());
+    $cmap .= sprintf(qq|/CMapName /pdfbldr-%s+0 def\n|, $self->name());
     if ($self->can('uniByCId') and $self->can('glyphNum')) {
         # this is a type0 font
         $cmap .= sprintf(qq|1 begincodespacerange <0000> <%04X> endcodespacerange\n|, $self->glyphNum()-1);
@@ -136,7 +136,7 @@ sub tounicodemap {
 
     my $tuni = PDFDict();
     $tuni->{'Type'} = PDFName('CMap');
-    $tuni->{'CMapName'} = PDFName(sprintf(qq|pdfapi4-%s+0|, $self->name()));
+    $tuni->{'CMapName'} = PDFName(sprintf(qq|pdfbldr-%s+0|, $self->name()));
     $tuni->{'CIDSystemInfo'} = PDFDict();
     $tuni->{'CIDSystemInfo'}->{'Registry'} = PDFStr($self->name());
     $tuni->{'CIDSystemInfo'}->{'Ordering'} = PDFStr('XYZ');

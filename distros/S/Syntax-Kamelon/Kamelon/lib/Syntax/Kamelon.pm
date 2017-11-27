@@ -1,5 +1,6 @@
 package Syntax::Kamelon;
 
+use 5.006;
 use strict;
 use warnings;
 use Carp;
@@ -11,7 +12,7 @@ use Syntax::Kamelon::Indexer;
 use Module::Load::Conditional qw[can_load];
 use Data::Dumper;
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 # sub AUTOLOAD {
 #     # This AUTOLOAD is used to 'autoload' constants from the constant()
@@ -1166,7 +1167,7 @@ sub testRegExprDI {
 	if ($$text =~ /$reg/i) {
 		my $match = $1;
 		chomp $match; #Sometimes a trailing newline is matched.
-		if ($match eq '') { return '' } #Sometimes a reg gives a positive result of zero length
+		if ($match eq '') { return '' } #And when that happens a reg can give a positive result of zero length
 		if ($#- > 1) {
 			no strict 'refs';
 			my @cap = map {$$_} 2 .. $#-;

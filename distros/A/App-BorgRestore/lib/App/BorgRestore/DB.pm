@@ -9,6 +9,7 @@ use autodie;
 use DBI;
 use Function::Parameters;
 use Log::Any qw($log);
+use Path::Tiny;
 
 =encoding utf-8
 
@@ -27,6 +28,9 @@ method new($class: $db_path, $cache_size) {
 	bless $self, $class;
 
 	if (! -f $db_path) {
+		# ensure the cache directory exists
+		path($db_path)->parent->mkpath({mode => oct(700)});
+
 		my $db = $self->_open_db($db_path, $cache_size);
 		$self->initialize_db();
 	} else {

@@ -17,7 +17,7 @@ sub operate {
 	}
 	my $result = str2time($operand, "UTC");
 	return undef unless $result;
-	return DateTime->from_epoch( epoch => $result );
+	return DateTime->from_epoch( epoch => $result, time_zone => "floating" );
 }
 
 1;

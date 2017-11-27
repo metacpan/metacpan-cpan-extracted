@@ -3,7 +3,7 @@ NAME
     after distribution release
 
 VERSION
-    version 0.015
+    version 0.016
 
 SYNOPSIS
     In your code, declare $VERSION like this:
@@ -166,7 +166,12 @@ ATTRIBUTES
 
   global
     If true, all occurrences of the version pattern will be replaced.
-    Otherwise, only the first occurrence is replaced. Defaults to false.
+    Otherwise, only the first occurrence in each file is replaced. Defaults
+    to false.
+
+  all_matching
+    If true, only versions matching that of the last release will be
+    replaced. Defaults to false.
 
   munge_makefile_pl
     If there is a Makefile.PL in the root of the repository, its version

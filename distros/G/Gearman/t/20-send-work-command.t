@@ -33,8 +33,11 @@ foreach my $method (qw/data warning/) {
 
         my $client = new_ok("Gearman::Client",
             [exceptions => 1, job_servers => [@job_servers]]);
-        my $worker
-            = worker(join('_', "send", $str), job_servers => [@job_servers]);
+        my $worker = worker(
+            join('_', "send", $str),
+            job_servers => [@job_servers],
+            debug       => $ENV{DEBUG}
+        );
 
         my ($i, $r) = (0, 0);
         my $res = $client->do_task(
@@ -75,6 +78,9 @@ sub worker {
     my $pg = Proc::Guard->new(
         code => sub {
             $w->work(
+                on_fail => sub {
+                    fail join ' ', "on fail", @_;
+                },
                 stop_if => sub {
                     my ($idle) = @_;
                     return $idle;

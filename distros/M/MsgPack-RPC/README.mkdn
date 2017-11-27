@@ -4,7 +4,7 @@ MsgPack::RPC - MessagePack RPC client
 
 # VERSION
 
-version 1.0.1
+version 2.0.0
 
 # SYNOPSIS
 
@@ -18,8 +18,6 @@ $rpc->notify( 'something' => [ 'with', 'args' ] );
 $rpc->request( 
     request_method => [ 'some', 'args' ] 
 )->on_done(sub{
-    my $resp = @_;
-
     print "replied with: ", @_;
 });
 
@@ -33,15 +31,10 @@ the protocol described at [https://github.com/msgpack-rpc/msgpack-rpc/blob/maste
 
 # METHODS
 
-`MsgPack::RPC` consumes the role [MooseX::Role::Loggable](https://metacpan.org/pod/MooseX::Role::Loggable), and thus has all its
-exported methods.
-
 ## new( %args )
 
-The class constructor takes all the arguments for [MooseX::Role::Loggable](https://metacpan.org/pod/MooseX::Role::Loggable), plus the following:
-
-- io( \[ $in\_fh, $out\_fh \] )
 - io( $socket )
+- io( \[ $in\_fh, $out\_fh \] )
 
     Required. Defines which IO on which the MessagePack messages will be received and sent.
 
@@ -85,6 +78,7 @@ $rpc->subscribe( log => sub($msg) {
 ```
 
 Register a callback for the given event. If a notification or a request matching the
+event
 is received, the callback will be called. The callback will be passed either a [MsgPack::RPC::Message](https://metacpan.org/pod/MsgPack::RPC::Message) (if triggered by
 a notification) or
 [MsgPack::RPC::Message::Request](https://metacpan.org/pod/MsgPack::RPC::Message::Request) object.
@@ -124,7 +118,7 @@ Yanick Champoux <yanick@cpan.org> [![endorse](http://api.coderwall.com/yanick/en
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Yanick Champoux.
+This software is copyright (c) 2017, 2016, 2015 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

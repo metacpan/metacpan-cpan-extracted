@@ -1,0 +1,6 @@
+Some useful shortcuts to make writing event-driven Moo objects easy.
+
+This is most definitely a work-in-progress in an extremely early stage
+of its life and its entire API is subject to change.
+
+Comments on the design are very much welcome.

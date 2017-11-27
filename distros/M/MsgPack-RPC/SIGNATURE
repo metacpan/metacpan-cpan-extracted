@@ -15,34 +15,53 @@ not run its Makefile.PL or Build.PL.
 Hash: SHA1
 
 SHA1 e4c638b95b48bc3cd9bdf0ff7e78816674415019 AUTHOR_PLEDGE
-SHA1 f4f136746d24419394114e40722c9660a2e88c6e Changes
+SHA1 65c61b6532f3a158b5ab2f3ca4027a96cabfdce1 Changes
 SHA1 66a57d55bd710560d49144b2ba4b3b0a1138c8a6 INSTALL
-SHA1 5b807b764a3d24ce4f99fc96878cfe82bcc03288 LICENSE
-SHA1 7ebb1769fe79d5ab88a41795eff2cc632b504e0c MANIFEST
-SHA1 8acb75fc59dc8379825ad660991c65cdb3347aea META.json
-SHA1 b26c50a30585d93870647d417475d00cab4d876b META.yml
-SHA1 5eeae1f7fe3af8b5237633577b4300bc930f0247 Makefile.PL
-SHA1 f006832a9a8b6423adc8cc02ae400a1f0d6a5308 README.mkdn
-SHA1 d16a634f16f48d64ce1d57ac87e32246cc9b5bf9 cpanfile
-SHA1 8e20c2413b565b56dafd39c225e9305439786ccd doap.xml
-SHA1 20f7b12421eb5f67e92c54b0ad2ee4f2c7859f36 lib/MsgPack/Decoder.pm
-SHA1 d76eeedf1b39afdb5cac93320ab03ac51b7190ca lib/MsgPack/Encoder.pm
-SHA1 1f22c105c15edff2d7075c53eba8089f3f160150 lib/MsgPack/RPC.pm
-SHA1 b7452f4a5ddea0b4dcf9ebee8b36471e592e560f lib/MsgPack/RPC/Message.pm
-SHA1 ceecceabc1ebc2b6d5d414024cde52cead16f4f6 lib/MsgPack/RPC/Message/Request.pm
-SHA1 da6451f80ae48215b39622525759e6da9c4ddcf5 lib/MsgPack/Type/Boolean.pm
-SHA1 2afb6dc6b1fd9ae154a1ce47d90c4e9ca91591ae lib/MsgPack/Type/Ext.pm
-SHA1 d1c67e18ba3eb6fbf66f8ce75d9b36a6b239fbac t/00-compile.t
-SHA1 a450dfb9f3e4ef680fd4f28bbcf1d6beee33a7e5 t/00-report-prereqs.dd
+SHA1 2038148b02a09f89e92968620c13b0ba7cdd0c49 LICENSE
+SHA1 7df059863aaf0a5f756fdc72790a6ab3de0c4db6 MANIFEST
+SHA1 7ee370afe81e8decc38410dc42c5240d8e78520a META.json
+SHA1 ea1637b6c0f8d639e59003413a8f4c46fa405599 META.yml
+SHA1 ce1c3c2697e95a156f4253c24ab0d621a9256efb Makefile.PL
+SHA1 2538b727ac98e22e4ab4383a7a88f0b31ca22a21 README.mkdn
+SHA1 2a231f84a727ffe0904e2c71cc187487f9016115 cpanfile
+SHA1 b0ffff5cb241e868e52e42eb13073fd0e8f36e04 doap.xml
+SHA1 8e627c2a86fa68201b9ed4c78a17a9ef7c718378 lib/MsgPack/Decoder.pm
+SHA1 27cbbc958503c8b36b05deebfd9bd4acae666005 lib/MsgPack/Decoder/Event/Decoded.pm
+SHA1 bd6ca93f116c0007a3fb9ff42fb84c62e1ecc350 lib/MsgPack/Decoder/Generator.pm
+SHA1 1cc19e799087ae77113402576ea92d55fcd0e8a2 lib/MsgPack/Decoder/Generator/Any.pm
+SHA1 d6731be2c5eda9cfa9d1ff334602a3b5c398b44f lib/MsgPack/Decoder/Generator/Array.pm
+SHA1 117d7a845b561dec605bee2028850186aa68256d lib/MsgPack/Decoder/Generator/ArraySize.pm
+SHA1 b830b28f8e3bdd005ebc316cfde34c9bdf3f8db5 lib/MsgPack/Decoder/Generator/Boolean.pm
+SHA1 2d0019e30ffa838f190d928bb0e1f203b09639f4 lib/MsgPack/Decoder/Generator/Ext.pm
+SHA1 0853a3e4135096a3c7b4be9cf04d82354735070a lib/MsgPack/Decoder/Generator/FixInt.pm
+SHA1 bba600c37fae2aaac396d9301a0c779cb5c95642 lib/MsgPack/Decoder/Generator/Float.pm
+SHA1 b756c3e322333209f5891aa91e0d4cf57f7ed37b lib/MsgPack/Decoder/Generator/Int.pm
+SHA1 fd2b97fc099a35878df9f74de88e1d81713b3f1c lib/MsgPack/Decoder/Generator/Nil.pm
+SHA1 809a53b6f95034d8f3145a88b9265a5022f3b234 lib/MsgPack/Decoder/Generator/Noop.pm
+SHA1 7b02b3348e5bed9ef00f99f466d0ec56581889b4 lib/MsgPack/Decoder/Generator/Size.pm
+SHA1 0fe58f33d50e63a7057a8d55cd6ca97e12637ba7 lib/MsgPack/Decoder/Generator/Str.pm
+SHA1 f69b68fd709bfacedcf48c421d6f408fd47ca23a lib/MsgPack/Decoder/Generator/UInt.pm
+SHA1 cca1546ecf42e42b46da59e1d3b5f09177956950 lib/MsgPack/Encoder.pm
+SHA1 8e339a27b1e8169d8c5aec23a1d019911c634500 lib/MsgPack/RPC.pm
+SHA1 7be89291328ee0d1b376b5d846491a2ca98f4429 lib/MsgPack/RPC/Event/Receive.pm
+SHA1 8c093833500ae5412f1a9b21f32dd3f6ce7689e9 lib/MsgPack/RPC/Event/Write.pm
+SHA1 163d0f6c2a915ee456cd8425658df08819297e8d lib/MsgPack/RPC/Message.pm
+SHA1 7ac91e9ca7ade14f354c47608d4feade4e2cebea lib/MsgPack/RPC/Message/Notification.pm
+SHA1 6bcfccc39971645f9a25e8d7839f50412302f0b1 lib/MsgPack/RPC/Message/Request.pm
+SHA1 33aa63dec9f89fa3d507947eb62bc5055ed81b82 lib/MsgPack/RPC/Message/Response.pm
+SHA1 bea20c9ff7489e364aa51a11a702525626c3ce99 lib/MsgPack/Type/Boolean.pm
+SHA1 deca3ee80b468f8e76a8b05401e70dece9eb8a64 lib/MsgPack/Type/Ext.pm
+SHA1 a67579b2012c83c6402db726076c8a80108b5c0e t/00-compile.t
+SHA1 d7a74f4e913b1ff12665d53bfd3d0d125b4946d1 t/00-report-prereqs.dd
 SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
-SHA1 8d0ee6eb1ccc7d6ba9786e085d1bb66385d1df93 t/decode.t
+SHA1 fbbc663c70151b51dce12109806f0b9a23f7ada2 t/decode.t
 SHA1 8b2bb6efb60598ce90cc31e24803621823b3a7f7 t/encode.t
-SHA1 c03f7f15bc36b3a9f593b86f320ca20974d45da3 t/encoding-decoding.t
-SHA1 4310c85fd4f3320e02f328699e65e9b210d211b5 t/rpc.t
-SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
+SHA1 ff122f9df07831632bee5a917f9497eebfd6dce5 t/encoding-decoding.t
+SHA1 e068151e83dac86377ff71841dd0d10abfc0761f t/garbage_collect_responses.t
+SHA1 fe714d57e7e223d61236139b5ec8ab50501dddfc t/rpc.t
 -----BEGIN PGP SIGNATURE-----
 
-iEYEARECAAYFAljJwZ4ACgkQ34Hwf+GwC4wbjQCeK3vPDnSX1yi8bVb515HYhkIN
-iOYAnjxh8GRCCeN0YmyFl0nlnpylDN4r
-=KHpq
+iEYEARECAAYFAlobHxkACgkQ34Hwf+GwC4xfvwCfdRKo309mtmnjLCv9vAAVgwiE
+QOQAn1oh3gyShbR+IWc3yId1ypL0wJeE
+=J7da
 -----END PGP SIGNATURE-----

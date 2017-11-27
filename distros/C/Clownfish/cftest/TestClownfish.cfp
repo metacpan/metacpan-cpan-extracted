@@ -2,8 +2,8 @@
     "name": "TestClownfish",
     "nickname": "TestCfish",
     "installed": false,
-    "version": "v0.6.1",
+    "version": "v0.6.2",
     "prerequisites": {
-        "Clownfish": "v0.6.1"
+        "Clownfish": "v0.6.2"
     }
 }

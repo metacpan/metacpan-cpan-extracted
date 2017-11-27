@@ -1,0 +1,13 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Syntax::Kamelon::Indexer;
+
+my $folder = 'lib/Syntax/Kamelon/XML';
+
+unlink "$folder/indexrc";
+my $indexer = Syntax::Kamelon::Indexer->new(
+	xmlfolder => $folder
+);
+

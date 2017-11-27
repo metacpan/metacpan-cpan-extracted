@@ -99,17 +99,17 @@
  //                      |=========|=========|=========|=========|=========|=========|
 -  {VK_SPACE     ,0      ,' '      ,WCH_DEAD ,' '      ,WCH_NONE ,WCH_DEAD ,WCH_DEAD },
 -  {0xff         ,0      ,WCH_NONE ,0x0138   ,WCH_NONE ,WCH_NONE ,0x0192   ,0x00a0   },
--  {VK_ABNT_C1   ,0      ,WCH_DEAD ,WCH_DEAD ,WCH_NONE ,WCH_NONE ,WCH_DEAD ,0x0301   },
--  {0xff         ,0      ,0x06f0   ,0x00a0   ,WCH_NONE ,WCH_NONE ,0x00a3   ,WCH_NONE },
+-  {VK_ABNT_C1   ,0      ,WCH_DEAD ,WCH_DEAD ,WCH_NONE ,WCH_NONE ,WCH_DEAD ,WCH_DEAD },
+-  {0xff         ,0      ,0x06f0   ,0x00a0   ,WCH_NONE ,WCH_NONE ,0x00a3   ,0x0301   },
 -  {0            ,0      ,0        ,0        ,0        ,0        ,0        ,0        }
 +  {VK_SPACE     ,0      ,' '      ,WCH_DEAD ,' '      ,WCH_NONE ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD },
 +  {0xff         ,0      ,WCH_NONE ,0x0138   ,WCH_NONE ,WCH_NONE ,0x0192   ,0x00a0   ,0x06f0   ,0x06e8   ,0x06f0   ,0x06e8   },
-+  {VK_CONVERT   ,0      ,' '      ,WCH_DEAD ,' '      ,WCH_NONE ,WCH_DEAD ,WCH_DEAD ,WCH_NONE ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD },
++  {VK_CONVERT   ,0      ,' '      ,WCH_DEAD ,' '      ,WCH_NONE ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD },
 +  {0xff         ,0      ,WCH_NONE ,0x0138   ,WCH_NONE ,WCH_NONE ,0x0192   ,0x00a0   ,0x06f0   ,0x06e8   ,0x06f0   ,0x06e8   },
-+  {VK_NONCONVERT,0      ,' '      ,WCH_DEAD ,' '      ,WCH_NONE ,WCH_DEAD ,WCH_DEAD ,WCH_NONE ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD },
++  {VK_NONCONVERT,0      ,' '      ,WCH_DEAD ,' '      ,WCH_NONE ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD },
 +  {0xff         ,0      ,WCH_NONE ,0x0138   ,WCH_NONE ,WCH_NONE ,0x0192   ,0x00a0   ,0x06f0   ,0x06e8   ,0x06f0   ,0x06e8   },
-+  {VK_ABNT_C1   ,0      ,WCH_DEAD ,WCH_DEAD ,WCH_NONE ,WCH_NONE ,WCH_DEAD ,0x0301   ,WCH_NONE ,WCH_NONE ,WCH_NONE ,WCH_NONE },
-+  {0xff         ,0      ,0x06f0   ,0x00a0   ,WCH_NONE ,WCH_NONE ,0x00a3   ,WCH_NONE ,WCH_NONE ,WCH_NONE ,WCH_NONE ,WCH_NONE },
++  {VK_ABNT_C1   ,0      ,WCH_DEAD ,WCH_DEAD ,WCH_NONE ,WCH_NONE ,WCH_DEAD ,WCH_DEAD ,WCH_NONE ,WCH_NONE ,WCH_NONE ,WCH_NONE },
++  {0xff         ,0      ,0x06f0   ,0x00a0   ,WCH_NONE ,WCH_NONE ,0x00a3   ,0x0301   ,WCH_NONE ,WCH_NONE ,WCH_NONE ,WCH_NONE },
 +  {0            ,0      ,0        ,0        ,0        ,0        ,0        ,0        ,0		 ,0 }
  };
  
@@ -295,11 +295,11 @@
 -  {VK_ABNT_C1   ,0      ,WCH_DEAD ,WCH_DEAD ,WCH_NONE ,WCH_NONE ,WCH_DEAD ,0x0301   },
 -  {0xff         ,0      ,0x06f0   ,0x00a0   ,WCH_NONE ,WCH_NONE ,0x00a3   ,WCH_NONE },
 -  {0            ,0      ,0        ,0        ,0        ,0        ,0        ,0        }
-+  {VK_SPACE     ,0      ,' '      ,WCH_DEAD ,' '      ,WCH_NONE ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD ,WCH_NONE ,WCH_DEAD ,WCH_NONE },
++  {VK_SPACE     ,0      ,' '      ,WCH_DEAD ,' '      ,WCH_NONE ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD },
 +  {0xff         ,0      ,WCH_NONE ,0x0138   ,WCH_NONE ,WCH_NONE ,0x0192   ,0x00a0   ,0x06f0   ,0x06e8   ,0x06f0   ,0x06e8   },
-+  {VK_CONVERT   ,0      ,' '      ,WCH_DEAD ,' '      ,WCH_NONE ,WCH_DEAD ,WCH_DEAD ,WCH_NONE ,WCH_NONE ,WCH_DEAD ,WCH_NONE },
++  {VK_CONVERT   ,0      ,' '      ,WCH_DEAD ,' '      ,WCH_NONE ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD },
 +  {0xff         ,0      ,WCH_NONE ,0x0138   ,WCH_NONE ,WCH_NONE ,0x0192   ,0x00a0   ,0x06f0   ,0x06e8   ,0x06f0   ,0x06e8   },
-+  {VK_NONCONVERT,0      ,' '      ,WCH_DEAD ,' '      ,WCH_NONE ,WCH_DEAD ,WCH_DEAD ,WCH_NONE ,WCH_NONE ,WCH_DEAD ,WCH_NONE },
++  {VK_NONCONVERT,0      ,' '      ,WCH_DEAD ,' '      ,WCH_NONE ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD },
 +  {0xff         ,0      ,WCH_NONE ,0x0138   ,WCH_NONE ,WCH_NONE ,0x0192   ,0x00a0   ,0x06f0   ,0x06e8   ,0x06f0   ,0x06e8   },
 +  {VK_ABNT_C1   ,0      ,WCH_DEAD ,WCH_DEAD ,WCH_NONE ,WCH_NONE ,WCH_DEAD ,0x0301   ,WCH_NONE ,WCH_NONE ,WCH_NONE ,WCH_NONE },
 +  {0xff         ,0      ,0x06f0   ,0x00a0   ,WCH_NONE ,WCH_NONE ,0x00a3   ,WCH_NONE ,WCH_NONE ,WCH_NONE ,WCH_NONE ,WCH_NONE },
@@ -522,9 +522,9 @@
 -  {0            ,0      ,0        ,0        ,0        ,0        ,0        ,0        }
 +  {VK_SPACE     ,0      ,' '      ,WCH_DEAD ,' '      ,WCH_NONE ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD },
 +  {0xff         ,0      ,WCH_NONE ,0x0138   ,WCH_NONE ,WCH_NONE ,0x0192   ,0x00a0   ,0x06f0   ,0x06e8   ,0x06f0   ,0x06e8   },
-+  {VK_CONVERT   ,0      ,' '      ,WCH_DEAD ,' '      ,WCH_NONE ,WCH_DEAD ,WCH_DEAD ,WCH_NONE ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD },
++  {VK_CONVERT   ,0      ,' '      ,WCH_DEAD ,' '      ,WCH_NONE ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD },
 +  {0xff         ,0      ,WCH_NONE ,0x0138   ,WCH_NONE ,WCH_NONE ,0x0192   ,0x00a0   ,0x06f0   ,0x06e8   ,0x06f0   ,0x06e8   },
-+  {VK_NONCONVERT,0      ,' '      ,WCH_DEAD ,' '      ,WCH_NONE ,WCH_DEAD ,WCH_DEAD ,WCH_NONE ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD },
++  {VK_NONCONVERT,0      ,' '      ,WCH_DEAD ,' '      ,WCH_NONE ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD },
 +  {0xff         ,0      ,WCH_NONE ,0x0138   ,WCH_NONE ,WCH_NONE ,0x0192   ,0x00a0   ,0x06f0   ,0x06e8   ,0x06f0   ,0x06e8   },
 +  {VK_ABNT_C1   ,0      ,WCH_DEAD ,WCH_DEAD ,WCH_NONE ,WCH_NONE ,WCH_DEAD ,0x0301   ,WCH_NONE ,WCH_NONE ,WCH_NONE ,WCH_NONE },
 +  {0xff         ,0      ,0x06f0   ,0x00a0   ,WCH_NONE ,WCH_NONE ,0x00a3   ,WCH_NONE ,WCH_NONE ,WCH_NONE ,WCH_NONE ,WCH_NONE },
@@ -699,9 +699,9 @@
 -  {0            ,0      ,0        ,0        ,0        ,0        ,0        ,0        }
 +  {VK_SPACE     ,0      ,' '      ,WCH_DEAD ,' '      ,WCH_NONE ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD },
 +  {0xff         ,0      ,WCH_NONE ,0x0138   ,WCH_NONE ,WCH_NONE ,0x0192   ,0x00a0   ,0x06f0   ,0x06e8   ,0x06f0   ,0x06e8   },
-+  {VK_CONVERT   ,0      ,' '      ,WCH_DEAD ,' '      ,WCH_NONE ,WCH_DEAD ,WCH_DEAD ,WCH_NONE ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD },
++  {VK_CONVERT   ,0      ,' '      ,WCH_DEAD ,' '      ,WCH_NONE ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD },
 +  {0xff         ,0      ,WCH_NONE ,0x0138   ,WCH_NONE ,WCH_NONE ,0x0192   ,0x00a0   ,0x06f0   ,0x06e8   ,0x06f0   ,0x06e8   },
-+  {VK_NONCONVERT,0      ,' '      ,WCH_DEAD ,' '      ,WCH_NONE ,WCH_DEAD ,WCH_DEAD ,WCH_NONE ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD },
++  {VK_NONCONVERT,0      ,' '      ,WCH_DEAD ,' '      ,WCH_NONE ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD ,WCH_DEAD },
 +  {0xff         ,0      ,WCH_NONE ,0x0138   ,WCH_NONE ,WCH_NONE ,0x0192   ,0x00a0   ,0x06f0   ,0x06e8   ,0x06f0   ,0x06e8   },
 +  {VK_ABNT_C1   ,0      ,WCH_DEAD ,WCH_DEAD ,WCH_NONE ,WCH_NONE ,WCH_DEAD ,0x0301   ,WCH_NONE ,WCH_NONE ,WCH_NONE ,WCH_NONE },
 +  {0xff         ,0      ,0x06f0   ,0x00a0   ,WCH_NONE ,WCH_NONE ,0x00a3   ,WCH_NONE ,WCH_NONE ,WCH_NONE ,WCH_NONE ,WCH_NONE },

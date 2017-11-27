@@ -1,0 +1,4 @@
+#fsdb experiment mean stddev pct_rsd conf_range conf_low conf_high conf_pct sum sum_squared min max n
+# no input
+# test trailing comment
+#  | dbmultistats -k experiment duration

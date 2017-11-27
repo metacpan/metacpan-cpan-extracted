@@ -10,6 +10,7 @@ my $lexer = WWW::Shopify::Liquid->new->lexer;
 
 my @tokens = $lexer->parse_text('{% if a %}	bd{%else%} {%if d%}flkdsajglk jfhdl{%else%}sa dfsdf{%endif%} {%endif%}');
 is(int(@tokens),11);
+
 is(@{$tokens[0]->{arguments}}, 1);
 @tokens = $lexer->parse_text('{% for i in (1..2) %}adlkgjf{% endfor %}');
 is(int(@tokens), 3);
@@ -18,6 +19,7 @@ is(@{$tokens[0]->{arguments}->[2]->{members}}, 3);
 
 @tokens = $lexer->parse_text(' {% for i in (1..2) %}{{ i }}{% endfor %}'); is(int(@tokens), 4);
 @tokens = $lexer->parse_text(' {% for i in (1..2) %}{{ i }}{% endfor %} '); is(int(@tokens), 5);
+
 @tokens = $lexer->parse_text('{% for i in (1..2) %}{{ i }}{% endfor %} ');
 
 is(int(@tokens), 4);
@@ -83,6 +85,7 @@ isa_ok($tokens[3], "WWW::Shopify::Liquid::Token::Tag");
 is(int(@tokens), 11);
 
 @tokens = $lexer->parse_text("{{ order.line_items[line_item.loop_index].sku }}");
+
 is(int(@tokens), 1);
 is(int(@{$tokens[0]->{core}}), 1);
 is(int(@{$tokens[0]->{core}->[0]->{core}}), 4);
@@ -121,8 +124,11 @@ is(int(@{$tokens[0]->{arguments}}), 1);
 @tokens = $lexer->parse_text( q({{ "New Mom's Bundle of Joy" }}));
 is(int(@tokens), 1);
 is(int(@{$tokens[0]->{core}}), 1);
+
 isa_ok($tokens[0]->{core}->[0], "WWW::Shopify::Liquid::Token::String");
 is($tokens[0]->{core}->[0]->{core}, "New Mom's Bundle of Joy");
+
+
 
 @tokens = $lexer->parse_text( q({{ 1-1 }}));
 is(int(@tokens) , 1);

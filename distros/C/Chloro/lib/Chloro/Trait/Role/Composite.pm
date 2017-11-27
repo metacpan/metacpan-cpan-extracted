@@ -1,11 +1,13 @@
+## no critic (Moose::RequireMakeImmutable)
 package Chloro::Trait::Role::Composite;
-BEGIN {
-  $Chloro::Trait::Role::Composite::VERSION = '0.06';
-}
+
+use strict;
+use warnings;
+use namespace::autoclean;
+
+our $VERSION = '0.07';
 
 use Moose::Role;
-
-use namespace::autoclean;
 
 use Moose::Util::MetaRole;
 use Moose::Util qw( does_role );
@@ -20,7 +22,7 @@ sub _merge_form_components {
 }
 
 sub _merge {
-    my $self = shift;
+    my $self  = shift;
     my $thing = shift;
 
     my $pl_thing = $thing . 's';
@@ -41,11 +43,11 @@ sub _merge {
             next if $seen{$name} == $thing;
 
             require Moose;
-            Moose->throw_error( "Role '"
+            Moose->throw_error( q{Role '}
                     . $self->name()
-                    . "' has encountered a Chloro $thing conflict "
-                    . "during composition. This is a fatal error and "
-                    . "cannot be disambiguated." );
+                    . q{' has encountered a Chloro $thing conflict }
+                    . 'during composition. This is a fatal error and '
+                    . 'cannot be disambiguated.' );
         }
 
         $seen{$name} = $thing;
@@ -69,10 +71,8 @@ around apply_params => sub {
     $self = Moose::Util::MetaRole::apply_metaroles(
         for            => $self,
         role_metaroles => {
-            application_to_class =>
-                ['Chloro::Trait::Application::ToClass'],
-            application_to_role =>
-                ['Chloro::Trait::Application::ToRole'],
+            application_to_class => ['Chloro::Trait::Application::ToClass'],
+            application_to_role  => ['Chloro::Trait::Application::ToRole'],
         },
     );
 
@@ -85,9 +85,11 @@ around apply_params => sub {
 
 # ABSTRACT: A trait that supports applying multiple roles at once
 
-
+__END__
 
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -95,7 +97,7 @@ Chloro::Trait::Role::Composite - A trait that supports applying multiple roles a
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 DESCRIPTION
 
@@ -106,20 +108,27 @@ which contain Chloro fields or groups) to a class or role.
 
 See L<Chloro> for details.
 
+Bugs may be submitted at L<http://rt.cpan.org/Public/Dist/Display.html?Name=Chloro> or via email to L<bug-chloro@rt.cpan.org|mailto:bug-chloro@rt.cpan.org>.
+
+I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
+
+=head1 SOURCE
+
+The source code repository for Chloro can be found at L<https://github.com/autarch/Chloro>.
+
 =head1 AUTHOR
 
 Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2011 by Dave Rolsky.
+This software is Copyright (c) 2017 by Dave Rolsky.
 
 This is free software, licensed under:
 
   The Artistic License 2.0 (GPL Compatible)
 
+The full text of the license can be found in the
+F<LICENSE> file included with this distribution.
+
 =cut
-
-
-__END__
-

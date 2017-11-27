@@ -1,0 +1,29 @@
+# take a PDF of at least 11 pages, and add outlines (bookmarks) for pages
+# 1 ("i"), 4 ("1"), and 11 ("7") physical pages.
+# (after "futuramedium"'s demo and fix for RT 121912 [and RT 41971])
+
+use strict;
+use warnings;
+use PDF::Builder;
+
+my $infile  = 'examples/resources/sample_55.pdf';
+my $outfile = 'examples/055_outlines_sample_55.pdf';
+
+my $doc = PDF::Builder-> open($infile);
+
+$doc-> outlines
+    -> outline
+        -> dest( $doc-> openpage( 1 ))
+        -> title( '1st page (i)' );
+
+$doc-> outlines
+    -> outline
+        -> dest( $doc-> openpage( 4 ))
+        -> title( '4th page (1)' );
+
+$doc-> outlines
+    -> outline
+        -> dest( $doc-> openpage( 11 ))
+        -> title( '11th page (7)' );
+
+$doc->saveas($outfile);

@@ -1,3 +1,4 @@
+## -*- mode: perl; -*-
 use strict;
 use warnings;
 use Test::More;
@@ -46,7 +47,7 @@ is $inst->input, 'test.txt', 'also set';
   local %ENV = %ENV;
   $ENV{TMPDIR} = undef;
   $ENV{PERL_USE_UNSAFE_INC} = 0;
-  my $app = applify_ok(<<"HERE");
+  my $app2 = applify_ok(<<"HERE");
 use Applify;
 option str  => mode => 'basic or expert', default => 'basic';
 option file => input => 'file to read', required => 1;

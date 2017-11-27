@@ -1,0 +1,4 @@
+1.0.1     - converted from BoutrosLab internal module (Valection)
+            to CPAN release (Bio::Sampling::Valection)
+          - new name for public release, shouldn't grab a top level name
+          - added README and ChangeLog for release

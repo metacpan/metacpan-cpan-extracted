@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
- 
+
 #define ASF_BLOCK_SIZE 8192
 
 #define IS_VALID_WMA_BASE       (1)
@@ -26,7 +26,7 @@
 
 #define DEFINE_GUID(name, l, w1, w2, b1, b2, b3, b4, b5, b6, b7, b8) \
   GUID name = {l, w1, w2, {b1, b2, b3, b4, b5, b6, b7, b8}}
-  
+
 #define IsEqualGUID(rguid1, rguid2) (!memcmp(rguid1, rguid2, sizeof(GUID)))
 
 #define GETLEN2b(bits) (((bits) == 0x03) ? 4 : bits)
@@ -60,7 +60,7 @@ DEFINE_GUID(ASF_Extended_Stream_Properties, 0x14E6A5CB, 0xC672, 0x4332,
 
 DEFINE_GUID(ASF_Extended_Content_Description, 0xd2d0a440, 0xe307, 0x11d2,
 	    0x97, 0xf0, 0x00, 0xa0, 0xc9, 0x5e, 0xa8, 0x50);
-	    
+
 DEFINE_GUID(ASF_Language_List, 0x7c4346a9, 0xefe0, 0x4bfc,
 	    0xb2, 0x29, 0x39, 0x3e, 0xde, 0x41, 0x5c, 0x85);
 
@@ -106,7 +106,7 @@ DEFINE_GUID(ASF_Index, 0xd6e229d3, 0x35da, 0x11d1,
 
 DEFINE_GUID(ASF_Simple_Index, 0x33000890, 0xe5b1, 0x11cf,
 	    0x89, 0xf4, 0x00, 0xa0, 0xc9, 0x03, 0x49, 0xcb);
-	    
+
 // Stream types found in Stream Properties
 DEFINE_GUID(ASF_Audio_Media, 0xf8699e40, 0x5b4d, 0x11cf,
 	    0xa8, 0xfd, 0x00, 0x80, 0x5f, 0x5c, 0x44, 0x2b);
@@ -145,7 +145,7 @@ DEFINE_GUID(ASF_Mutex_Bitrate, 0xd6e22a01, 0x35da, 0x11d1,
 
 DEFINE_GUID(ASF_Mutex_Unknown, 0xd6e22a02, 0x35da, 0x11d1,
       0x90, 0x34, 0x00, 0xa0, 0xc9, 0x03, 0x49, 0xbe);
-      
+
 typedef struct _asf_object_t {
   GUID     ID;
   uint64_t size;
@@ -174,13 +174,13 @@ typedef struct asfinfo {
   uint32_t object_offset;
   HV *info;
   HV *tags;
-  
+
   uint8_t seeking;      // flag if we're seeking
-  
+
   // DLNA profile detection bitfield
   uint8_t valid_profiles;
   uint32_t max_bitrate;
-  
+
   uint16_t spec_count;
   struct asf_index_specs *specs;
 } asfinfo;

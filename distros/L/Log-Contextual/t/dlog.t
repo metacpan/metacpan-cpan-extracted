@@ -31,6 +31,17 @@ for my $level (@levels) {
       "Output for Dlog_$level is correct"
    );
 
+   my @sfoo = main->can("Dslog_$level")->("Look ma, data: ", qw{frew bar baz});
+   ok(
+      eq_array(\@sfoo, [qw{frew bar baz}]),
+      "Dslog_$level passes data through correctly"
+   );
+   is(
+      $var,
+      qq([$level] Look ma, data: "frew"\n"bar"\n"baz"\n),
+      "Output for Dslog_$level is correct"
+   );
+
    my $bar =
      main->can("DlogS_$level")
      ->(sub { "Look ma, data: $_" }, [qw{frew bar baz}]);
@@ -47,5 +58,17 @@ for my $level (@levels) {
    @foo = main->can("Dlog_$level")->(sub { "nothing: $_" }, ());
    ok(eq_array(\@foo, []), "Dlog_$level passes nothing through correctly");
    is($var, "[$level] nothing: ()\n", "Output for Dlog_$level is correct");
+
+   my $sbar =
+     main->can("DslogS_$level")->("Look ma, data: ", [qw{frew bar baz}]);
+   ok(
+      eq_array($sbar, [qw{frew bar baz}]),
+      'DslogS_trace passes data through correctly'
+   );
+   like(
+      $var,
+      qr(\[$level\] Look ma, data: \[),
+      "Output for DslogS_$level is correct"
+   );
 }
 

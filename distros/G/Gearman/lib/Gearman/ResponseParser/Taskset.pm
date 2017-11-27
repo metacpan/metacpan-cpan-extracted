@@ -1,6 +1,6 @@
 package Gearman::ResponseParser::Taskset;
 use version ();
-$Gearman::ResponseParser::Taskset::VERSION = version->declare("2.004.009");
+$Gearman::ResponseParser::Taskset::VERSION = version->declare("2.004.010");
 
 use strict;
 use warnings;

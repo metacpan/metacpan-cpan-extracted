@@ -3,7 +3,7 @@ package MVC::Neaf::Request;
 use strict;
 use warnings;
 
-our $VERSION = 0.18;
+our $VERSION = 0.19;
 
 =head1 NAME
 
@@ -323,6 +323,20 @@ sub path_info {
     return $self->{path_info};
 };
 
+=head2 path_info_split
+
+Return a list of matched capture groups found in path_info_regex, if any.
+
+B<EXPERIMENTAL> Name and meaning subject to change.
+
+=cut
+
+sub path_info_split {
+    my $self = shift;
+
+    return @{ $self->{path_info_split} || [] };
+};
+
 =head2 set_full_path( $path )
 
 =head2 set_full_path( $script_name, $path_info )
@@ -376,7 +390,7 @@ sub _import_route {
     $self->{route}        = $route;
     $self->{script_name}  = $path;
     $self->{path_info}    = $path_info;
-    $self->{tail_split}   = $tail;
+    $self->{path_info_split}   = $tail;
 
     return $self;
 };
@@ -1359,6 +1373,44 @@ sub clear {
 }
 
 =head1 DEVELOPER METHODS
+
+=head2 id()
+
+Lazily fetch unique request id. These are guaranteed to be unique
+on a given machine within a reasonable timeframe.
+
+=cut
+
+my $lastid;
+sub id {
+    my $self = shift;
+
+    # Technically it is possible to repeat it by running a new process
+    # in the same second as the same pid... But who would?
+    return $self->{id} ||= unpack "H*", pack "N*", $$, CORE::time, ++$lastid;
+};
+
+=head2 set_id( $new_value )
+
+Set the id above to a user-supplied value.
+
+If a false value given, just generate a new one next time id is requested.
+
+Symbols outside ascii, as well as shitespace and C<"> and C"\", are prohibited.
+
+Returns the request object.
+
+=cut
+
+sub set_id {
+    my ($self, $id) = @_;
+
+    !$id or $id =~ /^[\x21-\x7E]+$/ && $id !~ /[\s\"\\]/
+        or $self->_croak( "Bad id format, should only contain printable" );
+
+    $self->{id} = $id;
+    return $self;
+};
 
 =head2 endpoint_origin
 

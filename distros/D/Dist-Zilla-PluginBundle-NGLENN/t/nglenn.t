@@ -13,13 +13,13 @@ my $wd = tempd;
 
 my $tzil = Builder->from_config( { dist_root => "$corpus" }, );
 
-ok( $tzil->build, "build dist with \@NGLENN" );
+ok( $tzil->build, 'build dist with @NGLENN' );
 
 done_testing;
 #
 # This file is part of Dist-Zilla-PluginBundle-NGLENN
 #
-# This software is Copyright (c) 2015 by Nathan Glenn.
+# This software is Copyright (c) 2017 by Nathan Glenn.
 #
 # This is free software, licensed under:
 #

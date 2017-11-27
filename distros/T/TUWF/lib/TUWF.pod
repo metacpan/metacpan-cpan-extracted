@@ -598,15 +598,15 @@ FastCGI:
 L<TUWF::DB>, L<TUWF::Misc>, L<TUWF::Request>, L<TUWF::Response>, L<TUWF::XML>.
 
 The homepage of TUWF can be found at
-L<http://dev.yorhel.nl/tuwf|http://dev.yorhel.nl/tuwf>.
+L<https://dev.yorhel.nl/tuwf|https://dev.yorhel.nl/tuwf>.
 
 TUWF is available on a git repository at
-L<http://g.blicky.net/tuwf.git/|http://g.blicky.net/tuwf.git/>.
+L<https://g.blicky.net/tuwf.git/|https://g.blicky.net/tuwf.git/>.
 
 
 =head1 COPYRIGHT
 
-Copyright (c) 2008-2015 Yoran Heling.
+Copyright (c) 2008-2017 Yoran Heling.
 
 This module is part of the TUWF framework and is free software available under
 the liberal MIT license. See the COPYING file in the TUWF distribution for the

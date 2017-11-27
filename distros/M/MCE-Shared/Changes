@@ -1,6 +1,19 @@
 
 Revision history for Perl module MCE::Shared.
 
+1.833 Tue Nov 21 15:30:00 EST 2017
+
+  * Condvar timedwait supports floating seconds via Time::HiRes.
+    The documentation was correct, but not high resolution in code.
+
+  * Added LWP::UserAgent to list for enabling posix_exit.
+  * Improved number-sequence generation for big integers.
+  * Improved exiting (CLOSE, DESTROY) during cleanup state.
+  * Improved signal handling when server is waiting on IO.
+  * Updated "OBJECT SHARING" section in documentation.
+
+  * Bumped MCE dependency to 1.832.
+
 1.832 Sun Oct 08 20:30:00 EST 2017
 
   * Added STFL (Terminal UI) to list for enabling posix_exit.

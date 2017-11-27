@@ -3,7 +3,7 @@ package PDF::Builder::Resource::Font::CoreFont::helveticaoblique;
 use strict;
 use warnings;
 
-our $VERSION = '3.007'; # VERSION
+our $VERSION = '3.008'; # VERSION
 my $LAST_UPDATE = '2.029'; # manually update whenever code is changed
 
 =head1 NAME

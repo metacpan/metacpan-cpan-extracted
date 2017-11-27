@@ -17,6 +17,7 @@ my %WriteMakefileArgs = (
   "CONFIGURE_REQUIRES" => {
     "Alien::Build" => "0.32",
     "Alien::Build::MM" => "0.32",
+    "Alien::Build::Plugin::Build::CMake" => "0.99",
     "ExtUtils::MakeMaker" => "6.52"
   },
   "DISTNAME" => "Alien-raylib",
@@ -31,7 +32,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.006",
   "test" => {
     "TESTS" => "t/*.t"
   }

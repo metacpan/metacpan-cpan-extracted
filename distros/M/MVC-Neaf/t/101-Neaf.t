@@ -62,6 +62,7 @@ is ($root->[0], 404, "Root not found");
     is (scalar @warn, 1, "1 warn issued");
     like ($warn[0], qr/ERROR.*foo.*MVC::Neaf::Request::PSGI->param/
         , "Warning as expected");
+    note "WARN: $_" for @warn;
 };
 
 $request{REQUEST_URI} = "/bar";

@@ -44,8 +44,8 @@ sub __cmp__ {
   Math_MPFR__Scalar: {
         return (
                   Math::MPFR::Rmpfr_nan_p($x) ? undef
-                : $y < 0 ? Math::MPFR::Rmpfr_cmp_si($x, $y)
-                :          Math::MPFR::Rmpfr_cmp_ui($x, $y)
+                : ($y || return Math::MPFR::Rmpfr_sgn($x)) < 0 ? Math::MPFR::Rmpfr_cmp_si($x, $y)
+                :                                                Math::MPFR::Rmpfr_cmp_ui($x, $y)
                );
     }
 
@@ -75,7 +75,7 @@ sub __cmp__ {
 
   Math_GMPq__Scalar: {
         return (
-                $y < 0
+                ($y || return Math::GMPq::Rmpq_sgn($x)) < 0
                 ? Math::GMPq::Rmpq_cmp_si($x, $y, 1)
                 : Math::GMPq::Rmpq_cmp_ui($x, $y, 1)
                );
@@ -107,7 +107,7 @@ sub __cmp__ {
 
   Math_GMPz__Scalar: {
         return (
-                $y < 0
+                ($y || return Math::GMPz::Rmpz_sgn($x)) < 0
                 ? Math::GMPz::Rmpz_cmp_si($x, $y)
                 : Math::GMPz::Rmpz_cmp_ui($x, $y)
                );

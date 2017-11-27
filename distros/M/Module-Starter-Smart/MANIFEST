@@ -7,6 +7,7 @@ lib/Module/Starter/Smart.pm
 t/00.load.t
 t/01.create_distro.t
 t/02.create_t.t
+t/03.create_distro_with_build.t
 t/pod-coverage.t
 t/pod.t
 META.json                                Module JSON meta-data (added by MakeMaker)

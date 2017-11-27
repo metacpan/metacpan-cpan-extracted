@@ -1,10 +1,16 @@
 Revision history for Log-Contextual
 
+0.008000  2017-11-24 08:40:15-08:00 America/Los_Angeles
+ - Add slog for logging strings without a code block
+   (Thanks Christian Walde!)
+ - Fix exporting into classes that subclass from users of Log::Contextual.
+   (Thanks Graham Knop!)
+
 0.007001  2017-05-21 07:49:18-07:00 America/Los_Angeles
-- Stop testing exact bytes produced by Data::Dumper::Concise
+ - Stop testing exact bytes produced by Data::Dumper::Concise
   (Thanks for reporting Errietta Kostal)
   (Fixes GH#11)
-- Add some documentation about exceptions
+ - Add some documentation about exceptions
   (Thanks Kent Fredric!)
 
 0.007000  2016-04-11 21:35:41-07:00 America/Los_Angeles

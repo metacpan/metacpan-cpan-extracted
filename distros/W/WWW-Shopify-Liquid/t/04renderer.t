@@ -115,4 +115,17 @@ $text = $liquid->render_ast({ },$liquid->parse_text("A{% include 'test-include-f
 write_file($path, "D{% include 'test-include-file' %}F");
 $text = $liquid->render_ast({ },$liquid->parse_text("A{% include 'test-include-file' %}C")); is($text, "ADDDDDDFFFFFFC");
 
+
+my $ast = $liquid->parse_text("{% assign var = apps.first %}{% if var %}{{ var }}{% endif %}");
+$ast = $liquid->optimize_ast({ }, $ast);
+$text = $liquid->render_ast({ apps => [1] }, $ast);
+is($text, 1);
+
+
+$ast = $liquid->parse_text("{% assign var = apps.backups.first %}{% if var %}{{ var.id }}{% endif %}");
+$ast = $liquid->optimize_ast({ }, $ast);
+$text = $liquid->render_ast({ apps => { backups => [{ id => 2 }] } }, $ast);
+is($text, 2);
+
+
 done_testing();

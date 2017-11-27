@@ -1,5 +1,13 @@
 Revision history for Perl-PrereqScanner-NotQuiteLite
 
+0.91 2017/11/25
+  - fixed packaging issue (RT-123735)
+
+0.90 2017/11/25
+  - refactored and added more parsers
+  - fixed various parsing issues
+  - cpanfile support
+
 0.50 2017/01/28
   - production release
 

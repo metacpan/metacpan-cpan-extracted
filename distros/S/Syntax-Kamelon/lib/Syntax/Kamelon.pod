@@ -6,6 +6,12 @@ Syntax::Kamelon - A versatile and fully programmable textual content parser that
 
  use Syntax::Kamelon;
  
+ my @attributes = Syntax::Kamelon->AvailableAttributes;
+ my %formtab = ();
+ for (@attributes) {
+    $formtab{$_} = "<font class=\"$_\">"
+ }
+ 
  my $textfilter = "[%~ text FILTER html FILTER replace('\\040', '&nbsp;') FILTER replace('\\t', '&nbsp;&nbsp;&nbsp;') ~%]";
  my $hl = new Syntax::Kamelon(
     xmlfolder => $xmldir,
@@ -59,7 +65,7 @@ A formatter can be any object that inherits B<Syntax::Kamelon::Format::Base> and
 lives in B<Syntax::Kamelon::Format::Name>. By default 'Base' without options is loaded.
 This is convenient if you only use B<ParseRaw>.
 
-See also B<Syntax::Kamelon::Format::Base>.
+See also B<Syntax::Kamelon::Format::Base>, B<Syntax::Kamelon::Format::ANSI>, B<Syntax::Kamelon::Format::HTML4>.
 
 =item B<indexfile> => filename
 
@@ -503,7 +509,7 @@ Published under the GPLV3 license
 
 B<Syntax::Kamelon::Builder>, B<Syntax::Kamelon::Debugger>, B<Syntax::Kamelon::Diagnostics>,
 B<Syntax::Kamelon::Indexer>, B<Syntax::Kamelon::XMLData>, B<Syntax::Kamelon::Format::Base>, 
-B<Syntax::Kamelon::Format::ANSI>, B<Syntax::Kamelon::Format::HTML4>.
+B<Syntax::Kamelon::Format::ANSI>, B<Syntax::Kamelon::Format::HTML4>, B<Syntax::Kamelon::Syntaxes>.
 
 =cut
 

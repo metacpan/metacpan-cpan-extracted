@@ -7,3 +7,7 @@ my $conf = shift @ARGV;
 push @ARGV, '--global_c_argv=[global_c]', '--argv-example=abc', '--argv-example2', 'xyz';
 
 print Dumper(Config::Simple::Conf->new($conf || "example/test_inc.conf"));
+
+print "\@ARGV: " . join(' ', @ARGV) . "\n";
+print "\@ARGV_ORIG: " . join(' ', @ARGV_ORIG) . "\n";
+

@@ -274,10 +274,10 @@ sub pktin {
 			# Try to merge this buffer into next one in the hope
 			# that we can process the data together
 			if (@$obuf) {
-			    $obuf->[-1][P_DATA] =
-				$buf->[P_DATA] . $obuf->[-1][P_DATA];
-			    debug("merge %d bytes into next buffer for $odir",
-				length($buf->[P_DATA]));
+			    $obuf->[0][P_DATA] =
+				$buf->[P_DATA] . $obuf->[0][P_DATA];
+			    debug("merge %d bytes into next buffer for $odir - new len %d",
+				length($buf->[P_DATA]),length($obuf->[0][P_DATA]));
 			    next;
 			}
 

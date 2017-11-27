@@ -1,7 +1,7 @@
 package DDG::Meta::Data;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Metadata functions for instant answers
-$DDG::Meta::Data::VERSION = '1017';
+$DDG::Meta::Data::VERSION = '1018';
 use JSON::XS qw'decode_json encode_json';
 use Path::Class;
 use File::ShareDir 'dist_file';
@@ -228,7 +228,7 @@ DDG::Meta::Data - Metadata functions for instant answers
 
 =head1 VERSION
 
-version 1017
+version 1018
 
 =head1 AUTHOR
 

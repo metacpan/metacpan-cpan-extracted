@@ -11,7 +11,7 @@ use Moo;
 use namespace::clean;
 
 # Version.
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 # Get XML.
 has xml => (
@@ -218,6 +218,52 @@ For more information about Sofia Map, click L<here|https://en.wikipedia.org/wiki
  # Втори метродиаметър
  # Първи метродиаметър
 
+=head1 EXAMPLE5
+
+ # Pragmas.
+ use strict;
+ use warnings;
+
+ # Modules.
+ use Encode qw(decode_utf8 encode_utf8);
+ use Map::Tube::Sofia;
+
+ # Arguments.
+ if (@ARGV < 1) {
+         print STDERR "Usage: $0 line\n";
+         exit 1;
+ }
+ my $line = decode_utf8($ARGV[0]);
+
+ # Object.
+ my $obj = Map::Tube::Sofia->new;
+
+ # Get stations for line.
+ my $stations_ar = $obj->get_stations($line);
+
+ # Print out.
+ map { print encode_utf8($_->name)."\n"; } @{$stations_ar};
+
+ # Output:
+ # Usage: __PROG__ line
+
+ # Output with 'foo' argument.
+ # Map::Tube::get_stations(): ERROR: Invalid Line Name [foo]. (status: 105) file __PROG__ on line __LINE__
+
+ # Output with 'Втори метродиаметър' argument.
+ # Обеля
+ # Ломско шосе
+ # Бели Дунав
+ # Надежда
+ # Хан Кубрат
+ # Княгиня Мария Луиза
+ # Централна жп гара
+ # Лъвов мост
+ # Сердика
+ # НДК
+ # Европейски съюз
+ # Джеймс Баучер
+
 =head1 DEPENDENCIES
 
 L<File::Share>,
@@ -249,18 +295,18 @@ L<https://github.com/tupinek/Map-Tube-Sofia>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2014-2015 Michal Špaček
+ © 2014-2017 Michal Josef Špaček
  Artistic License
  BSD 2-Clause License
 
 =head1 VERSION
 
-0.07
+0.08
 
 =cut

@@ -8,7 +8,7 @@ my $builder = Module::Build->new(
     dist_author       => 'Ivan Wills <ivan.wills@gmail.com>',
     dist_version_from => 'lib/SVG/Calendar.pm',
     requires          => {
-        'perl'                       => '5.006',
+        'perl'                       => '5.010',
         'Clone'                      => '0.17',
         'Config::Std'                => 0,
         'DateTime::Format::Strptime' => 0,
@@ -26,7 +26,7 @@ my $builder = Module::Build->new(
     },
     build_requires => {
         'Test::More'     => '0.88',
-        'Test::Warnings' => 0,
+        'Test::Warnings' => '0.026',
     },
     recommends => {
         'Astro::Coord::ECI::Moon' => 0.044,

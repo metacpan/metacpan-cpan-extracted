@@ -1,3 +1,52 @@
+0.011   2017-11-24 (PERLANCAR)
+
+	- [Bugfix] balance: Fix logic error and don't die if a balance is
+	  not in either IDR/BTC market e.g. STR but just ignore it.
+
+
+0.010   2017-11-24 (PERLANCAR)
+
+	- [ux] balance: Add -e as shortcut for --with-idr-estimates.
+
+	- Forgot to add pair: btg_idr.
+
+
+0.009   2017-11-24 (PERLANCAR)
+
+	- Tweak Abstract.
+
+	- [Bugfix] Forgot to pass 'pair' argument to cancel_order()
+	  function.
+
+
+0.008   2017-11-24 (PERLANCAR)
+
+	- Add subcommands: cancel-orders, cancel-all-orders.
+
+	- open-orders: By default now show open orders from all markets, unless
+          filtered by --pair. Add filter --type.
+
+	- cancel-order: Add dry-run mode.
+
+	- [Bugfix] Reenable xlm_idr, VIP reports some markets as invalid in
+	  get_open_orders() but they exist nevertheless.
+
+
+0.007   2017-11-24 (PERLANCAR)
+
+        - Disable market pair xlm_idr because VIP currently reports 'Invalid
+          pair' for it.
+
+        - Add subcommand: hold-details.
+
+        - [doc] Fix typo. Thanks MANWAR.
+
+
+0.006   2017-11-23 (PERLANCAR)
+
+        - Add currency: BTG (bitcoin gold).
+
+
 0.005   2017-11-19 (PERLANCAR)
 
 	- Update currencies: +BCH (bitcoin cash), -CRAVE, +ETC (Ethereum

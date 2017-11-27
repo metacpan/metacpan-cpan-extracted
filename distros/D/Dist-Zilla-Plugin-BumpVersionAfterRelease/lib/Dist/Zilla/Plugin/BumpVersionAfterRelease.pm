@@ -5,7 +5,7 @@ use warnings;
 package Dist::Zilla::Plugin::BumpVersionAfterRelease;
 # ABSTRACT: Bump module versions after distribution release
 
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 
 use Moose;
 use namespace::autoclean;
@@ -26,11 +26,23 @@ has allow_decimal_underscore => (
 #pod =attr global
 #pod
 #pod If true, all occurrences of the version pattern will be replaced.  Otherwise,
-#pod only the first occurrence is replaced.  Defaults to false.
+#pod only the first occurrence in each file is replaced.  Defaults to false.
 #pod
 #pod =cut
 
 has global => (
+    is  => 'ro',
+    isa => 'Bool',
+);
+
+#pod =attr all_matching
+#pod
+#pod If true, only versions matching that of the last release will be replaced.
+#pod Defaults to false.
+#pod
+#pod =cut
+
+has all_matching => (
     is  => 'ro',
     isa => 'Bool',
 );
@@ -128,11 +140,12 @@ sub rewrite_version {
       if $version =~ /_/ and scalar( $version =~ /\./g ) <= 1;
 
     my $assign_regex = $self->assign_re();
+    my $matching_regex = $self->matching_re($self->zilla->version);
 
     if (
-        $self->global
-        ? ( $content =~ s{^$assign_regex[^\n]*$}{$code}msg )
-        : ( $content =~ s{^$assign_regex[^\n]*$}{$code}ms )
+            $self->global ? ( $content =~ s{^$assign_regex[^\n]*$}{$code}msg )
+          : $self->all_matching ? ( $content =~ s{^$matching_regex[^\n]*$}{$code}msg  )
+          : ( $content =~ s{^$assign_regex[^\n]*$}{$code}ms )
       )
     {
         # append+truncate to preserve file mode
@@ -222,7 +235,7 @@ Dist::Zilla::Plugin::BumpVersionAfterRelease - Bump module versions after distri
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 
@@ -398,7 +411,12 @@ tuples with underscores are never allowed!)
 =head2 global
 
 If true, all occurrences of the version pattern will be replaced.  Otherwise,
-only the first occurrence is replaced.  Defaults to false.
+only the first occurrence in each file is replaced.  Defaults to false.
+
+=head2 all_matching
+
+If true, only versions matching that of the last release will be replaced.
+Defaults to false.
 
 =head2 munge_makefile_pl
 

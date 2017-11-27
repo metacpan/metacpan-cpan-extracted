@@ -5,8 +5,8 @@ package App::Music::PlayTab;
 # Author          : Johan Vromans
 # Created On      : Tue Sep 15 15:59:04 1992
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Apr 26 15:17:55 2017
-# Update Count    : 399
+# Last Modified On: Fri Apr  7 11:33:38 2017
+# Update Count    : 566
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -14,12 +14,7 @@ package App::Music::PlayTab;
 use strict;
 use warnings;
 
-our $VERSION = "2.027";
-
-# Package or program libraries, if appropriate.
-# $LIBDIR = $ENV{'LIBDIR'} || '/usr/local/lib/sample';
-# use lib qw($LIBDIR);
-# require 'common.pl';
+our $VERSION = "2.903";
 
 # Package name.
 my $my_package = 'Sciurix';
@@ -35,6 +30,7 @@ use Getopt::Long;
 sub app_options();
 
 my $output;
+my $generate;
 my $preamble;
 my $gxpose = 0;			# global xpose value
 my $verbose = 0;		# verbose processing
@@ -47,28 +43,32 @@ my $debug = 0;			# debugging
 my $trace = 0;			# trace (show process)
 my $test = 0;			# test
 
-################ Presets ################
-
-# Print dimensions.
-my $std_width	   =  30;
-my $std_height	   = -15;
-my $std_margin	   =  40;
-my $std_gridscale  =   8;
-
-my @Rom = qw(I II III IV V VI VII VIII IX X XI XII);
-
 ################ The Process ################
 
 my $line;			# current line (for messages)
-my $linetype = 0;		# type of current line
-my $posttext;
 
 my $xpose = $gxpose;
+
+my $data;			# opus being constructed
+my $entry;			# entry under construction
+my $width  = 30;		# horizontal 'step' for chords
+my $height = -15;		# vertical 'step' for lines
+my $margin = 40;		# default indentation, if required
+my $indent = 0;			# actual indentation
+my $barno;			# barnumber (slightly magical)
+my $s_margin = $margin;		# save values
+my $s_indent = 0;		# save values
+
+use App::Music::PlayTab::Output;
+
+use Encode;
+use Clone qw(clone);
 
 sub run {
     local (@ARGV) = @_ ? @_ : @ARGV;
 
     app_options();
+    binmode( STDERR, ':utf8' );
     print STDOUT ("ok 1\n") if $test;
 
     if ( defined $output ) {
@@ -82,15 +82,53 @@ sub run {
 
     # Options post-processing.
     $trace |= ($debug || $test);
+    $xpose = $gxpose;
 
-    ps_preamble();
+    # Actually we should probe all backends and let them register what
+    # they can handle.
+    $generate = 'PDF' if $Cava::Packager::PACKAGED;
+    if ( $generate ) {
+	if ( $generate eq 'ps' ) {
+	    $generate = 'PostScript';
+	}
+	elsif ( $generate eq 'pdf' ) {
+	    $generate = 'PDF';
+	}
+    }
+    elsif ( $output ) {
+	if ( $output =~ /\.ps$/i ) {
+	    $generate = 'PostScript';
+	}
+	elsif ( $output =~ /\.pdf$/i ) {
+	    $generate = 'PDF';
+	}
+	elsif ( $output =~ /\.dmp$/i ) {
+	    $generate = 'Dump';
+	}
+    }
+
+    $generate ||= 'PDF';
+
+    my $gen = App::Music::PlayTab::Output->new({
+		      generate => $generate,
+		      output => $output,
+	        });
+
     print STDOUT ("ok 3\n") if $test;
 
+    reset_globals();
+
     while ( <> ) {
+	# Skip comment lines.
 	next if /^\s*#/;
+	# Skip LilyPond comment lines.
 	next if $lilypond && /^\s*%/;
-	$lilypond && s/\s+%\s*\d+\s*$//;
+	# Remove LilyPond line number comments.
+	$lilypond && s/\s+\%\s*\d+.*//;
+	# Skip empty lines.
 	next unless /\S/;
+
+	$_ = decode_utf8($_);
 	chomp($line = $_);
 
 	s/\^\s+//;
@@ -100,62 +138,91 @@ sub run {
 	}
 
 	if ( /^\s*\[/ ) {
+	    # Chord diagram(s).
 	    while ( /^\s*\[([^]]+)\](.*)/ ) {
 		eval { chord($1) };
 		errout($@) if $@;
 		$_ = $2;
 	    }
-	    $linetype = 2;
 	    next;
-	}
-	elsif ( $linetype == 2 ) {
-	    print_newline(4);
-	    $linetype = 0;
 	}
 
 	if ( /^\s*\|/ ) {
-	    print_newline() if $linetype;
 	    bar($_);
-	    $linetype = 1;
 	    next;
-	}
-	elsif ( $linetype == 1 && /^%?[-+=<]/ ) {
-	    print_newline();
-	    $linetype = 0;
 	}
 
 	# Spacing/margin notes.
+
+	if ( /^%?[-+=<]/ && $entry->{prefix} && $entry->{prefix} ne "" ) {
+	    $entry->{height} = $height;
+	    $entry->{margin} = 0;
+	    $entry->{measures} = [];
+	    push_entry();
+	}
+
 	if ( /^%?=(.*)/ ) {
-	    print_margin(2, $1);
-	    $linetype = 0;
+	    $entry->{prefix} = $1;
+	    $entry->{pfx_vsp} = 2;
 	    next;
 	}
 	if ( /^%?-(.*)/ ) {
-	    print_margin(1, $1);
-	    $linetype = 0;
+	    $entry->{prefix} = $1;
+	    $entry->{pfx_vsp} = 1;
 	    next;
 	}
 	if ( /^%?\+(.*)/ ) {
-	    print_margin(0, $1);
-	    $linetype = 0;
+	    $entry->{prefix} = $1;
+	    $entry->{pfx_vsp} = 0;
 	    next;
 	}
-	if ( /^%?\</ ) {
-	    print_margin(0, undef);
-	    $linetype = 0;
+	if ( /^%?\</ ) {	# cancel margin changes
+	    $s_margin = $margin;
+	    $s_indent = $indent;
+	    $margin = $indent = 0;
 	    next;
 	}
 
-	text($_);
-	$linetype = 0;
+	# Text. Treat as +Prefix without measures.
+	if ( $entry->{prefix} && $entry->{prefix} ne "" ) {
+	    $entry->{height} = $height;
+	    $entry->{margin} = 0;
+	    $entry->{measures} = [];
+	    push_entry();
+	}
+	text($line);
     }
+    continue {
+	if ( eof ) {
+	    $gen->generate({ opus => $data });
+	    reset_globals();
+	}
+    }
+
     print STDOUT ("ok 4\n") if $test;
 
-    ps_trailer ();
     print STDOUT ("ok 5\n") if $test;
 
     close OUTPUT if defined $output;
     exit 0 unless $test;
+}
+
+sub push_entry {
+    return unless $entry && keys(%$entry);
+    push( @{ $data->{lines} }, $entry );
+    $entry = {};
+}
+
+sub reset_globals {
+    $data = {};
+    $entry = {};
+    $width  = 30;		# horizontal 'step' for chords
+    $height = -15;		# vertical 'step' for lines
+    $margin = 40;		# default indentation, if required
+    $indent = 0;		# actual indentation
+    undef $barno;		# barnumber (slightly magical)
+    $s_margin = $margin;	# save values
+    $s_indent = 0;		# save values
 }
 
 ################ Subroutines ################
@@ -163,7 +230,24 @@ sub run {
 sub bar {
     my ($line) = @_;
 
-    on_top();
+    my @m = ();
+    $indent = $margin if $entry->{prefix} && $entry->{prefix} ne "";
+    $entry->{barno}  = $barno if defined $barno && $barno > 0;
+    $entry->{width}  = $width;
+    $entry->{height} = $height;
+    $entry->{margin} = $indent if $indent;
+    $entry->{bpm}    = $bpm;
+
+    # Autosensing...
+    # Uppercase chords -> not lilypond mode.
+    if ( $line =~ /^\s*\|\s*[A-G]/ ) {
+	$lilypond = 0;
+    }
+    # Lowcase chords and : modifiers -> lilypond mode.
+    elsif ( $line =~ /^\s*\|\s*[a-g].*?:(m|\d|sus|aug|dim)/ ) {
+	$lilypond = 1;
+    };
+
 
     if ( $lilypond ) {
 	# LilyPond chords use : and ., so don't split on these.
@@ -181,95 +265,102 @@ sub bar {
 	eval {
 	    my $c = shift(@c);
 	    if ( $c eq '|' ) {
-		print_bar($firstbar);
-		$firstbar = 0;
+		if ( $firstbar ) {
+		    $firstbar = 0;
+		}
+		else {
+		    push( @{ $entry->{measures} }, [ @m ] );
+		    $barno++ if defined $barno;
+		}
+		@m = ();
 	    }
 	    elsif ( $c eq ':' ) {
-		print_again();
+		push( @m, "again" );
 	    }
 	    elsif ( $c eq '.' ) {
-		print_space();
+		push( @m, "space" );
 	    }
 	    elsif ( $c eq '%' ) {
 		my $xs = 1;
-		while ( @c > 0 && $c[0] eq '.' ) {
-		    shift(@c);
-		    $xs++;
+		if ( $lilypond ) {
+		    $xs = $bpm;
 		}
-		print_same('1', $xs);
+		else {
+		    while ( @c > 0 && $c[0] eq '.' ) {
+			shift(@c);
+			$xs++;
+		    }
+		}
+		push( @m, [ "same", 1, $xs ] );
 	    }
 	    elsif ( $c eq '-' ) {
-		print_rest();
+		push( @m, "rest" );
 	    }
 	    elsif ( $c eq '\'' ) {
-		ps_skip(4);
+		push( @m, "hmore" );
 	    }
 	    elsif ( $c eq '`' ) {
-		ps_skip(-4);
-	    }
-	    elsif ( lc($c) eq 'ta' ) {
-		print_turnaround();
+		push( @m, "hless" );
 	    }
 	    else {
-		ps_move();
 		my $chord = parse_chord($c);
 
 		if ( $chord->is_rest ) {
-		    print_rest();
+		    push( @m, "rest" );
 		}
 		else {
 		    $chord->transpose($xpose) if $xpose;
-		    print_chord($chord);
-		    ps_step();
+		    push( @m, clone($chord) );
 		}
 		if ( my $d = $chord->duration ) {
 		    $d = int($d / ($chord->duration_base / $bpm));
-		    unshift(@c, ('.') x ($d-1));
+		    unshift(@c, ('.') x ($d-1)) if $d > 1;
 		}
 	    }
 	};
 	die($@) if $@ =~ /can\'t locate/i;
 	errout($@) if $@;
     }
-    if ( defined $posttext ) {
-	ps_skip(4);
-	ps_move();
-	print OUTPUT ('SF (', $posttext, ') show', "\n");
-	undef $posttext;
-    }
-    print_newline();
+
+    push_entry();
 }
 
 sub control {
     local ($_) = @_;
 
     # Title.
-    if ( /^t(itle)?\s+(.*)/i ) {
-	print_title(1, $+);
+    if ( /^t(?:itle)?\s+(.*)/i ) {
+	$data->{title} = $1;
 	return;
     }
 
     # Subtitle(s).
-    if ( /^s(ub(title)?)?\s+(.*)/i ) {
-	print_title(0, $+);
+    if ( /^s(?:ub(?:title)?)?\s+(.*)/i ) {
+	push( @{ $data->{subtitle} }, $1 );
 	return;
     }
 
     # Width adjustment.
     if ( /^w(idth)?\s+([-+]?\d+)/i ) {
-	ps_set_width($2);
+	set_width($2);
 	return;
     }
 
     # Height adjustment.
     if ( /^h(eight)?\s+([-+]?\d+)/i ) {
-	ps_set_height($2);
+	set_height($2);
 	return;
     }
 
     # Margin width adjustment.
     if ( /^m(argin)?\s+([-+]?\d+)/i ) {
-	ps_set_margin($2);
+	set_margin($2);
+	$indent = $margin if $indent;
+	return;
+    }
+    if ( /^m(argin)?/i ) {
+	$margin = $s_margin;
+	$indent = $s_indent;
 	return;
     }
 
@@ -279,24 +370,31 @@ sub control {
 	return;
     }
 
-    # Bar numbering
+    # Bar numbering.
     if ( /^n(umber)?\s+([-+]?\d+)?/i ) {
-	set_barno(defined $2 ? $2 ? $2 < 0 ? $2+1 : $2 : undef : 1);
+	set_barno(defined $2 ? $2 ? $2 < 0 ? $2+1 : $2 : 0 : 1);
 	return;
     }
 
-    # LilyPond syntax
+    # LilyPond syntax.
     if ( /^l(?:y|ilypond)?(?:\s+(\d+))?/i ) {
 	$lilypond = defined $1 ? $1 : 1;
 	$bpm = ($lilypond && defined $1) ? $1 : 4;
 	return;
     }
 
-    if ( /^\>\s+(.+)/i ) {
-	$posttext = $1;
+    # Global settings for drivers and so on.
+    if ( /^g(?:lobal)?\s+(.*)/ ) {
+	use Text::ParseWords;
+	push( @{ $data->{globalsettings} }, shellwords($1) );
 	return;
     }
 
+    # Postfix text.
+    if ( /^\>\s+(.+)/i ) {
+	$entry->{postfix} = $1;
+	return;
+    }
 
     errout("Unrecognized control");
 }
@@ -305,6 +403,7 @@ my $chordparser;
 my $lilyparser;
 sub parse_chord {
     my $chord = shift;
+
     my $parser;
     if ( $lilypond ) {
 	unless ( $lilyparser ) {
@@ -324,7 +423,7 @@ sub parse_chord {
 }
 
 sub chord {
-    my (@l) = split(' ',$_[0]);
+    my (@l) = split( ' ', $_[0] );
 
     die("Illegal [chord] spec, need 7 or 8 values")
 	unless @l == 8 || @l == 7;
@@ -333,41 +432,39 @@ sub chord {
     my $chord = eval { parse_chord($cn) };
 
     my @c = ();
-    my $c = '()';
+    my $c = 0;
     foreach ( @l ) {
 	$_ = -1 if lc($_) eq "x";
 	if ( /^@(\d+)/ ) {
-	    $c = "($Rom[$1-1])" if $1 > 1;
+	    $c = 0+$1 if $1 > 1;
 	    next;
 	}
 	die("Illegal [chord] spec, need 6 numbers")
 	    unless /^-?\d$/ || @c == 6;
-	push(@c, $_);
+	push(@c, 0+$_);
     }
 
-    on_top();
+    unshift( @c, $c );
+    unshift( @c, $chord ? clone($chord) : $cn );
 
-    my $ps = $chord ? $chord->ps : "($cn) root";
-
-    print OUTPUT ('1000 1000 moveto', "\n",
-		  $ps, "\n",
-		  'currentpoint pop 1000 sub 2 div', "\n");
-    ps_move();
-    print OUTPUT (2.5*$std_gridscale, ' exch sub 8 add 0 rmoveto ',
-		  $ps, "\n");
-    ps_move();
-    print OUTPUT ('8 ', -5-(4*$std_gridscale), " rmoveto @c $c dots\n");
-    ps_skip(80);
+    if ( $data->{lines}->[-1]->{chords} ) {
+	push( @{ $data->{lines}->[-1]->{chords} }, \@c  );
+    }
+    else {
+	$entry->{margin} = $margin;
+	$entry->{height} = $height;
+	$entry->{chords} = [ \@c ];
+	push_entry();
+    }
 }
 
 sub text {
     my ($line) = @_;
-    ps_push_actual_margin(0);
-    on_top();
-    ps_move();
-    print OUTPUT ('SF (', $line, ') show', "\n");
-    ps_advance();
-    ps_pop_actual_margin();
+    $entry->{height} = $height;
+    $entry->{margin} = 0;
+    $entry->{prefix} = $line;
+    $entry->{pfx_vsp} = 0;
+    push_entry();
 }
 
 sub errout {
@@ -376,244 +473,38 @@ sub errout {
     warn("$msg\n", "Line $.: $line\n");
 }
 
-################ Print Routines ################
+################ Helper Routines ################
 
-my $x0 = 0;
-my $y0 = 0;
-my $x = 0;
-my $y = 0;
-my $xd = 0;
-my $yd = 0;
-my $xw = 0;
-my $yd_width = 0;
-my $xm = 0;
-my $md = 0;
-my $on_top = 0;
-my $barno;
-
-sub set_barno {
-    $barno = shift;
-}
-
-sub print_title {
-    my ($new, $title) = @_;
-
-    if ( $new ) {
-	ps_page();
-    }
-    ps_move();
-    print OUTPUT ($new ? 'TF (' : 'SF (', $title, ') show', "\n");
-    ps_advance();
-    $on_top = 1;
-    undef $barno;
-    $xpose = $gxpose;
-}
-
-# begin scope for $prev_chord
-my $prev_chord;
-
-sub print_chord {
-    my($chord) = @_;
-    print OUTPUT ($chord->ps, "\n");
-    $prev_chord = $chord;
-}
-
-sub print_again {
-    ps_move();
-    print OUTPUT ($prev_chord->ps, "\n");
-    ps_step();
-}
-
-# end scope for $prev_chord
-
-sub print_bar {
-    my ($first) = @_;
-    ps_move();
-    if ( defined($barno) ) {
-	if ( $first ) {
-	    print OUTPUT $barno > 0 ? ("($barno) barn\n") : ("bar\n");
-	}
-	else {
-	    print OUTPUT ("bar\n");
-	    $barno++;
-	}
-    }
-    else {
-	print OUTPUT ("bar\n");
-    }
-    ps_skip(4);
-}
-
-sub print_newline {
-    &ps_advance;
-}
-
-sub print_space {
-    ps_step();
-}
-
-sub print_rest {
-    ps_move();
-    print OUTPUT ("rest\n");
-    ps_step();
-}
-
-sub print_same {
-    my ($wh, $xs) = @_;
-    ps_push_x(($xs * $xd) / 2);
-    ps_move();
-    print OUTPUT ("same$wh\n");
-    ps_pop_x();
-    ps_skip($xs * $xd);
-}
-
-sub print_turnaround {
-    ps_move();
-    print OUTPUT ("ta\n");
-    ps_step();
-}
-
-sub print_margin {
-    my ($full, $margin) = @_;
-    unless ( on_top() ) {
-	ps_advance($full);
-    }
-    $xm = 0, return unless defined $margin;
-    return unless $margin =~ /\S/;
-    $margin =~ s/^\s+//;
-    $margin =~ s/\s$//;
-    $xm = 0;
-    ps_move();
-    print OUTPUT ('SF (', $margin, ') show', "\n");
-    $xm = $md;
-}
-
-sub on_top {
-    return 0 unless $on_top;
-    $x = 0;
-    $y = 4*$yd;
-    $on_top = 0;
-    return 1;
-}
-
-################ PostScript routines ################
-
-my $ps_pages = 0;
-
-sub ps_page {
-    print OUTPUT ('end showpage', "\n") if $ps_pages;
-    print OUTPUT ('%%Page: ', ++$ps_pages. ' ', $ps_pages, "\n",
-		  'tabdict begin', "\n");
-    $x = $y = $xm = 0;
-    $xd = $std_width;
-    $yd = $std_height;
-    $md = $std_margin;
-}
-
-sub ps_set_margin {
+sub _set_incr {
+    my $var = shift;
+    my $ref = shift;
     my $v = shift;
-    croak("ps_set_margin: number or increment\n")
+    warn("set_$var: number or increment expected\n")
       unless $v =~ /^([-+])?(\d+)$/;
-    if ( defined $1 ) {
-	$md += $1.$2;
+    if ( defined($1) ) {
+	$$ref += $1.$2;
     }
     else {
-	$md = $2;
+	$$ref = $2;
     }
+    $entry->{$var} = $$ref if $var;
 }
 
-my @oldmargin;
-sub ps_push_actual_margin {
-    push(@oldmargin, $xm);
-    $xm = shift;
+sub set_width  { unshift( @_, "width",     \$width  ); goto &_set_incr }
+
+sub set_height {
+    unshift( @_, "height",    \$height );
+    $height = -$height;
+    &_set_incr;
+    $height = -$height;
 }
 
-sub ps_pop_actual_margin {
-    $xm = pop(@oldmargin);
-}
-
-sub ps_set_width {
-    my $v = shift;
-    croak("ps_set_width: number or increment\n")
-      unless $v =~ /^([-+])?(\d+)$/;
-    if ( defined $1 ) {
-	$xd += $1.$2;
-    }
-    else {
-	$xd = $2;
-    }
-}
-
-sub ps_set_height {
-    my $v = shift;
-    croak("ps_set_height: number or increment\n")
-      unless $v =~ /^([-+])?(\d+)$/;
-    if ( defined $1 ) {
-	$yd -= $1.$2;
-    }
-    else {
-	$yd = -$2;
-    }
-}
-
-sub ps_move {
-    print OUTPUT ($x0+$x+$xm, ' ' , $y0+$y, ' m ');
-}
-
-sub ps_step {
-    $x += $xd;
-}
-
-sub ps_advance {
-    $x = 0;
-    $y += $yd;
-    $y += ($_[0]-1)*$yd if defined $_[0];
-}
-
-sub ps_skip {
-    $x += $_[0];
-}
-
-my @oldx;
-sub ps_push_x {
-    push(@oldx, $x);
-    $x += shift;
-}
-
-sub ps_pop_x {
-    $x = pop(@oldx);
-}
-
-sub ps_preamble {
-    my $data;
-    if ( defined $preamble ) {
-	open(DATA, $preamble) or die("$preamble: $!\n");
-	local($/);
-	$data = <DATA>;
-	close(DATA);
-    }
-    else {
-	require App::Music::PlayTab::PostScript::Preamble;
-	$data = App::Music::PlayTab::PostScript::Preamble->preamble;
-    }
-    $data =~ s/\$std_gridscale/$std_gridscale/g;
-    print OUTPUT ($data);
-
-    $x0 = 50;
-    $y0 = 800;
-    $xd = $std_width;
-    $yd = $std_height;
-    $x = $y = $xm = 0;
-    $ps_pages = 0;
-}
-
-sub ps_trailer {
-    print OUTPUT <<EOD;
-end showpage
-%%Trailer
-%%Pages: $ps_pages
-%%EOF
-EOD
+sub set_margin { unshift( @_, "margin",    \$margin ); goto &_set_incr }
+sub set_barno  {
+    # Values: 0 = disable, >0 = use, <0 lead-in.
+    unshift( @_, undef, \$barno );
+    &_set_incr;
+    $barno = undef unless $barno;
 }
 
 ################ Command Line Options ################
@@ -630,6 +521,7 @@ sub app_options() {
     return unless @ARGV > 0;
 
     if ( !GetOptions('output=s'	=> \$output,
+		     'generate=s' => \$generate,
 		     'preamble=s' => \$preamble,
 		     'transpose|x=i' => \$gxpose,
 		     'lilypond=i' => \$lilypond,
@@ -758,6 +650,30 @@ sub pr_syntax {
     print STDERR <<EOD;
 EOD
 }
+
+################ Resources ################
+
+sub ::findlib {
+    my ( $file ) = @_;
+
+    # Packaged.
+    if ( $App::Packager::PACKAGED ) {
+	my $found = App::Packager::GetUserFile($file);
+	return $found if -e $found;
+	$found = App::Packager::GetResource($file);
+	return $found if -e $found;
+    }
+
+    ( my $me = __PACKAGE__ ) =~ s;::;/;g;
+    foreach ( @INC ) {
+	return "$_/$me/user/$file" if -e "$_/$me/user/$file";
+	return "$_/$me/res/$file"  if -e "$_/$me/res/$file";
+	return "$_/$me/$file"      if -e "$_/$me/$file";
+    }
+    undef;
+}
+
+use lib ( grep { defined } ::findlib("CPAN") );
 
 ################ Documentation ################
 
@@ -903,7 +819,10 @@ To see how this looks, see http://johan.vromans.org/software/sw_playtab.html .
 You can modify the width of the bars with a '!w' control. Standard
 width of a beat is 30. '!w +5' increases the width to 35. '!w 25' sets
 it to 25. You get the idea. You can also change the height with '!h'
-(default is 15) and margin with '!m' (default width is 40).
+(default is 15) and margin with '!m' (default width is 40). You can
+restore the margin to its default value with '<'. This will save the
+current settings, and '!m' without argument will restore the saved
+settings.
 
 You can transpose an individual song with '!x I<amount>', where
 I<amount> can range from -11 to +11, inclusive. A positive transpose
@@ -946,7 +865,7 @@ Have fun, and let me know your ideas!
   #               raise the pitch of the note to a sharp [C11#9]
   b               lower the pitch of the note to a flat [C11b9]
   --------------------------------------------------------------
-  no              substract a note from a chord [C9no11]
+  no              subtract a note from a chord [C9no11]
   --------------------------------------------------------------
   _ may be used to avoid ambiguity, e.g. C_#9 <-> C#9 <-> C#_9
 
@@ -986,7 +905,7 @@ Have fun, and let me know your ideas!
   +               raise the pitch of an added note   c4:11.9+
   -               lower the pitch of an added note   c4:11.9-
   --------------------------------------------------------------
-  ^               substract a note from a chord      c4:9.^11
+  ^               subtract a note from a chord       c4:9.^11
   --------------------------------------------------------------
 
   Other:          Meaning
@@ -1008,7 +927,7 @@ Johan Vromans, Squirrel Consultancy E<lt>jvromans@squirrel.nlE<gt>
 
 =head1 COPYRIGHT AND DISCLAIMER
 
-This program is Copyright 1990,2013 by Johan Vromans.
+This program is Copyright 1990,2016 by Johan Vromans.
 
 This program is free software; you may redistribute it and/or modify
 it under the same terms as Perl itself.

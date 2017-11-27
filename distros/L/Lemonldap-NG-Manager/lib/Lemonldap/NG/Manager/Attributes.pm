@@ -8,12 +8,12 @@ sub types {
         'authParamsText' => {
             'test' => sub {
                 1;
-              }
+            }
         },
         'blackWhiteList' => {
             'test' => sub {
                 1;
-              }
+            }
         },
         'bool' => {
             'msgFail' => '__notABoolean__',
@@ -34,8 +34,8 @@ sub types {
                 push @cf, defined $conf->{'customFunctions'}
                   ? map( {
                         my $f = $_;
-                          $f =~ s/\w+:://g;
-                          $f, $_;
+                        $f =~ s/\w+:://g;
+                        $f, $_;
                     } split( /\s+/, $conf->{'customFunctions'}, 0 ) )
                   : ();
                 foreach my $f (@cf) {
@@ -44,21 +44,21 @@ sub types {
 
                 BEGIN {
                     ${^WARNING_BITS} =
-"\x54\x55\x55\x55\x15\x55\x55\x55\x55\x55\x51\x55\x55\x55\x55\x55\x55";
+"\x54\x55\x55\x55\x15\x55\x55\x55\x55\x55\x51\x55\x55\x55\x55\x55\x55\x01";
                 }
                 eval "$s $val";
                 return $@ ? ( 1, "__badExpression__: $@" ) : 1;
-              }
+            }
         },
         'catAndAppList' => {
             'test' => sub {
                 1;
-              }
+            }
         },
         'file' => {
             'test' => sub {
                 1;
-              }
+            }
         },
         'hostname' => {
             'form'    => 'text',
@@ -92,48 +92,48 @@ qr/^(?:(?:(?:(?:(?:(?:[a-zA-Z0-9][-a-zA-Z0-9]*)?[a-zA-Z0-9])[.])*(?:[a-zA-Z][-a-
                       if $_ =~ /exportedvars$/i and defined $conf->{$_}{$val};
                 }
                 return 1, "__unknownAttrOrMacro__: $val";
-              }
+            }
         },
         'longtext' => {
             'test' => sub {
                 1;
-              }
+            }
         },
         'menuApp' => {
             'test' => sub {
                 1;
-              }
+            }
         },
         'menuCat' => {
             'test' => sub {
                 1;
-              }
+            }
         },
         'oidcmetadatajson' => {
             'test' => sub {
                 1;
-              }
+            }
         },
         'oidcmetadatajwks' => {
             'test' => sub {
                 1;
-              }
+            }
         },
         'oidcOPMetaDataNode' => {
             'test' => sub {
                 1;
-              }
+            }
         },
         'oidcRPMetaDataNode' => {
             'test' => sub {
                 1;
-              }
+            }
         },
         'password' => {
             'msgFail' => '__malformedValue__',
             'test'    => sub {
                 1;
-              }
+            }
         },
         'pcre' => {
             'form' => 'text',
@@ -144,7 +144,7 @@ qr/^(?:(?:(?:(?:(?:(?:[a-zA-Z0-9][-a-zA-Z0-9]*)?[a-zA-Z0-9])[.])*(?:[a-zA-Z][-a-
                       }
                 };
                 return $@ ? ( 0, "__badRegexp__: $@" ) : 1;
-              }
+            }
         },
         'PerlModule' => {
             'form'    => 'text',
@@ -154,17 +154,17 @@ qr/^(?:(?:(?:(?:(?:(?:[a-zA-Z0-9][-a-zA-Z0-9]*)?[a-zA-Z0-9])[.])*(?:[a-zA-Z][-a-
         'portalskin' => {
             'test' => sub {
                 1;
-              }
+            }
         },
         'portalskinbackground' => {
             'test' => sub {
                 1;
-              }
+            }
         },
         'post' => {
             'test' => sub {
                 1;
-              }
+            }
         },
         'RSAPrivateKey' => {
             'test' => sub {
@@ -172,7 +172,7 @@ qr/^(?:(?:(?:(?:(?:(?:[a-zA-Z0-9][-a-zA-Z0-9]*)?[a-zA-Z0-9])[.])*(?:[a-zA-Z][-a-
 m[^(?:(?:\-+\s*BEGIN\s+(?:RSA\s+)?PRIVATE\s+KEY\s*\-+\r?\n)?[a-zA-Z0-9/\+\r\n]+={0,2}(?:\r?\n\-+\s*END\s+(?:RSA\s+)PRIVATE\s+KEY\s*\-+)?[\r\n]*)?$]s
                   ? 1
                   : ( 1, '__badPemEncoding__' );
-              }
+            }
         },
         'RSAPublicKey' => {
             'test' => sub {
@@ -180,7 +180,7 @@ m[^(?:(?:\-+\s*BEGIN\s+(?:RSA\s+)?PRIVATE\s+KEY\s*\-+\r?\n)?[a-zA-Z0-9/\+\r\n]+=
 m[^(?:(?:\-+\s*BEGIN\s+PUBLIC\s+KEY\s*\-+\r?\n)?[a-zA-Z0-9/\+\r\n]+={0,2}(?:\r?\n\-+\s*END\s+PUBLIC\s+KEY\s*\-+)?[\r\n]*)?$]s
                   ? 1
                   : ( 1, '__badPemEncoding__' );
-              }
+            }
         },
         'RSAPublicKeyOrCertificate' => {
             'test' => sub {
@@ -188,37 +188,37 @@ m[^(?:(?:\-+\s*BEGIN\s+PUBLIC\s+KEY\s*\-+\r?\n)?[a-zA-Z0-9/\+\r\n]+={0,2}(?:\r?\
 m[^(?:(?:\-+\s*BEGIN\s+(?:PUBLIC\s+KEY|CERTIFICATE)\s*\-+\r?\n)?[a-zA-Z0-9/\+\r\n]+={0,2}(?:\r?\n\-+\s*END\s+(?:PUBLIC\s+KEY|CERTIFICATE)\s*\-+)?[\r\n]*)?$]s
                   ? 1
                   : ( 1, '__badPemEncoding__' );
-              }
+            }
         },
         'rule' => {
             'test' => sub {
                 1;
-              }
+            }
         },
         'samlAssertion' => {
             'test' => sub {
                 1;
-              }
+            }
         },
         'samlAttribute' => {
             'test' => sub {
                 1;
-              }
+            }
         },
         'samlIDPMetaDataNode' => {
             'test' => sub {
                 1;
-              }
+            }
         },
         'samlService' => {
             'test' => sub {
                 1;
-              }
+            }
         },
         'samlSPMetaDataNode' => {
             'test' => sub {
                 1;
-              }
+            }
         },
         'select' => {
             'test' => sub {
@@ -228,19 +228,19 @@ m[^(?:(?:\-+\s*BEGIN\s+(?:PUBLIC\s+KEY|CERTIFICATE)\s*\-+\r?\n)?[a-zA-Z0-9/\+\r\
                 return $test
                   ? 1
                   : ( 0, "Invalid value '$_[0]' for this select" );
-              }
+            }
         },
         'subContainer' => {
             'keyTest' => qr/\w/,
             'test'    => sub {
                 1;
-              }
+            }
         },
         'text' => {
             'msgFail' => '__malformedValue__',
             'test'    => sub {
                 1;
-              }
+            }
         },
         'trool' => {
             'msgFail' => '__authorizedValues__: -1, 0, 1',
@@ -319,6 +319,10 @@ sub attributes {
                     {
                         'k' => 'Google',
                         'v' => 'Google'
+                    },
+                    {
+                        'k' => 'Kerberos',
+                        'v' => 'Kerberos'
                     },
                     {
                         'k' => 'LDAP',
@@ -505,6 +509,10 @@ sub attributes {
                 {
                     'k' => 'Google',
                     'v' => 'Google'
+                },
+                {
+                    'k' => 'Kerberos',
+                    'v' => 'Kerberos'
                 },
                 {
                     'k' => 'LDAP',
@@ -829,8 +837,8 @@ qr/^(?:(?:(?:(?:[a-zA-Z0-9][-a-zA-Z0-9]*)?[a-zA-Z0-9])[.])*(?:[a-zA-Z][-a-zA-Z0-
                     push @cf, defined $conf->{'customFunctions'}
                       ? map( {
                             my $f = $_;
-                              $f =~ s/\w+:://g;
-                              $f, $_;
+                            $f =~ s/\w+:://g;
+                            $f, $_;
                         } split( /\s+/, $conf->{'customFunctions'}, 0 ) )
                       : ();
                     foreach my $f (@cf) {
@@ -839,11 +847,11 @@ qr/^(?:(?:(?:(?:[a-zA-Z0-9][-a-zA-Z0-9]*)?[a-zA-Z0-9])[.])*(?:[a-zA-Z][-a-zA-Z0-
 
                     BEGIN {
                         ${^WARNING_BITS} =
-"\x54\x55\x55\x55\x15\x55\x55\x55\x55\x55\x51\x55\x55\x55\x55\x55\x55";
+"\x54\x55\x55\x55\x15\x55\x55\x55\x55\x55\x51\x55\x55\x55\x55\x55\x55\x01";
                     }
                     eval $s;
                     return $@ ? ( 1, "__badExpression__: $@" ) : 1;
-                  }
+                }
             },
             'type' => 'keyTextContainer'
         },
@@ -918,8 +926,8 @@ qr/^(?:(?:(?:(?:[a-zA-Z0-9][-a-zA-Z0-9]*)?[a-zA-Z0-9])[.])*(?:[a-zA-Z][-a-zA-Z0-
                 push @cf, defined $conf->{'customFunctions'}
                   ? map( {
                         my $f = $_;
-                          $f =~ s/\w+:://g;
-                          $f, $_;
+                        $f =~ s/\w+:://g;
+                        $f, $_;
                     } split( /\s+/, $conf->{'customFunctions'}, 0 ) )
                   : ();
                 foreach my $f (@cf) {
@@ -928,7 +936,7 @@ qr/^(?:(?:(?:(?:[a-zA-Z0-9][-a-zA-Z0-9]*)?[a-zA-Z0-9])[.])*(?:[a-zA-Z][-a-zA-Z0-
 
                 BEGIN {
                     ${^WARNING_BITS} =
-"\x54\x55\x55\x55\x15\x55\x55\x55\x55\x55\x51\x55\x55\x55\x55\x55\x55";
+"\x54\x55\x55\x55\x15\x55\x55\x55\x55\x55\x51\x55\x55\x55\x55\x55\x55\x01";
                 }
                 eval "$s $val";
                 return $@ ? ( 1, "__badExpression__: $@" ) : 1;
@@ -953,8 +961,8 @@ qr/^(?:(?:(?:(?:[a-zA-Z0-9][-a-zA-Z0-9]*)?[a-zA-Z0-9])[.])*(?:[a-zA-Z][-a-zA-Z0-
                 push @cf, defined $conf->{'customFunctions'}
                   ? map( {
                         my $f = $_;
-                          $f =~ s/\w+:://g;
-                          $f, $_;
+                        $f =~ s/\w+:://g;
+                        $f, $_;
                     } split( /\s+/, $conf->{'customFunctions'}, 0 ) )
                   : ();
                 foreach my $f (@cf) {
@@ -963,7 +971,7 @@ qr/^(?:(?:(?:(?:[a-zA-Z0-9][-a-zA-Z0-9]*)?[a-zA-Z0-9])[.])*(?:[a-zA-Z][-a-zA-Z0-
 
                 BEGIN {
                     ${^WARNING_BITS} =
-"\x54\x55\x55\x55\x15\x55\x55\x55\x55\x55\x51\x55\x55\x55\x55\x55\x55";
+"\x54\x55\x55\x55\x15\x55\x55\x55\x55\x55\x51\x55\x55\x55\x55\x55\x55\x01";
                 }
                 eval "$s $val";
                 return $@ ? ( 1, "__badExpression__: $@" ) : 1;
@@ -1034,7 +1042,7 @@ qr/^(?:(?:(?:(?:[a-zA-Z0-9][-a-zA-Z0-9]*)?[a-zA-Z0-9])[.])*(?:[a-zA-Z][-a-zA-Z0-
                           and defined $conf->{$_}{$val};
                     }
                     return 1, "__unknownAttrOrMacro__: $val";
-                  }
+                }
             },
             'type' => 'doubleHash'
         },
@@ -1088,6 +1096,25 @@ qr/^(?:(?:(?:(?:[a-zA-Z0-9][-a-zA-Z0-9]*)?[a-zA-Z0-9])[.])*(?:[a-zA-Z][-a-zA-Z0-
         },
         'key' => {
             'type' => 'password'
+        },
+        'krbAuthnLevel' => {
+            'default' => 3,
+            'type'    => 'int'
+        },
+        'krbByJs' => {
+            'default' => 0,
+            'type'    => 'bool'
+        },
+        'krbKeytab' => {
+            'type' => 'text'
+        },
+        'krbRemoveDomain' => {
+            'default' => 1,
+            'type'    => 'bool'
+        },
+        'krbUseModKrb' => {
+            'default' => 0,
+            'type'    => 'bool'
         },
         'ldapAllowResetExpiredPassword' => {
             'default' => 0,
@@ -1299,8 +1326,8 @@ qr/^(?:(?:(?:(?:[a-zA-Z0-9][-a-zA-Z0-9]*)?[a-zA-Z0-9])[.])*(?:[a-zA-Z][-a-zA-Z0-
                     push @cf, defined $conf->{'customFunctions'}
                       ? map( {
                             my $f = $_;
-                              $f =~ s/\w+:://g;
-                              $f, $_;
+                            $f =~ s/\w+:://g;
+                            $f, $_;
                         } split( /\s+/, $conf->{'customFunctions'}, 0 ) )
                       : ();
                     foreach my $f (@cf) {
@@ -1309,11 +1336,11 @@ qr/^(?:(?:(?:(?:[a-zA-Z0-9][-a-zA-Z0-9]*)?[a-zA-Z0-9])[.])*(?:[a-zA-Z][-a-zA-Z0-
 
                     BEGIN {
                         ${^WARNING_BITS} =
-"\x54\x55\x55\x55\x15\x55\x55\x55\x55\x55\x51\x55\x55\x55\x55\x55\x55";
+"\x54\x55\x55\x55\x15\x55\x55\x55\x55\x55\x51\x55\x55\x55\x55\x55\x55\x01";
                     }
                     eval $s;
                     return $@ ? ( 1, "__badExpression__: $@" ) : 1;
-                  }
+                }
             },
             'type' => 'ruleContainer'
         },
@@ -1345,8 +1372,8 @@ qr/^(?:(?:(?:(?:[a-zA-Z0-9][-a-zA-Z0-9]*)?[a-zA-Z0-9])[.])*(?:[a-zA-Z][-a-zA-Z0-
                 push @cf, defined $conf->{'customFunctions'}
                   ? map( {
                         my $f = $_;
-                          $f =~ s/\w+:://g;
-                          $f, $_;
+                        $f =~ s/\w+:://g;
+                        $f, $_;
                     } split( /\s+/, $conf->{'customFunctions'}, 0 ) )
                   : ();
                 foreach my $f (@cf) {
@@ -1355,7 +1382,7 @@ qr/^(?:(?:(?:(?:[a-zA-Z0-9][-a-zA-Z0-9]*)?[a-zA-Z0-9])[.])*(?:[a-zA-Z][-a-zA-Z0-
 
                 BEGIN {
                     ${^WARNING_BITS} =
-"\x54\x55\x55\x55\x15\x55\x55\x55\x55\x55\x51\x55\x55\x55\x55\x55\x55";
+"\x54\x55\x55\x55\x15\x55\x55\x55\x55\x55\x51\x55\x55\x55\x55\x55\x55\x01";
                 }
                 eval "$s $val";
                 return $@ ? ( 1, "__badExpression__: $@" ) : 1;
@@ -1994,8 +2021,8 @@ qr/^(?:(?:(?:(?:[a-zA-Z0-9][-a-zA-Z0-9]*)?[a-zA-Z0-9])[.])*(?:[a-zA-Z][-a-zA-Z0-
                 push @cf, defined $conf->{'customFunctions'}
                   ? map( {
                         my $f = $_;
-                          $f =~ s/\w+:://g;
-                          $f, $_;
+                        $f =~ s/\w+:://g;
+                        $f, $_;
                     } split( /\s+/, $conf->{'customFunctions'}, 0 ) )
                   : ();
                 foreach my $f (@cf) {
@@ -2004,7 +2031,7 @@ qr/^(?:(?:(?:(?:[a-zA-Z0-9][-a-zA-Z0-9]*)?[a-zA-Z0-9])[.])*(?:[a-zA-Z][-a-zA-Z0-
 
                 BEGIN {
                     ${^WARNING_BITS} =
-"\x54\x55\x55\x55\x15\x55\x55\x55\x55\x55\x51\x55\x55\x55\x55\x55\x55";
+"\x54\x55\x55\x55\x15\x55\x55\x55\x55\x55\x51\x55\x55\x55\x55\x55\x55\x01";
                 }
                 eval "$s $val";
                 return $@ ? ( 1, "__badExpression__: $@" ) : 1;
@@ -2685,19 +2712,19 @@ qr/(?:(?:https?):\/\/(?:(?:(?:(?:(?:(?:[a-zA-Z0-9][-a-zA-Z0-9]*)?[a-zA-Z0-9])[.]
             'default' => 0,
             'select'  => [
                 {
-                    'k' => 0,
+                    'k' => '0',
                     'v' => 'unsecuredCookie'
                 },
                 {
-                    'k' => 1,
+                    'k' => '1',
                     'v' => 'securedCookie'
                 },
                 {
-                    'k' => 2,
+                    'k' => '2',
                     'v' => 'doubleCookie'
                 },
                 {
-                    'k' => 3,
+                    'k' => '3',
                     'v' => 'doubleCookieForSingleSession'
                 }
             ],

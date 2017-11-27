@@ -1,47 +1,62 @@
 =head1 NAME
 
-Gentoo::App::Pram - Library to fetch a GitHub Pull Request as an am-like patch.
+pram - (p)ull (r)equests made easy via git (am)!
 
 =head1 DESCRIPTION
 
-The purpose of this module is to fetch Pull Requests from GitHub's CDN as
-am-like patches in order to facilitate the merging and closing of Pull
-Requests. This module also takes care of adding "Closes:" and "Bug:" which are
-Gentoo-specific. See GLEP 0066.
+The pram utility assists Gentoo developers in merging contributions from the
+Gentoo Github repository in the Gentoo git repository.
 
-=head1 FUNCTIONS
+Let 123 a pull request filed against the official Gentoo Github repository.
+pram retrieves this PR from the Github CDN as a patch using the HTTP protocol.
+pram then adds the necessary headers to close one or more Gentoo bug reports
+but also the PR automatically. pram then opens up the patch with C<$EDITOR> for
+you to review it. Eventually, if you deem the contribution good enough and
+accept it, pram merges it using the git am command. Git is an essential part of
+the backend of pram for merging patches.
 
-=over 4
+At Gentoo we are very opinionated. We are against merge commits. We think they
+add unnecessary clutter to the history of a git repository. We want to keep the
+history of the Portage tree as linear as possible. For this reason, we leverage
+the tools offered by Github to merge contributions as patches without
+compromising our standards.
 
-=item * fetch_patch($patch_url)
+Originally, pram was written to ease the triaging of Gentoo Github PRs and make
+it more convenient. Yet, it can be used to merge PRs from virtually any
+Github repository. Give it a try!
 
-Fetch patch from $patch_url. Return patch as a string.
+=head1 SYNOPSIS
 
-=item * modify_patch($patch)
+pram <pull request number>
 
-Modify the patch headers. This function only modifies the headers of the first
-commit. Namely:
-* Add a "Closes: https://github.com/XXX" header. Check first if it wasn't
-added already. This header is parsed by the Github bot upon merge. The bot
-then automatically closes the pull request. See
-https://help.github.com/articles/closing-issues-using-keywords for more info.
-* Add a "Bug: https://bugs.gentoo.org/XXX" header when the `--bug XXX` option
-is given. This header is parsed by the Gentoo Bugzilla bot upon merge. The bot
-then writes a message in the bug report. See GLEP 0066 for more info.
-* Add a "Closes: https://bugs.gentoo.org/XXX" header when the `--closes XXX`
-option is given. This header is parsed by the Gentoo Bugzilla bot upon merge.
-The bot then automatically closes the bug report. See GLEP 0066 for more info.
+ --repository|r <repository> Set repository to fetch PR from.
+ --signoff|-s                Pass --signoff option to git am.
+ --editor|e     <editor>     Set editor to visualise patch in.
+ --closes|c     <bug number> Add "Closes: https://bugs.gentoo.org/<bug number>" header to first commit.
+ --bug|b        <bug number> Add "Bug: https://bugs.gentoo.org/<bug number>" header to first commit.
+ --help|h                    Display help.
+ --man|m                     Display a man page.
 
-=item * apply_patch($editor, $git_command, $patch)
+=head1 EXAMPLE
 
-Apply $patch onto HEAD of the current git repository using $git_command. This
-functions also shows $patch in $editor for a final review.
+ # GENTOO DEVELOPERS! Bear in mind that pram fetches pull requets from the
+ # Gentoo Github repository by default. You don't need to specify it.
 
-=back
+ # Fetch PR 123 and display it in emacs.
+ $ pram --editor emacs 123
+
+ # Fetch PR 456 and add a reference to the Gentoo bug report 101010.
+ $ pram --bug 101010 456
+
+ # Fetch PR 789 and close the Gentoo bug report 114499.
+ $ pram --closes 114499 789
+
+ # Fetch PR 994422 from the Github repository https://github.com/foo/bar.
+ $ pram --repository foo/bar 994422
 
 =head1 VERSION
 
-version 0.100
+version 0.100100
 
 =head1 COPYRIGHT AND LICENSE
 
@@ -53,6 +68,7 @@ the same terms as the Perl 5 programming language system itself.
 =head1 AUTHOR
 
 Patrice Clement <monsieurp@gentoo.org>
-Kent Fredric <kentln@gentoo.org>
+
+Kent Fredric <kentnl@gentoo.org>
 
 =cut

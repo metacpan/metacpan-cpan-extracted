@@ -167,6 +167,7 @@ $msg = from_xmlrpc(<<'MESSAGE');
               <value><string>Egypt</string></value>
               <value><boolean>0</boolean></value>
               <value><i4>-31</i4></value>
+              <value>Bare string</value>
             </data>
           </array>
         </value>
@@ -177,7 +178,33 @@ MESSAGE
 
 isa_ok $msg, 'Mojo::XMLRPC::Message::Response', 'correct message type';
 ok !$msg->is_fault, 'not a fault';
-is_deeply $msg->parameters, [[12, 'Egypt', Mojo::JSON::false, -31]], 'correct parameters';
+is_deeply $msg->parameters, [[12, 'Egypt', Mojo::JSON::false, -31, 'Bare string']], 'correct parameters';
+
+$msg = from_xmlrpc(<<'MESSAGE');
+<?xml version="1.0"?>
+<methodResponse>
+   <params>
+      <param>
+        <value>
+          <struct>
+            <member>
+              <name>hello</name>
+              <value><string>world</string></value>
+            </member>
+            <member>
+              <name>hi</name>
+              <value>chicago</value>
+            </member>
+          </array>
+        </value>
+      </param>
+    </params>
+  </methodResponse>
+MESSAGE
+
+isa_ok $msg, 'Mojo::XMLRPC::Message::Response', 'correct message type';
+ok !$msg->is_fault, 'not a fault';
+is_deeply $msg->parameters, [{hello => 'world', hi => 'chicago'}], 'correct parameters';
 
 $msg = from_xmlrpc(<<'MESSAGE');
 <?xml version="1.0"?>
@@ -188,15 +215,15 @@ $msg = from_xmlrpc(<<'MESSAGE');
             <member>
                <name>faultCode</name>
                <value><int>4</int></value>
-               </member>
+            </member>
             <member>
                <name>faultString</name>
                <value><string>Too many parameters.</string></value>
-               </member>
-            </struct>
-         </value>
-      </fault>
-   </methodResponse>
+            </member>
+        </struct>
+      </value>
+   </fault>
+</methodResponse>
 MESSAGE
 
 isa_ok $msg, 'Mojo::XMLRPC::Message::Response', 'correct message type';

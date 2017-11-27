@@ -7,8 +7,8 @@ use warnings;
 
 no warnings 'uninitialized';
 
-our $VERSION = '3.007'; # VERSION
-my $LAST_UPDATE = '3.006'; # manually update whenever code is changed
+our $VERSION = '3.008'; # VERSION
+my $LAST_UPDATE = '3.008'; # manually update whenever code is changed
 
 use Compress::Zlib;
 
@@ -29,7 +29,11 @@ PDF::Builder::Resource::XObject::Image::TIFF - TIFF image support
 
 =item  $res = PDF::Builder::Resource::XObject::Image::TIFF->new($pdf, $file)
 
-Returns a tiff-image object.
+Returns a TIFF-image object.
+
+If the Graphics::TIFF package is installed, the TIFF_GT library will be used
+instead of the TIFF library. In such a case, use of the TIFF library may be 
+forced via the C<-nouseGT> flag (see Builder documentation for C<image_tiff()>).
 
 =cut
 
@@ -56,6 +60,20 @@ sub new {
     $tif->close();
 
     return $self;
+}
+
+=item  $mode = $tif->usesLib()
+
+Returns 1 if Graphics::TIFF installed and used, 0 if not installed, or -1 if
+installed but not used (-nouseGT option given to C<image_tiff>).
+
+=cut
+
+sub usesLib {
+    my ($self) = shift;
+    # should be 0 for Graphics::TIFF not installed, or -1 for is installed,
+    # but not using it
+    return $self->{'usesGT'}->val();
 }
 
 sub deLZW {

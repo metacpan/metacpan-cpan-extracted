@@ -15,7 +15,7 @@ use Chloro::Test::DateFromStr;
 my $form = Chloro::Test::DateFromStr->new();
 
 {
-    my $set = $form->process(
+    my $result_set = $form->process(
         params => {
             year  => 2011,
             month => 3,
@@ -23,7 +23,7 @@ my $form = Chloro::Test::DateFromStr->new();
         }
     );
 
-    my $results = $set->results_as_hash();
+    my $results = $result_set->results_as_hash();
 
     isa_ok( $results->{date}, 'DateTime', 'date field result' );
 

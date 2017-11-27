@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 use List::AllUtils qw( all );
 use Markdent::Types;
@@ -24,7 +24,7 @@ role {
 
     my $validator = validation_for(
         params => [
-            { type => object_does_type('Markdent::Role::Event') },
+            { type => t('EventObject') },
         ],
     );
 
@@ -60,7 +60,7 @@ Markdent::Role::BalancedEvent - A parameterized role for events which can check 
 
 =head1 VERSION
 
-version 0.27
+version 0.28
 
 =head1 DESCRIPTION
 

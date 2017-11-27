@@ -11,12 +11,14 @@ use version;
 # XXX: 5.8.8 and 5.8.9 also have debug_tokens.
 my $min_version = version->parse('5.010000');
 
+my $api_url = "https://fastapi.metacpan.org/v1/release/_search?q=distribution:perl&fields=download_url,date&size=500&sort=date:desc";
+
 my $ua = HTTP::Tiny->new;
 
 my @perls;
 {
     my %seen;
-    my $res = $ua->get("http://api.metacpan.org/v0/release/_search?q=distribution:perl&fields=download_url,date&size=500&sort=date:desc");
+    my $res = $ua->get($api_url);
     die "Can't get perl versions" unless $res->{success};
     @perls =
         map {+{version => $_->[0], url => $_->[2], canon_version => $_->[3]}}

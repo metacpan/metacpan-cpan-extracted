@@ -6,6 +6,7 @@ package WWW::Shopify::Liquid::Operator::With;
 use base 'WWW::Shopify::Liquid::Operator';
 sub symbol { return ('with'); }
 sub priority { return 11; }
-sub operate { return undef; }
+sub optimize { return $_[0]; }
+sub render { return $_[0]; }
 
 1;

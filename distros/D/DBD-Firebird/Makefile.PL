@@ -156,6 +156,8 @@ unless ($EMBEDDED) {
             locate_firebird();
         }
     }
+
+    detect_firebird_api_version();
 }
 
 my $client_lib = ( $EMBEDDED and $FB::API_VER < 30 ) ? 'fbembed' : 'fbclient';
@@ -232,11 +234,13 @@ qq(*.xsi *.old t/*.old *~ t/*~ trace.txt t/trace.txt lib/DBD/Firebird/*~ lib/DBD
         'File::Which'  => 0,
     },
     BUILD_REQUIRES     => {
-        'Test::Deep' => 0,
-        'Test::More' => 0.4,
-        'Test::Exception' => 0.31,
-        'Time::HiRes' => 0,
+        'File::Path'     => 0,
+        'File::Temp'     => 0,
         'Math::BigFloat' => 1.55,
+        'Test::Deep' => 0,
+        'Test::Exception' => 0.31,
+        'Test::More' => 0.4,
+        'Time::HiRes' => 0,
     },
     LICENSE            => 'perl',
     MIN_PERL_VERSION   => '5.008001',
@@ -299,7 +303,8 @@ unless ($EMBEDDED) {
         create_embedded_files();
     }
     else {
-        print "libfbembed not found, building of DBD::FirebirdEmbed skipped.\n";
+        print
+            "libfbembed not found and API version is $FB::API_VER, building of DBD::FirebirdEmbed skipped.\n";
         # make sure there is no embedded build involved
         my $mfpl = File::Spec->catfile( 'embed', 'Makefile.PL' );
         unlink $mfpl if -e $mfpl;

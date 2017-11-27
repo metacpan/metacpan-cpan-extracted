@@ -1,7 +1,14 @@
 Revision history for MVC-Neaf
 
-Mon Nov 20 2017
+0.19    Fri Nov 24 2017
+        - CLI Add --listen option to CLI interface
+        - API Add exp. path_info_split method to fetch regex capture groups
+        - API BREAK default error = json + logged err_id
+        - API BREAK Deprecate foo => bar => baz => sub {}-style paths in route()
+        - API BREAK Remove CGI driver for good, remove CGI.pm dependency
+        - BUG Add hack to prevent tests from failing on older perls
 
+0.18    Mon Nov 20 2017
         - TST Rework examples to use the new declarative get+post syntax
         - API BREAK Use -view=>JS by default; switch to TT & issue warning if -template seen
         - API Add experimental predefined param_regex to route

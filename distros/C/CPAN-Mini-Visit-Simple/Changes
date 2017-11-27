@@ -1,5 +1,10 @@
 Revision history for Perl module CPAN::Mini::Visit::Simple
 
+0.017 Sat Nov 25 11:52:15 EST 2017
+    - Add 'do_not_visit' option to visit().  This enables the user to avoid
+      visiting distributions in a minicpan which are known to not extract
+      cleanly.
+
 0.016 Mon Nov 20 19:46:04 EST 2017
     - visit() internals modified to pass an absolute path to the
       action coderef.  This should provide more flexibility in

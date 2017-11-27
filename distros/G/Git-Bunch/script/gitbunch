@@ -1,7 +1,7 @@
 #!perl
 
-our $DATE = '2017-10-19'; # DATE
-our $VERSION = '0.620'; # VERSION
+our $DATE = '2017-11-24'; # DATE
+our $VERSION = '0.621'; # VERSION
 
 use 5.010001;
 use strict;
@@ -39,7 +39,7 @@ gitbunch - Manage gitbunch directory (directory which contain git repos)
 
 =head1 VERSION
 
-This document describes version 0.620 of gitbunch (from Perl distribution Git-Bunch), released on 2017-10-19.
+This document describes version 0.621 of gitbunch (from Perl distribution Git-Bunch), released on 2017-11-24.
 
 =head1 SYNOPSIS
 
@@ -616,7 +616,7 @@ ownership. If you need to maintain ownership (e.g. you run as root and the repos
 are not owned by root), turn this option on.
 
 
-=item B<--skip-mtime-check>
+=item B<--skip-mtime-check>, B<-M>
 
 Whether or not, when rsync-ing non-repos, we check mtime first.
 

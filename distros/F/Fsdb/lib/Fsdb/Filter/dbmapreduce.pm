@@ -733,7 +733,7 @@ sub _open_new_key {
 
     _close_old_key
 
-Internal, finish a tag.
+Internal, finish a key.
 
 =cut
 
@@ -751,7 +751,7 @@ sub _close_old_key {
     croak $self->{_prog} . ": internal error: current key doesn't equal prior key " . $self->_key_to_string($self->{_current_key}) . " != key " . $self->_key_to_string($key) . "\n"
 	if (defined($key) && $self->{_current_key} ne $key);
     # finish the reducer
-    print STDERR "# dbmapreduce: _close_old_key closing reducer ($key)\n" if ($self->{_debug} >= 2);
+    print STDERR "# dbmapreduce: _close_old_key closing reducer (" . ($key // "null key") . ")\n" if ($self->{_debug} >= 2);
     $self->{_to_reducer_writer}->close;
 }
 

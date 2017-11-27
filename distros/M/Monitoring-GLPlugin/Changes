@@ -1,3 +1,13 @@
+* 2017-11-26 2.4.14.6
+  update UCD-SNMP-MIB
+* 2017-11-26 2.4.14.5
+  add MMB-COM-MIB
+* 2017-11-23 2.4.14.4
+  remove 15s session timeout
+* 2017-11-20 2.4.14.3
+  fix a bug in negate
+* 2017-11-02 2.4.14.2
+  update F5-BIGIP-LOCAL-MIB and F5-BIGIP-GLOBAL-MIB
 * 2017-09-28 2.4.14.1
   fix a typo in QUANTUM-SNMP-MIB
 * 2017-09-28 2.4.14

@@ -16,8 +16,8 @@ package PDF::Builder::Basic::PDF::File;
 
 use strict;
 
-our $VERSION = '3.007'; # VERSION
-my $LAST_UPDATE = '3.005'; # manually update whenever code is changed
+our $VERSION = '3.008'; # VERSION
+my $LAST_UPDATE = '3.008'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -887,6 +887,8 @@ sub remove_obj {
 }
 
 =head2 $p->ship_out(@objects)
+
+=head2 $p->ship_out()
 
 Ships the given objects (or all objects for output if @objects is empty) to
 the currently open output file (assuming there is one). Freed objects are not

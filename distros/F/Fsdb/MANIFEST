@@ -121,6 +121,8 @@ TEST/combined_log_format_to_db.out
 TEST/csv_to_db.cmd
 TEST/csv_to_db.in
 TEST/csv_to_db.out
+TEST/csv_to_db_tab.cmd
+TEST/csv_to_db_tab.out
 TEST/db_to_csv.cmd
 TEST/db_to_csv.in
 TEST/db_to_csv.out
@@ -287,6 +289,9 @@ TEST/dbcolscorrelate_uncentered.out
 TEST/dbcolsplittocols_C.cmd
 TEST/dbcolsplittocols_C.in
 TEST/dbcolsplittocols_C.out
+TEST/dbcolsplittocols_dest_list.cmd
+TEST/dbcolsplittocols_dest_list.in
+TEST/dbcolsplittocols_dest_list.out
 TEST/dbcolsplittocols_ex.cmd
 TEST/dbcolsplittocols_ex.in
 TEST/dbcolsplittocols_ex.out
@@ -352,6 +357,11 @@ TEST/dbcolstats_nist_zarr13.altout
 TEST/dbcolstats_nist_zarr13.cmd
 TEST/dbcolstats_nist_zarr13.in
 TEST/dbcolstats_nist_zarr13.out
+TEST/dbcolstats_no_input.in
+TEST/dbcolstats_no_input_no_output.cmd
+TEST/dbcolstats_no_input_no_output.out
+TEST/dbcolstats_no_input_with_output.cmd
+TEST/dbcolstats_no_input_with_output.out
 TEST/dbcolstats_ntile.cmd
 TEST/dbcolstats_ntile.in
 TEST/dbcolstats_ntile.out
@@ -694,6 +704,9 @@ TEST/dbmultistats_grouped_incorrectly.cmd
 TEST/dbmultistats_grouped_incorrectly.out
 TEST/dbmultistats_header.cmd
 TEST/dbmultistats_header.out
+TEST/dbmultistats_no_input.cmd
+TEST/dbmultistats_no_input.in
+TEST/dbmultistats_no_input.out
 TEST/dbmultistats_quartile.cmd
 TEST/dbmultistats_quartile.in
 TEST/dbmultistats_quartile.out

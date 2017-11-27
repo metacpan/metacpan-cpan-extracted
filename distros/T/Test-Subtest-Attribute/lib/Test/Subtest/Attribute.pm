@@ -15,7 +15,7 @@ use base qw( Exporter );
 our @EXPORT_OK = qw(
     subtests
 );
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 my @subtests;
 my $builder;
@@ -29,7 +29,11 @@ sub UNIVERSAL::Subtest : ATTR(CODE) {       ## no critic (Capitalization)
         $sub_name = *{ $symbol }{NAME};
     }
 
-    my @args = ref $data ? @{ $data } : ();
+    my @args = ();
+    if ( defined $data ) {
+        @args = ref $data ? @{ $data } : ( $data );
+    }
+
     my ( $name, $append_prepend ) = @args;
     $append_prepend ||= 'append';
     if ( $sub_name && ! $name ) {
@@ -165,18 +169,18 @@ Test::Subtest::Attribute - Declare subtests using subroutine attributes
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
   use Test::More;
   use Test::Subtest::Attribute qw( subtests );
-  
+
   sub subtest_foo :Subtest {
       ok( 1, 'foo is OK' );
       return 1;
   }
-  
+
   sub subtest_bar :Subtest( 'name for bar' ) {
       ok( 1, 'bar is OK' );
       return 1;
@@ -187,15 +191,19 @@ version 0.03
 
 =head1 DESCRIPTION
 
-This module provides a simple way, using a subroutine attribute called C<:Subtest>, to declare normal subroutines to be subtests in a test script.
+This module provides a simple way, using a subroutine attribute called C<:Subtest>, to declare normal subroutines to be
+subtests in a test script.
 
-Subtests are typically declared using a call to the C<subtest()> function from L<Test::More>, in one of the two following ways:
+Subtests are typically declared using a call to the C<subtest()> function from L<Test::More>, in one of the two
+following ways:
 
   subtest 'name1'  => sub { ... };  # An anonymous sub
   subtest 'name 2' => \&some_named_sub;
 
-The first way can quickly lead to long anonymous subs that can present issues when looking at stacktraces for debugging, profiling, logging, etc.
-The second way usually leads to repeating the same, or similar, names for each subtest subroutine, in addition to declaring the sub itself, e.g.:
+The first way can quickly lead to long anonymous subs that can present issues when looking at stacktraces for debugging,
+profiling, logging, etc.
+The second way usually leads to repeating the same, or similar, names for each subtest subroutine, in addition to
+declaring the sub itself, e.g.:
 
   subtest 'test_this' => \&test_this;
   subtest 'test_that' => \&test_that;
@@ -204,8 +212,8 @@ The second way usually leads to repeating the same, or similar, names for each s
   sub test_that { ... }
   ...
 
-This module lets you declare those subtests without calls to the C<subtest()> function, by simply adding a C<:Subtest> attribute to any
-subroutine that you'd like to have executed as a subtest, like so:
+This module lets you declare those subtests without calls to the C<subtest()> function, by simply adding a C<:Subtest>
+attribute to any subroutine that you'd like to have executed as a subtest, like so:
 
   sub subtest_name1 :Subtest {
     ...
@@ -213,8 +221,9 @@ subroutine that you'd like to have executed as a subtest, like so:
 
 That declares a subtest named 'name1' (the subtest_ part of the name, if present, is automatically stripped off).
 
-If you'd like to specify the name of the subtest explicitly, which is handy if you'd like to use a name that includes characters. such as spaces,
-that aren't allowed in bareword identifiers, you can do so by providing an argument to the C<:Subtest> attribute like so:
+If you'd like to specify the name of the subtest explicitly, which is handy if you'd like to use a name that includes
+characters. such as spaces, that aren't allowed in bareword identifiers, you can do so by providing an argument to the
+C<:Subtest> attribute like so:
 
   sub some_named_sub :Subtest('name 2') {
     ...
@@ -222,9 +231,10 @@ that aren't allowed in bareword identifiers, you can do so by providing an argum
 
 When you're done declaring subtests, you run all the ones you've queued up by calling C<subtests()->run()>.
 
-From this module, most test scripts will only need to use the C<:Subtest> attribute and the C<run()> method described below.
-Most of the other methods described below are for more advanced usage, such as in test modules that might want to conditionally
-add, remove, or otherwise manipulate the subtests managed herein.
+From this module, most test scripts will only need to use the C<:Subtest> attribute and the C<run()> method described
+below.
+Most of the other methods described below are for more advanced usage, such as in test modules that might want to
+conditionally add, remove, or otherwise manipulate the subtests managed herein.
 
 =head1 METHODS
 
@@ -314,8 +324,9 @@ The test builder to use.  If none is given, a new L<Test::Builder> instance will
 
 If given, the subtest subroutines will be invoked via this reference.
 
-NOTE: When the C<:Subtest> attribute is used, the name of the package that the subroutine appears in will be remembered in the subtest
-metadata, and that package name will be used if no C<invocant> argument is given explicitly when calling this method.
+NOTE: When the C<:Subtest> attribute is used, the name of the package that the subroutine appears in will be remembered
+in the subtest metadata, and that package name will be used if no C<invocant> argument is given explicitly when calling
+this method.
 If that value happens to be undefined for any reason, the package name C<main> is the default instead.
 
 =item verbose_names

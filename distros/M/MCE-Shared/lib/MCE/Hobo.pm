@@ -13,7 +13,7 @@ no warnings qw( threads recursion uninitialized once redefine );
 
 package MCE::Hobo;
 
-our $VERSION = '1.832';
+our $VERSION = '1.833';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
@@ -100,7 +100,8 @@ sub init {
          $INC{'Curses.pm'} || $INC{'CGI.pm'} || $INC{'FCGI.pm'} ||
          $INC{'Prima.pm'} || $INC{'Tk.pm'} || $INC{'Wx.pm'} ||
          $INC{'Gearman/Util.pm'} || $INC{'Gearman/XS.pm'} ||
-         $INC{'Coro.pm'} || $INC{'stfl.pm'} || $INC{'Win32/GUI.pm'}
+         $INC{'Coro.pm'} || $INC{'LWP/UserAgent.pm'} ||
+         $INC{'Win32/GUI.pm'} || $INC{'stfl.pm'}
       );
    }
    if ( $mngd->{max_workers} ) {
@@ -317,6 +318,7 @@ sub is_joinable {
       };
    }
    else {
+      return undef if ( exists $self->{JOINED} );
       $_DATA->{$pkg}->exists('R'.$wrk_id) ? 1 : '';
    }
 }
@@ -337,6 +339,7 @@ sub is_running {
       };
    }
    else {
+      return undef if ( exists $self->{JOINED} );
       $_DATA->{$pkg}->exists('R'.$wrk_id) ? '' : 1;
    }
 }
@@ -775,7 +778,7 @@ MCE::Hobo - A threads-like parallelization module
 
 =head1 VERSION
 
-This document describes MCE::Hobo version 1.832
+This document describes MCE::Hobo version 1.833
 
 =head1 SYNOPSIS
 
@@ -1087,7 +1090,8 @@ terminate after some time. The default is C<0> for no timeout.
 
 Set C<posix_exit> to avoid all END and destructor processing. Constructing
 MCE::Hobo inside a thread implies 1 or if present CGI, FCGI, Coro, Curses,
-Gearman::Util, Gearman::XS, Mojo::IOLoop, Prima, STFL, Tk, Wx, or Win32::GUI.
+Gearman::Util, Gearman::XS, LWP::UserAgent, Mojo::IOLoop, Prima, STFL,
+Tk, Wx, or Win32::GUI.
 
 The callback options C<on_start> and C<on_finish> are called in the parent
 process after starting a Hobo and later when terminated. The arguments

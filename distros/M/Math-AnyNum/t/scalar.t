@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Test::More;
 
-plan tests => 233;
+plan tests => 239;
 
 use Math::AnyNum;
 
@@ -353,12 +353,12 @@ is($x <=> '-inf', 1);
 ok(not $inf < 'inf');
 is($inf <=> 'inf', 0);
 
-#is($inf->acmp('inf'),   0);
-#is($ninf->acmp('inf'),  0);
-#is($ninf->acmp('-inf'), 0);
-#is($inf->acmp('-inf'),  0);
-#is($inf->acmp(42),      1);
-#is($ninf->acmp(42),     1);
+is($inf->acmp('inf'),   0);
+is($ninf->acmp('inf'),  0);
+is($ninf->acmp('-inf'), 0);
+is($inf->acmp('-inf'),  0);
+is($inf->acmp(42),      1);
+is($ninf->acmp(42),     1);
 
 ok($x == 42);
 ok(42 == $x);

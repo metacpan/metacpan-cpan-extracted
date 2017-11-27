@@ -15,6 +15,7 @@ useall WWW::Shopify::Liquid::Tag;
 useall WWW::Shopify::Liquid::Filter;
 
 sub new { return bless {
+	# Internal
 	order_of_operations => [],
 	operators => {},
 	enclosing_tags => {},
@@ -22,9 +23,22 @@ sub new { return bless {
 	filters => {},
 	inner_tags => {},
 	security => WWW::Shopify::Liquid::Security->new,
-	accept_unknown_filters => 0
+	
+	# Determines whether or not we should error on finding a filter we don't recognize. Can be useful for parsing, without actually rendering ot have this on.
+	# No tag version, because we need to know whether a tag is free or enclosing to parse correctly.
+	accept_unknown_filters => 0,
+	# Determines whether we clear the custom tag/filter cache after each parse. For security purposes, should be true by default,
+	# or custom tags should be disabled entirely.
+	transient_custom_operations => 1,
+	custom_tags => {},
+	custom_filters => {},
+	transient_elements => []
 }, $_[0]; }
 sub accept_unknown_filters { $_[0]->{accept_unknown_filters} = $_[1] if defined $_[1]; return $_[0]->{accept_unknown_filters}; }
+sub accept_method_calls { $_[0]->{accept_method_calls} = $_[1] if defined $_[1]; return $_[0]->{accept_method_calls}; }
+sub transient_custom_operations { $_[0]->{transient_custom_operations} = $_[1] if defined $_[1]; return $_[0]->{transient_custom_operations}; }
+sub custom_tags { return $_[0]->{custom_tags}; }
+sub custom_filters { return $_[0]->{custom_filters}; }
 sub operator { return $_[0]->{operators}->{$_[1]}; }
 sub operators { return $_[0]->{operators}; }
 sub order_of_operations { return @{$_[0]->{order_of_operations}}; }
@@ -34,15 +48,16 @@ sub inner_tags { return $_[0]->{inner_tags}; }
 sub filters { return $_[0]->{filters}; }
 
 sub register_tag {
-	$_[0]->free_tags->{$_[1]->name} = $_[1] if $_[1]->is_free;
-	if ($_[1]->is_enclosing) {
-		$_[0]->enclosing_tags->{$_[1]->name} = $_[1];
-		foreach my $tag ($_[1]->inner_tags) {
-			$_[0]->inner_tags->{$tag} = 1;
+	my ($self, $tag) = @_;
+	$self->SUPER::register_tag($tag);
+	$self->free_tags->{$tag->name} = $tag if $tag->is_free;
+	if ($tag->is_enclosing) {
+		$self->enclosing_tags->{$tag->name} = $tag;
+		foreach my $inner_tag ($tag->inner_tags) {
+			$self->inner_tags->{$inner_tag} = 1;
 		}
 	}
 }
-
 
 sub register_operator {
 	$_[0]->SUPER::register_operator($_[1]);
@@ -58,15 +73,33 @@ sub register_operator {
 	$_[0]->{order_of_operations} = [sort { $b->[0]->priority <=> $a->[0]->priority } @$ooo];
 }
 sub register_filter {
+	$_[0]->SUPER::register_filter($_[1]);
 	$_[0]->filters->{$_[1]->name} = $_[1];
 }
 
+sub deregister_tag {
+	my ($self, $tag) = @_;
+	$self->SUPER::deregister_tag($tag);
+	if ($tag->is_enclosing) {
+		delete $self->enclosing_tags->{$tag->name} if $self->enclosing_tags->{$tag->name};
+		foreach my $inner_tag ($tag->inner_tags) {
+			delete $self->inner_tags->{$inner_tag} if $self->inner_tags->{$inner_tag};
+		}
+	} else {
+		delete $self->free_tags->{$tag->name} if $self->free_tags->{$tag->name};
+	}
+}
+sub deregister_filter {
+	my ($self, $filter) = @_;
+	$self->SUPER::deregister_filter($filter);
+	delete $self->filters->{$filter->name} if $self->filters->{$filter->name};
+}
 
 
 sub parse_filter_tokens {
 	my ($self, $initial, @tokens) = @_;
 	my $filter = shift(@tokens);
-	my $filter_name = $filter->{core}->[0]->{core};
+	my $filter_name = $filter->isa('WWW::Shopify::Liquid::Token::Operator') ? $filter->{core} : $filter->{core}->[0]->{core};
 	# TODO God, this is stupid, but temporary patch.
 	my $filter_package;
 	if ($filter_name =~ m/::/) {
@@ -92,20 +125,39 @@ sub parse_filter_tokens {
 		my $i = 0;
 		@arguments = map { $self->parse_argument_tokens(grep { !$_->isa('WWW::Shopify::Liquid::Token::Separator') } @{$_}) } part { $i++ if $_->isa('WWW::Shopify::Liquid::Token::Separator') && $_->{core} eq ","; $i; } @tokens;
 	}
-	$filter = $filter_package->new($initial->{line}, $filter_name, $initial, @arguments);
+	$filter = $filter_package->new($self, $filter->{line}, $filter_name, $initial, @arguments);
 	$filter->verify($self);
 	return $filter;
 }
 use List::MoreUtils qw(part);
 
+sub walk_groupings {
+	my ($self, $aggregate) = @_;
+	for (grep { 
+		$aggregate->{members}->[$_]->isa('WWW::Shopify::Liquid::Token::Grouping')
+	} 0..(int(@{$aggregate->{members}})-1)) {
+		($aggregate->{members}->[$_]) = $self->parse_argument_tokens($aggregate->{members}->[$_]->members);
+	}
+	$self->walk_groupings($_) for (grep { $_->isa('WWW::Shopify::Liquid::Token::Hash') || $_->isa('WWW::Shopify::Liquid::Token::Array') } $aggregate->members);
+	
+}
+
 # Similar, but doesn't deal with tags; deals solely with order of operations.
 sub parse_argument_tokens {
 	my ($self, @argument_tokens) = @_;
 	
+	# Process all function calls. That means groupings, preceded by a varialbe.	
+	my @ids = grep {
+		$argument_tokens[$_]->isa('WWW::Shopify::Liquid::Token::Variable') && $argument_tokens[$_+1]->isa('WWW::Shopify::Liquid::Token::Grouping')
+	} (0..$#argument_tokens-1);
+	for (@ids) {
+		$argument_tokens[$_] = WWW::Shopify::Liquid::Token::FunctionCall->new($argument_tokens[$_]->{line}, pop(@{$argument_tokens[$_]->{core}}), $argument_tokens[$_], $self->parse_argument_tokens($argument_tokens[$_+1]->members));
+		$argument_tokens[$_+1] = undef;
+	}
+	@argument_tokens = grep { defined $_ } @argument_tokens;
+	
 	# Process all groupings.
 	($argument_tokens[$_]) = $self->parse_argument_tokens($argument_tokens[$_]->members) for (grep { $argument_tokens[$_]->isa('WWW::Shopify::Liquid::Token::Grouping') } 0..$#argument_tokens);
-	
-	
 	
 	# Process all groupings inside named variables.
 	($_->{core}) = $self->parse_argument_tokens($_->{core}->members) for (grep { $_->isa('WWW::Shopify::Liquid::Token::Variable::Named') && $_->{core}->isa('WWW::Shopify::Liquid::Token::Grouping') } @argument_tokens);
@@ -115,7 +167,8 @@ sub parse_argument_tokens {
 		($variable->{core}->[$_]) = $self->parse_argument_tokens($core[$_]->members) for (grep { $core[$_]->isa('WWW::Shopify::Liquid::Token::Grouping') } 0..$#core);
 	}
 	
-	
+	# Every member that's a grouping inside of the hash should be evaluated.
+	$self->walk_groupings($_) for (grep { $_->isa('WWW::Shopify::Liquid::Token::Hash') || $_->isa('WWW::Shopify::Liquid::Token::Array') } @argument_tokens);
 	
 	# Process unary operators first; these have highest priority, regardless of what the priority field says.
 	while ((my $idx = firstidx { $_->isa('WWW::Shopify::Liquid::Token::Operator') && defined $_->{core} && $self->operator($_->{core}) && $self->operator($_->{core})->arity eq "unary" } @argument_tokens) != -1) {
@@ -141,6 +194,8 @@ sub parse_argument_tokens {
 		@partitions = (\@argument_tokens);
 	}
 	
+	
+	
 	my @tops;
 	
 	
@@ -158,7 +213,7 @@ sub parse_argument_tokens {
 					die new WWW::Shopify::Liquid::Exception::Parser($tokens[0]) if $idx == 0;
 					my $i = 0;
 					# Part should consist of the first token before a pipe, and then split on all pipes after this.,
-					my @parts = map { shift(@{$_}) if $_->[0]->{core} eq "|"; $_ } part { $i++ if $_->isa('WWW::Shopify::Liquid::Token::Operator') && $_->{core} eq "|"; $i; } splice(@tokens, $idx-1);
+					my @parts = map { shift(@{$_}) if $_->[0]->{core} && $_->[0]->{core} eq "|"; $_ } part { $i++ if $_->isa('WWW::Shopify::Liquid::Token::Operator') && $_->{core} eq "|"; $i; } splice(@tokens, $idx-1);
 					my $next = undef;
 					$top = $self->parse_filter_tokens($self->parse_argument_tokens(@{shift(@parts)}), @{shift(@parts)});
 					while (my $part = shift(@parts)) {
@@ -170,7 +225,7 @@ sub parse_argument_tokens {
 				while ((my $idx = firstidx { $_->isa('WWW::Shopify::Liquid::Token::Operator') && exists $ops{$_->{core}} } @tokens) != -1) {
 					my ($op1, $op, $op2) = @tokens[$idx-1..$idx+1];
 					# The one exception would be if we have a - operator, and nothing before, this is unary negative operator, i.e. 0 - number.
-					die new WWW::Shopify::Liquid::Exception::Parser::Operands($tokens[0], $op1, $op, $op2) unless
+					die new WWW::Shopify::Liquid::Exception::Parser::Operands($op, $op1, $op, $op2) unless
 						$idx > 0 && $idx < $#tokens && 
 						($op1->isa('WWW::Shopify::Liquid::Operator') || $op1->isa('WWW::Shopify::Liquid::Token::Operand') || $op1->isa('WWW::Shopify::Liquid::Filter')) &&
 						($op2->isa('WWW::Shopify::Liquid::Operator') || $op2->isa('WWW::Shopify::Liquid::Token::Operand') || $op2->isa('WWW::Shopify::Liquid::Filter'));
@@ -189,7 +244,8 @@ sub parse_argument_tokens {
 	return @tops;
 }
 
-sub parse_tokens {
+
+sub parse_inner_tokens {
 	my ($self, @tokens) = @_;
 	
 	return () if int(@tokens) == 0;
@@ -222,10 +278,10 @@ sub parse_tokens {
 								@contents = map {
 									my @array = @$_;
 									if (int(@array) > 0 && $array[0]->isa('WWW::Shopify::Liquid::Token::Tag') && $allowed_internal_tags{$array[0]->tag}) {
-										[$array[0], $self->parse_tokens(@array[1..$#array])];
+										[$array[0], $self->parse_inner_tokens(@array[1..$#array])];
 									}
 									else {
-										[$self->parse_tokens(@array)]
+										[$self->parse_inner_tokens(@array)]
 									}
 								} @contents;
 								$last_int = $int;
@@ -241,11 +297,11 @@ sub parse_tokens {
 					}
 				}
 				die new WWW::Shopify::Liquid::Exception::Parser::NoClose($token) unless $closed;
-				$tag = $self->enclosing_tags->{$token->tag}->new($line, $token->tag, [$self->parse_argument_tokens(@{$token->{arguments}})], \@contents);
+				$tag = $self->enclosing_tags->{$token->tag}->new($line, $token->tag, [$self->parse_argument_tokens(@{$token->{arguments}})], \@contents, $self);
 				$tag->verify($self);
 			}
 			elsif ($self->free_tags->{$token->tag}) {
-				$tag = $self->free_tags->{$token->tag}->new($line, $token->tag, [$self->parse_argument_tokens(@{$token->{arguments}})]);
+				$tag = $self->free_tags->{$token->tag}->new($line, $token->tag, [$self->parse_argument_tokens(@{$token->{arguments}})], undef, $self);
 				$tag->verify($self);
 			}
 			else {
@@ -273,13 +329,27 @@ sub parse_tokens {
 	return $top;
 }
 
+sub parse_tokens {
+	my ($self, @tokens) = @_;
+	my $ast = $self->parse_inner_tokens(@tokens);
+	for (@{$self->{transient_elements}}) {
+		if ($_->isa('WWW::Shopify::Liquid::Tag')) {
+			$self->deregister_tag($_);
+		} elsif ($_->isa('WWW::Shopify::Liquid::Filter')) {
+			$self->deregister_filter($_);
+		}
+	}
+	$self->{transient_elements} = [];
+	return $ast;
+}
+
 sub unparse_argument_tokens {
 	my ($self, $ast) = @_;
 	return $ast if $self->is_processed($ast);
 	if ($ast->isa('WWW::Shopify::Liquid::Filter')) {
 		my @optokens = ($self->unparse_argument_tokens($ast->{operand}), 
-			WWW::Shopify::Liquid::Token::Operator->new([0,0,0], '|'), 
-			WWW::Shopify::Liquid::Token::Variable->new([0,0,0], WWW::Shopify::Liquid::Token::String->new([0,0,0], $ast->{core})),
+			WWW::Shopify::Liquid::Token::Operator->new([0,0,0], '|'),
+			($ast->transparent ? WWW::Shopify::Liquid::Token::Variable->new([0,0,0], WWW::Shopify::Liquid::Token::String->new([0,0,0], $ast->{core}->name)) : WWW::Shopify::Liquid::Token::Variable->new([0,0,0], WWW::Shopify::Liquid::Token::String->new([0,0,0], $ast->{core}))),
 			(int(@{$ast->{arguments}}) > 0 ? (do {
 				my @args = @{$ast->{arguments}};
 				(
@@ -306,6 +376,22 @@ sub unparse_tokens {
 		if ($ast->isa('WWW::Shopify::Liquid::Tag::Enclosing')) {
 			if ($ast->isa('WWW::Shopify::Liquid::Tag::If')) {
 				return (WWW::Shopify::Liquid::Token::Tag->new([0,0,0], $ast->{core}, \@arguments), $self->unparse_tokens($ast->{true_path}), WWW::Shopify::Liquid::Token::Tag->new([0,0,0], 'end' . $ast->{core})) if !$ast->{false_path};
+				if ($ast->{false_path}->isa('WWW::Shopify::Liquid::Tag::If')) {
+					# Untangle the thing, and spread out in an array all if statement that have if statements as their false_paths.
+					my @elsifs;
+					my $recursive;
+					$recursive = sub {
+						my ($ast) = @_;
+						push(@elsifs, WWW::Shopify::Liquid::Token::Tag->new([0,0,0], 'elsif', ($ast->{arguments} ? [$self->unparse_argument_tokens(@{$ast->{arguments}})] : [])), $self->unparse_tokens($ast->{true_path}));
+						if ($ast->{false_path} && $ast->{false_path}->isa('WWW::Shopify::Liquid::Tag::If')) {
+							$recursive->($ast->{false_path});
+						} elsif ($ast->{false_path}) {
+							push(@elsifs, WWW::Shopify::Liquid::Token::Tag->new([0,0,0], 'else'), $self->unparse_tokens($ast->{false_path}));
+						}
+					};
+					$recursive->($ast->{false_path});
+					return (WWW::Shopify::Liquid::Token::Tag->new([0,0,0], $ast->{core}, \@arguments), $self->unparse_tokens($ast->{true_path}), @elsifs, WWW::Shopify::Liquid::Token::Tag->new([0,0,0], 'end'. $ast->{core}));
+				}
 				return (WWW::Shopify::Liquid::Token::Tag->new([0,0,0], $ast->{core}, \@arguments), $self->unparse_tokens($ast->{true_path}), WWW::Shopify::Liquid::Token::Tag->new([0,0,0], 'else'), $self->unparse_tokens($ast->{false_path}), WWW::Shopify::Liquid::Token::Tag->new([0,0,0], 'end'. $ast->{core}));
 			}
 			else {

@@ -45,9 +45,9 @@
             "Class::Accessor::Lite" : "0",
             "JSON" : "0",
             "Scalar::Util" : "0",
-            "Test2::V0" : "0",
+            "Test2::Suite" : "0.000071",
             "Test::Simple" : "1.302015",
-            "Text::CSV" : "0",
+            "Text::CSV" : "1.91",
             "perl" : "5.010001"
          }
       }
@@ -55,7 +55,13 @@
    "provides" : {
       "Test::MasterData::Declare" : {
          "file" : "lib/Test/MasterData/Declare.pm",
-         "version" : "0.01"
+         "version" : "0.02"
+      },
+      "Test::MasterData::Declare::Compare::RowCustrom" : {
+         "file" : "lib/Test/MasterData/Declare/Compare/RowCustom.pm"
+      },
+      "Test::MasterData::Declare::Compare::RowHash" : {
+         "file" : "lib/Test/MasterData/Declare/Compare/RowHash.pm"
       },
       "Test::MasterData::Declare::CompareRow" : {
          "file" : "lib/Test/MasterData/Declare/CompareRow.pm"
@@ -81,7 +87,7 @@
          "web" : "https://github.com/mackee/Test-MasterData-Declare"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_authority" : "cpan:MACOPY",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test2::Bundle::Extended;
+use Test2::V0;
 use Test2::Plugin::NoWarnings;
 
 use Params::ValidationCompiler qw( validation_for );
@@ -17,13 +17,13 @@ use Specio::Library::Builtins;
 
     like(
         dies { $sub->( 42, 43, 44 ) },
-        qr/got 1 extra parameter/,
+        qr/Got 1 extra parameter/,
         'dies when given one extra parameter'
     );
 
     like(
         dies { $sub->( 42, 43, 44, 'whuh' ) },
-        qr/got 2 extra parameters/,
+        qr/Got 2 extra parameters/,
         'dies when given two extra parameters'
     );
 }
@@ -38,7 +38,7 @@ use Specio::Library::Builtins;
 
     like(
         dies { $sub->() },
-        qr/got 0 parameters but expected at least 1/,
+        qr/Got 0 parameters but expected at least 1/,
         'foo is still required when slurpy is true'
     );
 
@@ -59,7 +59,7 @@ use Specio::Library::Builtins;
 
     like(
         dies { $sub->() },
-        qr/got 0 parameters but expected at least 1/,
+        qr/Got 0 parameters but expected at least 1/,
         'foo is still required when slurpy is a type constraint'
     );
 

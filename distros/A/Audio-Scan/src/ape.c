@@ -33,7 +33,7 @@ static int _ape_error(ApeTag *tag, char *error, int ret) {
 
 int _ape_parse(ApeTag* tag) {
   int ret = 0;
-  
+
   if (!(tag->flags & APE_CHECKED_APE)) {
     if ((ret = _ape_get_tag_info(tag)) < 0) {
       return ret;
@@ -45,7 +45,7 @@ int _ape_parse(ApeTag* tag) {
       return ret;
     }
   }
-  
+
   return 0;
 }
 
@@ -58,16 +58,16 @@ int _ape_get_tag_info(ApeTag* tag) {
   off_t file_size = 0;
   unsigned char compare[12];
   unsigned char *tmp_ptr;
-  
+
   file_size = _file_size(tag->fd);
-  
+
   /* No ape or id3 tag possible in this size */
   if (file_size < APE_MINIMUM_TAG_SIZE) {
     tag->flags |= APE_CHECKED_APE;
     tag->flags &= ~(APE_HAS_APE | APE_HAS_ID3);
     return 0;
-  } 
-  
+  }
+
   if (!(tag->flags & APE_NO_ID3)) {
 
     if (file_size < APE_ID3_MIN_TAG_SIZE) {
@@ -103,7 +103,7 @@ int _ape_get_tag_info(ApeTag* tag) {
       return 0;
     }
   }
-  
+
   /* Check for existance of ape tag footer */
   if (PerlIO_seek(tag->fd, file_size - APE_TAG_FOOTER_LEN - id3_length, SEEK_SET) == -1) {
     return _ape_error(tag, "Couldn't seek (tag footer)", -1);
@@ -121,7 +121,7 @@ int _ape_get_tag_info(ApeTag* tag) {
   if (memcmp(APE_PREAMBLE, &compare, 8)) {
     // Check for Lyricsv2 tag between APE and ID3
     char *bptr;
-    
+
     buffer_consume(&tag->tag_footer, 15);
     bptr = buffer_ptr(&tag->tag_footer);
     if ( bptr[0] == 'L' && bptr[1] == 'Y' && bptr[2] == 'R'
@@ -129,22 +129,22 @@ int _ape_get_tag_info(ApeTag* tag) {
       && bptr[6] == '2' && bptr[7] == '0' && bptr[8] == '0'
     ) {
       // read Lyrics tag size, stored as a 6-digit number (!?)
-      // http://www.id3.org/Lyrics3v2      
+      // http://www.id3.org/Lyrics3v2
       bptr -= 6;
       lyrics_size = atoi(bptr);
-      
+
       if ( (PerlIO_seek(tag->fd, file_size - (160 + lyrics_size + 15), SEEK_SET)) == -1 ) {
         return _ape_error(tag, "Couldn't seek (tag footer)", -1);
       }
-      
+
       buffer_clear(&tag->tag_footer);
       if ( !_check_buf(tag->fd, &tag->tag_footer, APE_TAG_FOOTER_LEN, APE_TAG_FOOTER_LEN) ) {
         return _ape_error(tag, "Couldn't read tag footer", -2);
       }
-      
+
       buffer_get(&tag->tag_footer, &compare, 8);
-      
-      if (memcmp(APE_PREAMBLE, &compare, 8)) {    
+
+      if (memcmp(APE_PREAMBLE, &compare, 8)) {
         tag->flags &= ~APE_HAS_APE;
         tag->flags |= APE_CHECKED_APE;
         return 0;
@@ -156,16 +156,16 @@ int _ape_get_tag_info(ApeTag* tag) {
       return 0;
     }
   }
-  
+
   tag->version      = buffer_get_int_le(&tag->tag_footer) / 1000;
   tag->size         = buffer_get_int_le(&tag->tag_footer);
   tag->item_count   = buffer_get_int_le(&tag->tag_footer);
   tag->footer_flags = buffer_get_int_le(&tag->tag_footer);
   tag->size += APE_TAG_FOOTER_LEN;
   data_size = tag->size - APE_TAG_HEADER_LEN - APE_TAG_FOOTER_LEN;
-  
+
   DEBUG_TRACE("Found APEv%d tag, size %d with %d items\n", tag->version, tag->size, tag->item_count);
-  
+
   my_hv_store( tag->info, "ape_version", newSVpvf( "APEv%d", tag->version ) );
 
   /* Check tag footer for validity */
@@ -192,25 +192,25 @@ int _ape_get_tag_info(ApeTag* tag) {
   if (PerlIO_seek(tag->fd, (file_size -(long)tag->size - id3_length - (lyrics_size ? (lyrics_size + 15) : 0)), SEEK_SET) == -1) {
     return _ape_error(tag, "Couldn't seek to tag offset", -1);
   }
-  
+
   tag->offset = file_size -(long)tag->size - id3_length - (lyrics_size ? (lyrics_size + 15) : 0);
   DEBUG_TRACE("APE tag offset %d\n", tag->offset);
 
   /* ---------- Read tag header and data --------------- */
   buffer_init(&tag->tag_header, APE_TAG_HEADER_LEN);
   buffer_init(&tag->tag_data, data_size);
-  
+
   if (tag->footer_flags & APE_TAG_CONTAINS_HEADER) {
     // Bug 15324, Header may or may not be present, only read if footer flag says it is
     if (!_check_buf(tag->fd, &tag->tag_header, APE_TAG_HEADER_LEN, APE_TAG_HEADER_LEN)) {
       return _ape_error(tag, "Couldn't read tag header", -2);
     }
-    
+
     buffer_get(&tag->tag_header, &compare, 12);
     tmp_ptr = buffer_ptr(&tag->tag_header);
 
     /* Check tag header for validity */
-    if (memcmp(APE_PREAMBLE, &compare, 8) || 
+    if (memcmp(APE_PREAMBLE, &compare, 8) ||
        (tmp_ptr[8] != '\0' && tmp_ptr[8] != '\1')) {
       return _ape_error(tag, "Bad tag header flags", -3);
     }
@@ -229,21 +229,21 @@ int _ape_get_tag_info(ApeTag* tag) {
       return _ape_error(tag, "Couldn't seek to tag offset", -1);
     }
   }
-  
+
   tag->offset += APE_TAG_HEADER_LEN;
 
   if (!_check_buf(tag->fd, &tag->tag_data, data_size, data_size)) {
     return _ape_error(tag, "Couldn't read tag data", -2);
   }
-  
+
   tag->flags |= APE_CHECKED_APE | APE_HAS_APE;
-  
+
   // Reduce the size of the audio_size value
   if (my_hv_exists(tag->info, "audio_size")) {
     int audio_size = SvIV(*(my_hv_fetch(tag->info, "audio_size")));
     if (lyrics_size > 0)
       lyrics_size += 15;
-    
+
     my_hv_store(tag->info, "audio_size", newSVuv(audio_size - tag->size - lyrics_size));
     DEBUG_TRACE("Reduced audio_size value by APE/Lyrics2 tag size %d\n", tag->size + lyrics_size);
   }
@@ -259,7 +259,7 @@ int _ape_parse_fields(ApeTag* tag) {
   if (tag->num_fields >= APE_MAXIMUM_ITEM_COUNT) {
     return _ape_error(tag, "Maximum item count exceeded", -3);
   }
-  
+
   for (i = 0; i < tag->item_count; i++) {
     if ((ret = _ape_parse_field(tag)) != 0) {
       return ret;
@@ -271,7 +271,7 @@ int _ape_parse_fields(ApeTag* tag) {
   }
 
   tag->flags |= APE_CHECKED_FIELDS;
-  
+
   return 0;
 }
 
@@ -289,10 +289,10 @@ int _ape_parse_field(ApeTag* tag) {
   unsigned char *tmp_ptr;
   SV *key = NULL;
   SV *value = NULL;
-  
+
   if (buffer_len(&tag->tag_data) < 8)
     return _ape_error(tag, "Ran out of tag data before number of items was reached", -3);
-  
+
   size  = buffer_get_int_le(&tag->tag_data);
   flags = buffer_get_int_le(&tag->tag_data);
 
@@ -304,30 +304,30 @@ int _ape_parse_field(ApeTag* tag) {
 
   key = newSVpvn( buffer_ptr(&tag->tag_data), key_length );
   buffer_consume(&tag->tag_data, key_length + 1);
-  
+
   // Bug 9942, APE tags can contain multiple items with a null separator
   tmp_ptr = buffer_ptr(&tag->tag_data);
   while (tmp_ptr[0] != '\0' && val_length <= size) {
     val_length += 1;
     tmp_ptr    += 1;
   }
-  
+
   tag->offset += 8 + key_length + 1;
-  
+
   DEBUG_TRACE("key_length: %d / val_length: %d / size: %d / flags %x @ %d\n", key_length, val_length, size, flags, tag->offset);
-  
+
   if (flags & APE_TAG_TYPE_BINARY) {
     // Binary data, just copy it as-is
-    
+
     // Special handling if the tag is cover art, strip the filename from the front of
     // the cover art data
     if ( sv_len(key) == 17 && !memcmp( upcase(SvPVX(key)), "COVER ART (FRONT)", 17 ) ) {
       if ( _env_true("AUDIO_SCAN_NO_ARTWORK") ) {
         // Don't read artwork, just return the size
         value = newSVuv(size - (val_length + 1) );
-        
+
         my_hv_store( tag->tags, "COVER ART (FRONT)_offset", newSVuv(tag->offset + val_length + 1) );
-        
+
         buffer_consume(&tag->tag_data, size);
       }
       else {
@@ -335,20 +335,20 @@ int _ape_parse_field(ApeTag* tag) {
         size -= val_length + 1;
       }
     }
-    
+
     if ( value == NULL ) {
       value = newSVpvn( buffer_ptr(&tag->tag_data), size );
       buffer_consume(&tag->tag_data, size);
     }
-    
+
     tag->offset += val_length + 1;
   }
   else if (val_length >= size - 1) {
     // Single item
     value = newSVpvn( buffer_ptr(&tag->tag_data), val_length < size ? val_length : size );
-    
+
     buffer_consume(&tag->tag_data, size);
-    
+
     // Don't add invalid items
     if (_ape_check_validity(tag, flags, SvPVX(key), SvPVX(value)) != 0) {
       // skip this item
@@ -358,7 +358,7 @@ int _ape_parse_field(ApeTag* tag) {
       sv_utf8_decode(value);
       DEBUG_TRACE("  %s = %s\n", SvPVX(key), SvPVX(value));
     }
-    
+
     tag->offset += val_length < size ? val_length : size;
   }
   else {
@@ -366,7 +366,7 @@ int _ape_parse_field(ApeTag* tag) {
     AV *av = newAV();
     SV *tmp_val;
     uint32_t done = 0;
-    
+
     while ( done < size ) {
       val_length = 0;
       tmp_ptr = buffer_ptr(&tag->tag_data);
@@ -375,12 +375,12 @@ int _ape_parse_field(ApeTag* tag) {
         tmp_ptr++;
         done++;
       }
-      
+
       tmp_val = newSVpvn( buffer_ptr(&tag->tag_data), val_length );
       buffer_consume(&tag->tag_data, val_length);
-      
+
       tag->offset += val_length;
-    
+
       // Don't add invalid items
       if (_ape_check_validity(tag, flags, SvPVX(key), SvPVX(tmp_val)) != 0) {
         // skip this item
@@ -390,11 +390,11 @@ int _ape_parse_field(ApeTag* tag) {
       else {
         sv_utf8_decode(tmp_val);
       }
-      
+
       DEBUG_TRACE("  %s = %s\n", SvPVX(key), SvPVX(tmp_val));
-    
+
       av_push(av, tmp_val);
-      
+
       if ( done < size ) {
         // Still more to read, consume the null separator
         buffer_consume(&tag->tag_data, 1);
@@ -402,7 +402,7 @@ int _ape_parse_field(ApeTag* tag) {
         done++;
       }
     }
-    
+
     value = newRV_noinc( (SV *)av );
   }
 
@@ -410,9 +410,9 @@ int _ape_parse_field(ApeTag* tag) {
   if (size + buffer_len(&tag->tag_data) + APE_ITEM_MINIMUM_SIZE > data_size) {
     return _ape_error(tag, "Impossible item length (greater than remaining space)", -3);
   }
-  
+
   my_hv_store(tag->tags, upcase(SvPVX(key)), value);
-  
+
   SvREFCNT_dec(key);
 
   tag->num_fields++;
@@ -424,12 +424,12 @@ int _ape_check_validity(ApeTag* tag, uint32_t flags, char* key, char* value) {
   unsigned long key_length;
   char* key_end;
   char* c;
-  
+
   /* Check valid flags */
   if (flags > 7) {
     return _ape_error(tag, "Invalid item flags", -3);
   }
-  
+
   /* Check valid key */
   key_length = strlen(key);
   key_end    = key + (long)key_length;
@@ -444,12 +444,12 @@ int _ape_check_validity(ApeTag* tag, uint32_t flags, char* key, char* value) {
 
   if (key_length == 3) {
 #ifdef _MSC_VER
-    if (strnicmp(key, "id3", 3) == 0 || 
-        strnicmp(key, "tag", 3) == 0 || 
+    if (strnicmp(key, "id3", 3) == 0 ||
+        strnicmp(key, "tag", 3) == 0 ||
         strnicmp(key, "mp+", 3) == 0) {
 #else
-    if (strncasecmp(key, "id3", 3) == 0 || 
-        strncasecmp(key, "tag", 3) == 0 || 
+    if (strncasecmp(key, "id3", 3) == 0 ||
+        strncasecmp(key, "tag", 3) == 0 ||
         strncasecmp(key, "mp+", 3) == 0) {
 #endif
       return _ape_error(tag, "Invalid item key 'id3, tag or mp+'", -3);
@@ -469,14 +469,14 @@ int _ape_check_validity(ApeTag* tag, uint32_t flags, char* key, char* value) {
       return _ape_error(tag, "Invalid or non-ASCII key character", -3);
     }
   }
-  
+
   if (tag->version > 1) {
     /* Check value is utf-8 if flags specify utf8 or external format*/
     if (((flags & APE_ITEM_TYPE_FLAGS) & 2) == 0 && !is_utf8_string((unsigned char*)(value), strlen(value))) {
       return _ape_error(tag, "Invalid UTF-8 value", -3);
     }
   }
-  
+
   return 0;
 }
 
@@ -485,7 +485,7 @@ get_ape_metadata(PerlIO *infile, char *file, HV *info, HV *tags)
 {
   int status = -1;
   ApeTag* tag;
-  
+
   Newz(0, tag, sizeof(ApeTag), ApeTag);
 
   if (tag == NULL) {

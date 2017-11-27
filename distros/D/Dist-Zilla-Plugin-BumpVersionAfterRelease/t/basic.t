@@ -25,6 +25,7 @@ sub _new_tzil {
         [
             BumpVersionAfterRelease => {
                 $c->{global}           ? ( global           => 1 ) : (),
+                $c->{all_matching}     ? ( all_matching     => 1 ) : (),
                 $c->{add_tarball_name} ? ( add_tarball_name => 1 ) : (),
             }
         ],
@@ -72,6 +73,21 @@ my @cases = (
         override         => 1,
         add_tarball_name => 1,
     },
+
+    {
+        label    => "all matching replacement, identity",
+        version  => "0.001",
+        override => 1,
+        all_matching => 1,
+    },
+
+    {
+        label    => "all matching replacement, final file matches once",
+        version  => "0.003",
+        override => 1,
+        all_matching => 1,
+    },
+
 );
 
 sub _regex_for_version {
@@ -162,11 +178,20 @@ for my $c (@cases) {
         $next_re = qr/$next_re$/m;
 
         local $TODO = 'qr/...$/m is broken before 5.10' if $] lt '5.010000';
-        like( $orig, $next_re, "version line updated in single-quoted source file" );
+        if (!$c->{all_matching} || $version eq '0.001') {
+            like( $orig, $next_re, "version line updated in single-quoted source file" );
+        }
+        else {
+            unlike( $orig, $next_re, "version line not updated in source file - did not match release version");
+        }
         local $TODO;
 
         $count =()= $orig =~ /$next_re/mg;
-        $exp = $c->{global} ? 2 : 1;
+        $exp = $c->{global} || ($c->{all_matching} && $version eq '0.001') ? 2 : 1;
+        $exp =
+            $c->{global} ? 2
+          : $c->{all_matching} ? ($version eq '0.001' ? 2 : 0)
+          : 1;
         is( $count, $exp, "right number of replacements" )
           or diag $orig;
 
@@ -176,12 +201,36 @@ for my $c (@cases) {
         $orig = $tzil->slurp_file('source/lib/DZT/DQuote.pm');
 
         local $TODO = 'qr/...$/m is broken before 5.10' if $] lt '5.010000';
-        like( $orig, $next_re,
-            "version line updated from double-quotes to single-quotes in source file",
-        );
+        if (!$c->{all_matching} || $version eq '0.001') {
+            like( $orig, $next_re, "version line updated from double-quotes to single-quotes in source file");
+        }
+        else {
+            unlike( $orig, $next_re, "version line not updated in source file - did not match release version");
+        }
         local $TODO;
 
         like( $orig, qr/1;\s+# last line/, "last line correct in revised source file" );
+
+        $orig = $tzil->slurp_file('source/lib/DZT/Mismatched.pm');
+
+        local $TODO = 'qr/...$/m is broken before 5.10' if $] lt '5.010000';
+
+        if ($c->{all_matching} && $version ne '0.003' && $version ne '0.004') {
+            unlike( $orig, $next_re, "version line not updated in source file - did not match release version");
+        }
+        else {
+            like( $orig, $next_re, "version line updated unconditionally in source file");
+        }
+        local $TODO;
+
+        $count =()= $orig =~ /$next_re/mg;
+        $exp =
+            $c->{global} ? 2
+          : $c->{all_matching} ? ($version eq '0.003' || $version eq '0.004' ? 1 : 0)
+          : 1;
+
+        is( $count, $exp, "right number of replacements" )
+          or diag $orig;
 
         $makefilePL = $tzil->slurp_file('source/Makefile.PL');
 
@@ -241,6 +290,7 @@ for my $c (@cases) {
             ],
             superbagof(
                 '[RewriteVersion] updating $VERSION assignment in lib/DZT/Sample.pm',
+                $c->{all_matching} && $version ne '0.001' ? () :
                 '[BumpVersionAfterRelease] bumped $VERSION in '
                   . path( $tzil->tempdir, qw(source lib DZT Sample.pm) ),
             ),

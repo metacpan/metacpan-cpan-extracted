@@ -26,31 +26,20 @@ $|++;
 my @skip = qw/
     4ABK
     54T7
-    5C5M
-    5KJE
-    6HB6
     87E4
+    8CWC
     8UDB
     C2DT
+    CN3R
     CT4Q
     DBG4
-    D88J
     DFF7
-    DHP8
-    EHF6
+    F3CP
     FRK4
-    FUP4
     L9U5
-    LP6E
     LQZ7
-    MXS3
-    N782
-    Q88A
     QF4Y
     U3C3
-    UDR7
-    YD5X
-    ZF4X
 
     5WE3
     7W2P
@@ -60,7 +49,12 @@ my @skip = qw/
     S3PD
     W42U
 
-    R4YG
+    FH7J
+    LE5A
+    S4JQ
+    8XYN
+    Q5MG
+
 /;
 my %skip;
 @skip{ @skip }= ();
@@ -101,7 +95,7 @@ for my $item (@dirs) {
 
 #    diag "------------------------------ $id";
     my $ypp = YAML::PP::Loader->new(boolean => 'JSON::PP');
-    my $data = eval { $ypp->load($yaml) };
+    my $data = eval { $ypp->load_string($yaml) };
 #    warn __PACKAGE__.':'.__LINE__.$".Data::Dumper->Dump([\$data], ['data']);
     if ($@) {
         warn __PACKAGE__.':'.__LINE__.": ERROR: $@\n";

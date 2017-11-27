@@ -8,7 +8,7 @@ eval{
 
     local $/ = undef;
     my (  %param, $i ) = %{ YAML::XS::Load( <> ) };
-    my ( $param ) = @{$param{argv}};
+    my $param  = $param{argv} || $param{data};
     
     die "agent/code/download argv no hash" unless $param && ref $param eq 'HASH';
     

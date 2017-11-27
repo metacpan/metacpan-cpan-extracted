@@ -32,7 +32,7 @@ no_index:
 provides:
   App::BorgRestore:
     file: lib/App/BorgRestore.pm
-    version: v2.1.1
+    version: v2.2.0
   App::BorgRestore::Borg:
     file: lib/App/BorgRestore/Borg.pm
   App::BorgRestore::DB:
@@ -44,12 +44,12 @@ provides:
 requires:
   DBD::SQLite: '0'
   DBI: '0'
-  File::Path: '0'
-  File::Temp: '0'
+  Date::Parse: '0'
   File::pushd: '0'
   Function::Parameters: '0'
   Getopt::Long: '0'
   IPC::Run: '0'
+  JSON: '0'
   List::Util: '0'
   Log::Any: '0'
   Log::Any::Adapter::Log4perl: '0'
@@ -58,12 +58,14 @@ requires:
   Log::Log4perl::Appender::ScreenColoredLevels: '0'
   Log::Log4perl::Layout::PatternLayout: '0'
   Log::Log4perl::Level: '0'
+  Path::Tiny: '0'
   Pod::Usage: '0'
+  Version::Compare: '0'
   autodie: '0'
   perl: v5.14.0
 resources:
   bugtracker: https://github.com/Bluewind/App-BorgRestore/issues
   homepage: https://github.com/Bluewind/App-BorgRestore
   repository: git://github.com/Bluewind/App-BorgRestore.git
-version: 2.1.1
+version: 2.2.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

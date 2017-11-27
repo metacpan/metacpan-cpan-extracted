@@ -1,6 +1,6 @@
 package Gearman::Objects;
 use version ();
-$Gearman::Objects::VERSION = version->declare("2.004.009");
+$Gearman::Objects::VERSION = version->declare("2.004.010");
 
 use strict;
 use warnings;
@@ -143,7 +143,7 @@ sub func {
 
 =head2 prefix([$prefix])
 
-getr/set the namespace / prefix for the function names.
+get/set the namespace / prefix for the function names.
 
 =cut
 

@@ -2,6 +2,7 @@
 use strictures 2;
 
 use Test::More;
+use Test::Deep; # Needed for re() below
 
 use lib 't/lib';
 
@@ -126,6 +127,29 @@ sims_test "Create row using existing parent which would have had a different chi
   rv => {
     Artist => { id => 1, name => 'Superstar' },
     Album => { id => 1, name => 'Wonder Years', artist_id => 1 },
+  },
+};
+
+sims_test "Auto-generate other children of parent by amount" => {
+  spec => {
+    Mansion => {
+      name => 'My Place',
+      artist => {
+        name => 'Superstar',
+        albums => 2,
+      },
+    },
+  },
+  expect => {
+    Artist => { id => 1, name => 'Superstar' },
+    Album => [
+      { id => 1, name => re('.+'), artist_id => 1 },
+      { id => 2, name => re('.+'), artist_id => 1 },
+    ],
+    Mansion => { id => 1, name => 'My Place', artist_id => 1 },
+  },
+  rv => {
+    Mansion => { id => 1, name => 'My Place', artist_id => 1 },
   },
 };
 

@@ -1,6 +1,8 @@
 package Chloro::Test::Address;
 
 use Moose;
+use namespace::autoclean;
+
 use Chloro;
 
 use Chloro::Types qw( Bool Str );

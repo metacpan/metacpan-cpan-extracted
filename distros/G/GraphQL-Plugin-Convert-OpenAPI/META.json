@@ -1,0 +1,70 @@
+{
+   "abstract" : "convert OpenAPI schema to GraphQL schema",
+   "author" : [
+      "Ed J <etj@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "GraphQL-Plugin-Convert-OpenAPI",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "7.10"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Markdown" : "0",
+            "Test::CheckManifest" : "0.9",
+            "Test::Pod" : "1.22"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "GraphQL" : "0.21",
+            "JSON::Validator" : "1.06",
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "GraphQL" : "0.21",
+            "JSON::Validator" : "1.06",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/graphql-perl/GraphQL-Plugin-Convert-OpenAPI/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/graphql-perl/GraphQL-Plugin-Convert-OpenAPI"
+      },
+      "x_IRC" : "irc://irc.perl.org/#graphql-perl"
+   },
+   "version" : "0.01"
+}

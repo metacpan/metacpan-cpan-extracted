@@ -1,7 +1,7 @@
 package Finance::BTCIndo;
 
-our $DATE = '2017-06-03'; # DATE
-our $VERSION = '0.005'; # VERSION
+our $DATE = '2017-11-24'; # DATE
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -198,7 +198,8 @@ sub cancel_order {
     $self->tapi(
         "cancelOrder",
         order_id => $args{order_id},
-        type    => $args{type},
+        pair     => $args{pair},
+        type     => $args{type},
     );
 }
 
@@ -217,7 +218,7 @@ Finance::BTCIndo - Trade with bitcoin.co.id (VIP) using Perl
 
 =head1 VERSION
 
-This document describes version 0.005 of Finance::BTCIndo (from Perl distribution Finance-BTCIndo), released on 2017-06-03.
+This document describes version 0.006 of Finance::BTCIndo (from Perl distribution Finance-BTCIndo), released on 2017-11-24.
 
 =head1 SYNOPSIS
 
@@ -446,8 +447,6 @@ Arguments:
 
 =item * pair => str (required)
 
-Currently only "btc_idr".
-
 =back
 
 =head2 get_open_orders
@@ -461,8 +460,6 @@ Arguments:
 
 =item * pair => str (required)
 
-Currently only "btc_idr".
-
 =back
 
 =head2 create_order
@@ -474,8 +471,6 @@ Arguments:
 =over
 
 =item * pair => str (required)
-
-Currently only "btc_idr".
 
 =item * type => str (required)
 
@@ -502,6 +497,8 @@ This method cancel existing open order. The API method name is C<cancelOrder>.
 Arguments:
 
 =over
+
+=item * pair => pair (required)
 
 =item * type => str (required)
 

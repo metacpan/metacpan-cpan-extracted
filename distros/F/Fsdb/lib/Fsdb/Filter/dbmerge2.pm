@@ -2,7 +2,7 @@
 
 #
 # dbmerge2.pm
-# Copyright (C) 1991-2015 by John Heidemann <johnh@isi.edu>
+# Copyright (C) 1991-2017 by John Heidemann <johnh@isi.edu>
 # $Id: 66ef27627d3d5cfbc6108d4e1508b3330952c22d $
 #
 # This program is distributed under terms of the GNU general
@@ -38,6 +38,9 @@ Although described above as a command line too, the command line
 version of dbmerge2 is not installed by default.
 Dbmerge2 is used primarily internal to perl;
 L<dbmerge(1)> is the command-line tool for user use.
+
+Warning: we do not verify that each input is actually sorted.
+In correct merge results will occur if they are not.
 
 =head1 OPTIONS
 
@@ -334,7 +337,7 @@ sub run ($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1991-2015 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1991-2017 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

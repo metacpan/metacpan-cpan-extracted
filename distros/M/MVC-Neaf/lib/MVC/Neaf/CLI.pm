@@ -2,25 +2,44 @@ package MVC::Neaf::CLI;
 
 use strict;
 use warnings;
-our $VERSION = 0.18;
+our $VERSION = 0.19;
 
 =head1 NAME
 
-MVC::Neaf::CLI - Command line debugger for Not Even A Framework
+MVC::Neaf::CLI - Command line debugger and runner for Not Even A Framework
 
 =head1 DESCRIPTION
 
 Run your applications from command line, with various overrides.
 
-This is only useful for debugging, slightly better than CGI.pm's though.
+May be useful for command-line mode debugging (think CGI.pm)
+as well as starting the app from command line.
 
-=head1 SINOPSYS
+=head1 SYNOPSIS
+
+    perl application.pl --list
+
+Print routes defined in the application.
 
     perl application.pl --post /foo/bar arg=42
+
+Simulate a request without running a server.
+
+    perl application.pl --listen :5000
+
+Run a psgi server.
 
 =head1 OPTIONS
 
 =over
+
+=item * --help - display a brief usage message.
+
+=item * --list - print routes configured in the application.
+
+=item * --listen <port-or-socket> - start application as a standalone
+plack  servers. Any subsequent options compatible with plackup(1)
+are allowed in this mode.
 
 =item * --post - set method to POST.
 
@@ -34,11 +53,6 @@ This is only useful for debugging, slightly better than CGI.pm's though.
 
 =item * --view - force (JS,TT,Dumper) view.
 
-=item * --list - don't process request, instead print routes
-configured in the application.
-
-=item * --help - don't process request, instead display a brief
-usage message
 
 =back
 
@@ -55,7 +69,7 @@ use Carp;
 use HTTP::Headers;
 use File::Basename qw(basename);
 
-use MVC::Neaf::Request::CGI;
+use MVC::Neaf;
 use MVC::Neaf::Upload;
 
 =head2 run( $app )
@@ -72,71 +86,108 @@ B<NOTE> Spoils @AGRV.
 sub run {
     my ($self, $app) = @_;
 
-    my $todo = "run";
-    my %opt;
-    my @upload;
-    my @cookie;
-    my @head;
-    my $view;
+    my %test;
+
+    if (grep { $_ eq '--list' } @ARGV) {
+        return $self->list($app);
+    };
+    if (grep { $_ eq '--help' } @ARGV) {
+        return usage();
+    };
+
+    # TODO 0.30 --view here so that view is forced in both modes
+    if (grep { $_ =~ /^--listen/ } @ARGV) {
+        return $self->serve( $app );
+    };
 
     GetOptions(
-        "help"      => \&usage,
-        "list"      => sub { $todo = "list" },
-        "post"      => sub { $opt{method} = 'POST' },
-        "method=s"  => \$opt{method},
-        "upload=s"  => \@upload,
-        "cookie=s"  => \@cookie,
-        "header=s"  => \@head,
-        "view=s"    => \$view,
+        "post"       => sub { $test{method} = 'POST' },
+        "method=s"   => \$test{method},
+        "upload=s@"  => \$test{upload},
+        "cookie=s@"  => \$test{cookie},
+        "header=s@"  => \$test{head},
+        "view=s"     => \$test{view},
         # TODO 0.30 --session to reduce hassle
-    ) or croak "Unknown command line arguments given to MVC::Neaf::CLI";
+    ) or croak "Bad command line options in MVC::Neaf::CLI, see $0 --help";
 
-    $opt{method} = uc $opt{method} if $opt{method};
+    return $self->run_test($app, %test);
+};
+
+=head2 serve( $app, @arg )
+
+Use L<Plack::Runner> to start server.
+
+=cut
+
+sub serve {
+    my ($self, $app) = @_;
+
+    require Plack::Runner;
+    my $runner = Plack::Runner->new;
+    $runner->parse_options( @ARGV );
+    $runner->run( $app->run );
+    exit;
+};
+
+=head2 run_test( $app, %override )
+
+Call L<MVC::Neaf>'s C<run_test>.
+
+=cut
+
+sub run_test {
+    my ($self, $app, %test) = @_;
+
+    $test{method} = uc $test{method} if $test{method};
 
     croak "--upload requires --post"
-        if @upload and $opt{method} ne 'POST';
+        if $test{upload} and $test{method} ne 'POST';
 
-    if ($todo eq 'list') {
-        return $self->list( $app );
+    if (my $up =  delete $test{upload}) {
+        foreach (@$up) {
+            /^(\w+)=(.+)$/ or croak "Usage: --upload key=/path/to/file";
+            my ($key, $file) = ($1, $2);
+
+            open my $fd, "<", $file
+                or die "Failed to open upload $key file $file: $!";
+
+            # TODO 0.30 create temp file
+            $test{uploads}{$key} = MVC::Neaf::Upload->new(
+                id => $key, handle => $fd, filename => $file );
+        };
     };
 
-    foreach (@upload) {
-        /^(\w+)=(.+)$/ or croak "Usage: --upload key=/path/to/file";
-        my ($key, $file) = ($1, $2);
-
-        open my $fd, "<", $file
-            or die "Failed to open upload $key file $file: $!";
-
-        $opt{uploads}{$key} = MVC::Neaf::Upload->new(
-            id => $key, handle => $fd );
+    if (my $cook = delete $test{cookie}) {
+        foreach (@$cook) {
+            /^(\w+)=(.*)$/
+                or croak "Usage: --cookie name=value";
+            $test{cookie}{$1} = $2;
+        };
     };
 
-    foreach (@cookie) {
-        /^(\w+)=(.*)$/
-            or croak "Usage: --cookie name=value";
-
-        $opt{neaf_cookie_in}{$1} = $2;
-    };
-
-    if (@head) {
-        $opt{header_in} = HTTP::Headers->new (
+    if (my @head = @{ delete $test{head} || [] }) {
+        $test{header_in} = HTTP::Headers->new (
             map { /^([^=]+)=(.*)$/ or croak "Bad header format"; $1=>$2 } @head
         );
     };
 
-
-    # Create and mangle the request
-    my $req = MVC::Neaf::Request::CGI->new(%opt);
-    if ($ARGV[0] and $ARGV[0] =~ m#/(.*?)(?:\?|$)#) {
-        $req->set_path($1);
-    } else {
-        $req->set_path("/");
+    my ($path, @rest) = @ARGV;
+    $path ||= '/';
+    if (@rest) {
+        my $sep = $path =~ /\?/ ? '&' : '?';
+        $path .= $sep . join '&', @rest;
     };
 
-    # Run the application
-    $app->set_forced_view( $view ) if $view;
-    my $unused = $app->run(); # warm up caches
-    $app->handle_request( $req );
+    if (my $view = delete $test{view}) {
+        $app->set_forced_view( $view );
+    };
+
+    my ($status, $head, $content) = $app->run_test( $path, %test );
+
+    print STDOUT "Status $status\n";
+    print STDOUT $head->as_string, "\n";
+    print STDOUT $content;
+    # exit?
 };
 
 =head2 usage()
@@ -154,7 +205,14 @@ sub usage {
     $script
 is a web-application powered by Perl and MVC::Neaf (Not Even A Framework).
 It will behave according to the CGI spec if run without parameters.
-It will return a PSGI-compliant subrouting if require'd from other Perl code.
+It will return a PSGI-compliant subroutine if require'd from other Perl code.
+To run it as a standalone server, use --listen switch along with any
+other switches recognized by plackup(1)
+    perl $script --listen :31415 <...>
+To peek at the application, run
+    perl $script --list
+To get this summary, run
+    perl $script --help
 To invoke debugging mode, run:
     perl $script [options] [/path] <param=value> ...
 Options may include:
@@ -164,8 +222,6 @@ Options may include:
     --cookie name="value" - add cookie.
     --header name="value" - set http header.
     --view - force (JS,TT,Dumper) view.
-    --list - print routes configured in the application.
-    --help - print this message and exit.
 See `perldoc MVC::Neaf::CLI` for more.
 USAGE
 

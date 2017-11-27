@@ -93,6 +93,7 @@ Compute I<whole> population statistics
 Assume data is already sorted.
 With one -S, we check and confirm this precondition.
 When repeated, we skip the check.
+(This flag is ignored if quartiles are not requested.)
 
 =item B<--parallelism=N> or C<-j N>
 
@@ -118,6 +119,12 @@ Default is /tmp.
 Do multi-stats, grouped by each key.
 Assumes keys are sorted.  (Use dbmultistats to guarantee sorting order.)
 
+=item B<--output-on-no-input>
+
+Enables null output (all fields are "-", n is 0)
+if we get input with a schema but no records.
+Without this option, just output the schema but no rows.
+Default: no output if no input.
 
 =back
 
@@ -285,6 +292,7 @@ sub set_defaults($) {
     $self->{_fscode} = undef;
     $self->{_max_parallelism} = undef;
     $self->{_key_column} = undef;
+    $self->{_output_on_no_input} = undef;
     $self->set_default_tmpdir;
 }
 
@@ -317,6 +325,7 @@ sub parse_options($@) {
 	'log!' => \$self->{_logprog},
 	'm|median!' =>  \$self->{_median},
 	'o|output=s' => sub { $self->parse_io_option('output', @_); },
+        'output-on-no-input!' => \$self->{_output_on_no_input},
 	'q|quantile=i' => \$self->{_quantile},
 	's|sample!' =>  \$self->{_sample},
 	'S|pre-sorted+' => \$self->{_pre_sorted},
@@ -667,7 +676,9 @@ sub run_one_key($) {
         $out_hash{$key_column} = $last_key;
     };
 
-    $self->{_out}->write_row_from_href(\%out_hash);
+    if ($n > 0 || ($n == 0 && $self->{_output_on_no_input})) {
+        $self->{_out}->write_row_from_href(\%out_hash);
+    };
 }
 
 =head2 run

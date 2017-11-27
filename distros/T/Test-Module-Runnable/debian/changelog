@@ -1,3 +1,12 @@
+libtest-module-runnable-perl (0.3.0) stable; urgency=low
+
+  * Added clearMocks()
+  * Added mock()
+  * Added mockCalls()
+  * Added unmock()
+
+ -- Duncan Ross Palmer <palmer@overchat.org>  Thu, 23 Nov 2017 21:45:47 +0000
+
 libtest-module-runnable-perl (0.2.3) stable; urgency=low
 
   * Fix issue where not was directly tested against a blank string. (Unit tests only).

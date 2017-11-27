@@ -57,9 +57,9 @@ typedef struct wvpinfo {
   off_t file_size;
   off_t file_offset;
   off_t audio_offset;
-  
+
   WavpackHeader *header; // current block header data
-  
+
   uint8_t seeking; // flag if we're seeking
 } wvpinfo;
 
@@ -86,19 +86,25 @@ const int wavpack_sample_rates[] = {
 #define ID_WVC_BITSTREAM        0xb
 #define ID_WVX_BITSTREAM        0xc
 #define ID_CHANNEL_INFO         0xd
+#define ID_DSD_BLOCK            0xe
 
 #define ID_RIFF_HEADER          (ID_OPTIONAL_DATA | 0x1)
 #define ID_RIFF_TRAILER         (ID_OPTIONAL_DATA | 0x2)
-#define ID_REPLAY_GAIN          (ID_OPTIONAL_DATA | 0x3)    // never used (APEv2)
-#define ID_CUESHEET             (ID_OPTIONAL_DATA | 0x4)    // never used (APEv2)
+#define ID_ALT_HEADER           (ID_OPTIONAL_DATA | 0x3)
+#define ID_ALT_TRAILER          (ID_OPTIONAL_DATA | 0x4)
 #define ID_CONFIG_BLOCK         (ID_OPTIONAL_DATA | 0x5)
 #define ID_MD5_CHECKSUM         (ID_OPTIONAL_DATA | 0x6)
 #define ID_SAMPLE_RATE          (ID_OPTIONAL_DATA | 0x7)
+#define ID_ALT_EXTENSION        (ID_OPTIONAL_DATA | 0x8)
+#define ID_ALT_MD5_CHECKSUM     (ID_OPTIONAL_DATA | 0x9)
+#define ID_NEW_CONFIG_BLOCK     (ID_OPTIONAL_DATA | 0xa)
+#define ID_BLOCK_CHECKSUM       (ID_OPTIONAL_DATA | 0xf)
 
 static int get_wavpack_info(PerlIO *infile, char *file, HV *info);
 wvpinfo * _wavpack_parse(PerlIO *infile, char *file, HV *info, uint8_t seeking);
 int _wavpack_parse_block(wvpinfo *wvp);
 int _wavpack_parse_sample_rate(wvpinfo *wvp, uint32_t size);
 int _wavpack_parse_channel_info(wvpinfo *wvp, uint32_t size);
+int _wavpack_parse_dsd_block(wvpinfo *wvp, uint32_t size);
 void _wavpack_skip(wvpinfo *wvp, uint32_t size);
 int _wavpack_parse_old(wvpinfo *wvp);

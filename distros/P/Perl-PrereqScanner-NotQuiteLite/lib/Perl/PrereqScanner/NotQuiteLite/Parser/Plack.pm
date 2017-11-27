@@ -15,11 +15,11 @@ sub parse_plack_builder_args {
 
   # TODO: support add_middleware(_if) methods?
 
-  $c->register_keyword(
+  $c->register_keyword_parser(
     'enable',
     [$class, 'parse_enable_args', $used_module],
   );
-  $c->register_keyword(
+  $c->register_keyword_parser(
     'enable_if',
     [$class, 'parse_enable_if_args', $used_module],
   );

@@ -6,7 +6,7 @@ Math::AnyNum - Arbitrary size precision for integers, rationals, floating-points
 
 =head1 VERSION
 
-Version 0.17
+Version 0.18
 
 =head1 SYNOPSIS
 
@@ -539,7 +539,7 @@ Example:
 
 Raises C<x> to power C<y> and returns the result.
 
-When both C<x> and C<y> are integers, it does integer exponentiation and returns the exact result.
+When C<x> and C<y> are both integers, it does integer exponentiation and returns the exact result.
 
 When C<x> is rational and C<y> is an integer, it does rational exponentiation based on the identity: C<(a/b)**n = a**n / b**n>,
 which also computes the exact result.
@@ -993,11 +993,11 @@ Returns the Kronecker symbol I<(n|m)>, which is a generalization of the Jacobi s
 
 =head2 faulhaber_sum
 
-    faulhaber_sum(n, p)                           #=> Int | NaN
+    faulhaber_sum(n, k)                           #=> Int | NaN
 
-Computes the sum C<1**p + 2**p + 3**p +...+ n**p>, using Faulhaber's formula.
+Computes the sum C<1**k + 2**k + 3**k +...+ n**k>, using Faulhaber's formula.
 
-C<p> must be a non-negative integer. Returns NaN otherwise.
+C<k> must be a non-negative integer. Returns NaN otherwise.
 
 Example:
 
@@ -1177,7 +1177,7 @@ Second integer k-gonal root of C<n>. Returns C<NaN> when a real root does not ex
 
 Example:
 
-    say ipolygonal_root2($n, 5);                   # integer second pentagonal root
+    say ipolygonal_root2($n, 5);                   # second integer pentagonal root
     say ipolygonal_root2(polygonal(-10, 5), 5);    # prints: "-10"
 
 =head2 is_polygonal
@@ -1686,17 +1686,19 @@ Example:
 
 =head2 digits
 
-    digits(x)                                     #=> (Scalar, Scalar, ...)
-    digits(x, b)                                  #=> (Scalar, Scalar, ...)
+    digits(n)                                     #=> (Scalar, Scalar, ...)
+    digits(n, b)                                  #=> (Scalar | Int, Scalar | Int, ...)
 
-Returns a list with the digits of C<x> in a given base. When no base is specified, it defaults to base 10.
+Returns a list with the digits of C<n> in a given base. When no base is specified, it defaults to base 10.
 
-Only the absolute integer part of C<x> is considered.
+Only the absolute integer part of C<n> is considered.
+
+The value of C<b> must be greater than C<1>. Returns an empty list otherwise.
 
 Example:
 
-    digits(-1234.56) = (1,2,3,4)
-    digits(4095, 16) = ('f','f','f')
+    digits(12345)      = (5, 4, 3, 2, 1)
+    digits(12345, 100) = (45, 23, 1)
 
 =head1 * Comparisons
 
@@ -1817,7 +1819,7 @@ support for complex numbers, therefore that project was abandoned and much of it
 
 =head1 AUTHOR
 
-Daniel Șuteu, C<< <trizenx at gmail.com> >>
+Daniel Șuteu, C<< <trizen@protonmail.com> >>
 
 =head1 BUGS
 

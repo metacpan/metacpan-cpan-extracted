@@ -5,7 +5,7 @@ use warnings;
 package Authen::SCRAM;
 # ABSTRACT: Salted Challenge Response Authentication Mechanism (RFC 5802)
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 1;
 
@@ -24,7 +24,7 @@ Authen::SCRAM - Salted Challenge Response Authentication Mechanism (RFC 5802)
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -84,6 +84,14 @@ Authentication Mechanism (SCRAM) from RFC 5802.
 
 See L<Authen::SCRAM::Client> and L<Authen::SCRAM::Server> for usage details.
 
+=head1 NAME
+
+Authen::SCRAM - Salted Challenge Response Authentication Mechanism (RFC 5802)
+
+=head1 VERSION
+
+version 0.006
+
 =for Pod::Coverage BUILD
 
 =for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
@@ -108,6 +116,49 @@ L<https://github.com/dagolden/Authen-SCRAM>
 =head1 AUTHOR
 
 David Golden <dagolden@cpan.org>
+
+=head1 CONTRIBUTOR
+
+=for stopwords David Golden
+
+David Golden <xdg@xdg.me>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2014 by David Golden.
+
+This is free software, licensed under:
+
+  The Apache License, Version 2.0, January 2004
+
+=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+
+=head1 SUPPORT
+
+=head2 Bugs / Feature Requests
+
+Please report any bugs or feature requests through the issue tracker
+at L<https://github.com/dagolden/Authen-SCRAM/issues>.
+You will be notified automatically of any progress on your issue.
+
+=head2 Source Code
+
+This is open source software.  The code repository is available for
+public review and contribution under the terms of the license.
+
+L<https://github.com/dagolden/Authen-SCRAM>
+
+  git clone https://github.com/dagolden/Authen-SCRAM.git
+
+=head1 AUTHOR
+
+David Golden <dagolden@cpan.org>
+
+=head1 CONTRIBUTOR
+
+=for stopwords David Golden
+
+David Golden <xdg@xdg.me>
 
 =head1 COPYRIGHT AND LICENSE
 

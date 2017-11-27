@@ -10,6 +10,7 @@ do { my $x = {
                         'requires' => {
                                         'Alien::Build' => '0.32',
                                         'Alien::Build::MM' => '0.32',
+                                        'Alien::Build::Plugin::Build::CMake' => '0.99',
                                         'ExtUtils::MakeMaker' => '6.52'
                                       }
                       },

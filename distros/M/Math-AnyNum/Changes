@@ -1,5 +1,15 @@
 Revision history for Math-AnyNum
 
+0.18    2017-11-22
+
+        - Extended the `digits()` method to support arbitrary large bases.
+
+            + Additionally, it returns the digits in reverse order, matching the output of the `.digits()` method from Ruby.
+
+        - Fixed a minor issue in `rat(str)` to return NaN when `str` cannot be parsed as a fraction.
+        - Fixed `polygonal_root(n, NaN)` to return `NaN` instead of `n`.
+        - Minor optimizations for `x <=> 0`, `x == 0` and `x != 0`, when `0` is a native integer.
+
 0.17    2017-11-04
 
         - Optimized `is_div(n, k)` when `n` and `k` are integers.

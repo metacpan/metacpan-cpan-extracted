@@ -1,5 +1,12 @@
 Revision history for Dist-Zilla-Plugin-BumpVersionAfterRelease
 
+0.016     2017-11-26 16:54:54-05:00 America/New_York
+
+    [ADDED]
+
+    - New "all_matching" option for [BumpVersionAfterRelease], which only
+      bumps $VERSIONs that match the release version
+
 0.015     2016-04-03 13:43:32-04:00 America/New_York
 
     [ADDED]

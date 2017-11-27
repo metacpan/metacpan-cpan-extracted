@@ -22,6 +22,7 @@ $n->route( '/' => sub { die "Fubar" } );
 $n->run->({});
 is (scalar @log, 1, "1 error issued");
 like ($log[0], qr/^Fubar\s/s, "Error correct" );
+note "ERROR: $_" for @log;
 
 note "TESTING set_default()";
 my @warn;

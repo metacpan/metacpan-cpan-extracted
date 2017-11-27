@@ -1,5 +1,8 @@
 Revision history for Perl extension Distribution-Metadata
 
+0.06  2017-11-24 22:11:07 JST
+    - enable static install
+
 0.05  2015-10-08 00:16:24 JST
 
     - fix bug agian; should have cache install.json per directories

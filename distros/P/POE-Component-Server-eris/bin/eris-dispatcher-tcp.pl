@@ -104,7 +104,7 @@ eris-dispatch-tcp.pl - Example using POE::Component::Server::eris with a PoCo::S
 
 =head1 VERSION
 
-version 2.3
+version 2.4
 
 =head1 AUTHOR
 
@@ -112,7 +112,7 @@ Brad Lhotsky <brad@divsionbyzero.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Brad Lhotsky.
+This software is Copyright (c) 2017 by Brad Lhotsky.
 
 This is free software, licensed under:
 

@@ -11,7 +11,6 @@ unlink $index;
 
 my $yashe = Syntax::Kamelon->new(
 	xmlfolder => $folder,
-	indexfile => $index,
 );
 ok(defined $yashe, 'Can create Kamelon');
 

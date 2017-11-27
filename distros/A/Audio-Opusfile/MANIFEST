@@ -7,6 +7,8 @@ ppport.h
 typemap
 README
 t/Audio-Opusfile.t
+t/perlcritic.t
+t/perlcriticrc
 fallback/const-c.inc
 fallback/const-xs.inc
 lib/Audio/Opusfile.pm

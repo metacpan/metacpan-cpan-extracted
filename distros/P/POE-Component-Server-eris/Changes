@@ -1,4 +1,7 @@
 Revision History for POE-Component-Server-eris
+2.4     2017-11-24 Brad Lhotsky <brad@divisionbyzero.net>
+        - Fix for older versions of Perl
+
 2.3     2017-11-19 Brad Lhotsky <brad@divisionbyzero.net>
         - Fix the reference implementation to shutdown when STDIN is closed
         - Make commands easier to add

@@ -1,0 +1,60 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+my @manifest = (
+	'Makefile.PL',
+	'Changes',
+	'LICENSE',
+	'MANIFEST			This list of files',
+	'README.md',
+	'regenerate',
+);
+
+my @folders = (
+	'bin',
+	'Kamelon',
+	'lib',
+	't',
+	'tools',
+);
+
+my %ignore = (
+	'Kamelon.bs' => 0,
+	'Kamelon.o' => 0,
+	'kamelonc.o' => 0,
+	'MANIFEST' => 0,
+	'Makefile.old' => 0,
+	'Makefile' => 0,
+	'MANIFEST.bak' => 0,
+	'META.yml' => 0,
+	'META.json' => 0,
+	'MYMETA.json' => 0,
+	'MYMETA.yml' => 0,
+	'pm_to_blib' => 0,
+);
+
+for (@folders) {
+	&scan_dir($_)
+}
+
+for (@manifest) {
+	print "$_\n"
+}
+
+sub scan_dir {
+	my $dir = shift;
+	my @files = < $dir/* >;
+	for (@files) { 
+		if (-d $_) {
+			&scan_dir($_);
+		} else {
+			my $dirlength = length($dir) + 1;
+			my $name = substr($_, $dirlength, length($_) - $dirlength);
+			unless (exists $ignore{$name}) {
+				push @manifest, $_;
+			}
+		}
+	}
+}

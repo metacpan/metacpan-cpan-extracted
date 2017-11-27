@@ -4,8 +4,6 @@ requires 'FFI::Platypus';
 requires 'FFI::CheckLib';
 requires 'IPC::Cmd';
 
-recommends 'PkgConfig', '0.17026';
-
 on 'configure' => sub {
     requires 'FFI::CheckLib';
 };

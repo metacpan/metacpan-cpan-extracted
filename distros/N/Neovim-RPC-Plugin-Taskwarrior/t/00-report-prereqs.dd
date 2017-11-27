@@ -1,0 +1,40 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Test::More' => '0.96',
+                                      'Test::Vars' => '0'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'DateTime' => '0',
+                                      'DateTime::Format::ISO8601' => '0',
+                                      'Neovim::RPC::Plugin' => '0',
+                                      'Promises' => '0',
+                                      'Taskwarrior::Kusarigama::Wrapper' => '0',
+                                      'experimental' => '0',
+                                      'perl' => 'v5.20.0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'Test::More' => '0',
+                                   'strict' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

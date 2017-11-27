@@ -31,10 +31,14 @@ aks.h
 aks.c
 simpqs.h
 simpqs.c
+tinyqs.h
+tinyqs.c
 isaac.h
 isaac.c
 random_prime.h
 random_prime.c
+real.h
+real.c
 utility.h
 utility.c
 t/01-load.t
@@ -52,7 +56,8 @@ t/21-conseq-lcm.t
 t/22-partitions.t
 t/23-gcd.t
 t/24-bernfrac.t
-t/25-pi.t
+t/25-const-euler.t
+t/25-const-pi.t
 t/26-combinatorial.t
 t/26-digits.t
 t/26-ismisc.t
@@ -60,6 +65,7 @@ t/26-lambertw.t
 t/26-logs.t
 t/26-mersenne.t
 t/26-mod.t
+t/26-real.t
 t/26-riemann.t
 t/26-roots.t
 t/27-clusters.t
@@ -86,5 +92,4 @@ examples/convert-gmpecpp-cert.pl
 examples/vcert.c
 examples/verify_primegap.pl
 .travis.yml
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)
+META.yml                                 Module meta-data (added by MakeMaker)

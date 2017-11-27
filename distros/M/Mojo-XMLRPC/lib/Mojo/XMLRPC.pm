@@ -18,7 +18,7 @@ use Exporter 'import';
 
 our @EXPORT_OK = (qw[decode_xmlrpc encode_xmlrpc from_xmlrpc to_xmlrpc]);
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 $VERSION = eval $VERSION;
 
 my $message = Mojo::Template->new(
@@ -140,7 +140,13 @@ sub _decode_element {
   my $tag = $elem->tag;
 
   if ($tag eq 'param' || $tag eq 'value' || $tag eq 'fault') {
-    return _decode_element($elem->children->first);
+    my $children = $elem->children;
+
+    # elements with no children must be strings
+    return $elem->text unless @$children;
+
+    # otherwise they are another element
+    return _decode_element($children->first);
 
   } elsif ($tag eq 'array') {
     my $data = $elem->children('data')->first;

@@ -3,26 +3,27 @@ abstract: 'Send messages to a systemd journal'
 author:
   - 'Lubomir Rintel <lkundrak@v3.sk>'
 build_requires:
-  ExtUtils::CBuilder: 0
+  ExtUtils::CBuilder: '0'
 configure_requires:
-  Module::Build: 0
+  Module::Build: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4007, CPAN::Meta::Converter version 2.132140'
+generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Log-Journald
 provides:
   Log::Dispatch::Journald:
     file: lib/Log/Dispatch/Journald.pm
   Log::Journald:
     file: lib/Log/Journald.pm
-    version: 0.20
+    version: '0.30'
   Log::Log4perl::Appender::Journald:
     file: lib/Log/Log4perl/Appender/Journald.pm
 resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Log-Journald
   license: http://dev.perl.org/licenses/
   repository: https://github.com/lkundrak/perl-Log-Journald
-version: 0.20
+version: '0.30'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

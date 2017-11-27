@@ -17,7 +17,7 @@ use URI::QueryParam;
 # Clean Up the Namespace
 use namespace::autoclean;
 
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 
 has 'protocol' => (
@@ -172,7 +172,7 @@ WWW::Subsonic - Interface with the Subsonic API
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

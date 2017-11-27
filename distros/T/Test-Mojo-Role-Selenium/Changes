@@ -1,5 +1,10 @@
 Revision history for perl distribution Test-Mojo-Role-Selenium
 
+0.11 2017-11-22T11:07:06+0100
+ - Fix documentation order issue
+ - Add support for finding elements by id, css, xpath, ...
+ - send_keys_ok() add the keys sent to default description
+
 0.10 2017-08-10T13:17:23+0200
  - Add screenshots() attribute
 

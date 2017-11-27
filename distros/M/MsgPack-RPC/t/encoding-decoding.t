@@ -27,18 +27,21 @@ subtest simple_encoding => sub {
         'mix' => [0, 4, "vim_eval", ["call rpcrequest( nvimx_channel, \"foo\", \"dummy\" )"]],
         'some string' => 'call rpcrequest( nvimx_channel, "foo", "dummy" )',
         'int8' => -128,
-        float32 => 1/3,
+        float64 => 1/3,
     );
 
     plan tests => scalar keys %structs;
 
-    while ( my( $name, $struct ) = each %structs ) {
-        $decoder->read( MsgPack::Encoder->new(  struct => $struct )->encoded );
-        if ( $name eq 'float32' ) {
-            is_approx( $decoder->next, $struct, $name );
-        }
-        else {
-            cmp_deeply $decoder->next => $struct, $name;
+    for ( sort keys %structs ) {
+        my( $name, $struct ) = ( $_, $structs{$_} );
+        subtest $name => sub {
+            $decoder->read( MsgPack::Encoder->new(  struct => $struct )->encoded );
+            if ( $name eq 'float32' ) {
+                is_approx( $decoder->next, $struct, $name );
+            }
+            else {
+                cmp_deeply $decoder->next => $struct, $name;
+            }
         }
     }
 };
@@ -281,7 +284,8 @@ subtest 'fixext' => sub {
         my $func = "msgpack_fixext$i";
         subtest $func => sub {
             my $payload = 'x' x $i;
-            is $decoder->read_next(eval "$func( 3 => '$payload' )")->data => $payload;
+            my $data = eval "$func( 3 => '$payload' )";
+            is $decoder->read_next($data)->data => $payload;
         };
     }
 };
@@ -291,7 +295,7 @@ subtest 'ext' => sub {
         my $func = "msgpack_ext$i";
         subtest $func => sub {
             my $payload = 'x' x $i;
-            is $decoder->read_next(eval "$func( 3 => '$payload' )")->data => $payload;
+            is eval { $decoder->read_next(eval "$func( 3 => '$payload' )")->data } => $payload;
         };
     }
 };

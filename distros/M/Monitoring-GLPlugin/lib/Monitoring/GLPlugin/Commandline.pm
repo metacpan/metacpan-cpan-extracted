@@ -399,7 +399,8 @@ sub nagios_exit {
     # negate again: --negate "UNKNOWN - no peers"=ok
     my $original_code = $code;
     foreach my $from (keys %{$self->opts->negate}) {
-      if ((uc $self->opts->negate->{$from}) =~ /^(OK|WARNING|CRITICAL|UNKNOWN)$/) {
+      if ((uc $from) !~ /^(OK|WARNING|CRITICAL|UNKNOWN)$/ &&
+          (uc $self->opts->negate->{$from}) =~ /^(OK|WARNING|CRITICAL|UNKNOWN)$/) {
         if ($output =~ /$from/) {
           $code = $ERRORS{uc $self->opts->negate->{$from}};
           $output =~ s/^.*? -/$STATUS_TEXT{$code} -/;

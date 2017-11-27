@@ -1,0 +1,83 @@
+{
+   "abstract" : "Search for bad strings in source files",
+   "author" : [
+      "Joelle Maslak <jmaslak@antelope.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Perl-Critic-Policy-BadStrings",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Kwalitee" : "1.21",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "English" : "0",
+            "Exporter" : "0",
+            "Import::Into" : "0",
+            "Perl::Critic::Policy" : "0",
+            "Perl::Critic::Utils" : "0",
+            "Readonly" : "0",
+            "Smart::Comments" : "0",
+            "base" : "0",
+            "feature" : "0",
+            "perl" : "v5.22.0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Perl6::Slurp" : "0",
+            "Perl::Critic" : "1.130",
+            "Perl::Critic::Exception::Fatal::Internal" : "0",
+            "Perl::Critic::PolicyFactory" : "0",
+            "Test2::Bundle::Extended" : "0.000058"
+         }
+      }
+   },
+   "provides" : {
+      "File::FindStrings" : {
+         "file" : "lib/File/FindStrings.pm",
+         "version" : "1.000"
+      },
+      "File::FindStrings::Boilerplate" : {
+         "file" : "lib/File/FindStrings/Boilerplate.pm",
+         "version" : "1.000"
+      },
+      "Perl::Critic::Policy::BadStrings" : {
+         "file" : "lib/Perl/Critic/Policy/BadStrings.pm",
+         "version" : "1.000"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jmaslak/Perl-Critic-Policy-BadStrings/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/jmaslak/Perl-Critic-Policy-BadStrings.git",
+         "web" : "https://github.com/jmaslak/Perl-Critic-Policy-BadStrings"
+      }
+   },
+   "version" : "1.000",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+}
+

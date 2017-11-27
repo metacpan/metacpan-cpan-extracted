@@ -6,8 +6,8 @@ use Module::Build;
 my $build = Module::Build->new(
    module_name => 'Devel::MAT',
    requires => {
-      'Cwd' => 0,
       'File::ShareDir' => 0,
+      'File::Spec' => 0,
       'List::Util' => '1.44', # uniq
       'List::UtilsBy' => 0,   # sort_by
       'Module::Pluggable' => 0,
@@ -27,7 +27,6 @@ my $build = Module::Build->new(
       module => { "Devel::MAT::UI" => "share" },
    },
    license => 'perl',
-   create_makefile_pl => 'small',
    create_license => 1,
    create_readme  => 1,
 );

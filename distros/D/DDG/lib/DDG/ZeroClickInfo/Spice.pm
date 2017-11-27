@@ -1,7 +1,7 @@
 package DDG::ZeroClickInfo::Spice;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: DuckDuckGo server side used ZeroClickInfo Spice result class
-$DDG::ZeroClickInfo::Spice::VERSION = '1017';
+$DDG::ZeroClickInfo::Spice::VERSION = '1018';
 use Moo;
 with 'DDG::IsControllable';
 
@@ -36,7 +36,7 @@ DDG::ZeroClickInfo::Spice - DuckDuckGo server side used ZeroClickInfo Spice resu
 
 =head1 VERSION
 
-version 1017
+version 1018
 
 =head1 SYNOPSIS
 

@@ -1,3 +1,8 @@
+0.621   2017-11-24 (PERLANCAR)
+
+	- Add -M as shortcut for --skip-mtime-check.
+
+
 0.620   2017-10-19 (PERLANCAR)
 
 	- When syncing file/nongit-dir under dry-run, run rsync with

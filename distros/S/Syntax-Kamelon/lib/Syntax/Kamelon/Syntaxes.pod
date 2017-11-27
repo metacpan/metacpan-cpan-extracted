@@ -1,0 +1,348 @@
+=head1 NAME
+
+Syntax::Kamelon::Syntaxes - List of available syntaxes
+
+=head1 LIST
+
+This is a list of all included syntax definition files in this release 0.16 of B<Syntax::Kamelon>.
+Please note that the names may contain spaces.
+
+=over 4
+
+=item B<3D>
+
+ --NAME--                                --VERSION--
+ G-Code                                  4
+ GLSL                                    3
+ PLY                                     2
+ POV-Ray                                 3
+ RenderMan RIB                           3
+ STL                                     2
+ VRML                                    4
+ Wavefront OBJ                           2
+
+=item B<Assembler>
+
+ --NAME--                                --VERSION--
+ AVR Assembler                           3
+ Asm6502                                 2
+ GNU Assembler                           3
+ Intel x86 (FASM)                        1
+ Intel x86 (NASM)                        3
+ MIPS Assembler                          2
+ Motorola 68k (VASM/Devpac)              2
+ Motorola DSP56k                         2
+ PicAsm                                  2
+
+=item B<Configuration>
+
+ --NAME--                                --VERSION--
+ .desktop                                2
+ Apache Configuration                    3
+ Asterisk                                2
+ Cisco                                   2
+ Git Ignore                              1
+ Gitolite                                1
+ INI Files                               2
+ Kconfig                                 5
+ Nagios                                  2
+ TOML                                    3
+ Varnish 4 Configuration Language        1
+ Varnish 4 Test Case language            1
+ Varnish Configuration Language          1
+ Varnish Test Case language              1
+ WINE Config                             3
+ fstab                                   2
+ kdesrc-buildrc                          1
+ mergetag text                           2
+ x.org Configuration                     2
+
+=item B<Database>
+
+ --NAME--                                --VERSION--
+ 4GL                                     2
+ 4GL-PER                                 2
+ LDIF                                    2
+ SQL                                     2
+ SQL (MySQL)                             2
+ SQL (Oracle)                            2
+ SQL (PostgreSQL)                        2
+ progress                                2
+
+=item B<Hardware>
+
+ --NAME--                                --VERSION--
+ AHDL                                    2
+ Spice                                   2
+ SystemC                                 2
+ SystemVerilog                           3
+ VHDL                                    2
+ Vera                                    3
+ Verilog                                 2
+
+=item B<Markup>
+
+ --NAME--                                --VERSION--
+ ASN.1                                   2
+ ASP                                     2
+ BibTeX                                  2
+ CSS                                     4
+ CartoCSS                                1
+ CleanCSS                                2
+ ColdFusion                              2
+ ConTeXt                                 2
+ DTD                                     2
+ Django HTML Template                    3
+ Doxygen                                 3
+ DoxygenLua                              3
+ FTL                                     2
+ GNU Gettext                             4
+ GlossTex                                1
+ HTML                                    5
+ Haml                                    2
+ Hamlet                                  2
+ JSON                                    2
+ JSP                                     2
+ Javadoc                                 2
+ Jira                                    3
+ LESSCSS                                 2
+ LaTeX                                   4
+ MAB-DB                                  2
+ Mako                                    3
+ Markdown                                2
+ MediaWiki                               3
+ Metapost/Metafont                       1
+ Pango                                   2
+ PostScript                              2
+ PostScript Printer Description          2
+ R Markdown                              2
+ RELAX NG                                1
+ RelaxNG-Compact                         1
+ Restructured Text                       1.0
+ Rich Text Format                        2
+ Roff                                    2
+ Ruby/Rails/RHTML                        5
+ SCSS                                    4
+ SGML                                    2
+ SiSU                                    2
+ TT2                                     1
+ Texinfo                                 1
+ Textile                                 2
+ Troff Mandoc                            1
+ Wesnoth Markup Language                 1
+ XML                                     5
+ XML (Debug)                             2
+ XUL                                     2
+ YAML                                    3
+ reStructuredText                        2
+ txt2tags                                2
+ vCard, vCalendar, iCalendar             2
+ xslt                                    2
+
+=item B<Other>
+
+ --NAME--                                --VERSION--
+ ABC                                     3
+ Alerts                                  3
+ Alerts_indent                           3
+ CMake                                   4
+ CSS/PHP                                 4
+ CUE Sheet                               1
+ ChangeLog                               2
+ Debian Changelog                        3
+ Debian Control                          1
+ Diff                                    2
+ Dockerfile                              5
+ Email                                   2
+ GDB Backtrace                           2
+ Git Rebase                              2
+ Hunspell Affix File                     1
+ Hunspell Dictionary File                1
+ Hunspell Thesaurus File                 1
+ Hunspell Thesaurus Index File           1
+ Jam                                     2
+ JavaScript/PHP                          2
+ LilyPond                                4
+ M3U                                     2
+ Makefile                                5
+ Meson                                   2
+ Modelines                               3
+ Music Publisher                         2
+ PGN                                     4
+ QMake                                   3
+ RPM Spec                                4
+ Valgrind Suppression                    2
+
+=item B<Scientific>
+
+ --NAME--                                --VERSION--
+ Ansys                                   2
+ B-Method                                1
+ FASTQ                                   2
+ GAP                                     1
+ GDL                                     2
+ Gnuplot                                 2
+ Magma                                   2
+ Mathematica                             9
+ Matlab                                  2
+ Maxima                                  3
+ Octave                                  2
+ R Script                                6
+ Replicode                               3
+ Stata                                   4
+ TI Basic                                2
+ dot                                     2
+ scilab                                  2
+ yacas                                   2
+
+=item B<Scripts>
+
+ --NAME--                                --VERSION--
+ 4DOS BatchToMemory                      2
+ AMPLE                                   2
+ AWK                                     1
+ AutoHotKey                              2
+ Bash                                    3
+ Chicken                                 3
+ CoffeeScript                            2
+ CubeScript                              1
+ Erlang                                  3
+ Euphoria                                4
+ GNU Linker Script                       2
+ J                                       2
+ JavaScript                              2
+ LSL                                     3
+ Lua                                     2
+ MEL                                     3
+ MS-DOS Batch                            1
+ Mason                                   2
+ NSIS                                    2
+ PHP (HTML)                              5
+ PHP/PHP                                 2
+ Perl                                    3
+ Pig                                     5
+ Pike                                    2
+ Praat                                   2
+ Puppet                                  4
+ Python                                  4
+ QML                                     3
+ Quake Script                            2
+ REXX                                    2
+ Ruby                                    3
+ Scheme                                  3
+ Sieve                                   4
+ TaskJuggler                             3
+ Tcl/Tk                                  3
+ Tcsh                                    1
+ UnrealScript                            1
+ Velocity                                2
+ Xonotic Script                          1
+ Zsh                                     1
+ ferite                                  2
+ k                                       3
+ q                                       3
+ sed                                     2
+
+=item B<Sources>
+
+ --NAME--                                --VERSION--
+ ABAP                                    2
+ ANS-Forth94                             3
+ ANSI C89                                3
+ ActionScript 2.0                        2
+ Ada                                     2
+ Agda                                    2
+ Bitbake                                 2
+ Boo                                     2
+ C                                       2
+ C#                                      2
+ C++                                     4
+ C++/Qt4                                 1.2
+ CGiS                                    2
+ Cg                                      2
+ Clipper                                 2
+ Clojure                                 6
+ Common Lisp                             3
+ Component-Pascal                        2
+ Crack                                   2
+ Curry                                   1
+ D                                       2
+ E Language                              2
+ Eiffel                                  2
+ Elixir                                  2
+ FSharp                                  2
+ Fortran                                 2
+ FreeBASIC                               1
+ GCCExtensions                           1
+ GNU M4                                  2
+ Go                                      3
+ Groovy                                  2
+ Haskell                                 5
+ Haxe                                    1
+ IDL                                     2
+ ILERPG                                  3
+ ISO C++                                 6
+ Inform                                  2
+ Java                                    2
+ Julia                                   1
+ KBasic                                  2
+ KDev-PG[-Qt                             1
+ Kotlin                                  2
+ LPC                                     1
+ Lex/Flex                                2
+ Literate Curry                          1
+ Literate Haskell                        3
+ Logtalk                                 2
+ Modelica                                6
+ Modula-2                                2
+ MonoBasic                               2
+ Nemerle                                 1
+ OORS                                    2
+ OPAL                                    2
+ Objective Caml                          4
+ Objective Caml Ocamllex                 3
+ Objective Caml Ocamlyacc                3
+ Objective-C                             2
+ Objective-C++                           2
+ OpenCL                                  2
+ PL/I                                    2
+ Pascal                                  2
+ Prolog                                  3
+ Protobuf                                3
+ PureBasic                               6
+ RSI IDL                                 2
+ RapidQ                                  2
+ Rust                                    4
+ SML                                     2
+ Sather                                  2
+ Scala                                   3
+ TADS 3                                  3
+ Vala                                    3
+ Varnish 3 module spec file              1
+ Varnish 4 module spec file              1
+ Yacc/Bison                              3
+ Zonnon                                  2
+ nesC                                    2
+ noweb                                   2
+ xHarbour                                2
+
+=back
+
+=head1 AUTHOR AND COPYRIGHT
+
+This module is written and maintained by:
+
+Hans Jeuken < hansjeuken at xs4all dot nl>
+
+Copyright (c) 2017 by Hans Jeuken, all rights reserved.
+
+Published under the GPLV3 license
+
+=head1 SEE ALSO
+
+B<Syntax::Kamelon>, B<Syntax::Kamelon::Builder>, B<Syntax::Kamelon::Debugger>, B<Syntax::Kamelon::Diagnostics>,
+B<Syntax::Kamelon::XMLData>, B<Syntax::Kamelon::Format::Base>, B<Syntax::Kamelon::Format::ANSI>, 
+B<Syntax::Kamelon::Format:HTML4>
+
+=cut
+

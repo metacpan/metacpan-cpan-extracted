@@ -4,7 +4,7 @@ Bio::SeqHash - get one or more sequences from a FASTA file quickly.
 
 # VERSION
 
-version 0.1.3
+version 0.1.4
 
 # SYNOPSIS
 

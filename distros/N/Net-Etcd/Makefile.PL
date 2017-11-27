@@ -27,7 +27,7 @@ WriteMakefile(
         'URI'                   => 0,
         'HTTP::Tiny'            => 0,
         'Types::Standard'       => 0,
-        'AnyEvent'              => 0,
+        'AnyEvent'              => '7.14',
         'AnyEvent::HTTP'        => 0,
         'JSON'                  => 0,
         'Math::Int64'           => 0,

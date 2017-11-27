@@ -15,7 +15,6 @@ WriteMakefile(
     PL_FILES             => {},
     PREREQ_PM => {
         'Carp'           => 0,
-        'CGI'            => 0,
         'Data::Dumper'   => 0,
         'Digest::MD5'    => 0,
         'Digest::SHA'    => 0,

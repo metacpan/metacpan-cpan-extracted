@@ -1,6 +1,12 @@
 Also see Moose::Manual::Delta for more details of, and workarounds
 for, noteworthy changes.
 
+2.2008   2017-11-21
+
+  [BUG FIXES]
+
+  - fixed empty exception messages under -d (new issue in 2.2007)
+
 2.2007   2017-11-12
 
   [DOCUMENTATION]
@@ -99,7 +105,7 @@ for, noteworthy changes.
     same name, this now generates a warning.
 
   - The warning when attribute methods overwrite one another is now much more
-    informative. It includes the type of accessors involve (reader, writer,
+    informative. It includes the type of accessors involved (reader, writer,
     predicate, etc.) as well as the file and line where each accessor was
     defined. Fixes RT #118325.
 

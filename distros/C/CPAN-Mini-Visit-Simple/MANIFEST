@@ -11,7 +11,7 @@ lib/CPAN/Mini/Visit/Simple.pod
 lib/CPAN/Mini/Visit/Simple/Auxiliary.pm
 LICENSE
 Makefile.PL
-MANIFEST
+MANIFEST			This list of files
 MANIFEST.SKIP
 README
 t/001_new.t
@@ -23,6 +23,7 @@ t/006_refresh_list.t
 t/007_get_lookup_table.t
 t/008_visit.t
 t/data/mydistro.tar.gz
+t/data/Non-Visit-0.01.tar.gz
 Todo
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

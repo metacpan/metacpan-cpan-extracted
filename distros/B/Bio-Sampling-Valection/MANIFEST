@@ -1,0 +1,9 @@
+Build.PL
+ChangeLog
+lib/Bio/Sampling/Valection.pm
+MANIFEST			This list of files
+MYMETA.json
+MYMETA.yml
+README
+META.yml
+META.json

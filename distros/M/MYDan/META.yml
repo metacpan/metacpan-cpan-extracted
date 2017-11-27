@@ -1,0 +1,58 @@
+---
+abstract: 'A suite of cluster administration tools and platforms'
+author:
+  - 'Li Jinfeng <lijinfeng2011@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: MYDan
+no_index:
+  directory:
+    - t
+    - inc
+    - xt
+requires:
+  AnyEvent: '0'
+  AnyEvent::Handle: '0'
+  AnyEvent::Impl::Perl: '0'
+  AnyEvent::Socket: '0'
+  Authen::OATH: '0'
+  Compress::Zlib: '0'
+  Convert::Base32: '0'
+  Crypt::PK::RSA: '0'
+  DBD::SQLite: '1.37'
+  DBI: '1.625'
+  Data::UUID: '0'
+  Data::Validate::IP: '0'
+  DateTime: '1.03'
+  Expect: '1.21'
+  File::Temp: '0'
+  Getopt::Long: '2.38'
+  IO::Poll: '0'
+  IO::Pty: '1.12'
+  IO::Socket::Multicast: '1.12'
+  IO::Stty: '0'
+  JSON: '2.9'
+  LWP::UserAgent: '0'
+  Net::IP::Match::Regexp: '0'
+  Term::ANSIColor: '3'
+  Term::Completion: '0'
+  Term::ReadKey: '0'
+  Term::Size: '0'
+  Thread::Queue: '2.12'
+  Time::HiRes: '0'
+  Time::TAI64: '0'
+  YAML::XS: '0.65'
+  threads: '1.8'
+resources:
+  bugtracker: https://github.com/mydan/mayi/issues
+  homepage: https://github.com/mydan/mayi
+  repository: https://github.com/mydan/mayi.git
+version: v0.1.17

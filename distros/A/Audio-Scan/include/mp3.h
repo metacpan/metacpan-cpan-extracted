@@ -56,9 +56,9 @@ typedef struct mp3frame {
   bool copyrighted;
   bool original;
   int emphasis;
-  
+
   bool valid;
-  
+
   int samplerate;
   int channels;
   int bitrate_kbps;
@@ -70,7 +70,7 @@ typedef struct mp3frame {
 // based on pcutmp3 XingInfoLameTagFrame
 typedef struct xingframe {
   int frame_size;
-  
+
   bool xing_tag;
   bool info_tag;
   int flags;
@@ -79,7 +79,7 @@ typedef struct xingframe {
   bool has_toc;
   uint8_t xing_toc[100];
   int xing_quality;
-  
+
   bool lame_tag;
   char lame_encoder_version[9];
   uint8_t lame_tag_revision;
@@ -98,13 +98,13 @@ typedef struct xingframe {
   uint8_t lame_surround;
   uint16_t lame_preset;
   int lame_music_length;
-  
+
   bool vbri_tag;
   uint16_t vbri_delay;
   uint16_t vbri_quality;
   uint32_t vbri_bytes;
   uint32_t vbri_frames;
-  
+
   int lame_tag_ofs;
 } xingframe;
 
@@ -113,18 +113,18 @@ typedef struct mp3info {
   char *file;
   Buffer *buf;
   HV *info;
-  
+
   off_t file_size;
   uint32_t id3_size;
   off_t audio_offset;
   off_t audio_size;
   uint16_t bitrate;
   uint32_t song_length_ms;
-  
+
   uint8_t vbr;
   int music_frame_count;
   int samples_per_frame;
-  
+
   mp3frame *first_frame;
   xingframe *xing_frame;
 } mp3info;
@@ -210,7 +210,7 @@ static int bitrate_map[4][4][16] = {
     { 0, 8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160, 0 },
     { 0, 8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160, 0 },
     { 0, 32, 48, 56, 64, 80, 96, 112, 128, 144, 160, 176, 192, 224, 256, 0 }
-  }, 
+  },
   { { 0 }, // MPEG1
     { 0, 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 0 },
     { 0, 32, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 384, 0 },

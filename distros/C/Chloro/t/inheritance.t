@@ -1,3 +1,4 @@
+## no critic (Modules::ProhibitMultiplePackages)
 use strict;
 use warnings;
 
@@ -9,6 +10,8 @@ use Chloro::Types qw( Int Str );
     package Parent1;
 
     use Moose;
+    use namespace::autoclean;
+
     use Chloro;
 
     use Chloro::Types qw( Str );
@@ -16,12 +19,16 @@ use Chloro::Types qw( Int Str );
     field parent => (
         isa => Str,
     );
+
+    __PACKAGE__->meta()->make_immutable;
 }
 
 {
     package Child1;
 
     use Moose;
+    use namespace::autoclean;
+
     use Chloro;
 
     use Chloro::Types qw( Str );
@@ -31,6 +38,8 @@ use Chloro::Types qw( Int Str );
     field child => (
         isa => Str,
     );
+
+    __PACKAGE__->meta()->make_immutable;
 }
 
 {
@@ -59,6 +68,8 @@ use Chloro::Types qw( Int Str );
     package Child2;
 
     use Moose;
+    use namespace::autoclean;
+
     use Chloro;
 
     use Chloro::Types qw( Int Str );
@@ -73,6 +84,8 @@ use Chloro::Types qw( Int Str );
     field child => (
         isa => Str,
     );
+
+    __PACKAGE__->meta()->make_immutable;
 }
 
 {
@@ -101,14 +114,19 @@ use Chloro::Types qw( Int Str );
     package NotChloro;
 
     use Moose;
+    use namespace::autoclean;
 
     sub foo { }
+
+    __PACKAGE__->meta()->make_immutable;
 }
 
 {
     package Child3;
 
     use Moose;
+    use namespace::autoclean;
+
     use Chloro;
 
     use Chloro::Types qw( Str );
@@ -118,6 +136,8 @@ use Chloro::Types qw( Int Str );
     field child => (
         isa => Str,
     );
+
+    __PACKAGE__->meta()->make_immutable;
 }
 
 {
@@ -146,6 +166,8 @@ use Chloro::Types qw( Int Str );
     package Parent4;
 
     use Moose;
+    use namespace::autoclean;
+
     use Chloro;
 
     use Chloro::Types qw( Str );
@@ -158,12 +180,16 @@ use Chloro::Types qw( Int Str );
             )
         )
     );
+
+    __PACKAGE__->meta()->make_immutable;
 }
 
 {
     package Child4;
 
     use Moose;
+    use namespace::autoclean;
+
     use Chloro;
 
     use Chloro::Types qw( Str );
@@ -178,6 +204,8 @@ use Chloro::Types qw( Int Str );
             )
         )
     );
+
+    __PACKAGE__->meta()->make_immutable;
 }
 
 {
@@ -189,7 +217,7 @@ use Chloro::Types qw( Int Str );
         \%groups, {
             parent => {
                 repetition_key => 'parent_id',
-                fields           => {
+                fields         => {
                     name => {
                         type     => Str,
                         required => 0,
@@ -199,7 +227,7 @@ use Chloro::Types qw( Int Str );
             },
             child => {
                 repetition_key => 'child_id',
-                fields           => {
+                fields         => {
                     name => {
                         type     => Str,
                         required => 0,

@@ -1,5 +1,11 @@
 Revision history for Perl extension Udev-FFI
 
+0.099001 2017-11-23T21:17:15Z
+    -fix typo in test
+
+0.099000 2017-11-22T21:58:27Z
+    - add old libudev support
+
 0.098005 2017-10-06T11:57:04Z
     - update configure in cpanfile
 

@@ -1,7 +1,7 @@
 package DDG::Meta;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Main meta layer implementation factory... dark side of the moon...
-$DDG::Meta::VERSION = '1017';
+$DDG::Meta::VERSION = '1018';
 use strict;
 use warnings;
 use Carp;
@@ -93,7 +93,7 @@ DDG::Meta - Main meta layer implementation factory... dark side of the moon...
 
 =head1 VERSION
 
-version 1017
+version 1018
 
 =head1 SYNOPSIS
 

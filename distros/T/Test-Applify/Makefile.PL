@@ -15,13 +15,15 @@ WriteMakefile(
     },
   },
   BUILD_REQUIRES => {
-  'Test::More' => '0.90'
+  'Test::More' => '0.90',
+  'Test::Synopsis' => '0.15'
 }
 ,
   PREREQ_PM => {
-  'Applify' => '0.12'
+  'Applify' => '0.12',
+  'IO::String' => '1.08'
 }
 ,
   test => {TESTS => (-e 'META.yml' ? 't/*.t' : 't/*.t xt/*.t')},
-  dist => { ($^O eq 'darwin' ? (TAR => 'gnutar') : ())}
+  dist => { ($^O eq 'darwin' ? (TAR => 'gnutar') : ())},
 );

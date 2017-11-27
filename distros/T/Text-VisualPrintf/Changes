@@ -1,5 +1,22 @@
 Revision history for Perl extension Text-VisualPrintf
 
+2.03 2017-11-22T16:25:24Z
+
+    Now Text::VisualWidth::PP supports unicode combined text.
+
+    - Add dependency to Text::VisualWidth::PP 0.05.
+    - Update algorithm more simpler.
+
+2.02 2017-11-21T15:58:31Z
+
+    - use open ':std', ':encoding(utf8)';
+    - new t/04_combined.t
+    - Fix incorrect dependency for Text::VisualWidth::PP.  Closes issue #1.
+    - Add special test case.
+    - Remove unnecessary, or even incorrect prototype.
+    - Delete README.ja.pod.
+    - This was unintended code, but works fine. (25->24)
+
 2.01 2017-11-19T10:15:56Z
 
     - Moved from MBPrintf

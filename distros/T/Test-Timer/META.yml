@@ -27,10 +27,10 @@ name: Test-Timer
 provides:
   Test::Timer:
     file: lib/Test/Timer.pm
-    version: '2.08'
+    version: '2.09'
   Test::Timer::TimeoutException:
     file: lib/Test/Timer/TimeoutException.pm
-    version: '2.08'
+    version: '2.09'
 requires:
   Benchmark: '0'
   Carp: '0'
@@ -43,5 +43,5 @@ resources:
   bugtracker: https://github.com/jonasbn/perl-test-timer/issues
   homepage: https://jonasbn.github.io/perl-test-timer/
   repository: https://github.com/jonasbn/perl-test-timer.git
-version: '2.08'
+version: '2.09'
 x_serialization_backend: 'YAML::Tiny version 1.70'

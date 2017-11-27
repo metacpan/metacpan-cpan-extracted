@@ -1,6 +1,8 @@
 package Chloro::Test::User;
 
 use Moose;
+use namespace::autoclean;
+
 use Chloro;
 
 use Chloro::ErrorMessage;
@@ -27,6 +29,7 @@ field password2 => (
     secure => 1,
 );
 
+## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
 sub _validate_form {
     my $self   = shift;
     my $params = shift;
@@ -41,9 +44,10 @@ sub _validate_passwords {
 
     return
         if all { !( defined && length ) }
-        @{$params}{ 'password', 'password2' };
+    @{$params}{ 'password', 'password2' };
 
     {
+        ## no critic (TestingAndDebugging::ProhibitNoWarnings)
         no warnings 'uninitialized';
         return if $params->{password} eq $params->{password2};
     }
@@ -62,6 +66,7 @@ sub _validate_username {
         text     => 'Special is no good.'
     );
 }
+## use critic
 
 __PACKAGE__->meta()->make_immutable;
 

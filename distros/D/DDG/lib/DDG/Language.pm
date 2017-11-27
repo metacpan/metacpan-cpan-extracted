@@ -1,7 +1,7 @@
 package DDG::Language;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: A language, can be empty [TODO]
-$DDG::Language::VERSION = '1017';
+$DDG::Language::VERSION = '1018';
 use Moo;
 
 my @language_attributes = qw(
@@ -48,7 +48,7 @@ DDG::Language - A language, can be empty [TODO]
 
 =head1 VERSION
 
-version 1017
+version 1018
 
 =head1 AUTHOR
 

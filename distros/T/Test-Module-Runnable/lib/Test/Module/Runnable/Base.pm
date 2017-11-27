@@ -67,13 +67,15 @@ L<Test::More>.
 =cut
 
 package Test::Module::Runnable::Base;
-
 use Moose;
-use Test::More 0.96;
+
+use Data::Dumper;
 use POSIX qw/EXIT_SUCCESS/;
+use Test::MockModule;
+use Test::More 0.96;
 
 BEGIN {
-	our $VERSION = '0.2.3';
+	our $VERSION = '0.3.0';
 }
 
 =head1 ATTRIBUTES
@@ -364,6 +366,248 @@ sub debug {
 	return unless ($ENV{'TEST_VERBOSE'});
 	diag(sprintf($format, @params));
 	return;
+}
+
+=item C<mock($class, $method, $return)>
+
+This mocks the given method on the specified class, with the specified
+return value, described below.  Additionally, stores internally a log of all
+method calls, and their arguments.  Note that the first argument is not
+saved, i.e. the object on which the method was called, as this is rarely useful
+in a unit test comparison.
+
+The return value, C<$return>, may be specified in one of two ways:
+
+=over
+
+=item A C<CODE> reference
+
+In which case the code reference is simply called
+each time, with all arguments as passed to the mocked function, and the
+return value passed as-is to the caller.  Note that care is taken that
+if the mocked method is called in array context, the code reference is
+called in array context, and likewise for scalar context.
+
+=item An C<ARRAY> reference
+
+In which case, a value is shifted from the front
+of the array.  If the value removed is itself a C<CODE> ref the code
+reference is called, and its return value returned, as described above,
+otherwise the value is returned as-is.
+
+Note that you cannot return a list by adding it to an array, so if you need to
+use the array form, and also return a list, you will need to add a C<CODE> reference into the array:
+
+   $self->mock($class, $method, [
+     1,                       # first call returns scalar '1'
+     [2,3,4],                 # second call returns array reference
+     sub { return (5,6,7) },  # third call returns a list
+  ]);
+
+=back
+
+If no value is specified, or if the specified array is exhaused, then either
+C<undef> or an empty array is returned, depending on context.
+
+Calls including arguments and return values are passed to the C<debug()>
+method.
+
+=cut
+
+sub mock {
+	my ($self, $class, $method, $return) = @_;
+
+	unless ($class->can($method) || $class->can('AUTOLOAD')) {
+		BAIL_OUT("Cannot mock $class->$method because it doesn't exist and $class has no AUTOLOAD")
+	}
+
+	die('$return must be CODE or ARRAY ref') if defined($return) && ref($return) ne 'CODE' && ref($return) ne 'ARRAY';
+
+	unless ($self->{mock_module}->{$class}) {
+		$self->{mock_module}->{$class} = Test::MockModule->new($class);
+	}
+
+	$self->{mock_module}->{$class}->mock($method, sub {
+		my @ret;
+		my @args = @_;
+
+		push @{$self->{mock_args}->{$class}->{$method}}, [@args];
+
+		if ($return) {
+			my ($val, $empty);
+			if (ref($return) eq 'ARRAY') {
+				# $return is an array ref, so shift the next value
+				if (@$return) {
+					$val = shift @$return;
+				} else {
+					$empty = 1;
+				}
+			} else {
+				# here $return must be a CODE ref, so just set $val
+				# and carry on.
+				$val = $return;
+			}
+
+			if (ref($val) eq 'CODE') {
+				if (wantarray) {
+					@ret = $val->(@_);
+				} else {
+					$ret[0] = scalar $val->(@_);
+				}
+			} else {
+				# just return this value, unless we're in the case
+				# where we exhausted the array, in which case we
+				# don't set this - it would make us return (undef)
+				# rather than empty list in list context.
+				$ret[0] = $val unless $empty;
+			}
+		}
+
+		# TODO: When running the CODE ref above, we should catch any fatal error,
+		# log them here, and then re-throw the error.
+		shift @args;
+		$self->debug(sprintf('%s::%s(%s) returning (%s)',
+				$class, $method, _mockdump(\@args), _mockdump(\@ret)));
+		return (wantarray ? @ret : $ret[0]);
+	});
+
+	return;
+}
+
+=item unmock([class], [$method])
+
+Clears all mock objects.
+
+If no arguments are specified clearMocks is called.
+
+Is a class is specified, only that class is cleared.
+
+If a method is specified too, only that method of that mocked class is cleared
+(not methods by the same name under other classes).
+
+It is not legal to unmock a method in many or unspecified classes,
+doing so will invoke C<die()>.
+
+The reference to the the tester is returned.
+
+=cut
+
+sub unmock {
+	my ($self, $class, $method) = @_;
+
+	if (!$class) {
+		die('It is not legal to unmock a method in many or unspecified classes') if ($method);
+		$self->clearMocks;
+	} elsif (!$method) {
+		delete($self->{mock_module}->{$class});
+		delete($self->{mock_args}->{$class});
+	} else {
+		if ($self->{mock_module}->{$class}) {
+			$self->{mock_module}->{$class}->unmock($method);
+		}
+		delete($self->{mock_args}->{$class}->{$method});
+	}
+
+	return $self;
+}
+
+=item C<_mockdump>
+
+Helper method for dumping arguments and return values from C<mock> function.
+
+=cut
+
+sub _mockdump {
+	my $arg = shift;
+	my $dumper = Data::Dumper->new([$arg], ['arg']);
+	$dumper->Indent(1);
+	$dumper->Maxdepth(1);
+	my $str = $dumper->Dump();
+	$str =~ s/\n\s*/ /g;
+	$str =~ s/^\$arg = \[\s*//;
+	$str =~ s/\s*\];\s*$//s;
+	return $str;
+}
+
+=item C<mockCalls($class, $method)>
+
+Return a reference to an array of the calls made to the specified mocked function.  Each entry in the arrayref
+is an arrayref of the arguments to that call, B<excluding> the object reference itself (i.e. C<$self>).
+
+=cut
+
+sub mockCalls {
+	my ($self, $class, $method) = @_;
+	return $self->__mockCalls($class, $method);
+}
+
+=item C<mockCallsWithObject($class, $method)>
+
+Return a reference to an array of the calls made to the specified mocked function.  Each entry in the arrayref
+is an arrayref of the arguments to that call, B<including> the object reference itself (i.e. C<$self>).
+
+This method is strongly encouraged in preference to L</mockCalls($class,
+$method)> if your test constructs multiple instances of the same class,
+so that you know that the right method calls were actually made on the
+right object.
+
+Normal usage:
+
+  cmp_deeply($self->mockCallsWithObject($class, $method), [
+    [ shallow($instance1), $arg1, $arg2 ],
+    [ shallow($instance2), $otherArg1, $otherArg2 ],
+    ...
+  ], 'correct method calls');
+
+=cut
+
+sub mockCallsWithObject {
+	my ($self, $class, $method) = @_;
+	return $self->__mockCalls($class, $method, withObject => 1);
+}
+
+=item C<clearMocks>
+
+Forcibly clear all mock objects, if required e.g. in C<tearDown>.
+
+=cut
+
+sub clearMocks {
+	my ($self) = @_;
+
+	$self->{mock_module} = {};
+	$self->{mock_args} = {};
+	return;
+}
+
+=item C<__mockCalls>
+
+Helper method used by L</mockCalls($class, $method)> and L</mockCallsWithObject($class, $method)>.
+
+=cut
+
+sub __mockCalls {
+	my ($self, $class, $method, %args) = @_;
+
+	my $calls = $self->{mock_args}->{$class}->{$method} || [];
+	unless ($args{withObject}) {
+		# This ugly code takes $calls, which is a an arrayref
+		# of arrayrefs, and maps it into a new arrayref, where
+		# each inner arrayref is a copy of the original, with the
+		# first element removed (i.e. the object reference).
+		#
+		# i.e. given $calls = [
+		#    [ $obj, $arg1, $arg2 ],
+		#    [ $obj, $arg3, $arg4 ],
+		# ]
+		# this will set $calls = [
+		#    [ $arg1, $arg2 ],
+		#    [ $arg3, $arg4 ],
+		# ]
+		$calls = [ map { [ @{$_}[1..$#$_] ] } @$calls ];
+	}
+
+	return $calls;
 }
 
 =back

@@ -3,12 +3,15 @@ package Config::Simple::Conf;
 # Licensed under the terms of perl itself.
 
 use strict;
+use Exporter;
+use base 'Exporter';
 
-our $VERSION = "2.002";
-
+our $VERSION = "2.003";
+our @EXPORT = qw(@ARGV_ORIG);
+our @ARGV_ORIG;
 
 # Revision - cvs automagically updated
-our $REVISION = '$Id: Conf.pm,v 1.14 2016/05/25 17:13:54 cfaber Exp $';
+our $REVISION = '$Id: Conf.pm,v 1.16 2017/11/26 08:04:28 cfaber Exp $';
 
 # Ruckus Global Version Number
 
@@ -63,6 +66,33 @@ With the resulting output looking something like:
 		/root/to/my/stuff/abc
 		/root/to/my/stuff/xyz
 
+=head1 SYNOPSIS
+
+use Config::Simple::Conf;
+
+my $conf = Config::Simple::Conf->new('/etc/Something/Example.conf');
+
+print $conf->value('global', 'example_key');
+
+=head1 HANDLING COMMAND LINE ARGUMENTS
+
+Command line arguments are processed automatically when detected within the B<@ARGV> list. The values of these arguments are represented in the special B<argv> section. Command line arguments can be in either a single or double (B<->) hash value such as B<--key> or B<-k>
+
+A value can be assigned to each argument as well by either placing the value after the B<--key value> or by using an (B<=>) equals sign B<--key=value>. Multiple duplicate keys can be used to generate a list.
+
+Values may also be macros, so a value could be sourced from a configuration file. An example of this might be  B<--color [colors:red]> with the configuration file:
+
+	[colors]
+	red   = 255,0,0
+	green = 0,255,0
+	blue  = 0,0,255
+
+=head2 NOTE ON @ARGV
+
+Once an entry has been processed successfully it is automatically pruned from the @ARGV list.
+
+B<The unabridged @ARGV list is exported as @ARGV_ORIG>
+
 =head1 CONFIG FILE FORMAT
 
 Configuration files are defined as ascii text, with comments lines starting with a pound symbol B<#>, sections, keys, and values. Values may be macro entries referencing other configuration keys.
@@ -76,7 +106,7 @@ A section is defined as a single line entry with double square brakets B<[sectio
 
 =head2 KEYS
 
-Keys are defined within a section as lines with keyname = value type entry
+Keys are defined within a B<section> as lines with B<keyname = value> type entry
 
 	# Define a value for keyname in section [section]
 	[section]
@@ -84,25 +114,40 @@ Keys are defined within a section as lines with keyname = value type entry
 
 =head2 USING A MACRO
 
-Macros are defined as square brakets with a section:key entry between them. These are automatically resolved to other configuration keys and those key values are utilized.
-
-Macros may B<NOT> utilize list entries as a macro value at this point.
+Macros are defined as square brakets with a B<section:key> entry between them. These are automatically resolved to other configuration sections and keys and that keys value is utilized.
 
 	# Define a value based on a macro
 	[section2]
 	key = [section:keyname]
+=head2 NOTE
+
+Macros may B<NOT> utilize list entries of duplicate macro keys.
+
+=head2 SPECIAL MACROS
+
+Currently there are two special macros which perform useful tasks
+
+=over
+
+=item include
+
+The B<include> key name allows you to include another configuration file with additional configuration information
+
+=item die
+
+The B<die> key will result in the program dying at that spot with an error dumped to STDERR.
+
+=back
 
 =head2 EXAMPLES
 
-See examples/ directory for various configuration file examples
+	# Include another configuration file
+	include = /some/config.cfg
 
-=head1 SYNOPSIS
+	# Die right here so user changes things
+	die
 
-use Config::Simple::Conf;
-
-my $conf = Config::Simple::Conf->new('/etc/Something/Example.conf');
-
-print $conf->value('global', 'example_key');
+Additionally see the examples/ directory within this libraries distrobution for more configuration file examples
 
 =head1 METHODS
 
@@ -142,8 +187,6 @@ Keys may make use of other keys values with in the key value.
 When making use of other key's values (as explainded in the example above) the embedded key '[abc]' MUST be unique. Using embedded keys in a listing context is not allowed and will result in an fatal error.
 
 In some cases configuration files may need to include other configuration files.  The way this is done is via a speical key called 'include'. The same file will be automatically execluded if it's detected multiple times. 
-
-Command line arguments are captured and placed in the ARGV configuration section, command line arguments are B<CASE SENSITIVE>.
 
 =cut
 
@@ -328,6 +371,8 @@ sub _fileargs {
 sub _cliargs {
 	my (@argv, $conf, $last_key);
 	for(my $i = 0; $i < @ARGV; $i++){
+		push @ARGV_ORIG, $ARGV[$i];
+
 		$ARGV[$i] =~ /(.+)/s;	# Untaint everything from the user.
 		$_ = $1;
 
@@ -390,10 +435,8 @@ sub _cliargs {
 		$conf = {};
 	}
 
-	# Make sure to freshen up the @ARGV array
-	if((caller)[0] ne 'Config::Simple::Conf'){
-		@ARGV = (@argv);
-	}
+	# Make sure to freshen up the @ARGV list
+	@ARGV = (@argv);
 
 	return $conf;
 }
@@ -499,6 +542,10 @@ sub _die {
 	exit(64);
  }
 }
+
+=head1 EXPORTS
+
+@ARGV_ORIG is exported automatically containing the unabridged copy of the original @ARGV list
 
 =head1 AUTHOR
 

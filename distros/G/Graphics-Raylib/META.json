@@ -26,7 +26,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Alien::raylib" : "0.003"
+            "Alien::raylib" : "0.006"
          }
       },
       "configure" : {
@@ -51,7 +51,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Alien::raylib" : "0.003",
+            "Alien::raylib" : "0.006",
+            "Import::Into" : "0",
             "perl" : "5.010"
          }
       },
@@ -73,71 +74,71 @@
    "provides" : {
       "Color" : {
          "file" : "lib/Graphics/Raylib/Color.pm",
-         "version" : "0.004"
+         "version" : "0.007"
       },
       "Graphics::Raylib" : {
          "file" : "lib/Graphics/Raylib.pm",
-         "version" : "0.004"
+         "version" : "0.007"
       },
       "Graphics::Raylib::Color" : {
          "file" : "lib/Graphics/Raylib/Color.pm",
-         "version" : "0.004"
+         "version" : "0.007"
       },
       "Graphics::Raylib::Mouse" : {
          "file" : "lib/Graphics/Raylib/Mouse.pm",
-         "version" : "0.004"
+         "version" : "0.007"
       },
       "Graphics::Raylib::Shape" : {
          "file" : "lib/Graphics/Raylib/Shape.pm",
-         "version" : "0.004"
+         "version" : "0.007"
       },
       "Graphics::Raylib::Shape::Bitmap" : {
          "file" : "lib/Graphics/Raylib/Shape.pm",
-         "version" : "0.004"
+         "version" : "0.007"
       },
       "Graphics::Raylib::Shape::Circle" : {
          "file" : "lib/Graphics/Raylib/Shape.pm",
-         "version" : "0.004"
+         "version" : "0.007"
       },
       "Graphics::Raylib::Shape::Line" : {
          "file" : "lib/Graphics/Raylib/Shape.pm",
-         "version" : "0.004"
+         "version" : "0.007"
       },
       "Graphics::Raylib::Shape::Pixel" : {
          "file" : "lib/Graphics/Raylib/Shape.pm",
-         "version" : "0.004"
+         "version" : "0.007"
       },
       "Graphics::Raylib::Shape::Polygon" : {
          "file" : "lib/Graphics/Raylib/Shape.pm",
-         "version" : "0.004"
+         "version" : "0.007"
       },
       "Graphics::Raylib::Shape::Rectangle" : {
          "file" : "lib/Graphics/Raylib/Shape.pm",
-         "version" : "0.004"
+         "version" : "0.007"
       },
       "Graphics::Raylib::Shape::Triangle" : {
          "file" : "lib/Graphics/Raylib/Shape.pm",
-         "version" : "0.004"
+         "version" : "0.007"
       },
       "Graphics::Raylib::Text" : {
          "file" : "lib/Graphics/Raylib/Text.pm",
-         "version" : "0.004"
+         "version" : "0.007"
       },
       "Graphics::Raylib::Util" : {
          "file" : "lib/Graphics/Raylib/Util.pm",
-         "version" : "0.004"
+         "version" : "0.007"
       },
       "Rectangle" : {
          "file" : "lib/Graphics/Raylib/Util.pm",
-         "version" : "0.004"
+         "version" : "0.007"
       },
       "Vector2" : {
          "file" : "lib/Graphics/Raylib/Util.pm",
-         "version" : "0.004"
+         "version" : "0.007"
       },
       "Vector3" : {
          "file" : "lib/Graphics/Raylib/Util.pm",
-         "version" : "0.004"
+         "version" : "0.007"
       }
    },
    "release_status" : "stable",
@@ -152,7 +153,7 @@
          "web" : "https://github.com/athreef/Graphics-Raylib"
       }
    },
-   "version" : "0.004",
+   "version" : "0.007",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.026001"
@@ -420,7 +421,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.14.2",
+                  "git_version" : "2.15.0",
                   "repo_root" : "."
                }
             },
@@ -443,7 +444,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.14.2",
+                  "git_version" : "2.15.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -460,12 +461,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.004",
+                  "tag" : "v0.007",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.14.2",
+                  "git_version" : "2.15.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -485,7 +486,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.14.2",
+                  "git_version" : "2.15.0",
                   "repo_root" : "."
                }
             },
@@ -506,7 +507,7 @@
                   "version_regexp" : "(?^:^v(.+)$)"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.14.2",
+                  "git_version" : "2.15.0",
                   "repo_root" : "."
                }
             },

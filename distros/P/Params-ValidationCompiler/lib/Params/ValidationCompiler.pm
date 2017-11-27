@@ -3,7 +3,7 @@ package Params::ValidationCompiler;
 use strict;
 use warnings;
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 use Params::ValidationCompiler::Compiler;
 
@@ -40,7 +40,7 @@ Params::ValidationCompiler - Build an optimized subroutine parameter validator o
 
 =head1 VERSION
 
-version 0.24
+version 0.25
 
 =head1 SYNOPSIS
 
@@ -173,12 +173,12 @@ must be values of the specified type.
 =item * named_to_list
 
 If this is true, the generated subroutine will expect a list of key-value
-pairs or a hashref and it will return a list containing only the values.
-C<params> must be a arrayref of key-value pairs in the order of which the
-values should be returned.
+pairs or a hashref and it will return a list containing only values. The
+C<params> you pass must be a arrayref of key-value pairs. The order of these
+pairs determines the order in which values are returned.
 
 You cannot combine C<slurpy> with C<named_to_list> as there is no way to know
-how the order in which extra values should be returned.
+how to order the extra return values.
 
 =back
 
@@ -197,7 +197,7 @@ a list of values.
 
 For now, you must shift off the invocant yourself.
 
-This subroutine accepts an additional parameter:
+This subroutine accepts the following additional parameters:
 
 =over 4
 
@@ -206,6 +206,9 @@ This subroutine accepts an additional parameter:
 If this is given, then the generated subroutine will be named using
 L<Sub::Util>. This is strongly recommended as it makes it possible to
 distinguish different check subroutines when profiling or in stack traces.
+
+This name will also be used in some exception messages, even if L<Sub::Util>
+is not available.
 
 Note that you must install L<Sub::Util> yourself separately, as it is not
 required by this distribution, in order to avoid requiring a compiler.

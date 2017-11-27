@@ -1,3 +1,50 @@
+2017-11-24T23:04:06+08:00 : 发布0.1.17版本到cpan.org
+2017-11-24T23:02:39+08:00 : Makefile.PL 删除Makefile.PL 中dan和box依赖的模块的标识
+2017-11-24T23:01:02+08:00 : INSTALL.PL 删除编译安装时候通过cpan命令安装依赖模块部分，这样的方式兼容性不好，cpan命令参数不一样。如需编译安装，需要先用cpan命令安装一个最新版本的MYDan来完成依赖的安装
+2017-11-24T21:34:11+08:00 : 发布0.1.16版本到cpan.org
+2017-11-24T21:30:07+08:00 : ProcLock.pm 升级进程锁，为防止文件中的进程号被其他进程占用，多匹配进程中的环境变量
+2017-11-24T21:27:13+08:00 : Bootstrap.pm 把进程锁换成文件锁MYDan::Util::FLock
+2017-11-23T23:06:21+08:00 : 发布0.1.15版本到cpan.org
+2017-11-23T23:05:36+08:00 : 添加文件锁模块MYDan::Util::FLock
+2017-11-23T21:37:10+08:00 : tools/mrsync,.config 配置mrsync默认用的是协议2
+2017-11-23T21:34:13+08:00 : tools/grsync,.config 配置grsync默认用的是协议3
+2017-11-23T21:30:00+08:00 : tools/grsync 添加协议3的部分
+2017-11-23T21:27:06+08:00 : MYDan::Agent::Grsync::V3 添加grsync的协议3，在代理机器上进行子mrsync
+2017-11-23T21:25:11+08:00 : README.md添加用cpan命令安装的说明
+2017-11-23T21:23:51+08:00 : INSTALL.PL 调整def的安装路径
+2017-11-23T21:21:54+08:00 : agent/code/mrsync 把mrsync的日志打印到标准输出，同时格式化失败的节点信息
+2017-11-23T13:02:14+08:00 : 发布0.1.14版本到cpan.org
+2017-11-23T13:01:34+08:00 : 修改 Makefile.PL , mayi中不需要 Mail::Sendmail
+2017-11-22T23:25:03+08:00 : 发布0.1.13版本到cpan.org
+2017-11-22T23:20:54+08:00 : agent/argv/mrsync 修改成方便Agent::Grsync::V3调用的方式
+2017-11-22T22:38:29+08:00 : agent/argv/mrsync 添加远程插件mrsync的参数解析插件
+2017-11-22T22:33:21+08:00 : agent/code/mrsync 添加 queryxdata 参数
+2017-11-22T22:07:02+08:00 : Agent::Mrsync  允许new的时候携带queryxdata 数据，这个在远程mrsync的时候会用到
+2017-11-22T22:03:52+08:00 : agent/code/mrsync 添加远程同步插件mrsync，在子网内进行同步，提供给grsync第3协议
+2017-11-22T22:02:22+08:00 : tools/grsync,Grsync:V12  grsync的协议1和2对应上mrsync的协议1和2
+2017-11-22T21:58:05+08:00 : 把box和dan中的mrsync拆开
+2017-11-22T21:52:25+08:00 : Agent::Mrsync 添加queryx，支持一次加密全局使用，这种模式下安全性变弱,但是速度会变快，同时这个模式会在grsync中使用
+2017-11-22T21:49:45+08:00 : Agent::Client run 函数添加queryx参数，存在queryx参数情况下Client中不重复计算
+2017-11-22T14:40:56+08:00 : 发布0.1.12版本到cpan.org
+2017-11-22T14:38:21+08:00 : 上一次修改Makefile.PL文件,导致INSTALL.PL匹配出现错误，问题修复
+2017-11-22T13:12:24+08:00 : 发布0.1.11版本到cpan.org
+2017-11-22T13:07:42+08:00 : 在Makefile.PL中添加git相关信息
+2017-11-22T12:48:55+08:00 : Merge pull request #11 from manwar/tidy-up-distribution
+2017-11-21T18:03:19+00:00 : - Updated .gitignore to ignore *.bak.
+2017-11-21T18:01:14+00:00 : - Added MANIFEST to the .gitignore
+2017-11-21T17:59:09+00:00 : - Added MANIFEST.SKIP to help in creating nice MANIFEST file.
+2017-11-21T17:58:27+00:00 : - Removed auto generated META.json from source.
+2017-11-21T22:25:49+08:00 : 发布0.1.10版本到cpan.org
+2017-11-21T22:03:47+08:00 : argv/code/{download,load} 首选使用argv，没有argv情况下使用data
+2017-11-21T21:57:39+08:00 : argv/code/download, Agent::Mrsync download 插件argv使用hash
+2017-11-21T21:49:42+08:00 : 把MYDan::Agent::Grsync默认的方式改成V1
+2017-11-21T21:42:21+08:00 : MYDan::Agent::Grsync new函数保留proxy信息
+2017-11-21T21:36:18+08:00 : .config,Util::Tcpserver 添加传输buf限制
+2017-11-21T21:28:10+08:00 : MYDan::Agent::Client 代理返空的情况处理
+2017-11-21T21:23:22+08:00 : tools/grsync MYDan::Agent::Grsync 添加--chown --chmod --cc参数
+2017-11-21T13:02:28+08:00 : tools/rcall,agent/code/version,MYDan::Agent::Client 添加查看版本参数和插件
+2017-11-21T12:54:37+08:00 : Agent::Mrsync 使用Agent::Client ，可以匹配上代理，而不是直接建立tcp到目标机
+2017-11-21T12:50:45+08:00 : fix 传递chown chmod cc参数位置错误
 2017-11-20T23:02:47+08:00 : 发布0.1.9版本到cpan.org
 2017-11-20T23:00:40+08:00 : 把协议中的keepalive 改成 MYDan_$version
 2017-11-20T22:48:51+08:00 : tools/mrsync MYDan::Agent::Mrsync 添加--chown --chmod --cc参数

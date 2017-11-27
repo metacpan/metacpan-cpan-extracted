@@ -3,7 +3,7 @@ abstract: 'A Module::Starter plugin for adding new modules into an existing dist
 author:
   - 'Ruey-Cheng Chen <rueycheng@cpan.com>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '6.48'
   File::Spec: '0'
   Module::Starter: '1.58'
   Test::More: '0'
@@ -12,8 +12,8 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
-license: unknown
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -29,6 +29,8 @@ requires:
   Test::More: '0'
   Test::TempDir::Tiny: '0'
   parent: '0'
+  perl: '5.006000'
 resources:
   repository: https://github.com/rueycheng/Module-Starter-Smart.git
-version: v0.0.8
+version: v0.0.9
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

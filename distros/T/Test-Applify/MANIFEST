@@ -1,3 +1,4 @@
+.gitattributes
 Changes
 cpanfile
 lib/Test/Applify.pm
@@ -7,13 +8,13 @@ README
 t/00-basic.t
 t/applify-ok-subcommand.t
 t/applify-ok.t
-t/basic-dev.t
 t/basic.t
 t/coding-error-1.pl
 t/coding-error-2.pl
 t/coding-error-3.pl
 t/file.pl
 t/file.t
+t/run-ok.t
 t/subclass.t
 t/subcommand.pl
 t/syntax-error-1.pl

@@ -39,7 +39,7 @@ sub build_schema {
       $pkg .= "  __PACKAGE__->add_unique_constraint($key);\n";
     }
 
-    foreach my $rel_type (qw(has_many belongs_to)) {
+    foreach my $rel_type (qw(has_many belongs_to has_one might_have)) {
       while (my ($name, $opts) = each %{$defn->{$rel_type}}) {
         while (my ($foreign, $column) = each %{$opts}) {
           $column = ref($column) eq 'HASH'

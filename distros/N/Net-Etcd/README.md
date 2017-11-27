@@ -13,7 +13,10 @@ Net::Etcd - etcd v3 REST API.
     $etcd = Net::Etcd->new({ host => $host, port => $port, ssl => 1 });
 
     # put key
-    $result = $etcd->put({ key =>'foo1', value => 'bar' });
+    $put_key = $etcd->put({ key =>'foo1', value => 'bar' });
+
+    # check for success of a transaction
+    $put_key->is_success;
 
     # get single key
     $key = $etcd->range({ key =>'test0' });
@@ -53,6 +56,13 @@ Net::Etcd - etcd v3 REST API.
 
     # grant role
     $etcd->user_role( { user => 'samba', role => 'myrole' } )->grant;
+
+    # defrag member's backend database
+    $defrag = $etcd->maintenance()->defragment;
+    print "Defrag request complete!" if $defrag->is_success;
+
+    # member version
+    $v = $etcd->version;
 
 # DESCRIPTION
 
@@ -94,6 +104,12 @@ The token that is passed during authentication.  This is generated during the
 authentication process and stored until no longer valid or username is changed.
 
 # PUBLIC METHODS
+
+## version
+
+Returns the etcd member version
+
+    $etcd->version()
 
 ## watch
 

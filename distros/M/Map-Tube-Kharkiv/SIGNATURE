@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.81.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,37 +12,38 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: SHA512
 
-SHA1 5a4b60d7055f6388030f412e367730d62479bc85 Changes
-SHA1 6f0cdc8173519e8c8eb5cc0f9224d18f3590ce76 Kharkiv.pm
+SHA1 e78f89fc9adf9cd2fac0db0b1f95383aab84c04b Changes
+SHA1 af102482a7a80d77593a4f130784ead45d0b2785 Kharkiv.pm
 SHA1 882221895a73bad18eb9f16a0ce523a968a932c1 LICENSE.artistic_2
-SHA1 507a10efa92555ddddfbe72be27964d9e3eef80f LICENSE.bsd
-SHA1 871ec5005d63c8fd60910809bde851af1fae05c4 MANIFEST
-SHA1 e18cc97fffaa67bc50de8184116281e9aa47b4ff META.yml
-SHA1 f400ffffe9da0258ccc20315c4fc2fa3865df964 Makefile.PL
-SHA1 7e66306a9759674bcc7e42f4c3c3d3896b12f756 README
+SHA1 c2a761283151cfab0e2f28a22cbbb24cbde838fc LICENSE.bsd
+SHA1 2031f2b555feba106b6c38d0656c4426277a6d21 MANIFEST
+SHA1 bbedee3ab3d10eb56a18a50c96fd5a6c2e26eda8 META.yml
+SHA1 67966af5bb14811d06e4971891d9a9321233d34d Makefile.PL
+SHA1 f34f2ce3ede2115a39d12ee69a20fa8ab27770ce README
 SHA1 ff91471bd147655bfbc039522c58ba78900256ee examples/ex1.pl
 SHA1 4210d6edf278e745bb2aaceab54279ac85737fd4 examples/ex2.pl
 SHA1 8ba9be57d639df4cdc1f8b85fb995062e06d9b75 examples/ex3.pl
 SHA1 f650c56347192af4019b1d40b3b49c3c242635f3 examples/ex4.pl
+SHA1 25d34ecc34e3ddaa7e6aca320b1ade249dd2cedb examples/ex5.pl
 SHA1 caec7ef2551e78010a4a0fe1618d5ed4d8aebd11 images/Kharkiv.png
-SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 fb87e7e7964647af0e7f6422bc7943754935dca7 inc/Module/Install.pm
 SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
 SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
-SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
-SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
-SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
-SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
-SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
-SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
-SHA1 42de62df31eaf796d8bfd49a11fdc9cff1b50b74 inc/Module/Install/Share.pm
-SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
-SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
-SHA1 26b10d08a3a1c9dd8412031e2e1cbb847853e25c share/kharkiv-map.xml
+SHA1 06ca84c52f555dfd7cf8bb7c941c975e25adfc9d inc/Module/Install/Base.pm
+SHA1 3eeb29878c8a435182b492e22315166a0229a373 inc/Module/Install/Can.pm
+SHA1 3bb596078a0413cc568ff3a834d9fc54dbddd54b inc/Module/Install/Fetch.pm
+SHA1 5885b5a7af6c3d54cbeb1274a896a565e5cbdb9a inc/Module/Install/Makefile.pm
+SHA1 9247628a32ad889e815a356fb39b2bc94ff3cc3a inc/Module/Install/Metadata.pm
+SHA1 8d19f4485276b987b7838d4ec01909f8055a4724 inc/Module/Install/ReadmeFromPod.pm
+SHA1 47c4d01e2a0df08bf3be46fcc132783f5228d238 inc/Module/Install/Share.pm
+SHA1 b0b3ad3cfea40b508eb61e0e5c8ea477f81f3eb1 inc/Module/Install/Win32.pm
+SHA1 b162866505fb2a1141efa422cfdc864394cb4444 inc/Module/Install/WriteAll.pm
+SHA1 8f91d72b16f5ae220720aa0da68fb225d25849c5 share/kharkiv-map.xml
 SHA1 2da81468c967cea284a73522c1e637d9654325f4 t/Map-Tube-Kharkiv/01-use.t
-SHA1 6c9efed564443111be8ab5bb22d77494786be5d0 t/Map-Tube-Kharkiv/02-version.t
-SHA1 a33bdaf91dd20e118d587d9b2f71c94a9f931e53 t/Map-Tube-Kharkiv/03-map.t
+SHA1 dcfe2f238829f55a2c5b037fbfcac09318e3639f t/Map-Tube-Kharkiv/02-version.t
+SHA1 d00bc95f0b68342f49a77429ed72a6c234f60a63 t/Map-Tube-Kharkiv/03-map.t
 SHA1 0c46106eee454ad50b14c01affa36741a91de719 t/Map-Tube-Kharkiv/04-get_node_by_id.t
 SHA1 75152c80232e8bcec29171a19f21fe9935c10a2d t/Map-Tube-Kharkiv/05-get_node_by_name.t
 SHA1 28304b60f929d0ef49d55e413407041f7b118441 t/Map-Tube-Kharkiv/06-get_shortest_route.t
@@ -51,13 +52,13 @@ SHA1 b3a9bedc5b01b64b22463e9b1a33ced5f226e4c2 t/Map-Tube-Kharkiv/08-xml.t
 SHA1 c990bf32a58cc1a1f81fc871d580e1befe30bc09 xt/Map-Tube-Kharkiv/01-pod_coverage.t
 SHA1 a6e2aac321d4d72ed08b46ca6f03f52d0565a660 xt/Map-Tube-Kharkiv/02-pod.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQEcBAEBAgAGBQJWIBuBAAoJEJe+XXKaIuTlHV0H/ilHfXEy7C+K1jOxkjoaD1dy
-WUQCfTTCoRaY41+SjEi5Er3FxQLh6hZi6VvSCPy4qsd+L9b+sgKsnw5Y0Vyv23FN
-EQV4KYVvMxj2ud5RgXWaCM9ZcOTsmpLpwVko3XK9S2IGAdmlzXz9CBJYXbU31paL
-ErLk0nxDNC/YuAEmr850Ih2wWqq1PWG8lODe3XFEWeO+mTSyHuo/x1HD+rmQAYCe
-bNETfDbjSCQUWTwB8W0oVCmnl8EibNYY2UiCojQYrxnbnI0qysLRz6CjmP1mb+gQ
-MnPmCwV2z4XhtZWH9IQ2iWJNzIMG5+UInXlQ34jwCLSgOAyMfsQMbTdHD39I+XI=
-=ZZqw
+iQEzBAEBCgAdFiEEAxWqUSy7qDLVZJQKKyiOZjWerHYFAloWfWYACgkQKyiOZjWe
+rHbD4Qf/XQNnqaq5uEudT9DUBLzkfgNqRF2tzZH8w69giqXfI6X2x54Am3kyNPFS
+QzLg7EEC9mbKoKrb+8NVKnCaREjkUHNqGfgAwx7rsIjFxKZuFSQ8TeJxvq0Gouw7
+dYyLTaikApKxXuJRmHwenegwS7HTwfbXLz2vVcVVd505QlHijObpBUEBjEGppOD8
+Sr7+rDnjIgIEyD+hTcl6apxYrMFkwfHRSZegMlssRmaLD0SPW0+dlkKRrCIfkpD/
+YEgHsF3l4v9drxei95a63ieEJ6n1dQPT3lC00NCSybZTOSY/oqL8tMlD1XC4Lza0
+EJmAf6/rSuo9Szebz3RNQ+GsUKGUyA==
+=0wT1
 -----END PGP SIGNATURE-----

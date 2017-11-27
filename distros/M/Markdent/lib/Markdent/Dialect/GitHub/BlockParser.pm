@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 use List::AllUtils qw( insert_after_string );
 use Markdent::Event::CodeBlock;
@@ -77,7 +77,7 @@ Markdent::Dialect::GitHub::BlockParser - Block parser for GitHub Markdown
 
 =head1 VERSION
 
-version 0.27
+version 0.28
 
 =head1 DESCRIPTION
 

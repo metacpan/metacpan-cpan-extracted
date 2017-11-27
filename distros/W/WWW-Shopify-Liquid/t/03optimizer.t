@@ -468,4 +468,55 @@ isa_ok($ast->{arguments}->[0], 'WWW::Shopify::Liquid::Token::Variable');
 is($ast->{arguments}->[0]->{core}->[0], 'a');
 
 
+$ast = $liquid->parse_text('{% assign total = 0 %}
+
+{{ total }}
+
+{% for property in product.properties %}
+	{% assign total = total + property.value %}
+{% endfor %}
+
+{{ total }}');
+
+$ast = $liquid->optimizer->optimize({ }, $ast);
+
+# Ensure that the totals in the loop, and outside the loop haven't been optimized.
+ok($ast);
+isa_ok($ast, 'WWW::Shopify::Liquid::Operator::Concatenate');
+
+is(int(@{$ast->{operands}}), 5);
+like($ast->{operands}->[1], qr/^\s+0\s+/is);
+
+isa_ok($ast->{operands}->[2], 'WWW::Shopify::Liquid::Tag::For');
+isa_ok($ast->{operands}->[2]->{contents}, 'WWW::Shopify::Liquid::Operator::Concatenate');
+is(int(@{$ast->{operands}->[2]->{contents}->{operands}}), 3);
+isa_ok($ast->{operands}->[2]->{contents}->{operands}->[1], 'WWW::Shopify::Liquid::Tag::Assign');
+isa_ok($ast->{operands}->[2]->{contents}->{operands}->[1]->{arguments}->[0], 'WWW::Shopify::Liquid::Operator::Assignment');
+isa_ok($ast->{operands}->[2]->{contents}->{operands}->[1]->{arguments}->[0]->{operands}->[0], 'WWW::Shopify::Liquid::Token::Variable');
+isa_ok($ast->{operands}->[2]->{contents}->{operands}->[1]->{arguments}->[0]->{operands}->[0]->{core}->[0], 'WWW::Shopify::Liquid::Token::String');
+is($ast->{operands}->[2]->{contents}->{operands}->[1]->{arguments}->[0]->{operands}->[0]->{core}->[0]->{core}, 'total');
+
+isa_ok($ast->{operands}->[-1], 'WWW::Shopify::Liquid::Tag::Output');
+isa_ok($ast->{operands}->[-1]->{arguments}->[0], 'WWW::Shopify::Liquid::Token::Variable');
+
+
+package WWW::Shopify::Liquid::Tag::TestTag;
+use base 'WWW::Shopify::Liquid::Tag::Enclosing';
+
+sub operate {
+	my ($self, $hash, $content, @arguments) = @_;
+	return $content;
+}
+
+package main;
+
+$liquid->register_tag('WWW::Shopify::Liquid::Tag::TestTag');
+
+@tokens = $lexer->parse_text("{% test_tag %}ASD{% endtest_tag %}");
+$ast = $parser->parse_tokens(@tokens);
+$ast = $optimizer->optimize({ }, $ast);
+
+isa_ok($ast, 'WWW::Shopify::Liquid::Token::Text');
+is($ast->{core}, 'ASD');
+
 done_testing();

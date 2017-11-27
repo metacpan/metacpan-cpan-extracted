@@ -22,6 +22,8 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "File::Path" : "0",
+            "File::Temp" : "0",
             "Math::BigFloat" : "1.55",
             "Test::Deep" : "0",
             "Test::Exception" : "0.31",
@@ -48,6 +50,6 @@
          "url" : "https://github.com/mariuz/perl-dbd-firebird"
       }
    },
-   "version" : "1.25",
+   "version" : "1.26",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

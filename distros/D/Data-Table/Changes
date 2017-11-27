@@ -1,5 +1,8 @@
 Revision history for Perl extension Data::Table.
 
+1.76 Tue Nov 21 08:08:30 PST 2017
+  Minor syntax bug in fromFile.
+
 1.75 Sat Apr 23 13:52:25 PDT 2016
   Patch parseCSV(). It returns incorrect columns when delimiter is space and has empty fields
   Thanks to Jeff Janes for the fix.

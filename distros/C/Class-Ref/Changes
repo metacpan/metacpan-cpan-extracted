@@ -1,3 +1,9 @@
+Revision history for Class-Ref
+
+0.06      2017-11-22 21:42:05-05:00 America/New_York
+    Improvements
+    * Documentaion cleanup (including broken sample code) [Jon Jensen]
+
 0.05  2012-10-18
     New features
     * Iterator methods for arrays

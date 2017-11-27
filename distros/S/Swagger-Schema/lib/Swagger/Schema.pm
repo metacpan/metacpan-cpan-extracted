@@ -13,9 +13,11 @@ coerce 'Swagger::Schema::Parameter',
    };
 
 package Swagger::Schema {
-  our $VERSION = '1.01';
+  our $VERSION = '1.02';
   #ABSTRACT: Object model for Swagger schema files
   use MooseX::DataModel;
+  use Moose::Util::TypeConstraints;
+  use namespace::autoclean;
 
   key swagger => (isa => enum([ '2.0' ]), required => 1);
   key info => (isa => 'Swagger::Schema::Info', required => 1);
@@ -39,10 +41,8 @@ package Swagger::Schema {
 
 package Swagger::Schema::SecurityScheme {
   use MooseX::DataModel;
-
+  use namespace::autoclean;
   
-
-  no MooseX::DataModel;
 }
 
 #package Swagger::Schema::SecurityRequirement {
@@ -57,6 +57,8 @@ package Swagger::Schema::SecurityScheme {
 
 package Swagger::Schema::Path {
   use MooseX::DataModel;
+  use namespace::autoclean;
+
   key get => (isa => 'Swagger::Schema::Operation');
   key put => (isa => 'Swagger::Schema::Operation');
   key post => (isa => 'Swagger::Schema::Operation');
@@ -69,6 +71,8 @@ package Swagger::Schema::Path {
 
 package Swagger::Schema::Tag {
   use MooseX::DataModel;
+  use namespace::autoclean;
+
   key name => (isa => 'Str');
   key description => (isa => 'Str');
   key externalDocs => (isa => 'Swagger::Schema::ExternalDocumentation');
@@ -79,6 +83,7 @@ enum 'Swagger::Schema::ParameterTypes',
 
 package Swagger::Schema::Schema {
   use MooseX::DataModel;
+  use namespace::autoclean;
 
   key ref => (isa => 'Str', location => '$ref');
   key x_ms_client_flatten => (isa => 'Bool', location => 'x-ms-client-flatten');
@@ -105,17 +110,17 @@ package Swagger::Schema::Schema {
   key items => (isa => 'Swagger::Schema::Schema');
   array allOf => (isa => 'Swagger::Schema::Schema');
   object properties => (isa => 'Swagger::Schema::Schema');
-  object additionalProperties => (isa => 'Any');
+  key additionalProperties => (isa => 'Swagger::Schema::Schema');
   key readOnly => (isa => 'Bool');
   #key xml => (isa => 'Swagger::Schema::XML');
   key externalDocs => (isa => 'Swagger::Schema::ExternalDocumentation');
   key example => (isa => 'Any');
-
-  no MooseX::DataModel;
 }
 
 package Swagger::Schema::Parameter {
   use MooseX::DataModel;
+  use namespace::autoclean;
+
   key name => (isa => 'Str');
   key in => (isa => 'Str');
   key description => (isa => 'Str');
@@ -131,32 +136,40 @@ package Swagger::Schema::Parameter {
 
 package Swagger::Schema::MSX::ParameterGrouping {
   use MooseX::DataModel;
+  use namespace::autoclean;
+
   key name => (isa => 'Str');
   key postfix => (isa => 'Str');
-  no MooseX::DataModel;
 }
 
 package Swagger::Schema::MSX::Enum {
   use MooseX::DataModel;
+  use namespace::autoclean;
+
   key name => (isa => 'Str');
   key modelAsString => (isa => 'Bool');
-  no MooseX::DataModel;
 }
 
 package Swagger::Schema::RefParameter {
   use MooseX::DataModel;
+  use namespace::autoclean;
+
   extends 'Swagger::Schema::Parameter';
   key ref => (isa => 'Str', location => '$ref');
 }
 
 package Swagger::Schema::BodyParameter {
   use MooseX::DataModel;
+  use namespace::autoclean;
+
   extends 'Swagger::Schema::Parameter';
   key schema => (isa => 'Swagger::Schema::Schema', required => 1);
 }
 
 package Swagger::Schema::OtherParameter {
   use MooseX::DataModel;
+  use namespace::autoclean;
+
   extends 'Swagger::Schema::Parameter';
 
   key type => (isa => 'Swagger::Schema::ParameterTypes', required => 1);
@@ -178,8 +191,6 @@ package Swagger::Schema::OtherParameter {
   array enum => (isa => 'Any');
   key multipleOf => (isa => 'Num');
   #x-^ patterned fields
-
-  no MooseX::DataModel;
 }
 
 enum 'Swagger::Schema::CollectionFormat',
@@ -187,6 +198,7 @@ enum 'Swagger::Schema::CollectionFormat',
 
 package Swagger::Schema::Item {
   use MooseX::DataModel;
+  use namespace::autoclean;
 
   key type => (isa => 'Swagger::Schema::ParameterTypes', required => 1);
   key format => (isa => 'Str');
@@ -208,12 +220,12 @@ package Swagger::Schema::Item {
   array enum => (isa => 'Any');
   key multipleOf => (isa => 'Num');
   #x-^ patterned fields
-
-  no MooseX::DataModel;
 }
 
 package Swagger::Schema::Operation {
   use MooseX::DataModel;
+  use namespace::autoclean;
+
   array tags => (isa => 'Str');
   key summary => (isa => 'Str');
   key description => (isa => 'Str');
@@ -223,7 +235,7 @@ package Swagger::Schema::Operation {
   array produces => (isa => 'Str'); #Must be a Mime Type
   array parameters => (isa => 'Swagger::Schema::Parameter');
   object responses => (isa => 'Swagger::Schema::Response');
-  key schemes => (isa => 'Str');
+  array schemes => (isa => 'Str');
   key deprecated => (isa => 'Bool');
   #key security => (isa =>
   #TODO: x-^ fields  
@@ -231,6 +243,8 @@ package Swagger::Schema::Operation {
 
 package Swagger::Schema::Response {
   use MooseX::DataModel;
+  use namespace::autoclean;
+
   key description => (isa => 'Str');
   key schema => (isa => 'Swagger::Schema::Parameter');
   object headers => (isa => 'Swagger::Schema::Header');
@@ -240,6 +254,8 @@ package Swagger::Schema::Response {
 
 package Swagger::Schema::Header {
   use MooseX::DataModel;
+  use namespace::autoclean;
+
   key description => (isa => 'Str');
   key type => (isa => 'Str', required => 1);
   key format => (isa => 'Str');
@@ -258,18 +274,20 @@ package Swagger::Schema::Header {
   key uniqueItems => (isa => 'Bool');
   array enum => (isa => 'Any');
   key multipleOf => (isa => 'Num');
-
-  no MooseX::DataModel;
 }
 
 package Swagger::Schema::ExternalDocumentation {
   use MooseX::DataModel;
+  use namespace::autoclean;
+
   key description => (isa => 'Str');
   key url => (isa => 'Str', required => 1); #Must be in the format of a URL
 }
 
 package Swagger::Schema::Info {
   use MooseX::DataModel;
+  use namespace::autoclean;
+
   key title => (isa => 'Str', required => 1);
   key description => (isa => 'Str'); #Can contain GFM
   key termsOfService => (isa => 'Str');
@@ -281,12 +299,16 @@ package Swagger::Schema::Info {
 
 package Swagger::Schema::License {
   use MooseX::DataModel;
+  use namespace::autoclean;
+
   key name => (isa => 'Str', required => 1);
   key url => (isa => 'Str'); #Must be in the format of a URL
 }
 
 package Swagger::Schema::Contact {
   use MooseX::DataModel;
+  use namespace::autoclean;
+
   key name => (isa => 'Str');
   key url => (isa => 'Str');
   key email => (isa => 'Str');

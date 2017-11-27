@@ -23,7 +23,7 @@ tcpdump_to_db - convert tcpdump textual output to fsdb
 
 =head1 DESCRIPTION
 
-Converts a tcpdump data stream to Fsdb format.
+Converts a tcpdump textual data stream to Fsdb format.
 
 B<Currently it handles only TCP and silently fails on other traffic!>
 Awaiting enhancement... you're welcome to help.
@@ -95,6 +95,11 @@ end_standard_fsdb_options
     14:11:18.847937 excalibur.usc.edu.ssh > dash.isi.edu.1023: P 328:468(140) ack 488 win 4096
     14:11:18.860047 dash.isi.edu.1023 > excalibur.usc.edu.ssh: . ack 468 win 32696 (DF) [tos 0x10]
     14:11:18.936255 dash.isi.edu.1023 > excalibur.usc.edu.ssh: P 488:516(28) ack 468 win 32696 (DF) [tos 0x10]
+
+
+or a more modern form
+
+    17:00:14.808855 IP 10.0.0.172.31738 > 10.1.0.50.telnet: Flags [S], seq 3236187954, win 21463, length 0
 
 =head2 Command:
 

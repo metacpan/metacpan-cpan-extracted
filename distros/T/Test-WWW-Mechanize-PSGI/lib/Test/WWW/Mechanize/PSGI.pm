@@ -1,12 +1,13 @@
 package Test::WWW::Mechanize::PSGI;
-$Test::WWW::Mechanize::PSGI::VERSION = '0.37';
+
 use strict;
 use warnings;
 
-use Carp;
-use HTTP::Message::PSGI;
-use Test::WWW::Mechanize;
-use Try::Tiny;
+our $VERSION = '0.38';
+
+use Carp qw( confess );
+use HTTP::Message::PSGI ();    # adds from_psgi() to HTTP::Response
+use Try::Tiny qw( catch try );
 
 use base 'Test::WWW::Mechanize';
 
@@ -31,13 +32,12 @@ sub new {
 sub simple_request {
     my ( $self, $request ) = @_;
 
-    $self->run_handlers( "request_send", $request );
-
     my $uri = $request->uri;
     $uri->scheme('http')    unless defined $uri->scheme;
     $uri->host('localhost') unless defined $uri->host;
 
     my $env = $self->prepare_request($request)->to_psgi;
+    $self->run_handlers( 'request_send', $request );
     my $response;
     try {
         $response = HTTP::Response->from_psgi( $self->{app}->($env) );
@@ -46,10 +46,28 @@ sub simple_request {
         $Test->diag("PSGI error: $_");
         $response = HTTP::Response->new(500);
         $response->content($_);
-        $response->content_type('');
+        $response->content_type(q{});
     };
     $response->request($request);
-    $self->run_handlers( "response_done", $response );
+
+    # Trigger set_my_handler call in LWP::UserAgent::parse_head()
+    $self->run_handlers( 'response_header', $response );
+
+    # Running the reponse_data handlers via run_handlers() doesn't pass all of
+    # the args that are required, so we'll run each handler explicitly.  We do
+    # this here so that we can fire off the handler which gets added in
+    # LWP::UserAgent::parse_head().  Without this handler firing,
+    # LWP::UserAgent::base() will not know about any URL which may have been
+    # set in a <base href="..."> tag.  If we don't know about this tag then we
+    # may end up with an incorrect base URL and, by extension, we could end up
+    # at the wrong location when trying to follow relative URLs.
+
+    for my $handler ( $self->handlers( 'response_data', $response ) ) {
+        $handler->{callback}
+            ->( $response, $self, $handler, $response->content );
+    }
+
+    $self->run_handlers( 'response_done', $response );
     return $response;
 }
 
@@ -65,7 +83,7 @@ Test::WWW::Mechanize::PSGI - Test PSGI programs using WWW::Mechanize
 
 =head1 VERSION
 
-version 0.37
+version 0.38
 
 =head1 SYNOPSIS
 

@@ -20,18 +20,31 @@ It is not a pre-requisite for Kamelon itself. But if you want to use
 the graphical interface modules that come along with the distribution
 you might want to install Wx.
 
+# kamelon executable
+
+You can explore Kamelon's capabilities by calling the kamelon script.
+The following command should get you going:
+
+ kamelon -help
+
+If you want to do this before installation then you do:
+
+ perl -Mblib bin/kamelon -help
+
 # State of development
 
-Kamelon parsing mechanism is stable and fully developed. The formatting
-side of Kamelon is coming out of alpha phase. Documentation is well
-underway but still rather spartan. There is a working output interface
-for use with the template toolkit.
+Kamelon parsing mechanism is stable and fully developed. Documentation
+is well underway but still rather spartan. There area working output
+formatters based on the template toolkit. Besides a base formatter
+that you can configure for just about anything (Syntax::Kamelon::Base)
+there are also formatters for ANSI (Syntax::Kamelon::ANSI) and HTML4
+(Syntax::Kamelon::HTML4) output.
 
 # Development plans
 
- Improve speed by Rewriting some core functions of Kamelon in C
- 
- Add output formatters for HTML5, PDF, RTF, ODT, etcetera
+Improve speed by Rewriting some core functions of Kamelon in C
+
+Add output formatters for HTML5, PDF, RTF, ODT, etcetera
 
 Help and support is appreciated.
 

@@ -3,13 +3,12 @@ NAME
 
 SYNOPSIS
       use Test::More;
-      use Test::Applify;
+      use Test::Applify 'applify_ok';
 
       my $t = Test::Applify->new('./bin/app.pl');
-      my $help = $t->help_ok;
-      like $help, qr/basic/, 'help mentions basic mode';
-      $t->documentation_ok;
-      $t->version_ok('1.0.999');
+      $t->help_ok(qr/basic/)
+        ->documentation_ok
+        ->version_ok('1.0.999');
       $t->is_option($_) for qw{mode input};
       $t->is_required_option($_) for qw{input};
 
@@ -19,10 +18,10 @@ SYNOPSIS
       my $app2 = $t->app_instance(qw{-mode expert -input strings.txt});
       is $app2->mode, 'expert', 'expert mode enabled';
       is $app2->input, 'strings.txt', 'reading strings.txt';
+      $t->run_instance_ok($app2);
 
-      use Test::Applify 'applify_ok';
       my $inlineapp = applify_ok("use Applify; app { print 'hello world!'; 0;};");
-      my $t = Test::Applify->new($inlineapp);
+      $t = Test::Applify->new($inlineapp);
 
 DESCRIPTION
     Test::Applify is a test agent to be used with Test::More to test Applify
@@ -91,8 +90,13 @@ METHODS
 
   app_instance
       my $safe  = $t->app_instance(qw{-opt value -mode safe});
+      is $safe->mode, 'safe', 'will run in safe mode';
       my $risky = $t->app_instance();
       is $risky->mode, 'expert', 'expert mode is the default';
+
+    Create an instance of the application class, which will be the contents
+    of the Applify script created. The array passed will be turned into
+    @ARGV as if those options had been passed on the command line.
 
   can_ok
       $t->can_ok(qw{mode input});
@@ -127,11 +131,34 @@ METHODS
     Test that the option is a required option.
 
   new
-      my $t = Test::Applify->new('script.pl');
+      my $t = Test::Applify->new('./script.pl');
       # instance for the 'list' subcommand
-      my $t = Test::Applify->new('script.pl', 'list');
+      my $t = Test::Applify->new('./script.pl', 'list');
 
     Instantiate a new test instance for the supplied script name.
+
+  run_instance_ok
+      my $t = Test::Applify->new('./script.pl');
+      my $app = $t->app_instance(qw{-mode expert});
+      is $app->mode, 'expert', 'everyone is an expert';
+      my ($retval, $stdout, $stderr, $exited) = $t->run_instance_ok($app);
+
+    Call "run" on the Applify application class instance (execute the "app
+    {}" block). Returns a list of scalars which are:
+
+    retval - the return value of the "app" block
+        This is "undef" when "die" in perlfunc called
+
+    stdout - the content that was printed to "STDOUT" during the run
+    stderr - "$@" in perlvar or the content that was printed to "STDERR"
+    during the run
+    exit - whether the code exited
+
+  run_ok
+      my $t = Test::Applify->new('./script.pl');
+      my ($exit, $stdout, $stderr, $retval) = $t->run_ok(qw{-mode expert});
+
+    Same as "run_instance_ok", but less code.
 
   subcommand_ok
       my $subcommand = $t->subcommand_ok('list');

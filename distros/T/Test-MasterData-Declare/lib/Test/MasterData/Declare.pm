@@ -4,22 +4,24 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = "0.01";
+our $VERSION = "0.02";
 
 use Test2::API qw/context/;
 use Test2::V0;
 use Test2::Compare ();
 use Test2::Tools::Compare qw/number/;
 use Test2::Compare::Custom;
+use Test2::Compare::String;
 use Scalar::Util qw/blessed/;
 
 use Carp qw/croak/;
 
 %Carp::Internal = (
     %Carp::Internal,
-    "Test::MasterData::Declare"             => 1,
-    "Test::MasterData::Declare::CompareRow" => 1,
-    "Test::MasterData::Declare::Row"        => 1,
+    "Test::MasterData::Declare"                      => 1,
+    "Test::MasterData::Declare::Compare::RowHash"    => 1,
+    "Test::MasterData::Declare::Compare::RowCustrom" => 1,
+    "Test::MasterData::Declare::Row"                 => 1,
 );
 
 use parent "Exporter";
@@ -39,11 +41,12 @@ our $DEFAULT_IDENTIFIER_KEY = "id";
 
 use Test::MasterData::Declare::Runner;
 use Test::MasterData::Declare::Reader;
-use Test::MasterData::Declare::CompareRow;
+use Test::MasterData::Declare::Compare::RowHash;
+use Test::MasterData::Declare::Compare::RowCustom;
 
 my $runner;
 
-sub master_data :prototype(&) {
+sub master_data (&) {
     my $code = shift;
 
     $runner = Test::MasterData::Declare::Runner->new(
@@ -71,8 +74,8 @@ sub load_csv {
     }
 }
 
-sub row_hash :prototype(&) {
-    Test2::Compare::build("Test::MasterData::Declare::CompareRow", @_)
+sub row_hash (&) {
+    Test2::Compare::build("Test::MasterData::Declare::Compare::RowHash", @_)
 }
 
 sub row_json {
@@ -80,8 +83,8 @@ sub row_json {
     my $check = pop @keys;
 
     my $build = Test2::Compare::get_build();
-    croak "row_json must be with-in Test::MasterData::Declare::CompareRow"
-        unless $build->isa("Test::MasterData::Declare::CompareRow");
+    croak "row_json must be with-in Test::MasterData::Declare::Compare::RowHash"
+        unless $build->isa("Test::MasterData::Declare::Compare::RowHash");
 
     $build->add_json_field($column, @keys, $check);
 }
@@ -206,16 +209,17 @@ sub expect_row {
 
     my $ctx = context();
 
+    my $check = Test::MasterData::Declare::Compare::RowCustrom->new(
+        code => sub {
+            my %args = @_;
+            my $got = $args{got};
+            $func->($got);
+        },
+    );
+
     my $rows = $runner->rows($table_name);
     like $rows, array {
-        all_items
-            row_hash {
-                validator(sub {
-                    my %args = @_;
-                    my $got = $args{got};
-                    $func->($got);
-                });
-        };
+        all_items $check;
     };
 
     $ctx->release;
@@ -238,24 +242,32 @@ sub relation {
 
         my @matched_rows = grep {
             my $row = $_->row;
-            grep { $from_row_values{$_} == $row->{$conds{$_}} } keys %conds;
+            grep {
+                defined $from_row_values{$_} &&
+                defined $row->{$conds{$_}} &&
+                $from_row_values{$_} eq $row->{$conds{$_}}
+            } keys %conds;
         } @$to_rows;
 
         return @matched_rows;
     };
 
+
+    my $check = Test::MasterData::Declare::Compare::RowCustrom->new(
+        name     => "HasRelation",,
+        operator => "$from_table has $to_table",
+        code     => sub {
+            my %args = @_;
+            my $got = $args{got};
+            my @matched_rows = $to_rows_selector->(%$got);
+
+            return scalar(@matched_rows) > 0;
+        },
+    );
+
     my $ctx = context();
     like $from_rows, array {
-        all_items
-            row_hash {
-                validator(sub {
-                    my %args = @_;
-                    my $from_row = $args{got};
-                    my @relations = $to_rows_selector->(%$from_row);
-
-                    my $ok = is scalar(@relations), scalar(keys %conds);
-                });
-            };
+        all_items $check;
     };
     $ctx->release;
 }

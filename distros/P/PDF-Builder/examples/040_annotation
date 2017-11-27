@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
-# demonstrate open and closed annotations. the icons can be dragged elsewhere,
-# and it seems to be possible to post to a closed annotation. if you make any
+# demonstrate (initially) open and closed annotations. the icons can be dragged
+# elsewhere, and one annotation is initally open for update. if you make any
 # posts (replies), you will be prompted to save the document before leaving.
 
 use strict;
@@ -11,44 +11,61 @@ use lib '../lib';
 use PDF::Builder;
 use PDF::Builder::Util;
 
-#my $compress = 'none'; # uncompressed streams
-my $compress = 'flate'; # compressed streams
+my $compress = 'none'; # uncompressed streams
+#my $compress = 'flate'; # compressed streams
 
 my $pdf = PDF::Builder->new(-compress => $compress);
 
-my $f1 = $pdf->corefont('Helvetica', -encode=>'latin1'); # unused
+#my $f1 = $pdf->corefont('Helvetica', -encode=>'latin1'); # unused
 my $f2 = $pdf->corefont('Helvetica-Bold', -encode=>'latin1'); # page heading
 
 my $page = $pdf->page();
-$page->mediabox(595,842);
+$page->mediabox(595,842); # A4 paper
 
 # just some random text near the top of the page
 my $gfx = $page->gfx();
 my $text = $page->text();
-$text->textlabel(50,700, $f2,20, 'Hello World!', -color=>'red');
+$text->textlabel(50,750, $f2,20, 'Hello World!', -color=>'red');
 
 # draw a grid with 50pt blocks to see where rectangles are
 $gfx->strokecolor("#CCC");
-for (my $i=0; $i<=300; $i+=50) {
-  $gfx->poly(0,$i, 300,$i);
-  $text->textlabel(315,$i, $f2,10, $i);
+my $gridW = 500;
+my $gridH = 700;
+# offset everything by 10,10 to clear edges
 
-  $gfx->poly($i,0, $i,300);
-  $text->textlabel($i,315, $f2,10, $i);
+# horizontal lines and labels, i is Y (0 at bottom)
+for (my $i=0; $i<=$gridH; $i+=50) {
+  $gfx->poly(10,$i+10, $gridW+10,$i+10);
+  $text->textlabel($gridW+20,$i+8, $f2,10, $i);
+}
+
+# vertical lines and labels, i is X (0 at left)
+for (my $i=0; $i<=$gridW; $i+=50) {
+  $gfx->poly($i+10,10, $i+10,$gridH+10);
+  $text->textlabel($i+8,$gridH+20, $f2,10, $i);
 }
 $gfx->stroke();
 
-# open note (annotation) that can be replied to multiple times by users
-# active area is supposed to be 100x100 at 0,0 (LL), but it seems to be little 
-# larger than the visible icon! BTW, the icon can be dragged and dropped.
-my $ant = $page->annotation();
-$ant->text("This is an open note.\nnext line", -rect=>[0,0, 100,100], -open=>1);
-
-# closed note (annotation) that still can be replied to multiple times by users
-# active area is supposed to be 100x100 at 100,100 (LL), but it seems to be 
+# initially open note (annotation), can be replied to multiple times by users.
+# active area is supposed to be 100x100 at 50,150 (LL), but it seems to be a
 # little larger than the visible icon! BTW, the icon can be dragged and dropped.
+my $ant = $page->annotation();
+$ant->text("This is an initially open note.\nnext line", 
+	   -color=>[ 0.8 ],  # light gray icon fill
+	   -icon=>'Key',
+	   -rect=>[60,10, 160,110], -open=>1);
+
+# initially closed note (annotation), can be replied to multiple times by users.
+# active area is supposed to be 100x100 at 200,300 (LL), but it seems to be 
+# little larger than the visible icon! BTW, the icon can be dragged and dropped.
+# note that a new annotation object must be created.
 $ant = $page->annotation();
-$ant->text('This is an closed note', -rect=>[100,100, 200,200]);
+$ant->text('This is an initially closed note', 
+	   -color=>[ 0.3 ],  # dark gray icon fill
+	   -text=>'Closed for the day!',  # extra note on rollover
+	   -border=>[10,10, 10],  # prominent border
+	   # -icon   use default (Note)
+	   -rect=>[210,110, 310,210]);
 
 $pdf->saveas("$0.pdf");
 $pdf->end();

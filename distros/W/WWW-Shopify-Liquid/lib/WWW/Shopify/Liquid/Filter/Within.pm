@@ -7,6 +7,10 @@ use base 'WWW::Shopify::Liquid::Filter';
  
 sub min_arguments { return 1; }
 sub max_arguments { return 1; }
-sub operate { return "/collections/" . $_[3]->{handle} . $_[2]; }
+sub operate { 
+	my ($self, $hash, $operand, $collection) = @_;
+	return $operand unless $collection;
+	return "/collections/" . $collection->{handle} . $operand;
+}
 
 1;

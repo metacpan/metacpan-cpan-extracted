@@ -2,8 +2,7 @@
 
 #
 # dbcolsplittocols.pm
-# Copyright (C) 1991-2015 by John Heidemann <johnh@isi.edu>
-# $Id: a77153f1d066313657e9c830914d1f135e047459 $
+# Copyright (C) 1991-2017 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -18,7 +17,7 @@ dbcolsplittocols - split an existing column into multiple new columns
 
 =head1 SYNOPSIS
 
-dbcolsplittocols [-E] [-C ElementSeparator] column [column...]
+dbcolsplittocols [-E] [-C ElementSeparator] column
 
 =head1 DESCRIPTION
 
@@ -39,7 +38,27 @@ to set column names.
 =item B<-C S> or B<--element-separator S>
 
 Specify the separator I<S> used to join columns.
+Usually a signle character, it can also be a regular expression
+(so, for example, [,_] matches either , or _ as an element separator.)
 (Defaults to a single underscore.)
+
+=item B<-E> or B<--enumerate>
+
+Enumerate output columns: rather than assuming the column name uses
+the element separator, we keep it whole and fill in with indexes
+starting from 0.
+(Not currently implemented, but planned.  See
+L<dbcolsplittorows>.)
+
+=item B<-N> on B<--new-name>
+
+Specify the names of the new columns
+as a I<space> separated list.
+(Default is to apply the separator to the name of the column that is being split.)
+
+By default, column C<a_b> will split to columns a and b.
+If the column is given as ab with option C<-N 'a b'>, 
+one will get the same result.
 
 =item B<-E> or B<--enumerate>
 
@@ -78,6 +97,11 @@ By default, programs process automatically,
 but Fsdb::Filter objects in Perl do not run until you invoke
 the run() method.
 The C<--(no)autorun> option controls that behavior within Perl.
+
+=item B<--header> H
+
+Use H as the full Fsdb header, rather than reading a header from
+then input.
 
 =item B<--help>
 
@@ -177,6 +201,8 @@ sub set_defaults ($) {
     $self->{_elem_separator} = '_';
     $self->{_enumerate} = undef;
     $self->{_target_column} = undef;
+    $self->{_header} = undef;
+    $self->{_destination_column_list} = undef;
 }
 
 =head2 parse_options
@@ -200,8 +226,10 @@ sub parse_options ($@) {
 	'C|element-separator=s' => \$self->{_elem_separator},
 	'd|debug+' => \$self->{_debug},
 	'E|enumerate!' => \$self->{_enumerate},
+	'header=s' => \$self->{_header},
 	'i|input=s' => sub { $self->parse_io_option('input', @_); },
 	'log!' => \$self->{_logprog},
+	'N|new-name=s' => \$self->{_destination_column_list},
 	'o|output=s' => sub { $self->parse_io_option('output', @_); },
 	) or pod2usage(2);
     $self->parse_target_column(\@argv);
@@ -215,10 +243,12 @@ Internal: setup, parse headers.
 
 =cut
 
-sub setup ($) {
+sub setup($) {
     my($self) = @_;
 
-    $self->finish_io_option('input', -comment_handler => $self->create_pass_comments_sub);
+    my(@in_options) = (-comment_handler => $self->create_pass_comments_sub);
+    push(@in_options, -header => $self->{_header}) if (defined($self->{_header}));
+    $self->finish_io_option('input', @in_options);
 
     pod2usage(2) if (!defined($self->{_target_column}));
 
@@ -236,7 +266,11 @@ sub setup ($) {
 	# xxx: need to estimate how many we need, but we can't do that.
 	croak $self->{_prog} . ": enumeration is not currently supported\n";
     } else {
-	@new_columns = split(/$self->{_elem_separator}/, $self->{_target_column});
+        if (defined($self->{_destination_column_list})) {
+            @new_columns = split(/[\s+]/, $self->{_destination_column_list});
+        } else {
+            @new_columns = split(/$self->{_elem_separator}/, $self->{_target_column});
+        };
     };
     my @new_colis = ();
 
@@ -285,7 +319,7 @@ sub run ($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1991-2015 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1991-2017 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

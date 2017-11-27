@@ -5,8 +5,8 @@ no warnings qw[ deprecated recursion uninitialized ];
 
 # $VERSION defined here so developers can run PDF::Builder from git.
 # it should be automatically updated as part of the CPAN build.
-our $VERSION = '3.007'; # VERSION
-my $LAST_UPDATE = '3.006'; # manually update whenever code is changed
+our $VERSION = '3.008'; # VERSION
+my $LAST_UPDATE = '3.008'; # manually update whenever code is changed
 
 use Carp;
 use Encode qw(:all);
@@ -31,6 +31,8 @@ use Scalar::Util qw(weaken);
 
 our @FontDirs = ( (map { "$_/PDF/Builder/fonts" } @INC),
                   qw[ /usr/share/fonts /usr/local/share/fonts c:/windows/fonts c:/winnt/fonts ] );
+our @MSG_COUNT = (0,  # Graphics::TIFF not installed
+	         );
 
 =head1 NAME
 
@@ -1131,14 +1133,14 @@ sub saveas {
 }
 
 sub save {
-    my ($self, $file) = @_;
+    my ($self) = @_;
 
-    if ($self->{'reopened'}) {
-        die "invalid method invocation: use 'saveas' instead.";
+    if      ($self->{'reopened'}) {
+        die "Invalid method invocation: use 'saveas' instead of 'save'.";
     } elsif ($self->{' filed'}) {
         $self->{'pdf'}->close_file();
     } else {
-        die "invalid method invocation: use 'saveas' instead.";
+        die "Invalid method invocation: use 'saveas' instead of 'save'.";
     }
 
     $self->end();
@@ -2158,6 +2160,14 @@ Emboldening factor (0.1+, bold = 1, heavy = 2, ...)
 
 Additional character spacing in ems (0-1000)
 
+=item -caps
+
+0 for normal text, 1 for small caps. Note that not all lower case letters
+appear to have small caps equivalents defined for them. These include, but are
+not limited to, 'n U+0149, fi ligature U+FB01, fl ligature U+FB02, German eszet
+(sharp s) U+00DF, and doubtless others. In such cases, you may want to consider
+replacing these ligatures with separate characters: '+n, f+i, f+l, s+s, etc.
+
 =back
 
 See also L<PDF::Builder::Resource::Font::SynFont>
@@ -2261,20 +2271,97 @@ sub image_jpeg {
     return $obj;
 }
 
+=item $tiff = $pdf->image_tiff($file, %opts)
+
 =item $tiff = $pdf->image_tiff($file)
 
-Imports and returns a new TIFF image object.  C<$file> may be either a filename or a filehandle.
+Imports and returns a new TIFF image object. C<$file> may be either a filename or a filehandle.
+
+Note that the Graphics::TIFF support library does B<not> currently permit a 
+filehandle for C<$file>.
+
+PDF::Builder will use the Graphics::TIFF support library for TIFF functions, if
+it is available, unless explicitly told not to. Your code can test whether
+Graphics::TIFF is available by examining C<< $tiff->usesLib() >>.
+
+=over
+
+=item -1 
+
+Graphics::TIFF I<is> installed, but your code has specified C<-nouseGT>, to 
+I<not> use it. The old, pure Perl, code (buggy!) will be used instead, as if 
+Graphics::TIFF was not installed.
+
+=item 0
+
+Graphics::TIFF is I<not> installed. Not all systems are able to successfully
+install this package, as it requires libtiff.a.
+
+=item 1
+
+Graphics::TIFF is installed and is being used.
+
+=back
+
+Options:
+
+=over
+
+=item -nouseGT => 1
+
+Do B<not> use the Graphics::TIFF library, even if it's available. Normally
+you I<would> want to use this library, but there may be cases where you don't,
+such as when you want to use a file I<handle> instead of a I<name>.
+
+=item -silent => 1
+
+Do not give the message that Graphics::TIFF is not B<installed>. This message
+will be given only once, but you may want to suppress it, such as during 
+t-tests.
+
+=back
 
 =cut
-
-# =item $tiff = $pdf->image_tiff($file, %options)   no current options
 
 sub image_tiff {
     my ($self, $file, %opts) = @_;
 
-    require PDF::Builder::Resource::XObject::Image::TIFF;
-    my $obj = PDF::Builder::Resource::XObject::Image::TIFF->new($self->{'pdf'}, $file);
-    $self->{'pdf'}->out_obj($self->{'pages'});
+    my ($rc, $obj);
+    $rc = eval {
+        require Graphics::TIFF;
+	1;
+    };
+    if (!defined $rc) { $rc = 0; }  # else is 1
+    if ($rc) {
+	# Graphics::TIFF available
+	if (defined $opts{'-nouseGT'} && $opts{'-nouseGT'} == 1) {
+	   $rc = -1;  # don't use it
+	}
+    }
+    if ($rc == 1) {
+	# Graphics::TIFF available and to be used
+        require PDF::Builder::Resource::XObject::Image::TIFF_GT;
+        $obj = PDF::Builder::Resource::XObject::Image::TIFF_GT->new($self->{'pdf'}, $file);
+        $self->{'pdf'}->out_obj($self->{'pages'});
+    } else {
+	# Graphics::TIFF not available, or is but is not to be used
+        require PDF::Builder::Resource::XObject::Image::TIFF;
+        $obj = PDF::Builder::Resource::XObject::Image::TIFF->new($self->{'pdf'}, $file);
+        $self->{'pdf'}->out_obj($self->{'pages'});
+
+	if ($rc == 0 && $MSG_COUNT[0]++ == 0) {
+	    # TBD give warning message once, unless silenced (-silent) or
+	    # deliberately not using Graphics::TIFF (rc == -1)
+	    if (!defined $opts{'-silent'} || $opts{'-silent'} == 0) {
+	        print STDERR "Your system does not have Graphics::TIFF installed, so some\nTIFF functions may not run correctly.\n";
+		# even if -silent only once, COUNT still incremented
+	    }
+	}
+    }
+    $obj->{'usesGT'} = PDFNum($rc);  # -1 available but unused
+                                     #  0 not available
+			             #  1 available and used
+				     # $tiff->usesLib() to get number
 
     return $obj;
 }
@@ -2646,6 +2733,11 @@ sub outlines {
     $self->{'pdf'}->{'Root'}->{'Outlines'} ||= PDF::Builder::Outlines->new($self);
 
     my $obj = $self->{'pdf'}->{'Root'}->{'Outlines'};
+    bless $obj, 'PDF::Builder::Outlines';
+    $obj->{' apipdf'} = $self->{'pdf'};
+    $obj->{' api'}    = $self;
+    weaken $obj->{' apipdf'};
+    weaken $obj->{' api'};
 
     $self->{'pdf'}->new_obj($obj) unless $obj->is_obj($self->{'pdf'});
     $self->{'pdf'}->out_obj($obj);

@@ -77,50 +77,43 @@ if( -f $opt->cache ) {
 unless( keys %SongsByArtist ) {
     my $artists = $subsonic->api_request('getArtists');
     debug_var($artists);
-    foreach my $idx ( sort keys %{ $artists->{artists}{index} } ) {
-        debug({color=>'magenta'}, "Index:$idx");
-        foreach my $artist (sort keys %{ $artists->{artists}{index}{$idx}{artist} })  {
-            my $i = $artists->{artists}{index}{$idx}{artist}{$artist};
+    foreach my $idx ( @{ $artists->{artists}{index} } ) {
+        debug({color=>'magenta'}, "Index:$idx->{name}");
+        foreach my $i (@{ $idx->{artist} })  {
+            my $artist     = $i->{name};
             my $normArtist = normalize($artist);
             output({clear=>1},"$i->{id} - $artist ($normArtist)");
             my $artres = $subsonic->api_request(getArtist => { id => $i->{id} } );
             debug_var($artres);
             my $albums = $artres->{artist}{album};
-            # If only one album, we need to emulate more than one album
-            if( exists $albums->{artistId} ) {
-                $albums = { $albums->{name} => dclone($albums) };
-            }
             foreach my $album (
-                sort { $albums->{$a}{year} <=> $albums->{$b}{year} }
-                map  { $albums->{$_}{year} //= 0; $_ }
-                keys %{ $albums }
+                sort { $a->{year} <=> $b->{year} }
+                map  { $_->{year} //= 0; $_ }
+               @{ $albums }
             ) {
                 output({indent=>1}, sprintf "%04d - %s by %s",
-                    $albums->{$album}{year},
-                    $album,
-                    $albums->{$album}{artist},
+                    $album->{year},
+                    $album->{name},
+                    $album->{artist},
                 );
-                my $normAlbum = normalize($album);
-                my $albres = $subsonic->api_request(getAlbum => { id => $albums->{$album}{id} });
+                my $normAlbum = normalize($album->{name});
+                my $albres = $subsonic->api_request(getAlbum => { id => $album->{id} });
                 debug_var($albres);
                 my $songs = $albres->{album}{song};
-                if ( exists $songs->{id} ) {
-                    $songs = { $songs->{id} => dclone($songs) };
-                }
-                foreach my $song_id (
-                    sort { $songs->{$a}{track} <=> $songs->{$b}{track} }
-                    map  { $songs->{$_}{track} ||= 0; $_ }
-                    keys %{ $songs }
+                foreach my $song (
+                    sort { $a->{track} <=> $b->{track} }
+                    map  { $_->{track} ||= 0; $_ }
+                    @{ $songs }
                 ) {
                     output({indent=>2}, sprintf "%02d - %s",
-                        $songs->{$song_id}{track},
-                        $songs->{$song_id}{title},
+                        $song->{track},
+                        $song->{title},
                     );
 
-                    my $normTitle = normalize($songs->{$song_id}{title});
+                    my $normTitle = normalize($song->{title});
                     $SongsByArtist{$normArtist} ||= {};
                     $SongsByArtist{$normArtist}->{$normAlbum}{$normTitle} ||= [];
-                    push @{ $SongsByArtist{$normArtist}->{$normAlbum}{$normTitle} }, $song_id;
+                    push @{ $SongsByArtist{$normArtist}->{$normAlbum}{$normTitle} }, $song->{id};
                 }
             }
         }
@@ -214,7 +207,7 @@ subsonic_import_ratings.pl - Import Ratings from an iTunes Library XML Export to
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 AUTHOR
 

@@ -32,6 +32,8 @@
 //
 // login-dialog.js
 //
+// this module implements the login dialog
+//
 "use strict";
 
 define ([
@@ -50,9 +52,10 @@ define ([
 
     return function () {
 
-        var // submitCallback is called when user submits login dialog form 
-
-            submitCallback = function (event) {
+        var submitCallback = function (event) {
+                //
+                // called when user submits login dialog form
+                //
                 console.log("Entering submitCallback()");
                 event.preventDefault();
                 login({
@@ -61,16 +64,13 @@ define ([
                 });
             },
 
-            // formHandler processes user input in login dialog form
-
             formHandler = function () {
+                //
+                // process user input in login dialog form
+                //
                 $('input[name="nam"]').val('').focus();
                 $('input[name="pwd"]').val('');
-
-                // Set up form submit callback
                 $('#loginform').submit(submitCallback);
-
-                // Set up listener for <ENTER> keydowns in "username" field
                 $('input[name="nam"]').keydown(function (evt) {
                     lib.logKeyDown(evt);
                     if (evt.keyCode === 13) {
@@ -80,8 +80,6 @@ define ([
                         evt.preventDefault();
                     }
                 });
-
-                // Set up listener for <ENTER> and <TAB> keydowns in "password" field
                 $('input[name="pwd"]').keydown(function (evt) {
                     lib.logKeyDown(evt);
                     if (evt.keyCode === 13) {
@@ -92,10 +90,12 @@ define ([
                         $('input[name="nam"]').focus();
                     }
                 });
-            }; // end of var list
+            }
+            ;
 
         $('#mainarea').html(html.loginDialog());
         formHandler();
 
     }
+
 });

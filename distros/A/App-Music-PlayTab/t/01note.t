@@ -8,6 +8,7 @@ use Test::More tests => 4 * 12 + 1 + 3 * 13 * 2;
 BEGIN { use_ok qw(App::Music::PlayTab::Note) }
 
 use App::Music::PlayTab::NoteMap qw(@FNotes @SNotes);
+use App::Music::PlayTab::Output::PostScript;
 
 # Foreach note, check the name and ps function.
 foreach my $k ( @FNotes ) {

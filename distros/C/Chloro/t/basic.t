@@ -7,7 +7,7 @@ use lib 't/lib';
 
 use Chloro::Test::Login;
 use Chloro::Types qw( Bool Str );
-use List::MoreUtils qw( all );
+use List::AllUtils qw( all );
 
 my $form = Chloro::Test::Login->new();
 
@@ -38,7 +38,7 @@ my $form = Chloro::Test::Login->new();
 }
 
 {
-    my $set = $form->process(
+    my $result_set = $form->process(
         params => {
             username => 'foo',
             password => 'bar',
@@ -47,17 +47,17 @@ my $form = Chloro::Test::Login->new();
     );
 
     ok(
-        $set->is_valid(),
+        $result_set->is_valid(),
         'the returned result set says the form values are valid'
     );
 
     ok(
-        ( all { $_->is_valid() } $set->_result_values() ),
+        ( all { $_->is_valid() } $result_set->_result_values() ),
         'all individual results are marked as valid'
     );
 
     is_deeply(
-        $set->results_as_hash(), {
+        $result_set->results_as_hash(), {
             username => 'foo',
             password => 'bar',
             remember => 0,
@@ -67,7 +67,7 @@ my $form = Chloro::Test::Login->new();
 }
 
 {
-    my $set = $form->process(
+    my $result_set = $form->process(
         params => {
             username => 'foo',
             password => 'bar',
@@ -76,7 +76,7 @@ my $form = Chloro::Test::Login->new();
     );
 
     is_deeply(
-        $set->results_as_hash(), {
+        $result_set->results_as_hash(), {
             username => 'foo',
             password => 'bar',
             remember => 1,
@@ -86,18 +86,18 @@ my $form = Chloro::Test::Login->new();
 }
 
 {
-    my $set = $form->process(
+    my $result_set = $form->process(
         params => {
             username => 'foo',
         }
     );
 
     ok(
-        !$set->is_valid(),
+        !$result_set->is_valid(),
         'result set is not valid when password is not provided'
     );
 
-    my $pw_result = $set->result_for('password');
+    my $pw_result = $result_set->result_for('password');
 
     is_deeply(
         $pw_result->param_names(),
@@ -106,7 +106,7 @@ my $form = Chloro::Test::Login->new();
     );
 
     ok(
-       !$pw_result->is_valid(),
+        !$pw_result->is_valid(),
         'result for password is not valid'
     );
 
@@ -130,17 +130,17 @@ my $form = Chloro::Test::Login->new();
 }
 
 {
-    my $set = $form->process(
+    my $result_set = $form->process(
         params => {
             username => 'foo',
             password => undef,
         }
     );
 
-    my $pw_result = $set->result_for('password');
+    my $pw_result = $result_set->result_for('password');
 
     ok(
-       !$pw_result->is_valid(),
+        !$pw_result->is_valid(),
         'result for password is not valid (password is undef)'
     );
 
@@ -158,17 +158,17 @@ my $form = Chloro::Test::Login->new();
 }
 
 {
-    my $set = $form->process(
+    my $result_set = $form->process(
         params => {
             username => 'foo',
             password => q{},
         }
     );
 
-    my $pw_result = $set->result_for('password');
+    my $pw_result = $result_set->result_for('password');
 
     ok(
-       !$pw_result->is_valid(),
+        !$pw_result->is_valid(),
         'result for password is not valid (password is empty string)'
     );
 
@@ -186,17 +186,17 @@ my $form = Chloro::Test::Login->new();
 }
 
 {
-    my $set = $form->process(
+    my $result_set = $form->process(
         params => {
             username => 'foo',
             password => [],
         }
     );
 
-    my $pw_result = $set->result_for('password');
+    my $pw_result = $result_set->result_for('password');
 
     ok(
-       !$pw_result->is_valid(),
+        !$pw_result->is_valid(),
         'result for password is not valid (password is an array ref)'
     );
 

@@ -1,7 +1,7 @@
 package DDG::Meta::ZeroClickInfoSpice;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Functions for generating a L<DDG::ZeroClickInfo::Spice> factory
-$DDG::Meta::ZeroClickInfoSpice::VERSION = '1017';
+$DDG::Meta::ZeroClickInfoSpice::VERSION = '1018';
 use strict;
 use warnings;
 use Carp;
@@ -29,14 +29,15 @@ sub zeroclickinfospice_attributes {qw(
 	ttl
 	error_fallback
 	alt_to
-        upstream_timeouts
+	upstream_timeouts
+	content_type_javascript
 )}
 
 my %applied;
 
 sub apply_keywords {
 	my ( $class, $target ) = @_;
-	
+
 	return if exists $applied{$target};
 	$applied{$target} = undef;
 
@@ -48,8 +49,9 @@ sub apply_keywords {
 		call => $path,
 		wrap_jsonp_callback => 0,
 		wrap_string_callback => 0,
+		content_type_javascript => 0,
 		accept_header => 0,
-                upstream_timeouts => +{},
+		upstream_timeouts => +{},
 	);
 
 	my $stash = Package::Stash->new($target);
@@ -63,7 +65,8 @@ sub apply_keywords {
 		delete $params{'accept_header'};
 		delete $params{'proxy_cache_valid'};
 		delete $params{'proxy_ssl_session_reuse'};
-                delete $params{'upstream_timeouts'};
+		delete $params{'upstream_timeouts'};
+		delete $params{'content_type_javascript'};
 		return DDG::ZeroClickInfo::Spice->new(
 			%params,
 		);
@@ -157,7 +160,7 @@ sub apply_keywords {
 		unless (defined $rewrite) {
 			if ($target->has_rewrite) {
 				$rewrite = create_rewrite($callback, $path, \%zcispice_params);
-			} 
+			}
 			else {
 				$rewrite = '';
 			}
@@ -185,7 +188,7 @@ sub apply_keywords {
 	$stash->add_symbol('&get_nginx_conf',sub {
 		my $nginx_conf_func = $stash->get_symbol('&nginx_conf');
 		return $nginx_conf_func->(@_) if $nginx_conf_func;
- 
+
 		# (20151208 zt) just in case downstream can't handle undef ;-/
 		my $conf = '';
 		if($target->has_rewrite){
@@ -237,6 +240,7 @@ sub create_rewrite {
 		to => $params->{to},
 		defined $params->{from} ? ( from => $params->{from}) : (),
 		defined $params->{proxy_cache_valid} ? ( proxy_cache_valid => $params->{proxy_cache_valid} ) : (),
+		defined $params->{content_type_javascript} ? ( content_type_javascript => $params->{content_type_javascript} ) : (),
 		defined $params->{proxy_ssl_session_reuse} ? ( proxy_ssl_session_reuse => $params->{proxy_ssl_session_reuse} ) : (),
 		defined $params->{post_body} ? ( post_body => $params->{post_body} ) : (),
 		callback => $callback,
@@ -245,7 +249,7 @@ sub create_rewrite {
 		wrap_string_callback => $params->{wrap_string_callback},
 		headers => $params->{headers},
 		error_fallback => $params->{error_fallback},
-                upstream_timeouts => $params->{upstream_timeouts},
+		upstream_timeouts => $params->{upstream_timeouts},
 	);
 }
 
@@ -261,7 +265,7 @@ DDG::Meta::ZeroClickInfoSpice - Functions for generating a L<DDG::ZeroClickInfo:
 
 =head1 VERSION
 
-version 1017
+version 1018
 
 =head1 AUTHOR
 

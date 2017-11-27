@@ -1084,6 +1084,8 @@ sub establish_snmp_session {
       $params{'-community'} = 
           $self->decode_password($self->opts->community);
     }
+    # breaks cisco wlc $params{'-timeout'} = $self->opts->timeout() > 60 ?
+    #    15 : $self->opts->timeout() - 1;
     my ($session, $error) = Net::SNMP->session(%params);
     if (! defined $session) {
       $self->add_message(CRITICAL, 

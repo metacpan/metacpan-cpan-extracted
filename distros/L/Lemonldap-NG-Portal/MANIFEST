@@ -114,12 +114,14 @@ example/skins/common/js/jquery.base64.js
 example/skins/common/js/jquery.base64.min.js
 example/skins/common/js/jquery.cookie.js
 example/skins/common/js/jquery.cookie.min.js
+example/skins/common/js/kerberos.js
 example/skins/common/js/portal.js
 example/skins/common/js/portal.min.js
 example/skins/common/js/sha256.js
 example/skins/common/js/sha256.min.js
 example/skins/common/key.png
 example/skins/common/lemonldap-ng_square.png
+example/skins/common/LinkedIn.png
 example/skins/common/mail_confirm.tpl
 example/skins/common/mail_footer.tpl
 example/skins/common/mail_header.tpl
@@ -250,7 +252,9 @@ lib/Lemonldap/NG/Portal/AuthDBI.pm
 lib/Lemonldap/NG/Portal/AuthDemo.pm
 lib/Lemonldap/NG/Portal/AuthFacebook.pm
 lib/Lemonldap/NG/Portal/AuthGoogle.pm
+lib/Lemonldap/NG/Portal/AuthKerberos.pm
 lib/Lemonldap/NG/Portal/AuthLDAP.pm
+lib/Lemonldap/NG/Portal/AuthLinkedIn.pm
 lib/Lemonldap/NG/Portal/AuthMulti.pm
 lib/Lemonldap/NG/Portal/AuthNull.pm
 lib/Lemonldap/NG/Portal/AuthOpenID.pm

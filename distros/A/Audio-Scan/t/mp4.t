@@ -30,11 +30,11 @@ use Audio::Scan;
 # AAC file from iTunes 8.1.1
 {
     my $s = Audio::Scan->scan( _f('itunes811.m4a'), { md5_size => 4096 } );
-    
+
     my $info  = $s->{info};
     my $tags  = $s->{tags};
     my $track = $info->{tracks}->[0];
-    
+
     is( $info->{audio_offset}, 6169, 'Audio offset ok' );
     is( $info->{audio_size}, 320, 'Audio size ok' );
     is( $info->{audio_md5}, '9bf0388a5bfd81c857fdce52dac9ce7f', 'Audio MD5 ok' );
@@ -49,7 +49,7 @@ use Audio::Scan;
     is( $info->{samplerate}, 44100, 'Sample rate ok' );
     is( $info->{avg_bitrate}, 96000, 'Avg bitrate ok' );
     is( $info->{dlna_profile}, 'AAC_ISO_192', 'DLNA profile AAC_ISO_192 ok' );
-    
+
     is( $track->{audio_object_type}, 2, 'Audio object type ok' );
     is( $track->{audio_type}, 64, 'Audio type ok' );
     is( $track->{bits_per_sample}, 16, 'Bits per sample ok' );
@@ -60,7 +60,7 @@ use Audio::Scan;
     is( $track->{handler_type}, 'soun', 'Handler type ok' );
     is( $track->{id}, 1, 'Track ID ok' );
     is( $track->{max_bitrate}, 0, 'Max bitrate ok' );
-    
+
     is( $tags->{AART}, 'Album Artist', 'AART ok' );
     is( $tags->{ALB}, 'Album', 'ALB ok' );
     is( $tags->{ART}, 'Artist', 'ART ok' );
@@ -96,22 +96,22 @@ use Audio::Scan;
 # ALAC file from iTunes 8.1.1
 {
     my $s = Audio::Scan->scan( _f('alac.m4a') );
-    
+
     my $info  = $s->{info};
     my $tags  = $s->{tags};
     my $track = $info->{tracks}->[0];
-    
+
     is( $info->{audio_offset}, 3850, 'ALAC audio offset ok' );
     is( $info->{song_length_ms}, 10, 'ALAC song length ok' );
     is( $info->{samplerate}, 44100, 'ALAC samplerate ok' );
     is( $info->{avg_bitrate}, 981600, 'ALAC avg bitrate ok' );
     ok( !exists $info->{dlna_profile}, 'ALAC no DLNA profile ok' );
-    
+
     is( $track->{duration}, 10, 'ALAC duration ok' );
     is( $track->{encoding}, 'alac', 'ALAC encoding ok' );
     is( $track->{bits_per_sample}, 16, 'ALAC bits_per_sample ok' );
     is( $track->{channels}, 2, 'ALAC channels ok' );
-    
+
     is( $tags->{CPIL}, 0, 'ALAC CPIL ok' );
     is( $tags->{DISK}, '1/2', 'ALAC DISK ok' );
     is( $tags->{TOO}, 'iTunes 8.1.1', 'ALAC TOO ok' );
@@ -120,17 +120,17 @@ use Audio::Scan;
 # File with mdat before the rest of the boxes
 {
     my $s = Audio::Scan->scan( _f('leading-mdat.m4a') );
-    
+
     my $info  = $s->{info};
     my $tags  = $s->{tags};
-    
+
     is( $info->{audio_offset}, 20, 'Leading MDAT offset ok' );
     is( $info->{leading_mdat}, 1, 'Leading MDAT flag ok' );
     is( $info->{song_length_ms}, 69845, 'Leading MDAT length ok' );
     is( $info->{samplerate}, 44100, 'Leading MDAT samplerate ok' );
     is( $info->{avg_bitrate}, 128000, 'Leading MDAT bitrate ok' );
     ok( !exists $info->{dlna_profile}, 'Leading MDAT no DLNA profile ok' );
-    
+
     is( $tags->{DAY}, '-001', 'Leading MDAT DAY ok' );
     is( $tags->{TOO}, 'avc2.0.11.1110', 'Leading MDAT TOO ok' );
 }
@@ -138,9 +138,9 @@ use Audio::Scan;
 # File with array keys, bug 13486
 {
     my $s = Audio::Scan->scan( _f('array-keys.m4a') );
-    
+
     my $tags = $s->{tags};
-    
+
     is( $tags->{AART}, 'Sonic Youth', 'Array key single key ok' );
     is( ref $tags->{PRODUCER}, 'ARRAY', 'Array key array element ok' );
     is( $tags->{PRODUCER}->[0], 'Ron Saint Germain', 'Array key element 0 ok' );
@@ -153,9 +153,9 @@ use Audio::Scan;
 # 88.2 kHz sample rate, bug 8563
 {
     my $s = Audio::Scan->scan( _f('882-sample-rate.m4a') );
-    
+
     my $info = $s->{info};
-    
+
     is( $info->{samplerate}, 88200, '88.2 sample rate ok' );
     is( $info->{song_length_ms}, 179006, '88.2 song length ok' );
     ok( !exists $info->{dlna_profile}, '88.2 no DLNA profile ok' );
@@ -164,20 +164,20 @@ use Audio::Scan;
 # Multiple covers, bug 14476
 {
 	my $s = Audio::Scan->scan( _f('multiple-covers.m4a') );
-	
+
 	my $tags = $s->{tags};
-	
+
 	is( length( $tags->{COVR} ), 2103, 'Multiple cover art reads first cover ok' );
 }
 
 # Test ignoring artwork
 {
     local $ENV{AUDIO_SCAN_NO_ARTWORK} = 1;
-    
+
     my $s = Audio::Scan->scan( _f('multiple-covers.m4a') );
-	
+
 	my $tags = $s->{tags};
-	
+
 	is( $tags->{COVR}, 2103, 'COVR with AUDIO_SCAN_NO_ARTWORK ok' );
 	is( $tags->{COVR_offset}, 1926, 'COVR with AUDIO_SCAN_NO_ARTWORK offset ok' );
 }
@@ -185,9 +185,9 @@ use Audio::Scan;
 # File with array keys that are integers, bug 14462
 {
     my $s = Audio::Scan->scan( _f('array-keys-int.m4a') );
-    
+
     my $tags = $s->{tags};
-    
+
     is( $tags->{AART}, 'Stevie Wonder', 'Array key int single key ok' );
     is( ref $tags->{FREE}, 'ARRAY', 'Array key int array element ok' );
     is( $tags->{FREE}->[0], 1969970, 'Array key int element 0 ok' );
@@ -201,9 +201,9 @@ use Audio::Scan;
 # File with short trkn field
 {
     my $s = Audio::Scan->scan( _f('short-trkn.m4a') );
-    
+
     my $tags = $s->{tags};
-    
+
     is( $tags->{TRKN}, 10, 'Short trkn ok' );
 }
 
@@ -211,21 +211,21 @@ use Audio::Scan;
 # Contains 48khz LC track and 96khz SLS track
 {
     my $s = Audio::Scan->scan( _f('hd-aac.m4a') );
-    
+
     my $info = $s->{info};
-    
+
     is( $info->{samplerate}, 96000, 'HD-AAC samplerate ok' );
     is( $info->{song_length_ms}, 409130, 'HD-AAC song length ok' );
     is( $info->{avg_bitrate}, 4, 'HD-AAC avg bitrate ok' );
     ok( !exists $info->{dlna_profile}, 'HD-AAC no DLNA profile ok' );
-    
+
     my $track1 = $info->{tracks}->[0];
     my $track2 = $info->{tracks}->[1];
-    
+
     is( $track1->{audio_object_type}, 2, 'HD-AAC LC track ok' );
     is( $track1->{samplerate}, 48000, 'HD-AAC LC track samplerate ok' );
     is( $track1->{bits_per_sample}, 16, 'HD-AAC LC track bps ok' );
-    
+
     is( $track2->{audio_object_type}, 37, 'HD-AAC SLS track ok' );
     is( $track2->{samplerate}, 96000, 'HD-AAC SLS track samplerate ok' );
     is( $track2->{bits_per_sample}, 24, 'HD-AAC SLS track bps ok' );
@@ -234,9 +234,9 @@ use Audio::Scan;
 # Bug 15262, secondary hint track with 0 duration, caused bad song_length_ms value
 {
     my $s = Audio::Scan->scan( _f('hint-track.m4a') );
-    
+
     my $info = $s->{info};
-    
+
     is( $info->{song_length_ms}, 263433, 'MP4 hint track song_length_ms ok' );
     is( $info->{dlna_profile}, 'AAC_ISO_320', 'MP4 hint track DLNA profile AAC_ISO_320 ok' );
     is( $info->{tracks}->[0]->{duration}, 263433, 'MP4 hint track track 1 duration ok' );
@@ -246,12 +246,12 @@ use Audio::Scan;
 # HE-AAC file, tests that we got the right samplerate from esds
 {
     my $s = Audio::Scan->scan( _f('heaac.mp4') );
-    
+
     my $info = $s->{info};
-    
+
     is( $info->{samplerate}, 16000, 'HE-AAC main samplerate 16000 ok' );
     is( $info->{tracks}->[0]->{samplerate}, 16000, 'HE-AAC track 1 samplerate 16000 ok' );
-    
+
     # XXX this should be 2
     #is( $info->{tracks}->[0]->{channels}, 2, 'HE-AAC track 1 channels 2 ok' );
 }
@@ -259,14 +259,14 @@ use Audio::Scan;
 # Find frame
 {
     my $offset = Audio::Scan->find_frame( _f('itunes811.m4a'), 30 );
-    
+
     is( $offset, 6183, 'Find frame ok' );
 }
 
 # Find frame with info
 {
     my $info = Audio::Scan->find_frame_return_info( _f('itunes811.m4a'), 30 );
-    
+
     is( $info->{seek_offset}, 6183, 'Find frame return info offset ok' );
     is( length( $info->{seek_header} ), 6173, 'Find frame return info header rewrite ok' );
 }
@@ -274,7 +274,7 @@ use Audio::Scan;
 # Find frame in ALAC file with unusual stts values
 {
     my $info = Audio::Scan->find_frame_return_info( _f('alac-multiple-stts.m4a'), 30000 );
-    
+
     is( $info->{seek_offset}, 2123193, 'Find frame in ALAC multiple stts ok' );
     is( length( $info->{seek_header} ), 34274, 'Find frame in ALAC multiple stts header ok' );
 }
@@ -282,19 +282,19 @@ use Audio::Scan;
 # Find frame in HD-AAC file (2 tracks) (not yet supported)
 {
     my $info = Audio::Scan->find_frame_return_info( _f('hd-aac.m4a'), 10 );
-    
+
     is( $info->{seek_offset}, -1, 'Find frame in HD-AAC ok' );
 }
 
 # Find frame with info from filehandle
 {
     open my $fh, '<', _f('itunes811.m4a');
-    
+
     my $info = Audio::Scan->find_frame_fh_return_info( mp4 => $fh, 30 );
-    
+
     is( $info->{seek_offset}, 6183, 'Find frame return info via filehandle ok' );
     is( length( $info->{seek_header} ), 6173, 'Find frame return info via filehandle rewrite ok' );
-    
+
     close $fh;
 }
 

@@ -1,5 +1,9 @@
 Revision history for Perl module Mojo::XMLRPC
 
+0.05 2017-11-22
+  - Remove file errantly included in previous release
+0.04 2017-11-22
+  - Fix a bug wherein values without types threw errors rather than treating them as strings (github #2)
 0.03 2017-09-15
   - Fix some errors in the documentation
 0.02 2017-09-08

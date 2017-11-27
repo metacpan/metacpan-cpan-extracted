@@ -11,7 +11,7 @@ use Lemonldap::NG::Portal::Simple;
 use Lemonldap::NG::Portal::_SAML;
 our @ISA = qw(Lemonldap::NG::Portal::_SAML);
 
-our $VERSION = '1.9.13';
+our $VERSION = '1.9.14';
 
 ## @method void issuerDBInit()
 # Load and check SAML configuration
@@ -383,7 +383,7 @@ sub issuerForUnAuthUser {
             my $session_index;
             eval { $session_index = $logout->request()->SessionIndex; };
 
-            # SLO requests without session index are not accepted
+            # SLO requests without session index are not accepted in SOAP mode
             unless ( defined $session_index ) {
                 $self->lmLog(
                     "No session index in SLO request from $spConfKey SP",
@@ -1214,6 +1214,13 @@ sub issuerForAuthUser {
       $self->normalize_url( $url, $self->{issuerDBSAMLPath},
         $saml_sso_get_url );
 
+    # Get domain GET attribute
+    my $domain = $self->url_param('domain');
+
+    if ($domain) {
+        $self->lmLog( "Found domain $domain in SAML GET parameter", 'debug' );
+    }
+
     # 1.1. SSO (SSO URL or Proxy Mode)
     if ( $url =~
 /^(\Q$saml_sso_soap_url\E|\Q$saml_sso_soap_url_ret\E|\Q$saml_sso_get_url\E|\Q$saml_sso_get_url_ret\E|\Q$saml_sso_post_url\E|\Q$saml_sso_post_url_ret\E|\Q$saml_sso_art_url\E|\Q$saml_sso_art_url_ret\E)$/io
@@ -1743,6 +1750,16 @@ sub issuerForAuthUser {
                 return PE_SAML_SSO_ERROR;
             }
 
+            # Rewrite Issuer with domain
+            if ($domain) {
+                my $original_issuer = $login->response->Issuer->content;
+                $self->lmLog( "Add domain $domain to Issuer $original_issuer",
+                    'debug' );
+                my $new_issuer = $original_issuer . "?domain=$domain";
+                $login->response->Issuer->content($new_issuer);
+                $login->response->Assertion->Issuer->content($new_issuer);
+            }
+
             # Set subject NameID
             $response_assertions[0]
               ->set_subject_name_id( $login->nameIdentifier );
@@ -2137,12 +2154,11 @@ sub issuerForAuthUser {
             my $session_index;
             eval { $session_index = $logout->request()->SessionIndex; };
 
-            # SLO requests without session index are not accepted
+            # SLO requests without session index can be accepted
             if ( $@ or !defined $session_index ) {
                 $self->lmLog(
                     "No session index in SLO request from $spConfKey SP",
-                    'error' );
-                return $self->sendSLOErrorResponse( $logout, $method );
+                    'warn' );
             }
 
             # Validate request if no previous error
@@ -2174,18 +2190,27 @@ sub issuerForAuthUser {
             my $provider_nb =
               $self->sendLogoutRequestToProviders( $logout, $relayID );
 
-            # Get session index
-            my $sessionIndexSession = $self->getSamlSession($session_index);
-            return PE_SAML_SESSION_ERROR unless $sessionIndexSession;
+            # Get local session id session index
+            my $local_session_id;
 
-            my $local_session_id = $sessionIndexSession->data->{_saml_id};
+            if ($session_index) {
+                my $sessionIndexSession = $self->getSamlSession($session_index);
+                return PE_SAML_SESSION_ERROR unless $sessionIndexSession;
 
-            $sessionIndexSession->remove;
+                $local_session_id = $sessionIndexSession->data->{_saml_id};
 
-            $self->lmLog(
+                $sessionIndexSession->remove;
+
+                $self->lmLog(
 "Get session id $local_session_id (from session index $session_index)",
-                'debug'
-            );
+                    'debug'
+                );
+            }
+            else {
+                $local_session_id = $self->id;
+                $self->lmLog( "Get session id $local_session_id (from cookie)",
+                    'debug' );
+            }
 
             my $user = $self->{sessionInfo}->{user};
             my $local_session = $self->getApacheSession( $local_session_id, 1 );
@@ -2361,7 +2386,7 @@ L<Lemonldap::NG::Portal>
 =head1 BUG REPORT
 
 Use OW2 system to report bug or ask for features:
-L<http://jira.ow2.org>
+L<https://gitlab.ow2.org/lemonldap-ng/lemonldap-ng/issues>
 
 =head1 DOWNLOAD
 

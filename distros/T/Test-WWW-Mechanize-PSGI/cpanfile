@@ -30,10 +30,20 @@ on 'configure' => sub {
 
 on 'develop' => sub {
   requires "Pod::Coverage::TrustPod" => "0";
+  requires "Pod::Wordlist" => "0";
   requires "Test::CPAN::Changes" => "0.19";
   requires "Test::Code::TidyAll" => "0.50";
-  requires "Test::More" => "0.88";
+  requires "Test::More" => "0.96";
   requires "Test::Pod::Coverage" => "1.08";
   requires "Test::Spelling" => "0.12";
   requires "Test::Synopsis" => "0";
+};
+
+on 'develop' => sub {
+  suggests "Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional" => "0.004";
+  suggests "Dist::Zilla::Plugin::CopyFilesFromRelease" => "0";
+  suggests "Dist::Zilla::Plugin::Git::Commit" => "2.020";
+  suggests "Dist::Zilla::Plugin::Git::Tag" => "0";
+  suggests "Dist::Zilla::Plugin::NextRelease" => "5.033";
+  suggests "Dist::Zilla::Plugin::RewriteVersion::Transitional" => "0.004";
 };

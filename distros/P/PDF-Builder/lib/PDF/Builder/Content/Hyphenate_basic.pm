@@ -5,7 +5,7 @@ use base 'PDF::Builder::Content::Text';
 use strict;
 use warnings;
 
-our $VERSION = '3.007'; # VERSION
+our $VERSION = '3.008'; # VERSION
 my $LAST_UPDATE = '3.006'; # manually update whenever code is changed
 
 # basic language word-splitting routines for PDF::Builder.

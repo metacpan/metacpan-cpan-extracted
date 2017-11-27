@@ -6,14 +6,33 @@ use warnings;
 
 use Test::More;
 
-plan tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 26 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'MsgPack/Decoder.pm',
+    'MsgPack/Decoder/Event/Decoded.pm',
+    'MsgPack/Decoder/Generator.pm',
+    'MsgPack/Decoder/Generator/Any.pm',
+    'MsgPack/Decoder/Generator/Array.pm',
+    'MsgPack/Decoder/Generator/ArraySize.pm',
+    'MsgPack/Decoder/Generator/Boolean.pm',
+    'MsgPack/Decoder/Generator/Ext.pm',
+    'MsgPack/Decoder/Generator/FixInt.pm',
+    'MsgPack/Decoder/Generator/Float.pm',
+    'MsgPack/Decoder/Generator/Int.pm',
+    'MsgPack/Decoder/Generator/Nil.pm',
+    'MsgPack/Decoder/Generator/Noop.pm',
+    'MsgPack/Decoder/Generator/Size.pm',
+    'MsgPack/Decoder/Generator/Str.pm',
+    'MsgPack/Decoder/Generator/UInt.pm',
     'MsgPack/Encoder.pm',
     'MsgPack/RPC.pm',
+    'MsgPack/RPC/Event/Receive.pm',
+    'MsgPack/RPC/Event/Write.pm',
     'MsgPack/RPC/Message.pm',
+    'MsgPack/RPC/Message/Notification.pm',
     'MsgPack/RPC/Message/Request.pm',
+    'MsgPack/RPC/Message/Response.pm',
     'MsgPack/Type/Boolean.pm',
     'MsgPack/Type/Ext.pm'
 );

@@ -3,6 +3,10 @@ use strict;
 use warnings;
 
 package WWW::Shopify::Liquid::Filter::Join; use base 'WWW::Shopify::Liquid::Filter';
-sub operate { return join($_[3], @{$_[2]}); }
+sub operate { 
+	my ($self, $hash, $operand, $argument) = @_;
+	return undef unless $operand && ref($operand) eq 'ARRAY';
+	return join($argument, @$operand);
+}
 
 1;

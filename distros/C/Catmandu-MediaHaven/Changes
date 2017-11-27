@@ -1,8 +1,11 @@
 Revision history for Catmandu-MediaHaven
 
+0.06  2017-11-21 13:54:35 CET
+   - adding more support to change configuration of command line tool
+
 0.05  2017-09-12 11:43:59 CEST
    - adding support for exporters
-  
+
 0.04  2017-09-09 08:30:27 CEST
    - fixing dependencies
 

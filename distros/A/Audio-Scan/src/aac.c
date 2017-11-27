@@ -25,20 +25,20 @@ get_aacinfo(PerlIO *infile, char *file, HV *info, HV *tags)
   int err = 0;
   unsigned int id3_size = 0;
   unsigned int audio_offset = 0;
-  
+
   buffer_init(&buf, AAC_BLOCK_SIZE);
-  
+
   file_size = _file_size(infile);
-  
+
   my_hv_store( info, "file_size", newSVuv(file_size) );
-  
+
   if ( !_check_buf(infile, &buf, 10, AAC_BLOCK_SIZE) ) {
     err = -1;
     goto out;
   }
-  
+
   bptr = buffer_ptr(&buf);
-  
+
   // Check for ID3 tag
   if (
     (bptr[0] == 'I' && bptr[1] == 'D' && bptr[2] == '3') &&
@@ -52,52 +52,52 @@ get_aacinfo(PerlIO *infile, char *file, HV *info, HV *tags)
       // footer present
       id3_size += 10;
     }
-    
+
     audio_offset += id3_size;
-    
+
     DEBUG_TRACE("Found ID3 tag of size %d\n", id3_size);
-    
+
     // Seek past ID3 and clear buffer
     buffer_clear(&buf);
     PerlIO_seek(infile, id3_size, SEEK_SET);
-      
+
     // Read start of AAC data
     if ( !_check_buf(infile, &buf, 10, AAC_BLOCK_SIZE) ) {
       err = -1;
       goto out;
     }
   }
-  
+
   // Find 0xFF sync
   while ( buffer_len(&buf) >= 6 ) {
     bptr = buffer_ptr(&buf);
-    
+
     if ( (bptr[0] == 0xFF) && ((bptr[1] & 0xF6) == 0xF0)
       && aac_parse_adts(infile, file, file_size - audio_offset, &buf, info))
     {
       break;
     }
-    else {    
+    else {
       buffer_consume(&buf, 1);
       audio_offset++;
     }
   }
-  
+
 /*
  XXX: need an ADIF test file
   else if ( memcmp(bptr, "ADIF", 4) == 0 ) {
     aac_parse_adif(infile, file, &buf, info);
   }
 */
-  
+
   my_hv_store( info, "audio_offset", newSVuv(audio_offset) );
   my_hv_store( info, "audio_size", newSVuv(file_size - audio_offset) );
-  
+
   // Parse ID3 at end
   if (id3_size) {
     parse_id3(infile, file, info, tags, 0, file_size);
   }
-  
+
 out:
   buffer_free(&buf);
 
@@ -118,9 +118,9 @@ aac_parse_adts(PerlIO *infile, char *file, off_t audio_size, Buffer *buf, HV *in
   uint8_t profile = 0;
   uint8_t channels = 0;
   float frames_per_sec, bytes_per_frame, length;
-  
+
   unsigned char *bptr;
-  
+
   /* Read all frames to ensure correct time and bitrate */
   for (frames = 0; /* */; frames++) {
     if ( !_check_buf(infile, buf, audio_size > AAC_BLOCK_SIZE ? AAC_BLOCK_SIZE : audio_size, AAC_BLOCK_SIZE) ) {
@@ -129,9 +129,9 @@ aac_parse_adts(PerlIO *infile, char *file, off_t audio_size, Buffer *buf, HV *in
       else
         break;
     }
-    
+
     bptr = buffer_ptr(buf);
-    
+
     /* check syncword */
     if (!((bptr[0] == 0xFF)&&((bptr[1] & 0xF6) == 0xF0)))
       break;
@@ -147,7 +147,7 @@ aac_parse_adts(PerlIO *infile, char *file, off_t audio_size, Buffer *buf, HV *in
 
     if (frames == 0 && _check_buf(infile, buf, frame_length + 10, AAC_BLOCK_SIZE)) {
       unsigned char *bptr2 = (unsigned char *)buffer_ptr(buf) + frame_length;
-      int frame_length2;      
+      int frame_length2;
       if (!((bptr2[0] == 0xFF)&&((bptr2[1] & 0xF6) == 0xF0))
         || profile != (bptr2[2] & 0xc0) >> 6
         || samplerate != adts_sample_rates[(bptr2[2]&0x3c)>>2]
@@ -174,36 +174,36 @@ aac_parse_adts(PerlIO *infile, char *file, off_t audio_size, Buffer *buf, HV *in
     }
 
     t_framelength += frame_length;
-    
+
     if (frame_length > buffer_len(buf))
       break;
 
     buffer_consume(buf, frame_length);
     audio_size -= frame_length;
-    
+
     // Avoid looping again if we have a partial frame header
     if (audio_size < 6)
       break;
   }
-  
+
   if (frames < 1) {
     DEBUG_TRACE("False sync\n");
     return 0;
   }
-  
+
   frames_per_sec = (float)samplerate/1024.0f;
   if (frames != 0)
     bytes_per_frame = (float)t_framelength/(float)(frames*1000);
   else
     bytes_per_frame = 0;
-    
+
   bitrate = (int)(8. * bytes_per_frame * frames_per_sec + 0.5);
-  
+
   if (frames_per_sec != 0)
     length = (float)frames/frames_per_sec;
   else
     length = 1;
-  
+
   // DLNA profile detection
   // XXX Does not detect HEAAC_L3_ADTS
   if (samplerate >= 8000) {
@@ -236,11 +236,11 @@ aac_parse_adts(PerlIO *infile, char *file, off_t audio_size, Buffer *buf, HV *in
       }
     }
   }
-  
+
   // Samplerate <= 24000 is AACplus and the samplerate is doubled
   if (samplerate <= 24000)
     samplerate *= 2;
-  
+
   my_hv_store( info, "bitrate", newSVuv(bitrate * 1000) );
   my_hv_store( info, "song_length_ms", newSVuv(length * 1000) );
   my_hv_store( info, "samplerate", newSVuv(samplerate) );

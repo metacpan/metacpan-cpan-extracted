@@ -5,7 +5,7 @@
 # Handler module
 package Lemonldap::NG::Handler;
 
-our $VERSION = '1.9.13';
+our $VERSION = '1.9.14';
 
 use Lemonldap::NG::Handler::SharedConf;
 @ISA = qw(Lemonldap::NG::Handler::SharedConf);
@@ -345,7 +345,7 @@ L<http://lemonldap-ng.org/>
 =head1 BUG REPORT
 
 Use OW2 system to report bug or ask for features:
-L<http://jira.ow2.org>
+L<https://gitlab.ow2.org/lemonldap-ng/lemonldap-ng/issues>
 
 =head1 DOWNLOAD
 

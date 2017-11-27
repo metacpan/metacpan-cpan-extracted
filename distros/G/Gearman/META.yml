@@ -14,8 +14,10 @@ build_requires:
   Test::TCP: '2.17'
   Test::Timer: '0'
   version: '0.77'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.82, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -43,5 +45,4 @@ requires:
 resources:
   bugtracker: https://github.com/p-alik/perl-Gearman/issues
   repository: https://github.com/p-alik/perl-Gearman.git
-version: v2.4.9
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: v2.4.10

@@ -1,7 +1,8 @@
 0xx = if this fails, stop
-1xx = core modules w/o routing
-2xx = core modules
+1xx = core modules standalone
+2xx = core modules via mini-apps (TODO some of 1xx belong here, must rename)
 3xx = sane defaults
 4xx = error handling
 8xx = plugins
 9xx = experimental & deprecated
+

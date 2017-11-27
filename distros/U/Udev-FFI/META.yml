@@ -27,19 +27,17 @@ no_index:
 provides:
   Udev::FFI:
     file: lib/Udev/FFI.pm
-    version: '0.098005'
+    version: '0.099001'
   Udev::FFI::Device:
     file: lib/Udev/FFI/Device.pm
   Udev::FFI::Devnum:
     file: lib/Udev/FFI/Devnum.pm
   Udev::FFI::Enumerate:
     file: lib/Udev/FFI/Enumerate.pm
-  Udev::FFI::FFIFunctions:
-    file: lib/Udev/FFI/FFIFunctions.pm
+  Udev::FFI::Functions:
+    file: lib/Udev/FFI/Functions.pm
   Udev::FFI::Monitor:
     file: lib/Udev/FFI/Monitor.pm
-recommends:
-  PkgConfig: '0.17026'
 requires:
   FFI::CheckLib: '0'
   FFI::Platypus: '0'
@@ -49,7 +47,7 @@ resources:
   bugtracker: https://github.com/Ilya33/udev-ffi/issues
   homepage: https://github.com/Ilya33/udev-ffi
   repository: git://github.com/Ilya33/udev-ffi.git
-version: '0.098005'
+version: '0.099001'
 x_contributors:
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

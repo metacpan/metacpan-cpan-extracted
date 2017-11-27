@@ -1,3 +1,4 @@
+## -*- mode: perl; -*-
 use strict;
 use warnings;
 use POSIX ();

@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 use Getopt::Long;
-use Data::Printer;
+use Data::Printer alias => 'pdump';
 use Devel::Confess 'color';
 use Backup::EZ;
 use File::ShareDir;
@@ -19,129 +19,135 @@ Getopt::Long::Configure('no_ignore_case');
 
 ###### GLOBAL VARIABLES ######
 
-use vars qw($Conf $DryRun $Exclude $InstallCfg $InstallCron);
+use vars qw($Conf $DryRun $Exclude $InstallCfg $InstallCron $DumpConf);
 
 ###### MAIN PROGRAM ######
 
 parse_cmd_line();
 
 if ($InstallCfg) {
-	install_cfg();
+    install_cfg();
 }
 elsif ($InstallCron) {
-	install_cron();
+    install_cron();
 }
 else {
-	main();
+    main();
 }
 
 ###### END MAIN #######
 
 sub install_cron {
-	my $cron_dir = "/etc/cron.$InstallCron";
+    my $cron_dir = "/etc/cron.$InstallCron";
 
-	my $ez_path = `which ezbackup`;
-	chomp $ez_path;
+    my $ez_path = `which ezbackup`;
+    chomp $ez_path;
 
-	if ( !File::Spec->file_name_is_absolute($ez_path) ) {
-		$ez_path = File::Spec->rel2abs($ez_path);
-	}
+    if ( !File::Spec->file_name_is_absolute($ez_path) ) {
+        $ez_path = File::Spec->rel2abs($ez_path);
+    }
 
-	my $cron_file = "$cron_dir/ezbackup";
-	print "installing $cron_file\n";
+    my $cron_file = "$cron_dir/ezbackup";
+    print "installing $cron_file\n";
 
-	open my $fh, ">$cron_file" or die "failed to open $cron_file: $!";
-	print $fh "#!/bin/sh\n\n";
-	print $fh "nice $ez_path\n";
-	close $fh;
+    open my $fh, ">$cron_file" or die "failed to open $cron_file: $!";
+    print $fh "#!/bin/sh\n\n";
+    print $fh "nice $ez_path\n";
+    close $fh;
 
-	my_system("chmod 755 $cron_file");
+    my_system("chmod 755 $cron_file");
 }
 
 sub install_cfg {
-	my $etc_dir  = "/etc/ezbackup";
-	my $dist_dir = File::ShareDir::dist_dir("Backup-EZ");
+    my $etc_dir  = "/etc/ezbackup";
+    my $dist_dir = File::ShareDir::dist_dir("Backup-EZ");
 
-	my_system("mkdir -p $etc_dir");
-	my_system("cp $dist_dir/ezbackup.conf $etc_dir");
-	my_system("cp $dist_dir/ezbackup_exclude.rsync $etc_dir");
-	my_system("chmod 644 $etc_dir/*");
+    my_system("mkdir -p $etc_dir");
+    my_system("cp $dist_dir/ezbackup.conf $etc_dir");
+    my_system("cp $dist_dir/ezbackup_exclude.rsync $etc_dir");
+    my_system("chmod 644 $etc_dir/*");
 }
 
 sub my_system {
-	my $cmd = shift;
-	print "$cmd\n";
-	system($cmd);
-	die if $?;
+    my $cmd = shift;
+    print "$cmd\n";
+    system($cmd);
+    die if $?;
 }
 
 sub main {
-	my $ez = Backup::EZ->new(
-							  conf         => $Conf,
-							  exclude_file => $Exclude,
-							  dryrun       => $DryRun
-	);
-	die if !$ez;
+    my $ez = Backup::EZ->new(
+        conf         => $Conf,
+        exclude_file => $Exclude,
+        dryrun       => $DryRun
+    );
+    die if !$ez;
 
-	$ez->backup;
+    if ($DumpConf) {
+        $ez->dump_conf;
+    }
+    else {
+        $ez->backup;
+    }
 }
 
 sub check_required {
-	my $opt = shift;
-	my $arg = shift;
+    my $opt = shift;
+    my $arg = shift;
 
-	print_usage("missing arg $opt") if !$arg;
+    print_usage("missing arg $opt") if !$arg;
 }
 
 sub parse_cmd_line {
-	my $help;
+    my $help;
 
-	my $rc = GetOptions(
-						 "c=s"           => \$Conf,
-						 "e=s"           => \$Exclude,
-						 "dry-run"       => \$DryRun,
-						 "installcfg"    => \$InstallCfg,
-						 "installcron=s" => \$InstallCron,
-						 "help|?"        => \$help
-	);
+    my $rc = GetOptions(
+        "c=s"           => \$Conf,
+        "e=s"           => \$Exclude,
+        "dry-run"       => \$DryRun,
+        "installcfg"    => \$InstallCfg,
+        "installcron=s" => \$InstallCron,
+        "dumpconf"    => \$DumpConf,
+        "help|?"        => \$help
+    );
 
-	print_usage("usage:") if $help;
+    print_usage("usage:") if $help;
 
-	#check_required( '-h', $Host );
+    #check_required( '-h', $Host );
 
-	if ($InstallCron) {
-		if (     $InstallCron ne 'hourly'
-			 and $InstallCron ne 'daily'
-			 and $InstallCron ne 'weekly'
-			 and $InstallCron ne 'monthly' )
-		{
-			die "invalid option for -installcron";
-		}
-	}
+    if ($InstallCron) {
+        if (    $InstallCron ne 'hourly'
+            and $InstallCron ne 'daily'
+            and $InstallCron ne 'weekly'
+            and $InstallCron ne 'monthly' )
+        {
+            die "invalid option for -installcron";
+        }
+    }
 
-	if ( !($rc) || ( @ARGV != 0 ) ) {
-		## if rc is false or args are left on line
-		print_usage("parse_cmd_line failed");
-	}
+    if ( !($rc) || ( @ARGV != 0 ) ) {
+        ## if rc is false or args are left on line
+        print_usage("parse_cmd_line failed");
+    }
 }
 
 sub print_usage {
-	print STDERR "@_\n";
+    print STDERR "@_\n";
 
-	print "\n* Install default config files to /etc/ezbackup:\n\n"
-	  . "\t$0 -installcfg\n" . "\n\n";
+    print "\n* Install default config files to /etc/ezbackup:\n\n"
+      . "\t$0 -installcfg\n" . "\n\n";
 
-	print "* Install cron.X\n\n"
-	  . "\t$0 -installcron (hourly|daily|weekly|monthly)\n" . "\n\n";
+    print "* Install cron.X\n\n"
+      . "\t$0 -installcron (hourly|daily|weekly|monthly)\n" . "\n\n";
 
-	print "* Run a backup:\n\n" 
-	  . "\t$0\n"
-	  . "\t\t[-c <conf file>]\n"
-	  . "\t\t[-e <rsync exclude file>]\n"
-	  . "\t\t[-dry-run]\n"
-	  . "\t\t[-?] (usage)\n" . "\n";
+    print "* Run a backup:\n\n"
+      . "\t$0\n"
+      . "\t\t[-c <conf file>]\n"
+      . "\t\t[-e <rsync exclude file>]\n"
+      . "\t\t[-dry-run]\n"
+      . "\t\t[-?] (usage)\n" . "\n";
 
-	exit 1;
+    exit 1;
 }
 
 =head1 Backup-EZ

@@ -1,5 +1,6 @@
 package Syntax::Kamelon::Builder;
 
+use 5.006;
 our $VERSION = '0.15';
 
 use strict;

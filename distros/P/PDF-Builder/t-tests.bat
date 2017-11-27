@@ -7,7 +7,7 @@ REM to run arbitrary versions of the product. Most often, you would run the t
 REM tests as a regression bucket after making any changes to PDF::Builder
 REM itself (in development). To each his own!
 echo "=== use  |more  filter to page through test results"
-echo "===   or |grep -v '^ok' |more   to catch failing results"
+echo "===   or |grep -v \"^ok\" |more   to catch failing results. "
 echo on
 perl t\00-all-usable.t
 perl t\01-basic.t

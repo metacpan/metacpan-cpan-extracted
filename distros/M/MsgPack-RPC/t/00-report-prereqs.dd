@@ -4,25 +4,24 @@ do { my $x = {
                                         'ExtUtils::MakeMaker' => '0'
                                       }
                       },
-       'develop' => {
-                      'requires' => {
-                                      'Test::More' => '0.96',
-                                      'Test::Vars' => '0'
-                                    }
-                    },
        'runtime' => {
                       'requires' => {
                                       'Beam::Emitter' => '0',
                                       'Beam::Event' => '0',
-                                      'Data::Printer' => '0',
+                                      'Carp' => '0',
                                       'Exporter::Tiny' => '0',
-                                      'IO::Socket::INET' => '0',
-                                      'IO::Socket::UNIX' => '0',
+                                      'IO::Async::Loop' => '0',
+                                      'IO::Async::Stream' => '0',
+                                      'IO::Async::Timer::Countdown' => '0',
                                       'List::AllUtils' => '0',
+                                      'List::Util' => '0',
+                                      'Log::Any' => '0',
+                                      'Module::Runtime' => '0',
                                       'Moose' => '0',
+                                      'MooseX::MungeHas' => '0',
                                       'MooseX::NonMoose' => '0',
-                                      'MooseX::Role::Loggable' => '0',
                                       'Promises' => '0',
+                                      'Scalar::Util' => '0',
                                       'Type::Tiny' => '0',
                                       'Types::Standard' => '0',
                                       'experimental' => '0',

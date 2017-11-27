@@ -5,7 +5,7 @@ use warnings;
 package Authen::SCRAM::Client;
 # ABSTRACT: RFC 5802 SCRAM client
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 use Moo 1.001000;
 
@@ -61,6 +61,13 @@ has authorization_id => (
     is      => 'ro',
     isa     => Str,
     default => '',
+);
+
+# The derived PBKDF2 password can be reused if the salt and iteration count
+# is the same as a previous authentication conversation.
+has _cached_credentials => (
+    is      => 'rw',
+    default => sub { [ "", 0, "" ] }, # salt, iterations, derived password
 );
 
 #--------------------------------------------------------------------------#
@@ -204,8 +211,16 @@ sub final_msg {
     # assemble proof
     my $salt  = decode_base64( $self->_get_session("s") );
     my $iters = $self->_get_session("i");
-    my $salted_pw =
-      derive( $self->digest, encode_utf8( $self->_prepped_pass ), $salt, $iters );
+    my $cache = $self->_cached_credentials;
+    my $salted_pw;
+    if ( $cache->[0] eq $salt && $cache->[1] == $iters ) {
+        $salted_pw = $cache->[2];
+    }
+    else {
+        $salted_pw =
+          derive( $self->digest, encode_utf8( $self->_prepped_pass ), $salt, $iters );
+        $self->_cached_credentials( [ $salt, $iters, $salted_pw ] );
+    }
     my $client_key = $self->_hmac_fcn->( $salted_pw, "Client Key" );
     my $stored_key = $self->_digest_fcn->($client_key);
 
@@ -268,7 +283,7 @@ Authen::SCRAM::Client - RFC 5802 SCRAM client
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -298,6 +313,14 @@ version 0.005
 =head1 DESCRIPTION
 
 This module implements the client-side SCRAM algorithm.
+
+=head1 NAME
+
+Authen::SCRAM::Client - RFC 5802 SCRAM client
+
+=head1 VERSION
+
+version 0.006
 
 =head1 ATTRIBUTES
 
@@ -375,6 +398,18 @@ mechanism you are using.
 This is done to avoid double encoding/decoding problems if your transport is
 already doing UTF-8 encoding or decoding as it constructs outgoing messages or
 parses incoming messages.
+
+=head1 AUTHOR
+
+David Golden <dagolden@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2014 by David Golden.
+
+This is free software, licensed under:
+
+  The Apache License, Version 2.0, January 2004
 
 =head1 AUTHOR
 

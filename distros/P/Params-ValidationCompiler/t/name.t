@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test2::Bundle::Extended;
+use Test2::V0;
 use Test2::Plugin::NoWarnings;
 use Test2::Require::Module 'Sub::Util';
 

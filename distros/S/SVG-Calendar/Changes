@@ -1,5 +1,14 @@
 Revision history for Perl extension SVG::Calendar
 
+0.3.12   2017-11-25
+        Updating for release of version 0.3.12
+        Updated date (Ivan Wills)
+        Removed perl 5.8 from support (Ivan Wills)
+        Removed boilerplate text (Ivan Wills)
+        Updating Test dependencies for better windows experience (Ivan Wills)
+        Added perl 5.24 to travis build (Ivan Wills)
+        Updated license date (Ivan Wills)
+
 0.3.11   2016-02-28
         Updating for release of version 0.3.11
         Updated license date (Ivan Wills)

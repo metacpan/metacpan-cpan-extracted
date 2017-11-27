@@ -2,6 +2,8 @@
 use strict;
 use warnings;
 
+
+# The special-ist tag in the world.
 package WWW::Shopify::Liquid::Tag::For;
 use base 'WWW::Shopify::Liquid::Tag::Enclosing';
 
@@ -19,7 +21,7 @@ sub verify {
 sub inner_tags { return qw(else) }
 
 use List::Util qw(min);
-use Scalar::Util qw(looks_like_number blessed);
+use Scalar::Util qw(looks_like_number blessed reftype);
 use Clone qw(clone);
 
 
@@ -57,6 +59,12 @@ sub render_loop {
 	my $var = $op1->{core}->[0]->{core};
 	my $content;
 	
+	if ($renderer->state && exists $renderer->state->{values}->{$self . "-1"}) {
+		$start = $renderer->state->{values}->{$self . "-1"}->{index};
+		@texts = @{$renderer->state->{values}->{$self . "-1"}->{texts}};
+		delete $renderer->state->{values}->{$self . "-1"};
+
+	}
 	for ($start..$end) {
 		$hash->{$var} = $array[$_];
 		$hash->{forloop} = { 
@@ -68,11 +76,19 @@ sub render_loop {
 		};
 		if (my $exp = $@) {
 			if (defined $exp && blessed($exp) && $exp->isa('WWW::Shopify::Liquid::Exception::Control')) {
-				push(@texts, @{$exp->initial_render}) if $exp->initial_render && int(@{$exp->initial_render}) > 0;
-				if ($exp->isa('WWW::Shopify::Liquid::Exception::Control::Break')) {
-					last;
-				} elsif ($exp->isa('WWW::Shopify::Liquid::Exception::Control::Continue')) {
-					next;
+				if ($exp->isa('WWW::Shopify::Liquid::Exception::Control::Pause')) {
+					$exp->register_value($self . "-1", {
+						index => $_,
+						texts => \@texts
+					});
+					die $exp;
+				} else {
+					push(@texts, @{$exp->initial_render}) if $exp->initial_render && int(@{$exp->initial_render}) > 0;
+					if ($exp->isa('WWW::Shopify::Liquid::Exception::Control::Break')) {
+						last;
+					} elsif ($exp->isa('WWW::Shopify::Liquid::Exception::Control::Continue')) {
+						next;
+					}
 				}
 			} else {
 				die $exp;
@@ -94,11 +110,13 @@ sub expand_concatenations {
 sub optimize_loop {
 	my ($self, $optimizer, $hash, $op1, $op2, $start, $end, @array) = @_;
 	
+	
 	# First step, we replace everything by a big concatenate.
 	my @texts = ();
 	
 	my $var = $op1->{core}->[0]->{core};
 	return '' if $start > $end;
+	
 	my @parts = map { 
 		$hash->{$var} = $array[$_];
 		$hash->{forloop} = { 
@@ -121,10 +139,19 @@ sub optimize_loop {
 				die $exp;
 			}
 		}
-		$self->expand_concatenations($result);
+		
+		$self->expand_concatenations($result);				
 	} ($start..$end);
+	
 	return $parts[0] if int(@parts) == 1;
 	return WWW::Shopify::Liquid::Operator::Concatenate->new($self->{line}, "", @parts);
+}
+
+# Called to expand the second operand in "in" argument list.
+sub apply {
+	my ($self, $hash, $operand) = @_;
+	return [keys(%$operand)] if ref($operand) eq 'HASH';
+	return $operand;
 }
 
 # Should eventually support loop unrolling.
@@ -137,9 +164,24 @@ sub process {
 	$op2 = $op2->$action($pipeline, $hash) if !$self->is_processed($op2);
 	
 	$self->{arguments}->[0]->{operands}->[1] = $op2 if $self->is_processed($op2) && $action eq 'optimize';
+	if ($action eq "optimize" && !$self->is_processed($self->{contents})) {
+		# Ensure that the loop variable is unset for at least the duration of the loop while we do an initial optimization.
+		my $var = $op1->{core}->[0]->{core};
+		delete $hash->{$var};
+		# And, in fact, make sure that ALL variables that get set in the loop get unset here.
+		for (grep { ref($_) eq 'WWW::Shopify::Liquid::Tag::Assign' } $self->{contents}->tokens) {
+			next if int(@{$_->{arguments}->[0]->{operands}->[0]->{core}}) == 1 &&
+				blessed($_->{arguments}->[0]->{operands}->[0]->{core}->[0]->{core}) &&
+				$_->{arguments}->[0]->{operands}->[0]->{core}->[0]->{core}->isa('WWW::Shopify::Liquid::Token::String');
+			delete $hash->{$_->{arguments}->[0]->{operands}->[0]->{core}->[0]->{core}};
+		}
+		$pipeline->push_conditional_state;
+		$self->{contents} = $self->{contents}->optimize($pipeline, $hash);
+		$pipeline->pop_conditional_state;
+	}
+	$op2 = $self->apply($hash, $op2);
 	return $self if (!$self->is_processed($op2) && $action eq "optimize");
-	return '' if (!$self->is_processed($op2) && $action eq "render");
-	$op2 = [keys(%$op2)] if ref($op2) eq 'HASH';
+	return '' if (!$self->is_processed($op2) && $action eq "render");	
 	return (defined $self->{false_path} ? $self->{false_path}->$action($pipeline, $hash) : '') if ref($op2) ne "ARRAY" || int(@$op2) == 0;
 	die new WWW::Shopify::Liquid::Exception::Renderer::Arguments($self, "Requires an array in for loop.") unless ref($op2) eq "ARRAY";
 	

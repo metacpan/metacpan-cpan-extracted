@@ -228,6 +228,15 @@ sub tree {
                               [ 'googleAuthnLevel', 'googleExportedVars' ]
                         },
                         {
+                            title => 'kerberosParams',
+                            help  => 'authkerberos.html',
+                            nodes => [
+                                'krbKeytab',     'krbByJs',
+                                'krbAuthnLevel', 'krbUseModKrb',
+                                'krbRemoveDomain'
+                            ]
+                        },
+                        {
                             title => 'ldapParams',
                             help  => 'authldap.html',
                             nodes => [

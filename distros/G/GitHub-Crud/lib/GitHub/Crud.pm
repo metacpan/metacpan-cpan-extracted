@@ -7,12 +7,12 @@
 
 package GitHub::Crud;
 use v5.16;
-our $VERSION = '20171103';
+our $VERSION = '20171125';
 use warnings FATAL => qw(all);
 use strict;
 use Carp qw(confess);
 use Data::Dump qw(dump);
-use Data::Table::Text qw(appendFile dateTimeStamp decodeBase64 decodeJson encodeBase64 encodeJson filePath genLValueScalarMethods readFile temporaryFile writeFile xxx);
+use Data::Table::Text qw(appendFile binModeAllUtf8 dateTimeStamp decodeBase64 decodeJson encodeBase64 encodeJson filePath genLValueScalarMethods readFile temporaryFile writeFile xxx);
 use Digest::SHA1 qw(sha1_hex);
 use Storable qw(store retrieve);
 
@@ -35,6 +35,7 @@ genLValueScalarMethods(qw(fileList));                                           
 genLValueScalarMethods(qw(gitFile));                                            # File name on GitHub - this name can contain '/'
 genLValueScalarMethods(qw(gitFolder));                                          # Folder name on GitHub - this name can contain '/'
 genLValueScalarMethods(qw(logFile));                                            # The name of a local file  to w hwich to write error messages if any errors occur.
+genLValueScalarMethods(qw(message));                                            # Commit message
 genLValueScalarMethods(qw(personalAccessToken));                                # A personal access token with scope "public_repo" as generated on page: https://github.com/settings/tokens
 genLValueScalarMethods(qw(readData));                                           # Data produced by L<read|/read>
 genLValueScalarMethods(qw(repository));                                         # The name of your repository - you should create this repository first
@@ -42,6 +43,7 @@ genLValueScalarMethods(qw(response));                                           
 genLValueScalarMethods(qw(secret));                                             # The secret for a web hook - this is created by the creator of the web hook and remembered by GitHuib
 genLValueScalarMethods(qw(title));                                              # The title of an issue
 genLValueScalarMethods(qw(url));                                                # The url for a web hook
+genLValueScalarMethods(qw(utf8));                                               # Send the data as utf8 - do not use this for binary files containing images or audio, just for files containing text
 genLValueScalarMethods(qw(userid));                                             # Your userid on GitHub
 genLValueScalarMethods(qw(writeData));                                          # Data to be written by L<write|/write>
 
@@ -278,6 +280,7 @@ if (0 and !caller)
   $g->userid     = $testUserid;
   $g->repository = $testRepository;
   $g->gitFolder  = "images";
+
   say STDERR "list:\n", join ' ', $g->list;                                     # aaa.png bbb.png
  }
 
@@ -324,14 +327,20 @@ sub write($$)                                                                   
   my $repo = $gitHub->repository; $repo or confess "repository required";
   my $file = $gitHub->gitFile;    $file or confess "gitFile required";
   my $bran = $gitHub->refOrBranch(0) || '?';
+  my $Mess = $gitHub->message;
+  my $mess = $Mess ? $Mess =~ s(") (\\\")gsr : '';                              # Commit message if any with any " escaped
 
   $gitHub->read;                                                                # Read the file to get its sha it exists
   my $r    = $gitHub->response;                                                 # Get response
   my $sha  = $r->data->sha ? ', "sha": "'. $r->data->sha .'"' : '';             # Sha of existing file or blank string if no existing file
+  if ($gitHub->utf8)                                                            # Send the data as utf8 if requested
+   {use Encode 'encode';
+    $data  = encode('UTF-8', $data);
+   }
   my $denc = encodeBase64($data) =~ s/\n//gsr;
 
   writeFile(my $tmpFile = temporaryFile(),                                      # Write encoded content to temporary file
-            qq({"message": "", "content": "$denc" $sha}));
+            qq({"message": "$mess", "content": "$denc" $sha}));
   my $d = qq( -d @).$tmpFile;
   my $u = filePath($url, $user, $repo, qw(contents), $file.$bran.$d);
   my $s = "curl -si -X PUT $pat $u";                                            # Curl command
@@ -425,8 +434,10 @@ sub createPushWebHook($)                                                        
   my $webUrl = $gitHub->url;        $webUrl or confess "url required";
   my $bran   = $gitHub->refOrBranch(0);
   my $secret = $gitHub->secret;
-
   my $sj = $secret ? qq(, "secret": "$secret") : '';                            # Secret for Json
+
+  $webUrl =~ m(\Ahttps?://) or confess                                          # Check that we are using a url like thing for the web hook or complain
+   "Web hook has no scheme, should start with https?:// not:\n$webUrl";
 
   writeFile(my $tmpFile = temporaryFile(), my $json = <<END);                   # Write web hook definition
   {"name": "web", "active": true, "events": ["push"],
@@ -890,13 +901,13 @@ test unless caller;
 __DATA__
 use Test::More tests => 1;
 
-if (1)
- {my $pat = 123;
-  my $g = GitHub::Crud::new();
-     $g->personalAccessToken = $pat;
+if (1)                                                                          # Test saving a fake personal access token in a local file
+ {my $pat  = 123;
   my $file = "zzz.data";
+  my $g    = GitHub::Crud::new();
+  $g->personalAccessToken =   $pat;
   $g->savePersonalAccessToken($file);
-  $g->personalAccessToken = undef;
+  $g->personalAccessToken =   undef;
   $g->loadPersonalAccessToken($file);
   ok $pat eq $g->personalAccessToken, "Save/load of personal access token";
  }

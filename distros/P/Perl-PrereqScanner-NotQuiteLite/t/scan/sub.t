@@ -1,5 +1,7 @@
 use strict;
 use warnings;
+use FindBin;
+use lib "$FindBin::Bin/../../";
 use t::scan::Util;
 
 test(<<'TEST'); # INGY/YAML-Full-0.0.1/lib/YAML/Full/Base.pm
@@ -193,5 +195,11 @@ test(<<'TEST'); # MIK/CryptX-0.028/lib/Crypt/PRNG.pm
   sub random_string(;$)       { return $fetch_RNG->()->string(@_) }
 }
 TEST
+
+test(<<'END'); # MIKER/Net-DNS-Dig-0.12/Dig.pm
+sub for($$$) {
+  ...
+}
+END
 
 done_testing;

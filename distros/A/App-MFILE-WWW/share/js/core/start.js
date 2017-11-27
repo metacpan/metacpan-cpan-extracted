@@ -542,6 +542,7 @@ define ([
                 console.log('Entering start method of target ' + dfn + ', unadulterated opts', opts);
                 var entry,
                     i,
+                    msg,
                     populateArray = [];
                 if (typeof opts !== 'object') {
                     opts = {};
@@ -564,7 +565,8 @@ define ([
                         if (typeof entry.populate === 'function') {
                             populateArray.push(entry.populate);
                         } else {
-                            console.log("CRITICAL ERROR: bad populate property in entry " + entry.name);
+                            msg = "CRITICAL ERROR: bad populate property in entry " + entry.name;
+                            throw msg;
                         }
                     }
                 }

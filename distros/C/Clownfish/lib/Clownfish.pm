@@ -20,7 +20,7 @@ package Clownfish;
 
 use 5.008003;
 
-our $VERSION = '0.006001';
+our $VERSION = '0.006002';
 $VERSION = eval $VERSION;
 our $MAJOR_VERSION = 0.006000;
 
@@ -38,14 +38,14 @@ BEGIN {
     require DynaLoader;
     our @ISA = qw( DynaLoader );
     # This loads a large number of disparate subs.
-    bootstrap Clownfish '0.6.1';
+    bootstrap Clownfish '0.6.2';
 }
 
 sub error {$Clownfish::Err::error}
 
 {
     package Clownfish::Obj;
-    our $VERSION = '0.006001';
+    our $VERSION = '0.006002';
     $VERSION = eval $VERSION;
     use Carp qw( confess );
     # Clownfish objects are not thread-safe.
@@ -62,7 +62,7 @@ sub error {$Clownfish::Err::error}
 
 {
     package Clownfish::Class;
-    our $VERSION = '0.006001';
+    our $VERSION = '0.006002';
     $VERSION = eval $VERSION;
 
     sub _find_parent_class {
@@ -80,9 +80,11 @@ sub error {$Clownfish::Err::error}
         my $stash = \%{"$package\::"};
         my $methods
             = Clownfish::Vector->new( capacity => scalar keys %$stash );
-        while ( my ( $symbol, $glob ) = each %$stash ) {
-            next if ref $glob;
-            next unless *$glob{CODE};
+        while ( my ( $symbol, $entry ) = each %$stash ) {
+            # A subroutine is stored in the CODE slot of a typeglob. Since
+            # Perl 5.28 it may also be stored as a coderef.
+            next unless ref($entry) eq 'CODE'
+                        || ( ref(\$entry) eq 'GLOB' && *$entry{CODE} );
             $methods->push( Clownfish::String->new($symbol) );
         }
         return $methods;
@@ -105,7 +107,7 @@ sub error {$Clownfish::Err::error}
 
 {
     package Clownfish::Method;
-    our $VERSION = '0.006001';
+    our $VERSION = '0.006002';
     $VERSION = eval $VERSION;
     no warnings 'redefine';
     sub CLONE_SKIP { 0; }
@@ -114,7 +116,7 @@ sub error {$Clownfish::Err::error}
 
 {
     package Clownfish::Err;
-    our $VERSION = '0.006001';
+    our $VERSION = '0.006002';
     $VERSION = eval $VERSION;
     sub do_to_string { shift->to_string }
     use Scalar::Util qw( blessed );
@@ -153,7 +155,7 @@ sub error {$Clownfish::Err::error}
 
 {
     package Clownfish::Boolean;
-    our $VERSION = '0.006001';
+    our $VERSION = '0.006002';
     $VERSION = eval $VERSION;
     use Exporter 'import';
     our @EXPORT_OK = qw( $true_singleton $false_singleton );

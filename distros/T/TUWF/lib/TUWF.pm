@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use Carp 'croak';
 
-our $VERSION = '1.0';
+our $VERSION = '1.1';
 
 
 # Store the object in a global variable for some functions that don't get it
@@ -76,6 +76,7 @@ sub run {
     require FCGI;
     import FCGI;
     my $r = FCGI::Request();
+    $OBJ->{_TUWF}{fcgi_req} = $r;
     while($r->Accept() >= 0) {
       $OBJ->_handle_request;
       $r->Finish();
@@ -104,7 +105,7 @@ sub load_recursive {
   my $rec;
   $rec = sub {
     my($d, $f, $m) = @_;
-    for my $s (glob "$d/$f/*") {
+    for my $s (glob "\"$d/$f/*\"") {
       $OBJ->_load_module("${m}::$1") if -f $s && $s =~ /([^\/]+)\.pm$/;
       $rec->($d, "$f/$1", "${m}::$1") if -d $s && $s =~ /([^\/]+)$/;
     }

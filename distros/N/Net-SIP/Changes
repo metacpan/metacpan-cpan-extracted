@@ -1,5 +1,16 @@
 Revision history for Net::SIP
 
+0.812 2017-11-22
+- don't include To-Header into computation of branch, since this might differ
+  between INVITE and ACK (by adding the tag from the response).
+- RT#123685 - better debug-output in StatelessProxy on DNS problems
+- RT#122925 - call StatelessProxy::__forward_packet_final as method not function
+  to allow overriding in special cases - this does not make it a public API!
+- RT#122595 - Net::SIP::Debug->level looks for useful caller now starting with
+  caller(0) instead of caller(1)
+- RT#121348 - Leg::match check addr also against host
+- RT#120909 - support for same contact on multiple legs in StatelessProxy, i.e.
+  multiple IP for same domain of contact
 0.811 2017-11-06
 - Net::SIP::Simple - adhere to rtp_param on listener side too which makes it
   possible to use custom codecs for both sender and recipient

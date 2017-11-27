@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use English qw( -no_match_vars $EVAL_ERROR );
+use English qw( -no_match_vars $EVAL_ERROR $PERL_VERSION );
 use TAP::Parser qw();
 use Test::More;
 
@@ -23,7 +23,7 @@ if ( $ENV{AUTHOR_TESTING} ) {
 
 
 subtest 'perl ver' => sub {
-    ok( $^V, "Got a valid perl version: $^V" )
+    ok( $PERL_VERSION, "Got a valid perl version: $PERL_VERSION" )
         or die;
 
     return;
@@ -137,10 +137,10 @@ if ( $ENV{AUTHOR_TESTING} ) {
 }
 
 sub script_ok {
-    my ( $script, $expected ) = @_;
+    my ( $script, $expected_lines ) = @_;
 
     return if ! $script;
-    $expected ||= [];
+    $expected_lines ||= [];
 
     my $parser = TAP::Parser->new( { source => $script } );
     if ( ! $parser ) {
@@ -154,14 +154,15 @@ sub script_ok {
         $line_num++;
 
         my $actual   = defined $result ? $result->as_string() : undef;
-        my $expected = $expected->[ $line_num - 1 ];
+        my $expected = $expected_lines->[ $line_num - 1 ];
         if ( ! $expected ) {
             fail( "Saw unexpected line of output: $actual" );
             $all_ok = 0;
             last;
         }
 
-        $all_ok &= like( $actual, qr/\Q$expected\E/msx, "Line $line_num of test output has expected content: $expected" );
+        $all_ok &= like( $actual, qr/\Q$expected\E/msx,
+            "Line $line_num of test output has expected content: $expected" );
     }
 
     return $all_ok;

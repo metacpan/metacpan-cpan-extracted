@@ -17,6 +17,7 @@ ok($ast);
 
 $ast = $parser->parse_tokens($lexer->parse_text("{% for a in (1..10) %}sdfasdfds{% endfor %}"));
 ok($ast);
+
 isa_ok($ast, 'WWW::Shopify::Liquid::Tag::For');
 isa_ok($ast->{arguments}->[0], 'WWW::Shopify::Liquid::Operator::In');
 isa_ok($ast->{arguments}->[0]->{operands}->[0], 'WWW::Shopify::Liquid::Token::Variable');

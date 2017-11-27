@@ -1,7 +1,7 @@
 package Taskwarrior::Kusarigama::Plugin::Renew;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: create a follow-up task upon completion
-$Taskwarrior::Kusarigama::Plugin::Renew::VERSION = '0.3.1';
+$Taskwarrior::Kusarigama::Plugin::Renew::VERSION = '0.4.0';
 
 use 5.10.0;
 use strict;
@@ -70,7 +70,7 @@ Taskwarrior::Kusarigama::Plugin::Renew - create a follow-up task upon completion
 
 =head1 VERSION
 
-version 0.3.1
+version 0.4.0
 
 =head1 DESCRIPTION
 
@@ -122,7 +122,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Yanick Champoux.
+This software is copyright (c) 2017 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

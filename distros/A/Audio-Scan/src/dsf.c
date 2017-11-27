@@ -23,41 +23,41 @@ get_dsf_metadata(PerlIO *infile, char *file, HV *info, HV *tags)
   off_t file_size;
   int err = 0;
   uint64_t chunk_size, total_size, metadata_offset, sample_count, sample_bytes;
-  uint32_t format_version, format_id, channel_type, channel_num, 
-    sampling_frequency, block_size_per_channel, bits_per_sample;
+  uint32_t format_version, format_id, channel_type, channel_num,
+    sampling_frequency, block_size_per_channel, bits_per_sample, song_length_ms;
   unsigned char *bptr;
-	
+
   file_size = _file_size(infile);
-  
+
   buffer_init(&buf, DSF_BLOCK_SIZE);
-  
+
   if ( !_check_buf(infile, &buf, 80, DSF_BLOCK_SIZE) ) {
     err = -1;
     goto out;
   }
-  
+
   if ( !strncmp( (char *)buffer_ptr(&buf), "DSD ", 4 ) ) {
     buffer_consume(&buf, 4);
-  
+
     my_hv_store( info, "file_size", newSVuv(file_size) );
-		
+
     chunk_size = buffer_get_int64_le(&buf);
     total_size = buffer_get_int64_le(&buf);
     metadata_offset = buffer_get_int64_le(&buf);
-		
-    if ((chunk_size != 28) || 
+
+    if ((chunk_size != 28) ||
 				metadata_offset > total_size) {
       PerlIO_printf(PerlIO_stderr(), "Invalid DSF file header: %s\n", file);
       err = -1;
       goto out;
     }
-		
+
     if ( strncmp( (char *)buffer_ptr(&buf), "fmt ", 4 ) ) {
       PerlIO_printf(PerlIO_stderr(), "Invalid DSF file: missing fmt header: %s\n", file);
       err = -1;
       goto out;
     }
-    
+
     buffer_consume(&buf, 4);
     chunk_size = buffer_get_int64_le(&buf);
     format_version = buffer_get_int_le(&buf);
@@ -80,40 +80,43 @@ get_dsf_metadata(PerlIO *infile, char *file, HV *info, HV *tags)
       err = -1;
       goto out;
     }
-		
+
     buffer_consume(&buf, 4);
-    
+
     if ( strncmp( (char *)buffer_ptr(&buf), "data", 4 ) ) {
       PerlIO_printf(PerlIO_stderr(), "Invalid DSF file: missing data header: %s\n", file);
       err = -1;
       goto out;
     }
-		
+
     buffer_consume(&buf, 4);
-		
+
     sample_bytes = buffer_get_int64_le(&buf) - 12;
-		
+
+    song_length_ms = ((sample_count * 1.0) / sampling_frequency) * 1000;
+
     my_hv_store( info, "audio_offset", newSVuv( 28 + 52 + 12 ) );
     my_hv_store( info, "audio_size", newSVuv(sample_bytes) );
     my_hv_store( info, "samplerate", newSVuv(sampling_frequency) );
-    my_hv_store( info, "song_length_ms", newSVuv( (sample_count * 1000.) / sampling_frequency ) );
+    my_hv_store( info, "song_length_ms", newSVuv(song_length_ms) );
     my_hv_store( info, "channels", newSVuv(channel_num) );
     my_hv_store( info, "bits_per_sample", newSVuv(1) );
     my_hv_store( info, "block_size_per_channel", newSVuv(block_size_per_channel) );
-		
+    my_hv_store( info, "bitrate", newSVuv( _bitrate(file_size - (28 + 52 + 12), song_length_ms) ) );
+
     if (metadata_offset) {
       PerlIO_seek(infile, metadata_offset, SEEK_SET);
       buffer_clear(&buf);
-      if ( !_check_buf(infile, &buf, 10, WAV_BLOCK_SIZE) ) {
+      if ( !_check_buf(infile, &buf, 10, DSF_BLOCK_SIZE) ) {
 				goto out;
       }
-			
+
       bptr = buffer_ptr(&buf);
       if (
 					(bptr[0] == 'I' && bptr[1] == 'D' && bptr[2] == '3') &&
 					bptr[3] < 0xff && bptr[4] < 0xff &&
 					bptr[6] < 0x80 && bptr[7] < 0x80 && bptr[8] < 0x80 && bptr[9] < 0x80
-					) {        
+					) {
 				parse_id3(infile, file, info, tags, metadata_offset, file_size);
       }
     }
@@ -123,11 +126,11 @@ get_dsf_metadata(PerlIO *infile, char *file, HV *info, HV *tags)
     err = -1;
     goto out;
   }
-  
+
  out:
   buffer_free(&buf);
 
   if (err) return err;
-	
+
   return 0;
 }

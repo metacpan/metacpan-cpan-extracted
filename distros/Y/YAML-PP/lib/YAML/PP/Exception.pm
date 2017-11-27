@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Exception;
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use overload '""' => \&to_string;
 
@@ -25,7 +25,7 @@ sub to_string {
     for my $token (@$next) {
         $yaml .= $token->{value};
     }
-    my $remaining_yaml = ${ $self->{yaml} };
+    my $remaining_yaml = $self->{yaml}->[0] // '';
     $yaml .= $remaining_yaml;
     $yaml =~ s/[\r\n].*//s;
     {

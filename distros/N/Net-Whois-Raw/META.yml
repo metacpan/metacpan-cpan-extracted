@@ -3,37 +3,37 @@ abstract: 'Get Whois information of domains and IP addresses.'
 author:
   - 'Alexander Nalobin <alexander@nalobin.ru>'
 build_requires:
-  File::Temp: '0'
-  Socket: '0'
-  Test::More: '0'
-  Test::RequiresInternet: '0'
+  File::Temp: 0
+  Socket: 0
+  Test::More: 0
+  Test::RequiresInternet: 0
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: 0
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: '1.4'
+  version: 1.4
 name: Net-Whois-Raw
 requires:
-  Carp: '0'
-  Data::Dumper: '0'
-  Encode: '0'
-  File::Temp: '0'
-  Getopt::Long: '0'
-  HTTP::Headers: '0'
-  HTTP::Request: '0'
-  IO::Socket::IP: '0'
-  LWP::UserAgent: '0'
-  Net::IDN::Punycode: '0'
-  Regexp::IPv6: '0'
-  URI::URL: '0'
+  Carp: 0
+  Data::Dumper: 0
+  Encode: 0
+  File::Temp: 0
+  Getopt::Long: 0
+  HTTP::Headers: 0
+  HTTP::Request: 0
+  IO::Socket::IP: 0
+  LWP::UserAgent: 0
+  Net::IDN::Punycode: 0
+  Regexp::IPv6: 0
+  URI::URL: 0
   perl: 5.008_001
-  strict: '0'
-  utf8: '0'
-  warnings: '0'
+  strict: 0
+  utf8: 0
+  warnings: 0
 resources:
-  bugtracker: https://github.com/regru/Net-Whois-Raw/issues
-  repository: git://github.com/regru/Net-Whois-Raw.git
-version: '2.99010'
+  repository: git://github.com/nalobin/Net-Whois-Raw.git
+version: 2.99011
+x_serialization_backend: 'YAML::Tiny version 1.56'

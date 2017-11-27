@@ -1,4 +1,6 @@
 package Class::Ref;
+$Class::Ref::VERSION = '0.06';
+# ABSTRACT: Automatic OO wrapping of container references
 
 =head1 NAME
 
@@ -26,8 +28,6 @@ use warnings;
 
 use Scalar::Util ();
 use Carp ();
-
-our $VERSION = '0.05';
 
 =head1 OPTIONS
 
@@ -63,12 +63,12 @@ our $raw_access = 0;
 
     $o = Class::Ref->new({ foo => { bar => 1 } });
     {
-        $Class::Ref::allow_undef = 1;
+        local $Class::Ref::allow_undef = 1;
         $o->not_here;    # returns undef
     }
     $o->not_here;        # raises exception
 
-By default, an excpetion will be raised if you try read from a HASH key that is
+By default, an exception will be raised if you try to read from a HASH key that is
 non-existent.
 
 =back
@@ -155,7 +155,7 @@ data referenced with C<$o> remains the same as when it originally wrapped.
 =cut
 
 package Class::Ref::HASH;
-
+$Class::Ref::HASH::VERSION = '0.06';
 use strict;
 use warnings;
 
@@ -200,7 +200,7 @@ sub AUTOLOAD {
 }
 
 package Class::Ref::HASH::Tie;
-
+$Class::Ref::HASH::Tie::VERSION = '0.06';
 use strict;
 use warnings;
 
@@ -238,13 +238,13 @@ call would still be wrapped:
 
 See L<GUTS|/GUTS> for more discussion on how this is done.
 
-I am still debating if adding formal accessors moethods would be helpful in
+I am still debating if adding formal accessor methods would be helpful in
 this context.
 
 =cut
 
 package Class::Ref::ARRAY;
-
+$Class::Ref::ARRAY::VERSION = '0.06';
 use strict;
 use warnings;
 
@@ -314,7 +314,7 @@ sub AUTOLOAD {
 }
 
 package Class::Ref::ARRAY::Tie;
-
+$Class::Ref::ARRAY::Tie::VERSION = '0.06';
 use strict;
 use warnings;
 
@@ -346,8 +346,8 @@ REF is blessed into. HASHes go into C<Class::Ref::HASH> and ARRAYs go into
 C<Class::Ref::ARRAY>.
 
 The use of the L<overload> pragma to overload the dereference operators allows
-the REF object to still be accesed as HASH refs and ARRAY refs. When these REFs
-are coerced into their approriate type, they are wrapped in a tie mechanism to
+the REF object to still be accessed as HASH refs and ARRAY refs. When these REFs
+are coerced into their appropriate type, they are wrapped in a tie mechanism to
 retain control over the return of member values.
 
 The only way to fully bypass all of this is to manually dereference the REF
@@ -378,17 +378,17 @@ desire. And if it helps others, that's awesome too.
 
 =item * L<Class::Hash>
 
-Probably the defacto module for creating accessors to a hash. However, it only
+Probably the de facto module for creating accessors to a hash. However, it only
 provides a single layer of encapsulation.
 
 =item * L<Class::ConfigHash>
 
-Provides a deeper implementaion but takes (avoids) steps to make the hash
+Provides a deeper implementation but takes (avoids) steps to make the hash
 read-only.
 
 =item * L<Hash::AsObject>
 
-Also provides a deep implemetation. Goes further to provide access to methods
+Also provides a deep implementation. Goes further to provide access to methods
 like C<AUTOLOAD> and C<DESTROY>.
 
 =back

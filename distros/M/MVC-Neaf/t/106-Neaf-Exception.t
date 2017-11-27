@@ -22,7 +22,12 @@ my $err = $@;
 is ($res, undef, "Neaf error => die");
 is (ref $err, 'MVC::Neaf::Exception', "Type holds");
 is ($err->{-status}, 500, "Unknown error = status 500");
+ok $err->is_sudden, "Unknown error = is_sudden";
 
-is_deeply( $err->TO_JSON, {-status=>500}, "json works");
+is_deeply( $err->TO_JSON, {-status=>500, -sudden => 1}, "json works");
+
+my $err404 = MVC::Neaf::Exception->new(404);
+ok !$err404->is_sudden, "Not sudden error";
+is  $err404->status, 404, "status preserved";
 
 done_testing;

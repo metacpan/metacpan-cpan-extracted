@@ -87,6 +87,11 @@ importpage    method in Builder.pm
    currently given. importpage is scheduled to be removed on or after 
    August, 2019.
 
+pdfile    method in Annotation.pm
+   This functionality was renamed to pdf_file(). Simply rename any call to
+   "pdfile" to "pdf_file". pdfile is scheduled to be removed on or after
+   November, 2019.
+
 
 *** If I have missed any deprecated interfaces, please let me know! ***
 

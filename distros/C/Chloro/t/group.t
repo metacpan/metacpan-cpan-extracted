@@ -7,7 +7,7 @@ use lib 't/lib';
 
 use Chloro::Test::Address;
 use Chloro::Types qw( Bool Str );
-use List::MoreUtils qw( all );
+use List::AllUtils qw( all );
 
 my $form = Chloro::Test::Address->new();
 
@@ -61,7 +61,7 @@ my $form = Chloro::Test::Address->new();
 }
 
 {
-    my $set = $form->process(
+    my $result_set = $form->process(
         params => {
             allows_mail          => 0,
             address_id           => [ 42, 'x' ],
@@ -77,17 +77,17 @@ my $form = Chloro::Test::Address->new();
     );
 
     ok(
-        $set->is_valid(),
+        $result_set->is_valid(),
         'the returned result set says the form values are valid'
     );
 
     ok(
-        ( all { $_->is_valid() } $set->_result_values() ),
+        ( all { $_->is_valid() } $result_set->_result_values() ),
         'all individual results are marked as valid'
     );
 
     is_deeply(
-        $set->results_as_hash(), {
+        $result_set->results_as_hash(), {
             allows_mail => 0,
             address     => {
                 42 => {
@@ -109,7 +109,7 @@ my $form = Chloro::Test::Address->new();
     );
 
     for my $group_result ( grep { $_->isa('Chloro::Result::Group') }
-        $set->_result_values() ) {
+        $result_set->_result_values() ) {
 
         my $prefix = $group_result->prefix();
 
@@ -125,7 +125,7 @@ my $form = Chloro::Test::Address->new();
 }
 
 {
-    my $set = $form->process(
+    my $result_set = $form->process(
         params => {
             allows_mail          => 0,
             address_id           => 42,
@@ -137,17 +137,17 @@ my $form = Chloro::Test::Address->new();
     );
 
     ok(
-        $set->is_valid(),
+        $result_set->is_valid(),
         'the returned result set says the form values are valid'
     );
 
     ok(
-        ( all { $_->is_valid() } $set->_result_values() ),
+        ( all { $_->is_valid() } $result_set->_result_values() ),
         'all individual results are marked as valid'
     );
 
     is_deeply(
-        $set->results_as_hash(), {
+        $result_set->results_as_hash(), {
             allows_mail => 0,
             address     => {
                 42 => {
@@ -164,7 +164,7 @@ my $form = Chloro::Test::Address->new();
 }
 
 {
-    my $set = $form->process(
+    my $result_set = $form->process(
         params => {
             allows_mail          => 0,
             address_id           => [ 42, 'x' ],
@@ -180,17 +180,17 @@ my $form = Chloro::Test::Address->new();
     );
 
     ok(
-        $set->is_valid(),
+        $result_set->is_valid(),
         'the returned result set says the form values are valid (one group is entirely empty)'
     );
 
     ok(
-        ( all { $_->is_valid() } $set->_result_values() ),
+        ( all { $_->is_valid() } $result_set->_result_values() ),
         'all individual results are marked as valid'
     );
 
     is_deeply(
-        $set->results_as_hash(), {
+        $result_set->results_as_hash(), {
             allows_mail => 0,
             address     => {
                 42 => {
@@ -207,7 +207,7 @@ my $form = Chloro::Test::Address->new();
 }
 
 {
-    my $set = $form->process(
+    my $result_set = $form->process(
         params => {
             allows_mail          => 42,
             address_id           => [ 42, 'x' ],
@@ -223,11 +223,11 @@ my $form = Chloro::Test::Address->new();
     );
 
     ok(
-        !$set->is_valid(),
+        !$result_set->is_valid(),
         'the returned result set is not valid (one group is partially empty) '
     );
 
-    my %errors = $set->field_errors();
+    my %errors = $result_set->field_errors();
     is(
         scalar keys %errors, 3,
         'three fields have errors'
@@ -236,9 +236,7 @@ my $form = Chloro::Test::Address->new();
     ok(
         $errors{$_},
         "There is an error for the $_ field"
-        )
-        for
-        qw( allows_mail address.x.city address.x.state );
+    ) for qw( allows_mail address.x.city address.x.state );
 
     ok(
         !$errors{'address.x.street2'},
@@ -278,7 +276,8 @@ sub _error_breakdown {
     my %break;
 
     for my $key ( keys %{$errors} ) {
-        $break{$key} = [ map { [ $_->message()->category(), $_->message()->text() ] }
+        $break{$key}
+            = [ map { [ $_->message()->category(), $_->message()->text() ] }
                 @{ $errors->{$key} } ];
     }
 

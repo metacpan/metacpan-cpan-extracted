@@ -9,7 +9,8 @@ eval
     local $/ = undef;
     my (  %param, $i ) = %{ YAML::XS::Load( <> ) };
 
-    my ( $file, $position ) = @{$param{argv}} or die "file undef";
+    my ( $file, $position ) = $param{argv} ? @{$param{argv}} : @{$param{data}};
+    die "file undef" unless $file;
 
     die "Can't open '$file': $!" unless open my  $fh, '+<', $file;
 

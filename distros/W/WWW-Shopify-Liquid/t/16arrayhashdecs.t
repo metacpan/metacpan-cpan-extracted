@@ -39,6 +39,7 @@ is($text, '1,3,5,6');
 	1: 5,
 	3: 6,
 	5: 7,
+	c: 8,
 	\"a.b\": 10
 } %}");
 $ast = $liquid->parse_tokens(@tokens);
@@ -49,5 +50,20 @@ is($hash->{a}->{1}, 5);
 is($hash->{a}->{3}, 6);
 is($hash->{a}->{5}, 7);
 is($hash->{a}->{"a.b"}, 10);
+is($hash->{a}->{"c"}, 8);
+
+@tokens = $lexer->parse_text(q({% assign h = {
+	'r': ('a' | first)
+} %}));
+is(int(@tokens), 1);
+is(int(@{$tokens[0]->{arguments}}), 3);
+isa_ok($tokens[0]->{arguments}->[-1], 'WWW::Shopify::Liquid::Token::Hash');
+
+$ast = $liquid->parse_tokens(@tokens);
+
+ok($ast);
+is(int(@{$ast->{arguments}->[0]->{operands}->[1]->{members}}), 2);
+isa_ok($ast->{arguments}->[0]->{operands}->[1]->{members}->[1], 'WWW::Shopify::Liquid::Filter::First');
+
 
 done_testing();

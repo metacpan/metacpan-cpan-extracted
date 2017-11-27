@@ -23,13 +23,15 @@ use warnings;
 use Carp;
 use File::Spec;
 use Fcntl qw( :flock );
+use Digest::MD5;
 
 sub new
 {
-    my ( $class, $file, $match, $self ) = splice @_, 0, 3;
+    my ( $class, $file, $match, $self ) = splice @_, 0, 2;
 
-    $self->{file} = $file;
-    $self->{match} = $match;
+    die "file undef" unless $self->{file} = $file;
+
+    $ENV{mydan_proclock_md5} = $self->{match} = Digest::MD5->new()->add( $file )->hexdigest();;
 
     my $mode = -f ( $file = File::Spec->rel2abs( $file ) ) ? '+<' : '+>';
 
@@ -96,8 +98,9 @@ sub read
     
     return $pid unless defined $pid && $self->{match};
 
-    open my $ch, '<', "/proc/$pid/cmdline" or return undef;
+    open my $ch, '<', "/proc/$pid/environ" or return undef;
     my $cmdline = <$ch>;
+    close $ch;
 
     return $cmdline =~ /$self->{match}/ ? $pid : undef;
 }

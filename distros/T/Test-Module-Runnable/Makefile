@@ -13,9 +13,9 @@
 
 #     ABSTRACT => q[Base class for runnable unit tests using Moose introspection]
 #     AUTHOR => [q[Duncan Ross Palmer, 2E0EOL (palmer@overchat.org)]]
-#     BUILD_REQUIRES => { Test::More=>q[0], List::MoreUtils=>q[0], Readonly=>q[0], Moose=>q[0] }
+#     BUILD_REQUIRES => { Test::More=>q[0], Test::Exception=>q[0], Test::Output=>q[0], Test::Deep=>q[0], List::MoreUtils=>q[0], Readonly=>q[0], Moose=>q[0] }
 #     NAME => q[Test::Module::Runnable]
-#     PREREQ_PM => { Test::More=>q[0], Readonly=>q[0], List::MoreUtils=>q[0], Moose=>q[0] }
+#     PREREQ_PM => { Test::Exception=>q[0], Test::MockModule=>q[0], Readonly=>q[0], Test::More=>q[0], Test::Output=>q[0], Test::Deep=>q[0], List::MoreUtils=>q[0], Moose=>q[0] }
 #     VERSION_FROM => q[lib/Test/Module/Runnable.pm]
 
 # --- MakeMaker post_initialize section:
@@ -55,11 +55,11 @@ DIRFILESEP = /
 DFSEP = $(DIRFILESEP)
 NAME = Test::Module::Runnable
 NAME_SYM = Test_Module_Runnable
-VERSION = 0.2.3
+VERSION = 0.3.0
 VERSION_MACRO = VERSION
-VERSION_SYM = 0_2_3
+VERSION_SYM = 0_3_0
 DEFINE_VERSION = -D$(VERSION_MACRO)=\"$(VERSION)\"
-XS_VERSION = 0.2.3
+XS_VERSION = 0.3.0
 XS_VERSION_MACRO = XS_VERSION
 XS_DEFINE_VERSION = -D$(XS_VERSION_MACRO)=\"$(XS_VERSION)\"
 INST_ARCHLIB = blib/arch
@@ -255,7 +255,7 @@ RCS_LABEL = rcs -Nv$(VERSION_SYM): -q
 DIST_CP = best
 DIST_DEFAULT = tardist
 DISTNAME = Test-Module-Runnable
-DISTVNAME = Test-Module-Runnable-0.2.3
+DISTVNAME = Test-Module-Runnable-0.3.0
 
 
 # --- MakeMaker macro section:
@@ -480,7 +480,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) Generating META.yml
 	$(NOECHO) $(ECHO) '--- #YAML:1.0' > META_new.yml
 	$(NOECHO) $(ECHO) 'name:               Test-Module-Runnable' >> META_new.yml
-	$(NOECHO) $(ECHO) 'version:            0.2.3' >> META_new.yml
+	$(NOECHO) $(ECHO) 'version:            0.3.0' >> META_new.yml
 	$(NOECHO) $(ECHO) 'abstract:           Base class for runnable unit tests using Moose introspection' >> META_new.yml
 	$(NOECHO) $(ECHO) 'author:' >> META_new.yml
 	$(NOECHO) $(ECHO) '    - Duncan Ross Palmer, 2E0EOL (palmer@overchat.org)' >> META_new.yml
@@ -492,10 +492,14 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '    List::MoreUtils:  0' >> META_new.yml
 	$(NOECHO) $(ECHO) '    Moose:            0' >> META_new.yml
 	$(NOECHO) $(ECHO) '    Readonly:         0' >> META_new.yml
+	$(NOECHO) $(ECHO) '    Test::Deep:       0' >> META_new.yml
+	$(NOECHO) $(ECHO) '    Test::Exception:  0' >> META_new.yml
 	$(NOECHO) $(ECHO) '    Test::More:       0' >> META_new.yml
+	$(NOECHO) $(ECHO) '    Test::Output:     0' >> META_new.yml
 	$(NOECHO) $(ECHO) 'requires:' >> META_new.yml
-	$(NOECHO) $(ECHO) '    Moose:       0' >> META_new.yml
-	$(NOECHO) $(ECHO) '    Test::More:  0' >> META_new.yml
+	$(NOECHO) $(ECHO) '    Moose:             0' >> META_new.yml
+	$(NOECHO) $(ECHO) '    Test::MockModule:  0' >> META_new.yml
+	$(NOECHO) $(ECHO) '    Test::More:        0' >> META_new.yml
 	$(NOECHO) $(ECHO) 'no_index:' >> META_new.yml
 	$(NOECHO) $(ECHO) '    directory:' >> META_new.yml
 	$(NOECHO) $(ECHO) '        - t' >> META_new.yml
@@ -771,11 +775,12 @@ testdb_static :: testdb_dynamic
 # --- MakeMaker ppd section:
 # Creates a PPD (Perl Package Description) for a binary distribution.
 ppd :
-	$(NOECHO) $(ECHO) '<SOFTPKG NAME="$(DISTNAME)" VERSION="0.2.3">' > $(DISTNAME).ppd
+	$(NOECHO) $(ECHO) '<SOFTPKG NAME="$(DISTNAME)" VERSION="0.3.0">' > $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '    <ABSTRACT>Base class for runnable unit tests using Moose introspection</ABSTRACT>' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '    <AUTHOR>Duncan Ross Palmer, 2E0EOL (palmer@overchat.org)</AUTHOR>' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '    <IMPLEMENTATION>' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Moose::" />' >> $(DISTNAME).ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Test::MockModule" />' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Test::More" />' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '        <ARCHITECTURE NAME="x86_64-linux-gnu-thread-multi-5.14" />' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '        <CODEBASE HREF="" />' >> $(DISTNAME).ppd

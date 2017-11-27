@@ -1,9 +1,9 @@
 NAME
-    App::btcindo - CLI for bitcoin.co.id
+    App::btcindo - CLI for bitcoin.co.id (VIP)
 
 VERSION
-    This document describes version 0.005 of App::btcindo (from Perl
-    distribution App-btcindo), released on 2017-11-19.
+    This document describes version 0.011 of App::btcindo (from Perl
+    distribution App-btcindo), released on 2017-11-24.
 
 SYNOPSIS
     Please see included script btcindo.
@@ -23,7 +23,7 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-    Finance::BTCInfo
+    Finance::BTCIndo
 
 AUTHOR
     perlancar <perlancar@cpan.org>

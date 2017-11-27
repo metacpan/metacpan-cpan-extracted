@@ -16,7 +16,7 @@ lib/Udev/FFI.pm
 lib/Udev/FFI/Device.pm
 lib/Udev/FFI/Devnum.pm
 lib/Udev/FFI/Enumerate.pm
-lib/Udev/FFI/FFIFunctions.pm
+lib/Udev/FFI/Functions.pm
 lib/Udev/FFI/Monitor.pm
 minil.toml
 t/00_diag.t

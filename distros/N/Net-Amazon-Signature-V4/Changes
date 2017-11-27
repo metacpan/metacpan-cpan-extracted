@@ -1,4 +1,10 @@
 Revision history for Net-Amazon-Signature-v4
+0.18	2017-11-21
+		- Performance optimizations to request canonicalization
+
+0.17	2017-11-21
+		- Correctly canonicalize request URIs without a trailing slash after the
+		  hostname (GH#3)
 
 0.16	2017-04-28
 		- Stable release containing previous fixes

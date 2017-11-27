@@ -3,1660 +3,1937 @@ ext=*.desktop;*.kdelnk;*.desktop.cmake
 file=desktop.xml
 menu=Configuration
 mime=application/x-desktop
+version=2
 
 [4DOS BatchToMemory]
 ext=*.btm
 file=4dos.xml
 menu=Scripts
 mime=
+version=2
 
 [4GL]
 ext=*.4gl;*.4GL;*.err
 file=fgl-4gl.xml
 menu=Database
 mime=text/x-4glsrc;text/x-4glerr
+version=2
 
 [4GL-PER]
 ext=*.per;*.PER;*.per.err
 file=fgl-per.xml
 menu=Database
 mime=text/x-4glper;text/x-4glpererr
+version=2
 
 [ABAP]
 ext=*.abap;*.ABAP
 file=abap.xml
 menu=Sources
 mime=text/x-abap-src
+version=2
 
 [ABC]
 ext=*.abc;*.ABC
 file=abc.xml
 menu=Other
 mime=text/vnd.abc
+version=3
 
 [AHDL]
 ext=*.ahdl;*.tdf
 file=ahdl.xml
 menu=Hardware
 mime=text/x-ahdl
+version=2
 
 [AMPLE]
 ext=*.ample;*.menu;*.startup
 file=ample.xml
 menu=Scripts
 mime=text/x-amplesrc
+version=2
 
 [ANS-Forth94]
 ext=*.4th;*.4TH;*.f;*.F;*.frt;*.FRT;*.fs;*.FS;*.fth;*.FTH;*.seq;*.SEQ
 file=ansforth94.xml
 menu=Sources
 mime=
+version=3
 
 [ANSI C89]
 ext=*.c;*.C;*.h
 file=ansic89.xml
 menu=Sources
 mime=text/x-csrc;text/x-c++src;text/x-chdr
+version=3
 
 [ASN.1]
 ext=*.asn;*.asn1
 file=asn1.xml
 menu=Markup
 mime=
+version=2
 
 [ASP]
 ext=*.asp;
 file=asp.xml
 menu=Markup
 mime=text/x-asp-src;text/x-asp-src
+version=2
 
 [AVR Assembler]
 ext=*.asm;*.ASM;*.asm-avr
 file=asm-avr.xml
 menu=Assembler
 mime=text/x-asm;text/x-asm-avr
+version=3
 
 [AWK]
 ext=*.awk
 file=awk.xml
 menu=Scripts
 mime=text/x-awk
+version=1
 
 [ActionScript 2.0]
 ext=*.as
 file=actionscript.xml
 menu=Sources
 mime=text/x-actionscript
+version=2
 
 [Ada]
 ext=*.adb;*.ads;*.ada;*.a
 file=ada.xml
 menu=Sources
 mime=text/x-adasrc
+version=2
 
 [Agda]
 ext=*.agda
 file=agda.xml
 menu=Sources
 mime=text/x-agda
+version=2
 
 [Alerts]
 ext=
 file=alert.xml
 menu=Other
 mime=
+version=3
 
 [Alerts_indent]
 ext=
 file=alert_indent.xml
 menu=Other
 mime=
+version=3
 
 [Ansys]
 ext=*.ans
 file=ansys.xml
 menu=Scientific
 mime=
+version=2
 
 [Apache Configuration]
 ext=httpd.conf;httpd2.conf;apache.conf;apache2.conf;.htaccess*;.htpasswd*
 file=apache.xml
 menu=Configuration
 mime=
+version=3
 
 [Asm6502]
 ext=*.asm
 file=asm6502.xml
 menu=Assembler
 mime=text/x-asm6502
+version=2
 
 [Asterisk]
 ext=*asterisk/*.conf
 file=asterisk.xml
 menu=Configuration
 mime=
+version=2
 
 [AutoHotKey]
 ext=*.ahk;*.iahk
 file=ahk.xml
 menu=Scripts
 mime=
+version=2
 
 [B-Method]
 ext=*.mch;*.imp;*.ref
 file=bmethod.xml
 menu=Scientific
 mime=
+version=1
 
 [Bash]
 ext=*.sh;*.bash;*.ebuild;*.eclass;*.nix;.bashrc;.bash_profile;.bash_login;.profile
 file=bash.xml
 menu=Scripts
 mime=application/x-shellscript
+version=3
 
 [BibTeX]
 ext=*.bib
 file=bibtex.xml
 menu=Markup
 mime=text/x-bib
+version=2
 
 [Bitbake]
 ext=*.bb;*.bbappend;*.bbclass;*.inc;*.conf
 file=bitbake.xml
 menu=Sources
 mime=
+version=2
 
 [Boo]
 ext=*.boo
 file=boo.xml
 menu=Sources
 mime=text/x-boo
+version=2
 
 [C]
 ext=*.c;*.C;*.h
 file=c.xml
 menu=Sources
 mime=text/x-csrc;text/x-c++src;text/x-chdr
+version=2
 
 [C#]
 ext=*.cs
 file=cs.xml
 menu=Sources
 mime=text/x-csharp-src;text/x-csharp-hde
+version=2
 
 [C++]
 ext=*.c++;*.cxx;*.cpp;*.cc;*.C;*.h;*.hh;*.H;*.h++;*.hxx;*.hpp;*.hcc;*.ino;*.pde;*.moc
 file=cpp.xml
 menu=Sources
 mime=text/x-c++src;text/x-c++hdr;text/x-chdr
+version=4
 
 [C++/Qt4]
 ext=*.moc
 file=qt4.xml
 menu=Sources
 mime=text/x-c++src;text/x-c++hdr;text/x-chdr
+version=1.2
 
 [CGiS]
 ext=*.cgis
 file=cgis.xml
 menu=Sources
 mime=
+version=2
 
 [CMake]
 ext=CMakeLists.txt;*.cmake;*.cmake.in
 file=cmake.xml
 menu=Other
 mime=text/x-cmake
+version=4
 
 [CSS]
 ext=*.css
 file=css.xml
 menu=Markup
 mime=text/css
+version=4
 
 [CSS/PHP]
 ext=
 file=css-php.xml
 menu=Other
 mime=
+version=4
 
 [CUE Sheet]
 ext=*.cue
 file=cue.xml
 menu=Other
 mime=application/x-cue
+version=1
 
 [CartoCSS]
 ext=*.mss
 file=carto-css.xml
 menu=Markup
 mime=
+version=1
 
 [Cg]
 ext=*.cg;*.cgfx
 file=cg.xml
 menu=Sources
 mime=text/x-cgsrc
+version=2
 
 [ChangeLog]
 ext=ChangeLog
 file=changelog.xml
 menu=Other
 mime=
+version=2
 
 [Chicken]
 ext=*.chicken;*.scm;*.ss;*.scheme;*.meta
 file=chicken.xml
 menu=Scripts
 mime=text/x-scheme
+version=3
 
 [Cisco]
 ext=*.cis
 file=cisco.xml
 menu=Configuration
 mime=text/cisco
+version=2
 
 [CleanCSS]
 ext=*.ccss
 file=ccss.xml
 menu=Markup
 mime=
+version=2
 
 [Clipper]
 ext=*.prg;*.PRG;*.ch
 file=clipper.xml
 menu=Sources
 mime=text/x-clipper-src
+version=2
 
 [Clojure]
 ext=*.clj;*.cljs;*.cljc
 file=clojure.xml
 menu=Sources
 mime=
+version=6
 
 [CoffeeScript]
 ext=Cakefile;*.coffee;*.coco
 file=coffee.xml
 menu=Scripts
 mime=text/x-coffeescript;application/x-coffeescript
+version=2
 
 [ColdFusion]
 ext=*.cfm;*.cfc;*.cfml;*.dbm
 file=coldfusion.xml
 menu=Markup
 mime=text/x-coldfusion
+version=2
 
 [Common Lisp]
 ext=*.lisp;*.cl;*.lsp
 file=commonlisp.xml
 menu=Sources
 mime=
+version=3
 
 [Component-Pascal]
 ext=*.cp;*.bro
 file=component-pascal.xml
 menu=Sources
 mime=text/x-component-pascal
+version=2
 
 [ConTeXt]
 ext=*.ctx
 file=context.xml
 menu=Markup
 mime=text/x-tex
+version=2
 
 [Crack]
 ext=*.crk
 file=crk.xml
 menu=Sources
 mime=
+version=2
 
 [CubeScript]
 ext=*.cfg
 file=cubescript.xml
 menu=Scripts
 mime=
+version=1
 
 [Curry]
 ext=*.curry
 file=curry.xml
 menu=Sources
 mime=text/x-curry
+version=1
 
 [D]
 ext=*.d;*.D;*.di;*.DI;
 file=d.xml
 menu=Sources
 mime=text/x-dsrc
+version=2
 
 [DTD]
 ext=*.dtd
 file=dtd.xml
 menu=Markup
 mime=application/xml-dtd
+version=2
 
 [Debian Changelog]
 ext=
 file=debianchangelog.xml
 menu=Other
 mime=
+version=3
 
 [Debian Control]
 ext=control
 file=debiancontrol.xml
 menu=Other
 mime=
+version=1
 
 [Diff]
 ext=*.diff;*patch
 file=diff.xml
 menu=Other
 mime=text/x-patch
+version=2
 
 [Django HTML Template]
 ext=*.htm;*.html
 file=djangotemplate.xml
 menu=Markup
 mime=text/html
+version=3
 
 [Dockerfile]
 ext=Dockerfile
 file=dockerfile.xml
 menu=Other
 mime=
+version=5
 
 [Doxygen]
 ext=*.dox;*.doxygen
 file=doxygen.xml
 menu=Markup
 mime=text/x-doxygen
+version=3
 
 [DoxygenLua]
 ext=*.dox;*.doxygen
 file=doxygenlua.xml
 menu=Markup
 mime=text/x-doxygen
+version=3
 
 [E Language]
 ext=*.e
 file=e.xml
 menu=Sources
 mime=text/x-e-src
+version=2
 
 [Eiffel]
 ext=*.e
 file=eiffel.xml
 menu=Sources
 mime=text/x-eiffel-src
+version=2
 
 [Elixir]
 ext=*.ex;*.exs;*.eex;*.xml.eex;*.js.eex
 file=elixir.xml
 menu=Sources
 mime=text/x-elixir
+version=2
 
 [Email]
 ext=*.eml
 file=email.xml
 menu=Other
 mime=message/rfc822
+version=2
 
 [Erlang]
 ext=*.erl
 file=erlang.xml
 menu=Scripts
 mime=
+version=3
 
 [Euphoria]
 ext=*.e;*.ex;*.exw;*.exu
 file=euphoria.xml
 menu=Scripts
 mime=text/x-euphoria
+version=4
 
 [FASTQ]
 ext=*.fastq;*.fq;*.fastq.gz;*.fq.gz
 file=fastq.xml
 menu=Scientific
 mime=text/x-fastq
+version=2
 
 [FSharp]
 ext=*.fs;*.fsi;*.fsx
 file=fsharp.xml
 menu=Sources
 mime=
+version=2
 
 [FTL]
 ext=*.ftl
 file=ftl.xml
 menu=Markup
 mime=
+version=2
 
 [Fortran]
 ext=*.f;*.F;*.for;*.FOR;*.f90;*.F90;*.fpp;*.FPP;*.f95;*.F95;
 file=fortran.xml
 menu=Sources
 mime=text/x-fortran-src
+version=2
 
 [FreeBASIC]
 ext=*.bas;*.bi;*.BAS;*.BI
 file=freebasic.xml
 menu=Sources
 mime=text/x-freebasic
+version=1
 
 [G-Code]
 ext=*.ngc
 file=gcode.xml
 menu=3D
 mime=text/ngc
+version=4
 
 [GAP]
 ext=*.gd;*.gi;*.g
 file=gap.xml
 menu=Scientific
 mime=text/gap
+version=1
 
 [GCCExtensions]
 ext=*.c++;*.cxx;*.cpp;*.cc;*.C;*.h;*.hh;*.H;*.h++;*.hxx;*.hpp;*.hcc;
 file=gcc.xml
 menu=Sources
 mime=text/x-c++src;text/x-c++hdr;text/x-chdr;text/x-csrc
+version=1
 
 [GDB Backtrace]
 ext=*.kcrash;*.crash;*.bt
 file=gdb.xml
 menu=Other
 mime=
+version=2
 
 [GDL]
 ext=*.gdl;*.vcg;*.GDL;*.VCG
 file=gdl.xml
 menu=Scientific
 mime=
+version=2
 
 [GLSL]
 ext=*.glsl;*.vert;*.frag;*.geom;*.tcs;*.tes
 file=glsl.xml
 menu=3D
 mime=text/x-glslsrc
+version=3
 
 [GNU Assembler]
 ext=*.s;*.S
 file=gnuassembler.xml
 menu=Assembler
 mime=text/x-asm
+version=3
 
 [GNU Gettext]
 ext=*.po;*.pot
 file=gettext.xml
 menu=Markup
 mime=text/x-gettext-translation
+version=4
 
 [GNU Linker Script]
 ext=*.ld
 file=ld.xml
 menu=Scripts
 mime=
+version=2
 
 [GNU M4]
 ext=*.m4;
 file=m4.xml
 menu=Sources
 mime=
+version=2
 
 [Git Ignore]
 ext=.gitignore*;
 file=git-ignore.xml
 menu=Configuration
 mime=text/x-git-ignore
+version=1
 
 [Git Rebase]
 ext=git-rebase-todo
 file=git-rebase.xml
 menu=Other
 mime=text/vnd.git.rebase
+version=2
 
 [Gitolite]
 ext=gitolite.conf
 file=gitolite.xml
 menu=Configuration
 mime=
+version=1
 
 [GlossTex]
 ext=*.gdf
 file=glosstex.xml
 menu=Markup
 mime=text/x-gdf
+version=1
 
 [Gnuplot]
 ext=*.gnuplot;*.gp;*.gplt,*.plt
 file=gnuplot.xml
 menu=Scientific
 mime=
+version=2
 
 [Go]
 ext=*.go
 file=go.xml
 menu=Sources
 mime=
+version=3
 
 [Groovy]
 ext=*.groovy
 file=groovy.xml
 menu=Sources
 mime=
+version=2
 
 [HTML]
 ext=*.htm;*.html;*.shtml;*.shtm
 file=html.xml
 menu=Markup
 mime=text/html
+version=5
 
 [Haml]
 ext=*.haml
 file=haml.xml
 menu=Markup
 mime=text/x-haml
+version=2
 
 [Hamlet]
 ext=*.hamlet
 file=hamlet.xml
 menu=Markup
 mime=
+version=2
 
 [Haskell]
 ext=*.hs;*.chs
 file=haskell.xml
 menu=Sources
 mime=text/x-haskell
+version=5
 
 [Haxe]
 ext=*.hx;*.Hx;*.hX;*.HX;
 file=haxe.xml
 menu=Sources
 mime=text/x-hxsrc
+version=1
 
 [Hunspell Affix File]
 ext=*.aff
 file=hunspell-aff.xml
 menu=Other
 mime=
+version=1
 
 [Hunspell Dictionary File]
 ext=*.dic
 file=hunspell-dic.xml
 menu=Other
 mime=
+version=1
 
 [Hunspell Thesaurus File]
 ext=*.dat
 file=hunspell-dat.xml
 menu=Other
 mime=
+version=1
 
 [Hunspell Thesaurus Index File]
 ext=*.idx
 file=hunspell-idx.xml
 menu=Other
 mime=
+version=1
 
 [IDL]
 ext=*.idl
 file=idl.xml
 menu=Sources
 mime=text/x-idl-src
+version=2
 
 [ILERPG]
 ext=QRPG*.*;qrpg*.*
 file=ilerpg.xml
 menu=Sources
 mime=text/x-ilerpg-src
+version=3
 
 [INI Files]
 ext=*.ini;*.pls;*.kcfgc
 file=ini.xml
 menu=Configuration
 mime=
+version=2
 
 [ISO C++]
 ext=*.c++;*.cxx;*.cpp;*.cc;*.C;*.h;*.hh;*.H;*.h++;*.hxx;*.hpp;*.hcc;*.moc
 file=isocpp.xml
 menu=Sources
 mime=text/x-c++src;text/x-c++hdr;text/x-chdr
+version=6
 
 [Inform]
 ext=*.inf;*.h
 file=inform.xml
 menu=Sources
 mime=text/x-inform-src
+version=2
 
 [Intel x86 (FASM)]
 ext=*.asm;*.inc;*.fasm
 file=fasm.xml
 menu=Assembler
 mime=
+version=1
 
 [Intel x86 (NASM)]
 ext=*.asm
 file=nasm.xml
 menu=Assembler
 mime=
+version=3
 
 [J]
 ext=*.ijs;*.ijt;*.IJS;*.IJT
 file=j.xml
 menu=Scripts
 mime=text/x-j;text/x-jsrc
+version=2
 
 [JSON]
 ext=*.json;.kateproject;.arcconfig
 file=json.xml
 menu=Markup
 mime=application/json
+version=2
 
 [JSP]
 ext=*.jsp;*.JSP
 file=jsp.xml
 menu=Markup
 mime=text/html
+version=2
 
 [Jam]
 ext=Jam*;*.jam
 file=jam.xml
 menu=Other
 mime=text/x-jam;text/x-Jamfile;text/x-Jamrules;text/x-Jambase
+version=2
 
 [Java]
 ext=*.java
 file=java.xml
 menu=Sources
 mime=text/x-java
+version=2
 
 [JavaScript]
 ext=*.js;*.kwinscript
 file=javascript.xml
 menu=Scripts
 mime=text/x-javascript;application/x-javascript
+version=2
 
 [JavaScript/PHP]
 ext=
 file=javascript-php.xml
 menu=Other
 mime=
+version=2
 
 [Javadoc]
 ext=
 file=javadoc.xml
 menu=Markup
 mime=
+version=2
 
 [Jira]
 ext=*.jira
 file=jira.xml
 menu=Markup
 mime=
+version=3
 
 [Julia]
 ext=*.jl
 file=julia.xml
 menu=Sources
 mime=
+version=1
 
 [KBasic]
 ext=*.kbasic
 file=kbasic.xml
 menu=Sources
 mime=text/x-kbasic-src
+version=2
 
 [KDev-PG[-Qt] Grammar]
 ext=*.g
 file=grammar.xml
 menu=Sources
 mime=
+version=1
 
 [Kconfig]
 ext=Kconfig*
 file=kconfig.xml
 menu=Configuration
 mime=
+version=5
 
 [Kotlin]
 ext=*.kt;*.kts
 file=kotlin.xml
 menu=Sources
 mime=
+version=2
 
 [LDIF]
 ext=*.ldif
 file=ldif.xml
 menu=Database
 mime=application/directory
+version=2
 
 [LESSCSS]
 ext=*.less
 file=less.xml
 menu=Markup
 mime=text/css
+version=2
 
 [LPC]
 ext=*.c;*.h;*.inc;*.o
 file=lpc.xml
 menu=Sources
 mime=
+version=1
 
 [LSL]
 ext=*.lsl
 file=lsl.xml
 menu=Scripts
 mime=text/x-lsl
+version=3
 
 [LaTeX]
 ext=*.tex;*.ltx;*.dtx;*.sty;*.cls;*.bbx;*.cbx;*.lbx;*.tikz
 file=latex.xml
 menu=Markup
 mime=text/x-tex
+version=4
 
 [Lex/Flex]
 ext=*.l;*.lex;*.flex
 file=lex.xml
 menu=Sources
 mime=
+version=2
 
 [LilyPond]
 ext=*.ly;*.LY;*.ily;*.ILY;*.lyi;*.LYI
 file=lilypond.xml
 menu=Other
 mime=text/x-lilypond
+version=4
 
 [Literate Curry]
 ext=*.lcurry
 file=literate-curry.xml
 menu=Sources
 mime=text/x-curry
+version=1
 
 [Literate Haskell]
 ext=*.lhs
 file=literate-haskell.xml
 menu=Sources
 mime=text/x-haskell
+version=3
 
 [Logtalk]
 ext=*.lgt;*.config
 file=logtalk.xml
 menu=Sources
 mime=text/x-logtalk
+version=2
 
 [Lua]
 ext=*.lua
 file=lua.xml
 menu=Scripts
 mime=text/x-lua
+version=2
 
 [M3U]
 ext=*.m3u
 file=m3u.xml
 menu=Other
 mime=audio/x-mpegurl
+version=2
 
 [MAB-DB]
 ext=*.mab;*.MAB;*.Mab
 file=mab.xml
 menu=Markup
 mime=text/x-mab
+version=2
 
 [MEL]
 ext=*.mel
 file=mel.xml
 menu=Scripts
 mime=
+version=3
 
 [MIPS Assembler]
 ext=*.s;
 file=mips.xml
 menu=Assembler
 mime=text/x-mips
+version=2
 
 [MS-DOS Batch]
 ext=*.bat
 file=dosbat.xml
 menu=Scripts
 mime=application/x-dos
+version=1
 
 [Magma]
 ext=*.m;*.mag
 file=magma.xml
 menu=Scientific
 mime=text/x-magma
+version=2
 
 [Makefile]
 ext=GNUmakefile;Makefile;makefile;GNUmakefile.*;Makefile.*;makefile.*;*.mk
 file=makefile.xml
 menu=Other
 mime=text/x-makefile
+version=5
 
 [Mako]
 ext=*.mako;*.mak
 file=mako.xml
 menu=Markup
 mime=
+version=3
 
 [Markdown]
 ext=*.md;*.mmd;*.markdown
 file=markdown.xml
 menu=Markup
 mime=
+version=2
 
 [Mason]
 ext=*.html;
 file=mason.xml
 menu=Scripts
 mime=
+version=2
 
 [Mathematica]
 ext=*.nb
 file=mathematica.xml
 menu=Scientific
 mime=
+version=9
 
 [Matlab]
 ext=*.m;*.M
 file=matlab.xml
 menu=Scientific
 mime=text/mfile
+version=2
 
 [Maxima]
 ext=*.mac;*.MAC;*.dem;*.DEM
 file=maxima.xml
 menu=Scientific
 mime=
+version=3
 
 [MediaWiki]
 ext=*.mediawiki
 file=mediawiki.xml
 menu=Markup
 mime=
+version=3
 
 [Meson]
 ext=meson.build;meson_options.txt
 file=meson.xml
 menu=Other
 mime=text/x-meson
+version=2
 
 [Metapost/Metafont]
 ext=*.mp;*.mps;*.mpost;*.mf
 file=metafont.xml
 menu=Markup
 mime=text/x-metapost
+version=1
 
 [Modelica]
 ext=*.mo
 file=modelica.xml
 menu=Sources
 mime=
+version=6
 
 [Modelines]
 ext=
 file=modelines.xml
 menu=Other
 mime=
+version=3
 
 [Modula-2]
 ext=*.mod;*.def;*.mi;*.md
 file=modula-2.xml
 menu=Sources
 mime=text/x-modula-2
+version=2
 
 [MonoBasic]
 ext=*.vb
 file=monobasic.xml
 menu=Sources
 mime=
+version=2
 
 [Motorola 68k (VASM/Devpac)]
 ext=*.s;*.i;*.S;*.I
 file=asm-m68k.xml
 menu=Assembler
 mime=
+version=2
 
 [Motorola DSP56k]
 ext=*.asm;*.inc;*.ASM;*.INC
 file=asm-dsp56k.xml
 menu=Assembler
 mime=
+version=2
 
 [Music Publisher]
 ext=*.mup;*.not
 file=mup.xml
 menu=Other
 mime=text/x-mup;audio/x-mup;application/x-mup;audio/x-notes
+version=2
 
 [NSIS]
 ext=*.nsi
 file=nsis.xml
 menu=Scripts
 mime=text/x-nsis
+version=2
 
 [Nagios]
 ext=*.cfg
 file=nagios.xml
 menu=Configuration
 mime=
+version=2
 
 [Nemerle]
 ext=*.n
 file=nemerle.xml
 menu=Sources
 mime=text/x-nemerle
+version=1
 
 [OORS]
 ext=*.oors
 file=oors.xml
 menu=Sources
 mime=
+version=2
 
 [OPAL]
 ext=*.impl;*.sign
 file=opal.xml
 menu=Sources
 mime=
+version=2
 
 [Objective Caml]
 ext=*.ml;*.mli
 file=ocaml.xml
 menu=Sources
 mime=text/x-ocaml
+version=4
 
 [Objective Caml Ocamllex]
 ext=*.mll
 file=ocamllex.xml
 menu=Sources
 mime=
+version=3
 
 [Objective Caml Ocamlyacc]
 ext=*.mly
 file=ocamlyacc.xml
 menu=Sources
 mime=
+version=3
 
 [Objective-C]
 ext=*.m;*.h
 file=objectivec.xml
 menu=Sources
 mime=text/x-objc-src;text/x-c-hdr
+version=2
 
 [Objective-C++]
 ext=*.mm;*.M;*.h
 file=objectivecpp.xml
 menu=Sources
 mime=text/x-objcpp-src;text/x-c-hdr
+version=2
 
 [Octave]
 ext=*.octave;*.m;*.M
 file=octave.xml
 menu=Scientific
 mime=text/octave
+version=2
 
 [OpenCL]
 ext=*.cl
 file=opencl.xml
 menu=Sources
 mime=text/x-clsrc
+version=2
 
 [PGN]
 ext=*.pgn;*.PGN
 file=pgn.xml
 menu=Other
 mime=
+version=4
 
 [PHP (HTML)]
 ext=*.php;*.php3;*.wml;*.phtml;*.phtm;*.inc
 file=html-php.xml
 menu=Scripts
 mime=text/x-php4-src;text/x-php3-src;text/vnd.wap.wml;application/x-php
+version=5
 
 [PHP/PHP]
 ext=
 file=php.xml
 menu=Scripts
 mime=
+version=2
 
 [PL/I]
 ext=*.pli
 file=pli.xml
 menu=Sources
 mime=text/x-pli
+version=2
 
 [PLY]
 ext=*.ply
 file=ply.xml
 menu=3D
 mime=
+version=2
 
 [POV-Ray]
 ext=*.inc;*.pov
 file=povray.xml
 menu=3D
 mime=text/x-povray-script;text/x-povray-include
+version=3
 
 [Pango]
 ext=
 file=pango.xml
 menu=Markup
 mime=
+version=2
 
 [Pascal]
 ext=*.p;*.pas;*.pp
 file=pascal.xml
 menu=Sources
 mime=text/x-pascal
+version=2
 
 [Perl]
 ext=*.pl;*.PL;*.pm
 file=perl.xml
 menu=Scripts
 mime=application/x-perl;text/x-perl
+version=3
 
 [PicAsm]
 ext=*.src;*.SRC;*.asm;*.ASM;*.pic;*.PIC
 file=picsrc.xml
 menu=Assembler
 mime=text/x-PicSrc;text/x-PicHdr
+version=2
 
 [Pig]
 ext=*.pig
 file=pig.xml
 menu=Scripts
 mime=application/x-pig;text/x-pig
+version=5
 
 [Pike]
 ext=*.pike
 file=pike.xml
 menu=Scripts
 mime=application/x-pike;text/x-pike
+version=2
 
 [PostScript]
 ext=*.ps;*.ai;*.eps
 file=postscript.xml
 menu=Markup
 mime=application/postscript
+version=2
 
 [PostScript Printer Description]
 ext=*.ppd
 file=ppd.xml
 menu=Markup
 mime=application/vnd.cups-ppd
+version=2
 
 [Praat]
 ext=*.Praat;*.praat;*.psc;*.praat-script;*.praatscript;*.proc
 file=praat.xml
 menu=Scripts
 mime=
+version=2
 
 [Prolog]
 ext=*.prolog;*.dcg;*.pro
 file=prolog.xml
 menu=Sources
 mime=text/x-prolog
+version=3
 
 [Protobuf]
 ext=*.proto
 file=protobuf.xml
 menu=Sources
 mime=text/x-protobuf
+version=3
 
 [Puppet]
 ext=*.pp
 file=puppet.xml
 menu=Scripts
 mime=application/x-puppet
+version=4
 
 [PureBasic]
 ext=*.pb;*.pbi
 file=purebasic.xml
 menu=Sources
 mime=text/x-purebasic
+version=6
 
 [Python]
 ext=*.py;*.pyw;SConstruct;SConscript
 file=python.xml
 menu=Scripts
 mime=application/x-python;text/x-python
+version=4
 
 [QML]
 ext=*.qml;*.qmltypes
 file=qml.xml
 menu=Scripts
 mime=text/x-qml;application/x-qml
+version=3
 
 [QMake]
 ext=*.pro;*.pri;*.prf;
 file=qmake.xml
 menu=Other
 mime=
+version=3
 
 [Quake Script]
 ext=*.cfg
 file=idconsole.xml
 menu=Scripts
 mime=
+version=2
 
 [R Markdown]
 ext=*.rmd;*.Rmd;*.RMD
 file=rmarkdown.xml
 menu=Markup
 mime=text/x-r-markdown
+version=2
 
 [R Script]
 ext=*.R;*.r;*.S;*.s;*.q
 file=r.xml
 menu=Scientific
 mime=
+version=6
 
 [RELAX NG]
 ext=*.rng;*.RNG
 file=relaxng.xml
 menu=Markup
 mime=
+version=1
 
 [REXX]
 ext=*.rex
 file=rexx.xml
 menu=Scripts
 mime=
+version=2
 
 [RPM Spec]
 ext=*.spec
 file=rpmspec.xml
 menu=Other
 mime=
+version=4
 
 [RSI IDL]
 ext=*.pro
 file=rsiidl.xml
 menu=Sources
 mime=text/x-rsiidl-src
+version=2
 
 [RapidQ]
 ext=*.rqb
 file=rapidq.xml
 menu=Sources
 mime=
+version=2
 
 [RelaxNG-Compact]
 ext=*.rnc
 file=relaxngcompact.xml
 menu=Markup
 mime=
+version=1
 
 [RenderMan RIB]
 ext=*.rib
 file=rib.xml
 menu=3D
 mime=
+version=3
 
 [Replicode]
 ext=*.replicode
 file=replicode.xml
 menu=Scientific
 mime=
+version=3
 
 [Restructured Text]
 ext=*.rst
 file=restructuredtext.xml
 menu=Markup
 mime=
+version=1.0
 
 [Rich Text Format]
 ext=*.rtf
 file=rtf.xml
 menu=Markup
 mime=text/rtf;application/rtf
+version=2
 
 [Roff]
 ext=
 file=roff.xml
 menu=Markup
 mime=
+version=2
 
 [Ruby]
 ext=*.rb;*.rjs;*.rxml;*.xml.erb;*.js.erb;*.rake;Rakefile;Gemfile;*.gemspec;Vagrantfile
 file=ruby.xml
 menu=Scripts
 mime=application/x-ruby
+version=3
 
 [Ruby/Rails/RHTML]
 ext=*.rhtml;*.RHTML;*.html.erb
 file=rhtml.xml
 menu=Markup
 mime=
+version=5
 
 [Rust]
 ext=*.rs
 file=rust.xml
 menu=Sources
 mime=text/rust
+version=4
 
 [SCSS]
 ext=*.scss
 file=scss.xml
 menu=Markup
 mime=text/css
+version=4
 
 [SGML]
 ext=*.sgml
 file=sgml.xml
 menu=Markup
 mime=text/sgml
+version=2
 
 [SML]
 ext=*.sml;*.ml
 file=sml.xml
 menu=Sources
 mime=
+version=2
 
 [SQL]
 ext=*.sql;*.SQL;*.ddl;*.DDL
 file=sql.xml
 menu=Database
 mime=text/x-sql
+version=2
 
 [SQL (MySQL)]
 ext=*.sql;*.SQL;*.ddl;*.DDL
 file=sql-mysql.xml
 menu=Database
 mime=text/x-sql
+version=2
 
 [SQL (Oracle)]
 ext=*.sql;*.SQL;*.ddl;*.DDL;*.trg;*.TRG;*.spc;*.SPC;*.bdy;*.DBY
 file=sql-oracle.xml
 menu=Database
 mime=text/x-sql
+version=2
 
 [SQL (PostgreSQL)]
 ext=*.sql;*.SQL;*.ddl;*.DDL
 file=sql-postgresql.xml
 menu=Database
 mime=text/x-sql
+version=2
 
 [STL]
 ext=*.stl
 file=stl.xml
 menu=3D
 mime=application/sla
+version=2
 
 [Sather]
 ext=*.sa
 file=sather.xml
 menu=Sources
 mime=text/x-sather-src
+version=2
 
 [Scala]
 ext=*.scala;*.sbt
 file=scala.xml
 menu=Sources
 mime=text/x-scala
+version=3
 
 [Scheme]
 ext=*.scm;*.ss;*.scheme;*.guile
 file=scheme.xml
 menu=Scripts
 mime=text/x-scheme
+version=3
 
 [SiSU]
 ext=*.sst;*.ssm;*.ssi;*._sst;*.-sst;
 file=sisu.xml
 menu=Markup
 mime=
+version=2
 
 [Sieve]
 ext=*.siv
 file=sieve.xml
 menu=Scripts
 mime=application/sieve
+version=4
 
 [Spice]
 ext=*.sp;*.hsp
 file=spice.xml
 menu=Hardware
 mime=text/spice
+version=2
 
 [Stata]
 ext=*.do; *.ado; *.doh; *.DO; *.ADO; *.DOH
 file=stata.xml
 menu=Scientific
 mime=
+version=4
 
 [SystemC]
 ext=*.c++;*.cxx;*.cpp;*.cc;*.C;*.h;*.hh;*.H;*.h++;*.hxx;*.hpp;*.hcc;*.moc
 file=systemc.xml
 menu=Hardware
 mime=text/x-c++src;text/x-c++hdr;text/x-chdr
+version=2
 
 [SystemVerilog]
 ext=*.sv;*.svh
 file=systemverilog.xml
 menu=Hardware
 mime=text/x-systemverilog-src
+version=3
 
 [TADS 3]
 ext=*.t;*.h
 file=tads3.xml
 menu=Sources
 mime=
+version=3
 
 [TI Basic]
 ext=
 file=tibasic.xml
 menu=Scientific
 mime=
+version=2
 
 [TOML]
 ext=*.toml
 file=toml.xml
 menu=Configuration
 mime=text/x-toml
+version=3
 
 [TT2]
 ext=*.tt*;
 file=template-toolkit.xml
 menu=Markup
 mime=
+version=1
 
 [TaskJuggler]
 ext=*.tjp;*.tji
 file=taskjuggler.xml
 menu=Scripts
 mime=
+version=3
 
 [Tcl/Tk]
 ext=*.tcl;*.tk
 file=tcl.xml
 menu=Scripts
 mime=text/x-tcl
+version=3
 
 [Tcsh]
 ext=*.csh;*.tcsh;csh.cshrc;csh.login;.tcshrc;.cshrc;.login
 file=tcsh.xml
 menu=Scripts
 mime=application/x-csh
+version=1
 
 [Texinfo]
 ext=*.texi
 file=texinfo.xml
 menu=Markup
 mime=application/x-texinfo
+version=1
 
 [Textile]
 ext=*.textile
 file=textile.xml
 menu=Markup
 mime=
+version=2
 
 [Troff Mandoc]
 ext=*.1;*.2;*.3;*.4;*.5;*.6;*.7;*.8;*.1m;*.3x;*.tmac
 file=mandoc.xml
 menu=Markup
 mime=
+version=1
 
 [UnrealScript]
 ext=*.uc
 file=uscript.xml
 menu=Scripts
 mime=text/x-uscript
+version=1
 
 [VHDL]
 ext=*.vhdl;*.vhd
 file=vhdl.xml
 menu=Hardware
 mime=text/x-vhdl
+version=2
 
 [VRML]
 ext=*.wrl
 file=vrml.xml
 menu=3D
 mime=model/vrml
+version=4
 
 [Vala]
 ext=*.vala
 file=vala.xml
 menu=Sources
 mime=text/x-vala
+version=3
 
 [Valgrind Suppression]
 ext=*.supp;
 file=valgrind-suppression.xml
 menu=Other
 mime=
+version=2
 
 [Varnish 3 module spec file]
 ext=*.vcc;
 file=varnishcc.xml
 menu=Sources
 mime=
+version=1
 
 [Varnish 4 Configuration Language]
 ext=*.vcl;
 file=varnish4.xml
 menu=Configuration
 mime=
+version=1
 
 [Varnish 4 Test Case language]
 ext=*.vtc;
 file=varnishtest4.xml
 menu=Configuration
 mime=
+version=1
 
 [Varnish 4 module spec file]
 ext=*.vcc;
 file=varnishcc4.xml
 menu=Sources
 mime=
+version=1
 
 [Varnish Configuration Language]
 ext=*.vcl;
 file=varnish.xml
 menu=Configuration
 mime=
+version=1
 
 [Varnish Test Case language]
 ext=*.vtc;
 file=varnishtest.xml
 menu=Configuration
 mime=
+version=1
 
 [Velocity]
 ext=*.vm;
 file=velocity.xml
 menu=Scripts
 mime=text/x-velocity-src;text/x-vm-src
+version=2
 
 [Vera]
 ext=*.vr;*.vri;*.vrh
 file=vera.xml
 menu=Hardware
 mime=text/x-vera-src
+version=3
 
 [Verilog]
 ext=*.v;*.V;*.vl
 file=verilog.xml
 menu=Hardware
 mime=text/x-verilog-src
+version=2
 
 [WINE Config]
 ext=*.reg
 file=winehq.xml
 menu=Configuration
 mime=
+version=3
 
 [Wavefront OBJ]
 ext=*.obj
 file=wavefront-obj.xml
 menu=3D
 mime=
+version=2
 
 [Wesnoth Markup Language]
 ext=*.cfg;*.pbl;*.CFG;*.PBL
 file=wml.xml
 menu=Markup
 mime=
+version=1
 
 [XML]
 ext=*.docbook;*.xml;*.rc;*.daml;*.rdf;*.rss;*.xspf;*.xsd;*.svg;*.ui;*.kcfg;*.qrc;*.wsdl;*.scxml
 file=xml.xml
 menu=Markup
 mime=text/xml;text/book;text/daml;text/rdf;application/rss+xml;application/xspf+xml;image/svg+xml;application/x-designer;application/xml;application/scxml+xml
+version=5
 
 [XML (Debug)]
 ext=
 file=xmldebug.xml
 menu=Markup
 mime=
+version=2
 
 [XUL]
 ext=*.xul;*.xbl
 file=xul.xml
 menu=Markup
 mime=text/xul
+version=2
 
 [Xonotic Script]
 ext=*.cfg
 file=xonotic-console.xml
 menu=Scripts
 mime=
+version=1
 
 [YAML]
 ext=*.yaml;*.yml
 file=yaml.xml
 menu=Markup
 mime=text/yaml
+version=3
 
 [Yacc/Bison]
 ext=*.y;*.yy
 file=yacc.xml
 menu=Sources
 mime=
+version=3
 
 [Zonnon]
 ext=*.znn
 file=zonnon.xml
 menu=Sources
 mime=text/x-zonnon
+version=2
 
 [Zsh]
 ext=*.sh;*.zsh;.zshrc;.zprofile;.zlogin;.zlogout;.profile
 file=zsh.xml
 menu=Scripts
 mime=application/x-shellscript
+version=1
 
 [dot]
 ext=*.dot
 file=dot.xml
 menu=Scientific
 mime=text/x-dot
+version=2
 
 [ferite]
 ext=*.fe;*.feh
 file=ferite.xml
 menu=Scripts
 mime=text/x-ferite-src
+version=2
 
 [fstab]
 ext=fstab;mtab
 file=fstab.xml
 menu=Configuration
 mime=
+version=2
 
 [k]
 ext=*.k
 file=k.xml
 menu=Scripts
 mime=
+version=3
 
 [kdesrc-buildrc]
 ext=.kdesrc-buildrc;kdesrc-buildrc
 file=kdesrc-buildrc.xml
 menu=Configuration
 mime=
+version=1
 
 [mergetag text]
 ext=*.mtt;
 file=mergetagtext.xml
 menu=Configuration
 mime=
+version=2
 
 [nesC]
 ext=*.nc
 file=nesc.xml
 menu=Sources
 mime=text/x-ncsrc
+version=2
 
 [noweb]
 ext=*.w;*.nw
 file=noweb.xml
 menu=Sources
 mime=
+version=2
 
 [progress]
 ext=*.p;*.w;*.i;*.cls;
 file=progress.xml
 menu=Database
 mime=
+version=2
 
 [q]
 ext=*.q
 file=q.xml
 menu=Scripts
 mime=
+version=3
 
 [reStructuredText]
 ext=*.rst
 file=rest.xml
 menu=Markup
 mime=text/x-rst
+version=2
 
 [scilab]
 ext=*.sci;*.sce
 file=sci.xml
 menu=Scientific
 mime=text/x-sci
+version=2
 
 [sed]
 ext=*.sed
 file=sed.xml
 menu=Scripts
 mime=text/x-sed
+version=2
 
 [txt2tags]
 ext=*.t2t
 file=txt2tags.xml
 menu=Markup
 mime=text/txt2tags
+version=2
 
 [vCard, vCalendar, iCalendar]
 ext=*.iCal;*.iCalendar;.ics;*.ifb;*.iFBf;*.vcal;*.vcalendar;*.vcard;*.vcf;
 file=vcard.xml
 menu=Markup
 mime=text/calendar;text/vcard
+version=2
 
 [x.org Configuration]
 ext=xorg.conf
 file=xorg.xml
 menu=Configuration
 mime=
+version=2
 
 [xHarbour]
 ext=*.prg;*.PRG;*.ch
 file=xharbour.xml
 menu=Sources
 mime=text/x-xharbour-src
+version=2
 
 [xslt]
 ext=*.xsl;*.xslt
 file=xslt.xml
 menu=Markup
 mime=
+version=2
 
 [yacas]
 ext=*.ys
 file=yacas.xml
 menu=Scientific
 mime=text/x-yacassrc
+version=2
 

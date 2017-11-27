@@ -1,0 +1,8 @@
+program-extensions = .pl .t
+
+[-CodeLayout::RequireTidyCode]
+[-Documentation::RequirePodSections]
+[-Documentation::RequirePodLinksIncludeText]
+[-Documentation::RequirePodAtEnd]
+[-ErrorHandling::RequireCarping]
+[-Modules::RequireVersionVar]

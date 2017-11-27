@@ -1,6 +1,10 @@
 
 Revision history for Perl module Mutex.
 
+1.005 Tue Nov 21 15:30:00 EST 2017
+
+  * Improved wantarray support in Mutex synchronize.
+
 1.004 Fri Apr 28 16:00:00 EST 2017
 
   * Fixed Mutex::Flock, tmp_file missing script name in path.

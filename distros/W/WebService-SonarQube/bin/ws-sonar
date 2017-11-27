@@ -16,7 +16,7 @@ use FindBin qw/$Bin/;
 use Path::Tiny;
 use WebService::SonarQube;
 
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 
 my %option = (

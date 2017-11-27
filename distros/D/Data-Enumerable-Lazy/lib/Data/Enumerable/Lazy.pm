@@ -5,7 +5,7 @@ use 5.18.2;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 =pod
 
@@ -81,9 +81,9 @@ caching.
 
 Usage:
 
-# We initialize a new range generator from 0 to 10 including.
+  # We initialize a new range generator from 0 to 10 including.
   my $range = basic_range(0, 10);
-# We check if the sequence has elements in it's tail.
+  # We check if the sequence has elements in it's tail.
   while ($range->has_next) {
     # In this very line the state of $range is being changed
     say $range->next;

@@ -19,7 +19,7 @@
 #define FOURCC_EQ(a, b) ((a)[0] == (b)[0] && (a)[1] == (b)[1] && (a)[2] && (b)[2] && (a)[3] == (b)[3])
 
 typedef enum {
-  AAC_INVALID   =  0, 
+  AAC_INVALID   =  0,
   AAC_MAIN      =  1, /* AAC Main */
   AAC_LC        =  2, /* AAC Low complexity */
   AAC_SSR       =  3, /* AAC SSR */
@@ -45,7 +45,7 @@ typedef enum {
   AAC_HILN_ER   = 26, /* HILN with error recovery */
   AAC_PARAM_ER  = 27, /* Parametric with error recovery */
   AAC_SSC       = 28, /* AAC SSC */
-  AAC_PS        = 29, /* Parametric Stereo */ 
+  AAC_PS        = 29, /* Parametric Stereo */
   AAC_ESCAPE    = 31, /* Escape */
   AAC_SLS       = 37, /* Scalable Lossless */
 } aac_object_type;
@@ -85,37 +85,37 @@ typedef struct mp4info {
   uint32_t track_count;
   uint8_t seen_moov;
   uint8_t dlna_invalid;
-  
+
   // Things needed for DLNA detection
   uint8_t audio_object_type;
   uint16_t channels;
   uint32_t samplerate;
   uint32_t bitrate;
-  
+
   // Data structures used to support seeking
   // Based on code from Rockbox
-  
+
   uint8_t seeking;      // flag if we're seeking
   uint32_t old_st_size; // size of original st* boxes
   uint32_t new_st_size; // size of rewritten st* boxes
   uint32_t meta_size;   // size of variable meta box
   SV *seekhdr;          // rewritten header during second seek pass
-  
+
   // stsc
   uint32_t num_sample_to_chunks;
   struct stc *sample_to_chunk;
   SV *new_stsc;
-  
+
   // stco
   uint32_t *chunk_offset;
   uint32_t num_chunk_offsets;
   SV *new_stco;
-  
+
   // stts
   struct tts *time_to_sample;
   uint32_t num_time_to_samples;
   SV *new_stts;
-  
+
   // stsz
   uint16_t *sample_byte_size;
   uint32_t num_sample_byte_sizes;

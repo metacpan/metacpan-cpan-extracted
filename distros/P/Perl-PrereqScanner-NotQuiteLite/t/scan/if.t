@@ -1,5 +1,7 @@
 use strict;
 use warnings;
+use FindBin;
+use lib "$FindBin::Bin/../../";
 use t::scan::Util;
 
 test(<<'TEST'); # ETHER/Pod-Coverage-Moose-0.07/t/lib/TestOverload.pm

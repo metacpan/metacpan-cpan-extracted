@@ -1,5 +1,7 @@
 use strict;
 use warnings;
+use FindBin;
+use lib "$FindBin::Bin/../../";
 use t::scan::Util;
 
 test(<<'TEST'); # LAWALSH/P-1.1.34/lib/P.pm
@@ -467,4 +469,48 @@ IGN
 		$p }
 1;}		#value 1 placed at as w/most of my end-of-packages (rt#89054)
 TEST
+
+test(<<'TEST'); # MCHE/Mojolicious-Che-0.031/lib/Mojolicious/Che.pm
+package Mojolicious::Che;
+use Mojo::Base::Che 'Mojolicious';
+use Mojo::Log::Che;
+use Mojo::Loader qw(load_class);
+
+...
+
+sub хазы { # Хазы из конфига
+  my $app = shift;
+  my $conf = $app->config;
+  my $h = $conf->{'mojo_has'} || $conf->{'mojo'}{'has'} || $conf->{'хазы'};
+  map {
+    $app->log->debug("Make the app->has('$_')");
+    has $_ => $h->{$_};
+  } keys %$h;
+}
+TEST
+
+test(<<'TEST'); # MCHE/Mojolicious-Plugin-RoutesAuthDBI-0.785/lib/Mojolicious/Plugin/RoutesAuthDBI/OAuth2.pm
+package Mojolicious::Plugin::RoutesAuthDBI::OAuth2;
+use Mojo::Base 'Mojolicious::Controller';
+use Mojolicious::Plugin::RoutesAuthDBI::Util qw(json_enc load_class);
+...
+
+sub отсоединить {
+  my $c = shift;
+  my $site_name = $c->stash('site');
+
+  my $site = $c->oauth2->providers->{$site_name}
+    or die "No such oauth provider [$site_name]" ;
+  
+  my $curr_profile = $c->curr_profile;
+  
+  my $r = $c->_model->detach($site->{id}, $curr_profile->{id},);
+  #~ $c->app->log->debug("Убрал авторизацию сайта [$site_name] профиля [$curr_profile->{id}]", $c->dumper($r));
+  
+  $Init->plugin->model->{Refs}->del($r->{ref_id}, undef, undef);
+  
+  $c->redirect_to($c->param('redirect') || 'profile');
+}
+TEST
+
 done_testing;

@@ -7,17 +7,40 @@ use lib '../lib';
 use PDF::Builder;
 use PDF::Builder::Util;
 
-#my $compress = 'none'; # no stream compression
-my $compress = 'flate'; # compress streams
+my $type = 0;  # 0 = full list of core fonts
+               # 1 = single core font (for testing)
+	       # 2 = TTF font(s)
+	       # 3 = Type1 (PS) font(s)
+my $encoding = 'latin1';  # normally latin1
+
+my @variants = ();
+my @varLabels = ();
+# show slant example
+push @variants, {-slant=>0.750};
+push @varLabels, 'slant 0.750';
+# show oblique example
+push @variants, {-oblique=>12};
+push @varLabels, 'oblique 12';
+# show bold example
+push @variants, {-bold=>4};
+push @varLabels, 'bold 4';
+# show small caps example
+push @variants, {-caps=>1};
+push @varLabels, 'caps 1';
+
+my $compress = 'none'; # no stream compression
+#my $compress = 'flate'; # compress streams
 
 my $sx = 33;
 my $sy = 45;
 my $fx = 20;
 
-my ($fn, $x, $y, $yp, $k);
+my ($fn, $ci, $x, $y, $yp, $k);
 
-# outer loop, one file each for Times-Roman, Times-Italic, etc.
-foreach $fn (qw(
+my (@font_list, @short_name, @T1_metrics);
+# core
+if ($type == 0) {
+  @font_list = qw(
     Times-Roman
     Times-Italic
     Times-Bold
@@ -46,9 +69,60 @@ foreach $fn (qw(
     verdanabold
     verdanabolditalic
     wingdings
-    webdings
-)) {
-   #if ($fn eq 'Times-Italic') { last; } # for testing
+    webdings);
+}
+if ($type == 1) {
+  @font_list = qw( Times-Roman ); 
+}
+  
+# note that for TTF and Type1, spaces in names (Windows) replaced by ~
+# TTF
+if ($type == 2) {
+  @font_list = qw( C:\\Windows\\Fonts\\calibri.ttf ); 
+  @short_name = qw( Calibri );
+}
+
+# Type1
+if ($type == 3) {
+# note that URWPalladioL appears to have some internal problems, resulting
+# in some characters appearing in the wrong slot. other fonts are OK, and there
+# is no obvious pattern, so for now it can't be fixed. suspect a bad font
+# "encoding map" resulting is mismapping by BaseFont::strByUtf to wrong 
+# character in BaseFont::textByStr returned to BaseFont::text
+   #C:\\T1fonts\\URWPalladioL-Roma.pfb
+  @font_list = qw( 
+    C:\\T1fonts\\gfsneohellenic\\type1\\GFSNeohellenic-Regular.pfb
+    C:\\Program~Files~(x86)\\MiKTeX~2.9\\fonts\\type1\\urw\\avantgar\\uagd8a.pfb
+		 );
+   #C:\\T1fonts\\URWPalladioL-Roma.afm
+  @T1_metrics = qw(
+    C:\\T1fonts\\gfsneohellenic\\afm\\GFSNeohellenic-Regular.afm
+    C:\\Program~Files~(x86)\\MiKTeX~2.9\\fonts\\type1\\urw\\avantgar\\uagd8a.pfm
+		  );
+   #Palladio 
+  @short_name = qw(
+    Neohellenic 
+    Avant~Garde
+                  );
+}
+
+my ($metrics, $sname);
+# outer loop, one file each for Times-Roman, Times-Italic, etc.
+foreach $fn (@font_list) {
+    $fn =~ s/~/ /g; # restore name
+    if ($type == 3) {
+      # Type1 also has metrics file
+      $metrics = shift @T1_metrics;
+      $metrics =~ s/~/ /g; # restore name
+    }
+    if ($type < 2) {
+      # core fn and sname are the same
+      $sname = $fn;
+    } else {
+      # TTF and Type1 have font short name
+      $sname = shift @short_name;
+      $sname =~ s/~/ /g; # restore name
+    }
 
     my $pdf = PDF::Builder->new(-compress => $compress);
     initNameTable();
@@ -58,17 +132,32 @@ foreach $fn (qw(
     print STDERR "\n$fn\n";
 
 
-    my $fn1 = $pdf->corefont($fn, -encode => 'latin1');
+    my $fn1;
+    if ($type == 0 || $type == 1) {
+      $fn1 = $pdf->corefont($fn, -encode => $encoding);
+    } elsif ($type == 2) {
+      $fn1 = $pdf->ttfont($fn, -encode => $encoding);
+    } else { # type == 3
+      if ($metrics =~ m/\.afm/i) {
+        $fn1 = $pdf->psfont($fn, -afmfile => $metrics, -encode => $encoding);
+      } else {
+        $fn1 = $pdf->psfont($fn, -pfmfile => $metrics, -encode => $encoding);
+      }
+    }
 
-    my @planes = ($fn1, $fn1->automap());
-    my @variants = ({-slant=>0.750}, {-oblique=>12}, {-bold=>4}, {-caps=>1});
-    my @varLabels = ('slant 0.750', 'oblique 12', 'bold 4', 'caps 1');
+    my @planes;
+    if ($type != 2) {
+      @planes = ($fn1, $fn1->automap());
+    } else {
+      # TrueType can't use automap. Need to get to glyphs beyond basic encoding
+      @planes = ($fn1);   
+    }
     my $varNum = 0;
 
-    print STDERR "  ".(scalar @variants)." variants of font, each ".
+    print STDERR "  ".(scalar @variants)." variants of font, each up to ".
                       (scalar @planes)." page(s)\n";
 
-    foreach $varNum ( 0..$#variants ) {
+    foreach $varNum ( 0 .. $#variants ) {
 	# 4 or so variants requested per font
 	$k = $variants[$varNum];
 
@@ -76,6 +165,25 @@ foreach $fn (qw(
 	    # individual planes of each font, character list varies by font
 
             my $font = $pdf->synfont($fnt, %{$k});
+
+	    # check if there is anything to be shown in this plane ($fnt)
+	    my $flag = 0; # no character found yet
+	    foreach $yp (0..15) {
+		foreach $x (0..15) {
+		    $ci = $yp*16 + $x;  # 0..255 value
+		    # always seems to be something at
+		    # ci = 32 (U+0020, space)
+		    # ci = 33 (U+E000, .notdef)
+		    if ($ci == 32 || $ci == 33) { next; }
+
+		    if (defined $fnt->uniByEnc($ci) && $fnt->uniByEnc($ci) > 0) {
+			$flag = 1;  # found at least one character (glyph)
+			last;
+		    }
+		}
+		if ($flag) { last; }
+            }
+	    if (!$flag) { next; } # no glyphs to show on this plane
 
             my $page = $pdf->page();
             $page->mediabox(595,842);
@@ -92,7 +200,7 @@ foreach $fn (qw(
 		if (defined $font->fontname()) {
 		    $x = $font->fontname();
 		} else {
-		    $x = $fn;
+		    $x = $sname;
 		}
 		if (defined $font->name()) {
 		    $y = $font->name();
@@ -104,6 +212,8 @@ foreach $fn (qw(
                 $txt2->translate(50,780);
 		$txt2->font($f1, 15);
 		$txt2->text("variant = $varLabels[$varNum]");
+                $txt2->translate(300,780);
+		$txt2->text("encoding = $encoding");
 
                 $txt2->font($f1, 5);
                 $txt2->hscale(80);
@@ -114,11 +224,11 @@ foreach $fn (qw(
             print STDERR ".";  # one . per page
 	    # draw grid of characters and information
 	    # yp character row value (increasing)
-            foreach $yp (0..15) {
+            foreach $yp (0 .. 15) {
 		$y = 15 - $yp;  # y vertical (row) position T to B
-                foreach $x (0..15) {
+                foreach $x (0 .. 15) {
                     $txt->translate(50+($sx*$x), 50+($sy*$y));
-		    my $ci = $yp*16 + $x;
+		    $ci = $yp*16 + $x;
 		    my $c  = chr($ci);
                     $txt->text($c);
 
@@ -158,7 +268,7 @@ foreach $fn (qw(
         } # end inner loop of 1 or more font pages
     } # end middle loop of @variants list
     
-    $pdf->saveas("$0.$fn.pdf");
+    $pdf->saveas("$0.$sname.pdf");
     $pdf->end();
     print STDERR "\n";
    #last;

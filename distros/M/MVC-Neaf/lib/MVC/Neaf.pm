@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = 0.18;
+our $VERSION = 0.19;
 
 =head1 NAME
 
@@ -199,6 +199,7 @@ our %EXPORT_TAGS = (
 
 use MVC::Neaf::Util qw(http_date canonize_path path_prefixes run_all run_all_nodie);
 use MVC::Neaf::Request;
+use MVC::Neaf::Request::PSGI;
 
 our $Inst;
 
@@ -233,7 +234,13 @@ one MAY define a separate HEAD handler explicitly.
 to be handled by this handler.
 
 A 404 error will be generated unless C<path_info_regex> is present
-and PATH_INFO matches the regex (without the leading slash).
+and PATH_INFO matches the regex (without the leading slashes).
+
+If path_info_regex matches, it will be available in the controller
+as C<$req-<gt>path_info>.
+
+If capture groups are present in said regular expression,
+their content will also be available as C<$req-<gt>path_info_split>.
 
 B<EXPERIMENTAL>. Name and semantics MAY change in the future.
 
@@ -268,6 +275,13 @@ This will be displayed if application called with --list (see L<MVC::Neaf::CLI>)
 Also, any number of dash-prefixed keys MAY be present.
 This is totally the same as putting them into C<default> hash.
 
+B<NOTE> For some reason ability to add multicomponent paths
+like (foo => bar => \&code) was added in the past,
+resulting in "/foo/bar" => \&code.
+
+It was never documented, will issue a warning, and will be killed for good
+it v.0.25.
+
 =cut
 
 my $year = 365 * 24 * 60 * 60;
@@ -279,8 +293,12 @@ $known_route_args{$_}++ for qw(default method view cache_ttl
 sub route {
     my $self = shift;
 
+    # TODO 0.25 kill this for good, just
+    #     my ($path, $sub, %args) = @_;
     # HACK!! pack path components together, i.e.
     # foo => bar => \&handle eq "/foo/bar" => \&handle
+    carp "NEAF: using multi-component path in route() is DEPRECATED and is to be removed in v.0.25"
+        unless ref $_[1];
     my ( $path, $sub );
     while ($sub = shift) {
         last if ref $sub;
@@ -320,7 +338,7 @@ sub route {
 
     # Always have regex defined to simplify routing
     $profile{path_info_regex} = (defined $args{path_info_regex})
-        ? qr#^($args{path_info_regex})$#
+        ? qr#^$args{path_info_regex}$#
         : qr#^$#;
 
     # Just for information
@@ -821,6 +839,20 @@ sub run {
     my $self = shift;
     $self = $Inst unless ref $self;
 
+    if (!defined wantarray) {
+        # void context - we're being called as CGI
+        if (@ARGV) {
+            require MVC::Neaf::CLI;
+            MVC::Neaf::CLI->run($self);
+        } else {
+            require Plack::Handler::CGI;
+            # Somehow this caused uninitialized warning in Plack::Handler::CGI
+            $ENV{SCRIPT_NAME} = ''
+                unless defined $ENV{SCRIPT_NAME};
+            Plack::Handler::CGI->new->run( $self->run );
+        };
+    };
+
     $self->{route_re} ||= $self->_make_route_re;
 
     # Add implicit HEAD for all GETs via shallow copy
@@ -856,28 +888,10 @@ sub run {
         };
     };
 
-    if (defined wantarray) {
-        # The run method is being called in non-void context
-        # This is the case for PSGI, but not CGI (where it's just
-        # the last statement in the script).
-
-        # PSGI
-        require MVC::Neaf::Request::PSGI;
-        return sub {
-            my $env = shift;
-            my $req = MVC::Neaf::Request::PSGI->new( env => $env );
-            return $self->handle_request( $req );
-        };
-    } else {
-        # void context - CGI called.
-        if (@ARGV) {
-            require MVC::Neaf::CLI;
-            MVC::Neaf::CLI->run($self);
-        } else {;
-            require MVC::Neaf::Request::CGI;
-            my $req = MVC::Neaf::Request::CGI->new;
-            $self->handle_request( $req );
-        };
+    return sub {
+        my $env = shift;
+        my $req = MVC::Neaf::Request::PSGI->new( env => $env );
+        return $self->handle_request( $req );
     };
 };
 
@@ -1403,11 +1417,6 @@ sub new {
 
     my $self = bless \%opt, $class;
 
-    $self->{on_error} ||= sub {
-        my ($req, $err) = @_;
-        $self->_log_error( $req->script_name, $err );
-    };
-
     $self->set_forced_view( $force )
         if $force;
 
@@ -1448,16 +1457,16 @@ sub _route_request {
             $req->set_header( Allow => join ", ", keys %$node );
             die "405\n";
         };
+        $self->_post_setup( $route )
+            unless exists $route->{lock};
 
         # TODO 0.90 optimize this or do smth. Still MUST keep route_re a prefix tree
         if ($path_info =~ /%/) {
             $path_info = decode_utf8( uri_unescape( $path_info ) );
         };
-        $path_info =~ $route->{path_info_regex}
+        my @split = $path_info =~ $route->{path_info_regex}
             or die "404\n";
-        $self->_post_setup( $route )
-            unless exists $route->{lock};
-        $req->_import_route( $route, $path, $path_info );
+        $req->_import_route( $route, $path, $path_info, \@split );
 
         # execute hooks
         run_all( $route->{hooks}{pre_logic}, $req)
@@ -1534,12 +1543,18 @@ sub _render_content {
         if (!defined $content) {
             # TODO 0.90 $req->clear; - but don't kill cleanup hooks
             # FIXME bug here - resetting data does NOT affect the inside of req
-            $self->_log_error( view => $@ );
-            $data = {
+            # TODO copypaste from _error_to_reply
+            my $where = sprintf "%s at %s req_id=%s (%d)"
+                , $req->script_name || "pre_route"
+                , $req->endpoint_origin, $req->id, 500;
+            $self->_log_error( $where => $@ || "Unexpected render failure" );
+            %$data = (
                 -status => 500,
-                -type   => "text/plain",
-            };
-            $content = "Template error."; # TODO 0.30 configurable
+                -type   => "application/json",
+            );
+            # TODO 0.30 configurable
+            $content = '{"error":"500","reason":"rendering error","req_id":"'
+                . $req->id .'"}';
         };
 
     return $content;
@@ -1694,6 +1709,10 @@ sub _post_setup {
     return;
 };
 
+# TODO 0.30 rework error handling altogether:
+#    - convert all errors (inc. blessed) to exceptions
+#    - stabilize error templates
+#    - configurable & robust on_error, log_error (join the 2???)
 sub _error_to_reply {
     my ($self, $req, $err) = @_;
 
@@ -1703,12 +1722,16 @@ sub _error_to_reply {
     };
 
     my $status = (!ref $err && $err =~ /^(\d\d\d)/) ? $1 : 500;
+    my $sudden = !$1;
 
     # Try exception handler
-    if( !$1 and exists $self->{on_error}) {
-        # TODO 0.30 Make error processing more robust
-        eval { $self->{on_error}->($req, $err, $req->endpoint_origin); 1 }
-            or $self->_log_error( "error handler", $@ );
+    if( $sudden and exists $self->{on_error}) {
+        eval {
+            $self->{on_error}->($req, $err, $req->endpoint_origin);
+            $sudden = 0;
+            1;
+        }
+            or $self->_log_error( "on_error callback failed", $@ );
     };
 
     # Try fancy error template
@@ -1724,14 +1747,21 @@ sub _error_to_reply {
             $ret->{-status} ||= $status;
             return $ret;
         };
-        $self->_log_error( "status $status handler:", $@ );
+        $self->_log_error( "error_template $status failed:", $@ );
     };
 
     # Options exhausted - return plain error message
+    my $req_id = $req->id;
+    if ($sudden) {
+        my $where = sprintf "%s at %s req_id=%s (%d)"
+            , $req->script_name || "pre_route"
+            , $req->endpoint_origin, $req->id, $status;
+        $self->_log_error($where, $err);
+    };
     return {
         -status     => $status,
-        -type       => 'text/plain',
-        -content    => "Error $status\n",
+        -type       => 'application/json',
+        -content    => qq({"error":"$status","req_id":"$req_id"}),
     };
 };
 
@@ -1743,6 +1773,7 @@ sub _croak {
     croak( (ref $self || $self)."->$where: $msg" );
 };
 
+# TODO 0.20 use req->id, req->origin etc
 sub _log_error {
     my ($self, $where, $err) = @_;
 
@@ -1799,20 +1830,35 @@ Continuation responses are supported, but will be returned in one chunk.
 
 =item * method - set method (default is GET)
 
-=item * override = \%hash - force certain data in ENV
-
 =item * cookie = \%hash - force HTTP_COOKIE header
+
+=item * header = \%hash - override some headers
+This gets overridden by type, cookie etc. in case of conflict
 
 =item * body = 'DATA' - force body in request
 
+=item * type - content-type of body
+
+=item * uploads - a hash of L<MVC::Neaf::Upload> objects.
+
 =item * secure = 0|1 - http vs https
+
+=item * override = \%hash - force certain data in ENV
+Gets overridden by all of the above.
 
 =back
 
 =cut
 
+my %run_test_allow;
+$run_test_allow{$_}++
+    for qw( type method cookie body override secure uploads header );
 sub run_test {
     my ($self, $env, %opt) = @_;
+
+    my @extra = grep { !$run_test_allow{$_} } keys %opt;
+    $self->_croak( "Extra keys @extra" )
+        if @extra;
 
     if (!ref $env) {
         $env =~ /^(.*?)(?:\?(.*))?$/;
@@ -1831,6 +1877,13 @@ sub run_test {
     $env->{REQUEST_METHOD} = $opt{method} if $opt{method};
     $env->{$_} = $opt{override}{$_} for keys %{ $opt{override} };
 
+    if (my $head = $opt{header} ) {
+        foreach (keys %$head) {
+            my $name = uc $_;
+            $name =~ tr/-/_/;
+            $env->{"HTTP_$name"} = $head->{$_};
+        };
+    };
     if (exists $opt{secure}) {
         $env->{'psgi.url_scheme'} = $opt{secure} ? 'https' : 'http';
     };
@@ -1855,7 +1908,14 @@ sub run_test {
         $env->{CONTENT_TYPE} = $opt{type} eq '?' ? '' : $opt{type}
     };
 
-    my $ret = $self->run->( $env );
+    my %fake;
+    $fake{uploads} = delete $opt{uploads};
+
+    scalar $self->run; # warn up caches
+
+    my $req = MVC::Neaf::Request::PSGI->new( %fake, env => $env );
+
+    my $ret = $self->handle_request( $req );
     if (ref $ret eq 'CODE') {
         # PSGI functional interface used.
         require MVC::Neaf::Request::FakeWriter;

@@ -674,10 +674,22 @@ void mpz_arctan(mpz_t r, unsigned long base, mpz_t pow, mpz_t t1, mpz_t t2)
   mpz_tdiv_q_ui(r, pow, base);
   mpz_set(t1, r);
   do {
-    mpz_ui_pow_ui(t2, base, 2);
-    mpz_tdiv_q(t1, t1, t2);
+    if (base > 65535) { mpz_ui_pow_ui(t2, base, 2); mpz_tdiv_q(t1, t1, t2); }
+    else               mpz_tdiv_q_ui(t1, t1, base*base);
     mpz_tdiv_q_ui(t2, t1, 2*i+1);
     if (i++ & 1) mpz_sub(r, r, t2); else mpz_add(r, r, t2);
+  } while (mpz_sgn(t2));
+}
+void mpz_arctanh(mpz_t r, unsigned long base, mpz_t pow, mpz_t t1, mpz_t t2)
+{
+  unsigned long i = 1;
+  mpz_tdiv_q_ui(r, pow, base);
+  mpz_set(t1, r);
+  do {
+    if (base > 65535) { mpz_ui_pow_ui(t2, base, 2); mpz_tdiv_q(t1, t1, t2); }
+    else               mpz_tdiv_q_ui(t1, t1, base*base);
+    mpz_tdiv_q_ui(t2, t1, 1 + (i++ << 1));
+    mpz_add(r, r, t2);
   } while (mpz_sgn(t2));
 }
 
@@ -765,110 +777,108 @@ UV logint(mpz_t n, UV base) {
 /******************************************************************************/
 /*
  * Floating point routines.
- * These are very crude.  Use MPFR if at all possible.
+ * These are not rigorously accurate.  Use MPFR if possible.
  *
+ * See also: http://fredrikj.net/math/elefun.pdf
+ * for how to really look at this correctly.
+ *
+ * Many ideas from Brent's presentation:
+ * https://pdfs.semanticscholar.org/8aec/ea97b8f2f23d4f09ec8f69025598f742ae9e.pdf
  */
 
+
+extern void const_pi(mpf_t pi, unsigned long prec);
+extern void const_log2(mpf_t logn, unsigned long prec);
+
+/* Log using Brent's second AGM algorithm (Sasaki and Kanada theta) */
 void mpf_log(mpf_t logn, mpf_t n)
 {
-  mpf_t N, a, b, t;
-  unsigned long k, bits = mpf_get_prec(n);
+  mpf_t N, t, q, theta2, theta3, logdn;
+  unsigned long k, iter, bits = mpf_get_prec(logn);
+  int neg = (mpf_sgn(n) < 0);
+
+  if (mpf_sgn(n) == 0)
+    croak("mpf_log(0)");
+  if (mpf_cmp_ui(n,2) == 0)
+    { const_log2(logn,BITS2DIGS(bits)); return; }
+  if ((neg && !mpf_cmp_si(n,-1)) || (!neg && !mpf_cmp_si(n,1)))
+    { mpf_set_ui(logn,0); return; }
 
   mpf_init2(N, bits);
-  mpf_init2(a, 64 + bits);
-  mpf_init2(b, 64 + bits);
-  mpf_init2(t, 64 + bits);
-
   mpf_set(N, n);
+  if (neg) mpf_neg(N, N);
+
+  mpf_init2(t, 64 + bits);
+  mpf_init2(q,      64 + bits);
+  mpf_init2(theta2, 64 + bits);
+  mpf_init2(theta3, 64 + bits);
+  mpf_init2(logdn,  64 + bits);
   mpf_set_ui(logn, 0);
-  mpf_set_ui(t, 1);
-  mpf_mul_2exp(t, t, 32);
-  for (k = 0; mpf_cmp(N, t) > 0; k++) {
-    mpf_div_2exp(N, N, 32);
-  }
-  if (k > 0) {
-    mpf_log(b, t);
-    mpf_mul_ui(logn, b, k);
+
+  /* ensure N >> 1 */
+  mpf_set_ui(t, 1);  mpf_mul_2exp(t, t, 1+(35+bits)/36);
+  if (mpf_cmp(N, t) <= 0) {
+    /* log(n) = log(n*2^k) - k*log(2) */
+    for (k = 0; mpf_cmp(N, t) <= 0; k += 16)
+      mpf_mul_2exp(N, N, 16);
+    if (k > 0) {
+      const_log2(t, BITS2DIGS(bits));
+      mpf_mul_ui(logn, t, k);
+      mpf_neg(logn, logn);
+    }
   }
 
-  mpf_set_ui(a, 1);
-  mpf_set(b, N);
-  /* TODO: this is AGM(1,N), make this generic */
-  mpf_mul(t, a, b);
-  mpf_add(a, a, b);
-  mpf_div_2exp(a, a, 1);
-  mpf_sqrt(b, t);
-  while (1) {
-    mpf_sub(t, a, b);
-    mpf_abs(t, t);
-    mpf_mul_2exp(t, t, bits);
-    if (mpf_cmp_d(t, .5) < 0)
-      break;
-    mpf_add(t, a, b);
-    mpf_div_2exp(a, t, 1);
-    mpf_mul(t, b, a);
-    mpf_sqrt(b, t);
-  }
-  /* End of generic AGM */
-  mpf_sub_ui(t, N, 1);
-  mpf_div(t, t, a);
-  mpf_add(logn, logn, t);
+  mpf_ui_div(q, 1, N);
+  mpf_pow_ui(t,q,9); mpf_add(theta2, q, t);
+  mpf_pow_ui(t,q,25); mpf_add(theta2, theta2, t);
+  mpf_mul_2exp(theta2, theta2, 1);
+  mpf_pow_ui(theta3,q,4);
+  mpf_pow_ui(t,q,16); mpf_add(theta3, theta3, t);
+  mpf_mul_2exp(theta3, theta3, 1);
+  mpf_add_ui(theta3, theta3, 1);
 
-  mpf_clear(t); mpf_clear(b); mpf_clear(a); mpf_clear(N);
+  /* Normally we would do:
+   *   mpf_mul(theta2, theta2, theta2); mpf_mul(theta3, theta3, theta3);
+   *   mpf_agm(t, theta2, theta3); mpf_mul_2exp(t, t, 2);
+   * but Brent points out the one term acceleration:
+   *   AGM(t2^2,t3^2)  =>  AGM(2*t2*t3,t2^2+t3^2)/2
+   */
+  mpf_mul(t, theta2, theta3);
+  mpf_mul_2exp(q, t, 1);  /* q = 2*t2*t3 */
+  mpf_add(t, theta2, theta3);
+  mpf_mul(t, t, t);       /* t = (t2+t3)^2 = t2^2 + t3^2 + 2*t2*t3 */
+  mpf_sub(theta3, t, q);
+  mpf_set(theta2, q);
+  mpf_agm(t, theta2, theta3);
+  mpf_mul_2exp(t, t, 1);
+
+  const_pi(logdn, BITS2DIGS(bits));
+  mpf_div(logdn, logdn, t);
+
+  mpf_add(logn, logn, logdn);
+  mpf_clear(logdn); mpf_clear(theta3); mpf_clear(theta2); mpf_clear(q);
+  mpf_clear(t); mpf_clear(N);
+  if (neg) mpf_neg(logn, logn);
 }
 
-void _mpf_lift_exp(mpf_t xj, mpf_t y, mpf_t t, mpf_t t2)
+/* x should be 0 < x < 1 */
+static void _exp_sinh(mpf_t expx, mpf_t x, unsigned long bits)
 {
   unsigned long k;
+  mpf_t t, s, N, D, X;
 
-  mpf_log(t, xj);
-
-  mpf_sub(t2, y, t);      /* t2 = y-ln(xj) */
-  mpf_mul(t, xj, t2);     /* t = xj(y-ln(x)) */
-  mpf_add(xj, xj, t);
-
-  /* third and higher orders */
-  for (k = 3; k <= 8; k++) {
-    mpf_mul(t, t, t2);
-    mpf_div_ui(t, t, k-1);
-    mpf_add(xj, xj, t);
-  }
-}
-
-void mpf_exp(mpf_t expn, mpf_t x)
-{
-  mpf_t N, D, X, s, t;
-  unsigned long k, kinit, bits = mpf_get_prec(x);
-
-  mpf_init2(t, 64 + bits);
-
-  /* Doubling rule, to make -.25 < x < .25.  Speeds convergence. */
-  mpf_abs(t, x);
-  for (k = 0; k < 30 && mpf_cmp_d(t, .25) > 0; k++)
-    mpf_div_2exp(t, t, 1);
-  if (k > 0) {
-    if (mpf_sgn(x) < 0)
-      mpf_neg(t, t);
-
-    mpf_exp(expn, t);
-
-    mpf_pow_ui(expn, expn, 1 << k);
-    mpf_clear(t);
-    return;
-  }
-
-  mpf_init2(N, 64 + bits);
-  mpf_init2(D, 64 + bits);
-  mpf_init2(s, 64 + bits);
-  mpf_init2(X, 64 + bits);
+  mpf_init2(t, 10 + bits);
+  mpf_init2(s, 10 + bits);
+  mpf_init2(N, 10 + bits);
+  mpf_init2(D, 10 + bits);
+  mpf_init2(X, 10 + bits);
 
   /* 1. Compute s =~ sinh(x). */
   mpf_set(s,x);
   mpf_set(N,x);
   mpf_mul(X,x,x);
   mpf_set_ui(D,1);
-  kinit = bits/10;
-  for (k = 1; k < kinit; k++) {
+  for (k = 1; k < bits; k++) {
     mpf_mul(N, N, X);
     mpf_mul_ui(D, D, 2*k);
     mpf_mul_ui(D, D, 2*k+1);
@@ -880,7 +890,7 @@ void mpf_exp(mpf_t expn, mpf_t x)
     if (mpf_cmp_d(t, .5) < 0)
       break;
   }
-  mpf_clear(X);
+  mpf_clear(X); mpf_clear(D); mpf_clear(N);
 
   /* 2. Compute s =~ e(x) from sinh(x). */
   mpf_mul(t, s, s);
@@ -888,36 +898,127 @@ void mpf_exp(mpf_t expn, mpf_t x)
   mpf_sqrt(t, t);
   mpf_add(s, s, t);
 
-  /* 3. If needed, use high-order Newton for more bits */
-  if (k >= kinit) {
-    for (k = 1; k < 100; k++) {
-      mpf_set(t, s);
-      _mpf_lift_exp(s, x, N, D);
-      mpf_sub(t, s, t);
-      mpf_abs(t,t);
-      mpf_mul_2exp(t, t, bits);
-      if (mpf_cmp_d(t, .5) < 0)
-        break;
-    }
+  mpf_set(expx, s);
+  mpf_clear(s); mpf_clear(t);
+}
+
+static void _exp_lift(mpf_t expx, mpf_t x, unsigned long bits)
+{
+  mpf_t s, t1, t2;
+  unsigned long k;
+
+  mpf_init2(s,  10 + bits);
+  mpf_init2(t1, 10 + bits);
+  mpf_init2(t2, 10 + bits);
+
+  mpf_set(s, expx);
+  mpf_log(t1, s);
+  mpf_sub(t2, x, t1);     /* t2 = s-ln(x) */
+  mpf_mul(t1, s, t2);     /* t1 = s(s-ln(x) */
+  mpf_add(s, s, t1);
+  /* third and higher orders */
+  for (k = 3; k <= 8; k++) {
+    mpf_mul(t1, t1, t2);
+    mpf_div_ui(t1, t1, k-1);
+    mpf_add(s, s, t1);
+  }
+  mpf_set(expx, s);
+  mpf_clear(t2); mpf_clear(t1); mpf_clear(s);
+}
+
+void mpf_exp(mpf_t expn, mpf_t x)
+{
+  mpf_t N, D, X, s, t;
+  unsigned long k, r, rbits, bits = mpf_get_prec(expn);
+
+  if (mpf_sgn(x) == 0) { mpf_set_ui(expn, 1); return; }
+
+  mpf_init2(t, 10 + bits);
+
+  if (mpf_sgn(x) < 0) { /* As per Brent, exp(x) = 1/exp(-x) */
+    mpf_neg(t, x);
+    mpf_exp(t, t);
+    if (mpf_sgn(t) != 0) mpf_ui_div(expn, 1, t);
+    else                 mpf_set_ui(expn, 0);
+    mpf_clear(t);
+    return;
   }
 
-  mpf_set(expn, s);
-  mpf_clear(s); mpf_clear(D); mpf_clear(N); mpf_clear(t);
+  /* Doubling rule, to make -.25 < x < .25.  Speeds convergence. */
+  mpf_set(t, x);
+  for (k = 0; mpf_cmp_d(t, 1.0L/8192.0L) > 0; k++)
+    mpf_div_2exp(t, t, 1);
+
+  /* exp with sinh method, then Newton lift to final bits */
+  for (rbits = bits, r = 0;  rbits > 4000;  rbits = (rbits+7)/8)
+    r++;
+  _exp_sinh(expn, t, rbits);
+  while (r-- > 0) {
+    rbits *= 8;
+    _exp_lift(expn, t, rbits);
+  }
+  if (rbits < bits)
+    _exp_lift(expn, t, bits);
+
+  if (k > 0) {
+    const unsigned long maxred = 8*sizeof(unsigned long)-1;
+    for ( ; k > maxred; k -= maxred)
+      mpf_pow_ui(expn, expn, 1UL << maxred);
+    mpf_pow_ui(expn, expn, 1UL << k);
+  }
+  mpf_clear(t);
 }
+
+
+/* Negative b with non-int x usually gives a complex result.
+ * We try to at least give a consistent result. */
 
 void mpf_pow(mpf_t powx, mpf_t b, mpf_t x)
 {
   mpf_t t;
+  int neg = 0;
+
+  if (mpf_sgn(b) == 0) { mpf_set_ui(powx, 0); return; }
+  if (mpf_sgn(b) <  0) { neg = 1; }
+  if (mpf_cmp_ui(b,1) == 0) { mpf_set_ui(powx, 1-2*neg); return; }
 
   if (mpf_integer_p(x) && mpf_fits_ulong_p(x)) {
     mpf_pow_ui(powx, b, mpf_get_ui(x));
     return;
   }
 
+  if (neg) mpf_neg(b,b);
   mpf_init2(t, mpf_get_prec(powx));
   mpf_log(t, b);
   mpf_mul(t, t, x);
   mpf_exp(powx, t);
+  if (neg) mpf_neg(powx,powx);
+  mpf_clear(t);
+}
+
+void mpf_agm(mpf_t r, mpf_t a, mpf_t b)
+{
+  mpf_t t;
+  unsigned long bits = mpf_get_prec(r);
+
+  if (mpf_cmp(a,b) > 0) mpf_swap(a,b);
+
+  mpf_init2(t, 6+bits);
+  while (1) {
+    mpf_sub(t, b, a);
+    mpf_abs(t, t);
+    mpf_mul_2exp(t, t, bits);
+    mpf_sub_ui(t,t,1);
+    if (mpf_sgn(t) < 0)
+      break;
+    mpf_sub_ui(t,t,1);
+    mpf_set(t, a);
+    mpf_add(a, a, b);
+    mpf_div_2exp(a, a, 1);
+    mpf_mul(b, b, t);
+    mpf_sqrt(b, b);
+  }
+  mpf_set(r, b);
   mpf_clear(t);
 }
 

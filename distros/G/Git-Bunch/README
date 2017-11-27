@@ -3,8 +3,8 @@ NAME
     repos)
 
 VERSION
-    This document describes version 0.620 of Git::Bunch (from Perl
-    distribution Git-Bunch), released on 2017-10-19.
+    This document describes version 0.621 of Git::Bunch (from Perl
+    distribution Git-Bunch), released on 2017-11-24.
 
 SYNOPSIS
     See the included gitbunch script.

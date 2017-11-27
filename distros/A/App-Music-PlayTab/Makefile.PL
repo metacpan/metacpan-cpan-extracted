@@ -2,8 +2,8 @@
 # Author          : Johan Vromans
 # Created On      : Mon Feb  8 11:46:56 1999
 # Last Modified By: Johan Vromans
-# Last Modified On: Wed Jan 16 15:47:50 2008
-# Update Count    : 78
+# Last Modified On: Wed Apr 12 15:45:48 2017
+# Update Count    : 81
 # Status          : Stable
 
 # Verify perl version.
@@ -17,9 +17,11 @@ WriteMakefile
   (
    NAME         => 'App::Music::PlayTab',
    AUTHOR	=> 'Johan Vromans (jvromans@squirrel.nl)',
-   ABSTRACT	=> 'Print play tabs of songs',
+   ABSTRACT	=> 'Print play tabs (griles, grids) of songs',
    VERSION_FROM => "lib/App/Music/PlayTab.pm",
-   PREREQ_PM	=> { },
+   PREREQ_PM	=> {
+   		     Clone => 0,
+   		     App::Packager => 1.420,
+		   },
    EXE_FILES    => [ map { "script/$_" } @scripts ],
-   # *.pm files will be picked up automatically from ./lib
  );

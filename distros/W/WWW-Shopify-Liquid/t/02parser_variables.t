@@ -18,6 +18,23 @@ isa_ok($ast->{arguments}->[0], 'WWW::Shopify::Liquid::Token::Variable::Named');
 is($ast->{arguments}->[0]->{name}, 'named');
 isa_ok($ast->{arguments}->[0]->{core}, 'WWW::Shopify::Liquid::Operator::Plus');
 
+$ast = $parser->parse_tokens($lexer->parse_text('{% comment named: [] %} {% endcomment %}'));
+is(int(@{$ast->{arguments}}), 1);
+isa_ok($ast->{arguments}->[0], 'WWW::Shopify::Liquid::Token::Variable::Named');
+is($ast->{arguments}->[0]->{name}, 'named');
+
+$ast = $parser->parse_tokens($lexer->parse_text('{% comment named:[{ attachment: ( form.resume.base64 | ceil )}]  %} {% endcomment %}'));
+is(int(@{$ast->{arguments}}), 1);
+isa_ok($ast->{arguments}->[0], 'WWW::Shopify::Liquid::Token::Variable::Named');
+is($ast->{arguments}->[0]->{name}, 'named');
+isa_ok($ast->{arguments}->[0]->{core}, 'WWW::Shopify::Liquid::Token::Array');
+isa_ok($ast->{arguments}->[0]->{core}->{members}->[0], 'WWW::Shopify::Liquid::Token::Hash');
+
+$ast = $parser->parse_tokens($lexer->parse_text('{% comment named: [{ type: \'text/csv\', name: \'Test.csv\', attachments: \'asd,dfgds,sdfs\' }] %} {% endcomment %}'));
+is(int(@{$ast->{arguments}}), 1);
+isa_ok($ast->{arguments}->[0], 'WWW::Shopify::Liquid::Token::Variable::Named');
+is($ast->{arguments}->[0]->{name}, 'named');
+
 $ast = $parser->parse_tokens($lexer->parse_text("{{ a.b }}"));
 ok($ast);
 isa_ok($ast, 'WWW::Shopify::Liquid::Tag::Output');
@@ -86,10 +103,10 @@ $ast = $parser->parse_tokens($lexer->parse_text("{% assign color = {} %}"));
 isa_ok($ast->{arguments}->[0]->{operands}->[1], 'WWW::Shopify::Liquid::Token::Hash');
 ok($ast);
 
-$ast = $parser->parse_tokens($lexer->parse_text("{{ 'this.is.a.test' | t }}"));
+$ast = $parser->parse_tokens($lexer->parse_text("{{ 'this.is.a.test' | max }}"));
 ok($ast);
 ok($ast->{arguments}->[0]);
-isa_ok($ast->{arguments}->[0], 'WWW::Shopify::Liquid::Filter::T');
+isa_ok($ast->{arguments}->[0], 'WWW::Shopify::Liquid::Filter::Max');
 isa_ok($ast->{arguments}->[0]->{operand}, 'WWW::Shopify::Liquid::Token::String');
 is($ast->{arguments}->[0]->{operand}->{core}, 'this.is.a.test');
 

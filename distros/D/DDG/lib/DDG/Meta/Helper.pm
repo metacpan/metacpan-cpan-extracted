@@ -1,7 +1,7 @@
 package DDG::Meta::Helper;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Helper functions for easy access to important functions
-$DDG::Meta::Helper::VERSION = '1017';
+$DDG::Meta::Helper::VERSION = '1018';
 use strict;
 use warnings;
 use Carp qw( croak );
@@ -43,7 +43,7 @@ DDG::Meta::Helper - Helper functions for easy access to important functions
 
 =head1 VERSION
 
-version 1017
+version 1018
 
 =head1 SYNOPSIS
 

@@ -147,7 +147,7 @@ is($liquid->render_text({ order => { line_items => [{ sku => 'a' }] } }, "{% for
 
 is($liquid->render_text({}, "{% for line_item in order.line_items %}{% if line_item.sku =~ 'a' %}1{% endif %}{% endfor %}"), '');
 
-is($liquid->render_text({}, "{{ 'asfdsdfsa.jpg' | product_img_url: 'large' }}"), 'asfdsdfsa_large.jpg');
+is($liquid->render_text({}, "{{ 'asfdsdfsa.jpg' | replace: '.jpg', '_large.jpg' }}"), 'asfdsdfsa_large.jpg');
 
 is($liquid->render_text({ today => DateTime->today,  now => DateTime->now }, "{{ (now - today) / 3600 | floor }}"), int((DateTime->now->epoch - DateTime->today->epoch) / 3600));
 
@@ -194,5 +194,22 @@ is($text, "a1a2a3a4a");
 
 ($text, $hash) = $liquid->render_text({ }, "{% for a in (1..10) %}a{% if a == 5 %}{% continue %}{% endif %}{{ a }}{% endfor %}");
 is($text, "a1a2a3a4aa6a7a8a9a10");
+
+
+
+package WWW::Shopify::Liquid::Tag::TestTag;
+use base 'WWW::Shopify::Liquid::Tag::Enclosing';
+
+sub operate {
+	my ($self, $hash, $content, @arguments) = @_;
+	return $content;
+}
+
+package main;
+
+$liquid->register_tag('WWW::Shopify::Liquid::Tag::TestTag');
+$text = $liquid->render_text({ }, "{% test_tag %}ASD{% endtest_tag %}");
+
+is($text, 'ASD');
 
 done_testing(); 

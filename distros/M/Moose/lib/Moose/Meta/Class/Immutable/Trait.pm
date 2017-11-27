@@ -1,5 +1,5 @@
 package Moose::Meta::Class::Immutable::Trait;
-our $VERSION = '2.2007';
+our $VERSION = '2.2008';
 
 use strict;
 use warnings;
@@ -56,7 +56,7 @@ Moose::Meta::Class::Immutable::Trait - Implements immutability for metaclass obj
 
 =head1 VERSION
 
-version 2.2007
+version 2.2008
 
 =head1 DESCRIPTION
 

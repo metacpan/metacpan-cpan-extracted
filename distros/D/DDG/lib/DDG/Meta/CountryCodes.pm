@@ -1,7 +1,7 @@
 package DDG::Meta::CountryCodes;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Master list of country renames and aliases for all IAs
-$DDG::Meta::CountryCodes::VERSION = '1017';
+$DDG::Meta::CountryCodes::VERSION = '1018';
 use Locale::Country 'country2code';
 
 unless(country2code('DuckDuckGo')){
@@ -57,7 +57,7 @@ DDG::Meta::CountryCodes - Master list of country renames and aliases for all IAs
 
 =head1 VERSION
 
-version 1017
+version 1018
 
 =head1 AUTHOR
 

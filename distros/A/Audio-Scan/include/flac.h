@@ -46,7 +46,7 @@ typedef struct flacinfo {
   HV *tags;
   off_t file_size;
   off_t audio_offset;
-  
+
   uint32_t min_blocksize;
   uint32_t max_blocksize;
   uint32_t min_framesize;
@@ -55,9 +55,9 @@ typedef struct flacinfo {
   uint32_t samplerate;
   uint32_t bits_per_sample;
   uint64_t total_samples;
-  
+
   uint8_t seeking; // flag if we're seeking
-  
+
   uint32_t num_seekpoints;
   struct seekpoint *seekpoints;
 } flacinfo;

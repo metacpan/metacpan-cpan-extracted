@@ -198,7 +198,7 @@ sub logger_setup {
 		return if($^S);
 		local $Log::Log4perl::caller_depth =
 			$Log::Log4perl::caller_depth + 1;
-		 Log::Log4perl->get_logger()->fatal(@_);
+		 Log::Log4perl->get_logger()->fatal("Uncaught exception: ".$_[0], @_[1..$#_]);
 		 exit(2);
 	};
 }
@@ -233,6 +233,11 @@ sub main {
 	if ($opts{"update-cache"}) {
 		$app->update_cache();
 		return 0;
+	}
+
+	if (!$app->cache_contains_data()) {
+		$opts{"adhoc"} = 1;
+		$log->warning("Cache is empty. --adhoc has been enabled for you automatically");
 	}
 
 	my @paths = @ARGV;

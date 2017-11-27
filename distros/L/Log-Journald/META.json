@@ -4,13 +4,13 @@
       "Lubomir Rintel <lkundrak@v3.sk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.132140",
+   "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Log-Journald",
    "prereqs" : {
@@ -31,7 +31,7 @@
       },
       "Log::Journald" : {
          "file" : "lib/Log/Journald.pm",
-         "version" : "0.20"
+         "version" : "0.30"
       },
       "Log::Log4perl::Appender::Journald" : {
          "file" : "lib/Log/Log4perl/Appender/Journald.pm"
@@ -49,5 +49,6 @@
          "url" : "https://github.com/lkundrak/perl-Log-Journald"
       }
    },
-   "version" : "0.20"
+   "version" : "0.30",
+   "x_serialization_backend" : "JSON::PP version 2.94"
 }

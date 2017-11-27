@@ -1,7 +1,7 @@
 package DDG::Block;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Block to bundle plugins with triggers
-$DDG::Block::VERSION = '1017';
+$DDG::Block::VERSION = '1018';
 use Moo::Role;
 use Carp;
 use Class::Load ':all';
@@ -207,7 +207,7 @@ DDG::Block - Block to bundle plugins with triggers
 
 =head1 VERSION
 
-version 1017
+version 1018
 
 =head1 SYNOPSIS
 

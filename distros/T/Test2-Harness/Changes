@@ -1,3 +1,8 @@
+0.001035  2017-11-22 09:59:49-08:00 America/Los_Angeles
+
+    - Fix infinite recrusion looking for .yathrc
+    - Add 'failed' command
+
 0.001034  2017-11-20 09:19:47-08:00 America/Los_Angeles
 
     - Prevent deadlock on win32 (tests do not pass yet in win32)

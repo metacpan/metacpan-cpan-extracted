@@ -1,7 +1,7 @@
 package DDG::App::Attribution;
 our $AUTHORITY = 'cpan:DDG';
 # ABSTRACT: Application class for reading the attributions of a package
-$DDG::App::Attribution::VERSION = '1017';
+$DDG::App::Attribution::VERSION = '1018';
 use MooX qw(
 	Options
 );
@@ -55,7 +55,7 @@ DDG::App::Attribution - Application class for reading the attributions of a pack
 
 =head1 VERSION
 
-version 1017
+version 1018
 
 =head1 AUTHOR
 

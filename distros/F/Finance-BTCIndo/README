@@ -1,17 +1,23 @@
-SYNOPSIS
+NAME
+    Finance::BTCIndo - Trade with bitcoin.co.id (VIP) using Perl
 
+VERSION
+    This document describes version 0.006 of Finance::BTCIndo (from Perl
+    distribution Finance-BTCIndo), released on 2017-11-24.
+
+SYNOPSIS
      use Finance::BTCIndo;
-    
+
      # API key and secret are required unless you only want to access the public
      # API. They can be retrieved by logging into your VIP account and
-    
+
      my $btcindo = Finance::BTCIndo->new(
          key    => 'Your API key',
          secret => 'Your API secret',
      );
-    
+
      ## public API methods, these do not require API key & secret
-    
+
      my $ticker = $btcindo->get_ticker();
      # sample result:
      {
@@ -26,7 +32,7 @@ SYNOPSIS
          vol_idr => 17409110187,
        },
      }
-    
+
      my $trades = $btcindo->get_trades();
      # sample result:
      [
@@ -46,7 +52,7 @@ SYNOPSIS
        },
        ... # about 148 more
      ]
-    
+
      my $depths = $btcindo->get_depth();
      # sample result:
      {
@@ -61,7 +67,7 @@ SYNOPSIS
          # ... about 148 more
        ],
      }
-    
+
      my $prices = $btcindo->get_price_history();
      # sample result:
      {
@@ -71,68 +77,61 @@ SYNOPSIS
          ...
        ],
      }
-    
+
      ## all the methods below requires API key & secret
-    
+
      $btcinfo->get_info();
-    
+
      $btcinfo->get_tx_history();
-    
+
      $btcinfo->get_trade_history(pair => "btc_idr");
-    
+
      # create buy order of Rp 2,000,000 worth of bitcoins at price Rp 38,400,000/BTC
      $btcinfo->create_order(pair => "btc_idr", type => "buy" , price => "38400000", idr => "2000000");
-    
+
      # create sell order of 0.01 BTC at price Rp 38,700,000/BTC
      $btcinfo->create_order(pair => "btc_idr", type => "sell", price => "38700000", btc => 0.01);
-    
+
      $btcinfo->cancel_order(type => "sell", order_id => 9038293);
 
 DESCRIPTION
-
-    https://bitcoin.co.id is an Indonesian Bitcoin exchange. This module
+    <https://bitcoin.co.id> is an Indonesian Bitcoin exchange. This module
     provides a Perl wrapper for bitcoin.co.id's Trade API.
 
 METHODS
-
- new
-
+  new
     Constructor.
 
- get_ticker
-
-    Public API. The API method name is ticker.
-
-    Arguments:
-
-      * pair => str
-
-      Optional, e.g. eth_btc. Default: btc_idr.
-
- get_trades
-
-    Public API. The API method name is ticker.
+  get_ticker
+    Public API. The API method name is "ticker".
 
     Arguments:
 
-      * pair => str
+    *   pair => str
 
-      Optional, e.g. eth_btc. Default: btc_idr.
+        Optional, e.g. eth_btc. Default: btc_idr.
 
- get_depth
-
-    Public API. The API method name is ticker.
+  get_trades
+    Public API. The API method name is "ticker".
 
     Arguments:
 
-      * pair => str
+    *   pair => str
 
-      Optional, e.g. eth_btc. Default: btc_idr.
+        Optional, e.g. eth_btc. Default: btc_idr.
 
- get_price_history
+  get_depth
+    Public API. The API method name is "ticker".
 
-    Public API (undocumented). The API method name is either chartdata or
-    chart_1d.
+    Arguments:
+
+    *   pair => str
+
+        Optional, e.g. eth_btc. Default: btc_idr.
+
+  get_price_history
+    Public API (undocumented). The API method name is either "chartdata" or
+    "chart_1d".
 
     This function returns an array of records. Each record is an array with
     the following data:
@@ -141,17 +140,16 @@ METHODS
 
     Arguments:
 
-      * pair => str
+    *   pair => str
 
-      Optional, e.g. eth_btc. Default: btc_idr.
+        Optional, e.g. eth_btc. Default: btc_idr.
 
-      * period => str (all|day, default: day)
+    *   period => str (all|day, default: day)
 
-      Specify period. all means since exchange began operation (Feb 2014).
-      day means in the last ~24h.
+        Specify period. "all" means since exchange began operation (Feb
+        2014). "day" means in the last ~24h.
 
- tapi
-
+  tapi
     General method to call API methods. Syntax:
 
      $btcinfo->tapi($method, %args)
@@ -164,98 +162,112 @@ METHODS
 
      $btcinfo->get_info()
 
- get_info
-
+  get_info
     This method give information about balance and server's timestamp. The
-    API method name is getInfo.
+    API method name is "getInfo".
 
     Arguments:
 
- get_tx_history
-
+  get_tx_history
     This method give information about history of deposit and withdraw. The
-    API method name is transHistory.
+    API method name is "transHistory".
 
     Arguments:
 
- get_trade_history
-
+  get_trade_history
     This method give information about bitcoin transaction in buying and
-    selling history. The API method name is tradeHistory.
+    selling history. The API method name is "tradeHistory".
 
     Arguments:
 
-      * count => int
+    *   count => int
 
-      * from_id => int
+    *   from_id => int
 
-      * to_id => int
+    *   to_id => int
 
-      * order => "asc" | "desc"
+    *   order => "asc" | "desc"
 
-      * since => epoch
+    *   since => epoch
 
-      * end => epoch
+    *   end => epoch
 
-      * pair => str (required)
+    *   pair => str (required)
 
-      Currently only "btc_idr".
-
- get_open_orders
-
+  get_open_orders
     This method give information about existing open order. The API method
-    name is openOrders.
+    name is "openOrders".
 
     Arguments:
 
-      * pair => str (required)
+    *   pair => str (required)
 
-      Currently only "btc_idr".
-
- create_order
-
-    This method use to make a new order. The API method name is trade.
+  create_order
+    This method use to make a new order. The API method name is "trade".
 
     Arguments:
 
-      * pair => str (required)
+    *   pair => str (required)
 
-      Currently only "btc_idr".
+    *   type => str (required)
 
-      * type => str (required)
+        Either "buy" or "sell".
 
-      Either "buy" or "sell".
+    *   price => num (required)
 
-      * price => num (required)
+        Price (in Rp) per bitcoin.
 
-      Price (in Rp) per bitcoin.
+    *   idr => num (required when type=buy)
 
-      * idr => num (required when type=buy)
+        Amount of IDR you want to buy.
 
-      Amount of IDR you want to buy.
+    *   btc => num (required when type=sell)
 
-      * btc => num (required when type=sell)
+        Amount of BTC you want to sell.
 
-      Amount of BTC you want to sell.
-
- cancel_order
-
+  cancel_order
     This method cancel existing open order. The API method name is
-    cancelOrder.
+    "cancelOrder".
 
     Arguments:
 
-      * type => str (required)
+    *   pair => pair (required)
 
-      Either "buy" or "sell".
+    *   type => str (required)
 
-      * order_id => num (required)
+        Either "buy" or "sell".
+
+    *   order_id => num (required)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Finance-BTCIndo>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Finance-BTCIndo>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Finance-BTCIndo>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-
     API documentation,
-    https://blog.bitcoin.co.id/wp-content/uploads/2014/03/API-Documentation-Bitcoin.co_.id_.pdf
+    <https://blog.bitcoin.co.id/wp-content/uploads/2014/03/API-Documentation
+    -Bitcoin.co_.id_.pdf>
 
     CLI that uses this module, for more convenience daily usage on the
     command-line: btcindo (from App::btcindo distribution).
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

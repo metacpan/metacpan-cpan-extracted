@@ -2,7 +2,7 @@ package App::Yath::Command::times;
 use strict;
 use warnings;
 
-our $VERSION = '0.001034';
+our $VERSION = '0.001035';
 
 use Test2::Util qw/pkg_to_file/;
 
@@ -19,7 +19,7 @@ use Test2::Harness::Util::HashBase;
 
 sub summary { "Get times from a test log" }
 
-sub group { 'times' }
+sub group { 'log' }
 
 sub has_runner  { 0 }
 sub has_logger  { 0 }

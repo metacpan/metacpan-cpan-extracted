@@ -10,7 +10,7 @@ use POE qw(
 );
 use Sys::Hostname qw(hostname);
 
-our $VERSION = '2.3';
+our $VERSION = '2.4';
 
 my @_STREAM_NAMES = qw(subscribers match debug full regex);
 my %_STREAM_ASSISTERS = (
@@ -728,7 +728,7 @@ sub client_input {
     # Check for messages:
     my $handled = 0;
     foreach my $cmd ( keys %COMMANDS ) {
-        if( $msg =~ /$COMMANDS{$cmd}->{re}/ai ) {
+        if( $msg =~ /$COMMANDS{$cmd}->{re}/i ) {
             my $args = $1;
             my $evt = sprintf "%s_client", $cmd;
             $kernel->post( $DISPATCH => $evt, $sid => $args );
@@ -783,7 +783,7 @@ POE::Component::Server::eris - POE eris message dispatcher
 
 =head1 VERSION
 
-version 2.3
+version 2.4
 
 =head1 SYNOPSIS
 
@@ -847,7 +847,7 @@ Brad Lhotsky <brad@divsionbyzero.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by Brad Lhotsky.
+This software is Copyright (c) 2017 by Brad Lhotsky.
 
 This is free software, licensed under:
 

@@ -11,7 +11,7 @@ require Exporter;
 our @ISA    = qw(Exporter);
 our @EXPORT = qw(perl_tokens);
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 =encoding utf8
 
@@ -21,7 +21,7 @@ Perl::Tokenizer - A tiny Perl code tokenizer.
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =cut
 
@@ -138,7 +138,7 @@ foreach my $name (qw(tr s y)) {
     $double_q{$name} = $make_double_q_balanced->($name);
 }
 
-my $number     = qr{(?=[0-9]|\.[0-9])[0-9_]*(?:\.(?!\.)[0-9_]*)?(?:[Ee](?:[+-]?[0-9_]+))?};
+my $number     = qr{(?=\.?[0-9])[0-9_]*(?:\.(?!\.)[0-9_]*)?(?:[Ee](?:[+-]?[0-9_]+))?};
 my $hex_num    = qr{0x[_0-9A-Fa-f]*};
 my $binary_num = qr{0b[_01]*};
 
@@ -182,29 +182,28 @@ my $special_var_names = do {
 
 my $bracket_var = qr~(?=\s*\{)(?!\s*\{\s*(?:\^?$var_name|$special_var_names|\{)\s*\})~;
 
-my $perl_keywords = qr{(?:CORE::)?(?>(a(?:bs|ccept|larm|nd|tan2)|b(?:in(?:mode|d)|les
-s|reak)|c(?:aller|h(?:dir|mod|o(?:mp|wn|p)|r(?:oot)?)|lose(?:dir)?|mp|o(?:
-n(?:nect|tinue)|s)|rypt)|d(?:bm(?:close|open)|e(?:f(?:ault|ined)|lete)|ie|
-ump|o)|e(?:ach|ls(?:if|e)|nd(?:grent|hostent|netent|p(?:rotoent|went)|serv
-ent)|of|val|x(?:ec|i(?:sts|t)|p)|q)|f(?:c(?:ntl)?|ileno|lock|or(?:(?:each|
-m(?:at|line)|k))?)|g(?:e(?:t(?:gr(?:ent|gid|nam)|host(?:by(?:addr|name)|en
-t)|login|net(?:by(?:addr|name)|ent)|p(?:eername|grp|pid|r(?:iority|oto(?:b
-yn(?:ame|umber)|ent))|w(?:ent|nam|uid))|s(?:erv(?:by(?:name|port)|ent)|ock
-(?:name|opt))|c))?|iven|lob|mtime|oto|rep|t)|hex|i(?:mport|n(?:dex|t)|octl
-|sa|f)|join|k(?:eys|ill)|l(?:ast|c(?:first)?|e(?:ngth)?|i(?:nk|sten)|o(?:c
-(?:al(?:time)?|k)|g)|stat|t)|m(?:ap|kdir|sg(?:ctl|get|rcv|snd)|y)|n(?:e(?:
-xt)?|ot?)|o(?:ct|pen(?:dir)?|rd?|ur)|p(?:ack(?:age)?|ipe|o[ps]|r(?:intf?|o
-totype)|ush)|quotemeta|r(?:and|e(?:ad(?:(?:dir|lin[ek]|pipe))?|cv|do|name|
-quire|set|turn|verse|winddir|f)|index|mdir)|s(?:ay|calar|e(?:ek(?:dir)?|le
-ct|m(?:ctl|get|op)|nd|t(?:grent|hostent|netent|p(?:grp|r(?:iority|otoent)|
-went)|s(?:ervent|ockopt)))|h(?:ift|m(?:ctl|get|read|write)|utdown)|in|leep
-|o(?:cket(?:pair)?|rt)|p(?:li(?:ce|t)|rintf)|qrt|rand|t(?:ate?|udy)|ub(?:s
-tr)?|y(?:mlink|s(?:call|open|read|seek|tem|write)))|t(?:ell(?:dir)?|i(?:ed
-?|mes?)|runcate)|u(?:c(?:first)?|mask|n(?:def|l(?:ess|ink)|pack|shift|ti[e
-l])|se|time)|v(?:alues|ec)|w(?:a(?:it(?:pid)?|ntarray|rn)|h(?:en|ile)|rite
-)|xor|BEGIN|END|INIT|CHECK)) \b }x;
+#<<<
+my $perl_keywords =
+    qr/(?:CORE::)?(?>(a(?:(?:ccept|larm|tan2|bs|nd))|b(?:in(?:(?:mode|d))|less|reak)|c(?:aller|h(?:dir|mod
+    |o(?:(?:m?p|wn))|r(?:oot)?)|lose(?:dir)?|mp|o(?:n(?:(?:tinue|nect))|s)|rypt)|d(?:bm(?:(?:close|open))|
+    e(?:f(?:(?:ault|ined))|lete)|ie|ump|o)|e(?:ach|ls(?:(?:if|e))|nd(?:grent|hostent|netent|p(?:(?:roto|w)
+    ent)|servent)|of|val|x(?:ec|i(?:(?:sts|t))|p)|q)|f(?:c(?:ntl)?|ileno|lock|or(?:(?:each|m(?:(?:line|at)
+    )|k))?)|g(?:e(?:t(?:gr(?:(?:ent|gid|nam))|host(?:by(?:(?:addr|name))|ent)|login|net(?:by(?:(?:addr|nam
+    e))|ent)|p(?:eername|grp|pid|r(?:iority|oto(?:byn(?:(?:umber|ame))|ent))|w(?:(?:ent|nam|uid)))|s(?:erv
+    (?:by(?:(?:name|port))|ent)|ock(?:(?:name|opt)))|c))?|iven|lob|mtime|oto|rep|t)|hex|i(?:mport|n(?:(?:d
+    ex|t))|octl|sa|f)|join|k(?:(?:eys|ill))|l(?:ast|c(?:first)?|e(?:ngth)?|i(?:(?:sten|nk))|o(?:c(?:al(?:t
+    ime)?|k)|g)|stat|t)|m(?:ap|kdir|sg(?:(?:ctl|get|rcv|snd))|y)|n(?:e(?:xt)?|ot?)|o(?:ct|pen(?:dir)?|rd?|
+    ur)|p(?:ack(?:age)?|ipe|o[ps]|r(?:(?:ototype|intf?))|ush)|quotemeta|r(?:and|e(?:ad(?:(?:(?:lin[ek]|pip
+    e|dir)))?|cv|do|name|quire|set|turn|verse|winddir|f)|index|mdir)|s(?:ay|calar|e(?:ek(?:dir)?|lect|m(?:
+    (?:ctl|get|op))|nd|t(?:grent|hostent|netent|p(?:grp|r(?:(?:iority|otoent))|went)|s(?:(?:erven|ockop)t)
+    ))|h(?:ift|m(?:(?:write|read|ctl|get))|utdown)|in|leep|o(?:cket(?:pair)?|rt)|p(?:li(?:(?:ce|t))|rintf)
+    |qrt|rand|t(?:(?:ate?|udy))|ub(?:str)?|y(?:mlink|s(?:(?:write|call|open|read|seek|tem))))|t(?:ell(?:di
+    r)?|i(?:(?:mes?|ed?))|runcate)|u(?:c(?:first)?|mask|n(?:def|l(?:(?:ess|ink))|pack|shift|ti[el])|se|tim
+    e)|v(?:(?:alues|ec))|w(?:a(?:it(?:pid)?|ntarray|rn)|h(?:(?:ile|en))|rite)|xor|BEGIN|END|INIT|CHECK))\b
+    /x;
+#>>>
 
-my $perl_filetests = qr{\-[ABCMORSTWXbcdefgkloprstuwxz]};
+my $perl_filetests = qr/\-[ABCMORSTWXbcdefgkloprstuwxz]/;
 
 sub perl_tokens(&$) {
     my ($callback, $code) = @_;
@@ -224,8 +223,8 @@ sub perl_tokens(&$) {
 
     given ($code) {
         {
-            when ($expect_format == 1 && m{\G(?=\n)}) {
-                if (m{.*?\n\.\h*(?=\n|\z)}gsc) {
+            when (($expect_format == 1) && /\G(?=\R)/) {
+                if (/.*?\R\.\h*(?=\R|\z)/cgs) {
                     $callback->('vertical_space', $-[0],     $-[0] + 1);
                     $callback->('format',         $-[0] + 1, $+[0]);
                     $expect_format = 0;
@@ -234,43 +233,43 @@ sub perl_tokens(&$) {
                     $postfix_op    = 0;
                 }
                 else {
-                    if (/\G(.)/gsc) {
+                    if (/\G(.)/cgs) {
                         $callback->('unknown_char', $-[0], $+[0]);
                         redo;
                     }
                 }
                 redo;
             }
-            when ($#heredoc_eofs >= 0 && m{\G(?=\n)}) {
+            when ($#heredoc_eofs >= 0 && /\G(?=\R)/) {
                 my $token = shift @heredoc_eofs;
-                if (m{\G.*?\n\Q$token\E(?=\n|\z)}sgc) {
+                if (m{\G.*?\R\Q$token\E(?=\R|\z)}sgc) {
                     $callback->('vertical_space', $-[0],     $-[0] + 1);
                     $callback->('heredoc',        $-[0] + 1, $+[0]);
                 }
                 redo;
             }
-            when (($regex == 1 || m{\G(?!<<[0-9])}) && m{\G$bhdoc}gc) {
+            when (($regex == 1 || /\G(?!<<[0-9])/) && m{\G$bhdoc}gc) {
                 $callback->('heredoc_beg', $-[0], $+[0]);
                 push @heredoc_eofs, $+;
                 $regex  = 0;
                 $canpod = 0;
                 redo;
             }
-            when ($canpod == 1 && m{\G^=[a-zA-Z]}mgc) {
-                m{\G.*?\n=cut\h*(?=\n|z)}sgc || m{\G.*\z}gcs;
+            when ($canpod == 1 && /\G^=[a-zA-Z]/cgm) {
+                /\G.*?\R=cut\h*(?=\R|\z)/cgs || /\G.*\z/cgs;
                 $callback->('pod', $-[0] - 2, $+[0]);
                 redo;
             }
-            when (m{\G(?=\s)}) {
-                when (m{\G\h+}gc) {
+            when (/\G(?=\s)/) {
+                when (/\G\h+/cg) {
                     $callback->('horizontal_space', $-[0], $+[0]);
                     redo;
                 }
-                when (m{\G\v+}gc) {
+                when (/\G\v+/cg) {
                     $callback->('vertical_space', $-[0], $+[0]);
                     redo;
                 }
-                when (m{\G\s+}gc) {
+                when (/\G\s+/cg) {
                     $callback->({other_space => [$-[0], $+[0]]});
                     redo;
                 }
@@ -281,31 +280,31 @@ sub perl_tokens(&$) {
                     $regex    = 0;
                     $variable = 0;
                     $canpod   = 0;
-                    $flat     = m~\G(?=\s*\{)~ ? 1 : 0;
+                    $flat     = /\G(?=\s*\{)/ ? 1 : 0;
                     redo;
                 }
                 when (
                       (
                        m{\G(?!\$+$var_name)}o && (   m~\G(?:\s+|#?)\{\s*(?:$var_name|$special_var_names|[#{])\s*\}~goc
                                                   || m{\G(?:\^\w+|#(?!\{)|$special_var_names)}gco
-                                                  || m~\G#~gc)
+                                                  || /\G#/cg)
                       )
                   ) {
                     $callback->('special_var_name', $-[0], $+[0]);
                     $regex    = 0;
                     $canpod   = 0;
                     $variable = 0;
-                    $flat     = m~\G(?<!\})(?=\s*\{)~ ? 1 : 0;
+                    $flat     = /\G(?<!\})(?=\s*\{)/ ? 1 : 0;
                     redo;
                 }
                 continue;
             }
-            when (m{\G#.*}gc) {
+            when (/\G#.*/cg) {
                 $callback->('comment', $-[0], $+[0]);
                 redo;
             }
-            when (($regex == 1 and not($postfix_op)) or m{\G(?=[\@\$])}) {
-                when (m{\G\$}gc) {
+            when (($regex == 1 and not($postfix_op)) or /\G(?=[\@\$])/) {
+                when (/\G\$/cg) {
                     $callback->('scalar_sigil', $-[0], $+[0]);
                     /\G$bracket_var/o || ++$variable;
                     $regex  = 0;
@@ -313,7 +312,7 @@ sub perl_tokens(&$) {
                     $flat   = 1;
                     redo;
                 }
-                when (m{\G\@}gc) {
+                when (/\G\@/cg) {
                     $callback->('array_sigil', $-[0], $+[0]);
                     /\G$bracket_var/o || ++$variable;
                     $regex  = 0;
@@ -321,7 +320,7 @@ sub perl_tokens(&$) {
                     $flat   = 1;
                     redo;
                 }
-                when (m{\G\%}gc) {
+                when (/\G\%/cg) {
                     $callback->('hash_sigil', $-[0], $+[0]);
                     /\G$bracket_var/o || ++$variable;
                     $regex  = 0;
@@ -329,7 +328,7 @@ sub perl_tokens(&$) {
                     $flat   = 1;
                     redo;
                 }
-                when (m{\G\*}gc) {
+                when (/\G\*/cg) {
                     $callback->('glob_sigil', $-[0], $+[0]);
                     /\G$bracket_var/o || ++$variable;
                     $regex  = 0;
@@ -337,7 +336,7 @@ sub perl_tokens(&$) {
                     $flat   = 1;
                     redo;
                 }
-                when (m{\G&}gc) {
+                when (/\G&/cg) {
                     $callback->('ampersand_sigil', $-[0], $+[0]);
                     /\G$bracket_var/o || ++$variable;
                     $regex  = 0;
@@ -347,40 +346,40 @@ sub perl_tokens(&$) {
                 }
                 continue;
             }
-            when ($proto == 1 && m{\G\(.*?\)}gcs) {
+            when ($proto == 1 && /\G\(.*?\)/cgs) {
                 $callback->('sub_proto', $-[0], $+[0]);
                 $proto  = 0;
                 $canpod = 0;
                 $regex  = 0;
                 redo;
             }
-            when (m{\G\(}gc) {
+            when (/\G\(/cg) {
                 $callback->('parenthesis_open', $-[0], $+[0]);
                 $regex  = 1;
                 $flat   = 0;
                 $canpod = 0;
                 redo;
             }
-            when (m{\G\)}gc) {
+            when (/\G\)/cg) {
                 $callback->('parenthesis_close', $-[0], $+[0]);
                 $regex  = 0;
                 $canpod = 0;
                 $flat   = 0;
                 redo;
             }
-            when (m~\G\{~gc) {
+            when (/\G\{/cg) {
                 $callback->('curly_bracket_open', $-[0], $+[0]);
                 $regex = 1;
                 $proto = 0;
                 redo;
             }
-            when (m~\G\}~gc) {
+            when (/\G\}/cg) {
                 $callback->('curly_bracket_close', $-[0], $+[0]);
                 $flat   = 0;
                 $canpod = 1;
                 redo;
             }
-            when (m~\G\[~gc) {
+            when (/\G\[/cg) {
                 $callback->('right_bracket_open', $-[0], $+[0]);
                 $regex      = 1;
                 $postfix_op = 0;
@@ -388,7 +387,7 @@ sub perl_tokens(&$) {
                 $canpod     = 0;
                 redo;
             }
-            when (m~\G\]~gc) {
+            when (/\G\]/cg) {
                 $callback->('right_bracket_close', $-[0], $+[0]);
                 $regex  = 0;
                 $canpod = 0;
@@ -396,7 +395,7 @@ sub perl_tokens(&$) {
                 redo;
             }
             when ($proto == 0) {
-                when ($canpod == 1 && m{\Gformat\b}gc) {
+                when ($canpod == 1 && /\Gformat\b/cg) {
                     $callback->('keyword', $-[0], $+[0]);
                     $regex  = 0;
                     $canpod = 0;
@@ -503,7 +502,7 @@ sub perl_tokens(&$) {
                 $flat   = 0;
                 redo;
             }
-            when (m{\G;}goc) {
+            when (/\G;/cg) {
                 $callback->('semicolon', $-[0], $+[0]);
                 $canpod     = 1;
                 $regex      = 1;
@@ -512,7 +511,7 @@ sub perl_tokens(&$) {
                 $flat       = 0;
                 redo;
             }
-            when (m{\G=>}gc) {
+            when (/\G=>/cg) {
                 $callback->('fat_comma', $-[0], $+[0]);
                 $regex      = 1;
                 $postfix_op = 0;
@@ -520,7 +519,7 @@ sub perl_tokens(&$) {
                 $flat       = 0;
                 redo;
             }
-            when (m{\G,}gc) {
+            when (/\G,/cg) {
                 $callback->('comma', $-[0], $+[0]);
                 $regex      = 1;
                 $postfix_op = 0;
@@ -549,7 +548,7 @@ sub perl_tokens(&$) {
                 }
                 redo;
             }
-            when (m{\G(?=__)}) {
+            when (/\G(?=__)/) {
                 when (m{\G__(?>DATA|END)__\b\h*+(?!=>).*\z}gcs) {
                     $callback->('data', $-[0], $+[0]);
                     redo;
@@ -562,7 +561,7 @@ sub perl_tokens(&$) {
                 }
                 continue;
             }
-            when ($regex == 1 && /\G(?<!(?:--|\+\+)\h)/ && m{\G$glob}gco) {
+            when ($regex == 1 && /\G(?<!(?:\+\+|--)\h)/ && m{\G$glob}gco) {
                 $callback->('glob_readline', $-[0], $+[0]);
                 $regex  = 0;
                 $canpod = 0;
@@ -570,26 +569,26 @@ sub perl_tokens(&$) {
             }
             when (m{\G$assignment_operators}gco) {
                 $callback->('assignment_operator', $-[0], $+[0]);
+                if ($format) {
+                    if (substr($_, $-[0], $+[0] - $-[0]) eq '=') {
+                        $format        = 0;
+                        $expect_format = 1;
+                    }
+                }
                 $regex  = 1;
                 $canpod = 0;
                 $flat   = 0;
                 redo;
             }
-            when (m{\G->}gc) {
+            when (/\G->/cg) {
                 $callback->('dereference_operator', $-[0], $+[0]);
                 $regex  = 0;
                 $canpod = 0;
                 $flat   = 1;
                 redo;
             }
-            when (m{\G$operators}gco || m{\Gx(?=[0-9\W])}gc) {
+            when (m{\G$operators}gco || /\Gx(?=[0-9\W])/cg) {
                 $callback->('operator', $-[0], $+[0]);
-                if ($format) {
-                    if (substr($_, $-[0], ($+[0] - $-[0])) eq '=') {
-                        $format        = 0;
-                        $expect_format = 1;
-                    }
-                }
                 if (substr($_, $-[0], ($+[0] - $-[0])) =~ /^$postfix_operators\z/) {
                     $postfix_op = 1;
                 }
@@ -633,11 +632,11 @@ sub perl_tokens(&$) {
                 $flat   = 0;
                 redo;
             }
-            when (m{\G\z}gc) {    # all done
+            when (/\G\z/cg) {    # all done
                 break;
             }
             default {
-                if (/\G(.)/sgc) {
+                if (/\G(.)/cgs) {
                     $callback->('unknown_char', $-[0], $+[0]);
                     redo;
                 }

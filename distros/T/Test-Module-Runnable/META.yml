@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Test-Module-Runnable
-version:            0.2.3
+version:            0.3.0
 abstract:           Base class for runnable unit tests using Moose introspection
 author:
     - Duncan Ross Palmer, 2E0EOL (palmer@overchat.org)
@@ -12,10 +12,14 @@ build_requires:
     List::MoreUtils:  0
     Moose:            0
     Readonly:         0
+    Test::Deep:       0
+    Test::Exception:  0
     Test::More:       0
+    Test::Output:     0
 requires:
-    Moose:       0
-    Test::More:  0
+    Moose:             0
+    Test::MockModule:  0
+    Test::More:        0
 no_index:
     directory:
         - t

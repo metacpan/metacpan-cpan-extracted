@@ -8,13 +8,11 @@ our (@ISA, @EXPORT_OK, %EXPORT_TAGS);
 require Exporter;
 @ISA = qw(Exporter);
 
+@EXPORT_OK = qw(major minor mkdev);
 
 %EXPORT_TAGS = (
-    'all' => [qw(major minor mkdev)]
+    'all' => \@EXPORT_OK
 );
-
-
-@EXPORT_OK = ( map {@{$_}} values %EXPORT_TAGS );
 
 
 

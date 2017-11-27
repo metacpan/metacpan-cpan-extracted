@@ -97,8 +97,8 @@ Fsdb(3)               User Contributed Perl Documentation              Fsdb(3)
                #    | dbrow _experiment eq "ufs_mab_sys"
                #    | dbcolstats duration
 
-       +o   The library is mature, supporting large datasets, corner cases,
-           error handling, backed by an automated test suite.
+       +o   The library is mature, supporting large datasets (more than 100GB),
+           corner cases, error handling, backed by an automated test suite.
 
            **  No more puzzling about bad output because your custom script
                skimped on error checking.
@@ -132,7 +132,8 @@ Fsdb(3)               User Contributed Perl Documentation              Fsdb(3)
 
        Fsdb-2.x will exploit multiple processors or cores, and provides Perl-
        level support for input, output, and threaded-pipelines.  (As of
-       Fsdb-2.44 it no longer uses Perl threading, just processes.)
+       Fsdb-2.44 it no longer uses Perl threading, just processes, since they
+       are faster.)
 
        Installation instructions follow at the end of this document.  Fsdb-2.x
        requires Perl 5.8 to run.  All commands have manual pages and provide
@@ -143,24 +144,24 @@ Fsdb(3)               User Contributed Perl Documentation              Fsdb(3)
        <http://www.isi.edu/~johnh/SOFTWARE/FSDB/index.html>.
 
 [1mWHAT'S NEW[0m
-   [1m2.63, 2017-02-03 Re-add some features supposedly in 2.62 but not, and add[0m
-       [1mmore --header options.[0m
-       ENHANCEMENT
-           The option [1m-j [22mis now a synonym for [1m--parallelism[22m.  (And several
-           documention bugs about this option are fixed.)
-
-       ENHANCEMENT
-           Additional support for "--header" in dbcolmerge, dbcol, dbrow, and
-           dbroweval.
-
+   [1m2.64, 2017-11-20 several small bugfixes and enhancements[0m
        BUG FIX
-           Version 2.62 was supposed to have this improvement, but did not
-           (and now does): dbfilepivot now allows the [1m--possible-pivots[0m
-           option, and if it is provided processes the data in one pass.
+           In dbroweval, the "next row" option previously did not correctly
+           set up "_last_fieldname".  It now does.
 
-       BUG FIX
-           Version 2.62 was supposed to have this improvement, but did not
-           (and now does): dbroweval logs are now quoted.
+       ENHANCEMENT
+           The csv_to_db converter now has an optional "-F x" option to set
+           the field separator.
+
+       ENHANCEMENT
+           Finally dbcolsplittocols has a "--header" option, and a new "-N"
+           option to give the list of resulting output columns.
+
+       INCOMPATIBLE CHANGE
+           Now dbcolstats and dbmultistats produce no output (but a schema)
+           when given no input but a schema.  Previously they gave a null row
+           of output.  The "--output-on-no-input" and
+           "--no-output-on-no-input" options can control this behavior.
 
 [1mREADME CONTENTS[0m
        executive summary
@@ -2270,6 +2271,25 @@ Fsdb(3)               User Contributed Perl Documentation              Fsdb(3)
        ENHANCEMENT
            dbroweval logs are now quoted.
 
+   [1m2.63, 2017-02-03 Re-add some features supposedly in 2.62 but not, and add[0m
+       [1mmore --header options.[0m
+       ENHANCEMENT
+           The option [1m-j [22mis now a synonym for [1m--parallelism[22m.  (And several
+           documention bugs about this option are fixed.)
+
+       ENHANCEMENT
+           Additional support for "--header" in dbcolmerge, dbcol, dbrow, and
+           dbroweval.
+
+       BUG FIX
+           Version 2.62 was supposed to have this improvement, but did not
+           (and now does): dbfilepivot now allows the [1m--possible-pivots[0m
+           option, and if it is provided processes the data in one pass.
+
+       BUG FIX
+           Version 2.62 was supposed to have this improvement, but did not
+           (and now does): dbroweval logs are now quoted.
+
 [1mAUTHOR[0m
        John Heidemann, "johnh@isi.edu"
 
@@ -2301,4 +2321,4 @@ Fsdb(3)               User Contributed Perl Documentation              Fsdb(3)
 
 
 
-perl v5.24.1                      2017-02-03                           Fsdb(3)
+perl v5.26.1                      2017-11-20                           Fsdb(3)

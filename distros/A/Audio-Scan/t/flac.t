@@ -26,7 +26,7 @@ use Audio::Scan;
     is( $info->{samplerate}, 44100, 'Samplerate ok' );
     is( $info->{song_length_ms}, 626466, 'Song length ok' );
     is( $info->{total_samples}, 27627180, 'Total samples ok' );
-    
+
     is( $tags->{VENDOR}, 'reference libFLAC 1.1.4 20070213', 'VENDOR ok' );
     is( $tags->{TITLE}, 'IV. Allegro impetuoso ', 'TITLE ok' );
 }
@@ -37,16 +37,16 @@ use Audio::Scan;
 
     my $info = $s->{info};
     my $tags = $s->{tags};
-    
+
     is( $info->{bitrate}, 187, 'Bitrate ok' );
-    
+
     is( ref $tags->{APPLICATION}, 'HASH', 'Application ok' );
     like( $tags->{APPLICATION}->{1835361648}, qr/^<\?xml/, 'App block start ok' );
     like( $tags->{APPLICATION}->{1835361648}, qr{</rdf:RDF>\n}, 'App block end ok' );
 
     is( ref $tags->{CUESHEET_BLOCK}, 'ARRAY', 'Cue sheet ok' );
     is( scalar @{ $tags->{CUESHEET_BLOCK} }, 37, 'Cue sheet size ok' );
-    
+
     my $cue = $tags->{CUESHEET_BLOCK};
     like( $cue->[0], qr/FILE "[^"]+" FLAC\n/, 'Cue 0 ok' );
     is( $cue->[1],  "  TRACK 01 AUDIO\n", 'Cue track 1 ok' );
@@ -56,7 +56,7 @@ use Audio::Scan;
     is( $cue->[5],  "    INDEX 01 00:00:32\n", 'Cue track 1 index 1 ok' );
     is( $cue->[6],  "  TRACK 02 AUDIO\n", 'Cue track 2 ok' );
     is( $cue->[7],  "    INDEX 01 04:53:72\n", 'Cue track 2 index 1 ok' );
-    
+
     is( $cue->[32], "  TRACK 14 AUDIO\n", 'Cue track 14 ok' );
     is( $cue->[33], "    INDEX 00 56:03:70\n", 'Cue track 14 index 0 ok' );
     is( $cue->[34], "    INDEX 01 56:07:45\n", 'Cue track 14 index 1 ok' );
@@ -70,12 +70,12 @@ use Audio::Scan;
 
     my $info = $s->{info};
     my $tags = $s->{tags};
-    
+
     is( $info->{id3_version}, 'ID3v2.3.0', 'ID3 tag ok' );
     is( $info->{audio_offset}, 10034, 'ID3 tag audio offset ok' );
     is( $info->{audio_size}, 19966, 'Audio size ok' );
     is( $info->{audio_md5}, '3a15e851a1dad49adcca57fe40ef6df6', 'Audio MD5 ok' );
-    
+
     is( $tags->{TITLE}, 'Allegro Maestoso', 'ID3 tag Vorbis title ok' );
     is( $tags->{TIT2}, 'Allegro Maestoso', 'ID3 tag TIT2 ok' );
 }
@@ -85,12 +85,12 @@ use Audio::Scan;
     my $s = Audio::Scan->scan( _f('picture.flac') );
 
     my $tags = $s->{tags};
-    
+
     is( ref $tags->{ALLPICTURES}, 'ARRAY', 'ALLPICTURES ok' );
     is( scalar @{ $tags->{ALLPICTURES} }, 1, 'ALLPICTURES count ok' );
-    
+
     my $pic = $tags->{ALLPICTURES}->[0];
-    
+
     is( ref $pic, 'HASH', 'Picture 0 ok' );
     is( $pic->{color_index}, 0, 'Color index ok' );
     is( $pic->{depth}, 24, 'Depth ok' );
@@ -106,13 +106,13 @@ use Audio::Scan;
 # Test ignoring artwork
 {
     local $ENV{AUDIO_SCAN_NO_ARTWORK} = 1;
-    
+
     my $s = Audio::Scan->scan( _f('picture.flac') );
-    
+
     my $tags = $s->{tags};
-    
+
     my $pic = $tags->{ALLPICTURES}->[0];
-    
+
     is( $pic->{image_data}, 37175, 'JPEG with AUDIO_SCAN_NO_ARTWORK ok ');
     is( $pic->{offset}, 686, 'JPEG with AUDIO_SCAN_NO_ARTWORK offset ok' );
 }
@@ -120,9 +120,9 @@ use Audio::Scan;
 # File with very short duration, make sure bitrate is correct
 {
     my $s = Audio::Scan->scan( _f('short-duration.flac') );
-    
+
     my $info = $s->{info};
-    
+
     is( $info->{audio_offset}, 8304, 'Short duration audio offset ok' );
     is( $info->{bitrate}, 946303, 'Short duration bitrate ok' );
 }
@@ -156,7 +156,7 @@ use Audio::Scan;
     open my $fh, '<', _f('id3tagged.flac');
     my $offset = Audio::Scan->find_frame_fh( flac => $fh, 2000 );
     close $fh;
-    
+
     is( $offset, 12792, 'Find frame via filehandle in ID3-tagged file ok' );
 }
 
@@ -177,14 +177,14 @@ use Audio::Scan;
 # Calc duration/bitrate when missing header information
 {
     my $s = Audio::Scan->scan( _f('bad-streaminfo.flac') );
-    
+
     my $info = $s->{info};
     is( $info->{audio_offset}, 350, 'Bad streaminfo audio offset ok' );
     is( $info->{bitrate}, 268415, 'Bad streaminfo bitrate ok' );
     is( $info->{maximum_framesize}, 0, 'Bad streaminfo has no max framesize' );
     is( $info->{audio_md5}, '0' x 32, 'Bad streaminfo has no md5' );
     is( $info->{minimum_framesize}, 0, 'Bad streaminfo has no min framesize' );
-    
+
     # XXX These values are slightly short because we aren't reading
     # backwards from the end to find the actual last frame
     is( $info->{song_length_ms}, 1462, 'Bad streaminfo duration ok' );
@@ -195,9 +195,9 @@ use Audio::Scan;
 {
     my $s = Audio::Scan->scan( _f('CVE-2007-4619-2.flac') );
     my $tags = $s->{tags};
-    
+
     is( $tags->{ALBUM}, 'Quod Libet Test Data', 'CVE-2007-4619 handled ok' );
-}    
+}
 
 sub _f {
     return catfile( $FindBin::Bin, 'flac', shift );

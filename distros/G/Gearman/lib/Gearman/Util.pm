@@ -1,6 +1,6 @@
 package Gearman::Util;
 use version ();
-$Gearman::Util::VERSION = version->declare("2.004.009");
+$Gearman::Util::VERSION = version->declare("2.004.010");
 
 use strict;
 use warnings;
@@ -215,7 +215,10 @@ sub _read_sock {
         $$offset_ref += $rv;
         $$readlen_ref -= $rv;
 
-        return _read_sock($sock, $buf_ref, $readlen_ref, $offset_ref);
+        $sock->blocking(1);
+        my $ret = _read_sock($sock, $buf_ref, $readlen_ref, $offset_ref);
+        $sock->blocking(0);
+        return $ret;
     } ## end unless ($rv >= $$readlen_ref)
 
     warn "   Finished reading\n" if DEBUG;

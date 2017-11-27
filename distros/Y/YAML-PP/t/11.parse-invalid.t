@@ -24,23 +24,13 @@ my @dirs = YAML::PP::Test->get_tests(
 @dirs = sort @dirs;
 
 my @skip = qw/
-    CML9 C2SP
-    N782
-    RXY3
-    55WF
-    5TRB
+    4H7K
+    G9HC
 
-    i035
 
-    i031
+    9C9N
+
 /;
-
-# Invalid, but wrong test.event output
-push @skip, qw/
-    SU5Z
-    X4QW
-/;
-
 
 my @todo = ();
 
@@ -59,6 +49,20 @@ my %skip;
 @skip{ @skip } = ();
 my %todo;
 @todo{ @todo } = ();
+
+# in case of error events might not be exactly matching
+my %skip_events = (
+    Q4CL => 1,
+    JY7Z => 1,
+    '3HFZ' => 1,
+    X4QW => 1,
+    SU5Z => 1,
+    W9L4 => 1,
+    ZL4Z => 1,
+    '9KBC' => 1,
+    SY6V => 1,
+    C2SP => 1,
+);
 
 unless (@dirs) {
     ok(1);
@@ -143,7 +147,12 @@ sub test {
         ok(0, "$name - $title - should be invalid");
     }
     else {
-        $ok = is_deeply(\@events, $test_events, "$name - $title");
+        if ($skip_events{ $name }) {
+            $ok = ok(1, "$name - $title");
+        }
+        else {
+            $ok = is_deeply(\@events, $test_events, "$name - $title");
+        }
     }
     if ($ok) {
     }

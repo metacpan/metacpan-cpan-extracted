@@ -1,11 +1,3 @@
-2.026	Apr 26 2017
-
-	Fix testing problem with parallel testing.
-
-2.026	Apr 07 2017
-
-	Fix testing problem with perl 5.26.
-
 2.025	Mar 26 2014
 
 	Add --syntax and --lilypond options.

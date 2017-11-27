@@ -9,10 +9,10 @@ use Audio::Scan;
 # Monkey's Audio files with APEv2 tags
 {
     my $s = Audio::Scan->scan( _f('apev2.ape'), { md5_size => 10 * 1024 } );
-    
+
     my $info = $s->{info};
     my $tags = $s->{tags};
-    
+
     is( $info->{audio_offset}, 3, 'Audio offset ok' );
     is( $info->{audio_size}, 97256, 'Audio size ok' );
     is( $info->{audio_md5}, '7fb9a646ea9f653e650346b28b24a351', 'Audio MD5 ok' );
@@ -36,12 +36,12 @@ use Audio::Scan;
 # APEv1 tags
 {
     my $s = Audio::Scan->scan( _f('apev1.ape') );
-    
+
     my $info = $s->{info};
     my $tags = $s->{tags};
-    
+
     is( $info->{ape_version}, 'APEv1', 'APEv1 version ok' );
-    
+
     is( $tags->{GENRE}, "\xFF", 'APEv1 genre ok' );
     is( $tags->{YEAR}, "2004", 'APEv1 year ok' );
 }

@@ -13,7 +13,7 @@ no warnings qw( threads recursion uninitialized numeric once );
 
 package MCE::Shared::Server;
 
-our $VERSION = '1.832';
+our $VERSION = '1.833';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
@@ -65,7 +65,7 @@ BEGIN {
 sub _get_freeze { $_freeze; }
 sub _get_thaw   { $_thaw;   }
 
-use Time::HiRes qw( sleep time );
+use Time::HiRes qw( alarm sleep time );
 use Scalar::Util qw( blessed looks_like_number reftype weaken );
 use Socket qw( SOL_SOCKET SO_RCVBUF );
 
@@ -395,15 +395,15 @@ sub _stop {
          local $SIG{'ALRM'}; local $SIG{'INT'};
 
          $SIG{'INT'} = $SIG{'ALRM'} = sub {
-            alarm 0; sleep 0.015;
-            CORE::kill 'KILL', $_svr_pid;
-         };
+            alarm 0; CORE::kill 'USR2', $_svr_pid;
+         } unless $_is_MSWin32;
+
          eval {
             local $\ = undef if (defined $\);
             print {$_DAT_W_SOCK} SHR_M_STP.$LF.'0'.$LF;
          };
 
-         alarm 2 unless $_is_MSWin32;
+         alarm 0.2 unless $_is_MSWin32;
          waitpid $_svr_pid, 0;
 
          alarm 0 unless $_is_MSWin32;
@@ -522,6 +522,7 @@ sub _loop {
 
    $SIG{TERM} = $SIG{QUIT} = $SIG{INT} = $SIG{HUP} = sub {};
    $SIG{KILL} = \&_exit if !$_spawn_child;
+   $SIG{USR2} = \&_exit if !$_is_MSWin32;
 
    if ($_spawn_child && !$_is_MSWin32) {
       $SIG{PIPE} = sub {
@@ -742,15 +743,17 @@ sub _loop {
          if ($_class eq 'MCE::Shared::Queue') {
             MCE::Shared::Queue::_init_mgr(
                \$_DAU_R_SOCK, \%_obj, \%_output_function, $_freeze, $_thaw
-            );
-         } elsif (reftype $_obj{ $_item->[0] } eq 'GLOB') {
+            ) if $INC{'MCE/Shared/Queue.pm'};
+         }
+         elsif (reftype $_obj{ $_item->[0] } eq 'GLOB') {
             MCE::Shared::Handle::_init_mgr(
                \$_DAU_R_SOCK, \%_obj, \%_output_function, $_thaw
-            );
-         } elsif ($_class eq 'MCE::Shared::Condvar') {
+            ) if $INC{'MCE/Shared/Handle.pm'};
+         }
+         elsif ($_class eq 'MCE::Shared::Condvar') {
             MCE::Shared::Condvar::_init_mgr(
                \$_DAU_R_SOCK, \%_obj, \%_output_function
-            );
+            ) if $INC{'MCE/Shared/Condvar.pm'};
          }
 
          return;
@@ -977,6 +980,7 @@ sub _loop {
       },
 
       SHR_M_STP.$LF => sub {                      # Stop server
+         $SIG{USR2} = sub {} unless $_is_MSWin32;
          $_done = 1;
 
          return;
@@ -1427,6 +1431,8 @@ sub _get_hobo_data {
 # timedwait, and wait.
 
 sub _req1 {
+   return unless defined $_DAU_W_SOCK;  # (in cleanup)
+
    local $\ = undef if (defined $\);
    local $/ = $LF   if ($/ ne $LF );
 
@@ -1826,7 +1832,7 @@ MCE::Shared::Server - Server/Object packages for MCE::Shared
 
 =head1 VERSION
 
-This document describes MCE::Shared::Server version 1.832
+This document describes MCE::Shared::Server version 1.833
 
 =head1 DESCRIPTION
 

@@ -3,6 +3,8 @@ abstract: 'DBD::Firebird is a DBI driver for Firebird, written using Firebird C 
 author:
   - 'Edwin Pratomo (edpratomo@users.sourceforge.net)'
 build_requires:
+  File::Path: '0'
+  File::Temp: '0'
   Math::BigFloat: '1.55'
   Test::Deep: '0'
   Test::Exception: '0.31'
@@ -27,5 +29,5 @@ requires:
   perl: '5.008001'
 resources:
   repository: https://github.com/mariuz/perl-dbd-firebird
-version: '1.25'
+version: '1.26'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

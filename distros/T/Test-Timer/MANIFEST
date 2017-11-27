@@ -24,8 +24,3 @@ t/release-kwalitee.t
 t/release-meta-json.t
 t/test-tester.t
 t/time_alert.t
-t/time_atleast.t
-t/time_atmost.t
-t/time_between.t
-t/time_nok.t
-t/time_ok.t

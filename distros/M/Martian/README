@@ -1,0 +1,66 @@
+NAME
+
+    Martian
+
+VERSION
+
+    version 0.06
+
+SYNOPSIS
+
+    This is an extension of the Starman server that can be run via Starman
+    by specifying the server Martian. It allows the server to kill the
+    processes when they use too much memory. This is done between requests
+    so that the web server isn't interrupted. This is similar to the max
+    requests parameter.
+
+        starman phoenix-ui-admin.psgi --listen :5001 --server Martian --memory-limit 10000
+
+    The memory figure relates to the processes 'maximum shared memory or
+    current resident set' which shows up in top/htop as RES. The figure is
+    in KiB.
+
+NAME
+
+    Martian - A more constrained Starman
+
+VERSION
+
+    Version 0.06
+
+AUTHOR OpusVL, <support at opusvl.com>
+
+BUGS
+
+    Please report any bugs or feature requests to bug-martian at
+    rt.cpan.org, or through the web interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Martian. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Martian
+
+ACKNOWLEDGEMENTS
+
+LICENSE AND COPYRIGHT
+
+    Copyright 2014 OpusVL.
+
+    This software is licensed according to the "IP Assignment Schedule"
+    provided with the development project.
+
+AUTHOR
+
+    OpusVL - www.opusvl.com
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2017 by OpusVL - www.opusvl.com.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

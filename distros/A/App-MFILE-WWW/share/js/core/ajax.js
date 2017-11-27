@@ -74,12 +74,24 @@
 define ([
     'jquery',
     'cf',
+    'current-user',
+    'html',
     'lib',
 ], function (
     $,
     cf,
+    currentUser,
+    html,
     lib,
 ) {
+
+    var logout = function () {
+        currentUser('obj', null);
+        currentUser('priv', null);
+        appLib.fillUserBox();
+        $('#mainarea').html(html.logout());
+    }
+    ;
 
     return function (rest, sc, fc) {
         // console.log("Initiating AJAX call", mfao);
@@ -91,23 +103,32 @@ define ([
             'processData': false,
             'contentType': 'application/json'
         })
-        .done(function (data) {
+        .done(function (data, textStatus) {
+            console.log("REST API RESPONSE", data);
             if (data.level === 'OK') {
-                console.log("AJAX success", rest, data);
                 if (typeof sc === 'function') {
                     lib.clearResult();
                     sc(data);
                 } else {
                     lib.displayResult(data.text);
                 }
+                return;
             } else {
-                console.log("AJAX failure", rest, data);
                 if (typeof fc === 'function') {
+                    lib.clearResult();
                     fc(data);
                 } else {
                     lib.displayError(data.payload.message);
                 }
+                return;
             }
+            console.log("AJAX unexpected success response ->" + textStatus + "<- with data", data);
+            throw textStatus;
+        })
+        .fail(function (data, textStatus) {
+            console.log("AJAX failure", data);
+            lib.displayResult(textStatus);
+            logout();
         });
     };
 

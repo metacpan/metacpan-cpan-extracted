@@ -35,7 +35,7 @@
       },
       "runtime" : {
          "requires" : {
-            "AnyEvent" : "0",
+            "AnyEvent" : "7.14",
             "AnyEvent::HTTP" : "0",
             "HTTP::Tiny" : "0",
             "JSON" : "0",
@@ -58,5 +58,5 @@
          "url" : "https://github.com/hexfusion/perl-net-etcd.git"
       }
    },
-   "version" : "0.014"
+   "version" : "0.017"
 }

@@ -4,7 +4,7 @@ use warnings;
 use Exporter 'import';
 our @EXPORT_OK = qw(fa2hs);
 
-our $VERSION = '0.1.3'; # VERSION: 
+our $VERSION = '0.1.4'; # VERSION: 
 # ABSTRACT: get one or more sequences from a FASTA file quickly.
 
 
@@ -22,7 +22,7 @@ sub fa2hs {
   my (%hs, $name);
   while (my $line = <$file>) {
     chomp($line);
-    if ($line =~/^>(.+?)\s/) {
+    if ($line =~/^>(\S+)/) {
       $name = $1;
     } else {
       $hs{$name} .= $line;
@@ -82,7 +82,7 @@ Bio::SeqHash - get one or more sequences from a FASTA file quickly.
 
 =head1 VERSION
 
-version 0.1.3
+version 0.1.4
 
 =head1 SYNOPSIS
 

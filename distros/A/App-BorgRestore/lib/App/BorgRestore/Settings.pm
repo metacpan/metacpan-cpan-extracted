@@ -6,7 +6,6 @@ use warnings;
 use App::BorgRestore::Helper;
 
 use autodie;
-use File::Path qw(mkpath);
 use Sys::Hostname;
 
 =encoding utf-8
@@ -35,6 +34,10 @@ You can set the following options in the config file.
 
 Note that the configuration file is parsed as a perl script. Thus you can also
 use any features available in perl itself.
+
+Also note that it is important that the last statement of the file is positive
+because it is used to check that running the config went well. You can simply
+use "1;" on the last line as shown in the example config.
 
 =over
 
@@ -85,6 +88,8 @@ the disk too much.
  );
  $sqlite_cache_size = 2097152;
 
+1; #ensure positive return value
+
 =head1 LICENSE
 
 Copyright (C) 2016-2017  Florian Pritz E<lt>bluewind@xinu.atE<gt>
@@ -118,11 +123,13 @@ for my $configfile (@configfiles) {
 }
 $cache_path_base = App::BorgRestore::Helper::untaint($cache_path_base, qr/.*/);
 
-# ensure the cache directory exists
-mkpath(get_cache_dir(), {mode => oct(700)});
+sub get_cache_base_dir_path {
+	my $path = shift;
+	return "$cache_path_base/$path";
+}
 
 sub get_cache_dir {
-	return "$cache_path_base/v2";
+	return "$cache_path_base/v3";
 }
 
 sub get_cache_path {

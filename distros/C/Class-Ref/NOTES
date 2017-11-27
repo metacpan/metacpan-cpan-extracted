@@ -1,0 +1,14 @@
+* qr// (Regexp) values seem to disappear when blessed but "bless \qr/foo/ => CLASS" seems to hold on to it
+
+* good to know when creating references all over the place
+** be responsible
+Benchmark: running ARRAY, HASH, REF, SCALAR for at least 5 CPU seconds...
+     ARRAY:  5 wallclock secs ( 5.18 usr + -0.00 sys =  5.18 CPU) @ 5540631.66/s (n=28700472)
+      HASH:  6 wallclock secs ( 5.09 usr + -0.01 sys =  5.08 CPU) @ 5470429.92/s (n=27789784)
+       REF:  5 wallclock secs ( 5.59 usr +  0.01 sys =  5.60 CPU) @ 5952663.57/s (n=33334916)
+    SCALAR:  6 wallclock secs ( 5.04 usr +  0.00 sys =  5.04 CPU) @ 6246622.22/s (n=31482976)
+            Rate   HASH  ARRAY    REF SCALAR
+HASH   5470430/s     --    -1%    -8%   -12%
+ARRAY  5540632/s     1%     --    -7%   -11%
+REF    5952664/s     9%     7%     --    -5%
+SCALAR 6246622/s    14%    13%     5%     --

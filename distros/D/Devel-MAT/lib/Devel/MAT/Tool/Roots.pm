@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Devel::MAT::Tool );
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 use List::Util qw( pairs );
 
@@ -31,8 +31,8 @@ This C<Devel::MAT> tool displays a list of all the root SVs.
 =head2 roots
 
    pmat> roots
-   the *@ GV                           : GLOB($*) at 0x1381ed0
-   the ARGV GV                         : GLOB(@*I) at 0x139f618
+   the *@ GV                           : GLOB($*) at 0x1381ed0/errgv
+   the ARGV GV                         : GLOB(@*I) at 0x139f618/argvgv
    ...
 
 Prints a list of every root SV in the heap.
@@ -50,8 +50,7 @@ sub run
          my ( $name, $description ) = @$_;
          my $sv = $df->$name;
 
-         $name = Devel::MAT::Cmd->format_note( $name, 1 );
-         $sv ? [ "$description ($name)", Devel::MAT::Cmd->format_sv( $sv ) ]
+         $sv ? [ "$description", Devel::MAT::Cmd->format_sv( $sv ) ]
              : ()
       } pairs $df->root_descriptions ],
       sep => ": ",

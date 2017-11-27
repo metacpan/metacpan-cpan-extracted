@@ -1,5 +1,7 @@
 use strict;
 use warnings;
+use FindBin;
+use lib "$FindBin::Bin/../../";
 use t::scan::Util;
 
 test(<<'TEST'); # CHORNY/Win32API-File-0.1203/File.pm
@@ -102,6 +104,12 @@ test(<<'TEST'); # SPROUT/CSS-DOM-0.16/lib/CSS/DOM/PropertyParser.pm
     shift @args, shift @args;
     \@args
    } @$list ];
+TEST
+
+test(<<'TEST'); # MAKAROW/Tk-TM-0.53/lib/Tk/TM/DataObject.pm
+ foreach (my $i=@[; $i<=$colcount; $i++) {
+   push(@$colspecs, ['','Entry']);
+ }
 TEST
 
 done_testing;

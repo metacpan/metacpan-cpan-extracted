@@ -1,6 +1,20 @@
 CHANGES
 -------
 
+  2.076 21 Nov 2017
+
+      * Zlib.xs
+        Silence gcc compiler warnings when -Wsign-compare is enabled
+        #123688: Compilation warnings with clang
+
+      * zlib-src/inflate.c and zlib-src/infback.c
+        Silence gcc compiler warnings when -Wimplicit-fallthrough is enabled
+        #123358: Compilation warnings with gcc-7.*
+
+      * Makefile.PL
+        Windows uses -lzlib. Linux uses -lz
+        #123699: wrong external zlib name used on Windows
+
   2.075 14 Nov 2017
 
       * Update zlib-src directory to use zlib 1.2.11

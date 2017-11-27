@@ -1,6 +1,8 @@
 package Chloro::Test::CompoundDate;
 
 use Moose;
+use namespace::autoclean;
+
 use Chloro;
 
 use Chloro::Types qw( Str );
@@ -11,11 +13,11 @@ field date => (
     extractor => '_extract_date',
 );
 
+## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
 sub _extract_date {
     my $self   = shift;
     my $params = shift;
     my $prefix = shift;
-    my $field  = shift;
 
     my @keys = qw( year month day );
 
@@ -25,6 +27,7 @@ sub _extract_date {
 
     return ( join '-', @{$params}{@keys} ), ( 'year', 'month', 'day' );
 }
+## use critic
 
 __PACKAGE__->meta()->make_immutable;
 

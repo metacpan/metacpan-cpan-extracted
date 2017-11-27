@@ -8,19 +8,21 @@ use Test::More;
 use Test::Exception;
 use Data::Dumper;
 
-my ($host, $port);
+my $config;
 
 if ( $ENV{ETCD_TEST_HOST} and $ENV{ETCD_TEST_PORT}) {
-    $host = $ENV{ETCD_TEST_HOST};
-    $port = $ENV{ETCD_TEST_PORT};
-
+    $config->{host}     = $ENV{ETCD_TEST_HOST};
+    $config->{port}     = $ENV{ETCD_TEST_PORT};
+    $config->{cacert}   = $ENV{ETCD_TEST_CAPATH} if $ENV{ETCD_TEST_CAPATH};
+    $config->{name}     = 'root';
+    $config->{password} = 'toor';
     plan tests => 8;
 }
 else {
     plan skip_all => "Please set environment variable ETCD_TEST_HOST and ETCD_TEST_PORT.";
 }
 
-my $etcd = Net::Etcd->new( { host => $host, port => $port, name => 'root', password => 'toor' } );
+my $etcd = Net::Etcd->new( $config );
 
 my ($user, $role, $auth);
 
@@ -53,7 +55,7 @@ lives_ok(
 
 #print STDERR Dumper($role);
 
-cmp_ok( $role->{response}{success}, '==', 1, "grant role success" );
+cmp_ok( $role->is_success, '==', 1, "grant role success" );
 
 # enable auth
 lives_ok(
@@ -64,7 +66,7 @@ lives_ok(
     "enable auth"
 );
 
-cmp_ok( $auth->{response}{success}, '==', 1, "enable auth" );
+cmp_ok( $auth->is_success, '==', 1, "enable auth" );
 
 # disable auth
 lives_ok(
@@ -75,6 +77,6 @@ lives_ok(
     "disable auth"
 );
 
-cmp_ok( $auth->{response}{success}, '==', 1, "disable auth" );
+cmp_ok( $auth->is_success, '==', 1, "disable auth" );
 
 1;

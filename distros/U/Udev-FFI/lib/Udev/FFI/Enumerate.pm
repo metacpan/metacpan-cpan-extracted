@@ -3,7 +3,7 @@ package Udev::FFI::Enumerate;
 use strict;
 use warnings;
 
-use Udev::FFI::FFIFunctions;
+use Udev::FFI::Functions qw(:all);
 
 
 

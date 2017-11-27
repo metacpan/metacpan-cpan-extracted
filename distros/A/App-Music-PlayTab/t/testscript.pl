@@ -11,6 +11,7 @@ print "1..6\n";
 our $base;
 
 my $prefix = "";
+my $ext = $ENV{PLAYTABTEST_EXT} || "ps";
 
 if ( -d "t" ) {
     $prefix = "t/";
@@ -18,15 +19,14 @@ if ( -d "t" ) {
 
 { package PlayTab;
   use App::Music::PlayTab;
-  run( "-test",
-       "-output", "${prefix}${base}test.ps",
-       "-preamble", "${prefix}dummy.pre",
+  run( "--test",
+       "--output", "${prefix}test.$ext",
        "${prefix}${base}.ptb",
      );
 }
 
-my $ok = !differ ("${prefix}${base}test.ps", "${prefix}${base}.ps");
-unlink ("${prefix}test.ps") if $ok;
+my $ok = !differ ("${prefix}test.$ext", "${prefix}${base}.$ext");
+unlink ("${prefix}test.$ext") if $ok;
 print $ok ? "" : "not ", "ok 6\n";
 
 # Compare two text files, ignoring line endings.
@@ -45,3 +45,5 @@ sub differ {
     return 0 if $str1 eq $str2;
     1;
 }
+
+1;

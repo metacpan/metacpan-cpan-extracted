@@ -19,5 +19,5 @@ requires:
 resources:
   bugtracker: https://github.com/pplu/swagger-schema-perl/issues
   repository: https://github.com/pplu/swagger-schema-perl.git
-version: '1.01'
+version: '1.02'
 x_serialization_backend: 'YAML::Tiny version 1.70'

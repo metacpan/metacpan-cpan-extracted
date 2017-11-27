@@ -8,7 +8,7 @@ my $builder = Module::Build->new(
     dist_author       => 'Ivan Wills <ivan.wills@gmail.com>',
     dist_version_from => 'lib/WebService/SonarQube.pm',
     requires          => {
-        'perl'             => 5.008,
+        'perl'             => 5.010,
         'JSON'             => '2.00',
         'Moo'              => '1.006001',
         'Path::Tiny'       => 0,
@@ -20,8 +20,8 @@ my $builder = Module::Build->new(
         'namespace::clean' => '0.25',
     },
     build_requires => {
-        'Test::More'     => 0,
-        'Test::Warnings' => 0,
+        'Test::More'     => '0.88',
+        'Test::Warnings' => '0.026',
     },
     add_to_cleanup     => [ 'WebService-SonarQube-*' ],
     create_license     => 1,

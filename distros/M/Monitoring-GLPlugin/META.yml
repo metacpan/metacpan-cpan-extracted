@@ -21,4 +21,4 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/lausser/GLPlugin.git
-version: v2.4.14.1
+version: v2.4.14.6

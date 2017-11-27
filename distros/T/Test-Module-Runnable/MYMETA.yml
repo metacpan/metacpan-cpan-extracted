@@ -6,7 +6,10 @@ build_requires:
   List::MoreUtils: 0
   Moose: 0
   Readonly: 0
+  Test::Deep: 0
+  Test::Exception: 0
   Test::More: 0
+  Test::Output: 0
 configure_requires:
   ExtUtils::MakeMaker: 0
 distribution_type: module
@@ -23,5 +26,6 @@ no_index:
     - inc
 requires:
   Moose: 0
+  Test::MockModule: 0
   Test::More: 0
-version: 0.2.3
+version: 0.3.0

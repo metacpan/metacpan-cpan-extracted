@@ -1,0 +1,12 @@
+1.000 - First Release
+Joelle Maslak <jmaslak@antelope.net>
+ * Same as 0.101, but released as a regular release
+
+0.101 - Trial Version
+Joelle Maslak <jmaslak@antelope.net>
+ * Work-around broken Perl::Critic module
+
+0.100 - Initial Dev Version
+Joelle Maslak <jmaslak@antelope.net>
+ * Initial Version
+

@@ -63,7 +63,7 @@ http {
     ssl_protocols             TLSv1.3 TLSv1.2; # TLSv1 TLSv1.1
     ssl_prefer_server_ciphers on;
     ssl_ciphers               "EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH";
-    ssl_ecdh_curve            secp384r1;
+    ssl_ecdh_curve            auto; # secp384r1;
 
     ssl_stapling              on;
     ssl_stapling_verify       on;

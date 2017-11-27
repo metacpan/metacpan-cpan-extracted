@@ -6,20 +6,23 @@ use Carp;
 use Perl::PrereqScanner::NotQuiteLite::Context;
 use Perl::PrereqScanner::NotQuiteLite::Util;
 
-our $VERSION = '0.50';
+our $VERSION = '0.91';
 
 our @BUNDLED_PARSERS = qw/
-  Aliased Core Moose Plack POE Superclass
-  TestMore UniversalVersion
+  Aliased AnyMoose Autouse Catalyst ClassAccessor
+  ClassAutouse ClassLoad Core Inline Later Mixin ModuleRuntime
+  MojoBase Moose MooseXDeclare Only Plack POE Prefork
+  Superclass Syntax SyntaxCollector TestClassMost TestMore
+  TestRequires UniversalVersion Unless
 /;
 our @DEFAULT_PARSERS = qw/Core Moose/;
 
 ### Helpers For Debugging
 
-use constant DEBUG => $ENV{PERL_PSNQL_DEBUG} || 0;
+use constant DEBUG => !!$ENV{PERL_PSNQL_DEBUG} || 0;
 use constant DEBUG_RE => DEBUG > 3 ? 1 : 0;
 
-if (!!DEBUG) {
+if (DEBUG) {
   require Data::Dump; Data::Dump->import(qw/dump/);
   sub _debug { print @_, "\n" }
   sub _error { print @_, "*" x 50, "\n" }
@@ -38,51 +41,23 @@ sub _match_error {
 
 ### Global Variables To Be Sorted Out Later
 
-my %defined_keywords = _keywords();
-
 my %unsupported_packages = map {$_ => 1} qw(
-  MooseX::Declare
   Perl6::Attributes
-  Text::RewriteRules
-  Regexp::Grammars
-  tt
-  syntax
+);
+
+my %sub_keywords = (
+  'Function::Parameters' => [qw/fun method/],
+  'TryCatch' => [qw/try catch/],
+);
+
+my %filter_modules = (
+  tt => sub { ${$_[0]} =~ s|\G.+?no\s*tt\s*;||s; 0; },
+  'Text::RewriteRules' => sub { ${$_[0]} =~ s|RULES.+?ENDRULES\n||gs; 1 },
 );
 
 my %is_conditional = map {$_ => 1} qw(
   if elsif unless else given when
   for foreach while until
-);
-
-my %expects_expr_block = map {$_ => 1} qw(
-  if elsif unless given when
-  for foreach while until
-);
-
-my %expects_block_list = map {$_ => 1} qw(
-  map grep sort
-);
-
-my %expects_fh_list = map {$_ => 1} qw(
-  print printf say
-);
-
-my %expects_fh_or_block_list = (
-  %expects_block_list,
-  %expects_fh_list,
-);
-
-my %expects_block = map {$_ => 1} qw(
-  else default
-  eval sub do while until continue
-  BEGIN END INIT CHECK
-  if elsif unless given when
-  for foreach while until
-  map grep sort
-);
-
-my %expects_word = map {$_ => 1} qw(
-  use require no sub
 );
 
 my %ends_expr = map {$_ => 1} qw(
@@ -113,15 +88,15 @@ my $re_variable = qr/
   | (?:[_"\(\)<\\\&`'\+\-,.\/\%#:=~\|?!\@\*\[\]\^])
 /x;
 my $re_pod = qr/(
-  =[a-z]\w*\b
+  =[a-zA-Z]\w*\b
   .*?
   (?:(?:\n)
   =cut\b.*?(?:\n|\z)|\z)
 )/sx;
-my $re_comment = qr/(?:\s*#.*?\n)+/s;
+my $re_comment = qr/(?:\s*#[^\n]*?\n)*(?:\s*#[^\n]*?)(?:\n|$)/s;
 
 my $g_re_scalar_variable = qr{\G(\$(?:$re_variable))};
-my $g_re_hash_shortcut = qr{\G(\{\s*(?:\w+|(['"])[\w\s]+\2|(?:$re_nonblock_chars))\s*(?<!\$)\})};
+my $g_re_hash_shortcut = qr{\G(\{\s*(?:[\+\-]?\w+|(['"])[\w\s]+\2|(?:$re_nonblock_chars))\s*(?<!\$)\})};
 my $g_re_prototype = qr{\G(\([^\)]*?\))};
 
 my %ReStrInDelims;
@@ -181,8 +156,8 @@ sub new {
   my @parsers = $class->_get_parsers($args{parsers});
   for my $parser (@parsers) {
     if (!exists $LOADED{$parser}) {
-      eval "require $parser; 1" or die $@;
-      $LOADED{$parser} = $parser->can('register') ? $parser->register : undef;
+      eval "require $parser; 1" or die "Parser Error: $@";
+      $LOADED{$parser} = $parser->can('register') ? $parser->register(%args) : undef;
     }
     my $parser_mapping = $LOADED{$parser} or next;
     for my $type (qw/use no keyword method/) {
@@ -192,6 +167,17 @@ sub new {
           $parser,
           $parser_mapping->{$type}{$name},
           (($type eq 'use' or $type eq 'no') ? ($name) : ()),
+        ];
+      }
+    }
+    if ($parser->can('register_fqfn')) {
+      my $fqfn_mapping = $parser->register_fqfn;
+      for my $name (keys %$fqfn_mapping) {
+        my ($module) = $name =~ /^(.+)::/;
+        $mapping{keyword}{$name} = [
+          $parser,
+          $fqfn_mapping->{$name},
+          $module,
         ];
       }
     }
@@ -230,6 +216,7 @@ sub scan_file {
   my ($self, $file) = @_;
   open my $fh, '<', $file or croak "Can't open $file: $!";
   my $code = do { local $/; <$fh> };
+  $self->{file} = $file;
   $self->scan_string($code);
 }
 
@@ -239,6 +226,11 @@ sub scan_string {
   $string = '' unless defined $string;
 
   my $c = Perl::PrereqScanner::NotQuiteLite::Context->new(%$self);
+
+  if ($self->{quick}) {
+    $c->{file_size} = length $string;
+    $self->_skim_string($c, \$string) if $c->{file_size} > 30_000;
+  }
 
   # UTF8 BOM
   if ($string =~ s/\A(\xef\xbb\xbf)//s) {
@@ -274,20 +266,44 @@ sub scan_string {
   {
     local $@;
     eval { $self->_scan($c, \$string, 0) };
-    push @{$c->{errors}}, $@ if $@;
+    push @{$c->{errors}}, "Scan Error: $@" if $@;
     if ($c->{redo}) {
       delete $c->{redo};
       delete $c->{ended};
+      @{$c->{stack}} = ();
       redo;
     }
   }
+
+  if (@{$c->{stack}} and !$c->{quick}) {
+    require Data::Dump;
+    push @{$c->{errors}}, Data::Dump::dump($c->{stack});
+  }
+
   $c;
+}
+
+sub _skim_string {
+  my ($self, $c, $rstr) = @_;
+  my $pos = pos($$rstr) || 0;
+  my $last_found = 0;
+  my $saw_moose;
+  my $re = qr/\G.*?\b((?:use|require|no)\s+(?:[A-Za-z][A-Za-z0-9_]*::)*[A-Za-z][A-Za-z0-9_]*)/;
+  while(my ($match) = $$rstr =~ /$re/gc) {
+    $last_found = pos($$rstr) + length $match;
+    if (!$saw_moose and $match =~ /^use\s+(?:Mo(?:o|(?:[ou]se))?X?|MooseX::Declare)\b/) {
+      $re = qr/\G.*?\b((?:(?:use|require|no)\s+(?:[A-Za-z][A-Za-z0-9_]*::)*[A-Za-z][A-Za-z0-9_]*)|(?:(?:extends|with)\s+(?:["']|q[a-z]*[^a-zA-Z0-9_])(?:[A-Za-z][A-Za-z0-9_]*::)*[A-Za-z][A-Za-z0-9_]*))/;
+      $saw_moose = 1;
+    }
+  }
+  $c->{last_found_by_skimming} = $last_found;
+  pos($$rstr) = $pos;
 }
 
 sub _scan {
   my ($self, $c, $rstr, $parent_scope) = @_;
 
-  _dump_stack($c, "BEGIN SCOPE") if !!DEBUG;
+  _dump_stack($c, "BEGIN SCOPE") if DEBUG;
 
   # found __DATA|END__ somewhere?
   return $c if $c->{ended};
@@ -304,6 +320,7 @@ sub _scan {
   my $caller_package;
   my $prepend;
   my ($pos, $c1);
+  my $prev_pos = 0;
   while(defined($pos = pos($$rstr))) {
     $token = undef;
 
@@ -331,7 +348,7 @@ sub _scan {
       next;
     } elsif ($c1 eq '_') {
       my $c2 = substr($$rstr, $pos + 1, 1);
-      if ($c2 eq '_' and $$rstr =~ m/\G(__(?:DATA|END)__\b)/gc) {
+      if ($c2 eq '_' and $$rstr =~ m/\G(__(?:DATA|END)__\b)(?!\s*=>)/gc) {
         if ($wants_doc) {
           ($token, $token_desc, $token_type) = ($1, 'END_OF_CODE', '');
           next;
@@ -367,6 +384,13 @@ sub _scan {
         } elsif ($$rstr =~ m{\G(\$\#(?:$re_namespace))}gc) {
           ($token, $token_desc, $token_type) = ($1, '$#NAME', 'TERM');
           next;
+        } elsif ($prev_token_type eq 'ARROW') {
+          my $c3 = substr($$rstr, $pos + 2, 1);
+          if ($c3 eq '*') {
+            pos($$rstr) = $pos + 3;
+            ($token, $token_desc, $token_type) = ('$#*', 'VARIABLE', 'VARIABLE');
+            next;
+          }
         } else {
           pos($$rstr) = $pos + 2;
           ($token, $token_desc, $token_type) = ('$#', 'SPECIAL_VARIABLE', 'TERM');
@@ -384,7 +408,7 @@ sub _scan {
       } elsif ($c2 eq '{') {
         if ($$rstr =~ m{\G(\$\{[\w\s]+\})}gc) {
           ($token, $token_desc, $token_type) = ($1, '${NAME}', 'VARIABLE');
-          if ($prev_token_type eq 'KEYWORD' and $expects_fh_or_block_list{$prev_token}) {
+          if ($prev_token_type eq 'KEYWORD' and $c->token_expects_fh_or_block_list($prev_token)) {
             $token_type = '';
             next;
           }
@@ -431,6 +455,21 @@ sub _scan {
           ($token, $token_desc, $token_type) = ('@$', '@$', 'VARIABLE');
           next;
         }
+      } elsif ($prev_token_type eq 'ARROW') {
+        # postderef
+        if ($c2 eq '*') {
+          pos($$rstr) = $pos + 2;
+          ($token, $token_desc, $token_type) = ('@*', '@*', 'VARIABLE');
+          next;
+        } else {
+          pos($$rstr) = $pos + 1;
+          ($token, $token_desc, $token_type) = ('@', '@', 'VARIABLE');
+          next;
+        }
+      } elsif ($c2 eq '[') {
+        pos($$rstr) = $pos + 2;
+        ($token, $token_desc, $token_type) = ('@[', 'SPECIAL_VARIABLE', 'VARIABLE');
+        next;
       } elsif ($$rstr =~ m{\G(\@(?:$re_namespace))}gc) {
         ($token, $token_desc, $token_type) = ($1, '@NAME', 'VARIABLE');
         next;
@@ -467,6 +506,16 @@ sub _scan {
         pos($$rstr) = $pos + 1;
         ($token, $token_desc, $token_type) = ($c1, $c1, 'OP');
         next;
+      } elsif ($prev_token_type eq 'ARROW') {
+        if ($c2 eq '*') {
+          pos($$rstr) = $pos + 2;
+          ($token, $token_desc, $token_type) = ('%*', '%*', 'VARIABLE');
+          next;
+        } else {
+          pos($$rstr) = $pos + 1;
+          ($token, $token_desc, $token_type) = ('%', '%', 'VARIABLE');
+          next;
+        }
       } else {
         pos($$rstr) = $pos + 1;
         ($token, $token_desc, $token_type) = ($c1, $c1, 'VARIABLE');
@@ -477,7 +526,7 @@ sub _scan {
       if ($c2 eq '{') {
         if ($$rstr =~ m{\G(\*\{[\w\s]+\})}gc) {
           ($token, $token_desc, $token_type) = ($1, '*{NAME}', 'VARIABLE');
-          if ($prev_token eq 'KEYWORD' and $expects_fh_or_block_list{$prev_token}) {
+          if ($prev_token eq 'KEYWORD' and $c->token_expects_fh_or_block_list($prev_token)) {
             $token_type = '';
             next;
           }
@@ -494,6 +543,10 @@ sub _scan {
         if (substr($$rstr, $pos + 2, 1) eq '=') {
           pos($$rstr) = $pos + 3;
           ($token, $token_desc, $token_type) = ('**=', '**=', 'OP');
+          next;
+        } elsif ($prev_token_type eq 'ARROW') {
+          pos($$rstr) = $pos + 2;
+          ($token, $token_desc, $token_type) = ('**', '**', 'VARIABLE');
           next;
         } else {
           pos($$rstr) = $pos + 2;
@@ -540,6 +593,12 @@ sub _scan {
       } elsif ($$rstr =~ m{\G(\&\$(?:$re_namespace))}gc) {
         ($token, $token_desc, $token_type) = ($1, '&$NAME', 'TERM');
         next;
+      } elsif ($prev_token_type eq 'ARROW') {
+        if ($c2 eq '*') {
+          pos($$rstr) = $pos + 2;
+          ($token, $token_desc, $token_type) = ('&*', '&*', 'VARIABLE');
+          next;
+        }
       } else {
         pos($$rstr) = $pos + 1;
         ($token, $token_desc, $token_type) = ($c1, $c1, 'OP');
@@ -612,7 +671,7 @@ sub _scan {
           next;
         } else {
           # the above may fail
-          _debug("REGEXP ERROR: $@") if !!DEBUG;
+          _debug("REGEXP ERROR: $@") if DEBUG;
           pos($$rstr) = $pos;
         }
       }
@@ -622,7 +681,7 @@ sub _scan {
           next;
         } else { 
           # the above may fail
-          _debug("REGEXP ERROR: $@") if !!DEBUG;
+          _debug("REGEXP ERROR: $@") if DEBUG;
           pos($$rstr) = $pos;
         }
       }
@@ -659,8 +718,17 @@ sub _scan {
           next;
         } elsif ($waiting_for_a_block) {
           $waiting_for_a_block = 0;
+          if (@keywords and $c->token_expects_block($keywords[0])) {
+            my $first_token = $keywords[0];
+            $current_scope |= F_EXPR_END;
+            if ($c->token_defines_sub($first_token) and $c->has_callback_for(sub => $first_token)) {
+              $c->run_callback_for(sub => $first_token, \@tokens);
+              $current_scope &= MASK_KEEP_TOKENS;
+              @tokens = ();
+            }
+          }
           next;
-        } elsif ($prev_token_type eq 'KEYWORD' and exists $expects_fh_or_block_list{$prev_token}) {
+        } elsif ($prev_token_type eq 'KEYWORD' and $c->token_expects_fh_or_block_list($prev_token)) {
           $token_type = '';
           next;
         } else {
@@ -674,8 +742,13 @@ sub _scan {
       if (@keywords) {
         for(my $i = @keywords; $i > 0; $i--) {
           my $keyword = $keywords[$i - 1];
-          if (exists $expects_block{$keyword}) {
+          if ($c->token_expects_block($keyword)) {
             $stack_owner = $keyword;
+            if (@tokens and $c->token_defines_sub($keyword) and $c->has_callback_for(sub => $keyword)) {
+              $c->run_callback_for(sub => $keyword, \@tokens);
+              $current_scope &= MASK_KEEP_TOKENS;
+              @tokens = ();
+            }
             last;
           }
         }
@@ -704,12 +777,13 @@ sub _scan {
         next;
       }
     } elsif ($c1 eq '(') {
-      if ($waiting_for_a_block and @keywords and $keywords[-1] eq 'sub' and $$rstr =~ m{$g_re_prototype}gc) {
+      my $prototype_re = $c->prototype_re;
+      if ($waiting_for_a_block and @keywords and $c->token_defines_sub($keywords[-1]) and $$rstr =~ m{$prototype_re}gc) {
         ($token, $token_desc, $token_type) = ($1, '(PROTOTYPE)', '');
         next;
       } elsif ($$rstr =~ m{\G\(((?:$re_nonblock_chars)(?<!\$))\)}gc) {
         ($token, $token_desc, $token_type) = ([[[$1, 'TERM']]], '()', 'TERM');
-        if ($prev_token_type eq 'KEYWORD' and @keywords and $keywords[-1] eq $prev_token and !exists $expects_expr_block{$prev_token}) {
+        if ($prev_token_type eq 'KEYWORD' and @keywords and $keywords[-1] eq $prev_token and !$c->token_expects_expr_block($prev_token)) {
           pop @keywords;
         }
         next;
@@ -720,7 +794,7 @@ sub _scan {
         if (@keywords) {
           for (my $i = @keywords; $i > 0; $i--) {
             my $keyword = $keywords[$i - 1];
-            if (exists $expects_block{$keyword}) {
+            if ($c->token_expects_block($keyword)) {
               $stack_owner = $keyword;
               last;
             }
@@ -810,7 +884,7 @@ sub _scan {
         ($token, $token_desc, $token_type) = ('::', '::', '');
         next;
       }
-      if ($waiting_for_a_block and @keywords and $keywords[-1] eq 'sub') {
+      if ($waiting_for_a_block and @keywords and $c->token_defines_sub($keywords[-1])) {
         while($$rstr =~ m{\G(:?[\w\s]+)}gcs) {
           my $startpos = pos($$rstr);
           if (substr($$rstr, $startpos, 1) eq '(') {
@@ -1037,7 +1111,7 @@ sub _scan {
       next;
     }
 
-    if ($prev_token_type ne 'ARROW' and ($prev_token_type ne 'KEYWORD' or !exists $expects_word{$prev_token})) {
+    if ($prev_token_type ne 'ARROW' and ($prev_token_type ne 'KEYWORD' or !$c->token_expects_word($prev_token))) {
       if ($prev_token_type eq 'TERM' or $prev_token_type eq 'VARIABLE') {
         if ($c1 eq 'x') {
           if ($$rstr =~ m{\G(x\b(?!\s*=>))}gc){
@@ -1048,12 +1122,13 @@ sub _scan {
       }
 
       if ($c1 eq 'q') {
-        if ($$rstr =~ m{\G((?:qq?)\b(?!\s*=>))}gc) {
+        my $quotelike_re = $c->quotelike_re;
+        if ($$rstr =~ m{\G((?:$quotelike_re)\b(?!\s*=>))}gc) {
           if (my $quotelike = $self->_match_quotelike($c, $rstr, $1)) {
             ($token, $token_desc, $token_type) = ($quotelike, 'STRING', 'STRING');
             next;
           } else {
-            _debug("QUOTELIKE ERROR: $@") if !!DEBUG;
+            _debug("QUOTELIKE ERROR: $@") if DEBUG;
             pos($$rstr) = $pos;
           }
         } elsif ($$rstr =~ m{\G((?:qw)\b(?!\s*=>))}gc) {
@@ -1061,7 +1136,7 @@ sub _scan {
             ($token, $token_desc, $token_type) = ($quotelike, 'QUOTED_WORD_LIST', 'TERM');
             next;
           } else {
-            _debug("QUOTELIKE ERROR: $@") if !!DEBUG;
+            _debug("QUOTELIKE ERROR: $@") if DEBUG;
             pos($$rstr) = $pos;
           }
         } elsif ($$rstr =~ m{\G((?:qx)\b(?!\s*=>))}gc) {
@@ -1069,7 +1144,7 @@ sub _scan {
             ($token, $token_desc, $token_type) = ($quotelike, 'BACKTICK', 'TERM');
             next;
           } else {
-            _debug("QUOTELIKE ERROR: $@") if !!DEBUG;
+            _debug("QUOTELIKE ERROR: $@") if DEBUG;
             pos($$rstr) = $pos;
           }
         } elsif ($$rstr =~ m{\G(qr\b(?!\s*=>))}gc) {
@@ -1077,7 +1152,7 @@ sub _scan {
             ($token, $token_desc, $token_type) = ($regexp, 'qr', 'TERM');
             next;
           } else {
-            _debug("QUOTELIKE ERROR: $@") if !!DEBUG;
+            _debug("QUOTELIKE ERROR: $@") if DEBUG;
             pos($$rstr) = $pos;
           }
         }
@@ -1087,7 +1162,7 @@ sub _scan {
             ($token, $token_desc, $token_type) = ($regexp, 'm', 'TERM');
             next;
           } else {
-            _debug("REGEXP ERROR: $@") if !!DEBUG;
+            _debug("REGEXP ERROR: $@") if DEBUG;
             pos($$rstr) = $pos;
           }
         }
@@ -1097,7 +1172,7 @@ sub _scan {
             ($token, $token_desc, $token_type) = ($regexp, 's', 'TERM');
             next;
           } else {
-            _debug("SUBSTITUTE ERROR: $@") if !!DEBUG;
+            _debug("SUBSTITUTE ERROR: $@") if DEBUG;
             pos($$rstr) = $pos;
           }
         }
@@ -1107,7 +1182,7 @@ sub _scan {
             ($token, $token_desc, $token_type) = ($trans, 'tr', 'TERM');
             next;
           } else {
-            _debug("TRANSLITERATE ERROR: $@") if !!DEBUG;
+            _debug("TRANSLITERATE ERROR: $@") if DEBUG;
             pos($$rstr) = $pos;
           }
         }
@@ -1117,7 +1192,7 @@ sub _scan {
             ($token, $token_desc, $token_type) = ($trans, 'y', 'TERM');
             next;
           } else {
-            _debug("TRANSLITERATE ERROR: $@") if !!DEBUG;
+            _debug("TRANSLITERATE ERROR: $@") if DEBUG;
             pos($$rstr) = $pos;
           }
         }
@@ -1132,13 +1207,13 @@ sub _scan {
       } elsif ($token eq 'CORE') {
         ($token_desc, $token_type) = ('NAMESPACE', 'WORD');
       } elsif ($token eq 'format') {
-        if ($$rstr =~ m{\G(.*?\n.*?\n\.\n)}gcs) {
+        if ($$rstr =~ m{\G([^=]*?=[ \t]*\n.*?\n\.\n)}gcs) {
           $token .= $1;
           ($token_desc, $token_type) = ('FORMAT', '');
           $current_scope |= F_SENTENCE_END|F_EXPR_END;
           next;
         }
-      } elsif (exists $defined_keywords{$token} and ($prev_token_type ne 'KEYWORD' or !$expects_word{$prev_token})) {
+      } elsif ($c->token_is_keyword($token) and ($prev_token_type ne 'KEYWORD' or !$c->token_expects_word($prev_token) or ($prev_token eq 'sub' and $token eq 'BEGIN'))) {
         ($token_desc, $token_type) = ('KEYWORD', 'KEYWORD');
         push @keywords, $token unless $token eq 'undef';
       } else {
@@ -1178,7 +1253,7 @@ sub _scan {
         _error("UNICODE?: $1");
         push @{$c->{errors}}, qq{"$1"};
       } else {
-        _debug("UTF8: $1") if !!DEBUG;
+        _debug("UTF8: $1") if DEBUG;
       }
       $token = $1;
       next;
@@ -1192,18 +1267,21 @@ sub _scan {
 
     last;
   } continue {
+    die "Aborted at $prev_pos" if $prev_pos == pos($$rstr);
+    $prev_pos = pos($$rstr);
+
     if (defined $token) {
       if (!($current_scope & F_EXPR)) {
-        _debug('BEGIN EXPR') if !!DEBUG;
+        _debug('BEGIN EXPR') if DEBUG;
         $current_scope |= F_EXPR;
-      } elsif (($current_scope & F_EXPR) and (($current_scope & F_EXPR_END) or $ends_expr{$token})) {
+      } elsif (($current_scope & F_EXPR) and (($current_scope & F_EXPR_END) or ($ends_expr{$token} and $token_type eq 'KEYWORD' and $prev_token ne ',' and $prev_token ne '=>'))) {
         @keywords = ();
-        _debug('END EXPR') if !!DEBUG;
+        _debug('END EXPR') if DEBUG;
         $current_scope &= MASK_EXPR_END;
       }
       $prepend = undef;
 
-      if (!!DEBUG) {
+      if (DEBUG) {
         my $token_str = ref $token ? Data::Dump::dump($token) : $token;
         _debug("GOT: $token_str ($pos) TYPE: $token_desc ($token_type)".($prev_token_type ? " PREV: $prev_token_type" : '').(@keywords ? " KEYWORD: @keywords" : '').(($current_scope | $parent_scope) & F_EVAL ? ' EVAL' : '').(($current_scope | $parent_scope) & F_KEEP_TOKENS ? ' KEEP' : ''));
       }
@@ -1214,14 +1292,31 @@ sub _scan {
           $prepend = $token;
         }
       }
-      if (!($current_scope & F_KEEP_TOKENS) and (exists $c->{callback}{$token} or exists $c->{keyword}{$token}) and $token_type ne 'METHOD') {
+      if (!($current_scope & F_KEEP_TOKENS) and (exists $c->{callback}{$token} or exists $c->{keyword}{$token} or exists $c->{sub}{$token}) and $token_type ne 'METHOD' and !$c->token_expects_word($prev_token)) {
         $current_scope |= F_KEEP_TOKENS;
       }
-      if (exists $expects_block{$token}) {
+      if ($c->token_expects_block($token)) {
         $waiting_for_a_block = 1;
       }
-      if ($current_scope & F_EVAL) {
+      if ($current_scope & F_EVAL or ($parent_scope & F_EVAL and (!@{$c->{stack}} or $c->{stack}[-1][0] ne '{'))) {
         if ($token_type eq 'STRING') {
+          if ($token->[0] =~ /\b(?:(?:use|no)\s+[A-Za-z]|require\s+(?:q[qw]?.|['"])?[A-Za-z])/) {
+            my $eval_string = $token->[0];
+            if (defined $eval_string and $eval_string ne '') {
+              $eval_string =~ s/\\(.)/$1/g;
+              pos($eval_string) = 0;
+              $c->{eval} = 1;
+              my $saved_stack = $c->{stack};
+              $c->{stack} = [];
+              eval { $self->_scan($c, \$eval_string, (
+                ($current_scope | $parent_scope | F_STRING_EVAL) &
+                F_RESCAN
+              ))};
+              $c->{stack} = $saved_stack;
+            }
+          }
+          $current_scope &= MASK_EVAL;
+        } elsif ($token_desc eq 'HEREDOC') {
           if ($token->[0] =~ /\b(?:use|require|no)\s+[A-Za-z]/) {
             my $eval_string = $token->[0];
             if (defined $eval_string and $eval_string ne '') {
@@ -1237,6 +1332,8 @@ sub _scan {
               $c->{stack} = $saved_stack;
             }
           }
+          $current_scope &= MASK_EVAL;
+        } elsif ($token_type eq 'VARIABLE') {
           $current_scope &= MASK_EVAL;
         }
         $c->{eval} = ($current_scope | $parent_scope) & F_EVAL ? 1 : 0;
@@ -1257,7 +1354,7 @@ sub _scan {
       }
       if ($stack) {
         push @{$c->{stack}}, $stack;
-        _dump_stack($c, $stack->[0]) if !!DEBUG;
+        _dump_stack($c, $stack->[0]) if DEBUG;
         my $child_scope = $current_scope | $parent_scope;
         if ($token eq '{' and $is_conditional{$stack->[2]}) {
           $child_scope |= F_CONDITIONAL
@@ -1265,6 +1362,10 @@ sub _scan {
         my $scanned_tokens = $self->_scan($c, $rstr, (
           $child_scope & F_RESCAN
         ));
+        if ($token eq '{' and $current_scope & F_EVAL) {
+          $current_scope &= MASK_EVAL;
+          $c->{eval} = ($current_scope | $parent_scope) & F_EVAL ? 1 : 0;
+        }
         if ($current_scope & F_KEEP_TOKENS) {
           my $start = pop @tokens || '';
           my $end = pop @$scanned_tokens || '';
@@ -1275,12 +1376,12 @@ sub _scan {
           push @scope_tokens, [$scanned_tokens, "$start->[0]$end->[0]"];
         }
 
-        if ($stack->[0] eq '(' and $prev_token_type eq 'KEYWORD' and @keywords and $keywords[-1] eq $prev_token and !exists $expects_expr_block{$prev_token}) {
+        if ($stack->[0] eq '(' and $prev_token_type eq 'KEYWORD' and @keywords and $keywords[-1] eq $prev_token and !$c->token_expects_expr_block($prev_token)) {
           pop @keywords;
         }
 
-        if ($stack->[0] eq '{' and @keywords and exists $expects_block{$keywords[0]} and !exists $expects_block_list{$keywords[-1]}) {
-          $current_scope |= F_SENTENCE_END unless @tokens and ($keywords[-1] eq 'sub' or $keywords[-1] eq 'eval');
+        if ($stack->[0] eq '{' and @keywords and $c->token_expects_block($keywords[0]) and !$c->token_expects_block_list($keywords[-1])) {
+          $current_scope |= F_SENTENCE_END unless @tokens and ($c->token_defines_sub($keywords[-1]) or $keywords[-1] eq 'eval');
         }
         $stack = undef;
       }
@@ -1296,7 +1397,7 @@ sub _scan {
           die "mismatch $stacked_type $unstack\n" .
               substr($$rstr, $prev_pos, pos($$rstr) - $prev_pos);
         }
-        _dump_stack($c, $unstack) if !!DEBUG;
+        _dump_stack($c, $unstack) if DEBUG;
         $current_scope |= F_SCOPE_END;
         $unstack = undef;
       }
@@ -1306,16 +1407,29 @@ sub _scan {
           my $first_token = $tokens[0][0];
           if ($first_token eq '->') {
             $first_token = $tokens[1][0];
+            # ignore ->use and ->no
+            # ->require may be from UNIVERSAL::require
+            if ($first_token eq 'use' or $first_token eq 'no') {
+              $first_token = '';
+            }
           }
           my $cond = (($current_scope | $parent_scope) & (F_CONDITIONAL|F_SIDEFF)) ? 1 : 0;
           if (exists $c->{callback}{$first_token}) {
             $c->{current_scope} = \$current_scope;
             $c->{cond} = $cond;
             $c->{callback}{$first_token}->($c, $rstr, \@tokens);
+
+            if ($c->{found_unsupported_package} and !$c->{quick}) {
+              my $unsupported = $c->{found_unsupported_package};
+              $c->{quick} = 1;
+              $self->_skim_string($c, $rstr);
+              warn "Unsupported package '$unsupported' is found. Result may be incorrect.\n";
+            }
           }
           if (exists $c->{keyword}{$first_token}) {
             $c->{current_scope} = \$current_scope;
             $c->{cond} = $cond;
+            $tokens[0][1] = 'KEYWORD';
             $c->run_callback_for(keyword => $first_token, \@tokens);
           }
           if (exists $c->{method}{$first_token} and $caller_package) {
@@ -1324,17 +1438,46 @@ sub _scan {
             $c->{cond} = $cond;
             $c->run_callback_for(method => $first_token, \@tokens);
           }
+          if ($current_scope & F_SIDEFF) {
+            $current_scope &= MASK_SIDEFF;
+            while(my $token = shift @tokens) {
+              last if $has_sideff{$token->[0]};
+            }
+            $current_scope &= F_SIDEFF if grep {$has_sideff{$_->[0]}} @tokens;
+            if (@tokens) {
+              $first_token = $tokens[0][0];
+              $cond = (($current_scope | $parent_scope) & (F_CONDITIONAL|F_SIDEFF)) ? 1 : 0;
+              if (exists $c->{callback}{$first_token}) {
+                $c->{current_scope} = \$current_scope;
+                $c->{cond} = $cond;
+                $c->{callback}{$first_token}->($c, $rstr, \@tokens);
+              }
+              if (exists $c->{keyword}{$first_token}) {
+                $c->{current_scope} = \$current_scope;
+                $c->{cond} = $cond;
+                $tokens[0][1] = 'KEYWORD';
+                $c->run_callback_for(keyword => $first_token, \@tokens);
+              }
+              if (exists $c->{method}{$first_token} and $caller_package) {
+                unshift @tokens, [$caller_package, 'WORD'];
+                $c->{current_scope} = \$current_scope;
+                $c->{cond} = $cond;
+                $c->run_callback_for(method => $first_token, \@tokens);
+              }
+            }
+          }
         }
         @tokens = ();
         @keywords = ();
         $current_scope &= MASK_SENTENCE_END;
         $caller_package = undef;
         $token = $token_type = '';
-        _debug('END SENTENSE') if !!DEBUG;
+        _debug('END SENTENSE') if DEBUG;
       }
 
       last if $current_scope & F_SCOPE_END;
       last if $c->{ended};
+      last if $c->{last_found_by_skimming} and $c->{last_found_by_skimming} < pos($$rstr);
 
       ($prev_token, $prev_token_type) = ($token, $token_type);
     }
@@ -1352,12 +1495,13 @@ sub _scan {
         $c->{callback}{$first_token}->($c, $rstr, \@tokens);
       }
       if (exists $c->{keyword}{$first_token}) {
+        $tokens[0][1] = 'KEYWORD';
         $c->run_callback_for(keyword => $first_token, \@tokens);
       }
     }
   }
 
-  _dump_stack($c, "END SCOPE") if !!DEBUG;
+  _dump_stack($c, "END SCOPE") if DEBUG;
 
   \@scope_tokens;
 }
@@ -1555,10 +1699,15 @@ sub _match_heredoc {
   unless ($$rstr =~ m{\G.*?\n(?=\Q$label\E\n)}gcs) {
     return _match_error($rstr, qq{Missing here doc terminator ('$label')});
   }
+  my $ldpos = pos($$rstr);
   $$rstr =~ m{\G\Q$label\E\n}gc;
   my $ld2pos = pos($$rstr);
 
-  my $heredoc = substr($$rstr, $startpos, $extrapos-$startpos)."\n".substr($$rstr, $str1pos, $ld2pos-$str1pos);
+  my $heredoc = [
+    substr($$rstr, $str1pos, $ldpos-$str1pos),
+    substr($$rstr, $startpos, $extrapos-$startpos),
+    substr($$rstr, $ldpos, $ld2pos-$ldpos),
+  ];
   substr($$rstr, $str1pos, $ld2pos - $str1pos) = '';
   pos($$rstr) = $extrapos;
   return $heredoc;
@@ -1568,7 +1717,7 @@ sub _scan_re {
   my ($self, $c, $rstr, $ldel, $rdel, $op) = @_;
   my $startpos = pos($$rstr) || 0;
 
-  _debug(" L $ldel R $rdel") if !!DEBUG_RE;
+  _debug(" L $ldel R $rdel") if DEBUG_RE;
 
   my ($outer_opening_delimiter, $outer_closing_delimiter);
   if (@{$c->{stack}}) {
@@ -1586,42 +1735,42 @@ sub _scan_re {
       $$rstr =~ m{\G\n\s*}gcs;
       $multiline = 1;
       $saw_sharp = 0;
-      # _debug("CRLF") if !!DEBUG_RE;
+      # _debug("CRLF") if DEBUG_RE;
       next;
     }
     if ($c1 eq ' ' or $c1 eq "\t") {
       $$rstr =~ m{\G\s*}gc;
-      # _debug("WHITESPACE") if !!DEBUG_RE;
+      # _debug("WHITESPACE") if DEBUG_RE;
       next;
     }
     if ($c1 eq '#' and $rdel ne '#') {
       if ($multiline and $$rstr =~ m{\G(#[^\Q$rdel\E]*?)\n}gcs) {
-        _debug(" comment $1") if !!DEBUG_RE
+        _debug(" comment $1") if DEBUG_RE
       } else {
         pos($$rstr) = $p + 1;
         $saw_sharp = 1;
-        _debug(" saw #") if !!DEBUG_RE;
+        _debug(" saw #") if DEBUG_RE;
       }
       next;
     }
 
     if ($c1 eq '\\' and $rdel ne '\\') {
       if ($$rstr =~ m/\G(\\.)/gcs) {
-        _debug(" escaped $1") if !!DEBUG_RE;
+        _debug(" escaped $1") if DEBUG_RE;
         next;
       }
     }
 
-    _debug(" looking @nesting: $c1") if !!DEBUG_RE;
+    _debug(" looking @nesting: $c1") if DEBUG_RE;
 
     if ($c1 eq '[') {
       # character class may have other (ignorable) delimiters
       if ($$rstr =~ m/\G(\[\[:\w+?:\]\])/gcs) {
-        _debug(" character class $1") if !!DEBUG_RE;
+        _debug(" character class $1") if DEBUG_RE;
         next;
       }
-      if ($$rstr =~ m/\G(\[[^\\\]]]*(\\.[^\\\]]]*)*\])/gcs) {
-        _debug(" character class: $1") if !!DEBUG_RE;
+      if ($$rstr =~ m/\G(\[[^\\\]]]*?(\\.[^\\\]]]*)*\])/gcs) {
+        _debug(" character class: $1") if DEBUG_RE;
         next;
       }
     }
@@ -1631,17 +1780,17 @@ sub _scan_re {
       if ($saw_sharp) {
         my $tmp_pos = $p + 1;
         if ($op eq 's') {
-          _debug(" looking for latter part") if !!DEBUG_RE;
+          _debug(" looking for latter part") if DEBUG_RE;
           my $latter = $self->_scan_re2($c, $rstr, $ldel, $op);
           if (!defined $latter) {
             pos($$rstr) = $tmp_pos;
             next;
           }
-          _debug(" latter: $latter") if !!DEBUG_RE;
+          _debug(" latter: $latter") if DEBUG_RE;
         }
         if ($$rstr =~ m/\G[a-wyz]*x/) {
           # looks like an end of block
-          _debug(" end of block $rdel (after #)") if !!DEBUG_RE;
+          _debug(" end of block $rdel (after #)") if DEBUG_RE;
           @nesting = ();
           pos($$rstr) = $tmp_pos;
           last;
@@ -1651,8 +1800,11 @@ sub _scan_re {
           next; # part of a comment
         }
       }
-      _debug(" end of block $rdel") if !!DEBUG_RE;
-      (my $expected = $rdel) =~ tr/)}]>/({[</;
+      _debug(" end of block $rdel") if DEBUG_RE;
+      my $expected = $rdel;
+      if ($ldel ne $rdel) {
+        $expected =~ tr/)}]>/({[</;
+      }
       while(my $nested = pop @nesting) {
         last if $nested eq $expected;
       }
@@ -1662,7 +1814,7 @@ sub _scan_re {
       pos($$rstr) = $p + 1;
       if ($multiline and $saw_sharp) {
       } else {
-        _debug(" block $ldel") if !!DEBUG_RE;
+        _debug(" block $ldel") if DEBUG_RE;
         push @nesting, $ldel;
         next;
       }
@@ -1671,7 +1823,7 @@ sub _scan_re {
     if ($c1 eq '{') {
       # quantifier shouldn't be nested
       if ($$rstr =~ m/\G({[0-9]+(?:,(?:[0-9]+)?)?})/gcs) {
-        _debug(" quantifier $1") if !!DEBUG_RE;
+        _debug(" quantifier $1") if DEBUG_RE;
         next;
       }
     }
@@ -1681,24 +1833,24 @@ sub _scan_re {
       if ($c2 eq '?' and !($multiline and $saw_sharp)) {
         # code
         if ($$rstr =~ m/\G((\()\?+?)(?=\{)/gc) {
-          _debug(" code $1") if !!DEBUG_RE;
+          _debug(" code $1") if DEBUG_RE;
           push @nesting, $2;
           unless (eval { $self->_scan($c, $rstr, F_EXPECTS_BRACKET); 1 }) {
-            _debug("scan failed") if !!DEBUG_RE;
+            _debug("scan failed") if DEBUG_RE;
             return;
           }
           next;
         }
         # comment
         if ($$rstr =~ m{\G(\(\?\#[^\\\)]*(?:\\.[^\\\)]*)*\))}gcs) {
-          _debug(" comment $1") if !!DEBUG_RE;
+          _debug(" comment $1") if DEBUG_RE;
           next;
         }
       }
 
       # grouping may have (ignorable) <>
       if ($$rstr =~ m/\G((\()(?:<[!=]|<\w+?>|>)?)/gc) {
-        _debug(" group $1") if !!DEBUG_RE;
+        _debug(" group $1") if DEBUG_RE;
         push @nesting, $2;
         next;
       }
@@ -1714,7 +1866,7 @@ sub _scan_re {
 
     if ($c1 eq ')') {
       if (@nesting and $nesting[-1] eq '(') {
-        _debug(" end of group $c1") if !!DEBUG_RE;
+        _debug(" end of group $c1") if DEBUG_RE;
         pop @nesting;
         pos($$rstr) = $p + 1;
         next;
@@ -1743,7 +1895,7 @@ sub _scan_re {
     }
 
     if ($$rstr =~ m/\G(\w+|.)/gcs) {
-      _debug(" rest $1") if !!DEBUG_RE;
+      _debug(" rest $1") if DEBUG_RE;
       next;
     }
     last;
@@ -1808,7 +1960,7 @@ sub _scan_re2 {
 
 sub _use {
   my ($c, $rstr, $tokens) = @_;
-_debug("USE TOKENS: ".(Data::Dump::dump($tokens))) if !!DEBUG;
+_debug("USE TOKENS: ".(Data::Dump::dump($tokens))) if DEBUG;
   shift @$tokens; # discard 'use' itself
 
   # TODO: see if the token is WORD or not?
@@ -1833,12 +1985,12 @@ _debug("USE TOKENS: ".(Data::Dump::dump($tokens))) if !!DEBUG;
       return;
     }
   }
-  if ($name eq 'utf8') {
+  if ($c->enables_utf8($name)) {
     $c->add($name => 0);
     $c->{utf8} = 1;
     if (!$c->{decoded}) {
       $c->{decoded} = 1;
-      _debug("UTF8 IS ON") if !!DEBUG;
+      _debug("UTF8 IS ON") if DEBUG;
       utf8::decode($$rstr);
       pos($$rstr) = 0;
       $c->{ended} = $c->{redo} = 1;
@@ -1854,37 +2006,61 @@ _debug("USE TOKENS: ".(Data::Dump::dump($tokens))) if !!DEBUG;
     } else {
       $c->add($name => 0);
     }
+
+    if (exists $sub_keywords{$name}) {
+      $c->register_sub_keywords(@{$sub_keywords{$name}});
+      $c->prototype_re(qr{\G(\((?:[^\\\(\)]*(?:\\.[^\\\(\)]*)*)\))});
+    }
+    if (exists $filter_modules{$name}) {
+      my $tmp = pos($$rstr);
+      my $redo = $filter_modules{$name}->($rstr);
+      pos($$rstr) = $tmp;
+      $c->{ended} = $c->{redo} = 1 if $redo;
+    }
   }
 
   if ($c->has_callback_for(use => $name)) {
     eval { $c->run_callback_for(use => $name, $tokens) };
-    warn $@ if $@;
+    warn "Callback Error: $@" if $@;
+  } elsif ($name =~ /\b(?:Mo[ou]se?X?|MooX?|Elk|Antlers|Role)\b/) {
+    my $module = $name =~ /Role/ ? 'Moose::Role' : 'Moose';
+    if ($c->has_callback_for(use => $module)) {
+      eval { $c->run_callback_for(use => $module, $tokens) };
+      warn "Callback Error: $@" if $@;
+    }
   }
 
   if (exists $unsupported_packages{$name}) {
-    $c->{ended} = 1;
+    $c->{found_unsupported_package} = $name;
   }
 }
 
 sub _require {
   my ($c, $rstr, $tokens) = @_;
-_debug("REQUIRE TOKENS: ".(Data::Dump::dump($tokens))) if !!DEBUG;
+_debug("REQUIRE TOKENS: ".(Data::Dump::dump($tokens))) if DEBUG;
   shift @$tokens; # discard 'require' itself
 
   # TODO: see if the token is WORD or not?
   my $name_token = shift @$tokens or return;
   my $name = $name_token->[0];
-  return if !defined $name or ref $name or $name eq '';
+  if (ref $name) {
+    $name = $name->[0];
+    return if $name =~ /\.pl$/i;
+
+    $name =~ s|/|::|g;
+    $name =~ s|\.pm$||i;
+  }
+  return if !defined $name or $name eq '';
 
   my $c1 = substr($name, 0, 1);
   if ($c1 eq '5') {
-    $c->add_recommendation(perl => $name);
+    $c->add_conditional(perl => $name);
     return;
   }
   if ($c1 eq 'v') {
     my $c2 = substr($name, 1, 1);
     if ($c2 eq '5') {
-      $c->add_recommendation(perl => $name);
+      $c->add_conditional(perl => $name);
       return;
     }
     if ($c2 eq '6') {
@@ -1893,15 +2069,15 @@ _debug("REQUIRE TOKENS: ".(Data::Dump::dump($tokens))) if !!DEBUG;
       return;
     }
   }
-  if ($name =~ /\A(\w|::)+\z/) {
-    $c->add_recommendation($name => 0);
+  if (is_module_name($name)) {
+    $c->add_conditional($name => 0);
     return;
   }
 }
 
 sub _no {
   my ($c, $rstr, $tokens) = @_;
-_debug("NO TOKENS: ".(Data::Dump::dump($tokens))) if !!DEBUG;
+_debug("NO TOKENS: ".(Data::Dump::dump($tokens))) if DEBUG;
   shift @$tokens; # discard 'no' itself
 
   # TODO: see if the token is WORD or not?
@@ -1943,267 +2119,10 @@ _debug("NO TOKENS: ".(Data::Dump::dump($tokens))) if !!DEBUG;
 
   if ($c->has_callback_for(no => $name)) {
     eval { $c->run_callback_for(no => $name, $tokens) };
-    warn $@ if $@;
+    warn "Callback Error: $@" if $@;
     return;
   }
 }
-
-sub _keywords {(
-    '__FILE__' => 1,
-    '__LINE__' => 2,
-    '__PACKAGE__' => 3,
-    '__DATA__' => 4,
-    '__END__' => 5,
-    '__SUB__' => 6,
-    AUTOLOAD => 7,
-    BEGIN => 8,
-    UNITCHECK => 9,
-    DESTROY => 10,
-    END => 11,
-    INIT => 12,
-    CHECK => 13,
-    abs => 14,
-    accept => 15,
-    alarm => 16,
-    and => 17,
-    atan2 => 18,
-    bind => 19,
-    binmode => 20,
-    bless => 21,
-    break => 22,
-    caller => 23,
-    chdir => 24,
-    chmod => 25,
-    chomp => 26,
-    chop => 27,
-    chown => 28,
-    chr => 29,
-    chroot => 30,
-    close => 31,
-    closedir => 32,
-    cmp => 33,
-    connect => 34,
-    continue => 35,
-    cos => 36,
-    crypt => 37,
-    dbmclose => 38,
-    dbmopen => 39,
-    default => 40,
-    defined => 41,
-    delete => 42,
-    die => 43,
-    do => 44,
-    dump => 45,
-    each => 46,
-    else => 47,
-    elsif => 48,
-    endgrent => 49,
-    endhostent => 50,
-    endnetent => 51,
-    endprotoent => 52,
-    endpwent => 53,
-    endservent => 54,
-    eof => 55,
-    eq => 56,
-    eval => 57,
-    evalbytes => 58,
-    exec => 59,
-    exists => 60,
-    exit => 61,
-    exp => 62,
-    fc => 63,
-    fcntl => 64,
-    fileno => 65,
-    flock => 66,
-    for => 67,
-    foreach => 68,
-    fork => 69,
-    format => 70,
-    formline => 71,
-    ge => 72,
-    getc => 73,
-    getgrent => 74,
-    getgrgid => 75,
-    getgrnam => 76,
-    gethostbyaddr => 77,
-    gethostbyname => 78,
-    gethostent => 79,
-    getlogin => 80,
-    getnetbyaddr => 81,
-    getnetbyname => 82,
-    getnetent => 83,
-    getpeername => 84,
-    getpgrp => 85,
-    getppid => 86,
-    getpriority => 87,
-    getprotobyname => 88,
-    getprotobynumber => 89,
-    getprotoent => 90,
-    getpwent => 91,
-    getpwnam => 92,
-    getpwuid => 93,
-    getservbyname => 94,
-    getservbyport => 95,
-    getservent => 96,
-    getsockname => 97,
-    getsockopt => 98,
-    given => 99,
-    glob => 100,
-    gmtime => 101,
-    goto => 102,
-    grep => 103,
-    gt => 104,
-    hex => 105,
-    if => 106,
-    index => 107,
-    int => 108,
-    ioctl => 109,
-    join => 110,
-    keys => 111,
-    kill => 112,
-    last => 113,
-    lc => 114,
-    lcfirst => 115,
-    le => 116,
-    length => 117,
-    link => 118,
-    listen => 119,
-    local => 120,
-    localtime => 121,
-    lock => 122,
-    log => 123,
-    lstat => 124,
-    lt => 125,
-    m => 126,
-    map => 127,
-    mkdir => 128,
-    msgctl => 129,
-    msgget => 130,
-    msgrcv => 131,
-    msgsnd => 132,
-    my => 133,
-    ne => 134,
-    next => 135,
-    no => 136,
-    not => 137,
-    oct => 138,
-    open => 139,
-    opendir => 140,
-    or => 141,
-    ord => 142,
-    our => 143,
-    pack => 144,
-    package => 145,
-    pipe => 146,
-    pop => 147,
-    pos => 148,
-    print => 149,
-    printf => 150,
-    prototype => 151,
-    push => 152,
-    q => 153,
-    qq => 154,
-    qr => 155,
-    quotemeta => 156,
-    qw => 157,
-    qx => 158,
-    rand => 159,
-    read => 160,
-    readdir => 161,
-    readline => 162,
-    readlink => 163,
-    readpipe => 164,
-    recv => 165,
-    redo => 166,
-    ref => 167,
-    rename => 168,
-    require => 169,
-    reset => 170,
-    return => 171,
-    reverse => 172,
-    rewinddir => 173,
-    rindex => 174,
-    rmdir => 175,
-    s => 176,
-    say => 177,
-    scalar => 178,
-    seek => 179,
-    seekdir => 180,
-    select => 181,
-    semctl => 182,
-    semget => 183,
-    semop => 184,
-    send => 185,
-    setgrent => 186,
-    sethostent => 187,
-    setnetent => 188,
-    setpgrp => 189,
-    setpriority => 190,
-    setprotoent => 191,
-    setpwent => 192,
-    setservent => 193,
-    setsockopt => 194,
-    shift => 195,
-    shmctl => 196,
-    shmget => 197,
-    shmread => 198,
-    shmwrite => 199,
-    shutdown => 200,
-    sin => 201,
-    sleep => 202,
-    socket => 203,
-    socketpair => 204,
-    sort => 205,
-    splice => 206,
-    split => 207,
-    sprintf => 208,
-    sqrt => 209,
-    srand => 210,
-    stat => 211,
-    state => 212,
-    study => 213,
-    sub => 214,
-    substr => 215,
-    symlink => 216,
-    syscall => 217,
-    sysopen => 218,
-    sysread => 219,
-    sysseek => 220,
-    system => 221,
-    syswrite => 222,
-    tell => 223,
-    telldir => 224,
-    tie => 225,
-    tied => 226,
-    time => 227,
-    times => 228,
-    tr => 229,
-    truncate => 230,
-    uc => 231,
-    ucfirst => 232,
-    umask => 233,
-    undef => 234,
-    unless => 235,
-    unlink => 236,
-    unpack => 237,
-    unshift => 238,
-    untie => 239,
-    until => 240,
-    use => 241,
-    utime => 242,
-    values => 243,
-    vec => 244,
-    wait => 245,
-    waitpid => 246,
-    wantarray => 247,
-    warn => 248,
-    when => 249,
-    while => 250,
-    write => 251,
-    x => 252,
-    xor => 253,
-    y => 254 || 255,
-)}
 
 1;
 

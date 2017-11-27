@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 10 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Neovim/RPC.pm',
@@ -14,11 +14,15 @@ my @module_files = (
     'Neovim/RPC/API/AutoDiscover.pm',
     'Neovim/RPC/API/Command.pm',
     'Neovim/RPC/Plugin.pm',
+    'Neovim/RPC/Plugin/Echo.pm',
     'Neovim/RPC/Plugin/FileToPackageName.pm',
+    'Neovim/RPC/Plugin/FlipOperator.pm',
     'Neovim/RPC/Plugin/LoadPlugin.pm'
 );
 
-
+my @scripts = (
+    'bin/nvimx.pl'
+);
 
 # no fake home requested
 
@@ -48,6 +52,31 @@ for my $lib (@module_files)
         push @warnings, @_warnings;
     }
 }
+
+foreach my $file (@scripts)
+{ SKIP: {
+    open my $fh, '<', $file or warn("Unable to open $file: $!"), next;
+    my $line = <$fh>;
+
+    close $fh and skip("$file isn't perl", 1) unless $line =~ /^#!\s*(?:\S*perl\S*)((?:\s+-\w*)*)(?:\s*#.*)?$/;
+    my @flags = $1 ? split(' ', $1) : ();
+
+    my $stderr = IO::Handle->new;
+
+    my $pid = open3($stdin, '>&STDERR', $stderr, $^X, $inc_switch, @flags, '-c', $file);
+    binmode $stderr, ':crlf' if $^O eq 'MSWin32';
+    my @_warnings = <$stderr>;
+    waitpid($pid, 0);
+    is($?, 0, "$file compiled ok");
+
+   # in older perls, -c output is simply the file portion of the path being tested
+    if (@_warnings = grep { !/\bsyntax OK$/ }
+        grep { chomp; $_ ne (File::Spec->splitpath($file))[2] } @_warnings)
+    {
+        warn @_warnings;
+        push @warnings, @_warnings;
+    }
+} }
 
 
 

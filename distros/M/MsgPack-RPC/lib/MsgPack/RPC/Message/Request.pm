@@ -1,39 +1,55 @@
 package MsgPack::RPC::Message::Request;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: a MessagePack-RPC request
-$MsgPack::RPC::Message::Request::VERSION = '1.0.1';
+$MsgPack::RPC::Message::Request::VERSION = '2.0.0';
 
 use strict;
 use warnings;
 
+use MsgPack::RPC::Message::Response;
+
 use Moose;
+use MooseX::MungeHas 'is_ro';
+
+extends 'MsgPack::RPC::Message::Notification';
 
 use Promises qw/ deferred /;
 
-extends 'MsgPack::RPC::Message';
+my $ID = 0;
 
-has message_id => (
+has id => (
     is => 'ro',
+    isa => 'Int',
+    lazy => 1,
+    default => sub { ++$ID },
 );
 
-has response => (
-    is => 'ro',
-    default => sub {
-        my $self = shift;
-        my $deferred = deferred;
+sub response {
+    my $self = shift;
+    
+    MsgPack::RPC::Message::Response->new(
+        id => $self->id,
+        result => shift,
+    );
+}
 
-        $deferred->then(
-            sub{ $self->emitter->response($self->message_id,shift) },
-            sub{ $self->emitter->response_error($self->message_id,shift) },
-        );
+sub response_error {
+    my $self = shift;
+    
+    MsgPack::RPC::Message::Response->new(
+        id => $self->id,
+        error => shift,
+    );
+}
 
-        $deferred;
-    },
-    handles => {
-        resp  => 'resolve',
-        error => 'reject',
-    }
-);
+sub is_request { 1}
+sub is_notification { 0}
+
+sub pack {
+    my $self = shift;
+    
+    return [ 0, $self->id, $self->method, $self->params ];
+}
 
 1;
 
@@ -49,7 +65,7 @@ MsgPack::RPC::Message::Request - a MessagePack-RPC request
 
 =head1 VERSION
 
-version 1.0.1
+version 2.0.0
 
 =head1 SYNOPSIS
 
@@ -97,7 +113,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Yanick Champoux.
+This software is copyright (c) 2017, 2016, 2015 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

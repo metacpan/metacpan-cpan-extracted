@@ -1131,3 +1131,9 @@ Revision history for App::MFILE::WWW
 - js: core/populate: handle undefined populateArray a little less stupidly
 - js: core/init2: do not clobber miniMenu objects
 
+0.176 2017-11-27 11:22 CET
+- js: core/html: unify usage of "&nbsp;" in dmenu and miniMenu; populate
+  mainarea with a placeholder
+- build/ops: drop older versions of jquery, qunit, requirejs
+- js: core/ajax: refactor; logout if session expires; always clear result line
+

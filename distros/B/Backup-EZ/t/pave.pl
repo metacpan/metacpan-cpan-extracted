@@ -17,6 +17,7 @@ system("mkdir -p $data_dir/dir1");
 my $frg = File::RandomGenerator->new(
     root_dir => "$data_dir/dir1",
     unlink   => 0,
+    depth => 2,
 );
 $frg->generate;
 

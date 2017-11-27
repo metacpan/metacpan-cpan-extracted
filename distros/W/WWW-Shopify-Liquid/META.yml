@@ -15,13 +15,95 @@ name: WWW-Shopify-Liquid
 provides:
   WWW::Shopify::Liquid:
     file: lib/WWW/Shopify/Liquid.pm
-    version: '0.06'
+    version: '0.07'
+  WWW::Shopify::Liquid::Analyzer:
+    file: lib/WWW/Shopify/Liquid/Analyzer.pm
+  WWW::Shopify::Liquid::Analyzer::Entity:
+    file: lib/WWW/Shopify/Liquid/Analyzer.pm
   WWW::Shopify::Liquid::Beautifier:
     file: lib/WWW/Shopify/Liquid/Beautifier.pm
+  WWW::Shopify::Liquid::Debugger:
+    file: lib/WWW/Shopify/Liquid/Debugger.pm
+  WWW::Shopify::Liquid::Debugger::Breakpoint:
+    file: lib/WWW/Shopify/Liquid/Debugger.pm
+  WWW::Shopify::Liquid::Dialect:
+    file: lib/WWW/Shopify/Liquid/Dialect.pm
   WWW::Shopify::Liquid::Dialect::Shopify:
     file: lib/WWW/Shopify/Liquid/Dialect/Shopify.pm
+  WWW::Shopify::Liquid::Dialect::Shopify::Filter::AssetUrl:
+    file: lib/WWW/Shopify/Liquid/Dialect/Shopify/Filter/AssetUrl.pm
+  WWW::Shopify::Liquid::Dialect::Shopify::Filter::CollectionImgUrl:
+    file: lib/WWW/Shopify/Liquid/Dialect/Shopify/Filter/CollectionImgUrl.pm
+  WWW::Shopify::Liquid::Dialect::Shopify::Filter::CustomerLoginLink:
+    file: lib/WWW/Shopify/Liquid/Dialect/Shopify/Filter/CustomerLoginLink.pm
+  WWW::Shopify::Liquid::Dialect::Shopify::Filter::DefaultErrors:
+    file: lib/WWW/Shopify/Liquid/Dialect/Shopify/Filter/DefaultErrors.pm
+  WWW::Shopify::Liquid::Dialect::Shopify::Filter::DefaultPagination:
+    file: lib/WWW/Shopify/Liquid/Dialect/Shopify/Filter/DefaultPagination.pm
+  WWW::Shopify::Liquid::Dialect::Shopify::Filter::Handle:
+    file: lib/WWW/Shopify/Liquid/Dialect/Shopify/Filter/Handle.pm
+  WWW::Shopify::Liquid::Dialect::Shopify::Filter::Handleize:
+    file: lib/WWW/Shopify/Liquid/Dialect/Shopify/Filter/Handleize.pm
+  WWW::Shopify::Liquid::Dialect::Shopify::Filter::LinkToAddTag:
+    file: lib/WWW/Shopify/Liquid/Dialect/Shopify/Filter/LinkToAddTag.pm
+  WWW::Shopify::Liquid::Dialect::Shopify::Filter::LinkToRemoveTag:
+    file: lib/WWW/Shopify/Liquid/Dialect/Shopify/Filter/LinkToRemoveTag.pm
+  WWW::Shopify::Liquid::Dialect::Shopify::Filter::LinkToTag:
+    file: lib/WWW/Shopify/Liquid/Dialect/Shopify/Filter/LinkToTag.pm
+  WWW::Shopify::Liquid::Dialect::Shopify::Filter::LinkToType:
+    file: lib/WWW/Shopify/Liquid/Dialect/Shopify/Filter/LinkToType.pm
+  WWW::Shopify::Liquid::Dialect::Shopify::Filter::LinkToVendor:
+    file: lib/WWW/Shopify/Liquid/Dialect/Shopify/Filter/LinkToVendor.pm
+  WWW::Shopify::Liquid::Dialect::Shopify::Filter::Money:
+    file: lib/WWW/Shopify/Liquid/Dialect/Shopify/Filter/Money.pm
+  WWW::Shopify::Liquid::Dialect::Shopify::Filter::MoneyWithCurrency:
+    file: lib/WWW/Shopify/Liquid/Dialect/Shopify/Filter/MoneyWithCurrency.pm
+  WWW::Shopify::Liquid::Dialect::Shopify::Filter::MoneyWithoutCurrency:
+    file: lib/WWW/Shopify/Liquid/Dialect/Shopify/Filter/MoneyWithoutCurrency.pm
+  WWW::Shopify::Liquid::Dialect::Shopify::Filter::MoneyWithoutTrailingZeros:
+    file: lib/WWW/Shopify/Liquid/Dialect/Shopify/Filter/MoneyWithoutTrailingZeros.pm
+  WWW::Shopify::Liquid::Dialect::Shopify::Filter::ProductImgUrl:
+    file: lib/WWW/Shopify/Liquid/Dialect/Shopify/Filter/ProductImgUrl.pm
+  WWW::Shopify::Liquid::Dialect::Shopify::Filter::ShopifyAssetUrl:
+    file: lib/WWW/Shopify/Liquid/Dialect/Shopify/Filter/ShopifyAssetUrl.pm
+  WWW::Shopify::Liquid::Dialect::Shopify::Filter::T:
+    file: lib/WWW/Shopify/Liquid/Dialect/Shopify/Filter/T.pm
+  WWW::Shopify::Liquid::Dialect::Shopify::Filter::ThemeUrl:
+    file: lib/WWW/Shopify/Liquid/Dialect/Shopify/Filter/ThemeUrl.pm
+  WWW::Shopify::Liquid::Dialect::Shopify::Filter::UrlForProduct:
+    file: lib/WWW/Shopify/Liquid/Dialect/Shopify/Filter/UrlForProduct.pm
+  WWW::Shopify::Liquid::Dialect::Shopify::Filter::UrlForType:
+    file: lib/WWW/Shopify/Liquid/Dialect/Shopify/Filter/UrlForType.pm
+  WWW::Shopify::Liquid::Dialect::Shopify::Filter::UrlForVendor:
+    file: lib/WWW/Shopify/Liquid/Dialect/Shopify/Filter/UrlForVendor.pm
+  WWW::Shopify::Liquid::Dialect::Shopify::Tag::Layout:
+    file: lib/WWW/Shopify/Liquid/Dialect/Shopify/Tag/Layout.pm
+  WWW::Shopify::Liquid::Dialect::Web:
+    file: lib/WWW/Shopify/Liquid/Dialect/Web.pm
+  WWW::Shopify::Liquid::Dialect::Web::Filter::EscapeCSS:
+    file: lib/WWW/Shopify/Liquid/Dialect/Web/Filter/EscapeCSS.pm
+  WWW::Shopify::Liquid::Dialect::Web::Filter::EscapeHTML:
+    file: lib/WWW/Shopify/Liquid/Dialect/Web/Filter/EscapeHTML.pm
+  WWW::Shopify::Liquid::Dialect::Web::Filter::EscapeJS:
+    file: lib/WWW/Shopify/Liquid/Dialect/Web/Filter/EscapeJS.pm
+  WWW::Shopify::Liquid::Dialect::Web::Filter::LinkTo:
+    file: lib/WWW/Shopify/Liquid/Dialect/Web/Filter/LinkTo.pm
+  WWW::Shopify::Liquid::Dialect::Web::Filter::ScriptTag:
+    file: lib/WWW/Shopify/Liquid/Dialect/Web/Filter/ScriptTag.pm
+  WWW::Shopify::Liquid::Dialect::Web::Filter::StylesheetTag:
+    file: lib/WWW/Shopify/Liquid/Dialect/Web/Filter/StylesheetTag.pm
+  WWW::Shopify::Liquid::Dialect::Web::Filter::UrlEscape:
+    file: lib/WWW/Shopify/Liquid/Dialect/Web/Filter/UrlEscape.pm
+  WWW::Shopify::Liquid::Dialect::Web::Filter::UrlEscapeParam:
+    file: lib/WWW/Shopify/Liquid/Dialect/Web/Filter/UrlEscapeParam.pm
+  WWW::Shopify::Liquid::Dialect::Web::Tag::Form:
+    file: lib/WWW/Shopify/Liquid/Dialect/Web/Tag/Form.pm
+  WWW::Shopify::Liquid::Dialect::Web::Tag::JavascriptString:
+    file: lib/WWW/Shopify/Liquid/Dialect/Web/Tag/JavascriptString.pm
+  WWW::Shopify::Liquid::Dialect::Web::Tag::Tablerow:
+    file: lib/WWW/Shopify/Liquid/Dialect/Web/Tag/Tablerow.pm
   WWW::Shopify::Liquid::Element:
-    file: lib/WWW/Shopify/Liquid.pm
+    file: lib/WWW/Shopify/Liquid/Element.pm
   WWW::Shopify::Liquid::Exception:
     file: lib/WWW/Shopify/Liquid/Exception.pm
   WWW::Shopify::Liquid::Exception::Control:
@@ -29,6 +111,8 @@ provides:
   WWW::Shopify::Liquid::Exception::Control::Break:
     file: lib/WWW/Shopify/Liquid/Exception.pm
   WWW::Shopify::Liquid::Exception::Control::Continue:
+    file: lib/WWW/Shopify/Liquid/Exception.pm
+  WWW::Shopify::Liquid::Exception::Control::Pause:
     file: lib/WWW/Shopify/Liquid/Exception.pm
   WWW::Shopify::Liquid::Exception::Lexer:
     file: lib/WWW/Shopify/Liquid/Exception.pm
@@ -38,6 +122,8 @@ provides:
     file: lib/WWW/Shopify/Liquid/Exception.pm
   WWW::Shopify::Liquid::Exception::Lexer::UnbalancedBrace:
     file: lib/WWW/Shopify/Liquid/Exception.pm
+  WWW::Shopify::Liquid::Exception::Lexer::UnbalancedControlTag:
+    file: lib/WWW/Shopify/Liquid/Exception.pm
   WWW::Shopify::Liquid::Exception::Lexer::UnbalancedDoubleQuote:
     file: lib/WWW/Shopify/Liquid/Exception.pm
   WWW::Shopify::Liquid::Exception::Lexer::UnbalancedLexingHalt:
@@ -45,8 +131,6 @@ provides:
   WWW::Shopify::Liquid::Exception::Lexer::UnbalancedOutputTag:
     file: lib/WWW/Shopify/Liquid/Exception.pm
   WWW::Shopify::Liquid::Exception::Lexer::UnbalancedSingleQuote:
-    file: lib/WWW/Shopify/Liquid/Exception.pm
-  WWW::Shopify::Liquid::Exception::Lexer::UnbalancedTag:
     file: lib/WWW/Shopify/Liquid/Exception.pm
   WWW::Shopify::Liquid::Exception::Optimizer:
     file: lib/WWW/Shopify/Liquid/Exception.pm
@@ -70,7 +154,11 @@ provides:
     file: lib/WWW/Shopify/Liquid/Exception.pm
   WWW::Shopify::Liquid::Exception::Renderer::Arguments:
     file: lib/WWW/Shopify/Liquid/Exception.pm
+  WWW::Shopify::Liquid::Exception::Renderer::Forbidden:
+    file: lib/WWW/Shopify/Liquid/Exception.pm
   WWW::Shopify::Liquid::Exception::Renderer::Unimplemented:
+    file: lib/WWW/Shopify/Liquid/Exception.pm
+  WWW::Shopify::Liquid::Exception::Renderer::Wrapped:
     file: lib/WWW/Shopify/Liquid/Exception.pm
   WWW::Shopify::Liquid::Exception::Security:
     file: lib/WWW/Shopify/Liquid/Security.pm
@@ -82,18 +170,14 @@ provides:
     file: lib/WWW/Shopify/Liquid/Filter/Abs.pm
   WWW::Shopify::Liquid::Filter::Append:
     file: lib/WWW/Shopify/Liquid/Filter/Append.pm
-  WWW::Shopify::Liquid::Filter::AssetUrl:
-    file: lib/WWW/Shopify/Liquid/Filter/AssetUrl.pm
   WWW::Shopify::Liquid::Filter::Camelize:
     file: lib/WWW/Shopify/Liquid/Filter/Camelize.pm
   WWW::Shopify::Liquid::Filter::Capitalize:
     file: lib/WWW/Shopify/Liquid/Filter/Capitalize.pm
   WWW::Shopify::Liquid::Filter::Ceil:
     file: lib/WWW/Shopify/Liquid/Filter/Ceil.pm
-  WWW::Shopify::Liquid::Filter::CollectionImgUrl:
-    file: lib/WWW/Shopify/Liquid/Filter/CollectionImgUrl.pm
-  WWW::Shopify::Liquid::Filter::CustomerLoginLink:
-    file: lib/WWW/Shopify/Liquid/Filter/CustomerLoginLink.pm
+  WWW::Shopify::Liquid::Filter::CustomFilter:
+    file: lib/WWW/Shopify/Liquid/Tag/CreateFilter.pm
   WWW::Shopify::Liquid::Filter::Date:
     file: lib/WWW/Shopify/Liquid/Filter/Date.pm
   WWW::Shopify::Liquid::Filter::DateMath:
@@ -102,32 +186,32 @@ provides:
     file: lib/WWW/Shopify/Liquid/Filter/DateParse.pm
   WWW::Shopify::Liquid::Filter::DateSetTimeZone:
     file: lib/WWW/Shopify/Liquid/Filter/DateSetTimeZone.pm
-  WWW::Shopify::Liquid::Filter::DefaultErrors:
-    file: lib/WWW/Shopify/Liquid/Filter/DefaultErrors.pm
-  WWW::Shopify::Liquid::Filter::DefaultPagination:
-    file: lib/WWW/Shopify/Liquid/Filter/DefaultPagination.pm
+  WWW::Shopify::Liquid::Filter::Decode:
+    file: lib/WWW/Shopify/Liquid/Filter/Decode.pm
+  WWW::Shopify::Liquid::Filter::DecodeBase64:
+    file: lib/WWW/Shopify/Liquid/Filter/DecodeBase64.pm
+  WWW::Shopify::Liquid::Filter::Default:
+    file: lib/WWW/Shopify/Liquid/Filter/Default.pm
   WWW::Shopify::Liquid::Filter::DividedBy:
     file: lib/WWW/Shopify/Liquid/Filter/DividedBy.pm
   WWW::Shopify::Liquid::Filter::Downcase:
     file: lib/WWW/Shopify/Liquid/Filter/Downcase.pm
+  WWW::Shopify::Liquid::Filter::Encode:
+    file: lib/WWW/Shopify/Liquid/Filter/Encode.pm
+  WWW::Shopify::Liquid::Filter::EncodeBase64:
+    file: lib/WWW/Shopify/Liquid/Filter/EncodeBase64.pm
   WWW::Shopify::Liquid::Filter::Escape:
     file: lib/WWW/Shopify/Liquid/Filter/Escape.pm
-  WWW::Shopify::Liquid::Filter::EscapeCSS:
-    file: lib/WWW/Shopify/Liquid/Filter/EscapeCSS.pm
-  WWW::Shopify::Liquid::Filter::EscapeHTML:
-    file: lib/WWW/Shopify/Liquid/Filter/EscapeHTML.pm
-  WWW::Shopify::Liquid::Filter::EscapeJS:
-    file: lib/WWW/Shopify/Liquid/Filter/EscapeJS.pm
+  WWW::Shopify::Liquid::Filter::Eval:
+    file: lib/WWW/Shopify/Liquid/Filter/Eval.pm
   WWW::Shopify::Liquid::Filter::First:
     file: lib/WWW/Shopify/Liquid/Filter/First.pm
   WWW::Shopify::Liquid::Filter::Floor:
     file: lib/WWW/Shopify/Liquid/Filter/Floor.pm
   WWW::Shopify::Liquid::Filter::Grep:
     file: lib/WWW/Shopify/Liquid/Filter/Grep.pm
-  WWW::Shopify::Liquid::Filter::Handle:
-    file: lib/WWW/Shopify/Liquid/Filter/Handle.pm
-  WWW::Shopify::Liquid::Filter::Handleize:
-    file: lib/WWW/Shopify/Liquid/Filter/Handleize.pm
+  WWW::Shopify::Liquid::Filter::IReplace:
+    file: lib/WWW/Shopify/Liquid/Filter/IReplace.pm
   WWW::Shopify::Liquid::Filter::ImgTag:
     file: lib/WWW/Shopify/Liquid/Filter/ImgTag.pm
   WWW::Shopify::Liquid::Filter::IsArray:
@@ -144,36 +228,20 @@ provides:
     file: lib/WWW/Shopify/Liquid/Filter/Keys.pm
   WWW::Shopify::Liquid::Filter::Last:
     file: lib/WWW/Shopify/Liquid/Filter/Last.pm
-  WWW::Shopify::Liquid::Filter::LinkTo:
-    file: lib/WWW/Shopify/Liquid/Filter/LinkTo.pm
-  WWW::Shopify::Liquid::Filter::LinkToAddTag:
-    file: lib/WWW/Shopify/Liquid/Filter/LinkToAddTag.pm
-  WWW::Shopify::Liquid::Filter::LinkToRemoveTag:
-    file: lib/WWW/Shopify/Liquid/Filter/LinkToRemoveTag.pm
-  WWW::Shopify::Liquid::Filter::LinkToTag:
-    file: lib/WWW/Shopify/Liquid/Filter/LinkToTag.pm
-  WWW::Shopify::Liquid::Filter::LinkToType:
-    file: lib/WWW/Shopify/Liquid/Filter/LinkToType.pm
-  WWW::Shopify::Liquid::Filter::LinkToVendor:
-    file: lib/WWW/Shopify/Liquid/Filter/LinkToVendor.pm
   WWW::Shopify::Liquid::Filter::Lstrip:
     file: lib/WWW/Shopify/Liquid/Filter/Lstrip.pm
   WWW::Shopify::Liquid::Filter::MD5:
     file: lib/WWW/Shopify/Liquid/Filter/MD5.pm
   WWW::Shopify::Liquid::Filter::Map:
     file: lib/WWW/Shopify/Liquid/Filter/Map.pm
+  WWW::Shopify::Liquid::Filter::Max:
+    file: lib/WWW/Shopify/Liquid/Filter/Max.pm
   WWW::Shopify::Liquid::Filter::Megumin:
     file: lib/WWW/Shopify/Liquid/Filter/Megumin.pm
+  WWW::Shopify::Liquid::Filter::Min:
+    file: lib/WWW/Shopify/Liquid/Filter/Min.pm
   WWW::Shopify::Liquid::Filter::Minus:
     file: lib/WWW/Shopify/Liquid/Filter/Minus.pm
-  WWW::Shopify::Liquid::Filter::Money:
-    file: lib/WWW/Shopify/Liquid/Filter/Money.pm
-  WWW::Shopify::Liquid::Filter::MoneyWithCurrency:
-    file: lib/WWW/Shopify/Liquid/Filter/MoneyWithCurrency.pm
-  WWW::Shopify::Liquid::Filter::MoneyWithoutCurrency:
-    file: lib/WWW/Shopify/Liquid/Filter/MoneyWithoutCurrency.pm
-  WWW::Shopify::Liquid::Filter::MoneyWithoutTrailingZeros:
-    file: lib/WWW/Shopify/Liquid/Filter/MoneyWithoutTrailingZeros.pm
   WWW::Shopify::Liquid::Filter::NewlineToBr:
     file: lib/WWW/Shopify/Liquid/Filter/NewlineToBr.pm
   WWW::Shopify::Liquid::Filter::Pluralize:
@@ -182,22 +250,18 @@ provides:
     file: lib/WWW/Shopify/Liquid/Filter/Plus.pm
   WWW::Shopify::Liquid::Filter::Prepend:
     file: lib/WWW/Shopify/Liquid/Filter/Prepend.pm
-  WWW::Shopify::Liquid::Filter::ProductImgUrl:
-    file: lib/WWW/Shopify/Liquid/Filter/ProductImgUrl.pm
   WWW::Shopify::Liquid::Filter::Remove:
     file: lib/WWW/Shopify/Liquid/Filter/Remove.pm
   WWW::Shopify::Liquid::Filter::RemoveFirst:
     file: lib/WWW/Shopify/Liquid/Filter/RemoveFirst.pm
   WWW::Shopify::Liquid::Filter::Replace:
     file: lib/WWW/Shopify/Liquid/Filter/Replace.pm
+  WWW::Shopify::Liquid::Filter::Reverse:
+    file: lib/WWW/Shopify/Liquid/Filter/Reverse.pm
   WWW::Shopify::Liquid::Filter::Round:
     file: lib/WWW/Shopify/Liquid/Filter/Round.pm
   WWW::Shopify::Liquid::Filter::Rstrip:
     file: lib/WWW/Shopify/Liquid/Filter/Rstrip.pm
-  WWW::Shopify::Liquid::Filter::ScriptTag:
-    file: lib/WWW/Shopify/Liquid/Filter/ScriptTag.pm
-  WWW::Shopify::Liquid::Filter::ShopifyAssetUrl:
-    file: lib/WWW/Shopify/Liquid/Filter/ShopifyAssetUrl.pm
   WWW::Shopify::Liquid::Filter::Size:
     file: lib/WWW/Shopify/Liquid/Filter/Size.pm
   WWW::Shopify::Liquid::Filter::Slice:
@@ -212,14 +276,8 @@ provides:
     file: lib/WWW/Shopify/Liquid/Filter/StripHtml.pm
   WWW::Shopify::Liquid::Filter::StripNewlines:
     file: lib/WWW/Shopify/Liquid/Filter/StripNewlines.pm
-  WWW::Shopify::Liquid::Filter::StylesheetTag:
-    file: lib/WWW/Shopify/Liquid/Filter/StylesheetTag.pm
   WWW::Shopify::Liquid::Filter::Sum:
     file: lib/WWW/Shopify/Liquid/Filter/Sum.pm
-  WWW::Shopify::Liquid::Filter::T:
-    file: lib/WWW/Shopify/Liquid/Filter/T.pm
-  WWW::Shopify::Liquid::Filter::ThemeUrl:
-    file: lib/WWW/Shopify/Liquid/Filter/ThemeUrl.pm
   WWW::Shopify::Liquid::Filter::Times:
     file: lib/WWW/Shopify/Liquid/Filter/Times.pm
   WWW::Shopify::Liquid::Filter::Truncate:
@@ -230,16 +288,10 @@ provides:
     file: lib/WWW/Shopify/Liquid/Filter.pm
   WWW::Shopify::Liquid::Filter::Upcase:
     file: lib/WWW/Shopify/Liquid/Filter/Upcase.pm
-  WWW::Shopify::Liquid::Filter::UrlEscape:
-    file: lib/WWW/Shopify/Liquid/Filter/UrlEscape.pm
-  WWW::Shopify::Liquid::Filter::UrlForProduct:
-    file: lib/WWW/Shopify/Liquid/Filter/UrlForProduct.pm
-  WWW::Shopify::Liquid::Filter::UrlForType:
-    file: lib/WWW/Shopify/Liquid/Filter/UrlForType.pm
-  WWW::Shopify::Liquid::Filter::UrlForVendor:
-    file: lib/WWW/Shopify/Liquid/Filter/UrlForVendor.pm
   WWW::Shopify::Liquid::Filter::Within:
     file: lib/WWW/Shopify/Liquid/Filter/Within.pm
+  WWW::Shopify::Liquid::Filter::WordWrap:
+    file: lib/WWW/Shopify/Liquid/Filter/WordWrap.pm
   WWW::Shopify::Liquid::Lexer:
     file: lib/WWW/Shopify/Liquid/Lexer.pm
   WWW::Shopify::Liquid::Operator:
@@ -305,11 +357,15 @@ provides:
   WWW::Shopify::Liquid::Parser:
     file: lib/WWW/Shopify/Liquid/Parser.pm
   WWW::Shopify::Liquid::Pipeline:
-    file: lib/WWW/Shopify/Liquid.pm
+    file: lib/WWW/Shopify/Liquid/Pipeline.pm
+  WWW::Shopify::Liquid::Precompiler:
+    file: lib/WWW/Shopify/Liquid/Precompiler.pm
   WWW::Shopify::Liquid::Renderer:
     file: lib/WWW/Shopify/Liquid/Renderer.pm
   WWW::Shopify::Liquid::Renderer::NoClone:
     file: lib/WWW/Shopify/Liquid/Renderer.pm
+  WWW::Shopify::Liquid::Resolver:
+    file: lib/WWW/Shopify/Liquid/Resolver.pm
   WWW::Shopify::Liquid::Security:
     file: lib/WWW/Shopify/Liquid/Security.pm
   WWW::Shopify::Liquid::Security::None:
@@ -330,6 +386,12 @@ provides:
     file: lib/WWW/Shopify/Liquid/Tag/Comment.pm
   WWW::Shopify::Liquid::Tag::Continue:
     file: lib/WWW/Shopify/Liquid/Tag/Continue.pm
+  WWW::Shopify::Liquid::Tag::CreateFilter:
+    file: lib/WWW/Shopify/Liquid/Tag/CreateFilter.pm
+  WWW::Shopify::Liquid::Tag::CreateTag:
+    file: lib/WWW/Shopify/Liquid/Tag/CreateTag.pm
+  WWW::Shopify::Liquid::Tag::CustomTag:
+    file: lib/WWW/Shopify/Liquid/Tag/CreateTag.pm
   WWW::Shopify::Liquid::Tag::Cycle:
     file: lib/WWW/Shopify/Liquid/Tag/Cycle.pm
   WWW::Shopify::Liquid::Tag::Decrement:
@@ -338,8 +400,6 @@ provides:
     file: lib/WWW/Shopify/Liquid/Tag/Enclosing.pm
   WWW::Shopify::Liquid::Tag::For:
     file: lib/WWW/Shopify/Liquid/Tag/For.pm
-  WWW::Shopify::Liquid::Tag::Form:
-    file: lib/WWW/Shopify/Liquid/Tag/Form.pm
   WWW::Shopify::Liquid::Tag::Free:
     file: lib/WWW/Shopify/Liquid/Tag/Free.pm
   WWW::Shopify::Liquid::Tag::If:
@@ -348,16 +408,16 @@ provides:
     file: lib/WWW/Shopify/Liquid/Tag/Include.pm
   WWW::Shopify::Liquid::Tag::Increment:
     file: lib/WWW/Shopify/Liquid/Tag/Increment.pm
-  WWW::Shopify::Liquid::Tag::Layout:
-    file: lib/WWW/Shopify/Liquid/Tag/Layout.pm
   WWW::Shopify::Liquid::Tag::Output:
-    file: lib/WWW/Shopify/Liquid/Tag.pm
+    file: lib/WWW/Shopify/Liquid/Tag/Output.pm
   WWW::Shopify::Liquid::Tag::Paginate:
     file: lib/WWW/Shopify/Liquid/Tag/Paginate.pm
   WWW::Shopify::Liquid::Tag::Raw:
     file: lib/WWW/Shopify/Liquid/Tag/Raw.pm
-  WWW::Shopify::Liquid::Tag::Tablerow:
-    file: lib/WWW/Shopify/Liquid/Tag/Tablerow.pm
+  WWW::Shopify::Liquid::Tag::RemoveKey:
+    file: lib/WWW/Shopify/Liquid/Tag/RemoveKey.pm
+  WWW::Shopify::Liquid::Tag::Return:
+    file: lib/WWW/Shopify/Liquid/Tag/Return.pm
   WWW::Shopify::Liquid::Tag::Unless:
     file: lib/WWW/Shopify/Liquid/Tag/Unless.pm
   WWW::Shopify::Liquid::Tag::Whitespace:
@@ -367,6 +427,8 @@ provides:
   WWW::Shopify::Liquid::Token::Array:
     file: lib/WWW/Shopify/Liquid/Lexer.pm
   WWW::Shopify::Liquid::Token::Bool:
+    file: lib/WWW/Shopify/Liquid/Lexer.pm
+  WWW::Shopify::Liquid::Token::FunctionCall:
     file: lib/WWW/Shopify/Liquid/Lexer.pm
   WWW::Shopify::Liquid::Token::Grouping:
     file: lib/WWW/Shopify/Liquid/Lexer.pm
@@ -408,13 +470,18 @@ requires:
   DateTime::Format::Strptime: '0'
   Devel::StackTrace: '0'
   Digest::MD5: '0'
+  File::Find: '0'
   File::Slurp: '0'
+  File::stat: '0'
   HTML::Entities: '0'
   JSON: '0'
   List::MoreUtils: '0'
   List::Util: '0'
   Module::Find: '0'
   Scalar::Util: '0'
+  Text::Unaccent::PurePerl: '0'
   URI::Escape: '0'
-version: '0.06'
+  perl: v5.12.5
+  re::engine::RE2: '0'
+version: '0.07'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

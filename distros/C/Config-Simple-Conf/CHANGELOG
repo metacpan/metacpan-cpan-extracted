@@ -1,3 +1,10 @@
+11/26/2017 v.2.003	Many documentation improvements
+			export @ARGV_ORIG
+			correctly prune @ARGV
+			update examples/test.pl script
+
+           v.2.002	Update
+
 05/23/2016 v.2.001	Disallow the 'global' section name.
 			For config files, key names should always be case insenstive
 

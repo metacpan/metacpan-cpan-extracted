@@ -4,7 +4,7 @@ Parse::Syslog::Line - Simple syslog line parser
 
 # VERSION
 
-version 4.0
+version 4.2
 
 # SYNOPSIS
 
@@ -82,8 +82,8 @@ Usage:
 
 ## DateParsing
 
-If this variable is set to 0 raw date will not be parsed further into components (datetime\_str date time epoch).
-Default is 1 (parsing enabled).
+If this variable is set to 0 raw date will not be parsed further into
+components (datetime\_str date time epoch).  Default is 1 (parsing enabled).
 
 Usage:
 
@@ -138,9 +138,16 @@ in your wanted format.
 
 **NOTE**: No further date processing will be done, you're on your own here.
 
+## HiResFmt
+
+Default is `%0.6f`, or microsecond resolution.  This variable only comes into
+play when the syslog date string contains a high resolution timestamp.  It
+defaults to using microsecond resolution.
+
 ## PruneRaw
 
-This variable defaults to 0, set to 1 to delete all keys in the return hash ending in "\_raw"
+This variable defaults to 0, set to 1 to delete all keys in the return hash
+ending in "\_raw"
 
 Usage:
 
@@ -148,7 +155,8 @@ Usage:
 
 ## PruneEmpty
 
-This variable defaults to 0, set to 1 to delete all keys in the return hash which are undefined.
+This variable defaults to 0, set to 1 to delete all keys in the return hash
+which are undefined.
 
 Usage:
 

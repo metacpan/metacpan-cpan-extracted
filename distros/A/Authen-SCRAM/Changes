@@ -1,5 +1,18 @@
 Revision history for Authen-SCRAM
 
+0.006     2017-11-22 10:45:58-05:00 America/New_York
+
+    [Added]
+
+    - Expensive digested password computation is cached in clients and
+      reused for future authentication where salt and iteration count
+      is the same.
+
+    [Fixed]
+
+    - Applies "stored strings" normalization when doing SASLprep,
+      as required by https://tools.ietf.org/html/rfc5802#section-2.2
+
 0.005     2014-10-15 17:30:07-04:00 America/New_York
 
     [Fixed]
